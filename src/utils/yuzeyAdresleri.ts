@@ -41,9 +41,10 @@ export interface AdresRotalari {
  * `Routes.category/product/products/brand` + `localizedHref` bileşiminin `adresUret` karşılığı.
  *
  * AÇIK kipte:
- *  - `category(kök, dal)` → iki seviyeli kanonik (`/tr/kategori/<kök>/<dal>`). Yalnız TEK slug verilen
- *    çağrı (çağıran üst kategoriyi bilmiyor) tek seviyeli adres üretir; sayfa katmanı dal ise iki
- *    seviyeliye tek 308 verir (Faz 3b-2, `kategoriSegmenti`). Üstü bilen çağıran İKİSİNİ verir.
+ *  - `category(kök, dal)` → TEK seviyeli kanonik (`/tr/kategori/<dal>`; SEO-35 B-1): dal verilmişse adres dalın kendi
+ *    slug'ıdır, üst slug'ı adrese girmez. Yalnız TEK slug verilen çağrı (çağıran üst kategoriyi bilmiyor) aynı
+ *    biçimi üretir (`/tr/kategori/<slug>`); slug yanlış dilde ya da büyük harfliyse sayfa katmanı tek 308 verir
+ *    (Faz 3b-2, `kategoriSegmenti`). İç içe adres hiçbir yüzeyde ÜRETİLMEZ.
  *  - `product(aile, sku)` → modelin kendi adresi (`/tr/urun/<aile>-p-<sku>`, `?sku=` YOK). Faz 2 öncesi
  *    modelin slug metni yok → metin olarak aile slug'ı (Faz 3b'deki `handleSelectVariant` ile aynı
  *    sözleşme; rota modeli SKU'dan çözer).
@@ -126,16 +127,17 @@ export function modelSecimiHedefi(
 /**
  * `Routes.category` için ÜST KATEGORİYİ ve DİLE GÖRE slug'ı bilen yüzeyin argümanları (REC-403).
  *
- * NİÇİN VAR: `adresRotalari().category(slug)` AÇIK kipte tek slug'ı kök sayar (`/tr/kategori/<slug>`).
- * Yüzey aslında bir DAL taşıyorsa (üstünü bilmeden) ya da kök slug'ı EN kanonik biçimde veriyorsa
- * (TR sayfada `fans`), ziyaretçi hedefe doğrudan değil, sayfa katmanının 308'i üzerinden bir fazla
- * sıçramayla varır (ölçüm 2026-09-29: TR'de çip `fans` → `/tr/kategori/fans` → 308 → `fanlar`).
+ * NİÇİN VAR: `adresRotalari().category(slug)` AÇIK kipte tek slug'ı olduğu gibi kullanır (`/tr/kategori/<slug>`).
+ * Yüzey kök slug'ını EN kanonik biçimde veriyorsa (TR sayfada `fans`), ziyaretçi hedefe doğrudan değil, sayfa
+ * katmanının 308'i üzerinden bir fazla sıçramayla varır (ölçüm 2026-09-29: TR'de çip `fans` →
+ * `/tr/kategori/fans` → 308 → `fanlar`). Dilin görünen slug'ı (`tam.slug`) bu yüzden ayrıca verilir.
  *
  * Kullanım: `const k = kategoriArgumanlari(…); Routes.category(k.slug, k.subSlug)`.
  *
  * ⭐KAPALIYKEN (bugün) `{ slug: bugunkuSlug }` döner: yüzeyin bugünkü tek slug çağrısı BİREBİR (yeni kod
  * yolu yok; `subSlug` tanımsız = `Routes.category(slug)`). AÇIKKEN üst biliniyorsa `{ slug: üst,
- * subSlug: dal }`, değilse `{ slug }`: kanonik adres, sıçramasız.
+ * subSlug: dal }`, değilse `{ slug }`: ikisi de AYNI tek segmentli kanonik adresi üretir (SEO-35 B-1: üst
+ * slug'ı adrese girmez); çift yalnız çağıranın bildiği bilgiyi taşır, sıçramasız.
  */
 export function kategoriArgumanlari(
   bugunkuSlug: string,
@@ -160,7 +162,8 @@ const bilgiMerkeziListe = (dil: AdresDili): string => `/${dil}/${BILGI_MERKEZI_B
  * çevrilir: `/tr/urun/x` ↔ `/en/products/x`, `/tr/urunler` ↔ `/en/products`, `/tr/kategori/…` ↔
  * `/en/category/…`, `/tr/markalar/x` ↔ `/en/brands/x` — yoksa dil değişince 404'e düşülürdü
  * (`/en/urun/x` rotası yok). Slug'lar AYNEN taşınır: kategori slug'ı dile göre farklıysa hedef sayfa
- * kanoniğine tek 308 verir (Faz 3b-2); aile/model slug'ı bugün iki dilde aynı.
+ * kanoniğine tek 308 verir (Faz 3b-2; kategori adresi tek segment olduğundan tek parça taşınır, SEO-35 B-1);
+ * aile/model slug'ı bugün iki dilde aynı.
  */
 export function dilDegistirYolu(
   pathname: string,

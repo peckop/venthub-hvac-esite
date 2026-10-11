@@ -21,10 +21,12 @@ import {
  * K3-b'nin `/tr/kategori/...` rotası aynı çekirdeği çağırır. Bu dosyada rota sınıfı + rota kararı kaldı.
  *
  * BAYRAK KAPALIYKEN (`ADRES_SEMASI_K3B=false`, bugün) davranış BİREBİR bugünkü (aşağıdaki `bugun*` dalları).
- * BAYRAK AÇIKKEN (plan §5 Faz 3 madde 1 + 5):
+ * BAYRAK AÇIKKEN (plan §5 Faz 3 madde 1 + 5; SEO-35 B-1):
  *  - TR: bu adres hiçbir durumda 200 dönmez; çözülebilen her slug (TR ya da EN biçimli, pasif dahil)
- *    `adresUret(…, 'tr')`'nin verdiği `/tr/kategori/...` adresine TEK 308; çözülemeyen → 404.
- *  - EN: kök adresi çizilir; tek seviyeli DAL adresi iki seviyeliye 308 (Y4); pasif → üst ya da ürünler.
+ *    `adresUret(…, 'tr')`'nin verdiği `/tr/kategori/<slug>` adresine TEK 308; çözülemeyen → 404.
+ *  - EN: kök de alt kategori de bu adreste ÇİZİLİR (kanonik adres tek segmenttir: `/en/category/<slug>`);
+ *    iç içe `/en/category/<üst>/<alt>` adresi `[subCategorySlug]` rotasında tek 308 ile buraya gelir;
+ *    pasif → aktif üst ya da ürünler.
  */
 
 /**
@@ -46,12 +48,10 @@ export async function generateStaticParams() {
     .eq('is_active', true)
 
   const categoriesList = (data || []) as { slug: string | null, metadata: unknown, parent_id: string | null }[]
-  // K3-b açıkken bu rotada içerik üreten tek adres EN KÖK adresidir (TR → /tr/kategori 308,
-  // EN dal → iki seviyeli 308); yönlendiren adresler önceden üretilmez (plan madde 13).
+  // K3-b açıkken bu rotada içerik üreten adresler EN kök ve EN alt kategori adresleridir (kanonik adres tek
+  // segment, SEO-35 B-1); TR adresi /tr/kategori'ye 308 verir ve yönlendiren adresler önceden üretilmez (plan madde 13).
   if (ADRES_SEMASI_K3B) {
-    return categoriesList
-      .filter((c) => !c.parent_id)
-      .map((c) => ({ lang: 'en', categorySlug: getLocalizedCategorySlug(c, 'en') }))
+    return categoriesList.map((c) => ({ lang: 'en', categorySlug: getLocalizedCategorySlug(c, 'en') }))
   }
   // Her dil için O DİLİN görünen slug'ı üretilir (tr → metadata.slug.tr, en → kanonik).
   return categoriesList.flatMap((c) => [
@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: Params) {
     // TR bu adreste hiç çizilmez (308) → üst veri yazılmaz. EN: çözüm kategori ise üst veri.
     if (lang !== 'en') return {}
     const cozum = await kategoriSegmentleriniCoz([categorySlug], 'en', kategoriBagimliliklari)
-    return cozum.tur === 'kategori' ? kategoriSayfasiUstVerisiK3b(lang, cozum.kategori, cozum.ust) : {}
+    return cozum.tur === 'kategori' ? kategoriSayfasiUstVerisiK3b(lang, cozum.kategori) : {}
   }
 
   preloadCategory(categorySlug)
@@ -85,8 +85,8 @@ export default async function Page({ params }: Params) {
     // Eski TR adresi → yeni TR adresine (istenen = null: her çözümde 308). EN yerinde kalır.
     const dil = lang === 'en' ? 'en' : 'tr'
     const istenen = dil === 'en' ? adresUret({ tur: 'kategori', kok: categorySlug }, 'en') : null
-    const { kategori, ust } = await kategoriRotasiniUygula([categorySlug], dil, istenen, kategoriBagimliliklari)
-    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={categorySlug} ust={ust} />
+    const { kategori } = await kategoriRotasiniUygula([categorySlug], dil, istenen, kategoriBagimliliklari)
+    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={categorySlug} />
   }
 
   preloadCategory(categorySlug)

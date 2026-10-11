@@ -12,7 +12,7 @@ import { aileYollari, kategoriYollari } from '../tazelemeYollari'
  * `/tr/urun/<slug>` olur, tazeleme yanlış yolu vurur, vitrin bayat kalır ve hiçbir test görmez.
  * ÖLÇMEDİĞİ: Next'in `revalidatePath`ının gerçekten önbelleği düşürmesi (yayın günü canlı ölçüm).
  */
-describe('INV-TAZELEME-YOL-1 — tazeleme yolları: aile ve kategori kökü iki şemada ve iki dilde; kategori dalı yalnız yeni şemada (bugünkü TR iki segmentli 308 yolu hariç, URN-7)', () => {
+describe('INV-TAZELEME-YOL-1 — tazeleme yolları: aile ve kategori (kök ve alt) iki şemada ve iki dilde; kategori adresi TEK segment, iç içe yol hiçbir şemada üretilmez (SEO-35 B-1, URN-7)', () => {
   it('aile: bugünkü ve yeni yol, TR ve EN', () => {
     expect(aileYollari('vortice-lineo-quiet').sort()).toEqual(
       [
@@ -30,28 +30,34 @@ describe('INV-TAZELEME-YOL-1 — tazeleme yolları: aile ve kategori kökü iki 
     )
   })
 
-  it('kategori dalı: yeni-şema üst/alt yolu üretilir; bugünkü TR iki segmentli 308 yolu üretilmez; tek segmentli alt yol durur (REC-205, URN-7)', () => {
+  it('kategori dalı (B-1): üst verilse de TEK segmentli alt yol iki şemada ve iki dilde üretilir; iç içe yollar üretilmez (REC-205, URN-7)', () => {
     const yollar = kategoriYollari(
       (d) => (d === 'tr' ? 'sessiz-kanal-fanlari' : 'quiet-duct-fans'),
       (d) => (d === 'tr' ? 'fanlar' : 'fans'),
     )
     expect(yollar).toEqual(
       expect.arrayContaining([
-        '/tr/kategori/fanlar/sessiz-kanal-fanlari',
-        '/en/category/fans/quiet-duct-fans',
+        '/tr/kategori/sessiz-kanal-fanlari',
+        '/en/category/quiet-duct-fans',
         '/tr/category/sessiz-kanal-fanlari',
       ]),
     )
-    // URN-7 (ölçüm 2026-10-01): bugünkü şemanın TR iki segmentli yolu bayrak kapalıyken yalnız 308'dir, önbelleği
-    // yok; tazelenmez. AYIRT EDİCİ iddia budur (`not.toContain` TR); EN iki segmentli yol yukarıdaki
-    // `arrayContaining` ile yeni-şema dalından zaten doğrulanıyor.
+    // İç içe yollar önbelleği olmayan 308'dir (URN-7 ölçümü 2026-10-01; B-1 sonrası yeni şemada da): üretilmez.
+    // AYIRT EDİCİ iddia budur: eski kod yeni şemada `/kategori/<üst>/<alt>` ve `/category/<üst>/<alt>` üretirdi.
     expect(yollar).not.toContain('/tr/category/fanlar/sessiz-kanal-fanlari')
+    expect(yollar).not.toContain('/tr/kategori/fanlar/sessiz-kanal-fanlari')
+    expect(yollar).not.toContain('/en/category/fans/quiet-duct-fans')
+    // Hiçbir yol iç içe değil: `/<dil>/<bölüm>/<slug>` tam üç parça.
+    expect(yollar.filter((y) => y.split('/').filter(Boolean).length !== 3)).toEqual([])
+    // Üst bilinmese de aynı küme (dal nesnesi tek segmentli adresi tekrar üretir, küme tekilleştirir).
+    const ustsuz = kategoriYollari((d) => (d === 'tr' ? 'sessiz-kanal-fanlari' : 'quiet-duct-fans'))
+    expect([...ustsuz].sort()).toEqual([...yollar].sort())
   })
 
-  it('INV-TAZELEME-YOL-3 — TR eski iki segmentli rota sayfa sınıfı ilan etmedi (ilan ederse yol listeye geri eklenmeli)', () => {
+  it('INV-TAZELEME-YOL-3 — iç içe rota sayfa sınıfı ilan etmedi (B-1: açık kipte de yalnız yönlendirir; ilan ederse bu kapı kırılır)', () => {
     // KORUDUĞU KUSUR: URN-7 `/<dil>/category/<üst>/<alt>` yolunu "önbelleği olmayan 308" diye tazelemiyor. Bu
     // yalnız o rota sayfa sınıfı (dynamic/revalidate/generateStaticParams/force-static) ilan etmediği sürece doğru.
-    // Faz 3-C ilan ederse bu test kırılır. Yorumlar atlanır (rota yorumda ilanı anlatıyor); yalnız kod taranır.
+    // Biri ilan eklerse bu test kırılır. Yorumlar atlanır (rota yorumda ilanı anlatıyor); yalnız kod taranır.
     const KOD_ILANI = /\b(?:export\s+const\s+(?:dynamic|revalidate)|generateStaticParams|force-static)\b/
     const yorumsuz = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
     const kaynak = fs.readFileSync(
@@ -60,7 +66,7 @@ describe('INV-TAZELEME-YOL-1 — tazeleme yolları: aile ve kategori kökü iki 
     )
     expect(
       yorumsuz(kaynak),
-      "Faz 3-C sayfa sınıfı ilan etti: TR eski iki segmentli yol tazeleme listesine geri eklenmeli (URN-7) — kategoriYollari'na `localizedHref` satırını geri koy ve bu kapıyı güncelle",
+      "İç içe kategori rotası sayfa sınıfı ilan etti: iç içe yol tazeleme listesine geri eklenmeli (URN-7) — kategoriYollari'na iç içe yolu geri koy ve bu kapıyı güncelle",
     ).not.toMatch(KOD_ILANI)
 
     // Sabotaj kanıtı: desen gerçek ilanlarda eşleşir, yorumdaki anlatımda eşleşmez (kapı boş geçmiyor).

@@ -60,13 +60,14 @@ function esle(harita: Awaited<ReturnType<typeof haritaKur>>, yol: string, dil: A
 
 describe('korozyon dalı: eski TR adres → yeni TR adres, TEK 308', () => {
   it.each([
-    ['/tr/category/asit-dayanikli-fanlar', '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar'], // tek seviyeli eski adres
-    ['/tr/category/fanlar/asit-dayanikli-fanlar', '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar'], // iki seviyeli eski adres
-    ['/tr/kategori/fanlar/asit-dayanikli-fanlar', '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar'], // yeni önek, eski slug
-    ['/en/category/asit-dayanikli-fanlar', '/en/category/fans/corrosion-and-acid-resistant-fans'], // EN önekinde TR slug: dile uygun yeni adres
+    // SEO-35 B-1: kanonik adres TEK segment — dalın üst slug'ı (`fanlar` / `fans`) adrese girmez.
+    ['/tr/category/asit-dayanikli-fanlar', '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar'], // tek seviyeli eski adres
+    ['/tr/category/fanlar/asit-dayanikli-fanlar', '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar'], // iki seviyeli eski adres
+    ['/tr/kategori/fanlar/asit-dayanikli-fanlar', '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar'], // yeni önek, eski slug
+    ['/en/category/asit-dayanikli-fanlar', '/en/category/corrosion-and-acid-resistant-fans'], // EN önekinde TR slug: dile uygun yeni adres
     // EN eski adres (kanonik EN slug da değişti): tek seviyeli ve iki seviyeli eski şema, yeni önek + eski slug.
-    ['/en/category/acid-resistant-fans', '/en/category/fans/corrosion-and-acid-resistant-fans'],
-    ['/en/category/fans/acid-resistant-fans', '/en/category/fans/corrosion-and-acid-resistant-fans'],
+    ['/en/category/acid-resistant-fans', '/en/category/corrosion-and-acid-resistant-fans'],
+    ['/en/category/fans/acid-resistant-fans', '/en/category/corrosion-and-acid-resistant-fans'],
   ])('%s → %s', async (yol, hedef) => {
     const harita = await haritaKur(true)
     const { sonuc, dilTespit } = esle(harita, yol)
@@ -77,34 +78,48 @@ describe('korozyon dalı: eski TR adres → yeni TR adres, TEK 308', () => {
   it('dilsiz eski TR adres: Türkçe slug olduğu için dil tespiti OLMADAN tek 308 (307 değil)', async () => {
     const harita = await haritaKur(true)
     const { sonuc, dilTespit } = esle(harita, '/category/asit-dayanikli-fanlar', 'en')
-    expect(sonuc).toEqual({ hedef: '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar', durum: 308 })
+    expect(sonuc).toEqual({ hedef: '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar', durum: 308 })
     expect(dilTespit).not.toHaveBeenCalled()
   })
 
   it('hedef kanoniktir: yeni adres kendine yönlenmez (zincir yok, ikinci sıçrama yok)', async () => {
     const harita = await haritaKur(true)
-    expect(esle(harita, '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar').sonuc).toBeNull()
-    expect(esle(harita, '/en/category/fans/corrosion-and-acid-resistant-fans').sonuc).toBeNull()
+    expect(esle(harita, '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar').sonuc).toBeNull()
+    expect(esle(harita, '/en/category/corrosion-and-acid-resistant-fans').sonuc).toBeNull()
+  })
+
+  it('(a) iç içe yeni adres (3-C iki seviyeli, EN iki seviyeli) tek sıçramada tek segmentli kanoniğe gider', async () => {
+    const harita = await haritaKur(true)
+    expect(esle(harita, '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar').sonuc).toEqual({
+      hedef: '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar',
+      durum: 308,
+    })
+    expect(esle(harita, '/en/category/fans/corrosion-and-acid-resistant-fans', 'en').sonuc).toEqual({
+      hedef: '/en/category/corrosion-and-acid-resistant-fans',
+      durum: 308,
+    })
   })
 
   it('yeni EN slug (corrosion-and-acid-resistant-fans) de eski şemadan tek hop çözülür', async () => {
     const harita = await haritaKur(true)
-    expect(esle(harita, '/en/category/corrosion-and-acid-resistant-fans', 'en').sonuc).toEqual({
-      hedef: '/en/category/fans/corrosion-and-acid-resistant-fans',
-      durum: 308,
+    // Eski EN dilsiz şema + yeni slug: ziyaretçi diline göre tek hop. Dil önekli hâli kanoniktir (satır yok).
+    expect(esle(harita, '/category/corrosion-and-acid-resistant-fans', 'en').sonuc).toEqual({
+      hedef: '/en/category/corrosion-and-acid-resistant-fans',
+      durum: 307,
     })
+    expect(esle(harita, '/en/category/corrosion-and-acid-resistant-fans', 'en').sonuc).toBeNull()
   })
 
   it('dilsiz eski EN slug (acid-resistant-fans): dil tespiti gerekmeden tek 308 DEĞİLSE bile sonuç yeni EN adrese gider', async () => {
     const harita = await haritaKur(true)
     const { sonuc } = esle(harita, '/category/acid-resistant-fans', 'en')
-    expect(sonuc).toEqual({ hedef: '/en/category/fans/corrosion-and-acid-resistant-fans', durum: expect.any(Number) })
+    expect(sonuc).toEqual({ hedef: '/en/category/corrosion-and-acid-resistant-fans', durum: expect.any(Number) })
   })
 
   it('yeni TR slug (korozyona-ve-aside-dayanimli-fanlar) de eski şemadan tek hop çözülür', async () => {
     const harita = await haritaKur(true)
     expect(esle(harita, '/tr/category/korozyona-ve-aside-dayanimli-fanlar').sonuc).toEqual({
-      hedef: '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar',
+      hedef: '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar',
       durum: 308,
     })
   })
@@ -118,11 +133,11 @@ describe('korozyon dalı: eski TR adres → yeni TR adres, TEK 308', () => {
     const harita = await haritaKur(true, false)
     // İki seviyeli eski EN adres: takma ad yoksa eşleyici ebeveyne (fans) düşer, korozyon dalına GİTMEZ.
     expect(esle(harita, '/en/category/fans/acid-resistant-fans').sonuc?.hedef).not.toBe(
-      '/en/category/fans/corrosion-and-acid-resistant-fans',
+      '/en/category/corrosion-and-acid-resistant-fans',
     )
     expect(esle(harita, '/en/category/acid-resistant-fans').sonuc).toBeNull()
     expect(esle(harita, '/tr/category/asit-dayanikli-fanlar').sonuc).toEqual({
-      hedef: '/tr/kategori/fanlar/korozyona-ve-aside-dayanimli-fanlar',
+      hedef: '/tr/kategori/korozyona-ve-aside-dayanimli-fanlar',
       durum: 308,
     })
   })
