@@ -15,10 +15,15 @@
  *  5. Hedef adresler yeni şemayla `adresUret(…, dil, true)`'dan kurulur — şemanın tek kaynağı.
  *  6. Hedef, gelen yolun kendisiyse null (kanonik adres kendine yönlenmez; EN önekleri yeni şemada
  *     değişmediği için `/en/category/<kök>`, `/en/category/<alt>` ve `/en/products/<aile>` bu yoldan geçer).
+ *  7. MARKA kolu (URN-119): `/brands`, `/markalar` (liste) ve `/brands/<slug>`, `/markalar/<slug>` (dil önekli ya da
+ *     dilsiz). Dilsiz `/brands/<slug>` bugün iki sıçramaydı (middleware dil önekini 307 ile ekler, sonra sayfa
+ *     `/tr/brands/<slug>` → `/tr/markalar/<slug>` 308 verir); burada tek adımda yeni adrese gider. Slug yalnız
+ *     yayındaki marka listesinde (`HVAC_BRANDS`) varsa eşlenir — sayfanın kendi `markaBul` karşılaştırmasıyla aynı.
  *
  * Pasif kategori → aktif üst kategoriye; üstü de pasifse tüm ürünler (plan §5 Faz 3 m.5, v4 O4).
  * Model adresi biçimindeki yollar (`…-p-<sku>`) haritanın değil sayfa çözücüsünün işidir → null.
  */
+import { HVAC_BRANDS } from '@/data/brands'
 import { type AdresDili, type AdresNesnesi, adresUret, yonlendirmeNesnesi } from '@/utils/adresUret'
 import { modelSegmentiMi } from '@/utils/modelAdresBicimi'
 
@@ -42,6 +47,7 @@ const DILLER: readonly AdresDili[] = ['tr', 'en']
 const KATEGORI_ONEKLERI = new Set(['category', 'kategori'])
 const URUN_ONEKLERI = new Set(['products', 'urun'])
 const TUM_URUNLER_ONEKLERI = new Set(['products', 'urunler'])
+const MARKA_ONEKLERI = new Set(['brands', 'markalar'])
 
 /**
  * Sondaki eğik çizgileri atar (kök `/` hariç). `replace(/\/+$/, '')` YERİNE doğrusal döngü: o desen çok sayıda
@@ -133,6 +139,22 @@ function urunCoz(harita: KiraciHaritasi, segment: string, skuParametresi: string
 }
 
 /**
+ * Marka listesi (`geri` boş) ya da marka sayfası (`geri` tek slug). `segmentler` yolu küçük harfe indirdiği için
+ * slug sayfanın `markaBul`'uyla (küçük harf, birebir slug) aynı karşılaştırmayla aranır. Bilinmeyen slug null:
+ * bugünkü akış (404) ya da `next.config` kuralları (yayından kalkan markalar) karar versin; ad ile eşleşen yazım
+ * (`nicotra%20gebhardt`) sayfanın kendi 308'ine kalır, burada ikinci sıçrama kurulmaz.
+ *
+ * `turkce`: `urunler` ile aynı kalıp — `/markalar` Türkçe bölüm adıdır, dilsiz isteği deterministik TR'ye 308 verir.
+ * Slug'lı adres `/urun/<aile>` gibi ziyaretçinin diline 307 gider (marka sayfası iki dilde var; D3).
+ */
+function markaCoz(bolum: string, geri: string[]): Cozum | null {
+  if (geri.length === 0) return { nesne: () => ({ tur: 'markalar' }), turkce: bolum === 'markalar' }
+  const slug = geri[0]
+  if (!HVAC_BRANDS.some((m) => m.slug === slug)) return null
+  return { nesne: () => ({ tur: 'marka', slug }), turkce: false }
+}
+
+/**
  * Yol eski bir adres mi? Öyleyse tek hedef + durum; değilse null.
  * `harita` yoksa (kiracının haritası üretilmemiş) null — eşleyici tahmin yürütmez.
  */
@@ -154,6 +176,8 @@ export function eskiAdresEsle(harita: KiraciHaritasi | undefined, girdi: Eslesme
     cozum = urunCoz(harita, geri[0], girdi.sku)
   } else if (TUM_URUNLER_ONEKLERI.has(bolum) && geri.length === 0) {
     cozum = { nesne: () => ({ tur: 'urunler' }), turkce: bolum === 'urunler' }
+  } else if (MARKA_ONEKLERI.has(bolum) && geri.length <= 1) {
+    cozum = markaCoz(bolum, geri)
   }
   if (!cozum) return null
 

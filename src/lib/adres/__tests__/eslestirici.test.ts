@@ -4,7 +4,8 @@ import { join } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { modellerdenVeri, yayindaVeriAyarla } from '@/config/__tests__/yayindaTestKiti'
-import { type AdresDili, adresUret } from '@/utils/adresUret'
+import { HVAC_BRANDS } from '@/data/brands'
+import { type AdresDili, type AdresNesnesi, adresUret } from '@/utils/adresUret'
 
 import { eskiAdresEsle } from '../eslestirici'
 import type { KiraciHaritasi } from '../haritaTipi'
@@ -231,6 +232,148 @@ describe('kural 6 — kanonik adres ve tanınmayan yol → null', () => {
 
   it('kiracının haritası yoksa null (tahmin yürütülmez)', () => {
     expect(eskiAdresEsle(undefined, { yol: '/tr/category/fans', sku: null, dilTespit: () => 'tr' })).toBeNull()
+  })
+})
+
+/**
+ * URN-119 — MARKA kolu. Bayrak açıkken dilsiz `/brands` ve `/brands/<slug>` bugün iki sıçramaydı (middleware dil
+ * önekini 307 ile ekler, sonra sayfa `/tr/brands…` → `/tr/markalar…` 308 verir); eşleyici tek adımda yeni adrese
+ * götürür. Bayrak KAPALIYKEN eşleyici hiç çağrılmaz: `middleware-bayrak-kapali.test.ts` ve `bayrak-kapisi.test.ts`.
+ */
+describe('kural 7 — marka kolu: dilsiz /brands ve /brands/<slug> TEK sıçrama (URN-119)', () => {
+  const MARKA = 'vortice'
+  const DIL_ONEKI = [
+    ['/tr', 'tr'],
+    ['/en', 'en'],
+  ] as const
+
+  it.each([
+    ['/brands', 'tr', '/tr/markalar'],
+    ['/brands', 'en', '/en/brands'],
+    [`/brands/${MARKA}`, 'tr', `/tr/markalar/${MARKA}`],
+    [`/brands/${MARKA}`, 'en', `/en/brands/${MARKA}`],
+    // `/urun/<aile>` ile aynı kalıp (D3): Türkçe bölüm adı + slug de ziyaretçinin diline gider.
+    [`/markalar/${MARKA}`, 'tr', `/tr/markalar/${MARKA}`],
+    [`/markalar/${MARKA}`, 'en', `/en/brands/${MARKA}`],
+  ] as const)('dilsiz %s (ziyaretçi %s) → TEK 307 %s', (yol, dil, hedef) => {
+    const { sonuc, dilTespit } = esle(yol, null, dil)
+    expect(sonuc).toEqual({ hedef, durum: 307 })
+    expect(dilTespit).toHaveBeenCalledTimes(1)
+  })
+
+  it('dilsiz /markalar (Türkçe bölüm adı): dil tespiti ÇAĞRILMAZ, TR\'ye 308 (`/urunler` ile aynı)', () => {
+    for (const ziyaretci of ['tr', 'en'] as const) {
+      const { sonuc, dilTespit } = esle('/markalar', null, ziyaretci)
+      expect(sonuc).toEqual({ hedef: '/tr/markalar', durum: 308 })
+      expect(dilTespit).not.toHaveBeenCalled()
+    }
+  })
+
+  it.each([
+    ['/tr/brands', '/tr/markalar'],
+    [`/tr/brands/${MARKA}`, `/tr/markalar/${MARKA}`],
+    ['/tr/brands/nicotra-gebhardt', '/tr/markalar/nicotra-gebhardt'],
+    ['/en/markalar', '/en/brands'],
+    [`/en/markalar/${MARKA}`, `/en/brands/${MARKA}`],
+  ])('dil önekli %s → TEK 308 %s (dil tespiti çağrılmaz)', (yol, hedef) => {
+    const { sonuc, dilTespit } = esle(yol, null, 'en')
+    expect(sonuc).toEqual({ hedef, durum: 308 })
+    expect(dilTespit).not.toHaveBeenCalled()
+  })
+
+  it('büyük harf ve sondaki eğik çizgi normalize edilir; sayfanın 308\'iyle AYNI hedef', () => {
+    expect(esle(`/brands/${MARKA.toUpperCase()}`, null, 'tr').sonuc).toEqual({ hedef: `/tr/markalar/${MARKA}`, durum: 307 })
+    expect(esle(`/BRANDS/${MARKA}/`, null, 'en').sonuc).toEqual({ hedef: `/en/brands/${MARKA}`, durum: 307 })
+    expect(esle(`/tr/brands/${MARKA.toUpperCase()}/`).sonuc).toEqual({ hedef: `/tr/markalar/${MARKA}`, durum: 308 })
+    expect(esle('/tr/brands/').sonuc).toEqual({ hedef: '/tr/markalar', durum: 308 })
+    // EN'de adres yerinde kalır; yalnız büyük harfli yazım küçük harfli kanoniğe gider.
+    expect(esle(`/en/brands/${MARKA.toUpperCase()}`).sonuc).toEqual({ hedef: `/en/brands/${MARKA}`, durum: 308 })
+  })
+
+  it('yüzde kodlu yazım çözülür: /brands/vor%74ice → vortice', () => {
+    expect(esle('/brands/vor%74ice', null, 'tr').sonuc).toEqual({ hedef: `/tr/markalar/${MARKA}`, durum: 307 })
+  })
+
+  it.each([
+    '/tr/markalar',
+    `/tr/markalar/${MARKA}`,
+    '/en/brands',
+    '/en/brands/',
+    `/en/brands/${MARKA}`,
+    `/en/brands/${MARKA}/`,
+  ])('kanonik %s → null (kendine yönlenmez, döngü yok)', (yol) => {
+    const { sonuc, dilTespit } = esle(yol)
+    expect(sonuc).toBeNull()
+    expect(dilTespit).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    '/brands/a/b', // iki slug segmenti: marka sayfası yok
+    '/tr/brands/a/b',
+    `/brands/${MARKA}/urunler`,
+    '/markalar/a/b',
+    '/brands/bilinmeyen-marka', // listede olmayan slug: bugünkü akış (404) karar versin
+    '/tr/brands/bilinmeyen-marka',
+    '/en/markalar/bilinmeyen-marka',
+    '/tr/brands/frekans-konvertoru', // yayından kalkan marka: next.config 308'i (markaYonlendirmeleri.mjs) karar verir
+    '/brands/nicotra%20gebhardt', // ad ile eşleşen yazım: sayfanın kendi 308'ine kalır, burada ikinci sıçrama kurulmaz
+    '/brandsx',
+    '/brands-vortice',
+  ])('tanınmayan %s → null', (yol) => {
+    const { sonuc, dilTespit } = esle(yol, null, 'en')
+    expect(sonuc).toBeNull()
+    expect(dilTespit).not.toHaveBeenCalled()
+  })
+
+  it('kiracının haritası yoksa marka kolu da null (tahmin yürütülmez)', () => {
+    for (const yol of ['/brands', `/brands/${MARKA}`, `/tr/brands/${MARKA}`]) {
+      expect(eskiAdresEsle(undefined, { yol, sku: null, dilTespit: () => 'tr' })).toBeNull()
+    }
+  })
+
+  it('?sku= marka adresinde yok sayılır ve hedefte query yok', () => {
+    const sonuc = eskiAdresEsle(h, { yol: `/brands/${MARKA}`, sku: 'SEA-61143003', dilTespit: () => 'tr' })
+    expect(sonuc).toEqual({ hedef: `/tr/markalar/${MARKA}`, durum: 307 })
+  })
+
+  it('⭐yayındaki HER marka × HER giriş biçimi: hedef adresUret ile aynı, ikinci sıçrama YOK', () => {
+    expect(HVAC_BRANDS.length).toBeGreaterThan(0)
+    const girisler: { yol: string; hedefDili: AdresDili; nesne: AdresNesnesi }[] = []
+    for (const m of HVAC_BRANDS) {
+      const nesne: AdresNesnesi = { tur: 'marka', slug: m.slug }
+      for (const [onek, dil] of DIL_ONEKI) {
+        girisler.push({ yol: `${onek}/brands/${m.slug}`, hedefDili: dil, nesne })
+        girisler.push({ yol: `${onek}/markalar/${m.slug}`, hedefDili: dil, nesne })
+      }
+      // Dilsiz: ziyaretçi diline göre (esle'nin varsayılanı 'tr'; EN ziyaretçi ayrıca).
+      girisler.push({ yol: `/brands/${m.slug}`, hedefDili: 'tr', nesne })
+    }
+    for (const [onek, dil] of DIL_ONEKI) {
+      const nesne: AdresNesnesi = { tur: 'markalar' }
+      girisler.push({ yol: `${onek}/brands`, hedefDili: dil, nesne })
+      girisler.push({ yol: `${onek}/markalar`, hedefDili: dil, nesne })
+    }
+    girisler.push({ yol: '/brands', hedefDili: 'tr', nesne: { tur: 'markalar' } })
+
+    for (const { yol, hedefDili, nesne } of girisler) {
+      const beklenen = adresUret(nesne, hedefDili, true)
+      const sonuc = esle(yol, null, hedefDili).sonuc
+      if (sonuc === null) {
+        // Yalnız kanonik adres kendine yönlenir: yol zaten hedefin kendisi.
+        expect(yol, `${yol} null döndü ama kanonik değil (beklenen ${beklenen})`).toBe(beklenen)
+        continue
+      }
+      expect(sonuc.hedef, yol).toBe(beklenen)
+      expect(sonuc.hedef, yol).not.toContain('?')
+      expect(esle(sonuc.hedef, null, hedefDili).sonuc, `${yol} → ${sonuc.hedef} yeniden eşleşiyor (ikinci sıçrama)`).toBeNull()
+    }
+  })
+
+  it('hedefler iki dilde tablodan: TR /tr/markalar…, EN /en/brands… (adresUret ile aynı, bayrak açık)', () => {
+    expect(adresUret({ tur: 'markalar' }, 'tr', true)).toBe('/tr/markalar')
+    expect(adresUret({ tur: 'markalar' }, 'en', true)).toBe('/en/brands')
+    expect(adresUret({ tur: 'marka', slug: MARKA }, 'tr', true)).toBe(`/tr/markalar/${MARKA}`)
+    expect(adresUret({ tur: 'marka', slug: MARKA }, 'en', true)).toBe(`/en/brands/${MARKA}`)
   })
 })
 
