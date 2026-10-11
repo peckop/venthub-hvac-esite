@@ -22,6 +22,8 @@
  *   G1 yeni iddia kökü yok · G2 kaynakta olmayan sayı yok · G3 kaynakta olmayan büyük harfli sözcük yok
  *   G4 kaldırma ve aynen korunan cümle kapıya takılmaz (sınır sabit) · G5 tam=false aynı kapı
  *   G6 geriAlma=true önceki değeri geri koyar (R8 atlanır, R3 koşar) · G7 arama alanı kapıları gevşemedi
+ *   G8 kalem işaretleri: duzeltme yoksa sayı/marka kapısı koşmaz (sınır sabit), kaynakNotu ile iddia kökü geçer ve görünür, işaret şekli
+ *   G9 arama alanı kardeş arama alanını kaynak saymaz (yalnız gövde yolu arama alanlarını kaynak sayar)
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs'
@@ -37,7 +39,7 @@ const BETIK = process.env.KMD_BETIK || join(process.cwd(), 'scripts', 'icerik-ha
 type Meta = Record<string, unknown>
 type Satir = { id: string; tenant_id: string; slug: string; metadata: Meta | null; updated_at: string; seo_title: string | null; seo_desc: string | null; name?: string | null }
 type Istek = { yontem: string; url: string; govde?: Record<string, unknown> }
-type Kalem = { slug: string; yol: Array<string | number>; eski: string | null; yeni: string | null; tam: boolean; geriAlma?: boolean }
+type Kalem = { slug: string; yol: Array<string | number>; eski: string | null; yeni: string | null; tam: boolean; geriAlma?: boolean; duzeltme?: boolean; kaynakNotu?: string }
 
 const ILK = '2026-10-10T10:00:00.123456+00:00'
 let satirlar: Satir[] = []
@@ -407,7 +409,8 @@ const govdeKur = (en = GOVDE_EN, tr = GOVDE_TR) => { (satirlar[0].metadata as Me
 const govdeKos = (dil: 'tr' | 'en', yeni: string, o: Partial<Kalem> = {}) => {
   const eski = dil === 'en' ? GOVDE_EN : GOVDE_TR
   govdeKur()
-  return kos({ kalemler: [kalem(['description_i18n', dil], yeni, { eski, ...o })] })
+  // Varsayılan duzeltme:true (gövde DÜZELTME kalemi: sayı ve marka kapısı da koşar); yazım kalemi için { duzeltme: false } geçilir.
+  return kos({ kalemler: [kalem(['description_i18n', dil], yeni, { eski, duzeltme: true, ...o })] })
 }
 
 describe('KTL-23 G1 · gövdeye yeni iddia kökü eklenemez (çekimli ve NBSP\'li biçimler dahil)', () => {
@@ -444,27 +447,27 @@ describe('KTL-23 G3 · gövdeye kaynakta olmayan büyük harfli sözcük (marka)
     const kotu = await govdeKos('en', yeni)
     expect(kotu.kod).toBe(1); expect(kotu.cikti).toContain('Zorlu')
     satirlar[0].metadata = { ...(satirlar[0].metadata as Meta), seo_desc_en: 'Zorlu series fans for ducts.' }
-    const iyi = await kos({ kalemler: [kalem(['description_i18n', 'en'], yeni, { eski: GOVDE_EN })] })
-    expect(iyi.kod).toBe(0)
+    const iyi = await kos({ kalemler: [kalem(['description_i18n', 'en'], yeni, { eski: GOVDE_EN, duzeltme: true })] })
+    expect(iyi.kod).toBe(0); expect(iyi.cikti).toContain('✓R8 govde-kaynak-sozcuk')
   })
 })
 
 describe('KTL-23 G4 · yalnız kaldırma ve aynen korunan cümle kapıya takılmaz (kapının sınırı açıkça sabit)', () => {
   it('iddia cümlesi KALDIRILIRSA geçer', async () => {
     govdeKur('Fans that move air inside the duct run. Operating cost is low. Circular models are available.')
-    const r = await kos({ kalemler: [kalem(['description_i18n', 'en'], 'Fans that move air inside the duct run. Circular models are available.', { eski: 'Fans that move air inside the duct run. Operating cost is low. Circular models are available.' })] })
+    const r = await kos({ kalemler: [kalem(['description_i18n', 'en'], 'Fans that move air inside the duct run. Circular models are available.', { eski: 'Fans that move air inside the duct run. Operating cost is low. Circular models are available.', duzeltme: true })] })
     expect(r.kod).toBe(0)
   })
   it('eski iddia cümlesi AYNEN kalırsa kapı onu yargılamaz (bu iş cümle-dayanak defterinindir), başka cümleyi değiştirmek geçer', async () => {
     const eski = 'Fans that move air inside the duct run. Operating cost is low. Circular models are available.'
     govdeKur(eski)
-    const r = await kos({ kalemler: [kalem(['description_i18n', 'en'], 'Fans that move air inside the duct run. Operating cost is low. Rectangular models are available.', { eski })] })
+    const r = await kos({ kalemler: [kalem(['description_i18n', 'en'], 'Fans that move air inside the duct run. Operating cost is low. Circular fans are available.', { eski, duzeltme: true })] })
     expect(r.kod).toBe(0)
   })
   it('eski metinde zaten olan iddia kökü yeniden yazılan cümlede "yeni iddia" sayılmaz', async () => {
     const eski = 'Fans for ducts. Operating cost is low.'
     govdeKur(eski)
-    const r = await kos({ kalemler: [kalem(['description_i18n', 'en'], 'Fans for ducts. Operating cost remains low.', { eski })] })
+    const r = await kos({ kalemler: [kalem(['description_i18n', 'en'], 'Fans for ducts. Operating cost remains low.', { eski, duzeltme: true })] })
     expect(r.kod).toBe(0)
   })
 })
@@ -516,5 +519,42 @@ describe('KTL-23 G7 · arama alanı kapıları DEĞİŞMEDİ (gövde kapısı on
     govdeKur()
     const r = await kos({ kalemler: [kalem(['seo_desc_en'], `Fans that move air inside the duct run at 50 Hz supply. Circular and rectangular models are available.`)] })
     expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 seo-rakam-yok')
+  })
+})
+
+describe('KTL-23 G8 · kalem işaretleri: duzeltme (sayı ve marka kapısı), kaynakNotu (iddia kökü), şekil', () => {
+  it('duzeltme işareti yoksa sayı ve marka kapısı koşmaz (yazım kalemi), iddia kökü kapısı yine koşar: sınır sabit', async () => {
+    const a = await govdeKos('en', `${GOVDE_EN} Noise is 40 dB lower. Siemens motors are used.`, { duzeltme: false })
+    expect(a.kod).toBe(0); expect(a.cikti).not.toContain('R8 govde-yeni-sayi-yok'); expect(a.cikti).not.toContain('R8 govde-kaynak-sozcuk')
+    const b = await govdeKos('en', `${GOVDE_EN} Operating cost is low.`, { duzeltme: false })
+    expect(b.kod).toBe(1); expect(b.cikti).toContain('✗R8 govde-yeni-iddia-koku-yok')
+  })
+  it('kaynakNotu ile yeni iddia kökü geçer ve kuru koşumda görünür; boş not geçmez', async () => {
+    const yeni = `${GOVDE_EN} Circular models are certified.`
+    const iyi = await govdeKos('en', yeni, { kaynakNotu: 'AVenS fiyat listesi s.12' })
+    expect(iyi.kod).toBe(0); expect(iyi.cikti).toContain('kaynak notu: AVenS fiyat listesi s.12')
+    const bos = await govdeKos('en', yeni, { kaynakNotu: '   ' })
+    expect(bos.kod).toBe(1); expect(bos.cikti).toContain('✗R8 govde-yeni-iddia-koku-yok')
+  })
+  it('işaret şekli: duzeltme true/false, kaynakNotu metin olmalı', async () => {
+    govdeKur()
+    const taban = kalem(['description_i18n', 'en'], `${GOVDE_EN} Circular fans are available.`, { eski: GOVDE_EN })
+    const a = await kos({ kalemler: [{ ...taban, duzeltme: 'evet' }] })
+    expect(a.kod).toBe(1); expect(a.cikti).toContain('duzeltme true/false olmalı')
+    const b = await kos({ kalemler: [{ ...taban, kaynakNotu: 5 }] })
+    expect(b.kod).toBe(1); expect(b.cikti).toContain('kaynakNotu metin olmalı')
+  })
+})
+
+describe('KTL-23 G9 · arama alanı kardeş arama alanını kaynak SAYAMAZ (yalnız gövde yolu arama alanlarını kaynak sayar)', () => {
+  it('seo_desc_en, yalnız seo_title_en\'de geçen özel adla yazılamaz; ad gövdede de varsa yazılır', async () => {
+    govdeKur()
+    satirlar[0].metadata = { ...(satirlar[0].metadata as Meta), seo_title_en: 'Zorlu Duct Fans: Circular Models' }
+    const yeni = 'Zorlu fans that move air inside the duct run, installed in-line with the ductwork. Circular and rectangular models are available.'
+    const kotu = await kos({ kalemler: [kalem(['seo_desc_en'], yeni)] })
+    expect(kotu.kod).toBe(1); expect(kotu.cikti).toContain('✗R7 seo-kaynak-sozcuk'); expect(kotu.cikti).toContain('Zorlu')
+    govdeKur(`${GOVDE_EN} Zorlu series is available.`)
+    const iyi = await kos({ kalemler: [kalem(['seo_desc_en'], yeni)] })
+    expect(iyi.kod).toBe(0); expect(iyi.cikti).toContain('✓R7 seo-kaynak-sozcuk')
   })
 })
