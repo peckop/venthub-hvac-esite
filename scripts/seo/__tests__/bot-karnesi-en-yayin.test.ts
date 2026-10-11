@@ -165,6 +165,24 @@ const YENI_SEMA: Satir[] = [
   { loc: '/tr/urun/vortice-lineo-quiet' },
   { loc: '/tr/urun/casals-hep' },
 ]
+// SEO-38 · B-1 (SEO-35, #1854 src/lib/data/kategoriSegmenti.ts): kategori adresi TEK segment, kök de alt de /tr/kategori/<slug>;
+// iç içe adres haritada YOK (yalnız 308). Bölüm adları adresUret.ts BOLUM tablosundan; harita canlı 11 Ekim haritasından türetildi.
+const B1_SEMA: Satir[] = [
+  { loc: '/tr' },
+  { loc: '/tr/urunler' },
+  { loc: '/tr/markalar' },
+  { loc: '/tr/kategori/aksesuarlar' },
+  { loc: '/tr/kategori/fanlar' },
+  { loc: '/tr/kategori/kanal-tipi-fanlar' },
+  { loc: '/tr/kategori/aksiyel-fanlar' },
+  { loc: '/tr/kategori/hava-perdeleri' },
+  { loc: '/tr/markalar/avens' },
+  { loc: '/tr/markalar/vortice' },
+  { loc: '/tr/urun/avens-bvu' },
+  { loc: '/tr/urun/seat-serisi' },
+  { loc: '/tr/urun/vortice-lineo-quiet' },
+  { loc: '/tr/urun/casals-hep' },
+]
 
 describe('INV-BOT-KARNESI-ORNEK-1 · örnekleme iki şemayı tanır', () => {
   it('KOL O1 · hreflang\'sız ESKİ şema haritası: hiçbir türde hayalet "/" yok, TR örnekleri haritadaki ilk sırayla, eksik yok', () => {
@@ -201,6 +219,23 @@ describe('INV-BOT-KARNESI-ORNEK-1 · örnekleme iki şemayı tanır', () => {
   it('KOL O5 · model türü isteğe bağlıdır: model adresi olmayan yeni şema haritası eksik saymaz (Pazar\'da model listesi boş, karar 327)', () => {
     expect(ornekTurleri(harita(YENI_SEMA)).eksik).not.toContain('model')
   })
+
+  it('KOL O12 · B-1 tek segment haritası: kök ve alt kategori aynı biçimde örneklenir, alt-kategori türü örneksiz ama eksik YOK (SEO-38)', () => {
+    const xml = harita(B1_SEMA)
+    // Kök ve alt kategori adresten ayırt edilemez: `kategori` türü haritadaki ilk iki tek segmentli adresi alır.
+    expect(turAdresleri(xml, 'kategori')).toEqual(['/tr/kategori/aksesuarlar', '/tr/kategori/fanlar'])
+    expect(turAdresleri(xml, 'alt-kategori')).toEqual([])
+    expect(turAdresleri(xml, 'aile-urun')).toEqual(['/tr/urun/avens-bvu', '/tr/urun/seat-serisi', '/tr/urun/vortice-lineo-quiet'])
+    expect(turAdresleri(xml, 'marka')).toEqual(['/tr/markalar/avens', '/tr/markalar/vortice'])
+    expect(tumAdresler(xml)).not.toContain('/')
+    expect(ornekTurleri(xml).eksik, 'B-1 haritasında sahte ORNEK-YOK (alt-kategori)').toEqual([])
+  })
+
+  it('KOL O13 · B-1 + EN hreflang: ilk kategori örneğinin GERÇEK EN karşılığı tek segmentli /en/category/<slug> eklenir; EN yoksa eklenmez', () => {
+    const enli = harita([{ loc: '/tr/kategori/aksesuarlar', en: '/en/category/accessories' }, ...B1_SEMA.slice(4)])
+    expect(turAdresleri(enli, 'kategori')).toEqual(['/tr/kategori/aksesuarlar', '/en/category/accessories', '/tr/kategori/fanlar'])
+    expect(turAdresleri(harita(B1_SEMA), 'kategori').some((a) => a.startsWith('/en/'))).toBe(false)
+  })
 })
 
 describe('INV-BOT-KARNESI-ORNEK-1 · örneksiz zorunlu tür sessiz geçmez', () => {
@@ -208,8 +243,10 @@ describe('INV-BOT-KARNESI-ORNEK-1 · örneksiz zorunlu tür sessiz geçmez', () 
     expect(ornekTurleri(harita(YENI_SEMA.filter((s) => !s.loc.startsWith('/tr/markalar/')))).eksik).toEqual(['marka'])
   })
 
-  it('KOL O7 · yeni şema haritasında alt kategori yoksa eksik = [alt-kategori] (eski şemada alt kategori tek seviyeli olduğu için zorunlu değil)', () => {
-    expect(ornekTurleri(harita(YENI_SEMA.filter((s) => s.loc.split('/').length !== 5 || !s.loc.startsWith('/tr/kategori/')))).eksik).toEqual(['alt-kategori'])
+  it('KOL O7 · alt-kategori ZORUNLU DEĞİL: iç içe adres yoksa eksik değil (B-1 haritası alt kategoriyi tek segmentle yazar, SEO-38)', () => {
+    // Eskiden yeni şema haritasında zorunluydu; B-1 bayrağı açılınca haritada iç içe adres hiç olmayacağı için sahte ORNEK-YOK verirdi.
+    const icicesiz = YENI_SEMA.filter((s) => s.loc.split('/').length !== 5 || !s.loc.startsWith('/tr/kategori/'))
+    expect(ornekTurleri(harita(icicesiz)).eksik, 'alt-kategori yeniden zorunlu: B-1 haritasında sahte kırmızı').toEqual([])
     expect(ornekTurleri(harita(ESKI_SEMA)).eksik).not.toContain('alt-kategori')
   })
 

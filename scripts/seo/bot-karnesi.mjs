@@ -144,17 +144,19 @@ const STATIK_TURLER = new Set(SABIT.map(([ad]) => ad))
  * Site haritasından örneklenen dinamik türler. Her tür İKİ adres şemasını tanır (SEO-29): eski (/tr/category, /tr/products,
  * /tr/brands) ve yeni (ADRES_SEMASI_K3B açık: /tr/kategori, /tr/urun, /tr/markalar; docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md).
  * Kodda adres listesi YOK, yalnız yol kalıbı. `zorunlu`: haritada örneği yoksa karne bunu ORNEK-YOK kusuru yazar (sessiz körlük olmasın);
- * `yeniSemadaZorunlu`: eski şemada kategoriler tek seviyeli olduğu için alt kategori yalnız yeni şema haritasında beklenir;
  * model sayfaları isteğe bağlıdır (Pazar 11 Ekim'de yayındaki-model listesi boş, karar 327).
+ * `alt-kategori` (SEO-38, B-1): kategori adresi TEK segmenttir, kök de alt de `/tr/kategori/<slug>` (src/lib/data/kategoriSegmenti.ts,
+ * SEO-35 B-1); alt kategori adresten ayırt edilemez (üst-alt ilişkisi kategori verisinde, parent_id) ve `kategori` türü ikisini de
+ * örnekler. İki seviyeli kalıp yalnız ESKİ iç içe adresleri yakalar: haritada varsa örneklenir, YOKLUĞU kusur sayılmaz. (Eskiden yeni
+ * şema haritasında zorunluydu; B-1 haritasında hiç örnek çıkmadığı için bayrak açılınca sahte ORNEK-YOK alt-kategori verirdi.)
  */
 const DINAMIK_TURLER = [
   { ad: 'kategori', desen: /^\/tr\/(category|kategori)\/[^/]+$/, zorunlu: true },
-  { ad: 'alt-kategori', desen: /^\/tr\/(category|kategori)\/[^/]+\/[^/]+$/, yeniSemadaZorunlu: true },
+  { ad: 'alt-kategori', desen: /^\/tr\/(category|kategori)\/[^/]+\/[^/]+$/ },
   { ad: 'aile-urun', desen: /^\/tr\/(products|urun)\/[^/]+$/, model: false, n: 3, zorunlu: true },
   { ad: 'model', desen: /^\/tr\/urun\/[^/]+$/, model: true },
   { ad: 'marka', desen: /^\/tr\/(brands|markalar)\/[^/]+$/, zorunlu: true },
 ]
-const YENI_SEMA = /^\/tr\/(kategori|urun|markalar)\//
 
 /**
  * Site haritası XML'inden dinamik türlere örnek seçer (belirlenimci: haritadaki ilk sıra) + ilk örneğin GERÇEK EN karşılığı.
@@ -169,7 +171,6 @@ export function ornekTurleri(haritaXml) {
     const en = (m[1].match(/hreflang="en"[^>]*href="([^"]+)"/) || m[1].match(/href="([^"]+)"[^>]*hreflang="en"/) || [])[1]
     return { loc: loc ? yol(loc) : null, en: en ? yol(en) : null }
   }).filter((x) => x.loc)
-  const yeniSema = locList.some((x) => YENI_SEMA.test(x.loc))
   const turler = []
   const eksik = []
   for (const t of DINAMIK_TURLER) {
@@ -177,7 +178,7 @@ export function ornekTurleri(haritaXml) {
     const uygun = (loc) => t.desen.test(loc) && (t.model === undefined || MODEL_DESENI.test(loc) === t.model)
     const secilen = locList.filter((x) => uygun(x.loc)).slice(0, t.n ?? 2)
     if (secilen.length) turler.push([t.ad, secilen.flatMap((x, i) => (i === 0 && x.en ? [x.loc, x.en] : [x.loc]))])
-    else if (t.zorunlu || (t.yeniSemadaZorunlu && yeniSema)) eksik.push(t.ad)
+    else if (t.zorunlu) eksik.push(t.ad)
   }
   return { turler, eksik }
 }
