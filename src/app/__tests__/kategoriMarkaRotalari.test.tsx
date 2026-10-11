@@ -192,9 +192,7 @@ describe('eski kategori rotası — kararlar bugünküyle aynı', () => {
     await expect(AltKategori(p({ lang: 'en', categorySlug: 'fans', subCategorySlug: 'duct-fans' }))).rejects.toThrow(
       'REDIRECT:/en/category/duct-fans',
     )
-    await expect(
-      altKategoriUst(p({ lang: 'en', categorySlug: 'fans', subCategorySlug: 'duct-fans' })),
-    ).resolves.toEqual({})
+    await expect(altKategoriUst()).resolves.toEqual({})
   })
 
   it('OPS-51: Sığınak kök olunca ESKİ iki seviyeli adres (/category/fanlar/siginak-havalandirma) üst kategoriye bakmadan kanoniğe TEK 308', async () => {
