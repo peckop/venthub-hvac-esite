@@ -30,15 +30,12 @@ import { kayitDenetle, markaDenetle } from '../../../scripts/rehber/marka-olgu-d
 /** anahtar → bunu kapatacak iş. Düzelen açık BURADAN SİLİNİR. */
 const BILINEN_ACIK: Record<string, string> = {
   'vortice.founded': 'URN-82: brands.ts founded 1954 kalkar (resmî kaynak "kuruldu" demiyor; 1954 yalnız faaliyet başlangıcı)',
-  'vortice.description': 'URN-82: "dünya lideri / standartları belirliyor" kalkar (BLG-6 tablosu brands.ts:vortice.description)',
-  'avens.founded': 'URN-82: 2010 kalkar ya da 2017 yazılır (resmî site 2017)',
   'avens.website': 'URN-82: avens.com.tr (başka şirket) yerine avensair.com (BLG-6 tablosu brands.ts:avens.website)',
-  'danfoss.description': "URN-82: \"öncüsüdür\" kalkar; \"1968'den beri üretiyor\" ve atıflı %80 (BLG-6 tablosu brands.ts:danfoss.description)",
   'nicotra-gebhardt.country': "URN-82: \"Almanya\" menşei yazılamaz; \"Almanya'da Waldenburg adresli\" (BLG-6 tablosu)",
   'nicotra-gebhardt.headquarters': 'URN-82: Waldenburg merkez değil Almanya adresi; headquarters alanı kalkar',
-  'nicotra-gebhardt.founded': 'URN-82: 1959 kalkar (resmî sitede yok; Gebhardt 1958)',
-  'nicotra-gebhardt.description': 'URN-82: "dünyanın en geniş" kalkar (BLG-6 tablosu brands.ts:nicotra-gebhardt.description)',
 }
+// Kapananlar (11 Ekim, URN-79/URN-82 #1793 brands.ts'i düzeltti, test kendiliğinden bildirdi): vortice.description,
+// avens.founded, danfoss.description, nicotra-gebhardt.founded, nicotra-gebhardt.description.
 
 type Ihlal = { anahtar: string; ayrinti: string }
 const ihlaller = (): Ihlal[] => markaDenetle(HVAC_BRANDS, kayit, { ovguVarMi })
