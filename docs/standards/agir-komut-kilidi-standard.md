@@ -3,10 +3,11 @@
 > **Kapsam:** aynı anda birden çok pencerenin ağır komut (type-check, build, tam test, install)
 > koşmasını sınırlayan kanca ve istem satırı. Tek pencerenin kendi bellek kuralı
 > (`.claude/rules/filo-ortak.md` "Test ve bellek") bu cetvelin DIŞINDA; bu cetvel o kuralı
-> **makine düzeyinde** zorlar.
-> **Sürüm:** v1.0 · 2026-10-10
+> **makine düzeyinde** zorlar. §6, aynı bellek ailesinden konuşma dosyası boyutu satırını (KAYIT,
+> ARC-82) tanımlar.
+> **Sürüm:** v1.1 · 2026-10-11 (v1.0 · 2026-10-10)
 > **Sahibi:** ARAÇ
-> **Son doğrulama:** 2026-10-10 (kanca, test ve bozma ölçüldü; canlı kabul ayar kaydından sonra)
+> **Son doğrulama:** 2026-10-11 (kanca, test ve bozma ölçüldü; canlı kabul ölçüldü, §5)
 > **Niçin bu cetvel doğdu:** kart ARC-81 "ağır komut kilidi için cetvel yok: yazımı bu işin
 > kapsamında" dedi (kural 1). Kanca: `.claude/hooks/agir-komut-kilidi.cjs`; test:
 > `src/__tests__/conformance/kanca-agir-komut-kilidi.test.ts`.
@@ -114,3 +115,48 @@ uygulanır (karar 224: onay pencereler arası taşınmaz).
 - Canlı kabul (ayar kaydından sonra): iki pencerede aynı anda `pnpm type-check` denenince ikincisi
   `AGIR KOMUT KILIDI` ile reddedilir ve istem satırında `⚠KILIT` görünür. Bu ölçüm kayıttan sonra
   karta yazılır; ölçülmeden "çalışıyor" denmez.
+- **Canlı kabul ölçüldü (2026-10-11, #1842'den sonra, master'a eşit ağaçta).** Komut `tsc --version`
+  (sınıflayıcıda "type-check" sayılır, proje derlemesi koşturmaz: tam type-check bellek kuralı gereği
+  koşturulmadı):
+  1. **İkinci pencere reddi:** URUN penceresi (`4a8eaf9c`) yuvayı arka plandaki `pnpm install --offline`
+     ile tutarken ARAÇ penceresindeki `tsc --version`, `AGIR KOMUT KILIDI (ARC-81)` mesajıyla
+     reddedildi; mesaj sahibi ve süreyi söyledi ("4a8eaf9c install 2 dk önce başladı").
+  2. **İstem satırı:** istem satırı kancası UserPromptSubmit girdisiyle koşturulunca
+     `⚠KILIT: agir komut 1/1 dolu (4a8eaf9c install 2 dk) — ikinci agir komut reddedilir` verdi.
+  3. **Bırakma:** ön plan `tsc --version` bitince yuva boşaldı (bir sonraki pencere hemen aldı).
+  4. **Başarısız komut:** `tsc --nonexistent-flag-xyz` (çıkış 1) sonrası yuva BOŞ; PostToolUseFailure
+     kaydı çalışıyor.
+- **Gözlem (tasarımın bedeli, §2 madde 3):** arka plan komutunun yuvası TTL'e kalır. URUN'un birkaç
+  dakikalık `install`'ı ve ardından aynı pencerenin `docker` komutu (yeniden giriş yuvayı yeniler)
+  yuvayı 11:21-11:53 arası, yaklaşık 32 dk dolu tuttu. Bir arka plan ağır komut, filonun geri kalanını
+  en çok TTL kadar bekletir; kısa arka plan TTL'i ya da komut sonuna bırakma eki ayrı karardır
+  (OPS'a yazıldı).
+
+## §6 KAYIT satırı: konuşma dosyasının boyutu (ARC-82)
+
+**Niçin:** konuşma dosyası (`<sid>.jsonl`) compact'a rağmen küçülmez, yalnız büyür. 2026-10-10
+ölçümü: en büyük kayıtlar 2129 MB (OPS), 2043 MB, 773 MB, 760 MB, 453 MB. Dosyayı okuyan kancalar ve
+pencere büyüdükçe yavaşlıyor. 10-09 20:00 kapanması bellekten (OPS, main.log); dosya boyutu İKİNCİL
+etken sayılır, kanıtlanmış sebep değildir.
+
+**Kural:** pencerenin kendi konuşma dosyasının boyutu her istemde görünür. Boyut yalnız `statSync` ile
+okunur (dosya AÇILMAZ, içerik okunmaz); yol yoksa ya da dosya değilse satır SUSAR.
+
+| Boyut | Satır | Dayanak | Ayar |
+|---|---|---|---|
+| 1 GB altı | `KAYIT: 612 MB` (eşiksiz, BAGLAM gibi) | Recep bağlamın yanında kayıt boyutunu da görür | yok |
+| 1 GB ve üstü | `⚠KAYIT: 1,0 GB — … 1,5 GB'ta yeni oturuma devret` | 10-10: 2 dosya 2 GB üstünde, 3 dosya 750 MB üstünde | `VENTHUB_KAYIT_UYARI_MB` (1024) |
+| 1,5 GB ve üstü | `⛔KAYIT: 1,5 GB — yeni oturuma DEVRET` | OPS emri 10-09 madde 3: "1,5 GB yeni oturuma devret" | `VENTHUB_KAYIT_DEVRET_MB` (1536) |
+
+**Biçim kuralları:** GB değeri AŞAĞI yuvarlanır (1535 MB "1,5 GB" görünmez; aksi halde satır "1,5 GB'ta
+devret" diyen metinle çelişir). Bozuk (sayı değil, ≤0, boş dize) ya da sırası ters (devret ≤ uyarı)
+ortam değeri İKİ eşiği de varsayılana döndürür.
+
+**Kod ve test:** `.claude/hooks/baglam-doluluk.cjs` (`kayitBoyutuMb`, `kayitSatiri`),
+`.claude/hooks/defter-tazelik-satiri.cjs` (çağrı); test `INV-KAYIT-BOYUTU-1..3`
+(`src/__tests__/conformance/kanca-kayit-boyutu.test.ts`). Bozma: 2026-10-11'de 17 mutasyonun 17'si
+yakalandı (ilk koşuda 16; kaçan "≤0 eşik kabul" için tek başına sıfır eşik ve tanımsız-değişken kolu
+eklendi).
+
+**Sınır:** her istemde boyutu gösterir ama kilit gibi komut REDDETMEZ; devret kararı insandadır.
+Kancaların dosyayı bütün okuması ayrı iştir (ARC-83, #1838: tur sonu kapıları kuyruk okur).
