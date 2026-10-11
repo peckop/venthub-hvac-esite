@@ -128,8 +128,8 @@ describe('INV-KOPUK-1 · kodda detached: true yalnız başlatıcıda', () => {
     expect(fazla).toEqual([])
   })
 
-  it('üç eski çağrı yeri başlatıcıya bağlı', () => {
-    for (const dosya of ['session-board.cjs', 'belge-satiri.cjs', 'bellek-yoklama.cjs']) {
+  it('eski çağrı yerleri ve WRONGSTACK satırı (ARC-24) başlatıcıya bağlı', () => {
+    for (const dosya of ['session-board.cjs', 'belge-satiri.cjs', 'bellek-yoklama.cjs', 'wrongstack-satiri.cjs']) {
       const kaynak = fs.readFileSync(path.join(KOK, '.claude', 'hooks', dosya), 'utf8')
       expect(kaynak, dosya).toContain('kopukBaslat')
     }

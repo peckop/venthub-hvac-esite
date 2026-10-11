@@ -66,7 +66,7 @@
     {
       "kalem": "DAN-80101 kimlik celiskisi",
       "durum": "BU MANIFESTE DAHIL DEGIL",
-      "gerekce": "Adi 'FC-51 - 220V - 0,37kW' ama ailesi danfoss-fc101 (o hat 3x380-480V ve 0,37 kW modeli PK37 kodunu tasir). Kaynaktan TEK BASINA cozulemez: ya ad yanlis ya urun yanlis aileye bagli. Satici bilgisi gerekir -> Recep karari."
+      "gerekce": "Adi 'FC-51 - 220V - 0,37kW' ama ailesi danfoss-vlt-hvac-basic-drive-fc-101 (o hat 3x380-480V ve 0,37 kW modeli PK37 kodunu tasir). Kaynaktan TEK BASINA cozulemez: ya ad yanlis ya urun yanlis aileye bagli. Satici bilgisi gerekir -> Recep karari."
     },
     {
       "kalem": "Eski ?sku= linkleri",

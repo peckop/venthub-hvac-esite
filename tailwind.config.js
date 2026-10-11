@@ -1,4 +1,5 @@
 import typography from '@tailwindcss/typography';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 import {
   blur,
@@ -53,6 +54,32 @@ const tailwindConfig = {
         'brand-cyan-ink':        'hsl(var(--brand-cyan-ink) / <alpha-value>)',
         'action-terracotta-deep': 'hsl(var(--action-terracotta-deep) / <alpha-value>)',
 
+        /* ── DS adları (OPS-53 Faz 2a, 2026-10-05) — GÖRÜNMEZ, TÜKETİCİSİ YOK ──
+           Design System'in renk adları, ADIYLA. Değişkenler `src/index.css` `:root`ta
+           (takma ad ya da tek literal) — SSOT orasıdır, burada SABİT HEX YOK ve
+           palet adı YAZILMAZ (INV-PALET-1 3. kol: ikinci kaynak olmaz).
+           Hiçbir sınıf bu anahtarları henüz kullanmıyor; Tailwind kullanılmayan
+           anahtar için CSS üretmez, yani bu satırlar çıktıyı değiştirmez.
+           Çakışan küme (primary-navy, brand-cyan, action-terracotta-deep, font-sans)
+           2a'da DOKUNULMAZ — görünür dönüşüm Faz 2b. */
+        'action-terracotta':      'hsl(var(--action-terracotta) / <alpha-value>)',
+        'warn-amber':             'hsl(var(--warn-amber) / <alpha-value>)',
+        'accent-air-green':       'hsl(var(--accent-air-green) / <alpha-value>)',
+        'text-strong':            'hsl(var(--text-strong) / <alpha-value>)',
+        'text-body':              'hsl(var(--text-body) / <alpha-value>)',
+        'text-muted':             'hsl(var(--text-muted) / <alpha-value>)',
+        'border-control':         'hsl(var(--border-control) / <alpha-value>)',
+        'border-hairline':        'hsl(var(--border-hairline) / <alpha-value>)',
+        'border-row':             'hsl(var(--border-row) / <alpha-value>)',
+        'surface-page':           'hsl(var(--surface-page) / <alpha-value>)',
+        'surface-card':           'hsl(var(--surface-card) / <alpha-value>)',
+        'surface-subtle':         'hsl(var(--surface-subtle) / <alpha-value>)',
+        'surface-inset':          'hsl(var(--surface-inset) / <alpha-value>)',
+        'surface-dark':           'hsl(var(--surface-dark) / <alpha-value>)',
+        'surface-dark-inset':     'hsl(var(--surface-dark-inset) / <alpha-value>)',
+        'text-on-dark':           'hsl(var(--text-on-dark) / <alpha-value>)',
+        'text-on-dark-muted':     'hsl(var(--text-on-dark-muted) / <alpha-value>)',
+
         /* ── Admin semantik renkleri ──────────────────────────────────
            Değişkenler `src/index.css`te `[data-admin-theme]` kapsamında
            tanımlı (varsayılan açık, `='dark'` ile koyu). Admin yüzeylerinde
@@ -91,6 +118,14 @@ const tailwindConfig = {
       },
       fontFamily: {
         'sans': ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        /* ── serif/mono (TSR-9, Faz 2b; plan v2.2 §1.2 "Tuzak") ─────────────────────
+           `var(--font-mono)` TANIMSIZSA (bayrak kapalı: `--font-mono` yalnız
+           `:root[data-gorunum='yeni']` kapsamında doğar) `font-family: var(--font-mono), …`
+           geçersiz sayılır ve özellik SIFIRLANIR. Bu yüzden `var(--ad, <Tailwind varsayılan
+           yığını>)` biçimi: kapalıyken `font-mono`/`font-serif` computed `font-family`
+           AYNEN eski yığın (kaynak: tailwindcss/defaultTheme, sürümle birlikte gider). */
+        'mono': [`var(--font-mono, ${defaultTheme.fontFamily.mono.join(', ')})`],
+        'serif': [`var(--font-serif, ${defaultTheme.fontFamily.serif.join(', ')})`],
       },
       letterSpacing: {
         'hvac-tight': '0.1em',
@@ -183,7 +218,32 @@ const tailwindConfig = {
         'cinematic-drop': '0 50px 100px rgba(0,0,0,0.8)',
         'sinevizyon-drop': '0 30px 60px rgba(0,0,0,0.9)',
       },
-      fontSize,
+      fontSize: {
+        ...fontSize,
+        /* DS yazı ölçeği (Faz 2a ikinci dilim): `ds-` öneki; mevcut akışkan `display` anahtarına DOKUNULMAZ. */
+        'ds-display':    ['var(--size-display)', { lineHeight: 'var(--lh-display)', letterSpacing: 'var(--track-display)' }],
+        'ds-h1':         ['var(--size-h1)', { lineHeight: 'var(--lh-h1)', letterSpacing: 'var(--track-h1)' }],
+        'ds-h1-mobil':   ['var(--size-h1-mobil)', { lineHeight: 'var(--lh-h1)', letterSpacing: 'var(--track-h1)' }],
+        'ds-h2':         ['var(--size-h2)', { lineHeight: 'var(--lh-h2)', letterSpacing: 'var(--track-h2)' }],
+        'ds-h3':         ['var(--size-h3)', { lineHeight: 'var(--lh-h3)', letterSpacing: 'var(--track-h3)' }],
+        'ds-body':       ['var(--size-body)', { lineHeight: 'var(--lh-body)' }],
+        'ds-body-small': ['var(--size-body-small)', { lineHeight: 'var(--lh-body-small)' }],
+        'ds-caption':    ['var(--size-caption)', { lineHeight: 'var(--lh-caption)' }],
+        'ds-overline':   ['var(--size-overline)', { lineHeight: 'var(--lh-overline)', letterSpacing: 'var(--track-overline)' }],
+        'ds-editorial':  ['var(--size-editorial)', { lineHeight: 'var(--lh-editorial)' }],
+      },
+      /* DS boşluk rolleri: `space-` öneki (varsayılan spacing ölçeği korunur; extend). */
+      spacing: {
+        'space-tight': 'var(--space-tight)',
+        'space-inline': 'var(--space-inline)',
+        'space-grid': 'var(--space-grid)',
+        'space-stack': 'var(--space-stack)',
+        'space-card': 'var(--space-card)',
+        'space-card-loose': 'var(--space-card-loose)',
+        'space-page-mobile': 'var(--space-page-mobile)',
+        'space-block': 'var(--space-block)',
+        'space-page': 'var(--space-page)',
+      },
       borderRadius,
       zIndex,
       maxWidth,

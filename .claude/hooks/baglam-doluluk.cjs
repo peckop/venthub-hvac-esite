@@ -121,15 +121,22 @@ const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') 
  * kapı (hafiza-baglam-ve-belge-satiri.test.ts) etiketleri yasaklar.
  */
 const HAZIRLIK_NOTU =
-  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA UC MADDELIK LISTE yaz; her madde '- ' ile baslayan " +
+  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA UC PARCA yaz. " +
+  "Birinci parca UC MADDELIK LISTE; her madde '- ' ile baslayan " +
   'ayri bir satir ve tam cumle, yan yana tek paragraf YOK, harfli ya da numarali etiket YOK. ' +
   'Birinci madde: durum dosyam guncel mi (dosya adi + saat). ' +
   'Ikinci madde: yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir). ' +
   "Ucuncu madde: hukum, 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
-  'Compact yapilana kadar her cevapta kisaca tekrarla. ' +
-  "Listenin altina Recep'e su tek cumleyi de yaz: " +
+  // ARC-69 (OPS 10-09): rol kurallarında şart olan satır kancada yoktu; pencere her istemde kancayı görüyor,
+  // kurallar dosyasını görmüyor. Metin .claude/rules/filo-ortak.md "Compact" bölümündeki kalıpla AYNI olmalı.
+  "Ikinci parca, listenin altinda, uc ters tirnakla acilan TEK KOD BLOGU icinde Recep'in kopyalayip yapistiracagi su /compact satiri: " +
+  "/compact Recep'in son sozlerini aynen koru. Sunlari koru: <numara (durum)>, ..., yarim isler (<kisa adlar>). " +
+  'Ayrinti durum dosyamda. Arac ciktilarini ve eski olcum ayrintilarini at. ' +
+  'Durumu cumleye KOPYALAMA, ayrinti durum dosyasinda durur; durum dosyan guncel degilse bu satiri vermeden ONCE onu yaz. ' +
+  "Ucuncu parca, en altta, Recep'e su tek cumle: " +
   '"Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. ' +
-  'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz."'
+  'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz." ' +
+  'Compact yapilana kadar her cevapta kisaca tekrarla.'
 
 /** Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı. */
 function satir(token, pencere) {
@@ -146,4 +153,199 @@ function satir(token, pencere) {
   return 'BAGLAM: ' + oran
 }
 
-module.exports = { compactPenceresi, esikler, sonBaglam, satir, COMPACT_SONRASI, DOLUYOR, YAKIN, OKUMA_BAYT, HAZIRLIK_NOTU }
+/**
+ * ── KAYIT BOYUTU (ARC-82, Ops emri 2026-10-09 madde 3) ──
+ *
+ * Konuşma dosyası (`<sid>.jsonl`) compact'a rağmen küçülmez, yalnız büyür; 10-09 ölçümü: OPS 1,77 GB,
+ * Ürün 682 MB, Katalog 260 MB, toplam 4,6 GB (10-10: OPS 2,1 GB). Büyüdükçe dosyayı okuyan her şey
+ * yavaşlıyor ve çöküyor. Pencerenin kendi dosyasının boyutu her istemde görünür; eşikler aşılınca
+ * uyarı çıkar, 1,5 GB'ta "yeni oturuma devret" denir.
+ *
+ * ⭐Yalnız `statSync` (dosya AÇILMAZ, ~0,1 ms); okuma yok. Dosya/yol yoksa satır YOK (susar).
+ * ⭐Satır EŞİKSİZ görünür (BAGLAM gibi): Recep bağlamın yanında kayıt boyutunu da görür.
+ * Eşikler `VENTHUB_KAYIT_UYARI_MB` (1024) ve `VENTHUB_KAYIT_DEVRET_MB` (1536) ile ayarlanır; bozuk
+ * (sayı değil, ≤0) ya da sırası ters (devret ≤ uyarı) değer ikisini de varsayılana döndürür.
+ *
+ * Not: 10-09 20:00 kapanması bellekten (OPS, main.log); dosya boyutu ikincil etken olarak ele alınır,
+ * kanıtlanmış sebep sayılmaz.
+ */
+/** Ortam değişkeninden pozitif eşik; bozuksa (boş, sayı değil, ≤0) varsayılan. */
+function mbEsigi(ad, varsayilan) {
+  const v = Number(process.env[ad])
+  return Number.isFinite(v) && v > 0 ? v : varsayilan
+}
+const UYARI_VARSAYILAN_MB = 1024
+const DEVRET_VARSAYILAN_MB = 1536
+const KAYIT_UYARI_MB_HAM = mbEsigi('VENTHUB_KAYIT_UYARI_MB', UYARI_VARSAYILAN_MB)
+const KAYIT_DEVRET_MB_HAM = mbEsigi('VENTHUB_KAYIT_DEVRET_MB', DEVRET_VARSAYILAN_MB)
+// Sıra bozuksa (devret ≤ uyarı) ikisi de varsayılana döner: ⛔ hiçbir zaman ⚠'dan önce çıkmaz.
+const ESIKLER_TUTARLI = KAYIT_DEVRET_MB_HAM > KAYIT_UYARI_MB_HAM
+const KAYIT_UYARI_MB = ESIKLER_TUTARLI ? KAYIT_UYARI_MB_HAM : UYARI_VARSAYILAN_MB
+const KAYIT_DEVRET_MB = ESIKLER_TUTARLI ? KAYIT_DEVRET_MB_HAM : DEVRET_VARSAYILAN_MB
+
+/**
+ * GB yazımı: AŞAĞI yuvarlanır. Yoksa 1535 MB "1,5 GB" görünür ve "1,5 GB'ta devret" diyen satırla
+ * çelişir; aşağı yuvarlayınca "1,5" ancak eşik aşılınca çıkar.
+ */
+function gbYaz(mb) {
+  return (Math.floor((mb / 1024) * 10) / 10).toFixed(1).replace('.', ',')
+}
+
+/** Konuşma dosyasının boyutu (MB); yol yok/okunamıyorsa ya da dosya değilse null. Dosya açılmaz. */
+function kayitBoyutuMb(kayitYolu) {
+  if (!kayitYolu) return null
+  try {
+    const st = fs.statSync(kayitYolu)
+    return st.isFile() ? st.size / (1024 * 1024) : null
+  } catch {
+    return null
+  }
+}
+
+/** Boyuta göre istem satırı; ölçülemediyse null. */
+function kayitSatiri(boyMb) {
+  if (typeof boyMb !== 'number' || !Number.isFinite(boyMb) || boyMb < 0) return null
+  if (boyMb >= KAYIT_DEVRET_MB) {
+    return '⛔KAYIT: ' + gbYaz(boyMb) + ' GB — yeni oturuma DEVRET: konusma dosyasi ' + gbYaz(KAYIT_DEVRET_MB) + " GB'i asti, kancalar ve pencere yavaslar (10-09 olcumu)."
+  }
+  if (boyMb >= KAYIT_UYARI_MB) {
+    return '⚠KAYIT: ' + gbYaz(boyMb) + ' GB — konusma dosyasi buyuyor; ' + gbYaz(KAYIT_DEVRET_MB) + " GB'ta yeni oturuma devret (devir belgesini simdiden hazirla)."
+  }
+  return 'KAYIT: ' + (boyMb < 1 ? '<1' : String(Math.floor(boyMb))) + ' MB'
+}
+
+/**
+ * ── PENCERE BAŞINA DURUM DOSYASI (ARC-33 madde 2, 10-04) ──
+ *
+ * Modlar (ops-kokpit) bağlamı `$.session.usage()` ile okuyunca değer donuyordu (kokpit 19, gerçek 27).
+ * Gerçek değeri bu kanca zaten her istemde ölçüyor; aynı ölçümü `~/.claude/mod-durum/pencereler/<sid>.json`
+ * dosyasına da bırakır, mod oradan okur (kanca denetlenebilir, mod yalnız gösterir). Aynı dosya pencere
+ * başına compact için temel olur. Alanlar: baglamToken (sayı; compact sonrası ilk mesajda null), durum
+ * ('olculdu' | 'compact-sonrasi'), pencere, saat (ISO), rol (CC_LANE; bilinmiyorsa null), sid.
+ *
+ * FAIL-OPEN: yazım hatası kancayı bozmaz, null döner. Yazım atomiktir (geçici dosya + rename), okuyan mod
+ * yarım dosya görmez. sid yalnız UUID ise yazılır (yol enjeksiyonu yok).
+ */
+const SID_BICIMI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const BOS_DURUM = Object.freeze({ durumDosyasi: null, durumBulundu: null, yarimIs: 'bilinmiyor' })
+
+/**
+ * ── COMPACT HAZIRLIK VERİSİ (ARC-31 madde 2, 10-05) ──
+ * Kokpitin "Açık pencereler" satırı ≥%50'de pencerenin durum dosyası güncel mi / yarım iş var mı / hüküm ne satırını gösterir.
+ * Durum dosyasını BULMA mantığı tek yerde kalır (precompact-durum-kapisi.cjs: kimlik, şerit adı, gün klasörleri); mod onu kopyalamaz.
+ * Bulma ~300 ms sürer (ölçüldü 10-05), her istemde koşamaz: bulunan yol pencere dosyasında saklanır, bağlam %40'ı geçince
+ * ve en çok 10 dakikada bir yeniden aranır. "Yarım iş" ifadesi dosyanın SON 24 KB'ından okunur (<1 ms).
+ * Dosya içeriği ekrana ya da bağlama GİRMEZ: yalnız sabit sözlükten bir değer çıkar ('yok' | 'var' | 'bilinmiyor').
+ */
+const HAZIRLIK_ESIGI = 0.4
+const DURUM_ARAMA_ARALIGI_MS = 10 * 60 * 1000
+const DURUM_OKUMA_BAYT = 24 * 1024
+
+/** Dosyadaki SON "yarım iş yok/var" ifadesi. Yoksa 'bilinmiyor'. Güvenli yön: belirsizlik "yok" demez. */
+function yarimIsOku(metin) {
+  const kucuk = String(metin).toLocaleLowerCase('tr')
+  let son = null
+  for (const m of kucuk.matchAll(/yar[ıi]m i[şs](?:im|lerim)?\s*[:=]?\s*(yok|var)(?![a-zçğıöşü])/g)) son = m[1]
+  return son === 'yok' || son === 'var' ? son : 'bilinmiyor'
+}
+
+function sonBaytlar(yol, bayt) {
+  const fd = fs.openSync(yol, 'r')
+  try {
+    const boy = fs.fstatSync(fd).size
+    const baslangic = Math.max(0, boy - bayt)
+    const tampon = Buffer.alloc(boy - baslangic)
+    fs.readSync(fd, tampon, 0, tampon.length, baslangic)
+    return tampon.toString('utf8')
+  } finally {
+    fs.closeSync(fd)
+  }
+}
+
+/**
+ * Pencere dosyasına yazılacak durum alanları. FAIL-OPEN: her hata BOS_DURUM'a (bilinmiyor) düşer, kancayı bozmaz.
+ * `bul(sid, transcriptPath)` → { tam } | null; testte yerine konur.
+ */
+function pencereDurumOzeti(klasor, sid, transcriptPath, token, pencere, simdi = Date.now(), bul = null) {
+  try {
+    if (!SID_BICIMI.test(String(sid || ''))) return BOS_DURUM
+    let onceki = {}
+    try {
+      onceki = JSON.parse(fs.readFileSync(path.join(klasor, String(sid).toLowerCase() + '.json'), 'utf8'))
+    } catch {
+      onceki = {}
+    }
+    let yol = typeof onceki.durumDosyasi === 'string' ? onceki.durumDosyasi : null
+    let bulundu = typeof onceki.durumBulundu === 'number' ? onceki.durumBulundu : null
+    if (yol !== null && !fs.existsSync(yol)) {
+      yol = null
+      bulundu = null
+    }
+    const oran = typeof token === 'number' && pencere > 0 ? token / pencere : 0
+    const eskidi = bulundu === null || simdi - bulundu > DURUM_ARAMA_ARALIGI_MS
+    if (oran >= HAZIRLIK_ESIGI && (yol === null || eskidi)) {
+      const bulucu = bul || require(path.join(__dirname, 'precompact-durum-kapisi.cjs')).durumDosyasiBul
+      const r = bulucu(String(sid).toLowerCase(), transcriptPath)
+      yol = r && typeof r.tam === 'string' ? r.tam : null
+      bulundu = simdi
+    }
+    if (yol === null) return { durumDosyasi: null, durumBulundu: bulundu, yarimIs: 'bilinmiyor' }
+    return { durumDosyasi: yol, durumBulundu: bulundu, yarimIs: yarimIsOku(sonBaytlar(yol, DURUM_OKUMA_BAYT)) }
+  } catch {
+    return BOS_DURUM
+  }
+}
+
+function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date(), durum = BOS_DURUM) {
+  try {
+    if (!SID_BICIMI.test(String(sid || ''))) return null
+    if (token === null || token === undefined) return null
+    const compactSonrasi = token === COMPACT_SONRASI
+    const kayit = {
+      sid: String(sid).toLowerCase(),
+      baglamToken: compactSonrasi ? null : token,
+      durum: compactSonrasi ? 'compact-sonrasi' : 'olculdu',
+      pencere,
+      saat: simdi.toISOString(),
+      rol: rol ? String(rol).toUpperCase() : null,
+      // Compact hazırlığı (ARC-31 madde 2): kokpit ≥%50'de bu üç alandan "durum dosyası güncel mi / yarım iş / hüküm" satırını kurar.
+      durumDosyasi: typeof durum.durumDosyasi === 'string' ? durum.durumDosyasi : null,
+      durumBulundu: typeof durum.durumBulundu === 'number' ? durum.durumBulundu : null,
+      yarimIs: durum.yarimIs === 'yok' || durum.yarimIs === 'var' ? durum.yarimIs : 'bilinmiyor',
+    }
+    fs.mkdirSync(klasor, { recursive: true })
+    const hedef = path.join(klasor, kayit.sid + '.json')
+    const gecici = hedef + '.' + process.pid + '.tmp'
+    fs.writeFileSync(gecici, JSON.stringify(kayit) + '\n')
+    fs.renameSync(gecici, hedef)
+    return hedef
+  } catch {
+    return null
+  }
+}
+
+/** Varsayılan klasör; VH_PENCERE_KLASORU yalnız testler içindir (gerçek kullanıcı klasörünü kirletmesin). */
+const PENCERE_KLASORU =
+  process.env.VH_PENCERE_KLASORU || path.join(os.homedir(), '.claude', 'mod-durum', 'pencereler')
+
+module.exports = {
+  compactPenceresi,
+  esikler,
+  sonBaglam,
+  satir,
+  kayitBoyutuMb,
+  kayitSatiri,
+  KAYIT_UYARI_MB,
+  KAYIT_DEVRET_MB,
+  pencereDosyasiYaz,
+  pencereDurumOzeti,
+  yarimIsOku,
+  HAZIRLIK_ESIGI,
+  DURUM_ARAMA_ARALIGI_MS,
+  PENCERE_KLASORU,
+  COMPACT_SONRASI,
+  DOLUYOR,
+  YAKIN,
+  OKUMA_BAYT,
+  HAZIRLIK_NOTU,
+}

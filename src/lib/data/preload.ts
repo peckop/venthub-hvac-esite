@@ -131,9 +131,9 @@ export interface KategoriUst {
 }
 
 /**
- * REC-300 Faz 3b-2 — kategori kimliği → üst bilgisi (kanonik iki seviyeli adres + pasif kategorinin
- * aktif üste yönlendirilmesi için). Hata FIRLATILIR: yutulsaydı geçici arıza "üst yok" sayılır ve dal
- * adresi yanlış (tek seviyeli) kanoniğe yönlenirdi.
+ * REC-300 Faz 3b-2 — kategori kimliği → üst bilgisi. SEO-35 B-1'den beri kanonik adres tek segmenttir ve
+ * üstten bağımsızdır; üst YALNIZ pasif kategorinin aktif üste yönlendirilmesi için okunur (`kategoriSegmenti.ts`).
+ * Hata FIRLATILIR: yutulsaydı geçici arıza "üst yok" sayılır ve pasif dal yanlışlıkla tüm ürünlere yönlenirdi.
  */
 export const getCachedKategoriUstById = cache(async (categoryId: string): Promise<KategoriUst | null> => {
   const { data, error } = await supabase
@@ -151,9 +151,17 @@ export const getCachedKategoriUstById = cache(async (categoryId: string): Promis
  * Kategori slug'ı bulunamadığında eski adres tablosuna bakar; hedef varsa dile uygun bugünkü
  * slug'ı, yoksa ya da hedef gelen slug'ın kendisiyse `null` döner (döngü yok). Hata FIRLATILIR —
  * çağıran 404 basmadan önce bunu çağırır; ölçüm hatası 5xx olur, kalıcı yokluk beyanı değil.
+ *
+ * URN-55: kategori takma adları dile özeldir (eski TR slug `dil='tr'`, eski EN slug `dil='en'`) ve çözücü
+ * yalnız istek dilinde bakar; bu yüzden eski TR slug EN önekiyle (ya da tersi) gelince "yok" → 404 olurdu.
+ * İstek dilinde bulunamazsa öbür dilde de aranır; hedef yine İSTEK DİLİNİN slug'ına çevrilir, yani
+ * çağıranın kanonik adres karşılaştırması tek yönlendirmeyle doğru dil önekli yeni adrese götürür.
+ * İstek dili önceliklidir: öbür dil yalnız orada bulunamayınca sorulur.
  */
 export async function eskiKategoriHedefi(slug: string, lang: string): Promise<string | null> {
-  const hedefId = await getCachedTakmaAd('kategori', lang, slug)
+  const hedefId =
+    (await getCachedTakmaAd('kategori', lang, slug)) ??
+    (await getCachedTakmaAd('kategori', lang === 'tr' ? 'en' : 'tr', slug))
   if (!hedefId) return null
   const kaynak = await getCachedCategorySlugSourceById(hedefId)
   const hedef = getLocalizedCategorySlug(kaynak as CategorySlugSource | null, lang)

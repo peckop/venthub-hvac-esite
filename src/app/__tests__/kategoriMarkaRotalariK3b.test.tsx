@@ -50,6 +50,14 @@ vi.mock('@/lib/data/preload', () => ({
 
 vi.mock('@/lib/supabase/static', () => ({ supabaseStaticClient: { from: cagri.staticFrom } }))
 
+// OPS-51: marka üst verisi artık DB'deki aktif ürün sayısına bakar; sayı ENJEKTE (ürünlü marka → bugünkü çıktı BİREBİR).
+// `unstable_cache` Next çalışma zamanı dışında kurulamaz → geçiş.
+vi.mock('next/cache', () => ({ unstable_cache: <T,>(fn: T) => fn }))
+vi.mock('@/lib/services/family.service', async (orijinal) => ({
+  ...(await orijinal<typeof import('@/lib/services/family.service')>()),
+  getBrandFamilyCount: async () => 5,
+}))
+
 vi.mock('@/lib/data/urunSegmenti', () => ({
   eskiTrUrunAdresiniYonlendir: cagri.eskiUrun,
   urunSegmentiniCoz: vi.fn(),
@@ -72,13 +80,21 @@ vi.mock('../_components/markaSayfasi', async (orijinal) => ({
 import { ADRES_SEMASI_K3B } from '../../config/features'
 import { SITE_URL as SITE } from '../../config/siteUrl'
 import MarkaEski, { generateMetadata as markaEskiUst } from '../[lang]/brands/[slug]/page'
+import MarkaListeEski, { generateMetadata as markaListeEskiUst } from '../[lang]/brands/page'
 import AltKategori, { generateMetadata as altKategoriUst } from '../[lang]/category/[categorySlug]/[subCategorySlug]/page'
-import KategoriEski, { generateMetadata as kategoriEskiUst } from '../[lang]/category/[categorySlug]/page'
+import KategoriEski, {
+  generateMetadata as kategoriEskiUst,
+  generateStaticParams as kategoriEskiParam,
+} from '../[lang]/category/[categorySlug]/page'
 import KategoriYeni, {
   generateMetadata as kategoriYeniUst,
   generateStaticParams as kategoriYeniParam,
 } from '../[lang]/kategori/[kok]/[[...dal]]/page'
 import MarkaYeni, { generateMetadata as markaYeniUst, generateStaticParams as markaYeniParam } from '../[lang]/markalar/[slug]/page'
+import MarkaListeYeni, {
+  generateMetadata as markaListeYeniUst,
+  generateStaticParams as markaListeYeniParam,
+} from '../[lang]/markalar/page'
 import UrunEski from '../[lang]/products/[slug]/page'
 import UrunlerEski, { generateMetadata as urunlerEskiUst } from '../[lang]/products/page'
 import UrunlerYeni, { generateMetadata as urunlerYeniUst, generateStaticParams as urunlerYeniParam } from '../[lang]/urunler/page'
@@ -107,14 +123,15 @@ describe('ön koşul', () => {
   it('bu dosyada bayrak AÇIK taklit ediliyor', () => expect(ADRES_SEMASI_K3B).toBe(true))
 })
 
-describe('/tr/kategori (yeni) — rota × durum × sonuç', () => {
+describe('/tr/kategori (yeni) — rota × durum × sonuç (SEO-35 B-1: kanonik adres TEK segment)', () => {
   it.each([
     // [kok, dal, beklenen]
-    ['fanlar', [], 'CIZ:fans'],
-    ['fanlar', ['kanal-tipi-fanlar'], 'CIZ:duct-fans'],
-    ['kanal-tipi-fanlar', [], 'REDIRECT:/tr/kategori/fanlar/kanal-tipi-fanlar'], // tek seviye dal
-    ['isi-geri-kazanim', ['kanal-tipi-fanlar'], 'REDIRECT:/tr/kategori/fanlar/kanal-tipi-fanlar'], // kök değişimi
-    ['fans', ['duct-fans'], 'REDIRECT:/tr/kategori/fanlar/kanal-tipi-fanlar'], // EN biçimli
+    ['fanlar', [], 'CIZ:fans'], // kök adresi DEĞİŞMEDİ
+    ['kanal-tipi-fanlar', [], 'CIZ:duct-fans'], // alt kategori: tek segment KANONİK, çizilir
+    ['fanlar', ['kanal-tipi-fanlar'], 'REDIRECT:/tr/kategori/kanal-tipi-fanlar'], // 3-C iki seviyeli → tek 308
+    ['isi-geri-kazanim', ['kanal-tipi-fanlar'], 'REDIRECT:/tr/kategori/kanal-tipi-fanlar'], // yanlış üst
+    ['fans', ['duct-fans'], 'REDIRECT:/tr/kategori/kanal-tipi-fanlar'], // EN biçimli iki seviyeli
+    ['duct-fans', [], 'REDIRECT:/tr/kategori/kanal-tipi-fanlar'], // EN biçimli tek seviye
     ['Fanlar', [], 'REDIRECT:/tr/kategori/fanlar'], // büyük harf
     ['otopark-jet-fanlari', [], 'REDIRECT:/tr/kategori/fanlar'], // pasif → aktif üst
     ['ticari-havalandirma', [], 'REDIRECT:/tr/urunler'], // pasif kök
@@ -134,24 +151,28 @@ describe('/tr/kategori (yeni) — rota × durum × sonuç', () => {
     await expect(KategoriYeni(p({ lang: 'tr', kok: 'fanlar', dal: [] }))).rejects.toThrow('db düştü')
   })
 
-  it('üst veri: canonical/hreflang/og:url adresUret\'ten, dal iki seviyeli', async () => {
-    const m = await kategoriYeniUst(p({ lang: 'tr', kok: 'fanlar', dal: ['kanal-tipi-fanlar'] }))
+  it('üst veri: canonical/hreflang/og:url adresUret\'ten, alt kategori TEK segment', async () => {
+    const m = await kategoriYeniUst(p({ lang: 'tr', kok: 'kanal-tipi-fanlar', dal: [] }))
     expect(m.alternates).toEqual({
-      canonical: `${SITE}/tr/kategori/fanlar/kanal-tipi-fanlar`,
+      canonical: `${SITE}/tr/kategori/kanal-tipi-fanlar`,
       languages: {
-        tr: `${SITE}/tr/kategori/fanlar/kanal-tipi-fanlar`,
-        en: `${SITE}/en/category/fans/duct-fans`,
-        'x-default': `${SITE}/tr/kategori/fanlar/kanal-tipi-fanlar`,
+        tr: `${SITE}/tr/kategori/kanal-tipi-fanlar`,
+        en: `${SITE}/en/category/duct-fans`,
+        'x-default': `${SITE}/tr/kategori/kanal-tipi-fanlar`,
       },
     })
     expect(m.openGraph).toMatchObject({
-      url: `${SITE}/tr/kategori/fanlar/kanal-tipi-fanlar`,
+      url: `${SITE}/tr/kategori/kanal-tipi-fanlar`,
       images: [{ url: '/images/og-default.jpg', width: 1200, height: 630 }],
     })
     expect(m.robots).toBeUndefined()
   })
 
-  it('önceden üretim: 6 kök + 18 dal, TR slug\'larıyla', async () => {
+  it('iç içe adreste (/tr/kategori/<üst>/<alt>) üst veri YAZILMAZ: sayfa 308 verir, kanonik ikiye bölünmez', async () => {
+    await expect(kategoriYeniUst(p({ lang: 'tr', kok: 'fanlar', dal: ['kanal-tipi-fanlar'] }))).resolves.toEqual({})
+  })
+
+  it('önceden üretim: 7 kök + 17 dal (Sığınak 7. kök), her biri KENDİ TR slug\'ıyla ve tek segment', async () => {
     const satirlar = (await import('../../lib/data/__tests__/fixtures/kategoriAgaci')).KATEGORI_AGACI.filter(
       (c) => c.is_active,
     )
@@ -161,8 +182,25 @@ describe('/tr/kategori (yeni) — rota × durum × sonuç', () => {
     const r = await kategoriYeniParam()
     expect(r).toHaveLength(24)
     expect(r).toContainEqual({ lang: 'tr', kok: 'fanlar', dal: [] })
-    expect(r).toContainEqual({ lang: 'tr', kok: 'fanlar', dal: ['kanal-tipi-fanlar'] })
-    expect(r.every((x) => x.lang === 'tr')).toBe(true)
+    // B-1: dal kendi adresiyle (tek segment) üretilir; üst/alt iki segmentli biçim ÜRETİLMEZ.
+    expect(r).toContainEqual({ lang: 'tr', kok: 'kanal-tipi-fanlar', dal: [] })
+    expect(r).not.toContainEqual({ lang: 'tr', kok: 'fanlar', dal: ['kanal-tipi-fanlar'] })
+    // OPS-51: Sığınak kökte üretilir
+    expect(r).toContainEqual({ lang: 'tr', kok: 'siginak-havalandirma', dal: [] })
+    expect(r.every((x) => x.lang === 'tr' && x.dal.length === 0)).toBe(true)
+    expect(new Set(r.map((x) => x.kok)).size, 'aynı TR slug iki kez üretiliyor').toBe(24)
+  })
+
+  it('önceden üretimde üstü PASİF dal da kendi adresiyle üretilir (kanonik adres üstten bağımsız)', async () => {
+    const satirlar = [
+      { id: 'u', slug: 'pasif-ust', metadata: { slug: { tr: 'pasif-ust', en: 'pasif-ust' } }, parent_id: null },
+      { id: 'd', slug: 'aktif-dal', metadata: { slug: { tr: 'aktif-dal', en: 'aktif-dal' } }, parent_id: 'u' },
+    ]
+    // `.eq('is_active', true)` süzgeci DB'dedir: yalnız aktif satırlar gelir (üst listede yok).
+    cagri.staticFrom.mockReturnValue({
+      select: () => ({ eq: async () => ({ data: [satirlar[1]], error: null }) }),
+    })
+    await expect(kategoriYeniParam()).resolves.toEqual([{ lang: 'tr', kok: 'aktif-dal', dal: [] }])
   })
 })
 
@@ -170,8 +208,8 @@ describe('/tr/category (eski) — her çözülebilir slug TEK 308 ile /tr/katego
   it.each([
     ['fanlar', 'REDIRECT:/tr/kategori/fanlar'],
     ['fans', 'REDIRECT:/tr/kategori/fanlar'], // EN biçimli
-    ['kanal-tipi-fanlar', 'REDIRECT:/tr/kategori/fanlar/kanal-tipi-fanlar'],
-    ['duct-fans', 'REDIRECT:/tr/kategori/fanlar/kanal-tipi-fanlar'],
+    ['kanal-tipi-fanlar', 'REDIRECT:/tr/kategori/kanal-tipi-fanlar'],
+    ['duct-fans', 'REDIRECT:/tr/kategori/kanal-tipi-fanlar'],
     ['ticari-havalandirma', 'REDIRECT:/tr/urunler'], // bugün 200 dönen pasif
     ['jet-fans', 'REDIRECT:/tr/kategori/fanlar'],
     ['boyle-bir-kategori-yok', 'NOT_FOUND'],
@@ -183,9 +221,9 @@ describe('/tr/category (eski) — her çözülebilir slug TEK 308 ile /tr/katego
     ['fans', 'duct-fans'],
     ['fanlar', 'kanal-tipi-fanlar'],
     ['isi-geri-kazanim', 'duct-fans'],
-  ])('/tr/category/%s/%s → /tr/kategori/fanlar/kanal-tipi-fanlar', async (categorySlug, subCategorySlug) => {
+  ])('(a) /tr/category/%s/%s → TEK 308 /tr/kategori/kanal-tipi-fanlar (iki sıçrama değil)', async (categorySlug, subCategorySlug) => {
     await expect(AltKategori(p({ lang: 'tr', categorySlug, subCategorySlug }))).rejects.toThrow(
-      'REDIRECT:/tr/kategori/fanlar/kanal-tipi-fanlar',
+      'REDIRECT:/tr/kategori/kanal-tipi-fanlar',
     )
   })
 
@@ -194,15 +232,17 @@ describe('/tr/category (eski) — her çözülebilir slug TEK 308 ile /tr/katego
   })
 })
 
-describe('/en/category — EN yerinde kalır, dal iki seviyeli (Y4)', () => {
+describe('/en/category — EN yerinde kalır, alt kategori TEK segment (SEO-35 B-1)', () => {
   it.each([
-    [['fans'], 'CIZ:fans'],
-    [['duct-fans'], 'REDIRECT:/en/category/fans/duct-fans'],
-    [['kanal-tipi-fanlar'], 'REDIRECT:/en/category/fans/duct-fans'],
-    [['fans', 'duct-fans'], 'CIZ:duct-fans'],
-    [['heat-recovery-vmc', 'duct-fans'], 'REDIRECT:/en/category/fans/duct-fans'],
+    [['fans'], 'CIZ:fans'], // kök adresi DEĞİŞMEDİ
+    [['duct-fans'], 'CIZ:duct-fans'], // alt kategori: tek segment kanonik, çizilir (eskiden iki seviyeliye 308)
+    [['kanal-tipi-fanlar'], 'REDIRECT:/en/category/duct-fans'], // TR biçimli slug → kanonik EN slug
+    [['fans', 'duct-fans'], 'REDIRECT:/en/category/duct-fans'], // (a) iç içe → tek 308
+    [['heat-recovery-vmc', 'duct-fans'], 'REDIRECT:/en/category/duct-fans'],
     [['jet-fans'], 'REDIRECT:/en/category/fans'],
     [['commercial-ventilation'], 'REDIRECT:/en/products'],
+    [['fans', 'jet-fans'], 'REDIRECT:/en/category/fans'], // iç içe pasif → aktif üst
+    [['fans', 'boyle-bir-kategori-yok'], 'NOT_FOUND'],
   ])('/en/category/%j → %s', async (seg, beklenen) => {
     const calis =
       seg.length === 1
@@ -211,11 +251,29 @@ describe('/en/category — EN yerinde kalır, dal iki seviyeli (Y4)', () => {
     await expect(sonuc(calis, cagri.kategori)).resolves.toBe(beklenen)
   })
 
+  it('EN önceden üretim: 7 kök + 17 dal TEK segment, EN slug\'larıyla (dal artık bu rotada çizilir)', async () => {
+    const satirlar = (await import('../../lib/data/__tests__/fixtures/kategoriAgaci')).KATEGORI_AGACI.filter(
+      (c) => c.is_active,
+    )
+    cagri.staticFrom.mockReturnValue({
+      select: () => ({ eq: async () => ({ data: satirlar, error: null }) }),
+    })
+    const r = await kategoriEskiParam()
+    expect(r).toHaveLength(24)
+    expect(r.every((x) => x.lang === 'en')).toBe(true)
+    expect(r).toContainEqual({ lang: 'en', categorySlug: 'fans' })
+    expect(r).toContainEqual({ lang: 'en', categorySlug: 'duct-fans' })
+  })
+
+  it('iç içe EN adreste üst veri YAZILMAZ (rota hiçbir kipte çizmez)', async () => {
+    await expect(altKategoriUst()).resolves.toEqual({})
+  })
+
   it('EN üst verisi (EN_YAYIN AÇIK): hreflang TR eşi yeni adres, EN dizine açık', async () => {
-    const m = await altKategoriUst(p({ lang: 'en', categorySlug: 'fans', subCategorySlug: 'duct-fans' }))
+    const m = await kategoriEskiUst(p({ lang: 'en', categorySlug: 'duct-fans' }))
     expect(m.alternates).toMatchObject({
-      canonical: `${SITE}/en/category/fans/duct-fans`,
-      languages: { tr: `${SITE}/tr/kategori/fanlar/kanal-tipi-fanlar` },
+      canonical: `${SITE}/en/category/duct-fans`,
+      languages: { tr: `${SITE}/tr/kategori/kanal-tipi-fanlar` },
     })
     expect(m.robots).toBeUndefined()
     const kok = await kategoriEskiUst(p({ lang: 'en', categorySlug: 'fans' }))
@@ -225,8 +283,8 @@ describe('/en/category — EN yerinde kalır, dal iki seviyeli (Y4)', () => {
   it('EN üst verisi (EN_YAYIN KAPALI): hreflang YOK, yalnız canonical; EN dizin dışı', async () => {
     enYayin.acik = false
     try {
-      const m = await altKategoriUst(p({ lang: 'en', categorySlug: 'fans', subCategorySlug: 'duct-fans' }))
-      expect(m.alternates).toEqual({ canonical: `${SITE}/en/category/fans/duct-fans` })
+      const m = await kategoriEskiUst(p({ lang: 'en', categorySlug: 'duct-fans' }))
+      expect(m.alternates).toEqual({ canonical: `${SITE}/en/category/duct-fans` })
       expect(m.robots).toEqual({ index: false, follow: true })
       const kok = await kategoriEskiUst(p({ lang: 'en', categorySlug: 'fans' }))
       expect(kok.alternates).toEqual({ canonical: `${SITE}/en/category/fans` })
@@ -285,6 +343,42 @@ describe('markalar', () => {
     const r = await markaYeniParam()
     expect(r.length).toBeGreaterThan(0)
     expect(r.every((x) => x.lang === 'tr')).toBe(true)
+  })
+})
+
+describe('marka LİSTESİ (URN-85, Design CSV satır 4): /tr/markalar ↔ /en/brands', () => {
+  const cizildi = async (calis: () => Promise<unknown>): Promise<string> => {
+    try {
+      const el = (await calis()) as ReactElement
+      return el && typeof el === 'object' && 'type' in el ? 'CIZ' : 'BASKA'
+    } catch (e) {
+      return (e as Error).message
+    }
+  }
+
+  it.each([
+    ['/tr/brands (eski)', () => MarkaListeEski(p({ lang: 'tr' })), 'REDIRECT:/tr/markalar'],
+    ['/en/brands yerinde çizilir', () => MarkaListeEski(p({ lang: 'en' })), 'CIZ'],
+    ['/tr/markalar çizilir', () => MarkaListeYeni(p({ lang: 'tr' })), 'CIZ'],
+    ['/en/markalar yok → 404', () => MarkaListeYeni(p({ lang: 'en' })), 'NOT_FOUND'],
+  ])('%s', async (_ad, calis, beklenen) => {
+    await expect(cizildi(calis)).resolves.toBe(beklenen)
+  })
+
+  it('üst veri: canonical /tr/markalar, hreflang tr=/tr/markalar en=/en/brands; eski adreste TR üst verisi yazılmaz', async () => {
+    const tr = await markaListeYeniUst(p({ lang: 'tr' }))
+    expect(tr.alternates).toEqual({
+      canonical: `${SITE}/tr/markalar`,
+      languages: { tr: `${SITE}/tr/markalar`, en: `${SITE}/en/brands`, 'x-default': `${SITE}/tr/markalar` },
+    })
+    expect(await markaListeYeniUst(p({ lang: 'en' }))).toEqual({})
+    expect(await markaListeEskiUst(p({ lang: 'tr' }))).toEqual({})
+    const en = await markaListeEskiUst(p({ lang: 'en' }))
+    expect(en.alternates).toMatchObject({ canonical: `${SITE}/en/brands` })
+  })
+
+  it('önceden üretim yalnız TR', async () => {
+    await expect(markaListeYeniParam()).resolves.toEqual([{ lang: 'tr' }])
   })
 })
 

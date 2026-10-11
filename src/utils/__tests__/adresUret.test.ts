@@ -6,10 +6,20 @@
  * (2026-09-24: `/tr/products/storm-serisi?sku=SEA-61143003`, `/tr/category/<dal>` tek seviye).
  * AÇIK kip plan §2 tablosunun satır satır karşılığıdır.
  */
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { modellerdenVeri, yayindaVeriAyarla } from '../../config/__tests__/yayindaTestKiti'
 import { ADRES_SEMASI_K3B } from '../../config/features'
 import { adresUret, MODEL_AYIRICI, modelAdresiCoz } from '../adresUret'
+
+// URN-31: model adresi YALNIZ yayındaki listedeki SKU için üretilir; bu dosya listeye tek model koyar ve adres
+// metinleri (slug_tr/slug_en) eski beklentilerle aynı seçilir.
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() =>
+  yayindaVeriAyarla(
+    modellerdenVeri([{ aile: 'storm-serisi', sku: 'SEA-61143003', tr: 'storm-10-kanal-fani', en: 'storm-10-duct-fan' }]),
+  ),
+)
 
 describe('bayrak', () => {
   it('Faz 3-C öncesi KAPALI — açılışı yalnız Faz 4 onaylı tek PR yapar', () => {
@@ -39,6 +49,10 @@ describe('adresUret — KAPALI kip = bugünkü canlı adresler', () => {
   it('marka', () => {
     expect(adresUret({ tur: 'marka', slug: 'vortice' }, 'tr', k)).toBe('/tr/brands/vortice')
   })
+  it('marka listesi: iki dilde de bugünkü /brands', () => {
+    expect(adresUret({ tur: 'markalar' }, 'tr', k)).toBe('/tr/brands')
+    expect(adresUret({ tur: 'markalar' }, 'en', k)).toBe('/en/brands')
+  })
 })
 
 describe('adresUret — AÇIK kip = plan §2 hedef şeması', () => {
@@ -46,32 +60,77 @@ describe('adresUret — AÇIK kip = plan §2 hedef şeması', () => {
   it.each([
     [{ tur: 'urunler' } as const, '/tr/urunler', '/en/products'],
     [{ tur: 'kategori', kok: 'fanlar' } as const, '/tr/kategori/fanlar', '/en/category/fanlar'],
+    // SEO-35 B-1: alt kategori TEK segment — üst slug'ı (`fanlar`) adrese GİRMEZ, kimlik soneki yok.
     [
       { tur: 'kategori', kok: 'fanlar', dal: 'kanal-tipi-fanlar' } as const,
-      '/tr/kategori/fanlar/kanal-tipi-fanlar',
-      '/en/category/fanlar/kanal-tipi-fanlar',
+      '/tr/kategori/kanal-tipi-fanlar',
+      '/en/category/kanal-tipi-fanlar',
     ],
     [{ tur: 'aile', slug: 'storm-serisi' } as const, '/tr/urun/storm-serisi', '/en/products/storm-serisi'],
     [{ tur: 'marka', slug: 'vortice' } as const, '/tr/markalar/vortice', '/en/brands/vortice'],
+    [{ tur: 'markalar' } as const, '/tr/markalar', '/en/brands'],
   ])('%o', (n, tr, en) => {
     expect(adresUret(n, 'tr', a)).toBe(tr)
     expect(adresUret(n, 'en', a)).toBe(en)
   })
 
-  it('model: <slug>-p-<sku küçük harf>, ?sku= YOK', () => {
-    const n = { tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003', slug: 'storm-10-kanal-fani' } as const
+  it('model: <slug>-p-<sku küçük harf>, ?sku= YOK; metin yayındaki listeden (dil başına)', () => {
+    const n = { tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003' } as const
     expect(adresUret(n, 'tr', a)).toBe('/tr/urun/storm-10-kanal-fani-p-sea-61143003')
-    expect(adresUret({ ...n, slug: 'storm-10-duct-fan' }, 'en', a)).toBe('/en/products/storm-10-duct-fan-p-sea-61143003')
+    expect(adresUret(n, 'en', a)).toBe('/en/products/storm-10-duct-fan-p-sea-61143003')
     expect(adresUret(n, 'tr', a)).not.toContain('?')
   })
 
-  it('model slug yoksa (Faz 2 öncesi veri) kırık adres değil AİLE adresi', () => {
-    const n = { tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003', slug: null } as const
-    expect(adresUret(n, 'tr', a)).toBe('/tr/urun/storm-serisi')
+  it('liste DIŞI model: model sayfası yok → AİLE adresi + ?sku= (yeni şemada bugünkü ?sku= seçiminin karşılığı)', () => {
+    const n = { tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-YOK-1', slug: 'storm-10' } as const
+    expect(adresUret(n, 'tr', a)).toBe('/tr/urun/storm-serisi?sku=SEA-YOK-1')
+    expect(adresUret(n, 'en', a)).toBe('/en/products/storm-serisi?sku=SEA-YOK-1')
   })
 
   it('segmentler kodlanır (adrese boşluk/eğik çizgi sızmaz)', () => {
     expect(adresUret({ tur: 'aile', slug: 'a b/c' }, 'tr', a)).toBe('/tr/urun/a%20b%2Fc')
+  })
+})
+
+describe('SEO-35 B-1 — kategori adresi iki dilde TEK segment', () => {
+  const kategori = (kok: string, dal?: string | null) => ({ tur: 'kategori', kok, dal }) as const
+
+  it('(d) KÖK adresi DEĞİŞMEDİ: /tr/kategori/<kök>, /en/category/<kök>; dal yok/null/boş aynı sonucu verir', () => {
+    for (const dal of [undefined, null, '']) {
+      expect(adresUret(kategori('fanlar', dal), 'tr', true)).toBe('/tr/kategori/fanlar')
+      expect(adresUret(kategori('fans', dal), 'en', true)).toBe('/en/category/fans')
+    }
+  })
+
+  it('ALT kategori TEK seviye: /tr/kategori/<alt>, /en/category/<alt>; üst slug\'ı ve kimlik soneki adrese girmez', () => {
+    const tr = adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', true)
+    const en = adresUret(kategori('fans', 'duct-fans'), 'en', true)
+    expect(tr).toBe('/tr/kategori/kanal-tipi-fanlar')
+    expect(en).toBe('/en/category/duct-fans')
+    // Segment sayısı: [dil, bölüm, slug] — iç içe adres üretilmez.
+    expect(tr.split('/').filter(Boolean)).toHaveLength(3)
+    expect(en.split('/').filter(Boolean)).toHaveLength(3)
+    // Model ayırıcısı ya da başka bir sonek kategori adresine sızmaz.
+    expect(tr).not.toContain(MODEL_AYIRICI)
+  })
+
+  it('adres yalnız dalın slug\'ından türer: yanlış ya da farklı üst aynı adresi verir (üst karar vermez, O6)', () => {
+    const dogru = adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', true)
+    expect(adresUret(kategori('isi-geri-kazanim', 'kanal-tipi-fanlar'), 'tr', true)).toBe(dogru)
+    expect(adresUret(kategori('', 'kanal-tipi-fanlar'), 'tr', true)).toBe(dogru)
+  })
+
+  it('(b) BAYRAK KAPALI: bugünkü adres değişmedi (/<dil>/category/<slug>), açık kiple yalnız bölüm adı ayrışır', () => {
+    expect(adresUret(kategori('fanlar'), 'tr', false)).toBe('/tr/category/fanlar')
+    expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', false)).toBe('/tr/category/kanal-tipi-fanlar')
+    expect(adresUret(kategori('fans', 'duct-fans'), 'en', false)).toBe('/en/category/duct-fans')
+    // Üretim varsayılanı bayrağı okur ve bayrak kapalıyken bugünkü adresi verir.
+    expect(ADRES_SEMASI_K3B).toBe(false)
+    expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr')).toBe('/tr/category/kanal-tipi-fanlar')
+  })
+
+  it('kodlanır: boşluk ve eğik çizgi iç içe adres üretemez', () => {
+    expect(adresUret(kategori('fanlar', 'a/b'), 'tr', true)).toBe('/tr/kategori/a%2Fb')
   })
 })
 
@@ -86,6 +145,11 @@ describe('modelAdresiCoz', () => {
   it('büyük harfli SKU çözülür ama kanonik DEĞİL (çağıran 308 verir)', () => {
     expect(modelAdresiCoz('kanal-fani-p-VRT-1')?.skuKanonik).toBe(false)
   })
+  it('büyük harfte İngilizce harfe dönüşen başka harfler (ſ, ı) kanonik DEĞİL: aynı SKU\'ya çözülür, çağıran 308 verir', () => {
+    expect(modelAdresiCoz('fan-p-vrt-1ſ')).toMatchObject({ sku: 'VRT-1S', skuKanonik: false })
+    expect(modelAdresiCoz('fan-p-vırt-1')).toMatchObject({ sku: 'VIRT-1', skuKanonik: false })
+    expect(modelAdresiCoz('fan-p-vrt-1s')?.skuKanonik).toBe(true)
+  })
   it('-p- yoksa aile adresi → null', () => {
     expect(modelAdresiCoz('storm-serisi')).toBeNull()
   })
@@ -98,9 +162,9 @@ describe('modelAdresiCoz', () => {
     expect(modelAdresiCoz('a-p-b-p-sku1')).toMatchObject({ slugMetni: 'a-p-b', sku: 'SKU1' })
   })
   it('gidiş-dönüş: üretilen model adresinin son segmenti aynı SKU\'ya çözülür', () => {
-    const adres = adresUret({ tur: 'model', aileSlug: 'x', sku: 'SEA-61143003', slug: 'storm-10' }, 'tr', true)
+    const adres = adresUret({ tur: 'model', aileSlug: 'x', sku: 'SEA-61143003' }, 'tr', true)
     const son = adres.split('/').pop() ?? ''
     expect(son).toContain(MODEL_AYIRICI)
-    expect(modelAdresiCoz(son)).toMatchObject({ sku: 'SEA-61143003', skuKanonik: true, slugMetni: 'storm-10' })
+    expect(modelAdresiCoz(son)).toMatchObject({ sku: 'SEA-61143003', skuKanonik: true, slugMetni: 'storm-10-kanal-fani' })
   })
 })

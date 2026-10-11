@@ -3,7 +3,8 @@
 > **SSOT.** Ürün kategori iskeleti + yerleşim + gösterim kuralları. Full ürün yüklemesinin OMURGASI.
 > Çelişirse kod/DB kazanır; bu cetvel niçin/nasıl'ı sabitler.
 > v1.2 · 2026-08-10 — **ingestor fork'u kapatıldı:** §6 kanonik ağaç 11→**12 dal** (`parking-jet-fan` eklendi),
-> §6.1 katalog-hattı yeni kategorileri (acid-resistant-fans / frequency-converters / electric-duct-heaters) karara bağlandı.
+> §6.1 katalog-hattı yeni kategorileri (acid-resistant-fans / frequency-converters / electric-duct-heaters) karara bağlandı
+> (`acid-resistant-fans` EN adresi sonradan değişti: §6.1 tablosundaki **yerine geçti: karar 292** notuna bak).
 > (v1.1 · 2026-06-19 — canlı DB ile yeniden doğrulandı; §3'teki yanlış "üste yığılı" önermesi düzeltildi.)
 
 ---
@@ -110,7 +111,7 @@ Ingestor CSV'lerindeki 230 satırlık slug sapması canlı DB'ye hizalandı; kar
 
 | Yeni kategori | Slug (üst/alt) | Kapsam | Gerekçe |
 |---|---|---|---|
-| Asit-dayanımlı fanlar | `industrial-ventilation` / `acid-resistant-fans` | Seat/Storm/Jet, 81 ürün | 81 ürün tek alt'a (`radyal-fanlar`) yığılmaz; kimyasal/asit ortam = net alıcı niyeti |
+| Asit-dayanımlı fanlar | `industrial-ventilation` / `acid-resistant-fans` | Seat/Storm/Jet, 81 ürün | 81 ürün tek alt'a (`radyal-fanlar`) yığılmaz; kimyasal/asit ortam = net alıcı niyeti. **Yerine geçti: karar 292 (10-05):** EN adres `corrosion-and-acid-resistant-fans`; eski EN adres `acid-resistant-fans` 308 yönlendirmesi verir |
 | Frekans konvertörleri | `accessories` / `frequency-converters` | Danfoss FC101/FC102, 34 ürün | Fan kontrol cihazı = aksesuar doğası; yeni ana dal gerektirmez |
 | Elektrikli kanal ısıtıcıları | `electric-heating` / `electric-duct-heaters` | Avens, 14 ürün | Mevcut `electric-heating` iskeleti tam bu iş için bekliyordu; HRV'ye gömmek yanlış raf |
 

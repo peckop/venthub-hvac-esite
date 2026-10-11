@@ -6,6 +6,7 @@
 // arasına gömülmesi ("satır arası not") bu kapıyla mekanik olarak imkânsızlaşır.
 // Not bir mekanizma değildir; bu dosya o notun mekanizmasıdır.
 const fs = require('fs');
+const { kuyrukSatirlari } = require('./transkript-kuyrugu.cjs');
 
 let raw = '';
 process.stdin.on('data', (c) => { raw += c; });
@@ -24,8 +25,22 @@ process.stdin.on('end', () => {
   const tp = input.transcript_path;
   if (!tp || !fs.existsSync(tp)) process.exit(0);
 
-  // Transkriptin kuyruğunu oku (son ~400 satır yeter: bir turun içi)
-  const satirlar = fs.readFileSync(tp, 'utf8').trim().split('\n').slice(-400);
+  // Transkriptin kuyruğunu oku (son ~400 satır yeter: bir turun içi). ARC-83: dosya BÜTÜN okunmaz,
+  // 1,78 GB'lık kayıtta readFileSync dizge sınırını aşıp kancayı çökertiyordu (kapı hiç çalışmıyordu).
+  let satirlar;
+  try {
+    satirlar = kuyrukSatirlari(tp);
+  } catch (e) {
+    // §9.7: okunamayan kayıt → fail-OPEN ama SESSİZ DEĞİL.
+    process.stderr.write('[son-soz-gate] transkript okunamadi (' + ((e && e.code) || (e && e.message) || 'bilinmeyen') + '), karisilmadi\n');
+    process.exit(0);
+  }
+  if (satirlar.length === 0) {
+    if (fs.statSync(tp).size > 0) {
+      process.stderr.write('[son-soz-gate] transkript kuyrugunda tam satir yok (tek satir pencereyi asiyor), karisilmadi\n');
+    }
+    process.exit(0);
+  }
   const kayitlar = [];
   for (const s of satirlar) { try { kayitlar.push(JSON.parse(s)); } catch { /* yut */ } }
 

@@ -29,7 +29,10 @@ interface Cati {
 }
 type Getir = (id: string) => Promise<Cati | null>
 interface Kapi {
-  degerlendir: (g: { govde?: string | null; yazar?: string }) => Sonuc
+  degerlendir: (g: { govde?: string | null; yazar?: string; bugun?: string }) => Sonuc
+  kanbanNumaralari: (temiz: string) => string[]
+  eskiYolDoldu: (bugun?: string) => boolean
+  ESKI_YOL_SON_GUN: string
   catiKontrolu: (kayitlar: string[], getir?: Getir | null) => Promise<{ durum: string; cati: string[]; aciklama: string }>
   linearGetirici: (anahtar: string | undefined) => unknown
 }
@@ -37,7 +40,10 @@ interface Kapi {
 const require_ = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '../../..')
 const KAPI_YOLU = path.join(KOK, 'scripts/board/pr-kayit-kapisi.cjs')
-const kapi = require_(KAPI_YOLU) as Kapi
+const kapiHam = require_(KAPI_YOLU) as Kapi
+/** Eski yol (Fixes/Kayıtsız) tarih sınırı vardır: mevcut kollar "sınırdan önce" bir günde ölçülür, yoksa gerçek takvim testi kırardı. */
+const SINIR_ONCESI = '2026-10-01'
+const kapi: Kapi = { ...kapiHam, degerlendir: (g) => kapiHam.degerlendir({ bugun: SINIR_ONCESI, ...g }) }
 
 describe('INV-PR-KAYIT-KAPISI-1 · kabul kolları', () => {
   it('Fixes REC-nn geçer ve kaydı verir', () => {
@@ -78,6 +84,109 @@ describe('INV-PR-KAYIT-KAPISI-1 · kabul kolları', () => {
   it("insan yazarın gövdesiz PR'ı KIRMIZI (bot muafiyeti yalnız botlara)", () => {
     expect(kapi.degerlendir({ govde: '', yazar: 'peckop' })).toMatchObject({ gecti: false, tur: 'yok' })
     expect(kapi.degerlendir({ govde: null })).toMatchObject({ gecti: false, tur: 'yok' })
+  })
+})
+
+describe('INV-PR-KAYIT-KAPISI-2 · Kanban numarası ASIL yol (karar 219/220, ARC-2)', () => {
+  it('`Kanban: ARC-3` geçer, tür=kanban, numarayı verir', () => {
+    expect(kapi.degerlendir({ govde: 'Özet\n\nKanban: ARC-3\n' })).toMatchObject({ gecti: true, tur: 'kanban', kayitlar: ['ARC-3'] })
+  })
+
+  it('taşınan Linear kaydı `Kanban: REC-554` aynı kalıpla geçer', () => {
+    expect(kapi.degerlendir({ govde: 'Kanban: REC-554' })).toMatchObject({ gecti: true, tur: 'kanban', kayitlar: ['REC-554'] })
+  })
+
+  it('2, 3 ve 4 harfli ön ekler geçer; liste koda gömülü DEĞİL (hiç bilinmeyen ön ek de geçer)', () => {
+    for (const no of ['OP-1', 'OPS-12', 'ARC-7', 'HRT-100', 'URN-2', 'ALT-3', 'ADM-4', 'KTL-5', 'SEO-9', 'ZZZZ-1']) {
+      expect(kapi.degerlendir({ govde: `Kanban: ${no}` }), no).toMatchObject({ gecti: true, tur: 'kanban', kayitlar: [no] })
+    }
+  })
+
+  it('birden çok numara: virgül, ve, and, & ve alt alta satırlar', () => {
+    expect(kapi.degerlendir({ govde: 'Kanban: ARC-3, ARC-4' }).kayitlar).toEqual(['ARC-3', 'ARC-4'])
+    expect(kapi.degerlendir({ govde: 'Kanban: ARC-3 ve HRT-12' }).kayitlar).toEqual(['ARC-3', 'HRT-12'])
+    expect(kapi.degerlendir({ govde: 'Kanban: ARC-3\nKanban: URN-1' }).kayitlar).toEqual(['ARC-3', 'URN-1'])
+  })
+
+  it('anahtar kelime büyük/küçük serbest, madde işareti ve CRLF tolere edilir', () => {
+    expect(kapi.degerlendir({ govde: 'kanban: ARC-3' }).gecti).toBe(true)
+    expect(kapi.degerlendir({ govde: 'KANBAN:ARC-3' }).gecti).toBe(true)
+    expect(kapi.degerlendir({ govde: '- Kanban: ARC-3' }).gecti).toBe(true)
+    expect(kapi.degerlendir({ govde: 'Özet\r\n\r\nKanban: ARC-3\r\n' }).gecti).toBe(true)
+  })
+
+  it('KIRMIZI kollar: küçük harfli numara, 1 ve 5 harfli ön ek, sayısız, boş, rakamlı ön ek, yapışık harf', () => {
+    for (const kotu of ['Kanban: arc-3', 'Kanban: A-1', 'Kanban: ABCDE-1', 'Kanban: ARC-', 'Kanban:', 'Kanban: A1C-2', 'Kanban: ARC-3x', 'Kanban: 123']) {
+      expect(kapi.degerlendir({ govde: kotu }), kotu).toMatchObject({ gecti: false, tur: 'yok' })
+    }
+  })
+
+  it('cümle ortasında, kod çitinde ve HTML yorumunda geçen `Kanban:` SAYILMAZ', () => {
+    expect(kapi.degerlendir({ govde: 'Bu iş Kanban: ARC-3 kartına bağlı' }).gecti).toBe(false)
+    expect(kapi.degerlendir({ govde: '```\nKanban: ARC-3\n```' }).gecti).toBe(false)
+    expect(kapi.degerlendir({ govde: '<!-- Kanban: ARC-3 -->' }).gecti).toBe(false)
+  })
+
+  it('Kanban ile eski yol birlikte yazılırsa Kanban kazanır; sınırdan SONRA da geçer (süresiz)', () => {
+    expect(kapi.degerlendir({ govde: 'Fixes REC-5\nKanban: ARC-3' }).tur).toBe('kanban')
+    expect(kapi.degerlendir({ govde: 'Kanban: ARC-3', bugun: '2027-01-01' })).toMatchObject({ gecti: true, tur: 'kanban' })
+  })
+
+  it('Kanban yolunda Linear çatı kolu çağrılmaz (CLI yalnız fixes türünde çağırır)', () => {
+    const r = spawnSync(process.execPath, [KAPI_YOLU], {
+      env: { ...process.env, PR_GOVDE: 'Kanban: ARC-3', PR_YAZAR: 'peckop', PR_BUGUN: SINIR_ONCESI, LINEAR_API_KEY: 'dummy', GITHUB_STEP_SUMMARY: '', GITHUB_OUTPUT: '' },
+      encoding: 'utf8',
+    })
+    expect(r.status).toBe(0)
+    expect(r.stdout).toContain('tür=kanban')
+    expect(r.stdout).not.toContain('ÇATI')
+    expect(r.stdout).not.toContain('Eski kayıt yolu')
+  })
+})
+
+describe('INV-PR-KAYIT-KAPISI-3 · eski iki yol 2026-10-08 DAHİL kabul, ertesi gün red', () => {
+  it('sınır günü sabittir (Ops 10-01) ve tek yerde durur', () => {
+    expect(kapiHam.ESKI_YOL_SON_GUN).toBe('2026-10-08')
+  })
+
+  it('sınır günü ve öncesi: Fixes ve Kayıtsız hâlâ geçer', () => {
+    for (const bugun of ['2026-10-01', '2026-10-07', '2026-10-08']) {
+      expect(kapiHam.degerlendir({ govde: 'Fixes REC-433', bugun }), bugun).toMatchObject({ gecti: true, tur: 'fixes' })
+      expect(kapiHam.degerlendir({ govde: 'Kayıtsız: yalnız belge düzeltmesi, iş yok', bugun }), bugun).toMatchObject({ gecti: true, tur: 'kayitsiz' })
+    }
+  })
+
+  it('ertesi gün (2026-10-09) ve sonrası: Fixes ve Kayıtsız KIRMIZI, mesaj Kanban yolunu söyler', () => {
+    for (const bugun of ['2026-10-09', '2026-11-01', '2027-01-01']) {
+      const f = kapiHam.degerlendir({ govde: 'Fixes REC-433', bugun })
+      expect(f, bugun).toMatchObject({ gecti: false, tur: 'eski-yol-suresi-doldu' })
+      expect(f.sebep).toContain('Kanban: ARC-3')
+      expect(kapiHam.degerlendir({ govde: 'Kayıtsız: yalnız belge düzeltmesi, iş yok', bugun })).toMatchObject({ gecti: false, tur: 'eski-yol-suresi-doldu' })
+    }
+  })
+
+  it('bağımlılık botu sınırdan sonra da geçer (gövdeye satır yazamaz)', () => {
+    expect(kapiHam.degerlendir({ govde: 'Bumps x', yazar: 'dependabot[bot]', bugun: '2027-01-01' })).toMatchObject({ gecti: true, tur: 'bot' })
+  })
+
+  it('bugun verilmezse gerçek takvim kullanılır (eskiYolDoldu gerçek tarihle sınır karşılaştırır)', () => {
+    expect(kapiHam.eskiYolDoldu('2026-10-08')).toBe(false)
+    expect(kapiHam.eskiYolDoldu('2026-10-09')).toBe(true)
+    expect(typeof kapiHam.eskiYolDoldu()).toBe('boolean')
+  })
+
+  it('CLI: eski yolla geçen PR ::warning "Eski kayıt yolu" alır; sınırdan sonra çıkış 1', () => {
+    const calis = (govde: string, bugun: string) =>
+      spawnSync(process.execPath, [KAPI_YOLU], {
+        env: { ...process.env, PR_GOVDE: govde, PR_YAZAR: 'peckop', PR_BUGUN: bugun, LINEAR_API_KEY: '', GITHUB_STEP_SUMMARY: '', GITHUB_OUTPUT: '' },
+        encoding: 'utf8',
+      })
+    const once = calis('Fixes REC-433', '2026-10-08')
+    expect(once.status).toBe(0)
+    expect(once.stdout).toContain('::warning title=Eski kayıt yolu')
+    const sonra = calis('Fixes REC-433', '2026-10-09')
+    expect(sonra.status).toBe(1)
+    expect(sonra.stdout).toContain('tür=eski-yol-suresi-doldu')
   })
 })
 
@@ -160,7 +269,7 @@ describe('INV-PR-KAYIT-KAPISI-1 · çatı uyarısı (kırmızı DEĞİL)', () =>
 describe('INV-PR-KAYIT-KAPISI-1 · CLI (iş akışının çağırdığı yol)', () => {
   const kos = (govde: string, yazar = 'peckop') =>
     spawnSync(process.execPath, [KAPI_YOLU], {
-      env: { ...process.env, PR_GOVDE: govde, PR_YAZAR: yazar, LINEAR_API_KEY: '', GITHUB_STEP_SUMMARY: '', GITHUB_OUTPUT: '' },
+      env: { ...process.env, PR_GOVDE: govde, PR_YAZAR: yazar, PR_BUGUN: SINIR_ONCESI, LINEAR_API_KEY: '', GITHUB_STEP_SUMMARY: '', GITHUB_OUTPUT: '' },
       encoding: 'utf8',
     })
 

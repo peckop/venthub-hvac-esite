@@ -21,6 +21,9 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+
 const KOK = process.cwd()
 const oku = (...p: string[]) => readFileSync(join(KOK, ...p), 'utf8')
 const varMi = (...p: string[]) => existsSync(join(KOK, ...p))
@@ -348,5 +351,37 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
                 ).toBe(true)
             }
         }
+    })
+})
+
+describe('INV-SECICI-2 — kanal kartı, bağlantının gittiği hesabı anlatır (URN-83)', () => {
+    // KORUDUĞU KUSUR: kart "hacim ve hava değişim sayısından debi" diyordu; bağlantı ise KANAL BASINÇ KAYBI
+    // hesaplayıcısına gider (debi + kanal ölçüsü girilir, hava hızı ve tahmini basınç kaybı çıkar). Ziyaretçi
+    // başka bir hesap bekleyerek tıklıyordu. Kart metni artık hedef sayfanın (`calculators.duct`) kendi anlattığı
+    // hesabı söyler; ondan fazlasını söylemez.
+    // NE ÖLÇMEZ: hesap motorunun doğruluğunu; yalnız kartın hedefle AYNI hesabı adlandırdığını.
+    it('ÖLÇÜM KONTROLÜ: hedef sayfa kanal basınç kaybı hesaplayıcısı olarak adlanıyor (iki dilde)', () => {
+        // Hedef sayfanın başlığı değişirse kart yeniden gözden geçirilmeli: bu kol o gün kırmızı verir.
+        expect(tr.calculators.duct.title).toMatch(/Basınç Kaybı/)
+        expect(en.calculators.duct.title).toMatch(/Pressure Loss/)
+        expect(oku('src', 'app', '[lang]', 'urun-secici', 'page.tsx')).toMatch(/anahtar:\s*'kanal'/)
+    })
+
+    it('TR kart: basınç kaybını anlatır; hacim / hava değişimi vaadi taşımaz', () => {
+        const { ad, aciklama } = tr.urunSecici.araclar.kanal
+        expect(ad).toMatch(/basınç kaybı/i)
+        expect(aciklama).toMatch(/basınç kaybı/i)
+        expect(`${ad} ${aciklama}`, 'kart hedefte olmayan bir girdiyi (hacim / hava değişim) vaat ediyor').not.toMatch(
+            /hacim|hava değişim/i,
+        )
+    })
+
+    it('EN kart: basınç kaybını anlatır; hacim / hava değişimi vaadi taşımaz', () => {
+        const { ad, aciklama } = en.urunSecici.araclar.kanal
+        expect(ad).toMatch(/pressure loss/i)
+        expect(aciklama).toMatch(/pressure loss/i)
+        expect(`${ad} ${aciklama}`, 'card promises an input the target page does not take (volume / air change)').not.toMatch(
+            /room volume|volume|air change/i,
+        )
     })
 })

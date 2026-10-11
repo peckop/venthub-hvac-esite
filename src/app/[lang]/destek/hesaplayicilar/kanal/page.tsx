@@ -52,7 +52,8 @@ export async function generateMetadata({
     lang,
     yol: Routes.destek.hesaplayicilar('kanal'),
     baslik: `${dict.calculators.duct.title} | ${dict.urunSecici.ustBaslik} | VentHub`,
-    aciklama: dict.calculators.duct.description,
+    // SEO-32: arama açıklaması ayrı anahtardan; `description` sayfanın görünür alt başlığıdır.
+    aciklama: dict.calculators.duct.metaDescription,
   })
 }
 

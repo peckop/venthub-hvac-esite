@@ -60,14 +60,14 @@ const getUsageLocations = (t: (key: string) => string) => [
         title: t('needsWizard.coldStorage'),
         description: t('needsWizard.coldStorageDesc'),
         icon: Snowflake,
-        tip: 'Soğuk zinciri KORUR, ürün bozulmasını engeller'
+        tip: t('needsWizard.coldStorageTip')
     },
     {
         id: 'industrial',
         title: t('needsWizard.industrial'),
-        description: 'Fabrika, lojistik tesisi',
+        description: t('needsWizard.industrialDesc'),
         icon: Factory,
-        tip: 'Toz, duman ve zararlı madde izolasyonu sağlar'
+        tip: t('needsWizard.industrialTip')
     },
     {
         id: 'retail',

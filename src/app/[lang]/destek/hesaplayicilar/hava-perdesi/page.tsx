@@ -29,7 +29,8 @@ export async function generateMetadata({
     lang,
     yol: Routes.destek.hesaplayicilar('hava-perdesi'),
     baslik: `${dict.calculators.airCurtain.title} | ${dict.urunSecici.ustBaslik} | VentHub`,
-    aciklama: dict.calculators.airCurtain.description,
+    // SEO-32: arama açıklaması ayrı anahtardan; `description` sayfanın görünür alt başlığıdır.
+    aciklama: dict.calculators.airCurtain.metaDescription,
   })
 }
 

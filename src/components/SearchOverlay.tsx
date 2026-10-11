@@ -356,11 +356,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         </div>
         <div className="flex-1">
           <div className="text-sm font-medium text-industrial-gray">{highlightMatch(label || '', debounced)}</div>
-          {s.type === 'product' && (s.metadata as Record<string, string>)?.sku && (
+          {/* URN-32: ürün önerisinin altında yalnız MARKA yazılır — eskiden `marka • sku` basılıyordu
+              (müşteriye iç kod). Öneri satırı model kodu taşımıyor; "kodu olmayan satırı hiç çizme"
+              hükmü (getProductModelLabel) gereği kod yerine hiçbir şey konmaz. INV-SKU-GORUNMEZ-1. */}
+          {s.type === 'product' && (s.metadata as Record<string, string>)?.brand && (
             <div className="text-xs text-steel-gray mt-0.5">
-              {(s.metadata as Record<string, string>).brand && <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>}
-              {(s.metadata as Record<string, string>).brand && (s.metadata as Record<string, string>).sku && <span> • </span>}
-              {highlightMatch((s.metadata as Record<string, string>).sku, debounced)}
+              <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>
             </div>
           )}
         </div>
@@ -426,14 +427,23 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             // SÖZLÜKTEN gelen sabit kısayollar. `cat.name` adı, kategori-adı kapısının
             // (INV-KATEGORI-ADI-1) haklı olarak ihlal saydığı desenle birebir aynıydı;
             // kapıyı gevşetmek yerine adı gerçeğe uygun hale getirdim.
+            // URN-19: çip slug'ı dile göre çözülür — TR'de kanonik EN slug (`fans`) adres olursa
+            // ziyaretçi sayfa katmanının 308'iyle varır. Kategori listede varsa çözücü (kural 7),
+            // yoksa `trSlug` yedeği (canlı DB 2026-09-27, `metadata.slug.tr`).
             [
-              { etiket: t('home.hero.quickChips.fans'), slug: 'fans' },
-              { etiket: t('home.hero.quickChips.airCurtains'), slug: 'air-curtains' },
-              { etiket: t('home.hero.quickChips.heatRecovery'), slug: 'heat-recovery-vmc' }
+              { etiket: t('home.hero.quickChips.fans'), slug: 'fans', trSlug: 'fanlar' },
+              { etiket: t('home.hero.quickChips.airCurtains'), slug: 'air-curtains', trSlug: 'hava-perdeleri' },
+              { etiket: t('home.hero.quickChips.heatRecovery'), slug: 'heat-recovery-vmc', trSlug: 'isi-geri-kazanim' }
             ].map(cip => (
               <button
                 key={cip.slug}
-                onClick={() => { router.push(Routes.category(cip.slug)); handleClose(); }}
+                onClick={() => {
+                  const kategori = getCategoryBySlug(cip.slug)
+                  const gorunenSlug = kategori
+                    ? getLocalizedCategorySlug(kategori, lang)
+                    : lang === 'en' ? cip.slug : cip.trSlug
+                  router.push(Routes.category(gorunenSlug)); handleClose();
+                }}
                 className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-colors"
               >
                 {cip.etiket}
@@ -510,11 +520,13 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                     )}
                     <div>
                       <div className="font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">{highlightMatch(r.name, debounced)}</div>
-                      <div className="text-xs text-steel-gray flex items-center gap-1.5 mt-0.5">
-                        {r.brand && <span className="font-semibold text-slate-600">{highlightMatch(r.brand, debounced)}</span>}
-                        {r.brand && <span className="text-gray-300">•</span>}
-                        <span>{highlightMatch(r.sku, debounced)}</span>
-                      </div>
+                      {/* URN-32: sonuç satırında yalnız MARKA; eskiden `marka • sku` basılıyordu (iç kod).
+                          Arama RPC'si `model_code` döndürmüyor → kod yerine hiçbir şey çizilmez. */}
+                      {r.brand && (
+                        <div className="text-xs text-steel-gray flex items-center gap-1.5 mt-0.5">
+                          <span className="font-semibold text-slate-600">{highlightMatch(r.brand, debounced)}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className={`transition-opacity flex items-center gap-2 ${isActive ? 'opacity-100 text-primary-navy' : 'opacity-0 text-primary-ocean group-hover:opacity-100'}`}>

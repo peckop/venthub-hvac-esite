@@ -38,24 +38,24 @@ const slidesData: SlideData[] = [
   {
     image: '/images/hero_hvac_industrial_premium_1.webp',
     products: [
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' },
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' }
     ],
     key: 0
   },
   {
     image: '/images/vortice_lineo_futuristic.webp',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' }
     ],
     key: 1
   },
   {
     image: '/images/hvac_installation_close_up_premium_3.webp',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' }
     ],
     key: 2
   }
@@ -272,7 +272,12 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                       : 'opacity-0'
                   }`}
                 >
-                  <Link href={Routes.product(p.familySlug)} className="relative block group">
+                  {/* URN-60: HUD etiketi artık BAĞLANTININ İÇİNDE DEĞİL. Eskiden `<Link>` HUD'u da sarıyordu ve
+                      "Sistem.Veri.Canlı" gibi dekoratif metin, ürün bağlantısının metni olarak 6 kez okunuyordu
+                      (botlar bağlantı metnini ürün adı sanıyordu). Şimdi: dış sarmal düz bir `div` (aynı
+                      `relative group` sınıfları, yerleşim aynı), bağlantı yalnız görseli sarar ve adını
+                      ürün adından alır (`aria-label`); HUD durum satırı `aria-hidden` dekoratiftir. */}
+                  <div className="relative block group">
                     {/* Technical HUD Label - Redesigned for High-Tech Aesthetic */}
                     <div className={`absolute ${i === 0 ? '-right-24 top-0' : '-left-24 bottom-0'} z-30 hidden lg:block`}>
                       <div className="relative">
@@ -298,7 +303,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <div className="h-1 w-1 bg-cyan-400 rounded-full" />
-                              <div className="text-xs font-black uppercase tracking-hvac-normal text-cyan-400/80">{t('home.cinematicShowcase.hudStatus')}</div>
+                              <div aria-hidden="true" className="text-xs font-black uppercase tracking-hvac-normal text-cyan-400/80">{t('home.cinematicShowcase.hudStatus')}</div>
                             </div>
                             <div className="text-base font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
                             <div className="flex items-center gap-2 mt-1">
@@ -310,26 +315,28 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                       </div>
                     </div>
 
-                    <div
-                      className="relative w-64 h-64 sm:w-80 sm:h-80 drop-shadow-sinevizyon-drop transition-transform group-hover:scale-105"
-                      style={{ 
-                        animation: `float ${5 + i}s ease-in-out infinite`,
-                        transform: 'translate3d(0, 0, 0)' // Trigger GPU acceleration
-                      }}
-                    >
-                      <Image 
-                        src={p.url} 
-                        alt={t('home.hero.sinevizyon.altProduct')} 
-                        fill 
-                        priority={slideIdx === 0}
-                        fetchPriority={slideIdx === 0 ? "high" : "low"}
-                        decoding={slideIdx === 0 ? "sync" : "async"}
-                        sizes="(max-width: 640px) 256px, (max-width: 768px) 320px, 400px"
-                        quality={70}
-                        className="object-contain" 
-                      />
-                    </div>
-                  </Link>
+                    <Link href={Routes.product(p.familySlug)} aria-label={t(p.labelKey)} className="block">
+                      <div
+                        className="relative w-64 h-64 sm:w-80 sm:h-80 drop-shadow-sinevizyon-drop transition-transform group-hover:scale-105"
+                        style={{
+                          animation: `float ${5 + i}s ease-in-out infinite`,
+                          transform: 'translate3d(0, 0, 0)' // Trigger GPU acceleration
+                        }}
+                      >
+                        <Image
+                          src={p.url}
+                          alt={t('home.hero.sinevizyon.altProduct')}
+                          fill
+                          priority={slideIdx === 0}
+                          fetchPriority={slideIdx === 0 ? "high" : "low"}
+                          decoding={slideIdx === 0 ? "sync" : "async"}
+                          sizes="(max-width: 640px) 256px, (max-width: 768px) 320px, 400px"
+                          quality={70}
+                          className="object-contain"
+                        />
+                      </div>
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

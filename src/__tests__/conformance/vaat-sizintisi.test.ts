@@ -407,7 +407,7 @@ describe('INV-VAAT-SIZINTI-2 · hiçbir yüzey "yakında" diye tarih vaat etmez'
       'This brand has no products in the catalogue yet.',
       'Şu an teklif kipindeyiz; sipariş ve ödeme kapalı.',
       'We are in quote mode; ordering and payment are closed.',
-      'Mağazamız kuruluş aşamasında. Fiyatlar günceldir; sipariş için bizden teklif isteyebilirsiniz — aynı gün dönüş yapıyoruz.',
+      'Çevrimiçi ödeme henüz açık değil. Fiyatlar günceldir; sipariş için bizden teklif isteyebilirsiniz — aynı gün dönüş yapıyoruz.',
     ]
     const yanlisYakalanan = mesruMetinler.filter((m) => zamanVaadiBul(m))
     expect(

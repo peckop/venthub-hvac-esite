@@ -12,8 +12,16 @@
  * demektir ve hiçbir kapı bunu kendiliğinden görmez. Aynı şekilde tohumdaki bir hedef bulunamazsa
  * ya da iki canlı nesne aynı slug'ı paylaşıyorsa (hangi adrese gidileceği belirsiz) üretim düşer.
  *
- * KİRACI (kural 12): her sorgu `tenant_id = kiraciId` ile AÇIKÇA süzülür. Üretici service-role ile
- * koşar (`url_takma_adlari` anon/authenticated'a kapalı) → RLS kiracıyı süzmez, süzgeç sorgudadır.
+ * KİRACI (kural 12): üç tablo okuması `tenant_id = kiraciId` ile AÇIKÇA süzülür (service-role RLS'i atlar,
+ * anon'da RLS aynı süzgeci ayrıca uygular). `url_takma_adlari` anon/authenticated'a KAPALI olduğundan okuma tek
+ * yoldan yapılır: `url_takma_adlari_listele()` işlevi (ALT-37e, karar 310). İşlev yalnız-okumadır, kiracıyı JWT'den
+ * çözer (`jwt_tenant_id()`) ve kiracı parametresi ALMAZ; bu yüzden üretici dönen her satırın `tenant_id`sini
+ * `kiraciId` ile karşılaştırır, uyuşmazlık HATADIR (başka kiracı adına koşan istemci sessizce yanlış harita üretmez).
+ *
+ * İSTEMCİ: anon anahtar yeter, derleme ortamına service-role KONMAZ. Service-role ile de aynı satırlar gelir: ikisi de
+ * `jwt_tenant_id()` içinde varsayılan kiracıya çözülür (canlıda ölçüldü, 2026-10-07). İşlev yokken (migration
+ * uygulanmamış), EXECUTE yokken ya da ağ yokken okuma HATA verir (fail-closed). Kiracının hiç takma adı yoksa boş
+ * liste hata DEĞİLDİR (yeni kiracı meşrudur); eksik okuma ise sayfalı döngüyle engellenir (aşağıda `tumunuOku`).
  *
  * ÖNCELİK: canlı slug > takma ad > tohum. Bir slug canlıysa eski adres sayılmaz (DB tetiği de canlı
  * slug'la çakışan takma adı siler; burada ikinci kez güvenceye alınır).
@@ -90,7 +98,7 @@ function sirali<V>(nesne: Record<string, V>): Record<string, V> {
 
 /**
  * Bir kiracının eski adres haritasını üretir. DI (kural 2): istemciyi çağıran verir — derleme
- * adımında service-role istemcisi, testte sahte `fetch`'li gerçek istemci.
+ * adımında anon (ya da service-role) istemcisi, testte sahte `fetch`'li gerçek istemci.
  */
 export async function eskiAdresHaritasiUret(
   supabase: SupabaseClient<Database>,
@@ -127,17 +135,29 @@ export async function eskiAdresHaritasiUret(
         .order('id')
         .range(bas, son)
     ),
+    // Tablo anon'a kapalı: tek yol yalnız-okuma liste işlevi. `get: true` PostgREST'e GET çağrısı yaptırır (salt-okunur
+    // işlem); işlev kiracıyı JWT'den çözer, burada kiracı süzgeci YOK, doğrulama aşağıda.
     tumunuOku('url_takma_adlari', (bas, son) =>
       supabase
-        .from('url_takma_adlari')
-        .select('tur, dil, eski_slug, hedef_id')
-        .eq('tenant_id', kiraciId)
+        .rpc('url_takma_adlari_listele', undefined, { get: true })
         .order('tur')
         .order('dil')
         .order('eski_slug')
         .range(bas, son)
     ),
   ])
+
+  // ── Takma ad kiracı doğrulaması (kural 12) ────────────────────────────────────────────────────
+  // İşlev parametre almaz; hangi kiracıyı döndürdüğüne istemcinin JWT'si karar verir. İstenenden başka kiracının
+  // satırı gelirse harita o kiracıya YAZILMAZ: aksi hâlde takma adların hedef kimlikleri bu kiracının nesnelerine
+  // eşlenmez, satırlar sessizce atlanır ve takma ad kaynaklı eski adreslerin tamamı 404'e düşerdi.
+  const yabanci = takmaSatirlari.find((t) => t.tenant_id.toLowerCase() !== kiraciId.toLowerCase())
+  if (yabanci) {
+    throw hata(
+      `url_takma_adlari_listele başka kiracının satırını döndürdü (${yabanci.tenant_id}); istenen kiracı ${kiraciId}. ` +
+        'İşlev kiracıyı istemcinin JWT\'sinden çözer (jwt_tenant_id()); bu istemci istenen kiracı adına koşmuyor'
+    )
+  }
 
   // ── Ürün sayısı eşiği (fail-closed) ───────────────────────────────────────────────────────────
   const urunSayisi = urunSatirlari.length

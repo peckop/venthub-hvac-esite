@@ -13,9 +13,10 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['vortice-vort-mono', 'Vortice VORT Mono'],
     ['yeni-aile-adi', 'Yeni Aile'],
     // Frekans konvertörü yazısı (canlı DB'de aktif, 2026-09-25 BLOG ölçümü: 2/16/17 ürün).
-    ['danfoss-fc51', 'Danfoss VLT Micro Drive FC 51'],
-    ['danfoss-fc101', 'Danfoss VLT HVAC Basic Drive FC 101'],
-    ['danfoss-fc102', 'Danfoss VLT HVAC Drive FC 102'],
+    // URN-53: slug'lar #1352 sonrası canlı (yazilar.ts bunları anar).
+    ['danfoss-vlt-micro-drive-fc-51', 'Danfoss VLT Micro Drive FC 51'],
+    ['danfoss-vlt-hvac-basic-drive-fc-101', 'Danfoss VLT HVAC Basic Drive FC 101'],
+    ['danfoss-vlt-hvac-drive-fc-102', 'Danfoss VLT HVAC Drive FC 102'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {

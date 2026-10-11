@@ -3,6 +3,7 @@ import { Activity, ArrowRight, ChevronDown, Layers,ShieldCheck, ThermometerSun, 
 import Link from 'next/link'
 import React, { useState } from 'react'
 
+import { AIR_CURTAIN_WIZARD_ENABLED } from '@/components/category/airCurtainWizardGate'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
@@ -15,6 +16,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../../lib/type-converters'
 import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import { vurguluBaslikParcalari } from '../../utils/vurguluBaslik'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -33,7 +35,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     const [wizardOpen, setWizardOpen] = useState(false)
     
     const vm = wrapCategory(category)
-    const isAirCurtain = category.slug.includes('hava-perde')
+    const baslikParcalari = vurguluBaslikParcalari(dict.category.showcase.whyVenthubTitle, t('common.brand'))
+    // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; tüm giriş noktaları (kahraman düğmesi,
+    // BottomCTA, sihirbazın kendisi) tek kapıdan kapalı — `airCurtainWizardGate.ts`.
+    const havaPerdesiSihirbazi = category.slug.includes('hava-perde') && AIR_CURTAIN_WIZARD_ENABLED
     const [breadcrumbRef, breadcrumbVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
     const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
     const [heroTitleRef, heroTitleVisible] = useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })
@@ -89,7 +94,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         {vm?.description || t('category.showcase.defaultDescription')}
                     </p>
 
-                    {isAirCurtain && (
+                    {havaPerdesiSihirbazi && (
                         <button
                             ref={airCurtainBtnRef}
                             onClick={() => setWizardOpen(true)}
@@ -149,7 +154,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         10'unda DOLU; yani veri hazırdı, onu okuyan kart yoktu.
 
                                         ⛔YER TUTUCU BİLEREK YOK: `VentImage` görsel bulunamayınca
-                                        `category-placeholder.png` basar. Onu her karta koymak, hangi
+                                        nötr yer tutucuyu (YER_TUTUCU_GORSEL) basar. Onu her karta koymak, hangi
                                         kategorinin görseli eksik olduğunu EKRANDA GÖRÜNMEZ yapardı.
                                         Bu yüzden bileşen yalnız `image_url` doluyken çiziliyor; boşsa
                                         kart aşağıdaki ikon düzeninde kalır — eksiklik hem ziyaretçiye
@@ -210,11 +215,15 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 <span>{t('category.showcase.guarantee')}</span>
                             </div>
                             <h2 className="text-5xl font-light tracking-tight mb-12">
-                                {dict.category.showcase.whyVenthubTitle.split('VentHub')[0]}
-                                <span className="font-medium italic">
-                                    {t('common.brand')}
-                                    {dict.category.showcase.whyVenthubTitle.split('VentHub')[1] || ''}
-                                </span>
+                                {/* URN-101: marka adı başlıkta geçiyorsa vurgulanır; geçmiyorsa başlık düz basılır
+                                    (eskiden "Katalogda Neler Var?" + "VentHub" yapışıyordu). */}
+                                {baslikParcalari.once}
+                                {baslikParcalari.vurgulu !== null && (
+                                    <span className="font-medium italic">
+                                        {baslikParcalari.vurgulu}
+                                        {baslikParcalari.sonra}
+                                    </span>
+                                )}
                             </h2>
                             <div className="space-y-10">
                                 {[ShieldCheck, Activity, Zap].map((Icon, i) => {
@@ -241,16 +250,18 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             </section>
 
             <BottomCTA 
-                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
-                showWizard={isAirCurtain}
+                onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
+                showWizard={havaPerdesiSihirbazi}
                 categoryName={vm?.displayName || getCategoryDisplayName(category, t)}
             />
 
-            <EnhancedNeedsWizard 
-                isOpen={wizardOpen} 
-                onClose={() => setWizardOpen(false)} 
-                parentSlug={category.slug}
-            />
+            {havaPerdesiSihirbazi && (
+                <EnhancedNeedsWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    parentSlug={category.slug}
+                />
+            )}
         </div>
     )
 }

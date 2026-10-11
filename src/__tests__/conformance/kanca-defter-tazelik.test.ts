@@ -411,9 +411,9 @@ describe('INV-KANCA-DEFTER-2 · olc cikis 3 bir CEVAPTIR, ariza degil', () => {
  * Recep aynen: *"bende DB'de değişiklik yaptığım an senin kendi yedeğin bayat olacak;
  * tekrardan onu tazelemek yine 2 gün mü sürecek?"*
  *
- * ⭐SATIR NİÇİN BU KANCADA: aynı ölçümü yapan bir CI kapısı var (`taban-tazeligi.test.ts`)
- * ama o yalnız PR'da konuşur. Recep'in sorduğu an PR anı DEĞİL, **karar anıdır** — REC-342'nin
- * dersi tam buydu. Ayrıca yeni bir kanca eklemek node açılışını (170-292 ms) ikinci kez
+ * ⭐SATIR NİÇİN BU KANCADA: aynı ölçümü yapan bir kapı var (`taban-tazeligi-dunya.test.ts`)
+ * ama o yalnız master'a her push'ta ve zamanlı koşuda konuşur (ALT-38: PR kapısından çıktı).
+ * Recep'in sorduğu an PR anı DEĞİL, **karar anıdır** — REC-342'nin dersi tam buydu. Ayrıca yeni bir kanca eklemek node açılışını (170-292 ms) ikinci kez
  * öder; satır MEVCUT kancaya eklendi.
  *
  * ⭐ÖLÇÜT SIR GEREKTİRMEZ ve bunu Recep'in kendi düzeltmesi mümkün kıldı: *"ben kendim bir
@@ -526,9 +526,9 @@ describe('INV-KANCA-DEFTER-4 · sema tabani tazeligi satiri', () => {
   })
 
   it('CI KAPISI ile BU SATIR AYNI ÖLÇÜTÜ paylaşır — ikisi de orphan değil', () => {
-    // Satır karar anında konuşur, kapı PR'da bloklar. Biri silinirse öteki yalnız kalır;
-    // bu kol ikisinin de VAR olduğunu ölçer.
-    const kapi = path.resolve(__dirname, 'taban-tazeligi.test.ts')
+    // Satır karar anında konuşur, kapı master'a her push'ta ve zamanlı koşuda kırmızı verir (PR'ı bloklamaz;
+    // ALT-38). Biri silinirse öteki yalnız kalır; bu kol ikisinin de VAR olduğunu ölçer.
+    const kapi = path.resolve(__dirname, 'taban-tazeligi-dunya.test.ts')
     expect(fs.existsSync(kapi), `CI kapisi YOK: ${kapi}`).toBe(true)
     const kapiMetin = fs.readFileSync(kapi, 'utf8')
     expect(kapiMetin, 'kapi ayni olcutu (create policy) kullanmiyor').toMatch(/create\\s\+policy/i)

@@ -17,21 +17,26 @@ metadata:
 | "project's own checks" | `pnpm type-check`, `pnpm lint`, `pnpm test -- --run`, ilgili `src/__tests__/conformance/*`; PR'da `gh pr checks` |
 | verification.run / execution.shell | Bash aracı |
 | Kanban "verified" | `kanban_manage` doğrulayıcısı (kural 7) |
+| `codebase-targeted-test`, `codebase-impact-analysis` araçları | Yok. Etkilenen test: değişen dosyanın yanındaki / `src/__tests__/conformance/` altındaki ilgili test; çağıranlar: `graphify affected "sembol()"` (parantez şart) ya da `codegraph_explore` |
+| "migration applied and rolled back locally" (Public API, schema satırı) | Bizde yerel Supabase yığını (Docker) **yok**, adım uygulanamaz. Yerine: `create-migration` zinciri + `plan-challenger`, prod'a karşı **yalnız okuma** sorgusuyla kanıt; "uygulandı" ancak merge sonrası ve ölçülerek yazılır (kural 13: merge prod'a otomatik yazar) |
+| "Clean install from the lockfile" | `pnpm install --frozen-lockfile --offline` (karar 88) |
+| UI kanıtı ("rendered at the relevant widths…") | `qa` skill'i (gerçek tarayıcıda gezip kanıt üretir) |
+| Gövdedeki "Skills in scope" atıfları (`testing`, `debugging`, `git-flow`) | Bu üçü WrongStack alımının 2. paketiyle depoya geldi; atıflar çalışır |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
 1. **Kimlik** yalnız `tools/wrongstack-mcp/posta-kutusu.cjs` sarmalayıcısından gelir. `.mcp.json`'a `--actor` ya da `${...}` yer tutucusu yazılmaz (genişlemiyor, bütün pencereler aynı kimliğe düşüyor).
 2. **Posta alıcısı** daima TAM oturum kimliğidir (36 karakter). 8 haneli kısa kimliğe giden mesaj hata vermeden kaybolur.
 3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz.
-4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir.
+4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir. Tek ayrı yol (karar 224): canlı DIŞI işte OPS, Recep'in OPS'ta verdiği evetin sözünü ve saatini OPS panosundaki onay kartına yazar; onayı orada doğrularsın. Canlı iş (migration'lı PR, sır/anahtar/parola, geçmişi silen git, canlı veritabanı yazımı, para harcatan her şey) bunun dışındadır: onay yine yalnız Recep'ten gelir.
 5. `*_watch` çağrısı kanıt değildir; durum `mailbox_read` / `kanban_read` ile okunarak doğrulanır.
-6. Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır; karttaki bilgi Linear'ı geçersiz kılmaz.
+6. İş takibinin tek kaynağı **Kanban**'dır (karar 219, 2026-10-01); Linear donuktur: yeni kayıt açılmaz, mevcut kayıtlar silinmez. İş emri = Kanban kartı (KAYNAK/CETVEL + YÖNTEM + kanıt komutu); Done kanıt komutuyla (`wrongstack-kanban` skill'i).
 7. "Bitti" doğrulayıcı komutu `gh` ile sınırlıdır ve sır içermez.
 8. Kanban yaması `cli.js` + `index.js` dosyalarında (`tools/wrongstack-mcp/yamalar/`). Sürüm yükselince yamanın hâlâ tuttuğu yeniden ölçülür.
 9. `mailbox-bridge` kullanılmaz (HTTP köprüsü; bizde kapalı).
 10. Ops'a rapor dört alanlı etiketle gider (NE · DURUM · KANIT · KİMDE). Kaynak metindeki `<nextsteps>` biçimi bunun ekidir, yerine geçmez.
 11. **İzin bilgisi** (kim neye yetki verdi) pencere mesajından hafızaya ya da durum dosyasına KOPYALANMAZ. Tek kaynak `~/.claude/settings.json`; en fazla "bkz. settings.json autoMode, <tarih>" yazılır.
-12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Linear) + hüküm + istek taşır; ayrıntı dosyada ya da Linear'dadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Kanban kartı) + hüküm + istek taşır; ayrıntı dosyada ya da Kanban kartındadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
 
 ---
 

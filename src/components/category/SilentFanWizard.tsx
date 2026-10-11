@@ -615,7 +615,9 @@ function OneriKarti({
 
       <dl className="mt-4 space-y-1 text-sm flex-1">
         <div className="flex justify-between">
-          <dt className="text-steel-gray">{t('silentFanWizard.cardDelivers')}</dt>
+          <dt className="text-steel-gray">
+            {sonuc.yaklasikEgri ? t('silentFanWizard.cardDeliversApprox') : t('silentFanWizard.cardDelivers')}
+          </dt>
           <dd className="font-bold text-industrial-gray">
             {Math.round(sonuc.calismaDebisiM3h)} {t('silentFanWizard.unitM3h')}
           </dd>
@@ -633,6 +635,12 @@ function OneriKarti({
           </div>
         )}
       </dl>
+
+      {sonuc.yaklasikEgri && (
+        <p className="mt-3 text-xs leading-relaxed text-steel-gray" data-testid="yaklasik-egri-notu">
+          {t('silentFanWizard.cardApproxCurve')}
+        </p>
+      )}
 
       <Link
         href={Routes.product(aday.slug)}

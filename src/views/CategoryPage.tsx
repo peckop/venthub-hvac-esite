@@ -3,7 +3,7 @@
 import React from 'react';
 
 import type { DomainCategory } from '../lib/type-converters';
-import type { FamilyListItem } from '../types/ui-models';
+import type { FamilyListItem, KatalogSayilari } from '../types/ui-models';
 import CategoryMasterView from './CategoryMasterView';
 
 export interface CategoryPageProps {
@@ -14,6 +14,8 @@ export interface CategoryPageProps {
   page?: number;
   pageSize?: number;
   initialSubCategories?: DomainCategory[];
+  /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucudan); yoksa iki Vortice sayaç kartı çizilmez. */
+  vorticeKatalogSayilari?: KatalogSayilari | null;
 }
 
 /**
@@ -21,7 +23,7 @@ export interface CategoryPageProps {
  * @description Dinamik Kategori Sayfası Giriş Noktası.
  * Tüm mantık ve sunum merkezi Unified Category Shell (CategoryMasterView) bileşenine delege edilmiştir.
  */
-const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, total, page, pageSize, initialSubCategories }) => {
+const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, total, page, pageSize, initialSubCategories, vorticeKatalogSayilari }) => {
   return (
     <CategoryMasterView
       initialCategory={initialCategory}
@@ -30,6 +32,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, 
       page={page}
       pageSize={pageSize}
       initialSubCategories={initialSubCategories}
+      vorticeKatalogSayilari={vorticeKatalogSayilari}
     />
   );
 };

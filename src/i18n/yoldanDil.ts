@@ -26,6 +26,14 @@ import type { Lang } from './I18nContext'
 export const DESTEKLENEN_DILLER: readonly Lang[] = ['tr', 'en'] as const
 
 /**
+ * `[lang]` rota parametresi desteklenen bir dil mi? (URN-15) Değilse sayfa `notFound()` vermeli:
+ * geçersiz değer (`"ai.txt"`) `Intl.Collator`a kadar ulaşıp `RangeError` ile 500 üretiyordu.
+ */
+export function dilGecerliMi(dil: string): dil is Lang {
+  return DESTEKLENEN_DILLER.some((d) => d === dil)
+}
+
+/**
  * Yol bir dil öneki taşımıyorsa (ör. `/admin`, `/api`, `/`) kullanılacak dil.
  * Tek tanım noktası — başka hiçbir yerde ham `'tr'` varsayılanı yazılmaz.
  */
