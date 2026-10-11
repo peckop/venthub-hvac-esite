@@ -43,11 +43,27 @@ describe('INV-ADRES-HARITA-1 — envanter', () => {
     const bul = (eski: string, sku: string | null = null) => satirlar.find((s) => s.eski === eski && s.sku === sku)
     expect(bul('/category/fanlar')).toMatchObject({ yeni: '/tr/kategori/fanlar', durum: 308 })
     expect(bul('/tr/category/fans')).toMatchObject({ yeni: '/tr/kategori/fanlar', durum: 308 })
-    expect(bul('/en/category/duct-fans')).toMatchObject({ yeni: '/en/category/fans/duct-fans', durum: 308 })
+    // SEO-35 B-1: kanonik adres TEK segment — alt kategorinin tek segmentli EN adresi kanoniktir (satır yok),
+    // iç içe adresler tek sıçramayla tek segmentli adrese gider.
+    expect(bul('/en/category/duct-fans')).toBeUndefined()
+    expect(bul('/en/category/fans/duct-fans')).toMatchObject({ yeni: '/en/category/duct-fans', durum: 308 })
+    expect(bul('/tr/category/fanlar/kanal-tipi-fanlar')).toMatchObject({
+      yeni: '/tr/kategori/kanal-tipi-fanlar',
+      durum: 308,
+    })
     expect(bul('/tr/products/storm-serisi', 'SEA-61143003')).toMatchObject({
       yeni: '/tr/urun/storm-14-atex-cati-fani-p-sea-61143003',
       durum: 308,
     })
+  })
+
+  it('hiçbir kategori hedefi iç içe değildir (B-1): /<dil>/(kategori|category)/<slug> — tam üç parça', () => {
+    for (const dil of ['tr', 'en'] as const) {
+      const { satirlar } = envanterUret(modelSlugluHarita(), dil)
+      const kategoriHedefleri = satirlar.map((s) => s.yeni).filter((y) => /^\/(tr\/kategori|en\/category)\//.test(y))
+      expect(kategoriHedefleri.length).toBeGreaterThan(0)
+      expect(kategoriHedefleri.filter((y) => y.split('/').filter(Boolean).length !== 3)).toEqual([])
+    }
   })
 })
 

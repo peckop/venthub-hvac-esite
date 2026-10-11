@@ -122,9 +122,10 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
 > her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
 > olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
-> Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
-> bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
-> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
+> Kategori dalı (SEO-35 B-1): iki şemada da dalın adresi TEK segmenttir (yeni: `/tr/kategori/<alt>`, EN `/en/category/<alt>`;
+> bugünkü: `/<dil>/category/<alt>`), dal nesnesi kök nesnesiyle aynı yolu üretir ve küme tekilleştirir. İç içe
+> `/<dil>/category/<üst>/<alt>` ve `/tr/kategori/<üst>/<alt>` yolları HİÇBİR kipte üretilmez: yalnız 308'dir, önbelleği yok
+> (URN-7 ölçümü 2026-10-01). Kapı: `INV-TAZELEME-YOL-1`, `INV-TAZELEME-YOL-3` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
 > products dalı, ürün SKU'su (UPDATE'te eski SKU da) `yayindaModeller` listesindeyse modelin TR + EN sayfa yolunu
 > (`/tr/urun/<slug>-p-<sku>`) `skuModelYollari` (adres tek noktası `adresUret`) ile tazeler; liste dışı SKU ve boş listede
 > ek yol yoktur, çağrı başına en çok 4 ek yol. Kapı: `INV-WEBHOOK-MODEL-YOLU-1`

@@ -29,6 +29,12 @@ export type AdresDili = 'tr' | 'en'
  */
 export type AdresNesnesi =
   | { tur: 'urunler' }
+  /**
+   * Kategori: kök ya da alt (dal). Adres TEK seviyedir (SEO-35 B-1, her iki kipte): `dal` verilmişse adres dalın
+   * KENDİ slug'ıdır ve `kok` adrese girmez (üstü bilmeyen çağıran yalnız `kok` verir, aynı biçim çıkar). `kok` ile
+   * `dal` birlikte verilebilir ki çağıran üst/alt çiftini tek nesnede taşısın; hangisinin kullanılacağı burada
+   * tek yerde karar verilir.
+   */
   | { tur: 'kategori'; kok: string; dal?: string | null }
   | { tur: 'aile'; slug: string }
   /**
@@ -78,8 +84,10 @@ function yeniAdres(n: AdresNesnesi, dil: AdresDili): Route {
     case 'urunler':
       return localizedHref(`/${b.urunler}`, dil)
     case 'kategori':
-      // İki seviye kanonik, iki dilde (REC-205 dersi): dal varsa adres HER ZAMAN kök/dal.
-      return localizedHref(n.dal ? `/${b.kategori}/${seg(n.kok)}/${seg(n.dal)}` : `/${b.kategori}/${seg(n.kok)}`, dil)
+      // TEK seviye kanonik, iki dilde (SEO-35 B-1; REC-205 dersi: bir kategori tek adresten yayınlanır). Kök de
+      // alt de `/<bölüm>/<kendi-slug>`; üst slug'ı adrese GİRMEZ. İç içe adres (`/<bölüm>/<üst>/<alt>`) artık yalnız
+      // yönlendirilir (`kategoriSegmenti.kategoriRotasiniUygula`, middleware eşleyicisi) — burada ÜRETİLMEZ.
+      return localizedHref(`/${b.kategori}/${seg(n.dal ? n.dal : n.kok)}`, dil)
     case 'aile':
       return localizedHref(`/${b.urun}/${seg(n.slug)}`, dil)
     case 'model': {

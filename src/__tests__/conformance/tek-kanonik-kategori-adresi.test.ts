@@ -132,11 +132,17 @@ describe('INV-TEK-ADRES-1 — kategori adresi tekilliği', () => {
       'iki seviyeli rota yeniden içerik üretiyor (PageComponent) — kanonik ikiye böl��nür',
     ).not.toContain('PageComponent')
     expect(kaynak).not.toContain('generateStaticParams')
-    // REC-300 Faz 3b-2: bayrak AÇIKKEN EN iki seviyeli adres kanonik olur ve metadata üretir;
-    // bayrak KAPALIYKEN metadata boş kalmalı (kanonik ikiye bölünmez).
-    expect(kaynak, 'iki seviyeli rota bayrak kapalıyken metadata üretiyor').toMatch(
-      /if\s*\(\s*!ADRES_SEMASI_K3B\s*\)\s*return\s*\{\s*\}/,
+    // SEO-35 B-1: kanonik adres iki dilde TEK segmenttir; iç içe adres bayrak AÇIKKEN de içerik çizmez ve metadata
+    // üretmez (eskiden bayrak açıkken EN iki seviyeli adres kanonikti — Faz 3b-2). İki kip için tek hüküm:
+    // metadata boş nesne, sayfa gövdesi ve üst veri üreticisi bu dosyada YOK.
+    expect(kaynak, 'iç içe adres rotası metadata üretiyor — çift yayın geri gelebilir').toMatch(
+      /generateMetadata\(\)[^{]*\{\s*return\s*\{\s*\}\s*\}/,
     )
+    expect(kaynak, 'iç içe adres rotası kategori sayfası çiziyor (KategoriSayfasi)').not.toContain('KategoriSayfasi')
+    expect(kaynak, 'iç içe adres rotası üst veri üretiyor').not.toContain('UstVerisi')
+    // Bayrak açıkken çözümü HER ZAMAN atan tek fonksiyon (dönüş tipi `never`) çağrılır; çizen `kategoriRotasiniUygula` değil.
+    expect(kaynak, 'bayrak açıkken iç içe adres 308/404 atan çözücüyü çağırmıyor').toContain('kategoriIcIceAdresiYonlendir(')
+    expect(kaynak, 'iç içe adres rotası çizen çözücüyü çağırıyor').not.toContain('kategoriRotasiniUygula')
   })
 
   it('K4 · özel yüzeyler (giriş/hesap/sepet) dizine girmez, ama bağlantıları izlenir', () => {

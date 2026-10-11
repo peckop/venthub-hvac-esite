@@ -180,7 +180,9 @@ describe('INV-INDEXNOW-1 · süzgeç ↔ tazelemeYollari bağı', () => {
   it('tazeleme yolları boş değil (bağ kendiliğinden boşalmasın)', () => {
     expect(aileYollari('x').length).toBeGreaterThan(0)
     expect(kategoriYollari(kok).length).toBeGreaterThan(0)
-    expect(kategoriYollari(kok, ust).length).toBeGreaterThan(kategoriYollari(kok).length)
+    // SEO-35 B-1: kategori adresi TEK segment; üst kategori adrese girmez, yani üst verilmesi yol kümesini
+    // büyütmez (eskiden iki seviyeli yeni-şema yolu eklenirdi). Küme aynıdır ve yine boş değildir.
+    expect([...kategoriYollari(kok, ust)].sort()).toEqual([...kategoriYollari(kok)].sort())
   })
 
   it.each(TAZELEME_YOLLARI)('⭐%s → k3bdenEtkilenirMi true', (yol) => {

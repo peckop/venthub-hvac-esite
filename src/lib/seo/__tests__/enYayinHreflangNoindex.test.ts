@@ -124,8 +124,8 @@ describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
       const { kategori } = await bayrakla(false)
       expect(kategori.kategoriSayfasiUstVerisi('tr', KATEGORI(false)).robots).toEqual(NOINDEX)
       expect(kategori.kategoriSayfasiUstVerisi('tr', KATEGORI(true)).robots).toBeUndefined()
-      expect(kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(false), null).robots).toEqual(NOINDEX)
-      expect(kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(true), null).robots).toBeUndefined()
+      expect(kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(false)).robots).toEqual(NOINDEX)
+      expect(kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(true)).robots).toBeUndefined()
     })
 
     it('site haritası: satırların HİÇBİRİNDE alternates alanı yok; /en adresi de yok', async () => {
