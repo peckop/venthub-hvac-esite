@@ -161,6 +161,19 @@ const ICERIK_KURALI = [
   '- Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub\'dır. Cetveller: `docs/standards/rehber-yazisi-standard.md` R4 madde 10, `docs/standards/i18n-localization-standard.md` §4.',
 ].join('\n')
 
+/**
+ * UNVAN VE ÖLÇÜM KURALLARI (OPS-104, 2026-10-11): yalnız URUN'un kurallar dosyasına girer (kartın bayt payına dokunmaz;
+ * ICERIK_KURALI kalıbı). Kural metni üç cetvele ve bir kapıya atıf verir: vaat-butunlugu, geo-olcum ve dizin-sistemleri
+ * cetvelleri, INV-SSR-GOVDE-2; geo-olcum ve dizin-sistemleri başkasının cetvelleridir, bu betik onları DEĞİŞTİRMEZ. Depo herkese
+ * açık: kuralın gerekçesi buraya YAZILMAZ; kart notlarında durur.
+ */
+const UNVAN_OLCUM_KURALI_ROLLERI = ['URUN']
+const UNVAN_OLCUM_KURALI = [
+  '## Unvan ve ölçüm kuralları (OPS-104)',
+  '- Bayilik unvanı: yazılı distribütörlük ya da yetki sözleşmesi olmayan markanın sitesinde "yetkili bayi", "resmi distribütör", "marka güvencesi" ve "yetkili satış noktası" unvanı yazılmaz; sözleşme netleşince tek satırla geri konur. Yöneten cetvel: docs/standards/vaat-butunlugu-standard.md.',
+  '- Ham HTML ölçümünde S:0 kopyası AYRI sayılır: sayfa ham HTML\'inde hidden id="S:0" gizli akış bloğunun içindeki metin dış gövdenin ayrı bir kopyasıysa h1, kırıntı ve model bağlantısı sayımı "S:0 dışı" ve "S:0 içi" iki sütunda yazılır, tek toplam verilmez. Aile sayfasındaki ikinci kopya bilinçli fallback\'tir (ProductDetailPageView Suspense fallback, URN-25 sonucu) ve kusur sayılmaz; kategori ve ürünler sayfalarında S:0 içi 0 olmalıdır (INV-SSR-GOVDE-2). Ölçüm cetveli docs/standards/geo-olcum-standard.md ve docs/standards/dizin-sistemleri-standard.md başkasının cetvelidir: bu kural onlara atıf verir, onları değiştirmez.',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -179,6 +192,7 @@ function kuralDosyasi(ad) {
     DURUM_SATIRI_KURALI,
     '',
     ...(ICERIK_KURALI_ROLLERI.includes(ad) ? [ICERIK_KURALI, ''] : []),
+    ...(UNVAN_OLCUM_KURALI_ROLLERI.includes(ad) ? [UNVAN_OLCUM_KURALI, ''] : []),
   ].join('\n')
 }
 
