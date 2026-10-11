@@ -1,3 +1,5 @@
+import { join, resolve } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { adresKur, anahtarOku, cikisKodu, depoIcindeMi, maskele, msTarih, oku, ozetle, urlBilgiOzet, yanitCoz } from '../bing-webmaster-oku.mjs'
@@ -171,7 +173,9 @@ describe('INV-BING-OKU-3 · koşucu: anahtar çıktıya sızmaz, geçersiz anaht
   })
 
   it('KOL B16 · çıktı klasörü bir git deposunun içindeyse depoIcindeMi true (anahtar ve ham çıktı depoya girmesin)', () => {
-    expect(depoIcindeMi('C:/proje/alt/cikti.json', (p: string) => p.replace(/\\/g, '/') === 'C:/proje/.git')).toBe(true)
-    expect(depoIcindeMi('C:/tmp/vh-arsiv/cikti.json', () => false)).toBe(false)
+    // Yol işletim sistemine göre kurulur (CI Linux, yerel Windows): sabit "C:/..." Linux'ta mutlak yol sayılmaz.
+    const kok = resolve('/proje')
+    expect(depoIcindeMi(join(kok, 'alt', 'cikti.json'), (p: string) => p === join(kok, '.git'))).toBe(true)
+    expect(depoIcindeMi(join(kok, 'alt', 'cikti.json'), () => false)).toBe(false)
   })
 })
