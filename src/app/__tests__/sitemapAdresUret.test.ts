@@ -83,15 +83,17 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
   describe('bayrak KAPALI — çıktı eski kodla bayt bayt aynı', () => {
     // OPS-51: marka listesi 5 → 7 ama haritada 6: casals girdi (+1 TR, +2 iki dilde), flexiva ürünsüz olduğu için
     // sitemap DIŞI (noindex,follow sayfa): 21 → 22 (TR) ve 40 → 42 (iki dil). Altın dosya yalnız casals satırlarıyla genişledi.
-    it('EN_YAYIN kapalı: 22 satır, altın veriyle birebir', async () => {
+    // BLG-3 (2026-10-11): ikinci rehber yazısı yayına girdi → +1 satır (kapalı 22 → 23, açık 42 → 43; EN_YAYIN açıkken
+    // Bilgi Merkezi yazıları yalnız TR'de yazıldığı için tek satır).
+    it('EN_YAYIN kapalı: 23 satır, altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(false, false)
-      expect(satirlar).toHaveLength(22)
+      expect(satirlar).toHaveLength(23)
       expect(altinaCevir(satirlar, base)).toEqual(ALTIN.enKapali)
     })
 
-    it('EN_YAYIN açık: 42 satır (iki dil, alternates ile), altın veriyle birebir', async () => {
+    it('EN_YAYIN açık: 43 satır (iki dil, alternates ile), altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(true, false)
-      expect(satirlar).toHaveLength(42)
+      expect(satirlar).toHaveLength(43)
       expect(altinaCevir(satirlar, base)).toEqual(ALTIN.enAcik)
     })
   })
