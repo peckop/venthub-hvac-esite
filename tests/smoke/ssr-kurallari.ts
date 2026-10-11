@@ -351,7 +351,10 @@ const YOL = {
   eskiIkiSeviye: /^\/tr\/category\/[^/]+\/[^/]+$/,
   /** AÇIK: kök kategori. */
   acikKok: /^\/tr\/kategori\/[^/]+$/,
-  /** AÇIK: dal kategori. KANONİK iki seviyedir, eski iki-seviyeli biçim DEĞİL → seçim yine İÇERİKTEN yapılır. */
+  /**
+   * AÇIK: iç içe kategori adresi. SEO-35 B-1'de dal da TEK segmenttir (`acikKok` ile aynı kalıp); iç içe adres yalnız
+   * 308 verir ve site haritasında OLMAZ. Bu kalıp haritada bulunursa `ikiSegmentli` sayılır ve kapı kırmızı verir.
+   */
   acikDal: /^\/tr\/kategori\/[^/]+\/[^/]+$/,
   /** Ürün detayı: ESKİ `/tr/products/<x>`, AÇIK `/tr/urun/<x>` (aile ya da model segmenti). */
   urun: /^\/tr\/(?:products|urun)\/[^/]+$/,
@@ -458,7 +461,8 @@ export async function temsilcileriSec(
   const markaListesi = MARKA_LISTESI_YOLLARI.find((y) => yollar.includes(y))
   const bolumler = bolumDagilimi(yollar)
 
-  // Sayımlar derinliği AÇIK şemadan da yansıtır: `kategori` = kök (tek seviyeli) sayfa, `ikiSegmentli` = iki seviyeli.
+  // Sayımlar: `kategori` = tek segmentli kategori sayfası (eski şemada kök ve dal, B-1'de açık şemada da kök ve dal),
+  // `ikiSegmentli` = iç içe adres (iki şemada da haritada OLMAMALI; sızarsa sayım ve kapı bunu gösterir).
   const sayimlar = {
     kategori: kategoriEski.length + kokAcik.length,
     ikiSegmentli: ikiSeviyeEski.length + dalAcik.length,
@@ -510,10 +514,11 @@ export async function temsilcileriSec(
   const ALTGRUP_DESENI = />Alt Ürün Grupları</
   const YAPRAK_DESENI = /data-ssr="family-card"/
 
-  // ⭐AÇIK ŞEMADA `kök/dal` KANONİK adrestir: aday kümesi iki derinliği BİRLİKTE içerir ve seçim yine İÇERİKTEN
-  // yapılır (aşağıdaki geriye dönük kol YALNIZ REC-205 öncesi eski iki seviyeli biçimde devreye girer). Açık şema
-  // `kök/dal` adresini "doğrulanmamış temsilci" sayıp gevşek ölçüte düşürseydi yaprak ölçütü gevşerdi (ratchet kaybı).
-  // Aday sayısı iki şemada aynıdır (kategori sayfası sayısı): ESKİ 23 tek seviyeli, AÇIK 6 kök + 17 dal (REC-286 sayımı).
+  // ⭐SEO-35 B-1: AÇIK şemada kök de dal da TEK segmentli (`kokAcik`); seçim yine İÇERİKTEN yapılır (aşağıdaki geriye
+  // dönük kol YALNIZ REC-205 öncesi eski iki seviyeli biçimde devreye girer). `dalAcik` (iç içe adres) haritada
+  // OLMAMALIDIR; sızarsa aday kümesine girer ve `ikiSegmentli` sayımı kapıyı kırar. Açık şemanın dalı "doğrulanmamış
+  // temsilci" sayılıp gevşek ölçüte düşseydi yaprak ölçütü gevşerdi (ratchet kaybı).
+  // Aday sayısı iki şemada aynıdır (kategori sayfası sayısı): ESKİ 23 tek seviyeli, AÇIK 23 tek segmentli (6 kök + 17 dal).
   const adaylar = [...kategoriEski, ...kokAcik, ...dalAcik].sort()
   const atlananlar: Atlanan[] = []
 

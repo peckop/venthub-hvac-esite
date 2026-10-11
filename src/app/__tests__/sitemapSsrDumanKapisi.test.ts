@@ -102,9 +102,10 @@ describe('INV-SITEMAP-DUMAN-1 — kapı, gerçek site haritası üreticisinin ç
         expect(t.pdp?.startsWith(k3b ? '/tr/urun/' : '/tr/products/')).toBe(true)
         expect(t.marka?.startsWith(k3b ? '/tr/markalar/' : '/tr/brands/')).toBe(true)
 
-        // Derinlik sayımı: açıkta kök 2 + dal 1; eskide tek seviyeli 3, iki seviyeli 0.
-        expect(t.sayimlar.kategori).toBe(k3b ? 2 : 3)
-        expect(t.sayimlar.ikiSegmentli).toBe(k3b ? 1 : 0)
+        // Derinlik sayımı (SEO-35 B-1): iki şemada da kök 2 + dal 1 = 3 TEK segmentli kategori sayfası; iç içe
+        // (iki segmentli) adres HARİTADA YOKTUR (o adres yalnız 308 verir, site haritası kanonik olmayanı ilan etmez).
+        expect(t.sayimlar.kategori).toBe(3)
+        expect(t.sayimlar.ikiSegmentli).toBe(0)
         expect(t.sayimlar.pdp).toBe(2)
         expect(t.sayimlar.marka).toBeGreaterThan(0)
 

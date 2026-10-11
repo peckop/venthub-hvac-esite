@@ -42,10 +42,10 @@ describe('icBaglantiCoz', () => {
     expect(await icBaglantiCoz('vh:model/vrt-65195', 'en', k)).toBe('/en/products/vortice-ad-air-curtain-p-vrt-65195')
   })
 
-  it('kategori → dile göre görünen slug (kural 7); alt kategori iki seviyeli kanonik adres (kök/dal)', async () => {
+  it('kategori → dile göre görünen slug (kural 7); alt kategori TEK segmentli kanonik adres (SEO-35 B-1)', async () => {
     expect(await icBaglantiCoz('vh:kategori/air-curtains', 'tr', k)).toBe('/tr/kategori/hava-perdeleri')
     expect(await icBaglantiCoz('vh:kategori/air-curtains', 'en', k)).toBe('/en/category/air-curtains')
-    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/fanlar/duman-egzoz-fanlari')
+    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/duman-egzoz-fanlari')
   })
 
   it('ESKİ AD: aile/kategori bugün yoksa url_takma_adlari ile YENİ adrese çözülür', async () => {

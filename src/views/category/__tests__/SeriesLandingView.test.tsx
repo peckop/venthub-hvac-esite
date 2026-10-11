@@ -106,7 +106,7 @@ describe('SeriesLandingView breadcrumb', () => {
     expect(categoryLink.getAttribute('href')).toBe('/tr/kategori/kanal-tipi-fanlar')
   })
 
-  it('kategori + alt kategori VARSA breadcrumb DÖRT basamaklı olur ve alt kategori href\'i iki segmentli kurulur', () => {
+  it('kategori + alt kategori VARSA breadcrumb DÖRT basamaklı olur ve alt kategori href\'i TEK segmentli kurulur (SEO-35 B-1)', () => {
     const category = makeCategory({ id: 'cat-1', name: 'Fanlar', slug: 'fanlar' })
     const subcategory = makeCategory({ id: 'sub-1', name: 'Kanal Tipi', slug: 'kanal-tipi' })
     renderView(
@@ -122,10 +122,10 @@ describe('SeriesLandingView breadcrumb', () => {
     // Ana Sayfa + Kategori + Alt kategori = 3 link; seri adı (son basamak) link DEĞİL.
     expect(nav.queryAllByRole('link')).toHaveLength(3)
     const subLink = nav.getByRole('link', { name: 'Kanal Tipi' })
-    // REC-205 → Faz 3-C: kırıntı yolundaki alt kategori basamağı artık KÖK/DAL iki seviyeli kanonik adrese
-    // gider (`/tr/kategori/<kök>/<dal>`, plan §2; REC-205 tek seviyeli dönemi bitti). Üst basamak ("Fanlar")
-    // kendi adresine gitmeye devam eder — kırıntı yolu hiyerarşiyi hem metinde hem adreste ANLATIR.
-    expect(subLink.getAttribute('href')).toBe('/tr/kategori/fanlar/kanal-tipi')
+    // SEO-35 B-1 (karar belgesi sürüm 5): alt kategori basamağı dalın TEK segmentli kanonik adresine gider
+    // (`/tr/kategori/<alt-slug>`; üst adrese girmez, 3-C'nin `<kök>/<dal>` adresi kalktı). Üst basamak ("Fanlar")
+    // kendi adresine gitmeye devam eder — kırıntı hiyerarşiyi METİNDE anlatır, adreste değil.
+    expect(subLink.getAttribute('href')).toBe('/tr/kategori/kanal-tipi')
     expect(nav.getByRole('link', { name: 'Fanlar' }).getAttribute('href')).toBe('/tr/kategori/fanlar')
   })
 

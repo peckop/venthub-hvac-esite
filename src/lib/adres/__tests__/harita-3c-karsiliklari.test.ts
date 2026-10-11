@@ -30,18 +30,19 @@ describe('Faz 3-C: commit\'li eski adres haritası', () => {
 
   it.each([
     // 13 dilsiz kategori kuralı (config'ten silindi). Hedefi 404 olan dört ve pasif iki kategori /tr/urunler'e iner.
+    // SEO-35 B-1: alt kategori hedefleri TEK segmenttir (`/tr/kategori/<alt-slug>`, üst adrese girmez).
     ['fanlar', '/tr/kategori/fanlar'],
     ['hava-perdeleri', '/tr/kategori/hava-perdeleri'],
     ['isi-geri-kazanim-cihazlari', '/tr/kategori/isi-geri-kazanim'],
     ['hava-temizleyiciler-anti-viral-urunler', '/tr/urunler'],
-    ['hiz-kontrolu-cihazlari', '/tr/kategori/kontrol-ve-suruculer/hiz-anahtarlari'],
+    ['hiz-kontrolu-cihazlari', '/tr/kategori/hiz-anahtarlari'],
     ['aksesuarlar', '/tr/kategori/aksesuarlar'],
     ['flexible-hava-kanallari', '/tr/urunler'],
-    ['nem-alma-cihazlari', '/tr/kategori/hava-sartlandirma/nem-alma-cihazlari'],
+    ['nem-alma-cihazlari', '/tr/kategori/nem-alma-cihazlari'],
     ['endustriyel-havalandirma', '/tr/urunler'],
     ['ticari-havalandirma', '/tr/urunler'],
     ['konut-tipi-havalandirma', '/tr/urunler'],
-    ['duman-egzoz-fanlari', '/tr/kategori/fanlar/duman-egzoz-fanlari'],
+    ['duman-egzoz-fanlari', '/tr/kategori/duman-egzoz-fanlari'],
     ['otopark-jet-fanlari', '/tr/kategori/fanlar'],
   ])('dilsiz /category/%s → tek 308 → %s', (eski, hedef) => {
     expect(coz(`/category/${eski}`)).toEqual({ hedef, durum: 308 })
