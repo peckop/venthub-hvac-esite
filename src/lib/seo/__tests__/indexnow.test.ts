@@ -31,7 +31,8 @@ import {
  *   2. bayrak AÇIK → YALNIZ `adresUret(…, true)` biçimli adresler gider (eskiden "hepsi gider"di: webhook yol
  *      listesi iki şemayı birden ürettiğinden Bing'e 308 veren eski adresler, `/sitemap.xml` ve dizine kapalı EN
  *      yolları da sızıyordu; tazeleme kümesi iki şemalı KALIR, süzgeç IndexNow girişindedir),
- *   3. `EN_YAYIN` kapalıyken `/en/...` yolu bayrak ne olursa olsun gitmez (dizine kapalı sayfa),
+ *   3. `EN_YAYIN` kapalıyken `/en/...` yolu bayrak AÇIKKEN gitmez (dizine kapalı sayfa); bayrak KAPALIYKEN
+ *      davranış değişmedi (etkilenmeyen EN yolları bugünkü gibi gider, etkilenenler düşer),
  *   4. IndexNow 2xx DIŞI yanıt verirse sonuç "reddedildi" + http kodu ve günlüğe yazılır (eskiden "gonderildi"ydi),
  *   5. doğrulama dosyası var, adı ve içeriği BİREBİR sabit (satır sonu yok — IndexNow dosya
  *      içeriğini anahtarla karşılaştırır; fazladan `\n` 403 üretebilir).
@@ -93,7 +94,7 @@ const ETKILENMEYEN_YOLLAR = [
   '/tr/destek/sss',
 ]
 
-/** Şemadan etkilenmeyen ama EN: `EN_YAYIN` kapalıyken (bugün) dizine kapalı, bildirilmez (URN-10). */
+/** Şemadan etkilenmeyen ama EN: `EN_YAYIN` kapalıyken (bugün) dizine kapalı; K3-b AÇIKKEN bildirilmez (URN-10). */
 const ETKILENMEYEN_EN_YOLLAR = ['/en/knowledge-hub', '/en/destek/sss']
 
 function bayraklariSifirla() {
@@ -457,12 +458,14 @@ describe('INV-INDEXNOW-2 · indexNoweGiderMi (tek süzgeç)', () => {
     ['/tr/urunler', false, false, false],
     ['/tr/urun/lineo-quiet', false, false, false],
     ['/tr/products/lineo-quiet', false, false, false],
-    // EN kapalı (bugün): hiçbir /en yolu gitmez; bayrak durumundan bağımsız
+    // EN kapalı (bugün), K3-b AÇIK: hiçbir /en yolu gitmez (dizine kapalı sayfa)
     ['/en', true, false, false],
-    ['/en', false, false, false],
     ['/en/products/lineo-quiet', true, false, false],
     ['/en/knowledge-hub', true, false, false],
-    ['/en/knowledge-hub', false, false, false],
+    // EN kapalı, K3-b KAPALI: davranış DEĞİŞMEDİ (K4) — etkilenmeyen yollar bugünkü gibi gider, etkilenenler düşer
+    ['/en', false, false, true],
+    ['/en/knowledge-hub', false, false, true],
+    ['/en/products/lineo-quiet', false, false, false],
     // EN yayında: yeni şemayla aynı biçim gider, iç içe kategori yine düşer
     ['/en', true, true, true],
     ['/en/products', true, true, true],
@@ -620,20 +623,28 @@ describe('INV-INDEXNOW-2 · webhook yol kümesi IndexNow girişinde süzülür (
     expect(sonuc).toEqual({ durum: 'atlandi', sebep: 'bildirilecek-yol-yok', dusurulen: girdi.length })
   })
 
-  it('⭐EN yayında değilken /en yolları bayrak KAPALI iken de gitmez; TR eşi gider', async () => {
+  it('⭐EN yayında değilken: bayrak AÇIKKEN /en yolları gitmez (TR eşi gider); bayrak KAPALIYKEN etkilenmeyen /en yolları bugünkü gibi gider (davranış değişmedi)', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 200 }))
+    const n = ETKILENMEYEN_EN_YOLLAR.length
 
-    const sonuc = await indexNowBildir(['/tr/bilgi-merkezi', ...ETKILENMEYEN_EN_YOLLAR])
+    // KAPALI: bu iş kapalı kipi DEĞİŞTİRMEZ (K4 davranışı aynen; EN kuralı yalnız açık kipte).
+    const kapali = await indexNowBildir(['/tr/bilgi-merkezi', ...ETKILENMEYEN_EN_YOLLAR])
+    expect(yollar(fetchSpy)).toEqual(['/tr/bilgi-merkezi', ...ETKILENMEYEN_EN_YOLLAR])
+    expect(kapali).toEqual({ durum: 'gonderildi', gonderilen: 1 + n, dusurulen: 0, http: 200 })
 
+    // AÇIK: dizine kapalı EN sayfaları düşer, TR eşi gider.
+    fetchSpy.mockClear()
+    bayrak.acik = true
+    const acik = await indexNowBildir(['/tr/bilgi-merkezi', ...ETKILENMEYEN_EN_YOLLAR])
     expect(yollar(fetchSpy)).toEqual(['/tr/bilgi-merkezi'])
-    expect(sonuc).toEqual({ durum: 'gonderildi', gonderilen: 1, dusurulen: ETKILENMEYEN_EN_YOLLAR.length, http: 200 })
+    expect(acik).toEqual({ durum: 'gonderildi', gonderilen: 1, dusurulen: n, http: 200 })
 
-    // Yalnız EN etkilenmeyen yollar: istek yok, sebep yayin-oncesi.
+    // AÇIK, yalnız EN etkilenmeyen yollar: istek yok, sebep bildirilecek-yol-yok.
     fetchSpy.mockClear()
     expect(await indexNowBildir(ETKILENMEYEN_EN_YOLLAR)).toEqual({
       durum: 'atlandi',
-      sebep: 'yayin-oncesi',
-      dusurulen: ETKILENMEYEN_EN_YOLLAR.length,
+      sebep: 'bildirilecek-yol-yok',
+      dusurulen: n,
     })
     expect(fetchSpy).not.toHaveBeenCalled()
 

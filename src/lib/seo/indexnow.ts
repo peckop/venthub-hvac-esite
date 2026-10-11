@@ -28,8 +28,9 @@ import { type AdresDili, type AdresNesnesi, adresUret } from '@/utils/adresUret'
  * eski şema adresleri (`/tr/products/<aile>`, `/tr/category/<slug>`, `/tr/brands/<marka>`: 308 verir), `/sitemap.xml`
  * ve dizine kapalı `/en/...` yolları da gidiyordu; arama motoru adresi öğrenir, geri alınamaz. Artık bildirilen küme
  * YALNIZ `adresUret(…, true)`'nun ürettiği biçimdeki adresler (`YENI_SEMA_BICIMLERI`, çıktıdan türetilir) + şemadan
- * etkilenmeyen bölümlerdir (`indexNoweGiderMi`). `EN_YAYIN` kapalıyken `/en/...` HİÇ gitmez (yayın bayrağının kendi
- * kuralı: `enKapaliMi`); K3-b bayrağından bağımsızdır, çünkü dizine kapalı sayfayı bildirmek talebin kendisidir.
+ * etkilenmeyen bölümlerdir (`indexNoweGiderMi`). Bayrak AÇIKKEN `EN_YAYIN` kapalıysa `/en/...` HİÇ gitmez (yayın
+ * bayrağının kendi kuralı: `enKapaliMi`; dizine kapalı sayfayı bildirmek anlamsız). Bayrak KAPALIYKEN davranış bu
+ * işle değişmez: etkilenmeyen EN yolları bugünkü gibi gider (K4; kapalı kipi değiştirmek ayrı karardır).
  * Plan: docs/plans/rec-300-plan-tazeleme-2026-09-29.md §4 madde 4c ("Eski adresler BİLDİRİLMEZ").
  *
  * KAPATMA (REC-405): bildirim sorun çıkarırsa (yanlış adres öğretme şüphesi, arama motoru şikâyeti) kod
@@ -162,7 +163,8 @@ function yolParcalari(yol: string): string[] | null {
  *
  * Sırayla (hepsi güvenli tarafa düşer):
  *  1. çözülemeyen / başka sunucu / dilsiz yol (`/sitemap.xml` dahil: sayfa değil, bildirilecek adres değil) → HAYIR,
- *  2. EN yayında değilse (`EN_YAYIN` kapalı) her `/en/...` yolu → HAYIR (dizine kapalı sayfa, `enKapaliMi`),
+ *  2. K3-b AÇIKKEN ve EN yayında değilse (`EN_YAYIN` kapalı) her `/en/...` yolu → HAYIR (dizine kapalı sayfa,
+ *     `enKapaliMi`); K3-b KAPALIYKEN bu kural YOKTUR (kapalı kip davranışı bu işle değişmez, K4),
  *  3. dil kökü ve şemadan etkilenmeyen bölümler (`K3B_DISI_BOLUMLER`) → EVET (iki bayrak durumunda da),
  *  4. şemadan etkilenen ya da bilinmeyen bölüm: K3-b KAPALIYKEN HAYIR (K4: değişecek adres); AÇIKKEN yalnız yolun
  *     `<dil>/<bölüm>` ve parça sayısı `adresUret(…, true)`'nun ürettiği biçimlerden biriyse EVET — eski şemanın
@@ -176,7 +178,8 @@ export function indexNoweGiderMi(yol: string, k3bAcik: boolean = ADRES_SEMASI_K3
   if (parcalar === null) return false
   const dil = DILLER.find((d) => d === parcalar[0])
   if (dil === undefined) return false
-  if (enKapaliMi(dil)) return false
+  // EN kuralı yalnız AÇIK kipte (URN-10 kapsamı): kapalı kipte etkilenmeyen EN yolları bugünkü gibi gider (K4).
+  if (k3bAcik && enKapaliMi(dil)) return false
   const bolum = parcalar[1]
   if (bolum === undefined) return true
   if (K3B_DISI_BOLUMLER.has(bolum)) return true
@@ -187,7 +190,7 @@ export function indexNoweGiderMi(yol: string, k3bAcik: boolean = ADRES_SEMASI_K3
 export type BildirimSonucu =
   | { durum: 'atlandi'; sebep: 'kapatildi' }
   | { durum: 'atlandi'; sebep: 'yol-yok' }
-  /** K3-b KAPALI: değişecek adresler (ve dizine kapalı EN yolları) düştü, gidecek yol kalmadı. */
+  /** K3-b KAPALI: değişecek adresler düştü, gidecek yol kalmadı. */
   | { durum: 'atlandi'; sebep: 'yayin-oncesi'; dusurulen: number }
   /** K3-b AÇIK: eski şema adresleri, `/sitemap.xml` ve dizine kapalı EN yolları düştü, gidecek yol kalmadı. */
   | { durum: 'atlandi'; sebep: 'bildirilecek-yol-yok'; dusurulen: number }
