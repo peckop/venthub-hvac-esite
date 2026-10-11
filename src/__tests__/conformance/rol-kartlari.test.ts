@@ -678,11 +678,19 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, isAkislari)).toEqual([])
   })
 
-  it('GEO-SEO ilk örnek: dört düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste)', () => {
+  it('GEO-SEO ilk örnek: beş düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, yayın sonrası dizin isteği)', () => {
     const g = gercek['GEO-SEO']
-    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay'])
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay', 'olay'])
     expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
     expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
+  })
+
+  // OPS 10-11 (SEO-39): dizin isteği ve IndexNow GEO-SEO'nun görevidir; yazılı olmadığı için her yayında Recep'e onay soruluyordu
+  it('GEO-SEO yayın sonrası dizin isteği görev listesinde yazılı: komut IndexNow betiği, tetik kart kapısı (henüz kurulu değil)', () => {
+    const d = gercek['GEO-SEO'].gorevler.find((x) => x.komut === 'scripts/seo/indexnow-bildir.mjs')
+    expect(d).toMatchObject({ siklik: 'olay', tetik: 'kart-kapisi', bagli: 'hayir', baglayacak: 'HARITA' })
+    expect(d?.gorev).toMatch(/dizine eklenmesini iste/)
+    expect(d?.gorev).toMatch(/Recep'ten ayrıca onay istenmez/)
   })
 
   // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin
