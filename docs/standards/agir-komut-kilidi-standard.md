@@ -5,9 +5,10 @@
 > (`.claude/rules/filo-ortak.md` "Test ve bellek") bu cetvelin DIŞINDA; bu cetvel o kuralı
 > **makine düzeyinde** zorlar. §6, aynı bellek ailesinden konuşma dosyası boyutu satırını (KAYIT,
 > ARC-82) tanımlar.
-> **Sürüm:** v1.1 · 2026-10-11 (v1.0 · 2026-10-10)
+> **Sürüm:** v1.2 · 2026-10-11 (v1.1 · 2026-10-11, v1.0 · 2026-10-10)
 > **Sahibi:** ARAÇ
-> **Son doğrulama:** 2026-10-11 (kanca, test ve bozma ölçüldü; canlı kabul ölçüldü, §5)
+> **Son doğrulama:** 2026-10-11 (kanca, test ve bozma ölçüldü; canlı kabul ölçüldü, §5; arka plan
+> sarmalayıcı testi ve bozması ölçüldü, canlı kabulü bekliyor, §7)
 > **Niçin bu cetvel doğdu:** kart ARC-81 "ağır komut kilidi için cetvel yok: yazımı bu işin
 > kapsamında" dedi (kural 1). Kanca: `.claude/hooks/agir-komut-kilidi.cjs`; test:
 > `src/__tests__/conformance/kanca-agir-komut-kilidi.test.ts`.
@@ -33,7 +34,8 @@ kendi kuralına uyuyordu; makineyi bağlayan bir şey yoktu. Pencereler birbirin
    **AĞIR komutun** olayı bırakır: aynı pencerenin sonraki hafif Bash çağrısı (`git status`) yuvayı
    düşürmez. Arka plan komutu (`run_in_background`) yuvayı BIRAKMAZ (komut hâlâ koşuyordur) ve
    yuvaya `arkaPlan` işareti konur; o yuvaya girilen ön plan ağır komutun olayı da onu düşürmez.
-   Arka plan yuvası TTL ile düşer.
+   Arka plan yuvasını komutun kendi **sarmalayıcısı** komut gerçekten bitince bırakır (§7, ARC-87);
+   TTL güvenlik ağıdır.
 4. **Bayat yuva:** 20 dakikadan eski yuva ölü sayılır ve bir sonraki deneyen onu siler (pencere
    kapanır, iptal edilir, PostToolUse gelmez).
 5. **Açık kalır:** kilit dizini yazılamıyor, girdi bozuk ya da beklenmeyen hata varsa komut GEÇER.
@@ -134,8 +136,8 @@ uygulanır (karar 224: onay pencereler arası taşınmaz).
 - **Gözlem (tasarımın bedeli, §2 madde 3):** arka plan komutunun yuvası TTL'e kalır. URUN'un birkaç
   dakikalık `install`'ı ve ardından aynı pencerenin `docker` komutu (yeniden giriş yuvayı yeniler)
   yuvayı 11:21-11:53 arası, yaklaşık 32 dk dolu tuttu. Bir arka plan ağır komut, filonun geri kalanını
-  en çok TTL kadar bekletir; kısa arka plan TTL'i ya da komut sonuna bırakma eki ayrı karardır
-  (OPS'a yazıldı).
+  en çok TTL kadar bekletir. OPS kararı (2026-10-11): komut sonuna bırakma eki; §7'de uygulandı
+  (ARC-87).
 
 ## §6 KAYIT satırı: konuşma dosyasının boyutu (ARC-82)
 
@@ -165,3 +167,66 @@ eklendi).
 
 **Sınır:** her istemde boyutu gösterir ama kilit gibi komut REDDETMEZ; devret kararı insandadır.
 Kancaların dosyayı bütün okuması ayrı iştir (ARC-83, #1838: tur sonu kapıları kuyruk okur).
+
+## §7 Arka plan sarmalayıcı: yuva komut bitince bırakılır (ARC-87)
+
+**Niçin:** §5 gözlemi: arka plan ağır komutun yuvası yalnız TTL ile (20 dk) düşüyordu; URUN'un kısa
+`install`'ı ve ardından `docker` komutu yuvayı 11:21-11:53 arası, yaklaşık 32 dk dolu tuttu ve filo
+bekledi. OPS kararı (2026-10-11): PreToolUse arka plan ağır komutu sarar, komut gerçekten bitince
+yuva bırakılır.
+
+**Mekanizma:** arka plan ağır komut yuvayı alınca kanca komutu `updatedInput` ile şu biçimde döndürür
+(girdi nesnesinin diğer alanları korunur; `permissionDecision` DÖNMEZ, izin akışı değişmez):
+
+```bash
+(
+<özgün komut>
+)
+__agir_rc=$?
+node "<kanca betiği>" --birak --yuva <i> --belirtec <t> --dizin "<kilit dizini>" >/dev/null 2>&1
+exit $__agir_rc
+```
+
+**Kurallar:**
+
+1. **Çıkış kodu aynen korunur** (komut 0, 1 ya da başka kodla bitse de yuva bırakılır ve kod döner).
+2. **Yalnız arka planda koşan ağır komut sarılır.** Ön plan akışı, hafif komut ve Bash dışı araç değişmez.
+3. **Belirteç şart:** `--belirtec` yuvadaki sahip kaydında yoksa bırakma HİÇBİR ŞEY düşürmez. TTL ile
+   yuvayı başka pencere aldıysa geç gelen bırakma onu silmemelidir.
+4. **Aynı pencerenin birden çok arka plan komutu:** her komutun kendi belirteci vardır; yuva son
+   belirteç düşünce verilir. Ön plan ağır komutun PostToolUse'u arka plan yuvasını yine düşürmez.
+5. **Bırakma kolu stdin OKUMAZ:** arka plan kabuğunda stdin açık kalabilir; okuma takılırdı.
+6. **TTL (20 dk) güvenlik ağı olarak kalır:** pencere kapanır, süreç öldürülür ya da sarmalayıcı hiç
+   çalışmazsa yuva yine bayatlar.
+7. **Kapatma:** `VENTHUB_AGIR_KILIT_SARMA=0` sarmayı kapatır (davranış v1.1'e döner, kayıt değişmez).
+
+**Ayar kaydı değişmez:** §4'teki üç kayıt aynıdır; sarmalayıcı kancanın ÇIKTISIDIR, yeni kayıt gerekmez.
+
+**Kod ve test:** `.claude/hooks/agir-komut-kilidi.cjs` (`kilitAl` belirteç üretir, `belirtecBirak`,
+`sarmala`); test `INV-AGIR-KILIT-4` (`src/__tests__/conformance/kanca-agir-komut-kilidi.test.ts`):
+sarma biçimi ve alanların korunması, çıkış 0 ve çıkış 1 ile biten komut, yorum satırıyla biten komut,
+belirteç uyuşmazlığı, iki arka plan komutu, N=2, kancanın ürettiği komutun uçtan uca koşması, bırakma
+kolunun stdin okumaması. **Bozma:** bırakma eki kaldırılınca yuva dolu kalır (testte) ve 13 mutasyon
+(çıkış kodunu bozma, belirteç denetimini kaldırma, ön planı da sarma, karar ekleme, kapanış parantezi,
+belirteç listesini kaybetme, son belirteçten önce silme, stdin okuma, kapatma anahtarını yok sayma,
+yanlış yuva/dizin, alanları düşürme) test dosyasınca yakalanır (sonuç kart notunda).
+
+**Bilinen sınırlar (ölçülmedi ya da kapsam dışı):**
+
+- **`updatedInput`'un `permissionDecision` olmadan uygulanıp uygulanmadığı resmî belgede yazmıyor**
+  (belge yalnız `allow` ve `ask` ile birlikte örnekliyor) ve bu pencerede ölçülemedi (yalıtılmış deneme
+  için gereken ikinci `claude` oturumu oturum açmıyor). Uygulanmıyorsa sarmalayıcı etkisiz kalır ve
+  TTL işler (çökme yok). `allow` döndürmek istemin atlanması demektir; bu karar OPS'tadır ve canlı
+  kabul ölçümüne bağlıdır (aşağıda).
+- Komutun kendisi `&` ile iç arka plan işi başlatırsa sarmalayıcı hemen biter ve yuva erken bırakılır.
+- Aynı pencerenin ön plan ağır komutu koşarken arka plan komutu biterse yuva ön plan komutuna rağmen
+  düşer (belirteç listesi boşalınca yuva silinir); kısa süreli çift yük riski, kabul edildi.
+- Uygulamanın uzun ön plan komutu kendiliğinden arka plana atması "ön plan" sayılır (PreToolUse'ta
+  `run_in_background` yok); sarılmaz ve PostToolUse'ta bırakılır (v1.1 davranışı).
+
+**Canlı kabul (ayar kaydı gerekmez, yeni pencerede):** (1) pencerede arka planda hafif bir ağır komut
+başlat (örn. `run_in_background` ile `tsc --version`); (2) komut bitince `<pano>/agir-kilit/yuva-0`
+dizininin yok olduğunu oku (TTL beklenmeden); (3) o sırada ikinci pencerenin ağır komutunun
+reddedilmediğini ölç; (4) hata veren arka plan komutunda da (`tsc --nonexistent-flag-xyz`) yuvanın
+bırakıldığını ölç. Yuva komut bitince boşalmıyorsa `updatedInput` kararsız uygulanmıyor demektir:
+OPS'a yaz, §7 sınırı. Ölçülmeden "çalışıyor" denmez.

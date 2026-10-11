@@ -8,7 +8,8 @@ import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * INV-AGIR-KILIT-1..3 · Ağır komut kilidi + pencere başına süreç sayımı (ARC-81, 2026-10-10).
+ * INV-AGIR-KILIT-1..4 · Ağır komut kilidi + pencere başına süreç sayımı (ARC-81, 2026-10-10) +
+ * arka plan sarmalayıcı (ARC-87, 2026-10-11: arka plan ağır komut bitince yuvayı kendisi bırakır).
  *
  * Ölçülen vaka: 2026-10-09 19:57'de dokuz pencere ayni anda ağır komut koştu, 32,6 GB'ın 123 MB'ı
  * boştu ve uygulama kapandı. Kilit olmadan her pencere kendi başına makuldü; makineyi bağlayan
@@ -24,11 +25,22 @@ interface Sahip {
   ad: string
   ts: number
 }
-type AlSonuc = { ok: true; yuva: number } | { ok: false; sahipler: Sahip[] }
+type AlSonuc = { ok: true; yuva: number; belirtec?: string } | { ok: false; sahipler: Sahip[] }
 interface Kilit {
   agirMi: (komut: string) => string | null
-  kilitAl: (o: { sid: string; komut: string; ad: string; lane?: string; simdi?: number; dizin?: string; adet?: number }) => AlSonuc
+  kilitAl: (o: {
+    sid: string
+    komut: string
+    ad: string
+    lane?: string
+    simdi?: number
+    dizin?: string
+    adet?: number
+    arkaPlan?: boolean
+  }) => AlSonuc
   kilitBirak: (o: { sid: string; dizin?: string; adet?: number }) => number
+  belirtecBirak: (o: { yuva: number; belirtec: string; dizin?: string }) => boolean
+  sarmala: (komut: string, o: { betik: string; dizin: string; yuva: number; belirtec: string }) => string
   durum: (o?: { simdi?: number; dizin?: string; adet?: number }) => { adet: number; dolu: Sahip[] }
   satir: (sid: string, simdi?: number, o?: { dizin?: string; adet?: number }) => string | null
 }
@@ -309,5 +321,184 @@ describe('INV-AGIR-KILIT-3: pencere başına süreç sayımı', () => {
     expect(kalabalik).toMatch(/^⚠BELLEK: /)
     expect(kalabalik).toMatch(/KALABALIK pencere \(>= 80 surec\): claude 7 altinda 80/)
     expect(yoklama.satir({ ...taban, pencereler: [], pencereToplam: 400 }, SIMDI)).toMatch(/pencereler toplam 400 surec/)
+  })
+})
+
+describe('INV-AGIR-KILIT-4: arka plan sarmalayıcı (ARC-87): komut bitince yuva bırakılır, çıkış kodu aynen', () => {
+  const calistir = (dizin: string, girdi: object, env: Record<string, string> = {}, ...arglar: string[]) =>
+    spawnSync(process.execPath, [KANCA, ...arglar], {
+      input: JSON.stringify(girdi),
+      encoding: 'utf8',
+      env: { ...process.env, VENTHUB_AGIR_KILIT_DIR: dizin, VENTHUB_AGIR_KILIT_N: '1', CC_LANE: '', ...env },
+    })
+  const bash = (sid: string, command: string, ekstra: object = {}) => ({
+    session_id: sid,
+    tool_name: 'Bash',
+    tool_input: { command, ...ekstra },
+  })
+  const BASH_VAR = spawnSync('bash', ['-c', 'exit 0']).status === 0
+  const sarmali = (dizin: string, ic: string) => {
+    const r = kilit.kilitAl({ sid: A, komut: 'pnpm build', ad: 'build', simdi: Date.now(), dizin, adet: 1, arkaPlan: true })
+    if (!r.ok || !r.belirtec) throw new Error('arka plan yuvası alınamadı')
+    return { r, komut: kilit.sarmala(ic, { betik: KANCA, dizin, yuva: r.yuva, belirtec: r.belirtec }) }
+  }
+  const kosKabuk = (komut: string) => spawnSync('bash', ['-c', komut], { encoding: 'utf8' })
+  const doluSayisi = (dizin: string): number => kilit.durum({ simdi: Date.now(), dizin, adet: 1 }).dolu.length
+  const belirtecOku = (s: string): string | undefined => /--belirtec ([0-9a-f]{12})/.exec(s)?.[1]
+
+  it('kanca arka plan ağır komutu SARAR: özgün komut + bırakma eki + belirteç; diğer alanlar korunur; KARAR dönmez', () => {
+    const dizin = yeniDizin()
+    const r = calistir(dizin, bash(A, 'pnpm build', { run_in_background: true, description: 'derleme', timeout: 1234 }))
+    expect(r.status).toBe(0)
+    const cevap = JSON.parse(r.stdout) as { hookSpecificOutput: Record<string, unknown> & { updatedInput: Record<string, unknown> } }
+    const ho = cevap.hookSpecificOutput
+    expect(ho.hookEventName).toBe('PreToolUse')
+    expect(ho).not.toHaveProperty('permissionDecision')
+    const ui = ho.updatedInput
+    expect(ui.run_in_background).toBe(true)
+    expect(ui.description).toBe('derleme')
+    expect(ui.timeout).toBe(1234)
+    expect(String(ui.command)).toContain('pnpm build')
+    expect(String(ui.command)).toMatch(/--birak --yuva 0 --belirtec [0-9a-f]{12}/)
+    expect(String(ui.command)).toContain('exit $__agir_rc')
+    const sahip = JSON.parse(fs.readFileSync(path.join(dizin, 'yuva-0', 'sahip.json'), 'utf8')) as { belirtecler: string[] }
+    expect(sahip.belirtecler).toContain(belirtecOku(String(ui.command)))
+  })
+
+  it('ÖN PLAN ağır komut, HAFİF arka plan komut ve kapatılmış sarma SARILMAZ', () => {
+    expect(calistir(yeniDizin(), bash(A, 'pnpm build')).stdout.trim()).toBe('')
+    expect(calistir(yeniDizin(), bash(A, 'git status', { run_in_background: true })).stdout.trim()).toBe('')
+    const kapali = calistir(yeniDizin(), bash(A, 'pnpm build', { run_in_background: true }), { VENTHUB_AGIR_KILIT_SARMA: '0' })
+    expect(kapali.stdout.trim()).toBe('')
+  })
+
+  it.skipIf(!BASH_VAR)('çıkış 0 ile biten komut: çıkış kodu 0, çıktı aynen, yuva BIRAKILIR', () => {
+    const dizin = yeniDizin()
+    const { komut } = sarmali(dizin, `node -e "console.log('ic-cikti'); process.exit(0)"`)
+    expect(doluSayisi(dizin)).toBe(1)
+    const p = kosKabuk(komut)
+    expect(p.status).toBe(0)
+    expect(p.stdout.trim()).toBe('ic-cikti')
+    expect(doluSayisi(dizin)).toBe(0)
+  })
+
+  it.skipIf(!BASH_VAR)('çıkış 1 ile biten komut: çıkış kodu 1 AYNEN korunur ve yuva yine BIRAKILIR', () => {
+    const dizin = yeniDizin()
+    const { komut } = sarmali(dizin, `node -e "console.error('hata'); process.exit(1)"`)
+    const p = kosKabuk(komut)
+    expect(p.status).toBe(1)
+    expect(p.stderr).toContain('hata')
+    expect(doluSayisi(dizin)).toBe(0)
+  })
+
+  it.skipIf(!BASH_VAR)('özgün komut yorum satırıyla biterse sarmalayıcı bozulmaz (kapanış paranteze kaçmaz)', () => {
+    const dizin = yeniDizin()
+    const { komut } = sarmali(dizin, `node -e "process.exit(0)" # bitiş yorumu`)
+    expect(kosKabuk(komut).status).toBe(0)
+    expect(doluSayisi(dizin)).toBe(0)
+  })
+
+  it.skipIf(!BASH_VAR)('BOZMA: bırakma eki kaldırılınca yuva DOLU kalır (yuvayı yalnız ek düşürür) ve çıkış kodu yine korunur', () => {
+    const dizin = yeniDizin()
+    const { komut } = sarmali(dizin, `node -e "process.exit(2)"`)
+    const eksiz = komut
+      .split('\n')
+      .filter((s) => !s.includes('--birak'))
+      .join('\n')
+    expect(eksiz).not.toContain('--birak')
+    const p = kosKabuk(eksiz)
+    expect(p.status).toBe(2)
+    expect(doluSayisi(dizin)).toBe(1)
+  })
+
+  it.skipIf(!BASH_VAR).each([
+    ['docker() { echo ic-ok; }; docker compose up', 0, 'ic-ok'],
+    ['docker() { echo ic-hata >&2; return 7; }; docker compose up', 7, ''],
+  ] as Array<[string, number, string]>)(
+    'UÇTAN UCA: kancanın ÜRETTİĞİ komut (%s) koşar, çıkış kodu %i aynen, yuva bırakılır',
+    (ic, kod, cikti) => {
+      const dizin = yeniDizin()
+      const r = calistir(dizin, bash(A, ic, { run_in_background: true }))
+      const ui = (JSON.parse(r.stdout) as { hookSpecificOutput: { updatedInput: { command: string } } }).hookSpecificOutput.updatedInput
+      expect(fs.existsSync(path.join(dizin, 'yuva-0'))).toBe(true)
+      const p = kosKabuk(ui.command)
+      expect(p.status).toBe(kod)
+      expect(p.stdout.trim()).toBe(cikti)
+      expect(fs.existsSync(path.join(dizin, 'yuva-0'))).toBe(false)
+    },
+  )
+
+  it('N=2: sarmalayıcı KENDİ yuvasını bırakır, öbür pencerenin yuvasına dokunmaz', () => {
+    const dizin = yeniDizin()
+    kilit.kilitAl({ sid: A, komut: 'pnpm build', ad: 'build', simdi: Date.now(), dizin, adet: 2 })
+    const b = kilit.kilitAl({ sid: B, komut: 'pnpm install', ad: 'install', simdi: Date.now(), dizin, adet: 2, arkaPlan: true })
+    if (!b.ok || !b.belirtec) throw new Error('alınamadı')
+    expect(b.yuva).toBe(1)
+    const komut = kilit.sarmala('echo x', { betik: KANCA, dizin, yuva: b.yuva, belirtec: b.belirtec })
+    expect(komut).toContain('--yuva 1 ')
+    expect(kilit.belirtecBirak({ yuva: 0, belirtec: b.belirtec, dizin })).toBe(false)
+    expect(fs.existsSync(path.join(dizin, 'yuva-0'))).toBe(true)
+    expect(kilit.belirtecBirak({ yuva: 1, belirtec: b.belirtec, dizin })).toBe(true)
+    expect(fs.existsSync(path.join(dizin, 'yuva-0'))).toBe(true)
+    expect(fs.existsSync(path.join(dizin, 'yuva-1'))).toBe(false)
+  })
+
+  it('belirteç yuvada yoksa bırakma yuvayı DÜŞÜRMEZ (TTL ile başkası aldı; geç gelen bırakma onu silmemeli)', () => {
+    const dizin = yeniDizin()
+    const a = kilit.kilitAl({ sid: A, komut: 'pnpm build', ad: 'build', simdi: SIMDI, dizin, adet: 1, arkaPlan: true })
+    if (!a.ok || !a.belirtec) throw new Error('alınamadı')
+    const b = kilit.kilitAl({ sid: B, komut: 'pnpm type-check', ad: 'type-check', simdi: SIMDI + 21 * 60_000, dizin, adet: 1 })
+    expect(b.ok).toBe(true)
+    expect(kilit.belirtecBirak({ yuva: a.yuva, belirtec: a.belirtec, dizin })).toBe(false)
+    expect(kilit.durum({ simdi: SIMDI + 22 * 60_000, dizin, adet: 1 }).dolu[0]?.sid).toBe(B)
+    expect(kilit.belirtecBirak({ yuva: 0, belirtec: '', dizin })).toBe(false)
+    expect(kilit.belirtecBirak({ yuva: -1, belirtec: a.belirtec, dizin })).toBe(false)
+  })
+
+  it('aynı pencerenin iki arka plan komutu: ilk alınan sürerken sonraki bitince yuva TUTULUR, sonuncusu bitince bırakılır', () => {
+    const dizin = yeniDizin()
+    const a1 = kilit.kilitAl({ sid: A, komut: 'pnpm build', ad: 'build', simdi: SIMDI, dizin, adet: 1, arkaPlan: true })
+    const a2 = kilit.kilitAl({ sid: A, komut: 'pnpm install', ad: 'install', simdi: SIMDI + 1000, dizin, adet: 1, arkaPlan: true })
+    if (!a1.ok || !a2.ok || !a1.belirtec || !a2.belirtec) throw new Error('alınamadı')
+    expect(a1.belirtec).not.toBe(a2.belirtec)
+    // önce SONRADAN alınan biter: ilkinin belirteci kaybolmuşsa yuva yanlışlıkla düşerdi
+    expect(kilit.belirtecBirak({ yuva: 0, belirtec: a2.belirtec, dizin })).toBe(false)
+    expect(kilit.durum({ simdi: SIMDI + 2000, dizin, adet: 1 }).dolu).toHaveLength(1)
+    expect(kilit.belirtecBirak({ yuva: 0, belirtec: a1.belirtec, dizin })).toBe(true)
+    expect(kilit.durum({ simdi: SIMDI + 3000, dizin, adet: 1 }).dolu).toHaveLength(0)
+  })
+
+  it('PostToolUse arka plan yuvasını sarmalayıcı varken de BIRAKMAZ (komut hâlâ koşuyor); sarmalayıcı bırakınca ikinci pencere alır', () => {
+    const dizin = yeniDizin()
+    const ilk = calistir(dizin, bash(A, 'pnpm build', { run_in_background: true }))
+    const t = belirtecOku(ilk.stdout)
+    expect(t).toBeTruthy()
+    calistir(dizin, bash(A, 'pnpm build', { run_in_background: true }), {}, '--birak')
+    expect(/"permissionDecision":"deny"/.test(calistir(dizin, bash(B, 'pnpm type-check')).stdout)).toBe(true)
+    const birak = spawnSync(process.execPath, [KANCA, '--birak', '--yuva', '0', '--belirtec', String(t), '--dizin', dizin], { encoding: 'utf8' })
+    expect(birak.status).toBe(0)
+    expect(calistir(dizin, bash(B, 'pnpm type-check')).stdout.trim()).toBe('')
+  })
+
+  it('bırakma kolu stdin OKUMAZ: açık kalan stdin ile de hemen biter (arka plan kabuğunda takılmaz)', async () => {
+    const dizin = yeniDizin()
+    const a = kilit.kilitAl({ sid: A, komut: 'pnpm build', ad: 'build', simdi: Date.now(), dizin, adet: 1, arkaPlan: true })
+    if (!a.ok || !a.belirtec) throw new Error('alınamadı')
+    const { spawn } = await import('node:child_process')
+    const kod = await new Promise<number | null>((coz) => {
+      const c = spawn(process.execPath, [KANCA, '--birak', '--yuva', '0', '--belirtec', String(a.belirtec), '--dizin', dizin], {
+        stdio: ['pipe', 'ignore', 'ignore'],
+      })
+      const zaman = setTimeout(() => {
+        c.kill()
+        coz(-999)
+      }, 8000)
+      c.on('exit', (k) => {
+        clearTimeout(zaman)
+        coz(k)
+      })
+    })
+    expect(kod).toBe(0)
+    expect(doluSayisi(dizin)).toBe(0)
   })
 })

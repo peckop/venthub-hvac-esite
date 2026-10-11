@@ -21,8 +21,16 @@
  *
  * ⭐NİÇİN TTL: PostToolUse her zaman gelmez (pencere kapanır, kullanıcı iptal eder, arka plan komutu
  * hemen döner). Yuva `TTL_DK` dakikadan eskiyse BAYAT sayılır ve bir sonraki deneyen onu siler.
- * Arka plan komutu (`run_in_background`) yuvayı PostToolUse'ta BIRAKMAZ: komut hâlâ koşuyor;
- * yuva TTL ile ya da aynı pencerenin sonraki ağır komutuyla yenilenir.
+ * Arka plan komutu (`run_in_background`) yuvayı PostToolUse'ta BIRAKMAZ: komut hâlâ koşuyor.
+ *
+ * ⭐ARKA PLAN SARMALAYICI (ARC-87, OPS kararı 2026-10-11): arka plan ağır komut yuvayı alınca PreToolUse
+ * komutu `( KOMUT ); rc=$?; node <bu betik> --birak --yuva <i> --belirtec <t>; exit $rc` biçiminde
+ * SARAR (`updatedInput`); komut GERÇEKTEN bitince yuva bırakılır, çıkış kodu aynen korunur. Belirteç
+ * (`--belirtec`) şart: TTL ile yuvayı başkası aldıysa geç gelen bırakma onu DÜŞÜRMEZ. TTL güvenlik
+ * ağı olarak kalır (pencere kapanır, süreç öldürülür, sarmalayıcı hiç çalışmaz). Yalnız ARKA PLANDA
+ * koşan ağır komut sarılır; ön plan akışı değişmez. KARAR (`permissionDecision`) DÖNMEZ: normal izin
+ * akışı sürer; `updatedInput` kararsız uygulanmıyorsa sarmalayıcı etkisiz kalır ve TTL işler
+ * (çökme yok, canlı kabulle ölçülür). Kapatmak: `VENTHUB_AGIR_KILIT_SARMA=0`.
  *
  * ⭐AÇIK KALIR (fail-open): kilit dizini yazılamıyor, girdi bozuk, beklenmeyen hata → komut geçer.
  * Kilit bir emniyet kemeridir; bozulduğunda işi durduran bir şeye dönüşmemeli.
@@ -39,9 +47,11 @@
  * Kayıt: `.claude/settings.json` PreToolUse(Bash) ve PostToolUse(Bash) — OPS kapısı; metin PR gövdesinde.
  */
 
+const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 
+const SARMA_ACIK = process.env.VENTHUB_AGIR_KILIT_SARMA !== '0'
 const N = Math.max(1, Number(process.env.VENTHUB_AGIR_KILIT_N || 1))
 const TTL_DK = Math.max(1, Number(process.env.VENTHUB_AGIR_KILIT_TTL_DK || 20))
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -143,11 +153,21 @@ function yuvalar(dizin, adet) {
 
 /**
  * Yuva almayı dener.
- * @returns {{ok:true, yuva:number}|{ok:false, sahipler:Array<{sid:string,lane:string,komut:string,ad:string,ts:number}>}}
+ * @returns {{ok:true, yuva:number, belirtec?:string}|{ok:false, sahipler:Array<{sid:string,lane:string,komut:string,ad:string,ts:number}>}}
+ *   `belirtec` yalnız ARKA PLAN alımında döner: sarmalayıcının bırakırken göstereceği tek kullanımlık kimlik.
  */
 function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini(), adet = N, arkaPlan = false }) {
   fs.mkdirSync(dizin, { recursive: true })
-  const kayit = { sid, lane: lane || '', ad, komut: String(komut || '').slice(0, 120), ts: simdi, arkaPlan: Boolean(arkaPlan) }
+  const belirtec = arkaPlan ? crypto.randomBytes(6).toString('hex') : undefined
+  const kayit = {
+    sid,
+    lane: lane || '',
+    ad,
+    komut: String(komut || '').slice(0, 120),
+    ts: simdi,
+    arkaPlan: Boolean(arkaPlan),
+    belirtecler: belirtec ? [belirtec] : [],
+  }
   const sahipler = []
   const hepsi = yuvalar(dizin, adet)
   for (let i = 0; i < hepsi.length; i += 1) {
@@ -156,17 +176,22 @@ function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini
       try {
         fs.mkdirSync(yol)
         fs.writeFileSync(path.join(yol, 'sahip.json'), JSON.stringify(kayit))
-        return { ok: true, yuva: i }
+        return belirtec ? { ok: true, yuva: i, belirtec } : { ok: true, yuva: i }
       } catch (e) {
         if (!e || e.code !== 'EEXIST') throw e
       }
       const s = sahipOku(yol)
       if (s && s.sid === sid) {
         // Aynı pencere: yeniden giriş (arka plan komutunun üstüne ikinci ağır komut) yuvayı yeniler.
-        // ⭐arkaPlan İŞARETİ KORUNUR (OPS 10-10): arka plandaki komut hâlâ koşuyorken öndeki ikinci
-        // ağır komutun PostToolUse'u yuvayı düşürmemeli; yuva TTL'e kalır.
-        fs.writeFileSync(path.join(yol, 'sahip.json'), JSON.stringify({ ...kayit, arkaPlan: Boolean(s.arkaPlan) || kayit.arkaPlan }))
-        return { ok: true, yuva: i }
+        // ⭐arkaPlan İŞARETİ ve BELİRTEÇLER KORUNUR (OPS 10-10): arka plandaki komut hâlâ koşuyorken
+        // öndeki ikinci ağır komutun PostToolUse'u yuvayı düşürmemeli; yuvayı arka plan komutunun
+        // kendi sarmalayıcısı (belirteçle) ya da TTL düşürür.
+        const onceki = Array.isArray(s.belirtecler) ? s.belirtecler : []
+        fs.writeFileSync(
+          path.join(yol, 'sahip.json'),
+          JSON.stringify({ ...kayit, arkaPlan: Boolean(s.arkaPlan) || kayit.arkaPlan, belirtecler: belirtec ? [...onceki, belirtec] : onceki }),
+        )
+        return belirtec ? { ok: true, yuva: i, belirtec } : { ok: true, yuva: i }
       }
       if (bayatMi(yol, simdi)) {
         fs.rmSync(yol, { recursive: true, force: true })
@@ -193,6 +218,42 @@ function kilitBirak({ sid, dizin = kilitDizini(), adet = N }) {
     }
   }
   return n
+}
+
+/**
+ * Arka plan komutunun SARMALAYICISI bırakır (ARC-87): yalnız kendi belirteci yuvadaysa.
+ * Belirteç yuvada yoksa (TTL ile başkası aldı, yuva bayat silindi, kanca açılmadan önce) HİÇBİR ŞEY düşmez.
+ * @returns {boolean} yuva fiilen verildiyse true (başka belirteç kaldıysa yuva tutulur, false)
+ */
+function belirtecBirak({ yuva, belirtec, dizin = kilitDizini() }) {
+  if (!Number.isInteger(yuva) || yuva < 0 || !belirtec) return false
+  const yol = path.join(dizin, 'yuva-' + yuva)
+  const s = sahipOku(yol)
+  const hepsi = s && Array.isArray(s.belirtecler) ? s.belirtecler : []
+  if (!hepsi.includes(belirtec)) return false
+  const kalan = hepsi.filter((t) => t !== belirtec)
+  if (kalan.length) {
+    fs.writeFileSync(path.join(yol, 'sahip.json'), JSON.stringify({ ...s, belirtecler: kalan }))
+    return false
+  }
+  fs.rmSync(yol, { recursive: true, force: true })
+  return true
+}
+
+/** bash çift tırnak içi için kaçış (yol ve kimlikler sabit karakterlerdir; yine de savunmacı). */
+function tirnak(s) {
+  return '"' + String(s).replace(/(["\\$`])/g, '\\$1') + '"'
+}
+
+/**
+ * Arka plan komutunu sarar: komut alt kabukta (satır sonu + `)` yorum satırını yutmasın diye ayrı
+ * satırlarda) koşar, çıkış kodu saklanır, sarmalayıcı yuvayı bırakır, çıkış kodu AYNEN döner.
+ * Bırakma çıktısı bastırılır (komutun çıktısı değişmez); node yoksa ya da bırakma düşerse TTL işler.
+ */
+function sarmala(komut, { betik, dizin, yuva, belirtec }) {
+  const birak =
+    'node ' + tirnak(String(betik).split(path.sep).join('/')) + ' --birak --yuva ' + Number(yuva) + ' --belirtec ' + belirtec + ' --dizin ' + tirnak(String(dizin).split(path.sep).join('/'))
+  return '(\n' + String(komut) + '\n)\n__agir_rc=$?\n' + birak + ' >/dev/null 2>&1\nexit $__agir_rc'
 }
 
 /** Doluluk durumu (istem satırı için): bayatlar hariç, sahipleriyle. */
@@ -249,7 +310,22 @@ function girdiOku() {
   }
 }
 
+function argDegeri(ad) {
+  const i = process.argv.indexOf(ad)
+  return i >= 0 ? process.argv[i + 1] : undefined
+}
+
 function calistir() {
+  // ⭐Sarmalayıcının bırakması (ARC-87): stdin OKUNMAZ. Arka plan kabuğunda stdin açık kalabilir;
+  // okuma takılır ve yuva TTL'e kalırdı. Yuva ve belirteç komut satırından gelir.
+  if (process.argv.includes('--birak') && process.argv.includes('--yuva')) {
+    belirtecBirak({
+      yuva: Number(argDegeri('--yuva')),
+      belirtec: argDegeri('--belirtec'),
+      dizin: argDegeri('--dizin') || kilitDizini(),
+    })
+    return
+  }
   const girdi = girdiOku()
   // BAŞARISIZ ağır komut (tsc çıkış 2, kırmızı test) PostToolUse üretmez; olay PostToolUseFailure'dır.
   // Aynı kayıt (`--birak`) iki olayda da çalışır; olay adı girdiden de okunur (OPS 10-10).
@@ -272,7 +348,19 @@ function calistir() {
   if (!ad) return
   const arkaPlan = Boolean(girdi.tool_input && girdi.tool_input.run_in_background)
   const r = kilitAl({ sid, komut, ad, lane: process.env.CC_LANE || '', simdi, arkaPlan })
-  if (r.ok) return
+  if (r.ok) {
+    // ⭐Yalnız ARKA PLAN alımı sarılır (belirteç yalnız onda üretilir); karar (`permissionDecision`)
+    // DÖNMEZ: izin akışı değişmez. `updatedInput` girdi nesnesinin TAMAMINI değiştirir: diğer alanlar korunur.
+    if (r.belirtec && SARMA_ACIK && !/--birak\s+--yuva/.test(String(komut))) {
+      const yeni = sarmala(komut, { betik: __filename, dizin: kilitDizini(), yuva: r.yuva, belirtec: r.belirtec })
+      process.stdout.write(
+        JSON.stringify({
+          hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: { ...girdi.tool_input, command: yeni } },
+        }) + '\n',
+      )
+    }
+    return
+  }
   process.stdout.write(
     JSON.stringify({
       hookSpecificOutput: {
@@ -293,4 +381,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { agirMi, parcaSinifla, kilitAl, kilitBirak, durum, satir, bayatMi, kilitDizini, N, TTL_DK }
+module.exports = { agirMi, parcaSinifla, kilitAl, kilitBirak, belirtecBirak, sarmala, durum, satir, bayatMi, kilitDizini, N, TTL_DK }
