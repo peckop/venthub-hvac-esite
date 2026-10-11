@@ -7,13 +7,20 @@
 
 ## 1. Karar (değişmez)
 
-| Yüzey | TR | EN | Not |
-|---|---|---|---|
-| Ana kategori | `/tr/kategori/<kök>` | `/en/category/<kök>` | DEĞİŞMEZ |
-| Alt kategori | `/tr/kategori/<alt-slug>` | `/en/category/<alt-slug>` (noindex) | TEK seviye; kategori adresinde kimlik soneki YOK |
-| Ürün ailesi | `/tr/urun/<aile-slug>` | aynı | DEĞİŞMEZ (adresUret.ts yeniAdres) |
-| Model | `/tr/urun/<ad>-p-<sku>` | aynı | DEĞİŞMEZ; yayındaki liste dışı SKU aile + `?sku=` |
-| Marka | `/tr/markalar/<slug>` | `/en/brands/<slug>` | DEĞİŞMEZ |
+İki ayrı okuma vardır ve karıştırılmaz: **3-C'ye göre** sütunu #1811'in (3-C) adresiyle karşılaştırır; **bugünkü canlıya
+göre** sütunu ziyaretçinin bugün gördüğü adresle. Açılışta (19 Ekim, bayrak açılınca) canlıya göre değişen her adres tek
+308 ile yenisine gider.
+
+| Yüzey | TR | EN | 3-C'ye göre | Bugünkü canlıya göre |
+|---|---|---|---|---|
+| Ana kategori | `/tr/kategori/<kök>` | `/en/category/<kök>` | değişmez | TR değişir (`/tr/category/<kök>` → tek 308); EN değişmez |
+| Alt kategori | `/tr/kategori/<alt-slug>` | `/en/category/<alt-slug>` | DEĞİŞİR: iki seviyeli adres kalktı, TEK seviye; kategori adresinde kimlik soneki YOK | TR ve EN değişir (`<kök>/<alt>` → `<alt-slug>`, tek 308) |
+| Ürün ailesi | `/tr/urun/<aile-slug>` | `/en/products/<aile-slug>` | değişmez (adresUret.ts yeniAdres) | TR değişir (`/tr/products/<aile>` → tek 308); EN değişmez |
+| Model | `/tr/urun/<ad>-p-<sku>` | `/en/products/<ad>-p-<sku>` | değişmez; yayındaki liste dışı SKU aile + `?sku=` | ölçülmedi (runbook §4.1 matrisi) |
+| Marka | `/tr/markalar/<slug>` | `/en/brands/<slug>` | değişmez | TR değişir (`/tr/brands/<slug>` → tek 308); EN değişmez |
+
+EN yayını kapalıyken (`EN_YAYIN`) bütün `/en/` sayfaları noindex'tir ve site haritasında yoktur; alt kategori bunun
+dışında noindex DEĞİLDİR (`robots` yalnız pasif kategoride yazılır, sitemap.ts alt kategoriyi tek segmentle ilan eder).
 
 ## 2. Eski adresler → yeni adres (tek sıçramalı 308)
 
