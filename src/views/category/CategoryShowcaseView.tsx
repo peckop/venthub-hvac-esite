@@ -16,6 +16,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../../lib/type-converters'
 import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import { vurguluBaslikParcalari } from '../../utils/vurguluBaslik'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -34,6 +35,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     const [wizardOpen, setWizardOpen] = useState(false)
     
     const vm = wrapCategory(category)
+    const baslikParcalari = vurguluBaslikParcalari(dict.category.showcase.whyVenthubTitle, t('common.brand'))
     // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; tüm giriş noktaları (kahraman düğmesi,
     // BottomCTA, sihirbazın kendisi) tek kapıdan kapalı — `airCurtainWizardGate.ts`.
     const havaPerdesiSihirbazi = category.slug.includes('hava-perde') && AIR_CURTAIN_WIZARD_ENABLED
@@ -213,11 +215,15 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 <span>{t('category.showcase.guarantee')}</span>
                             </div>
                             <h2 className="text-5xl font-light tracking-tight mb-12">
-                                {dict.category.showcase.whyVenthubTitle.split('VentHub')[0]}
-                                <span className="font-medium italic">
-                                    {t('common.brand')}
-                                    {dict.category.showcase.whyVenthubTitle.split('VentHub')[1] || ''}
-                                </span>
+                                {/* URN-101: marka adı başlıkta geçiyorsa vurgulanır; geçmiyorsa başlık düz basılır
+                                    (eskiden "Katalogda Neler Var?" + "VentHub" yapışıyordu). */}
+                                {baslikParcalari.once}
+                                {baslikParcalari.vurgulu !== null && (
+                                    <span className="font-medium italic">
+                                        {baslikParcalari.vurgulu}
+                                        {baslikParcalari.sonra}
+                                    </span>
+                                )}
                             </h2>
                             <div className="space-y-10">
                                 {[ShieldCheck, Activity, Zap].map((Icon, i) => {

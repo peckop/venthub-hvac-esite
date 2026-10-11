@@ -44,17 +44,17 @@
     "docs/reference/vortice_catalogs.md": "06"
   },
   "kural": [
-    ["02 Çalışma yöntemi, filo, iş kaydı", "collaboration|execution-method|fleet|multi-session|session-loop|subagent|work-tracking|is-kayit|settled-work|proje-takip|pano-orion|hafiza-kancalari|operasyon-dongusu|oturum-devir|registry-triyaj|kacirma-listesi|karar-kayit|t139-gun-sonu|gelistirme-kurallari"],
-    ["03 Ölçüm, kanıt, kapı disiplini", "measurement|hukum-kaynak|vaat|uretilmis-artefakt|t104-vaat|investigate|evren-muhafizi|rec162|rec336|rec352|vibe-coding|teknik-bosluk|model-kiyas|ocr-kiyas|rec363"],
-    ["04 Araçlar, skill, CI, bağımlılık", "arac-envanteri|skill|gstack|graphify|kod-grafigi|mcp-bellek|claude-mem|ci-runner|deploy-build|build-skip|bagimlilik|dependency|runtime-version|rec313|rec314|rec315|rec319|rec326|rec327|rec333|rec176|rec348|companion|document-numbering|izin-kapilari"],
-    ["05 Veritabanı, migration, RLS, güvenlik", "migration|ledger-ve-olu|db-grant|rls|yetki|edge-function-security|csp|secret|sir-ekrana|tenant|t101|t134|rec321|rec335|rec296|rec52|sema-graf|denetim-izi|rec292|kasa-ve-siralama|locale-kasa|vuln"],
-    ["06 Katalog ve içerik hattı: kurallar", "catalog-ingestion|catalog-depth|katalog-sayim|product-schema|spec-axis|category-taxonomy|kategori-adlandirma|csv-import|aile-metni|product-image|urun-yapisal|matris|catalog-commerce|f5b-family|urun-kimlik|kategori-esleme|kategori-gorsel|rec146|rec172|rec108|rec357|rec124|rec140|rec158|dealer-data|matris-sutun|fiyatsiz|aile-adi|t099|t119|t138|t140|t143|t146|t162|t077|urun-veri-fark|katalog-karnesi|t139-urun|rec442|category-images"],
+    ["02 Çalışma yöntemi, filo, iş kaydı", "collaboration|execution-method|fleet|multi-session|session-loop|subagent|work-tracking|is-kayit|settled-work|proje-takip|pano-orion|hafiza-kancalari|operasyon-dongusu|oturum-devir|registry-triyaj|kacirma-listesi|karar-kayit|t139-gun-sonu|gelistirme-kurallari|hafiza-yazma|duzenli-gorevler|kart-plani|kanban-gecis"],
+    ["03 Ölçüm, kanıt, kapı disiplini", "measurement|hukum-kaynak|vaat|uretilmis-artefakt|t104-vaat|investigate|evren-muhafizi|rec162|rec336|rec352|vibe-coding|teknik-bosluk|model-kiyas|ocr-kiyas|rec363|test-karnesi|test-secimi|ci-test-olcum"],
+    ["04 Araçlar, skill, CI, bağımlılık", "arac-envanteri|skill|gstack|graphify|kod-grafigi|mcp-bellek|claude-mem|ci-runner|deploy-build|build-skip|bagimlilik|dependency|runtime-version|rec313|rec314|rec315|rec319|rec326|rec327|rec333|rec176|rec348|companion|document-numbering|izin-kapilari|agir-komut"],
+    ["05 Veritabanı, migration, RLS, güvenlik", "migration|ledger-ve-olu|db-grant|rls|yetki|edge-function-security|csp|secret|sir-ekrana|tenant|t101|t134|rec321|rec335|rec296|rec52|sema-graf|denetim-izi|rec292|kasa-ve-siralama|locale-kasa|vuln|depoya-giremeyecek|rec409"],
+    ["06 Katalog ve içerik hattı: kurallar", "catalog-ingestion|catalog-depth|katalog-sayim|product-schema|spec-axis|category-taxonomy|kategori-adlandirma|csv-import|aile-metni|product-image|urun-yapisal|matris|catalog-commerce|f5b-family|urun-kimlik|kategori-esleme|kategori-gorsel|rec146|rec172|rec108|rec357|rec124|rec140|rec158|dealer-data|matris-sutun|fiyatsiz|aile-adi|t099|t119|t138|t140|t143|t146|t162|t077|urun-veri-fark|katalog-karnesi|t139-urun|rec442|category-images|ktl\\d+-"],
     ["07 İçerik hattı: ölçümler ve taslaklar", "icerik-hatti"],
     ["08 Fiyat, ödeme, sipariş, teklif", "pricing|fiyat|checkout|payment|odeme|quote|teklif|rec117|rec355|t080|t114|t116|t132|purchasing|t128|t129|satis-kipi|rec168|satis-acilis"],
-    ["09 Vitrin: tasarım, render, adres, SEO, dil", "storefront|rendering|render|canonical|adres|slug|seo|geo-olcum|yayin-gorunurluk|arama|vitrin|i18n|localization|tasarim|marka|mockup|3d|rec300|rec59|rec369|rehber-yazisi|pazar-olcum|analytics|t021|lighthouse|t093|t150|olu-sozluk|design|rec-300"],
-    ["10 Yönetim paneli, ERP, CRM, bayi", "admin|erp|crm|dealer|j\\d+-|faz2-admin|commerce-domain|notification|email|form-submission|auth-account|customer-account|t047"],
+    ["09 Vitrin: tasarım, render, adres, SEO, dil", "storefront|rendering|render|canonical|adres|slug|seo|geo-olcum|yayin-gorunurluk|arama|vitrin|i18n|localization|tasarim|marka|mockup|3d|rec300|rec59|rec369|rehber-yazisi|pazar-olcum|analytics|t021|lighthouse|t093|t150|olu-sozluk|design|rec-300|dizin-sistemleri|dizin-gorunurluk|blg\\d+-|onizleme|ops52|rota-dili"],
+    ["10 Yönetim paneli, ERP, CRM, bayi", "admin|erp|crm|dealer|j\\d+-|faz2-admin|commerce-domain|notification|email|form-submission|auth-account|customer-account|t047|eposta"],
     ["11 Mevzuat, yasal, AVenS", "legal|mevzuat|avens|kvkk"],
-    ["12 SaaS, yol haritası, stratejik plan", "saas|roadmap|faz0|faz1|kademe2|unified-refactor|lansman|barindirma|rec129|rec340|red-team"]
+    ["12 SaaS, yol haritası, stratejik plan", "saas|roadmap|faz0|faz1|kademe2|unified-refactor|lansman|barindirma|rec129|rec340|red-team|yayin-gunu|runbook"]
   ],
   "bol": {
     "06": ["06a Katalog ve ürün verisi: kurallar", "06b Katalog ve ürün verisi: plan, ölçüm, başvuru"],

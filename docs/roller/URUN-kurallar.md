@@ -47,3 +47,7 @@
 
 ## İçerik kuralı (HRT-46)
 - Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub'dır. Cetveller: `docs/standards/rehber-yazisi-standard.md` R4 madde 10, `docs/standards/i18n-localization-standard.md` §4.
+
+## Unvan ve ölçüm kuralları (OPS-104)
+- Bayilik unvanı: yazılı distribütörlük ya da yetki sözleşmesi olmayan markanın sitesinde "yetkili bayi", "resmi distribütör", "marka güvencesi" ve "yetkili satış noktası" unvanı yazılmaz; sözleşme netleşince tek satırla geri konur. Yöneten cetvel: docs/standards/vaat-butunlugu-standard.md.
+- Ham HTML ölçümünde S:0 kopyası AYRI sayılır: sayfa ham HTML'inde hidden id="S:0" gizli akış bloğunun içindeki metin dış gövdenin ayrı bir kopyasıysa h1, kırıntı ve model bağlantısı sayımı "S:0 dışı" ve "S:0 içi" iki sütunda yazılır, tek toplam verilmez. Aile sayfasındaki ikinci kopya bilinçli fallback'tir (ProductDetailPageView Suspense fallback, URN-25 sonucu) ve kusur sayılmaz; kategori ve ürünler sayfalarında S:0 içi 0 olmalıdır (INV-SSR-GOVDE-2). Ölçüm cetveli docs/standards/geo-olcum-standard.md ve docs/standards/dizin-sistemleri-standard.md başkasının cetvelidir: bu kural onlara atıf verir, onları değiştirmez.

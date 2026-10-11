@@ -132,6 +132,9 @@ supabase/.temp/
 # /qa skill geçici ekran görüntüleri (kanıt olarak gerekenler docs/audits/qa-ekran/ altına kopyalanır)
 qa-raporlari/
 
+# ALT-65: retro skill depo köküne .context/retros/*.json yazar (oturum çıktısı, kaynak değil); depo PUBLIC, commitlenmez
+.context/
+
 # REC-319: yerlesik eval vaka agaci URETILIR, commitlenmez
 # (uretici: scripts/skills-eval-convert.mjs — deterministik, idempotent)
 .claude/evals-yerlesik/

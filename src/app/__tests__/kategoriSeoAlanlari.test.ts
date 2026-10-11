@@ -80,7 +80,7 @@ function kategori(a: Alanlar = {}): DomainCategory {
 
 const KIPLER = [
   ['bugünkü kip (bayrak kapalı)', (lang: string, k: DomainCategory) => kategoriSayfasiUstVerisi(lang, k)],
-  ['K3-b kipi (bayrak açık)', (lang: string, k: DomainCategory) => kategoriSayfasiUstVerisiK3b(lang, k, null)],
+  ['K3-b kipi (bayrak açık)', (lang: string, k: DomainCategory) => kategoriSayfasiUstVerisiK3b(lang, k)],
 ] as const
 
 describe('getCategorySeoTitle / getCategorySeoDescription', () => {

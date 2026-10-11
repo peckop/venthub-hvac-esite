@@ -13,9 +13,9 @@ import { type AdresDili, adresUret } from '@/utils/adresUret'
  * önbellekli 308 de bayatlayabilir: ana plan v4 O2), ve geri alma (bayrak `false`) da aynı listeyle güvenlidir.
  * Var olmayan bir yolu geçersiz kılmanın maliyeti yok; eksik bırakmanın maliyeti bayat vitrin.
  *
- * İSTİSNA (URN-7, ölçüm 2026-10-01): bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu bayrak
- * kapalıyken önbelleği olmayan 308'dir; üretilmez. Faz 3-C o rotaya sayfa sınıfı (force-static/revalidate) ilan
- * ederse bu yol geri eklenir (kapı: INV-TAZELEME-YOL-3).
+ * İSTİSNA (URN-7, ölçüm 2026-10-01): iç içe `/<dil>/category/<üst>/<alt>` yolu önbelleği olmayan 308'dir;
+ * üretilmez. SEO-35 B-1 kararıyla o rota açık kipte de yalnız yönlendirir (içerik çizmez, sayfa sınıfı ilan etmez),
+ * yani yol hiçbir kipte tazelenmez (kapı: INV-TAZELEME-YOL-3).
  *
  * Saf yardımcı: `next/cache` ya da DB'ye dokunmaz; çağıran `revalidatePath` yapar (route handler tek koşullu
  * `if (table === 'x')` dallarını korur — INV-RENDER-2).
@@ -34,8 +34,8 @@ export function aileYollari(slug: string): string[] {
 
 /**
  * Bir kategori sayfasının yolları. `kok(dil)` çağıranın o dildeki slug'ını verir (kategori slug'ı dile göre
- * değişir — `getLocalizedCategorySlug`); `ust` varsa dal adresi (üst/alt) de üretilir, tek segmentli adres HER
- * ZAMAN da üretilir (alt kategori eski şemada tek segmentle de yayınlanmıştı — REC-205).
+ * değişir — `getLocalizedCategorySlug`). `ust` verilirse dal nesnesi de sorulur; SEO-35 B-1'den beri iki şemada da
+ * kategori adresi TEK segmenttir, dal nesnesi tek segmentli adresin aynısını üretir ve küme tekilleştirir.
  */
 export function kategoriYollari(
   kok: (dil: AdresDili) => string,
@@ -48,13 +48,13 @@ export function kategoriYollari(
     const ustSlug = ust?.(dil)
     for (const yeni of SEMALAR) {
       yollar.add(String(adresUret({ tur: 'kategori', kok: own }, dil, yeni)))
-      // Dal adresi ÜST'ü kök alır: yeni şemada `/kategori/<üst>/<alt>` (EN: `/category/<üst>/<alt>`); bugünkü şemada
-      // `adresUret` `Routes.category` çağırır ve TEK segment (`/category/<alt>`) üretir.
+      // Dal nesnesi ÜST'ü kök alır ama adres dalın kendi slug'ıdır: iki şemada da TEK segment (yeni: `/kategori/<alt>`,
+      // EN `/category/<alt>`; bugünkü: `Routes.category` → `/category/<alt>`). Yukarıdaki satırla aynı yol çıkar.
       if (ustSlug) yollar.add(String(adresUret({ tur: 'kategori', kok: ustSlug, dal: own }, dil, yeni)))
     }
-    // Bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu BİLİNÇLİ üretilmez: bayrak kapalıyken yalnız
-    // 308 yönlendirmesidir, önbelleği yoktur (URN-7 ölçümü 2026-10-01), tazelemek boş iştir. Bayrak açılınca iki
-    // segmentli sayfa yolu yukarıdaki yeni-şema dalından gelir (kapı: INV-TAZELEME-YOL-2 elle dil önekini yasaklar).
+    // İç içe `/<dil>/category/<üst>/<alt>` ve `/tr/kategori/<üst>/<alt>` yolları BİLİNÇLİ üretilmez: iki şemada da
+    // yalnız 308 yönlendirmesidir, önbelleği yoktur (URN-7 ölçümü 2026-10-01; SEO-35 B-1), tazelemek boş iştir.
+    // Kapı: INV-TAZELEME-YOL-2 elle dil önekini yasaklar.
   }
   return [...yollar]
 }

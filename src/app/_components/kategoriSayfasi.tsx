@@ -8,7 +8,6 @@ import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
-import type { KategoriUst } from '@/lib/data/preload'
 import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
@@ -41,7 +40,7 @@ import { getCachedMarkaKatalogOzeti, markaKatalogSayilari } from './markaSayfasi
  *
  * NİÇİN AYRI MODÜL (aileSayfasi.tsx ile aynı gerekçe): bu kod 2026-09-25'e kadar yalnız
  * `app/[lang]/category/[categorySlug]/page.tsx`'in içindeydi. K3-b şeması aynı sayfayı
- * `/tr/kategori/<kök>[/<dal>]` adresinde (ve bayrak açıkken EN iki seviyeli adreste) çizecek.
+ * `/tr/kategori/<slug>` adresinde (EN'de yine `/en/category/<slug>`) çizer; kök ve alt kategori tek segmenttir (SEO-35 B-1).
  * Gövdeyi kopyalamak iki kaynağı ayrıştırırdı — REC-205'te aynı nesne iki farklı sayfadan
  * yayınlanınca Google zayıf olanı eledi. Rotalar bu modülü çağırır.
  *
@@ -229,16 +228,12 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
 
 /**
  * K3-b üst verisi (bayrak AÇIK): canonical, hreflang ve og:url `adresUret`'ten (kategoriKanonikAdresi),
- * ortak kalıp `sayfaUstVerisi` (dil yolları + EN dizin dışılığı). Dal adresi iki seviyeli.
+ * ortak kalıp `sayfaUstVerisi` (dil yolları + EN dizin dışılığı). Kök de alt de TEK segmentli adres (SEO-35 B-1).
  */
-export function kategoriSayfasiUstVerisiK3b(
-  lang: string,
-  category: DomainCategory,
-  ust: KategoriUst | null,
-): Metadata {
+export function kategoriSayfasiUstVerisiK3b(lang: string, category: DomainCategory): Metadata {
   const { baslik, desc } = kategoriMetinleri(lang, category)
-  const trYol = kategoriKanonikAdresi(category, ust, 'tr')
-  const enYol = kategoriKanonikAdresi(category, ust, 'en')
+  const trYol = kategoriKanonikAdresi(category, 'tr')
+  const enYol = kategoriKanonikAdresi(category, 'en')
   const m = sayfaUstVerisi({
     lang,
     yol: lang === 'en' ? enYol : trYol,
@@ -269,15 +264,10 @@ export interface KategoriSayfasiProps {
   category: DomainCategory
   /** Adresteki (görünen) slug — JSON-LD ve ad yedeği için; bugünkü rotayla aynı girdi. */
   categorySlug: string
-  /**
-   * K3-b (bayrak AÇIK): çözücünün bulduğu üst kategori — `CollectionPage.url` iki seviyeli kanonik
-   * adresi ancak onunla kurabilir. Bayrak kapalıyken verilmez ve okunmaz.
-   */
-  ust?: KategoriUst | null
 }
 
 /** Kategori sayfası gövdesi — alt kategoriler + aile listesi + JSON-LD + görünüm. */
-export async function KategoriSayfasi({ lang, category, categorySlug, ust = null }: KategoriSayfasiProps) {
+export async function KategoriSayfasi({ lang, category, categorySlug }: KategoriSayfasiProps) {
   const page = SAYFA
 
   const dict = lang === 'en' ? en : tr
@@ -362,13 +352,13 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
 
   // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
   // içinde garanti edilir (eski kod dilsiz `${SITE_URL}/products/${slug}` yazıyordu).
-  // K3-b (REC-300 Faz 3d): bayrak açıkken sayfa adresi `kategoriKanonikAdresi` (adresUret, iki seviyeli
-  // dal), aile adresleri `adresUret`'ten; kapalıyken `buildCategoryJsonLd` bugünkü dizgeyi yazar.
+  // K3-b (REC-300 Faz 3d): bayrak açıkken sayfa adresi `kategoriKanonikAdresi` (adresUret, tek segment: SEO-35 B-1),
+  // aile adresleri `adresUret`'ten; kapalıyken `buildCategoryJsonLd` bugünkü dizgeyi yazar.
   const jsonLd = buildCategoryJsonLd({
     lang,
     baseUrl: SITE_URL,
     categorySlug,
-    sayfaYolu: ADRES_SEMASI_K3B ? kategoriKanonikAdresi(category, ust, lang === 'en' ? 'en' : 'tr') : undefined,
+    sayfaYolu: ADRES_SEMASI_K3B ? kategoriKanonikAdresi(category, lang === 'en' ? 'en' : 'tr') : undefined,
     name: displayName,
     description: lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
     total,

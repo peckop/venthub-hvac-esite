@@ -45,7 +45,7 @@ Modül sabitleri yalnızca `fs` modülünün çağrıldığını göstermektedir
 - **ic_degiskenler**:
   - `input` — `JSON.parse(raw)` sonucu elde edilen hook girdi objesi; `stop_hook_active` ve `transcript_path` alanlarına erişilir
   - `tp` — `input.transcript_path` değeri; transkript dosya yolu, `fs.existsSync` ile varlığı kontrol edilir
-  - `satirlar` — `fs.readFileSync(tp, 'utf8')` ile okunan dosya içeriğinin `.trim().split('\n').slice(-400)` ile elde edilen son 400 satırı
+  - `satirlar` — `kuyrukSatirlari(tp)` (`transkript-kuyrugu.cjs`) ile okunan konuşma kaydının son 400 tam satırı; dosya bütün okunmaz (ARC-83: 1,78 GB kayıtta `readFileSync` dizge sınırını aşıp kancayı çökertiyordu). Okunamazsa kanca karışmaz (exit 0) ve sebebi stderr'e yazar
   - `kayitlar` — `satirlar` dizisindeki her satırın `JSON.parse` ile ayrıştırılmasıyla oluşan kayıt dizisi; parse hataları yutulur
   - `insanMesaji` — ok fonksiyonu; bir kaydın gerçek insan mesajı olup olmadığını kontrol eder (parametre: `k`)
   - `sonInsan` — `kayitlar` dizisinde `insanMesaji` koşulunu sağlayan son kaydın indeksi; bulunamazsa `-1` kalır

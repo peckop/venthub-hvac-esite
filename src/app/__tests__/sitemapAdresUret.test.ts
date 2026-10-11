@@ -9,8 +9,8 @@ import ALTIN from './fixtures/sitemapAltin.json'
  * `fixtures/sitemapAltin.json` eski kodun (master 25c78d9c9) aynı sahte veriyle ürettiği satırlardır
  * (url, priority, alternates); `{BASE}` = SITE_URL. EN_YAYIN'ın iki hâli de sabitlenir. `changefreq` REC-498'de
  * KALDIRILDI (Google yok sayar): altın veriden de çıkarıldı, geri gelirse bu test kırılır.
- * AÇIK (Faz 4 yayın günü): her satır kanonik yeni şemadan; kategori dalı iki seviyeli, marka `markalar`,
- * ürün listesi `urunler`, aile `urun`; her adres tekil ve tek kanonik (sıçrama yok).
+ * AÇIK (Faz 4 yayın günü): her satır kanonik yeni şemadan; kategori (kök ve alt) tek segment (SEO-35 B-1), marka
+ * `markalar`, ürün listesi `urunler`, aile `urun`; her adres tekil ve tek kanonik (sıçrama yok).
  *
  * ÖLÇMEDİĞİ: 442 model adresi (3e-2), gerçek DB verisi, canlıda 308 sıçraması (yayın günü Faz 4).
  */
@@ -110,12 +110,14 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
   })
 
   describe('bayrak AÇIK — kanonik yeni şema', () => {
-    it('TR adresleri: ürün listesi urunler, kategori kök ve kök/dal, marka markalar, aile urun', async () => {
+    it('TR adresleri: ürün listesi urunler, kategori kök ve alt (tek segment), marka markalar, aile urun', async () => {
       const { satirlar, base } = await harita(false, true)
       const yollar = satirlar.map((s) => s.url.replace(base, ''))
       expect(yollar).toContain('/tr/urunler')
       expect(yollar).toContain('/tr/kategori/fanlar')
-      expect(yollar).toContain('/tr/kategori/fanlar/sessiz-kanal-fanlari')
+      // SEO-35 B-1: alt kategori TEK segment; üst slug'lı iki seviyeli biçim haritada YOK.
+      expect(yollar).toContain('/tr/kategori/sessiz-kanal-fanlari')
+      expect(yollar).not.toContain('/tr/kategori/fanlar/sessiz-kanal-fanlari')
       expect(yollar).toContain('/tr/kategori/hava-perdeleri')
       expect(yollar).toContain('/tr/markalar/vortice')
       expect(yollar).toContain('/tr/urun/vortice-lineo-quiet')
@@ -125,17 +127,22 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
       expect(yollar).toContain('/tr/contact')
     })
 
-    it('eski şema adresi HİÇBİRİNDE kalmaz (kategori dalı iki seviyeli, /category /brands/<slug> /products/<aile> yok)', async () => {
+    it('eski şema adresi HİÇBİRİNDE kalmaz (/category /brands/<slug> /products/<aile> yok); iç içe kategori adresi hiçbir dilde yok', async () => {
       const { satirlar, base } = await harita(true, true)
       const yollar = satirlar.map((s) => s.url.replace(base, ''))
       expect(yollar.filter((y) => /^\/tr\/(category|products\/|brands\/)/.test(y))).toEqual([])
-      expect(yollar).not.toContain('/tr/kategori/sessiz-kanal-fanlari')
+      expect(yollar).toContain('/tr/kategori/sessiz-kanal-fanlari')
+      // Kategori adresi `/<dil>/<bölüm>/<slug>` — tam üç parça; dördüncü parça iç içe adres demektir.
+      const kategoriYollari = yollar.filter((y) => /^\/(tr\/kategori|en\/category)\//.test(y))
+      expect(kategoriYollari.length).toBeGreaterThan(0)
+      expect(kategoriYollari.filter((y) => y.split('/').filter(Boolean).length !== 3)).toEqual([])
     })
 
-    it('EN adresleri: category/fans/quiet-duct-fans, brands/<slug>, products/<aile>; hreflang eşleri satırın kendi adresiyle tutarlı', async () => {
+    it('EN adresleri: category/quiet-duct-fans (tek segment), brands/<slug>, products/<aile>; hreflang eşleri satırın kendi adresiyle tutarlı', async () => {
       const { satirlar, base } = await harita(true, true)
       const en = satirlar.filter((s) => s.url.startsWith(`${base}/en/`)).map((s) => s.url.replace(base, ''))
-      expect(en).toContain('/en/category/fans/quiet-duct-fans')
+      expect(en).toContain('/en/category/quiet-duct-fans')
+      expect(en).not.toContain('/en/category/fans/quiet-duct-fans')
       expect(en).toContain('/en/brands/vortice')
       expect(en).toContain('/en/products/vortice-lineo-quiet')
       expect(en).toContain('/en/products')

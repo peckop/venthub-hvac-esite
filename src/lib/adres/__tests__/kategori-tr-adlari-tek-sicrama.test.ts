@@ -33,7 +33,7 @@ interface Satir {
   yeni: string
   /** Fikstürde var olan kategori kimliği; yoksa test kök satırı kurar. */
   id: string
-  /** Yeni adresin TR yolu (ebeveyn varsa köküyle). */
+  /** Yeni adresin TR yolu: TEK segment, ebeveyn varsa bile üst slug'ı adrese girmez (SEO-35 B-1). */
   hedef: string
 }
 
@@ -57,7 +57,7 @@ const SATIRLAR: readonly Satir[] = [
     eski: 'tekil-oda-uniteleri',
     yeni: 'tek-oda-uniteleri',
     id: '00000000-0000-4000-8000-0000000000c8',
-    hedef: '/tr/kategori/isi-geri-kazanim/tek-oda-uniteleri',
+    hedef: '/tr/kategori/tek-oda-uniteleri',
   },
   {
     en: 'water-coil-duct-heaters',
@@ -183,6 +183,24 @@ describe('kategori TR adları: eski TR adres → yeni TR adres, TEK 308 (sekiz k
   it.each(SATIRLAR.map((s) => [s.hedef] as const))('hedef %s kanoniktir: kendine yönlenmez (zincir yok)', async (hedef) => {
     const harita = await haritaKur(true)
     expect(esle(harita, hedef).sonuc).toBeNull()
+  })
+
+  it('(a) yeniden adlanan DAL: iç içe eski adresler (bugünkü canlı ve 3-C iki seviyeli) TEK sıçramada tek segmentli yeni adrese', async () => {
+    const harita = await haritaKur(true)
+    const dal = SATIRLAR.find((s) => s.en === 'single-room-hrv')!
+    expect(dal.hedef.split('/').filter(Boolean)).toHaveLength(3) // `/tr/kategori/<alt>`: üst slug'ı yok
+    for (const yol of [
+      `/tr/category/isi-geri-kazanim/${dal.eski}`, // bugünkü canlı iç içe, eski ad
+      `/tr/category/isi-geri-kazanim/${dal.yeni}`, // bugünkü canlı iç içe, yeni ad
+      `/tr/kategori/isi-geri-kazanim/${dal.eski}`, // 3-C iki seviyeli, eski ad
+      `/tr/kategori/isi-geri-kazanim/${dal.yeni}`, // 3-C iki seviyeli, yeni ad
+    ]) {
+      const { sonuc, dilTespit } = esle(harita, yol)
+      expect(sonuc, yol).toEqual({ hedef: dal.hedef, durum: 308 })
+      expect(dilTespit).not.toHaveBeenCalled()
+    }
+    // Hedef yeniden eşleşmez: ikinci sıçrama yok.
+    expect(esle(harita, dal.hedef).sonuc).toBeNull()
   })
 
   it('EN adres TR adıyla değişmez: kanonik EN slug eski şemadan da TR yeni adına gitmez', async () => {

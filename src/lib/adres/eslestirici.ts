@@ -14,7 +14,7 @@
  *     `utm_*` gibi parametrelerin düşmesi bilinçli (plan §6 satır 9, v4 D2).
  *  5. Hedef adresler yeni şemayla `adresUret(…, dil, true)`'dan kurulur — şemanın tek kaynağı.
  *  6. Hedef, gelen yolun kendisiyse null (kanonik adres kendine yönlenmez; EN önekleri yeni şemada
- *     değişmediği için `/en/category/<kök>` ve `/en/products/<aile>` bu yoldan geçer).
+ *     değişmediği için `/en/category/<kök>`, `/en/category/<alt>` ve `/en/products/<aile>` bu yoldan geçer).
  *
  * Pasif kategori → aktif üst kategoriye; üstü de pasifse tüm ürünler (plan §5 Faz 3 m.5, v4 O4).
  * Model adresi biçimindeki yollar (`…-p-<sku>`) haritanın değil sayfa çözücüsünün işidir → null.
@@ -89,8 +89,10 @@ function kategoriNesnesi(harita: KiraciHaritasi, hedef: KategoriHedefi): (dil: A
 function kategoriCoz(harita: KiraciHaritasi, kuyruk: string[]): Cozum | null {
   const ilk = kuyruk[0] ? harita.kategoriSluglari[kuyruk[0]] : undefined
   if (!ilk) return null
-  // İki seviye: ikinci segment bilinen bir kategoriyse o kazanır — kök segmenti yanlış olsa bile
-  // (üst değişimi, v4 O6) dalın bugünkü köküne gidilir. Tanınmayan ikinci segment düşer (önek eşleşmesi).
+  // İki segmentli istek (bugünkü `/<dil>/category/<üst>/<alt>` ve 3-C'nin `/tr/kategori/<üst>/<alt>`'ı): ikinci
+  // segment bilinen bir kategoriyse o kazanır — üst segmenti yanlış olsa bile (üst değişimi, v4 O6) dalın kanonik
+  // adresine gidilir; hedef TEK segmenttir (SEO-35 B-1: `adresUret` dal verilince üst slug'ını adrese koymaz), yani
+  // iki sıçrama yok. Tanınmayan ikinci segment düşer (önek eşleşmesi).
   const ikinci = kuyruk[1] ? harita.kategoriSluglari[kuyruk[1]] : undefined
   const secilen = ikinci ?? ilk
   return {
