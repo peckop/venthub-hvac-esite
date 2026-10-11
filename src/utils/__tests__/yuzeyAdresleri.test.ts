@@ -52,8 +52,10 @@ describe('adresRotalari — vekilin (useLocalizedRoutes) ve sunucu yüzeylerinin
   // [çağrı, dil, BUGÜNKÜ çıktı, K3-b çıktısı]
   const tablo: [string, (r: ReturnType<typeof adresRotalari>) => string, 'tr' | 'en', string, string][] = [
     ['kök kategori', (r) => r.category('fanlar'), 'tr', '/tr/category/fanlar', '/tr/kategori/fanlar'],
-    ['dal (üst verilir)', (r) => r.category('fanlar', 'kanal-tipi-fanlar'), 'tr', '/tr/category/kanal-tipi-fanlar', '/tr/kategori/fanlar/kanal-tipi-fanlar'],
-    ['dal EN', (r) => r.category('fans', 'duct-fans'), 'en', '/en/category/duct-fans', '/en/category/fans/duct-fans'],
+    // SEO-35 B-1: alt kategori TEK segment (üst slug'ı adrese girmez); kök adresi değişmedi.
+    ['dal (üst verilir)', (r) => r.category('fanlar', 'kanal-tipi-fanlar'), 'tr', '/tr/category/kanal-tipi-fanlar', '/tr/kategori/kanal-tipi-fanlar'],
+    ['dal (üst verilmez, tek slug)', (r) => r.category('kanal-tipi-fanlar'), 'tr', '/tr/category/kanal-tipi-fanlar', '/tr/kategori/kanal-tipi-fanlar'],
+    ['dal EN', (r) => r.category('fans', 'duct-fans'), 'en', '/en/category/duct-fans', '/en/category/duct-fans'],
     ["dal 'undefined' dizgesi", (r) => r.category('fanlar', 'undefined'), 'tr', '/tr/category/fanlar', '/tr/kategori/fanlar'],
     ['aile', (r) => r.product('storm-serisi'), 'tr', '/tr/products/storm-serisi', '/tr/urun/storm-serisi'],
     ['model (?sku=)', (r) => r.product('storm-serisi', 'SEA-61143003'), 'tr', '/tr/products/storm-serisi?sku=SEA-61143003', '/tr/urun/storm-serisi-p-sea-61143003'],
@@ -94,7 +96,7 @@ describe('dilDegistirYolu — LanguageSwitcher', () => {
     ['/en/products/storm-serisi', 'tr', '/tr/products/storm-serisi', '/tr/urun/storm-serisi'],
     ['/en/products', 'tr', '/tr/products', '/tr/urunler'],
     ['/tr/urunler', 'en', '/en/urunler', '/en/products'],
-    ['/tr/kategori/fanlar/kanal-tipi-fanlar', 'en', '/en/kategori/fanlar/kanal-tipi-fanlar', '/en/category/fanlar/kanal-tipi-fanlar'],
+    ['/tr/kategori/kanal-tipi-fanlar', 'en', '/en/kategori/kanal-tipi-fanlar', '/en/category/kanal-tipi-fanlar'],
     ['/en/category/fans', 'tr', '/tr/category/fans', '/tr/kategori/fans'],
     ['/tr/markalar/vortice', 'en', '/en/markalar/vortice', '/en/brands/vortice'],
     ['/en/brands/vortice', 'tr', '/tr/brands/vortice', '/tr/markalar/vortice'],
@@ -134,10 +136,11 @@ describe('ClientLayout · MobilAltSekmeCubugu yol yüklemleri', () => {
 })
 
 describe('kırıntı yolu (aile sayfası BreadcrumbList + breadcrumbUtils)', () => {
-  it('KAPALI: bugünkü dilsiz Routes.category; AÇIK: iki seviyeli dil önekli', () => {
+  it('KAPALI: bugünkü dilsiz Routes.category; AÇIK: tek seviyeli dil önekli (SEO-35 B-1)', () => {
     expect(kategoriKirintiYolu('fanlar', null, 'tr')).toBe('/category/fanlar')
     expect(kategoriKirintiYolu('fanlar', 'kanal-tipi-fanlar', 'tr', false)).toBe('/category/kanal-tipi-fanlar')
-    expect(kategoriKirintiYolu('fanlar', 'kanal-tipi-fanlar', 'tr', true)).toBe('/tr/kategori/fanlar/kanal-tipi-fanlar')
+    expect(kategoriKirintiYolu('fanlar', 'kanal-tipi-fanlar', 'tr', true)).toBe('/tr/kategori/kanal-tipi-fanlar')
+    expect(kategoriKirintiYolu('fanlar', null, 'tr', true)).toBe('/tr/kategori/fanlar')
     expect(kategoriKirintiYolu('fans', null, 'en', true)).toBe('/en/category/fans')
   })
 
@@ -148,14 +151,14 @@ describe('kırıntı yolu (aile sayfası BreadcrumbList + breadcrumbUtils)', () 
       steps: [
         { name: 'Ana Sayfa', path: '/' },
         { name: 'Fanlar', path: '/category/fanlar' },
-        { name: 'Kanal', path: '/tr/kategori/fanlar/kanal-tipi-fanlar' },
+        { name: 'Kanal', path: '/tr/kategori/kanal-tipi-fanlar' },
         { name: 'Aile', path: null },
       ],
     }) as { itemListElement: { item?: string }[] }
     expect(ld.itemListElement.map((i) => i.item)).toEqual([
       'https://x/tr', // REC-494: ana sayfa sonda eğik çizgisiz (`/tr/` 308 verir)
       'https://x/tr/category/fanlar',
-      'https://x/tr/kategori/fanlar/kanal-tipi-fanlar',
+      'https://x/tr/kategori/kanal-tipi-fanlar',
       undefined,
     ])
   })
@@ -255,16 +258,20 @@ describe('CollectionPage JSON-LD (kategori + seri)', () => {
     }) as { url: string; mainEntity: { itemListElement: { url: string }[] } }
 
   it('KAPALI birebir bugünkü (sayfaYolu verilse bile okunmaz)', () => {
-    for (const ld of [kategori(undefined), kategori(false, '/tr/kategori/fanlar/kanal-tipi-fanlar')]) {
+    for (const ld of [kategori(undefined), kategori(false, '/tr/kategori/kanal-tipi-fanlar')]) {
       expect(ld.url).toBe('https://x/tr/category/kanal-tipi-fanlar')
       expect(ld.mainEntity.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
     }
   })
 
-  it('AÇIK: sayfa yolu iki seviyeli kanonik, aile adresleri adresUret', () => {
-    const ld = kategori(true, '/tr/kategori/fanlar/kanal-tipi-fanlar')
-    expect(ld.url).toBe('https://x/tr/kategori/fanlar/kanal-tipi-fanlar')
+  it('AÇIK: sayfa yolu tek segmentli kanonik (SEO-35 B-1), aile adresleri adresUret', () => {
+    const ld = kategori(true, '/tr/kategori/kanal-tipi-fanlar')
+    expect(ld.url).toBe('https://x/tr/kategori/kanal-tipi-fanlar')
     expect(ld.mainEntity.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
+  })
+
+  it('AÇIK, sayfa yolu verilmezse: görünen slug aynı tek segmentli kanonik adresi üretir (üst gerekmez)', () => {
+    expect(kategori(true).url).toBe('https://x/tr/kategori/kanal-tipi-fanlar')
   })
 
   it('seri: KAPALI bugünkü, AÇIK adresUret', () => {

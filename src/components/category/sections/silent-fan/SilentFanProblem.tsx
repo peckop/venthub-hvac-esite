@@ -24,7 +24,7 @@ const SilentFanProblem: React.FC = () => {
     const colors = [
         { text: 'text-blue-500', bg: 'bg-blue-50' },
         { text: 'text-orange-500', bg: 'bg-orange-50' },
-        { text: 'text-red-500', bg: 'bg-red-50' },
+        { text: 'text-steel-gray', bg: 'bg-light-gray' },
         { text: 'text-purple-500', bg: 'bg-purple-50' }
     ]
 
@@ -90,16 +90,17 @@ const SilentFanProblem: React.FC = () => {
                         
                         <div className="relative z-10 h-full flex items-center p-6 md:p-12">
                             <div className="grid md:grid-cols-2 gap-8 w-full">
-                                {/* Without */}
-                                <div className="text-left bg-black/20 backdrop-blur-md rounded-xl p-6 border border-white/10">
+                                {/* AC motorlu model. Sol ve sağ kutu AYNI nötr stilde: iki eşit motor seçeneği, biri "kötü" değil
+                                    (URN-81, Recep 10-09: "standart Lineo diye bir şey yok"); kırmızı/yeşil karşılaştırma stili kalktı. */}
+                                <div className="text-left bg-blue-500/20 backdrop-blur-md rounded-xl p-6 border border-blue-400/30">
                                     <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">{String(tr('withoutMark'))}</div>
+                                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">{String(tr('withoutMark'))}</div>
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.without'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
                                         {Array.isArray(pDict.visual.withoutPoints) && pDict.visual.withoutPoints.map((p, i) => (
-                                            <li key={i} className="text-red-200 text-sm flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-red-400 rounded-full" /> {p}
+                                            <li key={i} className="text-blue-100 text-sm flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {p}
                                             </li>
                                         ))}
                                     </ul>

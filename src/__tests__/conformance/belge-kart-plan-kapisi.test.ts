@@ -281,7 +281,8 @@ describe('INV-KART-PLAN-1 · ÖNCEKİ ÇALIŞMA satırı (HRT-26, OPS-30)', () =
 })
 
 describe('INV-KART-PLAN-1 · cetvel dosyası', () => {
-  const standart = fs.readFileSync(path.join(KOK, 'docs/standards/kart-plani-standard.md'), 'utf8')
+  // Satır sonu LF'e normalleştirilir: depodaki blob LF (Linux CI), Windows çalışma ağacı .gitattributes "text=auto" ile CRLF olur.
+  const standart = fs.readFileSync(path.join(KOK, 'docs/standards/kart-plani-standard.md'), 'utf8').replace(/\r\n/g, '\n')
 
   it('ŞABLON bloğu (ilk kod çiti) PLAN başlığını ve sekiz etiketin hepsini (ÖNCEKİ ÇALIŞMA dahil) içerir', () => {
     const blok = standart.match(/```\n([\s\S]*?)```/)

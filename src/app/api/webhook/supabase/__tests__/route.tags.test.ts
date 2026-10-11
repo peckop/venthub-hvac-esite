@@ -545,10 +545,13 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
         old_record: urun({ category_id: 'kok-eski', subcategory_id: 'alt-eski' }),
       }))
 
+      // SEO-35 B-1: alt kategori adresi TEK segment (üst slug'ı adreste yok).
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/en/category/kok-yeni-slug/alt-yeni-slug',
-        '/tr/kategori/kok-eski-slug/alt-eski-slug', '/en/category/kok-eski-slug/alt-eski-slug',
+        '/tr/kategori/alt-yeni-slug', '/en/category/alt-yeni-slug',
+        '/tr/kategori/alt-eski-slug', '/en/category/alt-eski-slug',
       ]))
+      // İç içe yollar hiçbir şemada üretilmez (önbelleği olmayan 308).
+      expect(yollarOf().filter((p) => /^\/(tr\/kategori|en\/category)\/[^/]+\/[^/]+$/.test(p))).toEqual([])
     })
 
     it('(U12-i) yalnız subcategory_id değişti (category_id aynı): eski alt kategori tazelenir', async () => {
@@ -561,7 +564,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       }))
 
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/tr/kategori/kok-eski-slug/alt-eski-slug',
+        '/tr/kategori/alt-yeni-slug', '/tr/kategori/alt-eski-slug',
       ]))
     })
 
@@ -590,7 +593,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
 
       expect(res.status).toBe(200)
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/category/kok-yeni-slug', '/tr/kategori/kok-yeni-slug/alt-yeni-slug',
+        '/tr/category/kok-yeni-slug', '/tr/kategori/alt-yeni-slug',
       ]))
       expect(yollarOf().some((p) => p.includes('eski'))).toBe(false)
     })
@@ -604,7 +607,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       }))
 
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/category/kok-eski-slug', '/tr/kategori/kok-eski-slug/alt-eski-slug',
+        '/tr/category/kok-eski-slug', '/tr/kategori/alt-eski-slug',
       ]))
     })
 
@@ -627,7 +630,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       // Önbellek yolları değiştirmez: dört kimliğin hepsi tazelendi.
       expect(yollarOf()).toEqual(expect.arrayContaining([
         '/tr/category/kok-yeni-slug', '/tr/category/kok-eski-slug',
-        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/tr/kategori/kok-yeni-slug/alt-eski-2-slug',
+        '/tr/kategori/alt-yeni-slug', '/tr/kategori/alt-eski-2-slug',
       ]))
     })
 
@@ -700,7 +703,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/category/kat-a', '/tr/category/kat-b']))
     })
 
-    it('(U12-q) ÜST kategorinin slug\'ı değişti: çocukların ESKİ iki segmentli yolları da tazelenir', async () => {
+    it('(U12-q) ÜST kategorinin slug\'ı değişti: çocukların sayfaları tazelenir; adres tek segment olduğundan iç içe eski/yeni yol ÜRETİLMEZ (B-1)', async () => {
       categoryChildrenByParentId.set('kat-1', [
         { id: 'cocuk-1', slug: 'cocuk-slug', metadata: null, parent_id: 'kat-1' },
       ])
@@ -711,13 +714,14 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
         record: kat({ slug: 'ust-yeni' }), old_record: kat({ slug: 'ust-eski' }),
       }))
 
+      // Çocuğun adresi üstün slug'ına bağlı değil (SEO-35 B-1) ama sayfası üst adını/kırıntıyı gösterir: tazelenir.
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/ust-yeni/cocuk-slug', '/tr/kategori/ust-eski/cocuk-slug',
-        '/en/category/ust-eski/cocuk-slug',
+        '/tr/kategori/cocuk-slug', '/en/category/cocuk-slug',
       ]))
+      expect(yollarOf().filter((p) => p.includes('/ust-eski/') || p.includes('/ust-yeni/'))).toEqual([])
     })
 
-    it('(U12-r) ALT kategori başka üste taşındı: eski üst altındaki yol tazelenir', async () => {
+    it('(U12-r) ALT kategori başka üste taşındı: adres DEĞİŞMEZ (tek segment), alt sayfa tazelenir; üst altı iç içe yol ÜRETİLMEZ (B-1)', async () => {
       categoryRowsById.set('ust-eski-id', { id: 'ust-eski-id', slug: 'ust-eski', metadata: null, parent_id: null })
       categoryRowsById.set('ust-yeni-id', { id: 'ust-yeni-id', slug: 'ust-yeni', metadata: null, parent_id: null })
       const { POST } = await import('../route')
@@ -728,9 +732,8 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
         old_record: kat({ slug: 'alt', parent_id: 'ust-eski-id' }),
       }))
 
-      expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/ust-yeni/alt', '/tr/kategori/ust-eski/alt',
-      ]))
+      expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/kategori/alt']))
+      expect(yollarOf().filter((p) => p.includes('/ust-eski/') || p.includes('/ust-yeni/'))).toEqual([])
     })
 
     it('(U12-u) yolla ilgisiz metadata alanı değişti: eski yol çalışması açılmaz, üst satırı tek kez sorgulanır, yol tekrarı yok', async () => {
@@ -746,7 +749,8 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(categorySingleQueryIds.filter((id) => id === 'ust-1')).toHaveLength(1)
       const yollar = yollarOf()
       expect(new Set(yollar).size).toBe(yollar.length)
-      expect(yollar).toEqual(expect.arrayContaining(['/tr/category/alt-tr', '/tr/kategori/ust-slug/alt-tr']))
+      expect(yollar).toEqual(expect.arrayContaining(['/tr/category/alt-tr', '/tr/kategori/alt-tr']))
+      expect(yollar.filter((p) => p.includes('/ust-slug/'))).toEqual([])
     })
 
     it('(U12-s) değişmeyen satır: ek (eski) yol üretilmez; old_record YOK iken yalnız yeni yollar', async () => {

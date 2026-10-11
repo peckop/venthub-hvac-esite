@@ -6,6 +6,7 @@ import { NextRequest } from 'next/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { bilgiMerkeziYonlendirmeleri } from '../../config/bilgiMerkeziYonlendirmeleri.mjs'
+import { isLegalContentReady } from '../../config/legal'
 import {
   ASAMA_2_ONEKLERI,
   ROTA_DILI,
@@ -316,6 +317,15 @@ describe('4. ADRES ÜRETİMİ (açık kip) — iç bağlantı, kanonik, hreflang
       if (urller.has(`${SITE_URL}/tr/${satir.tr}`)) {
         expect(urller.has(String(tr.alternates?.canonical)), `${klasor}: kanonik sitemap'te`).toBe(true)
         expect(urller.has(String(en.alternates?.canonical)), `${klasor}: EN kanonik sitemap'te`).toBe(true)
+      }
+      // Taslak yasal sayfa (URN-97): `noindex, follow`; dizine girmeyen sayfa hreflang taşımaz, canonical kalır
+      // (INV-YASAL-DIZIN-1 `yasalSayfaDizinDisi.test.ts` aynı davranışı iki yönde sabitler).
+      if (klasor.startsWith('legal/') && !isLegalContentReady()) {
+        expect(tr.robots, `${klasor} tr robots`).toEqual({ index: false, follow: true })
+        expect(en.robots, `${klasor} en robots`).toEqual({ index: false, follow: true })
+        expect(tr.alternates?.languages, `${klasor} tr hreflang`).toBeUndefined()
+        expect(en.alternates?.languages, `${klasor} en hreflang`).toBeUndefined()
+        continue
       }
       // hreflang KARŞILIKLI: iki dilin sayfası aynı çifti bildirir ve çift kendi kanoniklerine işaret eder.
       expect(tr.alternates?.languages, klasor).toEqual({ tr: tr.alternates?.canonical, en: en.alternates?.canonical, 'x-default': tr.alternates?.canonical })

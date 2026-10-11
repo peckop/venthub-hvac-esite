@@ -42,7 +42,7 @@ const GERCEK = YAZILAR.map((y) => ({ y, m: y.diller.tr as YaziMetni })).filter((
 const kartMetinleri = (kap: ParentNode, secici: string): string[] =>
   Array.from(kap.querySelectorAll(`${secici} li a span`)).map((s) => s.textContent ?? '')
 
-const anaBlok = () => <KnowledgeBlock dictionary={tr.home.knowledge} finalCtaDict={tr.home.finalCta} statsExperience="" lang="tr" />
+const anaBlok = () => <KnowledgeBlock dictionary={tr.home.knowledge} finalCtaDict={tr.home.finalCta} lang="tr" />
 
 describe('ana sayfa Bilgi bloğu — kart özetini basar', () => {
   it('⭐yayındaki her TR yazının kart özeti blokta, meta açıklaması YOK', () => {

@@ -60,10 +60,11 @@ describe('adresUret — AÇIK kip = plan §2 hedef şeması', () => {
   it.each([
     [{ tur: 'urunler' } as const, '/tr/urunler', '/en/products'],
     [{ tur: 'kategori', kok: 'fanlar' } as const, '/tr/kategori/fanlar', '/en/category/fanlar'],
+    // SEO-35 B-1: alt kategori TEK segment — üst slug'ı (`fanlar`) adrese GİRMEZ, kimlik soneki yok.
     [
       { tur: 'kategori', kok: 'fanlar', dal: 'kanal-tipi-fanlar' } as const,
-      '/tr/kategori/fanlar/kanal-tipi-fanlar',
-      '/en/category/fanlar/kanal-tipi-fanlar',
+      '/tr/kategori/kanal-tipi-fanlar',
+      '/en/category/kanal-tipi-fanlar',
     ],
     [{ tur: 'aile', slug: 'storm-serisi' } as const, '/tr/urun/storm-serisi', '/en/products/storm-serisi'],
     [{ tur: 'marka', slug: 'vortice' } as const, '/tr/markalar/vortice', '/en/brands/vortice'],
@@ -88,6 +89,48 @@ describe('adresUret — AÇIK kip = plan §2 hedef şeması', () => {
 
   it('segmentler kodlanır (adrese boşluk/eğik çizgi sızmaz)', () => {
     expect(adresUret({ tur: 'aile', slug: 'a b/c' }, 'tr', a)).toBe('/tr/urun/a%20b%2Fc')
+  })
+})
+
+describe('SEO-35 B-1 — kategori adresi iki dilde TEK segment', () => {
+  const kategori = (kok: string, dal?: string | null) => ({ tur: 'kategori', kok, dal }) as const
+
+  it('(d) KÖK adresi DEĞİŞMEDİ: /tr/kategori/<kök>, /en/category/<kök>; dal yok/null/boş aynı sonucu verir', () => {
+    for (const dal of [undefined, null, '']) {
+      expect(adresUret(kategori('fanlar', dal), 'tr', true)).toBe('/tr/kategori/fanlar')
+      expect(adresUret(kategori('fans', dal), 'en', true)).toBe('/en/category/fans')
+    }
+  })
+
+  it('ALT kategori TEK seviye: /tr/kategori/<alt>, /en/category/<alt>; üst slug\'ı ve kimlik soneki adrese girmez', () => {
+    const tr = adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', true)
+    const en = adresUret(kategori('fans', 'duct-fans'), 'en', true)
+    expect(tr).toBe('/tr/kategori/kanal-tipi-fanlar')
+    expect(en).toBe('/en/category/duct-fans')
+    // Segment sayısı: [dil, bölüm, slug] — iç içe adres üretilmez.
+    expect(tr.split('/').filter(Boolean)).toHaveLength(3)
+    expect(en.split('/').filter(Boolean)).toHaveLength(3)
+    // Model ayırıcısı ya da başka bir sonek kategori adresine sızmaz.
+    expect(tr).not.toContain(MODEL_AYIRICI)
+  })
+
+  it('adres yalnız dalın slug\'ından türer: yanlış ya da farklı üst aynı adresi verir (üst karar vermez, O6)', () => {
+    const dogru = adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', true)
+    expect(adresUret(kategori('isi-geri-kazanim', 'kanal-tipi-fanlar'), 'tr', true)).toBe(dogru)
+    expect(adresUret(kategori('', 'kanal-tipi-fanlar'), 'tr', true)).toBe(dogru)
+  })
+
+  it('(b) BAYRAK KAPALI: bugünkü adres değişmedi (/<dil>/category/<slug>), açık kiple yalnız bölüm adı ayrışır', () => {
+    expect(adresUret(kategori('fanlar'), 'tr', false)).toBe('/tr/category/fanlar')
+    expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', false)).toBe('/tr/category/kanal-tipi-fanlar')
+    expect(adresUret(kategori('fans', 'duct-fans'), 'en', false)).toBe('/en/category/duct-fans')
+    // Üretim varsayılanı bayrağı okur ve bayrak kapalıyken bugünkü adresi verir.
+    expect(ADRES_SEMASI_K3B).toBe(false)
+    expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr')).toBe('/tr/category/kanal-tipi-fanlar')
+  })
+
+  it('kodlanır: boşluk ve eğik çizgi iç içe adres üretemez', () => {
+    expect(adresUret(kategori('fanlar', 'a/b'), 'tr', true)).toBe('/tr/kategori/a%2Fb')
   })
 })
 

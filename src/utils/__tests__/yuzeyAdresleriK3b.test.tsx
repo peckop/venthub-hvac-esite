@@ -68,14 +68,15 @@ describe('useLocalizedRoutes vekili — K3-b açık', () => {
     expect(r.products({ brand: 'Vortice' })).toBe('/tr/urunler?brand=Vortice')
     expect(r.product('storm-serisi')).toBe('/tr/urun/storm-serisi')
     expect(r.product('storm-serisi', 'SEA-61143003')).toBe('/tr/urun/storm-serisi-p-sea-61143003')
-    expect(r.category('fanlar', 'kanal-tipi-fanlar')).toBe('/tr/kategori/fanlar/kanal-tipi-fanlar')
+    // SEO-35 B-1: alt kategori TEK segment (üst slug'ı adrese girmez); kök adresi değişmedi.
+    expect(r.category('fanlar', 'kanal-tipi-fanlar')).toBe('/tr/kategori/kanal-tipi-fanlar')
     expect(r.category('fanlar')).toBe('/tr/kategori/fanlar')
     expect(r.brand('vortice')).toBe('/tr/markalar/vortice')
   })
 
-  it('EN: önekler aynı, dal iki seviyeli, model kendi adresinde', () => {
+  it('EN: önekler aynı, dal tek segment (B-1), model kendi adresinde', () => {
     const { result } = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('en') })
-    expect(result.current.category('fans', 'duct-fans')).toBe('/en/category/fans/duct-fans')
+    expect(result.current.category('fans', 'duct-fans')).toBe('/en/category/duct-fans')
     expect(result.current.product('storm-serisi', 'SEA-1')).toBe('/en/products/storm-serisi-p-sea-1')
     expect(result.current.brand('vortice')).toBe('/en/brands/vortice')
   })
@@ -102,7 +103,7 @@ describe('Bilgi Merkezi iç bağlantı çözücüsü — K3-b açık (adresUret 
     expect(await icBaglantiCoz('vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'tr', k)).toBe('/tr/urun/danfoss-vlt-hvac-basic-drive-fc-101')
     expect(await icBaglantiCoz('vh:model/vrt-65195', 'tr', k)).toBe('/tr/urun/vortice-hava-perdesi-p-vrt-65195')
     expect(await icBaglantiCoz('vh:kategori/frequency-converters', 'tr', k)).toBe('/tr/kategori/frekans-konvertorleri')
-    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/fanlar/duman-egzoz-fanlari')
+    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/duman-egzoz-fanlari')
     expect(await icBaglantiCoz('vh:sayfa/urunler', 'tr', k)).toBe('/tr/urunler')
     expect(await icBaglantiCoz('vh:marka/vortice', 'tr', k)).toBe('/tr/markalar/vortice')
   })

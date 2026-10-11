@@ -1,6 +1,6 @@
 import {
   Award,   Factory, Layers, Microscope,
-Shield, Target, Zap} from 'lucide-react'
+Shield, Target} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -21,6 +21,18 @@ interface AboutPageProps {
   sayaclar?: SiteSayaclari | null
 }
 
+/**
+ * Sayaç ızgarasının geniş ekran sütunu, KART SAYISINA göre (Tailwind sınıfı TAM dize olmalı, birleştirilmez).
+ * Üç kartta dar ekranda tek sütun: iki sütunda 2+1 öksüz kart kalırdı.
+ */
+const STAT_SUTUNLARI: Record<number, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-3',
+  4: 'grid-cols-2 lg:grid-cols-4'
+}
+const STAT_SUTUNLARI_VARSAYILAN = 'grid-cols-2 lg:grid-cols-4'
+
 const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) => {
   const dict = lang === 'en' ? en : tr
 
@@ -39,19 +51,20 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) =
     return typeof current === 'string' ? current : key
   }
 
-  const stats = [
-    // 15+ = kurucunun saha yılı (elle, dayanaklı). Marka / aktif ürün / aile sayıları ELLE YAZILMAZ: canlı veriden
-    // gelir (`sayaclar`, URN-75); okunamadıysa bu üç kart hiç çizilmez, eski ya da uydurma sayı basılmaz.
-    // Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30), '81 İl' dayanaksız vaatti (karar 295).
-    { value: '15+', label: t('aboutPage.experience'), icon: Zap },
-    ...(sayaclar
-      ? [
-          { value: String(sayaclar.markaSayisi), label: t('aboutPage.distributorship'), icon: Award },
-          { value: String(sayaclar.aktifUrunSayisi), label: t('aboutPage.completedProject'), icon: Factory },
-          { value: String(sayaclar.aileSayisi), label: t('aboutPage.productFamilies'), icon: Layers }
-        ]
-      : [])
-  ]
+  // Marka / aktif ürün / aile sayıları ELLE YAZILMAZ: canlı veriden gelir (`sayaclar`, URN-75); okunamadıysa (`null`)
+  // kartlar ve bölümün kendisi hiç çizilmez, eski ya da uydurma sayı basılmaz.
+  // "15+" deneyim sayacı KALDIRILDI (URN-82, karar 317): şirketin deneyim yılı hiçbir kayıtta yok; kurucunun saha yılı
+  // vitrinde şirket iddiasına dönüşüyordu. Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30),
+  // '81 İl' dayanaksız vaatti (karar 295).
+  // ETİKET anahtarı ↔ DEĞER kaynağı çiftleri `hakkimizda-sayac.test.ts` içinde SABİTTİR: etiket ile sayı yer değiştirirse
+  // (ör. "Ürünü Olan Marka" altında aile sayısı) kapı kırmızı verir.
+  const stats = sayaclar
+    ? [
+        { value: String(sayaclar.markaSayisi), label: t('aboutPage.distributorship'), icon: Award },
+        { value: String(sayaclar.aktifUrunSayisi), label: t('aboutPage.completedProject'), icon: Factory },
+        { value: String(sayaclar.aileSayisi), label: t('aboutPage.productFamilies'), icon: Layers }
+      ]
+    : []
 
   const coreValues = [
     {
@@ -105,10 +118,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) =
         </div>
       </section>
 
-      {/* Stats Grid */}
+      {/* Stats Grid: kart yoksa (sayaç okunamadı) bölüm hiç çizilmez; boş gri şerit kalmaz. */}
+      {stats.length > 0 && (
       <section className="py-24 bg-slate-50 border-b border-slate-100">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className={`grid ${STAT_SUTUNLARI[stats.length] ?? STAT_SUTUNLARI_VARSAYILAN} gap-12`}>
             {stats.map((stat, i) => (
               <ScrollReveal
                 key={i}
@@ -126,6 +140,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) =
                   0.1em'de aynı kelime ~103px → sütuna sığıyor. 640px üstünde tasarım
                   aynen korunuyor. (Sütun sayısını düşürmek yerine bunu seçtim: 375px'te
                   iki sütun zaten sığıyor, gereksiz yere tek sütuna inmesin.)
+                  URN-82: kart sayısı dörtten üçe indi; üç kartta dar ekranda tek sütun (2+1 öksüz kart kalmaz),
+                  `sm` üstünde üç sütun. Harf aralığı kuralı yukarıdaki gerekçeyle aynen durur.
                 */}
                 <div className="text-xs font-black uppercase tracking-hvac-tight sm:tracking-hvac-relaxed text-cyan-600">{stat.label}</div>
               </ScrollReveal>
@@ -133,6 +149,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) =
           </div>
         </div>
       </section>
+      )}
 
       {/* Story & Philosophy */}
       <section className="py-24 lg:py-32 overflow-hidden">

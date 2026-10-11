@@ -4,9 +4,17 @@ import React from 'react'
 import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
+import type { KatalogSayilari } from '@/types/ui-models'
 import { doluMu } from '@/utils/bosDegerKorumasi'
 
-const SilentFanVorticeBrand: React.FC = () => {
+import { sayacDegeri } from '../vorticeSayac'
+
+interface SilentFanVorticeBrandProps {
+    /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucudan). Yoksa iki sayaç kartı çizilmez. */
+    katalogSayilari?: KatalogSayilari | null
+}
+
+const SilentFanVorticeBrand: React.FC<SilentFanVorticeBrandProps> = ({ katalogSayilari }) => {
     const { t, dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const tr = (key: string) => t(`categorySilentFan.brand.${key}`)
@@ -16,9 +24,14 @@ const SilentFanVorticeBrand: React.FC = () => {
     const icons = [Clock, Globe, Award, Star]
     // URN-84: tablo bazı sayaç kartlarını (kuruluş yılı) BOŞ bırakır. Değer VE etiket birlikte boşsa kart
     // çizilmez; yalnız biri boşsa o alan basılmaz. Simge, sözlükteki özgün sıraya bağlı kalır (index korunur).
-    const stats = (bDict.stats || []).flatMap((item, index) =>
-        doluMu(item.value) || doluMu(item.label) ? [{ item, index }] : []
-    )
+    // URN-95: ürün ailesi ve aktif model kartlarının DEĞERİ sunucudan gelen katalog sayısıdır (`vorticeSayac`); sayı
+    // yoksa kart çizilmez.
+    const stats = (bDict.stats || []).flatMap((item, index) => {
+        const sayi = sayacDegeri(katalogSayilari, index)
+        if (sayi === null) return []
+        if (sayi !== undefined) return [{ item: { ...item, value: sayi }, index }]
+        return doluMu(item.value) || doluMu(item.label) ? [{ item, index }] : []
+    })
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-900 text-white relative overflow-hidden">

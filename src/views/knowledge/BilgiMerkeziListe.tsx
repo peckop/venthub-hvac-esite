@@ -30,6 +30,9 @@ export function listeKartlari(dil: YaziDili, yazilar: readonly RehberYazisi[] = 
       konu: getDictValue(dict, `bilgiMerkezi.konular.${y.konu}`),
       tarih: tarihYaz(y.yayinTarihi, dil),
       tarihIso: y.yayinTarihi,
+      // Yazı künyesiyle aynı kural: güncelleme tarihi yayın tarihinden farklıysa kartta da basılır.
+      guncelleme: y.guncellemeTarihi !== y.yayinTarihi ? tarihYaz(y.guncellemeTarihi, dil) : null,
+      guncellemeIso: y.guncellemeTarihi !== y.yayinTarihi ? y.guncellemeTarihi : null,
     }
   })
 }
@@ -83,6 +86,7 @@ export default function BilgiMerkeziListe({ dil, yazilar = YAZILAR }: { dil: Yaz
                 aramaYerTutucu: t('bilgiMerkezi.liste.aramaYerTutucu'),
                 sonucYok: t('bilgiMerkezi.liste.sonucYok'),
                 oku: t('bilgiMerkezi.liste.oku'),
+                guncelleme: t('bilgiMerkezi.yazi.guncelleme'),
               }}
             />
           </div>

@@ -235,8 +235,9 @@ export interface BuildCategoryJsonLdParams {
   pageSize: number
   families: FamilyListItem[]
   /**
-   * K3-b: sayfanın DİL ÖNEKLİ kanonik yolu (`kategoriKanonikAdresi` — iki seviyeli dal adresi
-   * slug'dan kurulamaz, üst kategori gerekir). Yalnız bayrak açıkken okunur.
+   * K3-b: sayfanın DİL ÖNEKLİ kanonik yolu (`kategoriKanonikAdresi`; SEO-35 B-1'den beri kök de alt de tek segment,
+   * yani `categorySlug` görünen slug olduğunda aynı adres çıkar — çağıran satırdan kurduğu yolu yine de verir).
+   * Yalnız bayrak açıkken okunur.
    */
   sayfaYolu?: string
   /** K3-b şeması (yalnız test verir; varsayılan `ADRES_SEMASI_K3B`). */

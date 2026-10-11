@@ -3,9 +3,16 @@ import React from 'react'
 
 import VentImage from '@/components/ui/VentImage'
 import { useI18n } from '@/i18n/I18nProvider'
+import type { KatalogSayilari } from '@/types/ui-models'
 import { doluMu } from '@/utils/bosDegerKorumasi'
 
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+import { sayacDegeri } from './vorticeSayac'
+
+interface VorticeBrandProps {
+    /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucudan). Yoksa iki sayaç kartı çizilmez. */
+    katalogSayilari?: KatalogSayilari | null
+}
 
 /** Sayaç satırının kart sayısına göre sütun sayısı (Tailwind sınıfı TAM dize olmalı, birleştirilmez). */
 const SAYAC_SUTUNLARI: Record<number, string> = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3' }
@@ -14,7 +21,7 @@ const SAYAC_SUTUNLARI: Record<number, string> = { 1: 'grid-cols-1', 2: 'grid-col
  * VorticeBrand - Marka Hikayesi Bölümü
  * 70 yıllık İtalyan mühendisliği ve güvenilirlik
  */
-const VorticeBrand: React.FC = () => {
+const VorticeBrand: React.FC<VorticeBrandProps> = ({ katalogSayilari }) => {
     const { dict, t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
 
@@ -26,12 +33,17 @@ const VorticeBrand: React.FC = () => {
     // URN-84: tablo bazı sayaç kartlarını (ör. kuruluş yılı) BOŞ bırakır. Değer VE etiket birlikte
     // boşsa kart çizilmez (ızgara 4'ten 3'e iner); yalnız biri boşsa o alan basılmaz.
     // Simge, sözlükteki özgün sıraya bağlı kalır: kart düşünce kalanların simgesi kaymaz.
+    // URN-95: ürün ailesi ve aktif model kartlarının DEĞERİ sunucudan gelen katalog sayısıdır (`vorticeSayac`); sayı
+    // yoksa kart çizilmez (etiket tek başına anlamsız, ham şablon basılmaz).
     const highlights = icons.flatMap((Icon, index) => {
         const item = bDict.highlights[index]
-        if (!item || (!doluMu(item.value) && !doluMu(item.label))) return []
+        if (!item) return []
+        const sayi = sayacDegeri(katalogSayilari, index)
+        if (sayi === null) return []
+        if (sayi === undefined && !doluMu(item.value) && !doluMu(item.label)) return []
         return [{
             icon: Icon,
-            value: item.value,
+            value: sayi ?? item.value,
             label: item.label,
             description: item.desc
         }]

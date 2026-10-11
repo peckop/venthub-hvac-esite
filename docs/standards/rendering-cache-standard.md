@@ -99,7 +99,7 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu + (varsa) **ailenin SERİSİ** — keşif tag'lerine DOKUNMAZ (PS-042) |
 | `product_images` | `on_product_images_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + keşif tag'leri + `/sitemap.xml` — ⚠️ tablo bugün **0 satır**; zincir T069 görsel yüklemesinden ÖNCE yerinde olmalı (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
 | `brands` | `on_brands_change` | var | markanın **tüm ailelerinin** PDP yolları + keşif tag'leri |
-| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout) yeniden üretilir; keşif/ana sayfa etiketlerine DOKUNMAZ. Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
+| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout, ödeme sonucu ve **ana sayfa**: ürün vitrini bloğunun çizim kapısı, URN-98 2026-10-10) yeniden üretilir; keşif etiketlerine DOKUNMAZ. Ana sayfa bu sarmalı `unstable_cache` içinde okur: içindeki `no-store` fetch Next 15.5.27'de o kapsamda sayfayı dinamik işaretlemez, `resolveTenant(undefined)` başlık okumaz, yani sınıf statik kalır (bekçi INV-ANASAYFA-STATIK-1 + INV-ANASAYFA-VITRIN-1). Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
 > **HAKKIMIZDA SAYACI (URN-75, 2026-10-09).** `/[lang]/about` artık `tam statik` DEĞİL: marka / aktif ürün / aile sayısı
@@ -122,9 +122,10 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
 > her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
 > olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
-> Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
-> bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
-> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
+> Kategori dalı (SEO-35 B-1): iki şemada da dalın adresi TEK segmenttir (yeni: `/tr/kategori/<alt>`, EN `/en/category/<alt>`;
+> bugünkü: `/<dil>/category/<alt>`), dal nesnesi kök nesnesiyle aynı yolu üretir ve küme tekilleştirir. İç içe
+> `/<dil>/category/<üst>/<alt>` ve `/tr/kategori/<üst>/<alt>` yolları HİÇBİR kipte üretilmez: yalnız 308'dir, önbelleği yok
+> (URN-7 ölçümü 2026-10-01). Kapı: `INV-TAZELEME-YOL-1`, `INV-TAZELEME-YOL-3` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
 > products dalı, ürün SKU'su (UPDATE'te eski SKU da) `yayindaModeller` listesindeyse modelin TR + EN sayfa yolunu
 > (`/tr/urun/<slug>-p-<sku>`) `skuModelYollari` (adres tek noktası `adresUret`) ile tazeler; liste dışı SKU ve boş listede
 > ek yol yoktur, çağrı başına en çok 4 ek yol. Kapı: `INV-WEBHOOK-MODEL-YOLU-1`
@@ -298,6 +299,28 @@ notu bunu açıkça yasaklıyor.
 > **Açık kalem (marka sayfaları):** `/[lang]/brands/[slug]` hâlâ ilan taşımıyor ve 2 işaret
 > üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
 > yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
+
+### 3.4 Marka sayfası (`/[lang]/brands/[slug]`) — DB'den türeyen gövde özeti, URN-79 (2026-10-09)
+
+Marka sayfasının gövdesi üretici övgüsü yerine markanın sitedeki **ürün ailelerini ve kategorilerini** DB'den yazar
+(`markaSayfasi.tsx` → `getBrandCatalogSummary`, sözlük şablonu `brands.detail.catalog*`). Statik sayfada görünen her tablo için
+zincir (§3 kuralı) — hepsi aynı keşif etiketine bağlanır, yeni önbellek biçimi YOKTUR:
+
+| Marka sayfasında görünen | Kaynak | Tetik + handler | Keşif etiketini tazeliyor mu |
+|---|---|---|---|
+| Aile sayısı + aile adları (`name`, `name_i18n`) | `product_families` (+ `products.status='active'` süzgeci, RPC) | `on_product_families_change`, `on_products_change` | **EVET** — `PRODUCTS_DISCOVERY_TAG` |
+| Kategori adları (alt kategori, yoksa ana kategori; yalnız `is_active`) | `categories` | `on_categories_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
+| Marka eşleşmesi (`p_brand` adı) | `brands` | `on_brands_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
+
+Önbellek: `unstable_cache`, anahtar `['brand-catalog-summary', lang, tenantId, markaAdı]` (kural 12), etiketler
+`[PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)]`, `revalidate: 3600` emniyet kemeri — aile sayısı için kurulan
+`brand-active-product-count` sarmalıyla AYNI desen. Kapı: `markaKaynagi.test.ts` "katalog özeti önbellek sarmalı".
+
+**Hata yolu SAYIDAN FARKLIDIR (bilerek):** aile SAYISI okunamazsa karar fırlatır (yanlış "ürünsüz" noindex + harita dışı yazar,
+bkz. `markaUrunDurumu.ts`); bu ÖZET ise isteğe bağlı metindir — okunamazsa sayfa özet paragrafsız çizilir, uyarı basılır, hata
+önbelleğe YAZILMAZ ve sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Ürünsüz markada (sayı 0) özet sorgusu hiç atılmaz.
+Üst veri (`<title>`/meta description) ve Brand JSON-LD bu özeti KULLANMAZ: yalnız kayıttaki nötr cümleden türer
+(`markaAciklamasi`, tek kaynak) — arama sonucu açıklaması DB gecikmesine/hatasına bağlanmaz.
 
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 

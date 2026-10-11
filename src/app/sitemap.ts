@@ -149,7 +149,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   // 2. Category Routes (URL'ler dile göre yerelleştirilmiş slug ile üretilir; boş kategoriler hariç)
-  // Kategori adresi ÜST'ü bilerek üretilir (dal → iki seviyeli kanonik, kök → tek); kapalıyken tek slug.
+  // Kategori adresi ÜST'ü bilerek istenir ama kanonik adres kök de alt de TEK segmenttir (SEO-35 B-1: dal → `/kategori/<dal>`);
+  // kapalıyken yine tek slug (`/category/<slug>`).
   const kategoriById = new Map(categories.map((c) => [c.id, c]))
   const kategoriYolu = (cat: (typeof categories)[number], lang: string): string => {
     const ust = cat.parent_id ? kategoriById.get(cat.parent_id) : undefined

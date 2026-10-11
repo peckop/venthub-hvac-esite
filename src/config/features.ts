@@ -117,8 +117,9 @@ export const EN_YAYIN = false
  * ⭐K3-b ADRES ŞEMASI (REC-300 Faz 3) — DERLEME SABİTİ. `false` iken canlı adresler BUGÜNKÜ gibi.
  *
  * Plan: docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md §2 (hedef şema) + §5 Faz 3.
- * Açıkken: `/tr/urunler` · `/tr/kategori/<kök>/<dal>` · `/tr/urun/<aile>` · `/tr/urun/<slug>-p-<sku>` ·
- * `/tr/markalar/<marka>` (EN'de önek değişmez: `/en/products`, `/en/category`, `/en/brands`).
+ * Açıkken: `/tr/urunler` · `/tr/kategori/<kök>` · `/tr/kategori/<alt-slug>` (dal da TEK segment, SEO-35 B-1) ·
+ * `/tr/urun/<aile>` · `/tr/urun/<slug>-p-<sku>` · `/tr/markalar/<marka>`
+ * (EN'de önek değişmez: `/en/products`, `/en/category`, `/en/brands`).
  *
  * TEK ÜRETİCİ: bütün adresler `src/utils/adresUret.ts`'ten çıkar; o fonksiyon bu bayrağa bakar. Faz 3
  * alt PR'larında yüzeyler (canonical, hreflang, site haritası, JSON-LD, kırıntı, kart, arama) tek tek
