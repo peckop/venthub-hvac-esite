@@ -241,7 +241,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     },
   },
   {
-    // BLOG, doğrulanan metin sha cba52ba2ec9f, gövde sha cb0372b1d223 (tur 6, 2026-10-11: bağımsız Opus doğrulayıcı +
+    // BLOG, doğrulanan metin sha f35b1afa7f7d, gövde sha f614b15b8282 (tur 7, 2026-10-11: bağımsız Opus doğrulayıcı +
     // belirlenimci atıf/alıntı/kalıp kontrolleri; mevzuat kaynakları 2026-10-11 tarihinde resmî metinden yeniden okundu).
     // Yayın onayı Recep'ten, OPS penceresinde, 2026-10-11. Kapak karar 135'e göre kapak şablonu PR'ında eklenecek.
     kimlik: 'radyal-aksiyel-fan-secimi',
@@ -303,7 +303,7 @@ Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düze
 | Nicotra Gebhardt RDH | Geriye eğik [3] | Kayışlı [3] |
 | Nicotra Gebhardt DD | Öne eğik [5] | Doğrudan tahrikli [5] |
 
-Bu serilerin modellerini [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarında; tüm fanları [radyal fanlar](vh:kategori/centrifugal-fans), [aksiyel endüstriyel fanlar](vh:kategori/axial-industrial-fans) ve [duman tahliye fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde inceleyebilirsiniz.
+Bu serilerin modellerini [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarında; tüm fanları [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans), [aksiyel sanayi fanları](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde inceleyebilirsiniz.
 
 ## Fan eğrisi nasıl okunur?
 
@@ -351,7 +351,7 @@ Vortice, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanların EN
 
 - Fanın tesisata esnek bir bağlantıyla bağlanması titreşim ve gürültü yalıtımını iyileştirir [2].
 - Tüm koruyucu tertibatlar takılıp bağlanmadan fan işletmeye alınmamalıdır [2].
-- Nicotra Gebhardt'ın kayışlı fanlarında doğru gerginlik, üreticinin belirttiği test kuvvetinin kayış açıklığının metresi başına 16 mm sehim oluşturduğu noktada elde edilir [2]. Aynı üretici, ölçü işaretleri arasındaki uzunluğun belirtilen uzama değeri kadar artmasıyla da doğru gerginliğin elde edildiğini söyler; bu işlem rulmanın aşırı zorlanmaması için iki aşamada yapılmalıdır [2].
+- Nicotra Gebhardt'ın kayışlı fanlarında doğru gerginlik, üreticinin belirttiği test kuvvetinin kayış açıklığının metresi başına 16 mm sehim oluşturduğu noktada elde edilir [2].
 - Nicotra Gebhardt'ın kayışlı AT serisi fanlarındaki rulmanlar 40.000 çalışma saatlik nominal ömür için tasarlanmıştır [2].
 
 ## Fiyatı belirleyen etkenler
@@ -371,7 +371,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "T
 2. Havanın temiz mi, tozlu ya da parçacıklı mı olduğuna göre kanat tipini seçin [1].
 3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
 4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
-5. Fan girişinde ve çıkışında sistem etkisi yaratacak dirsekleri ve daralmaları azaltın [1].
+5. Fan girişinde ve çıkışında sistem etkisi yaratacak dirsekleri azaltın [1].
 6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [7]; patlayıcı ortam söz konusuysa fanın o ortam için tasarlanıp pazarlandığını gösteren belgeyi üreticiden isteyin [8].
 
 ## Sık sorulan sorular
@@ -411,10 +411,10 @@ Gerekli debi ve toplam basınç [1], havanın temiz ya da parçacıklı olup olm
 5. Nicotra Gebhardt, Centrifugal Fans direct driven with scroll, DD range, Issue 1.3, 2012, s. 6, 9 (üretici belgesi).
 6. Vortice, Industrial Ventilation kataloğu, s. 4, 45, 58, 64 (üretici belgesi).
 7. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
-8. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
-9. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2). https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 11.10.2026)
+8. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, md. 1(3), 9, 10, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
+9. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2), md. 1, 10–12, geçici md. 1. https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 11.10.2026)
 10. SEAT Ventilation, SEAT Series — Specifications, s. 1 (üretici belgesi).
-11. Avrupa Komisyonu, Commission Regulation (EU) 2025/2481 (2024/1834'ü değiştiren tüzük), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2481 (erişim 11.10.2026)
+11. Avrupa Komisyonu, Commission Regulation (EU) 2025/2481 (2024/1834'ü değiştiren tüzük), md. 1(4), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2481 (erişim 11.10.2026)
 
 ## Teknik sorumluluk notu
 
