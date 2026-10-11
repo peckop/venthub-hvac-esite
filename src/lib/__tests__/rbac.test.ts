@@ -61,9 +61,14 @@ describe('RBAC (Role Based Access Control)', () => {
             expect(canAccessPage('moderator', '/admin/products')).toBe(true);
             expect(canAccessPage('moderator', '/admin/categories')).toBe(true);
             expect(canAccessPage('moderator', '/admin/coupons')).toBe(true);
-            // purchase_orders politikasi 'moderator'u ACIKCA sayiyor - tek istisna
-            expect(canAccessPage('moderator', '/admin/purchasing')).toBe(true);
             expect(canAccessPage('moderator', '/admin/inventory/settings')).toBe(true);
+        });
+
+        // REC-140 Faz 1b (karar 95): satinalma politikalari is_admin_user()'a cekildi, moderator
+        // maliyeti ve tedarikciyi gormez. Eskiden bu yuzey tek istisnaydi.
+        it('moderator: satinalma sayfasi KAPALI (karar 95)', () => {
+            expect(canAccessPage('moderator', '/admin/purchasing')).toBe(false);
+            expect(canAccessPage('admin', '/admin/purchasing')).toBe(true);
         });
 
         // Red kolu: moderator'un SIFIR satir gordugu yuzeyler. Bunlar acik kalsaydi
@@ -134,11 +139,12 @@ describe('RBAC (Role Based Access Control)', () => {
             expect(canWrite('admin', 'webhook')).toBe(false);
         });
 
-        // Yazma matrisi de canli politikadan olculdu: UC tablo moderator'u ACIKCA sayiyor.
-        it('moderator yalniz politikanin ACIKCA saydigi uc varliga yazar', () => {
+        // Yazma matrisi de canli politikadan olculdu: IKI varlik moderator'u ACIKCA sayiyor
+        // (purchasing REC-140 Faz 1b ile cikti, karar 95).
+        it('moderator yalniz politikanin ACIKCA saydigi iki varliga yazar', () => {
             expect(canWrite('moderator', 'products')).toBe(true);
             expect(canWrite('moderator', 'categories')).toBe(true);
-            expect(canWrite('moderator', 'purchasing')).toBe(true);
+            expect(canWrite('moderator', 'purchasing')).toBe(false);
             expect(canWrite('moderator', 'orders')).toBe(false);
             expect(canWrite('moderator', 'pricing')).toBe(false);
             expect(canWrite('moderator', 'settings')).toBe(false);
