@@ -282,6 +282,108 @@ describe('INV-KARTSIZ-KAPI-8: başka pencereye giden mesaj (SendMessage) aynı k
   })
 
   it('bilinen kart ön ekleri listesi sabit: yeni departman eklenince bilinçli güncellenir', () => {
-    expect(kanca.ONEKLER).toEqual(['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG'])
+    expect(kanca.ONEKLER).toEqual(['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS'])
+  })
+})
+
+// 10-05 sabahı 285 ve 286 kartsız soruldu ve kapı geçirdi: kapı output style'ın kendi karar biçimlerine kördü.
+describe('INV-KARTSIZ-KAPI-9: Recep output style karar biçimleri (karar maddesi, "demen yeterli", Önerim tablosu)', () => {
+  it('"**285.** … Önerim evet" kartsızsa bloklar, kartlıysa geçer', () => {
+    const kartsiz = '**285.** Kokpitte işlem yapılsın mı? Önerim evet, çünkü yazma kapısı hazır.'
+    expect(kanca.maddeleriCikar(kartsiz)).toHaveLength(1)
+    expect(kanca.degerlendir(kartsiz, hepsiGecerli).durum).toBe('blok')
+    expect(kanca.degerlendir(kartsiz + ' (kart OPS-74)', hepsiGecerli).durum).toBe('temiz')
+  })
+
+  it('"**Karar 285**" ve madde işaretli "- **285.**" biçimi de karar maddesidir', () => {
+    expect(kanca.maddeleriCikar('**Karar 285** Önerim hayır, bedeli yüksek.')).toHaveLength(1)
+    expect(kanca.maddeleriCikar('- **285.** Başlasın mı? Onayın yeterli.')).toHaveLength(1)
+  })
+
+  it('bitmiş iş anlatımı karar maddesi sayılmaz', () => {
+    expect(kanca.maddeleriCikar('**284.** evet verildi, uygulandı.')).toHaveLength(0)
+    expect(kanca.maddeleriCikar('**284.** Recep evet dedi, birleşti.')).toHaveLength(0)
+  })
+
+  it('karar kelimesi taşımayan kalın numaralı satır (başlık ya da özet) istek sayılmaz', () => {
+    expect(kanca.maddeleriCikar('**285.** Kokpit sürümü kopyalandı.')).toHaveLength(0)
+  })
+
+  it('"demen yeterli" ve "senin onayını bekliyor" ikinci kişi istektir; üçüncü kişi hâli değildir', () => {
+    expect(kanca.degerlendir('Bu pencerede evet demen yeterli.', hepsiGecerli).durum).toBe('blok')
+    expect(kanca.degerlendir('Birleştirme senin onayını bekliyor.', hepsiGecerli).durum).toBe('blok')
+    expect(kanca.degerlendir('Onayın gerekiyor.', hepsiGecerli).durum).toBe('blok')
+    expect(kanca.degerlendir('Ops\'un onayını bekliyorum.', hepsiGecerli).durum).toBe('temiz')
+    expect(kanca.degerlendir('Birleştirme OPS onayını bekliyor.', hepsiGecerli).durum).toBe('temiz')
+  })
+
+  it('olumsuz ifade ("senden onay gerekmiyor") ve compact ritüeli istek sayılmaz', () => {
+    expect(kanca.maddeleriCikar('Senin onayın gerekmiyor.')).toHaveLength(0)
+    expect(kanca.maddeleriCikar('Şimdi compact yapabilirsin, evet demen yeterli.')).toHaveLength(0)
+  })
+
+  it('karar tablosu: Önerim dolu her satır istektir, kartsızsa bloklar', () => {
+    const tablo = '| No | Karar | Önerim | Gerekçe |\n|---|---|---|---|\n| 285 | Kokpitte işlem | Evet | Kapı hazır |\n| 286 | Mavi nokta | Hayır | Karışır |\n'
+    expect(kanca.maddeleriCikar(tablo)).toHaveLength(2)
+    expect(kanca.degerlendir(tablo, hepsiGecerli).durum).toBe('blok')
+  })
+
+  it('karar tablosunda kart no satırda varsa geçer', () => {
+    const tablo = '| No | Karar | Önerim |\n|---|---|---|\n| OPS-74 · 285 | Kokpitte işlem | Evet |\n'
+    expect(kanca.degerlendir(tablo, hepsiGecerli).durum).toBe('temiz')
+  })
+
+  it('durum tablosu: yalnız Onayında satırı istektir; Sürüyor/Bitti satırı Önerim dolu olsa da istek değil', () => {
+    const tablo =
+      '| No | İş | Durum | Önerim | Sorumlu |\n|---|---|---|---|---|\n| ARC-1 | A | Onayında | Evet | sen |\n| ARC-2 | B | Sürüyor | Evet | ben |\n| ARC-3 | C | Bitti | — | ben |\n'
+    const m = kanca.maddeleriCikar(tablo)
+    expect(m).toHaveLength(1)
+    expect(m[0]?.metin).toContain('ARC-1')
+  })
+
+  it('Önerim boş ya da "—" olan satır istek sayılmaz; tablo biter, sonraki düz yazı yine taranır', () => {
+    const tablo = '| No | Karar | Önerim |\n|---|---|---|\n| 1 | A | — |\n| 2 | B |  |\n\nBu pencerede evet demen yeterli.\n'
+    const m = kanca.maddeleriCikar(tablo)
+    expect(m).toHaveLength(1)
+    expect(m[0]?.metin).toContain('demen yeterli')
+  })
+
+  it('ayraç satırı (|---|) olmayan düz metin "Önerim" başlığıyla tablo sayılmaz', () => {
+    expect(kanca.maddeleriCikar('| No | Önerim |\n| 1 | Evet |\n| 2 | Evet |\n| 3 | Evet |\n')).toHaveLength(0)
+  })
+
+  it('tablo satırı bitmiş işi ya da compact ritüelini anlatıyorsa istek sayılmaz', () => {
+    const tablo = '| No | Karar | Önerim |\n|---|---|---|\n| 1 | Kopyalama | Evet verildi, uygulandı |\n| 2 | Şimdi compact | Evet |\n| 3 | Kokpit | Evet |\n'
+    const m = kanca.maddeleriCikar(tablo)
+    expect(m).toHaveLength(1)
+    expect(m[0]?.metin).toContain('Kokpit')
+  })
+
+  it('Önerim sütunu olmayan tablo taranmaz', () => {
+    expect(kanca.maddeleriCikar('| No | İş | Durum |\n|---|---|---|\n| ARC-1 | A | Onayında |\n')).toHaveLength(0)
+  })
+
+  it('Türkçe harfle biten bitmiş-iş fiilleri (alındı, kapandı, yapıldı, tamamlandı) de istek DEĞİL: \\b bu harflerde sınır saymaz', () => {
+    for (const f of ['onayın alındı', 'kapandı', 'yapıldı', 'tamamlandı', 'uygulandı'])
+      expect(kanca.maddeleriCikar('**284.** Önerim evet, ' + f + '.'), f).toHaveLength(0)
+  })
+
+  it('tırnak, «» ya da ters tırnak içindeki örnek ifade istek sayılmaz (kapıyı anlatan satır)', () => {
+    expect(kanca.maddeleriCikar('Kapı «demen yeterli» ifadesini artık tanıyor.')).toHaveLength(0)
+    expect(kanca.maddeleriCikar('Kapı "demen yeterli" ve `senin onayını bekliyor` biçimlerini tanıyor.')).toHaveLength(0)
+    expect(kanca.maddeleriCikar('Bu pencerede evet demen yeterli.')).toHaveLength(1)
+  })
+
+  it('TSR/DIL/MRK/MVZ/STS kartları da tanınır (TASARIM kartı «bilinmeyen kart» diye bloklanmaz)', () => {
+    for (const k of ['TSR-6', 'DIL-3', 'MRK-1', 'MVZ-2', 'STS-4']) {
+      const r = kanca.degerlendir('Senden istenen: kararı ver (kart ' + k + ').', hepsiGecerli)
+      expect(r.durum, k).toBe('temiz')
+      expect(r.kartlar, k).toEqual([k])
+    }
+  })
+
+  it('"Kartsız: <sebep>" atlatması yeni biçimlerde de çalışır', () => {
+    const k = kanca.degerlendir('**285.** Başlasın mı? Önerim evet.\nKartsız: tek seferlik sözlü soru, takip gerekmiyor\n', hicbiriGecerli)
+    expect(k.durum).toBe('atlatildi')
   })
 })

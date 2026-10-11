@@ -24,11 +24,15 @@ type Satir = {
   bekleyen: { ad: string; neden: string }[]
 }
 type Setler = { kural: { enFazlaOnYukle: number; onYuklemeButceKB: number }; setler: Satir[] }
+/** rol-karti-uret.cjs ROLLER: pencere tanımının görev ve dosya alanı buradan gelir (rol kartıyla aynı veri). */
+type Roller = Record<string, { gorev: string; dosyalar: string }>
 type Uretici = {
   uret: (s: Setler) => Record<string, string>
   tanim: (s: Satir) => string
   sorunlar: (s: Setler, etkinMi: (ad: string) => boolean, kd: Set<string>) => string[]
   dosyaAdi: (d: string, t: string) => string
+  uretPencere: (s: Setler, roller: Roller) => Record<string, string>
+  PENCERE_DEPARTMANLARI: string[]
   TUR_MODEL: Record<string, string>
   KULLANICI_DUZEYI: Set<string>
   AD_CAKISMASI: Set<string>
@@ -37,6 +41,7 @@ type Uretici = {
 
 const kok = path.resolve(__dirname, '..', '..', '..')
 const uretici = createRequire(import.meta.url)(path.join(kok, 'scripts', 'belge', 'ajan-tanimi-uret.cjs')) as Uretici
+const roller = (createRequire(import.meta.url)(path.join(kok, 'scripts', 'belge', 'rol-karti-uret.cjs')) as { ROLLER: Roller }).ROLLER
 const setler = JSON.parse(fs.readFileSync(path.join(kok, uretici.SETLER_YOLU), 'utf8')) as Setler
 const etkinMi = (ad: string) => fs.existsSync(path.join(kok, '.claude', 'skills', ad, 'SKILL.md'))
 const kopya = (): Setler => JSON.parse(JSON.stringify(setler)) as Setler
@@ -88,6 +93,44 @@ describe('INV-AJAN-TANIM-1 — mandal', () => {
 
   it('tablonun kendisi üretim kurallarına uyuyor (boş ön yükleme yok, bütçe ve sayı sınırı, bilinen skill)', () => {
     expect(uretici.sorunlar(setler, etkinMi, uretici.KULLANICI_DUZEYI)).toEqual([])
+  })
+})
+
+/**
+ * DEPARTMAN PENCERE TANIMLARI (HRT-49): `.claude/agents/<departman>-pencere.md` aynı üreticinin üçüncü çıktısıdır; müdür penceresi
+ * settings'teki `"agent"` anahtarıyla bu tanımla açılır. Burada yalnız MANDAL ölçülür (disk = üretici çıktısı, öksüz yok); varlık,
+ * `memory: user`, model ve araç kısıtının yokluğu hazir-ozellik-kurulumu.test.ts'te sınanır.
+ */
+describe('INV-AJAN-TANIM-1 — departman pencere tanımları', () => {
+  const pencere = uretici.uretPencere(setler, roller)
+
+  it('listedeki her departman için tam bir pencere dosyası üretilir (sayı listeden okunur, boş küme geçmez)', () => {
+    expect(uretici.PENCERE_DEPARTMANLARI.length).toBeGreaterThan(0)
+    expect(Object.keys(pencere).sort()).toEqual(uretici.PENCERE_DEPARTMANLARI.map((d) => `${d.toLowerCase()}-pencere.md`).sort())
+  })
+
+  it('diskteki pencere tanımları üreticinin çıktısıyla bire bir aynı (CRLF normalize)', () => {
+    const farkli: string[] = []
+    for (const [ad, metin] of Object.entries(pencere)) {
+      const yol = path.join(kok, '.claude', 'agents', ad)
+      if (!fs.existsSync(yol) || fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n') !== metin) farkli.push(ad)
+    }
+    expect(farkli, `üretim çalıştırılmalı: node scripts/belge/ajan-tanimi-uret.cjs --yaz (${farkli.join(', ')})`).toEqual([])
+  })
+
+  it('öksüz pencere tanımı yok: diskteki her *-pencere.md üreticinin listesindeki bir departmandan gelir', () => {
+    const oksuz = fs.readdirSync(path.join(kok, '.claude', 'agents')).filter((f) => f.endsWith('-pencere.md') && !(f in pencere))
+    expect(oksuz).toEqual([])
+  })
+
+  it('listedeki her departmanın ROLLER kaydı vardır (görev ve dosya alanı boş değil); kaydı olmayan departman üretimi durdurur', () => {
+    for (const d of uretici.PENCERE_DEPARTMANLARI) {
+      expect(roller[d]?.gorev?.trim(), `${d}: ROLLER.gorev`).toBeTruthy()
+      expect(roller[d]?.dosyalar?.trim(), `${d}: ROLLER.dosyalar`).toBeTruthy()
+    }
+    const eksik = { ...roller }
+    delete eksik[uretici.PENCERE_DEPARTMANLARI[0]]
+    expect(() => uretici.uretPencere(setler, eksik)).toThrow(/ROLLER içinde/)
   })
 })
 
@@ -260,6 +303,20 @@ const maliyetKarakter = (cikti: Record<string, string>): number =>
 describe('INV-AJAN-TANIM-1 — bağlam maliyeti tavanı', () => {
   it('üretilen tanımların ad+açıklama toplamı OPS tavanının (6k jeton) karakter karşılığını aşmaz', () => {
     expect(maliyetKarakter(uretici.uret(setler))).toBeLessThanOrEqual(TAVAN_KARAKTER)
+  })
+
+  it('çalışan + departman pencere tanımları BİRLİKTE tavanı aşmaz (hepsi Agent aracının açıklamasına girer; HRT-49 payı dahil)', () => {
+    const hepsi = { ...uretici.uret(setler), ...uretici.uretPencere(setler, roller) }
+    expect(Object.keys(hepsi).length).toBeGreaterThan(Object.keys(uretici.uret(setler)).length)
+    expect(maliyetKarakter(hepsi)).toBeLessThanOrEqual(TAVAN_KARAKTER)
+  })
+
+  it('ayırt edici: şişirilmiş pencere açıklaması birleşik tavanı aşırır ve kapı kırmızı verir', () => {
+    const cikti = { ...uretici.uret(setler), ...uretici.uretPencere(setler, roller) }
+    const pencereAdi = Object.keys(cikti).find((f) => f.endsWith('-pencere.md'))
+    if (!pencereAdi) throw new Error('pencere tanımı yok')
+    cikti[pencereAdi] = cikti[pencereAdi].replace(/^description:\s*(.*)$/m, (_m, d: string) => `description: ${d}${' x'.repeat(2000)}`)
+    expect(maliyetKarakter(cikti)).toBeGreaterThan(TAVAN_KARAKTER)
   })
 
   it('ayırt edici: tek bir tanımın açıklaması şişirilirse tavan aşılır ve kapı kırmızı verir', () => {

@@ -31,7 +31,8 @@ export interface UrunKarti {
 
 export interface IlgiliYazi {
   baslik: string
-  ozet: string
+  /** Kartta görünen metin: ilgili yazının `kartOzeti` alanı; meta açıklaması (`ozet`) DEĞİL. Boşsa çizilmez. */
+  kartOzeti: string
   href: Route
 }
 
@@ -89,7 +90,7 @@ export async function yaziSayfasiHazirla(
 
   const ilgiliYazilar = ilgiliYazilariSec(yazi, dil, yazilar).map((y) => {
     const m = y.diller[dil] as YaziMetni
-    return { baslik: markdownAyristir(m.govde).h1, ozet: m.ozet, href: bilgiMerkeziYaziHref(m.slug, dil) }
+    return { baslik: markdownAyristir(m.govde).h1, kartOzeti: m.kartOzeti.trim(), href: bilgiMerkeziYaziHref(m.slug, dil) }
   })
 
   return {

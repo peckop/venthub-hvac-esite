@@ -35,7 +35,7 @@ Kararlar: K3-b, K4, **157**, **161**, **164 = A**, **249** (toplu IndexNow yaln�
 | 0 cetvel · 1-A · 1-B · 2 · 3a · 3b · 3c · 3d · **3e** | **Bitti** (bayrak arkasında; canlıda görünmez) | PR'lar §1 ve ana plan |
 | **3f** arama RPC (adres yerine kimlik) | **KALDI — MIGRATION, Recep onayı.** Ölçüm: `get_search_suggestions` bugün hâlâ `TABLE(type, label, url, metadata)` döndürür, yani adres DB'de üretiliyor. | canlı veritabanı 10-08 |
 | **3g** tazeleme | **Büyük ölçüde bitti.** Kalan: model yolu dışındaki kapsam ölçümü (kart notu 10-02 "ölçüm sürüyor"), bu tazelemede yeniden ölçülmedi. | #1561, #1651, #1716 |
-| 3-C bayrak `true` + harita + config'ten 19 satır silme | Yayın günü, tek geri dönüşsüz adım. Sırası ALT-13 ve #1738 ile birlikte OPS belirler. | ana plan Faz 3-C |
+| 3-C bayrak `true` + harita + config'ten 25 kural silme (13 dilsiz kategori + 6 Lineo + 6 ürün; "19" yanlıştı, tohum testi ve ana plan 25) | Yayın günü, tek geri dönüşsüz adım. Sırası ALT-13 ve #1738 ile birlikte OPS belirler. | ana plan Faz 3-C |
 | 4 Recep önizleme | Araç + tarama + 17 adreslik liste hazır | #1413, #1744, #1745 |
 | 5 yayın | §3 | — |
 
@@ -50,7 +50,7 @@ Kararlar: K3-b, K4, **157**, **161**, **164 = A**, **249** (toplu IndexNow yaln�
 **Yayın günü sırası (güncel):**
 
 1. Önkoşul ölçümleri: Recep önizlemesi (Faz 4) onayı · `canli-olc.sh` ve `canli-kapi.mjs` taban satırı · linkinator + unlighthouse taraması · GSC taban ölçümü (SEO-1/SEO-2 #1648 ile alındı, yayın günü yenilenir).
-2. **Faz 3-C merge** (bayrak `true` + harita + config'ten 19 satır silme). Aynı yayında #1738 (tek gövde) bayrağa bağlı iner.
+2. **Faz 3-C merge** (bayrak `true` + harita + config'ten 25 kural silme). Aynı yayında #1738 (tek gövde) bayrağa bağlı iner.
 3. Deploy sonrası yayın ölçümü: 5 örnek yeni adres 200, eski adresler **tek** 308, site haritası satır sayısı = beklenen, hreflang/canonical, linkinator kırık 0 ve zincir 0.
 4. IndexNow (karar 164 A, 249): anahtar dosyası 200 ve 32 bayt ölçülür → `--kuru` sayısı beklenene eşit mi → toplu betik bir kez; pilot kapsamında sayı 0 (ölçüt 3). **Karar 327 (OPS, 2026-10-09):** İngilizce vitrin 18 Ekim'de açılacak; Pazar günü `EN_YAYIN` kapalı, IndexNow yalnız TR. Pilottaki “bildirim 0” hükmünün yerine geçmez: Pazar günü yalnız adresi değişen TR sayfalar bildirilir. Beklenen URL sayısını GEO-SEO verir. Adım adım komutlar: `docs/plans/yayin-gunu-runbook-2026-10-11.md` §5.
 5. GSC site haritası yeniden gönderilir; KATALOG ve OPS'a haber (karar 157): katalog paketi canlı DB'den yeniden üretir.

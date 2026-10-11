@@ -27,11 +27,13 @@ describe('ters dizin — kategori/aile → rehber', () => {
     expect([...h].some((k) => k.startsWith('vh:hesaplayici/'))).toBe(false)
   })
 
-  it('kategoriye bağlanan yazı o kategori sayfasına döner: dil önekli adres, H1 başlık, özet', () => {
+  it('kategoriye bağlanan yazı o kategori sayfasına döner: dil önekli adres, H1 başlık, KART özeti (meta açıklaması değil)', () => {
     const r = ilgiliRehberler('vh:kategori/air-curtains', 'tr', 3, [ORNEK_YAZI], false)
     expect(r).toEqual([
-      { baslik: 'Örnek Rehber Yazısı', ozet: ORNEK_YAZI.diller.tr?.ozet, href: '/tr/bilgi-merkezi/ornek-yazi' },
+      { baslik: 'Örnek Rehber Yazısı', kartOzeti: ORNEK_YAZI.diller.tr?.kartOzeti, href: '/tr/bilgi-merkezi/ornek-yazi' },
     ])
+    expect(r[0]).not.toHaveProperty('ozet')
+    expect(r[0]?.kartOzeti).not.toBe(ORNEK_YAZI.diller.tr?.ozet)
   })
 
   it('ilgisiz kategori ve aile için BOŞ (blok basılmaz)', () => {

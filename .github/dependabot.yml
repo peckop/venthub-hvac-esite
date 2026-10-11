@@ -106,8 +106,9 @@ updates:
         update-types: [minor, patch]
 
   # WrongStack MCP araçları — kendi kilit dosyası var (`npm ci --ignore-scripts`, ANA ağaçta).
-  # Paketler 1.0.19'da bilinçli sabit; pilot ölçümü sürerken sürüm kayarsa karşılaştırma
-  # bozulur. Takip edilir ama tek PR'a gruplanır ve tavan 1.
+  # Paketler kilitte bilinçli sabit (şu an 1.0.26); yükseltme ELLE yapılır: yama + kilit + test
+  # aynı PR'da (tools/wrongstack-mcp/README.md "yama çıkmazı"). Bot sürüm PR'ı AÇMAZ (aşağıdaki
+  # ignore). groups ve tavan 1, ignore kalkarsa devreye girer.
   - package-ecosystem: npm
     directory: /tools/wrongstack-mcp
     schedule:
@@ -122,3 +123,13 @@ updates:
     groups:
       wrongstack:
         patterns: ['*']
+    ignore:
+      # KABUL EDİLMİŞ ERTELEME — OPS kararı 10-09 (karar 224, ARC-76). Bot yalnız package.json ve
+      # kilidi değiştirir; yamalar (tools/wrongstack-mcp/yamalar) ve kurulum.cjs'in kilit-yama kapısı
+      # gelmez: #1696 (1.0.26 → 1.0.29) bu yüzden ci'da INV-WRONGSTACK-KANBAN-YAMA-1 ve
+      # INV-WRONGSTACK-SAGE-YAMA-1'den kırmızı oldu ve birleşemezdi. Her yeni sürüm için aynı kırmızı
+      # PR açılır; yükseltme yama + kilit + test birlikte, elle gider. Yeni sürüm görünürlüğü:
+      # SessionStart WRONGSTACK satırı ve günlük etiket kontrolü (karar 257).
+      # KALDIRMA ŞARTI: WrongStack yükseltmesi yama + kilit + testle birlikte otomatik üretilebildiği
+      # (yama çıkmazı README'den kalktığı) gün bu satır silinir.
+      - dependency-name: '@wrongstack/*'

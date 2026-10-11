@@ -38,6 +38,8 @@ export type AdresNesnesi =
    */
   | { tur: 'model'; aileSlug: string; sku: string; slug?: string | null }
   | { tur: 'marka'; slug: string }
+  /** Marka LİSTESİ (URN-85, Design CSV satır 4): TR `/tr/markalar`, EN `/en/brands`. Kapalıyken bugünkü `/<dil>/brands`. */
+  | { tur: 'markalar' }
 
 /** Yeni şemada dile göre bölüm adları (plan §2). EN'de önekler bugünküyle aynı. */
 const BOLUM: Record<AdresDili, { urunler: string; kategori: string; urun: string; marka: string }> = {
@@ -64,6 +66,8 @@ function bugunkuAdres(n: AdresNesnesi, dil: AdresDili): Route {
       return localizedHref(Routes.product(n.aileSlug, n.sku), dil)
     case 'marka':
       return localizedHref(Routes.brand(n.slug), dil)
+    case 'markalar':
+      return localizedHref(Routes.brands(), dil)
   }
 }
 
@@ -93,6 +97,8 @@ function yeniAdres(n: AdresNesnesi, dil: AdresDili): Route {
     }
     case 'marka':
       return localizedHref(`/${b.marka}/${seg(n.slug)}`, dil)
+    case 'markalar':
+      return localizedHref(`/${b.marka}`, dil)
   }
 }
 

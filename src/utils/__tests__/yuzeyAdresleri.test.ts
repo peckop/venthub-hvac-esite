@@ -58,6 +58,8 @@ describe('adresRotalari — vekilin (useLocalizedRoutes) ve sunucu yüzeylerinin
     ['marka süzgeci', (r) => r.products({ brand: 'Vortice' }), 'tr', '/tr/products?brand=Vortice', '/tr/urunler?brand=Vortice'],
     ['marka', (r) => r.brand('vortice'), 'tr', '/tr/brands/vortice', '/tr/markalar/vortice'],
     ['marka EN', (r) => r.brand('vortice'), 'en', '/en/brands/vortice', '/en/brands/vortice'],
+    ['marka listesi', (r) => r.brands(), 'tr', '/tr/brands', '/tr/markalar'],
+    ['marka listesi EN', (r) => r.brands(), 'en', '/en/brands', '/en/brands'],
   ]
 
   it.each(tablo)('KAPALI birebir bugünkü: %s', (_ad, cagri, dil, bugun) => {
@@ -90,6 +92,8 @@ describe('dilDegistirYolu — LanguageSwitcher', () => {
     ['/en/category/fans', 'tr', '/tr/category/fans', '/tr/kategori/fans'],
     ['/tr/markalar/vortice', 'en', '/en/markalar/vortice', '/en/brands/vortice'],
     ['/en/brands/vortice', 'tr', '/tr/brands/vortice', '/tr/markalar/vortice'],
+    ['/tr/markalar', 'en', '/en/markalar', '/en/brands'],
+    ['/en/brands', 'tr', '/tr/brands', '/tr/markalar'],
     ['/tr/cart', 'en', '/en/cart', '/en/cart'],
     ['/tr', 'en', '/en', '/en'],
     ['/about', 'en', '/en/about', '/en/about'],
@@ -242,31 +246,31 @@ describe('CollectionPage JSON-LD (kategori + seri)', () => {
     buildCategoryJsonLd({
       lang: 'tr', baseUrl: 'https://x', categorySlug: 'kanal-tipi-fanlar', name: 'K', description: 'd',
       total: 1, page: 1, pageSize: 24, families: aileler, sayfaYolu, bayrak,
-    }) as { url: string; itemListElement: { url: string }[] }
+    }) as { url: string; mainEntity: { itemListElement: { url: string }[] } }
 
   it('KAPALI birebir bugünkü (sayfaYolu verilse bile okunmaz)', () => {
     for (const ld of [kategori(undefined), kategori(false, '/tr/kategori/fanlar/kanal-tipi-fanlar')]) {
       expect(ld.url).toBe('https://x/tr/category/kanal-tipi-fanlar')
-      expect(ld.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
+      expect(ld.mainEntity.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
     }
   })
 
   it('AÇIK: sayfa yolu iki seviyeli kanonik, aile adresleri adresUret', () => {
     const ld = kategori(true, '/tr/kategori/fanlar/kanal-tipi-fanlar')
     expect(ld.url).toBe('https://x/tr/kategori/fanlar/kanal-tipi-fanlar')
-    expect(ld.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
+    expect(ld.mainEntity.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
   })
 
   it('seri: KAPALI bugünkü, AÇIK adresUret', () => {
     const seri = (bayrak?: boolean) =>
       buildSeriesLandingJsonLd({ lang: 'tr', baseUrl: 'https://x', seriesSlug: 'lineo', name: 'L', description: 'd', models: aileler, bayrak }) as {
         url: string
-        itemListElement: { url: string }[]
+        mainEntity: { itemListElement: { url: string }[] }
       }
     expect(seri().url).toBe('https://x/tr/products/lineo')
-    expect(seri().itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
+    expect(seri().mainEntity.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
     expect(seri(true).url).toBe('https://x/tr/urun/lineo')
-    expect(seri(true).itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
+    expect(seri(true).mainEntity.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
   })
 })
 

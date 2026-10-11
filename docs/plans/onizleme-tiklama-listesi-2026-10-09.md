@@ -15,7 +15,7 @@
 
 Biri tutmazsa yalnız o satırın numarasını OPS'a yaz. Başka bir şey yazmana gerek yok.
 
-## Liste (17 adres)
+## Liste (18 adres)
 
 | # | Bugün (canlı sitede) | 11 Ekim'den sonra | Ne görmelisin |
 |---|---|---|---|
@@ -36,6 +36,7 @@ Biri tutmazsa yalnız o satırın numarasını OPS'a yaz. Başka bir şey yazman
 | 15 | `/category/fanlar` | yeni kategori ağacındaki Fanlar adresi (#1352 sonrası yazılır) | **Bekliyor** (#1352). |
 | 16 | `/category/hava-perdeleri` | yeni kategori ağacındaki Hava perdeleri adresi | **Bekliyor** (#1352). |
 | 17 | `/category/hiz-kontrolu-cihazlari` | yeni kategori ağacındaki Hız kontrol cihazları adresi | **Bekliyor** (#1352). |
+| 18 | `/tr/products/storm-serisi?sku=SEA-61143003` | `/tr/urun/storm-serisi` | Storm serisi **ürün ailesi** sayfası açılır ve adres çubuğunda `?sku=` kalmaz. Aile sayfasında hangi modelin seçili geldiği **görünmez**: sorgu bilinçli düşer (model sayfaları Pazar'da kapalı). **Yalnız 3-C önizlemesinde** (URUN ölçümü, #1811); Cuma önizlemesinde bu adres aile sayfasını yönlendirmesiz çizer ve ön kontrol bu satırda KIRMIZI verir, beklenen budur. |
 
 ## İki şey Cuma'da belirsiz
 
@@ -43,6 +44,8 @@ Biri tutmazsa yalnız o satırın numarasını OPS'a yaz. Başka bir şey yazman
 2. **Satır 11-14 haritaya bağlı ve ürün ailesine gider.** Eski ürün adresleri, eski adresleri yeni adrese eşleyen bir harita dosyasıyla yönlenir. Harita depoda boştur (`src/lib/adres/haritaKaynagi.ts`); önizleme başlatıcısı (ALT-37c, `--adres` kipi) haritayı canlı veritabanından üretip yalnız önizleme ağacına bağlar. Harita girmezse bu dört satır yönlenmez; bu adres kuralının bozuk olduğu anlamına gelmez, harita girmemiştir. Hedef model sayfası değil **ürün ailesi** sayfasıdır: model sayfaları yalnız `src/config/yayindaModeller.veri.json` listesindeki modellerde açılır (karar 259, kısa pilot) ve bu liste bugün boştur. Bir model açılırsa o modelin eski adresi model sayfasına gider; makine taraması listeyi kendisi okuyup beklentisini ona göre kurar, bu belge elle yenilenir.
 
 Satır 1-9 yalnız rota dili tablosuna bağlıdır; harita ya da #1352 gerekmez.
+
+**Satır 18 (10 Ekim'de eklendi, OPS emri ALT-50).** Eski ürün adreslerinin `?sku=` ile gelen biçimi tek yönlendirmeyle ailenin sayfasına gider, `?sku=` düşer. URUN ölçtü (URN-85): `/tr/products/storm-serisi?sku=SEA-61143003` → tek 308 → `/tr/urun/storm-serisi`; küçük harfli sku aynı. Bu kural 3-C PR'ının (#1811) içindedir, Cuma önizlemesinde yoktur; satır yalnız 3-C dalının önizlemesinde sınanır.
 
 ## Makine de ölçüyor
 

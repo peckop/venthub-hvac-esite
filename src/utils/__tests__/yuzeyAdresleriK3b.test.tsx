@@ -80,11 +80,19 @@ describe('useLocalizedRoutes vekili — K3-b açık', () => {
     expect(result.current.brand('vortice')).toBe('/en/brands/vortice')
   })
 
-  it('vitrin nesnesi OLMAYAN rotalar değişmez (sepet, hesap, marka listesi)', () => {
+  it('vitrin nesnesi OLMAYAN rotalar değişmez (sepet, hesap)', () => {
     const { result } = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('tr') })
     expect(result.current.cart()).toBe('/tr/cart')
     expect(result.current.account.orders()).toBe('/tr/account/orders')
-    expect(result.current.brands()).toBe('/tr/brands')
+  })
+
+  // URN-85: marka LİSTESİ de açık şemanın parçası (Design CSV: TR `/tr/markalar`); EN yayın kapalıyken `/en/brands`
+  // aynen kalır (marka sayfaları `/en/brands/<slug>` zaten böyle).
+  it('marka LİSTESİ: TR `/tr/markalar`, EN `/en/brands`', () => {
+    const tr = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('tr') })
+    expect(tr.result.current.brands()).toBe('/tr/markalar')
+    const en = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('en') })
+    expect(en.result.current.brands()).toBe('/en/brands')
   })
 })
 

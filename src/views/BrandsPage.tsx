@@ -122,29 +122,20 @@ const BrandsPage: React.FC = () => {
                 {t('brands.trust.eyebrow')}
               </div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-8">
-                {t('brands.trust.title').split(' ').slice(0, 2).join(' ')} <br />
-                <span className="font-medium text-cyan-400 italic">
-                  {t('brands.trust.title').split(' ').slice(2).join(' ')}
-                </span>
+                {t('brands.trust.title').split(' ').slice(0, 2).join(' ')}
+                {/* Başlık iki sözcük ya da kısaysa ikinci parça yok: boş italik <span> ve gereksiz <br> basılmaz. */}
+                {t('brands.trust.title').split(' ').length > 2 && (
+                  <>
+                    {' '}<br />
+                    <span className="font-medium text-cyan-400 italic">
+                      {t('brands.trust.title').split(' ').slice(2).join(' ')}
+                    </span>
+                  </>
+                )}
               </h2>
               <p className="text-lg text-slate-400 font-light leading-relaxed mb-12 max-w-xl">
                 {t('brands.trust.description')}
               </p>
-              
-              <div className="grid grid-cols-2 gap-8">
-                <div className="border-l border-white/10 pl-6">
-                  <div className="text-3xl font-bold mb-1">{100}%</div>
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
-                    {t('brands.trust.original')}
-                  </div>
-                </div>
-                <div className="border-l border-white/10 pl-6">
-                  <div className="text-3xl font-bold mb-1">{t('brands.page.statGlobal')}</div>
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
-                    {t('brands.trust.standard')}
-                  </div>
-                </div>
-              </div>
             </div>
             
             <div className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden border border-white/5">

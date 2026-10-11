@@ -24,6 +24,8 @@
  * KATEGORİ SLUG'LARI DB'DEN ÖLÇÜLDÜ (2026-09-27, canlı): `frequency-converters`
  * (metadata.slug.tr = `frekans-konvertorleri`, aktif, 35 aktif ürün — hepsi Danfoss), üstü
  * `control-systems` (metadata.slug.tr = `kontrol-sistemleri`, aktif).
+ * 2026-10-10 (URN-85): üstün TR slug'ı Design CSV adına çekildi (`kontrol-ve-suruculer`,
+ * supabase/migrations/20261010090000_kategori_tr_adlari_design_csv.sql); `kok.tr` aşağıda buna uyar.
  */
 
 /**
@@ -33,7 +35,7 @@
 export const KALDIRILAN_MARKALAR = Object.freeze({
   'frekans-konvertoru': {
     tur: 'kategori',
-    kok: { tr: 'kontrol-sistemleri', en: 'control-systems' },
+    kok: { tr: 'kontrol-ve-suruculer', en: 'control-systems' },
     dal: { tr: 'frekans-konvertorleri', en: 'frequency-converters' },
   },
 })
@@ -67,8 +69,9 @@ export function k3bOku(kaynak) {
 export function markaHedefi(slug, dil, k3b) {
   const h = KALDIRILAN_MARKALAR[slug]
   if (!h) throw new Error(`markaYonlendirmeleri: bilinmeyen eski marka "${slug}"`)
-  // Marka LİSTESİ yeni şemada da `/<dil>/brands` (adresUret'te liste nesnesi yok; Routes.brands()).
-  if (h.tur === 'liste') return `/${dil}/brands`
+  // Marka LİSTESİ: kapalıyken `/<dil>/brands`; K3-b açıkken TR `/tr/markalar` (adresUret `{ tur: 'markalar' }`, URN-85),
+  // EN yerinde `/en/brands`. Liste kolu bugün hiçbir eski marka kullanmıyor; ileride kullanılırsa hedef doğru olsun.
+  if (h.tur === 'liste') return k3b && dil === 'tr' ? '/tr/markalar' : `/${dil}/brands`
   return k3b
     ? `/${dil}/${KATEGORI_BOLUMU[dil]}/${h.kok[dil]}/${h.dal[dil]}`
     : `/${dil}/category/${h.dal[dil]}`

@@ -33,6 +33,8 @@ export interface AdresRotalari {
   product: (slug: string, sku?: string) => Route
   products: (params?: { brand?: string; limit?: number }) => Route
   brand: (slug: string) => Route
+  /** Marka LİSTESİ (URN-85): kapalıyken `/<dil>/brands`, açıkken TR `/tr/markalar` · EN `/en/brands`. */
+  brands: () => Route
 }
 
 /**
@@ -55,6 +57,7 @@ export function adresRotalari(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B
       product: (slug, sku) => localizedHref(Routes.product(slug, sku), dil),
       products: (params) => localizedHref(Routes.products(params), dil),
       brand: (slug) => localizedHref(Routes.brand(slug), dil),
+      brands: () => localizedHref(Routes.brands(), dil),
     }
   }
   return {
@@ -77,6 +80,7 @@ export function adresRotalari(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B
       return (i < 0 ? temel : `${temel}${bugunku.slice(i)}`) as Route
     },
     brand: (slug) => adresUret({ tur: 'marka', slug }, dil, true),
+    brands: () => adresUret({ tur: 'markalar' }, dil, true),
   }
 }
 

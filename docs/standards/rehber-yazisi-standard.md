@@ -351,6 +351,9 @@ v0.4'ten beri "URUN'un sayfa işi" diye yazılıydı ama emre bağlanmamıştı 
    either JobPosting or BroadcastEvent embedded in a VideoObject."*
    (developers.google.com/search/apis/indexing-api/v3/quickstart, ham HTML, "Last updated 2026-07-16",
    erişim 2026-09-24). Yazılar site haritası + tazeleme ile duyurulur.
+10. **Şirket iddiası ve reklam dili yok** (HRT-46): yazıda firma, kurum, ekip, kuruluş yılı, referans ya da "biz"
+    dili ve reklam dili kullanılmaz; tek istisna marka adı VentHub'dır. Aynı kural sözlük metni için
+    `i18n-localization-standard.md` §4'te de yazılıdır.
 
 ## R5 — Doğrulama (ajanlarda)
 

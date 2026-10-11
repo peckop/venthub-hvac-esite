@@ -119,8 +119,9 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
       expect(yollar).toContain('/tr/kategori/hava-perdeleri')
       expect(yollar).toContain('/tr/markalar/vortice')
       expect(yollar).toContain('/tr/urun/vortice-lineo-quiet')
-      // Marka LİSTESİ iki şemada da /brands (markalar/page.tsx yok); statikler dokunulmaz.
-      expect(yollar).toContain('/tr/brands')
+      // Marka LİSTESİ açık şemada TR `/tr/markalar` (URN-85, Design CSV satır: markalar); eski `/tr/brands` kalmaz.
+      expect(yollar).toContain('/tr/markalar')
+      expect(yollar).not.toContain('/tr/brands')
       expect(yollar).toContain('/tr/contact')
     })
 
