@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 'use strict';
 /**
- * PR kayıt kapısı (karar 187, REC-433): her birleşen PR bir Linear kaydına bağlanır.
+ * PR kayıt kapısı (karar 187, REC-433; Kanban geçişi karar 219/220, ARC-2): her birleşen PR bir iş kaydına bağlanır.
  *
- * Kabul edilen üç yol:
- *   1. `Fixes REC-nn` (Closes/Resolves de Linear'ın sihirli kelimesi): PR kendi kaydını kapatır.
- *   2. `Kayıtsız: <sebep>`: bilerek kayıtsız; sebep zorunlu, istisna SAYILIR (etiket + özet).
+ * Kabul edilen dört yol:
+ *   0. `Kanban: <ÖN EK>-<sayı>` (ASIL, süresiz): ör. `Kanban: ARC-3`, `Kanban: ARC-3, HRT-12`; Linear'dan taşınan kayıt
+ *      için `Kanban: REC-554`. Ön ek 2-4 BÜYÜK harf ve koda gömülü liste YOK (yeni departman kapıyı kırmaz).
+ *   1. `Fixes REC-nn` (Closes/Resolves de Linear'ın sihirli kelimesi): PR kendi kaydını kapatır. ESKİ YOL.
+ *   2. `Kayıtsız: <sebep>`: bilerek kayıtsız; sebep zorunlu, istisna SAYILIR (etiket + özet). ESKİ YOL.
  *   3. Bağımlılık botu PR'ı (dependabot/renovate): gövdeye satır yazamaz; SAYILIR.
+ * Eski iki yol (1, 2) ESKI_YOL_SON_GUN (2026-10-08) dahil kabul, ertesi gün tür=eski-yol-suresi-doldu ile KIRMIZI.
  * `Part of REC-nn` tek başına YETMEZ (kapatmayan kelime kaydı görünmez bırakır). Linear kayıt
  * sınırı (250) doluyken tek geçici istisna: `Kayıtsız: Linear sınırı dolu, Part of REC-nn`
  * kabul edilir ve ayrı sayılır.
@@ -21,6 +24,14 @@
 
 const KAPATAN_KELIME = '(?:fixes|closes|resolves)';
 const KAYIT_KALIBI = 'REC-\\d+';
+/**
+ * Kanban numarası (karar 219/220): `<ÖN EK>-<sayı>`, ön ek 2-4 BÜYÜK HARF (ARC, HRT, URN, OPS, ...).
+ * Departman listesi KODA GÖMÜLMEZ: yeni departman ön eki kapıyı kırmasın. Taşınan Linear kaydı
+ * (`REC-554`) aynı kalıba uyar ve korunur. Küçük harf (`arc-3`) KABUL EDİLMEZ: numara büyük harfle yazılır.
+ */
+const KANBAN_NO_KALIBI = '[A-Z]{2,4}-\\d+';
+/** Eski iki yol (`Fixes REC-nn`, `Kayıtsız:`) bu günün SONUNA kadar kabul; sonrası yalnız `Kanban:` (Ops, 10-01). */
+const ESKI_YOL_SON_GUN = '2026-10-08';
 const BOT_YAZARLAR = new Set(['dependabot[bot]', 'renovate[bot]']);
 const MIN_SEBEP_UZUNLUGU = 8;
 
@@ -47,6 +58,40 @@ function fixesKayitlari(temiz) {
   return [...kayitlar];
 }
 
+/** `Kanban: ARC-3` · `Kanban: ARC-3, HRT-12` · `Kanban: REC-554`. Numara BÜYÜK harf; kelime büyük/küçük serbest. */
+function kanbanNumaralari(temiz) {
+  const numaralar = new Set();
+  const satirKalibi = new RegExp(
+    `^[ \\t>*_-]*[Kk][Aa][Nn][Bb][Aa][Nn][ \\t]*:[ \\t]*((?:${KANBAN_NO_KALIBI})(?:[ \\t]*(?:,|ve|and|&)?[ \\t]*${KANBAN_NO_KALIBI})*)(?![A-Za-z0-9])`,
+    'gm',
+  );
+  let e;
+  while ((e = satirKalibi.exec(temiz)) !== null) {
+    for (const n of e[1].match(new RegExp(KANBAN_NO_KALIBI, 'g')) || []) numaralar.add(n);
+  }
+  return [...numaralar];
+}
+
+/**
+ * Eski iki yolun süresi doldu mu? `bugun` verilirse ('YYYY-MM-DD' ya da Date) onu, verilmezse UTC bugünü kullanır
+ * (testler saati verir; kapı gerçek tarihle koşar). ESKI_YOL_SON_GUN dahil kabul, ertesi gün red.
+ */
+function eskiYolDoldu(bugun) {
+  let gun;
+  if (typeof bugun === 'string' && /^\d{4}-\d{2}-\d{2}/.test(bugun)) gun = bugun.slice(0, 10);
+  else gun = (bugun instanceof Date ? bugun : new Date()).toISOString().slice(0, 10);
+  return gun > ESKI_YOL_SON_GUN;
+}
+
+function eskiYolReddi(yol) {
+  return {
+    gecti: false,
+    tur: 'eski-yol-suresi-doldu',
+    kayitlar: [],
+    sebep: `\`${yol}\` yolu ${ESKI_YOL_SON_GUN} tarihinde bitti: PR gövdesine \`Kanban: <ÖN EK>-<sayı>\` (ör. \`Kanban: ARC-3\`) ya da taşınan kayıt için \`Kanban: REC-nn\` yaz`,
+  };
+}
+
 function kayitsizSebebi(temiz) {
   const m = /^[ \t>*_-]*kay[ıi]ts[ıi]z[ \t]*:[ \t]*(\S[^\n]*)$/im.exec(temiz);
   return m ? m[1].trim() : null;
@@ -63,12 +108,20 @@ function degerlendir(girdi) {
     return { gecti: true, tur: 'bot', kayitlar: [], sebep: `bağımlılık botu (${yazar}) gövdeye satır yazamaz; sayılır` };
   }
   const temiz = govdeyiTemizle(girdi && girdi.govde);
+  // Kanban numarası ASIL yol (karar 219): süresiz kabul. Eski iki yoldan önce bakılır; ikisi birlikte yazılmışsa Kanban kazanır.
+  const kanban = kanbanNumaralari(temiz);
+  if (kanban.length > 0) {
+    return { gecti: true, tur: 'kanban', kayitlar: kanban, sebep: `Kanban ${kanban.join(', ')}` };
+  }
+  const eskiYolSuresiDolduMu = eskiYolDoldu(girdi && girdi.bugun);
   const fixes = fixesKayitlari(temiz);
   if (fixes.length > 0) {
-    return { gecti: true, tur: 'fixes', kayitlar: fixes, sebep: `Fixes ${fixes.join(', ')}` };
+    if (eskiYolSuresiDolduMu) return eskiYolReddi('Fixes REC-nn');
+    return { gecti: true, tur: 'fixes', kayitlar: fixes, sebep: `Fixes ${fixes.join(', ')} (eski yol; ${ESKI_YOL_SON_GUN} sonrası kabul edilmez)` };
   }
   const sebep = kayitsizSebebi(temiz);
   if (sebep !== null) {
+    if (eskiYolSuresiDolduMu) return eskiYolReddi('Kayıtsız:');
     if (sebep.length < MIN_SEBEP_UZUNLUGU) {
       return {
         gecti: false,
@@ -93,14 +146,14 @@ function degerlendir(girdi) {
       gecti: false,
       tur: 'sadece-part-of',
       kayitlar: [],
-      sebep: '"Part of REC-nn" tek başına yetmez: kayıt görünmez kalır. Kendi kaydını `Fixes REC-nn` ile kapat ya da `Kayıtsız: <sebep>` yaz',
+      sebep: '"Part of REC-nn" tek başına yetmez: kayıt görünmez kalır. PR gövdesine `Kanban: <ÖN EK>-<sayı>` yaz (ya da kendi kaydını `Fixes REC-nn` ile kapat / `Kayıtsız: <sebep>`)',
     };
   }
   return {
     gecti: false,
     tur: 'yok',
     kayitlar: [],
-    sebep: 'PR gövdesinde `Fixes REC-nn` ya da `Kayıtsız: <sebep>` satırı yok',
+    sebep: 'PR gövdesinde `Kanban: <ÖN EK>-<sayı>` (ör. `Kanban: ARC-3`; taşınan kayıt `Kanban: REC-nn`) satırı yok; eski yol `Fixes REC-nn` / `Kayıtsız: <sebep>` yalnız ' + ESKI_YOL_SON_GUN + ' tarihine kadar',
   };
 }
 
@@ -163,7 +216,7 @@ function linearGetirici(anahtar, fetchFn) {
   };
 }
 
-module.exports = { degerlendir, catiKontrolu, linearGetirici, govdeyiTemizle, fixesKayitlari, kayitsizSebebi, BOT_YAZARLAR };
+module.exports = { degerlendir, catiKontrolu, linearGetirici, govdeyiTemizle, fixesKayitlari, kanbanNumaralari, kayitsizSebebi, eskiYolDoldu, BOT_YAZARLAR, ESKI_YOL_SON_GUN };
 
 // CLI: CI iş akışı ortamdan okur (govde enjeksiyona karşı env üzerinden gelir, komut satırına GÖMÜLMEZ).
 if (require.main === module) {
@@ -171,7 +224,8 @@ if (require.main === module) {
     const fs = require('node:fs');
     const yazar = process.env.PR_YAZAR || '';
     const govde = process.env.PR_GOVDE || '';
-    const s = degerlendir({ govde, yazar });
+    // PR_BUGUN yalnız testler içindir (eski yol tarih sınırını sabitlemek); CI'da tanımsız, gerçek tarih geçerli.
+    const s = degerlendir({ govde, yazar, bugun: process.env.PR_BUGUN || undefined });
     const cati = s.gecti && s.tur === 'fixes'
       ? await catiKontrolu(s.kayitlar, linearGetirici(process.env.LINEAR_API_KEY))
       : { durum: 'temiz', cati: [], aciklama: '' };
@@ -188,6 +242,9 @@ if (require.main === module) {
       fs.appendFileSync(process.env.GITHUB_OUTPUT, `tur=${s.tur}\ngecti=${s.gecti}\ncati=${cati.durum}\n`);
     }
     if (cati.durum === 'uyari') console.log(`::warning title=Çatı kaydı::${cati.aciklama}`);
+    if (s.gecti && ['fixes', 'kayitsiz', 'kayitsiz-linear-siniri'].includes(s.tur)) {
+      console.log(`::warning title=Eski kayıt yolu::Bu PR eski yolla (${s.tur}) geçti; ${ESKI_YOL_SON_GUN} sonrası kabul edilmez. Gövdeye \`Kanban: <ÖN EK>-<sayı>\` yaz`);
+    }
     if (!s.gecti) {
       console.log(`::error title=PR kayıt kapısı::${s.sebep}`);
       process.exit(1);

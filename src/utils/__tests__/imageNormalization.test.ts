@@ -3,7 +3,8 @@ import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest'
 import { normalizeImageUrl } from '../imageUtils'
 
 describe('normalizeImageUrl', () => {
-  const defaultFallback = '/images/vortice_lineo_futuristic.webp'
+  // URN-57: varsayılan yedek ürün içermeyen nötr yer tutucudur (eskiden başka markanın fan fotoğrafı).
+  const defaultFallback = '/images/urun-gorseli-yok.svg'
 
   beforeEach(() => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test-supabase.co')

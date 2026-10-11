@@ -199,7 +199,26 @@ describe('orderStatusService', () => {
      * Bu iki test davranışsaldır (gerçek çağrının argümanını ölçer); haritayı okuyan
      * statik bir iddia, yeniden adlandırma veya yeni bir dal eklenmesini göremezdi.
      */
-    it.each(['received', 'cancelled', 'approved', 'rejected'])('should NOT write payment_status for %s (no money moved)', async (returnStatus) => {
+    /**
+     * ALT-4 — iade ONAYI siparişe hiç yazmaz.
+     *
+     * Eskiden `approved` → `status: 'processing'` yazılıyordu ve kaynak duruma bakılmıyordu:
+     * teslim edilmiş sipariş "hazırlanıyor"a geri gidiyordu. Fonksiyon siparişin mevcut
+     * durumunu okumadığı için "önce/sonra eşit" iddiasının davranışsal karşılığı şudur:
+     * `venthub_orders`a HİÇ dokunulmaz — siparişin dokuz durumundan hangisinde olursa olsun.
+     */
+    it('iade onayı (approved) siparişin durumunu DEĞİŞTİRMEZ — siparişe hiç yazılmaz', async () => {
+      const mockUpdate = vi.fn()
+      ;(supabase.from as import("vitest").Mock).mockImplementation(() => ({ update: mockUpdate }))
+
+      const result = await syncOrderFromReturn('order-1', 'approved')
+
+      expect(result.ok).toBe(true)
+      expect(supabase.from).not.toHaveBeenCalled()
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it.each(['received', 'cancelled', 'rejected'])('should NOT write payment_status for %s (no money moved)', async (returnStatus) => {
       const mockEq = vi.fn().mockResolvedValue({ error: null })
       const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
       ;(supabase.from as import("vitest").Mock).mockImplementation((table: string) =>
@@ -241,7 +260,7 @@ describe('orderStatusService', () => {
       })
       ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
 
-      const result = await syncOrderFromReturn('order-1', 'approved')
+      const result = await syncOrderFromReturn('order-1', 'received')
 
       expect(result.ok).toBe(false)
       expect(result.error).toBe('Update failed')

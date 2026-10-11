@@ -9,6 +9,12 @@
  *   pasif dal, pasif üst: inline-duct-fans (residential), rectangular-duct-fans (commercial) → /tr/urunler
  * Kimlikler kısaltıldı (ilk 8 hane) — çözücü kimliği yalnız üst bağlantısı için kullanır.
  * Veri değişirse (Faz 1-B ağaç göçü: 4 yeni dal, Casals) bu fikstür yeniden ölçülür.
+ *
+ * OPS-51 (2026-10-04) — ⚠ `shelter-ventilation` bu fikstürde KÖK (parent null): canlıda hâlâ fans'ın altında
+ * (level 1, ÖLÇÜLDÜ 2026-10-04); `supabase/migrations/20261004120000_casals_flexiva_markalari_siginak_kok.sql`
+ * uygulanınca 7. kök olur. Yani bu satır "migration sonrası beklenen" durumdur, canlı ölçüm değil; migration
+ * uygulandıktan sonra `select slug, parent_id from categories where slug='shelter-ventilation'` ile doğrulanır.
+ * Aktif kök 7, aktif dal 17 (toplam satır 31 aynı).
  */
 export interface FiksturKategori {
   id: string
@@ -43,8 +49,9 @@ export const KATEGORI_AGACI: readonly FiksturKategori[] = [
   k('bae47d92', 'jet-fans', 'otopark-jet-fanlari', false, FANS),
   k('c8d10f94', 'parking-jet-fan', 'otopark-jet-fan', false, FANS),
   k('88d9ac92', 'rectangular-duct-fans', 'dikdortgen-kanal-fanlari', false, COMMERCIAL),
-  // aktif kök (6)
+  // aktif kök (7) — shelter-ventilation OPS-51 ile (migration 20261004120000) fans'tan alınıp KÖK yapıldı
   k(ACCESSORIES, 'accessories', 'aksesuarlar', true, null),
+  k('076c6aa8', 'shelter-ventilation', 'siginak-havalandirma', true, null),
   k('f4ef8c4b', 'air-curtains', 'hava-perdeleri', true, null),
   k(AIR_TREATMENT, 'air-treatment', 'iklimlendirme-ve-hava-sartlandirma', true, null),
   k(CONTROL, 'control-systems', 'kontrol-sistemleri', true, null),
@@ -63,7 +70,6 @@ export const KATEGORI_AGACI: readonly FiksturKategori[] = [
   k('194adcb5', 'frequency-converters', 'frekans-konvertorleri', true, CONTROL),
   k('14c8c3fe', 'industrial-ceiling-fans', 'endustriyel-tavan-vantilatorleri', true, FANS),
   k('619025cb', 'roof-fans', 'cati-tipi-fanlar', true, FANS),
-  k('076c6aa8', 'shelter-ventilation', 'siginak-havalandirma', true, FANS),
   k('5e663aae', 'single-room-hrv', 'tekil-oda-uniteleri', true, HRV),
   k('9f4fc010', 'smoke-exhaust-fans', 'duman-egzoz-fanlari', true, FANS),
   k('1a87e18b', 'spare-parts-sensors', 'yedek-parca-ve-sensorler', true, ACCESSORIES),

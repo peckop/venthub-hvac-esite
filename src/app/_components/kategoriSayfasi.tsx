@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import React, { cache } from 'react'
+import { cache } from 'react'
 
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import { en } from '@/i18n/dictionaries/en'
@@ -9,24 +9,32 @@ import { getDictValue } from '@/i18n/getDictValue'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
 import type { KategoriUst } from '@/lib/data/preload'
+import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
+import {
+  getCategoryDescription,
+  getCategoryDisplayName,
+  getCategorySeoDescription,
+  getCategorySeoTitle,
+  getLocalizedCategorySlug,
+} from '@/utils/categoryHelpers'
 
 import { SITE_URL } from '../../config/siteUrl'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
 import type { DomainCategory } from '../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
-import type { FamilyListItem } from '../../types/ui-models'
+import type { FamilyListItem, KatalogSayilari } from '../../types/ui-models'
 import { kategoriMetniniIndir } from '../../utils/categoryHelpers'
 import { aileMetniniIndir } from '../../utils/dilMetni'
 import { DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 import PageComponent from '../../views/CategoryPage'
 import IlgiliRehberler from '../../views/knowledge/IlgiliRehberler'
+import { getCachedMarkaKatalogOzeti, markaKatalogSayilari } from './markaSayfasi'
 
 /**
  * KATEGORİ SAYFASI — üst veri + gövde, İKİ rotanın ortak çekirdeği (REC-300 Faz 3b-2).
@@ -117,6 +125,26 @@ const _getCachedSupabaseData = cache((id: string) => {
   return supabase.from('categories').select('*').eq('id', id).single()
 })
 
+/**
+ * Vortice marka adı (URN-95): marka sayfasının özetiyle AYNI önbellek girdisi (`getCachedMarkaKatalogOzeti`,
+ * anahtar `lang` + `tenantId` + marka adı); ayrı bir önbellek biçimi açılmaz. Etiketler `PRODUCTS_DISCOVERY_TAG` +
+ * kiracı etiketidir, yani aile/model eklenince hava perdesi ve sessiz fan sayaç kartları kendiliğinden tazelenir.
+ */
+const VORTICE_MARKA_ADI = 'Vortice'
+
+/**
+ * Vortice sayaç kartlarının sayıları (URN-95). Özet OKUNAMAZSA kategori sayfası yine çizilir, kartlar çizilmez
+ * (uyarı basılır): sayaç isteğe bağlı bir süstür, sayfayı kırmaz; hata önbelleğe yazılmaz, sonraki yenilemede döner.
+ */
+async function vorticeKatalogSayilari(lang: string, tenantId: string): Promise<KatalogSayilari | null> {
+  try {
+    return markaKatalogSayilari(await getCachedMarkaKatalogOzeti(lang, tenantId, VORTICE_MARKA_ADI))
+  } catch (hata) {
+    console.warn('[kategoriSayfasi] Vortice katalog özeti okunamadı; sayaç kartları çizilmiyor', hata)
+    return null
+  }
+}
+
 /** Başlık + açıklama — iki kipin ortak metni (sözlükten; RSC olduğumuz için `t` elle kurulur). */
 function kategoriMetinleri(lang: string, category: DomainCategory) {
   // SSOT: kategori adı DAİMA getCategoryDisplayName üzerinden çözülür
@@ -126,10 +154,22 @@ function kategoriMetinleri(lang: string, category: DomainCategory) {
   const t = (key: string) => getDictValue(dict, key)
   const displayName = getCategoryDisplayName(category, t)
 
-  const desc = lang === 'en'
-    ? `Explore the highest quality and most economical ventilation products in the ${displayName} category.`
-    : `${displayName} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
-  return { displayName, desc }
+  // URN-91 alt iş 1 (KTL-21): arama sonucu başlığı ve açıklaması kategorinin `seo_title` / `seo_desc` kaydından gelir
+  // (TR sütun, EN `metadata.seo_*_en`; yuva kararı `getCategorySeoTitle` yorumunda). Kayıt yoksa BUGÜNKÜ davranış:
+  // başlık = görünen kategori adı, açıklama = aşağıdaki zincir. Görünür H1 ve sayfa gövdesi DEĞİŞMEZ — `seo_title`
+  // yalnız `<title>` ve og:title'a gider. Site eki " | VentHub" HER ZAMAN koda aittir: kayda yanlışlıkla yazılmış
+  // ek çift basılmaz.
+  const seoBaslik = getCategorySeoTitle(category, lang).replace(/\s*\|\s*VentHub\s*$/i, '').trim()
+  const baslik = `${seoBaslik || displayName} | VentHub`
+
+  // REC-497: şablon ("en kaliteli ve ekonomik…") KALKTI. Canlı kapı 2026-10-02: 24 kategori sayfası
+  // aynı kalıpla bitiyordu ve "en kaliteli/ekonomik" sitede doğrulanamayan bir iddiaydı. Açıklama
+  // önce `seo_desc` kaydından, yoksa kategorinin KENDİ metninden (metadata.description_i18n, dile göre)
+  // türer; hiçbiri yoksa (pasif kategori) sözlükteki yedek cümle. İkisi de tek kırpıcıdan geçer.
+  const kendiMetni =
+    aciklamaKirp(getCategorySeoDescription(category, lang)) || aciklamaKirp(getCategoryDescription(category, lang))
+  const desc = kendiMetni || aciklamaKirp(t('category.seoYedekAciklama').replace('{{ad}}', displayName))
+  return { displayName, baslik, desc }
 }
 
 /** Kategori bulunamadığında üst veri (sayfa 404/308 verir; başlık yine dili bilir). */
@@ -144,7 +184,7 @@ export function kategoriBulunamadiUstVerisi(lang: string): Metadata {
  * Adresler bugünkü şemada (`/tr/category/<slug>` tek seviye).
  */
 export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory): Metadata {
-  const { displayName, desc } = kategoriMetinleri(lang, category)
+  const { baslik, desc } = kategoriMetinleri(lang, category)
 
   // hreflang: her dil kendi görünen slug'ıyla bildirilir; x-default = TR.
   const trUrl = `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
@@ -153,7 +193,7 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
   const pasif = pasifKategoriRobots(category)
 
   return {
-    title: `${displayName} | VentHub`,
+    title: baslik,
     description: desc,
     // O4 (REC-300): pasif (`is_active === false`) kategori sayfası 200 KALIR (bağlantı kırılmasın)
     // ama dizine girmez; aktif kategoride `robots` alanı YAZILMAZ (bugünkü). Sitemap zaten dışında.
@@ -170,7 +210,7 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
       }),
     },
     openGraph: {
-      title: `${displayName} | VentHub`,
+      title: baslik,
       description: desc,
       url: canonicalUrl,
       siteName: 'VentHub',
@@ -196,14 +236,14 @@ export function kategoriSayfasiUstVerisiK3b(
   category: DomainCategory,
   ust: KategoriUst | null,
 ): Metadata {
-  const { displayName, desc } = kategoriMetinleri(lang, category)
+  const { baslik, desc } = kategoriMetinleri(lang, category)
   const trYol = kategoriKanonikAdresi(category, ust, 'tr')
   const enYol = kategoriKanonikAdresi(category, ust, 'en')
   const m = sayfaUstVerisi({
     lang,
     yol: lang === 'en' ? enYol : trYol,
     dilYollari: { tr: trYol, en: enYol },
-    baslik: `${displayName} | VentHub`,
+    baslik,
     aciklama: desc,
   })
   const pasif = pasifKategoriRobots(category)
@@ -248,6 +288,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
   let families: FamilyListItem[] = []
   let total = 0
   let subCategories: DomainCategory[] = []
+  let vorticeSayilari: KatalogSayilari | null = null
 
   if (category) {
     // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59). Eskiden `(await getTenantConfig()).id`
@@ -310,6 +351,13 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
     // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
     families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
     total = familiesPage.total
+
+    // URN-95: Vortice anlatısı yalnız hava perdesi kategorisinde ve Vortice ailesi listeleyen sayfada çizilebilir
+    // (sessiz fan serisi tetikleyicisi istemcide, `CategoryLandingView`). Diğer kategorilerde özet hiç okunmaz.
+    const vorticeGerekli =
+      category.slug === 'air-curtains' ||
+      families.some((f) => (f.brand_name ?? '').toLocaleLowerCase('en-US') === VORTICE_MARKA_ADI.toLocaleLowerCase('en-US'))
+    if (vorticeGerekli) vorticeSayilari = await vorticeKatalogSayilari(lang, tenantId)
   }
 
   // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
@@ -337,17 +385,22 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
-        {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
-        <PageComponent
-          initialCategory={kategoriMetniniIndir(category, lang)}
-          families={families}
-          total={total}
-          page={page}
-          pageSize={PAGE_SIZE}
-          initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
-        />
-      </React.Suspense>
+      {/* ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Buradaki kök sınır TÜM gövdeyi
+          ham HTML'de gizli akış bloğuna (`<div hidden id="S:0">`) itiyordu: h1 ve liste JS'siz
+          görünmüyordu. Sebep iki kollu: sardığı içerik askıya alınırsa (`next/dynamic` görünümleri)
+          YA DA büyükse (Fizz, ~12800 bayt üstünü tamamlanmış olsa bile dışarı yazar) — yani BÜYÜK
+          GÖVDEYİ SARAN HER Suspense aynı sonucu verir. `useSearchParams` okuyan tek uç (Pagination)
+          CategoryMasterView içinde kendi sınırıyla sarılıdır. Kapı: INV-SSR-GOVDE-2. */}
+      {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
+      <PageComponent
+        initialCategory={kategoriMetniniIndir(category, lang)}
+        families={families}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
+        vorticeKatalogSayilari={vorticeSayilari}
+      />
       {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
           slug'dır (`vh:kategori/<categories.slug>`); yazı yoksa blok basılmaz. Veri kod sabiti
           (yazilar.ts) → derlemeyle tazelenir, DB tetiği gerekmez (rendering-cache-standard). */}

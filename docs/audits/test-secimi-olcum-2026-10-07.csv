@@ -1,0 +1,354 @@
+bolum,kimlik,tur,baslik,degisen_dosya,secilen_dosya,toplam_dosya,secilen_test,toplam_test,test_yuzde,ci_sure_yuzde,belirsiz_dosya,tam,sonuc,aciklama
+pr,1724,belge,TASARIM (TSR-3): plan v2.2 F4 ve B10/B11 adres eşlemesi CSV'ye göre düzeltildi —,1,44,624,737,7571,9.7,11.4,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1714,belge,TASARIM (TSR-10): plan v2.2 §2.1 açılış PR'ı kontrol listesi — yalnız belge,1,44,624,737,7571,9.7,11.4,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1710,belge,HARİTA (HRT-33): karar 287/288 belgelere işlendi (korozyon ve radyal dal adı),2,47,624,837,7571,11.1,11.9,41,0,SECIM,2 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1706,belge,TASARIM (OPS-53): plan v2.2 ARAMA 11 Ekim sonrasına alındı (URN-47) — yalnız bel,1,44,624,737,7571,9.7,11.4,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1700,belge,TASARIM (OPS-53): token köprüsü planı v2.1 + v2.2 (karar 271 tam kapsam) — yalnı,3,44,624,737,7571,9.7,11.4,41,0,SECIM,3 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1679,belge,HARİTA (REC-530): hafıza şartnamesi v0.9 — künye (tarih + kaynak) ve durum dosya,2,48,624,845,7571,11.2,12,41,0,SECIM,2 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1677,belge,OPS (karar 280): kartsız beklenti kapısı Stop kancası olarak bağlandı,1,58,624,1033,7571,13.6,20.8,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1667,belge,YETENEK (YTN-12): wrongstack-kanban önce-ara iki arama + kullanılmayan yetenekle,2,58,624,951,7571,12.6,14.7,41,0,SECIM,2 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1655,belge,HARİTA (HRT-21): cetvel §10.3 salt-okuma çalışan ad verilmeden açılır,1,50,624,855,7571,11.3,12.2,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1654,belge,HARİTA (HRT-22): erişim envanteri Bing Webmaster satırı tazelendi,1,45,624,813,7571,10.7,11.7,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1653,belge,HARİTA (HRT-17): erişim envanteri IndexNow satırına kapatma notu,1,45,624,813,7571,10.7,11.7,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1648,belge,"GEO-SEO (SEO-1, SEO-2): dizin sistemleri cetveli, dizin görünürlüğü ölçümü ve RE",6,52,624,902,7571,11.9,12.9,41,0,SECIM,6 değişen dosya; 0 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1736,diger,"URUN (URN-53, madde 7): içerik hattı ve yükleme betik verisi yeni aile slug'ına",9,50,624,792,7571,10.5,12.2,41,0,SECIM,9 değişen dosya; 1 tanesi test dosyası | vitest related (7 dosya için): 0 yeni test
+pr,1731,diger,URUN (REC-300): catalog-integrity tabanı #1352 sonrası güncellendi,1,50,624,837,7571,11.1,12.3,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1718,diger,"URUN (OPS-51): catalog-integrity tabanı (Sığınak yapraksız kök, 2 bayat satır) +",3,54,624,870,7571,11.5,12.7,41,0,SECIM,3 değişen dosya; 0 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1649,diger,GEO-SEO (SEO-10): bilinen listesinden kapalı kayda bağlı YETIM satırı silindi (c,1,49,624,840,7571,11.1,12.1,41,0,SECIM,1 değişen dosya; 0 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1646,diger,GEO-SEO (SEO-6): llms.txt bugünkü gerçeğe getirildi + canlı kapıya LLMS-SAYFA/LL,3,53,624,998,7571,13.2,12.7,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1735,kod,"URUN (URN-53, madde 5): SESSIZ_FAN_SERILERI yalnız yeni slug, AST kapısı ve görü",3,133,624,1470,7571,19.4,21.4,41,0,SECIM,3 değişen dosya; 2 tanesi test dosyası | vitest related (1 dosya için): 5 yeni test
+pr,1733,kod,"URUN (URN-53, madde 4): rehberler yeni aile slug'ını anar, eskiAileSluglari köpr",8,624,624,7571,7571,100,100,0,1,TAM,src/lib/bilgiMerkezi/eskiAileSluglari.ts: silinmiş/taşınmış kod dosyası (içe aktaran testi grafikte görünmez)
+pr,1732,kod,"URUN (URN-53, madde 3): eski-adres-tohum.json Lineo çap aile hedefleri yeni slug",7,129,624,1507,7571,19.9,22,41,0,SECIM,7 değişen dosya; 4 tanesi test dosyası | vitest related (3 dosya için): 8 yeni test
+pr,1727,kod,ALTYAPI (ALT-33): ön bilgilendirme EN adı Design CSV hedefine çevrildi,3,220,624,2666,7571,35.2,32.4,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 103 yeni test
+pr,1726,kod,"URUN (URN-55): dil karışık eski kategori adresi öbür dilde de aranır, tek 308 il",2,134,624,1543,7571,20.4,21.4,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 14 yeni test
+pr,1723,kod,ALTYAPI (ALT-33): karar 293 A — yasal sayfalar legal→yasal ve iade-degisim→yasal,5,221,624,2678,7571,35.4,32.5,41,0,SECIM,5 değişen dosya; 3 tanesi test dosyası | vitest related (1 dosya için): 101 yeni test
+pr,1716,kod,ALTYAPI (ALT-16): products webhook — yayındaki model sayfası yolu da tazelensin,4,132,624,1479,7571,19.5,21.6,41,0,SECIM,4 değişen dosya; 2 tanesi test dosyası | vitest related (1 dosya için): 3 yeni test
+pr,1715,kod,URUN (URN-38): model sayfasında veri yoksa 200 boş sayfa yerine hata,2,133,624,1476,7571,19.5,21.2,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 5 yeni test
+pr,1713,kod,HARİTA (HRT-32): ÜRÜN kartına ve haritaya arama sonuç sayfası sahipliği,5,123,624,1513,7571,20,23.9,41,0,SECIM,5 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1709,kod,ALTYAPI (ALT-32): braces GHSA-vfj7-8cjw-p6xm — §7 kabul kaydı (düzeltme sürümü y,2,121,624,1383,7571,18.3,20.3,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1707,kod,ALTYAPI (ALT-30): INV-PALET-1 4. kol — DS takma adı serbest,2,121,624,1395,7571,18.4,20.3,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1705,kod,HARİTA (HRT-31): durum dosyasına standart 'Yarım iş: yok|var' satırı + TASARIM k,36,124,624,1522,7571,20.1,24,41,0,SECIM,36 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1704,kod,ALTYAPI (ALT-15 devamı): siteUrl.ts stripTrailingSlash doğrusal döngü + test,2,157,624,1821,7571,24.1,24.6,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 41 yeni test
+pr,1703,kod,"URUN (URN-31): yayındaki modeller listesi mekanizması (boş liste, kapalı kipte s",37,234,624,2655,7571,35.1,34.2,41,0,SECIM,37 değişen dosya; 19 tanesi test dosyası | vitest related (17 dosya için): 81 yeni test
+pr,1702,kod,ARAÇ (ARC-31 madde 2): pencere dosyasına compact hazırlık verisi (durum dosyası ,3,123,624,1633,7571,21.6,22.3,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1699,kod,HARİTA (HRT-28): kanban_disa_aktar.py --tam (kart açıklaması ve notları; izleneb,2,118,624,1290,7571,17,19.8,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1698,kod,ALTYAPI (OPS-52 PR-C1 + ALT-14): adres üretimi rota dili tablosuna bağlandı (kap,9,227,624,2609,7571,34.5,32.9,41,0,SECIM,9 değişen dosya; 2 tanesi test dosyası | vitest related (7 dosya için): 102 yeni test
+pr,1693,kod,"ARAÇ (ARC-60): migration dosyası sorusu yalnız yeni dosyada, uygulanmış migratio",2,122,624,1453,7571,19.2,22.2,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1691,kod,ARAÇ (ARC-61): pencere adı tablosu 9 → 16 rol,4,132,624,1840,7571,24.3,25.8,41,0,SECIM,4 değişen dosya; 2 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1690,kod,HARİTA (HRT-29): Departman haritası — görev + dosya alanı + açılış yolu; OPS açı,7,131,624,1644,7571,21.7,25.4,41,0,SECIM,7 değişen dosya; 2 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1689,kod,"URUN (URN-32/33): müşteriye ham iç SKU basan yüzeyler onarıldı, kapı genişledi",19,236,624,2281,7571,30.1,37.4,41,0,SECIM,19 değişen dosya; 5 tanesi test dosyası | vitest related (12 dosya için): 99 yeni test
+pr,1688,kod,ALTYAPI (ALT-15): eslestirici normalizeEt ReDoS — doğrusal döngü,2,140,624,1621,7571,21.4,22.4,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 21 yeni test
+pr,1687,kod,HARİTA (REC-516): durum dosyası günlük döndürme betiği (§9b ilk uygulama),4,124,624,1432,7571,18.9,21.1,41,0,SECIM,4 değişen dosya; 1 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1686,kod,"URUN (OPS-51): Casals ve Flexiva marka sayfaları, 308'ler kalkıyor, Flexiva noin",37,252,624,2504,7571,33.1,39.3,41,0,SECIM,37 değişen dosya; 19 tanesi test dosyası | vitest related (18 dosya için): 103 yeni test
+pr,1685,kod,"ALTYAPI (OPS-52 PR-C2): middleware dilsiz kol, açıkken /about /contact tek sıçra",9,228,624,2763,7571,36.5,33.7,41,0,SECIM,9 değişen dosya; 4 tanesi test dosyası | vitest related (3 dosya için): 102 yeni test
+pr,1683,kod,ALTYAPI (OPS-52 PR-C0): rota dili saf çekirdeği fs'siz dosyaya ayrıldı (bağlı de,4,218,624,2589,7571,34.2,32,41,0,SECIM,4 değişen dosya; 1 tanesi test dosyası | vitest related (3 dosya için): 105 yeni test
+pr,1682,kod,"ALTYAPI (OPS-52 PR-B): adres matrisi ölçüm betiği + canlı taban (salt okuma, can",5,124,624,1394,7571,18.4,21.1,41,0,SECIM,5 değişen dosya; 1 tanesi test dosyası | vitest related (3 dosya için): 0 yeni test
+pr,1680,kod,ARAÇ (ARC-24): kanca satırına WRONGSTACK sürüm farkı + 1.0.27–1.0.31 özeti,6,126,624,1662,7571,22,22.6,41,0,SECIM,6 değişen dosya; 2 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1678,kod,"ARAÇ (ARC-51): Linear sayacı şerit tanıma imza + başlık, çelişen yorum belirsiz",2,122,624,1396,7571,18.4,20.6,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1676,kod,"ARAÇ (kart 0c0232db): kartsız beklenti kapısı, Recep'ten istenen şeyin kartı yok",3,126,624,1508,7571,19.9,22.6,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1675,kod,"ARAÇ (kart 6edd47ed): zil sayacına --durum kipi, ölçülemedi ve Design sessizliği",2,122,624,1396,7571,18.4,20.6,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1674,kod,ARAÇ (ARC-33 madde 2): kanca bağlam ölçümünü pencere başına dosyaya yazar,3,123,624,1633,7571,21.6,22.3,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1673,kod,"ARAÇ (ARC-33): kanban-anlik.cjs depoya girer, --detay ve süzgeçler",3,124,624,1372,7571,18.1,21.1,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1672,kod,"URUN (URN-25): kategori ve /products Suspense sınırı içeriği sarmaz, içerik hidd",9,139,624,1541,7571,20.4,21.9,41,0,SECIM,9 değişen dosya; 4 tanesi test dosyası | vitest related (5 dosya için): 5 yeni test
+pr,1668,kod,HARİTA (HRT-26): kart planına ÖNCEKİ ÇALIŞMA satırı + kapı (OPS-30),21,125,624,1530,7571,20.2,24.1,41,0,SECIM,21 değişen dosya; 1 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1666,kod,ARAÇ (ARC-29): Blog departmanı rol tablosuna eklendi,3,129,624,1811,7571,23.9,25.5,41,0,SECIM,3 değişen dosya; 2 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1664,kod,GEO-SEO (arama açıklamaları): marka açıklamasından doğrulanamayan üstünlük cümle,13,234,624,2386,7571,31.5,37.4,41,0,SECIM,13 değişen dosya; 4 tanesi test dosyası | vitest related (8 dosya için): 98 yeni test
+pr,1663,kod,"HARİTA (HRT-24): rol kartlarına Amaç + Düzenli görevler, GEO-SEO örneği",9,129,624,1587,7571,21,25,41,0,SECIM,9 değişen dosya; 1 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1661,kod,URUN (URN-21): aile/model sayfasında görünür kırıntı + Modeller satırları gerçek,16,246,624,2433,7571,32.1,38.6,41,0,SECIM,16 değişen dosya; 5 tanesi test dosyası | vitest related (10 dosya için): 113 yeni test
+pr,1660,kod,"GEO-SEO (SEO-12): toplu IndexNow süzgeçli kip, yalnız yayında değişmeyen adresle",4,124,624,1424,7571,18.8,20.9,41,0,SECIM,4 değişen dosya; 1 tanesi test dosyası | vitest related (2 dosya için): 1 yeni test
+pr,1659,kod,URUN (URN-19): ana sayfa kartları ve arama çipleri TR'de EN slug'lı adrese gitme,6,136,624,1474,7571,19.5,22.3,41,0,SECIM,6 değişen dosya; 3 tanesi test dosyası | vitest related (3 dosya için): 5 yeni test
+pr,1658,kod,YETENEK (YTN-11): WrongStack skill'leri çalışan setlerine ve müdür çekirdeğine b,42,125,624,1491,7571,19.7,22.3,41,0,SECIM,42 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1657,kod,HARİTA (HRT-21): 16 kurallar dosyasına çalışan açma kuralı (karar 251),18,123,624,1513,7571,20,23.9,41,0,SECIM,18 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1656,kod,URUN (URN-18): hesaplayıcı alt metinleri kendi sözlük anahtarına bağlandı (kanal,7,224,624,2134,7571,28.2,36,41,0,SECIM,7 değişen dosya; 2 tanesi test dosyası | vitest related (5 dosya için): 99 yeni test
+pr,1651,kod,URUN (URN-12): webhook eski slug ve eski kategori/aile tazelemesi (3g-2a),3,132,624,1479,7571,19.5,21.6,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 4 yeni test
+pr,1650,kod,HARİTA (HRT-14): kart planı kuralı + kapı (karar 241/243/244),23,129,624,1587,7571,21,25,41,0,SECIM,23 değişen dosya; 2 tanesi test dosyası | vitest related (2 dosya için): 0 yeni test
+pr,1647,kod,URUN (URN-15): var olmayan kök .txt/.xml adresleri 500 yerine 404 (SEO-5),7,150,624,1624,7571,21.5,23.5,41,0,SECIM,7 değişen dosya; 2 tanesi test dosyası | vitest related (5 dosya için): 19 yeni test
+pr,1645,kod,"URUN (URN-11, REC-300 3e-2): model adresleri site haritasına, yalnız bayrak açık",11,162,624,1914,7571,25.3,25.3,41,0,SECIM,11 değişen dosya; 7 tanesi test dosyası | vitest related (2 dosya için): 24 yeni test
+pr,1644,kod,URUN (URN-9): EN alt kategori sayfası etiketleri Subcategory diline çevrildi + k,2,215,624,2036,7571,26.9,35,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 96 yeni test
+pr,1643,kod,ARAÇ (ARC-18): açıcı --strict-mcp-config kullanmaz (terminal penceresi Masaüstü ,2,120,624,1378,7571,18.2,20.3,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1642,kod,"ARAÇ (ARC-10, ARC-13): açıcı --taze ilk mesaj ayırıcısı + EKİP KİPİ notu düzeltm",2,120,624,1378,7571,18.2,20.3,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1641,kod,"ARAÇ (ARC-6, ARC-17): compact durum kapısı ana proje dizinini ve günlüğü de tara",2,127,624,1582,7571,20.9,24.9,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1640,kod,"HARİTA (HRT-13): YTN-8 bulguları — üreticiden bayat skill adı, ToolSearch yasağı",3,125,624,1429,7571,18.9,20.8,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1639,kod,ALTYAPI (ALT-8): rls-politika-sarma testi izlenen taban dosyasını bozmasın,2,121,624,1351,7571,17.8,20.3,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1638,kod,"HARİTA (HRT-11): Recep mesaj kuralları ayrıntısı kurallar dosyasına, kartta işar",34,123,624,1513,7571,20,23.9,41,0,SECIM,34 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1637,kod,"YETENEK (YTN-9 düzeltme): graphify yedeği önce python dener, python3 yalnız pyth",2,130,624,1472,7571,19.4,22.4,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1636,kod,"URUN (URN-5): EN alt kategori düzeyi 'Subcategories', düğme 'Explore' + yazım ka",2,215,624,2036,7571,26.9,35,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 96 yeni test
+pr,1635,kod,"ARAÇ (ARC-15): Recep sözü defteri = karar kaydı — kayıpsız döndürme, doğrulanan ",7,130,624,1750,7571,23.1,23.5,41,0,SECIM,7 değişen dosya; 2 tanesi test dosyası | vitest related (4 dosya için): 0 yeni test
+pr,1634,kod,URUN (URN-7): bugünkü şemanın iki segmentli kategori yolu tazelenmez (bayrak kap,4,134,624,1546,7571,20.4,21.8,41,0,SECIM,4 değişen dosya; 1 tanesi test dosyası | vitest related (2 dosya için): 6 yeni test
+pr,1633,kod,HARİTA (HRT-10): rol kartı ortak bloğuna iki Recep kuralı (başka pencereden gele,18,123,624,1513,7571,20,23.9,41,0,SECIM,18 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1632,kod,"YETENEK (YTN-9): graphify skill'inde python3 yedeği sınanıyor, yoksa python'a dü",2,130,624,1472,7571,19.4,22.4,41,0,SECIM,2 değişen dosya; 1 tanesi test dosyası | vitest related atlandı: içe aktarılabilir dosya değişmedi
+pr,1631,kod,ALTYAPI (ARC-5): Recep için tek sayfalık pano görünümü üreticisi,3,123,624,1359,7571,18,20.9,41,0,SECIM,3 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1630,kod,"YETENEK (YTN-8): çalışan skill ön yüklemesi ölçüldü, kırık eklenti skill'i çıkar",6,125,624,1491,7571,19.7,22.3,41,0,SECIM,6 değişen dosya; 1 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1629,kod,ARAÇ (ARC-14): Stop kancası python3 çağırmaz — Mağaza sayfası açılmaz,3,122,624,1450,7571,19.2,22.1,41,0,SECIM,3 değişen dosya; 2 tanesi test dosyası | vitest related (1 dosya için): 0 yeni test
+pr,1729,kuresel,"ALTYAPI (ALT-38a): test çalıştırma düzeni — edited aynası (taban izli), dünya du",21,624,624,7571,7571,100,100,0,1,TAM,.github/workflows/ci.yml: küresel yol (.github/)
+pr,1722,kuresel,ALTYAPI (ALT-35): bağımlılık taraması 10-05 (yüksek 11 → 1) + iki düşük kayıt ka,2,624,624,7571,7571,100,100,0,1,TAM,pnpm-lock.yaml: küresel dosya (pnpm-lock.yaml)
+pr,1721,kuresel,ALTYAPI (ALT-34): M6 font preload ölçümü (kapalı kip: yalnız Inter),4,624,624,7571,7571,100,100,0,1,TAM,.github/workflows/e2e-smoke.yml: küresel yol (.github/)
+pr,1720,kuresel,"URUN (URN-53, kısmi): eski adres yönlendirmeleri + ana sayfa bağları yeni slug'a",4,624,624,7571,7571,100,100,0,1,TAM,next.config.mjs: küresel dosya (next.config.*)
+pr,1719,kuresel,"TASARIM (TSR-9): Faz 2b — YENI_GORUNUM bayrağı (kapalı=fark 0), üç font preload:",8,624,624,7571,7571,100,100,0,1,TAM,tailwind.config.js: küresel dosya (tailwind.config.*)
+pr,1712,kuresel,TASARIM (OPS-53): Faz 2a ikinci dilim — tipografi/ölçü/kenar/yüzey adları (tüket,4,624,624,7571,7571,100,100,0,1,TAM,tailwind.config.js: küresel dosya (tailwind.config.*)
+pr,1711,kuresel,"TASARIM (OPS-53): Faz 2a — görünmez token takma adları (tüketici 0, kapalı=fark ",4,624,624,7571,7571,100,100,0,1,TAM,tailwind.config.js: küresel dosya (tailwind.config.*)
+pr,1708,kuresel,ALTYAPI (ALT-31): @axe-core/playwright devDep; Lighthouse için yeni bağımlılık y,3,624,624,7571,7571,100,100,0,1,TAM,package.json: küresel dosya (package.json)
+pr,1701,kuresel,ALTYAPI (OPS-52 PR-D): rota dili veri satırları (8 sayfa) + kural hedeflerinin y,13,624,624,7571,7571,100,100,0,1,TAM,next.config.mjs: küresel dosya (next.config.*)
+pr,1692,kuresel,"URUN (OPS-51): Casals ayrı marka, Flexiva kaydı, Sığınak 7. kök, aile adları Cas",1,624,624,7571,7571,100,100,0,1,TAM,supabase/migrations/20261004120000_casals_flexiva_markalari_siginak_kok.sql: küresel yol (supabase/migrations/)
+pr,1681,kuresel,"ALTYAPI (OPS-52 PR-A): adres dili mekanizması, kapalı anahtar arkasında (canlıda",14,624,624,7571,7571,100,100,0,1,TAM,next.config.mjs: küresel dosya (next.config.*)
+pr,1652,kuresel,ARAÇ (ARC-21 / ARC-12b): vitest defter ortamı benzersiz dizin + globalSetup temi,6,624,624,7571,7571,100,100,0,1,TAM,vitest.config.ts: küresel dosya (vitest*)
+pr,1628,kuresel,ARAÇ (ARC-12): Recep sözü defteri sahte kayıt korumaları — test ortamı gerçek yo,3,624,624,7571,7571,100,100,0,1,TAM,vitest.setup.ts: küresel dosya (vitest*)
+b4,37314067396,ASIL,dependabot/npm_and_yarn/kucuk-ve-yama-33d73048da,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,37312823099,ASIL,dependabot/npm_and_yarn/kucuk-ve-yama-33d73048da,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,37303378062,ASIL,tasarim/faz-2b-gorunum-anahtari,8,624,624,,,,,,1,TAM,tailwind.config.js: küresel dosya (tailwind.config.*)
+b4,37302451945,ASIL,tasarim/faz-2b-gorunum-anahtari,7,624,624,,,,,,1,TAM,tailwind.config.js: küresel dosya (tailwind.config.*)
+b4,37302448175,ASIL,urun/catalog-baseline-siginak,1,50,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,37301995548,ASIL,altyapi/alt16-webhook-yol,4,132,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,37298489084,ASIL,dependabot/npm_and_yarn/kucuk-ve-yama-33d73048da,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,37297406040,ASIL,dependabot/npm_and_yarn/kucuk-ve-yama-33d73048da,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,37277406648,ASIL,urun/ops51-casals-flexiva-siginak,33,252,624,,,,,,0,SECILDI,33 değişen dosya; 16 tanesi test dosyası
+b4,37259292516,ASIL,dependabot/npm_and_yarn/kucuk-ve-yama-33d73048da,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,37258674517,ASIL,dependabot/npm_and_yarn/tools/wrongstack-mcp/wrongstack-4a6ce568ad,2,44,624,,,,,,0,SECILDI,2 değişen dosya; 0 tanesi test dosyası
+b4,37237017851,ASIL,urun/ops51-casals-flexiva-siginak,20,239,624,,,,,,0,SECILDI,20 değişen dosya; 8 tanesi test dosyası
+b4,37188897880,ASIL,arac/kanban-anlik-detay,3,124,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,37122901354,ASIL,urun/urn25-kategori-suspense-siniri,4,139,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,37111935792,ASIL,blog/ops29-metin-envanteri,2,49,624,,,,,,0,SECILDI,2 değişen dosya; 0 tanesi test dosyası
+b4,37109539721,ASIL,arac/sage-eslestirme,3,123,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36849628904,ASIL,harita/hrt3-santiye-kanban,6,120,624,,,,,,0,SECILDI,6 değişen dosya; 1 tanesi test dosyası
+b4,36848539630,ASIL,harita/hrt3-santiye-kanban,6,120,624,,,,,,0,SECILDI,6 değişen dosya; 1 tanesi test dosyası
+b4,36847579235,ASIL,harita/hrt3-santiye-kanban,4,120,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,36846141101,ASIL,arac/recep-sozu-defteri,4,131,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,36844869733,ASIL,urun/urn1-hazirlaniyor,8,224,624,,,,,,0,SECILDI,8 değişen dosya; 1 tanesi test dosyası
+b4,36843886394,ASIL,urun/rec549-vitrin-i18n,8,223,624,,,,,,0,SECILDI,8 değişen dosya; 0 tanesi test dosyası
+b4,36841238424,ASIL,altyapi/alt1-hazirlaniyor-zorunlu,5,132,624,,,,,,0,SECILDI,5 değişen dosya; 2 tanesi test dosyası
+b4,36837546623,ASIL,arac/claim-yenile-departman-ac,15,148,624,,,,,,0,SECILDI,15 değişen dosya; 3 tanesi test dosyası
+b4,36830283632,ASIL,arac/claim-yenile-departman-ac,13,148,624,,,,,,0,SECILDI,13 değişen dosya; 2 tanesi test dosyası
+b4,36829500263,ASIL,yetenek/wrongstack-alim-1,7,62,624,,,,,,0,SECILDI,7 değişen dosya; 0 tanesi test dosyası
+b4,36723235221,ASIL,arac/claim-yenile-departman-ac,13,148,624,,,,,,0,SECILDI,13 değişen dosya; 2 tanesi test dosyası
+b4,36722273973,ASIL,arac/hafiza-bekci-departman,3,123,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36716858424,ASIL,harita/rec-hafiza-duzeni,4,52,624,,,,,,0,SECILDI,4 değişen dosya; 0 tanesi test dosyası
+b4,36715159321,ASIL,yetenek/mutasyon-testi-skill,4,130,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,36694542667,ASIL,urun/rec507-seri-alt-kategori,3,134,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36682633486,ASIL,urun/rec300-3g1-tazeleme-yollari,5,135,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36682399253,ASIL,geoseo/yetim-tara,3,54,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36682394049,ASIL,urun/rec471-alt-kategori-baglantilari,2,133,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36681652007,ASIL,urun/rec300-3g1-tazeleme-yollari,4,134,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36681276687,ASIL,altyapi/rec355-drift-yeniden-dene,4,124,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36577916961,ASIL,geoseo/rec452-rehber-ic-baglanti,9,233,624,,,,,,0,SECILDI,9 değişen dosya; 1 tanesi test dosyası
+b4,36577679121,ASIL,admin/rec412-faz1,5,126,624,,,,,,0,SECILDI,5 değişen dosya; 1 tanesi test dosyası
+b4,36576973243,ASIL,arac/autosync-pencere,3,128,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36574955089,ASIL,arac/autosync-pencere,3,128,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36572043622,ASIL,arac/autosync-pencere,3,128,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36567602875,ASIL,altyapi/healthz-db-adimi,3,67,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36561902458,ASIL,harita/rec433-hafiza-esik-duzeltme,4,122,624,,,,,,0,ACIKLANDI,DEVRALINAN:sessionstart-tavan.test.ts<-36554427642(secildi)
+b4,36561173071,ASIL,arac/hafiza-indeks-esik,5,128,624,,,,,,0,SECILDI,5 değişen dosya; 2 tanesi test dosyası
+b4,36560468638,ASIL,altyapi/rec355-vuln002-bekci,5,624,624,,,,,,1,TAM,supabase/migrations/20260927162755_rec355_siparis_kolon_bekcisi.sql: küresel yol (supabase/migrations/)
+b4,36559859204,ASIL,harita/rec400-olcum-defterleri,7,46,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36559794659,ASIL,arac/olcum-defteri-yonlendirme,2,122,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36559389459,ASIL,altyapi/rec442-category-images,4,624,624,,,,,,1,TAM,supabase/migrations/20260929104500_rec442_category_images_yazma_kapat.sql: küresel yol (supabase/migrations/)
+b4,36559115443,ASIL,admin/rec412-baslik,7,132,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36559050511,ASIL,altyapi/rec355-vuln002-bekci,3,624,624,,,,,,1,TAM,supabase/migrations/20260927162755_rec355_siparis_kolon_bekcisi.sql: küresel yol (supabase/migrations/)
+b4,36558763334,ASIL,arac/kurulum-son-satir,2,118,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36558723404,ASIL,harita/rec433-34b-sahiplik,18,124,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36558479940,ASIL,arac/rol-karti-satiri,2,129,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36557992411,ASIL,admin/taban-0929,2,49,624,,,,,,0,ACIKLANDI,DEVRALINAN:sessionstart-tavan.test.ts<-36554427642(secildi)
+b4,36557739046,ASIL,urun/rec300-3e1-sitemap-adresuret,5,134,624,,,,,,0,ACIKLANDI,DEVRALINAN:sessionstart-tavan.test.ts<-36554427642(secildi) ; DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36557129322,ASIL,harita/rec433-pano-kanit,12,123,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,36556704612,ASIL,urun/rec300-3e1-sitemap-adresuret,3,133,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36554427642,ASIL,arac/sessionstart-butce-genislet,3,129,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36552763981,ASIL,urun/rec434-showcase-olu-slug,3,122,624,,,,,,0,SECILDI,3 değişen dosya; 2 tanesi test dosyası
+b4,36551783235,ASIL,urun/rec434-showcase-olu-slug,2,121,624,,,,,,0,SECILDI,2 değişen dosya; 1 tanesi test dosyası
+b4,36549315806,ASIL,harita/rec400-h3-filo-dizini,1,48,624,,,,,,0,SECILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,36548703152,ASIL,urun/rec405-betik-kapisi,3,122,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36546149597,ASIL,admin/rec411-url-dongusu,3,139,624,,,,,,0,SECILDI,3 değişen dosya; 2 tanesi test dosyası
+b4,36543700458,ASIL,arac/pencere-gizli-konsol,7,135,624,,,,,,0,SECILDI,7 değişen dosya; 1 tanesi test dosyası
+b4,36412266186,ASIL,arac/rec410-s1-sql-yazma-kapisi,9,137,624,,,,,,0,SECILDI,9 değişen dosya; 3 tanesi test dosyası
+b4,36373042260,ASIL,dependabot/npm_and_yarn/react-next-a8da19b315,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,36340729575,ASIL,arac/kanonik-kok-158,4,125,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,36340203719,ASIL,arac/kanonik-kok-158,4,125,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,36333539515,ASIL,urun-katalog/rec212-geri-yukle-yazma,5,56,624,,,,,,0,SECILDI,5 değişen dosya; 1 tanesi test dosyası
+b4,36332392001,ASIL,arac/kanban-yama-cli,3,117,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36314977083,ASIL,arac/kanban-ozet-yama,7,124,624,,,,,,0,SECILDI,7 değişen dosya; 2 tanesi test dosyası
+b4,36169604380,ASIL,ops/gun-kapanisi-2026-09-25,18,45,624,,,,,,0,SECILDI,18 değişen dosya; 0 tanesi test dosyası
+b4,36132981363,ASIL,geoseo/geo-olcum-cetvel,5,52,624,,,,,,0,SECILDI,5 değişen dosya; 0 tanesi test dosyası
+b4,36119448857,ASIL,altyapi/yerel-onizleme,3,124,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36118964350,ASIL,mevzuat/kayit-cetveli,45,48,624,,,,,,0,SECILDI,45 değişen dosya; 0 tanesi test dosyası
+b4,36117418445,ASIL,mevzuat/kayit-cetveli,45,48,624,,,,,,0,SECILDI,45 değişen dosya; 0 tanesi test dosyası
+b4,36004227355,ASIL,urun/rec300-faz3b-rotalar,8,153,624,,,,,,0,SECILDI,8 değişen dosya; 2 tanesi test dosyası
+b4,35997482481,ASIL,urun-katalog/rec212-paket-tazelik,5,54,624,,,,,,0,SECILDI,5 değişen dosya; 1 tanesi test dosyası
+b4,35996693321,ASIL,blog/rec369-zorunlu-bolum,9,59,624,,,,,,0,SECILDI,9 değişen dosya; 3 tanesi test dosyası
+b4,35995588856,ASIL,urun-katalog/rec209-img2-golge,4,54,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,35994333131,ASIL,altyapi/rec140-faz2-db,2,624,624,,,,,,1,TAM,supabase/migrations/20260924100500_rec140_faz2_gorunum_rpc.sql: küresel yol (supabase/migrations/)
+b4,35988074345,ASIL,urun-katalog/rec209-load-sinav,7,58,624,,,,,,0,SECILDI,7 değişen dosya; 2 tanesi test dosyası
+b4,35987502152,ASIL,urun-katalog/rec282-mukerrer-kapi,4,54,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35986469613,ASIL,blog/rec369-pazar-olcum,4,58,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35986407686,ASIL,altyapi/migration-tip-dosyasi-maddesi,2,60,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35986238253,ASIL,urun-katalog/rec383-maliyet-yazici,7,58,624,,,,,,0,SECILDI,7 değişen dosya; 2 tanesi test dosyası
+b4,35985519918,ASIL,urun-katalog/rec383-maliyet-okuyucu,5,53,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35985187822,ASIL,urun/tip-product-costs,1,116,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35984812435,ASIL,altyapi/rec140-faz2-db,1,624,624,,,,,,1,TAM,supabase/migrations/20260924100500_rec140_faz2_gorunum_rpc.sql: küresel yol (supabase/migrations/)
+b4,35984583090,ASIL,auth/anon-definer-kapatma,2,624,624,,,,,,1,TAM,supabase/migrations/20260924091417_anon_definer_yetki_kapatma.sql: küresel yol (supabase/migrations/)
+b4,35984332447,ASIL,urun-katalog/rec209-load-sinav,7,58,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35984332142,ASIL,auth/teklif-yayim-onarimi,5,225,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35983412536,ASIL,urun-katalog/rec209-load-sinav,6,54,624,,,,,,0,SECILDI,6 değişen dosya; 2 tanesi test dosyası
+b4,35982320736,ASIL,urun-katalog/rec209-load-sinav,3,51,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35977861661,ASIL,urun/rec140-vitrin-maliyet-kolonu,7,161,624,,,,,,0,SECILDI,7 değişen dosya; 2 tanesi test dosyası
+b4,35851762089,ASIL,altyapi/teklif-bildirim-infoya,3,131,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35850374890,ASIL,altyapi/teklif-bildirim-infoya,3,131,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35849200921,ASIL,altyapi/teklif-bildirim-infoya,3,131,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35848703361,ASIL,altyapi/k88-silme-baglanti-kapisi,5,137,624,,,,,,0,SECILDI,5 değişen dosya; 1 tanesi test dosyası
+b4,35848687651,ASIL,altyapi/tarayici-ayri-profil,5,126,624,,,,,,0,SECILDI,5 değişen dosya; 2 tanesi test dosyası
+b4,35845650745,ASIL,urun-katalog/rec172-cikarim-okuyucular,19,58,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35845229905,ASIL,urun/rec300-v5-model-ssr,1,44,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35843128476,ASIL,altyapi/k88-silme-baglanti-kapisi,5,137,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35843093869,ASIL,urun/rec300-faz1a-tipler,1,116,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35842826599,ASIL,urun-katalog/rec172-cikarim-okuyucular,16,57,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35842174081,ASIL,urun-katalog/rec172-cikarim-okuyucular,15,57,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35839137236,ASIL,urun/rec300-faz0-adres-cetveli,1,47,624,,,,,,0,SECILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,35833967602,ASIL,altyapi/rec376-stok-uyari-ozet,4,132,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,35829895448,ASIL,urun/en-dil-dususu-yok,14,208,624,,,,,,0,SECILDI,14 değişen dosya; 3 tanesi test dosyası
+b4,35828528949,ASIL,urun/en-dil-dususu-yok,12,208,624,,,,,,0,SECILDI,12 değişen dosya; 1 tanesi test dosyası
+b4,35726641869,ASIL,altyapi/model-kiyas-taban,2,46,624,,,,,,0,SECILDI,2 değişen dosya; 0 tanesi test dosyası
+b4,35698059085,ASIL,dependabot/npm_and_yarn/react-next-5514051293,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,35586962850,ASIL,dependabot/npm_and_yarn/guvenlik-5ba7e1753b,2,624,624,,,,,,1,TAM,package.json: küresel dosya (package.json)
+b4,35334562073,ASIL,urun/rec59-faz2-admin-sozluk-ayrimi,10,224,624,,,,,,0,SECILDI,10 değişen dosya; 4 tanesi test dosyası
+b4,35327456625,ASIL,urun/rec59-faz1-admin-anahtar-tasima,3,129,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35327295640,ASIL,altyapi/sage-dosya-dersi-kancasi,7,145,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35326805540,ASIL,urun/rec59-faz1-admin-anahtar-tasima,3,129,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35326086017,ASIL,altyapi/sage-dosya-dersi-kancasi,7,145,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35325960237,ASIL,urun/rec206-storm-guc-araligi,1,624,624,,,,,,1,TAM,supabase/migrations/20260918083557_aile_metni_storm_guc_araligi.sql: küresel yol (supabase/migrations/)
+b4,35324338767,ASIL,urun/tip-tazeleme-is-admin-claim,1,116,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35321462009,ASIL,urun/rec59-sozluk-prop,3,207,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35316085590,ASIL,urun/rec206-k45-blok-notu,4,624,624,,,,,,1,TAM,supabase/migrations/20260918062422_aile_blok_notu_temizligi.sql: küresel yol (supabase/migrations/)
+b4,35194640367,ASIL,altyapi/rec353-gemini-jules-kaldir,33,624,624,,,,,,1,TAM,.github/commands/gemini-invoke.toml: küresel yol (.github/)
+b4,35191385845,ASIL,urun/rec340-arama-yetki-onarim,1,624,624,,,,,,1,TAM,supabase/migrations/20260917064515_arama_yardimci_okuma_yetkisi.sql: küresel yol (supabase/migrations/)
+b4,35191028164,ASIL,altyapi/rec353-gemini-jules-kaldir,33,624,624,,,,,,1,TAM,.github/commands/gemini-invoke.toml: küresel yol (.github/)
+b4,35101187355,ASIL,altyapi/rec355-plan,7,135,624,,,,,,0,ACIKLANDI,DUNYA-KOLU-TASINDI:taban-tazeligi.test.ts
+b4,35100451421,ASIL,urun/rec355-odeme-ekrani-inceleme,4,222,624,,,,,,0,SECILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,35068671935,ASIL,urun/hukum-kaynak-cetveli,1,47,624,,,,,,0,SECILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,34942595059,ASIL,altyapi/rec336-sema-tabani,6,624,624,,,,,,1,TAM,.github/workflows/sema-tabani-uret.yml: küresel yol (.github/)
+b4,34832445447,ASIL,altyapi/rec333-ai-auto-repair,4,624,624,,,,,,1,TAM,.github/workflows/ai-auto-repair.yml: küresel yol (.github/)
+b4,34694176430,ASIL,altyapi/rec307-investigate,6,66,624,,,,,,0,SECILDI,6 değişen dosya; 0 tanesi test dosyası
+b4,34686724948,ASIL,altyapi/kapi-import-onarimi,8,624,624,,,,,,1,TAM,.gitattributes: küresel dosya (.gitattributes)
+b4,34352405489,ASIL,urun-katalog/rec212-belgeler-csv,6,57,624,,,,,,0,SECILDI,6 değişen dosya; 0 tanesi test dosyası
+b4,34350817014,ASIL,urun-katalog/rec212-belgeler-csv,5,57,624,,,,,,0,SECILDI,5 değişen dosya; 0 tanesi test dosyası
+b4,34349930467,ASIL,urun-katalog/rec212-belgeler-csv,3,56,624,,,,,,0,SECILDI,3 değişen dosya; 0 tanesi test dosyası
+b4,34346996194,ASIL,ops/kararlar-0909,7,45,624,,,,,,0,SECILDI,7 değişen dosya; 0 tanesi test dosyası
+b4,34327453928,ASIL,urun/bos-sku-render,4,149,624,,,,,,0,SECILDI,4 değişen dosya; 2 tanesi test dosyası
+b4,34323514994,ASIL,urun/rec117-misafir-teklif-kod,13,248,624,,,,,,0,SECILDI,13 değişen dosya; 1 tanesi test dosyası
+b4,34321237750,ASIL,urun/rec117-misafir-teklif-kod,11,246,624,,,,,,0,SECILDI,11 değişen dosya; 0 tanesi test dosyası
+b4,34225353465,ASIL,altyapi/rec287-prob-bagimsizlik,5,146,624,,,,,,0,SECILDI,5 değişen dosya; 1 tanesi test dosyası
+b4,34220254484,ASIL,urun/kategori-adlandirma-cetveli,2,48,624,,,,,,0,SECILDI,2 değişen dosya; 0 tanesi test dosyası
+b4,34217057356,ASIL,urun/rec286-cozucu-onceligi,3,137,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,34213507870,ASIL,altyapi/rec121-tip-drift,2,51,624,,,,,,0,SECILDI,2 değişen dosya; 0 tanesi test dosyası
+b4,34212416845,ASIL,urun-katalog/kategori-gorsel-olcum,5,52,624,,,,,,0,SECILDI,5 değişen dosya; 0 tanesi test dosyası
+b4,34212166241,ASIL,ops/arsiv-ve-denetim-0908,11,53,624,,,,,,0,SECILDI,11 değişen dosya; 0 tanesi test dosyası
+b4,34206663284,ASIL,claude/gunaydın-rrt2g1,6,624,624,,,,,,1,TAM,.gitignore: küresel dosya (.gitignore)
+b4,34161550331,ASIL,urun/rec266-kart-b,10,161,624,,,,,,0,SECILDI,10 değişen dosya; 5 tanesi test dosyası
+b4,34158606744,ASIL,urun-katalog/rec226-kod-turet,1,49,624,,,,,,0,SECILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,34156514506,ASIL,urun-katalog/skill-tekkaynak,1,49,624,,,,,,0,SECILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,34154989921,ASIL,urun-katalog/skill-tekkaynak,1,49,624,,,,,,0,SECILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,34153643112,ASIL,altyapi/rec185-arac-envanteri,3,123,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,34152211526,ASIL,altyapi/rec185-arac-envanteri,3,123,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,34151335605,ASIL,urun-katalog/rec226-kayip-urun,2,51,624,,,,,,0,SECILDI,2 değişen dosya; 0 tanesi test dosyası
+b4,34149198837,ASIL,urun-katalog/katalog-karnesi,1,51,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34149024880,ASIL,urun-katalog/rec146-kategori-metni,1,49,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34148522514,ASIL,urun-katalog/rec212-tasinabilir-katalog,3,54,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34148299015,ASIL,urun-katalog/rec190-birim-olcek,2,51,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34148183611,ASIL,ops/cetvel-0907,3,50,624,,,,,,0,SECILDI,3 değişen dosya; 0 tanesi test dosyası
+b4,34147922353,ASIL,urun-katalog/rec212-tasinabilir-katalog,2,52,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34147784927,ASIL,altyapi/rec216-rls-sarma-kapisi,5,624,624,,,,,,1,TAM,.github/workflows/db-advisor.yml: küresel yol (.github/)
+b4,34147480904,ASIL,urun/rec213a-urunler-kategori,8,147,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34147454996,ASIL,urun-katalog/atex-malzeme-kanit,2,51,624,,,,,,0,ACIKLANDI,DEVRALINAN:standard-section-integrity.test.ts<-34132568389(master-push-tam)
+b4,34146879322,ASIL,urun/rec205-cift-adres,9,624,624,,,,,,1,TAM,next.config.mjs: küresel dosya (next.config.*)
+b4,34124635156,ASIL,altyapi/rec185-arac-envanteri,3,123,624,,,,,,0,SECILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,34117789492,ASIL,altyapi/rec177-kancalar,9,125,624,,,,,,0,SECILDI,9 değişen dosya; 4 tanesi test dosyası
+b4,34117261355,ASIL,urun/rec205-cift-adres,5,624,624,,,,,,1,TAM,next.config.mjs: küresel dosya (next.config.*)
+b4,34103182531,ASIL,urun-katalog/calisma,18,54,624,,,,,,0,SECILDI,18 değişen dosya; 0 tanesi test dosyası
+b4,34099356179,ASIL,urun-katalog/calisma,18,54,624,,,,,,0,SECILDI,18 değişen dosya; 0 tanesi test dosyası
+b4,34098887878,ASIL,urun-katalog/calisma,17,54,624,,,,,,0,SECILDI,17 değişen dosya; 0 tanesi test dosyası
+b4,34095289434,ASIL,urun/rec178-tavan,14,238,624,,,,,,0,SECILDI,14 değişen dosya; 3 tanesi test dosyası
+b4,34094715878,ASIL,urun/rec178-tavan,8,214,624,,,,,,0,SECILDI,8 değişen dosya; 2 tanesi test dosyası
+b4,37607362408,PR-DISI,altyapi/alt38c-isolate-deneme,1,624,624,,,,,,1,TAM,vitest.config.ts: küresel dosya (vitest*)
+b4,37301130122,PR-DISI,master,1,624,624,,,,,,1,TAM,supabase/migrations/20261004120000_casals_flexiva_markalari_siginak_kok.sql: küresel yol (supabase/migrations/)
+b4,36681691784,PR-DISI,master,1,44,624,,,,,,0,KACIRILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,36558077705,PR-DISI,master,3,119,624,,,,,,0,KACIRILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,36556976515,PR-DISI,master,3,123,624,,,,,,0,KACIRILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35983536253,PR-DISI,master,2,624,624,,,,,,1,TAM,supabase/migrations/20260924091500_rec140_product_costs_ekle.sql: küresel yol (supabase/migrations/)
+b4,35842887824,PR-DISI,master,3,124,624,,,,,,0,KACIRILDI,3 değişen dosya; 1 tanesi test dosyası
+b4,35842099140,PR-DISI,master,1,624,624,,,,,,1,TAM,supabase/migrations/20260923083021_url_takma_adlari.sql: küresel yol (supabase/migrations/)
+b4,35326188252,PR-DISI,master,1,118,624,,,,,,0,KACIRILDI,1 değişen dosya; 1 tanesi test dosyası
+b4,35321768618,PR-DISI,master,4,624,624,,,,,,1,TAM,supabase/migrations/20260918062422_aile_blok_notu_temizligi.sql: küresel yol (supabase/migrations/)
+b4,35321256360,PR-DISI,master,6,624,624,,,,,,1,TAM,supabase/migrations/20260918063600_yetki_dongusu_kesildi.sql: küresel yol (supabase/migrations/)
+b4,35100639179,PR-DISI,master,1,48,624,,,,,,0,KACIRILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,34838443145,PR-DISI,master,6,624,624,,,,,,1,TAM,.github/workflows/ai-auto-repair.yml: küresel yol (.github/)
+b4,34686305271,PR-DISI,master,1,44,624,,,,,,0,KACIRILDI,1 değişen dosya; 0 tanesi test dosyası
+b4,34132568389,PR-DISI,master,4,236,624,,,,,,0,KACIRILDI,4 değişen dosya; 1 tanesi test dosyası
+b4,37607880969,TEST-YOK,altyapi/alt38c-shard-pr,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37606018945,TEST-YOK,altyapi/alt38c-shard-pr,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37473530488,TEST-YOK,altyapi/alt39-depo-dokum,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37468733049,TEST-YOK,altyapi/alt39-depo-dokum,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37461444970,TEST-YOK,urun/catalog-taban-1352-sonrasi,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37292782169,TEST-YOK,harita/hrt33-karar-287-288,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37292292785,TEST-YOK,urun/rec300-faz1b-agac,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37291936277,TEST-YOK,urun/rec300-faz1b-agac,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37291783434,TEST-YOK,urun/rec300-faz1b-agac,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37289996352,TEST-YOK,tasarim/plan-v2-2-arama,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37286127212,TEST-YOK,tasarim/plan-v2-1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37284631169,TEST-YOK,tasarim/plan-v2-1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37283973329,TEST-YOK,tasarim/plan-v2-1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37281957082,TEST-YOK,tasarim/plan-v2-1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37280131454,TEST-YOK,tasarim/plan-v2-1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37279066287,TEST-YOK,tasarim/plan-v2-1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37227505137,TEST-YOK,altyapi/ops52-c1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37226076528,TEST-YOK,altyapi/ops52-c0,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37224502097,TEST-YOK,altyapi/ops52-matris,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37223367174,TEST-YOK,altyapi/ops52-adres-plani,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37188364026,TEST-YOK,arac/kanban-anlik-detay,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37108881258,TEST-YOK,geoseo/rec497-aciklama,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37106471806,TEST-YOK,geoseo/indexnow-suzgec,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37005901606,TEST-YOK,urun/rec405-indexnow,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,37004589354,TEST-YOK,urun/rec405-indexnow,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36865008475,TEST-YOK,arac/acici-tam-mcp,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36863967448,TEST-YOK,arac/precompact-hafiza-dizinleri,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36863095271,TEST-YOK,arac/arc10-13-departman-acici,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36862289986,TEST-YOK,arac/precompact-hafiza-dizinleri,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36844564417,TEST-YOK,arac/recep-sozu-defteri,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36843869174,TEST-YOK,arac/recep-sozu-defteri,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36842306371,TEST-YOK,harita/kanban-gecis-plan,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36837225330,TEST-YOK,arac/claim-yenile-departman-ac,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36836559166,TEST-YOK,yetenek/wrongstack-alim-3,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36831144152,TEST-YOK,arac/hafiza-bekci-departman,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36831052218,TEST-YOK,arac/claim-yenile-departman-ac,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36722451614,TEST-YOK,arac/claim-yenile-departman-ac,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36709905128,TEST-YOK,arac/rec519-domain-terms-turkce,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36708741171,TEST-YOK,arac/rec519-hafiza-enjeksiyonu,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36708277742,TEST-YOK,yetenek/posta-skill-hazir,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36706546178,TEST-YOK,arac/rec519-domain-terms-turkce,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36680965161,TEST-YOK,urun/rec300-3g1-tazeleme-yollari,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36678958106,TEST-YOK,urun/rec300-3e1-sitemap-adresuret,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36676853430,TEST-YOK,altyapi/healthz-db-adimi,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36577511691,TEST-YOK,admin/rec412-faz1,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36558071843,TEST-YOK,altyapi/rec442-category-images,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36557782182,TEST-YOK,altyapi/rec442-category-images,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36554586330,TEST-YOK,admin/rec412-faz05,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36554353145,TEST-YOK,admin/rec412-faz05,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36553735279,TEST-YOK,urun/rec300-sitemap-hata-kirar,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36547310752,TEST-YOK,urun/rec405-betik-kapisi,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36404825112,TEST-YOK,arac/compact-ham-dokum,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36125956583,TEST-YOK,altyapi/rec384-webhook-yayim,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,36120248870,TEST-YOK,urun/bilgi-merkezi-eski-konular-kalkar,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35847491796,TEST-YOK,altyapi/tarayici-ayri-profil,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35847049103,TEST-YOK,altyapi/tarayici-ayri-profil,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35719817360,TEST-YOK,master,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35700325057,TEST-YOK,altyapi/rec357-pim-3-2,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35604777061,TEST-YOK,dependabot/npm_and_yarn/react-next-5ace068e80,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35587100555,TEST-YOK,dependabot/npm_and_yarn/react-next-5ace068e80,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35585212730,TEST-YOK,dependabot/npm_and_yarn/react-next-5ace068e80,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35582149823,TEST-YOK,dependabot/npm_and_yarn/guvenlik-4dcad5cbde,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35581905723,TEST-YOK,dependabot/npm_and_yarn/guvenlik-b5342b9c85,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35581676274,TEST-YOK,dependabot/npm_and_yarn/uc-boyut-4a51c54257,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35581636265,TEST-YOK,dependabot/npm_and_yarn/react-next-5ace068e80,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35317445599,TEST-YOK,altyapi/taban-kapisi-dal-migrationu,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35101017886,TEST-YOK,altyapi/golge-kur,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,35091099958,TEST-YOK,altyapi/golge-kur,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,34842305934,TEST-YOK,urun/rec59-adim2b-urunler-isr,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,34774302854,TEST-YOK,altyapi/rec321-error-groups-yazma-politikasi,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,34325309124,TEST-YOK,altyapi/rec292-denetim-izi,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,34212297469,TEST-YOK,urun/rec269-grup-gorseli,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)
+b4,34099979205,TEST-YOK,altyapi/rec177-kancalar,,,,,,,,,,OLCULEMEDI,kırılan test dosyası yok (kırmızı adım test değil)

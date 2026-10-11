@@ -343,7 +343,7 @@ function tara(): { bulgular: Bulgu[]; tarananDosya: number } {
  * düzeltmeyi sahibi yapar. Yeni ihlal KIRMIZI.
  */
 const DONMUS_BORC: ReadonlyArray<readonly [string, number]> = [
-  ['src/app/_components/ProductDetailPageView.tsx', 3], // family.name · family.brand_name · selectedVariant.sku
+  ['src/app/_components/ProductDetailPageView.tsx', 2], // family.brand_name · selectedVariant.sku (URN-21: kırıntıdaki family.name büyütmesi kalktı)
   ['src/components/BrandsShowcase.tsx', 1], // brand.name
   ['src/components/HVACIcons.tsx', 1], // {brand}
   ['src/components/ProductCard.tsx', 2], // product.brand ×2

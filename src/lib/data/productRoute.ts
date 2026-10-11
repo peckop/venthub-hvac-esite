@@ -1,6 +1,6 @@
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import type { FamilyDetail, SeriesLanding } from '@/lib/services/family.service'
-import { adresUret } from '@/utils/adresUret'
+import { adresUret, yonlendirmeNesnesi } from '@/utils/adresUret'
 import { localizedHref, Routes } from '@/utils/routes'
 
 /**
@@ -50,15 +50,13 @@ const UUID_DESENI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 
 /**
  * Yönlendirme hedefinin ADRESİ (REC-300 Faz 3d). KAPALI (bugün): aile adresi + `?sku=` — ifade bugünkünün
- * aynısı. AÇIK (plan §2, "`?sku=` kalkar"): modelin kendi adresi `adresUret` ile; slug metni istenen
- * slug (varyant slug'ı = ürünün bugünkü `products.slug`'ı; `eskiTrUrunAdresiniYonlendir` ile aynı
- * sözleşme), UUID ise aile slug'ı (adrese UUID yazılmaz).
+ * aynısı. AÇIK (plan §2, "`?sku=` kalkar"): yayındaki listedeki SKU'nun kendi adresi `adresUret` ile (adres
+ * metni listeden: istenen slug da UUID de adrese yazılmaz); liste dışı SKU → aile adresi, sorgusuz (URN-31).
  */
 function hedefAdresi(
   familySlug: string,
   sku: string | null,
   lang: string,
-  istenenSlug: string,
   bayrak: boolean,
 ): string {
   if (!bayrak) {
@@ -66,9 +64,9 @@ function hedefAdresi(
     return sku ? `${base}?sku=${encodeURIComponent(sku)}` : base
   }
   const dil = lang === 'en' ? 'en' : 'tr'
-  if (!sku) return adresUret({ tur: 'aile', slug: familySlug }, dil, true)
-  const metin = UUID_DESENI.test(istenenSlug) ? familySlug : istenenSlug
-  return adresUret({ tur: 'model', aileSlug: familySlug, sku, slug: metin }, dil, true)
+  // URN-31: liste içi SKU → modelin adresi (metin listeden; istenen slug ve UUID adrese yazılmaz); liste dışı SKU ya
+  // da SKU yok → aile adresi, SORGUSUZ.
+  return adresUret(sku ? yonlendirmeNesnesi(familySlug, sku) : { tur: 'aile', slug: familySlug }, dil, true)
 }
 
 export async function resolveProductRoute(
@@ -89,7 +87,7 @@ export async function resolveProductRoute(
       if (!urun || !familySlug) return { kind: 'not-found' }
       return {
         kind: 'redirect',
-        to: hedefAdresi(familySlug, urun.sku, lang, slug, bayrak),
+        to: hedefAdresi(familySlug, urun.sku, lang, bayrak),
         hedef: { aileSlug: familySlug, sku: urun.sku },
       }
     }
@@ -117,7 +115,7 @@ export async function resolveProductRoute(
         // Elle birleştirme, tr/en dallarından biri unutulduğunda linki sessizce kıran sınıf.
         return {
           kind: 'redirect',
-          to: hedefAdresi(familySlug, variant.sku, lang, slug, bayrak),
+          to: hedefAdresi(familySlug, variant.sku, lang, bayrak),
           hedef: { aileSlug: familySlug, sku: variant.sku },
         }
       }
@@ -133,7 +131,7 @@ export async function resolveProductRoute(
         if (familySlug && familySlug !== slug) {
           return {
             kind: 'redirect',
-            to: hedefAdresi(familySlug, hedef.sku, lang, slug, bayrak),
+            to: hedefAdresi(familySlug, hedef.sku, lang, bayrak),
             hedef: { aileSlug: familySlug, sku: hedef.sku },
           }
         }
@@ -145,7 +143,7 @@ export async function resolveProductRoute(
       if (familySlug && familySlug !== slug) {
         return {
           kind: 'redirect',
-          to: hedefAdresi(familySlug, null, lang, slug, bayrak),
+          to: hedefAdresi(familySlug, null, lang, bayrak),
           hedef: { aileSlug: familySlug, sku: null },
         }
       }

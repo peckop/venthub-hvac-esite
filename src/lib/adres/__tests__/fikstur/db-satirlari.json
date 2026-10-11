@@ -21,7 +21,7 @@
   ],
   "product_families": [
     { "id": "00000000-0000-4000-8000-0000000000f1", "slug": "storm-serisi", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
-    { "id": "00000000-0000-4000-8000-0000000000f2", "slug": "vortice-lineo-quiet", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
+    { "id": "00000000-0000-4000-8000-0000000000f2", "slug": "vortice-lineo-quiet-sessiz-kanal-fanlari", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
     { "id": "00000000-0000-4000-8000-0000000000f3", "slug": "nicotra-gebhardt-dd", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
     { "id": "00000000-0000-4000-8000-0000000000f4", "slug": "vortice-vort-commercial-in-line-rectangular", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
     { "id": "00000000-0000-4000-8000-0000000000f5", "slug": "vortice-vorticent-cms-atex", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },

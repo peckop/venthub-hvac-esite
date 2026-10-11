@@ -15,6 +15,7 @@
  */
 
 import { ADRES_SEMASI_K3B } from '../../config/features'
+import { sitemapModelMi } from '../../config/yayindaModeller'
 import type { FamilyListItem } from '../../types/ui-models'
 import { adresUret } from '../../utils/adresUret'
 import { dildekiMetin } from '../../utils/dilMetni'
@@ -24,6 +25,7 @@ import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../services/family.service'
+import { dilOnekliMi } from './kirinti'
 
 /**
  * Aile description/meta alanları için dil çözümü — YALNIZ sayfanın dili (INV-DIL-DUSUSU-1).
@@ -48,6 +50,31 @@ function buildWebSiteRef(baseUrl: string) {
     '@type': 'WebSite' as const,
     name: SITE_NAME,
     url: baseUrl,
+  }
+}
+
+/** `ItemList` içindeki tek satır: konum + dil önekli mutlak adres (fiyat/offers YAZILMAZ). */
+interface ListeSatiri {
+  position: number
+  url: string
+}
+
+/**
+ * REC-494 — liste düğümü. `numberOfItems` ve `itemListElement` schema.org'da `ItemList`'in
+ * özellikleridir, `CollectionPage`'in DEĞİL; sayfa düğümü listeyi `mainEntity` ile taşır
+ * (canlı kapı `JSONLD-COLLECTIONPAGE`: üst düzeyde bu iki alan KIRMIZI, 28 kategori sayfasında
+ * ölçüldü). İki CollectionPage üreticisi (kategori + seri) AYNI yardımcıyı kullanır; konum ve
+ * adres hesabı çağıranda kalır, burada yalnız şekil kurulur.
+ */
+function buildItemList(numberOfItems: number, satirlar: ListeSatiri[]) {
+  return {
+    '@type': 'ItemList' as const,
+    numberOfItems,
+    itemListElement: satirlar.map(({ position, url }) => ({
+      '@type': 'ListItem' as const,
+      position,
+      url,
+    })),
   }
 }
 
@@ -101,7 +128,9 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     // kanoniğe girmez). Faz 2 öncesi slug metni aile slug'ıdır (rota modeli SKU'dan çözer).
     // ⚠Adres SKU'yu (küçük harf) taşır — plan §2 şemasının kendisi (`…-p-<sku>`); `sku` ALANI yine
     // yazılmaz (INV-SKU-GORUNMEZ-1 K2). Adres `adresRotalari` üzerinden (`adresUret` model nesnesi).
-    if (bayrak) {
+    // URN-31: yalnız DİZİNE AÇIK model adresi yazılır (`sitemapModelMi`: yayındaki listedeki temel model). Liste dışı
+    // varyantın model sayfası yok (404); sürüm sayfasının kanoniği temele gider — ikisinde de url YOK.
+    if (bayrak && sitemapModelMi(variant.sku)) {
       productNode.url = `${baseUrl}${adresRotalari(dilOf(lang), true).product(family.slug, variant.sku)}`
     }
 
@@ -187,7 +216,10 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
         name: family.brand_name,
       },
     }),
-    isPartOf: buildWebSiteRef(baseUrl),
+    // REC-494: `isPartOf` YAZILMAZ. schema.org'da `isPartOf` bir CreativeWork özelliğidir;
+    // `ProductGroup` (Product soyundan) onu tanımaz ve doğrulayıcı "şema uyarısı" verir
+    // (canlı kapı `JSONLD-ISPARTOF`, 47 aile sayfasında ölçüldü). Site ilişkisi CollectionPage
+    // düğümlerinde (kategori + seri) kalır; onlar bir WebPage'dir.
     hasVariant,
   }
 }
@@ -231,12 +263,14 @@ export function buildCategoryJsonLd(params: BuildCategoryJsonLdParams): Record<s
     description,
     url,
     isPartOf: buildWebSiteRef(baseUrl),
-    numberOfItems: total,
-    itemListElement: families.map((family, index) => ({
-      '@type': 'ListItem',
-      position: (page - 1) * pageSize + index + 1,
-      url: aileUrl(baseUrl, lang, family.slug, bayrak),
-    })),
+    // REC-494: liste `mainEntity` ItemList içinde (CollectionPage üst düzeyinde değil).
+    mainEntity: buildItemList(
+      total,
+      families.map((family, index) => ({
+        position: (page - 1) * pageSize + index + 1,
+        url: aileUrl(baseUrl, lang, family.slug, bayrak),
+      })),
+    ),
   }
 }
 
@@ -257,7 +291,7 @@ export interface BuildSeriesLandingJsonLdParams {
  *
  * `ProductGroup` KASITLI KULLANILMAZ: seri satılabilir bir ürün değil, altındaki MODELLERİN
  * listesidir (K1 kararı — "KART = MODEL, SERİ = LANDING"). Şekil `buildCategoryJsonLd` ile
- * BİREBİR aynı (CollectionPage + numberOfItems + itemListElement) — kategori sayfası da aynı
+ * BİREBİR aynı (CollectionPage + mainEntity ItemList{numberOfItems, itemListElement}) — kategori sayfası da aynı
  * sınıf içerik sunar (bir grup ürünün landing'i). Sayfalama YOK: seri sayfası tüm modellerini
  * tek seferde basar (`?page=` bu yüzeyde hiç yok), bu yüzden `buildCategoryJsonLd`'nin
  * page/pageSize parametreleri burada bulunmaz.
@@ -286,12 +320,14 @@ export function buildSeriesLandingJsonLd(params: BuildSeriesLandingJsonLdParams)
     description,
     url: aileUrl(baseUrl, lang, seriesSlug, bayrak),
     isPartOf: buildWebSiteRef(baseUrl),
-    numberOfItems: models.length,
-    itemListElement: models.map((model, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: aileUrl(baseUrl, lang, model.slug, bayrak),
-    })),
+    // REC-494: liste `mainEntity` ItemList içinde (CollectionPage üst düzeyinde değil).
+    mainEntity: buildItemList(
+      models.length,
+      models.map((model, index) => ({
+        position: index + 1,
+        url: aileUrl(baseUrl, lang, model.slug, bayrak),
+      })),
+    ),
   }
 }
 
@@ -328,6 +364,17 @@ export interface BuildBreadcrumbJsonLdParams {
 }
 
 /**
+ * Kırıntı basamağının mutlak adresi. REC-494: ana sayfa basamağı (`path: '/'`) `https://…/tr/`
+ * (sonda eğik çizgi) üretiyordu; sitenin kanonik ana sayfası `/tr` ve `/tr/` 308 verir — yani
+ * yapılandırılmış veri her sayfada yönlendirilen adresi gösteriyordu. Sondaki eğik çizgi atılır
+ * (adres her zaman en az `/<dil>` taşır, boşalmaz).
+ */
+function kirintiAdresi(baseUrl: string, lang: string, path: string): string {
+  const adres = `${baseUrl}${dilOnekliMi(path) ? path : `/${lang}${path}`}`
+  return adres.endsWith('/') ? adres.slice(0, -1) : adres
+}
+
+/**
  * Breadcrumb zinciri → schema.org BreadcrumbList.
  *
  * NİÇİN AYRI BİR FONKSİYON: BreadcrumbList'i bugüne kadar YALNIZ `Breadcrumb.tsx` bileşeni
@@ -344,8 +391,6 @@ export interface BuildBreadcrumbJsonLdParams {
  * ATAR. Bunlar kullanıcı verisinden değil ÇAĞIRAN KODDAN gelir; sessizce düzeltmek, bozuk
  * yapılandırılmış veriyi fark edilmeden yayına almak olurdu.
  */
-const dilOnekliMi = (yol: string) => /^\/(tr|en)(\/|$)/.test(yol)
-
 export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Record<string, unknown> {
   const { lang, baseUrl, steps } = params
 
@@ -368,7 +413,7 @@ export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Reco
       name: step.name,
       // K3-b (REC-300 Faz 3d): adım `adresUret` çıktısı (zaten dil önekli) olabilir — önek ikinci
       // kez eklenmez. Dilsiz yol (bugünkü çağıranlar) bugünkü gibi `/${lang}` ile birleşir.
-      ...(step.path ? { item: `${baseUrl}${dilOnekliMi(step.path) ? step.path : `/${lang}${step.path}`}` } : {}),
+      ...(step.path ? { item: kirintiAdresi(baseUrl, lang, step.path) } : {}),
     })),
   }
 }

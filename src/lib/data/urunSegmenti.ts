@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from 'next/navigation'
 
-import { type AdresDili, adresUret, modelAdresiCoz } from '@/utils/adresUret'
+import { modelAdresiVarMi, modelSlugu } from '@/config/yayindaModeller'
+import { type AdresDili, adresUret, modelAdresiCoz, yonlendirmeNesnesi } from '@/utils/adresUret'
 
 import {
   getCachedFamilySlugById,
@@ -12,8 +13,6 @@ import {
   getFamilyDetailForRoute,
 } from './preload'
 import { type ProductRouteDeps, resolveProductRoute } from './productRoute'
-
-const UUID_DESENI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export interface UrunRotasiCozumu {
   /** Çizilecek ailenin slug'ı (AileSayfasi girdisi). */
@@ -35,10 +34,16 @@ export async function urunSegmentiniCoz(slug: string, dil: AdresDili): Promise<U
   const model = modelAdresiCoz(slug)
   if (!model) return { aileSlug: slug, sunucuSku: null }
 
-  if (!model.skuKanonik) {
-    permanentRedirect(
-      adresUret({ tur: 'model', aileSlug: model.slugMetni, sku: model.sku, slug: model.slugMetni }, dil, true),
-    )
+  // URN-31 (INV-YAYINDA-MODEL-2): model sayfası YALNIZ yayındaki listedeki SKU için vardır. Liste dışı → 404,
+  // DB'ye GİDİLMEDEN ve 308'den ÖNCE (404 verecek adrese 308 vermek ziyaretçiyi ölü adrese taşırdı). Boş liste
+  // = hiçbir model sayfası (fail-closed).
+  if (!modelAdresiVarMi(model.sku)) notFound()
+
+  // Büyük harfli SKU ya da listedeki adres metninden farklı metin (O1) → kanonik adrese TEK 308. Aile slug'ı
+  // yalnız `adresUret`'in zorunlu alanıdır; liste içi SKU için metin ve aile listeden gelir.
+  const kanonik = adresUret({ tur: 'model', aileSlug: model.slugMetni, sku: model.sku }, dil, true)
+  if (!model.skuKanonik || model.slugMetni !== modelSlugu(model.sku, dil)) {
+    permanentRedirect(kanonik)
   }
   const urun = await getCachedModelBySku(model.sku)
   if (!urun?.family_id) notFound()
@@ -80,7 +85,7 @@ export async function eskiTrUrunAdresiniYonlendir(slug: string): Promise<never> 
   if (model) {
     const { aileSlug, sunucuSku } = await urunSegmentiniCoz(slug, 'tr')
     if (!sunucuSku) notFound()
-    permanentRedirect(adresUret({ tur: 'model', aileSlug, sku: sunucuSku, slug: model.slugMetni }, 'tr'))
+    permanentRedirect(adresUret(yonlendirmeNesnesi(aileSlug, sunucuSku), 'tr'))
   }
 
   const cozum = await resolveProductRoute(slug, 'tr', urunRotasiBagimliliklari())
@@ -89,13 +94,9 @@ export async function eskiTrUrunAdresiniYonlendir(slug: string): Promise<never> 
   }
   if (cozum.kind === 'redirect') {
     const { aileSlug, sku } = cozum.hedef
-    // UUID adresinde (REC-300 Faz 3d, madde 6) slug metni aile slug'ıdır — adrese UUID yazılmaz.
-    const metin = UUID_DESENI.test(slug) ? aileSlug : slug
-    permanentRedirect(
-      sku
-        ? adresUret({ tur: 'model', aileSlug, sku, slug: metin }, 'tr')
-        : adresUret({ tur: 'aile', slug: aileSlug }, 'tr'),
-    )
+    // Hedef: liste içi SKU → modelin adresi (metin listeden; adrese UUID yazılmaz); liste dışı SKU ya da SKU yok →
+    // aile adresi, sorgusuz (URN-31).
+    permanentRedirect(adresUret(sku ? yonlendirmeNesnesi(aileSlug, sku) : { tur: 'aile', slug: aileSlug }, 'tr'))
   }
   if (cozum.kind === 'not-found') notFound()
   throw new Error(

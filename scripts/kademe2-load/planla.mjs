@@ -16,6 +16,46 @@ export const SUBCAT_SUFFIX = {
 // Birden çok (kategori, alt kategori) çiftini taşıyan CSV'ler: aile = CSV × alt kategori soneki.
 export const COK_CIFTLI_CSV = ['vortice-vort-commercial-in-line', 'vortice-vort-heatmaster-slimroof', 'vortice-vort-industrial-ventilation', 'vortice-radon-range']
 
+// ⭐EĞRİ KAYNAĞI KAPISI (KTL-7, karar 320): pq_curve taşıyan satır eğrinin nereden geldiğini söylemek zorunda.
+// NİÇİN: 21–23 Haziran 2026'da yapay zekâ çıkarım hattı 141 eğrinin orta noktasını azami değerlerden HESAPLADI
+// (orta debi tam Qmax/2, orta basınç tam %50 ya da %75) ve yükleyici bunu etiketsiz taşıdı; seçici hepsini
+// ölçüm sandı. Etiket yoksa türetilmiş eğri ile kitapçıktan okunmuş eğri ayırt edilemez.
+// Cetvel: spec-axis-standard §2.3 (pq_curve_kaynak), catalog-ingestion-standard §6.3 "Eğri çizimi".
+export const PQ_KAYNAK = ['kitapcik_tablo', 'kitapcik_grafik', 'turetilmis']
+const PQ_TOL = 0.5 + 1e-9 // elle yazılmış sabitler tam sayıya yuvarlanmış (572 ↔ 1145/2 = 572,5)
+
+/**
+ * Üç noktalı üçgen eğri: (0, Pmax) · (Qmax/2, %50|%75·Pmax) · (Qmax, 0). Bu desen ölçülmez, hesaplanır.
+ * @returns {0.5|0.75|null} eşleşen oran, desen değilse null
+ */
+export function pqTurevDeseniMi(noktalar) {
+  if (!Array.isArray(noktalar) || noktalar.length !== 3) return null
+  const [[q0, p0], [q1, p1], [q2, p2]] = noktalar
+  if (q0 !== 0 || p2 !== 0 || !(p0 > 0) || !(q2 > 0)) return null
+  if (Math.abs(q1 - q2 / 2) > PQ_TOL) return null
+  for (const oran of [0.5, 0.75]) if (Math.abs(p1 - oran * p0) <= PQ_TOL) return oran
+  return null
+}
+
+/** Ham CSV satırı için eğri kaynağı hatası (yoksa null). Boş etiket yeni yüklemede KABUL EDİLMEZ. */
+export function pqKapisi(r) {
+  const ham = r.spec_pq_curve
+  if (!ham) return null
+  let nokta
+  try { nokta = JSON.parse(ham) } catch { return `pq_curve JSON değil: ${ham.slice(0, 40)}` }
+  const gecerli = Array.isArray(nokta) && nokta.length >= 2
+    && nokta.every((n) => Array.isArray(n) && n.length === 2 && n.every((v) => typeof v === 'number' && Number.isFinite(v)))
+  if (!gecerli) return 'pq_curve [[Q,P],…] biçiminde değil (en az 2 sayısal nokta)'
+  const kaynak = (r.spec_pq_curve_kaynak ?? '').trim()
+  if (!kaynak) return `pq_curve var ama pq_curve_kaynak yok (${PQ_KAYNAK.join(' | ')})`
+  if (!PQ_KAYNAK.includes(kaynak)) return `pq_curve_kaynak '${kaynak}' tanımsız (${PQ_KAYNAK.join(' | ')})`
+  const oran = pqTurevDeseniMi(nokta)
+  if (oran !== null && kaynak !== 'turetilmis') {
+    return `noktalar azami değerden hesaplanmış desende (orta debi tam Qmax/2, orta basınç tam %${oran * 100}) ama pq_curve_kaynak='${kaynak}'; hesapla kurulan eğri 'turetilmis' etiketi taşır`
+  }
+  return null
+}
+
 export function parseCsv(text, delim = ';') {
   if (text.charCodeAt(0) === 0xfeff) text = text.slice(1)
   const rows = []
@@ -123,6 +163,10 @@ export function planla({ rows, kategoriler, aileHaritasi, gorselCoz }) {
     const sku = kimlik.sku
     if (skuSeen.has(sku)) { errors.push(`${r.__csv}/${r.model_code}: SKU çakışması ${sku} (ilk: ${skuSeen.get(sku)})`); continue }
     skuSeen.set(sku, `${r.__csv}/${r.model_code}`)
+
+    // eğri kaynağı kapısı (karar 320): etiketsiz ya da hesapla kurulmuş-ama-ölçüm-diye-etiketli eğri plan KIRMIZI
+    const pqHata = pqKapisi(r)
+    if (pqHata) { errors.push(`${r.__csv}/${r.model_code || r.name}: ${pqHata}`); continue }
 
     // aile anahtarı: CSV × çift
     let famSlug = r.__csv

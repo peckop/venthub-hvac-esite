@@ -111,6 +111,16 @@ async function main() {
     process.exit(2)
   }
 
+  const tabanEnv = process.env.RLS_SARMA_TABAN
+  if (tabanEnv && fIdx === -1) {
+    console.error('rls-politika-sarma: OLCULEMEDI — RLS_SARMA_TABAN yalniz --fikstur ile gecerli (gercek olcumde taban degistirilemez)')
+    process.exit(2)
+  }
+  if (tabanEnv && !fs.existsSync(path.resolve(tabanEnv))) {
+    console.error('rls-politika-sarma: OLCULEMEDI — RLS_SARMA_TABAN gosterilen dosya yok: ' + path.resolve(tabanEnv))
+    process.exit(2)
+  }
+
   let satirlar
   if (fIdx !== -1) {
     satirlar = JSON.parse(fs.readFileSync(process.argv[fIdx + 1], 'utf8'))
@@ -160,7 +170,14 @@ async function main() {
    * Aksi halde onarılmış bir politika sessizce yeniden şişebilir ve taban onu örterdi —
    * yani taban, kapının kendi fail-open kapısı olurdu.
    */
-  const tabanYolu = path.join(__dirname, 'rls-politika-sarma-taban.json')
+  // ⭐TABAN YOLU TEST İÇİN DEĞİŞTİRİLEBİLİR, GERÇEK ÖLÇÜMDE DEĞİL (ALT-8, 2026-10-01).
+  // Test bozuk/boş taban sınarken izlenen dosyayı yerinde yazıyordu; yarım kalan koşum onu
+  // bozuk bırakıp kapıyı ve CI'ı kırmızıya çeviriyordu (09-27'de oldu). Çare: test kendi
+  // geçici kopyasını RLS_SARMA_TABAN ile verir. Ortam değişkeni YALNIZ --fikstur ile geçerlidir:
+  // gerçek (DB'li) ölçümde yok sayılmaz, REDDEDİLİR — yoksa taban kapının kendi fail-open
+  // kapısı olurdu. Verilen yol yoksa da çıkış 2 (sessizce boş taban sayılmaz).
+  // (Ortam değişkeni doğrulaması main() başında, DB'ye bağlanmadan ÖNCE yapılır.)
+  const tabanYolu = tabanEnv ? path.resolve(tabanEnv) : path.join(__dirname, 'rls-politika-sarma-taban.json')
   let taban = { girdiler: {} }
   if (fs.existsSync(tabanYolu)) {
     try {

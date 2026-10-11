@@ -8,13 +8,13 @@
 
 ## 1. Yeniden açılış (makine kapandı, pencereler yeniden açıldı)
 
-Filo **doğrudan mesajla çalışır** (`fleet-mechanism-standard.md` §0, REC-328). Motor kurmak gerekmez; iş kaybolmaz çünkü pano, Linear, pull request ve durum dosyaları kalıcıdır.
+Filo **doğrudan mesajla çalışır** (`fleet-mechanism-standard.md` §0, REC-328). Motor kurmak gerekmez; iş kaybolmaz çünkü Kanban kartları, claim panosu, pull request ve durum dosyaları kalıcıdır.
 
 1. **Pencereyi aç.** Oturum açılış kancası (`session-board`) açılış türünü söyler: `resume` (makine geri döndü) ya da `compact` (bağlam sıkıştı).
-2. **Kendi durum dosyanı oku.** `compact` dönüşünde ilk iş durum dosyasının son bloğudur (`fleet-mechanism-standard.md` §10.4). `resume` dönüşünde durum dosyası + Linear'daki kaydın.
+2. **Kendi durum dosyanı oku.** `compact` dönüşünde ilk iş durum dosyasının son bloğudur (`fleet-mechanism-standard.md` §10.4). `resume` dönüşünde durum dosyası + Kanban'daki kartın.
 3. **Şeridini tazele.** Canlılık claim atışından gelir: `node scripts/board/board.cjs claim --sid <kendi sid> --lane <departman> --globs "<dosyalar>"`.
 4. **Hangi işte olduğunu lidere mesajla yaz** (`SendMessage`); lider açılış emrini mesajla verir. İş bitince `notify_when_idle`.
-5. **Recep'e plan sorma.** Kalıcı iş kayıttan (Linear + pano kartı) kurulur; Recep'e yalnız karar sorusu gider, OPS üzerinden.
+5. **Recep'e plan sorma.** Kalıcı iş kayıttan (Kanban kartı) kurulur; Recep'e yalnız karar sorusu gider, OPS üzerinden.
 
 **Açılış çıktısının tavanı (ölçüldü 2026-09-29, REC-433).** Bir SessionStart kancasının çıktısı 10.000 karakteri aşınca bağlama yalnız ilk yaklaşık 2.000 karakter girer. Bu yüzden `session-board` çıktısı en çok 9.000 karakter tutar: bölümler öncelik sırasındadır, Recep mesajları aynen ama sınırlı gelir, gerisi dosya işaretçisi olarak yazılır. Tavanı kapı (INV-SESSIONSTART-TAVAN-1) ölçer. Çıktıda "ROL KARTI:" satırının yeri ayrılmıştır; satırı `docs/roller/<DEPARTMAN>.md` kartından (en çok 300 karakter) HARİTA doldurur.
 

@@ -60,4 +60,18 @@ test.describe('INV-DIL-DUSUSU-1 — EN sayfada TR gövde metni yok', () => {
     const enHtml = await en.text()
     for (const parca of trMetin) expect(enHtml.includes(parca.slice(0, 60)), `EN kategori sayfasında TR aile metni: ${parca.slice(0, 60)}`).toBe(false)
   })
+
+  // URN-105 (2026-10-10): kategorinin arama sonucu alanları (`seo_title`, `seo_desc` ve `metadata.seo_*_en`)
+  // yalnız sunucuda başlık/açıklama üretir. KTL-21 28 kategoriyi doldurunca bu metinler gömülü veriye (RSC
+  // yükü) düştü ve yukarıdaki "alt dal paragrafları" kolu kırmızı verdi. Burada ham değerin kendisi aranır:
+  // sayfanın meta etiketi bunları DOLU basar, gömülü veride ise hiç bulunmaz (kaçışlı JSON: \"seo_desc\":\"...).
+  for (const yol of ['/tr', '/en', '/tr/category/fanlar', '/en/category/fans']) {
+    test(`gömülü arama alanları: ${yol}`, async ({ request }) => {
+      const yanit = await request.get(yol)
+      expect(yanit.status()).toBe(200)
+      const html = await yanit.text()
+      const dolu = [...html.matchAll(/\\"seo_(?:title|desc)(?:_en)?\\":\\"([^\\]{3,})/g)].map((m) => m[0].slice(0, 80))
+      expect(dolu, `${yol}: arama sonucu alanı gömülü veride: ${dolu.slice(0, 2).join(' | ')}`).toEqual([])
+    })
+  }
 })

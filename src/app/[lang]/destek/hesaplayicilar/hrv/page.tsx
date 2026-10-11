@@ -24,7 +24,8 @@ export async function generateMetadata({
     lang,
     yol: Routes.destek.hesaplayicilar('hrv'),
     baslik: `${dict.calculators.hrv.title} | ${dict.urunSecici.ustBaslik} | VentHub`,
-    aciklama: dict.calculators.hrv.description,
+    // SEO-32: arama açıklaması ayrı anahtardan; `description` sayfanın görünür alt başlığıdır.
+    aciklama: dict.calculators.hrv.metaDescription,
   })
 }
 

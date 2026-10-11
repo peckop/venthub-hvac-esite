@@ -119,11 +119,46 @@ describe('INV-PALET-1 — marka paleti tek kaynakta ve kapalı kararın değeriy
       '--cyan-400', '--cyan-500', '--cyan-glow', '--amber-400',
       '--text-secondary', '--text-muted', '--glass-bg', '--glass-border', '--glass-hover',
     ]
-    const geriGelenler = SILINENLER.filter((v) => new RegExp(`${v}\\s*:`).test(INDEX_CSS))
+    // DS takma adi SERBEST (ALT-30): `--ad: var(--hedef)` yeni renk kaynagi acmaz, mevcut tokene
+    // isaret eder. Kirmizi kalanlar: ham HSL/HEX/rgb deger, tanimsiz hedef, dongu.
+    const geriGelenler = SILINENLER.filter((v) => takmaAdOlmayanTanimlar(v).length > 0)
     expect(
       geriGelenler,
       `Olu legacy renk degiskenleri geri eklenmis: ${geriGelenler.join(', ')}. ` +
-        'Kullanimi olmayan renk kaynagi paleti bulandirir (cetvel §2).',
+        'Kullanimi olmayan renk kaynagi paleti bulandirir (cetvel §2). ' +
+        'Yalniz `--ad: var(--hedef)` takma adi serbest; hedef index.css\'te tanimli olmali, dongu olmamali.',
     ).toEqual([])
   })
 })
+
+/** `ad` icin index.css'teki TUM tanim degerleri (:root, .dark vb.). */
+function tumTanimlar(ad: string): string[] {
+  const re = new RegExp(`(?<![\\w-])${ad}\\s*:\\s*([^;}]+)[;}]`, 'g')
+  return [...INDEX_CSS.matchAll(re)].map((m) => m[1].trim())
+}
+
+/** Takma ad olmayan (ham deger / tanimsiz hedef / dongulu) tanimlar; bos dizi = temiz. */
+function takmaAdOlmayanTanimlar(ad: string): string[] {
+  const kotu: string[] = []
+  for (const deger of tumTanimlar(ad)) {
+    const ziyaret = new Set<string>([ad])
+    let simdiki = deger
+    for (;;) {
+      const m = simdiki.match(/^var\(\s*(--[\w-]+)\s*\)$/)
+      if (!m) {
+        // Zincirin sonu: ilk halka takma ad degilse ham degerdir; takma adsa son halka gercek tokendir.
+        if (simdiki === deger) kotu.push(deger)
+        break
+      }
+      const hedef = m[1]
+      const hedefTanimlari = tumTanimlar(hedef)
+      if (ziyaret.has(hedef) || hedefTanimlari.length === 0) {
+        kotu.push(deger)
+        break
+      }
+      ziyaret.add(hedef)
+      simdiki = hedefTanimlari[0]
+    }
+  }
+  return kotu
+}

@@ -23,7 +23,8 @@ const BETIK = path.join(KOK, 'scripts/nlm/gun_kapanisi.py')
 const kaynak = fs.readFileSync(BETIK, 'utf8')
 
 function pythonBul(): string | null {
-  for (const ad of ['python', 'python3', 'py']) {
+  // `python3` bilerek yok: Windows'ta Mağaza yönlendiricisidir (ARC-14, INV-PYTHON3-1).
+  for (const ad of ['python', 'py']) {
     const r = spawnSync(ad, ['--version'], { encoding: 'utf8' })
     if (r.status === 0) return ad
   }

@@ -16,9 +16,9 @@
  *  3. Canlı mı: `claude agents --json` (ölçülebilirse YETKİLİ) yoksa `~/.claude/sessions/<pid>.json` + pid canlılığı.
  *     Rolün BİLİNEN TÜM sid'lerinden biri ya da adı rol adıyla eşleşen (Türkçe katlamalı) bir ana pencere AÇIKSA
  *     AÇMAZ: "zaten açık: <ad> (sid8)", çıkış 0 (`departman-ortak.rolPencereleri`).
- *  4. TAVAN: açık ana pencere sayısı (alt süreçler ve OPS HARİÇ) 5'e ulaştıysa AÇMAZ, uyarır, çıkış 1.
+ *  4. TAVAN: açık ana pencere sayısı (alt süreçler ve OPS HARİÇ) `PENCERE_TAVANI`na (karar 328: 8) ulaştıysa AÇMAZ, uyarır, çıkış 1.
  *     OPS tavandan MUAFTIR: Ops tavan doluyken de açılır (sayıma girmediği gibi kapıya da takılmaz).
- *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --strict-mcp-config --mcp-config
+ *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --mcp-config
  *     <ana-kök>\.mcp.json` (sid yoksa `--resume` YOK = yeni oturum), çalışma dizini = ANA DEPO KÖKÜ
  *     (scripts/hijyen/ana-kok.cjs; sabit yol yazılmaz).
  *  · İZİN MODU (Recep kararı bekliyor): açılan pencere `--permission-mode auto` kipte BAŞLAR; Recep kararı gelene kadar
@@ -27,11 +27,16 @@
  *  · `--taze`: `--resume` YOK; yeni oturum `--name <Ad>` + ilk mesaj "durum dosyanı oku, devam et" (durum dosyasının
  *     yolu rolün son sid'inden mevcut kancanın çözümlemesiyle bulunur; bulunamazsa genel cümle + uyarı).
  *
- * EKİP KİPİ: Ekip gereken iş için departman kendi TERMINAL penceresini açar: Desktop penceresinde ekip kurulmaz (ölçüldü
- *  2026-10-01), cli girişli terminal penceresinde kurulur ve çalışır (EkipTest3 ölçümü). Terminal penceresi Desktop kenar
- *  çubuğunda GÖRÜNMEZ ama pencere listesinde (claude agents / ListAgents) adıyla durur ve SendMessage ile iki yönde
- *  ulaşılır. Her açılış Recep'in ekranında ve onayındadır; pencereyi kapatmak insan eylemidir. Eski oturumu --resume ile
- *  terminalde açınca ekip kurulup kurulmadığı ÖLÇÜLMEDİ; --taze yeni oturumda kurulur.
+ * EKİP KİPİ (Ops ölçümü, 2026-10-01; kayıt memory/ekip-modu-olculmus-gercek.md — TEKRAR ÖLÇME): ekip modu (agent teams)
+ *  TERMİNAL oturumunda VAR (taze de `--resume` de), Masaüstü uygulamasında YOK. Ayrı "TeamCreate" aracı yoktur; ekip üyesi
+ *  Agent'ı `name` ile çağırmakla açılır. Bu yüzden ekip isteyen departman bu betikle TERMİNAL sekmesinde açılır ve
+ *  `--resume` ekibi KAYBETTİRMEZ (yalnız önceki üyeler geri gelmez, lider yenilerini açar).
+ *  ⚠`/desktop` YAZMA: terminalde açık bir oturuma `/desktop` yazılırsa oturum Masaüstü'ne geçer, `Agent name` düz alt
+ *  ajana düşer ve ekip modu KAYBOLUR (ölçüldü 2026-10-01, Ürün). Ekip modu isteyen pencere terminalde KALIR.
+ *  Aynı sid iki yerde birden açılamaz: Masaüstü'nde açık bir oturumu terminale almak için önce Masaüstü tarafı kapanmalı
+ *  (bu betik "zaten açık" der ve açmaz). Her açılış Recep'in ekranında ve onayındadır; kapatmak insan eylemidir.
+ *  MCP KÜMESİNİ DARALTMAK (ör. `--strict-mcp-config`, rol başına sunucu listesi) RECEP KARARIDIR (Ops 10-01): varsayılan
+ *  Masaüstü penceresiyle AYNI sunucu kümesidir; daraltma gerekçeli ve ölçümlü bir kararla girer, betiğin kendi tercihiyle girmez.
  *
  * HATA YOLLARI (hepsi açık mesaj; sessiz geçmez): rol tanınmıyor · claude.exe bulunamadı · .mcp.json yok (bayrak yolu kırık
  * olurdu) · pencere tavanı dolu → çıkış 1. Pano dizini yok / olay dosyası bozuk / sessions dizini yok / sid yok →
@@ -100,14 +105,16 @@ function planla(rolArg, o = {}) {
   if (!exe) return { karar: 'hata', sebep: 'claude.exe bulunamadi (PATH icinde claude.exe yok; VENTHUB_CLAUDE_EXE ile de verilmedi)', ad: rol.ad, uyarilar }
   const kok = process.env.VENTHUB_ANA_KOK || anaKok()
   const mcp = path.join(kok, '.mcp.json')
-  if (!fs.existsSync(mcp)) return { karar: 'hata', sebep: `.mcp.json yok: ${mcp} (--strict-mcp-config bayrak yolu kirik olurdu)`, ad: rol.ad, uyarilar }
+  if (!fs.existsSync(mcp)) return { karar: 'hata', sebep: `.mcp.json yok: ${mcp} (--mcp-config bayrak yolu kirik olurdu)`, ad: rol.ad, uyarilar }
 
   const resume = son && !o.taze ? son.sid : null
   const args = [
     ...(resume ? ['--resume', resume] : []),
     '--name', rol.ad,
     '--permission-mode', 'auto',
-    '--strict-mcp-config',
+    // --strict-mcp-config YOK (Ops 10-01): strict, kullanici/eklenti/hesap duzeyindeki sunculari (github, codegraph, supabase,
+    // linear, playwright, sentry...) kapatiyor ve terminal penceresinde yalniz proje .mcp.json (4 wrongstack) kaliyordu. Varsayilan =
+    // Masaustu penceresiyle AYNI sunucu kumesi. .mcp.json acikca verilir (proje sunuculari onaylidir, onay istemi cikmaz).
     '--mcp-config', mcp,
   ]
   let istem = null
@@ -115,7 +122,9 @@ function planla(rolArg, o = {}) {
     const durum = son ? ortak.durumBul(son.sid) : null
     if (!durum) uyarilar.push('durum dosyasi bulunamadi — ilk mesaj genel cumle (dosya yolu yok)')
     istem = tazeIstem(durum)
-    args.push(istem) // konum argumani = ilk mesaj (claude [options] [prompt])
+    // Konum argumani = ilk mesaj (claude [options] [prompt]). `--mcp-config <configs...>` DEGISKEN-uzunluklu oldugundan
+    // `--` olmadan istem .mcp.json'un ikinci degeri sanilip yutulur (ARC-10); `--` secenek ayrimini kapatir.
+    args.push('--', istem)
   }
   const argumentList = args.map(ortak.tirnakla).join(' ')
   return {

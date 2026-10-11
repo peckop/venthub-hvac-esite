@@ -22,6 +22,7 @@ export const ORNEK_YAZI: RehberYazisi = {
     tr: {
       slug: 'ornek-yazi',
       ozet: 'Örnek yazının özeti tek cümledir ve gövdenin ilk paragrafıyla aynı cevabı verir.',
+      kartOzeti: 'Seçimde dikkat edilecekler ile boyutlandırma adımları, örnek bir rehber yazısı üzerinden.',
       govde: `# Örnek Rehber Yazısı
 
 Örnek yazının özeti tek cümledir ve gövdenin ilk paragrafıyla aynı cevabı verir.
@@ -43,6 +44,7 @@ ${SORUMLULUK_TR} Örnek değerler kendi sisteminizde farklı çıkabilir.
     en: {
       slug: 'sample-article',
       ozet: 'The sample article summary is a single sentence and gives the same answer as the first paragraph.',
+      kartOzeti: 'What to consider when choosing and how to size, shown through a sample guide article.',
       govde: `# Sample Guide Article
 
 The sample article summary is a single sentence and gives the same answer as the first paragraph.

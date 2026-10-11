@@ -9,7 +9,7 @@
 | Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
 |---|---|---|
 | Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
-| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Emir | pano notu / sıralı emir | **Kanban kartı** (karar 219) — Recep sözü **önce karta** (tırnak + pencere + saat), sonra şeride emir |
 | Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
 | Uyanma | cron + tur-sonu `ScheduleWakeup` | eski üçlü **EMEKLİ** · uyandırma = mesaj. ⚠**Karar 53 (2026-09-19):** cron / zamanlayıcı / loop genel olarak yasak **değil** — dönemsel bir karardı; gerekiyorsa **önce Recep'le konuşulur** |
 | Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
@@ -102,7 +102,7 @@ bakılarak söylenir.
 
 Recep'in sözü: *"ihtiyaç halinde birbirine yazabilmeli, işlerini bırakıp değil, iş gereği; sorumlulukların bilincinde olmalıyız."* OPS aracı değildir; pencereler `SendMessage` ile doğrudan konuşur. Kurallar:
 
-1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Linear numarası yazılı.
+1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Kanban numarası yazılı.
 2. **İş bırakılmaz:** alan sahibi elindeki adımı bitirir, sonra kısa cevap verir; gerekirse kendi kuyruğuna kart açar.
 3. **OPS'a da tek satır:** sıra/öncelik değiştiren, başkasının dosyasına dokunan ya da karar isteyen her şey. Pencereler kendi aralarında karar vermez; Recep'e soru dolaştırılmaz.
 4. **Açılışta claim alınır:** claim'siz pencere panoda "kapalı" görünür ve yazışma adresi belirsizleşir.
@@ -1119,6 +1119,24 @@ claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
    akran aktarımı onay yerine **geçmez**; yanlış adrese düşen bir GO, düştüğü şerit
    tarafından **taşınmaz** — yalnız *"teslimat kayboldu, kendi kanalından al"* denir.
    (Vaka 3 böyle kapatıldı.)
+4. **Onay yolu (karar 224, Recep 2026-10-01, OPS penceresi).** Recep'in sözü: *"canlı haricinde sen işi
+   bitirebilmelisin ama ben ister sana ister de o pencerede gidip yine onay verebilirim"*. Yani **canlı DIŞINDAKİ
+   işlerde** departman onayı doğrudan OPS'tan alınır; Recep'in OPS'ta verdiği evet için OPS sözünü ve saatini
+   aktarır ve kaydı OPS panosundaki REC-425 kartına not olarak yazar (departman doğrulayabilsin). "Canlı" =
+   Recep kapıları 1-5 (migration'lı PR, sır/anahtar/parola yazmak, geçmişi silen/zorlayan git, canlı veritabanına
+   yazım, para harcatan her şey) ve aşağıdaki liste; bunlar Recep'te kalır, OPS yalnız bunların dışındakini onaylar. Bu, madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR: adres doğrulanmıştır ve kaynak
+   Recep'in kendi sözüdür. **Recep'in onayını aktarma yetkisi YALNIZ OPS'tadır** (Recep, 2026-10-01:
+   *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*); bir departman başka bir departmana
+   Recep onayı aktaramaz (madde 3 aynen geçerlidir).
+   - **Son hâl (Recep, OPS penceresi, 2026-10-01):** *"canlı haricinde kimsenin penceresinde evet hayır yazmak zorunda
+     olmak istemiyorum."* Canlı dışındaki her onayı Recep yalnız OPS penceresinde verir. Ayar/izin/kullanıcı düzeyi
+     dosya (`recep.md`, settings gibi) değişikliği gerekiyorsa departman metni ya da komutu hazırlar, Recep OPS'ta
+     evet der, değişikliği OPS kendi penceresinde uygular (eş mesajı izin sayılmaz kuralı böyle korunur).
+     Recep dilerse departman penceresine de yazabilir (yasak değil, zorunlu da değil): o söz geçerlidir, departman
+     sözü aynı turda saatiyle OPS'a bildirir (karar defteri kancası REC-554 gelene kadar geçici kural).
+   - **Recep'in başka pencereye yazması gereken tek durum CANLI'dır:** prod, migration'lı PR, gerçek para, geri alınamaz
+     silme. Recep sözü o pencerede.
+   - Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
 
 ### Aracın yanıltan çıktısı — ve ailesi
 

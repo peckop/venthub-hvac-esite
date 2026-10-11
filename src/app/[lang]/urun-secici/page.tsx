@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const enUrl = `${SITE_URL}${localizedHref(Routes.urunSecici(), 'en')}`
     return {
         title: `${dict.urunSecici.baslik} | VentHub`,
-        description: dict.urunSecici.aciklama,
+        description: dict.urunSecici.seoDescription,
         alternates: {
             canonical: lang === 'en' ? enUrl : trUrl,
             // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.

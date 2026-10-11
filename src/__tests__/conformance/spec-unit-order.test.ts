@@ -14,6 +14,9 @@ import { formatSpecValue } from '../../utils/productHelpers'
  * ölçer — varlık testi bu hatayı yakalayamazdı, çünkü satır gerçekten oradaydı.
  */
 
+/** Birim kuralları dil bilmez (URN-58: `t` yalnız mantıksal değer içindir); özdeş çözücü yeter. */
+const t = (anahtar: string): string => anahtar
+
 /** [anahtar, ham değer, beklenen çıktı, niçin] */
 const ALTIN: ReadonlyArray<readonly [string, unknown, string, string]> = [
   // ── GÖLGELENME: bunlar yanlıştı, artık doğru ────────────────────────────────
@@ -55,7 +58,7 @@ describe('INV-SPEC-UNIT-1 · birim kuralları erişilebilir ve doğru', () => {
 
     const hatalar: string[] = []
     for (const [key, deger, beklenen, nicin] of ALTIN) {
-      const cikti = formatSpecValue(key, deger)
+      const cikti = formatSpecValue(key, deger, t)
       if (cikti !== beklenen) hatalar.push(`${key}: '${cikti}' != '${beklenen}'  (${nicin})`)
     }
     expect(
@@ -70,14 +73,14 @@ describe('INV-SPEC-UNIT-1 · birim kuralları erişilebilir ve doğru', () => {
     // Koruma HARF varlığına bakar, biçime değil. Bu ayrımı testi yazarken YANLIŞ
     // varsaymıştım: '230/400' harf içermediği için birim ALIR — ve bu DOĞRU davranış,
     // çift gerilimli bir motorun etiketi "230/400 V" diye okunur.
-    expect(formatSpecValue('voltage_v', '230/400')).toBe('230/400 V')
-    expect(formatSpecValue('insulation_class', 'Class F')).toBe('Class F')
-    expect(formatSpecValue('motor_type', 'EC')).toBe('EC')
-    expect(formatSpecValue('atex_marking', 'II 2G/D h T3')).toBe('II 2G/D h T3')
+    expect(formatSpecValue('voltage_v', '230/400', t)).toBe('230/400 V')
+    expect(formatSpecValue('insulation_class', 'Class F', t)).toBe('Class F')
+    expect(formatSpecValue('motor_type', 'EC', t)).toBe('EC')
+    expect(formatSpecValue('atex_marking', 'II 2G/D h T3', t)).toBe('II 2G/D h T3')
   })
 
   it('boş değer tire döner', () => {
-    expect(formatSpecValue('weight_kg', null)).toBe('-')
-    expect(formatSpecValue('weight_kg', undefined)).toBe('-')
+    expect(formatSpecValue('weight_kg', null, t)).toBe('-')
+    expect(formatSpecValue('weight_kg', undefined, t)).toBe('-')
   })
 })

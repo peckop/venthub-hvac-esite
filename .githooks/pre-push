@@ -1,13 +1,60 @@
 #!/bin/sh
-# Kapali dala push bekcisi (INV-KAPALI-DAL-1) — birlesmis ve acik PR'i olmayan dala push'u REDDEDER.
+# Push bekcileri — iki ayri kapi, ikisi de pre-push'ta, sirayla.
 #
-# NEDEN VAR (2026-09-22, #1305): squash-merge sonrasi ritüel uzak dali siliyor; ayni dala sonradan
-# itilen commit GitHub'da SESSIZCE yeni dal acar ve master'a hic girmez (9 commit 12 gun kayboldu).
-# Mantik ve testler: scripts/hijyen/kapali-dal-push.cjs. gh/ag yoksa UYARIR ve gecirir (fail-open).
-# Bilincli yeniden kullanim: VH_KAPALI_DAL_IZIN=1 git push ...
+# (1) DEPO DOKUM KAPISI (ALT-39, INV-DEPO-DOKUM-1, scripts/security/depo-dokum-kapisi.cjs --pre-push):
+#     itilecek TUM nesneleri (sonradan silinen dosyalar DAHIL) tarar.
+#       cikis 1 (ihlal)        -> push ENGELLENIR.
+#       cikis 2 (olculemedi)   -> push YINE ENGELLENIR (ALT-39 2. tur, Y1). Olcemeyen kapi yesil vermez; AGA cikis geri
+#                                 alinamaz (dal itildigi an commit herkese acik olabilir, refs/pull/N/head altinda kalir).
+#                                 Eski davranis (uyar ve gecir) olcum disi bir push'u sessizce serbest birakiyordu.
+#                                 BILINCLI GECIS: VH_DOKUM_OLCULEMEDI_IZIN=1 git push ...  (kapali-dal kancasindaki
+#                                 VH_KAPALI_DAL_IZIN=1 deseninin aynisi; uyari yine basilir). Yalniz "1" gecerlidir.
+#       baska cikis (kapi cokmesi, sinyal) -> ayni sekilde ENGELLENIR (olculemedi).
+#     `node` PATH'te yoksa kanca sessiz gecmez: YUKSEK SESLE uyarir ve gecirir (kapiyi hic kosamadi; burada engellemek
+#     node kurulu olmayan her makinede push'u imkansiz kilar), kesin kapi CI'dir.
+#     ⚠DURUST SINIR: `git push --no-verify` bu kancayi atlar; AGA cikisi yalniz bu kanca yakalar ve atlanabilir.
+#     CI ise yalniz birlesmeyi durdurur. ⚠KANCA DALA BAGLIDIR (scripts/setup-hooks.mjs shim'i her worktree'nin KENDI
+#     .githooks/pre-push dosyasina bakar): ALT-39 oncesi daldan itilirse kapi hic kosmaz ve uyari da cikmaz (cetvel §7 "gecis siniri").
+#
+# (2) Kapali dal push bekcisi (INV-KAPALI-DAL-1) — birlesmis ve acik PR'i olmayan dala push'u REDDEDER.
+#     NEDEN VAR (2026-09-22, #1305): squash-merge sonrasi rituel uzak dali siliyor; ayni dala sonradan
+#     itilen commit GitHub'da SESSIZCE yeni dal acar ve master'a hic girmez (9 commit 12 gun kayboldu).
+#     Mantik ve testler: scripts/hijyen/kapali-dal-push.cjs. gh/ag yoksa UYARIR ve gecirir (fail-open).
+#     Bilincli yeniden kullanim: VH_KAPALI_DAL_IZIN=1 git push ...
+#
+# git pre-push stdin'i BIR KEZ okunur ve iki kapiya da verilir.
+#
+# VH_NODE_YOLU: node'un yerini degistirmek icin (varsayilan `node`); testler "node yok" kolunu bununla kosar.
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+NODE="${VH_NODE_YOLU:-node}"
+if ! command -v "$NODE" >/dev/null 2>&1; then
+  echo "[pre-push] !!! UYARI !!! node PATH'te yok ('$NODE'): depo dokum kapisi ve kapali-dal kontrolu YAPILMADI." >&2
+  echo "[pre-push] Push'a IZIN VERILIYOR cunku kapiyi calistirmanin yolu yok; veri sizdirmama kontrolu bu push'ta YOK." >&2
+  echo "[pre-push] Kesin kapi CI'dir (master'a birlesmeyi durdurur), ama dal itildigi an commit herkese acik olabilir." >&2
+  echo "[pre-push] Duzeltme: node'u PATH'e ekle (ya da VH_NODE_YOLU=<node yolu>) ve push'u tekrarla." >&2
+  exit 0
+fi
+GIRDI=$(cat)
+
+DOKUM="$ROOT/scripts/security/depo-dokum-kapisi.cjs"
+if [ -f "$DOKUM" ]; then
+  printf '%s\n' "$GIRDI" | "$NODE" "$DOKUM" --pre-push
+  RC=$?
+  if [ "$RC" -eq 1 ]; then
+    echo "[depo-dokum] PUSH ENGELLENDI: itilecek nesnelerde kisisel veri / odeme parcasi / fiyat-maliyet dokumu / ikili veritabani var (liste yukarida)." >&2
+    exit 1
+  elif [ "$RC" -ne 0 ]; then
+    if [ "${VH_DOKUM_OLCULEMEDI_IZIN:-}" = "1" ]; then
+      echo "[depo-dokum] !!! UYARI !!! itilecek nesneler OLCULEMEDI (cikis $RC) ve VH_DOKUM_OLCULEMEDI_IZIN=1 ile GECILIYOR: dokum kontrolu YAPILMADI. Nedeni yukaridaki mesajdan oku." >&2
+    else
+      echo "[depo-dokum] PUSH ENGELLENDI: itilecek nesneler OLCULEMEDI (cikis $RC) — olcemeyen kapi yesil vermez. Nedeni yukaridaki mesajdan oku." >&2
+      echo "[depo-dokum] Nedeni gidermek mumkun degilse BILINCLI gecis: VH_DOKUM_OLCULEMEDI_IZIN=1 git push ...  (kontrol yapilmadan; sorumluluk sende)" >&2
+      exit 1
+    fi
+  fi
+fi
+
 BETIK="$ROOT/scripts/hijyen/kapali-dal-push.cjs"
 [ -f "$BETIK" ] || exit 0
-command -v node >/dev/null 2>&1 || { echo "[kapali-dal] UYARI: node yok — kontrol YAPILMADI." >&2; exit 0; }
-exec node "$BETIK"
+printf '%s\n' "$GIRDI" | "$NODE" "$BETIK"

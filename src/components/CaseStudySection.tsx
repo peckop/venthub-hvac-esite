@@ -1,11 +1,14 @@
 import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMu } from '@/utils/bosDegerKorumasi'
 
 import { trackEvent } from '../utils/analytics'
 
 const CaseStudySection: React.FC = () => {
   const { t } = useI18n()
+  // URN-84: tablo ölçü etiketlerini BOŞ bırakır (kaynaksız ölçü beyanı kalkar). Etiketsiz değer tek başına
+  // anlamsızdır → o hap çizilmez; hiç ölçüsü kalmayan kartta ölçü satırı da basılmaz. Başlığı boş kart çizilmez.
   const items = [
     {
       title: t('home.caseStudies.items.parking.title'),
@@ -24,12 +27,17 @@ const CaseStudySection: React.FC = () => {
       ],
     },
   ]
+    .filter((cs) => doluMu(cs.title))
+    .map((cs) => ({ ...cs, metrics: cs.metrics.filter((m) => doluMu(m.label) && doluMu(m.value)) }))
 
   const openLead = () => {
     if (typeof window !== 'undefined') {
       window.openLeadModal?.()
     }
   }
+
+  // Hiç kart kalmadıysa başlık ve altyazı boş bir ızgaranın üstünde asılı kalmasın.
+  if (items.length === 0) return null
 
   return (
     <section className="py-16 bg-white">
@@ -43,14 +51,16 @@ const CaseStudySection: React.FC = () => {
           {items.map((cs) => (
             <div key={cs.title} className="rounded-2xl border border-light-gray bg-gradient-to-br from-gray-50 to-white p-6 hover:shadow-md transition">
               <h3 className="text-xl font-semibold text-industrial-gray">{cs.title}</h3>
-              <p className="mt-2 text-steel-gray">{cs.summary}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {cs.metrics.map((m) => (
-                  <span key={m.label} className="inline-flex items-center rounded-full bg-light-gray px-3 py-1 text-sm text-industrial-gray">
-                    <span className="font-medium mr-1">{m.label}:</span> {m.value}
-                  </span>
-                ))}
-              </div>
+              {doluMu(cs.summary) && <p className="mt-2 text-steel-gray">{cs.summary}</p>}
+              {cs.metrics.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {cs.metrics.map((m) => (
+                    <span key={m.label} className="inline-flex items-center rounded-full bg-light-gray px-3 py-1 text-sm text-industrial-gray">
+                      <span className="font-medium mr-1">{m.label}:</span> {m.value}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="mt-6">
                 <button
                   onClick={() => { trackEvent('case_study_click', { title: cs.title }); openLead() }}

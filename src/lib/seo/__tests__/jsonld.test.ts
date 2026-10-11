@@ -10,6 +10,14 @@ import { assertNoUuid, buildCategoryJsonLd, buildProductGroupJsonLd, buildSeries
 
 const BASE_URL = 'https://venthub.com'
 
+/**
+ * REC-494: CollectionPage üreticilerinde liste üst düzeyde DEĞİL, `mainEntity` ItemList içindedir
+ * (`numberOfItems` ve `itemListElement` schema.org'da `ItemList`'in özellikleridir).
+ */
+function liste(ld: Record<string, unknown>) {
+  return ld.mainEntity as { numberOfItems: number; itemListElement: Record<string, unknown>[] }
+}
+
 function makeVariant(overrides: Partial<FamilyVariant> = {}): FamilyVariant {
   return {
     id: 'v-1',
@@ -280,7 +288,7 @@ describe('buildCategoryJsonLd', () => {
       families: [makeFamilyListItem({ slug: 'dds-nano' })],
     })
 
-    const items = jsonLd.itemListElement as Record<string, unknown>[]
+    const items = liste(jsonLd).itemListElement
     expect(items[0].url).toBe(`${BASE_URL}/en/products/dds-nano`)
   })
 
@@ -297,7 +305,7 @@ describe('buildCategoryJsonLd', () => {
       families: [makeFamilyListItem({ slug: 'a' }), makeFamilyListItem({ slug: 'b' })],
     })
 
-    const items = jsonLd.itemListElement as Record<string, unknown>[]
+    const items = liste(jsonLd).itemListElement
     expect(items[0].position).toBe(25)
     expect(items[1].position).toBe(26)
   })
@@ -331,7 +339,7 @@ describe('buildCategoryJsonLd', () => {
       families: [],
     })
 
-    expect(jsonLd.numberOfItems).toBe(42)
+    expect(liste(jsonLd).numberOfItems).toBe(42)
   })
 })
 
@@ -398,7 +406,7 @@ describe('buildSeriesLandingJsonLd', () => {
       ],
     })
 
-    const items = jsonLd.itemListElement as Record<string, unknown>[]
+    const items = liste(jsonLd).itemListElement
     expect(items).toHaveLength(2)
     expect(items[0]).toEqual({
       '@type': 'ListItem',
@@ -420,7 +428,7 @@ describe('buildSeriesLandingJsonLd', () => {
       models: [makeFamilyListItem(), makeFamilyListItem({ id: 'model-2', slug: 'model-2' })],
     })
 
-    expect(jsonLd.numberOfItems).toBe(2)
+    expect(liste(jsonLd).numberOfItems).toBe(2)
   })
 
   it('isPartOf (WebSite) ekler', () => {
