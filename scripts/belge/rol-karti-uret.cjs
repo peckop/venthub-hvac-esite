@@ -174,6 +174,19 @@ const UNVAN_OLCUM_KURALI = [
   '- Ham HTML ölçümünde S:0 kopyası AYRI sayılır: sayfa ham HTML\'inde hidden id="S:0" gizli akış bloğunun içindeki metin dış gövdenin ayrı bir kopyasıysa h1, kırıntı ve model bağlantısı sayımı "S:0 dışı" ve "S:0 içi" iki sütunda yazılır, tek toplam verilmez. Aile sayfasındaki ikinci kopya bilinçli fallback\'tir (ProductDetailPageView Suspense fallback, URN-25 sonucu) ve kusur sayılmaz; kategori ve ürünler sayfalarında S:0 içi 0 olmalıdır (INV-SSR-GOVDE-2). Ölçüm cetveli docs/standards/geo-olcum-standard.md ve docs/standards/dizin-sistemleri-standard.md başkasının cetvelidir: bu kural onlara atıf verir, onları değiştirmez.',
 ].join('\n')
 
+/**
+ * OPS YANIT KURALI (ARC-51, OPS kararı 2026-10-11): yalnız OPS'un kurallar dosyasına girer (kartın bayt payına dokunmaz;
+ * UNVAN_OLCUM_KURALI kalıbı). Okuyucu: `scripts/board/linear-yeni-yorum.cjs` (`--durum` "OPS N yorum yanıtsız" sayacı,
+ * `CEVAP_BEKLIYOR` işareti); envanter satırı: `docs/audits/arac-envanteri-2026-09-07.md`. Depo herkese açık: kuralın
+ * gerekçesi (canlı ölçüm) buraya YAZILMAZ; kodun başlık yorumunda ve ARC-51 kartında durur.
+ */
+const OPS_YANIT_KURALI_ROLLERI = ['OPS']
+const OPS_YANIT_KURALI = [
+  '## Design yorumuna yanıt (ARC-51)',
+  '- Design\'a iş veren (yeni istek, sorulan soru, bekleyen karar) OPS yanıtının gövdesine "CEVAP BEKLİYOR" yazılır (büyük/küçük harf fark etmez). Yazılmayan OPS yanıtı, Design\'ın hemen önceki yorumuna verilmiş kapanış sayılır ve `--durum` "OPS N yorum yanıtsız" sayacında yanıtsız sayılmaz.',
+  '- Okuyucu ve sınır: `scripts/board/linear-yeni-yorum.cjs`. İşaretsiz yazılan iş veren yanıt için sessizlik uyarısı çalmaz; işaret OPS\'un yazım kuralıdır, kod bunu tahmin etmez.',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -193,6 +206,7 @@ function kuralDosyasi(ad) {
     '',
     ...(ICERIK_KURALI_ROLLERI.includes(ad) ? [ICERIK_KURALI, ''] : []),
     ...(UNVAN_OLCUM_KURALI_ROLLERI.includes(ad) ? [UNVAN_OLCUM_KURALI, ''] : []),
+    ...(OPS_YANIT_KURALI_ROLLERI.includes(ad) ? [OPS_YANIT_KURALI, ''] : []),
   ].join('\n')
 }
 

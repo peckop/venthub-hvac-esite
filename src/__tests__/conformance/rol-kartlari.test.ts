@@ -658,6 +658,34 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it("ARC-51: 'Design yorumuna yanıt' bölümü yalnız OPS'un kurallar dosyasında (üretilen ve diskteki); rol kartında ve öteki rollerin kurallar dosyasında yok; işaret kodla bağlı", () => {
+    const baslik = '## Design yorumuna yanıt (ARC-51)'
+    const diskMetni = (ad: string): string =>
+      fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+    expect(Object.keys(kuralMetinleri), 'OPS kurallar dosyası üretilmeli').toContain('OPS')
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      const kaynaklar: Array<[string, string]> = [
+        [metin, `${ad}-kurallar.md (üretilen)`],
+        [diskMetni(ad), `${ad}-kurallar.md (disk)`],
+      ]
+      for (const [m, etiket] of kaynaklar) {
+        if (ad !== 'OPS') {
+          expect(m, `${etiket}: Design yorumuna yanıt kuralı bu role ait değil`).not.toContain(baslik)
+          continue
+        }
+        expect(m.split(baslik).length - 1, `${etiket}: bölüm tam bir kez`).toBe(1)
+        expect(m, etiket).toContain('"CEVAP BEKLİYOR"')
+        expect(m, etiket).toContain('scripts/board/linear-yeni-yorum.cjs')
+      }
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain(baslik)
+    }
+    // Kural metnindeki işaret, sayacın gerçekten aradığı işaretle aynı olmalı (kural kodla birlikte değişir).
+    const kod = fs.readFileSync(path.join(KOK, 'scripts', 'board', 'linear-yeni-yorum.cjs'), 'utf8')
+    expect(kod, 'sayaç kodu CEVAP BEKLİYOR işaretini arar').toContain('CEVAP\\s+B[Eİ]KL[Iİ]YOR')
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
