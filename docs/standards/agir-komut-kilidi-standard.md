@@ -115,7 +115,7 @@ uygulanır (karar 224: onay pencereler arası taşınmaz).
 - Canlı kabul (ayar kaydından sonra): iki pencerede aynı anda `pnpm type-check` denenince ikincisi
   `AGIR KOMUT KILIDI` ile reddedilir ve istem satırında `⚠KILIT` görünür. Bu ölçüm kayıttan sonra
   karta yazılır; ölçülmeden "çalışıyor" denmez.
-- **Canlı kabul ölçüldü (2026-10-11, #1842'den sonra, master'a eşit ağaçta).** Komut `tsc --version`
+- **Canlı kabul ölçüldü (2026-10-11, #1842'den sonra).** Komut `tsc --version`
   (sınıflayıcıda "type-check" sayılır, proje derlemesi koşturmaz: tam type-check bellek kuralı gereği
   koşturulmadı):
   1. **İkinci pencere reddi:** URUN penceresi (`4a8eaf9c`) yuvayı arka plandaki `pnpm install --offline`
@@ -126,6 +126,11 @@ uygulanır (karar 224: onay pencereler arası taşınmaz).
   3. **Bırakma:** ön plan `tsc --version` bitince yuva boşaldı (bir sonraki pencere hemen aldı).
   4. **Başarısız komut:** `tsc --nonexistent-flag-xyz` (çıkış 1) sonrası yuva BOŞ; PostToolUseFailure
      kaydı çalışıyor.
+- **Gözlem (kancanın çözüldüğü yer):** kanca, çalışma ağacının `settings.json`'unda kayıt olmasa ve
+  betik dosyası ağaçta bulunmasa bile koştu (ARAÇ penceresinin ağacı #1842'den 234 commit gerideydi;
+  `agir-komut-kilidi.cjs` o ağaçta yok, yuva yine de pencerenin kimliğiyle alındı). Çıkarım (ölçülmedi):
+  worktree pencerelerinde kanca kaydı ve betiği ana ağaçtan (proje kökü) çözülüyor; "ağaç geride
+  olduğu için kanca kayıtlı değildir" varsayımı bu pencerede doğrulanmadı.
 - **Gözlem (tasarımın bedeli, §2 madde 3):** arka plan komutunun yuvası TTL'e kalır. URUN'un birkaç
   dakikalık `install`'ı ve ardından aynı pencerenin `docker` komutu (yeniden giriş yuvayı yeniler)
   yuvayı 11:21-11:53 arası, yaklaşık 32 dk dolu tuttu. Bir arka plan ağır komut, filonun geri kalanını
