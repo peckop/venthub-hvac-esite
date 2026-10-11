@@ -154,6 +154,67 @@ function satir(token, pencere) {
 }
 
 /**
+ * ── KAYIT BOYUTU (ARC-82, Ops emri 2026-10-09 madde 3) ──
+ *
+ * Konuşma dosyası (`<sid>.jsonl`) compact'a rağmen küçülmez, yalnız büyür; 10-09 ölçümü: OPS 1,77 GB,
+ * Ürün 682 MB, Katalog 260 MB, toplam 4,6 GB (10-10: OPS 2,1 GB). Büyüdükçe dosyayı okuyan her şey
+ * yavaşlıyor ve çöküyor. Pencerenin kendi dosyasının boyutu her istemde görünür; eşikler aşılınca
+ * uyarı çıkar, 1,5 GB'ta "yeni oturuma devret" denir.
+ *
+ * ⭐Yalnız `statSync` (dosya AÇILMAZ, ~0,1 ms); okuma yok. Dosya/yol yoksa satır YOK (susar).
+ * ⭐Satır EŞİKSİZ görünür (BAGLAM gibi): Recep bağlamın yanında kayıt boyutunu da görür.
+ * Eşikler `VENTHUB_KAYIT_UYARI_MB` (1024) ve `VENTHUB_KAYIT_DEVRET_MB` (1536) ile ayarlanır; bozuk
+ * (sayı değil, ≤0) ya da sırası ters (devret ≤ uyarı) değer ikisini de varsayılana döndürür.
+ *
+ * Not: 10-09 20:00 kapanması bellekten (OPS, main.log); dosya boyutu ikincil etken olarak ele alınır,
+ * kanıtlanmış sebep sayılmaz.
+ */
+/** Ortam değişkeninden pozitif eşik; bozuksa (boş, sayı değil, ≤0) varsayılan. */
+function mbEsigi(ad, varsayilan) {
+  const v = Number(process.env[ad])
+  return Number.isFinite(v) && v > 0 ? v : varsayilan
+}
+const UYARI_VARSAYILAN_MB = 1024
+const DEVRET_VARSAYILAN_MB = 1536
+const KAYIT_UYARI_MB_HAM = mbEsigi('VENTHUB_KAYIT_UYARI_MB', UYARI_VARSAYILAN_MB)
+const KAYIT_DEVRET_MB_HAM = mbEsigi('VENTHUB_KAYIT_DEVRET_MB', DEVRET_VARSAYILAN_MB)
+// Sıra bozuksa (devret ≤ uyarı) ikisi de varsayılana döner: ⛔ hiçbir zaman ⚠'dan önce çıkmaz.
+const ESIKLER_TUTARLI = KAYIT_DEVRET_MB_HAM > KAYIT_UYARI_MB_HAM
+const KAYIT_UYARI_MB = ESIKLER_TUTARLI ? KAYIT_UYARI_MB_HAM : UYARI_VARSAYILAN_MB
+const KAYIT_DEVRET_MB = ESIKLER_TUTARLI ? KAYIT_DEVRET_MB_HAM : DEVRET_VARSAYILAN_MB
+
+/**
+ * GB yazımı: AŞAĞI yuvarlanır. Yoksa 1535 MB "1,5 GB" görünür ve "1,5 GB'ta devret" diyen satırla
+ * çelişir; aşağı yuvarlayınca "1,5" ancak eşik aşılınca çıkar.
+ */
+function gbYaz(mb) {
+  return (Math.floor((mb / 1024) * 10) / 10).toFixed(1).replace('.', ',')
+}
+
+/** Konuşma dosyasının boyutu (MB); yol yok/okunamıyorsa ya da dosya değilse null. Dosya açılmaz. */
+function kayitBoyutuMb(kayitYolu) {
+  if (!kayitYolu) return null
+  try {
+    const st = fs.statSync(kayitYolu)
+    return st.isFile() ? st.size / (1024 * 1024) : null
+  } catch {
+    return null
+  }
+}
+
+/** Boyuta göre istem satırı; ölçülemediyse null. */
+function kayitSatiri(boyMb) {
+  if (typeof boyMb !== 'number' || !Number.isFinite(boyMb) || boyMb < 0) return null
+  if (boyMb >= KAYIT_DEVRET_MB) {
+    return '⛔KAYIT: ' + gbYaz(boyMb) + ' GB — yeni oturuma DEVRET: konusma dosyasi ' + gbYaz(KAYIT_DEVRET_MB) + " GB'i asti, kancalar ve pencere yavaslar (10-09 olcumu)."
+  }
+  if (boyMb >= KAYIT_UYARI_MB) {
+    return '⚠KAYIT: ' + gbYaz(boyMb) + ' GB — konusma dosyasi buyuyor; ' + gbYaz(KAYIT_DEVRET_MB) + " GB'ta yeni oturuma devret (devir belgesini simdiden hazirla)."
+  }
+  return 'KAYIT: ' + (boyMb < 1 ? '<1' : String(Math.floor(boyMb))) + ' MB'
+}
+
+/**
  * ── PENCERE BAŞINA DURUM DOSYASI (ARC-33 madde 2, 10-04) ──
  *
  * Modlar (ops-kokpit) bağlamı `$.session.usage()` ile okuyunca değer donuyordu (kokpit 19, gerçek 27).
@@ -272,6 +333,10 @@ module.exports = {
   esikler,
   sonBaglam,
   satir,
+  kayitBoyutuMb,
+  kayitSatiri,
+  KAYIT_UYARI_MB,
+  KAYIT_DEVRET_MB,
   pencereDosyasiYaz,
   pencereDurumOzeti,
   yarimIsOku,
