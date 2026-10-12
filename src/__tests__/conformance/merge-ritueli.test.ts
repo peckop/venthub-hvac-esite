@@ -33,6 +33,8 @@ const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')
   }) => { maddeler: Array<{ no: number; ad: string; gecti: boolean; detay: string }>; kirmizi: number }
   onayGecerli: (ham: unknown) => { gecerli: boolean; sebep: string; metin: string }
   ONAY_ASGARI: number
+  okumaSorusuGerekli: (dosyalar: unknown) => boolean
+  OKUMA_SORUSU_METNI: string
 }
 
 /** Geçici workflow dizini kuran fikstür — durumu VARSAYMAZ, ÜRETİR. */
@@ -327,5 +329,72 @@ describe('INV-RITUEL-1 · --onay YALNIZ madde 5\'i ve YALNIZ kanıtlıysa açar'
     const s = ritual.degerlendir(tamGirdi({ onay: ONAY_GERCEK }))
     expect(madde(s, 5).gecti).toBe(true)
     expect(madde(s, 5).detay, 'gereksiz onay sessizce yutuldu — bir sonraki sefer refleks olur').toMatch(/GEREKSIZ/)
+  })
+})
+
+/**
+ * INV-RITUEL-2 · OKUMA SORUSU (ARC-110, OPS-120 madde 2).
+ *
+ * 12 Ekim 13:07 olayında kanca/MCP PR'ı farkı okunurken "başka sürümün canlı veriye ulaşması"
+ * sorusu sorulmadı. Ritüelin beş maddesi ölçer; bu soru okuyanın aklına gelmesi gereken şeydir.
+ * Sabit satır kanca/ayar/MCP sınıfında basılır, sınıf dışında basılmaz ve MADDE DEĞİLDİR
+ * (kırmızı vermez): kapıya çevrilirse her ayar PR'ı kör engele dönerdi.
+ */
+describe('INV-RITUEL-2 · okuma sorusu (kanca/ayar/MCP sınıfı)', () => {
+  const SINIF_ICI = [
+    '.claude/hooks/patinaj-bekcisi.cjs',
+    '.claude/settings.json',
+    '.claude/settings.local.json',
+    '.mcp.json',
+    'tools/wrongstack-mcp/kurulum.cjs',
+    'scripts/board/board.cjs',
+  ]
+
+  it.each(SINIF_ICI)('sınıf içi yol soruyu tetikler: %s', (yol) => {
+    expect(
+      ritual.okumaSorusuGerekli(['src/app/page.tsx', yol]),
+      `${yol} kanca/ayar/MCP sınıfı ama okuma sorusu basılmadı — 13:07 sorusu yine sorulmaz`,
+    ).toBe(true)
+  })
+
+  it('sınıf dışı değişiklik soruyu BASMAZ (gürültü hatırlatmayı öldürür)', () => {
+    expect(ritual.okumaSorusuGerekli(['src/app/page.tsx', 'docs/README.md', 'scripts/hijyen/merge-ritueli.cjs'])).toBe(false)
+    expect(ritual.okumaSorusuGerekli([])).toBe(false)
+  })
+
+  it('bozuk girdi fail-open: hatırlatma kapıyı düşürmez', () => {
+    expect(ritual.okumaSorusuGerekli(null)).toBe(false)
+    expect(ritual.okumaSorusuGerekli(undefined)).toBe(false)
+    expect(ritual.okumaSorusuGerekli([undefined, 42, null])).toBe(false)
+  })
+
+  it('Windows ayracı da sınıfa girer', () => {
+    expect(ritual.okumaSorusuGerekli(['.claude\\hooks\\a.cjs'])).toBe(true)
+  })
+
+  it('soru metni sabit ve "canlı veri" sorusunu söyler', () => {
+    expect(ritual.OKUMA_SORUSU_METNI).toMatch(/^OKUMA SORUSU:/)
+    expect(ritual.OKUMA_SORUSU_METNI).toMatch(/canli veriye/)
+  })
+
+  it('⭐MADDE DEĞİL: değerlendirme hâlâ beş madde ve hiçbiri okuma sorusu taşımaz', () => {
+    const s = ritual.degerlendir(tamGirdi({}))
+    expect(s.maddeler.length, 'okuma sorusu madde olarak eklendi: kırmızı sayısını değiştirir').toBe(5)
+    for (const m of s.maddeler) {
+      expect(`${m.ad} ${m.detay}`).not.toMatch(/OKUMA SORUSU/)
+    }
+  })
+
+  it('CLI soruyu yalnız sınıf testinden geçince basar ve kırmızıyı artırmaz (kaynak taraması)', () => {
+    const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+    expect(kaynak).toMatch(/if \(okumaSorusuGerekli\(degisen\)\) yaz\(/)
+    const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
+    const bas = cli.indexOf('const degisen')
+    const son = cli.indexOf('hatırlatma, ölçüt değil', bas)
+    expect(bas, 'okuma sorusu bloğu CLI içinde bulunamadı').toBeGreaterThan(-1)
+    expect(son, 'okuma sorusu bloğunun sonu bulunamadı').toBeGreaterThan(bas)
+    const blok = cli.slice(bas, son)
+    expect(blok, 'okuma sorusu bloğu kırmızıyı ya da çıkış kodunu değiştiriyor')
+      .not.toMatch(/\bkirmizi\s*(\+\+|\+=|=(?!=))|process\.exit/)
   })
 })
