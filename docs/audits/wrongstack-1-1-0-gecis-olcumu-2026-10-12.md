@@ -24,7 +24,7 @@ Olgunluk açısından 1.0.37'nin de ~12 saatlik olması 1.0.37'ye avantaj vermez
 | sage `remember` / `memory_update` | yeni opsiyonel alanlar (`sources`, `validity`, `expectedRevision`, `feedback`); zorunlu alanlar aynı | yok |
 | mailbox, codebase-index şeması | bayt aynı | yok |
 | `--help` bayrakları | aynı | yok |
-| yeni ortam değişkeni | `WRONGSTACK_JEV_LOG_CONTENT`, `WRONGSTACK_JEV_LOG_DIR`, `WRONGSTACK_RUNTIME_VERSION` | yok |
+| yeni ortam değişkeni | `WRONGSTACK_JEV_LOG_CONTENT`, `WRONGSTACK_JEV_LOG_DIR`, `WRONGSTACK_RUNTIME_VERSION`, `WRONGSTACK_BUN_TYPECHECK` (geliştirici kancası), `WRONGSTACK_INDEX_SERVER_FAULT` (yalnız test hata enjeksiyonu; ortamda ASLA ayarlanmaz) | yok (hiçbiri bizim çalıştırdığımız yolda okunmaz) |
 
 ## Geri dönüşte veri bozulur mu? (sentetik veriyle ölçüldü)
 
@@ -149,3 +149,35 @@ yalnız kapanış sırasında, pencereler kapalıyken ve kurulumla aynı turda b
 | 9 | Geri dönüş (yalnız bozulursa) | yukarıdaki "Geri dönüş prosedürü" | `saglik.cjs` 1.0.26 gösterir | OPS'a yaz |
 
 Ardından ayrı adım (OPS onayıyla): iç ayarların açılması (aşağıdaki liste; uygulama yükseltmeden SONRA).
+
+## İç ayarlar — aç / açma önerisi (OPS 12 Ekim; uygulama yükseltmeden sonra, ayrı adım, OPS onayıyla)
+
+**Kapsam notu (ben doğruladım: `.mcp.json`):** biz yalnız dört MCP sunucusunu (sage, kanban, mailbox, codebase-index)
+Claude Code altında koşuyoruz; WrongStack'in kendi AJAN çalışma zamanı (`wstack`: otonomi, skill-companion, sandbox, Jev)
+bu yolda koşmaz. Aşağıdaki ajan çalışma zamanı ayarlarının hiçbiri bizim yolumuzda etkili değildir; bu yüzden hepsi
+**AÇMA / DOKUNMA**. Bizi ilgilendiren tek gerçek ayar `sessionRetentionDays`. Kaynak: alt ajan raporu (paket kaynağı
+ve d.ts farkı, 1.0.26 ↔ 1.1.0); `skill-companion` varsayılanları ve `rememberStartupChoices` yalnız d.ts yorumuna
+dayanır, kodda okuma yeri bulunamadı (doğrulanmadı).
+
+| Ayar / özellik | Ne yapar | 1.1.0 varsayılanı | Önerim | Gerekçe (tek cümle) |
+|---|---|---|---|---|
+| sage `hygiene.sessionRetentionDays` | Oturum kapsamlı hafızayı N gün sonra temizler; 0 yaşa dayalı temizliği kapatır | 7 (iki sürümde aynı) | **DOKUNMA (7 kalsın)** | 0 sonsuz saklamadır ve sage.db'yi büyütür; mevcut davranış korunur. |
+| sage `memory_update` `feedback` (useful/outdated/incorrect/irrelevant/uncertain) | Kullanım geri bildirimini yazar; outdated/incorrect review adayı açar | ayar değil, araç argümanı | **DOKUNMA** | Ayar anahtarı yok; kullanırsak review adayları sage.db'ye yazılır. |
+| sage-mcp `memory_candidates` (`proposals`) | Dış ajanlara yalnız list/propose sunar; doğrudan hafızaya yazmaz | ayar değil; araç | **DOKUNMA** | Dış ajan önerisi review'a girer; bizde dış ajan yok. |
+| `autonomy.nextSteps` | Her tur sonunda nextsteps bloğu ister | required (yeni) | **AÇMA** | `autoProceedMaxIterations` sınırsızken model bitti diyene kadar sürer; bizim yolumuzda koşmaz. |
+| `autonomy.yoloPlus` | YOLO açıkken bile izin sormaz (yıkıcı işler dahil) | false (yeni) | **AÇMA** | Son izin kapısını kaldırır; PUBLIC depoda sır kapısını zayıflatır. |
+| `autonomy.yolo` | Tüm izin istemlerini kapatır | true (iki sürümde aynı; sahip kararı) | **AYRI KARAR (bu işin dışı)** | Yükseltmeyle değişmiyor; yoloPlus ile aynı kaygı. |
+| `autonomy.rememberStartupChoices` | Son YOLO/otonomi seçimini sormadan geri uygular | true (yalnız d.ts, doğrulanmadı) | **AÇMA (false)** | Son mod sessizce geri gelir. |
+| `features.toolCoach` / `skills.localSuggest` | Araç/skill için yönlendirme notu ekler | true / true | **VARSAYILAN KALSIN** | Yalnız metin ekler, ağ çağrısı yok; bizim yolda koşmaz. |
+| skill-companion (ana anahtar + sinyaller + `fileChurnThreshold` 5 → 20) | Arka plan yargıcı skill önerir, ilk dosya düzenlemesini bir kez tutar | enabled true (d.ts) | **AÇMA (enabled:false)** | Her turda ek model çağrısı ve sürtünme; faydası ölçülmedi. |
+| `tools.sandbox` (mode) | bash/exec/git için sandbox | off (eski davranış) | **AÇMA** | Enforced modda MCP çağrıları `sandbox_denied` alabilir; kanıt yok. |
+| `mcpServers.<ad>.sandboxTrust` | Sunucunun çağrıları sandbox'ı atlar | false | **AÇMA** | Güvenilen sunucu sandbox'ı atlar; depo kendi sunucusunu işaretleyemez. |
+| `typesafe.enabled` / `logContent` / `logDir` (Jev) | Jev isteği; içerik günlüğü diske yazar | kapalı / false / `~/.wrongstack/logs` | **AÇMA** | Açıkken istekler dış sağlayıcıya gider, içerik diske düşer; kullanmıyoruz. |
+| `root.disabledProviders` | Sağlayıcıyı fallback'ten çıkarır | boş | **AÇMA** | Kapatılacak sağlayıcı yok. |
+| `runtime.variant = scout` | Araç yüzeyini küçültür, kalanı tool_search ile çağrılır | default | **AÇMA** | Kanban/sage araçlarına dolaylı yol; ölçülmedi. |
+| `wstack sage connect` | Projeye MCP girdisi ve skill/kural dosyası yazar | komut | **KOŞMA** | Depo dosyalarını değiştirir; PUBLIC depoda commit kapısından geçmeli. |
+| `WRONGSTACK_INDEX_SERVER_FAULT`, `WRONGSTACK_BUN_TYPECHECK` | Test hata enjeksiyonu / geliştirici kancası | tanımsız | **ASLA AYARLAMA** | Üretimde sunucuyu düşürür. |
+
+**Hüküm:** yükseltmeden sonra açılacak ya da değiştirilecek bir iç ayar YOKTUR; liste "hepsi olduğu gibi kalsın"dır.
+Bu, ayrı bir uygulama adımının gerekmediği anlamına gelir (OPS onayı yalnız bu hükmü kayda geçirmek içindir).
+Çekince: skill-companion ve `rememberStartupChoices` kodda doğrulanmadı; bizim yolumuzda koşmadıkları için sonuç değişmez.
