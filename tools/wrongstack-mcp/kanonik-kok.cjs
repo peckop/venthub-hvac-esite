@@ -18,12 +18,16 @@
  * İlk argüman sunucunun kilitli yerel yoludur (INV-WRONGSTACK-MCP-1 bu yolu .mcp.json'da arar).
  * Yalnız `node_modules/@wrongstack/*\/dist/cli.js` kabul edilir; başka dosya ÇALIŞTIRILMAZ (çıkış 1).
  * Sarmalayıcı bayrak EKLEMEZ ve çıkarmaz: --writable kararı .mcp.json'da görünür kalır.
+ *
+ * ⭐SÜRÜM KAPISI (ARC-103, 12 Ekim 13:07 kazası): çalıştırılacak paket ana ağaçtaki kurulumla aynı dosya değilse
+ * sürümleri eşit olmalı; eşit değilse ya da okunamıyorsa sunucu AÇILMAZ (çıkış 1). Ayrıntı: posta-kutusu.cjs
+ * `surumKapisi` ve README "Sürüm kapısı".
  */
 
 const fs = require('node:fs')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
-const { kokuKanonikle, paketCli } = require('./posta-kutusu.cjs')
+const { kokuKanonikle, paketCli, surumKapisi, surumKapisiMetni } = require('./posta-kutusu.cjs')
 
 const PAKET_KOKU = path.join(__dirname, 'node_modules', '@wrongstack')
 
@@ -61,6 +65,11 @@ async function calistir() {
     process.stderr.write(
       'kanonik-kok: ilk arguman tools/wrongstack-mcp/node_modules/@wrongstack/<paket>/dist/cli.js degil — sunucu ACILMADI\n',
     )
+    process.exit(1)
+  }
+  const kapi = surumKapisi(argv[1])
+  if (!kapi.tamam) {
+    process.stderr.write(surumKapisiMetni('kanonik-kok', kapi))
     process.exit(1)
   }
   const i = argv.indexOf('--project-root')
