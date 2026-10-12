@@ -2,6 +2,12 @@
 
 Yazan: YETENEK. Emir: OPS 12 Ekim 14:25 ve 15:00 yönü (REC-515 yalnız üç ihtiyaçla sınırlı, bugün yalnız aday tablosu).
 Kurulum YAPILMADI; dış kod kurulumu ayrı onay ister (güvenlik + lisans).
+
+> **OPS onayı 12 Ekim 2026 (Recep: "alacaklarımız varsa alalım, gereksiz denetleme yok"):** yukarıdaki "kurulum yok" hükmü
+> bu emirle değişti. İlk dalga (PR #1898, tek geçiş inceleme: lisans + gövdede betik/ağ çağrısı): `web-performance`, `tech-stack`,
+> `payments-webhooks`, `database-migrations`, `geo-fundamentals`, `write-seo-geo-content`; hepsi "adıyla çağır". `nextjs-modern`
+> alınmaz. `chart-data-extractor` önce 3 gerçek katalog eğrisiyle ölçülür (Lineo s.18 bunlardan biri). Aşağıdaki tablo kurulum
+> öncesi durumu anlatır; kurulu olanlar belge `skill-departman-setleri-2026-09-30.md` §6.3'tedir.
 Cetvel: `docs/standards/execution-method-standard.md`, `docs/audits/skill-departman-setleri-2026-09-30.md` (set bağları, 35 KB / 8 skill sınırı),
 `docs/audits/gstack-skill-envanteri-2026-09-15.md` (lisans/kurulum ölçütü), kapı `INV-SKILL-BAGLI-1`.
 
