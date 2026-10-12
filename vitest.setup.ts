@@ -16,6 +16,11 @@ expect.extend(matchers)
 // Bu yolda oluşan dosya TEMİZLENMEZ (silecek ana süreç kapanışı yok); yalnız istisnai yolda kalır, işletim sistemi geçici dizini siler.
 process.env.VENTHUB_RECEP_DEFTER ??= join(tmpdir(), `vitest-recep-defter-${process.pid}-${randomUUID()}.jsonl`)
 
+// Posta kutuları (ARC-71): `sage-yedek.cjs` yedek kapsamına `~/.wrongstack/projects/*/_mailbox.sqlite` dosyalarını da alır.
+// Testler GERÇEK kutuları yedeklemesin/saymasın (geliştirici makinesinde beş gerçek kutu var, CI'da yok: sonuç makineye
+// bağlı olurdu). Var olmayan dizine yönlenir; posta kutusu sınayan test kendi fikstürünü bu değişkenle kurar.
+process.env.VENTHUB_POSTA_KOKU ??= join(tmpdir(), `vitest-posta-yok-${process.pid}-${randomUUID()}`)
+
 // Log unhandled rejections to help diagnose silent exits
 process.on('unhandledRejection', (reason) => {
   console.error('UnhandledRejection in tests:', reason)
