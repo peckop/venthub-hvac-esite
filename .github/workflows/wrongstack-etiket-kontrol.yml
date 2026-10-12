@@ -1,11 +1,11 @@
 name: WrongStack etiket kontrolu
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ARC-24 (karar 257) — GitHub'daki yeni WrongStack etiketi gunluk gozlenir.
+# ARC-24 (karar 257, haftalik: karar 336) — GitHub'daki yeni WrongStack etiketi haftalik gozlenir.
 #
 # NICIN: Dependabot npm'e bakar, GitHub'daki surumu gormez. WrongStack GitHub'da npm'den ONCE
 # cikiyor (v1.0.30 GitHub'da 2026-10-01, npm'deki son surum 1.0.29). Yeni etiket cikinca haberimiz
-# olmali.
+# olmali. Taban 12 Ekim 2026'da v1.1.0 (kurulu surum, ARC-94).
 #
 # SINYAL: yeni etiket varsa is KIRMIZI biter ve ozet sayfasi etiketi, yayin notunu, karsilastirma
 # baglantisini ve npm durumunu yazar. Yeni yoksa YESIL ve sessiz. GECICI ag hatasi (zaman asimi,
@@ -19,9 +19,10 @@ name: WrongStack etiket kontrolu
 
 on:
   schedule:
-    # Gunde bir, 05:17 UTC (Istanbul 08:17). Dakika tam saat degil: GitHub tam saatlerde
-    # zamanlanmis isleri geciktiriyor.
-    - cron: '17 5 * * *'
+    # Haftada bir, Pazartesi 04:17 UTC: bagimlilik-denetimi.yml ile AYNI takvim (karar 336, Recep 12 Ekim
+    # 2026: gunluk degil, mevcut surum/bagimlilik taramalarimiz gibi). Dakika tam saat degil: GitHub tam
+    # saatlerde zamanlanmis isleri geciktiriyor. Takvim esitligini INV-WS-ETIKET-1 testi olcer.
+    - cron: '17 4 * * 1'
   workflow_dispatch:
 
 # Depo PUBLIC: `permissions:` yazilinca varsayilanlar duser, `contents: read` ZORUNLU

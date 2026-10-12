@@ -7,7 +7,7 @@
  *
  * NİÇİN VAR: Dependabot npm'e bakar, GitHub'daki sürümü görmez. WrongStack GitHub'da npm'den ÖNCE çıkıyor
  * (v1.0.30 GitHub'da 2026-10-01'de, npm'deki son sürüm 1.0.29). Yeni etiket çıkınca haberimiz olmalı; bu betik
- * günlük workflow'dan (`.github/workflows/wrongstack-etiket-kontrol.yml`) koşar.
+ * haftalık workflow'dan (`.github/workflows/wrongstack-etiket-kontrol.yml`) koşar.
  *
  * ⭐YALNIZ OKUR: GitHub'dan okur (`gh api` yalnız GET), dışarıya hiçbir şey yazmaz (issue/PR/yorum/commit YOK).
  * Tek yazdığı yer `--ozet` ile verilen iş özeti dosyasıdır (GITHUB_STEP_SUMMARY).

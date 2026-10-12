@@ -7,7 +7,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-WS-ETIKET-1 · ARC-24 (karar 257) — günlük WrongStack etiket kontrolü sessizce sökülemez.
+ * INV-WS-ETIKET-1 · ARC-24 (karar 257, haftalık: karar 336) — WrongStack etiket kontrolü sessizce sökülemez.
  *
  * NİÇİN VAR: Dependabot npm'e bakar, GitHub'daki sürümü görmez; WrongStack GitHub'da npm'den ÖNCE çıkıyor.
  * Kontrol iki parçadır ve ikisi de sessizce bozulabilir: (a) betiğin sürüm kararı (sözlük sırasına dönerse
@@ -508,11 +508,14 @@ describe('INV-WS-ETIKET-1 · workflow sözleşmesi (public depo, yalnız okur)',
   const w = yorumsuz(ham)
   const betikKodu = jsYorumsuz(oku('scripts/board/wrongstack-etiket-bak.cjs'))
 
-  it('günde bir zamanlanmış koşar ve elle tetiklenebilir', () => {
+  it('haftalık zamanlanmış koşar (karar 336: bagimlilik-denetimi.yml ile aynı takvim) ve elle tetiklenebilir', () => {
     expect(w, 'schedule bloğu yok: kontrol hiç koşmaz').toMatch(/^on:\s*\n\s+schedule:\s*\n\s+-\s*cron:/m)
     const cron = /-\s*cron:\s*'([^']+)'/.exec(w)?.[1] ?? ''
-    // Günde bir = gün-ay-haftanın günü alanları '*'; dakika ve saat tek sayı (aralık/adım değil).
-    expect(cron, `cron "${cron}" günde bir değil`).toMatch(/^\d{1,2} \d{1,2} \* \* \*$/)
+    // Haftada bir = gün-ay alanları '*', haftanın günü tek sayı; dakika ve saat tek sayı (aralık/adım değil).
+    expect(cron, `cron "${cron}" haftada bir değil`).toMatch(/^\d{1,2} \d{1,2} \* \* \d$/)
+    // Karar 336: sürüm/bağımlılık taramalarımızla AYNI takvim; biri kayarsa öteki de bilinçli kaymalı.
+    const kardes = /-\s*cron:\s*'([^']+)'/.exec(yorumsuz(oku('.github/workflows/bagimlilik-denetimi.yml')))?.[1] ?? ''
+    expect(cron, `kardeş takvim (bagimlilik-denetimi.yml) "${kardes}"`).toBe(kardes)
     expect(w, 'workflow_dispatch yok: elle doğrulanamaz').toMatch(/^\s+workflow_dispatch:/m)
   })
 
