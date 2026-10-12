@@ -3,11 +3,11 @@ name: typescript-strict
 description: "Sıkı TypeScript kuralları: gevşek tip ve ts-ignore yok, doğrulama sınırlarında tip. Tetik: \"tip hatası\", \"strict\", \"zod\"."
 category: quality
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/typescript-strict/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/typescript-strict/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/typescript-strict/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/typescript-strict/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -31,28 +31,39 @@ metadata:
 
 # TypeScript Strict
 
+## Selection card
+- Task: TypeScript contracts and narrowing without any.
+- Start: Locate the affected route/component and its runtime/lockfile.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
+
 ## Overview
 
-Make the type checker carry the invariants so runtime doesn't have to discover
-them. Work within the project's compiler settings: read `tsconfig.json` (and any
-package-level configs it extends) before deciding what a file must satisfy.
+Target TypeScript 7.0.2, verified from npm on 2026-10-09. Static types protect
+compile-time contracts; external data still needs runtime validation. Work
+within the project strictness and module-resolution contract.
 
 ## Rules
 
-1. Respect the project's `tsconfig`. Write code that passes the flags it has.
+1. **Pre-flight: Inspect repo `tsconfig.json` & live TypeScript version first.** Check `package.json`
+   for the installed `typescript` version and inspect the project's `tsconfig.json`. Query
+   `registry.npmjs.org/typescript/latest` before recommending modern compiler flags (e.g.
+   `isolatedDeclarations` in TS 5.5+, `satisfies` in TS 4.9+) to ensure compiler compatibility.
+2. Respect the project's `tsconfig`. Write code that passes the flags it has.
    Tightening flags repo-wide is a separate, requested change — it can surface
    hundreds of errors.
-2. Fix type errors, don't silence them. No `as any`, no `as unknown as T`, no
+3. Fix type errors, don't silence them. No `as any`, no `as unknown as T`, no
    `@ts-ignore`; a `@ts-expect-error` needs a comment explaining why.
-3. Validate at trust boundaries. JSON, network responses, environment, and user
-   input arrive as `unknown` and are narrowed by a parser or type guard.
-4. Prefer narrowing to assertion. A non-null `!` or an `as` cast is acceptable
+3. Choose satisfies when validating an inferred expression without replacing its
+   inferred type; keep intentional annotations/widening where the contract needs them.
+4. Validate at trust boundaries. JSON, network responses, environment, and user
+   input arrive as `unknown` and are narrowed by Zod, TypeBox, or explicit type guards.
+5. Prefer narrowing to assertion. A non-null `!` or an `as` cast is acceptable
    only where the invariant is locally obvious and a check would be noise.
-5. Model finite states as discriminated unions, and end exhaustive switches with
+6. Model finite states as discriminated unions, and end exhaustive switches with
    a `never` check so a new variant fails to compile.
-6. Annotate the return types of exported functions; inference is fine inside.
-7. Verify with the type checker (the typecheck tool, or the project's own
-   command) before calling the work done.
+7. Always handle potential `undefined` safely when `noUncheckedIndexedAccess` is active.
+8. Annotate the return types of exported functions (`isolatedDeclarations` compliance);
+   inference is fine inside private helpers.
 
 ## Fixing a type error
 
@@ -81,7 +92,7 @@ function render(block: Block): string {
     case 'text':
       return block.text;
     case 'image':
-      return `<img src="${block.url}">`;
+      return block.url; // Caller must render/escape this as data, never interpolate untrusted HTML.
     case 'error':
       return block.message;
     default:
@@ -143,6 +154,18 @@ the boundary instead of hand-written guards.
 - [ ] External data narrowed from `unknown` at the boundary
 - [ ] Finite states modeled as unions with exhaustive handling
 - [ ] Exported functions have explicit return types
+
+## Current compiler and module contract
+
+Target TypeScript 7.0.2, checked from npm on 2026-10-09. Verify compiler/migration
+support in the framework and build plugins; use the repository's authoritative
+checker rather than silently substituting a different implementation.
+Match moduleResolution/module/exports to the emitted runtime: bundler and
+NodeNext describe different consumers. Type checking does not validate network
+payloads or ensure HTML strings are escaped.
+satisfies checks compatibility without serving as a runtime parser or a
+universal replacement for intentional annotations and widening.
+Read the [resolution reference](https://www.typescriptlang.org/tsconfig/moduleResolution.html).
 
 ## Skills in scope
 

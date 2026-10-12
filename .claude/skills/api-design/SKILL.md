@@ -3,11 +3,11 @@ name: api-design
 description: "API tasarımı: kaynak adlandırma, hata biçimi, sürümleme, idempotency; para alanı pricing-standard'a bağlı. Tetik: \"API tasarla\", \"endpoint\", \"hata sözleşmesi\"."
 category: quality
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/api-design/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/api-design/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/api-design/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/api-design/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -32,6 +32,11 @@ metadata:
 
 # API Design
 
+## Selection card
+- Task: Define HTTP contracts, pagination and error schemas.
+- Start: Locate the endpoint, schema, authentication boundary and caller.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
+
 ## Overview
 
 An API is a contract that outlives its first client. The most important
@@ -42,8 +47,11 @@ OpenAPI spec — follow them; consistency beats any rule below.
 
 ## Rules
 
-1. Read the existing API first: a neighbouring endpoint, the error helper, the
-   validation library, and any OpenAPI or schema file. Extend the pattern.
+1. **Pre-flight: Read existing repo API & live spec standards first.** Read neighbouring
+   endpoints, validation libraries (`zod`, `valibot`, `typebox`), existing router (Hono,
+   Fastify, Next.js), and the existing OpenAPI specification in the repo; current target is OpenAPI 3.2.1
+   (checked 2026-10-09 at https://spec.openapis.org/oas/latest.html). Query live documentation
+   to verify protocol standards (such as RFC 9457 Problem Details) before designing new routes.
 2. Authorize every request against the specific object, not just "is logged
    in". Loading `/orders/:id` must check the caller may see that order
    (broken object-level authorization is the most common API vulnerability).
@@ -133,12 +141,23 @@ Always cap `limit` on the server and sort by a stable, unique key.
 - **Returning a whole database row** — exposes fields that were never part of the contract.
 
 ## Before returning
-
 - [ ] Follows the project's existing router, validation, and error conventions
 - [ ] Object-level authorization checked on every resource access
 - [ ] Input validated at the edge; one error shape; correct status codes
 - [ ] Retries safe; collections paginated with a capped limit
 - [ ] No breaking change to an existing version; spec updated alongside
+
+## Retry, concurrency and compatibility
+
+Choose idempotency storage with the operation: scope keys by caller/tenant,
+compare request fingerprints, commit the result atomically and define expiry.
+Concurrent duplicate requests must not both create the side effect. A timeout
+after commit is different from a request rejected before processing.
+Use conditional updates/version checks where lost writes matter; idempotency
+does not prevent two different clients overwriting each other.
+Check error/content-type semantics against [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457).
+Use the latest stable specification supported by the project's tooling; verify
+the current OpenAPI release before choosing its schema dialect.
 
 ## Skills in scope
 

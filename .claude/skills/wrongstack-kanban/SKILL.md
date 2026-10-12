@@ -1,13 +1,13 @@
 ---
 name: wrongstack-kanban
-description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu, bu iş daha önce yapıldı mı, önceki çalışma. WrongStack 1.0.26 uyarlaması."
+description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu, bu iş daha önce yapıldı mı, önceki çalışma. WrongStack 1.1.0 uyarlaması."
 category: coordination
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/wrongstack-kanban/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı; YETENEK 2026-10-03 (YTN-12) önce-ara iki arama + kullanılmayan okuma yetenekleri. Kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/wrongstack-kanban/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı; YETENEK 2026-10-03 (YTN-12) önce-ara iki arama + kullanılmayan okuma yetenekleri. Kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/wrongstack-kanban/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/wrongstack-kanban/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -113,6 +113,11 @@ Haiku 200K bağlamında proje skill'lerinin çoğu açıklamasız (yalnız adıy
 
 
 # WrongStack Kanban
+
+## Selection card
+- Task: Operate WrongStack task-board lifecycle.
+- Start: Identify the host, protocol, enabled integration and authorization scope.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## What the board is for
 
@@ -251,6 +256,14 @@ filled in as it becomes known.
 - [ ] Completion went through the verifier; "Done" means the verifier actually ran
 - [ ] Todo/task/plan rows preserve `kanbanBoardId` / `kanbanTaskId` bindings in full-list updates
 - [ ] Card count scaled to the size of the work; no invented subtasks
+
+## Board identity and lost leases
+
+Persist exact task/board/lease ids from current results, not titles or old notes.
+When a heartbeat or mutation loses its expected lease, stop acting as that
+assignment's owner and reread state; do not continue mutating under a stale claim.
+Keep work evidence tied to the checked source snapshot. A board persistence
+failure can be reported without pretending the completion gate accepted the card.
 
 ## Related skills
 
