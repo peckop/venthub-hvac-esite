@@ -517,8 +517,8 @@ function surecCanli(pid) {
 }
 
 /**
- * ⭐KANONİK YOL (ARC-71, OPS 10-12): "bu hedef canlı depo mu" sorusu YAZILIŞA bakmaz. `C:\Users\x\r`, `c:/users/x/r/`,
- * bir junction ya da worktree üzerinden verilen aynı dizin AYNI yola iner: gerçek yol (`realpath.native`: junction ve
+ * ⭐KANONİK YOL (ARC-71, OPS 10-12): "bu hedef canlı depo mu" sorusu YAZILIŞA bakmaz. Büyük/küçük harfli sürücü, `\` ya da `/`
+ * ayracı, sondaki ayraç, bir junction ya da worktree üzerinden verilen aynı dizin AYNI yola iner: gerçek yol (`realpath.native`: junction ve
  * sembolik bağları çözer, Windows'ta gerçek harf büyüklüğünü verir) + `/` ayracı + sondaki ayraç yok + Windows'ta küçük harf.
  * Dosya henüz yoksa var olan en yakın üst dizin çözülür, kalan parça eklenir. HİÇ çözülemezse `null` (çağıran RET eder).
  * @param {string} yol
