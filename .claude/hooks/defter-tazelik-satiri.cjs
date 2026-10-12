@@ -427,4 +427,21 @@ try {
   process.stdout.write('⚠DUNYA: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+/**
+ * ── SAHİPSİZ PR (ARC-111, OPS-120 madde 3) — EŞİKLİ ──
+ * 7 günden eski açık PR kartsız ya da kartı kapalıysa konuşur; yoluna girince susar. Yalnız önbellek
+ * okunur, ölçüm arka planda (60 dakikada bir). BLOKLAMAZ. Gerekçe: sahipsiz-pr-satiri.cjs.
+ */
+try {
+  const sp = require(path.join(__dirname, 'sahipsiz-pr-satiri.cjs'))
+  const simdi = Date.now()
+  const s = sp.satir(sp.oku(sp.onbellekYolu(PANO)), simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    sp.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠SAHIPSIZ PR: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)
