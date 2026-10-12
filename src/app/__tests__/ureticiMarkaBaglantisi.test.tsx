@@ -9,8 +9,8 @@
  * HTML'e çevrilir (JS koşmayan tarayıcının ve botun gördüğü). İstemci bağlamları (router, sepet vb.) taklit
  * edilir; adres çözümü (`markaBulAdla` → `adresRotalari().brand`) ve bileşen GERÇEK koddur.
  */
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readFileSync, statSync } from 'node:fs'
+import { dirname, extname, join, relative, resolve } from 'node:path'
 
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -186,12 +186,135 @@ describe('üretici bloğu: marka sayfasına gerçek <a href> (URN-126)', () => {
   })
 })
 
+/**
+ * İSTEMCİ DEMETİ — import KAPANIŞI.
+ *
+ * `ProductDetailPageView` `'use client'`'tır: statik import ağacındaki her modül istemci demetine girer.
+ * Marka kataloğu (`HVAC_BRANDS`, tüm marka metinleri) sunucuda çözülür; PDP'ye yalnız hazır adres dizesi
+ * (`markaHref`) geçer. Dosyadaki literal `data/brands` metnine bakmak YETMEZ: PDP `ureticiMarkaAdresi`'ni
+ * (ya da onu çağıran başka bir modülü) import ederse katalog DOLAYLI girer ve hiçbir metin eşleşmesi görmez
+ * (doğrulayıcı mutantı, URN-126). Bu yüzden PDP'den başlayıp statik import'ları dosya dosya izleriz.
+ *
+ * Çözümleme bilerek basit: `@/` takma adı ve göreli yollar; `.ts/.tsx` ve `index.ts(x)`; paket (bare) import'ları
+ * atlanır. `import type` / `export type … from` çalışma zamanında silinir, izlenmez. `import { type X }` biçimi
+ * değer import'u sayılır (fazla tahmin: yanlış KIRMIZI verebilir, yanlış YEŞİL vermez).
+ */
+const KOK = process.cwd()
+const UZANTILAR = ['.ts', '.tsx']
+const PDP_DOSYASI = 'src/app/_components/ProductDetailPageView.tsx'
+const MARKA_KATALOGU = 'src/data/brands.ts'
+const MARKA_ADRESI = 'src/components/products/ureticiMarkaAdresi.ts'
+
+/** Kaynak metindeki değer import belirteçleri (type-only hariç). Deyimler satır başında aranır: yorum içi metin sayılmaz. */
+function importBelirtecleri(kaynak: string): string[] {
+  const bulunan: string[] = []
+  for (const m of kaynak.matchAll(/^(?:import|export)\b(?!\s+type\b)[^'";]*?\bfrom\s*['"]([^'"]+)['"]/gm)) bulunan.push(m[1])
+  for (const m of kaynak.matchAll(/^import\s*['"]([^'"]+)['"]/gm)) bulunan.push(m[1])
+  for (const m of kaynak.matchAll(/\bimport\(\s*['"]([^'"]+)['"]\s*\)/g)) {
+    const satirBasi = kaynak.lastIndexOf('\n', m.index ?? 0) + 1
+    const onek = kaynak.slice(satirBasi, m.index ?? 0).trim()
+    if (onek.startsWith('*') || onek.startsWith('//') || onek.startsWith('/*')) continue // yorum satırındaki örnek
+    bulunan.push(m[1])
+  }
+  return bulunan
+}
+
+/** Belirteci kök-göreli, `/` ayraçlı dosya yoluna çözer; paket/bulunamayan için `null`. */
+function belirtecCoz(belirtec: string, kaynakDosya: string): string | null {
+  let taban: string
+  if (belirtec.startsWith('@/')) taban = join(KOK, 'src', belirtec.slice(2))
+  else if (belirtec.startsWith('.')) taban = resolve(dirname(join(KOK, kaynakDosya)), belirtec)
+  else return null
+  const adaylar = [
+    ...UZANTILAR.map((u) => `${taban}${u}`),
+    ...UZANTILAR.map((u) => join(taban, `index${u}`)),
+    taban,
+  ]
+  for (const aday of adaylar) {
+    if (!UZANTILAR.includes(extname(aday)) || !existsSync(aday) || !statSync(aday).isFile()) continue
+    return relative(KOK, aday).replace(/\\/g, '/')
+  }
+  return null
+}
+
+/** `baslangic`tan erişilen tüm dosyalar; `ebeveyn`: her dosyanın hangi dosyadan geldiği (zincir göstermek için). */
+function importKapanisi(baslangic: string): { dosyalar: Set<string>; ebeveyn: Map<string, string> } {
+  const dosyalar = new Set<string>([baslangic])
+  const ebeveyn = new Map<string, string>()
+  const kuyruk = [baslangic]
+  while (kuyruk.length > 0) {
+    const dosya = kuyruk.pop() as string
+    for (const belirtec of importBelirtecleri(readFileSync(join(KOK, dosya), 'utf8'))) {
+      const hedef = belirtecCoz(belirtec, dosya)
+      if (!hedef || dosyalar.has(hedef)) continue
+      dosyalar.add(hedef)
+      ebeveyn.set(hedef, dosya)
+      kuyruk.push(hedef)
+    }
+  }
+  return { dosyalar, ebeveyn }
+}
+
+/** Hedefe giden import zinciri (başlangıç → … → hedef); başarısızlık iletisinde "hangi dosya getirdi" görünsün. */
+function zincir(ebeveyn: Map<string, string>, hedef: string): string {
+  const yol = [hedef]
+  for (let d = ebeveyn.get(hedef); d; d = ebeveyn.get(d)) yol.unshift(d)
+  return yol.join(' -> ')
+}
+
+describe('istemci demeti: import kapanışı (URN-126)', () => {
+  it('ayrıştırıcı: değer import\'ları bulur, type-only ve yorum satırını atlar (ölçütün kendi doğrulaması)', () => {
+    const kaynak = [
+      "import React, { Suspense } from 'react'",
+      "import type { Route } from 'next'",
+      "import {",
+      '  a,',
+      '  b,',
+      "} from '../../x/ucuncu'",
+      "export { y } from './disari'",
+      "export type { Z } from './sadeceTip'",
+      "export * from './hepsi'",
+      "import './yanEtki'",
+      "const m = await import('@/lib/tembel')",
+      " * örnek: import('@/lib/yorumda')",
+      "// import('@/lib/yorumda2')",
+    ].join('\n')
+    expect(importBelirtecleri(kaynak).sort()).toEqual(
+      ['react', '../../x/ucuncu', './disari', './hepsi', './yanEtki', '@/lib/tembel'].sort(),
+    )
+  })
+
+  it('çözümleyici: takma ad, göreli yol ve index; paket ve bulunamayan atlanır', () => {
+    expect(belirtecCoz('@/data/brands', PDP_DOSYASI)).toBe(MARKA_KATALOGU)
+    expect(belirtecCoz('../../components/products/ureticiMarkaAdresi', PDP_DOSYASI)).toBe(MARKA_ADRESI)
+    expect(belirtecCoz('../../components/products', PDP_DOSYASI)).toBe('src/components/products/index.ts')
+    expect(belirtecCoz('react', PDP_DOSYASI)).toBeNull()
+    expect(belirtecCoz('./yok-boyle-bir-dosya', PDP_DOSYASI)).toBeNull()
+  })
+
+  it('NEGATİF KONTROL: izleyici adres üreticisinden başlayınca marka kataloğuna ULAŞIR (ölçüt çalışıyor)', () => {
+    const { dosyalar, ebeveyn } = importKapanisi(MARKA_ADRESI)
+    expect(dosyalar.has(MARKA_KATALOGU)).toBe(true)
+    expect(zincir(ebeveyn, MARKA_KATALOGU)).toBe(`${MARKA_ADRESI} -> ${MARKA_KATALOGU}`)
+  })
+
+  it('istemci bileşeni marka kataloğuna ve adres çözücüsüne import kapanışıyla ULAŞMAZ (adres sunucuda çözülür)', () => {
+    const { dosyalar, ebeveyn } = importKapanisi(PDP_DOSYASI)
+    // Kapanış gerçekten yürüdü: doğrudan import'lar içeride ve boyut taban değerin üstünde (sessiz yeşil olmasın).
+    expect(dosyalar.has('src/components/products/AileKirintisi.tsx')).toBe(true)
+    expect(dosyalar.has('src/utils/yuzeyAdresleri.ts')).toBe(true)
+    expect(dosyalar.size).toBeGreaterThan(40)
+    for (const yasak of [MARKA_KATALOGU, MARKA_ADRESI]) {
+      expect(dosyalar.has(yasak), dosyalar.has(yasak) ? `${yasak} istemci demetine giriyor: ${zincir(ebeveyn, yasak)}` : '').toBe(false)
+    }
+  })
+})
+
 describe('kaynak denetimi (URN-126)', () => {
   const oku = (...p: string[]) => readFileSync(join(process.cwd(), ...p), 'utf8')
 
-  it('istemci bileşeni marka kataloğunu import etmez (adres sunucuda çözülür)', () => {
+  it('istemci bileşeni marka bağlantısını prop olarak alır ve markaBulAdla çağırmaz', () => {
     const pdp = oku('src/app/_components/ProductDetailPageView.tsx')
-    expect(pdp).not.toMatch(/from ['"][^'"]*data\/brands['"]/)
     expect(pdp).not.toMatch(/markaBulAdla/)
     expect(pdp).toMatch(/markaHref\s*\?/)
   })
