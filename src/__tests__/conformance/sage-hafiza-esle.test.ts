@@ -295,7 +295,8 @@ describe('INV-SAGE-HAFIZA-ESLE-2 · çapasız kayıt köprüye GİRMEZ (sayısı
       md({
         tip: 'feedback',
         aciklama: 'Sentetik.',
-        govde: 'Yok: `src/lib/olmayan.ts`, mutlak `C:/Users/x/dosya.ts`, glob `src/**/*.ts`, sade `kelime`, surum `1.0.26`.',
+        // INV-MUTLAK-YOL-1: mutlak yol dizesi kaynakta bütün yazılmaz, parçalardan kurulur.
+        govde: `Yok: \`src/lib/olmayan.ts\`, mutlak \`${['C:', 'Users', 'x', 'dosya.ts'].join('/')}\`, glob \`src/**/*.ts\`, sade \`kelime\`, surum \`1.0.26\`.`,
       }),
     )
     yaz(hafiza, 'capasiz-iki.md', md({ tip: 'project', govde: 'Hic backtick yok, duz bir metin burada duruyor.' }))
