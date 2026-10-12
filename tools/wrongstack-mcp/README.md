@@ -92,6 +92,18 @@ kullanılır; junction ise yalnız bağlantıyı kaldır: `cmd //c rmdir <yol>`,
 sürümü kur. **Sınır:** kapı yalnız sarmalayıcıdan açılan sunucuları korur; doğrudan `cli.js` açan betik
 (`saglik.cjs --sunucu`) kendi korumasını taşır (yalnız ana ağaç). Kapı: INV-WRONGSTACK-SURUM-KAPISI-1.
 
+## Yeni etiket bildirimi (ARC-24, karar 257, haftalık: karar 336) — kırmızı yanınca ne yapılır
+
+Dependabot npm'e bakar, GitHub'daki sürümü görmez; WrongStack GitHub'da npm'den önce çıkar. Haftalık iş
+(Pazartesi 04:17 UTC, `bagimlilik-denetimi.yml` ile aynı takvim; karar 336) `.github/workflows/wrongstack-etiket-kontrol.yml`
+(betik `scripts/board/wrongstack-etiket-bak.cjs`) en son etiketi `etiket-taban.json` içindeki `sonGorulen` ile karşılaştırır;
+yeni etiket ya da kalıcı ölçüm bozulması işi KIRMIZI bitirir. Taban güncellenene kadar her hafta kırmızı kalır
+(bilinçli: unutulan etiket görünür kalsın). Taban 12 Ekim 2026'da `v1.1.0` (kurulu sürüm, ARC-94).
+
+1. **Ölç** (iş özeti zaten yazar, doğrula): `gh api repos/WrongStack/WrongStack/releases/latest --jq .tag_name` ve `npm view @wrongstack/sage-mcp@<sürüm> version` (E404 = npm'de henüz yok; yükseltme npm'de çıkmadan yapılamaz).
+2. **Kart aç:** ARAÇ için Kanban kartı (KAYNAK/CETVEL bloğu: bu bölüm + ARC-24, karar 257). Yükseltip yükseltmemek Recep'in ya da ARAÇ'ın ölçüme dayalı kararıdır; yükseltme "Sürüm yükseltme" bölümündeki sırayla yapılır.
+3. **Tabanı güncelle:** ARAÇ dalında (`arac/wrongstack-<sürüm>`) `etiket-taban.json` → `sonGorulen` yeni etiket; yükseltilmese de güncellenir (karar kartta yazılı olsun), PR'ın başlığında `ARAÇ (<kart>)` ve `Kanban: <kart>`.
+
 ## Bilinen sınırlar (adıyla)
 
 1. **Kalıcı servis.** MCP süreci bir IPC istemcisidir; SQLite'ın sahibi proje başına **ayrık bir
