@@ -54,6 +54,25 @@ function kanonikKok(p) {
   return kok.replace(/^([A-Za-z]):/, (_, h) => h.toLowerCase() + ':')
 }
 
+/**
+ * ⭐WORKTREE'DE PAKET YOLU (ARC-98, 2026-10-12, OPS ölçümü): `node_modules` izlenmez, her worktree'de YOKTUR;
+ * relative yolla açılan sunucu worktree'de "Cannot find module" ile ölüp "Connection closed" veriyordu. Paket
+ * yerelde yoksa ANA AĞACIN kurulumu kullanılır (kanonik kök: worktree → ana ağaç). Yerel kurulum varsa o kazanır.
+ * Bulunamazsa yerel yol döner (sunucu kendi hatasını verir; sessiz başka yola düşülmez).
+ */
+function paketCli(paket, kokDizin = __dirname) {
+  const yerel = path.join(kokDizin, 'node_modules', '@wrongstack', paket, 'dist', 'cli.js')
+  if (fs.existsSync(yerel)) return yerel
+  try {
+    const ana = kanonikKok(path.resolve(kokDizin, '..', '..'))
+    const aday = path.join(ana, 'tools', 'wrongstack-mcp', 'node_modules', '@wrongstack', paket, 'dist', 'cli.js')
+    if (fs.existsSync(aday)) return aday
+  } catch {
+    // ana ağaç çözülemedi — yerel yol kalır
+  }
+  return yerel
+}
+
 /** argv içindeki `--project-root <yol>` değerini kanonik köke çevirir. */
 function kokuKanonikle(args) {
   const out = [...args]
@@ -88,7 +107,7 @@ async function calistir() {
     process.exit(1)
   }
   process.stderr.write(`posta-kutusu: kimlik ${bulunan.kimlik.slice(0, 8)}… (kaynak: ${bulunan.kaynak})\n`)
-  const cli = path.join(__dirname, 'node_modules', '@wrongstack', 'mailbox-mcp', 'dist', 'cli.js')
+  const cli = paketCli('mailbox-mcp')
   process.argv = [
     process.argv[0],
     cli,
@@ -108,4 +127,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { kimlikBul, kanonikKok, kokuKanonikle }
+module.exports = { kimlikBul, kanonikKok, kokuKanonikle, paketCli }
