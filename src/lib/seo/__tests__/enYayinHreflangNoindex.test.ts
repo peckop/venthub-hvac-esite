@@ -124,8 +124,8 @@ describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
         marka.markaUstVerisiK3b('en', 'avens'),
         marka.markaUstVerisi('tr', 'avens'),
         marka.markaUstVerisi('en', 'avens'),
-        kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(true), null),
-        kategori.kategoriSayfasiUstVerisiK3b('en', KATEGORI(true), null),
+        kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(true)),
+        kategori.kategoriSayfasiUstVerisiK3b('en', KATEGORI(true)),
         kategori.kategoriSayfasiUstVerisi('tr', KATEGORI(true)),
         kategori.kategoriSayfasiUstVerisi('en', KATEGORI(true)),
       ]
@@ -183,7 +183,7 @@ describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
         await seciciSayfa.generateMetadata(TR_ISTEK),
         marka.markaUstVerisiK3b('tr', 'avens'),
         marka.markaUstVerisi('tr', 'avens'),
-        kategori.kategoriSayfasiUstVerisiK3b('en', KATEGORI(true), null),
+        kategori.kategoriSayfasiUstVerisiK3b('en', KATEGORI(true)),
         kategori.kategoriSayfasiUstVerisi('en', KATEGORI(true)),
       ]
       for (const m of metalar) {
