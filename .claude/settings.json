@@ -143,6 +143,24 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "SendMessage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-emir-uyarisi.cjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__wrongstack-kanban__kanban_manage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kart-alani-kapisi.cjs\""
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -153,6 +171,16 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-board.cjs\"",
             "statusMessage": "board"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-yedek.cjs\"",
+            "timeout": 45
           }
         ]
       }
@@ -221,6 +249,16 @@
             "statusMessage": "hafiza (konu)"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-yedek.cjs\"",
+            "timeout": 45
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -264,6 +302,15 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\" --birak"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/patinaj-bekcisi.cjs\""
           }
         ]
       }
@@ -334,6 +381,16 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-konusma-dokumu.cjs\"",
             "statusMessage": "son konusma dokumu"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-yedek.cjs\"",
+            "timeout": 45
           }
         ]
       }
