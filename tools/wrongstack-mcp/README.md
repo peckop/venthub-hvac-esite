@@ -91,6 +91,9 @@ eşit değilse ya da okunamıyorsa (fail-closed) **sunucu açılmaz, çıkış 1
 kullanılır; junction ise yalnız bağlantıyı kaldır: `cmd //c rmdir <yol>`, `/s` YOK) ya da ana ağaçla aynı
 sürümü kur. **Sınır:** kapı yalnız sarmalayıcıdan açılan sunucuları korur; doğrudan `cli.js` açan betik
 (`saglik.cjs --sunucu`) kendi korumasını taşır (yalnız ana ağaç). Kapı: INV-WRONGSTACK-SURUM-KAPISI-1.
+**Paket hiçbir yerde kurulu değilse (REC-466, 12 Ekim 2026):** kapı ayrıca "PAKET KURULU DEGIL" der ve çıkış 1 verir; stderr
+`node tools/wrongstack-mcp/kurulum.cjs --denetle` (eksiği söyler) ve ardından ana ağaçta `kurulum.cjs` yolunu gösterir.
+Eskiden sunucu "Cannot find module" ile ölür, istemci yalnız "Connection closed" görürdü.
 
 ## Bilinen sınırlar (adıyla)
 
