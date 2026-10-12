@@ -32,7 +32,13 @@
  *                                                 # yedekten geri yükle (ARC-9); --evet yoksa yalnız plan.
  *                                                 # Servis canlıyken REDDEDER; eski dosyalar .oncesi-<damga> kalır.
  *   node scripts/hijyen/sage-yedek.cjs --geri sage|posta-<proje> [dosya] [--evet]
- *                                                 # ARC-71: aynı kurallar; "servis" = pencerelerdeki MCP süreçleri.
+ *                                                 # ARC-71: aynı kurallar; "servis" = pencerelerdeki MCP süreçleri
+ *                                                 # (kanban dahil: stdio sunucuları pid dosyasında görünmez).
+ *   node scripts/hijyen/sage-yedek.cjs --geri sage|kanban [dosya] --kok <yol> [--evet]
+ *   node scripts/hijyen/sage-yedek.cjs --geri posta-<proje> [dosya] --posta-koku <yol> [--evet]
+ *                                                 # YALITILMIŞ KÖK PROVASI: hedef kanonik karşılaştırmayla canlı depo
+ *                                                 # DEĞİLSE süreç denetimi atlanır (pencereler açıkken kopyada prova).
+ *                                                 # Canlı ya da ölçülemeyen hedefte denetim aynen kalır (fail-closed).
  *
  * ⭐POSTA KUTULARI (ARC-71, OPS kararı 10-09): `~/.wrongstack/projects/<proje>/_mailbox.sqlite` — hepsi (beş
  * dosya ölçüldü, her birinin WAL'ı dolu) aynı yöntemle yedeklenir: `VACUUM INTO` + kaynakla sayım. Düz kopya
@@ -45,7 +51,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 
-const { anaKok } = require('./ana-kok.cjs')
+const { anaKok, anaKokBul } = require('./ana-kok.cjs')
 // Süreç listesi AYRI modülde (bu dosyada dış süreç çağrısı yok: INV-SAGE-YEDEK-1 "dış servise çıkış izi yok" kolu).
 const { calisanSurecler } = require('./surec-listesi.cjs')
 
@@ -109,6 +115,10 @@ const DEPOLAR = [
     uyariSaat: 24,
     saklama: { son: 24, gunluk: 30 },
     servis: ['.wrongstack', 'kanban-server.json'],
+    // ARC-71 (OPS 10-12): ARC-98'den beri her pencere kanban-mcp'yi stdio + --writable açar; dosyayı açık tutan süreç
+    // `kanban-server.json` pid dosyasında GÖRÜNMEZ (canlıda 4 `kanban-mcp/dist/cli.js` süreci ölçüldü). Pid denetimi
+    // KALIR, süreç taraması ÜSTÜNE eklenir; ikisinden biri canlı derse RET.
+    surecDeseni: /kanban-mcp[\\/]dist[\\/]cli\.js/i,
   },
 ]
 
@@ -122,8 +132,7 @@ function postaKoku() {
  * Her çağrıda yeniden taranır: pencereler yeni kök (c:/C: harf farkı, yeni worktree) üretebilir; sabit liste
  * sessizce eksik kalırdı. Dosyası olmayan dizin depo sayılmaz. Hepsi aynı eşiği taşır (sage ile aynı).
  */
-function postaDepolari() {
-  const koku = postaKoku()
+function postaDepolari(koku = postaKoku()) {
   let adlar
   try {
     adlar = fs.readdirSync(koku).sort()
@@ -150,8 +159,8 @@ function postaDepolari() {
 }
 
 /** Sabit depolar (sage, kanban) + bulunan posta kutuları. `DEPOLAR` dışa açık kalır (yalnız sabit ikili). */
-function tumDepolar() {
-  return [...DEPOLAR, ...postaDepolari()]
+function tumDepolar(postaKokuYol) {
+  return [...DEPOLAR, ...postaDepolari(postaKokuYol)]
 }
 
 const depoBul = (ad) => tumDepolar().find((d) => d.ad === ad) || DEPOLAR[0]
@@ -508,8 +517,106 @@ function surecCanli(pid) {
 }
 
 /**
+ * ⭐KANONİK YOL (ARC-71, OPS 10-12): "bu hedef canlı depo mu" sorusu YAZILIŞA bakmaz. `C:\Users\x\r`, `c:/users/x/r/`,
+ * bir junction ya da worktree üzerinden verilen aynı dizin AYNI yola iner: gerçek yol (`realpath.native`: junction ve
+ * sembolik bağları çözer, Windows'ta gerçek harf büyüklüğünü verir) + `/` ayracı + sondaki ayraç yok + Windows'ta küçük harf.
+ * Dosya henüz yoksa var olan en yakın üst dizin çözülür, kalan parça eklenir. HİÇ çözülemezse `null` (çağıran RET eder).
+ * @param {string} yol
+ * @returns {string|null}
+ */
+function kanonikYol(yol) {
+  if (typeof yol !== 'string' || !yol) return null
+  let su = path.resolve(yol)
+  const kuyruk = []
+  for (let i = 0; i < 64; i++) {
+    try {
+      const gercek = fs.realpathSync.native(su)
+      let tam = kuyruk.length ? path.join(gercek, ...kuyruk.slice().reverse()) : gercek
+      tam = tam.replace(/\\/g, '/').replace(/^\/\/\?\//, '').replace(/\/+$/, '')
+      return process.platform === 'win32' ? tam.toLowerCase() : tam
+    } catch {
+      const ust = path.dirname(su)
+      if (ust === su) return null
+      kuyruk.push(path.basename(su))
+      su = ust
+    }
+  }
+  return null
+}
+
+/** İki yol AYNI dosyaya (dev+ino) işaret ediyor mu: sert bağ ve kanonikleştirmenin göremediği bağlar için ikinci emniyet. */
+function ayniDosyaMi(a, b) {
+  try {
+    const x = fs.statSync(a, { bigint: true })
+    const y = fs.statSync(b, { bigint: true })
+    return x.ino !== 0n && x.ino === y.ino && x.dev === y.dev
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Bu betiğin CANLI saydığı ana ağaç köklerinin kanonik yolları: betiğin kendi ağacı, çalışma dizini ve
+ * CLAUDE_PROJECT_DIR'den `git --git-common-dir` ile çözülenler. Hiçbiri çözülemezse boş liste (çağıran RET eder).
+ */
+function canliKokAdaylari() {
+  const sonuc = new Set()
+  for (const a of [path.resolve(__dirname, '..', '..'), process.cwd(), process.env.CLAUDE_PROJECT_DIR]) {
+    const k = a ? anaKokBul(a) : null
+    const kk = k ? kanonikYol(k) : null
+    if (kk) sonuc.add(k)
+  }
+  return [...sonuc]
+}
+
+/**
+ * ⛔FAIL-CLOSED: `true` = hedef CANLI ya da ÖLÇÜLEMEDİ. `false` yalnız şu hâlde: hedef yol çözüldü, canlı kökler
+ * çözüldü VE hedef hiçbirine (kanonik yol, dev+ino, git ağacı üyeliği) eşit değil.
+ * @param {object} depo `tumDepolar()` satırı
+ * @param {string} hedefYol geri yüklenecek dosyanın yolu
+ * @param {string|null} hedefKok sage/kanban için kök (posta için null)
+ * @param {string} [canliPostaKoku] canlı posta kökü; yalnız test enjekte eder (komut satırı/ortam değişkeni sunmaz:
+ *   güvenlik denetiminin "canlı nedir" tanımı operatörün elinde bir anahtar olmamalı)
+ * @param {string[]|null} [canliKokler] canlı ana ağaç kökleri; yalnız test enjekte eder (null = betikten çözülür)
+ */
+function canliHedefMi(
+  depo,
+  hedefYol,
+  hedefKok,
+  canliPostaKoku = path.join(os.homedir(), '.wrongstack', 'projects'),
+  canliKokler = null,
+) {
+  const hk = kanonikYol(hedefYol)
+  if (!hk) return true
+  let canliYollar
+  if (depo.mutlak) {
+    const proje = path.basename(path.dirname(depo.mutlak))
+    canliYollar = [path.join(canliPostaKoku, proje, '_mailbox.sqlite')]
+  } else {
+    const kokler = canliKokler || canliKokAdaylari()
+    if (kokler.length === 0) return true
+    canliYollar = kokler.map((k) => path.join(k, ...depo.goreli))
+    // Hedef kök canlı git ağacının İÇİNDEYSE (worktree, alt dizin) canlıdır: yazılış farkı bir şey değiştirmez.
+    const bagli = hedefKok ? anaKokBul(hedefKok) : null
+    const bagliK = bagli ? kanonikYol(bagli) : null
+    if (bagliK && kokler.some((k) => kanonikYol(k) === bagliK)) return true
+  }
+  for (const c of canliYollar) {
+    const ck = kanonikYol(c)
+    if (!ck) return true
+    if (ck === hk || ayniDosyaMi(c, hedefYol)) return true
+  }
+  return false
+}
+
+/**
  * YEDEKTEN GERİ YÜKLEME (ARC-9, ARC-71). Yalnız `servis` ya da `surecDeseni` tanımlı depolar
  * (kanban; ARC-71 ile sage ve her posta kutusu).
+ *
+ * ⭐YALITILMIŞ KÖK (ARC-71, OPS 10-12): `secenek.kok` (sage/kanban) ya da `secenek.postaKoku` (posta) VERİLMİŞSE ve
+ * hedef kanonik karşılaştırmayla canlı depo DEĞİLSE süreç/servis denetimi atlanır ("yalıtılmış kök": pencereler açıkken
+ * bir C:/tmp kopyasına geri yükleme provası). Seçenek verilmezse ya da hedef canlıysa/ölçülemezse denetim AYNEN kalır.
+ * Ortam değişkeni tek başına denetimi ATLATMAZ: atlatma bilinçli bir seçenek ister.
  *
  * ⛔SERVİS CANLIYKEN REDDEDER: çalışan servis dosyayı açık tutar; altından değiştirmek ya
  * başarısız olur ya da servis eski içeriği WAL'dan geri yazar. Önce servis kapatılır.
@@ -520,10 +627,11 @@ function surecCanli(pid) {
  *
  * @param {string} depoAdi
  * @param {string|null} dosyaAdi yedek dizinindeki dosya adı; verilmezse en yeni sağlam yedek
- * @param {{evet?: boolean, simdi?: Date}} secenek
+ * @param {{evet?: boolean, simdi?: Date, surecler?: string[]|null, kok?: string, postaKoku?: string, canliPostaKoku?: string}} secenek
+ *   `canliPostaKoku`: YALNIZ test enjeksiyonu (CLI sunmaz).
  */
 function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
-  const depo = tumDepolar().find((d) => d.ad === depoAdi)
+  const depo = tumDepolar(secenek.postaKoku || undefined).find((d) => d.ad === depoAdi)
   if (!depo) return { durum: 'hata', sebep: `bilinmeyen depo: ${depoAdi}` }
   if (!depo.servis && !depo.surecDeseni)
     return {
@@ -561,48 +669,58 @@ function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
     }
   }
 
-  const k = kok()
-  let pid = null
-  if (depo.servis) {
-    try {
-      pid = Number(JSON.parse(fs.readFileSync(path.join(k, ...depo.servis), 'utf8')).pid)
-    } catch {
-      /* servis dosyası yok ya da okunamıyor: servis çalışmıyor sayılır */
-    }
-  }
-  if (surecCanli(pid)) {
-    return {
-      durum: 'servis-canli',
-      yedek: secilen.ad,
-      sebep: `${depo.ad} servisi calisiyor (pid ${pid}); once servisi kapat, sonra yeniden dene`,
-    }
-  }
-  /**
-   * ⭐SÜREÇ DENETİMİ (ARC-71): sage ve posta kutusunda pid dosyası yoktur; dosyayı her pencerenin MCP süreci açık
-   * tutar. Komut satırında desen eşleşen süreç varsa RET; süreç listesi ALINAMAZSA da RET (fail-closed): "bakamadım"
-   * "kimse yok" demek değildir. Bu betiğin kendi süreci sayılmaz. `secenek.surecler`: test için sahte liste.
-   */
-  if (depo.surecDeseni) {
-    const surecler = 'surecler' in secenek ? secenek.surecler : calisanSurecler()
-    if (!Array.isArray(surecler)) {
-      return {
-        durum: 'servis-olculemedi',
-        yedek: secilen.ad,
-        sebep: `${depo.ad} icin calisan surec listesi ALINAMADI; pencereler kapali oldugu dogrulanmadan geri yukleme yapilmaz`,
+  const k = depo.mutlak ? kok() : secenek.kok ? path.resolve(secenek.kok) : kok()
+  const hedef = depo.mutlak ? depo.mutlak : path.join(k, ...depo.goreli)
+
+  // Yalıtılmış kök yalnız AÇIK seçenekle istenir; canlı/ölçülemeyen hedef yine tam denetimden geçer.
+  const yalitilmisIstek = depo.mutlak ? Boolean(secenek.postaKoku) : Boolean(secenek.kok)
+  const yalitilmis =
+    yalitilmisIstek && !canliHedefMi(depo, hedef, depo.mutlak ? null : k, secenek.canliPostaKoku || undefined)
+
+  if (!yalitilmis) {
+    let pid = null
+    if (depo.servis) {
+      try {
+        pid = Number(JSON.parse(fs.readFileSync(path.join(k, ...depo.servis), 'utf8')).pid)
+      } catch {
+        /* servis dosyası yok ya da okunamıyor: servis çalışmıyor sayılır */
       }
     }
-    const acik = surecler.filter((s) => depo.surecDeseni.test(s) && !/sage-yedek\.cjs/.test(s))
-    if (acik.length > 0) {
+    if (surecCanli(pid)) {
       return {
         durum: 'servis-canli',
         yedek: secilen.ad,
-        sebep: `${depo.ad} dosyasini acik tutan ${acik.length} MCP sureci var; once pencereleri kapat, sonra yeniden dene`,
+        sebep: `${depo.ad} servisi calisiyor (pid ${pid}); once servisi kapat, sonra yeniden dene`,
+      }
+    }
+    /**
+     * ⭐SÜREÇ DENETİMİ (ARC-71): sage ve posta kutusunda pid dosyası yoktur; dosyayı her pencerenin MCP süreci açık
+     * tutar (ARC-98'den beri kanban da stdio sunucusuyla aynı durumda). Komut satırında desen eşleşen süreç varsa RET;
+     * süreç listesi ALINAMAZSA da RET (fail-closed): "bakamadım" "kimse yok" demek değildir. Bu betiğin kendi süreci
+     * sayılmaz. `secenek.surecler`: test için sahte liste.
+     */
+    if (depo.surecDeseni) {
+      const surecler = 'surecler' in secenek ? secenek.surecler : calisanSurecler()
+      if (!Array.isArray(surecler)) {
+        return {
+          durum: 'servis-olculemedi',
+          yedek: secilen.ad,
+          sebep: `${depo.ad} icin calisan surec listesi ALINAMADI; pencereler kapali oldugu dogrulanmadan geri yukleme yapilmaz`,
+        }
+      }
+      const acik = surecler.filter((s) => depo.surecDeseni.test(s) && !/sage-yedek\.cjs/.test(s))
+      if (acik.length > 0) {
+        return {
+          durum: 'servis-canli',
+          yedek: secilen.ad,
+          sebep: `${depo.ad} dosyasini acik tutan ${acik.length} MCP sureci var; once pencereleri kapat, sonra yeniden dene`,
+        }
       }
     }
   }
 
-  const hedef = kaynakYolu(k, depo.ad)
   const tasinacak = [hedef, hedef + '-wal', hedef + '-shm'].filter((f) => fs.existsSync(f))
+  const kokTuru = yalitilmis ? 'yalitilmis' : 'canli'
   if (!secenek.evet) {
     return {
       durum: 'kuru',
@@ -611,6 +729,7 @@ function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
       tasinacak,
       iz: yedekIzi,
       icerik,
+      kok: kokTuru,
     }
   }
 
@@ -670,6 +789,7 @@ function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
     oncesi: tasinan.map((f) => f + ek),
     iz: yedekIzi,
     icerik,
+    kok: kokTuru,
   }
 }
 
@@ -765,6 +885,8 @@ module.exports = {
   kanbanSayim,
   kademeliSilinecek,
   surecCanli,
+  kanonikYol,
+  canliHedefMi,
   geriYukle,
 }
 
@@ -775,20 +897,41 @@ if (require.main === module) {
      * `--geri <depo> [yedek-dosya-adi] [--evet]` — `--evet` YOKSA yalnız planı yazar.
      * Çıkış: 0 = plan yazıldı / geri yüklendi · 1 = reddedildi ya da başarısız · 2 = kullanım hatası.
      */
-    const kalan = process.argv.slice(geriIdx + 1).filter((a) => !a.startsWith('--'))
+    // `--kok <yol>` (sage/kanban) ve `--posta-koku <yol>` (posta) değer alır; kalanlar konumsal argümandır.
+    const kalan = []
+    const secenekler = { evet: false }
+    const args = process.argv.slice(geriIdx + 1)
+    for (let i = 0; i < args.length; i++) {
+      const a = args[i]
+      if (a === '--evet') secenekler.evet = true
+      else if (a === '--kok' || a === '--posta-koku') {
+        const v = args[i + 1]
+        if (!v || v.startsWith('--')) {
+          process.stderr.write(`sage-yedek: ${a} bir dizin yolu ister\n`)
+          process.exit(2)
+        }
+        secenekler[a === '--kok' ? 'kok' : 'postaKoku'] = v
+        i++
+      } else if (!a.startsWith('--')) kalan.push(a)
+    }
     if (!kalan[0]) {
-      process.stderr.write('kullanim: sage-yedek.cjs --geri <depo> [yedek-dosya-adi] [--evet]\n')
+      process.stderr.write(
+        'kullanim: sage-yedek.cjs --geri <depo> [yedek-dosya-adi] [--evet] [--kok <yol> | --posta-koku <yol>]\n',
+      )
       process.exit(2)
     }
-    const r = geriYukle(kalan[0], kalan[1] || null, {
-      evet: process.argv.includes('--evet'),
-    })
+    const r = geriYukle(kalan[0], kalan[1] || null, secenekler)
     const sayim = r.icerik ? `${r.icerik.pano} pano / ${r.icerik.kart} kart` : r.iz ? `kayit ${r.iz.sayi}` : ''
+    const kokSatiri =
+      r.kok === 'yalitilmis'
+        ? '  kok      : YALITILMIS KOK (canli depo degil; surec denetimi atlandi)\n'
+        : '  kok      : canli kok (surec denetimi yapildi)\n'
     if (r.durum === 'kuru') {
       process.stdout.write(
         `sage-yedek [${kalan[0]}]: GERI YUKLEME PLANI (hicbir sey degismedi)\n` +
           `  yedek    : ${r.yedek} (${sayim})\n` +
           `  hedef    : ${r.hedef}\n` +
+          kokSatiri +
           `  yana alinacak (.oncesi-<damga>, SILINMEZ): ${r.tasinacak.length ? r.tasinacak.map((f) => path.basename(f)).join(', ') : 'yok'}\n` +
           `  uygulamak icin ayni komutu --evet ile kos\n`,
       )
@@ -797,6 +940,8 @@ if (require.main === module) {
     if (r.durum === 'geri-yuklendi') {
       process.stdout.write(
         `sage-yedek [${kalan[0]}]: GERI YUKLENDI ve DOGRULANDI <- ${r.yedek} (${sayim})\n` +
+          `  hedef    : ${r.hedef}\n` +
+          kokSatiri +
           `  eski hal: ${r.oncesi.length ? r.oncesi.map((f) => path.basename(f)).join(', ') : 'yoktu'}\n`,
       )
       process.exit(0)

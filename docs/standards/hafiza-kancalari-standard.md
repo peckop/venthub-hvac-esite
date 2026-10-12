@@ -341,9 +341,18 @@ mesajların çoğunu atlar. OPS hükmü 10-09 (kararlar 2 ve 3): kökteki **beş
    kendi sunucusunu açık tutar): komut satırında `sage-mcp`/`mailbox-mcp` geçen süreç varsa RET. **Süreç listesi
    alınamazsa da RET** (bakamamak "kimse yok" demek değildir). Betiğin kendi süreci sayılmaz. Eski dosyalar
    `.oncesi-<damga>` ile yana alınır, silinmez; yazıldıktan sonra parmak izi yedekle karşılaştırılır.
+   **Kanban da süreç taranır** (OPS 10-12): ARC-98'den beri her pencere `kanban-mcp`'yi stdio + `--writable` açar;
+   dosyayı tutan süreç `kanban-server.json`'da görünmez. Pid denetimi kalır, `kanban-mcp/dist/cli.js` taraması eklenir.
 5. **Yükseltme günü adımı:** pencereler kapalıyken `node scripts/hijyen/sage-yedek.cjs` (üç tür depo ayrı
    satır), `--liste` ile boyut kontrolü; geri dönüş `--geri sage`, `--geri posta-<proje>`, `--geri kanban`.
    Posta kutusu elle kopyalanmaz.
+6. **YALITILMIŞ KÖK PROVASI (OPS 10-12):** pencereler açıkken geri dönüş yolu kopyada denenir:
+   `--geri sage|kanban --kok <yol>` ve `--geri posta-<proje> --posta-koku <yol>`. Süreç denetimi **yalnız şu
+   hâlde** atlanır: seçenek AÇIKÇA verilmiş, hedef dosya **kanonik karşılaştırmayla** (gerçek yol, `/` ayracı,
+   Windows'ta harf büyüklüğü, junction) ve dev+ino ile canlı depo DEĞİL, canlı ana ağaç çözülebilmiş ve hedef
+   canlı git ağacının (worktree dahil) içinde değil. Kök çözülemezse ya da canlıysa denetim aynen kalır.
+   **Ortam değişkeni (`CLAUDE_PROJECT_DIR`, `VENTHUB_POSTA_KOKU`) tek başına denetimi atlatmaz.** Çıktı
+   `YALITILMIS KOK` satırını yazar; canlı depoya gerçek geri yükleme yalnız yükseltme bozulursa ve pencereler kapalıyken.
 
 ---
 

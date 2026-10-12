@@ -410,7 +410,11 @@ const kanbanModul = require_(MODUL_YOLU) as {
   kanbanSayim: (yol: string) => KanbanSayim | null
   kademeliSilinecek: (dosyalar: string[], depo: KanbanDepo) => string[]
   surecCanli: (pid: number) => boolean
-  geriYukle: (depo: string, dosya?: string | null, s?: { evet?: boolean; simdi?: Date }) => GeriSonuc
+  geriYukle: (
+    depo: string,
+    dosya?: string | null,
+    s?: { evet?: boolean; simdi?: Date; surecler?: string[] | null },
+  ) => GeriSonuc
   yedekAl: (
     simdi?: Date,
     depo?: string,
@@ -565,7 +569,8 @@ describe('INV-KANBAN-YEDEK-1 · Kanban yedegi kart sayisiyla dogrulanir, kademel
     expect(kanbanModul.kanbanSayim(yol)?.kart).toBe(10)
 
     // 1) PLAN: hiçbir şey değişmez.
-    const plan = kanbanModul.geriYukle('kanban')
+    // Süreç listesi SABİT verilir: kanban artık süreç deseni de taşır, gerçek liste makineye göre değişir.
+    const plan = kanbanModul.geriYukle('kanban', null, { surecler: [] })
     expect(plan.durum, `plan uretilemedi: ${plan.sebep}`).toBe('kuru')
     expect(plan.icerik?.kart, 'plan yedegin kart sayisini yazmiyor').toBe(7)
     expect(kanbanModul.kanbanSayim(yol)?.kart, 'plan asamasinda canli dosya DEGISTI').toBe(10)
@@ -573,13 +578,13 @@ describe('INV-KANBAN-YEDEK-1 · Kanban yedegi kart sayisiyla dogrulanir, kademel
     // 2) SERVİS CANLI: bu test sürecinin pid'i "çalışan servis" olarak yazılır → RET.
     const servis = path.join(kok, '.wrongstack', 'kanban-server.json')
     fs.writeFileSync(servis, JSON.stringify({ pid: process.pid }), 'utf8')
-    const ret = kanbanModul.geriYukle('kanban', null, { evet: true })
+    const ret = kanbanModul.geriYukle('kanban', null, { evet: true, surecler: [] })
     expect(ret.durum, 'calisan servisin altindan dosya degistirildi').toBe('servis-canli')
     expect(kanbanModul.kanbanSayim(yol)?.kart, 'ret edilen geri yukleme canliyi DEGISTIRDI').toBe(10)
 
     // 3) SERVİS KAPALI: geri yüklenir, eski dosya silinmez.
     fs.unlinkSync(servis)
-    const r = kanbanModul.geriYukle('kanban', null, { evet: true })
+    const r = kanbanModul.geriYukle('kanban', null, { evet: true, surecler: [] })
     expect(r.durum, `geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
     expect(kanbanModul.kanbanSayim(yol), 'geri yuklenen pano yedekle ayni degil').toMatchObject({
       pano: 2,
@@ -645,8 +650,26 @@ type PostaModul = {
   geriYukle: (
     depo: string,
     dosya?: string | null,
-    s?: { evet?: boolean; simdi?: Date; surecler?: string[] | null },
-  ) => { durum: string; sebep?: string; oncesi?: string[]; hedef?: string; iz?: Iz; yedek?: string }
+    s?: {
+      evet?: boolean
+      simdi?: Date
+      surecler?: string[] | null
+      kok?: string
+      postaKoku?: string
+      canliPostaKoku?: string
+    },
+  ) => { durum: string; sebep?: string; oncesi?: string[]; hedef?: string; iz?: Iz; yedek?: string; kok?: string }
+  kanonikYol: (yol: string) => string | null
+  canliHedefMi: (
+    depo: { ad: string; goreli?: string[]; mutlak?: string },
+    hedefYol: string,
+    hedefKok: string | null,
+    canliPostaKoku?: string,
+    canliKokler?: string[] | null,
+  ) => boolean
+}
+const anaKokModul = require_(path.join(KOK, 'scripts', 'hijyen', 'ana-kok.cjs')) as {
+  anaKokBul: (baslangic: string) => string | null
 }
 const postaModul = require_(MODUL_YOLU) as PostaModul
 const surecModul = require_(path.join(KOK, 'scripts', 'hijyen', 'surec-listesi.cjs')) as {
@@ -834,6 +857,180 @@ describe('INV-POSTA-YEDEK-1 · posta kutulari WAL dahil yedeklenir, sage ve post
     expect(r.durum, `sage geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
     expect(say(), 'geri yuklenen sage yedekle ayni degil').toBe(9)
     for (const f of r.oncesi ?? []) expect(fs.existsSync(f), `eski hal SILINMIS: ${f}`).toBe(true)
+  })
+
+  it('⭐KANBAN SUREC DENETIMI (OPS 10-12): pid dosyasi YOKKEN kanban-mcp stdio sureci varsa RET; liste alinamazsa RET', () => {
+    // ARC-98'den beri her pencere kanban-mcp'yi stdio + --writable açar; dosyayı tutan süreç pid dosyasında görünmez.
+    const { kok, db } = kanbanKur([4, 1])
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-surec-'))
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = dizin
+    process.env.VENTHUB_POSTA_KOKU = path.join(dizin, 'posta-yok')
+    expect(postaModul.yedekAl(new Date(), 'kanban').durum).toBe('alindi')
+    db.close()
+    expect(fs.existsSync(path.join(kok, '.wrongstack', 'kanban-server.json')), 'fikstur sahte: pid dosyasi var').toBe(false)
+
+    const stdio = [
+      'node C:\\x\\tools\\wrongstack-mcp\\node_modules\\@wrongstack\\kanban-mcp\\dist\\cli.js --writable --project-root C:\\x',
+    ]
+    expect(
+      postaModul.geriYukle('kanban', null, { evet: true, surecler: stdio }).durum,
+      'kanban dosyasini acik tutan stdio sureci pid dosyasi olmadigi icin gozden kacti',
+    ).toBe('servis-canli')
+    expect(postaModul.geriYukle('kanban', null, { evet: true, surecler: null }).durum).toBe('servis-olculemedi')
+    expect(postaModul.geriYukle('kanban', null, { surecler: ['node baska-bir-sey.js'] }).durum).toBe('kuru')
+  })
+
+  it('⭐CANLI KOK UC YAZILISLA RET (OPS 10-12): ayni dizin farkli yazilsa da surec denetimi ATLANMAZ; kok cozulemezse RET', () => {
+    // Plan modunda (evet yok) koşar: denetim atlanırsa durum 'kuru' olur, canlı depoya YAZILMAZ.
+    const { kok, db } = depoKur(5)
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-canli-yazilis-'))
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = dizin
+    process.env.VENTHUB_POSTA_KOKU = path.join(dizin, 'posta-yok')
+    expect(postaModul.yedekAl(new Date(), 'sage').durum).toBe('alindi')
+    db.close()
+
+    const canli = anaKokModul.anaKokBul(KOK) ?? KOK
+    const yazilislar: Record<string, string> = {
+      'oldugu gibi': canli,
+      'egik cizgi + sondaki ayrac (+ kucuk harf Windows)': (process.platform === 'win32' ? canli.toLowerCase() : canli)
+        .replace(/\\/g, '/')
+        .concat('/'),
+      'alt dizin uzerinden (worktree/ic dizin)': path.join(canli, 'src'),
+    }
+    const baglanti = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'vh-junction-')), 'canli-bag')
+    try {
+      fs.symlinkSync(canli, baglanti, 'junction')
+      yazilislar['junction/sembolik bag uzerinden'] = baglanti
+    } catch {
+      /* bag kurulamayan ortam: kalan yazilislar yine sinanir */
+    }
+    const surec = ['node tools/wrongstack-mcp/node_modules/@wrongstack/sage-mcp/dist/cli.js --project-root .']
+    for (const [ad, yol] of Object.entries(yazilislar)) {
+      expect(postaModul.geriYukle('sage', null, { surecler: surec, kok: yol }).durum, `${ad}: denetim atlandi`).toBe(
+        'servis-canli',
+      )
+      expect(
+        postaModul.geriYukle('sage', null, { surecler: null, kok: yol }).durum,
+        `${ad}: surec listesi yokken denetim atlandi`,
+      ).toBe('servis-olculemedi')
+    }
+
+    // Kök çözülemiyor: fail-closed.
+    expect(postaModul.kanonikYol('')).toBeNull()
+    expect(postaModul.canliHedefMi({ ad: 'sage', goreli: ['.wrongstack', 'memories', 'sage.db'] }, '', null)).toBe(true)
+    // Canlı kök HİÇ çözülemediyse (git yok / ağaç bulunamadı) hedef yalıtılmış sayılamaz: RET.
+    const sageDepo = { ad: 'sage', goreli: ['.wrongstack', 'memories', 'sage.db'] }
+    const baska = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-baska-kok-'))
+    const baskaHedef = path.join(baska, ...sageDepo.goreli)
+    expect(
+      postaModul.canliHedefMi(sageDepo, baskaHedef, baska, undefined, []),
+      'canli kok bilinmiyorken hedef yalitilmis sayildi',
+    ).toBe(true)
+    // Canlı kök biliniyor ve hedef onun dışında: yalıtılmış (false) — pozitif kol.
+    expect(postaModul.canliHedefMi(sageDepo, baskaHedef, baska, undefined, [canli])).toBe(false)
+    // Aynı hedef canlı kök listesinde ise canlı.
+    expect(postaModul.canliHedefMi(sageDepo, path.join(canli, ...sageDepo.goreli), canli, undefined, [canli])).toBe(true)
+    // Aynı dizinin iki yazılışı AYNI kanonik yola iner.
+    expect(postaModul.kanonikYol(canli)).toBe(postaModul.kanonikYol(canli.replace(/\\/g, '/') + '/'))
+  })
+
+  it('⭐YALITILMIS KOK PROVASI (OPS 10-12): secenek verilmis ve hedef canli degilse surec denetimi atlanir, YALNIZ o koka yazilir', () => {
+    const { kok, db } = depoKur(9)
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-yalitilmis-'))
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = dizin
+    process.env.VENTHUB_POSTA_KOKU = path.join(dizin, 'posta-yok')
+    expect(postaModul.yedekAl(new Date(), 'sage').durum).toBe('alindi')
+    db.prepare(
+      `insert into memories (id,data,status,kind,scope,importance,confidence,freshness,updated_at,created_at)
+       values (?,?,'active','fact','project',0.8,0.8,1,'2026-09-18','2026-09-18')`,
+    ).run('m-yeni', JSON.stringify({ text: 'yeni', anchors: [] }))
+    db.close()
+    const say = (k: string) => modul.parmakIzi(path.join(k, '.wrongstack', 'memories', 'sage.db')).sayi
+    expect(say(kok)).toBe(10)
+
+    const surec = ['node tools/wrongstack-mcp/node_modules/@wrongstack/sage-mcp/dist/cli.js --project-root .']
+    // Ortam değişkeni tek başına denetimi ATLATMAZ (atlatma bilinçli seçenek ister).
+    expect(postaModul.geriYukle('sage', null, { evet: true, surecler: surec }).durum).toBe('servis-canli')
+    expect(say(kok)).toBe(10)
+
+    const izole = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-izole-kok-'))
+    const r = postaModul.geriYukle('sage', null, { evet: true, surecler: surec, kok: izole })
+    expect(r.durum, `yalitilmis geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
+    expect(r.kok).toBe('yalitilmis')
+    expect(String(r.hedef).startsWith(izole), 'yalitilmis kok disina yazildi').toBe(true)
+    expect(say(izole), 'yalitilmis kokteki sage yedekle ayni degil').toBe(9)
+    expect(say(kok), 'yalitilmis geri yukleme CANLI koku degistirdi').toBe(10)
+  })
+
+  it('⭐POSTA: canli posta kokunun uc yazilisi RET; yalitilmis posta kokune geri yukleme surec varken calisir', () => {
+    // Hermetik "canlı posta kökü": gerçek ev dizinine dokunulmaz; kök seçeneği yalnız test enjeksiyonudur.
+    const ev = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-ev-'))
+    const canliPosta = path.join(ev, '.wrongstack', 'projects')
+    fs.mkdirSync(path.join(canliPosta, 'p1'), { recursive: true })
+    {
+      const { DatabaseSync } = sqlite()
+      const kutu = (yol: string, n: number) => {
+        const d = new DatabaseSync(yol)
+        d.exec('pragma journal_mode = WAL')
+        d.exec('create table messages (id INTEGER PRIMARY KEY, alici TEXT NOT NULL, govde TEXT NOT NULL)')
+        for (let i = 0; i < n; i++) d.prepare('insert into messages (alici,govde) values (?,?)').run('pencere', `mesaj ${i}`)
+        return d
+      }
+      const canliDb = kutu(path.join(canliPosta, 'p1', '_mailbox.sqlite'), 8)
+      const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-yalitilmis-'))
+      process.env.VENTHUB_POSTA_KOKU = canliPosta
+      process.env.CLAUDE_PROJECT_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-yal-kok-'))
+      process.env.VENTHUB_SAGE_YEDEK_DIZINI = dizin
+      expect(postaModul.yedekAl(new Date(), 'posta-p1').durum).toBe('alindi')
+      for (let i = 0; i < 5; i++) canliDb.prepare('insert into messages (alici,govde) values (?,?)').run('pencere', `yeni ${i}`)
+      canliDb.close()
+      const say = (yol: string) => {
+        const d = new DatabaseSync(yol, { readOnly: true })
+        try {
+          return Number(d.prepare('select count(*) as c from messages').get().c)
+        } finally {
+          d.close()
+        }
+      }
+      const surec = ['node C:\\x\\@wrongstack\\mailbox-mcp\\dist\\cli.js --stdio']
+
+      const baglanti = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-bag-')), 'canli-bag')
+      const yazilislar = [
+        canliPosta,
+        (process.platform === 'win32' ? canliPosta.toLowerCase() : canliPosta).replace(/\\/g, '/') + '/',
+      ]
+      try {
+        fs.symlinkSync(canliPosta, baglanti, 'junction')
+        yazilislar.push(baglanti)
+      } catch {
+        /* bag kurulamadi: kalan yazilislar sinanir */
+      }
+      for (const y of yazilislar) {
+        expect(
+          postaModul.geriYukle('posta-p1', null, { surecler: surec, postaKoku: y, canliPostaKoku: canliPosta }).durum,
+          `canli posta koku "${y}" yalitilmis sayildi`,
+        ).toBe('servis-canli')
+      }
+      expect(say(path.join(canliPosta, 'p1', '_mailbox.sqlite'))).toBe(13)
+
+      // Yalıtılmış kök: aynı adlı kutu farklı kökte; süreç dururken bile denetim atlanır, canlıya dokunulmaz.
+      const izole = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-izole-'))
+      fs.mkdirSync(path.join(izole, 'p1'))
+      kutu(path.join(izole, 'p1', '_mailbox.sqlite'), 2).close()
+      const r = postaModul.geriYukle('posta-p1', null, {
+        evet: true,
+        surecler: surec,
+        postaKoku: izole,
+        canliPostaKoku: canliPosta,
+      })
+      expect(r.durum, `yalitilmis posta geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
+      expect(r.kok).toBe('yalitilmis')
+      expect(say(path.join(izole, 'p1', '_mailbox.sqlite')), 'yalitilmis kutu yedekle ayni degil').toBe(8)
+      expect(say(path.join(canliPosta, 'p1', '_mailbox.sqlite')), 'yalitilmis geri yukleme CANLI kutuyu degistirdi').toBe(13)
+    }
   })
 
   it('GERCEK surec listesi: bu makinede alinabiliyor ve kendi sureci icinde (fail-closed kolu bozuksa kirmizi)', () => {
