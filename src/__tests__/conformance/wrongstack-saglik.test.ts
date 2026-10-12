@@ -30,6 +30,8 @@ const modul = require_(SAGLIK) as {
     okuSurum?: (klasor: string) => string | null,
   ) => Daemon[]
   anaAgacMi: (kok?: string) => boolean
+  sunucuSurumu: (cli: string, kok: string, zamanAsimi?: number, ek?: string[]) => Promise<{ surum?: string | null; arac?: number | null; hata?: string }>
+  SUNUCU_EK: Record<string, string[]>
 }
 
 const KOMUTLAR = {
@@ -136,5 +138,49 @@ describe('INV-WRONGSTACK-SAGLIK-1 · daemon sürümü ölçülür, ölçüm arac
     const r2 = kos(bos.betik)
     expect(r2.kod, r2.cikti).toBe(0)
     expect(r2.cikti.trim().split('\n').pop()).toBe('HAZIR')
+  })
+})
+
+/**
+ * ARC-108 (12 Ekim 13:55 ölçüldü): mailbox-mcp 1.1.0 `--actor` zorunlu, yoksa çıkış 2; sağlık ölçümü bayrağı vermediği için
+ * "sunucu beklenmedik kapandi" diyordu. Sahte sunucu: `--actor` yoksa çıkış 2, varsa initialize + tools/list cevaplar.
+ */
+describe('INV-WRONGSTACK-SAGLIK-2 · mailbox-mcp --actor ile açılır (ölçüm kusuru kapalı)', () => {
+  const sahteCli = () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-cli-'))
+    const cli = path.join(d, 'cli.js')
+    fs.writeFileSync(
+      cli,
+      [
+        "if (!process.argv.includes('--actor')) { process.stderr.write('--project-root and --actor are required\\n'); process.exit(2) }",
+        "process.stdin.on('data', (b) => { for (const l of String(b).split('\\n')) { if (!l.trim()) continue; const m = JSON.parse(l)",
+        "  if (m.method === 'initialize') process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: m.id, result: { serverInfo: { version: '9.9.9' } } }) + '\\n')",
+        "  if (m.method === 'tools/list') process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: m.id, result: { tools: [{}, {}] } }) + '\\n') } })",
+      ].join('\n'),
+    )
+    return { cli, d }
+  }
+
+  it('⭐mailbox-mcp için sabit --actor tanımlı; diğer üç sunucuya ek bayrak EKLENMEZ', () => {
+    expect(modul.SUNUCU_EK['mailbox-mcp']).toEqual(['--actor', 'wrongstack-saglik'])
+    for (const ad of ['sage-mcp', 'kanban-mcp', 'codebase-index-mcp']) expect(modul.SUNUCU_EK[ad], ad).toBeUndefined()
+  })
+
+  it('⭐GERÇEK SÜREÇ: --actor ile sürüm ve araç sayısı okunur; bayraksız açış "beklenmedik kapandi" (eski kusur)', async () => {
+    const { cli, d } = sahteCli()
+    try {
+      const iyi = await modul.sunucuSurumu(cli, d, 10_000, modul.SUNUCU_EK['mailbox-mcp'])
+      expect(iyi.hata).toBeUndefined()
+      expect(iyi.surum).toBe('9.9.9')
+      expect(iyi.arac).toBe(2)
+      const kotu = await modul.sunucuSurumu(cli, d, 10_000)
+      expect(kotu.hata).toMatch(/beklenmedik kapandi/)
+    } finally {
+      fs.rmSync(d, { recursive: true, force: true })
+    }
+  })
+
+  it('ana döngü sunucuSurumu çağrısına SUNUCU_EK geçirir (bayrak unutulursa kusur geri gelir)', () => {
+    expect(fs.readFileSync(SAGLIK, 'utf8')).toMatch(/sunucuSurumu\([\s\S]{0,200}SUNUCU_EK\[ad\]/)
   })
 })

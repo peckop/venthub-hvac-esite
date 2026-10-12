@@ -28,6 +28,13 @@ const ARAC = __dirname
 const KOK = path.resolve(ARAC, '..', '..')
 const SUNUCULAR = ['sage-mcp', 'kanban-mcp', 'mailbox-mcp', 'codebase-index-mcp']
 
+/**
+ * Sunucu başına ek bayrak (ARC-108, 12 Ekim 13:55 ölçüldü): mailbox-mcp 1.1.0 `--actor <id>` ZORUNLU kılıyor, yoksa çıkış 2
+ * ile kapanıyor ve ölçüm "sunucu beklenmedik kapandi" diyordu (ürün sağlam, ölçüm kusuruydu). Gerçek açış yolu
+ * (posta-kutusu.cjs) kimliği oturumdan türetir; sağlık ölçümü sabit, kendini belli eden bir kimlik kullanır.
+ */
+const SUNUCU_EK = { 'mailbox-mcp': ['--actor', 'wrongstack-saglik'] }
+
 function paketSurumu(klasor) {
   try {
     return JSON.parse(fs.readFileSync(path.join(klasor, 'package.json'), 'utf8')).version || null
@@ -72,9 +79,9 @@ function daemonSurumleri(surecler, beklenen, okuSurum = paketSurumu) {
 }
 
 /** Bir MCP sunucusunu salt-okuma açar; initialize.serverInfo.version ve araç sayısını döndürür. */
-function sunucuSurumu(cli, kok, zamanAsimi = 30000) {
+function sunucuSurumu(cli, kok, zamanAsimi = 30000, ek = []) {
   return new Promise((resolve) => {
-    const p = spawn(process.execPath, [cli, '--project-root', kok, '--stdio'], {
+    const p = spawn(process.execPath, [cli, '--project-root', kok, '--stdio', ...ek], {
       stdio: ['pipe', 'pipe', 'pipe'],
       windowsHide: true,
     })
@@ -149,7 +156,7 @@ function anaAgacMi(kok = KOK) {
   }
 }
 
-module.exports = { daemonPaketi, daemonSurumleri, paketSurumu, sunucuSurumu, kanonikKok, anaAgacMi, SUNUCULAR }
+module.exports = { daemonPaketi, daemonSurumleri, paketSurumu, sunucuSurumu, kanonikKok, anaAgacMi, SUNUCULAR, SUNUCU_EK }
 
 if (require.main === module) {
   ;(async () => {
@@ -167,7 +174,7 @@ if (require.main === module) {
       for (const ad of SUNUCULAR) {
         const klasor = path.join(ARAC, 'node_modules', '@wrongstack', ad)
         const kurulu = paketSurumu(klasor)
-        const r = await sunucuSurumu(path.join(klasor, 'dist', 'cli.js'), kanonikKok(KOK))
+        const r = await sunucuSurumu(path.join(klasor, 'dist', 'cli.js'), kanonikKok(KOK), 30000, SUNUCU_EK[ad] || [])
         const ok = !r.hata && r.surum && r.surum === kurulu
         process.stdout.write(
           `${ok ? 'tamam ' : 'HATA  '} ${ad.padEnd(22)} paket ${kurulu || 'YOK'}  initialize ${r.surum || r.hata}  araç ${r.arac ?? '-'}\n`,
