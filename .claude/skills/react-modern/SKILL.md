@@ -22,6 +22,7 @@ metadata:
 | `<nextsteps>` etiketi | **Hiç üretilmez.** Bizde ayrıştırıcı yok; Recep'e rapor akan cümledir |
 | React Compiler uyumu (satır ~38) | Uyumlu: depoda React 19 + Compiler var |
 | Örnek kodlardaki gömülü metinler (satır ~100-102) | **Kopyalanmaz**: kural 7 (kullanıcıya görünen metin sözlükten gelir); skill adımı değil örnektir |
+| `design-system` atfı | Bizde yok; atıf yok sayılır. Karşılığı: `src/design-system/tokens.js` (kural 8) ve `venthub-tasarim-dili` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

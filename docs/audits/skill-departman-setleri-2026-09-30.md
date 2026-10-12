@@ -61,9 +61,9 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), investigate (6K, y) | 6,0K | fallow (16,4K), research-web (7,3K, y), codebase-navigation (9,0K, y) | — |
-| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | debugging (13,0K, y), node-modern (10,3K, y), observability (8,6K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y) | — |
+| Araştırmacı | codegraph (5,4K), investigate (6K, y) | 6,0K | fallow (16,4K), research-web (7,3K, y), codebase-navigation (9,0K, y), tech-stack (9,4K, y) | — |
+| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | debugging (13,0K, y), node-modern (10,3K, y), observability (8,6K, y), tech-stack (9,4K, y), database-migrations (6,8K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y), database-migrations (6,8K, y) | — |
 | Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | — | venthub-enterprise-audit: dört denetim skill'i aynı işe talip; yan yana koşum yapılmadan biri seçilmez; venthub-auditor: aynı kıyas; venthub-20-eksen-denetimi: aynı kıyas; venthub-global-rontgen: aynı kıyas; ayrıca bayat yol/araç adları; diff-review: REC-514 kapanınca eklenir |
 
 Bu bölümdeki skill'lerde dikkat:
@@ -78,7 +78,7 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), investigate (6K) | 5,4K | research-web (7,3K, y), codebase-navigation (9,0K, y) | — |
+| Araştırmacı | codegraph (5,4K, y), investigate (6K) | 5,4K | research-web (7,3K, y), codebase-navigation (9,0K, y), tech-stack (9,4K, y) | — |
 | Uygulayıcı | — | — | mcp-builder (9,1K, y) | wrongstack-kanban: müdür düzeyi: çalışan başka pencereye yazmaz, kartı müdür yönetir (§10.4, belge §6); wrongstack-mailbox-mcp: müdür düzeyi: pencereler arası posta çalışanın işi değil; örnek yapılandırmada --admin ve mcp_use var (§10.4); guard: careful, freeze, guard üçlüsü kıyas bekliyor; careful: aynı kıyas; freeze: aynı kıyas |
 | Çürütücü | plan-challenger (14,6K), chimera (12,9K, y) | 12,9K | bug-hunter (12,3K, y), security-scanner (8,5K, y) | — |
 | Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | — | — |
@@ -94,7 +94,7 @@ Bu bölümdeki skill'lerde dikkat:
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
 | Araştırmacı | research-web (7,3K, y) | 7,3K | — | — |
-| Uygulayıcı | — | — | diagram (16K) | — |
+| Uygulayıcı | — | — | diagram (16K), write-seo-geo-content (21,9K, y) | — |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
 | Doğrulayıcı | verify-before-done (12,5K) | 10,3K | — | — |
 
@@ -109,9 +109,9 @@ Bu bölümdeki skill'lerde dikkat:
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
 | Araştırmacı | codegraph (5,4K, y), investigate (6K, y) | 11,4K | codebase-navigation (9,0K, y) | — |
-| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | supabase (18,8K), debugging (13,0K, y), typescript-strict (10,0K, y), node-modern (10,3K, y), observability (8,6K, y), api-design (10,0K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K, y) | 14,4K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y) | — |
-| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | — | venthub-global-rontgen: bayat yol ve araç adları (src/app/products/[slug] yok, npm run build), edge fonksiyonlarına dair tek madde var; bağımsız doğrulayıcı UYMAZ dedi; diff-review: REC-514 kapanınca eklenir (edge için D11 yanlış alarmı düzelmeli) |
+| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | supabase (18,8K), debugging (13,0K, y), typescript-strict (10,0K, y), node-modern (10,3K, y), observability (8,6K, y), api-design (10,0K, y), payments-webhooks (6,6K, y), database-migrations (6,8K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K, y) | 14,4K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y), database-migrations (6,8K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | payments-webhooks (6,6K, y) | venthub-global-rontgen: bayat yol ve araç adları (src/app/products/[slug] yok, npm run build), edge fonksiyonlarına dair tek madde var; bağımsız doğrulayıcı UYMAZ dedi; diff-review: REC-514 kapanınca eklenir (edge için D11 yanlış alarmı düzelmeli) |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -125,10 +125,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 0,0K | research-web (7,3K, y), web-platform-baseline (10,5K, y) | — |
-| Uygulayıcı | — | — | — | — |
+| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 0,0K | research-web (7,3K, y), web-platform-baseline (10,5K, y), geo-fundamentals (7K, y) | — |
+| Uygulayıcı | — | — | web-performance (6,4K, y), geo-fundamentals (7K, y) | — |
 | Çürütücü | plan-challenger (14,6K), chimera (12,9K, y) | 12,9K | bug-hunter (12,3K, y) | — |
-| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | accessibility (14,5K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | accessibility (14,5K, y), web-performance (6,4K, y) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -225,9 +225,9 @@ Bu bölümdeki skill'lerde dikkat:
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
 | Araştırmacı | codegraph (5,4K, y) | 5,4K | research-web (7,3K, y), codebase-navigation (9,0K, y) | supabase-postgres-best-practices: supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8, 10-01); projeye alınırsa ya da eklenti açılırsa eklenir |
-| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | supabase (18,8K), debugging (13,0K, y), typescript-strict (10,0K, y), api-design (10,0K, y) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
+| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | supabase (18,8K), debugging (13,0K, y), typescript-strict (10,0K, y), api-design (10,0K, y), payments-webhooks (6,6K, y) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
 | Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y) | — |
-| Doğrulayıcı | verify-before-done (12,5K, y), webapp-testing (3,9K), code-review (9,6K, y) | 22,1K | — | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
+| Doğrulayıcı | verify-before-done (12,5K, y), webapp-testing (3,9K), code-review (9,6K, y) | 22,1K | payments-webhooks (6,6K, y) | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -265,7 +265,7 @@ Bu bölümdeki skill'lerde dikkat:
 | Araştırmacı | codegraph (5,4K), investigate (6K, y), venthub-architecture (6,5K, y) | 12,5K | codebase-navigation (9,0K, y), web-platform-baseline (10,5K, y) | — |
 | Uygulayıcı | i18n-conventions (14,2K), venthub-tasarim-dili (11,4K), venthub-architecture (6,5K, y) | 6,5K | vercel-composition-patterns (4,8K, y), vercel-react-best-practices (9,1K, y), threejs-webgl-performance (22,4K, y), testing (12,2K, y), debugging (13,0K, y), react-modern (11,0K, y), typescript-strict (10,0K, y), observability (8,6K, y) | — |
 | Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y) | — |
-| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), web-design-guidelines (4K, y), webapp-testing (3,9K) | 4,0K | canary (52K, y), benchmark (28,6K, y), code-review (9,6K, y) | diff-review: REC-514 kapanınca eklenir (URUN doğrulayıcı "evet") |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), web-design-guidelines (4K, y), webapp-testing (3,9K) | 4,0K | canary (52K, y), benchmark (28,6K, y), code-review (9,6K, y), web-performance (6,4K, y) | diff-review: REC-514 kapanınca eklenir (URUN doğrulayıcı "evet") |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -363,6 +363,21 @@ Bunlar departman penceresinin (müdürün) kendi aracıdır; `Skill` aracıyla a
 
 Hiçbir departmana bağlanmayanlar (eski not): docker-deploy, plugin-author, audit-log (bu depoda skill klasörü yok); alınamayan: auto-review (çalıştıracak ana program yok).
 
+## 6.3 İlk dalga (YTN-18, OPS onayı 12 Ekim 2026)
+
+REC-515 aday tablosundan (`docs/audits/skills-dis-tarama-2026-10.md`) OPS onayıyla kurulan altı skill. Hepsi **adıyla çağır** olarak bağlandı
+(ön yükleme yok, 35 KB tavanı değişmedi); ön yüklemeye girecek olan, kullanım ölçümü sonrası ayrıca karar ister.
+
+| Skill | Kaynak (lisans) | KB | Bağlandığı setler |
+|---|---|---|---|
+| web-performance | WrongStack 1.1.0 (MIT) | 6,4 | GEO-SEO/uygulayici, GEO-SEO/dogrulayici, URUN/dogrulayici |
+| geo-fundamentals | vudovn/ag-kit (MIT) | 7 | GEO-SEO/uygulayici, GEO-SEO/arastirmaci |
+| write-seo-geo-content | onvoyage-ai/gtm-engineer-skills (MIT) | 21,9 | BLOG/uygulayici |
+| tech-stack | WrongStack 1.1.0 (MIT) | 9,4 | ALTYAPI/arastirmaci, ALTYAPI/uygulayici, ARAC/arastirmaci |
+| payments-webhooks | WrongStack 1.1.0 (MIT) | 6,6 | SATIS/uygulayici, SATIS/dogrulayici, EDGE/uygulayici, EDGE/dogrulayici |
+| database-migrations | WrongStack 1.1.0 (MIT) | 6,8 | ALTYAPI/uygulayici, ALTYAPI/curutucu, EDGE/uygulayici, EDGE/curutucu |
+
+Bağlar çalışan tanımına yalnız "adıyla çağır" notu olarak yansır; GEO-SEO ve BLOG uygulayıcı satırları `uret: false` kaldığı için (HRT-23 karar bekliyor) dosya üretmez.
 ## 7. Üretici girdisi
 
 Makine okuyan kaynak: `docs/audits/skill-departman-setleri-2026-09-30.json`. HARİTA'nın kart üreticisi her `uret: true` satırı için `.claude/agents/<dept>-<tur>.md` dosyasını üretir; `skills:` alanına `onYukle[].ad` girer. Bu belge ile JSON aynı betikten çıktı, elle düzenlenmez; değişiklik betikte yapılır.

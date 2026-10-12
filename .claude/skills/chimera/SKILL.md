@@ -19,6 +19,7 @@ metadata:
 | `codebase-incoming-calls` | `codebase_symbol_graph` ya da `codegraph_explore`; imza değişiminde `graphify affected "sembol()"` (parantez şart) |
 | runtime'ın `review-reports.jsonl` kalıcılığı, `cascadeOn`, `chimera.review_complete` | **Yok.** Rapor kalıcılığı ve takip işi bizde müdürün işidir |
 | `bug-hunter`, `security-scanner`, `typescript-strict`, `api-design`, `testing`, `output-standards` | `bug-hunter` paketten gelir (WrongStack alımı); `security-scanner` sonraki PR; `testing` paketten gelir; diğerleri bizde yok, atıf yok sayılır |
+| `auto-review` atfı | Bizde yok; atıf yok sayılır. Yerine `code-review` ve `chimera` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

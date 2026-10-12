@@ -204,6 +204,10 @@
     {
      "ad": "codebase-navigation",
      "kb": 9
+    },
+    {
+     "ad": "tech-stack",
+     "kb": 9.4
     }
    ],
    "bekleyen": []
@@ -237,6 +241,14 @@
     {
      "ad": "observability",
      "kb": 8.6
+    },
+    {
+     "ad": "tech-stack",
+     "kb": 9.4
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
     }
    ],
    "bekleyen": []
@@ -274,6 +286,10 @@
     {
      "ad": "data-governance",
      "kb": 9.3
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
     }
    ],
    "bekleyen": []
@@ -344,6 +360,10 @@
     {
      "ad": "codebase-navigation",
      "kb": 9
+    },
+    {
+     "ad": "tech-stack",
+     "kb": 9.4
     }
    ],
    "bekleyen": []
@@ -457,6 +477,10 @@
     {
      "ad": "diagram",
      "kb": 16
+    },
+    {
+     "ad": "write-seo-geo-content",
+     "kb": 21.9
     }
    ],
    "bekleyen": []
@@ -558,6 +582,14 @@
     {
      "ad": "api-design",
      "kb": 10
+    },
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
     }
    ],
    "bekleyen": []
@@ -595,6 +627,10 @@
     {
      "ad": "data-governance",
      "kb": 9.3
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
     }
    ],
    "bekleyen": []
@@ -616,7 +652,12 @@
     }
    ],
    "toplamKB": 22.1,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
+    }
+   ],
    "bekleyen": [
     {
      "ad": "venthub-global-rontgen",
@@ -653,6 +694,10 @@
     {
      "ad": "web-platform-baseline",
      "kb": 10.5
+    },
+    {
+     "ad": "geo-fundamentals",
+     "kb": 7
     }
    ],
    "bekleyen": []
@@ -663,7 +708,16 @@
    "uret": false,
    "onYukle": [],
    "toplamKB": 0,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "web-performance",
+     "kb": 6.4
+    },
+    {
+     "ad": "geo-fundamentals",
+     "kb": 7
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -712,6 +766,10 @@
     {
      "ad": "accessibility",
      "kb": 14.5
+    },
+    {
+     "ad": "web-performance",
+     "kb": 6.4
     }
    ],
    "bekleyen": []
@@ -1185,6 +1243,10 @@
     {
      "ad": "api-design",
      "kb": 10
+    },
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
     }
    ],
    "bekleyen": [
@@ -1253,7 +1315,12 @@
     }
    ],
    "toplamKB": 26,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
+    }
+   ],
    "bekleyen": [
     {
      "ad": "diff-review",
@@ -1524,6 +1591,10 @@
     {
      "ad": "code-review",
      "kb": 9.6
+    },
+    {
+     "ad": "web-performance",
+     "kb": 6.4
     }
    ],
    "bekleyen": [

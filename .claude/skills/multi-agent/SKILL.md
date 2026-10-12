@@ -18,6 +18,10 @@ metadata:
 | `collab_debug` | YOK — bizde karşılığı yok; kullanılmaz |
 | fleet / Director / `budget_exhausted` | YOK (WrongStack ana programında); ilke olarak okunur |
 | Yöntem seçimi | `docs/standards/execution-method-standard.md` (ŞERİT / alt ajan / Workflow / maestro) — çelişirse o kazanır |
+| `output-standards` atfı | Bizde yok (1.1.0 paketinde var, alınmadı); atıf yok sayılır. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu ve Recep çıktı stili |
+| `audit-log` atfı | Bizde yok; atıf yok sayılır. Karşılığı: admin işlemleri `admin_audit_log` (kural 11) |
+| `evidence-audit` atfı | Bizde yok; atıf yok sayılır. Yerine `bug-hunter` (kusur kanıtı) ve `verify-before-done` |
+| `mailbox-bridge` atfı | Bizde yok ve **kullanılmaz** (HTTP köprüsü; bizde kapalı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
