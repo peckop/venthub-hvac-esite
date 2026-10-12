@@ -17,6 +17,8 @@ metadata:
 | `mcp_use` köprüsü | Doğrudan MCP: `mcp__wrongstack-mailbox__mailbox_read` / `mailbox_manage` / `mailbox_watch` |
 | Açık pencere | Doğrudan mesaj **SendMessage** (posta kutusu değil) |
 | `mailbox_admin` | KAPALI (kural 3) |
+| `output-standards` atfı | Bizde yok (1.1.0 paketinde var, alınmadı); atıf yok sayılır. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu ve Recep çıktı stili |
+| `mailbox-bridge` atfı | Bizde yok ve **kullanılmaz** (HTTP köprüsü; bizde kapalı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

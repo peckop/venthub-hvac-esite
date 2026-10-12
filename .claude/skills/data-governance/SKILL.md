@@ -23,6 +23,7 @@ metadata:
 | "Her varlığın TEK sahibi servis, ortak tablo yok" (satır ~25, 61-62, 77, 87, 98, 103) | **Bizde uygulanmaz.** VentHub tek Supabase DB'sidir; Next servisleri, Edge fonksiyonları ve RLS aynı tabloları okur. Olduğu gibi uygulansa her tablo "ihlal" çıkardı. Yerine: **tablo sahibi = departman/servis katmanı + RLS + tenant kapsamı** (kural 12) |
 | `logger.info` örneği (satır ~36-46) | Bizim yığına uymaz (gözlem aracı Sentry); örnek, ilke geçerli |
 | GDPR dili ("right to erasure", satır ~29, 109) | KVKK karşılığı: silme, yok etme, anonimleştirme, saklama-imha politikası |
+| `audit-log` atfı | Bizde yok; atıf yok sayılır. Karşılığı: admin işlemleri `admin_audit_log` (kural 11) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

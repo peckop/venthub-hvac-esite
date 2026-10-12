@@ -26,6 +26,9 @@
 | `git-commit` skill'i | MIT (skill künyesinde yazılı) | Skill dosyası olduğu gibi | `.claude/skills/git-commit/`, `.agent/skills/git-commit/` |
 | Vercel — `vercel-react-best-practices` skill'i | MIT © vercel | Skill dosyası olduğu gibi | `.claude/skills/vercel-react-best-practices/`, `.agent/skills/…` |
 | Vercel — `vercel-composition-patterns` skill'i | MIT © vercel | Skill dosyası olduğu gibi | `.claude/skills/vercel-composition-patterns/`, `.agent/skills/…` |
+| WrongStack (Ersin Koç; telif ECOSTACK TECHNOLOGY OÜ) — `@wrongstack/core` 1.1.0 skill'leri: `web-performance`, `tech-stack`, `payments-webhooks`, `database-migrations` | MIT | Skill gövdesi **olduğu gibi**; başa araç eşlemesi + VentHub ek kuralları (bizden), açıklama yeniden yazıldı; `tech-stack/scripts/check-versions.mjs` ve `tech-stack/references/current-versions.md` aynen (YTN-18 ilk dalga, OPS onayı 2026-10-12). | `.claude/skills/{web-performance,tech-stack,payments-webhooks,database-migrations}/SKILL.md`, `.claude/skills/tech-stack/{scripts,references}/` |
+| vudovn (`vudovn/ag-kit` @3d7f9e0db6) — `geo-fundamentals` skill'i | MIT © 2026 VUDOVN | Skill gövdesi **olduğu gibi**; başa künye, araç eşlemesi + VentHub ek kuralları (bizden), açıklama yeniden yazıldı; `scripts/geo_checker.py` aynen (YTN-18 ilk dalga, OPS onayı 2026-10-12). | `.claude/skills/geo-fundamentals/` |
+| OnVoyage AI (`onvoyage-ai/gtm-engineer-skills` @d093d293b1) — `write-seo-geo-content` skill'i | MIT © 2025 OnVoyage AI | Skill gövdesi **olduğu gibi**; başa künye, araç eşlemesi + VentHub ek kuralları (bizden), açıklama yeniden yazıldı (YTN-18 ilk dalga, OPS onayı 2026-10-12). | `.claude/skills/write-seo-geo-content/SKILL.md` |
 
 **⛔İKİ SKILL AĞACI DA SAYILIR.** `.claude/skills/` (Claude Code) ve `.agent/skills/`
 (Antigravity/worker) **ikisi de aktif ve kasıtlıdır** (CLAUDE.md). Aynı skill iki ağaçta

@@ -24,6 +24,9 @@ metadata:
 | **"Kural 6: referans dosyayı aynı turda düzelt" (SKILL.md ~98-100)** | **Departman ajanı skill dosyasını DÜZENLEYEMEZ**: `.claude/skills/**` YETENEK'in yetkisindedir. Bayat satır görülürse YETENEK'e bildirilir |
 | `css.md` ~84, 95, 100: `color-mix(in oklch…)` ve serbest `clamp(…)` | Tailwind sınıfına taşınırsa **kural 8 ihlali** (arbitrary değer; renk HSL custom property) |
 | `css.md` ~63-64: `@container` | Tailwind 3.4'te eklenti ister; config'te var mı **ölçülmedi** |
+| `design-system` atfı | Bizde yok; atıf yok sayılır. Karşılığı: `src/design-system/tokens.js` (kural 8) ve `venthub-tasarim-dili` |
+| `design-craft` atfı | Bizde yok; atıf yok sayılır. Yerine `venthub-tasarim-dili` ve gstack `design-review` |
+| `design-critique` atfı | Bizde yok; atıf yok sayılır. Yerine `venthub-tasarim-dili` ve gstack `design-review` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

@@ -22,6 +22,7 @@ metadata:
 | "Clean install from the lockfile" | `pnpm install --frozen-lockfile --offline` (karar 88) |
 | UI kanıtı ("rendered at the relevant widths…") | `qa` skill'i (gerçek tarayıcıda gezip kanıt üretir) |
 | Gövdedeki "Skills in scope" atıfları (`testing`, `debugging`, `git-flow`) | Bu üçü WrongStack alımının 2. paketiyle depoya geldi; atıflar çalışır |
+| `mailbox-bridge` atfı | Bizde yok ve **kullanılmaz** (HTTP köprüsü; bizde kapalı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

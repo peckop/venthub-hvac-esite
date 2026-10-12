@@ -23,6 +23,7 @@ metadata:
 | `security-ast-scan` aracı (satır ~74-79) | Yok. Sır için `scripts/security/secret-scan.py`; enjeksiyon/ReDoS/`eval` örüntüleri `Grep` ile, bulgu kanıt satırıyla |
 | `dead-code-scan` aracı | `pnpm knip` ya da `fallow` (yalnız ADAY; dinamik import ve config ile kayıt görünmez) |
 | "Cascade agent" modu (bölüm 3, satır ~261-286) | **Uygulanmaz:** chimera'nın `cascadeOn` çalışma zamanı bizde yok; düzeltme ayrı, onaylı iştir |
+| `output-standards` atfı | Bizde yok (1.1.0 paketinde var, alınmadı); atıf yok sayılır. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu ve Recep çıktı stili |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

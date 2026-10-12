@@ -24,6 +24,7 @@ metadata:
 | PR gövdesi (satır ~101-102) | Gövdede `Kanban: <ÖN EK>-<sayı>` (ör. `Kanban: YTN-4`; Linear'dan taşınan kayıt `Kanban: REC-nn`); yoksa kayıt kapısı kırmızı. Eski `Fixes REC-nn` / `Kayıtsız:` yolları 2026-10-08'e kadar (dahil) kabul edilir, ertesi gün kırmızı (`ESKI_YOL_SON_GUN`, karar 219/220) |
 | **Ana dala geçip `merge --ff-only` yapmak (satır ~104-105)** | **BİZDE YASAK YOL.** Yerine: `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` (kapı eylemi müdürün işi; migration'lı PR yalnız Recep onayıyla) |
 | `git stash push` (satır ~85) | **Kullanma.** Stash tüm worktree'ler arasında ORTAKTIR; çok pencereli filoda başka pencerenin stash'i görünür. Yerine **önce WIP commit** |
+| `output-standards` atfı | Bizde yok (1.1.0 paketinde var, alınmadı); atıf yok sayılır. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu ve Recep çıktı stili |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

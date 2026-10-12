@@ -18,6 +18,7 @@ metadata:
 | Managed board / lease-fenced dispatch | **YETENEK panosu 10-01 09:39'dan beri yönetilen** (YTN-6 pilotu: kapanış `mark_assignment` ile, kapı araçta; ölçüm `docs/audits/skill-kanban-tam-kapasite-2026-10-03.md`). Diğer panolar yönetilmeyen (unmanaged); aşağıdaki "yönetilmeyen" anlatımı onlar içindir: `start_task` cevabı "This board is not in managed lifecycle mode" der (10-01 ölçüldü). Kaynak gövdedeki "managed" zorunlulukları (tek aşama kuralı, lease koruması) burada bağlanmaz; ARAÇ'ın 09-28 ölçümü: `transition_task` reddedilir, `move_task` kullanılır |
 | Dönüş boyutu | Her yazma panonun tamamını döndürür; bu bir **pano boyutu** işidir (aşağıda "Maliyet kuralı"). Yama diskte uygulanmıştır ama etkisi 3 kartlık panoda görünmedi (10-01) |
 | Linear | **Donuk** (karar 219): yeni kayıt açılmaz, mevcut kayıt silinmez ya da arşivlenmez. Kaynak gövdede ve eski kurallarda "Linear" geçen yerler artık "Kanban" okunur |
+| `mailbox-bridge` atfı | Bizde yok ve **kullanılmaz** (HTTP köprüsü; bizde kapalı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

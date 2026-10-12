@@ -22,6 +22,7 @@ metadata:
 | `<nextsteps>` etiketi | **Hiç üretilmez.** Bizde ayrıştırıcı yok; Recep'e rapor akan cümledir |
 | `/sdd …` komutları (satır ~37-58) ve görev yaşam döngüsü komutları | WrongStack ana programının; Claude Code'da **yok**. Spec elle `docs/plans/<ad>-<tarih>.md` olarak yazılır; görev durumları (satır ~91-98) `/sdd` deposunda değil **Kanban alt kartında** tutulur |
 | **"Goal & Eternal Mode" bölümü (satır 108-123: `/goal`, `/autonomy eternal`)** | **UYGULANMAZ, çıkarılmış say.** Sebep: bu komutlar Claude Code'da yok (bölüm zaten çalışmaz) ve sonsuz `decide→execute→reflect→sleep` döngüsü karar 53 (zamanlayıcı/döngü önce Recep'le) ile "kuyruk bitince dur" sözüyle çelişir. Yalnız Recep AÇIKÇA isterse konuşulur |
+| `output-standards` atfı | Bizde yok (1.1.0 paketinde var, alınmadı); atıf yok sayılır. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu ve Recep çıktı stili |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 

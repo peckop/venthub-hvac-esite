@@ -23,6 +23,7 @@ metadata:
 | "Planı uygulayan ajana devret" (satır ~28-31, ~315-316) | Devirden önce **onay adımı** vardır: kural 1 (plan + onay + cetvel). Çıktı şablonuna şu satırlar eklenir: `Cetvel: <docs/standards/... dosyası ya da "cetvel yok">`, `YÖNTEM: <şerit/alt ajan/Workflow/elle>` ve **"onaysız uygulanmaz"** |
 | "Phase 3 — blue-green deployment" (satır ~222) | Bizde blue-green yok; Vercel'de **önceki dağıtıma dönüş** vardır |
 | "Phase 1 — görev başına bir commit" (satır ~218) | PR başına `ŞERİT (<numara>): ne oldu — niçin (#PR)` + gövdede `Kanban: <ÖN EK>-<sayı>`; faz → alt kart (karar 219/220) |
+| `code-quality` atfı | Bizde yok; atıf yok sayılır. Yerine `fallow` ve `pnpm knip` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
