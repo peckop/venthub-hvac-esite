@@ -19,6 +19,11 @@ import { aileKirintiAdimlari, type AileKirintisiGirdisi, kirintiHref } from '../
 
 const TABAN = 'https://venthub.test'
 
+/** Kaynaktan blok ve satır yorumlarını atar. Satır yorumu işaretinin önündeki `:` URL şemasıdır, yorum başı değildir. */
+function yorumsuz(kaynak: string): string {
+  return kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/.*$/gm, '')
+}
+
 function girdi(ek: Partial<AileKirintisiGirdisi> = {}): AileKirintisiGirdisi {
   return {
     dil: 'tr',
@@ -130,9 +135,19 @@ describe('aileKirintiAdimlari — marka basamağı yok (URN-126)', () => {
 
   it('kaynak: kırıntı modülü marka adı/slug\'ı almaz ve marka rotası kurmaz (yorum satırları hariç)', () => {
     const kaynak = readFileSync(join(process.cwd(), 'src/lib/seo/kirinti.ts'), 'utf8')
-    const kod = kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+    const kod = yorumsuz(kaynak)
     expect(kod).not.toMatch(/\bmarka\b/)
     expect(kod).not.toMatch(/\.brand\(/)
+  })
+
+  it('kaynak denetiminin yorum sıyırıcısı URL şemasını yemez (INV-SCRUB-1 alt sınırı)', () => {
+    // Şemayı yorum sanan sıyırıcı `https://...` satırının sonunu siler ve bekçiyi sessizce kör bırakır:
+    // burada hem sıyrılan yorumun gittiği hem satırdaki URL'in KALDIĞI ölçülür.
+    const ornek = ["const u = 'https://venthub.test/x' // marka açıklaması", '/* marka */ const v = 1'].join('\n')
+    const kod = yorumsuz(ornek)
+    expect(kod).toContain("'https://venthub.test/x'")
+    expect(kod).toContain('const v = 1')
+    expect(kod).not.toMatch(/marka/)
   })
 })
 
