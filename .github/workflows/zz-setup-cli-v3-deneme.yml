@@ -1,0 +1,34 @@
+name: zz setup-cli v3 deneme (ALT-77, GEÇİCİ, birleşmez)
+
+# ALT-77 / OPS-121: dependabot #1694 supabase/setup-cli 1.7.1 -> 3.0.1 (MAJOR). Dört iş akışı bunu kullanıyor ve
+# hiçbiri #1694'ün PR koşusunda çalışmıyor. Bu dosya YALNIZ o satırın gerçek koşucuda kurulabildiğini ölçer;
+# sır kullanmaz, prod'a bağlanmaz. Ölçüm bitince PR kapatılır, dal silinir, dosya master'a GİRMEZ.
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/zz-setup-cli-v3-deneme.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deneme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Supabase CLI (v3.0.1, sabit CLI sürümü; üretimdekiyle aynı girdi)
+        uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
+        with:
+          version: 2.101.0
+
+      - name: CLI surumu
+        run: |
+          set -euo pipefail
+          supabase --version
+          test "$(supabase --version)" = "2.101.0"
+
+      - name: Komut sozdizimi (yalniz yardim, ag/sir yok)
+        run: |
+          set -euo pipefail
+          supabase db dump --help | head -n 5
+          supabase functions deploy --help | head -n 5
