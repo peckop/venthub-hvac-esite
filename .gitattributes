@@ -58,6 +58,16 @@
 scripts/**/*.mjs text eol=lf
 scripts/**/*.cjs text eol=lf
 
+# Kabuk betikleri (.sh) — LF ZORUNLU (ARC-96, 2026-10-12, ölçüldü)
+#
+# ⛔NİÇİN: `* text=auto` + Windows `core.autocrlf`, .sh dosyalarını çalışma kopyasına CRLF yazıyordu
+# (`git ls-files --eol`: i/lf w/crlf; 7 dosya). Bash CRLF'li betikte her satırın sonundaki `\r`'yi komuta
+# katar ("command not found", "syntax error near unexpected token"); `scripts/ci/__tests__/arka-plan.test.ts`
+# Windows ağacında 4 test düşüyordu, CI Linux olduğu için master yeşildi. Kabuk betiği girdisi olan her dosya LF olmalı.
+# ⚠SINIRI: yeni checkout'larda etkilidir; mevcut ağaçlar için `git add --renormalize` + dosyayı yeniden checkout
+# (dosyayı silip `git checkout -- <yol>`) gerekir.
+*.sh text eol=lf
+
 # Lockfile (CI pnpm kullanıyor)
 pnpm-lock.yaml text
 
