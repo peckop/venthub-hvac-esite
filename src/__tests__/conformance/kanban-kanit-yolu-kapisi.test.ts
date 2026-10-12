@@ -26,7 +26,7 @@ const reddedilir = (girdi: Record<string, unknown>) => k.incele(cagri(girdi)) !=
 
 describe('INV-KANBAN-KANIT-YOLU-1', () => {
   it('file_exists: mutlak yollar reddedilir (Windows, POSIX, ters bölü, ev dizini, kök dışı)', () => {
-    for (const yol of ['C:/Users/alize/x.md', 'C:\\tmp\\x.md', 'c:/', '/etc/hosts', '\\\\sunucu\\paylasim', '~/.claude/x', '~', '../baska/x', 'a/../../x']) {
+    for (const yol of [['C:', 'Users', 'ornek', 'x.md'].join('/'), 'C:\\tmp\\x.md', 'c:/', '/etc/hosts', '\\\\sunucu\\paylasim', '~/.claude/x', '~', '../baska/x', 'a/../../x']) {
       expect(reddedilir({ action: 'add_check', checkType: 'file_exists', checkNotes: yol }), yol).toBe(true)
     }
   })
