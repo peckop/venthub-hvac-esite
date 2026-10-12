@@ -35,6 +35,29 @@ const SUNUCULAR = ['sage-mcp', 'kanban-mcp', 'mailbox-mcp', 'codebase-index-mcp'
  */
 const SUNUCU_EK = { 'mailbox-mcp': ['--actor', 'wrongstack-saglik'] }
 
+/**
+ * Sunucunun `.mcp.json` ortamı (ARC-109, 12 Ekim 15:30 ölçüldü): kanban doğrulayıcı komut izin listesi
+ * (`WRONGSTACK_KANBAN_VERIFIER_COMMANDS=+gh`) paylaşılan DAEMON doğarken `process.env`'den okunur
+ * (`kanban/dist/project-server.js:6955`); ortamsız açılan ilk istemci daemon'u `+gh`sız doğurur ve bütün pencerelerde
+ * `gh` kanıtları "not in the verifier allowlist" ile reddedilir (13:51-15:30 yaşandı). Ölçüm sunucuyu açıyorsa AYNI ortamı
+ * `.mcp.json`dan alır. Bulunamazsa boş: ölçüm yine koşar.
+ * @param {string} ad `sage-mcp`, `kanban-mcp`, ...
+ * @param {string} [kok]
+ * @returns {Record<string,string>}
+ */
+function mcpOrtami(ad, kok = KOK) {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(kok, '.mcp.json'), 'utf8'))
+    for (const s of Object.values(j.mcpServers || {})) {
+      const arg = Array.isArray(s.args) ? s.args.join(' ').replace(/\\/g, '/') : ''
+      if (arg.includes('@wrongstack/' + ad + '/dist/cli.js') && s.env && typeof s.env === 'object') return { ...s.env }
+    }
+  } catch {
+    /* .mcp.json yok/bozuk: ortam eklenmez */
+  }
+  return {}
+}
+
 function paketSurumu(klasor) {
   try {
     return JSON.parse(fs.readFileSync(path.join(klasor, 'package.json'), 'utf8')).version || null
@@ -79,9 +102,10 @@ function daemonSurumleri(surecler, beklenen, okuSurum = paketSurumu) {
 }
 
 /** Bir MCP sunucusunu salt-okuma açar; initialize.serverInfo.version ve araç sayısını döndürür. */
-function sunucuSurumu(cli, kok, zamanAsimi = 30000, ek = []) {
+function sunucuSurumu(cli, kok, zamanAsimi = 30000, ek = [], ortam = {}) {
   return new Promise((resolve) => {
     const p = spawn(process.execPath, [cli, '--project-root', kok, '--stdio', ...ek], {
+      env: { ...process.env, ...ortam },
       stdio: ['pipe', 'pipe', 'pipe'],
       windowsHide: true,
     })
@@ -156,7 +180,7 @@ function anaAgacMi(kok = KOK) {
   }
 }
 
-module.exports = { daemonPaketi, daemonSurumleri, paketSurumu, sunucuSurumu, kanonikKok, anaAgacMi, SUNUCULAR, SUNUCU_EK }
+module.exports = { daemonPaketi, daemonSurumleri, paketSurumu, sunucuSurumu, kanonikKok, anaAgacMi, SUNUCULAR, SUNUCU_EK, mcpOrtami }
 
 if (require.main === module) {
   ;(async () => {
@@ -174,7 +198,7 @@ if (require.main === module) {
       for (const ad of SUNUCULAR) {
         const klasor = path.join(ARAC, 'node_modules', '@wrongstack', ad)
         const kurulu = paketSurumu(klasor)
-        const r = await sunucuSurumu(path.join(klasor, 'dist', 'cli.js'), kanonikKok(KOK), 30000, SUNUCU_EK[ad] || [])
+        const r = await sunucuSurumu(path.join(klasor, 'dist', 'cli.js'), kanonikKok(KOK), 30000, SUNUCU_EK[ad] || [], mcpOrtami(ad))
         const ok = !r.hata && r.surum && r.surum === kurulu
         process.stdout.write(
           `${ok ? 'tamam ' : 'HATA  '} ${ad.padEnd(22)} paket ${kurulu || 'YOK'}  initialize ${r.surum || r.hata}  araç ${r.arac ?? '-'}\n`,
