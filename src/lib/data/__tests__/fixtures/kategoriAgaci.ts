@@ -19,6 +19,10 @@
 export interface FiksturKategori {
   id: string
   slug: string
+  /** URN-112: `KategoriUst` ad alanları. Ölçülmedi; fikstür adı kanonik slug'a eşitler (çözücü adı okumaz). */
+  name: string
+  menu_label: string | null
+  translation_key: string | null
   metadata: { slug: { tr: string; en: string } }
   is_active: boolean
   parent_id: string | null
@@ -27,6 +31,9 @@ export interface FiksturKategori {
 const k = (id: string, en: string, trSlug: string, is_active: boolean, parent_id: string | null): FiksturKategori => ({
   id,
   slug: en,
+  name: en,
+  menu_label: null,
+  translation_key: null,
   metadata: { slug: { tr: trSlug, en } },
   is_active,
   parent_id,

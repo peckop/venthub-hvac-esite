@@ -8,6 +8,7 @@ import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
+import { getCachedKategoriUstById, type KategoriUst } from '@/lib/data/preload'
 import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
@@ -259,6 +260,39 @@ export function kategoriSayfasiUstVerisiK3b(lang: string, category: DomainCatego
   }
 }
 
+/**
+ * URN-112 — alt kategori sayfasının kırıntısındaki ÜST halkası SUNUCU HTML'inde dolu gelsin diye üst kategori
+ * satırı sunucuda okunur ve görünümlere `initialParentCategory` olarak iner. Önceden üst yalnız istemci
+ * bağlamından (`useCategories()`) çözülüyordu: bağlam hidrasyondan sonra dolduğu için ham HTML'in
+ * BreadcrumbList'i [Ana Sayfa, <alt>] çıkıyordu.
+ *
+ * Görünüm yalnız üstün ADINI (`getCategoryDisplayName`: translation_key → menu_label → name) ve görünen
+ * slug'ını (`metadata.slug`) okur; bu yüzden istemciye uzun metin ya da başka alan taşınmaz. Pasif üst
+ * kırıntıya basılmaz (null): pasif kategori sayfası zaten aktif üste ya da tüm ürünlere yönlenir.
+ */
+export function ustKategoriSatiri(ust: KategoriUst | null): DomainCategory | null {
+  if (!ust || ust.is_active !== true) return null
+  const meta = ust.metadata
+  const slugAlani =
+    meta && typeof meta === 'object' && 'slug' in meta ? (meta as { slug?: unknown }).slug : undefined
+  const yerelSlug: { tr?: string; en?: string } = {}
+  if (slugAlani && typeof slugAlani === 'object') {
+    const { tr: trSlug, en: enSlug } = slugAlani as Record<string, unknown>
+    if (typeof trSlug === 'string' && trSlug.length > 0) yerelSlug.tr = trSlug
+    if (typeof enSlug === 'string' && enSlug.length > 0) yerelSlug.en = enSlug
+  }
+  return mapDatabaseCategoryToDomain({
+    id: ust.id,
+    slug: ust.slug,
+    name: ust.name || '',
+    menu_label: ust.menu_label,
+    translation_key: ust.translation_key,
+    is_active: ust.is_active,
+    parent_id: ust.parent_id,
+    metadata: Object.keys(yerelSlug).length > 0 ? { slug: yerelSlug } : null,
+  } as DbCategory)
+}
+
 export interface KategoriSayfasiProps {
   lang: string
   category: DomainCategory
@@ -279,6 +313,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
   let total = 0
   let subCategories: DomainCategory[] = []
   let vorticeSayilari: KatalogSayilari | null = null
+  let ustKategori: DomainCategory | null = null
 
   if (category) {
     // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59). Eskiden `(await getTenantConfig()).id`
@@ -302,7 +337,9 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
     const tenantId = DEFAULT_TENANT_ID
 
     // SSR: Alt kategorilerin tam verisini çek — client-side hydration race'ini ortadan kaldır
-    const [{ data: subsData }, countsData] = await Promise.all([
+    // URN-112: alt kategorinin ÜSTÜ de sunucuda okunur (kırıntı ham HTML'de dolu gelsin). `getCachedKategoriUstById`
+    // React.cache'li ve HATA FIRLATIR: üstsüz sayfa "üst yok" diye önbelleğe yazılmasın. Kök kategoride sorgu yok.
+    const [{ data: subsData }, countsData, ustSatiri] = await Promise.all([
       supabase
         .from('categories')
         // `marketing_title` KASITEN YOK — emekli alan (REC-297); gerekçe `preload.ts`
@@ -311,8 +348,10 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         .eq('parent_id', category.id)
         .eq('is_active', true)
         .order('sort_order', { ascending: true }),
-      getCachedKategoriSayimlari(lang, tenantId)
+      getCachedKategoriSayimlari(lang, tenantId),
+      category.parent_id ? getCachedKategoriUstById(category.parent_id) : Promise.resolve(null)
     ])
+    ustKategori = ustKategoriSatiri(ustSatiri)
 
     // Ürünü OLMAYAN alt kategoriler gizlenir — CategoryContext istemcide aynı count>0
     // süzgeçini uyguluyordu; SSR'da uygulanmayınca hydration'da kart zıplaması oluyordu.
@@ -389,6 +428,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         page={page}
         pageSize={PAGE_SIZE}
         initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
+        initialParentCategory={ustKategori}
         vorticeKatalogSayilari={vorticeSayilari}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
