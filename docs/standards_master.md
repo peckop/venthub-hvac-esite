@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-10-07T11:24:53.444337+00:00
-total_compiled_files: 102
-source_commit: 1718021a7
+compiled_at: 2026-10-12T13:25:29.637502+00:00
+total_compiled_files: 104
+source_commit: 3d704131a
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -2636,8 +2636,10 @@ uyarlandı. Strateji: memory `standard-first-strategy`, boru hattı `knowledge-i
 
 # Adres Şeması Standardı (K3-b)
 
-> **Durum:** v0.1 · 2026-09-23 · Şerit: URUN · **Uygulama öncesi cetvel** — şemanın kendisi REC-300 yayınıyla
+> **Durum:** v0.2 (B-1) · 2026-10-11 · Şerit: URUN · **Uygulama öncesi cetvel** — şemanın kendisi REC-300 yayınıyla
 > canlıya çıkar; bugün canlıda olan kısımlar "CANLI", yayını bekleyenler "HEDEF" diye işaretlidir.
+> **v0.2:** alt kategori (dal) adresi TEK seviyedir (SEO-35 B-1, karar belgesi sürüm 5, 2026-10-10); v0.1'deki iki
+> seviyeli dal adresi kalktı.
 > **Plan:** `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` (v5) · **Kararlar:** SEO ve Yayın K3-b, Katalog
 > K17, 59, 68, 78b, 84, 86.
 > **İlgili cetveller:** `canonical-url-standard.md` (kanonik = yönlendirmesiz tek adres) · `category-taxonomy-standard.md`
@@ -2656,10 +2658,16 @@ tarayıcının İngilizce sayfaya gönderilmesi. CLAUDE.md 1. kural: cetvel yoks
 |---|---|---|
 | Tüm ürünler | `/tr/urunler` | `/en/products` |
 | Kök kategori | `/tr/kategori/<kök>` | `/en/category/<kök>` |
-| Dal | `/tr/kategori/<kök>/<dal>` | `/en/category/<kök>/<dal>` |
+| Dal (alt kategori) | `/tr/kategori/<alt-slug>` | `/en/category/<alt-slug>` |
 | Aile (seri) | `/tr/urun/<aile>` | `/en/products/<aile>` |
 | Model | `/tr/urun/<slug_tr>-p-<sku>` | `/en/products/<slug_en>-p-<sku>` |
 | Marka | `/tr/markalar/<marka>` | `/en/brands/<marka>` |
+
+**Dal adresi (B-1):** kök de dal da TEK segmenttir; adreste üst kategori YOKTUR. Üst-alt ilişkisi adresten
+çıkarılmaz, `parent_id`'den okunur (örn. site haritası `kategoriArgumanlari` ile üst slug'ı veriden alır). İç içe
+`/tr/kategori/<kök>/<dal>`, `/en/category/<kök>/<dal>` ve bugünkü `/tr/category/<kök>/<dal>` adresleri içerik çizmez:
+yalnız TEK 308 ile dalın tek segmentli adresine gider. EN yayını kapalıyken (`EN_YAYIN`) bütün `/en/` sayfaları
+noindex'tir ve site haritasında yoktur; alt kategori bunun dışında noindex DEĞİLDİR (`robots` yalnız pasif kategoride yazılır).
 
 **A1 — Model çözümü:** yol son `-p-`'den bölünür; sağ taraf SKU'dur (harf duyarsız), sol taraf serbest metindir ve
 çözümde **okunmaz**. Bu yüzden: SKU `-p-` içeremez ve `p-` ile başlayamaz; aile ve kategori slug'ı `-p-` içeremez
@@ -2683,9 +2691,10 @@ bunlarla kesişmez (HEDEF kapı INV-ADRES-CAKISMA-1).
 ## 2. Tek kanonik (CANLI ilke, REC-205)
 
 **A5 — Bir sayfa hiçbir an iki adresten 200 dönmez.** 2026-09-07'de Google iki seviyeli dal adresimizi "kopya"
-sayıp eledi; sebep iki adresin aynı anda 200 dönmesiydi. İki seviyeli dal adresi kanonik olduğunda tek seviyeli
-adres **yalnız 308** verir — **TR'de de EN'de de**. Eski önek (`/tr/products/*`, `/tr/category/*`) yeni önek
-açıldıktan sonra hiçbir girdide 200 dönmez.
+sayıp eledi; sebep iki adresin aynı anda 200 dönmesiydi. B-1 kararıyla dalın kanonik adresi TEK seviyelidir
+(`/tr/kategori/<alt-slug>`, `/en/category/<alt-slug>`); iç içe `<kök>/<dal>` adresi **yalnız 308** verir —
+**TR'de de EN'de de**, tek sıçramayla. Eski önek (`/tr/products/*`, `/tr/category/*`) yeni önek açıldıktan sonra
+hiçbir girdide 200 dönmez.
 
 ## 3. Eski adresler — üç katman (HEDEF)
 
@@ -2744,6 +2753,267 @@ yeni** slug'ın yolu ile eski ve yeni dal tazelenir. IndexNow'a iç yol değil `
 REC-212 katalog paketi bitti · 7 ailenin EN adı dolu · GSC taban ölçümü alındı (karar 86) · linkinator + unlighthouse
 yayın öncesi taraması · Recep ön izleme onayı (karar 68) · §7'deki HEDEF kapıların hepsi yeşil · eski adres
 envanteri (eski → yeni, her satır) commit'li.
+
+
+---
+# FILE: docs\standards\agir-komut-kilidi-standard.md
+
+# Ağır Komut Kilidi Standardı (ARC-81)
+
+> **Kapsam:** aynı anda birden çok pencerenin ağır komut (type-check, build, tam test, install)
+> koşmasını sınırlayan kanca ve istem satırı. Tek pencerenin kendi bellek kuralı
+> (`.claude/rules/filo-ortak.md` "Test ve bellek") bu cetvelin DIŞINDA; bu cetvel o kuralı
+> **makine düzeyinde** zorlar. §6, aynı bellek ailesinden konuşma dosyası boyutu satırını (KAYIT,
+> ARC-82) tanımlar.
+> **Sürüm:** v1.2 · 2026-10-11 (v1.1 · 2026-10-11, v1.0 · 2026-10-10)
+> **Sahibi:** ARAÇ
+> **Son doğrulama:** 2026-10-11 (kanca, test ve bozma ölçüldü; canlı kabul ölçüldü, §5; arka plan
+> sarmalayıcı testi ve bozması ölçüldü, canlı kabulü bekliyor, §7)
+> **Niçin bu cetvel doğdu:** kart ARC-81 "ağır komut kilidi için cetvel yok: yazımı bu işin
+> kapsamında" dedi (kural 1). Kanca: `.claude/hooks/agir-komut-kilidi.cjs`; test:
+> `src/__tests__/conformance/kanca-agir-komut-kilidi.test.ts`.
+
+---
+
+## §1 Niçin var — ölçülmüş kayıp
+
+2026-10-09 19:57'de uygulama bellek bittiği için kapandı: 32,6 GB'ın 123 MB'ı boştu, dokuz pencere
+14,9 GB tutuyordu, 399 süreç vardı, 19:58-20:02 arasında beş yeniden başlama oldu. Her pencere
+kendi kuralına uyuyordu; makineyi bağlayan bir şey yoktu. Pencereler birbirinin ne koştuğunu bilmiyordu.
+
+## §2 Kurallar
+
+1. **Ağır sayılan komutlar:** type-check / `tsc`, `build` / `next build`, tam test (dosya argümansız
+   `vitest` ya da `pnpm test`), tam `pnpm lint`, `knip`, `install` / `add` / `ci`, `docker`.
+   `pnpm test:ilgili` ve dosya argümanlı `vitest` / `eslint` HAFİFTİR, kilitlenmez.
+2. **Yuva:** ağır komut için `<pano>/agir-kilit/yuva-<i>` dizini atomik `mkdir` ile alınır.
+   Varsayılan yuva sayısı **1**. Yuva doluysa komut REDDEDİLİR; cevap sahibi (pencere, komut, kaç dk
+   önce) söyler ve "döngü kurma, bir kez daha dene" der.
+3. **Bırakma:** PostToolUse(Bash) ve **PostToolUseFailure(Bash)** `--birak` yuvayı verir; başarısız
+   komut (tsc çıkış 2, kırmızı test) PostToolUse üretmez, olay PostToolUseFailure'dır. Yalnız
+   **AĞIR komutun** olayı bırakır: aynı pencerenin sonraki hafif Bash çağrısı (`git status`) yuvayı
+   düşürmez. Arka plan komutu (`run_in_background`) yuvayı BIRAKMAZ (komut hâlâ koşuyordur) ve
+   yuvaya `arkaPlan` işareti konur; o yuvaya girilen ön plan ağır komutun olayı da onu düşürmez.
+   Arka plan yuvasını komutun kendi **sarmalayıcısı** komut gerçekten bitince bırakır (§7, ARC-87);
+   TTL güvenlik ağıdır.
+4. **Bayat yuva:** 20 dakikadan eski yuva ölü sayılır ve bir sonraki deneyen onu siler (pencere
+   kapanır, iptal edilir, PostToolUse gelmez).
+5. **Açık kalır:** kilit dizini yazılamıyor, girdi bozuk ya da beklenmeyen hata varsa komut GEÇER.
+   Kilit emniyet kemeridir; bozulunca işi durdurmamalı.
+6. **İstem satırı:** yuva doluyken `⚠KILIT: agir komut 1/1 dolu (<pencere> <komut> <dk> dk)`;
+   kendi pencerende tutan sensin ise "sende". Boşken susar (eşikli satır, `bellek-yoklama` gibi).
+7. **Pencere başına süreç sayımı** `bellek-yoklama.cjs` önbelleğindedir (`pencereler`,
+   `pencereToplam`); `⚠BELLEK` satırı pencere başına 80 ya da pencereler toplamı 400 süreci
+   aşınca "KALABALIK" der.
+
+## §3 Eşikler ve nasıl ölçüldü
+
+| Eşik | Değer | Dayanak | Ayar |
+|---|---|---|---|
+| Yuva sayısı (N) | 1 | boş bellek 2 GB civarı; tek type-check ~730 MB, tam test ve build bunun katı | `VENTHUB_AGIR_KILIT_N` |
+| Bayat yuva (TTL) | 20 dk | tam test 10+ dk sürebilir; PostToolUse gelmezse en çok 20 dk bekletir | `VENTHUB_AGIR_KILIT_TTL_DK` |
+| Pencere başı süreç | 80 | 2026-10-10 ölçümü: 7 pencere, 32-56 alt süreç (en çok 56); eşik gözlenen dağılımın üstünde | `VENTHUB_BELLEK_PENCERE_SUREC` |
+| Pencereler toplamı | 400 | aynı ölçüm: toplam ~260-310; 10-09 olayında toplam süreç 399 idi | `VENTHUB_BELLEK_PENCERE_TOPLAM` |
+
+**Sınır:** süreç eşikleri tek günün ölçümüdür; kullanımla yeniden ayarlanır (karne tarihi 2026-10-10).
+Aynı ölçümde 124 `conhost.exe` ve 46 `python.exe` görüldü; hangi kancanın/sunucunun bıraktığı bu
+cetvelin kapsamı dışında, ayrı ölçüm işidir.
+
+## §4 Ayar kaydı (OPS kapısı)
+
+`.claude/settings.json` değişikliği OPS'tadır; metin ARAÇ'tan gelir, OPS uygular.
+
+PreToolUse → `matcher: "Bash"` grubuna eklenecek kanca:
+
+```json
+{
+  "type": "command",
+  "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\"",
+  "statusMessage": "agir-komut-kilidi"
+}
+```
+
+PostToolUse → yeni grup:
+
+```json
+{
+  "matcher": "Bash",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\" --birak"
+    }
+  ]
+}
+```
+
+PostToolUseFailure → yeni grup (başarısız komut PostToolUse üretmez; bu kayıt olmazsa yuva 20 dk dolu kalır
+ve bütün filo bekler). Aynı komut, aynı `--birak`:
+
+```json
+{
+  "matcher": "Bash",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\" --birak"
+    }
+  ]
+}
+```
+
+**Geri alma:** üç kaydı (PreToolUse, PostToolUse, PostToolUseFailure) sil. Yuva dizinini silmek
+gerekmez (20 dk içinde bayatlar). Kancayı geçici kapatmak için `VENTHUB_AGIR_KILIT_N=99` yeter.
+
+**Onay:** filoda komutu REDDEDEN yeni bir davranıştır; ayar kaydı Recep'in sözüyle OPS tarafından
+uygulanır (karar 224: onay pencereler arası taşınmaz).
+
+## §5 Kabul
+
+- Test: `INV-AGIR-KILIT-1..3` (sınıflama tablosu, yuva dışlama/bırakma/bayat, kanca protokolü,
+  istem satırı, pencere sayımı, hafif komutun ve başarısız komutun bırakma davranışı). Bozma:
+  2026-10-10'da 22 mutasyonun 22'si yakalandı (OPS düzeltmeleri: hafif komut bırakmaz,
+  PostToolUseFailure, arkaPlan işareti dahil).
+- Canlı kabul (ayar kaydından sonra): iki pencerede aynı anda `pnpm type-check` denenince ikincisi
+  `AGIR KOMUT KILIDI` ile reddedilir ve istem satırında `⚠KILIT` görünür. Bu ölçüm kayıttan sonra
+  karta yazılır; ölçülmeden "çalışıyor" denmez.
+- **Canlı kabul ölçüldü (2026-10-11, #1842'den sonra).** Komut `tsc --version`
+  (sınıflayıcıda "type-check" sayılır, proje derlemesi koşturmaz: tam type-check bellek kuralı gereği
+  koşturulmadı):
+  1. **İkinci pencere reddi:** URUN penceresi (`4a8eaf9c`) yuvayı arka plandaki `pnpm install --offline`
+     ile tutarken ARAÇ penceresindeki `tsc --version`, `AGIR KOMUT KILIDI (ARC-81)` mesajıyla
+     reddedildi; mesaj sahibi ve süreyi söyledi ("4a8eaf9c install 2 dk önce başladı").
+  2. **İstem satırı:** istem satırı kancası UserPromptSubmit girdisiyle koşturulunca
+     `⚠KILIT: agir komut 1/1 dolu (4a8eaf9c install 2 dk) — ikinci agir komut reddedilir` verdi.
+  3. **Bırakma:** ön plan `tsc --version` bitince yuva boşaldı (bir sonraki pencere hemen aldı).
+  4. **Başarısız komut:** `tsc --nonexistent-flag-xyz` (çıkış 1) sonrası yuva BOŞ; PostToolUseFailure
+     kaydı çalışıyor.
+- **Gözlem (kancanın çözüldüğü yer):** kanca, çalışma ağacının `settings.json`'unda kayıt olmasa ve
+  betik dosyası ağaçta bulunmasa bile koştu (ARAÇ penceresinin ağacı #1842'den 234 commit gerideydi;
+  `agir-komut-kilidi.cjs` o ağaçta yok, yuva yine de pencerenin kimliğiyle alındı). Çıkarım (ölçülmedi):
+  worktree pencerelerinde kanca kaydı ve betiği ana ağaçtan (proje kökü) çözülüyor; "ağaç geride
+  olduğu için kanca kayıtlı değildir" varsayımı bu pencerede doğrulanmadı.
+- **Gözlem (tasarımın bedeli, §2 madde 3):** arka plan komutunun yuvası TTL'e kalır. URUN'un birkaç
+  dakikalık `install`'ı ve ardından aynı pencerenin `docker` komutu (yeniden giriş yuvayı yeniler)
+  yuvayı 11:21-11:53 arası, yaklaşık 32 dk dolu tuttu. Bir arka plan ağır komut, filonun geri kalanını
+  en çok TTL kadar bekletir. OPS kararı (2026-10-11): komut sonuna bırakma eki; §7'de uygulandı
+  (ARC-87).
+
+## §6 KAYIT satırı: konuşma dosyasının boyutu (ARC-82)
+
+**Niçin:** konuşma dosyası (`<sid>.jsonl`) compact'a rağmen küçülmez, yalnız büyür. 2026-10-10
+ölçümü: en büyük kayıtlar 2129 MB (OPS), 2043 MB, 773 MB, 760 MB, 453 MB. Dosyayı okuyan kancalar ve
+pencere büyüdükçe yavaşlıyor. 10-09 20:00 kapanması bellekten (OPS, main.log); dosya boyutu İKİNCİL
+etken sayılır, kanıtlanmış sebep değildir.
+
+**Kural:** pencerenin kendi konuşma dosyasının boyutu her istemde görünür. Boyut yalnız `statSync` ile
+okunur (dosya AÇILMAZ, içerik okunmaz); yol yoksa ya da dosya değilse satır SUSAR.
+
+| Boyut | Satır | Dayanak | Ayar |
+|---|---|---|---|
+| 1 GB altı | `KAYIT: 612 MB` (eşiksiz, BAGLAM gibi) | Recep bağlamın yanında kayıt boyutunu da görür | yok |
+| 1 GB ve üstü | `⚠KAYIT: 1,0 GB — … 1,5 GB'ta yeni oturuma devret` | 10-10: 2 dosya 2 GB üstünde, 3 dosya 750 MB üstünde | `VENTHUB_KAYIT_UYARI_MB` (1024) |
+| 1,5 GB ve üstü | `⛔KAYIT: 1,5 GB — yeni oturuma DEVRET` | OPS emri 10-09 madde 3: "1,5 GB yeni oturuma devret" | `VENTHUB_KAYIT_DEVRET_MB` (1536) |
+
+**Biçim kuralları:** GB değeri AŞAĞI yuvarlanır (1535 MB "1,5 GB" görünmez; aksi halde satır "1,5 GB'ta
+devret" diyen metinle çelişir). Bozuk (sayı değil, ≤0, boş dize) ya da sırası ters (devret ≤ uyarı)
+ortam değeri İKİ eşiği de varsayılana döndürür.
+
+**Kod ve test:** `.claude/hooks/baglam-doluluk.cjs` (`kayitBoyutuMb`, `kayitSatiri`),
+`.claude/hooks/defter-tazelik-satiri.cjs` (çağrı); test `INV-KAYIT-BOYUTU-1..3`
+(`src/__tests__/conformance/kanca-kayit-boyutu.test.ts`). Bozma: 2026-10-11'de 17 mutasyonun 17'si
+yakalandı (ilk koşuda 16; kaçan "≤0 eşik kabul" için tek başına sıfır eşik ve tanımsız-değişken kolu
+eklendi).
+
+**Sınır:** her istemde boyutu gösterir ama kilit gibi komut REDDETMEZ; devret kararı insandadır.
+Kancaların dosyayı bütün okuması ayrı iştir (ARC-83, #1838: tur sonu kapıları kuyruk okur).
+
+## §7 Arka plan sarmalayıcı: yuva komut bitince bırakılır (ARC-87)
+
+**Niçin:** §5 gözlemi: arka plan ağır komutun yuvası yalnız TTL ile (20 dk) düşüyordu; URUN'un kısa
+`install`'ı ve ardından `docker` komutu yuvayı 11:21-11:53 arası, yaklaşık 32 dk dolu tuttu ve filo
+bekledi. OPS kararı (2026-10-11): PreToolUse arka plan ağır komutu sarar, komut gerçekten bitince
+yuva bırakılır.
+
+**Mekanizma:** arka plan ağır komut yuvayı alınca kanca komutu `updatedInput` ile şu biçimde döndürür
+(girdi nesnesinin diğer alanları korunur; `permissionDecision` DÖNMEZ, izin akışı değişmez):
+
+```bash
+(
+<özgün komut>
+)
+__agir_rc=$?
+node "<kanca betiği>" --birak --yuva <i> --belirtec <t> --dizin "<kilit dizini>" >/dev/null 2>&1
+exit $__agir_rc
+```
+
+**Kurallar:**
+
+1. **Çıkış kodu aynen korunur** (komut 0, 1 ya da başka kodla bitse de yuva bırakılır ve kod döner).
+2. **Yalnız arka planda koşan ağır komut sarılır.** Ön plan akışı, hafif komut ve Bash dışı araç değişmez.
+3. **Belirteç şart:** `--belirtec` yuvadaki sahip kaydında yoksa bırakma HİÇBİR ŞEY düşürmez. TTL ile
+   yuvayı başka pencere aldıysa geç gelen bırakma onu silmemelidir.
+4. **Aynı pencerenin birden çok arka plan komutu:** her komutun kendi belirteci vardır; yuva son
+   belirteç düşünce verilir. Ön plan ağır komutun PostToolUse'u arka plan yuvasını yine düşürmez.
+5. **Bırakma kolu stdin OKUMAZ:** arka plan kabuğunda stdin açık kalabilir; okuma takılırdı.
+6. **TTL (20 dk) güvenlik ağı olarak kalır:** pencere kapanır, süreç öldürülür ya da sarmalayıcı hiç
+   çalışmazsa yuva yine bayatlar.
+7. **Kapatma:** `VENTHUB_AGIR_KILIT_SARMA=0` sarmayı kapatır (davranış v1.1'e döner, kayıt değişmez).
+
+**Ayar kaydı değişmez:** §4'teki üç kayıt aynıdır; sarmalayıcı kancanın ÇIKTISIDIR, yeni kayıt gerekmez.
+
+**Kod ve test:** `.claude/hooks/agir-komut-kilidi.cjs` (`kilitAl` belirteç üretir, `belirtecBirak`,
+`sarmala`); test `INV-AGIR-KILIT-4` (`src/__tests__/conformance/kanca-agir-komut-kilidi.test.ts`):
+sarma biçimi ve alanların korunması, çıkış 0 ve çıkış 1 ile biten komut, yorum satırıyla biten komut,
+belirteç uyuşmazlığı, iki arka plan komutu, N=2, kancanın ürettiği komutun uçtan uca koşması, bırakma
+kolunun stdin okumaması. **Bozma:** bırakma eki kaldırılınca yuva dolu kalır (testte) ve 13 mutasyon
+(çıkış kodunu bozma, belirteç denetimini kaldırma, ön planı da sarma, karar ekleme, kapanış parantezi,
+belirteç listesini kaybetme, son belirteçten önce silme, stdin okuma, kapatma anahtarını yok sayma,
+yanlış yuva/dizin, alanları düşürme) test dosyasınca yakalanır (sonuç kart notunda).
+
+**Bilinen sınırlar (ölçülmedi ya da kapsam dışı):**
+
+- **`updatedInput`'un `permissionDecision` olmadan uygulanıp uygulanmadığı resmî belgede yazmıyor**
+  (belge yalnız `allow` ve `ask` ile birlikte örnekliyor) ve bu pencerede ölçülemedi (yalıtılmış deneme
+  için gereken ikinci `claude` oturumu oturum açmıyor). Uygulanmıyorsa sarmalayıcı etkisiz kalır ve
+  TTL işler (çökme yok). `allow` döndürmek istemin atlanması demektir; bu karar OPS'tadır ve canlı
+  kabul ölçümüne bağlıdır (aşağıda).
+- Komutun kendisi `&` ile iç arka plan işi başlatırsa sarmalayıcı hemen biter ve yuva erken bırakılır.
+- Aynı pencerenin ön plan ağır komutu koşarken arka plan komutu biterse yuva ön plan komutuna rağmen
+  düşer (belirteç listesi boşalınca yuva silinir); kısa süreli çift yük riski, kabul edildi.
+- Uygulamanın uzun ön plan komutu kendiliğinden arka plana atması "ön plan" sayılır (PreToolUse'ta
+  `run_in_background` yok); sarılmaz ve PostToolUse'ta bırakılır (v1.1 davranışı).
+
+**Canlı kabul (ayar kaydı gerekmez, yeni pencerede):** (1) pencerede arka planda hafif bir ağır komut
+başlat (örn. `run_in_background` ile `tsc --version`); (2) komut bitince `<pano>/agir-kilit/yuva-0`
+dizininin yok olduğunu oku (TTL beklenmeden); (3) o sırada ikinci pencerenin ağır komutunun
+reddedilmediğini ölç; (4) hata veren arka plan komutunda da (`tsc --nonexistent-flag-xyz`) yuvanın
+bırakıldığını ölç. Yuva komut bitince boşalmıyorsa `updatedInput` kararsız uygulanmıyor demektir:
+OPS'a yaz, §7 sınırı. Ölçülmeden "çalışıyor" denmez.
+
+## §8 Sınıflama tırnak ve heredoc farkındadır; reddedilen komutun yuvası kendini bırakır (ARC-87b)
+
+**Ölçülen vaka (OPS 2026-10-11 17:41):** `python -I - "$F" <<'PY'` komutunun heredoc gövdesinde satır başı
+"pnpm install" vardı; bölücü gövdeyi komut saydı ve yuva alındı. Aynı komutu `bash-write-guard` reddetti
+(çıkış 2: heredoc gövdesinde yazma, hedef çıkarılamadı). PreToolUse kancaları PARALEL koşar, birbirinin
+kararını görmez; reddedilen çağrı için ne PostToolUse ne PostToolUseFailure gelir. Yuva 20 dakika TTL'e
+kaldı ve filo bekledi ("sende install 9 dk").
+
+**Kurallar:**
+- Bölücü tırnak ve heredoc'u tanır: tek tırnak içi hiç, çift tırnak içi yalnız `$( )` ve ters tırnak
+  komuttur; heredoc gövdesi (`<<EOF`, `<<'EOF'`, `<<-EOF`) sınırlayıcı satıra kadar metindir. `$( )` ve
+  ters tırnak içi AYRI komut olarak sınıflanır. Tek `&` de ayırıcıdır. Bölücü bozulursa eski düz bölme
+  kullanılır (temkinli: fazla parça, eksik değil).
+- Kendini onarma: aynı pencerenin (ve aynı ajanın, `agent_id`) yeni her PreToolUse(Bash) çağrısı o
+  ajanın ÖN PLAN yuvalarını bırakır; ön plan komutları ardışık koşar, yeni çağrı geldiyse öncekinin
+  bittiği ya da hiç koşmadığı kesindir. ARKA PLAN yuvası (belirteç), başka pencerenin ve başka ajanın
+  yuvası düşmez. `settings.json` değişmez.
+- Sınır: bir alt ajanın yuvasını ana pencere düşürmez, ama kancaya `agent_id` gelmiyorsa (eski sürüm) ayrım
+  yapılamaz ve pencerenin ön plan yuvası düşer; kabul edildi (kilit emniyet kemeridir, TTL arkada).
+
+**Test:** `kanca-agir-komut-kilidi.test.ts` INV-AGIR-KILIT-1 (heredoc/tırnak/`$( )` vakaları) ve
+INV-AGIR-KILIT-5 (heredoc gövdesi yuva almaz, reddedilen komutun yuvası sonraki Bash çağrısında düşer,
+arka plan yuvası kalır, ajan ve pencere ayrımı); bozma 9/9.
 
 
 ---
@@ -4336,13 +4606,13 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 
 | paket | aralık | tarih | durum | gerekçe |
 |---|---|---|---|---|
-| next | 15.5.26 | 2026-09-29 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. 15.5.26 = aynı ara sürümde yama (bot #1464; `next/og` SVG serileştirme sertleştirmesi, Next güvenlik duyurusu 2026-09-22; dependabot ana sürüm ignore'u Next 16'yı doğru tuttu), CI teyidiyle alındı. |
+| next | 15.5.27 | 2026-10-08 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. 15.5.26 = aynı ara sürümde yama (bot #1464; `next/og` SVG serileştirme sertleştirmesi, Next güvenlik duyurusu 2026-09-22; dependabot ana sürüm ignore'u Next 16'yı doğru tuttu). 15.5.27 = aynı ara sürümde yama (bot #1749; Next'in üç orta düzey güvenlik bildirimini kapatır: `GHSA-f87g-xv8r-7p7x` metadata görsel rotalarında `dynamicParams` atlatmasıyla bilgi sızıntısı, `GHSA-4jqv-mc3x-m676` ve `GHSA-mcj8-r9mp-w47p` SSG/ISR önbellek zehirlenmesi; sürüm 2026-09-30'da yayımlandı). Alınma şartı: PR'ın CI kontrolleri yeşil. |
 | react | ~19.2.8 | 2026-09-21 | KARAR | Tam pin 19.0.0 gevşetildi ama ÜST SINIRLI: `@react-three/fiber` 9.5.0 (son kararlı) peer `react: '>=19 <19.3'` ilan ediyor (reconciler iç API'sine bağlı) → 19.3 3D'yi kırabilir. ~19.2.8 = 19.2 yamaları akar. Kaldırma şartı: fiber peer'i 19.3'ü kapsayınca `^19`. |
 | react-dom | ~19.2.8 | 2026-09-21 | KARAR | `react` ile aynı sınır: fiber 9.5.0 peer `react-dom: '>=19 <19.3'`. ~19.2.8, react ile aynı yama çizgisi. |
 | react-day-picker | 9.14.0 | 2026-08-19 | KARAR | PR #698: v9 geçişi iki peer bağımlılık ihlalini kapattı ve o sırada tarih filtresinin **hiç çalışmadığı** ölçüldü. 9.14.0 sabit, çünkü v9 API'si tarih seçici bileşenini doğrudan besliyor. |
 | @types/react | ~19.2.18 | 2026-09-21 | KARAR | Tipler çalışma zamanıyla aynı ara sürümde tutulur: react ~19.2 (fiber sınırı) iken 19.3 tipleri var olmayan API'yi derletir. ~19.2.18. |
 | @types/react-dom | ~19.2.7 | 2026-09-21 | KARAR | `@types/react` ile aynı gerekçe; react-dom ~19.2 çizgisi. ~19.2.7. |
-| eslint-config-next | 15.5.26 | 2026-09-29 | KARAR | `next` ile AYNI sürümde tutulur: lint kuralları çalışan Next'in uyarılarını görsün. 15.1.0'da geride kalmıştı (gerekçesiz, §5 "kopukluk"); bot #1464 ikisini birlikte 15.5.26'ya taşıdı. Sabit pin, çünkü `next` sabit; ikisi aynı satırda yükselir. |
+| eslint-config-next | 15.5.27 | 2026-10-08 | KARAR | `next` ile AYNI sürümde tutulur: lint kuralları çalışan Next'in uyarılarını görsün. 15.1.0'da geride kalmıştı (gerekçesiz, §5 "kopukluk"); bot #1464 ikisini birlikte 15.5.26'ya taşıdı. Bot #1749 yalnız `next`i 15.5.27'ye taşıdı; kayma kalmasın diye `eslint-config-next` aynı PR'da 15.5.27'ye getirildi (ikisi de 2026-09-30'da yayımlandı). Sabit pin, çünkü `next` sabit; ikisi aynı satırda yükselir. |
 | eslint-plugin-react-compiler | 19.1.0-rc.2 | 2026-08-19 | KARAR | RC sürümü (19.1.0-rc.2) semver garantisi taşımaz — iki RC arası kırıcı değişiklik olağandır. Sabit pin zorunludur, aralık yazılamaz. |
 | minimatch | 9.0.7 | — | BORÇ | — |
 | minimatch@3 | >=3.1.4 | — | BORÇ | — |
@@ -4401,7 +4671,7 @@ kuralı: `0.x` ana sürüm garantisi vermez). `three` 0.183.2 → 0.186.0 bu yü
 | paket | kurulu | son | not |
 |---|---|---|---|
 | `@sentry/nextjs` | 8.55.2 | 10.75.0 | 11 yüksek güvenlik kaydının tamamı bunun altından geliyor (`bagimlilik-2026-09-19.md`); karar 17'ye bağlı, Recep sıralamada sona bıraktı |
-| `next` | 15.5.26 | 16.3.5 | tek başına bir iş; App Router davranışı değişir |
+| `next` | 15.5.27 | 16.3.5 | tek başına bir iş; App Router davranışı değişir |
 | `tailwindcss` | 3.4.19 | 4.3.3 | v4 yapılandırma biçimini tamamen değiştirdi (tasarım token'ları etkilenir) |
 | `zod` | 3.25.76 | 4.6.5 | doğrulama şemaları uçtan uca yeniden sınanmalı |
 | `framer-motion` | 11.18.2 | 13.4.0 | iki ana sürüm |
@@ -5760,6 +6030,69 @@ Kanıt tablosu `tenant_id` alanını **taşır** — 2026-09-06'da ölçüldü: 
 bugün tek kiracı (`d3b07384-d113-495f-a558-8c38634e0000`). Kiracı ayrımı
 sonradan eklenirse veri geriye dönük yeniden üretilmek zorunda kalmasın diye alan baştan var.
 
+### Eğri çizimi — grafikten nokta okuma (KTL-7, kararlar 318 · 319 · 320, 2026-10-08)
+
+**Niçin var.** Hiçbir kitapçık fan eğrisini sayı tablosu olarak vermiyor; eğri her yerde yalnız GRAFİK
+(tabloda yalnız model başına azami debi ve azami basınç var). Veritabanındaki 145 eğrinin 141'i üç noktalı
+ve ortadaki nokta okunmamış, **hesaplanmış** (kök ve rakamlar: `docs/audits/ktl7-pq-egri-olcumu-2026-10-08.md`).
+Üretici eğrileri 8–15 noktalı ve içbükeydir; seçici çalışma noktasını bu eğriden hesapladığı için az nokta
+yanlış "yeter/yetmez" demektir. Yukarıdaki "KANITSIZ 208'in 166'sı eğri" satırının cevabı budur.
+
+**Bu, §6.3 kuralının istisnası değil GENİŞLEMESİDİR.** Kuralın amacı "bir kez çıkar, kalıcı tut"tür. Eğri
+çizimini okumak PDF'in çizim katmanını açar (metin taraması değil); bunu her ajan kendi başına yapsaydı aynı
+sayfa yeniden okunurdu. Bu yüzden okuma dizinin **yeni bir çıktı türü** olarak girer: hash'li, deterministik,
+tek betik. Ajan eğri okumaz; `egriler.jsonl`'dan okur.
+
+**Kural 1 — nokta uydurulmaz.** Her nokta kitapçıktaki bir çizgi üzerinde ölçülmüş bir konumdur. Eksik
+yeri formülle, komşu modelden ya da "makul değerle" doldurmak yok. Okunamayan sayfa `kapi` alanında
+adıyla belirtilir, gizlenmez.
+
+**Kural 2 — türetilen eğri etiketsiz taşınmaz.** `pq_curve` yanında `pq_curve_kaynak` gider
+(`spec-axis-standard.md §2.3`: `kitapcik_tablo` · `kitapcik_grafik` · `turetilmis`). Kapı:
+`scripts/kademe2-load/planla.mjs` `pqKapisi` — etiketsiz eğri ya da hesapla kurulmuş-ama-ölçüm-diye-etiketli
+üçgen plan KIRMIZI (`scripts/kademe2-load/__tests__/planla.test.ts`, kapıyı kaldırınca test kırmızı).
+
+**Çıktı türü.** `kaynak-dizini/egriler.jsonl` (ingestor), eğri başına bir satır. `cikar.py`'nin determinizm
+kuralları AYNEN geçerlidir: zaman damgası yok, anahtarlar sıralı, LF, araç ve sürümü satırda.
+
+| Alan | Anlamı |
+|---|---|
+| `pdf_hash` · `dosya` · `sayfa` | kaynak (`sayfalar.jsonl` ile aynı anahtar) |
+| `profil_id` · `egri` | hangi okuma tarifi, hangi eğri (örn. `min_hiz`, `maks_hiz`) |
+| `yontem` | `vektor` (A) ya da `raster` (B) |
+| `noktalar` · `nokta_sayisi` | `[[Q m³/h, P Pa], …]`, Q artan, 0,1'e yuvarlı |
+| `kalibrasyon` | eksen etiketlerinden uydurulan doğrunun azami artığı (Q, P) |
+| `cipa` · `sapma_pct` | doğrulama çıpası (kitapçıktaki azami değer) ve ölçülen sapma |
+| `kapi` | `tuttu` · `tutmadi` · `cipasiz` · `monoton_degil` · `okunamadi` (bölgede seçilen renkte çizgi bulunamadı) |
+| `faz1_girer` | yalnız `kapi = tuttu` olan eğri veritabanına girmeye aday; geri kalanı çıkarılır ama girmez |
+| `girdi_ozeti` | `sha256(pdf_hash + okuma tarifi + araç sürümü)`; aynı özet → yeniden çıkarım YOK |
+
+**Yöntem.** Okuma tarifi (`kaynak-dizini/egri-profilleri.json`) sayfa, grafik bölgesi, eksen tipi (doğrusal /
+log) ve çıpayı söyler; eksen etiketleri sayfanın kendi metninden okunur.
+
+- **A — vektör (varsayılan).** Eğri PDF'te çizim yoluysa (`get_drawings`) köşe noktaları okunur, etiket
+  konumlarıyla kalibre edilir. Çizim hassasiyetinde; görüntü yok.
+- **B — raster.** Grafik görüntüyse eğri rengi piksel izlenir. **Yalnız çıpası olan sayfa `tuttu` alabilir**;
+  çıpasız raster sayfa çıkarılır ama `cipasiz` işaretlenir ve veritabanına girmez.
+
+**Kapı.** Eğrinin uç noktaları kitapçıktaki azami debi ve azami basınçla **±%2** içinde olmalı ve eğri
+monoton azalmalı. Çıpa olarak kitapçıktaki azami değer tablosu kullanılır; tablosu olmayan sayfada (Nicotra:
+çalışma noktası etiketi) çıpa tarifte açıkça yazılır, yazılmadıysa `cipasiz`.
+
+**Faz 0 ölçümü (2026-10-08, salt okuma).**
+
+| Sayfa | Yöntem | Sonuç |
+|---|---|---|
+| Vortice Commercial In-Line s.11–13 (LINEO 315 V0) | vektör, 0 görüntü | **±%2 kapısı TUTTU**: azami debi 1740 / 2301 m³/h (tablo 1740 / 2300), azami basınç 426 / 736 Pa (tablo 426,7 / 735,8); en büyük sapma %0,2; kalibrasyon artığı Q 0,9 m³/h, P 0,5 Pa. Min ve maks hız kademesi iki ayrı eğri olarak grafikte var |
+| Nicotra ADH s.8 | vektör, log-log nomogram | çıkarım DENENMEDİ: çok eğrili log-log, azami değer tablosu yok → ayrı kart |
+| SEAT 15 fişi s.2 | raster, 1094×1076 px (≈180 dpi), yarı-log | 3 eğri (2870 · 1450 · 930 d/dk) 15 · 8 · 5 nokta; kalibrasyon artığı Q ±2,1 m³/h, P %0,48; kapı SINANAMADI (fişte azami değer tablosu yok) → `cipasiz` |
+
+**Betik.** `scripts/kaynak_dizini/egri_cikar.py` (ingestor, `cikar.py`'nin yanında; peckop/venthub-pdf-ingestor#1).
+`python scripts/kaynak_dizini/egri_cikar.py --kontrol` bayat ya da eksik okumayı adıyla basar. İlk profil Faz 0
+sayfası: Vortice LINEO 315 V0, maks hız sapma %0,12 · min hız sapma %0,47, ikisi `tuttu`. Sınav:
+`scripts/kaynak_dizini/testler/egri_cikar_sinavi.py` (CI, yalnız stdlib: kalibrasyon, kapı, determinizm,
+sabotaj) ve `egri_cikar_pdf_sinavi.py` (yerel, PyMuPDF ile sentetik PDF).
+
 ---
 
 ## 6.4 KATALOG DEFTERİ (NotebookLM) — soru yüzeyi, KANIT DEĞİL (K14, 2026-09-09)
@@ -5930,7 +6263,8 @@ skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `ca
 > **SSOT.** Ürün kategori iskeleti + yerleşim + gösterim kuralları. Full ürün yüklemesinin OMURGASI.
 > Çelişirse kod/DB kazanır; bu cetvel niçin/nasıl'ı sabitler.
 > v1.2 · 2026-08-10 — **ingestor fork'u kapatıldı:** §6 kanonik ağaç 11→**12 dal** (`parking-jet-fan` eklendi),
-> §6.1 katalog-hattı yeni kategorileri (acid-resistant-fans / frequency-converters / electric-duct-heaters) karara bağlandı.
+> §6.1 katalog-hattı yeni kategorileri (acid-resistant-fans / frequency-converters / electric-duct-heaters) karara bağlandı
+> (`acid-resistant-fans` EN adresi sonradan değişti: §6.1 tablosundaki **yerine geçti: karar 292** notuna bak).
 > (v1.1 · 2026-06-19 — canlı DB ile yeniden doğrulandı; §3'teki yanlış "üste yığılı" önermesi düzeltildi.)
 
 ---
@@ -6037,7 +6371,7 @@ Ingestor CSV'lerindeki 230 satırlık slug sapması canlı DB'ye hizalandı; kar
 
 | Yeni kategori | Slug (üst/alt) | Kapsam | Gerekçe |
 |---|---|---|---|
-| Asit-dayanımlı fanlar | `industrial-ventilation` / `acid-resistant-fans` | Seat/Storm/Jet, 81 ürün | 81 ürün tek alt'a (`radyal-fanlar`) yığılmaz; kimyasal/asit ortam = net alıcı niyeti |
+| Asit-dayanımlı fanlar | `industrial-ventilation` / `acid-resistant-fans` | Seat/Storm/Jet, 81 ürün | 81 ürün tek alt'a (`radyal-fanlar`) yığılmaz; kimyasal/asit ortam = net alıcı niyeti. **Yerine geçti: karar 292 (10-05):** EN adres `corrosion-and-acid-resistant-fans`; eski EN adres `acid-resistant-fans` 308 yönlendirmesi verir |
 | Frekans konvertörleri | `accessories` / `frequency-converters` | Danfoss FC101/FC102, 34 ürün | Fan kontrol cihazı = aksesuar doğası; yeni ana dal gerektirmez |
 | Elektrikli kanal ısıtıcıları | `electric-heating` / `electric-duct-heaters` | Avens, 14 ürün | Mevcut `electric-heating` iskeleti tam bu iş için bekliyordu; HRV'ye gömmek yanlış raf |
 
@@ -6449,6 +6783,26 @@ asıl şey ölçülür.
 Burada uygulanışı: `playwright install-deps` en-iyi-çaba; ardından Chromium'u
 gerçekten açıp bir sayfa render eden ~5 saniyelik prob fatal.
 
+### 2.9 Paralel arka plan kurulumu (ALT-38f, 2026-10-07)
+
+Kural 1-5 ve 2.8 DEĞİŞMEZ; yalnız kurulumun NEREDE koştuğu değişti. `admin-smoke` işinde `playwright install-deps`, Build ile PARALEL arka planda koşar
+(`scripts/ci/arka-plan.sh baslat`); sonucunu Build'ten sonraki `bekle` adımı toplar. Ölçüm (88 başarılı koşu, 2026-10-04..07): adım sıralıyken medyan 15 sn
+(p90 23 sn, sağlıklı en uzun 52 sn) ve 3 koşuda (%3,4) 187, 339, 341 sn (ilk deneme 300 sn sınırını doldurdu). Build medyan 166 sn olduğundan adımın onu beklemesi için sebep yoktu.
+Paralel yolun canlı ölçümü (PR #1742, 6 koşu): komut arka planda 15-25 sn sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi (derleme 91 sn, önceki 92 sn). Takılma bu koşularda
+tetiklenmedi: kuyruğun kesilmesi mekanizma ve test (INV-E2E-HIZLI-3/4) olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
+
+- **Başlatan adım kural 1-2'ye uyar.** Adım `timeout-minutes` ilan eder ve komut `retry-bounded.sh` ile koşar; kapı (INV-CI-INSTALL-1) bu paralel yolu da tarar,
+  çünkü komut metni adımın gövdesindedir. Kemer aritmetiği (2.7): 75 sn × 2 + 10 = 160 sn < 4 dk.
+- **Sınır 300 sn'den 75 sn'ye indi** (sağlıklı en uzunun 1,4 katı): takılan ilk deneme 75 sn'de kesilir, ikinci deneme geçer; eskiden kuyruk 340 sn'ye çıkıyordu. Sağlıklı süre
+  Build'in içinde kaldığı için kuyruk işin süresini uzatmaz. En kötü durumda (iki deneme de takılır) `bekle`, `baslat`tan 240 sn sonrasına kadar bekler.
+- **`bekle` en-iyi-çabadır** (`continue-on-error`): 2.8 ile aynı gerekçe, asıl kapı prob. Prob `bekle`den SONRA koşar ve fataldir; eksik kütüphanede iş ADIYLA kırmızıdır
+  (sessiz yeşil yok). Prob yarım kurulumu görmesin diye `bekle` probtan ÖNCE gelir (INV-E2E-HIZLI-3 sırayı ölçer).
+- **Süreç ölürse yeniden koşar.** Arka plan işlemi sonuç yazmadan ölürse (ör. runner öldürürse) `bekle` komutu ön planda yeniden koşturur ve uyarı verir: mekanizma bozulsa bile
+  iş eski sıralı davranışına düşer, paralellik kaybolur, doğruluk kaybolmaz. Süre dolarsa (124) komut ÖLDÜRÜLMEZ: kendi sınırı vardır, kapıyı prob verir.
+- **Ne kuruyor.** Günlükte komutun YENİ kurduğu tek şey yazı tipleridir (`fonts-freefont-ttf`, `fonts-ipafont-gothic`, `fonts-unifont`, `fonts-wqy-zenhei` ve xfonts paketleri) ve beş mesa/freetype
+  yükseltmesi; Chromium'un çalışma kütüphaneleri koşucu imajında zaten kurulu ("already the newest version"). Adım 2.6'ya göre KALDIRILABİLİR görünür, ama yazı tipi kümesini
+  değiştirir: test ortamının yazı tipi kümesi değişirse reflow ve axe ölçümleri etkilenebilir. O karar ayrı bir iştir ve ÖLÇÜLMEDİ; bu işte yalnız adımın maliyeti gizlendi.
+
 ## 3. Muafiyetler — ADLA yazılır
 
 **Şu an muafiyet YOK.** Liste bilerek boş: tek muafiyet (`db-advisor.yml`) yazıldığı
@@ -6476,6 +6830,9 @@ bir kaldırma koşuluyla birlikte yazılır.
 `src/__tests__/conformance/ci-install-bounded.test.ts` — INV-CI-INSTALL-1.
 Kapı, iş akışı dosyalarını okur; ağdan indiren her adımda kural 1 ve 2'yi arar.
 Yeni bir iş akışı sınırsız `apt-get` ya da `playwright install` yazarsa kırmızı yanar.
+
+Paralel yol (2.9) için ek kapılar: `INV-E2E-HIZLI-3` (`e2e-smoke-paralel-kurulum.test.ts`: adım sırası, sınır ve deneme sayısı, `bekle` süresi ve en-iyi-çaba,
+probun fatal olması ve `bekle`den sonra gelmesi) ve `INV-E2E-HIZLI-4` (`scripts/ci/__tests__/arka-plan.test.ts`: betik gerçek bash ile, sabotajlı).
 
 
 ---
@@ -9138,11 +9495,14 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
 | `scripts/hijyen/**` | Ağaç hijyeni araçları (kirli sayacı, ağaç-silme kapısı). Ölçüldü (2026-08-27): aynı arama, aynı dosyalar — `scripts/hijyen` geçen **0 referans**; pozitif kontrol `scripts/setup-hooks` için **1 referans** buluyor, yani arama gerçekten arıyor. Gerekçe `scripts/board/**` ile aynı sınıf. |
 | `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
+| `__tests__/**` · `*.test.{ts,tsx,cjs,mjs}` · `e2e/**` · `e2e-canli/**` | Test dosyaları (ALT-44, 2026-10-07). Ölçüldü: üretim kodu test dosyasından içe aktarmıyor (**0**; aynı arama test dosyalarında **23** buluyor), Pages Router yok, testler CI'da aynen koşar. **Test OLMAYAN src dosyaları ve `public/**` HER ZAMAN build.** → D3.2 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
 etkilemez, ama önizleme dağıtımı migration'ın vitrine yansımasını görmenin **tek**
 yoludur ve bu depoda migration merge'i prod'a **otomatik** uygulanır. Ayrıca
-`.gitignore`, `package.json`, tüm yapılandırma ve elbette `src/**`.
+`.gitignore`, `package.json`, tüm yapılandırma, `public/**` (statik varlık olduğu gibi
+yayınlanır, `.md` dahil: D3.2) ve elbette `src/**` (yalnız **test olmayan** dosyalar; test
+kalıpları D3.2).
 
 **Listeye ekleme kuralı:** yeni bir sınıf eklemek isteyen, "bu dosya türü derlemeye
 girmiyor" iddiasını **ölçerek** kanıtlar (import taraması + yapılandırma kontrolü) ve
@@ -9189,6 +9549,35 @@ INV-BUILD-SKIP bu iki tuzağı **adıyla** ölçer (`scripts/vercel-ignore-build
 `.githooksfake/pre-commit → BUILD`). Sabotaj sınavı **5/5**: kapsamı `scripts/*`'a
 genişletmek, eğik çizgiyi düşürmek, eklenen satırı sökmek ve ölçüm aracını körleştirmek
 — dördü de kırmızı verdi; bozulmamış hâl yeşil kaldı (sınav vacuous değil).
+
+### D3.2 — Test sınıfı ve `public/` kapısı (2026-10-07, ALT-44)
+
+**NİÇİN:** Vercel ücretsiz ekipte "Dağıtım Depolama" doldu (OPS, Vercel e-postası 10-07 14:49). Son 30 günde (09-07..10-07) master'a **620** commit girdi; bu cetvelin kuralları bunların **137'sini** (%22,1) atlatıyordu. Eksik bölge TAHMİNLE değil, **her commit'in kendi dosya listesiyle gerçek betik koşturularak** ölçüldü (eski betik ve yeni betik, `VERCEL_GIT_COMMIT_REF=master`, liste-dosyası kipi):
+
+| Kural kümesi | Atlanan commit (30 gün, 620) | Not |
+|---|---|---|
+| eski (D3 tablosu, D3.1'e kadar) | **137** (%22,1) | taban |
+| + test sınıfı (bu iş) | **269** (%43,4) | **+132**, geri kayma **0** (eski ATLA → yeni BUILD olan commit yok) |
+| (ölçüldü, EKLENMEDİ) + `scripts/<dizin>/` | 381 (%61,5) | +112; en büyük: `scripts/belge` +38, `icerik-hatti` +23, `db` +15, `seo` +11; AYRI karar (D3.1 "kapsam dar tutulur": her dizin için ölçüm + bekçi kolu) |
+| (ölçüldü, EKLENMEDİ) `supabase/functions/`, `tools/` | +1, +0 | kazanç ~0: sınıf eklemenin bedeli kazançtan büyük |
+
+⚠ Bunlar ÜST SINIRDIR (D14): her derleme başarılı ve taban hep güncel varsayılır; yoğun günde taban geride kalır ve oran düşer. Yeni atlanan dosyaların sınıfı (ölçüldü): **166** dosya `__tests__/` içinde, **5** dosya `e2e/` içinde; başka hiçbir yol yeni atlanmadı.
+
+**NEDEN GÜVENLİ — ölçülen iddia:** "derlemeye giren hiçbir dosya test dosyasından içe aktarmaz ve bir test dosyası rota olamaz".
+1. **İçe aktarma taraması (2026-10-07, `INV-BUILD-SKIP-TEST` bunu depo üzerinde HER koşuda yeniden ölçer):** üretim kodu (src içindeki test olmayan dosya + kök yapılandırmalar) içinde `__tests__` ya da `.test` içe aktaran dosya: **0** (statik `import`/`export … from`, `import()` ve `require()` biçimleri). **POZİTİF KONTROL:** aynı arama test dosyalarında **23** dosya buluyor, yani arama gerçekten arıyor; ayrıca sentetik satırlarla (bulunması ve bulunmaması gerekenler: `latest`, `@testing-library`, `.test-helper`) sınanır.
+2. **Pages Router YOK** (`src/pages`, `pages` yok; bekçi sabitler): `pages/` altındaki her dosya (test dahil) rota olurdu. App Router'da `__tests__` alt çizgili (private) klasördür ve `x.test.ts` özel dosya adı değildir.
+3. **Test dosyaları Vercel'in `postinstall` tip denetiminde görünür** (`tsconfig.json` `include` `**/*.ts(x)`; `postinstall` = `pnpm run type-check`); aynı denetim CI'da (`Type check`, zorunlu `ci`) HER PR'da koşar → bir test dosyasının tip hatası zaten master'a girmez. Atlama CI kapılarını **körleştirmiyor**: testler `test-shard` işlerinde aynen koşar; atlanan YALNIZ Vercel derlemesidir. (ÖN KOŞUL, D3.1'deki gibi: `ci.yml`'e yol filtresi eklenirse bu satır yeniden ölçülür.)
+
+**HER ZAMAN BUILD kalanlar (OPS şartı, bekçi kollarıyla sabit):** src içindeki test OLMAYAN her dosya (`src/test/setup.ts` dahil); `next.config.*`, `package.json`, kilit dosyası ve kök yapılandırmalar; build zinciri betikleri (`scripts/assert-node-major.mjs`, `scripts/setup-hooks.mjs`, `scripts/vercel-ignore-build.sh`; `package.json`'ın `install/postinstall/prepare/prebuild/build/vercel-build` zincirinde adı geçen her betik bekçide TÜRETİLİR ve BUILD olduğu doğrulanır); adında "test" geçen ama test olmayan dosyalar (`contest.ts`, `TestimonialCard.tsx`, `latest.ts`); `__tests__` adına benzeyen dizinler (`__tests__fake`, `__test__`); `.test.ts.bak`, `.test.json`, `.tests.ts`; `public/**` altındaki HER ŞEY. KARMA commit'te TEK bir test olmayan dosya bile varsa BUILD (D2: tek ilgili dosya yeter).
+
+**`public/` KAPISI (aynı PR, mevcut bir deliğin kapatılması):** `*.md` kuralı `public/` altını da kapsıyordu; `public/x.md` olduğu gibi YAYINLANIR (`/x.md` olarak sunulur), yani siteye dokunur. "Hiçbir kod `.md` import etmiyor" ölçümü (D3, ilk satır) KOD için geçerlidir, statik varlık için değil. `public/*` artık `*.md` ve test kalıplarının ÖNÜNDE `BUILD` döndürür (`case` ilk eşleşeni alır: SIRA bekçiyle sabittir). Ölçüm: bugün `public/` altında 1 `.md` var (`public/decoders/README.md`); eski kural bu dosyanın değişikliğini atlatırdı.
+
+**Kaldırılan kol:** REC-168'in "kip betiğinin kapısı (`src/**` atlanmaz) → BUILD" kolu `buildGerektiren`'den KALDIRILDI ve `atlanabilir` listesine taşındı (artık test sınıfı). O kolun korumak istediği şey (kapı değişirse kontrol koşsun) testlerin CI'da aynen koşmasıyla zaten güvencede.
+
+**Bekçi:** `build-skip-positive-logic.test.ts` — `buildGerektiren`'e 20, `atlanabilir`'e 13 yeni kol; yeni `INV-BUILD-SKIP-TEST` (içe aktarma taraması + pozitif kontrol, Pages Router yok, yaşam döngüsü betikleri BUILD).
+**Bozma (sabotaj) sınavı (2026-10-07):** 14 bozma, her biri AYRI uygulanıp yalnız bu kapı koşturuldu ve her seferinde `git checkout` ile geri alındı: **14/14 KIRMIZI, hayatta kalan 0.** Bozmalar: `public/` kapısını kaldırmak ya da `ATLA` döndürtmek; test desenini `*test*` ile genişletmek (`contest.ts`, `latest.ts` atlanırdı); `src/*` tümünü atlatmak; `*/__tests__/*` kalıbını `*__tests__*` yapmak; kökteki `__tests__` kuralını silmek; `e2e/`, `e2e-canli/`, `*.test.cjs`, `*.test.tsx` kurallarını tek tek bozmak; `scripts/*` tümünü atlatmak; varsayılan yönü `ATLA` yapmak (negatif liste); tüm test kurallarını kaldırmak; üretim dosyasına `__tests__` içe aktarması sokmak (`INV-BUILD-SKIP-TEST` kırmızı verir). Bozulmamış hâl yeşil kaldı. **Ölçüm hatası ve düzeltmesi:** ilk koşuda 3 bozma (kökteki `__tests__` kuralını silmek, varsayılan yönü `ATLA` yapmak, tüm test kurallarını kaldırmak) UYGULANAMADI: Windows çalışma kopyası CRLF olduğundan çok satırlı kalıp eşleşmedi ve koşucu bunları "atlandı" diye yazdı. Atlanan bozma ölçülmüş sayılmaz; koşucu satır sonunu algılayacak şekilde düzeltilip yalnız o üçü yeniden koşturuldu (3/3 kırmızı).
+
+**Dürüst sınır:** bu iş Vercel'in "Dağıtım Depolama" sayacını sıfırlamaz (saklama süresi ayarı proje sahibinindir; eski dağıtımlara dokunulmadı) ve Vercel'de yalnız 7 sürüm durduğu ölçüldüğü için sayacın Vercel tarafında takılı kalmış olması MUHTEMELDİR (OPS, 10-07). Bu iş yalnız yeni dağıtım üretim hızını yaklaşık yarıya indirir (üst sınır 137 → 269 atlanan).
 
 ## D4 — Karşılaştırma tabanı `VERCEL_GIT_PREVIOUS_SHA`, `HEAD^` DEĞİL
 
@@ -10148,6 +10537,13 @@ demesi, o ürünün **kendi** dizininde yokluğu, ya da o cevap için **hiç ara
   yalnız `/tr`); ürün, kategori, marka ağaçları, yeni şema bölümleri ve tanınmayan her adres ATILIR. Kalanın her adresi GET ile
   sınanır (yönlendirme takip edilmez, 200 ve kanonik = kendisi, değilse durur) ve yalnız onlar bildirilir; süzgeçsiz kip kapıdan
   geçemez (K4, karar 164 A). Boş küme ya da kalan > 15 = DUR. Kilit: `indexnowSuzgec.test.ts` (INV-INDEXNOW-SUZGEC-1).
+- **Yayın günü kipi (karar 327, 2026-10-09; SEO-27): `--yalniz-yeni <eski-adresler.json>`.** Bildirilecek küme = canlı site haritası −
+  yayından ÖNCE `adres-yayin-denetim.mjs` ile alınan taban haritası, yani yalnız ADRESİ DEĞİŞEN TR sayfalar (değişmeyenler
+  `--yalniz-degismeyen` ile zaten bildirildi). Bayrak AÇIK olmalı (kapıyı aşmaz). Fail-closed: taban boş/bozuk, yeni harita tabanla hiç
+  kesişmiyor, yeni adres yok (taban yayından sonra alınmış), TR dışı adres (Pazar günü yalnız TR), küme > 200 = DUR. Her adres GET ile
+  sınanır (yönlendirme takip edilmez, 200, kanonik = kendisi). `--yalniz-degismeyen` ile birlikte kullanılamaz. Kuru koşumun
+  `bildirilecek URL (yeni/degisen TR): N` satırı beklenen sayıya eşit olmalı (SEO-26). Kilit: `indexnowBetikKapisi.test.ts`
+  (saf mantık + bayrağı açık geçici ağaçta uçtan uca + iki mutasyonlu sabotaj).
   Ölçüm 2026-10-03 (canlıya karşı kuru koşu): sitemap 87 adres, 78 atıldı, 9 kaldı, 9'u 200 ve kanonik. Değişecek 78 adres yayın günü
   adres yayınıyla aynı yayında gider.
 - Kaynak: indexnow.org/documentation, /faq; blogs.bing.com/webmaster/May-2025/… (2025-05-19).
@@ -10179,6 +10575,7 @@ buradan yapılmaz.
 |---|---|---|
 | 2026-10-02 | SEO-1 dizin görünürlüğü (bot erişimi, sunucu HTML'i, Bing/Google dizini, konu sorguları, yapay zekâ arama aracı) | `docs/audits/dizin-gorunurluk-olcum-2026-10-02.md` |
 | 2026-10-02 | REC-300 yayın öncesi tabanlar (EN ad, Search Console, bağlantı, PSI) | `docs/audits/rec-300-taban-2026-10-02.md` |
+| 2026-10-09 | SEO-2 taban yenilemesi, 10-06 yayınından sonra (Search Console, bağlantı, PSI, canlı kapı) | `docs/audits/rec-300-taban-2026-10-09.md` |
 
 
 ---
@@ -12001,6 +12398,34 @@ deneyi, HARİTA dökümü yeniden okudu, 2026-09-30): model parametresiz açıla
 `claude-haiku-4-5-20251001` (ilk 10 dosya okundu). Ajanın modelsiz açıldığı ARAÇ'ın beyanıdır; döküm bunu tek başına
 göstermez. Ajan tipinin kendi `model:` başlığı varsa (`denetim-opus`, `security-reviewer`: `opus`) o öncelikli olur (§5.4); başlıksız tipte ve `model` verilmeyen çağrıda Sonnet'e düşülür.
 Haiku (ya da Opus) istenen her `Agent` çağrısında `model` açıkça yazılır (§5.1 workflow betiği için aynı kuraldır: **bir seçim yapmamak da seçimdir**).
+
+#### Rol → model tablosu (karar 314, Recep 2026-10-08; ALT-45; kapı INV-AJAN-TANIM-1)
+
+| Tür | Dosyadaki `model:` | Gerekçe |
+|---|---|---|
+| **Araştırmacı** | `claude-haiku-5-5` | Salt-okuma, yargı vermez; çıktısını doğrulayıcı ve müdür yeniden ölçer (aşağıdaki sıra). OPS kartı (10-08): Haiku 5.5 fiyatı Sonnet 5.5'in ~1/20'si (100 bin jeton altı istem; üstünde ~1/4) ve AYNI haftalık havuzdan düşer. **Yalnız DAR okumada kullanılır** (aşağıdaki "Haiku araştırmacı şartı"). |
+| **Uygulayıcı** | `sonnet` | Dosya yazar, kapıları koşar; Haiku denenmedi. |
+| **Çürütücü** | `sonnet` | Kaçırdığı bulgu, hatalı kodun kontrolden geçmesi demektir; Haiku denenmedi. |
+| **Doğrulayıcı** | `sonnet` | Son halka. KALICI Sonnet (OPS, 10-08): asıl işi atıf ve sayıları yeniden ölçmektir; Haiku'nun sayı, dosya yolu ve sayfa numarasında uydurma yaptığı sahada görüldü (aşağıdaki "Doğrulayıcı Haiku denemesi" ve "Haiku araştırmacı şartı"). Çağrı başına `model` ile de Haiku verilmez. |
+
+- **Değişmeyenler:** `denetim-opus` ve `security-reviewer` `opus` KALIR; departman pencereleri (müdür) değişmez.
+- **Tek kaynak ve kayıt:** model YALNIZ `scripts/belge/ajan-tanimi-uret.cjs` içindeki `TUR_MODEL` sabitinde değişir (elle düzenleme yok); yeni bir departman bu üreticiden geçtiği için bu tabloya kendiliğinden uyar. Kapı `INV-AJAN-TANIM-1`: üretici sabiti = diskteki `model:` satırları = bu tablo; üçünden biri değişirse kırmızı.
+- **Departman pencere tanımları (HRT-49, OPS 10-10; pilot OPS-101):** müdür penceresi için `.claude/agents/<departman>-pencere.md` AYNI üreticiden çıkar (11 açık departman; kapalılar pencere açılınca listeye eklenir). `memory: user` taşır, model pencerenin bugünkü modelidir (OPS `claude-opus-5-5`, öteki on `claude-sonnet-5-5`; üretici sabitleri `PENCERE_MODEL`, `PENCERE_MODEL_VARSAYILAN`) ve araç kısıtı YOKTUR (müdür yazar). Pencere settings'teki `"agent": "<departman>-pencere"` ile açılır; settings'e geçişi bu üretici yapmaz (OPS yapar). Kapı: `INV-AJAN-TANIM-1` (disk = üretici çıktısı, öksüz yok, çalışan + pencere birlikte maliyet tavanı altında) ve `INV-HAZIR-OZELLIK-1` (her açık departmanın tanımı var, `memory: user`, model, araç kısıtı yok).
+- **Tam kimlik, takma ad değil:** `haiku` takma adı kayar (2026-09-30 ölçümünde `claude-haiku-4-5-20251001`, 2026-10-08'de `claude-haiku-5-5`); dosyaya tam kimlik yazılır.
+- **Doğrulayıcı Haiku denemesi (OPS, karar 314) — ÖLÇÜLDÜ 2026-10-08 (ALTYAPI); KARAR (OPS): doğrulayıcı KALICI Sonnet.** *Ayak 1, günlük okuma (yapıldı):* Haiku 5.5 (üç alt ajan dökümünde de yalnız `claude-haiku-5-5`), çağrıda `model: "haiku"` + `effort: "high"`; 3 bağımsız koşu (okuma sırası farklı) × 8 CI/test çıktısı = 24 hüküm. Çıktılar: 1 gerçek kırmızı günlük (CI koşusu 37628802492, shard 4/4) + 7 yazılmış çıktı (nokta raporlayıcıda tek gizli başarısız test, hepsi atlanmış, kesik günlük, testler geçtiği hâlde kapsama eşiği ihlaliyle süreç 1, iptal edilmiş iş, tsc hatası, stderr gürültülü ama yeşil). Gerçek hükümler cevaptan ÖNCE yazıldı (sha256 başı `dc682f23`). Hüküm kuralı ajan istemindeydi: YEŞİL = testler koştu ve hata yok; KIRMIZI = başarısız test, tip hatası, eşik ihlali, sıfırdan farklı çıkış, iptal; BELİRSİZ = kesik günlük ya da hiç test koşmamış. **Sonuç: 24/24 doğru; kırmızıya ya da belirsize "yeşil" diyen 0; yeşile "yeşil değil" diyen 0.** Sapma: bir koşuda iki satır ASCII yazım (`BELIRSIZ`); hükmü makineyle ayrıştıran kapı Türkçe harfsiz yazımı da tanımalıdır. Maliyet: koşu başı ≈210 bin jeton (alt ajan toplamı; dosyaları parça parça okuma ve ön yüklenen yetenekler dahil), 40-68 sn; haftalık kota göstergesi (tam puan, %77) oynamadı, etkisi ayrıştırılamadı. *Ayak 2, atıf ve sayı yeniden ölçümü (doğrulayıcının asıl işi) YAPILMADI:* OPS iptal etti, çünkü Katalog sahasında rapor veren beş Haiku araştırmacıdan ikisinin raporu yanlıştı (var olmayan bir sayısal tabloyu bildirdi, dosya yolu ve sayfa numarası uydurdu; Katalog betikle yeniden ölçtü; OPS aktarımı). Yani 24/24 YALNIZ günlük okumayı kapsar; doğrulayıcı rolünün kanıtı DEĞİLDİR ve model dosyada Sonnet kalır.
+- **Haiku araştırmacı şartı (OPS, 10-08; saha verisi: Katalog'da rapor veren 5 Haiku araştırmacıdan 2'sinin raporu yanlıştı):** Haiku araştırmacı dar okuma işinde kullanılır (verilen dosyaları oku, alan çıkar). Geniş tarama ile sayı, varlık, dosya yolu ve sayfa no hükmü betikle ya da kaynağa bakılarak doğrulanmadan rapora girmez; bütünü taramak gereken iş betikle yapılır. Bu şart §5.1'deki "Salt-okuma ölçüm / envanter / tarama → sonnet" satırını DEĞİŞTİRMEZ: geniş tarama Sonnet'te ya da betikte kalır; Haiku yalnız araştırmacı türünün DAR okumasıdır.
+- **Araştırmacı raporu hükme ikinci ölçümle girer (filo kuralı, OPS 10-09; Takip ve Katalog dersi):** Araştırmacının (özellikle Haiku'nun) raporu, ikinci bir ölçümden geçmeden hükme ya da karta girmez. Karta yazılacak sayı, yazar, varlık ve sebep iddiasını kartı açan müdür bir komutla bir kez yeniden ölçer (örnek: `gh pr view`, `ls`, `npm view`, kaynak dizininde `k.var_mi`); tutmayan iddia raporda "düzeltilen iddia" diye yazılır, sessizce silinmez. Bu madde yukarıdaki Haiku şartını değiştirmez, Haiku dışı araştırmacıyı da kapsayacak biçimde genişletir; doğrulayıcı zaten ikinci ölçümdür, ona uygulanmaz.
+  - **Niçin (sage kayıtlarının beyanı; HARİTA olayları yeniden koşmadı):** Katalog'da bir Haiku araştırmacı "sayısal P-Q tablosu, sayfa 280-340" bildirdi; kaynakta eğri yalnız grafikti ve dosyada o sayfalar yoktu (dosya yolu ve sayfa numarası uydurma), bir başka taramada "tablo boş" diyerek ölçmeden hüküm verdi (sage `01M4G22XX4VMYQABPFMG2M0FPW`). Takip'te emirdeki "iki mailbox dosyası" `ls` ile beş çıktı, bir alt ajan raporunun "envanter testi kırmızı olur" hükmünü bağımsız doğrulayıcı çürüttü, "giriş sorunu" sanılan bağlantı hatasının kök sebebi uv ortamında eksik modüldü (sage `01M4G0ZXBSYF86DGSY99ERP142`).
+
+**Ölçümler (2026-10-08, ALTYAPI; alt ajan döküm dosyasındaki `model` alanı ve `claude -p` çıktısındaki `modelUsage` okundu, beyan değil):**
+
+| Soru | Sonuç |
+|---|---|
+| Çağrıda `model: "haiku"` + kullanıcı ayarı `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` + tanımda `model: sonnet` | Çağrı parametresi kazandı: dökümde yalnız `claude-haiku-5-5`. |
+| Taze süreçte (`claude -p`) tanım dosyasındaki `model: claude-haiku-5-5` (çağrıda model yok, ortam değişkeni `sonnet` duruyor) | Uygulandı: `modelUsage` = `claude-sonnet-5-5` (ebeveyn) + `claude-haiku-5-5` (araştırmacı). Claude Code belgesindeki sıra da bu: çağrı parametresi > tanımdaki `model` > `CLAUDE_CODE_SUBAGENT_MODEL` > ana oturum modeli. |
+| Haiku'ya geçen araştırmacı pencerenin effort ayarını alıyor mu | Evet: aynı görev (iki koşuda da doğru cevap 3/13), tanımda effort yok; ebeveyn `--effort low` iken Haiku düşünme jetonu 499, `--effort max` iken 8.084 (16 kat). n=1 koşu/seviye; düşünme jetonu effort'un vekilidir. Bu yüzden tanıma `effort` YAZILMAZ (OPS, karar 314 eki). |
+| Açık pencerede tanım dosyası diskte değişince sonraki çağrı yeni tanımı alıyor mu | Bu pencerede almadı: dosyaya `model: claude-haiku-5-5` ve gövdeye işaret satırı yazıldı, sonraki çağrı Sonnet'te koştu ve işareti görmedi. Claude Code belgesi `.claude/agents/` dizinini izlediğini ve yeniden başlatma gerekmediğini söylüyor (üç istisna: yeni açılan agents dizini, `--add-dir` ile eklenen dizin, `--disable-slash-commands`); çelişki ÇÖZÜLMEDİ (bu pencerenin tanımları ek dizinden gelmiş olabilir). Kural: yeni tanımın geçerli olduğundan emin olmak için pencere yeniden açılır. |
+| Maliyet göstergesi | CLI 2.1.288 Haiku 5.5 fiyat tablosunu taşımıyor (`costBasis: unknown`; belge Haiku 5.5 için v2.1.293+ diyor): `total_cost_usd` Haiku payında GÜVENİLMEZ (0,42 USD göründü, Sonnet ebeveyn 0,35). Gerçek kota etkisi ÖLÇÜLMEDİ. |
 
 **Sıra:** çalışan → müdür denetimi → bağımsız doğrulayıcı → müdür hükmü. Ekip liderli işte: çalışan → ekip liderinin
 denetimi → liderin çalıştırdığı bağımsız doğrulayıcı → lider özeti → müdür denetimi (özeti örnekler, kaynağa iner). **Bağımsızlık şartı:** doğrulayıcı
@@ -14958,6 +15383,15 @@ ayar dizinindeki `sessions/` altına **1 kayıt yazılır, bitince silinir** (`k
 bu Recep gözüyle ölçülecek. Kural bu yüzden "OPS emri + kayıtta `entrypoint=sdk-cli` yazılır" olarak uygulanır,
 "sekmeyi kapatır" diye anılmaz.
 
+---
+
+## 37. İŞ BAŞI "ÖNCEKİ ÇALIŞMA" TARAMASI — tek komut, sonuç ilk satırda (ARC-30 / OPS-30)
+
+**Komut:** `node scripts/arac/onceki-calisma.cjs "<emir metni>" [--haric ARC-30] [--derin] [--json] [--kanca]`. Yeni arama motoru değildir; beş mevcut aramayı paralel koşar: dosya adı (`git ls-files`) · git konu satırı (`git log --all`) · Kanban başlık/etiket (`kanban_disa_aktar.py`) · sage (yalnız ipucu) · Linear (`LINEAR_API_KEY` varsa, ipucu).
+**İlk satır** üç sonuçtan biri ve karışmaz: `ÖNCEKİ ÇALIŞMA: BULUNDU n — …` · `YOK (k/5 yer arandı, ifade: …)` (yalnız dosya+git+Kanban tamam ölçüldüyse) · `ÖLÇÜLEMEDİ (kaynak: sebep)`. Kimlik `REC-300 = rec300 = rec 300`. Bütçe CLI 6 sn, `--kanca` 2,5 sn.
+**Sayaç:** `~/.claude/ara-onceki-calisma.jsonl` (depo DIŞI, yalnız-ekleme; depo içi yola yazmayı betik reddeder); `--sayac` oturumda bulunan yollarla yazılan dosya adlarının kesişimini `tekrar-uretim` satırı yazar.
+**Kapı:** `INV-ONCEKI-CALISMA-1..13`. **Ölçülmedi:** istem kancasına bağlama (UserPromptSubmit + SendMessage tetiklenmesi) ve Kanban description/notes araması.
+
 
 ---
 # FILE: docs\standards\form-submission-standard.md
@@ -15418,6 +15852,8 @@ bir durum değil, bir boşluktur.
 | `hafiza-kullanim-sayaci.cjs` | kanca | defterdeki enjeksiyonları `recordInjection`, transcript atıflarını `recordUse` ile sage'e yazar | Stop (async) | ARAÇ | aynı kapı |
 | `sage-hijyen-oturum-sonu.cjs` | kanca | taze doğrulanmış yedek varken `port.hygiene` koşar | SessionEnd | ARAÇ | aynı kapı |
 | `scripts/hijyen/hafiza-enjeksiyonu.cjs` · `sage-enjeksiyon-defteri.cjs` | modül | konu/sayaç/hijyen mantığı (port enjekte) · oturum+nesil anahtarlı enjeksiyon defteri | üç kanca + `sage-dosya-dersi` | ARAÇ | aynı kapı |
+| `hafiza-yedek.cjs` | kanca | hafıza deposunu PreCompact'ta ELDE, eşik (3600 sn) aşılınca ve bekleyen md varken arka planda yedekler; açılışta yaş satırı (§9) | PreCompact · SessionStart · UserPromptSubmit | ARAÇ | `…/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol) |
+| `scripts/hijyen/hafiza-yedek.cjs` | modül | yedek mantığı: ayrı `git add`, sır taraması, yaş ölçümü, saf karar; CLI `--yedekle --sebep <ad>` ve `--yas` (eski `~/.claude/hafiza-commit.sh`'ın yerine) | kanca + oturum kapanışı | ARAÇ | aynı kapı |
 
 ⚠**AYARA KAYIT RECEP KAPISI:** bu tabloda listelenen bir kanca `.claude/settings.json`'a
 bağlanmadıkça **dosya olarak var, tetik olarak ölüdür** (tablodaki kanca sayısı değişir; sayıya
@@ -15640,6 +16076,36 @@ eksik olan, yedeğin o dersi **uygulaması**ydı.
    sessiz kalsaydı yedek alınmadan "alındı" denecekti. Gölge tabloları (`*_fts_data`, `*_fts_idx`,
    `*_fts_docsize`) gerçek tablodur ve sayılır.
 
+### §7.7 POSTA KUTULARI da depodur; sage ve posta GERİ YÜKLENİR (ARC-71, 2026-10-12)
+
+Pencereler arası posta kutusu `~/.wrongstack/projects/<proje>/_mailbox.sqlite` altında yaşar (proje dizininin
+DIŞINDA) ve **WAL kiplidir**. Ölçüldü (TAKİP 10-09): canlı kutuda ana dosya 160 KB iken WAL 4,1 MB; düz kopya
+mesajların çoğunu atlar. OPS hükmü 10-09 (kararlar 2 ve 3): kökteki **beş dosyanın hepsi** kapsamdadır
+(hangisinin canlı olduğu yedek için önemsiz), sage geri yüklenebilir olur.
+
+1. **Her kutu AYRI depodur** (`posta-<proje>`); liste her çağrıda kökten taranır (`VENTHUB_POSTA_KOKU` ya da
+   `~/.wrongstack/projects`). Yeni kök doğarsa kutusu kendiliğinden kapsama girer; sabit liste sessizce eksik kalırdı.
+2. **Kaynakla sayım aynıdır**: `VACUUM INTO` + tablo satır sayıları. Kutu canlıyken (pencereler yazar) sayım
+   uyuşmazsa **bir kez** yeniden denenir; ikinci uyuşmazlık `.DOGRULANMADI` olur.
+3. **Yedek önce `.gecici`ye yazılır, doğrulanınca adına döner.** Dosya adı dakika çözünürlüklüdür; aynı dakikada
+   ikinci koşum eskiden "dosya zaten var" ile düşüyordu. Doğrulama düşerse aynı dakikadaki sağlam yedek yerinde kalır.
+4. **Geri yükleme "servis" olarak MCP süreçlerine bakar** (sage ve posta için pid dosyası yoktur; her pencere
+   kendi sunucusunu açık tutar): komut satırında `sage-mcp`/`mailbox-mcp` geçen süreç varsa RET. **Süreç listesi
+   alınamazsa da RET** (bakamamak "kimse yok" demek değildir). Betiğin kendi süreci sayılmaz. Eski dosyalar
+   `.oncesi-<damga>` ile yana alınır, silinmez; yazıldıktan sonra parmak izi yedekle karşılaştırılır.
+   **Kanban da süreç taranır** (OPS 10-12): ARC-98'den beri her pencere `kanban-mcp`'yi stdio + `--writable` açar;
+   dosyayı tutan süreç `kanban-server.json`'da görünmez. Pid denetimi kalır, `kanban-mcp/dist/cli.js` taraması eklenir.
+5. **Yükseltme günü adımı:** pencereler kapalıyken `node scripts/hijyen/sage-yedek.cjs` (üç tür depo ayrı
+   satır), `--liste` ile boyut kontrolü; geri dönüş `--geri sage`, `--geri posta-<proje>`, `--geri kanban`.
+   Posta kutusu elle kopyalanmaz.
+6. **YALITILMIŞ KÖK PROVASI (OPS 10-12):** pencereler açıkken geri dönüş yolu kopyada denenir:
+   `--geri sage|kanban --kok <yol>` ve `--geri posta-<proje> --posta-koku <yol>`. Süreç denetimi **yalnız şu
+   hâlde** atlanır: seçenek AÇIKÇA verilmiş, hedef dosya **kanonik karşılaştırmayla** (gerçek yol, `/` ayracı,
+   Windows'ta harf büyüklüğü, junction) ve dev+ino ile canlı depo DEĞİL, canlı ana ağaç çözülebilmiş ve hedef
+   canlı git ağacının (worktree dahil) içinde değil. Kök çözülemezse ya da canlıysa denetim aynen kalır.
+   **Ortam değişkeni (`CLAUDE_PROJECT_DIR`, `VENTHUB_POSTA_KOKU`) tek başına denetimi atlatmaz.** Çıktı
+   `YALITILMIS KOK` satırını yazar; canlı depoya gerçek geri yükleme yalnız yükseltme bozulursa ve pencereler kapalıyken.
+
 ---
 
 ## §8 KONU ENJEKSİYONU · KULLANIM SAYACI · HİJYEN (REC-519, 2026-09-30)
@@ -15703,6 +16169,35 @@ Sabotajsız kolun yeşili kanıt sayılmaz: bağımsız inceleme ilk yazımda 7 
 buldu (penceresi, durak süzgeci, zaman aşımı sarmalayıcısı, çıktı zarfı, spawn'lı port açılışı, dolaylı
 purge anahtarı, <4 belirteç koruması); kollar eklendi. Sage paketi kurulu olmadan gerçek kanca kablosunu
 ölçmek için testler geçici proje köküne sahte `@wrongstack/sage` modülü ve canlı pid'li `server.json` koyar.
+
+---
+
+## §9 HAFIZA YEDEĞİ — kapanışa tek bağ yetmez (ARC-92, OPS-104 K-047, 2026-10-11)
+
+**Ölçülen boşluk:** hafıza deposu (`peckop/venthub-ops-hafiza`) yalnız oturum KAPANIŞINDA commit/push alıyordu
+(kullanıcı düzeyi `hafiza-commit.sh`). Pencere compact'ta ya da uzun oturumda kapanmadan çökerse o oturumun
+hafıza yazıları yedeksiz kalırdı.
+
+**Kurallar:**
+
+1. **Üç yedek noktası.** PreCompact (ELDE, compact'tan önce); SessionStart ve UserPromptSubmit (son commit
+   > 3600 sn **VE** bekleyen `*.md` değişikliği varsa arka planda); oturum kapanışı (`--yedekle --sebep kapanis`).
+2. **ZAMANLAYICI YOK (karar 53).** Tetik kullanıcının mesajıdır. Arka plan denemesi 600 sn'de birden sık olmaz
+   (`.hafiza-yedek-deneme` işaretinin mtime'ı; `*.md` olmadığı için commit'e girmez).
+3. **Yaş = son commit'in yaşı.** Bekleyen değişiklik yokken uyarı ve yedek YOKTUR (yedeklenecek bir şey yok);
+   SessionStart yaş satırını her durumda söyler, UserPromptSubmit yalnız `bekleyen + eski` iken konuşur.
+4. **Sır taraması gevşetilmez.** Staged farkta tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…,
+   postgres URL'si) varsa commit ATILMAZ, `.hafiza-commit-uyari.log`'a yazılır, indeks `git reset -q` ile temizlenir.
+5. **`git add` kalıpları AYRI verilir.** Eşleşmeyen kalıpta git hiçbir şey eklemeden düşer: eski betik
+   `MEMORY.md.oncesi-*` dosyası yokken sessizce hiçbir şey yedeklemiyordu (ARC-92 testinin ilk koşusunda ölçüldü;
+   bugün 6 dosya var, bu yüzden canlıda tetiklenmiyordu).
+6. **Kayıt OPS kapısıdır.** `.claude/settings.json` (PreCompact — `timeout` 45 —, SessionStart, UserPromptSubmit)
+   ve kullanıcı düzeyi `settings.json:294` (eski betiğin yerine `node scripts/hijyen/hafiza-yedek.cjs --yedekle
+   --sebep kapanis`). Kayıtlı olana kadar kanca ölüdür; kural bu cetveldedir.
+
+**Kanıt:** `src/__tests__/conformance/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol, geçici git deposunda);
+bozma 8/8 yakalandı. **Ölçüt:** bekleyen değişiklik varken yaş ≤ 3600 sn
+(`node scripts/hijyen/hafiza-yedek.cjs --yas` ya da `git -C <hafıza dizini> log -1 --format=%ct`).
 
 ---
 
@@ -15792,11 +16287,31 @@ Bekçi **kendi hatasında da susmaz**: tek satır *"BEKCI CALISAMADI"* basar. Se
 
 ### ⛔Mutlak yol yazılmaz
 
-Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
+(Güncel durum, 2026-09-29'dan beri: bekçi hedefi **yazılan dosyanın yolundan** türetir, `os.homedir()` kullanmaz;
+aşağıdaki transcript/`os.homedir()` anlatımı precompact kapısı içindir.) Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
 gömülmez: depo 2026-08-15'ten beri PUBLIC ve kullanıcı adı taşıyan yol kimlik sızdırır
 (§24). Türetim `precompact-durum-kapisi.cjs` ile aynı mantığı kullanır ve aynı ölçülmüş
 sebeple: worktree'de açılan oturumların kendi proje dizini vardır ve orada `memory/` **yok**;
 cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 ölçümü).
+
+### Departman indeksi (2026-09-30, HARİTA kararı 4; şartname `hafiza-yazma-duzeni-standard.md` §7)
+
+Bekçi `.../memory/departman/<ROL>/MEMORY.md` dosyalarını da tanır (yalnız bu yol biçimi; harf duyarsız, `..` giderilmiş;
+`docs/departman/...`, `departman/<ROL>/alt/MEMORY.md`, konu dosyaları SUSAR). Departman indeksi Claude'un yerleşik yoluyla
+yüklenmez, `SessionStart` kancası onu rol kartıyla enjekte eder ve enjeksiyon **60 satır / 8 KB**'ta keser; bekçi aynı sayıyı
+**YUMUŞAK** eşik yapar, yoksa bekçiden geçen indeks açılışta görünmeden kırpılırdı.
+
+| | ana `memory/MEMORY.md` | `departman/<ROL>/MEMORY.md` |
+|---|---|---|
+| yumuşak (UYARIR, engel değil) | 160 satır / 20.000 bayt (`>=`) | 60 satır / 8.000 bayt (**aşılınca** `>`: 60 satır enjeksiyona sığar) |
+| sert (ENGELLER, çıkış 2) | 200 satır / 25.000 bayt | **aynı** 200 / 25.000 (engel dalı tektir) |
+| katlanmış satır aranan yer | hafıza dizini (`dizin-*.md`) | departmanın kendi dizini (`departman/<ROL>/<konu>.md`) |
+
+Ana `MEMORY.md` davranışı değişmedi (regresyon testi). **Ortak aday işlevi bu değişiklikte YAZILMADI:** bekçi hedefi yazılan
+dosyanın yolundan türetir, aday kümesi gerekmez. Kilit testinin `projeDiziniBul` yasağı bu yüzden **bilinçli** gevşetildi
+(hazırlık): ad yalnız paylaşılan modülden `require` edilen ortak işlev olarak serbest, kancanın içinde yerel türetim ve
+`os.homedir()` yasak; **mutlak kullanıcı yolu yasağı ve `os.homedir()` ile türetilmiş modül sabiti yasağı aynen kalır**
+(`.claude/hooks/lib/*hafiza*|*aday*.cjs` yazıldığı gün otomatik kapsanır).
 
 ### Kapı
 
@@ -15804,7 +16319,10 @@ cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 �
 bağlı · exit 2 yok + kendi hatasını söyler · mutlak yol yok, dizin türetilir · ⭐**katlanmış
 satır sessiz / silinmiş satır uyarır** (ayırt edici çift) · yalnız boşluk farkı uyarı üretmez
 · yumuşak eşik üstünde uyarır, altında susar (ikinci ayırt edici çift) · precompact iki eşiği
-taşır ve **farklı** şey söyler.
+taşır ve **farklı** şey söyler. Departman genişlemesiyle eklenenler: eşik çifti (59/60 sessiz, 61 uyarı) ·
+bayt eşiği · Edit sonucu · sert eşik ortak · ana regresyon · katlama araması departman dizininde · tanıma sınırları ·
+harf duyarsız + `..` · fail-open (boş/bozuk/okunamayan) · **mutasyon tablosu** (kancanın kritik satırı bozulunca senaryo
+kırmızı) · kullanıcı yolu dedektörlerinin sabotaj testi.
 
 
 ---
@@ -15844,6 +16362,8 @@ taşır ve **farklı** şey söyler.
 `<ROL>` değerleri `docs/roller/` kartlarındaki adlardır: OPS, ARAC, ALTYAPI, HARITA, URUN, ADMIN, KATALOG, GEO-SEO,
 BLOG, MARKA, MEVZUAT, SATIS, TASARIM, EDGE, I18N, YETENEK (ASCII, büyük harf; tek kaynak `scripts/belge/rol-karti-uret.cjs`
 içindeki `ROLLER`). Pencerenin görünen adını Recep verir (`scripts/board/pencere-adlari.cjs`); görünen ad rol değildir.
+
+**Ders etiketi (HRT-36, Recep emri 2026-10-09).** Katman 4'e giden her ders anında `wrongstack-sage remember` ile yazılır: `audience.roles=[<rol>]` (rol kimliği küçük harf, mevcut kayıtlarda `altyapi`, `urun`, `geo-seo`) ve etiketler `[rol, ders]`. Rol etiketi olmayan kayıt role özel enjekte edilmez, genel proje hafızasına düşer ve departman bazında sayılamaz. Etiket öneridir, kanca zorlamaz; gün sonu raporunda "sage'e bugün N ders" yazılır, sayım etiketten yapılır. Ölçüm gerekçesi (OPS, 10-09): son 7 günde 5 kayıt, hiçbirinde departman etiketi yok. Satır her rol kartında `rol-karti-uret.cjs` ortak bloğundan gelir.
 
 **Cetvellerin içeriği** sahibi departmanda kalır (`docs/roller/cetvel-sahipligi.md`); bu cetvel yalnız hafıza ve talimat
 katmanlarını yönetir.
@@ -16369,6 +16889,7 @@ otomatik yazılan son dokunma zamanıdır, bilginin yazıldığı ya da olduğu 
   şöyle yazıyor (tarih)" kalıbı ve bayatlık kuralı; **§9b** durum dosyasının günlük döndürülmesi (DEVİR bloğu dosyanın sonunda + bugün/dün, `gecmis/` kayıpsız iki adım, kapı `gecmis/`'i taramaz; ilk uygulama OPS durum dosyası 2026-10-04: 336.438 → 106.480 bayt, betik `scripts/belge/durum-dondur.py`).
   §1 satır 3, §8 (D33, D34), §10 (v0.9 eki), §11 (iki açık soru) buna göre güncellendi. Başlıktaki "v0.7" bayattı (değişiklik kaydı v0.8'e gelmişti): v0.9 yapıldı.
   Kanca değişmedi; v0.9 bağımsız okuyucudan geçmedi, uygulamayla doğrulanacak.
+- 2026-10-09 v0.9 eki (HRT-36, Recep emri, OPS aktardı): §1 sonuna "Ders etiketi" paragrafı (sage'e anında, `audience.roles` + `[rol, ders]`, öneri; kanca yok). Rol kartlarına ders ve Kanban (sütun/status/not/kanıt) ortak satırları geldi (`rol-karti-uret.cjs`).
 - 2026-10-05 v0.9 eki (HRT-31, OPS isteği): §9b madde 7, durum dosyasının sonunda standart `Yarım iş: yok|var — ...` satırı (ARAÇ'ın #1702 kancası okuyor; biçim gerçek `yarimIsOku` ile ölçüldü). Rol kartlarına tek cümle, kurallar dosyalarına blok eklendi (`rol-karti-uret.cjs`). Kanca ve yazma kapıları değişmedi.
 
 - 2026-10-01 v0.8 (v0.7 son okuma turu; statü: uygulamayla doğrulanacak): 1 engelleyici + 4 orta + 3 düşük işlendi. §6 "Bash kaza yolları" `genisletmeli`'yi §5/D13d ile hizaladı (kanca işaretler); kalem 7 öncesi `unlink`/`rmdir`/`mv` kaynağı açık delik olarak §6'ya yazıldı;
@@ -16732,6 +17253,7 @@ GÖRÜNMÜYORDU (vitrin sözlük yedeğine düşüyordu) ama **latent**ti: içer
 - [ ] Dilsiz URL yok (her iç link `/tr|/en` önekli render ediliyor).
 - [ ] Hardcoded TR/EN literal yok (izinli semboller hariç).
 - [ ] EN deyimsel (`30%` değil `%30` değil; TR=EN sızıntısı yok — sadık-kopya yan etkisi taranmış).
+- [ ] Şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yok; tek istisna marka adı VentHub (HRT-46; yazılar için `rehber-yazisi-standard.md` R4 madde 10).
 
 ---
 
@@ -16868,8 +17390,9 @@ NOKTASI`), HUD'un noktalı "makine" üslubu korundu, karşılaştırma etiketi k
 > **v2 (karar 219, Recep 2026-10-01, aynen):** *"bugünden itibaren kanban wrongstack tam kapasite kullanıma
 > geçiriliyor her yerdeki kuralları değiştir. şayet beğenirsek linear devre dışı"*. Canlı iş kaydının tek kaynağı
 > **Kanban**'dır; **Linear DONUKTUR** (yeni iş kaydı açılmaz, mevcut kayıtlar silinmez/arşivlenmez, okunabilir).
-> Deneme **1 hafta (2026-10-08)**; beğenilirse Linear iş kaydı için emekli edilir, beğenilmezse bu belge geri
-> yazılır. Aşağıda "Linear" tarihçe ya da donuk arşiv anlamındadır; canlı kural "Kanban"dır.
+> Deneme **1 hafta (2026-10-08)** sürdü ve **kesinleşti (karar 324, Recep 2026-10-08)**: Linear iş kaydı olarak
+> **EMEKLİDİR**; yalnız Design yorum kanalı ve eski kayıt arşivi olarak kalır, hiçbir şey silinmez. Aşağıda "Linear"
+> tarihçe ya da arşiv anlamındadır; canlı kural "Kanban"dır.
 > **Niçin var:** 2026-08-26'da "açık" görünen 120 kaydın 54'ü ZATEN YAPILMIŞTI, 19'u
 > tanımlanamayacak kadar kötü açılmıştı, 5 kimlik çakışıyordu. Sistem geçmişini bilmiyordu;
 > aynı iş yeniden öne sürülebiliyordu. Bu cetvel o sınıfı kapatır.
@@ -16921,15 +17444,16 @@ korur. **Kısa ad tablosu yalnız bu belgededir; diğer belgeler bu tabloya atı
 | MEVZUAT | `MVZ` | `MVZ-1` |
 | SATIS | `STS` | `STS-1` |
 | TASARIM | `TSR` | `TSR-1` |
+| TAKIP (karar 322) | `TKP` | `TKP-1` |
 
 OPS ve SEO zaten üç harf olduğu için aynı kalır; I18N harf-rakam karışık olduğu için `DIL` alır (biçim: 2-4 büyük harf).
 Tabloda olmayan departman ilk kartını açmadan önce
 OPS'tan kısa ad alır ve OPS bu tabloya satır ekler; kısa ad elle uydurulmaz.
 
-**Design istisnası (karar 219, DENEME BOYUNCA, 2026-10-08'e kadar):** "Linear donuk" yalnız İŞ KAYDI içindir.
+**Design istisnası (karar 219, KALICI: karar 324, 2026-10-08):** "Linear emekli" yalnız İŞ KAYDI içindir.
 Claude Design Kanban'a yazamaz (`olcum/erisim-envanteri.md`); karar yorumları Linear PROJE yorumlarında açık kalır
-ve sayaç kancası ile `ops-iletisim-protokolu.md` yerinde durur. Deneme bitişinde beğenilirse Design için ayrı yol
-(kartta dosya ya da panoya yorum) kurulur; bu madde o zaman yeniden yazılır.
+ve sayaç kancası ile `ops-iletisim-protokolu.md` yerinde durur. Design için ayrı bir yol (kartta dosya ya da panoya
+yorum) kurulursa bu madde o zaman yeniden yazılır.
 
 ## 2. Kart AÇMA şablonu (Kanban)
 
@@ -16976,14 +17500,15 @@ cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
   **önce ardıl kayıt açılır, sonra eski kayıt ona işaret ederek kapanır** (ORION §6).
 - **Kart yaşam döngüsü (karar 219; karar 187'nin Kanban karşılığı, Recep 2026-10-01).** Kanban'da otomatik
   kapanış YOKTUR: kart **kanıtla, elle** Done'a çekilir (§6.1: tek komut, çıkış koduyla konuşur).
-  - Her PR gövdesi `Kanban: <numara>` satırı taşır (`Kanban: HRT-2`; taşınan kart için `Kanban: REC-538`).
+  - Her PR gövdesinin İLK satırı `Kanban: <numara>` olur (`Kanban: HRT-2`; taşınan kart için `Kanban: REC-538`); numara aşağıda gömülü kalırsa
+    `node scripts/belge/kart-plan-kapisi.cjs --pr-govde-dosyasi <govde.md>` kırmızı verir (HRT-46; yerelde koşar, CI'da değil).
     Kapı bu satırı kabul eder (ARAÇ, PR 0).
-  - **Geçiş penceresi (2026-10-08'e kadar):** kapı eski kalıpları da kabul eder: `Fixes REC-nn` (Linear'ın GitHub bağı
-    donuk REC-nn kaydında çalışmaya devam eder ve o kaydı kapatır) ve `Kayıtsız: <sebep>`. Pencere bitince `Fixes`
-    kalkar (ARAÇ, PR 2); deneme beğenilmezse kalıcı olur ve bu belge geri yazılır.
+  - **Geçiş penceresi KAPANDI (2026-10-08, karar 324):** kapı yalnız `Kanban:` satırını kabul eder; eski kalıplar
+    `Fixes REC-nn` ve `Kayıtsız: <sebep>` ertesi günden beri KIRMIZI verir (`scripts/board/pr-kayit-kapisi.cjs`,
+    `ESKI_YOL_SON_GUN`). Kartsız iş yoktur: önce kart açılır.
   - Birden fazla PR'lık iş, her biri tek PR'la biten **alt kartlara** bölünür (karar 187 ilkesi korunur); her PR kendi
-    alt kartını taşır, çatı karta doğrudan bağlanmaz. Pencere boyunca çatı REC-nn kaydına `Fixes`/`Closes`/`Resolves`
-    yazılmaz (Linear o kaydı birleşmede kapatır; 2026-09-29'da REC-433 çatısı bu riske girdi, birleşmeden önce
+    alt kartını taşır, çatı karta doğrudan bağlanmaz. Çatı REC-nn kaydına `Fixes`/`Closes`/`Resolves`
+    yazılmaz (Linear'ın GitHub bağı o kaydı birleşmede kapatır; 2026-09-29'da REC-433 çatısı bu riske girdi, birleşmeden önce
     yakalandı).
   - **Çatı kartı alt kart almaz, bağlantılı kart alır.** Çatı = program, plan, kalıcı defter, kapsamı zamanla büyüyen
     iş (REC-425 talimat defteri, REC-345 bağımlılık programı, REC-206 katalog hattı, REC-433 tek plan, REC-400 belge
@@ -17042,8 +17567,8 @@ kondu; departman gerçekten üzerinde çalıştığını In Progress'e kendisi a
 
 ## 6.1 Kanban tam kullanım (pilot: karar 46, 2026-09-18; tam kullanım: karar 219, 2026-10-01)
 
-**Kapsam (karar 219):** her iş için Kanban'da kart açılır; tüm iş takibi Kanban'dadır, Linear donuktur. Panolar:
-ortak "Bekleyenler" panosu + departman başına bir pano. Deneme **1 hafta (2026-10-08)**; pilotun ölçülmüş
+**Kapsam (karar 219):** her iş için Kanban'da kart açılır; tüm iş takibi Kanban'dadır, Linear iş kaydı olarak emeklidir (karar 324). Panolar:
+ortak "Bekleyenler" panosu + departman başına bir pano. 1 haftalık deneme 2026-10-08'de kesinleşti; pilotun ölçülmüş
 tuzakları ve kart kanıt kuralları aşağıda aynen geçerlidir (pilot sırasında Linear yanında koşuyordu; artık yerine geçti).
 
 **Kart biçimi:** başlığın ilk satırı kart numarasıyla başlar (§1: `<KISA AD>-<sayı>`; Linear'dan taşınan kartta
@@ -17051,6 +17576,21 @@ tuzakları ve kart kanıt kuralları aşağıda aynen geçerlidir (pilot sıras�
 Kartın **Done**'a geçmesi için kanıt zorunludur: `gh pr checks <PR>` çıktısı ya da eşdeğeri.
 "Bitti", "tamam", "çalışıyor" gibi tek kelimelik özet **reddedilir** (aracın kendi belirsizlik
 süzgeci de bunları eliyor — ölçüldü).
+
+**Teslim notu (OPS 2026-10-09, HRT-44):** Done'a geçen her kartta, geçiş gününde yazılmış en az bir dolu not bulunur
+(yazar `system` olmayan, en az 10 harf ya da rakam içeren; nokta, boşluk, emoji not değildir). Not teslimin yerini söyler: dosya yolu
+ya da PR numarası + iki satır özet; `→`, `KANIT:`, `#<PR no>` ya da commit kısaltması "kanıt izi" sayılır. Ölçü:
+`node scripts/board/kart-not-sayimi.cjs` (şerit başına "Done(bugün) N, notsuz M: <no [kısa kimlik]>"; notsuz varsa çıkış 1; eşik **0**;
+`--kanit-zorunlu` ile kanıtsız not da eksik sayılır; ölçülemeyen hal çıkış 2, "temiz" sayılmaz).
+"Bugün Done oldu" Done'a geçiş anıdır: `completedAt`, yoksa Kanban olay kaydındaki son Done taşıması (`doneAt`; Done kolonundaki arşivli
+kartlarda `completedAt` boştur), ikisi de yoksa `sonAnlamli` ve satır "yaklaşık" diye işaretlenir. `sonAnlamli` ilk tercih DEĞİLDİR: eski
+karta bugün düşülen not onu bugüne taşır. Betik yalnız Done kolonundaki kartı sayar; hiç Done'a çekilmemiş teslim (kart Backlog'da
+kalmış, PR birleşmiş) bu ölçüye girmez; onu `node scripts/board/teslim-kart-koprusu.cjs` ölçer (bugün origin/master'a giren her PR'ın
+numarası (`#N`, `PR N` ya da `.../pull/N`; komşu numara anmak sayılmaz: `#17`, `#1786`'yı karşılamaz) ya da tek başına duran en az 7
+karakterlik commit kısaltması o gün yazılmış bir kart notunda geçmeli; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)";
+eşik **0**; ölçülemeyen hal çıkış 2). Dependabot birleştirmeleri (başlığı `chore(deps…):`, `chore(ci…):` ya da `chore(tools…):`;
+önekler `.github/dependabot.yml`'deki `commit-message.prefix` değerleridir, test ikisini eşit tutar) teslim sayılmaz: ayrı
+"Bot PR" satırında görünür, çıkış kodunu etkilemez (OPS 10-10). İkisi birlikte koşulur; notsuz bulunan teslim sahibine yazılır, OPS'a özet gider.
 
 **Ölçülmüş tuzaklar ve karşılıkları:**
 
@@ -17089,9 +17629,51 @@ eksisidir. Toplu giriş MCP aracıyla tek tek DEĞİL, sunucuya stdio üzerinden
 (OPS 2026-10-01: 154 kart, hata 0, pencere bağlamına yük binmedi); `create_from_graph`/`sync_task_graph` toplu girişte
 KULLANILMAZ (yukarıdaki tuzak: yönetilmeyen pano, kanıtsız Done).
 
-**Denemenin ölçütü (2026-10-08'de değerlendirilir):** dört ölçü karşılaştırılır — (a) kart açılmadan kalan iş
+**Denemenin ölçütü (2026-10-08'de değerlendirildi; sonuç karar 324: Linear iş kaydı olarak emekli):** dört ölçü karşılaştırıldı — (a) kart açılmadan kalan iş
 sayısı, (b) Done'a kanıtsız geçme denemesi sayısı, (c) Linear'a sızan yeni iş kaydı sayısı (donukluk ihlali), (d) Recep panodan durumu kendi gözüyle görebildi mi (ARC-5 sayfası).
 Deneme "iyi hissettirdi" diye sürdürülmez; sayılar OPS'tan Recep'e tek tabloyla gider.
+
+---
+
+## 6.2 RECEP YETKİSİ satırı (ARC-95, 2026-10-12)
+
+**Niçin:** Yetkisi zaten verilmiş iş tekrar tekrar Recep'e soru olarak geldi; kural yazılıydı
+(`.claude/rules/filo-ortak.md` "Onay nerede verilir", karar 317 ailesi) ama uygulayan kapı yoktu.
+
+**Kural:** Recep'e bağlanan her kartın (etiket `recep-bekliyor` ya da `karar-bekliyor`, ya da atananı `Sen`/`Recep`)
+açıklamasında satır başında şu satır bulunur:
+
+```
+RECEP YETKİSİ: <gerekçe>
+```
+
+Gerekçe YALNIZ şu altı sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
+yazımı fark etmez):
+
+| Gerekçe | Ne zaman |
+|---|---|
+| canlı yazım | Canlı veriye (fiyat, katalog, ürün satırı) yazan betik/iş |
+| migration birleştirme | Migration içeren PR'ın master'a birleşmesi (kural 13) |
+| gerçek para | Ödeme, fatura, ücretli abonelik/alım |
+| geri alınamaz silme | Geri dönüşü olmayan silme |
+| yeni görünüm/iddia/yapı kararı | Vitrinde/metinde yeni görünüm, yeni iddia ya da yapı kararı (üç biçim de geçerli) |
+| hesap/ayar dosyası | Hesap, kimlik ya da izin/ayar dosyası değişikliği |
+
+Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerekçe liste dışıysa kapı kırmızı verir
+("bu işin yetkisi zaten verilmiş, yap").
+
+**Kapı:** `.claude/hooks/kartsiz-beklenti-kapisi.cjs` (Stop kancası) ikinci denetim olarak yürütür; birinci denetim
+(istek maddesinin kartı var mı, kart açık ve Recep'e bağlı mı) geçince, anılan kartın TAM açıklaması
+(`kanban-anlik.cjs --detay`) okunup satır aranır. Testi: `src/__tests__/conformance/kanca-kartsiz-beklenti-kapisi.test.ts`
+(INV-KARTSIZ-KAPI-10, -11; altı bozma yakalandı).
+
+**Sınırlar (bilinçli):**
+
+- Ayrıntı okuması çökerse tur GEÇER (fail-open) ama durum dosyası ve stderr "denetim ölçülemedi" der; sessiz değildir.
+- Mesajda `Kartsız: <sebep>` atlatması önceki gibi çalışır ve bu denetimi de atlar; sebep `kartsiz-atlatma.log`'a düşer.
+- Gerekçe satırı yalnız VARLIĞINI ve sınıfını doğrular; sınıfın doğru seçilip seçilmediğine (ör. canlı yazım olmayan işe
+  "canlı yazım" yazmak) kapı bakamaz: o OPS'un kart incelemesidir.
+- Atananı `Sen`/`Recep` olup etiketsiz kart da Recep'e bağlı sayılır (birinci denetimde de geçerli).
 
 ---
 
@@ -23563,6 +24145,10 @@ sırası gelince sıfırdan yazılır.
 AB/TR tarih kuralı.
 **2026-09-29 (REC-452, GEO-SEO):** R3.2 ters bağlantı — kategori, aile ve ana sayfadan rehbere yol;
 INV-REHBER-TERS-BAGLANTI-1.
+**2026-10-11 (BLG-3, OPS hükmü):** R5.7 — onay ara önizlemeyle sorulur, gerçek sayfa yayından sonra
+gösterilir (frekans emsali, karar 120/135); "yayına giremeyecek metnin onayı sorulmaz" sınırı korunur ve
+ölçülebilir hâle geldi: kimlikler güncel slug'a çözülmeli. Tetik ölçüm: sıra 2 yazısında dört aile kimliği
+6 Ekim yeniden adlandırması öncesi slug'la duruyordu (sha256 değişir, R5.5).
 
 ---
 
@@ -23875,6 +24461,9 @@ v0.4'ten beri "URUN'un sayfa işi" diye yazılıydı ama emre bağlanmamıştı 
    either JobPosting or BroadcastEvent embedded in a VideoObject."*
    (developers.google.com/search/apis/indexing-api/v3/quickstart, ham HTML, "Last updated 2026-07-16",
    erişim 2026-09-24). Yazılar site haritası + tazeleme ile duyurulur.
+10. **Şirket iddiası ve reklam dili yok** (HRT-46): yazıda firma, kurum, ekip, kuruluş yılı, referans ya da "biz"
+    dili ve reklam dili kullanılmaz; tek istisna marka adı VentHub'dır. Aynı kural sözlük metni için
+    `i18n-localization-standard.md` §4'te de yazılıdır.
 
 ## R5 — Doğrulama (ajanlarda)
 
@@ -23956,11 +24545,19 @@ sha256'sının ilk 12 hanesini gösterir; Recep'in onayladığı metin doğrulan
 Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü). İlk yazı beklemez; yayın bekler:
 - Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Kanban kartında (not + depo dışı dosya yolu; eski kayıt Linear REC-369)** tutulur
   (özel; PUBLIC depo değil — R4.8).
-- ⛔**Rota ve sayfa gelmeden Recep'e yayın onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
-  bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi). Yayına giremeyecek
-  metnin onayı karar değildir; "senden beklenen" diye sunulamaz. Ara önizleme yalnız **bilgi** içindir;
-  onay sorusu yazı gerçek sayfasında (R5.6) görülebildiğinde, tek soru olarak gider. Doğrulanmış metnin
-  sha256'sı o güne kadar değişmezse aynı metin gider.
+- **Onay ara önizlemeyle sorulur; gerçek sayfa yayından sonra gösterilir** (OPS hükmü 2026-10-11; emsal:
+  frekans konvertörü yazısı, karar 120 ve 135). Yayın yolu çalışır (`yazilar.ts` → `[yazi]` rotası; frekans
+  yazısı canlıda), ama R5.6 önizleme rotası yoktur ve dal önizlemeleri kapalıdır: gerçek sayfa yayından
+  önce görülemez. Bu yüzden onay sorusu ara önizleme (aşağıdaki claude.ai sayfası) ve R5.4'ün özetiyle gider;
+  önizleme sayfa kabuğunu temsil eder, metin birebirdir. Recep'in "evet"i yayına girme iznidir; yayından
+  sonra gerçek sayfa Recep'e ayrıca gösterilir, kabuk ya da görsel farkı varsa ayrı iş olur.
+- ⛔**Sınır aynıdır: yayına giremeyecek metnin onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
+  bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi); "senden beklenen"
+  diye sunulamaz. Soru gitmeden önce yayın yolunun BU metin için çalıştığı ölçülmüş olmalıdır: bağlantı
+  kimlikleri güncel slug'a çözülür (kimlik eskiyse derleme durur; ölçü: son aile/kategori yeniden adlandırma
+  migration'ının eski-yeni çiftleri), yayını bloke eden açık karar yoktur ya da tarihi OPS'ta yazılıdır.
+  Doğrulanmış metnin sha256'sı soru ile yayın arasında değişirse (bağlantı kimliği güncellemesi dahil) yeni
+  sha256 ve fark soruda gösterilir; R5.5 uyarınca durum taslağa düşer, bağımsız tur yeniden koşar.
 - Ara önizleme rota gelene kadar **özel bir claude.ai sayfasıdır** (Artifact; varsayılan olarak
   yalnız sahibine açık, arama motoruna kapalı — R4.8'i çiğnemez). Sayfa doğrulanan markdown'dan üretilir,
   sha256'nın ilk 12 hanesini gösterir; metin değişirse sayfa aynı adreste yeniden yayınlanır.
@@ -24106,8 +24703,8 @@ kurala karşı tarandı ve ölçüm geçmişine sınıfıyla yazıldı.
 
 | Sınıf | Nasıl | Nerede | Neden |
 |---|---|---|---|
-| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
-| **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · hakkımızda · iletişim | İçerik deploy dışında değişmez |
+| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP) · **hakkımızda** (canlı marka/ürün/aile sayacı, URN-75). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
+| **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · iletişim | İçerik deploy dışında değişmez |
 | **Dinamik** | `export const dynamic = 'force-dynamic'` | Admin/** · hesap/** · API rotaları | Kullanıcıya/oturuma özel; önbelleklenirse veri sızar |
 
 **`ssr: false` ana rotalarda YASAK** (CLAUDE.md kural 4). İstemci-tarafı veri gerektiren
@@ -24189,9 +24786,17 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu + (varsa) **ailenin SERİSİ** — keşif tag'lerine DOKUNMAZ (PS-042) |
 | `product_images` | `on_product_images_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + keşif tag'leri + `/sitemap.xml` — ⚠️ tablo bugün **0 satır**; zincir T069 görsel yüklemesinden ÖNCE yerinde olmalı (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
 | `brands` | `on_brands_change` | var | markanın **tüm ailelerinin** PDP yolları + keşif tag'leri |
-| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout) yeniden üretilir; keşif/ana sayfa etiketlerine DOKUNMAZ. Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
+| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout, ödeme sonucu ve **ana sayfa**: ürün vitrini bloğunun çizim kapısı, URN-98 2026-10-10) yeniden üretilir; keşif etiketlerine DOKUNMAZ. Ana sayfa bu sarmalı `unstable_cache` içinde okur: içindeki `no-store` fetch Next 15.5.27'de o kapsamda sayfayı dinamik işaretlemez, `resolveTenant(undefined)` başlık okumaz, yani sınıf statik kalır (bekçi INV-ANASAYFA-STATIK-1 + INV-ANASAYFA-VITRIN-1). Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
+> **HAKKIMIZDA SAYACI (URN-75, 2026-10-09).** `/[lang]/about` artık `tam statik` DEĞİL: marka / aktif ürün / aile sayısı
+> `getSiteSayaclari` ile canlı veriden gelir (`src/app/_components/siteSayaclari.ts`, `unstable_cache`, anahtar
+> `['site-sayaclari', lang, tenantId]`, etiket `PRODUCTS_DISCOVERY_TAG` + `discoveryTag(tenantId)`, `revalidate = 3600`).
+> Dayandığı üç tablo (`products` status/family_id/deleted_at, `product_families`, `brands`) keşif etiketini ZATEN tazelediği için
+> yeni tetik/handler dalı gerekmedi. Okunamazsa sayaç `null` olur ve kartlar çizilmez (uydurma sayı yok). Kapı:
+> `INV-HAKKIMIZDA-SAYAC-1` (`src/__tests__/conformance/hakkimizda-sayac.test.ts`). **Canlı tazeleme ölçümü** (§1.1: ürün değişince sayfanın
+> gerçekten yenilendiği) yayın sonrası ayrıca yapılır; bu kapı kaynağı ölçer.
+>
 > **SİTE HARİTASI MODEL `lastmod`'U (REC-300 3e-2, 2026-10-02):** model adresinin `lastModified`'ı `products.updated_at`'tir; `on_products_change` tetiği değere bakmadığı için aynı değerli toplu UPDATE de modelin `updated_at`'ini kaydırır ("hepsi değişti" sinyali) — bilinçli kabul, tetiği değere duyarlı yapmak ayrı ALTYAPI kartıdır.
 
 > **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı
@@ -24204,9 +24809,10 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
 > her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
 > olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
-> Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
-> bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
-> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
+> Kategori dalı (SEO-35 B-1): iki şemada da dalın adresi TEK segmenttir (yeni: `/tr/kategori/<alt>`, EN `/en/category/<alt>`;
+> bugünkü: `/<dil>/category/<alt>`), dal nesnesi kök nesnesiyle aynı yolu üretir ve küme tekilleştirir. İç içe
+> `/<dil>/category/<üst>/<alt>` ve `/tr/kategori/<üst>/<alt>` yolları HİÇBİR kipte üretilmez: yalnız 308'dir, önbelleği yok
+> (URN-7 ölçümü 2026-10-01). Kapı: `INV-TAZELEME-YOL-1`, `INV-TAZELEME-YOL-3` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
 > products dalı, ürün SKU'su (UPDATE'te eski SKU da) `yayindaModeller` listesindeyse modelin TR + EN sayfa yolunu
 > (`/tr/urun/<slug>-p-<sku>`) `skuModelYollari` (adres tek noktası `adresUret`) ile tazeler; liste dışı SKU ve boş listede
 > ek yol yoktur, çağrı başına en çok 4 ek yol. Kapı: `INV-WEBHOOK-MODEL-YOLU-1`
@@ -24380,6 +24986,28 @@ notu bunu açıkça yasaklıyor.
 > **Açık kalem (marka sayfaları):** `/[lang]/brands/[slug]` hâlâ ilan taşımıyor ve 2 işaret
 > üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
 > yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
+
+### 3.4 Marka sayfası (`/[lang]/brands/[slug]`) — DB'den türeyen gövde özeti, URN-79 (2026-10-09)
+
+Marka sayfasının gövdesi üretici övgüsü yerine markanın sitedeki **ürün ailelerini ve kategorilerini** DB'den yazar
+(`markaSayfasi.tsx` → `getBrandCatalogSummary`, sözlük şablonu `brands.detail.catalog*`). Statik sayfada görünen her tablo için
+zincir (§3 kuralı) — hepsi aynı keşif etiketine bağlanır, yeni önbellek biçimi YOKTUR:
+
+| Marka sayfasında görünen | Kaynak | Tetik + handler | Keşif etiketini tazeliyor mu |
+|---|---|---|---|
+| Aile sayısı + aile adları (`name`, `name_i18n`) | `product_families` (+ `products.status='active'` süzgeci, RPC) | `on_product_families_change`, `on_products_change` | **EVET** — `PRODUCTS_DISCOVERY_TAG` |
+| Kategori adları (alt kategori, yoksa ana kategori; yalnız `is_active`) | `categories` | `on_categories_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
+| Marka eşleşmesi (`p_brand` adı) | `brands` | `on_brands_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
+
+Önbellek: `unstable_cache`, anahtar `['brand-catalog-summary', lang, tenantId, markaAdı]` (kural 12), etiketler
+`[PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)]`, `revalidate: 3600` emniyet kemeri — aile sayısı için kurulan
+`brand-active-product-count` sarmalıyla AYNI desen. Kapı: `markaKaynagi.test.ts` "katalog özeti önbellek sarmalı".
+
+**Hata yolu SAYIDAN FARKLIDIR (bilerek):** aile SAYISI okunamazsa karar fırlatır (yanlış "ürünsüz" noindex + harita dışı yazar,
+bkz. `markaUrunDurumu.ts`); bu ÖZET ise isteğe bağlı metindir — okunamazsa sayfa özet paragrafsız çizilir, uyarı basılır, hata
+önbelleğe YAZILMAZ ve sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Ürünsüz markada (sayı 0) özet sorgusu hiç atılmaz.
+Üst veri (`<title>`/meta description) ve Brand JSON-LD bu özeti KULLANMAZ: yalnız kayıttaki nötr cümleden türer
+(`markaAciklamasi`, tek kaynak) — arama sonucu açıklaması DB gecikmesine/hatasına bağlanmaz.
 
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 
@@ -24709,6 +25337,49 @@ o rolde `bypassrls = true`, yani politikalar hiç değerlendirilmez.
 içinde verilir. O yüzden karar mercii hâline gelmiş yardımcıların **tam gövdesi** ayrı
 okundu. `is_admin_user` yalnız `claims ->> 'user_role'` ve `app_metadata ->> 'user_role'`
 dallarını okuyor, `user_metadata`'yı bilerek okumuyor (CLAUDE.md kural 12).
+
+## 9 · BAYAT ROL: `is_admin_user()` token'dan okur (ALT-74 hükmü, 2026-10-12)
+
+Otomatik güvenlik taraması (12 Ekim) `is_admin_user()` için "rol JWT claim'inden okunuyor, `user_profiles`
+ile karşılaştırılmıyor; rolü düşürülen kullanıcının eski oturumu token süresi dolana kadar yetkili kalır"
+dedi. **Hüküm: mekanizma gerçek, bugünkü zarar sıfır, sınıf `ilk satıştan önce`.**
+
+| Soru | Ölçüm (2026-10-12, canlı salt okuma + kaynak) |
+|---|---|
+| Fonksiyon neyi okuyor? | Önce `claims ->> 'user_role'`, sonra `app_metadata ->> 'user_role'` (access-token hook'u token üretirken yazar); claim yoksa (tetik/betik bağlamı) `user_profiles`. Canlı gövde `20260818081500_role_source_single_authority.sql` ile aynı. Claim VARSA tabloya bakılmaz. |
+| Kim getirdi? | Karar 95 / #1852 değil. Bu davranış T047'den (18 Ağustos) beri; #1852 yalnız 16 politikayı bu fonksiyona bağladı. |
+| Bayat pencere ne kadar? | Rolün düşürüldüğü an ile kullanıcının access token'ının süresi dolması arası. Süre ölçülmedi (`supabase/config.toml`'da `jwt_expiry` satırı yok; Supabase varsayılanı 1 saattir, proje ayarı panelden okunmalı). Token yenilenince hook yeniden koşar ve yeni rol claim'e girer. |
+| Oturum iptal yolu var mı? | Hayır. Uygulamadaki rol değiştirme yolu: yönetim paneli toplu "Rol Değiştir" → `setUserAdminRole` (`src/config/admin.ts`) → `set_user_admin_role` RPC'si (DEFINER; kapı: çağıranın `user_profiles` rolü admin/super_admin, tablodan okunur). RPC yalnız `user_profiles` satırını yazar; `auth.sessions` temizliği ya da `signOut` yok (`git grep`, migrations + src + functions: 0). |
+| Bugünkü zarar? | Yok: `user_profiles` dağılımı `super_admin` 2, `user` 1; `admin`, `moderator`, `warehouse` 0. Düşürülecek rolü taşıyan hesap yok. |
+
+**Kapanış seçenekleri (kazanç / bedel):**
+
+| Seçenek | Kazanç | Bedel |
+|---|---|---|
+| A · Rolü düşürürken aynı anda o kullanıcının oturumları kapatılır: ya elle prosedür (Supabase panelinden oturum kapatma), ya `set_user_admin_role` gövdesine `auth.sessions` temizliği eklenir | Pencere token ömrünün tamamından "yenileme anına" iner (refresh token da iptal edilirse yeni token alınamaz) | Elle prosedür unutulabilir; gövdeye eklemek migration'dır (kural 13, Recep onayı) ve DEFINER fonksiyonun `auth` şemasına yazma yetkisini sorgulatır |
+| B · Kısa token ömrü (panel ayarı) | Pencere token ömrüyle sınırlı, kod değişmez | Daha sık yenileme; ayar paneldedir (OPS), repoda izi yok |
+| C · Kritik yazmalarda tabloyla çift kontrol (fonksiyonu `user_profiles`'a her çağrıda da bakar hâle getirmek) | Pencere 0 | Fonksiyonun güven duruşu değişir (`20260818081500` migration notundaki W2 / plan §7 E2 ayrı kararı), her RLS değerlendirmesinde ek okuma, migration = kural 13 (Recep onayı) |
+
+**Öneri:** A'nın elle prosedürü şimdi (bugün rolü düşürülecek hesap yok, prosedür yazılı dursun); gövdeye ekleme ve C çok
+kiracılı faz ile birlikte (kural 12, Faz 2 PARK). B yalnız Recep isterse.
+
+**Yan bulgu (hüküm yok, bilgi):** `set_user_role(uuid, text)` DEFINER ve gövdesinde HİÇ yetki kapısı yok; yalnız ACL
+koruyor (canlı ölçüm: EXECUTE yalnız `postgres` ve `service_role`; `anon` ve `authenticated` false). Bugün kapalı;
+bir `GRANT` ya da `CREATE OR REPLACE` ile ACL sıfırlanırsa kapı gövdede yok. Gövdeye kapı eklenmesi ADMIN/ALTYAPI işi.
+
+**Aynı taramanın üç DEFINER fonksiyonu (canlı gövdeler okundu):**
+
+- `adjust_stock` (iki imza): kapıyı `user_profiles.role`'den **tablodan** okur (bayat değil); rol listesinde `warehouse` ve
+  `moderator` var; `UPDATE products` kiracı süzgeçsiz (`id` ile). Tek kiracıda etki yok.
+- `admin_list_all_users`: kapı `user_profiles` tablosundan; listede `moderator` var ve `auth.users` e-postalarını
+  döndürür, kiracı süzgeci yok. Moderatör rolü bugün 0 hesapta; karar 95'in (moderatör satın alma maliyetini görmez) kişisel
+  veri karşılığı sorulacak: moderatör tüm kullanıcı e-postalarını görmeli mi (ADMIN/Recep kararı).
+- `anonymize_user_personal_data`: kapısı `is_admin_user()` (bu bölümün bayat pencereli kaynağı), `p_user_id` için
+  kiracı denetimi yok; silme/anonimleştirme geri alınamaz. Tek kiracıda yönetici zaten tüm veriyi yönetir; ikinci kiracı
+  geldiği gün kiracılar arası silme riski doğar → Faz 2 (çok kiracı) işi, `ilk satıştan önce` değil.
+
+⚠Bu bölüm **ölçüm ve hüküm**dür; hiçbir fonksiyon değiştirilmedi. Değişiklik gerektiren seçenekler (C ve üç fonksiyonun
+rol listesi/kiracı süzgeci) migration olduğundan kural 13 ve karar sahibi Recep/ADMIN'dir.
 
 
 ---
@@ -25198,7 +25869,7 @@ Sıra: **önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm →
 
 | # | kalem | ölçüm | sahibi |
 |---|---|---|---|
-| K1 | Yasal sayfalarda yer tutucu yok | canlı 12 yasal sayfa gövdesi: ham `[X_Y]` = 0 **ve** görünüm metni ("Şirket bilgileri kuruluşla eklenecek"/EN) = 0 (görünüm metni ham yer tutucuyu GİZLER; yalnız ham=0 yeşil verirdi) · muaf olabilir | Recep + URUN |
+| K1 | Yasal sayfalarda yer tutucu yok | canlı 12 yasal sayfa gövdesi: ham `[X_Y]` = 0 **ve** görünüm metni ("Bilgi eklenecek"/"To be added", URN-94: eski "kuruluşla eklenecek" metni şirket durumu beyanı olduğu için kalktı) = 0 (görünüm metni ham yer tutucuyu GİZLER; yalnız ham=0 yeşil verirdi) · muaf olabilir | Recep + URUN |
 | K2 | Ödeme ortamı canlı | `healthz` **anon JWT ile**: `durum=saglikli` ve `odeme_ortami='prod'`. **Sınır:** yalnız konak adı ölçütü; İyzico anahtar çiftinin geçerliliğini KANITLAMAZ | Recep + ALTYAPI |
 | K3 | Edge satış kapısı canlıda | `iyzico-payment` boş sepet probu: `403 SALES_CLOSED` (`409 VALIDATION_EMPTY_CART` = kapı yok). Anahtar zaten açıksa onarımdır, probe uygulanmaz. Kimlik yoksa ölçülemedi | ALTYAPI (REC-355) |
 | K4 | `site_settings` kilidi + RPC + webhook tetikleri | `pg_policy` (2 RESTRICTIVE), `satis_kipi_oku()` var, 3 tetik `tgenabled='O'`; `SUPABASE_DB_URL` yoksa ölçülemedi | URUN |
@@ -25620,6 +26291,29 @@ kavramı iki birimde taşır. İkisi bin kat farklıdır; aynı sütuna konursa 
 ve `discharge_velocity_curve` (8) ise nesne dizisi (`{"airflow_m3h":…, "efficiency_pct":…}`).
 Aynı tabloda **üç farklı şekil**. Okuyan taraf şekli varsaymaz, tanır ve tanıyamadığında
 uydurmaz (bkz. `ductFanSelection.parsePQCurve`).
+
+**Eğrinin kaynağı etiketlidir — `pq_curve_kaynak` (karar 320, 2026-10-08).** `pq_curve` taşıyan
+her kayıt, eğrinin nereden geldiğini yanında söyler. Üç değer vardır, dördüncü yoktur:
+
+| Değer | Anlamı |
+|---|---|
+| `kitapcik_tablo` | noktalar kitapçıktaki sayısal tablodan alındı |
+| `kitapcik_grafik` | noktalar kitapçıktaki grafikten okundu (catalog-ingestion §6.3 "Eğri çizimi": yöntem, ±%2 kapısı ve sapma kayıtlı) |
+| `turetilmis` | noktalar azami debi ve azami basınçtan HESAPLA kuruldu; ölçüm DEĞİL |
+
+**Boş etiket "bilinmiyor" demektir** ve yalnız bu karardan ÖNCE yüklenmiş kayıtlarda bulunabilir; seçici
+etiketsiz eğriyi "yaklaşık" sayar. Yeni yüklemede boş etiket KABUL EDİLMEZ
+(`scripts/kademe2-load/planla.mjs` `pqKapisi`: etiketsiz eğri plan KIRMIZI).
+
+Kapı ayrıca şunu durdurur: orta debi tam `Qmax/2` ve orta basınç tam `%50` ya da `%75·Pmax` olan üç
+noktalı eğri `turetilmis` dışında bir etiket taşıyamaz. Bu kapı gerçeği HÜKMETMEZ — desene uymayan
+ama uydurma bir eğriyi etiketliyse geçirir — etiketsizliği ve "hesaplanmış ama ölçüm diye etiketli"
+yalanını durdurur. Gerçek doğruluk §6.3'ün ±%2 kapısının işidir.
+
+*Niçin:* 2026-10-08 ölçümü (`docs/audits/ktl7-pq-egri-olcumu-2026-10-08.md`) — 141 üç noktalı eğrinin
+ortadaki noktası kitapçıktan okunmamıştı: 58 ürün `%75`, 48 ürün `%50` formülüyle, 35 ürün (QBK, AVenS Plug)
+betiğe elle yazılmış değerle kurulmuştu; etiket olmadığı için seçici hepsini ölçüm sandı ve eğriler düz
+çizgi gibi göründü.
 
 ## 3. Yeni marka / yeni kaynak bağlanırken
 
@@ -26434,9 +27128,9 @@ yönetildiğini söyler) · kural 8/9 (`tokens.js` SSOT, R3F).
 ---
 # FILE: docs\standards\test-karnesi-standard.md
 
-# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.0
+# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.2
 
-**Sürüm 1.0 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-06 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296**
+**Sürüm 1.2 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-09 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -26444,11 +27138,20 @@ yönetildiğini söyler) · kural 8/9 (`tokens.js` SSOT, R3F).
 > `INV-CI-EDITED-2` → `scripts/ci/__tests__/edited-ayna.test.ts` ·
 > `INV-DUNYA-SATIRI-1` → `src/__tests__/conformance/dunya-durumu-satiri.test.ts` ·
 > `INV-CI-SINIF-1`, `INV-CI-SINIF-2` ve `INV-CI-SINIF-3` → `src/__tests__/conformance/ci-degisiklik-sinifi.test.ts` ·
-> `INV-CI-SHARD-1` ve `INV-CI-SHARD-2` → `src/__tests__/conformance/ci-test-shard.test.ts`
+> `INV-CI-SHARD-1` ve `INV-CI-SHARD-2` → `src/__tests__/conformance/ci-test-shard.test.ts` ·
+> `INV-CI-SECIM-1` → `src/__tests__/conformance/ci-test-secimi.test.ts` ve `src/__tests__/conformance/ci-test-secimi-ifade.test.ts` ·
+> `INV-CI-SECIM-2` → `src/__tests__/conformance/ci-test-secimi-kapsam.test.ts`, `src/__tests__/conformance/ci-test-secimi-hizli.test.ts`, `src/__tests__/conformance/ci-test-secimi-uyum.test.ts` ve `scripts/ci/__tests__/test-shard-secim.test.ts` (ortak yardımcı: `ci-test-secimi.yardimci.ts`) ·
+> `INV-E2E-HIZLI-1` ve `INV-E2E-HIZLI-2` → `src/__tests__/conformance/e2e-hizli-derleme.test.ts` ·
+> `INV-E2E-HIZLI-3` → `src/__tests__/conformance/e2e-smoke-paralel-kurulum.test.ts` ·
+> `INV-E2E-HIZLI-4` → `scripts/ci/__tests__/arka-plan.test.ts` ·
+> `INV-TEST-KARNE-1` → `src/__tests__/conformance/test-karnesi-yapisi.test.ts` ·
+> `INV-TEST-KARNE-2` → `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` ·
+> `INV-TEST-KARNE-3` → `scripts/test-karnesi/__tests__/sabotaj.test.ts` ·
+> `INV-TEST-KARNE-4` → `scripts/test-karnesi/__tests__/karne-uret.test.ts`
 >
-> **Kapsam:** bu sürüm testlerin NEREDE koşacağını yönetir (§1–§5). Her test dosyasının KARNESİ (neyi koruyor, gerçekten
-> kırmızı veriyor mu, ortama bağlı mı, aynısını başka test koruyor mu) ve silme listesi kuralı işin ikinci teslimiyle (ALT-38b)
-> bu dosyaya §6'dan sonra eklenir. O zamana kadar karne bölümü bu cetvelde YOKTUR; "yok" bir eksik değil, işin ikinci teslimidir.
+> **Kapsam:** §1–§6 testlerin NEREDE koşacağını yönetir. §7 her test dosyasının KARNESİNİ (neyi koruyor, gerçekten kırmızı veriyor
+> mu, ortama bağlı mı, aynısını başka test koruyor mu, hangi dosya değişince koşmalı) ve silme listesi kuralını yönetir. Karne bir
+> ölçüm belgesidir, hüküm vermez: hiçbir test Recep onayı olmadan silinmez.
 
 ## 1. Amaç ve ilke
 
@@ -26469,7 +27172,7 @@ yer yazılıdır, yeni yerde gerçekten koştuğunu bir kapı doğrular, kırmı
 
 | Yer | Ne zaman | Hangi testler | Kırmızıda ne olur |
 |---|---|---|---|
-| PR kapısı (`pull_request` olayı: paralel `test-shard` işleri, §4.2; `ci` işinin Test adımı yalnız `edited` koşusunda) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`), her dosya TAM BİR shard'da | kırmızı shard `ci`yi kırmızı yapar (son adım bekler), birleştirme durur |
+| PR kapısı (`pull_request` olayı: paralel `test-shard` işleri, §4.2; `ci` işinin Test adımı yalnız `edited` koşusunda) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`), her dosya TAM BİR shard'da; seçici daraltırsa (§4.3) yalnız seçilenler, şüphede hepsi | kırmızı shard `ci`yi kırmızı yapar (son adım bekler), birleştirme durur |
 | master push (`ci` işi, aynı Test adımı) | master'a her birleşmede | TAM paket, liste dahil (kip boş) | master kırmızı; ⚠ aynı `concurrency` grubunda koşu iptal edilebilir (07-06..10-06: 1119 master koşusunun 419'u iptal), tek başına güvence DEĞİLDİR |
 | Zamanlı (`dunya-durumu.yml`) | 6 saatte bir (`23 */6 * * *`) ve elle | YALNIZ dünya durumu listesi (kip `yalniz`) | iş akışı kırmızı; PR'ı bloklamaz, kanca satırı `DUNYA:` her mesajda gösterir |
 | Yerel `pnpm test` | elle | TAM paket (kip boş) | geliştiricinin terminalinde |
@@ -26593,7 +27296,7 @@ Bu yüzden her dosya bilinen süresiyle (`scripts/ci/test-sureleri.json`, yerel 
   toleransından sonra), fazladan ya da aynı adı taşıyan iş, 900 sn zaman aşımı, üst üste 3 kez okunamayan API ve geçersiz ortam kırmızıdır; doğrulanamayan shard yeşil sayılmaz.
 - Dağıtıcı ya doğru böler ya kırmızı verir: her dosya TAM BİR parçaya girer (birleşim = `vitest list`, kesişim 0); boş parça, tekrar eden dosya, geçersiz N, kök dışı ya da `..` içeren yol, boş liste,
   bozuk süre dosyası ve çalışmayan `vitest list` çıkış kodu 1 verir. Süresi yazılmamış (yeni) dosya varsayılan ağırlıkla dağıtılır: kapsam kaybı sıfır.
-- Shard'ların Test adımı atlanamaz: `if`, `continue-on-error`, `|| true` taşımaz; kabuk açık `bash` (pipefail, `| tee` kırmızıyı yutmaz); `--shard "$SHARD"` matrix numarasını taşır, `--toplam`, matrix
+- Shard'ların Test adımı yalnız §4.3'teki seçim koşuluyla (TAM beklenen satır: seçim kendiliğinden boş değilse ve parçaya test düştüyse koşar) atlanabilir; başka `if`, `continue-on-error`, `|| true` taşımaz; kabuk açık `bash` (pipefail, `| tee` kırmızıyı yutmaz); `--shard "$SHARD"` matrix numarasını taşır, `--toplam`, matrix
   sayısı, `ci`nin `SHARD_TOPLAM`ı ve iş adındaki `/N` AYNI sayıdır. Dünya durumu testleri shard'larda `dislan` kipiyle dışarıda kalır (§3): kapsam kanıtı shard'lar ∪ dünya durumu listesi = tam paket.
 
 **Yeniden koşum kuralı.** Bekleyici yalnız bu denemenin (`run_attempt`) iş listesine bakar; önceki denemenin yeşili bu denemeye TAŞINMAZ. Kısmi yeniden koşumda (yalnız kırmızı işler yeniden koşturulunca) iş listesinde
@@ -26602,6 +27305,78 @@ görünmeyen shard "eksik" sayılır ve `ci` KIRMIZI olur: çare "Re-run all job
 **Sayıyı değiştirmek.** Shard sayısı dört yerde yazılıdır (matrix, `--toplam`, `ci`nin `SHARD_TOPLAM`ı, iş adındaki `/N`) ve `INV-CI-SHARD-1` hepsinin eşitliğini ölçer (adım adındaki `/N` yalnız etikettir).
 Sayı değişince bölme otomatik uyar; denge `INV-CI-SHARD-2`de en yüklü/ortalama <= 1,25 olarak ölçülür. Yeni ağır test dosyası eklenince `scripts/ci/test-sureleri.json`a süresi yazılırsa denge korunur;
 yazılmazsa dosya varsayılan ağırlıkla yine bir parçaya girer (kapsam kaybı olmaz, yalnız denge bozulabilir).
+
+### 4.3 Test seçimi ve belge hızlı yolu: PR'da yalnız değişenle ilgili testler koşar (ALT-38e, karar 308)
+
+**Neden.** PR'da her seferinde ~626 test dosyası koşuyor, belge PR'ının `ci`si de kurulum, Lint, tip ve Deno kapılarını bekliyordu. Çoğu testin girdisi bellidir (içe aktardığı kod ya da koşarken okuduğu dosya); okumadığı bir belge değişince sonucu değişemez.
+
+**Seçici ve harita.** `scripts/ci/test-sec.cjs` (karar mantığı ALT-38d) PR'ın değişen dosyalarından (`git diff HEAD^1 HEAD`) koşacak testleri seçer: küresel dosya (kilit, paket, yapılandırma, iş akışı, `scripts/ci/`, migration) ya da haritanın bilmediği kök `tam`dır; değişen test dosyası seçilir;
+`vitest related` (içe aktarma grafiği) ile ölçülmüş harita (`scripts/ci/test-haritasi.json`: testin koşarken okuduğu dosya/dizin) birleşir; haritada kaydı olmayan, bayat ya da `belirsiz` işaretli test HER ZAMAN koşar. Şüphede, hatada ve okunamayan çıktıda `tam`.
+
+**Bağlama: YALNIZ `test-shard` işlerinde.** Seçici `ci` içinde, master push, elle koşum, `edited` ve zamanlı koşuda HİÇ çalışmaz (o olaylarda tam paket koşar: `ci`nin Test'i ve `dunya-durumu.yml`). Seçici, haritası ve sınıflayıcısı (`degisiklik-sinifi.cjs`: seçici onu önce kendi yanından, yoksa checkout'tan yükler; yanında olmazsa PR'ın kopyası kurulumdan ÖNCE seçici sürecinde koşardı) PR'ın kendi kopyasından değil TABANDAN (`git show HEAD^1:`) çıkarılıp
+`$RUNNER_TEMP/secici/` altında koşar: PR'ın seçici kopyası koşmaz; üçünden biri tabanda yoksa (ilk PR) `tam`. İki geçiş vardır: (1) kurulumdan ÖNCE `--vitestsiz` (vitest açılmaz; yalnız `.md`/`.csv` gibi içe aktarılamaz dosyalar değiştiyse kendisi cevap verir, değilse `tam=true` yazar);
+seçim kendiliğinden BOŞSA (`tam=false` ve `secilen-sayisi=0`: adım bunu SON satırında `bos=true` diye yazar, başka her durumda `bos=false`) Deno, kurulum, V8 önbelleği, ikinci geçiş, dağıtım ve Test atlanır ve iş saniyeler içinde yeşil biter; (2) kurulumdan sonra vitest'li geçiş nihai seçimi verir (vitest'in kendi listesi ve `related` grafiği). Dağıtıcı (`test-shard.cjs --secim ...`)
+yalnız ikinci geçişin çıktısını okur ve doğrular; bölmeyi HER ZAMAN `vitest list`in tam listesi üzerinde (aynı LPT) yapar ve her iş kendi parçasını seçimle SÜZER (tüm işler seçimdeyse birleşim = seçim, kesişim 0). Neden: dört shard işi seçimi birbirinden bağımsız hesaplar;
+biri tam'a düşerse (seçici çöktü, ikinci geçiş kesildi) ve bölme seçim üstünde olsaydı bölmeler ayrışır, seçilen testler hiçbir işte koşmazdı (gerçek seçimlerde bir iş tam'a düşünce 59 seçilenden 11-12, 131 seçilenden 22-27 test hiçbir işte koşmuyordu); tam listede bölününce birleşim her kombinasyonda ⊇ seçim. Bedel: seçilenler
+parçalara seçimin kendi LPT'sine göre değil tam listeninkine göre dağılır; 2026-10-07 ölçümünde belge ve kod PR'larında seçilenin en yüklü/ortalama oranı 1,8-2,0 (seçimin kendi bölmesinde 1,0). Dengeyi bozmayan çözüm seçimi tek yerde (ayrı iş) yapmaktır; ölçüm gerektirirse ayrı iştir.
+Parçaya hiç test düşmezse (seçim az ya da başka parçada) `kos=false` yazar ve o parçada vitest koşmaz. Lifecycle betikleri YALNIZ shard kurulumunda kapalıdır (`--ignore-scripts`): kökün `postinstall`ı `tsc --noEmit` koşturur (~20 sn, her shard'da),
+testler onu kullanmaz; tip denetimi `ci` işindedir ve orada kurulum DEĞİŞMEZ.
+
+**Güvenlik yönü: seçim yalnız DARALTIR.** Dağıtıcıda `tam` harfi harfine `false`, seçilen sayısı geçerli bir tam sayı ve dosyadaki satır sayısına eşit, her yol geçerli ve diskte var, tekrar yok, seçilenin her dosyası `vitest list`te olmalı; biri tutmazsa tam paket dağıtılır ve `::warning::` yazılır.
+Seçici çökerse adım kırmızı olmaz `tam=true` yazar (tabandaki seçici bozulursa onu düzelten PR kilitlenmesin; seçici kendisi asla `tam=false` yazamaz). Kurulum/Test koşulları adımın yazdığı `bos` çıktısını `!= 'true'` ile okur: çıktı eksik, boş ya da başka bir değerse KOŞAR. Seçicinin ham çıktısı koşulda KULLANILMAZ: GitHub eşitsiz türleri sayıya çevirir (null ve `'0'` ikisi de 0), bu yüzden `secilen-sayisi != '0'` yarım çıktıda (`tam=false`, sayı yok) kurulumu ve Test'i sessizce atlatırdı. Tam modda boş parça hâlâ kırmızıdır; boş parça yalnız geçerli seçim modunda meşrudur.
+Seçici çıktısı dağıtıcıya argüman olarak verilir, ortam değişkeni olarak testlerin adımına GİRMEZ (canlı ders #1741: Test adımının ortamı alt süreçlere miras kalır).
+
+**Belge hızlı yolu (`ci` işi).** Sınıf `belge` iken `ci` içinde kurulum (yalnız pnpm deposu önbelleği İSABET ettiyse: `setup-node`'un `cache-hit` çıktısı), Lint, tip, Deno ve edge kapıları ve V8 önbelleği atlanır; PR kayıt kapısı, Secret guard, Döküm kapısı (`.csv` dökümü hızlı yola girer), taban izi ve sınıf adımı HEP koşar. `belge` sınıfı tek başına YETMEZ: `.claude/` ve `docs/` altındaki `.cjs`/`.mjs` dosyaları da `belge`dir ama
+`eslint .` onları tarar (2026-10-07 ölçümü: `.claude/hooks/*.cjs` ignore edilmiyor; 52 `.cjs` + 11 `.mjs` belge dizinlerinde), `.ts`/`.tsx` tsc'nin girdisidir, JSON'u bir test içe aktarırsa tip denetimi değişir. Bu yüzden `Hızlı yol` adımı git'in kendi yol süzgeciyle (`:(exclude,glob)**/*.md`, `.txt`, `.csv`) yalnız bu üç uzantıdaki farkta
+`belge=true` yazar; dışarıda kalan tek bir fark (kod, JSON, silinen ya da taşınan kod dosyası, boş fark, git hatası) çıktıyı YAZMAZ ve her kapı koşar. `edited` koşusunda adım hiç açılmaz (o koşuda `ci`nin Test'i kuruluma ihtiyaç duyar). Kod kapıları çıktıyı `!= 'true'` ile okur.
+
+**Belge PR'ında kazanç nereden gelir.** Belirsiz testler (alt38d ölçümü, 2026-10-07: 41 test; harita 2026-10-08: 50 test) her PR'da koşar; bu yüzden belge PR'ında bile seçim boş kalmaz, shard'lar kurulum yapar ve boş seçim yolu savunmadır. Bu işin kendi testlerinden beşi alt süreç (bash, git, esbuild) başlattığı için bu kümeye girer; en ağır üçü yerelde (Windows) 18-31 sn sürer ve süreleri `test-sureleri.json`da yazılıdır (yazılmasa dağıtıcı üçünü de varsayılan 0,1 sn sayıp aynı shard'a yığabilirdi). Belge hızlı yolunun kazancı `ci` işindeki kurulum, Lint, tip ve Deno atlamasıdır; `ci` son adımda shard'ları bekler, yani süre en yavaş shard'a da bağlıdır.
+
+**Kabul edilen riskler.** (1) PR kodunun çalıştığı yerler: birinci geçiş (kurulumsuz, `bos` kararı) yalnız tabandan çıkan kodla koşar; ikinci geçişte vitest PR'ın `vitest.config.ts` ve `scripts/ci/` dosyalarını yükler ve testlerin kendisi PR kodudur. Garanti "PR'ın seçici kopyası koşmaz"dır, kötü niyetli PR'a karşı değil: `ci.yml`'i değiştirebilen PR her kapıyı değiştirebilir, kapı inceleme ve
+`ci.yml`/`scripts/ci/` değişikliğinin küresel (tam) sayılmasıdır. (2) Kurulum atlanınca `setup-node`'un önbellek KAYIT adımı (iş sonunda), pnpm deposu önbelleğinde ıska varsa `Path Validation Error` ile işi kırmızı yapar (v7.0.0 kaynağı: `saveCache` hatası yakalanmaz; boş depoyu kaydetmek de önbelleği zehirlerdi). `ci` içindeki hızlı yol bunu
+önler: kurulum yalnız önbellek isabetinde atlanır, ıskada koşar (en olası ıska: kilit dosyası değişip master önbelleği henüz kaydedilmemişken açılan belge PR'ı). Kalan yol: shard işindeki boş seçim (`bos=true`) kurulumu koşulsuz atlar; o yol pratikte açılmaz (belirsiz testler her PR'da seçilir) ve açılırsa
+ıskada yeniden koşum çözer; `edited` aynasının kurulumu atladığı koşularda aynı yol seçimden önce de vardı.
+
+**Dürüstçe ele alınmayanlar.** Harita bir ölçümdür (ölçümde çalışmayan kol eksik kalabilir: atlanan test `belirsiz` sayılır; master push tam koşar; haritanın gece yenilenmesi seçici cetvelindedir). Seçici ve harita tabandan geldiği için yeni seçici/harita ancak birleşince etkindir (ilk PR tam koşar). İlk ölçüm PR'ın kendi koşusundadır
+(`ci` süresi: okunmayan belge, okunan belge, kod PR'ı); yerel ölçüm yalnız kurulumdur (postinstall açık 29 sn, `--ignore-scripts` 3 sn).
+
+### 4.4 `admin-smoke` süresi: tip ve lint e2e'de kapalı, apt Build ile paralel (ALT-38f)
+
+**Neden.** Kod PR'ında en uzun bekleyen zorunlu kontrol `admin-smoke` idi. Başlangıç ölçümü (88 başarılı koşu, 2026-10-04..07): iş medyanı 285 sn (p10 237, p90 310, en kısa 198, en uzun 640).
+Adım medyanları (sn): kurulum 53 (bağımlılık kurulumu 35) · apt 15 · Build 166,5 · Playwright 39,5. Tek bir Build günlüğünde: 92 sn derleme, 51 sn "Linting and checking validity of types",
+26 sn sayfa üretimi. apt adımı 3 koşuda (%3,4) 187, 339 ve 341 sn sürdü (ilk deneme 300 sn sınırını doldurdu, ikinci deneme geçti).
+
+**İki kaldıraç.** Hiçbiri sınıf koşullarına (§4.1), iş adına (`admin-smoke`, zorunlu kontrol) ya da tarayıcı probuna dokunmaz; her adım hâlâ aynı tam koşulu taşır. Üçüncü bir kaldıraç (webpack derleme önbelleği) ölçüldü ve ÇIKARILDI (aşağıda).
+
+1. **Tip ve lint yalnız e2e Build'inde kapalı** (`src/config/e2eHizliDerleme.mjs`, INV-E2E-HIZLI-1/2). `VENTHUB_E2E_TIP_LINT_ATLA=1`, YALNIZ `Build (real Supabase env)` adımının adım env'inde verilir ve `next.config.mjs`e
+   `typescript.ignoreBuildErrors` ile `eslint.ignoreDuringBuilds` ekler (günlükte "Skipping validation of types" ve "Skipping linting"). Anahtar yok ya da tam `1` değilken yapılandırmaya HİÇBİR anahtar eklenmez
+   (bugünkü ayarla birebir aynı). `ci`, Vercel, yerel derleme, package.json, vercel.json, `.env*` ve öteki iş akışları anahtarı HİÇ vermez ve vermemesi testle ölçülür. **Kapsam boşluğu yok**: tip ve lint hatası
+   `ci` işinde üç yerde kırmızı verir (Lint, Type check, `Build (blocking)`) ve `ci` ile `admin-smoke` AYNI sınıf koşuluyla koşar/atlanır. **Önkoşul: `ci` zorunlu kontrol kalır.**
+2. **apt adımı Build ile PARALEL** (`scripts/ci/arka-plan.sh`, cetvel `ci-runner-install-standard.md` §2.9, INV-E2E-HIZLI-3/4). `playwright install-deps` arka planda başlar, `bekle` adımı Build'ten sonra toplar; sınır 300 sn × 2'den 75 sn × 2'ye indi.
+   Gerçek kapı değişmedi: tarayıcı probu `bekle`den SONRA ve fataldir.
+
+**Çıkarılan kaldıraç: webpack derleme önbelleği (OPS hükmü 2026-10-09).** Bu PR'ın ilk sürümünde e2e'ye özgü bir `actions/cache` adımı vardı (`.next/cache/webpack`, `.rscinfo`, `.previewinfo`; anahtar öneki `e2e-nextjs-`). Ölçüm: sıcak önbellekle derleme 91 → 28-36 sn, iş 142-201 sn. Çıkarıldı, çünkü (a) kod PR'ının toplam süresini `ci` işi belirler (2026-10-07 ölçümü: `ci` işi 340 sn, `admin-smoke` zaten `ci`nin altında); `admin-smoke`u 142-201 sn'ye indirmek kod PR'ı toplamına en çok ~40 sn kazandırır; (b) depo önbellek kotası 10 GB'ın 9,94 GB'ında (55 giriş) ve her e2e anahtarı yaklaşık 137 MB ekler: kazanç küçük, kota riski gerçek. Önbellek yalnız hız olduğundan çıkarılması kapıyı değiştirmez. Yeniden eklemek yeni karar ister (kaydı yalnız master push'a çevirip PR'da yalnız geri yüklemek bir seçenekti). Ölçüm kaydı aşağıda kalır.
+
+**Ölçüm** (PR #1742, gerçek CI koşuları, aynı iş, sn). Her sütunda tek tek koşular yazılır: GitHub koşucusunun hızı koşudan koşuya ±%30 oynar (önceki 88 koşuda iş toplamı 198-313, ilk bağımlılık kurulumu 25-45 sn),
+bu yüzden tek koşuyu medyanla kıyaslamak yanıltır; aynı koşucu hızı için kurulum satırına bakılır. SOĞUK sütunlar (önbellek yok) bu PR'da KALAN iki kaldıracı temsil eder; SICAK sütunlar ÇIKARILAN webpack önbelleğini de içerir. SOĞUK koşulardaki 'diğer' satırının 5-6 sn'si önbellek kaydıdır; önbelleksiz hâlde yoktur.
+
+| | önceki medyan (88 koşu) | SOĞUK (önbellek yok): koşu 1 · koşu 3 | SICAK (aynı anahtar, kaynak değişmeden): koşu 4 · koşu 5 · koşu 6 |
+|---|---|---|---|
+| **iş toplamı** | **285** (p10 237, p90 310) | **241 · 180** | **201 · 142 · 174** |
+| kurulum (iş başlatma, checkout, pnpm, Node, bağımlılık) | 53 | 53 · 39 | 55 · 39 · 49 |
+| tarayıcı + sistem bağımlılıkları (apt dahil) | 20 (apt 15; 3 koşuda 187-341) | 7 · 3 | 7 · 5 · 4 |
+| Build | 166,5 | 128 · 92 | 76 · 62 · 73 |
+| ↳ webpack derleme (günlükteki "Compiled successfully") | 92 | 91 · 66 | 31,6 · 28,1 · 36,1 |
+| Playwright testi | 39,5 | 43 · 37 | 56 · 32 · 44 |
+| diğer (adım sonrası, önbellek kaydı) | 1 | 6 · 5 | 3 · 1 · 2 |
+
+Kaldıraç başına (koşu içi, günlükten): **tip ve lint kapalı** Build'ten ~40 sn düşürür (derleme 91 sn aynı, "Linting and checking" aşaması hiç koşmaz); **apt paralel** adımı iş süresinden çıkarır (arka planda 15-19 sn
+sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi); ÇIKARILAN **webpack önbelleği** derlemeyi 91 → 28-36 sn'ye indiriyordu (yalnız `.rscinfo` ile birlikte; yalnız `webpack/` saklanan ilk sürümde derleme 91 → 89 sn, iş 228 sn).
+**Sonuç (kalan iki kaldıraç = SOĞUK sütunlar):** önbelleksiz iki koşuda iş 241 ve 180 sn (önceki medyan 285), ikisi de `ci`den (252 sn) kısa; çıkarılan kaldıraçla (SICAK) 142-201 sn idi. İki koşu küçük bir örnektir. Apt takılması (%3,4) bu 6 koşuda
+tetiklenmedi: kuyruğun kesilmesi mekanizma ve test olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
+
+**Güvenlik yönü.** (a) Anahtar yanlış yere sızarsa `ci`/Vercel/yerel derleme tipsiz kalırdı: `INV-E2E-HIZLI-2` anahtarın adım düzeyi dışında hiçbir yerde olmadığını ölçer. (b) apt arka planda ölürse `bekle` komutu ön planda yeniden
+koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir.
 
 ## 5. Kapılar ve görünen yüzler
 
@@ -26614,11 +27389,318 @@ yazılmazsa dosya varsayılan ağırlıkla yine bir parçaya girer (kapsam kayb�
 | `INV-CI-EDITED-1` | `ci-edited-ayna.test.ts` | aynanın `ci.yml`'ye bağlantısı: ağır adımlar atlama koşulu taşır, hep koşan adımlar (kayıt kapısı, taban izi) taşımaz, iz adımı adı ve sırası, ayna adımı kayıt kapısından sonra ve karar betiğini TABAN kopyasından koşturur, `edited` ayrı grupta, izinler en az, tam geçmiş |
 | `INV-CI-EDITED-2` | `edited-ayna.test.ts` | aynanın karar mantığı ve GitHub çağrısının biçimi: atla yalnız aynı head ve AYNI taban izli tam koşu `success` iken; taban değişti, mekanizmaya dokunuldu, merge-ref biçimi bozuk ya da iz yoksa TAM; çağrı bütçesi |
 | `INV-DUNYA-SATIRI-1` | `dunya-durumu-satiri.test.ts` | kanca satırı: yalnız `master` sorgusu, eşikler, ölçüm hatasında ve 404'te bilinen kırmızının korunması, çözülemeyen damganın susmaması, dış metnin satıra girmemesi, kancaya bağlantı |
-| `INV-CI-SHARD-1` | `ci-test-shard.test.ts` | `test-shard` işinin ve `ci` bekleme adımının `ci.yml` bağı: iş yalnız `pull_request` (edited hariç) koşar, `needs`/`continue-on-error`/`environment` yok, `fail-fast: false`, kabuk `bash`, adımlarda `if`/`continue-on-error`/hata yutma yok; matrix sayısı = `--toplam` = `SHARD_TOPLAM` = iş adındaki `/N` ve bekleyicinin beklediği adlar; `--shard "$SHARD"`, `dislan`, `VENTHUB_TEST_SHARD_DOSYALARI`; bekleme adımı `ci`nin SON adımı (`if`, ortam, `run` tam eşitlik, `KOSU_DENEME` dahil); `ci` Test koşulu shard olayının tersi; `actions: read`; YAML'ın verdiği ortamla bekleyici sahte API'de çalışır. Sabotaj tablosu: 70 bozulma yakalanır |
+| `INV-CI-SHARD-1` | `ci-test-shard.test.ts` | `test-shard` işinin ve `ci` bekleme adımının `ci.yml` bağı: iş yalnız `pull_request` (edited hariç) koşar, `needs`/`continue-on-error`/`environment` yok, `fail-fast: false`, kabuk `bash`, adımlarda `if`/`continue-on-error`/hata yutma yok; matrix sayısı = `--toplam` = `SHARD_TOPLAM` = iş adındaki `/N` ve bekleyicinin beklediği adlar; `--shard "$SHARD"`, `dislan`, `VENTHUB_TEST_SHARD_DOSYALARI`; bekleme adımı `ci`nin SON adımı (`if`, ortam, `run` tam eşitlik, `KOSU_DENEME` dahil); `ci` Test koşulu shard olayının tersi; `actions: read`; YAML'ın verdiği ortamla bekleyici sahte API'de çalışır; ALT-38e ile dağıtım ve Test ayrı adımdır (Test'in ortamı yalnız `VENTHUB_DUNYA_DURUMU` ve `NODE_COMPILE_CACHE`, `SHARD`/`SECIM_*` yalnız dağıtım adımında) ve `if` yalnız bilinen adımlarda TAM beklenen satırla serbesttir. Sabotaj tablosu: 77 bozulma yakalanır |
 | `INV-CI-SHARD-2` | `ci-test-shard.test.ts`, `test-shard.test.ts`, `test-shard-bekle.test.ts` | bölmenin KAPSAMI gerçek `vitest list` ile: birleşim = liste, kesişim 0, her parça dolu, en yüklü/ortalama <= 1,25, belirlenimli ve girdi sırasından bağımsız, süresi bilinmeyen dosya da dağıtılır; shard'lar ∪ dünya durumu listesi = tam paket; `VENTHUB_TEST_SHARD_DOSYALARI` ile gerçek `vitest list` her parça için TAM o parçayı döner; özel karakterli yollar düz metin eşleşir. Birim: dağıtıcının ve bekleyicinin karar tabloları, her hata kırmızı |
+| `INV-CI-SECIM-1` | `ci-test-secimi.test.ts`, `ci-test-secimi-ifade.test.ts` (pinler: `ci-edited-ayna.test.ts`, `ci-test-shard.test.ts`, `ci-degisiklik-sinifi.test.ts`) | test seçiminin ve belge hızlı yolunun `ci.yml` bağı: seçici, harita ve sınıflayıcı YALNIZ `test-shard` işinde ve TABANDAN (`git show HEAD^1:`; PR kopyası, `HEAD:`, `HEAD^2:` ve çalışma ağacından harita yasak; sınıflayıcı seçicinin yanına konur, aksi hâlde seçici onu PR'dan yükler), seçim adımlarının GÖVDESİ tam eşitlik ve anlamsal değişmezler (tek `node`, `--kok`/`--harita`/`--cikti`, `--vitestsiz` yalnız birinci geçişte, çökme yedeği, seçici kendisi `tam=false` yazamaz; `bos` kararı yalnız birinci geçişte, seçicinin SON `tam`/`secilen-sayisi` değerinden, çökme yedeğinden SONRA ve gövdenin SON satırında); ifade doğruluk tablosu GERÇEK `if` metninden GitHub'ın tür dönüşümüyle değerlendirilir (kurulum/Test YALNIZ `bos` TAM `true` iken kapanır; çıktı eksik/boş/`false`/başka değer KOŞAR; eski `secilen-sayisi != '0'` biçimi yarım çıktıda ATLATIRDI); ÖLÇÜM (hızlı yolun dayanağı): tsconfig `include` yalnız .ts/.tsx, eslint yapılandırması docs/md/txt/csv okumaz, deno check kaynakları md/txt/csv içe aktarmaz; `ci`, öteki iş akışları ve `vitest.config.ts` seçiciyi bilmez (edited, push, elle koşum, zamanlı koşu tam); hızlı yol adımı (koşul, kimlik, sıra, çıktı tek yerde `belge=true`, yol süzgeci yalnız md/txt/csv) ve sekiz kod kapısının koşulu TAM eşitlik (kurulum: yalnız `cache-hit` isabetinde atlanır, `Setup Node` `id: node`); kayıt kapısı, Secret guard, Döküm kapısı, `ci` Test'i, Build ve bekleme adımı hızlı yolu OKUMAZ; shard kurulumu `--ignore-scripts`, `ci` kurulumu DEĞİŞMEZ; dağıtım adımı `id: dagit`; `ci` ve `test-shard` işlerinde iş akışı/iş düzeyinde `env:` ve adım düzeyinde `shell:`/`working-directory:` yasak (alt süreçlere sızıntı, pipefail kaybı). Sabotaj tablosu: 63 bozulma yakalanır |
+| `INV-CI-SECIM-2` | `ci-test-secimi-kapsam.test.ts`, `ci-test-secimi-hizli.test.ts`, `ci-test-secimi-uyum.test.ts`, `test-shard-secim.test.ts` | UYUM (seçici ve harita repoda varsa; yoksa atlanır): GERÇEK seçicinin çıktısı dağıtıcıda uygulanır ya da seçici tam dediyse tam dağıtılır, dağıtıcı çıktıyı REDDETMEZ (uyarı yok: sözleşme kaymadı), kurulumsuz geçiş nihai geçişin üst kümesidir. DAVRANIŞ (gerçek bash + gerçek git + tabandan sahte seçici): taban kopyası koşar PR kopyası ASLA, kopya yoksa `tam=true`, seçici çökerse kırmızı olmaz `tam=true`; `bos=true` YALNIZ seçicinin SON `tam=false` VE `secilen-sayisi=0` değerinde yazılır, sessiz, yarım çıktılı, boş yazıp çöken ya da kendi `bos`unu yazan seçicide `bos=false` ve koşullar KOŞAR; hızlı yol yalnız md/txt/csv farkında `belge=true` (Türkçe ad, silinen belge dahil), `.cjs`/`.mjs`/`.ts`/`.json`/silinen-taşınan kod/boş fark/git hatasında çıktı YOK. KAPSAM (gerçek `vitest list`, kip `dislan`): tam ise birleşim = liste; seçim (K = 0, 1, 3, 37, 200, tümü) ise birleşim = seçim, kesişim 0, boş parça `[]` + `kos=false`; KARMA KİP: dört işin her tam/seçim kombinasyonunda (K = 1, 5, 60, 150) birleşim ⊇ seçim, kesişim 0 (bölme tam listede, seçim parçayı süzer); seçilen vitest listesinde yoksa TAM; gerçek `include` bağı; ci.yml'deki GERÇEK dağıtım komutu bash'te koşar. Birim: seçici çıktısı doğrulaması (tutarsız sayı, geçersiz yol, tekrar, diskte yok = TAM), boş seçimde `vitest list` ÇAĞRILMAZ, tam modda boş parça kırmızı |
+| `INV-TEST-KARNE-1` | `test-karnesi-yapisi.test.ts` | en yeni `docs/audits/test-karnesi-*.json` YAPISAL olarak tutarlıdır (§7.5): sürüm, tarih, sayı ve kayıt tekrarı; her kayıtta sekiz soru bloğu; `olculmedi` nedensiz yazılamaz; sabotajı `UYGULANAMADI`/`TABAN_ATLANDI` olan kayıt "ölçüldü" olamaz; ölçülmemiş test `KORU` önerisi alamaz; 8. sorunun kaynak, tetik ve yer alanları geçerli; `scripts/ci/dunya-durumu-testleri.json`daki HER test karnede yeni yeriyle görünür; kanarya (300+ kayıt). Sabotaj: yedi bozulma yolu yakalanır. Karne tazeliği bilerek ölçülmez (§7.5) |
+| `INV-TEST-KARNE-2` | `ci-gecmis.test.ts` | CI geçmişi toplayıcısı (`ci-gecmis.cjs`): GitHub günlüğündeki iki renk biçimi (gerçek ESC ve iki karakterlik `^[` metni) soyulur; başarısız test dosyaları ayıklanır; `created=` pencereleri `total_count` ile doğrulanır, sayfalama sınırı uyarı verir; bayrak tablosu ve sayısal bayrakların tamsayı olması; süre örneği en yeni N başarılı koşu; `gh` çağrısının kendisi (URL, sayfa, bayrak) sahte GitHub'da assert edilir, kırmızı koşuda günlük çekilir; eşzamanlılık sınırı ve yeniden deneme; kullanım hatasında `gh` ÇAĞRILMAZ, çıkış kodu 1 |
+| `INV-TEST-KARNE-3` | `sabotaj.test.ts` | Bozma koşucusunun (`sabotaj.cjs`) güvenlik vaadi: plan doğrulama ve hedef reddi (`.git`, `node_modules`, sınanan testin kendisi, depo dışı); hüküm tablosu (yakalanırsa KIRMIZI, yakalanmazsa YESIL, sabotajsız kırmızı TABAN_KIRMIZI); gerçek git deposunda dört bozma türü uygulanır ve geri alınır (içerik byte-byte eşit, indeks temiz, art arda adımlar ters sırayla, CRLF); bağlı olmayan ana ağaç reddi ve kanıtlanamıyorsa kapalı kalma; koşucu uçtan uca sahte vitest ile: ana ağaçta çıkış 3, kirli ağaçta çıkış 2 (kirli ağaca dokunmadan), alt sürece sır ve `CLAUDE*` gitmez, boş geçici ev, zaman aşımı ve yan etki temizliği |
+| `INV-TEST-KARNE-4` | `karne-uret.test.ts` | Karne üreticisinin (`karne-uret.cjs`) karar kuralları: dünya olayı kümesi (aynı test en az 3 FARKLI dalda, ardışık en çok 12 saat arayla kırmızı; eşiklerin altı, kendisi ve üstü ayrı); kırmızıdan sonra aynı dalda ne olduğu; ortam hükmü (ölçüm sinyali > imza > hiçbiri); öneri sırası (taşındı > sahte yeşil > ortam > dünya durumu adayı > kısmi koruma > çoklu koruma > ölçülmedi > koru) ve her öncelik çifti; `UYGULANAMADI` / `TABAN_ATLANDI` ölçümü `OLCULMEDI` yapar, `KORU` yapmaz; kısmi koruma `KORU` yazılmaz; aynı test için çelişen iki hüküm sessizce çözülmez, yalnız gerekçeli `yerine-gecen.json` ilanı geçer; ek yoklama ana hükmü ezmez; `statik.cjs` ve `sabotaj.cjs` ile sözleşme |
+| `INV-E2E-HIZLI-1` | `e2e-hizli-derleme.test.ts` | `VENTHUB_E2E_TIP_LINT_ATLA` okuyucusu YALNIZ tam `1` açar; açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds` (tam iki anahtar), kapalıyken `next.config.mjs`in dışa verdiği nesnede bu anahtarlar HİÇ yok ve adresler (redirects/headers/rewrites) aynı; yeni Node sürecinde anahtar yalnız o sürecin ortamından okunur. Sabotaj: 7 gevşek okuyucu, 6 bozuk ayar üreticisi |
+| `INV-E2E-HIZLI-2` | `e2e-hizli-derleme.test.ts` | anahtar YALNIZ `e2e-smoke.yml`in `Build (real Supabase env)` adımının ADIM env'inde ve değeri tam `'1'`; iş/iş akışı env'i, `$GITHUB_ENV`, başka adım, başka iş akışı (`ci.yml` dahil), package.json, vercel.json, `.env*`, `scripts/` ve Playwright/Vitest ayarlarında YOK; yazım ayrışması kırmızı. Sabotaj: 9 iş akışı bozulması + `ci.yml` + 3 yüzey |
+| `INV-E2E-HIZLI-3` | `e2e-smoke-paralel-kurulum.test.ts` | `admin-smoke` adım sırası (apt Build'ten önce başlar, `bekle` Build'ten sonra ve probtan ÖNCE, prob smoke'tan önce), apt sınırı ≤ 90 sn × 2 deneme ve kemer aritmetiği, `bekle` süresi ≥ en kötü süre, `bekle` en-iyi-çaba, prob `continue-on-error`suz ve fatal. Sabotaj: 14 bozulma |
+| `INV-E2E-HIZLI-4` | `scripts/ci/__tests__/arka-plan.test.ts` | `arka-plan.sh` gerçek bash ile: `baslat` hemen döner ve çıktı borusunu tutmaz, `bekle` çıkış kodunu taşır (124 süre, 125 başlatılmamış, 2 kullanım), öldürülen işlem ön planda yeniden koşar (alıntı + ortam korunur), pid dosyası yok/sıfır/bozuksa süreç yaşıyor sanılmaz, eski sonuç karışmaz. Sabotaj: 9 betik bozulması |
 
 Yeni bir dünya durumu kaydı ya da yeni bir `ci` adımı ekleyen değişiklik bu kapılardan geçer; kapı kırmızıysa kayıt ya da sınıflandırma
-eksiktir, kapı gevşetilmez. Karne bölümü (§6 ve sonrası) ALT-38b ile bu tabloya kapı ekler.
+eksiktir, kapı gevşetilmez. Karne bölümü (§7) bu tabloya `INV-TEST-KARNE-1` ile `INV-TEST-KARNE-4` arasını ekledi.
+
+## 6. Test seçimi (karar 308)
+
+**Sürüm 1.1 · 2026-10-07 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38d (karar 308, OPS-91) · Ölçüm: `docs/audits/test-secimi-olcum-2026-10-07.md`**
+
+Bu bölüm PR kapısında HANGİ testlerin koşacağını belirler: tam paket yerine yalnız değişenle ilgili olanlar. §2'deki "PR kapısı" satırını
+daraltır, başka satırı değiştirmez: master push, zamanlı iş ve yerel `pnpm test` TAM kalır; seçim yalnız `pull_request` olayında, `ci` işinin
+test dağıtımında uygulanır. Yerel kısayol `pnpm test:ilgili` aynı seçiciyi koşturur ama TAM'a düşerse hiçbir test koşmaz (yerelde tam paket yok;
+CI koşar).
+
+**İlke: seçici bir testi yanlışlıkla ELEMEZ.** Seçilmeyen testin koruduğu kural sessizce kırılır ve kimse kırmızı görmez; fazladan seçmenin
+bedeli ise yalnız dakikadır. Bu yüzden şüphe, hata, bilinmeyen ve hesaplanamayan her durum `tam`dır (tam = vitest'in listelediği HER test),
+`sec` hiçbir koşulda fırlatmaz ve `tam` sonucunda seçilen liste de TÜM testlerdir (`tam` bayrağını okumayı unutan tüketici bile hepsini
+koşturur; boş liste "hiçbir şey koşma" demek olurdu, o yön asla varsayılan olmaz). Seçilmeyen testin korumasını master push (TAM) ve zamanlı
+koşu taşır; bu bölüm yeni bir tam paket zamanlayıcısı kurmaz.
+
+### 6.1 Karar sırası (`scripts/ci/test-sec.cjs`)
+
+| Sıra | Koşul | Sonuç |
+|---|---|---|
+| 1 | Değişen yol KÜRESEL girdi (§6.2) | `tam` |
+| 2 | Haritanın bilmediği kök ad (yeni üst dizin ya da kök dosya) | `tam`: sınıflanamayan yüzey |
+| 3 | Silinmiş ya da taşınmış KOD dosyası | `tam`: içe aktaran test, dosya yokken `vitest related` grafiğinde görünmez |
+| 4 | Değişen dosya bir TEST dosyası | o test seçilir |
+| 5 | İçe aktarılabilir dosya değişti | `vitest related` (içe aktarma grafiği) sonucu eklenir |
+| 6 | Testin koşarken okuduğu dosya/dizin ya da `import.meta.glob` deseni değişen yolu kapsıyor | o test seçilir |
+| 7 | Haritada kaydı OLMAYAN test, kaynağı ölçümden sonra değişmiş (bayat kayıt) test, `belirsiz` test | HER ZAMAN seçilir |
+| 8 | Değişen liste boş ya da 2000+ dosya; git, harita ya da vitest hatası; harita biçimi, sürümü ya da ölçüm aracı özeti uyuşmuyor | `tam` |
+
+5 ve 6 BİRLEŞTİRİLİR: `related` vite'ın `?raw` ve `import.meta.glob` okumalarını görmez (78 test), harita ise içe aktarma grafiğini görmez;
+biri öbürünün kör noktasını kapatır. Belge, CSV, SQL gibi içe aktarılamaz dosyada `related` hiç hesaplanmaz.
+
+### 6.2 Küresel girdiler
+
+Değişirse `tam`: `.github/`, `.githooks/`, `scripts/ci/`, `supabase/migrations/`, `scripts/assert-node-major.mjs`, `scripts/setup-hooks.mjs`,
+`scripts/board/vitest-defter-ortami.cjs`, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc`, `.nvmrc`, `.node-version`, `.gitignore`, `.gitattributes`, `tsconfig*.json`,
+`vitest*`, `playwright*`, `next.config.*`, `eslint.config.*`, `.eslintrc*`, `tailwind.config.*`, `postcss.config.*`, `knip.*`, `middleware.*`; ek
+olarak sınıflayıcının (`scripts/ci/degisiklik-sinifi.cjs`) "her zaman tam" listesi (`src/` ve `public/` HARİÇ: bunlar daraltılmak istenen
+yüzeylerdir) ve haritanın kurulum evresinde okunan yolları. SSOT `KURESEL_GIRDILER`dir; her girdinin `INV-TEST-SEC-1` örnek tablosunda satırı
+olmak ZORUNDADIR (yeni küresel girdi örneksiz eklenemez, listeyi daraltmak kırmızı verir).
+
+**Koşum kapanımı.** Her vitest koşumunda yüklenen yerel dosyalar küreseldir, çünkü kaydedici worker'da çalışır ve ana süreçte yüklenenleri GÖRMEZ: global kurulum
+(`vitest.global-setup.ts`) ana süreçte koşar ve `scripts/board/vitest-defter-ortami.cjs`i yükler; harita bu dosyayı yalnız kendi testine bağlıyordu ve değişince
+seçim o testle sınırlı kalıyordu (alt38e bulgusu, 10-07). `INV-TEST-SEC-1` blok 7 `vitest*` kök dosyalarının (yapılandırma, kurulum, global kurulum) yerel
+`import`/`require`/`createRequire` kapanımını KAYNAKTAN çıkarır; küresel listede olmayan dosyayı ve kanıtlanamayan yüklemeyi (dinamik argüman, `require` dışı adla
+bağlanmış `createRequire`, çözülemeyen yerel belirteç) KIRMIZI yapar: yeni bir koşum bağımlılığı listeye yazılmadan birleşemez. Sınır: kapı yalnız YÜKLEME
+kapanımını bilir; kurulum dosyalarının veri okumalarını (`readFileSync`) bilmez (şu an yalnız `scripts/ci/dunya-durumu.cjs`, o da küresel dizinde).
+
+### 6.3 Test haritası (`scripts/ci/test-haritasi.json`)
+
+**Harita bir ÖLÇÜMDÜR, tahmin değil.** Test kaynağına bakıp okunan yolu tahmin etmek hesaplanan yolu (`path.join(KOK, ad)`), döngüyle gezilen
+dizini ve alt süreçte okunan dosyayı sessizce kaçırır. Bu yüzden üretici her testi GERÇEKTEN koşturur ve `fs` çağrılarını yakalar
+(`test-haritasi-kaydedici.cjs`: vitest `setupFiles` ile yalnız ölçüm yapılandırmasında yüklenir, `vitest.config.ts`e dokunulmaz; PR kapısında ve
+normal `pnpm test`te yüklenmez). Kaydedilen: okunan dosya, okunan dizin (doğrudan çocuklar), özyinelemeli alt ağaç, `import.meta.glob` desenleri
+(vite bunları ana süreçte okuduğu için kaydedici görmez; üretici kaynaktan çıkarır ve ölçülen `?raw` genişlemesiyle doğrular), test kaynağının özeti (`sha`)
+ve `belirsiz` işareti. `node` çocuklarının okumaları izlenir (çocuğa `NODE_OPTIONS=--require` verilir); `git` (repo içinde, dosyaya bağlı alt komut),
+python, sh, cmd, esbuild, powershell izlenemez ve test `belirsiz` olur: HER PR'da koşar. Ölçümde atlanan ya da kırmızı olan test de `belirsiz`dir.
+
+Çıktı BELİRLENİMLİDİR (tarih, makine adı, süre yok; hepsi sıralı): aynı ağaç + aynı ham kayıt = bayt bayt aynı dosya.
+
+| Komut | Ne yapar |
+|---|---|
+| `node scripts/ci/test-haritasi-uret.cjs` | tam ölçüm koşusu (PR kapısıyla aynı küme, `VENTHUB_DUNYA_DURUMU=dislan`; parçalara bölünür, kesilirse en çok bir parça kaybolur) + harita yaz |
+| `... --devam <ham klasör>` | yarım kalan koşuyu sürdürür (yalnız sonuç dosyası olmayan parçalar koşar) |
+| `... --yalniz a.test.ts b.test.ts` | yalnız bu testleri yeniden ölçer, kalanını korur (ölçüm aracı özeti AYNI olmalı) |
+| `... --ham <klasör>` | koşmadan, var olan ham kayıttan yazar |
+| `... --kontrol` | haritayı ağaçla karşılaştırır, yazmaz; biçim, canonical bayt, ölçüm aracı özeti sorunu varsa çıkış 1 |
+
+Bakım kuralları:
+
+| Olay | Ne olur | Ne yapılır |
+|---|---|---|
+| Yeni test dosyası | haritada yok → HER ZAMAN koşar (atlanamaz) | birleşmeden sonra `--yalniz <yeni testler>` ile kaydedilir (yaklaşık 1 dk); iki dalda aynı anda kaydetmeyin (aynı dosya çakışır) |
+| Test dosyası değişti | bayat kayıt → HER ZAMAN koşar (zaten değişen testtir) | birleşmeden sonra `--yalniz` |
+| Ölçüm aracı değişti (kaydedici, kurulum dosyaları, `test-haritasi.vitest.config.ts`) | araç özeti uyuşmaz → TAM; `INV-TEST-HARITA-1` KIRMIZI | tam yeniden üretim (yaklaşık 20 dk, 6 işçi) |
+| Test silindi | hayalet kayıt (zararsız) | sonraki üretimde düşer |
+| Testin dolaylı bağımlılığı değişti (testin içe aktardığı yardımcı başka dosya okumaya başladı) | test kaynağı değişmediği için kayıt bayat görünmez; `related` o PR'da testi seçer, sonraki PR'lar yeni okumayı harita yenilenene dek görmez | master push TAM koşar (güvenlik ağı); gece yenileme önerisi §6.7 |
+
+### 6.4 Güvenlik ağı: hiçbir koruma sessizce düşmez
+
+| Durum | Davranış | Kanıt |
+|---|---|---|
+| Küresel dosya, bilinmeyen kök ad, silinmiş kod dosyası | `tam` | `INV-TEST-SEC-1` blok 1 ve 3 |
+| Boş değişen liste, 2000+ dosya, git/harita/vitest hatası, bozuk girdi | `tam`; `sec` fırlatmaz | `INV-TEST-SEC-1` blok 1 ve 5 |
+| Harita bayat, bozuk, sürüm ya da araç özeti uyuşmuyor | `tam` | `INV-TEST-SEC-1`, `INV-TEST-HARITA-1` blok 6 |
+| Haritada olmayan (yeni) test | her zaman seçilir | `INV-TEST-SEC-1` blok 1 |
+| Bayat kayıt, `belirsiz` test | her zaman seçilir | `INV-TEST-SEC-1` blok 1 |
+| `tam` sonucu | `secilen` = TÜM testler | `INV-TEST-SEC-1` blok 1 ve 5 |
+| Seçicinin kaynağına konan tek hata (küresel liste daralır, harita yok sayılır, bilinmeyen test seçilmez, `tam` yerine boş seçim döner) | en az bir senaryo KIRMIZI | `INV-TEST-SEC-1` blok 2 (sabotaj tablosu) |
+| Üreticiye konan tek hata | en az bir senaryo KIRMIZI | `INV-TEST-HARITA-1` blok 7 |
+| master push, `workflow_dispatch`, `schedule`, yerel `pnpm test` | seçim UYGULANMAZ, TAM | §6.5 koşul 1 |
+
+### 6.5 Bağlama koşulları (`ci.yml` ve `test-shard` için)
+
+1. Seçim yalnız `pull_request` olayında, varsayılan (birleştirme commit'i) checkout'ta ve `fetch-depth >= 2` ile uygulanır (`HEAD^1` için); push ve elle
+   koşumda seçim YOK SAYILIR.
+2. Betik ve harita PR'ın kendi kopyasından değil TABANDAN (`git show HEAD^1:scripts/ci/test-sec.cjs`) çıkarılıp koşturulur (`--kok "$GITHUB_WORKSPACE"
+   --harita "$RUNNER_TEMP/test-haritasi.json"`); PR bunlara dokunuyorsa `scripts/ci/` zaten küresel olduğundan `tam`dır.
+3. Seçim yalnız DARALTIR: çıktı yoksa ya da okunamazsa HER ŞEY koşar. Tüketici önce `tam` çıktısına bakar. Çıkış kodu daima 0'dır, hata `tam` olarak
+   yazılır; `$GITHUB_OUTPUT`a `tam=`, `secilen-sayisi=`, `toplam=`, `neden=` eklenir (`neden` tek satır, enjeksiyona kapalı).
+4. Dağıtım: seçilen liste ∩ `vitest list --filesOnly` çıktısı shard'lara dağıtılır. Beklenen shard sayısı SABİT kalır; boş kalan shard bile `success`
+   verir (bekleme adımı sayıya bakar). Seçim hiçbir zaman boş değildir (belirsiz testler her PR'da seçilir); boş yol yine de güvenli yazılır.
+5. Kurulumdan ÖNCE koşan ilk geçiş `--vitestsiz`tir (`git ls-files` ile üst küme liste; yalnız belge/CSV/SQL gibi dosyalar değiştiyse kendi seçimini verir,
+   içe aktarılabilir dosya değiştiyse `tam=true` ve "vitest gerekli" der); kurulumdan sonra ikinci geçiş bayraksız koşar.
+
+### 6.6 Kapılar (bu bölümün kendi tablosu)
+
+| Kapı | Dosya (`scripts/ci/__tests__/`) | Neyi ölçer |
+|---|---|---|
+| `INV-TEST-SEC-1` | `test-sec.test.ts` | seçicinin karar mantığı (senaryolar, SABOTAJ tablosu, küresel girdi örnek tablosu, glob eşleştirici, CLI çıktı sözleşmesi, `--yerel`, içe aktarma grafiğinin paralel kurulumu, sınıflayıcı yükleme sırası: önce seçicinin yanı sonra kök, koşum kapanımı kapısı); gerçek harita ve gerçek git ile belge değişimi daraltır, belirsiz testler HER ZAMAN seçilir |
+| `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur |
+| `INV-TEST-HARITA-KAYDEDICI-1` | `test-haritasi-kaydedici.test.ts` | yakalama (fs, dizin, glob, alt süreç sınıflaması, `node` çocuğu, belirlenimli kayıt) |
+| `INV-TEST-SEC-GERIYE-1` | `test-sec-geriye.test.ts` | geriye dönük doğrulamanın sayım mantığı: kategori önceliği, kaçırma yalnız ASIL kategoriden, kaçırılanın açıklanması (açıklanamayan = GERÇEK kaçırma), CI günlüğünden süre modeli |
+
+**Seçiciyi gevşeten her değişiklik (küresel listeyi daraltmak, `belirsiz` kapsamını azaltmak, yeni bir "atla" kuralı) önce B4 ile ölçülür:**
+`node scripts/ci/test-sec-geriye.cjs --b4 <kırmızı koşular.json> --log-dizini <günlükler>` çıktısında `gercekKacirilan` listesi BOŞ olmadan
+birleşmez. `kirmizi-kosular` kaydı: koşu başına değişen dosyalar, kırılan test dosyaları ve (günlükten) kırılan başlıklar.
+
+### 6.7 Ölçülmüş durum ve açık konular (2026-10-07)
+
+| Ölçü (ayrıntı ve ham veri: `docs/audits/test-secimi-olcum-2026-10-07.md` ve `.csv`) | Değer |
+|---|---|
+| Test evreni, harita kapsamı | 624 dosya; conformance 345/345 kayıtlı (312 kesin eşlenmiş, 33 `belirsiz`); tümü 622/624 (2 dosya tümüyle `describe.skip`) |
+| Her zaman koşan | 43 (41 `belirsiz` + 2 haritada olmayan) |
+| Güncel harita (2026-10-08, ALT-38e testleri kayıtlıyken; `test-haritasi-uret.cjs --kontrol`: sorun 0) | 636/639 kayıtlı (3 kayıtsız test); 50 `belirsiz` + 3 haritada olmayan = 53 her zaman koşan; conformance 355 kayıtlı (314 kesin, 41 `belirsiz`) |
+| Belge-yalnız PR (12 gerçek PR) | ortalama 833 test (%11,0), CI günlüğünden modellenen Test süresi %12,8 |
+| Kod PR (64 gerçek PR) | ortalama 1803 test (%23,8), süre %26,2 (medyan %22,5) |
+| Küresel girdili PR | 13/94: hepsi TAM |
+| Geriye dönük (259 kırmızı CI koşusu, 2026-09-07..10-07) | 171 değerlendirilebilir koşunun 43'ü ham kaçırma; 34'ü dünya durumu kolu (artık PR kapısında yok), 10'u devralınan kırmızı (kök master push TAM ya da seçilmiş PR); gerçek kaçırma 0 |
+| `belirsiz` kümesini belge PR'ında atlamanın bedeli | son ayda 17 belge PR kırmızısının 10'u PR'da görünmezdi (`arac-envanteri`, `mutlak-yol-sizintisi`, `belge-tazelik`) |
+
+Hedef (belge PR'ında Test ≤40 sn) bu ağaçta TUTMAZ: belge PR'ında Test tam paketin yaklaşık %13'üdür ve bunun %11 puanı `belirsiz` kümesinden gelir; seçim hiçbir belge PR'ında
+boş değildir, kurulum atlanamaz. Kazanç Test adımındadır (yaklaşık %87 az işlemci süresi); PR duvar süresini bundan sonra kurulum, lint ve derleme belirler.
+
+Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz, hepsi daha dar seçim içindir):
+
+1. **`belirsiz` kümesi** (izlenemeyen alt süreç) belge-yalnız PR'ın süresinin büyük kısmını oluşturur; yeni belge eklendiğinde sonucu gerçekten değişen
+   belge yapısı kapılarını da içerir (`git ls-files`, `git log` ile `docs/` sayanlar), bu yüzden belge PR'ında bile atlanamaz. Kapatma yolları: (a) Linux'ta
+   `strace -f` ile ölçüm (alt süreç okumaları görünür, `belirsiz` kümesi kapanır); (b) 40 haneli revizyona bağlı `git show|cat-file|ls-tree|log`
+   komutlarının kaydedicide "dosyaya bağlı değil" sayılması (değişmez geçmiş, çalışma ağacına bağlı değil); (c) yalnız `git ls-files` kullanan testlerin
+   yalnız EKLENEN/SİLİNEN dosyada seçilmesi (adlar kümesine bağlıdır, içeriğe değil). Üçü de ölçüm aracını değiştirir (tam yeniden üretim) ve B4 ile
+   doğrulanmadan açılmaz.
+2. **Haritanın yenilenmesi**: yeni test dosyaları birleşmeden sonra `--yalniz` ile kaydedilir (§6.3). Tam yenileme için yeni bir tam-paket zamanlayıcısı
+   önerilmez; master push TAM koşusu zaten tüm testleri koşturuyor, haritanın ham kaydı o koşuda `test-haritasi.vitest.config.ts` ile alınıp yapıt olarak
+   saklanabilir (`--ham` ile haritaya yazılır). Bu bir öneridir, kurulu değildir.
+3. **Ölçüm makinesi**: harita Windows'ta ölçüldü; Linux'ta atlanan ya da farklı kolu izleyen test (platforma bağlı `skipIf`) ölçümde görünmeyebilir, bu testler
+   atlandığında `belirsiz` işaretlenir. Linux ölçümü (1a) bunu da kapatır.
+4. **Geriye dönük pencere** bir aydır (2026-09-07..10-07, `ci.yml` koşuları): `karne.json`un üç aylık `ci` özeti koşu başına değişen dosya taşımaz.
+5. **Kod PR'ında seçimin kendi maliyeti.** `vitest related` (içe aktarma grafiği) tüm test dosyaları için kurulur: tek süreçte yerelde (Windows, 16 çekirdek) 41-57 sn,
+   belge PR'ında 0,5-1,4 sn (grafik hesaplanmaz). Grafik 4 işçi sürecinde PARALEL kurulur (`grafikKur`; `VENTHUB_TEST_SEC_ISCI=1` sıralıya zorlar; işçi hatasında ya da tutarsız
+   çıktıda sıralıya düşer, sonuç sıralıyla bayt bayt AYNI doğrulandı): 26 sn (2 işçi 31, 8 işçi 22 sn). 4 shard seçimi ayrı hesapladığı için kod PR'ında shard başına duvar süresi
+   tam paketle aynı mertebede ya da biraz altında kalır (4 çekirdekli CI'da yerelden uzun olabilir); kazanç belge PR'ındadır. Kapatma yolu: her testin içe aktarma kapanımını ve
+   kapanımdaki dosya özetlerini haritaya önbellek olarak yazmak; seçimde yalnız özeti uyuşmayan (ya da dosya eklenen/silinen) testlerin grafiğini canlı hesaplamak. Önbellek yalnız
+   HIZ içindir, geçersizse canlı hesaba düşer (doğruluk haritanın tazeliğine bağlı olmaz). Ölçülmeden açılmaz: seçim `vitest related` sonucunun ÜST KÜMESİ olmalı (94 PR ve B4 ile karşılaştırılır).
+
+## 7. Test karnesi (ALT-38b)
+
+**Sürüm 1.2 · 2026-10-09 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38 (OPS emri 10-09; Recep'in "hangi test kalır, hangisi silinir" sorusu) ve karar 296 · Ölçüm: `docs/audits/test-karnesi-2026-10-09.json` (ham, makine okunur) ve `.md` (insan özeti) · Recep özeti: `docs/audits/test-karnesi-ozet-recep-2026-10-09.md`**
+
+Karne, her test dosyası için sekiz sorunun cevabıdır ve **ölçülenle ölçülmeyen ayrı yazılır**. Bir ÖLÇÜM BELGESİDİR, hüküm vermez: `oneri` alanı bir ADAYDIR.
+Silme ve taşıma kararı insanındır; silme listesi Recep onayıyla çıkar, onaysız hiçbir test silinmez. Ölçülemeyen şey "ölçülmedi" ve nedeniyle yazılır,
+tahmin yazılmaz; ölçülmemiş test `KORU` önerisi alamaz.
+
+### 7.1 Parçalar
+
+| Parça | Dosya | Ne yapar |
+|---|---|---|
+| Üretici | `scripts/test-karnesi/karne-uret.cjs` | Ölçüm çıktılarını birleştirir ve sınıflar; **hiçbir şey ölçmez** |
+| Bozma ölçümü | `scripts/test-karnesi/sabotaj.cjs` | Bir testin koruduğu şeyi bozan sabotajları ("bozma") sırayla uygular, testi yeniden koşar, bozmayı geri alır ve sha256 ile doğrular; **ilk yakalanışta durur**. Yalnız bağlı worktree'de koşar, ana ağaçta ve testin kendisini bozmayı reddeder |
+| CI geçmişi | `scripts/test-karnesi/ci-gecmis.cjs` | GitHub'dan `ci.yml` koşularını ve kırmızılardaki başarısız test dosyalarını okur |
+| Statik tarama | `scripts/test-karnesi/statik.cjs` | Kaynaktan ortam imzası, benzerlik adayı, INV/karar/cetvel atıfları ve testin kaynakta andığı yolları çıkarır |
+| Tetik beyanı | `scripts/test-karnesi/beyan.cjs`, `beyan-tabani.json` | Testin başlığındaki `TETİK:` / `YER:` satırını okur (8. soru). Beyansız yeni testi reddeden kapı (`INV-TEST-BEYAN-1`) bu sürümde KURULU DEĞİLDİR (§7.7, madde 5) |
+| Çıktı | `docs/audits/test-karnesi-YYYY-AA-GG.json` ve `.md` | Karne: her test dosyası için bir kayıt. Recep'e giden düz özet ayrı dosyadır (`test-karnesi-ozet-recep-*.md`) |
+
+### 7.2 Sekiz soru
+
+| Alan | Soru | Cevap biçimi |
+|---|---|---|
+| `q1_korur` | Bu test neyi koruyor? | `metin` (tek cümle; bilinmiyorsa `null`), `kaynak` (cevabı kimin yazdığı), `inv` / `kararlar` / `cetveller` (atıflar) |
+| `q2_ci` | CI geçmişinde kaç kez kırmızı verdi, kaçı PR'dan bağımsız? | `kirmizi`, `dal`, `master`. `dunyaKumesi`: aynı testin, ardışık aralığı en çok 12 saat olan bir koşu zincirinde en az 3 farklı dalda kırmızı verdiği "dünya olayı" kümelerindeki kırmızılar (PR'ın hatası sayılmaz). Kümede olmayan `izole` kırmızılar, aynı daldaki sonraki koşuya göre `duzeldi` / `halaKirmizi` / `belirsiz` |
+| `q3_sabotaj` | Koruduğu şey bozulunca kırmızı veriyor mu? | `durum`: `olculdu` / `olculmedi` (+ `neden`). Ölçen hükümler: `KIRMIZI` (bir bozma yakalandı), `YESIL` (hiçbiri yakalanmadı), `TABAN_KIRMIZI` (bozma yapılmadan kırmızı). Ölçmeyen hükümler: `UYGULANAMADI`, `TABAN_ATLANDI`; karne bunlara "ölçüldü" demez. `denenen` / `yakalanan` / `yakalanmayanlar` ana tur, `ekDenenen` / `ekYakalanmayan` ek yoklama; `kismi`: hüküm `KIRMIZI` ama en az bir bozma yakalanmadı |
+| `q4_ortam` | Ortama (saat, ağ, ev dizini, makine, dünyanın durumu) bağlı mı? | `bagli`: sabotajsız taban koşusu ya da tam yerel koşu kırmızı, ya da CI kırmızılarının en az yarısı dünya olayı kümesinde. `supheli`: yalnız kaynak imzası (ev dizini, git geçmişi, ağ, veritabanı, sunucu, sabitlenmemiş saat) ya da ajan notu. `bagimsiz`: hiçbiri |
+| `q5_sure` | Ne kadar sürüyor? | `dosyaMs`, `testMs`, `testSayisi`: tam yerel koşu, 3 işçi, çekişmeli; yalnız GÖRELİ sıralama içindir. CI'da dosya başına süre ölçülmez |
+| `q6_kopya` | Aynı şeyi başka test de koruyor mu? | `olculen`: aynı bozmada kırmızı veren ve tabanda yeşil olan eş testler. `adaylar` / `olculenAday`: kaynak benzerliği, ölçüm değildir |
+| `q7_kanban` | Artık Kanban ya da kokpit mi koruyor? | Ajan değerlendirmesi (`ajan`), ölçüm değildir |
+| `q8_tetik` | Bu test hangi dosya değişince koşmalı? | `kaynak`: `beyan` (testin kendi `TETİK:` satırı), `statik` (kaynakta andığı yollar, KESİN DEĞİL), `yok` (+ `olculmedi` nedeni). `yer`: `PR` / `zamanli` |
+
+### 7.3 Öneri sözlüğü
+
+`oneri.tur` KAPALI bir sözlüktür. Sıra, üreticinin denetim sırasıdır; ilk eşleşen kazanır. Koşucuya yeni bir hüküm eklenirse, üreticinin "ölçen hükümler"
+listesine girene kadar öneri `OLCULMEDI` olur (sessizce `KORU` olmaz).
+
+| Sıra | `tur` | Koşul | Anlamı |
+|---|---|---|---|
+| 1 | `TASINDI` | PR kapısından zaten çıkmış (`scripts/ci/dunya-durumu-testleri.json`) | Dokunulmaz; yeni yeri `dunyaDurumu` alanında yazılı |
+| 2 | `CELISKI-INCELE` | İki ölçüm aynı test için farklı hüküm verdi | İnsan çözer |
+| 3 | `SAHTE-YESIL-ADAYI` | Denenen bozmaların hiçbiri yakalanmadı | Test mi bozma mı kör: yeniden ölçülür |
+| 4 | `ORTAM-INCELE` | Bozma yapılmadan bile kırmızı | Ortam ya da gerçek hata incelenir |
+| 5 | `TASI-ADAYI-DUNYA-DURUMU` | Ortama bağlı ve kırmızılarının en az yarısı dünya olayı kümesinde | PR kapısı dışına taşıma ya da bölme adayı (§7.4, madde 1) |
+| 6 | `KISMI-KORUMA` | Test kırmızı veriyor ama denenen bozmalardan en az biri (ana tur ya da ek yoklama) yakalanmadı | Güçlendirme adayı; silme adayı DEĞİLDİR |
+| 7 | `COKLU-KORUMA-ADAYI` | Aynı bozmayı başka test de yakalıyor ve test pencerede hiç kırmızı vermedi | Birleştirme adayı; silme için §7.4, madde 4 |
+| 8 | `OLCULMEDI` | Bozma ölçümü yok ya da hiçbir şey ölçmedi | Dokunulmaz; `KORU` yazılmaz |
+| 9 | `KORU` | Ölçüldü ve denenen bozmaların hiçbiri kaçmadı | Dokunulmaz. "Tam korunuyor" demek DEĞİLDİR: ana tur ilk yakalanışta durur, kalan bozmalar denenmez |
+
+### 7.4 Taşıma, bölme, güçlendirme, birleştirme ve silme
+
+1. **Taşıma ve bölme** (`TASI-ADAYI-DUNYA-DURUMU`): §3 geçerlidir. Bütün kırmızıları PR'dan bağımsız (dünya olayı) olan test `scripts/ci/dunya-durumu-testleri.json`a
+   taşınır; neden, kanıt ve yeni yer yazılır, kanıt `q2_ci` sayılarıdır. Kırmızılarının bir kısmı PR'ın KENDİ hatası olan test (`izole` kırmızılar sonraki koşuda
+   `duzeldi`) tümden taşınmaz: dünya durumu kolu ayrı dosyaya çıkar, PR kolu PR'da kalır (örnek: `taban-tazeligi` ve `taban-tazeligi-dunya`). Aksi hâlde PR'ın gerçek
+   hatasını yakalayan kol da kaçar.
+2. **Güçlendirme** (`KISMI-KORUMA`): test kalır. Yakalanmayan her bozma için bir kontrol eklenir ve o bozma yeniden uygulanıp testin kırmızı verdiği gösterilir.
+   Sıra: para, yetki ve veritabanı kapıları önce.
+3. **Birleştirme** (`COKLU-KORUMA-ADAYI`): iki testin bütün kontrolleri tek dosyada toplanır, hiçbiri düşmez. Kazanç dosya sayısıdır, süre değil (bugünkü üç adayın
+   toplamı yaklaşık 16 sn); öncelik düşüktür.
+4. **Silme listesi.** Karne kimseyi sildirmez. Bir test silme listesine ancak şu koşulların HEPSİYLE girer:
+   - öneri `COKLU-KORUMA-ADAYI`;
+   - adayın bozmaları, ilk yakalanışta DURMAYAN bir koşuda yeniden denenmiş; en az 3 FARKLI bozma çıkmış ve her birini en az bir eş test yakalıyor. Tek ya da
+     çift bozmanın örtüşmesi rastlantı olabilir; bir bozmayı yalnız aday yakalıyorsa aday silinmez. Bugünkü ölçüm ilk yakalanışta durduğundan bu koşullar için
+     AYRI bir ölçüm gerekir;
+   - Recep onayı.
+
+   Silme PR'ı adayın INV/karar atıflarını eşe taşır ve karneyi aynı PR'da yeniler.
+
+### 7.5 Kapı
+
+`INV-TEST-KARNE-1`, `src/__tests__/conformance/test-karnesi-yapisi.test.ts`: `docs/audits/` altındaki en yeni `test-karnesi-YYYY-AA-GG.json`u denetler.
+
+- Şema: sürüm 1, tarih biçimi, `dosyaSayisi` kayıt sayısına eşit, kayıt tekrarı yok, küme geçerli.
+- Her kayıtta sekiz soru bloğu var; `q4` hükmü sözlükte.
+- `olculmedi` nedensiz yazılamaz; `UYGULANAMADI` / `TABAN_ATLANDI` hükmü "ölçüldü" yazılamaz; ölçülmemiş test `KORU` önerisi alamaz.
+- 8. soruda `kaynak` geçerli; `beyan` / `statik` tetiği boş değil ve yalnız metin içerir; `yok` nedenli; `beyan` yeri `PR` ya da `zamanli`.
+- `scripts/ci/dunya-durumu-testleri.json`daki HER test karnede, `dunyaDurumu` alanı ve yeni yeriyle görünür ("hiçbir koruma sessizce düşmez" sözünün mekanik karşılığı, §1).
+- Kanarya: karne 300'den fazla kayıt taşır (boş belgeyle yeşil verilmez).
+
+Yedi sabotaj vakası denetçinin her kolunu bozar (alan silme, nedensiz `olculmedi`, dünya durumu kaydının silinmesi / yer değişmesi / alanın boşalması, tekrar ve sayı,
+8. soru kolları, sabotajı ölçmeyen hükmün "ölçüldü" yazılması).
+
+Karneyi üreten üç aracın kendi birim testleri de kapıdır, çünkü araç bozulursa karne sessizce yanlış üretilir ve hiçbir şey kırmızı vermez:
+
+- `INV-TEST-KARNE-2`, `scripts/test-karnesi/__tests__/ci-gecmis.test.ts`: CI geçmişi toplayıcısı. Doğum sebebi iki gerçek kusurdur (ALT-38, 2026-10-06 ölçüldü):
+  GitHub günlüğünün renk kodu gerçek ESC değil `^[` metni gelir (yalnız ESC'yi soyan ilk sürüm 182 kırmızı koşuda 0 test dosyası buldu) ve
+  `status=failure&page=N` sayfalaması kararsızdır (pencereler `total_count` ile doğrulanır).
+- `INV-TEST-KARNE-3`, `scripts/test-karnesi/__tests__/sabotaj.test.ts`: bozma koşucusu. Tek vaadi "bozduğunu tam geri alır, ana ağaca dokunmaz, sır görmez"dir;
+  vaat saf yüklemlerle değil koşucunun kendisi gerçek git deposunda ve sahte vitest ile uçtan uca koşarak ölçülür.
+- `INV-TEST-KARNE-4`, `scripts/test-karnesi/__tests__/karne-uret.test.ts`: öneri adayının hangi kanıttan çıktığı. Ölçülmemiş test `KORU` olamaz, kısmi koruma
+  `KORU` yazılamaz, çelişen iki hüküm sessizce çözülmez; her eşik üç yanıyla (altı, kendisi, üstü) ve her öncelik çifti ayrı satırdır.
+
+**Bilerek YOK: karne tazelik kapısı** (karne yaşı ya da "karnede olmayan yeni test dosyası"). Takvimle kırmızı olan kapı, PR'dan bağımsız kırmızı üretir; §1'deki
+`taban-tazeligi` örneği (55 kırmızı, 39 dal) aynı hatadır. Tazelik görev olarak yaşar (§7.6).
+
+### 7.6 Yenileme (görev; kapı değil)
+
+Karneyi ALTYAPI yeniler: ayda bir, ve bir kapıyı PR dışına çıkaran ya da yeni öneri türü / yeni soru ekleyen değişiklikten sonra. Sıra:
+
+1. `node scripts/test-karnesi/ci-gecmis.cjs --cikti <dizin>/ci-gecmis.json` (`--baslangic` ve `--bitis` ile pencere);
+2. tam yerel vitest JSON raporu (`--reporter=json --outputFile`);
+3. bozma ölçümü: `node scripts/test-karnesi/sabotaj.cjs --repo <bağlı worktree> --plan <plan.json> --cikti <dizin>/gNN.jsonl`; önce karnede `olculmedi` olanlar
+   (para, yetki ve veritabanı kapıları önce), sonra kaynağı değişenler;
+4. `node scripts/test-karnesi/karne-uret.cjs --ci <ci-gecmis.json> --vitest <vitest.json> --sabotaj <dizin> --cikti-json docs/audits/test-karnesi-YYYY-AA-GG.json --cikti-md docs/audits/test-karnesi-YYYY-AA-GG.md`.
+
+Eski tarihli karne silinmez. **Bilinen sınır:** ham bozma çıktıları (`gNN.jsonl`, yaklaşık 3 MB, test çıktı satırları taşır) ve bozma planları depoya girmez;
+2026-10-09 karnesinin 347 ölçümü yalnız karne JSON'unda yaşar. Üretici önceki karneyi girdi olarak OKUMAZ, bu yüzden bir sonraki yenileme eski ölçümleri kaybeder;
+önce `--onceki` bayrağı gerekir (§7.7, madde 4).
+
+### 7.7 Ölçülmüş durum ve açık konular (2026-10-09)
+
+| Ölçü (ham veri: `docs/audits/test-karnesi-2026-10-09.json`) | Değer |
+|---|---|
+| Test dosyası | 654 (conformance 361, birim 222, betik 46, e2e 17, edge 7, smoke 1) |
+| Bozma ölçümü yapılan / yapılmayan | 347 / 307 (ölçülenlerin hepsi conformance) |
+| Ölçülen 347'nin hükmü | 345 `KIRMIZI` · 1 `YESIL` · 1 `TABAN_KIRMIZI` |
+| Denenen / kaçan bozma | 709 / 306 (ana tur 558 / 213; ek yoklama 151 / 93, 107 testte) |
+| En az bir bozması kaçan test (`kismi`) | 221 |
+| Öneri dağılımı | `OLCULMEDI` 306 · `KISMI-KORUMA` 218 · `KORU` 117 · `TASI-ADAYI-DUNYA-DURUMU` 7 · `COKLU-KORUMA-ADAYI` 3 · `SAHTE-YESIL-ADAYI` 1 · `ORTAM-INCELE` 1 · `TASINDI` 1 |
+| 8. soru | 2 `beyan` · 292 `statik` (kesin değil) · 360 `yok` (hangi dosya değişince koşacağı belirlenemedi) |
+| Silinecek test | 0: §7.4 madde 4 sağlanmadı, üç adayın her birinde yalnız 1 bozma denendi |
+| CI penceresi | `ci.yml` koşuları, 2026-07-06..2026-10-07 |
+
+**Okuma kuralı.** `yakalanan` ana turda en çok 1'dir (ilk yakalanışta durulur), bu yüzden "yakalanan / denenen" bir yakalama oranı DEĞİLDİR ve hiçbir belgede oran
+olarak yazılmaz. Doğru okuma: ölçülen 347 testin 345'i en az bir bozmayı yakalar (gerçekten kırmızı verir); 221'inin en az bir bozması kaçar (güçlendirme listesi);
+117 testin denenen bozmalarından hiçbiri kaçmaz, ama bu kalan bozmaların denenmediği anlamına da gelir. Bozmalar el yapımıdır, rastgele örnek DEĞİLDİR.
+
+Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz):
+
+1. **307 test ölçülmedi** (birim, betik, e2e, edge, smoke ve ölçümden sonra eklenen conformance testleri); hiçbirine tahmini hüküm yazılmadı. Sıradaki ölçüm
+   turu: para, yetki ve veritabanı kapıları önce (ALT-38k).
+2. **İki ölçüm yeniden yapılacak:** `belge-kart-plan-kapisi.test.ts` (bozma yapılmadan kırmızı: ölçüm makinesinde satır sonu CRLF; `ORTAM-INCELE`) ve
+   `instruction-surface-ppr.test.ts` (iki bozma yakalanmadı ama test yalnız kayıtlı dosyalara bakıyor, bozmalar kayıtlı değildi; `SAHTE-YESIL-ADAYI`).
+3. **Uygulama kayıtları** (bu PR'ın dışında, ayrı Kanban kartları): ALT-38i, PR kapısından çıkacak 2 test (`sessionstart-tavan`, `githooks-doc-scope`; üç ayda 10
+   kırmızı, ikisi de toplu olay) ve bölünecek 4 test (`comment-scrubber-scheme-safety`, `companion-parity-coverage`, `standard-section-integrity`,
+   `uretilmis-artefakt-tazeligi`); ALT-38j, birleşecek 3 test (`bash-write-audit-uretilmis-sinifi`, `e1-kimlik-kontrolu`, `storage-yazma-nobetcisi`, eşleriyle);
+   ALT-38k, güçlendirme dalgası 1 ve ölçülmeyen testlerin ölçümü.
+4. **`--onceki` bayrağı** (ALT-38l): üretici önceki karnenin `q3_sabotaj` sonuçlarını, kaynağı değişmemiş testler için devralır; bunsuz yenileme eski ölçümleri
+   kaybeder (§7.6).
+5. **`INV-TEST-BEYAN-1` kurulu değil.** "Beyansız yeni test birleşmez" kuralı her yeni test başlığına `TETİK:` / `YER:` yazma zorunluluğu getirir; bu yeni bir
+   zorunluluktur ve ayrı karar ister. Okuyucu ve taban (`beyan.cjs`, `beyan-tabani.json`) hazırdır; kapı karar sonrası eklenir.
+6. **Ölçüm tek makinede** (Windows) yapıldı; Linux'ta farklı kolu izleyen test (platforma bağlı atlama) farklı çıkabilir. CI'da dosya başına süre ölçülmedi.
 
 
 ---
@@ -27740,6 +28822,58 @@ sessiz eksik demektir.
 
 
 ---
+# FILE: docs\standards\vitrin-genel-metin-standard.md
+
+# Genel Vitrin Metni Standardı (Cetvel) — v0.2 TASLAK (OPS-29, BLG-1)
+
+> **Sahibi:** BLOG (OPS kararı, 2026-10-09). M5 kapı kodu GEO-SEO'da (SEO-20); M6 beyan kaydı OPS'ta (REC-425).
+> **Son doğrulama:** 2026-10-09. Envanter sayıları aynı gün canlı HTML (TR ve EN) ve master sözlüğü ile yeniden sayıldı; bkz. `ops29-site-metni-envanteri-2026-10-03.md` §3a–§3c.
+> **Durum:** TASLAK, yürürlükte değil. Karar OPS'ta; `docs/README.md` satırı ve `cetvel-sahipligi.md` kaydı 11 Ekim'den sonra HARİTA ile yürürlüğe alınırken eklenir.
+> **Ne yönetir:** müşterinin gördüğü, `vitrin-metni-standard.md` K1'in **sayamadığı** metinler: ana sayfa (sözlük `home`),
+> sabit sayfalar (hakkımızda, iletişim, altbilgi), kategori açıklaması (`categories.metadata`), marka açıklaması (`brands.ts`),
+> arama açıklamaları (`<meta name="description">`, ana sayfa, kategori, marka), Bilgi Merkezi liste metni.
+> **Niçin var:** OPS-29 envanteri (`docs/audits/ops29-site-metni-envanteri-2026-10-03.md`): bu yüzeylerin hiçbirini yöneten cetvel yok;
+> ana sayfa ve hakkımızda'da 16 bulgu satırı, kategori/aile/marka metinlerinde 9 gerçek üstünlük iddiası ölçüldü (10-03 ölçümü).
+> 10-09 yeniden sayımda 16 satırın 13'ü olduğu gibi canlıda duruyor, 3'ü 10-08'de #1758 ile tamamen ya da kısmen kalktı; envanterde olmayan yeni uçlar ve İngilizce sayfalardaki sorunlar da bulundu.
+> **Yeni şey icat edilmedi:** M1–M5 iki cetvelden genişletilir; M6–M7 YENİ ve ayrıca karar ister (aşağıda işaretli).
+
+## M0 Kapsam genişletmesi
+
+`vitrin-metni-standard.md` K1 tablosuna şu alanlar eklenir (aynı K2–K7 kuralları bunlara da uygulanır): `home.*` sözlük
+anahtarları, `about.*`, altbilgi sözlük anahtarları, `categories.metadata` içindeki `description_i18n` ve benzeri metin alanları,
+`brands.ts` `description`, meta açıklama üreten her şablon. Kural zinciri: bir metin hangi alana ait olursa olsun müşteriye gidiyorsa kapsamdadır.
+
+## Kurallar (kaynak maddeye bağlı)
+
+| Madde | Kural | Kaynağı |
+|---|---|---|
+| M1 | İç not, taslak, editör sesi ("…pasif logo vitrini olmaktan çıkarıp…" gibi iç hedef cümleleri) metinde bulunmaz | K2 |
+| M2 | Olumsuz iddia ("…içermez", "…gerekmez") kaynakta aynen geçmiyorsa yazılmaz | K4.1, R4.5 |
+| M3 | Birimi, kapsamı ya da doğruluğu belirsiz teknik değer yazılmaz; "ultra sessiz", "maksimum verim" gibi ölçüsüz üstlük de bu sınıftır | K6 |
+| M4 | Metin yalnız sayfanın dilinde görünür; dil düşüşü yok. TR ve EN aynı şeyi söyler: yalnız bir dilde bulunan iddia ya da cümle yazılmaz (10-09 canlı okumada EN ana sayfanın güven bölümünde 14 anahtar TR ile aynı anlamı taşımıyordu ve çoğu editör notu gibi okunuyordu; hakkımızda başlığı kırıktı; envanter §3c) | K10 |
+| M5 | **Üstünlük, kıyas, garanti ve vaat yasak** ("en iyi", "dünya lideri", "kusursuz", "kesintisiz", "sistemin ömrü boyunca yanınızdayız"). İstisna: kaynağı gösterilen ve sayıyla doğrulanabilir kıyas ("VentHub'ın en geniş kategorisi" → ürün sayısı yazılır ya da cümle kalkar) | R4.2; ortak liste `src/lib/seo/ovguAyikla.ts` |
+| M6 **YENİ** (OPS 10-09, karar 317'nin yazıya geçmişi) | **İşletme beyanı** (deneyim yılı, stok, teslimat süresi, sertifika/yetki, garanti, çalışma saati, test sonucu, çalışan kadrosu, destek vaadi) kaynaksızsa **kalkar ve yerine doğru, somut bir cümle konur**; yalnız silmek yetmez. Kaldırmayı OPS onaylar, Recep'e bilgi verilir. Yeni bir işletme beyanı eklemek Recep kararıdır; toplu yazılı beyan istenmez | Envanter §3: bu türden 5 satır; §3b |
+| M7 **YENİ** (ayrı madde, OPS 10-09) | **Süslü soyut ifade** ("mükemmeliyet", "estetik", "sanat eseri", "kürasyon", "deterministik", "katman", "geleceği") yerine her başlık ve ilk cümle somut bir ürün, ölçü ya da kullanım durumu söyler. Sayılabilir ölçüt: başlıkta ve ilk cümlede en az bir somut isim (ürün, ölçü, kullanım yeri) ve sıfat başına bir kanıt | Envanter §3 türü C: 5 satır |
+
+## "Yapay zekâ kokusu" kuralı var mı? (ölçüldü 2026-10-03)
+
+İki cetvelde **yok**: `vitrin-metni-standard.md`'de hiç geçmiyor; `rehber-yazisi-standard.md` yalnız yazı için üstünlük vaadini (R4.2) ve "yapay zekâ notu konmaz" kararını (106) taşıyor. M7 bu boşluğu "koku" diye değil, **sayılabilir ölçüt** olarak kapatır; "kokuyor" hükmü kural olamaz, kanıt ister.
+
+## Kapılar (öneri, yazılmadı)
+
+- M5: `ovguAyikla.ts` kalıbına sözcük sınırı (`\b`) eklenmeden aile/kategori metnine uygulanmaz: envanterde 12 yanlış alarmın 3'ü "yerden yüksekliği", "üstünde", "en üstünden" sözcüklerinden. Kapı SEO'da (SEO-20), liste ortak.
+- M6/M7: yeni kural; kapı ancak karardan sonra (envanter betiği taslağı `scripts/` altında, yazılmadı).
+- Canlı metin değişikliği Recep sözüyle; bu taslak metne dokunmaz.
+
+## Sorular ve OPS yanıtları (2026-10-09)
+
+1. Cetvel sahibi: **BLOG**. M5 kapı kodu GEO-SEO'da (SEO-20); M6 beyan kaydı OPS'ta (REC-425).
+2. M6'daki beyanları kim yazar? Kaynaksız beyan kalkar, OPS onaylar, Recep'e bilgi verilir; yeni beyan Recep kararıdır; toplu yazılı beyan istenmez.
+3. M7 ayrı madde olarak kalır.
+4. Yürürlüğe alma (README satırı, `cetvel-sahipligi` kaydı): 11 Ekim'den sonra HARİTA ile; bu belge o güne kadar TASLAK'tır.
+
+
+---
 # FILE: docs\standards\vitrin-metni-standard.md
 
 # Vitrin Metni Standardı
@@ -28225,6 +29359,7 @@ depoya yalnız özet sayı girer.
 | **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Kanban kartı |
 | **Model adresleri yayından +1, +7, +14 gün** (SEO-4, URN-11) | gsc-url-denetim (model adresi örneklemi: son tarama, dizin durumu) · GSC site haritası durumu (gönderilen/dizinlenen, hata) · tarama sıklığının `lastmod` değişiminden bağımsız olup olmadığı | canlı | tek tablo URUN + OPS; tabana (REC-300 taban tablosu) kıyas. Gerekçe: model satırlarının `lastmod`'u `products.updated_at`, 441 aktif modelde 10 gün / 20 dakikaya yayılı (en büyük küme 09-25 09:11Z 166 model); aynı damgayı taşıyan çok adres Google'ın lastmod'u yok saymasına yol açabilir (REC-461/A). Bayrak kapalıyken model satırı haritaya girmez |
 | **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar kart numarasıyla; eski kayıtlarda REC-nn) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili Kanban kartı |
+| **Her yeni yazı ya da düzeltilmiş sayfa yayını, canlıda 200 görülünce** (SEO-39) | Search Console'da URL denetimi ve "dizine eklenmesini iste" (yalnız o adresler) + IndexNow (`scripts/seo/indexnow-bildir.mjs`); yayını bildirmek yayın kartının sahibine, isteği göndermek GEO-SEO'ya aittir ve Recep'ten ayrıca onay istenmez | canlı, yalnız yayınlanan adresler | sonuç (adres, istek, IndexNow yanıtı) ilgili Kanban kartına; oturum ya da günlük sınır engeli OPS'a tek satır |
 
 EN_YAYIN kapalıyken `--en-harita-disi-bilincli` verilir: EN alternatifinin haritada olmaması kırmızı değil,
 ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalkar.
@@ -28235,6 +29370,13 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
   GECICI 0 · YOK 0 · HEDEF-YANLIS 0**.
 - Site haritası: her adres doğrudan 200; model adresi sayısı = 442 (plan §1).
 - Canonical: her sayfada tek ve kendini gösterir. hreflang: tr + en + x-default (EN bilinçli istisnası hariç).
+- **Yasal sayfalar (URN-97, 2026-10-10):** altı yasal sayfa (kvkk, gizlilik, çerez, mesafeli satış, kullanım koşulları, ön bilgilendirme)
+  hukukçu teyidi ve satıcı bilgileri hazır olana kadar (`isLegalContentReady()` false) **`noindex, follow`** basar, hreflang yazmaz,
+  canonical kalır; sayfa erişilebilir kalır (footer bağlantıları, doğrudan adres) ve site haritasında yoktur. Başlıktaki "(Taslak)" eki ve
+  uyarı bandıyla AYNI koşuldan okunur (`yasalDizinDisi`); hazır olunca üçü birlikte kendiliğinden kalkar. Bu altı adreste `noindex`
+  KUSUR DEĞİLDİR: `bot-karnesi` bu adreslerde `noindex: EVET` gösterir (beklenen değer); araçların bunu bilinçli listeye alıp
+  almayacağı Geo-SEO'nun kararıdır (`canli-kapi` `noindex`'i yalnız gizli yüzeylerde ölçer, bu adresler o listede değildir). Kapı:
+  `src/app/__tests__/yasalSayfaDizinDisi.test.ts` (INV-YASAL-DIZIN-1). Canlı ölçüm: tarayıcı bölmesiyle `meta[name=robots]`.
 - Bağlantı taraması: kırık 0 · site içi yönlendirme 0 (plan §7 "kırık 0, zincir 0").
 - Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
   bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
