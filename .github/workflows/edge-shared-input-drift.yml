@@ -93,7 +93,7 @@ jobs:
       # Surum PINLI: drift-check.mjs `functions download --use-api` bayragina bagli ve
       # o bayragin davranisi CLI surumune bagli. 2.101.0 = davranisin olculdugu surum.
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
+        uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.101.0
 
