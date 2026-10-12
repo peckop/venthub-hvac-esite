@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.26`, `@wrongstack/codebase-index-mcp@1.0.26`, `@wrongstack/kanban-mcp@1.0.26`, `@wrongstack/mailbox-mcp@1.0.26` (09-27 1.0.19'dan yükseltildi), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.0`, `@wrongstack/codebase-index-mcp@1.1.0`, `@wrongstack/kanban-mcp@1.1.0`, `@wrongstack/mailbox-mcp@1.1.0` (ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
 | **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
@@ -55,6 +55,12 @@ değiştiremeyebilir, değiştirse bile eski kod bellekte koşar (09-27: makined
 4. Öteki pencereler açılır.
 `--denetle` yalnız doğrular (sürümler, yamalar, `.mcp.json` giriş dosyaları), hiçbir şey değiştirmez.
 Kapı: `INV-WRONGSTACK-KURULUM-1` (başka pencere varken hiçbir süreç kapatılmaz).
+
+**Kurulumdan sonra sürüm okuma (ARC-94):** `node tools/wrongstack-mcp/saglik.cjs` koşan her `project-server.js`
+daemon'unun paket sürümünü okur (eski sürümlü daemon varsa `HATA`); `--sunucu` ek olarak her MCP sunucusunu açıp
+`initialize` sürümünü okur. ⛔`--sunucu` YALNIZ ana ağaçta ve yükseltme bittikten sonra: sunucu worktree kökünü ana
+ağaca çevirir, o ağacın paket sürümüyle canlı kökü açar ve sage.db şemasını yerinde göç ettirir (12 Ekim 13:07'de
+ölçülen kaza; betik worktree'de `--sunucu`yu reddeder). Kapı: `INV-WRONGSTACK-SAGLIK-1`.
 
 **⛔Yeni sürümde yama ÇIKMAZI (yamalı paket yükseltilirken):** yama bir sürüme özeldir ve kurulum betiği
 sürüm kayınca `package-lock.json`'a bakıp `npm ci`dan ÖNCE `HATA` verir; ama yeni yamayı üretmek için
@@ -148,7 +154,7 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    özet kesicisi (`kanbanTool.serialize` → pano okumayan eylemde panoyu {sütun → kart sayısı}
    özetine indirir) MCP yolunda **hiç çağrılmıyor**. 1.0.26'da da aynı satır (ölçüldü). Bedel:
    47 KB'lık panoda her `add_task`/`add_note`/`transition_task` 48,6 KB dönüyordu.
-   `yamalar/kanban-mcp-1.0.26-ozet-donus.patch` başarılı sonucu kesiciden geçirir; kesici girintili
+   `yamalar/kanban-mcp-1.1.0-ozet-donus.patch` (1.0.26'dan ARC-94 ile yeniden üretildi: yukarı akım `signal.throwIfAborted()` ekleyince bağlam kaydı; yukarı akım hâlâ `{content: result}`) başarılı sonucu kesiciden geçirir; kesici girintili
    metin döndürdüğü için sonuç `JSON.parse` ile nesneye çevrilir, sunucu sıkı biçimde yazar.
    Yalnız panoyu döndüren eylemlerde (`add_note`, `update_task`, `move_task`, `assign_task`…)
    özet kartı da kaybettirirdi; yama `args.taskId` kartını özetin yanına koyar.
@@ -164,7 +170,7 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    `@wrongstack/sage` `SageDomainTermExtractor` yalnız ASCII varsayar: `normalizeTerm("Şerit")` → `"erit"`,
    `("çıktı")` → `"kt"`, `("ığış")` → boş anahtar; "İstanbul Şubesi Müdürü" hiç aday olmaz, "ÇıkışKapısı"
    camelCase sayılmaz, Türkçe harfle biten terimin tanım cümlesi bulunmaz (`\b` ASCII-sözcük tanımlıdır).
-   `yamalar/sage-1.0.26-domain-terms-turkce.patch` (6 hunk) regex'leri Unicode sınıflarına (`\p{L}` `\p{Lu}`
+   `yamalar/sage-1.1.0-domain-terms-turkce.patch` (7 hunk; ARC-94'te 1.0.26'daki 6 hunk'lık yamadan yeniden üretildi: aday mantığı `domain-term-candidates` bölümüne taşınmış, claim örtüşme mantığı eklenmiş; yukarı akım hâlâ ASCII-only) regex'leri Unicode sınıflarına (`\p{L}` `\p{Lu}`
    `\p{Ll}`) çevirir, girdiyi ve anahtarı NFC'ye çevirir ve "İ"nin küçük harfinin ürettiği birleşik noktayı
    (U+0307) siler; İngilizce sonuç normal metinde değişmez (aynı terimler, aynı güven). **Uzunluk üst sınırı
    (bağımsız inceleme O1):** boşluksuz çok uzun sözcük `new RegExp(terim)` kurulumunda "Stack overflow" atıyordu
@@ -177,7 +183,7 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    araçlarında yok; yalnız kütüphane dışa aktarımı) — yama, çıkarıcıyı kullanacak iş için hazır tutulur, sunucu
    davranışını şimdi değiştirmez. **Bilinen sınır:** anahtar yerel-bağımsız küçültülür, yani "Işık" → `işık`,
    "ışık" → `ışık` (ayrı anahtar); `toLocaleLowerCase('tr')` İngilizce "INDEX"i bozacağı için kullanılmadı.
-   **Ne zaman düşer:** `sage` sürümü 1.0.26'dan kayınca yama uymaz; `kurulum.cjs` sürüm farkını adıyla söyler,
+   **Ne zaman düşer:** `sage` sürümü 1.1.0'dan kayınca (1.0.26'dan 1.0.37'ye kayışta da düşmüştü) yama uymaz; `kurulum.cjs` sürüm farkını adıyla söyler,
    yama yeni sürümde yeniden üretilir (kaynak satırlar `extractCandidatesFromMessage`, `hasCamelBoundary`,
    `normalizeTerm`) ya da yukarı akış düzeltince silinir. Kapı `INV-WRONGSTACK-SAGE-YAMA-1` (yamasız/yamalı kopya
    karşılaştırması + sunucunun yüklediği dosya; yama biçimi ayrıca CI'da, kurulu paket olmadan sahte ağaçta
