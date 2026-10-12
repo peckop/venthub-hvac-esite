@@ -2,13 +2,13 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-10-07T11:24:52.619313+00:00
-total_compiled_files: 656
-source_commit: 1718021a7
+compiled_at: 2026-10-12T13:20:38.604424+00:00
+total_compiled_files: 655
+source_commit: e8fe0bb42
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-10-07T11:24:52.619313+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-10-12T13:20:38.604424+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -28474,137 +28474,6 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `${color.bg`, `${scrollAnimationClasses.fadeUp(isVisible`, `${scrollAnimationClasses.scaleIn(isVisible`, `aspect-video`, `border`, `duration-300`, `font-bold`, `font-semibold`, `group`, `group-hover:scale-110`, `inset-0`, `lg:px-8`, `mb-1`, `mb-12`, `mb-2`
 
 ---
-# FILE: src\components\category\sections\silent-fan\SilentFanTypeComparison.md
-
----
-domain: general
-source_type: doc
-namespace_type: module
-source_path: C:\tmp\vh-urun-comp\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-skeleton_hash: a8e884a695e1fe9a
-entity_hashes:
-  func:SilentFanTypeComparison: d3f5f980a16f61d9
-  func:tr: b282b53f03d688a5
-  overview: bed9a48986deb76b
-  style_tokens: fb4db20eff738486
-generated_at: 2026-08-27T07:00:29Z
----
-
-## Genel Bakış
-Bu modül, sessiz fan türlerinin karşılaştırılmasını görselleştiren bir React bileşeni sunar. Bileşen, kullanıcı arayüzünde farklı fan tiplerinin özelliklerini yan yana sergiler. Metin içerikleri çeviri desteğiyle sunulur.
-
-## Fonksiyon Grupları
-
-### Ana Bileşen
-Sessiz fan tür karşılaştırma ekranını oluşturur ve render eder. Kullanıcıya farklı fan tiplerinin özelliklerini karşılaştırmalı olarak gösteren arayüzün tamamından sorumludur.
-- SilentFanTypeComparison
-
-### Yardımcı Fonksiyonlar
-Bileşen içinde kullanılan metinlerin çevirisini sağlar. Verilen bir anahtar değeri karşılık gelen yerelleştirilmiş metinle eşleştirir.
-- tr
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-Bu modül için fonksiyon gövdeleri sağlanmadığından, yalnızca imzalardan aksiyom üretilemez. Aksiyomlar yalnızca fonksiyon gövdelerinden türetilir; çıkarım yapılmaz.
-
----
-
-## FONKSİYON DETAYLARI
-
-### SilentFanTypeComparison
-**Ne yapar**: Sessiz fan türlerinin karşılaştırmasını gösteren bir React bileşeni oluşturur. React.FC tipinde bir fonksiyon döndürür.
-**Nasıl yapar**: Kaynak dosyada fonksiyonun iç mantığı hakkında bilgi verilmemiştir. Bir React fonksiyonel bileşeni olarak tanımlanmıştır ve `React.FC` tipinde bir bileşen döndürür.
-**Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: `React.FC` — React fonksiyonel bileşeni döndürür.
-
-### tr
-**Ne yapar**: Verilen anahtar (key) değeriyle ilişkili çeviri/metin işleme işlevi gerçekleştirir.
-**Nasıl yapar**: Kaynak dosyada fonksiyonun iç mantığı hakkında bilgi verilmemiştir. Muhtemelen bir çeviri (translation) yardımcısıdır; verilen key parametresine karşılık gelen metni işler.
-**Parametreler**:
-- key: `string` — İşlenecek metin anahtarı
-**Dönüş**: Kaynakta dönüş tipi belirtilmemiştir; bilinmiyor.
-
----
-
-## İTHALATLAR (IMPORTS)
-- import: @/components/ui/VentImage::VentImage
-- import: @/hooks/useScrollAnimation::scrollAnimationClasses
-- import: @/hooks/useScrollAnimation::useScrollAnimation
-- import: @/i18n/I18nProvider::useI18n
-- import: lucide-react::Check
-- import: lucide-react::X
-- import: react::React
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: SilentFanTypeComparison.tsx::SilentFanTypeComparison
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu; metin anahtarlarını çevirmek için kullanılır
-  - `dict` — useI18n hook'undan gelen sözlük nesnesi; çeviri verilerine erişmek için kullanılır
-  - `sectionRef` — useScrollAnimation hook'undan gelen HTMLElement ref'i; section DOM elemanına bağlanır
-  - `isVisible` — useScrollAnimation hook'undan gelen boolean; scroll animasyonunun tetiklenip tetiklenmediğini belirtir
-  - `tr` — yerel çeviri yardımcısı fonksiyonu; `categorySilentFan.comparison.` öneki ile anahtarları t fonksiyonuna aktarır
-  - `features` — `dict.categorySilentFan.comparison.features` dizisi; karşılaştırma özelliklerini içerir, yoksa boş dizi atanır
-  - `f` — features.map callback'inde kullanılan tekil feature nesnesi; `f.label`, `f.standard`, `f.quiet` alanlarına erişilir
-  - `i` — features.map callback'inde kullanılan sayısal indeks; key prop'u olarak kullanılır
-- **Dönüş**: JSX elementi (section bileşeni)
-
-### [N2_NASIL] AST Pointer: SilentFanTypeComparison.tsx::tr
-- **params**: `key: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (t fonksiyonunun dönüş değerini döndürür)
-
-### [N3_NASIL] AST Pointer: SilentFanTypeComparison.tsx::features.map callback (orta sütun)
-- **params**: `f`, `i: number`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX elementi (div; `f.label` görüntüler)
-
-### [N4_NASIL] AST Pointer: SilentFanTypeComparison.tsx::features.map callback (masaüstü kartlar)
-- **params**: `f`, `i: number`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX elementi (div; `f.standard` ve `f.quiet` görüntüler)
-
-### [N5_NASIL] AST Pointer: SilentFanTypeComparison.tsx::features.map callback (mobil görünüm)
-- **params**: `f`, `i: number`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX elementi (div; `f.label`, `f.standard`, `f.quiet` görüntüler)
-
----
-
-## NODE ID STANDARD
-
-  file: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-  function: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx::SilentFanTypeComparison
-  function: src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx::tr
-
----
-
-## DISA AKTARILANLAR (EXPORTS)
-  export: SilentFanTypeComparison
-
----
-
-## STİL TOKENLERİ
-
-### Arbitrary Değerler (token'a geçirilmemiş)
-Yok — tüm stiller token'a geçirilmiş. ✅
-
-### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
-
-### Tailwind Sınıf Özeti
-- **Renkler:** `bg-blue-600`, `bg-blue-900/40`, `bg-center`, `bg-cover`, `bg-slate-100`, `bg-slate-50`, `bg-slate-900`, `bg-white`, `bg-white/80`, `border-b`, `border-slate-100`, `border-slate-200`, `border-white/5`, `last:border-0`, `md:text-5xl`
-- **Layout:** `absolute`, `backdrop-blur`, `backdrop-blur-2`, `block`, `flex`, `flex-col`, `gap-0`, `gap-12`, `gap-4`, `grid`, `grid-cols-2`, `h-73px`, `h-full`, `hidden`, `items-center`
-- **Varyant/Responsive:** `group-hover:`, `last:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${scrollAnimationClasses.fadeUp(isVisible`, `-mx-48`, `border`, `duration-700`, `font-bold`, `font-extrabold`, `font-medium`, `grayscale`, `group`, `group-hover:scale-110`, `inset-0`, `lg:col-start-3`, `lg:px-8`, `mb-1`, `mb-16`
-
----
 # FILE: src\components\category\sections\silent-fan\SilentFanVorticeBrand.md
 
 ---
@@ -34071,7 +33940,7 @@ Bu modül, ürün kartlarını dairesel bir 3B yörüngede sergileyen interaktif
 ### [N4_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::SuspendedCardMaterial
 - **params**: `finalPath` — `string | null` tipinde doku dosya yolu; `hovered` — `boolean` tipinde hover durumu
 - **ic_degiskenler**:
-  - `texture` — `useTexture(finalPath || '/images/placeholders/product-placeholder.png')` çağrısı sonucu; ürün kartının dokusu
+  - `texture` — `useTexture(finalPath || YER_TUTUCU_GORSEL)` çağrısı sonucu; ürün kartının dokusu
 - **Dönüş**: JSX elementi — `<meshStandardMaterial>`; `texture` map olarak, `hovered` true ise `CONFIG.glowColor` emissive renk ve `CONFIG.emissiveIntensity * 1.5` yoğunluk, aksi halde siyah ve 0 yoğunluk
 
 ### [N5_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalCard
@@ -42750,21 +42619,19 @@ Bu modül, görsel gösterimi ve yedek görsel mekanizması üzerine kurulu bir 
 
 ### VentImageProps
 - `src: string | null | undefined`
-- `fallbackType?: 'product' | 'category' | 'brand' | 'generic'`
+- `fallbackType?: 'product' | 'category' | 'brand' | 'generic'` — **@deprecated (URN-69)**: etkisi yok, yedek tektir
 
 ---
 
 ## SABİTLER
-- **FALLBACK_IMAGES** (object) — `{
-  product: '/images/placeholders/product-placeholder.png',
-  category: '/...`
+- Yedek sabiti bu dosyada yok: görsel yokken ya da yüklenemediğinde `YER_TUTUCU_GORSEL` (`@/utils/imageUtils`, ürün içermeyen nötr SVG) basılır; yer tutucuda alt metin `t('common.imagePreparing')`.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: VentImage.tsx::VentImage
-- **params**: (src, alt, fallbackType = 'generic', className, ...props)
+- **params**: (src, alt, fallbackType (kullanılmaz), className, ...props)
 - **ic_degiskenler**: 
   - `error` — React state boolean, resim yükleneme durumunu takip eder
   - `isLoaded` — React state boolean, resmin başarıyla yüklenip yüklenmediğini takip eder
@@ -58297,7 +58164,7 @@ Gerçek bir görsel atanmamış ürünler için deterministik bir yer tutucu gö
 ### [N3_NASIL] AST Pointer: src/lib/images/productImage.ts::productImagePlaceholder
 - **params**: `_seed` (string) — kullanılmıyor (alt çizgi öneki ile işaretli)
 - **ic_degiskenler**: yok
-- **Dönüş**: string — `PRODUCT_IMAGE_PLACEHOLDER` sabitinin değeri
+- **Dönüş**: string — `YER_TUTUCU_GORSEL` (ürün içermeyen nötr yer tutucu, `@/utils/imageUtils`)
 
 ---
 
