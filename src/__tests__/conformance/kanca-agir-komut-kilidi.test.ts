@@ -91,6 +91,12 @@ describe('INV-AGIR-KILIT-1: hangi komut ağır sayılır', () => {
     ['pnpm lint', 'lint'],
     ['pnpm knip', 'knip'],
     ['docker compose up -d', 'docker'],
+    // ARC-87b: gövde/tırnak metin sayılır, ama ondan SONRAKİ ya da $( ) içindeki gerçek komut ağırdır.
+    ["cat <<'EOF' > a.txt\nmetin\nEOF\npnpm build", 'build'],
+    ['echo $(pnpm type-check)', 'type-check'],
+    ['echo "$(pnpm install)"', 'install'],
+    ['sleep 1 & pnpm build', 'build'],
+    ['cat <<-EOF\n\tx\n\tEOF\npnpm build', 'build'],
   ]
   it.each(agir)('AĞIR: %s → %s', (komut, ad) => {
     expect(kilit.agirMi(komut)).toBe(ad)
@@ -107,6 +113,13 @@ describe('INV-AGIR-KILIT-1: hangi komut ağır sayılır', () => {
     'echo "pnpm type-check"',
     'node scripts/board/board.cjs who',
     'gh api repos/x/y/pulls/1/merge',
+    // ARC-87b (OPS 10-11 17:41): heredoc gövdesi, tırnak içi metin ve yorum KOMUT DEĞİLDİR.
+    "python -I - \"$F\" <<'PY'\nprint('x')\npnpm install geri alındı\nPY",
+    'git commit -m "fix; pnpm install --frozen-lockfile"',
+    "git commit -m 'a\npnpm type-check --noEmit\nb'",
+    'echo "a && pnpm build now"',
+    '# pnpm install',
+    'cat <<-EOF\n\tpnpm install\n\tEOF',
   ]
   it.each(hafif)('HAFİF (kilitlenmez): %s', (komut) => {
     expect(kilit.agirMi(komut)).toBeNull()
@@ -500,5 +513,71 @@ describe('INV-AGIR-KILIT-4: arka plan sarmalayıcı (ARC-87): komut bitince yuva
     })
     expect(kod).toBe(0)
     expect(doluSayisi(dizin)).toBe(0)
+  })
+})
+
+describe('INV-AGIR-KILIT-5: tırnak/heredoc farkında sınıflama + reddedilen komutta yuvanın kendini bırakması (ARC-87b)', () => {
+  // OPS 10-11 17:41: `python -I - "$F" <<'PY'` gövdesindeki satır başı "pnpm install" yuva aldırdı; aynı komutu
+  // bash-write-guard reddedince (çıkış 2) PostToolUse hiç gelmedi ve yuva TTL'e kaldı.
+  const calistir = (dizin: string, girdi: Record<string, unknown>) =>
+    spawnSync(process.execPath, [KANCA], {
+      input: JSON.stringify(girdi),
+      encoding: 'utf8',
+      env: { ...process.env, VENTHUB_AGIR_KILIT_DIR: dizin, VENTHUB_AGIR_KILIT_SARMA: '0' },
+    })
+  const on = (sid: string, command: string, ekstra: Record<string, unknown> = {}, aracGirdi: Record<string, unknown> = {}) => ({
+    session_id: sid,
+    tool_name: 'Bash',
+    hook_event_name: 'PreToolUse',
+    tool_input: { command, ...aracGirdi },
+    ...ekstra,
+  })
+  const yuvaVar = (dizin: string) => fs.existsSync(path.join(dizin, 'yuva-0'))
+  const GOVDE = ['python -I - "$F" <<\'PY\'', 'import sys', 'print(sys.argv[1])', 'pnpm install geri alındı', 'PY'].join('\n')
+
+  it('heredoc gövdesindeki satır başı "pnpm install" yuva ALMAZ; gövdeden sonraki gerçek ağır komut alır', () => {
+    const dizin = yeniDizin()
+    expect(calistir(dizin, on(A, GOVDE)).status).toBe(0)
+    expect(yuvaVar(dizin)).toBe(false)
+    calistir(dizin, on(A, GOVDE + '\npnpm build'))
+    expect(yuvaVar(dizin)).toBe(true)
+  })
+
+  it('REDDEDİLMİŞ ağır komutun (PostToolUse gelmedi) yuvası, aynı pencerenin sonraki Bash çağrısında DÜŞER', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, on(A, 'pnpm install --frozen-lockfile'))
+    expect(yuvaVar(dizin)).toBe(true) // başka kanca reddetti; bırakma olayı yok
+    // başka pencere hâlâ bekler
+    expect(calistir(dizin, on(B, 'pnpm build')).stdout).toContain('deny')
+    // aynı pencerenin sonraki (hafif) çağrısı yuvayı düşürür
+    calistir(dizin, on(A, 'git status'))
+    expect(yuvaVar(dizin)).toBe(false)
+    expect(calistir(dizin, on(B, 'pnpm build')).stdout.trim()).toBe('')
+    expect(yuvaVar(dizin)).toBe(true)
+  })
+
+  it('ARKA PLAN yuvası sonraki Bash çağrısında DÜŞMEZ (komut hâlâ koşuyor)', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, on(A, 'pnpm build', {}, { run_in_background: true }))
+    expect(yuvaVar(dizin)).toBe(true)
+    calistir(dizin, on(A, 'git status'))
+    expect(yuvaVar(dizin)).toBe(true)
+  })
+
+  it('başka AJANIN yuvasını ana pencere düşürmez; kendi ajanı düşürür', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, on(A, 'pnpm type-check', { agent_id: 'ajan-1' }))
+    expect(yuvaVar(dizin)).toBe(true)
+    calistir(dizin, on(A, 'git status')) // ana pencere (agent_id yok)
+    expect(yuvaVar(dizin)).toBe(true)
+    calistir(dizin, on(A, 'git status', { agent_id: 'ajan-1' })) // aynı ajanın sonraki çağrısı
+    expect(yuvaVar(dizin)).toBe(false)
+  })
+
+  it('başka pencerenin yuvasını düşürmez', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, on(A, 'pnpm build'))
+    calistir(dizin, on(B, 'git status'))
+    expect(yuvaVar(dizin)).toBe(true)
   })
 })

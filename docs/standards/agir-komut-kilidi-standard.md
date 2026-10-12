@@ -230,3 +230,27 @@ dizininin yok olduğunu oku (TTL beklenmeden); (3) o sırada ikinci pencerenin a
 reddedilmediğini ölç; (4) hata veren arka plan komutunda da (`tsc --nonexistent-flag-xyz`) yuvanın
 bırakıldığını ölç. Yuva komut bitince boşalmıyorsa `updatedInput` kararsız uygulanmıyor demektir:
 OPS'a yaz, §7 sınırı. Ölçülmeden "çalışıyor" denmez.
+
+## §8 Sınıflama tırnak ve heredoc farkındadır; reddedilen komutun yuvası kendini bırakır (ARC-87b)
+
+**Ölçülen vaka (OPS 2026-10-11 17:41):** `python -I - "$F" <<'PY'` komutunun heredoc gövdesinde satır başı
+"pnpm install" vardı; bölücü gövdeyi komut saydı ve yuva alındı. Aynı komutu `bash-write-guard` reddetti
+(çıkış 2: heredoc gövdesinde yazma, hedef çıkarılamadı). PreToolUse kancaları PARALEL koşar, birbirinin
+kararını görmez; reddedilen çağrı için ne PostToolUse ne PostToolUseFailure gelir. Yuva 20 dakika TTL'e
+kaldı ve filo bekledi ("sende install 9 dk").
+
+**Kurallar:**
+- Bölücü tırnak ve heredoc'u tanır: tek tırnak içi hiç, çift tırnak içi yalnız `$( )` ve ters tırnak
+  komuttur; heredoc gövdesi (`<<EOF`, `<<'EOF'`, `<<-EOF`) sınırlayıcı satıra kadar metindir. `$( )` ve
+  ters tırnak içi AYRI komut olarak sınıflanır. Tek `&` de ayırıcıdır. Bölücü bozulursa eski düz bölme
+  kullanılır (temkinli: fazla parça, eksik değil).
+- Kendini onarma: aynı pencerenin (ve aynı ajanın, `agent_id`) yeni her PreToolUse(Bash) çağrısı o
+  ajanın ÖN PLAN yuvalarını bırakır; ön plan komutları ardışık koşar, yeni çağrı geldiyse öncekinin
+  bittiği ya da hiç koşmadığı kesindir. ARKA PLAN yuvası (belirteç), başka pencerenin ve başka ajanın
+  yuvası düşmez. `settings.json` değişmez.
+- Sınır: bir alt ajanın yuvasını ana pencere düşürmez, ama kancaya `agent_id` gelmiyorsa (eski sürüm) ayrım
+  yapılamaz ve pencerenin ön plan yuvası düşer; kabul edildi (kilit emniyet kemeridir, TTL arkada).
+
+**Test:** `kanca-agir-komut-kilidi.test.ts` INV-AGIR-KILIT-1 (heredoc/tırnak/`$( )` vakaları) ve
+INV-AGIR-KILIT-5 (heredoc gövdesi yuva almaz, reddedilen komutun yuvası sonraki Bash çağrısında düşer,
+arka plan yuvası kalır, ajan ve pencere ayrımı); bozma 9/9.

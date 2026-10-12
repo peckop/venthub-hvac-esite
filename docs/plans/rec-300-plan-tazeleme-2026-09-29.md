@@ -59,7 +59,10 @@ erişimi var, sonuç bu tazelemede aranmadı) · linkinator + unlighthouse yayı
    hreflang/canonical, linkinator kırık 0 / zincir 0.
 4. **IndexNow adımı (karar 164 A) — yayınla AYNI yayında:**
    a. #1459 içeriği (anahtar `src/config/indexnow.ts`, `public/<anahtar>.txt`, yol süzgeci) 3-C ile birlikte ya da hemen önce iner;
-      bayrak açık olduğundan süzgeç devre dışı, bildirim serbest.
+      bayrak açık olduğundan süzgeç devre dışı, bildirim serbest. **Düzeltme (URN-10, 2026-10-11): bu varsayım yanlıştı** —
+      webhook yol listesi iki şemayı birden üretir (tazeleme için doğru); süzgeç açık kipte de çalışır ve IndexNow'a yalnız
+      `adresUret(…, true)` biçimli adresler gider (`src/lib/seo/indexnow.ts` `indexNoweGiderMi`; eski şema, `/sitemap.xml`
+      ve `EN_YAYIN` kapalıyken `/en/...` gitmez).
    b. Canlıda `https://venthub.com.tr/<anahtar>.txt` **200, 32 bayt, içerik = anahtar** ölçülür.
    c. **Hangi adresler:** yeni sitemap'in TÜM adresleri (bugün 88; yayından sonra 442 model + aile + kategori + dal + marka + statik),
       tek toplu bildirim (tavan 10.000). **Eski adresler BİLDİRİLMEZ** (308). Site haritası kaynağı canlı `sitemap.xml`.

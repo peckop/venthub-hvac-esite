@@ -189,15 +189,15 @@ type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; paren
  *       `getLocalizedCategorySlug` ile çözülür (CLAUDE.md kural 7 — kanonik EN, görünen
  *       URL dile göre). Kanonik yol da tazelenmeye DEVAM eder: 308 kaynağı olsa bile
  *       prerender edilmiş olabilir, kaldırmak yeni bir delik açardı.
- *       İSTİSNA (URN-7, ölçüm 2026-10-01): bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu
- *       bayrak kapalıyken önbelleği olmayan 308'dir; üretilmez. Faz 3-C o rotaya sayfa sınıfı
- *       (force-static/revalidate) ilan ederse bu yol geri eklenir (kapı: INV-TAZELEME-YOL-3).
+ *       İSTİSNA (URN-7, ölçüm 2026-10-01; SEO-35 B-1): iç içe `/<dil>/category/<üst>/<alt>` yolu önbelleği
+ *       olmayan 308'dir; üretilmez. B-1 kararıyla o rota bayrak açıkken de yalnız yönlendirir (içerik çizmez,
+ *       sayfa sınıfı ilan etmez), yani yol hiçbir kipte tazelenmez (kapı: INV-TAZELEME-YOL-3).
  *
  *  W2 — 14 `revalidatePath` çağrısının tamamı TEK segmentliydi; `/category/[c]/[s]`
- *       (alt-kategori) hiç tazelenmiyordu. Artık `parent_id` varsa iki segmentli yol da
- *       üretilir — yeni şemanın `/kategori/<üst>/<alt>` (EN: `/category/<üst>/<alt>`) yolu. Bugünkü şemanın
- *       `/<dil>/category/<üst>/<alt>` yolu üretilmez: bayrak kapalıyken yalnız 308'dir, önbelleği yok
- *       (URN-7 ölçümü 2026-10-01); bkz. `kategoriYollari`.
+ *       (alt-kategori) hiç tazelenmiyordu. Alt kategori yolu `parent_id` varsa sorulur ama B-1'den beri dalın
+ *       adresi (yeni: `/kategori/<alt>`, EN ve bugünkü: `/category/<alt>`) TEK segmenttir ve üst adrese girmez;
+ *       dal nesnesi kök nesnesiyle aynı yolu verir, küme tekilleştirir. İç içe `<üst>/<alt>` yolları üretilmez:
+ *       iki şemada da yalnız 308'dir, önbelleği yok (URN-7 ölçümü 2026-10-01); bkz. `kategoriYollari`.
  *
  * Yollar tekilleştirilir: iki dilin slug'ı aynı olabilir (çeviri yoksa kanoniğe düşer).
  */
@@ -409,7 +409,8 @@ export async function POST(request: NextRequest) {
        * Kategori + alt kategori: YENİ ve ESKİ `category_id` / `subcategory_id` (URN-12). Eskiden yalnız yeni
        * `category_id` tazeleniyordu: ürün kategoriden çıkınca eski kategori/alt kategori listesi bayat kalıyor,
        * `subcategory_id` hiç tazelenmiyordu. Her kimlik bir kez çözülür; ortak yollar (ör. aynı üst kategori)
-       * tekilleştirilir. Alt kategorinin yolları üstüyle birlikte iki segmentli adresi de içerir (`revalidateCategoryTree`).
+       * tekilleştirilir. Alt kategorinin yolları kendi tek segmentli adresini içerir (B-1: dal adresi üste bağlı değil;
+       * `revalidateCategoryTree`).
        */
       const kategoriKimlikleri = [
         ...new Set(
@@ -474,10 +475,11 @@ export async function POST(request: NextRequest) {
       }
 
       /**
-       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse
-       * TÜM çocuklarının iki segmentli yolları değişir. Çocuklar tazelenmezse ebeveyn
-       * adı düzelir ama alt-kategori sayfaları eski yolda donar (sessiz bayatlama).
-       * Tavan küçük (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse çocukların iki segmentli
+       * yolları değişiyordu. B-1'den beri çocuğun ADRESİ üstten bağımsızdır (kendi tek segmentli slug'ı); bu dal
+       * artık adres değişimi için değil, çocuk sayfaların kırıntısında üstün adı ve bağlantısı yer aldığı için
+       * (CategoryLandingView) üst değişince çocuk sayfaları bayat kalmasın diye korunur. Tavan küçük
+       * (ölçüm: en fazla 18 satır), tek sorgu yeter.
        */
       if (self.id) {
         const { data: children } = await supabase
@@ -488,7 +490,8 @@ export async function POST(request: NextRequest) {
           const childPaths = categoryPathsFor(child, self)
           for (const p of childPaths) revalidatePath(p)
           revalidatedPaths.push(...childPaths)
-          // Üstün ESKİ slug'ıyla kurulmuş iki segmentli çocuk yolları da bayatlar (URN-12).
+          // Üstün ESKİ adıyla kurulmuş çocuk yolları da bayatlar (URN-12). B-1'den beri çocuk adresi üstten
+          // bağımsızdır, yani küme çoğu durumda yukarıdakiyle aynıdır ve süzgeç onu boş bırakır; davranış değişmedi.
           if (eskiSelf) {
             const eskiChildPaths = categoryPathsFor(child, eskiSelf).filter((p) => !revalidatedPaths.includes(p))
             for (const p of eskiChildPaths) revalidatePath(p)

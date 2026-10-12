@@ -32,7 +32,7 @@ export function kanon(v) {
 }
 
 /** @typedef {Array<string | number>} Yol */
-/** @typedef {{ slug: string, yol: Yol, eski: string | null, yeni: string | null, tam: boolean }} Kalem */
+/** @typedef {{ slug: string, yol: Yol, eski: string | null, yeni: string | null, tam: boolean, geriAlma?: boolean, duzeltme?: boolean, kaynakNotu?: string }} Kalem */
 /** @typedef {Record<string, unknown>} Meta */
 /** @typedef {{ kural: string, gecti: boolean, ayrinti?: string }} KuralSonucu */
 
@@ -204,6 +204,13 @@ export function kaynakMetni(metadata) {
   return parca.join('\n')
 }
 
+/** Kategorinin arama alanları (KOLON.seo_title/seo_desc ve metadata.seo_title_en/seo_desc_en) tek metinde; yalnız gövde yolunun kaynağı için. */
+export function aramaAlanlariMetni(/** @type {Meta | null | undefined} */ metadata) {
+  const m = nesne(metadata) ? /** @type {Meta} */ (metadata) : {}
+  const kolon = nesne(m[KOLON]) ? /** @type {Meta} */ (m[KOLON]) : {}
+  return [kolon.seo_title, kolon.seo_desc, m.seo_title_en, m.seo_desc_en].filter((x) => typeof x === 'string').join('\n')
+}
+
 /**
  * Marka/model/özel ad kapısı: büyük harfli sözcük kategorinin KENDİ kaynağında geçmeli.
  * - AÇIKLAMA (baslikMi=false): büyük harfle başlayan HER sözcük (cümle başı dahil: "Vortice fanları…").
@@ -226,12 +233,35 @@ export function kaynakDisiOzelAd(/** @type {string} */ metin, /** @type {string}
   return [...yok]
 }
 
+// ---- KTL-23 gövde kapıları (bağımsız iddia okuması: description_i18n yolunda rakam, iddia kökü ve kaynak kapısı YOKTU;
+// "işletme maliyeti düşüktür" ve "yüzde 95" gövde yoluna aynen geçiyordu). Gövdede yeni iddia ancak EKLENEN cümlelerde
+// sınanabilir; eski bir cümlenin doğruluğu bu kapının işi DEĞİLDİR (o iş cümle-dayanak defteridir, araclar/ktl23_dayanak_kontrol).
+/** Cümlelere böler (nokta, ünlem, soru, satır sonu); boşluklar sadeleşir. */
+export function cumlelereBol(/** @type {unknown} */ metin) {
+  if (typeof metin !== 'string') return []
+  return metin.split(/(?<=[.!?])\s+|\n+/u).map((c) => c.replace(/\s+/gu, ' ').trim()).filter(Boolean)
+}
+
+/** `yeni`de olup `eski`de OLMAYAN cümleler (aynen korunan cümle eklenmiş sayılmaz; yalnız kaldırma → boş). */
+export function eklenenCumleler(/** @type {unknown} */ yeni, /** @type {unknown} */ eski) {
+  const mevcut = new Set(cumlelereBol(eski))
+  return cumlelereBol(yeni).filter((c) => !mevcut.has(c))
+}
+
+const IDDIA_KOKU_HEPSI = new RegExp(IDDIA_KOKU.source, 'gu')
+/** @returns {Set<string>} metindeki iddia kökleri (çekimli biçimler köke indirgenir) */
+const iddiaKokleri = (/** @type {string} */ m) => new Set([...kucuk(m).matchAll(IDDIA_KOKU_HEPSI)].map((x) => x[0]))
+const SAYI_DESENI = /\d+(?:[.,]\d+)?/gu
+const sayilar = (/** @type {string} */ m) => m.match(SAYI_DESENI) ?? []
+
 /**
  * KURAL 3 — `yeni` metin kapıları. Her kural ayrı satırda raporlanır (kuru koşumda ✓/✗).
  * `kaynak` verilirse (arama alanları) kaynak-sözcük kapısı da koşar; verilmezse atlanır.
+ * `eski` verilirse (KTL-23) ARAMA DIŞI alanlarda (gövde, hero, başlık, özellik) yalnız EKLENEN cümleler sınanır:
+ * yeni sayı yok (kaynakta geçmeyen), yeni iddia kökü yok (eski metinde olmayan), kaynakta geçmeyen büyük harfli sözcük yok.
  * @returns {KuralSonucu[]}
  */
-export function metinKapilari(/** @type {string} */ yeni, /** @type {Yol} */ yol, /** @type {string | undefined} */ kaynak) {
+export function metinKapilari(/** @type {string} */ yeni, /** @type {Yol} */ yol, /** @type {string | undefined} */ kaynak, /** @type {string | null | undefined} */ eski, /** @type {{ duzeltme?: boolean, kaynakNotu?: string } | undefined} */ sart) {
   const seo = seoAlani(yol)
   const en = (dizi(yol) && yol[0] === 'description_i18n' && yol[1] === 'en') || seo === 'seo_title_en' || seo === 'seo_desc_en'
   const s = typeof yeni === 'string' ? yeni : ''
@@ -264,6 +294,30 @@ export function metinKapilari(/** @type {string} */ yeni, /** @type {Yol} */ yol
       const yok = kaynakDisiOzelAd(s, kaynak, seo === 'seo_title' || seo === 'seo_title_en')
       kurallar.push({ kural: 'R7 seo-kaynak-sozcuk', gecti: yok.length === 0, ayrinti: yok.length ? `kaynakta geçmeyen büyük harfli sözcük: ${yok.join(', ')}` : undefined })
     }
+  } else if (eski !== undefined) {
+    // KTL-23: gövde yolu. Yalnız EKLENEN cümleler (yeni − eski) sınanır; kaldırma ve aynen korunan cümle kapıya takılmaz.
+    const ek = eklenenCumleler(s, eski ?? '').join(' ')
+    // R8b (her gövde yazımında): eklenen cümlede eski metinde OLMAYAN iddia kökü yazılmaz. Meşru ihtiyaçta kalem
+    // `kaynakNotu` (dosya + sayfa) taşır; not boş olamaz ve kuru koşumda görünür (yazıcı notu doğrulamaz, okuyan görür).
+    const eskiKokler = iddiaKokleri(typeof eski === 'string' ? eski : '')
+    const yeniKok = [...iddiaKokleri(ek)].filter((k) => !eskiKokler.has(k))
+    const not = typeof sart?.kaynakNotu === 'string' ? sart.kaynakNotu.trim() : ''
+    kurallar.push({
+      kural: 'R8 govde-yeni-iddia-koku-yok',
+      gecti: yeniKok.length === 0 || not !== '',
+      ayrinti: yeniKok.length ? (not ? `kaynak notu: ${not}` : `eklenen cümlede yeni iddia kökü: "${yeniKok.join('", "')}" (tasarruf/garanti/sertifika/maliyet vb.; kaynağı varsa kalem kaynakNotu taşır)`) : undefined,
+    })
+    // R8a + R8c yalnız DÜZELTME kalemlerinde (kalem.duzeltme=true): yeni sayı ve kaynakta geçmeyen özel ad yazılmaz.
+    // Yazım (yeniden metin üretme) kalemlerinde sayı ve marka katalogdan gelir; onu bu yazıcı doğrulayamaz, kaynak dizini doğrular.
+    if (sart?.duzeltme === true) {
+      const kaynakSayilari = new Set(kaynak === undefined ? [] : sayilar(kaynak))
+      const yeniSayi = [...new Set(sayilar(ek))].filter((n) => !kaynakSayilari.has(n))
+      kurallar.push({ kural: 'R8 govde-yeni-sayi-yok', gecti: yeniSayi.length === 0, ayrinti: yeniSayi.length ? `eklenen cümlede kaynakta geçmeyen sayı: ${yeniSayi.join(', ')} (düzeltmede yeni sayı yazılmaz)` : undefined })
+      if (kaynak !== undefined) {
+        const yok = kaynakDisiOzelAd(ek, kaynak, false)
+        kurallar.push({ kural: 'R8 govde-kaynak-sozcuk', gecti: yok.length === 0, ayrinti: yok.length ? `eklenen cümlede kaynakta geçmeyen büyük harfli sözcük: ${yok.join(', ')}` : undefined })
+      }
+    }
   }
   return kurallar
 }
@@ -277,6 +331,9 @@ export function kalemSekli(/** @type {unknown} */ k) {
   const o = /** @type {Record<string, unknown>} */ (k)
   if (typeof o.slug !== 'string' || !o.slug.trim()) return 'slug yok/boş'
   if (typeof o.tam !== 'boolean') return 'tam true/false olmalı'
+  if ('geriAlma' in o && typeof o.geriAlma !== 'boolean') return 'geriAlma true/false olmalı'
+  if ('duzeltme' in o && typeof o.duzeltme !== 'boolean') return 'duzeltme true/false olmalı'
+  if ('kaynakNotu' in o && typeof o.kaynakNotu !== 'string') return 'kaynakNotu metin olmalı'
   if (o.yeni === null) {
     // KTL-21 geri alma: alanı boşalt. Yalnız arama alanları; kör silme yok (eski = şu anki tam değer ZORUNLU).
     if (seoAlani(o.yol) === null) return 'yeni=null (alanı boşalt) yalnız arama alanlarında geçerli (seo_title, seo_desc, seo_title_en, seo_desc_en)'
@@ -319,7 +376,14 @@ export function kalemUygula(metadata, kalem, ekKaynak = '') {
   }
 
   // KTL-21: kaynak = metadata dizgeleri + satırın kendi metin sütunları (name, menu_label, marketing_title, description) — sayfanın h1'i bunlardan gelir.
-  for (const m of metinKapilari(kalem.yeni, kalem.yol, seoAlani(kalem.yol) ? `${kaynakMetni(metadata)}\n${ekKaynak}` : undefined)) kurallar.push(m)
+  // KTL-23: kaynak ve eski HER yolda verilir; arama alanları tam kapıdan, gövde/hero/özellik yalnız eklenen cümlelerden geçer.
+  // Gövde yolunda kaynak, kategorinin yayındaki arama alanlarını da kapsar (başlık/açıklama sayfada görünür ve KTL-21 kapılarından
+  // geçmiştir); arama alanı yolunda bu EKLENMEZ (kalem kendini ya da kardeş arama alanını doğrulayamaz).
+  // geriAlma=true: önceki canlı değeri GERİ KOYAN kalem (yazım planının tersi). Geri konan metin "yeni iddia" sayılmaz,
+  // bu yüzden eklenen-cümle kapısı (R8) atlanır; R3 kapıları (boş, EN-Türkçe-harf, iç not, abartı, ref) AYNEN koşar.
+  const kaynak = `${kaynakMetni(metadata)}\n${ekKaynak}${seoAlani(kalem.yol) ? '' : `\n${aramaAlanlariMetni(metadata)}`}`
+  const sart = { duzeltme: kalem.duzeltme === true, kaynakNotu: kalem.kaynakNotu }
+  for (const m of metinKapilari(kalem.yeni, kalem.yol, kaynak, kalem.geriAlma === true ? undefined : (kalem.eski ?? ''), sart)) kurallar.push(m)
   const metinHata = kurallar.find(x => !x.gecti)
   if (metinHata) return red(`${metinHata.kural}: ${metinHata.ayrinti}`)
 
