@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- VentHub: CLI betiği, sonucu stdout'a yazar (WrongStack 1.1.0 betiği; bu satır dışında değişiklik yok) */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
