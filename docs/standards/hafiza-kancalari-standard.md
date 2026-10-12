@@ -102,6 +102,8 @@ bir durum değil, bir boşluktur.
 | `hafiza-kullanim-sayaci.cjs` | kanca | defterdeki enjeksiyonları `recordInjection`, transcript atıflarını `recordUse` ile sage'e yazar | Stop (async) | ARAÇ | aynı kapı |
 | `sage-hijyen-oturum-sonu.cjs` | kanca | taze doğrulanmış yedek varken `port.hygiene` koşar | SessionEnd | ARAÇ | aynı kapı |
 | `scripts/hijyen/hafiza-enjeksiyonu.cjs` · `sage-enjeksiyon-defteri.cjs` | modül | konu/sayaç/hijyen mantığı (port enjekte) · oturum+nesil anahtarlı enjeksiyon defteri | üç kanca + `sage-dosya-dersi` | ARAÇ | aynı kapı |
+| `hafiza-yedek.cjs` | kanca | hafıza deposunu PreCompact'ta ELDE, eşik (3600 sn) aşılınca ve bekleyen md varken arka planda yedekler; açılışta yaş satırı (§9) | PreCompact · SessionStart · UserPromptSubmit | ARAÇ | `…/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol) |
+| `scripts/hijyen/hafiza-yedek.cjs` | modül | yedek mantığı: ayrı `git add`, sır taraması, yaş ölçümü, saf karar; CLI `--yedekle --sebep <ad>` ve `--yas` (eski `~/.claude/hafiza-commit.sh`'ın yerine) | kanca + oturum kapanışı | ARAÇ | aynı kapı |
 
 ⚠**AYARA KAYIT RECEP KAPISI:** bu tabloda listelenen bir kanca `.claude/settings.json`'a
 bağlanmadıkça **dosya olarak var, tetik olarak ölüdür** (tablodaki kanca sayısı değişir; sayıya
@@ -387,6 +389,35 @@ Sabotajsız kolun yeşili kanıt sayılmaz: bağımsız inceleme ilk yazımda 7 
 buldu (penceresi, durak süzgeci, zaman aşımı sarmalayıcısı, çıktı zarfı, spawn'lı port açılışı, dolaylı
 purge anahtarı, <4 belirteç koruması); kollar eklendi. Sage paketi kurulu olmadan gerçek kanca kablosunu
 ölçmek için testler geçici proje köküne sahte `@wrongstack/sage` modülü ve canlı pid'li `server.json` koyar.
+
+---
+
+## §9 HAFIZA YEDEĞİ — kapanışa tek bağ yetmez (ARC-92, OPS-104 K-047, 2026-10-11)
+
+**Ölçülen boşluk:** hafıza deposu (`peckop/venthub-ops-hafiza`) yalnız oturum KAPANIŞINDA commit/push alıyordu
+(kullanıcı düzeyi `hafiza-commit.sh`). Pencere compact'ta ya da uzun oturumda kapanmadan çökerse o oturumun
+hafıza yazıları yedeksiz kalırdı.
+
+**Kurallar:**
+
+1. **Üç yedek noktası.** PreCompact (ELDE, compact'tan önce); SessionStart ve UserPromptSubmit (son commit
+   > 3600 sn **VE** bekleyen `*.md` değişikliği varsa arka planda); oturum kapanışı (`--yedekle --sebep kapanis`).
+2. **ZAMANLAYICI YOK (karar 53).** Tetik kullanıcının mesajıdır. Arka plan denemesi 600 sn'de birden sık olmaz
+   (`.hafiza-yedek-deneme` işaretinin mtime'ı; `*.md` olmadığı için commit'e girmez).
+3. **Yaş = son commit'in yaşı.** Bekleyen değişiklik yokken uyarı ve yedek YOKTUR (yedeklenecek bir şey yok);
+   SessionStart yaş satırını her durumda söyler, UserPromptSubmit yalnız `bekleyen + eski` iken konuşur.
+4. **Sır taraması gevşetilmez.** Staged farkta tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…,
+   postgres URL'si) varsa commit ATILMAZ, `.hafiza-commit-uyari.log`'a yazılır, indeks `git reset -q` ile temizlenir.
+5. **`git add` kalıpları AYRI verilir.** Eşleşmeyen kalıpta git hiçbir şey eklemeden düşer: eski betik
+   `MEMORY.md.oncesi-*` dosyası yokken sessizce hiçbir şey yedeklemiyordu (ARC-92 testinin ilk koşusunda ölçüldü;
+   bugün 6 dosya var, bu yüzden canlıda tetiklenmiyordu).
+6. **Kayıt OPS kapısıdır.** `.claude/settings.json` (PreCompact — `timeout` 45 —, SessionStart, UserPromptSubmit)
+   ve kullanıcı düzeyi `settings.json:294` (eski betiğin yerine `node scripts/hijyen/hafiza-yedek.cjs --yedekle
+   --sebep kapanis`). Kayıtlı olana kadar kanca ölüdür; kural bu cetveldedir.
+
+**Kanıt:** `src/__tests__/conformance/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol, geçici git deposunda);
+bozma 8/8 yakalandı. **Ölçüt:** bekleyen değişiklik varken yaş ≤ 3600 sn
+(`node scripts/hijyen/hafiza-yedek.cjs --yas` ya da `git -C <hafıza dizini> log -1 --format=%ct`).
 
 ---
 
