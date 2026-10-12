@@ -47,8 +47,6 @@ export interface AileKirintisiGirdisi {
   ana: KirintiAd | null
   /** Alt kategori; ana ile aynı slug'sa ya da ana yoksa eklenmez. */
   alt: KirintiAd | null
-  /** Marka kaydı (vitrindeki marka sayfası olan). Çözülemediyse `null` → basamak yok. */
-  marka: KirintiAd | null
   /** Aile: görünen ad (`familyName`) + slug. */
   aile: KirintiAd
   /** Model sayfasında seçili modelin görünen etiketi; aile sayfasında `null`. */
@@ -58,14 +56,19 @@ export interface AileKirintisiGirdisi {
 }
 
 /**
- * Ana Sayfa › Kategori › [Alt kategori] › Marka › Aile › [Model].
+ * Ana Sayfa › Kategori › [Alt kategori] › Aile › [Model].
  *
- * Çözülemeyen basamak (kategori/marka yok, ad boş) HİÇ eklenmez: zincir kısalır, kırılmaz. Son basamak
+ * MARKA BASAMAĞI YOKTUR (URN-126): kırıntıda bir adım yukarı çıkmak, listeden gelen kullanıcıyı
+ * kategoriye değil markanın TÜM ürünlerine düşürüyordu. Zincir yalnız kategori hiyerarşisini izler;
+ * markaya bağlantı kırıntının değil sayfadaki üretici bloğunun işidir. Marka burada girdi de değildir:
+ * bu modül marka adı/slug'ı almaz, böylece basamak yanlışlıkla geri eklenemez.
+ *
+ * Çözülemeyen basamak (kategori yok, ad boş) HİÇ eklenmez: zincir kısalır, kırılmaz. Son basamak
  * bulunulan sayfadır ve `path` taşımaz: aile sayfasında aile, model sayfasında model. Model sayfasında
  * aile basamağı bağlantıdır.
  */
 export function aileKirintiAdimlari(girdi: AileKirintisiGirdisi): KirintiAdimi[] {
-  const { dil, anasayfaAdi, ana, alt, marka, aile, model, bayrak = ADRES_SEMASI_K3B } = girdi
+  const { dil, anasayfaAdi, ana, alt, aile, model, bayrak = ADRES_SEMASI_K3B } = girdi
   const gecerli = (k: KirintiAd | null): k is KirintiAd => !!k && !!k.ad.trim() && !!k.slug
   const rotalar = adresRotalari(dil, bayrak)
 
@@ -76,7 +79,6 @@ export function aileKirintiAdimlari(girdi: AileKirintisiGirdisi): KirintiAdimi[]
       adimlar.push({ name: alt.ad, path: kategoriKirintiYolu(ana.slug, alt.slug, dil, bayrak) })
     }
   }
-  if (gecerli(marka)) adimlar.push({ name: marka.ad, path: rotalar.brand(marka.slug) })
 
   if (model && model.etiket.trim()) {
     adimlar.push({ name: aile.ad, path: rotalar.product(aile.slug) })

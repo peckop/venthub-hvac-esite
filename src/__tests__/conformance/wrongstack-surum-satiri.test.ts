@@ -34,6 +34,7 @@ interface Modul {
   surumAyir: (s: string) => number[] | null
   karsilastir: (a: string, b: string) => number | null
   kurulu: (depo: string) => { surum: string; karisik: boolean } | { hata: string }
+  anaAgac: (depo: string) => string
   sonSurumuOlc: (o?: { fetchFn?: typeof fetch; zamanAsimiMs?: number }) => Promise<Olc>
   oku: (yol: string) => Sonuc
   satir: (s: Sonuc, depo: string, simdi?: number) => string
@@ -397,5 +398,67 @@ describe('INV-WRONGSTACK-SATIRI-1 · kanca bütünleşmesi', () => {
     })
     expect(r.status).toBe(0)
     expect(r.stdout).toMatch(/⚠WRONGSTACK: bizde \d+\.\d+\.\d+, son 99\.0\.0 \(2030-01-01\)/)
+  })
+})
+
+/**
+ * INV-WRONGSTACK-SATIRI-2 (ARC-109, OPS 12 Ekim 14:10 ölçümü): "bizde" ANA AĞACIN kurulumudur. Worktree'nin izlenen
+ * package.json'ı kendi commit'ini yansıtır; #1883'ten önceki bir dalda 1.0.26 yazar ve satır ana ağaçta 1.1.0 iken
+ * "bizde 1.0.26 · geride" derdi (ops-pencere'de ölçüldü).
+ */
+describe('INV-WRONGSTACK-SATIRI-2 · "bizde" ana ağaçtan okunur (worktree bayat package.json yazmaz)', () => {
+  /** Ana ağaç + worktree: `.git` ana ağaçta DİZİN, worktree'de "gitdir:" DOSYASI (gerçek git çağrısı gerekmez). */
+  function anaVeWorktree(anaSurum: string, wtSurum: string) {
+    const kok = gecici()
+    const ana = path.join(kok, 'ana')
+    const wt = path.join(kok, 'wt')
+    for (const [d, s] of [[ana, anaSurum], [wt, wtSurum]] as const) {
+      fs.mkdirSync(path.join(d, 'tools', 'wrongstack-mcp'), { recursive: true })
+      fs.writeFileSync(
+        path.join(d, 'tools', 'wrongstack-mcp', 'package.json'),
+        JSON.stringify({ dependencies: { '@wrongstack/sage-mcp': s, '@wrongstack/kanban-mcp': s } }),
+      )
+    }
+    fs.mkdirSync(path.join(ana, '.git', 'worktrees', 'wt'), { recursive: true })
+    fs.writeFileSync(path.join(wt, '.git'), `gitdir: ${path.join(ana, '.git', 'worktrees', 'wt').replace(/\\/g, '/')}\n`)
+    return { ana, wt }
+  }
+
+  it('⭐worktree bayat package.json (1.0.26) taşısa da satır ANA AĞACIN sürümünü (1.1.0) yazar', () => {
+    const { ana, wt } = anaVeWorktree('1.1.0', '1.0.26')
+    expect(ws.kurulu(wt)).toEqual({ surum: '1.1.0', karisik: false })
+    expect(ws.kurulu(ana)).toEqual({ surum: '1.1.0', karisik: false })
+    const s = ws.satir(tamam('1.1.0', 1), wt, SIMDI)
+    expect(s).toBe('WRONGSTACK: bizde 1.1.0, son 1.1.0 (2026-10-03) · guncel')
+    expect(s).not.toMatch(/1\.0\.26|geride/)
+  })
+
+  it('anaAgac: .git DİZİN → kendisi; gitdir DOSYASI → ana ağaç; .git yok/bozuk/başka kalıp → verilen dizin', () => {
+    const { ana, wt } = anaVeWorktree('1.1.0', '1.0.26')
+    expect(path.resolve(ws.anaAgac(ana))).toBe(path.resolve(ana))
+    expect(path.resolve(ws.anaAgac(wt))).toBe(path.resolve(ana))
+    const yok = gecici()
+    expect(ws.anaAgac(yok)).toBe(yok)
+    const bozuk = gecici()
+    fs.writeFileSync(path.join(bozuk, '.git'), 'bu bir gitdir degil')
+    expect(ws.anaAgac(bozuk)).toBe(bozuk)
+    const baska = gecici()
+    fs.writeFileSync(path.join(baska, '.git'), `gitdir: ${baska.replace(/\\/g, '/')}/baska/yer\n`)
+    expect(ws.anaAgac(baska), '.git/worktrees kalıbı olmayan gitdir ana ağaç sayıldı').toBe(baska)
+  })
+
+  it('⭐KURULU paketin kendi sürümü bildirilen aralıktan doğrudur (merge ile yükseltme arasındaki pencere)', () => {
+    const d = sahteDepo({ '@wrongstack/sage-mcp': '1.1.0', '@wrongstack/kanban-mcp': '1.1.0' })
+    for (const p of ['sage-mcp', 'kanban-mcp']) {
+      const k = path.join(d, 'tools', 'wrongstack-mcp', 'node_modules', '@wrongstack', p)
+      fs.mkdirSync(k, { recursive: true })
+      fs.writeFileSync(path.join(k, 'package.json'), JSON.stringify({ name: '@wrongstack/' + p, version: '1.0.26' }))
+    }
+    expect(ws.kurulu(d), 'bildirilen 1.1.0 yazıldı ama koşan kurulum 1.0.26').toEqual({ surum: '1.0.26', karisik: false })
+  })
+
+  it('kurulu paket okunamazsa bildirilen sürüme düşer (eski davranış KORUNUR)', () => {
+    const d = sahteDepo({ '@wrongstack/sage-mcp': '^1.0.28' })
+    expect(ws.kurulu(d)).toEqual({ surum: '1.0.28', karisik: false })
   })
 })

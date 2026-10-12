@@ -223,3 +223,46 @@ o rolde `bypassrls = true`, yani politikalar hiç değerlendirilmez.
 içinde verilir. O yüzden karar mercii hâline gelmiş yardımcıların **tam gövdesi** ayrı
 okundu. `is_admin_user` yalnız `claims ->> 'user_role'` ve `app_metadata ->> 'user_role'`
 dallarını okuyor, `user_metadata`'yı bilerek okumuyor (CLAUDE.md kural 12).
+
+## 9 · BAYAT ROL: `is_admin_user()` token'dan okur (ALT-74 hükmü, 2026-10-12)
+
+Otomatik güvenlik taraması (12 Ekim) `is_admin_user()` için "rol JWT claim'inden okunuyor, `user_profiles`
+ile karşılaştırılmıyor; rolü düşürülen kullanıcının eski oturumu token süresi dolana kadar yetkili kalır"
+dedi. **Hüküm: mekanizma gerçek, bugünkü zarar sıfır, sınıf `ilk satıştan önce`.**
+
+| Soru | Ölçüm (2026-10-12, canlı salt okuma + kaynak) |
+|---|---|
+| Fonksiyon neyi okuyor? | Önce `claims ->> 'user_role'`, sonra `app_metadata ->> 'user_role'` (access-token hook'u token üretirken yazar); claim yoksa (tetik/betik bağlamı) `user_profiles`. Canlı gövde `20260818081500_role_source_single_authority.sql` ile aynı. Claim VARSA tabloya bakılmaz. |
+| Kim getirdi? | Karar 95 / #1852 değil. Bu davranış T047'den (18 Ağustos) beri; #1852 yalnız 16 politikayı bu fonksiyona bağladı. |
+| Bayat pencere ne kadar? | Rolün düşürüldüğü an ile kullanıcının access token'ının süresi dolması arası. Süre ölçülmedi (`supabase/config.toml`'da `jwt_expiry` satırı yok; Supabase varsayılanı 1 saattir, proje ayarı panelden okunmalı). Token yenilenince hook yeniden koşar ve yeni rol claim'e girer. |
+| Oturum iptal yolu var mı? | Hayır. Uygulamadaki rol değiştirme yolu: yönetim paneli toplu "Rol Değiştir" → `setUserAdminRole` (`src/config/admin.ts`) → `set_user_admin_role` RPC'si (DEFINER; kapı: çağıranın `user_profiles` rolü admin/super_admin, tablodan okunur). RPC yalnız `user_profiles` satırını yazar; `auth.sessions` temizliği ya da `signOut` yok (`git grep`, migrations + src + functions: 0). |
+| Bugünkü zarar? | Yok: `user_profiles` dağılımı `super_admin` 2, `user` 1; `admin`, `moderator`, `warehouse` 0. Düşürülecek rolü taşıyan hesap yok. |
+
+**Kapanış seçenekleri (kazanç / bedel):**
+
+| Seçenek | Kazanç | Bedel |
+|---|---|---|
+| A · Rolü düşürürken aynı anda o kullanıcının oturumları kapatılır: ya elle prosedür (Supabase panelinden oturum kapatma), ya `set_user_admin_role` gövdesine `auth.sessions` temizliği eklenir | Pencere token ömrünün tamamından "yenileme anına" iner (refresh token da iptal edilirse yeni token alınamaz) | Elle prosedür unutulabilir; gövdeye eklemek migration'dır (kural 13, Recep onayı) ve DEFINER fonksiyonun `auth` şemasına yazma yetkisini sorgulatır |
+| B · Kısa token ömrü (panel ayarı) | Pencere token ömrüyle sınırlı, kod değişmez | Daha sık yenileme; ayar paneldedir (OPS), repoda izi yok |
+| C · Kritik yazmalarda tabloyla çift kontrol (fonksiyonu `user_profiles`'a her çağrıda da bakar hâle getirmek) | Pencere 0 | Fonksiyonun güven duruşu değişir (`20260818081500` migration notundaki W2 / plan §7 E2 ayrı kararı), her RLS değerlendirmesinde ek okuma, migration = kural 13 (Recep onayı) |
+
+**Öneri:** A'nın elle prosedürü şimdi (bugün rolü düşürülecek hesap yok, prosedür yazılı dursun); gövdeye ekleme ve C çok
+kiracılı faz ile birlikte (kural 12, Faz 2 PARK). B yalnız Recep isterse.
+
+**Yan bulgu (hüküm yok, bilgi):** `set_user_role(uuid, text)` DEFINER ve gövdesinde HİÇ yetki kapısı yok; yalnız ACL
+koruyor (canlı ölçüm: EXECUTE yalnız `postgres` ve `service_role`; `anon` ve `authenticated` false). Bugün kapalı;
+bir `GRANT` ya da `CREATE OR REPLACE` ile ACL sıfırlanırsa kapı gövdede yok. Gövdeye kapı eklenmesi ADMIN/ALTYAPI işi.
+
+**Aynı taramanın üç DEFINER fonksiyonu (canlı gövdeler okundu):**
+
+- `adjust_stock` (iki imza): kapıyı `user_profiles.role`'den **tablodan** okur (bayat değil); rol listesinde `warehouse` ve
+  `moderator` var; `UPDATE products` kiracı süzgeçsiz (`id` ile). Tek kiracıda etki yok.
+- `admin_list_all_users`: kapı `user_profiles` tablosundan; listede `moderator` var ve `auth.users` e-postalarını
+  döndürür, kiracı süzgeci yok. Moderatör rolü bugün 0 hesapta; karar 95'in (moderatör satın alma maliyetini görmez) kişisel
+  veri karşılığı sorulacak: moderatör tüm kullanıcı e-postalarını görmeli mi (ADMIN/Recep kararı).
+- `anonymize_user_personal_data`: kapısı `is_admin_user()` (bu bölümün bayat pencereli kaynağı), `p_user_id` için
+  kiracı denetimi yok; silme/anonimleştirme geri alınamaz. Tek kiracıda yönetici zaten tüm veriyi yönetir; ikinci kiracı
+  geldiği gün kiracılar arası silme riski doğar → Faz 2 (çok kiracı) işi, `ilk satıştan önce` değil.
+
+⚠Bu bölüm **ölçüm ve hüküm**dür; hiçbir fonksiyon değiştirilmedi. Değişiklik gerektiren seçenekler (C ve üç fonksiyonun
+rol listesi/kiracı süzgeci) migration olduğundan kural 13 ve karar sahibi Recep/ADMIN'dir.
