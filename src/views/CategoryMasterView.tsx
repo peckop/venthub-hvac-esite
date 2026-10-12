@@ -77,6 +77,11 @@ interface CategoryMasterViewProps {
   pageSize?: number
   initialSubCategories?: DomainCategory[]
   /**
+   * URN-112: alt kategorinin ÜSTÜ, sunucudan. Kırıntı üst halkası istemci bağlamını (`useCategories`)
+   * beklemeden ham HTML'de dolu gelir; bağlam yüklenince aynı kategoriyi verir.
+   */
+  initialParentCategory?: DomainCategory | null
+  /**
    * REC-213-A — YALNIZ keşif (kategorisiz) hâlinde kullanılır: `/products` sayfasının
    * kategori kapısı. Kategori sayfalarında anlamsızdır ve oraya geçilmez; kırıntı yolu
    * ve alt kategori kartları o hâlin kendi kapısıdır.
@@ -96,6 +101,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   page = 1,
   pageSize = 24,
   initialSubCategories,
+  initialParentCategory,
   kategoriler,
   vorticeKatalogSayilari
 }) => {
@@ -109,7 +115,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
     loading,
     filters,
     updateFilters
-  } = useCategoryGateway(initialCategory, initialSubCategories)
+  } = useCategoryGateway(initialCategory, initialSubCategories, initialParentCategory)
 
   // 2. Presentation Layer (ViewModel)
   const { wrapCategory } = useCategoryViewModel()

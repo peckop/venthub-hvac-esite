@@ -41,7 +41,8 @@ const DEFAULT_FILTERS: CategoryFilters = {
 
 export function useCategoryGateway(
   initialCategory?: DomainCategory | null,
-  initialSubCategories?: DomainCategory[]
+  initialSubCategories?: DomainCategory[],
+  initialParentCategory?: DomainCategory | null
 ) {
   const isMounted = useIsMounted()
   const router = useRouter()
@@ -109,10 +110,14 @@ export function useCategoryGateway(
     return { byId, childrenByParentId }
   }, [globalCategories])
 
+  // URN-112: üst önce SUNUCUDAN gelen prop'tan okunur (ham HTML'de kırıntı üst halkası dolu çıksın); bağlam
+  // yalnız prop verilmediğinde (ör. `/products` ya da eski çağıranlar) devreye girer. Prop, kategorinin
+  // `parent_id`'siyle eşleşmiyorsa (başka sayfadan kalan değer) kullanılmaz.
   const parentCategory = useMemo(() => {
     if (!category?.parent_id) return null
+    if (initialParentCategory && initialParentCategory.id === category.parent_id) return initialParentCategory
     return categoryMaps.byId.get(category.parent_id) ?? null
-  }, [category, categoryMaps])
+  }, [category, categoryMaps, initialParentCategory])
 
   const subCategories = useMemo(() => {
     if (initialSubCategories && initialSubCategories.length > 0) return initialSubCategories
