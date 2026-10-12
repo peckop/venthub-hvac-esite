@@ -111,6 +111,16 @@ try {
 // SAGIR kaldi ve Recep elle durtmek zorunda kaldi. Bu alani OKUYUP resume'da davranis veriyoruz.
 const source = input.source || 'startup'
 
+// OPS OTURUM KİMLİĞİ (ARC-99): OPS penceresi (agent: ops-pencere) açılışta kimliğini TEK dosyaya yazar; kokpit
+// düğmeleri, linear-zil ve aşağıdaki lider testi buradan okur (kodda sabit kimlik YOK). Hata açılışı bozmaz.
+let opsOturumu = null
+try {
+  opsOturumu = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'ops-oturumu.cjs'))
+  opsOturumu.acilistaYaz({ sid, kaynak: source, cwd: input.cwd, agentType: input.agent_type })
+} catch {
+  opsOturumu = null
+}
+
 /**
  * Registry oto-senkronu — KOPARILMIŞ süreç olarak başlatılır.
  *
@@ -398,7 +408,7 @@ function rolBolumuEkle() {
 // bul, her birine SendMessage ile 'uyan: uclunu kur + panoyu oku + isbasi notu' gonder.
 // Bu kanca ajan degil harness'tir; mesaji ATAMAZ — yalnizca lidere TALIMAT yazar, mesaji ajan atar.
 if (source === 'resume') {
-  const lider = /audit|ops/i.test(process.env.CC_LANE || '') || sid === 'cb0467f1-f1a3-437d-bc15-52c0bd90feb3'
+  const lider = /audit|ops/i.test(process.env.CC_LANE || '') || Boolean(opsOturumu && opsOturumu.kimlikMi(sid))
   bolum('resume', 1,
     // ⛔REC-328: "uclunu yeniden kur" talimati kaldirildi (gozcu/cron EMEKLI).
     // Resume'da gercekten kaybolan sey MEKANIZMA degil, KIMIN NEREDE OLDUGU bilgisidir.
