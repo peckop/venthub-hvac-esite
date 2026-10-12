@@ -103,6 +103,13 @@ export interface ProductDetailPageProps {
    * kuruyordu; bağlam ilk render'da boş olduğundan ham HTML'de kategori/marka bağlantısı yoktu.
    */
   kirinti: KirintiAdimi[]
+  /**
+   * URN-126 — üretici bloğundaki marka adının bağlantısı (marka sayfası). SUNUCUDA çözülür
+   * (`ureticiMarkaAdresi`): marka kataloğu bu istemci bileşeninin demetine girmesin. `null` = marka
+   * vitrinde çözülemedi → ad düz metin kalır (var olmayan sayfaya bağlantı çizilmez).
+   * Kırıntıda marka basamağı YOKTUR; aile/model sayfasından marka sayfasına giden gövde bağlantısı budur.
+   */
+  markaHref: string | null
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -144,6 +151,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   priceTaxIncluded = null,
   sunucuSku = null,
   kirinti,
+  markaHref,
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
@@ -573,7 +581,21 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 {/* Marka adı hemen yanında yazıyla basılıyor — logo dekoratif (REC-268). */}
                 <BrandIcon brand={family.brand_name || ''} className="w-8 h-8" dekoratif />
                 <div className="flex flex-col">
-                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{family.brand_name}</span>
+                  {/* URN-126: marka adı BAĞLANTI (kırıntıdaki marka basamağı kalktı; arama motoru siteyi
+                      `<a href>` ile gezer). Tek `uppercase` öğesi korunur; bağlantı rengi/harf biçimini
+                      miras alır. Çözülemeyen marka (`markaHref` null) düz metin kalır. */}
+                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">
+                    {markaHref ? (
+                      <Link
+                        href={markaHref as Route}
+                        className="hover:text-primary-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy rounded-sm"
+                      >
+                        {family.brand_name}
+                      </Link>
+                    ) : (
+                      family.brand_name
+                    )}
+                  </span>
                   <span className="text-steel-gray text-xs font-medium tracking-hvac-normal">{t('pdp.officialDistributor')}</span>
                 </div>
               </div>

@@ -1,10 +1,10 @@
 import type { Metadata, Route } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 
+import { ureticiMarkaAdresi } from '@/components/products/ureticiMarkaAdresi'
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
 import { kanonikModelSku } from '@/config/yayindaModeller'
-import { markaBulAdla } from '@/data/brands'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
@@ -292,8 +292,10 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
 
   // URN-21: kırıntı zinciri BİR kez kurulur; JSON-LD ve görünür `<nav>` AYNI diziyi tüketir (ayrışamaz).
   // Yol/ad kuralları `aileKirintiAdimlari`'nda (adresler adres üreticisinden, adlar bu sayfada çözülmüş).
-  // Marka: aile satırı slug taşımaz, yalnız adı; vitrinde sayfası olmayan marka basamak olmaz.
-  const marka = family ? markaBulAdla(family.brand_name) : null
+  // URN-126: marka basamağı kırıntıda YOK (kategoriden geri giden kullanıcı markanın tüm ürünlerine
+  // düşmesin); marka bağlantısı sayfadaki ÜRETİCİ bloğunun işidir ve zincire girdi olarak VERİLMEZ.
+  // Adres sunucuda çözülür (marka kataloğu istemci demetine girmesin); çözülemezse `null` → düz metin.
+  const markaHref = family ? ureticiMarkaAdresi(family.brand_name, adresDili(lang)) : null
   const seciliModel = sunucuSku ? variants.find((v) => v.sku === sunucuSku) : undefined
   const kirinti: KirintiAdimi[] =
     family && gorunenAileAdi.trim()
@@ -302,7 +304,6 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
           anasayfaAdi: t('category.breadcrumbHome'),
           ana: { ad: mainName, slug: mainSlug },
           alt: { ad: subName, slug: subSlug },
-          marka: marka ? { ad: marka.name, slug: marka.slug } : null,
           aile: { ad: gorunenAileAdi, slug: family.slug },
           model: seciliModel
             ? { etiket: getProductModelLabel(seciliModel) ?? getProductDisplayName(seciliModel, family, lang) }
@@ -340,6 +341,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
         priceTaxIncluded={detail?.price_tax_included ?? null}
         sunucuSku={sunucuSku}
         kirinti={kirinti}
+        markaHref={markaHref}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): aile → o aileye bağlanan rehber. Aile bulunamadıysa
           (unavailable) blok yok; yazı yoksa `IlgiliRehberler` hiçbir şey basmaz. */}
