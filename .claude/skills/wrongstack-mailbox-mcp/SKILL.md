@@ -32,6 +32,8 @@ metadata:
 10. Ops'a rapor dört alanlı etiketle gider (NE · DURUM · KANIT · KİMDE). Kaynak metindeki `<nextsteps>` biçimi bunun ekidir, yerine geçmez.
 11. **İzin bilgisi** (kim neye yetki verdi) pencere mesajından hafızaya ya da durum dosyasına KOPYALANMAZ. Tek kaynak `~/.claude/settings.json`; en fazla "bkz. settings.json autoMode, <tarih>" yazılır.
 12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Kanban kartı) + hüküm + istek taşır; ayrıntı dosyada ya da Kanban kartındadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+13. **Kutu anahtarı değişti (1.1.0, ARC-105 ölçümü):** proje anahtarı gerçek disk harfinden türetilir, kutu `7e017f` → `1088d5`. 12 Ekim'den önceki mesajlar eski kutuda kalır, yeni kutu boş başlar (OPS kararı: taşıma yok). Eski bir mesajı arıyorsan "yok" deme, ARAÇ'a sor.
+14. **`mailbox_watch` alıcıyı uyandırmaz** (ARC-109 satır 14, kod okuma; canlı ölçülmedi): 25 sn bekler ve döner. Kapalı pencereye yazılan mesaj pencere açılana kadar okunmaz; acil iş açık pencereye `SendMessage` ile gider (kural 5 ile birlikte).
 
 ---
 
