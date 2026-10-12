@@ -6,6 +6,7 @@ import type { DomainCategory } from '@/lib/type-converters'
 
 import { useCategoryGateway } from '../../hooks/useCategoryGateway'
 import CategoryMasterView from '../CategoryMasterView'
+import CategoryPage from '../CategoryPage'
 
 /**
  * INV-KATEGORI-UST-SUNUCU-2 (URN-112) — alt kategori görünümü, üst kategoriyi sunucudan gelen prop'tan
@@ -96,6 +97,18 @@ describe('CategoryMasterView · sunucu çiziminde üst kategori', () => {
     baglam.kategoriler = [UST, ALT]
     const html = renderToString(<CategoryMasterView initialCategory={ALT} />)
     expect(html).toContain('UST:Fanlar')
+  })
+})
+
+describe('CategoryPage · üst kategori iletimi (kategoriSayfasi.tsx bu bileşeni çağırır)', () => {
+  it('initialParentCategory CategoryPage üzerinden görünüme iner (bağlam boş); prop yokken eski davranış', () => {
+    // Sunucu bileşeni `CategoryPage`'e prop geçirir; iletim kopsa MasterView testi yeşil kalır ama özellik ölür.
+    const dolu = renderToString(<CategoryPage initialCategory={ALT} initialParentCategory={UST} />)
+    expect(dolu).toContain('UST:Fanlar')
+
+    const bos = renderToString(<CategoryPage initialCategory={ALT} />)
+    expect(bos).toContain('UST:YOK')
+    expect(bos).not.toContain('UST:Fanlar')
   })
 })
 
