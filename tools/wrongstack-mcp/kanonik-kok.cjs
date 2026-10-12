@@ -20,9 +20,10 @@
  * Sarmalayıcı bayrak EKLEMEZ ve çıkarmaz: --writable kararı .mcp.json'da görünür kalır.
  */
 
+const fs = require('node:fs')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
-const { kokuKanonikle } = require('./posta-kutusu.cjs')
+const { kokuKanonikle, paketCli } = require('./posta-kutusu.cjs')
 
 const PAKET_KOKU = path.join(__dirname, 'node_modules', '@wrongstack')
 
@@ -37,11 +38,21 @@ function cliDogrula(verilen, cwd = process.cwd()) {
   return mutlak
 }
 
+/**
+ * Doğrulanmış cli yolunu ÇALIŞTIRILACAK dosyaya çevirir (ARC-98): worktree'de paket kurulumu yoksa aynı paketin
+ * ana ağaçtaki kurulumu. Yapı doğrulaması cliDogrula'dadır; burada yalnız aynı `<paket>/dist/cli.js` aranır.
+ */
+function cliCoz(dogrulanmis) {
+  if (fs.existsSync(dogrulanmis)) return dogrulanmis
+  const paket = path.basename(path.dirname(path.dirname(dogrulanmis)))
+  return paketCli(paket, __dirname)
+}
+
 /** Sunucuya verilecek argv; cli geçersizse null. Yan etkisiz — test bunu çağırır. */
 function argvKur(argv0, args, cwd = process.cwd()) {
   const cli = cliDogrula(args[0], cwd)
   if (!cli) return null
-  return [argv0, cli, ...kokuKanonikle(args.slice(1))]
+  return [argv0, cliCoz(cli), ...kokuKanonikle(args.slice(1))]
 }
 
 async function calistir() {

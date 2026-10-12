@@ -884,6 +884,12 @@ gerektirmez).
   sarmalayıcıdan açar, kök posta kutusuyla AYNI `kanonikKok` ile çözülür. Yalnız
   `@wrongstack/*/dist/cli.js` çalıştırır, bayrak eklemez (`--writable` yok). Kapı:
   INV-WRONGSTACK-KANONIK-KOK-1. `…-1088d5/codebase-index` artık yetim — silinmesi ayrı iş (B(0)d).
+  **Worktree'de paket yolu (2026-10-12, ARC-98) — sahip ARAC, durum KAL:** `node_modules` izlenmez, worktree'de
+  yoktur; sunucu göreli yolla açılınca "Cannot find module" ile ölüp "Connection closed" veriyordu. Sage ve
+  kanban artık aynı `kanonik-kok.cjs` sarmalayıcısından açılır; sarmalayıcı ve posta kutusu `paketCli`
+  (`posta-kutusu.cjs`) ile paketi önce yerelde, yoksa ana ağacın kurulumunda arar (bulunamazsa yerel yol:
+  sessiz başka dosya çalışmaz). Ölçüm: worktree'den açılan kanban 16 pano ve OPS-109 kartını ana depoyla
+  aynı gördü. Kapı: INV-WRONGSTACK-KANONIK-KOK-1 üç yeni kol (sabotajla doğrulandı).
   **Kanban yaması (2026-09-27, karar 144, REC-391 K1) — sahip ARAC, durum KAL (yukarı akış
   düzeltince SİL):** `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.26-ozet-donus.patch`. Betik
   değil, kurulum parçası → tabloda değil burada. kanban-mcp yazma dönüşünü aracın kendi özet
