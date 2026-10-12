@@ -449,6 +449,45 @@ describe('INV-KARTSIZ-KAPI-10 (ARC-95): RECEP YETKİSİ satırı — ikinci dene
     expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: bence\nRECEP YETKİSİ: gerçek para').durum).toBe('tamam')
   })
 
+  it('⭐OPS 10-12 (a): satır başı çapası biçim işaretlerini tanır — kalın, madde, alıntı, kalın+madde', () => {
+    const biciimler = [
+      '**RECEP YETKİSİ:** canlı yazım',
+      '**RECEP YETKİSİ**: canlı yazım',
+      '- RECEP YETKİSİ: canlı yazım',
+      '> RECEP YETKİSİ: canlı yazım',
+      '- **RECEP YETKİSİ:** canlı yazım',
+      '* RECEP YETKİSİ: canlı yazım',
+      '__RECEP YETKİSİ:__ canlı yazım',
+      '  \t> - RECEP YETKİSİ:   canlı yazım',
+    ]
+    for (const satir of biciimler) {
+      const d = kanca.yetkiDegerlendir('YAP: x.\n' + satir)
+      expect(d.durum, 'tanınmadı: ' + satir).toBe('tamam')
+    }
+    // Liste dışı gerekçe biçim işaretiyle de liste dışı kalır; metin içi alıntı hâlâ sayılmaz.
+    expect(kanca.yetkiDegerlendir('- **RECEP YETKİSİ:** bence gerekli').durum).toBe('liste-disi')
+    expect(kanca.yetkiDegerlendir('Not: **RECEP YETKİSİ:** canlı yazım diye yazılır').durum).toBe('yok')
+  })
+
+  it('⭐OPS 10-12 (b): eşanlamlılar — "canlı veritabanı yazımı/…na yazım", "migration\'lı PR birleştirme", "migration içeren dalın merge\'ü"', () => {
+    const esanlamlilar = [
+      'canlı veritabanı yazımı',
+      'Canlı veritabanına yazım — ayrıntı',
+      'canlı veritabanına yazma',
+      "migration'lı PR birleştirme",
+      'Migration’lı PR birleştirme (master’a birleşince prod’a uygulanır)',
+      'migration içeren dalın merge’ü',
+      "migration içeren PR birleştirme",
+    ]
+    for (const g of esanlamlilar) {
+      expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, 'tanınmadı: ' + g).toBe('tamam')
+    }
+    // Çok genişlememeli: ilgisiz "canlı" ya da "migration" ifadeleri liste dışı kalır.
+    for (const g of ['canlı site görünümü', 'migration dosyası okundu', 'canlı veri hakkında soru']) {
+      expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, 'yanlış geçti: ' + g).toBe('liste-disi')
+    }
+  })
+
   it('satırı olmayan Recep kartı → blok, mesajda "yetkisi zaten verilmiş" ve izinli liste', () => {
     const k = kanca.degerlendir(mesaj('OPS-72'), dogrulayici({ 'OPS-72': { durum: 'yok', gerekce: '' } }))
     expect(k.durum).toBe('blok')

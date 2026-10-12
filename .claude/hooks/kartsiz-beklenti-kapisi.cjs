@@ -38,14 +38,20 @@ const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 // Kural: mesajda istek olarak anılan ve Recep'e bağlı (Sen/Recep ya da recep-bekliyor/karar-bekliyor) her açık kart, açıklamasında bir
 // satır "RECEP YETKİSİ: <gerekçe>" taşır; gerekçe YALNIZ aşağıdaki altı sınıftan biridir. Satır yoksa ya da gerekçe liste dışıysa KIRMIZI.
 // Cetvel: docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ. Kanban betiği ikinci kez (--detay) çağrılır; okunamazsa fail-open ama sessiz değil.
-const YETKI_SATIRI = /^[ \t]*RECEP[ \t]+YETK[İIiı]S[İIiı][ \t]*:[ \t]*(\S.*)$/gim
+// Satır başı çapası biçim işaretlerini tanır (OPS 10-12 okuması): düz, "**RECEP YETKİSİ:** x", "- RECEP YETKİSİ: x", "> RECEP YETKİSİ: x".
+// Başında madde/alıntı işareti (> - * +), kalın/altı çizili (** __) ve iki noktanın iki yanında kalın kapanışı serbesttir.
+const YETKI_SATIRI = /^[ \t]*(?:[>\-*+][ \t]*)*(?:\*\*|__)?[ \t]*RECEP[ \t]+YETK[İIiı]S[İIiı][ \t]*(?:\*\*|__)?[ \t]*:[ \t]*(?:\*\*|__)?[ \t]*(\S.*)$/gim
 const YETKI_GEREKCELERI = 'canlı yazım · migration birleştirme · gerçek para · geri alınamaz silme · yeni görünüm/iddia/yapı kararı · hesap/ayar dosyası'
 // Karşılaştırma ASCII'ye indirgenmiş metinle yapılır (ı/İ/ş/ğ/ü/ö/ç yazımı ayrımı bozmasın); gerekçenin devamı (" — ayrıntı") serbesttir.
 const asciiKucuk = (s) =>
   String(s).toLocaleLowerCase('tr').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
 const YETKI_KALIPLARI = [
-  /^canli\s+yazim\b/,
+  // "canlı yazım", "canlı veritabanı yazımı", "canlı veritabanına yazım" (filo-ortak.md adlandırması).
+  /^canli\s+(?:veritaban[a-z]*\s+)?(?:yazim[a-z]*|yazma)\b/,
   /^migration\s+birlestirme\b/,
+  // "migration'lı PR birleştirme", "migration içeren dalın merge'ü" (filo-ortak.md: "Migration'lı PR birleştirme" / "migration içeren PR").
+  /^migration['’`]?li\s+(?:pr\s+)?birlestirme\b/,
+  /^migration\s+iceren\s+(?:dal|pr|branch)[a-z]*\s+(?:merge|birlestirme)/,
   /^gercek\s+para\b/,
   /^geri\s+alinamaz\s+silme\b/,
   /^yeni\s+(?:gorunum|iddia|yapi)(?:\s*\/\s*(?:gorunum|iddia|yapi))*\s+karari\b/,
