@@ -30,8 +30,15 @@ const modul = require_(SAGLIK) as {
     okuSurum?: (klasor: string) => string | null,
   ) => Daemon[]
   anaAgacMi: (kok?: string) => boolean
-  sunucuSurumu: (cli: string, kok: string, zamanAsimi?: number, ek?: string[]) => Promise<{ surum?: string | null; arac?: number | null; hata?: string }>
+  sunucuSurumu: (
+    cli: string,
+    kok: string,
+    zamanAsimi?: number,
+    ek?: string[],
+    ortam?: Record<string, string>,
+  ) => Promise<{ surum?: string | null; arac?: number | null; hata?: string }>
   SUNUCU_EK: Record<string, string[]>
+  mcpOrtami: (ad: string, kok?: string) => Record<string, string>
 }
 
 const KOMUTLAR = {
@@ -182,5 +189,62 @@ describe('INV-WRONGSTACK-SAGLIK-2 · mailbox-mcp --actor ile açılır (ölçüm
 
   it('ana döngü sunucuSurumu çağrısına SUNUCU_EK geçirir (bayrak unutulursa kusur geri gelir)', () => {
     expect(fs.readFileSync(SAGLIK, 'utf8')).toMatch(/sunucuSurumu\([\s\S]{0,200}SUNUCU_EK\[ad\]/)
+  })
+})
+
+/**
+ * ARC-109 (12 Ekim 15:30 ölçüldü): kanban doğrulayıcı izin listesi paylaşılan DAEMON doğarken `process.env`'den okunur;
+ * ortamsız açılan ilk istemci daemon'u `+gh`sız doğurur ve bütün pencerelerde `gh` kanıtları reddedilir (13:51-15:30).
+ * Sağlık ölçümü sunucuyu açıyorsa `.mcp.json` ortamını AYNEN geçirmeli.
+ */
+describe('INV-WRONGSTACK-SAGLIK-3 · sunucu `.mcp.json` ortamıyla açılır (daemon izin listesi bozulmaz)', () => {
+  const mcpKok = (mcp: unknown) => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-mcp-'))
+    fs.writeFileSync(path.join(d, '.mcp.json'), typeof mcp === 'string' ? mcp : JSON.stringify(mcp))
+    return d
+  }
+
+  it('⭐gerçek .mcp.json: kanban-mcp için +gh ortamı gelir; diğer sunucularda ortam yok', () => {
+    expect(modul.mcpOrtami('kanban-mcp', KOK)).toEqual({ WRONGSTACK_KANBAN_VERIFIER_COMMANDS: '+gh' })
+    expect(modul.mcpOrtami('sage-mcp', KOK)).toEqual({})
+    expect(modul.mcpOrtami('olmayan-mcp', KOK)).toEqual({})
+  })
+
+  it('.mcp.json yok ya da bozuksa boş ortam döner, FIRLATMAZ (ölçüm yine koşar)', () => {
+    const yok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-mcp-'))
+    const bozuk = mcpKok('{bozuk')
+    const baska = mcpKok({ mcpServers: { x: { args: ['baska.js'], env: { A: '1' } } } })
+    try {
+      for (const k of [yok, bozuk, baska]) expect(modul.mcpOrtami('kanban-mcp', k)).toEqual({})
+    } finally {
+      for (const k of [yok, bozuk, baska]) fs.rmSync(k, { recursive: true, force: true })
+    }
+  })
+
+  it('⭐GERÇEK SÜREÇ: ortam sunucuya ULAŞIR (sahte cli ortam değişkeni yoksa çıkış 2)', async () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-env-'))
+    const cli = path.join(d, 'cli.js')
+    fs.writeFileSync(
+      cli,
+      [
+        "if (process.env.WRONGSTACK_KANBAN_VERIFIER_COMMANDS !== '+gh') process.exit(2)",
+        "process.stdin.on('data', (b) => { for (const l of String(b).split('\\n')) { if (!l.trim()) continue; const m = JSON.parse(l)",
+        "  if (m.method === 'initialize') process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: m.id, result: { serverInfo: { version: '9.9.9' } } }) + '\\n')",
+        "  if (m.method === 'tools/list') process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: m.id, result: { tools: [] } }) + '\\n') } })",
+      ].join('\n'),
+    )
+    try {
+      const iyi = await modul.sunucuSurumu(cli, d, 10_000, [], { WRONGSTACK_KANBAN_VERIFIER_COMMANDS: '+gh' })
+      expect(iyi.hata).toBeUndefined()
+      expect(iyi.surum).toBe('9.9.9')
+      const kotu = await modul.sunucuSurumu(cli, d, 10_000)
+      expect(kotu.hata, 'ortamsız açılış kabul edildi').toMatch(/beklenmedik kapandi/)
+    } finally {
+      fs.rmSync(d, { recursive: true, force: true })
+    }
+  })
+
+  it('ana döngü sunucuSurumu çağrısına mcpOrtami(ad) geçirir (unutulursa daemon +gh olmadan doğar)', () => {
+    expect(fs.readFileSync(SAGLIK, 'utf8')).toMatch(/sunucuSurumu\([\s\S]{0,260}mcpOrtami\(ad\)/)
   })
 })
