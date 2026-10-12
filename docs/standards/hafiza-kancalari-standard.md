@@ -324,6 +324,27 @@ eksik olan, yedeğin o dersi **uygulaması**ydı.
    sessiz kalsaydı yedek alınmadan "alındı" denecekti. Gölge tabloları (`*_fts_data`, `*_fts_idx`,
    `*_fts_docsize`) gerçek tablodur ve sayılır.
 
+### §7.7 POSTA KUTULARI da depodur; sage ve posta GERİ YÜKLENİR (ARC-71, 2026-10-12)
+
+Pencereler arası posta kutusu `~/.wrongstack/projects/<proje>/_mailbox.sqlite` altında yaşar (proje dizininin
+DIŞINDA) ve **WAL kiplidir**. Ölçüldü (TAKİP 10-09): canlı kutuda ana dosya 160 KB iken WAL 4,1 MB; düz kopya
+mesajların çoğunu atlar. OPS hükmü 10-09 (kararlar 2 ve 3): kökteki **beş dosyanın hepsi** kapsamdadır
+(hangisinin canlı olduğu yedek için önemsiz), sage geri yüklenebilir olur.
+
+1. **Her kutu AYRI depodur** (`posta-<proje>`); liste her çağrıda kökten taranır (`VENTHUB_POSTA_KOKU` ya da
+   `~/.wrongstack/projects`). Yeni kök doğarsa kutusu kendiliğinden kapsama girer; sabit liste sessizce eksik kalırdı.
+2. **Kaynakla sayım aynıdır**: `VACUUM INTO` + tablo satır sayıları. Kutu canlıyken (pencereler yazar) sayım
+   uyuşmazsa **bir kez** yeniden denenir; ikinci uyuşmazlık `.DOGRULANMADI` olur.
+3. **Yedek önce `.gecici`ye yazılır, doğrulanınca adına döner.** Dosya adı dakika çözünürlüklüdür; aynı dakikada
+   ikinci koşum eskiden "dosya zaten var" ile düşüyordu. Doğrulama düşerse aynı dakikadaki sağlam yedek yerinde kalır.
+4. **Geri yükleme "servis" olarak MCP süreçlerine bakar** (sage ve posta için pid dosyası yoktur; her pencere
+   kendi sunucusunu açık tutar): komut satırında `sage-mcp`/`mailbox-mcp` geçen süreç varsa RET. **Süreç listesi
+   alınamazsa da RET** (bakamamak "kimse yok" demek değildir). Betiğin kendi süreci sayılmaz. Eski dosyalar
+   `.oncesi-<damga>` ile yana alınır, silinmez; yazıldıktan sonra parmak izi yedekle karşılaştırılır.
+5. **Yükseltme günü adımı:** pencereler kapalıyken `node scripts/hijyen/sage-yedek.cjs` (üç tür depo ayrı
+   satır), `--liste` ile boyut kontrolü; geri dönüş `--geri sage`, `--geri posta-<proje>`, `--geri kanban`.
+   Posta kutusu elle kopyalanmaz.
+
 ---
 
 ## §8 KONU ENJEKSİYONU · KULLANIM SAYACI · HİJYEN (REC-519, 2026-09-30)

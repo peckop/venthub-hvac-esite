@@ -31,13 +31,23 @@
  *   node scripts/hijyen/sage-yedek.cjs --geri kanban [dosya] [--evet]
  *                                                 # yedekten geri yükle (ARC-9); --evet yoksa yalnız plan.
  *                                                 # Servis canlıyken REDDEDER; eski dosyalar .oncesi-<damga> kalır.
+ *   node scripts/hijyen/sage-yedek.cjs --geri sage|posta-<proje> [dosya] [--evet]
+ *                                                 # ARC-71: aynı kurallar; "servis" = pencerelerdeki MCP süreçleri.
+ *
+ * ⭐POSTA KUTULARI (ARC-71, OPS kararı 10-09): `~/.wrongstack/projects/<proje>/_mailbox.sqlite` — hepsi (beş
+ * dosya ölçüldü, her birinin WAL'ı dolu) aynı yöntemle yedeklenir: `VACUUM INTO` + kaynakla sayım. Düz kopya
+ * yedek değildir: ana dosya 160 KB iken WAL 4,1 MB (mesajların çoğu WAL'da). Hangisinin canlı olduğu yedek
+ * için önemsizdir; hepsi alınır. Kök `VENTHUB_POSTA_KOKU` ile değişir (testler boş dizine yönlendirir).
  *
  * Yöneten cetvel: docs/standards/hafiza-kancalari-standard.md §7.
  */
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 
 const { anaKok } = require('./ana-kok.cjs')
+// Süreç listesi AYRI modülde (bu dosyada dış süreç çağrısı yok: INV-SAGE-YEDEK-1 "dış servise çıkış izi yok" kolu).
+const { calisanSurecler } = require('./surec-listesi.cjs')
 
 /** Kaç yedek tutulur (en yenileri). Eski olanlar silinir — sonsuz büyüme de bir arızadır. */
 const TUTULACAK = 14
@@ -86,6 +96,8 @@ const DEPOLAR = [
     uyariSaat: 72,
     saklama: null,
     servis: null,
+    // ARC-71: geri yükleme sage-mcp süreçleri YOKKEN yapılır (her pencere bir sunucu açar; WAL açık tutulur).
+    surecDeseni: /sage-mcp[\\/]dist[\\/]cli\.js/i,
   },
   {
     ad: 'kanban',
@@ -100,10 +112,60 @@ const DEPOLAR = [
   },
 ]
 
-const depoBul = (ad) => DEPOLAR.find((d) => d.ad === ad) || DEPOLAR[0]
+/** Posta kutularının üst dizini: ortam değişkeni ya da `~/.wrongstack/projects` (proje dizini DEĞİL, kullanıcı dizini). */
+function postaKoku() {
+  return process.env.VENTHUB_POSTA_KOKU || path.join(os.homedir(), '.wrongstack', 'projects')
+}
+
+/**
+ * ⭐POSTA KUTULARI (ARC-71): kökteki her `<proje>/_mailbox.sqlite` AYRI bir depodur (`posta-<proje>`).
+ * Her çağrıda yeniden taranır: pencereler yeni kök (c:/C: harf farkı, yeni worktree) üretebilir; sabit liste
+ * sessizce eksik kalırdı. Dosyası olmayan dizin depo sayılmaz. Hepsi aynı eşiği taşır (sage ile aynı).
+ */
+function postaDepolari() {
+  const koku = postaKoku()
+  let adlar
+  try {
+    adlar = fs.readdirSync(koku).sort()
+  } catch {
+    return []
+  }
+  return adlar
+    .filter((a) => fs.existsSync(path.join(koku, a, '_mailbox.sqlite')))
+    .map((a) => ({
+      ad: 'posta-' + a,
+      mutlak: path.join(koku, a, '_mailbox.sqlite'),
+      onek: 'posta-' + a + '-',
+      uzanti: '.sqlite',
+      ana: null,
+      tazeSaat: 24,
+      uyariSaat: 72,
+      saklama: null,
+      servis: null,
+      // Her pencere kendi mailbox-mcp süreciyle (ya da sarmalayıcıyla) kutuyu açık tutar.
+      surecDeseni: /mailbox-mcp[\\/]dist[\\/]cli\.js|posta-kutusu\.cjs/i,
+      // Canlı kutu: kaynak yedek sırasında değişebilir; sayım uyuşmazsa bir kez daha denenir.
+      canli: true,
+    }))
+}
+
+/** Sabit depolar (sage, kanban) + bulunan posta kutuları. `DEPOLAR` dışa açık kalır (yalnız sabit ikili). */
+function tumDepolar() {
+  return [...DEPOLAR, ...postaDepolari()]
+}
+
+const depoBul = (ad) => tumDepolar().find((d) => d.ad === ad) || DEPOLAR[0]
+
+/** Bu deponun yedek dosya adı deseni. Posta kutuları SIKI desen kullanır (`posta-a-` ile `posta-a-b-` karışmasın). */
+function yedekDeseni(depo) {
+  const kac = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  if (depo.mutlak) return new RegExp('^' + kac(depo.onek) + '\\d{4}-\\d{2}-\\d{2}T\\d{4}Z' + kac(depo.uzanti) + '$')
+  return new RegExp('^' + depo.onek + '.*' + depo.uzanti.replace('.', '\\.') + '$')
+}
 
 function kaynakYolu(k = kok(), depoAdi = 'sage') {
-  return path.join(k, ...depoBul(depoAdi).goreli)
+  const depo = depoBul(depoAdi)
+  return depo.mutlak ? depo.mutlak : path.join(k, ...depo.goreli)
 }
 
 /** Git DIŞI hedef dizin. Depo içine ASLA yazılmaz (ikili + üç yazar = çözülemez çatışma). */
@@ -237,7 +299,7 @@ function damga(d) {
  * Tutarlı yedek alır ve DOĞRULAR.
  * @returns {{durum:'alindi'|'dogrulanmadi'|'kaynak-yok'|'hata', yol?:string, kaynak?:object, yedek?:object, sebep?:string}}
  */
-function yedekAl(simdi = new Date(), depoAdi = 'sage') {
+function yedekAl(simdi = new Date(), depoAdi = 'sage', deneme = 1) {
   const depo = depoBul(depoAdi)
   const kaynak = kaynakYolu(kok(), depo.ad)
   if (!fs.existsSync(kaynak)) return { durum: 'kaynak-yok', depo: depo.ad, sebep: kaynak }
@@ -245,6 +307,17 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
   const dizin = yedekDizini()
   fs.mkdirSync(dizin, { recursive: true })
   const hedef = path.join(dizin, `${depo.onek}${damga(simdi)}${depo.uzanti}`)
+  /**
+   * ⭐GEÇİCİ DOSYA (ARC-71): ad dakika çözünürlüklüdür; aynı dakikada ikinci koşum VACUUM INTO'yu "dosya zaten var"
+   * ile düşürüyordu (kod okuması, OPS 10-09). Yedek önce `.gecici`ye yazılıp DOĞRULANIR, sonra adına döner;
+   * doğrulama düşerse aynı dakikadaki sağlam yedek yerinde kalır. `.gecici` hiçbir yedek deseniyle eşleşmez.
+   */
+  const yaz = hedef + '.gecici'
+  try {
+    fs.unlinkSync(yaz)
+  } catch {
+    /* yoktu */
+  }
 
   let kaynakIzi
   let kaynakKanban = null
@@ -255,7 +328,7 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
     const db = new DatabaseSync(kaynak, { readOnly: true })
     try {
       // ⭐VACUUM INTO: WAL dahil TEK tutarlı dosya. Kaynağa YAZMAZ (readOnly ile açıldı).
-      db.exec(`VACUUM INTO '${hedef.replace(/'/g, "''")}'`)
+      db.exec(`VACUUM INTO '${yaz.replace(/'/g, "''")}'`)
     } finally {
       try {
         db.close()
@@ -270,11 +343,11 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
   // GERİ YÜKLEME DENEMESİ: yedeği aç, parmak izini kaynakla karşılaştır.
   let yedekIzi
   try {
-    yedekIzi = parmakIzi(hedef, depo.ana)
+    yedekIzi = parmakIzi(yaz, depo.ana)
   } catch (e) {
     const bozuk = hedef + '.DOGRULANMADI'
     try {
-      fs.renameSync(hedef, bozuk)
+      fs.renameSync(yaz, bozuk)
     } catch {
       /* yeniden adlandırma başarısızsa dosya yerinde kalır; durum yine kırmızı */
     }
@@ -287,9 +360,18 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
     yedekIzi.tablolar.join(',') === kaynakIzi.tablolar.join(',') &&
     JSON.stringify(yedekIzi.satirlar) === JSON.stringify(kaynakIzi.satirlar)
   if (!uyusuyor) {
+    // Canlı kutuda (pencereler yazıyor) kaynak, kopya ile sayım arasında ilerlemiş olabilir: bir kez daha dene.
+    if (depo.canli && deneme < 2) {
+      try {
+        fs.unlinkSync(yaz)
+      } catch {
+        /* silinemedi: yeniden denemede ezilir */
+      }
+      return yedekAl(simdi, depoAdi, deneme + 1)
+    }
     const bozuk = hedef + '.DOGRULANMADI'
     try {
-      fs.renameSync(hedef, bozuk)
+      fs.renameSync(yaz, bozuk)
     } catch {
       /* aynı: durum kırmızı kalır */
     }
@@ -310,7 +392,7 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
   if (kaynakKanban) {
     let sebep = null
     try {
-      yedekKanban = kanbanSayim(hedef)
+      yedekKanban = kanbanSayim(yaz)
       if (!yedekKanban) sebep = 'yedekte kanban_boards tablosu yok'
       else if (yedekKanban.butunluk !== 'ok') sebep = 'butunluk denetimi BOZUK'
       else if (yedekKanban.bozukPayload > 0) sebep = `${yedekKanban.bozukPayload} pano payload'i okunamiyor`
@@ -322,7 +404,7 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
     if (sebep) {
       const bozuk = hedef + '.DOGRULANMADI'
       try {
-        fs.renameSync(hedef, bozuk)
+        fs.renameSync(yaz, bozuk)
       } catch {
         /* aynı: durum kırmızı kalır */
       }
@@ -336,6 +418,12 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
     }
   }
 
+  // Doğrulandı: geçici dosya asıl adına döner (aynı dakikadaki eski kopyanın yerine geçer).
+  try {
+    fs.renameSync(yaz, hedef)
+  } catch (e) {
+    return { durum: 'hata', sebep: 'yedek adina tasinamadi: ' + String((e && e.message) || e).slice(0, 160) }
+  }
   budama(dizin, depo.ad)
   return {
     durum: 'alindi',
@@ -354,13 +442,13 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
  * raporlar. Tek bir başarılı satırın ötekinin düştüğünü örtmesi, yedeksizliğin sessiz hâlidir.
  */
 function hepsiniAl(simdi = new Date()) {
-  return DEPOLAR.map((d) => ({ depo: d.ad, ...yedekAl(simdi, d.ad) }))
+  return tumDepolar().map((d) => ({ depo: d.ad, ...yedekAl(simdi, d.ad) }))
 }
 
 /** En yeni TUTULACAK yedeği bırakır. `.DOGRULANMADI` dosyalarına DOKUNMAZ (kanıt olarak kalır). */
 function budama(dizin = yedekDizini(), depoAdi = 'sage') {
   const depo = depoBul(depoAdi)
-  const desen = new RegExp('^' + depo.onek + '.*' + depo.uzanti.replace('.', '\\.') + '$')
+  const desen = yedekDeseni(depo)
   let dosyalar
   try {
     dosyalar = fs
@@ -420,7 +508,8 @@ function surecCanli(pid) {
 }
 
 /**
- * YEDEKTEN GERİ YÜKLEME (ARC-9). Yalnız `servis` tanımlı depolar (bugün: kanban).
+ * YEDEKTEN GERİ YÜKLEME (ARC-9, ARC-71). Yalnız `servis` ya da `surecDeseni` tanımlı depolar
+ * (kanban; ARC-71 ile sage ve her posta kutusu).
  *
  * ⛔SERVİS CANLIYKEN REDDEDER: çalışan servis dosyayı açık tutar; altından değiştirmek ya
  * başarısız olur ya da servis eski içeriği WAL'dan geri yazar. Önce servis kapatılır.
@@ -434,16 +523,16 @@ function surecCanli(pid) {
  * @param {{evet?: boolean, simdi?: Date}} secenek
  */
 function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
-  const depo = DEPOLAR.find((d) => d.ad === depoAdi)
+  const depo = tumDepolar().find((d) => d.ad === depoAdi)
   if (!depo) return { durum: 'hata', sebep: `bilinmeyen depo: ${depoAdi}` }
-  if (!depo.servis)
+  if (!depo.servis && !depo.surecDeseni)
     return {
       durum: 'hata',
       sebep: `${depo.ad} icin geri yukleme tanimli degil (servis denetimi yok)`,
     }
 
   const dizin = yedekDizini()
-  const desen = new RegExp('^' + depo.onek + '.*' + depo.uzanti.replace('.', '\\.') + '$')
+  const desen = yedekDeseni(depo)
   const saglam = liste(dizin, depo.onek).filter((y) => desen.test(y.ad))
   const secilen = dosyaAdi ? saglam.find((y) => y.ad === path.basename(dosyaAdi)) : saglam[saglam.length - 1]
   if (!secilen) {
@@ -474,16 +563,41 @@ function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
 
   const k = kok()
   let pid = null
-  try {
-    pid = Number(JSON.parse(fs.readFileSync(path.join(k, ...depo.servis), 'utf8')).pid)
-  } catch {
-    /* servis dosyası yok ya da okunamıyor: servis çalışmıyor sayılır */
+  if (depo.servis) {
+    try {
+      pid = Number(JSON.parse(fs.readFileSync(path.join(k, ...depo.servis), 'utf8')).pid)
+    } catch {
+      /* servis dosyası yok ya da okunamıyor: servis çalışmıyor sayılır */
+    }
   }
   if (surecCanli(pid)) {
     return {
       durum: 'servis-canli',
       yedek: secilen.ad,
       sebep: `${depo.ad} servisi calisiyor (pid ${pid}); once servisi kapat, sonra yeniden dene`,
+    }
+  }
+  /**
+   * ⭐SÜREÇ DENETİMİ (ARC-71): sage ve posta kutusunda pid dosyası yoktur; dosyayı her pencerenin MCP süreci açık
+   * tutar. Komut satırında desen eşleşen süreç varsa RET; süreç listesi ALINAMAZSA da RET (fail-closed): "bakamadım"
+   * "kimse yok" demek değildir. Bu betiğin kendi süreci sayılmaz. `secenek.surecler`: test için sahte liste.
+   */
+  if (depo.surecDeseni) {
+    const surecler = 'surecler' in secenek ? secenek.surecler : calisanSurecler()
+    if (!Array.isArray(surecler)) {
+      return {
+        durum: 'servis-olculemedi',
+        yedek: secilen.ad,
+        sebep: `${depo.ad} icin calisan surec listesi ALINAMADI; pencereler kapali oldugu dogrulanmadan geri yukleme yapilmaz`,
+      }
+    }
+    const acik = surecler.filter((s) => depo.surecDeseni.test(s) && !/sage-yedek\.cjs/.test(s))
+    if (acik.length > 0) {
+      return {
+        durum: 'servis-canli',
+        yedek: secilen.ad,
+        sebep: `${depo.ad} dosyasini acik tutan ${acik.length} MCP sureci var; once pencereleri kapat, sonra yeniden dene`,
+      }
     }
   }
 
@@ -560,7 +674,7 @@ function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
 }
 
 function liste(dizin = yedekDizini(), onek = null) {
-  const onekler = onek ? [onek] : DEPOLAR.map((d) => d.onek)
+  const onekler = onek ? [onek] : tumDepolar().map((d) => d.onek)
   try {
     return fs
       .readdirSync(dizin)
@@ -587,8 +701,8 @@ function sonDurum(dizin = yedekDizini(), simdi = Date.now()) {
   const hepsi = liste(dizin)
   const dogrulanmadi = hepsi.filter((y) => y.ad.endsWith('.DOGRULANMADI')).map((y) => y.ad)
 
-  const depolar = DEPOLAR.map((d) => {
-    const desen = new RegExp('^' + d.onek + '.*' + d.uzanti.replace('.', '\\.') + '$')
+  const depolar = tumDepolar().map((d) => {
+    const desen = yedekDeseni(d)
     const saglam = hepsi.filter((y) => desen.test(y.ad))
     const son = saglam.length ? saglam[saglam.length - 1] : null
     let kaynakVar = false
@@ -634,6 +748,11 @@ function sonDurum(dizin = yedekDizini(), simdi = Date.now()) {
 module.exports = {
   TUTULACAK,
   DEPOLAR,
+  tumDepolar,
+  postaDepolari,
+  postaKoku,
+  calisanSurecler,
+  yedekDeseni,
   kaynakYolu,
   yedekDizini,
   parmakIzi,

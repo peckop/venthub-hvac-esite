@@ -597,9 +597,8 @@ describe('INV-KANBAN-YEDEK-1 · Kanban yedegi kart sayisiyla dogrulanir, kademel
     process.env.CLAUDE_PROJECT_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-geri-hata-'))
     process.env.VENTHUB_SAGE_YEDEK_DIZINI = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-geri-bos-'))
     expect(kanbanModul.geriYukle('yok').durum).toBe('hata')
-    expect(kanbanModul.geriYukle('sage').sebep, 'servis denetimi olmayan depo geri yuklenebiliyor').toMatch(
-      /tanimli degil/,
-    )
+    // ARC-71: sage artık geri yüklenebilir (süreç denetimli); yedeği yoksa sebebi yedeksizliktir, "tanımlı değil" DEĞİL.
+    expect(kanbanModul.geriYukle('sage').sebep, 'sage geri yukleme hala tanimsiz').toMatch(/yedegi yok/)
     expect(kanbanModul.geriYukle('kanban').sebep).toMatch(/yedegi yok/)
     expect(kanbanModul.geriYukle('kanban', 'kanban-2000-01-01T0000Z.sqlite').sebep).toMatch(/bulunamadi/)
     expect(kanbanModul.surecCanli(process.pid)).toBe(true)
@@ -629,5 +628,239 @@ describe('INV-KANBAN-YEDEK-1 · Kanban yedegi kart sayisiyla dogrulanir, kademel
       'esik depo basina degil',
     ).toEqual(['kanban'])
     expect(d.geciken[0]?.saat).toBe(25)
+  })
+})
+
+/**
+ * INV-POSTA-YEDEK-1 (ARC-71, OPS kararı 10-09) — pencereler arası posta kutuları da WAL dahil tutarlı yedeklenir,
+ * sage ve posta geri yüklenebilir (süreç denetimli). Ölçülen tuzak (TAKİP 10-09): canlı kutuda ana dosya 160 KB
+ * iken WAL 4,1 MB; düz kopya mesajların çoğunu atlar. Sayı ikiyle sınırlı DEĞİL: kökteki her `_mailbox.sqlite` depodur.
+ */
+type PostaModul = {
+  tumDepolar: () => { ad: string; onek: string; uzanti: string; mutlak?: string }[]
+  yedekDeseni: (d: { onek: string; uzanti: string; mutlak?: string }) => RegExp
+  yedekAl: (simdi?: Date, depo?: string) => { durum: string; yol?: string; sebep?: string; yedek?: Iz }
+  hepsiniAl: (simdi?: Date) => { depo: string; durum: string; yol?: string }[]
+  liste: (d?: string, onek?: string | null) => { ad: string }[]
+  geriYukle: (
+    depo: string,
+    dosya?: string | null,
+    s?: { evet?: boolean; simdi?: Date; surecler?: string[] | null },
+  ) => { durum: string; sebep?: string; oncesi?: string[]; hedef?: string; iz?: Iz; yedek?: string }
+}
+const postaModul = require_(MODUL_YOLU) as PostaModul
+const surecModul = require_(path.join(KOK, 'scripts', 'hijyen', 'surec-listesi.cjs')) as {
+  calisanSurecler: () => string[] | null
+}
+const ESKI_POSTA = process.env.VENTHUB_POSTA_KOKU
+afterEach(() => {
+  if (ESKI_POSTA === undefined) delete process.env.VENTHUB_POSTA_KOKU
+  else process.env.VENTHUB_POSTA_KOKU = ESKI_POSTA
+})
+
+/** Her proje için WAL kipli `_mailbox.sqlite` kurar; bağlantılar AÇIK döner (kapanış checkpoint yapar, tuzak kaybolur). */
+function postaKur(projeler: Record<string, number>): { koku: string; dbler: Record<string, SqliteDb>; yol: (p: string) => string } {
+  const koku = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-'))
+  const { DatabaseSync } = sqlite()
+  const dbler: Record<string, SqliteDb> = {}
+  for (const [proje, n] of Object.entries(projeler)) {
+    fs.mkdirSync(path.join(koku, proje), { recursive: true })
+    const db = new DatabaseSync(path.join(koku, proje, '_mailbox.sqlite'))
+    db.exec('pragma journal_mode = WAL')
+    db.exec('create table messages (id INTEGER PRIMARY KEY, alici TEXT NOT NULL, govde TEXT NOT NULL)')
+    for (let i = 0; i < n; i++) db.prepare('insert into messages (alici,govde) values (?,?)').run('pencere', `mesaj ${i}`)
+    dbler[proje] = db
+  }
+  return { koku, dbler, yol: (p) => path.join(koku, p, '_mailbox.sqlite') }
+}
+
+function postaOrtam(koku: string): { kok: string; dizin: string } {
+  // Kaynağı olmayan sage/kanban kökü: yalnız posta kutuları sınanır.
+  const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-kok-'))
+  const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-posta-hedef-'))
+  process.env.VENTHUB_POSTA_KOKU = koku
+  process.env.CLAUDE_PROJECT_DIR = kok
+  process.env.VENTHUB_SAGE_YEDEK_DIZINI = dizin
+  return { kok, dizin }
+}
+
+describe('INV-POSTA-YEDEK-1 · posta kutulari WAL dahil yedeklenir, sage ve posta geri yuklenir', () => {
+  it('⭐WAL: mesajlar yalniz WAL da — YEDEK tam, DUZ KOPYA eksik; her proje AYRI depo', () => {
+    const k = postaKur({ 'venthub-hvac-7e017f': 40, 'ops-ws-repo-a9436a': 3 })
+    const { dizin } = postaOrtam(k.koku)
+    const adlar = postaModul.tumDepolar().map((d) => d.ad)
+    expect(adlar, 'posta kutulari depo listesinde YOK — yukseltme gunu mesajlar yedeksiz').toEqual(
+      expect.arrayContaining(['posta-venthub-hvac-7e017f', 'posta-ops-ws-repo-a9436a']),
+    )
+
+    const s = postaModul.yedekAl(new Date(), 'posta-venthub-hvac-7e017f')
+    expect(s.durum, `posta yedegi alinamadi: ${s.sebep}`).toBe('alindi')
+    expect(s.yedek?.sayi, 'posta yedegi EKSIK — WAL daki mesajlar atlandi').toBe(40)
+    expect(path.basename(String(s.yol))).toMatch(/^posta-venthub-hvac-7e017f-\d{4}-\d{2}-\d{2}T\d{4}Z\.sqlite$/)
+    expect(path.dirname(String(s.yol)), 'yedek hedef dizin disina yazildi').toBe(dizin)
+
+    // Düz kopya (tuzak): yalnız ana dosya → mesajların çoğu/tamamı yok.
+    const duz = path.join(dizin, 'duz-kopya.bin')
+    fs.copyFileSync(k.yol('venthub-hvac-7e017f'), duz)
+    let duzSayi = 0
+    try {
+      const { DatabaseSync } = sqlite()
+      const d = new DatabaseSync(duz, { readOnly: true })
+      duzSayi = Number(d.prepare('select count(*) as c from messages').get().c)
+      d.close()
+    } catch {
+      duzSayi = 0 // tablo bile yok: WAL tuzağının uç hâli
+    }
+    expect(duzSayi, 'fikstur sahte: duz kopya da tam — WAL tuzagi uretilmedi').toBeLessThan(40)
+    for (const db of Object.values(k.dbler)) db.close()
+  })
+
+  it('HEPSI alinir; kutusu olmayan dizin ve on ek cakismasi (a / a-b) karismaz', () => {
+    const k = postaKur({ a: 2, 'a-b': 5 })
+    fs.mkdirSync(path.join(k.koku, 'bos-proje'))
+    const { dizin } = postaOrtam(k.koku)
+    const sonuc = postaModul.hepsiniAl(new Date()).filter((r) => r.depo.startsWith('posta-'))
+    expect(sonuc.map((r) => r.depo).sort(), 'kutusu olmayan dizin depo sayildi ya da kutu atlandi').toEqual([
+      'posta-a',
+      'posta-a-b',
+    ])
+    for (const r of sonuc) expect(r.durum, r.depo).toBe('alindi')
+    const depolar = postaModul.tumDepolar()
+    const a = depolar.find((d) => d.ad === 'posta-a')
+    const ab = depolar.find((d) => d.ad === 'posta-a-b')
+    if (!a || !ab) throw new Error('depolar listede yok')
+    const dosyalar = fs.readdirSync(dizin)
+    expect(dosyalar.filter((f) => postaModul.yedekDeseni(a).test(f)), 'a deposu a-b nin yedegini yutuyor').toHaveLength(1)
+    expect(dosyalar.filter((f) => postaModul.yedekDeseni(ab).test(f))).toHaveLength(1)
+    for (const db of Object.values(k.dbler)) db.close()
+  })
+
+  it('⭐AYNI DAKIKADA ikinci kosum DUSMEZ (eski kusur); dogrulama duserse sagliklı yedek YERINDE kalir', () => {
+    const k = postaKur({ p1: 6 })
+    postaOrtam(k.koku)
+    const simdi = new Date()
+    const ilk = postaModul.yedekAl(simdi, 'posta-p1')
+    const ikinci = postaModul.yedekAl(simdi, 'posta-p1')
+    expect(ilk.durum).toBe('alindi')
+    expect(ikinci.durum, `ayni dakikada ikinci kosum dustu: ${ikinci.sebep}`).toBe('alindi')
+    expect(ikinci.yol).toBe(ilk.yol)
+    expect(fs.readdirSync(path.dirname(String(ilk.yol))).filter((f) => f.endsWith('.gecici')), 'gecici dosya kaldi').toEqual([])
+
+    // Sabotaj: geçici ada DİZİN konur → yazma düşer; aynı dakikadaki sağlam yedek bozulmaz/silinmez.
+    const bayt = fs.statSync(String(ilk.yol)).size
+    fs.mkdirSync(String(ilk.yol) + '.gecici')
+    const dusen = postaModul.yedekAl(simdi, 'posta-p1')
+    expect(dusen.durum, 'engellenen yazma basari gibi gorunuyor').not.toBe('alindi')
+    expect(fs.existsSync(String(ilk.yol)), 'dusen kosum sagliklı yedegi SILDI').toBe(true)
+    expect(fs.statSync(String(ilk.yol)).size).toBe(bayt)
+    for (const db of Object.values(k.dbler)) db.close()
+  })
+
+  it('⭐POSTA GERI YUKLEME: plan sey degistirmez; MCP sureci varken RET; sureç listesi ALINAMAZSA RET; uygulaninca eski hal KALIR', () => {
+    const k = postaKur({ p1: 8 })
+    postaOrtam(k.koku)
+    expect(postaModul.yedekAl(new Date(), 'posta-p1').durum).toBe('alindi')
+    // Yedekten SONRA 5 mesaj daha: geri yükleme 8'e DÖNMELİ.
+    for (let i = 0; i < 5; i++) k.dbler.p1?.prepare('insert into messages (alici,govde) values (?,?)').run('pencere', `yeni ${i}`)
+    k.dbler.p1?.close()
+    const say = (yol: string) => {
+      const { DatabaseSync } = sqlite()
+      const d = new DatabaseSync(yol, { readOnly: true })
+      try {
+        return Number(d.prepare('select count(*) as c from messages').get().c)
+      } finally {
+        d.close()
+      }
+    }
+    expect(say(k.yol('p1'))).toBe(13)
+
+    // 1) PLAN: hiçbir şey değişmez (süreç listesi boş verilir: plan yine de adımları yazar).
+    const plan = postaModul.geriYukle('posta-p1', null, { surecler: [] })
+    expect(plan.durum, `plan uretilemedi: ${plan.sebep}`).toBe('kuru')
+    expect(say(k.yol('p1')), 'plan asamasinda canli dosya DEGISTI').toBe(13)
+
+    // 2) MAILBOX SÜRECİ VAR → RET (kendi süreci sayılmaz).
+    const canli = [
+      'node C:\\x\\tools\\wrongstack-mcp\\kanonik-kok.cjs tools/wrongstack-mcp/node_modules/@wrongstack/mailbox-mcp/dist/cli.js --stdio',
+    ]
+    const ret = postaModul.geriYukle('posta-p1', null, { evet: true, surecler: canli })
+    expect(ret.durum, 'acik pencerenin altindan posta dosyasi degistirildi').toBe('servis-canli')
+    expect(say(k.yol('p1')), 'ret edilen geri yukleme canliyi DEGISTIRDI').toBe(13)
+    const kendi = ['node scripts/hijyen/sage-yedek.cjs --geri posta-p1 --evet mailbox-mcp/dist/cli.js']
+    expect(
+      postaModul.geriYukle('posta-p1', null, { surecler: kendi }).durum,
+      'betigin kendi sureci "pencere acik" sayildi',
+    ).toBe('kuru')
+
+    // 3) LİSTE ALINAMADI → RET (bakamamak "kimse yok" demek değildir).
+    const olculemedi = postaModul.geriYukle('posta-p1', null, { evet: true, surecler: null })
+    expect(olculemedi.durum).toBe('servis-olculemedi')
+    expect(say(k.yol('p1'))).toBe(13)
+
+    // 4) KAPALI: geri yüklenir, eski dosya silinmez.
+    const r = postaModul.geriYukle('posta-p1', null, { evet: true, surecler: ['node baska-bir-sey.js'] })
+    expect(r.durum, `geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
+    expect(say(k.yol('p1')), 'geri yuklenen kutu yedekle ayni degil').toBe(8)
+    expect(r.oncesi?.length, 'eski hal yana alinmadi').toBeGreaterThan(0)
+    for (const f of r.oncesi ?? []) expect(fs.existsSync(f), `eski hal SILINMIS: ${f}`).toBe(true)
+    const eski = (r.oncesi ?? []).find((f) => /_mailbox\.sqlite\.oncesi-[^-]+$/.test(f))
+    expect(eski, 'ana dosyanin eski hali listede yok').toBeDefined()
+    expect(say(String(eski)), 'yana alinan eski dosya 13 mesaji tasimiyor').toBe(13)
+  })
+
+  it('⭐SAGE GERI YUKLEME (OPS karar 3): sage-mcp sureci varken RET, kapaliyken geri yuklenir', () => {
+    const { kok, db } = depoKur(9)
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-geri-'))
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = dizin
+    process.env.VENTHUB_POSTA_KOKU = path.join(dizin, 'posta-yok')
+    expect(postaModul.yedekAl(new Date(), 'sage').durum).toBe('alindi')
+    db.prepare(
+      `insert into memories (id,data,status,kind,scope,importance,confidence,freshness,updated_at,created_at)
+       values (?,?,'active','fact','project',0.8,0.8,1,'2026-09-18','2026-09-18')`,
+    ).run('m-yeni', JSON.stringify({ text: 'yeni', anchors: [] }))
+    db.close()
+    const say = () => modul.parmakIzi(path.join(kok, '.wrongstack', 'memories', 'sage.db')).sayi
+    expect(say()).toBe(10)
+
+    const ret = postaModul.geriYukle('sage', null, {
+      evet: true,
+      surecler: ['node tools/wrongstack-mcp/node_modules/@wrongstack/sage-mcp/dist/cli.js --project-root .'],
+    })
+    expect(ret.durum, 'sage MCP sureci varken geri yukleme calisti').toBe('servis-canli')
+    expect(say(), 'ret edilen geri yukleme sage i DEGISTIRDI').toBe(10)
+
+    const r = postaModul.geriYukle('sage', null, { evet: true, surecler: [] })
+    expect(r.durum, `sage geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
+    expect(say(), 'geri yuklenen sage yedekle ayni degil').toBe(9)
+    for (const f of r.oncesi ?? []) expect(fs.existsSync(f), `eski hal SILINMIS: ${f}`).toBe(true)
+  })
+
+  it('GERCEK surec listesi: bu makinede alinabiliyor ve kendi sureci icinde (fail-closed kolu bozuksa kirmizi)', () => {
+    const l = surecModul.calisanSurecler()
+    expect(Array.isArray(l), 'surec listesi alinamadi — geri yukleme HEP reddedilir').toBe(true)
+    expect((l ?? []).some((s) => /node/i.test(s)), 'liste kendi node surecimizi icermiyor').toBe(true)
+  }, 40_000)
+
+  it('⭐OTURUM SONU KANCASI posta kutularini da alir ve loga yazar', () => {
+    const k = postaKur({ 'venthub-hvac-7e017f': 4 })
+    const { kok, dizin } = postaOrtam(k.koku)
+    const r = spawnSync(process.execPath, [KANCA_OTURUM_SONU], {
+      input: '{"session_id":"t","reason":"clear"}',
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        CLAUDE_PROJECT_DIR: kok,
+        VENTHUB_SAGE_YEDEK_DIZINI: dizin,
+        VENTHUB_POSTA_KOKU: k.koku,
+        VENTHUB_RECEP_DEFTER: path.join(dizin, 'yok', 'defter.jsonl'),
+      },
+      timeout: 60_000,
+    })
+    expect(r.status, 'kanca oturum kapanisini BLOKLADI').toBe(0)
+    const log = fs.readFileSync(path.join(dizin, 'son-kosum.log'), 'utf8')
+    expect(log, 'posta yedegi loga yazilmadi').toMatch(/\[posta-venthub-hvac-7e017f\] ALINDI/)
+    expect(fs.readdirSync(dizin).filter((f) => /^posta-venthub-hvac-7e017f-.*\.sqlite$/.test(f))).toHaveLength(1)
+    for (const db of Object.values(k.dbler)) db.close()
   })
 })

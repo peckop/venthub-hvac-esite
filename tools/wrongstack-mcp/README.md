@@ -92,6 +92,10 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    **Yedeği artık VAR (2026-09-18, #1267):** `node scripts/hijyen/sage-yedek.cjs` — `VACUUM INTO`
    ile WAL dahil tutarlı kopya, git dışı dizine, her koşumda kaynakla doğrulanır. ⚠Düz dosya
    kopyası yedek DEĞİLDİR: ölçüldü, 26 kaydın 20'sini veriyordu.
+   **Posta kutuları da kapsamda (ARC-71, 2026-10-12):** `~/.wrongstack/projects/*/_mailbox.sqlite` (beş dosya,
+   hepsi WAL kipli; ana dosya 160 KB iken WAL 4,1 MB ölçüldü) aynı betikle, her biri ayrı depo olarak
+   yedeklenir ve geri yüklenir (`--geri sage`, `--geri posta-<proje>`; pencerelerdeki MCP süreçleri açıkken
+   RET). Yükseltme gününde posta kutusunu elle kopyalama, betiği koş.
    **Kimlik harfe duyarlı:** `<ad-hash>` = sha256(`path.resolve(kök)`) ilk 6 hane; `c:\…` (VS Code) →
    `7e017f`, `C:\…` (terminal) → `1088d5`. Kanonik kimlik küçük harfli olandır; sage bundan etkilenmez
    (verisi proje dizininde).
