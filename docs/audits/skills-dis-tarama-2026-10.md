@@ -100,7 +100,9 @@ Yani yöntem kaba değildir; **sorun doğruluk değil, yerine kimin geçeceği:*
   monotonluk kapısı vardır, "nokta uydurulmaz" kuralı kodda yazılıdır. Görme okuması bunların hiçbirini vermez.
 - **Tekrarlanamaz.** Aynı grafik her okumada birkaç Pa oynar; veritabanına giren değer yeniden üretilebilir olmalıdır (`catalog-ingestion-standard.md` §6.3).
 - **Ölçüm sınırı.** Tek sayfa, temiz vektör grafik, ızgaralı. OPS "3 eğri" istedi; yalnız **2 eğrinin** kapıdan geçmiş referansı var. Üçüncü
-  eğri için referans ve çıpa olmadığından **ölçülemedi**. Lineo s.18 metin katmanına göre teknik veri tablosu sayfasıdır; eğri grafiği ölçülmedi.
+  eğri için referans ve çıpa olmadığından **ölçülemedi**. OPS'un andığı "Lineo Quiet katalog s.18" (`LINEO_QUITE_KATALOG.pdf`, 12 Ekim ölçüldü):
+  min/med/max debi, basınç ve güç **tablosu** ("TECHNICAL AND PERFORMANCE DATA"); sayfadaki 283 vektör çizimi tablo çizgisi, eğri grafiği değil.
+  Yani s.18 eğri değil **tablo** konusudur (pdfplumber ile çıkarılır); ölçülen eğriler `Commercial_Ventilation_in_Line_1.pdf` s.12'dedir.
 - **Olası tek yeri:** hattın okuyamadığı (çıpasız, raster) sayfada danışma amaçlı hızlı bakış; veriye yazılmaz.
 
 Karar: **alınmaz.** KATALOG yeni eğri istediğinde `egri-profilleri.json`'a profil eklenir (sahibi KATALOG/ARAÇ).
