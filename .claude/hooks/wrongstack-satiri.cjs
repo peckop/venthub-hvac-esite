@@ -75,20 +75,49 @@ function karsilastir(a, b) {
 }
 
 /**
- * Bizde sabitli sürüm: dört paketin EN DÜŞÜĞÜ (karışıksa ayrıca işaretlenir).
+ * ⭐ANA AĞAÇ (ARC-109, OPS 12 Ekim 14:10 ölçümü): "bizde" canlıda KOŞAN kurulumdur; o ana ağaçtadır. Worktree'de `.git`
+ * bir DOSYADIR ("gitdir: <ana>/.git/worktrees/<ad>") ve worktree'nin izlenen package.json'ı KENDİ commit'ini yansıtır:
+ * #1883'ten önceki bir dalda 1.0.26 yazar, satır ana ağaçta 1.1.0 iken "bizde 1.0.26 · geride" der. Git çağrısı YOK:
+ * hook her istemde koşar, yalnız dosya okur. `.git` yoksa ya da çözülemezse verilen dizin kalır.
+ */
+function anaAgac(depo) {
+  try {
+    const g = path.join(depo, '.git')
+    if (fs.statSync(g).isDirectory()) return depo
+    const m = /^gitdir:\s*(.+?)\s*$/m.exec(fs.readFileSync(g, 'utf8'))
+    if (!m) return depo
+    const gd = path.resolve(depo, m[1])
+    return path.basename(path.dirname(path.dirname(gd))) === '.git' ? path.dirname(path.dirname(path.dirname(gd))) : depo
+  } catch {
+    return depo
+  }
+}
+
+/**
+ * Bizde sabitli sürüm: dört paketin EN DÜŞÜĞÜ (karışıksa ayrıca işaretlenir). Okuma yeri ANA AĞAÇTIR (anaAgac).
  * @returns {{ surum: string, karisik: boolean } | { hata: string }}
  */
 function kurulu(depo) {
+  const kok = anaAgac(depo)
   let paket
   try {
-    paket = JSON.parse(fs.readFileSync(path.join(depo, PAKET_YOLU), 'utf8'))
+    paket = JSON.parse(fs.readFileSync(path.join(kok, PAKET_YOLU), 'utf8'))
   } catch {
     return { hata: 'package.json okunamadi' }
   }
   const bagimlilik = (paket && paket.dependencies) || {}
+  // Kurulu paketin KENDİ sürümü bildirilen aralıktan doğrudur (merge ile yükseltme arasındaki pencere); yoksa bildirilen.
+  const kuruluSurum = (ad, bildirilen) => {
+    try {
+      const v = JSON.parse(fs.readFileSync(path.join(kok, 'tools', 'wrongstack-mcp', 'node_modules', ad, 'package.json'), 'utf8')).version
+      return typeof v === 'string' && v ? v : bildirilen
+    } catch {
+      return bildirilen
+    }
+  }
   const surumler = Object.entries(bagimlilik)
     .filter(([ad]) => ad.startsWith('@wrongstack/'))
-    .map(([, s]) => String(s).replace(/^[\^~]/, ''))
+    .map(([ad, s]) => String(kuruluSurum(ad, String(s))).replace(/^[\^~]/, ''))
     .filter((s) => surumAyir(s))
   if (surumler.length === 0) return { hata: '@wrongstack bagimliligi yok' }
   const sirali = surumler.slice().sort((a, b) => karsilastir(a, b))
@@ -235,6 +264,7 @@ module.exports = {
   surumAyir,
   karsilastir,
   kurulu,
+  anaAgac,
   sonSurumuOlc,
   oku,
   satir,
