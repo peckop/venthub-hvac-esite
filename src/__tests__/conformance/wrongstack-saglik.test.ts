@@ -1,0 +1,140 @@
+// @vitest-environment node
+import { spawnSync } from 'node:child_process'
+import fs from 'node:fs'
+import { createRequire } from 'node:module'
+import os from 'node:os'
+import path from 'node:path'
+
+import { describe, expect, it } from 'vitest'
+
+/**
+ * INV-WRONGSTACK-SAGLIK-1 (ARC-94, OPS 12 Ekim) — yükseltme sonrası "koşan süreç gerçekten yeni sürüm mü" ölçülür
+ * ve ölçüm aracı canlıya YAN ETKİ üretmez.
+ *
+ * ⭐ÖLÇÜLMÜŞ KAZA (12 Ekim 13:07): sürüm okuma betiği worktree'den sunucu açınca sunucu `--project-root`u ANA AĞACA
+ * çevirdi, worktree'nin 1.1.0 paketiyle CANLI kökü açtı ve sage.db şemasını yerinde 34 → 47 nesneye göç ettirdi.
+ * Bu dosya o yolu kilitler: varsayılan hiçbir sunucu açmaz; `--sunucu` yalnız ana ağaçta (`.git` DİZİN) çalışır.
+ *
+ * Cetvel: tools/wrongstack-mcp/README.md (yükseltme sırası), docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md.
+ */
+const KOK = process.cwd()
+const SAGLIK = path.join(KOK, 'tools', 'wrongstack-mcp', 'saglik.cjs')
+const require_ = createRequire(import.meta.url)
+
+type Daemon = { pid: number; paket: string; kok: string | null; surum: string | null; beklenen: string | null; eski: boolean }
+const modul = require_(SAGLIK) as {
+  daemonPaketi: (komut: string) => { klasor: string; paket: string; kok: string | null } | null
+  daemonSurumleri: (
+    surecler: { pid: number; komut: string }[],
+    beklenen: (paket: string) => string | null,
+    okuSurum?: (klasor: string) => string | null,
+  ) => Daemon[]
+  anaAgacMi: (kok?: string) => boolean
+}
+
+const KOMUTLAR = {
+  kanban:
+    '"C:\\Program Files\\nodejs\\node.exe" c:\\x\\tools\\wrongstack-mcp\\node_modules\\@wrongstack\\kanban\\dist\\project-server.js --project-root c:\\x',
+  sage: '"C:\\Program Files\\nodejs\\node.exe" c:\\x\\tools\\wrongstack-mcp\\node_modules\\@wrongstack\\sage\\dist\\project-server.js --project-root c:\\x',
+  tools:
+    '"C:\\Program Files\\nodejs\\node.exe" c:\\x\\tools\\wrongstack-mcp\\node_modules\\@wrongstack\\tools\\dist\\codebase-index\\project-server.js --project-root c:\\x',
+  core: '"C:\\Program Files\\nodejs\\node.exe" c:\\x\\tools\\wrongstack-mcp\\node_modules\\@wrongstack\\core\\dist\\coordination\\mailbox-project-server.js --project-dir C:\\Users\\y\\.wrongstack\\projects\\p-7e017f',
+}
+
+function sahteAgac(opts: { gitDizin: boolean; gitDosya: boolean; surecler: { pid: number; komut: string }[]; kurulu: string }) {
+  const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-'))
+  const arac = path.join(kok, 'tools', 'wrongstack-mcp')
+  fs.mkdirSync(arac, { recursive: true })
+  fs.copyFileSync(SAGLIK, path.join(arac, 'saglik.cjs'))
+  // kurulum.cjs yerine saplama: gerçek süreç listesi/PowerShell çağrısı olmasın.
+  fs.writeFileSync(
+    path.join(arac, 'kurulum.cjs'),
+    `module.exports = { surecleriOku: () => ${JSON.stringify(opts.surecler)} }\n`,
+  )
+  for (const p of ['sage-mcp', 'kanban-mcp', 'mailbox-mcp', 'codebase-index-mcp', 'sage', 'kanban', 'tools', 'core']) {
+    const d = path.join(arac, 'node_modules', '@wrongstack', p)
+    fs.mkdirSync(d, { recursive: true })
+    fs.writeFileSync(path.join(d, 'package.json'), JSON.stringify({ name: '@wrongstack/' + p, version: opts.kurulu }))
+  }
+  if (opts.gitDizin) fs.mkdirSync(path.join(kok, '.git'))
+  if (opts.gitDosya) fs.writeFileSync(path.join(kok, '.git'), 'gitdir: /baska/yer')
+  return { kok, betik: path.join(arac, 'saglik.cjs') }
+}
+
+function kos(betik: string, ...args: string[]) {
+  const r = spawnSync(process.execPath, [betik, ...args], { encoding: 'utf8', timeout: 30000 })
+  return { kod: r.status, cikti: String(r.stdout) + String(r.stderr) }
+}
+
+describe('INV-WRONGSTACK-SAGLIK-1 · daemon sürümü ölçülür, ölçüm aracı canlıya yan etki üretmez', () => {
+  it('komut satırından paket klasörü, paket adı ve kök çözülür (dört daemon türü)', () => {
+    const k = modul.daemonPaketi(KOMUTLAR.kanban)
+    expect(k?.paket).toBe('kanban')
+    expect(k?.klasor.replace(/\\/g, '/')).toMatch(/c:\/x\/tools\/wrongstack-mcp\/node_modules\/@wrongstack\/kanban$/i)
+    expect(k?.kok).toBe('c:/x')
+    expect(modul.daemonPaketi(KOMUTLAR.sage)?.paket).toBe('sage')
+    expect(modul.daemonPaketi(KOMUTLAR.tools)?.paket).toBe('tools')
+    const m = modul.daemonPaketi(KOMUTLAR.core)
+    expect(m?.paket, 'mailbox daemon (core paketi, --project-dir) tanınmadı').toBe('core')
+    expect(m?.kok).toMatch(/p-7e017f$/)
+    expect(modul.daemonPaketi('node tools/wrongstack-mcp/node_modules/@wrongstack/sage-mcp/dist/cli.js --stdio'), 'istemci daemon sayıldı').toBeNull()
+  })
+
+  it('⭐ESKİ daemon ayıklanır; sürümü OKUNAMAYAN daemon da ESKİ sayılır (fail-closed)', () => {
+    const surecler = [
+      { pid: 1, komut: KOMUTLAR.kanban },
+      { pid: 2, komut: KOMUTLAR.sage },
+      { pid: 3, komut: KOMUTLAR.tools },
+      { pid: 4, komut: 'node baska.js' },
+    ]
+    const okuma: Record<string, string | null> = { kanban: '1.0.26', sage: '1.1.0', tools: null }
+    const d = modul.daemonSurumleri(
+      surecler,
+      () => '1.1.0',
+      (klasor) => okuma[path.basename(klasor)] ?? null,
+    )
+    expect(d.map((x) => [x.pid, x.eski])).toEqual([
+      [1, true],
+      [2, false],
+      [3, true],
+    ])
+    expect(d.find((x) => x.pid === 3)?.surum).toBeNull()
+  })
+
+  it('anaAgacMi: .git DİZİN ise ana ağaç; DOSYA (worktree) ya da yok ise değil', () => {
+    const a = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-a-'))
+    fs.mkdirSync(path.join(a, '.git'))
+    expect(modul.anaAgacMi(a)).toBe(true)
+    const w = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-w-'))
+    fs.writeFileSync(path.join(w, '.git'), 'gitdir: /x')
+    expect(modul.anaAgacMi(w)).toBe(false)
+    expect(modul.anaAgacMi(fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-y-')))).toBe(false)
+  })
+
+  it('⭐WORKTREE\'DE --sunucu REDDEDİLİR ve hiçbir sunucu açılmaz (12 Ekim kazasının kilidi)', () => {
+    const t = sahteAgac({ gitDizin: false, gitDosya: true, surecler: [], kurulu: '1.1.0' })
+    const r = kos(t.betik, '--sunucu')
+    expect(r.kod).toBe(1)
+    expect(r.cikti).toMatch(/ANA AGACTA/)
+    expect(r.cikti, 'sunucu acma denemesi yapildi').not.toMatch(/initialize/)
+  })
+
+  it('varsayılan koşum sunucu AÇMAZ; eski daemon varsa HATA, yoksa HAZIR', () => {
+    const eski = sahteAgac({
+      gitDizin: false,
+      gitDosya: true,
+      surecler: [{ pid: 7, komut: KOMUTLAR.sage.replace('c:\\x', 'c:\\x') }],
+      kurulu: '1.1.0',
+    })
+    // Sahte süreç komutu mutlak yolu `c:\x` paket klasörüne gider (yok): okunamayan sürüm = ESKİ.
+    const r1 = kos(eski.betik)
+    expect(r1.kod, r1.cikti).toBe(1)
+    expect(r1.cikti).toMatch(/ESKİ/)
+    expect(r1.cikti).not.toMatch(/initialize/)
+
+    const bos = sahteAgac({ gitDizin: false, gitDosya: true, surecler: [], kurulu: '1.1.0' })
+    const r2 = kos(bos.betik)
+    expect(r2.kod, r2.cikti).toBe(0)
+    expect(r2.cikti.trim().split('\n').pop()).toBe('HAZIR')
+  })
+})

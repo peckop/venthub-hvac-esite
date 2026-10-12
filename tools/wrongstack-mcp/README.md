@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.0`, `@wrongstack/codebase-index-mcp@1.1.0`, `@wrongstack/kanban-mcp@1.1.0`, `@wrongstack/mailbox-mcp@1.1.0` (ARC-94, 2026-10-13'te 1.0.26'dan yükseltildi; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.0`, `@wrongstack/codebase-index-mcp@1.1.0`, `@wrongstack/kanban-mcp@1.1.0`, `@wrongstack/mailbox-mcp@1.1.0` (ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
 | **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
@@ -55,6 +55,12 @@ değiştiremeyebilir, değiştirse bile eski kod bellekte koşar (09-27: makined
 4. Öteki pencereler açılır.
 `--denetle` yalnız doğrular (sürümler, yamalar, `.mcp.json` giriş dosyaları), hiçbir şey değiştirmez.
 Kapı: `INV-WRONGSTACK-KURULUM-1` (başka pencere varken hiçbir süreç kapatılmaz).
+
+**Kurulumdan sonra sürüm okuma (ARC-94):** `node tools/wrongstack-mcp/saglik.cjs` koşan her `project-server.js`
+daemon'unun paket sürümünü okur (eski sürümlü daemon varsa `HATA`); `--sunucu` ek olarak her MCP sunucusunu açıp
+`initialize` sürümünü okur. ⛔`--sunucu` YALNIZ ana ağaçta ve yükseltme bittikten sonra: sunucu worktree kökünü ana
+ağaca çevirir, o ağacın paket sürümüyle canlı kökü açar ve sage.db şemasını yerinde göç ettirir (12 Ekim 13:07'de
+ölçülen kaza; betik worktree'de `--sunucu`yu reddeder). Kapı: `INV-WRONGSTACK-SAGLIK-1`.
 
 **⛔Yeni sürümde yama ÇIKMAZI (yamalı paket yükseltilirken):** yama bir sürüme özeldir ve kurulum betiği
 sürüm kayınca `package-lock.json`'a bakıp `npm ci`dan ÖNCE `HATA` verir; ama yeni yamayı üretmek için
