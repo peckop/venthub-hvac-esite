@@ -29,6 +29,7 @@ vi.mock('@/lib/supabase/static', () => ({
         select: () => builder,
         eq: () => builder,
         is: () => builder,
+        order: () => builder,
         limit: () => builder,
         single: async () => ({ data: null, error: null }),
         then: (resolve: (v: { data: unknown }) => unknown) => resolve({ data: [] }),

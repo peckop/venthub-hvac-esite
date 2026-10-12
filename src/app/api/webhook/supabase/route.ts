@@ -87,8 +87,9 @@ const MAX_FAMILY_CHAIN_HOPS = 4
 /**
  * Bir ÜST kategorinin çocuk sayfalarını tazelerken okunacak en çok çocuk sayısı (URN-112). Alt kategori sayfası
  * üstün adını ve görünen slug'ını sunucu HTML'ine yazar; üst değişince çocuk sayfaları bayat kalmasın diye tek
- * sorguyla okunur. Ölçüm (OPS notu, ALT-75; bu dosyada yeniden ölçülmedi): bir üstün en çok 26 alt kategorisi
- * var; sınır bunun yaklaşık dört katıdır. Aşılırsa SESSİZCE KIRPILMAZ: `fanoutTruncated` yanıtta true olur ve uyarı basılır (kategori
+ * sorguyla okunur. Ölçüm (doğrulayıcı, canlı DB salt okuma 2026-10-12; bu dosyada yeniden ölçülmedi): toplam 26
+ * alt kategori, üst başına en çok 14; sınır bunun yaklaşık yedi katıdır. Okuma `id`'ye göre sıralıdır: sınır
+ * aşılırsa hangi çocukların tazeleneceği belirli olur. Aşılırsa SESSİZCE KIRPILMAZ: `fanoutTruncated` yanıtta true olur ve uyarı basılır (kategori
  * sayfaları ISR yedeğiyle en geç 1 saatte yine yenilenir).
  */
 const MAX_KATEGORI_COCUK = 100
@@ -506,6 +507,7 @@ export async function POST(request: NextRequest) {
           .from('categories')
           .select('id, slug, metadata, parent_id')
           .eq('parent_id', self.id)
+          .order('id', { ascending: true })
           .limit(MAX_KATEGORI_COCUK + 1)
         if (cocukHatasi) {
           // Üstün kendi yolları, etiketler ve site haritası yine tazelenir; hata yanıt sonunda 500 ile bildirilir.

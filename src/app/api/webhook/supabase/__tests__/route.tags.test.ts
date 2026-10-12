@@ -26,12 +26,14 @@ const {
   categoryChildrenByParentId,
   categorySingleQueryIds,
   cocukSorgusuSiniri,
+  cocukSorgusuSirasi,
   cocukSorgusuHatasi,
 } = vi.hoisted(() => ({
   // URN-12: `categories` tablosuna `.eq('id', x).single()` ile giden sorguların kimlikleri (istek-içi önbellek ölçümü).
   categorySingleQueryIds: [] as string[],
   // URN-112: çocuk sorgusunun `.limit(n)` değerleri ve sorgu hatası enjeksiyonu.
   cocukSorgusuSiniri: [] as number[],
+  cocukSorgusuSirasi: [] as { col: string; ascending: boolean | undefined }[],
   cocukSorgusuHatasi: { deger: null as string | null },
   familyRowsById: new Map<
     string,
@@ -65,6 +67,11 @@ vi.mock('@/lib/supabase/static', () => ({
           return builder
         }),
         is: vi.fn(() => builder),
+        // URN-112: çocuk sorgusu `.order('id')` ile sıralanır (sınır aşılınca hangi çocukların alınacağı belirli olsun).
+        order: vi.fn((col: string, opts?: { ascending?: boolean }) => {
+          cocukSorgusuSirasi.push({ col, ascending: opts?.ascending })
+          return builder
+        }),
         // URN-112: çocuk sorgusu `.limit(MAX_KATEGORI_COCUK + 1)` ile sınırlanır; sınır değeri kaydedilir.
         limit: vi.fn((n: number) => {
           cocukSorgusuSiniri.push(n)
@@ -129,6 +136,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
     categoryChildrenByParentId.clear()
     categorySingleQueryIds.length = 0
     cocukSorgusuSiniri.length = 0
+    cocukSorgusuSirasi.length = 0
     cocukSorgusuHatasi.deger = null
   })
 
@@ -829,6 +837,8 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(yollarOf()).toEqual(expect.arrayContaining([...cocukYollari(1), ...cocukYollari(2)]))
       expect(json.revalidatedPaths).toEqual(expect.arrayContaining(cocukYollari(1)))
       expect(cocukSorgusuSiniri).toEqual([101])
+      // Sınır aşılınca hangi 100 çocuğun alınacağı belirli olsun: okuma `id`'ye göre ARTAN sıralı.
+      expect(cocukSorgusuSirasi).toEqual([{ col: 'id', ascending: true }])
       expect(json.fanoutTruncated).toBe(false)
     })
 
