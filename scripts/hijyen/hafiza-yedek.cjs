@@ -31,7 +31,8 @@
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const { execFileSync, spawn } = require('child_process')
+const { execFileSync } = require('child_process')
+const { kopukBaslat } = require('../board/kopuk-baslat.cjs')
 
 const ESIK_SN = 3600
 const DENEME_ARALIGI_SN = 600
@@ -148,13 +149,9 @@ function karar({ olay, yasSn, bekleyen, sonDenemeYasSn }) {
 
 function arkaPlandaYedekle(dir, sebep) {
   try {
-    const cocuk = spawn(process.execPath, [__filename, '--yedekle', '--sebep', sebep], {
-      detached: true,
-      stdio: 'ignore',
-      windowsHide: true,
-      env: { ...process.env, HAFIZA_DIZINI: dir },
-    })
-    cocuk.unref()
+    // `detached: true` yalnız başlatıcıda (INV-KOPUK-1, REC-415): kopuk süreç konsolsuzdur, başlatıcı çocuğa
+    // windowsHide enjekte eder; doğrudan spawn içindeki git yeni konsol penceresi açardı.
+    kopukBaslat(__filename, ['--yedekle', '--sebep', sebep], { env: { ...process.env, HAFIZA_DIZINI: dir } })
   } catch {
     // Başlatılamazsa bir sonraki mesajda yeniden denenir.
   }
