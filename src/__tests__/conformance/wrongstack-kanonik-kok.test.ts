@@ -167,7 +167,7 @@ describe('INV-WRONGSTACK-KANONIK-KOK-1', () => {
  * Kapı: çalıştırılacak paket dosyası ana ağaçtakiyle aynı dosya değilse sürümler eşit olmalı; okunamıyorsa RET.
  */
 const kapi = gerek(path.join(ARAC, 'posta-kutusu.cjs')) as {
-  surumKapisi: (cli: string, kokDizin?: string) => { tamam: boolean; sebep?: string; calisan?: string | null; ana?: string | null }
+  surumKapisi: (cli: string, kokDizin?: string) => { tamam: boolean; kuruluDegil?: boolean; sebep?: string; calisan?: string | null; ana?: string | null }
   surumKapisiMetni: (onek: string, k: { sebep?: string }) => string
 }
 
