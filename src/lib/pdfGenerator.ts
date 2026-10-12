@@ -3,13 +3,29 @@ import autoTable from 'jspdf-autotable';
 
 import type { Product } from '@/types/ui-models';
 
-import { SITE_URL } from '../config/siteUrl';
-import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
+import { en } from '../i18n/dictionaries/en';
+import { tr } from '../i18n/dictionaries/tr';
+import { getDictValue } from '../i18n/getDictValue';
+import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER, type SpecValueTranslate } from '../utils/productHelpers';
 import { specFieldLabel, specGroupLabel } from '../utils/specLabel';
-import { getAbsoluteAssetUrl,getBase64ImageFromUrl, PDF_COLORS, PDF_FONTS } from './pdfAssets';
+import { getAbsoluteAssetUrl,getBase64ImageFromUrl, getPdfSiteHost, PDF_COLORS, PDF_FONTS, standartYaziTipiMetni, yaziTipiDenetle } from './pdfAssets';
 
 /** `specLabel.ts` ile AYNI imza — ikinci bir tip tanımı, ikinci bir davranış kapısıdır. */
 type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string) => string
+
+/** Föyün varsayılan dili: `generateProductDatasheet`'in `lang` varsayılanı ve `t`'siz değer çözümü TEK yerden okur. */
+const VARSAYILAN_FOY_DILI = 'tr';
+
+/**
+ * URN-58: değer metinleri ("Var"/"Yok", "Yes"/"No") dil ister. Üretimde föyü açan sayfa kendi `t`'sini verir ve vitrinle
+ * AYNI çözücü kullanılır. `t` verilmediği hâlde (testler, `t`'siz çağrılar) sessizce ham "true"/"false" basmak yerine
+ * sözlük `lang` ile doğrudan okunur — böylece föy hiçbir yoldan makine değeri basmaz.
+ */
+function degerCozucu(t: TranslateFn | undefined, lang: string = VARSAYILAN_FOY_DILI): SpecValueTranslate {
+    if (t) return t; // aynı çözücü, sarmalayıcı yok: `t(değişken)` çağrısı eklemek INV-6 ön koşulunu da kırar
+    const sozluk = lang === 'en' ? en : tr;
+    return (key) => getDictValue(sozluk, key);
+}
 
 /**
  * ⭐SAF ÇEKİRDEK — föyün teknik özellik satırlarını üretir. `jsPDF`'e DOKUNMAZ.
@@ -26,9 +42,10 @@ type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string)
  */
 export function buildSpecRows(
     specs: Record<string, unknown>,
-    opts: { t?: TranslateFn; translateKey?: (key: string) => string } = {},
+    opts: { t?: TranslateFn; translateKey?: (key: string) => string; lang?: string } = {},
 ): string[][] {
-    const { t, translateKey } = opts;
+    const { t, translateKey, lang } = opts;
+    const degerT = degerCozucu(t, lang);
     const gruplar = groupTechnicalSpecs(specs) || {};
     const satirlar: string[][] = [];
 
@@ -39,8 +56,8 @@ export function buildSpecRows(
             // ETİKET: `t` varsa vitrinin TAM yolu (i18n sözlüğü → küratörlü → humanize).
             // Yoksa eski parametre yolu — ayrışır, ve bu ayrışma kapıda ADIYLA ölçülür.
             const label = t ? specFieldLabel(key, t) : (translateKey ? translateKey(key) : key);
-            // DEĞER: `t` GEREKTİRMEZ — birim eklemesi her hâlde uygulanır.
-            satirlar.push([label, formatSpecValue(key, value)]);
+            // DEĞER: birim eklemesi `t` GEREKTİRMEZ; mantıksal değer ("Var"/"Yok") dil ister → `degerT` (URN-58).
+            satirlar.push([label, formatSpecValue(key, value, degerT)]);
         }
     }
     return satirlar;
@@ -66,7 +83,8 @@ export function buildSpecGroupLabels(specs: Record<string, unknown>, t: Translat
  * ("aynı ölçüt, iki uygulama") ve bu kez bir MÜŞTERİ BELGESİNDEYDİ.
  *
  * ⚠PARİTE İKİ PARÇALIDIR ve ikisi AYNI ANDA gelmez:
- *   · **değer + sıra** → `t` GEREKTİRMEZ, bu PR ile geldi.
+ *   · **değer + sıra** → birim eki `t` GEREKTİRMEZ, bu PR ile geldi. (URN-58: mantıksal değer "Var"/"Yok" dil ister;
+ *     `t` yoksa sözlük `lang` ile okunur, bkz. `degerCozucu` — ham "true"/"false" hiçbir yoldan basılmaz.)
  *   · **etiket** → `specFieldLabel(key, t)` i18n sözlüğünü okur, yani `t` ŞARTTIR.
  *     `t` verilmezse eski `translateKey` yoluna düşülür ve etiket vitrinden AYRIŞIR
  *     (`"Ip Rating"` ↔ `"Koruma Sınıfı (IP)"`). Çağıran taraf (`ProductDetailPageView`)
@@ -77,7 +95,7 @@ export async function generateProductDatasheet(
     product: Product,
     imageUrl?: string,
     translateKey?: (key: string) => string,
-    lang: string = 'tr',
+    lang: string = VARSAYILAN_FOY_DILI,
     t?: TranslateFn
 ): Promise<void> {
     const doc = new jsPDF({
@@ -87,22 +105,16 @@ export async function generateProductDatasheet(
     });
 
     // ----- FONT YÜKLEME -----
+    // URN-123: iki dosya da İMZA denetiminden geçmeden jsPDF'e HİÇBİRİ verilmez (yarım Roboto yok).
+    // `response.ok` yetmez: bozuk dosya HTTP 200 ile gelir (bkz. `yaziTipiDenetle`).
     let fontName = 'helvetica';
     try {
         // Roboto fontunu lokal sunucudan yükle (Türkçe karakter desteği için)
-        const fontResponse = await fetch(getAbsoluteAssetUrl(PDF_FONTS.Roboto.regular));
-        if (!fontResponse.ok) throw new Error(`Regular font load status: ${fontResponse.status}`);
-        const fontBuffer = await fontResponse.arrayBuffer();
-        const fontBase64 = arrayBufferToBase64(fontBuffer);
+        const fontBase64 = await yaziTipiYukle(PDF_FONTS.Roboto.regular, 'Regular');
+        const fontBoldBase64 = await yaziTipiYukle(PDF_FONTS.Roboto.bold, 'Bold');
 
         doc.addFileToVFS('Roboto-Regular.ttf', fontBase64);
         doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-
-        // Bold versiyonu
-        const fontBoldResponse = await fetch(getAbsoluteAssetUrl(PDF_FONTS.Roboto.bold));
-        if (!fontBoldResponse.ok) throw new Error(`Bold font load status: ${fontBoldResponse.status}`);
-        const fontBoldBuffer = await fontBoldResponse.arrayBuffer();
-        const fontBoldBase64 = arrayBufferToBase64(fontBoldBuffer);
 
         doc.addFileToVFS('Roboto-Bold.ttf', fontBoldBase64);
         doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
@@ -113,6 +125,10 @@ export async function generateProductDatasheet(
         console.error('Font loading failed, falling back to standard fonts (Helvetica):', error);
         doc.setFont(fontName);
     }
+
+    // URN-123: yedek yolda (Helvetica, WinAnsi) ğ Ğ ş Ş ı İ çizilemez; ASCII karşılığıyla basılır.
+    // Gömülü Roboto'da metin AYNEN geçer. Tüm görünür metin bu işlevden geçer (ölçüm: pdfGeneratorFallback testi).
+    const metin = (m: string): string => (fontName === 'Roboto' ? m : standartYaziTipiMetni(m));
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -141,22 +157,22 @@ export async function generateProductDatasheet(
         // Marka İsmi
         doc.setFontSize(22);
         doc.text('VentHub', margin + 28, 24);
-        // Alt başlık
-        doc.setFont(fontName, 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(200, 200, 200);
-        doc.text('HVAC PREMIUM', margin + 28, 30);
+        // URN-80: buradaki alt başlık ('HVAC PREMIUM') KALDIRILDI — kaynaksız üstünlük sözüydü ve müşteriye
+        // giden teknik föyün her sayfasının üst bilgisine basılıyordu. Yerine 'VentHub' yazmak marka adını
+        // hemen üstündeki 22 punto yazının altında İKİNCİ kez basardı; bu yüzden satır hiç yok.
+        // Kapı: src/lib/__tests__/pdfGeneratorFallback.test.ts ("föyde 'HVAC PREMIUM' ve 'Akıllı Sistem' yok").
 
         // Sağ Taraf Başlık
         doc.setTextColor(255, 255, 255);
         doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
-        const title = lang === 'tr' ? 'TEKNİK ÜRÜN FÖYÜ' : 'TECHNICAL DATASHEET';
+        const title = metin(lang === 'tr' ? 'TEKNİK ÜRÜN FÖYÜ' : 'TECHNICAL DATASHEET');
         doc.text(title, pageWidth - margin, 20, { align: 'right' });
 
-        doc.setFont(fontName, 'normal');
-        doc.setFontSize(9);
-        doc.text(`Ref: ${product.sku || product.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 26, { align: 'right' });
+        // URN-33: buradaki `Ref: <iç SKU>` satırı KALDIRILDI. Müşteri belgesine iç kod basıyordu
+        // (yedeği de `product.id` parçasıydı, o da iç kimlik). Model kodu zaten gövdede,
+        // markanın yanında `getProductModelLabel` ile basılıyor ("Model Kodu: …"); üst bilgiye
+        // ikinci bir kopya koymak hem gereksiz hem sızıntı yolu. Bekçi: INV-SKU-GORUNMEZ-1 (K7).
     };
 
     // ----- FOOTER (ALT BİLGİ) -----
@@ -167,15 +183,17 @@ export async function generateProductDatasheet(
         doc.setFontSize(8);
         doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
 
-        const footerText = lang === 'tr'
-            ? 'VentHub Akıllı Sistemi ile oluşturulmuştur.'
-            : 'Generated by VentHub Smart System.';
+        // URN-80: "Akıllı Sistemi" / "Smart System" KALDIRILDI — ortada "akıllı" diye adlandırılabilecek
+        // bir sistem yok; yalnız bu belgeyi üreten marka adı kalır.
+        const footerText = metin(lang === 'tr'
+            ? 'VentHub ile oluşturulmuştur.'
+            : 'Generated by VentHub.');
         doc.text(footerText, margin, pageHeight - 12);
 
         // URL'yi sağ tarafa (sayfa numarasının üstüne) veya ortaya çakışmayacak şekilde koyalım
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
         doc.setFont(fontName, 'bold');
-        doc.text(SITE_URL.replace(/^https?:\/\//, ''), pageWidth / 2, pageHeight - 12, { align: 'center' });
+        doc.text(getPdfSiteHost(), pageWidth / 2, pageHeight - 12, { align: 'center' });
 
         doc.setFont(fontName, 'normal');
         doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
@@ -192,7 +210,7 @@ export async function generateProductDatasheet(
     doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
     doc.setFont(fontName, 'bold');
     doc.setFontSize(20);
-    const splitTitle = doc.splitTextToSize(product.name, pageWidth - (margin * 2));
+    const splitTitle = doc.splitTextToSize(metin(product.name), pageWidth - (margin * 2));
     doc.text(splitTitle, margin, currentY);
     currentY += (splitTitle.length * 8) + 5;
 
@@ -205,9 +223,9 @@ export async function generateProductDatasheet(
     // Yalnız `model_code` okunuyor; `ProductIdentitySource`'un tüm alanları opsiyonel
     // olduğu için daraltılmış nesne yeterli — tip zorlaması (`as`) gerekmez.
     const modelKodu = getProductModelLabel({ model_code: product.model_code });
-    const brandModelText = lang === 'tr'
+    const brandModelText = metin(lang === 'tr'
         ? (modelKodu ? `Marka: ${product.brand} | Model Kodu: ${modelKodu}` : `Marka: ${product.brand}`)
-        : (modelKodu ? `Brand: ${product.brand} | Model Code: ${modelKodu}` : `Brand: ${product.brand}`);
+        : (modelKodu ? `Brand: ${product.brand} | Model Code: ${modelKodu}` : `Brand: ${product.brand}`));
     doc.text(brandModelText, margin, currentY);
     currentY += 15;
 
@@ -220,12 +238,12 @@ export async function generateProductDatasheet(
         doc.setFont(fontName, 'bold');
         doc.setFontSize(11);
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-        doc.text(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description', margin, currentY);
+        doc.text(metin(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description'), margin, currentY);
 
         doc.setFont(fontName, 'normal');
         doc.setFontSize(10);
         doc.setTextColor(PDF_COLORS.text[0], PDF_COLORS.text[1], PDF_COLORS.text[2]);
-        const splitDesc = doc.splitTextToSize(product.description, contentWidth);
+        const splitDesc = doc.splitTextToSize(metin(product.description), contentWidth);
         doc.text(splitDesc, margin, currentY + 7);
         currentY += (splitDesc.length * 5) + 15;
     };
@@ -241,12 +259,12 @@ export async function generateProductDatasheet(
                     doc.setFont(fontName, 'bold');
                     doc.setFontSize(11);
                     doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-                    doc.text(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description', margin + imageSize + 10, currentY + 5);
+                    doc.text(metin(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description'), margin + imageSize + 10, currentY + 5);
 
                     doc.setFont(fontName, 'normal');
                     doc.setFontSize(10);
                     doc.setTextColor(PDF_COLORS.text[0], PDF_COLORS.text[1], PDF_COLORS.text[2]);
-                    const descText = product.description.replace(/(\r\n|\n|\r)/gm, " ");
+                    const descText = metin(product.description.replace(/(\r\n|\n|\r)/gm, " "));
                     const splitDesc = doc.splitTextToSize(descText, contentWidth - imageSize - 10);
                     doc.text(splitDesc, margin + imageSize + 10, currentY + 12);
                 }
@@ -268,7 +286,7 @@ export async function generateProductDatasheet(
     // DOĞRU olan bu; ama sonuç, hepsi boşsa satır kalmamasıdır. O hâlde tablo HİÇ çizilmez:
     // başlığı basıp altını boş bırakmak, okuyana "veri yok" değil "üretim bozuk" dedirtir.
     const specRows = product.technical_specs
-        ? buildSpecRows(product.technical_specs as Record<string, unknown>, { t, translateKey })
+        ? buildSpecRows(product.technical_specs as Record<string, unknown>, { t, translateKey, lang })
         : [];
     if (specRows.length > 0) {
         // Sayfa sonu kontrolü
@@ -285,14 +303,14 @@ export async function generateProductDatasheet(
         doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-        doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical Specifications', margin + 4, currentY);
+        doc.text(metin(lang === 'tr' ? 'Teknik Özellikler' : 'Technical Specifications'), margin + 4, currentY);
         currentY += 8;
 
-        const tableData = specRows;
+        const tableData = specRows.map((satir) => satir.map(metin));
 
         autoTable(doc, {
             startY: currentY,
-            head: [[lang === 'tr' ? 'Özellik' : 'Property', lang === 'tr' ? 'Değer' : 'Value']],
+            head: [[metin(lang === 'tr' ? 'Özellik' : 'Property'), metin(lang === 'tr' ? 'Değer' : 'Value')]],
             body: tableData,
             theme: 'grid',
             headStyles: {
@@ -334,6 +352,22 @@ export async function generateProductDatasheet(
     // PDF Kaydet
     const cleanName = product.name.replace(/[^a-zA-Z0-9-_.]/g, '_').substring(0, 30);
     doc.save(`${product.brand}_${cleanName}_Datasheet.pdf`);
+}
+
+/**
+ * URN-123: yazı tipi dosyasını getirir, İMZASINI denetler, Base64 döndürür. Reddederse neden yazılıdır.
+ *
+ * `!ok` tek başına yetmez: bozuk dosya HTTP 200 ile geldi (`response.ok` yeşil, gövde HTML). Denetim
+ * `arrayBuffer`'dan SONRA, jsPDF'e HİÇBİR bayt verilmeden yapılır; jsPDF `addFont` hatasını yuttuğu için
+ * onu denetim sayamayız.
+ */
+async function yaziTipiYukle(yol: string, ad: string): Promise<string> {
+    const yanit = await fetch(getAbsoluteAssetUrl(yol));
+    if (!yanit.ok) throw new Error(`${ad} font load status: ${yanit.status}`);
+    const tampon = await yanit.arrayBuffer();
+    const denetim = yaziTipiDenetle(new Uint8Array(tampon));
+    if (!denetim.gecerli) throw new Error(`${ad} font dosyası geçersiz (${yol}): ${denetim.sebep}`);
+    return arrayBufferToBase64(tampon);
 }
 
 /**

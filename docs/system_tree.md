@@ -2,21 +2,20 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-09T12:24:55.683613+00:00
+compiled_at: 2026-10-06T09:23:25.666564+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-10-06T09:23:25.666564+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
-├── 📂 ** .agents/**
-│   └── 📂 **explorer_m4_1_gen2/**
-│       └── ⚠️ `handoff.md`
+├── ⚠️ `AGENTS.md`
 ├── ⚪ `CHANGELOG.md`
 ├── ⚪ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
+├── ⚠️ `NOTICE.md`
 ├── ⚠️ `ORIGINAL_REQUEST.md`
 ├── ⚪ `PROJECT.md`
 ├── ⚪ `README.md`
@@ -24,27 +23,29 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
-├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
 │   ├── 📂 **archive/**
 │   │   ├── ⚪ `014-kategori-ssr-plan.md`
-│   │   ├── ⚪ `JULES_PROMPT.md`
+│   │   ├── ⚪ `CONTEXT-2026-08-17.md`
+│   │   ├── ⚪ `DURUM-TAKIP-2026-09-17.md`
 │   │   ├── ⚪ `NEXT_STEPS.md`
 │   │   ├── ⚪ `VENTHUB_ULTIMATE_PROMPT.md`
 │   │   ├── ⚪ `WARP.md`
 │   │   ├── ⚪ `ajanlar_ve_karmasa_3d_carousel_casestudy.md`
 │   │   ├── ⚪ `architectural_vision.md`
 │   │   ├── ⚪ `changelog_2025_legacy.md`
-│   │   ├── 📂 **db-backup-pre-kademe2/**
+│   │   ├── ⚪ `fleet-mechanism-v1-gozcu-cron-tarihce.md`
 │   │   ├── ⚪ `legacy-vite-seo-report.md`
 │   │   ├── ⚪ `legacy_homepage_enhancements_2025.md`
 │   │   ├── ⚪ `legacy_smart_routing_plan.md`
 │   │   ├── ⚪ `lighthouse_performance_fix_plan_merged_2026-06-10.md`
+│   │   ├── ⚪ `multi-session-coordination-standard-v1-2026-08-14.md`
 │   │   ├── ⚪ `plan-and-tasklist-current.md`
 │   │   ├── ⚪ `plan-and-tasklist.md`
-│   │   └── ⚪ `project_state_and_skills_audit.md`
+│   │   ├── ⚪ `project_state_and_skills_audit.md`
+│   │   └── ⚪ `session-loop-ritual-v1-2026-09-25.md`
 │   ├── 📂 **audits/**
 │   │   ├── ⚪ `3d-surfaces-audit-2026-06-16.md`
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-13.md`
@@ -53,10 +54,17 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `aile-adi-en-cevirileri-2026-08-23.md`
 │   │   ├── ⚪ `arac-envanteri-2026-09-07.md`
+│   │   ├── ⚪ `avens-sorular-2026-09-22.md`
+│   │   ├── ⚪ `bagimlilik-2026-09-15.md`
+│   │   ├── ⚪ `bagimlilik-2026-09-19.md`
+│   │   ├── ⚪ `bagimlilik-2026-10-05.md`
 │   │   ├── ⚪ `build-skip-canli-olcum-2026-08-28.md`
 │   │   ├── ⚪ `canliya-alma-hazirlik-2026-08-15.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
+│   │   ├── ⚪ `dizin-gorunurluk-olcum-2026-10-02.md`
 │   │   ├── ⚪ `fiyatsiz-27-ayrim-2026-09-06.md`
+│   │   ├── ⚪ `gstack-skill-envanteri-2026-09-15.md`
+│   │   ├── ⚪ `gstack-yan-yana-2026-09-15.md`
 │   │   ├── ⚪ `i18n-sozluk-render-denetimi-2026-08-23.md`
 │   │   ├── ⚪ `icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md`
 │   │   ├── ⚪ `icerik-hatti-anlatim-derinligi-2026-09-05.md`
@@ -66,6 +74,8 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `icerik-hatti-avens-katalog-hatalari-2026-09-05.md`
 │   │   ├── ⚪ `icerik-hatti-birim-olcek-kusurlari-2026-09-07.md`
 │   │   ├── ⚪ `icerik-hatti-bolum-aile-eslemesi-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-carm-hukum-geri-cekildi-2026-09-10.md`
+│   │   ├── ⚪ `icerik-hatti-defter-iki-yol-2026-09-10.md`
 │   │   ├── ⚪ `icerik-hatti-faz2-inceleme-2026-09-07.md`
 │   │   ├── ⚪ `icerik-hatti-faz4-canli-yazim-2026-09-07.md`
 │   │   ├── ⚪ `icerik-hatti-faz4-hazirlik-2026-09-07.md`
@@ -76,8 +86,13 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `icerik-hatti-kayip-urun-aktarimi-2026-09-07.md`
 │   │   ├── ⚪ `icerik-hatti-kaynak-dizini-olcumu-2026-09-06.md`
 │   │   ├── ⚪ `icerik-hatti-kaynak-dizini-tazeleme-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-kaynak-edinme-2026-09-22.md`
+│   │   ├── ⚪ `icerik-hatti-kaynak-eslemesi-2026-09-09.md`
+│   │   ├── ⚪ `icerik-hatti-metin-boslugu-2026-09-25.md`
 │   │   ├── ⚪ `icerik-hatti-musteri-belgeleri-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-paket-v1-kolonlari-2026-09-22.md`
 │   │   ├── ⚪ `icerik-hatti-pdf-yapisi-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-pim-oznitelik-esleme-2026-09-22.md`
 │   │   ├── ⚪ `icerik-hatti-rec178-olu-aday-olcumu-2026-09-07.md`
 │   │   ├── ⚪ `icerik-hatti-recep-kararlari-uygulama-2026-09-08.md`
 │   │   ├── ⚪ `icerik-hatti-sayfa-araliklari-2026-09-05.md`
@@ -103,31 +118,78 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `icerik-hatti-taslak-vortice-tekiller-2026-09-06.md`
 │   │   ├── ⚪ `icerik-hatti-taslak-vortice-ticari-2026-09-06.md`
 │   │   ├── ⚪ `icerik-hatti-toplu-sunum-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-uretici-fark-tablosu-2026-09-22.md`
+│   │   ├── ⚪ `investigate-kuru-kosu-2026-09-12.md`
+│   │   ├── ⚪ `kacirma-listesi-2026-09-16.md`
 │   │   ├── ⚪ `karar-kayit-bagi-vitrin-15a-2026-09-07.md`
 │   │   ├── ⚪ `kasa-ve-siralama-denetimi-2026-08-23.md`
 │   │   ├── ⚪ `katalog-karnesi-2026-09-09.md`
 │   │   ├── ⚪ `katalog-sayim-2026-09-03.md`
+│   │   ├── ⚪ `kod-grafigi-uc-arac-mukayese-2026-09-16.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
 │   │   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   │   ├── ⚪ `locale-kasa-envanteri-2026-08-23.md`
 │   │   ├── ⚪ `matris-sutun-doluluk-2026-09-05.md`
+│   │   ├── ⚪ `mcp-bellek-2026-09-22.md`
+│   │   ├── ⚪ `model-kiyas-2026-09-22.md`
+│   │   ├── ⚪ `ocr-kiyas-2026-09-16-pr1221.md`
 │   │   ├── ⚪ `odeme-yolu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `olu-sozluk-anahtari-olcumu-2026-09-06.md`
 │   │   ├── ⚪ `operasyon-dongusu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `product-schema-ground-truth-2026-06-21.md`
+│   │   ├── ⚪ `rec-300-taban-2026-10-02.md`
 │   │   ├── ⚪ `rec124-katalog-veri-kusurlari-2026-09-04.md`
 │   │   ├── ⚪ `rec146-kod-cakismasi-11936-2026-09-09.md`
 │   │   ├── ⚪ `rec146-kodsuz-urun-cikarim-yolu-2026-09-09.md`
 │   │   ├── ⚪ `rec146-red-team-csv-plani-2026-09-09.md`
 │   │   ├── ⚪ `rec146-uydurma-kimlik-canli-yazim-2026-09-09.md`
 │   │   ├── ⚪ `rec162-evren-muhafizi-adaylari-2026-09-06.md`
+│   │   ├── ⚪ `rec168-satis-kipi-golge-2026-09-29.md`
 │   │   ├── ⚪ `rec176-skill-dogrulama-2026-09-07.md`
 │   │   ├── ⚪ `rec179-evren-muhafizi-sinavi-2026-09-07.md`
+│   │   ├── ⚪ `rec313-graphify-deneme-2026-09-13.md`
+│   │   ├── ⚪ `rec314-tetiklenebilirlik-sinavi-2026-09-14.md`
+│   │   ├── ⚪ `rec315-squawk-ilk-tarama-2026-09-13.md`
+│   │   ├── ⚪ `rec319-yerlesik-skill-araclari-2026-09-13.md`
+│   │   ├── ⚪ `rec321-ek-silme-uygulandi-2026-09-14.md`
+│   │   ├── ⚪ `rec321-olu-migration-secenekleri-2026-09-14.md`
+│   │   ├── ⚪ `rec326-sentry-postcss-zinciri-2026-09-14.md`
+│   │   ├── ⚪ `rec327-workflow-envanteri-2026-09-14.md`
+│   │   ├── ⚪ `rec333-ai-auto-repair-2026-09-14.md`
+│   │   ├── ⚪ `rec335-rls-yetki-borclari-canli-olcum-2026-09-14.md`
+│   │   ├── ⚪ `rec336-baseline-2026-09-15.md`
+│   │   ├── 📂 **rec340-karar59-olcum/**
+│   │   │   └── ⚪ `README.md`
+│   │   ├── ⚪ `rec340-pgroonga-olcum-2026-09-16.md`
+│   │   ├── ⚪ `rec347-dort-soru-2026-09-16.md`
+│   │   ├── ⚪ `rec348-rota-sinif-kapsami-2026-09-16.md`
+│   │   ├── ⚪ `rec348-taze-derleme-marker-2026-09-16.md`
+│   │   ├── ⚪ `rec352-dis-pratik-2026-09-16.md`
+│   │   ├── ⚪ `rec352-sifir-noktasi-kaniti-2026-09-16.md`
+│   │   ├── ⚪ `rec355-plan-curutuldu-2026-09-16.md`
+│   │   ├── ⚪ `rec355-siparis-bekcisi-golge-2026-09-29.md`
+│   │   ├── ⚪ `rec363-gomme-kiyasi-2026-09-22.md`
+│   │   ├── ⚪ `rec369-rehber-cetveli-red-team-2026-09-24.md`
+│   │   ├── ⚪ `rec369-rehber-cetveli-red-team-opus-2026-09-24.md`
+│   │   ├── ⚪ `rec369-rehber-cetveli-red-team-tur2-2026-09-24.md`
+│   │   ├── 📂 **rec412-faz05-golge/**
+│   │   ├── ⚪ `rec412-faz05-red-team-2026-09-29.md`
+│   │   ├── 📂 **rec412-maliyet-golge/**
+│   │   ├── ⚪ `rec412-maliyet-red-team-2026-09-29.md`
+│   │   ├── ⚪ `rec442-category-images-golge-2026-09-29.md`
+│   │   ├── ⚪ `rec59-marka-kapi-kurali-2026-09-15.md`
 │   │   ├── ⚪ `registry-triyaj-2026-08-26.md`
 │   │   ├── ⚪ `render-stratejisi-denetimi-2026-08-16.md`
 │   │   ├── ⚪ `secret-exposure-audit-2026-08-15.md`
+│   │   ├── ⚪ `sema-graf-uretici-2026-09-16.md`
 │   │   ├── ⚪ `sir-ekrana-basma-olayi-2026-09-04.md`
+│   │   ├── ⚪ `skill-calisan-yukleme-olcumu-2026-10-01.md`
+│   │   ├── ⚪ `skill-departman-setleri-2026-09-30.md`
 │   │   ├── ⚪ `skill-envanteri-2026-09-05.md`
+│   │   ├── ⚪ `skill-ihtiyac-raporu-2026-09-30.md`
+│   │   ├── ⚪ `skill-kanban-tam-kapasite-2026-10-03.md`
+│   │   ├── ⚪ `skill-yonetilen-pano-deneyi-2026-10-01.md`
+│   │   ├── ⚪ `skill-yuku-2026-09-12.md`
 │   │   ├── ⚪ `t021-analytics-coverage-2026-08-19.md`
 │   │   ├── ⚪ `t077-ad-arayan-iddia-taramasi-2026-08-17.md`
 │   │   ├── ⚪ `t099-aile-icerik-uyumu-2026-08-18.md`
@@ -147,9 +209,14 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `t146-csv-import-kategori-slug-2026-08-23.md`
 │   │   ├── ⚪ `t150-wizard-i18n-anahtarlari-2026-08-23.md`
 │   │   ├── ⚪ `t162-lineo-birlestirme-2026-08-23.md`
+│   │   ├── ⚪ `tasarim-envanteri-2026-09-25-ds-marka-belge.md`
+│   │   ├── ⚪ `tasarim-envanteri-2026-09-25-menu.md`
+│   │   ├── ⚪ `tasarim-envanteri-2026-09-25.md`
 │   │   ├── ⚪ `tasarim-kod-envanteri-2026-09-06.md`
 │   │   ├── ⚪ `tasarim-sozlesmesi-fark-2026-09-05.md`
 │   │   ├── ⚪ `teknik-bosluk-2026-09-06.md`
+│   │   ├── ⚪ `urun-veri-fark-raporu-2026-09-22.md`
+│   │   ├── ⚪ `urun-veri-fark-raporu-2026-09-23.md`
 │   │   ├── ⚪ `vibe-coding-20-madde-denetimi-2026-08-13.md`
 │   │   ├── ⚪ `vibe-coding-20-madde-v2-2026-08-16.md`
 │   │   └── ⚪ `yetki-katmani-denetimi-2026-08-15.md`
@@ -158,6 +225,17 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   ├── ⚪ `kayitlar_master.md`
 │   ├── 📂 **legal/**
 │   │   └── ⚪ `en-yasal-ceviri-inceleme-2026-06-16.md`
+│   ├── 📂 **mevzuat/**
+│   │   └── 📂 **kanit/**
+│   ├── 📂 **olcum/**
+│   │   ├── ⚪ `README.md`
+│   │   ├── ⚪ `admin-panel-altyapisi.md`
+│   │   ├── ⚪ `crm-erp-alan-kararlari.md`
+│   │   ├── ⚪ `e-fatura-muhasebe-erp.md`
+│   │   ├── ⚪ `erisim-envanteri.md`
+│   │   ├── ⚪ `pim-unopim.md`
+│   │   ├── ⚪ `satis-hazirligi.md`
+│   │   └── ⚪ `wrongstack-ozellik-envanteri.md`
 │   ├── 📂 **plans/**
 │   │   ├── ⚪ `3d-migration-waves-2026-06-17.md`
 │   │   ├── ⚪ `3d-wave3-models-brief.md`
@@ -176,6 +254,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `faz1-remaining-divided-2026-06-13.md`
 │   │   ├── ⚪ `faz2-admin-backlog.md`
 │   │   ├── ⚪ `fiyat-motoru-plan-2026-08-13.md`
+│   │   ├── ⚪ `graphify-kurulum-emri-2026-09-16.md`
 │   │   ├── ⚪ `i18n-jsx-literals-cleanup-2026-06-14.md`
 │   │   ├── ⚪ `j1-dashboard-data-brief.md`
 │   │   ├── ⚪ `j10-inventorysettings-refactor-brief.md`
@@ -194,24 +273,56 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `j8-coupons-refactor-brief.md`
 │   │   ├── ⚪ `j9-categorybuilder-refactor-brief.md`
 │   │   ├── ⚪ `kademe2-clean-rebuild-2026-08-11.md`
+│   │   ├── ⚪ `kanban-gecis-plani-2026-10-01.md`
 │   │   ├── ⚪ `kategori-esleme-2026-09-04.md`
 │   │   ├── ⚪ `kategori-gorsel-tedarik-2026-09-08.md`
 │   │   ├── ⚪ `lansman-oncesi-dayaniklilik-plani-2026-09-08.md`
+│   │   ├── ⚪ `ops52-adres-dili-mekanizma-plani-2026-10-04.md`
+│   │   ├── ⚪ `ops52-spike-rewrite-usepathname-2026-10-04.md`
+│   │   ├── ⚪ `oturum-devir-0df102e3-2026-09-16.md`
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
+│   │   ├── ⚪ `rec-300-3e-dilim-plani-2026-09-29.md`
+│   │   ├── ⚪ `rec-300-plan-tazeleme-2026-09-29.md`
 │   │   ├── ⚪ `rec-adres-agac-tek-yayin-2026-09-07.md`
 │   │   ├── ⚪ `rec108-aile-adi-dil-zinciri-2026-09-01.md`
 │   │   ├── ⚪ `rec110-114-117-migration-paketi-2026-09-01.md`
 │   │   ├── ⚪ `rec117-misafir-teklif-akisi-2026-09-08.md`
 │   │   ├── ⚪ `rec129-faz1-kabuk-plani-2026-09-04.md`
+│   │   ├── ⚪ `rec140-maliyet-kolonlari-kilidi-2026-09-24.md`
 │   │   ├── ⚪ `rec146-avens-csv-yeniden-uretim-2026-09-09.md`
+│   │   ├── ⚪ `rec146-karar70-aciklama-2026-09-22.md`
 │   │   ├── ⚪ `rec158-foy-vitrin-bicim-paritesi-2026-09-06.md`
 │   │   ├── ⚪ `rec162-vercel-kapisi-2026-09-06.md`
 │   │   ├── ⚪ `rec168-migration-taslagi-2026-09-06.md`
+│   │   ├── ⚪ `rec168-satis-acilis-onkosullari-2026-09-29.md`
+│   │   ├── ⚪ `rec168-satis-kipi-db-plani-2026-09-29.md`
+│   │   ├── ⚪ `rec172-cikarim-dort-aile-2026-09-22.md`
 │   │   ├── ⚪ `rec292-denetim-izi-2026-09-09.md`
 │   │   ├── ⚪ `rec296-koken-allowlist-2026-09-09.md`
+│   │   ├── ⚪ `rec300-design-adres-semasi-v3-2026-09-11.md`
+│   │   ├── ⚪ `rec300-design-kategori-agaci-sql-2026-09-11.md`
+│   │   ├── ⚪ `rec300-design-slug-uretim-kurali-2026-09-11.md`
+│   │   ├── ❌ `rec300-model-adres-uret.py`
+│   │   ├── ⚪ `rec300-rakip-slug-taramasi-2026-09-22.md`
+│   │   ├── ⚪ `rec340-faz1-plan-2026-09-15.md`
+│   │   ├── ⚪ `rec355-odeme-siparis-eslesmesi-2026-09-16.md`
+│   │   ├── ⚪ `rec355-sandbox-yan-etki-envanteri-2026-09-29.md`
+│   │   ├── ⚪ `rec355-satis-kipi-edge-kapisi-2026-09-29.md`
+│   │   ├── ⚪ `rec355-vuln002-siparis-kolon-bekcisi-2026-09-27.md`
+│   │   ├── ⚪ `rec355-yetki-dongusu-2026-09-18.md`
+│   │   ├── ⚪ `rec357-faz2-pim-kalici-hat.md`
+│   │   ├── ⚪ `rec357-katalog-pim-cozumu-red-team.md`
+│   │   ├── ⚪ `rec357-katalog-pim-cozumu.md`
+│   │   ├── ⚪ `rec368-eposta-defter-plani-2026-09-30.md`
+│   │   ├── ⚪ `rec369-gorsel-ihtiyac-2026-09-25.md`
+│   │   ├── ⚪ `rec409-canli-yedek-plani-2026-10-01.md`
+│   │   ├── ⚪ `rec412-tek-urun-fiyat-girisi-2026-09-29.md`
+│   │   ├── ⚪ `rec442-category-images-yazma-kapatma-2026-09-29.md`
 │   │   ├── ⚪ `rec52-whsec-rotasyon-plani-2026-09-06.md`
+│   │   ├── ⚪ `rec59-adim2-anasayfa-statik-2026-09-09.md`
 │   │   ├── ⚪ `red-team-rec129-faz1-2026-09-04.md`
+│   │   ├── ⚪ `red-team-tasarim-kod-plani-v2-2026-09-25.md`
 │   │   ├── ⚪ `red-team-teklif-modu-2026-09-04.md`
 │   │   ├── ⚪ `render-dalga1-plan-2026-08-17.md`
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
@@ -221,13 +332,17 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `t080-odeme-ekrani-bos-2026-08-17.md`
 │   │   ├── ⚪ `t093-adres-il-ilce-2026-08-18.md`
 │   │   ├── ⚪ `t116-odeme-defteri-tasarim-2026-08-20.md`
+│   │   ├── ⚪ `tasarim-kod-plani-v2-2026-09-25.md`
+│   │   ├── ⚪ `tasarim-kod-plani-v2.1-2026-10-05.md`
+│   │   ├── ⚪ `tasarim-kod-plani-v2.2-2026-10-05.md`
 │   │   ├── ⚪ `teklif-modu-tutarlilik-paketi-2026-09-04.md`
 │   │   ├── ⚪ `tenant-id-hardening-2026-08-15.md`
 │   │   ├── ⚪ `urun-kimlik-duzeltme-2026-08-22.md`
 │   │   ├── ⚪ `venthub-hikaye-sayfasi-skill-taslak-2026-09-05.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
-│   │   └── ⚪ `venthub_saas_master_roadmap.md`
+│   │   ├── ⚪ `venthub_saas_master_roadmap.md`
+│   │   └── ⚪ `vuln006-csv-formul-enjeksiyonu-2026-09-29.md`
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
@@ -472,20 +587,19 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ⚪ `gozden-gecirme-brief.md`
 │   │   │   ├── ⚪ `secim-motoru-kapsam-haritasi-taslak.md`
 │   │   │   └── ⚪ `venthub-canli-durum.md`
-│   │   ├── ⚪ `gun-kapanisi-2026-09-07.md`
+│   │   ├── ⚪ `gun-kapanisi-2026-09-25.md`
 │   │   ├── ⚪ `hafiza-sinavi-sonuc.md`
 │   │   ├── ⚪ `is-dagilimi.md`
 │   │   ├── 📂 **linear/**
 │   │   │   ├── ⚪ `anahtar-ve-kip-haritasi-2026-09-04.md`
-│   │   │   ├── ⚪ `is-dagilimi-2026-09-07.md`
-│   │   │   ├── ⚪ `is-dagilimi-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-altyapi-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-katalog-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-marka-kilavuzu-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-seo-ve-yayin-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-teklif-akisi-2026-09-09.md`
-│   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-09.md`
+│   │   │   ├── ⚪ `is-dagilimi-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-altyapi-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-katalog-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-marka-kilavuzu-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-seo-ve-yayin-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-teklif-akisi-2026-09-25.md`
+│   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-25.md`
 │   │   │   └── ⚪ `venthub-yol-haritasi-ve-durum.md`
 │   │   ├── ⚪ `recep-bekleyen.md`
 │   │   └── ⚪ `yol-haritasi-durum.md`
@@ -501,6 +615,42 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `t134-acik-kaynak-erp-2026-08-20.md`
 │   │   ├── ⚪ `t134-cpq-proposal-saha-2026-08-20.md`
 │   │   └── ⚪ `t134-sentez-karar-tablosu-2026-08-20.md`
+│   ├── 📂 **roller/**
+│   │   ├── ⚪ `ADMIN-kurallar.md`
+│   │   ├── ⚪ `ADMIN.md`
+│   │   ├── ⚪ `ALTYAPI-kurallar.md`
+│   │   ├── ⚪ `ALTYAPI.md`
+│   │   ├── ⚪ `ARAC-kurallar.md`
+│   │   ├── ⚪ `ARAC.md`
+│   │   ├── ⚪ `BLOG-kurallar.md`
+│   │   ├── ⚪ `BLOG.md`
+│   │   ├── ⚪ `DEPARTMAN-HARITASI.md`
+│   │   ├── ⚪ `EDGE-kurallar.md`
+│   │   ├── ⚪ `EDGE.md`
+│   │   ├── ⚪ `GEO-SEO-gorevler.md`
+│   │   ├── ⚪ `GEO-SEO-kurallar.md`
+│   │   ├── ⚪ `GEO-SEO.md`
+│   │   ├── ⚪ `HARITA-kurallar.md`
+│   │   ├── ⚪ `HARITA.md`
+│   │   ├── ⚪ `I18N-kurallar.md`
+│   │   ├── ⚪ `I18N.md`
+│   │   ├── ⚪ `KATALOG-kurallar.md`
+│   │   ├── ⚪ `KATALOG.md`
+│   │   ├── ⚪ `MARKA-kurallar.md`
+│   │   ├── ⚪ `MARKA.md`
+│   │   ├── ⚪ `MEVZUAT-kurallar.md`
+│   │   ├── ⚪ `MEVZUAT.md`
+│   │   ├── ⚪ `OPS-kurallar.md`
+│   │   ├── ⚪ `OPS.md`
+│   │   ├── ⚪ `SATIS-kurallar.md`
+│   │   ├── ⚪ `SATIS.md`
+│   │   ├── ⚪ `TASARIM-kurallar.md`
+│   │   ├── ⚪ `TASARIM.md`
+│   │   ├── ⚪ `URUN-kurallar.md`
+│   │   ├── ⚪ `URUN.md`
+│   │   ├── ⚪ `YETENEK-kurallar.md`
+│   │   ├── ⚪ `YETENEK.md`
+│   │   └── ⚪ `cetvel-sahipligi.md`
 │   ├── 📂 **screenshots/**
 │   │   └── ⚪ `README.md`
 │   ├── 📂 **skill-gozlemleri/**
@@ -508,7 +658,8 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── 📂 **acik/**
 │   │   │   ├── ⚪ `2026-09-08-kaynak-alinan-bizden.md`
 │   │   │   ├── ⚪ `2026-09-08-olcmeden-hukum-verme.md`
-│   │   │   └── ⚪ `2026-09-09-bilgi-kaynagini-kod-gibi-degerlendirme.md`
+│   │   │   ├── ⚪ `2026-09-09-bilgi-kaynagini-kod-gibi-degerlendirme.md`
+│   │   │   └── ⚪ `2026-09-19-yolu-yazmadan-red.md`
 │   │   └── 📂 **arsiv/**
 │   ├── 📂 **standards/**
 │   │   ├── ⚪ `3d-scene-lighting-research.md`
@@ -518,10 +669,16 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `admin-capabilities.md`
 │   │   ├── ⚪ `admin-design-standard.md`
 │   │   ├── ⚪ `admin-standard.md`
+│   │   ├── ⚪ `adres-semasi-standard.md`
 │   │   ├── ⚪ `aile-metni-sayisal-standard.md`
 │   │   ├── ⚪ `analytics-standard.md`
 │   │   ├── ⚪ `arac-envanteri-standard.md`
+│   │   ├── ⚪ `arama-standard.md`
 │   │   ├── ⚪ `auth-account-standard.md`
+│   │   ├── ⚪ `bagimlilik-guvenlik-yukseltme-standard.md`
+│   │   ├── ⚪ `bagimlilik-kararlari.md`
+│   │   ├── ⚪ `barindirma-standard.md`
+│   │   ├── ⚪ `belge-yonetimi-standard.md`
 │   │   ├── ⚪ `canonical-url-standard.md`
 │   │   ├── ⚪ `catalog-depth-standard.md`
 │   │   ├── ⚪ `catalog-ingestion-standard.md`
@@ -541,36 +698,51 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `denetim-izi-standard.md`
 │   │   ├── ⚪ `dependency-integrity-standard.md`
 │   │   ├── ⚪ `deploy-build-skip-standard.md`
+│   │   ├── ⚪ `depoya-giremeyecek-veri-standard.md`
+│   │   ├── ⚪ `dizin-sistemleri-standard.md`
 │   │   ├── ⚪ `document-numbering-standard.md`
+│   │   ├── ⚪ `duzenli-gorevler-standard.md`
 │   │   ├── ⚪ `edge-function-security-standard.md`
 │   │   ├── ⚪ `email-template-standard.md`
 │   │   ├── ⚪ `erp-workspace-design-standard.md`
 │   │   ├── ⚪ `execution-method-standard.md`
 │   │   ├── ⚪ `fleet-mechanism-standard.md`
 │   │   ├── ⚪ `form-submission-standard.md`
+│   │   ├── ⚪ `gelistirme-kurallari-tam-liste.md`
+│   │   ├── ⚪ `geo-olcum-standard.md`
 │   │   ├── ⚪ `hafiza-kancalari-standard.md`
+│   │   ├── ⚪ `hafiza-yazma-duzeni-standard.md`
+│   │   ├── ⚪ `hukum-kaynak-standard.md`
 │   │   ├── ⚪ `i18n-localization-standard.md`
 │   │   ├── ⚪ `i18n-ters-yon-standard.md`
 │   │   ├── ⚪ `is-kayit-duzeni-standard.md`
+│   │   ├── ⚪ `izin-kapilari-standard.md`
+│   │   ├── ⚪ `kart-plani-standard.md`
 │   │   ├── ⚪ `katalog-sayim-standard.md`
 │   │   ├── ⚪ `kategori-adlandirma-standard.md`
+│   │   ├── ⚪ `ledger-ve-olu-migration-standard.md`
 │   │   ├── ⚪ `legal-compliance-standard.md`
 │   │   ├── ⚪ `marka-token-eslemesi-standard.md`
 │   │   ├── ⚪ `matris-gorunum-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`
+│   │   ├── ⚪ `mevzuat-kaydi-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
 │   │   ├── ⚪ `mockup-gelisim-hatti-standardi.md`
 │   │   ├── ⚪ `multi-session-coordination-standard.md`
 │   │   ├── ⚪ `notification-standard.md`
 │   │   ├── ⚪ `pano-orion-koprusu-standardi.md`
 │   │   ├── ⚪ `payment-ledger-standard.md`
+│   │   ├── ⚪ `pazar-olcum-standard.md`
 │   │   ├── ⚪ `pricing-standard.md`
 │   │   ├── ⚪ `product-image-standard.md`
 │   │   ├── ⚪ `product-schema-standard.md`
 │   │   ├── ⚪ `proje-takip-defteri-standard.md`
 │   │   ├── ⚪ `purchasing-standard.md`
 │   │   ├── ⚪ `quote-standard.md`
+│   │   ├── ⚪ `rehber-yazisi-standard.md`
 │   │   ├── ⚪ `rendering-cache-standard.md`
+│   │   ├── ⚪ `rls-yetki-karari-standard.md`
+│   │   ├── ⚪ `rota-dili-standard.md`
 │   │   ├── ⚪ `runtime-version-alignment-standard.md`
 │   │   ├── ⚪ `satis-kipi-gecis-standard.md`
 │   │   ├── ⚪ `session-loop-ritual.md`
@@ -583,20 +755,27 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ⚪ `uretilmis-artefakt-standard.md`
 │   │   ├── ⚪ `urun-yapisal-veri-standard.md`
 │   │   ├── ⚪ `vaat-butunlugu-standard.md`
-│   │   └── ⚪ `work-tracking-ssot-standard.md`
+│   │   ├── ⚪ `vitrin-metni-standard.md`
+│   │   ├── ⚪ `work-tracking-ssot-standard.md`
+│   │   └── ⚪ `yayin-gorunurluk-denetim-standard.md`
 │   ├── ⚪ `standards_master.md`
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`
 │   └── ⚪ `venthub_skills_master.md`
 ├── 📂 **e2e/**
+│   ├── ❌ `admin-filtre-donma.e2e.ts`
 │   ├── ✅ `admin-smoke.e2e.ts`
+│   ├── ❌ `axe-anasayfa.e2e.ts`
 │   ├── ✅ `checkout-smoke.e2e.ts`
+│   ├── ❌ `dil-dususu.e2e.ts`
 │   ├── ✅ `reflow.e2e.ts`
-│   └── ✅ `ssr-html.e2e.ts`
+│   ├── ✅ `ssr-html.e2e.ts`
+│   └── ❌ `teklif-eposta-smoke.e2e.ts`
+├── 📂 **e2e-canli/**
+│   ├── ❌ `karar104-teklif-yayim.e2e.ts`
+│   └── ❌ `playwright.config.ts`
 ├── ⚠️ `eslint.config.md`
-├── 📂 **explorer_m2_3/**
-│   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
@@ -650,6 +829,10 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **reset-password/**
 │   │   │   │       └── ✅ `page.tsx`
+│   │   │   ├── 📂 **bilgi-merkezi/**
+│   │   │   │   ├── 📂 **[yazi]/**
+│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **brands/**
 │   │   │   │   ├── 📂 **[slug]/**
 │   │   │   │   │   └── ✅ `page.tsx`
@@ -679,15 +862,18 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   │   │       └── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **iade-degisim/**
 │   │   │   │   │   └── ✅ `page.tsx`
-│   │   │   │   ├── 📂 **konular/**
-│   │   │   │   │   └── 📂 **[slug]/**
-│   │   │   │   │       └── ✅ `page.tsx`
-│   │   │   │   ├── 📂 **merkez/**
-│   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **sss/**
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **teslimat-kargo/**
 │   │   │   │       └── ✅ `page.tsx`
+│   │   │   ├── 📂 **kategori/**
+│   │   │   │   └── 📂 **[kok]/**
+│   │   │   │       └── 📂 **[[...dal]]/**
+│   │   │   │           └── ❌ `page.tsx`
+│   │   │   ├── 📂 **knowledge-hub/**
+│   │   │   │   ├── 📂 **[yazi]/**
+│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── ✅ `layout.tsx`
 │   │   │   ├── 📂 **legal/**
 │   │   │   │   ├── 📂 **cerez-politikasi/**
@@ -702,6 +888,9 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **on-bilgilendirme-formu/**
 │   │   │   │       └── ✅ `page.tsx`
+│   │   │   ├── 📂 **markalar/**
+│   │   │   │   └── 📂 **[slug]/**
+│   │   │   │       └── ❌ `page.tsx`
 │   │   │   ├── ✅ `page.tsx`
 │   │   │   ├── 📂 **payment-success/**
 │   │   │   │   └── ✅ `page.tsx`
@@ -709,10 +898,19 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   │   ├── 📂 **[slug]/**
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── ✅ `page.tsx`
-│   │   │   └── 📂 **urun-secici/**
+│   │   │   ├── 📂 **urun/**
+│   │   │   │   └── 📂 **[slug]/**
+│   │   │   │       └── ❌ `page.tsx`
+│   │   │   ├── 📂 **urun-secici/**
+│   │   │   │   └── ❌ `page.tsx`
+│   │   │   └── 📂 **urunler/**
 │   │   │       └── ❌ `page.tsx`
 │   │   ├── 📂 **_components/**
-│   │   │   └── ✅ `ProductDetailPageView.tsx`
+│   │   │   ├── ✅ `ProductDetailPageView.tsx`
+│   │   │   ├── ❌ `aileSayfasi.tsx`
+│   │   │   ├── ❌ `kategoriSayfasi.tsx`
+│   │   │   ├── ❌ `markaSayfasi.tsx`
+│   │   │   └── ❌ `urunlerSayfasi.tsx`
 │   │   ├── 📂 **admin/**
 │   │   │   ├── 📂 **audit-logs/**
 │   │   │   │   └── ✅ `page.tsx`
@@ -779,6 +977,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   └── 📂 **signout/**
 │   │   │       └── ✅ `route.ts`
 │   │   ├── ✅ `layout.tsx`
+│   │   ├── ❌ `not-found.tsx`
 │   │   ├── ✅ `robots.ts`
 │   │   └── ✅ `sitemap.ts`
 │   ├── 📂 **assets/**
@@ -822,6 +1021,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ✅ `AdminEmptyState.tsx`
 │   │   │   ├── ✅ `AdminRealtimeNotifications.tsx`
 │   │   │   ├── ✅ `AdminSkeleton.tsx`
+│   │   │   ├── ❌ `AdminSozlukKapisi.tsx`
 │   │   │   ├── ✅ `AdminToolbar.tsx`
 │   │   │   ├── ✅ `ColumnsMenu.tsx`
 │   │   │   ├── ✅ `CommandPalette.tsx`
@@ -850,7 +1050,6 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   │   └── ✅ `StatCard.tsx`
 │   │   │   ├── 📂 **data-table/**
 │   │   │   │   ├── ✅ `BulkBar.tsx`
-│   │   │   │   ├── ✅ `BulkPricePanel.tsx`
 │   │   │   │   ├── ✅ `BulkRolePanel.tsx`
 │   │   │   │   ├── ✅ `DataTableHead.tsx`
 │   │   │   │   ├── ✅ `DataTableKit.tsx`
@@ -875,7 +1074,8 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── 📂 **products/**
 │   │   │   │   ├── ✅ `ProductCsvImport.tsx`
 │   │   │   │   ├── ✅ `ProductFormModal.tsx`
-│   │   │   │   └── ✅ `ProductHealthBadge.tsx`
+│   │   │   │   ├── ✅ `ProductHealthBadge.tsx`
+│   │   │   │   └── ❌ `productForm.columns.ts`
 │   │   │   ├── 📂 **purchasing/**
 │   │   │   │   └── ✅ `CreatePurchaseOrderPanel.tsx`
 │   │   │   ├── 📂 **settings/**
@@ -889,6 +1089,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │       └── ✅ `useAdminThemeBodyScope.ts`
 │   │   ├── 📂 **analytics/**
 │   │   │   └── ✅ `ConsentGatedAnalytics.tsx`
+│   │   ├── ❌ `aramaOnHazirlik.ts`
 │   │   ├── 📂 **authority/**
 │   │   │   ├── ✅ `AuthorityRenderer.tsx`
 │   │   │   ├── ⚪ `README.md`
@@ -1014,6 +1215,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   │       ├── ✅ `SpeedControlModel.tsx`
 │   │   │   │       └── ✅ `WallMountedCompactFanModel.tsx`
 │   │   │   ├── ✅ `AddToProjectModal.tsx`
+│   │   │   ├── ❌ `AileKirintisi.tsx`
 │   │   │   ├── ✅ `BentPlaneGeometry.tsx`
 │   │   │   ├── ✅ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
@@ -1025,8 +1227,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   ├── ✅ `VariantSelector.tsx`
-│   │   │   └── 📂 **visual-models/**
+│   │   │   └── ✅ `VariantSelector.tsx`
 │   │   ├── 📂 **quotes/**
 │   │   │   ├── ✅ `QuoteRequestButton.tsx`
 │   │   │   └── ✅ `QuoteRequestModal.tsx`
@@ -1040,9 +1241,11 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ✅ `admin.ts`
 │   │   ├── ✅ `applications.ts`
 │   │   ├── ✅ `features.ts`
+│   │   ├── ❌ `indexnow.ts`
 │   │   ├── ✅ `legal.ts`
 │   │   ├── ✅ `orbitalCarouselConfig.ts`
-│   │   └── ✅ `siteUrl.ts`
+│   │   ├── ✅ `siteUrl.ts`
+│   │   └── ❌ `yayindaModeller.ts`
 │   ├── 📂 **contexts/**
 │   │   ├── ✅ `AuthContext.tsx`
 │   │   ├── ✅ `AuthContextDefinition.ts`
@@ -1052,6 +1255,8 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ✅ `ProjectContext.tsx`
 │   │   └── ✅ `ProjectProvider.tsx`
 │   ├── 📂 **data/**
+│   │   ├── 📂 **bilgiMerkezi/**
+│   │   │   └── ❌ `yazilar.ts`
 │   │   └── ✅ `brands.ts`
 │   ├── 📂 **design-system/**
 │   │   └── ✅ `tokens.js`
@@ -1168,15 +1373,35 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ✅ `returnStatusMachine.ts`
 │   │   │   └── 📂 **search/**
 │   │   │       └── ✅ `resourceSearchers.ts`
+│   │   ├── 📂 **adres/**
+│   │   │   ├── ❌ `envanter.ts`
+│   │   │   ├── ❌ `eslestirici.ts`
+│   │   │   ├── ❌ `haritaKaynagi.ts`
+│   │   │   ├── ❌ `haritaTipi.ts`
+│   │   │   ├── ❌ `haritaUret.ts`
+│   │   │   ├── ❌ `rotaDiliTablo.ts`
+│   │   │   ├── ❌ `tazelemeYollari.ts`
+│   │   │   ├── ❌ `tohum.ts`
+│   │   │   └── ❌ `yayindaModelYollari.ts`
 │   │   ├── ✅ `audit.ts`
+│   │   ├── 📂 **bilgiMerkezi/**
+│   │   │   ├── ❌ `icBaglanti.ts`
+│   │   │   ├── ❌ `jsonld.ts`
+│   │   │   ├── ❌ `markdown.ts`
+│   │   │   ├── ❌ `sayfa.ts`
+│   │   │   ├── ❌ `siteHaritasi.ts`
+│   │   │   └── ❌ `tersDizin.ts`
 │   │   ├── 📂 **cache/**
 │   │   │   └── ✅ `tags.ts`
 │   │   ├── 📂 **consent/**
 │   │   ├── 📂 **data/**
+│   │   │   ├── ❌ `bilgiMerkeziKaynak.ts`
 │   │   │   ├── ✅ `csvImportGuard.ts`
+│   │   │   ├── ❌ `kategoriSegmenti.ts`
 │   │   │   ├── ✅ `preload.ts`
 │   │   │   ├── ✅ `productRoute.ts`
-│   │   │   └── ✅ `selectVariant.ts`
+│   │   │   ├── ✅ `selectVariant.ts`
+│   │   │   └── ❌ `urunSegmenti.ts`
 │   │   ├── ✅ `ensureSessionFresh.ts`
 │   │   ├── ✅ `errorReporter.ts`
 │   │   ├── 📂 **hvac/**
@@ -1189,6 +1414,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ❌ `categoryImage.ts`
 │   │   │   └── ✅ `productImage.ts`
 │   │   ├── 📂 **kip/**
+│   │   │   ├── ❌ `odemeKapisi.ts`
 │   │   │   └── ❌ `satisKipi.ts`
 │   │   ├── 📂 **kvkk/**
 │   │   │   └── ✅ `dueState.ts`
@@ -1197,6 +1423,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ✅ `pdfAssets.ts`
 │   │   ├── ✅ `pdfGenerator.ts`
 │   │   ├── 📂 **pricing/**
+│   │   │   ├── ❌ `degisiklikYontemi.ts`
 │   │   │   └── ❌ `quoteMode.ts`
 │   │   ├── 📂 **purchasing/**
 │   │   │   └── ✅ `poStatusMachine.ts`
@@ -1204,11 +1431,17 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   └── ✅ `quoteStatusMachine.ts`
 │   │   ├── ✅ `rbac.ts`
 │   │   ├── 📂 **seo/**
+│   │   │   ├── ❌ `aciklamaKirp.ts`
 │   │   │   ├── ❌ `canonicalOrigin.ts`
+│   │   │   ├── ❌ `enYayinKurali.ts`
 │   │   │   ├── ❌ `indexnow.ts`
-│   │   │   └── ✅ `jsonld.ts`
+│   │   │   ├── ✅ `jsonld.ts`
+│   │   │   ├── ❌ `kirinti.ts`
+│   │   │   ├── ❌ `ovguAyikla.ts`
+│   │   │   └── ❌ `sayfaUstVerisi.ts`
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
+│   │   │   ├── ❌ `adminQuoteService.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
 │   │   │   ├── ✅ `contactMessageService.ts`
@@ -1224,6 +1457,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ✅ `pricingAdmin.service.ts`
 │   │   │   ├── ✅ `pricingMaterialize.service.ts`
 │   │   │   ├── ✅ `pricingPolicy.service.ts`
+│   │   │   ├── ❌ `pricingProductPrice.service.ts`
 │   │   │   ├── ✅ `product.columns.ts`
 │   │   │   ├── ✅ `product.service.ts`
 │   │   │   ├── ✅ `project.service.ts`
@@ -1247,6 +1481,9 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   ├── 📂 **providers/**
 │   │   └── ✅ `SupabaseProvider.tsx`
 │   ├── 📂 **test/**
+│   │   ├── ❌ `dil-dususu-yok.test.ts`
+│   │   ├── ❌ `dil-tespiti.test.ts`
+│   │   └── ❌ `eposta-sessiz-dusus-yok.test.ts`
 │   ├── 📂 **types/**
 │   │   ├── ✅ `admin-shared.ts`
 │   │   ├── ✅ `authority.ts`
@@ -1263,18 +1500,27 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ✅ `adminQueryFilters.ts`
 │   │   ├── ✅ `adminShipping.ts`
 │   │   ├── ✅ `adminUi.ts`
+│   │   ├── ❌ `adresUret.ts`
 │   │   ├── ✅ `analytics.ts`
 │   │   ├── ✅ `applicationLinks.ts`
 │   │   ├── ✅ `applicationUi.tsx`
+│   │   ├── ❌ `bilgiMerkezi.ts`
+│   │   ├── ❌ `bilgiMerkeziRotalari.ts`
 │   │   ├── ✅ `breadcrumbUtils.ts`
 │   │   ├── ✅ `categoryHelpers.ts`
 │   │   ├── ✅ `checkoutHelpers.ts`
 │   │   ├── ✅ `crypto.ts`
+│   │   ├── ❌ `csvHucre.ts`
+│   │   ├── ❌ `dilMetni.ts`
+│   │   ├── ❌ `dilTespiti.ts`
 │   │   ├── ✅ `engineeringIntelligence.ts`
 │   │   ├── ✅ `getCategoryIcon.tsx`
 │   │   ├── ❌ `icIngestNotu.ts`
 │   │   ├── ✅ `imageUtils.ts`
+│   │   ├── ❌ `kokDosya.ts`
+│   │   ├── ❌ `modelAdresBicimi.ts`
 │   │   ├── ✅ `navigationConfig.ts`
+│   │   ├── ❌ `orderStatusDisplay.ts`
 │   │   ├── ✅ `passwordSecurity.ts`
 │   │   ├── ✅ `prefetch.ts`
 │   │   ├── ✅ `productHelpers.ts`
@@ -1287,7 +1533,8 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── ✅ `tenantServer.ts`
 │   │   ├── ✅ `testA11y.tsx`
 │   │   ├── ✅ `type-converters.ts`
-│   │   └── ✅ `whatsapp.ts`
+│   │   ├── ✅ `whatsapp.ts`
+│   │   └── ❌ `yuzeyAdresleri.ts`
 │   └── 📂 **views/**
 │       ├── ✅ `AboutPage.tsx`
 │       ├── ✅ `AuthCallbackPage.tsx`
@@ -1301,6 +1548,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │       ├── ✅ `ForgotPasswordPage.tsx`
 │       ├── ✅ `HomePage.tsx`
 │       ├── ✅ `LoginPage.tsx`
+│       ├── ❌ `NotFoundView.tsx`
 │       ├── ✅ `OrdersPage.tsx`
 │       ├── ✅ `PaymentSuccessPage.tsx`
 │       ├── ✅ `ProductsDiscoveryView.tsx`
@@ -1399,8 +1647,14 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │       │   ├── ✅ `buildPaymentRequest.ts`
 │       │   └── ✅ `injectCheckoutForm.ts`
 │       ├── 📂 **knowledge/**
+│       │   ├── ❌ `BilgiMerkeziArama.tsx`
+│       │   ├── ❌ `BilgiMerkeziListe.tsx`
 │       │   ├── ✅ `HubPage.tsx`
-│       │   └── ✅ `TopicPage.tsx`
+│       │   ├── ❌ `IlgiliRehberler.tsx`
+│       │   ├── ❌ `RehberGovdesi.tsx`
+│       │   ├── ❌ `RehberYazisiSayfasi.tsx`
+│       │   ├── ✅ `TopicPage.tsx`
+│       │   └── ❌ `bilgiMerkeziRotasi.tsx`
 │       ├── 📂 **legal/**
 │       │   ├── ✅ `CookiePolicyPage.tsx`
 │       │   ├── ✅ `DistanceSalesAgreementPage.tsx`
@@ -1436,12 +1690,15 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   │   ├── ✅ `caller.ts`
 │   │   │   ├── ✅ `config_audit.ts`
 │   │   │   ├── ✅ `cors.ts`
+│   │   │   ├── ❌ `db_saglik.ts`
 │   │   │   ├── ✅ `notify.ts`
+│   │   │   ├── ❌ `odeme_eslesme.ts`
 │   │   │   ├── ✅ `origins.ts`
 │   │   │   ├── ✅ `rate_limit.ts`
 │   │   │   ├── ✅ `refund_guard.ts`
 │   │   │   ├── ✅ `return_transitions.ts`
 │   │   │   ├── ✅ `revenue_alarm.ts`
+│   │   │   ├── ❌ `satis_kipi.ts`
 │   │   │   ├── ✅ `sentry.ts`
 │   │   │   ├── ✅ `tenant.ts`
 │   │   │   ├── ✅ `tenant_config.ts`
@@ -1469,6 +1726,7 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── 📂 **order-paid-webhook/**
 │   │   ├── 📂 **order-validate/**
 │   │   ├── 📂 **quote-notification-webhook/**
+│   │   │   └── ❌ `ic_bildirim.ts`
 │   │   ├── 📂 **quote-request-guest/**
 │   │   ├── 📂 **refund-order-mock/**
 │   │   ├── 📂 **release-expired-reservations/**
@@ -1480,57 +1738,214 @@ Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihind
 │   │   ├── 📂 **shipping-status/**
 │   │   ├── 📂 **shipping-webhook/**
 │   │   ├── 📂 **stock-alert/**
+│   │   │   └── ❌ `teklif_modu.ts`
 │   │   └── 📂 **tcmb-rates-sync/**
 │   └── 📂 **migrations/**
 ├── 📂 **support/**
 ├── ✅ `tailwind.config.js`
-├── 📂 **testsprite_tests/**
-│   └── 📂 **tmp/**
+├── 📂 **tools/**
+│   └── 📂 **wrongstack-mcp/**
+│       ├── ⚪ `README.md`
+│       └── 📂 **yamalar/**
+├── ❌ `vitest.global-setup.ts`
 └── ✅ `vitest.smoke.config.ts`
 ```
 
 ## Eksik Dokümantasyonlar
+- [ ] `docs\plans\rec300-model-adres-uret.py`
+- [ ] `e2e-canli\karar104-teklif-yayim.e2e.ts`
+- [ ] `e2e-canli\playwright.config.ts`
+- [ ] `e2e\admin-filtre-donma.e2e.ts`
+- [ ] `e2e\axe-anasayfa.e2e.ts`
+- [ ] `e2e\dil-dususu.e2e.ts`
+- [ ] `e2e\teklif-eposta-smoke.e2e.ts`
+- [ ] `src\app\[lang]\bilgi-merkezi\[yazi]\page.tsx`
+- [ ] `src\app\[lang]\bilgi-merkezi\page.tsx`
+- [ ] `src\app\[lang]\kategori\[kok]\[[...dal]]\page.tsx`
+- [ ] `src\app\[lang]\knowledge-hub\[yazi]\page.tsx`
+- [ ] `src\app\[lang]\knowledge-hub\page.tsx`
+- [ ] `src\app\[lang]\markalar\[slug]\page.tsx`
 - [ ] `src\app\[lang]\urun-secici\page.tsx`
+- [ ] `src\app\[lang]\urun\[slug]\page.tsx`
+- [ ] `src\app\[lang]\urunler\page.tsx`
+- [ ] `src\app\_components\aileSayfasi.tsx`
+- [ ] `src\app\_components\kategoriSayfasi.tsx`
+- [ ] `src\app\_components\markaSayfasi.tsx`
+- [ ] `src\app\_components\urunlerSayfasi.tsx`
+- [ ] `src\app\not-found.tsx`
+- [ ] `src\components\admin\AdminSozlukKapisi.tsx`
+- [ ] `src\components\admin\products\productForm.columns.ts`
+- [ ] `src\components\aramaOnHazirlik.ts`
 - [ ] `src\components\calculators\UrlParametreOkuyucu.tsx`
 - [ ] `src\components\navigation\HeaderTeklifPaneli.tsx`
 - [ ] `src\components\navigation\MobilAltSekmeCubugu.tsx`
 - [ ] `src\components\navigation\TeklifPaneliIcerigi.tsx`
+- [ ] `src\components\products\AileKirintisi.tsx`
+- [ ] `src\config\indexnow.ts`
+- [ ] `src\config\yayindaModeller.ts`
+- [ ] `src\data\bilgiMerkezi\yazilar.ts`
 - [ ] `src\i18n\yoldanDil.ts`
+- [ ] `src\lib\adres\envanter.ts`
+- [ ] `src\lib\adres\eslestirici.ts`
+- [ ] `src\lib\adres\haritaKaynagi.ts`
+- [ ] `src\lib\adres\haritaTipi.ts`
+- [ ] `src\lib\adres\haritaUret.ts`
+- [ ] `src\lib\adres\rotaDiliTablo.ts`
+- [ ] `src\lib\adres\tazelemeYollari.ts`
+- [ ] `src\lib\adres\tohum.ts`
+- [ ] `src\lib\adres\yayindaModelYollari.ts`
+- [ ] `src\lib\bilgiMerkezi\icBaglanti.ts`
+- [ ] `src\lib\bilgiMerkezi\jsonld.ts`
+- [ ] `src\lib\bilgiMerkezi\markdown.ts`
+- [ ] `src\lib\bilgiMerkezi\sayfa.ts`
+- [ ] `src\lib\bilgiMerkezi\siteHaritasi.ts`
+- [ ] `src\lib\bilgiMerkezi\tersDizin.ts`
+- [ ] `src\lib\data\bilgiMerkeziKaynak.ts`
+- [ ] `src\lib\data\kategoriSegmenti.ts`
+- [ ] `src\lib\data\urunSegmenti.ts`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\kip\odemeKapisi.ts`
 - [ ] `src\lib\kip\satisKipi.ts`
+- [ ] `src\lib\pricing\degisiklikYontemi.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
+- [ ] `src\lib\seo\aciklamaKirp.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
+- [ ] `src\lib\seo\enYayinKurali.ts`
 - [ ] `src\lib\seo\indexnow.ts`
+- [ ] `src\lib\seo\kirinti.ts`
+- [ ] `src\lib\seo\ovguAyikla.ts`
+- [ ] `src\lib\seo\sayfaUstVerisi.ts`
+- [ ] `src\lib\services\adminQuoteService.ts`
+- [ ] `src\lib\services\pricingProductPrice.service.ts`
 - [ ] `src\lib\supabase\tumSatirlar.ts`
+- [ ] `src\test\dil-dususu-yok.test.ts`
+- [ ] `src\test\dil-tespiti.test.ts`
+- [ ] `src\test\eposta-sessiz-dusus-yok.test.ts`
+- [ ] `src\utils\adresUret.ts`
+- [ ] `src\utils\bilgiMerkezi.ts`
+- [ ] `src\utils\bilgiMerkeziRotalari.ts`
+- [ ] `src\utils\csvHucre.ts`
+- [ ] `src\utils\dilMetni.ts`
+- [ ] `src\utils\dilTespiti.ts`
 - [ ] `src\utils\icIngestNotu.ts`
+- [ ] `src\utils\kokDosya.ts`
+- [ ] `src\utils\modelAdresBicimi.ts`
+- [ ] `src\utils\orderStatusDisplay.ts`
 - [ ] `src\utils\siparisNo.ts`
+- [ ] `src\utils\yuzeyAdresleri.ts`
+- [ ] `src\views\NotFoundView.tsx`
+- [ ] `src\views\knowledge\BilgiMerkeziArama.tsx`
+- [ ] `src\views\knowledge\BilgiMerkeziListe.tsx`
+- [ ] `src\views\knowledge\IlgiliRehberler.tsx`
+- [ ] `src\views\knowledge\RehberGovdesi.tsx`
+- [ ] `src\views\knowledge\RehberYazisiSayfasi.tsx`
+- [ ] `src\views\knowledge\bilgiMerkeziRotasi.tsx`
+- [ ] `supabase\functions\_shared\db_saglik.ts`
+- [ ] `supabase\functions\_shared\odeme_eslesme.ts`
+- [ ] `supabase\functions\_shared\satis_kipi.ts`
 - [ ] `supabase\functions\_shared\tum_satirlar.ts`
+- [ ] `supabase\functions\quote-notification-webhook\ic_bildirim.ts`
+- [ ] `supabase\functions\stock-alert\teklif_modu.ts`
+- [ ] `vitest.global-setup.ts`
+- [ ] `docs\plans\rec300-model-adres-uret.py`
+- [ ] `src\app\[lang]\bilgi-merkezi\[yazi]\page.tsx`
+- [ ] `src\app\[lang]\bilgi-merkezi\page.tsx`
+- [ ] `src\app\[lang]\kategori\[kok]\[[...dal]]\page.tsx`
+- [ ] `src\app\[lang]\knowledge-hub\[yazi]\page.tsx`
+- [ ] `src\app\[lang]\knowledge-hub\page.tsx`
+- [ ] `src\app\[lang]\markalar\[slug]\page.tsx`
 - [ ] `src\app\[lang]\urun-secici\page.tsx`
+- [ ] `src\app\[lang]\urun\[slug]\page.tsx`
+- [ ] `src\app\[lang]\urunler\page.tsx`
+- [ ] `src\app\_components\aileSayfasi.tsx`
+- [ ] `src\app\_components\kategoriSayfasi.tsx`
+- [ ] `src\app\_components\markaSayfasi.tsx`
+- [ ] `src\app\_components\urunlerSayfasi.tsx`
+- [ ] `src\app\not-found.tsx`
+- [ ] `src\components\admin\AdminSozlukKapisi.tsx`
+- [ ] `src\components\admin\products\productForm.columns.ts`
+- [ ] `src\components\aramaOnHazirlik.ts`
 - [ ] `src\components\calculators\UrlParametreOkuyucu.tsx`
 - [ ] `src\components\navigation\HeaderTeklifPaneli.tsx`
 - [ ] `src\components\navigation\MobilAltSekmeCubugu.tsx`
 - [ ] `src\components\navigation\TeklifPaneliIcerigi.tsx`
+- [ ] `src\components\products\AileKirintisi.tsx`
+- [ ] `src\config\indexnow.ts`
+- [ ] `src\config\yayindaModeller.ts`
+- [ ] `src\data\bilgiMerkezi\yazilar.ts`
 - [ ] `src\i18n\yoldanDil.ts`
+- [ ] `src\lib\adres\envanter.ts`
+- [ ] `src\lib\adres\eslestirici.ts`
+- [ ] `src\lib\adres\haritaKaynagi.ts`
+- [ ] `src\lib\adres\haritaTipi.ts`
+- [ ] `src\lib\adres\haritaUret.ts`
+- [ ] `src\lib\adres\rotaDiliTablo.ts`
+- [ ] `src\lib\adres\tazelemeYollari.ts`
+- [ ] `src\lib\adres\tohum.ts`
+- [ ] `src\lib\adres\yayindaModelYollari.ts`
+- [ ] `src\lib\bilgiMerkezi\icBaglanti.ts`
+- [ ] `src\lib\bilgiMerkezi\jsonld.ts`
+- [ ] `src\lib\bilgiMerkezi\markdown.ts`
+- [ ] `src\lib\bilgiMerkezi\sayfa.ts`
+- [ ] `src\lib\bilgiMerkezi\siteHaritasi.ts`
+- [ ] `src\lib\bilgiMerkezi\tersDizin.ts`
+- [ ] `src\lib\data\bilgiMerkeziKaynak.ts`
+- [ ] `src\lib\data\kategoriSegmenti.ts`
+- [ ] `src\lib\data\urunSegmenti.ts`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\kip\odemeKapisi.ts`
 - [ ] `src\lib\kip\satisKipi.ts`
+- [ ] `src\lib\pricing\degisiklikYontemi.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
+- [ ] `src\lib\seo\aciklamaKirp.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
+- [ ] `src\lib\seo\enYayinKurali.ts`
 - [ ] `src\lib\seo\indexnow.ts`
+- [ ] `src\lib\seo\kirinti.ts`
+- [ ] `src\lib\seo\ovguAyikla.ts`
+- [ ] `src\lib\seo\sayfaUstVerisi.ts`
+- [ ] `src\lib\services\adminQuoteService.ts`
+- [ ] `src\lib\services\pricingProductPrice.service.ts`
 - [ ] `src\lib\supabase\tumSatirlar.ts`
+- [ ] `src\test\dil-dususu-yok.test.ts`
+- [ ] `src\test\dil-tespiti.test.ts`
+- [ ] `src\test\eposta-sessiz-dusus-yok.test.ts`
+- [ ] `src\utils\adresUret.ts`
+- [ ] `src\utils\bilgiMerkezi.ts`
+- [ ] `src\utils\bilgiMerkeziRotalari.ts`
+- [ ] `src\utils\csvHucre.ts`
+- [ ] `src\utils\dilMetni.ts`
+- [ ] `src\utils\dilTespiti.ts`
 - [ ] `src\utils\icIngestNotu.ts`
+- [ ] `src\utils\kokDosya.ts`
+- [ ] `src\utils\modelAdresBicimi.ts`
+- [ ] `src\utils\orderStatusDisplay.ts`
 - [ ] `src\utils\siparisNo.ts`
+- [ ] `src\utils\yuzeyAdresleri.ts`
+- [ ] `src\views\NotFoundView.tsx`
+- [ ] `src\views\knowledge\BilgiMerkeziArama.tsx`
+- [ ] `src\views\knowledge\BilgiMerkeziListe.tsx`
+- [ ] `src\views\knowledge\IlgiliRehberler.tsx`
+- [ ] `src\views\knowledge\RehberGovdesi.tsx`
+- [ ] `src\views\knowledge\RehberYazisiSayfasi.tsx`
+- [ ] `src\views\knowledge\bilgiMerkeziRotasi.tsx`
+- [ ] `supabase\functions\_shared\db_saglik.ts`
+- [ ] `supabase\functions\_shared\odeme_eslesme.ts`
+- [ ] `supabase\functions\_shared\satis_kipi.ts`
 - [ ] `supabase\functions\_shared\tum_satirlar.ts`
+- [ ] `supabase\functions\quote-notification-webhook\ic_bildirim.ts`
+- [ ] `supabase\functions\stock-alert\teklif_modu.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
-- [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
+- [⚠️] `AGENTS.md`
+- [⚠️] `NOTICE.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
 - [⚠️] `eslint.config.md`
-- [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 

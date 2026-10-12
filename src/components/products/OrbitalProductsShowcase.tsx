@@ -10,6 +10,7 @@ import { DoubleSide, MathUtils, SRGBColorSpace, Vector3 } from 'three'
 
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
+import { YER_TUTUCU_GORSEL } from '@/utils/imageUtils'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -124,7 +125,8 @@ const PlaceholderWireframe = ({ scale = 1 }: { scale?: number }) => {
  * Texture Yüklenene Kadar Bekleyen Material (Kategori dışı standart resimli kartlar için)
  */
 const SuspendedCardMaterial = ({ finalPath, hovered }: { finalPath: string | null, hovered: boolean }) => {
-    const texture = useTexture(finalPath || '/images/placeholders/product-placeholder.png')
+    // URN-69: yedek ürün içermeyen nötr yer tutucu (SVG'de açık width/height var; WebGL dokusu için gerekli).
+    const texture = useTexture(finalPath || YER_TUTUCU_GORSEL)
     if (texture) {
         texture.colorSpace = SRGBColorSpace
     }

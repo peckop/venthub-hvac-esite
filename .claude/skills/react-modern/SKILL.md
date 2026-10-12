@@ -3,11 +3,11 @@ name: react-modern
 description: "Modern React 19 yazım kuralları: RSC sınırı, Compiler uyumu, durum ve efekt disiplini. Tetik: \"React bileşeni\", \"useEffect\", \"RSC\"."
 category: quality
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/react-modern/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/react-modern/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/react-modern/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/react-modern/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -22,6 +22,7 @@ metadata:
 | `<nextsteps>` etiketi | **Hiç üretilmez.** Bizde ayrıştırıcı yok; Recep'e rapor akan cümledir |
 | React Compiler uyumu (satır ~38) | Uyumlu: depoda React 19 + Compiler var |
 | Örnek kodlardaki gömülü metinler (satır ~100-102) | **Kopyalanmaz**: kural 7 (kullanıcıya görünen metin sözlükten gelir); skill adımı değil örnektir |
+| `design-system` atfı | Bizde yok; atıf yok sayılır. Karşılığı: `src/design-system/tokens.js` (kural 8) ve `venthub-tasarim-dili` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -31,6 +32,11 @@ metadata:
 ---
 
 # Modern React
+
+## Selection card
+- Task: React component state, forms and hooks.
+- Start: Locate the affected route/component and its runtime/lockfile.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -43,10 +49,15 @@ Several "modern" rules only apply to one of the two.
 
 ## Rules
 
-1. Match the setup. Server Components, `'use client'`, and server actions exist
+1. **Pre-flight: Inspect repo & live registry versions first.** Check `package.json`
+   for the exact React version (`"react"`, `"react-dom"`) and framework setup. Query
+   `registry.npmjs.org/react/latest` or online docs to verify current React 19 stable
+   capabilities (such as `useActionState`, `useOptimistic`, `use()`, and ref-as-prop without `forwardRef`).
+   If the repo is on React 18, identify upgrade steps before applying React 19-only hooks.
+2. Match the setup. Server Components, `'use client'`, and server actions exist
    only in RSC frameworks. In a client-only app, fetch through the project's data
    layer (TanStack Query, SWR, a loader) instead.
-2. Derive, don't sync. If a value can be computed from props or state during
+3. Derive, don't sync. If a value can be computed from props or state during
    render, compute it; don't mirror it into state with an effect.
 3. Effects are for synchronizing with external systems (subscriptions, DOM
    APIs, timers, non-React widgets). User-caused changes belong in event
@@ -56,7 +67,7 @@ Several "modern" rules only apply to one of the two.
 5. Never mutate state or props; update with new objects and arrays.
 6. Keys are stable identities from the data — never array indexes for lists
    that reorder, insert, or delete.
-7. Memoize after measuring, or not at all when the React Compiler is enabled.
+7. Memoize after measuring; inspect compiler coverage before adding manual memoization.
    `useMemo`/`useCallback` exist for expensive work and referential stability
    a child or effect actually depends on.
 8. Follow the framework's file conventions over style preferences — Next.js
@@ -165,6 +176,17 @@ function RenameForm({ rename }: { rename: (prev: State, data: FormData) => Promi
 - [ ] Stable keys; no state or prop mutation
 - [ ] Framework file conventions respected
 - [ ] Inputs labelled, keyboard path works
+
+## Current React and async semantics
+
+Target React/react-dom 19.3.0, checked from npm on 2026-10-09; upgrade the pair
+with the framework and type packages after checking peer requirements.
+Keep rendering pure, make cleanup work under Strict Mode and distinguish
+optimistic state from persisted success. Server Action authorization belongs
+server-side even when useActionState provides UI feedback.
+useEffectEvent is for non-reactive logic called from Effects; it is not a way
+to hide reactive dependencies or create an ordinary click handler.
+Check its [current semantics](https://react.dev/reference/react/useEffectEvent).
 
 ## Skills in scope
 

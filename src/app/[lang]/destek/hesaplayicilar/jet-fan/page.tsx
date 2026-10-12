@@ -23,7 +23,8 @@ export async function generateMetadata({
     lang,
     yol: Routes.destek.hesaplayicilar('jet-fan'),
     baslik: `${dict.calculators.jetFan.pageTitle} | ${dict.urunSecici.ustBaslik} | VentHub`,
-    aciklama: dict.calculators.jetFan.pageDescription,
+    // SEO-32: arama açıklaması ayrı anahtardan; `pageDescription` sayfanın görünür alt başlığıdır.
+    aciklama: dict.calculators.jetFan.metaDescription,
   })
 }
 

@@ -4660,6 +4660,16 @@ export type Database = {
         Args: { p_dil: string; p_eski_slug: string; p_tur: string }
         Returns: string
       }
+      url_takma_adlari_listele: {
+        Args: never
+        Returns: {
+          dil: string
+          eski_slug: string
+          hedef_id: string
+          tenant_id: string
+          tur: string
+        }[]
+      }
     }
     Enums: {
       contact_department: "sales" | "support" | "consulting"

@@ -225,6 +225,25 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
         'url_takma_ad_coz anon icin KAPANMIS — eski adresler yonlendirilemez',
       ).toBe(false)
     })
+
+    // ALT-37e (karar 310, 2026-10-07): eski adres haritası üreteci `url_takma_adlari` tablosunu anon anahtarla,
+    // tabloyu AÇMADAN okuyabilsin diye eklenen yalnız-okuma liste işlevi. url_takma_ad_coz ile AYNI sınıf ve aynı
+    // sıkılık: DEFINER, anon + authenticated + service_role AÇIK, PUBLIC KAPALI (hedefli grant). Gövdenin kiracı
+    // süzgeci, yazma içermemesi, sabit search_path ve tablonun kapalı kalışı `url-takma-adlari-listele.test.ts`'tedir.
+    // Kapanırsa harita üretilemez (11 Ekim yönlendirmesi), açık PUBLIC ise kimlik doğrulaması bile gerekmez hâle gelir.
+    it('⭐url_takma_adlari_listele: SECURITY DEFINER, anon + authenticated + service_role AÇIK, PUBLIC KAPALI', () => {
+      expect(sonKip(zincir, 'url_takma_adlari_listele'), 'url_takma_adlari_listele tanimi zincirde yok — okuyucu kor').toBe('definer')
+      for (const rol of ['anon', 'authenticated', 'service_role']) {
+        expect(
+          sonHalKapali(zincir, 'url_takma_adlari_listele', rol, []),
+          `url_takma_adlari_listele ${rol} icin KAPANMIS — eski adres haritasi uretilemez (11 Ekim yonlendirmesi)`,
+        ).toBe(false)
+      }
+      expect(
+        sonHalKapali(zincir, 'url_takma_adlari_listele', 'public', []),
+        'url_takma_adlari_listele PUBLIC icin acik — hedefli grant yerine herkese acilmis',
+      ).toBe(true)
+    })
   })
 
   describe('AYIRT EDİCİLİK — değerlendirici her geri kaçışı reddediyor', () => {

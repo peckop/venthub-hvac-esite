@@ -34,8 +34,15 @@ const path = require('node:path')
 const SETLER_YOLU = path.join('docs', 'audits', 'skill-departman-setleri-2026-09-30.json')
 const AJAN_DIZINI = path.join('.claude', 'agents')
 
-/** Çalışan türü → model. Execution-method §10.3: model açık yazılır; kullanıcı ayarı modelsizi Sonnet'e düşürür. */
-const TUR_MODEL = { arastirmaci: 'sonnet', uygulayici: 'sonnet', curutucu: 'sonnet', dogrulayici: 'sonnet' }
+/**
+ * Çalışan türü → model. Execution-method §10.3: model açık yazılır; kullanıcı ayarı modelsizi Sonnet'e düşürür.
+ * KARAR 314 (Recep, 2026-10-08; ALT-45): ARAŞTIRMACI Haiku 5.5 (salt-okuma, yargı vermez; sonucunu doğrulayıcı ve müdür doğrular);
+ * uygulayıcı, çürütücü ve doğrulayıcı Sonnet KALIR. TAM model kimliği yazılır, `haiku` takma adı DEĞİL: takma ad kayar
+ * (2026-09-30 ölçümünde `haiku` → claude-haiku-4-5-20251001, 2026-10-08'de → claude-haiku-5-5); kimlik kayıtlı kalır.
+ * Rol→model tablosu ve gerekçe: execution-method-standard.md §10.3 "Rol → model tablosu"; tabloyu bu sabitle karşılaştıran kapı:
+ * INV-AJAN-TANIM-1 (src/__tests__/conformance/ajan-tanimlari.test.ts). Yeni departman bu üreticiden geçer, kendiliğinden uyar.
+ */
+const TUR_MODEL = { arastirmaci: 'claude-haiku-5-5', uygulayici: 'sonnet', curutucu: 'sonnet', dogrulayici: 'sonnet' }
 
 /** Çalışan türü → Türkçe ad ve görev cümlesi (execution-method §10.3 tablosundan). */
 const TURLER = {
@@ -68,6 +75,9 @@ function tanim(satir) {
     `name: ${dosyaAdi(satir.dept, satir.tur)}`,
     `description: ${aciklama(satir.dept, satir.tur)}`,
     `model: ${TUR_MODEL[satir.tur]}`,
+    // Ajan hafızası KULLANICI kapsamında: ~/.claude/agent-memory/<ad>/MEMORY.md (depo dışı; depo PUBLIC, worktree'ler arası bölünmez).
+    // `project`/`local` hafızayı depoya yazar. Yazmayan türlerde disallowedTools yazmayı kapalı tutar (hafıza yetkisi onu açmaz; 10-09 ölçüldü).
+    'memory: user',
   ]
   if (YAZMAYAN.has(satir.tur)) f.push('disallowedTools: Edit, Write, NotebookEdit')
   const skills = (satir.onYukle || []).map((o) => o.ad)
@@ -92,6 +102,77 @@ function uret(setler) {
   for (const s of setler.setler) {
     if (!s.uret) continue
     cikti[dosyaAdi(s.dept, s.tur) + '.md'] = tanim(s)
+  }
+  return cikti
+}
+
+/**
+ * DEPARTMAN PENCERE TANIMLARI (HRT-49, OPS emri 2026-10-10; "filo geçişinin ön şartı").
+ * Müdür penceresi `.claude/settings.local.json` içinde `"agent": "<departman>-pencere"` ile bu tanımla açılır (OPS pilotu, 2026-10-10:
+ * pencere rol tanımıyla açıldı, kendi hafızasını (`memory: user`) ve `.claude/rules/filo-ortak.md` dosyasını yükledi, araçsız 4/4).
+ * Bu betik YALNIZ tanım dosyasını üretir; hiçbir pencerenin settings dosyasına dokunmaz (geçişi OPS yapar).
+ *
+ * LİSTE DURUMDAN TÜRETİLMEZ: `ROLLER[...].durum` metni KATALOG ve BLOG için "Kapalı" diyor ama pencereleri açık (OPS emri 11 departman
+ * sayıyor); kapalı departmanlar (ADMIN, EDGE, I18N, MARKA, MEVZUAT, SATIS) pencere açıldığında listeye eklenir. Her listeli departmanın
+ * ROLLER kaydı ve docs/roller/<ROL>.md dosyası bulunmalıdır (hazir-ozellik-kurulumu.test.ts bunu ölçer).
+ *
+ * İÇERİK TEK KAYNAKTAN: görev ve dosya alanı `scripts/belge/rol-karti-uret.cjs` ROLLER sabitinden gelir (rol kartıyla AYNI veri, kopya yok);
+ * çalışan türleri skill setleri JSON'unun `uret: true` satırlarından. Araç kısıtı YOK (müdür yazar, `disallowedTools`/`tools` konmaz).
+ * Gövde boş olmadığı için tanımın istemi varsayılan sistem istemini değiştirir (CLAUDE.md yine yüklenir); bu yüzden gövde kısa tutulur
+ * ve ayrıntıyı rol kartına bırakır. Açıklama kısa: tüm tanımların ad+açıklaması her oturumun Agent aracı açıklamasına girer (tavan
+ * INV-AJAN-TANIM-1 maliyet kapısı, çalışan + pencere birlikte ölçülür).
+ */
+const PENCERE_DEPARTMANLARI = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK']
+/** Pencere modeli = pencerenin bugünkü modeli (OPS emri: departmanlar Sonnet 5.5, OPS Opus 5.5); TAM kimlik, takma ad kayar. */
+const PENCERE_MODEL = { OPS: 'claude-opus-5-5' }
+const PENCERE_MODEL_VARSAYILAN = 'claude-sonnet-5-5'
+const CALISAN_TUR_SIRASI = ['arastirmaci', 'curutucu', 'dogrulayici', 'uygulayici']
+
+function pencereDosyaAdi(dept) {
+  return `${String(dept).toLowerCase()}-pencere`
+}
+
+/** Departmanın üretilen çalışan tanımı adları (tür sırasıyla). */
+function pencereCalisanlari(setler, dept) {
+  const var_ = new Set(setler.setler.filter((s) => s.uret && String(s.dept).toUpperCase() === String(dept).toUpperCase()).map((s) => s.tur))
+  return CALISAN_TUR_SIRASI.filter((t) => var_.has(t)).map((t) => dosyaAdi(dept, t))
+}
+
+const cumle = (s) => {
+  const t = String(s).trim()
+  return /[.!?]$/.test(t) ? t : `${t}.`
+}
+
+/** Tek pencere tanımı metni (LF). `rol` = ROLLER[dept] ({ gorev, dosyalar, ... }). */
+function pencereTanimi(dept, rol, calisanlar) {
+  const f = [
+    '---',
+    `name: ${pencereDosyaAdi(dept)}`,
+    `description: ${dept} departmanının müdür penceresi (settings agent anahtarıyla açılır; alt ajan olarak çağrılmaz).`,
+    `model: ${PENCERE_MODEL[dept] || PENCERE_MODEL_VARSAYILAN}`,
+    // Ajan hafızası KULLANICI kapsamında (depo PUBLIC; project/local hafızayı depoya yazar). Araç kısıtı yok: müdür yazar.
+    'memory: user',
+    '---',
+    '',
+  ]
+  const govde = [
+    `Sen VentHub'ın ${dept} departmanının müdür penceresisin. Departmanın görevi: ${cumle(rol.gorev)} Dosya alanın: ${cumle(rol.dosyalar)}`,
+    `Yetkin, yasakların ve kuralların docs/roller/${dept}.md ile docs/roller/${dept}-kurallar.md dosyalarındadır; işe başlamadan önce onları oku.`,
+    'Açılış sırası: önce durum dosyanı oku (açılışta kanca yolunu gösterir), sonra Kanban panondaki kartlarına bak, sonra işe başla.',
+    calisanlar.length
+      ? `Müdür penceresisin: konu başına çalışan açarsın (${calisanlar.join(', ')}); çalışan sonucu yalnız sana döner (docs/standards/execution-method-standard.md §10.3).`
+      : `Müdür penceresisin: bu departmanın tanımlı çalışanı yok (skill setleri tablosunda satırı yok); işi kendin yürütürsün.`,
+  ]
+  return f.concat(govde).join('\n') + '\n'
+}
+
+/** { dosyaAdi: metin } — PENCERE_DEPARTMANLARI için; `roller` = rol-karti-uret.cjs ROLLER. */
+function uretPencere(setler, roller) {
+  const cikti = {}
+  for (const dept of PENCERE_DEPARTMANLARI) {
+    const rol = roller[dept]
+    if (!rol || !rol.gorev || !rol.dosyalar) throw new Error(`pencere tanımı: ROLLER içinde ${dept} kaydı (gorev, dosyalar) yok`)
+    cikti[pencereDosyaAdi(dept) + '.md'] = pencereTanimi(dept, rol, pencereCalisanlari(setler, dept))
   }
   return cikti
 }
@@ -137,7 +218,9 @@ function main() {
   const kok = path.resolve(__dirname, '..', '..')
   const setler = setleriOku(kok)
   const dizin = path.join(kok, AJAN_DIZINI)
-  const tanimlar = uret(setler)
+  const calisanlar = uret(setler)
+  const pencereler = uretPencere(setler, require('./rol-karti-uret.cjs').ROLLER)
+  const tanimlar = { ...calisanlar, ...pencereler }
   const yaz = process.argv.includes('--yaz')
   let fark = 0
   if (yaz) fs.mkdirSync(dizin, { recursive: true })
@@ -151,7 +234,8 @@ function main() {
   }
   // Öksüz: uret:false (ya da silinmiş) satırın eski çıktısı diskte kaldıysa.
   const beklenen = new Set(Object.keys(tanimlar))
-  const kalip = new RegExp(`^(${[...new Set(setler.setler.map((x) => String(x.dept).toLowerCase()))].map((d) => d.replace(/[-]/g, '\\-')).join('|')})-(arastirmaci|uygulayici|curutucu|dogrulayici)\\.md$`)
+  const departmanlar = new Set([...setler.setler.map((x) => String(x.dept).toLowerCase()), ...PENCERE_DEPARTMANLARI.map((d) => d.toLowerCase())])
+  const kalip = new RegExp(`^(${[...departmanlar].map((d) => d.replace(/[-]/g, '\\-')).join('|')})-(arastirmaci|uygulayici|curutucu|dogrulayici|pencere)\\.md$`)
   if (fs.existsSync(dizin)) {
     for (const f of fs.readdirSync(dizin)) {
       if (kalip.test(f) && !beklenen.has(f)) {
@@ -166,10 +250,29 @@ function main() {
   const etkinMi = (ad) => fs.existsSync(path.join(kok, '.claude', 'skills', ad, 'SKILL.md'))
   const s = sorunlar(setler, etkinMi, KULLANICI_DUZEYI)
   for (const x of s) console.error(`SORUN: ${x}`)
-  if (yaz) console.log(`${Object.keys(tanimlar).length} çalışan tanımı yazıldı`)
+  if (yaz) console.log(`${Object.keys(tanimlar).length} tanım yazıldı (${Object.keys(calisanlar).length} çalışan, ${Object.keys(pencereler).length} pencere)`)
   process.exit(fark || s.length ? 1 : 0)
 }
 
-module.exports = { uret, tanim, sorunlar, dosyaAdi, TURLER, TUR_MODEL, YAZMAYAN, KULLANICI_DUZEYI, AD_CAKISMASI, SETLER_YOLU, AJAN_DIZINI }
+module.exports = {
+  uret,
+  tanim,
+  sorunlar,
+  dosyaAdi,
+  TURLER,
+  TUR_MODEL,
+  YAZMAYAN,
+  KULLANICI_DUZEYI,
+  AD_CAKISMASI,
+  SETLER_YOLU,
+  AJAN_DIZINI,
+  uretPencere,
+  pencereTanimi,
+  pencereDosyaAdi,
+  pencereCalisanlari,
+  PENCERE_DEPARTMANLARI,
+  PENCERE_MODEL,
+  PENCERE_MODEL_VARSAYILAN,
+}
 
 if (require.main === module) main()

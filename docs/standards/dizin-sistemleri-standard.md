@@ -76,6 +76,13 @@ demesi, o ürünün **kendi** dizininde yokluğu, ya da o cevap için **hiç ara
   yalnız `/tr`); ürün, kategori, marka ağaçları, yeni şema bölümleri ve tanınmayan her adres ATILIR. Kalanın her adresi GET ile
   sınanır (yönlendirme takip edilmez, 200 ve kanonik = kendisi, değilse durur) ve yalnız onlar bildirilir; süzgeçsiz kip kapıdan
   geçemez (K4, karar 164 A). Boş küme ya da kalan > 15 = DUR. Kilit: `indexnowSuzgec.test.ts` (INV-INDEXNOW-SUZGEC-1).
+- **Yayın günü kipi (karar 327, 2026-10-09; SEO-27): `--yalniz-yeni <eski-adresler.json>`.** Bildirilecek küme = canlı site haritası −
+  yayından ÖNCE `adres-yayin-denetim.mjs` ile alınan taban haritası, yani yalnız ADRESİ DEĞİŞEN TR sayfalar (değişmeyenler
+  `--yalniz-degismeyen` ile zaten bildirildi). Bayrak AÇIK olmalı (kapıyı aşmaz). Fail-closed: taban boş/bozuk, yeni harita tabanla hiç
+  kesişmiyor, yeni adres yok (taban yayından sonra alınmış), TR dışı adres (Pazar günü yalnız TR), küme > 200 = DUR. Her adres GET ile
+  sınanır (yönlendirme takip edilmez, 200, kanonik = kendisi). `--yalniz-degismeyen` ile birlikte kullanılamaz. Kuru koşumun
+  `bildirilecek URL (yeni/degisen TR): N` satırı beklenen sayıya eşit olmalı (SEO-26). Kilit: `indexnowBetikKapisi.test.ts`
+  (saf mantık + bayrağı açık geçici ağaçta uçtan uca + iki mutasyonlu sabotaj).
   Ölçüm 2026-10-03 (canlıya karşı kuru koşu): sitemap 87 adres, 78 atıldı, 9 kaldı, 9'u 200 ve kanonik. Değişecek 78 adres yayın günü
   adres yayınıyla aynı yayında gider.
 - Kaynak: indexnow.org/documentation, /faq; blogs.bing.com/webmaster/May-2025/… (2025-05-19).
@@ -107,3 +114,4 @@ buradan yapılmaz.
 |---|---|---|
 | 2026-10-02 | SEO-1 dizin görünürlüğü (bot erişimi, sunucu HTML'i, Bing/Google dizini, konu sorguları, yapay zekâ arama aracı) | `docs/audits/dizin-gorunurluk-olcum-2026-10-02.md` |
 | 2026-10-02 | REC-300 yayın öncesi tabanlar (EN ad, Search Console, bağlantı, PSI) | `docs/audits/rec-300-taban-2026-10-02.md` |
+| 2026-10-09 | SEO-2 taban yenilemesi, 10-06 yayınından sonra (Search Console, bağlantı, PSI, canlı kapı) | `docs/audits/rec-300-taban-2026-10-09.md` |

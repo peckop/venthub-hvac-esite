@@ -1,0 +1,34 @@
+{
+  "_aciklama": "Adres matrisinin SABİT dinamik-segment örnekleri (OPS-52 PR-B). Betik sitemap'e SONRADAN BAKMAZ: canlı veri değişse de matris aynı adresleri sorar, fark yalnız sunucu davranışından gelir. Yeni dinamik rota (`[x]` içeren page.tsx) eklenirse buraya örnek girmeden betik ÇALIŞMAZ (sessizce atlamaz).",
+  "alinma": { "tarih": "2026-10-04", "kaynak": "https://venthub.com.tr/sitemap.xml", "not": "kategori/aile/marka: sitemap'teki ilk üçü. Bilgi merkezi: sitemap'te tek yazı var (frekans-konvertoru-nedir); ikisi YAYINDAN_KALKAN (geçici 307) davranışını ölçmek için eklendi. Dal/kök çiftleri sitemap'te düz listelenir; çift davranışı (404/308) matris ölçer, varsayılmaz. SONDAJ (sitemap'te YOK, uydurma ya da sitemap dışı; davranışı olduğu gibi ölçülür, 404 beklenebilir): /markalar/*, /kategori/*, /urun/* örnekleri (2026-10-04'te canlıda 404), /olmayan-sayfa-matris, tüm '…/ornek' kuyrukları (betik üretir), dört EN knowledge-hub yazı sluğu, dil çapraz bilgi merkezi örnekleri." },
+  "sablonlar": {
+    "/brands/[slug]": [{ "slug": "vortice" }, { "slug": "avens" }, { "slug": "seat" }],
+    "/markalar/[slug]": [{ "slug": "vortice" }, { "slug": "avens" }, { "slug": "seat" }],
+    "/category/[categorySlug]": [{ "categorySlug": "aksesuarlar" }, { "categorySlug": "fanlar" }, { "categorySlug": "hava-perdeleri" }],
+    "/category/[categorySlug]/[subCategorySlug]": [
+      { "categorySlug": "fanlar", "subCategorySlug": "aksiyel-sanayi-fanlari" },
+      { "categorySlug": "fanlar", "subCategorySlug": "radyal-fanlar" },
+      { "categorySlug": "kontrol-sistemleri", "subCategorySlug": "frekans-konvertorleri" }
+    ],
+    "/kategori/[kok]/[[...dal]]": [
+      { "kok": "aksesuarlar" },
+      { "kok": "fanlar" },
+      { "kok": "kontrol-sistemleri" },
+      { "kok": "kontrol-sistemleri", "dal": "frekans-konvertorleri" }
+    ],
+    "/products/[slug]": [{ "slug": "avens-siginak-havalandirma-uniteleri" }, { "slug": "avens-bvu-ls" }, { "slug": "avens-dikdortgen-kanal-radyal" }],
+    "/urun/[slug]": [{ "slug": "avens-siginak-havalandirma-uniteleri" }, { "slug": "avens-bvu-ls" }, { "slug": "avens-dikdortgen-kanal-radyal" }],
+    "/bilgi-merkezi/[yazi]": [{ "yazi": "frekans-konvertoru-nedir" }, { "yazi": "hava-perdesi" }, { "yazi": "otopark-jet-fan" }],
+    "/knowledge-hub/[yazi]": [{ "yazi": "frequency-converter-guide" }, { "yazi": "air-curtain" }, { "yazi": "car-park-jet-fan" }]
+  },
+  "dilsizOrnekler": [
+    "/", "/about", "/contact", "/hakkimizda", "/iletisim", "/cart", "/account", "/checkout", "/auth/login",
+    "/destek/sss", "/destek/hesaplayicilar", "/legal/kvkk", "/urun-secici", "/brands", "/products",
+    "/bilgi-merkezi", "/category/fanlar", "/urunler"
+  ],
+  "dilliEkOrnekler": [
+    "/tr/hakkimizda", "/en/hakkimizda", "/tr/iletisim", "/en/iletisim", "/tr/olmayan-sayfa-matris", "/en/olmayan-sayfa-matris",
+    "/tr/destek", "/tr/destek/konular/hava-perdesi"
+  ],
+  "dosyalar": ["/robots.txt", "/sitemap.xml"]
+}

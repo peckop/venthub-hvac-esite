@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { yayindaModuluSahtele } from '@/config/__tests__/yayindaTestKiti'
+
 /**
  * INV-SITEMAP-MODEL-1 — aktif MODELLER site haritasına girer, YALNIZ adres şeması bayrağı AÇIKKEN
  * (REC-300 Faz 3e-2, OPS hükmü 2026-10-02: model `lastModified` = `products.updated_at`, migration yok).
@@ -56,6 +58,17 @@ async function harita(kosul: Kosul) {
     EN_YAYIN: kosul.enYayin,
     ADRES_SEMASI_K3B: kosul.k3b,
   }))
+  // URN-31: haritaya yalnız yayındaki listedeki modeller girer. Bu dosya "tüm aktif modeller" davranışını ölçer →
+  // fikstürdeki HER SKU listeye alınır (adres metni = aile slug'ı); liste süzgeci: sitemapYayindaModel.test.ts.
+  const liste = {
+    modeller: Object.fromEntries(
+      kosul.aileler.map((a) => [a.slug, Object.fromEntries(a.products.map((p) => [p.sku, { tr: a.slug, en: a.slug }]))]),
+    ),
+    surumler: {},
+  }
+  vi.doMock('@/config/yayindaModeller', async (orijinal) =>
+    yayindaModuluSahtele(await orijinal<typeof import('@/config/yayindaModeller')>(), () => liste),
+  )
   vi.doMock('@/lib/supabase/static', () => {
     const zincir = {
       select: () => zincir,
@@ -81,6 +94,8 @@ async function harita(kosul: Kosul) {
   vi.doMock('@/lib/services/family.service', async (orijinal) => ({
     ...(await orijinal<typeof import('@/lib/services/family.service')>()),
     getAllFamilySlugs: async () => kosul.aileler.map((a) => ({ slug: a.slug })),
+    // OPS-51: marka ürün sayısı ENJEKTE (DB yerine; gerçek sayım ayrı RPC'dir ve bu dosyanın `product_families` sayacını bozmasın).
+    getBrandFamilyCount: async () => 5,
   }))
   const { SITE_URL } = await import('../../config/siteUrl')
   const { default: sitemap } = await import('../sitemap')
@@ -94,6 +109,7 @@ describe('INV-SITEMAP-MODEL-1 — aktif modeller site haritasında, yalnız bayr
   afterEach(() => {
     vi.unstubAllEnvs()
     vi.doUnmock('@/config/features')
+    vi.doUnmock('@/config/yayindaModeller')
     vi.doUnmock('@/lib/supabase/static')
     vi.doUnmock('@/lib/services/category.service')
     vi.doUnmock('@/lib/services/family.service')
@@ -129,12 +145,13 @@ describe('INV-SITEMAP-MODEL-1 — aktif modeller site haritasında, yalnız bayr
       }
     })
 
-    it('her model satırı modelin KENDİ updated_at tarihini taşır; changefreq weekly, priority 0.8', async () => {
+    it('her model satırı modelin KENDİ updated_at tarihini taşır; changefreq YOK (REC-498), priority 0.8', async () => {
       const { satirlar } = await harita({ aileler: fikstur(), enYayin: false, k3b: true })
       for (let n = 1; n <= AKTIF_MODEL; n++) {
         const satir = satirlar.find((s) => s.url.endsWith(`-p-${sku(n).toLowerCase()}`))
         expect(satir?.lastModified && new Date(satir.lastModified).toISOString(), sku(n)).toBe(damga(n))
-        expect((satir as { changefreq?: string }).changefreq).toBe('weekly')
+        expect(satir && 'changefreq' in satir).toBe(false)
+        expect(satir && 'changeFrequency' in satir).toBe(false)
         expect(satir?.priority).toBe(0.8)
       }
     })
@@ -171,7 +188,7 @@ describe('INV-SITEMAP-MODEL-1 — aktif modeller site haritasında, yalnız bayr
         })
         expect(modelSatirlari(modelli.satirlar)).toEqual([])
         expect(modelli.satirlar.some((s) => s.url.includes('?sku='))).toBe(false)
-        // TÜM satır (url, lastModified, alternates, changefreq, priority) birebir: bayrak kapalıyken model verisi çıktıya sızmaz.
+        // TÜM satır (url, lastModified, alternates, priority) birebir: bayrak kapalıyken model verisi çıktıya sızmaz.
         expect(modelli.satirlar).toEqual(modelsiz.satirlar)
       })
     }

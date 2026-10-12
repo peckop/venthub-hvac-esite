@@ -1,9 +1,30 @@
+import { createRequire } from "node:module"
+
 import react from "@vitejs/plugin-react"
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - NodeJS path module is available in the Vite environment but may lack explicit root types in some environments
 import * as path from "path"
 import type { PluginOption } from 'vite';
 import { defineConfig } from "vitest/config"
+
+// ALT-38: dünya durumu testleri (liste: scripts/ci/dunya-durumu-testleri.json) PR kapısından çıkar.
+// `VENTHUB_DUNYA_DURUMU` boşsa TAM paket (yerel `pnpm test`, master push); `dislan` ise listedekiler dışarıda
+// (yalnız pull_request olayında `ci` işi); `yalniz` ise yalnız onlar (zamanlı dunya-durumu.yml).
+// Geçersiz değer FIRLATIR — sessizce "tam"a düşen bir yazım hatası kapıyı gizlice kaldırırdı.
+const dunyaDurumu = (createRequire(import.meta.url)("./scripts/ci/dunya-durumu.cjs") as {
+  ayar: (env: NodeJS.ProcessEnv) => { exclude: string[]; include: string[] | null; uyari?: string }
+}).ayar(process.env)
+// `dislan` yalnız TABANDA (base dalı) da yazılı kayıtları dışlar; taban okunamazsa hiçbir şey dışlanmaz (TAM paket koşar) ve neden burada
+// SESSİZ kalmaz: yazılmazsa "dışlama çalışıyor" sanılır ama her PR'da tam paket koşardı (ALT-38a B3).
+if (dunyaDurumu.uyari) process.stderr.write(`[dunya-durumu] ${dunyaDurumu.uyari}\n`)
+
+// ALT-38c-2: `VENTHUB_TEST_SHARD_DOSYALARI` (JSON liste dosyası) doluysa YALNIZ o listedeki test dosyaları koşar (ci.yml `test-shard` işleri; liste
+// scripts/ci/test-shard.cjs ile üretilir, parçaların birleşimi TÜM paketin listesidir: INV-CI-SHARD-2). Boşsa (yerel `pnpm test`, master push, edited,
+// zamanlı koşu) hiçbir şey değişmez. Bozuk/boş liste FIRLATIR: sessizce tam pakete ya da boş pakete düşmez.
+const shardInclude = (createRequire(import.meta.url)("./scripts/ci/test-shard.cjs") as {
+  ortamdanInclude: (env: NodeJS.ProcessEnv) => string[] | null
+}).ortamdanInclude(process.env)
+if (shardInclude && dunyaDurumu.include) throw new Error("VENTHUB_TEST_SHARD_DOSYALARI ile VENTHUB_DUNYA_DURUMU=yalniz birlikte kullanılamaz")
 
 export default defineConfig({
   plugins: [react() as PluginOption],
@@ -40,7 +61,9 @@ export default defineConfig({
     // Burada kalsaydı `ci`'nin Test adımı onu sunucusuz toplayıp kırmızı verirdi.
     // Eskiden buradaydı ve `describe.skipIf` ile SIFIR test topluyordu — yani
     // kilit hiç koşmadı ve kontrol listesinde yeşil göründü.
-    exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/empirical_*.test.ts', 'tests/smoke/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/empirical_*.test.ts', 'tests/smoke/**', ...dunyaDurumu.exclude],
+    ...(dunyaDurumu.include ? { include: dunyaDurumu.include } : {}),
+    ...(shardInclude ? { include: shardInclude } : {}),
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',
     testTimeout: 20000,

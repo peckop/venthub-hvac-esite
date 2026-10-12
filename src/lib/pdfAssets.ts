@@ -11,6 +11,19 @@ export function getAbsoluteAssetUrl(path: string): string {
     return new URL(path, base).toString();
 }
 
+/**
+ * Föyün alt bilgisinde basılan alan adı (şemasız).
+ *
+ * NİÇİN `SITE_URL` DEĞİL: föy TARAYICIDA üretilir; `SITE_URL` `process.env` okur ve tarayıcıda env boştur
+ * (`NEXT_PUBLIC_SITE_URL` prod'da tanımsız), yani değer `http://localhost:3000`'a düşer. 2026-10-09'da canlı
+ * pakette ölçüldü: indirilen her föyün alt bilgisi "localhost:3000" basıyordu. Tarayıcıda gerçek adres zaten
+ * `window.location`'dır (`getAbsoluteAssetUrl` de aynısını yapar); `SITE_URL` yalnız sunucu tarafı yedeğidir.
+ */
+export function getPdfSiteHost(): string {
+    const host = typeof window !== 'undefined' && window.location ? window.location.host : '';
+    return host || SITE_URL.replace(/^https?:\/\//, '');
+}
+
 // Roboto font URLs from reliable local server (for runtime loading and CSP compliance)
 export const PDF_FONTS = {
     Roboto: {
@@ -18,6 +31,75 @@ export const PDF_FONTS = {
         bold: '/fonts/Roboto-Bold.ttf'
     }
 };
+
+/**
+ * URN-123: föye gömülecek yazı tipi dosyasının İMZA denetimi (`response.ok` bunu GÖRMEZ).
+ *
+ * NİÇİN: `public/fonts/Roboto-*.ttf` 7 Haziran'dan 11 Ekim'e kadar yazı tipi değil HTML'di (ilk baytlar satır
+ * sonu + `<!DOCTYPE html>`). Sunucu bunları HTTP 200 + `font/ttf` ile veriyordu: `fetch` reddedilmedi, `!ok`
+ * olmadı, gövde jsPDF'e gitti. jsPDF `addFont` hatasını olay yöneticisinde YUTAR (fırlatmaz), PDF yine üretilir
+ * ve Türkçe harfler bozuk çıkar. Güvenilir ölçüt gövdenin kendisidir.
+ *
+ * KABUL: sfnt 1.0 (`00 01 00 00`) ya da Apple `true`. `OTTO` (CFF) KABUL EDİLMEZ: jsPDF `glyf`/`loca` okur,
+ * CFF'de bu tablolar yoktur. Zorunlu tablolar jsPDF'in okuduklarıdır; tablo konumu dosya sınırını aşıyorsa
+ * (kesik indirme) de red.
+ */
+export type YaziTipiDenetimi = { gecerli: true } | { gecerli: false; sebep: string };
+
+const SFNT_SURUM_1 = 0x00010000;
+const SFNT_TRUE = 0x74727565; // 'true'
+const ZORUNLU_TABLOLAR = ['cmap', 'glyf', 'head', 'hhea', 'hmtx', 'loca', 'maxp'] as const;
+
+export function yaziTipiDenetle(bayt: Uint8Array): YaziTipiDenetimi {
+    if (bayt.byteLength < 12) {
+        return { gecerli: false, sebep: `dosya çok kısa (${bayt.byteLength} bayt)` };
+    }
+    const gorunum = new DataView(bayt.buffer, bayt.byteOffset, bayt.byteLength);
+    const imza = gorunum.getUint32(0);
+    if (imza !== SFNT_SURUM_1 && imza !== SFNT_TRUE) {
+        return { gecerli: false, sebep: `yazı tipi imzası yok (ilk dört bayt ${imza.toString(16).padStart(8, '0')})` };
+    }
+    const tabloSayisi = gorunum.getUint16(4);
+    if (tabloSayisi === 0 || 12 + 16 * tabloSayisi > bayt.byteLength) {
+        return { gecerli: false, sebep: `tablo dizini bozuk (${tabloSayisi} tablo, ${bayt.byteLength} bayt)` };
+    }
+    const tablolar = new Map<string, { konum: number; uzunluk: number }>();
+    for (let i = 0; i < tabloSayisi; i++) {
+        const kayit = 12 + 16 * i;
+        const etiket = String.fromCharCode(
+            gorunum.getUint8(kayit), gorunum.getUint8(kayit + 1), gorunum.getUint8(kayit + 2), gorunum.getUint8(kayit + 3),
+        );
+        tablolar.set(etiket, { konum: gorunum.getUint32(kayit + 8), uzunluk: gorunum.getUint32(kayit + 12) });
+    }
+    for (const etiket of ZORUNLU_TABLOLAR) {
+        const tablo = tablolar.get(etiket);
+        if (!tablo) return { gecerli: false, sebep: `zorunlu tablo yok: ${etiket}` };
+        if (tablo.konum + tablo.uzunluk > bayt.byteLength) {
+            return { gecerli: false, sebep: `tablo dosya sınırını aşıyor: ${etiket} (dosya kesik)` };
+        }
+    }
+    return { gecerli: true };
+}
+
+/**
+ * URN-123: YEDEK yol (gömülü Roboto yüklenemedi) için metin uyarlaması.
+ *
+ * jsPDF'in standart yazı tipleri (Helvetica…) WinAnsi kodlar: ö ü ç Ö Ü Ç VAR, ğ Ğ ş Ş ı İ YOK ve jsPDF bu
+ * altı harfi 2 baytlık UTF-16 yazar (jsPDF 4.2.1'de bellekte ölçüldü) — PDF'te bozuk glif çıkar. Yedekte
+ * bu altı harf ASCII karşılığıyla basılır: yanlış harf yerine okunabilir harf. Gömülü Roboto'da DOKUNULMAZ.
+ */
+const WINANSI_DISI_HARFLER: Record<string, string> = {
+    'ğ': 'g', // ğ
+    'Ğ': 'G', // Ğ
+    'ş': 's', // ş
+    'Ş': 'S', // Ş
+    'ı': 'i', // ı
+    'İ': 'I', // İ
+};
+
+export function standartYaziTipiMetni(metin: string): string {
+    return metin.replace(/[ğĞşŞıİ]/g, (harf) => WINANSI_DISI_HARFLER[harf] ?? harf);
+}
 
 export const PDF_COLORS = {
     primary: [27, 43, 75],     // Navy #1B2B4B

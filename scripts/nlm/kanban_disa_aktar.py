@@ -17,9 +17,18 @@ completedAt/labels/notes):
   · sonAnlamli = en geç not / tamamlanma / açılış tarihi (updatedAt bilerek KULLANILMAZ: toplu bakım yaşı tazelemesin).
   · Recep kapısı = "Recep kapısı" etiketi.
 
+--tam (HRT-28, ARC-30 isteği): kayıtlara kartın `description` metni ve `notes` listesi (author, content, createdAt) da
+eklenir; "ÖNCEKİ ÇALIŞMA" gibi kart İÇİ bilgiler aranabilsin diye. `completedAt` (kartın Done'a geçtiği an; HRT-44) da yalnız --tam ile
+çıkar: "bugün Done oldu" sorusunun cevabı sonAnlamli değildir (eski bir karta bugün düşülen not onu bugüne taşır). `doneAt` kartın Done
+kolonuna son taşınma anıdır (kanban_events 'task.moved'): completedAt yalnız status=completed iken yazıldığı için Done kolonundaki
+arşivli kartlarda boştur. `id` kartın tam kimliğidir (numara tekil değil: 75 numara birden fazla kartta geçiyor, 10-09 ölçümü).
+Bayrak yoksa çıktı bayt bayt aynıdır. İçerik taşıyan çıktı
+depoya sızmasın diye: --tam ile --hedef depo içinde git'in yok saymadığı (izlenebilir) bir yolsa betik YAZMAZ, çıkış 2.
+Hedefsiz (stdout) kullanım ve depo dışı hedef serbesttir.
+
 Kullanım:
-  python scripts/nlm/kanban_disa_aktar.py [--db <sqlite>] [--hedef <json>]   → hedef yoksa stdout
-Çıkış kodu: 0 başarı · 2 pano dosyası yok/okunamadı (sessizlik "sıfır kayıt" ile karışmasın).
+  python scripts/nlm/kanban_disa_aktar.py [--db <sqlite>] [--hedef <json>] [--tam]   → hedef yoksa stdout
+Çıkış kodu: 0 başarı · 2 pano dosyası yok/okunamadı ya da --tam hedefi izlenebilir (sessizlik "sıfır kayıt" ile karışmasın).
 """
 import argparse, datetime, json, os, re, sqlite3, subprocess, sys
 
@@ -65,11 +74,60 @@ def son_anlamli(kart):
     return max(adaylar) if adaylar else None
 
 
-def kayitlar(yol):
+def tam_alanlar(kart, done_ani=None):
+    """--tam: kart içi metin. Alan yoksa boş ('' / []), şema kayması sessizce None üretmesin.
+    `doneAt` (HRT-44): kartın Done kolonuna SON taşınma anı (kanban_events). completedAt yalnız status=completed iken yazılır;
+    Done kolonundaki arşivli kartlarda (10-09 ölçümü: 240 Done kartın 83'ü) boştur, gün tespiti doneAt'e düşer."""
+    notlar = [
+        {"author": n.get("author"), "content": n.get("content") or "", "createdAt": n.get("createdAt")}
+        for n in (kart.get("notes") or []) if isinstance(n, dict)
+    ]
+    return {"id": kart.get("id"), "description": kart.get("description") or "", "completedAt": kart.get("completedAt"),
+            "doneAt": done_ani, "notes": notlar}
+
+
+def done_anlari(db):
+    """{taskId: Done kolonuna son taşınma anı (ISO)} — kanban_events 'task.moved' (after.columnId == done). Tablo ya da olay yoksa {}
+    (eski/sade pano dosyası; çağıran doneAt'i None bırakır, sayaç bunu 'tarihsiz' diye işaretler)."""
+    try:
+        satirlar = db.execute("select payload from kanban_events where payload like '%task.moved%' order by seq").fetchall()
+    except sqlite3.Error:
+        return {}
+    son = {}
+    for (yuk,) in satirlar:
+        try:
+            e = json.loads(yuk)
+        except ValueError:
+            continue
+        if e.get("type") != "task.moved" or ((e.get("after") or {}).get("columnId")) != "done":
+            continue
+        if e.get("taskId") and e.get("ts"):
+            son[e["taskId"]] = max(son.get(e["taskId"], ""), e["ts"])
+    return son
+
+
+def hedef_izlenebilir(hedef):
+    """True = hedef depo içinde ve git onu yok saymıyor (içerik PUBLIC depoya girebilir). Ölçülemezse True (kapalı güvenli)."""
+    yol = os.path.realpath(hedef)
+    kok = os.path.realpath(REPO)
+    try:
+        if os.path.commonpath([os.path.normcase(yol), os.path.normcase(kok)]) != os.path.normcase(kok):
+            return False   # depo dışı
+    except ValueError:   # farklı sürücü
+        return False
+    try:
+        r = subprocess.run(["git", "-C", REPO, "check-ignore", "-q", yol], capture_output=True, timeout=10)
+    except Exception:
+        return True
+    return r.returncode != 0   # 0 = yok sayılıyor; 1 = izlenebilir; 128 = hata (kapalı güvenli: izlenebilir say)
+
+
+def kayitlar(yol, tam=False):
     """[(kayit, ...)] — her kart bir kayıt. Okunamazsa istisna (çağıran 2 ile çıkar)."""
     db = sqlite3.connect(f"file:{yol}?mode=ro", uri=True, timeout=5)
     try:
         satirlar = db.execute("select payload from kanban_boards").fetchall()
+        done_ani = done_anlari(db) if tam else {}
     finally:
         db.close()
     cikti = []
@@ -82,7 +140,7 @@ def kayitlar(yol):
             baslik = k.get("title") or ""
             m = NUMARA.search(baslik[:60])
             etiketler = list(k.get("labels") or [])
-            cikti.append({
+            kayit = {
                 "identifier": m.group(1) if m else (k.get("id") or "?")[:8],
                 "title": baslik,
                 "status": SUTUN.get(k.get("columnId"), "?"),
@@ -94,15 +152,18 @@ def kayitlar(yol):
                 "blockedBy": [],
                 "createdAt": k.get("createdAt"),
                 "sonAnlamli": son_anlamli(k),
-            })
+            }
+            if tam:
+                kayit.update(tam_alanlar(k, done_ani.get(k.get("id"))))
+            cikti.append(kayit)
     return cikti
 
 
-def disa_aktar(yol):
+def disa_aktar(yol, tam=False):
     return {
         "kaynak": "Kanban",
         "damga": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "kayitlar": kayitlar(yol),
+        "kayitlar": kayitlar(yol, tam),
     }
 
 
@@ -114,13 +175,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--db")
     ap.add_argument("--hedef")
+    ap.add_argument("--tam", action="store_true", help="description ve notes alanları da çıksın (varsayılan: çıkmaz)")
     a = ap.parse_args()
+    if a.tam and a.hedef and hedef_izlenebilir(a.hedef):
+        print(f"HATA: --tam çıktısı depoda izlenebilir bir yola yazılamaz (repo PUBLIC, kart içeriği sızar): {a.hedef}. "
+              "Depo dışı bir yol ya da .gitignore'daki bir dizin (ör. tmp/) verin.", file=sys.stderr)
+        sys.exit(2)
     yol = pano_dosyasi(a.db)
     if not os.path.exists(yol):
         print(f"HATA: pano dosyası yok: {yol}", file=sys.stderr)
         sys.exit(2)
     try:
-        d = disa_aktar(yol)
+        d = disa_aktar(yol, a.tam)
     except Exception as e:  # ölçülemedi ≠ sıfır kayıt
         print(f"HATA: pano okunamadı: {e}", file=sys.stderr)
         sys.exit(2)

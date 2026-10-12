@@ -110,9 +110,24 @@ function istemci(kok) {
   return { surec, istek, bildir }
 }
 
+/**
+ * ⭐HATA ZARFI (ARC-106, WrongStack 1.1.0 ölçümü 12 Ekim): geçersiz argümanı 1.0.26 JSON-RPC `error` ile döner,
+ * 1.1.0 AYNI mesajı `result.isError=true` + düz metin olarak döner. Yalnız `mesaj.error`a bakmak 1.1.0'da geçersiz
+ * priority/checkType/assignee'yi SESSİZ yutar (veri=null, atma yok). İki zarf da burada fırlatılır.
+ */
+function mcpHatasi(mesaj, ad) {
+  if (mesaj.error) return new Error(`${ad}: ${JSON.stringify(mesaj.error).slice(0, 200)}`)
+  if (mesaj.result?.isError) {
+    const metin = mesaj.result.content?.[0]?.text ?? 'isError (metin yok)'
+    return new Error(`${ad}: ${String(metin).slice(0, 200)}`)
+  }
+  return null
+}
+
 async function arac(c, args) {
   const { mesaj, bayt } = await c.istek('tools/call', { name: 'kanban_manage', arguments: args })
-  if (mesaj.error) throw new Error(`${args.action}: ${JSON.stringify(mesaj.error).slice(0, 200)}`)
+  const hata = mcpHatasi(mesaj, args.action)
+  if (hata) throw hata
   const metin = mesaj.result?.content?.[0]?.text ?? ''
   let veri = null
   try {
@@ -142,6 +157,8 @@ async function panoOzeti(boardId) {
       name: 'kanban_read',
       arguments: { action: 'get_board', boardId, includeTasks: true },
     })
+    const okumaHatasi = mcpHatasi(mesaj, 'get_board')
+    if (okumaHatasi) throw okumaHatasi
     const veri = JSON.parse(mesaj.result?.content?.[0]?.text ?? '{}')
     const gorevler = veri.board?.tasks ?? []
     const say = {}
@@ -176,6 +193,8 @@ async function yenidenDegerlendir(boardId) {
       name: 'kanban_read',
       arguments: { action: 'get_board', boardId, includeTasks: true },
     })
+    const panoHatasi = mcpHatasi(pano.mesaj, 'get_board')
+    if (panoHatasi) throw panoHatasi
     bayt += pano.bayt
     const gorevler = (JSON.parse(pano.mesaj.result?.content?.[0]?.text ?? '{}').board?.tasks ?? []).filter(
       (g) => g.status !== 'completed' && g.status !== 'archived',
@@ -285,4 +304,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { siraDenetle, kontrolDenetle, istemci, arac }
+module.exports = { siraDenetle, kontrolDenetle, istemci, arac, mcpHatasi }

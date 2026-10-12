@@ -5,9 +5,14 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { modellerdenVeri, yayindaVeriAyarla } from '../../config/__tests__/yayindaTestKiti'
 import { modelBaglantiAdresi } from '../yuzeyAdresleri'
+
+// URN-31: model adresi yalnız yayındaki listedeki SKU için üretilir (adres metni listeden).
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() => yayindaVeriAyarla(modellerdenVeri([{ aile: 'avens-bvu-ls', sku: 'ABC-1', tr: 'avens-bvu-ls', en: 'avens-bvu-ls' }])))
 
 describe('modelBaglantiAdresi', () => {
   it('KAPALI: aile adresi + ?sku= (model sayfası yokken var olan sayfaya gider), her iki dilde', () => {

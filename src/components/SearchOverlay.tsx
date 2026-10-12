@@ -356,11 +356,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         </div>
         <div className="flex-1">
           <div className="text-sm font-medium text-industrial-gray">{highlightMatch(label || '', debounced)}</div>
-          {s.type === 'product' && (s.metadata as Record<string, string>)?.sku && (
+          {/* URN-32: ürün önerisinin altında yalnız MARKA yazılır — eskiden `marka • sku` basılıyordu
+              (müşteriye iç kod). Öneri satırı model kodu taşımıyor; "kodu olmayan satırı hiç çizme"
+              hükmü (getProductModelLabel) gereği kod yerine hiçbir şey konmaz. INV-SKU-GORUNMEZ-1. */}
+          {s.type === 'product' && (s.metadata as Record<string, string>)?.brand && (
             <div className="text-xs text-steel-gray mt-0.5">
-              {(s.metadata as Record<string, string>).brand && <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>}
-              {(s.metadata as Record<string, string>).brand && (s.metadata as Record<string, string>).sku && <span> • </span>}
-              {highlightMatch((s.metadata as Record<string, string>).sku, debounced)}
+              <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>
             </div>
           )}
         </div>
@@ -519,11 +520,13 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                     )}
                     <div>
                       <div className="font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">{highlightMatch(r.name, debounced)}</div>
-                      <div className="text-xs text-steel-gray flex items-center gap-1.5 mt-0.5">
-                        {r.brand && <span className="font-semibold text-slate-600">{highlightMatch(r.brand, debounced)}</span>}
-                        {r.brand && <span className="text-gray-300">•</span>}
-                        <span>{highlightMatch(r.sku, debounced)}</span>
-                      </div>
+                      {/* URN-32: sonuç satırında yalnız MARKA; eskiden `marka • sku` basılıyordu (iç kod).
+                          Arama RPC'si `model_code` döndürmüyor → kod yerine hiçbir şey çizilmez. */}
+                      {r.brand && (
+                        <div className="text-xs text-steel-gray flex items-center gap-1.5 mt-0.5">
+                          <span className="font-semibold text-slate-600">{highlightMatch(r.brand, debounced)}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className={`transition-opacity flex items-center gap-2 ${isActive ? 'opacity-100 text-primary-navy' : 'opacity-0 text-primary-ocean group-hover:opacity-100'}`}>

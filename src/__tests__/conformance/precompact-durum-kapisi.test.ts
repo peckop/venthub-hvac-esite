@@ -261,3 +261,87 @@ describe('INV-COMPACT-1 — PreCompact durum kapısı', () => {
     expect(m.MEMORY_ESIK_BAYT).toBe(25000)
   })
 })
+
+/**
+ * INV-COMPACT-2 · Özet yönergesi (ARC-69, karar 321): otomatik compact uyarısız gelir; kapı durum dosyasının
+ * SON bloğunu "özete AYNEN taşı" yönergesiyle stdout'a da yazar (PreCompact stdout'u özet talimatı olarak işlenir,
+ * 10-08 denemesinde kancanın cümlesi özete aynen geçti). Bayatsa (30 dk) dönüşte ilk işin son konuşma dökümünü
+ * okumak olduğunu söyler. Yönerge uzunluğu sınırlıdır (SessionStart 4500 karakterde bloğu ortadan kesiyordu).
+ */
+describe('INV-COMPACT-2 — özet yönergesi', () => {
+  const ESKI_BLOK = '## ESKI GUN\n**SON GIRDI:** ESKI-BLOK-ISARETI eski gunun isi\n'
+  const YENI_BLOK = '## YENI GUN\n**SON GIRDI:** YENI-BLOK-ISARETI son is\n**ACIK KUYRUK:** iki kalem\n**VERILEN SOZLER:** rapor\n**BEKLEYEN KARARLAR:** yok\n'
+  const front = `---\nname: kol-lane-day\nmetadata:\n  originSessionId: ${SID}\n---\n\n`
+
+  const yaslandir = (kok: string, ad: string, dakika: number) =>
+    nodeKos(`
+      const fs=require('fs'),path=require('path');
+      const y=path.join(${JSON.stringify(kok)},'memory',${JSON.stringify(ad)});
+      const t=new Date(Date.now()-${dakika}*60000); fs.utimesSync(y,t,t);
+    `)
+
+  it('SON BLOK AYNEN yazılır: yönerge işareti ve sınırlayıcı satırlar var, eski blok yok', () => {
+    const { transcript } = projeKur([['kol-lane-day-2026-10-10.md', front + ESKI_BLOK + '\n' + YENI_BLOK]])
+
+    const r = kapiKos(transcript)
+
+    expect(r.status, 'yönerge compact\'ı BLOKLAMAMALI').toBe(0)
+    expect(r.stdout).toMatch(/OZET YONERGESI[^\n]*kol-lane-day-2026-10-10\.md[^\n]*SON blogudur/)
+    expect(r.stdout).toContain('AYNEN tasi')
+    const bas = r.stdout.indexOf('<<<DURUM-DOSYASI-SON-BLOK')
+    const son = r.stdout.indexOf('DURUM-DOSYASI-SON-BLOK>>>')
+    expect(bas, 'açılış sınırlayıcısı yok').toBeGreaterThanOrEqual(0)
+    expect(son, 'kapanış sınırlayıcısı yok').toBeGreaterThan(bas)
+    const blok = r.stdout.slice(bas, son)
+    expect(blok, 'son blok içeriği yok').toContain('YENI-BLOK-ISARETI')
+    expect(blok, 'ESKİ blok özete taşınıyor (yalnız SON blok olmalı)').not.toContain('ESKI-BLOK-ISARETI')
+  })
+
+  it('TAZE dosyada bayat notu YOK; 30 dakikadan eskide VAR ve son-konusma dökümünü gösterir', () => {
+    const { transcript, kok } = projeKur([['kol-lane-day-2026-10-10.md', front + YENI_BLOK]])
+    const taze = kapiKos(transcript)
+    expect(taze.stdout, 'taze dosyada bayat notu çıktı').not.toContain('DURUM DOSYASI BAYAT')
+
+    yaslandir(kok, 'kol-lane-day-2026-10-10.md', 45)
+    const bayat = kapiKos(transcript)
+    expect(bayat.status).toBe(0)
+    expect(bayat.stdout, '45 dk eski dosyada bayat notu yok').toContain('DURUM DOSYASI BAYAT')
+    expect(bayat.stdout, 'son konuşma dökümünün adı yok').toContain(`son-konusma-${SID}.md`)
+    expect(bayat.stdout, 'ilk iş yönergesi yok').toMatch(/ILK IS/)
+  })
+
+  it('UZUN BLOK kırpılır: başı ve sonu korunur, kırpma söylenir, yönerge sınırı aşılmaz', () => {
+    // sonBlok en çok 60 satır verir (var olan davranış): başlık + 1 + 55 + 1 = 58 satır, hepsi içeride.
+    const uzunGovde = Array.from({ length: 55 }, (_, i) => `satir-${i} ${'x'.repeat(180)}`).join('\n')
+    const uzun = '## UZUN\n**SON GIRDI:** BAS-ISARETI\n' + uzunGovde + '\n**VERILEN SOZLER:** SON-ISARETI\n'
+    const { transcript } = projeKur([['kol-lane-day-2026-10-10.md', front + uzun]])
+
+    const r = kapiKos(transcript)
+
+    const bas = r.stdout.indexOf('<<<DURUM-DOSYASI-SON-BLOK')
+    const son = r.stdout.indexOf('DURUM-DOSYASI-SON-BLOK>>>')
+    const blok = r.stdout.slice(bas, son)
+    expect(blok).toContain('BAS-ISARETI')
+    expect(blok, 'kırpma blok sonunu yutmuş').toContain('SON-ISARETI')
+    expect(blok, 'kırpma söylenmiyor').toMatch(/karakter kirpildi/)
+    const m = require_(KAPI) as { YONERGE_MAX_KARAKTER?: number }
+    expect(typeof m.YONERGE_MAX_KARAKTER).toBe('number')
+    // 2800 üst sınır + sınırlayıcılar + kırpma notu için pay.
+    expect(blok.length, 'yönerge bloğu sınırı aştı').toBeLessThan((m.YONERGE_MAX_KARAKTER ?? 0) + 250)
+  })
+
+  it('YÖNERGE eşiği kodda sayıyla durur ve uyarı eşiğinden (60) AYRIDIR', () => {
+    const m = require_(KAPI) as { YONERGE_BAYAT_DK?: number; BAYAT_ESIK_DK?: number }
+    expect(m.YONERGE_BAYAT_DK).toBe(30)
+    expect(m.BAYAT_ESIK_DK, 'uyarı eşiği değişti: ölçüm 2026-08-28 60 dk der').toBe(60)
+  })
+
+  it('TEMİZ kapı satırı korunur: yönerge eklenince uyarı simgesi ⚠ çıkmaz', () => {
+    const { transcript } = projeKur([['kol-lane-day-2026-10-10.md', TAM_DURUM]])
+
+    const r = kapiKos(transcript)
+
+    expect(r.stdout).toMatch(/TEMIZ/)
+    expect(r.stdout, 'yönerge her koşumda öten uyarı satırı üretmemeli').not.toMatch(/⚠/)
+  })
+})

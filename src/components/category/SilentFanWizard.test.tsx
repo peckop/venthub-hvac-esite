@@ -159,6 +159,25 @@ describe('sonuç ekranı', () => {
     expect(screen.queryByText('silentFanWizard.badgeBest')).toBeNull()
   })
 
+  it('⭐3 noktalı eğri: kart "yaklaşık" notu ve etiketi taşır, 5 noktalıda not yok (karar 316/317)', async () => {
+    getWizardCandidatesMock.mockResolvedValue([ADAYLAR[0]])
+    const ilk = ac()
+    fireEvent.click(screen.getByText('silentFanWizard.skipToResult'))
+    await waitFor(() => expect(screen.getByText('silentFanWizard.badgeBest')).toBeTruthy())
+    expect(screen.getAllByText('silentFanWizard.cardApproxCurve').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('silentFanWizard.cardDeliversApprox').length).toBeGreaterThan(0)
+    ilk.unmount()
+
+    getWizardCandidatesMock.mockResolvedValue([
+      { ...ADAYLAR[0], pqCurveHam: '[[0, 210], [100, 180], [255, 105], [400, 40], [510, 0]]' },
+    ])
+    ac()
+    fireEvent.click(screen.getByText('silentFanWizard.skipToResult'))
+    await waitFor(() => expect(screen.getByText('silentFanWizard.badgeBest')).toBeTruthy())
+    expect(screen.queryByText('silentFanWizard.cardApproxCurve')).toBeNull()
+    expect(screen.getAllByText('silentFanWizard.cardDelivers').length).toBeGreaterThan(0)
+  })
+
   it('⭐sorgu patlarsa hata YUTULMAZ — kullanıcı görür', async () => {
     // Hava perdesi sihirbazını beş ay öldüren kusur tam buydu: catch yutuyor,
     // ekran sessizce boş kalıyordu.

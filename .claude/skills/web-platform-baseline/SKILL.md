@@ -3,11 +3,11 @@ name: web-platform-baseline
 description: "Web platformu temel çizgisi: güncel CSS/HTML/JS özellikleri ve tarayıcı desteği, tarihli doğrulama. Tetik: \"container query\", \"tarayıcı desteği\", \"modern CSS\"."
 category: research
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/web-platform-baseline/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/web-platform-baseline/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/web-platform-baseline/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/web-platform-baseline/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -24,6 +24,9 @@ metadata:
 | **"Kural 6: referans dosyayı aynı turda düzelt" (SKILL.md ~98-100)** | **Departman ajanı skill dosyasını DÜZENLEYEMEZ**: `.claude/skills/**` YETENEK'in yetkisindedir. Bayat satır görülürse YETENEK'e bildirilir |
 | `css.md` ~84, 95, 100: `color-mix(in oklch…)` ve serbest `clamp(…)` | Tailwind sınıfına taşınırsa **kural 8 ihlali** (arbitrary değer; renk HSL custom property) |
 | `css.md` ~63-64: `@container` | Tailwind 3.4'te eklenti ister; config'te var mı **ölçülmedi** |
+| `design-system` atfı | Bizde yok; atıf yok sayılır. Karşılığı: `src/design-system/tokens.js` (kural 8) ve `venthub-tasarim-dili` |
+| `design-craft` atfı | Bizde yok; atıf yok sayılır. Yerine `venthub-tasarim-dili` ve gstack `design-review` |
+| `design-critique` atfı | Bizde yok; atıf yok sayılır. Yerine `venthub-tasarim-dili` ve gstack `design-review` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -32,6 +35,11 @@ metadata:
 ---
 
 # Web Platform Baseline — WrongStack
+
+## Selection card
+- Task: Choose compatible HTML, CSS and browser APIs.
+- Start: Locate the affected route/component and its runtime/lockfile.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Why this exists
 
@@ -139,6 +147,18 @@ The common wins, which the references cover in detail:
 
 Each of these makes the code both shorter and less generated-looking — the
 hand-rolled version of a platform feature is itself a tell.
+
+## Availability versus suitability
+
+Verify the actual browser/device matrix and feature semantics. Baseline describes
+interoperability, not the project's complete user population, accessibility
+behavior or performance. Browser support, framework integration and required
+fallback behavior are separate questions. Cite the specific feature/version
+data; do not refresh an entire reference file's date after checking only one row.
+
+## Acceptance checks
+
+- Verify browser support, semantics, accessible behavior and necessary fallbacks.
 
 ## Skills in scope
 

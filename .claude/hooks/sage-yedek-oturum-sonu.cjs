@@ -117,7 +117,9 @@ try {
 
   const damga = new Date(t0).toISOString().replace(/\.\d+Z$/, 'Z')
   /** Yedeği eşiğinden ESKİ (ya da hiç olmayan) depolar; yalnız bunlar alınır. */
-  const bayat = yedek.DEPOLAR.filter((d) => {
+  // ARC-71: sabit depolar + bulunan posta kutuları (her biri ayrı depo).
+  const depolar = yedek.tumDepolar()
+  const bayat = depolar.filter((d) => {
     const ds = durum.depolar.find((x) => x.depo === d.ad)
     // Bu makinede kaynağı olmayan depo (ör. pano hiç açılmamış) yedeksiz sayılmaz: olmayan şeyin yedeği istenmez.
     if (ds && !ds.kaynakVar && !ds.sonYedek) return false
@@ -129,7 +131,7 @@ try {
     fs.existsSync(defter.defterYolu()) &&
     !(dd.sonYedek && t0 - Date.parse(dd.sonYedek) < defterYedek.TAZE_SAAT * 3_600_000)
   if (bayat.length === 0 && !defterBayat) {
-    const esik = [...yedek.DEPOLAR.map((d) => `${d.ad} ${d.tazeSaat} saat`), `defter ${defterYedek.TAZE_SAAT} saat`].join(', ')
+    const esik = [...depolar.map((d) => `${d.ad} ${d.tazeSaat} saat`), `defter ${defterYedek.TAZE_SAAT} saat`].join(', ')
     logaYaz(dizin, `${damga} ATLANDI — her deponun son yedegi esiginden yeni (${esik})`)
     process.exit(0)
   }

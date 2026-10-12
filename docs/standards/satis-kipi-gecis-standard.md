@@ -215,7 +215,7 @@ Sıra: **önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm →
 
 | # | kalem | ölçüm | sahibi |
 |---|---|---|---|
-| K1 | Yasal sayfalarda yer tutucu yok | canlı 12 yasal sayfa gövdesi: ham `[X_Y]` = 0 **ve** görünüm metni ("Şirket bilgileri kuruluşla eklenecek"/EN) = 0 (görünüm metni ham yer tutucuyu GİZLER; yalnız ham=0 yeşil verirdi) · muaf olabilir | Recep + URUN |
+| K1 | Yasal sayfalarda yer tutucu yok | canlı 12 yasal sayfa gövdesi: ham `[X_Y]` = 0 **ve** görünüm metni ("Bilgi eklenecek"/"To be added", URN-94: eski "kuruluşla eklenecek" metni şirket durumu beyanı olduğu için kalktı) = 0 (görünüm metni ham yer tutucuyu GİZLER; yalnız ham=0 yeşil verirdi) · muaf olabilir | Recep + URUN |
 | K2 | Ödeme ortamı canlı | `healthz` **anon JWT ile**: `durum=saglikli` ve `odeme_ortami='prod'`. **Sınır:** yalnız konak adı ölçütü; İyzico anahtar çiftinin geçerliliğini KANITLAMAZ | Recep + ALTYAPI |
 | K3 | Edge satış kapısı canlıda | `iyzico-payment` boş sepet probu: `403 SALES_CLOSED` (`409 VALIDATION_EMPTY_CART` = kapı yok). Anahtar zaten açıksa onarımdır, probe uygulanmaz. Kimlik yoksa ölçülemedi | ALTYAPI (REC-355) |
 | K4 | `site_settings` kilidi + RPC + webhook tetikleri | `pg_policy` (2 RESTRICTIVE), `satis_kipi_oku()` var, 3 tetik `tgenabled='O'`; `SUPABASE_DB_URL` yoksa ölçülemedi | URUN |

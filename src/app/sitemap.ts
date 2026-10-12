@@ -2,11 +2,14 @@ import { MetadataRoute } from 'next'
 
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
+import { sitemapModelMi } from '../config/yayindaModeller'
 import { HVAC_BRANDS } from '../data/brands'
+import { rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
+import { urunsuzMarkaSluglari } from '../lib/seo/markaUrunDurumu'
 import { getCategories } from '../lib/services/category.service'
-import { type FamilySitemapData,getAllFamilySlugs, getFamilySitemapData } from '../lib/services/family.service'
+import { type FamilySitemapData, getAllFamilySlugs, getBrandFamilyCount, getFamilySitemapData } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { adresDili, adresRotalari, kategoriArgumanlari } from '../utils/yuzeyAdresleri'
@@ -121,8 +124,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const dilYolu = (lang: string) => adresRotalari(adresDili(lang))
 
   // Ürün listesi şemaya duyarlıdır (`/products` ↔ `/urunler`); diğer statik sayfalar şemadan bağımsız.
+  // Statik sayfalar dilde GÖRÜNEN adresle ilan edilir (rota dili, OPS-52): kanonik = sitemap adresi
+  // (canonical-url-standard); ikisi de aynı `rotaDiliYoluOku` tablosundan çıkar. Anahtar kapalıyken
+  // `rotaDiliYoluOku` rotayı AYNEN döndürür → bugünkü `/${lang}${route}`.
   const statikYol = (lang: string, route: string): string =>
-    route === '/products' ? dilYolu(lang).products() : `/${lang}${route}`
+    route === '/products'
+      ? dilYolu(lang).products()
+      : route === '/brands'
+        ? dilYolu(lang).brands() // marka listesi şemaya duyarlı (URN-85): TR `/tr/markalar` ↔ EN `/en/brands`
+        : `/${lang}${rotaDiliYoluOku(route, lang)}`
 
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({
@@ -130,7 +140,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // lastmod YOK (REC-454): bu sayfaların güvenilir değişiklik tarihi yok. Eskiden `new Date()`
       // yazılıyordu = her üretimde "bugün değişti" → Google haritanın tarihlerine güvenmeyi bırakır.
       // Uydurma tarih yerine alan hiç yazılmaz (Google: lastmod isteğe bağlıdır).
-      changefreq: 'daily',
       priority: route === '' ? 1.0 : 0.8,
       ...siteHaritasiAlternates({
         tr: `${baseUrl}${statikYol('tr', route)}`,
@@ -140,7 +149,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   // 2. Category Routes (URL'ler dile göre yerelleştirilmiş slug ile üretilir; boş kategoriler hariç)
-  // Kategori adresi ÜST'ü bilerek üretilir (dal → iki seviyeli kanonik, kök → tek); kapalıyken tek slug.
+  // Kategori adresi ÜST'ü bilerek istenir ama kanonik adres kök de alt de TEK segmenttir (SEO-35 B-1: dal → `/kategori/<dal>`);
+  // kapalıyken yine tek slug (`/category/<slug>`).
   const kategoriById = new Map(categories.map((c) => [c.id, c]))
   const kategoriYolu = (cat: (typeof categories)[number], lang: string): string => {
     const ust = cat.parent_id ? kategoriById.get(cat.parent_id) : undefined
@@ -156,7 +166,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}${kategoriYolu(cat, lang)}`,
       // Tarihsiz satırda `new Date()` yedeği KALDIRILDI (REC-454) — tarih yoksa alan yazılmaz.
       ...(cat.updated_at ? { lastModified: new Date(cat.updated_at) } : {}),
-      changefreq: 'weekly',
       priority: 0.7,
       ...siteHaritasiAlternates({
         tr: `${baseUrl}${kategoriYolu(cat, 'tr')}`,
@@ -180,11 +189,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // yönlendirme yapar). Site haritası kanonik olmayan adresi İLAN ETMEZ.
 
   // 3. Brand Routes
+  // OPS-51: ürünsüz marka (DB'de aktif ürünü 0; şu an flexiva) sitemap DIŞI — sayfası noindex,follow basar (markaSayfasi.tsx);
+  // dizine kapalı bir adresi haritada ilan etmek çelişkidir. Marka listesinde ve ana sayfa bandında logoyla kalır.
+  // Karar sayfayla AYNI yardımcıdan (`markaUrunDurumu.ts`) ve harita üretildiği ANDA DB'den türer: ürün girince marka
+  // satırı kendiliğinden haritaya girer (statik bayrak YOK). DB okunamazsa karar FIRLATIR (harita üretilmez; hata yutulmaz,
+  // sahte-veritabanlı CI derlemesi hariç — yardımcının HATA YOLU).
+  const urunsuzMarkalar = await urunsuzMarkaSluglari(HVAC_BRANDS, (ad) => getBrandFamilyCount(supabaseStaticClient, ad))
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
-    HVAC_BRANDS.map((brand) => ({
+    HVAC_BRANDS.filter((brand) => !urunsuzMarkalar.has(brand.slug)).map((brand) => ({
       url: `${baseUrl}${dilYolu(lang).brand(brand.slug)}`,
       // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
-      changefreq: 'weekly',
       priority: 0.6,
       ...siteHaritasiAlternates({
         tr: `${baseUrl}${dilYolu('tr').brand(brand.slug)}`,
@@ -203,7 +217,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}${dilYolu(lang).product(f.slug)}`,
         // REC-454: gerçek değişiklik tarihi (aile + aktif varyantlar). Seri slug'ı haritada yok → alan yazılmaz.
         ...(aileTarihleri.has(f.slug) ? { lastModified: new Date(aileTarihleri.get(f.slug) as string) } : {}),
-        changefreq: 'daily',
         priority: 0.9,
         ...siteHaritasiAlternates({
           tr: `${baseUrl}${dilYolu('tr').product(f.slug)}`,
@@ -218,10 +231,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // `lastModified` = modelin kendi `updated_at`'i; yoksa alan yazılmaz (uydurma tarih yok, REC-454).
   const modelRoutes: MetadataRoute.Sitemap = ADRES_SEMASI_K3B
     ? locales.flatMap((lang) =>
-        modeller.map((m) => ({
+        // URN-31: yalnız yayındaki listedeki TEMEL modeller (sürüm kanoniği temele gider; liste dışı modelin sayfası
+        // yok). Boş liste = sıfır satır. DB'deki aktiflik süzgeci serviste, liste süzgeci burada.
+        modeller.filter((m) => sitemapModelMi(m.sku)).map((m) => ({
           url: `${baseUrl}${dilYolu(lang).product(m.aileSlug, m.sku)}`,
           ...(m.updatedAt ? { lastModified: new Date(m.updatedAt) } : {}),
-          changefreq: 'weekly',
           priority: 0.8,
           ...siteHaritasiAlternates({
             tr: `${baseUrl}${dilYolu('tr').product(m.aileSlug, m.sku)}`,

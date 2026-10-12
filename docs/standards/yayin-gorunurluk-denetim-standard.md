@@ -44,6 +44,7 @@ depoya yalnız özet sayı girer.
 | **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Kanban kartı |
 | **Model adresleri yayından +1, +7, +14 gün** (SEO-4, URN-11) | gsc-url-denetim (model adresi örneklemi: son tarama, dizin durumu) · GSC site haritası durumu (gönderilen/dizinlenen, hata) · tarama sıklığının `lastmod` değişiminden bağımsız olup olmadığı | canlı | tek tablo URUN + OPS; tabana (REC-300 taban tablosu) kıyas. Gerekçe: model satırlarının `lastmod`'u `products.updated_at`, 441 aktif modelde 10 gün / 20 dakikaya yayılı (en büyük küme 09-25 09:11Z 166 model); aynı damgayı taşıyan çok adres Google'ın lastmod'u yok saymasına yol açabilir (REC-461/A). Bayrak kapalıyken model satırı haritaya girmez |
 | **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar kart numarasıyla; eski kayıtlarda REC-nn) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili Kanban kartı |
+| **Her yeni yazı ya da düzeltilmiş sayfa yayını, canlıda 200 görülünce** (SEO-39) | Search Console'da URL denetimi ve "dizine eklenmesini iste" (yalnız o adresler) + IndexNow (`scripts/seo/indexnow-bildir.mjs`); yayını bildirmek yayın kartının sahibine, isteği göndermek GEO-SEO'ya aittir ve Recep'ten ayrıca onay istenmez | canlı, yalnız yayınlanan adresler | sonuç (adres, istek, IndexNow yanıtı) ilgili Kanban kartına; oturum ya da günlük sınır engeli OPS'a tek satır |
 
 EN_YAYIN kapalıyken `--en-harita-disi-bilincli` verilir: EN alternatifinin haritada olmaması kırmızı değil,
 ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalkar.
@@ -54,6 +55,13 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
   GECICI 0 · YOK 0 · HEDEF-YANLIS 0**.
 - Site haritası: her adres doğrudan 200; model adresi sayısı = 442 (plan §1).
 - Canonical: her sayfada tek ve kendini gösterir. hreflang: tr + en + x-default (EN bilinçli istisnası hariç).
+- **Yasal sayfalar (URN-97, 2026-10-10):** altı yasal sayfa (kvkk, gizlilik, çerez, mesafeli satış, kullanım koşulları, ön bilgilendirme)
+  hukukçu teyidi ve satıcı bilgileri hazır olana kadar (`isLegalContentReady()` false) **`noindex, follow`** basar, hreflang yazmaz,
+  canonical kalır; sayfa erişilebilir kalır (footer bağlantıları, doğrudan adres) ve site haritasında yoktur. Başlıktaki "(Taslak)" eki ve
+  uyarı bandıyla AYNI koşuldan okunur (`yasalDizinDisi`); hazır olunca üçü birlikte kendiliğinden kalkar. Bu altı adreste `noindex`
+  KUSUR DEĞİLDİR: `bot-karnesi` bu adreslerde `noindex: EVET` gösterir (beklenen değer); araçların bunu bilinçli listeye alıp
+  almayacağı Geo-SEO'nun kararıdır (`canli-kapi` `noindex`'i yalnız gizli yüzeylerde ölçer, bu adresler o listede değildir). Kapı:
+  `src/app/__tests__/yasalSayfaDizinDisi.test.ts` (INV-YASAL-DIZIN-1). Canlı ölçüm: tarayıcı bölmesiyle `meta[name=robots]`.
 - Bağlantı taraması: kırık 0 · site içi yönlendirme 0 (plan §7 "kırık 0, zincir 0").
 - Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
   bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
@@ -70,6 +78,11 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
   bilinçli taşınır, her onarım bilinen listesinden çıkarılır.
 - `llms.txt`: sayfa/kategori sayısı ve `Languages:` beyanı site haritasıyla **aynı** (`LLMS-SAYFA`, `LLMS-DIL`, INV-LLMS-GERCEK-1;
   EN_YAYIN açılınca dil satırı ve sayılar aynı PR'da güncellenir). Olmayan kök adres (`/ai.txt`, `/llms-full.txt` …) **404** verir, 500 değil (URN-15).
+- Meta açıklama: **ACIKLAMA-KESIK 0 · ACIKLAMA-SABLON 0 · ACIKLAMA-TEKRAR 0**; açıklama kaydın KENDİ metninden türer (aile: aile
+  açıklaması, kategori: `metadata.description_i18n`, marka: marka kaydı), tek kırpıcıdan geçer (`aciklamaKirp`, ≤155 karakter,
+  cümle ya da sözcük sınırında; INV-ACIKLAMA-KIRP-1) ve doğrulanamayan övgü ("en kaliteli", "ekonomik", "avantajlı fiyat") içermez
+  (INV-ACIKLAMA-URETEC-1; satış modu teklif usulü, fiyat vaadi yok). `ACIKLAMA-KISA` (<70 karakter) uyarıdır; kaynağı DB metniyse
+  (ör. `seat-serisi` aile açıklaması 68 karakter) düzeltme KATALOG verisidir, kodla şişirilmez.
 - Sayfa kalitesi: SEO ortalaması tabandan **düşmez**; aynı yolda SEO'su düşen sayfa 0.
 - Search Console (+7/+28): "bulunamadı" birikimi 0; tık tabana göre kıyaslanır — geçici düşüş beklenir,
   kalıcı düşüş kusurdur (plan §8).
@@ -99,6 +112,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 | gerçek bot erişimi (Vercel Bot Protection / güvenlik duvarı kuralı, bot günlüğü) | ALTYAPI (salt okuma ölçüm, ALT-9) |
 | olmayan adresin 500 vermesi (middleware kök `.txt` muafiyeti) | URUN (URN-15; ölçümü GEO-SEO, SEO-5) |
 | `llms.txt` beyanı haritayla çelişiyor | GEO-SEO (SEO-6) |
+| meta açıklama üreticisi (aile/kategori/marka kırpma ve şablon) | GEO-SEO (REC-497); kaynak metnin kendisi (DB açıklaması çok kısa/yok) KATALOG |
 | ölçümün kendisi (betik hatası, yanlış kırmızı) | GEO-SEO |
 
 **Bilinçli istisna (2026-09-25, URUN):** yalnız TR'de yayında olan sayfa (EN karşılığı yok) hreflang basmaz —

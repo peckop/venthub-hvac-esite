@@ -1,13 +1,13 @@
 ---
 name: prompt-engineering
-description: "Sistem istemi, araç açıklaması, skill tanımı ve diğer model talimat metnini tasarlar, eleştirir, düzeltir; model talimatı yok sayıyorsa nedenini bulur. Tetik: \"prompt\", \"talimat metni\", \"skill açıklaması\", \"model dinlemiyor\". WrongStack 1.0.26 uyarlaması."
+description: "Sistem istemi, araç açıklaması, skill tanımı ve diğer model talimat metnini tasarlar, eleştirir, düzeltir; model talimatı yok sayıyorsa nedenini bulur. Tetik: \"prompt\", \"talimat metni\", \"skill açıklaması\", \"model dinlemiyor\". WrongStack 1.1.0 uyarlaması."
 category: quality
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/prompt-engineering/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/prompt-engineering/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/prompt-engineering/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/prompt-engineering/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -32,6 +32,11 @@ metadata:
 ---
 
 # Prompt Engineering
+
+## Selection card
+- Task: Design grounded instructions and output contracts.
+- Start: Identify the requested artifact, repository owner and acceptance criteria.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -129,6 +134,15 @@ selection, not for documentation:
 - [ ] Emphasis reserved for real hard constraints
 - [ ] Tool and skill descriptions say when to use, inputs, outputs, and alternatives
 - [ ] Checked against representative and edge-case inputs
+
+## Behavioral evaluation
+
+Pin realistic inputs and observable success criteria before changing a prompt.
+Include near-miss activation cases, ambiguous instructions and untrusted source
+text. Compare tool choice, task completion and output validity against the old
+prompt; regex/phrase presence alone is structural evidence.
+Record model/version/settings and repeated-run variability for meaningful
+quality claims. Instructions cannot substitute for runtime validation or permissions.
 
 ## Skills in scope
 

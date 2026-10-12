@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   kontrolEt, haritaCoz, sayfaAlanlari, jsonldBloklari, robotsDisallow, robotsEslesir,
-  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu,
+  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu, hamDegerHucreleri,
 } from '../canli-kapi.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -494,9 +494,9 @@ describe('bilinen listesi kalıcı susturucu olamaz (OPS şartı, REC-502)', () 
  */
 type HaritaSatir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
 const haritaSatir = (yol: string): HaritaSatir => ({ loc: TABAN + yol, lastmod: null, changefreq: null, priority: null })
-function haritaKur(toplam: number, kategori: number, enSayfa = 0): { satirlar: HaritaSatir[]; hreflangSayisi: number } {
+function haritaKur(toplam: number, kategori: number, enSayfa = 0, kategoriYolu = 'category'): { satirlar: HaritaSatir[]; hreflangSayisi: number } {
   const satirlar: HaritaSatir[] = []
-  for (let i = 0; i < kategori; i++) satirlar.push(haritaSatir(`/tr/category/k${i}`))
+  for (let i = 0; i < kategori; i++) satirlar.push(haritaSatir(`/tr/${kategoriYolu}/k${i}`))
   for (let i = 0; i < enSayfa; i++) satirlar.push(haritaSatir(`/en/products/p${i}`))
   while (satirlar.length < toplam) satirlar.push(haritaSatir(`/tr/products/p${satirlar.length}`))
   return { satirlar, hreflangSayisi: 0 }
@@ -530,6 +530,19 @@ describe('INV-LLMS-GERCEK-1 · llms.txt beyanı haritayla tutarlı', () => {
   })
   it('sabotaj: kategori sayısı haritadan farklıysa KIRMIZI (24 yazılı, haritada 23)', () => {
     expect(llmsBulgu(haritaKur(87, 23), llmsMetni()).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+  })
+  describe.each([
+    { ad: 'kapalı kip: /tr/category/<slug> (bayrak kapalı, bugünkü canlı)', yol: 'category' },
+    { ad: 'açık kip: /tr/kategori/<slug> (K3-b bayrağı açık, Pazar sonrası)', yol: 'kategori' },
+  ])('kategori sayacı, $ad', ({ yol }) => {
+    it('doğru beyan hiç bulgu vermez (24 yazılı, 24 adres)', () => {
+      expect(llmsBulgu(haritaKur(87, 24, 0, yol), llmsMetni())).toEqual([])
+    })
+    it('sabotaj: bir kategori adresi eksikse KIRMIZI (24 yazılı, haritada 23; sayaç körleşmedi)', () => {
+      const b = llmsBulgu(haritaKur(87, 23, 0, yol), llmsMetni())
+      expect(b.map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+      expect(b[0].kanit).toMatch(/23 kategori/)
+    })
   })
   it('sabotaj: harita /en adresleri taşıyorken llms.txt yalnız "tr" diyorsa KIRMIZI (EN yayınlanınca dosya güncellenmeli)', () => {
     const b = llmsBulgu(haritaKur(87, 24, 10), llmsMetni())
@@ -571,5 +584,116 @@ describe('INV-LLMS-GERCEK-1 · llms.txt beyanı haritayla tutarlı', () => {
     expect(yazilanKategori).toBeGreaterThan(0)
     expect(llmsBulgu(haritaKur(yazilanSayfa, yazilanKategori), llms)).toEqual([])
     expect(llmsBulgu(haritaKur(yazilanSayfa - 1, yazilanKategori), llms).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+  })
+})
+
+describe('INV-CANLI-KAPI-1 · VITRIN-IDDIA (URN-60, karar 295)', () => {
+  it('sabotaj: yasak ifade sayfanın GÖRÜNEN metninde KIRMIZI; her ifade ayrı yakalanır', () => {
+    for (const ifade of ['%92 Optimizasyon', 'Çok Satanlar', 'Geniş stok ağımız', 'Dünya Devlerinin Partneri', 'Sistem.Veri.Canlı', '81 il kargo']) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[1], '<h1>', `<h1>${ifade} `)
+      const b = kodlar(v, 'VITRIN-IDDIA')
+      expect(b.length, `"${ifade}" yakalanmadı`).toBeGreaterThan(0)
+      expect(b[0].adres).toBe('/tr/a')
+      expect(b[0].seviye).toBe('KIRMIZI')
+    }
+  })
+  it('URN-79 sabotaj: marka kayıtlarından kalkan üretici övgüleri (TR+EN) geri gelirse KIRMIZI; React\'in `&#x27;` yazdığı kesme işaretli hâl de yakalanır', () => {
+    const geriGelenler = [
+      '1954 yılından bu yana havalandırma teknolojilerinde dünya lideri',
+      'A world leader in ventilation technology since 1954',
+      'konut, ticari ve endüstriyel iklimlendirmede standartları belirliyor',
+      'endüstriyel santrifüj fanlarda dünyanın en geniş ve teknolojik ürün gamına sahip üreticisi',
+      'frekans konvertörlerinin öncüsüdür',
+      'enerji tüketimini %80&#x27;e varan oranda azaltır',
+      'Avens, Türkiye&#x27;nin önde gelen yerli HVAC markasıdır',
+      'Yüksek Verimli Santrifüj Fanlar',
+    ]
+    for (const ifade of geriGelenler) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[1], '<h1>', `<h1>${ifade} `)
+      const b = kodlar(v, 'VITRIN-IDDIA')
+      expect(b.length, `"${ifade}" yakalanmadı`).toBeGreaterThan(0)
+      expect(b[0].adres).toBe('/tr/a')
+    }
+  })
+  it('URN-79: yeni marka cümleleri (nötr menşei/uzmanlık + DB özeti) yanlış alarm vermez', () => {
+    const v = temiz()
+    govdeDegistir(
+      v.sayfalar[1],
+      '<h1>',
+      '<h1>İtalya menşeli havalandırma üreticisi. VentHub kataloğunda Vortice markasının ürün ailesi sayısı: 31. Kategoriler: Aksiyel Fanlar. ',
+    )
+    expect(kodlar(v, 'VITRIN-IDDIA')).toEqual([])
+  })
+  it('Türkçe büyük/küçük harf simetrisi: DETERMİNİSTİK, Deterministik, deterministik üçü de yakalanır (REC-343 körlüğü yok)', () => {
+    for (const yazim of ['DETERMİNİSTİK SİSTEMLER', 'Deterministik Sistemler', 'deterministik sistemler']) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[2], '<h1>', `<h1>${yazim} `)
+      expect(adresler(v, 'VITRIN-IDDIA'), yazim).toEqual(['/tr/b'])
+    }
+  })
+  it('görünen metin değilse sayılmaz: <script> içi ve etiket özniteliği yanlış alarm vermez', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], '</body>', '<script>var x = "Çok Satanlar %92"</script><div data-x="Geniş stok"></div></body>')
+    expect(kodlar(v, 'VITRIN-IDDIA')).toEqual([])
+  })
+  it('temiz sentetik site hiç VITRIN-IDDIA bulgusu vermez ve kuralı kayıtlıdır', () => {
+    expect(kodlar(temiz(), 'VITRIN-IDDIA')).toEqual([])
+    expect(Object.keys(KURAL_NO)).toContain('VITRIN-IDDIA')
+  })
+})
+
+describe('INV-CANLI-KAPI-1 · SPEC-HAM-DEGER (URN-58, karar 298)', () => {
+  /** Ürün sayfasının teknik tablosundaki gerçek işaretleme kalıbı: etiket span'ı + değer span'ı (tek satır). */
+  const satir = (etiket: string, deger: string): string =>
+    `<div class="flex justify-between"><span class="text-xs font-bold">${etiket}</span><span class="text-xs font-black">${deger}</span></div>`
+
+  it('sabotaj: hücrenin görünür metni tam `true`/`false` ise KIRMIZI; gövde çift olunca sayı da çift, etiket=değer kanıtta', () => {
+    const v = temiz()
+    const govde = [satir('Zamanlayıcı', 'false'), satir('ErP Uyumlu', 'true'), satir('Higrostat', 'false')].join('')
+    govdeDegistir(v.sayfalar[1], '</body>', govde + govde + '</body>') // Lineo Quiet'te ölçülen hâl: her alan iki kez
+    const b = kodlar(v, 'SPEC-HAM-DEGER')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/a'])
+    expect(b[0].seviye).toBe('KIRMIZI')
+    expect(b[0].kanit).toContain('6 teknik tablo hücresinde')
+    for (const parca of ['Zamanlayıcı=false', 'ErP Uyumlu=true', 'Higrostat=false']) expect(b[0].kanit, parca).toContain(parca)
+  })
+  it('sabotaj: <td>/<dd> hücresi, tırnak içinde ">" taşıyan öznitelik ve React yazı-sınırı yorumu (<!-- -->) da yakalanır', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[2], '</body>',
+      '<table><tr><th>Bypass</th><td>false</td></tr></table>' +
+      '<dl><dt>Ters Dönüş</dt><dd data-x="a>b">true</dd></dl>' +
+      '<div><span>Sensör</span><span><!-- -->false<!-- --></span></div></body>')
+    const b = kodlar(v, 'SPEC-HAM-DEGER')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/b'])
+    expect(b[0].kanit).toContain('3 teknik tablo hücresinde')
+    for (const parca of ['Bypass=false', 'Ters Dönüş=true', 'Sensör=false']) expect(b[0].kanit, parca).toContain(parca)
+  })
+  it('iyi girdi: sözlük metni (Var/Yok, Yes/No), kod öğeleri, cümle içi sözcük, script/JSON-LD/yorum, öznitelik, büyük harf YANLIŞ ALARM vermez', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], '</body>', [
+      satir('Zamanlayıcı', 'Yok'), satir('ErP Uyumlu', 'Var'), satir('Timer', 'No'), satir('ErP', 'Yes'),
+      '<code>true</code><pre>false</pre><kbd>true</kbd><samp>false</samp>',
+      '<p>Bu ifade true değildir; false positive yoktur.</p><span>truefalse</span><span>false positive</span>',
+      '<input value="true"><div data-flag="false"></div>',
+      '<script>var a = "true"; window.__x = {k: false}</script><script type="application/ld+json">{"x": true}</script>',
+      '<!-- <span>true</span> --><span>True</span><span>FALSE</span>',
+      '</body>',
+    ].join(''))
+    expect(kodlar(v, 'SPEC-HAM-DEGER')).toEqual([])
+  })
+  it('hamDegerHucreleri: önceki kapanan öğe yoksa etiket "?"; temiz sentetik site bulgu vermez ve kural kayıtlıdır', () => {
+    expect(hamDegerHucreleri('<div><span>true</span></div>')).toEqual([{ deger: 'true', etiket: '?' }])
+    expect(hamDegerHucreleri('<div><b>Etiket</b> <i>false</i></div>')).toEqual([{ deger: 'false', etiket: 'Etiket' }])
+    expect(hamDegerHucreleri('')).toEqual([])
+    expect(kodlar(temiz(), 'SPEC-HAM-DEGER')).toEqual([])
+    expect(Object.keys(KURAL_NO)).toContain('SPEC-HAM-DEGER')
+  })
+  it('çıkış kodu: SPEC-HAM-DEGER yeni KIRMIZI olarak çıkışı 1 yapar (bilinen listesinde yoksa susturulmaz)', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], '</body>', satir('Zamanlayıcı', 'false') + '</body>')
+    expect(cikisKodu(kontrolEt(v))).toBe(1)
+    expect(cikisKodu(kontrolEt(temiz()))).toBe(0)
   })
 })

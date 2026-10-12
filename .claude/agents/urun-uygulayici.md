@@ -2,6 +2,7 @@
 name: urun-uygulayici
 description: URUN departmanının uygulayıcı çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
 model: sonnet
+memory: user
 skills:
   - i18n-conventions
   - venthub-tasarim-dili

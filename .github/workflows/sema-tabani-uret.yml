@@ -65,7 +65,7 @@ jobs:
           echo "SUPABASE_DB_URL mevcut (uzunluk ${#DB_URL} karakter, deger BASILMADI)."
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
+        uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.101.0
 
@@ -127,7 +127,7 @@ jobs:
           echo "doküm dolu — artefakt olarak yuklenebilir."
 
       - name: Artefakt yukle
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sema-tabani
           path: |

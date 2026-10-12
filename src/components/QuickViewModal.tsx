@@ -5,6 +5,7 @@ import React from 'react'
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { getProductModelLabel } from '../utils/productHelpers'
 import type { StorefrontProduct } from './ProductCard'
 
 const PLACEHOLDER_EMOJI = '🌪️'
@@ -25,6 +26,8 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
   // W4b: fiyat motordan gelir (displayPrice); ham `products.price` emekli (INV-PRICE-1).
   const displayPrice = product.displayPrice ?? null
   const quoteMode = displayPrice == null || displayPrice <= 0
+  // URN-32: görünen kod YALNIZ `model_code` (ham `sku` basılmaz — INV-SKU-GORUNMEZ-1).
+  const modelKodu = getProductModelLabel({ model_code: product.model_code })
 
   const handleAdd = () => {
     if (quoteMode) return
@@ -47,7 +50,10 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
           </div>
           <div className="flex flex-col">
             <h4 className="font-semibold text-industrial-gray mb-1 line-clamp-2">{product.name}</h4>
-            <div className="text-sm text-steel-gray mb-2">{product.brand} • {product.sku}</div>
+            <div className="text-sm text-steel-gray mb-2">
+              {product.brand}
+              {modelKodu && <> • {modelKodu}</>}
+            </div>
             {/* Fiyat YALNIZ ürün satış sayfasında gösterilir (`rendering-cache-standard.md` §2).
                 Hızlı önizleme bir liste yüzeyidir: fiyatı burada göstermek hem ticari kararın
                 (Recep, 2026-08-15) hem PS-042 önbellek izolasyonunun dışına çıkar. Sepete ekleme

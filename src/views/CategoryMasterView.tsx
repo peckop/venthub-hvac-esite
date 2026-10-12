@@ -10,13 +10,23 @@ import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import { useI18n } from '../i18n/I18nProvider'
 import { compareText } from '../i18n/sort'
 import type { DomainCategory } from '../lib/type-converters'
-import type { FamilyListItem } from '../types/ui-models'
+import type { FamilyListItem, KatalogSayilari } from '../types/ui-models'
 
 // ssr:false BİLİNÇLİ KALDIRILDI (SSR boş-kabuk kök sebebiydi): client bileşende
 // ssr:false, SSR sırasında en yakın Suspense sınırını komple CSR'a düşürür —
 // kategori//products sayfaları Haziran'dan beri bota/LCP'ye boş <main> sunuyordu.
 // dynamic() code-splitting için kalır; ağır 3D (CategoryOrbitCarousel) kendi
 // izole Suspense'inde ssr:false olarak ProductsDiscoveryView içinde durur.
+//
+// ⭐BU GÖRÜNÜMLERİ SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, 2026-10-03). Mekanizma İKİ KOLLU:
+// bir Suspense sınırının sardığı içerik, (a) askıya alınırsa (`dynamic()` sunucuda `React.lazy`
+// gibi askıya alır) ya da (b) büyükse (Fizz, içerik `progressiveChunkSize` ≈ 12800 bayt üstündeyse
+// TAMAMLANMIŞ olsa bile) sınırın DIŞINA, akış bloğuna (`<div hidden id="S:0">`) yazılır; görünür
+// yerde yalnız fallback (spinner) iskeleti kalır. Ham HTML'de sayfa gövdesi (h1 dahil) gizli
+// blokta kalıyordu (kategori ve /products). İkinci kol bu işte izole ölçülmedi; kaynağı
+// çürütücü ölçümüdür (dynamic'siz `brands/page.tsx` da S:0 üretiyor). Sonuç değişmez: BÜYÜK GÖVDEYİ
+// SARAN HER Suspense aynı arızayı verir, bu yüzden Suspense yalnız `useSearchParams` okuyan
+// küçük yaprağı (Pagination) sarar (kural 5). Sınır olmayınca gövde HTML'e düz yazılır.
 const CategoryGridView = dynamic(() => import('./category/CategoryGridView'))
 const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'))
 const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView'))
@@ -67,11 +77,21 @@ interface CategoryMasterViewProps {
   pageSize?: number
   initialSubCategories?: DomainCategory[]
   /**
+   * URN-112: alt kategorinin ÜSTÜ, sunucudan. Kırıntı üst halkası istemci bağlamını (`useCategories`)
+   * beklemeden ham HTML'de dolu gelir; bağlam yüklenince aynı kategoriyi verir.
+   */
+  initialParentCategory?: DomainCategory | null
+  /**
    * REC-213-A — YALNIZ keşif (kategorisiz) hâlinde kullanılır: `/products` sayfasının
    * kategori kapısı. Kategori sayfalarında anlamsızdır ve oraya geçilmez; kırıntı yolu
    * ve alt kategori kartları o hâlin kendi kapısıdır.
    */
   kategoriler?: CategoryViewModelLite[]
+  /**
+   * URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucudan, `getBrandCatalogSummary` özeti). Yalnız
+   * hava perdesi ve sessiz fan anlatısındaki iki Vortice bölümünün sayaç kartlarını besler; yoksa kartlar çizilmez.
+   */
+  vorticeKatalogSayilari?: KatalogSayilari | null
 }
 
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
@@ -81,7 +101,9 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   page = 1,
   pageSize = 24,
   initialSubCategories,
-  kategoriler
+  initialParentCategory,
+  kategoriler,
+  vorticeKatalogSayilari
 }) => {
   const { lang } = useI18n()
 
@@ -93,7 +115,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
     loading,
     filters,
     updateFilters
-  } = useCategoryGateway(initialCategory, initialSubCategories)
+  } = useCategoryGateway(initialCategory, initialSubCategories, initialParentCategory)
 
   // 2. Presentation Layer (ViewModel)
   const { wrapCategory } = useCategoryViewModel()
@@ -148,8 +170,11 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
    *
    * Koşulu ÇAĞIRANA taşımak hook'u hiç çağırmaz. Kategori rotasında `total > pageSize` artık
    * asla doğru olmaz (sayfa boyu 48, en kalabalık kategori 34) — yani orada sayfalama tümüyle
-   * devre dışı. `/products` rotası aynı bileşeni kullanıyor ve orada sayfalama HÂLÂ GEÇERLİ;
-   * o rota `searchParams` aldığı için zaten dinamik, dolayısıyla bailout'un bedeli yok.
+   * devre dışı. `/products` rotası aynı bileşeni kullanıyor ve o da `force-static` (`searchParams`
+   * ALMAZ; sayfa boyu 72, ölçülen aile sayısı 47 — `urunlerSayfasi.tsx` K7 kolu), yani orada da
+   * koşul bugün yanlış ve Pagination çizilmez. Aile sayısı 72'yi aştığı gün Pagination çizilir ve
+   * `useSearchParams` bailout'u kendi sınırında kalır; o sınırı bu dosyada TEK Suspense yapan şey
+   * INV-SSR-GOVDE-2'dir (içeriği değil yalnız Pagination'ı sarmalı).
    */
   const cokSayfaVar = total > pageSize
   const pagination = cokSayfaVar ? (
@@ -160,10 +185,10 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
 
   if (!category && !loading) {
     return (
-      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
+      <>
         <ProductsDiscoveryView kategoriler={kategoriler} families={visibleFamilies} total={total} isLoading={loading} />
         {pagination}
-      </React.Suspense>
+      </>
     )
   }
 
@@ -190,6 +215,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
             category={category.raw}
             parentCategory={parentCategory?.raw}
             families={visibleFamilies}
+            vorticeKatalogSayilari={vorticeKatalogSayilari}
           />
         )
       case 'series':
@@ -221,6 +247,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
                 category={category.raw}
                 parentCategory={parentCategory?.raw}
                 families={visibleFamilies}
+                vorticeKatalogSayilari={vorticeKatalogSayilari}
               />
             )
         }
@@ -242,10 +269,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
 
   return (
     <div className="min-h-screen">
-      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
-        {renderView()}
-        {etkinMod !== 'showcase' && pagination}
-      </React.Suspense>
+      {renderView()}
+      {etkinMod !== 'showcase' && pagination}
     </div>
   )
 }

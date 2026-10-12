@@ -63,7 +63,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
    **İş emri de aynı kurala tabidir (2026-08-20):** Kanban'da açılan her kartın (iş emri;
-   Linear 2026-10-01'den beri donuktur, karar 219) açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
+   Linear 2026-10-01'den beri donuktur, karar 219; 2026-10-08'de iş kaydı olarak emekli edildi, karar 324 — yalnız Design yorum kanalı ve eski kayıt arşivi kaldı) açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
    karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
    Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
    cetvel var mı" diye SORAR. (Niçin: 2026-08-20'de ERP yetenek çerçeveleri zaten yazılıyken
@@ -124,7 +124,7 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar),
 
 - `CONTEXT.md` — **EMEKLİ (2026-09-29)**: yerinde yönlendirme sayfası; eski metin `docs/archive/`. Bilgi için `docs/README.md`.
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
-- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` **EMEKLİ (2026-09-29)** — canlı durum = Kanban panoları + claim panosu (`board.cjs who`); Linear donuk arşiv.
+- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` **EMEKLİ (2026-09-29)** — canlı durum = Kanban panoları + claim panosu (`board.cjs who`); Linear iş kaydı olarak emekli, arşiv (karar 324).
 - `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
   skill / elle): karar tablosu + emirde `YÖNTEM:` satırı (öneri; sapma yazılır). Yöntemsiz emir eksik emirdir.
 - `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne

@@ -1,9 +1,10 @@
 import type { Metadata, Route } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 
+import { ureticiMarkaAdresi } from '@/components/products/ureticiMarkaAdresi'
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
-import { markaBulAdla } from '@/data/brands'
+import { kanonikModelSku } from '@/config/yayindaModeller'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
@@ -14,6 +15,7 @@ import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
+import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
@@ -71,9 +73,12 @@ export function aileSayfasiAdresleri(
   if (!bayrak) {
     return { tr: `${SITE_URL}/tr${Routes.product(aileSlug)}`, en: `${SITE_URL}/en${Routes.product(aileSlug)}` }
   }
+  // URN-31: canonical = `kanonikModelSku` — model kendisi, SÜRÜM temel modelin adresi (URN-27 asgarisi); liste
+  // dışı SKU (rota zaten 404 verir) 404 adrese işaret etmesin diye aile adresine düşer.
+  const kanonikSku = sunucuSku ? kanonikModelSku(sunucuSku) : null
   const yol = (dil: 'tr' | 'en') =>
-    sunucuSku
-      ? adresUret({ tur: 'model', aileSlug, sku: sunucuSku, slug: aileSlug }, dil, true)
+    kanonikSku
+      ? adresUret({ tur: 'model', aileSlug, sku: kanonikSku }, dil, true)
       : adresUret({ tur: 'aile', slug: aileSlug }, dil, true)
   return { tr: `${SITE_URL}${yol('tr')}`, en: `${SITE_URL}${yol('en')}` }
 }
@@ -116,8 +121,8 @@ export async function aileSayfasiUstVerisi(
       // Süzgeç null döndürünce zincir bir sonraki halkaya düşer — davranış "açıklama yok"
       // ile aynıdır, uydurma metin ÜRETİLMEZ.
       const description =
-        pickLang(family.meta_description, lang) ||
-        musteriyeGorunurAciklama(pickLang(family.description, lang))?.substring(0, 160) ||
+        aciklamaKirp(pickLang(family.meta_description, lang)) ||
+        aciklamaKirp(musteriyeGorunurAciklama(pickLang(family.description, lang))) ||
         // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
         (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
       const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
@@ -231,6 +236,14 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   // `unavailable` = veri yok DEĞİL, veriye ULAŞILAMADI (ağ/RPC/env). 404 basılmaz —
   // önbelleğe alınabilen kalıcı bir yokluk beyanı olurdu; mevcut "bulunamadı" görünümü çizilir.
   const detail = resolution.kind === 'family' ? resolution.detail : null
+
+  // URN-38: MODEL rotasında (canonical'ı kendi adresi) veri yoksa içi boş 200 çizilmez — o sayfa
+  // önbelleğe girer ve indekslenebilirdi. Hata fırlatılır: sayfa önbelleğe alınmaz, ISR son iyi
+  // sayfayı korur. Aile rotası (`sunucuSku` yok) bugünkü "bulunamadı" görünümünü çizmeye devam eder.
+  if (sunucuSku && !detail) {
+    throw new Error(`model sayfası verisi alınamadı (${slug}, ${sunucuSku}): veriye ulaşılamadı`)
+  }
+
   const family = detail?.family ?? null
   const variants = detail?.variants ?? []
 
@@ -279,8 +292,10 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
 
   // URN-21: kırıntı zinciri BİR kez kurulur; JSON-LD ve görünür `<nav>` AYNI diziyi tüketir (ayrışamaz).
   // Yol/ad kuralları `aileKirintiAdimlari`'nda (adresler adres üreticisinden, adlar bu sayfada çözülmüş).
-  // Marka: aile satırı slug taşımaz, yalnız adı; vitrinde sayfası olmayan marka basamak olmaz.
-  const marka = family ? markaBulAdla(family.brand_name) : null
+  // URN-126: marka basamağı kırıntıda YOK (kategoriden geri giden kullanıcı markanın tüm ürünlerine
+  // düşmesin); marka bağlantısı sayfadaki ÜRETİCİ bloğunun işidir ve zincire girdi olarak VERİLMEZ.
+  // Adres sunucuda çözülür (marka kataloğu istemci demetine girmesin); çözülemezse `null` → düz metin.
+  const markaHref = family ? ureticiMarkaAdresi(family.brand_name, adresDili(lang)) : null
   const seciliModel = sunucuSku ? variants.find((v) => v.sku === sunucuSku) : undefined
   const kirinti: KirintiAdimi[] =
     family && gorunenAileAdi.trim()
@@ -289,7 +304,6 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
           anasayfaAdi: t('category.breadcrumbHome'),
           ana: { ad: mainName, slug: mainSlug },
           alt: { ad: subName, slug: subSlug },
-          marka: marka ? { ad: marka.name, slug: marka.slug } : null,
           aile: { ad: gorunenAileAdi, slug: family.slug },
           model: seciliModel
             ? { etiket: getProductModelLabel(seciliModel) ?? getProductDisplayName(seciliModel, family, lang) }
@@ -327,6 +341,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
         priceTaxIncluded={detail?.price_tax_included ?? null}
         sunucuSku={sunucuSku}
         kirinti={kirinti}
+        markaHref={markaHref}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): aile → o aileye bağlanan rehber. Aile bulunamadıysa
           (unavailable) blok yok; yazı yoksa `IlgiliRehberler` hiçbir şey basmaz. */}

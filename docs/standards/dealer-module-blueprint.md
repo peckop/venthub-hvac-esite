@@ -65,6 +65,8 @@ Canlı DB, 11 Haziran audit snapshot'ından ileri gitmiş. **"Canlı kazanır"**
 | **B2** | `product_prices` SEED + uçtan-uca bayi siparişi kanıtı | dealer/corporate listelerine **gerçek** fiyat (idempotency: `valid_from` **sabit**, `now()` DEĞİL → `ON CONFLICT(product_id,price_list_id,valid_from) DO NOTHING`). Kanıt: dealer hesabı ürün fiyatını individual'dan **farklı** görür → sepet → order-validate → order_item snapshot'ları doğru. **Bu faz biterse "Avensair-hazır" karşılanır.** |
 | **Yan** | `is_user_admin` enum onarımı | `role IN ('admin','superadmin','super_admin')` + app_metadata'dan oku. **Latent** — B1'i bloklamaz ama ilk `super_admin` kullanıcıdan önce kapat. Ayrı küçük PR. |
 
+> **R3 okuma tarafına NOT (2026-10-05, URN-32/33):** `account/OrderDetailPage` snapshot-kazanır kuralından **bir alanda** bilerek ayrıldı. `product_sku_snapshot` okuma yolundan ÇIKARILDI (sorgu kolonu, tip alanı, ekran satırı): sipariş detayı müşteriye görünür ve `INV-SKU-GORUNMEZ-1` "HİÇBİR müşteri yüzeyinde" der — snapshot muafiyeti yok. Yerine kalemde gösterilen model kodu `venthub_order_items.product_id → products.model_code` ile **GÜNCEL katalogdan** gelir (embed `products ( model_code )`), **snapshot DEĞİLDİR**: şemada `model_code` snapshot'ı yok. Ürün sonradan değişirse müşteri güncel kodu görür; ad, adet ve fiyat snapshot'tan okunmaya devam eder. Kalem başına model kodu snapshot'ı istenirse migration gerektirir (ayrı kayıt).
+
 ---
 
 ## 4. Premium-yüzey tuzakları (denetimin armağanı — bunlara DÜŞME)

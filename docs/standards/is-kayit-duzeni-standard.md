@@ -6,8 +6,9 @@
 > **v2 (karar 219, Recep 2026-10-01, aynen):** *"bugünden itibaren kanban wrongstack tam kapasite kullanıma
 > geçiriliyor her yerdeki kuralları değiştir. şayet beğenirsek linear devre dışı"*. Canlı iş kaydının tek kaynağı
 > **Kanban**'dır; **Linear DONUKTUR** (yeni iş kaydı açılmaz, mevcut kayıtlar silinmez/arşivlenmez, okunabilir).
-> Deneme **1 hafta (2026-10-08)**; beğenilirse Linear iş kaydı için emekli edilir, beğenilmezse bu belge geri
-> yazılır. Aşağıda "Linear" tarihçe ya da donuk arşiv anlamındadır; canlı kural "Kanban"dır.
+> Deneme **1 hafta (2026-10-08)** sürdü ve **kesinleşti (karar 324, Recep 2026-10-08)**: Linear iş kaydı olarak
+> **EMEKLİDİR**; yalnız Design yorum kanalı ve eski kayıt arşivi olarak kalır, hiçbir şey silinmez. Aşağıda "Linear"
+> tarihçe ya da arşiv anlamındadır; canlı kural "Kanban"dır.
 > **Niçin var:** 2026-08-26'da "açık" görünen 120 kaydın 54'ü ZATEN YAPILMIŞTI, 19'u
 > tanımlanamayacak kadar kötü açılmıştı, 5 kimlik çakışıyordu. Sistem geçmişini bilmiyordu;
 > aynı iş yeniden öne sürülebiliyordu. Bu cetvel o sınıfı kapatır.
@@ -59,15 +60,16 @@ korur. **Kısa ad tablosu yalnız bu belgededir; diğer belgeler bu tabloya atı
 | MEVZUAT | `MVZ` | `MVZ-1` |
 | SATIS | `STS` | `STS-1` |
 | TASARIM | `TSR` | `TSR-1` |
+| TAKIP (karar 322) | `TKP` | `TKP-1` |
 
 OPS ve SEO zaten üç harf olduğu için aynı kalır; I18N harf-rakam karışık olduğu için `DIL` alır (biçim: 2-4 büyük harf).
 Tabloda olmayan departman ilk kartını açmadan önce
 OPS'tan kısa ad alır ve OPS bu tabloya satır ekler; kısa ad elle uydurulmaz.
 
-**Design istisnası (karar 219, DENEME BOYUNCA, 2026-10-08'e kadar):** "Linear donuk" yalnız İŞ KAYDI içindir.
+**Design istisnası (karar 219, KALICI: karar 324, 2026-10-08):** "Linear emekli" yalnız İŞ KAYDI içindir.
 Claude Design Kanban'a yazamaz (`olcum/erisim-envanteri.md`); karar yorumları Linear PROJE yorumlarında açık kalır
-ve sayaç kancası ile `ops-iletisim-protokolu.md` yerinde durur. Deneme bitişinde beğenilirse Design için ayrı yol
-(kartta dosya ya da panoya yorum) kurulur; bu madde o zaman yeniden yazılır.
+ve sayaç kancası ile `ops-iletisim-protokolu.md` yerinde durur. Design için ayrı bir yol (kartta dosya ya da panoya
+yorum) kurulursa bu madde o zaman yeniden yazılır.
 
 ## 2. Kart AÇMA şablonu (Kanban)
 
@@ -114,14 +116,15 @@ cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
   **önce ardıl kayıt açılır, sonra eski kayıt ona işaret ederek kapanır** (ORION §6).
 - **Kart yaşam döngüsü (karar 219; karar 187'nin Kanban karşılığı, Recep 2026-10-01).** Kanban'da otomatik
   kapanış YOKTUR: kart **kanıtla, elle** Done'a çekilir (§6.1: tek komut, çıkış koduyla konuşur).
-  - Her PR gövdesi `Kanban: <numara>` satırı taşır (`Kanban: HRT-2`; taşınan kart için `Kanban: REC-538`).
+  - Her PR gövdesinin İLK satırı `Kanban: <numara>` olur (`Kanban: HRT-2`; taşınan kart için `Kanban: REC-538`); numara aşağıda gömülü kalırsa
+    `node scripts/belge/kart-plan-kapisi.cjs --pr-govde-dosyasi <govde.md>` kırmızı verir (HRT-46; yerelde koşar, CI'da değil).
     Kapı bu satırı kabul eder (ARAÇ, PR 0).
-  - **Geçiş penceresi (2026-10-08'e kadar):** kapı eski kalıpları da kabul eder: `Fixes REC-nn` (Linear'ın GitHub bağı
-    donuk REC-nn kaydında çalışmaya devam eder ve o kaydı kapatır) ve `Kayıtsız: <sebep>`. Pencere bitince `Fixes`
-    kalkar (ARAÇ, PR 2); deneme beğenilmezse kalıcı olur ve bu belge geri yazılır.
+  - **Geçiş penceresi KAPANDI (2026-10-08, karar 324):** kapı yalnız `Kanban:` satırını kabul eder; eski kalıplar
+    `Fixes REC-nn` ve `Kayıtsız: <sebep>` ertesi günden beri KIRMIZI verir (`scripts/board/pr-kayit-kapisi.cjs`,
+    `ESKI_YOL_SON_GUN`). Kartsız iş yoktur: önce kart açılır.
   - Birden fazla PR'lık iş, her biri tek PR'la biten **alt kartlara** bölünür (karar 187 ilkesi korunur); her PR kendi
-    alt kartını taşır, çatı karta doğrudan bağlanmaz. Pencere boyunca çatı REC-nn kaydına `Fixes`/`Closes`/`Resolves`
-    yazılmaz (Linear o kaydı birleşmede kapatır; 2026-09-29'da REC-433 çatısı bu riske girdi, birleşmeden önce
+    alt kartını taşır, çatı karta doğrudan bağlanmaz. Çatı REC-nn kaydına `Fixes`/`Closes`/`Resolves`
+    yazılmaz (Linear'ın GitHub bağı o kaydı birleşmede kapatır; 2026-09-29'da REC-433 çatısı bu riske girdi, birleşmeden önce
     yakalandı).
   - **Çatı kartı alt kart almaz, bağlantılı kart alır.** Çatı = program, plan, kalıcı defter, kapsamı zamanla büyüyen
     iş (REC-425 talimat defteri, REC-345 bağımlılık programı, REC-206 katalog hattı, REC-433 tek plan, REC-400 belge
@@ -180,8 +183,8 @@ kondu; departman gerçekten üzerinde çalıştığını In Progress'e kendisi a
 
 ## 6.1 Kanban tam kullanım (pilot: karar 46, 2026-09-18; tam kullanım: karar 219, 2026-10-01)
 
-**Kapsam (karar 219):** her iş için Kanban'da kart açılır; tüm iş takibi Kanban'dadır, Linear donuktur. Panolar:
-ortak "Bekleyenler" panosu + departman başına bir pano. Deneme **1 hafta (2026-10-08)**; pilotun ölçülmüş
+**Kapsam (karar 219):** her iş için Kanban'da kart açılır; tüm iş takibi Kanban'dadır, Linear iş kaydı olarak emeklidir (karar 324). Panolar:
+ortak "Bekleyenler" panosu + departman başına bir pano. 1 haftalık deneme 2026-10-08'de kesinleşti; pilotun ölçülmüş
 tuzakları ve kart kanıt kuralları aşağıda aynen geçerlidir (pilot sırasında Linear yanında koşuyordu; artık yerine geçti).
 
 **Kart biçimi:** başlığın ilk satırı kart numarasıyla başlar (§1: `<KISA AD>-<sayı>`; Linear'dan taşınan kartta
@@ -189,6 +192,21 @@ tuzakları ve kart kanıt kuralları aşağıda aynen geçerlidir (pilot sıras�
 Kartın **Done**'a geçmesi için kanıt zorunludur: `gh pr checks <PR>` çıktısı ya da eşdeğeri.
 "Bitti", "tamam", "çalışıyor" gibi tek kelimelik özet **reddedilir** (aracın kendi belirsizlik
 süzgeci de bunları eliyor — ölçüldü).
+
+**Teslim notu (OPS 2026-10-09, HRT-44):** Done'a geçen her kartta, geçiş gününde yazılmış en az bir dolu not bulunur
+(yazar `system` olmayan, en az 10 harf ya da rakam içeren; nokta, boşluk, emoji not değildir). Not teslimin yerini söyler: dosya yolu
+ya da PR numarası + iki satır özet; `→`, `KANIT:`, `#<PR no>` ya da commit kısaltması "kanıt izi" sayılır. Ölçü:
+`node scripts/board/kart-not-sayimi.cjs` (şerit başına "Done(bugün) N, notsuz M: <no [kısa kimlik]>"; notsuz varsa çıkış 1; eşik **0**;
+`--kanit-zorunlu` ile kanıtsız not da eksik sayılır; ölçülemeyen hal çıkış 2, "temiz" sayılmaz).
+"Bugün Done oldu" Done'a geçiş anıdır: `completedAt`, yoksa Kanban olay kaydındaki son Done taşıması (`doneAt`; Done kolonundaki arşivli
+kartlarda `completedAt` boştur), ikisi de yoksa `sonAnlamli` ve satır "yaklaşık" diye işaretlenir. `sonAnlamli` ilk tercih DEĞİLDİR: eski
+karta bugün düşülen not onu bugüne taşır. Betik yalnız Done kolonundaki kartı sayar; hiç Done'a çekilmemiş teslim (kart Backlog'da
+kalmış, PR birleşmiş) bu ölçüye girmez; onu `node scripts/board/teslim-kart-koprusu.cjs` ölçer (bugün origin/master'a giren her PR'ın
+numarası (`#N`, `PR N` ya da `.../pull/N`; komşu numara anmak sayılmaz: `#17`, `#1786`'yı karşılamaz) ya da tek başına duran en az 7
+karakterlik commit kısaltması o gün yazılmış bir kart notunda geçmeli; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)";
+eşik **0**; ölçülemeyen hal çıkış 2). Dependabot birleştirmeleri (başlığı `chore(deps…):`, `chore(ci…):` ya da `chore(tools…):`;
+önekler `.github/dependabot.yml`'deki `commit-message.prefix` değerleridir, test ikisini eşit tutar) teslim sayılmaz: ayrı
+"Bot PR" satırında görünür, çıkış kodunu etkilemez (OPS 10-10). İkisi birlikte koşulur; notsuz bulunan teslim sahibine yazılır, OPS'a özet gider.
 
 **Ölçülmüş tuzaklar ve karşılıkları:**
 
@@ -227,9 +245,51 @@ eksisidir. Toplu giriş MCP aracıyla tek tek DEĞİL, sunucuya stdio üzerinden
 (OPS 2026-10-01: 154 kart, hata 0, pencere bağlamına yük binmedi); `create_from_graph`/`sync_task_graph` toplu girişte
 KULLANILMAZ (yukarıdaki tuzak: yönetilmeyen pano, kanıtsız Done).
 
-**Denemenin ölçütü (2026-10-08'de değerlendirilir):** dört ölçü karşılaştırılır — (a) kart açılmadan kalan iş
+**Denemenin ölçütü (2026-10-08'de değerlendirildi; sonuç karar 324: Linear iş kaydı olarak emekli):** dört ölçü karşılaştırıldı — (a) kart açılmadan kalan iş
 sayısı, (b) Done'a kanıtsız geçme denemesi sayısı, (c) Linear'a sızan yeni iş kaydı sayısı (donukluk ihlali), (d) Recep panodan durumu kendi gözüyle görebildi mi (ARC-5 sayfası).
 Deneme "iyi hissettirdi" diye sürdürülmez; sayılar OPS'tan Recep'e tek tabloyla gider.
+
+---
+
+## 6.2 RECEP YETKİSİ satırı (ARC-95, 2026-10-12)
+
+**Niçin:** Yetkisi zaten verilmiş iş tekrar tekrar Recep'e soru olarak geldi; kural yazılıydı
+(`.claude/rules/filo-ortak.md` "Onay nerede verilir", karar 317 ailesi) ama uygulayan kapı yoktu.
+
+**Kural:** Recep'e bağlanan her kartın (etiket `recep-bekliyor` ya da `karar-bekliyor`, ya da atananı `Sen`/`Recep`)
+açıklamasında satır başında şu satır bulunur:
+
+```
+RECEP YETKİSİ: <gerekçe>
+```
+
+Gerekçe YALNIZ şu altı sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
+yazımı fark etmez):
+
+| Gerekçe | Ne zaman |
+|---|---|
+| canlı yazım | Canlı veriye (fiyat, katalog, ürün satırı) yazan betik/iş |
+| migration birleştirme | Migration içeren PR'ın master'a birleşmesi (kural 13) |
+| gerçek para | Ödeme, fatura, ücretli abonelik/alım |
+| geri alınamaz silme | Geri dönüşü olmayan silme |
+| yeni görünüm/iddia/yapı kararı | Vitrinde/metinde yeni görünüm, yeni iddia ya da yapı kararı (üç biçim de geçerli) |
+| hesap/ayar dosyası | Hesap, kimlik ya da izin/ayar dosyası değişikliği |
+
+Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerekçe liste dışıysa kapı kırmızı verir
+("bu işin yetkisi zaten verilmiş, yap").
+
+**Kapı:** `.claude/hooks/kartsiz-beklenti-kapisi.cjs` (Stop kancası) ikinci denetim olarak yürütür; birinci denetim
+(istek maddesinin kartı var mı, kart açık ve Recep'e bağlı mı) geçince, anılan kartın TAM açıklaması
+(`kanban-anlik.cjs --detay`) okunup satır aranır. Testi: `src/__tests__/conformance/kanca-kartsiz-beklenti-kapisi.test.ts`
+(INV-KARTSIZ-KAPI-10, -11; altı bozma yakalandı).
+
+**Sınırlar (bilinçli):**
+
+- Ayrıntı okuması çökerse tur GEÇER (fail-open) ama durum dosyası ve stderr "denetim ölçülemedi" der; sessiz değildir.
+- Mesajda `Kartsız: <sebep>` atlatması önceki gibi çalışır ve bu denetimi de atlar; sebep `kartsiz-atlatma.log`'a düşer.
+- Gerekçe satırı yalnız VARLIĞINI ve sınıfını doğrular; sınıfın doğru seçilip seçilmediğine (ör. canlı yazım olmayan işe
+  "canlı yazım" yazmak) kapı bakamaz: o OPS'un kart incelemesidir.
+- Atananı `Sen`/`Recep` olup etiketsiz kart da Recep'e bağlı sayılır (birinci denetimde de geçerli).
 
 ---
 

@@ -7,9 +7,10 @@ import ALTIN from './fixtures/sitemapAltin.json'
  *
  * KAPALI (ADRES_SEMASI_K3B=false, bugün): çıktı, bu değişiklikten ÖNCEKİ kodun çıktısıyla BAYT BAYT aynı.
  * `fixtures/sitemapAltin.json` eski kodun (master 25c78d9c9) aynı sahte veriyle ürettiği satırlardır
- * (url, changefreq, priority, alternates); `{BASE}` = SITE_URL. EN_YAYIN'ın iki hâli de sabitlenir.
- * AÇIK (Faz 4 yayın günü): her satır kanonik yeni şemadan; kategori dalı iki seviyeli, marka `markalar`,
- * ürün listesi `urunler`, aile `urun`; her adres tekil ve tek kanonik (sıçrama yok).
+ * (url, priority, alternates); `{BASE}` = SITE_URL. EN_YAYIN'ın iki hâli de sabitlenir. `changefreq` REC-498'de
+ * KALDIRILDI (Google yok sayar): altın veriden de çıkarıldı, geri gelirse bu test kırılır.
+ * AÇIK (Faz 4 yayın günü): her satır kanonik yeni şemadan; kategori (kök ve alt) tek segment (SEO-35 B-1), marka
+ * `markalar`, ürün listesi `urunler`, aile `urun`; her adres tekil ve tek kanonik (sıçrama yok).
  *
  * ÖLÇMEDİĞİ: 442 model adresi (3e-2), gerçek DB verisi, canlıda 308 sıçraması (yayın günü Faz 4).
  */
@@ -37,11 +38,19 @@ vi.mock('@/lib/services/family.service', () => ({
   getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }, { slug: 'vortice-hava-perdesi' }, { slug: '' }],
   // REC-454 (master): aile lastmod'u ayrı sorgudan gelir; bu test yalnız ADRESİ ölçer, tarih sitemapLastmod.test.ts'te.
   getFamilySitemapData: async () => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
+  // OPS-51: marka ürün sayısı ENJEKTE (DB yerine). Flexiva ürünsüz → haritada yok (altın veriyle tutarlı); diğerleri ürünlü.
+  getBrandFamilyCount: async (_supabase: unknown, ad: string) => (ad === 'Flexiva' ? 0 : 5),
 }))
 
-type Satir = { url: string; changefreq: unknown; priority: unknown; alternates: unknown }
+type Satir = { url: string; priority: unknown; alternates: unknown }
 
-async function harita(enYayin: boolean, k3b: boolean): Promise<{ satirlar: Satir[]; base: string }> {
+/** Next.js site haritası satırında tanıdığı alan adları (yanlış ad sessizce düşer; REC-498'de `changefreq` böyle yaşadı). */
+const TANINAN_ALANLAR = new Set(['url', 'lastModified', 'changeFrequency', 'priority', 'alternates', 'images', 'videos'])
+
+async function harita(
+  enYayin: boolean,
+  k3b: boolean,
+): Promise<{ satirlar: Satir[]; base: string; ham: Array<Record<string, unknown>> }> {
   vi.resetModules()
   vi.doMock('@/config/features', async (orijinal) => ({
     ...(await orijinal<typeof import('@/config/features')>()),
@@ -53,9 +62,9 @@ async function harita(enYayin: boolean, k3b: boolean): Promise<{ satirlar: Satir
   const ham = await sitemap()
   return {
     base: SITE_URL,
+    ham: ham.map((s) => ({ ...s })),
     satirlar: ham.map((s) => ({
       url: s.url,
-      changefreq: s.changeFrequency ?? (s as { changefreq?: string }).changefreq,
       priority: s.priority,
       alternates: s.alternates,
     })),
@@ -72,45 +81,70 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
   })
 
   describe('bayrak KAPALI — çıktı eski kodla bayt bayt aynı', () => {
-    it('EN_YAYIN kapalı: 21 satır, altın veriyle birebir', async () => {
+    // OPS-51: marka listesi 5 → 7 ama haritada 6: casals girdi (+1 TR, +2 iki dilde), flexiva ürünsüz olduğu için
+    // sitemap DIŞI (noindex,follow sayfa): 21 → 22 (TR) ve 40 → 42 (iki dil). Altın dosya yalnız casals satırlarıyla genişledi.
+    // BLG-3 (2026-10-11): ikinci rehber yazısı yayına girdi → +1 satır (kapalı 22 → 23, açık 42 → 43; EN_YAYIN açıkken
+    // Bilgi Merkezi yazıları yalnız TR'de yazıldığı için tek satır).
+    it('EN_YAYIN kapalı: 23 satır, altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(false, false)
-      expect(satirlar).toHaveLength(21)
+      expect(satirlar).toHaveLength(23)
       expect(altinaCevir(satirlar, base)).toEqual(ALTIN.enKapali)
     })
 
-    it('EN_YAYIN açık: 40 satır (iki dil, alternates ile), altın veriyle birebir', async () => {
+    it('EN_YAYIN açık: 43 satır (iki dil, alternates ile), altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(true, false)
-      expect(satirlar).toHaveLength(40)
+      expect(satirlar).toHaveLength(43)
       expect(altinaCevir(satirlar, base)).toEqual(ALTIN.enAcik)
     })
   })
 
+  describe('alan adları — changefreq/changeFrequency YOK (REC-498)', () => {
+    for (const [enYayin, k3b] of [[false, false], [true, false], [false, true], [true, true]] as const) {
+      it(`EN_YAYIN ${enYayin ? 'açık' : 'kapalı'}, k3b ${k3b ? 'açık' : 'kapalı'}: her satırda yalnız Next.js'in tanıdığı alanlar, değişiklik sıklığı yok`, async () => {
+        const { ham } = await harita(enYayin, k3b)
+        expect(ham.length).toBeGreaterThan(0)
+        for (const satir of ham) {
+          expect(Object.keys(satir).filter((a) => !TANINAN_ALANLAR.has(a)), String(satir.url)).toEqual([])
+          expect('changeFrequency' in satir, `${String(satir.url)}: changeFrequency (Google yok sayar)`).toBe(false)
+        }
+      })
+    }
+  })
+
   describe('bayrak AÇIK — kanonik yeni şema', () => {
-    it('TR adresleri: ürün listesi urunler, kategori kök ve kök/dal, marka markalar, aile urun', async () => {
+    it('TR adresleri: ürün listesi urunler, kategori kök ve alt (tek segment), marka markalar, aile urun', async () => {
       const { satirlar, base } = await harita(false, true)
       const yollar = satirlar.map((s) => s.url.replace(base, ''))
       expect(yollar).toContain('/tr/urunler')
       expect(yollar).toContain('/tr/kategori/fanlar')
-      expect(yollar).toContain('/tr/kategori/fanlar/sessiz-kanal-fanlari')
+      // SEO-35 B-1: alt kategori TEK segment; üst slug'lı iki seviyeli biçim haritada YOK.
+      expect(yollar).toContain('/tr/kategori/sessiz-kanal-fanlari')
+      expect(yollar).not.toContain('/tr/kategori/fanlar/sessiz-kanal-fanlari')
       expect(yollar).toContain('/tr/kategori/hava-perdeleri')
       expect(yollar).toContain('/tr/markalar/vortice')
       expect(yollar).toContain('/tr/urun/vortice-lineo-quiet')
-      // Marka LİSTESİ iki şemada da /brands (markalar/page.tsx yok); statikler dokunulmaz.
-      expect(yollar).toContain('/tr/brands')
+      // Marka LİSTESİ açık şemada TR `/tr/markalar` (URN-85, Design CSV satır: markalar); eski `/tr/brands` kalmaz.
+      expect(yollar).toContain('/tr/markalar')
+      expect(yollar).not.toContain('/tr/brands')
       expect(yollar).toContain('/tr/contact')
     })
 
-    it('eski şema adresi HİÇBİRİNDE kalmaz (kategori dalı iki seviyeli, /category /brands/<slug> /products/<aile> yok)', async () => {
+    it('eski şema adresi HİÇBİRİNDE kalmaz (/category /brands/<slug> /products/<aile> yok); iç içe kategori adresi hiçbir dilde yok', async () => {
       const { satirlar, base } = await harita(true, true)
       const yollar = satirlar.map((s) => s.url.replace(base, ''))
       expect(yollar.filter((y) => /^\/tr\/(category|products\/|brands\/)/.test(y))).toEqual([])
-      expect(yollar).not.toContain('/tr/kategori/sessiz-kanal-fanlari')
+      expect(yollar).toContain('/tr/kategori/sessiz-kanal-fanlari')
+      // Kategori adresi `/<dil>/<bölüm>/<slug>` — tam üç parça; dördüncü parça iç içe adres demektir.
+      const kategoriYollari = yollar.filter((y) => /^\/(tr\/kategori|en\/category)\//.test(y))
+      expect(kategoriYollari.length).toBeGreaterThan(0)
+      expect(kategoriYollari.filter((y) => y.split('/').filter(Boolean).length !== 3)).toEqual([])
     })
 
-    it('EN adresleri: category/fans/quiet-duct-fans, brands/<slug>, products/<aile>; hreflang eşleri satırın kendi adresiyle tutarlı', async () => {
+    it('EN adresleri: category/quiet-duct-fans (tek segment), brands/<slug>, products/<aile>; hreflang eşleri satırın kendi adresiyle tutarlı', async () => {
       const { satirlar, base } = await harita(true, true)
       const en = satirlar.filter((s) => s.url.startsWith(`${base}/en/`)).map((s) => s.url.replace(base, ''))
-      expect(en).toContain('/en/category/fans/quiet-duct-fans')
+      expect(en).toContain('/en/category/quiet-duct-fans')
+      expect(en).not.toContain('/en/category/fans/quiet-duct-fans')
       expect(en).toContain('/en/brands/vortice')
       expect(en).toContain('/en/products/vortice-lineo-quiet')
       expect(en).toContain('/en/products')

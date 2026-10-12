@@ -16,7 +16,7 @@
  *  3. Canlı mı: `claude agents --json` (ölçülebilirse YETKİLİ) yoksa `~/.claude/sessions/<pid>.json` + pid canlılığı.
  *     Rolün BİLİNEN TÜM sid'lerinden biri ya da adı rol adıyla eşleşen (Türkçe katlamalı) bir ana pencere AÇIKSA
  *     AÇMAZ: "zaten açık: <ad> (sid8)", çıkış 0 (`departman-ortak.rolPencereleri`).
- *  4. TAVAN: açık ana pencere sayısı (alt süreçler ve OPS HARİÇ) 5'e ulaştıysa AÇMAZ, uyarır, çıkış 1.
+ *  4. TAVAN: açık ana pencere sayısı (alt süreçler ve OPS HARİÇ) `PENCERE_TAVANI`na (karar 328: 8) ulaştıysa AÇMAZ, uyarır, çıkış 1.
  *     OPS tavandan MUAFTIR: Ops tavan doluyken de açılır (sayıma girmediği gibi kapıya da takılmaz).
  *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --mcp-config
  *     <ana-kök>\.mcp.json` (sid yoksa `--resume` YOK = yeni oturum), çalışma dizini = ANA DEPO KÖKÜ

@@ -19,9 +19,22 @@ vi.mock('next/cache', () => ({
 // yüzden mock `.eq('id', val)` argümanını izleyip `familyRowsById`/`productRowsById` map'lerinden
 // okuyan bir builder'a yükseltildi. `vi.hoisted` kullanılır çünkü `vi.mock` fabrikası hoist edilir
 // ve dışarıdaki değişkenlere normal kapanışla erişemez.
-const { familyRowsById, productRowsById, categoryRowsById, categoryChildrenByParentId, categorySingleQueryIds } = vi.hoisted(() => ({
+const {
+  familyRowsById,
+  productRowsById,
+  categoryRowsById,
+  categoryChildrenByParentId,
+  categorySingleQueryIds,
+  cocukSorgusuSiniri,
+  cocukSorgusuSirasi,
+  cocukSorgusuHatasi,
+} = vi.hoisted(() => ({
   // URN-12: `categories` tablosuna `.eq('id', x).single()` ile giden sorguların kimlikleri (istek-içi önbellek ölçümü).
   categorySingleQueryIds: [] as string[],
+  // URN-112: çocuk sorgusunun `.limit(n)` değerleri ve sorgu hatası enjeksiyonu.
+  cocukSorgusuSiniri: [] as number[],
+  cocukSorgusuSirasi: [] as { col: string; ascending: boolean | undefined }[],
+  cocukSorgusuHatasi: { deger: null as string | null },
   familyRowsById: new Map<
     string,
     { id: string; slug: string | null; parent_family_id: string | null }
@@ -54,13 +67,27 @@ vi.mock('@/lib/supabase/static', () => ({
           return builder
         }),
         is: vi.fn(() => builder),
-        // `await supabase.from('categories').select().eq('parent_id', id)` (çocuk sorgusu) `single()` çağırmaz.
-        then: (resolve: (value: { data: unknown }) => unknown) =>
+        // URN-112: çocuk sorgusu `.order('id')` ile sıralanır (sınır aşılınca hangi çocukların alınacağı belirli olsun).
+        order: vi.fn((col: string, opts?: { ascending?: boolean }) => {
+          cocukSorgusuSirasi.push({ col, ascending: opts?.ascending })
+          return builder
+        }),
+        // URN-112: çocuk sorgusu `.limit(MAX_KATEGORI_COCUK + 1)` ile sınırlanır; sınır değeri kaydedilir.
+        limit: vi.fn((n: number) => {
+          cocukSorgusuSiniri.push(n)
+          return builder
+        }),
+        // `await supabase.from('categories').select().eq('parent_id', id).limit(n)` (çocuk sorgusu) `single()` çağırmaz.
+        then: (resolve: (value: { data: unknown; error?: { message: string } | null }) => unknown) =>
           resolve({
             data:
               table === 'categories' && queriedColumn === 'parent_id' && queriedId
-                ? (categoryChildrenByParentId.get(queriedId) ?? [])
+                ? (cocukSorgusuHatasi.deger ? null : (categoryChildrenByParentId.get(queriedId) ?? []))
                 : undefined,
+            error:
+              table === 'categories' && queriedColumn === 'parent_id' && cocukSorgusuHatasi.deger
+                ? { message: cocukSorgusuHatasi.deger }
+                : null,
           }),
         single: vi.fn(async () => {
           if (table === 'product_families') {
@@ -108,6 +135,9 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
     categoryRowsById.clear()
     categoryChildrenByParentId.clear()
     categorySingleQueryIds.length = 0
+    cocukSorgusuSiniri.length = 0
+    cocukSorgusuSirasi.length = 0
+    cocukSorgusuHatasi.deger = null
   })
 
   afterEach(() => {
@@ -545,10 +575,13 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
         old_record: urun({ category_id: 'kok-eski', subcategory_id: 'alt-eski' }),
       }))
 
+      // SEO-35 B-1: alt kategori adresi TEK segment (üst slug'ı adreste yok).
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/en/category/kok-yeni-slug/alt-yeni-slug',
-        '/tr/kategori/kok-eski-slug/alt-eski-slug', '/en/category/kok-eski-slug/alt-eski-slug',
+        '/tr/kategori/alt-yeni-slug', '/en/category/alt-yeni-slug',
+        '/tr/kategori/alt-eski-slug', '/en/category/alt-eski-slug',
       ]))
+      // İç içe yollar hiçbir şemada üretilmez (önbelleği olmayan 308).
+      expect(yollarOf().filter((p) => /^\/(tr\/kategori|en\/category)\/[^/]+\/[^/]+$/.test(p))).toEqual([])
     })
 
     it('(U12-i) yalnız subcategory_id değişti (category_id aynı): eski alt kategori tazelenir', async () => {
@@ -561,7 +594,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       }))
 
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/tr/kategori/kok-eski-slug/alt-eski-slug',
+        '/tr/kategori/alt-yeni-slug', '/tr/kategori/alt-eski-slug',
       ]))
     })
 
@@ -590,7 +623,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
 
       expect(res.status).toBe(200)
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/category/kok-yeni-slug', '/tr/kategori/kok-yeni-slug/alt-yeni-slug',
+        '/tr/category/kok-yeni-slug', '/tr/kategori/alt-yeni-slug',
       ]))
       expect(yollarOf().some((p) => p.includes('eski'))).toBe(false)
     })
@@ -604,7 +637,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       }))
 
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/category/kok-eski-slug', '/tr/kategori/kok-eski-slug/alt-eski-slug',
+        '/tr/category/kok-eski-slug', '/tr/kategori/alt-eski-slug',
       ]))
     })
 
@@ -627,7 +660,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       // Önbellek yolları değiştirmez: dört kimliğin hepsi tazelendi.
       expect(yollarOf()).toEqual(expect.arrayContaining([
         '/tr/category/kok-yeni-slug', '/tr/category/kok-eski-slug',
-        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/tr/kategori/kok-yeni-slug/alt-eski-2-slug',
+        '/tr/kategori/alt-yeni-slug', '/tr/kategori/alt-eski-2-slug',
       ]))
     })
 
@@ -700,7 +733,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/category/kat-a', '/tr/category/kat-b']))
     })
 
-    it('(U12-q) ÜST kategorinin slug\'ı değişti: çocukların ESKİ iki segmentli yolları da tazelenir', async () => {
+    it('(U12-q) ÜST kategorinin slug\'ı değişti: çocukların sayfaları tazelenir; adres tek segment olduğundan iç içe eski/yeni yol ÜRETİLMEZ (B-1)', async () => {
       categoryChildrenByParentId.set('kat-1', [
         { id: 'cocuk-1', slug: 'cocuk-slug', metadata: null, parent_id: 'kat-1' },
       ])
@@ -711,13 +744,14 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
         record: kat({ slug: 'ust-yeni' }), old_record: kat({ slug: 'ust-eski' }),
       }))
 
+      // Çocuğun adresi üstün slug'ına bağlı değil (SEO-35 B-1) ama sayfası üst adını/kırıntıyı gösterir: tazelenir.
       expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/ust-yeni/cocuk-slug', '/tr/kategori/ust-eski/cocuk-slug',
-        '/en/category/ust-eski/cocuk-slug',
+        '/tr/kategori/cocuk-slug', '/en/category/cocuk-slug',
       ]))
+      expect(yollarOf().filter((p) => p.includes('/ust-eski/') || p.includes('/ust-yeni/'))).toEqual([])
     })
 
-    it('(U12-r) ALT kategori başka üste taşındı: eski üst altındaki yol tazelenir', async () => {
+    it('(U12-r) ALT kategori başka üste taşındı: adres DEĞİŞMEZ (tek segment), alt sayfa tazelenir; üst altı iç içe yol ÜRETİLMEZ (B-1)', async () => {
       categoryRowsById.set('ust-eski-id', { id: 'ust-eski-id', slug: 'ust-eski', metadata: null, parent_id: null })
       categoryRowsById.set('ust-yeni-id', { id: 'ust-yeni-id', slug: 'ust-yeni', metadata: null, parent_id: null })
       const { POST } = await import('../route')
@@ -728,9 +762,8 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
         old_record: kat({ slug: 'alt', parent_id: 'ust-eski-id' }),
       }))
 
-      expect(yollarOf()).toEqual(expect.arrayContaining([
-        '/tr/kategori/ust-yeni/alt', '/tr/kategori/ust-eski/alt',
-      ]))
+      expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/kategori/alt']))
+      expect(yollarOf().filter((p) => p.includes('/ust-eski/') || p.includes('/ust-yeni/'))).toEqual([])
     })
 
     it('(U12-u) yolla ilgisiz metadata alanı değişti: eski yol çalışması açılmaz, üst satırı tek kez sorgulanır, yol tekrarı yok', async () => {
@@ -746,7 +779,8 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(categorySingleQueryIds.filter((id) => id === 'ust-1')).toHaveLength(1)
       const yollar = yollarOf()
       expect(new Set(yollar).size).toBe(yollar.length)
-      expect(yollar).toEqual(expect.arrayContaining(['/tr/category/alt-tr', '/tr/kategori/ust-slug/alt-tr']))
+      expect(yollar).toEqual(expect.arrayContaining(['/tr/category/alt-tr', '/tr/kategori/alt-tr']))
+      expect(yollar.filter((p) => p.includes('/ust-slug/'))).toEqual([])
     })
 
     it('(U12-s) değişmeyen satır: ek (eski) yol üretilmez; old_record YOK iken yalnız yeni yollar', async () => {
@@ -766,6 +800,134 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(res.status).toBe(200)
       expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/category/yeni']))
       expect(yollarOf().some((p) => p.includes('eski'))).toBe(false)
+    })
+  })
+
+  /**
+   * URN-112 — alt kategori sayfasının sunucu HTML'i ÜST kategorinin adını, görünen slug'ını ve aktifliğini taşır
+   * (`kategoriSayfasi.tsx`). Üst satır değişince çocuk sayfaları bayat kalmamalı.
+   *
+   * ÖLÇÜLEN DURUM: çocuk yollarının tazelenmesi bu işten ÖNCE de vardı (URN-12 dalı, `self.id` koşuluyla HER
+   * categories olayında); eksik olan üç şeydi: çocuk sorgusunun HATASI yutuluyordu, okumanın üst sınırı yoktu ve
+   * yanıt hata durumunu söylemiyordu. Bu blok o üçünü ve mevcut kapsamı (ad değişimi, DELETE) sabitler.
+   */
+  describe('URN-112 — üst kategori değişimi: çocuk sayfaları, hata ve üst sınır', () => {
+    const ust = (extra: Record<string, unknown>) => ({
+      id: 'ust-1', slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } }, parent_id: null, tenant_id: 'tenant-1', ...extra,
+    })
+    const cocuk = (n: number) => ({
+      id: `cocuk-${n}`, slug: `alt-${n}`, metadata: { slug: { tr: `alt-tr-${n}`, en: `alt-en-${n}` } }, parent_id: 'ust-1',
+    })
+    const cocukYollari = (n: number) => [
+      `/tr/category/alt-tr-${n}`, `/en/category/alt-en-${n}`, `/tr/kategori/alt-tr-${n}`,
+    ]
+
+    it('(U112-a) ÜSTÜN ADI değişti: çocuk sayfalarının TR ve EN yolları (iki şema) tazelenir; çocuk okuması TEK ve sınırlı', async () => {
+      categoryChildrenByParentId.set('ust-1', [cocuk(1), cocuk(2)])
+      const { POST } = await import('../route')
+
+      const res = await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: ust({ name: 'Fanlar', menu_label: 'Fanlar' }), old_record: ust({ name: 'Fans', menu_label: 'Fans' }),
+      }))
+      const json = (await res.json()) as { revalidated: boolean; fanoutTruncated: boolean; revalidatedPaths: string[] }
+
+      expect(res.status).toBe(200)
+      expect(json.revalidated).toBe(true)
+      expect(yollarOf()).toEqual(expect.arrayContaining([...cocukYollari(1), ...cocukYollari(2)]))
+      expect(json.revalidatedPaths).toEqual(expect.arrayContaining(cocukYollari(1)))
+      expect(cocukSorgusuSiniri).toEqual([101])
+      // Sınır aşılınca hangi 100 çocuğun alınacağı belirli olsun: okuma `id`'ye göre ARTAN sıralı.
+      expect(cocukSorgusuSirasi).toEqual([{ col: 'id', ascending: true }])
+      expect(json.fanoutTruncated).toBe(false)
+    })
+
+    it('(U112-b) üstün adı da is_active da bu satırın içinde: is_active değişince de çocuklar tazelenir', async () => {
+      categoryChildrenByParentId.set('ust-1', [cocuk(1)])
+      const { POST } = await import('../route')
+
+      await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: ust({ is_active: false }), old_record: ust({ is_active: true }),
+      }))
+
+      expect(yollarOf()).toEqual(expect.arrayContaining(cocukYollari(1)))
+    })
+
+    it('(U112-c) HATA YOLU: çocuk sorgusu düşerse yanıt 500 + error, `revalidated` false; üstün kendi yolu ve etiketler yine tazelenir', async () => {
+      cocukSorgusuHatasi.deger = 'baglanti kesildi'
+      const { POST } = await import('../route')
+
+      const res = await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: ust({ name: 'Fanlar' }), old_record: ust({ name: 'Fans' }),
+      }))
+      const json = (await res.json()) as { revalidated: boolean; error?: string; revalidatedPaths: string[] }
+
+      expect(res.status).toBe(500)
+      expect(json.revalidated).toBe(false)
+      expect(json.error).toContain('parent_id=ust-1')
+      expect(json.error).toContain('baglanti kesildi')
+      // Üstün KENDİ sayfası ve keşif etiketleri hata yüzünden düşmez.
+      expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/category/fanlar']))
+      expect(revalidateTagMock.mock.calls.map(([t]) => t)).toEqual(expect.arrayContaining(['products-discovery']))
+    })
+
+    it('(U112-d) ÜST SINIR: 101 çocuk dönerse yalnız ilk 100 tazelenir ve fanoutTruncated true (sessiz kırpma yok)', async () => {
+      categoryChildrenByParentId.set('ust-1', Array.from({ length: 101 }, (_, i) => cocuk(i + 1)))
+      const { POST } = await import('../route')
+
+      const res = await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: ust({ name: 'Fanlar' }), old_record: ust({ name: 'Fans' }),
+      }))
+      const json = (await res.json()) as { fanoutTruncated: boolean }
+
+      expect(json.fanoutTruncated).toBe(true)
+      expect(yollarOf()).toContain('/tr/category/alt-tr-100')
+      expect(yollarOf()).not.toContain('/tr/category/alt-tr-101')
+    })
+
+    it('(U112-e) tam sınırda (100 çocuk) kırpma yok', async () => {
+      categoryChildrenByParentId.set('ust-1', Array.from({ length: 100 }, (_, i) => cocuk(i + 1)))
+      const { POST } = await import('../route')
+
+      const res = await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: ust({ name: 'Fanlar' }), old_record: ust({ name: 'Fans' }),
+      }))
+
+      expect(((await res.json()) as { fanoutTruncated: boolean }).fanoutTruncated).toBe(false)
+      expect(yollarOf()).toContain('/tr/category/alt-tr-100')
+    })
+
+    it('(U112-f) DELETE: üstün çocukları bugünkü gibi tazelenir (davranış DEĞİŞMEDİ); INSERT\'te çocuk yoksa ek yol yok', async () => {
+      categoryChildrenByParentId.set('ust-1', [cocuk(1)])
+      const { POST } = await import('../route')
+
+      await POST(buildRequest({
+        type: 'DELETE', table: 'categories', schema: 'public', record: null, old_record: ust({}),
+      }))
+      expect(yollarOf()).toEqual(expect.arrayContaining(cocukYollari(1)))
+
+      revalidatePathMock.mockClear()
+      categoryChildrenByParentId.clear()
+      await POST(buildRequest({
+        type: 'INSERT', table: 'categories', schema: 'public', record: ust({ id: 'yeni-ust', slug: 'yeni' }), old_record: null,
+      }))
+      expect(yollarOf().filter((p) => p.includes('alt-'))).toEqual([])
+    })
+
+    it('(U112-g) BUGÜNKÜ DAVRANIŞ: yolla/adla ilgisiz alan (sort_order) değişse de çocuklar tazelenir — üst satırın HER değişimi kapsanır', async () => {
+      categoryChildrenByParentId.set('ust-1', [cocuk(1)])
+      const { POST } = await import('../route')
+
+      await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: ust({ sort_order: 2 }), old_record: ust({ sort_order: 1 }),
+      }))
+
+      expect(yollarOf()).toEqual(expect.arrayContaining(cocukYollari(1)))
     })
   })
 })

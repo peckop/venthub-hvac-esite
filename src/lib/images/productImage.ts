@@ -13,9 +13,10 @@
  *    sabit `product-images` — path'in önüne `product-images/` eklenerek VentImage'a verilir.
  */
 
+import { YER_TUTUCU_GORSEL } from '@/utils/imageUtils';
+
 const PRODUCT_IMAGE_BUCKET = 'product-images';
 const PUBLIC_OBJECT_SEGMENT = '/storage/v1/object/public/';
-const PRODUCT_IMAGE_PLACEHOLDER = '/images/placeholders/product-placeholder.png';
 
 /**
  * product_images.path (Storage yolu) → herkese açık (public) Supabase Storage URL'i.
@@ -55,9 +56,10 @@ export function resolveProductImageUrl(p: {
 }
 
 /**
- * Deterministik yerel placeholder. Ürüne-özel .webp üretmez; mevcut genel
- * public/images/placeholders/product-placeholder.png asset'ini döner.
+ * Deterministik yerel placeholder. Ürüne-özel görsel üretmez; her yüzeyin ortak, ÜRÜN İÇERMEYEN
+ * nötr yer tutucusunu (`YER_TUTUCU_GORSEL`) döner. Eskiden burada gerçek bir fan fotoğrafı vardı
+ * (URN-69): görseli olmayan ısıtıcı/kontrol ürünü de fan gibi görünüyordu.
  */
 export function productImagePlaceholder(_seed: string): string {
-  return PRODUCT_IMAGE_PLACEHOLDER;
+  return YER_TUTUCU_GORSEL;
 }

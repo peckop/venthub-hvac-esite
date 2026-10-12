@@ -21,12 +21,12 @@
     { "eski": "industrial-ventilation", "bicim": "en", "hedef": null, "kaynak": "next.config'in bugün 404 veren hedefi; plan §4.1" }
   ],
   "aileler": [
-    { "eski": "vortice-lineo-100-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162 (Lineo çap aileleri 2026-08-23'te birleşti)" },
-    { "eski": "vortice-lineo-125-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
-    { "eski": "vortice-lineo-150-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
-    { "eski": "vortice-lineo-200-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
-    { "eski": "vortice-lineo-250-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
-    { "eski": "vortice-lineo-315-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" }
+    { "eski": "vortice-lineo-100-quiet", "hedef": "vortice-lineo-quiet-sessiz-kanal-fanlari", "kaynak": "next.config T162 (URN-53: hedef #1352 sonrası yeni aile slug'ı; Lineo çap aileleri 2026-08-23'te birleşti)" },
+    { "eski": "vortice-lineo-125-quiet", "hedef": "vortice-lineo-quiet-sessiz-kanal-fanlari", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-150-quiet", "hedef": "vortice-lineo-quiet-sessiz-kanal-fanlari", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-200-quiet", "hedef": "vortice-lineo-quiet-sessiz-kanal-fanlari", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-250-quiet", "hedef": "vortice-lineo-quiet-sessiz-kanal-fanlari", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-315-quiet", "hedef": "vortice-lineo-quiet-sessiz-kanal-fanlari", "kaynak": "next.config T162" }
   ],
   "urunler": [
     { "eski": "dd-12-12-1500w-3f-4p-2v-6n090p-11921", "hedefSku": "NIC-11921", "kaynak": "next.config K12 (2026-09-07); url_takma_adlari'nda da var — commit'li kopya veri kaybına karşı" },

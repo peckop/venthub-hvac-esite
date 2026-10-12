@@ -215,8 +215,9 @@ try {
  * gösterir. Bu yüzden satır MEVCUT kancaya ekleniyor; kancanın kendi işi ~135-240 ms
  * bandında kalır.
  *
- * ⭐NİÇİN GÖRÜNÜR OLMASI ŞART (REC-342 dersi): aynı ölçümü yapan bir CI kapısı var
- * (`taban-tazeligi.test.ts`) ama o yalnız PR'da konuşur. Recep'in sorusu *"DB'de değişiklik
+ * ⭐NİÇİN GÖRÜNÜR OLMASI ŞART (REC-342 dersi): aynı ölçümü yapan bir kapı var
+ * (`taban-tazeligi-dunya.test.ts`) ama o yalnız master'a her push'ta ve zamanlı koşuda konuşur
+ * (ALT-38: PR kapısından çıktı, suçsuz PR'ları bekletiyordu). Recep'in sorusu *"DB'de değişiklik
  * yaptığım an yedeğin bayat olacak, tazelemek yine 2 gün mü sürecek"* — o an PR anı DEĞİL,
  * karar anıdır. Ölçen ama kararın verildiği yerde görünmeyen kapı, görünmeyen kapıdır.
  *
@@ -331,6 +332,19 @@ try {
 }
 
 /**
+ * ── KİLİT (ARC-81) — EŞİKLİ ──
+ * Ağır komut yuvası doluysa kim tuttuğunu söyler (boşken susar). Yalnız yuva dizini okunur.
+ * Gerekçe ve sınıflama: agir-komut-kilidi.cjs.
+ */
+try {
+  const ak = require(path.join(__dirname, 'agir-komut-kilidi.cjs'))
+  const s = ak.satir(String(girdi.session_id || ''), Date.now())
+  if (s) process.stdout.write(s + '\n')
+} catch (e) {
+  process.stdout.write('⚠KILIT: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
  * ── BAĞLAM (karar 148, 2026-09-27) — HER MESAJDA ──
  * Eşik altında düz "BAGLAM: 146k/1M"; compact sınırından sonra cevap yoksa "compact sonrasi".
  * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son
@@ -338,10 +352,29 @@ try {
  */
 try {
   const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
-  const s = bd.satir(bd.sonBaglam(girdi.transcript_path), bd.compactPenceresi(DEPO))
+  const token = bd.sonBaglam(girdi.transcript_path)
+  const pencere = bd.compactPenceresi(DEPO)
+  const s = bd.satir(token, pencere)
   if (s) process.stdout.write(s + '\n')
+  // Modlar bu ölçümü pencere başına dosyadan okur (ARC-33 madde 2); yazım hatası satırı bozmaz.
+  // Compact hazırlığı (ARC-31 madde 2): durum dosyası yolu + "yarım iş" ifadesi de aynı dosyaya; kokpit satırı bundan kurar.
+  const durum = bd.pencereDurumOzeti(bd.PENCERE_KLASORU, girdi.session_id, girdi.transcript_path, token, pencere)
+  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE, undefined, durum)
 } catch (e) {
   process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── KAYIT (ARC-82) — HER MESAJDA ──
+ * Pencerenin konuşma dosyasının boyutu: "KAYIT: 612 MB"; 1 GB ⚠, 1,5 GB ⛔ yeni oturuma devret.
+ * Yalnız statSync (dosya açılmaz). Gerekçe ve eşikler: baglam-doluluk.cjs "KAYIT BOYUTU".
+ */
+try {
+  const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
+  const s = bd.kayitSatiri(bd.kayitBoyutuMb(girdi.transcript_path))
+  if (s) process.stdout.write(s + '\n')
+} catch (e) {
+  process.stdout.write('⚠KAYIT: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 /**
@@ -358,6 +391,40 @@ try {
   }
 } catch (e) {
   process.stdout.write('⚠BELGE: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── WRONGSTACK (ARC-24, karar 257) — HER MESAJDA, EŞİKSİZ ──
+ * "bizde X, son Y": sabitli sürüm taze okunur, son sürüm GitHub'dan günde en çok bir kez
+ * arka planda ölçülüp önbelleğe yazılır. Ağ yoksa "OLCULEMEDI". Gerekçe: wrongstack-satiri.cjs.
+ */
+try {
+  const ws = require(path.join(__dirname, 'wrongstack-satiri.cjs'))
+  const simdi = Date.now()
+  process.stdout.write(ws.satir(ws.oku(ws.onbellekYolu(PANO)), DEPO, simdi) + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ws.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠WRONGSTACK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── DÜNYA DURUMU (ALT-38) — EŞİKLİ ──
+ * PR kapısından çıkan dünya durumu testlerinin zamanlı koşusu (dunya-durumu.yml) kırmızı, iptal ya da
+ * sessizce ölmüşse konuşur; yoluna girdiğinde susar. Yalnız önbellek okunur, ölçüm arka planda
+ * (30 dakikada bir). PR'ı BLOKLAMAZ. Gerekçe: dunya-durumu-satiri.cjs.
+ */
+try {
+  const ds = require(path.join(__dirname, 'dunya-durumu-satiri.cjs'))
+  const simdi = Date.now()
+  const s = ds.satir(ds.oku(ds.onbellekYolu(PANO)), DEPO, simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ds.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠DUNYA: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 process.exit(0)

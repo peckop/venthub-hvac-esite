@@ -44,8 +44,8 @@ export async function generateStaticParams() {
  * REC-338 — bu rotanın `generateMetadata`'sı HİÇ YOKTU.
  *
  * ÖLÇÜM (canlı, 2026-09-14): `/tr/products` ve `/en/products` HTML'inde `rel="canonical"`
- * SIFIR; `<title>` kök layout'un varsayılanıydı (`VentHub — Premium HVAC Çözümleri` /
- * `... Solutions`). Yani sitenin en büyük liste sayfasının kendi başlığı ve kanonik adresi
+ * SIFIR; `<title>` kök layout'un varsayılanıydı (o gün `VentHub — Premium HVAC Çözümleri` /
+ * `... Solutions`; başlık sonradan değişti, bkz. `meta.siteTitle`). Yani sitenin en büyük liste sayfasının kendi başlığı ve kanonik adresi
  * yoktu — arama motoru için bu sayfa ana sayfanın kopyası gibi görünüyordu.
  *
  * `?page=` kaldırılmasıyla aynı PR'da olmasının sebebi: sorgu parametreli adresler kanonik

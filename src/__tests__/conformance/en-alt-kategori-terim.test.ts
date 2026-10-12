@@ -208,8 +208,10 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
     const { en } = await import('../../i18n/dictionaries/en')
     expect(en.category.series.technicalFamily).toBe('Subcategory')
     expect(en.category.series.seriesDetail).toBe('Subcategory Detail')
+    // BLG-6 (10-09): cümle kanıtsız "professional ventilation solutions" ifadesini bırakıp sayfanın gerçek içeriğini söyler;
+    // terim değişmedi ("product families" cümle içi çoğul, yasak kalıp "Technical Product Family" tekil değil).
     expect(en.category.series.heroDefaultDesc).toBe(
-      'Browse professional ventilation solutions by their technical product families.',
+      'Browse products by technical product families; specification tables are on the product pages.',
     )
   })
 

@@ -4,6 +4,23 @@ Sahibi: ARAÇ · Son doğrulama: 2026-09-30 · Kaynak: Recep 09-29 (Ops aracıl�
 
 **Kural (README ile aynı):** WrongStack açılınca ÖNCE bu defter okunur. Yeniden ölçüm yalnız "Yeniden ölçme tetikleyicisi" oluştuysa ya da "ölçülmedi" satırı için yapılır; yapılınca AYNI deftere tarihli eklenir.
 
+## 1.1.0 devreye alma tablosu — ENVANTER + ÖNERİ (12 Ekim 2026, ARC-109; ayrıntılı 27 satır dosyanın SONUNDA)
+
+Biçim OPS'un (12 Ekim 14:02). **Kural:** veri silen, otomatik arşivleyen ya da kayıt değiştiren hiçbir şey Recep "evet" demeden açılmaz; yalnız salt okuma ve görünürlük işleri OPS onayıyla açılır. Ölçümler 12 Ekim 13:50-15:10, sage ölçümü canlı kopya + yalıtılmış git dışı kopya.
+
+| # | Ayar / özellik | Ne yapar | Bize etkisi (ölçüldü) | Önerim | Geri alma |
+|---|---|---|---|---|---|
+| 1 | **sage toplu yeniden doğrulama** (oturum sonu hijyeni → `port.hygiene` → tüm çapalı kayıtlar) | Her oturum kapanışında `sage-hijyen-oturum-sonu.cjs` hijyeni koşar; daemon günde değil SAATTE bir gerçek doğrulama yapar (saatte bir kısma) ve çapası olan her kaydın `lastVerifiedAt`/`updatedAt` alanını yeniler, `revision` +1 | **1.1.0'a özgü DEĞİL, bir kerelik göç de DEĞİL:** hook günlüğü 30 Eylül'den beri 132 "HIJYEN tamam" (gün başına 1-19); 1.0.26'da 11 Ekim 17:30'da 209 kayıt aynı biçimde yazılmıştı, 38 `memory.hygiene_completed`, kayıt başına ortalama 27,8 revizyon (1.0.26 iken). 12 Ekim 10:56:16Z'de 210/253 kayıt tek saniyede yenilendi (log 10:56:17, incelenen 249, doğrulanan 249). Yalıtılmış kopyada daemon açılışı, arama ve iki yazma toplu yazımı TETİKLEMEDİ. Etki: `updatedAt` tazelik sinyali anlamsız (kayıtların %83'ü aynı an), revizyon şişmesi; sage.db 2,08 MB, `hq_memory_sync` kayıt başına TEK satır (253, büyümüyor), yedek boyutu ihmal edilebilir | **Dokunma (şimdilik):** zarar yok, silme yok. Görünürlük: tazelik için `updatedAt` yerine kaydın `createdAt`/içerik revizyonu okunur; isteğe bağlı: oturum sonu hijyenini günde bir kez ile sınırlamak (hook değişikliği, OPS tam fark, Recep kararı: bayat kayıt tespiti gecikir) | Hook satırı geri alınır; doğrulama zaten kayıt içeriğini değiştirmiyor |
+| 2 | **Kanban `verify_completion` komut izin listesi** (`WRONGSTACK_KANBAN_VERIFIER_COMMANDS=+gh`) | Kanıt komutunda hangi komutların koşabileceğini söyler; `gh` `+gh` ile açılır | **12 Ekim 13:51'den 15:30'a kadar `gh` kanıtları HERKES için reddedildi:** izin listesi daemon DOĞARKEN `process.env`'den okunuyor (`project-server.js:6955`), kanban daemon `+gh` olmadan doğmuştu (paylaşılan daemon: ilk açan istemcinin ortamı). Daemon yeniden başlatıldı (pid 27552), `gh api …/merge` kanıtı geçiyor | **Al (görünürlük):** `saglik.cjs --sunucu` kanban için `.mcp.json` ortamını geçirsin; kanban daemon'u yalnız `.mcp.json` istemcisinden doğsun (betikler zaten `+gh` geçiriyor). Yükseltme sırasında daemon'ları kurulum.cjs durdurur, sonra ilk istemci kaynaklıdır | Daemon durdurulur, sonraki çağrıda doğru ortamla doğar |
+| 3 | **Posta kutusu anahtarı** (`canonicalProjectRoot` gerçek disk harfi) | Aynı kök artık `venthub-hvac-1088d5` kutusunu açar (1.0.26: `7e017f`) | Eski geçmiş `7e017f`'te duruyor, 1 okunmamış mesaj vardı (GEO-SEO→HARİTA, içeriği OPS'a verildi); yeni kutuda başlandı | **Boş başlama KABUL** (OPS); taşıma ARC-105, düşük öncelik | Eski kutu silinmedi; `7e017f` 1.0.26'ya dönüşte aynen açılır |
+| 4 | **`verify_completion` bekleyen manual kontrol** (`needs_human`) | Manual kontrol bekleyen kartı `passed` saymaz | 18 açık kart (16'sı yalnız manual): hepsi insan adımı/onayı (Recep adımı, Design kare kabulü, yayın onayı); doğru çalışıyor | **Dokunma.** Ajanlara tek satır: insan onayı gelince kontrolü `passed` yap, sonra Done | — |
+| 5 | **`hygiene.sessionRetentionDays`** | Oturum kapsamlı hafızayı N gün sonra temizler | Varsayılan 7, açılacak ayar yok (ARC-94 hükmü) | **Dokunma** (0 = sonsuz saklama, sage.db büyür) | — |
+| 6 | **`memory_update` `feedback`**, **`memory_candidates` proposals** | Kullanım geri bildirimi / dış ajan önerisi | Araç argümanı, ayar değil; outdated/incorrect review adayı açar | **Dokunma** (REC-488 ile birlikte bağlanır) | — |
+| 7 | **Boşta süreç temizliği** (`DEFAULT_IDLE_MS` 5 dk, REC-464) | İstemci kalmayınca daemon'un kendini kapatması | Kod var (`sage/dist/project-server.js:8346-8489`), çalıştığı ölçülmedi | **Ölç** (yalıtılmış kopyada `WRONGSTACK_SAGE_SERVER_IDLE_MS=2000`), sonra karar | — |
+| 8 | **Yeni 1.1.0 sage yapıları** (`memories.unicode_text`, `ws_text_index_revisions`, `hq_memory_sync`, `hq_memory_sync_clock`) | Metin dizini revizyonu ve bellek senkron saati | Göç 13:07 ve 13:51'de çalıştı, kayıt kaybı yok (251→253 yeni yazımla), Türkçe "sıfırdan" aramasında 1 sonuç | **Dokunma**; yalnız gözlem | 09:54Z ve 10:49Z yedekleri; geri dönüş README "Sürüm yükseltme" |
+
+**17:00 TABLOSU NOTU:** tam 27 satırlık envanter ve eski hazırlık kartlarının hükmü bu dosyanın sonundaki "2026-10-12 · 1.1.0 devreye alma tablosu (ARC-109)" bölümündedir.
+
 ## Ne ölçüldü, nasıl
 
 | Konu | Değer |
@@ -316,8 +333,87 @@ Kaynak: alt-ajan taraması, 1.0.29, salt okuma; hiçbir özellik çalıştırıl
 3. "`memory_hygiene` aday üretir, silmez": oturum kapsamlı hafızaları 7 gün sonra yumuşak siler, tekilleştirmede `superseded` yapar; proje hafızaları için silme yalnız aday.
 4. "1.0.29'da kanban-mcp/mailbox-mcp/codebase-index-mcp yok" (alt-ajan bulgusu): üçü de npm'de 1.0.29 olarak var, karşılaştırıldı.
 
+## 1.0.27 – 1.0.31 değişiklik özeti (2026-10-04, ARC-24, karar 257) — KURULUM YAPILMADI
+
+**Ne ölçüldü:** GitHub `WrongStack/WrongStack` sürüm notları (1.0.27–1.0.30 notları yalnız "Full Changelog" bağlantısı, 1.0.31'in notu dolu), `v1.0.26...v1.0.31` arası 111 commit başlığı ve ilgili commit'lerin hangi paketlere dokunduğu (GitHub API). **Kod satırı satırı okunmadı**; commit gövdeleri boş, yalnız `fix(kanban)` commit'inin dosya listesine ve değişen işlev adlarına bakıldı. Kanıt dili yukarıdaki gibi: yazılmayan "ölçülmedi"dir.
+
+| Sürüm | GitHub'da | npm'de | Not |
+|---|---|---|---|
+| 1.0.27 | 09-27 | var | notu yalnız karşılaştırma bağlantısı |
+| 1.0.28 | 09-29 | var | aynı |
+| 1.0.29 | 09-29 | **var (npm'in son sürümü)** | sage HQ eşitleme, harici ajan bağlantısı, birleşik sıralı arama (commit başlığı) |
+| 1.0.30 | 10-01 | **yok** | MCP OAuth boş/null isteğe bağlı alan düzeltmesi (changelog satırı) |
+| 1.0.31 | 10-03 | **yok** | ToolFlow, Session Story, kalıcı Docker otomasyonu, hesap girişleri (sürüm notu) |
+
+| Bizim sunucu | Değişiklik (commit başlığından) | Bize etkisi |
+|---|---|---|
+| kanban-mcp | `fix(kanban): enforce assignment, completion and session-mirror integrity`: 27 kaynak dosya, yeni `completion-gate`, `definition-of-done`, `task-checks`, atama kurtarma (`assignment-recovery`) | **Kart kapatma (kanıt komutuyla Done) ve atama davranışı değişebilir.** Yükseltmeden önce ayrı çalışma kopyasında bir deneme kartı kapatılmalı. Ölçülmedi: bizim kapanış akışımızı bozup bozmadığı. |
+| kanban-mcp | `fix(kanban): drop the unreachable completed-branch that fails declaration emit` | Derleme düzeltmesi, davranış değişmez. |
+| sage-mcp | `graphFor` bozuk satırda fırlatmak yerine atlar; aynı terim iki kanaldan eşleşse bir kez sayılır; `close()` kimlik yeniden denemesinde bekleyen çağrıyı uyandırır; bellek geçerliliği yönetimi | Hata düzeltmeleri. **ARC-23 (aday kuyruğu) ile ilgili bir başlık görünmüyor**; ölçülmedi. |
+| mailbox-mcp | Başlıklarda mailbox-mcp'ye özel düzeltme yok; yalnız 1.0.29 toplu sürüm commit'i dokunuyor | Etki görünmüyor. WebUI'de yazma/yanıtlama eklenmiş (bizde WebUI kullanılmıyor). |
+| codebase-index-mcp | yaml/ruby/css satır eşleşmesi kendi satırında kalır; Rust `cr"…"` C-string sabitleri ham sayılır | İndekste küçük doğruluk düzeltmeleri. |
+| ortak (core, tools, runtime) | `fix(security)` sıfır ömürlü önbellek yanıtı bayat kullanılamaz (core); `harden command execution` (tools); `harden persistence, prompts, plugin guards` (core, runtime, plugins, sage…) | Dört sunucumuzun bunlara bağımlılığı **ölçülmedi**; sertleştirme niteliğinde, bir açık kapatma ilanı yok. |
+
+**Güvenlik düzeltmesi var mı:** GitHub'ın güvenlik duyuruları listesi **boş**, sürüm notlarında CVE/duyuru ifadesi yok. "security" etiketli tek commit `fix(security)` (core'da yanıt önbelleği); sertleştirme commit'leri ayrıca var. Bizim dört MCP sunucusunu doğrudan etkileyen bir açık ilan edilmemiş. Bu "etkilemez" demek değildir: ortak paketlerin sunuculara yansıması ölçülmedi.
+
+**Kurulabilirlik:** dört paketin npm'deki son sürümü **1.0.29**; 1.0.30 ve 1.0.31 yalnız GitHub etiketi. Kurulacaksa hedef 1.0.29'dur, 1.0.31 değil.
+
+**Öneri:** güvenlik duyurusu olmadığı için yükseltme **12 Ekim sonrası**; önce ayrı çalışma kopyasında kanban kart kapatma denemesi. Bu dört madde bu bölümde karara bağlanmadı: ARC-24'ün 4. kalemi (Context Dashboard ve Session Story'nin bizim bağlam kancamızla karşılaştırılması) **henüz yapılmadı**.
+
+**Satırın kendisi:** her mesajın kanca satırında "WRONGSTACK: bizde X, son Y" görünür (`.claude/hooks/wrongstack-satiri.cjs`); GitHub'dan günde en çok bir kez okunur.
+
 ## Yeniden ölçme tetikleyicisi
 
-- WrongStack yeni sürüm yayımlanınca (bugün en yeni 1.0.29): yalnız `diff` ile değişen paketler okunur, bu deftere tarihli satır eklenir.
+- WrongStack yeni sürüm yayımlanınca (kanca satırı "WRONGSTACK: bizde X, son Y" uyarı verir; 2026-10-04'te en yeni GitHub 1.0.31, npm 1.0.29): yalnız `diff` ile değişen paketler okunur, bu deftere tarihli satır eklenir.
 - REC-391 kalemlerinden biri kapanınca ilgili satırın "Bizde durum" hücresi güncellenir.
 - "Yeni kayıt gerekir" yazan satırlar için Ops onayından sonra Linear kaydı açılır; kayıt numarası satıra yazılır (kaydı olmayan iş takip tablosuna girmez).
+
+## 2026-10-12 · 1.1.0 devreye alma tablosu (ARC-109)
+
+Sahibi: ARAÇ · Kayıt: ARC-109 · Sürüm: bizde **1.1.0** (12 Ekim 13:51, ARC-94, kurulu paketler `tools/wrongstack-mcp/node_modules/@wrongstack/*` 11 paket 1.1.0) · Emir: OPS 12 Ekim 14:02 (Recep: bekleyen WrongStack özellikleri hızla hayata geçsin, gereksiz denetim yapılmasın).
+
+**Yöntem:** salt-okuma tek araştırmacı alt ajan (kurulu paket `dist`, kart verisi, `git grep origin/master`) + ARAÇ'ın üç doğrulaması (#1670 ve #1662 durumu `gh`, ARC-30 betiğinin master'da olmaması `git ls-files`, K5 izin listesi `kanban/dist/index.js:5406`). Hiçbir sunucu canlı köke açılmadı. **Üst düzey hüküm:** 1.1.0'da açılacak iç ayar yoktur (`docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md` satır 151-181); asıl iş, bekleyen kartların devreye alınmasıdır.
+
+⚠**Düzeltme (ölçüldü 12 Ekim):** araştırmacı "ARC-74/#1662 birleşti" dedi, doğru değil: **#1662 (ARC-24 günlük etiket kontrolü) ve #1670 (ARC-30 önceki çalışma betiği) AÇIK, master'da YOK** (`gh pr view`: state OPEN; `git ls-files` onceki-calisma 0). Bu iki kalem tabloda 1 ve 3. satırdır.
+
+| # | Özellik / kart | 1.1.0'da var mı | Biz kullanıyor muyuz | Devreye alma adımı | Hangi ajan nasıl kullanacak | Önerim |
+|---|---|---|---|---|---|---|
+| 1 | ARC-30 iş başı önceki çalışma tek komut (WrongStack özelliği değil, bizim betik) | — | Hayır: #1670 AÇIK (10-03'ten beri, 1094 satır, 4 dosya), master'da yok | #1670 güncellenir (master'a rebase), OPS tam fark okur, UserPromptSubmit kancasına bağlanır (**AYAR/KANCA ETKİLİ**) | Her ajan iş başında ilk satırda "önceki çalışma" sonucunu görür; plan satırı için ayrıca kart kapısı (#1668) var | **AL** (gereksiz tekrar işi en çok azaltan kalem) |
+| 2 | ARC-107 `verify_completion` bekleyen manual kontrol | Evet, davranış değişti: 1.0.26 `passed`, 1.1.0 `needs_human` | Evet: 18 açık kartta bekleyen manual kontrol (kopya sayımı) | Canlı panodan liste çıkarılır; her kartta kontrol `update_check` ile kapatılır ya da kaldırılır | wrongstack-kanban skill B.6.1: `needs_human` kapanmaz, Done'dan önce kanıt komutu | **AL, hemen** (kod yok, canlı sayım yenilenir) |
+| 3 | ARC-24 günlük WrongStack etiket kontrolü | Hayır (bizim kanca/iş) | Hayır: #1662 AÇIK | #1662 güncellenir, taban 1.1.0 yapılır; zamanlama (cron/zamanlayıcı) **Recep kararı** (karar 53) | Yok (sürüm satırı zaten `wrongstack-satiri.cjs` ile her mesajda) | **AL (taban güncelle)**; zamanlama Recep'te |
+| 4 | REC-488 bayat hafıza denetleyicisi (karar 197) | Kısmen: `memory_verify`, `memory_hygiene` var; içerik hükmü alt ajanı `cli` paketinde (bu ağaçta kurulu değil) | Kısmen: `memory_hygiene` kurulu, düzenli koşmuyor | Önce mnemosyne skill + `memory_hygiene {verify:true}` koşusu ölçülür; sonra Haiku salt-okuma ajan dosyası (**yeni ajan dosyası, OPS onayı**) | Müdür: eski iddia tespiti, salt okuma, insan onaylı | **AL, dar kapsamda** (önce mevcut araçla ölç) |
+| 5 | REC-467 döngü/patinaj bekçisi | Kısmen: `core` içinde `agent-loop-detector` var ama WrongStack ajan çalışma zamanına bağlı; Claude Code yolunda yok | Hayır (`git grep origin/master` ve 42 kanca dosyası: 0) | PostToolUse kancası + settings matcher (**AYAR/KANCA ETKİLİ**); yalnız fikir alınır, WrongStack kodu alınmaz | Tüm ajanlar: uyarı satırı, bloklamaz | **AL** (uyarı v1) |
+| 6 | ARC-79 OPS kart numarasız emir kapısı | Yok | Hayır | PreToolUse matcher SendMessage (**AYAR/KANCA ETKİLİ**); v1 uyarı, v2 durdur; onay/hüküm mesajları muaf | OPS penceresi: kart numarasız emir uyarılır | **AL** (v1 uyarı) |
+| 7 | ARC-32 kart açma kapısı (departman görevi + dosya alanı) | Yok | Hayır (settings matcher'larında kanban/add_task 0) | PreToolUse matcher `kanban_manage` + yeni kanca (**AYAR/KANCA ETKİLİ**), fail-open | OPS ve müdürler kart açarken departman görevini görür | **AL** (vadesi geçti) |
+| 8 | ARC-106 `kanban-toplu.cjs` hata zarfı | Evet: 1.1.0 geçersiz argümanı `result.isError` ile döner | Evet, sessiz yutuluyor (`:114-115`) | `if (mesaj.result?.isError) throw` + iki zarf testi | Toplu kart betiği kullananlar | **AL** (küçük) |
+| 9 | ARC-108 `saglik.cjs --sunucu` mailbox `--actor` | Evet: mailbox-mcp 1.1.0 `--actor` zorunlu | Evet (betik kusuru) | `sunucuSurumu()` mailbox için `--actor` ekler + test | ARAÇ sağlık ölçümü | **AL** (küçük) |
+| 10 | REC-466 paket kurulu değilken yalnız "bağlantı kapandı" | Yok (bizim sarmalayıcı) | Kısmen: ARC-103 sürüm kapısı artık RET nedenini stderr'e yazıyor; kurulu-değil durumu ayrı | Kurulu değilse stderr'e tek satır "kurulum.cjs --denetle" | Ajanlar teşhisi hızlanır | **AL** (küçük, ARC-103'ten sonra) |
+| 11 | REC-464 boşta süreç temizliği (K6) | Kısmen: `sage/dist/project-server.js:8346-8489` ve kanban aynı desen, `DEFAULT_IDLE_MS` 5 dk; çalıştığı ölçülmedi | Evet (daemon'lar) | Değişiklik yok; izole kopyada `WRONGSTACK_SAGE_SERVER_IDLE_MS=2000` ile süreç sayısı ölçülür | Yok (bellek uyarısı azalır) | **ÖLÇ** (yerel temizlik yazmadan önce) |
+| 12 | ARC-105 posta kutusu anahtarı 7e017f → 1088d5 | Evet (`canonicalProjectRoot` gerçek disk harfi) | Evet | OPS kararı: boş başlama KABUL. Ölçüm: 7e017f'te 1 okunmamış (GEO-SEO→HARİTA, içeriği OPS'a verildi); taşıma ayrı iş | Ajanlar yeni kutuda başlar | **AL, düşük öncelik** (taşıma) |
+| 13 | Kısa alıcı kimliği sessizce düşüyor (M3) | Ölçülmedi (`normalizeRecipient` var, kısa kimlik davranışı ölçülmedi) | Kural ile önleniyor (tam oturum kimliği) | Önce izole ölçüm; sonra sarmalayıcıda kısa kimliği reddet | Mesaj gönderen ajan | **ÖLÇ**, sonra AL |
+| 14 | Mesaj gelince alıcıyı uyandırma (M4) | Hayır: `mailbox_watch` 25 sn bekler, uyandırmaz; HTTP köprüsü `cli`'de, ölçülmedi | Hayır | İzole kopyada `mailbox serve` + bildirim kancası ölçümü | Pencereler | **ÖLÇ** (zamanlama/uyandırma Recep kararı) |
+| 15 | REC-408 süreli kiralama/çitleme | Evet (kanban-mcp: `claim_task`, `heartbeat_assignment`, `recover_stale`, `expectedLeaseId`) | Hayır: `board.cjs claim` süresiz. Kart ALTYAPI panosunda | ALTYAPI'ya devir (ARAÇ yapmaz) | Şerit claim'inde süre | **ÖLÇ**, sahibi ALTYAPI |
+| 16 | Yönetilen pano / `transition_task` (K3) | Evet (`transition_task`, `adopt_managed_lifecycle`) | Hayır: pano yönetilmiyor; `move_task` Done'a kanıtsız taşıyabiliyor (10-01 denemesi) | Pano yönetim kararı OPS/Recep; adopt başarılı yolu izole kopyada denenir | Ajan Done'dan önce `verify_completion` (kural zaten var) | **ÖLÇ** (Done riski burada) |
+| 17 | `memory_update` `feedback` (useful/outdated/incorrect) | Evet, araç argümanı | Hayır | Ayar yok; REC-488 ile birlikte bağlanır | Mnemosyne ajanı | **ÖLÇ** (REC-488 ile) |
+| 18 | Yol yeniden eşleme (path-remap, çapalar) | Evet: sage `dist` içinde, MCP yolunda yok | Hayır | Bizim küçük betiğimiz gerekir | Bayat çapa azalır | **ÖLÇ** (bayat çapa sayısı) |
+| 19 | Skill metinleri: upstream core 1.1.0 ↔ yerel kopya | Evet (`core/skills/*`; yerel-upstream diff: bug-hunter 387, multi-agent 435, chimera 187, mnemosyne 91, verify-before-done 118 satır) | Kopya ("1.0.26 kaynaklı") | YETENEK farkı okur, VentHub eklerini koruyarak upstream değişikliğini alır | Ajanlar skill'i okur | **ÖLÇ** (YETENEK'in işi, OPS iletir) |
+| 20 | `sessionRetentionDays` (oturum hafızası 7 gün) | Evet (`sage/dist/index.js:5794`) | Evet, varsayılan | Yok | Yok | **DOKUNMA** (0 = sonsuz saklama, sage.db büyür) |
+| 21 | `memory_candidates` proposals kipi | Evet | Araç kullanılıyor, kip açık değil | Yok | Dış ajan yok | **DOKUNMA** |
+| 22 | K5 `verify_completion` izin listesi | Evet: `["pwd","true","false","test"]` + bizde `+gh` | Kısmen | Yok | Kanıt komutu `gh` ile yazılabilir | **ALMA** (dar kalsın) |
+| 23 | Mailbox girdi doğrulaması (enum öncelik/kitle) | Evet | Evet | Yok | Geçerli değer gönderilir | **ALMA** (zaten geldi) |
+| 24 | ARC-23 sage beslenmiyor | Hayır: aday/ders üretimi yalnız WrongStack ajan çalışma zamanında | Sorun kanıtlı (sage.db 171 kayıt, 164'ü tek hafta, OPS 10-03) | WrongStack yolu yok; rol kurallarına tek satır `remember` kuralı | Her rol dosyaya çapalı ders yazar | **ALMA** (kendi `remember` akışımızla) |
+| 25 | MemoryInjectorAgent (enjeksiyon planı) | Evet, ajan çalışma zamanı içinde; MCP'de açılmıyor | Hayır; claude-mem enjeksiyonu var | Yok | Yok | **ALMA** (karar 146: önce hangisi isabetli ölçülür) |
+| 26 | codebase-index `incoming-calls`, `impact-analysis`, `dead-code-scan` | Hayır (MCP'de yok; `tools` paketinde) | Hayır; CodeGraph kullanıyoruz | Yok | CodeGraph (CLAUDE.md zorunlu yol) | **ALMA** |
+| 27 | `cli`/`plugins`: cron, telegram, notify-hub, injection-shield, dep-guard, cost-tracker | **Ölçülmedi** (bu ağaçta kurulu değil) | Hayır | İzole `npm pack --ignore-scripts` ile C:/tmp'de 1.1.0 ölçümü | Yok | **ÖLÇ** (Recep kararı, karar 53 ilkesi) |
+
+**Eski 1.0.35 hazırlık kartları** (hepsi backlog'da, hiçbiri kapanmadı):
+
+| Kart | 1.1.0 ile anlamı | Hüküm |
+|---|---|---|
+| ARC-72 (yamaları 1.0.35 için yeniden üret) | Yitirdi: yamalar 1.1.0 için üretildi (`yamalar/` içinde yalnız `*-1.1.0-*`) | Kapat |
+| ARC-73 (1.0.35 kopya denemesi, kart kapatma ve kilit farkı) | Yitirdi: yerine 1.1.0 geri dönüş provası ve kırma riski ölçümü geldi | Kapat |
+| ARC-71 (posta kutusu yedek kapsamında) | İş bitti: #1878 (5cd7022b2) ile birleşti | Kapat (OPS kabulüyle; kanıt komutu çalıştırılır) |
+| ARC-74 (#1662'yi birleşmeye hazırla) | **Anlamı sürüyor:** #1662 hâlâ AÇIK; taban 1.0.26 → 1.1.0 | Açık kalsın, başlığı 1.1.0'a güncelle (tablo 3. satır) |
+| ARC-24 (sürüm takibi kör) | Kısmen: hedef "1.0.26'da kal" geçersiz; günlük kontrol kalemi açık | Açık kalsın, yalnız günlük kontrol kalemiyle |
+
+**Ölçülmedi (adıyla):** `cli` ve `plugins` paketleri 1.1.0 (kurulu değil); K2 `update_task` assignee sessizce yok sayılıyor (1.1.0'da kod yolu bulunamadı); K6 boşta kapanmanın çalışma kanıtı; vector-memory (Türkçe gömme); ARC-107'deki 18 kartın canlı sayımı (kopya sayımı 10-09).

@@ -31,7 +31,6 @@ import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
-import { ADRES_SEMASI_K3B } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCart } from '../../hooks/useCartHook'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -39,6 +38,7 @@ import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { selectVariant } from '../../lib/data/selectVariant'
+import { egriYaklasikMi } from '../../lib/hvac/ductFanSelection'
 import { familyName } from '../../lib/i18n/familyName'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
@@ -49,7 +49,6 @@ import { getProductById } from '../../lib/services/product.service'
 import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { FamilyListItem,Product } from '../../types/ui-models'
-import { adresUret } from '../../utils/adresUret'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { dildekiMetin } from '../../utils/dilMetni'
 import { musteriyeGorunurAciklama } from '../../utils/icIngestNotu'
@@ -62,7 +61,7 @@ import {
   translateSpecKey} from '../../utils/productHelpers'
 import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
-import { adresDili, adresRotalari, modelBaglantiAdresi } from '../../utils/yuzeyAdresleri'
+import { adresDili, adresRotalari, modelBaglantiAdresi, modelSecimiHedefi } from '../../utils/yuzeyAdresleri'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -104,6 +103,13 @@ export interface ProductDetailPageProps {
    * kuruyordu; bağlam ilk render'da boş olduğundan ham HTML'de kategori/marka bağlantısı yoktu.
    */
   kirinti: KirintiAdimi[]
+  /**
+   * URN-126 — üretici bloğundaki marka adının bağlantısı (marka sayfası). SUNUCUDA çözülür
+   * (`ureticiMarkaAdresi`): marka kataloğu bu istemci bileşeninin demetine girmesin. `null` = marka
+   * vitrinde çözülemedi → ad düz metin kalır (var olmayan sayfaya bağlantı çizilmez).
+   * Kırıntıda marka basamağı YOKTUR; aile/model sayfasından marka sayfasına giden gövde bağlantısı budur.
+   */
+  markaHref: string | null
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -145,6 +151,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   priceTaxIncluded = null,
   sunucuSku = null,
   kirinti,
+  markaHref,
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
@@ -309,16 +316,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   // Varyant seçimi yalnız ?sku='yı günceller — sayfa yeniden yüklenmez, kaydırma korunur.
   const handleSelectVariant = useCallback((sku: string) => {
-    // Model rotası: her modelin kendi kanonik adresi var → o adrese GİDİLİR (push: geri tuşu
-    // önceki modele döner). Slug metni Faz 2'de `slug_i18n`'den gelecek; o güne kadar aile slug'ı
-    // metin olarak kullanılır — rota modeli SKU'dan çözdüğü için adres yine doğru sayfayı açar.
-    // K3-b açıkken (REC-300 Faz 3d, plan §1 "`?sku=` kalkar") aile sayfasında da seçim modelin
-    // adresine gider — `?sku=` yazıcısı yalnız bayrak KAPALIYKEN (bugün) çalışır.
-    if ((sunucuSku || ADRES_SEMASI_K3B) && family) {
-      router.push(
-        adresUret({ tur: 'model', aileSlug: family.slug, sku, slug: family.slug }, lang === 'en' ? 'en' : 'tr'),
-        { scroll: false },
-      )
+    // Karar `modelSecimiHedefi`'nde (URN-31, INV-YAYINDA-MODEL-4): yayındaki listedeki modelin kendi sayfasına GİDİLİR
+    // (push: geri tuşu önceki modele döner); yayında OLMAYAN modelin adresine push EDİLMEZ (404 olurdu) — aile
+    // sayfasında `?sku=` yazıcısı, model sayfasında aile sayfası + `?sku=` adresine gidilir. Adres metni listeden.
+    const hedef = family ? modelSecimiHedefi(adresDili(lang), family.slug, sku, sunucuSku !== null) : { tur: 'sorgu' as const }
+    if (hedef.tur === 'git') {
+      router.push(hedef.adres as Route, { scroll: false })
       return
     }
     // Tıklama yalnız istemcide olur — mevcut query'yi konumdan okumak useSearchParams
@@ -578,7 +581,21 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 {/* Marka adı hemen yanında yazıyla basılıyor — logo dekoratif (REC-268). */}
                 <BrandIcon brand={family.brand_name || ''} className="w-8 h-8" dekoratif />
                 <div className="flex flex-col">
-                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{family.brand_name}</span>
+                  {/* URN-126: marka adı BAĞLANTI (kırıntıdaki marka basamağı kalktı; arama motoru siteyi
+                      `<a href>` ile gezer). Tek `uppercase` öğesi korunur; bağlantı rengi/harf biçimini
+                      miras alır. Çözülemeyen marka (`markaHref` null) düz metin kalır. */}
+                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">
+                    {markaHref ? (
+                      <Link
+                        href={markaHref as Route}
+                        className="hover:text-primary-navy hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy rounded-sm"
+                      >
+                        {family.brand_name}
+                      </Link>
+                    ) : (
+                      family.brand_name
+                    )}
+                  </span>
                   <span className="text-steel-gray text-xs font-medium tracking-hvac-normal">{t('pdp.officialDistributor')}</span>
                 </div>
               </div>
@@ -666,7 +683,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability')}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{/* URN-60: teklif kipinde "Fiyat & Stok" başlığı yanlış vaat (fiyat/stok gösterilmiyor);
+                    kip `quoteMode` tek kaynağından (satis-kipi-gecis) okunur. */}
+                  {quoteMode ? t('pdp.quoteLabel') : t('pdp.priceAvailability')}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -704,7 +723,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                         Kardeş yüzeyler bu çözücüye çoktan geçmişti (VariantSelector:78,
                         JSON-LD `mpn`); geride kalan tek yer burasıydı. */}
                     {variantLabel && (
-                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {variantLabel}</span>
+                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.modelCode')}: {variantLabel}</span>
                     )}
                   </div>
                 </div>
@@ -974,7 +993,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                               </div>
                             ))}
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
-                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
+                              {/* URN-83: teklif kipinde "Liste Fiyatı: Teknik Teklif İste" çelişkisi — fiyat yok, etiket de "fiyat"
+                                  demez. Üstteki fiyat bloğundaki URN-60 düzeltmesinin aynısı; kip `quoteMode` tek kaynağından. */}
+                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{quoteMode ? t('pdp.quoteLabel') : t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
                                 {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                               </span>
@@ -1025,7 +1046,14 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
                                         <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
+                                        <span className="text-xs font-black text-industrial-gray text-right">
+                                          {formatSpecValue(key, val, t)}
+                                          {key === 'pq_curve' && egriYaklasikMi(val) && (
+                                            <span className="block text-xs font-normal normal-case tracking-normal text-steel-gray" data-testid="yaklasik-egri-notu">
+                                              {t('pdp.labels.approxCurve')}
+                                            </span>
+                                          )}
+                                        </span>
                                       </div>
                                     ))}
                                   </div>
