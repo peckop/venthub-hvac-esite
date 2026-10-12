@@ -293,9 +293,30 @@ async function cek() {
  */
 const DURUM_SORGU = `query {
   comments(first: 100, orderBy: createdAt) {
-    nodes { createdAt body project { id name } }
+    nodes { id createdAt body parent { id } project { id name } }
   }
 }`
+
+/**
+ * ⭐KAPANIŞ YANITI YANITSIZ SAYILMAZ (ARC-51 kök sebebi, ölçüm 2026-10-11, canlı veri).
+ *
+ * "Yanıtsız" = Design'ın son yorumundan SONRA yazılmış OPS yorumları. Bu tanım, OPS'un Design'a verdiği
+ * CEVABI da (konuşmanın kapanışı) Design'ın cevaplamadığı bir istek sayıyordu. Canlı ölçüm: DESIGN-MARKA'da
+ * Design 12:16Z'de yazdı, OPS 12:18Z'de AYNI KONUYA thread yanıtı verdi ("**OPS → DESIGN-MARKA:** …"); 24 saat
+ * sonra `--durum` "OPS 1 yorum yanıtsız (en eski 2 gün)" ve KIRMIZI verdi: OPS'un kendi kapanış yanıtı
+ * sayıldı (OPS 10-09 20:30: "sayaç OPS'un kendi yorumlarını sayıyor"; zil 02:5x'te üç kez aynı alarm).
+ * Sınıflandırma (imza + başlık) kusursuzdu: son 40 yorumun 40'ı tanındı, `serit=null` 0.
+ *
+ * KURAL: bir OPS yorumu, kendi thread'inde HEMEN ÖNCEKİ yorum bir DESIGN yorumuysa Design'a verilmiş
+ * yanıttır ve yanıtsız sayılmaz. (Linear thread'leri düzdür: yanıtların `parent`'ı kök yorumdur; MENU'de
+ * Design'ın thread yanıtına OPS'un "alındı" yanıtı bu yüzden "ebeveyni Design" ölçüsüyle kaçıyordu.)
+ * İSTİSNA: gövdede açık işaret `CEVAP BEKLİYOR` varsa (büyük/küçük harf fark etmez) bu yanıt da yeni bir
+ * istektir ve sayılır. Üst düzey yorum, kimliksiz düğüm ve thread kökü pencerede olmayan yanıt eskisi gibi
+ * sayılır (bilinmeyeni sessiz geçmek yerine eski, daha temkinli davranış).
+ * ⚠SINIR, ADIYLA: Design'a thread içinde yeni iş veren bir yanıt işaretsizse sessizlik uyarısı vermez;
+ * işaret OPS'un yazım kuralıdır (cetvel: bu başlık).
+ */
+const CEVAP_BEKLIYOR = /CEVAP\s+B[Eİ]KL[Iİ]YOR/i
 
 /** Yanıtsız OPS yorumu için eşikler: 6 saatten sonra amber, 24 saatten sonra kırmızı. */
 const ESIK_AMBER_MS = 6 * 60 * 60 * 1000
@@ -327,6 +348,23 @@ function durumHesapla(dugumler, simdiMs, okumaMs = null) {
   const projeler = new Map()
   // ⭐İmza ile başlığı çelişen yorumlar ne OPS'un ne Design'ın sayılır; son okumadan SONRA yazılanlar "belirsiz N" diye ayrı gösterilir.
   let belirsizSayi = 0
+  // ⭐Kapanış yanıtı tespiti: Linear thread'leri DÜZDÜR (yanıtların `parent`'ı thread'in KÖK yorumudur, bir önceki
+  // yanıt değil; canlı ölçüm 10-11). Bu yüzden "ebeveyn Design mı" değil, "thread içinde HEMEN ÖNCEKİ yorum
+  // Design mı" ölçülür. Kimliksiz düğüm thread'e girmez (eski şekil davranışı değişmez).
+  const konular = new Map()
+  for (const d of Array.isArray(dugumler) ? dugumler : []) {
+    if (!d || typeof d.id !== 'string' || typeof d.createdAt !== 'string') continue
+    const z = Date.parse(d.createdAt)
+    if (!Number.isFinite(z)) continue
+    const kok = d.parent && typeof d.parent.id === 'string' ? d.parent.id : d.id
+    if (!konular.has(kok)) konular.set(kok, [])
+    konular.get(kok).push({ id: d.id, zaman: z, tur: seritTuru(d.body) })
+  }
+  const oncekiTur = new Map() // yorum kimliği → thread'de hemen önceki yorumun türü ('design' | 'ops' | null)
+  for (const liste of konular.values()) {
+    liste.sort((a, b) => a.zaman - b.zaman)
+    for (let i = 1; i < liste.length; i++) oncekiTur.set(liste[i].id, liste[i - 1].tur)
+  }
   for (const d of Array.isArray(dugumler) ? dugumler : []) {
     if (!d || typeof d.createdAt !== 'string' || !d.project || !d.project.id) continue
     const zaman = Date.parse(d.createdAt)
@@ -338,6 +376,16 @@ function durumHesapla(dugumler, simdiMs, okumaMs = null) {
     }
     const tur = seritTuru(d.body)
     if (!tur) continue
+    // ⭐OPS'un thread'de Design'ın HEMEN ARDINDAN verdiği yanıt konuşmayı KAPATIR: yanıtsız sayılmaz
+    // (açık "CEVAP BEKLİYOR" hariç). Üst düzey yorum thread'in kökü olduğu için "önceki" yoktur: sayılır.
+    if (
+      tur === 'ops' &&
+      typeof d.id === 'string' &&
+      oncekiTur.get(d.id) === 'design' &&
+      !CEVAP_BEKLIYOR.test(String(d.body))
+    ) {
+      continue
+    }
     let p = projeler.get(d.project.id)
     if (!p) {
       p = { ad: d.project.name || '?', design: [], ops: [] }

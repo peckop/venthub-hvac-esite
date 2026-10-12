@@ -27,3 +27,7 @@
 - Durum dosyasının SONUNA (DEVİR bloğunun içine) her güncellemede ve compact öncesinde tam bu iki biçimden biri yazılır: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Kokpit compact hazırlığı bunu okur; ifade yoksa "ölçülemedi" görünür.
 - Kanca dosyanın son 24 KB'ındaki SON `yarım iş yok|var` ifadesini okur: satır en sonda durur, altına aynı ifadeyi taşıyan başka cümle yazılmaz. `yok` derken yarım iş listelenmez; belirsizse `var` yazılır. Ayrıntı AÇIK KUYRUK alanındadır (hafiza-yazma-duzeni-standard §9b madde 7).
 - Recep compact hazırlığı istediğinde (ya da "COMPACT YAKIN" uyarısında) üç maddelik not (durum dosyası güncel mi + saat / yarım iş / hüküm) ve iki aşamalı compact cümlesi KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu OPS'a yazıp Recep'e yazmamak kuralı çiğner (OPS 2026-10-05: iki departman bunu yaptı).
+
+## Design yorumuna yanıt (ARC-51)
+- Design'a iş veren (yeni istek, sorulan soru, bekleyen karar) OPS yanıtının gövdesine "CEVAP BEKLİYOR" yazılır (büyük/küçük harf fark etmez). Yazılmayan OPS yanıtı, Design'ın hemen önceki yorumuna verilmiş kapanış sayılır ve `--durum` "OPS N yorum yanıtsız" sayacında yanıtsız sayılmaz.
+- Okuyucu ve sınır: `scripts/board/linear-yeni-yorum.cjs`. İşaretsiz yazılan iş veren yanıt için sessizlik uyarısı çalmaz; işaret OPS'un yazım kuralıdır, kod bunu tahmin etmez.

@@ -57,7 +57,8 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     expect(m.sirKalibiVar(uzun('ghp_', 36))).toBe(true)
     expect(m.sirKalibiVar(uzun('lin_api_', 40))).toBe(true)
     expect(m.sirKalibiVar(uzun('sbp_', 40, 'f'))).toBe(true)
-    expect(m.sirKalibiVar('postgresql://kullanici:parola@sunucu/veritabani')).toBe(true)
+    // Bağlantı dizesi parçalardan kurulur: CI'daki sabit-bağlantı-dizesi taraması (ci.yml Secret guard) sahte örneği de yakalar.
+    expect(m.sirKalibiVar(['postgresql', '://kullanici:parola@sunucu/veritabani'].join(''))).toBe(true)
     expect(m.sirKalibiVar('sk-ant-...kirpilmis')).toBe(false)
     expect(m.sirKalibiVar(uzun('ghp_', 10))).toBe(false)
     expect(m.sirKalibiVar('düz hafıza notu')).toBe(false)

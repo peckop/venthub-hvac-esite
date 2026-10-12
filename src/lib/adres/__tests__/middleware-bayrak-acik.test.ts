@@ -39,6 +39,30 @@ describe('middleware — ADRES_SEMASI_K3B = true (fikstür harita)', () => {
     expect(r).toMatchObject({ durum: 308, konum: '/tr/urun/storm-serisi' })
   })
 
+  it('marka kolu (URN-119): dilsiz /brands ve /brands/<slug> TEK sıçrama — eskiden dil öneki 307 + sayfa 308 = iki', async () => {
+    expect(await istek('/brands/vortice', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/markalar/vortice' })
+    expect(await istek('/brands/vortice', { 'accept-language': 'en-US,en;q=0.9' })).toMatchObject({ durum: 307, konum: '/en/brands/vortice' })
+    expect(await istek('/brands', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/markalar' })
+    expect(await istek('/brands', { 'accept-language': 'en-US,en;q=0.9' })).toMatchObject({ durum: 307, konum: '/en/brands' })
+    const r = await istek('/brands/vortice', { 'accept-language': TR_CHROME })
+    expect(r.res.headers.get('cache-control')).toBe('max-age=0, must-revalidate')
+    expect(r.res.cookies.get('tenant_id')?.value).toBe('d3b07384-d113-495f-a558-8c38634e0000')
+  })
+
+  it('marka kolu: dilli eski adres TEK 308; hedef ikinci kez yönlenmez; bilinmeyen marka bugünkü akışta', async () => {
+    expect(await istek('/tr/brands/vortice')).toMatchObject({ durum: 308, konum: '/tr/markalar/vortice' })
+    expect(await istek('/tr/brands')).toMatchObject({ durum: 308, konum: '/tr/markalar' })
+    expect(await istek('/en/brands/VORTICE')).toMatchObject({ durum: 308, konum: '/en/brands/vortice' })
+    for (const yol of ['/tr/markalar', '/tr/markalar/vortice', '/en/brands', '/en/brands/vortice']) {
+      expect((await istek(yol)).konum, yol).toBeNull()
+    }
+    // Listede olmayan slug eşleyiciye takılmaz: dilsiz adres bugünkü dil öneki 307'sini alır (sayfa 404 verir).
+    expect(await istek('/brands/bilinmeyen-marka', { 'accept-language': TR_CHROME })).toMatchObject({
+      durum: 307,
+      konum: '/tr/brands/bilinmeyen-marka',
+    })
+  })
+
   it('kanonik ve eşleşmeyen yollar bugünkü akışa devam eder', async () => {
     for (const yol of ['/en/category/fans', '/tr/cart', '/tr/kategori/fanlar']) {
       const r = await istek(yol)

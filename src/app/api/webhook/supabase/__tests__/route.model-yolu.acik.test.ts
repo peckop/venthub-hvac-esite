@@ -54,6 +54,9 @@ describe('INV-WEBHOOK-MODEL-YOLU-1 — açık kip: tazelenen yol sitenin servis 
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('SUPABASE_WEBHOOK_SECRET', WEBHOOK_SECRET)
+    // Bayrak açıkken webhook gerçek `indexNowBildir`'i çağırır; fetch taklidi yok → test sahte slug'larla gerçek
+    // api.indexnow.org'a POST atardı (arama motoru uydurma adresi öğrenir, geri alınamaz). Kapatma anahtarı (URN-10).
+    vi.stubEnv('INDEXNOW_KAPALI', '1')
     yayindaListesiAyarla({ modeller: { 'aile-a': ['AAA-100'] } })
   })
 
