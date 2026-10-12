@@ -84,6 +84,15 @@ function eskiDeger(
  */
 const MAX_FAMILY_CHAIN_HOPS = 4
 
+/**
+ * Bir ÜST kategorinin çocuk sayfalarını tazelerken okunacak en çok çocuk sayısı (URN-112). Alt kategori sayfası
+ * üstün adını ve görünen slug'ını sunucu HTML'ine yazar; üst değişince çocuk sayfaları bayat kalmasın diye tek
+ * sorguyla okunur. Ölçüm (OPS notu, ALT-75; bu dosyada yeniden ölçülmedi): bir üstün en çok 26 alt kategorisi
+ * var; sınır bunun yaklaşık dört katıdır. Aşılırsa SESSİZCE KIRPILMAZ: `fanoutTruncated` yanıtta true olur ve uyarı basılır (kategori
+ * sayfaları ISR yedeğiyle en geç 1 saatte yine yenilenir).
+ */
+const MAX_KATEGORI_COCUK = 100
+
 interface FamilyChainRow {
   id: string
   slug: string | null
@@ -325,6 +334,9 @@ export async function POST(request: NextRequest) {
     // T138-VH K6: seri↔model zincir yürüyüşü üst sınırı aştıysa (bkz. walkFamilyChain)
     // burada toplanır ve yanıt gövdesinde görünür olur — sessizce kırpma YOK.
     let fanoutTruncated = false
+    // URN-112: üst kategorinin çocuk sorgusu düştüyse mesaj burada tutulur; iş (etiketler, site haritası,
+    // IndexNow) bitirilir ve yanıt 500 ile bu hatayı taşır — sessiz "başarılı" yok.
+    let kategoriCocukHatasi: string | null = null
 
     // PS-042: keşif (discovery) tag'leri yalnız keşfi etkileyen değişimde tetiklenir.
     // products UPDATE'inde bu, duyarlı alan (status/family_id/category_id/subcategory_id/
@@ -480,13 +492,35 @@ export async function POST(request: NextRequest) {
        * artık adres değişimi için değil, çocuk sayfaların kırıntısında üstün adı ve bağlantısı yer aldığı için
        * (CategoryLandingView) üst değişince çocuk sayfaları bayat kalmasın diye korunur. Tavan küçük
        * (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       *
+       * URN-112: alt kategori sayfasının ham HTML'inde üst halka (ad + görünen slug + aktiflik) artık sunucuda
+       * yazılıdır (`kategoriSayfasi.tsx`); bu dal bu yüzden her `categories` olayında (INSERT/UPDATE/DELETE) üstün
+       * çocuklarını tazelemeye DEVAM eder — ad (name, menu_label, translation_key), slug, metadata.slug ya da
+       * is_active değişimi bu satırın ZATEN kapsadığı kümedir; eski ad ayrıca gerekmez (çocuk adresi üstten
+       * bağımsız, yol kümesi eski/yeni üstle aynı).
        */
       if (self.id) {
-        const { data: children } = await supabase
+        // URN-112: sorgu HATASI artık yutulmaz (eskiden `data` undefined olunca çocuklar sessizce atlanıyor,
+        // yanıt "başarılı" görünüyordu) ve okuma `MAX_KATEGORI_COCUK + 1` ile sınırlıdır (+1 = aşıldığını görmek için).
+        const { data: children, error: cocukHatasi } = await supabase
           .from('categories')
           .select('id, slug, metadata, parent_id')
           .eq('parent_id', self.id)
-        for (const child of children ?? []) {
+          .limit(MAX_KATEGORI_COCUK + 1)
+        if (cocukHatasi) {
+          // Üstün kendi yolları, etiketler ve site haritası yine tazelenir; hata yanıt sonunda 500 ile bildirilir.
+          kategoriCocukHatasi = `categories çocuk sorgusu düştü (parent_id=${self.id}): ${cocukHatasi.message}`
+          console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+        }
+        const cocuklar = children ?? []
+        if (cocuklar.length > MAX_KATEGORI_COCUK) {
+          fanoutTruncated = true
+          console.warn(
+            `[Supabase Webhook] categories çocuk sayısı MAX_KATEGORI_COCUK (${MAX_KATEGORI_COCUK}) sınırını aştı — ` +
+            `parent_id=${self.id}; ilk ${MAX_KATEGORI_COCUK} çocuk tazelendi.`,
+          )
+        }
+        for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
           const childPaths = categoryPathsFor(child, self)
           for (const p of childPaths) revalidatePath(p)
           revalidatedPaths.push(...childPaths)
@@ -758,7 +792,9 @@ export async function POST(request: NextRequest) {
     const indexNow = await indexNowBildir(revalidatedPaths)
 
     return NextResponse.json({
-      revalidated: true,
+      // URN-112: çocuk sorgusu düştüyse `revalidated` false ve durum 500 (yapılan tazelemeler `revalidatedPaths`ta).
+      revalidated: kategoriCocukHatasi === null,
+      ...(kategoriCocukHatasi !== null ? { error: kategoriCocukHatasi } : {}),
       event: { table, type },
       revalidatedPaths,
       revalidatedTags,
@@ -773,7 +809,7 @@ export async function POST(request: NextRequest) {
       // bulduysa) burada true olur — sessizce kırpılmaz, ölçülebilir sinyal.
       fanoutTruncated,
       timestamp: new Date().toISOString()
-    })
+    }, { status: kategoriCocukHatasi === null ? 200 : 500 })
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('[Supabase Webhook Error]:', error)
