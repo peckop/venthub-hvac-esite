@@ -1,13 +1,13 @@
 ---
 name: git-flow
-description: "Git işlemlerinde güvenli akış: açık yolla stage, kanca atlatmama, yıkıcı komuttan önce bakma, paylaşılan geçmişi yeniden yazmama. Tetik: \"commit at\", \"PR aç\", \"dal\", \"rebase\", \"geri al\". WrongStack 1.0.26 uyarlaması."
+description: "Git işlemlerinde güvenli akış: açık yolla stage, kanca atlatmama, yıkıcı komuttan önce bakma, paylaşılan geçmişi yeniden yazmama. Tetik: \"commit at\", \"PR aç\", \"dal\", \"rebase\", \"geri al\". WrongStack 1.1.0 uyarlaması."
 category: git
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/git-flow/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/git-flow/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/git-flow/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/git-flow/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -34,6 +34,11 @@ metadata:
 ---
 
 # Git Workflow
+
+## Selection card
+- Task: Manage scoped commits, branches and pull requests.
+- Start: Identify the requested artifact, repository owner and acceptance criteria.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -143,6 +148,15 @@ reason, the trade-off, and anything a reviewer can't see in the diff.
 - [ ] Message matches the repository's convention and explains why
 - [ ] No hook bypass; no force push to shared history
 - [ ] Anything destructive was inspected first and is recoverable
+
+## Exact state and shared index
+
+Recheck the index and owned paths immediately before a commit. Hooks may produce
+additional artifacts: inspect them and verify the resulting commit after hooks
+finish. In a shared checkout, an alternate index can isolate authorized paths
+without consuming another writer's staged work; it still needs the normal hooks.
+Use structured PR input or a body file to preserve newlines. Pin the PR head
+and required CI results before any authorized merge.
 
 ## Skills in scope
 
