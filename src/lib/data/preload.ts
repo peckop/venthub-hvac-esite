@@ -121,10 +121,17 @@ export const getCachedCategorySlugSourceById = cache(async (categoryId: string) 
   return data ?? null
 })
 
-/** Kategori çözücüsünün üst kategoriden okuduğu alanlar (REC-300 Faz 3b-2). */
+/**
+ * Kategori çözücüsünün ve alt kategori sayfasının üst kategoriden okuduğu alanlar (REC-300 Faz 3b-2; URN-112).
+ * Ad alanları (`name`, `menu_label`, `translation_key`) alt kategori sayfasının kırıntısındaki ÜST adını sunucu
+ * HTML'ine yazmak içindir; adı çözen tek kural `getCategoryDisplayName`dir (kural 7).
+ */
 export interface KategoriUst {
   id: string
   slug: string
+  name: string
+  menu_label: string | null
+  translation_key: string | null
   metadata: unknown
   is_active: boolean | null
   parent_id: string | null
@@ -132,13 +139,15 @@ export interface KategoriUst {
 
 /**
  * REC-300 Faz 3b-2 — kategori kimliği → üst bilgisi. SEO-35 B-1'den beri kanonik adres tek segmenttir ve
- * üstten bağımsızdır; üst YALNIZ pasif kategorinin aktif üste yönlendirilmesi için okunur (`kategoriSegmenti.ts`).
- * Hata FIRLATILIR: yutulsaydı geçici arıza "üst yok" sayılır ve pasif dal yanlışlıkla tüm ürünlere yönlenirdi.
+ * üstten bağımsızdır; üst, pasif kategorinin aktif üste yönlendirilmesi için (`kategoriSegmenti.ts`) ve
+ * URN-112'den beri alt kategori sayfasının kırıntı üst halkası için (`kategoriSayfasi.tsx`) okunur.
+ * Hata FIRLATILIR: yutulsaydı geçici arıza "üst yok" sayılır ve pasif dal yanlışlıkla tüm ürünlere yönlenirdi;
+ * kırıntıda ise üstsüz sayfa önbelleğe yazılırdı.
  */
 export const getCachedKategoriUstById = cache(async (categoryId: string): Promise<KategoriUst | null> => {
   const { data, error } = await supabase
     .from('categories')
-    .select('id, slug, metadata, is_active, parent_id')
+    .select('id, slug, name, menu_label, translation_key, metadata, is_active, parent_id')
     .eq('id', categoryId)
     .limit(1)
     .maybeSingle()

@@ -14,6 +14,8 @@ export interface CategoryPageProps {
   page?: number;
   pageSize?: number;
   initialSubCategories?: DomainCategory[];
+  /** URN-112: alt kategorinin ÜSTÜ (sunucudan); kırıntı üst halkası ham HTML'de dolu gelsin. Kök kategoride ve pasif üstte null. */
+  initialParentCategory?: DomainCategory | null;
   /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucudan); yoksa iki Vortice sayaç kartı çizilmez. */
   vorticeKatalogSayilari?: KatalogSayilari | null;
 }
@@ -23,7 +25,7 @@ export interface CategoryPageProps {
  * @description Dinamik Kategori Sayfası Giriş Noktası.
  * Tüm mantık ve sunum merkezi Unified Category Shell (CategoryMasterView) bileşenine delege edilmiştir.
  */
-const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, total, page, pageSize, initialSubCategories, vorticeKatalogSayilari }) => {
+const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, total, page, pageSize, initialSubCategories, initialParentCategory, vorticeKatalogSayilari }) => {
   return (
     <CategoryMasterView
       initialCategory={initialCategory}
@@ -32,6 +34,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, 
       page={page}
       pageSize={pageSize}
       initialSubCategories={initialSubCategories}
+      initialParentCategory={initialParentCategory}
       vorticeKatalogSayilari={vorticeKatalogSayilari}
     />
   );
