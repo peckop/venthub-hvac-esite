@@ -167,7 +167,7 @@ describe('INV-WRONGSTACK-KANONIK-KOK-1', () => {
  * Kapı: çalıştırılacak paket dosyası ana ağaçtakiyle aynı dosya değilse sürümler eşit olmalı; okunamıyorsa RET.
  */
 const kapi = gerek(path.join(ARAC, 'posta-kutusu.cjs')) as {
-  surumKapisi: (cli: string, kokDizin?: string) => { tamam: boolean; sebep?: string; calisan?: string | null; ana?: string | null }
+  surumKapisi: (cli: string, kokDizin?: string) => { tamam: boolean; kuruluDegil?: boolean; sebep?: string; calisan?: string | null; ana?: string | null }
   surumKapisiMetni: (onek: string, k: { sebep?: string }) => string
 }
 
@@ -258,6 +258,50 @@ describe('INV-WRONGSTACK-SURUM-KAPISI-1', () => {
       const k2 = kapi.surumKapisi(cli2, t.arac(t.wt))
       expect(k2.tamam, 'ana ağaç sürümü bilinmezken canlı köke açmaya İZİN verildi').toBe(false)
       expect(k2.sebep).toMatch(/ana agac/)
+    } finally {
+      t.temizle()
+    }
+  })
+
+  it('⭐REC-466 paket HİÇBİR yerde kurulu değilse: RET + "kurulum.cjs --denetle" yönlendirmesi (yalnız "bağlantı kapandı" DEĞİL)', () => {
+    const t = kur()
+    try {
+      const yok = path.join(t.arac(t.wt), 'node_modules', '@wrongstack', 'x-mcp', 'dist', 'cli.js')
+      const k = kapi.surumKapisi(yok, t.arac(t.wt))
+      expect(k.tamam, 'kurulu olmayan paket kapıdan GEÇTİ').toBe(false)
+      expect(k.kuruluDegil).toBe(true)
+      expect(k.sebep).toMatch(/kurulu degil/)
+      // ana ağacın kendi (var olmayan) dosyası da "aynı dosya" diye geçmemeli
+      const anaYok = path.join(t.arac(t.ana), 'node_modules', '@wrongstack', 'x-mcp', 'dist', 'cli.js')
+      expect(kapi.surumKapisi(anaYok, t.arac(t.ana)).kuruluDegil, 'ana ağaçta eksik paket sessizce geçti').toBe(true)
+      const m = kapi.surumKapisiMetni('x', k)
+      expect(m).toMatch(/PAKET KURULU DEGIL/)
+      expect(m).toMatch(/kurulum\.cjs --denetle/)
+      expect(m, 'kurulu-değil metni sürüm çözümünü (node_modules sil) söylememeli').not.toMatch(/rmdir/)
+      // paket ana ağaçta kuruluysa worktree'de yokluk RET sebebi DEĞİL (ARC-98 davranışı korunur)
+      const anaCli = t.paket(t.ana, '1.1.0')
+      expect(kapi.surumKapisi(anaCli, t.arac(t.wt)).tamam).toBe(true)
+    } finally {
+      t.temizle()
+    }
+  })
+
+  it('⭐REC-466 SABOTAJ (gerçek süreç): paket kurulu değilken kanonik-kok.cjs çıkış 1 ve stderr kurulum yolunu söyler', () => {
+    const t = kur()
+    try {
+      for (const agac of [t.ana, t.wt]) {
+        fs.mkdirSync(t.arac(agac), { recursive: true })
+        for (const f of ['kanonik-kok.cjs', 'posta-kutusu.cjs']) fs.copyFileSync(path.join(ARAC, f), path.join(t.arac(agac), f))
+      }
+      const r = spawnSync(
+        process.execPath,
+        [path.join(t.arac(t.wt), 'kanonik-kok.cjs'), 'tools/wrongstack-mcp/node_modules/@wrongstack/x-mcp/dist/cli.js', '--project-root', '.', '--stdio'],
+        { cwd: t.wt, encoding: 'utf8', timeout: 15_000, windowsHide: true },
+      )
+      expect(r.status, `stderr: ${r.stderr}`).toBe(1)
+      expect(r.stderr).toMatch(/PAKET KURULU DEGIL/)
+      expect(r.stderr).toMatch(/kurulum\.cjs --denetle/)
+      expect(r.stderr, 'ham "Cannot find module" sızdı: kapı sunucuyu açmaya çalıştı').not.toMatch(/Cannot find module/)
     } finally {
       t.temizle()
     }

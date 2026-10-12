@@ -103,6 +103,11 @@ function surumKapisi(cli, kokDizin = __dirname) {
   } catch {
     return { tamam: false, sebep: 'ana agac cozulemedi (' + paket + ')', calisan: paketSurumu(cli), ana: null }
   }
+  // ⭐REC-466 (12 Ekim 2026): paket HİÇBİR yerde kurulu değilse sunucu "Cannot find module" ile ölür, istemci yalnız
+  // "Connection closed" görür. Ana ağacın kendi (var olmayan) dosyası "aynı dosya" kuralından GEÇMEMELİ: önce varlık.
+  if (!fs.existsSync(cli) && !fs.existsSync(anaCli)) {
+    return { tamam: false, kuruluDegil: true, sebep: paket + ' paketi kurulu degil (ne bu agacta ne ana agacta)', calisan: null, ana: null }
+  }
   if (path.resolve(cli).toLowerCase() === path.resolve(anaCli).toLowerCase()) return { tamam: true }
   const calisan = paketSurumu(cli)
   const ana = paketSurumu(anaCli)
@@ -118,6 +123,16 @@ function surumKapisi(cli, kokDizin = __dirname) {
 
 /** Kapı reddettiğinde stderr'e yazılan, ne yapılacağını söyleyen tek metin. */
 function surumKapisiMetni(onek, k) {
+  if (k.kuruluDegil) {
+    return (
+      onek +
+      ': PAKET KURULU DEGIL — ' +
+      k.sebep +
+      '. Sunucu ACILMADI. ' +
+      'Cozum: ANA AGACTA node tools/wrongstack-mcp/kurulum.cjs --denetle (eksigi soyler), sonra ayni dizinde ' +
+      'node tools/wrongstack-mcp/kurulum.cjs (kurulum yalniz ana agacta yapilir).\n'
+    )
+  }
   return (
     onek +
     ': SURUM KAPISI RET — ' +
