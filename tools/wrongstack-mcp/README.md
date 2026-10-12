@@ -79,6 +79,19 @@ mailbox 3. sage.db şeması değişmedi (`user_version` 0, 31 nesne, aynı imza)
 `pnpm` **kullanılmaz**: ana lockfile'a ve worktree'lerin `node_modules` bağına dokunmaz.
 Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açılışta onaya sorar.
 
+### Sürüm kapısı (ARC-103, 12 Ekim 2026): worktree farklı sürümle canlı köke AÇILMAZ
+
+**Niçin:** sunucu `--project-root`u git üzerinden ana ağaca çevirir; worktree'nin kendi `node_modules`
+paketi (yerel kurulum kazanır) canlı kökü açar. 12 Ekim 13:07'de #1883 ağacındaki 1.1.0 paketi canlı
+sage.db şemasını yerinde göç ettirdi (34 → 47 nesne, geri alınamaz; yedek vardı, veri kaybı olmadı).
+**Kural:** `kanonik-kok.cjs` ve `posta-kutusu.cjs` sunucuyu açmadan önce `surumKapisi()` çağırır:
+çalıştırılacak paket dosyası ana ağaçtakiyle aynı dosya değilse iki `package.json` sürümü eşit olmalıdır;
+eşit değilse ya da okunamıyorsa (fail-closed) **sunucu açılmaz, çıkış 1**, stderr'e iki sürüm ve çözüm yazılır.
+**Çözüm:** bu ağacın `tools/wrongstack-mcp/node_modules` dizinini sil (yerel kurulum yoksa ana ağacınki
+kullanılır; junction ise yalnız bağlantıyı kaldır: `cmd //c rmdir <yol>`, `/s` YOK) ya da ana ağaçla aynı
+sürümü kur. **Sınır:** kapı yalnız sarmalayıcıdan açılan sunucuları korur; doğrudan `cli.js` açan betik
+(`saglik.cjs --sunucu`) kendi korumasını taşır (yalnız ana ağaç). Kapı: INV-WRONGSTACK-SURUM-KAPISI-1.
+
 ## Bilinen sınırlar (adıyla)
 
 1. **Kalıcı servis.** MCP süreci bir IPC istemcisidir; SQLite'ın sahibi proje başına **ayrık bir
