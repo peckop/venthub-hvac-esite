@@ -83,14 +83,18 @@ const BrandsPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <h2 className="min-w-0 truncate text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
                       <div className="h-px flex-1 mx-4 bg-slate-100 group-hover:bg-cyan-500/20 transition-colors" />
-                      <span className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
-                        {brandText(brand.country, lang)}
-                      </span>
+                      {brand.country && (
+                        <span className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
+                          {brandText(brand.country, lang)}
+                        </span>
+                      )}
                     </div>
-                    
-                    <div className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-600/80">
-                      {brandText(brand.specialty, lang)}
-                    </div>
+
+                    {brand.specialty && (
+                      <div className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-600/80">
+                        {brandText(brand.specialty, lang)}
+                      </div>
+                    )}
                     
                     <p className="text-sm text-slate-500 font-light leading-relaxed line-clamp-3">
                       {brandText(brand.description, lang)}
@@ -118,29 +122,20 @@ const BrandsPage: React.FC = () => {
                 {t('brands.trust.eyebrow')}
               </div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-8">
-                {t('brands.trust.title').split(' ').slice(0, 2).join(' ')} <br />
-                <span className="font-medium text-cyan-400 italic">
-                  {t('brands.trust.title').split(' ').slice(2).join(' ')}
-                </span>
+                {t('brands.trust.title').split(' ').slice(0, 2).join(' ')}
+                {/* Başlık iki sözcük ya da kısaysa ikinci parça yok: boş italik <span> ve gereksiz <br> basılmaz. */}
+                {t('brands.trust.title').split(' ').length > 2 && (
+                  <>
+                    {' '}<br />
+                    <span className="font-medium text-cyan-400 italic">
+                      {t('brands.trust.title').split(' ').slice(2).join(' ')}
+                    </span>
+                  </>
+                )}
               </h2>
               <p className="text-lg text-slate-400 font-light leading-relaxed mb-12 max-w-xl">
                 {t('brands.trust.description')}
               </p>
-              
-              <div className="grid grid-cols-2 gap-8">
-                <div className="border-l border-white/10 pl-6">
-                  <div className="text-3xl font-bold mb-1">{100}%</div>
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
-                    {t('brands.trust.original')}
-                  </div>
-                </div>
-                <div className="border-l border-white/10 pl-6">
-                  <div className="text-3xl font-bold mb-1">{t('brands.page.statGlobal')}</div>
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
-                    {t('brands.trust.standard')}
-                  </div>
-                </div>
-              </div>
             </div>
             
             <div className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden border border-white/5">

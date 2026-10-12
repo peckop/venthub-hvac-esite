@@ -75,6 +75,7 @@ describe('SSR HTML duman alarmı (PROD) — içerik sunucudan gelmeli', () => {
   for (const sinif of [
     'anasayfa',
     'liste',
+    'liste-en',
     'altgruplu-kategori',
     'yaprak-kategori',
     'pdp',

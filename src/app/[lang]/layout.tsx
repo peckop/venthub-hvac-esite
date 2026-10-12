@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { EN_YAYIN } from '@/config/features'
+import { dilGecerliMi } from '@/i18n/yoldanDil'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
@@ -105,6 +107,9 @@ type Props = {
  */
 export default async function LangLayout({ children, params }: Props) {
   const { lang } = await params
+  // Derin savunma (URN-15): geçersiz dil değeri 500 değil 404 verir. Middleware bunu zaten süzer;
+  // bu, süzgeç delinirse `Intl.Collator`a geçersiz yerel ayar gitmesin diye.
+  if (!dilGecerliMi(lang)) notFound()
 
   return (
     <I18nProvider lang={lang as Lang}>

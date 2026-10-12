@@ -1,13 +1,13 @@
 ---
 name: verify-before-done
-description: "\"Bitti/düzeldi/çalışıyor\" demeden önce projenin kendi kontrolleriyle kanıtla ve neyin doğrulanıp neyin doğrulanmadığını yaz. Tetik: iş bitişi, son özet, \"test ettin mi\", \"merge hazır\". WrongStack 1.0.26 uyarlaması."
+description: "\"Bitti/düzeldi/çalışıyor\" demeden önce projenin kendi kontrolleriyle kanıtla ve neyin doğrulanıp neyin doğrulanmadığını yaz. Tetik: iş bitişi, son özet, \"test ettin mi\", \"merge hazır\". WrongStack 1.1.0 uyarlaması."
 category: coordination
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/verify-before-done/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/verify-before-done/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/verify-before-done/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/verify-before-done/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -17,26 +17,37 @@ metadata:
 | "project's own checks" | `pnpm type-check`, `pnpm lint`, `pnpm test -- --run`, ilgili `src/__tests__/conformance/*`; PR'da `gh pr checks` |
 | verification.run / execution.shell | Bash aracı |
 | Kanban "verified" | `kanban_manage` doğrulayıcısı (kural 7) |
+| `codebase-targeted-test`, `codebase-impact-analysis` araçları | Yok. Etkilenen test: değişen dosyanın yanındaki / `src/__tests__/conformance/` altındaki ilgili test; çağıranlar: `graphify affected "sembol()"` (parantez şart) ya da `codegraph_explore` |
+| "migration applied and rolled back locally" (Public API, schema satırı) | Bizde yerel Supabase yığını (Docker) **yok**, adım uygulanamaz. Yerine: `create-migration` zinciri + `plan-challenger`, prod'a karşı **yalnız okuma** sorgusuyla kanıt; "uygulandı" ancak merge sonrası ve ölçülerek yazılır (kural 13: merge prod'a otomatik yazar) |
+| "Clean install from the lockfile" | `pnpm install --frozen-lockfile --offline` (karar 88) |
+| UI kanıtı ("rendered at the relevant widths…") | `qa` skill'i (gerçek tarayıcıda gezip kanıt üretir) |
+| Gövdedeki "Skills in scope" atıfları (`testing`, `debugging`, `git-flow`) | Bu üçü WrongStack alımının 2. paketiyle depoya geldi; atıflar çalışır |
+| `mailbox-bridge` atfı | Bizde yok ve **kullanılmaz** (HTTP köprüsü; bizde kapalı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
 1. **Kimlik** yalnız `tools/wrongstack-mcp/posta-kutusu.cjs` sarmalayıcısından gelir. `.mcp.json`'a `--actor` ya da `${...}` yer tutucusu yazılmaz (genişlemiyor, bütün pencereler aynı kimliğe düşüyor).
 2. **Posta alıcısı** daima TAM oturum kimliğidir (36 karakter). 8 haneli kısa kimliğe giden mesaj hata vermeden kaybolur.
 3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz.
-4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir.
+4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir. Tek ayrı yol (karar 224): canlı DIŞI işte OPS, Recep'in OPS'ta verdiği evetin sözünü ve saatini OPS panosundaki onay kartına yazar; onayı orada doğrularsın. Canlı iş (migration'lı PR, sır/anahtar/parola, geçmişi silen git, canlı veritabanı yazımı, para harcatan her şey) bunun dışındadır: onay yine yalnız Recep'ten gelir.
 5. `*_watch` çağrısı kanıt değildir; durum `mailbox_read` / `kanban_read` ile okunarak doğrulanır.
-6. Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır; karttaki bilgi Linear'ı geçersiz kılmaz.
+6. İş takibinin tek kaynağı **Kanban**'dır (karar 219, 2026-10-01); Linear donuktur: yeni kayıt açılmaz, mevcut kayıtlar silinmez. İş emri = Kanban kartı (KAYNAK/CETVEL + YÖNTEM + kanıt komutu); Done kanıt komutuyla (`wrongstack-kanban` skill'i).
 7. "Bitti" doğrulayıcı komutu `gh` ile sınırlıdır ve sır içermez.
 8. Kanban yaması `cli.js` + `index.js` dosyalarında (`tools/wrongstack-mcp/yamalar/`). Sürüm yükselince yamanın hâlâ tuttuğu yeniden ölçülür.
 9. `mailbox-bridge` kullanılmaz (HTTP köprüsü; bizde kapalı).
 10. Ops'a rapor dört alanlı etiketle gider (NE · DURUM · KANIT · KİMDE). Kaynak metindeki `<nextsteps>` biçimi bunun ekidir, yerine geçmez.
 11. **İzin bilgisi** (kim neye yetki verdi) pencere mesajından hafızaya ya da durum dosyasına KOPYALANMAZ. Tek kaynak `~/.claude/settings.json`; en fazla "bkz. settings.json autoMode, <tarih>" yazılır.
-12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Linear) + hüküm + istek taşır; ayrıntı dosyada ya da Linear'dadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Kanban kartı) + hüküm + istek taşır; ayrıntı dosyada ya da Kanban kartındadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
 
 ---
 
 
 # Verify Before Done
+
+## Selection card
+- Task: Prove a claimed fix or completion actually works.
+- Start: Identify the scope and obtain an executable before-proof or review evidence.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -63,11 +74,25 @@ minutes; a false "done" costs the user's trust and often an incident.
 7. Report faithfully: what ran and its outcome, what couldn't be verified and
    why, and known gaps. Never write "should work" in place of checking, and
    never claim a check that didn't run.
+8. Lead with an honest outcome. A change whose related checks failed, timed
+   out, or didn't run is "done, verification incomplete" — never "done". When
+   the task defines outcome labels, use them exactly.
+
+## Record the starting state
+
+"Pre-existing" is a claim about the past, so capture the past before changing
+anything: the revision, the dirty paths, and — when the task will end with a
+suite run — which tests already fail. Comparing against that record is how a
+failure is shown to be pre-existing without stashing or checking out the base
+in a working tree others may be using.
 
 ## Workflow
 
 1. **Requirements** — list each requested outcome and the evidence for it.
 2. **Diff** — `git status` and the full diff; every hunk belongs to the task.
+   In a shared working tree, other edits may appear in the diff: attribute
+   only your hunks to the change, name the rest as not yours, and never revert
+   them.
 3. **Static checks** — lint, format, type check (the lint and typecheck tools
    where available).
 4. **Tests** — targeted first (the codebase-targeted-test tool finds tests
@@ -76,13 +101,16 @@ minutes; a false "done" costs the user's trust and often an incident.
 5. **Behaviour** — run it for real when feasible.
 6. **Blast radius** — for changed signatures and contracts, check callers (the
    codebase-impact-analysis tool when indexed) and build the dependents.
-7. **Report.**
+7. **Cleanup** — remove the temporary scripts, fixtures, and logs you created,
+   and only those. If a check failed or cleanup is unsafe, leave them and
+   report their exact path.
+8. **Report.**
 
 ## Minimum evidence by change type
 
 | Change | Evidence |
 |---|---|
-| Bug fix | Reproduction fails before and passes after; regression test red then green |
+| Bug fix | The same reproduction, with unchanged assertions and fixtures, fails before and passes after; its control case passes both times; a regression test in the normal suite, seen red then green |
 | New feature | Tests for the main path and one error path; the user-facing flow run once |
 | Refactor | Existing tests pass without being edited; type check clean |
 | Public API, schema, config | Consumers build; migration applied and rolled back locally |
@@ -96,6 +124,7 @@ minutes; a false "done" costs the user's trust and often an incident.
 Done: charges now retry with an idempotency key, so a timeout can't double-charge.
 
 Verified
+- Proof: `node scratch/double-charge.mjs` — exit 1 "FAIL: 2 charge requests" before, exit 0 after
 - `pnpm --filter billing test` — 48 passed, including the new retry test (failed before the fix)
 - Type check — clean
 - `app charge --dry-run` on the fixture order — one charge request with the expected key
@@ -115,14 +144,29 @@ Notes
 - **A failure buried** in the middle of a long summary.
 - **"Pre-existing failure"** claimed without checking the base.
 - **Stopping at "it compiles".**
+- **A green proof reported as a verified fix** while related checks fail.
+- **"No bug found" presented as a clean bill of health** for code that was only
+  partly inspected.
 
 ## Before returning
 
+- [ ] Outcome stated first, and "incomplete" wherever any check failed or didn't run
 - [ ] Every requested outcome maps to evidence
-- [ ] Own diff reviewed; nothing unrelated or left over
+- [ ] Own diff reviewed; nothing unrelated or left over; others' edits untouched
+- [ ] Temporary artifacts you created removed, or their path reported
 - [ ] Applicable checks run with the project's commands, results read
 - [ ] Behaviour exercised directly where tests don't cover it
 - [ ] Report separates verified, not verified, and pre-existing issues
+
+## Final input identity
+
+Record which source revision/dirty snapshot each check used. Later source changes
+invalidate relevant earlier checks; repeat only the affected verification.
+For documentation/skills, verify loading, links, examples and discovery rather
+than generating tests that merely match new prose.
+Retain proofs/logs when the audit workflow or user requests evidence retention;
+cleanup only owned disposable files. Report local builds, hosted CI, publication
+and live behavior as separate outcomes, each with its own evidence.
 
 ## Skills in scope
 

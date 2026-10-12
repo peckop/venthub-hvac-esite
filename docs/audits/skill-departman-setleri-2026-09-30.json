@@ -24,7 +24,16 @@
     }
    ],
    "toplamKB": 11.9,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    },
+    {
+     "ad": "web-platform-baseline",
+     "kb": 10.5
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -61,6 +70,30 @@
     {
      "ad": "ui-ux-pro-max",
      "kb": 13.6
+    },
+    {
+     "ad": "testing",
+     "kb": 12.2
+    },
+    {
+     "ad": "debugging",
+     "kb": 13
+    },
+    {
+     "ad": "react-modern",
+     "kb": 11
+    },
+    {
+     "ad": "typescript-strict",
+     "kb": 10
+    },
+    {
+     "ad": "observability",
+     "kb": 8.6
+    },
+    {
+     "ad": "api-design",
+     "kb": 10
     }
    ],
    "bekleyen": []
@@ -82,7 +115,24 @@
     }
    ],
    "toplamKB": 29,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "chimera",
+     "kb": 12.9
+    },
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    },
+    {
+     "ad": "security-scanner",
+     "kb": 8.5
+    },
+    {
+     "ad": "data-governance",
+     "kb": 9.3
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -92,7 +142,7 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "yetenek"
     },
     {
@@ -111,8 +161,13 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 31.3,
-   "adiylaCagir": [],
+   "toplamKB": 34.9,
+   "adiylaCagir": [
+    {
+     "ad": "code-review",
+     "kb": 9.6
+    }
+   ],
    "bekleyen": [
     {
      "ad": "diff-review",
@@ -141,6 +196,18 @@
     {
      "ad": "fallow",
      "kb": 16.4
+    },
+    {
+     "ad": "research-web",
+     "kb": 7.3
+    },
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    },
+    {
+     "ad": "tech-stack",
+     "kb": 9.4
     }
    ],
    "bekleyen": []
@@ -154,10 +221,36 @@
      "ad": "create-migration",
      "kb": 6.3,
      "kaynak": "departman"
+    },
+    {
+     "ad": "testing",
+     "kb": 12.2,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 6.3,
-   "adiylaCagir": [],
+   "toplamKB": 18.5,
+   "adiylaCagir": [
+    {
+     "ad": "debugging",
+     "kb": 13
+    },
+    {
+     "ad": "node-modern",
+     "kb": 10.3
+    },
+    {
+     "ad": "observability",
+     "kb": 8.6
+    },
+    {
+     "ad": "tech-stack",
+     "kb": 9.4
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -177,7 +270,28 @@
     }
    ],
    "toplamKB": 29,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "chimera",
+     "kb": 12.9
+    },
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    },
+    {
+     "ad": "security-scanner",
+     "kb": 8.5
+    },
+    {
+     "ad": "data-governance",
+     "kb": 9.3
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -187,11 +301,16 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 22.1,
    "adiylaCagir": [],
    "bekleyen": [
     {
@@ -233,7 +352,20 @@
     }
    ],
    "toplamKB": 11.4,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "research-web",
+     "kb": 7.3
+    },
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    },
+    {
+     "ad": "tech-stack",
+     "kb": 9.4
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -280,10 +412,24 @@
      "ad": "plan-challenger",
      "kb": 14.6,
      "kaynak": "departman"
+    },
+    {
+     "ad": "chimera",
+     "kb": 12.9,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 14.6,
-   "adiylaCagir": [],
+   "toplamKB": 27.5,
+   "adiylaCagir": [
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    },
+    {
+     "ad": "security-scanner",
+     "kb": 8.5
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -293,20 +439,31 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 22.1,
    "adiylaCagir": [],
    "bekleyen": []
   },
   {
    "dept": "BLOG",
    "tur": "arastirmaci",
-   "uret": false,
-   "onYukle": [],
-   "toplamKB": 0,
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "research-web",
+     "kb": 7.3,
+     "kaynak": "yetenek"
+    }
+   ],
+   "toplamKB": 7.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -320,6 +477,10 @@
     {
      "ad": "diagram",
      "kb": 16
+    },
+    {
+     "ad": "write-seo-geo-content",
+     "kb": 21.9
     }
    ],
    "bekleyen": []
@@ -346,11 +507,11 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 12.5,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -371,7 +532,12 @@
     }
    ],
    "toplamKB": 11.4,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -383,14 +549,47 @@
      "ad": "create-migration",
      "kb": 6.3,
      "kaynak": "departman"
+    },
+    {
+     "ad": "testing",
+     "kb": 12.2,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 6.3,
+   "toplamKB": 18.5,
    "adiylaCagir": [
     {
      "ad": "supabase",
      "kb": 18.8,
      "uyari": "ad çakışması: proje supabase (19K) ile eklenti supabase:supabase (13K); alanın hangisini çözdüğü ölçülmedi"
+    },
+    {
+     "ad": "debugging",
+     "kb": 13
+    },
+    {
+     "ad": "typescript-strict",
+     "kb": 10
+    },
+    {
+     "ad": "node-modern",
+     "kb": 10.3
+    },
+    {
+     "ad": "observability",
+     "kb": 8.6
+    },
+    {
+     "ad": "api-design",
+     "kb": 10
+    },
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
     }
    ],
    "bekleyen": []
@@ -412,7 +611,28 @@
     }
    ],
    "toplamKB": 29,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "chimera",
+     "kb": 12.9
+    },
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    },
+    {
+     "ad": "security-scanner",
+     "kb": 8.5
+    },
+    {
+     "ad": "data-governance",
+     "kb": 9.3
+    },
+    {
+     "ad": "database-migrations",
+     "kb": 6.8
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -422,12 +642,22 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.9,
-   "adiylaCagir": [],
+   "toplamKB": 22.1,
+   "adiylaCagir": [
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
+    }
+   ],
    "bekleyen": [
     {
      "ad": "venthub-global-rontgen",
@@ -456,7 +686,20 @@
     }
    ],
    "toplamKB": 17.9,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "research-web",
+     "kb": 7.3
+    },
+    {
+     "ad": "web-platform-baseline",
+     "kb": 10.5
+    },
+    {
+     "ad": "geo-fundamentals",
+     "kb": 7
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -465,7 +708,16 @@
    "uret": false,
    "onYukle": [],
    "toplamKB": 0,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "web-performance",
+     "kb": 6.4
+    },
+    {
+     "ad": "geo-fundamentals",
+     "kb": 7
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -477,10 +729,20 @@
      "ad": "plan-challenger",
      "kb": 14.6,
      "kaynak": "departman"
+    },
+    {
+     "ad": "chimera",
+     "kb": 12.9,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 14.6,
-   "adiylaCagir": [],
+   "toplamKB": 27.5,
+   "adiylaCagir": [
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -490,15 +752,24 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 22.1,
    "adiylaCagir": [
     {
      "ad": "accessibility",
      "kb": 14.5
+    },
+    {
+     "ad": "web-performance",
+     "kb": 6.4
     }
    ],
    "bekleyen": []
@@ -518,7 +789,11 @@
    "adiylaCagir": [
     {
      "ad": "graphify",
-     "kb": 42.6
+     "kb": 43.1
+    },
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
     }
    ],
    "bekleyen": []
@@ -563,11 +838,11 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 12.5,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -583,7 +858,16 @@
     }
    ],
    "toplamKB": 5.4,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    },
+    {
+     "ad": "web-platform-baseline",
+     "kb": 10.5
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -595,10 +879,20 @@
      "ad": "i18n-conventions",
      "kb": 14.2,
      "kaynak": "yetenek"
+    },
+    {
+     "ad": "testing",
+     "kb": 12.2,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 14.2,
-   "adiylaCagir": [],
+   "toplamKB": 26.4,
+   "adiylaCagir": [
+    {
+     "ad": "debugging",
+     "kb": 13
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -610,10 +904,20 @@
      "ad": "plan-challenger",
      "kb": 14.6,
      "kaynak": "yetenek"
+    },
+    {
+     "ad": "chimera",
+     "kb": 12.9,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 14.6,
-   "adiylaCagir": [],
+   "toplamKB": 27.5,
+   "adiylaCagir": [
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -623,7 +927,7 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "yetenek"
     },
     {
@@ -632,8 +936,14 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 23.1,
-   "adiylaCagir": [],
+   "toplamKB": 26.7,
+   "adiylaCagir": [
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "uyari": "35 KB set bütçesi (YTN-18, 1.1.0 gövdesi büyüdü): ön yüklenmez, görev metninde adı yazılır"
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -648,7 +958,16 @@
     }
    ],
    "toplamKB": 5.4,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "research-web",
+     "kb": 7.3
+    },
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    }
+   ],
    "bekleyen": [
     {
      "ad": "pdf",
@@ -692,7 +1011,16 @@
     }
    ],
    "toplamKB": 29,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "chimera",
+     "kb": 12.9
+    },
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -702,11 +1030,16 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 22.1,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -719,9 +1052,14 @@
      "ad": "pdf",
      "kb": 8.2,
      "kaynak": "departman"
+    },
+    {
+     "ad": "research-web",
+     "kb": 7.3,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.2,
+   "toplamKB": 15.5,
    "adiylaCagir": [],
    "bekleyen": [
     {
@@ -761,11 +1099,11 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 12.5,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -781,7 +1119,12 @@
     }
    ],
    "toplamKB": 5.4,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -829,11 +1172,11 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 12.5,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -846,16 +1189,25 @@
      "ad": "codegraph",
      "kb": 5.4,
      "kaynak": "yetenek"
-    },
-    {
-     "ad": "supabase-postgres-best-practices",
-     "kb": 3.2,
-     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.6,
-   "adiylaCagir": [],
-   "bekleyen": []
+   "toplamKB": 5.4,
+   "adiylaCagir": [
+    {
+     "ad": "research-web",
+     "kb": 7.3
+    },
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    }
+   ],
+   "bekleyen": [
+    {
+     "ad": "supabase-postgres-best-practices",
+     "neden": "supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8 ölçümü 2026-10-01: Haiku ve Sonnet alt ajanı \"YOK\" dedi; olmayan ad hata vermeden atlanır). Projeye alınırsa (MIT, 3,2 KB; yük bütçesine sığma ayrıca bakılır) ya da eklenti açılırsa eklenir"
+    }
+   ]
   },
   {
    "dept": "SATIS",
@@ -868,20 +1220,41 @@
      "kaynak": "departman"
     },
     {
-     "ad": "supabase-postgres-best-practices",
-     "kb": 3.2,
+     "ad": "testing",
+     "kb": 12.2,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 9.5,
+   "toplamKB": 18.5,
    "adiylaCagir": [
     {
      "ad": "supabase",
      "kb": 18.8,
      "uyari": "ad çakışması: proje supabase (19K) ile eklenti supabase:supabase (13K); alanın hangisini çözdüğü ölçülmedi"
+    },
+    {
+     "ad": "debugging",
+     "kb": 13
+    },
+    {
+     "ad": "typescript-strict",
+     "kb": 10
+    },
+    {
+     "ad": "api-design",
+     "kb": 10
+    },
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
     }
    ],
-   "bekleyen": []
+   "bekleyen": [
+    {
+     "ad": "supabase-postgres-best-practices",
+     "neden": "supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8 ölçümü 2026-10-01: Haiku ve Sonnet alt ajanı \"YOK\" dedi; olmayan ad hata vermeden atlanır). Projeye alınırsa (MIT, 3,2 KB; yük bütçesine sığma ayrıca bakılır) ya da eklenti açılırsa eklenir"
+    }
+   ]
   },
   {
    "dept": "SATIS",
@@ -900,7 +1273,24 @@
     }
    ],
    "toplamKB": 29,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "chimera",
+     "kb": 12.9
+    },
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    },
+    {
+     "ad": "security-scanner",
+     "kb": 8.5
+    },
+    {
+     "ad": "data-governance",
+     "kb": 9.3
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -910,17 +1300,27 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "yetenek"
     },
     {
      "ad": "webapp-testing",
      "kb": 3.9,
      "kaynak": "departman"
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 12.8,
-   "adiylaCagir": [],
+   "toplamKB": 26,
+   "adiylaCagir": [
+    {
+     "ad": "payments-webhooks",
+     "kb": 6.6
+    }
+   ],
    "bekleyen": [
     {
      "ad": "diff-review",
@@ -944,6 +1344,10 @@
     {
      "ad": "browse",
      "kb": 29.9
+    },
+    {
+     "ad": "web-platform-baseline",
+     "kb": 10.5
     }
    ],
    "bekleyen": []
@@ -962,9 +1366,14 @@
      "ad": "venthub-tasarim-dili",
      "kb": 11.4,
      "kaynak": "departman"
+    },
+    {
+     "ad": "react-modern",
+     "kb": 11,
+     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 18.7,
+   "toplamKB": 29.7,
    "adiylaCagir": [
     {
      "ad": "ui-ux-pro-max",
@@ -1004,7 +1413,7 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     },
     {
@@ -1018,7 +1427,7 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 27.3,
+   "toplamKB": 30.9,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -1044,7 +1453,16 @@
     }
    ],
    "toplamKB": 17.9,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "codebase-navigation",
+     "kb": 9
+    },
+    {
+     "ad": "web-platform-baseline",
+     "kb": 10.5
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -1081,6 +1499,26 @@
     {
      "ad": "threejs-webgl-performance",
      "kb": 22.4
+    },
+    {
+     "ad": "testing",
+     "kb": 12.2
+    },
+    {
+     "ad": "debugging",
+     "kb": 13
+    },
+    {
+     "ad": "react-modern",
+     "kb": 11
+    },
+    {
+     "ad": "typescript-strict",
+     "kb": 10
+    },
+    {
+     "ad": "observability",
+     "kb": 8.6
     }
    ],
    "bekleyen": []
@@ -1102,7 +1540,16 @@
     }
    ],
    "toplamKB": 29,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "chimera",
+     "kb": 12.9
+    },
+    {
+     "ad": "bug-hunter",
+     "kb": 12.3
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -1112,7 +1559,7 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     },
     {
@@ -1131,7 +1578,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 31.3,
+   "toplamKB": 34.9,
    "adiylaCagir": [
     {
      "ad": "canary",
@@ -1140,6 +1587,14 @@
     {
      "ad": "benchmark",
      "kb": 28.6
+    },
+    {
+     "ad": "code-review",
+     "kb": 9.6
+    },
+    {
+     "ad": "web-performance",
+     "kb": 6.4
     }
    ],
    "bekleyen": [
@@ -1163,6 +1618,10 @@
     {
      "ad": "task-observer",
      "kb": 7.4
+    },
+    {
+     "ad": "research-web",
+     "kb": 7.3
     }
    ],
    "bekleyen": []
@@ -1208,13 +1667,173 @@
    "onYukle": [
     {
      "ad": "verify-before-done",
-     "kb": 8.9,
+     "kb": 12.5,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 8.9,
+   "toplamKB": 12.5,
    "adiylaCagir": [],
    "bekleyen": []
   }
- ]
+ ],
+ "mudurCekirdegi": [
+  {
+   "ad": "wrongstack-kanban",
+   "departmanlar": "HEPSI",
+   "ne": "Kart açma, havuzdan iş alma, kanıt komutuyla Done müdürün işi (karar 219); çalışan başka pencereye yazmaz (§10.4)."
+  },
+  {
+   "ad": "wrongstack-mailbox-mcp",
+   "departmanlar": "HEPSI",
+   "ne": "Kapalı pencereye mesaj müdürün işi; açık pencereye SendMessage. Örnek yapılandırmada --admin ve mcp_use var (§10.4)."
+  },
+  {
+   "ad": "multi-agent",
+   "departmanlar": "HEPSI",
+   "ne": "İşi çalışanlara bölme, görev metni, sonuç birleştirme: çalışanı yöneten müdürün aracı (set kuralı 5)."
+  },
+  {
+   "ad": "prompt-engineering",
+   "departmanlar": [
+    "YETENEK",
+    "ARAC",
+    "HARITA",
+    "OPS"
+   ],
+   "ne": "Görev metni, ajan tanımı ve skill açıklaması yazarken; çalışan metin yazmaz, müdür yazar."
+  },
+  {
+   "ad": "git-flow",
+   "departmanlar": "HEPSI",
+   "ne": "Commit, PR, rebase, geri alma: kapı eylemi müdürün (set kuralı 4); çalışan commit atmaz."
+  },
+  {
+   "ad": "refactor-planner",
+   "departmanlar": [
+    "ADMIN",
+    "ALTYAPI",
+    "ARAC",
+    "EDGE",
+    "HARITA",
+    "I18N",
+    "KATALOG",
+    "SATIS",
+    "URUN"
+   ],
+   "ne": "Çok dosyalı yeniden düzenleme planı (plan yazar, uygulamaz): müdür planlar, uygulayıcı dar dosya kümesini yazar."
+  },
+  {
+   "ad": "sdd",
+   "departmanlar": [
+    "ADMIN",
+    "ALTYAPI",
+    "ARAC",
+    "EDGE",
+    "HARITA",
+    "I18N",
+    "KATALOG",
+    "SATIS",
+    "URUN",
+    "OPS"
+   ],
+   "ne": "Spec ve görev grafiği: planlama müdür düzeyinde; çalışana hazır kabul ölçütüyle bölünmüş iş gider."
+  },
+  {
+   "ad": "mnemosyne",
+   "departmanlar": [
+    "ARAC"
+   ],
+   "ne": "Sage hafıza bakımı (ARC-23): silme/arşiv yalnız öneri olarak dosyalanır; bakımı ARAÇ müdürü başlatır, sonucu OPS onaylar."
+  },
+  {
+   "ad": "maestro",
+   "departmanlar": [
+    "ADMIN",
+    "ALTYAPI",
+    "ARAC",
+    "EDGE",
+    "HARITA",
+    "I18N",
+    "KATALOG",
+    "SATIS",
+    "URUN"
+   ],
+   "ne": "Bölünebilir büyük değişiklik dalgaları: orkestrasyon, ekip lideri düzeyi (set kuralı 5)."
+  },
+  {
+   "ad": "agy-orchestrate",
+   "departmanlar": [
+    "ALTYAPI",
+    "ARAC",
+    "HARITA"
+   ],
+   "ne": "Geniş tarama için agy filosu: orkestrasyon, ekip lideri düzeyi (set kuralı 5)."
+  },
+  {
+   "ad": "git-commit",
+   "departmanlar": "HEPSI",
+   "ne": "Commit atar: kapı eylemi (set kuralı 4)."
+  },
+  {
+   "ad": "qa",
+   "departmanlar": [
+    "URUN",
+    "ADMIN",
+    "TASARIM",
+    "GEO-SEO"
+   ],
+   "ne": "Gerçek tarayıcıda gezip hata düzeltir ve commit atar: kapı eylemi (set kuralı 4)."
+  },
+  {
+   "ad": "mutasyon-testi",
+   "departmanlar": [
+    "ADMIN",
+    "ALTYAPI",
+    "ARAC",
+    "EDGE",
+    "I18N",
+    "KATALOG",
+    "SATIS",
+    "URUN"
+   ],
+   "ne": "Mutasyon doğrulayıcısı yazma istisnasıdır (§10.3) ve doğrulayıcı tanımında Write kapalı; ayrı çalışan türü kararına kadar müdür adıyla çağırır (§9 soru 3)."
+  },
+  {
+   "ad": "notebooklm-sync",
+   "departmanlar": [
+    "HARITA",
+    "OPS"
+   ],
+   "ne": "Milestone/manuel senkron; NotebookLM kimlik doğrulama gerektirir."
+  },
+  {
+   "ad": "orion-cli",
+   "departmanlar": [
+    "HARITA"
+   ],
+   "ne": "Doküman hattı komutları (tree, şema üretimi)."
+  },
+  {
+   "ad": "office-hours",
+   "departmanlar": [
+    "OPS"
+   ],
+   "ne": "Fikir/özellik önerisi plandan önce: karar öncesi tartışma, çalışan işi değil."
+  },
+  {
+   "ad": "to-prd",
+   "departmanlar": [
+    "OPS"
+   ],
+   "ne": "Konuşmayı PRD’ye çevirir: müdür/OPS düzeyi."
+  },
+  {
+   "ad": "video-kaynak",
+   "departmanlar": [
+    "OPS"
+   ],
+   "ne": "Video bulup NotebookLM’e kaynak ekler: seçimi Recep yapar, çalışan işi değil."
+  }
+ ],
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi"
 }

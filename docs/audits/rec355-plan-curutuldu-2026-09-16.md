@@ -8,9 +8,9 @@ Bağımsız bir çürütme denetimi ilk onarım planına **BLOK** verdi. Bulgula
 Planım *"`retrieve` gerçekten `basketId` echo ediyor mu? PROD'DA ÖLÇMEDİM, izin reddedildi"*
 diyordu ve **bütün tasarımı o belirsizliğin üzerine kurmuştu** ("en az biri eşleşsin").
 
-Oysa ölçüm prod erişimi İSTEMİYORDU: `docs/archive/db-backup-pre-kademe2/venthub_orders.json`
-içinde **13 gerçek İyzico `retrieve` yanıtı** `payment_debug.raw` olarak duruyor. Dosya
-2026-09-06'dan beri depoda.
+Oysa ölçüm prod erişimi İSTEMİYORDU: depodaki eski bir veritabanı dökümünde (ALT-39'da
+ağaçtan çıkarıldı; geçmişten silme ALT-41) **13 gerçek İyzico `retrieve` yanıtı**
+`payment_debug.raw` olarak duruyordu.
 
 ⭐**DERS: "izin reddedildi" cümlesi ölçümü bitirmez.** Reddedilen YOL bir tanesiydi; veri
 çevrimdışı ve elin altındaydı. Belirsizliğe karşı tasarım yazmak yerine belirsizliği
@@ -31,8 +31,8 @@ içinde **13 gerçek İyzico `retrieve` yanıtı** `payment_debug.raw` olarak du
 | `raw.paidPrice` == `total_amount` | 13/13 (birebir) |
 | `installment` | 13/13 = 1 (taksitli koşum evrende YOK) |
 
-Örnek satır: `order_number = VH-20250903-4973` · `conversation_id = CONV-1756904973154` ·
-`raw.basketId = VH-1756904973154-a4bv8k`. Aynı epoch'u taşıyorlar ama **hiçbir kolonda o
+Örnek satır (sentetik değerler): `order_number = VH-20231114-0042` · `conversation_id = CONV-1700000000000` ·
+`raw.basketId = VH-1700000000000-abc123`. Aynı epoch'u taşıyorlar ama **hiçbir kolonda o
 dize yok.**
 
 ## 2. PLANIN ÜÇ ÖNCÜLÜ DE YANLIŞTI

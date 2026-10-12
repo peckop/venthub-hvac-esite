@@ -1,6 +1,8 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
+import { aileYollari, kategoriYollari } from '@/lib/adres/tazelemeYollari'
+import { skuModelYollari } from '@/lib/adres/yayindaModelYollari'
 import {
   discoveryTag,
   familyTag,
@@ -44,6 +46,28 @@ interface SupabaseWebhookPayload {
   old_record: Record<string, unknown> | null
 }
 
+/** Payload alanını boş olmayan metne indirger; null/undefined/boş/başka tip → undefined. */
+function metin(deger: unknown): string | undefined {
+  return typeof deger === 'string' && deger.length > 0 ? deger : undefined
+}
+
+/**
+ * ESKİ DEĞER KAPISI (REC-300 3g-2a, URN-12). Eski adres/kategori yalnız UPDATE'te ve yalnız İKİ görüntü de
+ * (record + old_record) varken karşılaştırılabilir. `scripts/webhook_setup.sql` ölçümü: INSERT'te `old_record`
+ * NULL, DELETE'te `record` NULL (DELETE'te `activeRecord = old_record` zaten eski değeri tazeler); PS-042 notu:
+ * UPDATE'te de `old_record` eksik gelebilir. Eksikse dönüş `undefined` → çağıran YALNIZ yeni değeri tazelemeye
+ * devam eder (mevcut davranış, güvenli geri düşüş).
+ */
+function eskiDeger(
+  record: Record<string, unknown> | null,
+  oldRecord: Record<string, unknown> | null,
+  alan: string
+): string | undefined {
+  if (!record || !oldRecord) return undefined
+  const eski = metin(oldRecord[alan])
+  return eski !== undefined && eski !== metin(record[alan]) ? eski : undefined
+}
+
 /**
  * T138-VH K6 — SERİ↔MODEL zinciri.
  *
@@ -59,6 +83,16 @@ interface SupabaseWebhookPayload {
  * üzerinden yanıt gövdesinde (`fanoutTruncated`) ölçülebilir sinyale dönüşür.
  */
 const MAX_FAMILY_CHAIN_HOPS = 4
+
+/**
+ * Bir ÜST kategorinin çocuk sayfalarını tazelerken okunacak en çok çocuk sayısı (URN-112). Alt kategori sayfası
+ * üstün adını ve görünen slug'ını sunucu HTML'ine yazar; üst değişince çocuk sayfaları bayat kalmasın diye tek
+ * sorguyla okunur. Ölçüm (doğrulayıcı, canlı DB salt okuma 2026-10-12; bu dosyada yeniden ölçülmedi): toplam 26
+ * alt kategori, üst başına en çok 14; sınır bunun yaklaşık yedi katıdır. Okuma `id`'ye göre sıralıdır: sınır
+ * aşılırsa hangi çocukların tazeleneceği belirli olur. Aşılırsa SESSİZCE KIRPILMAZ: `fanoutTruncated` yanıtta true olur ve uyarı basılır (kategori
+ * sayfaları ISR yedeğiyle en geç 1 saatte yine yenilenir).
+ */
+const MAX_KATEGORI_COCUK = 100
 
 interface FamilyChainRow {
   id: string
@@ -117,23 +151,33 @@ async function walkFamilyChain(
 }
 
 /**
+ * Bir ailenin (ya da serisinin) sayfa yollarını tazeler ve üretilenleri döndürür. Yollar İKİ şemada ve iki dilde
+ * gelir (`aileYollari`, REC-300 Faz 3g): adres şeması bayrağı açılınca sabit `/tr/products/<slug>` yolu yanlış
+ * sayfayı vururdu.
+ */
+function aileYolunuTazele(slug: string): string[] {
+  const yollar = aileYollari(slug)
+  for (const p of yollar) revalidatePath(p)
+  return yollar
+}
+
+/**
  * Bir aile id'si için kendi + (varsa) seri sayfasını tazeler (path + familyTag).
  * `products` / `inventory_movements` / `product_prices` / `product_images` dallarının
  * hepsi buradan geçer — böylece "model değişti, serisi bayatladı" boşluğu TEK yerde kapanır.
  */
 async function revalidateFamilyChain(
-  familyId: string | undefined
+  familyId: string | undefined,
+  zatenTazelenen?: readonly string[]
 ): Promise<{ paths: string[]; tags: string[]; truncated: boolean }> {
   const { slugs, truncated } = await walkFamilyChain(familyId)
   const paths: string[] = []
   const tags: string[] = []
 
   for (const slug of slugs) {
-    for (const lang of ['tr', 'en'] as const) {
-      const p = `/${lang}/products/${slug}`
-      revalidatePath(p)
-      paths.push(p)
-    }
+    // Eski+yeni zincir aynı seriyi paylaşabilir (URN-12): aynı yol/etiket iki kez tazelenmez.
+    if (zatenTazelenen?.includes(familyTag(slug))) continue
+    paths.push(...aileYolunuTazele(slug))
     revalidateTag(familyTag(slug))
     tags.push(familyTag(slug))
   }
@@ -155,33 +199,28 @@ type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; paren
  *       `getLocalizedCategorySlug` ile çözülür (CLAUDE.md kural 7 — kanonik EN, görünen
  *       URL dile göre). Kanonik yol da tazelenmeye DEVAM eder: 308 kaynağı olsa bile
  *       prerender edilmiş olabilir, kaldırmak yeni bir delik açardı.
+ *       İSTİSNA (URN-7, ölçüm 2026-10-01; SEO-35 B-1): iç içe `/<dil>/category/<üst>/<alt>` yolu önbelleği
+ *       olmayan 308'dir; üretilmez. B-1 kararıyla o rota bayrak açıkken de yalnız yönlendirir (içerik çizmez,
+ *       sayfa sınıfı ilan etmez), yani yol hiçbir kipte tazelenmez (kapı: INV-TAZELEME-YOL-3).
  *
  *  W2 — 14 `revalidatePath` çağrısının tamamı TEK segmentliydi; `/category/[c]/[s]`
- *       (alt-kategori) hiç tazelenmiyordu. Artık `parent_id` varsa iki segmentli yol da
- *       üretilir.
+ *       (alt-kategori) hiç tazelenmiyordu. Alt kategori yolu `parent_id` varsa sorulur ama B-1'den beri dalın
+ *       adresi (yeni: `/kategori/<alt>`, EN ve bugünkü: `/category/<alt>`) TEK segmenttir ve üst adrese girmez;
+ *       dal nesnesi kök nesnesiyle aynı yolu verir, küme tekilleştirir. İç içe `<üst>/<alt>` yolları üretilmez:
+ *       iki şemada da yalnız 308'dir, önbelleği yok (URN-7 ölçümü 2026-10-01); bkz. `kategoriYollari`.
  *
  * Yollar tekilleştirilir: iki dilin slug'ı aynı olabilir (çeviri yoksa kanoniğe düşer).
  */
 function categoryPathsFor(category: CategoryRow, parent: CategoryRow | null): string[] {
-  const paths = new Set<string>()
   const canonical = category.slug ?? ''
+  const yerel = (c: CategoryRow) => (dil: 'tr' | 'en') => getLocalizedCategorySlug(c, dil) || c.slug || ''
 
-  for (const lang of ['tr', 'en'] as const) {
-    const own = getLocalizedCategorySlug(category, lang) || canonical
-    if (!own) continue
-
-    paths.add(`/${lang}/category/${own}`)
-
-    if (parent) {
-      const parentSlug = getLocalizedCategorySlug(parent, lang) || parent.slug || ''
-      if (parentSlug) paths.add(`/${lang}/category/${parentSlug}/${own}`)
-    }
-  }
+  // İki dil × iki adres şeması (REC-300 Faz 3g): yeni şemanın `/kategori/<kök>/<dal>` yolu da tazelenir.
+  const paths = new Set<string>(kategoriYollari(yerel(category), parent ? yerel(parent) : null))
 
   // Kanonik EN yolu her hâlükârda kalsın (yukarıdaki gerekçe).
   if (canonical) {
-    paths.add(`/tr/category/${canonical}`)
-    paths.add(`/en/category/${canonical}`)
+    for (const p of kategoriYollari(() => canonical)) paths.add(p)
   }
 
   return [...paths]
@@ -198,10 +237,37 @@ async function categoryRowById(id: string | undefined): Promise<CategoryRow | nu
   return data ?? null
 }
 
-/** Bir kategori için tüm yolları (kendi + ebeveyn zinciri) tazeler; üretilenleri döndürür. */
-async function revalidateCategoryTree(category: CategoryRow): Promise<string[]> {
-  const parent = await categoryRowById(category.parent_id ?? undefined)
-  const paths = categoryPathsFor(category, parent)
+type KategoriCozucu = (id: string | undefined) => Promise<CategoryRow | null>
+
+/**
+ * İSTEK ÖMRÜNDE önbellekli `categoryRowById` (URN-12). Eski+yeni kategori/alt kategori ağaçları aynı üstü paylaşır;
+ * önbelleksiz her biri üstü ayrıca çekerdi (442'lik toplu güncellemede ~900 ek sorgu). Önbellek her POST için
+ * YENİDEN kurulur ve istekle ölür: modül düzeyinde paylaşılan önbellek bayatlar ve kiracılar arası sızabilir (kural 12).
+ * Bulunamayan satır (`null`) da önbelleğe girer; aynı kimlik ikinci kez DB'ye gitmez.
+ */
+function istekKategoriCozucu(): KategoriCozucu {
+  const onbellek = new Map<string, CategoryRow | null>()
+  return async (id) => {
+    if (!id) return null
+    if (onbellek.has(id)) return onbellek.get(id) ?? null
+    const satir = await categoryRowById(id)
+    onbellek.set(id, satir)
+    return satir
+  }
+}
+
+/**
+ * Bir kategori için tüm yolları (kendi + ebeveyn zinciri) tazeler; tazelenenleri döndürür.
+ * `zatenTazelenen` verilirse o listedeki yollar atlanır (URN-12: eski+yeni kategori ağaçları ortak yol
+ * üretebilir; aynı yol iki kez tazelenmez ve yanıtta iki kez görünmez). Üst satır `kategoriSatiri` ile çözülür.
+ */
+async function revalidateCategoryTree(
+  category: CategoryRow,
+  kategoriSatiri: KategoriCozucu,
+  zatenTazelenen?: readonly string[]
+): Promise<string[]> {
+  const parent = await kategoriSatiri(category.parent_id ?? undefined)
+  const paths = categoryPathsFor(category, parent).filter((p) => !zatenTazelenen?.includes(p))
   for (const p of paths) revalidatePath(p)
   return paths
 }
@@ -262,12 +328,16 @@ export async function POST(request: NextRequest) {
 
     const revalidatedPaths: string[] = []
     const revalidatedTags: string[] = []
+    const kategoriSatiri = istekKategoriCozucu()
     // PS-042: products UPDATE'inde alan-bazlı karşılaştırma yapılıp yapılamadığını
     // (old_record var mı) yanıtta raporlamak için.
     let discoveryComparisonSkipped = false
     // T138-VH K6: seri↔model zincir yürüyüşü üst sınırı aştıysa (bkz. walkFamilyChain)
     // burada toplanır ve yanıt gövdesinde görünür olur — sessizce kırpma YOK.
     let fanoutTruncated = false
+    // URN-112: üst kategorinin çocuk sorgusu düştüyse mesaj burada tutulur; iş (etiketler, site haritası,
+    // IndexNow) bitirilir ve yanıt 500 ile bu hatayı taşır — sessiz "başarılı" yok.
+    let kategoriCocukHatasi: string | null = null
 
     // PS-042: keşif (discovery) tag'leri yalnız keşfi etkileyen değişimde tetiklenir.
     // products UPDATE'inde bu, duyarlı alan (status/family_id/category_id/subcategory_id/
@@ -315,18 +385,60 @@ export async function POST(request: NextRequest) {
       revalidatedTags.push(...familyChainTags)
       if (productFanoutTruncated) fanoutTruncated = true
 
+      /**
+       * URN-12: ürün başka aileye taşındıysa ESKİ ailenin (ve varsa serisinin) sayfası da bayatlar — kartı hâlâ
+       * basıyordur. `eskiDeger` yalnız UPDATE + iki görüntü varken ve değer değiştiyse döner; yoksa davranış aynı.
+       */
+      const eskiAileId = eskiDeger(record, old_record, 'family_id')
+      if (eskiAileId) {
+        const { paths: eskiPaths, tags: eskiTags, truncated: eskiTruncated } =
+          await revalidateFamilyChain(eskiAileId, familyChainTags)
+        revalidatedPaths.push(...eskiPaths)
+        revalidatedTags.push(...eskiTags)
+        if (eskiTruncated) fanoutTruncated = true
+      }
+
+      /**
+       * ALT-16 (REC-300 3g-2): YAYINDAKİ model sayfası. Ürün satırı (ad, fiyat, stok, aktiflik, aile/kategori)
+       * değişince o SKU'nun model sayfası (TR + EN) ISR yüzünden 1 saate kadar bayat kalırdı. Yollar
+       * `adresUret`'in tek noktasından gelir (`skuModelYollari`, URN-31); burada yol metni YOKTUR. Liste dışı SKU
+       * ve boş liste → boş küme: davranış aynı. Çağrı başına en çok 2 SKU (yeni + eski) × 2 dil = 4 ek yol.
+       * SKU değiştiyse eski SKU'nun sayfası da bayatlar (`eskiDeger`: yalnız UPDATE + iki görüntü varken).
+       */
+      const modelSkulari = [metin(activeRecord.sku), eskiDeger(record, old_record, 'sku')].filter(
+        (s): s is string => s !== undefined
+      )
+      const modelYollari = [...new Set(modelSkulari.flatMap((s) => skuModelYollari(s)))]
+      for (const p of modelYollari) revalidatePath(p)
+      revalidatedPaths.push(...modelYollari)
+
       if (shouldRevalidateDiscovery) {
         revalidateTag(PRODUCTS_DISCOVERY_TAG)
         revalidateTag(HOME_DATA_TAG)
         revalidatedTags.push(PRODUCTS_DISCOVERY_TAG, HOME_DATA_TAG)
       }
 
-      // If category has changed or is associated, we also revalidate the category path
-      const categoryId = activeRecord.category_id as string | undefined
-      if (categoryId) {
-        const category = await categoryRowById(categoryId)
+      /**
+       * Kategori + alt kategori: YENİ ve ESKİ `category_id` / `subcategory_id` (URN-12). Eskiden yalnız yeni
+       * `category_id` tazeleniyordu: ürün kategoriden çıkınca eski kategori/alt kategori listesi bayat kalıyor,
+       * `subcategory_id` hiç tazelenmiyordu. Her kimlik bir kez çözülür; ortak yollar (ör. aynı üst kategori)
+       * tekilleştirilir. Alt kategorinin yolları kendi tek segmentli adresini içerir (B-1: dal adresi üste bağlı değil;
+       * `revalidateCategoryTree`).
+       */
+      const kategoriKimlikleri = [
+        ...new Set(
+          [
+            metin(activeRecord.category_id),
+            metin(activeRecord.subcategory_id),
+            eskiDeger(record, old_record, 'category_id'),
+            eskiDeger(record, old_record, 'subcategory_id'),
+          ].filter((id): id is string => id !== undefined)
+        ),
+      ]
+      for (const kategoriId of kategoriKimlikleri) {
+        const category = await kategoriSatiri(kategoriId)
         if (category) {
-          revalidatedPaths.push(...(await revalidateCategoryTree(category)))
+          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths)))
         }
       }
     }
@@ -341,24 +453,86 @@ export async function POST(request: NextRequest) {
         parent_id: (activeRecord.parent_id as string | null) ?? null,
       }
       if (self.slug) {
-        revalidatedPaths.push(...(await revalidateCategoryTree(self)))
+        revalidatedPaths.push(...(await revalidateCategoryTree(self, kategoriSatiri)))
       }
 
       /**
-       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse
-       * TÜM çocuklarının iki segmentli yolları değişir. Çocuklar tazelenmezse ebeveyn
-       * adı düzelir ama alt-kategori sayfaları eski yolda donar (sessiz bayatlama).
-       * Tavan küçük (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       * URN-12 — ESKİ YOLLAR. Slug (kanonik ya da `metadata.slug.{tr,en}`) ya da ebeveyn değişince eski adres
+       * önbellekte durur: A→B→A dönüşünde önbellekli 308 döngü yapabilir (ana plan m.9, O2). Eski satır payload'daki
+       * `old_record`'dan kurulur (`to_jsonb(OLD)`: slug + metadata + parent_id içerir, ek sorgu gerekmez). Yalnız
+       * UPDATE'te ve iki görüntü varken çalışır; `old_record` eksikse yalnız yeni yollar tazelenir (güvenli düşüş).
+       * Yeni yollarla ortak olanlar tekrar tazelenmez.
+       */
+      let eskiSelf: CategoryRow | null = null
+      if (record && old_record) {
+        const eskiSlug = metin(old_record.slug)
+        // Yalnız YOL ÜRETEN alanlar karşılaştırılır: kanonik slug, iki dildeki çözülmüş slug
+        // (`metadata.slug.tr|en`) ve ebeveyn. Yolla ilgisiz metadata alanı (açıklama, görsel…) değişince eski
+        // yol/üst sorgusu açılmaz.
+        const yerelSlug = (r: Record<string, unknown>, dil: 'tr' | 'en') =>
+          getLocalizedCategorySlug({ slug: metin(r.slug) ?? null, metadata: r.metadata }, dil)
+        const degisti =
+          eskiSlug !== metin(record.slug) ||
+          metin(old_record.parent_id) !== metin(record.parent_id) ||
+          yerelSlug(old_record, 'tr') !== yerelSlug(record, 'tr') ||
+          yerelSlug(old_record, 'en') !== yerelSlug(record, 'en')
+        if (degisti && eskiSlug) {
+          eskiSelf = {
+            id: self.id,
+            slug: eskiSlug,
+            metadata: old_record.metadata,
+            parent_id: metin(old_record.parent_id) ?? null,
+          }
+          revalidatedPaths.push(...(await revalidateCategoryTree(eskiSelf, kategoriSatiri, revalidatedPaths)))
+        }
+      }
+
+      /**
+       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse çocukların iki segmentli
+       * yolları değişiyordu. B-1'den beri çocuğun ADRESİ üstten bağımsızdır (kendi tek segmentli slug'ı); bu dal
+       * artık adres değişimi için değil, çocuk sayfaların kırıntısında üstün adı ve bağlantısı yer aldığı için
+       * (CategoryLandingView) üst değişince çocuk sayfaları bayat kalmasın diye korunur. Tavan küçük
+       * (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       *
+       * URN-112: alt kategori sayfasının ham HTML'inde üst halka (ad + görünen slug + aktiflik) artık sunucuda
+       * yazılıdır (`kategoriSayfasi.tsx`); bu dal bu yüzden her `categories` olayında (INSERT/UPDATE/DELETE) üstün
+       * çocuklarını tazelemeye DEVAM eder — ad (name, menu_label, translation_key), slug, metadata.slug ya da
+       * is_active değişimi bu satırın ZATEN kapsadığı kümedir; eski ad ayrıca gerekmez (çocuk adresi üstten
+       * bağımsız, yol kümesi eski/yeni üstle aynı).
        */
       if (self.id) {
-        const { data: children } = await supabase
+        // URN-112: sorgu HATASI artık yutulmaz (eskiden `data` undefined olunca çocuklar sessizce atlanıyor,
+        // yanıt "başarılı" görünüyordu) ve okuma `MAX_KATEGORI_COCUK + 1` ile sınırlıdır (+1 = aşıldığını görmek için).
+        const { data: children, error: cocukHatasi } = await supabase
           .from('categories')
           .select('id, slug, metadata, parent_id')
           .eq('parent_id', self.id)
-        for (const child of children ?? []) {
+          .order('id', { ascending: true })
+          .limit(MAX_KATEGORI_COCUK + 1)
+        if (cocukHatasi) {
+          // Üstün kendi yolları, etiketler ve site haritası yine tazelenir; hata yanıt sonunda 500 ile bildirilir.
+          kategoriCocukHatasi = `categories çocuk sorgusu düştü (parent_id=${self.id}): ${cocukHatasi.message}`
+          console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+        }
+        const cocuklar = children ?? []
+        if (cocuklar.length > MAX_KATEGORI_COCUK) {
+          fanoutTruncated = true
+          console.warn(
+            `[Supabase Webhook] categories çocuk sayısı MAX_KATEGORI_COCUK (${MAX_KATEGORI_COCUK}) sınırını aştı — ` +
+            `parent_id=${self.id}; ilk ${MAX_KATEGORI_COCUK} çocuk tazelendi.`,
+          )
+        }
+        for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
           const childPaths = categoryPathsFor(child, self)
           for (const p of childPaths) revalidatePath(p)
           revalidatedPaths.push(...childPaths)
+          // Üstün ESKİ adıyla kurulmuş çocuk yolları da bayatlar (URN-12). B-1'den beri çocuk adresi üstten
+          // bağımsızdır, yani küme çoğu durumda yukarıdakiyle aynıdır ve süzgeç onu boş bırakır; davranış değişmedi.
+          if (eskiSelf) {
+            const eskiChildPaths = categoryPathsFor(child, eskiSelf).filter((p) => !revalidatedPaths.includes(p))
+            for (const p of eskiChildPaths) revalidatePath(p)
+            revalidatedPaths.push(...eskiChildPaths)
+          }
         }
       }
 
@@ -390,9 +564,9 @@ export async function POST(request: NextRequest) {
 
           // If product is linked to a category, revalidate category path too
           if (product.category_id) {
-            const category = await categoryRowById(product.category_id)
+            const category = await kategoriSatiri(product.category_id)
             if (category) {
-              revalidatedPaths.push(...(await revalidateCategoryTree(category)))
+              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri)))
             }
           }
         }
@@ -422,9 +596,7 @@ export async function POST(request: NextRequest) {
          * değişince PDP en fazla ISR yedeğiyle (1 saat) güncelleniyordu. PDP verisi
          * `React.cache()` ile sarılı olduğu için etkili olan şey `revalidatePath`'tir.
          */
-        revalidatePath(`/tr/products/${familySlug}`)
-        revalidatePath(`/en/products/${familySlug}`)
-        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+        revalidatedPaths.push(...aileYolunuTazele(familySlug))
 
         revalidateTag(familyTag(familySlug))
         revalidatedTags.push(familyTag(familySlug))
@@ -440,13 +612,36 @@ export async function POST(request: NextRequest) {
         const { slugs: seriesSlugs, truncated: seriesFanoutTruncated } =
           await walkFamilyChain(parentFamilyId)
         for (const slug of seriesSlugs) {
-          revalidatePath(`/tr/products/${slug}`)
-          revalidatePath(`/en/products/${slug}`)
-          revalidatedPaths.push(`/tr/products/${slug}`, `/en/products/${slug}`)
+          revalidatedPaths.push(...aileYolunuTazele(slug))
           revalidateTag(familyTag(slug))
           revalidatedTags.push(familyTag(slug))
         }
         if (seriesFanoutTruncated) fanoutTruncated = true
+      }
+
+      /**
+       * URN-12 — ESKİ ADRES. Aile slug'ı değişince eski slug'ın sayfası (ve etiketi) önbellekte kalırdı; A→B→A
+       * dönüşünde A'daki önbellekli 308 döngü yapabilir (ana plan m.9, O2). `eskiDeger` yalnız UPDATE'te ve iki
+       * görüntü de varken (değişmişse) döner; `old_record` eksikse yalnız yeni slug tazelenir (güvenli düşüş).
+       * Model başka seriye taşındıysa ESKİ serinin landing'i de bayatlar (model kartı oradan kalkar).
+       */
+      const eskiFamilySlug = eskiDeger(record, old_record, 'slug')
+      if (eskiFamilySlug) {
+        revalidatedPaths.push(...aileYolunuTazele(eskiFamilySlug))
+        revalidateTag(familyTag(eskiFamilySlug))
+        revalidatedTags.push(familyTag(eskiFamilySlug))
+      }
+      const eskiParentFamilyId = eskiDeger(record, old_record, 'parent_family_id')
+      if (eskiParentFamilyId) {
+        const { slugs: eskiSeriesSlugs, truncated: eskiSeriesTruncated } =
+          await walkFamilyChain(eskiParentFamilyId)
+        for (const slug of eskiSeriesSlugs) {
+          if (revalidatedTags.includes(familyTag(slug))) continue
+          revalidatedPaths.push(...aileYolunuTazele(slug))
+          revalidateTag(familyTag(slug))
+          revalidatedTags.push(familyTag(slug))
+        }
+        if (eskiSeriesTruncated) fanoutTruncated = true
       }
     }
 
@@ -521,9 +716,7 @@ export async function POST(request: NextRequest) {
 
         for (const f of families ?? []) {
           if (!f.slug) continue
-          revalidatePath(`/tr/products/${f.slug}`)
-          revalidatePath(`/en/products/${f.slug}`)
-          revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+          revalidatedPaths.push(...aileYolunuTazele(f.slug))
         }
       }
 
@@ -536,7 +729,7 @@ export async function POST(request: NextRequest) {
      * 8. Table: price_lists (W4) — TÜM ailelerin PDP yolları; keşife DOKUNMAZ.
      *
      * ⚠️ FAN-OUT SINIRI: bu dal aile sayısı kadar yol tazeler (ölçüm 2026-08-17: **32 aile**
-     * → 64 çağrı). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
+     * → 64 çağrı; REC-300 Faz 3g'den sonra aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir) = 96). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
      * çözüme geçilmelidir. Sınır cetvele sayıyla yazıldı; sessizce yavaşlamasın.
      *
      * Keşife dokunmama kararı `product_prices` ile aynı gerekçeye dayanır: fiyat yalnız
@@ -550,9 +743,7 @@ export async function POST(request: NextRequest) {
 
       for (const f of families ?? []) {
         if (!f.slug) continue
-        revalidatePath(`/tr/products/${f.slug}`)
-        revalidatePath(`/en/products/${f.slug}`)
-        revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+        revalidatedPaths.push(...aileYolunuTazele(f.slug))
       }
     }
 
@@ -596,17 +787,21 @@ export async function POST(request: NextRequest) {
      * Tek çağrı, tek yer: `revalidatedPaths` zaten bu isteğin biriktiricisi, dolayısıyla
      * her dala ayrı ayrı dokunmaya gerek yok (dokunsaydım 14+ çağrı yerinde risk üretirdim).
      * `await` ediliyor ki serverless çalışma zamanı isteği bitirip fetch'i KESMESİN;
-     * modül ASLA throw etmez ve anahtar yoksa no-op'tur, yani bu satır webhook'un asıl
-     * işini (önbellek tazeleme) hiçbir koşulda düşüremez.
+     * modül ASLA throw etmez, yani bu satır webhook'un asıl işini (önbellek tazeleme) hiçbir
+     * koşulda düşüremez. REC-405: K3-b bayrağı kapalıyken değişecek adresler (ürün/kategori/
+     * marka) modülün içinde süzülür; hepsi düşerse istek atılmaz (`atlandi/yayin-oncesi`).
      */
     const indexNow = await indexNowBildir(revalidatedPaths)
 
     return NextResponse.json({
-      revalidated: true,
+      // URN-112: çocuk sorgusu düştüyse `revalidated` false ve durum 500 (yapılan tazelemeler `revalidatedPaths`ta).
+      revalidated: kategoriCocukHatasi === null,
+      ...(kategoriCocukHatasi !== null ? { error: kategoriCocukHatasi } : {}),
       event: { table, type },
       revalidatedPaths,
       revalidatedTags,
-      // Bildirimin ne yaptığı yanıtta GÖRÜNÜR: "atlandi/anahtar-yok" ile "gonderildi" ayrımı
+      // Bildirimin ne yaptığı yanıtta GÖRÜNÜR: "atlandi/yayin-oncesi" ile "gonderildi" ayrımı
+      // (ve kaç yolun süzüldüğü, `dusurulen`)
       // olmadan, çalışmayan bir bildirim çalışıyormuş gibi sessizce durur.
       indexNow,
       // PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırma yapılamadı —
@@ -616,7 +811,7 @@ export async function POST(request: NextRequest) {
       // bulduysa) burada true olur — sessizce kırpılmaz, ölçülebilir sinyal.
       fanoutTruncated,
       timestamp: new Date().toISOString()
-    })
+    }, { status: kategoriCocukHatasi === null ? 200 : 500 })
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('[Supabase Webhook Error]:', error)

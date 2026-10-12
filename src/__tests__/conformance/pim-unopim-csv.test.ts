@@ -9,7 +9,8 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const require = createRequire(import.meta.url)
-const { csvUret, urunFarklari, OZNITELIKLER, TURETILMIS, specsCevir } = require('../../../scripts/pim/unopim.cjs') as {
+const { csvUret, urunFarklari, OZNITELIKLER, TURETILMIS, specsCevir, ondalikSayisi } = require('../../../scripts/pim/unopim.cjs') as {
+  ondalikSayisi: (v: number) => number
   TURETILMIS: Record<string, (s: Record<string, unknown>) => number | undefined>
   specsCevir: (u: unknown) => { specs: Record<string, unknown>; bilinmeyen: string[] }
   csvUret: (u: unknown[]) => { csv: string; eksik: string[]; sutun: number }
@@ -81,7 +82,21 @@ describe('INV-PIM-UNOPIM-1 geri okuma karşılaştırması', () => {
     expect(TURETILMIS.max_delivery_ls({})).toBeUndefined()
     const a = { values: { common: { url_key: 's', max_delivery_m3h: { amount: '380.0000' } }, channel_locale_specific: { default: { en_US: { name: 'V' } } } } }
     expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 105.56 } }, a)).toEqual([])
-    expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 106 } }, a)).toHaveLength(1)
+    // Kaynak hassasiyetinde kıyas (OPS/KATALOG hükmü 2026-09-23): 105.56 tam sayıya yuvarlanınca 106 → eşit.
+    expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 106 } }, a)).toEqual([])
+    expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 107 } }, a)).toHaveLength(1)
+    expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 105.5 } }, a)).toHaveLength(1)
+  })
+  it('KAYNAK BASILIYSA KAYNAK KAZANIR: VRT-11333 katalog 48.6 l/s, taban 175 m3/h → 48.61 → 1 ondalıkta eşit', () => {
+    const b = { values: { common: { url_key: 's', max_delivery_m3h: { amount: '175.0000' } }, channel_locale_specific: { default: { en_US: { name: 'V' } } } } }
+    expect(urunFarklari({ sku: 'VRT-11333', name: 'V', slug: 's', specs: { max_delivery_m3h: 175, max_delivery_ls: 48.6 } }, b)).toEqual([])
+    expect(urunFarklari({ sku: 'VRT-11333', name: 'V', slug: 's', specs: { max_delivery_m3h: 175, max_delivery_ls: 48.5 } }, b)).toHaveLength(1)
+  })
+  it('ondalık sayısı: üslü gösterim dahil', () => {
+    expect(ondalikSayisi(48.6)).toBe(1)
+    expect(ondalikSayisi(175)).toBe(0)
+    expect(ondalikSayisi(1e-7)).toBe(7)
+    expect(ondalikSayisi(Number.NaN)).toBe(0)
   })
   it('farklı sayı, eksik öznitelik ve farklı ad yakalanır', () => {
     const f = urunFarklari({ sku: 'A', name: 'W', slug: 'vortice-test', specs: { weight_kg: 12.6, has_timer: false } }, api)

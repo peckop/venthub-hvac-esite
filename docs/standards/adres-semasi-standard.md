@@ -1,7 +1,9 @@
 # Adres Şeması Standardı (K3-b)
 
-> **Durum:** v0.1 · 2026-09-23 · Şerit: URUN · **Uygulama öncesi cetvel** — şemanın kendisi REC-300 yayınıyla
+> **Durum:** v0.2 (B-1) · 2026-10-11 · Şerit: URUN · **Uygulama öncesi cetvel** — şemanın kendisi REC-300 yayınıyla
 > canlıya çıkar; bugün canlıda olan kısımlar "CANLI", yayını bekleyenler "HEDEF" diye işaretlidir.
+> **v0.2:** alt kategori (dal) adresi TEK seviyedir (SEO-35 B-1, karar belgesi sürüm 5, 2026-10-10); v0.1'deki iki
+> seviyeli dal adresi kalktı.
 > **Plan:** `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` (v5) · **Kararlar:** SEO ve Yayın K3-b, Katalog
 > K17, 59, 68, 78b, 84, 86.
 > **İlgili cetveller:** `canonical-url-standard.md` (kanonik = yönlendirmesiz tek adres) · `category-taxonomy-standard.md`
@@ -20,10 +22,16 @@ tarayıcının İngilizce sayfaya gönderilmesi. CLAUDE.md 1. kural: cetvel yoks
 |---|---|---|
 | Tüm ürünler | `/tr/urunler` | `/en/products` |
 | Kök kategori | `/tr/kategori/<kök>` | `/en/category/<kök>` |
-| Dal | `/tr/kategori/<kök>/<dal>` | `/en/category/<kök>/<dal>` |
+| Dal (alt kategori) | `/tr/kategori/<alt-slug>` | `/en/category/<alt-slug>` |
 | Aile (seri) | `/tr/urun/<aile>` | `/en/products/<aile>` |
 | Model | `/tr/urun/<slug_tr>-p-<sku>` | `/en/products/<slug_en>-p-<sku>` |
 | Marka | `/tr/markalar/<marka>` | `/en/brands/<marka>` |
+
+**Dal adresi (B-1):** kök de dal da TEK segmenttir; adreste üst kategori YOKTUR. Üst-alt ilişkisi adresten
+çıkarılmaz, `parent_id`'den okunur (örn. site haritası `kategoriArgumanlari` ile üst slug'ı veriden alır). İç içe
+`/tr/kategori/<kök>/<dal>`, `/en/category/<kök>/<dal>` ve bugünkü `/tr/category/<kök>/<dal>` adresleri içerik çizmez:
+yalnız TEK 308 ile dalın tek segmentli adresine gider. EN yayını kapalıyken (`EN_YAYIN`) bütün `/en/` sayfaları
+noindex'tir ve site haritasında yoktur; alt kategori bunun dışında noindex DEĞİLDİR (`robots` yalnız pasif kategoride yazılır).
 
 **A1 — Model çözümü:** yol son `-p-`'den bölünür; sağ taraf SKU'dur (harf duyarsız), sol taraf serbest metindir ve
 çözümde **okunmaz**. Bu yüzden: SKU `-p-` içeremez ve `p-` ile başlayamaz; aile ve kategori slug'ı `-p-` içeremez
@@ -36,7 +44,10 @@ tarayıcının İngilizce sayfaya gönderilmesi. CLAUDE.md 1. kural: cetvel yoks
 **A3 — Slug metni:** ≤ 70 karakter · teknik değer yalnız `technical_specs`'ten (uydurma sayı yok) · EN slug'da
 Türkçe harf yok · kategori slug'ı zenginleşmez (Design slug kuralı §6). Model slug'ları üreticiyle kurulur:
 `docs/plans/rec300-model-adres-uret.py`; tip kelimeleri rakip taramasıyla seçilir (karar 78) ve dal başına
-kararlarla sabitlenir (karar 84: korozyon dalı `korozyon-dayanimli-asit-fani`).
+kararlarla sabitlenir (karar 84: korozyon dalı `korozyon-dayanimli-asit-fani`;
+**yerine geçti: karar 287 = B (2026-10-05):** korozyon dalı adı "Korozyona ve Aside Dayanımlı Fanlar", TR adresi
+`korozyona-ve-aside-dayanimli-fanlar` · **karar 288 = B (2026-10-05):** radyal dalı adı "Radyal (Santrifüj) Fanlar",
+adres `radyal-fanlar` değişmedi).
 
 **A4 — Rezerve kelimeler:** Design v3 §4 listesi + `api`, `admin`, `_next`. Hiçbir kategori/aile/marka slug'ı
 bunlarla kesişmez (HEDEF kapı INV-ADRES-CAKISMA-1).
@@ -44,9 +55,10 @@ bunlarla kesişmez (HEDEF kapı INV-ADRES-CAKISMA-1).
 ## 2. Tek kanonik (CANLI ilke, REC-205)
 
 **A5 — Bir sayfa hiçbir an iki adresten 200 dönmez.** 2026-09-07'de Google iki seviyeli dal adresimizi "kopya"
-sayıp eledi; sebep iki adresin aynı anda 200 dönmesiydi. İki seviyeli dal adresi kanonik olduğunda tek seviyeli
-adres **yalnız 308** verir — **TR'de de EN'de de**. Eski önek (`/tr/products/*`, `/tr/category/*`) yeni önek
-açıldıktan sonra hiçbir girdide 200 dönmez.
+sayıp eledi; sebep iki adresin aynı anda 200 dönmesiydi. B-1 kararıyla dalın kanonik adresi TEK seviyelidir
+(`/tr/kategori/<alt-slug>`, `/en/category/<alt-slug>`); iç içe `<kök>/<dal>` adresi **yalnız 308** verir —
+**TR'de de EN'de de**, tek sıçramayla. Eski önek (`/tr/products/*`, `/tr/category/*`) yeni önek açıldıktan sonra
+hiçbir girdide 200 dönmez.
 
 ## 3. Eski adresler — üç katman (HEDEF)
 

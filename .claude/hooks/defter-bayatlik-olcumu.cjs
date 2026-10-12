@@ -133,8 +133,19 @@ if (!Number.isFinite(yasSaat) || yasSaat < ESIK_SAAT) process.exit(0)
  */
 const OLC_GECERLI_KODLAR = [0, 3]
 
+/*
+ * ⛔`python3` ADI LİSTEDE YOK (ARC-14, 2026-10-01): Windows'ta `python3` yalnız Mağaza yönlendiricisidir
+ * (WindowsApps); gerçek Python `python` ya da `py` adıyla kuruludur. Eski liste `python` hata kodu
+ * verince `python3`e düşüyor ve her Stop turunda Microsoft Store sayfası açılıyordu (Recep: "Python
+ * için bu neden çıkıyor"). Ayrıca yorumlayıcıdan yorumlayıcıya geçiş YALNIZ "bu ad yok" (ENOENT)
+ * durumunda olur; betik kendi hatasını verdiyse başka yorumlayıcıyla yeniden denemek aynı hatayı
+ * tekrarlar ve gerçek sebebi gizler.
+ */
+const YORUMLAYICILAR = ['python', 'py']
+
 function olcOzeti() {
-  for (const yorumlayici of ['python', 'python3', 'py']) {
+  let sonSebep = ''
+  for (const yorumlayici of YORUMLAYICILAR) {
     let cikti = null
     let sebep = ''
     try {
@@ -147,18 +158,23 @@ function olcOzeti() {
     } catch (e) {
       // ⭐KOD 3 = CEVAP: stdout yine dolu gelir, onu kullan.
       if (OLC_GECERLI_KODLAR.includes(e.status) && e.stdout) cikti = String(e.stdout)
+      else if (e.code === 'ENOENT') sebep = 'yok'
       else sebep = 'cikis kodu ' + String(e.status ?? e.code ?? 'bilinmiyor')
     }
     if (cikti == null) {
-      if (!sebep) sebep = 'ciktisiz'
-      continue
+      // Yorumlayıcı bu adla yoksa sıradakini dene; betik kendi hatasını verdiyse DUR ve sebebi söyle.
+      if (sebep === 'yok') {
+        sonSebep = 'python/py bulunamadi'
+        continue
+      }
+      return { hata: 'betik ' + (sebep || 'ciktisiz') + ' (' + yorumlayici + ')' }
     }
     // `OZET: 14 degisen / 8 ayni / 22 demet` satırı SÖZLEŞMEDİR; yoksa biçim değişmiş demektir.
     const m = /OZET:\s*(\d+)\s*degisen\s*\/\s*(\d+)\s*ayni\s*\/\s*(\d+)\s*demet/i.exec(cikti)
     if (m) return { degisen: Number(m[1]), toplam: Number(m[3]) }
     return { hata: 'OZET satiri bulunamadi — olc cikti bicimi degismis olabilir' }
   }
-  return { hata: 'python/py bulunamadi ya da betik cikti vermedi' }
+  return { hata: sonSebep || 'python/py bulunamadi' }
 }
 
 const olc = olcOzeti()

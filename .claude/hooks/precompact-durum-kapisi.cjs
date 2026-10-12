@@ -36,6 +36,18 @@ const path = require('path')
 // ayırt eder. Eşiği düşürmek (ör. 30) AUTH'u yanlış alarmla vururdu — o gün 46 dakikaydı.
 const BAYAT_ESIK_DK = 60
 
+// ── ÖZET YÖNERGESİ (ARC-69, karar 321, 2026-10-10) ──
+// Otomatik compact (350k) uyarısız gelir; özet durum dosyasını taşımazsa pencere dönüşte "neredeydim"i kaybeder.
+// PreCompact'ın stdout'u özet talimatı olarak işlenir (10-08 deneme: kancanın yazdığı cümle özete AYNEN geçti).
+// Bu yüzden kapı, durum dosyasının SON bloğunu "özete aynen taşı" yönergesiyle stdout'a da yazar.
+// YÖNERGE_BAYAT_DK uyarı eşiği DEĞİL (o 60'tır, yukarıda ölçülü): burada bayatlık özetin başına konan bir not,
+// yanlış alarm üretmez; 30 dakika kart (ARC-69) hükmüdür.
+// Uzunluk sınırı: SessionStart 4500 karakterde bloğu ortadan kesiyordu (10-07 dersi); baş ve son korunur.
+const YONERGE_MAX_KARAKTER = 2800
+const YONERGE_BAS_KARAKTER = 2000
+const YONERGE_SON_KARAKTER = 700
+const YONERGE_BAYAT_DK = 30
+
 // MEMORY.md boyut bekçisi. ÖLÇÜM TABANI (HARİTA, REC-433 1.9, 2026-09-29): gerçek kırpma sınırı
 // 200 SATIR YA DA ~25.000 BAYT, hangisi önce dolarsa. Eski "16384 bayt" yanlış ölçümdü ve satır
 // sınırını hiç izlemiyordu. Aynı eşikler `hafiza-indeks-bekcisi.cjs`te de var (orada yazım engellenir).
@@ -159,31 +171,131 @@ const AD_KALIBI = /(lane-day|state|durum)/i
  * (2)'nin eşiği ölçümle seçildi; gerekçesi gövdedeki yorumda — önce 2 yazmıştım ve o değer
  * katmanı ÖLÜ bırakıyordu, çünkü gerçek durum dosyaları da dörtten yalnız birini tutuyor.
  */
-function oturumunDosyalari(memoryDir, sid) {
-  let adlar = []
-  try {
-    adlar = fs.readdirSync(memoryDir).filter(a => a.endsWith('.md'))
-  } catch {
-    return []
+/**
+ * ⭐HAFIZA DİZİNLERİ — ARC-6 + ARC-17 (2026-10-01), ÖLÇÜLMÜŞ iki kusur:
+ *
+ * (ARC-6) Worktree'de açılan pencerenin transcript'i KENDİ proje dizininde durur
+ * (`...--claude-worktrees-<ad>`), ama şeritler durum dosyasını çoğunlukla ANA projenin
+ * `memory/` klasörüne yazar. Kapı yalnız transcript'in dizinine baktığı için dosya VAR iken
+ * "originSessionId taşıyan dosya 0" deyip compact'ı DURDURDU (ALTYAPI, iki kez; ilk seferde
+ * dosyayı worktree dizinine kopyalayarak aşmıştı, kalıcı çözüm bu). Artık ikisine de bakılır.
+ *
+ * (ARC-17) Şartname (`hafiza-yazma-duzeni`) durum dosyalarının `memory/` kökünde VE
+ * `memory/gunluk/<tarih>/` + `memory/gunluk/_sahipsiz/` altında durabileceğini söyler; kod
+ * yalnız kökü tarıyordu. Günlük alt klasörler de taranır.
+ *
+ * @param {string} projeDizini  oturumun (transcript'in) proje dizini
+ * @returns {string[]} taranacak memory dizinleri (var olmayanlar elenir; tekrar yok)
+ */
+function hafizaDizinleri(projeDizini) {
+  const adaylar = [path.join(projeDizini, 'memory')]
+  const ana = process.env.VENTHUB_ANA_PROJE_DIZINI || anaProjeDizini()
+  if (ana && path.resolve(ana).toLowerCase() !== path.resolve(projeDizini).toLowerCase()) {
+    adaylar.push(path.join(ana, 'memory'))
   }
+  // Yalnız KÖK memory dizinleri döner; `gunluk/*` alt klasörlerini `oturumunDosyalari` ekler (tek yerde).
+  return adaylar.filter((d, i) => adaylar.indexOf(d) === i && fs.existsSync(d))
+}
+
+/** Ana projenin dizini (`~/.claude/projects/<ana-kök-adı>`). Çözülemezse null (kapı yine worktree dizinine bakar). */
+function anaProjeDizini() {
+  try {
+    const { anaKok } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs'))
+    // Claude Code yol→ad kuralı: alfasayısal olmayan her karakter '-'. Sürücü harfi büyük/küçük gelebilir.
+    const hedef = String(anaKok()).replace(/[^A-Za-z0-9]/g, '-').toLowerCase()
+    const kok = path.join(os.homedir(), '.claude', 'projects')
+    const e = fs.readdirSync(kok, { withFileTypes: true }).find(x => x.isDirectory() && x.name.toLowerCase() === hedef)
+    return e ? path.join(kok, e.name) : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * ⭐ŞERİT ADI YEDEĞİ — ARC-6 2. katman (2026-10-01, ÖLÇÜLDÜ): kapı kimliği dosyanın İLK 600 karakterinde arıyor; her yeni
+ * oturumun kimliği değiştiği için başlığı güncellenmemiş durum dosyası "dosya 0" diye compact'ı DURDURUYORDU (ARAÇ'ın kendi
+ * dosyasında önceki oturumun kimliği vardı; kimliği yenileyince kapı geçti). Kalıcı çözüm: kimlikle eşleşen dosya YOKSA,
+ * oturumun şerit adıyla (sessions kaydındaki `name`; Türkçe katlamalı) başlayan durum dosyası KABUL edilir ve
+ * "kimlik eski, güncelle" diye UYARILIR. Bloklamaz; başka şeridin dosyasını kabul etmez (ad ÖNEK eşleşmesi + durum kalıbı).
+ */
+function oturumSeridi(sid) {
+  if (!sid) return ''
+  try {
+    const dizin = process.env.VENTHUB_SESSIONS_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
+    for (const f of fs.readdirSync(dizin)) {
+      if (!f.endsWith('.json')) continue
+      try {
+        const j = JSON.parse(fs.readFileSync(path.join(dizin, f), 'utf8'))
+        if (j && j.sessionId === sid && typeof j.name === 'string') return asciiKatla(j.name).trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
+      } catch { /* bozuk kayıt atlanır */ }
+    }
+  } catch { /* sessions dizini yok */ }
+  return ''
+}
+
+function oturumunDosyalari(memoryDizinleri, sid) {
+  const sidli = sidIleDosyalar(memoryDizinleri, sid)
+  if (sidli.length) return sidli
+  const serit = oturumSeridi(sid)
+  if (!serit) return sidli
+  const yedek = []
+  for (const k of [].concat(memoryDizinleri)) {
+    const dizinler = [k]
+    try {
+      const g = path.join(k, 'gunluk')
+      for (const e of fs.readdirSync(g, { withFileTypes: true })) if (e.isDirectory()) dizinler.push(path.join(g, e.name))
+    } catch { /* gunluk yok */ }
+    for (const d of dizinler) {
+      let adlar = []
+      try { adlar = fs.readdirSync(d).filter(a => a.endsWith('.md')) } catch { continue }
+      for (const ad of adlar) {
+        if (!asciiKatla(ad).toLowerCase().startsWith(serit + '-') || !AD_KALIBI.test(ad)) continue
+        try { yedek.push({ ad, tam: path.join(d, ad), mt: fs.statSync(path.join(d, ad)).mtimeMs, seritEslesmesi: serit }) } catch { /* atla */ }
+      }
+    }
+  }
+  return yedek.sort((a, b) => b.mt - a.mt)
+}
+
+function sidIleDosyalar(memoryDizinleri, sid) {
+  // Eski çağrı biçimi (tek dizin dizgisi) çalışmaya devam eder; günlük alt klasörleri de tarar.
+  const kokler = [].concat(memoryDizinleri)
+  const dizinler = []
+  for (const k of kokler) {
+    dizinler.push(k)
+    try {
+      const g = path.join(k, 'gunluk')
+      for (const e of fs.readdirSync(g, { withFileTypes: true })) if (e.isDirectory()) dizinler.push(path.join(g, e.name))
+    } catch { /* gunluk yok */ }
+  }
+  const benzersiz = dizinler.filter((d, i) => dizinler.indexOf(d) === i)
   const adEsleseni = []
   const icerikEsleseni = []
-  for (const ad of adlar) {
-    const tam = path.join(memoryDir, ad)
+  const tara = (memoryDir) => {
+    let adlar = []
     try {
-      const govde = fs.readFileSync(tam, 'utf8')
-      // Kimlik yalnız frontmatter'da aranır: gövdede geçen bir sid ATIFTIR, sahiplik değil.
-      if (!sid || !govde.slice(0, 600).includes(sid)) continue
-      const kayit = { ad, tam, mt: fs.statSync(tam).mtimeMs }
-      // İçerik eşiği 1 — ÖLÇÜLDÜ 2026-08-28, ilk yazdığım 2 değeri ÖLÜ KATMAN üretiyordu:
-      // filodaki gerçek durum dosyaları bu dört desenden yalnız BİRİNİ tutuyor
-      // (altyapi-lane-day: 1 alan), ders dosyaları ise SIFIR (dizin-olcum-kanit-dersleri: 0,
-      // dizin-kapi-test-dersleri: 0). Yani 1, durum dosyasını yakalar ve dersi yine dışlar;
-      // 2 ise ikisini birden dışlıyordu — katman hiç iş görmüyordu ve bunu ancak ölçünce gördüm.
-      if (AD_KALIBI.test(ad)) adEsleseni.push(kayit)
-      else if (DORT_ALAN.filter(a => a.desen.test(asciiKatla(govde))).length >= 1) icerikEsleseni.push(kayit)
-    } catch { /* okunamayan dosya kapıyı düşürmez */ }
+      adlar = fs.readdirSync(memoryDir).filter(a => a.endsWith('.md'))
+    } catch {
+      return
+    }
+    for (const ad of adlar) {
+      const tam = path.join(memoryDir, ad)
+      try {
+        const govde = fs.readFileSync(tam, 'utf8')
+        // Kimlik yalnız frontmatter'da aranır: gövdede geçen bir sid ATIFTIR, sahiplik değil.
+        if (!sid || !govde.slice(0, 600).includes(sid)) continue
+        const kayit = { ad, tam, mt: fs.statSync(tam).mtimeMs }
+        // İçerik eşiği 1 — ÖLÇÜLDÜ 2026-08-28, ilk yazdığım 2 değeri ÖLÜ KATMAN üretiyordu:
+        // filodaki gerçek durum dosyaları bu dört desenden yalnız BİRİNİ tutuyor
+        // (altyapi-lane-day: 1 alan), ders dosyaları ise SIFIR (dizin-olcum-kanit-dersleri: 0,
+        // dizin-kapi-test-dersleri: 0). Yani 1, durum dosyasını yakalar ve dersi yine dışlar;
+        // 2 ise ikisini birden dışlıyordu — katman hiç iş görmüyordu ve bunu ancak ölçünce gördüm.
+        if (AD_KALIBI.test(ad)) adEsleseni.push(kayit)
+        else if (DORT_ALAN.filter(a => a.desen.test(asciiKatla(govde))).length >= 1) icerikEsleseni.push(kayit)
+      } catch { /* okunamayan dosya kapıyı düşürmez */ }
+    }
   }
+  for (const d of benzersiz) tara(d)
   const secilen = adEsleseni.length ? adEsleseni : icerikEsleseni
   return secilen.sort((a, b) => b.mt - a.mt)
 }
@@ -196,7 +308,7 @@ function oturumunDosyalari(memoryDir, sid) {
 function durumDosyasiBul(sid, transcriptPath) {
   const pd = projeDiziniBul(sid, transcriptPath)
   if (!pd) return null
-  const liste = oturumunDosyalari(path.join(pd, 'memory'), sid)
+  const liste = oturumunDosyalari(hafizaDizinleri(pd), sid)
   return liste.length ? liste[0] : null
 }
 
@@ -234,6 +346,43 @@ function yasMetni(dk) {
   return Math.round(dk / 1440) + ' gun'
 }
 
+/**
+ * Özete AYNEN taşınacak yönerge metni (ARC-69). Durum dosyasının SON bloğunu sınırlı uzunlukta verir; bayatsa
+ * (YONERGE_BAYAT_DK) dönüşte ilk işin son konuşma dökümünü okumak olduğunu söyler. Blok okunamazsa yönerge
+ * ÜRETİLMEZ ama bunu açıkça söyler (sessiz değil). Saf işlev: dosya okumak dışında yan etkisi yok.
+ *
+ * @param {{ad: string, tam: string}} dosya  durum dosyası (oturumunDosyalari öğesi)
+ * @param {number} yasDk  dosyanın yaşı (dakika)
+ * @param {string} sid  oturum kimliği (son-konusma dökümünün adı için)
+ * @returns {string}
+ */
+function ozetYonergesi(dosya, yasDk, sid) {
+  let blok = sonBlok(dosya.tam)
+  if (blok === '(durum dosyasi okunamadi)') {
+    return '[precompact] OZET YONERGESI URETILEMEDI: ' + dosya.ad + ' okunamadi. Donuste durum dosyani ELLE ac.\n'
+  }
+  if (blok.length > YONERGE_MAX_KARAKTER) {
+    const atilan = blok.length - YONERGE_BAS_KARAKTER - YONERGE_SON_KARAKTER
+    blok =
+      blok.slice(0, YONERGE_BAS_KARAKTER) +
+      '\n[... ' + atilan + ' karakter kirpildi: blogun tamami ' + dosya.ad + ' dosyasinda ...]\n' +
+      blok.slice(-YONERGE_SON_KARAKTER)
+  }
+  const satirlar = [
+    '[precompact] OZET YONERGESI: asagidaki blok ' + dosya.ad + ' dosyasinin SON blogudur (' + yasMetni(yasDk) +
+      ' once guncellenmis). Ozetin ILK satirlarina AYNEN tasi; ozetleme, kisaltma, yeniden yazma.',
+  ]
+  if (yasDk > YONERGE_BAYAT_DK) {
+    const dokum = sid ? 'son-konusma-' + sid + '.md' : 'son konusma dokumunu'
+    satirlar.push(
+      '[precompact] DURUM DOSYASI BAYAT (' + yasMetni(yasDk) + '): bu blok son konusmayi yansitmiyor olabilir. ' +
+        'Donuste ILK IS: ' + dokum + ' dosyasini oku (Recep\'in son sozleri orada).',
+    )
+  }
+  satirlar.push('<<<DURUM-DOSYASI-SON-BLOK', blok, 'DURUM-DOSYASI-SON-BLOK>>>')
+  return satirlar.join('\n') + '\n'
+}
+
 function main() {
 const girdi = girdiOku()
 const sid = girdi.session_id || girdi.sessionId || process.env.CLAUDE_SESSION_ID || ''
@@ -255,13 +404,15 @@ if (!projeDizini) {
 }
 
 const memoryDir = path.join(projeDizini, 'memory')
-const dosyalar = oturumunDosyalari(memoryDir, sid)
+const tarananDizinler = hafizaDizinleri(projeDizini)
+const dosyalar = oturumunDosyalari(tarananDizinler, sid)
 const uyarilar = []
 
 // KOL 1 — durum dosyası hiç yok mu? Tek BLOKLAYAN kol.
 if (dosyalar.length === 0) {
   process.stderr.write(
-    '⛔ COMPACT DURDURULDU — bu oturumun HIC durum dosyasi yok (' + memoryDir + ' icinde ' +
+    '⛔ COMPACT DURDURULDU — bu oturumun HIC durum dosyasi yok (' +
+      (tarananDizinler.length ? tarananDizinler.join(' + ') : memoryDir) + ' ve gunluk/* altlarinda ' +
       'originSessionId=' + (sid || 'YOK') + ' tasiyan dosya 0).\n' +
       'Compact baglami kirpar; yazilmayan sey KAYBOLUR. Once durum dosyani yaz:\n' +
       '  <serit>-lane-day-<tarih>.md, frontmatter metadata.originSessionId = ' + sid + '\n' +
@@ -273,6 +424,12 @@ if (dosyalar.length === 0) {
 
 // KOL 2 — en taze dosya bayat mı? (uyarır, bloklamaz)
 const enTaze = dosyalar[0]
+if (enTaze.seritEslesmesi) {
+  uyarilar.push(
+    'KIMLIK ESKI: ' + enTaze.ad + ' dosyasinin originSessionId alani bu oturumu (' + sid + ') gostermiyor; "' +
+      enTaze.seritEslesmesi + '" serit adiyla eslesti ve KABUL edildi. Kimligi guncelle (sonraki acilis ayni yere takilmasin).',
+  )
+}
 const yasDk = Math.round((Date.now() - enTaze.mt) / 60000)
 if (yasDk > BAYAT_ESIK_DK) {
   uyarilar.push(
@@ -328,13 +485,16 @@ if (uyarilar.length) {
     '[precompact] durum kapisi TEMIZ — ' + enTaze.ad + ' ' + yasDk + ' dk once guncellenmis, dort alan tam.\n',
   )
 }
+// ARC-69: uyarı olsun olmasın özetin başına durum dosyasının son bloğu yönergesi (kapı BLOKLAMADI, yalnız ekler).
+process.stdout.write(ozetYonergesi(enTaze, yasDk, sid))
 process.exit(0)
 }
 
 // `require` edildiğinde kapı KOŞMAMALI: session-board.cjs bu dosyayı modül olarak çağırıyor ve
 // stdin okuyup process.exit çağıran bir modül, çağıranın oturumunu öldürürdü.
 module.exports = {
-  durumDosyasiBul, sonBlok, projeDiziniBul, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI, yasMetni,
+  durumDosyasiBul, sonBlok, projeDiziniBul, hafizaDizinleri, oturumunDosyalari, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI, yasMetni,
+  ozetYonergesi, YONERGE_MAX_KARAKTER, YONERGE_BAYAT_DK,
   // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
   // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
   asciiKatla,

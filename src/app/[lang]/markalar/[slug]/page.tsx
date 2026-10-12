@@ -5,7 +5,7 @@ import { ADRES_SEMASI_K3B } from '@/config/features'
 import { HVAC_BRANDS } from '@/data/brands'
 import { adresUret } from '@/utils/adresUret'
 
-import { markaBul, MarkaSayfasi, markaUstVerisiK3b } from '../../../_components/markaSayfasi'
+import { markaBul, MarkaSayfasi, markaUrunsuzMu, markaUstVerisiK3b } from '../../../_components/markaSayfasi'
 
 /**
  * K3-b TR marka adresi — `/tr/markalar/<marka>` (REC-300 Faz 3b-2, plan §2).
@@ -30,7 +30,8 @@ type Params = { params: Promise<{ lang: string; slug: string }> }
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, slug } = await params
   if (!ADRES_SEMASI_K3B || lang !== 'tr') return {}
-  return markaUstVerisiK3b(lang, slug)
+  // OPS-51: ürünsüz marka kararı DB'deki aktif ürün sayısından (gövdeyle AYNI kaynak: `markaUrunsuzMu`).
+  return markaUstVerisiK3b(lang, slug, await markaUrunsuzMu(lang, slug))
 }
 
 export default async function Page({ params }: Params) {

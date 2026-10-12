@@ -9,9 +9,13 @@ import { adresRotalari, kategoriArgumanlari } from '../yuzeyAdresleri'
 /**
  * REC-403 — üst kategoriyi ve dile göre slug'ı bilen yüzeyler `Routes.category`'ye TAM nesneyi verir.
  *
- * Ölçüm (2026-09-29, bayrak AÇIK): tek slug verilen dal (`/tr/kategori/kanal-tipi-fanlar`) ve EN kanonik
- * slug verilen TR kök (`/tr/kategori/fans`) kanonik adrese doğrudan değil, sayfa katmanının 308'i
- * üzerinden bir fazla sıçramayla ulaşıyordu. Kapalıyken (bugün) yüzeylerin çağrısı BİREBİR aynı kalmalı.
+ * Ölçüm (2026-09-29, bayrak AÇIK, iki seviyeli kanonik zamanı): tek slug verilen dal
+ * (`/tr/kategori/kanal-tipi-fanlar`) ve EN kanonik slug verilen TR kök (`/tr/kategori/fans`) kanonik adrese
+ * doğrudan değil, sayfa katmanının 308'i üzerinden bir fazla sıçramayla ulaşıyordu. Kapalıyken (bugün)
+ * yüzeylerin çağrısı BİREBİR aynı kalmalı.
+ *
+ * SEO-35 B-1 (kanonik adres tek segment): dal için "tek slug çağrısı" ile "üst + dal çağrısı" AYNI adresi üretir,
+ * dal sıçraması kalmadı; yardımcının kalan işi dile göre slug'ı (TR sayfada `fans` yerine `fanlar`) vermektir.
  */
 
 const KANONIK_DAL = adresUret({ tur: 'kategori', kok: 'fanlar', dal: 'kanal-tipi-fanlar' }, 'tr', true)
@@ -24,16 +28,17 @@ describe('REC-403 · kategoriArgumanlari', () => {
     expect(r.category(k.slug, k.subSlug)).toBe(r.category('fans'))
   })
 
-  it('bayrak AÇIK, dal + üst: kanonik iki seviyeli adres, sıçramasız', () => {
+  it('bayrak AÇIK, dal + üst: kanonik tek seviyeli adres, sıçramasız', () => {
     const k = kategoriArgumanlari('kanal-tipi-fanlar', { slug: 'kanal-tipi-fanlar', ustSlug: 'fanlar' }, true)
     expect(k).toEqual({ slug: 'fanlar', subSlug: 'kanal-tipi-fanlar' })
     const r = adresRotalari('tr', true)
     expect(r.category(k.slug, k.subSlug)).toBe(KANONIK_DAL)
+    expect(KANONIK_DAL).toBe('/tr/kategori/kanal-tipi-fanlar')
   })
 
-  it('bayrak AÇIK: eski tek slug çağrısı kanoniğe EŞİT DEĞİL (sıçrama vardı — ölçüm kaydı)', () => {
+  it('bayrak AÇIK: üstü bilmeyen tek slug çağrısı da AYNI kanonik adrese gider (B-1: dal sıçraması kalmadı)', () => {
     const r = adresRotalari('tr', true)
-    expect(r.category('kanal-tipi-fanlar')).not.toBe(KANONIK_DAL)
+    expect(r.category('kanal-tipi-fanlar')).toBe(KANONIK_DAL)
   })
 
   it('bayrak AÇIK, dile göre kök slug: TR sayfada `fanlar`, kanonik adres', () => {

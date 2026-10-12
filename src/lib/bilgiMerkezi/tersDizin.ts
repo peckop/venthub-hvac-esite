@@ -27,7 +27,12 @@ import { baglantilariTopla, markdownAyristir } from './markdown'
 
 export interface RehberBaglantisi {
   baslik: string
-  ozet: string
+  /**
+   * Kartta görünen metin: yazının `kartOzeti` alanı (ana sayfa Bilgi bloğu, kategori ve aile sayfasının
+   * "ilgili rehberler" kartları). Meta açıklaması (`ozet`) kartta BASILMAZ (SEO-30). Boşsa tüketici
+   * paragraf çizmez; meta açıklaması yerine konmaz.
+   */
+  kartOzeti: string
   href: Route
 }
 
@@ -46,7 +51,7 @@ export function yazininHedefleri(yazi: RehberYazisi, dil: YaziDili): Set<string>
 
 function baglanti(yazi: RehberYazisi, dil: YaziDili): RehberBaglantisi {
   const m = yazi.diller[dil] as YaziMetni
-  return { baslik: markdownAyristir(m.govde).h1, ozet: m.ozet, href: bilgiMerkeziYaziHref(m.slug, dil) }
+  return { baslik: markdownAyristir(m.govde).h1, kartOzeti: m.kartOzeti.trim(), href: bilgiMerkeziYaziHref(m.slug, dil) }
 }
 
 /** Sayfanın dili (`lang`) → yazı dili; Bilgi Merkezi o dilde kapalıysa `null`. */
@@ -60,7 +65,7 @@ function acikDil(lang: string, enYayin: boolean): YaziDili | null {
  * O dilde Bilgi Merkezi kapalıysa ya da yazı yoksa BOŞ dizi — görünüm bloğu hiç basmaz.
  */
 export function ilgiliRehberler(
-  hedef: RehberHedefi,
+  hedef: RehberHedefi | readonly RehberHedefi[],
   lang: string,
   adet: number = 3,
   yazilar: readonly RehberYazisi[] = YAZILAR,
@@ -68,8 +73,13 @@ export function ilgiliRehberler(
 ): RehberBaglantisi[] {
   const dil = acikDil(lang, enYayin)
   if (!dil) return []
+  // Birden çok kimlik verilebilir (herhangi biri eşleşirse yazı döner).
+  const aranan = typeof hedef === 'string' ? [hedef] : hedef
   return dildekiYazilar(dil, yazilar)
-    .filter((y) => yazininHedefleri(y, dil).has(hedef))
+    .filter((y) => {
+      const hedefler = yazininHedefleri(y, dil)
+      return aranan.some((h) => hedefler.has(h))
+    })
     .slice(0, adet)
     .map((y) => baglanti(y, dil))
 }

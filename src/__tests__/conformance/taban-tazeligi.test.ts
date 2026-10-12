@@ -1,11 +1,19 @@
-import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-TABAN-TAZE-1 — şema TABANI, onaylanmış son migration'dan geri kalmamalı.
+ * INV-TABAN-TAZE-1 — şema TABANI, onaylanmış son migration'dan geri kalmamalı. (KAPININ KENDİ KODU)
+ *
+ * ⭐ALT-38 (2026-10-06): bu dosya yalnız KAPININ KENDİ KODUNU korur ve pull request kapısında KALIR: evren boş
+ * olamaz (ölçemedik ≠ taze), kısmi dosya taban seçilmez, sabotaj fikstürü, damga biçimi, README tablosu. Bunların
+ * hiçbiri master'ın o anki durumuna bağlı değildir, PR'ın kendi hatasını gösterir. TAZELİK kolu (dünya durumu:
+ * "en yeni migration tabandan yeni mi") `taban-tazeligi-dunya.test.ts`e TAŞINDI ve PR kapısından çıktı: master'a bir
+ * migration girince suçsuz PR'lar kırmızı oluyordu (CI geçmişi 07-06..10-06: 55 kırmızı koşu, 39 farklı dal). Yeni
+ * yeri: master push + zamanlı koşu (liste `scripts/ci/dunya-durumu-testleri.json`, cetvel
+ * `docs/standards/test-karnesi-standard.md`). Hiçbir koruma düşmedi: kırmızıyı `TABAN:` ve `DUNYA:` kanca satırları
+ * her mesajda gösterir.
  *
  * ⭐NİÇİN VAR (Recep, 2026-09-16): *"bende DB'de değişiklik yaptığım an senin kendi yedeğin
  * bayat olacak; tekrardan onu tazelemek yine 2 gün mü sürecek?"*
@@ -34,10 +42,12 @@ import { describe, expect, it } from 'vitest'
  * `docs/standards/ledger-ve-olu-migration-standard.md`.
  */
 
+// ⚠ORTAK YARDIMCILAR (aşağıdaki iki işaret arası): `taban-tazeligi-dunya.test.ts` ile BİREBİR aynı kalmak ZORUNDA.
+// İki ayrı dosya olduğu için kopyadır; ayrılırlarsa son koldaki "ORTAK YARDIMCILAR AYNI" testi kırmızı verir.
+// ORTAK-BLOK-BASLA
 const KOK = path.resolve(__dirname, '..', '..', '..')
 const TABAN_DIZIN = path.join(KOK, 'supabase', 'baselines')
 const MIGRATION_DIZIN = path.join(KOK, 'supabase', 'migrations')
-const README = path.join(TABAN_DIZIN, 'README.md')
 
 /**
  * ⭐TAM/KISMİ AYRIMI ÖLÇÜLMÜŞ BİR ÖLÇÜTLE YAPILIR, DOSYA ADIYLA DEĞİL.
@@ -107,8 +117,11 @@ function migrationlariTopla(): Array<{ dosya: string; tarih: string }> {
   }
   return out.sort((a, b) => a.dosya.localeCompare(b.dosya))
 }
+// ORTAK-BLOK-BITIS
 
-describe('INV-TABAN-TAZE-1 · sema tabani son migration dan geri kalmaz', () => {
+const README = path.join(TABAN_DIZIN, 'README.md')
+
+describe('INV-TABAN-TAZE-1 · sema tabani kapisinin KENDI KODU (tazelik kolu: taban-tazeligi-dunya.test.ts)', () => {
   const tabanlar = tabanlariTopla()
   const tamTabanlar = tabanlar.filter((t) => t.tam)
   const enYeniTaban = tamTabanlar.at(-1)
@@ -142,68 +155,6 @@ describe('INV-TABAN-TAZE-1 · sema tabani son migration dan geri kalmaz', () => 
       ).not.toBe(k.dosya)
     }
     expect(enYeniTaban?.politika ?? 0, 'secilen taban politika tasimiyor').toBeGreaterThan(0)
-  })
-
-  it('TAZELIK: en yeni migration damgasi, TABAN tarihinden YENI OLAMAZ', () => {
-    const tabanTarih = enYeniTaban!.tarih
-    /**
-     * ⭐DALIN KENDİ MIGRATION'I SAYILMAZ (REC-351 hükmü (a), 2026-09-18'de uygulandı).
-     *
-     * Ölçülmüş tasarım kusuru: taban ancak migration prod'a UYGULANDIKTAN sonra tazelenebilir
-     * (README Yol A: dökümü CI canlıdan alır). Dolayısıyla migration içeren HER PR kendi kapısını
-     * kırmızı yapıyordu — 09-17'de karar 40, 09-18'de URUN'un karar 45 PR'ı aynı yere takıldı ve
-     * tek çıkış yolu ya kapıyı görmezden gelmek ya tabanı elle uydurmaktı; ikisi de kapının
-     * anlamını öldürür.
-     *
-     * Kural: `origin/master` ile birleşme tabanından SONRA bu dalda EKLENEN (ve çalışma ağacında
-     * henüz commit edilmemiş) migration'lar sayılmaz. Master'a inince aynı dosyalar sayılır ve
-     * taban tazelenmezse kapı yine kırmızıdır — yani alarm kaybolmuyor, PR'dan master'a ÖTELENİYOR.
-     * Git okunamazsa HİÇBİR ŞEY dışlanmaz (fail-closed): ölçemediğimizde taze saymayız.
-     */
-    const git = (...a: string[]) =>
-      execFileSync('git', a, { cwd: KOK, encoding: 'utf8', timeout: 20000, stdio: ['ignore', 'pipe', 'pipe'] })
-    let dalinKendisi: string[] = []
-    try {
-      const taban = git('merge-base', 'HEAD', 'origin/master').trim()
-      const eklenen = git('diff', '--name-only', '--diff-filter=A', taban, '--', 'supabase/migrations')
-      // ⚠Commit edilmemiş dosya da dalın kendisidir: `git diff` izlenmeyeni görmez ve ilk sürüm
-      // tam bu yüzden yine kırmızı verdi (2026-09-18). CI'da bu küme boştur.
-      const calisma = git('status', '--porcelain', '--', 'supabase/migrations')
-      dalinKendisi = Array.from(
-        new Set(
-          [
-            ...eklenen.split('\n').map((s) => s.trim()),
-            ...calisma
-              .split('\n')
-              .map((s) => s.trim())
-              .filter((s) => /^(\?\?|A |AM|M )/.test(s))
-              .map((s) => s.replace(/^\S+\s+/, '')),
-          ]
-            .filter(Boolean)
-            .map((s) => s.split('/').pop() as string),
-        ),
-      )
-    } catch {
-      dalinKendisi = []
-      console.warn('[INV-TABAN-TAZE-1] git okunamadi — hicbir dosya DISLANMADI (fail-closed)')
-    }
-    if (dalinKendisi.length > 0) {
-      // Sessiz dışlama YOK: neyin sayılmadığı çıktıda görünür.
-      console.warn(
-        `[INV-TABAN-TAZE-1] dalin KENDI migration'lari sayilmadi (${dalinKendisi.length}): ` +
-          `${dalinKendisi.join(', ')} — master'a inince taban TAZELENMELI (README Yol A).`,
-      )
-    }
-    const geride = migrationlar.filter((m) => m.tarih > tabanTarih && !dalinKendisi.includes(m.dosya))
-    expect(
-      geride.map((m) => m.dosya),
-      `⚠TABAN BAYAT. Secilen taban: ${enYeniTaban!.dosya} (${tabanTarih}).\n` +
-        `      Ondan SONRA gelen migration sayisi: ${geride.length}\n` +
-        `      Dosyalar: ${geride.map((m) => m.dosya).join(', ')}\n` +
-        `      ONARIM: .github/workflows/sema-tabani-uret.yml elle tetiklenir (salt-okuma\n` +
-        `      supabase db dump, olculmus sure 57 sn), cikti artefakt olarak iner, INSAN PR acar.\n` +
-        `      Depoya dogrudan commit EDILMEZ. Ayrintli: supabase/baselines/README.md Yol A.`,
-    ).toEqual([])
   })
 
   it('⭐SABOTAJ: tabandan YENI bir migration damgasi kapiyi KIRMIZI yapar (kor olmadigi kaniti)', () => {
@@ -242,5 +193,22 @@ describe('INV-TABAN-TAZE-1 · sema tabani son migration dan geri kalmaz', () => 
         `      Klasorun kendi haritasi bayatladi. 2026-09-14 hatasinin sebebi tam buydu:\n` +
         `      yanlis secilen dosya tabloda HIC YOKTU.`,
     ).toEqual([])
+  })
+
+  it('ORTAK YARDIMCILAR AYNI: taban-tazeligi-dunya.test.ts ayni kopyayi tasiyor (kayma kapisi)', () => {
+    // Tazelik kolu (dunya durumu) ayri dosyada koşar ve AYNI yardimcilari kullanir. Biri degisip oteki
+    // degismezse PR kapisi bir seyi, zamanli kosu baska bir seyi olcer — sessizce. Burasi ikisini baglar.
+    const ortakBlok = (dosya: string): string => {
+      const metin = fs.readFileSync(path.join(__dirname, dosya), 'utf8').replace(/\r\n/g, '\n')
+      const m = /\/\/ ORTAK-BLOK-BASLA\n([\s\S]*?)\n\/\/ ORTAK-BLOK-BITIS/.exec(metin)
+      expect(m, `${dosya}: ORTAK-BLOK-BASLA / ORTAK-BLOK-BITIS isaretleri YOK`).not.toBeNull()
+      return m![1]
+    }
+    const burada = ortakBlok('taban-tazeligi.test.ts')
+    const dunya = ortakBlok('taban-tazeligi-dunya.test.ts')
+    for (const parca of ['function tabanlariTopla', 'function migrationTarihi', 'function migrationlariTopla', 'POLITIKA_DESENI']) {
+      expect(burada, `ortak blokta ${parca} YOK — olcum kor`).toContain(parca)
+    }
+    expect(dunya, 'taban-tazeligi-dunya.test.ts yardimcilari bu dosyadakinden AYRILMIS').toBe(burada)
   })
 })

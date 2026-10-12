@@ -52,6 +52,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { getProductModelLabel } from '../../utils/productHelpers'
 import QuoteRequestButton from '../quotes/QuoteRequestButton'
 
 /** Panelde en fazla kaç kalem gösterilir — tasarım v13 ekran 12. */
@@ -99,17 +100,22 @@ export default function TeklifPaneliIcerigi({ kapat, baslikId }: Props) {
       ) : (
         <>
           <ul className="mb-3 flex flex-col gap-2">
-            {gosterilen.map((k) => (
-              <li key={k.id} className="flex flex-col">
-                <span className="text-sm text-industrial-gray">{k.product.name}</span>
-                {/* Marka + SKU: fotoğraf kaynağı olmadığı için ayırt edici bilgi
-                    bunlar (sepet sayfasıyla aynı desen). */}
-                <span className="text-xs text-steel-gray">
-                  {k.product.brand}
-                  {k.product.sku ? ` · ${k.product.sku}` : ''}
-                </span>
-              </li>
-            ))}
+            {gosterilen.map((k) => {
+              // URN-32: eskiden ham `sku` basılıyordu (müşteriye iç kod). Görünen kod YALNIZ
+              // `model_code`; yoksa hiç çizilmez (INV-SKU-GORUNMEZ-1).
+              const modelKodu = getProductModelLabel({ model_code: k.product.model_code })
+              return (
+                <li key={k.id} className="flex flex-col">
+                  <span className="text-sm text-industrial-gray">{k.product.name}</span>
+                  {/* Marka + model kodu: fotoğraf kaynağı olmadığı için ayırt edici bilgi
+                      bunlar (sepet sayfasıyla aynı desen). */}
+                  <span className="text-xs text-steel-gray">
+                    {k.product.brand}
+                    {modelKodu && <> · {modelKodu}</>}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
 
           {sayi > GOSTERILEN_KALEM && (

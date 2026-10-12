@@ -60,12 +60,12 @@ Kurallar:
 - **Tarayıcıyla soru sorulmaz.** Google sonuç sayfası ve içindeki yapay zekâ modu `pazar-olcum-standard.md`
   P4 gereği otomatik açılmaz (robots.txt `Disallow: /search`). Diğer sohbet arayüzleri de şartları ayrıca
   ölçülüp yazılmadan tarayıcıyla otomatik sorulmaz.
-- **Anahtarlar** yalnız kullanıcı ortam değişkenindedir; depoya, Linear'a, posta kutusuna ve günlük dosyasına
+- **Anahtarlar** yalnız kullanıcı ortam değişkenindedir; depoya, Kanban kartına, posta kutusuna ve günlük dosyasına
   yazılmaz. Varlığı yalnız "var/yok + uzunluk" ile ölçülür.
 
 ## G2 — Soru listesi
 
-- **Yer:** Linear kaydına ek (REC-369) + çalışma kopyası `~/venthub-olcum/geo/`. **Depoya girmez**
+- **Yer:** Kanban kartına not + depo dışı dosya yolu (karar 219; REC-369 eski Linear kaydıdır) + çalışma kopyası `~/venthub-olcum/geo/`. **Depoya girmez**
   (`pazar-olcum-standard.md` P6: sorgu listesi, rakip adı).
 - **Sürüm:** liste sürüm numarası taşır (v0, v1…). Soru değiştirmek yeni sürümdür; eski sürümün sonucu yeni
   sürümle yalnız ortak sorular üzerinden kıyaslanır.
@@ -103,7 +103,7 @@ Her cevap bir satır (JSON), `~/venthub-olcum/geo/<tarih>/<motor>.jsonl`:
 `soruNo · listeSurum · motor · model · zaman (UTC) · cevapMetni · kaynaklar[] (adres + başlık) · venthubMetinde
 (bool) · venthubKaynakta (bool) · venthubSayfalari[] · hata`
 
-- Ham cevap depo dışında kalır. Linear kaydına aylık özet + ham dosya eki gider.
+- Ham cevap depo dışında kalır. Kanban kartına aylık özet notu + ham dosyanın depo dışı yolu gider.
 - Depoya yalnız G5'teki **özet oranlar** girer (Ölçüm geçmişi tablosu).
 
 ## G5 — Ölçütler
@@ -113,7 +113,7 @@ Her cevap bir satır (JSON), `~/venthub-olcum/geo/<tarih>/<motor>.jsonl`:
 | **Görünürlük oranı** | VentHub'ın metinde **ya da** kaynakta geçtiği soru / toplam soru (motor başına) |
 | **Kaynak oranı** | VentHub'ın kaynak listesinde olduğu soru / toplam soru |
 | **Sayfa dağılımı** | Kaynak gösterilen VentHub sayfaları ve kaç soruda (hangi sayfa türü çalışıyor) |
-| **Rakip payı** | Kaynaklarda en sık geçen 10 alan adı — **yalnız Linear'da** (rakip adı depoya girmez) |
+| **Rakip payı** | Kaynaklarda en sık geçen 10 alan adı — **yalnız Kanban kartında / depo dışı dosyada** (rakip adı depoya girmez) |
 
 Yorum kuralı: tek ayın oranı iddia kurmaz; iki ardışık koşuda aynı yöndeki değişim eğilim sayılır. Bir yayına
 (adres, yazı) bağlanan değişim ancak +28 gün koşusunda görülürse o yayına bağlanır.

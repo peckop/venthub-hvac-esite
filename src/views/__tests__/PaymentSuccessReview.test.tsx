@@ -52,7 +52,13 @@ vi.mock('../../hooks/useLocalizedRoutes', () => ({
 vi.mock('@/lib/supabase/client', () => ({
   supabaseBrowserClient: {
     functions: { invoke: vi.fn() },
-    from: vi.fn(() => ({ select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn() })) })) })),
+    // URN-83 (güvenlik bulgusu 3): `needs_review` yalnız sipariş KAYDI bu ziyaretçiye görünüyorsa sepeti siler;
+    // gerçek akışta callback siparişi zaten bulmuştur, bu yüzden kayıt bulunuyor.
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({ maybeSingle: vi.fn(async () => ({ data: { id: 'ord-1' }, error: null })) })),
+      })),
+    })),
   },
 }))
 

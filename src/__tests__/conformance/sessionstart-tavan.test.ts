@@ -26,6 +26,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 const KOK = path.resolve(__dirname, '../../..')
 const KANCA = path.join(KOK, '.claude/hooks/session-board.cjs')
 const TAVAN = 9000
+const MUTLAK_TAVAN = 9900 // OPS'ta harita özeti için genişlemiş tavan (kancanın kendi sınırı 10.000)
 const SID = '0dfe070e-0000-4000-8000-tavan0000001'
 const SON_MESAJ_BASI = 'SON-MESAJ-ANAHTARI Recep bu sozu aynen gormek istiyor'
 const CEVAP_ANAHTARI = 'CEVAP-KOKU-ANAHTARI'
@@ -33,6 +34,7 @@ const CEVAP_ANAHTARI = 'CEVAP-KOKU-ANAHTARI'
 let gecici = ''
 let memoryDir = ''
 let kayitYolu = ''
+let oturumKayitDizini = '' // pid kaydı (~/.claude/sessions) taklidi; boş = gerçek kayıtlar teste sızmaz
 
 beforeAll(() => {
   gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sstart-'))
@@ -40,6 +42,8 @@ beforeAll(() => {
   fs.mkdirSync(memoryDir)
   kayitYolu = path.join(gecici, `${SID}.jsonl`)
   fs.writeFileSync(kayitYolu, '')
+  oturumKayitDizini = path.join(gecici, 'oturum-kayitlari')
+  fs.mkdirSync(oturumKayitDizini)
 
   // Durum dosyası: kimlik frontmatter'da, son blok ~21k karakter.
   const satirlar: string[] = []
@@ -68,13 +72,14 @@ afterAll(() => {
   if (gecici) fs.rmSync(gecici, { recursive: true, force: true })
 })
 
-function calistir(source: string, ekEnv: Record<string, string> = {}): { ek: string; durum: number | null } {
+function calistir(source: string, ekEnv: Record<string, string> = {}, ekGirdi: Record<string, string> = {}): { ek: string; durum: number | null } {
   const girdi = JSON.stringify({
     session_id: SID,
     source,
     transcript_path: kayitYolu,
     cwd: KOK,
     hook_event_name: 'SessionStart',
+    ...ekGirdi,
   })
   const r = spawnSync(process.execPath, [KANCA], {
     input: girdi,
@@ -82,7 +87,7 @@ function calistir(source: string, ekEnv: Record<string, string> = {}): { ek: str
     cwd: KOK,
     // CC_LANE / üretici / toplam-tavan geçersiz kılmaları her zaman açıkça verilir: geliştiricinin kendi
     // kabuğundaki değerler testi etkilemesin.
-    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', CC_LANE: '', VH_ROL_KARTI_URETICI: '', ...ekEnv },
+    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', CC_LANE: '', VH_ROL_KARTI_URETICI: '', VENTHUB_OTURUM_KAYIT_DIZINI: oturumKayitDizini, ...ekEnv },
     windowsHide: true,
     timeout: 60_000,
   })
@@ -279,4 +284,149 @@ describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
     const m = dokum.enjeksiyonKisa(memoryDir, SID, { sonN: 1, mesajTavan: 200, tavan: 3600 }) ?? ''
     expect(m).toContain('mesaj kırpıldı')
   })
+})
+
+describe('HRT-29 · rol OPS ise açılışta departman haritası kısa özeti gelir', () => {
+  const HARITA_TAVANI = 2048
+  const ROLLER = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA', 'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK', 'TAKIP']
+  /** HRT-35 (karar 315): planlı ama kapalı departman; açılış harfi yerine "açılış yok" yazar. */
+  const PLANLI = 'MÜHENDİSLİK'
+
+  it('CC_LANE=OPS: 17 departman satırı + planlı MÜHENDİSLİK ve açılış harfleri görünür, çıktı tavanı yalnız özet kadar genişler', () => {
+    const { ek, durum } = calistir('startup', { CC_LANE: 'OPS' })
+    expect(durum).toBe(0)
+    expect(ek).toContain('DEPARTMAN HARİTASI')
+    for (const ad of ROLLER) expect(ek, `${ad} satırı yok`).toContain(`${ad} · `)
+    expect(ek).toMatch(new RegExp(`${PLANLI} · PLANLI, KAPALI .* · açılış yok`))
+    expect(ek).toMatch(/ · M\/T\n/)
+    expect(ek.length).toBeLessThanOrEqual(TAVAN + HARITA_TAVANI)
+    expect(ek.startsWith(`Oturum kimliğin: ${SID}`)).toBe(true)
+  }, 60_000)
+
+  // OPS denetimi (#1690 bulgu 1): tavan 9.000 + özet 1.855 = 10.855'e çıkıyor, compact açılışı 10.719 oluyordu → kancanın 10.000
+  // sınırında kırpılıyordu. Eski üst sınır (TAVAN+2048) yalnız startup'ı deniyor ve bu kusuru yakalamıyordu.
+  for (const source of ['startup', 'resume', 'clear', 'compact']) {
+    it(`${source}: OPS + şişirilmiş durum/döküm → additionalContext ${MUTLAK_TAVAN} karakteri aşmaz, kancanın 10.000 sınırı altında`, () => {
+      const { ek, durum } = calistir(source, { CC_LANE: 'OPS' })
+      expect(durum).toBe(0)
+      expect(ek.length, `${source} çıktısı ${ek.length} karakter`).toBeLessThanOrEqual(MUTLAK_TAVAN)
+      expect(ek).toContain('DEPARTMAN HARİTASI')
+      expect(ek).not.toContain('SessionStart tavani: cikti kirpildi')
+    }, 60_000)
+  }
+
+  it('OPS compact: harita özeti bütünüyle durur ve Recep sözü hâlâ aynen görünür (taşan pay durum bloğundan alınır)', () => {
+    const { ek } = calistir('compact', { CC_LANE: 'OPS' })
+    for (const ad of [...ROLLER, PLANLI]) expect(ek, `${ad} satırı yok`).toContain(`${ad} · `)
+    expect(ek).toContain(SON_MESAJ_BASI)
+  }, 60_000)
+
+  it('OPS olmayan rolde tavan 9.000 kalır (genişleme yalnız OPS)', () => {
+    const { ek } = calistir('compact', { CC_LANE: 'ARAC' })
+    expect(ek.length).toBeLessThanOrEqual(TAVAN)
+  }, 60_000)
+
+  describe('üretici sınırı çalışma anında ölçülür (bulgu 2) ve sebep yazılır (bulgu 4)', () => {
+    /** Verilen gövdeyle geçici bir sahte üretici yazar (kanca VH_ROL_KARTI_URETICI ile bunu çağırır). */
+    const sahteUretici = (ad: string, govde: string): string => {
+      const yol = path.join(gecici, ad)
+      fs.writeFileSync(yol, govde)
+      return yol
+    }
+
+    it('20.000 karakter basan üretici: ham metin GİRMEZ, işaretçi + sınır sebebi yazılır, çıktı tavan altında', () => {
+      const uretici = sahteUretici(
+        'kacak-uretici.cjs',
+        "if(process.argv.includes('--harita-ozet'))process.stdout.write('KACAK-HARITA '+'x'.repeat(20000));" +
+          "else process.stdout.write('SAHTE-GOREV')\n",
+      )
+      const { ek, durum } = calistir('compact', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: uretici })
+      expect(durum).toBe(0)
+      expect(ek).not.toContain('KACAK-HARITA')
+      expect(ek).toContain('DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md')
+      expect(ek).toMatch(/kisa ozet uretilemedi \([^)]+\)/)
+      expect(ek.length).toBeLessThanOrEqual(MUTLAK_TAVAN)
+    }, 60_000)
+
+    it('2.100 bayt sınırının hemen altı kabul edilir, hemen üstü reddedilir (sınır tam yerinde)', () => {
+      const uretim = (n: number) =>
+        sahteUretici(
+          `sinir-${n}.cjs`,
+          `if(process.argv.includes('--harita-ozet'))process.stdout.write('SINIR-OZET '+'y'.repeat(${n - 11}));else process.stdout.write('SAHTE-GOREV')\n`,
+        )
+      expect(calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: uretim(2100) }).ek).toContain('SINIR-OZET')
+      const ust = calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: uretim(2101) }).ek
+      expect(ust).not.toContain('SINIR-OZET')
+      expect(ust).toMatch(/ozet 2101 bayt > 2100 sinir/)
+    }, 120_000)
+
+    it('üretici hata verirse (çıkış 1): işaretçide sebep yazılır, oturum açılır', () => {
+      const uretici = sahteUretici('hatali-uretici.cjs', "if(process.argv.includes('--harita-ozet'))process.exit(1)\n")
+      const { ek, durum } = calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: uretici })
+      expect(durum).toBe(0)
+      expect(ek).toMatch(/kisa ozet uretilemedi \(.+\)/)
+    }, 60_000)
+
+    it('üretici boş basarsa: sebep "bos cikti"', () => {
+      const uretici = sahteUretici('bos-uretici.cjs', "if(process.argv.includes('--harita-ozet'))process.stdout.write('  ')\n")
+      expect(calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: uretici }).ek).toContain('uretici bos cikti verdi')
+    }, 60_000)
+
+    it('üretici dosyası yoksa: sebep "uretici bu agacta yok"', () => {
+      const { ek } = calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: path.join(gecici, 'yok-boyle-bir-uretici.cjs') })
+      expect(ek).toContain('kisa ozet uretilemedi (uretici bu agacta yok)')
+    }, 60_000)
+  })
+
+  // OPS denetimi (#1690 bulgu 5): compact/clear girdisinde session_title yok; rol pid kaydındaki addan (`~/.claude/sessions`) çıkar.
+  describe("claim'siz pencerede rol başlıktan çıkar: compact ve clear dahil, pid kaydı yedeği", () => {
+    const kayitYaz = (ad: string) =>
+      fs.writeFileSync(path.join(oturumKayitDizini, '4242.json'), JSON.stringify({ sessionId: SID, name: ad }))
+    afterAll(() => fs.rmSync(path.join(oturumKayitDizini, '4242.json'), { force: true }))
+
+    for (const source of ['compact', 'clear']) {
+      it(`${source}: session_title gelmese de pid kaydındaki "Ops" adı → rol OPS, harita gelir`, () => {
+        kayitYaz('Ops')
+        const { ek } = calistir(source)
+        expect(ek).toContain('ROL KARTI: OPS')
+        expect(ek).toContain('DEPARTMAN HARİTASI')
+        expect(ek.length).toBeLessThanOrEqual(MUTLAK_TAVAN)
+      }, 60_000)
+    }
+
+    it('pid kaydındaki ad tabloda yoksa rol tanınmaz (tahmin yok)', () => {
+      kayitYaz('Baska Bir Ad')
+      const { ek } = calistir('compact')
+      expect(ek).toContain('ROL KARTI: (bu oturumun seridi/rolu bilinmiyor')
+      expect(ek).not.toContain('DEPARTMAN HARİTASI')
+    }, 60_000)
+
+    it("tablo rollerinin hepsinde (yalnız OPS değil) başlıktan rol kartı gelir; harita yalnız OPS'ta", () => {
+      kayitYaz('Araç')
+      const { ek } = calistir('startup')
+      expect(ek).toContain('ROL KARTI: ARAC')
+      expect(ek).not.toContain('DEPARTMAN HARİTASI')
+    }, 60_000)
+  })
+
+  it('claim YOK ve CC_LANE yok: pencere başlığı "Ops" ise rol OPS tanınır, harita ve rol kartı gelir', () => {
+    const { ek } = calistir('startup', {}, { session_title: 'Ops' })
+    expect(ek).toContain('ROL KARTI: OPS')
+    expect(ek).toContain('DEPARTMAN HARİTASI')
+  }, 60_000)
+
+  it('AYIRT EDİCİLİK: OPS olmayan rolde ve başlıksız/tanımsız başlıkta harita GELMEZ, rol kartı bilinmiyor der', () => {
+    expect(calistir('startup', { CC_LANE: 'ARAC' }).ek).not.toContain('DEPARTMAN HARİTASI')
+    const bos = calistir('startup', {}, { session_title: '' }).ek
+    expect(bos).not.toContain('DEPARTMAN HARİTASI')
+    expect(bos).toContain('ROL KARTI: (bu oturumun seridi/rolu bilinmiyor')
+    expect(calistir('startup', {}, { session_title: 'Baska Bir Ad' }).ek).not.toContain('DEPARTMAN HARİTASI')
+  }, 120_000)
+
+  it('FAIL-OPEN: üretici yoksa oturum açılır, harita yerine işaretçi satırı yazılır', () => {
+    const { ek, durum } = calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: path.join(gecici, 'yok-boyle-bir-uretici.cjs') })
+    expect(durum).toBe(0)
+    expect(ek).toContain('DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md')
+    expect(ek).not.toContain('GEO-SEO · ')
+  }, 60_000)
 })

@@ -4,11 +4,15 @@ import React from 'react'
 import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMu } from '@/utils/bosDegerKorumasi'
 
 interface PainPoint {
     title: string
     description: string
 }
+
+/** Kart sayısına göre geniş ekran sütunu (Tailwind sınıfı TAM dize olmalı, birleştirilmez). */
+const KART_SUTUNLARI: Record<number, string> = { 1: 'lg:grid-cols-1', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3' }
 
 const SilentFanProblem: React.FC = () => {
     const { t, dict } = useI18n()
@@ -20,11 +24,15 @@ const SilentFanProblem: React.FC = () => {
     const colors = [
         { text: 'text-blue-500', bg: 'bg-blue-50' },
         { text: 'text-orange-500', bg: 'bg-orange-50' },
-        { text: 'text-red-500', bg: 'bg-red-50' },
+        { text: 'text-steel-gray', bg: 'bg-light-gray' },
         { text: 'text-purple-500', bg: 'bg-purple-50' }
     ]
 
-    const painPoints = pDict.painPoints || []
+    // URN-84: tablo bir kartı BOŞ bırakabilir (kaldırma). Başlık VE açıklama birlikte boşsa kart çizilmez;
+    // yalnız biri boşsa o alan basılmaz. Simge/renk sözlükteki özgün sıraya bağlı kalır (index korunur).
+    const painPoints = (pDict.painPoints || []).flatMap((point: PainPoint, index: number) =>
+        doluMu(point.title) || doluMu(point.description) ? [{ point, index }] : []
+    )
 
     return (
         <section ref={sectionRef} className="py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
@@ -43,8 +51,8 @@ const SilentFanProblem: React.FC = () => {
                 </div>
 
                 {/* Problem Cards Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
-                    {painPoints.map((point: PainPoint, index: number) => {
+                <div className={`grid grid-cols-2 md:grid-cols-2 ${KART_SUTUNLARI[painPoints.length] ?? 'lg:grid-cols-4'} gap-4 sm:gap-6 mb-12`}>
+                    {painPoints.map(({ point, index }) => {
                         const Icon = icons[index % icons.length]
                         const color = colors[index % colors.length]
                         return (
@@ -56,12 +64,16 @@ const SilentFanProblem: React.FC = () => {
                                 <div className={`w-10 h-10 sm:w-14 sm:h-14 ${color.bg} rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
                                     <Icon className={color.text} size={20} />
                                 </div>
-                                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">
-                                    {point.title}
-                                </h3>
-                                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
-                                    {point.description}
-                                </p>
+                                {doluMu(point.title) && (
+                                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">
+                                        {point.title}
+                                    </h3>
+                                )}
+                                {doluMu(point.description) && (
+                                    <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
+                                        {point.description}
+                                    </p>
+                                )}
                             </div>
                         )
                     })}
@@ -78,16 +90,17 @@ const SilentFanProblem: React.FC = () => {
                         
                         <div className="relative z-10 h-full flex items-center p-6 md:p-12">
                             <div className="grid md:grid-cols-2 gap-8 w-full">
-                                {/* Without */}
-                                <div className="text-left bg-black/20 backdrop-blur-md rounded-xl p-6 border border-white/10">
+                                {/* AC motorlu model. Sol ve sağ kutu AYNI nötr stilde: iki eşit motor seçeneği, biri "kötü" değil
+                                    (URN-81, Recep 10-09: "standart Lineo diye bir şey yok"); kırmızı/yeşil karşılaştırma stili kalktı. */}
+                                <div className="text-left bg-blue-500/20 backdrop-blur-md rounded-xl p-6 border border-blue-400/30">
                                     <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">{String(tr('withoutMark'))}</div>
+                                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">{String(tr('withoutMark'))}</div>
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.without'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
                                         {Array.isArray(pDict.visual.withoutPoints) && pDict.visual.withoutPoints.map((p, i) => (
-                                            <li key={i} className="text-red-200 text-sm flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-red-400 rounded-full" /> {p}
+                                            <li key={i} className="text-blue-100 text-sm flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {p}
                                             </li>
                                         ))}
                                     </ul>

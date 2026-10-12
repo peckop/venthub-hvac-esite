@@ -10,18 +10,22 @@ import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 import { KategoriSayfasi, kategoriSayfasiUstVerisiK3b } from '../../../../_components/kategoriSayfasi'
 
 /**
- * K3-b TR kategori adresi — `/tr/kategori/<kök>` ve `/tr/kategori/<kök>/<dal>` (REC-300 Faz 3b-2, plan §2).
+ * K3-b TR kategori adresi — `/tr/kategori/<slug>` (REC-300 Faz 3b-2, plan §2; SEO-35 B-1).
+ *
+ * KANONİK ADRES TEK SEGMENTTİR: kök de alt kategori de kendi slug'ıyla `/tr/kategori/<slug>`; üst slug'ı ve kimlik
+ * soneki adrese girmez. `[[...dal]]` KATMAN KORUNUR: eski iç içe adresler (`/tr/kategori/<üst>/<alt>`, 3-C'nin
+ * iki seviyeli biçimi) bu rotaya düşer ve TEK 308 ile `/tr/kategori/<alt>`'a gider — içerik üretmez.
  *
  * BAYRAK KAPALIYKEN (`ADRES_SEMASI_K3B=false`, bugün) HER İSTEK 404: rota var ama canlıda hiçbir
  * adres açmaz. EN bu rotayı kullanmaz (`/en/category/...` bugünkü rotada kalır) → `lang≠tr` 404.
  *
- * Karar `kategoriRotasiniUygula`'da: dal slug'la bulunur (adresteki kök karar vermez, O6), adres
- * kanonik değilse (tek seviyeli dal, yanlış kök, EN biçimli slug, büyük harf) TEK 308; pasif
- * kategori → aktif üst ya da `/tr/urunler` (O4); bilinmeyen → takma ad → 404; DB hatası fırlar.
- * Gövde ve üst veri `kategoriSayfasi.tsx`'ten — bugünkü `/[lang]/category/[categorySlug]` ile AYNI çekirdek.
+ * Karar `kategoriRotasiniUygula`'da: kategori YAPRAK slug'la bulunur (adresteki üst karar vermez, O6), adres
+ * kanonik değilse (iç içe adres, EN biçimli slug, büyük harf) TEK 308; pasif kategori → aktif üst ya da
+ * `/tr/urunler` (O4); bilinmeyen → takma ad → 404; DB hatası fırlar. Gövde ve üst veri `kategoriSayfasi.tsx`'ten —
+ * bugünkü `/[lang]/category/[categorySlug]` ile AYNI çekirdek.
  *
- * Önceden üretim (plan madde 13): bayrak açıkken her aktif kök ve dal TR adresiyle üretilir;
- * eski slug / takma ad gibi adresler talep üzerine (`dynamicParams`).
+ * Önceden üretim (plan madde 13): bayrak açıkken her aktif kategori (kök ve alt) kendi TR slug'ıyla üretilir;
+ * eski slug / takma ad / iç içe adres gibi adresler talep üzerine (`dynamicParams`) ve yalnız yönlendirir.
  */
 export const dynamic = 'force-static'
 export const revalidate = 3600
@@ -35,15 +39,8 @@ export async function generateStaticParams() {
       .select('id, slug, metadata, parent_id')
       .eq('is_active', true)
     if (error) throw error
-    const satirlar = data ?? []
-    const idIle = new Map(satirlar.map((c) => [c.id, c]))
-    return satirlar.flatMap((c) => {
-      const yaprak = getLocalizedCategorySlug(c, 'tr')
-      if (!c.parent_id) return [{ lang: 'tr', kok: yaprak, dal: [] as string[] }]
-      const ust = idIle.get(c.parent_id)
-      // Üstü pasif dal kanonik adres üretemez (üst satır listede yok) → talep üzerine çözülür.
-      return ust ? [{ lang: 'tr', kok: getLocalizedCategorySlug(ust, 'tr'), dal: [yaprak] }] : []
-    })
+    // Tek segment: üst kategorinin aktifliği adresi etkilemez (kanonik adres üstten bağımsız).
+    return (data ?? []).map((c) => ({ lang: 'tr', kok: getLocalizedCategorySlug(c, 'tr'), dal: [] as string[] }))
   } catch (e) {
     // Önceden üretim bir hızlandırmadır, doğruluk şartı değil: liste boşalırsa sayfalar talep
     // üzerine üretilir (dynamicParams). Sessiz geçilmez, loglanır.
@@ -56,18 +53,18 @@ type Params = { params: Promise<{ lang: string; kok: string; dal?: string[] }> }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, kok, dal = [] } = await params
-  if (!ADRES_SEMASI_K3B || lang !== 'tr') return {}
-  const cozum = await kategoriSegmentleriniCoz([kok, ...dal], 'tr', kategoriBagimliliklari)
-  return cozum.tur === 'kategori' ? kategoriSayfasiUstVerisiK3b(lang, cozum.kategori, cozum.ust) : {}
+  // İç içe adres (`dal` dolu) yalnız yönlendirir: üst veri üretilmez.
+  if (!ADRES_SEMASI_K3B || lang !== 'tr' || dal.length > 0) return {}
+  const cozum = await kategoriSegmentleriniCoz([kok], 'tr', kategoriBagimliliklari)
+  return cozum.tur === 'kategori' ? kategoriSayfasiUstVerisiK3b(lang, cozum.kategori) : {}
 }
 
 export default async function Page({ params }: Params) {
   const { lang, kok, dal = [] } = await params
   if (!ADRES_SEMASI_K3B || lang !== 'tr') notFound()
-  // İkiden fazla segment çözücüde "yok" olur (404) — istenen adres o hâlde hiç karşılaştırılmaz.
-  const istenen = adresUret({ tur: 'kategori', kok, dal: dal[0] ?? null }, 'tr')
-  const { kategori, ust } = await kategoriRotasiniUygula([kok, ...dal], 'tr', istenen, kategoriBagimliliklari)
-  return (
-    <KategoriSayfasi lang={lang} category={kategori} categorySlug={getLocalizedCategorySlug(kategori, 'tr')} ust={ust} />
-  )
+  // İstenen adres YALNIZ ilk segmentten kurulur; `dal` doluysa (iç içe adres) çözücü istenene bakmadan 308 verir.
+  // İkiden fazla segment çözücüde "yok" olur (404).
+  const istenen = adresUret({ tur: 'kategori', kok }, 'tr')
+  const { kategori } = await kategoriRotasiniUygula([kok, ...dal], 'tr', istenen, kategoriBagimliliklari)
+  return <KategoriSayfasi lang={lang} category={kategori} categorySlug={getLocalizedCategorySlug(kategori, 'tr')} />
 }

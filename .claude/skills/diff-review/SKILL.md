@@ -32,7 +32,7 @@ exclusions: []
 - Bir fonksiyonun silindiği veya tip güvenliğinden şüphelenilen değişikliklerde.
 
 ## Çalışma Prensibi
-Ajanın insiyatifine ("Baktım, her şey yolunda" halüsinasyonuna) bırakılmamış bir `Guardrail` (Duvar) sistemidir. Doğrudan `git diff HEAD` çağrısını Python üzerinden parse eder.
+Ajanın insiyatifine ("Baktım, her şey yolunda" halüsinasyonuna) bırakılmamış bir `Guardrail` (Duvar) sistemidir. Dalın TABANINA (`origin/master`, yoksa `master`; `--taban <dal>` ile değişir) göre diff alır: commitlenmiş + staged + unstaged değişiklik tek geçişte taranır. Çıktının ikinci satırı hangi tabanın tarandığını söyler. Taban çözülemezse `[UYARI] taban bulunamadi` basar ve yalnız commitlenmemiş değişikliğe (`git diff HEAD`) düşer — sessiz yeşil vermez; `--taban` çözülemezse çıkış 2.
 Eğer riskli bir hareket tespit ederse `Exit Code 1` döner ve süreci bloklar.
 
 ## Kapsanan Kurallar (Siyah Liste)
@@ -43,8 +43,11 @@ Eğer riskli bir hareket tespit ederse `Exit Code 1` döner ve süreci bloklar.
 ## Nasıl Çalıştırılır
 Terminale (veya `SafeToAutoRun` workflowuna) şu komut girilerek otonom denetim sağlanır:
 ```bash
-python .claude/skills/diff-review/scripts/check_diff_rules.py
+python .claude/skills/diff-review/scripts/check_diff_rules.py            # tabanı kendisi bulur
+python .claude/skills/diff-review/scripts/check_diff_rules.py --taban origin/master
 ```
+Çıkış kodu: `0` temiz (ya da yalnız MAJOR/MINOR uyarı) · `1` BLOCKER var · `2` tarama ÇALIŞAMADI (git yok, `--taban` çözülemedi). `2` "temiz" demek değildir.
+Kapı testi: `src/__tests__/conformance/diff-review-taban.test.ts` (python ister; `python` ya da `python3`).
 
 Eğer haklı bir gerekçe (Örn: Veritabanı masayı *bilerek* drop etmeli) varsa, kod satırının yanına `// diff-ignore` comment'i eklenerek kural aşılır.
 Örn:
@@ -55,7 +58,7 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 5. **Hardcoded URL sızıntısı (localhost:3000):** Geliştirme ortamı URL'si production bundle'a gitmemeli.
 6. **Mock data sızıntısı:** app/ path'lerinde inline object array kalıntıları (geçici test verisi).
 7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması.
-8. **useSearchParams Suspense İhlali:** Git diff'te yeni eklenen veya değiştirilen bir dosyada `useSearchParams` hook'unun kullanıldığı, ancak dosya içerisinde `<Suspense>` sarmalının veya wrapper'ının yer almadığı durumlar riskli kabul edilerek uyarılır.
+8. **useSearchParams Suspense İhlali (⚠BETİK BUNU ÖLÇMEZ — yalnız elle/gözle bakılır; betiğe ekleme ayrı iş, D11):** Git diff'te yeni eklenen veya değiştirilen bir dosyada `useSearchParams` hook'unun kullanıldığı, ancak dosya içerisinde `<Suspense>` sarmalının veya wrapper'ının yer almadığı durumlar riskli kabul edilerek uyarılır.
 
 <!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
 ## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt

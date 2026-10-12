@@ -13,6 +13,7 @@ import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { orderStatusLabelKey, type ShipPhase, shipPhase, shipPhaseStepIndex } from '../../utils/orderStatusDisplay'
 import { siparisNoGoster } from '../../utils/siparisNo'
 
 
@@ -111,28 +112,31 @@ export default function AccountOverviewPage() {
 
   // İstatistik Hesaplamaları
   const totalVolume = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0)
-  const activeOrders = orders.filter(o => !['delivered', 'cancelled', 'refunded', 'rejected'].includes(o.status.toLowerCase()))
+  const activeOrders = orders.filter(o => !['delivered', 'cancelled', 'refunded', 'rejected', 'failed'].includes(o.status.toLowerCase()))
   const completedOrdersCount = orders.filter(o => o.status.toLowerCase() === 'delivered').length
 
   // Aktif Sipariş için Kargo Durumu Bulma (En son verilen, bitmemiş sipariş)
   const activeShipment = activeOrders[0] // created_at DESC geldiği için ilk eleman en yenisi
 
-  const getShipStatus = (row?: ShipmentRecord): 'delivered' | 'shipped' | 'preparing' => {
-    if (!row) return 'preparing'
-    if (row.delivered_at || row.status.toLowerCase() === 'delivered') return 'delivered'
-    if (row.shipped_at || row.tracking_number || row.status.toLowerCase() === 'shipped') return 'shipped'
-    return 'preparing'
-  }
+  // Kargo evresi ortak yardımcıdan gelir (URN-1): ödenmemiş sipariş "Hazırlanıyor" görünmez.
+  const getShipStatus = (row?: ShipmentRecord): ShipPhase => shipPhase(row)
   const activeShipStatus = getShipStatus(activeShipment)
 
-  const activeShipStatusBadge = (status: 'delivered' | 'shipped' | 'preparing') => {
+  const activeShipStatusBadge = (status: ShipPhase, orderStatus?: string | null) => {
     switch (status) {
       case 'delivered':
         return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-green-500/10 text-green-700 border border-green-500/20"><CheckCircle className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.delivered')}</span>
       case 'shipped':
         return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-700 border border-purple-500/20"><Truck className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.shipped')}</span>
-      default:
+      case 'preparing':
         return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 border border-amber-500/20"><Clock className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.preparing')}</span>
+      case 'closed':
+        // İptal / başarısız / iade: etiket siparişin kendi durumundan gelir.
+        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-red-500/10 text-red-700 border border-red-500/20"><AlertTriangle className="w-3.5 h-3.5" /> {t(orderStatusLabelKey(orderStatus))}</span>
+      case 'unknown':
+        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-light-gray/30 text-steel-gray border border-light-gray"><Clock className="w-3.5 h-3.5" /> {t('orders.statusUnknown')}</span>
+      default:
+        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-yellow-500/10 text-yellow-800 border border-yellow-500/20"><Clock className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.awaitingPayment')}</span>
     }
   }
 
@@ -142,12 +146,7 @@ export default function AccountOverviewPage() {
     { key: 'delivered', label: t('account.overview.shipSteps.delivered'), icon: CheckCircle },
   ]
 
-  const getStepIndex = (status: 'delivered' | 'shipped' | 'preparing') => {
-    if (status === 'delivered') return 2
-    if (status === 'shipped') return 1
-    return 0
-  }
-  const activeStepIdx = getStepIndex(activeShipStatus)
+  const activeStepIdx = shipPhaseStepIndex(activeShipStatus)
 
   if (loading) {
     return (
@@ -240,7 +239,7 @@ export default function AccountOverviewPage() {
 
               {activeShipment && (
                 <div className="self-start sm:self-auto">
-                  {activeShipStatusBadge(activeShipStatus)}
+                  {activeShipStatusBadge(activeShipStatus, activeShipment?.status)}
                 </div>
               )}
             </div>
@@ -333,7 +332,7 @@ export default function AccountOverviewPage() {
                       </div>
 
                       <div className="flex items-center gap-3 self-start sm:self-auto ml-16 sm:ml-0">
-                        {activeShipStatusBadge(getShipStatus(o))}
+                        {activeShipStatusBadge(getShipStatus(o), o.status)}
                         <button onClick={() => router.push(Routes.account.orderDetail(o.id))} className="w-9 h-9 rounded-xl flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-primary-navy hover:border-primary-navy transition-colors shadow-sm">
                           <ArrowRight size={16} />
                         </button>
