@@ -45,6 +45,10 @@
    "priority": 0.6
   },
   {
+   "url": "{BASE}/tr/bilgi-merkezi/radyal-fan-mi-aksiyel-fan-mi",
+   "priority": 0.6
+  },
+  {
    "url": "{BASE}/tr/category/fanlar",
    "priority": 0.7
   },
@@ -276,6 +280,10 @@
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi/radyal-fan-mi-aksiyel-fan-mi",
    "priority": 0.6
   },
   {
