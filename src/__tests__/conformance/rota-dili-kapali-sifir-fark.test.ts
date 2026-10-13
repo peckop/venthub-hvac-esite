@@ -28,6 +28,8 @@ import {
  *
  * YENİLEME KAYDI: OPS-51 (karar 264 + 265, 2026-10-05) casals ve flexiva marka 308'lerini bilerek kaldırdı
  * (tr/en × 2 = 4 satır); fikstürden yalnız bu dört kayıt çıktı (49 → 45), başka fark yok.
+ * YENİLEME KAYDI 2: ALT-57 (2026-10-12) `/(.*)` başlık grubuna `Permissions-Policy: camera=(), microphone=(),
+ * geolocation=()` ekledi; fikstüre yalnız bu başlık girdisi eklendi (adres değişmedi: yönlendirme ve yeniden yazım aynı).
  */
 
 const ANAHTAR = 'NEXT_PUBLIC_ADRES_DILI'
