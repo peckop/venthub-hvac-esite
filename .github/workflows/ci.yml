@@ -253,9 +253,15 @@ jobs:
         if: steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')
         run: pnpm install --prefer-offline --config.allow-scripts true
 
-      - name: Lint (blocking)
+      # ALT-80 — Lint, tip denetimi ve Build ile PARALEL koşar (cetvel: docs/standards/test-karnesi-standard.md §4.2). Eskiden Lint Build'ten ÖNCE sırayla koşuyordu ve süresi
+      # (kodlu PR'da ~40 sn, ölçülmedi: PR açılınca ölçülür) doğrudan `ci` süresine ekleniyordu. Bu adım `eslint .`i arka planda başlatır ve HEMEN döner (scripts/ci/arka-plan.sh,
+      # e2e-smoke.yml'deki apt adımıyla aynı mekanizma); sonucu Build'ten SONRA "Lint sonucu (bekle, blocking)" adımı toplar ve KIRMIZIYI AYNEN taşır.
+      # Kapı DEĞİŞMEDİ: aynı komut, aynı `if`; bu adımın kendisi artık kapı değildir (hep 0 döner), kapı bekleme adımıdır ve o silinirse/atlanırsa INV-CI-EDITED-1 kırmızı verir.
+      # ⚠ `next build`in kendi "Linting and checking validity of types" aşaması KAPATILMAZ (`VENTHUB_E2E_TIP_LINT_ATLA` yalnız e2e-smoke'ta): `ci` son savunma hattıdır.
+      # ⚠ `2>&1 | tee ci-lint.log` kalktı: günlük arka plan durum dizinine ($RUNNER_TEMP/arka-plan/lint.log) gider ve bekleme adımı onu yazdırır; `ci-lint.log` dosyasını okuyan bir tüketici yoktur.
+      - name: Lint (arka planda başlat)
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
-        run: pnpm run lint 2>&1 | tee ci-lint.log
+        run: bash scripts/ci/arka-plan.sh baslat lint -- pnpm run lint
 
       - name: Type check
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
@@ -370,6 +376,14 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
 
+      # ALT-80 — LINT SONUCU (paralel başlayan Lint'in KAPISI). `Lint (arka planda başlat)` ile AYNI koşul (başlatılmayan komut beklenmez: aksi `bekle` 125 verirdi) artı `!cancelled()`:
+      # Build ya da bir önceki adım KIRMIZI olsa da Lint sonucu yine yazılır (iş zaten kırmızı; geliştirici iki hatayı birden görür); iptalde koşmaz. `bekle` komutun KENDİ çıkış koduyla
+      # döner (0 başarılı, N komutun kodu, 124 süre doldu, 125 hiç başlatılmamış): sıfır dışı her değer bu adımı ve `ci`yi KIRMIZI yapar. ⚠ `|| true` ve `continue-on-error` YOK
+      # (INV-CI-EDITED-1 sabotaj kolları: hata yutma, koşulun daralması, Build'den ÖNCEYE taşıma). Arka plan işlemi sonuç yazmadan ölürse betik Lint'i ÖN PLANDA yeniden koşar
+      # (sıralı eski davranışa düşer: paralellik kaybolur, doğruluk kaybolmaz). 600 sn `baslat`tan itibaren sınırdır (Lint süresi bu işte ölçülmedi); takılan komut ÖLDÜRÜLMEZ ama kırmızı verir (124).
+      - name: Lint sonucu (bekle, blocking)
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true' && !cancelled()
+        run: bash scripts/ci/arka-plan.sh bekle lint 600
 
       # ALT-38c-2 — TEST SHARD SONUÇLARI (mantık ve test: scripts/ci/test-shard-bekle.cjs). pull_request'te (edited hariç) Test aşağıdaki `test-shard` işlerinde koşar;
       # bu adım AYNI koşunun AYNI denemesindeki shard işlerinin HEPSİNİN `success` olmasını bekler (Lint ve Build ile üst üste ilerlediği için son adımdır).

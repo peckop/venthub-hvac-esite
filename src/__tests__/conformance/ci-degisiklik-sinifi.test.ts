@@ -254,7 +254,7 @@ describe('INV-CI-SINIF-1 · sınıf kararı iki iş akışında AYNI ve güvenli
 
   const CI_BOZ: Array<{ ad: string; boz: (c: string) => string; beklenen: string }> = [
     { ad: 'Test adımı sınıf çıktısını okur (kapsam kaybı)', boz: (c) => c.replace("- name: Test\n        if: steps.ayna.outputs.atla != 'true'", "- name: Test\n        if: steps.ayna.outputs.atla != 'true' && steps.sinif.outputs.sinif != 'belge'"), beklenen: 'adım "Test" sınıf çıktısını okuyor' },
-    { ad: 'Lint adımı sınıf çıktısını okur', boz: (c) => c.replace("- name: Lint (blocking)\n        if: steps.ayna.outputs.atla != 'true'", "- name: Lint (blocking)\n        if: steps.ayna.outputs.atla != 'true' && steps.sinif.outputs.sinif != 'belge'"), beklenen: 'adım "Lint (blocking)" sınıf çıktısını okuyor' },
+    { ad: 'Lint adımı sınıf çıktısını okur', boz: (c) => c.replace("- name: Lint (arka planda başlat)\n        if: steps.ayna.outputs.atla != 'true'", "- name: Lint (arka planda başlat)\n        if: steps.ayna.outputs.atla != 'true' && steps.sinif.outputs.sinif != 'belge'"), beklenen: 'adım "Lint (arka planda başlat)" sınıf çıktısını okuyor' },
     { ad: 'Build sınıf çıktısını OKUMAZ (dar sınıfta da koşar)', boz: (c) => c.replace(/(- name: Build \(blocking\)\n\s+if: [^\n]*)/, "- name: Build (blocking)\n        if: steps.ayna.outputs.atla != 'true'"), beklenen: '"Build (blocking)" sınıf çıktısını OKUMUYOR' },
     { ad: 'dar kümeden `karma` düşer', boz: (c) => c.split(DAR_LITERAL).join('["belge","edge","betik"]'), beklenen: 'dar sınıf kümesi sınıflayıcıyla AYNI değil' },
     { ad: 'dar kümeye `tam` girer', boz: (c) => c.split(DAR_LITERAL).join('["belge","edge","betik","karma","tam"]'), beklenen: 'dar sınıf kümesi sınıflayıcıyla AYNI değil' },

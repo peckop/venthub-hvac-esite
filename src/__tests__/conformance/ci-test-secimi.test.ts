@@ -38,7 +38,7 @@ const KOSUL_KURULUM_HIZLI = "if: steps.ayna.outputs.atla != 'true' && (steps.hiz
 const HIZLI_ADI = 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)'
 const HIZLI_KOSULU = `if: ${SHARD_OLAYI} && steps.sinif.outputs.sinif == 'belge'`
 const HIZLI_ATLANANLAR = [
-  ...['Setup Deno', 'Install dependencies', 'Lint (blocking)', 'Type check', 'Deno check (edge functions — kapı-körlüğü guard)'],
+  ...['Setup Deno', 'Install dependencies', 'Lint (arka planda başlat)', 'Type check', 'Deno check (edge functions — kapı-körlüğü guard)'],
   ...['Edge mangle-guard (string-literal — deno check göremez)', 'Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)', 'Node derleme önbelleği (V8 bayt kodu)'],
 ]
 /** Hızlı yoldan ETKİLENMEYEN ci adımları: bu kapılar belge PR'ında DA koşar (kayıt kapısı, gizli bilgi taraması, döküm kapısı: `.csv` dökümü hızlı yola GİRER, sınıf, taban izi, bekleme). */
@@ -495,7 +495,7 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'hızlı yol boş farkı dışlamaz (`! git diff --quiet` kalkar: fark yokken de `belge=true`)', boz: (c) => metinDegistir(c, hizliAr(c), 'if ! git diff --quiet --no-renames HEAD^1 HEAD && git diff --quiet', 'if git diff --quiet'), beklenen: 'boş farkı dışlamıyor' },
   { ad: "hızlı yol `--no-renames`'i kaybeder (`src/a.ts` → `docs/a.md` taşıması yalnız yeni yolla görünür)", boz: (c) => metinDegistir(c, hizliAr(c), 'git diff --quiet --no-renames HEAD^1 HEAD -- .', 'git diff --quiet HEAD^1 HEAD -- .'), beklenen: 'yol süzgecini taşımıyor' },
   { ad: 'hızlı yol her koşuda `belge=true` yazar (süzgeç sonucuna bakmaz)', boz: (c) => metinDegistir(c, hizliAr(c), 'else\n', 'else\n            echo "belge=true" >> "$GITHUB_OUTPUT"\n'), beklenen: 'TEK yerde yazmalı' },
-  { ad: 'Lint koşulu hızlı yolun çıktısını POZİTİF okur (`belge == true` iken değil, çıktı yoksa ATLANIR)', boz: (c) => sd(c, ciAdim(c, 'Lint (blocking)'), /^if: /, "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge == 'false'"), beklenen: '"Lint (blocking)" koşulu TAM' },
+  { ad: 'Lint koşulu hızlı yolun çıktısını POZİTİF okur (`belge == true` iken değil, çıktı yoksa ATLANIR)', boz: (c) => sd(c, ciAdim(c, 'Lint (arka planda başlat)'), /^if: /, "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge == 'false'"), beklenen: '"Lint (arka planda başlat)" koşulu TAM' },
   { ad: 'Type check hızlı yolu okumaz (belge PR\'ında tsc koşar: kazanç sıfır)', boz: (c) => sd(c, ciAdim(c, 'Type check'), /^if: /, "if: steps.ayna.outputs.atla != 'true'"), beklenen: '"Type check" koşulu TAM' },
   { ad: '`ci` kurulum koşulu önbellek ıskasını yok sayar (yalnız hızlı yol çıktısına bakar: ıskada kurulum atlanır, setup-node kayıt adımı var olmayan depoyla işi kırmızı yapar)', boz: (c) => sd(c, ciAdim(c, 'Install dependencies'), /^if: /, KOSUL_HIZLI), beklenen: '"Install dependencies" koşulu TAM' },
   { ad: '`ci` Setup Node kimliği düşer (`cache-hit` okunamaz: hızlı yolda kurulum hiç atlanmaz, kazanç sıfır)', boz: (c) => sd(c, ciAdim(c, 'Setup Node'), 'id: node', null), beklenen: '`id: node` olmalı' },
