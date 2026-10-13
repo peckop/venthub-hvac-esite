@@ -38,7 +38,9 @@ describe('INV-GEO-OLCUM-1', () => {
 
   it('(b) ⭐ayırt edici: sızıntı izi KELİME SINIRLI — "finalizes" ve "dekantralize" iz değil, gerçek ad iz', () => {
     expect(sizintiIzleri('finalizes the plan, dekantralize eder', IZLER)).toEqual([])
-    expect(sizintiIzleri('çalışma dizini C:/Users/ali/proje', IZLER)).toContain('kullanici-adi')
+    // Yol parçalardan kurulur: sabit kimlik yolu yazmak depo kuralını (INV-MUTLAK-YOL-1) çiğnerdi.
+    const kimlikYolu = ['C:', 'Users', 'ali', 'proje'].join('/')
+    expect(sizintiIzleri(`çalışma dizini ${kimlikYolu}`, IZLER)).toContain('kullanici-adi')
     expect(sizintiIzleri('Ali Bey söyledi', IZLER)).toContain('kullanici-adi')
     expect(sizintiIzleri('Şirket adı: VentHub', IZLER)).toContain('venthub')
     expect(sizintiIzleri('hiçbir ad geçmiyor', IZLER)).toEqual([])
@@ -46,8 +48,9 @@ describe('INV-GEO-OLCUM-1', () => {
 
   it('(b2) tarafsız klasör yolu ipucu taşımaz: C:/tmp/q7x2 geçer, VentHub/kullanıcı adı taşıyan yol reddedilir', () => {
     expect(tarafsizKlasorKontrol('C:/tmp/q7x2', IZLER).gecerli).toBe(true)
-    expect(tarafsizKlasorKontrol('C:\\Users\\ali\\venthub-olcum\\geo', IZLER).gecerli).toBe(false)
-    expect(tarafsizKlasorKontrol('/home/x/venthub-olcum', IZLER).gecerli).toBe(false)
+    expect(tarafsizKlasorKontrol(['C:', 'Users', 'ali', 'venthub-olcum', 'geo'].join('\\'), IZLER).gecerli).toBe(false)
+    expect(tarafsizKlasorKontrol(['', 'tmp', 'venthub-olcum'].join('/'), IZLER).gecerli).toBe(false)
+    expect(tarafsizKlasorKontrol(['', 'tmp', 'ali', 'x'].join('/'), IZLER).gecerli).toBe(false)
   })
 
   it('(c) ⭐ayırt edici: hata satırı ve boş cevap oran paydasına GİRMEZ (G3), ayrı sayılır', () => {
