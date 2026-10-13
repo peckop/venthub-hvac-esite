@@ -199,6 +199,9 @@ function hafizaDizinleri(projeDizini) {
 
 /** Ana projenin dizini (`~/.claude/projects/<ana-kök-adı>`). Çözülemezse null (kapı yine worktree dizinine bakar). */
 function anaProjeDizini() {
+  // Ortam değişkeni ÖNCE (hafizaDizinleri ile aynı sözleşme): SessionStart kimlik devri bu işlevi doğrudan çağırır;
+  // testler ve özel kurulumlar ana proje dizinini buradan verir (CI'da gerçek ~/.claude/projects yok → null dönerdi).
+  if (process.env.VENTHUB_ANA_PROJE_DIZINI) return process.env.VENTHUB_ANA_PROJE_DIZINI
   try {
     const { anaKok } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs'))
     // Claude Code yol→ad kuralı: alfasayısal olmayan her karakter '-'. Sürücü harfi büyük/küçük gelebilir.

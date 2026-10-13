@@ -68,7 +68,9 @@ const kimlik = require_(path.join(KOK, 'scripts/board/pencere-kimligi.cjs')) as 
 const defter = require_(path.join(KOK, 'scripts/board/recep-sozu-defteri.cjs')) as Defter
 
 const ESKI = '65844ccb-e970-48ab-a9f2-0e497c6a7ef9'
-const YENI = 'ca8d9fdc-865e-4fe8-97fc-fdb5f02b7d07'
+// SENTETİK kimlik: gerçek bir pencerenin numarası OLMAMALI. Kapı `<sid>.jsonl` dökümünü ~/.claude/projects altında arar;
+// gerçek numara kullanılınca yerelde döküm bulunup test kazara geçiyordu, CI'da (döküm yok) kırmızıydı (13 Ekim).
+const YENI = 'c0ffee00-1111-4222-8333-444455556666'
 const BASKA = '11111111-2222-3333-4444-555555555555'
 
 let gecici = ''
