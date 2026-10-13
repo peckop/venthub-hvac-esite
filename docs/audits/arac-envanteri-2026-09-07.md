@@ -576,6 +576,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/seo/__tests__/bing-webmaster-fark.test.ts` | INV-BING-FARK-1 · Bing Webmaster okumasında iki koşu arası FARK (Kanban SEO-43) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` (Bing satırı) | 2026-10-13: 9 test yeşil, 7 bozma kırmızı | — | AKTIF |
 | `scripts/seo/__tests__/geo-olcum.test.ts` | INV-GEO-OLCUM-1 · GEO ölçüm betiğinin ağsız çekirdeği (Kanban SEO-42) | GEO-SEO | `geo-olcum-standard.md` G7 | 2026-10-13: 16 test yeşil, 8 bozma kırmızı | — | AKTIF |
 | `scripts/seo/geo-olcum.mjs` | GEO ÖLÇÜM BETİĞİ — yapay zekâ cevaplarında VentHub görünürlüğü: koşu (kos) + G5 özeti (ozet) (Kanban SEO-42; REC-369 devamı) | GEO-SEO | `geo-olcum-standard.md` G1-G5, G7; `pazar-olcum-standard.md` P6 | 2026-10-13 gerçek veri: Gemini 0/27 · 0/27 (kaynak listeli 24/27), Claude 0/15 · 0/15 (6/15) | `__tests__/geo-olcum.test.ts` | AKTIF |
+| `scripts/board/pencere-kimligi.cjs` | PENCERE KİMLİĞİ — yeni düzen (OPS-122, ARC-124): settings.local.json agent anahtarı veya agent_type → rol; rolün önceki oturum kimlikleri ~/.claude/mod-durum/rol-kimlikleri.json (posta devri); VENTHUB_PENCERE_AGENT test kapağı | ARAÇ | .claude/hooks/session-board.cjs (rol kartı, kimlik devri, posta); .claude/hooks/precompact-durum-kapisi.cjs (şerit adayı) | test 22/22 + sabotaj 7/7 (13 Ekim); canlı: yeni düzen penceresinde açılış gözlemi bekliyor | src/__tests__/conformance/yeni-duzen-kimlik.test.ts (INV-YENIDUZEN-KIMLIK-1..6) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
