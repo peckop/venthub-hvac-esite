@@ -136,12 +136,130 @@ export function izinliSayilar(kayit, slug) {
   return s
 }
 
-/** Metindeki yıl (19xx/20xx) ve yüzde sayıları. */
+// ─── normalizasyon (BLG-7 onarımı, çürütme turu 10-09: İ/I, NBSP, NFD, ASCII Türkçe kapıdan kaçıyordu) ──────
+const GIZLI_BOSLUK = /[​-‍⁠﻿­]/g
+const HER_BOSLUK = /[\s   -   　]+/g
+
+/** NFC + tüm boşluk türleri tek ASCII boşluk + görünmez karakterler atılır. Kalıp eşleşmesinden ÖNCE uygulanır. */
+export const normalize = (t) => String(t ?? '').normalize('NFC').replace(GIZLI_BOSLUK, '').replace(HER_BOSLUK, ' ').trim()
+
+/**
+ * KATLA: normalize + NFD işaretleri atılır + Türkçe harfler ASCII'ye (ı/İ → i, ş → s…) + küçük harf.
+ * "EN İYİ", "en iyi", "EN IYI" (ASCII), NFD yazım ve NBSP'li yazım AYNI dizeye iner; kalıplar bu biçimde yazılır.
+ */
+export const katla = (t) =>
+  normalize(t).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[ıİ]/g, 'i').toLowerCase()
+
+/** Katlanmış metinden harf/rakam belirteçleri (alt dize değil, sözcük eşleşmesi için). */
+export const belirtecler = (t) => katla(t).split(/[^a-z0-9]+/).filter(Boolean)
+
+/** Kalıp kaynağını katlanmış biçime çevirir (kalıplar okunur Türkçe yazılır, burada katlanır). */
+export const katlaDesen = (re) => new RegExp(katla(re.source), 'i')
+
+// ─── sayılar: yıl ve yüzde, alan bağlamıyla ────────────────────────────────────────────────────────────
+const SAYI = '\\d+(?:[.,]\\d+)?'
+const YIL_RE = /(?<!\d)(1[89]\d{2}|20\d{2})(?!\d)/g
+const YUZDE_RE = new RegExp(`(?:%\\s*(${SAYI})|(${SAYI})\\s*%|(?:yuzde|percent|per cent)\\s*(${SAYI})|(${SAYI})\\s*(?:yuzde|percent|per cent)\\b)`, 'g')
+
+/** Metindeki yıl (19xx/20xx) ve yüzde sayıları: [{deger, konum, tur}], katlanmış metin üzerinde. */
+export function sayiKonumlari(metin) {
+  const k = katla(metin)
+  const sonuc = []
+  for (const m of k.matchAll(YIL_RE)) sonuc.push({ deger: m[1], konum: m.index, tur: 'yil' })
+  for (const m of k.matchAll(YUZDE_RE)) sonuc.push({ deger: `%${m[1] ?? m[2] ?? m[3] ?? m[4]}`, konum: m.index, tur: 'yuzde' })
+  return { katli: k, sayilar: sonuc }
+}
+
+/** Metindeki yıl ve yüzde sayıları (küme). "1969'den", "1969den", "yüzde 95", "95 percent", "%95" hepsi görülür. */
 export function metindekiSayilar(metin) {
-  const sonuc = new Set()
-  for (const m of metin.matchAll(/\b(1[89]\d{2}|20\d{2})\b/g)) sonuc.add(m[1])
-  for (const m of metin.matchAll(/(?:%\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*%)/g)) sonuc.add(`%${m[1] ?? m[2]}`)
-  return sonuc
+  return new Set(sayiKonumlari(metin).sayilar.map((s) => s.deger))
+}
+
+/**
+ * Yılın yanındaki anahtar sözcük, o yılın HANGİ olguyu iddia ettiğini söyler. Aynı marka için kümeye karışma kapanır:
+ * "Vortice 1954'te kuruldu" → 1954 yalnız `founded` alanında yazılabilir; faaliyet başlangıcı olarak yazılmışsa geçer.
+ */
+const YIL_BAGLAMLARI = [
+  { ad: 'kurulus', kalip: /kuruldu|kurulus|kurulmus|kurulan|kurdu|founded|established|incorporated/g, alanlar: ['founded', 'gebhardtKurulus'] },
+  // "…'den beri / since" hangi faaliyetin başladığını söylemez: faaliyet, kuruluş ve üretim başlangıcı alanlarının hepsi geçerlidir.
+  { ad: 'faaliyet', kalip: /(?:ten|dan|den|tan)\s+beri|\bberi\b|bu yana|itibaren|\bsince\b|faaliyet|operat\w*/g, alanlar: ['faaliyetBaslangici', 'founded', 'gebhardtKurulus', 'frekansKonvertoruUretimi'] },
+  { ad: 'uretim', kalip: /uret\w*|production|manufactur\w*/g, alanlar: ['frekansKonvertoruUretimi'] },
+]
+const BAGLAM_PENCERE = 40
+
+/**
+ * Yılın ±40 karakterinde geçen anahtar sözcük GRUPLARININ birleşimi: yalnız "kuruldu" varsa yalnız kuruluş
+ * alanları; "1968'den beri … üretir" iki grubu birden taşır, ikisinin alanları geçerlidir. Hiç anahtar yoksa null.
+ */
+function yilBaglami(katli, konum) {
+  const bulunan = YIL_BAGLAMLARI.filter((b) => [...katli.matchAll(b.kalip)].some((m) => Math.abs(m.index - konum) <= BAGLAM_PENCERE))
+  if (!bulunan.length) return null
+  return { ad: bulunan.map((b) => b.ad).join('+'), alanlar: [...new Set(bulunan.flatMap((b) => b.alanlar))] }
+}
+
+/** Marka için bir alanın yazılabilir olgusunun sayıları. */
+function alanSayilari(kayit, slug, alanlar) {
+  const s = new Set()
+  for (const o of kayit.markalar?.[slug]?.olgular ?? []) {
+    if (!YAZILABILIR.includes(o.durum) || !alanlar.includes(o.alan)) continue
+    for (const n of o.sayilar ?? []) s.add(String(n))
+  }
+  return s
+}
+
+/**
+ * Bir markanın vitrin metnindeki yıl/yüzde sayılarını kayıtla çapraz denetler. Her ihlal {sayi, sebep}.
+ *  · yıl: önce yanındaki anahtar sözcüğe göre alan kümesi, yoksa markanın tüm yazılabilir olguları
+ *  · yüzde: markanın tüm yazılabilir olguları
+ */
+export function markaSayiDenetle(kayit, slug, metin) {
+  const ihlal = []
+  const tum = izinliSayilar(kayit, slug)
+  const { katli, sayilar } = sayiKonumlari(metin)
+  for (const s of sayilar) {
+    if (s.tur === 'yuzde') {
+      if (!tum.has(s.deger)) ihlal.push({ sayi: s.deger, sebep: 'kayıtta yazılabilir bir olgunun sayısı değil' })
+      continue
+    }
+    const b = yilBaglami(katli, s.konum)
+    if (!b) {
+      if (!tum.has(s.deger)) ihlal.push({ sayi: s.deger, sebep: 'kayıtta yazılabilir bir olgunun sayısı değil' })
+      continue
+    }
+    if (!alanSayilari(kayit, slug, b.alanlar).has(s.deger)) {
+      ihlal.push({ sayi: s.deger, sebep: `yanında "${b.ad}" bağlamı var; ${b.alanlar.join(' / ')} alanlarında yazılabilir bir olgu bu yılı vermiyor` })
+    }
+  }
+  return ihlal
+}
+
+/** Marka adı + takma adlar (adın sözcükleri ≥ 4 harf: "Nicotra Gebhardt" → Nicotra, Gebhardt, Nicotra-Gebhardt). */
+export function markaAdlari(m) {
+  const tam = String(m.ad ?? '').trim()
+  const parcalar = belirtecler(tam).filter((x) => x.length >= 4)
+  return [...new Set([tam, ...(m.takmaAdlar ?? []), ...(parcalar.length > 1 ? parcalar : [])].map((x) => belirtecler(x).join(' ')).filter(Boolean))]
+}
+
+/** Metinde marka adı (ya da takma adı) geçiyor mu: belirteç dizisi eşleşmesi (alt dize değil). */
+export function markaGeciyorMu(m, metin) {
+  const t = belirtecler(metin)
+  return markaAdlari(m).some((ad) => {
+    const a = ad.split(' ')
+    for (let i = 0; i + a.length <= t.length; i++) if (a.every((x, j) => t[i + j] === x)) return true
+    return false
+  })
+}
+
+// ─── ortak övgü listesine EK (src/lib/seo/ovguAyikla.ts Ürün'ün ortak dosyası: dokunulmaz; BLG-7 çürütmesi M) ──
+const OVGU_EK = [
+  /en koklu/, /en guvenilir/, /en kaliteli/, /en gelismis/, /premium/, /mukemmel/, /kusursuz/, /essiz/, /rakipsiz/, /lider\b/, /\bno\.? ?1\b/, /numara bir/, /number one/, /#1\b/,
+  /world[- ]class/, /market leader/, /unrivaled|unrivalled|unmatched|unparalleled/, /most (?:reliable|trusted|advanced)/, /second to none/,
+]
+/** Ek övgü kalıbı taşıyor mu: katlanmış metinde ilk eşleşen kalıp ya da null. */
+export function ovguEkBul(metin) {
+  const k = katla(metin)
+  const e = OVGU_EK.find((re) => re.test(k))
+  return e ? e.source : null
 }
 
 const kes = (u) => String(u ?? '').replace(/\/+$/, '').toLowerCase()
@@ -178,11 +296,12 @@ export function markaDenetle(markalar, kayit, { ovguVarMi }) {
       const o = olgu('website')
       if (o && ![o.deger, ...(o.esdegerler ?? [])].some((d) => kes(d) === kes(b.website))) ekle(`${b.slug}.website`, `brands.ts ${b.website} ≠ kayıt ${o.deger}`)
     }
-    const izinli = izinliSayilar(kayit, b.slug)
     for (const dil of ['tr', 'en']) {
-      const metin = b.description?.[dil] ?? ''
-      for (const s of metindekiSayilar(metin)) if (!izinli.has(s)) ekle(`${b.slug}.description`, `${dil}: "${s}" kayıtta yazılabilir bir olgunun sayısı değil`)
+      const metin = normalize(b.description?.[dil] ?? '')
+      for (const s of markaSayiDenetle(kayit, b.slug, metin)) ekle(`${b.slug}.description`, `${dil}: "${s.sayi}" ${s.sebep}`)
       if (ovguVarMi(metin)) ekle(`${b.slug}.description`, `${dil}: üstünlük/övgü kalıbı (M5)`)
+      const ek = ovguEkBul(metin)
+      if (ek) ekle(`${b.slug}.description`, `${dil}: üstünlük/övgü kalıbı, BLG-7 ek listesi (M5) /${ek}/`)
     }
   }
   return ihlal

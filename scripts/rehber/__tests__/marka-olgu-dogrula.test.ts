@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest'
 
-import { durumHesapla, kayitDenetle, markaDenetle, varlikCoz, metindekiSayilar, izinliSayilar } from '../marka-olgu-dogrula.mjs'
+import { durumHesapla, kayitDenetle, markaDenetle, varlikCoz, metindekiSayilar, izinliSayilar, katla, normalize, markaSayiDenetle, markaAdlari, markaGeciyorMu, ovguEkBul } from '../marka-olgu-dogrula.mjs'
 
 type Kaynak = Record<string, unknown>
 type KayitOlgusu = { alan: string; durum: string; deger?: string; degerEn?: string; neden?: string; sayilar?: string[]; esdegerler?: string[]; kaynaklar: Kaynak[] }
@@ -126,5 +126,74 @@ describe('INV-MARKA-OLGU-2 · markaDenetle (brands.ts × kayıt) sabotajları', 
   it('izinliSayilar: DOGRULANAMADI olgunun sayısı izinli sayılmaz', () => {
     const k = kayit([olgu('founded', 'DOGRULANAMADI', { deger: undefined, neden: 'yok', kaynaklar: [], sayilar: ['1959'] }), olgu('x', 'TEK_KAYNAK', { sayilar: ['1968'] })])
     expect([...izinliSayilar(k, 'x')]).toEqual(['1968'])
+  })
+})
+
+/**
+ * BLG-7 ONARIM SABOTAJLARI (çürütme O, P, G, M, A+B+H): sayı biçimleri, alan bağlamı, takma ad, ek övgü listesi
+ * ve normalizasyon. Her kural kapıyı ATLATAN girdiyle sınanır; karşı kol meşru yazımın geçtiğini gösterir.
+ */
+describe('INV-MARKA-OLGU-2 · onarım sabotajları', () => {
+  const kayitD = {
+    surum: 1,
+    sonDogrulama: '2026-10-13',
+    markalar: {
+      vortice: { ad: 'Vortice', olgular: [olgu('founded', 'DOGRULANAMADI', { deger: undefined, neden: 'kaynak "kuruldu" demiyor', kaynaklar: [] }), olgu('faaliyetBaslangici', 'DOGRULANDI', { deger: '1954', sayilar: ['1954'], kaynaklar: [kaynak('marka-sitesi'), kaynak('uretici-katalogu')] })] },
+      danfoss: { ad: 'Danfoss', olgular: [olgu('founded', 'TEK_KAYNAK', { deger: '1933', sayilar: ['1933'] }), olgu('frekansKonvertoruUretimi', 'TEK_KAYNAK', { deger: '1968', sayilar: ['1968'] }), olgu('enerjiTasarrufu', 'TEK_KAYNAK', { deger: '%80', sayilar: ['%80'] })] },
+      'nicotra-gebhardt': { ad: 'Nicotra Gebhardt', olgular: [olgu('gebhardtKurulus', 'TEK_KAYNAK', { deger: '1958', sayilar: ['1958'] })] },
+    },
+  }
+
+  it('O: yıl ve yüzde biçimleri (bitişik ek, "yüzde N", "N percent") görülür', () => {
+    expect([...metindekiSayilar("1969den beri, 1969'dan, yüzde 95, 95 percent, 12,5%")].sort()).toEqual(['%12,5', '%95', '1969'])
+    expect([...metindekiSayilar('Model 11969 ve 19691 sayılmaz')]).toEqual([])
+  })
+
+  it('P: yıl yanındaki anahtar sözcüğün alanında yazılabilir olmalı (kuruldu ≠ faaliyet başlangıcı)', () => {
+    const f = (m: string, s = 'vortice') => markaSayiDenetle(kayitD, s, m).map((x: { sayi: string }) => x.sayi)
+    expect(f("Vortice 1954'te kuruldu")).toEqual(['1954'])
+    expect(f('Vortice was founded in 1954')).toEqual(['1954'])
+    expect(f("Vortice 1954'ten beri faaliyette")).toEqual([])
+    expect(f('Vortice has operated since 1954')).toEqual([])
+    expect(f('Vortice 1954')).toEqual([]) // anahtar sözcük yok: markanın tüm yazılabilir olgularına bakılır
+    expect(f("Danfoss 1968'de kuruldu", 'danfoss')).toEqual(['1968'])
+    expect(f("Danfoss 1933'te kuruldu", 'danfoss')).toEqual([])
+    expect(f("Danfoss 1968'den beri frekans konvertörü üretir", 'danfoss')).toEqual([])
+    expect(f('Danfoss enerjiyi yüzde 80 azaltır', 'danfoss')).toEqual([])
+    expect(f('Danfoss enerjiyi yüzde 90 azaltır', 'danfoss')).toEqual(['%90'])
+  })
+
+  it('G: marka takma adı ve tire/boşluk biçimleri aynı marka sayılır; alt dize değil belirteç eşleşmesi', () => {
+    const m = kayitD.markalar['nicotra-gebhardt']
+    expect(markaAdlari(m)).toEqual(expect.arrayContaining(['nicotra gebhardt', 'nicotra', 'gebhardt']))
+    for (const t of ['Gebhardt 1959', 'Nicotra-Gebhardt 1959', "NICOTRA'nın 1959", 'nicotra gebhardt fanları']) expect(markaGeciyorMu(m, t), t).toBe(true)
+    expect(markaGeciyorMu(m, 'Nicotrabilgi sayfası')).toBe(false)
+  })
+
+  it('M: ek övgü listesi ortak listenin kaçırdığı kalıpları yakalar (en köklü, en güvenilir, premium, No. 1)', () => {
+    for (const t of ['Sektörün en köklü markası', 'EN GÜVENİLİR seçim', 'Premium kalite', 'Kusursuz işçilik', 'The No. 1 choice', 'Unrivalled quality', 'Mükemmel performans']) {
+      expect(ovguEkBul(t), t).not.toBeNull()
+    }
+    expect(ovguEkBul('Danfoss 1933 yılında kurulan bir şirkettir')).toBeNull()
+    const marka = { slug: 'x', name: 'X', description: { tr: 'Sektörün en köklü markasıdır.', en: 'A maker.' } }
+    const kayitX = kayit([olgu('country', 'DOGRULANDI')])
+    const ihlal = markaDenetle([marka], kayitX, { ovguVarMi: () => false }) as { anahtar: string; ayrinti: string }[]
+    expect(ihlal.some((i) => i.anahtar === 'x.description' && /ek listesi/.test(i.ayrinti))).toBe(true)
+  })
+
+  it('A+B+H: normalize ve katla İ/I, NBSP, sıfır genişlik, NFD ve ASCII biçimlerini tek dizeye indirir', () => {
+    const hedef = 'en iyi'
+    for (const t of ['EN İYİ', 'EN IYI', 'en iyi', 'e​n  iyi', 'EN IYİ', 'en i̇yi']) expect(katla(t), t).toBe(hedef)
+    expect(normalize('  a  b​c \n d ')).toBe('a bc d')
+    expect(katla('Çözüm Şeması ĞÜÖ')).toBe('cozum semasi guo')
+  })
+
+  it('markaDenetle: açıklamadaki "1969den", "yüzde 95", alanla çelişen yıl yakalanır', () => {
+    const marka = (tr: string, en = 'A maker.') => ({ slug: 'vortice', name: 'Vortice', description: { tr, en } })
+    const anahtar = (m: object) => (markaDenetle([m], kayitD, { ovguVarMi: () => false }) as { anahtar: string }[]).map((i) => i.anahtar)
+    expect(anahtar(marka('Vortice 1969den beri üretir.'))).toContain('vortice.description')
+    expect(anahtar(marka('Enerjiyi yüzde 95 azaltır.'))).toContain('vortice.description')
+    expect(anahtar(marka("Vortice 1954'te kuruldu."))).toContain('vortice.description')
+    expect(anahtar(marka("Vortice 1954'ten beri üretir."))).not.toContain('vortice.description')
   })
 })

@@ -27,19 +27,27 @@ import { ovguVarMi } from '@/lib/seo/ovguAyikla'
 import kayit from '../../../docs/standards/marka-olgu-kaydi.json'
 import { kayitDenetle, markaDenetle } from '../../../scripts/rehber/marka-olgu-dogrula.mjs'
 
-/** anahtar → bunu kapatacak iş. Düzelen açık BURADAN SİLİNİR. */
-const BILINEN_ACIK: Record<string, string> = {
-  'vortice.founded': 'URN-82: brands.ts founded 1954 kalkar (resmî kaynak "kuruldu" demiyor; 1954 yalnız faaliyet başlangıcı)',
-  'avens.website': 'URN-82: avens.com.tr (başka şirket) yerine avensair.com (BLG-6 tablosu brands.ts:avens.website)',
-  'nicotra-gebhardt.country': "URN-82: \"Almanya\" menşei yazılamaz; \"Almanya'da Waldenburg adresli\" (BLG-6 tablosu)",
-  'nicotra-gebhardt.headquarters': 'URN-82: Waldenburg merkez değil Almanya adresi; headquarters alanı kalkar',
+/**
+ * anahtar → { parca: ihlal metninde BEKLENEN parça, kapatan: bunu kapatacak iş }. Düzelen açık BURADAN SİLİNİR.
+ * ⚠ANAHTAR + DEĞER (BLG-7 çürütme N): ilk sürümde süzme yalnız anahtara bakıyordu; 9 anahtarın altına her yeni
+ * yanlış değer yeşil giriyordu. Şimdi ihlalin KENDİ metni de beklenen parçayı taşımalıdır: aynı anahtarda başka bir
+ * yanlış değer (ör. avens.website başka bir adres) bilinen açık sayılmaz, kırmızı verir.
+ */
+const BILINEN_ACIK: Record<string, { parca: string; kapatan: string }> = {
+  'vortice.founded': { parca: 'yazılamaz (DOGRULANAMADI)', kapatan: 'URN-82: brands.ts founded 1954 kalkar (resmî kaynak "kuruldu" demiyor; 1954 yalnız faaliyet başlangıcı)' },
+  'avens.website': { parca: 'avens.com.tr', kapatan: 'URN-82: avens.com.tr (başka şirket) yerine avensair.com (BLG-6 tablosu brands.ts:avens.website)' },
+  'nicotra-gebhardt.country': { parca: 'yazılamaz (DOGRULANAMADI)', kapatan: "URN-82: \"Almanya\" menşei yazılamaz; \"Almanya'da Waldenburg adresli\" (BLG-6 tablosu)" },
+  'nicotra-gebhardt.headquarters': { parca: 'yazılamaz (DOGRULANAMADI)', kapatan: 'URN-82: Waldenburg merkez değil Almanya adresi; headquarters alanı kalkar' },
 }
 // Kapananlar (11 Ekim, URN-79/URN-82 #1793 brands.ts'i düzeltti, test kendiliğinden bildirdi): vortice.description,
 // avens.founded, danfoss.description, nicotra-gebhardt.founded, nicotra-gebhardt.description.
 
 type Ihlal = { anahtar: string; ayrinti: string }
 const ihlaller = (): Ihlal[] => markaDenetle(HVAC_BRANDS, kayit, { ovguVarMi })
-const anahtarlar = (): string[] => [...new Set(ihlaller().map((i) => i.anahtar))].sort()
+/** Bilinen açık yalnız anahtar VE beklenen değer parçası birlikte tutuyorsa sayılır. */
+const bilinenMi = (i: Ihlal): boolean => BILINEN_ACIK[i.anahtar] !== undefined && i.ayrinti.includes(BILINEN_ACIK[i.anahtar].parca)
+/** Bilinen açık süzmesinin sınanabilir hâli (testlenir: sahte ihlalle sabotaj). */
+const yeniIhlaller = (liste: Ihlal[]): Ihlal[] => liste.filter((i) => !bilinenMi(i))
 
 describe('INV-MARKA-OLGU-1 · marka olgu kaydı', () => {
   it('kayıt şeması ve durum tutarlılığı temiz', () => {
@@ -54,14 +62,23 @@ describe('INV-MARKA-OLGU-1 · marka olgu kaydı', () => {
     expect(new Date(kayit.sonDogrulama).getTime()).toBeLessThanOrEqual(Date.now() + 86_400_000)
   })
 
-  it('⭐brands.ts × kayıt: yeni çatışma yok (bilinen açıklar hariç)', () => {
-    const yeni = ihlaller().filter((i) => !(i.anahtar in BILINEN_ACIK))
+  it('⭐brands.ts × kayıt: yeni çatışma yok (bilinen açıklar hariç; anahtar VE değer parçası eşleşmeli)', () => {
+    const yeni = yeniIhlaller(ihlaller())
     expect(yeni, `kayıtla çatışan yeni olgu:\n${yeni.map((i) => `  ${i.anahtar}: ${i.ayrinti}`).join('\n')}`).toEqual([])
   })
 
-  it('bilinen açık listesi eskimedi: listedeki her açık hâlâ çatışıyor (düzelen satır silinmeli)', () => {
-    const hala = new Set(anahtarlar())
-    const eski = Object.keys(BILINEN_ACIK).filter((a) => !hala.has(a))
+  it('bilinen açık listesi eskimedi: listedeki her açık hâlâ aynı değerle çatışıyor (düzelen satır silinmeli)', () => {
+    const hala = ihlaller()
+    const eski = Object.entries(BILINEN_ACIK).filter(([a, b]) => !hala.some((i) => i.anahtar === a && i.ayrinti.includes(b.parca))).map(([a]) => a)
     expect(eski, `brands.ts düzelmiş, BILINEN_ACIK'tan sil: ${eski.join(', ')}`).toEqual([])
+  })
+
+  it('sabotaj: bilinen anahtarın altına gelen YENİ yanlış değer bilinen açık sayılmaz', () => {
+    const sahte: Ihlal[] = [
+      { anahtar: 'avens.website', ayrinti: 'brands.ts https://www.baska-sirket.com ≠ kayıt https://avensair.com' },
+      { anahtar: 'vortice.founded', ayrinti: 'brands.ts 1959 ≠ kayıt 1954' },
+      { anahtar: 'avens.website', ayrinti: 'brands.ts https://avens.com.tr ≠ kayıt https://avensair.com' },
+    ]
+    expect(yeniIhlaller(sahte).map((i) => i.ayrinti)).toEqual([sahte[0].ayrinti, sahte[1].ayrinti])
   })
 })
