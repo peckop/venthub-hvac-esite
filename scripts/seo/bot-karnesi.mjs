@@ -18,8 +18,10 @@
  * sayısı · iç bağlantı sayısı · yinelenen başlık/metin.
  *
  * Kullanım:
- *   node scripts/seo/bot-karnesi.mjs [--taban https://venthub.com.tr] [--cikti <dizin>] [--cwv]
+ *   node scripts/seo/bot-karnesi.mjs [--taban https://venthub.com.tr] [--cikti <dizin>] [--cwv] [--onceki <karne.json>]
  *   --cikti verilirse karne.json + karne.md oraya yazılır; verilmezse Markdown stdout'a basılır.
+ *   --onceki (SEO-44): önceki karne.json ile FARK (yeni/giden sorun, eklenen/çıkan adres, değişen alan, sınıf farkı);
+ *   karne-fark.md/json yazılır. Bozuk dosya ağa gitmeden çıkış 2.
  *   --cwv: PageSpeed Insights API'den alan verisi (CrUX) dener; anahtarsız kota düşükse "ölçülemedi" yazar.
  *
  * Sınırlar (dürüst): bot kimliği yalnız User-Agent ile taklit edilir, IP doğrulaması yapılamaz; barındırıcının
@@ -68,6 +70,85 @@ const arg = (ad, varsayilan) => {
 const TABAN = arg('--taban', 'https://venthub.com.tr').replace(/\/$/, '')
 const CIKTI = arg('--cikti', null)
 const CWV = process.argv.includes('--cwv')
+const ONCEKI = arg('--onceki', null)
+
+/**
+ * `--onceki` karnesini okur (SEO-44). Bozuk/eksik/başka biçimli dosya SESSİZ geçmez: hata KODU döner, çağıran ağa
+ * gitmeden durur.
+ * @returns {{ karne: { satirlar: object[], olculme?: string } } | { hata: 'ONCEKI-OKUNAMADI' | 'ONCEKI-BICIMI' }}
+ */
+export function oncekiKarneOku(yol, oku = (y) => readFileSync(y, 'utf8')) {
+  let j
+  try { j = JSON.parse(oku(yol)) } catch { return { hata: 'ONCEKI-OKUNAMADI' } }
+  if (!j || typeof j !== 'object' || !Array.isArray(j.satirlar)) return { hata: 'ONCEKI-BICIMI' }
+  return { karne: j }
+}
+
+/** Sorun metninin sınıfı (rapordaki "Sorun sınıfları" tablosuyla aynı kural: ilk sözcük). */
+const sorunSinifi = (x) => String(x).split(' ')[0]
+const adresAnahtari = (s) => `${s.tur} ${s.adres}`
+const KARSILASTIRILAN_ALANLAR = ['durum', 'son', 'baslik', 'title', 'aciklama', 'h1', 'markaBag', 'haritada']
+
+/**
+ * İki karne arasındaki FARK (SEO-44). Adres anahtarı `tur + adres`. Sorun karşılaştırması tam metinledir; sınıf farkı
+ * ilk sözcükledir. `ORNEK-YOK` satırı normal satır gibi eklenen/çıkan olarak (sorun metniyle) görünür, sessiz kalmaz.
+ * @param {{ satirlar: object[] }} onceki
+ * @param {{ satirlar: object[] }} simdi
+ */
+export function karneFarki(onceki, simdi) {
+  const eski = new Map(onceki.satirlar.map((s) => [adresAnahtari(s), s]))
+  const yeni = new Map(simdi.satirlar.map((s) => [adresAnahtari(s), s]))
+  const ozet = (s) => ({ tur: s.tur, adres: s.adres, sorunlar: s.sorunlar ?? [] })
+  const eklenen = [...yeni].filter(([k]) => !eski.has(k)).map(([, s]) => ozet(s))
+  const cikan = [...eski].filter(([k]) => !yeni.has(k)).map(([, s]) => ozet(s))
+  const degisen = []
+  for (const [k, b] of yeni) {
+    const a = eski.get(k)
+    if (!a) continue
+    const eskiSorun = a.sorunlar ?? []
+    const yeniSorun = b.sorunlar ?? []
+    const eklenenSorun = yeniSorun.filter((x) => !eskiSorun.includes(x))
+    const gidenSorun = eskiSorun.filter((x) => !yeniSorun.includes(x))
+    const alanlar = {}
+    for (const f of KARSILASTIRILAN_ALANLAR) if (a[f] !== b[f]) alanlar[f] = { once: a[f] ?? null, simdi: b[f] ?? null }
+    const jsonA = JSON.stringify([...(a.jsonld ?? [])].sort())
+    const jsonB = JSON.stringify([...(b.jsonld ?? [])].sort())
+    if (jsonA !== jsonB) alanlar.jsonld = { once: a.jsonld ?? [], simdi: b.jsonld ?? [] }
+    if (eklenenSorun.length || gidenSorun.length || Object.keys(alanlar).length) {
+      degisen.push({ tur: b.tur, adres: b.adres, yeniSorun: eklenenSorun, gidenSorun, alanlar })
+    }
+  }
+  const sinifSay = (satirlar) => {
+    const m = {}
+    for (const s of satirlar) for (const x of s.sorunlar ?? []) { const c = sorunSinifi(x); m[c] = (m[c] ?? 0) + 1 }
+    return m
+  }
+  const sa = sinifSay(onceki.satirlar)
+  const sb = sinifSay(simdi.satirlar)
+  const sinifFarki = {}
+  for (const c of new Set([...Object.keys(sa), ...Object.keys(sb)])) {
+    const fark = (sb[c] ?? 0) - (sa[c] ?? 0)
+    if (fark !== 0) sinifFarki[c] = { once: sa[c] ?? 0, simdi: sb[c] ?? 0, fark }
+  }
+  const sorunlu = (satirlar) => satirlar.filter((s) => (s.sorunlar ?? []).length).length
+
+  const satirlar = [
+    `Karne farkı: adres ${onceki.satirlar.length} → ${simdi.satirlar.length} · sorunlu adres ${sorunlu(onceki.satirlar)} → ${sorunlu(simdi.satirlar)} · eklenen ${eklenen.length} · çıkan ${cikan.length} · değişen ${degisen.length}`,
+  ]
+  for (const [c, d] of Object.entries(sinifFarki).sort((x, y) => Math.abs(y[1].fark) - Math.abs(x[1].fark))) {
+    satirlar.push(`sınıf ${c}: ${d.once} → ${d.simdi} (${d.fark > 0 ? '+' : ''}${d.fark})`)
+  }
+  for (const e of eklenen) satirlar.push(`EKLENDI ${e.tur} ${e.adres}${e.sorunlar.length ? ` · ${e.sorunlar.join(' · ')}` : ''}`)
+  for (const c of cikan) satirlar.push(`CIKTI ${c.tur} ${c.adres}${c.sorunlar.length ? ` · önceki sorun: ${c.sorunlar.join(' · ')}` : ''}`)
+  for (const d of degisen) {
+    const parca = []
+    if (d.yeniSorun.length) parca.push(`YENİ SORUN: ${d.yeniSorun.join(' · ')}`)
+    if (d.gidenSorun.length) parca.push(`GİTTİ: ${d.gidenSorun.join(' · ')}`)
+    for (const [f, v] of Object.entries(d.alanlar)) parca.push(`${f} ${JSON.stringify(v.once)} → ${JSON.stringify(v.simdi)}`)
+    satirlar.push(`DEGISTI ${d.tur} ${d.adres} · ${parca.join(' · ')}`)
+  }
+  return { eklenen, cikan, degisen, sinifFarki, ozetSatirlari: satirlar }
+}
 
 export const BOTLAR = {
   googlebot: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
@@ -293,6 +374,13 @@ export function robotsIzin(gruplar, belirtec, p) {
 
 // ─── ana akış ──────────────────────────────────────────────────────────────────
 async function main() {
+  // --onceki ağa GİTMEDEN okunur: bozuk dosya sessiz geçmez (çıkış 2).
+  let oncekiKarne = null
+  if (ONCEKI) {
+    const t = oncekiKarneOku(ONCEKI)
+    if (t.hata) { console.error(`HATA: --onceki ${t.hata}: ${ONCEKI}`); process.exitCode = 2; return }
+    oncekiKarne = t.karne
+  }
   const hatalar = []
   const robotsMetin = (await getir('/robots.txt', BOTLAR.googlebot)).govde || (await (await fetch(TABAN + '/robots.txt')).text())
   const robots = robotsAyristir(robotsMetin)
@@ -441,6 +529,16 @@ async function main() {
     writeFileSync(join(CIKTI, 'karne.md'), md)
     console.log(`karne yazıldı: ${CIKTI} · ${satirlar.length} adres · sorunlu ${satirlar.filter((s) => s.sorunlar.length).length}`)
   } else process.stdout.write(md)
+  if (oncekiKarne) {
+    const fark = karneFarki(oncekiKarne, { satirlar })
+    const farkMd = `# Karne farkı — ${TABAN} — önceki ${oncekiKarne.olculme ?? '?'} → şimdi ${new Date().toISOString().slice(0, 16)}Z\n\n${fark.ozetSatirlari.map((s) => `- ${s}`).join('\n')}\n`
+    if (CIKTI) {
+      writeFileSync(join(CIKTI, 'karne-fark.json'), JSON.stringify({ taban: TABAN, onceki: oncekiKarne.olculme ?? null, simdi: new Date().toISOString(), ...fark }, null, 1))
+      writeFileSync(join(CIKTI, 'karne-fark.md'), farkMd)
+      console.log(`karne farkı yazıldı: ${CIKTI}/karne-fark.md`)
+    }
+    console.log(fark.ozetSatirlari.join('\n'))
+  }
   if (hatalar.length) process.exitCode = 1
 }
 
@@ -465,6 +563,6 @@ function raporMd({ satirlar, robotsMetin, aiBotlar, cwv, haritaSayisi }) {
   return L.join('\n') + '\n'
 }
 
-if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('bot-karnesi.mjs')) {
+if (import.meta.url === `file://${(process.argv[1] ?? '').replace(/\\/g, '/')}` || process.argv[1]?.endsWith('bot-karnesi.mjs')) {
   main().catch((e) => { console.error('HATA', e.stack || e.message); process.exitCode = 1 })
 }
