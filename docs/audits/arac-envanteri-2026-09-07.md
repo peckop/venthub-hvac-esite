@@ -570,6 +570,8 @@ madde 1 gereği araç sayılmaz.
 | `scripts/board/wrongstack-etiket-bak.cjs` | WRONGSTACK ETİKET BAKICISI (ARC-24, karar 257) — GitHub'daki en son WrongStack etiketi, depodaki taban | ARAÇ | .github/workflows/wrongstack-etiket-kontrol.yml, src/__tests__/conformance/wrongstack-etiket-kontrol.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/wrongstack-etiket-kontrol.test.ts | KAL |
 | `scripts/hijyen/sahipsiz-pr.cjs` | SAHİPSİZ PR KAPISI (ARC-111, OPS-120 madde 3) — salt okuma. | ARAÇ | .claude/hooks/sahipsiz-pr-satiri.cjs (arka plan ölçümü), elle node scripts/hijyen/sahipsiz-pr.cjs [--json] | 2026-10-12 canlı: 16 açık PR, 1 sahipsiz (#1446, 14 gün) | src/__tests__/conformance/sahipsiz-pr.test.ts | KAL |
 | `scripts/seo/__tests__/bot-karnesi-marka-baglantisi.test.ts` | SEO-40 · bot karnesi aile sayfasında MARKA BAĞLANTISINI sayar; sıfırsa kırmızıdır. | GEO-SEO | vitest (`pnpm test`) | 2026-10-13 (8/8; üç bozma ilgili kolu kırmızıya çevirdi) | kendisi test | AKTIF |
+| `scripts/seo/__tests__/gsc-sayfa-oku.test.ts` | INV-GSC-SAYFA-OKU-1 · Tek sayfa Search Console okumasının ağsız parçaları (Kanban SEO-41) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y1 | 2026-10-13: 10 test yeşil, 5 bozma kırmızı | — | AKTIF |
+| `scripts/seo/gsc-sayfa-oku.mjs` | TEK SAYFA OKUMA — Search Console'dan az sayıda adres için URL denetimi + günlük gösterim, depo dışı JSON (Kanban SEO-41; OPS-123) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y1, `pazar-olcum-standard.md` P2/P6 | 2026-10-13 canlı: 2 yazı adresi, ikisi dizinde, çıkış 0 | `__tests__/gsc-sayfa-oku.test.ts` | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
