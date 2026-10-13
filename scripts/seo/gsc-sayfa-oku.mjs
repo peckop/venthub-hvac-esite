@@ -178,7 +178,7 @@ async function calistir() {
   const kok = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
   let yokSayiliyor = false
   if (cikti && depoIcinde(cikti, kok)) {
-    try { execFileSync('git', ['check-ignore', '-q', resolve(cikti)], { cwd: kok }); yokSayiliyor = true } catch { yokSayiliyor = false }
+    try { execFileSync('git', ['check-ignore', '-q', resolve(cikti)], { cwd: kok, stdio: 'ignore' }); yokSayiliyor = true } catch { yokSayiliyor = false }
   }
   const kontrol = ciktiYoluKontrol(cikti, kok, yokSayiliyor)
   if (!kontrol.gecerli) { console.error('HATA:', kontrol.neden); process.exit(2) }

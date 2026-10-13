@@ -13,8 +13,8 @@
 > varsayılan, P4 Google sonuç sayfası yasağı, P6 depoya girmeyen veri) · `yayin-gorunurluk-denetim-standard.md`
 > (bot kalitesi karnesi) · `rehber-yazisi-standard.md` (yazı konusu).
 
-**Durum:** TASLAK. Koşu elle yapılır; zamanlayıcı/cron/loop kararı önce Recep ile konuşulur (karar 53).
-Koşu betiği yazılınca G7'deki kapı onu getiren PR'da doğar.
+**Durum:** TASLAK. Koşu elle başlatılır (betik: `scripts/seo/geo-olcum.mjs`, SEO-42); zamanlayıcı/cron/loop
+kararı önce Recep ile konuşulur (karar 53). Ağsız çekirdeğin kapısı G7'dedir.
 
 ---
 
@@ -129,9 +129,27 @@ Yorum kuralı: tek ayın oranı iddia kurmaz; iki ardışık koşuda aynı yönd
 
 ## G7 — Kapılar
 
-⚠Bugün bu cetveli zorlayan otomatik kapı yok. Koşu betiği (`scripts/seo/geo-olcum.mjs`, yazılacak) geldiğinde
-ağsız kısmı (cevaptan VentHub/kaynak ayıklama, G4 satır biçimi, anahtarın çıktıya yazılmaması) `ci` testine
-bağlanır; kapı betiği getiren PR'da doğar.
+Kapı: `scripts/seo/__tests__/geo-olcum.test.ts` (INV-GEO-OLCUM-1, `ci` içinde koşar; SEO-42). Kilitlediği ağsız
+çekirdek:
+
+- cevaptan VentHub izi **metinde** ve **kaynakta** ayrı ayıklanır (G0, G4 satır biçimi);
+- sızıntı izleri kelime sınırlıdır ("finalizes" iz sayılmaz), tarafsız klasör yolu ipucu taşımaz (G1);
+- hata satırı ve boş cevap oran paydasına girmez, marka sorusu ayrı sayılır, grup kırılımı "kaynak listesi
+  olan / gruptaki soru" yazılır (G3, G5);
+- anahtar hiçbir satıra ve hata metnine yazılmaz; rakip alan adları herkese açık özetten atılır (G5, P6);
+- kota (429) koşuyu durdurur ve hata satırı biriktirmez (G3).
+
+Koşu ve özet komutları (soru listesi, ham cevap ve rakip alan adları depo dışıdır; betik yalnız yol alır):
+
+- `node scripts/seo/geo-olcum.mjs kos <gemini|claude> --liste <v0.json> [--ek <ek.json>] --cikti <depo dışı klasör>`
+  (`claude` için `--tarafsiz <boş klasör>` zorunlu; her koşudan önce sızıntı sorusu kendiliğinden sorulur ve iz
+  varsa koşu başlamaz). **Önce `--kuru`:** istek göndermeden kaç istek yapılacağını yazar. Ortamda
+  `GEMINI_API_KEY` tanımlıysa `kos` GERÇEK koşar ve günlük ücretsiz kotadan (≈22-25) harcar;
+- `--yalniz 1,7,M1` ile alt küme koşulur, `--onceki <jsonl>` hatasız satırları atlar;
+- `node scripts/seo/geo-olcum.mjs ozet <jsonl...> [--cikti <depo dışı klasör>]` G5 cümlesini üretir; rakip alan
+  adları yalnız `--cikti` klasöründeki dosyaya yazılır.
+
+Betiğin kapısı olmayan kısmı (gerçek Gemini/Claude çağrısı) CI'da koşmaz: abonelik ve anahtar gerektirir.
 
 ---
 
@@ -147,5 +165,5 @@ Kaynak sınıfı: **A** = GEO-SEO'nun kendi ölçümü · **B** = başkasının 
 | 2026-09-27 | Claude temiz oturum sızıntı sorusu | A | Klasör `~/venthub-olcum/…` iken cevap klasör adını gördü, 09-25'in 3 "VentHub" geçişi sahte pozitif → 43 satır geçersiz. `C:/tmp/q7x2`'de VentHub geçişi **0** |
 | 2026-09-27 | Gemini günlük kota | A | 09-25: 25 başarı → 429; 09-27 (20 sn aralık): 22 başarı → 429. Sınır ≈22–25/gün |
 | 2026-09-27 | GEO v0 Gemini ara sonuç | A | 27/52 tekil soru (ilk 10 soru ×3): **VentHub metinde 0, kaynakta 0**. Kalan 25 soru + Claude örneklemi ayrı koşu |
-| 2026-10-11/12 | GEO v1 Gemini `gemini-2.5-flash-lite` + Google arama, liste v1 (v0 + 5 paket sorusu), 29 tekil soru | A | Marka sorusu hariç 27 soruda **VentHub metinde 0/27, kaynakta 0/27** (kaynak listesi olan 24/27: bilgi 14, yerel 8, paket-ek 5). Doğrudan marka sorusu (M1) genel ve tahmine dayalı cevap, kaynak 0; M2 boş cevap, ölçülemedi |
+| 2026-10-11/12 | GEO v1 Gemini `gemini-2.5-flash-lite` + Google arama, liste v1 (v0 + 5 paket sorusu), 29 tekil soru | A | Marka sorusu hariç 27 soruda **VentHub metinde 0/27, kaynakta 0/27** (kaynak listesi olan 24/27: bilgi 13/14, yerel 8/8, paket-ek 3/5; 13 Ekim'de betikle düzeltildi, önceki metin grup toplamlarını kaynak listesi olan diye yazmıştı). Doğrudan marka sorusu (M1) genel ve tahmine dayalı cevap, kaynak 0; M2 boş cevap, ölçülemedi |
 | 2026-10-13 | GEO v1 Claude (abonelik, yalnız WebSearch, `C:/tmp/q7x2`, koşu öncesi sızıntı sorusunda "VentHub" 0), 16 soru, tekrar yok | A | Marka sorusu hariç 15 soruda **VentHub metinde 0/15, kaynakta 0/15** (kaynak listesi olan 6/15; bilgi ve paket sorularının 7/8'i aramasız cevaplandı). M1: "doğrulanabilir bilgi bulamadım". Yayın öncesi TABAN (B-1 adres yayını hedef 19 Ekim); tek koşu eğilim sayılmaz, +2 ve +6 hafta tekrarı (SEO-22) bu tabana kıyaslanır |
