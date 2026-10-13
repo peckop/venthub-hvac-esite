@@ -116,6 +116,11 @@ export interface FanAdayi {
   gucW: number | null
   /** `technical_specs.diameter_mm`. */
   capMm: number | null
+  /**
+   * Ham `technical_specs.pq_curve_kaynak` (URN-127, karar 320/348). Opsiyoneldir: eski çağıranlar
+   * ve fikstürler alanı hiç vermez; verilmemesi "etiketsiz" demektir. Tanıma `egriKaynagiOku` yapar.
+   */
+  pqCurveKaynak?: unknown
 }
 
 /** Bir adayın hesaplanmış sonucu. */
@@ -131,8 +136,16 @@ export interface AdaySonucu {
   puan: number
   /** Debi yetersizse ya da çap uyuşmuyorsa dolu gelir; elenme sebebi. */
   elenmeSebebi: ElenmeSebebi | null
-  /** Eğri ≤3 noktalı: çalışma noktası yaklaşıktır, "yeter" hükmü üreticiyle doğrulanmalı. */
+  /**
+   * Eğri yaklaşıktır (≤3 nokta ya da kaynak `turetilmis`): çalışma noktası yaklaşıktır,
+   * "yeter" hükmü üreticiyle doğrulanmalı. `egriNotu === 'yaklasik'` ile AYNI değer.
+   */
   yaklasikEgri: boolean
+  /**
+   * Eğri yanında konacak not türü (`egriNotuTuru`, tek karar yeri). `null` = not yok
+   * (eğri yok, tablodan alınmış ya da etiketsiz ≥4 nokta).
+   */
+  egriNotu: EgriNotuTuru | null
 }
 
 export type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
@@ -206,6 +219,56 @@ export const YAKLASIK_EGRI_NOKTA_ESIGI = 3
 export function egriYaklasikMi(ham: unknown): boolean {
   const n = parsePQCurve(ham).length
   return n > 0 && n <= YAKLASIK_EGRI_NOKTA_ESIGI
+}
+
+/**
+ * `technical_specs.pq_curve_kaynak` için TANINAN üç değer (karar 320;
+ * `docs/standards/spec-axis-standard.md` §2.3). Dördüncü değer yoktur: tanınmayan metin
+ * etiketsiz sayılır, uydurulmuş bir kaynağa dönüştürülmez.
+ */
+export const EGRI_KAYNAKLARI = ['kitapcik_tablo', 'kitapcik_grafik', 'turetilmis'] as const
+
+export type EgriKaynagi = (typeof EGRI_KAYNAKLARI)[number]
+
+/**
+ * Ham değeri kaynak etiketine çevirir. Yalnız metin, kırpılmış ve BİREBİR eşleşen değer
+ * kabul edilir (büyük/küçük harf ya da benzer yazım "yaklaşık eşleşme" yapılmaz); aksi null.
+ */
+export function egriKaynagiOku(ham: unknown): EgriKaynagi | null {
+  if (typeof ham !== 'string') return null
+  const metin = ham.trim()
+  return (EGRI_KAYNAKLARI as readonly string[]).includes(metin) ? (metin as EgriKaynagi) : null
+}
+
+/**
+ * Müşteriye eğri yanında gösterilecek not türü.
+ *  · `yaklasik`          — eğri üretici grafiği/tablosu değil (hesapla kurulmuş ya da çok seyrek).
+ *  · `grafikten-okundu`  — eğri kitapçıktaki grafikten okunmuş (`kitapcik_grafik`, ≥4 nokta).
+ */
+export type EgriNotuTuru = 'yaklasik' | 'grafikten-okundu'
+
+/**
+ * Eğri notunun TEK karar yeri (URN-127, karar 348). PDP ve sessiz fan sihirbazı aynı
+ * fonksiyonu çağırır; ikinci bir nokta-sayısı kuralı YAZILMAZ.
+ *
+ * Sıra anlamlıdır:
+ *  1. eğri yok (0 nokta)                   → null  (not konacak bir eğri yok)
+ *  2. kaynak `turetilmis`                  → yaklaşık (nokta sayısı ne olursa olsun)
+ *  3. nokta ≤ eşik                         → yaklaşık (karar 316/317; kaynak etiketi ne derse desin)
+ *  4. kaynak `kitapcik_grafik`             → grafikten okundu
+ *  5. kalan her şey (`kitapcik_tablo`, etiketsiz, tanınmayan değer) → null
+ *
+ * Etiketsiz ≥4 nokta bilerek NOT SAYILMAZ: etiket karar 320'den ÖNCE yüklenen kayıtlarda
+ * boş olabilir ve hiçbir şey iddia etmemek, doğrulanmamış bir "grafikten okundu" yazmaktan
+ * doğrudur.
+ */
+export function egriNotuTuru(egriHam: unknown, kaynakHam: unknown): EgriNotuTuru | null {
+  if (parsePQCurve(egriHam).length === 0) return null
+  const kaynak = egriKaynagiOku(kaynakHam)
+  if (kaynak === 'turetilmis') return 'yaklasik'
+  if (egriYaklasikMi(egriHam)) return 'yaklasik'
+  if (kaynak === 'kitapcik_grafik') return 'grafikten-okundu'
+  return null
 }
 
 /**
@@ -340,6 +403,7 @@ export function degerlendir(
       puan: 0,
       elenmeSebebi: 'veri-yok',
       yaklasikEgri: false,
+      egriNotu: null,
     }
   }
 
@@ -381,6 +445,8 @@ export function degerlendir(
   const puan =
     100 * (sesAgirligi * sesPuani + kalan * ((2 / 3) * debiPuani + (1 / 3) * verimPuani))
 
+  const egriNotu = egriNotuTuru(aday.pqCurveHam, aday.pqCurveKaynak)
+
   return {
     aday,
     calismaDebisiM3h: nokta.debiM3h,
@@ -388,7 +454,8 @@ export function degerlendir(
     karsilamaOrani,
     puan: elenmeSebebi ? 0 : puan,
     elenmeSebebi,
-    yaklasikEgri: egri.length <= YAKLASIK_EGRI_NOKTA_ESIGI,
+    yaklasikEgri: egriNotu === 'yaklasik',
+    egriNotu,
   }
 }
 
