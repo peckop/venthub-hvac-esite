@@ -46,10 +46,78 @@ depoya yalnız özet sayı girer.
 | **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Kanban kartı |
 | **Model adresleri yayından +1, +7, +14 gün** (SEO-4, URN-11) | gsc-url-denetim (model adresi örneklemi: son tarama, dizin durumu) · GSC site haritası durumu (gönderilen/dizinlenen, hata) · tarama sıklığının `lastmod` değişiminden bağımsız olup olmadığı | canlı | tek tablo URUN + OPS; tabana (REC-300 taban tablosu) kıyas. Gerekçe: model satırlarının `lastmod`'u `products.updated_at`, 441 aktif modelde 10 gün / 20 dakikaya yayılı (en büyük küme 09-25 09:11Z 166 model); aynı damgayı taşıyan çok adres Google'ın lastmod'u yok saymasına yol açabilir (REC-461/A). Bayrak kapalıyken model satırı haritaya girmez |
 | **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar kart numarasıyla; eski kayıtlarda REC-nn) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili Kanban kartı |
-| **Her yeni yazı ya da düzeltilmiş sayfa yayını, canlıda 200 görülünce** (SEO-39) | Search Console'da URL denetimi ve "dizine eklenmesini iste" (yalnız o adresler) + IndexNow (`scripts/seo/indexnow-bildir.mjs`); yayını bildirmek yayın kartının sahibine, isteği göndermek GEO-SEO'ya aittir ve Recep'ten ayrıca onay istenmez | canlı, yalnız yayınlanan adresler | sonuç (adres, istek, IndexNow yanıtı) ilgili Kanban kartına; oturum ya da günlük sınır engeli OPS'a tek satır |
+| **Canlıda yeni ya da değişen her adres: canlıda doğrulandığı anda, aynı tur ve en geç 1 saat içinde** (SEO-39, SEO-45) | Y2.1 zinciri: doğrula → IndexNow → Google dizin oluşturma isteği → Bing URL Gönder (API) → harita ve `lastmod` → kayıt. Kimseden ayrıca onay istenmez | canlı, yalnız yeni ya da değişen adresler | sonuç (adres, saat, IndexNow yanıtı, Google ve Bing sonucu) ilgili Kanban kartına; günlük sınır dolarsa kalan adres listesi ertesi günün ilk işi, OPS'a tek satır |
 
 EN_YAYIN kapalıyken `--en-harita-disi-bilincli` verilir: EN alternatifinin haritada olmaması kırmızı değil,
 ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalkar.
+
+### Y2.1 Dizin isteği: canlıda yeni ya da değişen her adres için standart iş (SEO-45, 2026-10-13)
+
+**Kural.** Canlıda yeni ya da değişen bir adres doğrulanır doğrulanmaz, aynı turda ve en geç 1 saat içinde, GEO-SEO
+Google ve Bing'e dizin isteğini gönderir. Recep'ten ya da OPS'tan ayrıca onay istenmez; yayın ile istek arasında
+bekleme yoktur. Günlük sınır dolarsa kalan adresler ertesi günün ilk işidir, aşağıdaki öncelik sırasıyla. Süre,
+bildirim anından değil **canlıda doğrulanma anından** sayılır.
+
+**Tetik** (biri yeterli). "Canlıda doğrulandı" = adres GET 200, kanonik kendisi, `noindex` ve robots engeli yok;
+yönlendirmede eski adres 308 ile yeni adrese gider ve yeni adres 200 verir.
+
+- Yeni yazı ya da yeni sayfa (yazı akışında rehber-yazisi-standard.md R10 B10'dan sonra).
+- Başlığı, ana metni ya da yapılandırılmış verisi anlamlı değişen mevcut sayfa.
+- Adres değişikliği ya da yönlendirme: yeni adres (TR adres şeması yayını dahil).
+- Yeni ürün ailesi, kategori ya da marka sayfası.
+
+Tetik **değildir**: yalnız fiyat ya da stok değeri değişen sayfa; onu harita `lastmod`'u (Y3.1) ve IndexNow web
+kancası (REC-127) kapsar.
+
+**Kim bildirir.** Yayını yapan kartın sahibi (BLOG, URUN, ALTYAPI…) canlı doğrulamayı karta yazar ve adres listesini
+GEO-SEO'ya SendMessage ile verir. Liste yayından önce de verilebilir; zincir yayın doğrulanınca koşar. Bildirim
+gelmese de GEO-SEO canlı haritayı tabanla karşılaştırıp yeni adresi kendisi görür (Y2 "Taban" satırı).
+`--yalniz-yeni` kipi için taban (`eski-adresler.json`) yayından **önce** GEO-SEO tarafından alınır.
+
+**Zincir** (sıra sabit; her adım kayda yazılır):
+
+1. **Doğrula.** `gsc-url-denetim.mjs` (getirme başarılı, robots engeli yok, kanonik kendisi) ya da `gsc-sayfa-oku.mjs`.
+   Yönlendirmede eski adres 308, yeni adres 200 görülür. Kırmızıysa istek gönderilmez, kusur sahibine döner (Y4).
+2. **IndexNow** (Bing, Yandex…). `scripts/seo/indexnow-bildir.mjs`: bayrak (`ADRES_SEMASI_K3B`) kapalıyken
+   `--yalniz-degismeyen`, açıkken `--yalniz-yeni <eski-adresler.json>`; önce `--kuru`. Anahtar dosyası
+   `public/<anahtar>.txt` depoda ve canlıda 200 olmalıdır; "anahtar yok" demeden önce `public/*.txt` ve canlı
+   adrese bakılır (SEO-39).
+3. **Google dizin isteği.** Search Console URL denetimi sonuç sayfasında dizin oluşturma isteği düğmesi (tarayıcı;
+   yalnız bu adresler; aynı adres aynı gün ikinci kez istenmez). Bu istek için API yoktur: Google'ın Indexing API'si
+   "yalnız JobPosting ya da VideoObject içindeki BroadcastEvent taşıyan sayfalar" içindir (Google belgesi, 2026-10-13
+   okundu); URL denetimi API'si yalnız okur.
+4. **Bing URL Gönder** (API, tarayıcı oturumu gerekmez): `bing-webmaster-oku.mjs --gonder` (SEO-47) —
+   `GetUrlSubmissionQuota` ile kota okunur, `SubmitUrlBatch` ile gönderilir. Betik gelene kadar bu adım IndexNow
+   ile karşılanır ve kayda "Bing URL Gönder: SEO-47 bekliyor" yazılır.
+5. **Harita.** Adres `sitemap.xml`de ve `lastmod` gerçek mi (Y3.1). Değilse istekten önce sahibine dönülür; Google
+   haritayı kendi tarar, harita yeniden gönderilmez.
+6. **Kayıt.** Kartta: adres sayısı, saat, IndexNow yanıt kodu, Google istek sonucu ("istendi" ya da "kota aşıldı"),
+   Bing sonucu. Kalan adres varsa liste ve "ertesi gün ilk iş" notu.
+
+**Günlük sınırlar** (ölçüm tarihi 2026-10-13):
+
+| Kanal | Sınır | Kaynak ve ölçüm durumu | Dolunca |
+|---|---|---|---|
+| Google dizin isteği | Panelde yazmıyor (ölçüldü: URL denetimi sonuç sayfasında yalnız düğme var). **Planlama tabanı günde 10 adres**; gerçek sayı ilk "kota aşıldı" hatasında bu satıra yazılır | Search Console URL denetimi, 2026-10-13; Recep "sanırım 15" dedi, ölçülmedi | kalanlar ertesi gün ilk iş, aynı sıra |
+| Bing URL Gönder | 100 (Recep panelde gördü, 2026-10-13); API'den `GetUrlSubmissionQuota` ile ölçülecek (SEO-47) | Bing Webmaster API belgesi: toplu gönderim en çok 500 adres ve kotayı aşamaz | aynı |
+| IndexNow | pratikte sınırsız (betikte istek başına 10 000 adres) | `indexnow-bildir.mjs` | — |
+
+**Öncelik sırası** (yalnız Google sınırı dolarsa; Bing ve IndexNow'da hepsi gider):
+
+1. Yeni içerik: yeni yazı, yeni sayfa, yeni aile/kategori/marka (başka yolla keşfedilmez).
+2. Üst kategori ve marka sayfaları (çok iç bağlantı alır, altlarını keşfettirir).
+3. Alt kategori sayfaları.
+4. Aile sayfaları, son 28 günde gösterimi olandan başlayarak (`gsc-sayfa-oku.mjs`).
+5. Gösterimi 0 olan eski adres yönlendirmeleri ve yasal sayfalar: istek gönderilmez, harita ve IndexNow yeter.
+
+**Ölçek örneği (19 Ekim TR adres şeması).** SEO-26 listesi 88–89 TR adres (5 sayfa + 3 yasal + 28 kategori [7 üst,
+21 alt] + 6 marka + 47 aile; liste yeni şemadan 16 Ekim'de yeniden üretilir). Google tabanı günde 10 ise ilk 18 adres
+(5 sayfa + 7 üst + 6 marka) ilk iki güne, 21 alt kategori sonraki üç güne, 47 aile ardından beş güne düşer; Google
+tarafı yaklaşık 10 günde biter. Bing 100 ve IndexNow ile 89 adresin hepsi yayın günü gider.
+
+**Okuma** (aynı kayıt, her adres için): 3., 7. ve 14. gün. `gsc-url-denetim.mjs` (son tarama, dizin durumu),
+`bing-webmaster-oku.mjs --taban` (fark kipi, SEO-43), `sayfa-kalite.mjs` (+7). 14. günde gösterim, tık, sıra
+(`gsc-sayfa-oku.mjs`). Kartta tek satır + sayı; ham çıktı depo dışı dosyada.
 
 ## Y3 — Kabul (yayın günü ve sonrası)
 
