@@ -202,6 +202,19 @@ async function getir(adres, ua, azami = 6) {
   return { zincir, durum: 'COK-YONLENDIRME', url }
 }
 
+/**
+ * Marka bağlantısı (SEO-40, URN-126): aile sayfasında kırıntıda marka basamağı YOKTUR; markaya bağlantı sayfadaki üretici
+ * bloğundadır (`/tr/brands/<marka>`, yeni şemada `/tr/markalar/<marka>`). Yalnız gerçek `<a href>` sayılır; liste adresi
+ * (`/tr/brands`, slug'sız) ve bağlantısız "SEAT" yazısı sayılmaz.
+ */
+export const MARKA_BAGLANTISI = /<a\b[^>]*\bhref\s*=\s*["'](?:https?:\/\/(?:www\.)?venthub\.com\.tr)?\/(?:tr|en)\/(?:brands|markalar)\/[^"'#?/]+\/?(?:[?#][^"']*)?["']/gi
+
+/** Aile sayfasında marka bağlantısı yoksa kusur etiketi (başka türlerde ölçülmez). `a`: ayristir() çıktısı. */
+export function markaBaglantisiSorunu(tur, a) {
+  if (tur !== 'aile-urun' || !a) return null
+  return a.markaBaglantisi === 0 ? 'MARKA-BAGLANTISI-YOK (aile sayfasında gövdede markaya giden <a href> yok; üretici bloğu, URN-126)' : null
+}
+
 const ozellik = (etiket, ad) => (etiket.match(new RegExp(`\\b${ad}\\s*=\\s*"([^"]*)"`, 'i')) || etiket.match(new RegExp(`\\b${ad}\\s*=\\s*'([^']*)'`, 'i')) || [])[1]
 const etiketler = (html, ad) => html.match(new RegExp(`<${ad}\\b[^>]*>`, 'gi')) || []
 
@@ -234,7 +247,10 @@ export function ayristir(html) {
   const kelime = (metin.match(/[\p{L}\p{N}][\p{L}\p{N}'’.,-]*/gu) || []).length
   const h1 = (govde.match(/<h1\b/gi) || []).length
   const ic = (govde.match(/<a\b[^>]*href\s*=\s*["'](\/[^"'#]*|https?:\/\/(www\.)?venthub\.com\.tr[^"'#]*)["']/gi) || []).length
-  return { title, aciklama: meta('description'), robots: meta('robots').concat(meta('googlebot')), canonical, hreflang, jsonld, kelime, metinOzet: ozet(metin), h1, ic }
+  // <main> varsa yalnız ondan, yoksa gövdeden sayılır: header/nav/footer bağlantısı gövde bağlantısı değildir.
+  const anaGovde = (govde.match(/<main\b[\s\S]*?<\/main>/i) || [govde])[0]
+  const markaBaglantisi = (anaGovde.match(MARKA_BAGLANTISI) || []).length
+  return { title, aciklama: meta('description'), robots: meta('robots').concat(meta('googlebot')), canonical, hreflang, jsonld, kelime, metinOzet: ozet(metin), h1, ic, markaBaglantisi }
 }
 
 // ─── robots.txt (Google kuralı: en özel UA grubu, en uzun eşleşen yol; eşitlikte Allow) ───
@@ -332,7 +348,9 @@ async function main() {
 
       s.title = a.title.length; s.baslik = a.title[0] || ''
       s.aciklama = a.aciklama.length ? a.aciklama[0].length : 0
-      s.h1 = a.h1; s.ic = a.ic; s.kelime = a.kelime; s.metinOzet = a.metinOzet
+      s.h1 = a.h1; s.ic = a.ic; s.kelime = a.kelime; s.metinOzet = a.metinOzet; s.markaBag = a.markaBaglantisi
+      const markaSorunu = markaBaglantisiSorunu(tur, a)
+      if (markaSorunu) s.sorunlar.push(markaSorunu)
       s.jsonld = a.jsonld.map((x) => x.tur)
       if (a.title.length !== 1) s.sorunlar.push(`TITLE-SAYISI ${a.title.length}`)
       if (a.title.length === 1 && varsayilanBaslikMi(a.title[0], baslikTuru(tur, s.son))) s.sorunlar.push('VARSAYILAN-BASLIK (kendi title/description yok)')
@@ -430,12 +448,12 @@ function raporMd({ satirlar, robotsMetin, aiBotlar, cwv, haritaSayisi }) {
   const L = []
   L.push(`# Bot kalitesi karnesi — ${TABAN} — ${new Date().toISOString().slice(0, 16)}Z`, '')
   L.push(`Adres ${satirlar.length} · site haritası loc ${haritaSayisi} · sorunlu adres ${satirlar.filter((s) => s.sorunlar.length).length}`, '')
-  L.push('| tür | adres | zincir | kelime G/GPT/Claude/Perp/Tar | title | açıkl. | H1 | canonical | hreflang | JSON-LD | harita | robots G | noindex | iç bağ. | sorunlar | bilinçli |')
-  L.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+  L.push('| tür | adres | zincir | kelime G/GPT/Claude/Perp/Tar | title | açıkl. | H1 | canonical | hreflang | JSON-LD | harita | robots G | noindex | iç bağ. | marka bağ. | sorunlar | bilinçli |')
+  L.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
   for (const s of satirlar) {
     const k = s.botlar ? ['googlebot', 'gptbot', 'claudebot', 'perplexitybot', 'tarayici'].map((b) => s.botlar[b]?.kelime ?? '-').join('/') : '-'
     const hl = s.hreflang ? Object.entries(s.hreflang).map(([d, h]) => `${d}=${h}`).join(' ') : '-'
-    L.push(`| ${s.tur} | ${s.adres} | ${s.zincir} | ${k} | ${s.title ?? '-'} | ${s.aciklama ?? '-'} | ${s.h1 ?? '-'} | ${(s.canonical || []).join(' ') || '-'} | ${hl} | ${(s.jsonld || []).join(', ') || '-'} | ${s.haritada ?? '-'} | ${s.robots ? (s.robots.googlebot.izin ? 'izin' : 'YASAK') : '-'} | ${s.noindex ? 'EVET' : 'hayır'} | ${s.ic ?? '-'} | ${s.sorunlar.join(' · ') || '✓'} | ${(s.bilincli || []).join(' · ') || '-'} |`)
+    L.push(`| ${s.tur} | ${s.adres} | ${s.zincir} | ${k} | ${s.title ?? '-'} | ${s.aciklama ?? '-'} | ${s.h1 ?? '-'} | ${(s.canonical || []).join(' ') || '-'} | ${hl} | ${(s.jsonld || []).join(', ') || '-'} | ${s.haritada ?? '-'} | ${s.robots ? (s.robots.googlebot.izin ? 'izin' : 'YASAK') : '-'} | ${s.noindex ? 'EVET' : 'hayır'} | ${s.ic ?? '-'} | ${s.markaBag ?? '-'} | ${s.sorunlar.join(' · ') || '✓'} | ${(s.bilincli || []).join(' · ') || '-'} |`)
   }
   L.push('', '## Sorun sınıfları', '')
   const sinif = new Map()
