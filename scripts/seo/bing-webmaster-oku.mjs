@@ -14,7 +14,9 @@
  * sayaçları günlerce gecikmeli; tarihi olmayan sayı tazelik kanıtı değildir).
  *
  * Kullanım: node scripts/seo/bing-webmaster-oku.mjs --cikti <depo-dışı klasör> [--site https://venthub.com.tr/]
- *           [--url-bilgi <adres,adres,... | dosya.txt>] [--gun 30]
+ *           [--url-bilgi <adres,adres,... | dosya.txt>] [--gun 30] [--taban <önceki bing-webmaster-*.json>]
+ *           `--taban` (SEO-43): koşunun sonunda iki dosya arasındaki FARKI yazar (veri yeni mi, sayaç değişimi, sayfa kaydı
+ *           yeni mi) ve bing-webmaster-fark-<tarih>.json üretir. Bozuk taban dosyası çıkış 2 (API'ye gitmeden).
  * Çıkış: 0 tüm yöntemler TAMAM ya da OLCULEMEDI · 1 en az bir HATA (anahtar geçersiz, yetki, ağ, bozuk yanıt) · 2 araç koşmadı.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -176,6 +178,106 @@ export async function oku({ fetchFn = fetch, anahtar, siteUrl, urlBilgi = [], gu
   return { yontemler, ham, urlBilgi: urlSonuclari, durdu: null }
 }
 
+/**
+ * `--taban` dosyasını okur. Bozuk/eksik/başka biçimli dosya SESSİZ geçmez: hata KODU döner (çağıran API'ye gitmeden durur).
+ * @returns {{ taban: { yontemler: object, urlBilgi?: object[], alinma?: string } } | { hata: 'TABAN-OKUNAMADI' | 'TABAN-BICIMI' }}
+ */
+export function tabanOku(yol, oku = (y) => readFileSync(y, 'utf8')) {
+  let j
+  try { j = JSON.parse(oku(yol)) } catch { return { hata: 'TABAN-OKUNAMADI' } }
+  if (!j || typeof j !== 'object' || !j.yontemler || typeof j.yontemler !== 'object') return { hata: 'TABAN-BICIMI' }
+  return { taban: j }
+}
+
+/** Yöntem başına karşılaştırılan sayaç alanları (özet alan adları `ozetle` çıktısındandır). */
+const SAYAC_ALANLARI = {
+  GetRankAndTrafficStats: ['tik', 'gosterim'],
+  GetQueryStats: ['tekil', 'satir'],
+  GetPageStats: ['tekil', 'satir'],
+  GetCrawlStats: ['dizindeSayfa', 'taranan', 'hata', 'kod2xx', 'kod301', 'kod4xx', 'kod5xx', 'robotsEngel'],
+  GetCrawlIssues: ['satir'],
+  GetFeeds: ['satir'],
+}
+const gunKisalt = (iso) => (iso ? String(iso).slice(0, 10) : null)
+/** Sayfa kaydı var mı: durum TAMAM ve son tarama dolu (Bing kayıtsız sayfaya "0001-01-01" döner). */
+const kayitVar = (u) => Boolean(u && u.durum === 'TAMAM' && u.sonTarama && !String(u.sonTarama).startsWith('0001'))
+
+/**
+ * İki koşu arasındaki FARK (SEO-43): yöntem bazında veri yeni mi, sayaç değişimi; sayfa bazında kayıt durumu.
+ * Karşılaştırılamayan (özet yok, tarih yok) `veriYeni: null` olur; hiçbir koşulda "değişmedi" diye sayılmaz.
+ * @param {{ yontemler?: object, urlBilgi?: object[] }} onceki  taban koşu (kaydedilmiş JSON)
+ * @param {{ yontemler?: object, urlBilgi?: object[] }} simdi   bu koşu
+ */
+export function farkUret(onceki, simdi) {
+  const yontemler = {}
+  const adlar = new Set([...Object.keys(onceki?.yontemler ?? {}), ...Object.keys(simdi?.yontemler ?? {})])
+  for (const y of adlar) {
+    if (y === 'GetUserSites') continue
+    const a = onceki?.yontemler?.[y]
+    const b = simdi?.yontemler?.[y]
+    const sonOnce = gunKisalt(a?.ozet?.sonTarih)
+    const sonSimdi = gunKisalt(b?.ozet?.sonTarih)
+    const alanlar = {}
+    if (a?.ozet && b?.ozet) {
+      for (const k of SAYAC_ALANLARI[y] ?? []) {
+        if (typeof a.ozet[k] === 'number' && typeof b.ozet[k] === 'number') alanlar[k] = { once: a.ozet[k], simdi: b.ozet[k], fark: b.ozet[k] - a.ozet[k] }
+      }
+    }
+    const haritalar = []
+    if (y === 'GetFeeds' && a?.ozet?.haritalar && b?.ozet?.haritalar) {
+      const eski = new Map(a.ozet.haritalar.map((h) => [h.url, h]))
+      for (const h of b.ozet.haritalar) {
+        const e = eski.get(h.url)
+        if (e && (e.urlSayisi !== h.urlSayisi || e.sonTarama !== h.sonTarama || e.durum !== h.durum)) {
+          haritalar.push({ url: h.url, urlSayisi: { once: e.urlSayisi, simdi: h.urlSayisi }, sonTarama: { once: gunKisalt(e.sonTarama), simdi: gunKisalt(h.sonTarama) }, durum: { once: e.durum, simdi: h.durum } })
+        }
+      }
+    }
+    yontemler[y] = {
+      durum: { once: a?.durum ?? null, simdi: b?.durum ?? null },
+      sonTarih: { once: sonOnce, simdi: sonSimdi },
+      veriYeni: sonOnce && sonSimdi ? sonSimdi > sonOnce : null,
+      alanlar, ...(haritalar.length && { haritalar }),
+    }
+  }
+
+  const eskiUrl = new Map((onceki?.urlBilgi ?? []).map((u) => [u.adres, u]))
+  const yeniUrl = new Map((simdi?.urlBilgi ?? []).map((u) => [u.adres, u]))
+  const urlBilgi = []
+  for (const adres of new Set([...eskiUrl.keys(), ...yeniUrl.keys()])) {
+    const a = eskiUrl.get(adres)
+    const b = yeniUrl.get(adres)
+    let degisim
+    if (!a) degisim = 'TABANDA-YOK'
+    else if (!b) degisim = 'BU-KOSUDA-YOK'
+    else if (!kayitVar(a) && kayitVar(b)) degisim = 'YENI-KAYIT'
+    else if (kayitVar(a) && !kayitVar(b)) degisim = 'KAYIT-KAYBOLDU'
+    else if (!kayitVar(a) && !kayitVar(b)) degisim = 'KAYIT-YOK' // iki koşuda da Bing kaydı yok: "0001" ile null farkı değişim değildir
+    else if (a.sonTarama !== b.sonTarama) degisim = 'SON-TARAMA-DEGISTI'
+    else if (a.httpDurum !== b.httpDurum) degisim = 'HTTP-DEGISTI'
+    else degisim = 'DEGISMEDI'
+    urlBilgi.push({
+      adres, degisim,
+      kayit: { once: a ? kayitVar(a) : null, simdi: b ? kayitVar(b) : null },
+      sonTarama: { once: gunKisalt(a?.sonTarama), simdi: gunKisalt(b?.sonTarama) },
+      http: { once: a?.httpDurum ?? null, simdi: b?.httpDurum ?? null },
+    })
+  }
+
+  const satirlar = []
+  for (const [y, v] of Object.entries(yontemler)) {
+    const veri = v.veriYeni === null ? 'KARŞILAŞTIRILAMADI' : v.veriYeni ? `VERİ YENİ (son veri ${v.sonTarih.once} → ${v.sonTarih.simdi})` : `VERİ DEĞİŞMEDİ (son veri ${v.sonTarih.simdi})`
+    const durum = v.durum.once !== v.durum.simdi ? ` · DURUM ${v.durum.once} → ${v.durum.simdi}` : ''
+    const sayac = Object.entries(v.alanlar).filter(([, d]) => d.fark !== 0).map(([k, d]) => `${k} ${d.once} → ${d.simdi} (${d.fark > 0 ? '+' : ''}${d.fark})`).join(', ')
+    satirlar.push(`${y}: ${veri}${durum}${sayac ? ` · ${sayac}` : ''}`)
+    for (const h of v.haritalar ?? []) satirlar.push(`  harita ${h.url}: url ${h.urlSayisi.once} → ${h.urlSayisi.simdi}, son tarama ${h.sonTarama.once} → ${h.sonTarama.simdi}`)
+  }
+  const degisenUrl = urlBilgi.filter((u) => u.degisim !== 'DEGISMEDI' && u.degisim !== 'KAYIT-YOK')
+  for (const u of degisenUrl) satirlar.push(`sayfa ${u.degisim}: ${u.adres}${u.sonTarama.once !== u.sonTarama.simdi ? ` · son tarama ${u.sonTarama.once} → ${u.sonTarama.simdi}` : ''}`)
+  satirlar.push(`sayfa özeti: ${urlBilgi.length} adres, ${degisenUrl.length} değişen, ${urlBilgi.filter((u) => u.degisim === 'YENI-KAYIT').length} yeni kayıt`)
+  return { yontemler, urlBilgi, ozetSatirlari: satirlar }
+}
+
 export const cikisKodu = (sonuc) =>
   sonuc.durdu || Object.values(sonuc.yontemler).some((y) => HATA_DURUMLARI.has(y.durum)) || sonuc.urlBilgi.some((u) => HATA_DURUMLARI.has(u.durum)) ? 1 : 0
 
@@ -205,6 +307,14 @@ async function calistir() {
   if (!Number.isFinite(gun) || gun < 1) { console.error('HATA: --gun pozitif sayı olmalı'); process.exit(2) }
   const k = anahtarOku(anahtarDosyasiYolu())
   if (k.hata) { console.error(`HATA: ${k.hata} (BING_WEBMASTER_ANAHTAR_DOSYASI ya da varsayılan dosya; 32 onaltılı hane beklenir)`); process.exit(2) }
+  // --taban: önceki koşu JSON'u. Bozuk/eksik dosya API'ye GİTMEDEN durdurur (sessiz geçmez).
+  const tabanYolu = deger('--taban')
+  let taban = null
+  if (tabanYolu) {
+    const t = tabanOku(resolve(tabanYolu))
+    if (t.hata) { console.error(`HATA: --taban ${t.hata}: ${tabanYolu}`); process.exit(2) }
+    taban = t.taban
+  }
   const ub = deger('--url-bilgi')
   const urlBilgi = !ub ? [] : /\.txt$/i.test(ub) ? readFileSync(ub, 'utf8').split(/\r?\n/).map((s) => s.trim()).filter(Boolean) : ub.split(',').map((s) => s.trim()).filter(Boolean)
   const sonuc = await oku({ anahtar: k.anahtar, siteUrl, urlBilgi, gun })
@@ -218,6 +328,14 @@ async function calistir() {
   }
   for (const u of sonuc.urlBilgi) console.log(`GetUrlInfo ${u.durum} ${u.adres}${u.sonTarama ? ` · son tarama ${u.sonTarama.slice(0, 10)}` : ''}${u.httpDurum !== undefined ? ` · http ${u.httpDurum}` : ''}`)
   console.log(`çıktı: ${dosya}`)
+  if (taban) {
+    const fark = farkUret(taban, sonuc)
+    const farkDosya = join(resolve(cikti), `bing-webmaster-fark-${alinma.slice(0, 10)}.json`)
+    writeFileSync(farkDosya, JSON.stringify({ alinma, taban: { alinma: taban.alinma ?? null, dosya: tabanYolu }, ...fark }, null, 1))
+    console.log(`--- FARK (taban ${taban.alinma ?? '?'} → şimdi ${alinma}) ---`)
+    for (const s of fark.ozetSatirlari) console.log(s)
+    console.log(`fark: ${farkDosya}`)
+  }
   process.exit(cikisKodu(sonuc))
 }
 
