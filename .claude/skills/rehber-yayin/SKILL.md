@@ -38,7 +38,7 @@ metadata:
 
 ## Sahada düşülen yanlışlar (ölçüldü; tekrar etme)
 
-1. **"IndexNow anahtarı yok" sanıldı.** Anahtar `public/<anahtar>.txt` olarak depoda ve canlıda 200'dür; Bing/IndexNow adımı atlanmaz (B12).
+1. **"IndexNow anahtarı yok" sanıldı.** Anahtarın durumu ve komutu `yayin-gorunurluk-denetim-standard.md` Y2'dedir (tek kaynak); varsayımla atlanmaz, Bing/IndexNow adımı GEO-SEO'ya yazılır (B12).
 2. **Liste kartı ve ters bağlantı ham HTML'le onaylanmaz.** Görünüm tarayıcı bölmesiyle ölçülür (B10).
 3. **Kart doğrulayıcısı `curl` ve kabuk operatörünü reddeder.** "Canlı 200" ölçütü elle işaretlenir; kanıt kart notundadır.
 4. **Birleşmiş PR'ın dalına commit atılmaz.** Kapalı PR yeni commit almaz; düzeltme yeni dal ve yeni PR olur (R5.5 revizyonu).

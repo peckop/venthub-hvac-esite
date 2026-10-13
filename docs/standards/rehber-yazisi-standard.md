@@ -610,11 +610,11 @@ flowchart TD
 | **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
 | **B9** Birleşme | PR birleşmeden önce OPS'a gösterilir; `scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` | OPS onaylar; ritüeli emri veren pencere koşar | ritüel çıkış 0; `mergeStateStatus` CLEAN; `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` 204 | birleşme yapılmaz; kırmızı kapı B8'e döner | karta PR no + birleşme ölçümü |
 | **B10** Canlı doğrulama | Dağıtım bitince: yazı adresi **200**; site haritasında adres, `lastmod` = yayın tarihi; bilgi merkezi liste kartı **tarayıcı bölmesiyle** görülür (ham HTML yetmez); ters bağlantı yerinde; iç bağlantılar doğrudan 200 | BLOG | `curl` 200; harita satırı; `ic-baglanti-denetle.mjs`; `bot-karnesi.mjs` yazı adresinde temiz | düzeltme R5.5 revizyonu; B11–B12 başlamaz | karta not: adres, 200, `lastmod`, liste kartı (tarayıcı). ⚠Kart doğrulayıcısı `curl` ve kabuk operatörünü reddeder: "canlı 200" ölçütü elle işaretlenir, kanıt kart notundadır |
-| **B11** Google dizin isteği | Search Console'da URL denetimi ve "dizine eklenmesini iste", yalnız bu adres(ler) | GEO-SEO (SEO-39; Recep'ten ayrıca onay istenmez) | `gsc-url-denetim.mjs`: getirme başarılı, robots engeli yok; istek yapıldı kaydı | günlük istek sınırı → OPS'a tek satır | karta: adres, istek, saat |
-| **B12** IndexNow (Bing, Yandex…) | `scripts/seo/indexnow-bildir.mjs` ile yeni adres bildirilir; anahtar dosyası `public/<anahtar>.txt`, depoda ve canlıda 200 | GEO-SEO | gönderim öncesi adres GET 200 ve kanonik kendisi (betik zorlar); IndexNow yanıtı 200/202 | hata → karta + OPS | karta: adres, yanıt kodu |
-| **B13** 3. gün | URL denetimi: son tarama, dizin durumu; Bing Webmaster (`bing-webmaster-oku.mjs`) | GEO-SEO | Googlebot getirmiş mi, dizinde mi | dizinde değilse sebep (canonical, noindex, bot erişimi) kartta; düzeltme BLOG'a SendMessage | karta tek satır + sayı |
-| **B14** 7. gün | R7 "1. hafta": indekslendi mi + `bot-karnesi.mjs` yazı adresinde temiz + `sayfa-kalite.mjs` | GEO-SEO ölçer, BLOG yorumlar | R7 | sorun varsa R5.5 revizyonu | karta tek satır + sayı |
-| **B15** 14. gün | İlk gösterim, tık, sıra (`gsc-sayfa-oku.mjs`); R7 tabanıyla kıyas; haftalık ölçüm (R7 "4 hafta") başlar | GEO-SEO | R7 taban kıyası (aynı sorgu, aynı gün sayısı) | konu kümesi tekrar değerlendirilir (R1) | karta özet sayı; sorgu listesi depo dışı |
+| **B11** Google dizin isteği | Metin, kapı ve komut **tek kaynakta**: `yayin-gorunurluk-denetim-standard.md` Y2 ("her yeni yazı ya da düzeltilmiş sayfa yayını" satırı). R10 yalnız sırayı gösterir, burada yeniden yazılmaz | GEO-SEO (Recep'ten ayrıca onay istenmez) | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B11 kaydı aranır (R10.3) |
+| **B12** IndexNow ve Bing | Aynı kaynak: Y2 (IndexNow ve Bing Webmaster adımları). R10'da komut satırı ya da anahtar dosyası yolu yazılmaz | GEO-SEO | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B12 kaydı aranır (R10.3) |
+| **B13** 3. gün | Ölçüm içeriği Y2'de (gün sayıları ve evren orada) | GEO-SEO | Y2; kıyas ölçütü R7 | Y2; düzeltme gerekirse BLOG'a SendMessage | Y2'nin kayıt kuralı |
+| **B14** 7. gün | R7 "1. hafta" ölçütleri; ölçüm koşusu Y2'de | GEO-SEO ölçer, BLOG yorumlar | R7 | sorun varsa R5.5 revizyonu | karta tek satır + sayı |
+| **B15** 14. gün | R7 taban kıyası ve "4 hafta" ölçümü; koşu Y2'de | GEO-SEO | R7 taban kıyası (aynı sorgu, aynı gün sayısı) | konu kümesi tekrar değerlendirilir (R1) | karta özet sayı; sorgu listesi depo dışı |
 | **B16** Aylık kaynak bakımı | Yayındaki her yazının kaynakları R2.3 betiğiyle yeniden çekilir | BLOG | `alinti-dogrula.mjs`: son adres, durum, sha256 değişti mi | "gözden geçir" listesi → R5.5 revizyonu | karta not |
 
 ### R10.2 BLG-10 bulgularından çıkan kapılar şemada nerede durur
@@ -653,9 +653,8 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
 
 | Nokta | Sahibi | Durum |
 |---|---|---|
-| B11–B15 metni ve kapıları | GEO-SEO | Bu sürümde BLOG'un okuyabildiği betiklerden ve `yayin-gorunurluk-denetim-standard.md` Y2'den çıkarıldı; GEO-SEO onaylayana kadar **taslak** |
-| `yayin-gorunurluk-denetim-standard.md` Y2 "her yeni yazı" satırından R10'a bağ (R7 tarafındaki bağ bu sürümde eklendi) | GEO-SEO (Y2'nin sahibi) | BLOG öneri olarak iletir; Y2'yi BLOG değiştirmez |
-| `indexnow-bildir.mjs` tek yeni yazı için kullanılacak kip (`--yalniz-yeni` taban site haritası ve `ADRES_SEMASI_K3B` bayrağı ister) | GEO-SEO | doğrulanmadı; B12'nin komut satırı kesinleşmedi |
+| B11–B15 metni, kapıları ve komutları | GEO-SEO (Y2'nin sahibi) | **Tek kaynak `yayin-gorunurluk-denetim-standard.md` Y2** (OPS kararı 13 Ekim; GEO-SEO Y2'yi genişletiyor: her canlı adres değişikliği, aynı tur ve en geç 1 saat, Bing Webmaster tarayıcıdan, IndexNow, günlük sınır, öncelik). R10 yalnız sıra, sahip ve bağlantı taşır; Y2'yi BLOG değiştirmez |
+| Y2'den R10'a bağ (R7 tarafındaki bağ bu sürümde var) | GEO-SEO | Y2 genişleyince "her yeni yazı" satırına R10'a bağ eklenir; BLOG öneri olarak iletir |
 | EN yayını (`EN_YAYIN`) açılınca B10–B12 EN adresleri için tekrarlanır | GEO-SEO + URUN | bayrak kapalı, kapsam dışı |
 
 ---
