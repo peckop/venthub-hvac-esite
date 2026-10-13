@@ -642,6 +642,12 @@ function OneriKarti({
         </p>
       )}
 
+      {sonuc.egriNotu === 'grafikten-okundu' && (
+        <p className="mt-3 text-xs leading-relaxed text-steel-gray" data-testid="grafik-egri-notu">
+          {t('silentFanWizard.cardChartCurve')}
+        </p>
+      )}
+
       <Link
         href={Routes.product(aday.slug)}
         className="focus-ring mt-5 text-center bg-primary-navy text-white py-3 rounded-hvac-md font-bold hover:bg-secondary-blue transition-colors"

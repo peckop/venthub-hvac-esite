@@ -209,6 +209,18 @@ export const formatSpecValue = (key: string, value: unknown, t: SpecValueTransla
  */
 const ELEKTRIK_ANAHTARLARI = new Set(['motor_efficiency_class', 'electrical_protection_class'])
 
+/**
+ * Müşteriye SATIR olarak gösterilmeyen iç/meta `technical_specs` anahtarları (URN-88 + URN-127).
+ *
+ * TEK liste: ürün sayfası teknik tablosu, föy (`pdfGenerator.buildSpecRows` aynı gruplayıcıyı kullanır) ve
+ * model matrisi (`VariantSelector`) buradan süzer; ikinci bir liste yazılmaz.
+ *
+ * `pq_curve_kaynak` (spec-axis-standard §2.3, karar 320): eğrinin kaynağını söyleyen iç etiket. Değeri
+ * (`kitapcik_grafik` vb.) makine metnidir; müşteriye bir not olarak eğri satırının YANINDA gösterilir
+ * (`egriNotuTuru`), kendi satırı olarak değil.
+ */
+export const GIZLI_SPEC_ANAHTARLARI: ReadonlySet<string> = new Set(['pq_curve_kaynak'])
+
 export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | undefined) => {
   if (!specs) return null;
 
@@ -239,6 +251,7 @@ export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | unde
     if (value === null || value === undefined || value === '') return;
     
     const k = key.toLowerCase();
+    if (GIZLI_SPEC_ANAHTARLARI.has(k)) return;
     if (k.includes('airflow') || k.includes('speed') || k.includes('rpm') || k.includes('delivery') || k.includes('pressure')) {
       groups.performance.specs[key] = value;
     } else if (k.includes('size') || k.includes('weight') || k.includes('width') || k.includes('height') || k.includes('depth') || k.includes('dim_')) {

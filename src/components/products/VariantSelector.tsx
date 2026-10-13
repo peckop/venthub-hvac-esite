@@ -8,7 +8,12 @@ import React, { useMemo, useState } from 'react'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { FamilyVariant } from '../../lib/services/family.service'
-import { formatSpecValue, getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
+import {
+  formatSpecValue,
+  getProductDisplayName,
+  getProductModelLabel,
+  GIZLI_SPEC_ANAHTARLARI,
+} from '../../utils/productHelpers'
 import { specFieldLabel } from '../../utils/specLabel'
 
 /**
@@ -91,6 +96,9 @@ function variantLabel(v: FamilyVariant, lang: string): string {
  * anahtar birleşimi içinden, birden fazla farklı değer taşıyanlar (sabit değerli
  * anahtar matriste bilgi taşımaz). Kapsam (kaç varyantta var) ve alfabetik sıra
  * ile deterministik sıralanır.
+ *
+ * URN-127: müşteriye satır olarak gösterilmeyen iç/meta anahtarlar (`GIZLI_SPEC_ANAHTARLARI`, tek liste)
+ * matrise de KOLON olamaz; varyantlar arasında farklı değer taşısalar bile.
  */
 function distinguishingSpecKeys(variants: FamilyVariant[]): string[] {
   const values = new Map<string, Set<string>>()
@@ -99,6 +107,7 @@ function distinguishingSpecKeys(variants: FamilyVariant[]): string[] {
   for (const v of variants) {
     for (const [key, raw] of Object.entries(v.technical_specs ?? {})) {
       if (raw === null || raw === undefined || raw === '') continue
+      if (GIZLI_SPEC_ANAHTARLARI.has(key.toLowerCase())) continue
       if (!values.has(key)) values.set(key, new Set())
       values.get(key)!.add(String(raw))
       coverage.set(key, (coverage.get(key) ?? 0) + 1)

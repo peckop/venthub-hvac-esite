@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
+import { GIZLI_SPEC_ANAHTARLARI, groupTechnicalSpecs } from '../../utils/productHelpers'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
 
 /**
@@ -33,6 +34,14 @@ const manifest = JSON.parse(
 ) as SpecManifest
 
 const canliAnahtarlar = Object.keys(manifest.anahtarlar)
+
+/**
+ * URN-127: müşteriye SATIR olarak gösterilmeyen iç/meta anahtarlar (`GIZLI_SPEC_ANAHTARLARI`, örn.
+ * `pq_curve_kaynak`) etiket gerektirmez: hiçbir yüzeyde etiketiyle çizilmezler. Manifest yenilenip bu anahtarı
+ * içerdiğinde kapı, hiç görünmeyecek bir etiket için kırmızı vermesin. Sayım iddiası (`tekil_anahtar`) TÜM
+ * anahtarlar üzerinde kalır; yalnız etiket gereksinimi gizli listeyi dışarıda bırakır.
+ */
+const etiketliAnahtarlar = canliAnahtarlar.filter((k) => !GIZLI_SPEC_ANAHTARLARI.has(k))
 
 function sozlukSpecs(d: unknown): Record<string, string> {
   const pdp = (d as Record<string, Record<string, unknown>>).pdp
@@ -77,8 +86,8 @@ describe('INV-SPEC-LABEL-1 · teknik özellik etiketleri sözlükten gelir', () 
 
     const trSpecs = sozlukSpecs(tr)
     const enSpecs = sozlukSpecs(en)
-    const eksikTr = canliAnahtarlar.filter((k) => !trSpecs[k]?.trim())
-    const eksikEn = canliAnahtarlar.filter((k) => !enSpecs[k]?.trim())
+    const eksikTr = etiketliAnahtarlar.filter((k) => !trSpecs[k]?.trim())
+    const eksikEn = etiketliAnahtarlar.filter((k) => !enSpecs[k]?.trim())
 
     expect(
       { eksikTr, eksikEn },
@@ -94,7 +103,7 @@ describe('INV-SPEC-LABEL-1 · teknik özellik etiketleri sözlükten gelir', () 
     for (const [ad, sozluk] of [['tr', tr], ['en', en]] as const) {
       const t = tFor(sozluk)
       const specs = sozlukSpecs(sozluk)
-      for (const key of canliAnahtarlar) {
+      for (const key of etiketliAnahtarlar) {
         const etiket = specFieldLabel(key, t)
         if (etiket !== specs[key]) hatalar.push(`${ad}/${key}: '${etiket}' != sözlük '${specs[key]}'`)
       }
@@ -105,6 +114,20 @@ describe('INV-SPEC-LABEL-1 · teknik özellik etiketleri sözlükten gelir', () 
         'Muhtemel sebep: specLabel.ts\'teki anahtar yolu (pdp.specs.<key>) ile sözlükteki ' +
         'yapı ayrışmış.',
     ).toEqual([])
+  })
+
+  it('URN-127: gizli (iç/meta) anahtar hiçbir grupta SATIR olmaz; diğer canlı anahtarlar kaybolmaz', () => {
+    // Kapsam kanaryası: gizli liste boşalırsa aşağıdaki döngü boş kümede doğrulanırdı.
+    expect(GIZLI_SPEC_ANAHTARLARI.size, 'gizli anahtar listesi boş: kapı hiçbir şeye bakmıyor').toBeGreaterThanOrEqual(1)
+    expect(GIZLI_SPEC_ANAHTARLARI.has('pq_curve_kaynak')).toBe(true)
+
+    const girdi: Record<string, unknown> = {}
+    for (const k of [...canliAnahtarlar, ...GIZLI_SPEC_ANAHTARLARI]) girdi[k] = 'x'
+    const gruplar = groupTechnicalSpecs(girdi) ?? {}
+    const gorunen = Object.values(gruplar).flatMap((g) => Object.keys(g.specs))
+
+    expect(gorunen.filter((k) => GIZLI_SPEC_ANAHTARLARI.has(k.toLowerCase())), 'gizli anahtar satır olarak çıkıyor').toEqual([])
+    expect(gorunen.sort()).toEqual([...etiketliAnahtarlar].sort())
   })
 
   it('grup başlıkları da sözlükten gelir (EN sayfada Türkçe basmasın)', () => {

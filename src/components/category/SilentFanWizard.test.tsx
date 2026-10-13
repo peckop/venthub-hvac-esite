@@ -11,7 +11,7 @@
  * anahtarın kendisini döndürür ve testler METİNLE değil ROL ve ANAHTARLA eşleşir — sözlük
  * gelince bu testler kırılmaz.
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -176,6 +176,65 @@ describe('sonuç ekranı', () => {
     await waitFor(() => expect(screen.getByText('silentFanWizard.badgeBest')).toBeTruthy())
     expect(screen.queryByText('silentFanWizard.cardApproxCurve')).toBeNull()
     expect(screen.getAllByText('silentFanWizard.cardDelivers').length).toBeGreaterThan(0)
+  })
+
+  describe('URN-127 — eğri kaynağı notu (karar 348): kaynak etiketi + nokta sayısı kartta TEK kuralla okunur', () => {
+    const ALTI_NOKTA = '[[0, 210.9], [100, 190], [255, 105.5], [380, 55], [450, 25], [510, 0]]'
+    const BES_NOKTA = '[[0, 210], [100, 180], [255, 105], [400, 40], [510, 0]]'
+    const UC_NOKTA = '[[0, 210.9], [255, 105.5], [510, 0]]'
+
+    async function sonuc(pqCurveHam: string, pqCurveKaynak?: unknown) {
+      getWizardCandidatesMock.mockResolvedValue([{ ...ADAYLAR[0], pqCurveHam, pqCurveKaynak }])
+      ac()
+      fireEvent.click(screen.getByText('silentFanWizard.skipToResult'))
+      await waitFor(() => expect(screen.getByText('silentFanWizard.badgeBest')).toBeTruthy())
+      return {
+        grafikNotu: screen.queryAllByTestId('grafik-egri-notu'),
+        yaklasikNotu: screen.queryAllByTestId('yaklasik-egri-notu'),
+        etiketTam: screen.queryAllByText('silentFanWizard.cardDelivers'),
+        etiketYaklasik: screen.queryAllByText('silentFanWizard.cardDeliversApprox'),
+      }
+    }
+
+    it('6 nokta + kitapcik_grafik: grafik notu VAR, yaklaşık notu ve "(yaklaşık)" etiketi YOK', async () => {
+      const s = await sonuc(ALTI_NOKTA, 'kitapcik_grafik')
+      expect(s.grafikNotu.length).toBeGreaterThan(0)
+      expect(s.grafikNotu[0].textContent).toBe('silentFanWizard.cardChartCurve')
+      expect(s.yaklasikNotu).toHaveLength(0)
+      expect(s.etiketYaklasik).toHaveLength(0)
+      expect(s.etiketTam.length).toBeGreaterThan(0)
+    })
+
+    it('6 nokta kaynaksız: ikisi de YOK (hiçbir şey iddia edilmez)', async () => {
+      const s = await sonuc(ALTI_NOKTA)
+      expect(s.grafikNotu).toHaveLength(0)
+      expect(s.yaklasikNotu).toHaveLength(0)
+      expect(s.etiketYaklasik).toHaveLength(0)
+    })
+
+    it('6 nokta + kitapcik_tablo ya da tanınmayan değer: not YOK; ham kaynak metni ekrana basılmaz', async () => {
+      for (const kaynak of ['kitapcik_tablo', 'olculmus']) {
+        const s = await sonuc(ALTI_NOKTA, kaynak)
+        expect(s.grafikNotu, kaynak).toHaveLength(0)
+        expect(s.yaklasikNotu, kaynak).toHaveLength(0)
+        expect(document.body.textContent).not.toContain(kaynak)
+        cleanup()
+      }
+    })
+
+    it('3 nokta: kaynak kitapcik_grafik dese de YAKLAŞIK notu (karar 316/317), grafik notu yok', async () => {
+      const s = await sonuc(UC_NOKTA, 'kitapcik_grafik')
+      expect(s.yaklasikNotu.length).toBeGreaterThan(0)
+      expect(s.etiketYaklasik.length).toBeGreaterThan(0)
+      expect(s.grafikNotu).toHaveLength(0)
+    })
+
+    it('5 nokta + turetilmis: YAKLAŞIK (nokta sayısı ne olursa olsun), grafik notu yok', async () => {
+      const s = await sonuc(BES_NOKTA, 'turetilmis')
+      expect(s.yaklasikNotu.length).toBeGreaterThan(0)
+      expect(s.etiketYaklasik.length).toBeGreaterThan(0)
+      expect(s.grafikNotu).toHaveLength(0)
+    })
   })
 
   it('⭐sorgu patlarsa hata YUTULMAZ — kullanıcı görür', async () => {

@@ -27,6 +27,7 @@ import { ProductSmartInference } from '../../components/product/ProductSmartInfe
 import { AddToProjectModal } from '../../components/products'
 import { AileKirintisi } from '../../components/products/AileKirintisi'
 import FamilyCard from '../../components/products/FamilyCard'
+import { PqEgriNotu } from '../../components/products/PqEgriNotu'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
@@ -38,7 +39,6 @@ import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { selectVariant } from '../../lib/data/selectVariant'
-import { egriYaklasikMi } from '../../lib/hvac/ductFanSelection'
 import { familyName } from '../../lib/i18n/familyName'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
@@ -1048,10 +1048,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                                         <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
                                         <span className="text-xs font-black text-industrial-gray text-right">
                                           {formatSpecValue(key, val, t)}
-                                          {key === 'pq_curve' && egriYaklasikMi(val) && (
-                                            <span className="block text-xs font-normal normal-case tracking-normal text-steel-gray" data-testid="yaklasik-egri-notu">
-                                              {t('pdp.labels.approxCurve')}
-                                            </span>
+                                          {key === 'pq_curve' && (
+                                            <PqEgriNotu
+                                              egri={val}
+                                              kaynak={selectedVariant.technical_specs?.pq_curve_kaynak}
+                                              t={t}
+                                            />
                                           )}
                                         </span>
                                       </div>

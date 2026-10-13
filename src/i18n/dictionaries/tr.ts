@@ -1921,6 +1921,7 @@ export const tr = {
       category: 'Kategori',
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       approxCurve: 'Yaklaşık eğri — üretici grafiğinden ayrıntılandırılıyor.',
+      curveFromChart: 'Eğri, üretici kataloğundaki grafikten okunmuştur.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Teknik Özet',
       /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
@@ -3132,6 +3133,7 @@ export const tr = {
     cardDelivers: 'Kanalınızda hesaplanan',
     cardDeliversApprox: 'Kanalınızda hesaplanan (yaklaşık)',
     cardApproxCurve: 'Yaklaşık eğri — üretici grafiğinden ayrıntılandırılıyor. Bu modelin yeterliliğini üreticiyle doğrulayın.',
+    cardChartCurve: 'Eğri, üretici kataloğundaki grafikten okunmuştur.',
     cardNoise: 'Ses seviyesi',
     cardDiameter: 'Bağlantı çapı',
     cardCta: 'Ürünü incele',
