@@ -66,8 +66,13 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
 - Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
   bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
 - **Gövdede iç bağlantı (URN-21, 2026-10-03):** "yetim yok" yetmez; sayfaya giden bağlantının **gövdeden** (header/nav/footer
-  hariç, ham HTML) gelmesi gerekir. Aile ve model sayfasında: (a) görünür kırıntıda kategori + marka (+ alt kategori; model
-  sayfasında aile) gerçek `<a href>`, aile sayfasında **≥2**, son basamak bağlantısız ve `aria-current="page"`; (b) "Modeller"
+  hariç, ham HTML) gelmesi gerekir. Aile ve model sayfasında: (a) görünür kırıntıda ana kategori (+ alt kategori; model
+  sayfasında aile) gerçek `<a href>`, aile sayfasında **≥2** (Ana Sayfa + ana kategori), son basamak bağlantısız ve
+  `aria-current="page"`; **kırıntıda marka basamağı YOKTUR** (URN-126, canlıda ölçüldü 2026-10-13: `/tr/products/seat-serisi`
+  BreadcrumbList = Ana Sayfa › Fanlar › Korozyona ve Aside Dayanımlı Fanlar › aile adı); markaya bağlantı kırıntının değil sayfadaki
+  **üretici bloğunun** işidir (H1 üstünde, "ÜRETİCİ VERİSİ" etiketinin yanında, `/tr/brands/<marka>` ya da yeni şemada
+  `/tr/markalar/<marka>`) ve **≥1** olmalıdır; `bot-karnesi` aile sayfasında bunu sayar, 0 ise `MARKA-BAGLANTISI-YOK` kırmızıdır
+  (SEO-40); (b) "Modeller"
   bölümünde her model satırı **tam 1** `<a href>` (model adresi; bayrak kapalıyken `?sku=` biçimi, K3-b açılınca modelin kendi
   adresi), `<button>` değil; (c) kırıntı JSON-LD BreadcrumbList ile **aynı diziden** gelir (`src/lib/seo/kirinti.ts`
   `aileKirintiAdimlari`; ikinci bir kurucu yazılmaz); (d) mobilde bu bağlantılar en az 44px (`min-h-11`). Ağsız kapılar:
