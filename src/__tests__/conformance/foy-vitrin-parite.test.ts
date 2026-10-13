@@ -202,6 +202,34 @@ describe('INV-FOY-PARITE-1 · föy ile vitrin AYNI çıktıyı üretir', () => {
   })
 
   /**
+   * INV-FOY-GIZLI-ANAHTAR-1 (URN-127, karar 348). `pq_curve_kaynak` eğrinin iç kaynak etiketidir
+   * (`kitapcik_grafik` vb. makine metni); ne vitrinde ne müşteriye giden föyde SATIR olarak basılır.
+   * Föy `groupTechnicalSpecs`'i kullandığı için süzgeç tek yerdedir; bu kol iki yüzeyin de çıkarmadığını ve
+   * `pq_curve` dahil diğer satırların yerinde kaldığını ve ikisinin AYNI kaldığını ölçer.
+   */
+  it('INV-FOY-GIZLI-ANAHTAR-1: pq_curve_kaynak vitrinde ve föyde satır olmaz; pq_curve ve diğerleri aynen durur', () => {
+    const specs: Record<string, unknown> = {
+      ...URUN_17160,
+      pq_curve: '[[0, 210.9], [100, 190], [255, 105.5], [380, 55], [450, 25], [510, 0]]',
+      pq_curve_kaynak: 'kitapcik_grafik',
+    }
+    const foy = buildSpecRows(specs, { t })
+    const vitrin = vitrinSatirlari(specs)
+    const metin = (satirlar: string[][]) => satirlar.map((s) => s.join(' = ')).join('\n')
+
+    for (const [ad, satirlar] of [['föy', foy], ['vitrin', vitrin]] as const) {
+      expect(metin([...satirlar]), `${ad}: iç kaynak etiketi müşteriye basılıyor`).not.toMatch(/kitapcik_|Pq Curve Kaynak|pq_curve_kaynak/i)
+    }
+    expect(foy, 'föy ile vitrin ayrışmış').toEqual(vitrin)
+
+    // Kaynak anahtarı OLMAYAN aynı fikstürle satır kümesi aynıdır: süzgeç yalnız o anahtarı kaldırır.
+    const etiketsiz = buildSpecRows({ ...specs, pq_curve_kaynak: undefined }, { t })
+    expect(foy).toEqual(etiketsiz)
+    // pq_curve satırı yerinde duruyor (kapı boş kümede yeşil olmasın).
+    expect(foy.some(([, v]) => v.startsWith('[[0, 210.9]')), 'pq_curve satırı kaybolmuş').toBe(true)
+  })
+
+  /**
    * INV-SPEC-HAM-DEGER-1 (URN-58, karar 298). Canlıda Lineo Quiet ailesinin teknik tablosunda "Zamanlayıcı false",
    * "ErP Uyumlu true", "Higrostat false" görünüyordu (formatSpecValue `String(value)` basıyordu, gövde çift olduğu
    * için her biri iki kez); ses satırı da hangi koşulda ölçüldüğünü söylemeden "26.1 dB(A)" diyordu. Bu kol GERÇEK
