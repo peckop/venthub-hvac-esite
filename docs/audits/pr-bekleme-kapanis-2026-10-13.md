@@ -83,6 +83,8 @@ Bozma ölçümü: 709 bozma denendi, 306'sı yakalanmadı; 347 dosyanın 345'i e
 
 Önerim A: kazanç küçük (46 sn), gevşeyen koruma belge kapılarının tamamı.
 
+**Sonuç (13 Ekim 2026): karar 351, seçenek A.** Belge PR hedefi ≤2:00; kapılar gevşemedi. Hedef `docs/standards/test-karnesi-standard.md` §8'e yazıldı (cetvel 1.3). Kod PR hedefi ≤4:00 aynen kalır, ALT-80 sürer.
+
 ## 7. Açık işler (hepsi kartlı)
 
 | Kart | İş | Durum |

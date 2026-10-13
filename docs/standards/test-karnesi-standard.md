@@ -1,6 +1,6 @@
-# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.2
+# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.3
 
-**Sürüm 1.2 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-09 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b**
+**Sürüm 1.3 · 2026-10-13 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-13 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -571,3 +571,17 @@ Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz):
 5. **`INV-TEST-BEYAN-1` kurulu değil.** "Beyansız yeni test birleşmez" kuralı her yeni test başlığına `TETİK:` / `YER:` yazma zorunluluğu getirir; bu yeni bir
    zorunluluktur ve ayrı karar ister. Okuyucu ve taban (`beyan.cjs`, `beyan-tabani.json`) hazırdır; kapı karar sonrası eklenir.
 6. **Ölçüm tek makinede** (Windows) yapıldı; Linux'ta farklı kolu izleyen test (platforma bağlı atlama) farklı çıkabilir. CI'da dosya başına süre ölçülmedi.
+
+## 8. PR bekleme süresi hedefi (ALT-38 kapanışı, karar 351)
+
+Bu bölüm testlerin kendisini değil, bir PR'ın birleşmeye kadar beklediği süreyi yönetir. Hedefler medyan içindir.
+
+| Sınıf | Hedef (medyan) | Son ölçüm (11 Ekim 21:13 TR sonrası, 37 PR) | Durum |
+|---|---|---|---|
+| Belge PR | **≤ 2:00** | 1:46 (n=9), p90 1:59 | Tutuyor, örnek küçük |
+| Kod PR | **≤ 4:00** | 4:35 (n=27), p90 4:56 | Tutmuyor; kaldıraç `ci` içinde Lint ∥ Build (ALT-80) |
+
+- **Belge hedefi 1:00 idi, 2:00 oldu (karar 351, 13 Ekim 2026).** Seçenek A uygulandı: hedef ölçülen medyana göre çekildi, hiçbir kapı gevşemedi. Seçenek B (belge PR'ında 4 test dilimini atlamak) **reddedildi**; belge PR'ı belge yapısı kapılarına (`arac-envanteri`, `mutlak-yol-sizintisi`, `belge-tazelik` gibi) dokunan PR olduğundan atlama PR'da o korumayı kaldırır (§6.7 ölçümü: son ayda 17 belge PR kırmızısının 10'u PR'da görünmezdi).
+- **Bekleme tanımı:** birleşen PR'ın son uç SHA'sındaki her kontrolün son koşusu; ilk başlama → son bitiş, Vercel hariç. Sınıf dosya yolundan yaklaşıktır (hepsi `docs/` ya da `.md` ise belge); CI'ın kendi sınıflayıcısı değildir. 15 dk üstü uç değerler ayrı sayılır. Ayrıntı: `docs/audits/pr-bekleme-kapanis-2026-10-13.md` §3.
+- **Bu hedefi zorlayan kapı YOKTUR.** Süre bir test değil ölçümdür; yeniden ölçüm kartla yapılır (ALT-80 teslimi sonrası önce/sonra). Hedef tutmazsa tek yetkili yol kaldıracı (ALT-80) ilerletmektir; kapıyı ya da testi atlamak yol değildir.
+- **Ölçülmedi:** belge PR'ında test dilimleri atlansaydı `ci` süresi (atlanmış koşu yok); Lint ∥ Build paralel koşunun gerçek kazancı.
