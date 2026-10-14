@@ -32,6 +32,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const { execFileSync } = require('child_process')
 
 /** Env'den asıl kimlik. Boş/bozuk değer YOK sayılır — yarım kimlik en kötü kimliktir. */
 function envSid() {
@@ -113,6 +114,30 @@ function bagliWorktreeMi(gitDir) {
 }
 
 /**
+ * ⭐TEST YALITIMINDA GERÇEK DEPOYA KİMLİK YAZILMAZ / SİLİNMEZ (ARC-130, 14 Ekim 2026).
+ *
+ * ARC-129 vitest HOME/USERPROFILE'ı geçici dizine yönlendirir; ama `venthub-sid` HOME'da değil, worktree'nin
+ * GIT dizininde yaşar (`<ortak>/worktrees/<ad>/venthub-sid`) ve HOME yalıtımı onu KAPSAMAZ. Gerçek worktree
+ * cwd'siyle koşan kanca testi geçerli (UUID) bir sid ile o dosyayı yeniden ezebilir; ortak ağaçta ise eski
+ * kimliği SİLEBİLİR. Test yalıtım modu (`VENTHUB_HOME_YALITIMI_DIZINI` dolu: vitest globalSetup koyar) ve hedef
+ * git dizini BU dosyanın deposuna aitse yazma/silme yapılmaz. `git init` ile açılan geçici depolar başka
+ * ortak dizindedir: yazmaya devam eder (kimlik yazan testler çalışır). Git ölçülemezse test modunda KORUR.
+ */
+function gercekDepoyaAitMi(gitDir, env = process.env) {
+  if (!env.VENTHUB_HOME_YALITIMI_DIZINI) return false
+  try {
+    const kok = path.resolve(__dirname, '..', '..')
+    const ham = execFileSync('git', ['rev-parse', '--git-common-dir'], { cwd: kok, encoding: 'utf8', timeout: 10000 }).trim()
+    const norm = (p) => path.resolve(p).replace(/\/g, '/').toLowerCase()
+    const ortak = norm(path.resolve(kok, ham))
+    const g = norm(gitDir)
+    return g === ortak || g.startsWith(ortak + '/')
+  } catch {
+    return true
+  }
+}
+
+/**
  * Bayat dosyayı ASIL kimlikle onar. Yan etki GİZLİ DEĞİLDİR: çağıran uyarıyı basar.
  * Onarım başarısızsa sessiz kalır — kapının işi commit'i geçirmek/durdurmak, dosya yazmak değil.
  *
@@ -124,6 +149,7 @@ function bagliWorktreeMi(gitDir) {
  */
 function onar(gitDir, sid) {
   if (!bagliWorktreeMi(gitDir)) return false
+  if (gercekDepoyaAitMi(gitDir)) return false
   try {
     fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
     return true
@@ -132,4 +158,4 @@ function onar(gitDir, sid) {
   }
 }
 
-module.exports = { coz, onar, envSid, dosyaSid, bagliWorktreeMi }
+module.exports = { coz, onar, envSid, dosyaSid, bagliWorktreeMi, gercekDepoyaAitMi }
