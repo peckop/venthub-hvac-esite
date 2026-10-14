@@ -51,6 +51,7 @@ type Uretici = {
   serilestir: (h: Harita) => string
   kontrolEt: (kok: string, testler: string[], harita?: Harita | null, metin?: string | null) => { sorunlar: string[]; bilgi: { bayat: string[]; kayitsiz: string[]; hayalet: string[] } }
   kodGlobTaramasi: (kok: string, dosyalar: string[], testMi: (d: string) => boolean) => { desenler: string[]; belirsiz: string[] }
+  argumanlariCoz: (argv: string[]) => { bayat: boolean; esik: number | null; kontrol: boolean; yalniz: string[] }
 }
 type Secici = {
   TEST_DESENI: RegExp
@@ -398,6 +399,29 @@ const SENARYOLAR: Senaryo[] = [
       esit(bilgi.bilgi.hayalet, ['src/hayalet.test.ts'], 'hayalet')
     },
   },
+  {
+    // ALT-83: bayat + kayıtsız test "her zaman koşar" (kırmızı değil) ama sayısı eşiği aşınca harita TAZELENMELİ; `--bayat` o testleri TEK komutta yeniden ölçer.
+    ad: 'argumanlariCoz: --bayat tek başına açılır; --esik yalnız --kontrol ile ve sıfır/pozitif tam sayıyla; --bayat diğer kiplerle birleşmez',
+    kos: (u) => {
+      const hata = (argv: string[]): boolean => {
+        try {
+          u.argumanlariCoz(argv)
+          return false
+        } catch {
+          return true
+        }
+      }
+      esit(u.argumanlariCoz(['--bayat']).bayat, true, '--bayat açılır')
+      esit(u.argumanlariCoz([]).bayat, false, '--bayat varsayılan kapalı')
+      esit(u.argumanlariCoz(['--kontrol', '--esik', '12']).esik, 12, '--esik sayıdır')
+      esit(u.argumanlariCoz(['--kontrol']).esik, null, '--esik varsayılan yok')
+      dogru(hata(['--esik', '12']), '--esik --kontrol olmadan reddedilir')
+      dogru(hata(['--kontrol', '--esik', 'x']), '--esik sayı olmalı')
+      dogru(hata(['--kontrol', '--esik', '-1']), '--esik negatif olamaz')
+      dogru(hata(['--bayat', '--kontrol']), '--bayat --kontrol ile birleşmez')
+      dogru(hata(['--bayat', '--yalniz', 'a.test.ts']), '--bayat --yalniz ile birleşmez')
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------------------------------------------------------
@@ -440,6 +464,10 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: 'birden çok vitest sonuç dosyası okunmaz (yalnız vitest.json)', eski: '/^vitest(?:-\\d+)?\\.json$/', yeni: '/^vitest\\.json$/' },
   { ad: 'parti bölmesi parça sayısını bozar (Math.ceil yerine floor)', eski: 'Math.max(1, Math.ceil(liste.length / n))', yeni: 'Math.max(1, Math.floor(liste.length / n))' },
   { ad: 'kısmi sonuç dosyasının atlanması: ölçülen süre kaybolur', eski: 'sn: Math.max(0, (r.endTime - r.startTime) / 1000),', yeni: '' },
+  { ad: '--bayat bayrağı açılmaz', eski: "if (a === '--bayat') s.bayat = true;", yeni: "if (a === '--bayat') s.bayat = false;" },
+  { ad: '--esik --kontrol olmadan sessiz kabul edilir', eski: "if (s.esik !== null && !s.kontrol) throw new Error('--esik yalnız --kontrol ile kullanılır');", yeni: '' },
+  { ad: '--esik sayı doğrulaması kalkar', eski: "if (s.esik !== null && (!Number.isInteger(s.esik) || s.esik < 0)) throw new Error('--esik sıfır ya da pozitif tam sayı olmalı');", yeni: '' },
+  { ad: '--bayat başka kiplerle birleşebilir', eski: "if (s.bayat && (s.yalniz.length > 0 || s.kontrol || s.ham || s.devam)) throw new Error('--bayat, --yalniz/--kontrol/--ham/--devam ile birlikte verilemez');", yeni: '' },
 ]
 
 function sabotajliModul(sabotaj: Sabotaj, dizin: string, sira: number): Uretici {
@@ -478,6 +506,25 @@ describe('INV-TEST-HARITA-1 · 6. DEPODAKİ HARİTA (scripts/ci/test-haritasi.js
     expect(S.haritaSorunu(harita)).toBeNull()
     const k = U.kontrolEt(KOK, [], harita, metin)
     expect(k.sorunlar, `harita bayat ya da bozuk — onarım: node scripts/ci/test-haritasi-uret.cjs\n${k.sorunlar.join('\n')}`).toEqual([])
+  })
+
+  // ALT-83 (karar 351 sonrası): bayat/kayıtsız test KIRMIZI DEĞİLDİR (seçicide "her zaman koşar", güvenli yön) ama sayısı sınırsız büyürse yerel seçim
+  // ve CI shard'ları sessizce genişler (14 Ekim: 739 testin 231'i her zaman koşuyordu, 8 Ekim'den beri hiç kimse haritayı tazelememişti).
+  // Bakım kuralı yazılıydı ("birleşmeden sonra --yalniz"); tetikleyen yoktu. Bu eşik tetikleyicidir. Liste `git ls-files` ile kurulur (vitest'in listesinin
+  // ÜST KÜMESİ; dışlanan testler kayıtsız sayılır: eşiğe sabit bir pay ekler, bozmaz).
+  it('bayat + kayıtsız test sayısı git listesinin %20\'sini AŞMAZ (haritayı tazele: node scripts/ci/test-haritasi-uret.cjs --bayat)', () => {
+    const liste = execFileSync('git', ['ls-files', '-z'], { cwd: KOK, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+      .split('\0')
+      .filter((y) => y !== '' && S.TEST_DESENI.test(y))
+    expect(liste.length).toBeGreaterThan(300)
+    const k = U.kontrolEt(KOK, liste, harita, metin)
+    const toplam = k.bilgi.bayat.length + k.bilgi.kayitsiz.length
+    const esik = Math.floor(liste.length * 0.2)
+    expect(
+      toplam,
+      `harita çürüdü: bayat ${k.bilgi.bayat.length} + kayıtsız ${k.bilgi.kayitsiz.length} = ${toplam} test, eşik ${esik} (git listesi ${liste.length}). Tazele: node scripts/ci/test-haritasi-uret.cjs --bayat\n` +
+        `ilk bayatlar: ${k.bilgi.bayat.slice(0, 5).join(', ')}\nilk kayıtsızlar: ${k.bilgi.kayitsiz.slice(0, 5).join(', ')}`,
+    ).toBeLessThanOrEqual(esik)
   })
 
   it('her kayıt bir test dosyasına ait; yollar köke göreli POSIX, `..`/mutlak/ters bölü/node_modules içermez; diziler tekil', () => {

@@ -21,6 +21,21 @@ function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
 }
 
+/**
+ * ⭐TEST YALITIMINDA GERÇEK DEPONUN KİMLİK DOSYASINA DOKUNULMAZ (ARC-130, 14 Ekim 2026).
+ * `venthub-sid` HOME'da değil git dizininde yaşar; vitest HOME yalıtımı (ARC-129) onu kapsamaz. Yalıtım modunda
+ * (`VENTHUB_HOME_YALITIMI_DIZINI` dolu) ve hedef dizin BU deponun git dizini ise yazma ve silme yapılmaz.
+ * Üretimde değişken yoktur: davranış aynı. Yardımcı yüklenemezse yalıtım modunda KORUR (kapalı kalır).
+ */
+function gercekDepoKorunuyor(dizin) {
+  if (!process.env.VENTHUB_HOME_YALITIMI_DIZINI) return false
+  try {
+    return require('../../scripts/board/kimlik.cjs').gercekDepoyaAitMi(dizin) === true
+  } catch {
+    return true
+  }
+}
+
 let input = {}
 try { input = JSON.parse(readStdin() || '{}') } catch { input = {} }
 
@@ -82,7 +97,9 @@ try {
     const eski = path.join(path.resolve(gitCwd, gitDir), 'venthub-sid')
     let temizlendi = ''
     try {
-      if (fs.existsSync(eski)) {
+      if (gercekDepoKorunuyor(path.resolve(gitCwd, gitDir))) {
+        process.stderr.write('[session-board] test yalitimi — gercek deponun venthub-sid dosyasi SILINMEDI (ARC-130).\n')
+      } else if (fs.existsSync(eski)) {
         temizlendi = fs.readFileSync(eski, 'utf8').trim().slice(0, 8)
         fs.unlinkSync(eski)
       }
@@ -103,6 +120,8 @@ try {
      * böyle sildi. Gerçek oturum numarası her zaman UUID'dir; UUID olmayan sid kimlik dosyasına yazılmaz.
      */
     process.stderr.write('[session-board] sid UUID degil (' + String(sid).slice(0, 12) + '…) — venthub-sid YAZILMADI (uydurma kimlik).\n')
+  } else if (gitDir && gercekDepoKorunuyor(gitDir)) {
+    process.stderr.write('[session-board] test yalitimi — gercek deponun venthub-sid dosyasi YAZILMADI (ARC-130).\n')
   } else if (gitDir) {
     fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
   }
@@ -665,9 +684,10 @@ try {
   bolum('filo', 4,
     'FILO ILETISIMI: dogrudan mesaj (SendMessage) + is bitince notify_when_idle; kapali pencereye ' +
     'mailbox_manage send (alici = TAM oturum kimligi, kisa 8 hane SESSIZCE duser). Pano = claim + canlilik, ' +
-    'NOT KUTUSU DEGIL. Emir = Linear kaydi. Zamanlayici/cron/loop ONCE Recep ile (karar 53). ' +
-    'Kutuya sir ve Recep onayi yazilmaz. Ayrinti: docs/standards/fleet-mechanism-standard.md\n',
-    'FILO: SendMessage + notify_when_idle; emir = Linear; ayrinti fleet-mechanism-standard.md\n')
+    'NOT KUTUSU DEGIL. Emir = Kanban karti (Linear emekli, karar 324). Zamanlayici/cron/loop ONCE Recep ile (karar 53). ' +
+    'Kutuya sir ve Recep onayi yazilmaz. Ayrinti: docs/standards/fleet-mechanism-standard.md\n' +
+    'OPS ADRESI: SendMessage to="OPS" (ciplak ad; ListAgents [ref] ve local_ kimligi hafizaya YAZILMAZ, her resume\'de degisir)\n',
+    'FILO: SendMessage + notify_when_idle; OPS ADRESI: to="OPS" (ciplak ad); ayrinti fleet-mechanism-standard.md\n')
 
   bolum('pano', 5, kisaPano(board.summary(sid)) + '\n', 'PANO: node scripts/board/board.cjs who\n')
 
@@ -750,6 +770,20 @@ const yaz = () => {
     })
   } catch (e) {
     bolum('posta', 1, `⚠posta kutusu sayaci yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — kutu OLCULMEDI.\n`)
+  }
+  // WRONGSTACK MCP AYAR SATIRI (ARC-128, 14 Ekim): disabledMcpjsonServers'ta adı geçen ya da .mcp.json'da olmayan
+  // sunucuyu açılışta söyle (OPS penceresinin bağlantı sorunu ayardan çıktı ve görünmedi). Yalnız AYAR; bağlantıyı
+  // yukarıdaki posta sayacı ölçer. Uyarı öncelik 1, temiz satır 5 (bütçe dolunca temiz satır düşer).
+  try {
+    const wb = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'wrongstack-baglanti.cjs'))
+    const s = wb.incele({
+      cwd: input.cwd || process.cwd(),
+      kok: path.join(__dirname, '..', '..'),
+      home: require('os').homedir(),
+    })
+    bolum('wrongstack-mcp', wb.uyariVar(s) ? 1 : 5, wb.acilisSatiri(s))
+  } catch (e) {
+    bolum('wrongstack-mcp', 1, `⚠WRONGSTACK MCP satiri yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — devre disi durumu OLCULMEDI.\n`)
   }
   yaz()
 })()
