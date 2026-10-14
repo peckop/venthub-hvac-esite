@@ -176,6 +176,85 @@ export function kalipDenetle(md) {
   return kirmizi
 }
 
+// ─── başlık yapısı (R11; UYARI, KIRMIZI DEĞİL) ────────────────────────────────
+/**
+ * R11 İLKE kuralları (Y2 alt başlık tek başına anlamlı, Y3 doldurma yok). Google'ın resmî belgelerinde
+ * H2/H3 için konu ifadesi şartı ve sayısal eşik YOKTUR (R11.2, 2026-10-14 ölçümü); bu yüzden kol
+ * `kirmizi` dizisine DEĞİL ayrı bir `uyari` dizisine yazar ve eşikler bizimdir. Kırmızıya terfi ettirilmez:
+ * ürün/model adı taşıyan meşru başlık ("Danfoss FC 51… karşılaştırması") konu terimi taşımaz.
+ *
+ * Konu terimleri: H1 metninden (yoksa ön bilgideki `baslik:`) + ön bilgideki `konu_terimleri:` satırından.
+ * Soru/fiil sözcükleri ve 3 harften kısa sözcükler terim sayılmaz; terim = ilk 5 harf (Türkçe ek, kök eşleşir).
+ */
+export const BASLIK_DURAK = new Set([
+  'nedir', 'nasıl', 'neden', 'nelerdir', 'nelere', 'hangi', 'midir', 'mıdır', 'mudur', 'müdür', 'için', 'gibi',
+  'farkı', 'fark', 'seçilir', 'seçim', 'seçin', 'kullanılır', 'bakılır', 'yapılır', 'olur', 'ile', 'veya', 'daha',
+  'kadar', 'nerede', 'zaman', 'nelerdir', 'hakkında', 'başlıca', 'tüm',
+])
+export const BASLIK_ESIKLERI = { enAzH2: 4, konuOraniAlti: 0.5, tekrarUstu: 0.6, kokUzunluk: 5 }
+
+const kucuk = (s) => s.toLocaleLowerCase('tr')
+const kelimeler = (s) => kucuk(s).match(/[\p{L}\p{N}]+/gu) || []
+const kok = (w) => w.slice(0, BASLIK_ESIKLERI.kokUzunluk)
+
+/** `# Başlık` (ön bilgi atılmış) ya da ön bilgideki `baslik:`; yoksa null. */
+function h1Metni(md) {
+  const metin = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '')
+  const m = metin.match(/^#\s+(.+)$/m)
+  return m ? m[1].trim() : null
+}
+
+/** H1/baslik + konu_terimleri → kök dizisi (sıra korunur, tekrar atılır). */
+export function konuTerimleri(md) {
+  const { onBilgi } = bolumle(md)
+  const h1 = h1Metni(md) || onBilgi.baslik || ''
+  const adaylar = kelimeler(h1).filter((w) => w.length >= 3 && !BASLIK_DURAK.has(w) && !/^\d+$/.test(w))
+  const ek = (onBilgi.konu_terimleri || '').split(',').flatMap((s) => kelimeler(s))
+  return [...new Set([...adaylar, ...ek].map(kok))]
+}
+
+/** Zorunlu bölümler hariç `## ` başlıkları (üçüncü seviye ve H1 hariç). */
+export function h2Basliklari(md) {
+  const metin = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '')
+  return metin
+    .split('\n')
+    .map((s) => s.match(/^##\s+(.+?)\s*$/))
+    .filter(Boolean)
+    .map((m) => m[1])
+    .filter((b) => !ZORUNLU_BOLUMLER.includes(b))
+}
+
+/**
+ * @returns {{ uyari: { sinif: string, ayrinti: string }[], olcu: { h2: number, konulu: number, oran: number, tekrar: number, terimler: string[] } }}
+ */
+export function baslikDenetle(md) {
+  const uyari = []
+  const terimler = konuTerimleri(md)
+  const basliklar = h2Basliklari(md)
+  const tasir = (b, terim) => kelimeler(b).some((w) => w.startsWith(terim))
+  const konulu = basliklar.filter((b) => terimler.some((t) => tasir(b, t)))
+  // Ana ifade = ilk iki konu terimi (tek terimse o): "radyal fan"/"frekans konvertörü" gibi baştaki ad öbeği
+  const ana = terimler.slice(0, 2)
+  const tekrarEden = ana.length ? basliklar.filter((b) => ana.every((t) => tasir(b, t))) : []
+  const n = basliklar.length
+  const oran = n ? konulu.length / n : 1
+  const tekrar = n ? tekrarEden.length / n : 0
+  if (n >= BASLIK_ESIKLERI.enAzH2 && terimler.length && oran < BASLIK_ESIKLERI.konuOraniAlti) {
+    const yok = basliklar.filter((b) => !konulu.includes(b))
+    uyari.push({
+      sinif: 'BASLIK-KONU-ORANI',
+      ayrinti: `${n} H2'den ${konulu.length}'i konu terimi (${terimler.join(', ')}) taşıyor (oran ${oran.toFixed(2)} < ${BASLIK_ESIKLERI.konuOraniAlti}); taşımayanlar: ${yok.map((b) => `"${b}"`).join(' · ')}`,
+    })
+  }
+  if (n >= BASLIK_ESIKLERI.enAzH2 && ana.length && tekrar > BASLIK_ESIKLERI.tekrarUstu) {
+    uyari.push({
+      sinif: 'BASLIK-TEKRAR',
+      ayrinti: `${n} H2'den ${tekrarEden.length}'i ana ifadeyi (${ana.join(' + ')}) tekrarlıyor (oran ${tekrar.toFixed(2)} > ${BASLIK_ESIKLERI.tekrarUstu}); doğal olmayan tekrar doldurmadır (R11.3 Y3)`,
+    })
+  }
+  return { uyari, olcu: { h2: n, konulu: konulu.length, oran, tekrar, terimler } }
+}
+
 // ─── iç bağlantı (R3) ──────────────────────────────────────────────────────────
 /**
  * Site içi bağlantı metne düz adresle yazılmaz, KİMLİKLE yazılır: `[metin](vh:<tür>/<anahtar>)`.
@@ -217,7 +296,7 @@ export function icBaglantiDenetle(govde) {
  * @typedef {{ metin: string, kaynak?: number[], alinti?: string, tur?: 'sayi'|'olumsuz'|'mevzuat'|'genel'|string }} Iddia
  * @param {string} md
  * @param {{ iddialar?: Iddia[], rakipler?: string[] }} [secenek]
- * @returns {{ kirmizi: { sinif: string, ayrinti: string }[], ozet: { cumle: number, atif: number, kaynak: number, olumsuz: number, mevzuat: number } }}
+ * @returns {{ kirmizi: { sinif: string, ayrinti: string }[], uyari: { sinif: string, ayrinti: string }[], ozet: { cumle: number, atif: number, kaynak: number, olumsuz: number, mevzuat: number } }}
  */
 export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
   const kirmizi = []
@@ -267,5 +346,8 @@ export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
   // 6. İç bağlantı kimlikle (R3; ağlı yarısı `ic-baglanti-denetle.mjs`)
   kirmizi.push(...icBaglantiDenetle(taranan))
 
-  return { kirmizi, ozet: { cumle: birimler.length, atif: kullanilan.size, kaynak: kaynaklar.size, olumsuz: olumsuzlar.length, mevzuat: mevzuatlar.length } }
+  // 7. Başlık yapısı (R11): UYARI, `kirmizi` dizisine GİRMEZ (resmî eşik yok, eşikler bizim)
+  const { uyari } = baslikDenetle(md)
+
+  return { kirmizi, uyari, ozet: { cumle: birimler.length, atif: kullanilan.size, kaynak: kaynaklar.size, olumsuz: olumsuzlar.length, mevzuat: mevzuatlar.length } }
 }
