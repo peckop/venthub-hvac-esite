@@ -14,7 +14,6 @@
  * VANA: `VENTHUB_KANBAN_ONARIM_KAPALI=1` kancayı tamamen susturur (test ve acil durum).
  */
 const path = require('node:path')
-const { spawn } = require('node:child_process')
 
 const ARAC = 'mcp__wrongstack-kanban__kanban_manage'
 const IZLENEN = new Set(['move_task', 'transition_task', 'update_task'])
@@ -74,11 +73,11 @@ function main() {
   const k = onarimGerekli(girdi)
   if (!k.gerekli) return
   const betik = path.join(__dirname, '..', '..', 'scripts', 'board', 'kanban-tutarlilik.cjs')
-  const args = [betik, '--onar', '--kart', k.kartKimligi]
+  const args = ['--onar', '--kart', k.kartKimligi]
   if (k.panoKimligi) args.push('--pano', k.panoKimligi)
   try {
-    const s = spawn(process.execPath, args, { detached: true, stdio: 'ignore', windowsHide: true })
-    s.unref()
+    // `detached: true` yalnız ortak başlatıcıda (INV-KOPUK-1, REC-415): konsolsuz süreç gizli-konsol ön yüklemesini alır.
+    require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs')).kopukBaslat(betik, args)
   } catch {
     /* tetiklenemedi: onarım bir sonraki taramada yapılır, çağrı bozulmaz */
   }
