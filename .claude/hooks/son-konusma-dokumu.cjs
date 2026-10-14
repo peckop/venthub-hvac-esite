@@ -287,6 +287,10 @@ function main() {
     const memoryDir = path.join(proje, 'memory')
     const hedef = dosyaYolu(memoryDir, sid)
     if (olay === 'Stop' && !dokumGerekli(kayit, hedef)) return
+    // ARC-131 (14 Ekim): pencere worktree'sinde transcript proje dizini (`...--claude-worktrees-<ad>`) vardır ama
+    // `memory/` YOKTUR; klasör olmadan geçici dosya yazımı ENOENT verir ve döküm hiç yazılmazdı (açılışta
+    // "son konusma dokumu YOK" uyarısının kök sebebi). Yoksa oluştur; varsa dokunmaz.
+    fs.mkdirSync(memoryDir, { recursive: true })
     // Yarım dosya SessionStart'ın okuduğu yerde kalmasın: önce geçici dosya, sonra yeniden adlandır.
     const gecici = path.join(memoryDir, `son-konusma-${sid}.yaz.md`)
     fs.writeFileSync(gecici, dokumUret(kayit, new Date(), olay))
