@@ -106,8 +106,8 @@ function satir(sid, simdi = Date.now()) {
   const tekil = new Map()
   for (const k of yeni) tekil.set(`${k.file || k.source}|${Math.floor(k.ts / TEKIL_MS)}`, k)
   const liste = [...tekil.values()].sort((a, b) => a.ts - b.ts)
-  const son5 = liste.slice(-3)
-  const parca = son5.map((k) => `${k.source}${k.file ? ' (' + path.posix.basename(k.file) + ')' : ''} ${saat(k.ts)}`).join(' · ')
+  const son3 = liste.slice(-3)
+  const parca = son3.map((k) => `${k.source}${k.file ? ' (' + path.posix.basename(k.file) + ')' : ''} ${saat(k.ts)}`).join(' · ')
   if (typeof sid === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid)) {
     try {
       okundu[sid] = Math.max(...yeni.map((k) => k.ts))
