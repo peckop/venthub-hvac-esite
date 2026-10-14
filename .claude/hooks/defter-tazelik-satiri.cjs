@@ -444,4 +444,18 @@ try {
   process.stdout.write('⚠SAHIPSIZ PR: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+/**
+ * ── AYAR DEĞİŞTİ (ARC-118, REC-529 madde 1) — EŞİKLİ ──
+ * Oturum içinde bir ayar (settings) ya da skill dosyası değiştiyse (ConfigChange olayının kaydı, Bash yolu dahil)
+ * son 30 dakikada bu oturuma bir kez konuşur, sonra susar. Yalnız küçük bir kayıt dosyası okunur. BLOKLAMAZ.
+ * Gerekçe ve kapsam sınırı: ayar-degisti-bekci.cjs.
+ */
+try {
+  const ab = require(path.join(__dirname, 'ayar-degisti-bekci.cjs'))
+  const s = ab.satir(String(girdi.session_id || ''), Date.now())
+  if (s) process.stdout.write(s + '\n')
+} catch (e) {
+  process.stdout.write('⚠AYAR DEGISTI: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)
