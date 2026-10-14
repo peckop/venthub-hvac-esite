@@ -86,9 +86,11 @@ gelmese de GEO-SEO canlı haritayı tabanla karşılaştırıp yeni adresi kendi
    yalnız bu adresler; aynı adres aynı gün ikinci kez istenmez). Bu istek için API yoktur: Google'ın Indexing API'si
    "yalnız JobPosting ya da VideoObject içindeki BroadcastEvent taşıyan sayfalar" içindir (Google belgesi, 2026-10-13
    okundu); URL denetimi API'si yalnız okur.
-4. **Bing URL Gönder** (API, tarayıcı oturumu gerekmez): `bing-webmaster-oku.mjs --gonder` (SEO-47) —
-   `GetUrlSubmissionQuota` ile kota okunur, `SubmitUrlBatch` ile gönderilir. Betik gelene kadar bu adım IndexNow
-   ile karşılanır ve kayda "Bing URL Gönder: SEO-47 bekliyor" yazılır.
+4. **Bing URL Gönder** (API, tarayıcı oturumu gerekmez): `bing-url-gonder.mjs --gonder <adresler|liste.txt>` (SEO-47) —
+   önce `GetUrlSubmissionQuota` ile kota okunur (okunamazsa hiçbir şey gönderilmez), her adres GET 200 ve kanonik
+   kendisi diye sınanır, sonra kota kadarı `SubmitUrlBatch` ile gönderilir; liste öncelik sırasındadır, kota
+   yetmezse sondakiler kalır (çıkış kodu 3). Önce `--kuru` ile sınanabilir; yalnız kota için `--kota`.
+   Ayrı betik olmasının sebebi: `bing-webmaster-oku.mjs` salt okuma sözleşmesindedir.
 5. **Harita.** Adres `sitemap.xml`de ve `lastmod` gerçek mi (Y3.1). Değilse istekten önce sahibine dönülür; Google
    haritayı kendi tarar, harita yeniden gönderilmez.
 6. **Kayıt.** Kartta: adres sayısı, saat, IndexNow yanıt kodu, Google istek sonucu ("istendi" ya da "kota aşıldı"),
@@ -99,7 +101,7 @@ gelmese de GEO-SEO canlı haritayı tabanla karşılaştırıp yeni adresi kendi
 | Kanal | Sınır | Kaynak ve ölçüm durumu | Dolunca |
 |---|---|---|---|
 | Google dizin isteği | Panelde yazmıyor (ölçüldü: URL denetimi sonuç sayfasında yalnız düğme var). **Planlama tabanı günde 10 adres**; gerçek sayı ilk "kota aşıldı" hatasında bu satıra yazılır | Search Console URL denetimi, 2026-10-13; Recep "sanırım 15" dedi, ölçülmedi | kalanlar ertesi gün ilk iş, aynı sıra |
-| Bing URL Gönder | 100 (Recep panelde gördü, 2026-10-13); API'den `GetUrlSubmissionQuota` ile ölçülecek (SEO-47) | Bing Webmaster API belgesi: toplu gönderim en çok 500 adres ve kotayı aşamaz | aynı |
+| Bing URL Gönder | **Günlük 100, aylık 1800** (ÖLÇÜLDÜ 2026-10-14: `bing-url-gonder.mjs --kota` → DailyQuota 100 · MonthlyQuota 1800, hiç gönderim yapılmadan; Recep panelde 100 görmüştü, doğrulandı). Gönderim sonrası bu sayıların "kalan" olarak düşüp düşmediği ilk gerçek gönderimde ölçülür | Bing Webmaster API belgesi: toplu gönderim en çok 500 adres ve kotayı aşamaz; betik `min(günlük, aylık)` kadarını gönderir | aynı |
 | IndexNow | pratikte sınırsız (betikte istek başına 10 000 adres) | `indexnow-bildir.mjs` | — |
 
 **Öncelik sırası** (yalnız Google sınırı dolarsa; Bing ve IndexNow'da hepsi gider):
