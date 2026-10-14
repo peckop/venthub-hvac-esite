@@ -313,6 +313,16 @@
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/patinaj-bekcisi.cjs\""
           }
         ]
+      },
+      {
+        "matcher": "mcp__wrongstack-kanban__kanban_manage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kanban-tutarlilik-onarimi.cjs\"",
+            "statusMessage": "kanban-tutarlilik-onarimi"
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -391,6 +401,18 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-yedek.cjs\"",
             "timeout": 45
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ayar-degisti-bekci.cjs\"",
+            "statusMessage": "ayar-degisti-bekci"
           }
         ]
       }
