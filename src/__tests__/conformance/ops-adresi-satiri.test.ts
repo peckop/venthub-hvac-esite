@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 /**
@@ -35,6 +36,8 @@ describe('INV-OPS-ADRES-1 · açılış satırında OPS adresi çıplak adla yaz
       expect(cikti, 'filo bölümünde OPS ADRESI satırı yok').toContain('OPS ADRESI')
       expect(cikti).toContain('to=\\"OPS\\"')
       expect(cikti).toMatch(/\[ref\]/)
+      // Linear iş kaydı olarak emekli (karar 324): açılış satırı emri Linear kaydı diye öğretmez.
+      expect(cikti, 'bayat "Emir = Linear kaydi" ifadesi geri geldi').not.toContain('Emir = Linear kaydi')
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true })
     }
