@@ -575,7 +575,7 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: 'tam sonucu sıralanmaz', eski: "testDosyalari.filter((t) => typeof t === 'string').sort()", yeni: "testDosyalari.filter((t) => typeof t === 'string')" },
   { ad: 'alt ağaç eşleşmesi önek sınırını kaybeder (standards-ekstra eşleşir)', eski: 'for (const u of uste) tumu(indeks.ozy.get(u));', yeni: 'for (const [k, v] of indeks.ozy) if (yol.startsWith(k)) tumu(v);' },
   { ad: 'bayat uyarısı tam sınırda da verilir (> yerine >=)', eski: 'bayatKayitsiz / liste.size > BAYAT_UYARI_ORANI', yeni: 'bayatKayitsiz / liste.size >= BAYAT_UYARI_ORANI' },
-  { ad: 'bayat uyarısı küçük listede de verilir', eski: 'liste.size >= BAYAT_UYARI_AZAMI_TEST && ', yeni: '' },
+  { ad: 'bayat uyarısı küçük listede de verilir', eski: 'liste.size >= BAYAT_UYARI_ASGARI_TEST && ', yeni: '' },
   { ad: 'bayat uyarısı tazeleme komutunu yazmaz', eski: 'tazele: node scripts/ci/test-haritasi-uret.cjs --bayat`', yeni: 'tazele`' },
 ]
 

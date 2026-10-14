@@ -73,8 +73,8 @@ const EN_UZUN_YOL = 1024;
 const NEDEN_AZAMI = 300;
 /** ALT-83b: bayat + kayıtsız test oranı bunu AŞARSA seçimin neden satırı tazeleme uyarısı taşır (bloklamaz); kırmızı eşik INV-TEST-HARITA-1'de yüzde 20. */
 const BAYAT_UYARI_ORANI = 0.1;
-/** Uyarı yalnız bu kadar ya da daha büyük test listesinde verilir (birim test düzenekleri küçük liste kurar). */
-const BAYAT_UYARI_AZAMI_TEST = 100;
+/** Uyarı yalnız bu ASGARİ sayıda ya da daha büyük test listesinde verilir (birim test düzenekleri küçük liste kurar). */
+const BAYAT_UYARI_ASGARI_TEST = 100;
 const GIT_CIKTI_AZAMI = 16 * 1024 * 1024;
 const GIT_ZAMAN_ASIMI_MS = 30000;
 const GIT_ARGUMANLARI = Object.freeze(['diff', '--name-only', '-z', '--no-renames', 'HEAD^1', 'HEAD']);
@@ -581,7 +581,7 @@ function secIc(girdi) {
   // `--yerel` çıktısı bu satırı zaten yazar. Küçük listelerde (birim test düzenekleri) uyarı verilmez. `%` işareti satirTemizle'de silindiği için "yüzde" yazılır.
   const bayatKayitsiz = bayat + kayitsiz;
   const bayatUyari =
-    tazeTestler && liste.size >= BAYAT_UYARI_AZAMI_TEST && bayatKayitsiz / liste.size > BAYAT_UYARI_ORANI
+    tazeTestler && liste.size >= BAYAT_UYARI_ASGARI_TEST && bayatKayitsiz / liste.size > BAYAT_UYARI_ORANI
       ? `; UYARI: harita yüzde ${Math.round((100 * bayatKayitsiz) / liste.size)} bayat/kayıtsız (${bayatKayitsiz}/${liste.size}), tazele: node scripts/ci/test-haritasi-uret.cjs --bayat`
       : '';
   neden.push(`her zaman koşan: ${belirsiz + kayitsiz + bayat} test (belirsiz ${belirsiz}, haritada yok ${kayitsiz}, bayat kayıt ${bayat})${bayatUyari}`);
