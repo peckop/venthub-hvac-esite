@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.0`, `@wrongstack/codebase-index-mcp@1.1.0`, `@wrongstack/kanban-mcp@1.1.0`, `@wrongstack/mailbox-mcp@1.1.0` (ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.2`, `@wrongstack/codebase-index-mcp@1.1.2`, `@wrongstack/kanban-mcp@1.1.2`, `@wrongstack/mailbox-mcp@1.1.2` (ARC-127, 14 Ekim: 1.1.0'dan; dört sarmalayıcı 1.1.2, içerideki `core`/`sage`/`kanban`/`tools` paketleri 1.1.0 PİNLİ kaldı, yani çalışma kodu yalnız sarmalayıcıda değişti; core skill'leri 1.1.0 ile 1.1.2 arasında BİREBİR aynı, ölçüldü; önceki: ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
 | **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
@@ -182,7 +182,7 @@ yeni etiket ya da kalıcı ölçüm bozulması işi KIRMIZI bitirir. Taban günc
    özet kesicisi (`kanbanTool.serialize` → pano okumayan eylemde panoyu {sütun → kart sayısı}
    özetine indirir) MCP yolunda **hiç çağrılmıyor**. 1.0.26'da da aynı satır (ölçüldü). Bedel:
    47 KB'lık panoda her `add_task`/`add_note`/`transition_task` 48,6 KB dönüyordu.
-   `yamalar/kanban-mcp-1.1.0-ozet-donus.patch` (1.0.26'dan ARC-94 ile yeniden üretildi: yukarı akım `signal.throwIfAborted()` ekleyince bağlam kaydı; yukarı akım hâlâ `{content: result}`) başarılı sonucu kesiciden geçirir; kesici girintili
+   `yamalar/kanban-mcp-1.1.2-ozet-donus.patch` (ARC-127: 1.1.2'de değişmeden uygulandı, yalnız adı sürümle yeniden adlandırıldı; 1.0.26'dan ARC-94 ile yeniden üretildi: yukarı akım `signal.throwIfAborted()` ekleyince bağlam kaydı; yukarı akım hâlâ `{content: result}`) başarılı sonucu kesiciden geçirir; kesici girintili
    metin döndürdüğü için sonuç `JSON.parse` ile nesneye çevrilir, sunucu sıkı biçimde yazar.
    Yalnız panoyu döndüren eylemlerde (`add_note`, `update_task`, `move_task`, `assign_task`…)
    özet kartı da kaybettirirdi; yama `args.taskId` kartını özetin yanına koyar.

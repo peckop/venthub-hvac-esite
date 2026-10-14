@@ -94,6 +94,15 @@ try {
         (temizlendi ? '  Orada duran ESKI kimlik TEMIZLENDI: ' + temizlendi + '\n' : '') +
         '  Serit isini kendi worktree inde yap; kimlik orada yazilir.\n',
     )
+  } else if (gitDir && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid)) {
+    /**
+     * ⭐UYDURMA SID KİMLİK DOSYASINA YAZILMAZ (ARC-124, 13 Ekim 2026 — "KIMLIK YOK" bulgusunun kök sebebi).
+     * `sessionstart-tavan.test.ts` kancayı GERÇEK worktree'de sahte oturum numarasıyla (`0dfe070e-…-tavan0000001`)
+     * koşturuyordu; kanca bu sahte numarayı worktree'nin `venthub-sid` dosyasına yazıyor, şerit kapısı (E1) ve
+     * `bash-write-audit` o pencerede "KIMLIK YOK" diyordu. `pnpm test:ilgili` koşan HER pencere kendi kimliğini
+     * böyle sildi. Gerçek oturum numarası her zaman UUID'dir; UUID olmayan sid kimlik dosyasına yazılmaz.
+     */
+    process.stderr.write('[session-board] sid UUID degil (' + String(sid).slice(0, 12) + '…) — venthub-sid YAZILMADI (uydurma kimlik).\n')
   } else if (gitDir) {
     fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
   }
@@ -270,6 +279,10 @@ bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${sour
  * Öncelik 0: asla işaretçiye çevrilmez (300 karakterlik tek satır bütçeyi zorlamaz).
  */
 let rolSeridi = process.env.CC_LANE || ''
+// ARC-124 (yeni düzen): rol agent anahtarından (settings.local.json `agent` ya da kancaya gelen agent_type) çözülür ve
+// şerit adından/başlıktan ÖNCE gelir; önceki oturum kimlikleri posta sayacına gider (aşağıda, board bloğunda doldurulur).
+let agentRolu = ''
+let oncekiKimlikleri = []
 function rolKartiSatiri(lane) {
   const rol = String(lane || '').trim().toUpperCase()
   if (!rol) return 'ROL KARTI: (bu oturumun seridi/rolu bilinmiyor — serit talep et ya da docs/roller/ altina bak)\n'
@@ -550,7 +563,59 @@ try {
   }
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
-  if (mine && mine.lane) rolSeridi = mine.lane
+  // ARC-124: agent anahtarı KİMLİKTİR (şerit adı ve başlık ipucudur) → önce o. Yok ya da pencere ajanı değilse eski sıra.
+  let pencereKimligi = null
+  try {
+    pencereKimligi = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-kimligi.cjs'))
+    agentRolu = pencereKimligi.rolAdi(pencereKimligi.agentAdi({ cwd: input.cwd, agentType: input.agent_type }))
+  } catch {
+    agentRolu = ''
+  }
+  if (agentRolu) rolSeridi = agentRolu
+  else if (mine && mine.lane) rolSeridi = mine.lane
+  if (agentRolu && pencereKimligi) {
+    try {
+      const uyari = pencereKimligi.modelUyarisi({
+        cwd: input.cwd,
+        agent: pencereKimligi.agentAdi({ cwd: input.cwd, agentType: input.agent_type }),
+        oturumModeli: input.model,
+      })
+      if (uyari) bolum('model', 1, uyari)
+    } catch {
+      /* model uyarısı açılışı bozmaz */
+    }
+  }
+  /**
+   * KİMLİK DEVRİ (ARC-124): rolün durum dosyasında originSessionId eskiyse yeni sid yazılır (PreCompact kapısı ilk
+   * compact'ta durmasın) ve eski kimlik `rol-kimlikleri.json`a "önceki kimlik" diye kaydedilir (posta sayacı eski
+   * kimliğe adreslenmiş postayı da sayar). Fail-open: hata açılışı bozmaz, tek satır uyarı basılır.
+   */
+  if (agentRolu && pencereKimligi) {
+    try {
+      const kapiDevir = require(path.join(__dirname, 'precompact-durum-kapisi.cjs'))
+      const pd = kapiDevir.projeDiziniBul(sid, input.transcript_path) || kapiDevir.anaProjeDizini()
+      const dev = kapiDevir.kimlikDevret({
+        sid,
+        slug: pencereKimligi.rolSlug(agentRolu),
+        memoryDizinleri: pd ? kapiDevir.hafizaDizinleri(pd) : [],
+        canliMi: (s) => pencereKimligi.canliKayitVarMi(s),
+      })
+      const kayit = pencereKimligi.kimlikKaydet({ rol: agentRolu, sid, eski: dev.devir ? dev.eski : undefined })
+      oncekiKimlikleri = kayit.oncekiler
+      const kisa = (s) => String(s || '').slice(0, 8)
+      if (dev.devir) {
+        bolum('kimlik-devri', 1,
+          `KİMLİK DEVRİ: ${dev.dosya} originSessionId ${kisa(dev.eski)} → ${kisa(sid)} yazıldı (rol ${agentRolu}); eski kimliğe giden posta aşağıda sayılır.\n`)
+      } else if (dev.sebep === 'eski-canli') {
+        bolum('kimlik-devri', 1,
+          `⚠KİMLİK DEVRİ YAPILMADI: ${dev.dosya} eski kimliği ${kisa(dev.eski)} hâlâ canlı bir pencere kaydında; ilk compact'ta kapı rol adıyla eşler ama kimliği ELLE güncelle.\n`)
+      } else if (dev.sebep !== 'ayni' && dev.sebep !== 'dosya-yok') {
+        bolum('kimlik-devri', 1, `⚠KİMLİK DEVRİ YAPILMADI (${dev.sebep}): durum dosyanın originSessionId alanını ELLE güncelle.\n`)
+      }
+    } catch (e) {
+      process.stderr.write(`[session-board] kimlik devri atlandi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — oturum acilisi etkilenmedi.\n`)
+    }
+  }
   // compact/clear girdisinde session_title YOK (belge: yalnız startup/resume/fork); pid kaydındaki ad (`~/.claude/sessions`)
   // her açılış türünde okunur. Rol ipucudur, ad taahhüdü değil; claim'li pencere bunu kullanmaz (yukarıdaki `mine.lane`).
   // Niyet: pano talebi olmayan HER rolde (9 tablo rolü) kart gelsin — yalnız OPS'ta değil.
@@ -560,7 +625,7 @@ try {
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
     : `Şeridin: TALEP EDİLMEMİŞ. Çok dosyalı bir işe başlamadan önce şeridi al:\n` +
-      `  node scripts/board/board.cjs claim --sid ${sid} --lane <ad> --globs "src/**"\n`,
+      `  node scripts/board/board.cjs claim --sid ${sid} --lane ${agentRolu ? agentRolu.toLowerCase() : '<ad>'} --globs "src/**"\n`,
     mine ? `Şeridin: ${mine.lane}\n` : 'Şeridin: TALEP EDİLMEMİŞ (board.cjs claim)\n')
 
   // MEKANİZMA (T115-VH) — oturumun İLK işi.
@@ -666,7 +731,23 @@ const yaz = () => {
   try {
     const sayac = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'posta-kutusu-sayac.cjs'))
     const kok = path.join(__dirname, '..', '..')
-    bolum('posta', 1, sayac.acilisSatiri(await sayac.okunmamis(sid, { kok, zamanAsimiMs: 5000 })))
+    // ARC-124: ESKİ KİMLİĞE adreslenmiş postayı da say (yeni düzende pencere her açılışta yeni kimlik alır; kapalı
+    // pencereye bırakılan mesaj eski kimlikte kalıyordu). Paralel, 3 sn tavan; ölçülemeyen kimlik sessiz geçmez.
+    const eskiler = oncekiKimlikleri.slice(0, 3)
+    const [kendi, ...eskiSonuclar] = await Promise.all([
+      sayac.okunmamis(sid, { kok, zamanAsimiMs: 5000 }),
+      ...eskiler.map((o) => sayac.okunmamis(o, { kok, zamanAsimiMs: 3000 })),
+    ])
+    bolum('posta', 1, sayac.acilisSatiri(kendi))
+    eskiSonuclar.forEach((r, i) => {
+      const o = eskiler[i]
+      if (r.durum === 'sayildi' && r.n > 0) {
+        bolum('posta-eski-' + i, 1,
+          `📬 ESKİ KİMLİĞE ADRESLİ ${r.n} OKUNMAMIŞ POSTA (${o}) — mailbox_read query unreadBy=${o} ile oku, sonra ack et.\n`)
+      } else if (r.durum !== 'sayildi') {
+        bolum('posta-eski-' + i, 1, `⚠eski kimlik ${o.slice(0, 8)} postası OLCULEMEDI (${r.sebep}) — mailbox_read query unreadBy=${o} ile elle bak.\n`)
+      }
+    })
   } catch (e) {
     bolum('posta', 1, `⚠posta kutusu sayaci yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — kutu OLCULMEDI.\n`)
   }
