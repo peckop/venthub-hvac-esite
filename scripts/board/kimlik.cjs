@@ -128,7 +128,7 @@ function gercekDepoyaAitMi(gitDir, env = process.env) {
   try {
     const kok = path.resolve(__dirname, '..', '..')
     const ham = execFileSync('git', ['rev-parse', '--git-common-dir'], { cwd: kok, encoding: 'utf8', timeout: 10000 }).trim()
-    const norm = (p) => path.resolve(p).replace(/\/g, '/').toLowerCase()
+    const norm = (p) => path.resolve(p).split(path.sep).join("/").toLowerCase()
     const ortak = norm(path.resolve(kok, ham))
     const g = norm(gitDir)
     return g === ortak || g.startsWith(ortak + '/')
