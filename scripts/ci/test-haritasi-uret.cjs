@@ -562,10 +562,12 @@ function kontrolEt(kok, testler, harita = null, metin = null) {
 // ---------------------------------------------------------------------------------------------------------------------------
 
 function argumanlariCoz(argv) {
-  const s = { ham: null, devam: null, yalniz: [], isci: 6, parti: 12, cikti: HARITA_YOLU, kontrol: false, hamSil: false };
+  const s = { ham: null, devam: null, yalniz: [], isci: 6, parti: 12, cikti: HARITA_YOLU, kontrol: false, hamSil: false, bayat: false, esik: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--ham') s.ham = argv[++i];
+    if (a === '--bayat') s.bayat = true;
+    else if (a === '--esik') s.esik = Number.parseInt(argv[++i], 10);
+    else if (a === '--ham') s.ham = argv[++i];
     else if (a === '--devam') s.devam = argv[++i];
     else if (a === '--yalniz') {
       while (argv[i + 1] && !argv[i + 1].startsWith('--')) s.yalniz.push(argv[++i]);
@@ -579,6 +581,9 @@ function argumanlariCoz(argv) {
   if (!Number.isInteger(s.isci) || s.isci < 1) throw new Error('--isci pozitif tam sayı olmalı');
   if (!Number.isInteger(s.parti) || s.parti < 1) throw new Error('--parti pozitif tam sayı olmalı');
   if (s.ham && s.devam) throw new Error('--ham (koşmadan işle) ile --devam (yarım koşuyu sürdür) birlikte verilemez');
+  if (s.esik !== null && (!Number.isInteger(s.esik) || s.esik < 0)) throw new Error('--esik sıfır ya da pozitif tam sayı olmalı');
+  if (s.esik !== null && !s.kontrol) throw new Error('--esik yalnız --kontrol ile kullanılır');
+  if (s.bayat && (s.yalniz.length > 0 || s.kontrol || s.ham || s.devam)) throw new Error('--bayat, --yalniz/--kontrol/--ham/--devam ile birlikte verilemez');
   return s;
 }
 
@@ -658,7 +663,23 @@ async function calistir(argv, kok = path.resolve(__dirname, '..', '..')) {
     const sonuc = kontrolEt(kok, await testListesi(kok));
     process.stdout.write(`[harita] sorun ${sonuc.sorunlar.length} · bayat kayıt ${sonuc.bilgi.bayat.length} · kayıtsız test ${sonuc.bilgi.kayitsiz.length} · hayalet kayıt ${sonuc.bilgi.hayalet.length}\n`);
     for (const sorun of sonuc.sorunlar) process.stdout.write(`[harita] KIRMIZI: ${sorun}\n`);
+    // ALT-83: bayat + kayıtsız test "her zaman koşar" (güvenli yön, kırmızı değil); sayı eşiği aşınca harita TAZELENMELİ (yoksa yerel seçim genişler).
+    const bayatToplam = sonuc.bilgi.bayat.length + sonuc.bilgi.kayitsiz.length;
+    if (s.esik !== null && bayatToplam > s.esik) {
+      process.stdout.write(`[harita] KIRMIZI: bayat ${sonuc.bilgi.bayat.length} + kayıtsız ${sonuc.bilgi.kayitsiz.length} = ${bayatToplam} test eşiği (${s.esik}) aşıyor: haritayı tazele: node scripts/ci/test-haritasi-uret.cjs --bayat\n`);
+      return 1;
+    }
     return sonuc.sorunlar.length === 0 ? 0 : 1;
+  }
+  if (s.bayat) {
+    const guncel = kontrolEt(kok, await testListesi(kok));
+    if (guncel.sorunlar.length > 0) throw new Error(`harita sorunlu (${guncel.sorunlar[0]}): --bayat kısmi yenileme güvenli değil, tam üretim koş`);
+    s.yalniz = [...guncel.bilgi.bayat, ...guncel.bilgi.kayitsiz].sort();
+    if (s.yalniz.length === 0) {
+      process.stdout.write('[harita] taze: bayat ve kayıtsız test yok, yazılacak bir şey yok\n');
+      return 0;
+    }
+    process.stdout.write(`[harita] --bayat: ${guncel.bilgi.bayat.length} bayat + ${guncel.bilgi.kayitsiz.length} kayıtsız test yeniden ölçülecek\n`);
   }
   let onceki = null;
   if (s.yalniz.length > 0) {
@@ -706,6 +727,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  argumanlariCoz,
   ESIK,
   HARITA_YOLU,
   VITEST_YAPILANDIRMASI,

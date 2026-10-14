@@ -341,16 +341,27 @@ python, sh, cmd, esbuild, powershell izlenemez ve test `belirsiz` olur: HER PR'd
 | `... --yalniz a.test.ts b.test.ts` | yalnız bu testleri yeniden ölçer, kalanını korur (ölçüm aracı özeti AYNI olmalı) |
 | `... --ham <klasör>` | koşmadan, var olan ham kayıttan yazar |
 | `... --kontrol` | haritayı ağaçla karşılaştırır, yazmaz; biçim, canonical bayt, ölçüm aracı özeti sorunu varsa çıkış 1 |
+| `... --kontrol --esik N` | yukarıdakine ek: bayat + kayıtsız test sayısı N'yi AŞARSA çıkış 1 ve yenileme komutunu yazar (ALT-83) |
+| `... --bayat` | bayat ve kayıtsız testleri kendisi bulur ve yalnız onları yeniden ölçer (`--yalniz` listesini elle çıkarmak gerekmez); taze ise bir şey yazmaz (ALT-83) |
 
 Bakım kuralları:
 
 | Olay | Ne olur | Ne yapılır |
 |---|---|---|
-| Yeni test dosyası | haritada yok → HER ZAMAN koşar (atlanamaz) | birleşmeden sonra `--yalniz <yeni testler>` ile kaydedilir (yaklaşık 1 dk); iki dalda aynı anda kaydetmeyin (aynı dosya çakışır) |
-| Test dosyası değişti | bayat kayıt → HER ZAMAN koşar (zaten değişen testtir) | birleşmeden sonra `--yalniz` |
+| Yeni test dosyası | haritada yok → HER ZAMAN koşar (atlanamaz) | birleşmeden sonra `--bayat` ile kaydedilir; iki dalda aynı anda kaydetmeyin (aynı dosya çakışır) |
+| Test dosyası değişti | bayat kayıt → HER ZAMAN koşar (zaten değişen testtir) | birleşmeden sonra `--bayat` |
 | Ölçüm aracı değişti (kaydedici, kurulum dosyaları, `test-haritasi.vitest.config.ts`) | araç özeti uyuşmaz → TAM; `INV-TEST-HARITA-1` KIRMIZI | tam yeniden üretim (yaklaşık 20 dk, 6 işçi) |
 | Test silindi | hayalet kayıt (zararsız) | sonraki üretimde düşer |
 | Testin dolaylı bağımlılığı değişti (testin içe aktardığı yardımcı başka dosya okumaya başladı) | test kaynağı değişmediği için kayıt bayat görünmez; `related` o PR'da testi seçer, sonraki PR'lar yeni okumayı harita yenilenene dek görmez | master push TAM koşar (güvenlik ağı); gece yenileme önerisi §6.7 |
+
+**Tazelik kapısı (ALT-83, 14 Ekim).** Yukarıdaki bakım kuralları yazılıydı ama onları tetikleyen yoktu: harita 8 Ekim'de tam ölçüldü (10 Ekim'de yalnız dört karne testi eklendi), 14 Ekim'de 739 testin 231'i
+"her zaman koşan"dı (bayat 92, kayıtsız 99, belirsiz 39; ARAÇ'ın `test-sec.cjs --yerel --kuru` ölçümü, #1934) ve yerelde `pnpm test:ilgili` bu yüzden 309 test seçip
+kimseye çekici gelmedi, kanca PR'larının kapıları iki kez yalnız CI'da yakalandı (#1932, #1934). Yenileme `--bayat` ile TEK komuta indi (bayat ve kayıtsız testleri
+kendisi bulur) ve harita `INV-TEST-HARITA-1`in eşik kapısıyla korunur: bayat + kayıtsız test sayısı `git ls-files` test listesinin yüzde 20'sini aşarsa KIRMIZI
+(mesaj yenileme komutunu yazar). Bayat/kayıtsız kayıt tek başına hâlâ kırmızı DEĞİLDİR (güvenli yön: o test her zaman koşar); kapı yalnız birikimi keser.
+Yenileme maliyeti (ölçüldü, 191 test, bu makine, 2 işçi): yaklaşık 13 dk. Eşik gözleme dayanır: 191 test 4-6 günde biriktiği için (günde 30-48 test) yüzde 20 (yaklaşık 150 test) kabaca haftada bir tazelemeyi zorlar;
+sıklığı sakin bulursa ALTYAPI eşiği düşürür. Sayı kapıda sabittir ve değişirse bu paragraf ile `INV-TEST-HARITA-1` birlikte güncellenir.
+Yenileme sonrası ölçüm (aynı kuru koşu yöntemi, aynı ağaç): her zaman koşan 231 → 58 (bayat 1, kayıtsız 2: dislan kipinde `skip` olan iki test, belirsiz 55).
 
 ### 6.4 Güvenlik ağı: hiçbir koruma sessizce düşmez
 
@@ -384,7 +395,7 @@ Bakım kuralları:
 | Kapı | Dosya (`scripts/ci/__tests__/`) | Neyi ölçer |
 |---|---|---|
 | `INV-TEST-SEC-1` | `test-sec.test.ts` | seçicinin karar mantığı (senaryolar, SABOTAJ tablosu, küresel girdi örnek tablosu, glob eşleştirici, CLI çıktı sözleşmesi, `--yerel`, içe aktarma grafiğinin paralel kurulumu, sınıflayıcı yükleme sırası: önce seçicinin yanı sonra kök, koşum kapanımı kapısı); gerçek harita ve gerçek git ile belge değişimi daraltır, belirsiz testler HER ZAMAN seçilir |
-| `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur |
+| `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur; bayat + kayıtsız test sayısı `git ls-files` test listesinin %20'sini aşarsa KIRMIZI (ALT-83, §6.3 tazelik kapısı) |
 | `INV-TEST-HARITA-KAYDEDICI-1` | `test-haritasi-kaydedici.test.ts` | yakalama (fs, dizin, glob, alt süreç sınıflaması, `node` çocuğu, belirlenimli kayıt) |
 | `INV-TEST-SEC-GERIYE-1` | `test-sec-geriye.test.ts` | geriye dönük doğrulamanın sayım mantığı: kategori önceliği, kaçırma yalnız ASIL kategoriden, kaçırılanın açıklanması (açıklanamayan = GERÇEK kaçırma), CI günlüğünden süre modeli |
 
