@@ -1009,3 +1009,108 @@ vurgulanmıştır.)
 **Ek toplamlar:** companion `.md` (hook, envanter dışı) 13 · skill tekil ad 39 (satır 64) ·
 GitHub-hayalet CI 1 (`tmp-lf-fix.yml`, 29'a dahil değil) · özel-durum envanter-dışı nesne 1
 (`.claude/worktrees/agent-a91c11837d4004440`).
+
+---
+
+## 7 · Claude Code sürüm notu taraması — 2.1.251 → 2.1.296 (en yeni belgelenen 2.1.299) · 14 Ekim 2026 · ARC-135
+
+> Bu bölüm tür tablosu DEĞİLDİR: `scripts/hijyen/arac-envanteri.cjs` yalnız `### 3.x` başlıklarının altındaki
+> tabloları okur, bu bölüm sayıma girmez. Kaynak REC-529'un "changelog son 60 gün taranmadı" eksiğidir.
+
+### 7.0 · Kaynak, tazelik, sınır
+
+| Konu | Değer |
+|---|---|
+| Sürüm notu | `anthropics/claude-code` `CHANGELOG.md`, 8.982 satır, 419 sürüm başlığı, getirme 14 Ekim 2026 09:20 UTC |
+| Tarih kaynağı | Sürüm başlıklarında tarih YOK; yayın zamanı `npm view @anthropic-ai/claude-code time` (UTC) |
+| Belge | `code.claude.com/docs/en/` routines, desktop-scheduled-tasks, scheduled-tasks, hooks, sub-agents, worktrees, settings-reference, cross-session-messaging, changelog |
+| Kurulu sürüm | 2.1.296 (`claude --version`, 14 Ekim); belge changelog'u 2.1.299'a (14 Ekim) kadar; 2.1.297 ve 2.1.298 npm'de yok |
+| Bizim önceki sürüm tabanı | **2.1.251** (28 Ağustos yayın; 30 Ağustos tarihli en eski transkriptler hep 2.1.251). Transkriptlerde 2.1.296 hiç görülmedi, en yenisi 2.1.295 (oturum eski sürümle açılmış olabilir) |
+| Pencere | 15 Ağustos – 14 Ekim 2026 (ilk sürüm 2.1.234, 17 Ağustos) |
+| Okunan | "Added" satırlarının tamamı (2.1.234-2.1.296). "Changed/Removed/Improved" ve 1.713 "Fixed" satırı anahtar kelime süzgecinden geçti: süzgeç dışı ilgili bir düzeltme kalmış olabilir |
+
+### 7.1 · Zamanlama: üç yol (Recep'in sorusu: bulut mu yerel mi, kota, bilgisayar kapalıyken)
+
+Kaynak: routines, desktop-scheduled-tasks, scheduled-tasks sayfaları (14 Ekim). Routines sayfası "research preview" işaretlidir: davranış ve sınırlar değişebilir.
+
+| Konu | Bulut routine (`/schedule`, claude.ai/code/routines) | Desktop zamanlanmış görev (Routines > Local) | Oturum içi (`/loop`, CronCreate, ScheduleWakeup) |
+|---|---|---|---|
+| Nerede çalışır | Anthropic bulutu | Bu makine, Desktop uygulaması açıkken | Açık Claude Code oturumu |
+| Bilgisayar kapalıyken | **Çalışır** | Çalışmaz (uygulama açık, makine uyanık olmalı) | Çalışmaz |
+| Kota | Abonelik kotasından düşer; hesap başına saatte 100 zamanlanmış çalıştırma, rutin başına saatte 30 "Run now"/API; kota dolunca kullanım kredisi açıksa ücretli sürer, kapalıysa reddedilir | Belgede yazmıyor | Belgede yazmıyor |
+| Erişim | Her çalıştırmada temiz repo klonu; claude.ai connector'ları; yerel dosya YOK; yerel `claude mcp add` sunucuları gelmez | Yerel klasör ve dosyalar, connector'lar | Oturumun MCP'si ve izinleri |
+| Kalıcılık | Hesapta kayıtlı | `~/.claude/scheduled-tasks/<ad>/SKILL.md`, yeniden başlatmada kalır | Oturuma bağlı; yinelenen görev 7 gün sonra kendini siler |
+| En kısa aralık | 1 saat | 1 dakika | 1 dakika |
+
+Bizim için sonuç: bilgisayar kapalıyken çalışması gereken denetim (sahipsiz PR, bayat defter) yalnız bulut routine ile olur ve yerel kancalar, claude-mem ve `~/.claude` yapılandırması orada YOKTUR (belgede kancaların bulutta çalışıp çalışmadığı yazmıyor). Zamanlama açmak karar 53 gereği önce OPS'a/Recep'e sorulur.
+
+### 7.2 · REC-529'daki 6 "AL" özelliğinde belgedeki güncel durum
+
+| # | Özellik | Belge (14 Ekim) | Pencerede değişen |
+|---|---|---|---|
+| 1 | ConfigChange kancası | Eklendi 2.1.49. Matcher: user/project/local/policy_settings, skills. Engelleyebilir (exit 2 ya da `decision: block`); policy_settings engellenemez | Yeni alan yok; 2.1.290'da Linux sandbox'ta komut ortası yeniden yükleme düzeltmesi |
+| 2 | PostCompact kancası | Eklendi 2.1.76. Girdi: `trigger`, `compact_summary`. **Karar kontrolü yok**; düz stdout'un bağlama girdiği olaylar listesinde PostCompact yok (UserPromptSubmit, UserPromptExpansion, SessionStart, PostModelSwitch) | `auto` eşleşmesi artık idle compaction'ı da kapsıyor (2.1.299, yerelde yok). **ARC-119 hükmü: bağlam enjeksiyonu için PostCompact uygun değil; doğru yol SessionStart(compact)** |
+| 3 | Alt ajan `isolation: worktree` | Eklendi 2.1.49/2.1.50. Varsayılan "fresh" (uzak varsayılan daldan); `worktree.baseRef="head"` ile yerel HEAD. Değişiklik yapmayan ajanın worktree'si otomatik silinir. Belge: worktree `.claude/worktrees/` altındaysa alt ajan worktree kökündeki CLAUDE.md ve `.claude/rules/`'u yüklemez, oturumunkini kullanır | Yeni alan yok; 2.1.286, 2.1.287, 2.1.288, 2.1.290, 2.1.295'te worktree'li alt ajan düzeltmeleri |
+| 4 | `crossSessionInbound` ayarı | Değerler `accept`/`hold`/`refuse`; varsayılan tanımsız (izin sınıfına göre onay); öncelik managed > --settings > user, proje/yerel yalnız daha katıysa; katılık refuse > hold > accept. Eklendi 2.1.224; Windows'ta 2.1.234+ | Pencere dışı (2.1.224); bu ayar için pencerede madde yok |
+| 5 | Kalıcı zamanlama | §7.1 | 2.1.273, 2.1.290, 2.1.292, 2.1.299'da kaydedilmiş görev ve DST düzeltmeleri |
+| 6 | InstructionsLoaded kancası | Eklendi 2.1.69. `load_reason`: session_start, nested_traversal, path_glob_match, include, compact. Engelleyemez, asenkron, yalnız gözlem | 2.1.288'de alt ajan dosya erişiminde `agent_id`/`agent_type` eksikliği düzeltildi |
+
+### 7.3 · Pencerede gelen, bizim akışı ilgilendiren yeni şeyler (sürüm · yayın tarihi · öneri)
+
+| Alan | Sürüm · tarih | Özellik | Öneri |
+|---|---|---|---|
+| Kanca | 2.1.295 · 8 Ekim | Command ve HTTP kancalarında `onFailure: "block"` (kanca başlamazsa/zaman aşımı/beklenmeyen çıkış kodu eylemi engeller) | AL |
+| Kanca | 2.1.251 · 28 Ağustos | PreModelSwitch / PostModelSwitch olayları | İZLE |
+| Kanca | 2.1.296 · 9 Ekim | `--debug` çıktısında kanca komutu, sonuç ve süre (yavaş kanca tespiti) | İZLE |
+| Kanca | 2.1.299 · 14 Ekim | UserPromptSubmit kancaları skill ve slash komutu açılmadan önce koşar; bloklarsa gömülü kabuk komutları da durur | İZLE (yerelde yok) |
+| Ajan | 2.1.296 · 9 Ekim | `--debug` tanımsız ajan frontmatter alanlarını ve yazım hatalarını bildirir | AL (ajan dosyası kalite kontrolü) |
+| Ajan | 2.1.251 · 28 Ağustos | `CLAUDE_CODE_SUBAGENT_MODEL` artık yalnız VARSAYILAN; ajan tanımındaki `model:` ve spawn'daki açık model onu geçer | Ajan dosyalarının `model:` alanı kontrol edilecek |
+| Ajan | 2.1.271 · 14 Eylül | Frontmatter `omitClaudeMd` (CLAUDE.md olmadan çalışan alt ajan) | İZLE (salt-okuma ajanda kural kaybı riski) |
+| Ajan | 2.1.296 · 9 Ekim | Frontmatter `autoCompactWindow`; `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` | İZLE |
+| Zamanlama | 2.1.243 · 24 Ağustos | `/usage` içinde Loops dökümü (loop başına çalıştırma ve token) | AL (kota kontrolü) |
+| Zamanlama | 2.1.285/288 · 29 Eylül/2 Ekim | Arka plan Bash komutlarına zaman sınırı (varsayılan 30 dk, en çok 2 saat; yalnız gözetimsiz oturumlarda) | İZLE |
+| İzin | 2.1.257 · 1 Eylül | `permissions.blockReadsOutsideWorkingDirectories` | AL (ajan izolasyonu) |
+| İzin | 2.1.259 · 2 Eylül | `--permission-prompts none` (gözetimsiz koşumda soran her şey otomatik reddedilir) | AL (`-p` koşumları) |
+| Ayar doğrulama | 2.1.246/2.1.260 · 25 Ağustos/3 Eylül | Bash izin kurallarında joker öneki uyarısı; hatalı kural artık sessizce atlanmaz, geçersiz ayar olarak bildirilir | AL (settings dosyalarımızı kontrol et) |
+| Ayar | 2.1.257 · 1 Eylül | Proje/yerel `defaultMode: bypassPermissions` yok sayılır | Bilgi |
+| Ayar | 2.1.290 · 5 Ekim | Repo `.claude/settings*.json` artık `CLAUDE_CODE_DISABLE_ATTACHMENTS` ayarlayamaz | Bilgi |
+| Güvenlik | 2.1.292 · 6 Ekim | PreToolUse kanca onayları ve auto mod UNC yollarından okumada izin istemini atlatıyordu, düzeltildi | Bilgi |
+| Bağlam/kota | 2.1.299 · 14 Ekim | Idle compaction (200K+ token, ~54 dk boşta kalırsa önbellek dolmadan sıkıştırır; `idleCompaction: false` ile kapanır) | AL, önce ölçüm (yerelde yok) |
+| Bağlam/kota | 2.1.251 · 28 Ağustos | `/cost` oturum başına önbellek satırı ve status line `prompt_cache` alanı | AL (önbellek ölçümü için resmi kaynak) |
+| Bağlam/kota | 2.1.260 · 3 Eylül | `/cost` ve durum satırı önbellek kaçırmanın olası nedenini gösterir | İZLE |
+| Bağlam/kota | 2.1.243 · 24 Ağustos | `promptCacheTtl` / `subagentPromptCacheTtl` (ana oturum 1 saat, alt ajan 5 dk) | İZLE |
+| Kalite | 2.1.261 · 4 Eylül | `/skill-doctor` (kullanılmayan skill ve bağlam maliyeti) | AL |
+| Kalite | 2.1.283 · 25 Eylül | `/doctor prompt-audit` (CLAUDE.md, skill, ajan ve komutlarda eski model kalıpları) | AL |
+| MCP | 2.1.296 · 9 Ekim | MCP araç açıklaması sınırı 2.048 → 4.096; tool search ile yüklenenlerde 16.384 | Bilgi |
+| Bellek | 2.1.284/268 · 28 Eylül/10 Eylül | MEMORY.md'de görünmez karakter nötrleştirme; kesilme uyarısı satır ve yeri söyler | Bilgi |
+| Disiplin | 2.1.281 · 23 Eylül | `"attribution": false` ayarı (commit/PR attribution gizler) | Bilgi: attribution OPS kuralıdır, ayar kapatma değildir |
+
+Gürültü sayıldı: VSCode, Slack (Claude Tag), cloud session, code review, remote control ve web etiketli satırlar; Windows/WSL/macOS'a özgü ilgisiz düzeltmeler.
+
+### 7.4 · Belgede olup bizim `settings.json`'da OLMAYAN kanca olayları (33 olaydan 25'i)
+
+Bizde kayıtlı 8: PreToolUse, SessionStart, SessionEnd, UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, PreCompact. Kayıtsız 25: Setup, UserPromptExpansion, PermissionRequest, PermissionDenied, PostToolBatch, Notification, MessageDisplay, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, StopFailure, InstructionsLoaded, ConfigChange, CwdChanged, FileChanged, DirectoryAdded, WorktreeCreate, WorktreeRemove, PostCompact, PreModelSwitch, PostModelSwitch, Elicitation, ElicitationResult. Eklenme sürümleri: ConfigChange 2.1.49, InstructionsLoaded 2.1.69, PostCompact 2.1.76, StopFailure 2.1.78, CwdChanged/FileChanged 2.1.83, TaskCreated 2.1.84, PermissionDenied 2.1.89, DirectoryAdded 2.1.219, Pre/PostModelSwitch 2.1.251.
+
+### 7.5 · AL adayları (OPS'a önerilir; karar OPS'tadır, settings.json kaydı Recep kararıdır)
+
+| Sıra | Aday | Gerekçe (tek cümle) |
+|---|---|---|
+| 1 | Kanca `onFailure: "block"` (2.1.295) | Koruma kancamız hiç başlamazsa eylem artık kendiliğinden durur; bugün sessizce geçiyor |
+| 2 | `--permission-prompts none` (2.1.259) | Gözetimsiz `-p` koşumunda soru bekleyip takılmak yerine otomatik ret |
+| 3 | `blockReadsOutsideWorkingDirectories` (2.1.257) | Ajanın çalışma dizini dışını okumasını kapatır; izolasyon kazancı |
+| 4 | `/skill-doctor` ve `/doctor prompt-audit` (2.1.261, 2.1.283) | Kullanılmayan skill ve bayat kalıpları ölçer: envanter için hazır ölçüm aracı |
+| 5 | `/cost` önbellek satırı ve `prompt_cache` (2.1.251) | Her mesajdaki kanca satırlarının önbelleği bozup bozmadığının (karar 363 madde 6) resmi ölçüm kaynağı |
+| 6 | Idle compaction (2.1.299) | Boşta kalan büyük oturumda önbellek dolmadan sıkıştırır; davranış otomatik değişir, önce ölçülür |
+| 7 | `--debug` ajan frontmatter denetimi (2.1.296) | Yedi uygulayıcı ve araştırmacı tanımındaki yazım hatalı alanı yakalar |
+| 8 | Hatalı izin kuralı uyarıları (2.1.246, 2.1.260) | Kendi settings dosyalarımızdaki sessizce atlanan kuralları bulur |
+| 9 | `/usage` Loops dökümü (2.1.243) | Zamanlama açılırsa (karar 53) kota bedelini görünür kılar |
+| 10 | Bulut routine (§7.1) | Bilgisayar kapalıyken sahipsiz PR/bayat defter denetimi için tek yol; kancalar ve claude-mem orada yok, karar 53 |
+
+### 7.6 · Belirsizlik ve sınırlar
+
+- crossSessionInbound ve PostCompact: sürüm notu taramam 2.1.234'ten başladı; ayar 2.1.224'te, kanca 2.1.76'da eklendi, yani pencere dışı. Belge davranışı §7.2'de.
+- Düz stdout'un PostCompact'ta bağlama girmediği belgede açık cümleyle değil, "bağlama giren olaylar" listesinden çıkarımla yazılıdır.
+- 2.1.273 (otomatik mod yerel sınıflandırıcı) ile 2.1.278 (sunucu tarafı sınıflandırıcı) çelişir; son sürüm geçerli sayıldı, bizim akışı etkilemez.
+- Sürüm notunda ve npm'de olmayan sürümler: 2.1.253-256, 2.1.262, 2.1.264, 2.1.279, 2.1.297, 2.1.298.
+- "Fixed" satırlarının tamamı okunmadı; kanca/ajan/worktree/zamanlama süzgeci dışında ilgili düzeltme kalmış olabilir.
+- Kota kısıtı: Desktop görevi ve `/loop` için belge kota/maliyet cümlesi içermiyor.
