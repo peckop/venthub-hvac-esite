@@ -34,7 +34,14 @@ interface Baglam {
     pencere: number,
     simdi?: number,
     bul?: ((sid: string, transcriptPath: string | undefined) => { tam: string } | null) | null,
-  ) => { durumDosyasi: string | null; durumBulundu: number | null; yarimIs: string }
+  ) => {
+    durumDosyasi: string | null
+    durumBulundu: number | null
+    yarimIs: string
+    hazir?: boolean
+    hazirNeden?: string
+    compactMetni?: string
+  }
   yarimIsOku: (metin: string) => string
   DURUM_ARAMA_ARALIGI_MS: number
 }
@@ -235,7 +242,10 @@ describe('INV-BAGLAM-PENCERE-3 · compact hazırlık verisi (ARC-31 madde 2)', (
     const d = gecici()
     const yol = durumDosyasi('# Durum\nYarım iş yok.\n')
     const r = bd.pencereDurumOzeti(d, SID, undefined, 520_000, 1_000_000, T0, () => ({ tam: yol }))
-    expect(r).toEqual({ durumDosyasi: yol, durumBulundu: T0, yarimIs: 'yok' })
+    // ARC-131: eşik üstünde hüküm alanları da gelir (HAZIR/DEĞİL + hazır /compact metni); ilk üç alan değişmedi.
+    expect(r).toMatchObject({ durumDosyasi: yol, durumBulundu: T0, yarimIs: 'yok' })
+    expect(typeof r.hazir).toBe('boolean')
+    expect(String(r.compactMetni)).toMatch(/^\/compact /)
     const var2 = durumDosyasi('Yarım iş: var (PR açılacak)\n')
     const r2 = bd.pencereDurumOzeti(gecici(), SID, undefined, 520_000, 1_000_000, T0, () => ({ tam: var2 }))
     expect(r2.yarimIs).toBe('var')
