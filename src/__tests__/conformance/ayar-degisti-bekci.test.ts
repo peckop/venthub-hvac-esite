@@ -21,7 +21,7 @@ const SATIR_KANCASI = path.join(KOK, '.claude/hooks/defter-tazelik-satiri.cjs')
 interface Bekci {
   kaydet: (girdi: unknown, simdi?: number) => { ts: number; source: string; file: string | null } | null
   satir: (sid: string, simdi?: number) => string
-  kayitYolu: () => string
+  jsonlDosyasi: () => string
 }
 const bekci = require_(KANCA) as Bekci
 
@@ -100,7 +100,7 @@ describe('INV-AYAR-DEGISTI-2 · satır: oturuma bir kez, tekilleştirilmiş, 30 
   it('30 dakikadan eski kayıt susar; yeni değişiklik yeniden söyletir', () => {
     bekci.kaydet(olay(), SIMDI)
     expect(bekci.satir(SID_A, SIMDI + 31 * 60_000)).toBe('')
-    bekci.kaydet(olay({ source: 'user_settings', file_path: '/home/x/.claude/settings.json' }), SIMDI + 40 * 60_000)
+    bekci.kaydet(olay({ source: 'user_settings', file_path: 'D:/ayarlar/.claude/settings.json' }), SIMDI + 40 * 60_000)
     expect(bekci.satir(SID_A, SIMDI + 41 * 60_000)).toContain('user_settings')
   })
 })

@@ -29,13 +29,13 @@ const PENCERE_MS = 30 * 60 * 1000
 const AZAMI_SATIR = 200
 const TEKIL_MS = 10 * 1000
 
-function kayitYolu() {
+function jsonlDosyasi() {
   if (process.env.VH_AYAR_DEGISTI_DOSYASI) return process.env.VH_AYAR_DEGISTI_DOSYASI
   return path.join(os.homedir(), '.claude', 'mod-durum', 'ayar-degisti.jsonl')
 }
 
 function okunduYolu() {
-  return kayitYolu().replace(/\.jsonl$/, '') + '-okundu.json'
+  return jsonlDosyasi().replace(/\.jsonl$/, '') + '-okundu.json'
 }
 
 /** ConfigChange girdisinden bir kayıt satırı yazar. Dönen: yazılan kayıt ya da null (ilgisiz/geçersiz). */
@@ -47,7 +47,7 @@ function kaydet(girdi, simdi = Date.now()) {
     source: typeof girdi.source === 'string' ? girdi.source : 'bilinmiyor',
     file: typeof girdi.file_path === 'string' ? girdi.file_path.replace(/\\/g, '/') : null,
   }
-  const yol = kayitYolu()
+  const yol = jsonlDosyasi()
   fs.mkdirSync(path.dirname(yol), { recursive: true })
   let satirlar = []
   try {
@@ -64,7 +64,7 @@ function kaydet(girdi, simdi = Date.now()) {
 function kayitlariOku() {
   let ham = ''
   try {
-    ham = fs.readFileSync(kayitYolu(), 'utf8')
+    ham = fs.readFileSync(jsonlDosyasi(), 'utf8')
   } catch {
     return []
   }
@@ -140,4 +140,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { kaydet, satir, kayitYolu, PENCERE_MS }
+module.exports = { kaydet, satir, jsonlDosyasi, PENCERE_MS }
