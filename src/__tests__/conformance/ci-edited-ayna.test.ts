@@ -53,6 +53,11 @@ import { describe, expect, it } from 'vitest'
  * ALT-38e · BELGE HIZLI YOLU: yeni HEP KOŞAN adım "Hızlı yol" (sınıf adımından sonra; `edited` DIŞINDAKİ pull_request'te ve sınıf `belge` iken yalnız .md/.txt/.csv farkında `belge=true` yazar) ve onu okuyan sekiz kod kapısı
  *  (Setup Deno, kurulum, Lint, tip, Deno check, edge guard'ları, V8 önbelleği: `if` = ayna koşulu VE `steps.hizli.outputs.belge != 'true'`). Ayna koşulu burada da korunur; çıktı yoksa kapılar KOŞAR. Ayrıntı: ci-test-secimi.test.ts.
  *
+ * ALT-80 · LINT, BUILD İLE PARALEL: Lint iki adıma bölündü: "Lint (arka planda başlat)" (`scripts/ci/arka-plan.sh baslat lint -- pnpm run lint`: hemen 0 döner, ayna koşulu ve hızlı yol çıktısı AYNI koşul) ve
+ *  "Lint sonucu (bekle, blocking)" (`bekle lint 600`: komutun KENDİ çıkış kodunu taşır). KAPI ikincisidir; birincisi hep yeşil olduğundan hata yutma denetimi onu GÖREMEZ. Bu yüzden: iki `run` satırı TAM
+ *  eşitlik (komut boşaltılamaz, ad ayrışamaz, `bekle` `baslat`a çevrilemez), bekleme koşulu = başlatma koşulu + `!cancelled()` TAM eşitlik (Build kırmızıyken de Lint sonucu yazılır; belge PR'ında ve ayna koşusunda
+ *  atlanır: aksi `bekle` 125 verirdi), `continue-on-error`/`|| true` yok, sıra: başlat < Build < bekle < shard bekleme (son adım). Davranış (gerçek bash): scripts/ci/__tests__/arka-plan.test.ts.
+ *
  * SABOTAJ TESTLERİ ÇAPASIZDIR: bozucular adımı/anahtarı ADIYLA bulup satırı BÜTÜNÜYLE yeniden yazar (bul-değiştir metni yok);
  * ci.yml sabotaj yoklamasında zaten bozulmuşsa fikstür kırılmaz, yani sabotaj testi yalnız KENDİ denetimi çalışmazsa kırmızı olur.
  *
@@ -124,10 +129,21 @@ fi`
 const KOSUL_HIZLI = "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'"
 /** Kurulum hızlı yolda YALNIZ pnpm önbelleği isabet ettiyse (`setup-node` `cache-hit`) atlanır: ıskada `setup-node`'un kayıt adımı var olmayan depoyu kaydetmeye çalışıp işi kırmızı yapar. Çıktı yoksa KOŞAR. */
 const KOSUL_KURULUM_HIZLI = "if: steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')"
+
+// ── ALT-80 · LINT, BUILD İLE PARALEL: iki adım (başlat, bekle). Kapı bekleme adımıdır; başlatma adımı hep 0 döner ──────────────────────────
+/** Lint'i arka planda başlatan adım (`scripts/ci/arka-plan.sh baslat`): hızlı yol çıktısını okur (belge PR'ında koşmaz), hep 0 döner. */
+const LINT_BASLAT_ADI = 'Lint (arka planda başlat)'
+/** Sonucu toplayan KAPI: Build'ten SONRA; başlatmayla aynı koşul + `!cancelled()` (Build kırmızı olsa da Lint sonucu yazılır; iptalde koşmaz). */
+const LINT_BEKLE_ADI = 'Lint sonucu (bekle, blocking)'
+const LINT_BASLAT_RUN = 'run: bash scripts/ci/arka-plan.sh baslat lint -- pnpm run lint'
+const LINT_BEKLE_RUN = 'run: bash scripts/ci/arka-plan.sh bekle lint 600'
+/** Bekleme adımının `if:` satırı: başlatma koşulunun AYNISI + `!cancelled()` (durum işlevi örtük `success()`ı kaldırır: önceki adım kırmızıyken de koşar). Sonda yazılır: `!` ile başlayan düz YAML skaleri etiket sayılır. */
+const KOSUL_LINT_BEKLE = `${KOSUL_HIZLI} && !cancelled()`
+
 const HIZLI_ATLANANLAR = [
   'Setup Deno',
   'Install dependencies',
-  'Lint (blocking)',
+  LINT_BASLAT_ADI,
   'Type check',
   'Deno check (edge functions — kapı-körlüğü guard)',
   'Edge mangle-guard (string-literal — deno check göremez)',
@@ -140,6 +156,7 @@ const AGIR_KOSULU: Record<string, string> = {
   'Build (blocking)': KOSUL_BUILD,
   [NEXT_ONBELLEK_ADI]: KOSUL_BUILD,
   Test: KOSUL_TEST,
+  [LINT_BEKLE_ADI]: KOSUL_LINT_BEKLE,
   ...Object.fromEntries(HIZLI_ATLANANLAR.map((ad) => [ad, KOSUL_HIZLI])),
   'Install dependencies': KOSUL_KURULUM_HIZLI,
 }
@@ -163,7 +180,7 @@ fi`
 const AGIR = [
   'Setup Deno',
   'Install dependencies',
-  'Lint (blocking)',
+  LINT_BASLAT_ADI,
   'Type check',
   'Deno check (edge functions — kapı-körlüğü guard)',
   'Edge mangle-guard (string-literal — deno check göremez)',
@@ -173,6 +190,7 @@ const AGIR = [
   'Test',
   NEXT_ONBELLEK_ADI,
   'Build (blocking)',
+  LINT_BEKLE_ADI,
 ]
 
 const KAPI_ADI = 'PR kayıt kapısı (karar 187)'
@@ -655,6 +673,18 @@ const SHARD_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
   ['Test', SHARD_BEKLE_ADI, "bekleme adımı Test'ten ÖNCE: master push ve elle koşumda sıra bozulur"],
 ]
 
+/**
+ * ALT-80 sırası: Lint sonucu (KAPI) başlatmadan SONRA, Build'den SONRA ve shard bekleme adımından ÖNCE. Başlatmadan önce gelirse `bekle` hiç başlatılmamış komutu bekler (125: iş KIRMIZI);
+ * Build'den önce gelirse Lint, Build bitmeden beklenir (paralellik kazancı sıfır); shard beklemesinden sonra gelirse "son adım" kuralı (INV-CI-SHARD-1) bozulur ve Lint kırmızısı
+ * dakikalarca shard'ları bekledikten sonra görünür. Hızlı yol adımından SONRA: koşulu hızlı yol çıktısını okur (çıktı yazılmadan okunursa belge PR'ında da koşar: 125).
+ */
+const LINT_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
+  [LINT_BASLAT_ADI, LINT_BEKLE_ADI, 'Lint sonucu adımı Lint başlatma adımından ÖNCE: `bekle` hiç başlatılmamış komutu bekler (125: iş kırmızı)'],
+  ['Build (blocking)', LINT_BEKLE_ADI, "Lint sonucu adımı Build'den ÖNCE: Lint Build'i beklemeden bitmeyi bekler (paralellik kazancı sıfır)"],
+  [LINT_BEKLE_ADI, SHARD_BEKLE_ADI, "shard bekleme adımı Lint sonucu adımından ÖNCE: bekleme adımı SON adım olmaktan çıkar ve Lint kırmızısı shard'lar bitene dek görünmez"],
+  [HIZLI_ADI, LINT_BEKLE_ADI, 'Lint sonucu adımı hızlı yol adımından ÖNCE: koşulu henüz yazılmamış çıktıyı okur (belge PR\'ında da koşar: 125)'],
+]
+
 const IZ_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
   [CHECKOUT_ADI, TABAN_ADI, "taban SHA'sı adımı Checkout'tan ÖNCE: depo yokken `git rev-parse HEAD^1` boş döner, iz hiçbir koşuda yazılmaz (ayna hep TAM der)"],
   [TABAN_ADI, IZ_ADI, "iz adımı taban SHA'sı adımından ÖNCE: ad henüz üretilmemiş (boş) çıktıyı okur, iz yazılmaz"],
@@ -674,7 +704,7 @@ function siraDenetle(adimlar: Adim[]): string[] {
     const i = sira(ad)
     if (aynaSira >= 0 && i >= 0 && i < aynaSira) ihlal.push(`AĞIR adım "${ad}" ayna adımından ÖNCE: koşul henüz hesaplanmamışken koşar`)
   }
-  for (const [once, sonra, neden] of [...IZ_SIRASI, ...SINIF_SIRASI, ...SHARD_SIRASI]) {
+  for (const [once, sonra, neden] of [...IZ_SIRASI, ...SINIF_SIRASI, ...SHARD_SIRASI, ...LINT_SIRASI]) {
     const i = sira(once)
     const j = sira(sonra)
     if (i >= 0 && j >= 0 && j < i) ihlal.push(neden)
@@ -716,6 +746,29 @@ function izAdimlariniDenetle(adimlar: Adim[]): string[] {
     if (b.id !== tabanId) ihlal.push(`iz adındaki \`steps.${b.id}\` taban adımının id'siyle (${tabanId ?? 'yok'}) aynı değil: ad boş SHA ile oluşur, iz hiçbir koşuda eşleşmez`)
     const okunan = izTabani({ jobs: [{ name: 'ci', steps: [{ name: adiGenislet(iz.ad), conclusion: 'success' }] }] })
     if (okunan !== ORNEK_SHA) ihlal.push(`iz adı çalışma anında betiğin \`izTabani\`'sının okuyabileceği \`${IZ_ADIM_ONEKI}<40 hane>\` biçimine dönüşmüyor (bulunan: ${okunan ?? 'null'})`)
+  }
+  return ihlal
+}
+
+/**
+ * ALT-80 · Lint hattı: iki adım BİRBİRİNE bağlıdır ve `run` satırları TAM eşitlikle sabittir. Başlatma adımı hep 0 döner (hata yutma denetimi onu GÖREMEZ: kapı ondan sonraki adımdır);
+ * bu yüzden komutu sessizce boşaltılabilir (`-- true`), ad ayrışabilir (`baslat lint` ↔ `bekle lintt`: `bekle` 125 verir, kırmızı) ya da bekleme adımı başlatma kipine çevrilebilir
+ * (`baslat` hemen 0 döner: kapı ölür, Lint hiç beklenmez). Anahtar kümesi sabit (yenisi bilinçle eklenir).
+ */
+function lintHattiDenetle(adimlar: Adim[]): string[] {
+  const ihlal: string[] = []
+  const beklenen: Array<{ ad: string; run: string }> = [
+    { ad: LINT_BASLAT_ADI, run: LINT_BASLAT_RUN },
+    { ad: LINT_BEKLE_ADI, run: LINT_BEKLE_RUN },
+  ]
+  for (const b of beklenen) {
+    const a = adimlar.find((x) => x.ad === b.ad)
+    if (!a) continue // yokluğu siniflandirmaDenetle bildirir
+    const run = a.anahtarlar.filter((k) => k.anahtar === 'run').map((k) => `run: ${k.deger}`)
+    if (run.length !== 1 || run[0] !== b.run) ihlal.push(`Lint hattı: adım "${b.ad}" run satırı beklenen TAM \`${b.run}\` değil (bulunan: ${run.join(' ; ') || 'yok'})`)
+    for (const k of a.anahtarlar) {
+      if (!['name', 'if', 'run'].includes(k.anahtar)) ihlal.push(`Lint hattı: adım "${b.ad}" beklenmeyen anahtar \`${k.anahtar}\` taşıyor (izinli: name, if, run); yenisi bilinçle eklenir`)
+    }
   }
   return ihlal
 }
@@ -957,6 +1010,7 @@ function denetle(metin: string): string[] {
     ...agirAdimlariDenetle(adimlar),
     ...hepKosanAdimlariDenetle(adimlar),
     ...siraDenetle(adimlar),
+    ...lintHattiDenetle(adimlar),
     ...izAdimlariniDenetle(adimlar),
     ...tabanRunDenetle(adimlar),
     ...aynaRunDenetle(adimlar),
@@ -1253,7 +1307,29 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: "bekleme adımı Build'den ÖNCEYE taşınır (shard'larla üst üste binme kazancı kaybolur)", boz: (c) => adimiTasi(c, SHARD_BEKLE_ADI, 'Build (blocking)', 'once'), beklenen: ["bekleme adımı Build'den ÖNCE"] },
   { ad: 'bekleme adımı Test adımından ÖNCEYE taşınır', boz: (c) => adimiTasi(c, SHARD_BEKLE_ADI, 'Test', 'once'), beklenen: ["bekleme adımı Test'ten ÖNCE"] },
   { ad: 'Build adımına `continue-on-error: true`', boz: (c) => adimaAnahtarEkle(c, 'Build (blocking)', 'continue-on-error: true'), beklenen: ['AĞIR adım "Build (blocking)" continue-on-error taşıyor'] },
-  { ad: 'Lint `run` satırına `|| true` (tek satırlık ağır adım hatayı yutar)', boz: (c) => adimAnahtariniYaz(c, 'Lint (blocking)', 'run', 'run: pnpm run lint 2>&1 | tee ci-lint.log || true'), beklenen: ['AĞIR adım "Lint (blocking)" run komutu hatayı yutuyor'] },
+  { ad: 'Lint başlatma `run` satırına `|| true` (tek satırlık ağır adım hatayı yutar)', boz: (c) => adimAnahtariniYaz(c, LINT_BASLAT_ADI, 'run', `${LINT_BASLAT_RUN} || true`), beklenen: [`AĞIR adım "${LINT_BASLAT_ADI}" run komutu hatayı yutuyor`, 'run satırı beklenen TAM'] },
+
+  // ── ALT-80: Lint hattı (başlat + bekle). Kapı BEKLEME adımıdır; başlatma adımı hep 0 döner, bu yüzden sessiz yolları ayrıca sabit ──────────────────────────────
+  { ad: 'Lint komutu başlatma satırında boşaltılır (`-- true`: başlatma 0 döner, Lint hiç koşmaz, bekleme yeşil verir)', boz: (c) => adimAnahtariniYaz(c, LINT_BASLAT_ADI, 'run', 'run: bash scripts/ci/arka-plan.sh baslat lint -- true'), beklenen: [`Lint hattı: adım "${LINT_BASLAT_ADI}" run satırı beklenen TAM`] },
+  { ad: 'Lint başlatma adı ayrışır (`baslat lintt`: bekleme başka adı arar, 125)', boz: (c) => adimAnahtariniYaz(c, LINT_BASLAT_ADI, 'run', 'run: bash scripts/ci/arka-plan.sh baslat lintt -- pnpm run lint'), beklenen: [`Lint hattı: adım "${LINT_BASLAT_ADI}" run satırı beklenen TAM`] },
+  { ad: 'Lint başlatma `continue-on-error: true` alır', boz: (c) => adimaAnahtarEkle(c, LINT_BASLAT_ADI, 'continue-on-error: true'), beklenen: [`AĞIR adım "${LINT_BASLAT_ADI}" continue-on-error taşıyor`] },
+  { ad: 'Lint başlatma koşulu hızlı yol çıktısını okumaz (belge PR\'ında da başlar: kazanç sıfır)', boz: (c) => adimAnahtariniYaz(c, LINT_BASLAT_ADI, 'if', KOSUL), beklenen: [`AĞIR adım "${LINT_BASLAT_ADI}" atlama koşulu TAM eşit değil`] },
+  { ad: 'Lint başlatma adımı silinir (bekleme hiç başlatılmamış komutu bekler)', boz: (c) => adimiSil(c, LINT_BASLAT_ADI), beklenen: [`adım "${LINT_BASLAT_ADI}" ci.yml içinde yok`] },
+  { ad: 'Lint sonucu (KAPI) adımı silinir (Lint kırmızısı `ci`yi kırmızı yapmaz)', boz: (c) => adimiSil(c, LINT_BEKLE_ADI), beklenen: [`adım "${LINT_BEKLE_ADI}" ci.yml içinde yok`] },
+  { ad: 'Lint sonucu adımından `if:` silinir (belge PR\'ında da koşar: 125, ayna koşusunda da koşar)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'if', null), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" atlama koşulu taşımıyor`] },
+  { ad: 'Lint sonucu koşulundan `!cancelled()` düşer (Build kırmızıyken Lint sonucu yazılmaz)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'if', KOSUL_HIZLI), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" atlama koşulu TAM eşit değil`] },
+  { ad: 'Lint sonucu koşulu `|| always()` kuyruğu alır (ayna ve hızlı yol kararından bağımsız koşar)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'if', `${KOSUL_LINT_BEKLE} || always()`), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" atlama koşulu TAM eşit değil`] },
+  { ad: 'Lint sonucu koşulu `always()` olur (iptalde de koşar, ayna ve hızlı yol kararını yok sayar)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'if', 'if: always()'), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" atlama koşulu TAM eşit değil`] },
+  { ad: 'Lint sonucu `continue-on-error: true` alır (kırmızı Lint işi kırmızı yapmaz)', boz: (c) => adimaAnahtarEkle(c, LINT_BEKLE_ADI, 'continue-on-error: true'), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" continue-on-error taşıyor`] },
+  { ad: 'Lint sonucu `run` satırına `|| true` (bekleme adımının kırmızısı yutulur)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'run', `${LINT_BEKLE_RUN} || true`), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" run komutu hatayı yutuyor`, 'run satırı beklenen TAM'] },
+  { ad: 'Lint sonucu `run` satırı `; true` ile biter', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'run', `${LINT_BEKLE_RUN}; true`), beklenen: [`AĞIR adım "${LINT_BEKLE_ADI}" run komutu hatayı yutuyor`] },
+  { ad: 'Lint sonucu `bekle` yerine `baslat` kipini çağırır (hemen 0 döner: kapı ölür, Lint hiç beklenmez)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'run', 'run: bash scripts/ci/arka-plan.sh baslat lint -- pnpm run lint'), beklenen: [`Lint hattı: adım "${LINT_BEKLE_ADI}" run satırı beklenen TAM`] },
+  { ad: 'Lint sonucu başka adı bekler (`bekle lintt`: 125 ya da başka koşunun sonucu)', boz: (c) => adimAnahtariniYaz(c, LINT_BEKLE_ADI, 'run', 'run: bash scripts/ci/arka-plan.sh bekle lintt 600'), beklenen: [`Lint hattı: adım "${LINT_BEKLE_ADI}" run satırı beklenen TAM`] },
+  { ad: 'Lint sonucu adımına beklenmeyen anahtar (timeout-minutes)', boz: (c) => adimaAnahtarEkle(c, LINT_BEKLE_ADI, 'timeout-minutes: 1'), beklenen: [`Lint hattı: adım "${LINT_BEKLE_ADI}" beklenmeyen anahtar \`timeout-minutes\``] },
+  { ad: "Lint sonucu adımı Build'den ÖNCEYE taşınır (paralellik kazancı kaybolur)", boz: (c) => adimiTasi(c, LINT_BEKLE_ADI, 'Build (blocking)', 'once'), beklenen: ["Lint sonucu adımı Build'den ÖNCE"] },
+  { ad: 'Lint sonucu adımı Lint başlatma adımından ÖNCEYE taşınır (bekleme hiç başlatılmamış komutu bekler)', boz: (c) => adimiTasi(c, LINT_BEKLE_ADI, LINT_BASLAT_ADI, 'once'), beklenen: ['Lint sonucu adımı Lint başlatma adımından ÖNCE'] },
+  { ad: "Lint sonucu adımı shard bekleme adımının SONRASINA taşınır (son adım kuralı bozulur, Lint kırmızısı geç görünür)", boz: (c) => adimiTasi(c, LINT_BEKLE_ADI, SHARD_BEKLE_ADI, 'sonra'), beklenen: ['shard bekleme adımı Lint sonucu adımından ÖNCE'] },
+  { ad: 'Lint sonucu adımı hızlı yol adımının ÖNCESİNE taşınır (çıktı yazılmadan okunur)', boz: (c) => adimiTasi(c, LINT_BEKLE_ADI, HIZLI_ADI, 'once'), beklenen: ['Lint sonucu adımı hızlı yol adımından ÖNCE'] },
   { ad: 'Test `run` satırına `|| :`', boz: (c) => adimAnahtariniYaz(c, 'Test', 'run', 'run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log || :'), beklenen: ['AĞIR adım "Test" run komutu hatayı yutuyor'] },
 
   // ── ayna adımının ortam değişkenleri: DEĞERLER tam eşitlik ─────────────────────────────────────────────────────────
