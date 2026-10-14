@@ -684,9 +684,10 @@ try {
   bolum('filo', 4,
     'FILO ILETISIMI: dogrudan mesaj (SendMessage) + is bitince notify_when_idle; kapali pencereye ' +
     'mailbox_manage send (alici = TAM oturum kimligi, kisa 8 hane SESSIZCE duser). Pano = claim + canlilik, ' +
-    'NOT KUTUSU DEGIL. Emir = Linear kaydi. Zamanlayici/cron/loop ONCE Recep ile (karar 53). ' +
-    'Kutuya sir ve Recep onayi yazilmaz. Ayrinti: docs/standards/fleet-mechanism-standard.md\n',
-    'FILO: SendMessage + notify_when_idle; emir = Linear; ayrinti fleet-mechanism-standard.md\n')
+    'NOT KUTUSU DEGIL. Emir = Kanban karti (Linear emekli, karar 324). Zamanlayici/cron/loop ONCE Recep ile (karar 53). ' +
+    'Kutuya sir ve Recep onayi yazilmaz. Ayrinti: docs/standards/fleet-mechanism-standard.md\n' +
+    'OPS ADRESI: SendMessage to="OPS" (ciplak ad; ListAgents [ref] ve local_ kimligi hafizaya YAZILMAZ, her resume\'de degisir)\n',
+    'FILO: SendMessage + notify_when_idle; OPS ADRESI: to="OPS" (ciplak ad); ayrinti fleet-mechanism-standard.md\n')
 
   bolum('pano', 5, kisaPano(board.summary(sid)) + '\n', 'PANO: node scripts/board/board.cjs who\n')
 
