@@ -770,7 +770,8 @@ değişeceği için R5.5 gereği sha256 değişir ve doğrulama turu yeniden ko�
 | Search Central blogu ve Search Off the Record taraması (H2/H3 için resmî ek kanıt) | BLOG | YAPILMADI, ayrı iş |
 | Mueller açıklamasının birincil kaydı | BLOG | YAPILMADI; satır GÖRÜŞ olarak kalır |
 | Uyarı eşiklerinin üçüncü yazıda yeniden ayarı | BLOG | üçüncü yazıdan sonra |
-| "Sürücü", "hız kontrol", "inverter" ve "frekans konvertörü" sözcüklerinin arama talebi (başlıkta hangisinin geçeceği) | GEO-SEO | ÖLÇÜLMEDİ; Trends ölçümü için kart gerekir; öneri tablosunda alternatifli satır bu karara bağlı |
+| "Hız sürücüsü" ile "frekans konvertörü" sözcüklerinin arama talebi (başlıkta hangisinin geçeceği) | GEO-SEO (SEO-50) | ÖLÇÜLDÜ 14 Ekim, Google Trends TR, 12 ay, 6 çağrı, **düşük güvenilirlik**: iki sözcük aynı büyüklük sınıfında; talep ikisi arasında seçim yapmıyor, seçimi tekrar kuralı (Y3) ve yazının kendi sözcüğü belirler. "Sürücü" tek başına ölçülemez (genel sözcük). Düşük hacimli terimler iki gün arayla tutarsız çıktı, bu yüzden frekans ailesi içinde sıra iddia edilmez |
+| Yazıdaki "invertör" yazımı ile arama dilindeki "inverter" yazımı | BLOG + Recep | AÇIK: Trends'te "inverter" en yüksek hacimli terim, "invertör" yaklaşık onda biri (SEO-50, düşük güvenilirlik); başlığa yansıtılıp yansıtılmayacağı ayrı karar, bu PR başlıkta "inverter" önermez |
 
 ---
 
