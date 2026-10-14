@@ -49,7 +49,7 @@ getirmez, mevcut R1–R9 ve `yayin-gorunurluk-denetim-standard.md` Y2'yi sıraya
 Tetik ölçüm: radyal/aksiyel yazısında Google dizin isteği yapıldı, IndexNow yapılmadı (anahtar depoda ve
 canlıda 200 iken "yok" sanıldı).
 **v0.9 (2026-10-14, BLG-12, OPS emri):** R11 — başlık ve içerik yapısı: Google'ın resmî belgelerinden
-derlenen 12 satır (adresli, belge tarihli, ham HTML'de doğrulanmış alıntı), Google'ın YAZMADIĞI şeyler
+derlenen 13 satır (adresli, belge tarihli, ham HTML'de doğrulanmış alıntı), Google'ın YAZMADIĞI şeyler
 (alt başlıkta konu ifadesi şartı ve sayısal eşik yok) ve bunların üstüne kurulan İLKE sınıfı kurallar;
 R3'e alt başlık satırı; kapıya `baslikDenetle` UYARI kolu. Kırmızı kural getirmez.
 
@@ -696,7 +696,8 @@ arandı, özetleyici araç kanıt sayılmadı (R2.3). Türkçe arayüzlü sürü
 | 9 | Başlık bağlantısı, `<h1>` gibi başlık öğelerinden de üretilebilir | "Heading elements, such as <h1> elements" | `appearance/title-link` | 2025-12-10 |
 | 10 | Anahtar kelime doldurma spamdir (tanım) | "Keyword stuffing refers to the practice of filling a web page with keywords or numbers in an attempt to manipulate rankings in Google Search results." | `essentials/spam-policies` | 2026-08-28 |
 | 11 | Doldurmanın biçimi: doğal olmayacak sıklıkta tekrar | "Repeating the same words or phrases so often that it sounds unnatural." | `essentials/spam-policies` | 2026-08-28 |
-| 12 | Anahtar kelime dizisi kullanıcıya sayfa hakkında net fikir vermez | "meta descriptions comprised of long strings of keywords don't give users a clear idea of the page's content" | `appearance/snippet` | 2026-04-20 |
+| 12 | **Yan dayanak** (meta açıklama kuralıdır, başlık kuralı değil): anahtar kelime dizisi kullanıcıya sayfa hakkında net fikir vermez | "meta descriptions comprised of long strings of keywords don't give users a clear idea of the page's content" | `appearance/snippet` | 2026-04-20 |
+| 13 | Bölüme giden "Read more" derin bağlantısı için içerik insana hemen görünür olmalı, kaydırma JS ile kontrol edilmemeli, adres çubuğundaki hash silinmemeli; bu bir olasılık artırma önerisidir, garanti değildir | "A "Read more" deep link is a link within a snippet that leads users to a specific section on that page." ve "Make sure content is immediately visible on the page to a human (and not hidden behind an expandable section or tabbed interface, for example)." | `appearance/snippet` | 2026-04-20 |
 
 **GÖRÜŞ:** Google Arama sözcüsü John Mueller (2019, haber metni üzerinden ikincil kaynak; birincil kayıt
 aranmadı): bir sayfada H1 sayısının alt ya da üst sınırı yoktur ("There's no limit, neither upper or lower
@@ -718,6 +719,12 @@ Engine Land makalesi 403 verdi, iki ikincil kaynak karşılaştırılamadı).
   yapısı için **iç kuraldır**; gerekçesi Google değil, tek başlıklı bir belge şablonudur. Bu bölüm o
   kuralı değiştirmez; yalnız gerekçesinin kaynağını doğru yere yazar.
 - **Sayfa içi anahtar anlar (key moments)** yalnız video işaretlemesi içindir; yazıya uygulanmaz.
+- **"Read more" derin bağlantısı başlık metnine bağlanmaz** (satır 13). Belge bu bölüm bağlantısı için başlığın
+  metnini değil içeriğin görünürlüğünü, kaydırmanın JS ile yönetilmemesini ve hash'in korunmasını şart koşar. Yani
+  alt başlığı yeniden yazmak bu bağlantıların görünme olasılığını artırdığı için DEĞİL, okuyucu için yapılır.
+- **Bu sitenin şablonunda gövde ve SSS cevapları daraltılabilir (accordion) değildir** (ölçüldü 2026-10-14:
+  `src/lib/bilgiMerkezi/markdown.ts` ve `RehberYazisiSayfasi.tsx`'te `<details>` yalnız dar ekrandaki İçindekiler
+  için var). 13. satırın birinci şartı bu yüzden bugün karşılanıyor; şablon değişirse yeniden ölçülür (Y8).
 
 **Sonuç:** alt başlık kuralı "Google şöyle istiyor" diye yazılmaz. Aşağıdaki kurallar İLKE sınıfındadır;
 resmî satırlara yaslanır ama onları aşar, bu yüzden aşağıdaki uyarı kolu **KIRMIZI değil UYARIDIR**.
@@ -733,6 +740,7 @@ resmî satırlara yaslanır ama onları aşar, bu yüzden aşağıdaki uyarı ko
 | Y5 | SSS soruları tam soru cümlesidir ve konuyu adıyla anar ("Fan eğrisindeki verim her devirde geçerli mi?" iyi; "Peki ya verim?" kötü) | 3, 8 | İLKE |
 | Y6 | H2 sayısı ve kelime sayısı hedef değildir (R3'ün mevcut cümlesi); bölüm sayısı yan soruların sayısından gelir | 7 | RESMÎ |
 | Y7 | Başlığın metni değişirse içindekinin çapası da değişir; dışarıdan o çapaya bağlantı varsa eski çapa kırılır (R10 B9 ölçümünde çapa bağlantısı sorulur) | R6 | İLKE |
+| Y8 | Gövde ve SSS cevapları daraltılabilir (accordion, sekme) yapılmaz; bölüm içeriği sayfa yüklenirken görünür kalır ve sayfa yüklenirken kaydırma konumu JS ile değiştirilmez, adresteki hash silinmez. Şablon kararıdır (URUN); değişirse bu satır yeniden ölçülür | 13 | RESMÎ (öneri, garanti değil) |
 
 ### R11.4 Denetim kolu (`baslikDenetle`, UYARI)
 
@@ -762,6 +770,7 @@ değişeceği için R5.5 gereği sha256 değişir ve doğrulama turu yeniden ko�
 | Search Central blogu ve Search Off the Record taraması (H2/H3 için resmî ek kanıt) | BLOG | YAPILMADI, ayrı iş |
 | Mueller açıklamasının birincil kaydı | BLOG | YAPILMADI; satır GÖRÜŞ olarak kalır |
 | Uyarı eşiklerinin üçüncü yazıda yeniden ayarı | BLOG | üçüncü yazıdan sonra |
+| "Sürücü", "hız kontrol", "inverter" ve "frekans konvertörü" sözcüklerinin arama talebi (başlıkta hangisinin geçeceği) | GEO-SEO | ÖLÇÜLMEDİ; Trends ölçümü için kart gerekir; öneri tablosunda alternatifli satır bu karara bağlı |
 
 ---
 
@@ -785,7 +794,7 @@ Kaynak sınıfı (`hukum-kaynak-standard.md`): **A** = BLOG'un kendi ölçümü 
 | 2026-09-24 | Kalıp kapısı ilk yazıya karşı (BLOG) | A | Onaya sunulmuş metin (sha f29ab1c35e26): ZORUNLU-BOLUM-YOK × 2 (fiyat etkenleri, sorumluluk notu); tamamlanmış metin: 0 |
 | 2026-10-13 | BLG-3 + frekans yazısı bulgu tablosu, kapı koşusu (BLOG, çürütme turlu) | A | 59 gerçek bulgu; `rehber-denetim.mjs` tur 4–10 taslaklarına koşuldu: 0 bulguya hüküm; `alinti-dogrula.mjs` fonksiyon düzeyi: tur 4 GECTI 114 · INCELE 7 · KALDI 0; tur 4–9'un 41 bulgusundan 35'i 25 Eylül'de doğrulanmış metinde vardı. Rapor `docs/audits/blg3-bulgu-tablosu-2026-10.md` (BLG-10 PR'ı) |
 | 2026-09-24 | Alıntı betiği canlı (BLOG) | A | Cetvelin 5 Google alıntısı: GECTI 2 · INCELE 3 · KALDI 0; bayat SSS alıntısı yol değişikliğiyle yakalandı; bayatlık kelimesi olağan cümlede de işaret verdi (ayırt etmez) |
-| 2026-10-14 | Google başlık ve içerik yapısı belgeleri, ham HTML (BLOG, blog-arastirmaci + müdür doğrulaması) | A | 5 belge 200; 12 resmî alıntının 12'si belge metninde birebir bulundu; H2/H3 için konu ifadesi şartı ve başlıkta sayısal eşik YOK; tek H1 sınırı yok (GÖRÜŞ, ikincil kaynak). Search Central blogu ve Search Off the Record taranmadı |
+| 2026-10-14 | Google başlık ve içerik yapısı belgeleri, ham HTML (BLOG, blog-arastirmaci + müdür doğrulaması) | A | 5 belge 200; 13 resmî alıntının 13'ü belge metninde birebir bulundu (GEO-SEO bağımsız olarak 12'sini aynı sonuçla doğruladı, 13. satırı BLOG ekledi ve doğruladı); H2/H3 için konu ifadesi şartı ve başlıkta sayısal eşik YOK; tek H1 sınırı yok (GÖRÜŞ, ikincil kaynak). Search Central blogu ve Search Off the Record taranmadı |
 
 ⚠**v0.1'de bu cetvelin kendisi R2'yi çiğnedi:** SSS alıntısı özetleyici araçla "ölçüldü" diye yazıldı ve
 bayattı (R2.3 vakası). Kuralı yazmak onu uygulamak değildir; bu sürümün de her olgusal cümlesi aynı

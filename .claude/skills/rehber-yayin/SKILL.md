@@ -3,7 +3,7 @@ name: rehber-yayin
 description: Rehber ya da blog yazısının yayın akışını yönlendirir. Yeni blog yazısı yayınlıyoruz, yazı yayınlandı, rehber yazısı yayına çıkıyor, dizine ekle, doğrulama turu cümlelerinde kullan. Basamağı, sahibini ve kapıyı söyler (cetvel R10). Yazı yazmak için write-seo-geo-content.
 category: orchestration
 metadata:
-  kaynak: "docs/standards/rehber-yazisi-standard.md R10 (v0.8), BLG-11, OPS emri 13 Ekim 2026"
+  kaynak: "docs/standards/rehber-yazisi-standard.md R10 (v0.8) ve R11 (v0.9), BLG-11, BLG-12, OPS emri 13 ve 14 Ekim 2026"
   sahibi: "BLOG (B1–B10, B16), GEO-SEO (B11–B15)"
 ---
 
@@ -45,6 +45,7 @@ metadata:
 5. **Onay sorusu gitmeden önce yayın yolu ölçülür** (R5.7): bağlanan kimlikler güncel slug'a çözülmüyorsa metin yayına giremez, onay sorulmaz.
 6. **Doğrulanan metin tek karakter değişirse** durum taslağa düşer ve tüm metin yeniden tura girer (R5.1 adım 5).
 7. **Zincir bitmeden kart kapanmaz.** B10, B11 ve B12 kayıtları kartta olmadan yazı kartı Done'a taşınmaz (R10.3).
+8. **Konu ifadesi taşımayan alt başlık** ("Nasıl çalışır?", "İzlenecek yol"): tek başına neyin başlığı olduğu anlaşılmaz (R11.3 Y2). Taslakta kapıyı koştur (`baslikDenetle`, UYARI verir, kırmızı değil). Google belgelerinde bu bir şart değildir (R11.2); "Google istiyor" diye yazma, okuyucu için ilke olarak yaz.
 
 ## Sınır
 

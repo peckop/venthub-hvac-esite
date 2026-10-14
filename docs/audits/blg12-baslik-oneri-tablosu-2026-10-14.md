@@ -16,6 +16,8 @@ R11'in kuralları İLKE sınıfındadır; Google'ın belgelerinde alt başlık (
 
 ## 2. Ölçüm (bugünkü başlıklar ve öneri, `baslikDenetle`)
 
+**Search Console ile çapraz kontrol (GEO-SEO, 14 Ekim, SEO-49):** iki yazıda adı görünen sorgu 2, öneriyle çelişen başlık yok. Veri çok ince olduğu için bu bir doğrulama değildir; radyal yazısı için henüz hiçbir sorguda gösterim yok. Sorgu cümleleri depoya yazılmaz (P6).
+
 | Yazı | H2 (zorunlu bölümler hariç) | Konu terimi taşıyan | Oran | Ana ifadeyi tekrarlayan | Uyarı |
 |---|---|---|---|---|---|
 | Frekans konvertörü, bugün | 12 | 2 | 0,17 | 1 (0,08) | BASLIK-KONU-ORANI |
@@ -32,7 +34,7 @@ Konu terimleri H1'den çıkar: frekans yazısında *freka, konve, fan, pompa*; r
 | H1 | Frekans konvertörü nedir, fan ve pompada nasıl seçilir? | **Değişmez** | Konu adı ve aranan soru birlikte; betimleyici ve abartısız (Y1). |
 | 1 | Frekans konvertörü nedir? | **Değişmez** | Konu terimi başlığın kendisi. |
 | 2 | Nasıl çalışır? | Frekans konvertörü nasıl çalışır? | Tek başına neyin çalışmasından söz ettiği anlaşılmıyor; içindekide bağlamsız kalır (Y2). Bölüm dört ana kısmı anlatıyor, başlık bunu aşmıyor. |
-| 3 | Fan ve pompada neden kullanılır? | Fan ve pompada hız sürücüsü neden kullanılır? | "Neyin kullanıldığı" belli değil. Her başlığa "frekans konvertörü" yazılırsa 12 başlığın 11'i aynı ifadeyi taşır (ölçüldü: tekrar oranı 0,92, `BASLIK-TEKRAR`); bu yüzden aynı cihaz için yazının kendi sözcüğü "sürücü" kullanıldı. |
+| 3 | Fan ve pompada neden kullanılır? | Fan ve pompada hız sürücüsü neden kullanılır? | "Neyin kullanıldığı" belli değil. Her başlığa "frekans konvertörü" yazılırsa 12 başlığın 11'i aynı ifadeyi taşır (ölçüldü: tekrar oranı 0,92, `BASLIK-TEKRAR`); bu yüzden aynı cihaz için yazının kendi sözcüğü "sürücü" kullanıldı. **Alternatif:** "Fan ve pompada frekans konvertörü neden kullanılır?" (ölçüldü: konu terimi taşıyan 6/12 = 0,50, ana ifadeyi tekrarlayan 6/12 = 0,50, uyarı yok). "Sürücü" sözcüğünün arama talebi ölçülmedi (R11.5); karar Recep'in. |
 | 4 | Yumuşak kalkış | Motorun yumuşak kalkışı | "Yumuşak kalkış" tek başına neye ait olduğunu söylemiyor. Konu terimi eklenmedi; bölüm yıldız/üçgen ve yumuşak yol vericiyi de anıyor, başlık bir kıyas ya da üstünlük iddia etmiyor. |
 | 5 | Değişken tork ve sabit tork | Değişken tork ve sabit tork uygulamaları | Mühendis okuyucu için terimler yeterli; "uygulamaları" bölümün yük türlerini (fan, pompa, konveyör) anlattığını söylüyor. Küçük değişiklik. |
 | 6 | Seçim: neye bakılır? | Frekans konvertörü seçerken neye bakılır? | "Seçim" neyin seçimi? Aranan ifadeye en yakın bölüm bu; konu terimi doğal yerde (Y2). Başlıktaki iki nokta kaldırıldı. |
