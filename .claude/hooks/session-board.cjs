@@ -21,6 +21,21 @@ function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
 }
 
+/**
+ * ⭐TEST YALITIMINDA GERÇEK DEPONUN KİMLİK DOSYASINA DOKUNULMAZ (ARC-130, 14 Ekim 2026).
+ * `venthub-sid` HOME'da değil git dizininde yaşar; vitest HOME yalıtımı (ARC-129) onu kapsamaz. Yalıtım modunda
+ * (`VENTHUB_HOME_YALITIMI_DIZINI` dolu) ve hedef dizin BU deponun git dizini ise yazma ve silme yapılmaz.
+ * Üretimde değişken yoktur: davranış aynı. Yardımcı yüklenemezse yalıtım modunda KORUR (kapalı kalır).
+ */
+function gercekDepoKorunuyor(dizin) {
+  if (!process.env.VENTHUB_HOME_YALITIMI_DIZINI) return false
+  try {
+    return require('../../scripts/board/kimlik.cjs').gercekDepoyaAitMi(dizin) === true
+  } catch {
+    return true
+  }
+}
+
 let input = {}
 try { input = JSON.parse(readStdin() || '{}') } catch { input = {} }
 
@@ -82,7 +97,9 @@ try {
     const eski = path.join(path.resolve(gitCwd, gitDir), 'venthub-sid')
     let temizlendi = ''
     try {
-      if (fs.existsSync(eski)) {
+      if (gercekDepoKorunuyor(path.resolve(gitCwd, gitDir))) {
+        process.stderr.write('[session-board] test yalitimi — gercek deponun venthub-sid dosyasi SILINMEDI (ARC-130).\n')
+      } else if (fs.existsSync(eski)) {
         temizlendi = fs.readFileSync(eski, 'utf8').trim().slice(0, 8)
         fs.unlinkSync(eski)
       }
@@ -103,6 +120,8 @@ try {
      * böyle sildi. Gerçek oturum numarası her zaman UUID'dir; UUID olmayan sid kimlik dosyasına yazılmaz.
      */
     process.stderr.write('[session-board] sid UUID degil (' + String(sid).slice(0, 12) + '…) — venthub-sid YAZILMADI (uydurma kimlik).\n')
+  } else if (gitDir && gercekDepoKorunuyor(gitDir)) {
+    process.stderr.write('[session-board] test yalitimi — gercek deponun venthub-sid dosyasi YAZILMADI (ARC-130).\n')
   } else if (gitDir) {
     fs.writeFileSync(path.join(gitDir, 'venthub-sid'), sid + '\n', 'utf8')
   }
