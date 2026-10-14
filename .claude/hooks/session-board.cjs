@@ -770,5 +770,19 @@ const yaz = () => {
   } catch (e) {
     bolum('posta', 1, `⚠posta kutusu sayaci yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — kutu OLCULMEDI.\n`)
   }
+  // WRONGSTACK MCP AYAR SATIRI (ARC-128, 14 Ekim): disabledMcpjsonServers'ta adı geçen ya da .mcp.json'da olmayan
+  // sunucuyu açılışta söyle (OPS penceresinin bağlantı sorunu ayardan çıktı ve görünmedi). Yalnız AYAR; bağlantıyı
+  // yukarıdaki posta sayacı ölçer. Uyarı öncelik 1, temiz satır 5 (bütçe dolunca temiz satır düşer).
+  try {
+    const wb = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'wrongstack-baglanti.cjs'))
+    const s = wb.incele({
+      cwd: input.cwd || process.cwd(),
+      kok: path.join(__dirname, '..', '..'),
+      home: require('os').homedir(),
+    })
+    bolum('wrongstack-mcp', wb.uyariVar(s) ? 1 : 5, wb.acilisSatiri(s))
+  } catch (e) {
+    bolum('wrongstack-mcp', 1, `⚠WRONGSTACK MCP satiri yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — devre disi durumu OLCULMEDI.\n`)
+  }
   yaz()
 })()
