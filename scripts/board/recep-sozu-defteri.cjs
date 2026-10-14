@@ -89,6 +89,8 @@ const DIS_BLOKLAR = [
 ]
 /** Kapanışı gelmemiş (kesik) dış blok açılışı: kalan her şey o bloğun içindir, Recep sözü sayılmaz. */
 const ACIK_DIS_BLOK = /<(?:cross-session-message|agent-message|task-notification|ci-monitor-event|system-reminder|pasted_content|local-command-caveat|local-command-stdout|command-name|command-message|command-args|new-diagnostics)\b[\s\S]*$/i
+/** `start_session` görev metninin sabit başlığı: ilk mesaj başka oturumdan gelir, Recep'in sözü değildir. */
+const BASLANGIC_BRIEF = /^\s*Background \(from the session that started this one\):/i
 /** Harness'in peer mesajlarını sarmak için yazdığı çerçeve cümleleri (etiket dışında kalanlar). */
 const CERCEVE_CUMLELERI = [
   /Another Claude session sent a message(?: while you were working)?:?/gi,
@@ -108,6 +110,10 @@ const CERCEVE_CUMLELERI = [
  */
 function siniflandir(prompt) {
   if (typeof prompt !== 'string' || prompt.trim() === '') return { recep: false, soz: '', sebep: 'bos' }
+  // ARC-124 (ölçüldü 13 Ekim, defterde 11 kayıt): `start_session` ile başlatılan pencerenin İLK mesajı başka oturumun
+  // yazdığı görev metnidir ("Background (from the session that started this one): ... Task: ...") ve etiketsiz gelir.
+  // Recep sözü DEĞİLDİR; kayda girmez, okumada da süzülür (gecerliKayit bu işlevi kullanır → eski kayıtlar silinmeden gizlenir).
+  if (BASLANGIC_BRIEF.test(prompt)) return { recep: false, soz: '', sebep: 'baslangic-brief' }
   let m = prompt.replace(/\r\n?/g, '\n')
   for (const k of DIS_BLOKLAR) m = m.replace(k, ' ')
   m = m.replace(ACIK_DIS_BLOK, ' ')

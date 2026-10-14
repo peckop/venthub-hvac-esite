@@ -5,6 +5,7 @@ import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 import {
   formatSpecValue,
+  GIZLI_SPEC_ANAHTARLARI,
   groupTechnicalSpecs,
   translateSpecKey} from '../productHelpers'
 
@@ -141,6 +142,35 @@ describe('groupTechnicalSpecs', () => {
     expect(grouped?.other.specs).toEqual({
       custom_spec: 'Value'
     })
+  })
+
+  it('URN-127: gizli iç anahtar (pq_curve_kaynak) hiçbir grupta satır olmaz; pq_curve ve diğerleri aynen durur', () => {
+    const specs = {
+      pq_curve: '[[0,210],[100,180],[255,105],[400,40],[510,0]]',
+      pq_curve_kaynak: 'kitapcik_grafik',
+      max_delivery_m3h: 510,
+      weight_kg: 4.2,
+      voltage_v: 230,
+      ip_rating: 'IP44',
+    }
+    const grouped = groupTechnicalSpecs(specs)
+    expect(GIZLI_SPEC_ANAHTARLARI.has('pq_curve_kaynak')).toBe(true)
+
+    const tumSatirlar = Object.values(grouped ?? {}).flatMap((g) => Object.keys(g.specs))
+    expect(tumSatirlar, 'iç anahtar müşteriye satır olarak basılıyor').not.toContain('pq_curve_kaynak')
+    expect(Object.values(grouped ?? {}).some((g) => JSON.stringify(g.specs).includes('kitapcik_grafik'))).toBe(false)
+
+    // pq_curve ("pressure" içermez, "curve") → other; diğer anahtarlar kendi gruplarında kalır.
+    expect(grouped?.other.specs).toEqual({ pq_curve: specs.pq_curve, ip_rating: 'IP44' })
+    expect(grouped?.performance.specs).toEqual({ max_delivery_m3h: 510 })
+    expect(grouped?.physical.specs).toEqual({ weight_kg: 4.2 })
+    expect(grouped?.electrical.specs).toEqual({ voltage_v: 230 })
+  })
+
+  it('URN-127: gizli anahtar büyük/küçük harf ayrımı yapmadan süzülür; benzer adlı anahtar süzülmez', () => {
+    const grouped = groupTechnicalSpecs({ PQ_CURVE_KAYNAK: 'turetilmis', pq_curve_note: 'metin' })
+    const tum = Object.values(grouped ?? {}).flatMap((g) => Object.keys(g.specs))
+    expect(tum).toEqual(['pq_curve_note'])
   })
 
   it('REC-172 tur 2: IE verim sınıfı ve elektrik koruma sınıfı ELEKTRİK grubunda; benzer adlı alan kaymaz', () => {
