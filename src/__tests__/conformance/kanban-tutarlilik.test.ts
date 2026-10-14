@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process'
+import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 
@@ -52,6 +53,7 @@ interface Betik {
 }
 interface Kanca {
   onarimGerekli: (g: unknown) => { gerekli: boolean; kartKimligi?: string; panoKimligi?: string; sebep: string }
+  cagriBasarisizMi: (cevap: unknown) => boolean
 }
 
 const betik = require_(BETIK) as Betik
@@ -196,6 +198,40 @@ describe('INV-KANBAN-TUTARLILIK-4 · kanca yalnız ilgili çağrıda tetiklenir 
     expect(kanca.onarimGerekli(cagri({ action: 'move_task', targetColumnId: 'done' }, { tool_response: '{"ok":false,"error":{}}' })).gerekli).toBe(false)
     expect(kanca.onarimGerekli(cagri({ action: 'move_task', targetColumnId: 'in-progress' })).gerekli).toBe(false)
     expect(kanca.onarimGerekli(cagri({ action: 'move_task', targetColumnId: 'done', taskId: '' })).gerekli).toBe(false)
+  })
+
+  it('başarısız çağrı HER cevap biçiminde tanınır: dizge, nesne, MCP içerik dizisi (JSON.stringify tırnağı kaçırır)', () => {
+    const basarisiz = [
+      '{"ok":false,"error":{"code":"X"}}',
+      { ok: false, error: { code: 'X' } },
+      { content: [{ type: 'text', text: '{"ok":false,"error":{"code":"X"}}' }] },
+      { result: { content: [{ type: 'text', text: '{"ok": false}' }] } },
+      [{ type: 'text', text: '{"ok":false}' }],
+    ]
+    for (const r of basarisiz) {
+      expect(kanca.cagriBasarisizMi(r), JSON.stringify(r)).toBe(true)
+      expect(kanca.onarimGerekli(cagri({ action: 'move_task', targetColumnId: 'done' }, { tool_response: r })).gerekli).toBe(false)
+    }
+    const basarili = [
+      '{"ok":true}',
+      { ok: true, task: { labels: ['ok'] } },
+      { content: [{ type: 'text', text: '{"ok":true,"message":"Task moved."}' }] },
+      'düz metin',
+      null,
+      undefined,
+    ]
+    for (const r of basarili) {
+      expect(kanca.cagriBasarisizMi(r), JSON.stringify(r)).toBe(false)
+    }
+    expect(
+      kanca.onarimGerekli(cagri({ action: 'move_task', targetColumnId: 'done' }, { tool_response: { content: [{ type: 'text', text: '{"ok":true}' }] } })).gerekli,
+    ).toBe(true)
+  })
+
+  it('betik tek kartta get_task kullanır (pano taranmaz) ve iş bitince süreç açıkça çıkar', () => {
+    const kaynak = fs.readFileSync(BETIK, 'utf8')
+    expect(kaynak, 'tek kart için get_task yok: kanca her tetikte tüm panoyu okur').toMatch(/action: 'get_task'/)
+    expect(kaynak, '60 sn zamanlayıcı süreci canlı tutar: açık çıkış yok').toMatch(/\.then\(\(\) => process\.exit\(process\.exitCode \|\| 0\)\)/)
   })
 
   it('kanca SÜRECİ: bozuk girdide ve vana açıkken çıkış 0, çıktı yok', () => {

@@ -158,9 +158,25 @@ async function cli(argv) {
     c.bildir('notifications/initialized', {})
     const panolar = a.pano ? [{ id: a.pano }] : (await cagir('kanban_read', { action: 'list_boards' })).boards
     const kartlar = []
-    for (const b of panolar) {
-      const g = await cagir('kanban_read', { action: 'get_board', boardId: b.id, includeTasks: true })
-      for (const t of (g.board && g.board.tasks) || []) kartlar.push({ ...t, boardId: b.id })
+    if (a.kart) {
+      // Tek kart (kanca her tetikte bunu çağırır): pano tüm kartlarıyla OKUNMAZ (16 pano / ~1100 kart), yalnız get_task.
+      // Pano verilmediyse kart her panoda denenir (get_task hafif; bulunamayan pano hata verir, sıradakine geçilir).
+      for (const b of panolar) {
+        try {
+          const g = await cagir('kanban_read', { action: 'get_task', boardId: b.id, taskId: a.kart })
+          if (g.task) {
+            kartlar.push({ ...g.task, boardId: b.id })
+            break
+          }
+        } catch {
+          /* bu panoda kart yok */
+        }
+      }
+    } else {
+      for (const b of panolar) {
+        const g = await cagir('kanban_read', { action: 'get_board', boardId: b.id, includeTasks: true })
+        for (const t of (g.board && g.board.tasks) || []) kartlar.push({ ...t, boardId: b.id })
+      }
     }
     const yaz = a.onar
       ? {
@@ -183,10 +199,14 @@ async function cli(argv) {
 }
 
 if (require.main === module) {
-  cli(process.argv.slice(2)).catch((e) => {
-    process.stderr.write(`[kanban-tutarlilik] ${(e && e.message) || e}\n`)
-    process.exit(1)
-  })
+  // İş bitince süreç AÇIKÇA çıkar: MCP istemcisinin 60 sn'lik zamanlayıcısı temizlenmiyor, çıkış çağrılmazsa süreç
+  // iş bittikten sonra ~60 sn yaşar (OPS ölçümü, #1932). Çıkış kodu cli'nin process.exitCode'undan gelir.
+  cli(process.argv.slice(2))
+    .then(() => process.exit(process.exitCode || 0))
+    .catch((e) => {
+      process.stderr.write(`[kanban-tutarlilik] ${(e && e.message) || e}\n`)
+      process.exit(1)
+    })
 }
 
 module.exports = { KURAL, DEPARTMAN_BASLIGI, ihlaller, plan, isoHafta, haftaEtiketi, calistir, bitmisMi }
