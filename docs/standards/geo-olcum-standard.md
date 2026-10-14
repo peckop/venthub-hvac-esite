@@ -151,6 +151,43 @@ Koşu ve özet komutları (soru listesi, ham cevap ve rakip alan adları depo d�
 
 Betiğin kapısı olmayan kısmı (gerçek Gemini/Claude çağrısı) CI'da koşmaz: abonelik ve anahtar gerektirir.
 
+## G8 — Trends talep ölçümü: Supermetrics sonrası kendi yolumuz (SEO-51, karar 365)
+
+Supermetrics aboneliği alınmadı (karar 365, deneme 15 Ekim 2026'da bitti). Talep ölçümü (karar 326: çağrı başına
+en çok 5 terim, değer aynı çağrıdaki en yüksek terime göre, null eşik altı ≠ sıfır, ortak çapa terimle kıyas,
+çapa null ya da 3'ün altındaysa çağrı geçersiz, her bulgu en az iki farklı çağrıyla) **yöntem olarak aynen
+kalır**; yalnız aracı değişir:
+
+| | Eski | Yeni |
+|---|---|---|
+| Araç | Supermetrics GT (`data_query`) | Tarayıcı bölmesi ya da Chrome'daki `trends.google.com` sayfasının kendi isteği |
+| Kimlik | Supermetrics hesabı | Gerekmez; oturumsuz sayfa |
+| Doğrulandı | 2026-10-14 (6 çağrı) | 2026-10-14: `/trends/api/explore` → `/trends/api/widgetdata/multiline`, 2 terim, 5 yıl, 262 haftalık nokta, durum 200 |
+
+**Tarif (sayfa konsolundan, salt okuma).** Önce `trends.google.com/trends/explore?geo=TR&hl=tr&q=<terim>` açılır
+(tarayıcı bölmesi ya da `claude-in-chrome`). Sonra sayfa bağlamında iki istek koşulur: `explore` (widget jetonu)
+ve `multiline` (zaman serisi). Terim ve pencere `req` nesnesindedir:
+
+```js
+const req = {comparisonItem: [{keyword: 'frekans konvertörü', geo: 'TR', time: 'today 5-y'}, {keyword: 'inverter', geo: 'TR', time: 'today 5-y'}], category: 0, property: ''}
+const temizle = (s) => JSON.parse(s.replace(/^\)\]\}',?\n?/, ''))
+const e = temizle(await (await fetch('/trends/api/explore?hl=tr&tz=-180&req=' + encodeURIComponent(JSON.stringify(req)))).text())
+const w = e.widgets.find((x) => x.id === 'TIMESERIES')
+const m = temizle(await (await fetch('/trends/api/widgetdata/multiline?hl=tr&tz=-180&req=' + encodeURIComponent(JSON.stringify(w.request)) + '&token=' + w.token)).text())
+// m.default.timelineData: [{time, formattedTime, value: [terim1, terim2…], hasData: [...]}]
+```
+
+Sınırlar ve dürüstlük:
+
+- ⚠Bu uçlar **belgelenmemiştir** ve herhangi bir gün değişebilir ya da 429 verebilir (ölçülmedi: 429 sınırı, yalnız
+  bir koşu); çağrılar arasına bekleme konur, kota dolarsa koşu durur ve hata satırı biriktirilmez (G3'teki kural).
+- Değerler yine **göreli**dir (G5'in Trends cümlesi): mutlak hacim iddiası için Bing ya da Search Console verisi
+  gerekir. Düşük hacimli terimler koşular arasında oynar (9 ↔ 14 Ekim'de "frekans invertörü" 68,9 → null);
+  sıra iddiası yalnız iki farklı çağrıda aynı yönde çıkarsa yazılır.
+- `time` değeri `today 5-y` (haftalık), `today 12-m` (haftalık/günlük), `all` (2004'ten aylık) alabilir; kayıt
+  dosyasında pencere ve terim sırası yazılır.
+- Sorgu ve sayfa verisi gibi bu seri de depo dışıdır (P6). Son arşiv: `C:/tmp/vh-arsiv/geo-seo/supermetrics-son-2026-10-14/`.
+
 ---
 
 ## Ölçüm geçmişi
