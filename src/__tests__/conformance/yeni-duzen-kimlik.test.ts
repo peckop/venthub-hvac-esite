@@ -281,6 +281,9 @@ describe('INV-YENIDUZEN-KIMLIK-5 · SessionStart kancası (süreç): rol kartı,
         VENTHUB_SESSIONS_DIZINI: path.join(t, 'sessions'),
         VENTHUB_ROL_KIMLIK_DOSYASI: path.join(t, 'rol-kimlikleri.json'),
         VENTHUB_ANA_PROJE_DIZINI: path.join(t, 'ana'),
+        // ARC-129: kanca ops-oturumu.cjs.acilistaYaz çağırır; bu değişken olmadan GERÇEK ~/.claude/mod-durum/ops-oturumu.json'a
+        // sahte kimlik yazılıyordu (14 Ekim, kokpit OPS'u tanımadı). İkinci katman: vitest-home-ortami (test-home-yalitimi.test.ts).
+        VH_OPS_OTURUMU_DOSYASI: path.join(t, 'ops-oturumu.json'),
         ...env,
       },
       windowsHide: true,
