@@ -879,11 +879,22 @@ function tabanBul(gitCalistir, kok, istenen) {
   throw new Error(`taban bulunamadı (${adaylar.join(', ')}): git fetch origin master`);
 }
 
-/** Yerel değişenler: tabana göre çalışma ağacı farkı (kayıtlı + kaydedilmemiş izlenen dosyalar, silinenler dahil) ∪ izlenmeyen yeni dosyalar (`.gitignore` hariç). */
-function yerelDegisenler(gitCalistir, kok, taban) {
+/**
+ * Yerel değişenler: tabana göre çalışma ağacı farkı (kayıtlı + kaydedilmemiş izlenen dosyalar, silinenler dahil) ∪ izlenmeyen yeni dosyalar (`.gitignore` hariç).
+ * ARC-143 (15 Ekim): `kokler` (haritanın bilinen kök adları) verilirse, kökü haritaca BİLİNMEYEN izlenmeyen dosyalar (ör. bir PowerShell
+ * oturumunun cwd'ye yazdığı `Microsoft/Windows/PowerShell/ModuleAnalysisCache`) değişen sayılmaz ve `yoksayilan` listesine girer: eskiden
+ * bunlar "sınıflanamayan yol" diye seçimi TAM'a düşürüyor ve yerelde HİÇ test koşmuyordu. Gerçek değişiklik yolu KAPANMAZ: `git add`
+ * edilen ya da izlenen dosya hâlâ değişendir ve bilinmeyen kökteyse TAM kalır (CI kolu ayrı: `--degisen-dosya`/git diff, buradan geçmez).
+ */
+function yerelDegisenlerAyrintili(gitCalistir, kok, taban, kokler = null) {
   const izlenen = yollariAyir(gitCalistir(['-C', kok, 'diff', '--name-only', '-z', '--no-renames', taban]));
   const yeni = yollariAyir(gitCalistir(['-C', kok, 'ls-files', '--others', '--exclude-standard', '-z']));
-  return [...new Set([...izlenen, ...yeni])].sort();
+  const bilinen = kokler instanceof Set ? yeni.filter((y) => kokler.has(String(y).replace(/\\/g, '/').split('/')[0])) : yeni;
+  return { degisen: [...new Set([...izlenen, ...bilinen])].sort(), yoksayilan: yeni.filter((y) => !bilinen.includes(y)) };
+}
+
+function yerelDegisenler(gitCalistir, kok, taban, kokler = null) {
+  return yerelDegisenlerAyrintili(gitCalistir, kok, taban, kokler).degisen;
 }
 
 /** Seçilen test dosyalarını vitest ile koşar (yerel tam paket DEĞİL). Dönüş: vitest çıkış kodu. */
@@ -988,8 +999,23 @@ async function calistir(argv, secenekler = {}) {
     if (arg.yerel && oturumAc === vitestOturumuAc && !process.env.VENTHUB_DUNYA_DURUMU) process.env.VENTHUB_DUNYA_DURUMU = 'dislan';
     let degisen;
     if (arg.degisenDosya) degisen = yolDosyasiniOku(arg.degisenDosya);
-    else if (arg.yerel) degisen = yerelDegisenler(gitCalistir, kok, tabanBul(gitCalistir, kok, arg.taban));
-    else degisen = yollariAyir(gitCalistir(['-C', kok, ...GIT_ARGUMANLARI]));
+    else if (arg.yerel) {
+      // ARC-143: haritanın bilinen kökleri okunamazsa (null) filtre YOK = eski davranış (güvenli taraf).
+      let kokler = null;
+      try {
+        kokler = new Set(JSON.parse(fs.readFileSync(haritaYolu, 'utf8')).kokler);
+      } catch {
+        kokler = null;
+      }
+      const a = yerelDegisenlerAyrintili(gitCalistir, kok, tabanBul(gitCalistir, kok, arg.taban), kokler);
+      degisen = a.degisen;
+      if (a.yoksayilan.length > 0) {
+        yaz(
+          `Uyarı: izlenmeyen ve haritanın bilmediği kökte ${a.yoksayilan.length} dosya yok sayıldı (${a.yoksayilan.slice(0, 3).join(', ')}${a.yoksayilan.length > 3 ? ' …' : ''}); ` +
+            'gerçek değişiklikse `git add` ile izlet, sonra seçime girer.\n',
+        );
+      }
+    } else degisen = yollariAyir(gitCalistir(['-C', kok, ...GIT_ARGUMANLARI]));
     if (arg.yerel && degisen.length === 0) {
       yaz('Değişiklik yok (tabana göre): koşacak test yok.\n');
       return { tam: false, secilen: [], neden: ['değişiklik yok'], cikisKodu: 0 };
@@ -1018,6 +1044,12 @@ async function calistir(argv, secenekler = {}) {
       }
     }
   } catch (e) {
+    // ARC-143: YEREL kipte yanlış yazılmış bayrak (ör. --maxWorkers) sessizce "TAM, hiç test koşmadı" olmasın: açık hata, çıkış 2.
+    // CI kolu (--yerel yok) eski davranışta kalır: argüman çözülemezse güvenli tarafta TAM.
+    if (argv.includes('--yerel') && /^bilinmeyen argüman/.test(hataMetni(e))) {
+      yaz(`HATA: ${hataMetni(e)}. Geçerli: --yerel --taban <ref> --kuru --vitestsiz --json (ayrıntı: dosya başlığı). Hiçbir test koşmadı.\n`);
+      return { tam: false, secilen: [], neden: [hataMetni(e)], cikisKodu: 2 };
+    }
     sonuc = tamSonuc([`seçim hesaplanamadı (${hataMetni(e)}): güvenli tarafta tam`], testler);
   } finally {
     if (oturum) {
@@ -1120,6 +1152,7 @@ module.exports = {
   tazelikHesapla,
   vitestOturumuAc,
   yerelDegisenler,
+  yerelDegisenlerAyrintili,
   yoluNormalle,
   yollariAyir,
 };
