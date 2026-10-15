@@ -59,7 +59,7 @@ const PENCERE = /-pencere\.md$/
  * departman düşüren PR kapıyı da kendiliğinden yeşil tutardı (totoloji). Kapalı departmanlar (ADMIN, EDGE, I18N, MARKA, MEVZUAT,
  * SATIS) pencere açıldığında hem buraya hem üretici listesine eklenir; ikisi ayrışırsa aşağıdaki "üreticiyle bağ" kolu kırmızı verir.
  */
-const ACIK_DEPARTMANLAR = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK'] as const
+const ACIK_DEPARTMANLAR = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK', '3D'] as const
 /** Pencere modeli: pencerenin bugünkü modeli (OPS Opus 5.5, öteki departmanlar Sonnet 5.5); TAM kimlik, takma ad kayar. */
 const PENCERE_MODEL: Record<string, string> = { OPS: 'claude-opus-5-5' }
 const PENCERE_MODEL_VARSAYILAN = 'claude-sonnet-5-5'
@@ -374,7 +374,7 @@ describe('INV-HAZIR-OZELLIK-1 — departman müdür pencere tanımları (HRT-49)
     }
   })
 
-  it('model sabit ve beklenen: OPS claude-opus-5-5, öteki on departman claude-sonnet-5-5 (takma ad değil tam kimlik)', () => {
+  it('model sabit ve beklenen: OPS claude-opus-5-5, öteki on bir departman claude-sonnet-5-5 (takma ad değil tam kimlik)', () => {
     const modeller = Object.fromEntries(ACIK_DEPARTMANLAR.map((d) => [d, alan(ajanFm(`${d.toLowerCase()}-pencere.md`), 'model')]))
     expect(modeller).toEqual({
       OPS: 'claude-opus-5-5',
@@ -388,6 +388,7 @@ describe('INV-HAZIR-OZELLIK-1 — departman müdür pencere tanımları (HRT-49)
       'GEO-SEO': 'claude-sonnet-5-5',
       TAKIP: 'claude-sonnet-5-5',
       YETENEK: 'claude-sonnet-5-5',
+      '3D': 'claude-sonnet-5-5',
     })
   })
 
