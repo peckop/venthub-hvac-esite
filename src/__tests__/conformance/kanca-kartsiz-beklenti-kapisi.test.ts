@@ -469,6 +469,26 @@ describe('INV-KARTSIZ-KAPI-10 (ARC-95): RECEP YETKİSİ satırı — ikinci dene
     expect(kanca.yetkiDegerlendir('Not: **RECEP YETKİSİ:** canlı yazım diye yazılır').durum).toBe('yok')
   })
 
+  it('ARC-142: yedinci sınıf "dış kişiye Recep adına yazışma" geçer (OPS-155 AVenS belge isteği); "Recep adına" olmayan ilgisiz ifade liste dışı kalır', () => {
+    const gecenler = [
+      'dış kişiye Recep adına yazışma',
+      'tedarikçiye/dış kişiye Recep adına yazışma',
+      'Tedarikçiye Recep adına yazışma — AVenS belge isteği',
+      'üreticiye Recep adına belge isteği',
+      'kuruma Recep adına e-posta',
+      'DIŞ KİŞİYE RECEP ADINA MESAJ',
+    ]
+    for (const g of gecenler) {
+      expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, 'tanınmadı: ' + g).toBe('tamam')
+    }
+    for (const g of ['tedarikçi hakkında soru', 'dış kişiye yazışma', 'Recep adına karar', 'tedarikçiyi ara', 'firma bilgisi okundu']) {
+      expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, 'yanlış geçti: ' + g).toBe('liste-disi')
+    }
+    // Hata mesajı yedinci sınıfı da sayar (kullanıcı hangi gerekçeler izinli görebilsin).
+    const m = kanca.degerlendir(mesaj('OPS-73'), dogrulayici({ 'OPS-73': { durum: 'liste-disi', gerekce: 'bence gerekli' } }))
+    expect(m.sorunlar[0]).toContain('dış kişiye Recep adına yazışma')
+  })
+
   it('⭐OPS 10-12 (b): eşanlamlılar — "canlı veritabanı yazımı/…na yazım", "migration\'lı PR birleştirme", "migration içeren dalın merge\'ü"', () => {
     const esanlamlilar = [
       'canlı veritabanı yazımı',

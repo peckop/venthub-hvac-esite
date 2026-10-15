@@ -36,12 +36,14 @@ const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 // ── ARC-95 (10-12): İKİNCİ DENETİM — Recep'e bağlanan kartın açıklaması "RECEP YETKİSİ: <gerekçe>" satırı taşır ──
 // Olay: yetkisi zaten verilmiş iş tekrar tekrar Recep'e soru olarak geldi; kural yazılıydı ama kapı yoktu (karar 317 ailesi).
 // Kural: mesajda istek olarak anılan ve Recep'e bağlı (Sen/Recep ya da recep-bekliyor/karar-bekliyor) her açık kart, açıklamasında bir
-// satır "RECEP YETKİSİ: <gerekçe>" taşır; gerekçe YALNIZ aşağıdaki altı sınıftan biridir. Satır yoksa ya da gerekçe liste dışıysa KIRMIZI.
+// satır "RECEP YETKİSİ: <gerekçe>" taşır; gerekçe YALNIZ aşağıdaki yedi sınıftan biridir (yedincisi ARC-142, 15 Ekim: dış kişiye
+// Recep adına yazışma; OPS-155 AVenS belge isteği altı sınıfta karşılık bulamadan kırmızı aldı). Satır yoksa ya da gerekçe liste dışıysa KIRMIZI.
 // Cetvel: docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ. Kanban betiği ikinci kez (--detay) çağrılır; okunamazsa fail-open ama sessiz değil.
 // Satır başı çapası biçim işaretlerini tanır (OPS 10-12 okuması): düz, "**RECEP YETKİSİ:** x", "- RECEP YETKİSİ: x", "> RECEP YETKİSİ: x".
 // Başında madde/alıntı işareti (> - * +), kalın/altı çizili (** __) ve iki noktanın iki yanında kalın kapanışı serbesttir.
 const YETKI_SATIRI = /^[ \t]*(?:[>\-*+][ \t]*)*(?:\*\*|__)?[ \t]*RECEP[ \t]+YETK[İIiı]S[İIiı][ \t]*(?:\*\*|__)?[ \t]*:[ \t]*(?:\*\*|__)?[ \t]*(\S.*)$/gim
-const YETKI_GEREKCELERI = 'canlı yazım · migration birleştirme · gerçek para · geri alınamaz silme · yeni görünüm/iddia/yapı kararı · hesap/ayar dosyası'
+const YETKI_GEREKCELERI =
+  'canlı yazım · migration birleştirme · gerçek para · geri alınamaz silme · yeni görünüm/iddia/yapı kararı · hesap/ayar dosyası · dış kişiye Recep adına yazışma'
 // Karşılaştırma ASCII'ye indirgenmiş metinle yapılır (ı/İ/ş/ğ/ü/ö/ç yazımı ayrımı bozmasın); gerekçenin devamı (" — ayrıntı") serbesttir.
 const asciiKucuk = (s) =>
   String(s).toLocaleLowerCase('tr').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
@@ -56,6 +58,9 @@ const YETKI_KALIPLARI = [
   /^geri\s+alinamaz\s+silme\b/,
   /^yeni\s+(?:gorunum|iddia|yapi)(?:\s*\/\s*(?:gorunum|iddia|yapi))*\s+karari\b/,
   /^(?:hesap|ayar)(?:\s*\/\s*(?:hesap|ayar))*\s+dosyasi\b/,
+  // ARC-142: "dış kişiye Recep adına yazışma", "tedarikçiye/dış kişiye Recep adına yazışma", "üreticiye Recep adına belge isteği".
+  // "Recep adına" ZORUNLU: yalnız "tedarikçi hakkında soru" gibi ifadeler liste dışı kalır (kullanıcı adına mesaj göndermek açık izin ister).
+  /^(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*(?:\s*\/\s*(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*)*\s+recep\s+adina\s+(?:yazisma|mesaj|e-?posta|belge\s+istegi)/,
 ]
 
 /** Kartın açıklamasından: { durum: 'yok' | 'liste-disi' | 'tamam', gerekce }. Birden çok satırda biri geçerliyse 'tamam'. */
