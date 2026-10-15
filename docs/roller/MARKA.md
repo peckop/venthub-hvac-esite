@@ -4,6 +4,7 @@
 
 ## Görev
 Marka kimliği: logo, palet, yazı tipi ve belge sistemi (Design-MARKA projesi).
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): canlıya uygulama (URUN); token ve bileşen kodu (TASARIM).
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.

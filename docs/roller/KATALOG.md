@@ -3,7 +3,8 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Ürün verisi hattı: katalog PDF'inden ürün satırına, CSV içe/dışa aktarım, fiyat ve şema cetvelleri.
+Resmî katalog ve föyleri bulmak, indirmek, kaynak dizinine almak; CSV içe/dışa aktarım, fiyat ve şema cetvelleri; Design'ın çıkardığı veriyi kaynağa karşı doğrulayıp canlı yazım hazırlığı.
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): PDF'ten veri çıkarımı, açıklama metni, eğri sayısallaştırma, sayfa içeriği Design'ın.
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -28,7 +29,7 @@ supabase, kaynak dizini betikleri, csv-import-export cetveli.
 - Gerekçeli özet: `docs/roller/KATALOG-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Kapalı (iş dondurma, karar 165); açılınca ilk iş REC-423.
+Açık (karar 165 dondurması kalktı).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

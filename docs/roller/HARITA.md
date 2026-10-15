@@ -4,6 +4,7 @@
 
 ## Görev
 Belge ve hafıza düzeni: CLAUDE.md, AGENTS.md, docs/README.md haritası, belge yönetimi cetveli, kanca tasarımı.
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): kod ve CI (ALTYAPI, ARAC); sahibi başkasının cetvelini değiştirmek; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmak.
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.

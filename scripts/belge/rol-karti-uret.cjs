@@ -278,6 +278,9 @@ const CALISMA = [
   '- Genel bileşen/modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdeği biz yazarız.',
 ].join('\n')
 
+/** Karar 369 (OPS-146): kural `.claude/rules/filo-ortak.md` "İş ve kart" bölümündedir; kartta kısa hâli + sınır satırı. */
+const GOREV_DEGIL_BASLIK = 'Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS\'a "görev dışı: <satır>" yaz): '
+
 /** Karar 181: yalnız URUN, ADMIN, ALTYAPI, KATALOG kartlarının Yasak bölümüne eklenir. */
 const ARKA_OFIS_YASAGI = ' Genel arka ofis modülünü (stok, satınalma, CRM, teknik servis) genişletmek = önce OPS\'a sor (karar 181).'
 
@@ -285,6 +288,7 @@ const ARKA_OFIS_YASAGI = ' Genel arka ofis modülünü (stok, satınalma, CRM, t
 const ROLLER = {
   OPS: {
     gorev: 'Filonun orkestratörü ve genel müdürü (yürütmenin başı, sahibe karşı tek sorumlu yüz): sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını kendi cümlesiyle OPS panosundaki REC-425 kartına not olarak kaydeder (Linear\'a yazılmaz). Kanban panolarını (ortak "Bekleyenler" + departman başına) ve Linear\'ın donukluğunu (karar 219) gözler; Linear\'a yeni iş kaydı açılmaz.',
+    gorevDegil: 'kod yazmak; departman işini kendi eliyle yürütmek (emir verir, yapmaz).',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
     yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',
@@ -293,6 +297,7 @@ const ROLLER = {
   },
   ARAC: {
     gorev: 'Kanca, WrongStack, claude-mem ve şerit aracı altyapısı; araç envanteri ve araç-atıl-kalmaz kuralı.',
+    gorevDegil: 'CI iş akışı ve bağımlılık (ALTYAPI); belge ve rol kartı (HARİTA); site kodu (URUN).',
     dosyalar: '.claude/hooks/**, scripts/board/**, tools/**, .github/dependabot.yml, docs/audits/arac-envanteri-*.',
     yetki: 'Kanca kurulumu ve araç denemeleri (kanca TASARIMI HARİTA\'dadır); araç envanterine satır ekleme.',
     yasak: '.mcp.json ve settings değişikliği OPS kapısıdır; ALTYAPI\'nın CI dosyalarına dokunmaz.',
@@ -301,6 +306,7 @@ const ROLLER = {
   },
   ALTYAPI: {
     gorev: 'CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi; rota dili satırı ve yönlendirme (arama sonuç sayfasının kendisi URUN\'dur).',
+    gorevDegil: 'arama sonuç sayfasının kendisi (URUN); kanca ve WrongStack aracı (ARAC); belge düzeni (HARİTA).',
     dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, docs/standards/fleet-mechanism-standard.md.',
     yetki: 'CI ve bağımlılık değişikliği, dependabot PR\'ları, güvenlik taraması; kendi cetveli için gözden geçirme.',
     yasak: 'Sürüm sabitleme istisnadır (gerekçesiz pin yok); sır yazmaz; migration merge\'ü Recep kapısıdır.' + ARKA_OFIS_YASAGI,
@@ -309,6 +315,7 @@ const ROLLER = {
   },
   HARITA: {
     gorev: 'Belge ve hafıza düzeni: CLAUDE.md, AGENTS.md, docs/README.md haritası, belge yönetimi cetveli, kanca tasarımı.',
+    gorevDegil: 'kod ve CI (ALTYAPI, ARAC); sahibi başkasının cetvelini değiştirmek; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmak.',
     dosyalar: 'CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, docs/roller/**, docs/archive/**.',
     yetki: 'Belge temizliği ve emeklilik, rol kartı üretimi, tazelik göstergesi ölçümü (kurulum ARAÇ\'ta).',
     yasak: 'CLAUDE.md değişikliği OPS kapısıdır; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmaz.',
@@ -317,6 +324,7 @@ const ROLLER = {
   },
   URUN: {
     gorev: 'Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi. Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI\'da kalır.',
+    gorevDegil: '3d/** (3D); sözlük ve çeviri metni (I18N); token ve yazı tipi (TASARIM); ürün verisi (KATALOG); CI (ALTYAPI).',
     dosyalar: 'src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*.',
     yetki: 'Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").',
     yasak: 'Adres şeması değişikliği tek başına Recep\'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır.' + ARKA_OFIS_YASAGI,
@@ -325,6 +333,7 @@ const ROLLER = {
   },
   ADMIN: {
     gorev: 'Yönetici paneli: tablo, form ve iş akışı ekranları.',
+    gorevDegil: 'vitrin sayfaları (URUN); Edge fonksiyonları (EDGE); ürün verisi hattı (KATALOG).',
     dosyalar: 'src/views/admin/**, src/components/admin/**, src/app/admin/**, src/hooks/useAdminTable*, src/lib/services/admin*/**.',
     yetki: 'Admin arayüzü ve servis katmanı değişikliği (DI kuralı geçerli).',
     yasak: 'Admin işlemleri admin_audit_log\'a yazılır; yetki kararı yalnız app_metadata\'dan; canlı veri yazımı Recep kapısıdır.' + ARKA_OFIS_YASAGI,
@@ -332,15 +341,17 @@ const ROLLER = {
     durum: 'Açık; işler OPS\'tan gelir.',
   },
   KATALOG: {
-    gorev: 'Ürün verisi hattı: katalog PDF\'inden ürün satırına, CSV içe/dışa aktarım, fiyat ve şema cetvelleri.',
+    gorev: 'Resmî katalog ve föyleri bulmak, indirmek, kaynak dizinine almak; CSV içe/dışa aktarım, fiyat ve şema cetvelleri; Design\'ın çıkardığı veriyi kaynağa karşı doğrulayıp canlı yazım hazırlığı.',
+    gorevDegil: 'PDF\'ten veri çıkarımı, açıklama metni, eğri sayısallaştırma, sayfa içeriği Design\'ın.',
     dosyalar: 'scripts/icerik-hatti/**, scripts/db/product-data/**, catalog-ingestion / csv-import-export / pricing / product-schema standartları; kardeş depo venthub-pdf-ingestor.',
     yetki: 'Kaynak dizininden okuma ve veri hazırlama; PDF\'i doğrudan taramaz (KAYNAK DİZİNİ önce).',
     yasak: 'Canlı ürün/fiyat yazımı Recep kapısıdır; uydurma kimlik üretmez; ErP kararı çıkana kadar dondurulmuş liste değişmez.' + ARKA_OFIS_YASAGI,
     yetenek: 'supabase, kaynak dizini betikleri, csv-import-export cetveli.',
-    durum: 'Kapalı (iş dondurma, karar 165); açılınca ilk iş REC-423.',
+    durum: 'Açık (karar 165 dondurması kalktı).',
   },
   'GEO-SEO': {
     gorev: 'Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük denetimi ve pazar ölçümü.',
+    gorevDegil: 'içerik yazımı (BLOG); sayfa ve robots kodu (URUN, ALTYAPI); canlı içeriğe yazmak.',
     dosyalar: 'scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum}-standard.md, docs/audits/geo-*, docs/audits/seo-*.',
     yetki: 'Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.',
     yasak: 'Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.',
@@ -349,6 +360,7 @@ const ROLLER = {
   },
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi.',
+    gorevDegil: 'arama görünürlük ölçümü (GEO-SEO); sayfa kodu (URUN); mevzuat hükmü üretmek (MEVZUAT).',
     dosyalar: 'docs/standards/rehber-yazisi-standard.md ve rehber yazı taslakları (REC-369).',
     yetki: 'Taslak yazma, kaynak ve mevzuat paketi isteme (MEVZUAT girdisi), kalıp kapısı.',
     yasak: 'Recep görmeden içerik onayı istenmez (karar 98); yayın Recep onayıyla; mevzuat iddiası kaynaksız yazılmaz.',
@@ -357,6 +369,7 @@ const ROLLER = {
   },
   MARKA: {
     gorev: 'Marka kimliği: logo, palet, yazı tipi ve belge sistemi (Design-MARKA projesi).',
+    gorevDegil: 'canlıya uygulama (URUN); token ve bileşen kodu (TASARIM).',
     dosyalar: 'Design-MARKA proje çıktıları ve yorumları; markanın belge sistemi.',
     yetki: 'Tasarım kararı önerisi ve marka kılavuzu; Linear proje yorumları tasarım yüzeyidir (karar 219 Design istisnası, karar 324 ile kalıcı).',
     yasak: 'Tasarım = hedef, canlı = eski: canlıya uygulama URUN işidir; para harcatan tasarım aracı Recep kapısıdır.',
@@ -367,6 +380,7 @@ const ROLLER = {
   // doğrulayıcı atıfları yeniden ölçtü (8 düzeltme kalemi, kartlara düzeltilmiş hâliyle yazıldı). Ölçülmeyen "ölçülmedi" der.
   MEVZUAT: {
     gorev: 'Teknik mevzuat ve standart kaydı: ürünlerimize dokunan AB tüzük/direktif, TR yönetmelik/tebliğ ve EN/ISO/IEC hükümlerini kanıtlı tutmak; KATALOG, BLOG ve SATIS\'a ürün ailesi × hüküm paketi vermek.',
+    gorevDegil: 'ürün sayfası ve veri yazımı (KATALOG); KVKK, mesafeli satış, fatura (OPS).',
     dosyalar: 'docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya).',
     yetki: 'Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirsiz" hükmü verir; BLOG yazısındaki mevzuat cümlelerini kontrol eder (R5.1); kayıt değişince ilgili departmana bildirir; "ilk anlatan" konu önerir, sırayı Recep belirler.',
     yasak: 'Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).',
@@ -375,6 +389,7 @@ const ROLLER = {
   },
   SATIS: {
     gorev: 'Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, müşteri e-postaları, KVKK ve roller; satış kipi şirket kurulana dek kapalı-hazır.',
+    gorevDegil: 'bildirim cetveli (ALTYAPI); e-posta şablonu (URUN); KVKK cetveli (OPS); canlı ödeme anahtarı (Recep kapısı).',
     dosyalar: 'Migration\'lar `*quote*`, `*anon_definer*`; edge `quote-notification-webhook`, `quote-request-guest`; `quoteService.ts`, `adminQuoteService.ts`, `src/views/admin/quotes/**`; INV-QUOTE-YAYIM-1, INV-AUTH-DEFINER-ANON-1. Cetveller (devir 2026-09-30): ödeme ve satış kipi (checkout-payment, payment-ledger, satis-kipi-gecis), teklif ve belge numarası (quote-standard, document-numbering; quote-standard yönetici tarafında ADMIN ikincil).',
     yetki: 'Migration planı, gölge veritabanı kanıtı, çürütme; teklif servisini bağlama; konformans kapısı ve cetvel yazımı; birleştirme sonrası canlı salt-okuma ölçüm; migrationsız karar 98 sınıfı PR\'ı ritüelle kendisi birleştirir.',
     yasak: 'Kırmızı CI\'da birleştirme yok; yeni fonksiyonda anon\'a REVOKE; migration/DEFINER PR\'ında birleştirmeden önce diff-review + security-reviewer; test teklifi alıcısı Recep; birleştirme saati ALTYAPI\'ya yazılır; satış kipi yalnız `scripts/kip/satis-kipine-gec.mjs` ile. Bildirim cetveli (notification-standard) ALTYAPI, e-posta şablonu URUN, KVKK cetveli OPS: sahibi başkasıysa değiştirmeden önce ona yaz.',
@@ -383,14 +398,16 @@ const ROLLER = {
   },
   TASARIM: {
     gorev: 'Claude Design ile site arasındaki köprü: Design kararlarını kayda geçirir, tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır, yapılan ekranı Design karesiyle yan yana ölçer.',
+    gorevDegil: 'sayfa, rota, adres, veri, SEO ve kabuk dosyaları (URUN); marka kimliği (MARKA).',
     dosyalar: '`src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7), `docs/plans/tasarim-kod-plani-v2*` (dosya kümesi plan önerisidir, karar değil). Cetvel: marka token eşlemesi (OPS onaylı devir 09-30, önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN\'da kalır.',
     yetki: 'Faz 2a (görünmez token köprüsü), Faz 2b (görünüm dönüşü, bayrak arkasında) ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.',
-    yasak: 'Sayfa, rota, adres, veri, SEO ve kabuk dosyaları URUN\'undur (dokunma, ölç); adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz; para harcatan tasarım aracı Recep kapısıdır. Sınır: MARKA = web\'deki Design-MARKA projesi (kimlik), TASARIM = yerel köprü, canlıya uygulama URUN.',
+    yasak: 'Adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz; para harcatan tasarım aracı Recep kapısıdır.',
     yetenek: 'venthub-tasarim-dili (kare kabul ölçümü), design-dna (yalnız Faz 1-2), Playwright, plan-challenger, typography, accessibility; DesignSync yalnız ana oturumda.',
     durum: 'Açık (asli görev); K36 karar 271 ile kararlı (10-03).',
   },
   EDGE: {
     gorev: 'Supabase Edge Function katmanı (`supabase/functions/**`, 29 fonksiyon + `_shared/`): güvenlik duruşu, deploy hattı, repo↔prod sapma denetimi; her fonksiyon çağıran sınıfına (a/b/c/d) yazılı bağlanır.',
+    gorevDegil: 'ödeme ve bildirim iş kuralı (ALTYAPI kayıtları); e-posta şablonu kodu (URUN); CI (ALTYAPI).',
     dosyalar: '`supabase/functions/**`, `supabase/config.toml`, `deploy-functions.yml`, `edge-shared-input-drift.yml`, `scripts/edge/*`, `edge-security.test.ts`, docs/standards/edge-function-security-standard.md (cetvel sahibi EDGE, OPS 09-30).',
     yetki: 'Edge fonksiyon kodu, CORS/getUser(jwt)/rol kapısı, HMAC + replay koruması, `_shared/**`; fonksiyon başına çağıran sınıfı yorumu; INV-EDGE-* ve INV-KOKEN-* kapıları.',
     yasak: 'Argümansız `auth.getUser()`; CORS başlığı olmayan elle cevap; fonksiyon başına ayrı `supabase.toml`; imzasız JWT\'yi `atob` ile çözmek; sınıfı yazılmamış yeni fonksiyon; ham hata gövdesi dönmek (REC-355); "PROD İLERİ" raporuna bakmadan toplu deploy. Sınır: ödeme ve bildirim fonksiyonları ALTYAPI kayıtlarıyla (REC-355, REC-368) değişir, e-posta koduna URUN de commit atıyor (son 30 günde 16 commit: 11 ALTYAPI, 4 URUN): değiştirmeden önce o pencereye yaz. EDGE penceresi kapalıyken cetvel değişikliği OPS onayıyla.',
@@ -399,6 +416,7 @@ const ROLLER = {
   },
   I18N: {
     gorev: 'TR/EN dil katmanı: sözlükler (tr.ts kaynak, en.ts sadık çeviri), literal→t() göçü, para/sayı/tarih/kasa/rota yardımcıları ve bunları koruyan i18n kapıları; EN deyim pası ve TR yüzeyde İngilizce sızıntı taraması dahil.',
+    gorevDegil: 'çevrilecek içeriğin üretimi (KATALOG, BLOG); sayfa düzeni (URUN).',
     dosyalar: '`src/i18n/**`, `src/__tests__/conformance/i18n-*.test.ts`, docs/standards/i18n-localization-standard.md (cetvel sahibi I18N, OPS 09-30), `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md`. Paylaşılan: i18n-ters-yon ve kategori-adlandirma cetvelleri URUN\'da; tr.ts\'i fiilen düzenleyen URUN.',
     yetki: 'Sözlük ve i18n yardımcı değişikliği, yeni INV-x kapısı, çok dosyalı literal göçü (ajanlar sözlüğe yazmaz, müdür merkezi birleştirir), EN deyim pası, "meşru aynılık" listesine sınıf + gerekçeyle ekleme.',
     yasak: 'Sabit metin, elle `/${lang}/`, ham `Intl.*` / `toLocale*String`, noktalı düz anahtar, mevcut anahtarı körce yeniden tanımlama, `toLocaleLowerCase(\'tr\')`; dile bağlı DB metni için sütun/migration değil `metadata.<alan>_i18n`; canlılığı gösterilmeyen "KAPALI" ilanı yok.',
@@ -407,6 +425,7 @@ const ROLLER = {
   },
   YETENEK: {
     gorev: 'Skill\'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill\'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Departmanların kendi işini ölçmesi departmanların işidir.',
+    gorevDegil: 'departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS).',
     dosyalar: '`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`. Rol kartlarındaki skill listesinin içeriği YETENEK\'ten gelir, kartı HARİTA\'nın üreticisi yazar.',
     yetki: 'Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını önerir; skill kusurlarını (bayat yol/araç adı, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydeder, `.claude/skills/**` düzeltmesini ayrı PR\'la yapar; haftalık kullanım ölçümü (atanmış ama kullanılmayan kırmızı); amaca bağlanamayan skill\'i kapatır (silmez).',
     yasak: '`.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.',
@@ -416,6 +435,7 @@ const ROLLER = {
   // HRT-35 (karar 322, OPS-93, 2026-10-09): tek işi takip; kod yazmaz, işi az olsun ki her zaman açık tutulabilsin.
   TAKIP: {
     gorev: 'Tek işi takip: Claude Code, WrongStack (en sıkı izlenen araç) ve notebooklm-py sürümleri, MCP bağlantı sağlığı, bağımlılık güncelleme PR\'ları (her biri için fayda/risk/hüküm: birleştir / önce sına / beklet) ve işimize yarayan yeni özellikler. Her gün "ne çıktı · bize faydası · risk · kime iş" raporunu OPS\'a verir; bulduğu işi sahibine kart olarak açar. Kod yazmaz.',
+    gorevDegil: 'kod, ayar, sürüm yükseltme ve PR birleştirme (ALTYAPI, ARAC).',
     dosyalar: 'docs/audits/takip-* (salt-okuma raporları), docs/olcum/wrongstack-ozellik-envanteri.md ("bize ne" satırı). Kod dosyası sahibi değildir.',
     yetki: 'Salt-okuma ölçüm ve rapor; güncelleme PR\'ına hüküm yazma; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ\'a kart.',
     yasak: 'Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.',
@@ -424,7 +444,8 @@ const ROLLER = {
   },
   // HRT-62 (karar 372, OPS-150, 2026-10-15): Claude Design'da üretilen 3D ürün modelleri ve R3F parça fabrikası URUN'dan ayrıldı.
   '3D': {
-    gorev: 'Görev: Claude Design\'da üretilen 3D ürün modellerini siteye taşımak; R3F parametrik parça fabrikası (src/components/products/3d) bakımı; model kalite ve performans bütçesi (3d-webgl-standard); gerektiğinde Blender ile model düzeltmek. Görev değil: ürün verisi ve metni (KATALOG, Design), sayfa düzeni (URUN), tasarım dili (TASARIM).',
+    gorev: 'Claude Design\'da üretilen 3D ürün modellerini siteye taşımak; R3F parametrik parça fabrikası (src/components/products/3d) bakımı; model kalite ve performans bütçesi (3d-webgl-standard); gerektiğinde Blender ile model düzeltmek.',
+    gorevDegil: 'ürün verisi ve metni (KATALOG, Design); sayfa düzeni (URUN); tasarım dili (TASARIM).',
     dosyalar: 'src/components/products/3d/**, docs/standards/3d-webgl-standard.md.',
     yetki: 'R3F bileşen kodu, model dosyası düzeltmesi ve performans bütçesi ölçümü; Blender kullanımı kurulumdan sonra (kurulum ilk işte Recep\'le konuşulur).',
     yasak: 'Saf Three.js DOM yok (yalnız R3F + Drei); gölge yalnız \'percentage\'; CSP 3D CDN beyaz listesi kalkmaz; ürün verisi, sayfa düzeni ve tasarım dili başkasınındır (dokunma, ölç); canlı veri yazımı Recep kapısıdır.',
@@ -596,6 +617,7 @@ function kart(ad, r) {
     '',
     '## Görev',
     r.gorev,
+    GOREV_DEGIL_BASLIK + r.gorevDegil,
     '',
     YONETIM_ISTISNA[ad] || YONETIM,
     '',
@@ -653,6 +675,8 @@ function sorunlar(kartlar) {
     for (const baslik of ['## Görev', '## Yönetim (karar 201)', '## Dosyalar', '## Yetki', '## Yasak ve sınır', '## Yetenek ve araç', '## Kurallar', '## Durum']) {
       if (!metin.includes(baslik)) s.push(`${ad}: başlık eksik: ${baslik}`)
     }
+    // Her kartta "Görev değil" satırı bulunur (karar 369, OPS-146): sınırı olmayan görev tanımı eksiktir.
+    if (!metin.includes(GOREV_DEGIL_BASLIK)) s.push(`${ad}: "Görev değil" satırı eksik/değişmiş`)
     // Kartta kural özeti değil kısa adı ve dosya atfı bulunur (REC-521).
     if (!metin.includes(kuralBolumu(ad))) s.push(`${ad}: kural bölümü eksik/değişmiş (kısa ad listesi ve atıf)`)
     // OPS kartı Departman haritası işaretçisini taşır (HRT-29): harita ayrı dosyada, kartta yalnız yol bulunur.
@@ -1001,6 +1025,7 @@ function main() {
 }
 
 module.exports = {
+  GOREV_DEGIL_BASLIK,
   ROLLER,
   DURUM_SATIRI_KURALI,
   CALISMA,
