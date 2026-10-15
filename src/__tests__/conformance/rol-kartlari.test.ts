@@ -19,6 +19,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 type Uretici = {
+  GOREV_DEGIL_BASLIK: string
   uret: () => Record<string, string>
   uretKurallar: () => Record<string, string>
   kuralDosyaAdi: (ad: string) => string
@@ -933,10 +934,23 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     expect(uretici.terminaldenAcilir('3D')).toBe(true)
     for (const dosya of ['3D.md', '3D-kurallar.md']) expect(fs.existsSync(path.join(KOK, 'docs', 'roller', dosya)), dosya).toBe(true)
     const kart = uretici.uret()['3D']
-    expect(kart).toContain('Görev değil:')
+    expect(kart).toContain(uretici.GOREV_DEGIL_BASLIK + 'ürün verisi ve metni (KATALOG, Design)')
     expect(kart).toContain('## Dosyalar\nsrc/components/products/3d/**, docs/standards/3d-webgl-standard.md.')
     const kurallar = uretici.uretKurallar()['3D']
     for (const k of ['K1 ', 'K19 ', 'K20 ']) expect(kurallar, k).toContain(`- ${k.trim()} `)
+  })
+
+  // HRT-64 (karar 369, OPS-146): her kartta "Görev değil" satırı bulunur; sınırı olmayan görev tanımı eksiktir.
+  it('karar 369: her rol kartında dolu "Görev değil" satırı bulunur; satır düşerse üretici yakalar', () => {
+    const kartlar = uretici.uret()
+    expect(Object.keys(kartlar).length).toBe(Object.keys(uretici.ROLLER).length)
+    for (const [ad, r] of Object.entries(uretici.ROLLER) as Array<[string, { gorevDegil?: string }]>) {
+      expect(String(r.gorevDegil ?? '').length, `${ad} gorevDegil dolu`).toBeGreaterThan(20)
+      expect(kartlar[ad], ad).toContain(uretici.GOREV_DEGIL_BASLIK + r.gorevDegil)
+    }
+    const bozuk = { ...kartlar, ARAC: kartlar.ARAC.replace(uretici.GOREV_DEGIL_BASLIK, 'Görev değil: ') }
+    expect(uretici.sorunlar(bozuk).join('\n')).toMatch(/ARAC: "Görev değil" satırı eksik\/değişmiş/)
+    expect(uretici.sorunlar(kartlar)).toEqual([])
   })
 
   it('AYIRT EDİCİLİK: planlı satır silinirse özet ve tam harita değişir; alanı eksik, kartı da olan ya da tabloya girmiş planlı departman yakalanır', () => {
