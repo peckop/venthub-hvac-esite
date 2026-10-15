@@ -187,18 +187,62 @@ const AD_KALIBI = /(lane-day|state|durum)/i
  * @param {string} projeDizini  oturumun (transcript'in) proje dizini
  * @returns {string[]} taranacak memory dizinleri (var olmayanlar elenir; tekrar yok)
  */
-function hafizaDizinleri(projeDizini) {
+function hafizaDizinleri(projeDizini, ipucu) {
   const adaylar = [path.join(projeDizini, 'memory')]
-  const ana = process.env.VENTHUB_ANA_PROJE_DIZINI || anaProjeDizini()
-  if (ana && path.resolve(ana).toLowerCase() !== path.resolve(projeDizini).toLowerCase()) {
-    adaylar.push(path.join(ana, 'memory'))
+  const ekle = (ana) => {
+    if (ana && path.resolve(ana).toLowerCase() !== path.resolve(projeDizini).toLowerCase()) adaylar.push(path.join(ana, 'memory'))
   }
+  ekle(process.env.VENTHUB_ANA_PROJE_DIZINI || anaProjeDizini())
+  // ⭐GİT'TEN BAĞIMSIZ İKİNCİ YOL (ARC-137, 14 Ekim): anaProjeDizini() `git rev-parse` ister (5 sn zaman aşımı, sessiz null).
+  // Git cevap vermediğinde ana kök CLAUDE_PROJECT_DIR'e (= worktree) düşüyor, ana hafıza dizini hiç adaylara girmiyor ve
+  // kapı dosya VAR iken "dosya 0" deyip compact'ı durduruyordu (ölçüldü: PATH'ten git çıkarılınca Altyapı'nın gerçek
+  // girdisiyle çıkış 2). Worktree proje dizininin adı ana proje adı + `--claude-worktrees-<ad>` olduğundan ana dizin
+  // ad önekinden türetilir; cwd/CLAUDE_PROJECT_DIR `.claude/worktrees/<ad>` içindeyse kökü oradan da türetilir.
+  ekle(anaProjeDizinindenTuret(projeDizini))
+  const cwdler = [ipucu && ipucu.cwd, process.env.CLAUDE_PROJECT_DIR]
+  for (const c of cwdler) ekle(anaProjeDizinindenTuret(null, c))
   // Yalnız KÖK memory dizinleri döner; `gunluk/*` alt klasörlerini `oturumunDosyalari` ekler (tek yerde).
-  return adaylar.filter((d, i) => adaylar.indexOf(d) === i && fs.existsSync(d))
+  const gorulen = new Set()
+  return adaylar.filter((d) => {
+    const k = path.resolve(d).toLowerCase()
+    if (gorulen.has(k) || !fs.existsSync(d)) return false
+    gorulen.add(k)
+    return true
+  })
+}
+
+/**
+ * Worktree'den ANA proje dizinini git'siz türetir. `projeDizini` (transcript dizini) ya da `kokYol` (çalışma dizini)
+ * verilir; ikisi de worktree DEĞİLSE null. Dönen dizin yalnız VAR ise döner (büyük/küçük harf farkı çözülür).
+ * @param {string|null} projeDizini  `~/.claude/projects/<slug>--claude-worktrees-<ad>` biçimi
+ * @param {string} [kokYol]  `<ana>/.claude/worktrees/<ad>` biçimi çalışma dizini
+ */
+function anaProjeDizinindenTuret(projeDizini, kokYol) {
+  try {
+    const kok = path.join(os.homedir(), '.claude', 'projects')
+    let anaSlug = null
+    if (projeDizini) {
+      const m = path.basename(projeDizini).match(/^(.+?)--claude-worktrees-/i)
+      if (m) anaSlug = m[1]
+    }
+    if (!anaSlug && kokYol) {
+      const duz = String(kokYol).replace(/\\/g, '/')
+      const m = duz.match(/^(.*?)\/\.claude\/worktrees\//i)
+      if (m) anaSlug = m[1].replace(/[^A-Za-z0-9]/g, '-')
+    }
+    if (!anaSlug) return null
+    const e = fs.readdirSync(kok, { withFileTypes: true }).find((x) => x.isDirectory() && x.name.toLowerCase() === anaSlug.toLowerCase())
+    return e ? path.join(kok, e.name) : null
+  } catch {
+    return null
+  }
 }
 
 /** Ana projenin dizini (`~/.claude/projects/<ana-kök-adı>`). Çözülemezse null (kapı yine worktree dizinine bakar). */
 function anaProjeDizini() {
+  // Ortam değişkeni ÖNCE (hafizaDizinleri ile aynı sözleşme): SessionStart kimlik devri bu işlevi doğrudan çağırır;
+  // testler ve özel kurulumlar ana proje dizinini buradan verir (CI'da gerçek ~/.claude/projects yok → null dönerdi).
+  if (process.env.VENTHUB_ANA_PROJE_DIZINI) return process.env.VENTHUB_ANA_PROJE_DIZINI
   try {
     const { anaKok } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs'))
     // Claude Code yol→ad kuralı: alfasayısal olmayan her karakter '-'. Sürücü harfi büyük/küçük gelebilir.
@@ -218,7 +262,7 @@ function anaProjeDizini() {
  * oturumun şerit adıyla (sessions kaydındaki `name`; Türkçe katlamalı) başlayan durum dosyası KABUL edilir ve
  * "kimlik eski, güncelle" diye UYARILIR. Bloklamaz; başka şeridin dosyasını kabul etmez (ad ÖNEK eşleşmesi + durum kalıbı).
  */
-function oturumSeridi(sid) {
+function oturumAdi(sid) {
   if (!sid) return ''
   try {
     const dizin = process.env.VENTHUB_SESSIONS_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
@@ -226,19 +270,59 @@ function oturumSeridi(sid) {
       if (!f.endsWith('.json')) continue
       try {
         const j = JSON.parse(fs.readFileSync(path.join(dizin, f), 'utf8'))
-        if (j && j.sessionId === sid && typeof j.name === 'string') return asciiKatla(j.name).trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
+        if (j && j.sessionId === sid && typeof j.name === 'string') return j.name
       } catch { /* bozuk kayıt atlanır */ }
     }
   } catch { /* sessions dizini yok */ }
   return ''
 }
 
-function oturumunDosyalari(memoryDizinleri, sid) {
-  const sidli = sidIleDosyalar(memoryDizinleri, sid)
-  if (sidli.length) return sidli
-  const serit = oturumSeridi(sid)
-  if (!serit) return sidli
-  const yedek = []
+/** Şerit adı düzleştirme: Türkçe katla, harf-rakam dışını at ("Araç" → "arac"). */
+function seritSlug(ad) {
+  return asciiKatla(ad).trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
+}
+
+/**
+ * ⭐AD EKİ (ARC-124, 2026-10-13, ÖLÇÜLDÜ): yeni düzen pencereleri "Araç (yeni düzen)", "Geo-SEO (yeni düzen)" adıyla
+ * açılıyor; düzleştirilince "aracyeniduzen" olur ve "arac-" önekiyle eşleşmez → kimlik eşleşmesi yokken kapı compact'ı
+ * DURDURDU (Geo-SEO ve Altyapı, 13 Ekim). Parantezli/köşeli ek ad parçası değildir; atılır.
+ */
+function adEkiniAt(ad) {
+  return String(ad || '').replace(/\s*[(\[][^)\]]*[)\]]/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function pencereKimligiModulu() {
+  try {
+    return require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-kimligi.cjs'))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Oturumun şerit ADAYLARI, en kesinden en zayıfa: (1) agent anahtarının rolü (`settings.local.json` agent ya da
+ * kancaya gelen `agent_type`; ARC-124), (2) ek atılmış pencere adı, (3) tam pencere adı (ARC-6 davranışı).
+ * @param {string} sid
+ * @param {{cwd?: string, agentType?: string}} [ipucu]
+ * @returns {{slug: string, kaynak: string}[]} tekil, boşsuz
+ */
+function seritAdaylari(sid, ipucu) {
+  const aday = []
+  const ekle = (slug, kaynak) => { if (slug && !aday.some(a => a.slug === slug)) aday.push({ slug, kaynak }) }
+  const pk = pencereKimligiModulu()
+  if (pk && ipucu) ekle(pk.rolSlug(pk.rolAdi(pk.agentAdi({ cwd: ipucu.cwd, agentType: ipucu.agentType }))), 'agent anahtari')
+  const ad = oturumAdi(sid)
+  if (ad) {
+    ekle(seritSlug(adEkiniAt(ad)), 'pencere adi')
+    ekle(seritSlug(ad), 'pencere adi')
+  }
+  return aday
+}
+
+/** Bir şerit ÖNEKİYLE (`<slug>-…`) başlayan durum-kalıbı dosyaları (kök + gunluk/*), en yeni önce. */
+function seritOnekiDosyalari(memoryDizinleri, slug) {
+  const bulunan = []
+  if (!slug) return bulunan
   for (const k of [].concat(memoryDizinleri)) {
     const dizinler = [k]
     try {
@@ -249,15 +333,72 @@ function oturumunDosyalari(memoryDizinleri, sid) {
       let adlar = []
       try { adlar = fs.readdirSync(d).filter(a => a.endsWith('.md')) } catch { continue }
       for (const ad of adlar) {
-        if (!asciiKatla(ad).toLowerCase().startsWith(serit + '-') || !AD_KALIBI.test(ad)) continue
-        try { yedek.push({ ad, tam: path.join(d, ad), mt: fs.statSync(path.join(d, ad)).mtimeMs, seritEslesmesi: serit }) } catch { /* atla */ }
+        if (!asciiKatla(ad).toLowerCase().startsWith(slug + '-') || !AD_KALIBI.test(ad)) continue
+        try { bulunan.push({ ad, tam: path.join(d, ad), mt: fs.statSync(path.join(d, ad)).mtimeMs }) } catch { /* atla */ }
       }
     }
   }
-  return yedek.sort((a, b) => b.mt - a.mt)
+  return bulunan.sort((a, b) => b.mt - a.mt)
+}
+
+function oturumunDosyalari(memoryDizinleri, sid, ipucu) {
+  const sidli = sidIleDosyalar(memoryDizinleri, sid)
+  if (sidli.length) return sidli
+  for (const a of seritAdaylari(sid, ipucu)) {
+    const yedek = seritOnekiDosyalari(memoryDizinleri, a.slug).map(d => ({ ...d, seritEslesmesi: a.slug, eslesmeKaynagi: a.kaynak }))
+    if (yedek.length) return yedek
+  }
+  return sidli
+}
+
+/**
+ * ⭐KİMLİK DEVRİ (ARC-124): yeni düzen penceresi her açılışta YENİ oturum kimliği alır; rolün durum dosyası ise eski
+ * kimliği taşır. SessionStart bu işlevi çağırır: rolün en yeni durum dosyasında frontmatter `originSessionId` eskiyse yeni
+ * sid yazılır (dosyanın DEĞİŞTİRME ZAMANI korunur; yoksa bayat dosya taze görünürdü). Devir yapılmayan haller:
+ *  · alan yok (frontmatter başka biçimde) — uydurma alan eklenmez,
+ *  · eski kimlik hâlâ CANLI bir pencere kaydında (iki pencere aynı dosyayı çekiştirmesin; canlıMi dışarıdan verilir).
+ * Fırlatmaz: hata → { devir: false, sebep }.
+ * @param {{sid: string, slug: string, memoryDizinleri: string|string[], canliMi?: (sid: string) => boolean}} p
+ * @returns {{devir: boolean, sebep?: string, dosya?: string, tam?: string, eski?: string, yeni?: string}}
+ */
+function kimlikDevret({ sid, slug, memoryDizinleri, canliMi } = {}) {
+  try {
+    if (!sid || !slug) return { devir: false, sebep: 'girdi-yok' }
+    const adaylar = seritOnekiDosyalari(memoryDizinleri, slug)
+    if (!adaylar.length) return { devir: false, sebep: 'dosya-yok' }
+    const d = adaylar[0]
+    const govde = fs.readFileSync(d.tam, 'utf8')
+    const m = govde.slice(0, 600).match(/originSessionId:[ \t]*(\S+)/)
+    if (!m) return { devir: false, sebep: 'alan-yok', dosya: d.ad }
+    const eski = m[1].replace(/^["']|["']$/g, '')
+    if (eski.toLowerCase() === String(sid).toLowerCase()) return { devir: false, sebep: 'ayni', dosya: d.ad, eski }
+    if (typeof canliMi === 'function' && canliMi(eski)) return { devir: false, sebep: 'eski-canli', dosya: d.ad, eski }
+    const st = fs.statSync(d.tam)
+    fs.writeFileSync(d.tam, govde.replace(m[0], 'originSessionId: ' + sid), 'utf8')
+    try { fs.utimesSync(d.tam, st.atime, st.mtime) } catch { /* zaman geri yazılamadı: devir yine de geçerli */ }
+    return { devir: true, dosya: d.ad, tam: d.tam, eski, yeni: sid }
+  } catch (e) {
+    return { devir: false, sebep: 'hata:' + ((e && (e.code || e.message)) || 'bilinmeyen') }
+  }
+}
+
+/** Son taramada açılamayan/okunamayan .md sayısı (ARC-137): "okunamadı" ile "yok"u ayırmak için. */
+let okumaSorunu = 0
+function okumaSorunuSayisi() {
+  return okumaSorunu
+}
+
+/** Eşzamanlı kısa bekleme (kapı eşzamanlı bir betik; busy-wait değil, Atomics.wait). */
+function beklet(ms) {
+  try {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
+  } catch {
+    /* bekleme desteklenmiyorsa hemen devam */
+  }
 }
 
 function sidIleDosyalar(memoryDizinleri, sid) {
+  okumaSorunu = 0
   // Eski çağrı biçimi (tek dizin dizgisi) çalışmaya devam eder; günlük alt klasörleri de tarar.
   const kokler = [].concat(memoryDizinleri)
   const dizinler = []
@@ -275,7 +416,9 @@ function sidIleDosyalar(memoryDizinleri, sid) {
     let adlar = []
     try {
       adlar = fs.readdirSync(memoryDir).filter(a => a.endsWith('.md'))
-    } catch {
+    } catch (e) {
+      // Dizin hiç yoksa (ENOENT) sorun değil: günlük alt klasörleri var-yok diye denenir. Başka hata okunamadı demektir.
+      if (!e || e.code !== 'ENOENT') okumaSorunu++
       return
     }
     for (const ad of adlar) {
@@ -292,7 +435,7 @@ function sidIleDosyalar(memoryDizinleri, sid) {
         // 2 ise ikisini birden dışlıyordu — katman hiç iş görmüyordu ve bunu ancak ölçünce gördüm.
         if (AD_KALIBI.test(ad)) adEsleseni.push(kayit)
         else if (DORT_ALAN.filter(a => a.desen.test(asciiKatla(govde))).length >= 1) icerikEsleseni.push(kayit)
-      } catch { /* okunamayan dosya kapıyı düşürmez */ }
+      } catch { okumaSorunu++ /* okunamayan dosya kapıyı düşürmez; ama "yok" denmez (ARC-137) */ }
     }
   }
   for (const d of benzersiz) tara(d)
@@ -305,10 +448,10 @@ function sidIleDosyalar(memoryDizinleri, sid) {
  * Aynı çözümleme iki yerde iki kez yazılırsa bir gün ayrışır; bu depoda o sınıf bir gün
  * kaybettirdi (saf fonksiyon doğruydu, yazma noktası onu kullanmıyordu).
  */
-function durumDosyasiBul(sid, transcriptPath) {
+function durumDosyasiBul(sid, transcriptPath, ipucu) {
   const pd = projeDiziniBul(sid, transcriptPath)
   if (!pd) return null
-  const liste = oturumunDosyalari(hafizaDizinleri(pd), sid)
+  const liste = oturumunDosyalari(hafizaDizinleri(pd, ipucu), sid, ipucu)
   return liste.length ? liste[0] : null
 }
 
@@ -404,8 +547,35 @@ if (!projeDizini) {
 }
 
 const memoryDir = path.join(projeDizini, 'memory')
-const tarananDizinler = hafizaDizinleri(projeDizini)
-const dosyalar = oturumunDosyalari(tarananDizinler, sid)
+const ipucu = { cwd: girdi.cwd, agentType: girdi.agent_type }
+const tarananDizinler = hafizaDizinleri(projeDizini, ipucu)
+
+// ⭐ÇÖZÜLEMEDİ ≠ DOSYA YOK (ARC-137): hiçbir hafıza dizini bulunamadıysa kapı "dosya 0" diyemez; bakacağı yer yoktu.
+// Önceden bu hal da bloklanıyordu (ana kök git'ten çözülemeyince yanlış dizin taranıp compact durduruluyordu).
+if (tarananDizinler.length === 0) {
+  process.stdout.write(
+    '[precompact] hafiza dizini COZULEMEDI (' + memoryDir + ' yok; sid=' + (sid || 'YOK') + ') — durum dosyasi ' +
+      'OLCULEMEDI. Compact bloklanmadi; durum dosyani ELLE guncelle.\n',
+  )
+  process.exit(0)
+}
+
+let dosyalar = oturumunDosyalari(tarananDizinler, sid, ipucu)
+// ⭐OKUNAMAYAN DOSYA ≠ DOSYA YOK (ARC-137): bir .md kilitliyken/yazılırken okunamazsa tarama onu sessizce atlıyordu ve
+// "dosya 0" çıkıyordu. Okuma sorunu varsa bir kez yeniden denenir; hâlâ boşsa kapı bloklamaz, sebebi söyler.
+let okumaSorunu = okumaSorunuSayisi()
+if (dosyalar.length === 0 && okumaSorunu > 0) {
+  beklet(400)
+  dosyalar = oturumunDosyalari(tarananDizinler, sid, ipucu)
+  okumaSorunu = okumaSorunuSayisi()
+}
+if (dosyalar.length === 0 && okumaSorunu > 0) {
+  process.stdout.write(
+    '[precompact] durum dosyasi OLCULEMEDI — ' + okumaSorunu + ' hafiza dosyasi okunamadi (' +
+      tarananDizinler.join(' + ') + '). Compact bloklanmadi; durum dosyani ELLE guncelle.\n',
+  )
+  process.exit(0)
+}
 const uyarilar = []
 
 // KOL 1 — durum dosyası hiç yok mu? Tek BLOKLAYAN kol.
@@ -427,7 +597,8 @@ const enTaze = dosyalar[0]
 if (enTaze.seritEslesmesi) {
   uyarilar.push(
     'KIMLIK ESKI: ' + enTaze.ad + ' dosyasinin originSessionId alani bu oturumu (' + sid + ') gostermiyor; "' +
-      enTaze.seritEslesmesi + '" serit adiyla eslesti ve KABUL edildi. Kimligi guncelle (sonraki acilis ayni yere takilmasin).',
+      enTaze.seritEslesmesi + '" serit ' + (enTaze.eslesmeKaynagi === 'agent anahtari' ? '(agent anahtari)' : 'adiyla') +
+      ' eslesti ve KABUL edildi. Kimligi guncelle (sonraki acilis ayni yere takilmasin; SessionStart devri bunu kendiliginden yapar).',
   )
 }
 const yasDk = Math.round((Date.now() - enTaze.mt) / 60000)
@@ -495,6 +666,10 @@ process.exit(0)
 module.exports = {
   durumDosyasiBul, sonBlok, projeDiziniBul, hafizaDizinleri, oturumunDosyalari, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI, yasMetni,
   ozetYonergesi, YONERGE_MAX_KARAKTER, YONERGE_BAYAT_DK,
+  // ARC-124 (yeni düzen kimlik devri): şerit adayları, önekli dosya listesi, SessionStart devri.
+  seritAdaylari, seritOnekiDosyalari, kimlikDevret, adEkiniAt, seritSlug, anaProjeDizini,
+  // ARC-137: git'siz ana dizin türetme ve "okunamadı ≠ yok" sayacı.
+  anaProjeDizinindenTuret, okumaSorunuSayisi, sidIleDosyalar,
   // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
   // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
   asciiKatla,

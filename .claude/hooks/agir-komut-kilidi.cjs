@@ -110,10 +110,167 @@ function parcaSinifla(parca) {
   return null
 }
 
+/** `)` ile kapanan `$(`'in içinin bittiği indeks (iç içe parantez ve tırnak atlanır); kapanmazsa metin sonu. */
+function parantezSonu(m, bas) {
+  let d = 1
+  let j = bas
+  while (j < m.length) {
+    const c = m[j]
+    if (c === '\\') {
+      j += 2
+      continue
+    }
+    if (c === "'" || c === '"') {
+      j = tirnakSonu(m, j) + 1
+      continue
+    }
+    if (c === '(') d += 1
+    else if (c === ')') {
+      d -= 1
+      if (d === 0) return j
+    }
+    j += 1
+  }
+  return m.length
+}
+
+/** `ac` tırnağıyla açılan dizenin kapanış indeksi (çift tırnakta ters bölü atlanır); kapanmazsa metin sonu. */
+function tirnakSonu(m, ac) {
+  const q = m[ac]
+  let j = ac + 1
+  while (j < m.length) {
+    if (q === '"' && m[j] === '\\') {
+      j += 2
+      continue
+    }
+    if (m[j] === q) return j
+    j += 1
+  }
+  return m.length
+}
+
+/**
+ * Komutu zincir parçalarına böler: TIRNAK ve HEREDOC farkında (ARC-87b, 2026-10-12).
+ *
+ * ⭐NİÇİN: eski bölücü `;`, `|`, `&&` ve satır sonunda düz metin bölüyordu; heredoc gövdesindeki satır başı
+ * "pnpm install" ya da tırnak içindeki `git commit -m "x; pnpm install"` komut sanılıp yuva aldırıyordu
+ * (OPS 10-11 17:41: `python -I - "$F" <<'PY'` gövdesi). Kural: tırnak içi METİNDİR (tek tırnak hiç, çift tırnakta
+ * yalnız `$( )` ve ters tırnak komuttur), heredoc GÖVDESİ metindir (satırı tek başına sınırlayıcı olana kadar).
+ * `$( )` ve ters tırnak içi AYRI komut olarak sınıflanır.
+ */
+function parcala(metin) {
+  const parcalar = []
+  const ic = []
+  const bekleyen = []
+  let cur = ''
+  const bitir = () => {
+    if (cur.trim()) parcalar.push(cur)
+    cur = ''
+  }
+  const n = metin.length
+  let i = 0
+  const komutIci = (j) => {
+    // j: `$(` ya da ters tırnağın açıldığı indeks; dönen: ilk işlenmemiş indeks
+    if (metin[j] === '`') {
+      const k = metin.indexOf('`', j + 1)
+      const e = k === -1 ? n : k
+      ic.push(metin.slice(j + 1, e))
+      return e + 1
+    }
+    const k = parantezSonu(metin, j + 2)
+    ic.push(metin.slice(j + 2, k))
+    return k + 1
+  }
+  while (i < n) {
+    const c = metin[i]
+    if (c === '\\') {
+      cur += metin.slice(i, i + 2)
+      i += 2
+      continue
+    }
+    if (c === "'") {
+      const e = tirnakSonu(metin, i)
+      cur += metin.slice(i, e + 1)
+      i = e + 1
+      continue
+    }
+    if (c === '"') {
+      cur += '"'
+      let j = i + 1
+      while (j < n && metin[j] !== '"') {
+        if (metin[j] === '\\') {
+          cur += metin.slice(j, j + 2)
+          j += 2
+        } else if ((metin[j] === '$' && metin[j + 1] === '(') || metin[j] === '`') {
+          j = komutIci(j)
+          cur += ' '
+        } else {
+          cur += metin[j]
+          j += 1
+        }
+      }
+      cur += '"'
+      i = j + 1
+      continue
+    }
+    if ((c === '$' && metin[i + 1] === '(') || c === '`') {
+      i = komutIci(i)
+      cur += ' '
+      continue
+    }
+    if (c === '<' && metin[i + 1] === '<' && metin[i + 2] !== '<') {
+      const m = /^<<(-?)[ \t]*(?:'([^']+)'|"([^"]+)"|\\?([A-Za-z0-9_]+))/.exec(metin.slice(i, i + 200))
+      if (m) {
+        bekleyen.push({ sinir: m[2] || m[3] || m[4], tireli: m[1] === '-' })
+        cur += m[0]
+        i += m[0].length
+        continue
+      }
+    }
+    if (c === '\n' || c === '\r') {
+      if (c === '\r' && metin[i + 1] === '\n') i += 1
+      bitir()
+      i += 1
+      while (bekleyen.length) {
+        const h = bekleyen.shift()
+        while (i < n) {
+          let e = metin.indexOf('\n', i)
+          if (e === -1) e = n
+          const satir = metin.slice(i, e).replace(/\r$/, '')
+          i = e + 1
+          if ((h.tireli ? satir.replace(/^\t+/, '') : satir) === h.sinir) break
+        }
+      }
+      continue
+    }
+    if ((c === '&' && metin[i + 1] === '&') || (c === '|' && metin[i + 1] === '|')) {
+      bitir()
+      i += 2
+      continue
+    }
+    if (c === ';' || c === '|' || c === '&') {
+      bitir()
+      i += 1
+      continue
+    }
+    cur += c
+    i += 1
+  }
+  bitir()
+  for (const k of ic) parcalar.push(...parcala(k))
+  return parcalar
+}
+
 /** Komut zincirindeki ilk ağır parçanın kısa adı; hiçbiri ağır değilse null. */
 function agirMi(komut) {
-  const parcalar = String(komut || '')
-    .split(ZINCIR)
+  const metin = String(komut || '')
+  let ham
+  try {
+    ham = parcala(metin)
+  } catch {
+    ham = metin.split(ZINCIR) // bölücü bozulursa eski davranış (temkinli: fazla parça, eksik değil)
+  }
+  const parcalar = ham
     .map((p) => p.trim().replace(/^\(+/, '').replace(ORTAM_ATAMASI, '').trim())
     .filter(Boolean)
   for (const p of parcalar) {
@@ -156,11 +313,12 @@ function yuvalar(dizin, adet) {
  * @returns {{ok:true, yuva:number, belirtec?:string}|{ok:false, sahipler:Array<{sid:string,lane:string,komut:string,ad:string,ts:number}>}}
  *   `belirtec` yalnız ARKA PLAN alımında döner: sarmalayıcının bırakırken göstereceği tek kullanımlık kimlik.
  */
-function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini(), adet = N, arkaPlan = false }) {
+function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini(), adet = N, arkaPlan = false, agent = '' }) {
   fs.mkdirSync(dizin, { recursive: true })
   const belirtec = arkaPlan ? crypto.randomBytes(6).toString('hex') : undefined
   const kayit = {
     sid,
+    agent: String(agent || ''),
     lane: lane || '',
     ad,
     komut: String(komut || '').slice(0, 120),
@@ -208,11 +366,12 @@ function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini
  * Pencerenin tuttuğu yuvayı geri verir; kaç yuva bırakıldığını döner.
  * Arka plan komutunun yuvası (`arkaPlan: true`) bırakılmaz: komut hâlâ koşuyor, yuva TTL'le düşer.
  */
-function kilitBirak({ sid, dizin = kilitDizini(), adet = N }) {
+function kilitBirak({ sid, dizin = kilitDizini(), adet = N, agent }) {
   let n = 0
   for (const yol of yuvalar(dizin, adet)) {
     const s = sahipOku(yol)
-    if (s && s.sid === sid && !s.arkaPlan) {
+    // `agent` verilirse (kendini onarma) yalnız AYNI ajanın yuvası düşer: alt ajanın koşan komutunu ana pencere düşürmez.
+    if (s && s.sid === sid && !s.arkaPlan && (agent === undefined || String(s.agent || '') === agent)) {
       fs.rmSync(yol, { recursive: true, force: true })
       n += 1
     }
@@ -344,10 +503,16 @@ function calistir() {
     kilitBirak({ sid })
     return
   }
+  // ⭐KENDİNİ ONARMA (ARC-87b, OPS 10-11 17:41): PreToolUse kancaları PARALEL koşar; başka bir kanca bu komutu
+  // REDDEDERSE (bash-write-guard çıkış 2) ne PostToolUse ne PostToolUseFailure gelir ve alınmış yuva TTL'e kalırdı.
+  // Bir pencerenin ÖN PLAN komutları ardışık koşar: aynı ajandan yeni bir Bash çağrısı geldiyse önceki ön plan
+  // komutu bitmiştir ya da hiç koşmamıştır, yuvası düşer. Arka plan yuvası (belirteç) ve başka ajanın yuvası kalır.
+  const agent = typeof girdi.agent_id === 'string' ? girdi.agent_id : ''
+  kilitBirak({ sid, agent })
   const ad = agirMi(komut)
   if (!ad) return
   const arkaPlan = Boolean(girdi.tool_input && girdi.tool_input.run_in_background)
-  const r = kilitAl({ sid, komut, ad, lane: process.env.CC_LANE || '', simdi, arkaPlan })
+  const r = kilitAl({ sid, komut, ad, lane: process.env.CC_LANE || '', simdi, arkaPlan, agent })
   if (r.ok) {
     // ⭐Yalnız ARKA PLAN alımı sarılır (belirteç yalnız onda üretilir); karar (`permissionDecision`)
     // DÖNMEZ: izin akışı değişmez. `updatedInput` girdi nesnesinin TAMAMINI değiştirir: diğer alanlar korunur.

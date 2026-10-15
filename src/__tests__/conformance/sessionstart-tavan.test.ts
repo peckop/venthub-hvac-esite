@@ -87,7 +87,9 @@ function calistir(source: string, ekEnv: Record<string, string> = {}, ekGirdi: R
     cwd: KOK,
     // CC_LANE / üretici / toplam-tavan geçersiz kılmaları her zaman açıkça verilir: geliştiricinin kendi
     // kabuğundaki değerler testi etkilemesin.
-    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', CC_LANE: '', VH_ROL_KARTI_URETICI: '', VENTHUB_OTURUM_KAYIT_DIZINI: oturumKayitDizini, ...ekEnv },
+    // VENTHUB_PENCERE_AGENT: '' → kanca bu worktree'nin settings.local.json `agent` anahtarını okumaz (ARC-124): test hangi
+    // departman penceresinde koşarsa koşsun aynı sonucu verir (yoksa rol kartı o pencerenin rolüne döner).
+    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', CC_LANE: '', VH_ROL_KARTI_URETICI: '', VENTHUB_OTURUM_KAYIT_DIZINI: oturumKayitDizini, VENTHUB_PENCERE_AGENT: '', ...ekEnv },
     windowsHide: true,
     timeout: 60_000,
   })

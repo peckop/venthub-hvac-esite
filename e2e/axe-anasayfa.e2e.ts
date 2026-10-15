@@ -32,8 +32,12 @@ const TABAN: Readonly<Record<string, number>> = {}
  * Ölçüm: canlıda ilk koşu 23, sonraki beş koşu kararlı 17; CI (#1708, admin-smoke) de 17 verdi, yani
  * canlı-CI farkı yok. Tavan 17'ye sıkıldı (OPS, 10-05). Sabotaj (tavan 23 iken): 10 görsel arka planlı metin
  * → 27, kırmızı; tavan 17'de aynı sabotaj 27 > 17 ile kırmızıdır.
+ *
+ * BLG-3 (12 Ekim, OPS kararı): ikinci rehber kartı +2 belirsiz düğüm (KnowledgeBlock yarı saydam zemin);
+ * bilinçli tek seferlik açma, kök onarım TSR-17 tavanı geri indirir. TSR-17 birleşince 17'ye döner,
+ * en geç 16 Ekim.
  */
-const BELIRSIZ_KONTRAST_TABAN = 17
+const BELIRSIZ_KONTRAST_TABAN = 19
 
 const ETIKETLER = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const
 

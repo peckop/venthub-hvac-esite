@@ -255,7 +255,8 @@ async function main() {
     const p = kategoriPlani(belge(satirlar[0]), ks, ekKaynak(satirlar[0]))
     for (const s of p.sonuclar) {
       const etiket = yolEtiketi(Array.isArray(s.kalem?.yol) ? s.kalem.yol : [])
-      const kurallar = s.kurallar.map(x => `${x.gecti ? '✓' : '✗'}${x.kural}${!x.gecti && x.ayrinti ? ` (${x.ayrinti})` : ''}`).join(' ')
+      // Ayrıntı kırmızıda basılır; KTL-23 R8b geçse bile kalemin kaynakNotu'nu taşıyabilir (okuyan görsün diye) ve o da basılır.
+      const kurallar = s.kurallar.map(x => `${x.gecti ? '✓' : '✗'}${x.kural}${x.ayrinti && (!x.gecti || x.kural === 'R8 govde-yeni-iddia-koku-yok') ? ` (${x.ayrinti})` : ''}`).join(' ')
       if (s.durum === 'red') { red++; console.log(`  ⛔ ${etiket}  RED: ${s.sebep}\n     kurallar: ${kurallar}`); continue }
       if (s.durum === 'ayni') { ayni++; console.log(`  = ${etiket}  zaten uygulanmış (atlanır)\n     kurallar: ${kurallar}`); continue }
       yazilacak++

@@ -223,3 +223,63 @@ describe('VariantSelector: matris satırı iç SKU basmaz (URN-32)', () => {
     expect(onSelect).toHaveBeenCalledWith(v[3].sku)
   })
 })
+
+/**
+ * URN-127 — iç/meta anahtar (`pq_curve_kaynak`) model matrisine KOLON olmaz.
+ *
+ * `distinguishingSpecKeys` "birden çok farklı değer taşıyan her anahtarı" kolon yapar. Eğri kaynağı etiketi
+ * varyantlar arasında farklıysa (kimi `kitapcik_grafik`, kimi `kitapcik_tablo`) ham makine metni kolon
+ * olarak basılırdı. Gizli liste tek yerdedir (`GIZLI_SPEC_ANAHTARLARI`); bu test GERÇEK bileşeni renderlar
+ * ve ekrandaki METNİ ölçer.
+ */
+describe('VariantSelector: iç/meta anahtar matris kolonu olmaz (URN-127)', () => {
+  const kaynakli = (n: number): FamilyVariant[] =>
+    Array.from({ length: n }, (_, i) => ({
+      id: `id-${i}`,
+      sku: `sku-${i}`,
+      name: `Model ${i}`,
+      slug: null,
+      model_code: `MC-${i}`,
+      price: null,
+      stock_qty: 1,
+      // kaynak değeri varyantlar arasında FARKLI; debi ve guc de farklı (olumlu kontrol: bu ikisi kolon kalır).
+      technical_specs: {
+        pq_curve_kaynak: i % 2 === 0 ? 'kitapcik_grafik' : 'kitapcik_tablo',
+        debi: i,
+        guc: i * 2,
+      },
+      description: null,
+      images: [],
+    }))
+
+  it('kaynak değeri farklıyken matris kolonu OLUŞMAZ; ayırt edici diğer anahtarlar kolon kalır', () => {
+    const { container, getByText } = render(
+      <VariantSelector variants={kaynakli(24)} selectedSku={null} onSelect={() => {}} modelAdresi={adres} quoteMode />,
+    )
+    fireEvent.click(getByText('pdp.variant.viewMatrix'))
+
+    const metin = container.textContent ?? ''
+    // Kolon başlığı (insancıl etiket) ve hücre değeri (ham makine metni) görünmez.
+    expect(metin, 'kaynak kolon başlığı basılıyor').not.toMatch(/kaynak/i)
+    expect(metin, 'kaynak ham değeri hücrede basılıyor').not.toMatch(/kitapcik_/)
+
+    // Olumlu kontrol: farklı değerli başka anahtarlar kolon olarak durur (kapı boş kümede yeşil olmasın).
+    expect(metin).toContain('Debi')
+    expect(metin).toContain('Guc')
+    // Satır hücreleri: Model + 2 ayırt edici kolon + Fiyat = 4 (kaynak kolon olsaydı 5).
+    const ilkSatir = container.querySelector('a[href]') as HTMLElement
+    expect(ilkSatir.children).toHaveLength(4)
+  })
+
+  it('kaynak değeri bütün varyantlarda AYNI olsa da, farklı olsa da sonuç aynı: kolon yok', () => {
+    const ayni = kaynakli(21).map((v) => ({
+      ...v,
+      technical_specs: { ...v.technical_specs, pq_curve_kaynak: 'kitapcik_grafik' },
+    }))
+    const { container, getByText } = render(
+      <VariantSelector variants={ayni} selectedSku={null} onSelect={() => {}} modelAdresi={adres} quoteMode />,
+    )
+    fireEvent.click(getByText('pdp.variant.viewMatrix'))
+    expect(container.textContent).not.toMatch(/kaynak|kitapcik_/i)
+  })
+})

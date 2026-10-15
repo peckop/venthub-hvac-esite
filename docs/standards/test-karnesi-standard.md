@@ -1,6 +1,6 @@
-# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.2
+# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.3
 
-**Sürüm 1.2 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-09 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b**
+**Sürüm 1.3 · 2026-10-13 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-13 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -155,7 +155,7 @@ Bu yüzden her dosya bilinen süresiyle (`scripts/ci/test-sureleri.json`, yerel 
   `vitest list --filesOnly --json` çıktısını (koşan paketin kendi listesi, `dislan` kipi dahil) süreye göre LPT ile böler, kendi parçasını yazar; `VENTHUB_TEST_SHARD_DOSYALARI` ile `vitest.config.ts`
   `include`ı o parçaya sınırlanır. Aynı girdi her işte aynı bölmeyi üretir (ortak durum yok). Ölçüm (yerel, 2026-10-07, `dislan` kipi): 625 dosya (+1 dünya durumu dosyası = tam paket 626), parçalar 154/157/157/157 dosya, birleşim = liste, kesişim 0, en yüklü/ortalama 1,00.
 - `ci` işinin SON adımı "Test shard sonuçları (bekle ve doğrula)" (`scripts/ci/test-shard-bekle.cjs`), AYNI koşunun AYNI denemesinin (`run_id` + `run_attempt`) `test-shard (i/N)` işlerinin HEPSİ `success`
-  olmadan yeşil vermez. Lint, tip, Deno kapıları ve Build shard'larla ÜST ÜSTE koşar, bu yüzden bekleme en sondadır. Zorunlu kontrol `ci` adıdır; `needs`'li ayrı bir toplayıcı iş YOKTUR
+  olmadan yeşil vermez. Lint, tip, Deno kapıları ve Build shard'larla ÜST ÜSTE koşar, bu yüzden bekleme en sondadır. ALT-80: Lint ayrıca Build ile PARALEL koşar; "Lint (arka planda başlat)" `eslint .`i `scripts/ci/arka-plan.sh` ile başlatır ve hemen döner, KAPI Build'ten sonra ve shard beklemesinden ÖNCE gelen "Lint sonucu (bekle, blocking)" adımıdır (komutun kendi çıkış kodunu taşır; `|| true` ve `continue-on-error` yoktur, `!cancelled()` ile Build kırmızıyken de koşar). `next build`in kendi lint ve tip aşaması kapatılmadı. Kazanç ölçülmedi: PR açılınca `ci` süresinden okunur (hedef kod PR bekleme medyanı 4:35 → ≤4:00, §8). Kapı: INV-CI-EDITED-1. Zorunlu kontrol `ci` adıdır; `needs`'li ayrı bir toplayıcı iş YOKTUR
   (`ci`yi bölmek `edited` aynasını ve testlerini yeniden yazdırırdı, aynası `ci` işinin adımlarını okur).
 - master push, elle koşum ve `edited` koşusunda `Test` `ci` içinde eskisi gibi TAM koşar (`Test`in koşulu shard olayının tersidir: `... && !(github.event_name == 'pull_request' && github.event.action != 'edited')`).
   Böylece her olayda testler TAM BİR yerde koşar: PR'da shard'larda, öteki olaylarda `ci` içinde.
@@ -341,16 +341,27 @@ python, sh, cmd, esbuild, powershell izlenemez ve test `belirsiz` olur: HER PR'd
 | `... --yalniz a.test.ts b.test.ts` | yalnız bu testleri yeniden ölçer, kalanını korur (ölçüm aracı özeti AYNI olmalı) |
 | `... --ham <klasör>` | koşmadan, var olan ham kayıttan yazar |
 | `... --kontrol` | haritayı ağaçla karşılaştırır, yazmaz; biçim, canonical bayt, ölçüm aracı özeti sorunu varsa çıkış 1 |
+| `... --kontrol --esik N` | yukarıdakine ek: bayat + kayıtsız test sayısı N'yi AŞARSA çıkış 1 ve yenileme komutunu yazar (ALT-83) |
+| `... --bayat` | bayat ve kayıtsız testleri kendisi bulur ve yalnız onları yeniden ölçer (`--yalniz` listesini elle çıkarmak gerekmez); taze ise bir şey yazmaz (ALT-83) |
 
 Bakım kuralları:
 
 | Olay | Ne olur | Ne yapılır |
 |---|---|---|
-| Yeni test dosyası | haritada yok → HER ZAMAN koşar (atlanamaz) | birleşmeden sonra `--yalniz <yeni testler>` ile kaydedilir (yaklaşık 1 dk); iki dalda aynı anda kaydetmeyin (aynı dosya çakışır) |
-| Test dosyası değişti | bayat kayıt → HER ZAMAN koşar (zaten değişen testtir) | birleşmeden sonra `--yalniz` |
+| Yeni test dosyası | haritada yok → HER ZAMAN koşar (atlanamaz) | birleşmeden sonra `--bayat` ile kaydedilir; iki dalda aynı anda kaydetmeyin (aynı dosya çakışır) |
+| Test dosyası değişti | bayat kayıt → HER ZAMAN koşar (zaten değişen testtir) | birleşmeden sonra `--bayat` |
 | Ölçüm aracı değişti (kaydedici, kurulum dosyaları, `test-haritasi.vitest.config.ts`) | araç özeti uyuşmaz → TAM; `INV-TEST-HARITA-1` KIRMIZI | tam yeniden üretim (yaklaşık 20 dk, 6 işçi) |
 | Test silindi | hayalet kayıt (zararsız) | sonraki üretimde düşer |
 | Testin dolaylı bağımlılığı değişti (testin içe aktardığı yardımcı başka dosya okumaya başladı) | test kaynağı değişmediği için kayıt bayat görünmez; `related` o PR'da testi seçer, sonraki PR'lar yeni okumayı harita yenilenene dek görmez | master push TAM koşar (güvenlik ağı); gece yenileme önerisi §6.7 |
+
+**Tazelik kapısı (ALT-83, 14 Ekim).** Yukarıdaki bakım kuralları yazılıydı ama onları tetikleyen yoktu: harita 8 Ekim'de tam ölçüldü (10 Ekim'de yalnız dört karne testi eklendi), 14 Ekim'de 739 testin 231'i
+"her zaman koşan"dı (bayat 92, kayıtsız 99, belirsiz 39; ARAÇ'ın `test-sec.cjs --yerel --kuru` ölçümü, #1934) ve yerelde `pnpm test:ilgili` bu yüzden 309 test seçip
+kimseye çekici gelmedi, kanca PR'larının kapıları iki kez yalnız CI'da yakalandı (#1932, #1934). Yenileme `--bayat` ile TEK komuta indi (bayat ve kayıtsız testleri
+kendisi bulur) ve harita `INV-TEST-HARITA-1`in eşik kapısıyla korunur: bayat + kayıtsız test sayısı `git ls-files` test listesinin yüzde 20'sini aşarsa KIRMIZI
+(mesaj yenileme komutunu yazar). Bayat/kayıtsız kayıt tek başına hâlâ kırmızı DEĞİLDİR (güvenli yön: o test her zaman koşar); kapı yalnız birikimi keser.
+Yenileme maliyeti (ölçüldü, 191 test, bu makine, 2 işçi): yaklaşık 13 dk. Eşik gözleme dayanır: 191 test 4-6 günde biriktiği için (günde 30-48 test) yüzde 20 (yaklaşık 150 test) kabaca haftada bir tazelemeyi zorlar;
+sıklığı sakin bulursa ALTYAPI eşiği düşürür. Sayı kapıda sabittir ve değişirse bu paragraf ile `INV-TEST-HARITA-1` birlikte güncellenir.
+Yenileme sonrası ölçüm (aynı kuru koşu yöntemi, aynı ağaç): her zaman koşan 231 → 58 (bayat 1, kayıtsız 2: dislan kipinde `skip` olan iki test, belirsiz 55).
 
 ### 6.4 Güvenlik ağı: hiçbir koruma sessizce düşmez
 
@@ -384,7 +395,7 @@ Bakım kuralları:
 | Kapı | Dosya (`scripts/ci/__tests__/`) | Neyi ölçer |
 |---|---|---|
 | `INV-TEST-SEC-1` | `test-sec.test.ts` | seçicinin karar mantığı (senaryolar, SABOTAJ tablosu, küresel girdi örnek tablosu, glob eşleştirici, CLI çıktı sözleşmesi, `--yerel`, içe aktarma grafiğinin paralel kurulumu, sınıflayıcı yükleme sırası: önce seçicinin yanı sonra kök, koşum kapanımı kapısı); gerçek harita ve gerçek git ile belge değişimi daraltır, belirsiz testler HER ZAMAN seçilir |
-| `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur |
+| `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur; bayat + kayıtsız test sayısı `git ls-files` test listesinin %20'sini aşarsa KIRMIZI (ALT-83, §6.3 tazelik kapısı) |
 | `INV-TEST-HARITA-KAYDEDICI-1` | `test-haritasi-kaydedici.test.ts` | yakalama (fs, dizin, glob, alt süreç sınıflaması, `node` çocuğu, belirlenimli kayıt) |
 | `INV-TEST-SEC-GERIYE-1` | `test-sec-geriye.test.ts` | geriye dönük doğrulamanın sayım mantığı: kategori önceliği, kaçırma yalnız ASIL kategoriden, kaçırılanın açıklanması (açıklanamayan = GERÇEK kaçırma), CI günlüğünden süre modeli |
 
@@ -571,3 +582,17 @@ Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz):
 5. **`INV-TEST-BEYAN-1` kurulu değil.** "Beyansız yeni test birleşmez" kuralı her yeni test başlığına `TETİK:` / `YER:` yazma zorunluluğu getirir; bu yeni bir
    zorunluluktur ve ayrı karar ister. Okuyucu ve taban (`beyan.cjs`, `beyan-tabani.json`) hazırdır; kapı karar sonrası eklenir.
 6. **Ölçüm tek makinede** (Windows) yapıldı; Linux'ta farklı kolu izleyen test (platforma bağlı atlama) farklı çıkabilir. CI'da dosya başına süre ölçülmedi.
+
+## 8. PR bekleme süresi hedefi (ALT-38 kapanışı, karar 351)
+
+Bu bölüm testlerin kendisini değil, bir PR'ın birleşmeye kadar beklediği süreyi yönetir. Hedefler medyan içindir.
+
+| Sınıf | Hedef (medyan) | Son ölçüm (11 Ekim 21:13 TR sonrası, 37 PR) | Durum |
+|---|---|---|---|
+| Belge PR | **≤ 2:00** | 1:46 (n=9), p90 1:59 | Tutuyor, örnek küçük |
+| Kod PR | **≤ 4:00** | 4:35 (n=27), p90 4:56 | Tutmuyor; kaldıraç `ci` içinde Lint ∥ Build (ALT-80) |
+
+- **Belge hedefi 1:00 idi, 2:00 oldu (karar 351, 13 Ekim 2026).** Seçenek A uygulandı: hedef ölçülen medyana göre çekildi, hiçbir kapı gevşemedi. Seçenek B (belge PR'ında 4 test dilimini atlamak) **reddedildi**; belge PR'ı belge yapısı kapılarına (`arac-envanteri`, `mutlak-yol-sizintisi`, `belge-tazelik` gibi) dokunan PR olduğundan atlama PR'da o korumayı kaldırır (§6.7 ölçümü: son ayda 17 belge PR kırmızısının 10'u PR'da görünmezdi).
+- **Bekleme tanımı:** birleşen PR'ın son uç SHA'sındaki her kontrolün son koşusu; ilk başlama → son bitiş, Vercel hariç. Sınıf dosya yolundan yaklaşıktır (hepsi `docs/` ya da `.md` ise belge); CI'ın kendi sınıflayıcısı değildir. 15 dk üstü uç değerler ayrı sayılır. Ayrıntı: `docs/audits/pr-bekleme-kapanis-2026-10-13.md` §3.
+- **Bu hedefi zorlayan kapı YOKTUR.** Süre bir test değil ölçümdür; yeniden ölçüm kartla yapılır (ALT-80 teslimi sonrası önce/sonra). Hedef tutmazsa tek yetkili yol kaldıracı (ALT-80) ilerletmektir; kapıyı ya da testi atlamak yol değildir.
+- **Ölçülmedi:** belge PR'ında test dilimleri atlansaydı `ci` süresi (atlanmış koşu yok); Lint ∥ Build paralel koşunun gerçek kazancı.

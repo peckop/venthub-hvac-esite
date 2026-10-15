@@ -255,7 +255,8 @@ describe('INV-HAZIR-OZELLIK-1 — ajan yazma kapısı, hafıza KAPSAMI ve `memor
     expect(eksik, 'üretici `memory: user` yazmıyor ya da dosya elle bozulmuş (scripts/belge/ajan-tanimi-uret.cjs --yaz)').toEqual([])
     // Muaf iki tanım: tools allowlist'i var; memory verilince Read/Write/Edit otomatik açılır (ÖLÇÜLMEDİ). Eklenirse karar yeniden verilir.
     const muaflar = ajanDosyalari().filter((f) => !YARDIMCI.test(f) && !PENCERE.test(f))
-    expect(muaflar.sort()).toEqual(['denetim-opus.md', 'security-reviewer.md'])
+    // hafiza-denetleyici (REC-488, karar 197): elle yazılan salt-okuma tanımı; tools allowlist'li, hafızasız (aşağıdaki kapı bunu da korur).
+    expect(muaflar.sort()).toEqual(['denetim-opus.md', 'hafiza-denetleyici.md', 'security-reviewer.md'])
     expect(muaflar.filter((f) => alan(ajanFm(f), 'memory') !== undefined)).toEqual([])
   })
 
@@ -286,7 +287,7 @@ describe('INV-HAZIR-OZELLIK-1 — ajan yazma kapısı, hafıza KAPSAMI ve `memor
     const riskli = ajanDosyalari().filter((f) => alan(ajanFm(f), 'memory') !== undefined && liste(ajanFm(f), 'tools') !== undefined)
     expect(riskli).toEqual([])
     // allowlist'li iki tanım bugün hafızasızdır; memory eklemek ayrı karar ve ayrı ölçüm ister
-    for (const f of ['security-reviewer.md', 'denetim-opus.md']) {
+    for (const f of ['security-reviewer.md', 'denetim-opus.md', 'hafiza-denetleyici.md']) {
       expect(alan(ajanFm(f), 'memory'), `${f}: memory eklenirse yazma kapısı ölçülmeden açılabilir`).toBeUndefined()
     }
   })

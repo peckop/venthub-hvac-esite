@@ -1,13 +1,13 @@
 ---
 name: testing
-description: "Test yazma, düzeltme, gözden geçirme ve planlama: runner'ı projeden bulur, önce kırmızıyı görür, eşik düşürme ve skip yasak. Tetik: \"test yaz\", \"flaky\", \"regresyon testi\", \"kapsam\", \"vitest\". WrongStack 1.0.26 uyarlaması."
+description: "Test yazma, düzeltme, gözden geçirme ve planlama: runner'ı projeden bulur, önce kırmızıyı görür, eşik düşürme ve skip yasak. Tetik: \"test yaz\", \"flaky\", \"regresyon testi\", \"kapsam\", \"vitest\". WrongStack 1.1.0 uyarlaması."
 category: quality
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/testing/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/testing/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/testing/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/testing/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -32,6 +32,11 @@ metadata:
 
 # Testing
 
+## Selection card
+- Task: Write meaningful behavior and regression tests.
+- Start: Identify the scope and obtain an executable before-proof or review evidence.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
+
 ## Overview
 
 Write tests that fail for the right reason and pass for the right reason, in the
@@ -41,9 +46,10 @@ cost.
 
 ## Rules
 
-1. Match the project before writing anything. Find the runner (package.json
-   scripts, vitest/jest config, pytest.ini or pyproject, go.mod, Cargo.toml),
-   the test layout, the naming, and the helpers neighbouring tests already use.
+1. **Pre-flight: Inspect repo runner & live version first.** Inspect `package.json` test scripts,
+   runner configs (`vitest.config.ts`, `playwright.config.ts`, `pytest.ini`, `Cargo.toml`),
+   and existing suites. Query `registry.npmjs.org/<runner>/latest` to confirm active flags
+   (e.g. Vitest 5 options, fake timers) and match the project's runner layout before writing tests.
 2. See it fail first. A regression test must fail without the fix — a test that
    was never red proves nothing.
 3. Test behaviour through the public surface. Don't assert on private helpers or
@@ -69,6 +75,30 @@ cost.
 5. **Widen.** Run the covering suites (the codebase-targeted-test tool finds
    them for a symbol or file), then the full suite when the change touches
    shared code.
+
+## From proof to regression test
+
+A bug fix usually starts with a throwaway proof — a script or scratch test that
+went red against the unfixed code. It is not done until that case lives in the
+project's normal suite.
+
+1. **Place it where the suite runs it.** Same runner, same layout, next to the
+   existing tests for that module. Check the runner's include and exclude
+   patterns: a test file the config never picks up passes forever by not running.
+2. **Keep the exact trigger** from the proof, then add what the proof skipped:
+   the important boundary (empty, exact limit, last item), the secondary branch
+   the fix touched, and the control case that must keep passing.
+3. **Name the behaviour, not the ticket.** "keeps the abort listener count flat
+   across retries" survives; "fixes bug 42" tells the next reader nothing.
+4. **See it red against the unfixed code.** If the proof already went red with
+   the same assertions, that counts. Otherwise run a mutation check: back up the
+   fixed file, restore the old code in place, run the test and watch it fail,
+   then restore the backup and watch it pass. Never use stash, checkout, or
+   reset for this in a shared working tree — they carry other people's edits
+   away with yours.
+5. **Make it a good citizen.** No real sleeps, no leaked timers, handles,
+   listeners, or temp files; every wait bounded. A regression test that is
+   itself flaky will get skipped, and the bug comes back.
 
 ## Choosing what to assert
 
@@ -140,14 +170,30 @@ describe('withRetry', () => {
 - **Skipping tests or lowering coverage thresholds** to get a green run.
 - **Snapshots as the only assertion** on logic.
 - **Claiming "tests pass"** from a filtered or partial run without saying so.
+- **Leaving the proof only in a scratch directory** — deleted with the cleanup,
+  so nothing guards the fix.
+- **A red run that failed for the wrong reason** — import error, missing
+  fixture, timeout — counted as the bug reproducing.
 
 ## Before returning
 
 - [ ] Runner, layout, naming, and helpers match the project's existing tests
-- [ ] Every new regression test was seen failing before the fix
+- [ ] Every new regression test was seen failing before the fix, on its
+      assertion rather than on setup
+- [ ] The test file is inside the runner's include patterns and actually ran
 - [ ] Assertions target behaviour with specific matchers
 - [ ] Mocks, timers, and environment restored; no order dependence
 - [ ] Commands and results reported exactly, including skips and filters
+
+## Source resolution and safe red runs
+
+Current stable targets checked 2026-10-09: Vitest 5.0.3 and Playwright 1.64.0.
+Inspect their engine/peer requirements and installed configuration before upgrades.
+Pin runtime/source resolution so tests do not compare two stale builds.
+For red/green checks in a shared tree, use preserved snapshots or an isolated
+copy; do not temporarily overwrite a concurrently edited production file.
+Drive async races with barriers/deferred completion and reserve real-system
+checks for the boundary they actually verify. Serialize shared build/coverage writers.
 
 ## Skills in scope
 

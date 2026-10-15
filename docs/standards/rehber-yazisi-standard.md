@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.7 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.9 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -39,6 +39,19 @@ sırası gelince sıfırdan yazılır.
 AB/TR tarih kuralı.
 **2026-09-29 (REC-452, GEO-SEO):** R3.2 ters bağlantı — kategori, aile ve ana sayfadan rehbere yol;
 INV-REHBER-TERS-BAGLANTI-1.
+**2026-10-11 (BLG-3, OPS hükmü):** R5.7 — onay ara önizlemeyle sorulur, gerçek sayfa yayından sonra
+gösterilir (frekans emsali, karar 120/135); "yayına giremeyecek metnin onayı sorulmaz" sınırı korunur ve
+ölçülebilir hâle geldi: kimlikler güncel slug'a çözülmeli. Tetik ölçüm: sıra 2 yazısında dört aile kimliği
+6 Ekim yeniden adlandırması öncesi slug'la duruyordu (sha256 değişir, R5.5).
+**v0.8 (2026-10-13, BLG-11):** R10 yayın akışı — fikirden 14. gün ölçümüne tek şema; her basamakta sahibi,
+kapısı ve kaydı; BLG-10 bulgularından çıkan kapı adayları (K0–K5) şemadaki yerleriyle. Yeni kural
+getirmez, mevcut R1–R9 ve `yayin-gorunurluk-denetim-standard.md` Y2'yi sıraya dizer; R7'ye bağ eklendi.
+Tetik ölçüm: radyal/aksiyel yazısında Google dizin isteği yapıldı, IndexNow yapılmadı (anahtar depoda ve
+canlıda 200 iken "yok" sanıldı).
+**v0.9 (2026-10-14, BLG-12, OPS emri):** R11 — başlık ve içerik yapısı: Google'ın resmî belgelerinden
+derlenen 13 satır (adresli, belge tarihli, ham HTML'de doğrulanmış alıntı), Google'ın YAZMADIĞI şeyler
+(alt başlıkta konu ifadesi şartı ve sayısal eşik yok) ve bunların üstüne kurulan İLKE sınıfı kurallar;
+R3'e alt başlık satırı; kapıya `baslikDenetle` UYARI kolu. Kırmızı kural getirmez.
 
 ---
 
@@ -251,6 +264,7 @@ değildir. Fark ancak emsal yazıyla elle kıyasla bulundu (OPS).
 | Bölüm | Kural |
 |---|---|
 | H1 | Aranan soru ya da konu adı |
+| Alt başlıklar (H2, H3) | Tek başına okunduğunda anlamlı; konu terimi doğal yerinde; aynı ifade her H2'de tekrarlanmaz. **R11** (resmî dayanak ve İLKE sınıfı; kapı UYARI verir, kırmızı değil). Zorunlu bölüm başlıkları sabittir, bu satırdan muaftır |
 | Doğrudan cevap | İlk 2–3 cümle sorunun cevabı; giriş cümlesi yok |
 | Gövde | Konuya uyan bölümler: nedir / nasıl çalışır · türleri · uygulamalar · seçim ve boyutlandırma · hesap örneği (R2.5 + hesaplayıcı bağlantısı) · alternatiflerle kıyas · montaj · bakım · güvenlik ve mevzuat · fiyatı belirleyen etkenler · izlenecek yol. Her yan soru bir bölüme bağlanır |
 | Tablo | En az bir (kıyas ya da boyutlandırma); hücreler de iddiadır (R5.1) |
@@ -435,11 +449,19 @@ sha256'sının ilk 12 hanesini gösterir; Recep'in onayladığı metin doğrulan
 Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü). İlk yazı beklemez; yayın bekler:
 - Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Kanban kartında (not + depo dışı dosya yolu; eski kayıt Linear REC-369)** tutulur
   (özel; PUBLIC depo değil — R4.8).
-- ⛔**Rota ve sayfa gelmeden Recep'e yayın onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
-  bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi). Yayına giremeyecek
-  metnin onayı karar değildir; "senden beklenen" diye sunulamaz. Ara önizleme yalnız **bilgi** içindir;
-  onay sorusu yazı gerçek sayfasında (R5.6) görülebildiğinde, tek soru olarak gider. Doğrulanmış metnin
-  sha256'sı o güne kadar değişmezse aynı metin gider.
+- **Onay ara önizlemeyle sorulur; gerçek sayfa yayından sonra gösterilir** (OPS hükmü 2026-10-11; emsal:
+  frekans konvertörü yazısı, karar 120 ve 135). Yayın yolu çalışır (`yazilar.ts` → `[yazi]` rotası; frekans
+  yazısı canlıda), ama R5.6 önizleme rotası yoktur ve dal önizlemeleri kapalıdır: gerçek sayfa yayından
+  önce görülemez. Bu yüzden onay sorusu ara önizleme (aşağıdaki claude.ai sayfası) ve R5.4'ün özetiyle gider;
+  önizleme sayfa kabuğunu temsil eder, metin birebirdir. Recep'in "evet"i yayına girme iznidir; yayından
+  sonra gerçek sayfa Recep'e ayrıca gösterilir, kabuk ya da görsel farkı varsa ayrı iş olur.
+- ⛔**Sınır aynıdır: yayına giremeyecek metnin onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
+  bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi); "senden beklenen"
+  diye sunulamaz. Soru gitmeden önce yayın yolunun BU metin için çalıştığı ölçülmüş olmalıdır: bağlantı
+  kimlikleri güncel slug'a çözülür (kimlik eskiyse derleme durur; ölçü: son aile/kategori yeniden adlandırma
+  migration'ının eski-yeni çiftleri), yayını bloke eden açık karar yoktur ya da tarihi OPS'ta yazılıdır.
+  Doğrulanmış metnin sha256'sı soru ile yayın arasında değişirse (bağlantı kimliği güncellemesi dahil) yeni
+  sha256 ve fark soruda gösterilir; R5.5 uyarınca durum taslağa düşer, bağımsız tur yeniden koşar.
 - Ara önizleme rota gelene kadar **özel bir claude.ai sayfasıdır** (Artifact; varsayılan olarak
   yalnız sahibine açık, arama motoruna kapalı — R4.8'i çiğnemez). Sayfa doğrulanan markdown'dan üretilir,
   sha256'nın ilk 12 hanesini gösterir; metin değişirse sayfa aynı adreste yeniden yayınlanır.
@@ -475,6 +497,9 @@ girer. Bugünkü 10 adres (R0.1) kalıcı yönlendirmeyle taşınır; hedefsiz a
 
 ## R7 — Ölçüm (yayından sonra)
 
+Yayın günü ve sonrasındaki sıra, sahip ve kapılar **R10'dadır** (B10–B16); bu bölüm ölçülecek şeyleri
+tanımlar. Gün sayıları: 3. gün (B13), 7. gün (B14, aşağıdaki "1. hafta"), 14. gün (B15; ilk gösterim ve sıra).
+
 - **1. hafta:** indekslendi mi (Search Console URL denetimi) + bot karnesi (`scripts/seo/bot-karnesi.mjs`)
   yazı adresinde temiz mi.
 - **4 hafta, haftalık:** sayfa bazında gösterim, tık, ortalama sıra; hedef küme sorguları.
@@ -507,6 +532,7 @@ koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil veri
 | Kalıp (R3 zorunlu bölümler) | tek H1; en az bir tablo; `## Fiyatı belirleyen etkenler`, `## Sık sorulan sorular` (5–8 soru), `## Kaynaklar`, `## Teknik sorumluluk notu` var; not sabit cümleyle başlar. **Var** (v0.4, `kalipDenetle`); sabotaj kolu: 09-24 vakasının birebir benzeri iki kırmızı verir, onaya sunulmuş ilk metin (sha f29ab1c35e26) gerçek çalıştırmada aynı iki kırmızıyı verdi | BLOG kalıp kapısı PR'ı | BLOG |
 | İç bağlantı — metin (R3) | metinde düz site adresi 0 (mutlak, göreli, çıplak); kimlik biçimi `vh:<tür>/<anahtar>`. **Var** (v0.4, `icBaglantiDenetle`, `denetle` içinde; INV-REHBER-IC-BAGLANTI-1) | BLOG kalıp kapısı PR'ı | BLOG |
 | İç bağlantı — canlı (R3) | yayındaki her rehber yazısının gövdesindeki site içi bağlantı **doğrudan 200**; 3xx ve 404 KIRMIZI (yönlendirme izlenmez); yayında yazı yoksa `EVREN-BOS` (çıkış 3), temiz değil. **Betik var** (`scripts/rehber/ic-baglanti-denetle.mjs`, ağlı); ölçüldü 2026-09-24: site haritasında yazı 0 → EVREN-BOS; önizlemenin 5 bağlantısı 200; sabotaj: kök adres 308 → KIRMIZI. **Zamanlı koşu ve adres yayınından (REC-300) sonra koşturma ALTYAPI'da** | BLOG kalıp kapısı PR'ı (betik) · ALTYAPI (bağlama) | BLOG + ALTYAPI |
+| Başlık yapısı (R11) | zorunlu bölümler hariç H2'lerin yarısından azı konu terimi taşıyorsa `BASLIK-KONU-ORANI`, %60'ından fazlası konu terimlerinin tamamını taşıyorsa `BASLIK-TEKRAR`; **UYARI, kırmızı değil** (eşikler bizimdir, resmî eşik yok: R11.2). **Var** (v0.9, `baslikDenetle`, `denetle` çıktısında `uyari` dizisi); sabotaj kolu her sınıfı bilerek bozulmuş örnekte yakalar | BLOG başlık kuralı PR'ı (BLG-12) | BLOG |
 | Alıntı betiği (R5.1 3c) | alıntı ham kaynakta; son adres/durum/sha256 kaydı | BLOG doğrulama betikleri PR'ı | BLOG |
 | Not deseni (R4.4) | K2 sınıfı not 0 (R8.2) | BLOG doğrulama betikleri PR'ı ya da tablo kısıtı (migration PR'ı) | BLOG + URUN |
 | Vaat / rakip / fiyat deseni (R4.2, R4.3, R3) | "en iyi", "%100", "garanti"; rakip ad listesi (Kanban kartı/depo dışı dosyadan, depoya girmez); `₺ TL € EUR USD` + rakam = 0 | BLOG doğrulama betikleri PR'ı | BLOG |
@@ -537,6 +563,216 @@ kadar; sonra ölçüme göre artırılır. Üst sınır R8.1'deki toplu üretim 
 2 yeni yazı; revizyon sayılmaz). Karar 92 taşımasında eski konular **kaldırılıp yönlendirilir**, yeniden
 yazımları bu ritme ve R1.4 sırasına girer (karar 121: eski metinden alıntı yok, sıfırdan). Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
 
+## R10 — Yayın akışı: yazı fikrinden 14. gün ölçümüne tek şema (BLG-11, 2026-10-13)
+
+**Niçin var.** Yayından önceki kurallar R5.1, R5.7 ve R8.1'de, yayından sonrakiler R7'de ve
+`yayin-gorunurluk-denetim-standard.md` Y2'de duruyordu; yayın anından canlı doğrulamaya, dizin isteğine
+ve IndexNow'a kadar uzanan halkaları sıraya koyan **tek yer yoktu**. Ölçülen sonucu: ilk iki yazıda zincir elle
+kuruldu; radyal/aksiyel yazısında Google isteği yapıldı, Bing/IndexNow yapılmadı ("anahtar yok" sanıldı;
+anahtar dosyası `public/` altında, depoda ve canlıda 200 idi). Bu bölüm yeni kural koymaz, **mevcut kuralları
+tek sıraya dizer, her basamağa sahibini ve kapısını yazar, eksik halkayı ADIYLA gösterir**.
+Çelişirse ilgili R maddesi kazanır (burası haritadır); çelişki bu bölüme düzeltme olarak yazılır.
+
+**Okuma kuralı.** Her basamakta üç şey yazılıdır: kim yapar (SAHİBİ), neyle ölçülür (KAPI) ve nereye
+kaydedilir (KAYIT). Kapısı olmayan basamak "kapı yok" diye açıkça yazılır, boş bırakılmaz. **Aday** kapı
+yazılmamış kapıdır; var sayılmaz (R8.1).
+
+### R10.1 Şema
+
+```mermaid
+flowchart TD
+  subgraph ONCE["Yayından önce (BLOG)"]
+    B1["B1 Konu seçimi<br/>R1"] --> B2["B2 Kaynak ve mevzuat paketi<br/>R2, R2.6"]
+    B2 --> B3["B3 Taslak + iddia tablosu<br/>R3, R5.1 adım 2"]
+    B3 --> B4["B4 Yayın yolu ölçümü<br/>R5.7"]
+    B4 --> B5["B5 Doğrulama turu<br/>R5.1 3a–3g"]
+    B5 -->|"R5.3 kırmızı"| B6["B6 Düzeltme + tam yeniden tur<br/>R5.1 adım 4–5"]
+    B6 --> B5
+    B5 -->|"R5.3 temiz"| B7["B7 Önizleme + onay<br/>R5.4, R5.7"]
+  end
+  B7 -->|"onay"| B8["B8 Yazı kaydı + PR + kapılar<br/>R6, R8"]
+  B7 -->|"değişiklik"| B3
+  B8 --> B9["B9 OPS'a göster, birleşme"]
+  B9 --> B10["B10 Canlı doğrulama<br/>200, harita, liste kartı"]
+  B10 --> B11["B11 Google dizin isteği<br/>GEO-SEO"]
+  B10 --> B12["B12 IndexNow (Bing)<br/>GEO-SEO"]
+  B11 --> B13["B13 3. gün ölçüm"]
+  B12 --> B13
+  B13 --> B14["B14 7. gün ölçüm"]
+  B14 --> B15["B15 14. gün ölçüm"]
+  B15 --> B16["B16 Aylık kaynak bakımı<br/>R7"]
+  B16 -.->|"değişen kaynak"| REV["Revizyon R5.5 → B5"]
+```
+
+| Basamak | Ne yapılır | Sahibi | Kapı (neyle ölçülür) | Olmazsa | Kayıt |
+|---|---|---|---|---|---|
+| **B1** Konu seçimi | R1.2 ölçüt tablosu; konu başına tek yazı (R1.3); sıra R1.4 | BLOG önerir, Recep sırayı belirler | R1.3 tek yazı/konu. Toplu üretim kapısı (R4.1, R8.1) henüz yok; ritim R9 | konu elenir ya da başka yazıyla birleşir | Kanban kartı (BLG-n) + R1.2 tablosu karta not |
+| **B2** Kaynak ve mevzuat paketi | Araştırmacı alt ajan (salt-okuma) kaynakları açar: erişim sınıfı (R2.2), ham alıntı (R2.3); mevzuat iddiası MEVZUAT paketinden (R2.6 adım 1) | BLOG + MEVZUAT | `alinti-dogrula.mjs` KALDI 0; açılamayan kaynak 0 (R5.3) | kaynak elenir, iddia düşer; kaynak yoksa yazı yazılmaz | depo dışı klasör + karta not (R5.7) |
+| **B3** Taslak + iddia tablosu | R3 kalıbı; her iddia → kaynak no + birebir alıntı + tür; mevzuat yalnız paketten (R2.6 adım 2) | BLOG | `rehber-denetim.mjs` kırmızı 0 (kalıp, atıf, iç bağlantı-metin, vaat, olumsuz iddia, mevzuat). Adaylar: K0, K0b, K1, K3, K4, K5 (R10.2) | kırmızı 0 olmadan B5'e gidilmez | depo dışı taslak + iddia tablosu + betik çıktısı |
+| **B4** Yayın yolu ölçümü | Bağlanan aile ve kategori kimlikleri güncel slug'a çözülür (son yeniden adlandırma migration'ının eski-yeni çiftleri); site içi bağlantı hedefleri canlıda 200; yayını bloke eden açık karar yok | BLOG | R5.7 kimlik şartı; `ic-baglanti-denetle.mjs` (hedefler); açık karar yok | derleme durur; onay sorulmaz (R5.7 sınırı) | karta not: komut + çıktı |
+| **B5** Doğrulama turu | 3a kapsam çıkarımı (tabloyu görmeden), 3b atıf betiği, 3c alıntı betiği, 3d sınıflama, 3e sabotaj kolu (tuzak yalnız kopyada), 3f örnekleme, 3g MEVZUAT kontrolü | BLOG (doğrulayıcı alt ajanlar bağımsız; hüküm BLOG'da); 3g MEVZUAT | R5.3: eşlenmeyen 0 · DESTEKSİZ 0 · ÇELİŞİYOR 0 · BAYAT 0 · açılamayan 0 · sabotaj N/N (N ≥ 3) | B6 | karta tur notu: tur no, kırmızı sayısı, tuzak sayısı ve yakalanan |
+| **B6** Düzeltme + tam yeniden tur | R5.1 adım 4–5: düzelt, tuzakları çıkar, **tüm metin** yeniden 3a'dan geçer | BLOG | R5.1 adım 5 ("tüm metin"); tur sayacı (R10.3) | tur sayısı 3'ü aşarsa kök sebep notu: her bulgunun hangi aday kapıyla yakalanacağı (R10.2) | karta tur notu |
+| **B7** Önizleme + onay | R5.4 iki parça: önizleme (sha256 ilk 12 hane) + düz cümle özet; tek soru "yayınlayalım mı?" | BLOG sunar, Recep onaylar (kendi sözü, bu pencerede) | sha256 doğrulananla aynı; yayına giremeyecek metnin onayı sorulmaz (R5.7) | metin değişirse durum taslak, B5 | durum dosyası + karta onay kaydı (kim, ne zaman, sha256) |
+| **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı; **PR açılınca yazı adresi GEO-SEO'ya SendMessage ile verilir** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
+| **B9** Birleşme | PR birleşmeden önce OPS'a gösterilir; `scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` | OPS onaylar; ritüeli emri veren pencere koşar | ritüel çıkış 0; `mergeStateStatus` CLEAN; `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` 204; karta "GEO-SEO taban aldı" notu (ne zaman gerektiği ve kip: Y2.1) | birleşme yapılmaz; kırmızı kapı B8'e döner | karta PR no + birleşme ölçümü |
+| **B10** Canlı doğrulama | Dağıtım bitince: yazı adresi **200**; site haritasında adres, `lastmod` = yayın tarihi; bilgi merkezi liste kartı **tarayıcı bölmesiyle** görülür (ham HTML yetmez); ters bağlantı yerinde; iç bağlantılar doğrudan 200 | BLOG | `curl` 200; harita satırı; `ic-baglanti-denetle.mjs`; `bot-karnesi.mjs` yazı adresinde temiz | düzeltme R5.5 revizyonu; B11–B12 başlamaz | karta not: adres, 200, `lastmod`, liste kartı (tarayıcı). ⚠Kart doğrulayıcısı `curl` ve kabuk operatörünü reddeder: "canlı 200" ölçütü elle işaretlenir, kanıt kart notundadır |
+| **B11** Google dizin isteği | B10'dan sonra **aynı tur**. Metin, kapı, komut ve süre sınırı **tek kaynakta**: `yayin-gorunurluk-denetim-standard.md` Y2 ("her yeni yazı ya da düzeltilmiş sayfa yayını" satırı; genişletme Y2.1, GEO-SEO'nun SEO-45 PR'ı). R10 yalnız sırayı gösterir, burada yeniden yazılmaz | GEO-SEO (Recep'ten ayrıca onay istenmez) | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B11 kaydı aranır (R10.3) |
+| **B12** IndexNow ve Bing | B11 ile aynı tur. Aynı kaynak: Y2 (IndexNow, Bing Webmaster, kip ve günlük sınır). R10'da komut satırı, kip ya da anahtar dosyası yolu yazılmaz | GEO-SEO | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B12 kaydı aranır (R10.3) |
+| **B13** 3. gün | Ölçüm içeriği Y2'de (gün sayıları ve evren orada) | GEO-SEO | Y2; kıyas ölçütü R7 | Y2; düzeltme gerekirse BLOG'a SendMessage | karta tek satır + sayı; satır biçimi Y2.1 |
+| **B14** 7. gün | R7 "1. hafta" ölçütleri; ölçüm koşusu Y2'de | GEO-SEO ölçer, BLOG yorumlar | R7 | sorun varsa R5.5 revizyonu | karta tek satır + sayı; satır biçimi Y2.1 |
+| **B15** 14. gün | R7 taban kıyası ve "4 hafta" ölçümü; koşu Y2'de | GEO-SEO | R7 taban kıyası (aynı sorgu, aynı gün sayısı) | konu kümesi tekrar değerlendirilir (R1) | karta özet sayı; ham çıktı depo dışı, yolu satırda |
+| **B16** Aylık kaynak bakımı | Yayındaki her yazının kaynakları R2.3 betiğiyle yeniden çekilir | BLOG | `alinti-dogrula.mjs`: son adres, durum, sha256 değişti mi | "gözden geçir" listesi → R5.5 revizyonu | karta not |
+
+### R10.2 BLG-10 bulgularından çıkan kapılar şemada nerede durur
+
+Kaynak: `docs/audits/blg3-bulgu-tablosu-2026-10.md` (59 bulgu; mevcut kapı hiçbirine hüküm vermedi). Aşağıdaki
+adayların **hiçbiri yazılmadı**; "Nerede doğar" sütunu R8.1'e göredir (kapı, koruduğu şeyi getiren PR'da doğar
+ve sabotajla kırmızı yanmadan kapı sayılmaz).
+
+| Aday | Ne ölçer | Basamak | Durum | Nerede doğar |
+|---|---|---|---|---|
+| K0 | Her turda `rehber-denetim.mjs` çıktısı tur kaydına yazılır; uzun mevzuat cümlesinin tabloda parça parça girilmesi alt dizi eşleşmesi nedeniyle yanlış kırmızı vermez | B3, B5 | aday | BLG-7 onarımı (#1791) ya da ayrı kapı PR'ı |
+| K0b | `MEVZUAT` deseni tüzük, direktif ve karar numarası kalıplarını (2024/1834, 2014/34/AB) kapsar | B3 | aday (desen bugün "tüzük" ve "direktif" içermiyor, ölçüldü) | BLG-7 |
+| K1 | İddia tablosunda zorunlu `kapsam` alanı (seri, model, ortam, uygulama noktası); niceleyici cümlede alıntının aynı kapsamı söylediği gösterilmezse kırmızı | B3, B5 | aday | iddia şeması değişikliği (BLG-10 adım 2 cetvel maddesiyle birlikte) |
+| K2 | Mevzuat cümlesinde AB ve TR takvimi ayrı alan; değiştiren tüzük no ve 3g sonucu zorunlu | B3, B5 | aday | `tur: mevzuat` şeması (MEVZUAT ile) |
+| K3 | Künye alanları (başlık, yıl, sayfa, madde no, erişim tarihi) kaynak dizini manifestosundan doldurulur; yazı listesi ↔ manifest farkı betikle ölçülür | B3 | aday | BLOG betik PR'ı |
+| K4 | Alıntıdaki kesinlik sözcüğü (suggest, can, may, widely, must) Türkçe karşılığıyla sözlükte eşlenir; kesinlik değişimi `INCELE` | B3, B5 | aday | `alinti-dogrula.mjs` INCELE kolu; yanlış pozitif ölçümüyle |
+| K5 | `genel` tür yalnız tanım ve akıl yürütme taşır; site kapsamı ve canlı olgu iddiasında `canli_olcum` alanı; öneri fiilinde yan cümle atfı | B3, B5 | aday | iddia şeması + `rehber-denetim.mjs` |
+
+K0–K5'in etiketli satır sayıları yakalayacakları sayı değildir (BLG-10 §6): kapı yazılıp sabotajla sınanana
+kadar bu bölümde sayı iddia edilmez. Cetvel maddeleri (R5.1 3d'ye "kapsam" ve "aralık mı ayrık mı" alt
+maddeleri, R2.4'e yıl ve madde numarası, R2.6 paketine "kapsam dışı koşulları", R4'e site kapsamı iddiasının
+canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'de bu cetvele girer; burada tekrar yazılmaz.
+
+### R10.3 Ölçütler
+
+- **Tur sayısı:** üçüncü yazıda B5–B6 toplamı ≤ 3 tur (BLG-3'te 10 tur sürdü). Ölçü, her turun karttaki
+  tur notundan okunur. Hangi adayların yazıldığına bağlıdır; yazılmayan aday için ölçü verilmez.
+- **Yazı kartının kapanışı:** yazı kartı Done'a B10, B11 ve B12 kayıtları kartta olmadan taşınmaz
+  (kanıt: kart notunda canlı 200, Search Console isteği, IndexNow yanıtı). Frekans yazısında bu halka
+  eksik kaldığı için bu madde var.
+- **Skill:** bu akış `.claude/skills/rehber-yayin` ile yönlendirilir (BLG-11 adım 3); tetiği Türkçe doğal
+  ifadelerdir ("yeni yazı", "blog yazısı", "rehber yazısı", "yazı yayınlandı", "yazı yayına çıkıyor",
+  "dizine ekle"). Tetiğin gerçekten çalıştığı OPS-124 pilotunda ölçülür; ölçülmeden "çalışıyor" yazılmaz.
+
+### R10.4 Açık noktalar (sahibi belli)
+
+| Nokta | Sahibi | Durum |
+|---|---|---|
+| B11–B15 metni, kapıları ve komutları | GEO-SEO (Y2'nin sahibi) | **ONAYLANDI (GEO-SEO, 13 Ekim): şema doğru, kapı komutları betiklerle uyuşuyor.** Tek kaynak `yayin-gorunurluk-denetim-standard.md` Y2 (genişletme Y2.1: aynı tur, Bing Webmaster, IndexNow kipi, günlük sınır, öncelik, satır biçimi). R10 yalnız sıra, sahip ve bağlantı taşır; Y2'yi BLOG değiştirmez |
+| Y2.1'den R10'a bağ | GEO-SEO | Kabul edildi; Y2.1 PR'ında (SEO-45, OPS onayı ve #1917 birleşmesi sonrası) konur. Numara kesinleşince bu satır numarayla güncellenir |
+| EN yayını (`EN_YAYIN`) açılınca B10–B12 EN adresleri için tekrarlanır | GEO-SEO + URUN | bayrak kapalı, kapsam dışı |
+
+## R11 — Başlık ve içerik yapısı: Google'ın resmî belgelerine dayanan kural (BLG-12, 2026-10-14)
+
+**Tetik ölçüm (OPS, 14 Ekim):** R3 zorunlu bölümleri ve "H2 sayısı hedef değildir"i söylüyordu; alt başlığın
+metninin nasıl yazılacağına dair kural yoktu. Frekans konvertörü yazısında "Nasıl çalışır?", "Yumuşak kalkış",
+"Seçim: neye bakılır?", "İzlenecek yol" başlıkları konu ifadesi taşımıyor; tek başına aranınca eşleşmiyor.
+
+**Sınıf işareti (bu bölümde her satır birini taşır):**
+
+- **RESMÎ:** Google'ın kendi belgesinde yazıyor; adresi, belge tarihi ve alıntısı satırda.
+- **İLKE:** bizim kararımız. Resmî bir kural değildir; dayanağı hangi resmî satıra yaslandığıyla yazılır.
+  Resmî şart gibi sunulmaz (R2.3'ün aynı ruhu: yazılı olmayan şeyi Google'a atfetmek yanlış beyandır).
+- **GÖRÜŞ:** Google çalışanının açıklaması ya da ikincil kaynak; kural değil, yön gösterir.
+
+### R11.1 Resmî dayanak (BLOG ölçümü, 2026-10-14, A sınıfı)
+
+Beş belgenin ham HTML'i `curl` ile çekildi (durum 200, yönlendirme yok); alıntılar sayfa metninde birebir
+arandı, özetleyici araç kanıt sayılmadı (R2.3). Türkçe arayüzlü sürümleri (`hl=tr`) de açılıyor; alıntılar
+İngilizce özgün metinden. Belge tarihi sayfadaki "Last updated" satırıdır. Adresler
+`https://developers.google.com/search/docs/` altındadır.
+
+| # | Ne söylüyor | Alıntı (özgün) | Belge | Belge tarihi |
+|---|---|---|---|---|
+| 1 | Ana başlık içeriği betimleyici, yararlı bir özetle anlatmalı | "Does the main heading or page title provide a descriptive, helpful summary of the content?" | `fundamentals/creating-helpful-content` | 2026-10-05 |
+| 2 | Ana başlık abartılı ya da şok edici olmamalı | "Does the main heading or page title avoid exaggerating or being shocking in nature?" | `fundamentals/creating-helpful-content` | 2026-10-05 |
+| 3 | İyi başlık sayfaya özgü, açık, kısa ve içeriği doğru anlatan başlıktır | "a good title is unique to the page, clear and concise, and accurately describes the contents of the page." | `fundamentals/seo-starter-guide` | 2025-12-10 |
+| 4 | Ana başlık sayfadaki en belirgin metin olmalı; yoksa Google yanlış metni başlık bağlantısı yapabilir | "Consider ensuring that your main title is distinctive from other text on a page and stands out as being the most prominent on the page" | `appearance/title-link` | 2025-12-10 |
+| 5 | Uzun içerik bölümlere ayrılır, başlıklar gezinmeye yardım eder | "Break up long content into paragraphs and sections, and provide headings to help users navigate your pages." | `fundamentals/seo-starter-guide` | 2025-12-10 |
+| 6 | Başlıkların sırası Google Arama için önemli değildir | "from Google Search perspective, it doesn't matter if you're using them out of order." | `fundamentals/seo-starter-guide` | 2025-12-10 |
+| 7 | İdeal başlık sayısı yoktur; fazla geliyorsa fazladır | "There's also no magical, ideal amount of headings a given page should have. However, if you think it's too much, then it probably is." | `fundamentals/seo-starter-guide` | 2025-12-10 |
+| 8 | Bağlantı metni, bağlanılan sayfanın içeriğini önceden anlatmalı | "users and search engines can easily understand what your linked pages contain before they visit." | `fundamentals/seo-starter-guide` | 2025-12-10 |
+| 9 | Başlık bağlantısı, `<h1>` gibi başlık öğelerinden de üretilebilir | "Heading elements, such as <h1> elements" | `appearance/title-link` | 2025-12-10 |
+| 10 | Anahtar kelime doldurma spamdir (tanım) | "Keyword stuffing refers to the practice of filling a web page with keywords or numbers in an attempt to manipulate rankings in Google Search results." | `essentials/spam-policies` | 2026-08-28 |
+| 11 | Doldurmanın biçimi: doğal olmayacak sıklıkta tekrar | "Repeating the same words or phrases so often that it sounds unnatural." | `essentials/spam-policies` | 2026-08-28 |
+| 12 | **Yan dayanak** (meta açıklama kuralıdır, başlık kuralı değil): anahtar kelime dizisi kullanıcıya sayfa hakkında net fikir vermez | "meta descriptions comprised of long strings of keywords don't give users a clear idea of the page's content" | `appearance/snippet` | 2026-04-20 |
+| 13 | Bölüme giden "Read more" derin bağlantısı için içerik insana hemen görünür olmalı, kaydırma JS ile kontrol edilmemeli, adres çubuğundaki hash silinmemeli; bu bir olasılık artırma önerisidir, garanti değildir | "A "Read more" deep link is a link within a snippet that leads users to a specific section on that page." ve "Make sure content is immediately visible on the page to a human (and not hidden behind an expandable section or tabbed interface, for example)." | `appearance/snippet` | 2026-04-20 |
+
+**GÖRÜŞ:** Google Arama sözcüsü John Mueller (2019, haber metni üzerinden ikincil kaynak; birincil kayıt
+aranmadı): bir sayfada H1 sayısının alt ya da üst sınırı yoktur ("There's no limit, neither upper or lower
+bound"). Kaynak: `https://www.searchenginejournal.com/google-h1-headings-seo/328459/` (2019-09-30; Search
+Engine Land makalesi 403 verdi, iki ikincil kaynak karşılaştırılamadı).
+
+### R11.2 Google'ın YAZMADIĞI şeyler (ölçüldü; kuralları bunların üstüne kurmayız)
+
+- **H2/H3 başlığının konu ifadesi taşıması resmî şart değildir.** Yararlı içerik belgesindeki başlık sorusu
+  yalnız "ana başlık ya da sayfa başlığı" içindir (satır 1–2). Alt başlıklar için belgelerde yazan tek şey
+  "gezinmeye yardım" (satır 5); alt başlık metni için ayrı bir kural yok.
+- **Başlıkta anahtar kelime tekrarı için sayısal eşik yok.** Beş belgenin gövde metninde "keyword density",
+  yüzde ve eşik terimleri arandı; bulunmadı. Spam tanımı niteliksel ("unnatural", "out of context").
+  Taranmadı: Search Central blogu ve Search Off the Record kayıtları (bu yüzden "yok" hükmü yalnız beş
+  belge için ölçüldü).
+- **Başlık sırası ve sayısı Google Arama için ölçüt değil** (satır 6–7). Sıra kuralımız erişilebilirlik
+  ve içindekiler içindir (R3 şablonu), Google'a atfedilmez.
+- **"Tek H1" Google'ın kuralı değildir** (GÖRÜŞ: sınır yok). R3'teki tek H1 şartı şablon ve belge
+  yapısı için **iç kuraldır**; gerekçesi Google değil, tek başlıklı bir belge şablonudur. Bu bölüm o
+  kuralı değiştirmez; yalnız gerekçesinin kaynağını doğru yere yazar.
+- **Sayfa içi anahtar anlar (key moments)** yalnız video işaretlemesi içindir; yazıya uygulanmaz.
+- **"Read more" derin bağlantısı başlık metnine bağlanmaz** (satır 13). Belge bu bölüm bağlantısı için başlığın
+  metnini değil içeriğin görünürlüğünü, kaydırmanın JS ile yönetilmemesini ve hash'in korunmasını şart koşar. Yani
+  alt başlığı yeniden yazmak bu bağlantıların görünme olasılığını artırdığı için DEĞİL, okuyucu için yapılır.
+- **Bu sitenin şablonunda gövde ve SSS cevapları daraltılabilir (accordion) değildir** (ölçüldü 2026-10-14:
+  `src/lib/bilgiMerkezi/markdown.ts` ve `RehberYazisiSayfasi.tsx`'te `<details>` yalnız dar ekrandaki İçindekiler
+  için var). 13. satırın birinci şartı bu yüzden bugün karşılanıyor; şablon değişirse yeniden ölçülür (Y8).
+
+**Sonuç:** alt başlık kuralı "Google şöyle istiyor" diye yazılmaz. Aşağıdaki kurallar İLKE sınıfındadır;
+resmî satırlara yaslanır ama onları aşar, bu yüzden aşağıdaki uyarı kolu **KIRMIZI değil UYARIDIR**.
+
+### R11.3 Kurallar (İLKE; dayanak sütunu hangi resmî satıra yaslandığını söyler)
+
+| # | Kural | Dayanak | Sınıf |
+|---|---|---|---|
+| Y1 | H1 aranan soru ya da konu adıdır, içeriği betimler; abartı, ünlem ve vaat yok | 1, 2, 3 (+ R4.2) | RESMÎ |
+| Y2 | Her H2 ve H3 **tek başına okunduğunda** neyi anlattığı anlaşılır: içindekiler ve sayfa içi bağlantı başlığı bağlamsız gösterir. Konu terimi başlığın **doğal** yerinde geçer ("Nasıl çalışır?" yerine "Frekans konvertörü nasıl çalışır?"). Konu başka bir adla zaten anlaşılıyorsa (marka ya da model adı, "Danfoss FC 51…" gibi) o başlık yeterlidir | 3, 5, 8 | İLKE |
+| Y3 | **Doldurma yasağı:** aynı tam ifade H2'lerin çoğunda tekrarlanmaz; her H2 farklı bir yan soruyu anlatır, başlıkları doğal olmayacak sıklıkta aynı sözcüklerle bitirmek yasaktır | 10, 11 | RESMÎ (tanım) · İLKE (eşik) |
+| Y4 | Zorunlu bölüm başlıkları sabittir (R3; kapı birebir arar) ve Y2'den muaftır | R3 | İLKE |
+| Y5 | SSS soruları tam soru cümlesidir ve konuyu adıyla anar ("Fan eğrisindeki verim her devirde geçerli mi?" iyi; "Peki ya verim?" kötü) | 3, 8 | İLKE |
+| Y6 | H2 sayısı ve kelime sayısı hedef değildir (R3'ün mevcut cümlesi); bölüm sayısı yan soruların sayısından gelir | 7 | RESMÎ |
+| Y7 | Başlığın metni değişirse içindekinin çapası da değişir; dışarıdan o çapaya bağlantı varsa eski çapa kırılır (R10 B9 ölçümünde çapa bağlantısı sorulur) | R6 | İLKE |
+| Y8 | Gövde ve SSS cevapları daraltılabilir (accordion, sekme) yapılmaz; bölüm içeriği sayfa yüklenirken görünür kalır ve sayfa yüklenirken kaydırma konumu JS ile değiştirilmez, adresteki hash silinmez. Şablon kararıdır (URUN); değişirse bu satır yeniden ölçülür | 13 | RESMÎ (öneri, garanti değil) |
+
+### R11.4 Denetim kolu (`baslikDenetle`, UYARI)
+
+`scripts/rehber/rehber-denetim.mjs` içinde `baslikDenetle(md)`; `denetle()` çıktısına **`uyari`** dizisi olarak
+girer ve `kirmizi` dizisini değiştirmez. Konu terimleri, H1 metninden (ve varsa ön bilgideki `konu_terimleri:`
+satırından) çıkarılır: 4 harften uzun, bağlaç ve soru kelimesi olmayan sözcüklerin ilk beş harfi (Türkçe
+ek yüzünden kök eşleşmesi; eşik ölçüm sonrası ayarlanır).
+
+| Sınıf | Ne zaman uyarır | Dayanak |
+|---|---|---|
+| `BASLIK-KONU-ORANI` | Zorunlu bölümler hariç H2'lerin **yarısından azı** bir konu terimi taşıyor (en az 4 H2 olan yazıda) | Y2 |
+| `BASLIK-TEKRAR` | H2'lerin **%60'ından fazlası** konu terimlerinin **tamamını** taşıyor (en az 4 H2) | Y3 |
+
+⚠**Eşikler bizimdir** (yarım ve %60); resmî eşik yoktur (R11.2). İki yayındaki yazıda ölçüldü (R11.5); eşik
+oradaki yanlış pozitiflere göre ayarlanır, kırmızıya terfi ettirilmez: kırmızı yapılırsa ürün adı taşıyan
+meşru başlıklar ("Danfoss FC 51, FC 101 ve FC 102 karşılaştırması") sebepsiz yere düşer.
+
+### R11.5 Ölçüm ve açık noktalar
+
+İki yayındaki yazının başlık önerisi `docs/audits/blg12-baslik-oneri-tablosu-2026-10-14.md`'dedir: şimdiki ·
+önerilen · gerekçe. **Başlık değişikliği yayına yalnız Recep onayından sonra OPS üzerinden girer**; metin
+değişeceği için R5.5 gereği sha256 değişir ve doğrulama turu yeniden koşar (maliyeti tablonun altında).
+
+| Nokta | Sahibi | Durum |
+|---|---|---|
+| Zorunlu başlıklara ("Fiyatı belirleyen etkenler" vb.) konu teriminin eklenmesi: kapı başlığı birebir arıyor, değişirse `ZORUNLU_BOLUMLER` ve `kalipDenetle` birlikte değişir | BLOG + OPS kararı | AÇIK: Y4 şimdilik muaf tutar; değişiklik ayrı karar (R3 kalıbını etkiler) |
+| Search Central blogu ve Search Off the Record taraması (H2/H3 için resmî ek kanıt) | BLOG | YAPILMADI, ayrı iş |
+| Mueller açıklamasının birincil kaydı | BLOG | YAPILMADI; satır GÖRÜŞ olarak kalır |
+| Uyarı eşiklerinin üçüncü yazıda yeniden ayarı | BLOG | üçüncü yazıdan sonra |
+| "Hız sürücüsü" ile "frekans konvertörü" sözcüklerinin arama talebi (başlıkta hangisinin geçeceği) | GEO-SEO (SEO-50) | ÖLÇÜLDÜ 14 Ekim, Google Trends TR, 12 ay, 6 çağrı, **düşük güvenilirlik**: iki sözcük aynı büyüklük sınıfında; talep ikisi arasında seçim yapmıyor, seçimi tekrar kuralı (Y3) ve yazının kendi sözcüğü belirler. "Sürücü" tek başına ölçülemez (genel sözcük). Düşük hacimli terimler iki gün arayla tutarsız çıktı, bu yüzden frekans ailesi içinde sıra iddia edilmez |
+| Yazıdaki "invertör" yazımı ile arama dilindeki "inverter" yazımı | BLOG + Recep | AÇIK: Trends'te "inverter" en yüksek hacimli terim, "invertör" yaklaşık onda biri (SEO-50, düşük güvenilirlik); başlığa yansıtılıp yansıtılmayacağı ayrı karar, bu PR başlıkta "inverter" önermez |
+
 ---
 
 ## Ölçüm geçmişi
@@ -557,7 +793,9 @@ Kaynak sınıfı (`hukum-kaynak-standard.md`): **A** = BLOG'un kendi ölçümü 
 | 2026-09-24 | Emsal yazı yeniden, tarayıcıda işlenmiş (BLOG) | A | Normal istemci ve Googlebot kimliği aynı 9 kelimelik kabuğu alıyor (dolu hâl yalnız JS sonrası); işlenmiş sayfa 2.561 kelime · 15 H2 · 8 SSS · 2 tablo · 1 görsel · 17 kaynak (EPA, DOE, 2 üretici); JSON-LD TechArticle + FAQPage + BreadcrumbList; yazar Organization; teknik sorumluluk notu var ("…performans, emisyon veya tasarruf garantisi içermez…"); **yapay zekâ açıklaması yok** |
 | 2026-09-24 | Emsal blog liste + 3 yazı şablonu, Playwright 1280/390 (BLOG, Sonnet alt ajan) | B | İki ayrı site (deaboyler.com / deaenerji.com), yönlendirme yok; üç yazı üç farklı şablon (JSON-LD Article / TechArticle / BlogPosting, üçünde FAQPage). İçindekiler üçünde var (biri yapışkan); ilerleme çubuğu, paylaşım, yazar kutusu, ilgili yazılar yok; iki yazıda mobil sayfa taşması (scrollWidth 770 / 391); hiçbirinde erişim tarihi ve yapay zekâ notu yok. Tasarım kararı K37-a/U2 bulundu (ilgili makale + arama). Rapor Linear REC-369 |
 | 2026-09-24 | Kalıp kapısı ilk yazıya karşı (BLOG) | A | Onaya sunulmuş metin (sha f29ab1c35e26): ZORUNLU-BOLUM-YOK × 2 (fiyat etkenleri, sorumluluk notu); tamamlanmış metin: 0 |
+| 2026-10-13 | BLG-3 + frekans yazısı bulgu tablosu, kapı koşusu (BLOG, çürütme turlu) | A | 59 gerçek bulgu; `rehber-denetim.mjs` tur 4–10 taslaklarına koşuldu: 0 bulguya hüküm; `alinti-dogrula.mjs` fonksiyon düzeyi: tur 4 GECTI 114 · INCELE 7 · KALDI 0; tur 4–9'un 41 bulgusundan 35'i 25 Eylül'de doğrulanmış metinde vardı. Rapor `docs/audits/blg3-bulgu-tablosu-2026-10.md` (BLG-10 PR'ı) |
 | 2026-09-24 | Alıntı betiği canlı (BLOG) | A | Cetvelin 5 Google alıntısı: GECTI 2 · INCELE 3 · KALDI 0; bayat SSS alıntısı yol değişikliğiyle yakalandı; bayatlık kelimesi olağan cümlede de işaret verdi (ayırt etmez) |
+| 2026-10-14 | Google başlık ve içerik yapısı belgeleri, ham HTML (BLOG, blog-arastirmaci + müdür doğrulaması) | A | 5 belge 200; 13 resmî alıntının 13'ü belge metninde birebir bulundu (GEO-SEO bağımsız olarak 12'sini aynı sonuçla doğruladı, 13. satırı BLOG ekledi ve doğruladı); H2/H3 için konu ifadesi şartı ve başlıkta sayısal eşik YOK; tek H1 sınırı yok (GÖRÜŞ, ikincil kaynak). Search Central blogu ve Search Off the Record taranmadı |
 
 ⚠**v0.1'de bu cetvelin kendisi R2'yi çiğnedi:** SSS alıntısı özetleyici araçla "ölçüldü" diye yazıldı ve
 bayattı (R2.3 vakası). Kuralı yazmak onu uygulamak değildir; bu sürümün de her olgusal cümlesi aynı

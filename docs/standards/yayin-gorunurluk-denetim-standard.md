@@ -25,7 +25,9 @@
 | Canlı tarama kapısı | yayındaki siteyi TEK geçişte ölçer (sitemap + her adresin ham HTML'i + az sayıda ek istek): yetim, title (yok/tekrar/uzun/taslak), meta açıklama (yok/tekrar/kesik/şablon/kısa), `<html lang>` (EN dahil), favicon ve ikon dosyaları, lastmod (bugün/toplu), robots.txt kalıpları + gizli yüzeyler, olmayan adres 404 mü, site içi bağlantı yönlendirmesi, yönlendirme zinciri, JSON-LD geçerliliği/şema uyarıları, changefreq, `llms.txt` beyanı (sayfa/kategori sayısı ve `Languages:` satırı haritayla aynı mı: `LLMS-SAYFA`, `LLMS-DIL`) | `scripts/seo/canli-kapi.mjs` (`--taban`, `--cikti`, `--bilinen <json>`, `--bugun`) | çıkış 0 temiz · 1 yeni KIRMIZI · 2 araç/ağ hatası. `--bilinen {"KOD":"REC-nn"}`: bilinen kırmızı çıkışı 1 yapmaz, yeni kırmızı yapar. Google kural denetimi REC-461 TEK-TABLO kural numaraları kod başına konsol özetinde. REC-502. Ağsız kapı INV-CANLI-KAPI-1 |
 | Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | **PageSpeed Insights API v5** (Google sunucusunda Lighthouse, mobil; anahtar `PAGESPEED_API_KEY`, karar 127) — `scripts/seo/sayfa-kalite.mjs` (varsayılan `--kip psi`, `--strateji mobile|desktop`; geçici hata 3 deneme; anahtar hiçbir çıktıya yazılmaz) | örnekleme kapalı; ölçüt SEO; performans bilgi (REC-398). Yerel unlighthouse 0.18.1 **yedek**: 2026-09-25'te makinede boş bellek ~1 GB iken üç koşuda "Unable to get browser page" ile düştü (59→24→3 sayfa) |
 | Googlebot gözüyle sayfa | URL Inspection API: sayfa başına Googlebot getirme sonucu, robots, dizin kararı, son tarama zamanı (Search Console "tarama istatistikleri" API'de yok — ölçüldü 09-27) | `scripts/seo/gsc-url-denetim.mjs` | kırmızı: getirme başarısız, robots engeli; hiç taranmamış ayrı sayılır. Kota günde 2000. REC-402 |
-| Bot kalitesi karnesi | 5 bot kimliği × adres: aynı HTML, title, canonical, hreflang, JSON-LD | `scripts/seo/bot-karnesi.mjs --taban` | ön izleme sitesinde de koşar |
+| Tek sayfa okuma (yayın sonrası 3/7/14. gün) | az sayıda adres için URL denetimi satırı + page×date günlük tık/gösterim (veri olmayan gün 0 ile doldurulur, `veriGunu` gerçek gün sayısını söyler; son 3 gün ön veri dışarıda) | `scripts/seo/gsc-sayfa-oku.mjs --adres <yol,...> --cikti <depo dışı>` | çıkış 0 hepsi okundu · 1 denetlenemeyen ya da gösterim okunamayan adres · 2 araç koşmadı. Hata sıfıra çevrilmez ("ölçülemedi"); çıktı depo içindeyse ve git yok saymıyorsa durur (P6). SEO-41 |
+| Bing okuma ve fark | Bing Webmaster API salt okuma: tık/gösterim, sorgu/sayfa, tarama/dizin sayaçları, site haritası, adres bazında kayıt (GetUrlInfo). `--taban <önceki json>` ile iki koşu arası FARK: veri yeni mi (yalnız **son veri tarihi** ilerlediyse; Bing sayaçları 4-9 gün gecikmeli, tarihsiz sayı tazelik kanıtı değildir), sayaç değişimi, sayfa kaydı yeni mi | `scripts/seo/bing-webmaster-oku.mjs --cikti <depo dışı> [--url-bilgi ...] [--taban ...]` | çıkış 0/1/2; bozuk taban dosyası 2 (API'ye gitmeden). Karşılaştırılamayan "değişmedi" sayılmaz; iki koşuda kaydı olmayan sayfa `KAYIT-YOK` (değişim değil). SEO-9, SEO-43 |
+| Bot kalitesi karnesi | 5 bot kimliği × adres: aynı HTML, title, canonical, hreflang, JSON-LD | `scripts/seo/bot-karnesi.mjs --taban` | ön izleme sitesinde de koşar. `--onceki <karne.json>` ile iki karne arası FARK: yeni/giden sorun, eklenen/çıkan adres, değişen alan, sorun sınıfı farkı (`karne-fark.md/json`); bozuk önceki dosya ağa gitmeden çıkış 2 (SEO-44) |
 
 Araçlar **kurulmaz**: sürüm sabitli `npx` ile koşar, `package.json`'a dokunulmaz (kalıcı kurulum kararı
 ALTYAPI'da, `bagimlilik-kararlari.md`). Her betik `--taban` alır: canlı, yerel ön izleme ya da dal önizlemesi.
@@ -44,9 +46,80 @@ depoya yalnız özet sayı girer.
 | **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Kanban kartı |
 | **Model adresleri yayından +1, +7, +14 gün** (SEO-4, URN-11) | gsc-url-denetim (model adresi örneklemi: son tarama, dizin durumu) · GSC site haritası durumu (gönderilen/dizinlenen, hata) · tarama sıklığının `lastmod` değişiminden bağımsız olup olmadığı | canlı | tek tablo URUN + OPS; tabana (REC-300 taban tablosu) kıyas. Gerekçe: model satırlarının `lastmod`'u `products.updated_at`, 441 aktif modelde 10 gün / 20 dakikaya yayılı (en büyük küme 09-25 09:11Z 166 model); aynı damgayı taşıyan çok adres Google'ın lastmod'u yok saymasına yol açabilir (REC-461/A). Bayrak kapalıyken model satırı haritaya girmez |
 | **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar kart numarasıyla; eski kayıtlarda REC-nn) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili Kanban kartı |
+| **Canlıda yeni ya da değişen her adres: canlıda doğrulandığı anda, aynı tur ve en geç 1 saat içinde** (SEO-39, SEO-45) | Y2.1 zinciri: doğrula → IndexNow → Google dizin oluşturma isteği → Bing URL Gönder (API) → harita ve `lastmod` → kayıt. Kimseden ayrıca onay istenmez | canlı, yalnız yeni ya da değişen adresler | sonuç (adres, saat, IndexNow yanıtı, Google ve Bing sonucu) ilgili Kanban kartına; günlük sınır dolarsa kalan adres listesi ertesi günün ilk işi, OPS'a tek satır |
 
 EN_YAYIN kapalıyken `--en-harita-disi-bilincli` verilir: EN alternatifinin haritada olmaması kırmızı değil,
 ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalkar.
+
+### Y2.1 Dizin isteği: canlıda yeni ya da değişen her adres için standart iş (SEO-45, 2026-10-13)
+
+**Kural.** Canlıda yeni ya da değişen bir adres doğrulanır doğrulanmaz, aynı turda ve en geç 1 saat içinde, GEO-SEO
+Google ve Bing'e dizin isteğini gönderir. Recep'ten ya da OPS'tan ayrıca onay istenmez; yayın ile istek arasında
+bekleme yoktur. Günlük sınır dolarsa kalan adresler ertesi günün ilk işidir, aşağıdaki öncelik sırasıyla. Süre,
+bildirim anından değil **canlıda doğrulanma anından** sayılır.
+
+**Tetik** (biri yeterli). "Canlıda doğrulandı" = adres GET 200, kanonik kendisi, `noindex` ve robots engeli yok;
+yönlendirmede eski adres 308 ile yeni adrese gider ve yeni adres 200 verir.
+
+- Yeni yazı ya da yeni sayfa (yazı akışında rehber-yazisi-standard.md R10 B10'dan sonra).
+- Başlığı, ana metni ya da yapılandırılmış verisi anlamlı değişen mevcut sayfa.
+- Adres değişikliği ya da yönlendirme: yeni adres (TR adres şeması yayını dahil).
+- Yeni ürün ailesi, kategori ya da marka sayfası.
+
+Tetik **değildir**: yalnız fiyat ya da stok değeri değişen sayfa; onu harita `lastmod`'u (Y3.1) ve IndexNow web
+kancası (REC-127) kapsar.
+
+**Kim bildirir.** Yayını yapan kartın sahibi (BLOG, URUN, ALTYAPI…) canlı doğrulamayı karta yazar ve adres listesini
+GEO-SEO'ya SendMessage ile verir. Liste yayından önce de verilebilir; zincir yayın doğrulanınca koşar. Bildirim
+gelmese de GEO-SEO canlı haritayı tabanla karşılaştırıp yeni adresi kendisi görür (Y2 "Taban" satırı).
+`--yalniz-yeni` kipi için taban (`eski-adresler.json`) yayından **önce** GEO-SEO tarafından alınır.
+
+**Zincir** (sıra sabit; her adım kayda yazılır):
+
+1. **Doğrula.** `gsc-url-denetim.mjs` (getirme başarılı, robots engeli yok, kanonik kendisi) ya da `gsc-sayfa-oku.mjs`.
+   Yönlendirmede eski adres 308, yeni adres 200 görülür. Kırmızıysa istek gönderilmez, kusur sahibine döner (Y4).
+2. **IndexNow** (Bing, Yandex…). `scripts/seo/indexnow-bildir.mjs`: bayrak (`ADRES_SEMASI_K3B`) kapalıyken
+   `--yalniz-degismeyen`, açıkken `--yalniz-yeni <eski-adresler.json>`; önce `--kuru`. Anahtar dosyası
+   `public/<anahtar>.txt` depoda ve canlıda 200 olmalıdır; "anahtar yok" demeden önce `public/*.txt` ve canlı
+   adrese bakılır (SEO-39).
+3. **Google dizin isteği.** Search Console URL denetimi sonuç sayfasında dizin oluşturma isteği düğmesi (tarayıcı;
+   yalnız bu adresler; aynı adres aynı gün ikinci kez istenmez). Bu istek için API yoktur: Google'ın Indexing API'si
+   "yalnız JobPosting ya da VideoObject içindeki BroadcastEvent taşıyan sayfalar" içindir (Google belgesi, 2026-10-13
+   okundu); URL denetimi API'si yalnız okur.
+4. **Bing URL Gönder** (API, tarayıcı oturumu gerekmez): `bing-url-gonder.mjs --gonder <adresler|liste.txt>` (SEO-47) —
+   önce `GetUrlSubmissionQuota` ile kota okunur (okunamazsa hiçbir şey gönderilmez), her adres GET 200 ve kanonik
+   kendisi diye sınanır, sonra kota kadarı `SubmitUrlBatch` ile gönderilir; liste öncelik sırasındadır, kota
+   yetmezse sondakiler kalır (çıkış kodu 3). Önce `--kuru` ile sınanabilir; yalnız kota için `--kota`.
+   Ayrı betik olmasının sebebi: `bing-webmaster-oku.mjs` salt okuma sözleşmesindedir.
+5. **Harita.** Adres `sitemap.xml`de ve `lastmod` gerçek mi (Y3.1). Değilse istekten önce sahibine dönülür; Google
+   haritayı kendi tarar, harita yeniden gönderilmez.
+6. **Kayıt.** Kartta: adres sayısı, saat, IndexNow yanıt kodu, Google istek sonucu ("istendi" ya da "kota aşıldı"),
+   Bing sonucu. Kalan adres varsa liste ve "ertesi gün ilk iş" notu.
+
+**Günlük sınırlar** (ölçüm tarihi 2026-10-13):
+
+| Kanal | Sınır | Kaynak ve ölçüm durumu | Dolunca |
+|---|---|---|---|
+| Google dizin isteği | Panelde yazmıyor (ölçüldü: URL denetimi sonuç sayfasında yalnız düğme var). **Planlama tabanı günde 10 adres**; gerçek sayı ilk "kota aşıldı" hatasında bu satıra yazılır | Search Console URL denetimi, 2026-10-13; Recep "sanırım 15" dedi, ölçülmedi | kalanlar ertesi gün ilk iş, aynı sıra |
+| Bing URL Gönder | **Günlük 100, aylık 1800** (ÖLÇÜLDÜ 2026-10-14: `bing-url-gonder.mjs --kota` → DailyQuota 100 · MonthlyQuota 1800, hiç gönderim yapılmadan; Recep panelde 100 görmüştü, doğrulandı). Gönderim sonrası bu sayıların "kalan" olarak düşüp düşmediği ilk gerçek gönderimde ölçülür | Bing Webmaster API belgesi: toplu gönderim en çok 500 adres ve kotayı aşamaz; betik `min(günlük, aylık)` kadarını gönderir | aynı |
+| IndexNow | pratikte sınırsız (betikte istek başına 10 000 adres) | `indexnow-bildir.mjs` | — |
+
+**Öncelik sırası** (yalnız Google sınırı dolarsa; Bing ve IndexNow'da hepsi gider):
+
+1. Yeni içerik: yeni yazı, yeni sayfa, yeni aile/kategori/marka (başka yolla keşfedilmez).
+2. Üst kategori ve marka sayfaları (çok iç bağlantı alır, altlarını keşfettirir).
+3. Alt kategori sayfaları.
+4. Aile sayfaları, son 28 günde gösterimi olandan başlayarak (`gsc-sayfa-oku.mjs`).
+5. Gösterimi 0 olan eski adres yönlendirmeleri ve yasal sayfalar: istek gönderilmez, harita ve IndexNow yeter.
+
+**Ölçek örneği (19 Ekim TR adres şeması).** SEO-26 listesi 88–89 TR adres (5 sayfa + 3 yasal + 28 kategori [7 üst,
+21 alt] + 6 marka + 47 aile; liste yeni şemadan 16 Ekim'de yeniden üretilir). Google tabanı günde 10 ise ilk 18 adres
+(5 sayfa + 7 üst + 6 marka) ilk iki güne, 21 alt kategori sonraki üç güne, 47 aile ardından beş güne düşer; Google
+tarafı yaklaşık 10 günde biter. Bing 100 ve IndexNow ile 89 adresin hepsi yayın günü gider.
+
+**Okuma** (aynı kayıt, her adres için): 3., 7. ve 14. gün. `gsc-url-denetim.mjs` (son tarama, dizin durumu),
+`bing-webmaster-oku.mjs --taban` (fark kipi, SEO-43), `sayfa-kalite.mjs` (+7). 14. günde gösterim, tık, sıra
+(`gsc-sayfa-oku.mjs`). Kartta tek satır + sayı; ham çıktı depo dışı dosyada.
 
 ## Y3 — Kabul (yayın günü ve sonrası)
 
@@ -65,8 +138,13 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
 - Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
   bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
 - **Gövdede iç bağlantı (URN-21, 2026-10-03):** "yetim yok" yetmez; sayfaya giden bağlantının **gövdeden** (header/nav/footer
-  hariç, ham HTML) gelmesi gerekir. Aile ve model sayfasında: (a) görünür kırıntıda kategori + marka (+ alt kategori; model
-  sayfasında aile) gerçek `<a href>`, aile sayfasında **≥2**, son basamak bağlantısız ve `aria-current="page"`; (b) "Modeller"
+  hariç, ham HTML) gelmesi gerekir. Aile ve model sayfasında: (a) görünür kırıntıda ana kategori (+ alt kategori; model
+  sayfasında aile) gerçek `<a href>`, aile sayfasında **≥2** (Ana Sayfa + ana kategori), son basamak bağlantısız ve
+  `aria-current="page"`; **kırıntıda marka basamağı YOKTUR** (URN-126, canlıda ölçüldü 2026-10-13: `/tr/products/seat-serisi`
+  BreadcrumbList = Ana Sayfa › Fanlar › Korozyona ve Aside Dayanımlı Fanlar › aile adı); markaya bağlantı kırıntının değil sayfadaki
+  **üretici bloğunun** işidir (H1 üstünde, "ÜRETİCİ VERİSİ" etiketinin yanında, `/tr/brands/<marka>` ya da yeni şemada
+  `/tr/markalar/<marka>`) ve **≥1** olmalıdır; `bot-karnesi` aile sayfasında bunu sayar, 0 ise `MARKA-BAGLANTISI-YOK` kırmızıdır
+  (SEO-40); (b) "Modeller"
   bölümünde her model satırı **tam 1** `<a href>` (model adresi; bayrak kapalıyken `?sku=` biçimi, K3-b açılınca modelin kendi
   adresi), `<button>` değil; (c) kırıntı JSON-LD BreadcrumbList ile **aynı diziden** gelir (`src/lib/seo/kirinti.ts`
   `aileKirintiAdimlari`; ikinci bir kurucu yazılmaz); (d) mobilde bu bağlantılar en az 44px (`min-h-11`). Ağsız kapılar:

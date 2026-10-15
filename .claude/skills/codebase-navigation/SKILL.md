@@ -3,11 +3,11 @@ name: codebase-navigation
 description: "Kod tabanında gezinme: tanım, çağıran, etki; bizde codebase_* ve codegraph araçları. Tetik: \"nerede tanımlı\", \"kim çağırıyor\", \"etki analizi\"."
 category: research
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/codebase-navigation/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/codebase-navigation/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/codebase-navigation/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/codebase-navigation/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -31,6 +31,11 @@ metadata:
 
 # Codebase Navigation
 
+## Selection card
+- Task: Locate repository entry points and owning modules.
+- Start: Identify the requested artifact, repository owner and acceptance criteria.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
+
 ## Overview
 
 Reading files top to bottom is the slowest way to understand code and the
@@ -47,7 +52,7 @@ same moves work with glob, grep, and ranged reads.
    exact text for strings, config keys, and error messages.
 3. Read skeletons before bodies — signatures, types, and exports carry most of a
    module's contract.
-4. Once you know the line, read that range, not the whole file.
+4. Once you know the symbol, inspect it with codebase-read-symbol; read line ranges with read only when unindexed or non-declaration content.
 5. Trace relationships through the reference graph (callers, callees, imports)
    instead of guessing from file names.
 6. Don't conclude absence from one empty search. Retry with another query, a
@@ -64,6 +69,7 @@ same moves work with glob, grep, and ranged reads.
 | Code for a described behaviour | codebase-context tool | grep for domain words; glob for likely file names |
 | A symbol by name or kind | codebase-search tool | grep for the declaration |
 | A module's contract | codebase-skeleton tool | Read only exports and type definitions |
+| Specific declaration / implementation | codebase-read-symbol tool | Ranged read with offset and limit |
 | Who calls this, what it calls | codebase-incoming-calls and codebase-outgoing-calls tools | grep the name, read the call sites |
 | What breaks if it changes | codebase-impact-analysis tool | Callers plus the tests that import it |
 | Whether the index is trustworthy | codebase-stats tool; codebase-index tool to build or refresh | — |
@@ -123,6 +129,14 @@ Not traced: whether the email worker retries on failure
 - [ ] Claims about location and flow cite file:line
 - [ ] Absence claims backed by more than one search method
 - [ ] Untraced links in a flow labelled as such
+
+## Resolve source identity
+
+Check workspace exports, aliases, generated modules and build resolution before
+assuming the file you read is the code a caller executes. Record source vs.
+dist entrypoints and index freshness. Search dynamic registries/config keys when
+symbol references are empty; generated public APIs can have external consumers.
+Prefer bounded rg searches for exact text when no indexed surface is available.
 
 ## Skills in scope
 

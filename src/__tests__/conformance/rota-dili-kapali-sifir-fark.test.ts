@@ -30,6 +30,9 @@ import {
  * YENİLEME KAYDI: OPS-51 (karar 264 + 265, 2026-10-05) casals ve flexiva marka 308'lerini bilerek kaldırdı
  * (tr/en × 2 = 4 satır); fikstürden yalnız bu dört kayıt çıktı (49 → 45), başka fark yok.
  *
+ * YENİLEME KAYDI 2: ALT-57 (2026-10-12) `/(.*)` başlık grubuna `Permissions-Policy: camera=(), microphone=(),
+ * geolocation=()` ekledi; fikstüre yalnız bu başlık girdisi eklendi (adres değişmedi: yönlendirme ve yeniden yazım aynı).
+ *
  * FAZ 3-C (URN-85 2/2) — FİKSTÜR DOSYASI DEĞİŞMEDİ (master anlık görüntüsü kanıt olarak kalır); beklenen küme
  * ondan TÜRETİLİR: (1) config'ten BİLEREK kalkan 25 kural çıkarılır (13 dilsiz kategori + 6 Lineo çap + 6 eski
  * ürün; tek taşıyıcıları eski adres haritası — kapı: `src/lib/adres/__tests__/tohum.test.ts`,

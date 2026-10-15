@@ -1,13 +1,13 @@
 ---
 name: code-review
-description: "PR, dal, commit aralığı ya da mevcut diff'i doğruluk, güvenlik ve bakım açısından SALT-OKUMA ile inceler. Tetik: \"code review\", \"PR'ı incele\", \"merge'e hazır mı\", \"değişikliklerime bak\". WrongStack 1.0.26 uyarlaması."
+description: "PR, dal, commit aralığı ya da mevcut diff'i doğruluk, güvenlik ve bakım açısından SALT-OKUMA ile inceler. Tetik: \"code review\", \"PR'ı incele\", \"merge'e hazır mı\", \"değişikliklerime bak\". WrongStack 1.1.0 uyarlaması."
 category: audit
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/code-review/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/code-review/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/code-review/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/code-review/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -33,6 +33,11 @@ metadata:
 ---
 
 # Code Review
+
+## Selection card
+- Task: Review implementation correctness and maintainability.
+- Start: Identify the scope and obtain an executable before-proof or review evidence.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -137,6 +142,14 @@ When nothing blocks, say so plainly. A short approval is a complete review.
 - [ ] Severity ranked; nits few and labelled
 - [ ] What was and wasn't verified is stated
 - [ ] No files modified unless fixes were requested
+
+## Evidence identity
+
+Read both tracked changes and relevant untracked additions for a local review;
+git diff alone omits untracked files. Pin the reviewed head/base and preserve
+pre-existing edits. Use merge-base semantics for branch intent and exact-head
+CI for release decisions. A green check for an older revision cannot approve
+the current diff. Separate source-supported concerns from tested failures.
 
 ## Skills in scope
 

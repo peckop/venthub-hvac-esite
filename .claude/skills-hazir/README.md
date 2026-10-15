@@ -16,4 +16,4 @@ Bu klasör Claude Code'un skill tarayıcısına GÖRÜNMEZ (`.claude/skills/` al
 | `mailbox-bridge` | `wstack mailbox serve` (wstack CLI kurulu değil; köprü kodu kurulu paketlerde yok) | ARAÇ | `wrongstack-mailbox-mcp` ek kural 9 ("mailbox-bridge kullanılmaz") |
 | `wrongstack-mailbox` | `mailbox-bridge` sunucusu (istemci rehberi) | ARAÇ | `mailbox-bridge` ile birlikte taşınır; değer notu skill başında |
 
-İnceleme kaydı: `docs/audits/` altında WrongStack skill incelemesi (REC-519); kaynak: `@wrongstack/core` 1.0.26, MIT.
+İnceleme kaydı: `docs/audits/` altında WrongStack skill incelemesi (REC-519); kaynak: `@wrongstack/core` 1.0.26, MIT; gövdeler 14 Ekim'de (ARC-127) 1.1.2'ye yenilendi.

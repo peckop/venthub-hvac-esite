@@ -3,11 +3,11 @@ name: observability
 description: "Gözlemlenebilirlik: yapılandırılmış log, metrik, iz; bizde Sentry; kişisel veri loglanmaz. Tetik: \"log ekle\", \"Sentry\", \"izleme\"."
 category: quality
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/observability/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/observability/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/observability/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/observability/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -29,6 +29,11 @@ metadata:
 ---
 
 # Observability
+
+## Selection card
+- Task: Instrument logs, traces, metrics and service signals.
+- Start: Identify the data owner, query/schema, consistency and recovery contract.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -126,6 +131,15 @@ export async function reserveStock(sku: string, qty: number): Promise<void> {
 - [ ] No secrets or personal data; redaction configured centrally
 - [ ] Errors logged once, at the handling site
 - [ ] Metric labels bounded; outbound I/O traced
+
+## Trace continuity and shutdown
+
+Verify context propagation across queues, callbacks and detached tasks rather
+than assuming an id on the inbound log reaches every span. Trace links may
+represent asynchronous causality better than a false parent-child relation.
+Bound exporter buffers and shutdown flush; telemetry failure must not create
+unbounded work or silently break the primary task. Record sampling and missing
+signals when interpreting incident counts or latency distributions.
 
 ## Skills in scope
 

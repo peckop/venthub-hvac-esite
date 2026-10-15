@@ -30,9 +30,17 @@ interface Karar {
   atlatmaSebebi?: string
   olculemedi?: string
 }
+interface Yetki {
+  durum: 'yok' | 'liste-disi' | 'tamam'
+  gerekce: string
+}
 interface Kanca {
   maddeleriCikar: (metin: string) => Madde[]
-  degerlendir: (metin: string, dogrula: (k: string[]) => { olculemedi: string } | { gecerli: Set<string> }) => Karar
+  degerlendir: (
+    metin: string,
+    dogrula: (k: string[]) => { olculemedi: string } | { gecerli: Set<string>; yetkiler?: Map<string, Yetki>; yetkiOlculemedi?: string },
+  ) => Karar
+  yetkiDegerlendir: (aciklama: string) => Yetki
   ONEKLER: string[]
 }
 const kanca: Kanca = require_(KANCA)
@@ -145,6 +153,7 @@ describe('INV-KARTSIZ-KAPI-5: "Kartsız: <sebep>" atlatması', () => {
 
 let dizin = ''
 let sahteKanban = ''
+let sahteKanbanDetaysiz = ''
 let durumDizini = ''
 
 const insan = (metin: string) => ({ type: 'user', message: { content: metin } })
@@ -155,7 +164,7 @@ const mesajGonder = (mesaj: string) => ({
 })
 
 let sayac = 0
-function calistir(kayitlar: object[], ek: { durdurAktif?: boolean; kanban?: 'iyi' | 'bozuk'; govde?: string } = {}) {
+function calistir(kayitlar: object[], ek: { durdurAktif?: boolean; kanban?: 'iyi' | 'bozuk' | 'detaysiz'; govde?: string } = {}) {
   const tp = path.join(dizin, 'tr-' + ++sayac + '.jsonl')
   fs.writeFileSync(tp, kayitlar.map(k => JSON.stringify(k)).join('\n') + '\n')
   const oturum = 'test-oturum-' + process.pid + '-' + sayac
@@ -165,7 +174,8 @@ function calistir(kayitlar: object[], ek: { durdurAktif?: boolean; kanban?: 'iyi
     timeout: 20000,
     env: {
       ...process.env,
-      KARTSIZ_KAPI_KANBAN: ek.kanban === 'bozuk' ? path.join(dizin, 'yok-boyle-betik.cjs') : sahteKanban,
+      KARTSIZ_KAPI_KANBAN:
+        ek.kanban === 'bozuk' ? path.join(dizin, 'yok-boyle-betik.cjs') : ek.kanban === 'detaysiz' ? sahteKanbanDetaysiz : sahteKanban,
       KARTSIZ_KAPI_DURUM_DIZINI: durumDizini,
     },
   })
@@ -176,16 +186,23 @@ beforeAll(() => {
   dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'kartsiz-kapi-'))
   durumDizini = path.join(dizin, 'mod-durum')
   sahteKanban = path.join(dizin, 'sahte-kanban.cjs')
-  // Sahte Kanban: OPS-61 açık ve Sen'de, OPS-70 kapalı (done), OPS-71 açık ama Recep'e bağlı değil.
-  fs.writeFileSync(
-    sahteKanban,
-    `const t=[{task:{id:'aaaa1111-0000-0000-0000-000000000061',title:'OPS-61: SEN: Design bak',status:'pending',columnId:'todo',labels:['recep-bekliyor'],assignee:'Sen'}},
-{task:{id:'aaaa1111-0000-0000-0000-000000000070',title:'OPS-70: bitti',status:'completed',columnId:'done',labels:['recep-bekliyor'],assignee:'Sen'}},
-{task:{id:'aaaa1111-0000-0000-0000-000000000071',title:'OPS-71: ic is',status:'pending',columnId:'todo',labels:[],assignee:'ARAÇ'}}]
+  // Sahte Kanban: OPS-61 açık ve Sen'de (yetki satırı geçerli), OPS-70 kapalı (done), OPS-71 açık ama Recep'e bağlı değil.
+  // ARC-95: OPS-72 Recep'e bağlı ama RECEP YETKİSİ satırı YOK; OPS-73 gerekçesi liste dışı; OPS-74 karar-bekliyor, geçerli gerekçe;
+  // OPS-75 atananı doğrudan "Recep", geçerli gerekçe.
+  const sahteGovde = `const t=[{task:{id:'aaaa1111-0000-0000-0000-000000000061',title:'OPS-61: SEN: Design bak',status:'pending',columnId:'todo',labels:['recep-bekliyor'],assignee:'Sen',description:'YAP: Bak.\\nRECEP YETKİSİ: yeni görünüm kararı — ana sayfa'}},
+{task:{id:'aaaa1111-0000-0000-0000-000000000070',title:'OPS-70: bitti',status:'completed',columnId:'done',labels:['recep-bekliyor'],assignee:'Sen',description:''}},
+{task:{id:'aaaa1111-0000-0000-0000-000000000071',title:'OPS-71: ic is',status:'pending',columnId:'todo',labels:[],assignee:'ARAÇ',description:'ic is'}},
+{task:{id:'aaaa1111-0000-0000-0000-000000000072',title:'OPS-72: yetkisiz soru',status:'pending',columnId:'todo',labels:['recep-bekliyor'],assignee:'Sen',description:'YAP: Bunu onayla.'}},
+{task:{id:'aaaa1111-0000-0000-0000-000000000073',title:'OPS-73: liste disi',status:'pending',columnId:'todo',labels:['recep-bekliyor'],assignee:'Sen',description:'RECEP YETKİSİ: bence gerekli'}},
+{task:{id:'aaaa1111-0000-0000-0000-000000000074',title:'OPS-74: karar',status:'pending',columnId:'todo',labels:['karar-bekliyor'],assignee:'OPS',description:'RECEP YETKİSİ: Migration birleştirme'}},
+{task:{id:'aaaa1111-0000-0000-0000-000000000075',title:'OPS-75: recep atanan',status:'pending',columnId:'todo',labels:[],assignee:'Recep',description:'RECEP YETKİSİ: hesap/ayar dosyası'}}]
 const ids=[];for(let i=2;i<process.argv.length;i++)if(process.argv[i]==='--id')ids.push(String(process.argv[++i]).toLowerCase())
 const cikti=t.filter(x=>{const no=(x.task.title.match(/^([A-Z]+-\\d+)/)||[])[1];return ids.includes(String(no).toLowerCase())||ids.includes(x.task.id)})
-console.log(JSON.stringify({ok:true,tasks:cikti}))`,
-  )
+`
+  fs.writeFileSync(sahteKanban, sahteGovde + `console.log(JSON.stringify({ok:true,tasks:cikti}))`)
+  // Ayrıntı okuması (--detay) çöken Kanban: birinci denetim (--kisa) çalışır, ikinci denetim ölçülemez.
+  sahteKanbanDetaysiz = path.join(dizin, 'sahte-kanban-detaysiz.cjs')
+  fs.writeFileSync(sahteKanbanDetaysiz, sahteGovde + `if(process.argv.includes('--detay'))process.exit(1)\nconsole.log(JSON.stringify({ok:true,tasks:cikti}))`)
 })
 
 afterAll(() => {
@@ -385,5 +402,169 @@ describe('INV-KARTSIZ-KAPI-9: Recep output style karar biçimleri (karar maddesi
   it('"Kartsız: <sebep>" atlatması yeni biçimlerde de çalışır', () => {
     const k = kanca.degerlendir('**285.** Başlasın mı? Önerim evet.\nKartsız: tek seferlik sözlü soru, takip gerekmiyor\n', hicbiriGecerli)
     expect(k.durum).toBe('atlatildi')
+  })
+})
+
+describe('INV-KARTSIZ-KAPI-10 (ARC-95): RECEP YETKİSİ satırı — ikinci denetim', () => {
+  const mesaj = (kart: string) => `Özet.\n\n**Senden beklenenler.**\n\n- Bunu onayla (kart ${kart})\n`
+  const tamam: Yetki = { durum: 'tamam', gerekce: 'canlı yazım' }
+  const dogrulayici = (yetkiler: Record<string, Yetki>, ek: { yetkiOlculemedi?: string } = {}) => (k: string[]) => ({
+    gecerli: new Set(k),
+    yetkiler: new Map(Object.entries(yetkiler)),
+    ...ek,
+  })
+
+  it('yetkiDegerlendir: altı izinli gerekçe geçer (büyük/küçük harf, Türkçe karakter ve ek ayrıntı fark etmez)', () => {
+    for (const g of [
+      'canlı yazım',
+      'CANLI YAZIM — fiyat satırları',
+      'Migration birleştirme (PR 1234)',
+      'gerçek para',
+      'geri alınamaz silme',
+      'yeni görünüm kararı',
+      'Yeni iddia kararı: sertifika',
+      'yeni görünüm/iddia/yapı kararı',
+      'hesap/ayar dosyası',
+      'Hesap dosyası',
+      'ayar dosyası — settings.json',
+    ]) {
+      expect(kanca.yetkiDegerlendir('YAP: x.\nRECEP YETKİSİ: ' + g).durum, g).toBe('tamam')
+    }
+  })
+
+  it('yetkiDegerlendir: satır yok → yok; liste dışı gerekçe → liste-disi; boş gerekçe satır sayılmaz', () => {
+    expect(kanca.yetkiDegerlendir('YAP: Bak.').durum).toBe('yok')
+    expect(kanca.yetkiDegerlendir('').durum).toBe('yok')
+    expect(kanca.yetkiDegerlendir('RECEP YETKİSİ:').durum).toBe('yok')
+    const d = kanca.yetkiDegerlendir('RECEP YETKİSİ: bence gerekli')
+    expect(d.durum).toBe('liste-disi')
+    expect(d.gerekce).toBe('bence gerekli')
+    // Liste kelimesi yalnız ortada geçiyorsa gerekçe değildir (başlangıç kalıbı aranır).
+    expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: sanırım canlı yazım gibi').durum).toBe('liste-disi')
+    // Satır başında değilse (açıklama içi alıntı) sayılmaz.
+    expect(kanca.yetkiDegerlendir('Kural: "RECEP YETKİSİ: canlı yazım" yazılır.').durum).toBe('yok')
+  })
+
+  it('yetkiDegerlendir: birden çok satırda biri geçerliyse tamam', () => {
+    expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: bence\nRECEP YETKİSİ: gerçek para').durum).toBe('tamam')
+  })
+
+  it('⭐OPS 10-12 (a): satır başı çapası biçim işaretlerini tanır — kalın, madde, alıntı, kalın+madde', () => {
+    const biciimler = [
+      '**RECEP YETKİSİ:** canlı yazım',
+      '**RECEP YETKİSİ**: canlı yazım',
+      '- RECEP YETKİSİ: canlı yazım',
+      '> RECEP YETKİSİ: canlı yazım',
+      '- **RECEP YETKİSİ:** canlı yazım',
+      '* RECEP YETKİSİ: canlı yazım',
+      '__RECEP YETKİSİ:__ canlı yazım',
+      '  \t> - RECEP YETKİSİ:   canlı yazım',
+    ]
+    for (const satir of biciimler) {
+      const d = kanca.yetkiDegerlendir('YAP: x.\n' + satir)
+      expect(d.durum, 'tanınmadı: ' + satir).toBe('tamam')
+    }
+    // Liste dışı gerekçe biçim işaretiyle de liste dışı kalır; metin içi alıntı hâlâ sayılmaz.
+    expect(kanca.yetkiDegerlendir('- **RECEP YETKİSİ:** bence gerekli').durum).toBe('liste-disi')
+    expect(kanca.yetkiDegerlendir('Not: **RECEP YETKİSİ:** canlı yazım diye yazılır').durum).toBe('yok')
+  })
+
+  it('⭐OPS 10-12 (b): eşanlamlılar — "canlı veritabanı yazımı/…na yazım", "migration\'lı PR birleştirme", "migration içeren dalın merge\'ü"', () => {
+    const esanlamlilar = [
+      'canlı veritabanı yazımı',
+      'Canlı veritabanına yazım — ayrıntı',
+      'canlı veritabanına yazma',
+      "migration'lı PR birleştirme",
+      'Migration’lı PR birleştirme (master’a birleşince prod’a uygulanır)',
+      'migration içeren dalın merge’ü',
+      "migration içeren PR birleştirme",
+    ]
+    for (const g of esanlamlilar) {
+      expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, 'tanınmadı: ' + g).toBe('tamam')
+    }
+    // Çok genişlememeli: ilgisiz "canlı" ya da "migration" ifadeleri liste dışı kalır.
+    for (const g of ['canlı site görünümü', 'migration dosyası okundu', 'canlı veri hakkında soru']) {
+      expect(kanca.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, 'yanlış geçti: ' + g).toBe('liste-disi')
+    }
+  })
+
+  it('satırı olmayan Recep kartı → blok, mesajda "yetkisi zaten verilmiş" ve izinli liste', () => {
+    const k = kanca.degerlendir(mesaj('OPS-72'), dogrulayici({ 'OPS-72': { durum: 'yok', gerekce: '' } }))
+    expect(k.durum).toBe('blok')
+    expect(k.sorunlar).toHaveLength(1)
+    expect(k.sorunlar[0]).toContain('RECEP YETKİSİ')
+    expect(k.sorunlar[0]).toContain('zaten verilmiş')
+    expect(k.sorunlar[0]).toContain('canlı yazım')
+  })
+
+  it('liste dışı gerekçe → blok; geçerli gerekçe → temiz', () => {
+    const disi = kanca.degerlendir(mesaj('OPS-73'), dogrulayici({ 'OPS-73': { durum: 'liste-disi', gerekce: 'bence gerekli' } }))
+    expect(disi.durum).toBe('blok')
+    expect(disi.sorunlar[0]).toContain('listede yok')
+    expect(disi.sorunlar[0]).toContain('bence gerekli')
+    expect(kanca.degerlendir(mesaj('OPS-61'), dogrulayici({ 'OPS-61': tamam })).durum).toBe('temiz')
+  })
+
+  it('Recep\'e bağlı OLMAYAN kart ikinci denetimden etkilenmez (yalnız birinci denetimin mesajı)', () => {
+    const k = kanca.degerlendir(mesaj('OPS-71'), () => ({ gecerli: new Set<string>(), yetkiler: new Map() }))
+    expect(k.durum).toBe('blok')
+    expect(k.sorunlar).toHaveLength(1)
+    expect(k.sorunlar[0]).not.toContain('RECEP YETKİSİ')
+  })
+
+  it('ayrıntısı okunamayan kart: blok DEĞİL, olculemedi (fail-open ama sessiz değil)', () => {
+    const k = kanca.degerlendir(mesaj('OPS-61'), dogrulayici({}, { yetkiOlculemedi: 'ayrıntı okuması çalışmadı (çıkış 1)' }))
+    expect(k.durum).toBe('olculemedi')
+    expect(k.olculemedi).toContain('RECEP YETKİSİ denetimi ölçülemedi')
+  })
+
+  it('eski doğrulayıcı (yetkiler yok) ikinci denetimi atlar: geriye uyum', () => {
+    expect(kanca.degerlendir(mesaj('OPS-72'), hepsiGecerli).durum).toBe('temiz')
+  })
+
+  it('"Kartsız: <sebep>" atlatması önceki gibi çalışır (sebep kayda düşer)', () => {
+    const k = kanca.degerlendir(mesaj('OPS-72') + '\nKartsız: bilgi notu, istek değil', dogrulayici({ 'OPS-72': { durum: 'yok', gerekce: '' } }))
+    expect(k.durum).toBe('atlatildi')
+  })
+})
+
+describe('INV-KARTSIZ-KAPI-11 (ARC-95): süreç — gerçek Kanban betiği çağrısı (--detay) ve çıkış kodları', () => {
+  const istek = (kart: string) => [insan('devam'), asistan(`Özet.\n\n**Senden beklenenler.**\n\n- Bunu onayla (kart ${kart})\n`)]
+
+  it('açıklamasında geçerli RECEP YETKİSİ olan kart → exit 0', () => {
+    expect(calistir(istek('OPS-61')).kod).toBe(0)
+  })
+
+  it('RECEP YETKİSİ satırı olmayan Recep kartı → exit 2, mesajda düzeltme yolu', () => {
+    const r = calistir(istek('OPS-72'))
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('RECEP YETKİSİ')
+    expect(r.stderr).toContain('zaten verilmiş')
+  })
+
+  it('gerekçesi liste dışı kart → exit 2', () => {
+    const r = calistir(istek('OPS-73'))
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('listede yok')
+  })
+
+  it('karar-bekliyor etiketli kart ve atananı doğrudan "Recep" olan kart da aynı kuraldan geçer (geçerli gerekçeyle exit 0)', () => {
+    expect(calistir(istek('OPS-74')).kod).toBe(0)
+    expect(calistir(istek('OPS-75')).kod).toBe(0)
+  })
+
+  it('Recep\'e bağlı olmayan kart (OPS-71) → birinci denetimin mesajıyla exit 2, YETKİ mesajı yok', () => {
+    const r = calistir(istek('OPS-71'))
+    expect(r.kod).toBe(2)
+    expect(r.stderr).not.toContain('RECEP YETKİSİ: <gerekçe>')
+  })
+
+  it('--detay okuması çökerse tur GEÇER ve durum dosyası uyarır (kapı ölçemedi)', () => {
+    const r = calistir(istek('OPS-72'), { kanban: 'detaysiz' })
+    expect(r.kod).toBe(0)
+    expect(r.stderr).toContain('RECEP YETKİSİ denetimi ölçülemedi')
+    const durum = JSON.parse(fs.readFileSync(path.join(durumDizini, 'kartsiz-kapi.json'), 'utf8')) as { seviye: string; ozet: string }
+    expect(durum.seviye).toBe('uyari')
+    expect(durum.ozet).toContain('ölçemedi')
   })
 })

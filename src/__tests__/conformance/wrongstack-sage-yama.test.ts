@@ -15,7 +15,7 @@ import { afterAll, describe, expect, it } from 'vitest'
  * varsayar. `normalizeTerm("Şerit")` → "erit", `("çıktı")` → "kt", `("ığış")` → "" (boş anahtar: bütün
  * Türkçe-harfli terimler birbirine çarpışır); "İstanbul Şubesi Müdürü" hiç aday olmaz; "ÇıkışKapısı"
  * camelCase sayılmaz. `\b` ASCII-sözcük tanımlıdır, Türkçe harfte kırılır. Yama bunu Unicode sınıflarıyla
- * (`\p{L}` `\p{Lu}` `\p{Ll}`) düzeltir. Kaynak: `yamalar/sage-1.0.26-domain-terms-turkce.patch`.
+ * (`\p{L}` `\p{Lu}` `\p{Ll}`) düzeltir. Kaynak: `yamalar/sage-<sürüm>-domain-terms-turkce.patch` (ölçüm 1.0.26'da yapıldı; ARC-94 ile 1.1.0'a yeniden üretildi, yukarı akım hâlâ ASCII-only).
  *
  * ⛔Bu kapının öğrendiği iki ders kanban yamasından geldi:
  *   (1) yamanın uygulandığını değil, sunucunun YÜKLEDİĞİ dosyanın yamalı olduğunu ölç (kol 5: sage-mcp
@@ -96,15 +96,20 @@ function kopya(yamali: boolean, depo = false): { kok: string; index: string } {
 }
 
 /**
- * Çıkarıcı modülü paketin bundle'ından ayrılır (`// src/domain-term-extractor.ts` … sonraki bölüm):
+ * Çıkarıcı modülü paketin bundle'ından ayrılır (başlangıç işareti … `// src/embeddings/provider.ts`):
  * yalnız node yerleşikleri kullanır, `@wrongstack/core` çözümlemesi gerekmez. İşaretler yoksa test düşer
  * (paket yapısı değişti demektir).
+ * ARC-94: 1.0.37+'da `normalizeTerm` ve aday çıkarımı `// src/domain-term-candidates.ts` bölümüne taşındı ve çıkarıcı
+ * bölümünden ÖNCE gelir; 1.0.26'da yalnız `// src/domain-term-extractor.ts` var. Başlangıç, mevcut işaretlerin en erkenidir.
  */
 async function yukle(index: string): Promise<Cikarici> {
   const kaynak = fs.readFileSync(index, 'utf8')
-  const bas = kaynak.indexOf('// src/domain-term-extractor.ts')
+  const bas = ['// src/domain-term-candidates.ts', '// src/domain-term-extractor.ts']
+    .map((isaret) => kaynak.indexOf(isaret))
+    .filter((i) => i > -1)
+    .reduce((en, i) => Math.min(en, i), Number.POSITIVE_INFINITY)
   const son = kaynak.indexOf('// src/embeddings/provider.ts')
-  expect(bas, 'çıkarıcı bölümünün başlangıç işareti yok').toBeGreaterThan(-1)
+  expect(Number.isFinite(bas), 'çıkarıcı bölümünün başlangıç işareti yok').toBe(true)
   expect(son, 'çıkarıcı bölümünün bitiş işareti yok').toBeGreaterThan(bas)
   const dosya = path.join(path.dirname(index), 'cikarici.mjs')
   fs.writeFileSync(dosya, `${kaynak.slice(bas, son)}\nexport { SageDomainTermExtractor, normalizeTerm };\n`)
@@ -367,16 +372,21 @@ describe('INV-WRONGSTACK-SAGE-YAMA-1 · sage alan-terimi çıkarıcısı Türkç
     const surumYaz = (v: string) => fs.writeFileSync(path.join(arac, 'node_modules', '@wrongstack', 'sage', 'package.json'), JSON.stringify({ version: v }))
     const kos = () => spawnSync(process.execPath, [path.join(arac, 'kurulum.cjs'), '--denetle'], { cwd: kok, encoding: 'utf8' })
 
-    surumYaz('1.0.27')
+    // Sürümler yamanın kendi adından türetilir (ARC-94: yama 1.0.26'dan 1.1.0'a taşındı; sabit sürüm yazmak her yükseltmede bu kolu kırar).
+    const yamaSurumu = (YAMA_ADI.match(/^sage-(\d+\.\d+\.\d+)-/) ?? [])[1] ?? '0.0.0'
+    const [ma, mi, yaz] = yamaSurumu.split('.').map(Number)
+    const kaymis = `${ma}.${mi}.${(yaz ?? 0) + 1}`
+
+    surumYaz(kaymis)
     const kayik = kos()
     expect(kayik.status).toBe(1)
     const son = kayik.stdout.trim().split('\n').pop() as string
     expect(son).toMatch(/^HATA: /)
     expect(son).toContain(YAMA_ADI)
-    expect(son).toContain('1.0.27')
+    expect(son).toContain(kaymis)
 
     // karşı-kontrol: sürüm uyuşunca sürüm mesajı YOK (mesaj sürüme özgü)
-    surumYaz('1.0.26')
+    surumYaz(yamaSurumu)
     expect(kos().stdout).not.toContain('icin yazildi')
   })
 

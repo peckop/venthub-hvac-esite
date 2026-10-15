@@ -17,12 +17,29 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['danfoss-vlt-micro-drive-fc-51', 'Danfoss VLT Micro Drive FC 51'],
     ['danfoss-vlt-hvac-basic-drive-fc-101', 'Danfoss VLT HVAC Basic Drive FC 101'],
     ['danfoss-vlt-hvac-drive-fc-102', 'Danfoss VLT HVAC Drive FC 102'],
+    // Radyal fan mı aksiyel fan mı yazısı (BLG-3, 2026-10-11): slug'lar canlı site haritasında 200 verir
+    // (migration 20261005100000 çiftleri; Vortice ailesi VORTICEL E, A-E, MP serilerini kapsar).
+    ['nicotra-gebhardt-at-cift-emisli-radyal-fanlar', 'Nicotra Gebhardt AT Çift Emişli Radyal Fanlar'],
+    ['nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar', 'Nicotra Gebhardt ADH Sık Kanatlı Radyal Fanlar'],
+    ['nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar', 'Nicotra Gebhardt RDH Seyrek Kanatlı Radyal Fanlar'],
+    ['nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar', 'Nicotra Gebhardt DD Direkt Akuple Radyal Fanlar'],
+    ['vortice-aksiyel-endustriyel-fanlar', 'Vortice Aksiyel Endüstriyel Fanlar'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
     'air-curtains': { slug: 'air-curtains', metadata: { slug: { tr: 'hava-perdeleri', en: 'air-curtains' } }, ust: null },
     'heat-recovery-vmc': { slug: 'heat-recovery-vmc', metadata: { slug: { tr: 'isi-geri-kazanim', en: 'heat-recovery-vmc' } }, ust: null },
     'frequency-converters': { slug: 'frequency-converters', metadata: { slug: { tr: 'frekans-konvertorleri', en: 'frequency-converters' } }, ust: null },
+    'centrifugal-fans': {
+      slug: 'centrifugal-fans',
+      metadata: { slug: { tr: 'radyal-fanlar', en: 'centrifugal-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'axial-industrial-fans': {
+      slug: 'axial-industrial-fans',
+      metadata: { slug: { tr: 'aksiyel-fanlar', en: 'axial-industrial-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
     'smoke-exhaust-fans': {
       slug: 'smoke-exhaust-fans',
       metadata: { slug: { tr: 'duman-egzoz-fanlari', en: 'smoke-exhaust-fans' } },

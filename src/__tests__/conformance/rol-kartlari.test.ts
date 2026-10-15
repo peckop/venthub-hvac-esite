@@ -658,6 +658,34 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it("ARC-51: 'Design yorumuna yanıt' bölümü yalnız OPS'un kurallar dosyasında (üretilen ve diskteki); rol kartında ve öteki rollerin kurallar dosyasında yok; işaret kodla bağlı", () => {
+    const baslik = '## Design yorumuna yanıt (ARC-51)'
+    const diskMetni = (ad: string): string =>
+      fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+    expect(Object.keys(kuralMetinleri), 'OPS kurallar dosyası üretilmeli').toContain('OPS')
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      const kaynaklar: Array<[string, string]> = [
+        [metin, `${ad}-kurallar.md (üretilen)`],
+        [diskMetni(ad), `${ad}-kurallar.md (disk)`],
+      ]
+      for (const [m, etiket] of kaynaklar) {
+        if (ad !== 'OPS') {
+          expect(m, `${etiket}: Design yorumuna yanıt kuralı bu role ait değil`).not.toContain(baslik)
+          continue
+        }
+        expect(m.split(baslik).length - 1, `${etiket}: bölüm tam bir kez`).toBe(1)
+        expect(m, etiket).toContain('"CEVAP BEKLİYOR"')
+        expect(m, etiket).toContain('scripts/board/linear-yeni-yorum.cjs')
+      }
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain(baslik)
+    }
+    // Kural metnindeki işaret, sayacın gerçekten aradığı işaretle aynı olmalı (kural kodla birlikte değişir).
+    const kod = fs.readFileSync(path.join(KOK, 'scripts', 'board', 'linear-yeni-yorum.cjs'), 'utf8')
+    expect(kod, 'sayaç kodu CEVAP BEKLİYOR işaretini arar').toContain('CEVAP\\s+B[Eİ]KL[Iİ]YOR')
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
@@ -678,11 +706,19 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, isAkislari)).toEqual([])
   })
 
-  it('GEO-SEO ilk örnek: dört düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste)', () => {
+  it('GEO-SEO ilk örnek: beş düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, yayın sonrası dizin isteği)', () => {
     const g = gercek['GEO-SEO']
-    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay'])
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay', 'olay'])
     expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
     expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
+  })
+
+  // OPS 10-11 (SEO-39): dizin isteği ve IndexNow GEO-SEO'nun görevidir; yazılı olmadığı için her yayında Recep'e onay soruluyordu
+  it('GEO-SEO yayın sonrası dizin isteği görev listesinde yazılı: komut IndexNow betiği, tetik kart kapısı (henüz kurulu değil)', () => {
+    const d = gercek['GEO-SEO'].gorevler.find((x) => x.komut === 'scripts/seo/indexnow-bildir.mjs')
+    expect(d).toMatchObject({ siklik: 'olay', tetik: 'kart-kapisi', bagli: 'hayir', baglayacak: 'HARITA' })
+    expect(d?.gorev).toMatch(/dizine eklenmesini iste/)
+    expect(d?.gorev).toMatch(/Recep'ten ayrıca onay istenmez/)
   })
 
   // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin

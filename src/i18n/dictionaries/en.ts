@@ -1464,6 +1464,7 @@ export const en: typeof tr = {
       category: 'Category',
       noSpecsAvailable: 'No technical specifications available for this product.',
       approxCurve: 'Approximate curve — being refined from the manufacturer chart.',
+      curveFromChart: "Curve read from the chart in the manufacturer's catalogue.",
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Technical Summary',
       /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
@@ -3108,6 +3109,7 @@ export const en: typeof tr = {
     cardDelivers: 'Calculated in your duct',
     cardDeliversApprox: 'Calculated in your duct (approx.)',
     cardApproxCurve: 'Approximate curve — being refined from the manufacturer chart. Please confirm this model\'s suitability with the manufacturer.',
+    cardChartCurve: "Curve read from the chart in the manufacturer's catalogue.",
     cardNoise: 'Noise level',
     cardDiameter: 'Connection diameter',
     cardCta: 'View product',

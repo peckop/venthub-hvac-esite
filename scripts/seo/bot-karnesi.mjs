@@ -18,8 +18,10 @@
  * sayısı · iç bağlantı sayısı · yinelenen başlık/metin.
  *
  * Kullanım:
- *   node scripts/seo/bot-karnesi.mjs [--taban https://venthub.com.tr] [--cikti <dizin>] [--cwv]
+ *   node scripts/seo/bot-karnesi.mjs [--taban https://venthub.com.tr] [--cikti <dizin>] [--cwv] [--onceki <karne.json>]
  *   --cikti verilirse karne.json + karne.md oraya yazılır; verilmezse Markdown stdout'a basılır.
+ *   --onceki (SEO-44): önceki karne.json ile FARK (yeni/giden sorun, eklenen/çıkan adres, değişen alan, sınıf farkı);
+ *   karne-fark.md/json yazılır. Bozuk dosya ağa gitmeden çıkış 2.
  *   --cwv: PageSpeed Insights API'den alan verisi (CrUX) dener; anahtarsız kota düşükse "ölçülemedi" yazar.
  *
  * Sınırlar (dürüst): bot kimliği yalnız User-Agent ile taklit edilir, IP doğrulaması yapılamaz; barındırıcının
@@ -68,6 +70,85 @@ const arg = (ad, varsayilan) => {
 const TABAN = arg('--taban', 'https://venthub.com.tr').replace(/\/$/, '')
 const CIKTI = arg('--cikti', null)
 const CWV = process.argv.includes('--cwv')
+const ONCEKI = arg('--onceki', null)
+
+/**
+ * `--onceki` karnesini okur (SEO-44). Bozuk/eksik/başka biçimli dosya SESSİZ geçmez: hata KODU döner, çağıran ağa
+ * gitmeden durur.
+ * @returns {{ karne: { satirlar: object[], olculme?: string } } | { hata: 'ONCEKI-OKUNAMADI' | 'ONCEKI-BICIMI' }}
+ */
+export function oncekiKarneOku(yol, oku = (y) => readFileSync(y, 'utf8')) {
+  let j
+  try { j = JSON.parse(oku(yol)) } catch { return { hata: 'ONCEKI-OKUNAMADI' } }
+  if (!j || typeof j !== 'object' || !Array.isArray(j.satirlar)) return { hata: 'ONCEKI-BICIMI' }
+  return { karne: j }
+}
+
+/** Sorun metninin sınıfı (rapordaki "Sorun sınıfları" tablosuyla aynı kural: ilk sözcük). */
+const sorunSinifi = (x) => String(x).split(' ')[0]
+const adresAnahtari = (s) => `${s.tur} ${s.adres}`
+const KARSILASTIRILAN_ALANLAR = ['durum', 'son', 'baslik', 'title', 'aciklama', 'h1', 'markaBag', 'haritada']
+
+/**
+ * İki karne arasındaki FARK (SEO-44). Adres anahtarı `tur + adres`. Sorun karşılaştırması tam metinledir; sınıf farkı
+ * ilk sözcükledir. `ORNEK-YOK` satırı normal satır gibi eklenen/çıkan olarak (sorun metniyle) görünür, sessiz kalmaz.
+ * @param {{ satirlar: object[] }} onceki
+ * @param {{ satirlar: object[] }} simdi
+ */
+export function karneFarki(onceki, simdi) {
+  const eski = new Map(onceki.satirlar.map((s) => [adresAnahtari(s), s]))
+  const yeni = new Map(simdi.satirlar.map((s) => [adresAnahtari(s), s]))
+  const ozet = (s) => ({ tur: s.tur, adres: s.adres, sorunlar: s.sorunlar ?? [] })
+  const eklenen = [...yeni].filter(([k]) => !eski.has(k)).map(([, s]) => ozet(s))
+  const cikan = [...eski].filter(([k]) => !yeni.has(k)).map(([, s]) => ozet(s))
+  const degisen = []
+  for (const [k, b] of yeni) {
+    const a = eski.get(k)
+    if (!a) continue
+    const eskiSorun = a.sorunlar ?? []
+    const yeniSorun = b.sorunlar ?? []
+    const eklenenSorun = yeniSorun.filter((x) => !eskiSorun.includes(x))
+    const gidenSorun = eskiSorun.filter((x) => !yeniSorun.includes(x))
+    const alanlar = {}
+    for (const f of KARSILASTIRILAN_ALANLAR) if (a[f] !== b[f]) alanlar[f] = { once: a[f] ?? null, simdi: b[f] ?? null }
+    const jsonA = JSON.stringify([...(a.jsonld ?? [])].sort())
+    const jsonB = JSON.stringify([...(b.jsonld ?? [])].sort())
+    if (jsonA !== jsonB) alanlar.jsonld = { once: a.jsonld ?? [], simdi: b.jsonld ?? [] }
+    if (eklenenSorun.length || gidenSorun.length || Object.keys(alanlar).length) {
+      degisen.push({ tur: b.tur, adres: b.adres, yeniSorun: eklenenSorun, gidenSorun, alanlar })
+    }
+  }
+  const sinifSay = (satirlar) => {
+    const m = {}
+    for (const s of satirlar) for (const x of s.sorunlar ?? []) { const c = sorunSinifi(x); m[c] = (m[c] ?? 0) + 1 }
+    return m
+  }
+  const sa = sinifSay(onceki.satirlar)
+  const sb = sinifSay(simdi.satirlar)
+  const sinifFarki = {}
+  for (const c of new Set([...Object.keys(sa), ...Object.keys(sb)])) {
+    const fark = (sb[c] ?? 0) - (sa[c] ?? 0)
+    if (fark !== 0) sinifFarki[c] = { once: sa[c] ?? 0, simdi: sb[c] ?? 0, fark }
+  }
+  const sorunlu = (satirlar) => satirlar.filter((s) => (s.sorunlar ?? []).length).length
+
+  const satirlar = [
+    `Karne farkı: adres ${onceki.satirlar.length} → ${simdi.satirlar.length} · sorunlu adres ${sorunlu(onceki.satirlar)} → ${sorunlu(simdi.satirlar)} · eklenen ${eklenen.length} · çıkan ${cikan.length} · değişen ${degisen.length}`,
+  ]
+  for (const [c, d] of Object.entries(sinifFarki).sort((x, y) => Math.abs(y[1].fark) - Math.abs(x[1].fark))) {
+    satirlar.push(`sınıf ${c}: ${d.once} → ${d.simdi} (${d.fark > 0 ? '+' : ''}${d.fark})`)
+  }
+  for (const e of eklenen) satirlar.push(`EKLENDI ${e.tur} ${e.adres}${e.sorunlar.length ? ` · ${e.sorunlar.join(' · ')}` : ''}`)
+  for (const c of cikan) satirlar.push(`CIKTI ${c.tur} ${c.adres}${c.sorunlar.length ? ` · önceki sorun: ${c.sorunlar.join(' · ')}` : ''}`)
+  for (const d of degisen) {
+    const parca = []
+    if (d.yeniSorun.length) parca.push(`YENİ SORUN: ${d.yeniSorun.join(' · ')}`)
+    if (d.gidenSorun.length) parca.push(`GİTTİ: ${d.gidenSorun.join(' · ')}`)
+    for (const [f, v] of Object.entries(d.alanlar)) parca.push(`${f} ${JSON.stringify(v.once)} → ${JSON.stringify(v.simdi)}`)
+    satirlar.push(`DEGISTI ${d.tur} ${d.adres} · ${parca.join(' · ')}`)
+  }
+  return { eklenen, cikan, degisen, sinifFarki, ozetSatirlari: satirlar }
+}
 
 export const BOTLAR = {
   googlebot: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
@@ -144,17 +225,19 @@ const STATIK_TURLER = new Set(SABIT.map(([ad]) => ad))
  * Site haritasından örneklenen dinamik türler. Her tür İKİ adres şemasını tanır (SEO-29): eski (/tr/category, /tr/products,
  * /tr/brands) ve yeni (ADRES_SEMASI_K3B açık: /tr/kategori, /tr/urun, /tr/markalar; docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md).
  * Kodda adres listesi YOK, yalnız yol kalıbı. `zorunlu`: haritada örneği yoksa karne bunu ORNEK-YOK kusuru yazar (sessiz körlük olmasın);
- * `yeniSemadaZorunlu`: eski şemada kategoriler tek seviyeli olduğu için alt kategori yalnız yeni şema haritasında beklenir;
  * model sayfaları isteğe bağlıdır (Pazar 11 Ekim'de yayındaki-model listesi boş, karar 327).
+ * `alt-kategori` (SEO-38, B-1): kategori adresi TEK segmenttir, kök de alt de `/tr/kategori/<slug>` (src/lib/data/kategoriSegmenti.ts,
+ * SEO-35 B-1); alt kategori adresten ayırt edilemez (üst-alt ilişkisi kategori verisinde, parent_id) ve `kategori` türü ikisini de
+ * örnekler. İki seviyeli kalıp yalnız ESKİ iç içe adresleri yakalar: haritada varsa örneklenir, YOKLUĞU kusur sayılmaz. (Eskiden yeni
+ * şema haritasında zorunluydu; B-1 haritasında hiç örnek çıkmadığı için bayrak açılınca sahte ORNEK-YOK alt-kategori verirdi.)
  */
 const DINAMIK_TURLER = [
   { ad: 'kategori', desen: /^\/tr\/(category|kategori)\/[^/]+$/, zorunlu: true },
-  { ad: 'alt-kategori', desen: /^\/tr\/(category|kategori)\/[^/]+\/[^/]+$/, yeniSemadaZorunlu: true },
+  { ad: 'alt-kategori', desen: /^\/tr\/(category|kategori)\/[^/]+\/[^/]+$/ },
   { ad: 'aile-urun', desen: /^\/tr\/(products|urun)\/[^/]+$/, model: false, n: 3, zorunlu: true },
   { ad: 'model', desen: /^\/tr\/urun\/[^/]+$/, model: true },
   { ad: 'marka', desen: /^\/tr\/(brands|markalar)\/[^/]+$/, zorunlu: true },
 ]
-const YENI_SEMA = /^\/tr\/(kategori|urun|markalar)\//
 
 /**
  * Site haritası XML'inden dinamik türlere örnek seçer (belirlenimci: haritadaki ilk sıra) + ilk örneğin GERÇEK EN karşılığı.
@@ -169,7 +252,6 @@ export function ornekTurleri(haritaXml) {
     const en = (m[1].match(/hreflang="en"[^>]*href="([^"]+)"/) || m[1].match(/href="([^"]+)"[^>]*hreflang="en"/) || [])[1]
     return { loc: loc ? yol(loc) : null, en: en ? yol(en) : null }
   }).filter((x) => x.loc)
-  const yeniSema = locList.some((x) => YENI_SEMA.test(x.loc))
   const turler = []
   const eksik = []
   for (const t of DINAMIK_TURLER) {
@@ -177,7 +259,7 @@ export function ornekTurleri(haritaXml) {
     const uygun = (loc) => t.desen.test(loc) && (t.model === undefined || MODEL_DESENI.test(loc) === t.model)
     const secilen = locList.filter((x) => uygun(x.loc)).slice(0, t.n ?? 2)
     if (secilen.length) turler.push([t.ad, secilen.flatMap((x, i) => (i === 0 && x.en ? [x.loc, x.en] : [x.loc]))])
-    else if (t.zorunlu || (t.yeniSemadaZorunlu && yeniSema)) eksik.push(t.ad)
+    else if (t.zorunlu) eksik.push(t.ad)
   }
   return { turler, eksik }
 }
@@ -199,6 +281,19 @@ async function getir(adres, ua, azami = 6) {
     return { zincir, durum: r.status, url, govde, xRobots: r.headers.get('x-robots-tag') || '' }
   }
   return { zincir, durum: 'COK-YONLENDIRME', url }
+}
+
+/**
+ * Marka bağlantısı (SEO-40, URN-126): aile sayfasında kırıntıda marka basamağı YOKTUR; markaya bağlantı sayfadaki üretici
+ * bloğundadır (`/tr/brands/<marka>`, yeni şemada `/tr/markalar/<marka>`). Yalnız gerçek `<a href>` sayılır; liste adresi
+ * (`/tr/brands`, slug'sız) ve bağlantısız "SEAT" yazısı sayılmaz.
+ */
+export const MARKA_BAGLANTISI = /<a\b[^>]*\bhref\s*=\s*["'](?:https?:\/\/(?:www\.)?venthub\.com\.tr)?\/(?:tr|en)\/(?:brands|markalar)\/[^"'#?/]+\/?(?:[?#][^"']*)?["']/gi
+
+/** Aile sayfasında marka bağlantısı yoksa kusur etiketi (başka türlerde ölçülmez). `a`: ayristir() çıktısı. */
+export function markaBaglantisiSorunu(tur, a) {
+  if (tur !== 'aile-urun' || !a) return null
+  return a.markaBaglantisi === 0 ? 'MARKA-BAGLANTISI-YOK (aile sayfasında gövdede markaya giden <a href> yok; üretici bloğu, URN-126)' : null
 }
 
 const ozellik = (etiket, ad) => (etiket.match(new RegExp(`\\b${ad}\\s*=\\s*"([^"]*)"`, 'i')) || etiket.match(new RegExp(`\\b${ad}\\s*=\\s*'([^']*)'`, 'i')) || [])[1]
@@ -233,7 +328,10 @@ export function ayristir(html) {
   const kelime = (metin.match(/[\p{L}\p{N}][\p{L}\p{N}'’.,-]*/gu) || []).length
   const h1 = (govde.match(/<h1\b/gi) || []).length
   const ic = (govde.match(/<a\b[^>]*href\s*=\s*["'](\/[^"'#]*|https?:\/\/(www\.)?venthub\.com\.tr[^"'#]*)["']/gi) || []).length
-  return { title, aciklama: meta('description'), robots: meta('robots').concat(meta('googlebot')), canonical, hreflang, jsonld, kelime, metinOzet: ozet(metin), h1, ic }
+  // <main> varsa yalnız ondan, yoksa gövdeden sayılır: header/nav/footer bağlantısı gövde bağlantısı değildir.
+  const anaGovde = (govde.match(/<main\b[\s\S]*?<\/main>/i) || [govde])[0]
+  const markaBaglantisi = (anaGovde.match(MARKA_BAGLANTISI) || []).length
+  return { title, aciklama: meta('description'), robots: meta('robots').concat(meta('googlebot')), canonical, hreflang, jsonld, kelime, metinOzet: ozet(metin), h1, ic, markaBaglantisi }
 }
 
 // ─── robots.txt (Google kuralı: en özel UA grubu, en uzun eşleşen yol; eşitlikte Allow) ───
@@ -276,6 +374,13 @@ export function robotsIzin(gruplar, belirtec, p) {
 
 // ─── ana akış ──────────────────────────────────────────────────────────────────
 async function main() {
+  // --onceki ağa GİTMEDEN okunur: bozuk dosya sessiz geçmez (çıkış 2).
+  let oncekiKarne = null
+  if (ONCEKI) {
+    const t = oncekiKarneOku(ONCEKI)
+    if (t.hata) { console.error(`HATA: --onceki ${t.hata}: ${ONCEKI}`); process.exitCode = 2; return }
+    oncekiKarne = t.karne
+  }
   const hatalar = []
   const robotsMetin = (await getir('/robots.txt', BOTLAR.googlebot)).govde || (await (await fetch(TABAN + '/robots.txt')).text())
   const robots = robotsAyristir(robotsMetin)
@@ -331,7 +436,9 @@ async function main() {
 
       s.title = a.title.length; s.baslik = a.title[0] || ''
       s.aciklama = a.aciklama.length ? a.aciklama[0].length : 0
-      s.h1 = a.h1; s.ic = a.ic; s.kelime = a.kelime; s.metinOzet = a.metinOzet
+      s.h1 = a.h1; s.ic = a.ic; s.kelime = a.kelime; s.metinOzet = a.metinOzet; s.markaBag = a.markaBaglantisi
+      const markaSorunu = markaBaglantisiSorunu(tur, a)
+      if (markaSorunu) s.sorunlar.push(markaSorunu)
       s.jsonld = a.jsonld.map((x) => x.tur)
       if (a.title.length !== 1) s.sorunlar.push(`TITLE-SAYISI ${a.title.length}`)
       if (a.title.length === 1 && varsayilanBaslikMi(a.title[0], baslikTuru(tur, s.son))) s.sorunlar.push('VARSAYILAN-BASLIK (kendi title/description yok)')
@@ -422,6 +529,16 @@ async function main() {
     writeFileSync(join(CIKTI, 'karne.md'), md)
     console.log(`karne yazıldı: ${CIKTI} · ${satirlar.length} adres · sorunlu ${satirlar.filter((s) => s.sorunlar.length).length}`)
   } else process.stdout.write(md)
+  if (oncekiKarne) {
+    const fark = karneFarki(oncekiKarne, { satirlar })
+    const farkMd = `# Karne farkı — ${TABAN} — önceki ${oncekiKarne.olculme ?? '?'} → şimdi ${new Date().toISOString().slice(0, 16)}Z\n\n${fark.ozetSatirlari.map((s) => `- ${s}`).join('\n')}\n`
+    if (CIKTI) {
+      writeFileSync(join(CIKTI, 'karne-fark.json'), JSON.stringify({ taban: TABAN, onceki: oncekiKarne.olculme ?? null, simdi: new Date().toISOString(), ...fark }, null, 1))
+      writeFileSync(join(CIKTI, 'karne-fark.md'), farkMd)
+      console.log(`karne farkı yazıldı: ${CIKTI}/karne-fark.md`)
+    }
+    console.log(fark.ozetSatirlari.join('\n'))
+  }
   if (hatalar.length) process.exitCode = 1
 }
 
@@ -429,12 +546,12 @@ function raporMd({ satirlar, robotsMetin, aiBotlar, cwv, haritaSayisi }) {
   const L = []
   L.push(`# Bot kalitesi karnesi — ${TABAN} — ${new Date().toISOString().slice(0, 16)}Z`, '')
   L.push(`Adres ${satirlar.length} · site haritası loc ${haritaSayisi} · sorunlu adres ${satirlar.filter((s) => s.sorunlar.length).length}`, '')
-  L.push('| tür | adres | zincir | kelime G/GPT/Claude/Perp/Tar | title | açıkl. | H1 | canonical | hreflang | JSON-LD | harita | robots G | noindex | iç bağ. | sorunlar | bilinçli |')
-  L.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+  L.push('| tür | adres | zincir | kelime G/GPT/Claude/Perp/Tar | title | açıkl. | H1 | canonical | hreflang | JSON-LD | harita | robots G | noindex | iç bağ. | marka bağ. | sorunlar | bilinçli |')
+  L.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
   for (const s of satirlar) {
     const k = s.botlar ? ['googlebot', 'gptbot', 'claudebot', 'perplexitybot', 'tarayici'].map((b) => s.botlar[b]?.kelime ?? '-').join('/') : '-'
     const hl = s.hreflang ? Object.entries(s.hreflang).map(([d, h]) => `${d}=${h}`).join(' ') : '-'
-    L.push(`| ${s.tur} | ${s.adres} | ${s.zincir} | ${k} | ${s.title ?? '-'} | ${s.aciklama ?? '-'} | ${s.h1 ?? '-'} | ${(s.canonical || []).join(' ') || '-'} | ${hl} | ${(s.jsonld || []).join(', ') || '-'} | ${s.haritada ?? '-'} | ${s.robots ? (s.robots.googlebot.izin ? 'izin' : 'YASAK') : '-'} | ${s.noindex ? 'EVET' : 'hayır'} | ${s.ic ?? '-'} | ${s.sorunlar.join(' · ') || '✓'} | ${(s.bilincli || []).join(' · ') || '-'} |`)
+    L.push(`| ${s.tur} | ${s.adres} | ${s.zincir} | ${k} | ${s.title ?? '-'} | ${s.aciklama ?? '-'} | ${s.h1 ?? '-'} | ${(s.canonical || []).join(' ') || '-'} | ${hl} | ${(s.jsonld || []).join(', ') || '-'} | ${s.haritada ?? '-'} | ${s.robots ? (s.robots.googlebot.izin ? 'izin' : 'YASAK') : '-'} | ${s.noindex ? 'EVET' : 'hayır'} | ${s.ic ?? '-'} | ${s.markaBag ?? '-'} | ${s.sorunlar.join(' · ') || '✓'} | ${(s.bilincli || []).join(' · ') || '-'} |`)
   }
   L.push('', '## Sorun sınıfları', '')
   const sinif = new Map()
@@ -446,6 +563,6 @@ function raporMd({ satirlar, robotsMetin, aiBotlar, cwv, haritaSayisi }) {
   return L.join('\n') + '\n'
 }
 
-if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('bot-karnesi.mjs')) {
+if (import.meta.url === `file://${(process.argv[1] ?? '').replace(/\\/g, '/')}` || process.argv[1]?.endsWith('bot-karnesi.mjs')) {
   main().catch((e) => { console.error('HATA', e.stack || e.message); process.exitCode = 1 })
 }

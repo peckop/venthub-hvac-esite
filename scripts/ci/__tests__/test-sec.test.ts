@@ -179,6 +179,7 @@ const KURESEL_ORNEKLER: Record<string, string[]> = {
   'scripts/assert-node-major.mjs': ['scripts/assert-node-major.mjs'],
   'scripts/setup-hooks.mjs': ['scripts/setup-hooks.mjs'],
   'scripts/board/vitest-defter-ortami.cjs': ['scripts/board/vitest-defter-ortami.cjs'],
+  'scripts/board/vitest-home-ortami.cjs': ['scripts/board/vitest-home-ortami.cjs'],
   'package.json': ['package.json'],
   'pnpm-lock.yaml': ['pnpm-lock.yaml'],
   'pnpm-workspace.yaml': ['pnpm-workspace.yaml'],
@@ -1224,7 +1225,7 @@ describe('INV-TEST-SEC-1 · 7. koşum kapanımı: her vitest koşumunda yüklene
     const k = kosumKapanimi(KOK)
     expect(k.kanitlanamayan, 'kapanım kanıtlanamıyor: yüklemeyi sabit metne çevirin ya da dosyayı küresel listeye elle ekleyip bu kapıyı güncelleyin').toEqual([])
     // yürüyüşün gerçekten çalıştığını kanıtlar: boş ya da eksik kapanım sessizce yeşil olmasın
-    for (const beklenen of ['vitest.config.ts', 'vitest.global-setup.ts', 'vitest.setup.ts', 'vitest-setup.tsx', 'scripts/board/vitest-defter-ortami.cjs', 'scripts/ci/dunya-durumu.cjs']) {
+    for (const beklenen of ['vitest.config.ts', 'vitest.global-setup.ts', 'vitest.setup.ts', 'vitest-setup.tsx', 'scripts/board/vitest-defter-ortami.cjs', 'scripts/board/vitest-home-ortami.cjs', 'scripts/ci/dunya-durumu.cjs']) {
       expect(k.dosyalar, `kapanımda ${beklenen} olmalı`).toContain(beklenen)
     }
     expect(

@@ -47,7 +47,15 @@ const OTURUMA_GIREN = new Set(['name', 'description', 'argument-hint'])
  * bütçeyle çözülmez (SKILL_ATAMASI'ndaki Haiku kuralı: skill adı müdür görev metninde AÇIKÇA yazılır).
  * ⛔24 KB'ı aşan bir sonraki PR kendiliğinden yükseltmez: OPS'a gider (yükseltme kararı OPS'undur).
  */
-const BUTCE_BAYT = 24 * 1024
+/**
+ * ⭐BÜTÇE 24 → 26 KB (YTN-18 ilk dalga, ölçüm 2026-10-12). Altı skill (web-performance, tech-stack, payments-webhooks,
+ * database-migrations, geo-fundamentals, write-seo-geo-content) oturum listesine +1,9 KB ekledi: 24,2 KB → 26,1 KB (69 skill).
+ * Açıklamalar 229-284 karaktere çekildi (tavan 300); daha fazla kısaltma tetik cümlelerini siler. 26 KB = bugünkü
+ * toplam + ~0,5 KB baş payı (önceki baş payıyla aynı büyüklük).
+ * ✅OPS onayı 12 Ekim 2026, YTN-18 (OPS, +1,9 KB; Recep: "alacaklarımız varsa alalım"). Bundan sonraki her yükseltme
+ * aynı yoldan gider: ölçüm + OPS kararı, bu bloğa yeni tarihli satır.
+ */
+const BUTCE_BAYT = 26 * 1024
 
 /** Tek bir açıklamanın tavanı. Yeni skill'ler için geçerli; bugünkü aşanlar aşağıda ADIYLA. */
 const ACIKLAMA_TAVANI = 300

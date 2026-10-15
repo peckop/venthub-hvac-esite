@@ -12,12 +12,15 @@
  *   6. R3 kalıbı: zorunlu bölümler (fiyat etkenleri, SSS, kaynaklar, teknik sorumluluk notu), tek H1,
  *      en az bir tablo, SSS 5–8 soru, sorumluluk notunun sabit ilk cümlesi. ⭐2026-09-24 vakası: ilk
  *      yazı fiyat bölümü ve başlıklı sorumluluk notu olmadan iki doğrulama turundan geçti.
+ *   7. Başlık yapısı (R11, BLG-12): konu terimi taşımayan H2 oranı ve aynı ifadenin her H2'de tekrarı
+ *      UYARI verir, KIRMIZI vermez (Google'ın resmî belgelerinde H2/H3 için konu ifadesi şartı ve
+ *      sayısal eşik yok; eşikler bizim). Zorunlu bölüm başlıkları sayılmaz.
  * Yazı taslakları depoya GİRMEZ (R4.8) — buradaki metinler UYDURMA örnektir, gerçek yazı değil.
  */
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, bolumMetni, SORUMLULUK_ILK_CUMLE } from '../rehber-denetim.mjs'
+import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, bolumMetni, SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari } from '../rehber-denetim.mjs'
 
 const TEMIZ = `---
 baslik: Örnek cihaz nedir, nasıl seçilir?
@@ -233,6 +236,58 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
   })
   it('Windows satır sonu (CRLF) bölümleri bozmaz', () => {
     expect(kalipDenetle(TEMIZ.replace(/\n/g, '\r\n'))).toEqual([])
+  })
+})
+
+describe('INV-REHBER-DENETIM-1 · başlık yapısı (R11, UYARI)', () => {
+  const yaz = (h2: string[], h1 = '# Radyal fan nedir, nasıl seçilir?', onBilgi = '') =>
+    `${onBilgi}${h1}\n\nİlk cümle [1].\n\n${h2.map((b) => `## ${b}\n\nMetin [1].\n`).join('\n')}`
+  const uyariSiniflari = (md: string) => baslikDenetle(md).uyari.map((u: { sinif: string }) => u.sinif)
+
+  it('temiz örnek: yalnız zorunlu bölüm başlıkları var, sayılmaz, uyarı yok', () => {
+    expect(h2Basliklari(TEMIZ)).toEqual([])
+    expect(baslikDenetle(TEMIZ).uyari).toEqual([])
+    expect(denetle(TEMIZ, { iddialar: IDDIALAR }).uyari).toEqual([])
+  })
+  it('SABOTAJ: hiçbir H2 konu terimi taşımıyorsa BASLIK-KONU-ORANI (ayrıntıda başlıklar listelenir)', () => {
+    const md = yaz(['Nasıl çalışır?', 'Yumuşak kalkış', 'Seçim: neye bakılır?', 'İzlenecek yol', 'Montaj ve bakım'])
+    const r = baslikDenetle(md)
+    expect(r.uyari.map((u: { sinif: string }) => u.sinif)).toEqual(['BASLIK-KONU-ORANI'])
+    expect(r.uyari[0].ayrinti).toMatch(/"Yumuşak kalkış"/)
+    expect(r.olcu.konulu).toBe(0)
+  })
+  it('SABOTAJ: ana ifade her H2\'de tekrarlanıyorsa BASLIK-TEKRAR (doldurma)', () => {
+    const md = yaz(['Radyal fan türleri', 'Radyal fan montajı', 'Radyal fan bakımı', 'Radyal fan eğrisi', 'Radyal fan seçimi'])
+    expect(uyariSiniflari(md)).toEqual(['BASLIK-TEKRAR'])
+  })
+  it('AYIRT EDER: konu terimi yarıda ve tekrar yoksa temiz (sınırda: oran tam 0,5)', () => {
+    const md = yaz(['Radyal fan nedir?', 'Kanat tipleri', 'Fan eğrisi nasıl okunur?', 'Montaj ve bakım'])
+    const r = baslikDenetle(md)
+    expect(r.olcu.oran).toBe(0.5)
+    expect(r.uyari).toEqual([])
+  })
+  it('AYIRT EDER: dört H2\'den az yazıda uyarı verilmez (örneklem küçük)', () => {
+    expect(baslikDenetle(yaz(['Nasıl çalışır?', 'Montaj', 'Bakım'])).uyari).toEqual([])
+  })
+  it('zorunlu bölüm başlıkları H2 sayılmaz; üçüncü seviye başlıklar da sayılmaz', () => {
+    const md = yaz(['Radyal fan nedir?', 'Fiyatı belirleyen etkenler', 'Sık sorulan sorular']) + '\n### Hangi hızda çalışır?\n\nMetin.\n'
+    expect(h2Basliklari(md)).toEqual(['Radyal fan nedir?'])
+  })
+  it('UYARI KIRMIZIYA GİRMEZ: denetle() kirmizi dizisinde BASLIK-* sınıfı yok, uyari dizisinde var', () => {
+    const md = yaz(['Nasıl çalışır?', 'Yumuşak kalkış', 'Seçim: neye bakılır?', 'İzlenecek yol'])
+    const r = denetle(md)
+    expect(r.kirmizi.some((k: { sinif: string }) => k.sinif.startsWith('BASLIK-'))).toBe(false)
+    expect(r.uyari.map((u: { sinif: string }) => u.sinif)).toContain('BASLIK-KONU-ORANI')
+  })
+  it('konu terimleri: H1\'den çıkar, soru sözcükleri atılır; ön bilgideki konu_terimleri eklenir', () => {
+    expect(konuTerimleri(yaz([]))).toEqual(['radya', 'fan'])
+    const md = yaz(['Yumuşak kalkış', 'Seçim: neye bakılır?', 'Montaj', 'Bakım'], '# Radyal fan nedir?', '---\nbaslik: x\nkonu_terimleri: kalkış, seçim\n---\n')
+    expect(konuTerimleri(md)).toEqual(['radya', 'fan', 'kalkı', 'seçim'])
+    expect(baslikDenetle(md).olcu.konulu).toBe(2)
+  })
+  it('CRLF ve ön bilgi başlık sayımını bozmaz', () => {
+    const md = yaz(['Nasıl çalışır?', 'Yumuşak kalkış', 'Seçim: neye bakılır?', 'İzlenecek yol'], '# Radyal fan nedir?', '---\nbaslik: Radyal fan\n---\n')
+    expect(uyariSiniflari(md.replace(/\n/g, '\r\n'))).toEqual(['BASLIK-KONU-ORANI'])
   })
 })
 

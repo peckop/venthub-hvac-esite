@@ -251,6 +251,48 @@ Deneme "iyi hissettirdi" diye sürdürülmez; sayılar OPS'tan Recep'e tek tablo
 
 ---
 
+## 6.2 RECEP YETKİSİ satırı (ARC-95, 2026-10-12)
+
+**Niçin:** Yetkisi zaten verilmiş iş tekrar tekrar Recep'e soru olarak geldi; kural yazılıydı
+(`.claude/rules/filo-ortak.md` "Onay nerede verilir", karar 317 ailesi) ama uygulayan kapı yoktu.
+
+**Kural:** Recep'e bağlanan her kartın (etiket `recep-bekliyor` ya da `karar-bekliyor`, ya da atananı `Sen`/`Recep`)
+açıklamasında satır başında şu satır bulunur:
+
+```
+RECEP YETKİSİ: <gerekçe>
+```
+
+Gerekçe YALNIZ şu altı sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
+yazımı fark etmez):
+
+| Gerekçe | Ne zaman |
+|---|---|
+| canlı yazım | Canlı veriye (fiyat, katalog, ürün satırı) yazan betik/iş |
+| migration birleştirme | Migration içeren PR'ın master'a birleşmesi (kural 13) |
+| gerçek para | Ödeme, fatura, ücretli abonelik/alım |
+| geri alınamaz silme | Geri dönüşü olmayan silme |
+| yeni görünüm/iddia/yapı kararı | Vitrinde/metinde yeni görünüm, yeni iddia ya da yapı kararı (üç biçim de geçerli) |
+| hesap/ayar dosyası | Hesap, kimlik ya da izin/ayar dosyası değişikliği |
+
+Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerekçe liste dışıysa kapı kırmızı verir
+("bu işin yetkisi zaten verilmiş, yap").
+
+**Kapı:** `.claude/hooks/kartsiz-beklenti-kapisi.cjs` (Stop kancası) ikinci denetim olarak yürütür; birinci denetim
+(istek maddesinin kartı var mı, kart açık ve Recep'e bağlı mı) geçince, anılan kartın TAM açıklaması
+(`kanban-anlik.cjs --detay`) okunup satır aranır. Testi: `src/__tests__/conformance/kanca-kartsiz-beklenti-kapisi.test.ts`
+(INV-KARTSIZ-KAPI-10, -11; altı bozma yakalandı).
+
+**Sınırlar (bilinçli):**
+
+- Ayrıntı okuması çökerse tur GEÇER (fail-open) ama durum dosyası ve stderr "denetim ölçülemedi" der; sessiz değildir.
+- Mesajda `Kartsız: <sebep>` atlatması önceki gibi çalışır ve bu denetimi de atlar; sebep `kartsiz-atlatma.log`'a düşer.
+- Gerekçe satırı yalnız VARLIĞINI ve sınıfını doğrular; sınıfın doğru seçilip seçilmediğine (ör. canlı yazım olmayan işe
+  "canlı yazım" yazmak) kapı bakamaz: o OPS'un kart incelemesidir.
+- Atananı `Sen`/`Recep` olup etiketsiz kart da Recep'e bağlı sayılır (birinci denetimde de geçerli).
+
+---
+
 ## 7. Bu cetvelin kendi kapıları (uygulama sırası)
 
 | Kapı | Soru | Durum |

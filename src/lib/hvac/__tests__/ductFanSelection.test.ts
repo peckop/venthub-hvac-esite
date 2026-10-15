@@ -17,6 +17,10 @@ import { describe, expect, it } from 'vitest'
 import {
   calismaNoktasi,
   degerlendir,
+  EGRI_KAYNAKLARI,
+  egriKaynagiOku,
+  type EgriNotuTuru,
+  egriNotuTuru,
   egriYaklasikMi,
   type FanAdayi,
   hesaplaTasarimDebisi,
@@ -340,5 +344,107 @@ describe('INV-YAKLASIK-EGRI-1 — ≤3 noktalı eğri üretici grafiği sayılma
     expect(hesap.tasarimDebiM3h).toBeGreaterThan(0)
     expect(once.enUygun?.yaklasikEgri).toBe(true)
     expect(sonra.enUygun?.yaklasikEgri).toBe(false)
+  })
+})
+
+describe('INV-EGRI-KAYNAK-NOTU-1 — eğri notu nokta sayısı + kaynak etiketiyle tek yerden karar verilir (URN-127, karar 348)', () => {
+  /** n noktalı, debiye göre artan, kaynağı etiketli olmayan eğri (JSONB string şekli). */
+  const egriN = (n: number): string => {
+    const noktalar: Array<[number, number]> = []
+    for (let i = 0; i < n; i += 1) noktalar.push([i * 100, 300 - i * (300 / Math.max(1, n - 1))])
+    return JSON.stringify(noktalar)
+  }
+
+  it('kaynak etiketi tam üç değerdir; dördüncü değer yoktur', () => {
+    expect([...EGRI_KAYNAKLARI]).toEqual(['kitapcik_tablo', 'kitapcik_grafik', 'turetilmis'])
+  })
+
+  it('egriKaynagiOku: yalnız metin, kırpılmış, BİREBİR eşleşen değeri tanır; gerisi null', () => {
+    expect(egriKaynagiOku('kitapcik_grafik')).toBe('kitapcik_grafik')
+    expect(egriKaynagiOku('  kitapcik_tablo  ')).toBe('kitapcik_tablo')
+    expect(egriKaynagiOku('turetilmis')).toBe('turetilmis')
+    for (const kotu of ['KITAPCIK_GRAFIK', 'olculmus', 'kitapcik', '', '  ', null, undefined, 0, 1, true, {}, ['kitapcik_grafik']]) {
+      expect(egriKaynagiOku(kotu), `tanınmamalı: ${JSON.stringify(kotu)}`).toBeNull()
+    }
+  })
+
+  // nokta × kaynak → beklenen not türü. Kural SIRAYLA: 0 nokta null · turetilmis yaklaşık · ≤3 yaklaşık ·
+  // kitapcik_grafik grafikten-okundu · kalan null.
+  const KAYNAKLAR: Array<[string, unknown]> = [
+    ['kaynak yok', undefined],
+    ['kitapcik_tablo', 'kitapcik_tablo'],
+    ['kitapcik_grafik', 'kitapcik_grafik'],
+    ['turetilmis', 'turetilmis'],
+    ['saçma', 'saçma'],
+  ]
+  const BEKLENEN: Record<number, Record<string, EgriNotuTuru | null>> = {
+    0: { 'kaynak yok': null, kitapcik_tablo: null, kitapcik_grafik: null, turetilmis: null, 'saçma': null },
+    2: { 'kaynak yok': 'yaklasik', kitapcik_tablo: 'yaklasik', kitapcik_grafik: 'yaklasik', turetilmis: 'yaklasik', 'saçma': 'yaklasik' },
+    3: { 'kaynak yok': 'yaklasik', kitapcik_tablo: 'yaklasik', kitapcik_grafik: 'yaklasik', turetilmis: 'yaklasik', 'saçma': 'yaklasik' },
+    4: { 'kaynak yok': null, kitapcik_tablo: null, kitapcik_grafik: 'grafikten-okundu', turetilmis: 'yaklasik', 'saçma': null },
+    6: { 'kaynak yok': null, kitapcik_tablo: null, kitapcik_grafik: 'grafikten-okundu', turetilmis: 'yaklasik', 'saçma': null },
+  }
+
+  for (const [nokta, satir] of Object.entries(BEKLENEN)) {
+    for (const [ad, ham] of KAYNAKLAR) {
+      it(`egriNotuTuru: ${nokta} nokta × ${ad} → ${String(satir[ad])}`, () => {
+        expect(egriNotuTuru(egriN(Number(nokta)), ham)).toBe(satir[ad])
+      })
+    }
+  }
+
+  it('bozuk/boş eğri hamı (null, "bozuk", "[]") hiçbir kaynakla not üretmez', () => {
+    for (const egri of [null, undefined, 'bozuk', '[]', []]) {
+      for (const [, kaynak] of KAYNAKLAR) expect(egriNotuTuru(egri, kaynak)).toBeNull()
+    }
+  })
+
+  it('egriNotuTuru ile egriYaklasikMi tutarlı: etiketsiz her eğride "yaklasik" ⇔ egriYaklasikMi', () => {
+    for (const n of [0, 1, 2, 3, 4, 5, 6]) {
+      const egri = egriN(n)
+      expect(egriNotuTuru(egri, undefined) === 'yaklasik', `n=${n}`).toBe(egriYaklasikMi(egri))
+    }
+  })
+
+  it('degerlendir: kaynaklı 6 nokta → grafikten-okundu (yaklasikEgri false); etiketsiz 6 nokta → null', () => {
+    const hesap = hesaplaTasarimDebisi('bathroom', 10, 2.5)
+    const grafik = degerlendir(aday({ pqCurveHam: egriN(6), pqCurveKaynak: 'kitapcik_grafik' }), hesap, TEMEL_GIRDI)
+    expect(grafik.egriNotu).toBe('grafikten-okundu')
+    expect(grafik.yaklasikEgri).toBe(false)
+
+    const etiketsiz = degerlendir(aday({ pqCurveHam: egriN(6) }), hesap, TEMEL_GIRDI)
+    expect(etiketsiz.egriNotu).toBeNull()
+    expect(etiketsiz.yaklasikEgri).toBe(false)
+  })
+
+  it('degerlendir: türetilmiş etiketli 6 nokta ve 3 nokta yaklaşık; yaklasikEgri = egriNotu === "yaklasik"', () => {
+    const hesap = hesaplaTasarimDebisi('bathroom', 10, 2.5)
+    const turetilmis = degerlendir(aday({ pqCurveHam: egriN(6), pqCurveKaynak: 'turetilmis' }), hesap, TEMEL_GIRDI)
+    expect(turetilmis.egriNotu).toBe('yaklasik')
+    expect(turetilmis.yaklasikEgri).toBe(true)
+
+    const uc = degerlendir(aday({ pqCurveKaynak: 'kitapcik_grafik' }), hesap, TEMEL_GIRDI)
+    expect(uc.egriNotu).toBe('yaklasik')
+    expect(uc.yaklasikEgri).toBe(true)
+  })
+
+  it('degerlendir: eğri yoksa (veri-yok) not da yok, kaynak ne derse desin', () => {
+    const hesap = hesaplaTasarimDebisi('bathroom', 10, 2.5)
+    const sonuc = degerlendir(aday({ pqCurveHam: null, pqCurveKaynak: 'kitapcik_grafik' }), hesap, TEMEL_GIRDI)
+    expect(sonuc.elenmeSebebi).toBe('veri-yok')
+    expect(sonuc.egriNotu).toBeNull()
+    expect(sonuc.yaklasikEgri).toBe(false)
+  })
+
+  it('tek nokta (hesaplanamayan eğri) veri-yok sayılır ve not üretmez', () => {
+    const hesap = hesaplaTasarimDebisi('bathroom', 10, 2.5)
+    const sonuc = degerlendir(aday({ pqCurveHam: '[[100, 50]]', pqCurveKaynak: 'kitapcik_grafik' }), hesap, TEMEL_GIRDI)
+    expect(sonuc.elenmeSebebi).toBe('veri-yok')
+    expect(sonuc.egriNotu).toBeNull()
+  })
+
+  it('secimYap: kaynak etiketi seçim sonucuna kadar taşınır (enUygun.egriNotu)', () => {
+    const sonuc = secimYap([aday({ pqCurveHam: egriN(6), pqCurveKaynak: 'kitapcik_grafik' })], TEMEL_GIRDI)
+    expect(sonuc.enUygun?.egriNotu).toBe('grafikten-okundu')
   })
 })

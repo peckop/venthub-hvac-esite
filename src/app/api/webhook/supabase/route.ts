@@ -84,6 +84,16 @@ function eskiDeger(
  */
 const MAX_FAMILY_CHAIN_HOPS = 4
 
+/**
+ * Bir ÜST kategorinin çocuk sayfalarını tazelerken okunacak en çok çocuk sayısı (URN-112). Alt kategori sayfası
+ * üstün adını ve görünen slug'ını sunucu HTML'ine yazar; üst değişince çocuk sayfaları bayat kalmasın diye tek
+ * sorguyla okunur. Ölçüm (doğrulayıcı, canlı DB salt okuma 2026-10-12; bu dosyada yeniden ölçülmedi): toplam 26
+ * alt kategori, üst başına en çok 14; sınır bunun yaklaşık yedi katıdır. Okuma `id`'ye göre sıralıdır: sınır
+ * aşılırsa hangi çocukların tazeleneceği belirli olur. Aşılırsa SESSİZCE KIRPILMAZ: `fanoutTruncated` yanıtta true olur ve uyarı basılır (kategori
+ * sayfaları ISR yedeğiyle en geç 1 saatte yine yenilenir).
+ */
+const MAX_KATEGORI_COCUK = 100
+
 interface FamilyChainRow {
   id: string
   slug: string | null
@@ -189,15 +199,15 @@ type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; paren
  *       `getLocalizedCategorySlug` ile çözülür (CLAUDE.md kural 7 — kanonik EN, görünen
  *       URL dile göre). Kanonik yol da tazelenmeye DEVAM eder: 308 kaynağı olsa bile
  *       prerender edilmiş olabilir, kaldırmak yeni bir delik açardı.
- *       İSTİSNA (URN-7, ölçüm 2026-10-01): bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu
- *       bayrak kapalıyken önbelleği olmayan 308'dir; üretilmez. Faz 3-C o rotaya sayfa sınıfı
- *       (force-static/revalidate) ilan ederse bu yol geri eklenir (kapı: INV-TAZELEME-YOL-3).
+ *       İSTİSNA (URN-7, ölçüm 2026-10-01; SEO-35 B-1): iç içe `/<dil>/category/<üst>/<alt>` yolu önbelleği
+ *       olmayan 308'dir; üretilmez. B-1 kararıyla o rota bayrak açıkken de yalnız yönlendirir (içerik çizmez,
+ *       sayfa sınıfı ilan etmez), yani yol hiçbir kipte tazelenmez (kapı: INV-TAZELEME-YOL-3).
  *
  *  W2 — 14 `revalidatePath` çağrısının tamamı TEK segmentliydi; `/category/[c]/[s]`
- *       (alt-kategori) hiç tazelenmiyordu. Artık `parent_id` varsa iki segmentli yol da
- *       üretilir — yeni şemanın `/kategori/<üst>/<alt>` (EN: `/category/<üst>/<alt>`) yolu. Bugünkü şemanın
- *       `/<dil>/category/<üst>/<alt>` yolu üretilmez: bayrak kapalıyken yalnız 308'dir, önbelleği yok
- *       (URN-7 ölçümü 2026-10-01); bkz. `kategoriYollari`.
+ *       (alt-kategori) hiç tazelenmiyordu. Alt kategori yolu `parent_id` varsa sorulur ama B-1'den beri dalın
+ *       adresi (yeni: `/kategori/<alt>`, EN ve bugünkü: `/category/<alt>`) TEK segmenttir ve üst adrese girmez;
+ *       dal nesnesi kök nesnesiyle aynı yolu verir, küme tekilleştirir. İç içe `<üst>/<alt>` yolları üretilmez:
+ *       iki şemada da yalnız 308'dir, önbelleği yok (URN-7 ölçümü 2026-10-01); bkz. `kategoriYollari`.
  *
  * Yollar tekilleştirilir: iki dilin slug'ı aynı olabilir (çeviri yoksa kanoniğe düşer).
  */
@@ -325,6 +335,9 @@ export async function POST(request: NextRequest) {
     // T138-VH K6: seri↔model zincir yürüyüşü üst sınırı aştıysa (bkz. walkFamilyChain)
     // burada toplanır ve yanıt gövdesinde görünür olur — sessizce kırpma YOK.
     let fanoutTruncated = false
+    // URN-112: üst kategorinin çocuk sorgusu düştüyse mesaj burada tutulur; iş (etiketler, site haritası,
+    // IndexNow) bitirilir ve yanıt 500 ile bu hatayı taşır — sessiz "başarılı" yok.
+    let kategoriCocukHatasi: string | null = null
 
     // PS-042: keşif (discovery) tag'leri yalnız keşfi etkileyen değişimde tetiklenir.
     // products UPDATE'inde bu, duyarlı alan (status/family_id/category_id/subcategory_id/
@@ -409,7 +422,8 @@ export async function POST(request: NextRequest) {
        * Kategori + alt kategori: YENİ ve ESKİ `category_id` / `subcategory_id` (URN-12). Eskiden yalnız yeni
        * `category_id` tazeleniyordu: ürün kategoriden çıkınca eski kategori/alt kategori listesi bayat kalıyor,
        * `subcategory_id` hiç tazelenmiyordu. Her kimlik bir kez çözülür; ortak yollar (ör. aynı üst kategori)
-       * tekilleştirilir. Alt kategorinin yolları üstüyle birlikte iki segmentli adresi de içerir (`revalidateCategoryTree`).
+       * tekilleştirilir. Alt kategorinin yolları kendi tek segmentli adresini içerir (B-1: dal adresi üste bağlı değil;
+       * `revalidateCategoryTree`).
        */
       const kategoriKimlikleri = [
         ...new Set(
@@ -474,21 +488,46 @@ export async function POST(request: NextRequest) {
       }
 
       /**
-       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse
-       * TÜM çocuklarının iki segmentli yolları değişir. Çocuklar tazelenmezse ebeveyn
-       * adı düzelir ama alt-kategori sayfaları eski yolda donar (sessiz bayatlama).
-       * Tavan küçük (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       * W2 TERS YÖNÜ — denetimde HİÇ yoktu: bir ÜST kategorinin slug'ı değişirse çocukların iki segmentli
+       * yolları değişiyordu. B-1'den beri çocuğun ADRESİ üstten bağımsızdır (kendi tek segmentli slug'ı); bu dal
+       * artık adres değişimi için değil, çocuk sayfaların kırıntısında üstün adı ve bağlantısı yer aldığı için
+       * (CategoryLandingView) üst değişince çocuk sayfaları bayat kalmasın diye korunur. Tavan küçük
+       * (ölçüm: en fazla 18 satır), tek sorgu yeter.
+       *
+       * URN-112: alt kategori sayfasının ham HTML'inde üst halka (ad + görünen slug + aktiflik) artık sunucuda
+       * yazılıdır (`kategoriSayfasi.tsx`); bu dal bu yüzden her `categories` olayında (INSERT/UPDATE/DELETE) üstün
+       * çocuklarını tazelemeye DEVAM eder — ad (name, menu_label, translation_key), slug, metadata.slug ya da
+       * is_active değişimi bu satırın ZATEN kapsadığı kümedir; eski ad ayrıca gerekmez (çocuk adresi üstten
+       * bağımsız, yol kümesi eski/yeni üstle aynı).
        */
       if (self.id) {
-        const { data: children } = await supabase
+        // URN-112: sorgu HATASI artık yutulmaz (eskiden `data` undefined olunca çocuklar sessizce atlanıyor,
+        // yanıt "başarılı" görünüyordu) ve okuma `MAX_KATEGORI_COCUK + 1` ile sınırlıdır (+1 = aşıldığını görmek için).
+        const { data: children, error: cocukHatasi } = await supabase
           .from('categories')
           .select('id, slug, metadata, parent_id')
           .eq('parent_id', self.id)
-        for (const child of children ?? []) {
+          .order('id', { ascending: true })
+          .limit(MAX_KATEGORI_COCUK + 1)
+        if (cocukHatasi) {
+          // Üstün kendi yolları, etiketler ve site haritası yine tazelenir; hata yanıt sonunda 500 ile bildirilir.
+          kategoriCocukHatasi = `categories çocuk sorgusu düştü (parent_id=${self.id}): ${cocukHatasi.message}`
+          console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+        }
+        const cocuklar = children ?? []
+        if (cocuklar.length > MAX_KATEGORI_COCUK) {
+          fanoutTruncated = true
+          console.warn(
+            `[Supabase Webhook] categories çocuk sayısı MAX_KATEGORI_COCUK (${MAX_KATEGORI_COCUK}) sınırını aştı — ` +
+            `parent_id=${self.id}; ilk ${MAX_KATEGORI_COCUK} çocuk tazelendi.`,
+          )
+        }
+        for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
           const childPaths = categoryPathsFor(child, self)
           for (const p of childPaths) revalidatePath(p)
           revalidatedPaths.push(...childPaths)
-          // Üstün ESKİ slug'ıyla kurulmuş iki segmentli çocuk yolları da bayatlar (URN-12).
+          // Üstün ESKİ adıyla kurulmuş çocuk yolları da bayatlar (URN-12). B-1'den beri çocuk adresi üstten
+          // bağımsızdır, yani küme çoğu durumda yukarıdakiyle aynıdır ve süzgeç onu boş bırakır; davranış değişmedi.
           if (eskiSelf) {
             const eskiChildPaths = categoryPathsFor(child, eskiSelf).filter((p) => !revalidatedPaths.includes(p))
             for (const p of eskiChildPaths) revalidatePath(p)
@@ -755,7 +794,9 @@ export async function POST(request: NextRequest) {
     const indexNow = await indexNowBildir(revalidatedPaths)
 
     return NextResponse.json({
-      revalidated: true,
+      // URN-112: çocuk sorgusu düştüyse `revalidated` false ve durum 500 (yapılan tazelemeler `revalidatedPaths`ta).
+      revalidated: kategoriCocukHatasi === null,
+      ...(kategoriCocukHatasi !== null ? { error: kategoriCocukHatasi } : {}),
       event: { table, type },
       revalidatedPaths,
       revalidatedTags,
@@ -770,7 +811,7 @@ export async function POST(request: NextRequest) {
       // bulduysa) burada true olur — sessizce kırpılmaz, ölçülebilir sinyal.
       fanoutTruncated,
       timestamp: new Date().toISOString()
-    })
+    }, { status: kategoriCocukHatasi === null ? 200 : 500 })
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('[Supabase Webhook Error]:', error)

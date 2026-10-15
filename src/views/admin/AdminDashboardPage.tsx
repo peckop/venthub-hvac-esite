@@ -16,8 +16,10 @@ import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTabl
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import AdminPageHeader from '../../components/admin/shell/AdminPageHeader'
+import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import { canViewCost } from '../../lib/rbac'
 import type { DbOrder } from '../../types/db-rows'
 
 interface DashboardChartData {
@@ -51,6 +53,9 @@ const ABC_COLORS: Record<string, string> = {
 
 const AdminDashboardPage: React.FC = () => {
   const { t } = useI18n()
+  // REC-140 Faz 1b (karar 95): bağlı sermaye alış fiyatından hesaplanır; moderatör maliyeti görmez.
+  const { role } = useRole()
+  const showCost = canViewCost(role)
 
   const [ordersCount, setOrdersCount] = useState<number | null>(null)
   const [salesTotal, setSalesTotal] = useState<number | null>(null)
@@ -286,14 +291,16 @@ const AdminDashboardPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard 
-          title={t('admin.dashboard.kpis.tiedCapital')}
-          value={tiedCapital}
-          icon={<Database />}
-          isCurrency
-          loading={loading}
-        />
-        <StatCard 
+        {showCost && (
+          <StatCard
+            title={t('admin.dashboard.kpis.tiedCapital')}
+            value={tiedCapital}
+            icon={<Database />}
+            isCurrency
+            loading={loading}
+          />
+        )}
+        <StatCard
           title={t('admin.dashboard.kpis.stockAlarms')}
           value={alarmCount}
           icon={<BellRing />}

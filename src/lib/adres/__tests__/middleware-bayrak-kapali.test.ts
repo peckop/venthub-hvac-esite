@@ -29,6 +29,10 @@ describe('middleware — ADRES_SEMASI_K3B = false', () => {
     ['/category/fanlar', { 'accept-language': TR_CHROME }, 307, '/tr/category/fanlar'],
     ['/category/fans', { 'accept-language': 'en-US,en;q=0.9' }, 307, '/en/category/fans'],
     ['/products/storm-serisi?sku=SEA-61143003', { 'accept-language': TR_CHROME }, 307, '/tr/products/storm-serisi?sku=SEA-61143003'],
+    // URN-119: marka kolu eşleyiciye bağlı; bayrak kapalıyken dilsiz marka adresi bugünkü dil öneki 307'sini alır.
+    ['/brands', { 'accept-language': TR_CHROME }, 307, '/tr/brands'],
+    ['/brands/vortice', { 'accept-language': TR_CHROME }, 307, '/tr/brands/vortice'],
+    ['/brands/vortice', { 'accept-language': 'en-US,en;q=0.9' }, 307, '/en/brands/vortice'],
     // `/tr/admin/…` → 308 `/admin/…` dalı bu tabloda YOK: bugün `/en/admin/products` → `/admindmin/products`
     // üretiyor (substring hesabı, bu işten bağımsız kusur; ayrı kayda raporlandı).
   ])('%s → %s %s', async (yol, basliklar, durum, konum) => {
@@ -42,6 +46,9 @@ describe('middleware — ADRES_SEMASI_K3B = false', () => {
     '/tr/category/fans/duct-fans',
     '/tr/products/storm-serisi?sku=SEA-61143003',
     '/en/products/vortice-lineo-100-quiet',
+    '/tr/brands', // URN-119: sayfa kendi 308'ini verir (bayrak açıkken); middleware dokunmaz
+    '/tr/brands/vortice',
+    '/en/brands/vortice',
     '/tr/cart',
     '/robots.txt',
     '/api/health',

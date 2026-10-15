@@ -88,7 +88,7 @@ Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek 
 
 Frekans konvertörü, motor hızını değiştirebilen ya da yükteki değişime rağmen sabit tutabilen bir kontrol cihazıdır [1]. ABD Enerji Bakanlığı, Europump ve Hydraulic Institute'un ortak pompa rehberine göre elektronik değişken hız sürücülerinin en yaygın biçimi, gerilim kaynaklı ve darbe genişlik modülasyonlu (PWM) frekans konvertörüdür [7]. Danfoss belgelerindeki "FC" kısaltması da "frequency converter", yani frekans konvertörü anlamına gelir [2].
 
-## Nasıl çalışır?
+## Frekans konvertörü nasıl çalışır?
 
 Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
 
@@ -102,7 +102,7 @@ Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre
 
 Hızı ayarlamanın temel yolu gerilimi ve frekansı birlikte değiştirmektir (V/Hz kontrolü); sürücü düşük hızlarda da tam tork verebilmek için bu oranı bir eğriye göre ayarlar [1]. Danfoss'un gerilim vektör kontrolü (VVC+), standart V/Hz kontrolüne göre hız ayarı ve yük torku değiştiğinde daha iyi dinamik tepki ve kararlılık sağlar [2][4].
 
-## Fan ve pompada neden kullanılır?
+## Fan ve pompada frekans konvertörü neden kullanılır?
 
 Santrifüj fan ve pompalar orantı yasalarına (benzerlik yasaları) uyar: debi devirle doğru orantılı, basınç devrin karesiyle, güç ise devrin küpüyle orantılıdır [2]. Bu yüzden hızdaki küçük bir düşüş güçte büyük bir düşüş getirir [2]. Üretici belgesindeki örnekte hız anma değerine göre yalnız %20 azaltıldığında debi de %20 azalır, elektrik tüketimi ise %50 azalır [2].
 
@@ -112,15 +112,15 @@ Bu hesap her sistemde aynı sonucu vermez. Aynı pompa rehberi, orantı yasalar�
 
 Frekans konvertörü, fan ya da pompanın hızını dahili kontrolüyle değiştirerek debiyi, seviyeyi ya da basıncı istenen değerde tutabilir [2].
 
-## Yumuşak kalkış
+## Frekans konvertörüyle yumuşak kalkış
 
 Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıldız/üçgen yol verici ya da yumuşak yol verici kullanılır; frekans konvertörü kullanıldığında bu ayrı yol vericilere gerek kalmaz [2][1]. Frekans konvertörü motoru kalkındırırken anma akımından fazla akım çekmez [2].
 
-## Değişken tork ve sabit tork
+## Değişken tork ve sabit tork uygulamaları
 
 Üretici belgeleri yükleri iki karakteristiğe ayırır: pompa ve fanlar değişken tork (VT), konveyör bantları, deplasmanlı pompalar ve vinçler sabit tork (CT) uygulamasıdır [1]. Değişken tork uygulamalarında tork devrin karesiyle, güç devrin küpüyle değişir ve düşük hızda motor için ek soğutma ya da akım düşürme gerekmez [1]. Sabit tork uygulamalarında motor anma hızının yarısının altında sürekli çalışacaksa ek hava soğutması ya da bu çalışma için tasarlanmış bir motor gerekir [1].
 
-## Seçim: neye bakılır?
+## Frekans konvertörü seçerken neye bakılır?
 
 - **Besleme gerilimi ve faz sayısı.** FC 51 tek fazlı 200–240 V, üç fazlı 200–240 V ve üç fazlı 380–480 V girişle sunulur [4]. FC 101 üç fazlı 200–240 V, 380–480 V ve 525–600 V girişle üretilir [2].
 - **Güç aralığı.** FC 51 gerilim sınıfına göre 0,18 kW ile 22 kW arasında güç sunar [6]. FC 101'in güç aralığı 0,25 kW ile 90 kW arasındadır [2].
@@ -140,7 +140,7 @@ Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıl
 
 Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 101](vh:aile/danfoss-vlt-hvac-basic-drive-fc-101) ve [FC 102](vh:aile/danfoss-vlt-hvac-drive-fc-102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
 
-## HVAC'a özel işlevler
+## HVAC uygulamalarına özel sürücü işlevleri
 
 - **Uyku modu.** Debi düşük ya da sıfır olduğunda sürücü enerji tasarrufu için uyku moduna geçer; basınç ayar değerinin altına düştüğünde kendiliğinden yeniden başlar [3].
 - **Yangın modu.** Sürücünün kendini korumak için durmasını engeller; merdiven basınçlandırma, otopark egzoz fanları ve duman tahliyesi gibi uygulamalarda fanın çalışmasını sürdürür [3].
@@ -150,13 +150,13 @@ Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 
 
 FC 102 işlevleri için kaynak olarak kullanılan tasarım kılavuzu 355–800 kW gövdeleri kapsar [1]. Bu yüzden yerleşik PID kontrolünün ve pompa kademelemenin seçtiğiniz güçteki modelde bulunduğunu ürün belgesinden doğrulayın.
 
-## Türkiye'de verimlilik şartı var mı?
+## Üç fazlı girişli frekans konvertörlerinde verimlilik şartı var mı?
 
 AB'nin 2019/1781 sayılı Komisyon Tüzüğü, 1 Temmuz 2021'den itibaren 0,12 kW ile 1000 kW arasındaki motorlarla kullanılan üç fazlı girişli değişken hız sürücülerinin güç kayıplarının IE2 verim düzeyine karşılık gelen en yüksek güç kaybını aşmamasını zorunlu kılar [8]. Tüzük 2021'de (EU) 2021/341 sayılı tüzükle değiştirildi; 24.01.2023 tarihli konsolide metinde sürücülere yönelik IE2 şartı ilk metindeki ifadesiyle yer alır [9].
 
 Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye duyarlı tasarım gereklilikleri, Sanayi ve Teknoloji Bakanlığı'nın 28 Nisan 2021 tarihli ve 31468 sayılı Resmî Gazete'de yayımlanan Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM: 2021/16) ile belirlenmiştir [10]. Tebliğ, 0,12 kW ile 1000 kW arasındaki motorlarla çalışan üç fazlı girişli değişken hız sürücülerini kapsar ve AB'nin 2019/1781 sayılı Komisyon Tüzüğü ile onu değiştiren 2021/341 sayılı tüzük esas alınarak hazırlanmıştır [10]. Tebliğin maddelerinin çoğu 15 Ağustos 2021'de yürürlüğe girmiştir; ilk metindeki 1 Temmuz 2021 tarihi, 29 Haziran 2021 tarihli değişiklik tebliğiyle (SGM: 2021/23) ertelenmiştir [10][12]. Bu nedenle Türkiye'deki başlangıç tarihi, AB tüzüğünün uygulandığı 1 Temmuz 2021'den farklıdır [8][12]. Tebliğ, 1 sayılı Cumhurbaşkanlığı Kararnamesi ile 2010/643 sayılı Bakanlar Kurulu Kararıyla yürürlüğe konulan yönetmeliğe dayanır [10].
 
-## Kurulumda dikkat edilecekler
+## Sürücü kurulumunda dikkat edilecekler
 
 - Motor kablosundaki hızlı gerilim değişimi (dU/dt), kablonun fazları ile ekranı ve ekran ile toprak arasında kaçak akımlar oluşturur; bu da sürücünün elektromanyetik yayılımını değiştirir [1].
 - Şebeke, motor ve kontrol kabloları birbirinden ayrı döşenmelidir; aksi hâlde istenmeyen davranış ya da düşük performans görülebilir [1].
@@ -166,7 +166,7 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 - Sürücü patlayıcı ortama kurulmamalıdır; gerekiyorsa bu alanın dışındaki bir panoya yerleştirilir [1].
 - Hava ile soğutma için sürücünün üstünde ve altında üreticinin belirttiği boşluk bırakılmalıdır; yetersiz boşluk aşırı ısınmaya ve performans düşüşüne yol açar [1].
 
-## Güvenlik ve bakım
+## Sürücü güvenliği ve bakımı
 
 - Sürücü şebekeden ayrıldıktan sonra da içindeki DC ara devre kapasitörleri yüklü kalabilir; servis öncesi üreticinin belirttiği süre kadar beklenmelidir [1]. Örneğin FC 51'de bu süre M1, M2 ve M3 gövdelerinde 4 dakika, M4 ve M5 gövdelerinde 15 dakikadır [4].
 - Sürücü şebekeye bağlıyken motor her an çalışabilir [4].
@@ -183,7 +183,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasınd
 - **Elektromanyetik uyumluluk kategorisi.** EN/IEC 61800-3'e göre C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Teklifteki cihazın, kurulacağı ortamın kategorisine uyduğuna bakın.
 - **Kurulum kalemleri.** Toplam maliyete cihazın yanında kurulum da girer: motor kablosunun türü ve uzunluğu (FC 51'de ekranlı kabloda azami 15 m, ekransız kabloda azami 50 m [4]), kaçak akım koruması kullanılacaksa besleme tarafındaki Tip B cihaz [1] ve şebeke, motor ve kontrol kablolarının ayrı döşenmesi [1].
 
-## İzlenecek yol
+## Frekans konvertörü seçiminde izlenecek yol
 
 1. Uygulamanın değişken tork mu sabit tork mu olduğunu belirleyin [1].
 2. Besleme gerilimine ve güç aralığına uygun aileyi seçin [2][4].
@@ -206,7 +206,7 @@ Tasarruf uygulamaya bağlıdır. Fan ve pompada hızı %20 azaltmak, üretici ö
 
 Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5].
 
-### Yangın anında sürücü fanı durdurur mu?
+### Yangın modunda frekans konvertörü fanı durdurur mu?
 
 FC 101'in yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3].
 
@@ -214,7 +214,7 @@ FC 101'in yangın modu açıldığında sürücü kendini korumak için durmaz; 
 
 Evet. AB tüzüğüne göre 1 Temmuz 2021'den beri üç fazlı girişli değişken hız sürücülerinin güç kayıpları IE2 sınırını aşmamalıdır [8]. Türkiye'de bu sürücüler, AB tüzüğü esas alınarak hazırlanan ve 28 Nisan 2021 tarihli Resmî Gazete'de yayımlanan Tebliğ'in kapsamındadır [10]; tebliğin sürücülere yönelik şartı değişiklik tebliğiyle 15 Ağustos 2021'den itibaren uygulanır [12].
 
-### Doğru teklif için hangi bilgileri paylaşmalıyım?
+### Frekans konvertörü teklifi için hangi bilgileri paylaşmalıyım?
 
 Teklifin doğru cihaza dayanması için motorun gücü, besleme gerilimi ve faz sayısı [2][4], uygulamanın değişken tork mu sabit tork mu olduğu [1], montaj yerinin sıcaklığı ve rakımı ile motor kablosunun uzunluğu [1] ve istenen koruma sınıfı [3][5] gerekir. Bu bilgilerle aynı özellikteki cihazlar karşılaştırılabilir.
 
@@ -236,6 +236,189 @@ Teklifin doğru cihaza dayanması için motorun gücü, besleme gerilimi ve faz 
 ## Teknik sorumluluk notu
 
 Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Yazıdaki tasarruf oranları üretici belgelerindeki örneklerdir; kendi sisteminizdeki sonuç farklı olabilir ve ölçülmüş işletme verisiyle hesaplanmalıdır. Kurulum, devreye alma ve bakım yetkili ve eğitimli personel tarafından yapılmalıdır. Yasal şartlara ilişkin bilgiler yayın tarihindeki resmî metinlere dayanır; uygulamadan önce güncel metin kontrol edilmelidir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG, doğrulanan metin sha 6e3eda3418ea, gövde sha 34eae81ca4e8 (tur 10, 2026-10-11: bağımsız Opus doğrulayıcı +
+    // belirlenimci atıf/alıntı/kalıp kontrolleri; mevzuat kaynakları 2026-10-11 tarihinde resmî metinden yeniden okundu).
+    // Yayın onayı Recep'ten, OPS penceresinde, 2026-10-11. Kapak karar 135'e göre kapak şablonu PR'ında eklenecek.
+    kimlik: 'radyal-aksiyel-fan-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-10-11',
+    // Güncelleme tarihi = yayın günü: site haritası lastmod'u ve Article `dateModified` buradan (INV-BILGI-MERKEZI-KART-1).
+    guncellemeTarihi: '2026-10-11',
+    urunler: [
+      'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
+      'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
+      'vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar',
+      'vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar',
+      'vh:aile/vortice-aksiyel-endustriyel-fanlar',
+    ],
+    diller: {
+      tr: {
+        slug: 'radyal-fan-mi-aksiyel-fan-mi',
+        ozet: 'Radyal ve aksiyel fanın farkı, kanat tipleri, fan eğrisinin okunması, çalışma noktası, montajın etkisi ve fanlar için güncel verimlilik şartları.',
+        // Kart metni yazının kendi bölüm başlıklarından derlenir (meta açıklamasından AYRI alan, SEO-30): yeni iddia, sayı ya da marka yok.
+        kartOzeti:
+          'Radyal ve aksiyel fanların çalışma biçimi, radyal fanlarda kanat tipleri, kayışlı ve doğrudan tahrik arasındaki fark, fan eğrisinden çalışma noktasının okunması, hava yoğunluğu düzeltmesi ve fanlara ilişkin AB ile Türkiye verimlilik düzenlemeleri.',
+        govde: `# Radyal fan mı aksiyel fan mı? Fan nasıl seçilir?
+
+Aksiyel fan havayı pervane gibi fan ekseni doğrultusunda iter; radyal (santrifüj) fan ise havayı radyal yönde hızlandırıp kinetik enerjiyi basınca çevirir [1]. Pervane tipi aksiyel fanlar düşük basınçta yüksek debi üretir [1]; radyal düz kanatlı fanlar ise yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1]. Doğru fan, sistemin gerektirdiği debi ve basıncın fan eğrisinde üreticinin önerdiği kararlı ve verimli bölgeye düştüğü fandır [2].
+
+## Radyal ve aksiyel fan nedir?
+
+Fanlar temelde iki tipe ayrılır: aksiyel ve santrifüj (radyal) [1]. Aksiyel fanlarda hava fan eksenine paralel akar; santrifüj fanda ise hava akımı radyal yönde hızlandırılır ve kazandığı kinetik enerji basınca dönüştürülür [1].
+
+Aksiyel fanların başlıca üstünlükleri kompakt olmaları, düşük maliyetleri ve hafiflikleridir [1]. Aynı debiyi sağlamak için benzer bir santrifüj fandan daha hızlı dönmeleri gerekir; bu yüzden daha gürültülüdürler, ancak gürültüleri daha kolay sönümlenen yüksek frekanslarda yoğunlaşır [1].
+
+## Radyal fanlarda kanat tipleri
+
+| Kanat tipi | Verim | Kirli ya da parçacıklı hava |
+|---|---|---|
+| Öne eğik | %55–65 [1] | Genellikle temiz hava uygulamalarıyla sınırlı [1] |
+| Radyal düz kanat | — | Toz, talaş ve metal kırıntısı taşıyan hava akımlarına uygun [1] |
+| Radyal uçlu | %75'e kadar [1] | — |
+| Geriye eğik, havayarı profilli | %85'in üzerine çıkabilir [1] | Düşük çarpma açısı kanatlarda birikmeye yol açabilir [1] |
+
+Geriye eğik kanatlı fanlarda en verimli olanlar havayarı profilli kanatlardır [1]. Bu kanatlar kaldırma kuvvetiyle çalıştığı için bu fan tipi tutunma kaybına (stall) bağlı kararsız çalışmaya karşı hassastır [1].
+
+## Aksiyel fan türleri
+
+- **Pervane tipi.** Düşük basınçta yüksek debi üretir; görece düşük verimlidir ama basit yapısı sayesinde ucuzdur [1].
+- **Tüp tipi (tubeaxial).** Orta basınç ve yüksek debi gerektiren uygulamalarda kullanılır ve kanallı HVAC tesisatına uygundur [1]. Motora doğrudan bağlanabildiği gibi kayışla da tahrik edilebilir [1].
+- **Kılavuz kanatlı (vaneaxial).** Esasen tüp tipi bir fanın çıkışına, akışı düzelten ve havanın kinetik enerjisini basınca çeviren kanatlar eklenmiş hâlidir [1]. Havayarı profilli kanatlar ve küçük boşluklarla üretildiğinde verimi %85'e kadar çıkabilir [1].
+
+Vortice'nin Industrial Ventilation kataloğundaki örneklerde MPC HP ve MPC ED serileri uzun gövdeli kanal tipi aksiyel fanlardır; kanatları fan durdurulmuşken ayarlanabilen yapıdadır [6]. Vortice [Vorticel E serisi](vh:aile/vortice-aksiyel-endustriyel-fanlar) ise düşük basınçlı plaka tipi aksiyel fan serisidir [6]. Otopark havalandırmasında kullanılan jet fanlar da iki gruba ayrılır: aksiyel fanlı itme tipi ve geriye kıvrık (backward-curved) metal kanatlı santrifüj çarklı indüksiyon tipi [7].
+
+## Fanlarda kayışlı mı doğrudan tahrikli mi?
+
+Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1]. Aksiyel fanlarda kayışlı tahrik motoru hava akımının dışında tutar; bu, yüksek sıcaklıklı, kirli ya da korozif ortamlarda bir üstünlük olabilir [1]. Aksiyel fanlarda düşük sıcaklıklı ve temiz havalı uygulamalarda ise doğrudan tahrik uygundur, çünkü fanın hemen arkasındaki motor hava akımıyla soğutulabilir [1].
+
+| Seri (üretici belgesi) | Kanat | Tahrik |
+|---|---|---|
+| Nicotra Gebhardt AT | Öne eğik [2] | Kayışlı [2] |
+| Nicotra Gebhardt ADH | Öne eğik [4] | Kayışlı [4] |
+| Nicotra Gebhardt RDH | Geriye eğik [3] | Kayışlı [3] |
+| Nicotra Gebhardt DD | Öne eğik [5] | Doğrudan tahrikli [5] |
+
+Bu serilerin modellerini [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarında; diğer fanları [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans), [aksiyel sanayi fanları](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde inceleyebilirsiniz.
+
+## Fan eğrisi nasıl okunur?
+
+Nicotra Gebhardt'ın kayışlı radyal fan kataloğunda (AT serisi) eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2]. Doğrudan tahrikli DD serisinin eğrisinde üretici, gri işaretli bölgede fanın kullanılmamasını önerir [5].
+
+Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1]. Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu yüzden çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildir [1]. Radyal kanatlı fanlarda ise tutunma kaybı sorunları diğer fan tiplerine göre daha az görülür [1].
+
+## Fanı en yüksek verim noktasına yakın seçin
+
+Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve onarımlar arasındaki süreyi uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Damper (ayar klapesi) karşı basıncı artırarak fanın toplam çıkışını düşürür ve çalışma noktasını eğri üzerinde sola kaydırır [1].
+
+Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1]. ABD Enerji Bakanlığı'nın 2003 tarihli rehberinin aktardığı bir ABD Çevre Koruma Ajansı çalışmasında (rehberin dipnotundaki kaynak: Temmuz 1997 tarihli ENERGY STAR Buildings Upgrade Manual), bina fan sistemlerindeki fanların yaklaşık %60'ının gereğinden büyük seçildiği, yaklaşık %10'unun ise %60 oranında büyük seçildiği bulunmuştur [1].
+
+Fan devri düşürüldüğünde debi devirle doğrusal, basınç devrin karesiyle, güç devrin küpüyle değişir [1]. Aynı rehbere göre fan devrini %20 azaltmak fan gücünü yaklaşık %50 azaltır [1].
+
+## Montaj fanın performansını nasıl etkiler?
+
+Sistem etkisi, sistem bileşenlerinin birbirini etkilemesinden doğan ve gerçek performansın hesaplanan performanstan sapması olarak görülen kayıptır [1]. Fan çıkışına yakın konumlandırılmış bir dirsek, iletilen debiyi %30'a kadar azaltan bir sistem etkisi yaratabilir [1].
+
+## Hava yoğunluğu ve fan eğrisi düzeltmesi
+
+Fan eğrilerinin çoğu standart hava yoğunluğu varsayımıyla çizilir [1]. Nicotra Gebhardt AT eğrilerinde fan girişindeki referans yoğunluk 1,2 kg/m³'tür [2]. Eğrideki basınç ve çark giriş gücü hava yoğunluğuyla doğru orantılıdır [2]. Bu yüzden ölçülen statik basınç, gerçek hava yoğunluğu ile eğrinin çizildiği yoğunluk arasındaki farka göre düzeltilmelidir [1].
+
+Örnek varsayım: sıcak hava taşıyan bir sistemde yoğunluk 1,08 kg/m³ olsun ve eğrideki çalışma noktasında basınç 1.000 Pa okunsun. Basınç yoğunlukla doğru orantılı olduğundan aynı devir ve debide bu sistemde fanın vereceği basınç yaklaşık 1.000 × 1,08 / 1,2 = 900 Pa olur [2].
+
+## Fan ses gücü seviyesi nasıl okunur?
+
+Ses gücü seviyesi, bir ses kaynağından yayılan akustik güçtür ve watt ya da desibel cinsinden verilir [1]. Nicotra Gebhardt AT kataloğunda 1 m mesafedeki yaklaşık A ağırlıklı ses basıncı seviyesi, A ağırlıklı ses gücü seviyesinden 7 dB çıkarılarak bulunur [2].
+
+## Fanlar için verimlilik mevzuatı
+
+Avrupa Birliği'nde elektrik giriş gücü 125 W ile 500 kW arasında olan motorlarla tahrik edilen fanların ekotasarım gereklilikleri, 3 Temmuz 2024 tarihli (EU) 2024/1834 sayılı Komisyon Tüzüğü ile düzenlenir [8]. Bu tüzük, önceki (EU) No 327/2011 sayılı tüzüğü 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [8]. Yeni tüzük genel olarak 24 Temmuz 2026'dan itibaren uygulanır [8]. Tüzük, 2 Aralık 2025 tarihli (EU) 2025/2481 sayılı Komisyon Tüzüğü ile değiştirilmiştir; bu değişikliğe göre, yeni tüzüğün Ek II'sinin ilk iki paragrafına uygun olarak, eski tüzüğün I, II ve III numaralı ekleri başka ürünlere entegre edilen fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [11].
+
+Tüzüğün kapsam dışı bıraktığı fanlar arasında, yalnız 2014/34/AB sayılı Direktif anlamında patlayıcı ortamlarda çalışmak üzere tasarlanıp pazarlanan fanlar ile yalnız acil durum için, 300 °C ve üzerinde 1 saat ya da daha uzun çalışabilecek yangın güvenliği fanları da bulunur [8].
+
+Türkiye'de aynı konu, 7 Şubat 2026 tarihli ve 33161 sayılı Resmî Gazete'de yayımlanan, (AB) 2024/1834 sayılı tüzük ile onu değiştiren (AB) 2025/2481 sayılı tüzük esas alınarak hazırlanan Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2) ile düzenlenmiştir [9]. Tebliğ, diğer ürünlere entegre edilenler dahil bu güç aralığındaki fanların piyasaya arz edilmesi veya hizmete sunulması açısından çevreye duyarlı tasarım gerekliliklerini belirler [9]. Tebliğ, 20 Aralık 2019 tarihli ve 30984 sayılı Resmî Gazete'de yayımlanan önceki fan tebliğini yürürlükten kaldırır [9]. Bu hüküm de dahil tebliğin esas hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [9].
+
+## Patlayıcı ortam ve duman tahliyesi fanları
+
+Yalnız patlayıcı ortamlarda çalışmak üzere tasarlanıp pazarlanan fanlar, yukarıda anlatılan verimlilik tüzüğünün kapsamı dışındadır [8].
+
+Vortice, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanların EN 12101-3 standardına göre üçüncü taraf bir kuruluşça belgelendirildiğini belirtir [7]. Aynı belgeye göre en yaygın sınıflar, sırasıyla 300 °C ve 400 °C'de duman tahliyesinde 2 saat kesintisiz çalışmaya karşılık gelen F300/120 ve F400/120'dir [7]. Vortice'nin VORT JET A F400 serisi F400/120 sertifikalıdır [6].
+
+## Fan montajı ve bakımı
+
+- Fanın tesisata esnek bir bağlantıyla bağlanması titreşim ve gürültü yalıtımını iyileştirir [2].
+- Tüm koruyucu tertibatlar takılıp bağlanmadan fan işletmeye alınmamalıdır [2].
+- Nicotra Gebhardt'ın kayışlı AT serisi fanlarında kama kayışlar için doğru gerginlik, üreticinin belirttiği test kuvvetinin kayış açıklığının metresi başına 16 mm sehim oluşturduğu noktada elde edilir [2].
+- Nicotra Gebhardt'ın kayışlı AT serisi fanlarındaki rulmanlar 40.000 çalışma saatlik nominal ömür için tasarlanmıştır [2].
+
+## Fiyatı belirleyen etkenler
+
+Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifleri karşılaştırırken aşağıdaki seçimlerin aynı olup olmadığına bakın.
+
+- **Fan tipi ve kanat biçimi.** Öne eğik, radyal ve geriye eğik kanatlar ile aksiyel türler farklı verim aralıklarına sahiptir [1].
+- **Debi ve basınç aralığı.** Aynı seri içinde boy büyüdükçe debi aralığı değişir; örneğin RDH serisinde 0180–0560 boyları 90.000 m³/h'e, 0630–1000 boyları 290.000 m³/h'e kadar çıkar [3].
+- **Tahrik biçimi.** Kayışlı tahrik hız ayarında esneklik sunar, doğrudan tahrik daha basit bir düzendir [1].
+- **Çark malzemesi.** Örneğin SEAT serisinde çark enjeksiyon kalıplı PPH'den üretilir [10].
+- **Özel kullanım belgesi.** Vortice'ye göre, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre belgelendirilir ve F300/120 ya da F400/120 gibi sınıflarla sunulur [7].
+- **Kurulum kalemleri.** Esnek bağlantı ve koruyucu tertibatlar kurulumun parçasıdır [2].
+
+## Fan seçiminde izlenecek yol
+
+1. Sistemin gerektirdiği debiyi ve toplam basıncı belirleyin; sistem eğrisini çıkarın [1].
+2. Havanın temiz mi, tozlu ya da parçacıklı mı olduğuna göre kanat tipini seçin [1].
+3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
+4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
+5. Fan girişinde ve çıkışında sistem etkisi yaratacak dirsekleri azaltın [1].
+6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [7]; patlayıcı ortam söz konusuysa, tüzüğün kapsam dışı koşulu fanın yalnız o ortamda çalışmak üzere belirtilmiş ve bu amaçla özel olarak tasarlanıp pazarlanmış olması olduğundan, bunu gösteren belgeyi üreticiden isteyin [8].
+
+## Sık sorulan sorular
+
+### Radyal fan mı daha verimli, aksiyel fan mı?
+
+Tipe bağlıdır. Havayarı profilli geriye eğik radyal fanlarda verim %85'in üzerine çıkabilir [1]. Havayarı profilli, küçük boşluklu kılavuz kanatlı aksiyel fanlar da %85'e kadar verime ulaşabilir [1]. Öne eğik radyal fanlarda verim %55–65 aralığındadır [1].
+
+### Aksiyel fan kanala takılır mı?
+
+Tüp tipi aksiyel fanlar kanallı HVAC tesisatına uygundur [1]. Vortice'nin Industrial Ventilation kataloğundaki MPC HP ve MPC ED serileri de uzun gövdeli kanal tipi aksiyel fanlardır [6].
+
+### Fan eğrisindeki verim her devirde geçerli mi?
+
+Nicotra Gebhardt'ın kayışlı AT serisinin eğrilerinde verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
+
+### Fazla büyük fan seçmenin zararı ne?
+
+Büyük seçilen fan en yüksek verim noktasından uzakta çalışabilir; çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1].
+
+### Fanlar için 327/2011 sayılı AB tüzüğü hâlâ geçerli mi?
+
+Yürürlükten kalktı; ancak iki sınırlı istisna sürer. (EU) 2024/1834 sayılı tüzük, 327/2011'i 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [8]. 2025/2481 sayılı değişiklik tüzüğüne göre, yeni tüzüğün Ek II'sinin ilk iki paragrafına uygun olarak, eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [11]. Türkiye'de ise tebliğe göre, tebliğin Ek II'sinin ilk iki paragrafına uygun olarak, 24 Temmuz 2027'de yürürlükten kalkacak olan eski tebliğin ekleri, diğer ürünlere entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [9].
+
+### Fan teklifi için hangi bilgileri paylaşmalıyım?
+
+Gerekli debi ve toplam basınç [1], havanın temiz ya da parçacıklı olup olmadığı [1], taşınan havanın sıcaklığı ve yoğunluğu [1][2], montaj yerindeki bağlantı düzeni [1] ve patlayıcı ortam ya da duman tahliyesi gibi özel bir kullanım olup olmadığı [7][8] teklifin doğru fana dayanmasını sağlar.
+
+## Kaynaklar
+
+Üretici belgelerinde verilen sayfa numaraları PDF dosyasındaki sayfa sırasıdır; basılı sayfa numarasından farklı olabilir.
+
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 6–9, 11, 13, 17–24, 32–34, 80 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 11.10.2026)
+2. Nicotra Gebhardt, Centrifugal Fans AT, belt driven, Issue 2.5 EN, 2013, s. 5, 70–71, 85, 99, 101 (üretici belgesi).
+3. Nicotra Gebhardt, Centrifugal Fans RDH, belt driven, Issue 2.5 EN, 2013, s. 5, 7 (üretici belgesi).
+4. Nicotra Gebhardt, Centrifugal Fans ADH, belt driven, Issue 2.5 EN, 2013, s. 5, 7 (üretici belgesi).
+5. Nicotra Gebhardt, Centrifugal Fans direct driven with scroll, DD range, Issue 1.3, 2012, s. 6, 9 (üretici belgesi).
+6. Vortice, Industrial Ventilation kataloğu, s. 4, 44–45, 58, 64 (üretici belgesi).
+7. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
+8. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, md. 1(3), 9, 10, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
+9. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2), md. 1, 10–12, geçici md. 1. https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 11.10.2026)
+10. SEAT Ventilation, SEAT Series — Specifications, s. 1 (üretici belgesi).
+11. Avrupa Komisyonu, Commission Regulation (EU) 2025/2481 (2024/1834'ü değiştiren tüzük), md. 1(4), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2481 (erişim 11.10.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Örnek hesaptaki varsayım değerleri dışında, yazıdaki verim, debi ve basınç değerleri üretici belgelerinde ve kaynak rehberlerde verilen değerlerdir; kendi sisteminizdeki sonuç, montaj koşullarına ve hava yoğunluğuna göre farklı olabilir. Kurulum, devreye alma ve bakım yetkili ve eğitimli personel tarafından yapılmalıdır. Yasal şartlara ilişkin bilgiler yayın tarihindeki resmî metinlere dayanır; uygulamadan önce güncel metin kontrol edilmelidir.
 `,
       },
     },

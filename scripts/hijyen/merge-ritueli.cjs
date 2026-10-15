@@ -354,9 +354,38 @@ function degerlendir(girdi) {
   return { maddeler, kirmizi: maddeler.filter((m) => !m.gecti).length }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// OKUMA SORUSU (ARC-110, OPS-120 madde 2) — MADDE DEĞİL, hatırlatma.
+// ─────────────────────────────────────────────────────────────────────────────
+// 2026-10-12 13:07 olayı: kanca/MCP PR'ı farkı okunurken "başka sürümün canlı sage.db'ye
+// ulaşması" sorusu HİÇ sorulmadı; kod kapısı (ARC-103) sonradan korudu, gözden geçirme sorusu
+// yoktu. Ritüelin beş maddesi ÖLÇER; okuyanın aklına gelmesi gereken soru ölçülmez. Bu yüzden
+// değişen dosyalar kanca / ayar / MCP sınıfındaysa çıktıya SABİT bir soru satırı basılır.
+// Kırmızı VERMEZ (merge kararını değiştirmez), yalnız okuyana hatırlatır; sınıf dışında basılmaz.
+
+/** Sorunun sorulacağı yol sınıfı: önek eşleşir (`.claude/settings*` için ad öneki). */
+const OKUMA_SORUSU_YOLLARI = [
+  '.claude/hooks/',
+  '.claude/settings',
+  '.mcp.json',
+  'tools/wrongstack-mcp/',
+  'scripts/board/',
+]
+
+const OKUMA_SORUSU_METNI =
+  'OKUMA SORUSU: bu degisiklik baska surumun/agacin canli veriye ulasmasini mumkun kiliyor mu? ' +
+  '(cevap PR govdesine yazilir)'
+
+/** Değişen yollardan en az biri kanca/ayar/MCP sınıfındaysa true. Saf fonksiyon. */
+function okumaSorusuGerekli(dosyalar) {
+  if (!Array.isArray(dosyalar)) return false
+  return dosyalar.some((d) => typeof d === 'string' &&
+    OKUMA_SORUSU_YOLLARI.some((onek) => d.replace(/\\/g, '/').startsWith(onek)))
+}
+
 module.exports = {
-  turetCekirdek, workflowCoz, degerlendir, onayGecerli,
-  DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI,
+  turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli,
+  DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -462,6 +491,13 @@ if (require.main === module) {
     const geride = git(['rev-list', '--count', 'origin/' + dal + '..origin/master'])
     yaz('  bilgi   geride ' + geride + ' commit' + (geride !== '0' ? '  ⚠taban tazelemesi gerekebilir' : ''))
   } catch { /* bilgi satırı, ölçüt değil */ }
+
+  // ARC-110: kanca/ayar/MCP sınıfı PR'da sabit okuma sorusu. Madde DEĞİL: kırmızı sayısına
+  // girmez, çıkış kodunu değiştirmez; ölçülemezse sessizce atlanır (hatırlatma, kapı değil).
+  try {
+    const degisen = git(['diff', '--name-only', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+    if (okumaSorusuGerekli(degisen)) yaz('  ' + OKUMA_SORUSU_METNI)
+  } catch { /* hatırlatma, ölçüt değil */ }
 
   yaz('')
   yaz(kirmizi === 0

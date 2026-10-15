@@ -441,3 +441,92 @@ describe('INV-LINEAR-YORUM-9: --durum kipi tek satır JSON, çıkış 0', () => 
     expect(r.stdout + r.stderr).not.toContain(gizli)
   })
 })
+
+// ---- ARC-51 kök sebebi (ölçüm 2026-10-11): OPS'un Design'a thread yanıtı "yanıtsız" sayılmaz ----
+interface DugumKimlikli extends Dugum {
+  id: string
+  parent?: { id: string } | null
+}
+function tasi(d: Dugum, id: string, parent: string | null = null, govde?: string): DugumKimlikli {
+  return { ...d, id, parent: parent ? { id: parent } : null, ...(govde ? { body: govde } : {}) }
+}
+
+describe('INV-LINEAR-YORUM-13: OPS thread yanıtı konuşmayı kapatır, yanıtsız sayılmaz (ARC-51)', () => {
+  it('olay verisi: Design yazdı, OPS AYNI konuya thread yanıtı verdi, 2 gün geçti → yanıtsız 0, seviye iyi', () => {
+    const d = tasi(design(50), 'c-design')
+    const yanit = tasi(ops(49.9), 'c-ops', 'c-design', '**OPS → DESIGN-MENU:** Dört sapmayı iş olarak açtım.\n\n— OPS')
+    const s = m.durumHesapla([yanit, d], SIMDI)
+    expect(s.yanitsizSayi).toBe(0)
+    expect(s.seviye).toBe('iyi')
+    expect(s.ozet).not.toContain('yanıtsız')
+  })
+
+  it('üst düzey (thread olmayan) OPS emri hâlâ yanıtsız sayılır', () => {
+    const s = m.durumHesapla([tasi(design(50), 'c-design'), tasi(ops(30), 'c-ops')], SIMDI)
+    expect(s.yanitsizSayi).toBe(1)
+    expect(s.seviye).toBe('kirmizi')
+  })
+
+  it('ebeveyni OPS olan thread yanıtı (OPS kendi yorumuna) yanıtsız sayılır', () => {
+    const s = m.durumHesapla(
+      [tasi(design(50), 'c-design'), tasi(ops(40), 'c-ops-1'), tasi(ops(30), 'c-ops-2', 'c-ops-1')],
+      SIMDI,
+    )
+    expect(s.yanitsizSayi).toBe(2)
+  })
+
+  it('ebeveyni pencerede olmayan thread yanıtı eski temkinli davranışla sayılır', () => {
+    const s = m.durumHesapla([tasi(design(50), 'c-design'), tasi(ops(30), 'c-ops', 'c-yok')], SIMDI)
+    expect(s.yanitsizSayi).toBe(1)
+  })
+
+  it('açık "CEVAP BEKLİYOR" işareti taşıyan thread yanıtı yeni istek sayılır', () => {
+    const govde = '**OPS → DESIGN-MENU:** Karar 329 = C. CEVAP BEKLİYOR: seçici sayfasını güncelle.\n\n— OPS'
+    const s = m.durumHesapla([tasi(design(50), 'c-design'), tasi(ops(30), 'c-ops', 'c-design', govde)], SIMDI)
+    expect(s.yanitsizSayi).toBe(1)
+    const kucuk = govde.replace('CEVAP BEKLİYOR', 'cevap bekliyor')
+    expect(m.durumHesapla([tasi(design(50), 'c-design'), tasi(ops(30), 'c-ops', 'c-design', kucuk)], SIMDI).yanitsizSayi).toBe(1)
+  })
+
+  it('kapanış yanıtından SONRA yazılan üst düzey OPS emri yine yanıtsız sayılır', () => {
+    const s = m.durumHesapla(
+      [tasi(design(50), 'c-design'), tasi(ops(49), 'c-ack', 'c-design'), tasi(ops(30), 'c-yeni-emir')],
+      SIMDI,
+    )
+    expect(s.yanitsizSayi).toBe(1)
+    expect(s.enEskiYanitsizYasMs).toBe(30 * SAAT)
+  })
+
+  it('düz thread (canlı şekil): yanıtların parent\'ı KÖK; Design yanıtının hemen ardındaki OPS "alındı"sı kapanıştır', () => {
+    const s = m.durumHesapla(
+      [
+        tasi(ops(60), 'kok'),
+        tasi(design(50), 'd-yanit', 'kok'),
+        tasi(ops(49.9), 'ops-alindi', 'kok', '**OPS → DESIGN-MENU · 07:26Z alındı**\n\n— OPS'),
+      ],
+      SIMDI,
+    )
+    expect(s.yanitsizSayi).toBe(0)
+    expect(s.seviye).toBe('iyi')
+  })
+
+  it('aynı thread\'de OPS art arda iki kez yazarsa ikincisi (Design arada yanıtlamadı) yanıtsız sayılır', () => {
+    const s = m.durumHesapla(
+      [tasi(design(50), 'c-d'), tasi(ops(49), 'ops-1', 'c-d'), tasi(ops(30), 'ops-2', 'c-d')],
+      SIMDI,
+    )
+    expect(s.yanitsizSayi).toBe(1)
+    expect(s.enEskiYanitsizYasMs).toBe(30 * SAAT)
+  })
+
+  it('kimliksiz/ebeveynsiz düğümler (eski şekil) davranışı DEĞİŞTİRMEZ', () => {
+    const s = m.durumHesapla([design(40), ops(30), ops(2)], SIMDI)
+    expect(s.yanitsizSayi).toBe(2)
+  })
+
+  it('sorgu ebeveyn ve kimlik alanlarını ister (DURUM_SORGU)', () => {
+    // Sorgu dizgisi sahte fetch gövdesinden okunur: alan istenmezse kural canlıda hiç çalışmaz.
+    const kaynak = require_('node:fs').readFileSync(BETIK, 'utf8') as string
+    expect(kaynak).toMatch(/nodes \{ id createdAt body parent \{ id \} project \{ id name \} \}/)
+  })
+})

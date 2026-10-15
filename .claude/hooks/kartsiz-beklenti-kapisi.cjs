@@ -33,6 +33,41 @@ const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 
 const KART_NO = new RegExp('\\b(?:' + ONEKLER.join('|') + ')-\\d{1,5}\\b', 'g')
 const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi
 
+// ── ARC-95 (10-12): İKİNCİ DENETİM — Recep'e bağlanan kartın açıklaması "RECEP YETKİSİ: <gerekçe>" satırı taşır ──
+// Olay: yetkisi zaten verilmiş iş tekrar tekrar Recep'e soru olarak geldi; kural yazılıydı ama kapı yoktu (karar 317 ailesi).
+// Kural: mesajda istek olarak anılan ve Recep'e bağlı (Sen/Recep ya da recep-bekliyor/karar-bekliyor) her açık kart, açıklamasında bir
+// satır "RECEP YETKİSİ: <gerekçe>" taşır; gerekçe YALNIZ aşağıdaki altı sınıftan biridir. Satır yoksa ya da gerekçe liste dışıysa KIRMIZI.
+// Cetvel: docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ. Kanban betiği ikinci kez (--detay) çağrılır; okunamazsa fail-open ama sessiz değil.
+// Satır başı çapası biçim işaretlerini tanır (OPS 10-12 okuması): düz, "**RECEP YETKİSİ:** x", "- RECEP YETKİSİ: x", "> RECEP YETKİSİ: x".
+// Başında madde/alıntı işareti (> - * +), kalın/altı çizili (** __) ve iki noktanın iki yanında kalın kapanışı serbesttir.
+const YETKI_SATIRI = /^[ \t]*(?:[>\-*+][ \t]*)*(?:\*\*|__)?[ \t]*RECEP[ \t]+YETK[İIiı]S[İIiı][ \t]*(?:\*\*|__)?[ \t]*:[ \t]*(?:\*\*|__)?[ \t]*(\S.*)$/gim
+const YETKI_GEREKCELERI = 'canlı yazım · migration birleştirme · gerçek para · geri alınamaz silme · yeni görünüm/iddia/yapı kararı · hesap/ayar dosyası'
+// Karşılaştırma ASCII'ye indirgenmiş metinle yapılır (ı/İ/ş/ğ/ü/ö/ç yazımı ayrımı bozmasın); gerekçenin devamı (" — ayrıntı") serbesttir.
+const asciiKucuk = (s) =>
+  String(s).toLocaleLowerCase('tr').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
+const YETKI_KALIPLARI = [
+  // "canlı yazım", "canlı veritabanı yazımı", "canlı veritabanına yazım" (filo-ortak.md adlandırması).
+  /^canli\s+(?:veritaban[a-z]*\s+)?(?:yazim[a-z]*|yazma)\b/,
+  /^migration\s+birlestirme\b/,
+  // "migration'lı PR birleştirme", "migration içeren dalın merge'ü" (filo-ortak.md: "Migration'lı PR birleştirme" / "migration içeren PR").
+  /^migration['’`]?li\s+(?:pr\s+)?birlestirme\b/,
+  /^migration\s+iceren\s+(?:dal|pr|branch)[a-z]*\s+(?:merge|birlestirme)/,
+  /^gercek\s+para\b/,
+  /^geri\s+alinamaz\s+silme\b/,
+  /^yeni\s+(?:gorunum|iddia|yapi)(?:\s*\/\s*(?:gorunum|iddia|yapi))*\s+karari\b/,
+  /^(?:hesap|ayar)(?:\s*\/\s*(?:hesap|ayar))*\s+dosyasi\b/,
+]
+
+/** Kartın açıklamasından: { durum: 'yok' | 'liste-disi' | 'tamam', gerekce }. Birden çok satırda biri geçerliyse 'tamam'. */
+function yetkiDegerlendir(aciklama) {
+  const gerekceler = []
+  for (const m of String(aciklama || '').matchAll(YETKI_SATIRI)) gerekceler.push(m[1].trim())
+  if (gerekceler.length === 0) return { durum: 'yok', gerekce: '' }
+  const gecen = gerekceler.find((g) => YETKI_KALIPLARI.some((k) => k.test(asciiKucuk(g).replace(/^[\s"'«(\-–—]+/, ''))))
+  if (gecen !== undefined) return { durum: 'tamam', gerekce: gecen }
+  return { durum: 'liste-disi', gerekce: gerekceler[0] }
+}
+
 // Başlık: satır başında "Senden istenen(ler)/beklenen(ler)" (kalın, başlık işaretli ya da düz).
 const BASLIK = /^\s*(?:#{1,6}\s*)?(?:[*_]{1,2})?\s*senden\s+(?:istenen|beklenen)(?:ler)?\b[\s*_:.\-–—]*(.*)$/i
 // Tek satırlık kalıplar: kendisi bir istektir, aynı satırda kart no gerekir.
@@ -183,6 +218,27 @@ function degerlendir(metin, kartlariDogrula) {
         sorunlar.push('kart ' + k + " yok, kapalı ya da Recep'e bağlı değil (sahibi Sen ya da etiket recep-bekliyor/karar-bekliyor olmalı)")
       }
     }
+    // ARC-95: ikinci denetim yalnız birinci denetimi geçen (açık ve Recep'e bağlı) kartlara uygulanır; Recep'e bağlı olmayan kart etkilenmez.
+    // `yetkiler` yoksa (enjekte edilen eski doğrulayıcı) ikinci denetim yapılmaz.
+    if (d.yetkiler instanceof Map) {
+      for (const k of benzersiz) {
+        if (!d.gecerli.has(k)) continue
+        const y = d.yetkiler.get(k) || d.yetkiler.get(String(k).toLowerCase())
+        if (y === undefined) continue // ayrıntısı okunamayan kart: aşağıdaki yetkiOlculemedi notu görünür kılar
+        if (y.durum === 'yok') {
+          sorunlar.push(
+            'kart ' + k + ': "RECEP YETKİSİ: <gerekçe>" satırı yok — bu işin yetkisi zaten verilmiş, Recep\'e SORMA, yap; ' +
+              "gerçekten Recep'in kararıysa kartın açıklamasına gerekçeyi yaz (" + YETKI_GEREKCELERI + ')',
+          )
+        } else if (y.durum === 'liste-disi') {
+          sorunlar.push('kart ' + k + ': RECEP YETKİSİ gerekçesi listede yok ("' + y.gerekce.slice(0, 50) + '") — izinli: ' + YETKI_GEREKCELERI)
+        }
+      }
+    }
+    // Ayrıntı okuması çöktüyse `yetkiler` hiç gelmez: denetim SESSİZCE atlanmaz, ölçülemedi diye görünür kılınır (fail-open, sessiz değil).
+    if (sorunlar.length === 0 && d.yetkiOlculemedi) {
+      return { durum: 'olculemedi', sorunlar, kartlar: benzersiz, olculemedi: 'RECEP YETKİSİ denetimi ölçülemedi: ' + d.yetkiOlculemedi }
+    }
   }
   return { durum: sorunlar.length > 0 ? 'blok' : 'temiz', sorunlar, kartlar: benzersiz }
 }
@@ -215,13 +271,51 @@ function kanbandanDogrula(kartlar) {
     if (!task) continue
     if (task.status === 'completed' || task.status === 'archived' || task.status === 'failed' || task.columnId === 'done') continue
     const etiketler = (task.labels || []).map((l) => String(l).toLowerCase())
-    const sen = String(task.assignee || '').trim().toLowerCase() === 'sen'
+    // "Sen" kokpit/Kanban'daki Recep takma adıdır; ARC-95: atananı doğrudan "Recep" olan kart da Recep'e bağlıdır.
+    const sen = ['sen', 'recep'].includes(String(task.assignee || '').trim().toLowerCase())
     if (!(sen || etiketler.includes('recep-bekliyor') || etiketler.includes('karar-bekliyor'))) continue
     const no = (String(task.title || '').match(/^([A-ZÇĞİÖŞÜ]+-\d+)/) || [])[1]
     if (no) gecerli.add(no)
     gecerli.add(String(task.id).toLowerCase())
   }
-  return { gecerli }
+
+  // ARC-95 ikinci denetim: Recep'e bağlı kartların açıklaması TAM okunur (--detay; listede açıklama 200 karakterde kesilir).
+  const yetkiKartlari = kartlar.filter((k) => gecerli.has(k) || gecerli.has(String(k).toLowerCase()))
+  if (yetkiKartlari.length === 0) return { gecerli }
+  const arg2 = [kanbanBetigi(), '--detay']
+  for (const k of yetkiKartlari) arg2.push('--id', k)
+  const r2 = spawnSync(process.execPath, arg2, { encoding: 'utf8', timeout: 8000, maxBuffer: 8 * 1024 * 1024 })
+  if (r2.error || r2.status !== 0) {
+    return { gecerli, yetkiOlculemedi: 'ayrıntı okuması çalışmadı (' + (r2.error ? r2.error.code || r2.error.message : 'çıkış ' + r2.status) + ')' }
+  }
+  let govde2
+  try {
+    govde2 = JSON.parse(String(r2.stdout).trim())
+  } catch {
+    return { gecerli, yetkiOlculemedi: 'ayrıntı cevabı çözülemedi' }
+  }
+  if (!govde2 || govde2.ok === false || !Array.isArray(govde2.tasks)) {
+    return { gecerli, yetkiOlculemedi: 'ayrıntı okunamadı' + (govde2 && govde2.hata ? ': ' + String(govde2.hata).slice(0, 80) : '') }
+  }
+  const yetkiler = new Map()
+  let aciklamasiz = 0
+  for (const t of govde2.tasks) {
+    const task = t && t.task
+    if (!task) continue
+    if (typeof task.description !== 'string') {
+      aciklamasiz++
+      continue
+    }
+    const y = yetkiDegerlendir(task.description)
+    const no = (String(task.title || '').match(/^([A-ZÇĞİÖŞÜ]+-\d+)/) || [])[1]
+    if (no) yetkiler.set(no, y)
+    yetkiler.set(String(task.id).toLowerCase(), y)
+  }
+  return {
+    gecerli,
+    yetkiler,
+    ...(aciklamasiz > 0 ? { yetkiOlculemedi: aciklamasiz + ' kartın açıklaması okunamadı' } : {}),
+  }
 }
 
 function durumDizini() {
@@ -312,7 +406,11 @@ function engelMetni(sorunlar, kaynak) {
     sorunlar.join(' · ') + '. ' +
     "Şimdi: Kanban'da (kendi panonda) kartı aç (atanan Sen ya da etiket recep-bekliyor; karardıysa karar-bekliyor), " +
     'numarasını ilgili maddenin sonuna yaz ("(kart OPS-61)") ve mesajı yeniden yaz. ' +
-    'Gerçekten kart gerekmiyorsa mesaja tek satır ekle: "Kartsız: <sebep>" (sebep kayda düşer).'
+    'Gerçekten kart gerekmiyorsa mesaja tek satır ekle: "Kartsız: <sebep>" (sebep kayda düşer).' +
+    (sorunlar.some((s) => s.includes('RECEP YETKİSİ'))
+      ? ' RECEP YETKİSİ sorunu: yetkisi verilmiş işi Recep\'e soru olarak getirme, işi yap; kartı gerçekten Recep\'e bağlıysa açıklamaya ' +
+        '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ).'
+      : '')
   )
 }
 
@@ -408,6 +506,6 @@ function main() {
   })
 }
 
-module.exports = { maddeleriCikar, degerlendir, kartBaslari, kanbandanDogrula, turuOku, ONEKLER }
+module.exports = { maddeleriCikar, degerlendir, kartBaslari, kanbandanDogrula, turuOku, yetkiDegerlendir, ONEKLER }
 
 if (require.main === module) main()

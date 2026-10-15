@@ -204,6 +204,24 @@ describe('INV-SON-KONUSMA-1 · Stop ve PreCompact olayları', () => {
     expect(yok.status).toBe(0)
   })
 
+  it('ARC-131: proje dizininde memory/ YOKSA (pencere worktree düzeni) PreCompact klasörü oluşturur ve dökümü yazar', () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'son-konusma-memorysiz-'))
+    const kayit = path.join(d, SID + '.jsonl')
+    fs.writeFileSync(kayit, [recep('worktree sorusu', '2026-10-14T09:00:00Z'), cevap('worktree cevabı', 'w1')].map((s) => JSON.stringify(s)).join('\n') + '\n')
+    const memory = path.join(d, 'memory')
+    expect(fs.existsSync(memory)).toBe(false)
+
+    const r = kos(kayit, 'PreCompact')
+    expect(r.status).toBe(0)
+    expect(r.stdout, 'ENOENT ile BASARISIZ olmamalı').toContain('[son-konusma] dokum yazildi')
+    expect(r.stdout).not.toContain('BASARISIZ')
+    const hedef = dk.dosyaYolu(memory, SID)
+    expect(fs.readFileSync(hedef, 'utf8')).toContain('worktree sorusu')
+    expect(fs.existsSync(path.join(memory, `son-konusma-${SID}.yaz.md`))).toBe(false)
+    // Açılış kancasının okuyucusu aynı klasörden dökümü bulur (dönüşte "dokum YOK" uyarısı çıkmaz).
+    expect(dk.enjeksiyon(memory, SID)).toContain('worktree sorusu')
+  })
+
   it('dokumGerekli: dosya yok ya da kayıttan eskiyse true', () => {
     const { memory, kayit } = proje()
     const hedef = dk.dosyaYolu(memory, SID)

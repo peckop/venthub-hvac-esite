@@ -1,13 +1,13 @@
 ---
 name: wrongstack-kanban
-description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu, bu iş daha önce yapıldı mı, önceki çalışma. WrongStack 1.0.26 uyarlaması."
+description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu, bu iş daha önce yapıldı mı, önceki çalışma. WrongStack 1.1.0 uyarlaması."
 category: coordination
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/wrongstack-kanban/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı; YETENEK 2026-10-03 (YTN-12) önce-ara iki arama + kullanılmayan okuma yetenekleri. Kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/wrongstack-kanban/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı; YETENEK 2026-10-03 (YTN-12) önce-ara iki arama + kullanılmayan okuma yetenekleri. Kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/wrongstack-kanban/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/wrongstack-kanban/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -18,6 +18,7 @@ metadata:
 | Managed board / lease-fenced dispatch | **YETENEK panosu 10-01 09:39'dan beri yönetilen** (YTN-6 pilotu: kapanış `mark_assignment` ile, kapı araçta; ölçüm `docs/audits/skill-kanban-tam-kapasite-2026-10-03.md`). Diğer panolar yönetilmeyen (unmanaged); aşağıdaki "yönetilmeyen" anlatımı onlar içindir: `start_task` cevabı "This board is not in managed lifecycle mode" der (10-01 ölçüldü). Kaynak gövdedeki "managed" zorunlulukları (tek aşama kuralı, lease koruması) burada bağlanmaz; ARAÇ'ın 09-28 ölçümü: `transition_task` reddedilir, `move_task` kullanılır |
 | Dönüş boyutu | Her yazma panonun tamamını döndürür; bu bir **pano boyutu** işidir (aşağıda "Maliyet kuralı"). Yama diskte uygulanmıştır ama etkisi 3 kartlık panoda görünmedi (10-01) |
 | Linear | **Donuk** (karar 219): yeni kayıt açılmaz, mevcut kayıt silinmez ya da arşivlenmez. Kaynak gövdede ve eski kurallarda "Linear" geçen yerler artık "Kanban" okunur |
+| `mailbox-bridge` atfı | Bizde yok ve **kullanılmaz** (HTTP köprüsü; bizde kapalı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -69,6 +70,7 @@ metadata:
    2. `move_task` ile `targetColumnId: done`. **`transition_task` bu panolarda `REFUSED` verir** ("Strict Kanban Agent transitions require a managed board"); denemeye gerek yok.
    - ⛔**`move_task` ile Done'da KAPI YOKTUR (DENEME kartı, 10-01 ölçüldü):** (a) kartta hiç kanıt komutu yokken `move_task` Done'a taşıdı, `status: completed`; (b) kartta koşmamış (`pending`) bir kanıt komutu varken de kart Done'da kaldı; (c) `verify_completion` `PASSED` verdikten sonra bile `transition_task` aynı hatayı verdi (`[REFUSED] Strict Kanban Agent transitions require a managed board`, `managed-policy-invalid`, alan `lifecycle.mode`): sebep karttaki kanıt değil, panonun yönetilen olmamasıdır. Yani bu panolarda kanıt kuralı **araç değil disiplin** işidir.
    - **Sıra bağlayıcıdır: önce `verify_completion`, rapor `passed` değilse `move_task` ile Done'a TAŞIMA.** Kanıtsız ya da `needs_human` kartı Done'a çeken kişi kuralı çiğnemiş olur, araç engellemez. "bitti, tamam, çalışıyor" gibi tek kelimelik özet kanıt değildir. Kapanışta PR numarası ve birleşme kanıtı kartın notunda kalır.
+   - **`verify_completion` `needs_human` verirse bu bir arıza değildir (ARC-107 ölçümü, 16 pano 18 kart; WrongStack 1.1.0'da davranış değişti, 1.0.26'da bekleyen manual kontrol `passed` görünürdü):** kanıt komutu yetmez, insan onayı bekliyor. Onayın **kaydını** (kimin verdiği, nerede, ne zaman) karta `add_note` ile yaz, manual kontrolü `update_check` ile `passed` yap, sonra Done. Onay sözünün kendisi başka pencereden taşınmaz (`wrongstack-mailbox-mcp` kural 4).
    - Gerçek kapı için araçta `adopt_managed_lifecycle` eylemi var; sonucu YTN-4 (atılabilir pano) ve YTN-6/YTN-12 (YETENEK panosu, canlı pilot) ölçtü; geçiş kararı OPS'undur. Yönetilmeyen panoda Done kapısı disiplindir.
 7. **Hata dalları** (kural 14): panoya yazma başarısız olursa söyle ve işe devam et (pano işi izler, iş panoyu beklemez); kanıt komutu kırmızıysa kart Done'a GİTMEZ, `record_activity` ile `blocker` yazılır; doğrulayıcı komutu `needs_human` verirse komutun bu kuralları ihlal edip etmediğine bak (aşağıda C).
 
@@ -113,6 +115,11 @@ Haiku 200K bağlamında proje skill'lerinin çoğu açıklamasız (yalnız adıy
 
 
 # WrongStack Kanban
+
+## Selection card
+- Task: Operate WrongStack task-board lifecycle.
+- Start: Identify the host, protocol, enabled integration and authorization scope.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## What the board is for
 
@@ -251,6 +258,14 @@ filled in as it becomes known.
 - [ ] Completion went through the verifier; "Done" means the verifier actually ran
 - [ ] Todo/task/plan rows preserve `kanbanBoardId` / `kanbanTaskId` bindings in full-list updates
 - [ ] Card count scaled to the size of the work; no invented subtasks
+
+## Board identity and lost leases
+
+Persist exact task/board/lease ids from current results, not titles or old notes.
+When a heartbeat or mutation loses its expected lease, stop acting as that
+assignment's owner and reread state; do not continue mutating under a stale claim.
+Keep work evidence tied to the checked source snapshot. A board persistence
+failure can be reported without pretending the completion gate accepted the card.
 
 ## Related skills
 

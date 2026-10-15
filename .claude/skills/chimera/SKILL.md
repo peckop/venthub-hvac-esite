@@ -1,13 +1,13 @@
 ---
 name: chimera
-description: "Değişen dosyaları SALT-OKUMA ile inceleyip şiddet sıralı kısa bir hata raporu çıkarır (düzeltme yazmaz). Tetik: \"chimera\", \"yaptığımız değişiklik güvenli mi\", \"merge öncesi gözden geçir\", \"neyi kaçırdık\", \"diff'e bak\". WrongStack 1.0.26 uyarlaması."
+description: "Değişen dosyaları SALT-OKUMA ile inceleyip şiddet sıralı kısa bir hata raporu çıkarır (düzeltme yazmaz). Tetik: \"chimera\", \"yaptığımız değişiklik güvenli mi\", \"merge öncesi gözden geçir\", \"neyi kaçırdık\", \"diff'e bak\". WrongStack 1.1.0 uyarlaması."
 category: audit
 metadata:
-  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/chimera/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 1) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  kaynak: "WrongStack @wrongstack/core 1.1.0 skills/chimera/SKILL.md (MIT lisansı, telif WrongStack)"
+  uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 1) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/chimera/SKILL.md`, MIT lisansı. Aşağıdaki
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/chimera/SKILL.md`, MIT lisansı. Aşağıdaki
 > "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
@@ -19,6 +19,7 @@ metadata:
 | `codebase-incoming-calls` | `codebase_symbol_graph` ya da `codegraph_explore`; imza değişiminde `graphify affected "sembol()"` (parantez şart) |
 | runtime'ın `review-reports.jsonl` kalıcılığı, `cascadeOn`, `chimera.review_complete` | **Yok.** Rapor kalıcılığı ve takip işi bizde müdürün işidir |
 | `bug-hunter`, `security-scanner`, `typescript-strict`, `api-design`, `testing`, `output-standards` | `bug-hunter` paketten gelir (WrongStack alımı); `security-scanner` sonraki PR; `testing` paketten gelir; diğerleri bizde yok, atıf yok sayılır |
+| `auto-review` atfı | Bizde yok; atıf yok sayılır. Yerine `code-review` ve `chimera` |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -34,6 +35,11 @@ metadata:
 
 
 # Chimera — Post-Session Code Guardian
+
+## Selection card
+- Task: Review session changes through the read-only guardian.
+- Start: Identify the scope and obtain an executable before-proof or review evidence.
+- Finish: apply the acceptance checks below; report observed results and unresolved constraints.
 
 ## Overview
 
@@ -157,14 +163,14 @@ peer, a session group, `to="*"`, or `to="all"`.
 ## Follow-up behavior
 
 Review completion is terminal for you: persist the report, notify every UI, and
-stop. You never start fixes yourself. When the user has opted in with
-`cascadeOn` (`high` or `critical`; default `off`), the runtime — not you — may
-spawn follow-up fix agents for verified findings at or above that severity.
+stop. You never start fixes yourself. When verified findings meet the
+`cascadeOn` threshold (`high` or `critical`; default `high`), the runtime — not
+you — may spawn follow-up fix agents for findings at or above that severity.
 
 The execution owner persists every completed review and its parsed findings to
 the project-scoped `review-reports.jsonl` and `review-findings.jsonl` stores
 before publishing `chimera.review_complete`. This durability contract is
-independent of whether the optional post-session `wstack-chimera` plugin is
+independent of whether the post-session `wstack-chimera` plugin is
 enabled; auto-review-only sessions must retain the same report history.
 Mutations and compaction use cross-process file locks. When the combined stores
 reach 8 MiB, retention compaction is checked at most once per 24 hours and uses
@@ -172,105 +178,13 @@ atomic replacement so concurrent clients cannot lose appended review data.
 
 ---
 
-## Output format
+## Report contract
 
-Return one structured report. The runtime stores the full text outside the main
-chat transcript and shows only a compact availability notice. Use this structure:
+Before producing the final review, [Read the detailed workflow](references/report-contract.md).
 
-```
-## 🦂 Chimera Review — <session title or date>
+## Acceptance checks
 
-### Critical (N)
-1. [BUG] `path/file.ts:42` — null deref on `user.name` when `user` is undefined
-   → Add guard: `if (!user) throw new NotFoundError()`
-
-### High (N)
-2. [SEC] `path/config.ts:8` — plaintext API key in source
-   → Move to env var via `process.env.MY_API_KEY`
-
-### Medium (N)
-3. [TYPE] `path/helper.ts:15` — `as any` cast silences type error
-   → Replace it with validation or an assertion function at the trust boundary
-
-### Summary
-- Files reviewed: N
-- Findings: C critical, H high, M medium
-- Clean files: N
-
-Duration: 31s
-
-<nextsteps>
-1. Fix null deref in path/file.ts:42
-2. Fix plaintext API key in path/config.ts:8
-3. Fix unsafe any cast in path/helper.ts:15
-</nextsteps>
-```
-
-If you find **nothing** worth flagging: write a single line.
-
-```
-## 🦂 Chimera Review — all clear ✅
-No issues found in N changed files across M packages.
-```
-
-An all-clear is a legitimate result, not a failure to find something. Sessions
-that touched three lines of config should usually come back clean. Manufacturing
-a Medium to justify the run is the fastest way to make the report worthless.
-
-### Tags
-
-Use a short uppercase tag in brackets. The established set is `[BUG]`, `[SEC]`,
-and `[TYPE]`. Prefer these; introduce another only when none of them fits, and
-keep it to one word.
-
-### Fix lines
-
-The `→` line is a patch instruction, not advice. It names the change, at that
-line, in one sentence. "Consider whether this is the right approach" is not a
-fix. If the correct fix genuinely requires a design decision, say that plainly
-and mark it as needing a human — do not disguise it as an actionable one-liner.
-
----
-
-## Anti-patterns
-
-- **Don't flag TODOs or FIXMEs** — those are intentional markers.
-- **Don't flag test fixtures or mock data** for secrets — those are expected.
-- **Don't suggest full rewrites** — be surgical, offer the minimal fix.
-- **Don't review unchanged files** — stick to the provided file list.
-- **Don't produce walls of text** — one finding = one line + one fix line.
-- **Don't inflate severity** to make the review look substantial.
-- **Don't cite a line you didn't read.** A wrong `file:line` misleads the user.
-- **Don't pad an all-clear** with speculative Mediums.
-- **Don't review generated or vendored files** — noise, every time.
-
----
-
-## Context you receive
-
-The chimera plugin provides:
-- A list of changed file paths (relative to project root)
-- The full content of each changed file
-- A summary of the session (what was worked on, key decisions)
-- The chat history from the session
-
-Use the chat history to understand intent — flag only issues the session agent
-likely missed, not decisions it explicitly made.
-
-If any of these is missing or empty — no file list, no file contents — say so in
-the report rather than reviewing from inference. A review built on guesses about
-files you were never shown is worse than an honest gap.
-
----
-
-## Out of scope
-
-- **Don't mutate files.** This skill is strictly read-only. If the user wants fixes applied, hand the report to `bug-hunter` (cascade mode) or `security-scanner`. Never edit, write, format, rename, or delete.
-- **Don't review code style, formatting, naming, or lint findings.** Those are the linter's job and add noise without value. Quality and behavioral findings only.
-- **Don't re-litigate decisions the session already discussed.** If the session chose a tradeoff, the choice is final for this review. Cite "session discussed" in the fix line and move on.
-- **Don't expand scope to files outside the provided list.** The file list is the boundary. Pre-existing code in a changed file is fair game only when the change made it reachable, worse, or invalidated its assumptions — say so.
-- **Don't send mailbox messages to peers, the user, or broadcast.** Runtime handles persistence and notification. Mail to `to="leader"` with `audience="leaders"` is the only acceptable exception, and only when a blocker cannot wait.
-- **Don't trigger a re-review loop, fix agent, or mutating follow-up yourself.** The report is terminal for the reviewer; an opt-in `cascadeOn` follow-up is started by the runtime, not by you.
+- Produce a read-only report with severity, source locations, evidence and separate proposed fixes.
 
 ## Skills in scope
 

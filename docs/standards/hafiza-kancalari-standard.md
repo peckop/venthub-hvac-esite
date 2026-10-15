@@ -102,6 +102,8 @@ bir durum değil, bir boşluktur.
 | `hafiza-kullanim-sayaci.cjs` | kanca | defterdeki enjeksiyonları `recordInjection`, transcript atıflarını `recordUse` ile sage'e yazar | Stop (async) | ARAÇ | aynı kapı |
 | `sage-hijyen-oturum-sonu.cjs` | kanca | taze doğrulanmış yedek varken `port.hygiene` koşar | SessionEnd | ARAÇ | aynı kapı |
 | `scripts/hijyen/hafiza-enjeksiyonu.cjs` · `sage-enjeksiyon-defteri.cjs` | modül | konu/sayaç/hijyen mantığı (port enjekte) · oturum+nesil anahtarlı enjeksiyon defteri | üç kanca + `sage-dosya-dersi` | ARAÇ | aynı kapı |
+| `hafiza-yedek.cjs` | kanca | hafıza deposunu PreCompact'ta ELDE, eşik (3600 sn) aşılınca ve bekleyen md varken arka planda yedekler; açılışta yaş satırı (§9) | PreCompact · SessionStart · UserPromptSubmit | ARAÇ | `…/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol) |
+| `scripts/hijyen/hafiza-yedek.cjs` | modül | yedek mantığı: ayrı `git add`, sır taraması, yaş ölçümü, saf karar; CLI `--yedekle --sebep <ad>` ve `--yas` (eski `~/.claude/hafiza-commit.sh`'ın yerine) | kanca + oturum kapanışı | ARAÇ | aynı kapı |
 
 ⚠**AYARA KAYIT RECEP KAPISI:** bu tabloda listelenen bir kanca `.claude/settings.json`'a
 bağlanmadıkça **dosya olarak var, tetik olarak ölüdür** (tablodaki kanca sayısı değişir; sayıya
@@ -324,6 +326,36 @@ eksik olan, yedeğin o dersi **uygulaması**ydı.
    sessiz kalsaydı yedek alınmadan "alındı" denecekti. Gölge tabloları (`*_fts_data`, `*_fts_idx`,
    `*_fts_docsize`) gerçek tablodur ve sayılır.
 
+### §7.7 POSTA KUTULARI da depodur; sage ve posta GERİ YÜKLENİR (ARC-71, 2026-10-12)
+
+Pencereler arası posta kutusu `~/.wrongstack/projects/<proje>/_mailbox.sqlite` altında yaşar (proje dizininin
+DIŞINDA) ve **WAL kiplidir**. Ölçüldü (TAKİP 10-09): canlı kutuda ana dosya 160 KB iken WAL 4,1 MB; düz kopya
+mesajların çoğunu atlar. OPS hükmü 10-09 (kararlar 2 ve 3): kökteki **beş dosyanın hepsi** kapsamdadır
+(hangisinin canlı olduğu yedek için önemsiz), sage geri yüklenebilir olur.
+
+1. **Her kutu AYRI depodur** (`posta-<proje>`); liste her çağrıda kökten taranır (`VENTHUB_POSTA_KOKU` ya da
+   `~/.wrongstack/projects`). Yeni kök doğarsa kutusu kendiliğinden kapsama girer; sabit liste sessizce eksik kalırdı.
+2. **Kaynakla sayım aynıdır**: `VACUUM INTO` + tablo satır sayıları. Kutu canlıyken (pencereler yazar) sayım
+   uyuşmazsa **bir kez** yeniden denenir; ikinci uyuşmazlık `.DOGRULANMADI` olur.
+3. **Yedek önce `.gecici`ye yazılır, doğrulanınca adına döner.** Dosya adı dakika çözünürlüklüdür; aynı dakikada
+   ikinci koşum eskiden "dosya zaten var" ile düşüyordu. Doğrulama düşerse aynı dakikadaki sağlam yedek yerinde kalır.
+4. **Geri yükleme "servis" olarak MCP süreçlerine bakar** (sage ve posta için pid dosyası yoktur; her pencere
+   kendi sunucusunu açık tutar): komut satırında `sage-mcp`/`mailbox-mcp` geçen süreç varsa RET. **Süreç listesi
+   alınamazsa da RET** (bakamamak "kimse yok" demek değildir). Betiğin kendi süreci sayılmaz. Eski dosyalar
+   `.oncesi-<damga>` ile yana alınır, silinmez; yazıldıktan sonra parmak izi yedekle karşılaştırılır.
+   **Kanban da süreç taranır** (OPS 10-12): ARC-98'den beri her pencere `kanban-mcp`'yi stdio + `--writable` açar;
+   dosyayı tutan süreç `kanban-server.json`'da görünmez. Pid denetimi kalır, `kanban-mcp/dist/cli.js` taraması eklenir.
+5. **Yükseltme günü adımı:** pencereler kapalıyken `node scripts/hijyen/sage-yedek.cjs` (üç tür depo ayrı
+   satır), `--liste` ile boyut kontrolü; geri dönüş `--geri sage`, `--geri posta-<proje>`, `--geri kanban`.
+   Posta kutusu elle kopyalanmaz.
+6. **YALITILMIŞ KÖK PROVASI (OPS 10-12):** pencereler açıkken geri dönüş yolu kopyada denenir:
+   `--geri sage|kanban --kok <yol>` ve `--geri posta-<proje> --posta-koku <yol>`. Süreç denetimi **yalnız şu
+   hâlde** atlanır: seçenek AÇIKÇA verilmiş, hedef dosya **kanonik karşılaştırmayla** (gerçek yol, `/` ayracı,
+   Windows'ta harf büyüklüğü, junction) ve dev+ino ile canlı depo DEĞİL, canlı ana ağaç çözülebilmiş ve hedef
+   canlı git ağacının (worktree dahil) içinde değil. Kök çözülemezse ya da canlıysa denetim aynen kalır.
+   **Ortam değişkeni (`CLAUDE_PROJECT_DIR`, `VENTHUB_POSTA_KOKU`) tek başına denetimi atlatmaz.** Çıktı
+   `YALITILMIS KOK` satırını yazar; canlı depoya gerçek geri yükleme yalnız yükseltme bozulursa ve pencereler kapalıyken.
+
 ---
 
 ## §8 KONU ENJEKSİYONU · KULLANIM SAYACI · HİJYEN (REC-519, 2026-09-30)
@@ -387,6 +419,35 @@ Sabotajsız kolun yeşili kanıt sayılmaz: bağımsız inceleme ilk yazımda 7 
 buldu (penceresi, durak süzgeci, zaman aşımı sarmalayıcısı, çıktı zarfı, spawn'lı port açılışı, dolaylı
 purge anahtarı, <4 belirteç koruması); kollar eklendi. Sage paketi kurulu olmadan gerçek kanca kablosunu
 ölçmek için testler geçici proje köküne sahte `@wrongstack/sage` modülü ve canlı pid'li `server.json` koyar.
+
+---
+
+## §9 HAFIZA YEDEĞİ — kapanışa tek bağ yetmez (ARC-92, OPS-104 K-047, 2026-10-11)
+
+**Ölçülen boşluk:** hafıza deposu (`peckop/venthub-ops-hafiza`) yalnız oturum KAPANIŞINDA commit/push alıyordu
+(kullanıcı düzeyi `hafiza-commit.sh`). Pencere compact'ta ya da uzun oturumda kapanmadan çökerse o oturumun
+hafıza yazıları yedeksiz kalırdı.
+
+**Kurallar:**
+
+1. **Üç yedek noktası.** PreCompact (ELDE, compact'tan önce); SessionStart ve UserPromptSubmit (son commit
+   > 3600 sn **VE** bekleyen `*.md` değişikliği varsa arka planda); oturum kapanışı (`--yedekle --sebep kapanis`).
+2. **ZAMANLAYICI YOK (karar 53).** Tetik kullanıcının mesajıdır. Arka plan denemesi 600 sn'de birden sık olmaz
+   (`.hafiza-yedek-deneme` işaretinin mtime'ı; `*.md` olmadığı için commit'e girmez).
+3. **Yaş = son commit'in yaşı.** Bekleyen değişiklik yokken uyarı ve yedek YOKTUR (yedeklenecek bir şey yok);
+   SessionStart yaş satırını her durumda söyler, UserPromptSubmit yalnız `bekleyen + eski` iken konuşur.
+4. **Sır taraması gevşetilmez.** Staged farkta tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…,
+   postgres URL'si) varsa commit ATILMAZ, `.hafiza-commit-uyari.log`'a yazılır, indeks `git reset -q` ile temizlenir.
+5. **`git add` kalıpları AYRI verilir.** Eşleşmeyen kalıpta git hiçbir şey eklemeden düşer: eski betik
+   `MEMORY.md.oncesi-*` dosyası yokken sessizce hiçbir şey yedeklemiyordu (ARC-92 testinin ilk koşusunda ölçüldü;
+   bugün 6 dosya var, bu yüzden canlıda tetiklenmiyordu).
+6. **Kayıt OPS kapısıdır.** `.claude/settings.json` (PreCompact — `timeout` 45 —, SessionStart, UserPromptSubmit)
+   ve kullanıcı düzeyi `settings.json:294` (eski betiğin yerine `node scripts/hijyen/hafiza-yedek.cjs --yedekle
+   --sebep kapanis`). Kayıtlı olana kadar kanca ölüdür; kural bu cetveldedir.
+
+**Kanıt:** `src/__tests__/conformance/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol, geçici git deposunda);
+bozma 8/8 yakalandı. **Ölçüt:** bekleyen değişiklik varken yaş ≤ 3600 sn
+(`node scripts/hijyen/hafiza-yedek.cjs --yas` ya da `git -C <hafıza dizini> log -1 --format=%ct`).
 
 ---
 
@@ -476,11 +537,31 @@ Bekçi **kendi hatasında da susmaz**: tek satır *"BEKCI CALISAMADI"* basar. Se
 
 ### ⛔Mutlak yol yazılmaz
 
-Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
+(Güncel durum, 2026-09-29'dan beri: bekçi hedefi **yazılan dosyanın yolundan** türetir, `os.homedir()` kullanmaz;
+aşağıdaki transcript/`os.homedir()` anlatımı precompact kapısı içindir.) Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
 gömülmez: depo 2026-08-15'ten beri PUBLIC ve kullanıcı adı taşıyan yol kimlik sızdırır
 (§24). Türetim `precompact-durum-kapisi.cjs` ile aynı mantığı kullanır ve aynı ölçülmüş
 sebeple: worktree'de açılan oturumların kendi proje dizini vardır ve orada `memory/` **yok**;
 cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 ölçümü).
+
+### Departman indeksi (2026-09-30, HARİTA kararı 4; şartname `hafiza-yazma-duzeni-standard.md` §7)
+
+Bekçi `.../memory/departman/<ROL>/MEMORY.md` dosyalarını da tanır (yalnız bu yol biçimi; harf duyarsız, `..` giderilmiş;
+`docs/departman/...`, `departman/<ROL>/alt/MEMORY.md`, konu dosyaları SUSAR). Departman indeksi Claude'un yerleşik yoluyla
+yüklenmez, `SessionStart` kancası onu rol kartıyla enjekte eder ve enjeksiyon **60 satır / 8 KB**'ta keser; bekçi aynı sayıyı
+**YUMUŞAK** eşik yapar, yoksa bekçiden geçen indeks açılışta görünmeden kırpılırdı.
+
+| | ana `memory/MEMORY.md` | `departman/<ROL>/MEMORY.md` |
+|---|---|---|
+| yumuşak (UYARIR, engel değil) | 160 satır / 20.000 bayt (`>=`) | 60 satır / 8.000 bayt (**aşılınca** `>`: 60 satır enjeksiyona sığar) |
+| sert (ENGELLER, çıkış 2) | 200 satır / 25.000 bayt | **aynı** 200 / 25.000 (engel dalı tektir) |
+| katlanmış satır aranan yer | hafıza dizini (`dizin-*.md`) | departmanın kendi dizini (`departman/<ROL>/<konu>.md`) |
+
+Ana `MEMORY.md` davranışı değişmedi (regresyon testi). **Ortak aday işlevi bu değişiklikte YAZILMADI:** bekçi hedefi yazılan
+dosyanın yolundan türetir, aday kümesi gerekmez. Kilit testinin `projeDiziniBul` yasağı bu yüzden **bilinçli** gevşetildi
+(hazırlık): ad yalnız paylaşılan modülden `require` edilen ortak işlev olarak serbest, kancanın içinde yerel türetim ve
+`os.homedir()` yasak; **mutlak kullanıcı yolu yasağı ve `os.homedir()` ile türetilmiş modül sabiti yasağı aynen kalır**
+(`.claude/hooks/lib/*hafiza*|*aday*.cjs` yazıldığı gün otomatik kapsanır).
 
 ### Kapı
 
@@ -488,4 +569,7 @@ cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 �
 bağlı · exit 2 yok + kendi hatasını söyler · mutlak yol yok, dizin türetilir · ⭐**katlanmış
 satır sessiz / silinmiş satır uyarır** (ayırt edici çift) · yalnız boşluk farkı uyarı üretmez
 · yumuşak eşik üstünde uyarır, altında susar (ikinci ayırt edici çift) · precompact iki eşiği
-taşır ve **farklı** şey söyler.
+taşır ve **farklı** şey söyler. Departman genişlemesiyle eklenenler: eşik çifti (59/60 sessiz, 61 uyarı) ·
+bayt eşiği · Edit sonucu · sert eşik ortak · ana regresyon · katlama araması departman dizininde · tanıma sınırları ·
+harf duyarsız + `..` · fail-open (boş/bozuk/okunamayan) · **mutasyon tablosu** (kancanın kritik satırı bozulunca senaryo
+kırmızı) · kullanıcı yolu dedektörlerinin sabotaj testi.

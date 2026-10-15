@@ -54,6 +54,95 @@ function kanonikKok(p) {
   return kok.replace(/^([A-Za-z]):/, (_, h) => h.toLowerCase() + ':')
 }
 
+/**
+ * ⭐WORKTREE'DE PAKET YOLU (ARC-98, 2026-10-12, OPS ölçümü): `node_modules` izlenmez, her worktree'de YOKTUR;
+ * relative yolla açılan sunucu worktree'de "Cannot find module" ile ölüp "Connection closed" veriyordu. Paket
+ * yerelde yoksa ANA AĞACIN kurulumu kullanılır (kanonik kök: worktree → ana ağaç). Yerel kurulum varsa o kazanır.
+ * Bulunamazsa yerel yol döner (sunucu kendi hatasını verir; sessiz başka yola düşülmez).
+ */
+function paketCli(paket, kokDizin = __dirname) {
+  const yerel = path.join(kokDizin, 'node_modules', '@wrongstack', paket, 'dist', 'cli.js')
+  if (fs.existsSync(yerel)) return yerel
+  try {
+    const ana = kanonikKok(path.resolve(kokDizin, '..', '..'))
+    const aday = path.join(ana, 'tools', 'wrongstack-mcp', 'node_modules', '@wrongstack', paket, 'dist', 'cli.js')
+    if (fs.existsSync(aday)) return aday
+  } catch {
+    // ana ağaç çözülemedi — yerel yol kalır
+  }
+  return yerel
+}
+
+/** `<...>/@wrongstack/<paket>/dist/cli.js` yolundan paketin package.json sürümü; okunamazsa null. */
+function paketSurumu(cli) {
+  try {
+    const v = JSON.parse(fs.readFileSync(path.join(path.dirname(path.dirname(cli)), 'package.json'), 'utf8')).version
+    return typeof v === 'string' && v ? v : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * ⭐SÜRÜM KAPISI (ARC-103, 2026-10-12, ÖLÇÜLDÜ 13:07 kazası): sunucu `--project-root`u git üzerinden ANA AĞACA
+ * çevirir; worktree'nin KENDİ node_modules paketi (yerel kurulum KAZANIR, paketCli) CANLI kökü açar. O paket ana
+ * ağaçta kurulu sürümden yeniyse canlı sage.db şeması yerinde göç eder (34 → 47 nesne, geri alınamaz) ve yeni
+ * sürüm daemon'u doğar; eskiyse canlı daemon ile sürüm bölünür (connection.status() null, hook sessiz kalır).
+ * Kural: çalıştırılacak paket dosyası ana ağaçtakiyle AYNI dosya ise geçer; farklı dosya ise iki sürüm okunur ve
+ * YALNIZ eşitse geçer. Sürüm okunamazsa RET (fail-closed): "bakamadım" "aynı" demek değildir.
+ * Git yoksa ya da depo değilse kanonikKok verilen yolu döndürür; çalıştırılacak dosya kendisiyle karşılaştırılır ve
+ * geçer (worktree kavramı da yoktur, sunucu da kökü başka ağaca çeviremez).
+ * @returns {{tamam: boolean, sebep?: string, calisan?: string|null, ana?: string|null}}
+ */
+function surumKapisi(cli, kokDizin = __dirname) {
+  const paket = path.basename(path.dirname(path.dirname(cli)))
+  let anaCli
+  try {
+    const anaKok = kanonikKok(path.resolve(kokDizin, '..', '..'))
+    anaCli = path.join(anaKok, 'tools', 'wrongstack-mcp', 'node_modules', '@wrongstack', paket, 'dist', 'cli.js')
+  } catch {
+    return { tamam: false, sebep: 'ana agac cozulemedi (' + paket + ')', calisan: paketSurumu(cli), ana: null }
+  }
+  // ⭐REC-466 (12 Ekim 2026): paket HİÇBİR yerde kurulu değilse sunucu "Cannot find module" ile ölür, istemci yalnız
+  // "Connection closed" görür. Ana ağacın kendi (var olmayan) dosyası "aynı dosya" kuralından GEÇMEMELİ: önce varlık.
+  if (!fs.existsSync(cli) && !fs.existsSync(anaCli)) {
+    return { tamam: false, kuruluDegil: true, sebep: paket + ' paketi kurulu degil (ne bu agacta ne ana agacta)', calisan: null, ana: null }
+  }
+  if (path.resolve(cli).toLowerCase() === path.resolve(anaCli).toLowerCase()) return { tamam: true }
+  const calisan = paketSurumu(cli)
+  const ana = paketSurumu(anaCli)
+  if (!calisan) return { tamam: false, sebep: 'calisacak paketin surumu okunamadi (' + paket + ')', calisan, ana }
+  if (!ana) {
+    return { tamam: false, sebep: 'ana agactaki ' + paket + ' kurulumunun surumu okunamadi (kurulu degil ya da bozuk)', calisan, ana }
+  }
+  if (calisan !== ana) {
+    return { tamam: false, sebep: paket + ' surumu ana agactakiyle ayni degil: bu agac ' + calisan + ', ana agac ' + ana, calisan, ana }
+  }
+  return { tamam: true }
+}
+
+/** Kapı reddettiğinde stderr'e yazılan, ne yapılacağını söyleyen tek metin. */
+function surumKapisiMetni(onek, k) {
+  if (k.kuruluDegil) {
+    return (
+      onek +
+      ': PAKET KURULU DEGIL — ' +
+      k.sebep +
+      '. Sunucu ACILMADI. ' +
+      'Cozum: ANA AGACTA node tools/wrongstack-mcp/kurulum.cjs --denetle (eksigi soyler), sonra ayni dizinde ' +
+      'node tools/wrongstack-mcp/kurulum.cjs (kurulum yalniz ana agacta yapilir).\n'
+    )
+  }
+  return (
+    onek +
+    ': SURUM KAPISI RET — ' +
+    k.sebep +
+    '. Sunucu ACILMADI (canli koku farkli surumle acmak sage.db semasini yerinde goc ettirir, geri alinamaz). ' +
+    'Cozum: bu agacin tools/wrongstack-mcp/node_modules dizinini sil (yerel kurulum yoksa ana agacinki kullanilir; ' +
+    'junction ise yalniz baglantiyi kaldir: cmd //c rmdir <yol>, /s YOK) ya da ana agactakiyle ayni surumu kur.\n'
+  )
+}
+
 /** argv içindeki `--project-root <yol>` değerini kanonik köke çevirir. */
 function kokuKanonikle(args) {
   const out = [...args]
@@ -88,7 +177,12 @@ async function calistir() {
     process.exit(1)
   }
   process.stderr.write(`posta-kutusu: kimlik ${bulunan.kimlik.slice(0, 8)}… (kaynak: ${bulunan.kaynak})\n`)
-  const cli = path.join(__dirname, 'node_modules', '@wrongstack', 'mailbox-mcp', 'dist', 'cli.js')
+  const cli = paketCli('mailbox-mcp')
+  const kapi = surumKapisi(cli)
+  if (!kapi.tamam) {
+    process.stderr.write(surumKapisiMetni('posta-kutusu', kapi))
+    process.exit(1)
+  }
   process.argv = [
     process.argv[0],
     cli,
@@ -108,4 +202,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { kimlikBul, kanonikKok, kokuKanonikle }
+module.exports = { kimlikBul, kanonikKok, kokuKanonikle, paketCli, paketSurumu, surumKapisi, surumKapisiMetni }

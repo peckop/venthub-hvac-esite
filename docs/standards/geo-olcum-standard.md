@@ -13,8 +13,8 @@
 > varsayılan, P4 Google sonuç sayfası yasağı, P6 depoya girmeyen veri) · `yayin-gorunurluk-denetim-standard.md`
 > (bot kalitesi karnesi) · `rehber-yazisi-standard.md` (yazı konusu).
 
-**Durum:** TASLAK. Koşu elle yapılır; zamanlayıcı/cron/loop kararı önce Recep ile konuşulur (karar 53).
-Koşu betiği yazılınca G7'deki kapı onu getiren PR'da doğar.
+**Durum:** TASLAK. Koşu elle başlatılır (betik: `scripts/seo/geo-olcum.mjs`, SEO-42); zamanlayıcı/cron/loop
+kararı önce Recep ile konuşulur (karar 53). Ağsız çekirdeğin kapısı G7'dedir.
 
 ---
 
@@ -129,9 +129,64 @@ Yorum kuralı: tek ayın oranı iddia kurmaz; iki ardışık koşuda aynı yönd
 
 ## G7 — Kapılar
 
-⚠Bugün bu cetveli zorlayan otomatik kapı yok. Koşu betiği (`scripts/seo/geo-olcum.mjs`, yazılacak) geldiğinde
-ağsız kısmı (cevaptan VentHub/kaynak ayıklama, G4 satır biçimi, anahtarın çıktıya yazılmaması) `ci` testine
-bağlanır; kapı betiği getiren PR'da doğar.
+Kapı: `scripts/seo/__tests__/geo-olcum.test.ts` (INV-GEO-OLCUM-1, `ci` içinde koşar; SEO-42). Kilitlediği ağsız
+çekirdek:
+
+- cevaptan VentHub izi **metinde** ve **kaynakta** ayrı ayıklanır (G0, G4 satır biçimi);
+- sızıntı izleri kelime sınırlıdır ("finalizes" iz sayılmaz), tarafsız klasör yolu ipucu taşımaz (G1);
+- hata satırı ve boş cevap oran paydasına girmez, marka sorusu ayrı sayılır, grup kırılımı "kaynak listesi
+  olan / gruptaki soru" yazılır (G3, G5);
+- anahtar hiçbir satıra ve hata metnine yazılmaz; rakip alan adları herkese açık özetten atılır (G5, P6);
+- kota (429) koşuyu durdurur ve hata satırı biriktirmez (G3).
+
+Koşu ve özet komutları (soru listesi, ham cevap ve rakip alan adları depo dışıdır; betik yalnız yol alır):
+
+- `node scripts/seo/geo-olcum.mjs kos <gemini|claude> --liste <v0.json> [--ek <ek.json>] --cikti <depo dışı klasör>`
+  (`claude` için `--tarafsiz <boş klasör>` zorunlu; her koşudan önce sızıntı sorusu kendiliğinden sorulur ve iz
+  varsa koşu başlamaz). **Önce `--kuru`:** istek göndermeden kaç istek yapılacağını yazar. Ortamda
+  `GEMINI_API_KEY` tanımlıysa `kos` GERÇEK koşar ve günlük ücretsiz kotadan (≈22-25) harcar;
+- `--yalniz 1,7,M1` ile alt küme koşulur, `--onceki <jsonl>` hatasız satırları atlar;
+- `node scripts/seo/geo-olcum.mjs ozet <jsonl...> [--cikti <depo dışı klasör>]` G5 cümlesini üretir; rakip alan
+  adları yalnız `--cikti` klasöründeki dosyaya yazılır.
+
+Betiğin kapısı olmayan kısmı (gerçek Gemini/Claude çağrısı) CI'da koşmaz: abonelik ve anahtar gerektirir.
+
+## G8 — Trends talep ölçümü: Supermetrics sonrası kendi yolumuz (SEO-51, karar 365)
+
+Supermetrics aboneliği alınmadı (karar 365, deneme 15 Ekim 2026'da bitti). Talep ölçümü (karar 326: çağrı başına
+en çok 5 terim, değer aynı çağrıdaki en yüksek terime göre, null eşik altı ≠ sıfır, ortak çapa terimle kıyas,
+çapa null ya da 3'ün altındaysa çağrı geçersiz, her bulgu en az iki farklı çağrıyla) **yöntem olarak aynen
+kalır**; yalnız aracı değişir:
+
+| | Eski | Yeni |
+|---|---|---|
+| Araç | Supermetrics GT (`data_query`) | Tarayıcı bölmesi ya da Chrome'daki `trends.google.com` sayfasının kendi isteği |
+| Kimlik | Supermetrics hesabı | Gerekmez; oturumsuz sayfa |
+| Doğrulandı | 2026-10-14 (6 çağrı) | 2026-10-14: `/trends/api/explore` → `/trends/api/widgetdata/multiline`, 2 terim, 5 yıl, 262 haftalık nokta, durum 200 |
+
+**Tarif (sayfa konsolundan, salt okuma).** Önce `trends.google.com/trends/explore?geo=TR&hl=tr&q=<terim>` açılır
+(tarayıcı bölmesi ya da `claude-in-chrome`). Sonra sayfa bağlamında iki istek koşulur: `explore` (widget jetonu)
+ve `multiline` (zaman serisi). Terim ve pencere `req` nesnesindedir:
+
+```js
+const req = {comparisonItem: [{keyword: 'frekans konvertörü', geo: 'TR', time: 'today 5-y'}, {keyword: 'inverter', geo: 'TR', time: 'today 5-y'}], category: 0, property: ''}
+const temizle = (s) => JSON.parse(s.replace(/^\)\]\}',?\n?/, ''))
+const e = temizle(await (await fetch('/trends/api/explore?hl=tr&tz=-180&req=' + encodeURIComponent(JSON.stringify(req)))).text())
+const w = e.widgets.find((x) => x.id === 'TIMESERIES')
+const m = temizle(await (await fetch('/trends/api/widgetdata/multiline?hl=tr&tz=-180&req=' + encodeURIComponent(JSON.stringify(w.request)) + '&token=' + w.token)).text())
+// m.default.timelineData: [{time, formattedTime, value: [terim1, terim2…], hasData: [...]}]
+```
+
+Sınırlar ve dürüstlük:
+
+- ⚠Bu uçlar **belgelenmemiştir** ve herhangi bir gün değişebilir ya da 429 verebilir (ölçülmedi: 429 sınırı, yalnız
+  bir koşu); çağrılar arasına bekleme konur, kota dolarsa koşu durur ve hata satırı biriktirilmez (G3'teki kural).
+- Değerler yine **göreli**dir (G5'in Trends cümlesi): mutlak hacim iddiası için Bing ya da Search Console verisi
+  gerekir. Düşük hacimli terimler koşular arasında oynar (9 ↔ 14 Ekim'de "frekans invertörü" 68,9 → null);
+  sıra iddiası yalnız iki farklı çağrıda aynı yönde çıkarsa yazılır.
+- `time` değeri `today 5-y` (haftalık), `today 12-m` (haftalık/günlük), `all` (2004'ten aylık) alabilir; kayıt
+  dosyasında pencere ve terim sırası yazılır.
+- Sorgu ve sayfa verisi gibi bu seri de depo dışıdır (P6). Son arşiv: `C:/tmp/vh-arsiv/geo-seo/supermetrics-son-2026-10-14/`.
 
 ---
 
@@ -147,3 +202,5 @@ Kaynak sınıfı: **A** = GEO-SEO'nun kendi ölçümü · **B** = başkasının 
 | 2026-09-27 | Claude temiz oturum sızıntı sorusu | A | Klasör `~/venthub-olcum/…` iken cevap klasör adını gördü, 09-25'in 3 "VentHub" geçişi sahte pozitif → 43 satır geçersiz. `C:/tmp/q7x2`'de VentHub geçişi **0** |
 | 2026-09-27 | Gemini günlük kota | A | 09-25: 25 başarı → 429; 09-27 (20 sn aralık): 22 başarı → 429. Sınır ≈22–25/gün |
 | 2026-09-27 | GEO v0 Gemini ara sonuç | A | 27/52 tekil soru (ilk 10 soru ×3): **VentHub metinde 0, kaynakta 0**. Kalan 25 soru + Claude örneklemi ayrı koşu |
+| 2026-10-11/12 | GEO v1 Gemini `gemini-2.5-flash-lite` + Google arama, liste v1 (v0 + 5 paket sorusu), 29 tekil soru | A | Marka sorusu hariç 27 soruda **VentHub metinde 0/27, kaynakta 0/27** (kaynak listesi olan 24/27: bilgi 13/14, yerel 8/8, paket-ek 3/5; 13 Ekim'de betikle düzeltildi, önceki metin grup toplamlarını kaynak listesi olan diye yazmıştı). Doğrudan marka sorusu (M1) genel ve tahmine dayalı cevap, kaynak 0; M2 boş cevap, ölçülemedi |
+| 2026-10-13 | GEO v1 Claude (abonelik, yalnız WebSearch, `C:/tmp/q7x2`, koşu öncesi sızıntı sorusunda "VentHub" 0), 16 soru, tekrar yok | A | Marka sorusu hariç 15 soruda **VentHub metinde 0/15, kaynakta 0/15** (kaynak listesi olan 6/15; bilgi ve paket sorularının 7/8'i aramasız cevaplandı). M1: "doğrulanabilir bilgi bulamadım". Yayın öncesi TABAN (B-1 adres yayını hedef 19 Ekim); tek koşu eğilim sayılmaz, +2 ve +6 hafta tekrarı (SEO-22) bu tabana kıyaslanır |

@@ -79,6 +79,8 @@ function satiriAdayaCevir(satir: DbProduct): FanAdayi {
     ad: satir.name ?? '',
     slug: satir.slug ?? '',
     pqCurveHam: specs?.pq_curve ?? null,
+    // URN-127: eğrinin kaynak etiketi (karar 320). Yoksa null = etiketsiz; tanıma `egriKaynagiOku` yapar.
+    pqCurveKaynak: specs?.pq_curve_kaynak ?? null,
     maksDebiM3h: sayiOku(specs, SPEC_ANAHTARLARI.debiM3h),
     sesDbA: sayiOku(specs, SPEC_ANAHTARLARI.sesDbA),
     gucW: sayiOku(specs, SPEC_ANAHTARLARI.gucW),
