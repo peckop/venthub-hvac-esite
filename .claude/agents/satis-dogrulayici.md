@@ -1,6 +1,6 @@
 ---
 name: satis-dogrulayici
-description: SATIS departmanının doğrulayıcı çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
+description: SATIS departmanının doğrulayıcı çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.
 model: sonnet
 memory: user
 disallowedTools: Edit, Write, NotebookEdit

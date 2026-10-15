@@ -1,6 +1,6 @@
 ---
 name: edge-uygulayici
-description: EDGE departmanının uygulayıcı çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
+description: EDGE departmanının uygulayıcı çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.
 model: sonnet
 memory: user
 skills:

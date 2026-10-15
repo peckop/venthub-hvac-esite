@@ -1674,6 +1674,91 @@
    "toplamKB": 12.5,
    "adiylaCagir": [],
    "bekleyen": []
+  },
+  {
+   "dept": "3D",
+   "tur": "arastirmaci",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "codegraph",
+     "kb": 5.4,
+     "kaynak": "departman"
+    },
+    {
+     "ad": "investigate",
+     "kb": 6,
+     "kaynak": "yetenek"
+    }
+   ],
+   "toplamKB": 11.4,
+   "adiylaCagir": [
+    {
+     "ad": "web-performance",
+     "kb": 6.4
+    }
+   ],
+   "bekleyen": []
+  },
+  {
+   "dept": "3D",
+   "tur": "uygulayici",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "threejs-webgl-performance",
+     "kb": 22.4,
+     "kaynak": "departman"
+    },
+    {
+     "ad": "venthub-architecture",
+     "kb": 6.5,
+     "kaynak": "yetenek"
+    }
+   ],
+   "toplamKB": 28.9,
+   "adiylaCagir": [
+    {
+     "ad": "web-performance",
+     "kb": 6.4
+    }
+   ],
+   "bekleyen": []
+  },
+  {
+   "dept": "3D",
+   "tur": "curutucu",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "plan-challenger",
+     "kb": 14.6,
+     "kaynak": "departman"
+    }
+   ],
+   "toplamKB": 14.6,
+   "adiylaCagir": [],
+   "bekleyen": []
+  },
+  {
+   "dept": "3D",
+   "tur": "dogrulayici",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "verify-before-done",
+     "kb": 12.5,
+     "kaynak": "departman"
+    },
+    {
+     "ad": "web-performance",
+     "kb": 6.4,
+     "kaynak": "departman"
+    }
+   ],
+   "toplamKB": 18.9,
+   "adiylaCagir": [],
+   "bekleyen": []
   }
  ],
  "mudurCekirdegi": [

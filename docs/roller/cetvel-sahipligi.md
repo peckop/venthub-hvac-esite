@@ -3,10 +3,11 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.
 > **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.
 
-Rol başına: ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 10 · SATIS 5 · TASARIM 1 · URUN 17
+Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 10 · SATIS 5 · TASARIM 1 · URUN 16
 
 | Cetvel | Sahip | Durum | Dayanak |
 |---|---|---|---|
+| 3d-webgl-standard.md | 3D | teyitli | OPS kararı 2026-10-15 (karar 372, OPS-150): URUN'den 3D departmanına devir |
 | admin-capabilities.md | ADMIN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | admin-design-standard.md | ADMIN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | admin-standard.md | ADMIN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
@@ -67,7 +68,6 @@ Rol başına: ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1
 | marka-token-eslemesi-standard.md | TASARIM | teyitli | OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip URUN) |
 | 3d-scene-lighting-research.md | URUN | teyitli | alt ajan sınıflandırması (orta güven), OPS onaylı |
 | 3d-showroom-ux-research.md | URUN | teyitli | alt ajan sınıflandırması (orta güven), OPS onaylı |
-| 3d-webgl-standard.md | URUN | teyitli | OPS kararı 2026-09-30 (sahipsiz cetvel atandı) |
 | adres-semasi-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | aile-metni-sayisal-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | customer-account-standard.md | URUN | teyitli | OPS sahipsiz alan kuralı: müşteri yüzü (müşteri hesabı) |

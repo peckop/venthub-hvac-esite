@@ -1,6 +1,6 @@
 ---
 name: mevzuat-curutucu
-description: MEVZUAT departmanının çürütücü çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
+description: MEVZUAT departmanının çürütücü çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.
 model: sonnet
 memory: user
 disallowedTools: Edit, Write, NotebookEdit

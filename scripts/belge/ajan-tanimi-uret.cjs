@@ -64,7 +64,7 @@ function dosyaAdi(dept, tur) {
 
 function aciklama(dept, tur) {
   const t = TURLER[tur]
-  return `${dept} departmanının ${t.ad} çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.`
+  return `${dept} departmanının ${t.ad} çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.`
 }
 
 /** Tek satır tanım metni (LF). */
@@ -122,7 +122,7 @@ function uret(setler) {
  * ve ayrıntıyı rol kartına bırakır. Açıklama kısa: tüm tanımların ad+açıklaması her oturumun Agent aracı açıklamasına girer (tavan
  * INV-AJAN-TANIM-1 maliyet kapısı, çalışan + pencere birlikte ölçülür).
  */
-const PENCERE_DEPARTMANLARI = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK']
+const PENCERE_DEPARTMANLARI = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK', '3D']
 /** Pencere modeli = pencerenin bugünkü modeli (OPS emri: departmanlar Sonnet 5.5, OPS Opus 5.5); TAM kimlik, takma ad kayar. */
 const PENCERE_MODEL = { OPS: 'claude-opus-5-5' }
 const PENCERE_MODEL_VARSAYILAN = 'claude-sonnet-5-5'
