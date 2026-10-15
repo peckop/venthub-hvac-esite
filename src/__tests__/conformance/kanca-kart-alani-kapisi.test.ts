@@ -22,13 +22,23 @@ interface Kanca {
   yollar: (metin: string) => string[]
   sahibi: (yol: string, harita: Harita) => string | null
   departman: (girdi: Record<string, unknown>, harita: Harita) => string | null
-  incele: (girdi: Record<string, unknown>, harita: Harita) => string[]
+  incele: (girdi: Record<string, unknown>, harita: Harita, kartOku?: (dept: string) => string | null) => string[]
   ad: (ham: string) => string
+  gorevDegilOku: (metin: string | null) => { ifadeler: string[]; sahip: string | null; ham: string }[]
+  GOREV_DEGIL_SATIRI: RegExp
 }
 const k = gerek(KANCA) as Kanca
 const harita = k.haritayiOku(fs.readFileSync(path.join(KOK, 'docs', 'roller', 'DEPARTMAN-HARITASI.md'), 'utf8'))
 
 const ekle = (o: Record<string, unknown>) => ({ action: 'add_task', ...o })
+const rolKarti = (dept: string): string | null => {
+  try {
+    return fs.readFileSync(path.join(KOK, 'docs', 'roller', `${dept}.md`), 'utf8')
+  } catch {
+    return null
+  }
+}
+const gorevDisiSatirlari = (satirlar: string[]) => satirlar.filter((x) => /görev dışı/.test(x))
 
 describe('INV-KANCA-KART-ALANI-1 · veri ve çözümleme', () => {
   it('gerçek departman haritası ayrıştırılır: ARAC, ALTYAPI, URUN, HARITA, YETENEK var; ARAC alanı .claude/hooks/ önekini içerir', () => {
@@ -107,6 +117,60 @@ describe('INV-KANCA-KART-ALANI-1 · kural', () => {
   })
 })
 
+describe('INV-KANCA-KART-ALANI-2 · "Görev değil" uyarısı (ARC-138, karar 369)', () => {
+  it('satır biçimi rol kartı üreticisinin başlık sabitiyle AYNI: üretici biçimi değişirse kanca körleşmez', () => {
+    const uretici = gerek(path.join(KOK, 'scripts', 'belge', 'rol-karti-uret.cjs')) as { GOREV_DEGIL_BASLIK: string }
+    expect(k.GOREV_DEGIL_SATIRI.test(`${uretici.GOREV_DEGIL_BASLIK}CI iş akışı (ALTYAPI); site kodu (URUN).`)).toBe(true)
+  })
+
+  it('gerçek ARAC kartından öğeler ve sahipleri okunur; yol içeren öğe atlanır', () => {
+    const ogeler = k.gorevDegilOku(rolKarti('ARAC'))
+    expect(ogeler.map((o) => o.sahip)).toEqual(expect.arrayContaining(['ALTYAPI', 'HARİTA', 'URUN']))
+    expect(ogeler.flatMap((o) => o.ifadeler)).toContain('bağımlılık')
+    // URUN kartındaki "3d/** (3D)" öğesi yol kolunun işidir, ifade olarak gelmez
+    const urun = k.gorevDegilOku(rolKarti('URUN')).flatMap((o) => o.ifadeler)
+    expect(urun.some((x) => x.includes('3d/'))).toBe(false)
+  })
+
+  it('çakışma: başlık atanan departmanın "Görev değil" ifadesini tam sözcük geçirirse UYARI, sahibi yazılır', () => {
+    const s = k.incele(ekle({ title: 'ARC-9 · bağımlılık güncelle', assignee: 'ARAC' }), harita, rolKarti)
+    const g = gorevDisiSatirlari(s)
+    expect(g).toHaveLength(1)
+    expect(g[0]).toMatch(/"bağımlılık"/)
+    expect(g[0]).toMatch(/ARAC rol kartının "Görev değil" satırında/)
+    expect(g[0]).toMatch(/sahibi: ALTYAPI/)
+  })
+
+  it('SESSİZ: rol kartı yok, kartta "Görev değil" satırı yok, okuma hatası ya da kartOku verilmedi', () => {
+    const girdi = ekle({ title: 'ARC-9 · bağımlılık güncelle', assignee: 'ARAC' })
+    expect(gorevDisiSatirlari(k.incele(girdi, harita, () => null))).toEqual([])
+    expect(gorevDisiSatirlari(k.incele(girdi, harita, () => '## Görev\nKanca işleri.\n'))).toEqual([])
+    expect(gorevDisiSatirlari(k.incele(girdi, harita))).toEqual([])
+    const hata = () => {
+      throw new Error('okunamadı')
+    }
+    expect(gorevDisiSatirlari(k.incele(girdi, harita, hata))).toEqual([])
+  })
+
+  it('tam sözcük: "bağımlılıklar" ya da yalnız açıklamada geçen ifade uyarı DEĞİL; yalnız başlığa bakılır', () => {
+    const a = k.incele(ekle({ title: 'ARC-9 · bağımlılıklar', assignee: 'ARAC' }), harita, rolKarti)
+    expect(gorevDisiSatirlari(a)).toEqual([])
+    const b = k.incele(ekle({ title: 'ARC-9 · kanca', description: 'bağımlılık ve belge', assignee: 'ARAC' }), harita, rolKarti)
+    expect(gorevDisiSatirlari(b)).toEqual([])
+  })
+
+  it('departmanın KENDİ işi uyarı vermez: ALTYAPI kartında "bağımlılık" ALTYAPI görevidir', () => {
+    const s = k.incele(ekle({ title: 'ALT-9 · bağımlılık güncelle', assignee: 'ALTYAPI' }), harita, rolKarti)
+    expect(gorevDisiSatirlari(s)).toEqual([])
+  })
+
+  it('departman çözülemezse bu kol da sessiz (yalnız mevcut "departman çözülemedi" satırı)', () => {
+    const s = k.incele(ekle({ title: 'bağımlılık güncelle' }), harita, rolKarti)
+    expect(gorevDisiSatirlari(s)).toEqual([])
+    expect(s[0]).toMatch(/departman çözülemedi/)
+  })
+})
+
 describe('INV-KANCA-KART-ALANI-1 · gerçek süreç', () => {
   const kos = (stdin: string) =>
     spawnSync(process.execPath, [KANCA], { input: stdin, encoding: 'utf8', timeout: 15_000, windowsHide: true })
@@ -120,6 +184,13 @@ describe('INV-KANCA-KART-ALANI-1 · gerçek süreç', () => {
     expect(c.hookSpecificOutput.hookEventName).toBe('PreToolUse')
     expect(c.hookSpecificOutput.additionalContext).toMatch(/KART ALANI \(URUN\)/)
     expect(c.hookSpecificOutput.additionalContext).toMatch(/ARAC dosya alanına düşüyor/)
+  })
+
+  it('"Görev değil" çakışması gerçek süreçte additionalContext\'e girer ve çıkış 0 kalır (ENGEL YOK)', () => {
+    const r = kos(cagri(KANBAN, { action: 'add_task', title: 'ARC-9 · bağımlılık güncelle', assignee: 'ARAC' }))
+    expect(r.status).toBe(0)
+    const c = JSON.parse(r.stdout) as { hookSpecificOutput: { additionalContext: string } }
+    expect(c.hookSpecificOutput.additionalContext).toMatch(/KART ALANI UYARI \(görev dışı\)/)
   })
 
   it('başka araç, başka eylem, bozuk ve boş stdin → sessiz ve çıkış 0 (FAIL-OPEN)', () => {
