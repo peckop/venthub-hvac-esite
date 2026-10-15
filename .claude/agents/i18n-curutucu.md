@@ -1,6 +1,6 @@
 ---
 name: i18n-curutucu
-description: I18N departmanının çürütücü çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
+description: I18N departmanının çürütücü çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.
 model: sonnet
 memory: user
 disallowedTools: Edit, Write, NotebookEdit

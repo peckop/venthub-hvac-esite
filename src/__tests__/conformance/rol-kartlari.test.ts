@@ -93,6 +93,8 @@ const BEKLENEN_ROLLER = [
   'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK',
   // HRT-35 (karar 322, OPS-93): tek işi takip olan etkin departman. MÜHENDİSLİK planlı/kapalı olduğu için burada DEĞİL (PLANLI).
   'TAKIP',
+  // HRT-62 (karar 372, OPS-150): 3D ürün modelleri ve R3F parça fabrikası URUN'dan ayrıldı.
+  '3D',
 ]
 
 describe('INV-ROL-1 — rol kartı üreticisi ayırt edici', () => {
@@ -279,7 +281,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   const uretilen = uretici.uret()
   const kuralMetinleri = uretici.uretKurallar()
 
-  it('beklenen 17 rolün hepsi var, fazlası yok', () => {
+  it('beklenen 18 rolün hepsi var, fazlası yok', () => {
     expect(Object.keys(uretilen).sort()).toEqual([...BEKLENEN_ROLLER].sort())
   })
 
@@ -839,7 +841,7 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     }
   })
 
-  it('kısa özet ≤ 2 KB, 17 etkin departmanı ve her satırda açılış harfini (M ya da M/T) taşır', () => {
+  it('kısa özet ≤ 2 KB, 18 etkin departmanı ve her satırda açılış harfini (M ya da M/T) taşır', () => {
     expect(Buffer.byteLength(ozet, 'utf8')).toBeLessThanOrEqual(uretici.HARITA_OZET_SINIRI)
     for (const ad of roller) {
       const satir = ozet.split('\n').find((l) => l.startsWith(`${ad} · `))
@@ -922,6 +924,19 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     expect(satir as string).toMatch(/ · M\/T$/)
     expect(uretici.terminaldenAcilir('TAKIP')).toBe(true)
     for (const dosya of ['TAKIP.md', 'TAKIP-kurallar.md']) expect(fs.existsSync(path.join(KOK, 'docs', 'roller', dosya)), dosya).toBe(true)
+  })
+
+  // HRT-62 (karar 372, OPS-150): 3D etkin departmandır; "Görev değil" ayrımı kartta, dosya alanı URUN'dan devir.
+  it('3D etkin departmandır (M/T): rol kartı, kurallar dosyası, "Görev değil" ayrımı ve dosya alanı vardır', () => {
+    const satir = ozet.split('\n').find((l) => l.startsWith('3D · '))
+    expect(satir as string).toMatch(/ · M\/T$/)
+    expect(uretici.terminaldenAcilir('3D')).toBe(true)
+    for (const dosya of ['3D.md', '3D-kurallar.md']) expect(fs.existsSync(path.join(KOK, 'docs', 'roller', dosya)), dosya).toBe(true)
+    const kart = uretici.uret()['3D']
+    expect(kart).toContain('Görev değil:')
+    expect(kart).toContain('## Dosyalar\nsrc/components/products/3d/**, docs/standards/3d-webgl-standard.md.')
+    const kurallar = uretici.uretKurallar()['3D']
+    for (const k of ['K1 ', 'K19 ', 'K20 ']) expect(kurallar, k).toContain(`- ${k.trim()} `)
   })
 
   it('AYIRT EDİCİLİK: planlı satır silinirse özet ve tam harita değişir; alanı eksik, kartı da olan ya da tabloya girmiş planlı departman yakalanır', () => {

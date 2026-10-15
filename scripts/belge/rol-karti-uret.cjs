@@ -41,7 +41,7 @@ const KURAL_KAYNAGI = path.join('docs', 'standards', 'gelistirme-kurallari-tam-l
 const FAZ2 = ' (Faz 2 park: tasarım kuralı, kodda ölçülmedi)'
 const KURALLAR = [
   [1, 'No-Plan-No-Code', 'Plan önce', 'Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").', 'HEPSI'],
-  [2, 'Tip Güvenliği', 'Tip güvenliği', '`any` yasak, strict TypeScript.', ['URUN', 'ADMIN', 'ALTYAPI', 'SATIS', 'EDGE', 'I18N', 'TASARIM']],
+  [2, 'Tip Güvenliği', 'Tip güvenliği', '`any` yasak, strict TypeScript.', ['URUN', 'ADMIN', 'ALTYAPI', 'SATIS', 'EDGE', 'I18N', 'TASARIM', '3D']],
   [3, 'RLS-First', 'RLS-first', 'Her tablo RLS politikasıyla korunur.', ['ALTYAPI', 'ADMIN', 'KATALOG', 'SATIS', 'EDGE']],
   [4, 'Monoton Durum', 'Monoton durum', 'Sipariş ve iade durumları yalnız ileri gider, geri dönüş engellenir.', ['ADMIN', 'ALTYAPI', 'SATIS']],
   [5, 'Audit Trail', 'Audit izi', 'Admin işlemleri `admin_audit_log` tablosuna yazılır.', ['ADMIN']],
@@ -50,7 +50,7 @@ const KURALLAR = [
   [8, 'Webhook Replay Guard', 'Replay koruması', 'Webhook\'ta HMAC\'e ek olarak zaman damgası (`x-timestamp`) ya da idempotency.', ['ALTYAPI', 'SATIS', 'EDGE']],
   [9, 'MVVM & Gateway Prensibi', 'MVVM/Gateway', 'UI bileşeni ham veri çekmez (fetch/supabase); veri Gateway kancalarından gelir.', ['URUN', 'ADMIN']],
   [10, 'Design Token ve Strict Linter Standardı', 'Design token', 'Arbitrary Tailwind değeri yasak; değerler `tokens.js`\'ten, renk HEX değil CSS custom property (HSL).', ['URUN', 'ADMIN', 'MARKA', 'TASARIM']],
-  [11, 'content-auto Render Performans Standardı', 'content-auto', 'Sayfa altı ağır bileşenlerde `.content-auto` zorunlu.', ['URUN', 'ADMIN']],
+  [11, 'content-auto Render Performans Standardı', 'content-auto', 'Sayfa altı ağır bileşenlerde `.content-auto` zorunlu.', ['URUN', 'ADMIN', '3D']],
   [12, 'focus-visible Klavye Erişilebilirlik Standardı', 'focus-visible', 'Etkileşimli elemanlarda `focus:` değil `focus-visible:`.', ['URUN', 'ADMIN', 'MARKA', 'TASARIM']],
   [13, 'Typography prose Standartları', 'Typography prose', 'Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.', ['URUN', 'BLOG', 'MARKA', 'TASARIM']],
   [14, 'Suspense Sınırı', 'Suspense sınırı', '`useSearchParams` kullanan her bileşen `<Suspense fallback={<Skeleton />}>` ile sarılır (sınır yalnız o uç bileşeni sarar).', ['URUN', 'ADMIN']],
@@ -58,9 +58,9 @@ const KURALLAR = [
   [16, 'On-Demand ISR ve Webhook Senkronizasyonu', 'ISR + webhook', 'Statik vitrinde görünen her tablonun DB tetiği VE webhook handler dalı olur; HMAC geçince `revalidatePath`/`revalidateTag`; secret yoksa fail-closed (cetvel: `rendering-cache-standard.md` §3).', ['URUN', 'ALTYAPI', 'KATALOG']],
   [17, 'SEO ve Sitemap Hreflang Standartları', 'Hreflang', 'Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook\'u yok.', ['URUN', 'GEO-SEO']],
   [18, 'Edge Functions & Mikroservis Standartları (Contextual Locale İzolasyonu)', 'Edge dil izolasyonu', 'Sipariş anında kullanıcı dili (`user_locale`) kaydedilir; e-posta şablonu ürün adını o dile göre süzer.', ['ALTYAPI', 'EDGE']],
-  [19, '3D Canvas Render ve Gölge Standartları', '3D gölge', 'R3F gölge haritası türü `\'percentage\'` olur; başka (yumuşak) gölge haritası türü yasak.', ['URUN']],
-  [20, 'CSP (İçerik Güvenlik Politikası) ve 3D CDN İzinleri', 'CSP 3D CDN', '`connect-src` beyaz listesinde `raw.githubusercontent.com` ve `raw.githack.com` kalıcıdır; kaldırmak yasak.', ['ALTYAPI', 'URUN']],
-  [21, 'React 19 Compiler ve useMemo/useCallback Sınırlandırması [GEÇİŞ AŞAMASINDA - WARNING]', 'React Compiler (geçiş, uyarı)', 'Basit bileşende manuel `useMemo`/`useCallback` kısıtlı; Gateway viewmodel ve Provider\'lar muaf.', ['URUN', 'ADMIN']],
+  [19, '3D Canvas Render ve Gölge Standartları', '3D gölge', 'R3F gölge haritası türü `\'percentage\'` olur; başka (yumuşak) gölge haritası türü yasak.', ['URUN', '3D']],
+  [20, 'CSP (İçerik Güvenlik Politikası) ve 3D CDN İzinleri', 'CSP 3D CDN', '`connect-src` beyaz listesinde `raw.githubusercontent.com` ve `raw.githack.com` kalıcıdır; kaldırmak yasak.', ['ALTYAPI', 'URUN', '3D']],
+  [21, 'React 19 Compiler ve useMemo/useCallback Sınırlandırması [GEÇİŞ AŞAMASINDA - WARNING]', 'React Compiler (geçiş, uyarı)', 'Basit bileşende manuel `useMemo`/`useCallback` kısıtlı; Gateway viewmodel ve Provider\'lar muaf.', ['URUN', 'ADMIN', '3D']],
   [22, 'Supabase ORM Tekilleştirme (React cache) [GEÇİŞ AŞAMASINDA - STRICT]', 'React.cache (geçiş, katı)', 'RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.', ['URUN', 'ADMIN']],
   [23, 'AI Botları ve Ajanlar için llms.txt Standardı [GEÇİŞ AŞAMASINDA - STRICT]', 'llms.txt (geçiş, katı)', 'Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).', ['GEO-SEO', 'HARITA']],
   [24, 'Tenant Data İzolasyonu (SaaS)', 'Tenant izolasyonu', 'Okuma/yazma, Edge API ve Realtime kanalları tenant-scoped olur; data bleeding kabul edilmez.', ['ALTYAPI', 'ADMIN', 'EDGE']],
@@ -421,6 +421,15 @@ const ROLLER = {
     yasak: 'Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.',
     yetenek: 'wrongstack-kanban, research-web, security-scanner, bagimlilik-guvenlik-yukseltme cetveli.',
     durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu ve takip-arastirmaci çalışan tanımı henüz yok (ALT-45).',
+  },
+  // HRT-62 (karar 372, OPS-150, 2026-10-15): Claude Design'da üretilen 3D ürün modelleri ve R3F parça fabrikası URUN'dan ayrıldı.
+  '3D': {
+    gorev: 'Görev: Claude Design\'da üretilen 3D ürün modellerini siteye taşımak; R3F parametrik parça fabrikası (src/components/products/3d) bakımı; model kalite ve performans bütçesi (3d-webgl-standard); gerektiğinde Blender ile model düzeltmek. Görev değil: ürün verisi ve metni (KATALOG, Design), sayfa düzeni (URUN), tasarım dili (TASARIM).',
+    dosyalar: 'src/components/products/3d/**, docs/standards/3d-webgl-standard.md.',
+    yetki: 'R3F bileşen kodu, model dosyası düzeltmesi ve performans bütçesi ölçümü; Blender kullanımı kurulumdan sonra (kurulum ilk işte Recep\'le konuşulur).',
+    yasak: 'Saf Three.js DOM yok (yalnız R3F + Drei); gölge yalnız \'percentage\'; CSP 3D CDN beyaz listesi kalkmaz; ürün verisi, sayfa düzeni ve tasarım dili başkasınındır (dokunma, ölç); canlı veri yazımı Recep kapısıdır.',
+    yetenek: 'threejs-webgl-performance, venthub-architecture, web-performance, codegraph.',
+    durum: 'Açık (karar 372, OPS-150); ilk iş Recep\'le konuşulur: Design\'daki model → siteye taşıma, Blender kurulumu.',
   },
 }
 
@@ -799,7 +808,7 @@ const HARITA_KISA = {
   ARAC: ['Kanca, WrongStack, araç envanteri', 'hooks, scripts/board, tools'],
   ALTYAPI: ['CI, bağımlılık, güvenlik denetimi', 'package.json, .github/workflows'],
   HARITA: ['Belge ve hafıza düzeni, rol kartları', 'CLAUDE.md, docs/README, scripts/belge, docs/roller'],
-  URUN: ['Vitrin: ürün, kategori, marka, arama sonuç sayfaları, adresler','components/products, views/category, next.config'],
+  URUN: ['Vitrin: ürün, kategori, marka, arama sonucu, adresler','components/products, views/category, next.config'],
   ADMIN: ['Yönetici paneli ekranları', 'views/admin, components/admin, app/admin'],
   KATALOG: ['Ürün verisi hattı: PDF, CSV, fiyat','scripts/icerik-hatti, scripts/db/product-data'],
   'GEO-SEO': ['Arama ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-*'],
@@ -812,6 +821,7 @@ const HARITA_KISA = {
   I18N: ['TR/EN sözlükler ve i18n kapıları', 'src/i18n, i18n-*.test.ts'],
   YETENEK: ['Skill\'leri departmana bağlama ve ölçme', 'docs/audits/skill-*, .claude/skills'],
   TAKIP: ['Sürüm/güncelleme takibi, günlük rapor', 'docs/audits/takip-*'],
+  '3D': ['3D ürün modelleri, R3F bileşenleri', 'products/3d, 3d-webgl-standard'],
 }
 
 /** Rol `departman-ac` ile terminalden açılabilir mi: pencere adı tablosunda (şerit adıyla) var mı. */
@@ -828,8 +838,8 @@ function haritaOzet(roller = ROLLER, kisa = HARITA_KISA, tablo, planli = PLANLI)
   // Planlı, kapalı departman: açılış harfi yok ("açılış yok"); iş yazılmaması için görünür kalır.
   const planliSatirlar = Object.entries(planli).map(([ad, p]) => `${ad} · PLANLI, KAPALI (${p.gorev.split(' (')[0]}) · ${p.alan} · açılış yok`)
   return [
-    'DEPARTMAN HARİTASI (departman · görev · dosya alanı · açılış; tam harita: docs/roller/DEPARTMAN-HARITASI.md)',
-    'Açılış: M = masaüstü; T = ekip modu gerekirse terminal (scripts\\board\\departman-ac.cmd <AD>). T yazmayan departman terminalden AÇILAMAZ (pencere adı tablosunda yok).',
+    'DEPARTMAN HARİTASI (ad · görev · alan · açılış; tam: docs/roller/DEPARTMAN-HARITASI.md)',
+    'Açılış: M = masaüstü; T = ekip modu için terminal (scripts\\board\\departman-ac.cmd <AD>). T yoksa terminalden AÇILAMAZ.',
     ...satirlar,
     ...planliSatirlar,
     '',

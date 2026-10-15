@@ -290,11 +290,11 @@ describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
 
 describe('HRT-29 · rol OPS ise açılışta departman haritası kısa özeti gelir', () => {
   const HARITA_TAVANI = 2048
-  const ROLLER = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA', 'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK', 'TAKIP']
+  const ROLLER = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA', 'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK', 'TAKIP', '3D']
   /** HRT-35 (karar 315): planlı ama kapalı departman; açılış harfi yerine "açılış yok" yazar. */
   const PLANLI = 'MÜHENDİSLİK'
 
-  it('CC_LANE=OPS: 17 departman satırı + planlı MÜHENDİSLİK ve açılış harfleri görünür, çıktı tavanı yalnız özet kadar genişler', () => {
+  it('CC_LANE=OPS: 18 departman satırı + planlı MÜHENDİSLİK ve açılış harfleri görünür, çıktı tavanı yalnız özet kadar genişler', () => {
     const { ek, durum } = calistir('startup', { CC_LANE: 'OPS' })
     expect(durum).toBe(0)
     expect(ek).toContain('DEPARTMAN HARİTASI')
