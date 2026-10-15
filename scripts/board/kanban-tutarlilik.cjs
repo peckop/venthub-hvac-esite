@@ -52,7 +52,9 @@ function ihlaller(t) {
   if (bitmis && (e.includes('recep-bekliyor') || e.includes('karar-bekliyor'))) o.push('bitenBekliyor')
   if (!DEPARTMAN_BASLIGI.test(t.title)) o.push('numarasiz')
   if (bitmis && !e.some((x) => /^hafta-\d+$/.test(x))) o.push('haftasiz')
-  if (!bitmis && e.includes('karar-verildi') && (t.columnId === 'backlog' || t.status === 'pending')) o.push('kararAcik')
+  // ARC-141 (15 Ekim): yalnız SÜTUNA bakar. Eskiden `|| status === 'pending'` de sayılıyordu; To Do kartları da pending
+  // olduğundan onarımdan sonra bile 9 kart tutarsız görünüyordu (To Do'daki karar-verildi kart zaten sıradadır).
+  if (!bitmis && e.includes('karar-verildi') && t.columnId === 'backlog') o.push('kararAcik')
   return o
 }
 
@@ -78,8 +80,8 @@ function haftaEtiketi(t, simdi = new Date()) {
 
 /**
  * Bir kart için ONARIM PLANI (saf): { etiketEkle: string|null, todoyaTasi: boolean, yalnizRapor: string[] }.
- * `todoyaTasi` yalnız columnId === 'backlog' iken (kokpit kuralı `status === pending`i de sayar; To Do'daki bekleyen kart
- * zaten sıradadır, taşınacak yer yok → o durum yalnız RAPORDA kalır).
+ * `todoyaTasi` yalnız columnId === 'backlog' iken. Kural da (ARC-141) yalnız Backlog sütununa bakar: To Do'daki
+ * karar-verildi kart zaten sıradadır, ihlal sayılmaz; onarımdan sonra aynı tarama 0 kararAcik bulur.
  */
 function plan(t, simdi = new Date()) {
   const ih = ihlaller(t)
@@ -189,6 +191,10 @@ async function cli(argv) {
     else {
       process.stdout.write(`[kanban-tutarlilik] taranan ${sonuc.taranan} · tutarsiz ${sonuc.tutarsiz}${a.onar ? ` · onarilan ${sonuc.onarilan.length}` : ' (yalniz rapor; --onar ile yazar)'}\n`)
       for (const [k, n] of Object.entries(sonuc.kurallar)) process.stdout.write(`  ${n} x ${KURAL[k] || k}\n`)
+      // ARC-141: tek tek kart listesi (OPS "düzelt" deyince hangi kart olduğunu görsün; onarılmayan kurallar için şart).
+      for (const i of sonuc.ihlalli) {
+        process.stdout.write(`  KART ${i.kart} [${i.sutun}/${i.durum}]: ${i.kurallar.map((k) => KURAL[k] || k).join('; ')}\n`)
+      }
       for (const o of sonuc.onarilan) process.stdout.write(`  ONARILDI ${o.islem}: ${o.kart}\n`)
       for (const h of sonuc.hatalar) process.stdout.write(`  HATA ${h}\n`)
     }

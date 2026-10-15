@@ -133,7 +133,7 @@ describe('INV-KANBAN-TUTARLILIK-3 · onarım planı SINIRI aşmaz', () => {
     expect(yazilan).toEqual([{ id: 'b', tasindi: 'todo' }])
   })
 
-  it('YALNIZ RAPOR kalan haller yazılmaz: biten+bekliyor, numarasız, To Do\'daki karar-verildi kart', async () => {
+  it('YALNIZ RAPOR kalan haller yazılmaz: biten+bekliyor, numarasız; To Do\'daki karar-verildi kart ihlal DEĞİLDİR (ARC-141)', async () => {
     const yazilan: unknown[] = []
     const s = await betik.calistir({
       kartlar: [
@@ -144,8 +144,29 @@ describe('INV-KANBAN-TUTARLILIK-3 · onarım planı SINIRI aşmaz', () => {
       yaz: { etiketle: async (...a) => void yazilan.push(a), tasi: async (...a) => void yazilan.push(a) },
     })
     expect(yazilan).toEqual([])
-    expect(s.tutarsiz).toBe(3)
+    expect(s.tutarsiz).toBe(2)
+    expect(s.ihlalli.map((i) => i.id)).toEqual(['c', 'd'])
     expect(s.onarilan).toEqual([])
+  })
+
+  it('ARC-141 · 15 Ekim vakası: onarımdan sonra kart To Do + status pending kalır, aynı tarama 0 tutarsız bulur', async () => {
+    // Taşıma sütunu değiştirir, status'u değiştirmez (OPS ölçümü: onarılan 6, kalan 9 — hepsi sütun todo / durum pending).
+    const kartlar = [
+      kart({ id: 'k1', columnId: 'backlog', status: 'pending', labels: ['karar-verildi'] }),
+      kart({ id: 'k2', columnId: 'backlog', status: 'pending', labels: ['karar-verildi', 'hafta-42'] }),
+    ]
+    const yaz = {
+      etiketle: async () => undefined,
+      tasi: async (t: Kart, kolon: string) => {
+        t.columnId = kolon // status bilerek DOKUNULMAZ
+      },
+    }
+    const ilk = await betik.calistir({ kartlar, yaz })
+    expect(ilk.onarilan.map((o) => o.islem)).toEqual(['backlog->todo', 'backlog->todo'])
+    expect(kartlar.map((k) => [k.columnId, k.status])).toEqual([['todo', 'pending'], ['todo', 'pending']])
+    const ikinci = await betik.calistir({ kartlar })
+    expect(ikinci.tutarsiz).toBe(0)
+    expect(ikinci.kurallar).toEqual({})
   })
 
   it('Done kartı geri TAŞINMAZ; onarım İKİNCİ koşuda iş bulmaz (idempotent)', async () => {
@@ -159,6 +180,7 @@ describe('INV-KANBAN-TUTARLILIK-3 · onarım planı SINIRI aşmaz', () => {
     expect(cagrilar.sort()).toEqual(['etiket:f', 'tasi:g'])
     const ikinci = await betik.calistir({ kartlar, yaz })
     expect(ikinci.onarilan).toEqual([])
+    expect(ikinci.tutarsiz).toBe(0) // ARC-141: onarılan kart tutarsız görünmeye DEVAM etmez
     expect(cagrilar).toHaveLength(2)
   })
 
