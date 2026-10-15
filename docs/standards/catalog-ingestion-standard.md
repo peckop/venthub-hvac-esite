@@ -684,9 +684,16 @@ library ve Price lists bölümleri açılmadı. Arama ayrıca tek kanallıydı: 
   sonra kutup/faz/hız/güçle (W) eşle ve **her eşleşmeyi güçle doğrula**; güç uyuşmuyorsa "eşleşti" yazılmaz
   (Nicotra DD: 11909 = M9F0 736 W eşleşti; 11905/11908 750 W satırı için katalogda 750 W motor yok; 11910 iki aday).
   Kod eşleşmesi tabloya yazılır, kod aramasının "yok" sonucu hüküm sayılmaz (KTL-44 düzeltmesi, OPS 15 Ekim).
+  Kayıtta ayrı **çekirdek ad araması** sütunu bulunur (aranan çekirdek adlar + sonuç); boşsa kapı KIRMIZI verir.
+- **Görülen yeni ya da farklı baskı, içine bakılmadan geçilmez.** Listede ya da sitede görülen farklı boyutlu,
+  yeni adlı ya da yeni tarihli dosya "içerik farkı ölçülmedi" denerek bırakılmaz: indirilir, kaynak dizinine
+  alınır, içeriği (seri, baskı, model satırları) ölçülür; ancak ondan sonra "aynı" ya da "ilgisiz" denir.
+  Boyut eşleşmesi aynı sürüm kanıtı değildir (KTL-42: 18 MB DDDDM görüldü, içine bakılmadan geçildi; Recep'in
+  bulduğu belgenin ailesiydi).
 
 **Kapı:** ingestor `kaynak-dizini/bulunamayanlar.json` + `scripts/kaynak_dizini/bulunamayan_kapisi.py`
-(CI "kapılar" işinde). `gercekten-yok` ya da `seciciede` satırında altı basamaktan biri boşsa **KIRMIZI**;
+(CI "kapılar" işinde). `gercekten-yok` ya da `seciciede` satırında altı basamaktan biri ya da `cekirdek_ad`
+(çekirdek ad araması: aranan adlar + sonuç) boşsa **KIRMIZI**;
 `indirildi` satırında envanterde olmayan dosya yolu **KIRMIZI**. Kapı sabotajla sınanır
 (`tests/test_bulunamayan_kapisi.py`: boş basamak, eksik basamak, olmayan dosya).
 
