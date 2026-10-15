@@ -206,7 +206,7 @@ function incele(girdi, harita, kartOku = () => null) {
       )
     }
   }
-  const metin =`${girdi.title || ''}\n${girdi.description || ''}`
+  const metin = `${girdi.title || ''}\n${girdi.description || ''}`
   // Anahtar kelime sezgisi (4 Ekim olayı: "mod/kanca/eklenti" işi ARAÇ'ındı, YETENEK'e açılmıştı). Yalnız ARAÇ için,
   // yalnız harita ARAC'ı tanıyorsa; "model/modül" gibi sözcükleri yakalamasın diye `mod` TAM sözcük aranır.
   if (dept !== 'ARAC' && harita.ARAC && ANAHTAR_ARAC.test(metin.toLocaleLowerCase('tr'))) {
