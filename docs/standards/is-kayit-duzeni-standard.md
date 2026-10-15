@@ -263,8 +263,8 @@ açıklamasında satır başında şu satır bulunur:
 RECEP YETKİSİ: <gerekçe>
 ```
 
-Gerekçe YALNIZ şu altı sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
-yazımı fark etmez):
+Gerekçe YALNIZ şu yedi sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
+yazımı fark etmez; yedincisi ARC-142 ile 15 Ekim'de eklendi):
 
 | Gerekçe | Ne zaman |
 |---|---|
@@ -274,6 +274,7 @@ yazımı fark etmez):
 | geri alınamaz silme | Geri dönüşü olmayan silme |
 | yeni görünüm/iddia/yapı kararı | Vitrinde/metinde yeni görünüm, yeni iddia ya da yapı kararı (üç biçim de geçerli) |
 | hesap/ayar dosyası | Hesap, kimlik ya da izin/ayar dosyası değişikliği |
+| dış kişiye Recep adına yazışma | Tedarikçi, üretici, kurum ya da başka bir dış kişiye Recep adına mesaj, e-posta ya da belge isteği göndermek (kullanıcı adına mesaj göndermek açık izin ister). Gerekçede "Recep adına" geçer; örnek: `tedarikçiye Recep adına yazışma — AVenS belge isteği` |
 
 Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerekçe liste dışıysa kapı kırmızı verir
 ("bu işin yetkisi zaten verilmiş, yap").
