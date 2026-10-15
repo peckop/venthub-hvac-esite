@@ -679,6 +679,11 @@ library ve Price lists bölümleri açılmadı. Arama ayrıca tek kanallıydı: 
 - Yalnız üreticinin kendi alanı ve yalnız PDF; yönlendirme resmî sayfadan üreticinin kendi belge CDN'ine
   giderse kayda "resmî sayfa → üreticinin belge CDN'i" yazılır, bilinmeyen üçüncü alanda durulur.
 - Araştırmacı (alt ajan) raporundaki varlık/sayı/adres iddiası ham kaynağa bakılarak doğrulanmadan hükme girmez.
+- **Model kodu bulunamazsa satıcı ekini at.** Distribütörün kodu (motor/sipariş kodu, örn. AVenS `6M06MH`) üreticinin
+  belgesinde yazmaz; üretici kendi kodunu yazar (Nicotra `M942`). Önce çekirdek adla ara (seri + boyut: "DD 9/9"),
+  sonra kutup/faz/hız/güçle (W) eşle ve **her eşleşmeyi güçle doğrula**; güç uyuşmuyorsa "eşleşti" yazılmaz
+  (Nicotra DD: 11909 = M9F0 736 W eşleşti; 11905/11908 750 W satırı için katalogda 750 W motor yok; 11910 iki aday).
+  Kod eşleşmesi tabloya yazılır, kod aramasının "yok" sonucu hüküm sayılmaz (KTL-44 düzeltmesi, OPS 15 Ekim).
 
 **Kapı:** ingestor `kaynak-dizini/bulunamayanlar.json` + `scripts/kaynak_dizini/bulunamayan_kapisi.py`
 (CI "kapılar" işinde). `gercekten-yok` ya da `seciciede` satırında altı basamaktan biri boşsa **KIRMIZI**;
