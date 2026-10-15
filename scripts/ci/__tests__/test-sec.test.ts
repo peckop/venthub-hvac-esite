@@ -975,6 +975,49 @@ describe('INV-TEST-SEC-1 · 5. CLI (calistir): çıktı sözleşmesi, hata → t
       expect(s.komutlar.find((c) => c.includes('merge-base'))).toEqual(['-C', kok, 'merge-base', 'HEAD', 'release/x'])
       expect(s.kosulan).toEqual([])
     })
+
+    // ARC-143 (15 Ekim): worktree'de izlenmeyen bir PowerShell önbellek dosyası seçimi TAM'a düşürüp hiç test koşturmuyordu.
+    it('ARC-143: kökü haritaca bilinmeyen İZLENMEYEN dosya değişen sayılmaz (uyarı yazılır), ilgili testler yine seçilir ve koşar', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      const s = await yerelKos(kok, 'docs/a.md\0', 'Microsoft/Windows/PowerShell/ModuleAnalysisCache\0')
+      expect(s.sonuc.tam).toBe(false)
+      expect(s.kosulan).toEqual([[T_BELGE]])
+      expect(s.yazilan).toMatch(/Uyarı: izlenmeyen ve haritanın bilmediği kökte 1 dosya yok sayıldı \(Microsoft\/Windows\/PowerShell\/ModuleAnalysisCache\)/)
+    })
+
+    it('ARC-143: aynı bilinmeyen kök İZLENEN (kayıtlı/eklenmiş) değişiklikteyse hâlâ TAM: gerçek değişiklik kapanmaz', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      const s = await yerelKos(kok, 'Microsoft/yeni.ts\0', '')
+      expect(s.sonuc.tam).toBe(true)
+      expect(s.yazilan).toMatch(/^TAM: Microsoft\/yeni\.ts: haritanın bilmediği kök/)
+      expect(s.kosulan).toEqual([])
+    })
+
+    it('ARC-143: yalnız bilinmeyen kökte izlenmeyen dosya varsa "değişiklik yok" der (TAM değil), uyarı yazar', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      const s = await yerelKos(kok, '', 'Microsoft/Windows/x\0')
+      expect(s.yazilan).toMatch(/Uyarı: izlenmeyen/)
+      expect(s.yazilan).toMatch(/Değişiklik yok/)
+      expect(s.sonuc.tam).toBe(false)
+      expect(s.kosulan).toEqual([])
+    })
+
+    it('ARC-143: --yerel ile bilinmeyen argüman açık HATA verir (çıkış 2, hiçbir test koşmaz, oturum açılmaz); CI kolu eskisi gibi TAM', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      let oturumAcildi = false
+      const s = await yerelKos(kok, 'docs/a.md\0', '', { oturumAc: async () => { oturumAcildi = true; throw new Error('açılmamalı') } }, ['--yerel', '--maxWorkers=3'])
+      expect(s.sonuc.cikisKodu).toBe(2)
+      expect(s.sonuc.tam).toBe(false)
+      expect(s.yazilan).toMatch(/^HATA: bilinmeyen argüman: --maxWorkers=3/)
+      expect(s.kosulan).toEqual([])
+      expect(oturumAcildi).toBe(false)
+      const ci = await M.calistir(['--bilinmeyen-bayrak'], { gitCalistir: () => '', oturumAc: oturum([T_BELGE]), kok, yaz: () => undefined })
+      expect(ci.tam).toBe(true)
+    })
   })
 
   it('satirTemizle: kontrol karakteri → boşluk, % silinir, :: tek olur, 300 karakterde kesilir', () => {
