@@ -674,8 +674,11 @@ library ve Price lists bölümleri açılmadı. Arama ayrıca tek kanallıydı: 
   hüküm vermeyi engeller. Yazılmamış basamak "denenmedi"dir, "yok" değildir.
 - "Yok / bulunamadı" hükmünden önce arama kökünün var olduğu ve beklenen sayıda sonuç döndüğü ölçülür
   (var olmayan klasör ya da boş sonuç sessizce "yok" verir; §6.5 patinaj dersi).
-- Hüküm üç değerden biridir: **indirildi** (resmî adres, bayt, sha256, klasör yolu) · **gerçekten yok**
-  (altı basamağın adresleri) · **seçici yazılımında** (hesap/oturum gerekir; seçici adresi + hesap yok notu).
+- Hüküm dört değerden biridir: **indirildi** (resmî adres, bayt, sha256, klasör yolu) · **gerçekten yok**
+  (altı basamağın adresleri + çekirdek ad araması) · **seçici yazılımında** (hesap/oturum gerekir; seçici adresi +
+  hesap yok notu) · **aksesuar, veri broşürde** (kalem bağımsız ürün değil, örn. fanın montaj kasası; kod ve açıklama
+  üreticinin broşüründe: dosya + sayfa + açıklama yazılır; "gerçekten yok" denmez ve Design'a giden listede
+  "veri yok" görünmez).
 - Yalnız üreticinin kendi alanı ve yalnız PDF; yönlendirme resmî sayfadan üreticinin kendi belge CDN'ine
   giderse kayda "resmî sayfa → üreticinin belge CDN'i" yazılır, bilinmeyen üçüncü alanda durulur.
 - Araştırmacı (alt ajan) raporundaki varlık/sayı/adres iddiası ham kaynağa bakılarak doğrulanmadan hükme girmez.
