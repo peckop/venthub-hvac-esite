@@ -248,6 +248,40 @@ describe('INV-LINEAR-YORUM-7: sorgu proje listesinden bağımsız', () => {
   })
 })
 
+describe('INV-LINEAR-YORUM-12: yeni Design kanalı sorguya girer (ARC-145, "3D Ürün Modelleri (DESIGN-3D)")', () => {
+  const ID_3D = '414eb227-fa10-4f6e-ae62-27df23847ee5'
+  const eskiAnahtar = process.env.LINEAR_API_KEY
+  beforeEach(() => {
+    process.env.LINEAR_API_KEY = 'x'.repeat(30)
+  })
+  afterEach(() => {
+    if (eskiAnahtar === undefined) delete process.env.LINEAR_API_KEY
+    else process.env.LINEAR_API_KEY = eskiAnahtar
+    vi.unstubAllGlobals()
+  })
+
+  it('PROJELER 3D projesini kısa adıyla içerir ve kimlikler tekrarsızdır', () => {
+    expect(m.PROJELER).toContainEqual({ id: ID_3D, kisa: '3D' })
+    expect(new Set(m.PROJELER.map((p) => p.id)).size).toBe(m.PROJELER.length)
+  })
+
+  it('cek() sunucuya giden proje süzgecine 3D kimliğini koyar (listede yoksa zil hiç çalmaz)', async () => {
+    const fetchSahte = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: { comments: { nodes: [] } } }) })
+    vi.stubGlobal('fetch', fetchSahte)
+    await m.cek()
+    const govde = JSON.parse(String((fetchSahte.mock.calls[0]?.[1] as { body: string }).body)) as { variables: { ids: string[] } }
+    expect(govde.variables.ids).toContain(ID_3D)
+  })
+
+  it('3D projesinden gelen Design yorumu kalem olur, proje "3D" diye etiketlenir', async () => {
+    const yorum = { createdAt: onceki(1), body: 'Teslim.\n\n— DESIGN-3D (Opus)', project: { id: ID_3D, name: '3D Ürün Modelleri (DESIGN-3D)' } }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: { comments: { nodes: [yorum] } } }) }))
+    const s = await m.cek()
+    expect(s.kalemler).toHaveLength(1)
+    expect(s.kalemler?.[0]).toMatchObject({ proje: '3D', serit: 'DESIGN-3D' })
+  })
+})
+
 describe('INV-LINEAR-YORUM-8: varsayılan çıktı geriye uyumlu', () => {
   it('anahtarsız satir() null döner (yüklü zil "yok" okur, yeni metin çıkmaz)', async () => {
     const eski = process.env.LINEAR_API_KEY
