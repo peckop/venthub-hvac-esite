@@ -36,13 +36,13 @@ const GERCEK_ENVANTER = 'docs/audits/arac-envanteri-2026-09-07.md'
 type Cikti = { kod: number; stdout: string; stderr: string }
 
 /** Betiği koşturur; çıkış kodunu ASLA yutmaz (kod da bir ölçümdür). */
-function kostur(args: string[]): Cikti {
+function kostur(args: string[], depo: string = KOK): Cikti {
   try {
     const stdout = execFileSync(process.execPath, [BETIK, ...args], {
-      cwd: KOK,
+      cwd: depo,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, VENTHUB_REPO: KOK },
+      env: { ...process.env, VENTHUB_REPO: depo },
     })
     return { kod: 0, stdout, stderr: '' }
   } catch (e) {
@@ -58,6 +58,31 @@ function fiksturBelgesi(donustur: (metin: string) => string): string {
   const hedef = path.join(dizin, 'arac-envanteri-2026-09-07.md')
   fs.writeFileSync(hedef, donustur(fs.readFileSync(kaynak, 'utf8')), 'utf8')
   return hedef
+}
+
+/**
+ * ⭐GEÇİCİ DEPO (ARC-139, 14 Ekim): sabotaj kolları canlı `scripts/` dizinine dosya yazıp siliyordu; paralel koşan
+ * `comment-scrubber-scheme-safety.test.ts` `scripts/`'i tarayıp silinmiş dosyayı ENOENT ile buluyordu (#1939 shard 4/4
+ * kırmızı). Üretici kökü `VENTHUB_REPO`dan alır; kollar artık TEMP bir depo kurar: gerçek envanter kopyalanır, `--yaz`
+ * ile tabana oturtulur (fark 0), sabotaj dosyası yalnız temp `scripts/`e yazılır. Canlı ağaca HİÇ yazılmaz.
+ * Çağıran işi bitince `temizle()` çağırır.
+ */
+function geciciDepo(): { kok: string; belge: string; temizle: () => void } {
+  const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-arac-depo-'))
+  fs.mkdirSync(path.join(kok, 'scripts'), { recursive: true })
+  const belgeDizini = path.join(kok, 'docs', 'audits')
+  fs.mkdirSync(belgeDizini, { recursive: true })
+  const belge = path.join(belgeDizini, path.basename(GERCEK_ENVANTER))
+  fs.copyFileSync(path.join(KOK, GERCEK_ENVANTER), belge)
+  execFileSync('git', ['init', '-q'], { cwd: kok, stdio: 'ignore' })
+  // Tabana oturt: kopya belgedeki satırların çoğu temp depoda yok (KAYIP); --yaz sonrası fark 0 olur.
+  kostur(['--yaz', '--bugun', '2026-09-07'], kok)
+  return { kok, belge, temizle: () => fs.rmSync(kok, { recursive: true, force: true }) }
+}
+
+/** Canlı `scripts/` altında bu dosyanın yazdığı geçici (`zz-*.mjs`) dosyalar; temp depo kullanılıyorsa daima boş. */
+function canliGeciciler(): string[] {
+  return fs.readdirSync(path.join(KOK, 'scripts')).filter((a) => /^zz-.*\.mjs$/.test(a))
 }
 
 /** Markdown ayraç satırı (`|---|:--:|`) mı. */
@@ -166,21 +191,27 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
    * yeni bir betik envantere yazılmadan PR'a girer ve hiçbir şey görmez.
    */
   it('SABOTAJ 1 — yeni betik envantere yazilmazsa INV-ARAC-1 KIRMIZI', () => {
-    const sahte = path.join(KOK, 'scripts', 'zz-sabotaj-gecici.mjs')
-    fs.writeFileSync(sahte, '// gecici sabotaj dosyasi (INV-ARAC-1 kolu)\n', 'utf8')
+    const depo = geciciDepo() // canlı ağaca yazılmaz (ARC-139)
     try {
-      const r = kostur(['--bugun', '2026-09-07'])
+      expect(kostur(['--bugun', '2026-09-07'], depo.kok).kod, 'temp depo tabana oturmadi').toBe(0)
+      const sahte = path.join(depo.kok, 'scripts', 'zz-sabotaj-gecici.mjs')
+      fs.writeFileSync(sahte, '// gecici sabotaj dosyasi (INV-ARAC-1 kolu)\n', 'utf8')
+      // ⭐ARC-139 kanıtı: sabotaj dosyası ANDA canlı `scripts/` dizininde YOK (paralel tarayıcı görmez).
+      expect(canliGeciciler(), 'sabotaj dosyasi CANLI agaca yazilmis (paralel tarayici testle ENOENT yarisi)').toEqual([])
+      const r = kostur(['--bugun', '2026-09-07'], depo.kok)
       expect(r.kod, 'envantere YAZILMAMIS yeni betik kapidan GECTI — kapi fail-open').toBe(1)
       expect(r.stdout, 'kirmizi verdi ama SEBEBI yazmadi (okuyan neyi onaracagini bilemez)').toContain(
         'scripts/zz-sabotaj-gecici.mjs',
       )
       expect(r.stdout).toContain('INV-ARAC-1 KIRMIZI')
-    } finally {
+      // ⭐SABOTAJIN GERİ ALINDIĞI DA ÖLÇÜLÜR: temizlenmemiş sabotaj sonraki kolları kirletir.
       fs.unlinkSync(sahte)
+      expect(kostur(['--bugun', '2026-09-07'], depo.kok).kod, 'sabotaj geri alindi ama kapi hala kirmizi').toBe(0)
+    } finally {
+      depo.temizle()
     }
-    // ⭐SABOTAJIN GERİ ALINDIĞI DA ÖLÇÜLÜR: temizlenmemiş sabotaj sonraki kolları kirletir.
-    expect(fs.existsSync(sahte), 'sabotaj dosyasi silinmedi').toBe(false)
-    expect(kostur(['--bugun', '2026-09-07']).kod, 'sabotaj geri alindi ama kapi hala kirmizi').toBe(0)
+    // Canlı ağaç hiç kirlenmedi.
+    expect(fs.existsSync(path.join(KOK, 'scripts', 'zz-sabotaj-gecici.mjs')), 'canli agaca sabotaj dosyasi yazilmis').toBe(false)
   })
 
   /**
@@ -379,6 +410,9 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
      * ⚠KIRILGAN KAPI, OLMAYAN KAPIDAN KÖTÜDÜR: rastgele kırmızı, ekibi "bir daha koştur"
      * alışkanlığına iter ve o alışkanlık gerçek kırmızıyı da yutar.
      */
+    // ARC-139: bu kol CANLI ağaçta `.ps1` ile KALDI, bilerek: satırların bayt bayt korunduğunu ölçüyor ve temp depoda gerçek
+    // satırların çoğu dosyası olmadığı için KAYIP'a döner (korunma ölçülemez). Yarışı çıkaran `.mjs` kolları (SABOTAJ 1,
+    // HUKUM) temp depoya taşındı; bu kolun uzantısı kardeş tarayıcıların globunda yok (yukarıdaki ölçüm).
     const sahte = path.join(KOK, 'scripts', 'zz-koruma-gecici.ps1')
     fs.writeFileSync(sahte, '// gecici koruma kolu dosyasi\n', 'utf8')
     try {
@@ -407,10 +441,12 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
    */
   it('BETIK HUKUM VERMEZ: eklenen satirin durumu daima YENI', () => {
     const belge = fiksturBelgesi((m) => m)
-    const sahte = path.join(KOK, 'scripts', 'zz-hukum-gecici.mjs')
+    const depo = geciciDepo() // canlı ağaca yazılmaz (ARC-139: paralel tarayıcı testle ENOENT yarışı)
+    const sahte = path.join(depo.kok, 'scripts', 'zz-hukum-gecici.mjs')
     fs.writeFileSync(sahte, '// gecici hukum kolu dosyasi\n', 'utf8')
     try {
-      kostur(['--yaz', '--envanter', belge])
+      expect(canliGeciciler(), 'hukum kolu dosyasi CANLI agaca yazilmis').toEqual([])
+      kostur(['--yaz', '--envanter', belge], depo.kok)
       const satir = fs
         .readFileSync(belge, 'utf8')
         .split(/\r?\n/)
@@ -421,7 +457,7 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
         'olculemedi',
       )
     } finally {
-      fs.unlinkSync(sahte)
+      depo.temizle()
     }
   })
 
