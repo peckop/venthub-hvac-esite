@@ -375,6 +375,11 @@
       "sahip": "KATALOG",
       "dogrulanacak": false,
       "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir"
+    },
+    "docs/standards/filo-tuzugu.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "OPS-169 (Recep isteği 2026-10-16): tüzüğün metin ve hüküm sahibi OPS, HARİTA belge düzenini tutar"
     }
   }
 }

@@ -12,6 +12,12 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır (hangi rol hangisini kullanır: YETENEK atar).
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
+## Amaç
+Doğru skill doğru departmanda ve iş türünde kullanılır; kullanılmayan ya da kusurlu skill ölçülür, kaynağıyla kaydedilir ve kapatılır.
+
+## Düzenli görevler
+- 2 görev, tetiğe bağlı 0: `docs/roller/YETENEK-gorevler.md`.
+
 ## Dosyalar
 `docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`. Rol kartlarındaki skill listesinin içeriği YETENEK'ten gelir, kartı HARİTA'nın üreticisi yazar.
 

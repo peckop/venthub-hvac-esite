@@ -5,6 +5,9 @@
 ## Amaç
 Belge ve hafıza düzenini güncel, bulunabilir ve tutarlı tutar; bayat belge, kırık yol ya da cetvelsiz iş yüzünden bir ekibin yanlış bilgiyle çalışması önce mesaj satırında, sonra kartta görünür.
 
+## Nasıl
+hafiza-yazma-duzeni-standard.md, belge-yonetimi-standard.md
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|

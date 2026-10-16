@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.
 > **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.
 
-Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 10 · SATIS 5 · TASARIM 1 · URUN 16
+Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 11 · SATIS 5 · TASARIM 1 · URUN 16
 
 | Cetvel | Sahip | Durum | Dayanak |
 |---|---|---|---|
@@ -51,6 +51,7 @@ Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · 
 | product-schema-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | mevzuat-kaydi-standard.md | MEVZUAT | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); cetvel v0.1 taslak, Recep onay kaydı bulunamadı |
 | execution-method-standard.md | OPS | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
+| filo-tuzugu.md | OPS | teyitli | OPS-169 (Recep isteği 2026-10-16): tüzüğün metin ve hüküm sahibi OPS, HARİTA belge düzenini tutar |
 | hukum-kaynak-standard.md | OPS | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | is-kayit-duzeni-standard.md | OPS | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | legal-compliance-standard.md | OPS | teyitli | OPS sahipsiz alan kuralı: hukuk (Recep kapısı; ayrı HUKUK rolü açılana kadar OPS) |

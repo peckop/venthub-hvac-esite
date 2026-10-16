@@ -5,6 +5,9 @@
 ## Amaç
 Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.
 
+## Nasıl
+marka-token-eslemesi-standard.md
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|
