@@ -1,0 +1,40 @@
+{
+  "_ad": "Vortice Air Door H AD (65155-65158) — canli absorbed_current_a ↔ katalog duzeltmesi (KTL-47 madde 37, OPS-158 sinif c)",
+  "_kaynak": "Doc_Pubblicita_Air_Door_Range_189461.pdf, s.6 'TECHNICAL DATA' tablosu (sutun A): H AD900 M 28, H AD900 T 10, H AD1200 T 13, H AD1500 T 18 A; KG sutunu H AD1500 T = 18.0. Kaynak dizini: venthub-pdf-ingestor/kaynak-dizini/sayfalar.jsonl. (Not: AIR DOOR kataloğu Mayis 2025 = bu dosya; KTL-47 cevap dosyasi madde 37.) 65158 agirlik: Air_Conditioning_Air_Door_2.pdf s.7 (07/15 baskisi) 18.5 diyor = canli deger; Mayis 2025 baskisi 18.0 diyor ve s.8'de 'cancels and replaces all previous versions' yaziyor, yani 18.0 yenidir. Bagimsiz dogrulayici (katalog-dogrulayici, 16 Ekim) 4 akim + agirliklari kaynaktan ve canli DB'den sifirdan olcup TUTTU dedi.",
+  "_olcum": "Canli degerler 16 Ekim 2026 salt-okuma SQL ile okundu. `onceki` o olcumdur; canli deger farkliysa betik BAYAT diye durur.",
+  "_kok": "DB akim degerleri katalogdan okunmamis, HESAPLANMIS: (isitici W + motor max W) / gerilim, ucte bir fazda / (√3 × gerilim) (KTL-47 madde 37 hukmu; 65155: (6000+160)/230 = 26.78). Katalog tablosu 28/10/13/18 A basiyor.",
+  "_tutulanlar": {
+    "heating_power_w": "Katalogda YOK (yalniz toplam guc 6150/8050/10650 W; 65155 icin 9200 W, tutarsiz). Kaynaksiz oldugu icin DEGISTIRILMEZ ve SILINMEZ; uretici sorusu (B1/B2) cevaplanana kadar oldugu gibi kalir.",
+    "65155_akim": "28 A katalogda basili; toplam guc 9200 W ile celisiyor (28 A x 230 V = 6,4 kW). Celiski toplam gucte gorunuyor (6 kW isitici + 0,16 motor ≈ 6,16 kW 28 A ile uyumlu); akim yazilir, toplam guc sorusu B1'de kalir.",
+    "voltage_v": "T modellerde DB 400, katalog sutun basligi 'V~50HZ' = 380. 400 V Avrupa sebeke adi, ayri karar; BU betikte DOKUNULMAZ.",
+    "noise_level_db_a": "Legacy alan; noise_lpa_2m_db'ye gecis ayri karar (siradaki ses/alan gecisi, cetvel §11.7). DOKUNULMAZ."
+  },
+  "items": {
+    "65155": {
+      "ad": "H AD 900 M",
+      "kaynak": "189461 s.6 (H AD900 M, A sutunu)",
+      "onceki": { "absorbed_current_a": 26.78 },
+      "yeni":   { "absorbed_current_a": 28 }
+    },
+    "65156": {
+      "ad": "H AD 900 T",
+      "kaynak": "189461 s.6 (H AD900 T, A sutunu)",
+      "onceki": { "absorbed_current_a": 8.89 },
+      "yeni":   { "absorbed_current_a": 10 }
+    },
+    "65157": {
+      "ad": "H AD 1200 T",
+      "kaynak": "189461 s.6 (H AD1200 T, A sutunu)",
+      "onceki": { "absorbed_current_a": 11.84 },
+      "yeni":   { "absorbed_current_a": 13 }
+    },
+    "65158": {
+      "ad": "H AD 1500 T",
+      "kaynak": "189461 s.6 (H AD1500 T, A ve KG sutunu)",
+      "onceki": { "absorbed_current_a": 14.77, "weight_kg": 18.5 },
+      "yeni":   { "absorbed_current_a": 18, "weight_kg": 18 },
+      "kolon_onceki": { "weight_kg": 18.5 },
+      "kolon": { "weight_kg": 18 }
+    }
+  }
+}
