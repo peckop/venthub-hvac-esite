@@ -23,8 +23,6 @@
       "Bash(git push -u origin *)",
       "Bash(git -C * add *)",
       "Bash(git -C * commit *)",
-      "Bash(git -C * push origin *)",
-      "Bash(git -C * push -u origin *)",
       "Bash(gh pr create *)",
       "mcp__claude_ai_Vercel__list_deployments",
       "mcp__codegraph__codegraph_explore",
