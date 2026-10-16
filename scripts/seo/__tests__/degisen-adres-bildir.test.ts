@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
+  K4_GEVSEK,
   calistir,
   depoIciMi,
   farkHesapla,
@@ -138,9 +139,9 @@ function dizin() {
 
 const sayfalar = (): Record<string, Sayfa> => ({ [BILGI]: { baslik: 'Rehber' }, [URUN]: { baslik: 'Ürün' }, [KATEGORI]: { baslik: 'Kategori' } })
 
-async function kos(fetchFn: typeof fetch, y: ReturnType<typeof dizin>, kip: 'kuru' | 'taban-kur' | 'uygula', k3bAcik = false) {
+async function kos(fetchFn: typeof fetch, y: ReturnType<typeof dizin>, kip: 'kuru' | 'taban-kur' | 'uygula', k3bAcik = false, k4Gevsek?: boolean) {
   const satirlar: string[] = []
-  const s = await calistir({ fetchFn, site: SITE, ...y, kip, k3bAcik, anahtar: ANAHTAR, zaman: '2026-10-16T09:00:00Z', cikti: (m: string) => satirlar.push(m) })
+  const s = await calistir({ fetchFn, site: SITE, ...y, kip, k3bAcik, k4Gevsek, anahtar: ANAHTAR, zaman: '2026-10-16T09:00:00Z', cikti: (m: string) => satirlar.push(m) })
   return { ...s, satirlar: satirlar.join('\n') }
 }
 
@@ -179,12 +180,28 @@ describe('INV-DEGISEN-ADRES-1 · uçtan uca', () => {
     expect(existsSync(y.kuyrukYolu)).toBe(false)
   })
 
-  it('(l) K4 kapalı: değişmeyen tür IndexNow\'a gider; ürün gitmez, kuyruğa girer, tabanı eski kalır; sonraki koşuda yeniden görünür', async () => {
+  it('(l0) karar 376: varsayılan K4_GEVSEK true; bayrak kapalıyken de değişen ürün ve rehber birlikte IndexNow\'a gider', async () => {
+    expect(K4_GEVSEK).toBe(true)
+    const y = dizin()
+    await kos(sahteSite(sayfalar()).fetchFn, y, 'taban-kur')
+    const a = sahteSite({ ...sayfalar(), [BILGI]: { baslik: 'Rehber v2' }, [URUN]: { baslik: 'Ürün v2' } })
+    const s = await kos(a.fetchFn, y, 'uygula')
+    expect(s.cikis).toBe(0)
+    expect(a.postlar).toHaveLength(1)
+    expect([...a.postlar[0].govde.urlList].sort()).toEqual([BILGI, URUN].sort())
+    // Gönderilenler tabanda ilerledi: ikinci koşuda fark yok.
+    const b = sahteSite({ ...sayfalar(), [BILGI]: { baslik: 'Rehber v2' }, [URUN]: { baslik: 'Ürün v2' } })
+    const s2 = await kos(b.fetchFn, y, 'uygula')
+    expect(s2.satirlar).toContain('yeni 0 · metin 0 · lastmod 0')
+    expect(b.postlar).toHaveLength(0)
+  })
+
+  it('(l) eski K4 (k4Gevsek=false geri dönüşü): değişmeyen tür gider; ürün gitmez, kuyruğa girer, tabanı eski kalır; sonraki koşuda yeniden görünür', async () => {
     const y = dizin()
     await kos(sahteSite(sayfalar()).fetchFn, y, 'taban-kur')
     const degisen = { ...sayfalar(), [BILGI]: { baslik: 'Rehber v2' }, [URUN]: { baslik: 'Ürün v2' } }
     const a = sahteSite(degisen)
-    const s = await kos(a.fetchFn, y, 'uygula')
+    const s = await kos(a.fetchFn, y, 'uygula', false, false)
     expect(s.cikis).toBe(0)
     expect(a.postlar).toHaveLength(1)
     expect(a.postlar[0].govde.urlList).toEqual([BILGI])
@@ -192,7 +209,7 @@ describe('INV-DEGISEN-ADRES-1 · uçtan uca', () => {
     expect(jsonlOku(readFileSync(y.kuyrukYolu, 'utf8')).map((q: any) => q.adres).sort()).toEqual([BILGI, URUN].sort())
     // İkinci koşu: rehber artık tabanda (gönderildi), ürün hâlâ "metin" farkı (K4 bekliyor), tekrar POST yok.
     const b = sahteSite(degisen)
-    const s2 = await kos(b.fetchFn, y, 'uygula')
+    const s2 = await kos(b.fetchFn, y, 'uygula', false, false)
     expect(s2.satirlar).toMatch(/metin\s+https:\/\/venthub\.com\.tr\/tr\/products\/aile-1/)
     expect(s2.satirlar).not.toContain(BILGI)
     expect(b.postlar).toHaveLength(0)

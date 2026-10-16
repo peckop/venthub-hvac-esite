@@ -22,10 +22,10 @@
  *
  * KURALLAR:
  *   - Taban ve kuyruk DEPO DIŞINDA durur (P6: arama/sayfa verisi depoya yazılmaz); depo içi yol exit 2.
- *   - K4 (Recep, 2026-09-03; karar 164 A): `ADRES_SEMASI_K3B` KAPALIYKEN ve `K4_GEVSEK` false iken IndexNow'a yalnız
- *     yayında DEĞİŞMEYEN adresler gider (`degismeyenMi`); ürün/kategori/marka adresleri GİTMEZ ama Google kuyruğuna girer
- *     (K4 Bing'i/IndexNow'u kapsar) ve tabanları GÜNCELLENMEZ, böylece kapı açılınca bir sonraki koşu onları gönderir.
- *     `K4_GEVSEK` yalnız karar 376 (K4 gevşetme) verildiğinde, ayrı küçük bir değişiklikle true yapılır.
+ *   - K4 (2026-09-03; karar 164 A) karar 376 (2026-10-16) ile GEVŞEDİ: `K4_GEVSEK = true` iken bayrak kapalıyken de haritadaki
+ *     (200 + kanonik=kendisi) her değişen adres IndexNow'a gider. `K4_GEVSEK = false` yapılırsa eski kural döner: yalnız
+ *     yayında DEĞİŞMEYEN adresler gider (`degismeyenMi`); ürün/kategori/marka adresleri GİTMEZ ama Google kuyruğuna girer ve
+ *     tabanları GÜNCELLENMEZ, böylece kapı açılınca bir sonraki koşu onları gönderir.
  *   - IndexNow reddederse (2xx dışı) gönderilen adreslerin tabanı güncellenmez: bir sonraki koşu yeniden dener.
  *   - Okunamayan adres (ağ hatası, 5xx) "kaldırıldı" sayılmaz; tabandaki eski kaydı KALIR. Okunamayan oranı
  *     `OKUNAMAYAN_AZAMI`'yı aşarsa koşu DURUR ve hiçbir şey yazmaz.
@@ -51,10 +51,11 @@ const MAX_URL = 10_000
 const DEPO_KOKU = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 /**
- * K4 gevşetme anahtarı. FALSE = bayrak kapalıyken IndexNow'a yalnız değişmeyen adresler gider. Karar 376 (K4 gevşetme)
- * verilince tek satırlık ayrı değişiklikle true yapılır; ondan önce true yapmak K4'ü çiğner.
+ * K4 gevşetme anahtarı. TRUE (karar 376, 2026-10-16): haritada olan ve 200 + kanonik=kendisi veren her değişen adres, adres
+ * şeması bayrağı kapalıyken de IndexNow'a gider. FALSE yapılırsa eski K4 geçerli olur (yalnız yayında değişmeyen türler gider,
+ * ürün/kategori/marka adresleri kuyruğa girer ve tabanı eski kalır); geri dönüş için tek satır.
  */
-export const K4_GEVSEK = false
+export const K4_GEVSEK = true
 
 /** Okunamayan adres oranı bunu aşarsa koşu durur (site kesintisinde "her şey değişti/kalktı" demesin). */
 export const OKUNAMAYAN_AZAMI = 0.2
@@ -327,7 +328,7 @@ function dur(kod, mesaj) {
 }
 
 /** Dışa açık çalıştırıcı: testler `fetchFn` ve zaman enjekte eder; CLI gerçek `fetch` verir. */
-export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, kip, k3bAcik, anahtar, zaman = new Date().toISOString(), cikti = console.log }) {
+export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek = K4_GEVSEK, anahtar, zaman = new Date().toISOString(), cikti = console.log }) {
   const siteUrl = site.replace(/\/+$/, '')
   const host = new URL(siteUrl).host
   const harita = await fetchFn(`${siteUrl}/sitemap.xml`, { headers: { 'user-agent': 'venthub-degisen-adres' } })
@@ -362,7 +363,7 @@ export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, k
   cikti(`fark: yeni ${sayim('yeni')} · metin ${sayim('metin')} · lastmod ${sayim('lastmod')} · aynı ${ayni} · kalkan ${kalkan.length}`)
   for (const d of degisimler) cikti(`  ${d.tur.padEnd(7)} ${d.adres}`)
   for (const a of kalkan) cikti(`  KALKAN  ${a} (haritada yok; bildirilmez)`)
-  const plan = indexNowPlani(degisimler, { k3bAcik })
+  const plan = indexNowPlani(degisimler, { k3bAcik, k4Gevsek })
   cikti(`IndexNow planı: gidecek ${plan.gidecek.length} · K4 bekleyen ${plan.bekleyen.length}`)
   if (kip !== 'uygula') {
     cikti('KURU KOŞUM — hiçbir şey gönderilmedi, yazılmadı.')
