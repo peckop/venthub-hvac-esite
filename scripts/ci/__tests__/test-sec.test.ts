@@ -492,6 +492,35 @@ const SENARYOLAR: Senaryo[] = [
       )
     },
   },
+  {
+    // ALT-83b: bayat + kayıtsız oranı yüzde 10'u AŞARSA "her zaman koşan" satırı tazeleme uyarısı taşır (bloklamaz: seçim aynı); sınırda (tam yüzde 10) ve küçük listede yok.
+    ad: 'harita bayat uyarısı: oran yüzde 10\'u aşınca "her zaman koşan" satırına tazele komutu eklenir; sınırda ve 100\'den küçük listede eklenmez; seçimi değiştirmez',
+    kos: (m) => {
+      const KOMUT = 'node scripts/ci/test-haritasi-uret.cjs --bayat'
+      const kur = (toplam: number, kayitsiz: number) => {
+        const liste = Array.from({ length: toplam }, (_, i) => `src/lib/__tests__/toplu-${String(i).padStart(3, '0')}.test.ts`)
+        const h = haritaKur()
+        const testler: Record<string, string> = {}
+        const kayit: Harita['testler'] = {}
+        liste.slice(kayitsiz).forEach((t) => {
+          kayit[t] = { sha: `sha-${t}` }
+          testler[t] = `sha-${t}`
+        })
+        h.testler = kayit
+        const s = m.sec({ degisenDosyalar: ['docs/a.md'], testDosyalari: liste, harita: h, ilgili: () => [], tazelik: { arac: h.arac, testler } })
+        const satir = s.neden.find((n) => n.startsWith('her zaman koşan'))
+        return { s, satir: satir ?? '' }
+      }
+      const sinir = kur(120, 12)
+      darMi(sinir.s, 'sınır')
+      dogru(sinir.satir.includes('haritada yok 12') && !sinir.satir.includes('UYARI'), `tam yüzde 10 uyarı vermemeli: ${sinir.satir}`)
+      const asan = kur(120, 13)
+      darMi(asan.s, 'eşik aşımı')
+      dogru(asan.satir.includes('UYARI') && asan.satir.includes('yüzde 11') && asan.satir.includes('13/120') && asan.satir.includes(KOMUT), `uyarı + komut beklenir: ${asan.satir}`)
+      esit(asan.s.secilen.length, 13, 'uyarı seçimi değiştirmez: yalnız 13 kayıtsız test koşar')
+      dogru(!kur(99, 99).satir.includes('UYARI'), '100\'den küçük listede uyarı verilmez')
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------------------------------------------------------
@@ -545,6 +574,9 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: 'çıktı sıralanmaz (girdi sırasına bağımlı)', eski: 'const sirali = [...secilen].sort();', yeni: 'const sirali = [...secilen];' },
   { ad: 'tam sonucu sıralanmaz', eski: "testDosyalari.filter((t) => typeof t === 'string').sort()", yeni: "testDosyalari.filter((t) => typeof t === 'string')" },
   { ad: 'alt ağaç eşleşmesi önek sınırını kaybeder (standards-ekstra eşleşir)', eski: 'for (const u of uste) tumu(indeks.ozy.get(u));', yeni: 'for (const [k, v] of indeks.ozy) if (yol.startsWith(k)) tumu(v);' },
+  { ad: 'bayat uyarısı tam sınırda da verilir (> yerine >=)', eski: 'bayatKayitsiz / liste.size > BAYAT_UYARI_ORANI', yeni: 'bayatKayitsiz / liste.size >= BAYAT_UYARI_ORANI' },
+  { ad: 'bayat uyarısı küçük listede de verilir', eski: 'liste.size >= BAYAT_UYARI_ASGARI_TEST && ', yeni: '' },
+  { ad: 'bayat uyarısı tazeleme komutunu yazmaz', eski: 'tazele: node scripts/ci/test-haritasi-uret.cjs --bayat`', yeni: 'tazele`' },
 ]
 
 function sabotajliModul(sabotaj: Sabotaj, dizin: string, sira: number): Modul {
