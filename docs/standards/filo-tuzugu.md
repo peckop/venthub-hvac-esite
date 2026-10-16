@@ -126,8 +126,9 @@ yalnız `cetvel-sahipligi.json` ile ve sahibin teyidiyle değişir.
 
 ## Madde 10 — İş kaydı
 
-Kart alanları `is-kayit-duzeni-standard.md` §2 ile birebirdir (Ne, Niçin, Kabul ölçütü, Eleme kaydı ve KAYNAK/CETVEL, YÖNTEM,
-ÖNCEKİ ÇALIŞMA; Recep'e bağlıysa RECEP YETKİSİ). Bitişin kanıtı `verify_completion`'dır.
+Kart alanları `is-kayit-duzeni-standard.md` §2 ile birebirdir (Ne, Niçin, Kabul ölçütü, Eleme kaydı, Kim, Ne zaman, Nerede ve
+KAYNAK/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA; Recep'e bağlıysa RECEP YETKİSİ). 5N1K her iş kartının da zorunlu tanımıdır
+(Recep 16 Ekim: "her şey tam tanımlı olmalı"): Kim, Ne, Ne zaman, Nerede, Nasıl, Neden. Bitişin kanıtı `verify_completion`'dır.
 
 ## Madde 11 — Recep ile iletişim
 
