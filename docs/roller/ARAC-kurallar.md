@@ -2,6 +2,18 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/ARAC.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Kapı ve kanca testi sabotajla doğrulanır.** Yeni kapının testinde kapıyı bozan en az bir sabotaj kolu bulunur; sabotajsız yeşil kanıt sayılmaz. Olay: ARC-150 (#1966) sabotaj testi ilk yazıldığında kör çıktı, çünkü aranan ifade tanım satırında da geçiyordu; kontrol çağrı satırına sıkılaştırılınca sabotajı yakaladı.
+2. **Kanca, ayar ve scripts/board değişikliği OPS tam fark okumadan birleşmez.** PR gövdesine "OPS tam fark okur" notu yazılır; settings.json kaydını yalnız OPS yapar. Olay: #1966 ve karar 378 (kanca PR'ı birleşti, kayıt OPS'ta bekledi).
+3. **Yeni kanca varsayılan olarak salt-okuma, fail-open ve çıktı tavanlıdır; vanası olur.** Hata ya da bozuk girdi durumunda oturumu bozmaz, çıkış 0 verir. Engelleyen (deny) kanca ayrı karar ve OPS onayı ister. Olay: ARC-147 headless ölçümü (InstructionsLoaded asenkron, engel yok) ve ARC-155 tasarımı.
+4. **Envanter satırı dosyayla aynı PR'da gelir ve satırı PR sahibi yazar; ARAÇ okur.** Dosya master'da yokken satır eklenirse INV-ARAC-1 "KAYIP" kırmızı verir. Olay: #1960, #1963, #1964, #1976 (GEO-SEO, ALTYAPI, KATALOG satırları kendi PR'larında geldi, ARAÇ "okudu" notunu yazdı).
+5. **Araç betiği (`--yaz` gibi) başka şeridin ağacında envanter ya da ortak dosya yazmaz.** Yazma yalnız ARAÇ şeridinde ya da açık hedef yolla. Olay: GEO-SEO worktree'sinde commit'siz değişiklik (OPS bulgusu, düzeltme #1962).
+6. **CRLF/LF ve bağlam kayması: yama yerine hedef satırı Edit ile değiştir, sonra kapıyı koştur.** Yama birleşen master'a uygulanmadığında (ALTYAPI #1963) üç satır Edit ile eklendi ve `arac-envanteri.cjs --bugun` yeşil doğruladı. Yazma kapısı heredoc'u reddederse dolanma, aracı değiştir.
+7. **WrongStack yükseltmesi yalnız ARAÇ ve OPS penceresi açıkken, önce sage yedeğiyle yapılır.** Sıra: `sage-yedek.cjs` → birleşme → `kurulum.cjs` → `saglik.cjs` → `--sunucu` → `kurulum.cjs --denetle`; yamalar yeni sürüme yeniden tabanlanır (1.1.4'te kanban özet-dönüş yaması uymadı). Olay: ARC-151.
+8. **Alt ajan görev metni çalışma dizinini ve dalı yazar; ajan işe başlamadan doğrular, uymuyorsa durur.** Olay: ARC-129 ve ARC-130 (testler gerçek depoya kimlik yazdı), ARC-120 (isolation worktree uzak varsayılan daldan açıldı). Kanca hatırlatması: ARC-162.
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 
 ## Recep'e mesaj kuralları (ayrıntı; yöneten metin `~/.claude/output-styles/recep.md`)

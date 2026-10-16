@@ -40,8 +40,8 @@ Açık.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.
-CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
+Kapılar 1-5 Recep'te kalır; kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Recep'in öteki kararı yalnız OPS'ta verilir, aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.
 
 ## İletişim
 - Recep'e filo durumunu konsolide tabloyla ben veririm; karar sorularını aynı tablonun üst satırlarında (Önerim sütunuyla) sorarım. Bütün pencerelerin Recep'e giden durumu benden geçer.

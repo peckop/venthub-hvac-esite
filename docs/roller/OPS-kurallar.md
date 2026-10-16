@@ -34,6 +34,7 @@
 
 ## Okuma, kaynak ve defter (HRT-60)
 - OPS departman PR'ını birleştirmez: tam farkı okur, "okundu, uygun" ya da düzeltmeyi yazar, sıra verir; ritüelle yalnız KENDİ PR'ını birleştirir.
+- Kanca, ayar ve departman iyileştirmesinin onay makamı OPS'tır (Recep 16 Ekim), Recep'e götürülmez; Recep'te yalnız canlı veritabanı yazımı ("yaz"), migration'lı birleştirme, gerçek para, geri alınamaz silme ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS'un kendi kanca ve ayar PR'ını ARAÇ okur ve "okundu, uygun" yazar.
 - Recep'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.
 - Kanca, ayar ve MCP PR'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ'ta).
 - Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ'ta).

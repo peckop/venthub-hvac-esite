@@ -16,7 +16,7 @@
           "esik": "Yeni KIRMIZI 0 (cetvel Y3)"
         },
         {
-          "gorev": "Haftalık veri incelemesi: Search Console ve Bing verisini kendi verimizden oku (aynı aramada yarışan sayfalar, dizinlenme oranı, düşen ve ilk 10'a giren sayfalar, son 60 günde değişene dokunma kuralı)",
+          "gorev": "Haftalık veri incelemesi: Search Console ve Bing verisini kendi verimizden oku (aynı aramada yarışan sayfalar, dizinlenme oranı, düşen ve ilk 10'a giren sayfalar, son 60 günde değişene dokunma kuralı); Search Console Geliştirmeler ve Alışveriş raporları (ürün snippet'leri, sayfa dizine ekleme, Core Web Vitals) da okunur, yeni sorunda aynı gün kart ve sahibine yazı",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": "istem satırında \"SEO haftalık: N gün\" (7 gün eşik); satırı ARAÇ kuruyor, ARC-28; incelemenin kendisi SEO-17",
@@ -49,16 +49,24 @@
           "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
         },
         {
-          "gorev": "Yayın sonrası dizin isteği: yeni yazı ya da düzeltilmiş sayfa canlıda 200 görülünce Search Console'da URL denetimi ve \"dizine eklenmesini iste\" (yalnız o adresler) ile IndexNow gönderimi; bu görev GEO-SEO'nundur, Recep'ten ayrıca onay istenmez",
-          "komut": "scripts/seo/indexnow-bildir.mjs",
+          "gorev": "Yayın sonrası dizin isteği: canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda IndexNow ve Google kuyruğu (değişen adres bildiricisi); Google günlük sınırı sabit değil ölçülür (bugüne dek 11), sınıra takılan adres sonraki gün ilk iş; GEO-SEO'nundur, onay sorulmaz",
+          "komut": "scripts/seo/degisen-adres-bildir.mjs",
           "siklik": "olay",
-          "tetik": "kart-kapisi",
-          "tetikAyrinti": "yayın kartı (BLOG, KATALOG, URUN) Done'a geçerken kapıda dizin isteği satırı (henüz yok); o zamana dek yayını bildiren pencere GEO-SEO'ya SendMessage yazar",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/dizin-tetigi.yml deployment_status (başarılı üretim dağıtımı) + günlük schedule; iş akışı ALT-91 (#1976), kuyruk komutu --kuyruk-sonraki",
+          "bagli": "evet",
           "cikti": "Adres başına Search Console isteği ve IndexNow sonucu ilgili Kanban kartına; engel varsa (oturum yok, günlük sınır) OPS'a tek satır",
-          "esik": "TASLAK: canlıda 200 görülen her yeni ya da düzeltilmiş adres için aynı gün istek; Search Console günlük sınırına takılan adresler sonraki gün, IndexNow aynı gün; GEO-SEO teyit eder.",
-          "taslak": true
+          "esik": "Canlıda 200 görülen her yeni ya da değişen adres için aynı gün istek; Google sınırına takılan ertesi gün ilk iş"
+        },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
       ]
     },
@@ -95,6 +103,16 @@
           "baglayacak": "HARITA",
           "cikti": "Eksik alanların listesi kart sahibine; kurulunca planı eksik kart Review'a geçmez",
           "esik": "GEÇTİ: plan iskeleti eksiksiz (docs/standards/kart-plani-standard.md)"
+        },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
       ]
     },
@@ -143,6 +161,16 @@
           "cikti": "PR'a hüküm notu ve OPS'a tek tablo; birleştirmeyi ya da kapatmayı ARAÇ ya da OPS yapar, TAKİP yapmaz",
           "esik": "TASLAK: hükümsüz açık güncelleme PR'ı 0",
           "taslak": true
+        },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
       ]
     },
@@ -209,6 +237,16 @@
           "cikti": "docs/audits/adres-matrisi-<tarih>.json ve kusur için Kanban kartı",
           "esik": "TASLAK: hata satırı 0 ve dilsiz adreslerde --dilsiz-hop-en-cok değerinin altı (rota-dili-standard.md; ölçüt ALT-14 canlı ölçümünden)",
           "taslak": true
+        },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
       ]
     },
@@ -276,6 +314,81 @@
           "cikti": "PR gövdesine kare numarası ve ölçüm satırı; fark Kanban kartı ÜRÜN'e (sayfa) ya da TASARIM'a (token, bileşen)",
           "esik": "TASLAK: geçti/kaldı ölçütü venthub-tasarim-dili skill'indeki ölçüm satırıdır; TASARIM teyit eder",
           "taslak": true
+        },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        }
+      ]
+    },
+    "KATALOG": {
+      "amac": "Sitedeki ürün sayıları (ses, ağırlık, devir, fiyat) üreticinin güncel kataloğuyla birebir tutsun; bozulursa müşteri yanlış fan seçer, iade ve güven kaybı olur; her değer kaynak sayfasına dayanır, canlı yazımı KATALOG hazırlar, Recep onayıyla OPS koşar.",
+      "gorevler": [
+        {
+          "gorev": "Kaynak dizini tazelik kapısı: dizin PDF'lerle ve çıktı CSV'leriyle örtüşüyor mu (kardeş depo scripts/kaynak_dizini/tazelik.py ve cikti_tazelik.py)",
+          "siklik": "her-dagitim",
+          "tetik": "actions",
+          "tetikAyrinti": "venthub-pdf-ingestor/.github/workflows/kaynak-kapilari.yml (kardeş depoda her push ve PR)",
+          "bagli": "evet",
+          "cikti": "Kırmızıda PR durur; kusur sahibi KATALOG, Kanban kartı",
+          "esik": "Kapı çıkışı 0 (dizin diskle örtüşüyor, çıktı CSV'ler taze)"
+        },
+        {
+          "gorev": "Katalog bütünlük kapısı: canlı katalog tutarlılığı tabana karşı; iş akışı dosyasının sahibi ALTYAPI, KATALOG yalnız katalog açısından kırmızıyı okur",
+          "komut": "scripts/db/checks/catalog-integrity.mjs",
+          "siklik": "her-dagitim",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/db-advisor.yml (catalog-integrity işi)",
+          "bagli": "evet",
+          "cikti": "Kırmızıda Kanban kartı; katalog verisi tarafını KATALOG okur, iş akışı kusurunu ALTYAPI düzeltir",
+          "esik": "Taban dosyasına (scripts/db/checks/catalog-integrity-baseline.json) karşı yeni ihlal 0"
+        },
+        {
+          "gorev": "Veri çıkarım kapısı: Design'ın teslim ettiği CSV kaynağa karşı doğrulanır (venthub-pdf-ingestor veri_cikarim_kapisi.py --csv <yol>)",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "Design teslimini işleyen kartta kapı satırı (henüz yok); o zamana dek OPS teslimi bildirince elle",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "OPS'a tek tablo; ihlaller Design'a",
+          "esik": "Kapı çıkışı 0; tablo hücresi kaynakta birebir yoksa yazılmaz"
+        },
+        {
+          "gorev": "Baskı tazelik taraması: canlı değer ile üreticinin SON baskısı aile aile karşılaştırılır; önce ses, ağırlık, devir, sonra diğer alanlar (KTL-51)",
+          "siklik": "aylik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"katalog baskı: N gün\" (30 gün eşik); satırı ARAÇ kuracak; üreticiden yeni baskı gelince de koşar",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Sapma tablosu (aile, alan, canlı değer, güncel baskı ve tarihi) ve her sapma için düzeltme betiği kartı",
+          "esik": "TASLAK: sapma 0 ya da her sapma bir kartla; eşiği KATALOG belirler",
+          "taslak": true
+        },
+        {
+          "gorev": "Yazım sonrası canlı sayfa ölçümü: OPS canlı yazımı bitirince yazılan değerin sayfada göründüğünü ölç (sunucu HTML'in veri yükü ve tarayıcıda model seçimi)",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "yazım kartında ölçüm notu satırı (henüz yok); OPS canlı yazımı sonrası",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Karta ölçüm notu (neyi, nasıl ölçtüm, sonuç)",
+          "esik": "Yazılan alanların tamamı sayfada beklenen değerde; sapma 0"
+        },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
       ]
     }

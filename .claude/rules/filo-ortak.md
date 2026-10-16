@@ -32,20 +32,22 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Kartı kanıt komutuyla aç (`add_check`: `command` ya da `file_matches`). Done'a taşımadan önce `verify_completion` koştur; rapor `passed` değilse taşıma. PR için kanıt `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`, kod için `pnpm test:ilgili` çıktısıdır. Ölçmediğin şeyi olgu diye yazma.
 - PR gövdesinde `Kanban: <ÖN EK>-<sayı>` satırı bulunur (kapı: scripts/board/pr-kayit-kapisi.cjs; taşınan kart için `Kanban: REC-nn` geçerlidir). Linear kapatma bağı (`Fixes REC-nn`) yazma; kapanmaması gereken Linear numarasını başlığa ve gövdeye koyma.
 - Migration içeren PR'ı yalnız Recep onayıyla birleştir (master'a birleşince prod'a otomatik uygulanır); onayın nerede verildiği aşağıda.
-- Kanca ve ayar etkili PR'ı (.claude/hooks, scripts/board, settings.json) OPS tam diff okumadan birleştirme; yazar bunu PR'a not etsin.
+- Kanca ve ayar etkili PR'ı (.claude/hooks, scripts/board, settings.json) OPS tam diff okumadan birleştirme (onay makamı OPS); yazar bunu PR'a not etsin.
 - Salt-okuma alt ajanı (araştırmacı, çürütücü, doğrulayıcı) `name` vermeden aç; yazan uygulayıcıyı `name` ile aç.
 - Alt ajanın görev metnine "bu dala push yok" yaz; açık bir PR dalına push ettirme.
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`, etiketler rol ve ders).
 - Recep'in onayladığı işi bekletmek için ölçülmüş engel gerekir; bekletme kararı karta "ölçüldü mü?" satırıyla yazılır.
 - Sorun için kendi çözümünü yazmadan önce Claude Code'un yerleşik karşılığını belgeden ara.
+- İyileştirme hakkı: her departman kendi alanında iyileştirme önerir ve yapar (kural, cetvel, düzenli görev, kapı, skill). Uygulamadan önce OPS'a tek mesaj yaz: ne, kazanç, bedel, kart numarası; OPS onayı gelmeden uygulanmaz. Her Cuma müdür kendi ekibinden bir çürütücü açar, haftanın kart ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okutur; bulgudan en çok 3 öneri OPS'a gider.
 
 ## Recep ile iletişim
 
 - Recep'e mekanik iş verme: dışa aktarma, kopyala-yapıştır, canlı yazım ya da pencere değiştirme adımı yazma. Tek istisna COMPACT YAKIN'daki `/compact` satırıdır; Recep onu yalnız kendi penceresine yapıştırır, bu mekanik iş sayılmaz.
-- Onay nerede verilir, üç durum:
+- Onay nerede verilir, üç durum (16 Ekim: kanca, ayar ve departman iyileştirmesinin onay makamı OPS'tır, Recep'e götürülmez):
   - Canlı yazım betiği: departman hazırlar ve koşmaz; Recep "yaz" sözünü OPS penceresinde söyler, OPS koşar. Komut, ortam değişkeni adları ve geri alma yolu OPS'a gider.
-  - Migration'lı PR birleştirme, gerçek para, geri alınamaz silme: Recep'in sözü işi koşan pencerede geçerlidir; onay pencereler arası taşınmaz (karar 224).
-  - Canlı dışı her onay ve ayar değişikliği: departman metni ya da komutu hazırlayıp OPS'a `SendMessage` ile verir; Recep yalnız OPS'a söyler, ayar ve izin dosyasını OPS kendi penceresinde uygular.
+  - Migration'lı PR birleştirme, gerçek para, geri alınamaz silme: Recep'in sözü işi koşan pencerede geçerlidir; onay pencereler arası taşınmaz (karar 224). Menü yeri, adres ve fiyat gibi ürün kararları da Recep'indir.
+  - Kanca, ayar (settings), izin dosyası ve departman iyileştirmesi: departman metni ya da komutu hazırlayıp OPS'a `SendMessage` ile verir; OPS tam farkı okuyup onaylar ve ayar ve izin dosyasını kendi penceresinde uygular; Recep'e sorulmaz. OPS'un kendi kanca ve ayar PR'ını ARAÇ okur ("okundu, uygun" yazar).
+- Pencereler farklı izin modundayken `SendMessage` bekletilip düşebilir; tüm pencereler aynı modda tutulur.
 - Karar sorusu tablodaki Onayında satırıdır (Önerim sütunu: evet ya da hayır ve tek cümle gerekçe). Tablonun altında akan cümlelerle beşini söyle: ne bu (tarihçesiyle), hiç çalıştı mı, işimize yarar mı ve neden, aktif etmezsek ne olur, önerim. Başlık etiketi kullanma; bağlamsız "onaylar mısın" sorma.
 - Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üst satırlardır, ayrı tablo yoktur.
 - Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.

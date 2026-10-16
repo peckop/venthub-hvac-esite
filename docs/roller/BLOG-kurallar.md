@@ -2,6 +2,18 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/BLOG.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Doğrulama klasörü temiz kopya.** Bağımsız doğrulama turuna giden klasöre yalnız o turun kopyası konur (taslak + iddia tablosu + satır listesi). Olay: BLG-15 tur 1 klasöründe temiz kopya kalmış, doğrulayıcı görmüş, bağımsızlık bozulmuş.
+2. **Metin değişince sha256 yenilenir ve tur türü seçilir.** Doğrulanmış metinden sonra tek karakter değişirse sha256 yenilenir; yalnız doğrulayıcı önerisiyle yapılan düzeltmede "değişen satırlar + tam okuma" teyit turu, başlık ya da anlam değişikliğinde bağımsız tam okuma koşar. Olay: BLG-15 tur 4, 5, 6 (üç kez sha değişti).
+3. **Başlıklar içerikten ayrı, bağımsız okunur.** Sahte hatalı kopya yazarın yeni başlıklarını sınamaz. Olay: BLG-13 (tur 2'de üç zayıf başlık) ve BLG-15 (başlık okumasında 8 zayıf başlık, 2 içerik riski).
+4. **Mevzuat atfı ham metinden ölçülür.** Madde ve ek numarası ile değiştirici yönetmelikler ham metinden alınır, özetten alınmaz. Olay: BLG-15 (tanımlar md.3 yazılmış, doğrusu md.4; 2018 değişikliği atıfsız kalmıştı).
+5. **MEVZUAT penceresi kapalıyken mevzuat cümlesi üç şartla yazılır:** her cümle için Resmî Gazete bağlantısı + ek PDF sayfa/tablo no + birebir alıntı; bağımsız doğrulayıcı aynı satırları birincil metinden ikinci kez okur, eşleşmeyen satır yazıdan çıkar; iddia tablosunda "MEVZUAT kontrolü yapılmadı (pencere kapalı), birincil metin BLOG + doğrulayıcı" notu kalır (R2.6'ya ayrı PR ile yazılacak). Dayanak: OPS hükmü, BLG-14 ve BLG-15.
+6. **Bağlanan sayfa içeriğiyle ölçülür.** Yazının bağlandığı ürün ve kategori sayfası yalnız durum koduyla değil içeriğiyle ölçülür: sayfadaki sayı alanları yazıdaki tabloyla karşılaştırılır, fark ilgili departmana (KATALOG/ÜRÜN) kartla gider. Olay: BLG-15 (ürün sayfası AC modellerde 26,1/25/30,7/40,2/40,1/45,4 dB(A) verirken katalog farklı).
+7. **Güncelleme tarihi aynı PR'da değişir.** Yayın ya da revizyon PR'ında yazı kaydındaki güncelleme tarihi aynı PR'da değişir; birleşmeden sonra canlı site haritası lastmod'u curl ile ölçülür. Olay: BLG-13 (lastmod eski kaldı, ayrı PR gerekti).
+8. **İddia tablosunda kaynak alanı betikle ölçülür.** Kaynak alanı cümledeki atıf kümesinden üretilir. Olay: BLG-15 (tur 4'te doğrulayıcı iki satırda, betikle ölçünce toplam yedi satırda kaynak alanı cümledeki atıflardan eksikti).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K7 i18n: Kullanıcıya görünen her metin sözlük dosyalarından gelir.
 - K13 Typography prose: Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.

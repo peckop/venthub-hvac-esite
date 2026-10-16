@@ -2,6 +2,20 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/URUN.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Servis katmanında DI (Mutlak Kural 2).** `src/lib/services/*` fonksiyonu ilk parametre `supabase` alır, modül düzeyi client yok; her yeni servis için sahte fetch ile süzgeç/hata yolu testi yazılır. Olay: URN-135'te `sessizFanKodlari.service.ts` bu desenle yazıldı, ilk yazımda status/silinmiş süzgeci testle sabitlendi.
+2. **Fiyat görünmüyorsa şemada da yok.** Yapısal veride `offers` yalnız vitrinde görünen geçerli fiyat için; teklif kipinde, fiyatsız ya da karışık ailede `ProductGroup/Product/hasVariant/offers` yazılmaz, `CollectionPage` + `ItemList` yazılır; `price: 0`, uydurma `review/aggregateRating` yasak. Olay: REC-111 (80 ürün adresinin 72'sinde gerçek fiyat yayınlandı) ve URN-138 (Search Console KRİTİK, 47 aile / 441 varyant).
+3. **`sku` ve model kodu yayınlanmaz kuralı: `INV-SKU-GORUNMEZ-1`.** Varyant SKU'su okunan yer tek modülde kalır; sayfa bileşeninde `variants.map(v => v.sku)` yazılmaz. Olay: URN-135 aile metni ilk sürümü bu kapıyı (bos-sku-render K6) kırmızı verdi.
+4. **Ses ve performans sayısı koşulsuz yazılmaz.** Vitrinde dB(A) gibi bir sayı yalnız tek üreticiden (`sesEtiketi`: değer · kademe · ölçüm noktası · mesafe) çıkar; metin dosyasındaki sayı elle yazılmaz, veriden doldurulur. Olay: Design metninde katalogda olmayan 10 ifade vardı, bağımsız doğrulama buldu (URN-135).
+5. **İstemci demetine ham veri girmez.** `'use client'` bileşenin import kapanışına büyük veri dosyası ya da veri modülü sokulmaz; veri sunucuda hesaplanıp küçük string/prop olarak geçer; her yeni veri modülü için kapanış testi yazılır. Olay: kategori sayfasına 54 KB veri JSON'u sızdı, doğrulayıcı yakaladı (URN-135, `sesEtiketi.ts` ayrıldı).
+6. **Vitrin metni sırası: Design → KATALOG kaynak doğrulaması → ÜRÜN uygulaması (O8).** Katalogda yoksa yazılmaz; düzeltilmiş tek metin kaynağı dosyası tutulur, uygulayıcı oradan okur. Olay: URN-135 (metin md dosyası, yer tutucular veriden).
+7. **Migration'lı PR yalnız bu pencerede Recep onayıyla birleşir (Mutlak Kural 13); adres şeması değişikliği tek başına Recep'e sorulur.** Olay: URN-85 (#1802, #1853) migration'ları Recep onayıyla bu pencereden birleşti.
+8. **Alt ajan görevine dizin ve dal yazılır, rapor "hangi dizinde, hangi dalda" der; müdür push öncesi `git status`/`git log` ile doğrular.** Bellek düşükken paylaşılan tek kurulu worktree'de iki iş yürütülmez. Olay: URN-138 uygulayıcısı kodu yanlış ağaçta yazdı, yama taşındı.
+
+Genel kurallardan sona alınan: Mevcut OPS-104 "S:0 ayrı sayılır" ve HRT-46 içerik kuralları aynen kalır. K19 ve K20 (3D) 3D departmanına taşındı.
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K2 Tip güvenliği: `any` yasak, strict TypeScript.
 - K7 i18n: Kullanıcıya görünen her metin sözlük dosyalarından gelir.
@@ -14,8 +28,6 @@
 - K15 Önbellek anahtarı: dil: `unstable_cache` anahtar dizisine aktif dil kodu (`lang`) eklenir.
 - K16 ISR + webhook: Statik vitrinde görünen her tablonun DB tetiği VE webhook handler dalı olur; HMAC geçince `revalidatePath`/`revalidateTag`; secret yoksa fail-closed (cetvel: `rendering-cache-standard.md` §3).
 - K17 Hreflang: Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook'u yok.
-- K19 3D gölge: R3F gölge haritası türü `'percentage'` olur; başka (yumuşak) gölge haritası türü yasak.
-- K20 CSP 3D CDN: `connect-src` beyaz listesinde `raw.githubusercontent.com` ve `raw.githack.com` kalıcıdır; kaldırmak yasak.
 - K21 React Compiler (geçiş, uyarı): Basit bileşende manuel `useMemo`/`useCallback` kısıtlı; Gateway viewmodel ve Provider'lar muaf.
 - K22 React.cache (geçiş, katı): RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.
 - K27 Feature flag / RSC: Server Component'ta `getTenantConfig()`, Client Component'ta `useTenant()`; RSC'de client hook yok.

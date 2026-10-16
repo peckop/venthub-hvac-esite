@@ -2,6 +2,20 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/GEO-SEO.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Arama ve sorgu verisi depoya yazılmaz (P6).** Search Console sorguları, tıklama ve gösterim satırları, sayfa bazlı arama verisi depoya, PR'a, kart dışı belgeye girmez; depo dışı arşivde durur. Depo herkese açıktır. Betikler depo içi çıktı yolunu reddeder (`gsc-arsiv.mjs`, `degisen-adres-bildir.mjs`: çıkış kodu 2). Kaynak: SEO-51, SEO-52, SEO-55.
+2. **Dizin tetiği bir insanın hatırlamasına bağlı kalmaz.** Canlıya çıkan her adres ve metin değişikliği IndexNow'a (karar 376: K4 gevşedi, bayrak kapalıyken de) ve Google kuyruğuna girer; yalnız haritada olan, 200 veren, kanoniği kendisi olan adres gönderilir. Olay: FC 101 (16 Ekim): K4 süzgeci ürün adresini düşürdü, kimse haber vermedi, Google eski adresi eski metniyle gösterdi. Kaynak: SEO-54, SEO-55.
+3. **Google günlük dizin isteği sınırı sabit varsayılmaz, ölçülür.** Ölçülen: 11 (15 Ekim gecesi, 12. istekte kota mesajı); tek gözlemdir. Kota mesajı gelene kadar gidilir, gerçek sayı kartta güncellenir. Kaynak: SEO-54.
+4. **Fiyatsız üründe işaretleme (karar 379).** Sahte fiyat, `price: 0` ve uydurma yorum/derecelendirme yazılmaz; görünür olmayan değer işaretlenmez. Fiyatsız ya da karışık aile `CollectionPage` + `ItemList` taşır, ailenin tüm modelleri fiyatlı olunca `ProductGroup` kendiliğinden döner (`urun-yapisal-veri-standard.md` §2). Olay: SEO-56: 47 aile sayfası, 441 varyantın hiçbirinde `offers` yok, Search Console KRİTİK.
+5. **`FAQPage` JSON-LD konmaz** (`src/lib/bilgiMerkezi/jsonld.ts:5`: SSS zengin sonucu 2026-05-07'de kalktı); görünür SSS kalır. Olay: URN-135 brifinde yanlış satır, OPS düzeltti.
+6. **Ölçmeden "dizinde yok", "bozuk" ya da "boş" denmez.** Canlı sayfanın ham HTML'i, Search Console canlı denetim ya da arama sonucu ölçülür; ham veritabanı alanı ya da başkasının aktarımı tek başına kanıt değildir. Olay: "kategoride sessiz 0" aktarımı yanlış çıktı (15 Ekim).
+7. **Arama sonucunda eski metin görülürse önce adres ölçülür.** Sırayla: canlı sayfanın ham HTML'i, eski adresin 308'i, yeni adresin Search Console durumu ("bilinmiyor" olabilir), sonra dizin isteği. Olay: FC 101: canlı sayfa doğruydu, Google eski adresin kaydını gösteriyordu. Kaynak: SEO-54.
+8. **Search Console "Geliştirmeler" ve "Alışveriş" raporları haftalık okunur** (SEO-17 haftalık incelemenin parçası); yeni sorunda aynı gün kart ve sahibine yazı. Olay: ürün snippet'leri sorunu Recep'in e-postasından öğrenildi, görülmemişti (SEO-56).
+
+Genel kurallardan sona alınan: İşe uyan genel kurallar sonda durur: K1 (plan önce), K17 (hreflang), K23 (llms.txt).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K17 Hreflang: Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook'u yok.
 - K23 llms.txt (geçiş, katı): Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).
