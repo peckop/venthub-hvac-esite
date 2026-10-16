@@ -8,7 +8,7 @@
 > **Sahibi:** OPS (metin ve hüküm). HARİTA yalnız belge düzenini, rol kartı üreticisini ve testi tutar.
 > **Üstünlük sırası:** Recep sözü ve CLAUDE.md Mutlak Kurallar > bu tüzük > cetveller. Tüzükle çelişen cetvel sahibine kart
 > olarak bildirilir ve SAHİBİ düzeltir; tüzük başkasının cetvelini değiştirmez.
-> **Durum:** v0.1. Taslak OPS çürütmesinden geçti (15 bulgu işlendi). Tetiği kurulmamış görevler "bağlı: hayır" yazılır.
+> **Durum:** v0.1. Taslak OPS çürütmesinden geçti. Tetiği kurulmamış görevler "bağlı: hayır" yazılır.
 >
 > **Kaynak/cetvel:** `execution-method-standard.md` §10.1 (organ ve rol tablosu), `fleet-mechanism-standard.md` §17 madde 4 ve
 > §18 (onay yolu, izin), `is-kayit-duzeni-standard.md` §2 ve RECEP YETKİSİ, `duzenli-gorevler-standard.md`,
@@ -40,8 +40,8 @@ iyileştirme önerisi, kural metni (Recep kapısı metni hariç), sıra ve önce
 verme (her sayısal iddianın kaynağı karar kartında).
 - **Sınır:** bir kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, 2.2 yolundan
   Recep'e gider. Kapıyı SIKILAŞTIRAN öneri OPS onayıyla geçer.
-- **Günlük iş (Recep 16 Ekim):** günlük işte Recep'e soru sorulmaz; beş Recep kapısı (canlı veritabanı yazımı, migration'lı
-  birleştirme, para harcatan her şey, geri alınamaz silme, ürün kararı) ve izin genişletme dışındaki her onay OPS'a gelir.
+- **Günlük iş (Recep 16 Ekim):** günlük işte Recep'e soru sorulmaz; Madde 2.1'deki beş Recep kapısı (`docs/roller/OPS.md`
+  "Recep kapıları") ve izin genişletme dışındaki her onay OPS'a gelir.
   Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS'a yazılır; Recep'e "şu pencereye şunu yaz" denmez, OPS kalıcı
   kuralı (`autoMode.allow`) önerir. Satır her rolün kurallar dosyasındadır (`scripts/belge/rol-karti-uret.cjs`, birleştirme bloğu).
 

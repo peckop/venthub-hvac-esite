@@ -1263,7 +1263,7 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
       expect(gorevDosyalari[ad], `${ad} görev dosyası Amaç`).toContain(`## Amaç\n${g.amac}`)
       expect(gorevDosyalari[ad], `${ad} görev dosyası Nasıl`).toContain(`## Nasıl\n${g.nasil}`)
     }
-    // Yol gerçekten kullanılıyor: en az bir rolün Amaç'ı karta sığmayıp görev dosyasına işaret ediyor (URUN, YETENEK).
+    // Yol gerçekten kullanılıyor: en az bir rolün Amaç'ı karta sığmayıp görev dosyasına işaret ediyor (şu an URUN).
     expect(Object.keys(uretici.GOREVLER).some((ad) => !uretici.amacKarttaMi(ad))).toBe(true)
   })
 
@@ -1298,7 +1298,7 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     for (const ad of roller) {
       expect(kurallar[ad], ad).toContain("Günlük işte Recep'e soru sorulmaz")
       expect(kurallar[ad], ad).toContain('autoMode.allow')
-      expect(kurallar[ad], ad).toContain('para harcatan her şey')
+      expect(kurallar[ad], ad).toContain('docs/roller/OPS.md')
     }
   })
 })

@@ -149,7 +149,7 @@ const BIRLESTIRME_KURALI = [
   '- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).',
   '- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR\'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).',
   '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.',
-  '- Günlük işte Recep\'e soru sorulmaz; beş Recep kapısı (canlı veritabanı yazımı, migration\'lı birleştirme, para harcatan her şey, geri alınamaz silme, ürün kararı) ve izin genişletme dışındaki her onay OPS\'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS\'a yazılır; Recep\'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).',
+  '- Günlük işte Recep\'e soru sorulmaz; beş Recep kapısı (`docs/roller/OPS.md` "Recep kapıları") ve izin genişletme dışındaki her onay OPS\'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS\'a yazılır; Recep\'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).',
 ].join('\n')
 
 /**
@@ -729,7 +729,7 @@ const TASLAK_ROLLERI = {
 function nasilGecerliMi(nasil, varMi) {
   if (typeof nasil !== 'string' || !nasil.trim()) return false
   if (/^cetvel yok — yazımı kapsamda/.test(nasil.trim())) return true
-  const adlar = nasil.match(/[a-z0-9][a-z0-9-]*\.md/g) || []
+  const adlar = nasil.match(/(?<![\w./-])[a-z0-9][a-z0-9-]*\.md(?![\w.])/g) || []
   return adlar.some((a) => varMi(`docs/standards/${a}`))
 }
 
