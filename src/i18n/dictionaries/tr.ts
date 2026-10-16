@@ -3022,11 +3022,11 @@ export const tr = {
         'Vortice Lineo Quiet, ses emici kaplaması dış gövdeye bütünleşik bir karışık akışlı kanal fanıdır; kaplama çevresel ses emisyonunu en aza indirmek için optimize edilmiştir.',
         'Katalog her model ve çalışma noktası için emiş, üfleme ve gövde değerini ayrı verir.',
         { ses: 'En düşük değer {{govdeMin}} ({{govdeMinModel}}).' },
-        { ses: 'Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet {{q200Govde}}; ses emici kaplaması olmayan Lineo 200 için kataloğun s.28’inde 46,9 dB(A) · gövde, 3 m yazar.' },
-        'ES sürümünde pasif bir Helmholtz rezonatör grubu belirli frekanslarda ses düzeyini ayrıca düşürür.',
-        'Seri Ø100–Ø315 mm yuvarlak kanal çaplarında, AC ve 0–10 V ayarlı EC motorlu sürümlerle gelir.'
+        { ses: 'Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet {{q200Govde}}; Lineo 200 için kataloğun s.28’inde 46,9 dB(A) · gövde, 3 m yazar.' },
+        'Katalog, pasif bir Helmholtz rezonatör grubunun belirli frekanslarda ses düzeyini düşürdüğünü belirtir.',
+        'Seri, 100 ile 315 mm arasında nominal kanal çaplarında (Ø100–Ø315), AC ve 0–10 V ayarlı EC motorlu sürümlerle gelir.'
       ],
-      source: 'Vortice LINEO kataloğu, Mayıs 2026 · s.6, 9, 12, 18, 28',
+      source: 'Vortice LINEO kataloğu, Mayıs 2026 · s.6, 9, 12, 18, 24, 28',
       painPoints: [
         {
           title: 'Ses Emici Kaplama',
@@ -3097,12 +3097,12 @@ export const tr = {
         {
           q: 'Vortice Lineo Quiet nedir?',
           a: [
-            'Yuvarlak kanala seri bağlanan, karışık akışlı (mixed flow) bir kanal tipi fan ailesidir.',
+            'Kanala seri bağlanan, karışık akışlı (mixed flow) bir kanal tipi fan ailesidir.',
             'Dış gövdesine bütünleşik ses emici kaplama taşır.',
             'İki sürümü vardır: AC motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES.',
             'Kanal çapı Ø100 ile Ø315 mm arasındadır; yatay ya da dikey kurulur.'
           ],
-          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.4–6, 10'
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.4–6, 10, 24'
         },
         {
           q: 'Lineo Quiet ne kadar sessiz?',
@@ -3116,7 +3116,7 @@ export const tr = {
         {
           q: 'Lineo ile Lineo Quiet arasındaki fark nedir?',
           a: [
-            'Lineo Quiet’in dış gövdesinde ses emici kaplama vardır, Lineo’da yoktur.',
+            'Lineo Quiet’in dış gövdesinde ses emici kaplama vardır; katalog kaplamayı yalnız Quiet serisi için anar.',
             { ses: 'Ø200 AC modellerinde en yüksek hızda: Lineo 200 Quiet (17164, 1160 m³/h) {{q200Govde}} ve {{q200Emis}}; kataloğun s.28’indeki Lineo 200 (17180, 1135 m³/h) için 46,9 dB(A) · gövde ve 55,4 dB(A) · emiş, 3 m.' },
             'Karşılığında Quiet daha ağırdır: Lineo 200 Quiet 8,6 kg, Lineo 200 4,9 kg.'
           ],

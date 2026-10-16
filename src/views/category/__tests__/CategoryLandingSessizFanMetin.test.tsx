@@ -266,8 +266,11 @@ describe('(c) boş kesişim: ses cümleleri çizilmez, bölümün kalanı durur'
   it('özet yok: ses sayısı taşımayan cümleler durur (TR örnek: kaplama / çap / sürümler)', () => {
     const metin = duzMetin(sayfa('tr', null))
     expect(metin).toContain('Katalog her model ve çalışma noktası için emiş, üfleme ve gövde değerini ayrı verir.')
-    expect(metin).toContain('Seri Ø100–Ø315 mm yuvarlak kanal çaplarında')
-    expect(metin).toContain('Lineo Quiet’in dış gövdesinde ses emici kaplama vardır, Lineo’da yoktur.')
+    expect(metin).toContain('Seri, 100 ile 315 mm arasında nominal kanal çaplarında')
+    expect(metin).toContain('katalog kaplamayı yalnız Quiet serisi için anar.')
+    expect(metin).not.toContain('yuvarlak kanal')
+    expect(metin).not.toContain('Lineo’da yoktur')
+    expect(metin).not.toContain('ES sürümünde pasif')
     expect(metin).not.toContain('En düşük gövde değeri')
     expect(metin).not.toContain('En düşük değer')
     expect(metin).not.toContain('Örnek Ø150 ES')

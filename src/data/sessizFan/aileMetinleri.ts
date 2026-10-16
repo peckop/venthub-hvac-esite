@@ -57,9 +57,9 @@ export const AILE_SABLONLARI: Readonly<Record<Dil, Sablon>> = {
     h1: 'Vortice Lineo Quiet Sessiz Kanal Tipi Fan',
     ilkParagraf: {
       ses:
-        'Vortice Lineo Quiet, yuvarlak kanala seri bağlanan karışık akışlı bir kanal fanıdır. Dış gövdeye bütünleşik ses emici kaplama çevresel ses emisyonunu en aza indirmek için optimize edilmiştir; katalogdaki en düşük değer {GOVDE_MIN}. Ø100–Ø315 mm çaplarda, AC ve 0–10 V ayarlı EC motorla gelir. Konut, ticari ya da sanayi mekânlarının kanallı havalandırması için, yatay ya da dikey kurulumla kullanılır.',
+        'Vortice Lineo Quiet, kanala seri bağlanan karışık akışlı bir kanal fanıdır. Dış gövdeye bütünleşik ses emici kaplama çevresel ses emisyonunu en aza indirmek için optimize edilmiştir; katalogdaki en düşük değer {GOVDE_MIN}. Ø100–Ø315 mm çaplarda, AC ve 0–10 V ayarlı EC motorla gelir. Konut, ticari ya da sanayi mekânlarının kanallı havalandırması için, yatay ya da dikey kurulumla kullanılır.',
       sayisiz:
-        'Vortice Lineo Quiet, yuvarlak kanala seri bağlanan karışık akışlı bir kanal fanıdır. Dış gövdeye bütünleşik ses emici kaplama çevresel ses emisyonunu en aza indirmek için optimize edilmiştir. Ø100–Ø315 mm çaplarda, AC ve 0–10 V ayarlı EC motorla gelir. Konut, ticari ya da sanayi mekânlarının kanallı havalandırması için, yatay ya da dikey kurulumla kullanılır.',
+        'Vortice Lineo Quiet, kanala seri bağlanan karışık akışlı bir kanal fanıdır. Dış gövdeye bütünleşik ses emici kaplama çevresel ses emisyonunu en aza indirmek için optimize edilmiştir. Ø100–Ø315 mm çaplarda, AC ve 0–10 V ayarlı EC motorla gelir. Konut, ticari ya da sanayi mekânlarının kanallı havalandırması için, yatay ya da dikey kurulumla kullanılır.',
     },
     meta: {
       sesVeN: [
@@ -82,9 +82,9 @@ export const AILE_SABLONLARI: Readonly<Record<Dil, Sablon>> = {
     h1: 'Vortice Lineo Quiet Silent In-Line Duct Fan',
     ilkParagraf: {
       ses:
-        'Vortice Lineo Quiet is a mixed-flow duct fan connected in series with a circular duct. The sound-absorbing coating integrated in the outer casing is optimised to minimise the sound radiated to the surroundings; the lowest catalogue value is {GOVDE_MIN}. It comes in Ø100–Ø315 mm diameters, with AC and 0–10 V adjustable EC motors. It is used for ducted ventilation of residential, commercial or industrial premises, installed horizontally or vertically.',
+        'Vortice Lineo Quiet is a mixed-flow duct fan connected in series with the duct. The sound-absorbing coating integrated in the outer casing is optimised to minimise the sound radiated to the surroundings; the lowest catalogue value is {GOVDE_MIN}. It comes in Ø100–Ø315 mm diameters, with AC and 0–10 V adjustable EC motors. It is used for ducted ventilation of residential, commercial or industrial premises, installed horizontally or vertically.',
       sayisiz:
-        'Vortice Lineo Quiet is a mixed-flow duct fan connected in series with a circular duct. The sound-absorbing coating integrated in the outer casing is optimised to minimise the sound radiated to the surroundings. It comes in Ø100–Ø315 mm diameters, with AC and 0–10 V adjustable EC motors. It is used for ducted ventilation of residential, commercial or industrial premises, installed horizontally or vertically.',
+        'Vortice Lineo Quiet is a mixed-flow duct fan connected in series with the duct. The sound-absorbing coating integrated in the outer casing is optimised to minimise the sound radiated to the surroundings. It comes in Ø100–Ø315 mm diameters, with AC and 0–10 V adjustable EC motors. It is used for ducted ventilation of residential, commercial or industrial premises, installed horizontally or vertically.',
     },
     meta: {
       sesVeN: [

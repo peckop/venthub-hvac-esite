@@ -2975,11 +2975,11 @@ export const en: typeof tr = {
         'Vortice Lineo Quiet is a mixed-flow duct fan with a sound-absorbing coating integrated in its outer casing; the coating is optimised to minimise the sound radiated to the surroundings.',
         'The catalogue gives intake, supply and casing values separately for each model and operating point.',
         { ses: 'The lowest value is {{govdeMin}} ({{govdeMinModel}}).' },
-        { ses: 'On the Ø200 AC models at maximum speed, Lineo 200 Quiet gives {{q200Govde}}; for Lineo 200 without the sound-absorbing coating, catalogue p.28 gives 46.9 dB(A) · casing, 3 m.' },
-        'In the ES version a passive Helmholtz resonator group further reduces the sound level at set frequencies.',
-        'The series covers circular duct diameters from Ø100 to Ø315 mm, with AC and 0–10 V adjustable EC motor versions.'
+        { ses: 'On the Ø200 AC models at maximum speed, Lineo 200 Quiet gives {{q200Govde}}; for Lineo 200, catalogue p.28 gives 46.9 dB(A) · casing, 3 m.' },
+        'The catalogue states that a passive Helmholtz resonator group reduces the sound level at predetermined frequencies.',
+        'The series covers nominal duct diameters from 100 to 315 mm (Ø100–Ø315), with AC and 0–10 V adjustable EC motor versions.'
       ],
-      source: 'Vortice LINEO catalogue, May 2026 · p.6, 9, 12, 18, 28',
+      source: 'Vortice LINEO catalogue, May 2026 · p.6, 9, 12, 18, 24, 28',
       painPoints: [
         {
           title: 'Sound-Absorbing Lining',
@@ -3050,12 +3050,12 @@ export const en: typeof tr = {
         {
           q: 'What is Vortice Lineo Quiet?',
           a: [
-            'It is a family of mixed-flow in-line duct fans connected in series with a circular duct.',
+            'It is a family of mixed-flow in-line duct fans connected in series with the duct.',
             'Its outer casing has an integrated sound-absorbing coating.',
             'There are two versions: LINEO QUIET with an AC motor and LINEO QUIET ES with an EC brushless motor.',
             'Duct diameters range from Ø100 to Ø315 mm; it is installed horizontally or vertically.'
           ],
-          k: 'Vortice LINEO catalogue, May 2026 · p.4–6, 10'
+          k: 'Vortice LINEO catalogue, May 2026 · p.4–6, 10, 24'
         },
         {
           q: 'How quiet is Lineo Quiet?',
@@ -3069,7 +3069,7 @@ export const en: typeof tr = {
         {
           q: 'What is the difference between Lineo and Lineo Quiet?',
           a: [
-            'Lineo Quiet has a sound-absorbing coating on its outer casing; Lineo does not.',
+            'Lineo Quiet has a sound-absorbing coating on its outer casing; the catalogue mentions the coating only for the Quiet series.',
             { ses: 'On the Ø200 AC models at maximum speed: Lineo 200 Quiet (17164, 1160 m³/h) {{q200Govde}} and {{q200Emis}}; for Lineo 200 (17180, 1135 m³/h), catalogue p.28 gives 46.9 dB(A) · casing and 55.4 dB(A) · intake, 3 m.' },
             'In return Lineo Quiet is heavier: Lineo 200 Quiet 8.6 kg, Lineo 200 4.9 kg.'
           ],
