@@ -767,13 +767,18 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
     const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
     expect(ortak).toContain('İyileştirme hakkı')
-    expect(ortak).toContain('OPS onayı gelmeden uygulanmaz')
-    expect(ortak).toContain('Kanca (izin vermeyen, kapıyı gevşetmeyen), izin içermeyen ayar ve departman iyileştirmesi')
-    expect(ortak).toContain('İzin, hesap ve MCP değişikliği (allow/ask/deny, izin modu, onay veren kanca, `.mcp.json`, hesap) ve bir kapıyı gevşeten her öneri: Recep yalnız OPS penceresinde söyler')
-    expect(ortak).toContain('deny listesi gevşetilmez (fleet-mechanism §18)')
-    expect(ortak).toContain('gevşeten öneri OPS onayıyla geçmez, Recep\'e gider; sıkılaştıran OPS onayıyla geçer')
-    expect(ortak).toContain('İzin modunu değiştirmek Recep kararıdır')
-    expect(ortak).toContain('OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur')
+    expect(ortak).toContain('onay gelmeden uygulanmaz')
+    expect(ortak).toContain('Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, iyileştirme: metni OPS')
+    expect(ortak).toContain('İzin, hesap, MCP (allow/ask/deny, izin modu, onay veren kanca, `.mcp.json`) ve kapıyı gevşeten öneri: Recep yalnız OPS penceresinde söyler')
+    expect(ortak).toContain('deny gevşetilmez (§18)')
+    expect(ortak).toContain("Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer")
+    expect(ortak).toContain('izin modunu değiştirmek Recep kararıdır')
+    expect(ortak).toContain("OPS'un kendi kanca/ayar PR'ını ARAÇ okur")
+    // filo-ortak 10.000 bayt tavanında (hazir-ozellik-kurulumu): çapalı hafıza ve bağımsız doğrulama satırları kurallar dosyalarında.
+    for (const [ad, m] of Object.entries(kuralMetinleri)) {
+      expect(m, `${ad}: çapalı hafıza`).toContain('Çapalı hafıza okunur ve etiketlenir')
+      expect(m, `${ad}: bağımsız doğrulama`).toContain('Bağımsız doğrulama: canlı yazım betiği')
+    }
     expect(kuralMetinleri.OPS).toContain('OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur')
   })
 
