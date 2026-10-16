@@ -108,7 +108,7 @@ const RECEP_MESAJ_KURALLARI = [
   '- (OPS hariç) tabloya yalnız KENDİ kartların girer; çok departmanlı genel resmi OPS verir; çok elzemse tablo dışında tek cümle hatırlat.',
   '- (OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider, Recep\'e ANLATILMAZ; Recep\'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). OPS Recep\'e filo durumunu konsolide tabloyla kendisi verir.',
   '- (OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde ya da durum sorduğunda son rapordan beri kartında değişen yoksa cevap TEK cümledir; bekleyen kartlar her cevapta yeniden dökülmez, tabloya yalnız durumu değişen ya da Recep\'in adıyla sorduğu kart girer. İşi kalmayan departman bunu Recep\'e değil OPS\'a yazar. Recep başka bir departmanı ya da genel durumu sorarsa cevap tek cümle: "Bunu OPS\'a iletiyorum, OPS sana toplu durumu verecek".',
-  '- İşin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok); Sorumlu = "ben" (OPS hariç).',
+  '- İşin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok) (OPS hariç).',
   '- Durum sütunu yalnız şu yedi kelimeden biri: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen iştir (OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"). Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır.',
   '- Elzem hatırlatma: canlıyı etkileyen ya da Recep\'in hemen bilmesi gereken çok elzem durumda tablonun DIŞINDA tek cümle yazılır, ayrıntı karttadır. Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS\'a yaz.',
   '- 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez).',
@@ -135,6 +135,33 @@ const KART_PLAN_KURALI = [
 const CALISAN_ACMA_KURALI = [
   '## Çalışan açma (karar 251)',
   '- Salt-okuma çalışan (araştırmacı, çürütücü, doğrulayıcı) `Agent` aracıyla `name` VERİLMEDEN açılır: sonuç doğrudan açana döner ve yazma yasağı ancak böyle işler; yazan uygulayıcı ekip üyesi olarak `name` ile açılır (docs/standards/execution-method-standard.md §10.3).',
+].join('\n')
+
+/**
+ * BİRLEŞTİRME VE ÖLÇÜM KAYDI (HRT-60, OPS emri 2026-10-12): kartın bayt payını yemesin diye kurallar dosyasında durur
+ * (kart tavanında pay yok). Yazılı kaynaklar: karar 98 (departman migrationsız kendi PR'ını birleştirir), fleet-mechanism §20.1-a/b
+ * (`gh pr merge` doğrudan çağrılmaz; migration'lı PR `--onay`), karar 224 (onay işi koşan pencerede). Her rolün dosyasına AYNEN girer
+ * (OPS'un kendi okuma kuralı ayrı blokta). Ölçüm kaydı: OPS-120 madde 7.
+ */
+const BIRLESTIRME_KURALI = [
+  '## Birleştirme ve ölçüm kaydı (HRT-60)',
+  '- Kendi PR\'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR\'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep\'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep\'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).',
+  '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.',
+].join('\n')
+
+/**
+ * OPS OKUMA KURALLARI (HRT-60, OPS-120 ek 2, 2026-10-12): yalnız OPS'un kurallar dosyasına girer. OPS birleştirmez, okur ve sıra verir;
+ * Recep'e giden metin kaynaklı olur; kanca/ayar farkı okumasının sabit sorusu (13:07 olayı, kapısı ARC-103); defter eşitleme (kapısı ARAÇ).
+ * Depo herkese açık: olayların ayrıntısı buraya YAZILMAZ; kartlarda durur.
+ */
+const OPS_OKUMA_KURALI_ROLLERI = ['OPS']
+const OPS_OKUMA_KURALI = [
+  '## Okuma, kaynak ve defter (HRT-60)',
+  '- OPS departman PR\'ını birleştirmez: tam farkı okur, "okundu, uygun" ya da düzeltmeyi yazar, sıra verir; ritüelle yalnız KENDİ PR\'ını birleştirir.',
+  '- Recep\'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.',
+  '- Kanca, ayar ve MCP PR\'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ\'ta).',
+  '- Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ\'ta).',
+  '- Tabloda Sorumlu = işi yürüten departmanın adı (OPS\'un kendi işiyse OPS); Recep kararı bekleyen satırda Durum Onayında, Önerim dolu, Sorumlu yine kararı uygulayacak departmandır; "sen" yazılmaz.',
 ].join('\n')
 
 /**
@@ -202,8 +229,11 @@ function kuralDosyasi(ad) {
     '',
     CALISAN_ACMA_KURALI,
     '',
+    BIRLESTIRME_KURALI,
+    '',
     DURUM_SATIRI_KURALI,
     '',
+    ...(OPS_OKUMA_KURALI_ROLLERI.includes(ad) ? [OPS_OKUMA_KURALI, ''] : []),
     ...(ICERIK_KURALI_ROLLERI.includes(ad) ? [ICERIK_KURALI, ''] : []),
     ...(UNVAN_OLCUM_KURALI_ROLLERI.includes(ad) ? [UNVAN_OLCUM_KURALI, ''] : []),
     ...(OPS_YANIT_KURALI_ROLLERI.includes(ad) ? [OPS_YANIT_KURALI, ''] : []),
