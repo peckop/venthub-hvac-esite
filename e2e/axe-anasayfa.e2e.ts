@@ -36,8 +36,12 @@ const TABAN: Readonly<Record<string, number>> = {}
  * BLG-3 (12 Ekim, OPS kararı): ikinci rehber kartı +2 belirsiz düğüm (KnowledgeBlock yarı saydam zemin);
  * bilinçli tek seferlik açma, kök onarım TSR-17 tavanı geri indirir. TSR-17 birleşince 17'ye döner,
  * en geç 16 Ekim.
+ *
+ * BLG-15 (16 Ekim, OPS kararı): üçüncü rehber kartı +2 belirsiz düğüm, tavan 19 → 21. Ana sayfa yalnız son 3 rehber
+ * kartını basar (enYeniRehberler adet=3): son 3 rehber kartı × 2 belirsiz düğüm, OPS 16 Ekim; sonraki yazılar tavanı
+ * daha fazla büyütmez. Kök onarım TSR-17 tavanı geri indirir.
  */
-const BELIRSIZ_KONTRAST_TABAN = 19
+const BELIRSIZ_KONTRAST_TABAN = 21
 
 const ETIKETLER = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const
 
