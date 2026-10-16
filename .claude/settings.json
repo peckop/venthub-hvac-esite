@@ -58,6 +58,8 @@
     ],
     "deny": [
       "Bash(node --env-file=.env *..*)",
+      "Bash(node --env-file=.env scripts/db/product-data/*--apply*)",
+      "Bash(node --env-file=.env scripts/db/product-data/*--rollback*)",
       "Bash(git push * master*)",
       "Bash(git push * main*)",
       "Bash(git push *--force*)",
