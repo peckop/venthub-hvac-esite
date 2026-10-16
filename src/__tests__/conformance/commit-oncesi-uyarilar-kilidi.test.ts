@@ -99,6 +99,14 @@ describe('REC-267: commit öncesi uyarılar kancaya bağlı ve UYARI olarak kal�
     expect(s, 'ilan edilmemiş betiğin YOLU basılmıyor').toMatch(/\$\{y\}|\$\{yol\}/)
   })
 
+  it('ARC-146: `--yaz` komutu yalniz ARAC agacina soylenir; baskasina "ARAC\'a satir iste" yonlendirmesi', () => {
+    // 16 Ekim: bu uyari her committer'a `--yaz` kostururdu; GEO-SEO ARAC'in dosyasini kendi agacinda degistirdi.
+    const s = oku(BETIK)
+    expect(s, 'rol ayrimi (benARacMi) kayboldu — uyari yine herkese --yaz soyler').toContain('benARacMi(kok)')
+    expect(s, 'ARAC disindakine yonlendirme yok').toContain("SendMessage ile satir iste")
+    expect(s, 'ARAC disindaki icin reddedilme bilgisi yok').toContain('reddedilir')
+  })
+
   it('⭐CETVEL satırı TABAN ADLA aranır — yol ölçütü her yeni cetvelde yanlış alarm veriyordu', () => {
     /**
      * ÖLÇÜLDÜ 2026-09-19 (REC-359): `docs/standards/bagimlilik-kararlari.md` envantere

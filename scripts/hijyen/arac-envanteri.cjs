@@ -53,7 +53,9 @@
  *
  * KİPLER
  *   --kontrol (varsayılan) : farkı basar; fark varsa ÇIKIŞ 1 (kapının koştuğu kip)
- *   --yaz                  : belgeyi yerinde günceller (YENİ ekle · kayıpta durum=KAYIP)
+ *   --yaz                  : belgeyi yerinde günceller (YENİ ekle · kayıpta durum=KAYIP).
+ *                            Varsayılan hedefe YALNIZ ARAÇ penceresinin ağacında yazar (ARC-146); başka ağaçta
+ *                            açık `--envanter <yol>` gerekir, yoksa çıkış 2 ve hiçbir şey yazılmaz.
  *   --envanter <yol>       : belge yolu (varsayılan: docs/audits/arac-envanteri-*.md en yenisi)
  *   --json                 : farkı JSON olarak basar (test bunu okur)
  *
@@ -638,11 +640,44 @@ function yaz(sonuc, envanterDosyasi) {
 // CLI
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * ŞERİT KORUMASI (ARC-146): envanter belgesi ARAÇ şeridinin dosyasıdır (`docs/audits/arac-envanteri-*`).
+ * `--yaz` VARSAYILAN hedefe (açık `--envanter` yolu yok) yalnız ARAÇ penceresinin ağacında yazar. 16 Ekim'de
+ * GEO-SEO kendi worktree'sinde `--yaz` koşunca ARAÇ'ın dosyasını değiştirdi (bash-write-audit alarmı, kapı
+ * geri almayı reddetti). Açık yol vermek bilinçli bir seçimdir ve serbest kalır; testler ve elle onarım bu yoldan gider.
+ * Pencere rolü `scripts/board/pencere-kimligi.cjs` ile okunur (ayar dosyasındaki `agent`); pencere değilse rol '' ve
+ * varsayılan hedefe YAZILMAZ (kimliği ölçülemeyen kişi "ARAÇ" sayılmaz — fail-closed).
+ * Dönüş: { izin: boolean, sebep: string }.
+ */
+function yazimaIzinliMi({ verilen, rol }) {
+  if (verilen) return { izin: true, sebep: 'acik hedef yol verildi' }
+  if (rol === 'ARAC') return { izin: true, sebep: 'ARAC penceresinin agaci' }
+  return {
+    izin: false,
+    sebep:
+      'varsayilan envanter ARAC seridinin dosyasidir; bu pencere ' + (rol ? 'ARAC degil (' + rol + ')' : 'bir pencere olarak taninmadi'),
+  }
+}
+
 function main(argv) {
   const yazKipi = argv.includes('--yaz')
   const jsonKipi = argv.includes('--json')
   const iEnv = argv.indexOf('--envanter')
   const verilen = iEnv >= 0 ? argv[iEnv + 1] : null
+
+  if (yazKipi) {
+    const pencereKimligi = require('../board/pencere-kimligi.cjs')
+    const rol = pencereKimligi.rolAdi(pencereKimligi.agentAdi({ cwd: process.cwd() }))
+    const karar = yazimaIzinliMi({ verilen, rol })
+    if (!karar.izin) {
+      process.stderr.write(
+        '[arac-envanteri] --yaz REDDEDILDI (serit korumasi, ARC-146): ' + karar.sebep + '.\n' +
+          '  Hicbir sey yazilmadi. ARAC\'in ayni envanteri bu ayrisimi kendi agacinda yazar; baska seridin yeni araci\n' +
+          '  icin ARAC\'a (SendMessage) satir iste. Bilincli yazacaksan acik hedef ver: --yaz --envanter <yol>\n',
+      )
+      return 2
+    }
+  }
 
   let dosya
   try {
@@ -751,6 +786,7 @@ module.exports = {
   sahipsizSatirlar,
   bayatOluAdaylar,
   cagiranSinifi,
+  yazimaIzinliMi,
   main,
 }
 
