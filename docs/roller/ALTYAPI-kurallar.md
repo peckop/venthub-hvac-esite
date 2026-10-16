@@ -2,6 +2,20 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/ALTYAPI.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **İzin bloğu.** İş akışına `permissions:` yazılınca `contents: read` ZORUNLUDUR (herkese açık depoda varsayılanlar düşer, yoksa checkout "Repository not found" verir). Ek izin yalnız gerekçeyle yazılır (örnek: dağıtım kapısında `statuses: read`). Kaynak: CLAUDE.md Notlar; `dagitim-hazir.yml` (ALT-82).
+2. **Aksiyonlar ve sırlar.** Her `uses:` tam 40 haneli commit'e sabitlenir (sürüm yorumda); `secrets.*`, `self-hosted` ve `pnpm install` yazılmaz (yabancı fork kodu kendi sunucuda çalışır; kurulum yüzeyi büyür). Kaynak: CLAUDE.md (herkese açık depo); `INV-DAGITIM-HAZIR-1` ve `INV-DIZIN-TETIGI-1` bunu ölçer.
+3. **Tetik seçimi birleşmeyi belirler.** Birleşmeyi BLOKLAMAYACAK kapıya `pull_request` tetiği yazılmaz: birleştirme ritüeli zorunlu çekirdeği `pull_request` tetikli, `paths`/`if` süzgeçsiz işlerden türetir; zorunlu çekirdeğe girecek işe `if:` ya da `paths:` konmaz. Kaynak: `merge-ritueli.cjs` türetme başlığı; ALT-82 (#1963).
+4. **`deployment_status` süzgeci.** Olay her ortam ve her durum için gelir; işe iş düzeyinde `environment == 'Production'` ve `state == 'success'` süzgeci yazılır, `schedule` ve elle tetik için `event_name != 'deployment_status'` kolu eklenir; ortam adı canlıdan ölçülür (16 Ekim: son 12 dağıtımın 12'si `Production`). Kaynak: ALT-91 (#1976).
+5. **Önbellekli taban.** `actions/cache` anahtarı değişmez: `cache/restore` ve `cache/save` ayrı adımlar, anahtar `run_id` + `run_attempt`, `restore-keys` önek; kaydetme adımı `always()`. Veri depo DIŞINDA (`runner.temp`) durur. Taban kaybolursa sessiz yeşil değil açık `::warning`. Kaynak: ALT-91 tasarımı; `INV-DIZIN-TETIGI-1` davranış senaryoları.
+6. **Aynı PR'da üç parça.** Yeni iş akışı ya da kapı betiği tek PR'da şunlarla gelir: sabotajlı test, `test-haritasi.json` satırı (`test-haritasi-uret.cjs --yalniz <test>`) ve araç envanteri satırı (PR sahibi ekler, ARAÇ okur; satırsız PR `INV-ARAC-1` "YENİ n" ile kırmızıdır). Kaynak: #1963, #1976; OPS-168 O4.
+7. **Ortak dosya ve çakışma.** Araç envanteri ve `test-haritasi.json`'a dokunan PR'lar SIRAYLA birleşir. PR dalı master'la çakışırsa master dala MERGE edilir ve normal push yapılır (zorla itme izni yoktur). Kaynak: 16 Ekim üç çakışma (#1963 iki kez, #1976 bir kez).
+8. **Done kanıtı ve doğrulayıcı.** Kanban `command` kontrolünde `pnpm` komutu doğrulayıcıda reddedilir (`pnpm exec` kısıtlı), `file_matches` ANA klasörü okur: önce `ana-agac-tazelik.cjs --ileri-sar`. Canlıya etkili iş akışı/kapı işinde `altyapi-curutucu` varsayılandır (O5) ve iş, birleşmeden sonraki İLK gerçek koşu ölçülmeden "Bitti" sayılmaz. Kaynak: ALT-84, ALT-82 Done koşulu.
+
+Genel kurallardan sona alınan: K3, K4, K6, K8, K15, K16, K18, K20, K24, K25, K26, K28 site koduna aittir (ALTYAPI bunlara yalnız inceleyen olarak dokunur); K29, K30, K31 ikinci faz (park). K1 ve K2 yerinde kalır.
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K2 Tip güvenliği: `any` yasak, strict TypeScript.
 - K3 RLS-first: Her tablo RLS politikasıyla korunur.
@@ -25,7 +39,7 @@
 - (OPS hariç) tabloya yalnız KENDİ kartların girer; çok departmanlı genel resmi OPS verir; çok elzemse tablo dışında tek cümle hatırlat.
 - (OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider, Recep'e ANLATILMAZ; Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). OPS Recep'e filo durumunu konsolide tabloyla kendisi verir.
 - (OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde ya da durum sorduğunda son rapordan beri kartında değişen yoksa cevap TEK cümledir; bekleyen kartlar her cevapta yeniden dökülmez, tabloya yalnız durumu değişen ya da Recep'in adıyla sorduğu kart girer. İşi kalmayan departman bunu Recep'e değil OPS'a yazar. Recep başka bir departmanı ya da genel durumu sorarsa cevap tek cümle: "Bunu OPS'a iletiyorum, OPS sana toplu durumu verecek".
-- İşin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok); Sorumlu = "ben" (OPS hariç).
+- İşin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok) (OPS hariç).
 - Durum sütunu yalnız şu yedi kelimeden biri: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen iştir (OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"). Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır.
 - Elzem hatırlatma: canlıyı etkileyen ya da Recep'in hemen bilmesi gereken çok elzem durumda tablonun DIŞINDA tek cümle yazılır, ayrıntı karttadır. Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS'a yaz.
 - 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez).
@@ -38,6 +52,12 @@
 
 ## Çalışan açma (karar 251)
 - Salt-okuma çalışan (araştırmacı, çürütücü, doğrulayıcı) `Agent` aracıyla `name` VERİLMEDEN açılır: sonuç doğrudan açana döner ve yazma yasağı ancak böyle işler; yazan uygulayıcı ekip üyesi olarak `name` ile açılır (docs/standards/execution-method-standard.md §10.3).
+
+## Birleştirme ve ölçüm kaydı (HRT-60)
+- Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
+- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).
+- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).
+- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.
 
 ## Durum dosyası: standart "Yarım iş" satırı (HRT-31)
 - Durum dosyasının SONUNA (DEVİR bloğunun içine) her güncellemede ve compact öncesinde tam bu iki biçimden biri yazılır: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Kokpit compact hazırlığı bunu okur; ifade yoksa "ölçülemedi" görünür.

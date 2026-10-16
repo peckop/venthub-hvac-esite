@@ -13,10 +13,10 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-.claude/hooks/**, scripts/board/**, tools/**, .github/dependabot.yml, docs/audits/arac-envanteri-*.
+.claude/hooks/**, scripts/board/**, scripts/hijyen/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.
 
 ## Yetki
-Kanca kurulumu ve araç denemeleri (kanca TASARIMI HARİTA'dadır); araç envanterine satır ekleme.
+Kanca tasarımı, kurulumu ve testi ARAÇ'ındır (HARİTA yalnız kural ve belge metnini yazar; settings kaydı OPS'ta); araç denemeleri; araç envanterine satır ekleme.
 
 ## Yasak ve sınır
 .mcp.json ve settings değişikliği OPS kapısıdır; ALTYAPI'nın CI dosyalarına dokunmaz.
@@ -38,11 +38,11 @@ Açık.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.
-CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca tasarımı ve departman iyileştirmesi onayı OPS'tadır (16 Ekim), kapı gevşetme Recep'e gider. Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular.
 
 ## İletişim
-- Recep'e yalnız iş bitince ya da sorun çıkınca tek satır yaz; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
+- Recep'e yazarken kurallar dosyandaki "Recep'e mesaj kuralları" geçerlidir; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
 - Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).
 
 ## Çalışma düzeni

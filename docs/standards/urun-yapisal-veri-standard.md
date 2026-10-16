@@ -41,9 +41,29 @@ yazılıdır.
 
 ---
 
-## 2. Aile sayfası — `ProductGroup`
+## 2. Aile sayfası — `ProductGroup` yalnız tüm varyantı fiyatlıysa, aksi halde `CollectionPage`
 
-Aile sayfası tek `Product` değil, `ProductGroup` + `hasVariant[]` yayınlar.
+Aile sayfası tek `Product` değil, `ProductGroup` + `hasVariant[]` yayınlar — **YALNIZ ailenin tüm
+varyantlarında geçerli ve görünür teklif (§3.2) varsa** (`tumVaryantlarFiyatliMi`, `jsonld.ts`).
+
+**URN-138 (SEO-56 A, 16 Ekim 2026):** Google ürün snippet'i `offers`, `review` ya da `aggregateRating`dan en az
+birini ZORUNLU tutar (Search Console "Ürün snippet'leri" KRİTİK: "hasVariant.offers, review veya aggregateRating
+belirtilmelidir"; canlıda 47 aile, 441 varyant, 0 offers). Teklif kipinde `offers` yazılamaz (§3.2), gerçek yorum
+yoktur, `price: 0` ve uydurma puan yasaktır (A1). Çözüm alan eklemek değil, **ürün işaretlemesini hiç yazmamaktır**:
+
+| aile durumu | JSON-LD |
+| -- | -- |
+| tüm varyantı görünür fiyatlı (kategori `hide_price` değil, fiyat > 0) | `ProductGroup` + `hasVariant[]` (aşağıdaki tablo, §3) |
+| en az bir varyantta teklif kipi / fiyat yok (fiyatsız, **karışık**, `hide_price`, `mainCategory` bilinmiyor, varyantsız) | `CollectionPage` + `mainEntity` `ItemList`; `Product`, `ProductGroup`, `hasVariant`, `offers`, `price`, `review`, `aggregateRating` **HİÇ yazılmaz**; kısmi `hasVariant` yazılmaz |
+
+`CollectionPage` biçimi `buildSeriesLandingJsonLd` ile aynıdır (`isPartOf` WebSite, liste `mainEntity` içinde) ve
+`name` (`familyName`), `description`, `url` (aile adresi), `image` (§2.1 kapak kuralı, varsa), `about: Brand` (marka
+varsa) taşır. `ItemList.numberOfItems` = varyant sayısı; her `ListItem` `position` + `name` (görünen ürün adı,
+`getProductDisplayName`) taşır, `sku`/`mpn` taşımaz. `ListItem.url` YALNIZ adres şeması bayrağı açıkken ve model
+sayfası dizine açıkken (`sitemapModelMi`) yazılır; bayrak kapalıyken varyant başına benzersiz adres yoktur ve aile
+adresi satırlara yinelenmez. Kapılar: `jsonld.test.ts` (URN-138 bloğu), `jsonld-fiyat-sizintisi.test.ts`.
+
+Fiyatlı aile çıkarsa (satış kipi) eski biçim aynen çalışır; geçiş otomatiktir, sayfa başına işaretleme yoktur.
 
 | alan | kural | kaynak / kapı |
 | -- | -- | -- |

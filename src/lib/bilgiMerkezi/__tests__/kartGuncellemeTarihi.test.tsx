@@ -56,11 +56,13 @@ describe('liste kartı — güncelleme tarihi', () => {
     expect(container.textContent).toContain(`Updated ${tarihYaz('2026-10-10', 'en')}`)
   })
 
-  it('yayındaki içerik: frekans konvertörü yazısının güncelleme tarihi 2026-10-10 ve kartı "10 Ekim 2026" basar', () => {
-    const yazi = YAZILAR.find((y) => y.kimlik === 'frekans-konvertoru')
-    expect(yazi, 'yazı yayın listesinde yok').toBeDefined()
-    expect(yazi?.guncellemeTarihi).toBe('2026-10-10')
+  it('yayındaki içerik: iki rehber yazısının güncelleme tarihi 2026-10-14 (BLG-13 alt başlık revizyonu) ve kartı "14 Ekim 2026" basar', () => {
+    for (const kimlik of ['frekans-konvertoru', 'radyal-aksiyel-fan-secimi']) {
+      const yazi = YAZILAR.find((y) => y.kimlik === kimlik)
+      expect(yazi, `${kimlik} yayın listesinde yok`).toBeDefined()
+      expect(yazi?.guncellemeTarihi, kimlik).toBe('2026-10-14')
+    }
     const kartlar = listeKartlari('tr', YAZILAR)
-    expect(kartlar.some((k) => k.guncelleme === '10 Ekim 2026' && k.guncellemeIso === '2026-10-10')).toBe(true)
+    expect(kartlar.filter((k) => k.guncelleme === '14 Ekim 2026' && k.guncellemeIso === '2026-10-14')).toHaveLength(2)
   })
 })

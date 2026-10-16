@@ -255,6 +255,22 @@ braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk 
 |---|---|---|---|---|---|
 | `GHSA-vfj7-8cjw-p6xm` | braces | high | 2026-10-05 | derleme zamanı (sentry webpack-plugin, tailwind); düzeltme sürümü yok; desenler bizim dosyalarımızdan, kullanıcı girdisi ulaşmaz | `npm view braces version` 3.0.3'ten büyük VE `pnpm why braces` çıktısındaki tüm tüketiciler onu çekiyor; ya da `pnpm audit --prod` bu kaydı artık vermiyor |
 
+## 7a · KABUL EDİLMİŞ ORTA ÖNEMLİ KAYITLAR — ALT-95 (OPS hükmü, 2026-10-16)
+
+> Bu bölüm `bagimlilik-denetimi.cjs`'in verisi DEĞİLDİR: kapı yalnız yüksek/kritik kayıtları sayar ve §7'deki
+> her kimliğin audit'te yüksek/kritik olarak var olmasını bekler; orta kayıt §7'ye yazılırsa kapı onu
+> "BAYAT KABUL" sayıp kırmızı verir (ölçüldü, kapı mantığı: `agirKayitlar` + `bayat` süzgeci). Bu yüzden
+> orta kabuller burada, el ile izlenir. **Kural (OPS, 10-16):** yama ya da küçük sürümle kapanan orta kayıt
+> YÜKSELTİLİR; kapanmayan bu tabloya gerekçe, kaldırma şartı ve SON TARİHLE girer. Son tarihte kayıt yeniden
+> ölçülür (`pnpm audit --prod`): kapanabilir hâle geldiyse yükseltilir, gelmediyse gerekçe yenilenip tarih
+> ilerletilir. Tarihi geçmiş satır bayattır. Ölçüm: `docs/audits/bagimlilik-2026-10-16.md` §2-§3.
+
+| kimlik | paket (kilitli) | kabul | gerekçe | kaldırma şartı | son tarih |
+|---|---|---|---|---|---|
+| GHSA-8988-4f7v-96qf | @opentelemetry/core 1.30.1 | 2026-10-16 (10-05'ten beri bilinen) | düzeltme ≥2.8.0 (ana sürüm); `@sentry/node` ve `@sentry/opentelemetry` 8.55.2 `^1.30.1` ister; override ana sürüm atlatır (cetvel §4 yasak) | `@sentry/nextjs` 10.x (karar 17) ya da `pnpm audit --prod` bu kaydı artık vermiyor | 2026-11-16 |
+| GHSA-qqmp-wf37-98f9 | @opentelemetry/instrumentation-pg 0.50.0, -mysql2 0.45.0, -mysql 0.45.0, -mongoose 0.46.0, -knex 0.44.0, -tedious 0.18.0 | 2026-10-16 | düzeltme ≥0.65–0.73; `@sentry/node` 8.55.2 altısını TAM SÜRÜM sabitler, düzeltilmiş hat `@opentelemetry/core ^2.9.0` ister (Sentry 8'in 1.x sözleşmesiyle çakışır) | `@sentry/nextjs` 10.x ya da `pnpm audit --prod` bu kaydı artık vermiyor | 2026-11-16 |
+| GHSA-rj75-hqrm-r3gf | postcss-selector-parser 6.1.4 | 2026-10-16 | düzeltme ≥7.1.6 (ana sürüm); tüketici `postcss-nested` (tailwindcss 3.4); yalnız derleme zamanı CSS derleyicisi, kullanıcı girdisi ulaşmaz | Tailwind 4 göçü ya da `pnpm why postcss-selector-parser` çıktısında 6.x tüketicisi kalmadı | 2026-11-16 |
+
 ## 8 · OVERRIDE KALDIRMA ŞARTI — karar 52
 
 Bir override **geçici bir müdahaledir**; ne zaman kaldırılacağı yazılmazsa kalıcılaşır ve

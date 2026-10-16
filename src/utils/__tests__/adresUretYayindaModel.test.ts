@@ -160,12 +160,24 @@ const aile = {
   id: 'f', name: 'A', slug: AILE, series_code: null, description: null, brand_name: null,
   category_id: null, subcategory_id: null, meta_title: null, meta_description: null, category: null, subcategory: null,
 }
-const varyantlar = ['AAA-100', 'AAA-101', 'ZZZ-9'].map((sku, i) => variant({ id: `v${i}`, sku }))
+// URN-138: ProductGroup (hasVariant) yalnız tüm varyantı fiyatlı + fiyat gösteren kategoriyle; fiyatsız aile
+// CollectionPage + ItemList üretir ve model adresini ListItem.url'de taşır. İki kol da AYNI kuralı ölçer.
+const fiyatliVaryantlar = ['AAA-100', 'AAA-101', 'ZZZ-9'].map((sku, i) => variant({ id: `v${i}`, sku, price: 100 + i, stock_qty: 1 }))
+const fiyatsizVaryantlar = ['AAA-100', 'AAA-101', 'ZZZ-9'].map((sku, i) => variant({ id: `v${i}`, sku }))
 type Dugum = { url?: string }
+const FIYATLI_KATEGORI = { metadata: { hide_price: false } }
 const jsonLd = (bayrak: boolean | undefined) =>
-  buildProductGroupJsonLd({ family: aile, variants: varyantlar, lang: 'tr', baseUrl: 'https://x', mainCategory: null, bayrak }) as {
+  buildProductGroupJsonLd({ family: aile, variants: fiyatliVaryantlar, lang: 'tr', baseUrl: 'https://x', mainCategory: FIYATLI_KATEGORI, bayrak }) as {
     hasVariant: Dugum[]
   }
+const liste = (bayrak: boolean | undefined) => {
+  const ld = buildProductGroupJsonLd({ family: aile, variants: fiyatsizVaryantlar, lang: 'tr', baseUrl: 'https://x', mainCategory: null, bayrak }) as {
+    '@type': string
+    mainEntity: { itemListElement: Dugum[] }
+  }
+  expect(ld['@type']).toBe('CollectionPage')
+  return ld.mainEntity.itemListElement
+}
 
 describe('JSON-LD hasVariant.url — yalnız dizine açık model sayfası adresi', () => {
   it('AÇIK: liste içi temel model url taşır; sürüm ve liste dışı varyantta url YOK', () => {
@@ -182,6 +194,25 @@ describe('JSON-LD hasVariant.url — yalnız dizine açık model sayfası adresi
 
   it('KAPALI: varyant düğümünde url yok (liste ne olursa)', () => {
     expect(jsonLd(false).hasVariant.every((v) => !('url' in v))).toBe(true)
+  })
+})
+
+describe('URN-138 · fiyatsız aile ItemList.url — aynı kural: yalnız dizine açık model sayfası adresi', () => {
+  it('AÇIK: liste içi temel model url taşır; sürüm ve liste dışı satırda url YOK; name her satırda', () => {
+    const [temel, surum, disi] = liste(true)
+    expect(temel.url && modelSayfasiMi(temel.url)).toBe(true)
+    expect(surum).not.toHaveProperty('url')
+    expect(disi).not.toHaveProperty('url')
+    expect(liste(true).every((e) => typeof (e as { name?: unknown }).name === 'string')).toBe(true)
+  })
+
+  it('FAIL-CLOSED: boş liste → hiçbir satırda url yok', () => {
+    yayindaListesiAyarla({})
+    expect(liste(true).every((e) => !('url' in e))).toBe(true)
+  })
+
+  it('KAPALI: hiçbir satırda url yok (liste ne olursa)', () => {
+    expect(liste(false).every((e) => !('url' in e))).toBe(true)
   })
 })
 
