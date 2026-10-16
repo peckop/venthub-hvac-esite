@@ -3150,7 +3150,7 @@ export const tr = {
         {
           q: 'Koruma sınıfı nedir?',
           a: [
-            'Koruma sınıfı kanallı kurulum içindir: tüm Lineo Quiet ES modelleri ve Lineo Quiet AC 100–160 IP45, Lineo Quiet AC 200–315 IPX5. Gövde, Vortice’e göre EN ISO 11925-2:2010’a göre E2 yangın dayanım sınıfındadır; sınıflandırma yalnız doğru kurulmuş ürün için geçerlidir.'
+            'Koruma sınıfı kanallı kurulum içindir: tüm Lineo Quiet ES modelleri ve Lineo Quiet AC 100–160 IP45, Lineo Quiet AC 200–315 IPX5. Gövde, Vortice’ye göre EN ISO 11925-2:2010 uyarınca E2 yangın dayanım sınıfındadır; sınıflandırma yalnız doğru kurulmuş ürün için geçerlidir.'
           ],
           k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.5, 12, 18'
         }

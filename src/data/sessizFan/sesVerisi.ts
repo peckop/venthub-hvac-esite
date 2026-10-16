@@ -6,22 +6,12 @@
 // Saf veri modülüdür: servis değil (DI kuralı dışı), UI ve sözlük içermez.
 
 import ham from './lineoQuiet.veri.json'
+import type { SesDegeri, SesYeri } from './sesEtiketi'
 
-/** Ses basıncının ölçüldüğü/hesaplandığı yer. */
-export type SesYeri = 'emis' | 'ufleme' | 'govde'
-
-/** Ses değerinin ZORUNLU koşulu: 3 m, serbest alan; yer ve kademe adı. */
-export type SesKosulu = Readonly<{ mesafeM: 3; yer: SesYeri; kademe: string }>
-
-/** Koşullu ses basıncı (dB(A)). Koşul alanı zorunludur; koşulsuz değer kurulamaz. */
-export type SesDegeri = Readonly<{ dbA: number; kosul: SesKosulu }>
-
-/** Çağıranın sözlükten verdiği sözcükler (bu modül sözlük dosyasına dokunmaz). */
-export type SesEtiketSozlugu = {
-  yer: Record<SesYeri, string>
-  metre: string
-  kademe: Record<string, string>
-}
+// Tipler ve tek basıcı `sesEtiketi` JSON'u import etmeyen `sesEtiketi.ts`te yaşar (istemci demeti ham veriyi taşımasın);
+// sunucu tarafı eski yoldan okumaya devam etsin diye buradan yeniden dışa aktarılır. `SesDegeri` KURMAK yalnız bu dosyada.
+export type { SesDegeri, SesEtiketSozlugu, SesKosulu, SesYeri } from './sesEtiketi'
+export { sesEtiketi } from './sesEtiketi'
 
 export type KontrolTuru = 'kademeli' | 'ec'
 
@@ -179,25 +169,6 @@ function lpDegeri(m: ModelVerisi, yer: SesYeri, i: number): SesDegeri | null {
   const kademe = m.kademeler[i]
   if (v === undefined || kademe === undefined) return null
   return degerKur(v, yer, kademe)
-}
-
-function sayiMetni(n: number, lang: 'tr' | 'en'): string {
-  const metin = String(n)
-  return lang === 'tr' ? metin.replace('.', ',') : metin
-}
-
-/**
- * SES DEĞERİNİ BASAN TEK ÜRETİCİ. Hiçbir yerde `dbA` ham sayı olarak yazılmaz; çıktı daima
- * koşullu bir cümledir: TR '9,9 dB(A) · 4 V · gövde, 3 m', EN '9.9 dB(A) · 4 V · casing, 3 m'.
- * Yer ve kademe sözcüklerini çağıran sözlükten verir; kademe sözlükte yoksa veri adı aynen yazılır.
- * Geçersiz değer (sonlu olmayan sayı) boş metin döner: çağıran boş kutuyu ÇİZMEZ.
- */
-export function sesEtiketi(d: SesDegeri, lang: 'tr' | 'en', etiket: SesEtiketSozlugu): string {
-  if (!Number.isFinite(d.dbA)) return ''
-  const kademe = Object.prototype.hasOwnProperty.call(etiket.kademe, d.kosul.kademe)
-    ? etiket.kademe[d.kosul.kademe]
-    : d.kosul.kademe
-  return `${sayiMetni(d.dbA, lang)} dB(A) · ${kademe} · ${etiket.yer[d.kosul.yer]}, ${d.kosul.mesafeM} ${etiket.metre}`
 }
 
 /** Bu kod için veri modülünde geçerli bir kayıt var mı. */

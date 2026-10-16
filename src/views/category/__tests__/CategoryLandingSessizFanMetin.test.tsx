@@ -11,8 +11,8 @@
 //  (d) sözlük = veri: 17164 değerleri, 1160 m³/h, kademe adları, 31 W / 50 W veri modülüyle tutar
 //  (e) kaynak taraması: katalog doğrulamasının çıkardığı ifadeler sözlükte geri gelmez
 //  (g) ses özeti prop zinciri: sunucu (kategoriSayfasi) → CategoryPage → CategoryMasterView → CategoryLandingView → bölümler
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readFileSync, statSync } from 'node:fs'
+import { dirname, extname, join, relative, resolve } from 'node:path'
 
 import React from 'react'
 import { renderToString } from 'react-dom/server'
@@ -339,6 +339,74 @@ describe('(d) sözlük = veri', () => {
   })
 })
 
+/**
+ * (h) İSTEMCİ DEMETİ — `CategoryLandingView` `'use client'`'tır; import kapanışına giren her modül tarayıcıya gider.
+ * Ses VERİ dosyası (`lineoQuiet.veri.json`, tüm eğriler, ~54 KB) ve onu okuyan `sesVerisi.ts` sunucuda kalır; istemciye yalnız
+ * JSON'suz biçimleyici (`sesEtiketi.ts`) girer. Çözümleme bilerek basit (`aileMetniLineoQuiet.test.tsx` (e) ile aynı yöntem):
+ * `@/` ve göreli yollar, type-only atlanır; JSON belirteci kapanışta dosya olarak değil metin olarak aranır.
+ */
+const KOK = process.cwd()
+const UZANTILAR = ['.ts', '.tsx']
+
+function importBelirtecleri(kaynak: string): string[] {
+  const bulunan: string[] = []
+  for (const m of kaynak.matchAll(/^(?:import|export)\b(?!\s+type\b)[^'";]*?\bfrom\s*['"]([^'"]+)['"]/gm)) bulunan.push(m[1])
+  for (const m of kaynak.matchAll(/^import\s*['"]([^'"]+)['"]/gm)) bulunan.push(m[1])
+  return bulunan
+}
+
+function belirtecCoz(belirtec: string, kaynakDosya: string): string | null {
+  let taban: string
+  if (belirtec.startsWith('@/')) taban = join(KOK, 'src', belirtec.slice(2))
+  else if (belirtec.startsWith('.')) taban = resolve(dirname(join(KOK, kaynakDosya)), belirtec)
+  else return null
+  const adaylar = [...UZANTILAR.map((u) => `${taban}${u}`), ...UZANTILAR.map((u) => join(taban, `index${u}`)), taban]
+  for (const aday of adaylar) {
+    if (!UZANTILAR.includes(extname(aday)) || !existsSync(aday) || !statSync(aday).isFile()) continue
+    return relative(KOK, aday).replace(/\\/g, '/')
+  }
+  return null
+}
+
+function importKapanisi(baslangic: string): Set<string> {
+  const dosyalar = new Set<string>([baslangic])
+  const kuyruk = [baslangic]
+  while (kuyruk.length > 0) {
+    const dosya = kuyruk.pop() as string
+    for (const belirtec of importBelirtecleri(readFileSync(join(KOK, dosya), 'utf8'))) {
+      const hedef = belirtecCoz(belirtec, dosya)
+      if (!hedef || dosyalar.has(hedef)) continue
+      dosyalar.add(hedef)
+      kuyruk.push(hedef)
+    }
+  }
+  return dosyalar
+}
+
+describe('(h) istemci demeti: ham ses verisi tarayıcıya gitmez', () => {
+  const SES_VERISI = 'src/data/sessizFan/sesVerisi.ts'
+  const SES_ETIKETI = 'src/data/sessizFan/sesEtiketi.ts'
+
+  it('NEGATİF KONTROL: sunucu modülü kategoriSayfasi ses verisine ULAŞIR, sesVerisi.ts JSON\'u import eder (ölçüt çalışıyor)', () => {
+    const sunucu = importKapanisi('src/app/_components/kategoriSayfasi.tsx')
+    expect(sunucu.has(SES_VERISI)).toBe(true)
+    expect(readFileSync(join(KOK, SES_VERISI), 'utf8')).toContain('lineoQuiet.veri.json')
+  })
+
+  it('CategoryLandingView import kapanışı sesVerisi.ts\'e ve lineoQuiet.veri.json\'a girmez; JSON\'suz sesEtiketi.ts girer', () => {
+    const dosyalar = importKapanisi('src/views/category/CategoryLandingView.tsx')
+    expect(dosyalar.size).toBeGreaterThan(40)
+    expect(dosyalar.has('src/components/category/sections/silent-fan/sesMetni.ts'), 'tarama sessiz fan bölümlerine ulaşıyor').toBe(true)
+    expect(dosyalar.has(SES_ETIKETI), 'biçimleyici istemcide olmalı').toBe(true)
+    for (const yasak of [SES_VERISI, 'src/data/sessizFan/sesOzeti.ts', 'src/data/sessizFan/aileMetinleri.ts']) {
+      expect(dosyalar.has(yasak), `${yasak} istemci demetine giriyor`).toBe(false)
+    }
+    for (const dosya of dosyalar) {
+      expect(readFileSync(join(KOK, dosya), 'utf8'), `${dosya} ham ses verisini import ediyor`).not.toMatch(/from\s*['"][^'"]*lineoQuiet\.veri\.json['"]/)
+    }
+  })
+})
+
 describe('(g) ses özeti prop zinciri: sunucu → görünümler → iki bölüm (kopuk halka sayıyı sessizce düşürür)', () => {
   const oku = (...parcalar: string[]) => readFileSync(join(process.cwd(), 'src', ...parcalar), 'utf8')
 
@@ -364,8 +432,8 @@ describe('(g) ses özeti prop zinciri: sunucu → görünümler → iki bölüm 
 
 describe('(e) kaynak taraması: doğrulamada çıkarılan ifadeler sözlükte geri gelmez', () => {
   const YASAKLI = {
-    tr: ['susturucu', 'bakım kapağı', 'yatak odası', 'toplantı odası', 'dört kademe', 'daha uzun', 'kabuk içindeki', 'kabuk içinde'],
-    en: ['silencer', 'service hatch', 'maintenance hatch', 'bedroom', 'meeting room', 'four speed', 'longer'],
+    tr: ['susturucu', 'bakım kapağı', 'yatak odası', 'toplantı odası', 'ofis', 'dört kademe', 'daha uzun', 'kabuk içindeki', 'kabuk içinde', 'sessizliğin kaynağı'],
+    en: ['silencer', 'service hatch', 'maintenance hatch', 'bedroom', 'meeting room', 'office', 'four speed', 'longer', 'source of the silence', 'source of quiet'],
   } as const
 
   for (const dil of ['tr', 'en'] as const) {

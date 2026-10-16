@@ -4,8 +4,9 @@
 // kodlarıyla ses veri modülünün kesişiminden hesaplanır. Özet yoksa (kesişim boş / kod listesi okunamadı) yer
 // tutucusu dolmayan `{ ses: … }` CÜMLESİ hiç çizilmez; cümlenin yarısı ya da ham `{{ad}}` ekrana çıkmaz (fail-closed).
 
+// DİKKAT: `sesVerisi.ts` DEĞİL `sesEtiketi.ts`: bu dosya istemci demetine girer, ham ses verisi (JSON) girmemeli.
+import { type SesDegeri, sesEtiketi, type SesEtiketSozlugu } from '@/data/sessizFan/sesEtiketi'
 import type { SesOzeti } from '@/data/sessizFan/sesOzeti'
-import { type SesDegeri, sesEtiketi, type SesEtiketSozlugu } from '@/data/sessizFan/sesVerisi'
 
 type Dil = 'tr' | 'en'
 

@@ -320,6 +320,7 @@ function kaynakDosyalari(kok: string): string[] {
 describe('(f) yapısal kapı: SesDegeri yalnız sesVerisi.ts içinde kurulur', () => {
   const SRC = join(process.cwd(), 'src')
   const MODUL = join(SRC, 'data', 'sessizFan', 'sesVerisi.ts')
+  const TIP_MODULU = join(SRC, 'data', 'sessizFan', 'sesEtiketi.ts')
 
   it('kural: kötü örnekler yakalanır, iyi örnekler geçer', () => {
     expect(ihlalSatirlari('const x = { dbA: 12, kosul: k }')).toHaveLength(1)
@@ -335,10 +336,19 @@ describe('(f) yapısal kapı: SesDegeri yalnız sesVerisi.ts içinde kurulur', (
     expect(dosyalar.length).toBeGreaterThan(100)
   })
 
-  it('sesVerisi.ts dışında hiçbir üretim dosyası SesDegeri kurmaz', () => {
+  it('sesEtiketi.ts yalnız TİP bildirir (SesDegeri kurmaz): ihlal kalıbı taşıyan her satır bir `type` bildirimidir', () => {
+    const metin = readFileSync(TIP_MODULU, 'utf8')
+    const satirlar = ihlalSatirlari(metin)
+    expect(satirlar.length, 'tip modülü bu kalıpları taşır (tür bildirimi)').toBeGreaterThan(0)
+    for (const satir of satirlar) expect(satir, satir).toMatch(/^\s*export type\s/)
+    // JSON/veri modülünü import etmez: istemci demetine ham veri taşımaz.
+    expect(metin).not.toMatch(/\bfrom\s*['"][^'"]*(lineoQuiet|sesVerisi)/)
+  })
+
+  it('sesVerisi.ts dışında hiçbir üretim dosyası SesDegeri kurmaz (tip modülü sesEtiketi.ts yukarıda ayrıca sınanır)', () => {
     const ihlaller: string[] = []
     for (const dosya of kaynakDosyalari(SRC)) {
-      if (dosya === MODUL) continue
+      if (dosya === MODUL || dosya === TIP_MODULU) continue
       for (const satir of ihlalSatirlari(readFileSync(dosya, 'utf8'))) {
         ihlaller.push(`${dosya.split(sep).slice(-3).join('/')}: ${satir.trim()}`)
       }
