@@ -28,7 +28,7 @@ const os = require('node:os')
 const path = require('node:path')
 
 /**
- * Sayılacak projeler: beş Design (MENU, KATALOG, MARKA, BELGE, 3D) + ALTYAPI'nın kendi projesi (OPS oraya emir yazıyor).
+ * Sayılacak projeler: altı Design (MENU, KATALOG, MARKA, BELGE, 3D, ICERIK) + ALTYAPI'nın kendi projesi (OPS oraya emir yazıyor).
  * "Yeni yorum" sorgusu (cek) bu listeyle SUNUCUDA süzer: listede olmayan proje için zil çalmaz. --durum kipi ise
  * projeden bağımsızdır (aşağıya bak).
  */
@@ -38,6 +38,7 @@ const PROJELER = [
   { id: 'bf2506a2-6e9e-47e4-b271-d38a22374c7e', kisa: 'MARKA' },
   { id: 'af5831c7-92be-4cd6-95da-7a87b05427e9', kisa: 'BELGE' },
   { id: '414eb227-fa10-4f6e-ae62-27df23847ee5', kisa: '3D' },
+  { id: '0f60f263-6ff2-44a2-9dc4-c6c6605224d4', kisa: 'ICERIK' },
   { id: '9c2ecb27-6e6c-48df-b4bb-85d188e0dfb6', kisa: 'ALTYAPI' },
 ]
 
