@@ -287,7 +287,9 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   const subCategory = family?.subcategory ?? null
 
   // W3.1: aile bulunamadıysa (not-found) JSON-LD hiç yazılmaz — tanımlanacak bir
-  // ürün yok; ProductGroup + hasVariant[] (teklif modunda offers HİÇ yazılmaz).
+  // ürün yok. Biçim `buildProductGroupJsonLd` içinde seçilir (URN-138): tüm varyantı görünür fiyatlı aile
+  // ProductGroup + hasVariant[]; teklif kipli / fiyatsız / karışık aile CollectionPage + ItemList (offers HİÇ yazılmaz).
+  // Model rotası (`sunucuSku`) AYNI çağrıdan geçer: ayrı bir model JSON-LD'si yok, karar tek yerde.
   // URN-135 D4: görünen ilk paragraf ile yapısal `description` AYNI kaynaktan (görünen = yapısal). Ad (`name`) ve diğer
   // alanlar DEĞİŞMEZ; yalnız açıklama sayfanın dilindeki geçersiz kılınmış paragrafla değişir.
   const ozelMetin = family && !sunucuSku ? lineoAileMetni(lang, family, variants) : null

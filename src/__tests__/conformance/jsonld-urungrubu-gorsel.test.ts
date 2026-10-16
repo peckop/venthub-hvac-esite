@@ -37,6 +37,8 @@ import type { FamilyVariant } from '../../lib/services/family.service'
 const BASE_URL = 'https://venthub.com'
 const FIYATLI_KATEGORI = { metadata: { hide_price: false } }
 
+// URN-138: ProductGroup yalnız tüm varyantı görünür fiyatlı ailede üretilir; bu kapı ProductGroup.image kuralını
+// ölçtüğü için kurgu fiyatlıdır (fiyatsız aile CollectionPage'dir, aynı kapak kuralı jsonld.test.ts'te ölçülür).
 function varyant(overrides: Partial<FamilyVariant> = {}): FamilyVariant {
   return {
     id: 'v-1',
@@ -44,7 +46,7 @@ function varyant(overrides: Partial<FamilyVariant> = {}): FamilyVariant {
     name: 'Test Varyant 100',
     slug: 'test-varyant-100',
     model_code: null,
-    price: null,
+    price: 1500,
     stock_qty: 0,
     technical_specs: null,
     description: null,
@@ -142,8 +144,10 @@ describe('INV-URUNGRUBU-GORSEL-1 — ProductGroup görseli: varsa yazılır, yok
   it('K5 (sınır) — varyant listesi boşken de alan yazılmaz ve builder çökmez', () => {
     // Aile sayfası varyantsız kalabilir (veri geçişi, filtre). Kapı burada da tanımlı
     // davranış ister: sessizce çökmek de, boş bir görsel yazmak da kabul değil.
+    // URN-138: varyantsız aile ProductGroup DEĞİL CollectionPage üretir (boş ProductGroup `offers` taşıyamaz);
+    // kapak kuralı yine aynı: görsel yok → alan yok.
     const jsonLd = kur([])
-    expect(jsonLd['@type']).toBe('ProductGroup')
+    expect(jsonLd['@type']).toBe('CollectionPage')
     expect(Object.prototype.hasOwnProperty.call(jsonLd, 'image')).toBe(false)
   })
 })

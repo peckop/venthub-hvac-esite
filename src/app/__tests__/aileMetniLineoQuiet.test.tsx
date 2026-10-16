@@ -91,22 +91,23 @@ const KODLAR = [
 const DB_BASLIK = 'Vortice Lineo Quiet Sessiz Kanal Fanları'
 const DB_ACIKLAMA = 'DB aile açıklaması: bu metin geçersiz kılma varken görünmemeli.'
 
-function varyant(kod: string, aciklama: string | null = null) {
+function varyant(kod: string, aciklama: string | null = null, fiyat: number | null = null) {
   return {
     id: `v-${kod}`,
     sku: `VRT-${kod}`,
     name: `Lineo ${kod}`,
     slug: null,
     model_code: kod,
-    price: null,
-    stock_qty: null,
+    price: fiyat,
+    stock_qty: fiyat === null ? null : 4,
     technical_specs: null,
     description: aciklama,
     images: [],
   }
 }
 
-function detayKur(slug: string, kodlar: string[] = KODLAR, ilkAciklama: string | null = null) {
+/** `fiyatli`: URN-138 — her varyantta geçerli fiyat + fiyat gösteren kategori (ProductGroup dalı). Varsayılan: fiyatsız, kategori çözülmemiş. */
+function detayKur(slug: string, kodlar: string[] = KODLAR, ilkAciklama: string | null = null, fiyatli = false) {
   return {
     family: {
       id: 'f1',
@@ -120,10 +121,10 @@ function detayKur(slug: string, kodlar: string[] = KODLAR, ilkAciklama: string |
       subcategory_id: null,
       meta_title: { tr: 'DB meta başlığı', en: 'DB meta title' },
       meta_description: { tr: 'DB meta açıklaması.', en: 'DB meta description.' },
-      category: null,
+      category: fiyatli ? { id: 'c1', name: 'Fans', slug: 'fans', metadata: { hide_price: false } } : null,
       subcategory: null,
     },
-    variants: kodlar.map((k, i) => varyant(k, i === 0 ? ilkAciklama : null)),
+    variants: kodlar.map((k, i) => varyant(k, i === 0 ? ilkAciklama : null, fiyatli ? 1500 : null)),
     price_tax_included: null,
   }
 }
@@ -246,19 +247,43 @@ describe('(b) sayfa gövdesi: H1 ve ilk paragraf', () => {
 })
 
 describe('(c) görünen = yapısal (JSON-LD)', () => {
-  it.each(['tr', 'en'] as const)('%s: ProductGroup.description görünen paragrafla aynı, name aile adı', async (lang) => {
+  // URN-138 (SEO-56 A): fiyatsız aile (bu fikstürde 12 varyantın 12'si fiyatsız, kategori çözülmemiş = teklif kipi)
+  // ProductGroup DEĞİL CollectionPage + ItemList basar; görünen = yapısal kuralı (description, name) aynen sürer.
+  it.each(['tr', 'en'] as const)('%s: fiyatsız aile CollectionPage — description görünen paragrafla aynı, name aile adı, ItemList 12', async (lang) => {
     const h = await html(lang, LINEO_QUIET_AILE_SLUG)
+    const ldler = jsonLdler(h)
+    const sayfa = ldler.find((j) => j['@type'] === 'CollectionPage')
+    expect(sayfa).toBeDefined()
+    expect(sayfa?.description).toBe(aciklamaKutulari(h)[0])
+    expect(sayfa?.name).toBe(lang === 'tr' ? DB_BASLIK : 'Vortice Lineo Quiet Silent Duct Fans')
+    expect((sayfa?.mainEntity as { numberOfItems: number }).numberOfItems).toBe(12)
+    // Basılan HİÇBİR JSON-LD bloğunda ürün düğümü / teklif / puan yok.
+    const hepsi = JSON.stringify(ldler)
+    expect(hepsi).not.toMatch(/ProductGroup|"Product"|hasVariant|productGroupID|"offers"|"price"|aggregateRating|"review"/)
+  })
+
+  it('tüm varyantı görünür fiyatlı + fiyat gösteren kategori: sayfa ProductGroup basar, her varyantta offers', async () => {
+    durum.dil = 'tr'
+    durum.detail = detayKur(LINEO_QUIET_AILE_SLUG, KODLAR, null, true)
+    const h = renderToStaticMarkup(await AileSayfasi({ lang: 'tr', slug: LINEO_QUIET_AILE_SLUG, sunucuSku: null }))
     const grup = jsonLdler(h).find((j) => j['@type'] === 'ProductGroup')
     expect(grup).toBeDefined()
-    expect(grup?.description).toBe(aciklamaKutulari(h)[0])
-    expect(grup?.name).toBe(lang === 'tr' ? DB_BASLIK : 'Vortice Lineo Quiet Silent Duct Fans')
-    expect(grup?.productGroupID).toBe(LINEO_QUIET_AILE_SLUG)
-    expect((grup?.hasVariant as unknown[]).length).toBe(12)
+    const dugumler = grup?.hasVariant as Array<Record<string, unknown>>
+    expect(dugumler).toHaveLength(12)
+    expect(dugumler.every((d) => typeof d.offers === 'object' && d.offers !== null)).toBe(true)
+    expect(jsonLdler(h).some((j) => j['@type'] === 'CollectionPage')).toBe(false)
+  })
+
+  it('model rotası (sunucuSku) AYNI karardan geçer: fiyatsız ailede CollectionPage', async () => {
+    const h = await html('tr', LINEO_QUIET_AILE_SLUG, 'VRT-17164')
+    const ldler = jsonLdler(h)
+    expect(ldler.some((j) => j['@type'] === 'CollectionPage')).toBe(true)
+    expect(JSON.stringify(ldler)).not.toMatch(/ProductGroup|hasVariant|"offers"/)
   })
 
   it('eşleşmeyen slug: JSON-LD açıklaması DB metni (dokunulmadı)', async () => {
     const h = await html('tr', 'avens-bvu-ls')
-    expect(jsonLdler(h).find((j) => j['@type'] === 'ProductGroup')?.description).toBe(DB_ACIKLAMA)
+    expect(jsonLdler(h).find((j) => j['@type'] === 'CollectionPage')?.description).toBe(DB_ACIKLAMA)
   })
 })
 

@@ -206,7 +206,9 @@ const family = {
   category_id: null, subcategory_id: null, meta_title: null, meta_description: null, category: null, subcategory: null,
 }
 const FIYATLI_KATEGORI = { metadata: { hide_price: false } }
-const varyantlar = [variant({ sku: 'SEA-1', price: 1500, stock_qty: 3 }), variant({ id: 'v2', sku: 'SEA-2', price: null })]
+// URN-138: ProductGroup yalnız TÜM varyantı fiyatlı ailede; karışık aile (biri fiyatsız) CollectionPage + ItemList.
+const varyantlar = [variant({ sku: 'SEA-1', price: 1500, stock_qty: 3 }), variant({ id: 'v2', sku: 'SEA-2', price: 2500, stock_qty: 1 })]
+const karisikVaryantlar = [variant({ sku: 'SEA-1', price: 1500, stock_qty: 3 }), variant({ id: 'v2', sku: 'SEA-2', price: null })]
 
 type Dugum = { url?: string; offers?: { price: string } }
 const grup = (bayrak: boolean | undefined, lang = 'tr') =>
@@ -214,8 +216,14 @@ const grup = (bayrak: boolean | undefined, lang = 'tr') =>
     url: string
     hasVariant: Dugum[]
   }
+const karisik = (bayrak: boolean | undefined, lang = 'tr') =>
+  buildProductGroupJsonLd({ family, variants: karisikVaryantlar, lang, baseUrl: 'https://x', mainCategory: FIYATLI_KATEGORI, bayrak }) as {
+    '@type': string
+    url: string
+    mainEntity: { numberOfItems: number; itemListElement: { name?: string; url?: string }[] }
+  }
 
-describe('Product JSON-LD — madde 11: fiyatlı modelde offers KORUNUR, fiyatsızda UYDURULMAZ (iki kol)', () => {
+describe('Product JSON-LD — madde 11: tüm varyantı fiyatlı ailede offers KORUNUR, karışık/fiyatsız ailede ürün düğümü HİÇ yazılmaz (iki kol)', () => {
   it.each([
     ['KAPALI (varsayılan)', undefined],
     ['KAPALI', false],
@@ -223,13 +231,21 @@ describe('Product JSON-LD — madde 11: fiyatlı modelde offers KORUNUR, fiyats�
   ] as const)('%s', (_ad, bayrak) => {
     const ld = grup(bayrak)
     expect(ld.hasVariant[0].offers?.price).toBe('1500.00')
-    expect(ld.hasVariant[1]).not.toHaveProperty('offers')
+    expect(ld.hasVariant[1].offers?.price).toBe('2500.00')
+    const karma = karisik(bayrak)
+    expect(karma['@type']).toBe('CollectionPage')
+    expect(JSON.stringify(karma)).not.toMatch(/offers|hasVariant|"price"/)
   })
 
   it('KAPALI: aile url bugünkü, varyant düğümünde url YOK (tek adres aileydi)', () => {
     const ld = grup(undefined)
     expect(ld.url).toBe('https://x/tr/products/storm-serisi')
     expect(ld.hasVariant.every((v) => !('url' in v))).toBe(true)
+    // Fiyatsız kol: aile url bugünkü, ItemList satırlarında url YOK (aile adresi yinelenmez).
+    const karma = karisik(undefined)
+    expect(karma.url).toBe('https://x/tr/products/storm-serisi')
+    expect(karma.mainEntity.itemListElement.every((e) => !('url' in e))).toBe(true)
+    expect(karma.mainEntity.numberOfItems).toBe(2)
   })
 
   it('AÇIK: aile url adresUret, her model kendi kanonik adresi (?sku= yok)', () => {
@@ -240,6 +256,14 @@ describe('Product JSON-LD — madde 11: fiyatlı modelde offers KORUNUR, fiyats�
       'https://x/tr/urun/storm-serisi-p-sea-2',
     ])
     expect(grup(true, 'en').hasVariant[0].url).toBe('https://x/en/products/storm-serisi-p-sea-1')
+    // Fiyatsız kol aynı model adreslerini ItemList satırında taşır (dizine açık model).
+    const karma = karisik(true)
+    expect(karma.url).toBe('https://x/tr/urun/storm-serisi')
+    expect(karma.mainEntity.itemListElement.map((e) => e.url)).toEqual([
+      'https://x/tr/urun/storm-serisi-p-sea-1',
+      'https://x/tr/urun/storm-serisi-p-sea-2',
+    ])
+    expect(karisik(true, 'en').mainEntity.itemListElement[0].url).toBe('https://x/en/products/storm-serisi-p-sea-1')
   })
 })
 

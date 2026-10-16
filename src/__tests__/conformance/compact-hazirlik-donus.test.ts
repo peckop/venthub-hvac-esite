@@ -93,6 +93,19 @@ describe('INV-COMPACT-HAZIRLIK-1 · /compact metni durum dosyasının SON bloğu
     expect(m).toContain('Ayrıntı durum dosyamda. Araç çıktılarını ve eski ölçüm ayrıntılarını at.')
   })
 
+  it('madde işaretsiz "Yarım iş:" satırı da okunur (filo-ortak kalıbı işaretsiz yazar); metne taşınır', () => {
+    const i = bd.compactIcerigi('## b\n- AÇIK: ARC-7\nYarım iş: var — ARC-7 PR dalda, OPS onayı bekliyor')
+    expect(i.yarim).toBe('var — ARC-7 PR dalda, OPS onayı bekliyor')
+    expect(bd.compactMetni(i)).toContain('yarım işler (var — ARC-7 PR dalda, OPS onayı bekliyor)')
+    expect(bd.compactIcerigi('## b\nYarım iş: yok — kısa').yarim).toBe('yok — kısa')
+  })
+
+  it('işaretsiz yalnız "Yarım iş:" satırı alınır; sıradan düz yazı satırı kart ve yarım iş sayılmaz', () => {
+    const i = bd.compactIcerigi('## b\nBugün ARC-9 üzerinde çalıştım, açık kalan ARC-10 var.\nYarım iş yok mu diye baktım')
+    expect(i.kartlar).toEqual([])
+    expect(i.yarim).toBeNull()
+  })
+
   it('kart bulunamazsa uydurmaz: "açık kartlar" yazar', () => {
     const m = bd.compactMetni(bd.compactIcerigi('## b\n- AÇIK: kart yok'))
     expect(m).toContain('Şunları koru: açık kartlar, yarım işler (yok)')

@@ -362,6 +362,8 @@ kendisi bulur) ve harita `INV-TEST-HARITA-1`in eşik kapısıyla korunur: bayat 
 Yenileme maliyeti (ölçüldü, 191 test, bu makine, 2 işçi): yaklaşık 13 dk. Eşik gözleme dayanır: 191 test 4-6 günde biriktiği için (günde 30-48 test) yüzde 20 (yaklaşık 150 test) kabaca haftada bir tazelemeyi zorlar;
 sıklığı sakin bulursa ALTYAPI eşiği düşürür. Sayı kapıda sabittir ve değişirse bu paragraf ile `INV-TEST-HARITA-1` birlikte güncellenir.
 Yenileme sonrası ölçüm (aynı kuru koşu yöntemi, aynı ağaç): her zaman koşan 231 → 58 (bayat 1, kayıtsız 2: dislan kipinde `skip` olan iki test, belirsiz 55).
+Erken uyarı (ALT-84, OPS kararı: yüzde 20 KIRMIZI kalır): bayat + kayıtsız oranı yüzde 10'u aşınca `test-sec.cjs` (`pnpm test:ilgili`, CI `neden` çıktısı) "her zaman koşan" satırının sonuna
+`UYARI: harita yüzde N bayat/kayıtsız (a/b), tazele: node scripts/ci/test-haritasi-uret.cjs --bayat` ekler. Uyarı BLOKLAMAZ ve seçimi değiştirmez; yalnız 100 ve üstü test listesinde verilir.
 
 ### 6.4 Güvenlik ağı: hiçbir koruma sessizce düşmez
 

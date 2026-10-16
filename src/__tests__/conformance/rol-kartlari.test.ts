@@ -563,7 +563,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('(OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
       expect(metin, ad).toContain('(OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde')
       expect(metin, ad).toContain("Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok)")
-      expect(metin, ad).toContain('"başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok); Sorumlu = "ben" (OPS hariç)')
+      expect(metin, ad).toContain('Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok) (OPS hariç)')
       expect(metin, ad).toContain("İşi kalmayan departman bunu Recep'e değil OPS'a yazar")
     }
   })
@@ -687,6 +687,37 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     // Kural metnindeki işaret, sayacın gerçekten aradığı işaretle aynı olmalı (kural kodla birlikte değişir).
     const kod = fs.readFileSync(path.join(KOK, 'scripts', 'board', 'linear-yeni-yorum.cjs'), 'utf8')
     expect(kod, 'sayaç kodu CEVAP BEKLİYOR işaretini arar').toContain('CEVAP\\s+B[Eİ]KL[Iİ]YOR')
+  })
+
+  it("HRT-60: 'Birleştirme ve ölçüm kaydı' her rolün kurallar dosyasında (üretilen ve diskteki) tam bir kez; 'Okuma, kaynak ve defter' yalnız OPS'ta; ikisi de kartta yok", () => {
+    const ortak = '## Birleştirme ve ölçüm kaydı (HRT-60)'
+    const opsOzel = '## Okuma, kaynak ve defter (HRT-60)'
+    const diskMetni = (ad: string): string =>
+      fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      for (const [m, etiket] of [[metin, `${ad} (üretilen)`], [diskMetni(ad), `${ad} (disk)`]] as Array<[string, string]>) {
+        expect(m.split(ortak).length - 1, `${etiket}: ortak bölüm tam bir kez`).toBe(1)
+        expect(m, etiket).toContain('merge-ritueli.cjs')
+        expect(m, etiket).toContain('--onay')
+        expect(m, etiket).toContain('okundu, uygun')
+        expect(m, etiket).toContain('--agac=<ağaç> --merge')
+        expect(m, etiket).toContain('doğrudan çağrılmaz')
+        expect(m, etiket).toContain('karar 98, 224')
+        if (ad === 'OPS') {
+          expect(m.split(opsOzel).length - 1, `${etiket}: OPS bölümü tam bir kez`).toBe(1)
+          expect(m, etiket).toContain('ölçülmedi')
+          expect(m, etiket).toContain('"sen" yazılmaz')
+        } else {
+          expect(m, `${etiket}: OPS okuma kuralı bu role ait değil`).not.toContain(opsOzel)
+        }
+      }
+    }
+    const ritueli = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+    for (const bayrak of ['--agac=', '--merge', '--onay=']) expect(ritueli, `ritüel ${bayrak} bayrağını almalı`).toContain(bayrak)
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain(ortak)
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain(opsOzel)
+    }
   })
 
   it('beş Recep kapısı her kartta bire bir aynı', () => {
