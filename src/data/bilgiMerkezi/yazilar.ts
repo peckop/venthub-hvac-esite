@@ -68,10 +68,11 @@ export const YAZILAR: readonly RehberYazisi[] = [
     kimlik: 'frekans-konvertoru',
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
-    // Güncelleme tarihi 2026-10-10: karar OPS'ta, 10 Ekim 2026. Liste kartı ve yazı künyesi "Güncelleme" olarak
-    // basar; site haritası lastmod'u ve Article `dateModified` buradan. Önceki değer 2026-10-08: gövdenin son
-    // değişikliği, #1755 ("Fiyatı belirleyen etkenler" giriş cümlesi); ondan önce 2026-10-06, #1733.
-    guncellemeTarihi: '2026-10-10',
+    // Güncelleme tarihi 2026-10-14: gövdenin son değişikliği, alt başlıkların yenilenmesi (BLG-13, #1945; 14 Ekim
+    // 2026'da birleşti). Liste kartı ve yazı künyesi "Güncelleme" olarak basar; site haritası lastmod'u ve Article
+    // `dateModified` buradan. Önceki değerler: 2026-10-10 (URN-90), 2026-10-08 (#1755, "Fiyatı belirleyen etkenler"
+    // giriş cümlesi), 2026-10-06 (#1733).
+    guncellemeTarihi: '2026-10-14',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
@@ -247,8 +248,10 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'radyal-aksiyel-fan-secimi',
     konu: 'verimlilik',
     yayinTarihi: '2026-10-11',
-    // Güncelleme tarihi = yayın günü: site haritası lastmod'u ve Article `dateModified` buradan (INV-BILGI-MERKEZI-KART-1).
-    guncellemeTarihi: '2026-10-11',
+    // Güncelleme tarihi 2026-10-14: gövdenin son değişikliği, alt başlıkların yenilenmesi (BLG-13, #1945; 14 Ekim
+    // 2026'da birleşti); yayın günü 2026-10-11'di. Site haritası lastmod'u ve Article `dateModified` buradan
+    // (INV-BILGI-MERKEZI-KART-1).
+    guncellemeTarihi: '2026-10-14',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
       'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
