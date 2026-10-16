@@ -20,6 +20,7 @@ import {
 import SilentFanWizard from '@/components/category/SilentFanWizard'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import FamilyCard from '@/components/products/FamilyCard'
+import type { SesOzeti } from '@/data/sessizFan/sesOzeti'
 import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
 import type { FamilyListItem, KatalogSayilari } from '@/types/ui-models'
 
@@ -54,9 +55,13 @@ interface CategoryLandingProps {
     parentCategory?: DomainCategory | null
     /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucu özetinden); iki marka bölümünün sayaç kartlarını besler. */
     vorticeKatalogSayilari?: KatalogSayilari | null
+    /** URN-135: sessiz fan metnindeki ses aralığı (sunucuda, canlı model kodları ∩ ses veri modülü); yoksa ses cümleleri çizilmez. */
+    sesOzeti?: SesOzeti | null
+    /** URN-135: sessiz fan rehberinin dil önekli adresi (sunucuda, yalnız yazı kaydı varsa); yoksa bağlantı çizilmez. */
+    rehberHref?: string | null
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, vorticeKatalogSayilari }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, vorticeKatalogSayilari, sesOzeti, rehberHref }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
@@ -191,11 +196,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
 
                 {isSilentFan && (
                     <>
-                        <SilentFanProblem />
+                        <SilentFanProblem sesOzeti={sesOzeti} />
                         <SilentFanHowItWorks />
                         <SilentFanVorticeBrand katalogSayilari={vorticeKatalogSayilari} />
                         <TrustSignals />
-                        <SilentFanFAQ />
+                        <SilentFanFAQ sesOzeti={sesOzeti} rehberHref={rehberHref} />
                     </>
                 )}
 

@@ -1,10 +1,12 @@
 import type { Metadata, Route } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 
+import { sesEtiketSozlugu } from '@/components/category/sections/silent-fan/sesMetni'
 import { ureticiMarkaAdresi } from '@/components/products/ureticiMarkaAdresi'
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
 import { kanonikModelSku } from '@/config/yayindaModeller'
+import { aileMetniGecersizKil,type AileMetniGecersizKilma } from '@/data/sessizFan/aileMetinleri'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
@@ -56,6 +58,29 @@ import { ProductDetailPage as PageComponent } from './ProductDetailPageView'
 // INV-DIL-DUSUSU-1: başlık/açıklama yalnız sayfanın dilinde; yoksa zincirin sonraki (aynı dildeki)
 // halkasına düşer, başka dile düşmez.
 const pickLang = dildekiMetin
+
+/**
+ * URN-135 (Design D4): Lineo Quiet AİLE sayfasının title / H1 / ilk paragraf / meta metni, DB'ye yazılmadan, slug'a
+ * özel geçersiz kılma olarak (`src/data/sessizFan/aileMetinleri.ts`; gerekçe ve silinme koşulu orada). Slug eşleşmezse
+ * `null`: bugünkü DB zinciri AYNEN çalışır. Çağıranlar YALNIZ aile rotasında çağırır (`sunucuSku` yok): model sayfasının
+ * başlığı ve açıklaması modele aittir, aile tanıtımı değildir. Varyant nesneleri olduğu gibi verilir (bu dosya ham
+ * `sku` okumaz: INV-SKU-GORUNMEZ-1).
+ *
+ * Girdiler sunucuda zaten yüklü canlı varyantlardan gelir (ek sorgu yok); ses sayısı `sesEtiketi`den, model sayısı canlı
+ * varyant sayısından. Hesaplanan dizeler istemciye küçük prop olarak geçer; şablonlar istemci demetine girmez.
+ */
+function lineoAileMetni(
+  lang: string,
+  family: { slug: string },
+  variants: ReadonlyArray<{ sku?: string | null }>,
+): AileMetniGecersizKilma | null {
+  const dict = lang === 'en' ? en : tr
+  return aileMetniGecersizKil(family.slug, lang, {
+    varyantlar: variants,
+    nModel: variants.length,
+    sesSozlugu: sesEtiketSozlugu(dict.categorySilentFan.ses),
+  })
+}
 
 /**
  * Aile/model sayfasının MUTLAK adresleri (canonical + hreflang + og:url) — REC-300 Faz 3d.
@@ -114,13 +139,16 @@ export async function aileSayfasiUstVerisi(
       const { tr: trUrl, en: enUrl } = aileSayfasiAdresleri(family.slug, sunucuSku)
       const canonicalUrl = lang === 'en' ? enUrl : trUrl
       // REC-108: sekme başlığı ve arama sonucu başlığı da dili bilir.
-      const title = pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
+      // URN-135 D4: Lineo Quiet aile sayfası için geçersiz kılma varsa title/description ONDAN gelir (OpenGraph aynı değerler).
+      const ozelMetin = sunucuSku ? null : lineoAileMetni(lang, family, variants)
+      const title = ozelMetin?.title || pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
       // ⭐İÇ INGEST NOTU ARAMA SONUCUNA DA ÇIKAMAZ (canlı olay, 2026-09-05): aile
       // açıklaması bu zincirin İKİNCİ halkası, yani 11/40 ailede Google'a "Avensair 2026
       // fiyat listesinden aktarılan temel ürün (Tier C)." diye açıklama gidebilirdi.
       // Süzgeç null döndürünce zincir bir sonraki halkaya düşer — davranış "açıklama yok"
       // ile aynıdır, uydurma metin ÜRETİLMEZ.
       const description =
+        ozelMetin?.meta ||
         aciklamaKirp(pickLang(family.meta_description, lang)) ||
         aciklamaKirp(musteriyeGorunurAciklama(pickLang(family.description, lang))) ||
         // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
@@ -262,8 +290,15 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   // ürün yok. Biçim `buildProductGroupJsonLd` içinde seçilir (URN-138): tüm varyantı görünür fiyatlı aile
   // ProductGroup + hasVariant[]; teklif kipli / fiyatsız / karışık aile CollectionPage + ItemList (offers HİÇ yazılmaz).
   // Model rotası (`sunucuSku`) AYNI çağrıdan geçer: ayrı bir model JSON-LD'si yok, karar tek yerde.
-  const jsonLd = family
-    ? buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL, mainCategory })
+  // URN-135 D4: görünen ilk paragraf ile yapısal `description` AYNI kaynaktan (görünen = yapısal). Ad (`name`) ve diğer
+  // alanlar DEĞİŞMEZ; yalnız açıklama sayfanın dilindeki geçersiz kılınmış paragrafla değişir.
+  const ozelMetin = family && !sunucuSku ? lineoAileMetni(lang, family, variants) : null
+  const jsonLdAilesi =
+    family && ozelMetin
+      ? { ...family, description: { ...(family.description ?? {}), [lang === 'en' ? 'en' : 'tr']: ozelMetin.ilkParagraf } }
+      : family
+  const jsonLd = jsonLdAilesi
+    ? buildProductGroupJsonLd({ family: jsonLdAilesi, variants, lang, baseUrl: SITE_URL, mainCategory })
     : null
 
   if (jsonLd) assertNoUuid(jsonLd)
@@ -344,6 +379,8 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
         sunucuSku={sunucuSku}
         kirinti={kirinti}
         markaHref={markaHref}
+        gorunenBaslik={ozelMetin?.h1 ?? null}
+        gorunenAciklama={ozelMetin?.ilkParagraf ?? null}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): aile → o aileye bağlanan rehber. Aile bulunamadıysa
           (unavailable) blok yok; yazı yoksa `IlgiliRehberler` hiçbir şey basmaz. */}
