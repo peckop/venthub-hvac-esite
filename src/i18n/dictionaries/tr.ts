@@ -3014,8 +3014,20 @@ export const tr = {
       withoutMark: '•',
       withMark: '•',
       eyebrow: 'SES VE KONFOR',
-      title: 'Ses Emici Kaplamalı Kanal Fanı',
-      subtitle: 'Vortice Lineo Quiet ailesi, kanal tipi karma akışlı fanlardan oluşur; ses emici kaplama dış gövdeye entegredir.',
+      // URN-135 (Design D3): bölüm başlığı ve giriş metni kategori sayfasının sessiz fan H2'si + açıklamasıdır. `intro`
+      // CÜMLE dizisidir. `{ ses: '…{{ad}}…' }` biçimindeki cümle veriden gelen ses sayısı taşır ve yalnız sitede canlı model
+      // kodlarının ses verisiyle kesişimi varsa çizilir (`silent-fan/sesMetni.ts`); düz dize her zaman çizilir.
+      title: 'Sessiz kanal tipi fan: ses emici kaplamalı Lineo Quiet',
+      intro: [
+        'Vortice Lineo Quiet, ses emici kaplaması dış gövdeye bütünleşik bir karışık akışlı kanal fanıdır; kaplama çevresel ses emisyonunu en aza indirmek için optimize edilmiştir.',
+        'Katalog her model ve çalışma noktası için emiş, üfleme ve gövde değerini ayrı verir.',
+        { ses: 'En düşük değer {{govdeMin}} ({{govdeMinModel}}).' },
+        { ses: 'Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet {{q200Govde}}; ses emici kaplaması olmayan Lineo 200 için kataloğun s.28’inde 46,9 dB(A) · gövde, 3 m yazar.' },
+        'ES sürümünde pasif bir Helmholtz rezonatör grubu belirli frekanslarda ses düzeyini ayrıca düşürür.',
+        'Seri Ø100–Ø315 mm yuvarlak kanal çaplarında, AC ve 0–10 V ayarlı EC motorlu sürümlerle gelir.',
+        'Her modelin değerleri Lineo Quiet ürün sayfasındaki tabloda verilir.'
+      ],
+      source: 'Vortice LINEO kataloğu, Mayıs 2026 · s.6, 9, 12, 18, 28',
       painPoints: [
         {
           title: 'Ses Emici Kaplama',
@@ -3059,20 +3071,88 @@ export const tr = {
     // 'comparison' (Motor Seçenekleri tablosu) kalktı — Blog BLG-6 son tablosu (OPS hükmü b, 10-09): iki
     // hücresi aynı kalan satırlar kalkınca tablo tümden kalkar; iki motor seçeneği problem.painPoints[2]
     // ve problem.visual içinde zaten anlatılıyor.
+    // URN-135 (Design D2): ses değerini basan TEK üretici `sesEtiketi`dir (`@/data/sessizFan/sesVerisi`); bu blok o
+    // üreticinin sözcüklerini verir (yer + kademe adı + mesafe birimi). Kademe adı veri kademesine eşlenir: AC "en düşük /
+    // orta / en yüksek", ES "4 V" … "10 V" (ES kademesi olduğu gibi yazılır, sözlüğe girmez).
+    ses: {
+      yer: {
+        emis: 'emiş',
+        ufleme: 'üfleme',
+        govde: 'gövde'
+      },
+      metre: 'm',
+      kademe: {
+        enDusuk: 'en düşük hız',
+        orta: 'orta hız',
+        enYuksek: 'en yüksek hız'
+      },
+      kaynakEtiketi: 'Kaynak'
+    },
+    // URN-135 (Design D2): yedi soru. `a` CÜMLE dizisidir; `{ ses: '…{{ad}}…' }` biçimindeki cümle veriden gelen ses
+    // sayısı taşır ve yalnız sitede canlı model kodlarının ses verisiyle kesişimi varsa çizilir. `k` kaynak notudur.
     faq: {
       title: 'Sıkça Sorulan Sorular',
       items: [
         {
-          q: 'Gerçekten ne kadar sessiz?',
-          a: 'Ses emici kaplama dış gövdeye entegredir; ortama yayılan sesi azaltmak üzere tasarlanmıştır. Teknik özellikler ürün sayfasındadır.'
-        },
-        {
-          q: 'Montajı zor mu?',
-          a: 'Montaj ve bakımda başvuru kaynağı, ürünün kullanım kılavuzu ve üretici belgesidir. Kılavuzu saklayınız.'
-        },
-        {
           q: 'Vortice Lineo Quiet nedir?',
-          a: 'Kanal tipi karma akışlı bir fandır; AC motorlu LINEO QUIET ve EC motorlu LINEO QUIET ES olmak üzere iki model grubu vardır.'
+          a: [
+            'Yuvarlak kanala seri bağlanan, karışık akışlı (mixed flow) bir kanal tipi fan ailesidir.',
+            'Dış gövdesine bütünleşik ses emici kaplama taşır.',
+            'İki sürümü vardır: AC motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES.',
+            'Kanal çapı Ø100 ile Ø315 mm arasındadır; yatay ya da dikey kurulur.'
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.4–6, 10'
+        },
+        {
+          q: 'Lineo Quiet ne kadar sessiz?',
+          a: [
+            'Katalog her model ve çalışma noktası için emiş, üfleme ve gövde ses değerini ayrı verir; ses basıncı 3 m mesafede, serbest alanda hesaplanmıştır.',
+            { ses: 'En düşük gövde değeri {{govdeMin}} ({{govdeMinModel}}); en yüksek gövde değeri {{govdeMax}} ({{govdeMaxModel}}).' },
+            { ses: 'Emiş tarafında değerler {{emisMin}} ile {{emisMax}} ({{emisMaxModel}}) arasındadır.' },
+            'Her modelin değerleri Lineo Quiet ürün sayfasındaki tabloda verilir.'
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.12, 18'
+        },
+        {
+          q: 'Lineo ile Lineo Quiet arasındaki fark nedir?',
+          a: [
+            'Lineo Quiet’in dış gövdesinde ses emici kaplama vardır, Lineo’da yoktur.',
+            { ses: 'Ø200 AC modellerinde en yüksek hızda: Lineo 200 Quiet (17164, 1160 m³/h) {{q200Govde}} ve {{q200Emis}}; kataloğun s.28’indeki Lineo 200 (17180, 1135 m³/h) için 46,9 dB(A) · gövde ve 55,4 dB(A) · emiş, 3 m.' },
+            'Karşılığında Quiet daha ağırdır: Lineo 200 Quiet 8,6 kg, Lineo 200 4,9 kg.'
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.6, 18, 28'
+        },
+        {
+          q: 'EC (ES) mi AC mi seçmeliyim?',
+          a: [
+            'ES sürümünde EC motor iki hızlıdır; hızlar kurulumda ayarlanır ya da 0–10 V sinyaliyle ayarlanır.',
+            'Katalog değerleri 4, 6, 8 ve 10 V çalışma noktalarında verir.',
+            'AC sürümü modele göre iki ya da üç hızlıdır.',
+            'Aynı çapta ES daha az güç çeker: Ø150’de 31 W (10 V) ile 50 W (AC, en yüksek hız).',
+            { ses: 'Örnek Ø150 ES: {{es150Govde4V}}.' }
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.10, 12, 18'
+        },
+        {
+          q: 'Hangi kumanda ve sensörler uyar?',
+          a: [
+            'ES modellerinde POT-IT (UNI 503 kutu) ya da POT (DIN kutu) potansiyometre. AC modellerinde TRIO-LINEO 503 üç hız seçici ya da C5 0.5, C 1.5, C 2.5 hız ayarlayıcılar (C 2.5 yalnız 250 ve 315). Sıcaklık (C TEMP), hava kalitesi (C SMOKE), nem (C HCS), hareket (C PIR) sensörleri ve zamanlayıcı (C TIMER) tüm modellere uyar.'
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.15, 21'
+        },
+        {
+          q: 'Montajı ve bakımı zor mu?',
+          a: [
+            'Fan kanala yatay ya da dikey kurulur. Ana gövde kendi ekseni etrafında döner; dar alana yerleştirmek ve dış yüzeydeki kablo bağlantılarına ulaşmak kolaylaşır. Vortice kataloğuna göre fan çevredeki boru sistemine dokunmadan sökülür, motor ve pervaneye kolayca erişilir; bakımdan sonra yeniden takılan ses emici kabuk test koşullarındaki ses performansını geri getirir. Montaj ayrıntısı için ürünün kullanım kılavuzu esas alınır.'
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.4–5'
+        },
+        {
+          q: 'Koruma sınıfı nedir?',
+          a: [
+            'Koruma sınıfı kanallı kurulum içindir: tüm Lineo Quiet ES modelleri ve Lineo Quiet AC 100–160 IP45, Lineo Quiet AC 200–315 IPX5. Gövde, Vortice’e göre EN ISO 11925-2:2010’a göre E2 yangın dayanım sınıfındadır; sınıflandırma yalnız doğru kurulmuş ürün için geçerlidir.'
+          ],
+          k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.5, 12, 18'
         }
       ]
     },

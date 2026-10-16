@@ -37,6 +37,13 @@ export type SeriOzeti = Readonly<{
   enYuksekGovde: SesDegeri
   enDusukEmis: SesDegeri
   enYuksekEmis: SesDegeri
+  /** Dört uç değerin hangi model koduna ait olduğu (URN-135 U3: metin "değer (model adı)" yazar). */
+  kodlar: Readonly<{
+    enDusukGovde: string
+    enYuksekGovde: string
+    enDusukEmis: string
+    enYuksekEmis: string
+  }>
 }>
 
 /** [Q m³/h, P Pa] ya da [Q m³/h, W] çifti. */
@@ -259,6 +266,10 @@ export function seriOzeti(kodlar: readonly string[]): SeriOzeti | null {
   let enYuksekGovde: SesDegeri | null = null
   let enDusukEmis: SesDegeri | null = null
   let enYuksekEmis: SesDegeri | null = null
+  let kodEnDusukGovde = ''
+  let kodEnYuksekGovde = ''
+  let kodEnDusukEmis = ''
+  let kodEnYuksekEmis = ''
   for (const kod of kodlar) {
     const m = MODELLER.get(kod)
     if (!m) continue
@@ -266,12 +277,35 @@ export function seriOzeti(kodlar: readonly string[]): SeriOzeti | null {
       const govde = lpDegeri(m, 'govde', i)
       const emis = lpDegeri(m, 'emis', i)
       if (!govde || !emis) return null
-      if (!enDusukGovde || govde.dbA < enDusukGovde.dbA) enDusukGovde = govde
-      if (!enYuksekGovde || govde.dbA > enYuksekGovde.dbA) enYuksekGovde = govde
-      if (!enDusukEmis || emis.dbA < enDusukEmis.dbA) enDusukEmis = emis
-      if (!enYuksekEmis || emis.dbA > enYuksekEmis.dbA) enYuksekEmis = emis
+      if (!enDusukGovde || govde.dbA < enDusukGovde.dbA) {
+        enDusukGovde = govde
+        kodEnDusukGovde = kod
+      }
+      if (!enYuksekGovde || govde.dbA > enYuksekGovde.dbA) {
+        enYuksekGovde = govde
+        kodEnYuksekGovde = kod
+      }
+      if (!enDusukEmis || emis.dbA < enDusukEmis.dbA) {
+        enDusukEmis = emis
+        kodEnDusukEmis = kod
+      }
+      if (!enYuksekEmis || emis.dbA > enYuksekEmis.dbA) {
+        enYuksekEmis = emis
+        kodEnYuksekEmis = kod
+      }
     }
   }
   if (!enDusukGovde || !enYuksekGovde || !enDusukEmis || !enYuksekEmis) return null
-  return { enDusukGovde, enYuksekGovde, enDusukEmis, enYuksekEmis }
+  return {
+    enDusukGovde,
+    enYuksekGovde,
+    enDusukEmis,
+    enYuksekEmis,
+    kodlar: {
+      enDusukGovde: kodEnDusukGovde,
+      enYuksekGovde: kodEnYuksekGovde,
+      enDusukEmis: kodEnDusukEmis,
+      enYuksekEmis: kodEnYuksekEmis,
+    },
+  }
 }

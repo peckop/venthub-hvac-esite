@@ -5,6 +5,7 @@ import React, { useMemo } from 'react'
 
 import { type CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 import Pagination from '../components/ui/Pagination'
+import type { SesOzeti } from '../data/sessizFan/sesOzeti'
 import { useCategoryGateway } from '../hooks/useCategoryGateway'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import { useI18n } from '../i18n/I18nProvider'
@@ -92,6 +93,11 @@ interface CategoryMasterViewProps {
    * hava perdesi ve sessiz fan anlatısındaki iki Vortice bölümünün sayaç kartlarını besler; yoksa kartlar çizilmez.
    */
   vorticeKatalogSayilari?: KatalogSayilari | null
+  /**
+   * URN-135: sessiz fan anlatısındaki ses aralığı (sunucuda, sitede canlı model kodlarıyla ses veri modülünün
+   * kesişimi). Yalnız sessiz fan serisi sayfasında doludur; yoksa ses sayıları ve cümleleri çizilmez.
+   */
+  sesOzeti?: SesOzeti | null
 }
 
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
@@ -103,7 +109,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   initialSubCategories,
   initialParentCategory,
   kategoriler,
-  vorticeKatalogSayilari
+  vorticeKatalogSayilari,
+  sesOzeti
 }) => {
   const { lang } = useI18n()
 
@@ -216,6 +223,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
             parentCategory={parentCategory?.raw}
             families={visibleFamilies}
             vorticeKatalogSayilari={vorticeKatalogSayilari}
+            sesOzeti={sesOzeti}
           />
         )
       case 'series':
@@ -248,6 +256,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
                 parentCategory={parentCategory?.raw}
                 families={visibleFamilies}
                 vorticeKatalogSayilari={vorticeKatalogSayilari}
+                sesOzeti={sesOzeti}
               />
             )
         }

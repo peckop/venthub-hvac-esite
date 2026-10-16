@@ -2966,8 +2966,21 @@ export const en: typeof tr = {
       withoutMark: '•',
       withMark: '•',
       eyebrow: 'SOUND AND COMFORT',
-      title: 'Duct Fan with Sound-Absorbing Lining',
-      subtitle: 'The Vortice Lineo Quiet family consists of duct-type, mixed-flow fans; the sound-absorbing lining is integrated into the outer casing.',
+      // URN-135 (Design D3): the section heading and intro are the category page's silent-fan H2 + description. `intro`
+      // is an array of SENTENCES. A sentence written as `{ ses: '…{{name}}…' }` carries a figure from the data and is
+      // rendered only when the live model codes on the site intersect the sound data (`silent-fan/sesMetni.ts`);
+      // a plain string is always rendered.
+      title: 'Silent in-line duct fan: Lineo Quiet with sound-absorbing casing',
+      intro: [
+        'Vortice Lineo Quiet is a mixed-flow duct fan with a sound-absorbing coating integrated in its outer casing; the coating is optimised to minimise the sound radiated to the surroundings.',
+        'The catalogue gives intake, supply and casing values separately for each model and operating point.',
+        { ses: 'The lowest value is {{govdeMin}} ({{govdeMinModel}}).' },
+        { ses: 'On the Ø200 AC models at maximum speed, Lineo 200 Quiet gives {{q200Govde}}; for Lineo 200 without the sound-absorbing coating, catalogue p.28 gives 46.9 dB(A) · casing, 3 m.' },
+        'In the ES version a passive Helmholtz resonator group further reduces the sound level at set frequencies.',
+        'The series covers circular duct diameters from Ø100 to Ø315 mm, with AC and 0–10 V adjustable EC motor versions.',
+        'The values of each model are in the table on the Lineo Quiet product page.'
+      ],
+      source: 'Vortice LINEO catalogue, May 2026 · p.6, 9, 12, 18, 28',
       painPoints: [
         {
           title: 'Sound-Absorbing Lining',
@@ -3011,20 +3024,89 @@ export const en: typeof tr = {
     // 'comparison' (Motor Options table) removed — Blog BLG-6 final table (OPS ruling b, 10-09): once the rows
     // with identical cells are gone the whole table goes; the two motor options are already described in
     // problem.painPoints[2] and problem.visual.
+    // URN-135 (Design D2): the ONLY producer of a printed sound figure is `sesEtiketi` (`@/data/sessizFan/sesVerisi`); this
+    // block gives it its words (place + speed name + distance unit). The speed name maps to the data speed: AC "lowest /
+    // medium / maximum", ES "4 V" … "10 V" (the ES speed is printed as is and is not in the dictionary).
+    ses: {
+      yer: {
+        emis: 'intake',
+        ufleme: 'supply',
+        govde: 'casing'
+      },
+      metre: 'm',
+      kademe: {
+        enDusuk: 'minimum speed',
+        orta: 'medium speed',
+        enYuksek: 'maximum speed'
+      },
+      kaynakEtiketi: 'Source'
+    },
+    // URN-135 (Design D2): seven questions. `a` is an array of SENTENCES; a sentence written as `{ ses: '…{{name}}…' }`
+    // carries a figure from the data and is rendered only when the live model codes intersect the sound data.
+    // `k` is the source note (catalogue + page).
     faq: {
       title: 'Frequently Asked Questions',
       items: [
         {
-          q: 'How quiet is it really?',
-          a: 'The sound-absorbing lining is integrated into the outer casing, designed to reduce emitted noise. Specifications are on the product page.'
-        },
-        {
-          q: 'Is it hard to install?',
-          a: 'For installation and maintenance, refer to the product\'s user manual and the manufacturer\'s documentation. Please keep the manual.'
-        },
-        {
           q: 'What is Vortice Lineo Quiet?',
-          a: 'A duct-type, mixed-flow fan with two model groups: the AC-motor LINEO QUIET and the EC-motor LINEO QUIET ES.'
+          a: [
+            'It is a family of mixed-flow in-line duct fans connected in series with a circular duct.',
+            'Its outer casing has an integrated sound-absorbing coating.',
+            'There are two versions: LINEO QUIET with an AC motor and LINEO QUIET ES with an EC brushless motor.',
+            'Duct diameters range from Ø100 to Ø315 mm; it is installed horizontally or vertically.'
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.4–6, 10'
+        },
+        {
+          q: 'How quiet is Lineo Quiet?',
+          a: [
+            'The catalogue gives intake, supply and casing sound values separately for every model and operating point; sound pressure is calculated at 3 m in free field.',
+            { ses: 'The lowest casing value is {{govdeMin}} ({{govdeMinModel}}); the highest casing value is {{govdeMax}} ({{govdeMaxModel}}).' },
+            { ses: 'On the intake side the values range from {{emisMin}} to {{emisMax}} ({{emisMaxModel}}).' },
+            'The values of each model are in the table on the Lineo Quiet product page.'
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.12, 18'
+        },
+        {
+          q: 'What is the difference between Lineo and Lineo Quiet?',
+          a: [
+            'Lineo Quiet has a sound-absorbing coating on its outer casing; Lineo does not.',
+            { ses: 'On the Ø200 AC models at maximum speed: Lineo 200 Quiet (17164, 1160 m³/h) {{q200Govde}} and {{q200Emis}}; for Lineo 200 (17180, 1135 m³/h), catalogue p.28 gives 46.9 dB(A) · casing and 55.4 dB(A) · intake, 3 m.' },
+            'In return Lineo Quiet is heavier: Lineo 200 Quiet 8.6 kg, Lineo 200 4.9 kg.'
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.6, 18, 28'
+        },
+        {
+          q: 'Should I choose EC (ES) or AC?',
+          a: [
+            'In the ES version the EC motor has two speeds; they are set at installation or with a 0–10 V signal.',
+            'The catalogue gives values at the 4, 6, 8 and 10 V operating points.',
+            'The AC version has two or three speeds depending on the model.',
+            'At the same diameter the ES draws less power: at Ø150, 31 W (10 V) against 50 W (AC, maximum speed).',
+            { ses: 'Example Ø150 ES: {{es150Govde4V}}.' }
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.10, 12, 18'
+        },
+        {
+          q: 'Which controls and sensors fit?',
+          a: [
+            'On ES models the POT-IT (UNI 503 box) or POT (DIN box) potentiometer. On AC models the TRIO-LINEO 503 three-speed selector or the C5 0.5, C 1.5, C 2.5 speed controllers (C 2.5 only for 250 and 315). The temperature (C TEMP), air quality (C SMOKE), humidity (C HCS) and motion (C PIR) sensors and the timer (C TIMER) fit all models.'
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.15, 21'
+        },
+        {
+          q: 'Is installation and maintenance difficult?',
+          a: [
+            'The fan is installed in the duct horizontally or vertically. The main body rotates on its own axis, which makes it easier to fit in a narrow space and to reach the cable connections on the outer surface. According to the Vortice catalogue the fan can be removed without touching the surrounding piping, giving easy access to the motor and impeller; the sound-absorbing shell refitted after maintenance restores the sound performance under test conditions. For installation details, the product’s instruction manual applies.'
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.4–5'
+        },
+        {
+          q: 'What is the protection grade?',
+          a: [
+            'The protection grade refers to ducted units: IP45 for all Lineo Quiet ES models and Lineo Quiet AC 100–160, IPX5 for Lineo Quiet AC 200–315. According to Vortice the casing is in fire resistance class E2 to EN ISO 11925-2:2010; the classification applies only to a correctly installed product.'
+          ],
+          k: 'Vortice LINEO catalogue, May 2026 · p.5, 12, 18'
         }
       ]
     },

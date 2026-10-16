@@ -3,6 +3,7 @@ import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 
 import { ADRES_SEMASI_K3B } from '@/config/features'
+import { type SesOzeti, sesOzetiHesapla,SESSIZ_FAN_SERI_SLUGLARI } from '@/data/sessizFan/sesOzeti'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
@@ -14,6 +15,7 @@ import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
+import { getSessizFanCanliKodlari } from '@/lib/services/sessizFanKodlari.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import {
   getCategoryDescription,
@@ -141,6 +143,31 @@ async function vorticeKatalogSayilari(lang: string, tenantId: string): Promise<K
     return markaKatalogSayilari(await getCachedMarkaKatalogOzeti(lang, tenantId, VORTICE_MARKA_ADI))
   } catch (hata) {
     console.warn('[kategoriSayfasi] Vortice katalog özeti okunamadı; sayaç kartları çizilmiyor', hata)
+    return null
+  }
+}
+
+/**
+ * Sessiz fan serisinin SİTEDE CANLI model kodları (URN-135, U3). Anahtar `lang` + `tenantId` + aile slug'ı (kural 12);
+ * etiketler aile/ürün değişiminde zaten tazelenen KEŞİF etiketleridir (`products`, `product_families` webhook'u).
+ * Hata önbelleğe YAZILMAZ (fırlatılır).
+ */
+const getCachedSessizFanKodlari = (lang: string, tenantId: string, familySlug: string) => unstable_cache(
+  async () => getSessizFanCanliKodlari(supabase, familySlug),
+  ['sessiz-fan-kodlari', lang, tenantId, familySlug],
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+)()
+
+/**
+ * Sessiz fan metnindeki ses sayıları: veri modülünün canlı kodlarla KESİŞİMİ (`sesOzetiHesapla`). Kod listesi
+ * OKUNAMAZSA ya da kesişim boşsa `null`: sayfa yine çizilir, ses cümleleri ve sayıları çizilmez (fail-closed,
+ * sayfayı kırmaz; uyarı basılır, sonraki yenilemede döner).
+ */
+async function sessizFanSesOzeti(lang: string, tenantId: string, familySlug: string): Promise<SesOzeti | null> {
+  try {
+    return sesOzetiHesapla(await getCachedSessizFanKodlari(lang, tenantId, familySlug))
+  } catch (hata) {
+    console.warn('[kategoriSayfasi] sessiz fan canlı model kodları okunamadı; ses sayıları çizilmiyor', hata)
     return null
   }
 }
@@ -313,6 +340,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
   let total = 0
   let subCategories: DomainCategory[] = []
   let vorticeSayilari: KatalogSayilari | null = null
+  let sesOzeti: SesOzeti | null = null
   let ustKategori: DomainCategory | null = null
 
   if (category) {
@@ -387,6 +415,11 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
       category.slug === 'air-curtains' ||
       families.some((f) => (f.brand_name ?? '').toLocaleLowerCase('en-US') === VORTICE_MARKA_ADI.toLocaleLowerCase('en-US'))
     if (vorticeGerekli) vorticeSayilari = await vorticeKatalogSayilari(lang, tenantId)
+
+    // URN-135: sessiz fan anlatısındaki ses sayıları yalnız seri sayfada listeleniyorsa hesaplanır (tetikleyici SERİ,
+    // `CategoryLandingView`); diğer kategorilerde canlı kod sorgusu hiç atılmaz.
+    const sessizFanAilesi = families.find((f) => (SESSIZ_FAN_SERI_SLUGLARI as readonly string[]).includes(f.slug))
+    if (sessizFanAilesi) sesOzeti = await sessizFanSesOzeti(lang, tenantId, sessizFanAilesi.slug)
   }
 
   // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
@@ -430,6 +463,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
         initialParentCategory={ustKategori}
         vorticeKatalogSayilari={vorticeSayilari}
+        sesOzeti={sesOzeti}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
           slug'dır (`vh:kategori/<categories.slug>`); yazı yoksa blok basılmaz. Veri kod sabiti
