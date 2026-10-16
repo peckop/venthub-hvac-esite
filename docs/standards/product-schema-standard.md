@@ -119,7 +119,7 @@ CREATE POLICY product_tenant_isolation_policy ON public.products
 
 *   **Flat URL Yönlendirmesi:** Ürün sayfası URL'si kategori yollarını içermemeli, doğrudan `/products/[family-slug]` formatında olmalıdır. Bu, URL stabilitesini korur [PS-039].
 *   **Canonical URL Kuralı:** Varyant sayfaları (Örn: `/products/punto-mex?size=100`) her zaman ana aile sayfasına (`/products/punto-mex`) canonical etiketi ile bağlanmalıdır [PS-043].
-*   **JSON-LD Schema Yapısı:** Ürün detay sayfalarında `ProductGroup` structured data standardı uygulanmalıdır. JSON-LD içinde veritabanı UUID'leri sızdırılmamalı, public URI slug'ları kullanılmalı ve `"isPartOf": { "@id": "${site_url}/#website" }` ilişkisi bulunmalıdır.
+*   **JSON-LD Schema Yapısı:** Ürün detay sayfalarında, ailenin tüm varyantları görünür fiyatlıysa `ProductGroup` structured data standardı uygulanmalıdır (teklif kipli/fiyatsız/karışık ailede `CollectionPage` + `ItemList`: `urun-yapisal-veri-standard.md` §2, URN-138). JSON-LD içinde veritabanı UUID'leri sızdırılmamalı, public URI slug'ları kullanılmalı ve `"isPartOf": { "@id": "${site_url}/#website" }` ilişkisi bulunmalıdır.
 
 ---
 

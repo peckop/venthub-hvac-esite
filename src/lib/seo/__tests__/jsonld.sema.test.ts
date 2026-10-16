@@ -124,7 +124,21 @@ function seriLd(bayrak: boolean) {
   })
 }
 
+/**
+ * URN-138: ProductGroup yalnız tüm varyantı görünür fiyatlı ailede üretilir; şekil testleri bu yüzden fiyatlı
+ * varyant + fiyat gösteren kategoriyle kurulur. Fiyatsız aile (CollectionPage) için `fiyatsizAileLd`.
+ */
 function grupLd() {
+  return buildProductGroupJsonLd({
+    family: GRUP_AILESI,
+    variants: [{ ...varyant('SEA-1'), price: 1500, stock_qty: 3 }, { ...varyant('SEA-2'), price: 2500, stock_qty: 0 }],
+    lang: 'tr',
+    baseUrl: BASE_URL,
+    mainCategory: { metadata: { hide_price: false } },
+  })
+}
+
+function fiyatsizAileLd() {
   return buildProductGroupJsonLd({
     family: GRUP_AILESI,
     variants: [varyant('SEA-1'), varyant('SEA-2')],
@@ -200,6 +214,46 @@ describe('REC-494 · ProductGroup: isPartOf YOK, başka alana dokunulmadı', () 
     expect(ld.productGroupID).toBe('storm-serisi')
     expect(ld.url).toBe(`${BASE_URL}/tr/products/storm-serisi`)
     expect(ld.hasVariant).toHaveLength(2)
+  })
+})
+
+describe('URN-138 · fiyatsız aile: CollectionPage + mainEntity ItemList (seri ile aynı şekil, fiyatsız)', () => {
+  it('üst düzey alan kümesi tam olarak beklenen; Product/ProductGroup/offers alanları yok', () => {
+    const ld = fiyatsizAileLd()
+
+    expect(Object.keys(ld).sort()).toEqual(
+      ['@context', '@type', 'about', 'description', 'isPartOf', 'mainEntity', 'name', 'url'].sort(),
+    )
+    expect(ld['@type']).toBe('CollectionPage')
+    expect(ld.isPartOf).toEqual(WEBSITE_REF)
+    expect(ld.url).toBe(`${BASE_URL}/tr/products/storm-serisi`)
+    expect(ld.about).toEqual({ '@type': 'Brand', name: 'Vortice' })
+    expect(ld).not.toHaveProperty('numberOfItems')
+    expect(ld).not.toHaveProperty('itemListElement')
+  })
+
+  it('mainEntity: varyant sayısı kadar ListItem (position + name), url yok (bayrak kapalı), fiyat yok', () => {
+    const ld = fiyatsizAileLd()
+
+    expect(ld.mainEntity).toEqual({
+      '@type': 'ItemList',
+      numberOfItems: 2,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Varyant SEA-1' },
+        { '@type': 'ListItem', position: 2, name: 'Varyant SEA-2' },
+      ],
+    })
+  })
+
+  it('gerçek kapı (kontrolEt) fiyatsız aile çıktısına JSONLD-* bulgusu vermez', () => {
+    expect(kapiBulgulari(fiyatsizAileLd())).toEqual([])
+  })
+
+  it('dedektör kör değil — fiyatsız aileye üst düzey liste konursa JSONLD-COLLECTIONPAGE verir', () => {
+    const { mainEntity, ...sayfa } = fiyatsizAileLd()
+    const eski = { ...sayfa, numberOfItems: 2, itemListElement: (mainEntity as { itemListElement: unknown[] }).itemListElement }
+
+    expect(kapiBulgulari(eski)).toEqual(['JSONLD-COLLECTIONPAGE'])
   })
 })
 
