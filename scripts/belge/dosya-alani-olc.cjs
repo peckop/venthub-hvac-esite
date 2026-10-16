@@ -41,7 +41,9 @@ function obek(yol) {
 }
 
 function olc({ gun = 14, dal = 'origin/master' } = {}) {
-  const cikti = execFileSync('git', ['log', `--since=${gun} days ago`, '--no-merges', '--name-only', '--format=@@%s', dal], {
+  if (!Number.isInteger(gun) || gun < 1 || gun > 365) throw new Error(`--gun 1-365 arası tam sayı olmalı: ${gun}`)
+  if (!/^[\w./-]+$/.test(dal) || dal.startsWith('-')) throw new Error(`--dal geçersiz: ${dal}`)
+  const cikti = execFileSync('git', ['-c', 'core.quotepath=false', 'log', `--since=${gun} days ago`, '--no-merges', '--name-only', '--format=@@%s', dal, '--'], {
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   })

@@ -531,9 +531,9 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   it('karar 224: her kart canlı dışı onay yolunu (OPS) ve aktarım yetkisinin yalnız OPS\'ta olduğunu taşır; OPS kartı genel müdür', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('Kapılar 1-5 Recep\'te kalır')
-      expect(metin, ad).toContain('Recep\'in öteki kararı yalnız OPS\'ta verilir')
+      expect(metin, ad).toContain('Kapılar 1-5 Recep\'te kalır (söz işi koşan pencerede)')
       expect(metin, ad).toContain('kanca, ayar ve departman iyileştirmesi onayı OPS\'tadır')
-      expect(metin, ad).toContain('aktarım yalnız OPS')
+      expect(metin, ad).toContain('Aktarım yalnız OPS')
       expect(metin, ad).toContain('§17 Kural 4')
       expect(metin, ad).toContain('OPS onaylar, uygular')
       expect(metin, ad).not.toContain('Recep teyidi bekliyor')

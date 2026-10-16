@@ -38,6 +38,8 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`, etiketler rol ve ders).
 - Recep'in onayladığı işi bekletmek için ölçülmüş engel gerekir; bekletme kararı karta "ölçüldü mü?" satırıyla yazılır.
 - Sorun için kendi çözümünü yazmadan önce Claude Code'un yerleşik karşılığını belgeden ara.
+- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur.
+- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında serbesttir; vitest, tsc, build ve `pnpm install` koşmaz.
 - İyileştirme hakkı: her departman kendi alanında iyileştirme önerir ve yapar (kural, cetvel, düzenli görev, kapı, skill). Uygulamadan önce OPS'a tek mesaj yaz: ne, kazanç, bedel, kart numarası; OPS onayı gelmeden uygulanmaz. Her Cuma müdür kendi ekibinden bir çürütücü açar, haftanın kart ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okutur; bulgudan en çok 3 öneri OPS'a gider.
 
 ## Recep ile iletişim

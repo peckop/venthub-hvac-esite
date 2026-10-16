@@ -158,7 +158,7 @@ const OPS_OKUMA_KURALI_ROLLERI = ['OPS']
 const OPS_OKUMA_KURALI = [
   '## Okuma, kaynak ve defter (HRT-60)',
   '- OPS departman PR\'ını birleştirmez: tam farkı okur, "okundu, uygun" ya da düzeltmeyi yazar, sıra verir; ritüelle yalnız KENDİ PR\'ını birleştirir.',
-  '- Kanca, ayar ve departman iyileştirmesinin onay makamı OPS\'tır (Recep 16 Ekim), Recep\'e götürülmez; Recep\'te yalnız canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, gerçek para, geri alınamaz silme ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur ve "okundu, uygun" yazar.',
+  '- Kanca, ayar ve departman iyileştirmesinin onay makamı OPS\'tır (Recep 16 Ekim), Recep\'e götürülmez; Recep\'te yalnız canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, gerçek para, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur ve "okundu, uygun" yazar.',
   '- Recep\'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.',
   '- Kanca, ayar ve MCP PR\'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ\'ta).',
   '- Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ\'ta).',
@@ -290,7 +290,7 @@ const RECEP_KAPILARI = [
   '4. Canlı veritabanına yazım.',
   '5. Para harcatan her şey (ücretli plan, servis, satın alma).',
   '',
-  'Kapılar 1-5 Recep\'te kalır; kanca, ayar ve departman iyileştirmesi onayı OPS\'tadır (16 Ekim). Recep\'in öteki kararı yalnız OPS\'ta verilir, aktarım yalnız OPS\'tan (karar 224, §17 Kural 4).',
+  'Kapılar 1-5 Recep\'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS\'tadır (16 Ekim). Aktarım yalnız OPS\'tan (karar 224, §17 Kural 4).',
   'CLAUDE.md OPS kapısıdır, Recep\'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.',
 ].join('\n')
 
@@ -389,15 +389,15 @@ const ROLLER = {
     gorev: 'Belge ve hafıza düzeni: CLAUDE.md, AGENTS.md, docs/README.md haritası, belge yönetimi cetveli; rol kartı ve ajan tanımı üreticileri, departman açma ve kapatma kaydı; kanca için yalnız kural ve belge metni (tasarım ARAC).',
     gorevDegil: 'uygulama kodu ve CI (ALTYAPI, ARAC); sahibi başkasının cetvelini değiştirmek; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmak.',
     dosyalar: 'CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**.',
-    yetki: 'Belge temizliği ve emeklilik, rol kartı üretimi, tazelik göstergesi ölçümü (kurulum ARAÇ\'ta).',
+    yetki: 'Belge temizliği ve emeklilik, rol kartı üretimi (üretici ve departman değişikliğinde PR öncesi harita-dogrulayici), tazelik göstergesi ölçümü (kurulum ARAÇ\'ta).',
     yasak: 'CLAUDE.md değişikliği OPS kapısıdır; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmaz.',
     yetenek: 'plan-challenger, diff-review, alt ajan çürütme, docs/README.md haritası.',
     durum: 'Açık (REC-400, REC-426).',
   },
   URUN: {
     gorev: 'Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi, yapısal veri (JSON-LD) üreticisi (GEO-SEO ölçer). Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI\'da kalır. İşe başlarken urun-yapisal-veri-standard §2 ve rendering-cache-standard oku.',
-    gorevDegil: '3d/** (3D); çeviri altyapısı ve toplu göç (I18N; vitrin içeriğinin sözlük girişi ÜRÜN\'dür); token ve yazı tipi (TASARIM); ürün verisi (KATALOG); CI (ALTYAPI).',
-    dosyalar: 'src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*, src/lib/seo/jsonld.ts, src/lib/seo/indexnow.ts, src/app/_components/aileSayfasi.tsx, ProductDetailPageView.tsx, src/data/sessizFan/**, sessizFanKodlari.service.ts, src/components/category/sections/silent-fan/**.',
+    gorevDegil: '3d/** (3D); çeviri altyapısı ve toplu göç (I18N, vitrin içeriğinin sözlük girişi ÜRÜN\'dür); token ve yazı tipi (TASARIM); ürün verisi (KATALOG); CI (ALTYAPI).',
+    dosyalar: 'src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*, src/lib/seo/jsonld.ts, src/lib/seo/indexnow.ts, src/app/_components/aileSayfasi.tsx, src/app/_components/ProductDetailPageView.tsx, src/data/sessizFan/**, src/lib/services/sessizFanKodlari.service.ts, src/components/category/sections/silent-fan/**.',
     yetki: 'Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").',
     yasak: 'Adres şeması değişikliği tek başına Recep\'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır.' + ARKA_OFIS_YASAGI,
     yetenek: 'rendering-cache cetveli, i18n-conventions, Playwright ölçümü.',
@@ -414,7 +414,7 @@ const ROLLER = {
   },
   KATALOG: {
     gorev: 'Resmî katalog ve föyleri bulmak, indirmek, kaynak dizinine almak; CSV içe/dışa aktarım, fiyat ve şema cetvelleri; Design\'ın çıkardığı veriyi kaynağa karşı doğrulayıp canlı yazım hazırlığı.',
-    gorevDegil: 'PDF\'ten veri çıkarımı, açıklama metni, eğri sayısallaştırma, sayfa içeriği Design\'ın (yalnız sayıdan türeyen cümlede sayıyı düzeltmek KATALOG\'dadır; cümle yapısı değişecekse Design\'a gider).',
+    gorevDegil: 'PDF\'ten veri çıkarımı, açıklama metni, eğri sayısallaştırma, sayfa içeriği Design\'ın (yalnız sayıdan türeyen cümlede sayıyı düzeltmek KATALOG\'dadır, cümle yapısı değişecekse Design\'a gider).',
     dosyalar: 'scripts/icerik-hatti/**, scripts/db/product-data/**, catalog-ingestion / csv-import-export / pricing / product-schema standartları; kardeş depo venthub-pdf-ingestor.',
     yetki: 'Kaynak dizininden okuma ve veri hazırlama; PDF\'i doğrudan taramaz (KAYNAK DİZİNİ önce).',
     yasak: 'Canlı ürün/fiyat yazımı Recep kapısıdır; uydurma kimlik üretmez; ErP kararı çıkana kadar dondurulmuş liste değişmez.' + ARKA_OFIS_YASAGI,
@@ -433,11 +433,11 @@ const ROLLER = {
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5 ve R11\'i oku.',
     gorevDegil: 'arama görünürlük ölçümü (GEO-SEO); sayfa kodu (URUN); mevzuat hükmü üretmek (MEVZUAT).',
-    dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydının gövde ve tarih alanları; liste ve rota kodu URUN).',
+    dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydının gövde ve tarih alanları; liste ve rota kodu URUN), src/lib/bilgiMerkezi/__tests__/kartGuncellemeTarihi.test.tsx.',
     yetki: 'Taslak yazma, kaynak ve mevzuat paketi isteme (MEVZUAT girdisi), kalıp kapısı.',
     yasak: 'Recep görmeden içerik onayı istenmez (karar 98); yayın Recep onayıyla; mevzuat iddiası kaynaksız yazılmaz.',
     yetenek: 'rehber-yazisi cetveli, kaynak dizini, görsel ihtiyaç listesi.',
-    durum: 'Açık (12 Ekim\'den beri; BLG işleri).',
+    durum: 'Açık (BLG işleri).',
   },
   MARKA: {
     gorev: 'Marka kimliği: logo, palet, yazı tipi ve belge sistemi (Design-MARKA projesi).',

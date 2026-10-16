@@ -4,7 +4,7 @@
 
 ## Görev
 Resmî katalog ve föyleri bulmak, indirmek, kaynak dizinine almak; CSV içe/dışa aktarım, fiyat ve şema cetvelleri; Design'ın çıkardığı veriyi kaynağa karşı doğrulayıp canlı yazım hazırlığı.
-Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): PDF'ten veri çıkarımı, açıklama metni, eğri sayısallaştırma, sayfa içeriği Design'ın (yalnız sayıdan türeyen cümlede sayıyı düzeltmek KATALOG'dadır; cümle yapısı değişecekse Design'a gider).
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): PDF'ten veri çıkarımı, açıklama metni, eğri sayısallaştırma, sayfa içeriği Design'ın (yalnız sayıdan türeyen cümlede sayıyı düzeltmek KATALOG'dadır, cümle yapısı değişecekse Design'a gider).
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -44,7 +44,7 @@ Açık (karar 165 dondurması kalktı).
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Recep'in öteki kararı yalnız OPS'ta verilir, aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
 CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.
 
 ## İletişim

@@ -4,7 +4,7 @@
 
 ## Görev
 Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi, yapısal veri (JSON-LD) üreticisi (GEO-SEO ölçer). Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI'da kalır. İşe başlarken urun-yapisal-veri-standard §2 ve rendering-cache-standard oku.
-Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): 3d/** (3D); çeviri altyapısı ve toplu göç (I18N; vitrin içeriğinin sözlük girişi ÜRÜN'dür); token ve yazı tipi (TASARIM); ürün verisi (KATALOG); CI (ALTYAPI).
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): 3d/** (3D); çeviri altyapısı ve toplu göç (I18N, vitrin içeriğinin sözlük girişi ÜRÜN'dür); token ve yazı tipi (TASARIM); ürün verisi (KATALOG); CI (ALTYAPI).
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -13,7 +13,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*, src/lib/seo/jsonld.ts, src/lib/seo/indexnow.ts, src/app/_components/aileSayfasi.tsx, ProductDetailPageView.tsx, src/data/sessizFan/**, sessizFanKodlari.service.ts, src/components/category/sections/silent-fan/**.
+src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*, src/lib/seo/jsonld.ts, src/lib/seo/indexnow.ts, src/app/_components/aileSayfasi.tsx, src/app/_components/ProductDetailPageView.tsx, src/data/sessizFan/**, src/lib/services/sessizFanKodlari.service.ts, src/components/category/sections/silent-fan/**.
 
 ## Yetki
 Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").
@@ -38,7 +38,7 @@ Açık.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Recep'in öteki kararı yalnız OPS'ta verilir, aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
 CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.
 
 ## İletişim

@@ -38,7 +38,7 @@ Açık (asli görev). Kuyruk: Edge deploy, istemci yayım çağrısını kaldır
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Recep'in öteki kararı yalnız OPS'ta verilir, aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
 CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.
 
 ## İletişim

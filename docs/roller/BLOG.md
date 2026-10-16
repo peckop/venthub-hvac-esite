@@ -13,7 +13,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydının gövde ve tarih alanları; liste ve rota kodu URUN).
+docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydının gövde ve tarih alanları; liste ve rota kodu URUN), src/lib/bilgiMerkezi/__tests__/kartGuncellemeTarihi.test.tsx.
 
 ## Yetki
 Taslak yazma, kaynak ve mevzuat paketi isteme (MEVZUAT girdisi), kalıp kapısı.
@@ -29,7 +29,7 @@ rehber-yazisi cetveli, kaynak dizini, görsel ihtiyaç listesi.
 - Gerekçeli özet: `docs/roller/BLOG-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık (12 Ekim'den beri; BLG işleri).
+Açık (BLG işleri).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
@@ -38,7 +38,7 @@ Açık (12 Ekim'den beri; BLG işleri).
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Recep'in öteki kararı yalnız OPS'ta verilir, aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
 CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.
 
 ## İletişim
