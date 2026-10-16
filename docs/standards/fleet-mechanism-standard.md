@@ -2876,3 +2876,39 @@ bu Recep gözüyle ölçülecek. Kural bu yüzden "OPS emri + kayıtta `entrypoi
 **İlk satır** üç sonuçtan biri ve karışmaz: `ÖNCEKİ ÇALIŞMA: BULUNDU n — …` · `YOK (k/5 yer arandı, ifade: …)` (yalnız dosya+git+Kanban tamam ölçüldüyse) · `ÖLÇÜLEMEDİ (kaynak: sebep)`. Kimlik `REC-300 = rec300 = rec 300`. Bütçe CLI 6 sn, `--kanca` 2,5 sn.
 **Sayaç:** `~/.claude/ara-onceki-calisma.jsonl` (depo DIŞI, yalnız-ekleme; depo içi yola yazmayı betik reddeder); `--sayac` oturumda bulunan yollarla yazılan dosya adlarının kesişimini `tekrar-uretim` satırı yazar.
 **Kapı:** `INV-ONCEKI-CALISMA-1..13`. **Ölçülmedi:** istem kancasına bağlama (UserPromptSubmit + SendMessage tetiklenmesi) ve Kanban description/notes araması.
+
+---
+
+## 38. BİRLEŞME SONRASI ÜRETİM DAĞITIMI KAPISI — CI yeşili ile dağıtımın çıkması ayrı kanıttır (ALT-82)
+
+**Cetvel durumu:** bu işten önce birleşme sonrası dağıtımı ölçen cetvel ve kapı yoktu; yazımı ALT-82'nin kapsamıydı. Bu bölüm o cetveldir.
+
+**Niçin (ölçüldü, 12-14 Ekim):** `ci.yml` yeşil iken iki birleşme (`5d82ca6dc`, `17212fba1`) Vercel'de "Deployment has failed" ile düştü ve hiçbir kapı kırmızı vermedi. Üretime çıkıp çıkmadığına birleşmeden sonra bakan bir ölçüm yoktu. Bu, CI yeşili ile Vercel build kapısının ayrı kanıt olduğu dersinin (2026-06-18) birleşme sonrası karşılığıdır.
+
+**Kapı:** `.github/workflows/dagitim-hazir.yml` → `scripts/ci/dagitim-hazir-kapisi.cjs`. Master'a her push'ta (ve elle) koşar; o commit'in GitHub commit durumunu (`commits/<sha>/status`, bağlam `Vercel`) 20 sn aralıkla en çok ~12 dk yoklar. `pnpm install`, sır, Vercel API'si ve self-hosted runner YOKTUR; üretim dağıtımı TETİKLENMEZ.
+
+**Sınıflar ve çıkış:**
+
+| Sınıf | Ölçüt | Seviye · çıkış |
+|---|---|---|
+| READY | `success` + açıklamada "completed" | notice · 0 |
+| ATLANDI | `success` + "Ignored Build Step" (site kodu içermeyen birleşme; üretime çıkmadı) | notice · 0 — KIRMIZI DEĞİL |
+| İPTAL, yerine geçildi | `failure` + "Canceled…" ve master ucu bu commit DEĞİL | notice · 0 |
+| İPTAL, yerine geçen yok | `failure` + "Canceled…" ve master ucu BU commit | error · **1** (elle dağıtım gerekir) |
+| HATA | `failure` ya da `error` + diğer her şey | error · **1** |
+| ZAMAN_AŞIMI | ~12 dk içinde terminal durum yok (Vercel bağlamı hiç gelmedi ya da hâlâ `pending`) | warning · 0 |
+| ÖLÇÜLEMEDİ | API 401/403/404/422, ağ ya da 5xx sürekli, girdi eksik, beklenmeyen `state`, tanınmayan `success` açıklaması | warning · 0 — "ölçülemedi" açık yazılır, sessiz yeşil YOK |
+
+`pending` yalnız `state`e bakılarak beklenir (açıklama metnine bağımlı değildir). Kalıcı görünen HTTP kodlarında (401/403/404/422) yoklama sürdürülmez.
+
+**Birleşmeyi BLOKLAMAZ:** iş akışı yalnız `push` (master) ve elle tetiklenir; `pull_request` tetiği yoktur, bu yüzden `scripts/hijyen/merge-ritueli.cjs` zorunlu çekirdeği türetirken onu saymaz ve branch protection'a yeni zorunlu kontrol eklenmez. Kırmızısı birleşmeyi geri çevirmez; birleşmeden SONRA ölçülmüş bir dağıtım sorununu görünür kılar.
+
+**Kırmızının kime gittiği OPS kararıdır** (bu cetvel yönlendirme yazmaz). Kırmızıda iş akışı kırmızıdır; elle dağıtım yolu karar 342'dir: OPS'a tek satır, Recep sözü OPS penceresinde. Dağıtımı bu kapı tetiklemez.
+
+**Dürüstçe ölçülmeyenler:**
+1. Hata NEDENİ (`errorCode`, git_info_fail) commit durumundan GELMEZ; mesaj "GitHub ikincil hız sınırı olabilir" der ama bunu kanıtlamaz. Kesin neden için Vercel API'si ya da `npx vercel inspect` gerekir (bu kapı kullanmaz).
+2. `pending` durumunun açıklama metni ölçülmedi; kapı ona bağlı değildir.
+3. Gerçek bir master push koşusu ölçülmedi (birleşmeden sonraki ilk koşu ölçümdür); sınıflayıcı yalnız 14 Ekim'de `gh api` ile okunan açıklamalarla sınanmıştır.
+4. Vercel'in commit durumu gecikmeli düşebilir; 12 dk dolarsa ZAMAN_AŞIMI uyarıdır, hata değil.
+
+**Kapı:** `INV-DAGITIM-HAZIR-1` (`scripts/ci/__tests__/dagitim-hazir-kapisi.test.ts`): ölçülmüş fikstürlerle tablo güdümlü sınıflayıcı, sahte ağ ve saatle yoklama, enjeksiyon/token sızıntısı, iş akışı dosyası değişmezleri ve kaynağa tek tek hata sokan sabotaj kolları.

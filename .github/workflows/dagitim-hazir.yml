@@ -1,0 +1,56 @@
+name: Dagitim hazir
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ALT-82 — master'a her birleşmeden SONRA o commit'in Vercel üretim dağıtımının sonucunu ölç.
+#
+# ÖLÇÜLDÜ 2026-10-12/14: ci.yml yeşil iken iki birleşme (5d82ca6dc, 17212fba1) Vercel'de
+# "Deployment has failed" ile düştü ve hiçbir kapı kırmızı vermedi. CI yeşili ile dağıtımın
+# çıkması ayrı kanıtlardır (cetvel: fleet-mechanism-standard.md §38).
+#
+# BİRLEŞMEYİ BLOKLAMAZ: yalnız `push` (master) ve elle tetik; `pull_request` YOK, `ci` ya da
+# `admin-smoke` ile aynı adı taşımaz ve zorunlu çekirdeğe girmez (merge-ritueli türetmesi
+# `pull_request` tetiği arar; scripts/ci/__tests__/dagitim-hazir-kapisi.test.ts ölçer).
+# Kırmızısı ölçülmüş bir dağıtım sorunudur: kime gittiği OPS kararıdır.
+#
+# `pnpm install` YOK, sır YOK, self-hosted runner YOK: betik yalnız Node yerleşiklerini kullanır
+# ve GitHub'ın commit durum uç noktasını yoklar. Vercel API'si ve token'ı kullanılmaz;
+# üretim dağıtımı TETİKLENMEZ (create_deployment bu kapının işi değildir).
+# Sınıflar, çıkış kodları ve yoklama süresi: scripts/ci/dagitim-hazir-kapisi.cjs başlığı.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU
+# (CLAUDE.md Notlar — yoksa checkout "Repository not found" verir).
+permissions:
+  contents: read
+  statuses: read
+
+# Her commit KENDİ sonucunu ölçer: yeni birleşme eskisinin yoklamasını iptal ETMEZ.
+concurrency:
+  group: dagitim-hazir-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  dagitim-hazir:
+    runs-on: ubuntu-latest
+    # 12 dk yoklama + checkout/kurulum payı.
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Vercel uretim dagitim sonucunu olc
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/dagitim-hazir-kapisi.cjs
