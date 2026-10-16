@@ -17,6 +17,13 @@
       "Bash(pnpm lint)",
       "Bash(node --env-file=.env scripts/db/product-data/*.mjs)",
       "Bash(node --env-file=.env scripts/db/product-data/*.mjs *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push origin *)",
+      "Bash(git push -u origin *)",
+      "Bash(git -C * add *)",
+      "Bash(git -C * commit *)",
+      "Bash(gh pr create *)",
       "mcp__claude_ai_Vercel__list_deployments",
       "mcp__codegraph__codegraph_explore",
       "mcp__github__get_file_contents",
@@ -50,7 +57,23 @@
       "mcp__codegraph__codegraph_status"
     ],
     "deny": [
-      "Bash(node --env-file=.env *..*)"
+      "Bash(node --env-file=.env *..*)",
+      "Bash(git push * master*)",
+      "Bash(git push * main*)",
+      "Bash(git push *--force*)",
+      "Bash(git push * -f *)",
+      "Bash(git push * -f)",
+      "Bash(git push * :*)",
+      "Bash(git push *--delete*)",
+      "Bash(git push *+*)",
+      "Bash(git -C * push * master*)",
+      "Bash(git -C * push * main*)",
+      "Bash(git -C * push *--force*)",
+      "Bash(git -C * push * -f *)",
+      "Bash(git -C * push * -f)",
+      "Bash(git -C * push * :*)",
+      "Bash(git -C * push *--delete*)",
+      "Bash(git -C * push *+*)"
     ]
   },
   "hooks": {
