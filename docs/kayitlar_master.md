@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-10-07T11:24:53.749483+00:00
-total_compiled_files: 281
-source_commit: 1718021a7
+compiled_at: 2026-10-16T09:00:30.052627+00:00
+total_compiled_files: 304
+source_commit: 192cd284a
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -792,9 +792,10 @@ hatasını tekrarlar.
 | `.claude/hooks/board-brief.cjs` | hook | UserPromptSubmit: sessiz pano brifingi + kira yenileme | ALTYAPI | `hook:UserPromptSubmit *` | bağlı | board-invariants.test.ts, fleet-mechanism-integrity.test.ts | KAL |
 | `.claude/hooks/board-release.cjs` | hook | SessionEnd: şeridi bırak (kira serbest bırakma) | ALTYAPI | `hook:SessionEnd *` | bağlı | kanca-board-release.test.ts | KAL |
 | `.claude/hooks/lane-guard.cjs` | hook | PreToolUse: şerit koruması (çok-oturumlu çakışma engeli) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-lane-guard.test.ts | KAL |
-| `.claude/hooks/precompact-durum-kapisi.cjs` | hook | PreCompact: durum kapısı (REC-86 Faz 1) | ALTYAPI | `hook:PreCompact *`; ayrıca `require()` ← session-board.cjs:176 | bağlı | precompact-durum-kapisi.test.ts | KAL |
+| `.claude/hooks/precompact-durum-kapisi.cjs` | hook | PreCompact: durum kapısı (REC-86 Faz 1). ARC-137 (14 Ekim): ana hafıza dizini git'siz de türetilir (worktree proje adı + cwd); "hafıza dizini çözülemedi" ve "dosya okunamadı" bloklamaz, "dosya yok" yalnız gerçekten dosyasızsa | ALTYAPI | `hook:PreCompact *`; ayrıca `require()` ← session-board.cjs:176 | bağlı | precompact-durum-kapisi.test.ts; INV-COMPACT-3 (precompact-yanlis-durdurma.test.ts: 7 test, sabotaj 5 kırmızı) | KAL |
 | `.claude/hooks/sql-yazma-kapisi.cjs` | hook | PreToolUse execute_sql / apply_migration / deploy_edge_function: okuma sessiz geçer, yazma/DDL/VOLATILE proje fonksiyonu Recep'e sorulur (REC-410 S1; cetvel izin-kapilari-standard.md). 2.024 gerçek sorguda 1.933 geçer / 91 sorulur. | ARAC | `hook:PreToolUse mcp__.*[Ss]upabase.*__(execute_sql\|…)` | bağlı; canlı 09-28 claude -p: okuma geçti, yazma durdu | sql-yazma-kapisi.test.ts | KAL |
 | `.claude/hooks/gh-api-kapisi.cjs` | hook | PreToolUse Bash: `gh api` yazmalarından beş kapıyı dolananlar (PR merge, dal koruması, contents, git refs, sır, DELETE, depo ayarı, mutation) Recep'e sorulur; PR aç/düzelt/yorum geçer (REC-410 S2). 131 gerçek yazmada 105 geçer / 26 sorulur. | ARAC | `hook:PreToolUse Bash` | bağlı; canlı 09-28 claude -p: `PUT pulls/999999/merge` durdu | gh-api-kapisi.test.ts | KAL |
+| `.claude/hooks/kartsiz-emir-uyarisi.cjs` | hook | PreToolUse SendMessage kartsız emir uyarısı (ARC-79, ARC-109): "OPS" ile başlayan mesaj bir iş emri gibi okunuyor (emir fiili ya da "emri") ve pano kart numarası yoksa modele tek satır uyarı; onay/hüküm/bilgi mesajı sayılmaz. v1: bloklamaz (çıkış hep 0), fail-open; v2 (durdur) ayrı karar. ARC-43 (Recep'e giden beklenti) ile aynı aile, kapsamı ayrı | ARAÇ | `hook:PreToolUse SendMessage` (settings.json kaydı OPS'ta, PR'da yok) | sabotaj: 3 bozma yakalandı (ARC-79 PR'ı); gerçek süreç stdin→stdout testli | kanca-kartsiz-emir-uyarisi.test.ts (INV-KANCA-KARTSIZ-EMIR-1) | KAL |
 | `.claude/hooks/sql-etki.cjs` | hook-yardimci | SQL yazma onay sorusunda komut yerine ETKİ: tablo · işlem · satır sayısı (aynı WHERE ile read_only COUNT kuru koşumu, Management API); sayılamayan "ölçülemedi". Kendi başına kanca değil. | ARAC | `require()` ← sql-yazma-kapisi.cjs | canlı 09-28 claude -p: "products → GÜNCELLE · 184 satır" | sql-etki.test.ts | KAL |
 | `.claude/hooks/env-yazma-kapisi.cjs` | hook | PreToolUse Bash: `.env` ailesine yeni içerik yazma Recep'e sorulur; ana depo dışına aynı adla `cp` ve kopyayı `rm` geçer (REC-410 S3, sensitive-path-guard'ın Bash tarafı). 795 gerçek komutta 3 sorulur. | ARAC | `hook:PreToolUse Bash` | bağlı; canlı 09-28 claude -p: `echo … >> .env.local` durdu, dosya oluşmadı | env-yazma-kapisi.test.ts | KAL |
 | `.claude/hooks/son-konusma-dokumu.cjs` | hook | PreCompact + Stop: Recep'in son 30 mesajı + son 5 cevap ÖZETSİZ, modelsiz `memory/son-konusma-<sid>.md`'ye (sır süzgeçli); SessionStart(compact) en yeni ~12k karakteri enjekte eder. Stop her cevapta sessizce tazeler: 09-29'da JEV yolunda PreCompact komut kancası koşmadı, iki gerçek compact'te dosya yazılmadı; PreCompact yerleşik özet yolu için kalır. | ARAC | `hook:PreCompact *`, `hook:Stop *`; ayrıca `require()` ← session-board.cjs (compact kolu) | bağlı; canlı ölçüm: ilk gerçek compact'te `yazildi:` saati < compact sınırı | son-konusma-dokumu.test.ts | KAL |
@@ -816,16 +817,27 @@ hatasını tekrarlar.
 | `.claude/hooks/silme-baglanti-kapisi.cjs` | hook | silme-baglanti-kapisi — PreToolUse (Bash) bekçisi (karar 88, 2026-09-23). Özyinelemeli silme (`git worktree remove`, `rm -r`, `rmdir /s`, `Remove-Item -Recurse`) hedefinde klasörün DIŞINI gösteren junction/symlink varsa DENY + güvenli yol; iç bağlantılar (pnpm) serbest; 60 000 girdi tavanı aşılırsa DENY. 09-23 olayı: worktree junction'ından geçilip ana deponun node_modules'u silindi | ALTYAPI | .claude/settings.json PreToolUse Bash | 2026-09-23 gerçek ağaçta: ops-rec179 (→ ana depo node_modules) DENY, vh-a154 izin | INV-SILME-BAGLANTI-1 (`silme-baglanti-kapisi.test.ts`, gerçek junction'la 4 biçim + 3 izin kolu) | KAL |
 | `.claude/hooks/merge-sonrasi-ileri-sar.cjs` | hook | PostToolUse Bash: komut `gh pr merge` ise `git fetch` + `ana-agac-tazelik.cjs` `ileriSar` (yalnız ff-only; kirli ağaçta DURUR ve söyler). Merge ritüeli atlandığında ana ağacın geride kalmasını kapatır (karar 165 W4). | ARAC | `hook:PostToolUse Bash` (kayıt Recep onayı bekliyor) | fikstürle 2026-09-28: geride→ileri, kirli→DUR, merge değil→dokunmaz; sabotaj 2 kırmızı | `merge-sonrasi-ileri-sar` | KAL |
 | `.claude/hooks/modele-ilet.cjs` | hook-yardimci | Kancanın stderr uyarısını çıkış 0 da `additionalContext` olarak modele de iletir (Claude Code çıkış 0 stderr ini modele göstermez). Kendi başına kanca değil, `require` ile yüklenir. | ARAC | `.claude/hooks/bash-write-audit.cjs`, `.claude/hooks/hafiza-indeks-bekcisi.cjs` (require) | fikstürle 2026-09-25: iki kancada uyarı stdout JSON a düştü, sessiz durumda stdout boş | `hafiza-indeks-bekcisi-kilidi`, `bash-write-audit-tree` (stdout kolları) | KAL |
-| `.claude/hooks/baglam-doluluk.cjs` | hook-yardimci | Eşikli BAGLAM satırı (karar 148): konuşma kaydının son 512 KB'ından son ana konuşma cevabının bağlam token'ı (input + cache_creation + cache_read). 300k "doluyor", 500k "COMPACT YAKIN"; compact penceresi küçültülmüşse %60/%80. Recep durum çubuğunu VS Code'da görmediği için kanca satırına. Kendi başına kanca değil. | ARAC | `.claude/hooks/defter-tazelik-satiri.cjs` (require) | canlı 2026-09-27: 12,9 MB kayıtta okuma ~1 ms, satır "304k/1M — doluyor" | `hafiza-baglam-ve-belge-satiri` | KAL |
+| `.claude/hooks/baglam-doluluk.cjs` | hook-yardimci | Eşikli BAGLAM satırı (karar 148): konuşma kaydının son 512 KB'ından son ana konuşma cevabının bağlam token'ı (input + cache_creation + cache_read). 300k "doluyor", 500k "COMPACT YAKIN"; compact penceresi küçültülmüşse %60/%80. Recep durum çubuğunu VS Code'da görmediği için kanca satırına. Kendi başına kanca değil. KAYIT BOYUTU (ARC-82, 2026-10-11): pencerenin kendi konuşma dosyasının boyutu yalnız `statSync` ile (dosya AÇILMAZ) istem satırında "KAYIT: <MB>"; 1 GB ⚠, 1,5 GB ⛔ "yeni oturuma devret"; eşikler `VENTHUB_KAYIT_UYARI_MB` / `VENTHUB_KAYIT_DEVRET_MB`, bozuk ya da ters sıralı değer varsayılana döner. COMPACT HAZIRLIĞI (ARC-131, 2026-10-14): bağlam ≥%40 iken kanca durum dosyasının yaşını ve "Yarım iş" satırını okur, pencere dosyasına `hazir` (HAZIR/DEĞİL), `hazirNeden` ve kendi ürettiği `compactMetni`ni yazar; COMPACT YAKIN satırı hükmü ve hazır /compact metnini taşır (pencere yalnız DEĞİL ise durum dosyasını günceller). DÖNÜŞ KONTROLÜ: son `compact_boundary`tan sonraki ilk gerçek cevap "bana ulaşan son girdin" ile başlamıyorsa istemde bir kez "⚠DONUS" uyarısı. Cetvel: `docs/standards/agir-komut-kilidi-standard.md` §6; `.claude/rules/filo-ortak.md` Compact. | ARAC | `.claude/hooks/defter-tazelik-satiri.cjs` (require) | canlı 2026-09-27: 12,9 MB kayıtta okuma ~1 ms, satır "304k/1M — doluyor"; KAYIT: 10-10 en büyük kayıtlar 2129/2043/773 MB, bozma 17/17 yakalandı; COMPACT: 14 Ekim 18 test, 3 bozma kırmızı | `hafiza-baglam-ve-belge-satiri`; INV-KAYIT-BOYUTU-1..3 (`kanca-kayit-boyutu.test.ts`); INV-COMPACT-HAZIRLIK-1..3 (`compact-hazirlik-donus.test.ts`) | KAL |
 | `.claude/hooks/wrongstack-satiri.cjs` | hook-yardimci | WRONGSTACK sürüm satırı (ARC-24, karar 257): "bizde X, son Y" her mesajda. Bizde = `tools/wrongstack-mcp/package.json` dört paketin en düşük sabit sürümü (taze okunur); son = GitHub son sürüm etiketi, günde en çok bir ağ çağrısı, önbellek `.wrongstack-surum-onbellek.json`, arka planda `--yaz` (kopukBaslat). Ağ hatasında 2 saatte yeniden dener, satır "OLCULEMEDI (sebep)" der, eski değeri güncel göstermez. Kurulum/yükseltme yapmaz. Kendi başına kanca değil. | ARAC | `.claude/hooks/defter-tazelik-satiri.cjs` (require) | canlı 2026-10-04: GitHub'dan 1.0.31 okundu → "bizde 1.0.26, son 1.0.31 · 5 surum geride" | `wrongstack-surum-satiri` | KAL |
 | `.claude/hooks/belge-satiri.cjs` | hook-yardimci | Eşikli BELGE satırı (REC-400 D2, metin/eşik HARİTA): çekirdek belge ≥14 gün, yeni kırık yol, graphify ≥7 gün, önbellek ≥24 saat. Yalnız pano dizinindeki önbelleği okur; 6 saatte bir `scripts/belge/belge-tazelik.cjs --yaz` arka planda gizli pencerede (betik yoksa başlatmaz). Kendi başına kanca değil. | ARAC | `.claude/hooks/defter-tazelik-satiri.cjs` (require) | canlı 2026-09-27: betik henüz yok → "OLCULMEDI (onbellek yok)" | `hafiza-baglam-ve-belge-satiri` | KAL |
 | `.claude/hooks/hafiza-kuyrugu.cjs` | hook-yardimci | claude-mem kuyruk bekçisi (REC-487, 09-30): worker'ın `GET /api/processing-status` adresinden bekleyen olay sayısını okur. Eşik satırı: ≥ 300 olay ise ⚠HAFIZA KUYRUK (altında sessiz, worker kapalıyken sessiz); `--kapanis [--bekle SN]` kolu "makine kapanıyor" rutini içindir (çıkış 0 boş/kapalı, 2 dolu ve kaç olay kaybolacağı yazılı, 3 ölçülemedi). Ölçüm arka planda (kopuk-baslat, 30 sn önbellek), fail-open. Gerekçe: kuyruk yalnız bellektedir, 09-29'da 5.469 olay kayboldu. | ARAC | `.claude/hooks/defter-tazelik-satiri.cjs` (require) | 09-30 ölçüm: 08:50=0 → 09:30=585 → 09:56=741 (birikim), uç nokta yanıtı 713 | `hafiza-kuyrugu` | KAYIP (onceki: KAL) |
 | `.claude/hooks/bellek-yoklama.cjs` | hook-yardimci | Eşikli ⚠BELLEK satırı: 3 GB üstü tek süreç (ÖZEL bellek, working set değil — 09-27 #1436), 2 GB altı boş bellek ya da sanal bellek (commit) ≥ %85. Ölçüm arka planda gizli pencerede (PowerShell, 10 dk önbellek), yalnız gerçek oturum kimliğinde başlar. Kendi başına kanca değil. | ARAC | `.claude/hooks/defter-tazelik-satiri.cjs` (require) | canlı 2026-09-25: ölçüm 10 sn, blok 47 ms; boş 0,7 GB + 2,2 GB tsserver yakalandı | `bellek-yoklama` | KAL |
+| `.claude/hooks/agir-komut-kilidi.cjs` | hook | AĞIR KOMUT KİLİDİ (ARC-81, Ops emri 10-09 madde 3b): PreToolUse(Bash) komutu zincir parçalarına böler; type-check/tsc, build, tam test, tam lint, knip, install/add/ci, docker AĞIR sayılır, `test:ilgili` ve dosya argümanlı vitest/eslint hafiftir. Ağır komut için `<pano>/agir-kilit/yuva-<i>` dizini atomik `mkdir` ile alınır (N=1 varsayılan); yuva doluysa komut REDDEDİLİR ve sahibi (pencere, komut, kaç dk) yazılır. PostToolUse(Bash) `--birak` yuvayı verir; arka plan komutu bırakmaz; 20 dk TTL bayatı temizler; hata hâlinde AÇIK KALIR. İstem satırında `⚠KILIT:` (yuva doluyken, boşken susar). Neden: 10-09 19:57 uygulama bellek bitip kapandı, dokuz pencere aynı anda ağır komut koşuyordu | ARAC | `.claude/settings.json` PreToolUse + PostToolUse Bash (OPS kapısı, PR gövdesinde metin), `.claude/hooks/defter-tazelik-satiri.cjs` (require, ⚠KILIT satırı) | ölçüldü 10-10: 640 süreç, pencere başı 32-56 alt süreç; bozma 18/18 yakalandı | INV-AGIR-KILIT-1..3 (`kanca-agir-komut-kilidi.test.ts`) | YENI |
 | `.claude/hooks/hafiza-enjeksiyonu.cjs` | hook | KANCA — konu farkında sage hafızası: istemin konusuna çapalı/ilgili dersleri bağlama koyar. | ARAÇ | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `.claude/hooks/hafiza-kullanim-sayaci.cjs` | hook | KANCA — sage kullanım sayacı: basılan derslerin enjeksiyonunu ve (transcript'te atıf | ARAÇ | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `.claude/hooks/sage-hijyen-oturum-sonu.cjs` | hook | KANCA — oturum kapanırken sage hijyenini (`port.hygiene`) koşar — ama YALNIZ taze | ARAÇ | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
-| `.claude/hooks/kartsiz-beklenti-kapisi.cjs` | hook | Stop kapısı: Recep'ten istenen şeyin Kanban kartı yoksa turu bloklar, pencere kartı açıp yeniden yazar (atlatma "Kartsız: sebep") | ARAÇ | `hook:Stop *` (settings'e ekleme Recep sözüyle OPS'ta bekliyor) | henüz bağlı değil | kanca-kartsiz-beklenti-kapisi.test.ts | KAL |
+| `.claude/hooks/kanban-kanit-yolu-kapisi.cjs` | hook | PreToolUse mcp__wrongstack-kanban__kanban_manage: add_check/update_check'te file_exists/file_matches kanıtı mutlak, `~` ya da kök dışı (`..`) yolsa reddeder ve çalışan üç yolu söyler (ARC-93; kök sebep: @wrongstack/kanban resolveProjectPath mutlak yolu kök kontrolünden önce reddeder, 1.0.26/1.0.36/1.0.37). Kural: .claude/hooks/kanban-kanit-yolu-kapisi.md | ARAÇ | `cagiran-yok` (ayar kaydı bekliyor: .claude/settings.json PreToolUse, matcher mcp__wrongstack-kanban__kanban_manage; settings OPS kapısı) | bağlı değil; test 7/7, bozma 8/8 (2026-10-11) | kanban-kanit-yolu-kapisi.test.ts | KAL |
+| `.claude/hooks/kartsiz-beklenti-kapisi.cjs` | hook | Stop kapısı: Recep'ten istenen şeyin Kanban kartı yoksa turu bloklar, pencere kartı açıp yeniden yazar (atlatma "Kartsız: sebep"); ARC-95 ikinci denetim: Recep'e bağlı kartın açıklamasında `RECEP YETKİSİ: <gerekçe>` satırı (altı izinli sınıf) yoksa ya da liste dışıysa KIRMIZI, cetvel `is-kayit-duzeni-standard.md` §6.2 | ARAÇ | `hook:Stop *` (settings.json'da bağlı) | 2026-10-12 (63/63; ARC-95 bozma yakalandı: liste dışı geçer, satırsız geçer, Recep atananı, sessiz atlama, kalıp çapası, satır başı çapası, biçim işareti, eşanlamlılar) | kanca-kartsiz-beklenti-kapisi.test.ts | KAL |
 | `.claude/hooks/dunya-durumu-satiri.cjs` | hook | KANCA — zamanlı dünya durumu koşusu (`dunya-durumu.yml`) kırmızı, iptal ya da sessizce ölmüşse OPS'un her mesajında `DUNYA:` satırı; eşikli, PR'ı bloklamaz (ALT-38) | ALTYAPI | `.claude/hooks/defter-tazelik-satiri.cjs` (UserPromptSubmit içinde `require`) | 2026-10-06 yazıldı; ilk ölçüm iş akışı birleşip koşunca | `dunya-durumu-satiri.test.ts` (INV-DUNYA-SATIRI-1) | KAL |
+| `.claude/hooks/patinaj-bekcisi.cjs` | hook | PostToolUse patinaj bekçisi (REC-467, ARC-109): aynı araç + aynı normalize girdi + AYNI sonuç son 12 çağrıda 4 kez (ve katlarında) tekrarlanınca modele tek satır uyarı; bloklamaz (çıkış hep 0), fail-open, oturum başına küçük halka kütük. Fikir kaynağı WrongStack `agent-loop-detector` (yalnız fikir) | ARAÇ | `hook:PostToolUse` (settings.json kaydı OPS'ta, PR'da yok) | sabotaj: 4 bozma yakalandı (REC-467 PR'ı); gerçek süreç stdin→stdout testli | kanca-patinaj-bekcisi.test.ts (INV-KANCA-PATINAJ-1) | KAL |
+| `.claude/hooks/transkript-kuyrugu.cjs` | hook (kütüphane) | Stop kancalarının ortak "konuşma kaydının kuyruğunu oku" yardımcısı: kaydı bütün okumaz, son 16 MB penceresinden son 400 tam satırı döndürür (yarım ilk satırı atar, tek satır pencereyi aşarsa pencereyi 256 MB'a kadar büyütür). 1,78 GB kayıtta `readFileSync` dizge sınırını aşıp iki tur sonu kancasını çökertmişti (ARC-83, 2026-10-10) | ARAÇ | `require()` ← son-soz-gate.cjs, kartsiz-beklenti-kapisi.cjs | dolaylı; sabotaj: 12 bozma yakalandı (ARC-83 PR'ı) | kanca-transkript-kuyrugu.test.ts (INV-KANCA-KUYRUK-1..3) | KAL |
+| `.claude/hooks/kart-alani-kapisi.cjs` | hook | PreToolUse kanban_manage add_task kart alanı kapısı (ARC-32, ARC-109): atanan departmanın Görev + Dosya alanı satırını (docs/roller/DEPARTMAN-HARITASI.md) kart açılırken gösterir; kart metnindeki dosya yolu başka departmanın alanına düşüyorsa ve metin kanca/hook/eklenti/mod/WrongStack/claude-mem geçiriyorsa "bu iş X'in alanına benziyor" uyarısı. Bloklamaz (çıkış hep 0), fail-open, ağ/DB yok. 4 Ekim olayı regresyonu testli | ARAÇ | `hook:PreToolUse mcp__wrongstack-kanban__kanban_manage` (settings.json kaydı OPS'ta, PR'da yok) | sabotaj: 3 bozma yakalandı (ARC-32 PR'ı); gerçek süreç stdin→stdout testli | kanca-kart-alani-kapisi.test.ts (INV-KANCA-KART-ALANI-1) | KAL |
+| `.claude/hooks/hafiza-yedek.cjs` | hook | PreCompact'ta hafıza deposunu ELDE yedekler; SessionStart/UserPromptSubmit'ta son commit > 3600 sn ve bekleyen md varsa arka planda yedekler, yaş satırı basar (ARC-92; ince giriş, mantık scripts/hijyen/hafiza-yedek.cjs) | ARAÇ | `cagiran-yok` (ayar kaydı bekliyor: PreCompact + SessionStart + UserPromptSubmit; settings OPS kapısı, PreCompact timeout 45) | bağlı değil; test 9/9, bozma 8/8 (2026-10-11) | hafiza-yedek.test.ts | KAL |
+| `.claude/hooks/sahipsiz-pr-satiri.cjs` | hook | SAHİPSİZ PR durum satırı (ARC-111, OPS-120 madde 3) — EŞİKLİ, bloklamaz, fail-open. | ARAÇ | .claude/hooks/defter-tazelik-satiri.cjs (UserPromptSubmit durum satırı) | 2026-10-12 canlı: 16 açık PR, #1446 sahipsiz | src/__tests__/conformance/sahipsiz-pr.test.ts | KAL |
+| `.claude/hooks/kanban-tutarlilik-onarimi.cjs` | hook | KANBAN TUTARSIZLIK ONARIMI KANCASI — ARC-125 (PostToolUse, matcher `mcp__wrongstack-kanban__kanban_manage`). | ARAÇ | src/__tests__/conformance/kanban-tutarlilik.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/kanban-tutarlilik.test.ts | YENI |
+| `.claude/hooks/ayar-degisti-bekci.cjs` | hook | AYAR DEĞİŞTİ BEKÇİSİ — ARC-118 (REC-529 madde 1; ConfigChange olayı). | ARAÇ | `hook:ConfigChange *` (kayıt OPS'ta, birleşince) + `.claude/hooks/defter-tazelik-satiri.cjs` satır bloğu | `~/.claude/mod-durum/ayar-degisti.jsonl`, `ayar-degisti-okundu.json` | ayar-degisti-bekci | YENI |
+| `.claude/hooks/done-kanit-kapisi.cjs` | hook | DONE KANIT KAPISI — ARC-150 (OPS 16 Ekim "B: önleme"). PreToolUse, matcher `mcp__wrongstack-kanban__kanban_manage`. | ARAÇ | `hook:PreToolUse mcp__wrongstack-kanban__kanban_manage` (settings.json kaydını OPS yapar; kayıt gelene kadar etkisiz) | 2026-10-16: 12/12 test, 4 sabotaj kırmızı; ölçüm: araç Done kapısını yalnız yönetilen panoda zorlar (YETENEK), OPS 10/68, HARİTA 11/41 Done kartında verify passed var | src/__tests__/conformance/kanca-done-kanit-kapisi.test.ts | AKTIF |
+| `.claude/hooks/talimat-yuklendi-gunlugu.cjs` | hook | TALİMAT YÜKLENDİ GÜNLÜĞÜ — ARC-155 (ARC-147 AL6, OPS 16 Ekim). Kanca olayı: InstructionsLoaded. | ARAÇ | `hook:InstructionsLoaded` (settings.json kaydını OPS yapar; kayıt gelene kadar etkisiz) | 2026-10-16: 8/8 test, 2 sabotaj kırmızı; ARC-147 headless ölçümü: olay 3 kayıt verdi (file_path, memory_type, load_reason) | src/__tests__/conformance/kanca-talimat-yuklendi-gunlugu.test.ts | AKTIF |
 
 **Not (kaldırıldı 2026-09-30 — `hafiza-kuyrugu.cjs`):** claude-mem bekçisi silindi (Recep: "kullanmayacağız",
 Ops onayladı). Dosya, konformans testi (`INV-HAFIZA-KUYRUGU-1`) ve `defter-tazelik-satiri.cjs` içindeki çağrı bloğu
@@ -900,6 +912,12 @@ madde 1 gereği araç sayılmaz.
 | `scripts/db/product-data/identity-fix.mjs` | T148-VH kimlik düzeltmesi (sku/model_code/name/slug) | URUN-KATALOG | `elle` | `docs/plans/urun-kimlik-duzeltme-2026-08-22.md:96`; 2026-09-22 NIC-11921 (DD) canlı yazım + VRT-253490106XN (karar 75) kuru koşum | `__tests__/identity-fix-kurallar.test.ts` (Ö4) | KAL |
 | `scripts/db/product-data/identity-fix-kurallar.mjs` | identity-fix Ö4 manifest kuralları (ağsız, testli modül) | URUN-KATALOG | `identity-fix.mjs` | 2026-09-22 | `__tests__/identity-fix-kurallar.test.ts` | AKTIF |
 | `scripts/db/product-data/__tests__/identity-fix-kurallar.test.ts` | identity-fix Ö4: harfli model_code + küçük harf slug, önek, katalog kodu, depodaki manifestler | URUN-KATALOG | vitest (her PR) | 2026-09-22 (4/4) | kendisi | AKTIF |
+| `scripts/db/product-data/radon-ca-rm-fix.mjs` | KTL-48 Radon CA-RM canlı değer düzeltmesi (ağırlık, devir, ses, akım, ölçü C, 150 RF ES basınç); varsayılan KURU KOŞUM, yazım yalnız `--apply` (OPS koşar), `--rollback` ile geri alma | URUN-KATALOG | `elle` (OPS, Recep "yaz" derse) | 2026-10-16 canlı kuru koşum: 8 ürün / 48 alan, ön koşullar temiz (yazım yok); ölçüm `foyler/KTL48-radon-ca-rm-olcum-2026-10-16.md` | `__tests__/radon-ca-rm-fix-kurallar.test.ts` | AKTIF |
+| `scripts/db/product-data/radon-ca-rm-fix-kurallar.mjs` | radon-ca-rm-fix manifest kuralları (ağsız, testli modül; bayat-değer ve alan beyaz listesi) | URUN-KATALOG | `radon-ca-rm-fix.mjs` | 2026-10-16 (14/14) | `__tests__/radon-ca-rm-fix-kurallar.test.ts` | AKTIF |
+| `scripts/db/product-data/__tests__/radon-ca-rm-fix-kurallar.test.ts` | radon-ca-rm-fix: 8 model manifesti, katalog değerleri, yasak alanlar (160 ES sesi yazılmaz) | URUN-KATALOG | vitest (her PR) | 2026-10-16 (14/14) | kendisi | AKTIF |
+| `scripts/db/product-data/lineo-quiet-ses-fix.mjs` | KTL-50 Lineo Quiet (12 model) canlı ses değeri düzeltmesi: `technical_specs.noise_level_db_a` + `description_i18n` TR/EN ses cümlesi, katalog gövde (yayılan) Lp; varsayılan KURU KOŞUM, yazım yalnız `--apply` (OPS koşar), `--rollback` ile geri alma | URUN-KATALOG | `elle` (OPS, Recep "yaz" derse) | 2026-10-16 canlı kuru koşum: 12 ürün / 36 alan, ön koşullar temiz (yazım yok) | `__tests__/lineo-quiet-ses-fix-kurallar.test.ts` | AKTIF |
+| `scripts/db/product-data/lineo-quiet-ses-fix-kurallar.mjs` | lineo-quiet-ses-fix manifest kuralları (ağsız, testli modül; bayat-değer, cümle kalıbı, kök kanıtı) | URUN-KATALOG | `lineo-quiet-ses-fix.mjs` | 2026-10-16 (22/22) | `__tests__/lineo-quiet-ses-fix-kurallar.test.ts` | AKTIF |
+| `scripts/db/product-data/__tests__/lineo-quiet-ses-fix-kurallar.test.ts` | lineo-quiet-ses-fix: 12 model manifesti (6 AC + 6 ES), yazılan = katalog gövde sütunu, canlı = eski baskı, cümle değişimi, bayatlık, tekrar koşum | URUN-KATALOG | vitest (her PR) | 2026-10-16 (22/22) | kendisi | AKTIF |
 | `scripts/db/product-data/seat-content-write.mjs` | T140-VH SEAT içerik yazımı, varsayılan DRY-RUN | URUN-KATALOG | `scripts/db/product-data/content-write.mjs` | 2026-08-22 | yok | KAL |
 | `scripts/db/product-data/t138-model-split.mjs` | T138-VH model katmanı ayrıştırma, varsayılan DRY-RUN | URUN-KATALOG | `docs/standards/product-schema-standard.md` | 2026-08-23 | yok | KAL |
 | `scripts/db/verify_security_hardening.js` | Güvenlik sertleştirme doğrulaması | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
@@ -916,6 +934,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/hijyen/artefakt-bayatlik-sayim.cjs` | Artefakt bayatlık sayımı (donmuş mod tek kaynağı, REC-132 D1) | ALTYAPI | `docs/standards/uretilmis-artefakt-standard.md`, `scripts/board/board.cjs` | 2026-09-05 | uretilmis-artefakt-tazeligi.test.ts | KAL |
 | `scripts/hijyen/companion-borc.cjs` | Companion borç listesi (uyku kipi defterdarı, REC-142) | ALTYAPI | `elle` | `docs/standards/companion-doc-standard.md:511` iş-emri kaynağı; çıktı bilerek commit edilmiyor | yok | KAL |
 | `scripts/hijyen/companion-sayim.cjs` | Companion sayımı — tek kaynak (§26) | ALTYAPI | `scripts/board/board.cjs`, `scripts/hijyen/companion-borc.cjs` | 2026-09-05 | yok | KAL |
+| `scripts/hijyen/dal-envanteri.cjs` | Uzak dal envanteri: canlı dal başlarını PR kayıtlarıyla tek sınıfa koyar, salt okuma, silmez (ALT-62, OPS-104 K-488) | ALTYAPI | `elle` | kart ALT-62; ilk koşu 2026-10-11: 560 dal = 21 açık PR + 398 uç eşleşen birleşmiş + 9 uç farklı birleşmiş + 132 PR'sız | dal-envanteri.test.ts | KAL |
 | `scripts/hijyen/kirli-sayac.cjs` | VS Code kaynak-denetimi rozetinin CLI karşılığı (REC-84 Kol-4) | ALTYAPI | `elle --taban-yaz` | `kirli-sayac-taban.json:5`, `vercel-ignore-build.sh:257`, `deploy-build-skip-standard.md:45` | yok | KAL |
 | `scripts/hijyen/kume-master-tazeligi.cjs` | Küme master tazelik paritesi — INV-DOC-3 v2 (REC-144) | ALTYAPI | `docs/standards/companion-doc-standard.md` | 2026-09-05 | INV-DOC-3 | KAL |
 | `scripts/hijyen/merge-ritueli.cjs` | Merge ritüeli — beş maddelik self-merge ölçümü (REC-131) | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` | 2026-09-06 | yok | KAL |
@@ -1032,13 +1051,13 @@ madde 1 gereği araç sayılmaz.
 | `scripts/hijyen/skill-bitis-blogu.mjs` | ORTAK BİTİŞ BLOĞUNU 71 SKILL.md'ye GEÇİRİR (REC-305). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skill-bitis-blogu.test.ts | KAL |
 | `scripts/skills-eval-convert.mjs` | evals.json → YERLEŞİK eval vaka ağacı dönüştürücüsü (REC-319 adım 2b). | ALTYAPI | .gitignore (betik taramasi) | 2026-09-13 (pilot: 18 vaka uretildi, 36 kosum kosuldu) | testi YOK — cikti .gitignore da, kapi kosamaz; KANIT pilot kosumu (docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md bolum 7-8) | KAL |
 | `scripts/board/linear-okundu.cjs` | Linear yorum sayacinin esik damgasini "simdi"ye ceker (`--goster`, `--geri`) | OPS *(yazan: ALTYAPI)* | ELLE kosulur, yorumlari okuyan kisi tarafindan; sayac satiri komutu kendi ciktisinda gosterir | 2026-09-14 yazildi ve kosuldu (kabul sinavi: okundu+geri gidis-donus) | INV-MECH-1 (sira ve sessizlik kolu) | KAL |
-| `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
+| `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca. "OPS N yorum yanitsiz" sayaci OPS'un Design'in hemen ardindan verdigi yaniti kapanis sayar; is veren OPS yanitinin govdesine "CEVAP BEKLIYOR" yazilir (ARC-51, OPS karari 2026-10-11; kural docs/roller/OPS-kurallar.md) | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
 | `scripts/db/checks/arama-davranisi.mjs` | INV-SEARCH-BEHAVIOR-1 — arama DAVRANIŞI kapısı (Katman B, canlı): on vakayı gerçek RPC üzerinden ölçer, ölçüt biçimleri oran/sıfır-değil/aynı-küme/marka-var/tam-SKU (sabit sayı YOK), hassasiyet tavanı %40, bilinen kırmızılar adıyla ilan edilir ve mandal İKİ YÖNLÜ (ilanlı vaka geçmeye başlarsa KIRMIZI) | ALTYAPI | `.github/workflows/db-advisor.yml` → `catalog-integrity` işine ADIM olarak bağlı, `db-gate-precheck.outputs.ready == 'true'` koşuluyla (yeni iş adı AÇILMADI: açık PR'ları "beklenen kontrol gelmedi"de kilitler) | 2026-09-15, REC-340 Faz 1 Adım 1. Prod'da salt-okuma ölçüldü (Supabase MCP): on vakanın **altısı** kırmızı (2,3,4,5,9,10), dördü geçiyor (1→47, 6→9, 7→1 doğru SKU, 8→52); aktif ürün 441, hiçbir vaka %40 tavanını aşmıyor. Betik sırsız koşturuldu → çıkış 0 + "OLCULEMEDI" + "ATLANMIS IS YESIL DEGILDIR" (konformans kolu bunu DAVRANIŞLA ölçüyor) | `src/__tests__/conformance/arama-davranisi.test.ts` (INV-SEARCH-BEHAVIOR-1 Katman A, 15 kol) | KAL |
 | `scripts/db/golge-kur.mjs` | GÖLGE VERİTABANI KURUCUSU — tek komutla geçerli test ortamı: mevcut Docker konteynerinin İÇİNDE ayrı bir DB açar, önsöz → en yeni TAM taban → tabandan sonraki migration'lar → (`--migration`) uygular ve **sadakati SAYARAK** doğrular. `postgres` DB'sine dokunmaz, `initdb`/port GEREKMEZ. ⛔`supabase db reset` İÇERMEZ (o komut aynı kümedeki AKRANIN gölgesini siliyor — 2026-09-16'da yaşandı). ⛔VAR OLAN DB EZİLMEZ: ad çakışırsa çıkış 3 ile DURUR. ⭐`--dusur` = YALNIZ kendi DB sini düşürür (küme sıfırlayan komutun YERİNE; küme altyapısı adlarını reddeder, çıkış 2). Çıkış 0=hazır · 1=sadakat TUTMADI · 2=ÖLÇEMEDİ · 3=ad çakıştı | ALTYAPI (Recep 2026-09-16: "geçerli test ortamı için her türlü izni veririm") | `docs/audits/sema-graf-uretici-2026-09-16.md` yanı sıra kendi başlığı; çağıran yok (elle koşulur) | 2026-09-16 yazıldı ve KOŞULDU: tablo 55 · **politika 163** · fonksiyon 67 · tetik 48 · indeks 199 — politika/fonksiyon/tetik/indeks CANLIYLA BİREBİR. Ad çakışma kolu AKRANIN DB'sini korudu (çıkış 3, dokunulmadı) | **INV-GOLGE-1** `src/__tests__/conformance/golge-kurucu.test.ts` 13 kol — SÖZLEŞME ölçer (yıkıcı komutun yokluğu İKİ biçimde, akran koruması, ad allowlist, çıkış kodları, eşikler, taşınabilirlik). ⚠İlk hâli KÖRDÜ: yalnız kabuk dizgesini arıyordu, argv dizisi biçimini görmüyordu; negatif sınamada yakalandı ve iki biçim de ölçülür oldu (ikisi de KIRMIZI verdirildi); sadakat eşikleri betiğin İÇİNDE (boş gölgeyi reddeder: tablo≥50, politika≥100, fonksiyon≥40, tetik≥20, indeks≥100) | KAL |
 | `scripts/db/sema-graf-uret.mjs` | ŞEMA GRAF ÜRETİCİSİ (aşama 1: tablolar + yabancı anahtarlar) — veritabanının KENDİ KATALOĞUNDAN graphify node-link biçiminde graf üretir. Metin taraması YOK, `pg_class`/`pg_constraint` okunur. Çıktı `graphify-out/db-graph.json` (üretilmiş, gitignore), `graphify merge-graphs` ile kod grafiğine eklenir. Düğümler `db_` ad alanında (ghost-duplicate riski). Çıkış 0=üretildi/atlandı · 1=parite TUTMADI · 2=ÖLÇEMEDİ | ALTYAPI (Recep istedi 2026-09-16: "supabase tarafının bir haritası lazım, codegraph gibi bir şey") | `src/__tests__/conformance/sema-graf-uretici.test.ts` (INV-SEMA-GRAF-1, 12 kol) + `docs/audits/sema-graf-uretici-2026-09-16.md` | 2026-09-16 yazıldı ve KOŞULDU: yerel yığında tablo 18=18 · fk 13=13 parite TUTTU, kapsam dışı 6 fk ADIYLA raporlandı; `merge-graphs` ile birleşti (+18 düğüm/+13 kenar) ve `explain` veritabanı sorusuna cevap verdi (8 ilişki, yönlü) | INV-SEMA-GRAF-1 — sır/TLS/taşınabilirlik/çıkış kodu/çıktı biçimi ölçülür; **graf DOĞRULUĞU ölçülmez** (o canlı koşum ister, sınır kapının başlığında yazılı) | KAL |
 | `scripts/hijyen/ana-agac-tazelik.cjs` | ANA AĞAÇ TAZELİĞİ — pencerelerin yüklediği ayarların DEPODAKİ hâlle aynı olup olmadığını ölçer; güvenliyse (master · izlenen dosya temiz · fazladan commit yok) yalnız ff-only ileri sarar (REC-345, karar 44) | ALTYAPI | `.claude/hooks/session-board.cjs` (açılış satırı) + `scripts/hijyen/merge-ritueli.cjs` (ayar yoluna değen merge sonrası) · cetvel `docs/standards/fleet-mechanism-standard.md` §20.2 | 2026-09-17 yazıldı; aynı gün ana ağaç 50 → 0 geride elle eşitlendi (ölçüm kaynağı) | `src/__tests__/conformance/ana-agac-tazelik.test.ts` (INV-ANA-AGAC-TAZE-1, 9 kol, geçici gerçek git depoları) | KAL |
 | `scripts/hijyen/sage-dosya-dersi.cjs` | SAGE DOSYA DERSİ modülü — çapa puanlaması (dosya 0.9 / dizin 0.5, ölçüldü), bütçe (8 ders · 2800 karakter · 800 ms — yukarı akım varsayılanı, ders KIRPILMAZ), "dosya başına bir kez" işaretleri ve compact nesli. | ALTYAPI | .claude/hooks/sage-dosya-dersi.cjs, .claude/hooks/session-board.cjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/sage-dosya-dersi.test.ts (6 kol) | KULLANIMDA |
-| `scripts/hijyen/sage-yedek.cjs` | WRONGSTACK YEDEĞİ — `.wrongstack/` altındaki HER depo (sage hafızası + iş kartı panosu) `VACUUM INTO` ile, WAL dahil tutarlı; her koşumda TÜM tabloların satır sayıları kaynakla karşılaştırılır, uyuşmazsa `.DOGRULANMADI`. Sanal (FTS5) tablo sayılmaz ama listede kalır. Budama önek başına, en yeni 14. Kaynak bulunamazsa çıkış 0 DEĞİL. | ALTYAPI | elle + `.claude/hooks/sage-yedek-oturum-sonu.cjs`, cron/gözcü YOK — REC-328 | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/sage-yedek.test.ts (8 kol; asıl kol WAL tuzağını her koşumda üretir) | KULLANIMDA |
+| `scripts/hijyen/sage-yedek.cjs` | WRONGSTACK YEDEĞİ — `.wrongstack/` altındaki HER depo (sage hafızası + iş kartı panosu) `VACUUM INTO` ile, WAL dahil tutarlı; her koşumda TÜM tabloların satır sayıları kaynakla karşılaştırılır, uyuşmazsa `.DOGRULANMADI`. Sanal (FTS5) tablo sayılmaz ama listede kalır. Budama önek başına, en yeni 14. Kaynak bulunamazsa çıkış 0 DEĞİL. **ARC-71 (2026-10-12):** posta kutuları (`~/.wrongstack/projects/*/_mailbox.sqlite`, her biri ayrı depo `posta-<proje>`) dahil; `--geri sage` ve `--geri posta-<proje>` süreç denetimli (MCP süreci açıkken RET, liste alınamazsa RET); aynı dakikada ikinci koşum geçici dosyayla düşmez. | ALTYAPI | elle + `.claude/hooks/sage-yedek-oturum-sonu.cjs`, cron/gözcü YOK — REC-328 | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/sage-yedek.test.ts (8 kol; asıl kol WAL tuzağını her koşumda üretir) | KULLANIMDA |
 | `scripts/hijyen/ana-kok.cjs` | ANA AĞAÇ KÖKÜ — `anaKok()` verinin kökünü (ana ağaç, `git --git-common-dir`), `agacKoku()` dosyanın kendi ağacının kökünü verir. Sage verisi yalnız ana ağaçta yaşar; worktree'de eski kök çözümü yedeği sessizce atlıyor ve dersi boş döndürüyordu (2026-09-18 ölçüldü). | ALTYAPI | scripts/hijyen/sage-yedek.cjs, .claude/hooks/sage-dosya-dersi.cjs | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/sage-ana-kok.test.ts (4 kol; GERÇEK git worktree kurar) | KULLANIMDA |
 | `scripts/hijyen/bagimlilik-denetimi.cjs` | BAĞIMLILIK DENETİMİ — karar 52. Üretim ağacındaki her yüksek/kritik kayıt `bagimlilik-kararlari.md` §7'de kabul edilmiş mi, her kabul gerçek bir kayda karşılık geliyor mu (iki yönlü). Çıkış 0 temiz · 1 yeni/bayat · 2 ÖLÇÜLEMEDİ (fail-closed) | ALTYAPI | `.github/workflows/bagimlilik-denetimi.yml` (CI: kilit dosyası değişince + haftalık) · cetvel §11 | 2026-09-21 yazıldı; gerçek audit çıktısında 11/11 kabul, çıkış 0 | `bagimlilik-denetimi.test.ts` (INV-DEP-DENETIM-1) — dört durum gerçek alt süreçle koşulur ve çıkış kodu ölçülür | KAL |
 | `scripts/hijyen/kanban-toplu.cjs` | KANBAN TOPLU GİRİŞ — iş kartı panosuna bir sırayı TEK KOŞUMDA yazar; kanban sunucusunu stdio ile sürer, bağlama yalnız özet düşer. Kipler: `<sira.json>` yaz · `--kuru` doğrula · `--pano <id>` kart başına tek satır · `--degerlendir <id>` bölünebilirlik hükmünü yeniden hesapla. Borulu komutu ve ölçütsüz kartı YAZMAZ | ALTYAPI | elle (şerit sırasını panoya girerken) · is-kayit-duzeni pilot bölümü | 2026-09-21: 11 kart / 38 çağrı — sunucu 983.776 bayt döndürdü, bağlama ~150 bayt girdi. Yeniden değerlendirme 13 kart / 514.614 bayt | `kanban-toplu.test.ts` (INV-KANBAN-TOPLU-1) — kabuk işleci ve ölçütsüz kart reddi | KAL |
@@ -1071,6 +1090,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/rec172-cikarim.py` | REC-172 karar 76: NIMUS/NIMAX/Enkelfan/CMS ATEX teknik verisini kaynak dizininden deterministik okur; tablolu kaynakta kol 2 (düz metin ↔ tablo), alıntı yeniden arama | URUN-KATALOG | `elle` → çıktısı `faz4-teknik-yukle.py --girdi` | 2026-09-23 ilk koşum: 49 ürün · 490 satır (alıntı 430 · koşullu 50 · türetildi 10), iki koşum bayt-eşit | yok (salt okuma) | AKTIF |
 | `scripts/icerik-hatti/karar70-hazirla.mjs` | Karar 70 hazırlık: canlıdan (salt okuma) kip ayrımı, onaylı↔canlı TR md5, plan.json + onaylı TR taslakları | URUN-KATALOG | `elle` | 2026-09-23 ilk koşum: en 17 · b 8 (jet değişti) · 2 K7.10 dışarıda | yok (salt okuma; çıktısı ingestor 2d06af1) | AKTIF |
 | `scripts/gsc/gsc-token.cjs` | Google Search Console erişim jetonu — HİZMET HESABI ile (süresi dolmayan kalıcı yol). Anahtar `GSC_SA_ANAHTAR` (depo dışı; depo içindeyse reddeder), stdout'a yalnız 1 saatlik jeton; `--dene <site>` erişimi ölçer. OAuth "Testing" kipinin 7 günlük yenileme jetonunun yerine | ALTYAPI | elle — OPS REC-369 taban ölçümü + search-console skill'i (`Authorization: Bearer $(node scripts/gsc/gsc-token.cjs)`) | 2026-09-23 koşuldu: venthub-gsc@venthub-507309 → sc-domain:venthub.com.tr siteRestrictedUser | INV-GSC-TOKEN-1 (`gsc-token.test.ts`) | KAL |
+| `scripts/pim/unopim-tam.cjs` | REC-357 §1 — TAM YÜKLEME (GÖLGE): canlının anlık kopyası (442 ürün / 47 aile) → yerel UnoPim. Canlıya YAZMAZ. `sema` (öznitelik/aile türetme, karışık tip → hata), `csv`, `ice-al` (docker cp + tinker, job_track bekler), `dogrula` (API ile hücre hücre kıyas; türetilen alan KAYNAK hassasiyetinde) | ALTYAPI | elle — REC-357 §1/§2 gölge yüklemesi; faz 2 kalıcı hat planı `docs/plans/rec357-faz2-pim-kalici-hat.md` | 2026-09-23 koşuldu: 442 ürün / 6542 hücre / 76 öznitelik / fark 0 (golge2, karar 76'nın 4 ailesi dahil) | INV-PIM-TAM-1 (`pim-unopim-tam.test.ts`) + INV-PIM-UNOPIM-1 (`pim-unopim-csv.test.ts`) | KAL |
 | `scripts/icerik-hatti/__tests__/fiyat-kaynak-esle.test.ts` | REC-212 · paket `fiyatlar.csv` kaynak kolonları (kdv · kaynak_fiyat_eur · fiyat_kaynak_sayfa). | URUN-KATALOG | vitest (`pnpm test`) | 2026-09-23 (13/13) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/__tests__/fiyat-bosluk.test.ts` | REC-209 C · fiyat boşluk raporu. Ağa, DB'ye, diske çıkmaz. ⛔ Fiyatlar UYDURMA. | URUN-KATALOG | vitest (`pnpm test`) | 2026-09-23 (4/4, sabotaj yönü dahil) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/fiyat-bosluk.mjs` | FİYAT BOŞLUK RAPORU — saf çekirdek (REC-209 C). Katalog hattı fiyat YAZMAZ (Recep kararı | URUN-KATALOG | `katalog-karnesi.mjs` | 2026-09-23 | `__tests__/fiyat-bosluk.test.ts` | AKTIF |
@@ -1099,7 +1119,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/urun-ad-en.test.ts` | Karar 116 · ürün EN adı kural dönüşümü (REC-146). Ağa, DB'ye çıkmaz; adlar canlıdaki gerçek örneklerdir. | URUN-KATALOG | vitest (`scripts/icerik-hatti/__tests__`) | 2026-09-25 (3/3) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/urun-ad-en-yaz.mjs` | ÜRÜN EN ADINI CANLIYA YAZAR — karar 116, REC-146 (plan docs/audits/icerik-hatti-metin-boslugu-2026-09-25.md §3.2) | URUN-KATALOG | elle: `[--liste <csv>] [--yaz --yedek <json>]` + CANLI_YAZIM_ONAYI (karar 116) | 2026-09-25 kuru koşum: yazılacak 166 · gerekmez 251 · elle EN 24 · RED 0 | scripts/icerik-hatti/__tests__/urun-ad-en.test.ts (saf çekirdek) | AKTIF |
 | `scripts/icerik-hatti/urun-ad-en.mjs` | ÜRÜN EN ADI — kural tabanlı dönüşüm (saf çekirdek; ağa, diske, DB'ye çıkmaz). Karar 116, REC-146. | URUN-KATALOG | modul: urun-ad-en-yaz.mjs | 2026-09-25 | scripts/icerik-hatti/__tests__/urun-ad-en.test.ts | AKTIF |
-| `scripts/onizleme.mjs` | YEREL ÖN İZLEME — bir dalı ya da PR'ı bu makinede üretim derlemesiyle ayağa kaldırır (OPS 2026-09-25, REC-300 1a). Canlı DB yalnız anon anahtarla, ayrı ağaç (C:/tmp/vh-onizleme), .env* kopyalanmaz | ALTYAPI | elle (`node scripts/onizleme.mjs <dal|PR> [--port 3100]`) | 2026-09-25 kuruldu | `src/__tests__/conformance/onizleme-yalitimi.test.ts` (INV-ONIZLEME-1) | AKTIF |
+| `scripts/onizleme.mjs` | YEREL ÖN İZLEME — bir dalı ya da PR'ı bu makinede üretim derlemesiyle ayağa kaldırır (OPS 2026-09-25, REC-300 1a). Canlı DB yalnız anon anahtarla, ayrı ağaç (C:/tmp/vh-onizleme), .env* kopyalanmaz. `--adres` kipi (ALT-37c, 2026-10-09): yeni adres şemasını YALNIZ bu ön izlemede açar (iki derleme sabiti ön izleme ağacında yamalanır ve derleme biter bitmez geri alınır; eski adres haritası canlıdan salt okuma üretilir), sunucu açılınca Recep'in 17 adresini ve tam taramayı aynı komutta koşar | ALTYAPI | elle (`node scripts/onizleme.mjs <dal|PR> [--port 3100] [--adres]`) | 2026-09-25 kuruldu; 2026-10-09 `--adres` kipi gerçek derlemede koştu: 17 adres 14 tamam · 0 kırmızı · 3 bekliyor (kategori ağacı #1352), tam tarama 247 beklenti · OK 241 · KIRMIZI 0 · BEKLİYOR 6 | `src/__tests__/conformance/onizleme-yalitimi.test.ts` (INV-ONIZLEME-1) + `onizleme-adres-kipi.test.ts` (INV-ONIZLEME-2) | AKTIF |
 | `scripts/icerik-hatti/__tests__/gorsel-alt.test.ts` | REC-146 · görsel alt metni: yalnız dilden bağımsız düzeltme, Türkçe adlı ürün sayfa koduna devredilir. Ağa, DB'ye çıkmaz. | URUN-KATALOG | vitest (`scripts/icerik-hatti/__tests__`) | 2026-09-25 (4/4) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/gorsel-alt-yaz.mjs` | GÖRSEL ALT METNİNİ CANLIYA YAZAR — REC-146, Recep sözü 2026-09-25 ("düzeltmen gerekenleri düzelt"). | URUN-KATALOG | elle: `[--liste <csv>] [--yaz --yedek <json>]` + CANLI_YAZIM_ONAYI (Recep 2026-09-25) | 2026-09-25 canlı: 89/89 yazıldı + geri okuma; 49 görsel sayfa kodu gerektirir (URUN) | scripts/icerik-hatti/__tests__/gorsel-alt.test.ts (saf çekirdek) | AKTIF |
 | `scripts/icerik-hatti/gorsel-alt.mjs` | GÖRSEL ALT METNİ PLANI — saf çekirdek (DB'ye dokunmaz). Yazıcı: `gorsel-alt-yaz.mjs`. REC-146, Recep sözü 2026-09-25. | URUN-KATALOG | modul: gorsel-alt-yaz.mjs | 2026-09-25 | scripts/icerik-hatti/__tests__/gorsel-alt.test.ts | AKTIF |
@@ -1134,7 +1154,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/board/departman-kapat.cjs` | DEPARTMAN KAPATICI — KARAR-ONLY: "kapatılabilir / kapatılamaz" hükmü + sebep verir; hiçbir süreci SONLANDIRMAZ (kabuk: `departman-kapat.cmd <Rol>`). | OPS | scripts/board/departman-kapat.ps1 (`--json`) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/departman-ac-kapat.test.ts | YENI |
 | `scripts/board/departman-kapat.ps1` | departman-kapat.ps1 - bir departman penceresi KAYIPSIZ kapatilabilir mi diye KARAR verir; pencereyi KENDISI KAPATMAZ. | OPS | scripts/board/departman-kapat.cmd; elle: `departman-kapat.cmd <Rol> [--kuru]` | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/departman-ac-kapat.test.ts | YENI |
 | `scripts/board/departman-ortak.cjs` | DEPARTMAN ORTAK KÜTÜPHANESİ — `departman-ac.cjs` ve `departman-kapat.cjs` AYNI çözümlemeyi kullanır. | OPS | scripts/board/departman-ac.cjs, scripts/board/departman-kapat.cjs | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/departman-ac-kapat.test.ts | YENI |
-| `scripts/belge/ajan-tanimi-uret.cjs` | ÇALIŞAN TANIMI ÜRETİCİ (REC-530 hattı, kart üreticisinin İKİNCİ ÇIKTISI; OPS emri 2026-09-30). | HARİTA | docs/README.md (çalışan tanımı satırı); `node scripts/belge/ajan-tanimi-uret.cjs --yaz` | 2026-10-01 yazıldı, yeşil | src/__tests__/conformance/ajan-tanimlari.test.ts (INV-AJAN-TANIM-1) | KAL |
+| `scripts/belge/ajan-tanimi-uret.cjs` | ÇALIŞAN TANIMI ve MÜDÜR PENCERESİ TANIMI ÜRETİCİ (REC-530 hattı, kart üreticisinin İKİNCİ ÇIKTISI; OPS emri 2026-09-30). HRT-49 ile ikinci çıktı: 11 açık departman için `.claude/agents/<departman>-pencere.md` (memory: user, araç kısıtı yok; OPS emri 2026-10-10). | HARİTA | docs/README.md (çalışan tanımı ve müdür penceresi satırları); `node scripts/belge/ajan-tanimi-uret.cjs --yaz` | 2026-10-10 pencere çıktısı eklendi (HRT-49), yeşil | src/__tests__/conformance/ajan-tanimlari.test.ts (INV-AJAN-TANIM-1); src/__tests__/conformance/hazir-ozellik-kurulumu.test.ts (INV-HAZIR-OZELLIK-1) | KAL |
 | `scripts/hijyen/skill-listesi-say.cjs` | skill listesinin KESIN sayimi: oturum dokumundeki skill_listing ekini sayar, kac skill (ve proje skill i) aciklamasiz gorunuyor; elle kosar, zamanlayici yok | YETENEK | elle (skill degisen PR da) | 2026-10-01 | INV-SKILL-LISTE-SAY-1 (cekirdek ayristirma; claude -p kismi sinanmaz) | KAL |
 | `scripts/board/recep-sozu-defteri.cjs` | RECEP SÖZÜ DEFTERİ (REC-554, karar 218/224): Recep'in KENDİ mesajı (peer/alt ajan/görev bildirimi/yapıştırma hariç) maskelenerek `~/.claude/recep-sozu-defteri.jsonl`'a yazılır; OPS her turda başkasına yazılan yeni sözü, departmanlar OPS'ta verilen numaralı kararı görür. Fail-open, bilmek yetki taşımaz | ARAÇ | `.claude/hooks/board-brief.cjs` (UserPromptSubmit; ayar dosyası değişmedi) | duman testi 2026-10-01: yalıtılmış dizinlerle kanca 3 girdiyle koştu (Recep sözü yazıldı, peer "217 evet" yazılmadı, parola maskelendi); canlı pencerede ilk gerçek söz ana ağaç sarılınca ölçülür | INV-RECEP-SOZU-1..5 (37 test; 6 sabotaj kırmızı) | KAL |
 | `scripts/board/recep-sozu-defteri-yedek.cjs` | RECEP SÖZÜ DEFTERİ YEDEĞİ (ARC-15) — defter karar kaydıdır; tek kopya, git dışı, ek-yazımlı bir dosyadır. Arşiv+aktif tek dosyada bayt eşitliğiyle doğrulanır, kademeli saklanır, `--geri` ile planlı geri yüklenir; döndürme kayıpsızdır (`recep-sozu-defteri.cjs dondur`). | ARAÇ | `.claude/hooks/sage-yedek-oturum-sonu.cjs` (SessionEnd; Stop kaydı AYRI Recep sözü ister), `.claude/hooks/defter-tazelik-satiri.cjs` (istem satırı) | 2026-10-01 yalıtılmış dizinlerle ölçüldü; canlı ilk yedek birleşme sonrası elle alınır | `recep-sozu-defteri-yedek.test.ts` (INV-DEFTER-YEDEK-1..3, 24 test; 4 sabotaj kırmızı) | KAL |
@@ -1142,6 +1162,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/kanban/pano-sayfasi.cjs` | PANO SAYFASI — Kanban panolarını, Recep'in kararını bekleyen kartları (etiket `recep-karari`), tarih-saatli son kararlarını (söz defteri, maskeli) ve kurulu araç sayımını TEK yerel HTML sayfaya döker (ARC-5, OPS 2026-10-01). İkinci okuyucu yok: Kanban verisi `scripts/nlm/kanban_disa_aktar.py`, sözler `recep-sozu-defteri.cjs` kayitlariOku(). Çıktı depo DIŞI (varsayılan `~/.claude/venthub-pano/pano.html`), hedef depo içindeyse reddeder (repo PUBLIC); metin HTML-kaçışlı; Kanban ölçülemezse çıkış 2 | ALTYAPI | elle (yayını OPS yapar) | 2026-10-01: 421 kart / 11 pano, ilk sayfa üretildi | `pano-sayfasi.test.ts` (INV-PANO-SAYFASI-1) — kart düşmez, HTML kaçışı, depo içi hedef reddi, ölçülemezse yazmaz | KAL |
 | `scripts/nlm/kanban_disa_aktar.py` | WrongStack Kanban panolarını (yerel sqlite, `mode=ro`) santiye.py'nin okuduğu "kayitlar" şemasına çevirir; karar 219 sonrası iş dağılımının veri katmanı. | HARITA | docs/standards/work-tracking-ssot-standard.md, scripts/nlm/santiye.py (betik taramasi) | 2026-10-01 gerçek panoyla ölçüldü (416 kart, pano başına sayılar Kanban'ın kendi sayımıyla birebir) | src/__tests__/conformance/santiye-kanban.test.ts | KAL |
 | `scripts/nlm/santiye_sinirlar.py` | İş dağılımı tablosunun renk eşikleri TEK dosyada (OPS kararı 10-01: sürüyor ≤3 yeşil, 4-5 sarı, >5 kırmızı; sırada sınırsız). | HARITA | scripts/nlm/santiye.py (betik taramasi) | 2026-10-01 yazıldı; eşikler Kanban pano WIP sınırı 5'e göre | src/__tests__/conformance/santiye-kanban.test.ts | KAL |
+| `scripts/hijyen/sage-hafiza-esle.cjs` | SAGE HAFIZA EŞLEME — konu hafızası .md dosyalarını sage'e DOSYA ÇAPALI kısa kayıt olarak taşır (ARC-23a). | ARAÇ | src/__tests__/conformance/sage-hafiza-esle.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/sage-hafiza-esle.test.ts | KAL |
 | `scripts/belge/kart-plan-kapisi.cjs` | KART-PLAN KAPISI (HRT-14, OPS-13 karar 241/243/244; cetvel: docs/standards/kart-plani-standard.md): yedi etiketli PLAN iskeletinin eksiksizliğini ölçer; Kanban sqlite'ını salt-okuma okur; yerelde koşar, CI'da koşmaz. | HARITA | docs/README.md, docs/standards/kart-plani-standard.md, docs/roller/*-kurallar.md (betik taramasi) | 2026-10-02: gerçek HRT-14 kartına karşı koşuldu, çıkış 0 | src/__tests__/conformance/belge-kart-plan-kapisi.test.ts | KAL |
 | `scripts/board/kanban-anlik.cjs` | KANBAN ANLIK OKUMA (ARC-33): modların (hafta, ops-kokpit) Kanban'ı izin istemeden okuduğu betik; `.wrongstack/kanbans/_kanban.sqlite` dosyasını node:sqlite `readOnly` ile açar, ASLA yazmaz. Varsayılan çıktıya sütun adı, kabul ölçütü m/n, bağımlılık ve not sayısı girer; `--detay` tek kartın tam içeriğini (açıklama, kabul ölçütleri, bağımlılık başlıkları, son 5 not, bağlantılar, süre) verir; `--id`, `--acik`, `--kisa`, `--pano`, `--vade-bas/--vade-son` süzgeçleri ve süzgeçten bağımsız `sayac` vardır. Hata olursa `ok:false` ve çıkış 0 | ARAÇ | `~/mods/` altındaki hafta ve ops-kokpit modları (`$.process.run`; ana ağaç yolu sabit) | 2026-10-04: gerçek panoyla 514 kart / 13 pano; OPS-31 kartında 12 kabul ölçütü, sütun ve notlar geldi | src/__tests__/conformance/kanban-anlik.test.ts (INV-KANBAN-ANLIK-1..7) | KAL |
 | `scripts/belge/durum-dondur.py` | DURUM DOSYASI GÜNLÜK DÖNDÜRME — hafiza-yazma-duzeni-standard.md §9b (REC-516): eski gün bloklarını `gunluk/<ROL>/gecmis/`'e kayıpsız taşır; varsayılan kuru koşu; DEVİR bloğu (sonda) ve dört alanı yoksa `--yaz` reddedilir; yazmadan önce yeniden kontrol, hata yolunda temizlik, diskten bayt bayt doğrulama. | HARITA | docs/standards/hafiza-yazma-duzeni-standard.md §9b (betik taramasi); elle: `python scripts/belge/durum-dondur.py --dosya <durum.md> --gecmis-dizin <gecmis> --tutulan-ilk-gun <gün>` | 2026-10-04: OPS durum dosyasında gerçek koşu, 336.438 → 106.480 bayt, kayıpsız | src/__tests__/conformance/durum-dondur.test.ts (INV-DURUM-DONDUR-1, 18 kol; 4 mutasyon kırmızı) | KAL |
@@ -1151,17 +1172,84 @@ madde 1 gereği araç sayılmaz.
 | `scripts/seo/__tests__/yayinda-model-veri-uret.test.ts` | INV-YAYINDA-MODEL-9 · yayındaki model listesi ↔ Faz 2 CSV birebirliği (URN-31) | URUN | ci test takımı | URN-31 (yeni, ilk koşu yeşil) | kendisi test | YENI |
 | `scripts/seo/yayinda-model-ag-kapisi.mjs` | YAYINDAKİ MODELLER AĞ KAPISI — canlı DB'ye salt SELECT: liste SKU'ları aktif/silinmemiş/doğru ailede mi (URN-31). Boş listede ağsız 0. ⚠AĞA ÇIKAR (liste doluyken) | URUN | liste açma PR'ı öncesi elle | URN-31 (yeni; canlıda koşulmadı) | yayinda-model-ag-kapisi.test.ts | YENI |
 | `scripts/seo/yayinda-model-veri-uret.mjs` | YAYINDAKİ MODELLER VERİ ÜRETİCİSİ — SKU listesi + Faz 2 CSV → `src/config/yayindaModeller.veri.json`; `--yenile` CSV değişince listeyi yeniler (URN-31). Ağa çıkmaz | URUN | liste açma PR'ı + CSV değişince elle | URN-31 (yeni, ilk koşu yeşil) | yayinda-model-veri-uret.test.ts | YENI |
+| `scripts/adres/harita-uret-yardimci.ts` | Harita çalıştırıcısının SAF fonksiyonları (ALT-37a): çıktıda anahtar/JWT/e-posta taraması ve harita biçim doğrulaması; ağ, dosya, ortam değişkeni YOK | ALTYAPI | `scripts/adres/harita-uret.ts` (içe aktarır), `src/__tests__/conformance/harita-uret-is-akisi.test.ts` | yok — 2026-10-05'te yazıldı | `harita-uret-is-akisi.test.ts` (INV-HARITA-URET-1, çıktı denetimi vakaları) | KAL |
+| `scripts/adres/harita-uret.ts` | ESKİ ADRES HARİTASI ÇALIŞTIRICISI (ALT-37a; plan rec-adres-agac-tek-yayin §4.1, ALT-13 parçası): üreteci canlı veritabanına karşı bir kez koşturur (yalnız SELECT), haritayı yazar; `--dogrula` ve `--kuru-calisma` kipleri sırsız | ALTYAPI | `.github/workflows/harita-uret.yml` (elle tetik) | yok — 2026-10-05'te yazıldı, canlıya karşı henüz koşmadı (kuru çalışma ve doğrulama kipi yerelde ölçüldü) | `harita-uret-is-akisi.test.ts` (INV-HARITA-URET-1: yazma çağrısı 0) | KAL |
 | `scripts/ci/degisiklik-sinifi.cjs` | DEĞİŞİKLİK SINIFLAYICI — PR'ın değişen dosyalarını belge / edge / betik / karma / tam sınıflar; YALNIZ dar sınıfta `Build (blocking)` ve e2e ağır adımları atlanır, şüphede HEP tam (ALT-38c) | ALTYAPI | `.github/workflows/ci.yml` ve `e2e-smoke.yml` (`Değişiklik sınıfı` adımı, tabandan çıkarılıp koşar) | 2026-10-07 bağlandı; canlı ölçüm PR'ın kendi koşusunda | `degisiklik-sinifi.test.ts` + `ci-degisiklik-sinifi.test.ts` (INV-CI-SINIF-1/2) | KAL |
 | `scripts/ci/__tests__/degisiklik-sinifi.test.ts` | Sınıflayıcının karar tablosu: yol normalleştirme, sınıf önekleri, HER_ZAMAN_TAM (tam yol girdileri dahil), çıktı enjeksiyonu, gerçek git ile uçtan uca; yanlış yön HEP `tam` (ALT-38c) | ALTYAPI | ci test takımı | 2026-10-07 yazıldı, ilk koşu yeşil | kendisi test | KAL |
 | `scripts/ci/__tests__/edited-ayna.test.ts` | INV-CI-EDITED-2 · `edited` aynasının karar mantığı: yalnız "aynı head SHA için tam koşu success + base ilerlememiş" atlatır, her belirsizlik tam koşudur (ALT-38) | ALTYAPI | ci test takımı | 2026-10-06 yazıldı, ilk koşu yeşil | kendisi test | KAL |
 | `scripts/ci/dunya-durumu.cjs` | DÜNYA DURUMU TESTLERİ — PR kapısından çıkan testlerin listesi (`dunya-durumu-testleri.json`), doğrulayıcısı ve `VENTHUB_DUNYA_DURUMU` kipleri (tam / dislan / yalniz); `vitest.config.ts` kullanır (ALT-38) | ALTYAPI | `vitest.config.ts` (her vitest koşusu), `src/__tests__/conformance/test-kosu-kapsami.test.ts` | 2026-10-06 yazıldı, ilk koşu yeşil | `test-kosu-kapsami.test.ts` (INV-TEST-KOSU-1) | KAL |
 | `scripts/ci/edited-ayna.cjs` | `edited` AYNASI — PR başlığı/gövdesi düzenlenince önceki tam yeşil koşuyu doğrulayıp ağır adımları atlatır; belirsizlikte tam koşu (ALT-38) | ALTYAPI | `.github/workflows/ci.yml` (`edited ayna kararı` adımı) | 2026-10-06 yazıldı; canlı ölçüm PR'ın kendi edited koşusunda | `edited-ayna.test.ts` (INV-CI-EDITED-2) + `ci-edited-ayna.test.ts` (INV-CI-EDITED-1) | KAL |
 | `scripts/ci/__tests__/dunya-durumu.test.ts` | INV-TEST-KOSU-1 (B3) · dünya durumu dışlama listesinin güven sınırı: kesişim (PR listesi ∩ taban), geçersiz listede fırlatma, DISLANAMAZ, taban okuma (git HEAD^1), komut satırı (ALT-38a) | ALTYAPI | ci test takımı | 2026-10-06 yazıldı, ilk koşu yeşil | kendisi test | KAL |
+| `scripts/ci/__tests__/arka-plan.test.ts` | INV-E2E-HIZLI-4 · `arka-plan.sh` gerçek bash ile: `baslat` hemen döner ve çıktı borusunu tutmaz, `bekle` çıkış kodunu taşır (124 süre, 125 başlatılmamış), öldürülen işlem ön planda yeniden koşar, bozuk pid yedek koşuyu açar, eski sonuç karışmaz; 9 sabotaj (ALT-38f) | ALTYAPI | ci test takımı | 2026-10-07 yazıldı, ilk koşu yeşil (yerel, Git Bash) | kendisi test | KAL |
+| `scripts/ci/arka-plan.sh` | `arka-plan.sh` — uzun süren bir komutu (e2e-smoke'ta `playwright install-deps`) Build ile PARALEL arka planda başlatır, sonucunu `bekle` adımında toplar; süreç ölürse komutu ön planda yeniden koşar (ALT-38f) | ALTYAPI | `.github/workflows/e2e-smoke.yml` (`Playwright sistem bagimliliklari` başlat ve bekle adımları) | 2026-10-07 yazıldı; canlı ölçüm PR'ın kendi CI koşusunda | `arka-plan.test.ts` (INV-E2E-HIZLI-4) + `e2e-smoke-paralel-kurulum.test.ts` (INV-E2E-HIZLI-3) | KAL |
+| `scripts/ci/test-haritasi-kaydedici.cjs` | ALT-38d · TEST HARİTASI KAYDEDİCİSİ — her test dosyasının KOŞARKEN okuduğu dosya ve dizinleri ÖLÇER (karar 308, B1). | ALTYAPI | `scripts/ci/test-haritasi.vitest.config.ts` (kurulum dosyaları); testin başlattığı node alt süreçleri `NODE_OPTIONS=--require` ile | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | `test-haritasi-kaydedici.test.ts` (INV-TEST-HARITA-KAYDEDICI-1) + araç özeti `test-haritasi-uret.test.ts` (INV-TEST-HARITA-1) | KAL |
+| `scripts/ci/test-haritasi-kurulum-son.ts` | ALT-38d · ölçüm kurulumu (SONRA): setupFiles listesinin SONUNA konur. Buraya gelindiğinde projenin kendi kurulum dosyaları | ALTYAPI | `scripts/ci/test-haritasi.vitest.config.ts` (setupFiles SONU; yalnız ölçüm koşusu) | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | araç özeti: `test-haritasi-uret.test.ts` (INV-TEST-HARITA-1) | KAL |
+| `scripts/ci/test-haritasi-kurulum.ts` | ALT-38d · ölçüm kurulumu (ÖNCE): `test-haritasi.vitest.config.ts` bu dosyayı setupFiles listesinin BAŞINA koyar. | ALTYAPI | `scripts/ci/test-haritasi.vitest.config.ts` (setupFiles BAŞI; yalnız ölçüm koşusu) | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | araç özeti: `test-haritasi-uret.test.ts` (INV-TEST-HARITA-1) | KAL |
+| `scripts/ci/test-haritasi-uret.cjs` | ALT-38d · TEST HARİTASI ÜRETİCİSİ (karar 308, B1) — `scripts/ci/test-haritasi.json`u ÖLÇÜMLE üretir. | ALTYAPI | elle: `node scripts/ci/test-haritasi-uret.cjs` (haritayı yeniler; `--kontrol` ağaçla karşılaştırır, `--yalniz` seçili testleri yeniler); cetvel docs/standards/test-karnesi-standard.md §6 | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | `test-haritasi-uret.test.ts` (INV-TEST-HARITA-1) | KAL |
+| `scripts/ci/test-haritasi.vitest.config.ts` | ALT-38d · test haritası ÖLÇÜM yapılandırması. `vitest.config.ts`e DOKUNMAZ: onu içe aktarır, kurulum dosyalarını sarar | ALTYAPI | `scripts/ci/test-haritasi-uret.cjs` (`vitest run --config`); PR kapısı ve `pnpm test` bunu yüklemez | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | araç özeti: `test-haritasi-uret.test.ts` (INV-TEST-HARITA-1) | KAL |
+| `scripts/ci/test-sec-geriye.cjs` | ALT-38d · GERİYE DÖNÜK DOĞRULAMA (karar 308, B4): "seçici, CI'da kırmızı veren her PR koşusunda kırılan testi SEÇER miydi?" | ALTYAPI | elle: `--b4 <kirmizi-kosular.json>` (geriye dönük doğrulama), `--pr-olc` (PR ölçümü), `--ozet` | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | `test-sec-geriye.test.ts` (INV-TEST-SEC-GERIYE-1) | KAL |
+| `scripts/ci/test-sec.cjs` | ALT-38d · TEST SEÇİCİ — PR'da TÜM paket yerine YALNIZ değişenle ilgili testleri koşturur (karar 308, B2). | ALTYAPI | `package.json` (`pnpm test:ilgili`); `test-haritasi-uret.cjs` ve `test-sec-geriye.cjs` kütüphane olarak; CI bağlaması (test-shard) ayrı iş | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | `test-sec.test.ts` (INV-TEST-SEC-1, sabotajlı) | KAL (ci.yml BAĞLANMADI: test-shard PR'ı sonrası) |
+| `scripts/ci/__tests__/test-haritasi-kaydedici.test.ts` | INV-TEST-HARITA-KAYDEDICI-1 · test haritası KAYDEDİCİSİ (scripts/ci/test-haritasi-kaydedici.cjs, karar 308 B1). | ALTYAPI | ci test takımı | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | kendisi test | KAL |
+| `scripts/ci/__tests__/test-haritasi-uret.test.ts` | INV-TEST-HARITA-1 · TEST HARİTASI ÜRETİCİSİ ve DEPODAKİ HARİTA (scripts/ci/test-haritasi-uret.cjs, karar 308 B1). | ALTYAPI | ci test takımı | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | kendisi test | KAL |
+| `scripts/ci/__tests__/test-sec-geriye.test.ts` | INV-TEST-SEC-GERIYE-1 · geriye dönük doğrulamanın SAYIM MANTIĞI (scripts/ci/test-sec-geriye.cjs, karar 308 B4). | ALTYAPI | ci test takımı | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | kendisi test | KAL |
+| `scripts/ci/__tests__/test-sec.test.ts` | INV-TEST-SEC-1 · TEST SEÇİCİNİN KARAR MANTIĞI (scripts/ci/test-sec.cjs, karar 308). | ALTYAPI | ci test takımı | 2026-10-07 yazıldı; ölçüm koşusu (620 test dosyası) ve testleri yeşil | kendisi test | KAL |
 | `scripts/security/depo-dokum-kapisi.cjs` | DEPO DÖKÜM KAPISI — izlenen dosyalarda veritabanı dökümü, dolu kişisel alan (R1/R2), fiyat-maliyet dökümü (R3), döküm yolu (R4), ödeme parçası (R5) ve ikili veritabanı (R6) arar; itilecek nesneleri de tarar (sonradan silinenler dahil; aynı içerik taşıyan her yolla); DEĞER BASMAZ, çıkış 0/1/2 (2 de itme öncesi kancada push'u engeller; ALT-39) | ALTYAPI | `.github/workflows/ci.yml` 'Döküm kapısı (depoya giremeyecek veri)' adımı (Install'dan önce, `if:` yok; önceki adım kırmızıysa koşmaz) ve `.githooks/pre-push` (`--pre-push`; çıkış 1 ve 2 engeller, bilinçli geçiş `VH_DOKUM_OLCULEMEDI_IZIN=1`; `--no-verify` ile atlanır; kanca dala bağlıdır); elle: `node scripts/security/depo-dokum-kapisi.cjs` | 2026-10-06: gerçek ağaçta 0 isabet; eski döküm geçici depoya geri konunca R1 + R3 + R4 kırmızı (çıkış 1) | `depo-dokum-kapisi.test.ts` + `depo-dokum-kapisi-uctan-uca.test.ts` (INV-DEPO-DOKUM-1) | KAL |
 | `scripts/ci/test-shard-bekle.cjs` | TEST SHARD SONUÇ BEKLEYİCİSİ — `ci` işinin son adımı: AYNI koşunun AYNI denemesindeki (run_id + run_attempt) `test-shard (i/N)` işlerinin HEPSİ `success` olmadan `ci` yeşil olmaz; kırmızı/iptal/atlanan/eksik shard, zaman aşımı ve okunamayan API = kırmızı (ALT-38c-2) | ALTYAPI | `.github/workflows/ci.yml` (`Test shard sonuçları` adımı) | 2026-10-07 yazıldı; canlı doğrulama PR'ın kendi koşusunda | `test-shard-bekle.test.ts` + `ci-test-shard.test.ts` (INV-CI-SHARD-1/2) | KAL |
 | `scripts/ci/test-shard.cjs` | TEST SHARD DAĞITICISI — test dosyalarını N paralel işe SÜREYE göre (LPT) dengeli, belirlenimci ve KAPSAMI KANITLI dağıtır: her dosya TAM BİR shard'a girer; boş/depo dışı/tekrarlı liste ve geçersiz N kırmızı; `vitest.config.ts` `VENTHUB_TEST_SHARD_DOSYALARI` ile include'u sınırlar (ALT-38c-2) | ALTYAPI | `.github/workflows/ci.yml` (`test-shard` işi), `vitest.config.ts`, `scripts/ci/test-sureleri.json` | 2026-10-07 yazıldı; canlı doğrulama PR'ın kendi koşusunda | `test-shard.test.ts` + `ci-test-shard.test.ts` (INV-CI-SHARD-1/2) | KAL |
 | `scripts/ci/__tests__/test-shard-bekle.test.ts` | Test shard SONUÇ BEKLEYİCİSİNİN birim testleri: success dışındaki her sonuç, eksik/fazla/tekrar shard, zaman aşımı, API hatası ve geçersiz ortam KIRMIZI; sahte saat ve sahte API, ağ yok (ALT-38c-2) | ALTYAPI | ci test takımı | 2026-10-07 yazıldı, ilk koşu yeşil | kendisi test | KAL |
 | `scripts/ci/__tests__/test-shard.test.ts` | Test shard DAĞITICISININ birim testleri: LPT belirlenimi, kapsam (birleşim = girdi, kesişim 0), yol normalleştirme, glob kaçırma, süre dosyası doğrulaması, sahte vitest ile liste, main çıkış kodları (ALT-38c-2) | ALTYAPI | ci test takımı | 2026-10-07 yazıldı, ilk koşu yeşil | kendisi test | KAL |
+| `scripts/ci/__tests__/test-shard-secim.test.ts` | Test shard dağıtıcısının SEÇİM kipi birim testleri: seçici çıktısı doğrulaması (tutarsız sayı/yol/tekrar/diskte yok = tam), kapsam (birleşim = seçim, kesişim 0), boş seçimde `vitest list` çağrılmaz, boş parça yalnız seçim modunda yeşil (tam modda kırmızı), gerçek süreç kurulumsuz kökte (ALT-38e) | ALTYAPI | ci test takımı | 2026-10-07 yazıldı, ilk koşu yeşil | kendisi test | KAL |
+| `scripts/adres/onizleme-tarama.cjs` | ÖNİZLEME ADRES TARAMASI (ALT-37b; Cuma 9 Ekim ADRES önizlemesi, karar 68, adres planı Faz 4). | ALTYAPI | `scripts/onizleme.mjs --adres` ön kontrolden sonra bu betikle tam taramayı koşar; elle: `node scripts/adres/onizleme-tarama.cjs --taban <önizleme adresi>` (ağsız beklenti dökümü `--liste`) | 2026-10-07: ağsız --liste ile 247 beklenti; kusursuz sahte sunucuda kırmızı 0; 51 sabotajın hepsi yakalandı. 2026-10-09: gerçek ön izleme sunucusunda 247 beklenti · OK 241 · KIRMIZI 0 · HATA 0 · BEKLİYOR 6 (kategori ağacı #1352); yayındaki modeller listesi (pilot) okunup beklenti kurulur, bu kol için 6 yeni bozmanın 6'sı yakalandı | `onizleme-tarama.test.ts` (INV-ONIZLEME-TARAMA-1) | KAL |
+| `scripts/adres/onizleme-adres.mjs` | ADRES ÖNİZLEMESİ KİPİ yardımcıları — `node scripts/onizleme.mjs [dal] --adres` için: kaynak seçimi ve tazeliği, ağaç kilidi, iki derleme sabitinin ön izleme ağacında yamalanıp geri alınması, eski adres haritasının canlıdan salt okuma üretimi, derleme izi ve Recep'in 17 adreslik ön kontrolü (ALT-37c; Cuma 9 Ekim ADRES önizlemesi, karar 68, adres planı Faz 4) | ALTYAPI | modül: `scripts/onizleme.mjs` (`--adres` kipi) | 2026-10-09 gerçek derlemede koştu: yamalar uygulandı ve geri alındı, harita canlıdan üretildi, 17 adres 14 tamam · 0 kırmızı · 3 bekliyor; bozma ölçümleri 12/12 ve 11/11 yakalandı | `src/__tests__/conformance/onizleme-adres-kipi.test.ts` (INV-ONIZLEME-2) | KAL |
+| `scripts/board/kart-not-sayimi.cjs` | Bugün (TR günü) Done'a geçen kartta bugün tarihli, sistem dışı dolu not var mı; şerit başına "Done(bugün) N, notsuz M: <no>", notsuz varsa çıkış 1, veri eksikse 2 (HRT-44, OPS 10-09). Stdout okur, depoya yazmaz | HARITA | ELLE / OPS gün sonu sayımı (`node scripts/board/kart-not-sayimi.cjs`); istem satırı kancası ARAÇ'ta (ARC-79) | canlı 2026-10-09 18:48: 0,9 sn, Done 8, notsuz 0 | INV-KART-NOT-1 (kart-not-sayimi.test.ts), santiye-kanban.test.ts | KAL |
+| `scripts/board/teslim-kart-koprusu.cjs` | Bugün (TR günü) origin/master'a giren her PR'ın numarası (ya da commit kısaltması) bugün yazılmış bir kart notunda geçiyor mu; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)", geçmeyen varsa çıkış 1, ölçülemeyen hal çıkış 2 (HRT-47, OPS 10-09). Depoya yazmaz; yalnız `git fetch origin master` | HARITA | ELLE / OPS gün sonu sayımı (`node scripts/board/teslim-kart-koprusu.cjs`), kart-not-sayimi.cjs ile birlikte; docs/standards/is-kayit-duzeni-standard.md anar | canlı 2026-10-09: 3,5 sn; 18:48 anlık görüntüsüyle URUN'un 4 notsuz teslimini buldu (#1774, #1752, #1766, #1754) | INV-TESLIM-KART-1 (teslim-kart-koprusu.test.ts) | KAL |
+| `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` | INV-TEST-KARNE-2 · CI geçmişi toplayıcısının ayıklayıcısı (scripts/test-karnesi/ci-gecmis.cjs). | ALTYAPI | ci test takımı | 2026-10-09 yazıldı; ilk koşu yeşil (238 test, 19 sn) | kendisi test | KAL |
+| `scripts/test-karnesi/__tests__/karne-uret.test.ts` | INV-TEST-KARNE-4 · karne üreticisinin KARAR KURALLARI (scripts/test-karnesi/karne-uret.cjs). | ALTYAPI | ci test takımı | 2026-10-09 yazıldı; ilk koşu yeşil (123 test, 11 sn) | kendisi test | KAL |
+| `scripts/test-karnesi/__tests__/sabotaj.test.ts` | INV-TEST-KARNE-3 · sabotaj koşucusunun GÜVENLİK ÖZELLİKLERİ (scripts/test-karnesi/sabotaj.cjs). | ALTYAPI | ci test takımı | 2026-10-09 yazıldı; ilk koşu yeşil (70 test, 101 sn; en ağır test dosyalarından biri, süresi `scripts/ci/test-sureleri.json`da) | kendisi test | KAL |
+| `scripts/test-karnesi/beyan.cjs` | ALT-38 · TEST BEYANI — "her test neyi değişince koşacağını (TETİK) ve nerede koşacağını (YER) kendisi söyler". | ALTYAPI | docs/standards/test-karnesi-standard.md, scripts/test-karnesi/karne-uret.cjs (betik taramasi) | 2026-10-09: karne üretiminde kullanıldı (654 test dosyası); birim testi YOK, `INV-TEST-BEYAN-1` kurulu değil (ALT-38l kapsamı) | yok | KAL |
+| `scripts/test-karnesi/ci-gecmis.cjs` | ALT-38 · Test karnesi — soru 2: "CI geçmişinde bu test kaç kez kırmızı verdi". | ALTYAPI | elle: `node scripts/test-karnesi/ci-gecmis.cjs --cikti <dizin>/ci-gecmis.json` (cetvel §7.6 adım 1) | 2026-10-09: karne için 2026-07-06..2026-10-07 penceresinde 3155 CI koşusu toplandı | `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` (INV-TEST-KARNE-2) | KAL |
+| `scripts/test-karnesi/karne-uret.cjs` | ALT-38 · TEST KARNESİ ÜRETİCİSİ — her test dosyası için sekiz soru, ölçülen ve ÖLÇÜLMEYEN ayrı. | ALTYAPI | elle: `node scripts/test-karnesi/karne-uret.cjs --ci <ci-gecmis.json> --vitest <vitest.json> --sabotaj <dizin> --cikti-json <dosya>` (cetvel §7.6 adım 4) | 2026-10-09: 654 test dosyasının karnesi üretildi (`docs/audits/test-karnesi-2026-10-09.json`) | `scripts/test-karnesi/__tests__/karne-uret.test.ts` (INV-TEST-KARNE-4), `src/__tests__/conformance/test-karnesi-yapisi.test.ts` (INV-TEST-KARNE-1) | KAL |
+| `scripts/test-karnesi/sabotaj.cjs` | ALT-38 · Test karnesi — soru 3: "koruduğu şeyi bozunca kırmızı veriyor mu" (sabotaj yoklaması). | ALTYAPI | elle: `node scripts/test-karnesi/sabotaj.cjs --repo <bağlı worktree> --plan <plan.json> --cikti <dizin>/gNN.jsonl` (cetvel §7.6 adım 3) | 2026-10-06..07: 347 test dosyasına 709 bozma denendi, 306'sı yakalanmadı (karne 2026-10-09) | `scripts/test-karnesi/__tests__/sabotaj.test.ts` (INV-TEST-KARNE-3), `scripts/test-karnesi/__tests__/karne-uret.test.ts` (sözleşme kolu) | KAL |
+| `scripts/test-karnesi/statik.cjs` | ALT-38 · Test karnesi — kaynak koddan ölçülebilen kısım (YALNIZ OKUMA). | ALTYAPI | `scripts/test-karnesi/karne-uret.cjs` içe aktarır (cetvel §7.6 adım 4) | 2026-10-09: karne üretiminde 654 test dosyasının kaynağı okundu (yalnız okuma) | scripts/test-karnesi/__tests__/karne-uret.test.ts | KAL |
+| `scripts/icerik-hatti/__tests__/aile-blok-duzelt.test.ts` | KATALOG · aile blok düzeltici — uçtan uca, SAHTE PostgREST'e karşı (gerçek DB'ye çıkmaz). | KATALOG | scripts/icerik-hatti/aile-blok-duzelt-kurallar.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/__tests__/kategori-meta-duzelt.test.ts` | KTL-11 · kategori-meta-duzelt.mjs — kuralların davranış kilidi. Betik GERÇEK alt süreç olarak koşar | KATALOG | scripts/icerik-hatti/kategori-meta-duzelt-kurallar.mjs, scripts/icerik-hatti/kategori-meta-duzelt.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/__tests__/urun-aciklama-duzelt.test.ts` | KATALOG · ürün açıklama düzeltici kalıp kapısı (KTL-15) — kural birimleri + uçtan uca, SAHTE PostgREST'e karşı | KATALOG | scripts/icerik-hatti/urun-aciklama-duzelt-kurallar.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/__tests__/urun-geri-al.test.ts` | KATALOG · ürün açıklaması GERİ ALMA (KTL-17) — kural birimleri + uçtan uca, SAHTE PostgREST'e karşı | KATALOG | scripts/icerik-hatti/urun-geri-al-kurallar.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/aile-blok-duzelt-kurallar.mjs` | AILE BLOK DUZELTICI KURALLARI — saf fonksiyonlar (ag yok, DB yok). `aile-blok-duzelt.mjs` bunlari | KATALOG | scripts/icerik-hatti/__tests__/aile-blok-duzelt.test.ts, scripts/icerik-hatti/aile-blok-duzelt.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/aile-blok-duzelt.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/aile-blok-duzelt.mjs` | AILE BLOK DUZELTICI — ailenin description JSON'unda TEK alandaki bir parcayi degistirir | KATALOG | scripts/icerik-hatti/__tests__/aile-blok-duzelt.test.ts, scripts/icerik-hatti/aile-blok-duzelt-kurallar.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/aile-blok-duzelt.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/kategori-meta-duzelt-kurallar.mjs` | KATEGORİ META DÜZELTİCİ KURALLARI — saf fonksiyonlar (ağ yok, disk yok, DB yok). KTL-11. | KATALOG | scripts/icerik-hatti/__tests__/kategori-meta-duzelt.test.ts, scripts/icerik-hatti/kategori-meta-duzelt.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/kategori-meta-duzelt.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/kategori-meta-duzelt.mjs` | KATEGORİ META DÜZELTİCİ — KTL-11. Kategori açıklamasının TR ve EN'ini (metadata.description_i18n), | KATALOG | scripts/icerik-hatti/__tests__/kategori-meta-duzelt.test.ts, scripts/icerik-hatti/kategori-meta-duzelt-kurallar.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/kategori-meta-duzelt.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/urun-aciklama-duzelt-kurallar.mjs` | URUN ACIKLAMA DUZELTICI KURALLARI — saf fonksiyonlar (ag yok, DB yok). `urun-aciklama-duzelt.mjs` bunlari | KATALOG | scripts/icerik-hatti/__tests__/urun-aciklama-duzelt.test.ts, scripts/icerik-hatti/urun-aciklama-duzelt.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/urun-aciklama-duzelt.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/urun-geri-al-kurallar.mjs` | URUN GERI ALMA KURALLARI — saf fonksiyonlar (ag yok, DB yok). `urun-geri-al.mjs` bunlari kullanir; | KATALOG | scripts/icerik-hatti/__tests__/urun-geri-al.test.ts, scripts/icerik-hatti/urun-geri-al.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/urun-geri-al.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/urun-geri-al.mjs` | ÜRÜN AÇIKLAMASI GERİ ALMA — `urun-aciklama-duzelt.mjs --yaz` kaydından `description_i18n`'yi eski haline döndürür (KTL-17) | KATALOG | scripts/icerik-hatti/__tests__/urun-geri-al.test.ts, scripts/icerik-hatti/urun-geri-al-kurallar.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/urun-geri-al.test.ts | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/icerik-hatti/__tests__/kategori-seo-duzelt.test.ts` | KTL-21 · kategori-meta-duzelt.mjs arama sonucu alanları (categories.seo_title / seo_desc KOLON, | KATALOG | scripts/icerik-hatti/kategori-meta-duzelt-kurallar.mjs, scripts/icerik-hatti/kategori-meta-duzelt.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | yazıcı araç (canlı yazım iki anahtarlı) |
+| `scripts/seo/__tests__/bing-webmaster-oku.test.ts` | INV-BING-OKU-1..3 · Bing Webmaster okuma betiği (SEO-9, OPS-106): anahtar okuma, maskeleme, kör kapı, koşucu | GEO-SEO | vitest (`pnpm test`) | 2026-10-11 (16/16; üç bozma kırmızı: maskeleme, boş yanıt, 401/403) | kendisi test (bozuk koda karşı sınandı) | AKTIF |
+| `scripts/seo/bing-webmaster-oku.mjs` | BING WEBMASTER OKUMA — Bing Webmaster API (JSON), salt okuma: tık/gösterim, sorgu/sayfa, tarama/dizin sayaçları, site haritası, GetUrlInfo (SEO-9, OPS-106) | GEO-SEO | `dizin-sistemleri-standard.md` D3, `yayin-gorunurluk-denetim-standard.md` | 2026-10-11 canlı: anahtar geçerli, 7 site yöntemi + 11 adres GetUrlInfo, çıkış 0 | `__tests__/bing-webmaster-oku.test.ts` | AKTIF |
+| `scripts/hijyen/hafiza-yedek.cjs` | HAFIZA YEDEĞİ — ARC-92 (OPS-104 K-047). Hafıza deposunu yedekler: ayrı `git add`, sır taraması (commit atmaz), yaş ölçümü, saf karar; CLI `--yedekle --sebep <ad>` ve `--yas`. Cetvel: docs/standards/hafiza-kancalari-standard.md §9 | ARAÇ | `hook:PreCompact` (kayıt bekliyor) · `.claude/hooks/hafiza-yedek.cjs` require · elle `--yedekle`/`--yas` | 2026-10-11 (9/9; bozma 8/8: sır kalıbı, indeks temizliği, eşik sınırı, PreCompact, bekleyen şartı, deneme aralığı, ayrı add, izlenmeyen dosya) | src/__tests__/conformance/hafiza-yedek.test.ts | AKTIF |
+| `scripts/board/ops-oturumu.cjs` | OPS oturum kimliği TEK kaynak: ~/.claude/mod-durum/ops-oturumu.json; yalnız agent=ops-pencere penceresi açılışta yazar, başka kimlik varken resume/compact yazmaz; kokpit, linear-zil ve session-board lider testi buradan okur (ARC-99) | ARAÇ | .claude/hooks/session-board.cjs (SessionStart yazar, resume lider testi okur); mods ops-kokpit ve linear-zil dosyayı okur | test 10/10; canlı: yeni OPS penceresinde kokpit düğmesi gözlemi bekliyor | ops-oturumu.test.ts (INV-OPS-OTURUMU-1..3) | KAL |
+| `scripts/hijyen/surec-listesi.cjs` | ÇALIŞAN SÜREÇLERİN KOMUT SATIRLARI (ARC-71) — `sage-yedek.cjs --geri` "dosyayı açık tutan MCP süreci var mı" sorusu. | ARAC | scripts/hijyen/sage-yedek.cjs (`--geri` sage/posta/kanban) | 2026-10-12 yazıldı (ARC-71); gerçek süreç listesi bu makinede alındı, fail-closed kolu sabotajla doğrulandı | INV-POSTA-YEDEK-1 (süreç listesi + fail-closed kolu; M3/M4/M5 bozma) | KAL |
+| `scripts/arac/onceki-calisma.cjs` | İŞ BAŞI "ÖNCEKİ ÇALIŞMA" TARAMASI (ARC-30 / OPS-30): "bu iş daha önce yapıldı mı" sorusunu tek komutla, İLK SATIRDA cevaplar. Dosya adı (git ls-files) + git konu satırı + Kanban başlık/etiket (kanban_disa_aktar.py alt süreci, ikinci okuyucu yok) + sage ve Linear (yalnız ipucu) paralel taranır; BULUNDU / YOK / ÖLÇÜLEMEDİ birbirine karışmaz; kimlik REC-300 = rec300; sayaç depo DIŞI (~/.claude/ara-onceki-calisma.jsonl). Bloklamaz, kaynak çökerse ölçülemedi yazar | ARAÇ | elle (CLI: node scripts/arac/onceki-calisma.cjs "<emir metni>" --haric <kart>); kanca bağlaması AYRI iş (UserPromptSubmit tetiği ölçülmedi) | 2026-10-03: "rec300 model adres listesi" -> BULUNDU 61 (09-23 CSV + commit 6290dd2b0 + URN-11), 1,3 sn; uydurma ifade -> YOK 5/5 | src/__tests__/conformance/onceki-calisma.test.ts (INV-ONCEKI-CALISMA-1..13; 8 sabotaj kırmızı) | KAL |
+| `scripts/board/wrongstack-etiket-bak.cjs` | WRONGSTACK ETİKET BAKICISI (ARC-24, karar 257) — GitHub'daki en son WrongStack etiketi, depodaki taban | ARAÇ | .github/workflows/wrongstack-etiket-kontrol.yml, src/__tests__/conformance/wrongstack-etiket-kontrol.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/wrongstack-etiket-kontrol.test.ts | KAL |
+| `scripts/hijyen/sahipsiz-pr.cjs` | SAHİPSİZ PR KAPISI (ARC-111, OPS-120 madde 3) — salt okuma. | ARAÇ | .claude/hooks/sahipsiz-pr-satiri.cjs (arka plan ölçümü), elle node scripts/hijyen/sahipsiz-pr.cjs [--json] | 2026-10-12 canlı: 16 açık PR, 1 sahipsiz (#1446, 14 gün) | src/__tests__/conformance/sahipsiz-pr.test.ts | KAL |
+| `scripts/seo/__tests__/bot-karnesi-marka-baglantisi.test.ts` | SEO-40 · bot karnesi aile sayfasında MARKA BAĞLANTISINI sayar; sıfırsa kırmızıdır. | GEO-SEO | vitest (`pnpm test`) | 2026-10-13 (8/8; üç bozma ilgili kolu kırmızıya çevirdi) | kendisi test | AKTIF |
+| `scripts/seo/__tests__/gsc-sayfa-oku.test.ts` | INV-GSC-SAYFA-OKU-1 · Tek sayfa Search Console okumasının ağsız parçaları (Kanban SEO-41) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y1 | 2026-10-13: 10 test yeşil, 5 bozma kırmızı | — | AKTIF |
+| `scripts/seo/gsc-sayfa-oku.mjs` | TEK SAYFA OKUMA — Search Console'dan az sayıda adres için URL denetimi + günlük gösterim, depo dışı JSON (Kanban SEO-41; OPS-123) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y1, `pazar-olcum-standard.md` P2/P6 | 2026-10-13 canlı: 2 yazı adresi, ikisi dizinde, çıkış 0 | `__tests__/gsc-sayfa-oku.test.ts` | AKTIF |
+| `scripts/seo/__tests__/bot-karnesi-fark.test.ts` | INV-KARNE-FARK-1 · Bot karnesinde iki koşu arası FARK (Kanban SEO-44) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` (bot kalitesi karnesi satırı) | 2026-10-13: 7 test yeşil, 7 bozma kırmızı | — | AKTIF |
+| `scripts/seo/__tests__/bing-webmaster-fark.test.ts` | INV-BING-FARK-1 · Bing Webmaster okumasında iki koşu arası FARK (Kanban SEO-43) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` (Bing satırı) | 2026-10-13: 9 test yeşil, 7 bozma kırmızı | — | AKTIF |
+| `scripts/seo/__tests__/geo-olcum.test.ts` | INV-GEO-OLCUM-1 · GEO ölçüm betiğinin ağsız çekirdeği (Kanban SEO-42) | GEO-SEO | `geo-olcum-standard.md` G7 | 2026-10-13: 16 test yeşil, 8 bozma kırmızı | — | AKTIF |
+| `scripts/seo/geo-olcum.mjs` | GEO ÖLÇÜM BETİĞİ — yapay zekâ cevaplarında VentHub görünürlüğü: koşu (kos) + G5 özeti (ozet) (Kanban SEO-42; REC-369 devamı) | GEO-SEO | `geo-olcum-standard.md` G1-G5, G7; `pazar-olcum-standard.md` P6 | 2026-10-13 gerçek veri: Gemini 0/27 · 0/27 (kaynak listeli 24/27), Claude 0/15 · 0/15 (6/15) | `__tests__/geo-olcum.test.ts` | AKTIF |
+| `scripts/board/pencere-kimligi.cjs` | PENCERE KİMLİĞİ — yeni düzen (OPS-122, ARC-124): settings.local.json agent anahtarı veya agent_type → rol; rolün önceki oturum kimlikleri ~/.claude/mod-durum/rol-kimlikleri.json (posta devri); VENTHUB_PENCERE_AGENT test kapağı | ARAÇ | .claude/hooks/session-board.cjs (rol kartı, kimlik devri, posta); .claude/hooks/precompact-durum-kapisi.cjs (şerit adayı) | test 22/22 + sabotaj 7/7 (13 Ekim); canlı: yeni düzen penceresinde açılış gözlemi bekliyor | src/__tests__/conformance/yeni-duzen-kimlik.test.ts (INV-YENIDUZEN-KIMLIK-1..6) | KAL |
+| `scripts/board/vitest-home-ortami.cjs` | VİTEST YALITILMIŞ HOME (ARC-129): koşum başına BENZERSİZ geçici dizin açar, `HOME` ve `USERPROFILE`'ı oraya yönlendirir, gerçek HOME'u `VENTHUB_GERCEK_HOME`'a saklar, `temizle()` ile siler; testler gerçek `~/.claude` altına (ops-oturumu.json, venthub-sid) yazamaz. 13 Ekim venthub-sid ve 14 Ekim ops-oturumu.json ezilmesinin ortak çözümü | ARAÇ | `vitest.global-setup.ts` (globalSetup), `src/__tests__/conformance/test-home-yalitimi.test.ts` (INV-TEST-HOME-1) | olculdu (14 Ekim: 21 kanca/pano testi + 61 git testi, yalıtımla 1802 geçti; sabotaj üçü kırmızı, gerçek dosya özeti değişmedi) | INV-TEST-HOME-1 (5 test; sabotaj: homeHazirla sökülünce 2 kırmızı, HOME değiştirilmeyince 3 kırmızı, kancadan env sökülünce ortak koruma tek başına yeter) | KAL |
+| `scripts/seo/__tests__/bing-url-gonder.test.ts` | INV-BING-GONDER-1 · Bing URL Gönder betiğinin ağsız çekirdeği: kota çözme, gönderim planı, 500 sınırı, kuru kip, çıkış kodu (Kanban SEO-47) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y2.1 adım 4 | 2026-10-14: 10 test yeşil, 8 bozma kırmızı | — | AKTIF |
+| `scripts/seo/bing-url-gonder.mjs` | BING URL GÖNDER — Bing Webmaster API `SubmitUrlBatch` + `GetUrlSubmissionQuota`; kota okunamazsa hiçbir şey göndermez, her adres GET 200 + kanonik sınanır (Kanban SEO-47; Y2.1 adım 4) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y2.1 | 2026-10-14 canlı `--kota`: DailyQuota 100 · MonthlyQuota 1800, çıkış 0 (gerçek gönderim henüz yok) | `__tests__/bing-url-gonder.test.ts` | AKTIF |
+| `scripts/board/wrongstack-baglanti.cjs` | WRONGSTACK MCP SUNUCULARI BU PENCEREDE KULLANILABİLİR Mİ — açılış satırı (ARC-128, 14 Ekim 2026). | ARAÇ | .claude/hooks/session-board.cjs, src/__tests__/conformance/wrongstack-baglanti-satiri.test.ts (betik taramasi) | test 7/7 + sabotaj 3 kırmızı (14 Ekim); açılış satırı ARC-128 | src/__tests__/conformance/wrongstack-baglanti-satiri.test.ts | KAL |
+| `scripts/board/kanban-tutarlilik.cjs` | KANBAN TUTARSIZLIK ONARIMI — ARC-125 (OPS emri 13 Ekim 2026, Recep isteği: "çözüm geliştir"). | ARAÇ | .claude/hooks/kanban-tutarlilik-onarimi.cjs, src/__tests__/conformance/kanban-tutarlilik.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/kanban-tutarlilik.test.ts | YENI |
+| `scripts/ci/__tests__/dagitim-hazir-kapisi.test.ts` | INV-DAGITIM-HAZIR-1 · dağıtım hazır kapısının testi (ALT-82): ölçülmüş fikstürlerle sınıflayıcı, sahte ağ ve saatle yoklama, enjeksiyon/token sızıntısı, iş akışı değişmezleri ve kaynağa tek tek hata sokan sabotaj kolları | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` §38 · `vitest` (PR kapısı, test seçici) | 2026-10-14 yazıldı; yerelde 60/60 geçti (sabotaj kolları dahil) | kendisi (INV-DAGITIM-HAZIR-1) | KAL |
+| `scripts/ci/dagitim-hazir-kapisi.cjs` | ALT-82 · DAĞITIM HAZIR KAPISI — master'a her birleşmeden SONRA o commit'in Vercel üretim dağıtımının sonucunu GitHub commit durumundan ölçer; READY/ATLANDI/İPTAL/HATA/ZAMAN_AŞIMI/ÖLÇÜLEMEDİ sınıfları, kırmızıda çıkış 1; birleşmeyi bloklamaz | ALTYAPI | `.github/workflows/dagitim-hazir.yml` (master push + elle) · cetvel `fleet-mechanism-standard.md` §38 | 2026-10-14 yazıldı; sınıflayıcı 12-14 Ekim'de `gh api` ile okunan açıklamalarla sınandı; ilk gerçek master push koşusu henüz ölçülmedi | `scripts/ci/__tests__/dagitim-hazir-kapisi.test.ts` (INV-DAGITIM-HAZIR-1, 33 sabotaj kolu) | KAL |
+| `scripts/seo/__tests__/degisen-adres-bildir.test.ts` | INV-DEGISEN-ADRES-1 · Değişen adres bildiricinin çekirdeği ve sahte ağla uçtan uca: özet, fark, K4 kapısı (karar 376 varsayılanı ve eski kural geri dönüşü), taban/kuyruk ilerlemesi, okunamayan oranı, depo içi yol reddi (Kanban SEO-55 Parça B) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y2.1, `dizin-sistemleri-standard.md` D4 | 2026-10-16: 19 test yeşil | — | AKTIF |
+| `scripts/seo/degisen-adres-bildir.mjs` | DEĞİŞEN ADRES BİLDİRİCİ — canlı site haritası + her adresin title/meta description/H1 özeti tabanla karşılaştırılır; değişen adres IndexNow'a (K4 kapısı, karar 376) ve Google dizin isteği kuyruğuna gider; taban ve kuyruk depo dışı (Kanban SEO-55 Parça B; Y2.1) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y2.1, `dizin-sistemleri-standard.md` D4 | 2026-10-16 canlı: 93 adres okundu, sorunlu 0, ikinci koşuda fark 0 (gerçek IndexNow gönderimi henüz yok) | `__tests__/degisen-adres-bildir.test.ts` | AKTIF |
+| `scripts/board/kanban-uyum.cjs` | KANBAN KURAL UYUM ÖLÇÜMÜ — ARC-153 (OPS 16 Ekim, Recep isteği: "kural uyumu kokpitte yazılımla ölçülsün"). | ARAÇ | `elle` (OPS/ARAÇ) ve ops-kokpit modu uyum paneli (ARC-153 ikinci parça: panel bu betiğin JSON çıktısını okur) | 2026-10-16: canlı salt-okuma ölçümü (14 pano, ARAÇ 63% kanıt komutu, OPS Done verify 2/7); test 14/14, 2 sabotaj kırmızı | src/__tests__/conformance/kanban-uyum.test.ts | AKTIF |
+| `scripts/ci/__tests__/dizin-tetigi.test.ts` | INV-DIZIN-TETIGI-1 · dizin tetiği iş akışının testi (ALT-91): statik kurallar (tetikler, Production süzgeci, izin, sabit aksiyonlar, sır ve kurulum yokluğu, önbellek biçimi), kabuk adımının sahte node ile davranışı ve iş akışına tek tek hata sokan sabotaj kolları | ALTYAPI | `.github/workflows/dizin-tetigi.yml` · `vitest` (PR kapısı, test seçici) | 2026-10-16 yazıldı; yerelde 32/32 geçti (sabotaj kolları dahil) | kendisi (INV-DIZIN-TETIGI-1) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -1266,6 +1354,13 @@ madde 1 gereği araç sayılmaz.
 | 97 | security-scanner | .claude | sir, enjeksiyon, bagimlilik acigi, yetki taramasi; kanitli bulgu (WrongStack 1.0.26 uyarlamasi; ornek ozel-anahtar basligi maskelendi) | YETENEK | `skill:security-scanner` | 2026-10-01 · manifest yok (.claude kapsam disi) | INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
 | 98 | typescript-strict | .claude | siki TypeScript: gevsek tip yok, dogrulama sinirlarinda tip (WrongStack 1.0.26 uyarlamasi; kural 3 ile ayni yonde) | YETENEK | `skill:typescript-strict` | 2026-10-01 · manifest yok (.claude kapsam disi) | INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
 | 99 | web-platform-baseline | .claude | guncel CSS/HTML/JS ozellikleri ve tarayici destegi, tarihli dogrulama (WrongStack 1.0.26 uyarlamasi; kural 8 sinirlari ek) | YETENEK | `skill:web-platform-baseline` | 2026-10-01 · manifest yok (.claude kapsam disi) | INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 100 | database-migrations | .claude | sema migration yontemi: expand/backfill/validate/contract, geri alma veriyi geri getirmez; bizde migration = prod (WrongStack 1.1.0 uyarlamasi) | YETENEK | `skill:database-migrations` | 2026-10-12 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 101 | geo-fundamentals | .claude | uretken motor optimizasyonu (GEO): yapay zeka yanitlarinda alinti icin icerik ve teknik kontrol listesi, salt okur (vudovn/ag-kit uyarlamasi) | YETENEK | `skill:geo-fundamentals` | 2026-10-12 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 102 | payments-webhooks | .claude | odeme saglayici entegrasyonu ve imzali tekrarsiz webhook isleme: ham govdede dogrulama, idempotency; bizde Iyzico (WrongStack 1.1.0 uyarlamasi) | YETENEK | `skill:payments-webhooks` | 2026-10-12 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 103 | tech-stack | .claude | bagimlilik surumu dogrulama ve yukseltme plani: canli paket kaydindan kararli surumu olcer, kurmaz (WrongStack 1.1.0 uyarlamasi) | YETENEK | `skill:tech-stack` | 2026-10-12 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 104 | web-performance | .claude | web performansi: LCP/INP/CLS olcumu ve iyilestirme, uretim derlemesinde once/sonra (WrongStack 1.1.0 uyarlamasi) | YETENEK | `skill:web-performance` | 2026-10-12 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 105 | write-seo-geo-content | .claude | arama ve yapay zeka alintisi icin sayfa tipi cerceveli icerik yazimi, uydurma veri yok (onvoyage-ai/gtm-engineer-skills uyarlamasi) | YETENEK | `skill:write-seo-geo-content` | 2026-10-12 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 106 | rehber-yayin | .claude | rehber ya da blog yazisinin yayin akisini yonlendirir: basamak, sahip ve kapi tek kaynaktan (rehber-yazisi-standard R10; BLG-11) | BLOG | `skill:rehber-yayin` | 2026-10-14 · manifest yok (.claude kapsam disi) | INV-SKILL-BAGLI-1, INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
@@ -1326,7 +1421,11 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `bagimlilik-denetimi.yml` | Bağımlılık denetimi — karar 52. Kilit dosyası / package.json / kabul listesi değişince ve haftada bir (pazartesi 04:17 UTC) denetim betiğini koşar; `pnpm install` YOK | ALTYAPI | GitHub Actions (PR + master push `paths` süzgeçli, `schedule`, `workflow_dispatch`) · cetvel §11 | 2026-09-21 yazıldı; ilk CI koşusu bu PR'da | `bagimlilik-denetimi.test.ts` — `contents: read`, install yokluğu, kilit dosyası ve haftalık tetik varlığı | KAL |
 | `canli-kanit-tek-sefer.yml` | Canlı kanıt (tek sefer) — karar 104: deneme teklifine yönetici yolundan fiyat girip yayımlayan spec'i CANLI siteye karşı koşar; yalnız elle tetik + onay girdisi | ALTYAPI | elle (workflow_dispatch, onay `karar-104-canli-yazim`) | henüz koşmadı (2026-09-24 kuruldu) | `src/__tests__/conformance/canli-kanit-yalitimi.test.ts` (INV-CANLI-KANIT-1) | KAL |
 | `derleme-cikti-olcumu.yml` | Derleme çıktısı ölçümü — REC-436: "bu paket Vercel'e giden çıktıda VAR MI?"; `next build` sonrası `.next/**/*.nft.json` içinde paket adı arar. Salt-okur, yalnız elle tetik | ALTYAPI | elle (`workflow_dispatch`, girdi: paket adı) | henüz koşmadı (2026-09-29 yazıldı) | betik mantığı fikstürle 3 durumda ölçüldü (var / yok / geçersiz ad); kalıcı test yok — tek seferlik ölçümdür | KAL |
+| `harita-uret.yml` | eski adres haritasını canlı veritabanından salt-okuma üretir, artefakt olarak 1 gün saklar (Cuma önizlemesi için) | ALTYAPI | `elle` (`workflow_dispatch`; pull_request/push/schedule BİLEREK yok — prod'a bağlanan iş akışı insan kararıyla koşar) | yok — 2026-10-05'te yazıldı, henüz koşmadı | `src/__tests__/conformance/harita-uret-is-akisi.test.ts` (INV-HARITA-URET-1, 12 vaka + 10 sabotaj) | KAL |
 | `dunya-durumu.yml` | Dünya durumu — PR kapısından çıkan testleri (scripts/ci/dunya-durumu-testleri.json) 6 saatte bir ve elle koşar (kip `yalniz`); kırmızısı OPS'un her mesajında `DUNYA:` satırıyla görünür (ALT-38) | ALTYAPI | GitHub Actions (`schedule` 23 */6 * * *, `workflow_dispatch`) | 2026-10-06 yazıldı; ilk CI koşusu birleşince | `src/__tests__/conformance/test-kosu-kapsami.test.ts` (INV-TEST-KOSU-1) | KAL |
+| `wrongstack-etiket-kontrol.yml` | WrongStack etiket kontrolu | ARAÇ | scripts/board/wrongstack-etiket-bak.cjs, src/__tests__/conformance/wrongstack-etiket-kontrol.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/wrongstack-etiket-kontrol.test.ts | KAL |
+| `dizin-tetigi.yml` | Dizin tetiği — her üretim dağıtımında (`deployment_status`, ortam Production, durum success) ve günde bir `scripts/seo/degisen-adres-bildir.mjs`'i koşar; taban ve kuyruk actions/cache ile depo dışında; sır yok, `pnpm install` yok (ALT-91, SEO-55 Parça C) | ALTYAPI | GitHub Actions (`deployment_status`, `schedule` 37 5 * * *, `workflow_dispatch`; `pull_request` BİLEREK yok) | 2026-10-16 yazıldı; ilk gerçek koşu birleşmeden sonra ölçülecek | `scripts/ci/__tests__/dizin-tetigi.test.ts` (INV-DIZIN-TETIGI-1) | KAL |
+| `dagitim-hazir.yml` | Dağıtım hazır — master'a her birleşmeden sonra o commit'in Vercel üretim dağıtımının sonucunu ölçer (ALT-82); `pnpm install` yok, sır yok, birleşmeyi bloklamaz | ALTYAPI | GitHub Actions (`push` master, `workflow_dispatch`; `pull_request` BİLEREK yok) · cetvel §38 | 2026-10-14 yazıldı; ilk CI koşusu birleşince | `scripts/ci/__tests__/dagitim-hazir-kapisi.test.ts` (INV-DAGITIM-HAZIR-1: push-only, zorunlu çekirdeğe girmez, izinler) | KAL |
 
 **Envanter dışı ek bulgu (29'a dahil değil):** `tmp-lf-fix.yml` — `gh workflow list --all` bunu
 `active` listeliyor, ama `.github/workflows/` dizininde YOK ve `git log --all` boş dönüyor.
@@ -1439,6 +1538,8 @@ gerektirmez).
 | rota-dili-standard | Rota Dili Standardı (statik sayfa adresleri: TR Türkçe, EN İngilizce) | ALTYAPI | `docs/README.md` (soru→dosya haritası), `src/config/rotaDili.mjs`, `src/config/rotaDiliCekirdek.mjs` (betik taramasi) | 2026-10-04 yazıldı; PR-A…C2 kodu ve kapıları aynı yığında | `rota-dili-kapali-sifir-fark.test.ts` (INV-ROTA-DILI-KAPALI-1), `rota-dili-adres-uretimi.test.ts` (INV-ROTA-DILI-KAPALI-2), `rotaDiliCekirdek.test.ts` (INV-ROTA-DILI-CEKIRDEK-1, Edge güvenlik taraması), `rotaDili.test.ts` | KAL |
 | test-karnesi-standard | Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.0 (ALT-38, 2026-10-06): testin nerede koşacağı (PR kapısı / master push / zamanlı), dünya durumu testlerinin PR kapısından çıkarılma kuralı, edited aynası; test karnesi bölümü ikinci teslimle gelir | ALTYAPI | `docs/README.md` (soru→dosya haritası), `.github/workflows/ci.yml`, `.github/workflows/dunya-durumu.yml`, `scripts/ci/dunya-durumu-testleri.json` | 2026-10-06 yazıldı; dört kapısı aynı PR'da yeşil | INV-TEST-KOSU-1 (`test-kosu-kapsami.test.ts`), INV-CI-EDITED-1 (`ci-edited-ayna.test.ts`), INV-CI-EDITED-2 (`edited-ayna.test.ts`), INV-DUNYA-SATIRI-1 (`dunya-durumu-satiri.test.ts`) | KAL |
 | depoya-giremeyecek-veri-standard | Depoya Giremeyecek Veri — Cetvel v1.3 (ALT-39, son tur): PUBLIC depoya veritabanı dökümü, müşteri/ödeme verisi ve fiyat-maliyet listesi girmez; R1-R6 kuralları (R1 toleranslı eşleşme, R6 uzantıdan bağımsız imza), izin kayıtları (yalnız R3 ve R6, tavan 4; R5 kart parçası izin ALMAZ; her biri gerekçeli ve BLOB'a bağlı), fikstürün gerçek değerden türetilmeden sentetik üretilmesi kuralı, geçmiş temizliği ALT-41'de | ALTYAPI | `docs/README.md` (soru→dosya haritası), `.github/workflows/ci.yml` (adım yorumu) | 2026-10-06 yazıldı; kapı ve testi aynı yığında | `depo-dokum-kapisi.test.ts` (INV-DEPO-DOKUM-1), `odeme_eslesme.test.ts` (sentetik fikstür kolları) | KAL |
+| agir-komut-kilidi-standard | Ağır Komut Kilidi Standardı (ARC-81): hangi komut ağır sayılır, yuva/TTL/açık kalma kuralları, eşiklerin dayanağı, ayar kaydı metni | ARAC | docs/README.md haritası, `.claude/hooks/agir-komut-kilidi.cjs` | ölçüldü 10-10: bozma 18/18 yakalandı; canlı kabul ayar kaydından sonra | INV-AGIR-KILIT-1..3 (`kanca-agir-komut-kilidi.test.ts`) | YENI |
+| vitrin-genel-metin-standard | Genel Vitrin Metni Standardı (Cetvel) — v0.2 TASLAK (OPS-29, BLG-1) | BLOG | cagiran-yok (betik taramasi; anma: docs/plans/blg5-sozluk-madde-kalibi-2026-10-09.md) | 2026-10-11 PR #1671 ile geliyor; INV-ARAC-1 yeşil (cetvel 99/99); sahip BLOG | yok | KAL |
 
 ---
 
@@ -1486,6 +1587,12 @@ gerektirmez).
   sarmalayıcıdan açar, kök posta kutusuyla AYNI `kanonikKok` ile çözülür. Yalnız
   `@wrongstack/*/dist/cli.js` çalıştırır, bayrak eklemez (`--writable` yok). Kapı:
   INV-WRONGSTACK-KANONIK-KOK-1. `…-1088d5/codebase-index` artık yetim — silinmesi ayrı iş (B(0)d).
+  **Worktree'de paket yolu (2026-10-12, ARC-98) — sahip ARAC, durum KAL:** `node_modules` izlenmez, worktree'de
+  yoktur; sunucu göreli yolla açılınca "Cannot find module" ile ölüp "Connection closed" veriyordu. Sage ve
+  kanban artık aynı `kanonik-kok.cjs` sarmalayıcısından açılır; sarmalayıcı ve posta kutusu `paketCli`
+  (`posta-kutusu.cjs`) ile paketi önce yerelde, yoksa ana ağacın kurulumunda arar (bulunamazsa yerel yol:
+  sessiz başka dosya çalışmaz). Ölçüm: worktree'den açılan kanban 16 pano ve OPS-109 kartını ana depoyla
+  aynı gördü. Kapı: INV-WRONGSTACK-KANONIK-KOK-1 üç yeni kol (sabotajla doğrulandı).
   **Kanban yaması (2026-09-27, karar 144, REC-391 K1) — sahip ARAC, durum KAL (yukarı akış
   düzeltince SİL):** `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.26-ozet-donus.patch`. Betik
   değil, kurulum parçası → tabloda değil burada. kanban-mcp yazma dönüşünü aracın kendi özet
@@ -1577,6 +1684,111 @@ vurgulanmıştır.)
 **Ek toplamlar:** companion `.md` (hook, envanter dışı) 13 · skill tekil ad 39 (satır 64) ·
 GitHub-hayalet CI 1 (`tmp-lf-fix.yml`, 29'a dahil değil) · özel-durum envanter-dışı nesne 1
 (`.claude/worktrees/agent-a91c11837d4004440`).
+
+---
+
+## 7 · Claude Code sürüm notu taraması — 2.1.251 → 2.1.296 (en yeni belgelenen 2.1.299) · 14 Ekim 2026 · ARC-135
+
+> Bu bölüm tür tablosu DEĞİLDİR: `scripts/hijyen/arac-envanteri.cjs` yalnız `### 3.x` başlıklarının altındaki
+> tabloları okur, bu bölüm sayıma girmez. Kaynak REC-529'un "changelog son 60 gün taranmadı" eksiğidir.
+
+### 7.0 · Kaynak, tazelik, sınır
+
+| Konu | Değer |
+|---|---|
+| Sürüm notu | `anthropics/claude-code` `CHANGELOG.md`, 8.982 satır, 419 sürüm başlığı, getirme 14 Ekim 2026 09:20 UTC |
+| Tarih kaynağı | Sürüm başlıklarında tarih YOK; yayın zamanı `npm view @anthropic-ai/claude-code time` (UTC) |
+| Belge | `code.claude.com/docs/en/` routines, desktop-scheduled-tasks, scheduled-tasks, hooks, sub-agents, worktrees, settings-reference, cross-session-messaging, changelog |
+| Kurulu sürüm | 2.1.296 (`claude --version`, 14 Ekim); belge changelog'u 2.1.299'a (14 Ekim) kadar; 2.1.297 ve 2.1.298 npm'de yok |
+| Bizim önceki sürüm tabanı | **2.1.251** (28 Ağustos yayın; 30 Ağustos tarihli en eski transkriptler hep 2.1.251). Transkriptlerde 2.1.296 hiç görülmedi, en yenisi 2.1.295 (oturum eski sürümle açılmış olabilir) |
+| Pencere | 15 Ağustos – 14 Ekim 2026 (ilk sürüm 2.1.234, 17 Ağustos) |
+| Okunan | "Added" satırlarının tamamı (2.1.234-2.1.296). "Changed/Removed/Improved" ve 1.713 "Fixed" satırı anahtar kelime süzgecinden geçti: süzgeç dışı ilgili bir düzeltme kalmış olabilir |
+
+### 7.1 · Zamanlama: üç yol (Recep'in sorusu: bulut mu yerel mi, kota, bilgisayar kapalıyken)
+
+Kaynak: routines, desktop-scheduled-tasks, scheduled-tasks sayfaları (14 Ekim). Routines sayfası "research preview" işaretlidir: davranış ve sınırlar değişebilir.
+
+| Konu | Bulut routine (`/schedule`, claude.ai/code/routines) | Desktop zamanlanmış görev (Routines > Local) | Oturum içi (`/loop`, CronCreate, ScheduleWakeup) |
+|---|---|---|---|
+| Nerede çalışır | Anthropic bulutu | Bu makine, Desktop uygulaması açıkken | Açık Claude Code oturumu |
+| Bilgisayar kapalıyken | **Çalışır** | Çalışmaz (uygulama açık, makine uyanık olmalı) | Çalışmaz |
+| Kota | Abonelik kotasından düşer; hesap başına saatte 100 zamanlanmış çalıştırma, rutin başına saatte 30 "Run now"/API; kota dolunca kullanım kredisi açıksa ücretli sürer, kapalıysa reddedilir | Belgede yazmıyor | Belgede yazmıyor |
+| Erişim | Her çalıştırmada temiz repo klonu; claude.ai connector'ları; yerel dosya YOK; yerel `claude mcp add` sunucuları gelmez | Yerel klasör ve dosyalar, connector'lar | Oturumun MCP'si ve izinleri |
+| Kalıcılık | Hesapta kayıtlı | `~/.claude/scheduled-tasks/<ad>/SKILL.md`, yeniden başlatmada kalır | Oturuma bağlı; yinelenen görev 7 gün sonra kendini siler |
+| En kısa aralık | 1 saat | 1 dakika | 1 dakika |
+
+Bizim için sonuç: bilgisayar kapalıyken çalışması gereken denetim (sahipsiz PR, bayat defter) yalnız bulut routine ile olur ve yerel kancalar, claude-mem ve `~/.claude` yapılandırması orada YOKTUR (belgede kancaların bulutta çalışıp çalışmadığı yazmıyor). Zamanlama açmak karar 53 gereği önce OPS'a/Recep'e sorulur.
+
+### 7.2 · REC-529'daki 6 "AL" özelliğinde belgedeki güncel durum
+
+| # | Özellik | Belge (14 Ekim) | Pencerede değişen |
+|---|---|---|---|
+| 1 | ConfigChange kancası | Eklendi 2.1.49. Matcher: user/project/local/policy_settings, skills. Engelleyebilir (exit 2 ya da `decision: block`); policy_settings engellenemez | Yeni alan yok; 2.1.290'da Linux sandbox'ta komut ortası yeniden yükleme düzeltmesi |
+| 2 | PostCompact kancası | Eklendi 2.1.76. Girdi: `trigger`, `compact_summary`. **Karar kontrolü yok**; düz stdout'un bağlama girdiği olaylar listesinde PostCompact yok (UserPromptSubmit, UserPromptExpansion, SessionStart, PostModelSwitch) | `auto` eşleşmesi artık idle compaction'ı da kapsıyor (2.1.299, yerelde yok). **ARC-119 hükmü: bağlam enjeksiyonu için PostCompact uygun değil; doğru yol SessionStart(compact)** |
+| 3 | Alt ajan `isolation: worktree` | Eklendi 2.1.49/2.1.50. Varsayılan "fresh" (uzak varsayılan daldan); `worktree.baseRef="head"` ile yerel HEAD. Değişiklik yapmayan ajanın worktree'si otomatik silinir. Belge: worktree `.claude/worktrees/` altındaysa alt ajan worktree kökündeki CLAUDE.md ve `.claude/rules/`'u yüklemez, oturumunkini kullanır | Yeni alan yok; 2.1.286, 2.1.287, 2.1.288, 2.1.290, 2.1.295'te worktree'li alt ajan düzeltmeleri |
+| 4 | `crossSessionInbound` ayarı | Değerler `accept`/`hold`/`refuse`; varsayılan tanımsız (izin sınıfına göre onay); öncelik managed > --settings > user, proje/yerel yalnız daha katıysa; katılık refuse > hold > accept. Eklendi 2.1.224; Windows'ta 2.1.234+ | Pencere dışı (2.1.224); bu ayar için pencerede madde yok |
+| 5 | Kalıcı zamanlama | §7.1 | 2.1.273, 2.1.290, 2.1.292, 2.1.299'da kaydedilmiş görev ve DST düzeltmeleri |
+| 6 | InstructionsLoaded kancası | Eklendi 2.1.69. `load_reason`: session_start, nested_traversal, path_glob_match, include, compact. Engelleyemez, asenkron, yalnız gözlem | 2.1.288'de alt ajan dosya erişiminde `agent_id`/`agent_type` eksikliği düzeltildi |
+
+### 7.3 · Pencerede gelen, bizim akışı ilgilendiren yeni şeyler (sürüm · yayın tarihi · öneri)
+
+| Alan | Sürüm · tarih | Özellik | Öneri |
+|---|---|---|---|
+| Kanca | 2.1.295 · 8 Ekim | Command ve HTTP kancalarında `onFailure: "block"` (kanca başlamazsa/zaman aşımı/beklenmeyen çıkış kodu eylemi engeller) | AL |
+| Kanca | 2.1.251 · 28 Ağustos | PreModelSwitch / PostModelSwitch olayları | İZLE |
+| Kanca | 2.1.296 · 9 Ekim | `--debug` çıktısında kanca komutu, sonuç ve süre (yavaş kanca tespiti) | İZLE |
+| Kanca | 2.1.299 · 14 Ekim | UserPromptSubmit kancaları skill ve slash komutu açılmadan önce koşar; bloklarsa gömülü kabuk komutları da durur | İZLE (yerelde yok) |
+| Ajan | 2.1.296 · 9 Ekim | `--debug` tanımsız ajan frontmatter alanlarını ve yazım hatalarını bildirir | AL (ajan dosyası kalite kontrolü) |
+| Ajan | 2.1.251 · 28 Ağustos | `CLAUDE_CODE_SUBAGENT_MODEL` artık yalnız VARSAYILAN; ajan tanımındaki `model:` ve spawn'daki açık model onu geçer | Ajan dosyalarının `model:` alanı kontrol edilecek |
+| Ajan | 2.1.271 · 14 Eylül | Frontmatter `omitClaudeMd` (CLAUDE.md olmadan çalışan alt ajan) | İZLE (salt-okuma ajanda kural kaybı riski) |
+| Ajan | 2.1.296 · 9 Ekim | Frontmatter `autoCompactWindow`; `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` | İZLE |
+| Zamanlama | 2.1.243 · 24 Ağustos | `/usage` içinde Loops dökümü (loop başına çalıştırma ve token) | AL (kota kontrolü) |
+| Zamanlama | 2.1.285/288 · 29 Eylül/2 Ekim | Arka plan Bash komutlarına zaman sınırı (varsayılan 30 dk, en çok 2 saat; yalnız gözetimsiz oturumlarda) | İZLE |
+| İzin | 2.1.257 · 1 Eylül | `permissions.blockReadsOutsideWorkingDirectories` | AL (ajan izolasyonu) |
+| İzin | 2.1.259 · 2 Eylül | `--permission-prompts none` (gözetimsiz koşumda soran her şey otomatik reddedilir) | AL (`-p` koşumları) |
+| Ayar doğrulama | 2.1.246/2.1.260 · 25 Ağustos/3 Eylül | Bash izin kurallarında joker öneki uyarısı; hatalı kural artık sessizce atlanmaz, geçersiz ayar olarak bildirilir | AL (settings dosyalarımızı kontrol et) |
+| Ayar | 2.1.257 · 1 Eylül | Proje/yerel `defaultMode: bypassPermissions` yok sayılır | Bilgi |
+| Ayar | 2.1.290 · 5 Ekim | Repo `.claude/settings*.json` artık `CLAUDE_CODE_DISABLE_ATTACHMENTS` ayarlayamaz | Bilgi |
+| Güvenlik | 2.1.292 · 6 Ekim | PreToolUse kanca onayları ve auto mod UNC yollarından okumada izin istemini atlatıyordu, düzeltildi | Bilgi |
+| Bağlam/kota | 2.1.299 · 14 Ekim | Idle compaction (200K+ token, ~54 dk boşta kalırsa önbellek dolmadan sıkıştırır; `idleCompaction: false` ile kapanır) | AL, önce ölçüm (yerelde yok) |
+| Bağlam/kota | 2.1.251 · 28 Ağustos | `/cost` oturum başına önbellek satırı ve status line `prompt_cache` alanı | AL (önbellek ölçümü için resmi kaynak) |
+| Bağlam/kota | 2.1.260 · 3 Eylül | `/cost` ve durum satırı önbellek kaçırmanın olası nedenini gösterir | İZLE |
+| Bağlam/kota | 2.1.243 · 24 Ağustos | `promptCacheTtl` / `subagentPromptCacheTtl` (ana oturum 1 saat, alt ajan 5 dk) | İZLE |
+| Kalite | 2.1.261 · 4 Eylül | `/skill-doctor` (kullanılmayan skill ve bağlam maliyeti) | AL |
+| Kalite | 2.1.283 · 25 Eylül | `/doctor prompt-audit` (CLAUDE.md, skill, ajan ve komutlarda eski model kalıpları) | AL |
+| MCP | 2.1.296 · 9 Ekim | MCP araç açıklaması sınırı 2.048 → 4.096; tool search ile yüklenenlerde 16.384 | Bilgi |
+| Bellek | 2.1.284/268 · 28 Eylül/10 Eylül | MEMORY.md'de görünmez karakter nötrleştirme; kesilme uyarısı satır ve yeri söyler | Bilgi |
+| Disiplin | 2.1.281 · 23 Eylül | `"attribution": false` ayarı (commit/PR attribution gizler) | Bilgi: attribution OPS kuralıdır, ayar kapatma değildir |
+
+Gürültü sayıldı: VSCode, Slack (Claude Tag), cloud session, code review, remote control ve web etiketli satırlar; Windows/WSL/macOS'a özgü ilgisiz düzeltmeler.
+
+### 7.4 · Belgede olup bizim `settings.json`'da OLMAYAN kanca olayları (33 olaydan 25'i)
+
+Bizde kayıtlı 8: PreToolUse, SessionStart, SessionEnd, UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, PreCompact. Kayıtsız 25: Setup, UserPromptExpansion, PermissionRequest, PermissionDenied, PostToolBatch, Notification, MessageDisplay, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, StopFailure, InstructionsLoaded, ConfigChange, CwdChanged, FileChanged, DirectoryAdded, WorktreeCreate, WorktreeRemove, PostCompact, PreModelSwitch, PostModelSwitch, Elicitation, ElicitationResult. Eklenme sürümleri: ConfigChange 2.1.49, InstructionsLoaded 2.1.69, PostCompact 2.1.76, StopFailure 2.1.78, CwdChanged/FileChanged 2.1.83, TaskCreated 2.1.84, PermissionDenied 2.1.89, DirectoryAdded 2.1.219, Pre/PostModelSwitch 2.1.251.
+
+### 7.5 · AL adayları (OPS'a önerilir; karar OPS'tadır, settings.json kaydı Recep kararıdır)
+
+| Sıra | Aday | Gerekçe (tek cümle) |
+|---|---|---|
+| 1 | Kanca `onFailure: "block"` (2.1.295) | Koruma kancamız hiç başlamazsa eylem artık kendiliğinden durur; bugün sessizce geçiyor |
+| 2 | `--permission-prompts none` (2.1.259) | Gözetimsiz `-p` koşumunda soru bekleyip takılmak yerine otomatik ret |
+| 3 | `blockReadsOutsideWorkingDirectories` (2.1.257) | Ajanın çalışma dizini dışını okumasını kapatır; izolasyon kazancı |
+| 4 | `/skill-doctor` ve `/doctor prompt-audit` (2.1.261, 2.1.283) | Kullanılmayan skill ve bayat kalıpları ölçer: envanter için hazır ölçüm aracı |
+| 5 | `/cost` önbellek satırı ve `prompt_cache` (2.1.251) | Her mesajdaki kanca satırlarının önbelleği bozup bozmadığının (karar 363 madde 6) resmi ölçüm kaynağı |
+| 6 | Idle compaction (2.1.299) | Boşta kalan büyük oturumda önbellek dolmadan sıkıştırır; davranış otomatik değişir, önce ölçülür |
+| 7 | `--debug` ajan frontmatter denetimi (2.1.296) | Yedi uygulayıcı ve araştırmacı tanımındaki yazım hatalı alanı yakalar |
+| 8 | Hatalı izin kuralı uyarıları (2.1.246, 2.1.260) | Kendi settings dosyalarımızdaki sessizce atlanan kuralları bulur |
+| 9 | `/usage` Loops dökümü (2.1.243) | Zamanlama açılırsa (karar 53) kota bedelini görünür kılar |
+| 10 | Bulut routine (§7.1) | Bilgisayar kapalıyken sahipsiz PR/bayat defter denetimi için tek yol; kancalar ve claude-mem orada yok, karar 53 |
+
+### 7.6 · Belirsizlik ve sınırlar
+
+- crossSessionInbound ve PostCompact: sürüm notu taramam 2.1.234'ten başladı; ayar 2.1.224'te, kanca 2.1.76'da eklendi, yani pencere dışı. Belge davranışı §7.2'de.
+- Düz stdout'un PostCompact'ta bağlama girmediği belgede açık cümleyle değil, "bağlama giren olaylar" listesinden çıkarımla yazılıdır.
+- 2.1.273 (otomatik mod yerel sınıflandırıcı) ile 2.1.278 (sunucu tarafı sınıflandırıcı) çelişir; son sürüm geçerli sayıldı, bizim akışı etkilemez.
+- Sürüm notunda ve npm'de olmayan sürümler: 2.1.253-256, 2.1.262, 2.1.264, 2.1.279, 2.1.297, 2.1.298.
+- "Fixed" satırlarının tamamı okunmadı; kanca/ajan/worktree/zamanlama süzgeci dışında ilgili düzeltme kalmış olabilir.
+- Kota kısıtı: Desktop görevi ve `/loop` için belge kota/maliyet cümlesi içermiyor.
 
 
 ---
@@ -1963,6 +2175,363 @@ dönük bir riski beklemeye almıyor.
 
 
 ---
+# FILE: docs\audits\blg12-baslik-oneri-tablosu-2026-10-14.md
+
+# BLG-12 başlık öneri tablosu — yayındaki iki rehber yazısının H2 ve SSS başlıkları
+
+> **Sahibi:** BLOG. **Kart:** BLG-12. **Durum:** ÖNERİ; yazıldığı gün 2026-10-14. **Yayına girmez:** başlık değişikliği Recep onayıyla, OPS üzerinden girer (cetvel R11.5). Bu belge yazının içeriğini ve adresini değiştirmez.
+> **KAYNAK/CETVEL:** [rehber-yazisi-standard.md](../standards/rehber-yazisi-standard.md) v0.9 R11 (resmî dayanak, İLKE kuralları, `baslikDenetle` UYARI kolu). Tazelik: Google belgeleri 2026-10-14'te ham HTML'den okundu (R11.1).
+> **ÖNCEKİ ÇALIŞMA:** BLG-3 ve frekans yazısının bulgu tablosu (`blg3-bulgu-tablosu-2026-10.md`; başlık kuralı yoktu), BLG-11 R10.
+
+## 1. Neye göre yazıldı
+
+R11'in kuralları İLKE sınıfındadır; Google'ın belgelerinde alt başlık (H2/H3) için konu ifadesi şartı ve sayısal eşik **yoktur** (R11.2). Öneri, okuyucunun başlığı tek başına gördüğü üç yerde anlamlı kalması ilkesine dayanır: içindekiler, sayfa içi bağlantı ve başlığın arama sonucunda bölüm bağlantısı olarak görünebilmesi. Dayanak satırları R11.1'de: başlıklar gezinmeye yardım eder (5), bağlantı metni gideceği yeri anlatır (8), doğal olmayan tekrar doldurmadır (10, 11).
+
+**Üç ölçüt, her satırda uygulandı:**
+
+- Başlık tek başına okunduğunda hangi konudan söz ettiği anlaşılıyor mu (Y2)?
+- Konu terimi doğal yerinde mi, aynı ifade başlıkların çoğunda tekrar ediyor mu (Y3)?
+- Önerilen başlık, bölümün zaten söylediğinden fazlasını iddia ediyor mu? Edenler önerilmedi (yeni iddia, yeni sayı ve yeni marka yok).
+
+## 2. Ölçüm (bugünkü başlıklar ve öneri, `baslikDenetle`)
+
+**Search Console ile çapraz kontrol (GEO-SEO, 14 Ekim, SEO-49):** iki yazıda adı görünen sorgu 2, öneriyle çelişen başlık yok. Veri çok ince olduğu için bu bir doğrulama değildir; radyal yazısı için henüz hiçbir sorguda gösterim yok. Sorgu cümleleri depoya yazılmaz (P6).
+
+| Yazı | H2 (zorunlu bölümler hariç) | Konu terimi taşıyan | Oran | Ana ifadeyi tekrarlayan | Uyarı |
+|---|---|---|---|---|---|
+| Frekans konvertörü, bugün | 12 | 2 | 0,17 | 1 (0,08) | BASLIK-KONU-ORANI |
+| Frekans konvertörü, öneri | 12 | 6 | 0,50 | 5 (0,42) | yok |
+| Radyal ve aksiyel fan, bugün | 13 | 6 | 0,46 | 2 (0,15) | BASLIK-KONU-ORANI |
+| Radyal ve aksiyel fan, öneri | 13 | 13 | 1,00 | 2 (0,15) | yok |
+
+Konu terimleri H1'den çıkar: frekans yazısında *freka, konve, fan, pompa*; radyal yazıda *radya, fan, aksiy*. ⚠**Oranlar kolun kendi ölçüsüdür**, okuyucunun anladığı şeyin ölçüsü değildir: eşikler bizimdir (R11.2), iki yazıdaki değerleri ölçüp raporlamak için kullanıldı. "Sürücü" sözcüğü ön bilgiye `konu_terimleri:` olarak yazılırsa frekans önerisi 9 başlıkla 0,75'e çıkar (aynı cihaz; yazının kendisi "elektronik değişken hız sürücüsü" der). Bu öneriye dahil değil, ön bilgi kararıdır.
+
+## 3. Frekans konvertörü yazısı (`frekans-konvertoru-nedir`)
+
+| # | Şimdiki | Önerilen | Gerekçe |
+|---|---|---|---|
+| H1 | Frekans konvertörü nedir, fan ve pompada nasıl seçilir? | **Değişmez** | Konu adı ve aranan soru birlikte; betimleyici ve abartısız (Y1). |
+| 1 | Frekans konvertörü nedir? | **Değişmez** | Konu terimi başlığın kendisi. |
+| 2 | Nasıl çalışır? | Frekans konvertörü nasıl çalışır? | Tek başına neyin çalışmasından söz ettiği anlaşılmıyor; içindekide bağlamsız kalır (Y2). Bölüm dört ana kısmı anlatıyor, başlık bunu aşmıyor. |
+| 3 | Fan ve pompada neden kullanılır? | Fan ve pompada hız sürücüsü neden kullanılır? | "Neyin kullanıldığı" belli değil. Her başlığa "frekans konvertörü" yazılırsa 12 başlığın 11'i aynı ifadeyi taşır (ölçüldü: tekrar oranı 0,92, `BASLIK-TEKRAR`); bu yüzden aynı cihaz için yazının kendi sözcüğü "sürücü" kullanıldı. **Alternatif:** "Fan ve pompada frekans konvertörü neden kullanılır?" (ölçüldü: konu terimi taşıyan 6/12 = 0,50, ana ifadeyi tekrarlayan 6/12 = 0,50, uyarı yok). Google Trends ölçümü (GEO-SEO, SEO-50, 6 çağrı, düşük güvenilirlik): "hız sürücüsü" ile "frekans konvertörü" aynı büyüklük sınıfında, yani talep ikisi arasında seçim yapmıyor; seçim tekrar kuralı ve yazının kendi sözcüğüdür. "Sürücü" tek başına ölçülemez. Karar Recep'in. |
+| 4 | Yumuşak kalkış | Motorun yumuşak kalkışı | "Yumuşak kalkış" tek başına neye ait olduğunu söylemiyor. Konu terimi eklenmedi; bölüm yıldız/üçgen ve yumuşak yol vericiyi de anıyor, başlık bir kıyas ya da üstünlük iddia etmiyor. |
+| 5 | Değişken tork ve sabit tork | Değişken tork ve sabit tork uygulamaları | Mühendis okuyucu için terimler yeterli; "uygulamaları" bölümün yük türlerini (fan, pompa, konveyör) anlattığını söylüyor. Küçük değişiklik. |
+| 6 | Seçim: neye bakılır? | Frekans konvertörü seçerken neye bakılır? | "Seçim" neyin seçimi? Aranan ifadeye en yakın bölüm bu; konu terimi doğal yerde (Y2). Başlıktaki iki nokta kaldırıldı. |
+| 7 | Danfoss FC 51, FC 101 ve FC 102 karşılaştırması | **Değişmez** | Model adları başlığı tek başına anlamlı kılıyor, Y2'nin istisna cümlesi. ⚠Uyarı kolu bu başlığı "konu terimi yok" sayar (bilinen yanlış pozitif); kırmızı olmadığı için sakıncası yok. |
+| 8 | HVAC'a özel işlevler | HVAC uygulamalarına özel sürücü işlevleri | "Neyin işlevleri" belli değil. Bölüm uyku modu, yangın modu ve yerleşik PID gibi sürücü işlevlerini sıralıyor; başlık bunu adıyla söylüyor. |
+| 9 | Türkiye'de verimlilik şartı var mı? | Frekans konvertörlerinde verimlilik şartı var mı? | Neyin verimlilik şartı? Konu terimi eklendi. Not: SSS'de "Türkiye'de frekans konvertörleri için verimlilik şartı var mı?" sorusu zaten var; ikisi aynı soruyu iki yerde soruyor. Bu başlık kuralı değil, içerik tekrarıdır; öneri başlığı sorudan ayırıyor, bölümün birleştirilmesi ayrı karar. |
+| 10 | Kurulumda dikkat edilecekler | Sürücü kurulumunda dikkat edilecekler | Neyin kurulumu? Konu terimi eklendi. |
+| 11 | Güvenlik ve bakım | Sürücü güvenliği ve bakımı | Hangi cihazın güvenliği ve bakımı olduğu tek başına anlaşılmıyor. |
+| 12 | İzlenecek yol | Frekans konvertörü seçiminde izlenecek yol | "İzlenecek yol" neyin yolu? Bölüm yük türünün belirlenmesinden kurulum kurallarına kadar seçim ve kurulum adımlarını sıralıyor. |
+
+**Zorunlu bölümler (bu belge önermez, açık nokta):** "Fiyatı belirleyen etkenler", "Sık sorulan sorular", "Kaynaklar", "Teknik sorumluluk notu" başlıkları kapıda birebir aranıyor (R3); değiştirmek `ZORUNLU_BOLUMLER` ve `kalipDenetle`'yi birlikte değiştirir. Bu ayrı karardır (R11.5).
+
+### SSS soruları (H3)
+
+| Şimdiki | Önerilen | Gerekçe |
+|---|---|---|
+| Frekans konvertörü ile invertör aynı şey mi? | Değişmez | Konu terimi var. |
+| Frekans konvertörü ne kadar enerji tasarrufu sağlar? | Değişmez | Konu terimi var. |
+| Frekans konvertörü motorda ses yapar mı? | Değişmez | Konu terimi var. |
+| Yangın anında sürücü fanı durdurur mu? | Yangın modunda frekans konvertörü fanı durdurur mu? | Cevap "yangın modu" özelliğini anlatıyor ("FC 101'in yangın modu açıldığında…"); "yangın anında" bunu gevşek söylüyor, "sürücü" konu adı değil. |
+| Türkiye'de frekans konvertörleri için verimlilik şartı var mı? | Değişmez | Konu terimi var (bkz. H2 satır 9 notu). |
+| Doğru teklif için hangi bilgileri paylaşmalıyım? | Frekans konvertörü teklifi için hangi bilgileri paylaşmalıyım? | Konu terimi yok; her yazıda aynı soru olduğu için tek başına ayırt etmiyor. |
+
+## 4. Radyal ve aksiyel fan yazısı (`radyal-fan-mi-aksiyel-fan-mi`)
+
+| # | Şimdiki | Önerilen | Gerekçe |
+|---|---|---|---|
+| H1 | Radyal fan mı aksiyel fan mı? Fan nasıl seçilir | Radyal fan mı aksiyel fan mı? Fan nasıl seçilir? | Yalnız soru işareti. İçerik ve adres aynı. |
+| 1 | Radyal ve aksiyel fan nedir? | **Değişmez** | Konu terimi başlığın kendisi. |
+| 2 | Radyal fanlarda kanat tipleri | **Değişmez** | Konu terimi var, bölüm tek başına anlamlı. |
+| 3 | Aksiyel fan türleri | **Değişmez** | Aynı. |
+| 4 | Kayışlı mı doğrudan tahrikli mi? | Fanlarda kayışlı mı doğrudan tahrikli mi? | Neyin tahriki? Tek başına okunduğunda motor mu fan mı belli değil. |
+| 5 | Fan eğrisi nasıl okunur? | **Değişmez** | Konu terimi var. |
+| 6 | En yüksek verim noktasına yakın seçin | Fanı en yüksek verim noktasına yakın seçin | Neyi seçin? Başlık emir kipinde ve nesnesiz. |
+| 7 | Montaj fanın performansını nasıl etkiler? | **Değişmez** | Konu terimi var. |
+| 8 | Hava yoğunluğu ve eğri düzeltmesi | Hava yoğunluğu ve fan eğrisi düzeltmesi | "Eğri" hangi eğri? Bölüm fan eğrilerinin standart yoğunlukla çizildiğini anlatıyor. |
+| 9 | Ses değerleri nasıl okunur? | Fan ses değerleri nasıl okunur? | Neyin ses değerleri? |
+| 10 | Fanlar için verimlilik mevzuatı | **Değişmez** | Konu terimi var. |
+| 11 | Patlayıcı ortam ve duman tahliyesi | Patlayıcı ortam ve duman tahliyesi fanları | Başlık ortamı söylüyor, neyin ortamı belli değil; bölüm bu ortamlara yönelik fanları ve verimlilik tüzüğünün dışında kalmalarını anlatıyor. |
+| 12 | Montaj ve bakım | Fan montajı ve bakımı | Tek başına ayırt etmiyor; 7. başlık da "Montaj…" ile başlıyor. |
+| 13 | İzlenecek yol | Fan seçiminde izlenecek yol | Neyin yolu? |
+
+⚠**Doldurma sınırı:** öneride 13 başlığın 13'ü "fan" sözcüğünü taşıyor, ama yazının konusu fan; ana ifade ("radyal fan") yalnız 2 başlıkta (0,15). Kolun ölçüsü bunu temiz sayar. Aynı sözcüğün her başlıkta geçmesinin okuyucuya ağır gelip gelmediği bir yargı sorusudur, kapı bunu ölçmez; ağır bulunursa 12 ve 13 numaralı başlıklar (montaj ve bakım, izlenecek yol) en kolay vazgeçilebilir olanlardır, çünkü "Montaj" ve "İzlenecek yol" başlıkları bu yazıda başka bir cihaza karışmıyor.
+
+### SSS soruları (H3)
+
+| Şimdiki | Önerilen | Gerekçe |
+|---|---|---|
+| Radyal fan mı daha verimli, aksiyel fan mı? | Değişmez | Konu terimi var. |
+| Aksiyel fan kanala takılır mı? | Değişmez | Aynı. |
+| Fan eğrisindeki verim her devirde geçerli mi? | Değişmez | Aynı. |
+| Fazla büyük fan seçmenin zararı ne? | Değişmez | Aynı. |
+| 327/2011 sayılı AB tüzüğü hâlâ geçerli mi? | Fanlar için 327/2011 sayılı AB tüzüğü hâlâ geçerli mi? | Tüzüğün neyle ilgili olduğu belli değil; tek başına okunduğunda konu dışı bir soru gibi duruyor. |
+| Doğru teklif için hangi bilgileri paylaşmalıyım? | Fan teklifi için hangi bilgileri paylaşmalıyım? | Her yazıda aynı soru; tek başına ayırt etmiyor. |
+
+## 5. Yayına girerse ne olur (maliyet ve risk, ölçülen ve ölçülmeyen)
+
+- **Metin değişir, sha256 değişir (R5.5):** başlık metni yazının parçasıdır; iki yazının onay kaydı yeniden alınır. İddia tablosu değişmez (başlıklara sayı, marka ya da olumsuz iddia eklenmedi); kalıp, atıf ve iç bağlantı kapıları koşar. Başlık-yalnız revizyon için bir tam doğrulama turunun yeterli olup olmadığı **ölçülmedi**; BLG-3'te 10 tur sürmüştü (R10.3 hedefi ≤ 3).
+- **Aynı turda yapılabilecek bekleyen iş:** radyal yazısında "dar toleranslarla" → "küçük boşluklarla" terim notu (BLG-3 tur 10'dan kalan, kaynakta "small clearances"; R5 gereği metin değişince tam tur olduğu için ayrı tur açmamak için buraya bağlandı).
+- **Çapa adresleri değişir** (içindekiler H2'den üretiliyor, R3): depoda bu iki yazıdaki başlıklara `#çapa` bağlantısı **yok** (git grep, 0 sonuç). Dışarıdan (başka site, kullanıcı yer imi) bağlantı olup olmadığı ölçülemez; eski çapa kırılırsa sayfa yine açılır, yalnız bölüme inmez.
+- **`kartOzeti` ve `<title>`:** kart özeti "yazının kendi bölüm başlıklarından" derlendi (kaynak dosyadaki yorum); başlıklar değişirse özet yeniden gözden geçirilir, bu belge özeti değiştirmeyi önermiyor. `<title>` ve meta açıklama bu belgenin kapsamı dışı.
+- **Canlıya etkisi ölçülmedi:** başlık değişikliğinin arama gösterimine etkisi bu belgede iddia edilmez. Google'ın belgelerinde alt başlık metninin sıralamaya etkisi yazılı değildir (R11.2); beklenen fayda okuyucu içindir.
+
+## 6. Karar için (Recep)
+
+1. Başlık değişiklikleri kabul edilsin mi, kısmen mi? Frekans yazısında 10 H2 ve 2 SSS sorusu, radyal yazısında 7 H2, H1'e soru işareti ve 2 SSS sorusu değişiyor.
+2. "Fiyatı belirleyen etkenler" gibi zorunlu başlıklara konu terimi eklensin mi (kapı ve R3 kalıbı değişir)?
+
+
+---
+# FILE: docs\audits\blg3-bulgu-tablosu-2026-10.md
+
+# BLG-3 bulgu tablosu — yazıdan yazıya ders aktarımının 1. adımı (BLG-10)
+
+> **Sahibi:** BLOG. **Kart:** BLG-10 (adım 1). **Durum:** TASLAK; yazıldığı gün 2026-10-13. Bağımsız çürütme turundan geçti (aynı gün); sınıf düzeltmeleri §1, §3, §4, §4.1'de.
+> **Kapsam:** radyal/aksiyel fan rehberi (BLG-3) tur 1 ile tur 10 arası. Frekans yazısının (BLG-4) bulguları aynı şemayla ayrı bölümdedir (§8).
+> **KAYNAK/CETVEL:** [rehber-yazisi-standard.md](../standards/rehber-yazisi-standard.md) v0.7 (R2.2–R2.6, R4.5, R4.6, R5.1 3a–3g, R5.3); kapılar `scripts/rehber/rehber-denetim.mjs` ve `scripts/rehber/alinti-dogrula.mjs`.
+> **ÖNCEKİ ÇALIŞMA:** BLG-7 (#1791 kapı onarımı, açık), BLG-10 kartı, depo dışı tur kayıtları (`blog-calisma/f5`).
+
+Bu belgenin tek işi şudur: BLG-3'te doğrulama turlarında bulunan her gerçek bulgu, "hangi kapı ya da cetvel maddesi bunu bir daha yakalar" sorusuna bağlanır. Tuzak kolunun (sabotaj) koyduğu satırlar bulgu sayılmaz, tabloya girmez, §4'te ayrıca sayılır.
+
+## 1. Sınıf kuralı
+
+Her bulguya üç sınıftan biri verilir. Karar cetvelin metnine ve kapı betiklerinin koşusuna dayanır, kelime sezgisine dayanmaz.
+
+Sınıf, bulgunun **hangi önlemle** önlenebileceğini söyler; o önlemin bu yazıda koşulup koşulmadığını söylemez. İkincisi §4.1'deki **köken** tablosunda satır kümeleriyle verilir. (İlk sürümde ikinci sınıfa "uygulanmadı" denmişti; bağımsız çürütme turu bunu ölçümle desteklenmediği için düzeltti: tur 4'ün bulguları 25 Eylül'de doğrulanmış metinde zaten vardı, kontroller koşuldu ve kaçırdı.)
+
+| Sınıf | Ölçüt |
+|---|---|
+| **mevcut bir kapı yakalayabilirdi** | `rehber-denetim.mjs` ya da `alinti-dogrula.mjs`, taslağa koşunca bulgunun **içeriğini** söylerdi. Betik başka bir sebeple cümleyi işaretliyorsa (ör. tablo satırı eksik) bu sınıf sayılmaz. |
+| **cetvelde vardı** | Cetvelde **adıyla** geçen bir kontrol bu kalemi kapsıyor: R5.1 3d "sayının bağlamı (model mi seri mi)", "cümle içindeki her iddia ayrı", "olumsuz iddia için açık ifade"; 3a eşlenmeyen iddia; 3b/3c; R2.4 künye alanları (yayıncı, başlık, belge sayfası, adres, erişim tarihi); R2.5; R2.6 ve 3g (AB/TR takvimi, yürürlük, değişiklik); R4.5; R4.6. |
+| **yeniydi** | Cetvelde adıyla geçen bir kontrol yok. "DESTEKSİZ sınıfı zaten kapsar" gibi genel bir gerekçe sınıf b için yeterli sayılmaz. |
+
+**Sınır kuralları** (çürütme turundan sonra açıkça yazıldı; **†** ile işaretli satırlar dar okumada c'ye düşer):
+
+- Hüküm **yazılmış ama eksik ya da yanlışsa** b (R2.6 adım 2 "yalnız paketten yazılır" + 3g); **hiç yazılmamış** kapsam cümlesi c, çünkü cetvelde "kapsam tamlığı" adıyla yok. Bu yüzden satır 46 b, satır 19 c.
+- Seri, model ya da üretici kapsamının genellenmesi b (3d "model mi seri mi" ve "cümle içindeki her iddia ayrı"): 9, 10, 30, 35, 47. Olasılığın zorunluluk gibi yazılması ya da kesinlik niteleyicisinin düşmesi c (ifade gücü): 11, 12, 31, 39.
+- Kaynaksız teknik iddia b (R2.2 son fıkra "her teknik iddia en az bir kaynağa bağlıdır"): 40. Cetvelin "genel" türü bu fıkrayla çelişir (§6.1, K5).
+- Cümle içinde alıntıyla örtülen ama kaynakta olmayan yan iddia b (3d "her iddia ayrı"): 36, 44.
+
+## 2. Tablo (48 gerçek bulgu)
+
+| No | Bulgu | Tur | Alt tip | Sınıf | Önerilen kapı ya da cetvel maddesi | Dayanak |
+|---|---|---|---|---|---|---|
+| 1 | ADH "tek fanda 120.000 m³/h, 2.200 Pa": alt seri (0160–0560) değeri seri/tek fan diye yazıldı | 1 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | R1 ÇELİŞİYOR-2; [4] s.7 |
+| 2 | RDH "tek fanda 90.000 m³/h": alt seri (0180–0560) değeri | 1 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | R1 ÇELİŞİYOR-3; [3] s.7 |
+| 3 | AT "65.000 m³/h, 2.500 Pa": aile sayfası değeri; seri sayfası 180.000 m³/h, 1.400 Pa | 1 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | R1 ÇELİŞİYOR-4; [2] s.5, s.7 |
+| 4 | "Nicotra fanlarındaki rulmanlar 40.000 saat": değer kayışlı seriye ait; DD için 20.000 saat | 1 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | R1 ÇELİŞİYOR-5; [2] s.85, [5] s.67 |
+| 5 | 327/2011 eklerinin entegre fanlar için 2037 tarihi: 2025/2481 ile 2027'ye değişmiş, metin eski tüzüğe dayanıyor | 1 | yürürlük/hüküm | cetvelde vardı | R2.3; R2.6 md.3, R5.1 3g; K2 | R1 BAYAT-1; [8] md.9(1), [11] md.1(4) |
+| 6 | "DIN ISO 281-1" standart adı güncel değil; yargı ölçülemedi (KAPALI kaynak) | 1 | standart adı | cetvelde vardı | R2.6 (standart kaydı MEVZUAT'ındır); R5.1 3d BAYAT; yargısız bulgu (hüküm ölçülemedi) | R1 BAYAT-2 |
+| 7 | Meta açıklamadaki "güncel verimlilik şartları": BAYAT-1'in türevi | 1 | bağlam (türev) | cetvelde vardı | R2.3 | R1 BAYAT-3 |
+| 8 | Ek II koşulu düşmüş: AB md.9(1) ve TR geçici md.1(1) "ilk iki paragrafına uygun olarak" yok (satır 78, 135) | 4 | yürürlük/hüküm | cetvelde vardı | R4.6; R2.6 md.3 (3g); K2 | U5 #8,#17,#18; D 10-11 19:27 (1) |
+| 9 | "Üretici eğrileri…" genelleme; kaynak yalnız Nicotra AT kataloğu s.99 | 4 | niceleyici genelleme | cetvelde vardı (sınır †) | R5.1 3d (model mi seri mi, her iddia ayrı); K1 | U5 #2; D 19:27 (2) |
+| 10 | "Düşük sıcaklıklı ve temiz havalı … doğrudan tahrik uygundur": kaynak yalnız aksiyel fanlar (DOE s.11) | 4 | niceleyici genelleme | cetvelde vardı (sınır †) | R5.1 3d (model mi seri mi, her iddia ayrı); K1 | U5 #1; D 19:27 (5) |
+| 11 | "widely" niteleyicisi düşmüş ("geniş ölçüde", DOE s.21) | 4 | niteleyici kaybı | yeniydi | yok; K4 | U5 #4; D 19:27 (3) |
+| 12 | "ister" yazılmış, kaynak "suggest" (önerir): kesinlik fazla | 4 | ifade gücü | yeniydi | yok; K4 | U5 #3; D 19:27 (9) |
+| 13 | "bakım aralıklarını uzatır": kaynak "intervals between repairs", anlam kaymış | 4 | anlam kayması | yeniydi | yok (R2.3 yalnız birebir alıntı) | U5 #5; D 19:27 (9) |
+| 14 | "bir ABD EPA çalışmasında": çalışmanın kaynak yılı yok (1997 dipnotu) | 4 | bağlam (tarih) | cetvelde vardı | R5.1 3d (BAYAT, tarih bağlamı); R2.3 adım 3 | U5 #6; D 19:27 (9) |
+| 15 | "Yeni tüzük 24 Temmuz 2026'dan itibaren uygulanır": "genel olarak" ve hüküm kapsamı eksik | 4 | hüküm kapsamı | cetvelde vardı | R4.6; K2 | U5 #7 |
+| 16 | Patlayıcı ortam cümlesi "yalnız … ve yalnız …" kapsam listesi gibi okunuyor | 4 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | U5 #9 |
+| 17 | "piyasaya arzına ilişkin": kaynak terimi "piyasaya arz edilmesi veya hizmete sunulması" | 4 | terim sadakati | cetvelde vardı (sınır †) | R2.6 adım 2 (mevzuat iddiası yalnız paketten yazılır); terim alanı (§6.1) | U5 #10 |
+| 18 | "Tebliğin esas hükümleri 24 Temmuz 2027'de yürürlüğe girer": Md.12/b kapsamı eksik | 4 | yürürlük kapsamı | cetvelde vardı | R2.6; K2 | U5 #11 |
+| 19 | Patlayıcı ortam başlığı altında kapsam dışı cümlesi yok | 4 | kapsam eksik | yeniydi | yok (kapsam tamlığı maddesi yok) | U5 #12 |
+| 20 | Kayış gerginliği "16 mm/m" ve "iki aşama" üreticiye özgü ölçüt, genel kural gibi yazılmış | 4 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | U5 #13; D 19:27 (4) |
+| 21 | "güncel fiyat ürün sayfasında görünür": canlıda 5 aile sayfasında fiyat yok; cetvel R3 "Fiyat" satırı da aynı kuralı taşıyor | 4 | canlı olgu | yeniydi | BLG-9; K5 | U5 #14; D 19:27 (7); orkestratör ölçümü |
+| 22 | "ilgili belgeyi isteyin [7][8]": [8] (tüzük) belge isteme önerisini desteklemiyor | 4 | yanlış kaynağa atıf | cetvelde vardı | R5.1 3d; R2.1 | U5 #15; D 19:27 (6) |
+| 23 | "Hayır." tek başına: yanıt "Yürürlükten kalktı; iki sınırlı istisna sürer" olmalı | 4 | yanıt biçimi | cetvelde vardı | R4.6 | U5 #16 |
+| 24 | Kaynak [1] sayfa listesi yok (basılı s.3, 4, 6–9, 11, 13, 17–24, 32–34, 80) | 4 | künye (sayfa) | cetvelde vardı | R2.4; K3 | U5 #19; D 19:27 (8) |
+| 25 | Seri etiketleri [2], [4], [5] belge metninde yok (dosya adından) | 4 | künye (başlık) | cetvelde vardı | R2.4; K3 | U5 #20,#22,#23 |
+| 26 | [3] s.5 (kayışlı bilgi) eksik | 4 | künye (sayfa) | cetvelde vardı | R2.4; K3 | U5 #21 |
+| 27 | Erişim tarihleri eski (24.09.2026; yeniden çekim 11.10.2026) | 4 | künye (erişim) | cetvelde vardı | R2.3; K3 | U5 #24–26 |
+| 28 | Teknik sorumluluk notu "değerler üretici belgelerinde": örnek varsayım istisnası eksik | 4 | varsayım işareti | cetvelde vardı | R2.5 (örnek varsayım); R3 teknik sorumluluk notu satırı | U5 #27 |
+| 29 | "iki nokta arasında gidip gelen kararsız davranış": kaynakta yok (DOE s.32) | 5 | kaynakta yok | cetvelde vardı | R5.1 3c, 3d; K5 | U6 #1; D 10-11 19:41 (1) |
+| 30 | SSS "Kayışlı Nicotra fanlarının eğrileri": RZR da kapsanıyor (kaynak başlığı ADH/AT/RDH) | 5 | niceleyici genelleme | cetvelde vardı (sınır †) | R5.1 3d (model mi seri mi, her iddia ayrı); K1 | U6 #2; D 19:41 |
+| 31 | "bir üstünlüktür": kaynak "can be an advantage", kesinlik fazla | 5 | ifade gücü | yeniydi | yok; K4 | U6 #3 |
+| 32 | TR kaldırma hükmü: "24 Temmuz 2027'de yürürlükten kalkacak" ve Ek II kapsamı | 5 | yürürlük kapsamı | cetvelde vardı | R2.6; K2 | U6 #4 |
+| 33 | Kaynak [2] künyesi belge metninde yok ("Centrifugal Fans AT, belt driven, Issue 2.5 EN") | 5 | künye (başlık) | cetvelde vardı | R2.4; K3 | U6 #5 |
+| 34 | Kaynak [5] yıl eksik (kapak: Issue 1.3, Kasım 2012) | 5 | künye (yıl) | yeniydi (ölçümde b→c) | R2.4; K3 | U6 #6 |
+| 35 | e* ölçü işareti yöntemi yalnız düz kayış için tanımlı (AT s.104), genellendi | 6 | niceleyici genelleme | cetvelde vardı (sınır †) | R5.1 3d (model mi seri mi, her iddia ayrı); K1 | U7 #1; D 19:58 (1) |
+| 36 | "fan giriş ve çıkış daralmaları" sistem etkisi olarak kaynakta yok (DOE s.6 yalnız dirsek) | 6 | kaynakta yok | cetvelde vardı (sınır †) | R5.1 3d (cümle içindeki her iddia ayrı); K5 | U7 #2; D 19:58 (2) |
+| 37 | Mevzuat ve kaynak künyelerinde madde no eksik ([8] md.1(3), 9, 10; [11] md.1(4); [9] md.1, 10–12, geçici md.1) | 6 | künye (madde) | yeniydi (ölçümde b→c) | R2.4; K3 | U7 #6–#8 |
+| 38 | "tüm fanları [radyal] [aksiyel] [duman] kategorilerinde": canlıda radyal fanlar Hücreli Aspiratör ve Plug Fanlar kategorilerinde de var | 7 | niceleyici genelleme | yeniydi | yok (site kapsam iddiası maddesi yok); K1, K5 | DG8 #1; D 20:06 (A) |
+| 39 | "Büyük seçilen fan … uzakta çalışır": olasılık zorunluluk gibi yazılmış (DOE s.33) | 7 | ifade gücü (olasılık → zorunluluk) | yeniydi (ölçümde b→c) | R5.1 3d; K4 | DG8 #2; D 20:14 (2) |
+| 40 | "her biri teklif edilen fanı ya da kurulumu değiştirir": kaynaksız sentez; cetvel "genel" türünü sınırsız kabul ediyor | 7 | kaynaksız ifade | cetvelde vardı (sınır †) | R2.2 son fıkra ("her teknik iddia kaynağa bağlıdır"); R5.1 3a; K5 ("genel" tür sınırı) | DG8 #3; D 20:06 (E4), 20:14 (3) |
+| 41 | "çift logaritmik bir diyagramda gösterilir" (özne-yüklem) | 8 | dil | yeniydi | yok (üslup kapısı yok) | DG9 #1; D 10-12 09:41 (satır 50) |
+| 42 | TR: "24 Temmuz 2027'de yürürlüğe girer" cümlesinde o tarihe kadar eski tebliğin yürürlükte kalması yok | 8 | yürürlük durumu | cetvelde vardı | R2.6 | DG9 #2; D 09:41 (satır 82) |
+| 43 | "kayışlı fanlarında doğru gerginlik": kayış tipi (kama) belirtilmemiş; doğrulayıcı B PDF görselini açamadı, orkestratör buldu | 8 | niceleyici genelleme | cetvelde vardı | R5.1 3d; K1 | DG9 #3; D 10:02 (kör nokta), 10-11 20:24 |
+| 44 | Patlayıcı ortam belge isteme cümlesinde [8] atfı yok (R5.1 3b kapsamı "isteyin" fiilini içermiyor) | 8 | atıfsız öneri (yan cümle) | cetvelde vardı (sınır †) | R5.1 3d (cümle içindeki her iddia ayrı), 3a; 3b cümle düzeyinde kalır, K5 yan cümleye genişletir | DG9 #4; D 09:41 (satır 115) |
+| 45 | Kaynak [6] s.44–45 (F400/120 sertifikası) eksik | 8 | künye (sayfa) | cetvelde vardı | R2.4; K3 | DG9 #5; D 09:41 |
+| 46 | Patlayıcı ortam: kapsam koşulu eksik ("yalnız o ortamda çalışmak üzere … özel tasarlanıp pazarlanmış") | 9 | kapsam koşulu | cetvelde vardı (sınır †) | R2.6 adım 2, 3g, R4.6; K2 | DG10 #1; D 10-12 10:02 (1) |
+| 47 | SSS "AT, ADH ve RDH" verim kuralı [2] ile atfedilmiş; [2] yalnız AT kataloğu | 9 | yanlış kaynağa atıf | cetvelde vardı (sınır †) | R5.1 3d (model mi seri mi, her iddia ayrı); K1 | DG10 #2; D 10:02 (2) |
+| 48 | TR "ile düzenlenir" → "düzenlenmiştir": esas hükümler 24.7.2027, o güne kadar önceki tebliğ yürürlükte | 9 | yürürlük durumu | cetvelde vardı | R2.6 | DG10 #3; D 10:02 (3) |
+
+**Dayanak sütunu:** R1–R3 = depo dışı `f5/dogrulama-rapor-N.md`; U5/U6/U7 = depo dışı `f5/uygula-tur5/6/7.py` (#sıra); DG8/9/10 = depo dışı `f5/degisiklik-8/9/10.json` (#sıra); "D hh:mm" = o turun saatli durum kaydı. Bu dosyalar depo dışıdır; depodaki doğrulanabilir karşılığı bu belgedir.
+
+## 3. Sayımlar (yeniden ölçüldü)
+
+| Tur | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | Toplam |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gerçek bulgu | 7 | 0 | 0 | 21 | 6 | 3 | 3 | 5 | 3 | 0 | **48** |
+
+| Sınıf | Satır | Pay |
+|---|---|---|
+| mevcut bir kapı yakalayabilirdi | 0 | %0 |
+| cetvelde vardı | 37 | %77,1 |
+| yeniydi | 11 | %22,9 |
+
+Bunların 10'u sınır (†) satırdır (9, 10, 17, 30, 35, 36, 40, 44, 46, 47): dar okumada b 27, c 21 olur (%56 / %44). "Mevcut kapı yakalayabilirdi = 0" her okumada aynıdır. Satır 11 ters yönde sınırdır (c; olumsuz iddia deseni cümlede ateşliyor ama kaynakta açık ifade var, bozulan niteleyici: K4).
+
+| Alt tip | Satır | Pay |
+|---|---|---|
+| niceleyici genelleme (tek, tüm, yalnız, seri ya da model kapsamı) | 12 | %25,0 |
+| künye (sayfa, başlık, yıl, madde no, erişim) | 8 | %16,7 |
+| yürürlük ve hüküm kapsamı | 7 | %14,6 |
+| ifade gücü, anlam ya da terim kayması | 6 | %12,5 |
+| yanlış kaynağa atıf | 2 | %4,2 |
+| kaynakta yok | 2 | %4,2 |
+| diğer (kapsam eksik, kapsam koşulu, bağlam, canlı olgu, varsayım işareti, standart adı, dil, atıfsız öneri, yanıt biçimi, kaynaksız ifade) | 11 | %22,9 |
+
+Tur 4'ün 21 satırı 27 değişiklik çiftinden gelir: iki künye satırı (25, 27) ve Ek II satırı (8) üçer çifti tek bulguya bağlar. Tur 6'nın 8 çiftinden 3'ü bağlantı metni hizalamasıdır, bulgu sayılmadı; tur 7'nin 5 çiftinden 2'si not niteliğindedir (Vortice atfı, [8] kaldırma satırı), bulgu sayılmadı.
+
+## 4. Yeniden ölçüm: ne ölçüldü, ne bulundu
+
+Araştırmacının sayıları hafızadan ve durum metninden çıkmıştı. Bu belge için şunlar ham dosyadan yeniden ölçüldü:
+
+| Ölçüm | Yöntem | Sonuç |
+|---|---|---|
+| Bulgu çifti sayısı | `uygula-tur5/6/7.py` ve `degisiklik-8/9/10.json` ayrıştırıldı | tur 4: 27 · tur 5: 6 · tur 6: 8 · tur 7: 5 · tur 8: 5 · tur 9: 3. Araştırmacının tablosuyla uyuyor (§3 notu). |
+| Her çiftin eski cümlesi ilgili taslakta var mı | `taslak-turN-11-ekim.md` içinde aranıyor | tur 4–9, 54 çiftin 54'ünde var. |
+| Tuzak sayısı | `tuzaklar-N-GIZLI.json` | tur 1–3: 4'er · tur 4: 5 · tur 5–10: 6'şar; toplam 53. |
+| Tur 1 rapor dökümü | `dogrulama-rapor-1.md` | 11 satır (DESTEKSİZ 3, ÇELİŞİYOR 5, BAYAT 3); bunların 4'ü tuzak (%40'a yükseltilen dirsek etkisi, [3]→[4] atıf, AT→DD yoğunluk, DD rulman yağlama), 7'si gerçek. Tabloyla uyuyor. |
+| `rehber-denetim.mjs` her turun taslağında | `denetle(md, {iddialar})` tur 4–10 taslakları ve iddia tablolarıyla koşuldu | **tur 4: 0 kırmızı**, 27 çiftin 27'sinde kapı çıktısı bulguya değmedi. **Tur 5–10: her turda 2 mevzuat cümlesi** `MEVZUAT-IDDIA-TABLODA-YOK` (aynı iki cümlenin tur tur düzeltilmiş biçimleri). |
+
+**Kapı çıktısının okunuşu.** Tur 5–10'daki iki kırmızı, uzun mevzuat cümlelerinin iddia tablosunda parça parça (başka sözcüklerle, "..." ya da parantezle) girilmiş olmasından gelir; betik tablodaki metni cümlenin alt dizisi olarak arar. Bulgunun içeriğini söylemez. Yalnız tur 5'te bir çift (satır 32, "tebliğin Ek II'sinin ilk iki paragrafına uygun olarak…" cümlesi) bu kırmızıya dolaylı değdi; sebep tablo eksiği olduğu için sınıf **a sayılmadı**. İki ek ölçüm (çürütme turu):
+
+- **Kapı düzeltmeyi cezalandırdı.** Tur 5–10'daki iki kırmızıdan biri satır 17'nin **düzeltilmiş** cümlesidir ("piyasaya arz edilmesi veya hizmete sunulması"); tur 4'te yanlış cümle yeşil, doğru cümle kırmızı çıktı. Sebep yine tablo girdisinin alt dizi eşleşmemesidir; kapı kendi tablosuyla tutarlı olmayan düzeltmeyi hata sayıyor.
+- **`MEVZUAT` deseni "tüzük" ve "direktif" içermiyor** (`rehber-denetim.mjs` satır 107: zorunlu, yasak, yönetmelik, mevzuat, kanun, tebliğ). AB tüzüğü cümleleri (satır 5, 8, 15, 23) `ATIFSIZ-IDDIA` ve `MEVZUAT-IDDIA-TABLODA-YOK` kapsamının dışındadır; kapı bu cümleleri hiç görmüyor. Desen genişlese bile bulgunun içeriğini (Ek II koşulu, değişiklik) söylemez: sınıf a değişmez, ama BLG-7 onarımının kapsamıdır (§6, K0b).
+
+**`alinti-dogrula.mjs` (fonksiyon düzeyi).** Ağ yolu koşulmadı; `alintiBul` ve `hukum` yerel kaynak kopyalarıyla tur 4–10 tablolarına koşuldu: tur 4 GECTI 114, INCELE 7, KALDI 0; tur 5–10 INCELE 9–10, KALDI 0. Tur 4'ün INCELE'lerinden üçü satır 8'in üç çiftidir ve çevre metni Ek II koşulunu ekrana basar; satır 32'nin cümlesi için 24/7/2027'yi basar. Betik kanıtı **gösteriyor, hüküm vermiyor** (işaret kelime sezgisinden); §1'in "başka sebeple işaretliyorsa a sayılmaz" kuralı gereği sınıf **a verilmedi**, ama bu satırlar "betik içeriği ekrana basıyordu, kimse hükmetmedi" kümesidir (§7).
+
+**Kapsam sınırı.** Koşu tur 4–9'un 41 satırında yapıldı (tur 10'da bulgu yok). Tur 1'in 7 satırı için tuzaklı doğrulama kopyası (`taslak-dogrulama-kopyasi-1.md`) `f5`te var ve satırların cümleleri içinde; ama tur 1 anındaki 105 satırlık iddia tablosu diskte yok (eldeki `iddialar.json` tur 3 sonrasıdır), bu yüzden orada kapı hükmü ölçülemedi. Kopyaya eldeki tabloyla koşunca 6 kırmızı çıktı: 1'i tuzak, 5'i `IDDIA-KAYNAGI-LISTEDE-YOK` ([11]); bunlar tablo-metin uyuşmazlığıdır, bulgu içeriği değil. "a yok" hükmü tur 1 için kod okumasından gelir.
+
+### 4.1 Köken: kontrol koşuldu mu?
+
+Aşağıdaki tablo her satırı **o satırın cümlesinin 25 Eylül'de doğrulanmış metinde (`f5/taslak.md`, sha256 66b819a57e6d…) olup olmadığına** göre kümeler. Çürütme çalışanı 41 bulgunun eski cümlelerini bu metinde aradı; bu belgenin yazarı beş satırı ham dosyada ayrıca doğruladı (41, 44, 46, 47 ve satır 8'in "ilk iki paragraf" ifadesinin 25 Eylül metninde ve tur 4 metninde bulunmaması; tur 4 metni 25 Eylül metninden 18 fark satırıyla ayrılır).
+
+| Köken | Satırlar | Sayı | Okuma |
+|---|---|---|---|
+| Tur 1'de yakalandı | 1–7 | 7 | Süreç çalıştı: doğrulama turu bulguyu yazımdan sonra yakaladı. Önlem yazım aşamasında olmalıydı. |
+| 25 Eylül metninde vardı, kontroller koşuldu ve kaçırdı | 8–28 (21) ve 29, 30, 31, 32, 34, 36, 37, 38, 39, 40, 42, 43, 45, 48 (14) | 35 | Tur 1–3, 3f ve 3g (MEVZUAT "doğru") koştu; bu cümleler geçti. Sonradan tur 4 (farklı brifle) ve sonraki turlar yakaladı. |
+| Düzeltmenin yan ürünü | 33, 35, 41, 44, 46, 47 | 6 | Eski cümle metinde yok, bir düzeltmeyle girdi. R5.1 adım 5 (tam yeniden tur) bunlar için var ve yakaladı. |
+
+Ek: satır 16 ve 30'da düzeltici, doğrulayıcının önerdiği ifadeyi uyguladı ve o ifade sonradan bulgu oldu (tur 1 ifade notu 1 ve 9, tur 3 DESTEKSİZ-2); doğrulayıcı önerisi de kontrol gerektirir.
+
+Bu üç kümenin hiçbiri "yazar cetveli okumadı" demek değildir. En ağırı ikincisidir: 35 bulgu, cetvelde adıyla olan kontroller koşulduktan sonra geçmişti. Üstelik tur 1–3'ün "ifade notu" ve "eşlenmeyen iddia" listelerinde (tur 1: 14 + 11, tur 2: 8 + 3) bulgu sayılmayan kalemlerden en az üçü (14, 22, 40) sonradan bulgu oldu; yani görülüp not düşülen, düzeltilmeyen kalem sonradan bulgu oldu. Bu belgenin "gerçek bulgu" tanımı bu notları saymaz (§5).
+
+**Araştırmacıdan farklar (7 satır).** Araştırmacının sonucu a 0 / b 36 / c 12 idi. İlk yeniden ölçümde 6 satır b→c yapılmıştı; bağımsız çürütme turu (§4.1) sonrası 9, 10, 35 geri b'ye döndü ve dört satır c→b oldu. Net: b 37, c 11.
+
+| Satır | Araştırmacı → bu belge | Neden |
+|---|---|---|
+| 39 | b → c | Olasılığın zorunluluk gibi yazılması (ifade gücü) adıyla yok; 11, 12, 31 ile aynı sınıf. |
+| 34 | b → c | R2.4 künye listesinde yayın yılı yok. |
+| 37 | b → c | R2.4 listesinde madde numarası yok; R4.6 yalnız resmî metne atıf ve yürürlük tarihi ister. |
+| 6 | c → b | R2.6 standart kaydının sahibini MEVZUAT yazar; 3d BAYAT sınıfı adıyla var. Hüküm ölçülemedi (yargısız bulgu). |
+| 17 | c → b | Mevzuat terimi R2.6 adım 2 "yalnız paketten yazılır" kapsamında; paketteki terim "piyasaya arz edilmesi veya hizmete sunulması". |
+| 40 | c → b | R2.2 son fıkra: her teknik iddia kaynağa bağlıdır; tur 1 raporu aynı cümleyi E4 olarak işaretlemişti. |
+| 44 | c → b | Yan cümlede kaynaksız öneri: 3d "cümle içindeki her iddia ayrı" ve 3a; 3b yalnız cümle düzeyindedir, bu betik açığıdır (K5). |
+
+## 5. Ölçülemeyenler
+
+- **Tur 4–10 ham doğrulayıcı çıktısı diskte yok** (yalnız `metin.md`, `GOREV-A/B/C.md`). Bulguların kaynağı değişiklik dosyaları ve tur özetleridir; hangi doğrulayıcının hangi bulguyu bulduğu bazı satırlarda belirsizdir (50, 82, 115, [6] s.44 ve tur 9'un üç bulgusu).
+- **Tuzak yakalama oranı** (tur başına 4–6 tuzak) ham çıktı olmadığı için yeniden ölçülemedi; yalnız tuzak sayısı ölçüldü (53).
+- **`alinti-dogrula.mjs` ağ yolu** (kaynak adresini çekme, yönlendirme zinciri, canlı `sonGüncelleme`) koşulmadı; yalnız fonksiyon düzeyi yerel kopyalarla koşuldu (§4). Yönlendirme zinciri ek INCELE verebilir. Bulgu cümlelerinin tabloda sınanacak alıntısı olmaması (en yakın tablo girdisiyle sözcük benzerliği ≤0,1: satır 13, 29) betiğin onları göremeyeceğini söyler, kanıtı koşu değil okumadır.
+- **Tur 1 anındaki iddia tablosu** (105 satır) diskte yok; tur 1'in 7 satırı için kapı hükmü onsuz kesinleşmez. R2.6/3g 25 Eylül 12:58'de (v0.6) girdi; satır 5 ve 7'nin tur 1'de hangi cetvel sürümüyle geçtiği saat düzeyinde ölçülemedi (R2.3 v0.3'ten beri var).
+- **"Gerçek bulgu" tanımı turlar arasında aynı değil.** Tur 1–3 raporları "ifade notu" ve "eşlenmeyen iddia" listeleri taşır (tur 1: 14 + 11, tur 2: 8 + 3) ve bu belge bunları saymaz; tur 4'ten itibaren aynı türdeki kalemler sayıldı. Tur 2 ve 3'ün "0 gerçek bulgu" değeri bu tanımdan gelir. Ayrıca satır 5 ile 7 aynı kökün, 25 ile 33 aynı künyenin, 8, 32, 42, 48 aynı geçiş hükmü zincirinin halkalarıdır: 48 satır 48 bağımsız bulgu değil, kök sayısı daha düşüktür (41 çiftten türeyen 7 çift/zincir elemanı).
+- **Tur 4 brifi** (`tur4-brief.md`) R5.1'de olmayan iki adım taşır: sayfa listesi ve atıfsız cümle taraması. Künye satırlarının (24, 26, 45) tur 1–3'te kapanmaması bu prosedür farkından mı geldiği ölçülemedi.
+- **Satır 30 ve 47'nin içeriksel doğruluğu:** kaynak sayfa ortak blok (aynı "Description" metni, tabloda RZR sütunu var); RZR'nin kapsanıp kapsanmadığı ölçülmedi. Satır 6 (DIN ISO 281-1 güncelliği), 38 (canlı sayfa) ve 21 (canlı fiyat) yeniden ölçülmedi.
+- **Rehber-denetim'in gerçek akışta koşulup koşulmadığı kayıtlı değil.** Taslak depoya girmediği için CI betiği taslağa koşmaz; cetvel R5.3 "numarasız iddia 0" der, koşu kaydı yoktur. Bu, kapı adayı K0'ın (aşağıda) gerekçesidir.
+- **Sınıfı kararsız satırlar:** 6 (kapalı kaynak, standardın güncelliği ölçülemez; hüküm yok), 21 (cetvelin R3 satırı da yanlıştı), 11 (c; olumsuz iddia deseni ateşliyor ama kaynakta açık ifade var, bozulan niteleyici) ve † ile işaretli on satır (§3).
+- Tur 1 ve tur 3 asıl dosyaları `f5`te yok; tuzak eşlemesi rapor metninden.
+
+## 6. Kapı ve cetvel adayları (projeksiyon, ölçüm değil)
+
+Adaylar, bulgu satırlarının "Önerilen kapı ya da cetvel maddesi" sütunundaki etiketlerden toplandı. Etiketli satır sayısı bir kapının yakalayacağı sayı **değildir**; kapı yazılıp sabotajla sınanana kadar iddia edilmez.
+
+| Aday | Ne yapar | Etiketli satır | Tur |
+|---|---|---|---|
+| K0 | Taslağa `rehber-denetim.mjs` koşusunu her turda zorunlu yapar ve çıktısını doğrulama kaydına yazar; uzun mevzuat cümlesi tablo girdisine alt dizi olarak eşleşmediğinde kapı parça parça girişi de kabul eder ya da cümleyi bölmeyi ister | ölçüm bulgusu (satır 32 dolaylı) | 5–10 |
+| K0b | `MEVZUAT` deseni "tüzük", "direktif", "regulation" ve karar numarası kalıplarını (ör. 2024/1834, 2014/34/AB) kapsar; atıfsız ya da tabloda eşleşmeyen AB metni cümlesi kırmızı olur. Aynı onarımda "uzun cümle parça parça girilmiş" alt dizi eşleşmesi için K0'daki çözüm uygulanır | ölçüm bulgusu (satır 5, 8, 15, 23 deseni hiç görmüyor) | 1, 4 |
+| K1 | Niceleyici ya da seri/model adı taşıyan her tablo satırında kapsam alanı (seri/model adı + kaynak başlığı) zorunlu | 13 | 1, 4, 5, 6, 7, 8, 9 |
+| K3 | Künye alanları (başlık, yıl, basılı ve PDF sayfası, madde no, erişim tarihi) kaynak dizini manifestosundan otomatik doldurulur; yazı-liste farkı betikle ölçülür | 8 | 4, 5, 6, 8 |
+| K2 | Her tüzük/tebliğ cümlesinde AB ve TR takvimi ayrı alanda, değiştiren tüzük no ve 3g sonucu zorunlu | 6 | 1, 4, 5, 9 |
+| K5 | "Genel" tür satırlarında sınırlı liste; site kapsamı ve canlı olgu iddiasında DB + canlı ölçüm alanı; öneri fiillerinde `[n]` zorunlu (R5.1 3b genişletmesi) | 6 | 4, 5, 6, 7, 8 |
+| K4 | Kaynak alıntısındaki kesinlik/niteleyici (suggest, can, widely, may, only) Türkçe karşılığıyla sözlükle eşlenir; kesinlik artışı kırmızı | 4 | 4, 5, 7 |
+
+Sınıf **cetvelde vardı** olan 37 satır için kapı yoksa cetvel yetmediğinin kanıtıdır; bunların bağlantısı tablonun son sütunundadır. İlk sürümde bu sınıf "uygulanmadı" diye okunmuştu; §4.1 köken tablosu 35 bulgunun kontroller koşulduktan sonra geçtiğini gösterir. Yani çare "cetveli daha çok uygula" değil, **koşan kontrolün kaçırdığı yeri belirlenimci bir kapıyla kapatmaktır** (K1–K5).
+
+### 6.1 "Yeniydi" sınıfının bağlanacağı yer
+
+Cetvelde adıyla yeri olmayan satırların (sınıf c: BLG-3'te 11, frekansta 5, toplam 16) her biri tek bir yere bağlanır; öncelik sırası kapı > cetvel maddesi > hafıza. Sınıf b satırlarının bağlantısı ana tablonun "Önerilen kapı ya da cetvel maddesi" sütunundadır (K1–K5 etiketleri, §6).
+
+| Satırlar | Bağlanacağı yer | Tür | Sahibi | Ölçüt (kabul) |
+|---|---|---|---|---|
+| F2, F7 (ve b satırları 9, 10, 30, 35, 47) | **K1:** iddia tablosuna zorunlu `kapsam` alanı (seri/model/ortam/uygulama noktası); "tüm, yalnız, her, tek, en yaygın" gibi niceleyici taşıyan cümlede alıntının aynı kapsamı söylediği gösterilmezse kırmızı. R5.1 3d'ye "kapsam" adıyla alt madde | kapı + cetvel | BLOG | `rehber-denetim.mjs` iddia şeması + INV testi; sabotaj: kapsamı daraltılmış alıntıyla genel cümle kırmızı yanar |
+| 11, 12, 31, 39 ve F5, F6 | **K4:** alıntıdaki kesinlik sözcüğü (suggest, can, may, widely, generally, up to, must) ↔ Türkçe karşılığı sözlükle eşlenir; kesinlik artışı ya da azalışı `INCELE`. R2.3'e "kesinlik düzeyi" maddesi | kapı + cetvel | BLOG | `alinti-dogrula.mjs` INCELE kolu; yanlış pozitif ölçümü yapılmadan bloklamaz |
+| F8 | R5.1 3d'ye "aralık mı, ayrık değerler mi" alt maddesi (kaynakta 2, 4, 8, 16 kHz yazan yerde "2 ile 16 arasında" yazılmaz) | cetvel (kapı yazılamaz: sözlükle yakalanmaz) | BLOG | doğrulayıcı brifinde açık soru; sabotaj kolunda bu türden tuzak |
+| 13 (ve b satırı 17) | **Terim sadakati:** iddia tablosuna `kaynak_terimi` alanı (alıntıdaki terim → yazıdaki terim); mevzuat terimi MEVZUAT paketindekiyle birebir (R2.6 adım 2'ye madde) | cetvel + tablo alanı | BLOG + MEVZUAT | kapı yazılamaz (anlam kayması betikle yakalanmaz); doğrulayıcı 3d çıktısında terim satırı |
+| 19 | R2.6 adım 1 paket çıktısına "kapsam dışı koşulları" satırı; yazının mevzuat bölümünde karşılığı yoksa **K2** kırmızı | cetvel + kapı | MEVZUAT + BLOG | MEVZUAT paketi şeması; K2 iddia alanı |
+| 34, 37 | R2.4 künye listesine yayın yılı ve mevzuatta madde numarası; **K3** künyeyi kaynak dizini manifestosundan doldurur | cetvel + kapı | BLOG | yazı listesi ↔ manifest farkı betikle 0 |
+| 38 | **K5:** site/ürün kapsamı iddiası `canli_olcum` alanı ister (DB sorgusu + canlı sayfa); R4'e "site kapsamı iddiası canlı ölçülür" maddesi | cetvel + kapı | BLOG | ölçüm komutu iddia satırında kayıtlı |
+| 21 | BLG-9: R3 "Fiyat" satırı düzeltilir (fiyatın ürün sayfasında görünmesi iddiası canlı ölçüme bağlanır); **K5** canlı olgu alanı | cetvel (BLG-9, OPS onayı) | BLOG | 5 aile sayfasında canlı ölçüm |
+| 41 | Dil/üslup (özne-yüklem uyumu): deterministik kapı yazılamaz. **Hafıza:** sage dersi (audience BLOG) + doğrulayıcı brifine satır | hafıza | BLOG | kapı yok, dürüstçe böyle yazılır |
+
+Özet (c sınıfı: BLG-3 11 + frekans 5 = 16): kapıya dönenler 13 (kapı + cetvel maddesi birlikte: K4 6 · K1 2 · K2 1 · K3 2 · K5 2), yalnız cetvel 2 (F8, 13), hafıza 1 (41). Sınıf b için ayrıca (ana tabloda) K5 bu belgenin ürettiği üç ek kural taşır: "genel" tür sınırı (40), yan cümle atfı (44; `rehber-denetim.mjs` ATIFSIZ-IDDIA desenine öneri fiili listesi), standart adı güncelliği MEVZUAT paketinden (6).
+
+## 7. Okuma
+
+- Mevcut kapılar, koşulabilen 41 satırın (tur 4–9) hiçbirinin içeriğine **hüküm vermedi**; `alinti-dogrula.mjs` satır 8 ve 32 için çevre metnini ekrana bastı (INCELE) ama hükmü kelime sezgisine bıraktı, `rehber-denetim.mjs` hiçbir bulguya değmedi. Tur 1'in 7 satırı için hüküm kod okumasına dayanır. BLG-10'un "kapıya dönen ders öncelikli" önermesi bu veriyle ancak **yeni kapılar yazılırsa** tutar. BLG-7 onarımı (#1791) sonrasında aynı koşu yeniden yapılacak; o ölçüm olmadan onarımın bu satırlara etkisi hakkında hüküm verilmez.
+- **Asıl ders kontrol sayısı değil, kontrolün gücüdür.** 41 bulgunun 35'i, cetvelde adıyla olan kontroller koştuktan sonra geçti (§4.1); tur 4 farklı bir brifle (sayfa listesi + atıfsız cümle taraması) bu 21 bulguyu bir turda yakaladı. Çare "daha çok doğrulayıcı" değil: belirlenimci kapı (K1–K5) ve, olası ama ölçülemedi (§5), tur 4 brifindeki iki adımın R5.1'e taşınmasıdır. Düzeltmeler 6 yeni bulgu üretti: R5.1 adım 5 (tam yeniden tur) bu yüzden gereklidir.
+- Bulguların büyük kısmı üç kalıptan gelir: niceleyici genelleme (%25), künye (%17), yürürlük kapsamı (%15). K1, K3, K2 adayları bu üç kalıbın karşılığıdır.
+- İki yazıda aynı kalıplar tekrar etti: kapsam/niceleyici genelleme (BLG-3 13 satır, frekans 3), künye (8 ve 2), yürürlük kapsamı (7 ve 1), kesinlik kayması (K4: 4 ve 3). Bu, kapı adaylarının yazıya özgü değil rehber türüne özgü olduğunu gösterir; örneklem iki yazıdır, küçüktür.
+- Bu tablo "tur sayısı ≤3" ölçüsünün tabanıdır: BLG-3 tur 4–10 arasında 7 tam tur gerektirdi. Üçüncü yazıda ölçü, hangi adayların yazıldığına bağlıdır; yazılmayan aday için ölçü verilmez.
+
+## 8. Frekans yazısı (BLG-4) bulguları
+
+Ham kayıt depo dışı `f4` altındaki yedi doğrulama raporudur (tur 1–7, 24–25 Eylül). Salt-okuma çalışan çıkardı; sınıf kuralı §1'dir ve BLG-3 ile aynı biçimde uygulandı: çalışanın "sınır" diye b verdiği iki satır (F2 konum bağlamı, F7 "en yaygın" kapsam genellemesi) sayı bağlamı olmadığı için **c** yapıldı. Satır numaraları "F" önekiyle yazılır.
+
+| No | Bulgu | Tur | Alt tip | Sınıf | Önerilen kapı ya da cetvel maddesi | Dayanak |
+|---|---|---|---|---|---|---|
+| F1 | FC 51 IP55 (uzaktan montaj kiti değeri) sürücü gövdesinin koruma sınıfı gibi yazıldı (gövde + tablo hücresi) | 1 | bağlam | cetvelde vardı | R5.1 3d (sayının bağlamı); K1 | rapor-1 §2 Ç3–Ç4; [5] s.33, s.35 |
+| F2 | Tip B RCD "sürücü çıkışında" yazıldı; kaynak besleme (şebeke) tarafı diyor | 1 | bağlam (konum) | yeniydi | K1 (kapsam alanına uygulama noktası) | rapor-1 §2 Ç5; [1] s.82, s.94 |
+| F3 | "sürücülere yönelik IE2 şartı bu değişikliklerle değişmedi": olumsuz iddia, açık ifade yok | 1 | kaynakta yok (olumsuz) | cetvelde vardı | R4.5; R5.1 3d (olumsuz için açık ifade); K5 | rapor-1 §2 D4 |
+| F4 | [11] IEC künyesinde başlık kısaltılmış | 2 (3–6'da tekrar) | künye (başlık) | cetvelde vardı | R2.4 (başlık); K3 | rapor-2 §3; **AÇIK, canlıda ölçüldü** |
+| F5 | "akım düşürme gerektirir": kaynak "Consider derating" | 3 | ifade gücü | yeniydi | K4 | rapor-3 §4 not b |
+| F6 | CT yarı hızın altında "ek hava soğutması gerekebilir": kaynak "must be supplied" (zayıflatma) | 3 | ifade gücü | yeniydi | K4 | rapor-3 §4 not d |
+| F7 | "değişken hız sürücülerinin en yaygın türü frekans konvertörüdür": kaynak "en yaygın biçimi"; gövde + SSS | 5 | niceleyici genelleme | yeniydi | K1 | rapor-5 §2 D3 |
+| F8 | "FC 51'de bu değer 2 ile 16 kHz arasında seçilebilir": kaynakta 4 ayrık değer | 5 | ifade gücü (aralık/ayrık) | yeniydi | R5.1 3d'ye alt madde (§6.1) | rapor-5 §4 N1 |
+| F9 | "Tebliğin maddelerinin çoğu 1 Temmuz 2021'de yürürlüğe girmiştir": sürücü şartı 15 Ağustos 2021'e ertelenmişti; **tur 4 "doğrulandı" dedi, kaçırıldı** | 4 (tur dışında bulundu) | yürürlük/hüküm | cetvelde vardı | R4.6; R2.6 + 3g; K2 | rapor-4 §4 Y7 |
+| F10 | FC 102 için kılavuz kapsamı (355–800 kW) yazılmadan FC 102 ailesi (11–90 kW) için PID/kademe genellemesi | 6 | bağlam (kaynak kapsamı, model mi seri mi) | cetvelde vardı | R5.1 3d; K1 | rapor-6 §4 bağlam notları |
+| F11 | "ABD Enerji Bakanlığı'nın pompa rehberi": kaynak üç kurumun ortak yayını | 6 | künye (yayıncı) | cetvelde vardı | R2.4 (yayıncı); K3 | rapor-6 §4 |
+
+| Ölçü | Değer |
+|---|---|
+| Gerçek bulgu | 11 (tur 1: 3 · tur 2: 1 · tur 3: 2 · tur 4: 0 + 1 kaçırılan (F9) · tur 5: 2 · tur 6: 2 · tur 7: 0) |
+| Sınıf | mevcut bir kapı yakalayabilirdi 0 · cetvelde vardı 6 · yeniydi 5 (F2 ve F7 sınırda: 3d "her iddia ayrı" geniş okunuşu b yapardı) |
+| Tuzak (tabloya girmez) | 26 (7 turda 4, 4, 4, 4, 4, 3, 3); yakalanan 26, çalışanın rapor metninden eşlemesi |
+| BLG-3 ile birlikte | 59 gerçek bulgu: kapı 0 · cetvelde vardı 43 (%73) · yeniydi 16 (%27); sınır satırlar (†) dar okumada cetvelde vardı 33, yeniydi 26 |
+
+**Frekans yazısına özgü ölçülemeyenler.**
+
+- Kapı betikleri frekans taslaklarına koşulamadı: tur 1, 2, 3, 5 asıl dosyaları ve her tur için iddia tablosu `f4`te yok. "Kapı 0" hükmü sentetik cümlelerle yapılan betik denemesi ve kod okumasından gelir; BLG-3'teki gibi taslak koşusu değildir. Çalışanın denemesi: olumsuz iddia deseni "gerekmez/gerektirmez" cümlelerini işaretler, F3'teki "değişmedi" fiilini işaretlemez.
+- Tur 7 yalnız değişen bölgeleri doğruladı; R5.1 adım 5 ("tüm metin") karşılanmadı, sayı alt sınırdır.
+- F9'u bulan kanal kayıtlı değil (tur dışında bulundu).
+- Sayılmayan "sınır" kalemler (13): kesinlik ya da kapsam açısından kayıt notu olan ama bulgu sayılmayanlar, en önemlileri: TR tebliğ Ek-I ham metni yok (IE2 sayısal şartı doğrulanamadı, atıf çıkarıldı), 2023/3 değişikliğinin yazıda anılmaması MEVZUAT kararında, FC aile/kategori sayfası iddiası canlı ölçülmedi.
+- **Yayındaki frekans yazısında bilinen açık kalem:** F4 (canlıda ölçüldü, 13 Ekim: [11] künyesi "Part 3: EMC requirements (kapsam sayfası)" kısa başlıkla duruyor). İki kayıt notu da canlıda duruyor ("tasarruf ayrıca hesaplanmalıdır" ve kaynaksız "toplam maliyete kurulum da girer" cümlesi); bunlar bulgu sayılmadı. Düzeltme R5.5 uyarınca ayrı revizyon olarak aynı doğrulama akışından geçer; kart ayrıca açılır.
+
+
+---
 # FILE: docs\audits\build-skip-canli-olcum-2026-08-28.md
 
 # Build-skip canlı ölçümü — D8.3 deneyi (2026-08-28)
@@ -2317,6 +2886,122 @@ Bakılmadı, çünkü kanıta erişilemedi veya başka şeridin mülkü:
 
 
 ---
+# FILE: docs\audits\ci-test-olcum-2026-10-06.md
+
+# CI Test Ölçümü — 2026-10-06
+
+**Sürüm 1.1 · 2026-10-07 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38 (OPS emri, Recep kararları 296, 297 ve 308) · Cetvel: `docs/standards/test-karnesi-standard.md`**
+
+> **Bu dosya niçin var.** "Hangi test ne kadar sürüyor, neyi okuyor, bir PR'da hangisi gerekli" sorusu her seferinde baştan ölçülüyordu ve ölçüm yalnız ALTYAPI çalışma
+> dallarında ve CI kayıtlarında yaşıyordu. Bu belge ölçümü TEK yere koyar. Dosya başına süre ve sınıf tablosu `docs/audits/ci-test-olcum-2026-10-06.csv` dosyasındadır
+> (605 satır); shard dengeleme ve test seçimi işleri o tabloyu OKUR, bu metin yalnız sonucu ve sınırlarını söyler.
+
+## 1. Ne ölçüldü
+
+| Ölçü | Değer |
+|---|---|
+| Vitest test dosyası | 605 |
+| Test | 6.634 |
+| Dosya sürelerinin toplamı | 873 sn (yerel tam koşu; dosyalar paralel koşar, duvar süresi değil) |
+| Sınıf kaynağı | testin KAYNAĞINDAN statik çıkarım: dosyanın okuduğu yol dizgeleri (`okunan_yollar`) ve sınıfı |
+| CI'da Test adımı | 6 dk 25 sn (master koşusu 2026-10-06, OPS ölçümü) |
+
+⚠ Süreler yerel, filo yükü altında ölçüldü: **sıralama ve pay güvenilir, mutlak saniye değildir** (kanca testleri alt süreç açtığı için yükte şişer). Mutlak süre için
+CI'daki Test adımı esas alınır.
+
+## 2. Sınıflar (yol sınıfı = testin okuduğu yollar)
+
+| Sınıf | Anlamı | Dosya | Süre payı |
+|---|---|---|---|
+| `belge-kanca-arac` | yalnız docs/, .claude/, .agent/, scripts/, tools/ okur | 94 | %21,6 |
+| `karma` | hem kaynak kod (src/) hem belge/betik okur | 87 | %53,1 |
+| `kod` | yalnız src/ okur | 100 | %3,1 |
+| `yol-yok` | hiçbir yol dizgesi okumaz (içe aktarılan koda dayanır) | 324 | %22,2 |
+
+Küme (klasör türü) gözüyle: conformance 345 dosya ve süre payı %89,4; birim 213 dosya ve %8,2. Dosya sistemi kullanan 299 dosya süre payının %90,4'ünü taşır:
+**Test süresi dosya okuyan kapılardadır; saf kod testi payı %6,7'dir (yaklaşık 20 sn).** Bu yüzden `Build` atlamak (ALT-38c, cetvel §4.1) Test'i küçültmez; Test'i
+küçültmek ya paralel bölmek (shard) ya da PR'da yalnız ilgili testleri koşmaktır (karar 308).
+
+## 3. Yoğunlaşma (shard dengesi için)
+
+| Ölçü | Değer |
+|---|---|
+| İlk 10 dosyanın payı | %56,0 |
+| İlk 50 dosyanın payı | %85,6 |
+| En uzun dosyalar | `sessionstart-tavan` 130 sn, `sessionstart-pencere-adi` 71 sn, `merge-sonrasi-ileri-sar` 67 sn, `departman-ac-kapat` 42 sn, `taban-tazele` 38 sn |
+
+Sonuç: **shard'lar dosya SAYISINA göre değil SÜREYE göre dengelenmelidir** (`--shard=i/N` dosya sayısına böler; tek bir 130 sn'lik dosya bir shard'ın alt sınırını belirler).
+Büyük dosyaların hepsi kanca/araç testidir (alt süreç açar); onların tetiği `.claude/hooks/` ve `scripts/` yollarıdır (karar 308 haritasının ilk adayları).
+
+## 4. Sınırlar
+
+- Sınıf statik çıkarımdır ve **kesin değildir**: dosyanın kaynakta adını andığı yol dizgelerine bakar; hesaplanan yolları (`path.join(kok, ad)`) göremez. Bu yüzden test seçimi
+  (karar 308) bu tabloya tek başına dayanmaz: değişen dosya ∩ `okunan_yollar` seçer, ayrıca `vitest related` ve master push ile gece tam koşusu güvenlik ağıdır.
+- `yol-yok` hiçbir şey okumadığı anlamına gelmez, "yol dizgesi bulunamadı" demektir; seçimde `related` ile birlikte kullanılır.
+- Tablo bir anlık görüntüdür (2026-10-06); yeni test dosyası eklenince satırı yoktur: seçim ve shard betikleri satırı olmayan dosyayı HER ZAMAN koşar (güvenli yön).
+
+## 5. İşler ve satırlar
+
+| İş | Durum | Bu tabloya etkisi |
+|---|---|---|
+| ALT-38c-1 Build ve e2e atlama, iki önbellek (#1739) | birleşti 2026-10-07 12:59 | ölçüm: §6 |
+| ALT-38c-2 shard, süreye göre dengeli (#1741) | birleşti 2026-10-07 14:02 | `sure_sn` sütunu girdi; ölçüm: §7 |
+| ALT-38c-3 `isolate: false` ölçümü (birleşme YOK) | ölçüldü | §8: önerilmez |
+| Karar 308 test seçimi (harita, seçici, CI bağlama) | sürüyor | `okunan_yollar` sütunu girdi; seçici ve geriye dönük doğrulama (kaçırma 0) bitmeden birleşmez |
+
+## 6. Canlı ölçüm: değişiklik sınıfı (ALT-38c-1, #1739)
+
+Saf belge PR'ı (bu PR'ın iki dosyası) aynı commit için iki tabana karşı koşturuldu. Süreler GitHub Actions iş API'sinden okundu (adım başına saniye); koşucu değişkenliği
+yüksektir (aynı Test adımı 252-387 sn arasında çıktı), bu yüzden tek koşu "kesin" değil **büyüklük sırası**dır.
+
+| Koşu | `ci` (zorunlu) | `admin-smoke` (zorunlu) | Test | Build | Not |
+|---|---|---|---|---|---|
+| ÖNCE: `master` tabanı (eski `ci.yml`), 2026-10-07 09:04Z | 11:41 | 4:31 | 387 sn | 182 sn | her şey koşar |
+| #1739'un kendi koşuları (sınıflayıcı tabanda yok → `tam`) | 11:34 (soğuk), 8:32 (sıcak) | 5:02, 4:42 | 362, 270 sn | 187, 124 sn | önbellekler: sıcak koşuda Test −92 sn, Build −63 sn (tek örnek) |
+| SONRA: aynı commit, taban #1739 dalı (sınıf `belge`), 2026-10-07 | 8:09 | 0:09 | 359 sn | atlandı | Build ve e2e atlandı; `admin-smoke` adı değişmedi ve yeşil; Test belge PR'ında da koşar (kabul edilmiş sapma) |
+
+PR'ın duvar saatiyle toplam bekleme süresi (kontrol listesinde en geç biten): 11:45 → 8:13. Koşular: `ci` 37600486604, `admin-smoke` 37600486557.
+
+## 7. Canlı ölçüm: shard (ALT-38c-2, #1741)
+
+Aynı belge PR'ı ve #1741'in kendisi, shard'lı `ci.yml` ile koşturuldu (4 test işi, süreye göre dengeli; `ci` işi aynı koşunun tüm shard'larını bekler; eksik, iptal ya da zaman aşımı kırmızıdır):
+
+| Koşu | PR toplam bekleme | `ci` | Shard işleri | `admin-smoke` | Önceki |
+|---|---|---|---|---|---|
+| Belge PR'ı (#1740, taban shard dalı), koşu 37609561091 | 3:17 | 196 sn (checkout 17, install 35, lint 46, shard bekleme 64) | 129 / 139 / 160 / 184 sn | 11 sn | 11:45 |
+| Kod PR'ı (#1741, 3. koşu), koşu 37608967577 | 4:56 | 254 sn | 116 - 195 sn | 295 sn (en uzun) | 8:32 - 11:34 |
+
+Kuyruk beklemesi (işin oluşması ile başlaması arası) 3 - 6 sn çıktı. En yoğun an 14:05: dört koşu üst üsteydi (master push, #1740'ın `edited` koşusu, iki dependabot koşusu); 20 eşzamanlı iş sınırına bu yükte ulaşılmadı.
+
+Shard KULLANMAYAN yollar (tasarım gereği, `if: pull_request && action != edited`): PR `edited` koşusu ve master push, testi `ci` işinde tek parça koşturur; ölçülen süreleri 485 - 594 sn'dir (koşular 37611432500, 37611431117, 37610218248).
+Master push'unu kimse beklemez. `edited` koşusu yalnız aynanın atlayamadığı durumda uzar: mekanizma yolları (`scripts/ci/`, `.github/workflows/`, `vitest.config.ts`, `package.json`) değişen PR'lar ve tabanı değişen PR'lar. Bu yüzden böyle bir PR'ın gövdesi ilk tam koşudan sonra TEK seferde düzenlenir.
+
+## 8. `isolate: false` ölçümü (ALT-38c-3, birleşme YOK)
+
+Ayrı deneme dalında, elle tetiklenen iki koşu (dalın birleşme isteği yoktur):
+
+| Koşu | Test adımı | Sonuç |
+|---|---|---|
+| master (yalıtım açık, bugünkü ayar), koşu 37607367998 | 229 sn | yeşil |
+| deneme dalı, `isolate: false`, koşu 37607362408 | 213 sn (−16 sn, −%7) | kırmızı: 23 test dosyası düştü (`Test Files: 23 failed, 598 passed, 2 skipped`) |
+
+Sonuç: kazanç küçük, kırılan test çok; **önerilmez**. Test süresini asıl küçülten iş, shard (§7) ve PR'a göre ilgili testlerin seçilmesidir (karar 308).
+
+## 9. Gereksiz olabilecek testler: ADAYLAR (silme YOK)
+
+OPS emri (2026-10-07): dünkü gereksiz test adayları gerekçeli listelenir, **hiçbiri silinmez**. Kaynak: ALT-38b karne denemesi (620 test dosyası, CI geçmişi 2026-07-06..2026-10-07, sabotaj ölçümü). Bu tablo hüküm değil adaydır; silme listesi karneyle Recep onayına gelir.
+
+| Test | Neden aday | Ölçülen kanıt | Süre (yerel, şişkin) | Kaldırılırsa ne düşer |
+|---|---|---|---|---|
+| `bash-write-audit-uretilmis-sinifi` (6 test) | Ana sabotajı üç başka test de yakalıyor; pencerede hiç kırmızı vermedi | Tek sabotaj denendi (manifest okunamazsa dosyanın "üretilmiş" sayılması): bu test ile `bash-write-audit-claude-deposu`, `-merge-muafiyeti` ve `-tree` kırmızı verdi | 8,4 sn | Ana sabotaj yine yakalanır. Testin öbür maddeleri (üretilmiş artefaktın ihlal sayılmaması, gerçek ihlalin yine ötmesi) için ayrı sabotaj ölçülmedi: silmeden önce o maddeler başka bir teste taşınmalı |
+| `e1-kimlik-kontrolu` (10 test) | `lane-precommit-merge` aynı sabotajda da kırmızı; pencerede hiç kırmızı vermedi | Tek sabotaj (tanınmayan kimlikte fail-open) iki testte kırmızı; karne notu: kapı davranışında örtüşme var | 7,5 sn | Kimlik öncelik kuralları (asıl kimlik dosyadaki vekil kimliğe üstündür; tanınmayan kimlik çakışan claim'de bloklar) yalnız bu testte duruyor: birleştirme düşünülür |
+| `storage-yazma-nobetcisi` (10 test) | `anon-yazma-nobetcisi` aynı ana sabotajda (nöbetçi adımına `continue-on-error`) birlikte kırmızı; pencerede hiç kırmızı vermedi | Ek sabotaj (fail-closed davranışı) yalnız bu testte denendi ve kırmızı. `anon-yazma-nobetcisi`nin `\|\| true` sabotajına kör olduğu ölçüldü; bu testte aynı sabotaj denenmedi | 0,19 sn | Silinirse `\|\| true` koluna karşı ÖLÇÜLMÜŞ koruma kalmaz: silme önerilmez, birleştirme ya da o sabotajın bu teste de uygulanması önerilir |
+| `instruction-surface-ppr` (3 test) | İki sabotajın ikisi de yeşil kaldı (karne "sahte yeşil adayı" dedi) | Sabotajlar commit'siz (çalışma ağacı ve indeks) uygulandı; test ise `git grep … HEAD` ile commit'lenmiş içeriği okur: ölçüm yönteminin sınırı olabilir. Pencerede 1 kez (2026-09-08, dalda) kırmızı verip düzeltildi | 0,4 sn | ADAY SAYILMAZ, yeniden ölçüm adayıdır: sabotaj commit'lenerek tekrarlanana kadar hüküm yok. CI commit'lenmiş içeriği koşar |
+
+Dört testin toplam süresi yaklaşık 16,5 sn: dosya sürelerinin toplamının (873 sn) yaklaşık %1,9'u. **Silmek CI beklemesini anlamlı kısaltmaz**; bu liste sadeleştirme içindir, hız için değil. Hiçbiri silinmedi; silme listesi karneyle (ALT-38b) Recep onayına gelir.
+
+
+---
 # FILE: docs\audits\dealer-data-ground-truth-2026-06-11.md
 
 # B2B/Bayi Veri Katmanı — Doğrulanmış Gerçek Zemin (2026-06-11)
@@ -2607,6 +3292,171 @@ Ayrıca `model_code` boş olan ürün **ölçülemez**, ayrı sınıfta tutulur;
 * **İçe alım boşlukları** → REC önerisi (açmayı OPS yapar).
 * **Ticari boşluklar** → Recep'e OPS taşır; AVenS'ten istenecek kalem.
 * Fiyat **yazılmadı**; bu iş yalnız sınıflandırmadır.
+
+
+---
+# FILE: docs\audits\geo-dizin-tetigi-olcum-2026-10-16.md
+
+# Dizin tetiği ölçümü ve otomatik tetik tasarımı (SEO-55, 2026-10-16)
+
+Cetvel: `docs/standards/yayin-gorunurluk-denetim-standard.md` Y2.1 · `docs/standards/rendering-cache-standard.md` (DB tetiği ↔ webhook dalı).
+Yöntem: kod okuma (`src/app/api/webhook/supabase/route.ts`, `src/lib/seo/indexnow.ts`, `src/config/features.ts`), canlı veritabanında salt okuma sorguları (tetik listesi, tablo-sütun taraması), iş akışı dizini taraması. Canlıya yazım yok. Sorgu/arama verisi bu dosyaya girmedi (P6).
+
+## 1. Soru ve kısa cevap
+
+Soru: sayfa metni, adresi ya da meta açıklaması canlıda değişince arama motorlarına kendiliğinden haber gidiyor mu?
+
+Cevap: DB yazımı webhook'a kadar kendiliğinden gidiyor, webhook IndexNow'u çağırıyor, ama **ürün, kategori ve marka adresleri bugün süzgeçte düşüyor**; kod deploy'u için hiçbir tetik yok; Google için kuyruk yok. FC 101 olayı bu üç boşluğun toplamıdır.
+
+## 2. Ölçülen zincir
+
+| Halka | Durum | Kanıt |
+|---|---|---|
+| DB yazımı → webhook | VAR. 9 tabloda tetik, hepsi `AFTER INSERT/UPDATE/DELETE`, sütun filtresi yok (`UPDATE OF` yok): metin, slug, meta yazımı webhook'a gider. Tetiği olan tablolar: products, product_families, categories, brands, product_images, product_prices, price_lists, inventory_movements, site_settings (yalnız `satis_kipi`). | `pg_trigger` sorgusu, 16 Ekim |
+| Metin taşıyan tablolar tetiksiz mi? | Yalnız `product_authorities` (sayfa kodu kullanmıyor: `src/`te yalnız tip dosyası) ve `product_search_index` (iç arama). Sayfa metni taşıyan tablo açıkta değil. | tablo-sütun taraması |
+| Webhook → IndexNow | VAR ve yalnız fiyat/stok DEĞİL: `indexNowBildir(revalidatedPaths)` tek çağrıyla her dalın tazelediği yolları bildirir. (REC-127 notundaki "yalnız fiyat/stok" ifadesi yanlış okunmuş.) | `route.ts` 794. satır |
+| IndexNow süzgeci | **KAPALI-KİP DÜŞÜRÜR.** `ADRES_SEMASI_K3B = false` iken `indexNoweGiderMi` `/tr/products`, `/tr/category`, `/tr/brands` ve tüm ürün/kategori/marka yollarını düşürür; yalnız bilgi merkezi, destek, hakkımızda, iletişim, ürün seçici ve dil kökü gider. Sonuç webhook yanıtında `atlandi/yayin-oncesi` görünür ama kalıcı kaydı yoktur. Gerekçe: K4 (adresler K3-b açılınca değişecek, arama motoruna eski şemayı öğretme). | `indexnow.ts` 176-188; `features.ts` 131; test `indexnow.test.ts` "bayrak KAPALI" |
+| Webhook sonucunun kaydı | YOK. pg_net yanıt tablosunda saatlik tutuluyor (30 günlük sorguda tek satır); Vercel günlüğüne yalnız hata düşüyor. "IndexNow gitti mi" sorusunun geçmişe dönük cevabı yok. | `net._http_response` sorgusu |
+| Kod deploy'u → dizin | YOK. `.github/workflows` altında `deployment_status` ya da deploy hook yok. Şablon değişikliği (başlık formülü, meta kırpma, JSON-LD) hiçbir bildirim üretmez. | iş akışı dizini taraması |
+| Google dizin isteği | Otomatik yolu YOK. Hizmet hesabı URL denetimi API'si yalnız inceler; dizin isteği Search Console arayüzünde, günlük sınır 11 (SEO-54'te ölçüldü). Haritadaki `lastmod` dışında kendiliğinden Google'a haber yolu yok. | SEO-45, SEO-54 |
+| Harita `lastmod` | Aile: ailenin ve aktif varyantlarının en son `updated_at`'i (REC-454). Marka, sabit sayfa: `lastmod` yok. Yani metin değişimi aile için haritaya yansır, marka metni yansımaz. | `src/app/sitemap.ts` |
+
+## 3. FC 101 olayının sebep zinciri
+
+1. Aile adresi (slug) DB'de değişti. Tetik çalıştı, webhook eski ve yeni yolu tazeledi.
+2. IndexNow süzgeci K4 gereği ürün adresini düşürdü; kayıt kalmadı. Kimse GEO-SEO'ya haber vermedi.
+3. Google eski adresi eski metniyle dizinde tutmaya devam etti; yeni adres için "bilinmiyor" döndü.
+
+Metin düzeltmesinin yayılmaması değil, **adres değişimine bağlı bildirimin hiç gitmemesi** sorundu.
+
+## 4. Kararı bekleyen nokta: K4 ile "her değişiklikte dizinle" çelişiyor
+
+K4 (2026-09-03) ürün/kategori/marka adreslerinin IndexNow'a gitmemesini ister; 16 Ekim talimatı "canlıya çıkan her değişiklik bildirilsin" ister. İkisi aynı anda geçerli olamaz.
+
+Önerim: **K4 gevşetilsin.** Bugün canlı olan, haritada listeli ve 200 veren adresler bayrak kapalıyken de gitsin. Gerekçe: IndexNow yalnız "bu sayfa değişti" der; K3-b açılınca eski adres 308 ile yeni adrese gider ve arama motorları 308'i izler; Google bu adresleri zaten haritadan biliyor. Bedeli: Bing, eski şemayı kısa süre öğrenir. K4 Recep kararıdır; değiştirme yetkisi OPS üzerinden Recep'tedir.
+
+## 5. Tasarım (üç parça, DB yazımına bağımlılığı azaltan yedekli)
+
+**Parça A: hızlı yol (webhook, ÜRÜN).** K4 kararı gevşerse `indexNoweGiderMi` kapalı kipte haritada olan adresleri geçirir (test gerektirir: INV-INDEXNOW-1 güncellenir). Ek: webhook `indexNow` sonucunu `console.warn("[IndexNow] durum=… gonderilen=…")` ile Vercel günlüğüne yazar; kalıcı kayıt şimdilik bu. Kalıcı tablo gerekirse ayrı karar (migration = Recep kapısı).
+
+**Parça B: yedek ve kod değişimi yakalayıcı (betik, GEO-SEO).** `scripts/seo/degisen-adres-bildir.mjs`: canlı site haritasını ve her adresin `title / meta description / H1` özetini (hash) önceki tabanla karşılaştırır; değişen ya da yeni adresleri IndexNow'a gönderir, Google kuyruk dosyasını (depo dışı) üretir. DB tetiğinden bağımsızdır: webhook düşse, toplu yazım tetiği atlasa, şablon kodu değişse de yakalar. `--kuru` ilk koşu, taban ilk koşuda alınır. Öncelik: yeni adres > metin değişimi > yalnız `lastmod`.
+
+**Parça C: tetik (iş akışı, ALTYAPI).** `.github/workflows/dizin-tetigi.yml`: (1) `deployment_status` production `success` olunca B'yi koşar, (2) günde bir cron yedeği (DB yazımı için), taban önbellekte (depo dışı). `permissions: contents: read`. Sır gerekmez (IndexNow anahtarı kamuya açıktır).
+
+**Google (GEO-SEO, günlük).** Kuyruk dosyasından günde 11 adres Search Console'da dizin isteği alır; bu adım tarayıcı oturumuyla yapılır ve benim günlük koşumdur, Recep'ten bir şey beklemez. Tam otomatik olmayan tek halka budur; sınırı Google koyuyor.
+
+## 6. Kim neyi yapacak
+
+| İş | Sahip | Önkoşul |
+|---|---|---|
+| K4 gevşetme kararı | Recep (OPS iletir) | Bu not |
+| `indexNoweGiderMi` kapalı-kip düzeltmesi + sonuç günlüğü + test | URUN (webhook rotası: ÜRÜN/EDGE) | K4 kararı |
+| `degisen-adres-bildir.mjs` + testi + taban | GEO-SEO | yok (K4'ten bağımsız, hemen başlanır) |
+| `dizin-tetigi.yml` | ALTYAPI | betik birleşmiş olacak |
+| Cetvel Y2.1: "dizin tetiği otomatiktir" maddesi | GEO-SEO | Parça B-C canlı |
+| Kesik meta açıklamalı 25 sayfanın veri düzeltmesi | URUN (SEO-54 notu) | yok |
+
+## 7. Bitiş ölçütü (karttan)
+
+İnsan tetiği olmadan bir canlı değişiklikte IndexNow `200` kaydı görülünce SEO-55 Done. Kayıt kaynağı: Parça C'nin Actions koşu günlüğü (ya da Parça A günlüğü). Ölçülmeden "oldu" yazılmaz.
+
+
+---
+# FILE: docs\audits\geo-sessiz-fan-2026-10-16.md
+
+# "Sessiz fan" arama görünürlüğü ölçümü (SEO-53, karar 375)
+
+> **Sahibi:** GEO-SEO · **Ölçüm günü:** 2026-10-15 gece (TR) · **Cetvel:** `docs/standards/pazar-olcum-standard.md`
+> (P2 ön veri, **P6 depoya girmeyen veri**), `docs/standards/yayin-gorunurluk-denetim-standard.md` Y2.1,
+> `docs/standards/rehber-yazisi-standard.md` · **Tazelik:** yayından sonra 3., 7. ve 14. günde yeniden ölçülür.
+>
+> **P6 notu (okuyucu için):** depo herkese açıktır. Bu dosyada sorgu listesi, hedef anahtar kümesi, rakip adı ve
+> adresi **yoktur**; yalnız yöntem ve özet sayılar vardır. Ayrıntı Kanban kartlarındadır: SEO-53 (ölçüm, küme,
+> rakip tablosu), BLG-15 (rehber brifi), URN-135 (kategori ve Lineo Quiet sayfası brifi).
+
+## 1. Soru
+
+Karar 375: "sessiz fan" aramasında Google ilk sayfasında görünmek. Bunun için (a) bugün hangi sorgularda ve hangi
+sayfamızla görünüyoruz, (b) gerçek Türkiye sonuç sayfasında ilk sayfayı kim tutuyor ve nasıl sayfalarla, (c) hangi
+sorgu kümesi gerçekçi, (d) yayına giren rehber ve ürün/kategori sayfaları ne taşımalı.
+
+## 2. Yöntem
+
+| Adım | Ne yapıldı | Kaynak ve sınır |
+|---|---|---|
+| Kendi görünürlüğümüz | Search Console arama analitiği, hizmet hesabı API'si, 2026-07-15 → 2026-10-12, `dataState=all`. Sorguda "sessiz", "quiet", "lineo", "kanal fan", "aspiratör", "banyo fan", "duct fan", "inline" geçen satırlar (sorgu × sayfa) ve adresinde "sessiz", "quiet", "lineo" geçen sayfalar (sayfa × sorgu) | OPS emri tarayıcıyı önermişti; aynı mülk ve aynı veri API'den okundu, çünkü süzgeçli sorgu satırlarını dar arayüz bölmesinde güvenilir okumak mümkün değil (sapma kartta yazılı). Mülk 2026-08-28'de kuruldu: pencerenin gerçek uzunluğu ~6 hafta |
+| Gerçek SERP | Google Türkiye, oturumsuz (`hl=tr`, `gl=tr`, `num=10`, `pws=0`), yerleşik tarayıcıdan, 13 sorgu: hedef 5 + ek 8 (havalandırma, "nasıl seçilir", dB niyeti). Her sorgunun organik başlık ve adres listesi alındı; yapay zekâ özeti ve reklamlar sayılmadı | Sıralama tek alımdır (2026-10-15 gece), kişiselleştirme kapalı; SERP günden güne oynar |
+| Sayfa yapısı | İlk sayfada çıkan 25 rakip sayfa (kategori/ürün 16, rehber/blog 9 geçerli) ile kendi 3 sayfamız canlı çekildi: title, meta açıklama, H1/H2, JSON-LD türleri, görünür kelime sayısı, "sessiz" geçiş sayısı, SSS var mı | Sunucu HTML'i (JavaScript çalıştırılmadı): Googlebot'un ilk gördüğü içerik. İki rehber adresi (404 verenler) sayıma girmedi |
+| Kendi sayfalarımız | Kategori ve Lineo Quiet aile sayfası aynı yöntemle çekildi; ÜRÜN'ün 15 Ekim ölçümüyle karşılaştırıldı (kelime sayısı ve "sessiz" sayısı birebir tutuyor) | OPS-157'nin "kategoride 'sessiz' 0" ölçümü bu yöntemle doğrulanmadı: sunucu HTML'inde **2** (ÜRÜN da aynı sonucu buldu) |
+
+## 3. Bulgular (özet sayılar)
+
+### 3.1 Bugünkü görünürlüğümüz
+
+- Hedef sorgu ailesinde son ~6 haftada **toplam 8 gösterim, 0 tık**. Genel "sessiz fan" aramasında **gösterim 0**.
+- Görünen iki sayfa: kanal tipi fanlar kategorisi ("sessiz" içeren sorgularda ortalama sıra 46 ile 82 arası) ve
+  Lineo Quiet ürün sayfası (marka sorgusunda sıra 2 ile 24 arası, birkaç gösterim).
+- Lineo Quiet ürün sayfası şu an **308 ile yeni adrese** (adında "sessiz-kanal-fanlari" geçen) gidiyor; gösterimlerin
+  tamamı eski adreste. Google'ın yeni adresi yeniden değerlendirmesi sürüyor.
+
+### 3.2 İlk sayfa kimin elinde
+
+| Sorgu sınıfı | İlk sayfanın bileşimi | Bizim için anlamı |
+|---|---|---|
+| Genel "sessiz fan" | Çoğunluğu pazar yeri ve fiyat karşılaştırma sayfaları, forumlar, bir iki HVAC kategori sayfası; niyet karışık (bilgisayar fanı, vantilatör, soğutucu, HVAC) | Üretici/bayi kategori sayfası ancak "kanal/aspiratör" bağlamıyla girer; hafta sonunda ilk sayfa **beklenti değil, hedef** |
+| "Sessiz kanal fanı / kanal tipi fan" | Kategori sayfaları (bayi ve üretici), ince; ürün ve video | Rakipler zayıf ve şemasız; bizim kategori sayfamız başlığında "sessiz" taşımıyor |
+| Marka/model (Lineo Quiet) | Üretici ve yetkili satıcı sayfaları, blog yazıları | Ürün sayfamız zaten görünüyor; adres değişikliğinin oturması gerekiyor |
+| "Banyo fanı / aspiratör" sınıfı | Pazar yerleri ve banyo fanı satıcıları | Lineo Quiet bir **kanal** fanıdır; niyet uyumsuz. Uygun ürün ailesi yoksa hedef dışı |
+| "Nasıl seçilir / kaç dB" (bilgi) | Küçük bayi ve üretici blogları, forumlar | Rehber için **açık alan**: rakip rehberler kısa ve tek tek şemasız |
+
+### 3.3 Rakip sayfa yapısı (ilk sayfada çıkanlar, sunucu HTML'i)
+
+| Ölçü | Kategori/ürün sayfaları (n=16) | Rehber/blog sayfaları (n=9) | Bizim kategori | Bizim Lineo Quiet |
+|---|---|---|---|---|
+| Görünür kelime, medyan (en az – en çok) | 585 (175 – 1514) | 665 (368 – 2682) | 588 | 624 |
+| "sessiz" geçiş sayısı, medyan | 7,5 | 8 | 2 | **0** |
+| Title'da "sessiz" | 14 / 16 | 6 / 9 | **yok** | **yok** |
+| H1'de "sessiz" | 8 / 16 | 4 / 9 | **yok** | **yok** |
+| JSON-LD var | 4 / 16 | 8 / 9 | CollectionPage + BreadcrumbList | ProductGroup + BreadcrumbList |
+| Görünür SSS bölümü | 0 / 16 | 2 / 9 | var | **yok** |
+| En az 3 H2 | 4 / 16 | 8 / 9 | 6 | 3 (tekrarlı) |
+
+Okuma: çıta düşük. Rakipler ya ince kategori sayfası ya kısa blog; bizim sayfalarda eksik olan **kelimenin
+kendisi** (title, H1, ilk metin, ses verisi bloğu), uzunluk ya da şema değil.
+
+### 3.4 Kendi sayfalarımızdaki teknik bulgular (URN-135'e)
+
+- Lineo Quiet aile sayfasında iki H1 var ve ikisi aynı metin; H2'ler ("Genel Bilgiler", "Teknik Özellikler",
+  "Modeller") sunucu HTML'inde iki kez geçiyor.
+- Aynı sayfanın meta açıklaması cümle ortasında "…" ile kesiliyor.
+- Kategori sayfası iki adresten 200 veriyor; kanonik doğru adrese işaret ediyor (sorun değil, izlenecek).
+- Kategori sayfasında "sessiz" 2 kez geçiyor ama dB(A) değeri hiç yok: ses **anlatısı** var, ses **verisi** yok.
+
+## 4. Gerçekçilik değerlendirmesi (ölçülmüş olanla ölçülmemiş ayrı)
+
+- **Ölçülmüş:** yukarıdaki sayılar. **Ölçülmemiş:** yeni içeriğin Google'da kaç günde nerede duracağı; domainin yaşı
+  (mülk 6 hafta) ve sıfır tıklama geçmişi göz önüne alınırsa "18 Ekim yayın = 18 Ekim ilk sayfa" sözü verilemez.
+- İlk sayfaya en yakın küme sırasıyla: marka/model sorguları → "sessiz kanal fanı / kanal tipi fan" → "nasıl seçilir"
+  bilgi sorguları → genel "sessiz fan". Genel "sessiz fan" pazar yeri ve forum ağırlıklıdır; oraya kategori sayfası +
+  rehberin birlikte etkisi gerekir.
+- Yayın, ölçüm planıyla birlikte düşünülmeli: 3. gün (21 Ekim), 7. gün (25 Ekim), 14. gün (1 Kasım).
+
+## 5. Öneri özeti (ayrıntı kartlarda)
+
+1. **Rehber (BLOG, BLG-15):** bilgi niyetine cevap veren, ses gücü ile ses basıncı farkını ve koşullu dB(A) okumayı
+   anlatan, Lineo Quiet'i örnek alan, soru başlıklı, görünür SSS'li yazı; kategori ve ürün sayfalarına iç bağlantı.
+2. **Kategori ve Lineo Quiet sayfası (URUN, URN-135):** başlık, H1, ilk paragraf ve meta açıklamada "sessiz"in doğal
+   geçmesi; Lineo Quiet sayfasında koşullu ses verisi bloğu ve görünür SSS; çift H1/H2 ve kesik açıklamanın
+   düzeltilmesi. Yeni adres açılmaz (karar 374).
+3. **Yayın günü (GEO-SEO, Y2.1):** değişen/yeni üç adres için canlı doğrulama, IndexNow, Google dizin isteği, Bing
+   URL Gönder, harita `lastmod` kontrolü; sonuç SEO-53 kartına.
+4. **Ölçüm:** aynı sorgu kümesi ve aynı SERP yöntemiyle 3/7/14. gün okuması; sonuç kartta (P6).
+
+## 6. Ölçüm geçmişi
+
+| Tarih | Ölçüm | Sonuç | Sınıf |
+|---|---|---|---|
+| 2026-10-15 | İlk taban: Search Console 2026-07-15 → 2026-10-12, SERP 13 sorgu, 25 rakip + 3 kendi sayfa yapısı | 8 gösterim, 0 tık; ilk sayfada sayfa tipi/kelime/şema tabloları (bkz. 3.3) | A |
 
 
 ---
@@ -13858,6 +14708,101 @@ ve bu tablodaki iyi sayılara rağmen beş soruda **sıfır** isabet etmişti �
 
 
 ---
+# FILE: docs\audits\ktl7-pq-egri-olcumu-2026-10-08.md
+
+# KTL-7 — P-Q eğrisi: kitapçıkta ne var, veritabanında ne var, orta nokta nereden geldi (KATALOG, 2026-10-08)
+
+**Tetik.** Seçim grafiği üretici (Systemair) eğrisiyle yan yana konunca bizim eğrilerin düz çizgi gibi
+göründüğü fark edildi. **Cetvel:** `docs/standards/catalog-ingestion-standard.md §6.3` ("Eğri çizimi" alt bölümü
+bu işle yazıldı) ve `docs/standards/spec-axis-standard.md §2.3` (`pq_curve_kaynak`).
+
+**Yöntem.** Kaynak dizini (`sayfalar.jsonl`, 2211 sayfa / 86 dosya); PDF yalnız Faz 0'ın üç sayfasında, karar 318
+onayıyla çizim katmanı için açıldı. Veritabanı: canlı, **yalnız okuma**. Yazma yok. Betikler yeniden koşulabilir
+(KATALOG makinesinde `C:\tmp\ktl7\`: `olc.py` DB ölçümü, `kok.py` köken, `f0*.py` Faz 0).
+
+## 1. Ana bulgu
+
+Hiçbir kitapçıkta P-Q eğrisi **sayısal tablo** olarak verilmiyor; eğri her yerde yalnız grafik. Tabloda yalnız model
+başına azami debi ve azami basınç (tek nokta) var. 8+ nokta ancak grafikten okuyarak girer; nokta uydurulmaz.
+
+## 2. Veritabanı durumu (canlı ölçüm)
+
+- `products.technical_specs.pq_curve`: 145 ürün, 15 aile. 141 ürün **tam 3 nokta**; yalnız Punto Evo/Flexo (4 ürün)
+  6 nokta. 8+ nokta olan ürün yok.
+- Eğrisi hiç olmayan aileler: SEAT 40, STORM 20, JET 21, Nicotra DD 13 / AT 8 / ADH 8 / RDH 6, Casals NIMUS 15 /
+  NIMAX 15 / ENKELFAN 9, Vortice CMS ATEX 11, Slimroof 10, Heatmaster 10, Nordik HVLS 7, AVenS kendi aileleri.
+
+## 3. Orta noktanın kökeni (betikle ölçüldü)
+
+141 eğrinin ortadaki noktası **kitapçıktan okunmamış**. Orta debi hepsinde tam `Qmax/2`; orta basınç:
+
+| Orta basınç | Ürün | Aileler | Nasıl kurulmuş |
+|---|---|---|---|
+| tam `%75·Pmax` | 58 | Commercial In-Line 19, Industrial Ventilation 17, E-ATEX 14 (biri yuvarlamayla %74), Radon 8 | Commercial ve Industrial betiğinde formül (`round(p_max * 0.75, 1)`, yorum "Construct PQ curve dynamically"); E-ATEX ve Radon'da formül çıktısı betiğe sabit yazılmış |
+| tam `%50·Pmax` (düz çizgi) | 48 | Quadro Evo 23, Lineo Quiet 12, Mono 8, Isı GK 5 | Quadro ve Lineo Quiet betiğinde formül (yorum "Simplified 3-point PQ Curve"); Mono ve Isı GK'da sabit |
+| `%56–%70`, formüle uymuyor | 35 | QBK 21, AVenS Plug 14 | betiğe elle yazılmış değerler; **gerçek mi uydurma mı BİLİNMİYOR** (kitapçık grafiğiyle kıyaslanmadan hüküm yok) |
+
+Toplam 58 + 48 + 35 = 141; canlı ölçümle örtüşür (57 tam %75, 48 tam %50, kalan 36; fark E-ATEX'in yuvarlanan bir ürünü).
+
+**Zincir.** (1) 21–23 Haziran 2026, `venthub-pdf-ingestor`, "Visual Multi-Agent Team" çıkarım hattı: her ailenin
+`02-work/scratch_multiagent/final_visual_extraction.json` dosyasında eğri zaten üç nokta; `validate_and_generate.py`
+bunu sabit yazmış ya da formülle yeniden kurmuş (commit e195767, e467a13, ec48c4e, 11895c0; yazar adı makinenin git
+kimliğidir, insan-yazar kanıtı değil). (2) `walkthrough.md` satır 98: *"Basitleştirilmiş 3 noktalı PQ debi-basınç eğrisi
+tüm modellere eklendi"* — bilinçli sadeleştirmeydi. (3) CSV `spec_pq_curve` sütunu `scripts/kademe2-load/planla.mjs`
+(`spec_` önekini atıp değeri aynen `technical_specs`'e koyar) ile yüklendi; **"basitleştirilmiş" bilgisi DB'ye geçmedi,
+kaynak/doğruluk etiketi hiç yoktu.** Seçici hepsini ölçüm sandı.
+
+**Açık soru (bu işin dışı, MÜHENDİSLİK kapsamı):** Punto Evo/Flexo'daki 6 nokta hiçbir kitapçıktan çıkmıyor
+(`walkthrough.md` satır 121 "seçim standardına göre" diyor; hangi standart belirsiz).
+
+## 4. Aile başına durum
+
+"Ölçülmedi" = bu turda betik ya da okumayla doğrulanmadı. Hız kademesi eğrisi (Systemair KD tipi, 5 kademe) kitapçıkta
+**sayısal tablo olarak hiçbir yerde yok**; Vortice Commercial In-Line'da grafikte iki kademe (min ve maks hız) çizili.
+
+| Aile | Kitapçıkta P-Q | Kaynak | Oktav ses tablosu |
+|---|---|---|---|
+| Nicotra ADH 8 · RDH 6 · AT 8 · DD 13 | yalnız grafik | 479 / 481 / 480 / 493 serisi PDF'leri | var (ADH/RDH/AT sayısal, 63–8000 Hz) |
+| SEAT 40 | yalnız grafik | SEAT-CATALOGUE.pdf, seat-15…50 fişleri | fişlerde biçim ölçülmedi |
+| STORM 20 | yalnız grafik | Storm_series.pdf s.3,5,7 | yok |
+| JET 21 | grafik, **itme** verir (P-Q ile seçilmez) | JET.pdf, JET-20/25/30 föyleri | JET.pdf'te 3 sayfa |
+| Casals KENTALFAN 14 · ENKELFAN 9 | yalnız grafik | cata-logo-plug-fans_casals.pdf | yok |
+| Casals NIMUS 15 · NIMAX 15 | **kitapçık dizinde yok** (yalnız web metni) | — | — |
+| AVenS kendi aileleri (≈40) | **kitapçık dizinde yok** (yalnız fiyat listesi, eğri yok) | avens_fiyat_listesi_2026_HQ.pdf | — |
+| Vortice kanal/ATEX/konut (97 + 48 ürün) | yalnız grafik; tablo = azami debi/basınç | Commercial, E-ATEX, Industrial, Quadro, QBK, Lineo Quiet, Radon, VMC kitapçıkları | Radon, VMC, NRG'de var |
+| Vortice CMS ATEX 11 · Slimroof 10 · Heatmaster 10 | yalnız grafik | tek-model dosyaları | yok |
+
+## 5. Faz 0 (karar 318): grafikten okuma sınaması
+
+Üç sayfa, yazma yok. Ayrıntı ve yöntem: `catalog-ingestion-standard.md §6.3 "Eğri çizimi"`.
+
+| Sayfa | Yöntem | Sonuç |
+|---|---|---|
+| Vortice Commercial In-Line s.11–13 | vektör (0 görüntü) | **±%2 kapısı TUTTU**, en büyük sapma %0,2 |
+| Nicotra ADH s.8 | vektör, log-log nomogram | çıkarım denenmedi (çok eğri, azami değer tablosu yok) → ayrı kart |
+| SEAT 15 fişi s.2 | raster ≈180 dpi, yarı-log | 3 eğri çıktı (15 · 8 · 5 nokta); kapı çıpa yokluğundan sınanamadı → `cipasiz` |
+
+## 6. Giriş planı (canlı yazma her fazda ayrı Recep onayı)
+
+| Faz | İş | Ürün | Yazma |
+|---|---|---|---|
+| 1 | Vortice kanal/ATEX: Quadro 23, QBK 21, E-ATEX 14, Commercial 12, Lineo Quiet 12, Mono 8, Lineo 7 (3 nokta → 8+) | 97 | kuru koşu + döküm, sonra onay. **Mevcut 141 satırın `pq_curve_kaynak` etiketlemesi bu pakette** (karar 320) |
+| 2 | Kalan eğrililer: Aksiyel Endüstriyel 16, KENTALFAN 14, Radon 8, VORT HR 5, Punto Evo 4, Tiracamino 1 | 48 | aynı |
+| 3 | Eğrisi olmayan, grafiği olan: Nicotra 35, SEAT 40, STORM 20, ENKELFAN 9, CMS ATEX 11 | 115 | aynı |
+| 4 | Kaynağı olmayanlar: NIMUS/NIMAX 30, AVenS ≈40: önce kaynak edinme; JET 21 alan kararı (itme) sonra | ≈90 | — |
+
+Şema notu: kademe eğrileri (çok devirli) için `pq_curve` tek eğri tutar; `pq_curves[{kademe, noktalar}]` listesine
+genişleme `product-schema-standard` ve Karar 316 çekirdeğinden bağımsız şema işidir.
+
+## 7. Yöntem notu — Haiku araştırmacılar
+
+Beş araştırmacı açıldı; rapor veren ikisi de **yanlış** çıktı (Nicotra raporu "sayısal tablo, ~12 nokta/model" dedi —
+yok; dosya yolu dizinde yok; sayfa "280–340" iken dosya 90 sayfa. Vortice raporu "ölçülmedi" ile hüküm verdi).
+Mekanik betikle yeniden ölçüldü, kalan üçü durduruldu. Kural (karar 314): sayı, varlık ve dosya yolu hükmü betikle ya da
+kaynağa bakılarak doğrulanmadan rapora girmez.
+
+
+---
 # FILE: docs\audits\legal-i18n-scope-antigravity-2026-06-16.md
 
 # Legal i18n Scope Audit Report
@@ -15882,6 +16827,255 @@ kapsamı dışında.
 
 
 ---
+# FILE: docs\audits\ops29-site-metni-envanteri-2026-10-03.md
+
+# OPS-29 — canlıda müşteriye görünen metinlerin envanteri (2026-10-03)
+
+**Sahip:** BLOG (kart BLG-1) · **Emir:** OPS-29 · **Yöntem:** salt okuma (canlı sayfa HTML'i, veritabanı SELECT, depo kaynağı); alt ajan yok.
+**Kural:** canlı metne dokunulmadı. **Cetvel:** `rehber-yazisi-standard.md` R4, `vitrin-metni-standard.md` K1/K2/K4.1/K6/K10, ortak övgü listesi `src/lib/seo/ovguAyikla.ts` (REC-497).
+**Önceki çalışma:** SEO-20 (aile ve kategori arama açıklamaları süzgeci; kod tarafı SEO'da, içerik bende), #1664 (marka arama açıklaması), `icerik-hatti-metin-boslugu-2026-09-25.md` (alan doluluğu; tekrar ölçülmedi).
+**Güncelleme 2026-10-09 (OPS emri, karar 317 sonrası):** #1758 (10-08) bazı ifadeleri kaldırdı. Canlı HTML (TR ve EN; ana sayfa ve hakkımızda) ve master sözlüğü yeniden okundu (salt okuma, canlı metne dokunulmadı). §3'teki **hiçbir satır silinmedi**; bugünkü durumları §3a'da, envanterde olmayan yeni uçlar §3b'de, İngilizce sayfalar §3c'de.
+
+## 1. Yüzey × cetvel
+
+| Yüzey | Canlı adres / kaynak | Ölçülen | Yöneten cetvel | Sahibi |
+|---|---|---|---|---|
+| Ana sayfa | `/tr` · sözlük `tr.ts` `home` | 1 H1, 10 H2, 28 paragraf (50+ karakter; 6'sı kategori kartı = DB metni, 2'si altbilgi). 10-09 yeniden sayım: aynı | **YOK** (K1 yalnız aile ve ürün alanlarını sayar) | URUN (kod), BLOG (metin) |
+| Hakkımızda | `/tr/about` | 1 H2, 8 paragraf; meta açıklama. 10-09 yeniden sayım: 3 H2, 7 paragraf (50+ karakter ölçütüyle); fark sebebi ölçülmedi (ölçüt farkı ya da sayfa değişikliği) | **YOK** | URUN, BLOG |
+| Kategori açıklaması | `/tr/category/*` · `categories.metadata` | 24 metin (24 sitemap adresi) | **YOK** | KATALOG (veri), BLOG (metin) |
+| Aile açıklaması | aile sayfaları · `product_families.description` | 47 aile; `tr` 47, `bloklar_tr` 37, `maddeler_tr` 38 | K1–K7 (`vitrin-metni-standard`) | KATALOG |
+| Marka açıklaması | `/tr/brands/*` · `src/data/brands.ts` | 6 marka; gövde metni değişmedi (#1664 yalnız arama açıklamasını süzdü) | **YOK** | URUN (kayıt), GEO-SEO (arama açıklaması) |
+| Bilgi Merkezi | `/tr/bilgi-merkezi` | 1 yazı canlı (frekans konvertörü); eski destek adresi `/tr/destek/merkez` → 308 → bilgi merkezi; `/tr/destek` 404 | `rehber-yazisi-standard` | BLOG |
+| Arama açıklamaları | `<meta name="description">` | ana sayfa, hakkımızda, 2 kategori, 2 marka, 2 ürün örneklendi | **YOK** (K1 `meta_description` yalnız aile) | GEO-SEO |
+| Ürün açıklaması | `products.description_i18n` | **ölçülmedi** (OPS listesinde yok) | K1–K7 | KATALOG |
+
+## 2. Cetvelde "yapay zekâ kokusu" kuralı var mı? (ölçüldü)
+
+| Cetvel | Sonuç |
+|---|---|
+| `vitrin-metni-standard.md` | **YOK.** K2 iç not, K4.1 olumsuz iddia, K6 doğrulanmamış teknik değer, K10 dil. Üstünlük/övgü yasağı yok; "yapay zekâ" ifadesi yok. |
+| `rehber-yazisi-standard.md` | **Yalnız rehber yazısı için, kısmen:** R4.2 garanti ve üstünlük vaadi yasak; R4.5 kaynaksız olumsuz iddia; R4.6 mevzuat hükmü kaynaksız yazılmaz; karar 106 "yapay zekâ notu konmaz". "Koku" ölçütü tanımlı değil. |
+
+## 3. Ana sayfa ve hakkımızda bulguları (canlı HTML'den, elle okundu; 10-03 durumu, bugünkü durum §3a)
+
+Türler: **A** kaynaksız üstünlük/kıyas · **B** kaynaksız test, sertifika, stok, teslimat, deneyim iddiası · **C** süslü soyut ifade (yapay zekâ kokusu adayı) · **D** vaat · **E** iç bilgi, doğrulanmadı.
+
+| Yer | Metin (kısaltılmış) | Tür | Doğrulama sahibi |
+|---|---|---|---|
+| Ana sayfa H2 | "Vortice Lineo Quiet: Sessizliğin Geleceği" | C | BLOG |
+| Ana sayfa H2 | "Teknik Mükemmeliyet ve Akıllı Akış" · "Hava Akışının Mühendislik Estetiği" · "Mühendislik Hassasiyeti, Operasyonel Güven" | C | BLOG |
+| Ana sayfa p | "Minimum enerji tüketimi, maksimum hava transfer verimliliği ve premium sessiz konforun kusursuz dengesi." | A, C | KATALOG |
+| Ana sayfa p | "uçtan uca deterministik havalandırma mühendisliği" · "VentHub kürasyonu ile endüstriyel standartlarda…" | C | BLOG |
+| Ana sayfa p | "…yüksek statik basınçta bile ultra sessiz operasyon verimliliği sunar." (Lineo Quiet kartı) | A | KATALOG (ses tablosu kaynağı var, "ultra" yok) |
+| Ana sayfa H2+p | "Dünya Devlerinin Güvenilir Partneri" · "Dünya devi HVAC markalarının en güncel ve sertifikalı ürün gamını marka güvencesiyle sunuyoruz." (hakkımızda'da aynı cümle) | A, B | Recep (sertifika/yetki belgesi) |
+| Ana sayfa p | "Sektörün en güvenilir ve verimli ürünlerini…" · "…en verimli şekilde çözüyoruz." | A | KATALOG |
+| Ana sayfa H3+p | "Performans Liderleri" · "Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin amiral gemisi çözümleri." | A, B | KATALOG (test kaydı var mı) |
+| Ana sayfa p | "Geniş stok ağımız ve profesyonel lojistik partnerlerimizle … tam zamanında teslimat yapıyoruz." | B, D | Recep |
+| Ana sayfa H3+p | "Kesintisiz Teknik Destek" · "uzman kadromuzla sisteminizin ömrü boyunca yanınızdayız." · "Marka ve Garanti Güvencesi" | D | Recep |
+| Ana sayfa p | "…sonuçlara saniyeler içinde ulaşır." (hesaplayıcı) | D | URUN (süre ölçülmedi) |
+| Ana sayfa p | "Marka alanını pasif logo vitrini olmaktan çıkarıp kalite, güven ve ürün yaklaşımının taşıyıcısı haline getiriyoruz." | C (iç not tonu) | BLOG |
+| Altbilgi (her sayfa) | "6 önde gelen marka, 50+ ürün çeşidiyle" | A, bayat sayı riski: veritabanında 442 aktif ürün | URUN |
+| Altbilgi (her sayfa) | "Hafta İçi 09:00 – 18:00, Cumartesi 09:00 – 14:00" | E | Recep |
+| Hakkımızda p + meta | "15 yılı aşkın saha deneyimimizle…" (meta: "15 yıllık saha tecrübesiyle") · "Avrupa'nın en prestijli markalarını…" | B, A | Recep |
+| Hakkımızda p | "operasyonel mükemmeliyet" · "her proje ise bir havalandırma sanatı eseridir" · "zamanında teslimatı hedefliyoruz" | C, D | BLOG |
+
+Toplam: ana sayfa ve hakkımızda için 16 bulgu satırı (bir satırda birden çok cümle olabilir). Doğrulama sahibine göre: **Recep** (işletme bilgisi, sertifika, stok, teslimat, deneyim, çalışma saati) 5 satır; **KATALOG** (teknik üstünlük ve test iddiası) 4 satır; **URUN** (sayı, süre) 2 satır; **BLOG** tek başına düzeltebilir (süslü soyut ifade) 5 satır.
+
+### 3a. 10-09 yeniden sayım — §3'ün 16 satırı canlıda (satır silinmedi)
+
+Kaynak: `venthub.com.tr/tr` ve `/tr/about` canlı HTML'i (2026-10-09) ve master sözlüğü. Satır numarası §3 tablosundaki sıradır.
+
+| §3 satır | Ne | 10-09 canlı | Not |
+|---|---|---|---|
+| 1 | "…Sessizliğin Geleceği" (H2) | duruyor | |
+| 2 | Üç H2: "Teknik Mükemmeliyet…", "Mühendislik Estetiği", "Mühendislik Hassasiyeti, Operasyonel Güven" | duruyor | |
+| 3 | "…premium sessiz konforun kusursuz dengesi" | duruyor | |
+| 4 | "deterministik havalandırma mühendisliği" · "VentHub kürasyonu…" | duruyor | #1758 yalnız büyük harfli etiketi değiştirdi ("DETERMİNİSTİK SİSTEMLER" → "HAVALANDIRMA ÇÖZÜMLERİ"); cümledeki küçük harfli "deterministik" kaldı |
+| 5 | "…ultra sessiz operasyon verimliliği sunar" | duruyor | |
+| 6 | "Dünya Devlerinin Güvenilir Partneri" · "Dünya devi HVAC markalarının … sertifikalı ürün gamını…" | **kısmen kalktı** | Başlık 10-08'de #1758 ile "Sunduğumuz Markalar" oldu. "Dünya devi … sertifikalı" cümlesi ana sayfada ve hakkımızda'da duruyor |
+| 7 | "Sektörün en güvenilir ve verimli ürünlerini…" · "…en verimli şekilde çözüyoruz" | duruyor | |
+| 8 | "Performans Liderleri" · "…testlerinden tam not almış… amiral gemisi çözümleri" | **kısmen kalktı** | Başlık duruyor. İkinci cümle 10-08'de #1758 ile "VentHub ürün ailesinden öne çıkan seçili modeller ve teknik özellikleri." oldu |
+| 9 | "Geniş stok ağımız … tam zamanında teslimat" | **kalktı** | 10-08'de #1758 ile "Teslimat Planlaması: Teslimat süresi ve sevkiyat koşulları, teklif aşamasında projenize göre netleştirilir." oldu |
+| 10 | "Kesintisiz Teknik Destek" · "…ömrü boyunca yanınızdayız" · "Marka ve Garanti Güvencesi" | duruyor | |
+| 11 | "…sonuçlara saniyeler içinde ulaşır" | duruyor | |
+| 12 | "…pasif logo vitrini olmaktan çıkarıp…" | duruyor | |
+| 13 | Altbilgi "6 önde gelen marka, 50+ ürün çeşidiyle" | duruyor | Sayı bayat: kayıtlı marka 7, aktif ürün 441 (10-09 veritabanı) |
+| 14 | Altbilgi çalışma saati | duruyor | Biçim "Hafta İçi: 09:00 - 18:00 / Cumartesi: 09:00 - 14:00"; her sayfada |
+| 15 | Hakkımızda "15 yılı aşkın saha deneyimimizle…" · "Avrupa'nın en prestijli…" · meta "15 yıllık saha tecrübesiyle" | duruyor | |
+| 16 | Hakkımızda "operasyonel mükemmeliyet" · "havalandırma sanatı eseridir" · "zamanında teslimatı hedefliyoruz" | duruyor | |
+
+**Sonuç:** 16 satırdan 13'ü olduğu gibi, 2'si kısmen (6, 8), 1'i tamamen (9) kalktı. #1758 envanterde ayrı satırı olmayan şunları da kaldırdı: "%92 Optimizasyon" sayacı, "Çok Satanlar" ve "En Çok Tercih Edilenler" adları, "…en çok sipariş edilen, güvenilirliği sahada kanıtlanmış modeller" cümlesi.
+
+### 3b. Yeni uçlar — TR (10-09 canlı okumada bulundu, §3'te yoktu)
+
+| Yer (sözlük anahtarı) | Canlı metin | Tür |
+|---|---|---|
+| Hero etiketleri (`home.hero.sinevizyon.slides[0..2].eyebrow`) | "İLERİ AERODİNAMİK MÜHENDİSLİĞİ" · "FÜTÜRİSTİK İKLİMLENDİRME" · "HASSAS HVAC SİSTEMLERİ" | C |
+| Hero ilk slayt (`slides[0].title`, `.subtitle`) | "Endüstriyel Havalandırma Katmanları" · "Yüksek debili sistemlerde statik balanslı ve akustik optimize edilmiş çözüm eksenleri." | C; ölçüsüz teknik ifade (M3) |
+| Hero veri kutuları (`slides[*].products[*]`, `cinematicShowcase.hudStatus`) | "Sistem.Veri.Canlı" (6 kutuda) · "Ultra Sessiz Performans" · "Laminer Akış Kontrolü" · "EC Motor Verimi / Düşük Enerji Tüketimi" · "Yüksek Kapasite" · "Otomasyon Entegrasyonu" | A, C. "Canlı" etiketi sabit sözlük metni; kutunun canlı veri çektiği ölçülmedi |
+| Lineo Quiet kartı (`cinematicShowcase.subtitle`, `.cta`) | "Aero-akustik gövde tasarımı ile sessizliğin yeni dijital standardı." · "Yüksek Çözünürlüklü Teknik Verilere Ulaş" | A, C |
+| Güven şeridi (`home.hero.trustStrip.*`) | "Dünyaca tanınan markalar" · "Türkiye geneli sevkiyat" | A, B |
+| Güven bölümü (`home.trustProof.badge`, `.subtitle`) | "ONAYLI" rozeti (4 kez; kimin onayı belirsiz) · "Her adımda doğrulanabilir kalite ve uzman desteği sunuyoruz." | E; A, D |
+| Ana sayfa sayacı (`home.knowledge.statsPipelineLabel`, `home.stats.yearsExperience`; "15+" bileşende sabit) | "Proje Hattı · 15+ · Yıl Deneyim" | B |
+| Marka bölümü (`home.strategicBrands.*`, `brands.sectionTitle`, `header.brandTagline`) | "Stratejik Markalar" · "Çalıştığımız markalar sadece logo değil, çözüm mimarisinin temelidir." · "Premium HVAC Markaları" · "HVAC Premium" (üst bilgide marka sloganı) | A, C |
+| Hakkımızda sayaçları (`src/views/AboutPage.tsx:43-46`, sözlük dışı sabit değer) | "15+ Yıllık Tecrübe" · "6 Küresel Marka Ağı" · "50+ Ürün Çeşidi" · "81 İl Sevkiyat Ağı" | B. "6" bayat (kayıtlı 7 marka); "50+" yerine gerçek 441 aktif ürün; "81 il" bileşendeki yoruma göre "kargoyla tüm illere sevkiyat vaadi" |
+| Hakkımızda hero (`aboutPage.heroBadge`, `.heroTitle` + `.heroTitleItalic`, `.heroDesc`) | "15+ Yıl Mühendislik Deneyimi" · "Havayı Yeniden Tanımlıyoruz" · "…yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerini…" | B, C, A |
+| Hakkımızda değerler (`aboutPage.precisionDesc`, `.standardsTitle`) | "…her projeye özel debi, basınç ve verimlilik hesaplamalarıyla…" · "Global Standartlar" | D, C |
+| Ana sayfa senaryo kartı (`home.applicationSolutions.items.entrance.description`) | "…hava perdesi keşfini daha anlaşılır hale getirin." (müşteriye değil tasarımcıya yazılmış talimat cümlesi) | M1 |
+| Marka kayıtları (`src/data/brands.ts`; 10-09'da yeniden okundu) | Vortice (satır 73): "…dünya lideri… standartları belirliyor" · Avens (86): "Yüksek performanslı…" (kaynak satırı yok) · Nicotra Gebhardt (150): "…dünyanın en geniş ve teknolojik ürün gamına sahip üreticisi" (kaynak satırı yok) · Flexiva (169): "Flexiva marka kaydı katalogda açıldı." (iç durum cümlesi) · Danfoss (137): "%80'e varan" üretici iddiası üreticiye atıf yapılmadan yazılmış | A (Vortice, Avens, Nicotra); M1 (Flexiva); Danfoss'ta üretici iddiasının atfı yok (hangi maddeye girdiği ölçülmedi) |
+
+### 3c. İngilizce sayfalar — bu envanterde ilk kez okundu (10-09, `/en` ve `/en/about`)
+
+§3 ve §3a yalnız TR'yi okumuştu. EN ana sayfada güven bölümünün (`home.trustProof`) 14 anahtarı TR ile aynı anlamı taşımıyor; çoğu editör notu ya da tasarım dili gibi okunuyor (M1, M4):
+
+| Anahtar | Canlı EN metin | Sorun |
+|---|---|---|
+| `home.trustProof.title` | "We build trust with clear operational realities, not decorative promises." | TR başlığı farklı ("Mühendislik Hassasiyeti, Operasyonel Güven"); "süslü vaat değil" cümlesi karşı-iddia sesi |
+| `home.trustProof.subtitle` | "The trust layer on the VentHub homepage should make the verified working model and expert support approach visible." | **Editör notu**: sayfa hakkında "olmalı" diye konuşuyor |
+| `home.trustProof.items.brands.*` | "Brand Layer" · "Premium brand selection" · "Represented brands are not only visual assets; they carry solution quality and category credibility." | İç etiket ("Layer"); TR ile farklı anlam; A ("Premium") |
+| `home.trustProof.items.guidance.*` | "Expert Layer" · "Engineering-guided direction" · "We aim to move users not only into product lists, but into a more accurate selection flow." | Editör notu |
+| `home.trustProof.items.delivery.*` | "Operations Layer" · "Delivery and supply visibility" · "Delivery and supply expectations are made clearer, more predictable and more professional." | Editör notu; #1758 yalnız TR'yi değiştirdi, EN eski kaldı |
+| `home.trustProof.items.support.*` | "Continuity Layer" · "Accessible after-sales support" · "Support, quoting and knowledge-center flows are not disconnected; they are parts of the same trust architecture." | Editör notu |
+| `home.strategicBrands.subtitle` | "We turn the brand area from passive logo wallpaper into a carrier of quality, trust and product positioning." | M1 (TR'deki "pasif logo vitrini" ile aynı) |
+| `aboutPage.heroTitle` + `aboutPage.heroTitleItalic` | "Turkey's Trusted HVAC Platform" + "the Air" → ekranda "Turkey's Trusted HVAC Platform the Air" | **Kırık cümle**; ayrıca A ("Trusted") |
+| `home.knowledge.subtitle` | "Guides, calculators and support-center routes help users reach not only products, but a better decision environment." | TR cümlesi bozuk ve farklı ("…sonuçları saniyeler içinde ulaşır") |
+
+Canlıda görünen 160 sözlük anahtarının (TR ya da EN) geri kalanında EN, TR ile aynı anlamı taşıyor; bu karşılaştırma anahtar anahtar yapıldı.
+
+## 4. Kategori, aile, marka bulguları (veritabanı SELECT + depo)
+
+Övgü kalıbı (`OVGU_KALIBI`) aile ve kategori metinlerine **salt okuma ile** uygulandı: **21 ham eşleşme**, elle okununca **9 gerçek iddia**, **12 yanlış alarm**.
+
+| Metin | Yer | Sonuç |
+|---|---|---|
+| "…asitlere ve korozyona karşı **üstün dayanım** sağlayarak maksimum koruma sunar" | SEAT ve STORM aile `bloklar_tr` + `maddeler_tr` (4 yer), kategori `acid-resistant-fans` (1 yer) | **Gerçek iddia (A)**. BLOG'un 09-25 ölçümü: üretici belgelerinde kimyasal dayanım tablosu yok → kaynaksız |
+| "performans, tüketim ve ses arasında **en iyi denge**" | Lineo `maddeler_tr`; hava perdesi `bloklar_tr` ("en iyi dengeyi kurar") (2 yer) | Gerçek iddia (A), kaynak ölçülmedi |
+| "…kanal direncinin düşük olduğu yerlerde **en verimli çözümdür**" | kategori `axial-industrial-fans` | Gerçek iddia (A) |
+| "VentHub'ın **en geniş kategorisi**" | kategori `fans`, ana sayfa kartı ve meta açıklama | Olgu, sayıyla doğrulanabilir; sayı değişince bayatlar |
+| "en küçük model / en büyük model", "en yüksek sürekli çalışma sıcaklığı" | 5 aile (`avens-elektrikli-isiticilar`, `avens-sulu-batarya`, `danfoss-fc101`, `avens-nimax`, `avens-nimus`) | **Yanlış alarm** (teknik olgu) |
+| "kapının **yerden yüksekliği**" → "en yüksek"; "ısıtıcılı modellerin **üstünde**", "binanın en **üstünden**" → "üstün" | `air-curtains`, `vortice-hava-perdesi`, `roof-fans` | **Yanlış alarm: kalıp sözcük sınırı gözetmiyor** |
+| Marka gövdesi | Vortice: "dünya lideri … standartları belirliyor" (`brands.ts`; üretici sitesinden) | Gerçek iddia (A). #1664 yalnız arama açıklamasından çıkardı, sayfa gövdesinde duruyor |
+
+⚠**GEO-SEO ve SEO-20 için bulgu:** `OVGU_KALIBI` "en yüksek" ve "üstün" için sözcük sınırı kullanmıyor; aile ve kategori açıklamasına olduğu gibi uygulanırsa teknik cümleleri atar (12 yanlış alarmın 3'ü bu iki sebepten: "yerden yüksekliği", "üstünde", "en üstünden"). SEO-20'nin ölçüm adımı bu sayımı kullanabilir.
+
+Yardımcı ölçütler (kural değil, aday; elle okunmadı): "abartılı sıfat" sözcük listesine takılan metin: `bloklar_tr` 17/37, `maddeler_tr` 8/38, aile `tr` 2/47, kategori 3/24; uzun çizgi (—) içeren: 11, 14, 2, 4. Bunlar yapay zekâ kokusunun **sayılabilir adaylarıdır**, kanıtı değil.
+
+## 5. Ölçülmedi
+
+- Ürün açıklamaları (`products.description_i18n`, OPS listesinde yok), EN metinler (10-09'da yalnız ana sayfa ve hakkımızda okundu, §3c; kategori/aile/marka EN okunmadı), aile `meta_description` (boş döndü), ürün ve aile sayfalarının meta açıklamaları (2 örnek), eski destek konu adreslerinin tek tek durumu.
+- Bulguların doğruluk hükmü: B ve E türü Recep'in işletme bilgisidir; teknik iddialar (A) için KATALOG kaynak dizininde okuyacak.
+
+
+---
+# FILE: docs\audits\pr-bekleme-kapanis-2026-10-13.md
+
+# ALT-38 Kapanış Raporu — PR bekleme süresi ve test düzeni (2026-10-13)
+
+**Sürüm 1.0 · 2026-10-13 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38 (BİTİŞ: 13 Ekim 18:00; ham ölçüm verisi depo dışında) · Cetvel: `docs/standards/test-karnesi-standard.md`, `docs/standards/execution-method-standard.md`**
+
+> **Bu dosya niçin var.** ALT-38 (test çalıştırma düzeni ve test karnesi) için söz verilmiş kapanış raporu. Okuyan iki şeyi öğrenir: PR bekleme süresi hedefe ulaştı mı, ve işin ne kadarı master'da. Her sayının yanında nereden geldiği ve neyin ölçülmediği yazılıdır.
+
+## 1. Kısa cevap
+
+- **İki süre hedefi de tutmadı.** Belge PR medyanı 1:46 (hedef ≤1:00), kod PR medyanı 4:35 (hedef ≤4:00). Kod PR'ında fark 35 sn.
+- **Teslim edilen parçalar master'da** (§2): testlerin dünya durumundan ayrılması, siteye dokunmayan PR'da Build ve e2e'nin atlanması, test seçimi, test karnesi. Süreyi en çok kısaltan iş e2e-smoke süresiydi (#1742).
+- **Kalan en büyük kaldıraç `ci` işinin içinde:** Lint (yaklaşık 42 sn) ile Build (yaklaşık 178 sn) ardışık koşuyor. Paralel koşturmak kod PR medyanını yaklaşık 3:53'e çekmesi beklenir (TAHMİN, ölçülmedi). Bu iş ALT-80 olarak ayrı kartta.
+- **Belge PR'ını 1:00'in altına indirmek bir kapı gevşetmesidir**; karar Recep'te (§6).
+
+## 2. Master'a giren teslimler
+
+| Dilim | PR | Ne yaptı |
+|---|---|---|
+| 38a | #1729 | Dış duruma (dünya durumu) bağlı testler PR kapısından çıktı; `edited` tetiği yalnız PR kayıt kapısını koşar |
+| 38c | #1739 | Siteye dokunmayan PR'da Build ve e2e atlanır; INV-CI-SINIF-1/2 |
+| 38c-2 | #1741 | Testler 4 paralel işe bölündü; `ci` aynı koşunun tüm dilimlerini bekler |
+| 38c ölçüm | #1740 | 605 test dosyasının süre, sınıf ve okunan yol ölçümü |
+| 38d | #1747 | Ölçümlü test haritası + seçici + geriye dönük doğrulama (gerçek kaçırma 0) |
+| 38e | #1756 | Seçici CI'a bağlandı + belge hızlı yolu |
+| 38f | #1742 | e2e-smoke: Build'de tip/lint kapalı, apt paralel; admin-smoke medyanı 285 → 187 sn (önceki 88 koşu, sonrası 7 koşu) |
+| 38b | #1790 | Test karnesi: cetvel §7, INV-TEST-KARNE-1..4, 654 dosyalık karne |
+| 38l | #1803 | Haritaya 4 karne testinin kaydı |
+| — | #1818 | `portMusait` testi paralel port yarışına dayanıklı (CI'da kesintili kırmızıydı) |
+
+## 3. PR bekleme süresi
+
+Yöntem: birleşen PR'ın son uç SHA'sındaki her kontrolün son koşusu; bekleme = ilk başlama → son bitiş, Vercel hariç; gh API salt okuma. **Sınıf dosya yolundan yaklaşıktır** (hepsi `docs/` ya da `.md` ise belge, değilse kod); CI'ın kendi sınıflayıcısı değildir. 15 dk üstü uç değerler ayrı sayılır.
+
+| Ölçüm | Belge PR | Kod PR | Not |
+|---|---|---|---|
+| 7 Ekim (tek koşu) | 3:17 | 4:56 | OPS aktarımı, yöntem aynı değil |
+| 9-11 Ekim (80 PR) | medyan 1:30, p90 2:05 (n=16) | medyan 4:29, p90 5:19 (n=60) | 4 uç değer ayrı: #1779 65:51, #1803 44:37, #1815 22:24, #1782 17:40 |
+| 11 Ekim 21:13 (TR) sonrası, 13 Ekim ölçümü (37 PR) | medyan 1:46, p90 1:59 (n=9) | medyan 4:35, p90 4:56 (n=27) | 1 uç değer ayrı: #1902 39:45 (`ci`) |
+| **Hedef** | **1:00** | **4:00** | |
+
+- **En uzun iş:** belge PR'ında 9/9 `ci`; kod PR'ında 24/27 `ci`, 3/27 `admin-smoke`.
+- **Ölçüm penceresi boşluğu:** önceki ölçüm 11 Ekim 18:13 (TR) ile bitti, bu ölçümün başlangıcı 11 Ekim 21:13 (TR) girildi; aradaki üç saatin PR'ları iki ölçümde de yok (Pazar akşamı, sayısı ölçülmedi).
+- **Küçük örnek:** belge PR'ında n=9; 1:30 → 1:46 farkı (16 sn) bu örnekle anlamlı sayılmaz.
+
+## 4. Neden hedef tutmadı
+
+Ölçülen:
+
+- **Bekleme `ci` işine bağlı, testlere değil.** Karne özeti §1: testlerin PR bekleme süresine etkisi yaklaşık 0 dk.
+- **Kod PR'ı:** `ci` içinde Lint (satır 256) ve Build (satır 366) aynı iş içinde ardışık; 7 Ekim adım ölçümü Build ≈ 178 sn, Lint ≈ 42 sn.
+- **Belge PR'ı:** 4 test dilimi hâlâ koşuyor (1:13-1:23, 11 Ekim #1862 ölçümü) ve `ci` kapanış adımı onları bekliyor.
+
+Ölçülmedi:
+
+- Lint∥Build paralel koşunun gerçek kazancı (42 sn yalnız adım süresinden çıkarım).
+- #1902'nin neden 39:45 sürdüğü (sonradan yeniden koşan kontrol olabilir).
+- Belge PR'ında testler atlanırsa `ci` süresinin kaç sn olacağı (atlanmış koşu yok).
+
+## 5. Test karnesi (654 dosya, 7.271 test)
+
+Kaynak: `docs/audits/test-karnesi-2026-10-09.md` ve `test-karnesi-ozet-recep-2026-10-09.md`; bu raporda yeniden hesaplanmadı.
+
+| Hüküm | Dosya |
+|---|---|
+| Kalır, tam koruma | 117 |
+| Kalır, güçlendirilecek (denenen en az bir bozmaya yeşil kalıyor) | 218 |
+| Bozma ölçümüne girmemiş (birim, e2e, edge, betik) | 306 |
+| Birleşir | 3 |
+| Zorunlu olmayan işe taşınır | 2 |
+| Dünya durumu kolu ayrılacak | 4 |
+| Yeniden ölçülecek (instruction-surface-ppr) / ortam sorunu (Windows satır sonu) | 1 / 1 |
+| Silinir | **0** |
+
+Satırlar karne özetindeki sınıflardır; toplamı 654'e tam tamamlanmaz (ayrıntı karne JSON'unda, bu raporda yeniden toplanmadı).
+
+Bozma ölçümü: 709 bozma denendi, 306'sı yakalanmadı; 347 dosyanın 345'i en az bir bozmayı yakaladı. (Önceki özette "558'in 345'i, %62" yazılmıştı; koşucu ilk yakalanışta durduğu için bu oran yanlıştı, 10 Ekim'de düzeltildi.)
+
+## 6. Karar gerektiren: belge PR hedefi (Recep'in kararı)
+
+| Seçenek | Etki | Risk |
+|---|---|---|
+| **A. Hedefi ≤2:00'a çek, kapılar aynen kalır** (önerim) | Ölçülen medyan 1:46 ve p90 1:59 zaten bu sınırın içinde; hiçbir kapı gevşemez | "1 dk" sözü değişir |
+| B. Hedefi 1:00 tut, belge PR'ında test dilimlerini atla | Belge PR'ı hedefe iner (TAHMİN, atlanmış koşu ölçülmedi); kazanç yaklaşık 46 sn | Belge PR'ı cetvel yapısı ve kart-plan gibi belge kapılarına dokunan PR'dır; atlamak o kapıları PR'da gevşetir (cetvel: kabul edilmiş sapma) |
+
+Önerim A: kazanç küçük (46 sn), gevşeyen koruma belge kapılarının tamamı.
+
+**Sonuç (13 Ekim 2026): karar 351, seçenek A.** Belge PR hedefi ≤2:00; kapılar gevşemedi. Hedef `docs/standards/test-karnesi-standard.md` §8'e yazıldı (cetvel 1.3). Kod PR hedefi ≤4:00 aynen kalır, ALT-80 sürer.
+
+## 7. Açık işler (hepsi kartlı)
+
+| Kart | İş | Durum |
+|---|---|---|
+| ALT-80 | `ci` içinde Lint ∥ Build + önce/sonra ölçüm (hedef kod PR ≤4:00) | Başlamadı |
+| ALT-72 | Test haritası yaşlandı: küçük PR'da 180/704 test seçiyor; yenileme OPS tetiğini bekliyor | Backlog |
+| ALT-38g | Yerel `pnpm test:ilgili` yalnız betik/belge değişen PR'da 156/605 test dosyası seçiyor ve 10 dakikada bitmiyor | Backlog |
+| ALT-38h | Seçicide "belirsiz" 41-43 test her PR'da koşuyor | Backlog |
+| ALT-38i | 2 testin PR kapısı dışına alınması (OPS onayı) + 4 testin dünya kolu ayrımı | Backlog |
+| ALT-38j | 3 test birleştirme adayı | Backlog |
+| ALT-38k | 218 testin güçlendirilmesi + bozma ölçümü yapılmamış 306 dosya | Backlog |
+| ALT-38l | Karne araç borçları (sabotaj `--onceki`, `beyan.cjs` birim testi, haritaya kaydın ikinci yarısı) | Backlog |
+
+## 8. Sınır
+
+- Hiçbir test silinmedi; çıkarılan her kapı başka yerde (master / zamanlı) koşuyor ve karnede gösteriliyor.
+- Bu rapor yeni test koşturmadan, gh API okumasıyla üretildi (ham veri: depo dışı JSON, `pr-bekleme-olcum.py`).
+
+
+---
 # FILE: docs\audits\product-schema-ground-truth-2026-06-21.md
 
 # Ürün Veritabanı Şeması Denetimi — Doğrulanmış Gerçek Zemin (2026-06-21)
@@ -16151,6 +17345,153 @@ aynı; iki fark: ham metrikleri saklar, 3 eşzamanlı istek atar).
 
 **Ölçülmeyenler:** gerçek kullanıcı (CrUX/alan) hız verisi; hız sorununun sıralamaya etkisi; eski adres kalıbının 308 sonrası davranışı
 (yayın sonrası ölçülür); Search Console'da sorguya atfedilemeyen 21 tık.
+
+
+---
+# FILE: docs\audits\rec-300-taban-2026-10-09.md
+
+# REC-300 yayın öncesi TABAN ölçümü — yenileme 2026-10-09 (SEO-2)
+
+> **Ne bu:** [10-02 tabanının](rec-300-taban-2026-10-02.md) yenisi. 10-06'da yayına giren kategori ağacı + Casals + 40 aile adresi
+> (308 ile) sonrası ilk ölçüm: hem model adresi pilotu için G0 öncesi taban, hem 10-06 yayınının G+3 görünümü
+> (`standards/yayin-gorunurluk-denetim-standard.md` Y2/Y3).
+> **Kim istedi:** OPS (SEO-2'nin kalan üç tabanı: Search Console, bağlantı, Lighthouse). **Sahibi:** GEO-SEO.
+> **Yöntem:** salt okuma; ölçümleri müdür betiklerle koştu (ekip üyesi yok). **Ham veri (depo dışı):**
+> `~/venthub-olcum/rec-300-taban-2026-10-09/`. Siteye ve Google'a hiçbir şey gönderilmedi (Search Console `searchAnalytics`,
+> URL Inspection ve `sitemaps.get` salt okur; IndexNow'a dokunulmadı).
+> **Dayanak sütunu:** *ölçtüm* = bu koşuda çalıştırıldı · *belgede okudum* · *tahmin* = çıkarım. Parantez içindeki 10-02 değerleri
+> 10-02 belgesinden ve ham dosyalarından alındı.
+> **Doğrulama:** belgedeki sayılar, ölçümü üreten özet betiklerinden bağımsız ikinci bir betikle ham dosyalardan yeniden
+> hesaplandı (iki tur); çıkan farklar bu metne işlendi. 308 yönlendirmeleri ve site haritası durumu belge yazıldıktan sonra yeniden çekildi
+> (`yonlendirme-dogrulama-2026-10-09.json`, `1-sitemaps-get.json`).
+
+## 0. Özet
+
+1. **Dizin oranı düşmüş gibi görünüyor ama düşmedi:** 10-02'de 87 adresin 83'ü dizindeydi; bugün 92 adresin 47'si. Fark tamamen
+   10-06 yayınından: 10-02'den kalan 46 adresin 45'i dizinde (10-02'de 44'tü), 46 yeni adresin yalnız 2'si dizinde.
+   40 yeni aile adresinin hiçbiri dizinde değil (12'si keşfedilmiş, 28'ini Google henüz bilmiyor).
+2. **308'lerin Google'a işlemesi henüz başlamadı (G+3):** 40 eski aile adresinin 40'ı da beklenen yeni adrese 308 veriyor
+   ve yeni adresler 200; ama Google'da 38 eski adres hâlâ "dizine eklendi", son taramaları 25-40 gün önce, 10-06'dan sonra taranan 0.
+   Aynı durum 11 eski/iç içe kategori adresinde (308 → 200); haritada olmayan 2 `/en/category` sayfası da dizinde ve 10-06'dan sonra
+   taranmadı (bunlar yönlendirmesiz 200). İstisna: yeniden adlanan kategori
+   `korozyona-ve-aside-dayanimli-fanlar` 10-08 04:57Z'de taranıp dizine girdi.
+3. **Gösterim kütlesinin %62'si bugünkü haritada olmayan adreslerde** (323/524): 28 eski aile adresi 173 gösterim, 11 eski kategori
+   adresi 28. Yeni 40 aile adresinde şimdilik 0 gösterim. Bu kütle 308 ile taşınacak; taşınma hızı G+7/G+14'te ölçülecek (§5).
+4. **Bağlantı temiz:** 92 sayfa, 1139 tekil adres, kırık 0. 691 → 1139 artışının 439'u 45 aile sayfasındaki `?sku=` model
+   bağlantıları (URN-21; kanonikleri aile adresine bakıyor).
+5. **Sayfa hızı 10-02'ye göre biraz iyi, hâlâ zayıf:** performans ortalaması 0,783 (eşleşen 85 sayfada 0,745 → 0,782); LCP ortanca
+   5,7 sn (6,0), 67 sayfada 4 sn üstü; CLS ortalaması 0,049 → 0,0003. 4 sayfa ilk koşuda "gürültü imzası" verdi, yeniden
+   koşuda normale döndü (§3.2).
+6. **Canlı kapı bilinen listesiyle KIRMIZI 92 = yeni 82 + bilinen 10:** yeni 82'nin 75'i JSON-LD (47 aile + 28 kategori); bilinen
+   listesindeki `JSONLD` satırı (REC-494, Linear'da Done) bu iki kodu da susturuyordu. Ayrıca llms.txt sayıları bayat (87/24, gerçek 92/28).
+   Çıkış kodu 1 (§4).
+
+## 1. Bu tabanın zamanı: 10-06 yayınından sonra
+
+| Tarih | Olay | Dayanak |
+|---|---|---|
+| 10-03 | #1661 (URN-21): aile sayfasında görünür kırıntı + Modeller satırları gerçek bağlantı (`?sku=`) | `git log` |
+| 10-06 11:43Z | #1352 birleşti: kategori ağacı + Casals + 40 aile adresi (migration). 40 eski aile adresi 308 | `gh pr view` + curl |
+| 10-08 01:37Z | Google site haritasını yeniden indirdi (92 adres) | ölçtüm (`sitemaps.get`) |
+| 10-09 ~08:00-09:30Z | bu belgenin ölçümleri | ham dosyalar |
+
+| Site haritası | 10-02 | 10-09 | Dayanak |
+|---|---|---|---|
+| Adres sayısı | 87 | **92** | ölçtüm |
+| Her iki günde de olan | | 46 | ölçtüm |
+| Yeni | | 46: 40 aile (yeni adres) + 5 kategori (`elektrikli-isiticili-hava-perdeleri`, `hucreli-aspiratorler`, `isiticisiz-hava-perdeleri`, `korozyona-ve-aside-dayanimli-fanlar`, `plug-fanlar`) + 1 marka (`casals`) | ölçtüm |
+| Düşen | | 41: 40 eski aile adresi + `/tr/category/asit-dayanikli-fanlar` (308 → `korozyona-ve-aside-dayanimli-fanlar`) | ölçtüm |
+| Kategori adresi | 24 | **28** | ölçtüm |
+
+## 2. Search Console tabanı (hizmet hesabı, `sc-domain:venthub.com.tr`)
+
+### 2.1 Site haritası ve dizin durumu
+
+| Ölçüt | Sonuç | Dayanak |
+|---|---|---|
+| Site haritası | tek yol `/sitemap.xml`; hata 0, uyarı 0; gönderilen 92; son gönderim 2026-08-29; Google son indirme **2026-10-08 01:37Z** (10-02: 10-01 23:08Z); bekleyen yok. Haritanın "dizine eklenen" sayacı yine 0: URL Inspection ile çelişiyor, KULLANILMAZ | ölçtüm (`sitemaps.get`) |
+| 92 adresin dizin durumu (URL Inspection) | **47** "Gönderildi ve dizine eklendi"; **14** "Keşfedildi - şu anda dizine eklenmiş değil"; **31** "URL Google tarafından bilinmiyor"; denetlenemeyen 0; getirme başarısız 0; robots engeli 0; Googlebot'un seçtiği kanonik ≠ adres: 0 | ölçtüm |
+| Tarama tazeliği | taranmış 47 adreste son tarama yaşı: 0-7 gün 2 · 8-30 gün 22 · 31+ gün 23; hiç taranmamış 45 (44'ü yeni adres) | ölçtüm |
+| 10-02'den kalan 46 adres | **45 dizinde** (10-02: 44). Dizinde olmayan tek adres `/tr/category/yedek-parca-ve-sensorler`: "Google bilmiyor" → "keşfedildi", hâlâ taranmamış. `bilgi-merkezi/frekans-konvertoru-nedir` "taranmış, eklenmemiş" → "dizinde" (son tarama 09-28) | ölçtüm |
+| 46 yeni adres | **aile 40:** 0 dizinde, 12 keşfedildi, 28 bilinmiyor · **kategori 5:** 1 dizinde (`korozyona-ve-aside-dayanimli-fanlar`, son tarama 10-08 04:57Z), 1 keşfedildi, 3 bilinmiyor · **marka 1:** `casals` dizinde (son tarama 08-29) | ölçtüm |
+| 40 eski aile adresi (haritada değil) | **38 dizinde**, 2 bilinmiyor (`avens-dikdortgen-kanal-radyal`, `vortice-vort-commercial-in-line-rectangular`; ikisi 10-02'de de dizinde değildi). Son tarama 25-40 gün önce; **10-06 11:43Z'den sonra taranan 0**; Google kanoniği başka adres: 0 | ölçtüm |
+| GSC'de gösterimi olup haritada olmayan 13 kategori adresi | 11'i TR eski/iç içe adres: hepsi **tek 308 → yeni adres → 200**; 2'si `/en/category/*` (200, EN yayını kapalı ama sayfa açık). 13'ü de dizinde; son tarama 27-40 gün önce; 10-06'dan sonra taranan 0. Not: `fans/parking-jet-fan` 308 ile `otopark-jet-fan` kategorisine gidiyor, o sayfa `noindex, follow` ve haritada yok | ölçtüm |
+| 308 doğrulaması | 40 eski aile adresinin 40'ı da 308 ve `Location` beklenen yeni adres; 40 yeni adres 200; 11 eski kategori adresi tek sıçramada 200 | ölçtüm (curl başlıkları) |
+
+### 2.2 Performans (`searchAnalytics`, varsayılan kesinleşmiş veri)
+
+| Ölçüt | Sonuç | Dayanak |
+|---|---|---|
+| Son 28 gün (09-09 → 10-06) | **25 tık · 433 gösterim · CTR %5,77 · ortalama sıra 21,6**; 92 sayfa, 56 sorgu satırı. 10-02 (09-02 → 09-29): 24 tık · 447 gösterim · %5,37 · 26,5. Pencereler 21 gün örtüşüyor ve hacim küçük: fark eğilim sayılmaz | ölçtüm |
+| Marka sorgusu | "venthub" **3 tık · 22 gösterim · sıra 7,0** (10-02: 3 · 23 · 6,7). En çok gösterimli sorgu "danfoss fc 102": 23 gösterim, sıra 36,2, 0 tık | ölçtüm |
+| Sorguya atfedilemeyenler | 56 sorgu satırı toplamı 4 tık / 174 gösterim: **21 tık ve 259 gösterim sorguya atfedilemiyor** (nadir sorgular, bu yetkiyle ölçülemez) | ölçtüm |
+| Adres sınıfına göre (92 sayfa; betik sınıflaması) | ürün/aile 37 sayfa: 5 tık / 214 gösterim · kategori 29: 3 / 100 · marka 8: 4 / 80 · ana 4: 4 / 43 · destek 6: 6 / 29 · diğer 8: 3 / 58. Sayfa satırlarının gösterim toplamı 524 (GSC'nin sayfa boyutundaki sayım biçimi; mülk toplamı 433) | ölçtüm |
+| Eski aile adresleri (40 slug değişen aile) | 28'i gösterim aldı: **4 tık (%16) · 173 gösterim (sayfa toplamının %33,0'ı)**. 10-02: 3 tık (%12,5) · 148 gösterim (%25,9) | ölçtüm |
+| Yeni 40 aile adresi | **0 sayfa · 0 tık · 0 gösterim** (yayın 10-06; veri 10-06'ya kadar) | ölçtüm |
+| Bugünkü haritada OLMAYAN adresler | **59 sayfa · 12 tık · 323 gösterim (sayfa toplamının %61,6'sı):** 28 eski aile adresi (4 / 173) · 11 eski/iç içe kategori (2 / 28) · 10 `/en` sayfası (4 / 54; yalnız `/en` ana sayfası 1 / 23) · 2 marka sayfası (1 / 24) · 8 diğer (1 / 44). Haritadaki 33 sayfa: 13 tık / 201 gösterim | ölçtüm |
+
+## 3. Bağlantı ve sayfa hızı tabanı
+
+### 3.1 Bağlantı taraması (`link-tara.mjs`, linkinator 8.1.0, 2026-10-09 07:58Z)
+
+| Ölçüt | Sonuç | Dayanak |
+|---|---|---|
+| Tarama | **92 kök sayfa, 1139 tekil adres**; **kırık 0 · yönlendirme 0 · hız sınırı 0**. 10-02: 87 sayfa / 691 adres | ölçtüm |
+| 691 → 1139 (+448) | **+439 `?sku=` bağlantısı** (URN-21): 47 aile sayfasının 45'inde, kendi model satırlarından (en çok `seat-serisi` 40, `vortice-vort-quadro-evo` 23, `jet-serisi` 21). Örnek `?sku=` adresinin kanoniği aile adresi ve `robots` etiketi yok. Kalan **+9 net:** yeni 51 adres (40 aile, 5 kategori, 2 marka, 3 görsel, 1 `?brand=Casals` süzgeç adresi) − düşen 44 (40 eski aile, 3 kategori adresi, 1 görsel) + derleme dosyaları (`/_next/static`: 54 yeni, 52 düşen) | ölçtüm (iki taramanın CSV'si + curl) |
+| Dikkat: "yönlendirme 0" sayacı | Aynı gün canlı kapı **4 iç bağlantıda 308** buldu (REC-493, `/tr` sayfasındaki eski model adresleri). `link-tara` sayacı bu 308'leri görmüyor: iç bağlantı yönlendirmesi için esas sayı kapının `IC-BAGLANTI-YONLENDIRME` değeri. Sebep araştırılmadı | ölçtüm (iki araç çelişiyor) |
+
+### 3.2 PSI (mobil, Lighthouse 13.5.0, `psi-kos.mjs` sarmalayıcı, 07:57-08:08Z)
+
+| Ölçüt | Sonuç | Dayanak |
+|---|---|---|
+| Kapsam | **92/92 sayfa ölçüldü**, hata 0 | ölçtüm |
+| Gürültü imzası | 4 sayfa ilk koşuda erişilebilirlik 0,54 + SEO 0,73-0,82 + iyi uygulamalar 0,92 verdi (`kontrol-sistemleri`, `vortice-lineo-quiet-sessiz-kanal-fanlari`, `vortice-vort-qbk-sal-kc-evo`, `vortice-vort-quadro-evo`); yeniden koşuda dördü de 1,00 / 0,95 / 0,96. **10-02'de aynı imza** (0,73 / 0,54 / 0,92) tek sayfada (`category/isi-geri-kazanim`) çıkmış ve o sayfa yeniden koşulmamıştı, yani 10-02 ortalamaları o değerlerle hesaplı; bugün aynı sayfa ilk koşuda normal (1,00 / 0,94 / 0,96, performans 0,86). Bugünkü 4 sayfada yeniden koşu imzayı kaldırdı → sayfanın gerçek durumu değil, ölçüm gürültüsü. Aşağıdaki değerler bu 4 sayfada yeniden koşu değeriyle | ölçtüm |
+| Kategori ortalamaları | SEO **0,999** · erişilebilirlik **0,954** · iyi uygulamalar **0,957** · performans **0,783**. 10-02 belgesi (87 sayfa, gürültülü sayfa dahil): 0,996 · 0,949 · 0,960 · 0,746 | ölçtüm |
+| Performans dağılımı | **75 altı 36 sayfa** (10-02: 51), 50 altı 0 (10-02: 1). Türe göre ortanca: aile 47 sayfa 0,76 (20'si 75 altı) · kategori 28: 0,75 (13) · marka 6: 0,80 (1) · diğer 10: 0,85 (1) · ana sayfa 0,74 (10-02: 0,65). En düşük: `category/frekans-konvertorleri` 0,55 · `vortice-radon-serisi-kanal-fanlari` 0,60 · `category/hava-perdeleri` 0,65 | ölçtüm |
+| LCP | ortanca **5738 ms** (10-02: 6029) · ortalama 5244 · en kötü 9676 (`category/hava-perdeleri`; sonra `kanal-tipi-fanlar` 9376, ana sayfa 7501 — 10-02'de ana sayfa 11642 idi) · **4000 ms üstü 67 sayfa** · 2500 ms altı 5 sayfa | ölçtüm |
+| TBT / CLS | TBT ortanca **106 ms** (10-02: 134), en kötü 674, 200 ms üstü 11 sayfa · CLS ortanca 0, ortalama **0,0003** (10-02: 0,049), en kötü 0,0105 (10-02: 0,612, `vortice-vort-e-atex`; düzelme sebebi araştırılmadı) | ölçtüm |
+| Eşleşen sayfalarda kıyas (10-02 yolu → bugünkü yol; 40 eski aile adresi yeni adresiyle eşlendi; hariç 2 sayfa: 10-02'de gürültü imzalı `category/isi-geri-kazanim` ve adı değişip eşlenemeyen `category/asit-dayanikli-fanlar` → **85 sayfa**) | performans ortalaması **0,745 → 0,782** (ortanca fark +0,02): 33 sayfa en az 0,05 iyi, 15 sayfa en az 0,05 kötü, 37 sayfada fark 0,05'ten küçük; LCP ortanca 6029 → 5713 ms; CLS ortalaması 0,0504 → 0,0001. Tek koşu gürültüsü ±0,05 mertebesinde: sayfa bazında okunmaz, ortalama okunur | ölçtüm |
+| İyi uygulamalar 0,9 altı | `category/hava-perdeleri` ve `category/endustriyel-tavan-vantilatorleri` (0,88) | ölçtüm |
+
+## 4. Canlı kapı tabanı (`canli-kapi.mjs --bilinen`, 26 kontrol, 92 sayfa + 112 iç bağlantı hedefi)
+
+**KIRMIZI 92 = yeni 82 + bilinen 10 · UYARI 74 · çıkış kodu 1.** (Bilinen listesi verilmeden: KIRMIZI 90 / UYARI 74.)
+
+| Kod | Seviye | Sayı | Bilinen | Anlamı | Sahip |
+|---|---|---|---|---|---|
+| `JSONLD-ISPARTOF` | KIRMIZI | 47 | yeni | aile sayfalarında `ProductGroup` `isPartOf` taşıyor (şema uyarısı) | URUN (kart yok) |
+| `JSONLD-COLLECTIONPAGE` | KIRMIZI | 28 | yeni | kategori `CollectionPage` üst düzeyde `numberOfItems/itemListElement` taşıyor (doğrusu `mainEntity` `ItemList`) | URUN (kart yok) |
+| `LLMS-SAYFA` | KIRMIZI | 2 | yeni | `llms.txt` "87 indexable URLs" ve "24 categories" diyor; harita 92 adres, 28 kategori | GEO-SEO |
+| `VITRIN-IDDIA` | KIRMIZI | 3 | yeni | `/tr` görünen metinde yasak ifadeler ("DETERMİNİSTİK", "Sistem.Veri.Canlı"), `/tr/about` "81 il" | URUN (URN-60) |
+| `BILINEN-KAYIT-KAPALI` | KIRMIZI | 2 | yeni | bilinen listesinde `FAVICON` (REC-491) ve `JSONLD` (REC-494): kayıtlar Linear'da Done, satır geçersiz | GEO-SEO |
+| `TITLE-TASLAK` | KIRMIZI | 3 | REC-508 | çerez, gizlilik, KVKK başlıklarında "Taslak" | bilinen |
+| `LANG` | KIRMIZI | 2 | REC-373 | `/en`, `/en/products`: URL dili en, `<html lang>` tr | bilinen |
+| `IC-BAGLANTI-YONLENDIRME` | KIRMIZI | 4 | REC-493 | 4 iç bağlantı 308 (örn. `/tr/products/12-kw-elektrikli-isitici-13034`) | bilinen |
+| `YONLENDIRME-ZINCIRI` | KIRMIZI | 1 | REC-495 | `/category/fanlar` 4 sıçrama (308→308→307→308) | bilinen |
+| `LASTMOD-TOPLU` | UYARI | 64 | | 17 kategori satırı aynı damga (08-31 10:25Z) + 47 aile satırı aynı damga (10-06 11:46Z, migration) | |
+| `TITLE-UZUN` | UYARI | 4 | | `/tr` başlığı 64 karakter ve üç sayfa daha | |
+| `ROBOTS-KALIP` | UYARI | 3 | | `Disallow` kalıpları (`/auth/` vb.) dil önekli gerçek yola eşleşmiyor | |
+| `ROBOTS-HARITA-ALAN` | UYARI | 2 | | haritada `<changefreq>` (PR #1669 bekliyor) | |
+| `ACIKLAMA-KISA` | UYARI | 1 | | `/tr/products/seat-serisi` 68 karakter | |
+
+**Okuma notları:**
+
+- `canli-kapi-bilinen.json` anahtarı kod **ya da kod ön ekidir** (`b.kod === k || b.kod.startsWith(k + '-')`): `JSONLD` satırı `JSONLD-ISPARTOF` ve `JSONLD-COLLECTIONPAGE`'i de susturuyordu.
+  10-03'te JSONLD toplamı 120 bilinen idi; bugün kırıntı bulgusu (`JSONLD-BREADCRUMB`) yok, geriye bu iki kod, 75 bulgu, kalıyor. Satır silinince ya da kayıt kapanınca 75 gerçek bulgu birden göründü.
+- Kapı kayıt durumunu hâlâ **Linear API'sinden** okuyor (`kayitDurumlariCek`); iş kaydı Kanban'a taşındı (karar 324), iki durum ayrışabilir (SEO-19 kapsamı). `BILINEN-KAYIT-KAPALI` mesajı "kusur hâlâ canlıda" der ama kaydı Done olan her satırda aynı genel metni basar (`canli-kapi.mjs:568`): `FAVICON` için kapıda bulgu yok, satır gereksiz ve silinebilir; `JSONLD` için kusur gerçekten sürüyor (75 bulgu).
+- 47 aile satırının lastmod'u tek damga (10-06 11:46:21Z, #1352 birleşmesinden 3 dakika sonra): migration'ın yazdığı `updated_at`. 40 ailede adres/ad gerçekten değişti; kalan 7 ailede içerik değişimi ölçülmedi. Sinyal olarak "hepsi aynı anda" görünür (REC-498 lastmod maddesinin ikinci örneği).
+
+## 5. Ölçülmeyenler ve sonraki ölçüm noktaları
+
+**Ölçülmeyenler:** gerçek kullanıcı (CrUX/alan) hız verisi; hız sorununun sıralamaya etkisi; GSC'de sorguya atfedilemeyen 21 tık;
+`link-tara`'nın 308 sayacının neden 0 verdiği; 47 aile satırının lastmod'unun içerik değişimiyle ilişkisi; 308'lerin Google tarafından
+ne zaman işleneceği (aşağıdaki noktalarda ölçülür).
+
+| Nokta | Tarih | Ne ölçülür |
+|---|---|---|
+| 10-06 yayını G+7 | 10-13 | 40 eski + 40 yeni aile adresi ve 13 kategori adresinde URL denetimi (`gsc-url-denetim` mantığı), GSC sayfa kıyası: eski adreslerin son tarama tarihi, yeni adreslerin dizin durumu ve gösterimi |
+| 10-06 yayını G+14 | 10-20 | aynı küme; eski adreslerden yeni adreslere gösterim/tık taşınması |
+| Model adresi pilotu G0 | OPS'tan sorulacak | bu belge G0'dan 7 günden eskiyse GSC tabanı G0 günü yeniden çekilir (SEO-21 sözü); G+1/3/7/14 ölçümü |
 
 
 ---
@@ -22771,6 +24112,63 @@ Karar **hedefe** bakar: yerel döngü adresi → TLS yok (trafiğin makineyi ter
 
 
 ---
+# FILE: docs\audits\seo-urun-snippet-offers-2026-10-16.md
+
+# Ürün snippet'leri KRİTİK sorunu: fiyatsız ürün için yapılandırılmış veri (SEO-56, 2026-10-16)
+
+Cetvel: `docs/standards/yayin-gorunurluk-denetim-standard.md` (şema denetimi), `docs/standards/rendering-cache-standard.md` (fiyat yüzeyi). Yöntem: Search Console raporu (yerleşik tarayıcı oturumu, 16 Ekim), haritadaki 93 adresin ham HTML'inde JSON-LD sayımı (yalnız GET), Google belgesinin okunması. Canlıya yazım yok. Sorgu/arama verisi bu dosyaya girmedi (P6).
+
+## 1. Sorun ne
+
+Search Console "Alışveriş > Ürün snippet'leri" raporu: 2 geçersiz öğe, 0 geçerli, tek sorun türü, KRİTİK: `hasVariant.offers`, `review` ya da `aggregateRating` belirtilmelidir. İlk tespit tarihi 16.10.2026, rapor son güncelleme 15.10.2026. Etkilenen iki adres, ikisi de aynı gün Google'ın taradığı sayfalar: `/tr/products/danfoss-vlt-micro-drive-fc-51` ve `/tr/products/danfoss-vlt-hvac-basic-drive-fc-101` (SEO-54'te dizin isteği gönderilen adresler).
+
+## 2. Kalıp ölçümü (canlı HTML, haritadaki 93 TR adres)
+
+| Ölçüt | Değer |
+|---|---|
+| Haritada ProductGroup JSON-LD'si olan adres | 47 (hepsi aile sayfası `/tr/products/<aile>`) |
+| Bu sayfalarda toplam varyant (`hasVariant`) | 441 |
+| `offers` taşıyan varyant | 0 (47 sayfanın 47'sinde, 441 varyantın 441'inde yok) |
+| ProductGroup düzeyinde `review`, `aggregateRating`, `offers` | 0 sayfada |
+| Tekil `Product` düğümlü sayfa | 0 |
+| Diğer sayfalar | kategori ve marka, bilgi merkezi, ana sayfa: CollectionPage, Article, Brand, Organization, BreadcrumbList; Ürün işaretlemesi yok |
+
+Yani sorun iki sayfaya özgü değildir. Search Console yalnız Google'ın şimdiye kadar taradığı iki adresi saymıştır; 47 aile sayfasının hepsi aynı kalıpta ve Google taradıkça her biri "geçersiz öğe" olarak eklenecektir (tahmin: 47 öğe; ölçülmedi, tarama hızına bağlı).
+
+## 3. Sebep: kasıtlı davranış ve belge kuralının çarpışması
+
+Kod: `src/lib/seo/jsonld.ts` `buildProductGroupJsonLd`. Fiyatsız ya da teklif kipindeki varyantta `offers` HİÇ yazılmaz (REC-111: vitrin "Teklif Alın" derken şemada gerçek fiyat yayınlanmasın). Bu doğru bir karardır ve korunmalıdır. Çarpışan kural: Google belgesine göre ürün snippet'i için `review`, `aggregateRating` ya da `offers` alanlarından en az biri ZORUNLUDUR (Search Central, "Product snippet structured data", Required properties). Teklif ve fiyat taşımayan, yorumu da olmayan bir ProductGroup bu zorunluluğu karşılayamaz; hata kalıbı kod hatası değil, "fiyatsız ürün + ürün işaretlemesi" kombinasyonudur.
+
+## 4. Seçenekler
+
+| Seçenek | Sonuç | Hüküm |
+|---|---|---|
+| A. Fiyatı olmayan ailede ProductGroup/Product yazma; yerine kategori ve seri sayfalarında zaten kullanılan `CollectionPage` + `ItemList` (model adları) yaz | Search Console'daki ürün öğeleri sıfıra iner; fiyat sızmaz; kalıp yeni açılacak katalog sayfalarına da otomatik uygulanır | ÖNERİLEN |
+| B. Olduğu gibi bırak | Sıralama üzerindeki etkisi bu çalışmada ölçülmedi (hata, ürün zengin sonucu uygunluğunu kapatır; fiyatsız sayfa zaten uygun değil), ama her taranan aile sayfası "kritik" öğe olarak eklenir, "Düzeltmeyi doğrula" başarısız olur, Recep'e e-posta gelmeye devam eder | Önerilmez |
+| C. `aggregateRating` ya da `review` ekle | Gerçek, görünür yorum yok; uydurma yasak | Yasak |
+| D. `Offer` ekle, `price: 0` yaz | Belgede `price: 0` "ödemesiz erişilebilir ürün" demektir; teklif kipindeki ürünü ücretsiz ilan etmek yanlış beyan | Yasak |
+| E. `Offer` ekle, fiyatsız | `price` Offer'ın zorunlu alanıdır; hata türü değişir ("price eksik"), çözülmez | Çözmez |
+
+## 5. Öneri (ÜRÜN kodu, tek noktada ölçeklenir)
+
+1. `buildProductGroupJsonLd` içinde karar: ailenin TÜM varyantlarında geçerli ve görünür fiyat (offers üretilen) varsa `ProductGroup` (bugünkü biçim); en az bir varyantta teklif kipi ya da fiyat yoksa `ProductGroup`/`Product` düğümü HİÇ üretilmez ve yerine `buildSeriesLandingJsonLd` ile aynı şekil (`CollectionPage` + `mainEntity` `ItemList`, fiyat yok) yazılır. Marka bilgisi `CollectionPage` üzerinde `about: Brand` olarak taşınabilir.
+2. Tek çağrı noktası (`aileSayfasi.tsx`; `ProductDetailPageView.tsx` içindeki yorum model dalının da ProductGroup'a bağlanacağını söylüyor, o zaman aynı kural orada da uygulanmalı): bütün katalog teklif kipiyle açılsa da kalıp yüzlerce sayfaya TEK değişiklikle uygulanır; sayfa başına işaretleme eklenmez.
+3. Kapı: "teklif kipindeki ürünün JSON-LD'sinde `Product`/`ProductGroup` yok, `offers` yok" ve "tüm varyantı fiyatlı ailede `offers` var" iki yönlü testle kilitlenir.
+4. Karışık aile (bazı varyant fiyatlı, bazısı fiyatsız) bugün YOK (47/47 hepsi fiyatsız). Çıkarsa yukarıdaki kural CollectionPage'e düşer; kısmi `hasVariant` yazılmaz (grubu eksik gösterir).
+
+Ölçülmeyenler: Google'ın bu sayfaları hangi hızla tarayacağı; ürün işaretlemesinin yapay zekâ cevaplarında alıntıya katkısı (kanıt bulunamadı, sayfa metni aynı bilgileri taşıyor); Rich Results Test sonucu (ÜRÜN düzeltmesi canlıya çıkınca canlı test ve Search Console doğrulaması ile ölçülür).
+
+## 6. Sonraki adımlar
+
+| Adım | Sahip |
+|---|---|
+| Kod: A seçeneği (tek fonksiyon + iki yönlü test) | URUN |
+| Canlıda ham HTML ölçümü: 47 sayfada `Product`/`ProductGroup` yok, `CollectionPage` var | GEO-SEO |
+| FC 51 ve FC 101 için dizin isteği (yeniden tarama) + Search Console "Düzeltmeyi doğrula" | GEO-SEO |
+| Doğrulama sonucunu bekleme (Google birkaç gün ile iki hafta arası sürer, süre ölçülecek) | GEO-SEO |
+
+
+---
 # FILE: docs\audits\sir-ekrana-basma-olayi-2026-09-04.md
 
 # Olay kaydı — sır değeri ekrana basıldı (2026-09-04, ALTYAPI)
@@ -23069,10 +24467,10 @@ Sütunlar: **Ön yükle** = çalışan tanımının `skills:` alanına girer (to
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), venthub-architecture (6,5K, y) | 11,9K | codebase-navigation (8,2K, y), web-platform-baseline (9,8K, y) | — |
-| Uygulayıcı | i18n-conventions (14,2K), venthub-architecture (6,5K, y), vercel-composition-patterns (4,8K, y) | 25,5K | create-migration (6,3K), vercel-react-best-practices (9,1K, y), ui-ux-pro-max (13,6K), testing (9,5K, y), debugging (9,8K, y), react-modern (9,8K, y), typescript-strict (8,5K, y), observability (7,9K, y), api-design (8,7K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K, y), web-design-guidelines (4K, y), webapp-testing (3,9K, y), accessibility (14,5K, y) | 32,7K | code-review (9K, y) | diff-review: REC-514 kapanınca eklenir (ADMIN doğrulayıcı "evet") |
+| Araştırmacı | codegraph (5,4K, y), venthub-architecture (6,5K, y) | 11,9K | codebase-navigation (9,0K, y), web-platform-baseline (10,5K, y) | — |
+| Uygulayıcı | i18n-conventions (14,2K), venthub-architecture (6,5K, y), vercel-composition-patterns (4,8K, y) | 11,3K | create-migration (6,3K), vercel-react-best-practices (9,1K, y), ui-ux-pro-max (13,6K), testing (12,2K, y), debugging (13,0K, y), react-modern (11,0K, y), typescript-strict (10,0K, y), observability (8,6K, y), api-design (10,0K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K, y), web-design-guidelines (4K, y), webapp-testing (3,9K, y), accessibility (14,5K, y) | 34,9K | code-review (9,6K, y) | diff-review: REC-514 kapanınca eklenir (ADMIN doğrulayıcı "evet") |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23090,10 +24488,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), investigate (6K, y) | 11,4K | fallow (16,4K), research-web (18,2K, y), codebase-navigation (8,2K, y) | — |
-| Uygulayıcı | create-migration (6,3K), testing (9,5K, y) | 15,8K | debugging (9,8K, y), node-modern (8,5K, y), observability (7,9K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | venthub-enterprise-audit: dört denetim skill'i aynı işe talip; yan yana koşum yapılmadan biri seçilmez; venthub-auditor: aynı kıyas; venthub-20-eksen-denetimi: aynı kıyas; venthub-global-rontgen: aynı kıyas; ayrıca bayat yol/araç adları; diff-review: REC-514 kapanınca eklenir |
+| Araştırmacı | codegraph (5,4K), investigate (6K, y) | 6,0K | fallow (16,4K), research-web (7,3K, y), codebase-navigation (9,0K, y), tech-stack (9,4K, y) | — |
+| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | debugging (13,0K, y), node-modern (10,3K, y), observability (8,6K, y), tech-stack (9,4K, y), database-migrations (6,8K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y), database-migrations (6,8K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | — | venthub-enterprise-audit: dört denetim skill'i aynı işe talip; yan yana koşum yapılmadan biri seçilmez; venthub-auditor: aynı kıyas; venthub-20-eksen-denetimi: aynı kıyas; venthub-global-rontgen: aynı kıyas; ayrıca bayat yol/araç adları; diff-review: REC-514 kapanınca eklenir |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23107,10 +24505,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), investigate (6K) | 11,4K | research-web (18,2K, y), codebase-navigation (8,2K, y) | — |
+| Araştırmacı | codegraph (5,4K, y), investigate (6K) | 5,4K | research-web (7,3K, y), codebase-navigation (9,0K, y), tech-stack (9,4K, y) | — |
 | Uygulayıcı | — | — | mcp-builder (9,1K, y) | wrongstack-kanban: müdür düzeyi: çalışan başka pencereye yazmaz, kartı müdür yönetir (§10.4, belge §6); wrongstack-mailbox-mcp: müdür düzeyi: pencereler arası posta çalışanın işi değil; örnek yapılandırmada --admin ve mcp_use var (§10.4); guard: careful, freeze, guard üçlüsü kıyas bekliyor; careful: aynı kıyas; freeze: aynı kıyas |
-| Çürütücü | plan-challenger (14,6K), chimera (16,9K, y) | 31,5K | bug-hunter (18K, y), security-scanner (12,7K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | — |
+| Çürütücü | plan-challenger (14,6K), chimera (12,9K, y) | 12,9K | bug-hunter (12,3K, y), security-scanner (8,5K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23122,10 +24520,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | research-web (18,2K, y) | 18,2K | — | — |
-| Uygulayıcı | — | — | diagram (16K) | — |
+| Araştırmacı | research-web (7,3K, y) | 7,3K | — | — |
+| Uygulayıcı | — | — | diagram (16K), write-seo-geo-content (21,9K, y) | — |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23137,10 +24535,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), investigate (6K, y) | 11,4K | codebase-navigation (8,2K, y) | — |
-| Uygulayıcı | create-migration (6,3K), testing (9,5K, y) | 15,8K | supabase (18,8K), debugging (9,8K, y), typescript-strict (8,5K, y), node-modern (8,5K, y), observability (7,9K, y), api-design (8,7K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K, y) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | venthub-global-rontgen: bayat yol ve araç adları (src/app/products/[slug] yok, npm run build), edge fonksiyonlarına dair tek madde var; bağımsız doğrulayıcı UYMAZ dedi; diff-review: REC-514 kapanınca eklenir (edge için D11 yanlış alarmı düzelmeli) |
+| Araştırmacı | codegraph (5,4K, y), investigate (6K, y) | 11,4K | codebase-navigation (9,0K, y) | — |
+| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | supabase (18,8K), debugging (13,0K, y), typescript-strict (10,0K, y), node-modern (10,3K, y), observability (8,6K, y), api-design (10,0K, y), payments-webhooks (6,6K, y), database-migrations (6,8K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K, y) | 14,4K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y), database-migrations (6,8K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | payments-webhooks (6,6K, y) | venthub-global-rontgen: bayat yol ve araç adları (src/app/products/[slug] yok, npm run build), edge fonksiyonlarına dair tek madde var; bağımsız doğrulayıcı UYMAZ dedi; diff-review: REC-514 kapanınca eklenir (edge için D11 yanlış alarmı düzelmeli) |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23154,10 +24552,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 17,9K | research-web (18,2K, y), web-platform-baseline (9,8K, y) | — |
-| Uygulayıcı | — | — | — | — |
-| Çürütücü | plan-challenger (14,6K), chimera (16,9K, y) | 31,5K | bug-hunter (18K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | accessibility (14,5K, y) | — |
+| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 0,0K | research-web (7,3K, y), web-platform-baseline (10,5K, y), geo-fundamentals (7K, y) | — |
+| Uygulayıcı | — | — | web-performance (6,4K, y), geo-fundamentals (7K, y) | — |
+| Çürütücü | plan-challenger (14,6K), chimera (12,9K, y) | 12,9K | bug-hunter (12,3K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | accessibility (14,5K, y), web-performance (6,4K, y) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23171,10 +24569,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K) | 5,4K | graphify (43,1K), codebase-navigation (8,2K, y) | — |
+| Araştırmacı | codegraph (5,4K) | 0,0K | graphify (43,1K), codebase-navigation (9,0K, y) | — |
 | Uygulayıcı | — | — | — | document-generate: commit ve push adımı var, sabit Co-Authored-By yazıyor, docs/ harita cetvelini atlıyor; uyarlanmadan verilmez; document-release: commit ve push yapıyor, VERSION ve TODOS.md varsayıyor, CLAUDE.md düzenliyor; uyarlanmadan verilmez |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23190,10 +24588,10 @@ I18N'in rapor dosyası yok; set yalnız SKILL.md okumasına dayanıyor. Departma
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y) | 5,4K | codebase-navigation (8,2K, y), web-platform-baseline (9,8K, y) | — |
-| Uygulayıcı | i18n-conventions (14,2K, y), testing (9,5K, y) | 23,7K | debugging (9,8K, y) | — |
-| Çürütücü | plan-challenger (14,6K, y), chimera (16,9K, y) | 31,5K | bug-hunter (18K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K, y), i18n-conventions (14,2K, y), code-review (9K, y) | 33,5K | — | — |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | codebase-navigation (9,0K, y), web-platform-baseline (10,5K, y) | — |
+| Uygulayıcı | i18n-conventions (14,2K, y), testing (12,2K, y) | 26,4K | debugging (13,0K, y) | — |
+| Çürütücü | plan-challenger (14,6K, y), chimera (12,9K, y) | 27,5K | bug-hunter (12,3K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K, y), i18n-conventions (14,2K, y) | 26,7K | code-review (9,6K; 35 KB bütçesi için ön yüklenmez, görev metninde adı yazılır, YTN-18) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23205,10 +24603,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K) | 5,4K | research-web (18,2K, y), codebase-navigation (8,2K, y) | pdf: K15: PDF doğrudan açılmaz, önce KAYNAK DİZİNİ; verilirse çalışan kural 15'i çiğneyebilir |
+| Araştırmacı | codegraph (5,4K) | 0,0K | research-web (7,3K, y), codebase-navigation (9,0K, y) | pdf: K15: PDF doğrudan açılmaz, önce KAYNAK DİZİNİ; verilirse çalışan kural 15'i çiğneyebilir |
 | Uygulayıcı | — | — | xlsx (8,5K), supabase (18,8K) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23223,10 +24621,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | pdf (8,2K), research-web (18,2K, y) | 26,4K | — | notebook-navigator: ücret sınıfı belirsiz (NotebookLM Google hesabı); ücretli ve belirsiz olanlar sonraya bırakılıyor |
+| Araştırmacı | pdf (8,2K), research-web (7,3K, y) | 7,3K | — | notebook-navigator: ücret sınıfı belirsiz (NotebookLM Google hesabı); ücretli ve belirsiz olanlar sonraya bırakılıyor |
 | Uygulayıcı | — | — | — | — |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23238,10 +24636,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y) | 5,4K | codebase-navigation (8,2K, y) | — |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | codebase-navigation (9,0K, y) | — |
 | Uygulayıcı | — | — | — | to-issues: D2: yerel task.md yazıyor, Linear kaydı açmıyor |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | llm-council: orkestrasyon skill'i; müdür ve ekip lideri kullanır, çalışana verilmez (kural 5); prd-complexity-audit: NotebookLM ikizi ve çok-ajanlı Workflow bağımlılığı; müdür düzeyi |
-| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23253,10 +24651,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y) | 5,4K | research-web (18,2K, y), codebase-navigation (8,2K, y) | supabase-postgres-best-practices: supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8, 10-01); projeye alınırsa ya da eklenti açılırsa eklenir |
-| Uygulayıcı | create-migration (6,3K), testing (9,5K, y) | 15,8K | supabase (18,8K), debugging (9,8K, y), typescript-strict (8,5K, y), api-design (8,7K, y) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K, y), webapp-testing (3,9K), code-review (9K, y) | 23,2K | — | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | research-web (7,3K, y), codebase-navigation (9,0K, y) | supabase-postgres-best-practices: supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8, 10-01); projeye alınırsa ya da eklenti açılırsa eklenir |
+| Uygulayıcı | create-migration (6,3K), testing (12,2K, y) | 12,2K | supabase (18,8K), debugging (13,0K, y), typescript-strict (10,0K, y), api-design (10,0K, y), payments-webhooks (6,6K, y) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y), security-scanner (8,5K, y), data-governance (9,3K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K, y), webapp-testing (3,9K), code-review (9,6K, y) | 22,1K | payments-webhooks (6,6K, y) | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23271,10 +24669,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | venthub-tasarim-dili (11,4K) | 11,4K | browse (29,9K, y), web-platform-baseline (9,8K, y) | — |
-| Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (9,8K, y) | 28,5K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
+| Araştırmacı | venthub-tasarim-dili (11,4K) | 0,0K | browse (29,9K, y), web-platform-baseline (10,5K, y) | — |
+| Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (11,0K, y) | 11,0K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
 | Çürütücü | plan-challenger (14,6K), web-design-guidelines (4K) | 18,6K | — | — |
-| Doğrulayıcı | verify-before-done (10,3K), accessibility (14,5K), webapp-testing (3,9K, y) | 28,7K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23291,10 +24689,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), investigate (6K, y), venthub-architecture (6,5K, y) | 17,9K | codebase-navigation (8,2K, y), web-platform-baseline (9,8K, y) | — |
-| Uygulayıcı | i18n-conventions (14,2K), venthub-tasarim-dili (11,4K), venthub-architecture (6,5K, y) | 32,1K | vercel-composition-patterns (4,8K, y), vercel-react-best-practices (9,1K, y), threejs-webgl-performance (22,4K, y), testing (9,5K, y), debugging (9,8K, y), react-modern (9,8K, y), typescript-strict (8,5K, y), observability (7,9K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y) | — |
-| Doğrulayıcı | verify-before-done (10,3K), accessibility (14,5K), web-design-guidelines (4K, y), webapp-testing (3,9K) | 32,7K | canary (52K, y), benchmark (28,6K, y), code-review (9K, y) | diff-review: REC-514 kapanınca eklenir (URUN doğrulayıcı "evet") |
+| Araştırmacı | codegraph (5,4K), investigate (6K, y), venthub-architecture (6,5K, y) | 12,5K | codebase-navigation (9,0K, y), web-platform-baseline (10,5K, y) | — |
+| Uygulayıcı | i18n-conventions (14,2K), venthub-tasarim-dili (11,4K), venthub-architecture (6,5K, y) | 6,5K | vercel-composition-patterns (4,8K, y), vercel-react-best-practices (9,1K, y), threejs-webgl-performance (22,4K, y), testing (12,2K, y), debugging (13,0K, y), react-modern (11,0K, y), typescript-strict (10,0K, y), observability (8,6K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 0,0K | chimera (12,9K, y), bug-hunter (12,3K, y) | — |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), web-design-guidelines (4K, y), webapp-testing (3,9K) | 4,0K | canary (52K, y), benchmark (28,6K, y), code-review (9,6K, y), web-performance (6,4K, y) | diff-review: REC-514 kapanınca eklenir (URUN doğrulayıcı "evet") |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23313,10 +24711,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | — | — | find-skills (7,4K), task-observer (7,4K, y), research-web (18,2K, y) | — |
+| Araştırmacı | — | — | find-skills (7,4K), task-observer (7,4K, y), research-web (7,3K, y) | — |
 | Uygulayıcı | — | — | skill-creator (32,4K) | skills-creator: D9 kapanınca eklenir (.agent ağacına yazıyor) |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -23347,21 +24745,21 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Skill | Tür | Ön yükle (departman) | Adıyla çağır (departman) | Neden |
 |---|---|---|---|---|
-| code-review (9,0K) | Doğrulayıcı | ALTYAPI, ARAC, EDGE, GEO-SEO, I18N, KATALOG, SATIS | ADMIN, URUN | Bağımsız ikinci okuma (diff, doğruluk, güvenlik); verify-before-done iddiaları ölçer, code-review kodu okur. ADMIN ve URUN setleri 31 KB dolu, orada adıyla çağır. |
-| chimera (16,9K) | Çürütücü | ARAC, GEO-SEO, I18N | ADMIN, ALTYAPI, EDGE, KATALOG, SATIS, URUN | Değişikliği şiddet sıralı hata raporuna çevirir (plan-challenger planı, chimera diff'i çürütür). Çürütücü setleri supabase-security ile dolu olan altı departmanda adıyla çağır. |
-| bug-hunter (18,0K) | Çürütücü | — | ADMIN, ALTYAPI, ARAC, EDGE, GEO-SEO, I18N, KATALOG, SATIS, URUN | 18,0K: plan-challenger ile birlikte 35 KB bütçeye ancak sığıyor ve her çürütme kusur avı değil; hepsinde adıyla çağır. |
-| security-scanner (12,7K) | Çürütücü | — | ADMIN, ALTYAPI, ARAC, EDGE, SATIS | Sır, enjeksiyon, bağımlılık açığı taraması; koşullu iş, çürütücü setleri dolu: adıyla çağır. |
-| data-governance (10,0K) | Çürütücü | — | ADMIN, ALTYAPI, EDGE, SATIS | KVKK, saklama, RLS sahipliği; yalnız veri dokunan işte: adıyla çağır. |
-| testing (9,5K) | Uygulayıcı | ALTYAPI, EDGE, I18N, SATIS | ADMIN, URUN | Her kod değişikliğinde (önce kırmızı, eşik düşürme ve skip yasak): odası olan dört departmanda ön yükle, ADMIN ve URUN dolu: adıyla çağır. |
-| debugging (9,8K) | Uygulayıcı | — | ADMIN, ALTYAPI, EDGE, I18N, SATIS, URUN | Yalnız "nedeni bilinmeyen bozukluk" işinde, her görevde değil: adıyla çağır. |
-| react-modern (9,8K) | Uygulayıcı | TASARIM | ADMIN, URUN | TASARIM uygulayıcı React yazar ve odası var: ön yükle; URUN ve ADMIN dolu: adıyla çağır. |
-| typescript-strict (8,5K) | Uygulayıcı | — | ADMIN, EDGE, SATIS, URUN | Depo zaten `any` yasağı ve tip kapısıyla korunuyor; tip hatası işinde adıyla çağır. |
-| node-modern (8,5K) | Uygulayıcı | — | ALTYAPI, EDGE | Betik/CJS işinde; bizde CommonJS korunur: adıyla çağır. |
-| observability (7,9K) | Uygulayıcı | — | ADMIN, ALTYAPI, EDGE, URUN | Log, Sentry, izleme işi koşullu: adıyla çağır. |
-| api-design (8,7K) | Uygulayıcı | — | ADMIN, EDGE, SATIS | Yeni endpoint ve hata sözleşmesi işi koşullu: adıyla çağır. |
-| research-web (18,2K) | Araştırmacı | BLOG, MEVZUAT | ALTYAPI, ARAC, GEO-SEO, KATALOG, SATIS, YETENEK | 18,2K (20K sınırına yakın). MEVZUAT ve BLOG'da işin kendisi web araştırması: ön yükle (BLOG araştırmacısı bu yüzden yeni dosya). Diğerlerinde adıyla çağır. |
-| codebase-navigation (8,2K) | Araştırmacı | — | ADMIN, ALTYAPI, ARAC, EDGE, HARITA, I18N, KATALOG, OPS, SATIS, URUN | codegraph skill'i zaten ön yüklü ve aynı işe talip; yan yana koşum olmadan ön yüklenmez (set kuralı 7): adıyla çağır. |
-| web-platform-baseline (9,8K) | Araştırmacı | — | ADMIN, GEO-SEO, I18N, TASARIM, URUN | Tarayıcı desteği ve modern CSS sorusu koşullu: adıyla çağır. |
+| code-review (9,6K) | Doğrulayıcı | ALTYAPI, ARAC, EDGE, GEO-SEO, I18N, KATALOG, SATIS | ADMIN, URUN | Bağımsız ikinci okuma (diff, doğruluk, güvenlik); verify-before-done iddiaları ölçer, code-review kodu okur. ADMIN ve URUN setleri 31 KB dolu, orada adıyla çağır. |
+| chimera (12,9K) | Çürütücü | ARAC, GEO-SEO, I18N | ADMIN, ALTYAPI, EDGE, KATALOG, SATIS, URUN | Değişikliği şiddet sıralı hata raporuna çevirir (plan-challenger planı, chimera diff'i çürütür). Çürütücü setleri supabase-security ile dolu olan altı departmanda adıyla çağır. |
+| bug-hunter (12,3K) | Çürütücü | — | ADMIN, ALTYAPI, ARAC, EDGE, GEO-SEO, I18N, KATALOG, SATIS, URUN | 18,0K: plan-challenger ile birlikte 35 KB bütçeye ancak sığıyor ve her çürütme kusur avı değil; hepsinde adıyla çağır. |
+| security-scanner (8,5K) | Çürütücü | — | ADMIN, ALTYAPI, ARAC, EDGE, SATIS | Sır, enjeksiyon, bağımlılık açığı taraması; koşullu iş, çürütücü setleri dolu: adıyla çağır. |
+| data-governance (9,3K) | Çürütücü | — | ADMIN, ALTYAPI, EDGE, SATIS | KVKK, saklama, RLS sahipliği; yalnız veri dokunan işte: adıyla çağır. |
+| testing (12,2K) | Uygulayıcı | ALTYAPI, EDGE, I18N, SATIS | ADMIN, URUN | Her kod değişikliğinde (önce kırmızı, eşik düşürme ve skip yasak): odası olan dört departmanda ön yükle, ADMIN ve URUN dolu: adıyla çağır. |
+| debugging (13,0K) | Uygulayıcı | — | ADMIN, ALTYAPI, EDGE, I18N, SATIS, URUN | Yalnız "nedeni bilinmeyen bozukluk" işinde, her görevde değil: adıyla çağır. |
+| react-modern (11,0K) | Uygulayıcı | TASARIM | ADMIN, URUN | TASARIM uygulayıcı React yazar ve odası var: ön yükle; URUN ve ADMIN dolu: adıyla çağır. |
+| typescript-strict (10,0K) | Uygulayıcı | — | ADMIN, EDGE, SATIS, URUN | Depo zaten `any` yasağı ve tip kapısıyla korunuyor; tip hatası işinde adıyla çağır. |
+| node-modern (10,3K) | Uygulayıcı | — | ALTYAPI, EDGE | Betik/CJS işinde; bizde CommonJS korunur: adıyla çağır. |
+| observability (8,6K) | Uygulayıcı | — | ADMIN, ALTYAPI, EDGE, URUN | Log, Sentry, izleme işi koşullu: adıyla çağır. |
+| api-design (10,0K) | Uygulayıcı | — | ADMIN, EDGE, SATIS | Yeni endpoint ve hata sözleşmesi işi koşullu: adıyla çağır. |
+| research-web (7,3K) | Araştırmacı | BLOG, MEVZUAT | ALTYAPI, ARAC, GEO-SEO, KATALOG, SATIS, YETENEK | 18,2K (20K sınırına yakın). MEVZUAT ve BLOG'da işin kendisi web araştırması: ön yükle (BLOG araştırmacısı bu yüzden yeni dosya). Diğerlerinde adıyla çağır. |
+| codebase-navigation (9,0K) | Araştırmacı | — | ADMIN, ALTYAPI, ARAC, EDGE, HARITA, I18N, KATALOG, OPS, SATIS, URUN | codegraph skill'i zaten ön yüklü ve aynı işe talip; yan yana koşum olmadan ön yüklenmez (set kuralı 7): adıyla çağır. |
+| web-platform-baseline (10,5K) | Araştırmacı | — | ADMIN, GEO-SEO, I18N, TASARIM, URUN | Tarayıcı desteği ve modern CSS sorusu koşullu: adıyla çağır. |
 
 `verify-before-done` değişmedi: 15 doğrulayıcı tanımında ön yüklü; "depoda olmayan üç skill'e gönderiyor" kusuru kapandı (testing, debugging, git-flow depoda).
 
@@ -23392,6 +24790,21 @@ Bunlar departman penceresinin (müdürün) kendi aracıdır; `Skill` aracıyla a
 
 Hiçbir departmana bağlanmayanlar (eski not): docker-deploy, plugin-author, audit-log (bu depoda skill klasörü yok); alınamayan: auto-review (çalıştıracak ana program yok).
 
+## 6.3 İlk dalga (YTN-18, OPS onayı 12 Ekim 2026)
+
+REC-515 aday tablosundan (`docs/audits/skills-dis-tarama-2026-10.md`) OPS onayıyla kurulan altı skill. Hepsi **adıyla çağır** olarak bağlandı
+(ön yükleme yok, 35 KB tavanı değişmedi); ön yüklemeye girecek olan, kullanım ölçümü sonrası ayrıca karar ister.
+
+| Skill | Kaynak (lisans) | KB | Bağlandığı setler |
+|---|---|---|---|
+| web-performance | WrongStack 1.1.0 (MIT) | 6,4 | GEO-SEO/uygulayici, GEO-SEO/dogrulayici, URUN/dogrulayici |
+| geo-fundamentals | vudovn/ag-kit (MIT) | 7 | GEO-SEO/uygulayici, GEO-SEO/arastirmaci |
+| write-seo-geo-content | onvoyage-ai/gtm-engineer-skills (MIT) | 21,9 | BLOG/uygulayici |
+| tech-stack | WrongStack 1.1.0 (MIT) | 9,4 | ALTYAPI/arastirmaci, ALTYAPI/uygulayici, ARAC/arastirmaci |
+| payments-webhooks | WrongStack 1.1.0 (MIT) | 6,6 | SATIS/uygulayici, SATIS/dogrulayici, EDGE/uygulayici, EDGE/dogrulayici |
+| database-migrations | WrongStack 1.1.0 (MIT) | 6,8 | ALTYAPI/uygulayici, ALTYAPI/curutucu, EDGE/uygulayici, EDGE/curutucu |
+
+Bağlar çalışan tanımına yalnız "adıyla çağır" notu olarak yansır; GEO-SEO ve BLOG uygulayıcı satırları `uret: false` kaldığı için (HRT-23 karar bekliyor) dosya üretmez.
 ## 7. Üretici girdisi
 
 Makine okuyan kaynak: `docs/audits/skill-departman-setleri-2026-09-30.json`. HARİTA'nın kart üreticisi her `uret: true` satırı için `.claude/agents/<dept>-<tur>.md` dosyasını üretir; `skills:` alanına `onYukle[].ad` girer. Bu belge ile JSON aynı betikten çıktı, elle düzenlenmez; değişiklik betikte yapılır.
@@ -23755,6 +25168,77 @@ Not: tek kartın `get_task`'ı ucuz (Done kartı ≈ 7 KB, kapanış raporu dahi
 
 
 ---
+# FILE: docs\audits\skill-wrongstack-1-1-0-tasima-2026-10-12.md
+
+# WrongStack skill'lerinin 1.0.26 → 1.1.0 taşıması (YTN-18, 2026-10-12)
+
+Yazan: YETENEK. Emir: OPS 12 Ekim 14:25 (Recep isteği: skill'ler yeni sürüme taşınsın, gereksiz denetim olmasın).
+Cetvel: `execution-method-standard.md` (yöntem), `docs/audits/skill-departman-setleri-2026-09-30.md` (set bağları ve bütçe),
+kapı `INV-SKILL-BAGLI-1`. `.agent/skills` değişmedi.
+
+## 1. Ne ölçüldü
+
+İki kaynak kopyası karşılaştırıldı: `@wrongstack/core` 1.0.26 (36 skill) ve 1.1.0 (114 skill; 78 yeni, hiçbiri silinmedi).
+Depoda "1.0.26" etiketli 24 skill vardı; 24'ü de 1.1.0'da değişmiş. "Yalnız etiket" kümesi boştu.
+
+Bizim uyarlamalarda kaynak gövde harfi harfine duruyordu (23/24 birebir; `security-scanner` farkı yalnız bizim maskelediğimiz
+örnek özel-anahtar başlığı). Bu yüzden taşıma elle yeniden yazım değil, **gövde değiştirme**: eski gövde çıkar, 1.1.0 gövdesi girer;
+"Araç eşlemesi", "VentHub ek kuralları" ve ortak bitiş bloğu dokunulmadan kalır. Yeni gövdelerde eşleme tablosuna girecek yeni araç adı çıkmadı.
+
+## 2. Skill başına değişim (SKILL.md satırı; + eklenen, − çıkan)
+
+| Skill | 1.0.26 | 1.1.0 | Fark | Not |
+|---|---|---|---|---|
+| api-design | 126 | 148 | +26 −4 | |
+| bug-hunter | 330 | 194 | +98 −234 | yeniden yazıldı; yeni `references/` 2 dosya |
+| chimera | 279 | 195 | +17 −101 | yeni `references/report-contract.md` |
+| code-review | 123 | 139 | +17 −1 | |
+| codebase-navigation | 112 | 129 | +19 −2 | |
+| data-governance | 119 | 124 | +28 −23 | |
+| debugging | 130 | 193 | +68 −5 | |
+| git-flow | 126 | 143 | +18 −1 | |
+| mnemosyne | 181 | 199 | +25 −7 | |
+| multi-agent | 313 | 90 | +83 −306 | yeniden yazıldı; yeni `references/collab-debug.md` |
+| node-modern | 118 | 147 | +40 −11 | |
+| observability | 115 | 132 | +18 −1 | |
+| prompt-engineering | 115 | 132 | +18 −1 | |
+| react-modern | 152 | 176 | +28 −4 | |
+| refactor-planner | 343 | 76 | +53 −320 | yeniden yazıldı |
+| research-web | 371 | 76 | +56 −351 | yeniden yazıldı |
+| sdd | 156 | 163 | +29 −22 | |
+| security-scanner | 203 | 88 | +70 −185 | yeniden yazıldı; örnek anahtar başlığı maskesi korundu |
+| testing | 137 | 187 | +56 −6 | |
+| typescript-strict | 131 | 157 | +40 −14 | |
+| verify-before-done | 105 | 146 | +45 −4 | |
+| web-platform-baseline | 127 | 147 | +21 −1 | `references/` 3 dosya yenilendi |
+| wrongstack-kanban | 158 | 173 | +17 −2 | ek kurallar kısmı ARC-109 envanterinden sonra |
+| wrongstack-mailbox-mcp | 102 | 118 | +17 −1 | ek kurallar kısmı ARC-109 envanterinden sonra |
+
+Ortak ekler (1.1.0): her skill'e `trigger` ve `routing-group` alanı, "Selection card" bölümü ve konuya özgü bir bölüm
+(ör. code-review: "Evidence identity", kanban: "Board identity and lost leases").
+
+## 3. Bizde ne değişti
+
+- 24 `SKILL.md` (gövde 1.1.0, `kaynak`/`uyarlama`/"Kaynak" notu ve description'daki sürüm etiketi 1.1.0); açıklama uzunluğu aynı (oturum yükü bütçesi etkilenmedi).
+- 4 skill'e `references/` dosyaları (bug-hunter, chimera, multi-agent, web-platform-baseline).
+- `docs/audits/skill-departman-setleri-2026-09-30.json` ve `.md`: `kb` alanları diskten yenilendi (102 girdi; ör. research-web 18,2 → 7,3 K, bug-hunter 18,0 → 12,3 K, debugging 9,8 → 13,0 K).
+- **Set bütçesi:** yenilenen boyutla tek set 35 KB'ı aştı: I18N-doğrulayıcı (36,3 KB). `code-review` ön yüklemeden "adıyla çağır"a alındı (26,7 KB); `.claude/agents/i18n-dogrulayici.md` yeniden üretildi (tek fark `skills:` listesinden `code-review` çıktı).
+- `NOTICE.md`: üç satırın sürümü 1.1.0.
+
+## 4. Bu PR'da OLMAYAN
+
+- `wrongstack-kanban` ve `wrongstack-mailbox-mcp` için "VentHub ek kuralları" düzeltmesi: ARC-109 özellik envanteri (17:00) sonrası ayrı küçük PR.
+- Dış skill alımı (REC-515): 1.1.0 paketindeki 78 yeni skill aday havuzu; aday tablosu ayrı belge, kurulum ayrı onay.
+- `.claude/skills-hazir/` altındaki `mailbox-bridge` ve `wrongstack-mailbox` (etkin değil, 1.0.26 olarak kaldı).
+
+## 5. Doğrulama
+
+Kapılar: `skill-bagli`, `skill-yuku-butcesi`, `skill-frontmatter-ayrisir`, `skill-katalog-tazeligi`, `skill-listesi-say`, `skill-ad-cakismasi`,
+`skill-bitis-blogu`, `skill-python-yedegi`, `ajan-skill-cozulur`, `ajan-tanimlari`, `skills-hazir`, `skills-eval-puanlama`: 12 dosya, 110 test yeşil.
+İlgili test paketi sonucu PR gövdesinde. Tetik cümlesiyle çağrı doğrulaması: PR gövdesinde.
+
+
+---
 # FILE: docs\audits\skill-yonetilen-pano-deneyi-2026-10-01.md
 
 # YTN-4 — Yönetilen pano deneyi (2026-10-01)
@@ -23896,6 +25380,119 @@ varsa, karara giden kopya kırpılmamış olanı olmalı.
   tutuyor, kısaltmıyor.
 - `.agent/skills` tarafının bütçesi — başka host, başka sahip.
 - `when_to_use` (4 skill) ve `license` (8 skill) anahtarlarının kime yaradığı ölçülmedi.
+
+
+---
+# FILE: docs\audits\skills-dis-tarama-2026-10.md
+
+# Aday skill tablosu: üç ihtiyaç, kurulum yok (REC-515, YTN-18, 2026-10-12)
+
+Yazan: YETENEK. Emir: OPS 12 Ekim 14:25 ve 15:00 yönü (REC-515 yalnız üç ihtiyaçla sınırlı, bugün yalnız aday tablosu).
+Kurulum YAPILMADI; dış kod kurulumu ayrı onay ister (güvenlik + lisans).
+
+> **OPS onayı 12 Ekim 2026 (Recep: "alacaklarımız varsa alalım, gereksiz denetleme yok"):** yukarıdaki "kurulum yok" hükmü
+> bu emirle değişti. İlk dalga (PR #1898, tek geçiş inceleme: lisans + gövdede betik/ağ çağrısı): `web-performance`, `tech-stack`,
+> `payments-webhooks`, `database-migrations`, `geo-fundamentals`, `write-seo-geo-content`; hepsi "adıyla çağır". `nextjs-modern`
+> alınmaz. `chart-data-extractor` **ölçüldü (§7) ve alınmaz**: KATALOG'da deterministik eğri hattı (KTL-7 `egri_cikar.py`) zaten var. Aşağıdaki tablo kurulum
+> öncesi durumu anlatır; kurulu olanlar belge `skill-departman-setleri-2026-09-30.md` §6.3'tedir.
+Cetvel: `docs/standards/execution-method-standard.md`, `docs/audits/skill-departman-setleri-2026-09-30.md` (set bağları, 35 KB / 8 skill sınırı),
+`docs/audits/gstack-skill-envanteri-2026-09-15.md` (lisans/kurulum ölçütü), kapı `INV-SKILL-BAGLI-1`.
+
+## 1. Üç ihtiyaç, tek bakışta hüküm
+
+| İhtiyaç | Hüküm | Önerim |
+|---|---|---|
+| **KATALOG**: PDF tablo ve eğri verisi çıkarma (OCR dahil) | Tablo + OCR için yeni skill gerekmiyor: kullanıcı düzeyinde kurulu `pdf` zaten pdfplumber ile tablo, pytesseract ile OCR anlatıyor. **Eğri** (fan P-Q eğrisi) için **KATALOG'da deterministik hat zaten var**: `venthub-pdf-ingestor/scripts/kaynak_dizini/egri_cikar.py` (KTL-7, karar 318/319; vektör çizim ya da piksel izleme, çıpa kapısı ±%2, çıktı `kaynak-dizini/egriler.jsonl`). Bulunan tek dış aday görüntüyü model okuyarak çıkarıyor, algoritmik izleme değil; ölçüldü, §7. | `pdf`'i KATALOG'a bağla (yeni kurulum yok); eğri için `egri-profilleri.json`'a profil eklenir, **`chart-data-extractor` alınmaz** |
+| **GEO-SEO**: uygulayıcı çalışan skill seti (HRT-23) | Parçalar var: `web-performance` (1.1.0 paketi, MIT) + kurulu SEO eklentileri; eksik olan GEO (yapay zekâ alıntılanabilirliği) için küçük, ağ çağrısı yapmayan bir aday bulundu | Uygulayıcı seti: web-performance + geo-fundamentals (+ improve-aeo-geo ikinci dalga) |
+| **BLOG**: teknik rehber yazısı ve yapılandırılmış veri | Rehber yazısı çerçevesi ve JSON-LD üreten iki aday bulundu, ikisi de MIT, ağ çağrısı yok | write-seo-geo-content önce; create-geo-charts ikinci |
+
+## 2. Okuma ve dürüstlük notu
+
+- **"SKILL.md okundu" sütunu üç düzeydir:** **Tam okundu** = ham dosya `gh api` ile indirilip satır satır okundu; **Yapı okundu** = ham dosya indirildi, açıklama satırı, tüm başlıklar ve riskli kalıp taraması yapıldı, gövde satır satır okunmadı; **Yalnız açıklama** = yalnız tanım satırı görüldü. Betik dosyaları (`.py`, `.mjs`) yalnız kalıp taramasından geçti, satır satır okunmadı.
+- Dış taramanın ölçüsü: 4 arama (PDF tablo/OCR, eğri sayısallaştırma, GEO/teknik SEO, teknik rehber + JSON-LD) ve 9 ham dosya. Arama motoru özeti **kanıt sayılmadı**; her satırın düzeyi ham dosyaya dayanır.
+- **Kurulumdan önce** "Yapı okundu" düzeyindeki dosyalar baştan sona okunur (OPS onayı sonrası, ayrı güvenlik adımı).
+- **Yargı kimin:** departman eşlemesi benim (YETENEK), kullanımla ölçülmüş değil. Dış skill'lerin çalışma kalitesi (çıktı doğruluğu) hiçbirinde ölçülmedi.
+- **Güvenlik taraması** her dosyada aynı kalıp: ağ çağrısı, kurulum komutu, silme, süreç başlatma, ortam değişkeni. Sonuç tabloda ayrıca yazılı.
+
+## 3. Aday tablosu (departman başına en fazla 3)
+
+| Skill | Kaynak (depo, lisans) | SKILL.md okundu mu | Departman | Hangi iş türünü hızlandırır | Güvenlik taraması | Önerim |
+|---|---|---|---|---|---|---|
+| `pdf` | anthropics/skills, `skills/pdf`; lisans: **Proprietary** (LICENSE.txt şartları okunmadı, yeniden dağıtım varsayılmaz). Zaten kullanıcı düzeyinde kurulu | Yapı okundu (315 satır; başlıklar ve ilk bölüm) | KATALOG | Metin katmanı olan PDF'ten tablo çıkarma (pdfplumber); taranmış sayfada OCR (pytesseract + pdf2image) | Tek kurulum satırı `pip install pytesseract pdf2image` (OCR için); başka yok | **Kullan, kopyalama.** Bağımlılığın `venthub-pdf-ingestor` ortamında kurulu olduğu ölçülmedi |
+| `pdf-extractor` | jmagly/aiwg, `agentic/code/addons/doc-intelligence/skills/pdf-extractor`; depo MIT, dosyada lisans satırı yok | Yapı okundu (230 satır; özet + kalıp taraması) | KATALOG | Taranmış PDF için OCR akışı: 300 DPI üstü, güven eşiği, karmaşık tablo için camelot yönlendirmesi | Ağ yok; örnekte parola komut satırında düz metin (bizde kullanılmaz) | Öncelik 2: `pdf`'ten farkı yalnız OCR güven eşiği ve çözünürlük notları; yöntem notu olarak al, kurulumu gerekmez |
+| `chart-data-extractor` | mohitagw15856/pm-claude-skills, `plugins/pm-data/skills/chart-data-extractor`; MIT | **Tam okundu** (102 satır) | KATALOG | Grafik görüntüsünden (çizgi, çubuk, saçılım) x-y değerleri, güven düzeyi (yüksek/orta/düşük) ve CSV; fan eğrisi için tek aday | Ağ, kurulum, silme yok | **Ölçüldü (§7), alınmaz:** yöntem model görme yeteneği, algoritmik izleme değil; skill kendisi "gridline aralığından ince değer uydurma" ve "log eksen yanlış okunursa büyüklük mertebesi kayar" uyarısını yapıyor. Değerler katalogdaki tablo değeriyle çapraz kontrol edilmeden veriye yazılmaz |
+| `web-performance` | WrongStack `@wrongstack/core` 1.1.0 paketi (yerelde), MIT | Evet (gövde okundu, 12 Ekim) | GEO-SEO (ve URUN) | LCP/INP/CLS eşikleri, "üretimde aynı koşulda önce/sonra" ölçüm yöntemi | Ağ yok (yerel paket) | **Öncelik 1.** Uygulayıcı setine bağla; bizde `vercel-react-best-practices` yalnız kural listesi |
+| `geo-fundamentals` | vudovn/ag-kit, `.agents/skills/geo-fundamentals`; MIT | **Tam okundu** (159 satır); `geo_checker.py` (274 satır) yalnız kalıp taraması | GEO-SEO | GEO ile SEO farkı, yapay zekâ alıntısı için içerik ve teknik kontrol listesi (Article/Person/FAQPage şeması, tarih damgası, tarayıcı erişimi); yerel dizini tarayan denetim betiği | Betik: ağ, kurulum, silme, süreç kalıbı yok; skill `allowed-tools: Read, Glob, Grep` (salt okuma) | **Öncelik 1.** 3,6 KB, set bütçesini zorlamaz. **Dikkat:** "RAG ağırlıkları (~%40, ~%20…)" tablosu kaynaksız; bu yüzdeler içeriğe ya da rapora sayı olarak taşınmaz |
+| `improve-aeo-geo` | onvoyage-ai/gtm-engineer-skills; MIT | Yapı okundu (561 satır, 20,8 KB; tüm başlıklar) | GEO-SEO | Kodda JSON-LD, `llms.txt`, `robots` düzeltmeleri; Next.js örneği var | Ağ yok; "hosted aeo-audit.sh" dış hizmetine atıf var (kullanılmaz) | Öncelik 2: **kodu değiştirir** (yalnız uygulayıcı rolü), 20 KB yer kaplar; set bütçesi dolarsa alınmaz |
+| `write-seo-geo-content` | onvoyage-ai/gtm-engineer-skills; MIT | Yapı okundu (419 satır, 18,4 KB; tüm başlıklar) | BLOG | Sayfa tipi çerçeveleriyle (karşılaştırma, rehber, kullanım, öğrenme) frontmatter'lı markdown taslağı | Ağ, kurulum, silme yok | **Öncelik 1.** Ürün odaklı satış dilinde; teknik rehber için "guide" çerçevesi kullanılır. Yönetmelik/sertifika iddiası ek kuralla resmi kaynaktan doğrulanır |
+| `create-geo-charts` | onvoyage-ai/gtm-engineer-skills; MIT | Yapı okundu (399 satır, 17,4 KB; tüm başlıklar) | BLOG | Satır içi SVG grafik + tablo + JSON-LD ile alıntılanabilir veri: ölçü ve kapasite tabloları | Ağ yok; örnek JSON-LD'de `license: CC BY 4.0` yazıyor (bizim içerik lisansımız değil, ek kuralla değiştirilir) | Öncelik 2 |
+| `doc-coauthoring` | WrongStack 1.1.0 paketi, MIT | **Yalnız açıklama** | BLOG, HARITA | Uzun teknik belge/RFC yazımı; blog için zayıf (belge odaklı) | Ağ yok (yerel paket) | Öncelik 3: alma |
+
+Ek, aynı üç ihtiyaca bağlı ama bu tabloda **değerlendirilmeyen**: `audit-website-aeo` (onvoyage-ai, MIT; 11,7 KB; tarayıcı betiği 45 KB):
+ağ ve süreç kalıpları tarandı, yalnız hedef URL'ye `fetch` eder, `--out` dosyasına yazar; betik **tam okunmadı**. GEO-SEO için denetim ölçümü gerektiğinde ikinci dalgada ele alınır.
+
+## 4. Departman setine yansıması (HRT-23 için taslak)
+
+- **GEO-SEO uygulayıcı seti (öneri):** `web-performance` + `geo-fundamentals` + mevcut `venthub-architecture`, `supabase`, `react-modern`; ikinci dalga: `improve-aeo-geo`.
+  Kurulu eklentiler (`searchfit-seo`: seo-audit, schema-markup, technical-seo, on-page-seo; `seo-ecommerce`; `search-console`) **gövdesi bu turda okunmadı**; uygulayıcı seti kurulurken çakışma ölçülür.
+- **BLOG:** `write-seo-geo-content` + `create-geo-charts` (ikinci dalga); JSON-LD için kurulu `searchfit-seo:schema-markup` ile çakışması ölçülmedi.
+- **KATALOG:** `pdf` bağlanır; `chart-data-extractor` yalnız ölçümden sonra.
+- Set bütçesi (35 KB / 8 skill) ve oturum yükü bütçesi (`skill-yuku-butcesi`, 24 KB açıklama) kurulum PR'ında ölçülür; bu belge bütçeyi değiştirmez.
+
+## 5. Ayrı bulgu: 24 skill'in gövdeleri bizde olmayan skill'lere atıf yapıyor
+
+12 Ekim doğrulamasında (24/24 skill yüklendi, hepsi 1.1.0) gövdelerde şu atıflar çıktı; hepsi paketin `skills/` dizininde **var**, bizde kurulu değil:
+
+| Atıf yapılan | Atıf yapan skill'ler | Not |
+|---|---|---|
+| `tech-stack` | research-web, security-scanner, web-platform-baseline | Üç skill'in atfı; en yüksek öncelikli |
+| `output-standards` | bug-hunter, multi-agent, prompt-engineering | Araç eşlemesinde bir kısmı "yok sayılır" yazıyor |
+| `audit-log`, `evidence-audit` | data-governance, multi-agent | |
+| `design-system`, `design-craft`, `design-critique` | react-modern, web-platform-baseline | Yerelde `venthub-tasarim-dili` var |
+| `code-quality` | refactor-planner | Bizde `fallow`, `pnpm knip` |
+| `mailbox-bridge`, `wrongstack-mailbox`, `auto-review` | wrongstack-mailbox-mcp, mnemosyne | `mailbox-bridge` bizde kapalı (HTTP köprüsü) |
+
+Kural: atıf, hedef skill'i yüklemeden **sessizce yok sayılır**; bu bir hata değil ama ajanın gövdede "şu skill'e bak" dediği yerde boşluğa düşer. Çözüm iki yönlü: (a) en çok atıf alan `tech-stack` alınır; (b) kalanlar için ilgili skill'in "Araç eşlemesi"ne "bizde yok, şunu kullan" satırı eklenir. Karar OPS/Recep'te; bu belge yalnız ölçümü yazar.
+
+## 6. Elenenler ve önceki sürüm
+
+- 1.1.0 paketindeki 78 yeni skill'in 52'si bu üç ihtiyaç dışında ya da bizim yığınla uyumsuz; `nextjs-modern` **uyumsuz** ("en son kararlı sürümü hedefle: Next 16", bizde 15.5).
+- WrongStack `pdf` yalnız PDF **üretim** (headless Chromium baskı); çıkarma yok, KATALOG için uygun değil.
+- İlk sürüm (26 adaylı, 16 departmanlı tablo) PR geçmişinde, commit `b95efdc3c`'de duruyor; OPS yönüyle bu belge üç ihtiyaca daraltıldı.
+
+## 7. `chart-data-extractor` ölçümü (12 Ekim 2026): alınmaz
+
+**Soru:** görme tabanlı bir skill KATALOG'un eğri ihtiyacına yarar mı? **Referans:** KTL-7 hattının kapıdan geçmiş çıktısı
+(`venthub-pdf-ingestor/kaynak-dizini/egriler.jsonl`: LINEO 315 V0 kod 17010, `Commercial_Ventilation_in_Line_1.pdf` s.12, iki eğri: maks ve min hız).
+
+**Yöntem:** sayfa 4x büyütmeyle görüntüye çevrildi; skill'in tarif ettiği yöntemle (eksen etiketi ve ızgara çizgisinden piksel→değer) 9 noktada
+basınç gözle okundu; okunan değer hattın doğrusal örneklenmiş eğrisiyle karşılaştırıldı (tam ölçek 826 Pa).
+
+| Eğri | Q (m³/h) | Gözle (Pa) | Hat (Pa) | Fark (Pa) |
+|---|---|---|---|---|
+| maks hız | 0 | 736 | 734,9 | +1,1 |
+| maks hız | 520 | 490 | 484,7 | +5,3 |
+| maks hız | 1040 | 323 | 323,0 | 0,0 |
+| maks hız | 1560 | 193 | 191,4 | +1,6 |
+| maks hız | 2080 | 46 | 45,6 | +0,4 |
+| min hız | 0 | 423 | 424,7 | -1,7 |
+| min hız | 520 | 244 | 244,9 | -0,9 |
+| min hız | 1040 | 117 | 114,7 | +2,3 |
+| min hız | 1560 | 17 | 18,0 | -1,0 |
+
+**Sonuç:** temiz, ızgaralı vektör grafikte görme okuması hatta yakındır: en büyük fark 5,3 Pa (tam ölçeğin %0,64), ortalama 1,6 Pa.
+Yani yöntem kaba değildir; **sorun doğruluk değil, yerine kimin geçeceği:**
+
+- **Referans zaten var ve daha sıkı.** Hat deterministiktir (aynı girdi, aynı çıktı), çıpaya (kitapçıktaki azami debi ve basınç) ±%2 kapısı ve
+  monotonluk kapısı vardır, "nokta uydurulmaz" kuralı kodda yazılıdır. Görme okuması bunların hiçbirini vermez.
+- **Tekrarlanamaz.** Aynı grafik her okumada birkaç Pa oynar; veritabanına giren değer yeniden üretilebilir olmalıdır (`catalog-ingestion-standard.md` §6.3).
+- **Ölçüm sınırı.** Tek sayfa, temiz vektör grafik, ızgaralı. OPS "3 eğri" istedi; yalnız **2 eğrinin** kapıdan geçmiş referansı var. Üçüncü
+  eğri için referans ve çıpa olmadığından **ölçülemedi**. OPS'un andığı "Lineo Quiet katalog s.18" (`LINEO_QUITE_KATALOG.pdf`, 12 Ekim ölçüldü):
+  min/med/max debi, basınç ve güç **tablosu** ("TECHNICAL AND PERFORMANCE DATA"); sayfadaki 283 vektör çizimi tablo çizgisi, eğri grafiği değil.
+  Yani s.18 eğri değil **tablo** konusudur (pdfplumber ile çıkarılır); ölçülen eğriler `Commercial_Ventilation_in_Line_1.pdf` s.12'dedir.
+- **Olası tek yeri:** hattın okuyamadığı (çıpasız, raster) sayfada danışma amaçlı hızlı bakış; veriye yazılmaz.
+
+Karar: **alınmaz.** KATALOG yeni eğri istediğinde `egri-profilleri.json`'a profil eklenir (sahibi KATALOG/ARAÇ).
 
 
 ---
@@ -28093,6 +29690,1273 @@ Aşağıdaki adresleri **Recep verdi** (2026-09-06 gece, compact öncesi). Ben h
 
 
 ---
+# FILE: docs\audits\test-haritasi-tazeleme-2026-10-14.md
+
+# Test haritası tazeleme ölçümü (ALT-83, 14 Ekim 2026)
+
+Cetvel: `docs/standards/test-karnesi-standard.md` §6.3 (Test haritası) ve §6.6 (kapılar). Emir: OPS, 14 Ekim (ARAÇ ölçümü, #1934).
+
+## Soru
+
+`pnpm test:ilgili` (seçici: `scripts/ci/test-sec.cjs --yerel`) bir kanca PR'ı için 309/740 test seçiyordu ve bunun 231'i "her zaman koşan"dı.
+Departmanlar bu yüzden yerelde koşturmuyor, kapılar CI'da yakalanıyor (#1932, #1934). Harita neden bayattı, nasıl tazelenir, bir daha bayatlamasın diye ne yapılır?
+
+## Ölçüm (master `26c8a8c0c`, aynı ağaç, aynı yöntem)
+
+| Büyüklük | Önce | Sonra |
+|---|---|---|
+| Test dosyası (vitest listesi) | 739 | 739 |
+| Haritada kayıtlı | 640 | 737 |
+| Bayat kayıt (test dosyası değişmiş) | 92 | 0 |
+| Kayıtsız test (haritada yok) | 99 | 2 |
+| Belirsiz (izlenemeyen alt süreç, ölçümde atlanan/kırmızı) | 50 | 55 |
+| **Her zaman koşan** (bayat + kayıtsız + yalnız belirsiz olan) | **231** | **58** |
+
+- "Önce" ARAÇ'ın ölçümüyle birebir tuttu (92 bayat, 99-100 kayıtsız): aynı sayıyı bu ağaçta yeniden üretmeden tazelemeye başlamadım.
+- Kalan 2 kayıtsız test (`OrdersPage.test.tsx`, `OrderDetailPageTabs.test.tsx`) `VENTHUB_DUNYA_DURUMU=dislan` kipinde `skip` olan testlerdir; dosya okumadıkları için ham kayıt üretmezler ve maliyetleri sıfırdır.
+- Belirsiz sayısı 50 → 55 arttı: yeni ölçülen testlerin bir kısmı repo içinde `git ls-files/log/show` ya da `python` çağırıyor (izlenemeyen alt süreç, §6.3). Bu ayrı bir azaltma fırsatıdır, bu işin kapsamı değil.
+
+## Sebep
+
+Bakım kuralı cetvelde yazılıydı (§6.3: "birleşmeden sonra `--yalniz` ile kaydedilir") ama onu tetikleyen hiçbir şey yoktu: haritayı 8 Ekim'de tam ölçülmüş, 10 Ekim'de
+yalnız dört karne testi eklenmişti; sonra gelen test değişikliklerinin hiçbiri kaydedilmedi. Bayat kayıt kırmızı değildir (güvenli yön: o test her zaman koşar), bu yüzden
+hiçbir kapı bunu görmedi; ceza yalnız yerel seçimin genişlemesi ve CI shard'larının gereksiz test koşmasıydı.
+
+## Yapılan
+
+1. Harita tazelendi: `--yalniz` ile 191 test (92 bayat + 99 kayıtsız) yeniden ölçüldü, iki işçiyle 13 dakika (12 parça); sonra `--bayat` ile bir test daha.
+2. `scripts/ci/test-haritasi-uret.cjs`: `--bayat` (bayat ve kayıtsız testleri kendisi bulur ve yeniden ölçer) ve `--kontrol --esik N` (eşik aşılırsa çıkış 1 ve yenileme komutu).
+3. `INV-TEST-HARITA-1`: depodaki harita için eşik kapısı: bayat + kayıtsız sayısı `git ls-files` test listesinin yüzde 20'sini (746 testte 149) aşarsa KIRMIZI.
+   Üretici testine `argumanlariCoz` senaryosu ve dört sabotaj (her biri kırmızı veriyor) eklendi.
+4. Cetvel §6.3: komut tablosu, bakım kuralları ve "Tazelik kapısı" paragrafı; §6.6 kapı satırı.
+
+## Doğrulama (yerelde, tek tek, 14 Ekim)
+
+- `scripts/ci/__tests__/test-haritasi-uret.test.ts`: 62/62 (yeni senaryo, sabotajlar, eşik kapısı dahil).
+- Haritayı ya da cetveli okuyan on dosya (`test-haritasi-kaydedici`, `test-sec`, `ci-test-secimi*`, `test-shard-secim`, `test-karnesi-yapisi`, `taban-tazeligi*`): 385 geçti, 1 atlandı (önceden var).
+- `node scripts/ci/test-haritasi-uret.cjs --kontrol --esik 20`: sorun 0, bayat 0, kayıtsız 2.
+- ÖLÇÜLMEDİ: CI'da `test-shard` koşusunda seçilen test sayısının düşüşü (PR açılınca ve birleşince ilk PR'larda okunur); geriye dönük doğrulama (`test-sec-geriye.cjs --b4`) bu değişiklikte yeniden koşulmadı, çünkü seçici mantığı (`test-sec.cjs`) değişmedi, yalnız harita girdisi tazelendi; gevşeme yönünde bir değişiklik yok, ama harita girdisi değiştiği için PR'ın CI'ı `tam` koşacak (`scripts/ci/` küreseldir).
+
+## Açık konu
+
+- Eşik (yüzde 20) gözleme dayanır (191 test 4-6 günde birikti). Sıklığı gerçekte nasıl çıkacağı birleşmeden sonra ilk haftada ölçülür.
+- Haritayı master'da otomatik tazeleyen bir iş (zamanlı ya da push sonrası) bu işte YAPILMADI: korunan master'a bot PR'ı `GITHUB_TOKEN` ile CI tetiklemez
+  (zorunlu `ci` kontrolü hiç koşmaz), ayrı bir kimlik ya da OPS kararı gerekir.
+
+
+---
+# FILE: docs\audits\test-karnesi-2026-10-09.md
+
+# Test karnesi — 2026-10-09
+
+> ÜRETİLMİŞ BELGE: elle düzenleme. Kaynak: `node scripts/test-karnesi/karne-uret.cjs` (cetvel: `docs/standards/test-karnesi-standard.md`).
+> Bu belge HÜKÜM VERMEZ: `oneri` sütunu bir ADAYDIR. Silme/taşıma kararı insanındır; silme listesi Recep onayıyla, sensiz test silinmez.
+> CI geçmişi penceresi: 2026-07-06..2026-10-07. "ölçülmedi" = ölçüm yapılmadı (tahmin yazılmadı).
+
+## Özet
+
+| Konu | Sayı |
+|---|---|
+| test dosyası (git ls-files) | 654 |
+| · betik | 46 |
+| · conformance | 361 |
+| · birim | 222 |
+| · edge | 7 |
+| · e2e | 17 |
+| · smoke | 1 |
+| sabotajla ÖLÇÜLEN dosya | 347 |
+| sabotajla ÖLÇÜLMEYEN dosya | 307 |
+| sabotajda ÇELİŞKİ (aynı test için farklı hüküm, çözülmedi) | 0 |
+| KISMİ koruma (kırmızı veriyor ama ölçülen bir bozulmaya yeşil kalıyor) | 221 |
+| 8. soru: TETİK beyanı yazılı dosya (kesin) | 2 |
+| 8. soru: yalnız statik okumadan (kesin DEĞİL) | 292 |
+| 8. soru: ÖLÇÜLMEDİ (beyan yok, okunan yol yok) | 360 |
+| CI penceresinde kırmızı veren dosya | 70 |
+| CI penceresinde HİÇ kırmızı vermeyen dosya | 584 |
+
+### Sabotaj hükümleri (ölçülen dosyalarda)
+
+| Hüküm | Dosya |
+|---|---|
+| KIRMIZI | 345 |
+| TABAN_KIRMIZI | 1 |
+| YESIL | 1 |
+
+### Ortama bağlılık
+
+| Hüküm | Dosya |
+|---|---|
+| supheli | 174 |
+| bagimsiz | 471 |
+| bagli | 9 |
+
+### Öneri adayları (KARAR DEĞİL)
+
+| Aday | Dosya |
+|---|---|
+| OLCULMEDI | 306 |
+| KISMI-KORUMA | 218 |
+| KORU | 117 |
+| COKLU-KORUMA-ADAYI | 3 |
+| ORTAM-INCELE | 1 |
+| TASI-ADAYI-DUNYA-DURUMU | 7 |
+| SAHTE-YESIL-ADAYI | 1 |
+| TASINDI | 1 |
+
+### CI koşuları (ci.yml, pencere içi)
+
+| Sonuç | Koşu |
+|---|---|
+| success | 2087 |
+| cancelled | 717 |
+| failure | 351 |
+
+Test adımı süresi medyanı: 190 sn (örnek 374 başarılı koşu).
+
+## PR kapısından çıkan (dünya durumu) testler ve yeni yerleri (1)
+
+| Test | Yeni yer | Neden | Kanıt |
+|---|---|---|---|
+| `src/__tests__/conformance/taban-tazeligi-dunya.test.ts` | master-push + zamanli | Şema tabanının en yeni migration'dan geri kalıp kalmadığını ölçer. Cevap pull request'in koduna değil master'ın o anki durumuna ve tabanın son dökülme tarihine bağlıdır; taban prod'dan elle dökülür (sema-tabani-uret.yml), yani suçsuz bir PR'ın yazarı düzeltemez. Dosya, kapının KENDİ koduna ait kollardan ayrıldı: onlar (evren, kısmi taban, damga biçimi, README) taban-tazeligi.test.ts'te PR kapısında KALDI. | CI geçmişi 2026-07-06..10-06 (ALT-38 ölçümü; karne belgesi ALT-38b PR'ı ile depoya girer): bu kapı 55 kırmızı koşuda, 39 farklı dalda kırmızı verdi; 52'si dünya olayı kümesinde (altı küme: aynı test ≥3 dalda 12 saat içinde), 11'i master push. OPS ölçümü 2026-10-06: son 10 kırmızının 5'i (#1692 migrate sonrası suçsuz PR'lar). |
+
+## ÇELİŞKİLER (aynı test için farklı sabotaj hükmü; çözülmedi, sessizce seçilmedi) (0)
+
+Yok.
+
+## Yerine geçen ölçümler (bilinçli tekrar: önceki kaydın yerine açıkça ilan edilmiş yeniden ölçüm) (1)
+
+| Test | Seçilen kayıt | Neden | Kayıtlar |
+|---|---|---|---|
+| `src/__tests__/conformance/companion-doc-parity.test.ts` | g99.jsonl | Koşucu sınırı: test `git ls-files` (indeks) okuyor; sabotaj koşucusu 'ekle' sabotajını indekse yazmadığı için ilk ölçüm YEŞİL çıkmıştı. Koşucu 'ekle' adımını indekse de yazacak (ve geri alacak) şekilde düzeltildi, test yeniden ölçüldü: KIRMIZI. Bilinçli tekrar, rastgele değil. | g04.jsonl=YESIL; g99.jsonl=KIRMIZI |
+
+## Sahte yeşil adayları (sabotajların hiçbiri yakalanmadı) (1)
+
+| Test | Korur | Denenen | Not |
+|---|---|---|---|
+| `src/__tests__/conformance/instruction-surface-ppr.test.ts` | Canlı talimat yüzeylerinin (.claude/skills, .agent/skills, .agent/rules) var olmayan PPR özelliğini yürürlükteki kural g | 2 | kısmi sahte yeşil: commit'siz (calisma agaci / indeks) PPR ihlali YAKALANMADI - iki sabotaj da GECTI (SKILL.md sonuna 'PPR config ... zorunludur' satiri; indeks |
+
+## Sabotajsız bile kırmızı (ortam ya da gerçek hata) (1)
+
+| Test | Ortam notu |
+|---|---|
+| `src/__tests__/conformance/belge-kart-plan-kapisi.test.ts` | Windows çalışma ağacında .md dosyaları CRLF (text=auto + core.eol=native; git ls-files --eol: i/lf w/crlf): ŞABLON bloğu kolu kırmızı. Ayrıca node:sqlite (Node 22+, deneysel), git rev-parse, geçici di |
+
+## Çoklu koruma adayları (aynı sabotajı başka test de yakalıyor, pencerede hiç kırmızı vermedi) (3)
+
+| Test | Birlikte yakalayan |
+|---|---|
+| `src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` | `bash-write-audit-claude-deposu.test.ts`, `bash-write-audit-merge-muafiyeti.test.ts`, `bash-write-audit-tree.test.ts` |
+| `src/__tests__/conformance/e1-kimlik-kontrolu.test.ts` | `lane-precommit-merge.test.ts` |
+| `src/__tests__/conformance/storage-yazma-nobetcisi.test.ts` | `anon-yazma-nobetcisi.test.ts` |
+
+## Kısmi koruma (test kırmızı veriyor ama bazı bozulmalara yeşil kalıyor: silme adayı DEĞİL, güçlendirme adayı) (221)
+
+| Test | Yakalanmayan bozulma |
+|---|---|
+| `scripts/ci/__tests__/edited-ayna.test.ts` | güvenlik payı 120 sn -> 0 sn; calistir: api.kosular(sha) yerine api.kosular(baseRef); calistir: api.tabanTarihi(baseRef) yerine api.tabanTarihi(sha); gercekApi: head_sha süzgeci URL'den düşer; main.catch: beklenmeyen hatada atla=true yazar; yaz: çıktı anahtarı atla -> atlama; calistir: adaylar eskid |
+| `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` | ansiSoy: ';' içeren çok parametreli renk kodları (38;5;196m) soyulmaz; basarisizTestleriAyikla: ad tekilleştirme (Set) kalkar; basarisizDosyaSayisiOku: yalnız tek haneli sayı (10+ başarısız = null); argumanlar: --pencere-gun >= 1 doğrulaması kalkar; argumanlar: --is-akisi yanlış alana (repo) yazılır |
+| `scripts/test-karnesi/__tests__/karne-uret.test.ts` | kumele: tam 12 saat aralık yeni kümeye bölünür (> yerine >=); KUMELEME_SAAT 12 -> 20; ciOzeti: küme için tam MIN_DAL (3) dal yetmez (>= yerine >); imzaListesi: ağ çağrısı imzası alan adı bozulur (ortam.ag -> ortam.ağ); oneriVer: dünya durumu aday oranı tam %50'de tetiklenmez (>= yerine >); oneriVer: |
+| `scripts/test-karnesi/__tests__/sabotaj.test.ts` | vitestSinifla: çıkış kodu doğrulaması kalkar (kodu !=0 ama test kırık yok -> GECTI); vitestSinifla: GECTI sınıfı yanlış yazılır (GEÇTİ) -> hukumVer tanımaz; main: bağlı worktree reddi (ana ağaçta koşmama) kalkar; testKos: alt süreç ortamı temizlenmez (env: process.env, sırlar ve gerçek ev görünür);  |
+| `src/__tests__/conformance/3d-model-recipe.test.ts` | jsx-prop-metalness-sayisi |
+| `src/__tests__/conformance/3d-single-canvas.test.ts` | canvas-takma-adla (ek yoklama) |
+| `src/__tests__/conformance/admin-csv-hucre.test.ts` | replaceAll-ile-satir-ici-kacis |
+| `src/__tests__/conformance/admin-customer-surface.test.ts` | offset-sabit-sifir-belirtec-yerinde |
+| `src/__tests__/conformance/admin-daypicker-classnames.test.ts` | tirnakli-v8-anahtari |
+| `src/__tests__/conformance/admin-export-hygiene.test.ts` | cok-satirli-export-as-default (ek yoklama) |
+| `src/__tests__/conformance/admin-fx-lock-crud.test.ts` | elle-kur-girdisi-onChange-sonra-value |
+| `src/__tests__/conformance/admin-fx-lock-visibility.test.ts` | sayi-gosterimi-silindi-ucluk-kaldi |
+| `src/__tests__/conformance/admin-istemci-yazma-politikasi.test.ts` | degisken-tablo-adiyla-yazma |
+| `src/__tests__/conformance/admin-list-search.test.ts` | filtre-degiskende-kurulup-or-a-verildi |
+| `src/__tests__/conformance/admin-mutate-real-write.test.ts` | fn-yalniz-await-sleep |
+| `src/__tests__/conformance/admin-overlay-invariants.test.ts` | ciplak-confirm |
+| `src/__tests__/conformance/admin-refund-real.test.ts` | yardimci-hata-dalinda-ok-true |
+| `src/__tests__/conformance/admin-shell-invariants.test.ts` | h-screen-cok-satirli-cn-icinde |
+| `src/__tests__/conformance/admin-status-filter-domain.test.ts` | odeme-degeri-baska-satirdaki-sabitle-eklendi |
+| `src/__tests__/conformance/admin-status-label-coverage.test.ts` | bilesen-ham-return-s-ye-dondu-olayin-kendisi |
+| `src/__tests__/conformance/admin-theme-invariants.test.ts` | gradyan-fill-keyfi-hex-onekleri |
+| `src/__tests__/conformance/aile-adi-tek-kaynak.test.ts` | yikici-atama-const-name-family |
+| `src/__tests__/conformance/aile-kategori-kapisi.test.ts` | workflow-adimi-or-true-ile-bloklamaz |
+| `src/__tests__/conformance/ajan-skill-cozulur.test.ts` | tanim-dosyasinda-olmayan-skill-adi |
+| `src/__tests__/conformance/altgrup-kart-baglanti.test.tsx` | href-sahte-diyez-degeri |
+| `src/__tests__/conformance/altgrup-kart-gorsel.test.tsx` | src-baska-alana-cevrildi-kosul-image_url |
+| `src/__tests__/conformance/ana-agac-tazelik.test.ts` | ff-only-bayragi-dustu (ek yoklama) |
+| `src/__tests__/conformance/analitik-yerlesimi.test.ts` | dogrudan-gtag-betigi-riza-kapisini-atliyor (ek yoklama) |
+| `src/__tests__/conformance/analytics-event-taxonomy.test.ts` | dogrudan-gtag-olayi (ek yoklama) |
+| `src/__tests__/conformance/anasayfa-rotasi-statik.test.ts` | unstable-noStore-sizdi (ek yoklama) |
+| `src/__tests__/conformance/anon-definer-yetki.test.ts` | yeni-definer-fonksiyon-revoke-yok (ek yoklama) |
+| `src/__tests__/conformance/anon-yazma-nobetcisi.test.ts` | nobetci-adimi-or-true-ile-yutuluyor |
+| `src/__tests__/conformance/arama-davranisi.test.ts` | ihlal-dali-hic-tetiklenmiyor; workflow-adimi-or-true-ile-yutuluyor |
+| `src/__tests__/conformance/auth-session-security.test.ts` | a9-captcha-bolumu-silindi-yalniz-satir-202-kaldi (ek yoklama) |
+| `src/__tests__/conformance/bash-write-audit-merge-muafiyeti.test.ts` | olculemeyen-agac-muaf-sayiliyor-fail-open |
+| `src/__tests__/conformance/bash-write-gate.test.ts` | yorumlayici-listesi-node-python-ile-daraldi (ek yoklama) |
+| `src/__tests__/conformance/belge-defteri.test.ts` | supabase-yol-oneki-kurali-olu (ek yoklama) |
+| `src/__tests__/conformance/belge-yonlendirici.test.ts` | varsayilan-maks-2den-5e; tekrarsiz-yol-suzgeci-kalkti |
+| `src/__tests__/conformance/bellek-yoklama.test.ts` | bos-bellek-esigi-2048den-1024e |
+| `src/__tests__/conformance/beyansiz-olcum-lambasi.test.ts` | beyan-kalibi-git-C-ve-cd-kollari-kalkti; beyansiz-olcum-kaydi-tur-basina-tuketilmiyor (ek yoklama) |
+| `src/__tests__/conformance/board-globs-tekrarlanan-bayrak.test.ts` | claim-glob-ayirici-virgulden-noktalivirguluye |
+| `src/__tests__/conformance/board-invariants.test.ts` | beyansiz-olcum-kaydi-tur-basina-tuketilmiyor |
+| `src/__tests__/conformance/board-pencere-adi.test.ts` | bayat-serit-ad-cakismasina-sayiliyor |
+| `src/__tests__/conformance/bos-sku-render.test.ts` | model-etiketi-yardimcisi-sku-ya-dusuyor |
+| `src/__tests__/conformance/build-skip-positive-logic.test.ts` | hijyen-sinifi-sondaki-slash-dustu |
+| `src/__tests__/conformance/canli-kanit-yalitimi.test.ts` | onay-kilidi-run-blogunda-girdi-gomuldu-enjeksiyon; e2e-smoke-her-pr-de-canli-spec-kosuyor |
+| `src/__tests__/conformance/canonical-lang-segment.test.ts` | marka sayfası trUrl dil öneksiz (üçlü yüzünden kör nokta yoklaması) |
+| `src/__tests__/conformance/canonical-url-ssot.test.ts` | marka sayfası kanonik yüzeyinde çıplak location.origin (window. öneksiz kör nokta yoklaması) |
+| `src/__tests__/conformance/category-metadata-i18n-ssot.test.ts` | destructuring ile ham okuma (nokta erişimi yok, kör nokta yoklaması) |
+| `src/__tests__/conformance/category-view-reach.test.ts` | çağrı noktasında alt kategori sayısı sabit 1 verildi (düzeltme prod'da devre dışı, kör nokta yoklaması) |
+| `src/__tests__/conformance/cati-dil-saglayicisi.test.ts` | yoldanDilCoz'a yol yerine null veriliyor (çatı hep varsayılan dil, kör nokta yoklaması) |
+| `src/__tests__/conformance/ci-edited-ayna.test.ts` | ci işi edited'de job düzeyinde atlanır (job-level if) |
+| `src/__tests__/conformance/ci-install-bounded.test.ts` | apt-get'siz `apt install` sarmalayıcısız ve zaman sınırsız adım eklendi (kör nokta yoklaması) |
+| `src/__tests__/conformance/ci-pr-kayit-kapisi.test.ts` | kapı adımına continue-on-error: true eklendi (kapı koşar ama hiçbir şeyi kırmızı yapamaz, kör nokta yoklaması) |
+| `src/__tests__/conformance/comment-scrubber-scheme-safety.test.ts` | şema-güvensiz sıyırıcı, karakter sınıfı sırası ters ([^\n\r]) — kör nokta yoklaması |
+| `src/__tests__/conformance/commit-oncesi-uyarilar-kilidi.test.ts` | `// true` komut yerine yorum satırı ekine taşındı (kanca artık bloklayabilir, kör nokta yoklaması) |
+| `src/__tests__/conformance/companion-defter.test.ts` | post-commit'te defter çağrısı ölü koşula bağlandı (`if false &&`) — metin kalır davranış gider |
+| `src/__tests__/conformance/config-fail-closed.test.ts` | iki adımlı sessiz sandbox varsayılanı (Deno.env.get ayrı satırda, // varsayılan sonraki satırda, kör nokta yoklaması) |
+| `src/__tests__/conformance/currency-not-from-language.test.ts` | çağrı noktasında para birimi dilden türetildi (currency kelimesi var, kör nokta yoklaması) |
+| `src/__tests__/conformance/db-view-grant-hygiene.test.ts` | REVOKE'suz CREATE MATERIALIZED VIEW (varsayılan yetkiler açık, kör nokta yoklaması) |
+| `src/__tests__/conformance/defter-bayatlik-olcumu.test.ts` | kancanın python çağrısına esitle fiili eklendi (`path.join(...)` sonrası, regex'in ilk ')'inin ötesinde, kör nokta yoklaması) |
+| `src/__tests__/conformance/denetim-izi-kapisi.test.ts` | kapı gevşedi: PRODUCTS_ZORUNLU_KOLON listesinden sku düşürüldü; yontemli() sarmalayıcısı başlığı hiç eklemiyor (ek yoklama) |
+| `src/__tests__/conformance/dunya-durumu-satiri.test.ts` | BAYAT_OLCUM_SAAT 36 -> 11; ILK_KOSU_BEKLEME_SAAT 24 -> 3; IS_AKISI adı gerçek dosyadan ayrılır (dunya-durumu-eski.yml); olc: son koşu yerine listenin SON elemanı (en eski) alınır; gerekirseTazele: 30 dk tazelik denetimi kalkar (API her mesajda çağrılır); kanca: satır hesaplanır ama stdout'a YAZILMAZ |
+| `src/__tests__/conformance/durum-dondur.test.ts` | diskten doğrulamada bayt eşitliği kontrolü devre dışı (doğrulayıcı içi boşaltıldı) |
+| `src/__tests__/conformance/edge-delivery-idempotency.test.ts` | tekilleştirme kapısı kısa devreyle devre dışı (alreadySent çağrısı koşulda duruyor, hiç çalışmıyor) |
+| `src/__tests__/conformance/edge-drift-yeniden-dene.test.ts` | drift-check fatal() artık çıkış 2 yerine 0 veriyor (başarısız indirme sessiz yeşil) |
+| `src/__tests__/conformance/edge-koken-allowlist.test.ts` | karar satırı joker son eke döndü: isVercel artık origin.includes('.vercel.app') (kalıp sabiti yerinde duruyor) |
+| `src/__tests__/conformance/edge-sayfalama.test.ts` | yardımcıda üst sınır kontrolü devre dışı (fırlatma metni yerinde, koşul hiç doğru olmuyor) |
+| `src/__tests__/conformance/edge-security.test.ts` | admin-orders-latest rol kapısı genişledi: sıradan 'user' rolü de geçiyor (admin ve super_admin literalleri yerinde) |
+| `src/__tests__/conformance/edge-shared-input-drift.test.ts` | rc=$? yerine rc=0 (kapı her zaman yeşil, metinler yerinde) (ek yoklama) |
+| `src/__tests__/conformance/env-yazma-kapisi.test.ts` | main() permissionDecision ask yerine allow basıyor (ek yoklama) |
+| `src/__tests__/conformance/eposta-defter-yazici-zorunlu-kolon.test.ts` | defterHatasiniBildir hiçbir şey bildirmiyor (hata alınıyor ama yutuluyor) (ek yoklama) |
+| `src/__tests__/conformance/eposta-kimlik-varsayilan.test.ts` | HTML şablonuna vercel.app logosu (tarayıcı yalnız .ts okur: kapsam sınırı yoklaması) |
+| `src/__tests__/conformance/fiyat-gunlugu-yontem-basligi.test.ts` | yontemli() sarmalayıcısı başlığı hiç eklemiyor (statik kapı çağrı yerini görür, gövdeyi görmez) |
+| `src/__tests__/conformance/font-preload-olcumu.test.ts` | main() kırmızı durumda çıkış 0 veriyor (CI adımı kırmızıyı yeşil görür) (ek yoklama) |
+| `src/__tests__/conformance/form-submission-standard.test.ts` | ContactPage: gerçek yazma yerine sahte gecikme + Promise.resolve (yorumsuz sahte başarı) |
+| `src/__tests__/conformance/gh-api-kapisi.test.ts` | main() permissionDecision ask yerine allow basıyor (ek yoklama) |
+| `src/__tests__/conformance/golge-kurucu.test.ts` | ad denetimi devre dışı (if false &&), desen ve exit(2) metinde duruyor (ek yoklama) |
+| `src/__tests__/conformance/gsc-token.test.ts` | jeton() içindeki depo-içi anahtar reddi devre dışı (yüklem duruyor, uygulama yok) |
+| `src/__tests__/conformance/hafiza-enjeksiyonu.test.ts` | sidechain-alt-ajan-mesaji-kullanim-sayilir (ek yoklama); compact-sifirlama-kopuk (ek yoklama); matcher-Edit-cikti (ek yoklama) |
+| `src/__tests__/conformance/hafiza-indeks-bekcisi-kilidi.test.ts` | yumusak-satir-esigi-tam-160-da-susar-off-by-one (ek yoklama) |
+| `src/__tests__/conformance/hafiza-sorusu-yonlendirme.test.ts` | satis-hazirligi-siparis-zinciri-kalibi-dusuruldu (ek yoklama) |
+| `src/__tests__/conformance/hardcoded-category-slug-ssot.test.ts` | taranmayan-yeni-dosyada-olmayan-slug (ek yoklama); cift-tirnakli-slug-yazimi (ek yoklama) |
+| `src/__tests__/conformance/hesaplayici-alt-metin-sahiplik.test.ts` | jsx-metin-dugumu-ifadeyle-karisik-sabit-metin |
+| `src/__tests__/conformance/home-hero-route-ssot.test.ts` | elle-dil-onekli-ham-url-tr-category |
+| `src/__tests__/conformance/hook-referential-stability.test.ts` | inline-fn-iceren-nesne-degiskene-atanip-doner |
+| `src/__tests__/conformance/i18n-attribute-literals.test.ts` | attribute-ifade-kapsayicisinda-ham-turkce |
+| `src/__tests__/conformance/i18n-key-resolution.test.ts` | utils-icinde-olmayan-anahtar-SCOPE-disi |
+| `src/__tests__/conformance/i18n-locale-case.test.ts` | cok-satirli-zincir-toLowerCase-satir-basinda |
+| `src/__tests__/conformance/i18n-locale-compare.test.ts` | cok satirli dilsiz localeCompare cagrisi (ek yoklama) |
+| `src/__tests__/conformance/i18n-ters-yon.test.ts` | tr degeri genel Ingilizce yapildi (nav.knowledgeHub = Knowledge Hub) |
+| `src/__tests__/conformance/ic-kod-sizintisi.test.ts` | ara degisken uzerinden model_code ?? sku (ek yoklama) |
+| `src/__tests__/conformance/invoice-ledger-contract.test.ts` | rbac /admin/invoices kapisi moderator'a acildi (kapi govdesi bozuldu, return false yerinde) |
+| `src/__tests__/conformance/kanban-anlik.test.ts` | yalniz readOnly bayragi kaldirildi, yazma YOK (ek yoklama) |
+| `src/__tests__/conformance/kanca-verify-on-stop.test.ts` | beyansiz-olcum-kaydi-tur-basina-tuketilmiyor (ek yoklama); tur-sonu-uyarisi-beyansiz-kayit-sartini-yitirdi (ek yoklama) |
+| `src/__tests__/conformance/kanonik-kok-istemci.test.ts` | 'use client' dosyasinda require('@/config/siteUrl') (ek yoklama) |
+| `src/__tests__/conformance/karar-kayit-bagi.test.ts` | UYARI kipindeki belgede (altyapi) DURUM satiri bicimsiz |
+| `src/__tests__/conformance/kart-aciklama-mobil.test.ts` | ust-kutu-gizli-baslar (aciklamayi 2 seviye ustten saran kutuya max-h-0 opacity-0) |
+| `src/__tests__/conformance/kart-yukleme-onceligi.test.ts` | takma-adla-import-onceliksiz-cagri (yeni dosya: import Kart from FamilyCard; <Kart .../>) |
+| `src/__tests__/conformance/kartsiz-kayit-sayaci.test.ts` | pano-yok-sessiz-sifir (pano dosyasi yoksa OLCULEMEDI yerine 0/0 sessiz sifir); pano-yazmaya-acik (readOnly kaldirildi); iptal-kart-acik-sayilir (cancelled/canceled kapali durumlardan cikti) |
+| `src/__tests__/conformance/katalog-sayim-tls.test.ts` | tls-dogrulama-kapali (rejectUnauthorized true -> false) |
+| `src/__tests__/conformance/kategori-aciklama-dil-cozumu.test.ts` | vm-sabit-tr-dil (useCategoryViewModel cozucuye lang yerine sabit 'tr' geciriyor); ham-i18n-destructuring (yeni dosya metadata.description_i18n'i parcalayarak ham okur) |
+| `src/__tests__/conformance/kategori-adi-marketing-emekli.test.ts` | taranmayan-dizinden-dolayli-okuma (src/lib/seo yardimcisi marketing_title okur, view yalniz yardimciyi cagirip h1 basar) |
+| `src/__tests__/conformance/kategori-adi-tek-kaynak.test.ts` | ham-ad-fallbackli (yeni dosya {category.menu_label // category.name} basar); yorumla-aklama (oneriEtiketi cozucuyu cagirmaz, adi yorumda kalir) |
+| `src/__tests__/conformance/kategori-bilinmeyen-slug.test.ts` | hata-null-doner (sorgu hatasi null'a cevrilir, throw olu dalda kalir; dosyada baska throw'lar var) |
+| `src/__tests__/conformance/kategori-cozucu-oncelik.test.ts` | cagri-yeri-bypass (getCachedCategoryData cozucuyu atlayip rows[0] alir: eski kusur geri geldi) |
+| `src/__tests__/conformance/kategori-gorsel-tek-kaynak.test.ts` | render-image-ucu-elle (yeni dosya storage/v1/render/image/public donusum adresini elle kurar) |
+| `src/__tests__/conformance/kategori-rotasi-statik.test.ts` | force-dynamic (rota sinifi force-static -> force-dynamic: prerender tamamen kapanir) |
+| `src/__tests__/conformance/kategori-sayilari-onbellek.test.ts` | rota-dosyasinda-dogrudan-rpc (kategoriSayfasi.tsx disinda, rota page.tsx icinde onbelleksiz RPC cagrisi); webhook-tazeleme-yorumda (products dalinda revalidateTag(PRODUCTS_DISCOVERY_TAG) yorum satirina alindi) |
+| `src/__tests__/conformance/kimlik-kurali-kapisi.test.ts` | yukleyici-sku-sablon-literaliyle (load.mjs prefix-model_code'u sablon dizesiyle kendisi kurar) |
+| `src/__tests__/conformance/kopuk-surec-pencere.test.ts` | detached-ts-dosyasinda (yeni scripts/**/*.ts dosyasi detached:true kullanir; tarayici yalniz cjs/mjs/js tarar) |
+| `src/__tests__/conformance/kume-master-tazeligi.test.ts` | canli-olcum-hep-taze (olc() sonraki kaynaklari bos verir: fikstur cekirdegi saglam, git ayagi kopuk) |
+| `src/__tests__/conformance/kvkk-request-ledger.test.ts` | sonraki-migration-musteri-update-politikasi (yeni *_dsr_customer_* migration musteriye UPDATE politikasi verir; test yalniz ILK migration'i okur); outcome-zorunlulugu-kismen-kalkti (rejected icin outcome artik zorunlu degil; kaynak metni regex'i hala eslesir) |
+| `src/__tests__/conformance/lane-precommit-merge.test.ts` | cherry-pick-revert-muafiyeti-kalkti (yalniz MERGE_HEAD muaf; test yalniz MERGE_HEAD'i dener) |
+| `src/__tests__/conformance/lang-metadata-locale.test.ts` | og-baslik-aciklama-sabit-tr (openGraph.title/description her dilde Turkce sozluk) |
+| `src/__tests__/conformance/legal-consent-analytics.test.ts` | riza-sonucu-yok-sayilir (hasConsent soruluyor ama && false ile engellemiyor); yukleyici-baslangicta-izinli (useState(false) -> useState(true): ilk render rizasiz script basar); baska-ga-sunucusu (yeni dosya google-analytics.com/analytics.js yukler; kapi yalniz googletagmanager.com arar) |
+| `src/__tests__/conformance/legal-consent-gate.test.ts` | dogrulama-hic-engellemez (validateLegalConsents icinde false && ile kosul devre disi); preinfo-yorum-satirina-alindi (zorunlu listeden preInfo yorumla cikarildi) |
+| `src/__tests__/conformance/legal-en-leftover.test.ts` | url-arkasinda-turkce-lf (ek yoklama); ozel-harfsiz-turkce-lf (ek yoklama) |
+| `src/__tests__/conformance/legal-promise-backing.test.ts` | en-fatura-suresi-30-gun (legalConfigEn.invoiceDeliveryTime 7 days -> 30 days; VUK arm yalniz TR degeri okur); kismi-ret-notu-yazilmaz (retained_data_note kosulu v_saklanan < 0: not hic yazilmaz; kolon tanimi adi tatmin eder) |
+| `src/__tests__/conformance/linear-arsiv.test.ts` | kanca-baslat-noop; anahtar-konsola-yazilir-sozcuksuz |
+| `src/__tests__/conformance/linear-yeni-yorum.test.ts` | durum-sorgusu-proje-filtreli |
+| `src/__tests__/conformance/localized-route-ssot.test.ts` | app-components-sabit-yol; router-push-sabit-yol; views-href-urunler-listede-yok (ek yoklama) |
+| `src/__tests__/conformance/maliyet-yazici-kurali.test.ts` | from-ve-update-ayri-ifadede (ek yoklama) |
+| `src/__tests__/conformance/marka-i18n-butunlugu.test.ts` | BRAND_DETAILS-story-en-metni-bos (ek yoklama) |
+| `src/__tests__/conformance/marka-palet-tokenlari.test.ts` | dark-blogunda-yanlis-renkli-ikinci-tanim (ek yoklama) |
+| `src/__tests__/conformance/marketing-title-yuk.test.ts` | listede-olmayan-vitrin-sorgusuna-marketing-title (ek yoklama) |
+| `src/__tests__/conformance/migration-atomicity.test.ts` | workflow-gercek-dongude-LC_ALL-C-silindi |
+| `src/__tests__/conformance/migration-ledger-model.test.ts` | uygulama-yolunda-ledger-yazimi-silindi |
+| `src/__tests__/conformance/misafir-teklif-ucu.test.ts` | kvkk-kapisi-tersine-cevrildi |
+| `src/__tests__/conformance/mobil-alt-sekme.test.ts` | perde-katmani-className-ifade-bicimine-gecti-ve-md-hidden-dustu (ek yoklama) |
+| `src/__tests__/conformance/mutlak-yol-sizintisi.test.ts` | kacisli-cift-ters-egik-cizgili-kimlik-yolu (ek yoklama) |
+| `src/__tests__/conformance/notice-kapsami.test.ts` | lisansli-skill-adi-notice-icinde-baska-sozcugun-parcasi (ek yoklama) |
+| `src/__tests__/conformance/numeric-format-ssot.test.ts` | mjs-dosyasinda-ham-toLocaleString (ek yoklama) |
+| `src/__tests__/conformance/onizleme-yalitimi.test.ts` | rol-denetimi-uyariya-dusurulmus |
+| `src/__tests__/conformance/order-status-dictionary.test.ts` | update-degisken-yuku-ile-sozluk-disi-status (ek yoklama) |
+| `src/__tests__/conformance/pano-sayfasi.test.ts` | bilinmeyen-sutunlu-kart-sayfadan-dusuyor |
+| `src/__tests__/conformance/payment-money-move.test.ts` | farkli-degisken-adiyla-psp-iadesi-sahiplik-yetkili-claimsiz (ek yoklama) |
+| `src/__tests__/conformance/payment-render-surface.test.ts` | hata-dali-olu-kod (ek yoklama) |
+| `src/__tests__/conformance/payment-status-trigger-contract.test.ts` | tetik-silindi-fonksiyon-kaldi (ek yoklama) |
+| `src/__tests__/conformance/pim-unopim-yedek.test.ts` | app-key-korumasi-yorum-satirina-alindi; yeni-anahtar-algilama-olu-kod (ek yoklama) |
+| `src/__tests__/conformance/postgrest-filter-grammar.test.ts` | degisken-uzerinden-gomme; dize-birlestirme-ile-gomme |
+| `src/__tests__/conformance/precompact-durum-kapisi.test.ts` | matcher-hic-eslesmez-baglanti-olu |
+| `src/__tests__/conformance/pricing-cache-invariants.test.ts` | edge-function-dogrudan-fiyat-yazar; elle-ezme-koruma-mantigi-kapatildi |
+| `src/__tests__/conformance/pricing-fx-lock-contract.test.ts` | refresh-halkasi-kilit-sonucunu-yoksayar |
+| `src/__tests__/conformance/pricing-fx-rate-single-resolver.test.ts` | ikinci-kopya-order-limit-lte-yok |
+| `src/__tests__/conformance/pricing-money-append-only.test.ts` | currency-rates-for-all-policy; fiyat-kolonu-alter-type-float |
+| `src/__tests__/conformance/pricing-order-snapshot-contract.test.ts` | yeni-yazma-yolu-alanlar-yalniz-yorumda |
+| `src/__tests__/conformance/pricing-segment-source.test.ts` | ucuncu-cozucu-edge-user-profiles-okur; tablo-adi-sabit-uzerinden-user-profiles |
+| `src/__tests__/conformance/pricing-storefront-source.test.ts` | select-degisken-uzerinden-price |
+| `src/__tests__/conformance/prob-bekleyen-kuyruk.test.ts` | bagimsiz-prob-jetonu-basar-ama-yazi-durur |
+| `src/__tests__/conformance/product-identity-resolver.test.ts` | jsonld-cagrisi-yoruma-alindi-ham-ad; pdp-ham-ad-istege-bagli-zincirle |
+| `src/__tests__/conformance/promise-backing-behavior.test.tsx` | yazma-yerine-ilgisiz-izleme-fetch |
+| `src/__tests__/conformance/purchasing-machine-and-evidence.test.ts` | goods-receipts-dogrudan-update |
+| `src/__tests__/conformance/quote-atomik-yazim.test.ts` | toplu-grant-tum-fonksiyonlar-anon |
+| `src/__tests__/conformance/quote-insert-policy-guard.test.ts` | bosluklu-tirnakli-politika-adi; tablo-adi-public-onekisiz |
+| `src/__tests__/conformance/quote-items-policy-guard.test.ts` | bosluklu-tirnakli-update-politikasi |
+| `src/__tests__/conformance/quote-machine-ssot.test.ts` | rakamli-ad-tenantsiz-select-politikasi |
+| `src/__tests__/conformance/quote-yayim-sunucu.test.ts` | sonraki-migration-damga-tetigini-siler; toplu-grant-yardimci-fonksiyon-acilir |
+| `src/__tests__/conformance/rec355-yetki-dongusu.test.ts` | yeni-migration-is_admin_claim-yeniden-tanimlandi-tablo-okuyor (ek yoklama) |
+| `src/__tests__/conformance/recep-sozu-defteri.test.ts` | kapali-cross-session-regexi-silindi |
+| `src/__tests__/conformance/registry-autosync-pencere.test.ts` | spawnSync-windowsHide-olmadan-eklendi |
+| `src/__tests__/conformance/render-revalidation-contract.test.ts` | product_prices-dal-basi-duruyor-govde-tazelemiyor |
+| `src/__tests__/conformance/required-checks-merge-ref.test.ts` | mergeref-adimi-hic-kosmuyor |
+| `src/__tests__/conformance/returns-webhook-transitions.test.ts` | webhook-verdikt-yok-sayiliyor-cagri-duruyor |
+| `src/__tests__/conformance/rls-coverage-ci-binding.test.ts` | is-kosulu-false-ile-etkisiz |
+| `src/__tests__/conformance/rls-politika-sarma.test.ts` | sarma-adimi-DB_URL-envsiz-yorum-kaliyor |
+| `src/__tests__/conformance/rls-yetki-karari.test.ts` | yeni-migration-auth.role()-admin-karari |
+| `src/__tests__/conformance/rota-dili-dil-degistirici.test.tsx` | window-location-render-aninda-okunuyor (ek yoklama) |
+| `src/__tests__/conformance/sage-ana-kok.test.ts` | kanca-dbKok-satira-gecmiyor |
+| `src/__tests__/conformance/sage-dosya-dersi.test.ts` | matcher-Edit-cikti; compact-sifirlama-kopuk |
+| `src/__tests__/conformance/sage-yedek.test.ts` | dogrulama-etkisiz-true-or |
+| `src/__tests__/conformance/santiye-kanban.test.ts` | pano-yazma-kipinde-aciliyor |
+| `src/__tests__/conformance/satis-kipi-acilis-onkosullari.test.ts` | ret-cikisi-yorumlandi |
+| `src/__tests__/conformance/satis-kipi-anahtari.test.ts` | env-koseli-parantezle-okunuyor; ret-cikisi-yorumlandi (ek yoklama); checkout-yalniz-anahtara-bagli-esitlik-bicimi (ek yoklama) |
+| `src/__tests__/conformance/satis-kipi-edge.test.ts` | yeni-uc-supabasejs-ile-siparis-yaziyor |
+| `src/__tests__/conformance/satis-kipi-webhook-dali.test.ts` | dal-general-anahtarinda-da-tazeler |
+| `src/__tests__/conformance/satis-kipi-yasal-kapi.test.ts` | checkout-yalniz-anahtara-bagli-esitlik-bicimi |
+| `src/__tests__/conformance/scheduled-invoker-presence.test.ts` | cron-satiri-yorumlandi-schedule-kaldi |
+| `src/__tests__/conformance/search-route-ssot.test.ts` | replace-ile-ham-adres |
+| `src/__tests__/conformance/sema-graf-uretici.test.ts` | sir-degeri-loga-yaziliyor; tablo-paritesi-kapali-metin-duruyor; sslmode-sokulmuyor-kalip-metni-duruyor |
+| `src/__tests__/conformance/sema-tabani-is-akisi.test.ts` | bos-dokum-reddi-devre-disi-metin-duruyor; supabase-db-push-adimi-eklendi |
+| `src/__tests__/conformance/seo-h1-tekilligi.test.tsx` | kategori-landing-ikinci-h1 |
+| `src/__tests__/conformance/seo-yonlendirme-hedefi.test.ts` | varyant-hedef-sablon-dizesiyle-yazildi |
+| `src/__tests__/conformance/shipping-alarm-ops.test.ts` | EK: mükerrer takip kontrolü ölü ama dizgiler yerinde (if (false)) (ek yoklama) |
+| `src/__tests__/conformance/silme-baglanti-kapisi.test.ts` | EK: tarama sınırı aşılınca durdurma kolu ölü (if (false)) (ek yoklama); EK: tarama derinliği 3 yerine 0 (iç içe bağlantı görülmez) (ek yoklama) |
+| `src/__tests__/conformance/siparis-no-tek-bicim.test.ts` | EK: takma ad (alias) ile kesme: const no = order_number; no.split('-')[1] (ek yoklama) |
+| `src/__tests__/conformance/skill-bitis-blogu.test.ts` | EK: bir skill'in bloğunda ENGELLI TANIMI silindi, kelime başka cümlede kalıyor (ek yoklama) |
+| `src/__tests__/conformance/skill-python-yedegi.test.ts` | graphify-else-kolu-python3-TEK-kopya (ek yoklama) |
+| `src/__tests__/conformance/skills-eval-puanlama.test.ts` | ikinci-claude-spawn-sade-bayraksiz (ek yoklama) |
+| `src/__tests__/conformance/skills-hazir.test.ts` | README-satir-adlari-silindi (ek yoklama) |
+| `src/__tests__/conformance/slug-degisince-yonlendirme.test.ts` | hedef-varyant-slug-adresi-oldu-K12-REC146-sinifi; lineo-hedefi-dil-sabit-yazildi (ek yoklama) |
+| `src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts` | kancaya-exec-alt-surec-eklendi (ek yoklama) |
+| `src/__tests__/conformance/son-konusma-dokumu.test.ts` | sir-suzgeci-AWS-AKIA-deseni-etkisiz (ek yoklama) |
+| `src/__tests__/conformance/spec-unit-order.test.ts` | harf-koruma-satiri-silindi (ek yoklama) |
+| `src/__tests__/conformance/sql-etki.test.ts` | sayim-zaman-asimi-5sn-yerine-5000sn (ek yoklama) |
+| `src/__tests__/conformance/sql-yazma-kapisi.test.ts` | settings-sql-yazma-kapisi-async-true (ek yoklama); pg_terminate_backend-yazma-sozcuklerinden-cikti (ek yoklama) |
+| `src/__tests__/conformance/ssr-duman-kilidi.test.ts` | alarm-adimi-if-false (ek yoklama); alarm-cron-hic-tetiklenmez-(31-subat) (ek yoklama) |
+| `src/__tests__/conformance/stok-uyari-teklif-paritesi.test.ts` | toplu yol ürün başına özet gönderiyor (map + Promise.all; for-of yok) (ek yoklama) |
+| `src/__tests__/conformance/storefront-fiyat-sizintisi.test.ts` | PDP quoteMode hükmünü çağırmıyor (sabit false: fiyat her zaman basılır) (ek yoklama) |
+| `src/__tests__/conformance/storefront-kategori-vitrin-izgara.test.ts` | className={'flex overflow-x-auto snap-x'} biçiminde yatay kaydırma eklendi (ek yoklama) |
+| `src/__tests__/conformance/storefront-metadata-tek-yazici.test.ts` | src/components altına ./Seo göreli yoluyla Seo'yu içe aktaran yeni dosya (ek yoklama) |
+| `src/__tests__/conformance/taban-tazeligi.test.ts` | tabandan yeni damgalı bir migration eklendi (dalda eklenen, indekse yazılan) |
+| `src/__tests__/conformance/teklif-ic-bildirim.test.ts` | alıcı yokken defter 'failed' yerine 'sent' yazıyor (5 failed yazımından biri bozuldu) (ek yoklama) |
+| `src/__tests__/conformance/test-kosu-kapsami.test.ts` | vitest.config: dislan dışlaması exclude listesine bağlı değil; vitest.config: yalniz kipinin include'u bağlı değil; vitest.config: ** ile başlayan belgesiz dışlama (taban-tazeligi); dunya-durumu.yml: test kırmızısı // true ile yutulur; dunya-durumu.yml: shell: bash (pipefail) bloğu silinir; dunya-du |
+| `src/__tests__/conformance/uc-boyut-musteri-yuzeyi.test.ts` | listede olmayan yeni dosyada bayraksız VentHubCanvas (yeni müşteri 3D giriş noktası) (ek yoklama) |
+| `src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts` | docs altına compiled_at damgalı, manifestte/istisnada olmayan üretilmiş dosya eklendi (indekse yazılan) (ek yoklama) |
+| `src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` | üretilmiş venthub_hvac_master.md elle düzenlendi (çalışma ağacında) (ek yoklama) |
+| `src/__tests__/conformance/urun-secici-girisi.test.ts` | arac-sayfasinda-permanentRedirect (ek yoklama) |
+| `src/__tests__/conformance/urunler-kategori-kapisi.test.tsx` | zincirde-sabit-bos-dizi-geciriliyor (ek yoklama) |
+| `src/__tests__/conformance/urunler-rotasi-statik.test.ts` | revalidate-sifira-cekildi (ek yoklama) |
+| `src/__tests__/conformance/vaat-sizintisi.test.ts` | en-sozlukte-free-shipping-vaadi (ek yoklama); footer-metni-ucretsiz-kargo-vaadi (ek yoklama) |
+| `src/__tests__/conformance/variant-selector-threshold.test.ts` | pdp-sabit-sayi-eski-ifade-yorumda (ek yoklama) |
+| `src/__tests__/conformance/veri-tavani-sayfalama.test.ts` | elle-sayfalama-sayfa-boyu-tavani-asti (ek yoklama) |
+| `src/__tests__/conformance/webhook-auth-fail-closed.test.ts` | baseline-sql-duz-metin-whsec-sirri (ek yoklama) |
+| `src/__tests__/conformance/workflow-model-yonlendirme.test.ts` | bos-model-dizesi (ek yoklama) |
+| `src/__tests__/conformance/wrongstack-kanonik-kok.test.ts` | cliDogrula: ".." kaçış (paket dışı) kontrolü kaldırıldı — node_modules/dist/cli.js gibi paket-dışı yol geçer (ek yoklama) |
+| `src/__tests__/conformance/wrongstack-kurulum-betigi.test.ts` | kur(): yabancı pencere varken throw yerine yalnız yazıyor (DURMAZ; "if (yabanci.length)" metni ve sırası aynı) (ek yoklama) |
+| `src/__tests__/conformance/wrongstack-sage-yama.test.ts` | yama eski satırı değişti (gerçek paketteki satırla uyuşmaz; yamanın kendi içinde tutarlı kalır) (ek yoklama) |
+| `src/__tests__/conformance/wrongstack-surum-satiri.test.ts` | sonSurumuOlc: GitHub isteğinden zaman aşımı sinyali (AbortSignal.timeout) kaldırıldı (ek yoklama) |
+| `src/__tests__/conformance/yayinda-model-tek-nokta.test.ts` | yeni üretim dosyası ayırıcıyı ["-","p","-"].join("") ile kuruyor (ek yoklama) |
+| `src/__tests__/conformance/yokluk-hukmu-cetveli.test.ts` | §9 c satırı: "aynı yöntemin tekrarı da yeterlidir" (kural tersine; anahtar ifade "En az iki FARKLI yöntem" durur) (ek yoklama); §9 hüküm cümlesi: "biri eksik olsa da hüküm yazılabilir" (bakılmadı / bilmiyorum ifadesi durur) (ek yoklama) |
+
+## Tüm dosyalar
+
+Ayrıntı (sekiz soru, her dosya için) `test-karnesi-*.json` içindedir. Bu tablo yalnız özet sütunlarını verir.
+
+| Dosya | Küme | CI kırmızı | Sabotaj | Ortam | Süre (ms) | Tetik | Aday |
+|---|---|---|---|---|---|---|---|
+| `scripts/ci/__tests__/degisiklik-sinifi.test.ts` | betik | 0 | ölçülmedi | supheli | ölçülmedi | statik (40) | OLCULMEDI |
+| `scripts/ci/__tests__/dunya-durumu.test.ts` | betik | 0 | ölçülmedi | supheli | ölçülmedi | statik (24) | OLCULMEDI |
+| `scripts/ci/__tests__/edited-ayna.test.ts` | betik | 0 | KIRMIZI (1/9) | supheli | ölçülmedi | statik (40) | KISMI-KORUMA |
+| `scripts/ci/__tests__/test-haritasi-kaydedici.test.ts` | betik | 0 | ölçülmedi | supheli | ölçülmedi | statik (19) | OLCULMEDI |
+| `scripts/ci/__tests__/test-haritasi-uret.test.ts` | betik | 0 | ölçülmedi | supheli | ölçülmedi | statik (32) | OLCULMEDI |
+| `scripts/ci/__tests__/test-sec-geriye.test.ts` | betik | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (25) | OLCULMEDI |
+| `scripts/ci/__tests__/test-sec.test.ts` | betik | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (40) | OLCULMEDI |
+| `scripts/ci/__tests__/test-shard-bekle.test.ts` | betik | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (1) | OLCULMEDI |
+| `scripts/ci/__tests__/test-shard-secim.test.ts` | betik | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (6) | OLCULMEDI |
+| `scripts/ci/__tests__/test-shard.test.ts` | betik | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (11) | OLCULMEDI |
+| `scripts/db/product-data/__tests__/identity-fix-kurallar.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/aile-metni-yaz.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 1208 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/en-jeton-kapisi.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 2514 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/faz4-teknik-yukle.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 4379 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/fiyat-bosluk.test.ts` | betik | 0 | ölçülmedi | supheli | 7 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/fiyat-kaynak-esle.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/gorsel-alt.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/gorsel-sozlesme.test.ts` | betik | 0 | ölçülmedi | supheli | 14 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/katalog-yukle.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 1631 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/kategori-en.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/paket-sozlesme.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 515 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/paket-tazelik.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/rec172-cikarim.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 1351 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/taslak-kaynak-kapisi.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 1426 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/teknik-duzelt.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 4158 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/toplu-sunum-k70.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 1815 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/uretici-fark-tablosu.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 554 | ölçülmedi | OLCULMEDI |
+| `scripts/icerik-hatti/__tests__/urun-ad-en.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `scripts/kademe2-load/__tests__/planla.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 11 | ölçülmedi | OLCULMEDI |
+| `scripts/media/__tests__/gorsel-mukerrer.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `scripts/media/__tests__/gorsel-uc-yuzey.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `scripts/rehber/__tests__/alinti-dogrula.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 13 | ölçülmedi | OLCULMEDI |
+| `scripts/rehber/__tests__/gsc-taban.test.ts` | betik | 0 | ölçülmedi | supheli | 5 | ölçülmedi | OLCULMEDI |
+| `scripts/rehber/__tests__/ic-baglanti.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `scripts/rehber/__tests__/rehber-denetim.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 46 | ölçülmedi | OLCULMEDI |
+| `scripts/seo/__tests__/adres-yayin-denetim.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 11 | ölçülmedi | OLCULMEDI |
+| `scripts/seo/__tests__/bot-karnesi-en-yayin.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 10 | statik (1) | OLCULMEDI |
+| `scripts/seo/__tests__/canli-kapi.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 65 | ölçülmedi | OLCULMEDI |
+| `scripts/seo/__tests__/gsc-url-denetim.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `scripts/seo/__tests__/tarama-sarmalayici.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 14 | ölçülmedi | OLCULMEDI |
+| `scripts/seo/__tests__/yayinda-model-ag-kapisi.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 84 | statik (1) | OLCULMEDI |
+| `scripts/seo/__tests__/yayinda-model-veri-uret.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 13 | ölçülmedi | OLCULMEDI |
+| `scripts/seo/__tests__/yetim-tara.test.ts` | betik | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` | betik | 0 | KIRMIZI (1/9) | bagimsiz | ölçülmedi | statik (17) | KISMI-KORUMA |
+| `scripts/test-karnesi/__tests__/karne-uret.test.ts` | betik | 0 | KIRMIZI (1/7) | bagimsiz | ölçülmedi | statik (7) | KISMI-KORUMA |
+| `scripts/test-karnesi/__tests__/sabotaj.test.ts` | betik | 0 | KIRMIZI (1/9) | supheli | ölçülmedi | statik (14) | KISMI-KORUMA |
+| `src/__tests__/conformance/3d-asset-validity.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 15 | ölçülmedi | KORU |
+| `src/__tests__/conformance/3d-csp.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 19 | statik (1) | KORU |
+| `src/__tests__/conformance/3d-model-recipe.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/3d-procedural-env.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 23 | ölçülmedi | KORU |
+| `src/__tests__/conformance/3d-single-canvas.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 27 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-csv-hucre.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 12 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-csv-import-mapping.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 12 | statik (2) | KORU |
+| `src/__tests__/conformance/admin-customer-surface.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 5 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-datatable-pagination.test.tsx` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 163 | statik (1) | KORU |
+| `src/__tests__/conformance/admin-daypicker-classnames.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 5 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-erp-resource-registry.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 4 | statik (2) | KORU |
+| `src/__tests__/conformance/admin-export-hygiene.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-fx-lock-crud.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 6 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-fx-lock-visibility.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-istemci-yazma-politikasi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 5 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-list-search.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 3 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-mutate-real-write.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 16 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-overlay-invariants.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 15 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-rbac-ui-db-drift.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 36 | ölçülmedi | KORU |
+| `src/__tests__/conformance/admin-refund-real.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 3 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-returns-concurrency.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | ölçülmedi | KORU |
+| `src/__tests__/conformance/admin-shell-invariants.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 10 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-status-filter-domain.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 8 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-status-label-coverage.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 5 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/admin-theme-invariants.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 16 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/aile-adi-tek-kaynak.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 463 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/aile-kategori-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 488 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/aile-metni-sayisal-deger.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 6 | ölçülmedi | KORU |
+| `src/__tests__/conformance/ajan-skill-cozulur.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 55 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/ajan-tanimlari.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 284 | statik (3) | KORU |
+| `src/__tests__/conformance/aksiyon-sha-pin.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 12 | statik (2) | KORU |
+| `src/__tests__/conformance/altgrup-kart-baglanti.test.tsx` | conformance | 0 | KIRMIZI (1/2) | supheli | 51 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/altgrup-kart-gorsel.test.tsx` | conformance | 0 | KIRMIZI (1/2) | supheli | 58 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/ana-agac-tazelik.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 28900 | statik (7) | KISMI-KORUMA |
+| `src/__tests__/conformance/analitik-yerlesimi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/analytics-event-taxonomy.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 308 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/anasayfa-rotasi-statik.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 54 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/anon-definer-yetki.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 478 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/anon-yazma-nobetcisi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 211 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/arac-envanteri.test.ts` | conformance | 30 | KIRMIZI (1/1) | bagli | 14023 | statik (14) | KORU |
+| `src/__tests__/conformance/arama-davranisi.test.ts` | conformance | 0 | KIRMIZI (1/3) | supheli | 339 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/auth-account-surface.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KORU |
+| `src/__tests__/conformance/auth-reset-chain.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KORU |
+| `src/__tests__/conformance/auth-role-source.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 29 | statik (3) | KORU |
+| `src/__tests__/conformance/auth-session-security.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/bagimlilik-denetimi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 351 | statik (4) | KORU |
+| `src/__tests__/conformance/bagimlilik-karar-kaydi.test.ts` | conformance | 7 | KIRMIZI (1/1) | bagimsiz | 7 | beyan (2) | KORU |
+| `src/__tests__/conformance/baglam-pencere-dosyasi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1033 | ölçülmedi | KORU |
+| `src/__tests__/conformance/bash-write-audit-claude-deposu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1010 | ölçülmedi | KORU |
+| `src/__tests__/conformance/bash-write-audit-merge-muafiyeti.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 13735 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/bash-write-audit-tree.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 31056 | statik (2) | KORU |
+| `src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 8386 | statik (3) | COKLU-KORUMA-ADAYI |
+| `src/__tests__/conformance/bash-write-gate.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 9 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/bash-write-guard-muafiyet.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 6299 | ölçülmedi | KORU |
+| `src/__tests__/conformance/belge-defteri.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 7162 | statik (10) | KISMI-KORUMA |
+| `src/__tests__/conformance/belge-kart-plan-kapisi.test.ts` | conformance | 0 | TABAN_KIRMIZI (0/0) | bagli | 2468 | statik (4) | ORTAM-INCELE |
+| `src/__tests__/conformance/belge-tazelik.test.ts` | conformance | 2 | KIRMIZI (1/1) | supheli | 592 | statik (13) | KORU |
+| `src/__tests__/conformance/belge-yonlendirici.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 10 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/bellek-yoklama.test.ts` | conformance | 1 | KIRMIZI (1/2) | supheli | 770 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/beyansiz-olcum-lambasi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 4214 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/board-globs-tekrarlanan-bayrak.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 868 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/board-hedef-serit-adi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 3431 | statik (3) | KORU |
+| `src/__tests__/conformance/board-invariants.test.ts` | conformance | 5 | KIRMIZI (1/2) | supheli | 25058 | statik (28) | KISMI-KORUMA |
+| `src/__tests__/conformance/board-pencere-adi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1647 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/bos-sku-render.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 637 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/build-skip-positive-logic.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 16961 | statik (40) | KISMI-KORUMA |
+| `src/__tests__/conformance/canli-kanit-yalitimi.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 6 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/canonical-lang-segment.test.ts` | conformance | 1 | KIRMIZI (1/2) | bagimsiz | 64 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/canonical-url-ssot.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 51 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/catalog-integrity-gate.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 1197 | statik (1) | KORU |
+| `src/__tests__/conformance/category-metadata-i18n-ssot.test.ts` | conformance | 1 | KIRMIZI (1/2) | bagimsiz | 21 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/category-name-ssot.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 16 | ölçülmedi | KORU |
+| `src/__tests__/conformance/category-view-reach.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 28 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/cati-dil-saglayicisi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 6 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/ci-degisiklik-sinifi.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (26) | OLCULMEDI |
+| `src/__tests__/conformance/ci-edited-ayna.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | ölçülmedi | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/ci-install-bounded.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 7 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/ci-kilitli-kurulum.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 10 | statik (2) | KORU |
+| `src/__tests__/conformance/ci-pr-kayit-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 8 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/ci-test-secimi-hizli.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (23) | OLCULMEDI |
+| `src/__tests__/conformance/ci-test-secimi-ifade.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (5) | OLCULMEDI |
+| `src/__tests__/conformance/ci-test-secimi-kapsam.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (11) | OLCULMEDI |
+| `src/__tests__/conformance/ci-test-secimi-uyum.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (9) | OLCULMEDI |
+| `src/__tests__/conformance/ci-test-secimi.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (7) | OLCULMEDI |
+| `src/__tests__/conformance/ci-test-shard.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (12) | OLCULMEDI |
+| `src/__tests__/conformance/claim-yenile.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 18423 | statik (13) | KORU |
+| `src/__tests__/conformance/comment-scrubber-scheme-safety.test.ts` | conformance | 11 | KIRMIZI (1/2) | bagli | 132 | statik (16) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/commit-oncesi-uyarilar-kilidi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1291 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/companion-defter.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1273 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/companion-doc-parity.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 132 | statik (15) | KORU |
+| `src/__tests__/conformance/companion-dondurulmus.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 1238 | statik (3) | KORU |
+| `src/__tests__/conformance/companion-parity-coverage.test.ts` | conformance | 13 | KIRMIZI (1/1) | bagli | 2833 | statik (10) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/config-fail-closed.test.ts` | conformance | 3 | KIRMIZI (1/2) | bagimsiz | 41 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/csp-origin-coverage.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 5 | statik (4) | KORU |
+| `src/__tests__/conformance/currency-not-from-language.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 76 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/db-view-grant-hygiene.test.ts` | conformance | 2 | KIRMIZI (1/2) | bagimsiz | 9 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/defter-bayatlik-olcumu.test.ts` | conformance | 1 | KIRMIZI (1/2) | supheli | 3469 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/denetim-izi-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 183 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/denetim-model-yonlendirme.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 48 | ölçülmedi | KORU |
+| `src/__tests__/conformance/departman-ac-kapat.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 42416 | statik (15) | KORU |
+| `src/__tests__/conformance/dependency-pins.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | statik (2) | KORU |
+| `src/__tests__/conformance/depo-dokum-kapisi-uctan-uca.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (5) | OLCULMEDI |
+| `src/__tests__/conformance/depo-dokum-kapisi.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | beyan (2) | OLCULMEDI |
+| `src/__tests__/conformance/diff-review-taban.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 4225 | statik (1) | KORU |
+| `src/__tests__/conformance/dunya-durumu-satiri.test.ts` | conformance | 0 | KIRMIZI (1/8) | supheli | ölçülmedi | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/durum-dondur.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 4296 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/e1-kimlik-kontrolu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 7492 | statik (5) | COKLU-KORUMA-ADAYI |
+| `src/__tests__/conformance/edge-delivery-idempotency.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 6 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/edge-drift-yeniden-dene.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 12 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/edge-koken-allowlist.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 7 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/edge-sayfalama.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 19 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/edge-security.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 39 | statik (14) | KISMI-KORUMA |
+| `src/__tests__/conformance/edge-select-columns.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 40 | ölçülmedi | KORU |
+| `src/__tests__/conformance/edge-shared-input-drift.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/en-alt-kategori-terim.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 162 | ölçülmedi | KORU |
+| `src/__tests__/conformance/en-yayin-anahtari.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 209 | statik (3) | KORU |
+| `src/__tests__/conformance/env-yazma-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 7 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/eol-normalization.test.ts` | conformance | 6 | KIRMIZI (1/1) | supheli | 2551 | statik (2) | KORU |
+| `src/__tests__/conformance/eposta-defter-yazici-zorunlu-kolon.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/eposta-kimlik-varsayilan.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 26 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/eposta-sablon-alanlari.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | statik (1) | KORU |
+| `src/__tests__/conformance/eski-adres-yonlendirme-yeni-slug.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (2) | OLCULMEDI |
+| `src/__tests__/conformance/eylem-defteri.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 588 | statik (2) | KORU |
+| `src/__tests__/conformance/favicon-baglantisi.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (3) | OLCULMEDI |
+| `src/__tests__/conformance/fiyat-gunlugu-yontem-basligi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 60 | statik (6) | KISMI-KORUMA |
+| `src/__tests__/conformance/fleet-mechanism-integrity.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 338 | statik (7) | KORU |
+| `src/__tests__/conformance/font-preload-olcumu.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/form-submission-standard.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 9 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/foy-vitrin-parite.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 9 | ölçülmedi | KORU |
+| `src/__tests__/conformance/gh-api-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/githooks-doc-scope.test.ts` | conformance | 6 | KIRMIZI (1/1) | bagli | 18283 | statik (6) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/githooks-integrity.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (1) | KORU |
+| `src/__tests__/conformance/golge-kurucu.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/gorsel-yedegi.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (4) | OLCULMEDI |
+| `src/__tests__/conformance/gorunum-anahtari-faz-2b.test.tsx` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 43 | ölçülmedi | KORU |
+| `src/__tests__/conformance/gozcu-oz-not-eleme.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 36145 | statik (1) | KORU |
+| `src/__tests__/conformance/gozlemci-sozlesmesi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 679 | ölçülmedi | KORU |
+| `src/__tests__/conformance/gsc-token.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 7 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/gun-kapanisi-belge-defteri.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 5109 | statik (1) | KORU |
+| `src/__tests__/conformance/hafiza-baglam-ve-belge-satiri.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 338 | statik (3) | KORU |
+| `src/__tests__/conformance/hafiza-enjeksiyonu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 4874 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/hafiza-indeks-bekcisi-kilidi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 2975 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/hafiza-sorusu-yonlendirme.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 2997 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/hardcoded-category-slug-ssot.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/harita-uret-is-akisi.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (4) | OLCULMEDI |
+| `src/__tests__/conformance/header-teklif-paneli.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | ölçülmedi | KORU |
+| `src/__tests__/conformance/header-urun-secici.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | statik (1) | KORU |
+| `src/__tests__/conformance/hesaplayici-alt-metin-sahiplik.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 65 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/home-hero-route-ssot.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/hook-referential-stability.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 116 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/i18n-attribute-literals.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 81 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/i18n-dead-key.test.ts` | conformance | 5 | KIRMIZI (1/1) | bagimsiz | 300 | statik (22) | KORU |
+| `src/__tests__/conformance/i18n-key-resolution.test.ts` | conformance | 1 | KIRMIZI (1/2) | bagimsiz | 25 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/i18n-locale-case.test.ts` | conformance | 1 | KIRMIZI (1/2) | bagimsiz | 31 | statik (17) | KISMI-KORUMA |
+| `src/__tests__/conformance/i18n-locale-compare.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 5 | statik (8) | KISMI-KORUMA |
+| `src/__tests__/conformance/i18n-ters-yon.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 10 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/i18n-uppercase-proper-noun.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | statik (14) | KORU |
+| `src/__tests__/conformance/i18n-yedek-literal.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | statik (1) | KORU |
+| `src/__tests__/conformance/ic-kod-sizintisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 130 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/ic-not-vitrine-cikamaz.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 5 | ölçülmedi | KORU |
+| `src/__tests__/conformance/instruction-surface-ppr.test.ts` | conformance | 1 | YESIL (0/2) | supheli | 392 | statik (6) | SAHTE-YESIL-ADAYI |
+| `src/__tests__/conformance/invoice-ledger-contract.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 7 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/izin-reddi-gunlugu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1479 | ölçülmedi | KORU |
+| `src/__tests__/conformance/jsonld-fiyat-sizintisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 295 | ölçülmedi | KORU |
+| `src/__tests__/conformance/jsonld-urungrubu-gorsel.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (1) | KORU |
+| `src/__tests__/conformance/kanban-anlik.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1187 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kanban-toplu.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | statik (1) | KORU |
+| `src/__tests__/conformance/kanca-board-brief.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1618 | statik (1) | KORU |
+| `src/__tests__/conformance/kanca-board-release.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 777 | statik (2) | KORU |
+| `src/__tests__/conformance/kanca-defter-tazelik.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 17705 | statik (4) | KORU |
+| `src/__tests__/conformance/kanca-kartsiz-beklenti-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1842 | ölçülmedi | KORU |
+| `src/__tests__/conformance/kanca-lane-guard.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1542 | statik (11) | KORU |
+| `src/__tests__/conformance/kanca-protect-config.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 1588 | statik (6) | KORU |
+| `src/__tests__/conformance/kanca-sensitive-path-guard.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 18417 | statik (7) | KORU |
+| `src/__tests__/conformance/kanca-son-soz-gate.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 1415 | ölçülmedi | KORU |
+| `src/__tests__/conformance/kanca-verify-on-stop.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/kanonik-kok-istemci.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 53 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/kapali-dal-push.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 1133 | statik (1) | KORU |
+| `src/__tests__/conformance/kapi-import-guvenligi.test.ts` | conformance | 2 | KIRMIZI (1/1) | supheli | 71 | statik (2) | KORU |
+| `src/__tests__/conformance/karar-kayit-bagi.test.ts` | conformance | 4 | KIRMIZI (1/2) | supheli | 25 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/kart-aciklama-mobil.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 5 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kart-yukleme-onceligi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/kartsiz-kayit-sayaci.test.ts` | conformance | 0 | KIRMIZI (1/4) | supheli | 121 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/katalog-sayim-tls.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 515 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-aciklama-dil-cozumu.test.ts` | conformance | 3 | KIRMIZI (1/3) | bagimsiz | 41 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-adi-marketing-emekli.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 14 | statik (7) | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-adi-tek-kaynak.test.ts` | conformance | 0 | KIRMIZI (1/3) | supheli | 2592 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-bilinmeyen-slug.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 85 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-cozucu-oncelik.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 5 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-gorsel-tek-kaynak.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 162 | statik (9) | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-rotasi-statik.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 69 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/kategori-sayilari-onbellek.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 5 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/kimlik-kurali-kapisi.test.ts` | conformance | 5 | KIRMIZI (1/2) | bagimsiz | 165 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/kopuk-surec-pencere.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 261 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/kume-master-tazeligi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1993 | statik (7) | KISMI-KORUMA |
+| `src/__tests__/conformance/kvkk-request-ledger.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 8 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/lane-precommit-merge.test.ts` | conformance | 2 | KIRMIZI (1/2) | supheli | 1530 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/lang-metadata-locale.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 20 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/legal-consent-analytics.test.ts` | conformance | 0 | KIRMIZI (1/4) | bagimsiz | 11 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/legal-consent-gate.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/legal-en-leftover.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 3 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/legal-promise-backing.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 10 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/linear-arsiv.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 129 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/linear-yeni-yorum.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1092 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/localized-route-ssot.test.ts` | conformance | 1 | KIRMIZI (1/3) | bagimsiz | 43 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/maliyet-yazici-kurali.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 131 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/marka-i18n-butunlugu.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 8 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/marka-palet-tokenlari.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/marketing-title-yuk.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 97 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/merge-ritueli.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 25 | statik (3) | KORU |
+| `src/__tests__/conformance/merge-sonrasi-ileri-sar.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 67043 | ölçülmedi | KORU |
+| `src/__tests__/conformance/migration-atomicity.test.ts` | conformance | 1 | KIRMIZI (1/2) | bagimsiz | 25 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/migration-ledger-model.test.ts` | conformance | 1 | KIRMIZI (1/2) | bagimsiz | 1465 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/misafir-teklif-ucu.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 99 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/mobil-alt-sekme.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/mutasyon-kosucu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1499 | statik (17) | KORU |
+| `src/__tests__/conformance/mutlak-yol-sizintisi.test.ts` | conformance | 27 | KIRMIZI (1/1) | supheli | 4448 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/notice-kapsami.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 131 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/notification-standard.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 106 | statik (2) | KORU |
+| `src/__tests__/conformance/numeric-format-ssot.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 21 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/odeme-eslesme-baglantisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 12 | statik (4) | KORU |
+| `src/__tests__/conformance/onizleme-adres-kipi.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (2) | OLCULMEDI |
+| `src/__tests__/conformance/onizleme-tarama.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (2) | OLCULMEDI |
+| `src/__tests__/conformance/onizleme-yalitimi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 7 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/order-status-dictionary.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 5 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/pano-canlilik-claude-agents.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 4147 | statik (1) | KORU |
+| `src/__tests__/conformance/pano-sayfasi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 256 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/payment-edge-integrity.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (6) | KORU |
+| `src/__tests__/conformance/payment-integrity.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (4) | KORU |
+| `src/__tests__/conformance/payment-ledger-vocabulary.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 79 | statik (2) | KORU |
+| `src/__tests__/conformance/payment-money-move.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/payment-render-surface.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | statik (6) | KISMI-KORUMA |
+| `src/__tests__/conformance/payment-status-trigger-contract.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 3 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/peer-dependency-integrity.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 7 | statik (2) | KORU |
+| `src/__tests__/conformance/pim-unopim-csv.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | ölçülmedi | KORU |
+| `src/__tests__/conformance/pim-unopim-yedek.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 8 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/postgrest-filter-grammar.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 128 | statik (10) | KISMI-KORUMA |
+| `src/__tests__/conformance/pr-kayit-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 403 | statik (2) | KORU |
+| `src/__tests__/conformance/precompact-durum-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 3303 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/precompact-hafiza-dizinleri.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1080 | statik (3) | KORU |
+| `src/__tests__/conformance/pricing-cache-invariants.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 23 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/pricing-fx-lock-contract.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 11 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/pricing-fx-rate-single-resolver.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 16 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/pricing-money-append-only.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 32 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/pricing-order-snapshot-contract.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 6 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/pricing-segment-source.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/pricing-storefront-source.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 8 | statik (7) | KISMI-KORUMA |
+| `src/__tests__/conformance/prob-bekleyen-kuyruk.test.ts` | conformance | 1 | KIRMIZI (1/2) | supheli | 13 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/product-identity-resolver.test.ts` | conformance | 0 | KIRMIZI (1/3) | supheli | 37 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/promise-backing-behavior.test.tsx` | conformance | 0 | KIRMIZI (1/2) | supheli | 342 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/purchasing-machine-and-evidence.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 89 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/quote-atomik-yazim.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 69 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/quote-insert-policy-guard.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/quote-items-policy-guard.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/quote-machine-ssot.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 24 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/quote-yayim-sunucu.test.ts` | conformance | 0 | KIRMIZI (1/3) | supheli | 137 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/rec355-yetki-dongusu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 8 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/recep-sozu-defteri-yedek.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 727 | statik (3) | KORU |
+| `src/__tests__/conformance/recep-sozu-defteri.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 3607 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/registry-autosync-pencere.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 3 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/rehber-aile-slug-gecmisi.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/__tests__/conformance/render-price-surface.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 12 | statik (22) | KORU |
+| `src/__tests__/conformance/render-revalidation-contract.test.ts` | conformance | 2 | KIRMIZI (1/2) | bagimsiz | 1403 | statik (7) | KISMI-KORUMA |
+| `src/__tests__/conformance/required-checks-merge-ref.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/returns-webhook-transitions.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 7 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/rls-coverage-ci-binding.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 3 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/rls-politika-sarma.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1709 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/rls-yetki-karari.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 65 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/rol-kartlari.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 18244 | statik (16) | KORU |
+| `src/__tests__/conformance/rota-dili-acik-kip.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 4463 | ölçülmedi | KORU |
+| `src/__tests__/conformance/rota-dili-adres-uretimi.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 1039 | ölçülmedi | KORU |
+| `src/__tests__/conformance/rota-dili-dil-degistirici.test.tsx` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 471 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/rota-dili-kapali-sifir-fark.test.ts` | conformance | 1 | KIRMIZI (1/1) | bagimsiz | 1594 | statik (1) | KORU |
+| `src/__tests__/conformance/rota-dili-matris.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 867 | ölçülmedi | KORU |
+| `src/__tests__/conformance/runtime-version-alignment.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 246 | statik (4) | KORU |
+| `src/__tests__/conformance/sage-ana-kok.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1129 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/sage-dosya-dersi.test.ts` | conformance | 0 | KIRMIZI (1/3) | supheli | 1080 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/sage-yedek.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 1860 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/santiye-kanban.test.ts` | conformance | 0 | KIRMIZI (1/2) | supheli | 3037 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/satis-kipi-acilis-onkosullari.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 438 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/satis-kipi-anahtari.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 597 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/satis-kipi-edge.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 550 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/satis-kipi-webhook-dali.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 6 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/satis-kipi-yasal-kapi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 59 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/scheduled-invoker-presence.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 6 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/search-route-ssot.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 142 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/sema-graf-uretici.test.ts` | conformance | 0 | KIRMIZI (1/4) | bagimsiz | 232 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/sema-tabani-is-akisi.test.ts` | conformance | 0 | KIRMIZI (1/3) | bagimsiz | 20 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/seo-h1-tekilligi.test.tsx` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 368 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/seo-yonlendirme-hedefi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/sessionstart-pencere-adi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 71005 | statik (2) | KORU |
+| `src/__tests__/conformance/sessionstart-tavan.test.ts` | conformance | 4 | KIRMIZI (1/1) | bagli | 130403 | statik (3) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/shipping-alarm-ops.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 12 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/silent-fan-series-binding.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 13 | statik (1) | KORU |
+| `src/__tests__/conformance/silme-baglanti-kapisi.test.ts` | conformance | 2 | KIRMIZI (1/1) | supheli | 541 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/siparis-istemci-yazma-bekcisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 219 | ölçülmedi | KORU |
+| `src/__tests__/conformance/siparis-no-tek-bicim.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 11 | statik (5) | KISMI-KORUMA |
+| `src/__tests__/conformance/sir-basan-kalip.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 10 | statik (3) | KORU |
+| `src/__tests__/conformance/skill-ad-cakismasi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 103 | statik (2) | KORU |
+| `src/__tests__/conformance/skill-bagli.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 50 | statik (2) | KORU |
+| `src/__tests__/conformance/skill-bitis-blogu.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/skill-frontmatter-ayrisir.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 51 | statik (7) | KORU |
+| `src/__tests__/conformance/skill-katalog-tazeligi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 26 | statik (5) | KORU |
+| `src/__tests__/conformance/skill-listesi-say.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | statik (1) | KORU |
+| `src/__tests__/conformance/skill-python-yedegi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 54 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/skill-yuku-butcesi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | statik (6) | KORU |
+| `src/__tests__/conformance/skills-eval-puanlama.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 10 | statik (4) | KISMI-KORUMA |
+| `src/__tests__/conformance/skills-hazir.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 8 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/slug-degisince-yonlendirme.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 5 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1006 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/son-konusma-dokumu.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 366 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/spec-axis-gate.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KORU |
+| `src/__tests__/conformance/spec-label-coverage.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | statik (1) | KORU |
+| `src/__tests__/conformance/spec-unit-order.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/sql-etki.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/sql-yazma-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 47 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/ssr-duman-kilidi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 3503 | statik (6) | KISMI-KORUMA |
+| `src/__tests__/conformance/standard-section-integrity.test.ts` | conformance | 13 | KIRMIZI (1/1) | bagli | 123 | statik (2) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/stock-restore-evidence.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 37 | statik (5) | KORU |
+| `src/__tests__/conformance/stok-uyari-teklif-paritesi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/storage-yazma-nobetcisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 187 | statik (4) | COKLU-KORUMA-ADAYI |
+| `src/__tests__/conformance/storefront-fiyat-sizintisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 3 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/storefront-kategori-vitrin-izgara.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 5 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/storefront-metadata-tek-yazici.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 265 | statik (3) | KISMI-KORUMA |
+| `src/__tests__/conformance/storefront-reflow-guards.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | statik (3) | KORU |
+| `src/__tests__/conformance/storefront-ssr-govde.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 127 | statik (3) | KORU |
+| `src/__tests__/conformance/storefront-style-ratchet.test.ts` | conformance | 13 | KIRMIZI (1/1) | bagimsiz | 46 | statik (2) | KORU |
+| `src/__tests__/conformance/taban-tazele.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 37952 | statik (13) | KORU |
+| `src/__tests__/conformance/taban-tazeligi-dunya.test.ts` | conformance | 0 | ölçülmedi | supheli | ölçülmedi | statik (5) | TASINDI |
+| `src/__tests__/conformance/taban-tazeligi.test.ts` | conformance | 55 | KIRMIZI (1/2) | bagli | 245 | statik (4) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/tailwind-token-aa-renkleri.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 136 | statik (1) | KORU |
+| `src/__tests__/conformance/tailwind-token-sinif-gecerliligi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 473 | ölçülmedi | KORU |
+| `src/__tests__/conformance/tek-kanonik-kategori-adresi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (4) | KORU |
+| `src/__tests__/conformance/teklif-ic-bildirim.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 16 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/test-kosu-kapsami.test.ts` | conformance | 0 | KIRMIZI (1/9) | supheli | ölçülmedi | statik (13) | KISMI-KORUMA |
+| `src/__tests__/conformance/tip-drift-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 94 | statik (2) | KORU |
+| `src/__tests__/conformance/uc-boyut-musteri-yuzeyi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1461 | statik (9) | KISMI-KORUMA |
+| `src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` | conformance | 36 | KIRMIZI (1/1) | bagli | 754 | statik (4) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/url-takma-adlari-listele.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/__tests__/conformance/urun-secici-girisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 63 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/urunler-kategori-kapisi.test.tsx` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 370 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/urunler-rotasi-statik.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 78 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/vaat-sizintisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 1663 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/variant-selector-threshold.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 4 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/vercel-json-kapsam.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | statik (2) | KORU |
+| `src/__tests__/conformance/veri-tavani-sayfalama.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/vitest-defter-ortami.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 13 | statik (2) | KORU |
+| `src/__tests__/conformance/vitrin-a11y-etiket-gorsel.test.tsx` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 406 | ölçülmedi | KORU |
+| `src/__tests__/conformance/webhook-auth-fail-closed.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 45 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/workflow-model-yonlendirme.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/wrongstack-kanban-yama.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 11 | ölçülmedi | KORU |
+| `src/__tests__/conformance/wrongstack-kanonik-kok.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 356 | statik (6) | KISMI-KORUMA |
+| `src/__tests__/conformance/wrongstack-kurulum-betigi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 7 | ölçülmedi | KISMI-KORUMA |
+| `src/__tests__/conformance/wrongstack-mcp-kurulum.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 411 | statik (6) | KORU |
+| `src/__tests__/conformance/wrongstack-sage-yama.test.ts` | conformance | 1 | KIRMIZI (1/1) | supheli | 359 | statik (2) | KISMI-KORUMA |
+| `src/__tests__/conformance/wrongstack-surum-satiri.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 882 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/conformance/yayinda-model-kapali-kip.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 8 | ölçülmedi | KORU |
+| `src/__tests__/conformance/yayinda-model-tek-nokta.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 117 | statik (11) | KISMI-KORUMA |
+| `src/__tests__/conformance/yazi-govdesi-ikame-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 155 | ölçülmedi | KORU |
+| `src/__tests__/conformance/yokluk-hukmu-cetveli.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 3 | statik (1) | KISMI-KORUMA |
+| `src/__tests__/middlewareAdminOnek.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 13 | ölçülmedi | OLCULMEDI |
+| `src/__tests__/middlewareKokDosya.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 19 | statik (2) | OLCULMEDI |
+| `src/__tests__/middlewareMatcher.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 3 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/aramaAciklamalari.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 12 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/kategoriMarkaRotalari.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 21 | statik (1) | OLCULMEDI |
+| `src/app/__tests__/kategoriMarkaRotalariK3b.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 27 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/langGecersizDil.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/modelSayfasiVeriYok.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/sitemapAdresUret.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 79 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/sitemapHataKirar.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 180 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/sitemapLastmod.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 64 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/sitemapModel.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 1472 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/sitemapYayindaModel.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 190 | ölçülmedi | OLCULMEDI |
+| `src/app/__tests__/urunRotasi.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/app/api/webhook/supabase/__tests__/route.family-fanout.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 47 | ölçülmedi | OLCULMEDI |
+| `src/app/api/webhook/supabase/__tests__/route.model-yolu.acik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 952 | ölçülmedi | OLCULMEDI |
+| `src/app/api/webhook/supabase/__tests__/route.model-yolu.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 49 | ölçülmedi | OLCULMEDI |
+| `src/app/api/webhook/supabase/__tests__/route.tags.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 92 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/Footer.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 50 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/FooterKategoriler.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/SearchOverlayKesintisiz.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 3430 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/SearchOverlayTekListe.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 2017 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/SearchOverlayYedekCip.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 556 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/aramaOnHazirlik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 138 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/dilSeciciKirilim.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 3 | ölçülmedi | OLCULMEDI |
+| `src/components/__tests__/yuzenDugmeKatmani.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 3 | statik (1) | OLCULMEDI |
+| `src/components/admin/__tests__/AdminRealtimeNotifications.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 411 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/__tests__/AdminToolbar.persist.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 1269 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/__tests__/CommandPalette.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 815 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/__tests__/DateRangePicker.behavior.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 954 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/categories/__tests__/CategoryFormModal.fieldErrors.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 451 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/orders/__tests__/OrderFormModal.fieldErrors.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 472 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/overlay/__tests__/ConfirmProvider.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 964 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/pricing/__tests__/PricingRuleFormModal.fieldErrors.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 421 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/pricing/__tests__/PricingRuleFormModal.uniqueViolation.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 368 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/pricing/__tests__/PricingSettingsFormModal.fieldErrors.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 298 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/products/__tests__/ProductFormModal.alisFiyati.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 300 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/settings/__tests__/SettingsFormModal.fieldErrors.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 382 | ölçülmedi | OLCULMEDI |
+| `src/components/admin/shell/__tests__/useAdminThemeBodyScope.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 247 | statik (1) | OLCULMEDI |
+| `src/components/category/SilentFanWizard.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 478 | ölçülmedi | OLCULMEDI |
+| `src/components/category/__tests__/showcaseOluSlug.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 3 | ölçülmedi | OLCULMEDI |
+| `src/components/category/sections/HowItWorks.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 600 | ölçülmedi | OLCULMEDI |
+| `src/components/home/__tests__/AnimationPerformance.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 144 | ölçülmedi | OLCULMEDI |
+| `src/components/home/__tests__/ApplicationSolutionsAdres.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 95 | ölçülmedi | OLCULMEDI |
+| `src/components/home/__tests__/HomeSinevizyonLCP.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 152 | ölçülmedi | OLCULMEDI |
+| `src/components/products/__tests__/AileKirintisi.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 17 | ölçülmedi | OLCULMEDI |
+| `src/components/products/__tests__/ProductsHero.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 184 | ölçülmedi | OLCULMEDI |
+| `src/components/products/__tests__/VariantSelector.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 329 | ölçülmedi | OLCULMEDI |
+| `src/components/ui/__tests__/VentImage.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/config/__tests__/siteUrl.test.ts` | birim | 0 | ölçülmedi | supheli | 8 | ölçülmedi | OLCULMEDI |
+| `src/config/__tests__/yayindaModeller.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 19 | ölçülmedi | OLCULMEDI |
+| `src/data/__tests__/markaKaynagi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 56 | statik (1) | OLCULMEDI |
+| `src/design-system/__tests__/ds-takma-adlari-faz-2a.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 24 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/use-mobile.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 23 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useAdminTable.sortMode.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 265 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useAdminTable.urlSync.test.ts` | birim | 1 | ölçülmedi | bagimsiz | 2543 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useApiCall.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 28 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useCalculatorUsage.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 37 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useCartHook.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 25 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useHideOnScroll.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 26 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useIsMounted.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 17 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useLocalizedRoutes.test.tsx` | birim | 1 | ölçülmedi | bagimsiz | 34 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useNavigationState.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 31 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useRole.effect-stability.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 19 | ölçülmedi | OLCULMEDI |
+| `src/hooks/__tests__/useRole.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 32 | ölçülmedi | OLCULMEDI |
+| `src/i18n/__tests__/admin-sozlugu-gec-yuklenir.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 424 | ölçülmedi | OLCULMEDI |
+| `src/i18n/__tests__/admin-sozlugu-vitrin-dosyasinda-kullanilmaz.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 252 | ölçülmedi | OLCULMEDI |
+| `src/i18n/__tests__/admin-sozlugu-vitrin-paketine-girmez.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 26 | statik (1) | OLCULMEDI |
+| `src/i18n/__tests__/case.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | statik (1) | OLCULMEDI |
+| `src/i18n/__tests__/i18n.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 25 | ölçülmedi | OLCULMEDI |
+| `src/i18n/__tests__/sort.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | statik (1) | OLCULMEDI |
+| `src/i18n/__tests__/sozluk-rsc-yukune-gecmez.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 47 | statik (3) | OLCULMEDI |
+| `src/lib/__tests__/audit.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 10 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/cart.service.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/diSignature.test.ts` | birim | 7 | ölçülmedi | bagimsiz | 180 | statik (1) | OLCULMEDI |
+| `src/lib/__tests__/ensureSessionFresh.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 10 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/errorReporter.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 518 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/hvacCalculations.pressure.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/hvacCalculations.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/order.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 19 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/orderStatusService.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 17 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/pdfAssets.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 3 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/pdfGeneratorFallback.test.ts` | birim | 0 | ölçülmedi | supheli | 12 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/rbac.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/type-converters.test.ts` | birim | 1 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/lib/__tests__/utils.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `src/lib/admin/__tests__/csvProductMapping.fiyat.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/lib/admin/__tests__/mutateWithAudit.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 11 | ölçülmedi | OLCULMEDI |
+| `src/lib/admin/__tests__/statusMachines.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/bayrak-kapisi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | statik (4) | OLCULMEDI |
+| `src/lib/adres/__tests__/envanter.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 41 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/eslestirici.test.ts` | birim | 0 | ölçülmedi | supheli | 21 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/eslestiriciYayinda.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 11 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/faz1b-aile-tek-sicrama.test.ts` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/haritaUret.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7085 | statik (1) | OLCULMEDI |
+| `src/lib/adres/__tests__/kategori-ad-sozluk-migration-uyumu.test.ts` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (1) | OLCULMEDI |
+| `src/lib/adres/__tests__/korozyon-tek-sicrama.test.ts` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-bayrak-acik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 18 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-bayrak-kapali.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 17 | statik (1) | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-rota-dili-acik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 367 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-rota-dili-kapali.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 214 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-rota-dili-zincir.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 2139 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-uuid.acik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 129 | statik (1) | OLCULMEDI |
+| `src/lib/adres/__tests__/middleware-uuid.kapali.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 24 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/perde-ailesi-ad-adres-uyumu.test.ts` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (2) | OLCULMEDI |
+| `src/lib/adres/__tests__/rotaDili.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 31 | statik (1) | OLCULMEDI |
+| `src/lib/adres/__tests__/rotaDiliCekirdek.test.ts` | birim | 0 | ölçülmedi | supheli | 31 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/tazelemeYollari.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/lib/adres/__tests__/tohum.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | statik (1) | OLCULMEDI |
+| `src/lib/adres/__tests__/yayindaModelYollari.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/bosDurum.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 284 | ölçülmedi | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/icBaglanti.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 18 | ölçülmedi | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/icerik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 19 | ölçülmedi | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/markdown.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 10 | ölçülmedi | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/tersDizin.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 30 | ölçülmedi | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/ustVeriHarita.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | statik (1) | OLCULMEDI |
+| `src/lib/bilgiMerkezi/__tests__/yonlendirmeler.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 12 | statik (1) | OLCULMEDI |
+| `src/lib/data/__tests__/csvImportGuard.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/eskiKategoriHedefi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/eskiTrUrunAdresi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 12 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/kategoriSegmenti.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 22 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/productRoute.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 12 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/selectVariant.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/urunSegmenti.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 11 | ölçülmedi | OLCULMEDI |
+| `src/lib/data/__tests__/urunSegmentiYayinda.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 15 | ölçülmedi | OLCULMEDI |
+| `src/lib/hvac/__tests__/ductFanSelection.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 13 | ölçülmedi | OLCULMEDI |
+| `src/lib/hvac/__tests__/ductPressure.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/lib/kip/__tests__/satisKipi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 26 | ölçülmedi | OLCULMEDI |
+| `src/lib/purchasing/__tests__/poStatusMachine.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/aciklamaKirp.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 10 | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/enYayinHreflangNoindex.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 1620 | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/gorselVar.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 336 | statik (1) | OLCULMEDI |
+| `src/lib/seo/__tests__/indexnow-middleware.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/indexnow.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 23 | statik (1) | OLCULMEDI |
+| `src/lib/seo/__tests__/indexnowBetikKapisi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 92 | statik (2) | OLCULMEDI |
+| `src/lib/seo/__tests__/indexnowSuzgec.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 1122 | statik (1) | OLCULMEDI |
+| `src/lib/seo/__tests__/jsonld.breadcrumb.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/jsonld.test.ts` | birim | 1 | ölçülmedi | bagimsiz | 12 | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/kirinti.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | statik (1) | OLCULMEDI |
+| `src/lib/seo/__tests__/markaUrunDurumu.test.ts` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/lib/seo/__tests__/ovguAyikla.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 10 | statik (1) | OLCULMEDI |
+| `src/lib/services/__tests__/adminQuoteService.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 35 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/category.service.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/displayPrice.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 29 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/family.service.detail-category.test.ts` | birim | 1 | ölçülmedi | bagimsiz | 32 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/family.service.slugs.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 46 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/family.service.vitrin-sozlesmesi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 20 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/familyRpcEszamanlilik.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 567 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/fxLockAdmin.service.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/orderInvoice.service.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 10 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/pricing.resolve.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 32 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/pricingAdmin.service.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 79 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/pricingMaterialize.test.ts` | birim | 2 | ölçülmedi | bagimsiz | 125 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/pricingProductPrice.service.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 126 | ölçülmedi | OLCULMEDI |
+| `src/lib/services/__tests__/vitrin-maliyet-kolonu.test.ts` | birim | 0 | ölçülmedi | supheli | 303 | ölçülmedi | OLCULMEDI |
+| `src/lib/validation/__tests__/invoiceIdentity.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/lib/validation/__tests__/taxIdentity.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `src/test/dil-dususu-yok.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 308 | ölçülmedi | OLCULMEDI |
+| `src/test/dil-tespiti.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | statik (1) | OLCULMEDI |
+| `src/test/eposta-sessiz-dusus-yok.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 33 | statik (1) | OLCULMEDI |
+| `src/utils/__tests__/3dModelOffsets.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/adminQueryFilters.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/adminShipping.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 13 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/adresUret.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/adresUretYayindaModel.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 14 | statik (1) | OLCULMEDI |
+| `src/utils/__tests__/analytics.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 12 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/applicationLinks.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/applicationUi.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 45 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/breadcrumbUtils.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/categoryHelpers.test.ts` | birim | 1 | ölçülmedi | bagimsiz | 10 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/checkoutHelpers.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/crypto.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/csvHucre.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/engineeringIntelligence.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/getCategoryIcon.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 66 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/imageNormalization.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/imageUtils.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 132 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/kategoriArgumanlari.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/modelBaglantiAdresi.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | statik (1) | OLCULMEDI |
+| `src/utils/__tests__/orderStatusDisplay.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 7 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/passwordSecurity.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 15 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/prefetch.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 8 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/productHelpers.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/routes.test.ts` | birim | 1 | ölçülmedi | bagimsiz | 13 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/searchHighlight.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 49 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/specLabel.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 6 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/type-converters.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/whatsapp.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/yuzeyAdresleri.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 28 | ölçülmedi | OLCULMEDI |
+| `src/utils/__tests__/yuzeyAdresleriK3b.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 37 | ölçülmedi | OLCULMEDI |
+| `src/views/__tests__/BrandDetailPage.urunsuz.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/views/__tests__/NotFoundView.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 275 | ölçülmedi | OLCULMEDI |
+| `src/views/__tests__/OrdersPage.test.tsx` | birim | 0 | ölçülmedi | supheli | 0 | ölçülmedi | OLCULMEDI |
+| `src/views/__tests__/PaymentSuccessReview.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 263 | ölçülmedi | OLCULMEDI |
+| `src/views/__tests__/ProductsDiscoveryView.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 56 | ölçülmedi | OLCULMEDI |
+| `src/views/account/__tests__/AccountSecurityPage.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 3930 | ölçülmedi | OLCULMEDI |
+| `src/views/account/__tests__/OrderDetailPageModelKodu.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 1113 | ölçülmedi | OLCULMEDI |
+| `src/views/account/__tests__/OrderDetailPageTabs.test.tsx` | birim | 0 | ölçülmedi | supheli | 0 | ölçülmedi | OLCULMEDI |
+| `src/views/account/__tests__/ReturnsModalClose.test.tsx` | birim | 0 | ölçülmedi | supheli | 99 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminAuditLogPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 703 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminCategoriesPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 657 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminCouponsPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 879 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminErrorGroupsPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 724 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminErrorsPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 602 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminInventoryPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 1390 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminLogisticsTableBody.sharedTracking.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 994 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminMovementsPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 815 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminOrdersBoard.detailPanel.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 812 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminOrdersBoard.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 5 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminOrdersPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 1113 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminProductsPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 1130 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminReturnsPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 736 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/AdminUsersPage.integration.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 970 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/OrdersTableBody.bulkShipping.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 6856 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/OrdersTableBody.overlay.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 2409 | ölçülmedi | OLCULMEDI |
+| `src/views/admin/__tests__/OrdersTableBody.sharedTracking.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 4526 | ölçülmedi | OLCULMEDI |
+| `src/views/category/__tests__/CategoryLandingSessizFan.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `src/views/category/__tests__/SeriesLandingView.test.tsx` | birim | 1 | ölçülmedi | bagimsiz | 383 | ölçülmedi | OLCULMEDI |
+| `src/views/checkout/__tests__/ReviewSummary.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 56 | ölçülmedi | OLCULMEDI |
+| `src/views/checkout/__tests__/buildPaymentRequest.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 4 | ölçülmedi | OLCULMEDI |
+| `src/views/checkout/__tests__/injectCheckoutForm.test.ts` | birim | 0 | ölçülmedi | bagimsiz | 226 | ölçülmedi | OLCULMEDI |
+| `src/views/knowledge/__tests__/rehberGovdesiKirilma.test.tsx` | birim | 0 | ölçülmedi | bagimsiz | 73 | ölçülmedi | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/config_audit.test.ts` | edge | 0 | ölçülmedi | supheli | 7 | ölçülmedi | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/db_saglik.test.ts` | edge | 0 | ölçülmedi | supheli | 53 | ölçülmedi | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/odeme_eslesme.test.ts` | edge | 0 | ölçülmedi | bagimsiz | 25 | statik (3) | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/origins.test.ts` | edge | 0 | ölçülmedi | supheli | 7 | ölçülmedi | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/satis_kipi.test.ts` | edge | 0 | ölçülmedi | supheli | 282 | ölçülmedi | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/tenant.test.ts` | edge | 0 | ölçülmedi | bagimsiz | 6 | statik (1) | OLCULMEDI |
+| `supabase/functions/_shared/__tests__/tum_satirlar.test.ts` | edge | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/adversarial.test.ts` | e2e | 3 | ölçülmedi | supheli | 174 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/auth.test.ts` | e2e | 1 | ölçülmedi | supheli | 24 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/cache.test.ts` | e2e | 0 | ölçülmedi | supheli | 32 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/challenger_security.test.ts` | e2e | 0 | ölçülmedi | supheli | 11 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/empirical_db.test.ts` | e2e | 4 | ölçülmedi | supheli | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `tests/e2e/empirical_db_audit_2.test.ts` | e2e | 4 | ölçülmedi | supheli | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `tests/e2e/empirical_db_subset.test.ts` | e2e | 4 | ölçülmedi | supheli | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `tests/e2e/empirical_rls_audit.test.ts` | e2e | 4 | ölçülmedi | supheli | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `tests/e2e/empirical_rls_status.test.ts` | e2e | 4 | ölçülmedi | supheli | ölçülmedi | ölçülmedi | OLCULMEDI |
+| `tests/e2e/features.test.ts` | e2e | 0 | ölçülmedi | bagimsiz | 9 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/helpers/sanity.test.ts` | e2e | 0 | ölçülmedi | supheli | 46 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/isolation.test.ts` | e2e | 0 | ölçülmedi | supheli | 8 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/pairwise.test.ts` | e2e | 0 | ölçülmedi | supheli | 9 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/realtimeSecurity.test.ts` | e2e | 0 | ölçülmedi | supheli | 7 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/resolution.test.ts` | e2e | 0 | ölçülmedi | supheli | 9 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/scenarios.test.ts` | e2e | 1 | ölçülmedi | supheli | 47 | ölçülmedi | OLCULMEDI |
+| `tests/e2e/webhooks.test.ts` | e2e | 0 | ölçülmedi | supheli | 49 | ölçülmedi | OLCULMEDI |
+| `tests/smoke/ssr-html.spec.ts` | smoke | 0 | ölçülmedi | supheli | ölçülmedi | statik (1) | OLCULMEDI |
+
+
+
+---
+# FILE: docs\audits\test-karnesi-ozet-recep-2026-10-09.md
+
+# Test Karnesi — Recep Özeti (2026-10-09)
+
+**Sürüm 1.0 · 2026-10-09 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38 (OPS emri 2026-10-09, Recep'in “hangi test kalır, hangisi silinir” sorusu) · Cetvel: `docs/standards/test-karnesi-standard.md` · Ham karne: `docs/audits/test-karnesi-2026-10-09.json` ve `.md`**
+
+> **Bu dosya niçin var.** Recep'in sorusuna düz cevap: hangi testler kalır, hangileri birleşir, hangileri PR dışına taşınır, hangileri silinir. Hiçbir test bu belge için yeniden koşturulmadı: kaynak 6–7 Ekim'deki bozma ölçümü (her teste bilerek hata koyup yakalayıp yakalamadığına bakma), 6 Temmuz–7 Ekim CI geçmişi ve 6 Ekim yerel süre ölçümüdür; `scripts/test-karnesi/karne-uret.cjs` bunları yalnız birleştirir. Tablo ham karneden 2026-10-09 tarihinde üretildi; hüküm sütunu ALTYAPI'nın önerisidir, silme listesi Recep onayıyla (cetvel §7).
+
+## 1. Kısa cevap
+
+- Depoda **654 test dosyası** (**7.271 test**) var. **347** dosyaya bilerek hata konarak bakıldı (hepsi kural/uyum testi, 6–7 Ekim); **307** dosyaya bakılmadı (birim, uçtan uca, edge, betik testleri ve ölçümden sonra eklenenler).
+- **Silinecek test yok.** Silmeye yetecek kanıt çıkmadı: en güçlü üç aday için denenen bozma sayısı birer tane ve eşlerinin ikisi de kendi başına kısmi korumalı. Üçü eşleriyle **birleşir**.
+- **2 test PR dışındaki işe taşınır** (üç ayda 10 kırmızı, 10'u da PR'dan bağımsız toplu olay).
+- **218 test güçlendirilecek:** kırmızı veriyorlar (en az bir bozmayı yakalıyorlar) ama denenen bir ya da daha fazla bozmaya yeşil kalıyorlar. Toplam 709 bozma denendi, 306'sı yakalanmadı (ana turda 213, ek yoklamada 93).
+- **PR süresi kazancı yaklaşık 0 dk.** Bekleme süresini testler değil derleme ve denetim işi (`ci`) belirliyor: 9 Ekim'in son 5 PR'ında `ci` 88–273 sn, en yavaş test dilimi 83–125 sn sürdü.
+
+## 2. Tablo
+
+| Test grubu | Kaç dosya (test) | Hüküm | Gerekçe |
+|---|---|---|---|
+| Aynı korumayı başka bir testin de verdiği testler | 3 (26) | birleşir | Her biri için denenen tek bozmayı başka bir test de yakalıyor ve üç ayda hiç kırmızı vermediler; ama tek bozma silmeye yetmez, ikisinin eşi de kısmi korumalı. Silmiyorum, eşleriyle tek dosyada birleştireceğim. |
+| Dünya durumundan kırmızı verip PR'ı boşuna durduran testler (pencere açılış çıktısının boyut sınırı, git kancalarının belge kapsamı) | 2 (37) | zorunlu olmayan işe taşınır | Üç ayda 10 kırmızı verdiler; 10'u da birçok PR'ı aynı anda durduran iki toplu olaydı (27 Ağustos, 29 Eylül), hiçbiri tek bir PR'ın hatası değildi. Canlı siteyi değil çalışma düzenini koruyorlar. |
+| Bir kolu dünya durumuna bağlı testler (yorum sıyırıcı, companion eşliği, cetvel bölüm yapısı, üretilmiş artefakt tazeliği) | 4 (38) | kalır (dünya durumu kolu ayrılacak) | Kırmızılarının 73'ünün 57'si PR'dan bağımsız, 16'sı PR'ın kendi hatasıydı (yani işe yaradıkları anlar); tamamını taşırsam o 16'yı kaçırırım. Yalnız dünya durumuna bağlı kolu ayrılacak. |
+| Talimat yüzeyi PPR testi (instruction-surface-ppr) | 1 (3) | kalır (yeniden ölçülecek) | Bozma ölçümü bu testin iki bozmasını da kaçırdı; ama test yalnız kaydedilmiş (commit'li) dosyalara bakıyor, benim bozmalarım kaydedilmemişti. Test mi kör ölçüm mü kör, yeniden ölçülecek. |
+| Kart-plan kapısı testi (belge-kart-plan-kapisi) | 1 (45) | kalır | Bozma yapmadan bile kırmızı çıktı: bu makinede (Windows) satır sonu karakteri farklı. Test kodu sağlam, yalnız ölçüm yapılamadı. |
+| Şema tabanı tazelik kapısı | 2 (7) | kalır | Dünya parçası 6 Ekim'de ayrı dosyaya taşındı ve PR dışında koşuyor; kalan dosya yalnız PR'ın kendi koduna bakıyor. |
+| Adres, kategori ve rota dili (URL, site haritası) | 96 (1.024) | kalır (29 güçlendirilecek, 58 ölçülmedi) | Pazar yayınındaki yeni adres düzeninin asıl koruması; yayından önce gevşetilecek bir şey yok. |
+| Ajan, kanca ve çalışma düzeni kapıları (pano, defter, merge, kanca) | 94 (1.443) | kalır (49 güçlendirilecek) | Pencerelerin çalışma düzenini koruyan en büyük grup. Yerel test süresinin %61'i burada (530 sn); CI'da en yavaş test dilimi 125 sn. |
+| Vitrin, arayüz, tasarım dili ve 3D | 90 (483) | kalır (21 güçlendirilecek, 54 ölçülmedi) | Müşterinin gördüğü yüzey (bileşenler, tasarım dili, 3D); ölçülmeyenlerin çoğu bileşen birim testi. |
+| Admin paneli | 59 (344) | kalır (15 güçlendirilecek, 39 ölçülmedi) | Yönetim ekranlarının yetki ve veri kapıları; yarısından çoğu yalnız birim testi, bozma ölçümü yapılmadı. |
+| Ürün, fiyat ve katalog verisi (içerik hattı betikleri dahil) | 56 (563) | kalır (13 güçlendirilecek, 34 ölçülmedi) | Fiyat ve katalog verisi ile ürün içerik hattı betikleri; bir fiyat hatası doğrudan vitrine yansır. |
+| Ödeme, sipariş ve teklif | 38 (321) | kalır (23 güçlendirilecek, 9 ölçülmedi) | Para, fatura ve teklif akışı; en riskli grup. Örnek: fatura defteri testi, fatura sayfasının yetki kapısını moderatöre açan bozmayı yakalamadı. |
+| SEO, içerik ve hukuki sayfalar | 35 (417) | kalır (11 güçlendirilecek, 24 ölçülmedi) | Arama motoru görünürlüğü, bilgi merkezi ve hukuki metin kapıları. |
+| CI ve test hattı kapıları | 29 (1.072) | kalır (9 güçlendirilecek, 16 ölçülmedi) | CI hattının kendi kapıları (test seçimi, dilimleme, dünya durumu listesi). |
+| Supabase edge fonksiyonları ve SQL kapıları | 24 (254) | kalır (14 güçlendirilecek, 8 ölçülmedi) | Edge fonksiyonlarının ve SQL yazımının kapıları (tekrar gönderim, sayfalama, kaynak izin listesi). |
+| Yardımcı kodların birim testleri (utils, lib, middleware) | 24 (187) | kalır (24 ölçülmedi) | Yardımcı işlevlerin ve ara katmanın (middleware) birim testleri; bozma ölçümü yapılmadı. |
+| Güvenlik: kimlik, depolama, sır | 20 (162) | kalır (11 güçlendirilecek, 3 ölçülmedi) | Kimlik, depolama yazma yetkisi ve sır sızıntısı kapıları. |
+| Çeviri (TR/EN) kapıları | 19 (110) | kalır (8 güçlendirilecek, 7 ölçülmedi) | Türkçe/İngilizce sözlük eşliği ve çeviri anahtarı kapıları. |
+| Uçtan uca ve duman testleri (tarayıcıda) | 18 (123) | kalır (18 ölçülmedi) | Tarayıcıda uçtan uca akışlar; bozma ölçümü yapılmadı. |
+| Veritabanı, şema ve yetki (RLS) | 13 (116) | kalır (8 güçlendirilecek, 5 ölçülmedi) | Veritabanı kuralları ve satır güvenliği (RLS) kapıları; yetki açığı en pahalı hata türü. |
+| Bağımlılık, sürüm ve derleme kapıları | 12 (312) | kalır (2 güçlendirilecek, 2 ölçülmedi) | Bağımlılık sabitleme, sürüm hizası ve derleme atlama mantığı. |
+| Belge ve cetvel kapıları | 9 (114) | kalır (4 güçlendirilecek, 1 ölçülmedi) | Belge ve cetvel yapısı kapıları. |
+| Mühendislik hesaplayıcıları (HVAC) | 5 (70) | kalır (1 güçlendirilecek, 4 ölçülmedi) | Mühendislik hesaplayıcılarının sonuçlarını koruyor. |
+| **Toplam** | **654 (7.271)** | | |
+
+Hüküm sözlüğü: **kalır** = dokunulmaz; **güçlendirilecek** = test kalır, kaçırdığı bozmalar için sağlamlaştırma eklenir; **birleşir** = iki test tek dosyada toplanır, koruma kaybolmaz; **zorunlu olmayan işe taşınır** = PR'ı durdurmaz, master'a girişte ve zamanlı koşuda çalışır; **silinir** = hiçbiri değil (bkz. §1).
+
+## 3. Süre hesabı (ölçülen ve ölçülmeyen ayrı)
+
+| Kalem | Değer | Kaynak |
+|---|---|---|
+| Birleşecek 3 dosyanın toplam test süresi | 16 sn (yerel, Windows) | `ci-test-olcum-2026-10-06.csv` |
+| Taşınacak 2 dosyanın toplam test süresi | 149 sn (yerel; CI'daki süresi ÖLÇÜLMEDİ) | aynı |
+| Tüm testlerin toplam yerel süresi | 872 sn | aynı |
+| `ci` işi süresi, son 5 PR (9 Ekim) | 88 / 95 / 204 / 251 / 273 sn | `gh run view` iş süreleri |
+| En yavaş test dilimi (4 paralel), kod PR'ları | 83 / 107 / 115 / 125 sn | aynı |
+
+Testler dört dilimde paralel koşuyor ve `ci` işinin son adımı dilimlerin bitmesini bekliyor; derleme ve denetimler daha uzun sürdüğü için PR beklemesi dilimlere bağlı değil. Test kısaltmak yalnız çok küçük PR'larda (dilim ≈ `ci`) en çok birkaç saniye kazandırır. Gerçek kısaltma kaldıracı `ci` içindeki sıralama (Lint'i Build ile paralel koşturmak, ALTYAPI ölçümü ≈ 42 sn) ve admin-smoke işidir; Pazartesi ele alınır.
+
+## 4. Sınırlar
+
+- Bozma ölçümü 347 dosyada yapıldı; 307 dosya “ölçülmedi” ve bu yüzden **kalır** yazıldı (tahmin yok).
+- Ölçüm bir teste bozmaları sırayla dener ve ilk yakalanışta durur (`sabotaj.cjs`). Bu yüzden “kaç bozmadan kaçı yakalandı” bir oran olarak verilmez: ölçülen 347 testin 345'i en az bir bozmayı yakaladı, 221'inin en az bir bozması kaçtı. “Hiçbir bozması kaçmadı” (117 test) “tam korunuyor” demek değildir, kalan bozmalar denenmedi. Bozmalar el yapımıdır, rastgele örnek değildir.
+- Süreler yerel Windows koşusundan (3 işçi, çekişmeli) gelir; CI'da dosya başına süre ölçülmedi, yalnız dilim toplamları ölçüldü.
+- Dünya durumu hükümleri 6 Temmuz–7 Ekim CI geçmişine dayanır; 6 Ekim'de taşınan şema tabanı kolu tabloda ayrıca gösterilmiştir.
+
+## 5. Sıradaki işler
+
+1. Karne PR'ı (üretici, ham karne, bu özet, cetvel §7): 9 Ekim akşamı.
+2. Pazartesi 12 Ekim: güçlendirme sırası (para, yetki ve veritabanı kapıları önce), `ci` içi sıralama ölçümü, günlük kazanç hesabı, seçimin bağımsız doğrulaması.
+3. Salı 13 Ekim: ALT-38 kapanış raporu.
+
+
+---
+# FILE: docs\audits\test-secimi-olcum-2026-10-07.md
+
+# Test Seçimi Ölçümü — 2026-10-07
+
+> Kayıt: Kanban ALT-38d (karar 308, OPS-91) · Sahibi: ALTYAPI · Ölçüm: 2026-10-07, dal `altyapi/alt38d-test-secimi` (taban master 2b0e252db),
+> Windows, Node 22.16, vitest 4.1.11 · Cetvel: `docs/standards/test-karnesi-standard.md` §6 · Ham veri: `docs/audits/test-secimi-olcum-2026-10-07.csv`
+> (353 satır: `bolum=pr` 94 PR, `bolum=b4` 259 CI koşusu) · Araç: `scripts/ci/test-sec-geriye.cjs` (`--pr-olc`, `--b4`).
+
+## 1 · Özet
+
+| Ölçü | Değer |
+|---|---|
+| Test evreni (PR kapısı, `vitest list`, dünya durumu dışarıda) | 624 dosya, 7571 test; conformance 345 dosya |
+| Harita kapsamı | conformance **345/345** kayıtlı: 312 kesin eşlenmiş + 33 `belirsiz` (her zaman koşar). Tümü 622/624 (kalan 2 dosya tümüyle `describe.skip`, her zaman koşar) |
+| Belge-yalnız PR (12 gerçek PR) | ort. **833 test (%11,0)**, 48 dosya (%7,7); CI-model Test süresi %12,8 (medyan %11,8) |
+| Kod PR (64 gerçek PR) | ort. **1803 test (%23,8)**, 157 dosya (%25,1); süre %26,2 (medyan %22,5); 1/64 TAM |
+| Küresel girdi değiştiren PR | 13/94 (%14): hepsi TAM |
+| PR karışımı (94 PR, #1628..#1736) | ort. test %32,1, ort. süre %34,0 (medyan %22,4): tam paketin yaklaşık üçte biri |
+| Geriye dönük doğrulama (259 kırmızı koşu, 09-07..10-07) | 171 değerlendirilebilir: 100 seçildi, 28 TAM, 43 ham kaçırma; 43'ünün 43'ü açıklandı: **gerçek kaçırma 0** |
+| Hedef (belge PR'ında Test ≤40 sn) | **tutmuyor**: belge PR'ında Test tam paketin %12,8'i; sebep §3 ve §4'te |
+| Seçimin kendi maliyeti (yerel ölçüm, 16 çekirdek) | belge PR'ında 0,5-1,4 sn; kod PR'ında vitest grafiği tek süreçte 41-57 sn, 4 işçide 26 sn. Test adımı shard başına tahmin: belge ≈68 sn → ≈10 sn, kod (medyan) ≈68 sn → ≈41-60 sn |
+
+Okuma notu: "süre" sütunları duvar saati değil, CI günlüğünden kurulan işlemci-saniye modelidir (§3); yüzdeler oransaldır.
+
+## 2 · Harita kapsamı ve her zaman koşanlar
+
+| Küme | Dosya | Anlamı |
+|---|---|---|
+| Evren | 624 | PR kapısındaki test dosyaları |
+| Kayıtlı (ölçülmüş) | 622 | koşarken okuduğu dosya/dizin/alt ağaç kaydı var |
+| Kesin eşlenmiş | 581 | değişen yol okunanlarla eşleşmedikçe seçilmez |
+| `belirsiz` | 41 | izlenemeyen alt süreç ya da ölçümde kırmızı/atlanan: HER PR'da koşar |
+| Haritada yok | 2 | `OrdersPage.test.tsx`, `OrderDetailPageTabs.test.tsx` (tümüyle `describe.skip`): HER PR'da seçilir (maliyeti yok) |
+| **Her zaman koşan** | **43** | belirsiz + haritada olmayan (ve bayat kayıt, şimdi 0) |
+
+`belirsiz` nedenleri (bir test birden çok nedene sahip olabilir): `git` repo içinde, dosyaya bağlı alt komut 23 (`ls-files`, `log`, `show`, `check-ignore`...),
+python 12, powershell 2, esbuild 2, sh 1, cmd 1, ölçümde kırmızı 3, ölçümde atlanan test 2. "Haritada olmayanlar için her zaman koşar kanıtı":
+`INV-TEST-SEC-1` senaryoları ("haritada kaydı OLMAYAN test HER ZAMAN seçilir", "kaynağı ölçümden sonra DEĞİŞMİŞ test HER ZAMAN seçilir", "belirsiz işaretli test HER ZAMAN
+seçilir") ve sabotaj tablosu ("haritada kaydı olmayan test seçilmez", "belirsiz test seçilmez" bozmaları kırmızı verir); ölçüm tarafında 94 PR satırının TAM olmayanlarının
+hepsinde `belirsiz_dosya` 41'dir (CSV).
+
+## 3 · PR örnekleri (94 gerçek PR, bu ağacın atası olan son 100 birleşmiş PR)
+
+Yöntem: `gh pr list --state merged` (en yeni 100) ∩ bu ağacın atası olanlar; her PR'ın dosya listesi `gh api pulls/N/files` ile, her biri için seçici BUGÜNKÜ harita ve ağaçla
+koşar. Tür: belge-yalnız (tüm yollar `docs/`, `.claude/`, `.agent/` ya da kök `*.md`), küresel (§6.2 girdisi var), kod (`src/` var), diğer.
+Süre modeli: bir CI koşusunun (2026-10-07 09:05, 622 dosya, Test adımı duvar 270 sn) günlüğünden her dosyanın test süresi + dosya başı ortak yük
+(transform+setup+import+environment ÷ dosya = 0,74 sn); tam paket 756 işlemci-sn. Yerel Windows süreleri CI'dan 10-40 kat uzundur (`taban-tazele` yerelde 150 sn, CI'da 3 sn),
+bu yüzden süre yüzdesi CI günlüğünden hesaplanır.
+
+| PR türü | PR | ort. dosya (/624) | ort. test (/7571) | test % | CI-model süre % (ort · medyan) | TAM |
+|---|---|---|---|---|---|---|
+| belge-yalnız | 12 | 48,3 (%7,7) | 833 | %11,0 | %12,8 · %11,8 | 0/12 |
+| kod (`src/`) | 64 | 156,5 (%25,1) | 1803 | %23,8 | %26,2 · %22,5 | 1/64 |
+| diğer (betik, edge, kök dosya) | 5 | 51,2 (%8,2) | 867 | %11,5 | %12,4 · %12,3 | 0/5 |
+| küresel girdi | 13 | 624,0 (%100,0) | 7571 | %100,0 | %100,0 · %100,0 | 13/13 |
+| **PR karışımı (hepsi)** | 94 | 201,7 | 2427 | %32,1 | %34,0 · %22,4 | 14/94 |
+
+En kötü 3 belge PR'ı: #1677 (58 dosya, 1033 test, süre %20,8: `.claude/settings.json` değişti, `.claude` alt ağacını okuyan testleri çeker) · #1667 (58 dosya, 951 test, %14,7) · #1648 (52 dosya, 902 test, %12,9).
+En kötü 3 kod PR'ı: #1733 (TAM, %100: taşınmış/silinmiş kod dosyası kuralı) · #1686 (252 dosya, 2504 test, %39,3) · #1661 (246 dosya, 2433 test, %38,6).
+İstenen asgari örnek (belge ≥10, kod ≥10) karşılandı; ilk koşuda (en yeni 14 belge + 14 kod PR'ı) belge aynı çıktı (835 test, %11,0), kod daha ağır çıktı (2191 test, %29,0; süre %30,0): kod sonucu
+dönemin PR'larına duyarlıdır, bu tablo 64 PR'a dayanır.
+
+**Belge PR'ının maliyeti nereden geliyor.** Belge PR'ında seçilen ortalama 97 işlemci-sn'nin 83'ü `belirsiz` kümesindendir (41 dosya, süre %11,0); `belirsiz` HARİÇ belge PR'ı %1,8'e iner.
+Hedef (belge PR'ında Test birkaç sn) bu yüzden tutmaz: seçim hiçbir belge PR'ında boş değildir (en az 43 test), kurulum atlanamaz, `test-shard` boş seçim yoluna girmez.
+`belirsiz` kümesini belge PR'ında atlamanın bedeli §4'te ölçüldü: atlanmamalı.
+
+## 4 · Geriye dönük doğrulama (B4): seçim, tam pakette kırmızı veren testi kaçırır mıydı?
+
+Girdi: `ci.yml` kırmızı koşuları 2026-09-07..10-07 (259 koşu, 153 farklı PR; her koşu için değişen dosyalar, kırılan test dosyaları ve vitest günlüğünden kırılan başlıklar). Her koşu için seçici
+BUGÜNKÜ harita ve ağaçla koşar ve kırılan test seçilmiş mi bakılır. Pencere bir aydır: `ci.yml` koşu kayıtları ve günlükleri bu aralıkta toplandı; `karne.json`un üç aylık `ci` özeti koşu başına değişen dosya taşımaz.
+
+| Kategori | Koşu | Sonuç |
+|---|---|---|
+| ASIL (PR olayı, Test adımı kırılan, kırılan test dosyası biliniyor) | 171 | 100 SEÇİLDİ · 28 TAM (küresel dosya) · 43 ham KACIRILDI |
+| TEST-YOK (kırmızı adım Test değil: Lint, Install, Build, kayıt kapısı...) | 73 | değerlendirilecek test yok |
+| PR-DISI (master push; seçici yalnız PR'da, master TAM koşar) | 15 | bilgi: 8'inde seçici olsaydı kaçırırdı, master TAM gerçekte koştu |
+
+Ham 43 kaçırma, günlükten çıkarılan kırık BAŞLIKLARLA sınıflanır (`kacirilanlariAcikla`; açıklanamayan = GERÇEK, başlık bilinmiyorsa açıklanmış sayılmaz):
+
+| Sınıf | Koşu | Test | Kanıt |
+|---|---|---|---|
+| DUNYA-KOLU-TASINDI | 34 | `taban-tazeligi.test.ts` (TAZELIK kolu) | kırık başlık bugünkü dosyada YOK, `taban-tazeligi-dunya.test.ts`te var; o dosya dünya durumu listesinde (ALT-38a), PR kapısında koşmaz: bugünkü kapı bu kırmızıyı üretmez |
+| DEVRALINAN | 10 | `standard-section-integrity.test.ts` (7), `sessionstart-tavan.test.ts` (3, her biri iki başlık) | aynı test+başlık 12 saat içinde başka dalda zaten kırmızıydı; zincir kökü master push (TAM koşar: 34132568389) ve seçilmiş PR koşusu (#1506, testin kendisini değiştirdi) |
+| GERÇEK kaçırma | **0** | | PR'ın kendi diff'inden gelen ve seçicinin kaçırdığı kırmızı yok |
+
+(43 koşu = 33 yalnız dünya kolu + 9 yalnız devralınan + 1 ikisi.) Sınıflama kuralları ve her birinin sabotajı `INV-TEST-SEC-GERIYE-1`dedir: kök seçilmediyse devralınan GERÇEK sayılır, aynı dalın kendi tekrarı devralınan sayılmaz,
+12 saat penceresi aşılırsa yeni zincir, farklı başlık aynı zincir sayılmaz, yer tutuculu başlık "bugünkü kapıda var" kabul edilir (güvenli yön).
+
+**`belirsiz` kümesinin gerekçesi (ölçülmüş).** SEÇİLDİ diye sayılan 100 koşuda kırılan 116 (koşu, test) çiftinin 53'ü `belirsiz` testtir (`arac-envanteri` 26, `mutlak-yol-sizintisi` 19, `belge-tazelik` 2, 6 diğer);
+45 koşuda kırılan testlerin HEPSİ `belirsiz` kümesindedir (harita onları tek başına seçmezdi, "her zaman koşan" kuralı yakaladı). Belge-yalnız PR kırmızısı 17'dir ve **10'unda kırılan test `belirsiz`dir**
+(README/standart/audit belgesi eklenince envanter ya da mutlak yol kapısı kırılıyor). Belirsizi belge PR'ında atlamak son ayda belge PR kırmızılarının %59'unu PR'da göstermez, master'a taşırdı.
+
+## 5 · Güvenlik ağı (seçimin ASLA gözden kaçıramayacağı durumlar)
+
+| Durum | Davranış | Kanıt |
+|---|---|---|
+| Küresel dosya (`.github/`, `package.json`, `pnpm-lock.yaml`, `vitest*`, `tsconfig*`, `next.config.*`, `scripts/ci/`, `supabase/migrations/`...) | TAM | `INV-TEST-SEC-1` küresel girdi tablosu; B4'te 28 koşu TAM |
+| Bilinmeyen dosya: haritanın bilmediği kök ad, silinmiş/taşınmış kod dosyası | TAM | `INV-TEST-SEC-1` ("bilmediği KÖK ad", "SİLİNMİŞ kod dosyası"); #1733 bu yüzden TAM |
+| Harita bayat/bozuk/sürüm farklı; ölçüm aracı değişti | TAM | `INV-TEST-SEC-1`, `INV-TEST-HARITA-1` blok 6 (depodaki harita canonical ve güncel araç özetiyle) |
+| Haritada olmayan (yeni) test, bayat kayıt, `belirsiz` test | her zaman SEÇİLİR | `INV-TEST-SEC-1` senaryoları + sabotaj |
+| Boş değişen liste, 2000+ dosya, git/harita/vitest hatası | TAM (`sec` fırlatmaz) | `INV-TEST-SEC-1` |
+| master push, `workflow_dispatch`, `schedule`, yerel `pnpm test` | seçim uygulanmaz, TAM | cetvel §6.5 |
+
+## 6 · Sapmalar ve sınırlar (dürüstçe)
+
+1. **Harita ölçümle üretildi, kaynaktan statik çıkarımla değil** (emir sonradan değişti): hesaplanan yol, döngüyle gezilen dizin ve alt süreç statik çıkarımda sessizce kaçıyordu. Bedeli: harita bir ölçümdür (tam yenileme yaklaşık 20 dk, 6 işçi) ve ölçüm Windows/Node 22'de yapıldı.
+2. **"Depodaki harita == üretici çıktısı" kapısı** tam yeniden ölçüm değil, ölçümün canonical baytları + GÜNCEL ölçüm aracı özeti + biçim kontrolüdür (CI'da yeniden ölçüm 20 dk sürer). Yeni/bayat/hayalet kayıt kırmızı vermez, seçicide güvenli yöne (her zaman koşar) düşer.
+3. **337 yerine 345**: conformance dosya sayısı bugünkü ağaçta 345 (sabah ölçümünden sonra eklenen testler).
+4. **Hedef tutmuyor** (§1, §3): belge PR'ında Test tam paketin %12,8'i, kod PR'ında %26,2. Hedefe giden yol `belirsiz` kümesini ölçümle küçültmektir (cetvel §6.7), gevşetmekle değil.
+5. **Geriye dönük pencere bir ay**; harita ve içe aktarma grafiği bugünkü ağaçtandır, koşudan sonra silinen/değişen testler `kapsamDisi` sayılır (bu veride 0). `DEVRALINAN` sınıfı "kök PR veri penceresinin dışında olabilir" riskini taşır: kök master push ya da seçilmiş PR olmadıkça GERÇEK sayılır.
+6. **Süre modeli CI günlüğünden** tek bir koşudan (09:05) kurulur; paralel iş sayısına bölünmemiş işlemci-saniyedir. `test-shard` (4 iş) ile duvar süresi ≈ model ÷ (4 × işçi paralelliği) + sabit kurulum.
+7. **ESLint** `scripts/ci/**` yollarını yok sayar (yapılandırma); bu dosyalarda eslint çıktısı boştur, denetim `tsc` ve testlerdendir.
+8. Test dosyası `test-sec.test.ts` (gerçek git kullanan bir senaryo) ve `test-haritasi-kaydedici.test.ts` (kaydedici kaydediciyi sınar: ölçüm altında kırmızı) `belirsiz` sınıfındadır; ikisi her PR'da koşar (yaklaşık 10 işlemci-sn).
+9. **Seçimin kendi maliyeti ölçüldü** (Windows, 16 çekirdek; CI'da ölçülmedi): belge PR'ında 0,5 sn (`--vitestsiz`) ile 1,4 sn; kod PR'ında `vitest` içe aktarma grafiği kurulduğu için tek süreçte
+   41-57 sn. Grafik 4 işçi sürecinde paralel kurulur (`grafikKur`: her işçi sıra % n kuralıyla ayrık parça alır; işçi hatasında ya da tutarsız çıktıda sıralıya düşer): 26 sn (2 işçi 31 sn, 8 işçi 22 sn);
+   sonuç sıralıyla bayt bayt aynıdır (10 dosya ve toplu sorgu, doğrulandı). `test-shard` her shard'da seçimi ayrı hesapladığından kod PR'ında shard başına duvar süresi tahmini: ≈15 sn test +
+   ≈26-45 sn seçim (4 çekirdekli CI'da yerelden uzun olabilir): tam paketin ≈68 sn'siyle aynı mertebede ya da biraz altında; belge PR'ında ≈10 sn. Kod PR'ının asıl kazancı için grafiğin haritada
+   doğrulamalı önbelleğe alınması gerekir (cetvel §6.7 madde 5).
+10. **Koşum kapanımı boşluğu kapatıldı** (alt38e bulgusu, doğrulandı): `vitest.global-setup.ts` ana süreçte `scripts/board/vitest-defter-ortami.cjs`i yükler; kaydedici worker'da çalıştığı için
+    harita bunu yalnız kendi testine bağlıyordu (`kuresel` boş) ve dosya değişince her koşum etkilenirken seçim o testle sınırlı kalıyordu. Dosya küresel listeye eklendi (değişirse TAM) ve
+    `INV-TEST-SEC-1` blok 7 `vitest*` kök dosyalarının yerel yükleme kapanımını kaynaktan çıkarıp küresel listede OLMAYANI kırmızı yapar (sentetik ağaç senaryoları + gerçek ağaçta kapanım:
+    `vitest.config.ts`, `vitest.global-setup.ts`, `vitest.setup.ts`, `vitest-setup.tsx`, `vitest.smoke.config.ts`, `scripts/ci/dunya-durumu.cjs`, `scripts/board/vitest-defter-ortami.cjs`). PR örnek ölçümü
+    değişmedi: son 100 birleşmiş PR'da bu dosyaya dokunan tek PR zaten küresel girdili (#1652). Aynı mesajdaki ikinci not (sınıflayıcı önce seçicinin yanından yüklenir) bozulmadı ve bir testle sabitlendi.
+
+## 7 · Birleşme sonrası güncelleme (master #1741 dahil, 16:25)
+
+Dalın ucuna master birleştirildi (#1728, #1737, #1739-#1741: sınıflayıcı, shard, ölçüm belgesi). Ağaç 632 test dosyasına çıktı (8 yeni master testi); harita aynı ağaçta yenilendi
+(`--yalniz` ile 13 dosya: 8 yeni + 5 bayat): **630/632 kayıtlı**, `belirsiz` 41 → **45** (yeni dört: `ci-degisiklik-sinifi` bash, `ci-test-shard` esbuild, `depo-dokum-kapisi` ve
+`depo-dokum-kapisi-uctan-uca` git), haritada olmayan 2 (tümüyle `describe.skip`), **her zaman koşan 47 (%7,4)**. `--kontrol`: sorun 0, bayat 0. B4 yeniden koşuldu: 171 değerlendirilebilir koşuda
+ham 43 aynı, **gerçek kaçırma 0** (ASIL koşularda ortalama seçilen dosya 194,0 → 198,7: yeni testler). PR örnek ölçümü (§3) yeniden koşulmadı; yöntem aynı, belge PR'ında seçilen dosya yaklaşık +4.
+Yukarıdaki sayılar (§1-§6) 2b0e252db tabanındaki 624 dosyalık ağacın ölçümüdür ve bu haliyle bırakıldı.
+
+## 8 · Yeniden üretme
+
+```
+# PR örnekleri (CI süre modeliyle)
+node scripts/ci/test-sec-geriye.cjs --pr-olc --sure <ham-klasör>/vitest-*.json --ci-log <ci-test-günlüğü> --belge 99 --kod 99 --limit 100 --cikti pr.jsonl
+# Geriye dönük doğrulama (günlük dizini: <runId>-<jobId>.txt)
+node scripts/ci/test-sec-geriye.cjs --b4 kirmizi-kosular.json --log-dizini <günlükler> --cikti b4.jsonl
+node scripts/ci/test-sec-geriye.cjs --ozet b4.jsonl     # gercekKacirilan BOŞ olmalı
+```
+
+
+---
 # FILE: docs\audits\urun-veri-fark-raporu-2026-09-22.md
 
 # Ürün verisi fark raporu — 2026-09-22
@@ -29224,6 +32088,194 @@ olmayan `iyzico-refund`'ın bu arada gerçeklenmesiyle doğdu.
 
 > İş emirleri: registry **T071** (bu denetim) + **T071-B1** (refund IDOR, HIGH-öncelik, EDGE).
 > Ham çıktı: 20-madde `wf_31722bcf-783`, doğrulama `wf_bb77c7aa-f05` (40 ajan). Migration YOK.
+
+
+---
+# FILE: docs\audits\wrongstack-1-1-0-gecis-olcumu-2026-10-12.md
+
+# WrongStack 1.0.26 → 1.1.0 geçiş ölçümü (ARC-94)
+
+> **Durum:** 2026-10-12 · Sahip: ARAÇ · Kart: ARC-94 (OPS emri: yükseltme Salı 13 Ekim akşamı)
+> **Cetvel:** `tools/wrongstack-mcp/README.md` (yamalar, kurulum), `tools/wrongstack-mcp/kurulum.cjs` (sürüm farkı kapısı).
+> **Yöntem:** alt ajan (izole HOME ve geçici köklerle; gerçek `.wrongstack` verisine DOKUNULMADI) 154 araç çağrısı, ~32 dk.
+> Aşağıdaki "ben doğruladım" işaretli satırlar ARAÇ penceresinin kendi ölçümüdür; geri kalanı alt ajan raporudur
+> (tam rapor depo dışı: `C:/tmp/vh-arac94-olcum/out/RAPOR.md`).
+
+## Hüküm
+
+Hedef sürüm **1.1.0**. 1.0.37 ile 1.1.0 arasında kanban-mcp, sage-mcp, mailbox-mcp, codebase-index-mcp, `@wrongstack/kanban`
+ve `@wrongstack/persistence` paket dosyaları bayt bayt aynıdır; değişen yalnız ajan çalışma zamanıdır (sage middleware ~6 satır,
+mcp istemci önbellek yolu, core/tools). 1.1.0, 2026-10-11T21:57Z'de yayımlandı, npm `latest`, deprecated değil.
+Olgunluk açısından 1.0.37'nin de ~12 saatlik olması 1.0.37'ye avantaj vermez.
+
+## Araç yüzeyi (`.mcp.json` çağrıları bozulur mu?)
+
+| Ne | 1.0.26 → 1.1.0 | Etki |
+|---|---|---|
+| araç adları | 27/27 aynı; eklenen ve kalkan YOK (**ben doğruladım**: `tools/list` JSON'ları) | yok |
+| 1.0.37 ↔ 1.1.0 `tools/list` | tam nesne olarak aynı; yalnız `version` alanı farklı (**ben doğruladım**) | yok |
+| kanban action enum | DEĞİŞMEDİ (manage 45, read 14); zorunlu alan `action` | yok |
+| kanban araç açıklamaları | `annotations` eklendi (`readOnlyHint`, `destructiveHint:false`) | yok |
+| sage `remember` / `memory_update` | yeni opsiyonel alanlar (`sources`, `validity`, `expectedRevision`, `feedback`); zorunlu alanlar aynı | yok |
+| mailbox, codebase-index şeması | bayt aynı | yok |
+| `--help` bayrakları | aynı | yok |
+| yeni ortam değişkeni | `WRONGSTACK_JEV_LOG_CONTENT`, `WRONGSTACK_JEV_LOG_DIR`, `WRONGSTACK_RUNTIME_VERSION`, `WRONGSTACK_BUN_TYPECHECK` (geliştirici kancası), `WRONGSTACK_INDEX_SERVER_FAULT` (yalnız test hata enjeksiyonu; ortamda ASLA ayarlanmaz) | yok (hiçbiri bizim çalıştırdığımız yolda okunmaz) |
+
+## Geri dönüşte veri bozulur mu? (sentetik veriyle ölçüldü)
+
+**Hayır.** Ama sage.db şeması **tek yönlü genişler**; eski sürüme dönmek şemayı eski hâline getirmez → **yedek şart**
+(`scripts/hijyen/sage-yedek.cjs`, ARC-71, #1878).
+
+| Depo | Bulgu |
+|---|---|
+| kanban | Şema değişmedi (15 nesne). 25 kart + not + check + `verify_completion` hedefte ve geri dönüşte okundu/yazıldı; kart kaybı yok. |
+| sage | `user_version` 0 sabit ama ilk açılışta 34 → 47 nesne: 3 tablo (`ws_text_index_revisions`, `hq_memory_sync`, `hq_memory_sync_clock`), 1 indeks, 7 tetikleyici; mevcut tablo/sütun/veri değişmez. 1.0.26'ya dönünce okundu/yazıldı. Bedel: sentetik 5.003 kayıtta 6,76 → 10,39 MiB (**+%54**), ilk açılış 2,5 sn. **Gerçek sage.db boyutu ölçülmedi.** |
+| mailbox | Şema değişmedi (22 nesne); kapalı pencereye mesaj, ack, cevap iki yönde çalıştı. |
+| codebase-index | `version 5` değişmedi; 1.1.0, 1.0.26 dizinini okur. |
+| karışık sürüm | Farklı sürüm istemci hayattaki daemon'a bağlanmaz, kendi daemon'unu doğurur (2 `project-server.js`, aynı SQLite); bozulma görülmedi ama İSTENMEZ. `kurulum.cjs` daemon'ları öldürdüğü için akışta sorun yok. |
+
+## Yamalar
+
+| Yama | 1.0.37 / 1.1.0'da eski yama | Sonuç |
+|---|---|---|
+| kanban `ozet-donus` | uygulanmaz (araya `signal.throwIfAborted()` girmiş) | `kanban-mcp-1.1.0-ozet-donus.patch` yeniden üretildi; yukarı akım hâlâ `{content: result}`. Duman: yamasız `add_task` 41.832 B → yamalı 1.965 B; `get_board` 39.844 B tam kalıyor; hata sonucu dokunulmadan geçiyor. |
+| sage `domain-terms-turkce` | uygulanmaz (aday mantığı `domain-term-candidates` bölümüne taşınmış) | `sage-1.1.0-domain-terms-turkce.patch` yeniden üretildi (7 hunk, 69 satır); yukarı akım hâlâ ASCII-only. Duman: Türkçe girdilerde yamasız 0 terim, yamalı 2-7 terim; İngilizce kontrol değişmedi. |
+
+1.0.37 ve 1.1.0 için üretilen yama dosyaları bayt bayt aynıdır (**ben doğruladım**). Depoya yalnız 1.1.0 adlı kopya girer.
+
+**Test uyarlaması:** `wrongstack-sage-yama.test.ts` `yukle()` başlangıç işareti 1.0.37+'da `// src/domain-term-candidates.ts`
+bölümüne kaymıştır (aday çıkarımı ve `normalizeTerm` orada). İşaret artık mevcut işaretlerin en erkenidir; "sürüm kaymışsa"
+kolundaki sabit `1.0.26/1.0.27` yamanın kendi adından türetilir. **Ben doğruladım:** 1.1.0 kurulu paket kopyası + yamalar
+uygulanmış hâlde `wrongstack-sage-yama`, `wrongstack-mcp-kurulum`, `wrongstack-kurulum-betigi`, `wrongstack-surum-satiri`
+testleri 71/71.
+
+## Kilit
+
+`tools/wrongstack-mcp/package-lock.json` proje kilidinden `npm install --package-lock-only` ile türetildi: **15 paket**
+ilerler (11 `@wrongstack/*`, `playwright` + `@playwright/test` + `playwright-core` 1.63.0 → 1.64.0, `pprof-format` 2.3.1 → 2.3.2);
+paket eklenmedi/kaldırılmadı, kurulum betiği (`install` script) yok. **Ben doğruladım:** aday kilit ↔ depo kilidi farkı yalnız bu 15.
+
+## Geri dönüş provası — GERÇEK veri kopyasında (12 Ekim 13:0x, ARAÇ, ayrı kök, canlıya dokunulmadı)
+
+Kopya: 09:54Z yedeğinden (`sage-yedek.cjs`, #1878) yalıtılmış köke geri yüklenen gerçek veri (sage 251 kayıt, kanban
+16 pano / 994 kart, 5 posta kutusu). Akış: 1.0.26 ile oku (taban) → 1.1.0 ile aç, yaz → daemon'lar durdurulur →
+yedekten geri yükle (`--geri … --kok/--posta-koku … --evet`) → 1.0.26 ile oku → karşılaştır. Araçlar: gerçek
+`@wrongstack/*-mcp` sunucuları (1.0.26 canlı kurulumdan, 1.1.0 + yamalar bu ağaçtan).
+
+| Ölçü | Taban (1.0.26) | Yükseltme sonrası (1.1.0) | Geri dönüş (1.0.26, yedekten) |
+|---|---|---|---|
+| sage `memory_search`, 10 Türkçe terim (sıfırdan, şerit, kapı, kanıt, göç, yedek, kanban, ğ, Çözümleyici, İstanbul) | 1, 12, 20, 20, 3, 5, 11, 20, 0, 0 sonuç | aynı | aynı kimlikler, aynı sıra: **10/10 BİREBİR** |
+| sage nesne sayısı | 34 | **47** (3 tablo + indeks + 7 tetikleyici) | 34 |
+| sage.db + WAL boyutu | 1,72 MB | 3,21 MB (**+%87**, gerçek veri; sentetik +%54'ten yüksek) | taban |
+| kanban pano / kart | 16 / 994 | 16 / 995 (yükseltme sonrası yazılan kart) | 16 / **994** (yazılan kart yok) |
+| yükseltme sonrası yazılan sage kaydı | — | var | **yok** |
+| posta `mailbox_read query` (yalıtılmış ev) | 1 | 1 | 1 |
+| 5 posta kutusu `--geri` | — | — | 5/5 GERI YUKLENDI ve DOGRULANDI |
+| daemon (prova kökünde) | — | eski sunucu açıkken 1, yeni istemci eklenince **2** | hepsi durduruldu, kalan 0 |
+
+**Karışık sürüm kanıtı:** 1.0.26 daemon'u ayaktayken 1.1.0 istemci ona bağlanmaz, kendi daemon'unu doğurur
+(iki daemon, aynı SQLite). Bu yüzden yükseltmede önce BÜTÜN daemon'lar durdurulur (`kurulum.cjs` yapar), sonra
+`saglik.cjs` ile koşan her daemon'un paket sürümü okunur; eski sürümlü daemon varsa `HATA`.
+
+**Disk:** gerçek `sage.db` 1,77 MB + WAL 0,9–1,3 MB; yedek dizini 207 MB toplam; boş disk 29,2 GB. Yükseltme ve
+yedek için yer yeterli (göç sonrası beklenen sage.db ≈ 3,3 MB).
+
+## Geri dönüş prosedürü (adım adım; bozulursa)
+
+1. Bütün pencereleri kapat (yedek geri yükleme canlı kökte süreç varken REDDEDER; bu bilerek böyle).
+2. Kodu eski sürüme al: yükseltme PR'ını geri al (`git revert -m 1 <birleşme-commit>`) ya da `tools/wrongstack-mcp/package.json`,
+   `package-lock.json` ve `yamalar/` dizinini birleşme öncesi commit'ten getir (1.0.26 yamaları git geçmişinde durur).
+3. `node tools/wrongstack-mcp/kurulum.cjs` — daemon'ları durdurur, `npm ci`, yamaları uygular, `HAZIR` der.
+4. **Veri:** göç toplamsaldır ve 1.0.26 47 nesneli şemayla çalışır; yükseltme sonrası yazılan kayıtlar gerekliyse
+   yedekten geri YÜKLEME yapılmaz. Eski şemaya dönmek (ya da bozulma şüphesi) için pencereler kapalıyken:
+   `node scripts/hijyen/sage-yedek.cjs --geri sage <yedek> --evet`, `--geri kanban …`, `--geri posta-<proje> …`
+   (mevcut dosyalar `.oncesi-<damga>` ile yana alınır, silinmez; yazılan parmak izi yedekle karşılaştırılır).
+5. Doğrula: `node tools/wrongstack-mcp/saglik.cjs` (daemon taraması) ve ana ağaçta `--sunucu`: her sunucu `1.0.26`.
+
+## ⚠Kaza kaydı — erken göç (12 Ekim 13:07, ARAÇ)
+
+Bu PR'ın `saglik.cjs` betiği ilk sürümünde sunucuları worktree'den açtı; sunucu `--project-root`u git üzerinden ANA
+AĞACA çevirdiği için bu ağacın 1.1.0 paketi CANLI kökü açtı: 1.1.0 sage/kanban/codebase-index daemon'ları doğdu ve
+canlı `sage.db` şeması 34 → 47 nesneye yerinde göç etti (geri alınamaz, toplamsal). Ölçülen zarar yok: integrity_check
+ok, 251 kayıt / 247 aktif (09:54Z yedekle aynı), kanban şeması değişmedi; ben doğurduğum üç daemon'u durdurdum.
+Düzeltme: betiğin varsayılanı yalnız daemon taraması; `--sunucu` yalnız ana ağaçta (`.git` dizin) ve açık bayrakla
+(`wrongstack-saglik.test.ts`, bozma 5/5). **Kural:** yükseltmeden önce hiçbir betik, test ya da araştırmacı, canlı köke
+çözülen bir kökle (worktree dahil) yeni sürüm sunucusu açmaz; prova kökü git DIŞI kopyadır.
+
+## Ölçülemeyenler (açıkça)
+
+- ~~Gerçek `sage.db`…~~ **Artık ölçüldü** (yukarıdaki gerçek veri provası). Hâlâ ölçülmeyen: canlı kökte eşzamanlı yazma yükü ve `transition_task` başarılı yolu (aşağıda).
+- `transition_task` başarılı yolu (yönetilen pano kolon kimlikleri üretilemedi; 1.0.26'da da "managed board" reddi var, yama o satırı aynı ifadeyle sarıyor).
+- Sage 15 aracın yalnız 7'si ve kanban/mailbox'ın bazı eylemleri gerçek veriyle; geri kalanı sahte argümanla sonuç sınıfı düzeyinde.
+- `kanban_watch`/`mailbox_watch` uzun bekleme, `--http`, `--destructive`, `--admin`; karışık daemon sage ve mailbox'ta; çoklu pencere eşzamanlı yazma yükü.
+- Node 22.16.0 + undici 8.11.2 (`node >=22.19` ister) `EBADENGINE` uyarısı üç sürümde aynı; dört sunucu 22.16'da çalıştı, Node yükseltmesi ölçülmedi.
+- Ölçüm taze çözüme dayanır (playwright 1.64.0, pprof-format 2.3.2); proje kilidindeki eski sürümlerle 1.1.0 ayrıca çalıştırılmadı.
+- Yukarı akım değişiklik notu yok (paketlerde CHANGELOG bulunmuyor); "büyük sürüm" gerekçesi kaynak farkından çıkarıldı.
+
+## Yükseltme öncesi şartlar (OPS emri + ölçüm)
+
+1. ARC-98 birleşmiş (#1877, **tamam**).
+2. Yamalar yeniden üretilmiş ve bu PR'da (**tamam**).
+3. Yedek: sage.db + kanban + posta kutuları (`sage-yedek.cjs`, #1878 birleşmeli; yedek geri dönüş şartıdır).
+4. Geri dönüş provası AYRI kopyada (şart 5): **tamam** (yukarıdaki gerçek veri tablosu).
+5. Bütün `project-server.js` daemon'ları durdurulur (`kurulum.cjs` yapar; pencereler kapalıyken).
+6. Yükseltme sonrası sağlık ölçümü: `saglik.cjs` (daemon sürümü), kanban okuma/yazma, sage, posta, kokpit düğmesi.
+
+**⚠BİRLEŞME ANI = YÜKSELTME ANI.** Bu PR birleşince ana ağaçta `kurulum.cjs --denetle` KIRMIZIDIR (kilit 1.1.0, kurulu
+1.0.26) ve `WRONGSTACK` durum satırı "bizde 1.1.0" der; ikisi de `kurulum.cjs` koşana kadar yanıltır. Bu yüzden PR
+yalnız kapanış sırasında, pencereler kapalıyken ve kurulumla aynı turda birleşir.
+
+## Yükseltme günü sırası (tek sayfa; 12 Ekim 17:30 kapanışı)
+
+Önkoşul — 16:30 kapısı (dördü de EVET olmadan bu akşam yok): (a) #1878 birleşmiş; (b) yalıtılmış kök provası birebir
+(kart sayısı + sage Türkçe arama + posta okuma); (c) kanban ve sage yamaları 1.1.0'da `kurulum.cjs --denetle` HAZIR;
+(d) geri dönüş yolu ayrı kopyada denenmiş.
+
+| # | Adım | Komut / ölçü | Beklenen | Bozulursa |
+|---|---|---|---|---|
+| 1 | Pencereler kapanır; yalnız ARAÇ penceresi kalır | `claude agents` / süreç listesi | başka MCP sunucusu yok | kurulum.cjs "başka pencere açık" ile DURUR, hiçbir şeye dokunmaz |
+| 2 | Yedek | `node scripts/hijyen/sage-yedek.cjs` | 7 depo (sage, kanban, 5 posta) `ALINDI ve DOGRULANDI` | tek depo düşerse DUR, yükseltme yok |
+| 3 | Birleştir | `node scripts/hijyen/merge-ritueli.cjs 1883 arac/arc94-wrongstack-1-1-0 --agac=C:/tmp/vh-arac-94 --merge` | beş madde YEŞİL, ana ağaç ilerler | KIRMIZI ise birleşmez |
+| 4 | Daemon durdur + kur + yamala | ana ağaçta `node tools/wrongstack-mcp/kurulum.cjs` | son satır `HAZIR` | `HATA: …` → adım 9 (geri dönüş) |
+| 5 | Daemon kalmadı mı | `node tools/wrongstack-mcp/saglik.cjs` | `daemon yok` ya da hepsi 1.1.0 | ESKİ daemon → süreci durdur, adım 4'ü yinele |
+| 6 | Sürüm oku (sunucular) | ana ağaçta `node tools/wrongstack-mcp/saglik.cjs --sunucu` | dört sunucu `initialize 1.1.0`, `HAZIR` | HATA → adım 9 |
+| 7 | Pencereler açılır; açılış sınaması | kanban `list_boards` (16+ pano), kokpit düğmesi, sage `memory_search sıfırdan` (1 sonuç), posta `mailbox_read` | hepsi çalışır | adım 9 |
+| 8 | Sağlık kaydı | karta tablo: yedek boyutları, sürümler, sınama sonuçları | — | — |
+| 9 | Geri dönüş (yalnız bozulursa) | yukarıdaki "Geri dönüş prosedürü" | `saglik.cjs` 1.0.26 gösterir | OPS'a yaz |
+
+Ardından ayrı adım (OPS onayıyla): iç ayarların açılması (aşağıdaki liste; uygulama yükseltmeden SONRA).
+
+## İç ayarlar — aç / açma önerisi (OPS 12 Ekim; uygulama yükseltmeden sonra, ayrı adım, OPS onayıyla)
+
+**Kapsam notu (ben doğruladım: `.mcp.json`):** biz yalnız dört MCP sunucusunu (sage, kanban, mailbox, codebase-index)
+Claude Code altında koşuyoruz; WrongStack'in kendi AJAN çalışma zamanı (`wstack`: otonomi, skill-companion, sandbox, Jev)
+bu yolda koşmaz. Aşağıdaki ajan çalışma zamanı ayarlarının hiçbiri bizim yolumuzda etkili değildir; bu yüzden hepsi
+**AÇMA / DOKUNMA**. Bizi ilgilendiren tek gerçek ayar `sessionRetentionDays`. Kaynak: alt ajan raporu (paket kaynağı
+ve d.ts farkı, 1.0.26 ↔ 1.1.0); `skill-companion` varsayılanları ve `rememberStartupChoices` yalnız d.ts yorumuna
+dayanır, kodda okuma yeri bulunamadı (doğrulanmadı).
+
+| Ayar / özellik | Ne yapar | 1.1.0 varsayılanı | Önerim | Gerekçe (tek cümle) |
+|---|---|---|---|---|
+| sage `hygiene.sessionRetentionDays` | Oturum kapsamlı hafızayı N gün sonra temizler; 0 yaşa dayalı temizliği kapatır | 7 (iki sürümde aynı) | **DOKUNMA (7 kalsın)** | 0 sonsuz saklamadır ve sage.db'yi büyütür; mevcut davranış korunur. |
+| sage `memory_update` `feedback` (useful/outdated/incorrect/irrelevant/uncertain) | Kullanım geri bildirimini yazar; outdated/incorrect review adayı açar | ayar değil, araç argümanı | **DOKUNMA** | Ayar anahtarı yok; kullanırsak review adayları sage.db'ye yazılır. |
+| sage-mcp `memory_candidates` (`proposals`) | Dış ajanlara yalnız list/propose sunar; doğrudan hafızaya yazmaz | ayar değil; araç | **DOKUNMA** | Dış ajan önerisi review'a girer; bizde dış ajan yok. |
+| `autonomy.nextSteps` | Her tur sonunda nextsteps bloğu ister | required (yeni) | **AÇMA** | `autoProceedMaxIterations` sınırsızken model bitti diyene kadar sürer; bizim yolumuzda koşmaz. |
+| `autonomy.yoloPlus` | YOLO açıkken bile izin sormaz (yıkıcı işler dahil) | false (yeni) | **AÇMA** | Son izin kapısını kaldırır; PUBLIC depoda sır kapısını zayıflatır. |
+| `autonomy.yolo` | Tüm izin istemlerini kapatır | true (iki sürümde aynı; sahip kararı) | **AYRI KARAR (bu işin dışı)** | Yükseltmeyle değişmiyor; yoloPlus ile aynı kaygı. |
+| `autonomy.rememberStartupChoices` | Son YOLO/otonomi seçimini sormadan geri uygular | true (yalnız d.ts, doğrulanmadı) | **AÇMA (false)** | Son mod sessizce geri gelir. |
+| `features.toolCoach` / `skills.localSuggest` | Araç/skill için yönlendirme notu ekler | true / true | **VARSAYILAN KALSIN** | Yalnız metin ekler, ağ çağrısı yok; bizim yolda koşmaz. |
+| skill-companion (ana anahtar + sinyaller + `fileChurnThreshold` 5 → 20) | Arka plan yargıcı skill önerir, ilk dosya düzenlemesini bir kez tutar | enabled true (d.ts) | **AÇMA (enabled:false)** | Her turda ek model çağrısı ve sürtünme; faydası ölçülmedi. |
+| `tools.sandbox` (mode) | bash/exec/git için sandbox | off (eski davranış) | **AÇMA** | Enforced modda MCP çağrıları `sandbox_denied` alabilir; kanıt yok. |
+| `mcpServers.<ad>.sandboxTrust` | Sunucunun çağrıları sandbox'ı atlar | false | **AÇMA** | Güvenilen sunucu sandbox'ı atlar; depo kendi sunucusunu işaretleyemez. |
+| `typesafe.enabled` / `logContent` / `logDir` (Jev) | Jev isteği; içerik günlüğü diske yazar | kapalı / false / `~/.wrongstack/logs` | **AÇMA** | Açıkken istekler dış sağlayıcıya gider, içerik diske düşer; kullanmıyoruz. |
+| `root.disabledProviders` | Sağlayıcıyı fallback'ten çıkarır | boş | **AÇMA** | Kapatılacak sağlayıcı yok. |
+| `runtime.variant = scout` | Araç yüzeyini küçültür, kalanı tool_search ile çağrılır | default | **AÇMA** | Kanban/sage araçlarına dolaylı yol; ölçülmedi. |
+| `wstack sage connect` | Projeye MCP girdisi ve skill/kural dosyası yazar | komut | **KOŞMA** | Depo dosyalarını değiştirir; PUBLIC depoda commit kapısından geçmeli. |
+| `WRONGSTACK_INDEX_SERVER_FAULT`, `WRONGSTACK_BUN_TYPECHECK` | Test hata enjeksiyonu / geliştirici kancası | tanımsız | **ASLA AYARLAMA** | Üretimde sunucuyu düşürür. |
+
+**Hüküm:** yükseltmeden sonra açılacak ya da değiştirilecek bir iç ayar YOKTUR; liste "hepsi olduğu gibi kalsın"dır.
+Bu, ayrı bir uygulama adımının gerekmediği anlamına gelir (OPS onayı yalnız bu hükmü kayda geçirmek içindir).
+Çekince: skill-companion ve `rememberStartupChoices` kodda doğrulanmadı; bizim yolumuzda koşmadıkları için sonuç değişmez.
 
 
 ---
@@ -30377,6 +33429,170 @@ Bu harita aynı zamanda bir öteleme-frenidir. Kapsam genişlemesi = teslimi gec
 mükemmelliyetçilik kalıbı (2026-06-15 değerlendirmesi). İlaç: **daha azını teslim et,
 gerisini müşteriyle yap.** İlgili memory: `venthub-vision`, `dealer-pivot-decision`,
 `standard-first-strategy`, `hold-full-scope`.
+
+
+---
+# FILE: docs\plans\blg5-sozluk-madde-kalibi-2026-10-09.md
+
+# BLG-5 — Sözlük madde kalıbı ve ilk dalga terim seçimi (2026-10-09, BLOG) — TASLAK
+
+> **DURUM: TASLAK — onaysız, uygulanmaz.** Yalnız belge: kod, sayfa, adres, şema, çeviri anahtarı yok. Sözlük için bugüne dek cetvel yoktu (`rehber-yazisi-standard.md` satır 142 sözlüğü SONRAYA bırakıyor; bilgi mimarisi kararı TASARIM'dan sonra gelir); bu belge o cetvelin taslağıdır.
+> **KAYNAK / CETVEL:** `rehber-yazisi-standard.md` (R1.1 kaynaklar, R1.3 konu başına tek yazı, R2 kaynak, R2.3 ham kaynak, R3 iç bağlantı kimlikle, R4 yasaklar, R4.8 taslak metin depoya girmez), `vitrin-genel-metin-standard.md` (M8 marka olgusu), `category-taxonomy-standard.md` (kategori ve aile adları), `catalog-ingestion-standard.md` §6.3 (kaynak dizini).
+> **Kapsam sınırı (OPS onaylı düzen, 2026-10-09):** depoya yalnız kalıp, terim ADLARI ve özet sayılar girer. Tanım cümleleri, kaynaklardan birebir alıntılar ve arama önerisi sorguları **depo dışında** durur (R4.8 delinmez; depo public).
+> **Kart:** BLG-5 (Kanban, VentHub BLOG panosu). **Sahibi:** BLOG. **Son doğrulama:** 2026-10-09 (ölçümler aşağıda; her ölçüm betikle tekrarlanabilir).
+
+## 1. Amaç ve bitiş ölçüsü
+
+Sözlüğün amacı arama ve yanıt motoru görünürlüğüdür: "X nedir" türü bilgi sorgularında sitenin kaynaklı, kısa ve alıntılanabilir bir cevabı olması. Terim listesi tek başına bitiş değildir. Bitiş ölçüsünü GEO-SEO koyar: yayından 4 hafta sonra sözlük sayfalarının Search Console gösterim ve tıklama sayıları ile terim sorgularındaki sıra raporlanır; yayın öncesi taban o gün ölçülür.
+
+## 2. Madde kalıbı
+
+Her madde aynı alanları taşır; hiçbiri boş bırakılmaz (bilinmeyen alanın yazılması için kaynak gerekir, kaynak yoksa madde yayınlanmaz).
+
+| Alan | Kural |
+|---|---|
+| Terim | Sitede ve kaynaklarda geçen Türkçe yazım. Yazım varyantları ve eş anlamlılar ayrı alandadır. |
+| Yazım ve eş anlamlılar | Varyantlar maddede yan yana verilir; ilk geçişte "invertör (İngilizcesi inverter)" biçimi, rehber yazılarında uygulanan kuralla aynıdır. |
+| Kısa tanım | 1-2 cümle, terimin kendisiyle başlar ("Terim, ... cihazdır"); kaynaklıdır; yanıt motorunun tek başına alıntılayabileceği uzunlukta ve kendi cümlemizdir (kaynaktan kopya değil). |
+| Açıklama | En çok 3 kısa paragraf. Bu sitedeki ürünle ilişki yalnız olgu olarak yazılır ("sitede X kategorisinde listelenir"); üstünlük, vaat, fiyat, rakip adı yoktur. |
+| Karıştırılan terimler | Varsa "X ile Y farkı" tek cümle; ikisi de sözlükte maddedir. |
+| Kaynaklar | Sıra: TDK → TS EN/IEC → üretici belgesi → sektör kullanımı. Her iddia numaralı kaynağa bağlıdır; birebir alıntı kaynak dizinindeki (belge, sayfa) noktasıyla kayıtlıdır. Yapay zekâ özeti kanıt değildir (R2.3). |
+| İlgili sayfalar | İlgili kategori, ürün ailesi ve rehber yazısı. Bağlantı kimlikle yazılır (`vh:<tür>/<anahtar>`, R3). Karşı yön: kategori ve ürün sayfaları da terime bağlanır. |
+| İngilizce karşılık | EN sayfada İngilizce terim ve kaynaklı karşılık; çeviri değil, kaynakta geçen karşılık. |
+| Yapısal veri | schema.org DefinedTerm, bir DefinedTermSet içinde. GEO-SEO uygunluğu doğrular. |
+
+## 3. Yasaklar (rehber R4'ten sözlüğe uyarlanmış)
+
+- Üstünlük, vaat, fiyat ve rakip adı yazılmaz.
+- Marka ve üretici olgusu (kuruluş yılı, ülke, merkez) yalnız `docs/standards/marka-olgu-kaydi.json` içindeki YAZILABİLİR olgudan alınır (M8).
+- Kaynakta birebir yoksa yazılmaz. Olumsuz iddia ("... değildir") açık alıntı ister (R4.5).
+- Sitenin terim düzeni bozulmaz: ana kategori, alt kategori, ürün ailesi, model.
+- Tanım cümlesi kaynaktan kopya olmaz; alıntı kısa ve etiketlidir ve depo dışı kayıtta durur.
+
+## 4. Terim seçimi
+
+### 4.1 Aday havuzu (tekrarlanabilir)
+
+Havuz, sitenin kendi sözlüğünden kurulur: canlı site haritasındaki 82 sayfanın başlığı (28 kategori, 47 ürün ailesi, 6 marka, 1 rehber yazısı), `tr.ts` içindeki 80 teknik özellik etiketi ve rehber yazısı gövdesi. Bu havuzdan 46 aday kavram çıkarıldı; her adayın sitede geçtiği betikle kanıtlandı (46/46). Sitede geçmeyen terim ilk dalgaya girmez.
+
+### 4.2 Dış talep ve sınırı
+
+Dış talep için Google arama önerisi kullanıldı (R1.1; ücretsiz, hacim vermez). Her aday için 5 bilgi niyetli sonek denendi ("nedir", "ne demek", "ne işe yarar", "nasıl çalışır", "farkı"). Ölçüm iki kez koşuldu; 46 terimde fark 0.
+
+**Ham sayı yanıltıcıdır.** Çok anlamlı başlıklarda öneriler başka alanlara gider (yedi başlık: vmc (kontrollü mekanik havalandırma), atex, debi, erp (ekotasarım), bypass, pervane, devir hızı (rpm)). Bağlam sözcüğü eklenerek (fan, havalandırma, klima) yapılan ikinci ölçüm 25 terimin 20'unda sıfır döndü: bu yöntem teknik kavramın HVAC talebini AYIRT EDEMİYOR. Bu terimler için kanıt Search Console (ve varsa Ads hacmi) ile aranır; ölçümü GEO-SEO yapar.
+
+### 4.3 Dalga kuralı (hesaplanır; GEO-SEO teyit eder)
+
+| Dalga | Kural | Terim sayısı |
+|---|---|---|
+| D1 | OPS emriyle zorunlu (frekans konvertörü, invertör, evirici) YA DA sitede geçer VE bilgi niyetli öneri ≥ 4 ve çok anlamlı değil | 14 |
+| D2-ANLAM | Ham öneri sayısı HVAC talebi göstermiyor; kanıt GEO-SEO Search Console ölçümünden gelir | 7 |
+| D2-ZAYIF | Bilgi niyetli öneri < 4; kanıt bulunana dek ilk dalgaya girmez | 25 |
+
+Çok anlamlı baş kuralı: örnek önerilerin en az ikisi HVAC dışı alan sözcüğü taşır (tıp, tarih, finans, yazılım gibi; liste `terim-adaylari.json` içinde, depo dışı).
+
+### 4.4 İlk 10 terim (önerilen)
+
+1. frekans konvertörü
+2. invertör
+3. evirici
+4. hava perdesi
+5. jet fan
+6. nem alma cihazı
+7. statik basınç
+8. radyal (santrifüj) fan
+9. aksiyel fan
+10. ısı geri kazanım
+
+Önceki geçici listeden iki terim düştü: plug fan (talep 2, eşik altı) ve değişken hızlı sürücü/VFD (sitede geçmiyor; frekans konvertörü maddesinde eş anlamlı olarak, kaynağı varsa yer alır). Yerlerine statik basınç ve nem alma cihazı girdi. Dalga 1'in kalan dört terimi: ip koruma sınıfı, anma gücü, ses basıncı, hava hızı.
+
+### 4.5 Aday tablosu (özet sayılarla)
+
+Sütunlar: sitede = o terimi taşıyan farklı sayfa/etiket sayısı; talep = bilgi niyetli arama önerisi sayısı (hacim değil); üretici belgesi = belge sayısı (Türkçe sayfa/İngilizce sayfa).
+
+| No | Terim | Grup | Sitede | Talep | Talep sınıfı | TDK | Üretici belgesi | Dalga |
+|---|---|---|---|---|---|---|---|---|
+| 1 | frekans konvertörü (zorunlu) | cihaz | 3 | 8 | KANITLI | yok | 27 (3/233) | D1 (karar 325) |
+| 2 | invertör (zorunlu) | cihaz | 1 | 22 | KANITLI | yok | 34 (0/115) | D1 (karar 325) |
+| 3 | evirici (zorunlu) | cihaz | 1 | 6 | KANITLI | yok | 0 (0/0) | D1 (karar 325) |
+| 4 | radyal (santrifüj) fan | cihaz | 10 | 6 | KANITLI | yok | 33 (18/438) | D1 |
+| 5 | aksiyel fan | cihaz | 2 | 4 | KANITLI | yok | 5 (6/38) | D1 |
+| 6 | plug fan | cihaz | 3 | 2 | ZAYIF | yok | 4 (32/32) | D2-ZAYIF |
+| 7 | kanal tipi fan | cihaz | 6 | 2 | ZAYIF | yok | 6 (8/45) | D2-ZAYIF |
+| 8 | jet fan | cihaz | 3 | 8 | KANITLI | yok | 4 (22/22) | D1 |
+| 9 | çatı fanı | cihaz | 3 | 1 | ZAYIF | yok | 9 (4/19) | D2-ZAYIF |
+| 10 | hücreli aspiratör | cihaz | 3 | 2 | ZAYIF | yok | 2 (1/10) | D2-ZAYIF |
+| 11 | duman egzoz fanı | cihaz | 2 | 0 | ZAYIF | yok | 18 (3/68) | D2-ZAYIF |
+| 12 | hava perdesi | cihaz | 6 | 16 | KANITLI | yok | 2 (3/6) | D1 |
+| 13 | ısı geri kazanım | cihaz | 4 | 4 | KANITLI | yok | 12 (8/300) | D1 |
+| 14 | vmc (kontrollü mekanik havalandırma) | cihaz | 1 | 8 | BELIRSIZ-ANLAM | yok | 6 (26/33) | D2-ANLAM |
+| 15 | sığınak havalandırma | cihaz | 2 | 0 | ZAYIF | yok | 1 (2/0) | D2-ZAYIF |
+| 16 | nem alma cihazı | cihaz | 3 | 7 | KANITLI | yok | 4 (1/17) | D1 |
+| 17 | hvls (endüstriyel tavan vantilatörü) | cihaz | 2 | 1 | ZAYIF | yok | 2 (22/26) | D2-ZAYIF |
+| 18 | şömine ve baca fanı | cihaz | 2 | 0 | ZAYIF | yok | 2 (1/2) | D2-ZAYIF |
+| 19 | elektrikli kanal ısıtıcısı | cihaz | 2 | 0 | ZAYIF | yok | 4 (0/14) | D2-ZAYIF |
+| 20 | sulu batarya | cihaz | 2 | 1 | ZAYIF | yok | 2 (1/7) | D2-ZAYIF |
+| 21 | hız anahtarı (fan hız kontrolü) | cihaz | 2 | 1 | ZAYIF | yok | 23 (18/87) | D2-ZAYIF |
+| 22 | korozyona dayanımlı fan | cihaz | 2 | 0 | ZAYIF | yok | 22 (9/73) | D2-ZAYIF |
+| 23 | tekil oda ünitesi | cihaz | 1 | 0 | ZAYIF | yok | 1 (0/1) | D2-ZAYIF |
+| 24 | atex | kavram | 5 | 22 | BELIRSIZ-ANLAM | yok | 38 (121/121) | D2-ANLAM |
+| 25 | ptc sensörü | kavram | 1 | 2 | ZAYIF | yok | 17 (22/44) | D2-ZAYIF |
+| 26 | ec motor | kavram | 1 | 3 | ZAYIF | yok | 20 (68/74) | D2-ZAYIF |
+| 27 | statik basınç | kavram | 3 | 7 | KANITLI | yok | 21 (3/50) | D1 |
+| 28 | toplam basınç | kavram | 1 | 3 | ZAYIF | yok | 21 (0/43) | D2-ZAYIF |
+| 29 | debi | kavram | 6 | 26 | BELIRSIZ-ANLAM | VAR | 47 (50/402) | D2-ANLAM |
+| 30 | basınç-debi eğrisi (fan eğrisi) | kavram | 1 | 0 | ZAYIF | yok | 26 (0/260) | D2-ZAYIF |
+| 31 | ip koruma sınıfı | kavram | 2 | 4 | KANITLI | yok | 44 (4/167) | D1 |
+| 32 | erp (ekotasarım) | kavram | 1 | 30 | BELIRSIZ-ANLAM | yok | 22 (64/76) | D2-ANLAM |
+| 33 | motor verim sınıfı | kavram | 1 | 0 | ZAYIF | yok | 9 (0/25) | D2-ZAYIF |
+| 34 | yalıtım sınıfı | kavram | 1 | 1 | ZAYIF | yok | 12 (1/86) | D2-ZAYIF |
+| 35 | motor kutup sayısı | kavram | 1 | 3 | ZAYIF | yok | 11 (0/98) | D2-ZAYIF |
+| 36 | anma gücü | kavram | 1 | 7 | KANITLI | yok | 13 (0/21) | D1 |
+| 37 | ısıl verim | kavram | 2 | 1 | ZAYIF | yok | 7 (1/75) | D2-ZAYIF |
+| 38 | bypass | kavram | 1 | 32 | BELIRSIZ-ANLAM | yok | 9 (55/55) | D2-ANLAM |
+| 39 | higrostat | kavram | 1 | 3 | ZAYIF | VAR | 5 (0/19) | D2-ZAYIF |
+| 40 | voc sensörü | kavram | 1 | 1 | ZAYIF | yok | 4 (5/2) | D2-ZAYIF |
+| 41 | pm2.5 | kavram | 1 | 2 | ZAYIF | yok | 3 (3/3) | D2-ZAYIF |
+| 42 | co2 sensörü | kavram | 1 | 3 | ZAYIF | yok | 7 (17/16) | D2-ZAYIF |
+| 43 | pervane | kavram | 1 | 38 | BELIRSIZ-ANLAM | VAR | 44 (4/304) | D2-ANLAM |
+| 44 | ses basıncı | kavram | 2 | 4 | KANITLI | yok | 37 (6/267) | D1 |
+| 45 | devir hızı (rpm) | kavram | 2 | 45 | BELIRSIZ-ANLAM | yok | 55 (3/221) | D2-ANLAM |
+| 46 | hava hızı | kavram | 2 | 5 | KANITLI | yok | 8 (0/19) | D1 |
+
+## 5. Kaynak sırasının bugünkü kapsamı
+
+### 5.1 TDK (Güncel Türkçe Sözlük)
+
+46 adaydan yalnız 3 terimin tam adı TDK'de madde olarak var: debi, higrostat, pervane. Frekans konvertörü, invertör ve evirici TDK'de yok (OPS'un 2026-10-08 ölçümüyle aynı). Yani bu terimlerde birinci basamak boş; dayanak sonraki basamaklardan gelir.
+
+### 5.2 TS EN / IEC
+
+Sonuç (2026-10-09): 14 terimin 14'ü ERİŞİLEMEDİ, 0 BULUNDU, 0 BULUNAMADI. Birincil kaynak Electropedia (IEV) bot doğrulaması (AWS WAF challenge) arkasında; doğrulama aşılmadı ve aşılmaya çalışılmadı. Bu yüzden hiçbir terim için 'IEV'de yok' denemez. Arama özetlerinden gelen aday IEV numaraları Electropedia'dan doğrulanmadığı için bu belgeye YAZILMADI. Ücretli standart metni (TS EN 60529 gibi) ayrıca erişilemez. TS EN/IEC basamağı insan erişimi ya da izinli kurumsal erişim olmadan doldurulamıyor.
+
+Kapsanan terimler (14): frekans konvertörü (ERİŞİLEMEDİ); invertör (ERİŞİLEMEDİ); evirici (ERİŞİLEMEDİ); radyal (santrifüj) fan (ERİŞİLEMEDİ); aksiyel fan (ERİŞİLEMEDİ); jet fan (ERİŞİLEMEDİ); hava perdesi (ERİŞİLEMEDİ); ısı geri kazanım (ERİŞİLEMEDİ); nem alma cihazı (ERİŞİLEMEDİ); statik basınç (ERİŞİLEMEDİ); IP koruma sınıfı (ERİŞİLEMEDİ); anma gücü (ERİŞİLEMEDİ); ses basıncı (ERİŞİLEMEDİ); hava hızı (ERİŞİLEMEDİ).
+
+### 5.3 Üretici belgesi
+
+Kaynak dizininde 86 belge, 2211 sayfa var. Terim başına belge sayısı tabloda. Belge dili ayrıca sınıflandırılmadı; ölçülen, Türkçe kalıplarla eşleşen sayfa sayısının çoğu terimde İngilizce kalıplarla eşleşenden çok düşük olmasıdır (tablodaki TR/EN sütunu, ör. statik basınç 3/50, ses basıncı 6/267). Bu nedenle Türkçe tanımın tek dayanağı üretici belgesi olamaz; Türkçe karşılığın kaynağı TS EN/IEC ya da TDK olmalıdır, üretici belgesi teknik içeriği doğrular.
+
+## 6. Açık sorular ve çakışmalar
+
+1. **Rehber yazısıyla aynı sorguda yarışma (R1.3).** "Frekans konvertörü nedir" rehber yazısı ile sözlük maddesi aynı sorguyu hedefler. Öneri: madde kısa tanımı verir ve yazıya bağlanır, yazı ayrıntıyı taşır; GEO-SEO iki sayfanın sıralamasını izler. Karar GEO-SEO ölçümüne bağlı.
+2. **Sayfa adresi yapısal karardır.** Recep'e tek başına sorulur. Öneri adres çifti BLG-5 kartında yazılı; bu belge adres belirlemez.
+3. **Sayfa düzeni TASARIM'ın, kod URUN'ündür** ve 11 Ekim adres yayınından sonra yazılır.
+4. **D2-ANLAM yedi terimin** talep kanıtı GEO-SEO'dan gelmeden ilk dalgaya girmez.
+
+## 7. Madde yazım akışı
+
+1. Kaynak noktası bulunur: kaynak dizini (belge, sayfa), TDK ya da IEV. Alıntı depo dışı kayda yazılır.
+2. `scripts/rehber/alinti-dogrula.mjs` ile alıntı ham kaynakta doğrulanır.
+3. Metin `scripts/rehber/rehber-denetim.mjs` desenlerinden geçer (üstünlük, vaat, fiyat, rakip, olumsuz iddia).
+4. Recep önizleme görür (R5.6); onay olmadan yayın yoktur.
+5. Sözlük için ayrı kalıp kapısı yazılır; kapı onu gerektiren PR'da doğar (R8.1).
+
+## 8. Ölçüm
+
+Yayın günü taban ve 4 hafta sonrası rapor GEO-SEO'dadır (bölüm 1). Sorgu listeleri depoya girmez, yalnız özet sayılar girer.
 
 
 ---
@@ -32508,6 +35724,65 @@ kurulunca. Her emirde KAYNAK/CETVEL bloğu bu belgeyi gösterir.
 
 
 ---
+# FILE: docs\plans\onizleme-tiklama-listesi-2026-10-09.md
+
+# Cuma önizlemesi: nereye tıklayacağım (adres listesi)
+
+> v1 · 2026-10-07 · Şerit: ALTYAPI · Kart: ALT-37d (üst kart ALT-37, vade Perşembe 8 Ekim 18:00) · **Durum: LİSTE HAZIR; gerçek sunucuda henüz denenmedi**
+> **Yöneten cetveller:** `docs/standards/rota-dili-standard.md` (adres tablosu tek kaynak; eski adres tek yönlendirmeyle yeni adrese gider), `docs/standards/adres-semasi-standard.md`.
+> **Kaynaklar:** `src/config/rotaDili.veri.json` (satır 1-10), `docs/plans/rec300-model-adres-listesi-2026-09-23.csv` (satır 11-14), `src/data/eski-adres-tohum.json` (satır 15-17).
+> Okuyan: Recep, Cuma 9 Ekim 15:00-18:00. Okuma süresi 2 dakika.
+
+## Ne yapacaksın
+
+Önizleme sunucusu Cuma 14:30'da ayakta olacak; adresini OPS yazar. Aşağıdaki her satır için:
+
+1. Soldaki adresi (bugün canlı sitede açılan adres) önizleme adresinin sonuna yapıştır, Enter.
+2. Sayfa açılmalı ve adres çubuğu **sağdaki adrese dönmeli**. Tek seferde dönmeli; arka arkaya iki kez değişmemeli.
+3. Sağdaki adresi de bir kez doğrudan yapıştır. Aynen açılmalı, adres değişmemeli.
+
+Biri tutmazsa yalnız o satırın numarasını OPS'a yaz. Başka bir şey yazmana gerek yok.
+
+## Liste (18 adres)
+
+| # | Bugün (canlı sitede) | 11 Ekim'den sonra | Ne görmelisin |
+|---|---|---|---|
+| 1 | `/tr/about` | `/tr/hakkimizda` | Hakkımızda sayfası açılır. |
+| 2 | `/tr/contact` | `/tr/iletisim` | İletişim sayfası açılır. |
+| 3 | `/tr/urun-secici` | `/tr/secici` | Ürün seçici açılır. |
+| 4 | `/tr/destek/sss` | `/tr/sss` | Sık sorulan sorular açılır. |
+| 5 | `/tr/legal/kvkk` | `/tr/yasal/kvkk-aydinlatma-metni` | KVKK aydınlatma metni açılır. |
+| 6 | `/tr/legal/mesafeli-satis-sozlesmesi` | `/tr/yasal/mesafeli-satis-sozlesmesi` | Mesafeli satış sözleşmesi açılır. |
+| 7 | `/tr/destek/iade-degisim` | `/tr/yasal/iptal-ve-iade` | İptal ve iade sayfası açılır (destek altından yasal altına taşınır). |
+| 8 | `/en/destek/sss` | `/en/faq` | İngilizce sık sorulan sorular açılır. |
+| 9 | `/en/about` | `/en/about` (değişmez) | İngilizce hakkımızda açılır. Adres **değişmemeli**, yönlendirme olmamalı. |
+| 10 | `/legal/kvkk` (dil öneksiz) | `/tr/yasal/kvkk-aydinlatma-metni` | Başa `/tr` eklenir, KVKK metni açılır. Önizleme sunucusunda ölçüldü (tek yönlendirme). |
+| 11 | `/tr/products/avens-5-a-hiz-anahtari-01801` | `/tr/urun/avens-hiz-anahtarlari` | AVenS hız anahtarları **ürün ailesi** sayfası açılır; 5 A model bu sayfadan seçilir. Model sayfası yok (aşağıda, madde 2). **Haritaya bağlı.** |
+| 12 | `/en/products/avens-5-a-hiz-anahtari-01801` | `/en/products/avens-hiz-anahtarlari` | Aynı ürün ailesi, İngilizce adresle. **Haritaya bağlı.** |
+| 13 | `/tr/products/vortice-lineo-100-q-17143` | `/tr/urun/vortice-lineo-kanal-fanlari` | Vortice Lineo kanal fanları ürün ailesi açılır. **Haritaya bağlı.** |
+| 14 | `/tr/products/nimax-1004-t4-55kw-nx10034250` | `/tr/urun/casals-nimax` | Casals Nimax ürün ailesi açılır. **Haritaya bağlı.** |
+| 15 | `/category/fanlar` | yeni kategori ağacındaki Fanlar adresi (#1352 sonrası yazılır) | **Bekliyor** (#1352). |
+| 16 | `/category/hava-perdeleri` | yeni kategori ağacındaki Hava perdeleri adresi | **Bekliyor** (#1352). |
+| 17 | `/category/hiz-kontrolu-cihazlari` | yeni kategori ağacındaki Hız kontrol cihazları adresi | **Bekliyor** (#1352). |
+| 18 | `/tr/products/storm-serisi?sku=SEA-61143003` | `/tr/urun/storm-serisi` | Storm serisi **ürün ailesi** sayfası açılır ve adres çubuğunda `?sku=` kalmaz. Aile sayfasında hangi modelin seçili geldiği **görünmez**: sorgu bilinçli düşer (model sayfaları Pazar'da kapalı). **Yalnız 3-C önizlemesinde** (URUN ölçümü, #1811); Cuma önizlemesinde bu adres aile sayfasını yönlendirmesiz çizer ve ön kontrol bu satırda KIRMIZI verir, beklenen budur. |
+
+## İki şey Cuma'da belirsiz
+
+1. **Satır 15-17 bekliyor.** Yeni kategori ağacı (#1352) birleşmedi; hedef adresler canlı veritabanında henüz yok. #1352 birleşince bu satırlara yeni adresler yazılır. Cuma'da bu üçü sınanamaz.
+2. **Satır 11-14 haritaya bağlı ve ürün ailesine gider.** Eski ürün adresleri, eski adresleri yeni adrese eşleyen bir harita dosyasıyla yönlenir. Harita depoda boştur (`src/lib/adres/haritaKaynagi.ts`); önizleme başlatıcısı (ALT-37c, `--adres` kipi) haritayı canlı veritabanından üretip yalnız önizleme ağacına bağlar. Harita girmezse bu dört satır yönlenmez; bu adres kuralının bozuk olduğu anlamına gelmez, harita girmemiştir. Hedef model sayfası değil **ürün ailesi** sayfasıdır: model sayfaları yalnız `src/config/yayindaModeller.veri.json` listesindeki modellerde açılır (karar 259, kısa pilot) ve bu liste bugün boştur. Bir model açılırsa o modelin eski adresi model sayfasına gider; makine taraması listeyi kendisi okuyup beklentisini ona göre kurar, bu belge elle yenilenir.
+
+Satır 1-9 yalnız rota dili tablosuna bağlıdır; harita ya da #1352 gerekmez.
+
+**Satır 18 (10 Ekim'de eklendi, OPS emri ALT-50).** Eski ürün adreslerinin `?sku=` ile gelen biçimi tek yönlendirmeyle ailenin sayfasına gider, `?sku=` düşer. URUN ölçtü (URN-85): `/tr/products/storm-serisi?sku=SEA-61143003` → tek 308 → `/tr/urun/storm-serisi`; küçük harfli sku aynı. Bu kural 3-C PR'ının (#1811) içindedir, Cuma önizlemesinde yoktur; satır yalnız 3-C dalının önizlemesinde sınanır.
+
+## Makine de ölçüyor
+
+Aynı kuralı 247 adreste tarama betiği (`scripts/adres/onizleme-tarama.cjs`, PR #1744) sınar: tablodan 20 yeni, 20 eski, 2 değişmeyen ve 11 dil öneksiz adres; 47 ürün ailesinden 94 model adresi (pilot liste boşken hepsi 404 olmalı: model sayfası yok) ve 94 eski adres (ürün ailesine tek yönlendirme); 6 eski kategori adresi. Başlatıcı bu taramayı kendisi koşar ve özetini basar. Gerçek önizleme sunucusunda 9 Ekim'de ölçüldü: 241 tamam, 0 kırmızı, 6 bekliyor. Kırmızı çıkarsa satırları adıyla listeler. Betik yalnız okur (GET), hiçbir şeyi değiştirmez.
+
+Bu liste rota dili tablosundan ve model listesinden türetildi; tablo değişirse yeniden üretilir. Tablo tek kaynaktır, bu belge değildir.
+
+
+---
 # FILE: docs\plans\ops52-adres-dili-mekanizma-plani-2026-10-04.md
 
 # OPS-52 — Adres dili mekanizması (kapalı anahtar arkasında) — ölçüm + plan
@@ -33447,7 +36722,10 @@ erişimi var, sonuç bu tazelemede aranmadı) · linkinator + unlighthouse yayı
    hreflang/canonical, linkinator kırık 0 / zincir 0.
 4. **IndexNow adımı (karar 164 A) — yayınla AYNI yayında:**
    a. #1459 içeriği (anahtar `src/config/indexnow.ts`, `public/<anahtar>.txt`, yol süzgeci) 3-C ile birlikte ya da hemen önce iner;
-      bayrak açık olduğundan süzgeç devre dışı, bildirim serbest.
+      bayrak açık olduğundan süzgeç devre dışı, bildirim serbest. **Düzeltme (URN-10, 2026-10-11): bu varsayım yanlıştı** —
+      webhook yol listesi iki şemayı birden üretir (tazeleme için doğru); süzgeç açık kipte de çalışır ve IndexNow'a yalnız
+      `adresUret(…, true)` biçimli adresler gider (`src/lib/seo/indexnow.ts` `indexNoweGiderMi`; eski şema, `/sitemap.xml`
+      ve `EN_YAYIN` kapalıyken `/en/...` gitmez).
    b. Canlıda `https://venthub.com.tr/<anahtar>.txt` **200, 32 bayt, içerik = anahtar** ölçülür.
    c. **Hangi adresler:** yeni sitemap'in TÜM adresleri (bugün 88; yayından sonra 442 model + aile + kategori + dal + marka + statik),
       tek toplu bildirim (tavan 10.000). **Eski adresler BİLDİRİLMEZ** (308). Site haritası kaynağı canlı `sitemap.xml`.
@@ -33470,6 +36748,82 @@ erişimi var, sonuç bu tazelemede aranmadı) · linkinator + unlighthouse yayı
 ## 6. OPS'tan beklenen
 
 Yalnız onay: bu sıra ve §4 yayın günü listesi. Karar isteyen yeni soru yok (164 cevaplandı; karar 64 paragrafı zaten OPS'ta).
+
+
+---
+# FILE: docs\plans\rec-300-plan-tazeleme-2026-10-08.md
+
+# REC-300 — plan tazeleme (bugünkü master'a göre) · 2026-10-08
+
+> **URUN · Bu belge PLAN'dır: kod yok, migration yok, prod yazımı yok.** Ana plan
+> [rec-adres-agac-tek-yayin-2026-09-07.md](rec-adres-agac-tek-yayin-2026-09-07.md) (v5) yerinde durur;
+> önceki tazeleme [rec-300-plan-tazeleme-2026-09-29.md](rec-300-plan-tazeleme-2026-09-29.md) bu belgeyle **yerini devreder**.
+> Burası "09-29'dan bu yana ne değişti, ne kaldı, yayın günü ne sırayla koşar" tazelemesidir.
+> **Emir:** OPS 2026-09-29 (URN-38), 2026-10-06 GEO paketi eki (kısa pilot kabul ölçütleri).
+
+**KAYNAK/CETVEL:** ana plan v5 · `canonical-url-standard.md` · `rendering-cache-standard.md` ·
+`yayin-gorunurluk-denetim-standard.md` (IndexNow satırı) · [ops52-adres-dili-mekanizma-plani-2026-10-04.md](ops52-adres-dili-mekanizma-plani-2026-10-04.md) ·
+Kararlar: K3-b, K4, **157**, **161**, **164 = A**, **249** (toplu IndexNow yalnız yayında değişmeyen adreslere), **259** (kısa pilot; metni bu depoda yok, kabul ölçütleri Kanban kartı URN-38 notundan).
+**Ölçüm tazeliği:** master `51fc924f4` (2026-10-08); bayraklar `src/config/features.ts` → `ADRES_SEMASI_K3B = false` (satır 130), `EN_YAYIN = false` (satır 114);
+`get_search_suggestions` dönüş tipi canlı veritabanından okundu 2026-10-08;
+§4'teki aile EN adı, kategori EN açıklaması ve REC-434 ölçümleri canlı DB ve canlı sayfadan 2026-10-09 (URN-73).
+**YÖNTEM:** şerit (URUN), elle; kod yayını yok.
+
+## 1. 09-29'dan bu yana ne değişti
+
+| Olay | Etkisi |
+|---|---|
+| **#1352 (Faz 1-B) birleşti** 10-06 | Kategori ağacı + Casals + 40 aile adresi canlı veritabanında. Yayın günü listesinden **"Faz 1-B merge" adımı DÜŞTÜ**. Canlı ölçüm: 103 kontrol, başarısız 0. Bayrak kapalı olduğundan görünen site değişmedi. |
+| **URN-53** (#1720, #1732, #1733, #1735, #1736) | Eski adres yönlendirmeleri, rehber bağları, sessiz fan serisi ve içerik hattı **yeni aile slug'ına** çevrildi; eski slug köprüsü kaldırıldı. Zincir kalmaz (ALT-13 ön koşulu). |
+| **OPS-51** (#1692 migration, #1686 kod) | Casals ayrı marka, Flexiva marka kaydı (noindex), Sığınak 7. kök kategori; Casals ve Flexiva 308'leri kalktı. Marka sayısı 7. |
+| **3e tamam** (#1510, #1493, #1557, #1645) | Site haritası adresleri `adresUret` üzerinden; model adresleri haritaya yalnız bayrak açıkken girer (INV-SITEMAP-MODEL-1); EN yazım eşitlendi. |
+| **3g büyük ölçüde** (#1561, #1651, ALT-16 #1716) | Webhook aile/kategori/eski slug/model yollarını tazeler. |
+| **URN-31** (#1703), **URN-38** (#1715) | "Yayındaki modeller" listesi mekanizması (bugün BOŞ, kapalı kipte sıfır fark); model rotasında veri yokken 200 boş sayfa yerine hata. |
+| **IndexNow** (#1459 → `ecef2d5d1`, SEO-12 #1660) | Anahtar + doğrulama dosyası master'da; K3-b adresleri yayına kadar süzülür; toplu kip yalnız yayında değişmeyen adresleri bildirir (karar 249). |
+| **OPS-52 + ALT** (#1681, #1682, #1728, #1744, #1745) | Adres dili mekanizması (kapalı), adres matrisi taban ölçümü (245 adres), eski adres haritası üreten elle tetikli iş akışı, önizleme adres taraması (78 vaka) ve Recep'in Cuma önizleme listesi (17 adres). |
+| **URN-59 / #1738** (açık) | Ürün sayfasında çift gövde (H1=2) bayrak açılınca tek gövdeye iner; bayrak kapalıyken bire bir aynı. Birleşme karar 298 Recep özetine bağlı. |
+
+## 2. Faz durumu (master'a göre, 2026-10-08)
+
+| Faz | Durum | Kanıt |
+|---|---|---|
+| 0 cetvel · 1-A · 1-B · 2 · 3a · 3b · 3c · 3d · **3e** | **Bitti** (bayrak arkasında; canlıda görünmez) | PR'lar §1 ve ana plan |
+| **3f** arama RPC (adres yerine kimlik) | **KALDI — MIGRATION, Recep onayı.** Ölçüm: `get_search_suggestions` bugün hâlâ `TABLE(type, label, url, metadata)` döndürür, yani adres DB'de üretiliyor. | canlı veritabanı 10-08 |
+| **3g** tazeleme | **Büyük ölçüde bitti.** Kalan: model yolu dışındaki kapsam ölçümü (kart notu 10-02 "ölçüm sürüyor"), bu tazelemede yeniden ölçülmedi. | #1561, #1651, #1716 |
+| 3-C bayrak `true` + harita + config'ten 25 kural silme (13 dilsiz kategori + 6 Lineo + 6 ürün; "19" yanlıştı, tohum testi ve ana plan 25) | Yayın günü, tek geri dönüşsüz adım. Sırası ALT-13 ve #1738 ile birlikte OPS belirler. | ana plan Faz 3-C |
+| 4 Recep önizleme | Araç + tarama + 17 adreslik liste hazır | #1413, #1744, #1745 |
+| 5 yayın | §3 | — |
+
+## 3. Kısa pilot (karar 259) kabul ölçütleri ve yayın günü sırası
+
+**Kabul ölçütleri** (ana plan v5 bunları içermiyordu, buraya eklendi; kaynak Kanban kartı URN-38 notu 10-06):
+
+1. Aile, kategori ve marka adreslerinin her biri **tek 308** ile yeni adrese gider (zincir 0).
+2. Model adresleri **yalnız "yayındaki modeller" listesindekiler** için açılır; liste dışı model adresi haritada ve bildirimde yoktur. Pasif/arşivli SKU'nun listeden elenmesi açma PR'ının ağ kapısı işidir (URN-51, ölçüt 3).
+3. IndexNow süzgeci pilot kapsamında **bildirilecek adres sayısını 0** tutar; toplu bildirim pilotun değil tam yayının adımıdır (SEO-21, karar 249).
+
+**Yayın günü sırası (güncel):**
+
+1. Önkoşul ölçümleri: Recep önizlemesi (Faz 4) onayı · `canli-olc.sh` ve `canli-kapi.mjs` taban satırı · linkinator + unlighthouse taraması · GSC taban ölçümü (SEO-1/SEO-2 #1648 ile alındı, yayın günü yenilenir).
+2. **Faz 3-C merge** (bayrak `true` + harita + config'ten 25 kural silme). Aynı yayında #1738 (tek gövde) bayrağa bağlı iner.
+3. Deploy sonrası yayın ölçümü: 5 örnek yeni adres 200, eski adresler **tek** 308, site haritası satır sayısı = beklenen, hreflang/canonical, linkinator kırık 0 ve zincir 0.
+4. IndexNow (karar 164 A, 249): anahtar dosyası 200 ve 32 bayt ölçülür → `--kuru` sayısı beklenene eşit mi → toplu betik bir kez; pilot kapsamında sayı 0 (ölçüt 3). **Karar 327 (OPS, 2026-10-09):** İngilizce vitrin 18 Ekim'de açılacak; Pazar günü `EN_YAYIN` kapalı, IndexNow yalnız TR. Pilottaki “bildirim 0” hükmünün yerine geçmez: Pazar günü yalnız adresi değişen TR sayfalar bildirilir. Beklenen URL sayısını GEO-SEO verir. Adım adım komutlar: `docs/plans/yayin-gunu-runbook-2026-10-11.md` §5.
+5. GSC site haritası yeniden gönderilir; KATALOG ve OPS'a haber (karar 157): katalog paketi canlı DB'den yeniden üretir.
+6. İki hafta izleme (ana plan §8).
+
+## 4. Riskler / açık noktalar
+
+* **3f migration** (Recep "şimdi yap"): `get_search_suggestions` dönüş tipi değişir (DROP+CREATE aynı işlemde), tek tüketici aynı PR'da. Kural 13 gereği `--auto` ile birleşmez.
+* **Önkoşul ölçümü (canlı DB, 2026-10-09; `product_families.name_i18n`, `categories.metadata.description_i18n`):**
+  * 7 ailenin EN adı **dolu** (REC-226 ile gelen aileler, toplam 67 ürün; güncel slug'lar `casals-nimax`, `casals-nimus`, `casals-enkelfan-ec-plug`, `vortice-vorticent-cms-atex-santrifuj-fanlar`, `avens-qe-b-kasa-serisi`, `avens-dikdortgen-kanal-tipi-radyal-fanlar`, `seat-atex-ptc-sensoru`; önceki planlardaki `avens-nimax` gibi adlar eskidir). 47 aktif ailenin 47'sinde EN adı dolu, EN adında Türkçe harf 0; EN adı TR adıyla aynı olan 8 aile marka/model adıdır.
+  * `EN_YAYIN` şart 3 (kategori EN açıklaması) **karşılanmıyor: 24/28.** 10-06'da açılan dört alt kategori (`cabinet-fans`, `plug-fans`, `electric-heated-air-curtains`, `unheated-air-curtains`; 44 ürün) hem TR hem EN açıklamada boş. Alan KATALOG'un (`description_i18n`). Bu dört `/en/` sayfasında görünür metin 170-177 kelime ve Türkçe harf 0: boşluk Türkçe sızıntı değil, kategori paragrafının yokluğu.
+  * `EN_YAYIN`'ın bu yayında açılıp açılmayacağı OPS'ta bekleyen karar; bayrak bugün `false`.
+* **#1738** karar 298 özetine kadar birleşmez; 3-C sırası değişirse ürün sayfası çift gövde ile (H1=2) kalmaya devam eder (bugünkü durum, canlı ölçüldü 10-08).
+* **REC-434** (ölü hızlı seçim slug'ları): **kapalı.** #1501 iki ölü kartı kaldırdı ve `showcaseOluSlug` kapısını ekledi; kayıt 2026-09-30'da Done. Ölçüm 2026-10-09: kaynakta `elektrikli-isitici` / `ortam-havali` adres olarak 0 (kalanlar yorum satırı ve 3D model adı eşlemesi), DB'de bu adla kategori 0, canlı `/tr/category/hava-perdeleri` sayfasındaki iç bağlantılar 2/2 HTTP 200. Yayın öncesi yapılacak iş yok.
+
+## 5. OPS'tan beklenen
+
+Yalnız onay: §3 sırası ve ölçütleri. Karar isteyen yeni soru yok.
 
 
 ---
@@ -33619,6 +36973,11 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
   DB ile birebirlik **zamanlanmış iş** olarak prod DB'ye karşı ölçülür (INV-ADRES-HARITA-1'in DB kolu).
   Çelişki giderildi: **harita commit'lenmez** (derleme çıktısı); **envanter dosyası** (§6, eski → yeni tam
   liste) commit'lenir ve kapı onu okur.
+  **KARAR DEĞİŞTİ (10 Ekim 2026, Faz 3-C PR'ı #1811): harita COMMIT'LENİR**
+  (`src/data/generated/eski-adres-haritasi.json`); üretim `harita-uret.yml` (canlı DB'ye karşı salt-okuma,
+  migration sonrası); DB değişince yeniden üretilip commit'lenir; bayatlık kapısı
+  `harita-3c-karsiliklari.test.ts` + zamanlanmış DB kolu. Yukarıdaki "commit'lenmez" cümlesi bu kararla
+  yürürlükten kalktı.
 - **Dil (Y3, ölçüldü):** bugünkü `detectLocale` `accept-language` içinde `en` geçiyor mu diye bakıyor;
   Türkçe Chrome'un varsayılanı `tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7` → Türkçe ziyaretçi `/category/fans`'ta
   EN (noindex) sayfaya düşüyor. v5: **slug'ı Türkçe olan dilsiz eski adres deterministik TR'ye 308**
@@ -33629,6 +36988,20 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
 - **Bayat harita (O1):** derlemeden sonra değişen slug'da zincir en çok **2 hop** (harita → eski hedef → sayfa
   308) — cetvele yazılır. Slug değişince tazeleme: webhook dalı Vercel **deploy hook**'unu tetikler (gün
   içinde ≤ 1 yeniden derleme, sıraya alınır) + gecelik derleme yedeği.
+- **Takma ad okuma yolu (karar 310 A, 10-08 canlı salt-okuma ölçümü):** `url_takma_adlari` anon'a kapalıdır (42501) ve
+  Vercel derleme ortamına `service_role` KONMAZ; tek yol parametresiz, yalnız-okuma `public.url_takma_adlari_listele()`
+  (SECURITY DEFINER, süzgeç `tenant_id = (select jwt_tenant_id())`). Derleme anon anahtarıyla koşar, anahtarda
+  `app_metadata.tenant_id` yoktur → `jwt_tenant_id()` **varsayılan kiracıyı** döndürür (gövdede claim yok/boş/bozuk →
+  varsayılan; anon claim'iyle ölçüldü: dönen kiracı `tenants`'taki tek kiracı, 49 takma ad satırının 49'u onun).
+  Tohumdaki `kiraciId` varsayılandan farklıysa işlev YABANCI satır döndürür ve üretici hata verip derlemeyi düşürür
+  (fail-closed, `haritaUret.ts`); parametre eklenmedi, çünkü anon çağıran kiracıyı kendisi seçerdi. İşlev canlıda
+  (migration #1757, 10-08, kural 13). Listede hedefi görünmeyen (silinmiş aile) takma adlar da bulunur: işlev kiracının
+  satırlarının TAMAMINI döner, hedefin görünürlüğüne bakmaz; ürün ve kategori zaten anon'a kiracı süzgeciyle açıktır,
+  aile yalnız silinmemişse (`deleted_at is null`). Bekçi `url-takma-adlari-listele.test.ts`: statik kol CI'da koşar
+  (gövde normalize edilmiş TEK beklenen dizeyle birebir karşılaştırılır; alt dize yetmez, `is not null` gibi süzgeci
+  söken yazımlar geçerdi). Davranış kolu (ikinci kiracı satırı varken yabancı satır dönerse KIRMIZI) PGlite ister;
+  PGlite depoda bağımlılık olmadığı için CI'da KOŞMAZ, yerelde `PGLITE_ZORUNLU=1` ile koşar (komut test dosyasının
+  başlığında).
 
 ## 5. Fazlar
 
@@ -33837,7 +37210,7 @@ sınırına uzak; Cloudflare/OpenNext'te koşullu aynen çalışır). Kapanan: v
 | # | bulgu | derece | v5 cevabı |
 |---|---|---|---|
 | Y1 | DB'den üretilen harita, DB'de hiç olmamış eski adresleri (13 dilsiz kural kaynağının 7'si, 6 Lineo) kaybeder; 4 hedef bugün 404 | YÜKSEK | §4.1 tohum dosyası; ölü hedefler en yakın canlı adrese; silinen satır 25 |
-| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; harita commit'lenmez, envanter commit'lenir |
+| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; ~~harita commit'lenmez~~ → **KARAR DEĞİŞTİ (10 Ekim 2026, #1811): harita commit'lenir** (bkz. §4.1 karar notu); envanter commit'lenir |
 | Y3 | `detectLocale` Türkçe Chrome'u EN'e yolluyor (ölçüldü) | YÜKSEK | §4.1 Türkçe slug'lı dilsiz adres → TR 308; q değeri ayrıştırma |
 | Y4 | `/tr/products/<x>` için sayfa katmanı dalı yok | YÜKSEK | Faz 3 m.5 genişledi |
 | O1 | bayat harita 2 hop | ORTA | §4.1 cetvel + deploy hook + gecelik derleme |
@@ -37566,14 +40939,14 @@ Emir bu hükmü gerekçesiyle bize bırakmış. **Kategori slug'ı kısa ve kano
 3. **Her zenginleştirme bir göç demek:** 308 zinciri, sitemap yenilemesi, `translation_key` ve sözlük dokunuşu. 22 dolu dal × iki dil = 44 adres; kazancı ölçülmemiş bir işlem için.
 4. **Kanonik kimlik EN slug'dır** (plan §1). Kimliği pazarlama metniyle şişirmek, kimliğin işini bozar.
 
-**Tek istisna — ad düzeltmesinden doğan slug:** Recep kararı `Asit Dayanımlı → Korozyon Dayanımlı Fanlar` (11-09). Burada TR slug `asit-dayanikli-fanlar` artık adı yansıtmıyor. Öneri: `metadata.slug.tr = korozyon-dayanimli-fanlar` yazılır, eski TR slug 308 ile yaşar, **kanonik EN slug `acid-resistant-fans` DEĞİŞMEZ** (kimlik sabit kalır, kod ve CSV dokunulmaz).
+**Tek istisna — ad düzeltmesinden doğan slug:** Recep kararı `Asit Dayanımlı → Korozyon Dayanımlı Fanlar` (11-09). Burada TR slug `asit-dayanikli-fanlar` artık adı yansıtmıyor. Öneri: `metadata.slug.tr = korozyon-dayanimli-fanlar` yazılır, eski TR slug 308 ile yaşar, **kanonik EN slug `acid-resistant-fans` DEĞİŞMEZ** (kimlik sabit kalır, kod ve CSV dokunulmaz). **Yerine geçti: karar 292 (10-05):** kanonik EN slug `corrosion-and-acid-resistant-fans` oldu, eski EN slug `acid-resistant-fans` 308 ile yaşar; "DEĞİŞMEZ" hükmü bu slug için artık geçerli değil (TR adres ve ad için karar 287 de bkz.). Model adres listesinin `dal` sütunu ve adres üreticisi ÜRÜN şeridindedir; güncellemesi orada yapılır.
 
 ## 7 · Ölçülen düzeltmeler (slug tarafı)
 
 | Kayıt | Bugün | Kusur | Öneri |
 |---|---|---|---|
 | `centrifugal-fans` | ad `Santrifüj / Radyal Fanlar`, tr slug `radyal-fanlar` | **ad** eğik çizgili; slug **doğru** | ad → `Radyal (Santrifüj) Fanlar`. Slug değişmez → **301 yok** |
-| `acid-resistant-fans` | ad `Asit Dayanımlı Fanlar`, tr slug `asit-dayanikli-fanlar` | ad/slug "dayanımlı↔dayanıklı" tutarsız | ad → `Korozyon Dayanımlı Fanlar`, tr slug → `korozyon-dayanimli-fanlar` + 308 |
+| `acid-resistant-fans` | ad `Asit Dayanımlı Fanlar`, tr slug `asit-dayanikli-fanlar` | ad/slug "dayanımlı↔dayanıklı" tutarsız | ad → `Korozyon Dayanımlı Fanlar`, tr slug → `korozyon-dayanimli-fanlar` + 308. **Yerine geçti: karar 287 (ad, TR slug) ve karar 292 (10-05, EN slug → `corrosion-and-acid-resistant-fans`, eskisi 308)** |
 | `spare-parts-sensors` | `translation_key = null` | cetvel §4 `translation_key` zorunlu; ham `c.name` render yasak | `sub.spare-parts` açılır, sözlüğe tr+en girer |
 | `jet-fans` + `parking-jet-fan` | ikisi de `is_active=false`, ürün 0 | **iki satır aynı kavram**; tr slug'lar neredeyse çakışıyor (`otopark-jet-fanlari` / `otopark-jet-fan`) | tek satıra indirilir (cetvel §6 `parking-jet-fan` kanonik), diğeri kapatılır |
 | Ürün slug'ları | yok | `products.metadata.slug` alanı yok | §1 hükmü ile açılır |
@@ -37582,6 +40955,220 @@ Emir bu hükmü gerekçesiyle bize bırakmış. **Kategori slug'ı kısa ve kano
 
 — DESIGN-MENU (Fable) 2026-09-11
 
+
+
+---
+# FILE: docs\plans\rec300-model-adres-b1.md
+
+# REC-300 · Model adres şeması · B-1 (alt kategori tek seviye)
+
+- Sahip: URUN · Kart: URN-85 · Durum: B-1 kod PR'ı ile depoya girdi; bayrak KAPALI
+- Karar: SEO-35 = B-1 (Geo-SEO adres şeması karar belgesi, sürüm 5, 2026-10-10). Bayrak açılışı ayrı onaya bağlıdır; bu belge ve ona bağlı kod PR'ı bayrağı AÇMAZ.
+- Yöneten cetveller: docs/standards/adres-semasi-standard.md · docs/standards/canonical-url-standard.md · docs/standards/rota-dili-standard.md · docs/standards/rendering-cache-standard.md · docs/standards/migration-safety-standard.md (slug indeksi) · docs/standards/yayin-gorunurluk-denetim-standard.md (Y2/Y3).
+- Bağlam: docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md (Faz 3-C), docs/plans/rec300-model-adres-kategori-tr-adlari-2026-10-10.md (kategori TR adları, migration 20261010090000 canlı).
+
+## 1. Karar (değişmez)
+
+İki ayrı okuma vardır ve karıştırılmaz: **3-C'ye göre** sütunu #1811'in (3-C) adresiyle karşılaştırır; **bugünkü canlıya
+göre** sütunu ziyaretçinin bugün gördüğü adresle. Açılışta (19 Ekim, bayrak açılınca) canlıya göre değişen her adres tek
+308 ile yenisine gider.
+
+| Yüzey | TR | EN | 3-C'ye göre | Bugünkü canlıya göre |
+|---|---|---|---|---|
+| Ana kategori | `/tr/kategori/<kök>` | `/en/category/<kök>` | değişmez | TR değişir (`/tr/category/<kök>` → tek 308); EN değişmez |
+| Alt kategori | `/tr/kategori/<alt-slug>` | `/en/category/<alt-slug>` | DEĞİŞİR: iki seviyeli adres kalktı, TEK seviye; kategori adresinde kimlik soneki YOK | TR ve EN değişir (`<kök>/<alt>` → `<alt-slug>`, tek 308) |
+| Ürün ailesi | `/tr/urun/<aile-slug>` | `/en/products/<aile-slug>` | değişmez (adresUret.ts yeniAdres) | TR değişir (`/tr/products/<aile>` → tek 308); EN değişmez |
+| Model | `/tr/urun/<ad>-p-<sku>` | `/en/products/<ad>-p-<sku>` | değişmez; yayındaki liste dışı SKU aile + `?sku=` | ölçülmedi (runbook §4.1 matrisi) |
+| Marka | `/tr/markalar/<slug>` | `/en/brands/<slug>` | değişmez | TR değişir (`/tr/brands/<slug>` → tek 308); EN değişmez |
+
+EN yayını kapalıyken (`EN_YAYIN`) bütün `/en/` sayfaları noindex'tir ve site haritasında yoktur; alt kategori bunun
+dışında noindex DEĞİLDİR (`robots` yalnız pasif kategoride yazılır, sitemap.ts alt kategoriyi tek segmentle ilan eder).
+
+## 2. Eski adresler → yeni adres (tek sıçramalı 308)
+
+| Eski | Yeni | Not |
+|---|---|---|
+| `/tr/category/<üst>/<alt>` (bugünkü canlı, iç içe) | `/tr/kategori/<alt-slug>` | TEK sıçrama; iki sıçrama yok |
+| `/tr/kategori/<üst>/<alt>` (3-C'nin iki seviyeli adresi) | `/tr/kategori/<alt-slug>` | aynı hedef |
+| `/en/category/<üst>/<alt>` | `/en/category/<alt-slug>` | EN karşılığı |
+| pasif kategori | aktif üstü varsa üstün adresi, yoksa `/tr/urunler` | 7 pasif kategori; hedef haritada güncellenir |
+
+Üst slug'ı karar vermez: yanlış üstle istenen iç içe adres de aynı kanonik adrese gider.
+
+## 3. Kapsam ve bayrak
+
+- Bayrak ADRES_SEMASI_K3B (src/config/features.ts) KAPALI kalır. Bayrak kapalıyken canlıda davranış farkı SIFIRDIR; yeni davranış yalnız bayrak açıkken çalışır.
+- Bu PR'da DEĞİL: next.config.mjs kural silmesi, eski-adres-haritasi.json yeniden üretimi (ALTYAPI), #1811 (3-C ikinci PR) rebase'i, bayrak yazımı, kategori slug indeksi migration'ı (ayrı PR).
+- Aile ve model adresi bugünkü K3-b kodunda zaten bu biçimde üretilir (adresUret.ts); aile slug 47/47 tekil (ölçüm 2026-10-10). Tek fark kategori adresinin kuruluşudur.
+
+### Kod haritası (bu PR)
+
+| Dosya | Değişiklik |
+|---|---|
+| src/utils/adresUret.ts | kategori nesnesi `dal` verilince `/<bölüm>/<dalın-slug'ı>` üretir (üst adrese girmez), iki dilde; kapalı kip (`bugunkuAdres`) aynı |
+| src/lib/data/kategoriSegmenti.ts | `kategoriKanonikAdresi` üstten bağımsız; `kategoriRotasiniUygula` iki segmentli isteği `istenen` ne olursa olsun 308 yapar; aktif kategori için üst sorgusu ödenmez; yeni `kategoriIcIceAdresiYonlendir` (`Promise<never>`) |
+| src/app/[lang]/kategori/[kok]/[[...dal]]/page.tsx | rota klasörü KORUNDU; `istenen` yalnız ilk segmentten kurulur; iç içe adreste `generateMetadata` boş; `generateStaticParams` her aktif kategoriyi kendi TR slug'ıyla üretir |
+| src/app/[lang]/category/[categorySlug]/page.tsx | EN alt kategori burada çizilir; K3-b `generateStaticParams` kök + alt |
+| src/app/[lang]/category/[categorySlug]/[subCategorySlug]/page.tsx | bayrak açıkken iki dilde yalnız yönlendirir; bayrak kapalı dal aynen |
+| src/app/_components/kategoriSayfasi.tsx | `ust` prop'u kalktı (kanonik adres üstten bağımsız) |
+| src/config/markaYonlendirmeleri.mjs | k3b hedefi tek segment; kapalı dal aynı |
+| src/utils/yuzeyAdresleri.ts, src/lib/adres/eslestirici.ts, src/lib/adres/tazelemeYollari.ts, src/lib/seo/jsonld.ts, src/app/sitemap.ts | yorum güncellemeleri; davranış değişmedi (eşleştirici hedefini `adresUret`'ten alır, otomatik tek segment oldu) |
+
+## 4. İş sırası
+
+| # | İş | Sahip | Bekler |
+|---|---|---|---|
+| 1 | Kategori slug dil başına benzersizlik ölçümü + migration taslağı | URUN | — |
+| 2 | B-1 kod PR'ı (master'a, bayrak KAPALI) | URUN | — |
+| 3 | Bağımsız okuyucu: bayrak kapalıyken fark sıfır + tek sıçrama kanıtı | URUN-doğrulayıcı | 2 |
+| 4 | Migration PR'ı: kategori slug dil başına benzersiz indeks (kural 13; şema tabanı aynı gün yenilenir; gölge denemesi birleşmeden önce koşar) | URUN yazar ve birleştirir (kural 13, karar 224: Recep'in onayı işi koşan URUN penceresinde verilir) · ALTYAPI taban | Recep onayı, gölge koşusu |
+| 5 | Eski→yeni harita yeniden üretimi (441 ürün / 47 aile / 35 kategori; kategori hedefleri tek seviye) | ALTYAPI | 2 birleşmiş |
+| 6 | #1811'i B-1 koduyla güncelle (master'a rebase, harita commit'i, bayrak true kalır, E2E kalıpları tek seviyeye) | URUN | 2 ve 5 |
+| 7 | Önizleme + 243 adres matrisi, SOĞUK önbellekle | ALTYAPI | 6 |
+| 8 | Tam doğrulama: adres-yayin-denetim, link-tara, bot-karnesi, sayfa-kalite | GEO-SEO | 7 |
+| 9 | canli-kapi kategori sayacı iki adres kipinde + llms.txt bağlantıları | GEO-SEO | — |
+| 10 | Yayın: #1811 birleştirme + yayın günü ölçümleri (Y2) | OPS birleştirir · URUN + GEO-SEO ölçer | 8, yayın onayı |
+
+İndeks YAYINDAN ÖNCE uygulanmış olmalıdır (adım 4 → adım 10).
+
+## 5. Riskler
+
+- Kök ile alt slug aynı olursa tek seviyede çakışır: adım 1 ölçtü (aşağıda), adım 4 indeksi kalıcı korur.
+- Bugünkü canlı `/tr/category/<kök>/<dal>` yayında tek sıçramayla yeni adrese gitmeli; haritada ve matriste ölçülür (adım 5-7).
+- Pasif kategori hedefleri aktif üste gider; hedef güncellenir.
+- Migration onayı gecikirse yayın kayar.
+- Rota dosyası `kategori/[kok]/[[...dal]]` korunur; `generateStaticParams` DEĞERLERİ değişti (param şekli `{lang, kok, dal}` aynı). Bayrak açıkken derlenen kategori sayfası 35 → 56 (28 TR + 28 EN; +21 EN alt kategori); bayrak kapalıyken sayı bugünkü ile aynı. Shard ve derleme planı ALTYAPI'dadır, haber verilir.
+
+## 6. Ölçümler ve ölçülmeyenler
+
+Ölçüldü (2026-10-11):
+
+- Slug tekrarı (repodaki taban fikstürü + migration 20261005100000 ve 20261010090000 uygulanmış hâli): 35 satır, 28 aktif = 7 kök + 21 dal; aktif TR slug tekrarı YOK, EN tekrarı YOK, TR slug ile başka kategorinin EN slug'ı çakışması YOK, kök TR = dal TR YOK. Fikstürün kendisi 17 dal diyor (eski), 21 doğrudur.
+- Canlı veritabanı (salt-okuma SELECT): categories 35 satır, TR slug tekrarı 0 grup, EN slug tekrarı 0 grup, benzersizlik indeksi henüz yok.
+
+Ölçülmedi:
+
+- Google'ın tek seviyeli kategori adresini nasıl yeniden indeksleyeceği (yayın sonrası +1/+7/+28 gün, Search Console).
+- Vercel önizlemede soğuk önbellek davranışı (adım 7'de ölçülür).
+- Gerçek HTTP 308 (middleware ve sayfa) ve `next build`: bayrak kapalı, yerelde build yok; açılış öncesi önizlemede ölçülür.
+
+## 7. Açılış öncesi takipler (ayrı kayıt)
+
+- scripts/seo/bot-karnesi.mjs `DINAMIK_TURLER` içindeki 'alt-kategori' kalıbı iki seviyelidir; B-1'de site haritasında iki segmentli kategori adresi yoktur, bayrak açılınca karne sahte kırmızı verir. Fikstür scripts/seo/__tests__/bot-karnesi-en-yayin.test.ts de iki seviyeli. Sahibi GEO-SEO/ALTYAPI; açılıştan ÖNCE düzeltilmeli.
+- Bayat yorum ve belge satırları: src/config/features.ts (kategori adresi satırı), src/app/api/webhook/supabase/route.ts (yorum ve `eskiChildPaths` döngüsü artık yeni yol üretmiyor, zararsız), docs/standards/adres-semasi-standard.md Dal satırı, docs/standards/rendering-cache-standard.md ilgili satır, docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md (ALTYAPI'nın dizini).
+- Webhook testlerinde (U12-q/r) adres artık üstten bağımsız; alt sayfa tazeleme mantığı doğru, yalnız iç içe yol üretimi kalktı.
+
+
+---
+# FILE: docs\plans\rec300-model-adres-kategori-tr-adlari-2026-10-10.md
+
+# REC-300 3-C ön koşulu: sekiz kategorinin görünen TR slug'ı Design CSV adına çekilir (URN-85, 2026-10-10)
+
+> Yöneten cetvel: `docs/standards/migration-safety-standard.md` (atomiklik, tabanın aynı gün tazelenmesi) ·
+> `docs/standards/rota-dili-standard.md` (adres tek kaynaktan) · tek hedef kaynak: Design CSV
+> `adres-listesi-2026-10-04-guncel-2026-10-09.csv` (OPS hükmü 2026-10-09 19:50, madde H1).
+> Karar sahibi: OPS onayı + Recep'in migration onayı (CLAUDE.md kural 13). Bu belge yöntemi ve ölçümü yazar; birleştirmeyi yapmaz.
+
+## Amaç
+
+Pazar 11 Ekim'de adres şeması açılırken kategori adresleri veritabanındaki adlarla değil Design listesindeki adlarla çıkacak.
+Sekiz kategorinin görünen TR slug'ı CSV'den farklı. Adres yalnız BİR kez değişir ve eski adres hiçbir an 404 vermez.
+
+## Yapılacak (tek, küçük, idempotent veri migration'ı)
+
+`categories.metadata.slug.tr` değeri sekiz satırda değişir (EN kanonik `categories.slug` ve `metadata.slug.en` DEĞİŞMEZ):
+
+| EN kanonik | Bugünkü TR | CSV TR |
+|---|---|---|
+| control-systems | kontrol-sistemleri | kontrol-ve-suruculer |
+| air-treatment | iklimlendirme-ve-hava-sartlandirma | hava-sartlandirma |
+| water-coil-duct-heaters | sulu-batarya-kanal-tipi | sulu-bataryalar |
+| single-room-hrv | tekil-oda-uniteleri | tek-oda-uniteleri |
+| axial-industrial-fans | aksiyel-sanayi-fanlari | aksiyel-fanlar |
+| spare-parts-sensors | yedek-parca-ve-sensorler | yedek-parcalar-ve-sensorler |
+| bathroom-toilet-fans | banyo-ve-tuvalet-fanlari | banyo-tuvalet-fanlari |
+| industrial-ceiling-fans | endustriyel-tavan-vantilatorleri | tavan-vantilatorleri |
+
+Aynı PR'da koddaki tek bağımlılık: `src/config/markaYonlendirmeleri.mjs` `kok.tr` ('kontrol-sistemleri' → 'kontrol-ve-suruculer') ve onun test fikstürü.
+Dallarda adı değişmeyen dört dal (frekans-konvertorleri, elektrikli-kanal-isiticilari, hiz-anahtarlari, nem-alma-cihazlari) yalnız kökü
+değiştiği için adres yolu değişir; veritabanında iş yok.
+
+## Neden DB (ve neden harita yeniden adlandırma tablosu değil)
+
+DB'ye dokunmadan CSV adını göstermek, DB slug'ını okuyan her yerde (çözücü, site haritası, hreflang, breadcrumb, JSON-LD, menü)
+ezme katmanı ister; tek kaynak ikiye bölünür. DB yolunda kaynak tek kalır: `getLocalizedCategorySlug`.
+
+## Ölçümler (2026-10-10, canlı DB salt okuma + kod okuma)
+
+1. Prod'da `url_takma_ad_kategori` ve `url_takma_ad_kategori_ekle` tetikleri AÇIK (`pg_trigger.tgenabled = 'O'`).
+2. Tetik yeniden adlandırmada eski TR slug'ı `url_takma_adlari`'na (`tur='kategori'`, `dil='tr'`, `hedef_id`=kategori) yazar.
+   Önceki kullanım canlıda var: asit-dayanikli-fanlar (1 TR + 1 EN satır); 40 aile satırı aynı mekanizmayla (Faz 1-B).
+3. Bayrak KAPALIYKEN `/tr/category/<eski>`: `getCachedCategoryData` ıskalar → `eskiKategoriHedefi` → `/tr/category/<yeni>` 308.
+   Bayrak AÇIKKEN `kategoriSegmentleriniCoz` aynı takma adı kullanır → TEK 308 `/tr/kategori/<yeni>`.
+4. Sekiz yeni adın `categories` içinde (slug, tr, en alanları) çakışması YOK.
+5. Etkilenen ürün sayısı değişmez: kategori kimliği ve ilişkiler yerinde, yalnız görünen adres metni değişir.
+
+6. Mekanizma canlıda UÇTAN UCA ölçüldü (anon istemci, yalnız GET): `/tr/category/asit-dayanikli-fanlar` → 308 →
+   `/tr/category/korozyona-ve-aside-dayanimli-fanlar`; `/en/category/acid-resistant-fans` → 308 →
+   `/en/category/corrosion-and-acid-resistant-fans` (tek sıçrama). Yani "eski ad takma ad tablosundan tek 308 ile yeni adrese gider"
+   aynı kod yolu için bugün kanıtlı.
+7. Sekiz adresin KENDİSİ migration öncesi ölçülemez (yeni adlar henüz yok; yokluk ISR'de önbelleğe girebileceği için
+   migration'dan önce prod'a bu adreslere istek ATILMAZ). Tek-sıçrama davranışı fikstür DB ile sınanır
+   (`src/lib/adres/__tests__/kategori-tr-adlari-tek-sicrama.test.ts`, korozyon emsali); HTTP kanıtı birleşme sonrası alınır (aşağıda Kanıt).
+8. ÖLÇÜLMEDİ: ISR'de önceden üretilmiş eski sayfanın yeniden üretimde 308'e dönmesi (Next'in standart davranışı; risk düşük, webhook
+   eski ve yeni yolu tazeler). Squawk (INV-MIGRATION-3) bu PR'ın CI'ında koşar; yerelde koşulmadı.
+
+## Migration'ın kendi güvenceleri (apply anında, hepsi aynı işlemde; biri düşerse hiçbir şey yazılmaz)
+
+1. Yeni ad başka bir kategoride kullanılıyorsa DURUR.
+2. Hedef satır tam bir tane değilse ya da adı ne beklenen eski ne beklenen yeni ise DURUR (kör yazım yok).
+3. Güncellemeden sonra her eski TR adın `url_takma_adlari` içinde doğru kategoriye işaret eden TAM BİR satırı olduğunu sayar;
+   sayı tutmazsa DURUR. Bu, takma ad SATIRININ varlığını ölçer; çözücüyü, kiracı kimliğini ve sayfa katmanını çalıştırmaz.
+   "Eski adres tek 308 ile yeni adrese gider" kanıtı fikstür testi ve birleşme sonrası HTTP ölçümüdür (aşağıda Kanıt).
+4. Zaman aşımı: `lock_timeout = 5s`, `statement_timeout = 30s`. Kategori satırı kilitliyse CI süresiz asılmaz; düşerse ledger
+   yazılmaz ve `supabase-migrate.yml` kırmızı verir (sonraki migration'lar bu düzelene kadar bekler: yayın günü penceresinde
+   bu bilinen bir risktir, geri alma betiği hazırdır).
+
+## Zamanlama
+
+- Migration CUMARTESİ, harita üretiminden ÖNCE birleşir. Harita (`harita-uret.yml`) DB'den okur; migration'dan önce üretilirse eski adı
+  taşır ve çift sıçrama olur.
+- Yayın günü runbook'una (`docs/plans/yayin-gunu-runbook-2026-10-11.md`, sahibi ALTYAPI) bağlı sıra; çürütme raporu (10-10) bulguları:
+  1. Migration saati 3-C PR'ının (Cumartesi 14:00) ÖNCESİNDE; açık beklenen matris migration'dan SONRA üretilir (3-C önizlemesi
+     prod DB'yi okur; yoksa kökler eski adla beklenir).
+  2. `matris-kapali-once` migration'dan SONRA alınır; yoksa "kapalı önce ≡ kapalı T0" farkı sekiz satır (200 → 308) üretir.
+  3. `eski-adresler.json` bugünkü site haritasıdır; migration önce uygulanırsa sekiz eski adres evrene girmez ve "eski adresin tamamı
+     tek 308 → 200" (§4.3) bu sekizi ölçmez: sekiz eski adres elle eklenir ya da evren migration'dan ÖNCE alınır.
+  4. Runbook'taki "veritabanı adımı yoktur ve geri alma merdivenine veritabanı girmez" cümlesi bu migration ile yanlış; §7 seviye 2
+     (Instant Rollback + env 0) veritabanı adlarını GERİ ALMAZ, geri alma `scripts/db/geri-alma/…geri-al.sql` ile ayrıca yapılır.
+  Bu dört madde runbook'un sahibine (ALTYAPI) bildirildi; bu PR runbook'u değiştirmez.
+- Webhook tek atıştır (5 sn, yeniden deneme yok); kaçarsa eski sayfa en çok 3600 sn 200 verir, kalıcı değil.
+- Cumartesi→Pazar arası `/tr/category/<yeni-ad>` yaşar; Pazar'da tek 308 ile `/tr/kategori/<yeni>` olur.
+- Birleşme sonrası şema tabanı aynı gün tazelenir (INV-TABAN-TAZE-1; `sema-tabani-uret.yml`). Tip dosyası etkilenmez (şema değişmiyor).
+- ISR önbelleği eski adresten en çok 1 saat 200 verebilir; kategori webhook'u tazeler. 404 değildir.
+
+## Geri alma
+
+Aynı güncellemenin tersi (yeni → eski), tek işlem. Tetik tersini de takma ada yazar; kanonik adres farklı olduğu için döngü oluşmaz
+(çözücü takma adı kanonik slug'a çevirir). Geri alma betiği: `scripts/db/geri-alma/20261010090000_kategori_tr_adlari_design_csv.geri-al.sql`.
+
+## Kanıt (birleşme sonrası, koşu `completed` olduktan sonra)
+
+1. `select eski_slug, hedef_id from url_takma_adlari where tur='kategori' and dil='tr'` → sekiz yeni satır + bugünkü mevcut satır.
+2. Sekiz eski adres için `curl -sI https://venthub.com.tr/tr/category/<eski>` → TEK 308, hedef 200.
+3. Sitemap'te sekiz yeni adres var, sekiz eski adres yok; webhook yanıtında `revalidatedPaths`.
+4. Şema tabanı aynı gün tazelenir (`sema-tabani-uret.yml`).
+
+## Kapsam dışı
+
+- EN slug farkları (controls-drives, heat-recovery, in-duct-fans, ducted-central-units, single-room-units, …): `EN_YAYIN` kapalı,
+  dil başına slug işi URN-86 (vade 17 Ekim).
+- Kategori GÖRÜNEN adları: bu migration yalnız adres metnini değiştirir. Tek tutarsızlık control-systems: sözlükte
+  "Kontrol Sistemleri", adres `kontrol-ve-suruculer`, CSV adı "Kontrol ve Sürücüler" → kart URN-87 (vade 17 Ekim).
+- Sığınak dalı (CSV satır 51): DB'de kök ile addaş tek kayıt; OPS hükmü H2 (URN-85 kartı): Katalog'a "alt kategoriye giren ürün var mı?"
+  soruldu, cevaba göre Pazar'a girer ya da boş sayfa AÇILMAZ. Bu migration Sığınak'a dokunmaz.
+- Migration'da kiracı sabitlenmesi (kural 12 hijyeni): `categories.slug` küresel benzersiz olduğu için bugün sayı ≤ 1; çok kiracılı
+  geçişte `tenant_id` koşulu eklenir (emsal 20261005100000).
 
 
 ---
@@ -39181,7 +42768,7 @@ ALTYAPI §3.3 → OPS §4 tablo + karar 36 sorusu → PIM hattı cetveli.
 
 # REC-368 — E-posta defteri: her gönderim başarıda da başarısızlıkta da iz bırakır
 
-**Durum:** PLAN (kod yok). Bağımsız çürütme (plan-challenger) sonucu §9'a işlenir; OPS onayı olmadan kod başlamaz.
+**Durum:** PLAN v4 (kod yok). M0 canlıda (#1574). M1 tasarımı §10, çürütme sonucu ve revizyonu §11 (çelişen yerde §11 kazanır); OPS onayı olmadan M1 kodu başlamaz.
 **Yöneten cetvel:** `docs/standards/notification-standard.md` v1.1 — §B3.3 (defter her iki hâlde satır bırakır),
 §B4 (sessizlik yasağı), §B5 (kiracı kapsamı), §B8 (kapılar). Migration için `create-migration` skill'i
 (damga 14 hane, geri alma satırı, INV-MIGRATION-3 SQL kalitesi). Bu plan cetveli DEĞİŞTİRMEZ; §B8'e bir kapı ekler (§6).
@@ -39336,6 +42923,119 @@ Sabotaj kolları: (a) defter yazımı silinirse, (b) muaf listesine gerekçesiz 
 4. Şema tabanı M1'den sonra tazelenir (ikinci taban PR'ı açılmaz; ADMIN/ARAÇ koordinasyonu).
 
 **Ölçülemedi (açık):** yerel/CI PG sürümü (kararı etkilemiyor: sentinel seçildi); `canCarrierTransition`'ın `received→received`'a izin verip vermediği (webhook ile yönetici ekranı gerçekten çakışır mı; Katman 1+2 bunu bilmeden de güvenli kılar); canlıdaki 2 aktif oturumun içeriği.
+
+## 10. M1 KESİN TASARIM (v3, 09-30 — M0 canlıda: #1574 61ec00b93; kod başlamadan plan-challenger'a gider)
+
+**M0 durumu:** birleşti ve yayında (deploy-functions 36693905928). Canlı kanıt ilk gerçek siparişte; yapay sipariş atılmaz.
+
+### 10.1 Canlıda ölçülenler (salt okuma, 09-30, proje tnofewwkwlyjsqgwjjga) — §9'daki varsayımları kesinleştirir
+
+| Ölçüm | Sonuç | Plana etkisi |
+|---|---|---|
+| PostgreSQL sürümü | 17.6 (canlı) | `NULLS NOT DISTINCT` canlıda VAR; ama yerel/CI sürümü hâlâ ölçülmedi → sentinel `coalesce` KALIR (§9.3) |
+| `order_email_events` politikaları | yalnız `service_role` (ALL + SELECT), `TO service_role` | anon/authenticated yazamaz; ama tablo hibeleri açık (anon: INSERT/UPDATE/DELETE/TRUNCATE) → `REVOKE` savunma derinliği, davranış değiştirmez |
+| `order_email_events` okuyanlar (`src/`) | yalnız testler + `database.types.ts` | `REVOKE ALL … FROM anon, authenticated` hiçbir çalışma zamanı okuyucusunu kırmaz |
+| `shipping_email_events.tenant_id` emsali | `uuid NOT NULL DEFAULT 'd3b07384-…0000' REFERENCES tenants(id) ON DELETE CASCADE` (migration 20260530220000) | `order_email_events.tenant_id` aynı kalıpla eklenir; tetik yalnız DEFAULT'u siparişin kiracısıyla ezer |
+| `venthub_orders.tenant_id` | `NOT NULL DEFAULT 'd3b07384-…0000'` | tetikteki alt sorgu NULL dönmez |
+| `tenants` | 1 satır | çok kiracılı mod PARK'ta; DEFAULT kabulü kayıtlı |
+| `order_email_events` | 0 satır (ödenmiş sipariş yok) | `ADD COLUMN NOT NULL DEFAULT` + dizin değişimi risksiz, kilit süresi ihmal edilebilir |
+| `quote_email_events` | `anon` SELECT hibesi + `user_profiles.role` okuyan politika | **kapsam dışı**, REC-442 (68 politika göçü) içinde; bu planda dokunulmaz |
+
+### 10.2 M1 migration iskeleti (`YYYYMMDDHHMMSS_eposta_defter_ref_tenant_sistem.sql`, 14 hane)
+
+1. Başlık: geri alma satırları (yorum). Geri alma sırası: yeni tabloyu düşür → eski dizini `(order_id, kind) WHERE status='sent'` ile yeniden kur → yeni dizini düşür → tetik+fonksiyonu düşür → `ref_id`, `tenant_id` kolonlarını düşür. Tablolar boş olduğu sürece veri kaybı yok; **satış açıldıktan sonra** geri alma satır kaybettirir → M1 satıştan ÖNCE uygulanmalı (zamanlama gerekçesi).
+2. `SET lock_timeout='3s'; SET statement_timeout='30s';` `BEGIN`'den önce.
+3. `ALTER TABLE order_email_events ADD COLUMN IF NOT EXISTS ref_id uuid;`
+4. `ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE` + `idx_order_email_events_tenant_id`.
+5. BEFORE INSERT tetiği `order_email_events_set_tenant()`: `NEW.tenant_id := coalesce((select tenant_id from venthub_orders where id = NEW.order_id), NEW.tenant_id)`; `SECURITY INVOKER`, `SET search_path = ''`, şema-nitelikli adlar.
+6. AYNI transaction: `CREATE UNIQUE INDEX uq_order_email_events_sent_once_ref ON order_email_events (order_id, kind, coalesce(ref_id, '00000000-0000-0000-0000-000000000000'::uuid)) WHERE status='sent'` → sonra `DROP INDEX uq_order_email_events_sent_once`.
+7. `CREATE TABLE system_email_events` (id, tenant_id NOT NULL DEFAULT emsal + FK, kind, email_to, subject, provider, provider_message_id, status CHECK `attempt|sent|failed`, error, ref_type, ref_id, created_at) + `ENABLE ROW LEVEL SECURITY` + `REVOKE ALL … FROM anon, authenticated` + `service_role` politikası (`TO service_role`).
+8. `REVOKE ALL ON order_email_events FROM anon, authenticated;` (davranış değişmez, RLS zaten kapalı tutuyor).
+9. Öz-denetim (`DO $$`): yeni dizinin `indexdef`'i `coalesce(ref_id` ve `WHERE (status = 'sent'` içeriyor; eski dizin yok; `ref_id`/`tenant_id` var; `system_email_events` RLS açık ve anon hibesi yok; tetik var. Hepsi `RAISE EXCEPTION` ile kırılır.
+
+### 10.3 M1 PR'ının geri kalanı (aynı PR, kural 14)
+
+- `src/types/database.types.ts` yeniden üretilir (`ref_id`, `tenant_id`, yeni tablo); tip senkron kapısı yeşil kalmalı.
+- `notification-standard.md` §B3 dizin tarifi (satır 333/362) güncellenir.
+- Şema tabanı (`scripts/db/checks/*`) yeni tabloyu ve dizin adını bilir: ADMIN/ARAÇ ile koordinasyon, ikinci taban PR'ı açılmaz (§8/4).
+- Migration testi: dizin davranışı gerçek PG'de sınanır (aynı `(order_id, kind, NULL)` ikinci `sent` reddedilir; aynı sipariş + aynı kind + FARKLI `ref_id` iki `sent` KABUL edilir; `failed` satırları sınırsız). Sabotaj: dizinden `coalesce` çıkarılırsa NULL-ref türünde tekrar yakalanmaz → kırmızı.
+- PR gövdesi: `Kayitsiz: Linear siniri dolu, Part of REC-368`.
+
+### 10.4 Çürütücüye açık sorular
+
+1. Tetik `SECURITY INVOKER` yeterli mi (yazıcı `service_role`, `venthub_orders` okuyabilir) yoksa yetki boşluğu var mı?
+2. `ON DELETE CASCADE` (tenants → defter) kiracı silinirse e-posta delilini de siler: kabul mü (KVKK gerekçesiyle) yoksa `RESTRICT` mı?
+3. Sıfır-uuid sentinel, gerçek bir `ref_id` ile çakışabilir mi (`gen_random_uuid()` sıfır üretmez, ama dışarıdan verilen `return_id`?).
+4. Tek transaction içinde yeni dizini kurup eskiyi düşürmek, `order-paid-webhook`'un eşzamanlı `sent` PATCH'i ile yarışırsa koruma açığı doğar mı (tablo boş; ama satış açılınca)?
+5. `REVOKE ALL FROM authenticated` ileride yönetici okumasını (`shipping_email_events_admin_select` kalıbı) engeller mi, yoksa o zaman `GRANT SELECT` + politika ile mi eklenir?
+6. Zamanlama: M1 satıştan önce uygulanmalı; satış açma kapısına ("açılış önkoşulları") madde olarak eklenmeli mi?
+
+## 11. Bağımsız çürütme (§10) ve doğrulama sonucu — REVİZYON v4 (09-30)
+
+**Hüküm: KOŞULLU.** Çekirdek (ref_id, tenant_id, tetik, yeni tablo) doğru; §10.2 olduğu gibi merge edilirse squawk'ta kırılır, tip-drift penceresi açar, öz-denetim prod'da patlayabilir. **Çelişen yerde bu bölüm §10'un yerine geçer.** Yöneten cetvel ek olarak `migration-safety-standard.md` (§ "tip dosyası ve şema tabanı AYNI SAATTE").
+Bağımsız doğrulayıcı §10.1'in 8 ölçümünü kendi sorgusuyla yeniden ölçtü: hepsi doğru; iki eksik (aşağıda 11.5) ve bir düzeltme (11.6).
+
+### 11.1 M1 migration yapısı — üç adım, idempotent (squawk INV-MIGRATION-3 + INV-MIGRATION-1)
+
+Emsal: `20260930061500_pricing_rule_urun_tek_sabit_uq.sql` (düz `CREATE UNIQUE INDEX` squawk'ta KIRMIZI, ölçülmüş; `CONCURRENTLY` transaction içinde yasak).
+
+- **A (`begin … commit`):** kolonlar, `system_email_events`, tetik fonksiyonu + tetik, REVOKE'lar, RLS/politika. Hepsi yeniden koşulabilir: `add column if not exists`, `create table if not exists`, `create or replace function`, `drop trigger if exists` + `create trigger`, `drop policy if exists` + `create policy`. FK `ADD CONSTRAINT … NOT VALID` (ayrı), `VALIDATE` bloğun dışında (emsal `20260923083021_url_takma_adlari`).
+- **B (transaction DIŞI):** `create unique index concurrently if not exists` (yeni dizinler), `idx_order_email_events_tenant_id` concurrently, sonra `drop index concurrently if exists uq_order_email_events_sent_once`. Önce yenisi, sonra eskisi: koruma açığı yok (yeni dizinler eskinin yalnız iade türü için gevşetilmişi).
+- **C (`begin … commit`):** son-guard: `indisvalid` (yarıda kalan CONCURRENTLY geçersiz dizin bırakır; `if not exists` onu "var" sayar) + yapı denetimi.
+- Runner `supabase-migrate.yml` kendi `BEGIN`'i olan dosyayı sarmaz: A commit'lenip B düşerse A kalıcıdır, ledger yazılmaz, sonraki koşu baştan dener → bu yüzden idempotans zorunlu.
+- **İlk sinyal CI'dır:** squawk yerelde kurulu değil, çıktısı ÖLÇÜLEMEDİ. PR'da squawk kırmızı verirse kural gerekçesiyle ele alınır, sessizce `squawk-ignore` konmaz.
+
+### 11.2 Dizin: sentinel YOK, iki kısmi dizin (S3, S-A3)
+
+`coalesce(ref_id, sıfır-uuid)` terk edilir (sentinel çakışma koruması yoktu; `pg_indexes.indexdef` deparse'ında büyük/küçük harf tuzağı; sürüm belirsizliği). Yerine:
+
+- `uq_order_email_events_sent_once_null ON (order_id, kind) WHERE status='sent' AND ref_id IS NULL`
+- `uq_order_email_events_sent_once_ref ON (order_id, kind, ref_id) WHERE status='sent' AND ref_id IS NOT NULL`
+
+İkisi de düz kolon: PostgREST insert/PATCH kalıbı ve `23505` yakalama (`order-paid-webhook:290`, `delivery-notification` `damgala` 409) aynen çalışır. Öz-denetim `indexdef ILIKE` ile `ref_id IS NULL` / `ref_id IS NOT NULL` ve `status = 'sent'` içeriğini + `indisvalid`'i sınar; eski dizin yok.
+
+### 11.3 Tetik ve yetki (S1, S-A7)
+
+- `coalesce(…, NEW.tenant_id)` KALDIRILDI: sipariş görünmezse sessizce DEFAULT kiracıya düşerdi (kural 12 sızıntı vektörü). Alt sorgu NULL dönerse NOT NULL ihlali fail-closed olur.
+- Tetik `BEFORE INSERT OR UPDATE OF order_id, tenant_id`.
+- Fonksiyona açık `REVOKE ALL ON FUNCTION … FROM public, anon, authenticated` (canlı varsayılan ACL anon/authenticated'a EXECUTE veriyor; `create-migration` skill'i her yeni fonksiyonda ister).
+- Cetvel §B5 "gönderen uç `tenant_id`'yi yazar" (A PR'ı): `order-paid-webhook` `order.tenant_id`'yi elinde tutuyor, yazıcılara ekler; tetik ikinci savunma.
+- `REVOKE ALL … FROM anon, authenticated` `order_email_events` için de (authenticated'ın SELECT dahil 7 hibesi açık; §10.1 satır 2b'ye eklenir). Kimseyi kırmaz (bağımlı view/fonksiyon yok; `src/`'de çalışma zamanı okuyucusu yok).
+- `ON DELETE CASCADE` (tenants → defter) KABUL: `venthub_orders` ve `shipping_email_events` da aynı; RESTRICT bu zincirde yanlış olur. `system_email_events` için de CASCADE, bu satırla kayıtlı.
+- Yönetici okuması ileride: `GRANT SELECT` + politika. Kopyalanacak `shipping_email_events_admin_select` kalıbı kural 12'ye tam temiz DEĞİL (`is_admin_user()` claim yoksa `user_profiles.role`'e, `jwt_tenant_id()` claim yoksa DEFAULT kiracıya düşüyor): o gün REC-442 sonucu beklenir ya da düşme bilinçli kabul edilir.
+
+### 11.4 `system_email_events` sütunları (S-A8; M0'ın kök nedeni tam buydu)
+
+`id uuid pk default gen_random_uuid()`; `tenant_id uuid NOT NULL DEFAULT '<varsayılan kiracı>' REFERENCES tenants ON DELETE CASCADE`; `kind text NOT NULL`; `email_to text` (NULLABLE); `subject text` (NULLABLE); `provider text NOT NULL DEFAULT 'resend'`; `provider_message_id text`; `status text NOT NULL DEFAULT 'attempt' CHECK (status IN ('attempt','sent','failed'))`; `error text`; `ref_type text`; `ref_id uuid`; `created_at timestamptz NOT NULL DEFAULT now()`. İndeksler: `(tenant_id)`, `(kind, created_at DESC)`. `INV-EPOSTA-DEFTER-YAZICI-1` yeni tabloyu da kapsayacak şekilde A PR'ında genişletilir. SMS/WhatsApp bu tabloda DEĞİL (§9.5).
+
+### 11.5 Tip dosyası, şema tabanı, PR gövdesi (S-A4) — §10.3'ün ilk maddesi DEĞİŞTİ
+
+- `database.types.ts` M1 PR'ında ÜRETİLMEZ: migration canlıya inmeden canlıdan üretilemez ve PR'da önde giden tip `INV-TIP-DRIFT-1`'i "TİPLERDE VAR, CANLIDA YOK" diye kırar; merge sonrası geride kalan "CANLIDA VAR, TİPLERDE YOK" diye filo genelinde kırar. Sıra: PR gövdesinde `tip takibi: URUN` (URUN merge'ten ÖNCE haberdar) → merge → `supabase-migrate.yml` yeşil → sahibi aynı saatte `pnpm supabase:gen` PR'ı.
+- Şema tabanı: migration damgası taban tarihinden (09-30) yeni olmamalı; merge günü `sema-tabani-uret.yml` koşturulur (ADMIN/ARAÇ'a haber, ikinci taban PR'ı açılmaz).
+- PR gövdesi: `Kayitsiz: Linear siniri dolu, Part of REC-368` + `⚠ MIGRATION İÇERİR — merge = prod'a otomatik uygulama. Yalnız Recep onayıyla merge.` + `tip takibi: URUN`.
+- Geri alma metni düzeltildi: A PR'ı yayına girip farklı `ref_id`'li iki `return_*` `sent` satırı doğduktan sonra eski `(order_id, kind)` dizinini yeniden kurmak HATA verir (satır kaybı değil, geri alma yapılamaz). Geri alma penceresi = M1'in uygulanmasından A'nın yayınına kadar.
+
+### 11.6 Doğrulayıcının plana düzeltmeleri
+
+- §2: `order-confirmation` "hata görünür mü: hayır" YANLIŞ: gönderim hatası `index.ts:229-246` ile Sentry + `admin_audit_log` + 502 olarak görünür; kör olan yalnız BAŞARI kaydı (`:250-257`, status/kind NULL, `.error` denetlenmiyor).
+- §2: `api.resend.com` çağıran `.ts` dosyası 6 (`order-confirmation`, `delivery-notification`, `shipping-notification`, `quote-notification-webhook`, `return-status-notification`, `notification-service`); `order-paid-webhook` gönderen değil devreden. `.md` dosyaları da bu dizeyi içerir → tarayıcı `.ts` ile sınırlanır (yoksa evren 9). **INV-NOTIFY-3 kanaryası ≥ 6** (≥ 7 ilk günden kırmızı doğardı) ve `notification-standard.test.ts`'teki mevcut `resendGonderenUclar()` yardımcısı kullanılır, ikinci tarayıcı yazılmaz. Muaf listesine `order-confirmation` değil tek-sahip ilkesiyle `order-paid-webhook` (devreden) uygun.
+- `notification-service` çağıranları: `stock-alert` (`:318`, `:400`), `_shared/notify.ts:75` (`iyzico-payment` ×3, `log-client-error` ×2), `QuotesTableBody.tsx:364` (plandaki `:346` yanlıştı).
+- Ek çift yazım: `shipping-notification:421` ve `admin-update-shipping:353` aynı e-posta için `shipping_email_events`'e iki satır yazıyor; `delivery-notification` da `order_email_events`'e ek olarak `shipping_email_events:288`'e yazıyor. M1/A kapsamı DEĞİL; ayrı alt iş olarak REC-368 altına yorum.
+- `quote-notification-webhook` iç bildirimi zaten `quote_email_events`'te (`:361-382`): `system_email_events` fiilen yalnız `notification-service` yolları için (stok özeti, `notify.ts` uyarıları, teklif durum e-postası).
+- Canlıda `venthub_returns` 1 satır (§2'de yoktu), `venthub_orders` 5 (hiçbiri ödenmiş değil).
+
+### 11.7 A PR'ına eklenenler (S-A6, S-A10, K10, 23505)
+
+- `order-paid-webhook` `sent` güncellemesine `provider_message_id` (`order-confirmation` cevabındaki `result.id`; `:275-278` bugün yalnız status+subject yazıyor). Yoksa satış açılış kontrolü K9'un sipariş kolu (`scripts/kip/acilis-onkosullari.mjs:234`: `status='sent' AND provider_message_id IS NOT NULL`) yapısal olarak sıfır sayar.
+- `order-paid-webhook` `sent` PATCH'inde (`:275-278`) 23505 filtresi yok (yalnız insert dalında `:290`); yeni dizinle yarışta yanlış alarm (`sent_guncelle`) üretir → filtre eklenir.
+- **A PR'ı yayınından ÖNCE** ölçüm: `order_email_events.ref_id` canlıda var mı (deploy-functions migration'dan bağımsız yayınlar; kolon yokken PostgREST yazımı düşer ve sessiz kalır). Recep sözü öncesi kontrol satırı.
+- Satış açılış önkoşullarına **K10** (ALTYAPI sahibi): `ref_id` kolonu + yeni dizinler + `system_email_events` tablosu + RLS var mı; `satis-kipi-acilis-onkosullari.test.ts` güncellenir. M1 satıştan ÖNCE uygulanmalıdır.
+- Migration içi apply-anı sondajı (gerçek PG CI'da yok: `ci.yml`'de postgres service yok; gölge DB Docker ister): var olan bir siparişle alt-işlemde iki `sent` ekle → `unique_violation` beklenir; farklı `ref_id` ile kabul beklenir; sonra geri al. Sipariş yoksa sondaj atlanır. Ek olarak statik konformans (migration metnini ayrıştırır) ve PGlite gölge koşumu PR'a kanıt olarak eklenir (PGlite geçici kurulur, depoya bağımlılık eklenmez).
+- Eski dizin adı/tanımını anlatan yorumlar (`delivery-notification:49,277`, `order-paid-webhook:269,288`) M1 ile güncellenir; `audit_checks.js` sabit R2/R10 listelerine `system_email_events` eklenir; pg_graphql canlıda kurulu değil (etkisiz), yine de tablo yorumuna `@graphql({"disabled": true})` konur.
+
+### 11.8 Ölçülemedi (açık)
+
+squawk çıktısı (kurulu değil; ilk sinyal CI); PGlite sürümü; `supabase-migrate.yml`'de `DB_URL` pooler tipi (oturum `SET lock_timeout` korunuyor mu); `tip-drift` PR'da zorunlu (required) kontrol mü (GitHub dal koruması, kodda görünmez); `returns-webhook` ile yönetici ekranı aynı değişiklik için ardışık çalışıyor mu (Katman 1+2 bunu bilmeden güvenli kılar).
 
 ## OKUNANLAR
 
@@ -44656,6 +48356,306 @@ Email gönderen Edge Function'lar tenant bazlı branding kullanmalı:
 
 
 ---
+# FILE: docs\plans\yayin-gunu-runbook-2026-10-11.md
+
+# Yayın günü runbook'u — Pazartesi 19 Ekim 2026 (yeni adres şeması B-1)
+
+> **YENİ TARİH — Pazartesi 19 Ekim 2026, 07:30–09:00 (TR).** Adres şeması **B-1** olarak kesinleşti (Recep, 10 Ekim; kaynak: SEO-35 karar belgesi sürüm 5 §9, OPS bildirimi). Pazar 11 Ekim'deki 3-C yayını iptal oldu; bu belge B-1'e göre yeniden yazıldı. **Takvim (OPS):** kod + harita 12–16 Ekim (URUN) · tam doğrulama ve önizleme **Cumartesi 17 Ekim** · TR yayın **Pazartesi 19 Ekim** · İngilizce adresler TR'den önce açılamaz (OPS önerisi en erken 22 Ekim, kesinleşmedi) · pilot model en erken 22 Ekim. **Pencere saatleri (07:30–09:00) ve taban/dondurma saatleri ALTYAPI önerisidir, OPS onayı bekliyor;** saat başına ziyaretçi ÖLÇÜLEMEDİ (Vercel Hobby'de gözlem verisi yok), öneri zamanlanmış işlerin saatlerinden türetildi. **Etiket:** `[B-1 PR'INDAN]` ile işaretli satır URUN'un B-1 kod PR'ına (#1854, **birleşti**: master `286c7b2ec`, bayrak kapalı) bağlıdır ve **ölçülmüş değildir**; v0.5.1'de URUN'un cevaplarıyla (11 Ekim) doldurulanlar etiketten çıktı. **Açık kalan:** (a) matris ucu SHA'sı: URUN #1854'e yalnız docs + `preload.ts` yorumu commit'i ekleyecek, uç değişir ve URUN yeni yeşil SHA'yı ayrıca yazar (matristeki kod davranışı o commit'le değişmez); (b) harita sonrası sayılar (silinen `next.config` kural sayısı, site haritası girdi sayısı) ve §4.11'in 12 maddesinden #1854'te karşılığı olmayanlar. v0.5.1 en geç Cuma 16 Ekim 18:00. Etiketsiz satırdaki 10 Ekim ölçümleri 3-C dönemine aittir ve B-1'de yeniden ölçülür (satırda yazılıdır).
+
+**Sürüm 0.5.1 (v0.5 taslağı PR #1843; v0.4.4 master'da: #1825; ERTELENDİ satırı #1826) · 2026-10-11 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-53 (OPS emri 2026-10-10, Recep kararı: adres şeması B-1), ALT-37, ALT-50 · Dayanak: `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` Faz 3-C/4/5, §6, §7, §11 · `docs/plans/rec-300-plan-tazeleme-2026-10-08.md` §3 · `docs/standards/rota-dili-standard.md` R2, R3, §3 · `docs/standards/adres-semasi-standard.md` · `docs/plans/rec300-model-adres-kategori-tr-adlari-2026-10-10.md` (URN-85) · B-1 kod PR'ının belgesi `docs/plans/rec300-model-adres-b1.md` (URUN; #1854 ile girer, bu belge yazılırken `origin/master`'da yok) · karar belgesi SEO-35 sürüm 5 §9 (depo dışı: `C:/tmp/vh-arsiv/geo-seo/adres-semasi-karar-belgesi-2026-10-10.md`)**
+
+**0.2'den 0.3'e değişenler (10 Ekim).** (1) URN-85 veri migration'ı (#1802) prod'a indi: sekiz kategorinin TR adı değişti; taban ölçümleri **migration sonrası** alınır, `eski-adresler.json`'a sekiz eski adres **elle** eklenir (§2.3, §2.6). (2) Adres haritası artefaktı migration'dan sonra üretilir; ilk koşu düştü, düzeltme #1804 (§1 madde 3, §10). (3) §7 "veritabanı adımı yoktur" cümlesi kalktı: veritabanı geri alma betiği ayrıdır. (4) §5: `--yalniz-yeni` master'da; A8 anahtar yolu yazıldı (GEO-SEO). (5) 3-C kural sayısı 25 (v0.2'de 19). (6) #1738 3-C'nin ardından aynı yayında (§4.7). **0.3 → 0.3.1 (10 Ekim, öğleden sonra):** (7) adres haritası üretildi ve URUN'a verildi, 3-C taslak PR'ı #1811'e bağlandı (§1 madde 3, §10 madde 10); (8) harita artık **commit'lenir** (plan §4.1 karar notu); (9) `?sku=` adreslerinin davranışı URUN'un ölçümüyle yazıldı (§10 madde 17, tıklama listesi satır 18); (10) #1804, #1803 ve #1808 birleşti, #1807 çift olduğu için kapandı. **0.3.1 → 0.4 (10 Ekim, öğleden sonra, OPS emirleri):** (11) A3'ü (Vercel değişkeni) **OPS** yapar, OPS penceresinde, Vercel CLI ile, Recep'in o penceredeki sözüyle; komut, doğrulama ve geri alma yazıldı (§3 A3, §7); **Preview ortamına dokunulmaz**; (12) #1738 **10 Ekim'de bayrak kapalıyken** birleşir (karar 298), Pazar penceresinde tek birleştirme (3-C) ve tek dağıtım kalır; (13) **N = 89** kesin (§5.3); (14) veritabanı yazım dondurması ve zamanlanmış yazıcı envanteri (ön koşul 11); (15) taban saati: URN-90, URN-92 ve #1738 birleştikten ve o commit'te CI success görüldükten sonra (ön koşul 4, 9); (16) 3-C dalının bayrak ucu GEÇİCİ, matris yeşil CI'lı kesin SHA'dan ve **yerel derlemeden** alınır (§2.2); (17) §4.7: `LASTMOD-BUGUN` kırmızı kümeye girmez, ayrı sayılır (OPS kararı). **0.4 → 0.4.1 (10 Ekim, öğleden sonra):** (18) rezervasyon iş akışının durdurma ve yeniden açma komutlarını OPS yürütür, komutlar yazıldı (ön koşul 11); (19) taban için CI success yetmez, o commit'in Production dağıtımı da READY olmalı (ön koşul 4); (20) #1772 JSON-LD şeklini değiştirdiği için tabanın JSON-LD sayıları 10 Ekim denemesinden farklı çıkabilir (ön koşul 4). **0.4.1 → 0.4.2 (10 Ekim, öğleden sonra):** (21) taban saati: Cumartesi birleşme sınırı 16:30, taban o son birleşmeden sonra, o commit'te CI success ve READY dağıtım görülünce; kesintili CI kırmızısında yalnız o iş yeniden koşturulur (ön koşul 4). **0.4.2 → 0.4.3 (10 Ekim, öğleden sonra):** (22) önizleme komutu dal adı/PR numarasıyla yazıldı; ilk koşu "ağaç commit'e çevrilemedi" derse bayat `index.lock` bakılır (§2.2); (23) **önizleme ağacının `.next` klasörü her derlemeden önce ağaç dışına taşınır** (dünden kalan veri önbelleği `frekans-konvertorleri` için yönlendirme döngüsü üretti, §2.2); (24) Pazar ön adımı A5b: kategori sayfası önbelleğinin Vercel etiketleriyle bayat işaretlenmesi (OPS kararı) ve 4.10 ayrı satır; (25) §7: tam geri dönüş iki adımdır (env kaldır, 3-C revert PR'ı), bayrağı kapatmak 25 eski yönlendirmeyi geri getirmez. **0.4.3 → 0.4.4 (10 Ekim, öğleden sonra):** (26) A5c: geri alma dalı ve DRAFT PR A4'ün hemen ardından açılır (OPS "evet", CI ısınır; birleştirme yalnız OPS kararıyla); revert provası çakışmasız (§7, A5c); (27) 437da0b0a'da önizleme+matris alındı (243 adres, hata 0, döngü 0, 362e6c934 ile fark yok; llms.txt dört bağlantı 200). **0.4.4 → 0.5 (11 Ekim, OPS emri ALT-53, Recep kararı B-1):** (28) **yayın tarihi** Pazartesi 19 Ekim 07:30–09:00; Pazar saatleri ve 10:00–11:30 penceresi kalktı; çıktı klasörü `C:/tmp/yayin-19-ekim/` (eski `yayin-11-ekim` 10 Ekim denemeleridir, taban DEĞİLDİR); (29) **adres şeması B-1** (§0.1): alt kategori tek seviyeli `/tr/kategori/<alt-slug>`; eski adres ve 3-C'nin iki seviyeli adresi **tek 308** ile oraya gider; aile, model, marka değişmez; (30) 3-C PR'ı (#1811) yerine **B-1 kod PR'ı** (URUN, 12–16 Ekim); B-1'e bağlı satırlar `[B-1 PR'INDAN]` etiketli; (31) **harita üretimi yalnız master'dan koşar** (`harita-uret.yml` `if: github.ref == 'refs/heads/master'`, güvenlik kapısı): B-1 kodu master'a girmeden B-1 hedefli harita ÜRETİLEMEZ; bağlayıcı sıra §1 madde 3'te; (32) **kategori slug benzersiz indeks migration'ı** ayrı küçük PR, kural 13, yayından önce prod'da (§1 madde 3); (33) **12 maddelik düzeltme paketi** aynı yayında, doğrulaması §4.11; (34) **taban ve dondurma Pazar 18 Ekim akşamı**, T0 karşılaştırması Pazartesi 07:30, tam doğrulama Cumartesi 17 Ekim; (35) **IndexNow listesi B-1'e göre yeniden üretilir** (GEO-SEO, SEO-26, 16 Ekim); N = 89 değildir; (36) **§7:** B-1'de iç içe kategori kuralı `next.config.mjs`'te YOK, 308'ler rota içinde üretilir (`src/lib/data/kategoriSegmenti.ts` `kategoriRotasiniUygula`; URUN ölçtü, 10 Ekim): geri almanın doğrulaması config'e bakılarak değil **matris karşılaştırmasıyla** yapılır; (37) **§0.2** B-1'in ALTYAPI'ya yüklediği araç işleri (matris örnekleri, tarama beklenen listesi, önizleme yama tablosu). **0.5 → 0.5.1 (11 Ekim, URUN'un B-a…B-i cevapları ve B-d kararı):** (38) B-1 kod PR'ı **#1854** (dal `urun/urn85-b1-kod`, yeşil CI'lı uç `0901b87aa`; önceki uç `f2bfebb80` GEÇERSİZ; 15/15 kontrol geçti, mergeable clean; ara sonrası #1854'e yalnız docs + `preload.ts` yorumu commit'i gelecek, uç değişir ve yeni yeşil SHA'yı URUN yazar); (39) bayrak `ADRES_SEMASI_K3B` **kapalı** master'a girer, yayın günü bayrağı `true` yapan ve haritayı taşıyan PR **#1811**'dir (B-1 koduyla güncellenip master'a rebase edilecek; ayrı bayrak PR'ı açılmaz); (40) indeks migration'ı **#1853** (taslak, CI 19/19; `categories_tr_slug_tenant_uq` ve `categories_en_slug_tenant_uq`; Recep onayı işi koşan pencerede, yani URUN penceresinde; birleştirmeyi URUN yapar; birleşince aynı gün şema tabanı OPS); gölge koşusu ÖLÇÜLEMEDİ (Docker kapalı); (41) harita yolu `src/data/generated/eski-adres-haritasi.json`; #1854'te `next.config.mjs` değişmedi, silinen kural sayısı ve site haritası girdi sayısı ÖLÇÜLMEDİ; (42) rota dosyası `kategori/[kok]/[[...dal]]/page.tsx` kalıyor, A5b etiket adı etkilenmez; bayrak açıkken derlenen kategori sayfası 35 → 56 (28 TR + 28 EN; URUN'un okuması, önizlemede ölçülür); (43) çift sıçrama kapıları tek sıçrama kollarına taşındı (birim düzeyinde yeşil; HTTP ölçümü önizlemede); (44) A5b'deki `kategoriYollari` cümlesi 3-C kodundan okunmuştu ve B-1 sonrası bayat sayıldı (§3 A5b); (45) §4.11'in 12 maddesinden #1854'te karşılığı olanlar: 5 ve 11 (kategori kısmı, bayrağa bağlı), 12 (slug tekilliği, #1853); 8 (breadcrumb) ayrı kart URN-112; 1, 2, 3, 4, 6, 7, 9, 10 karşılıksız, bayrak kapalıyken ya da #1811'de canlıda olup olmadığı URUN tarafından ÖLÇÜLMEDİ; (46) açılış öncesi iki takip: `scripts/seo/bot-karnesi.mjs:152` `alt-kategori` kalıbı iki seviyeli, bayrak açılınca sahte kırmızı verir; `adres-semasi-standard.md` Dal satırı ve `rendering-cache-standard.md` bayat; (47) §4.11 OPS kararıyla üç gruba bölündü (durduran / gerileme / kapsam dışı) ve canlı taban ölçümü (11 Ekim 13:56, bayrak kapalı) eklendi.
+
+> **Bu dosya niçin var.** Yayın gününde "şimdi ne yapıyorduk" sorusu hatırlanarak cevaplanmasın. Her adımın komutu, beklenen çıktısı, durma ölçütü ve geri alma yolu burada yazılıdır. Komutların hepsi mevcut betiklerdir; bu belgeyi yazarken **kapalı durumdaki canlı siteye** yalnız GET atan ölçümler denendi (§9). Bir komutun çıktısı burada yazılı beklentiden saparsa **durulur ve OPS'a sorulur**; beklenti sessizce değiştirilmez.
+
+## 0. Bir bakışta
+
+| Konu | Karar |
+|---|---|
+| **Açılan** | (1) `NEXT_PUBLIC_ADRES_DILI=1`: statik sayfa adresleri (`/tr/hakkimizda`, `/tr/about` → 308). (2) **B-1 bayrağı** `ADRES_SEMASI_K3B` (`src/config/features.ts`; #1854'te KAPALI girer, yayın günü #1811 `true` yapar): kategori, aile ve marka adresleri; alt kategori **tek seviyeli** `/tr/kategori/<alt-slug>`; eski adresler tek 308 (§0.1). (3) 12 maddelik düzeltme paketi (karar belgesi §3: büyük harf 308, site haritası bölümleri, breadcrumb, İngilizce dil etiketi, kapı testi…) aynı yayında; #1854'te yalnız 5 ve 11'in kategori kısmı (bayrağa bağlı) ile 12'nin slug tekilliği (#1853) karşılık bulur; 8 ayrı kart (URN-112); kalan 8 madde karşılıksız ya da ÖLÇÜLMEDİ (§4.11). |
+| **Açılmayan** | `EN_YAYIN` kapalı kalır (hreflang ve site haritasında EN yok); İngilizce adresler TR'den önce açılamaz. Model sayfaları kapalı: "yayındaki modeller" listesi **boş** (`src/config/yayindaModeller.veri.json`), yeni model adresi 404, eski model adresi tek 308 ile ailenin sayfasına; pilot en erken 22 Ekim. Sepet, ödeme, hesap (Aşama 2) dokunulmaz. |
+| **Veritabanı** | Yayın günü listesinde veritabanı **yazımı yoktur**. Yayından ÖNCE prod'da iki değişiklik vardır: (a) sekiz kategorinin TR adı (#1802, 10 Ekim 07:34Z; geri alma betiği §7); (b) **kategori slug benzersiz indeks migration'ı** (B-1; ayrı küçük PR **#1853** (taslak, CI 19/19), indeks adları `categories_tr_slug_tenant_uq` ve `categories_en_slug_tenant_uq`; kural 13 ve karar 224: Recep onayı işi koşan pencerede, **URUN penceresinde** verilir ve birleştirmeyi URUN yapar; birleşince aynı gün `sema-tabani-uret.yml` (OPS); gölge koşusu ÖLÇÜLEMEDİ (Docker kapalı); geri alma §7). |
+| **Sıra** | B-1 kod PR'ı (bayrak kapalı) master → indeks migration → harita üretimi (master) → harita commit'i → önizleme ve matris (17 Ekim) → taban (18 Ekim akşamı) → env değişkeni → B-1 yayın birleştirmesi → dağıtım → doğrulama → karar kapısı → IndexNow → GSC ve haberler. |
+| **Geri dönüşsüz adımlar** | B-1 yayın birleştirmesi (dizine girmeden önce geri alınabilir) ve IndexNow gönderimi (geri alınamaz). IndexNow **en sona** konur. |
+| **Çıktı klasörü** | `C:/tmp/yayin-19-ekim/` (depo dışı; ölçüm çıktısı depoya girmez). |
+
+**Roller.** OPS: pencereyi açar/kapatır, B-1 yayın PR'ını birleştirir, karar kapısını verir, Recep'e haber verir. ALTYAPI: ölçümler, Vercel değişkeni komutunu hazırlar, doğrulama, geri alma hazırlığı ve yürütmesi, **eski adres haritasının üretimi** (B-1 hedefleriyle; artefaktı commit'lenecek dosya olarak URUN'a verir, URUN elle değiştirmez). URUN: B-1 kod PR'ının içeriği, harita dosyasının PR'a konması, kategori slug indeks migration'ı. GEO-SEO: IndexNow gönderimi (A8), listenin B-1'e göre yeniden üretimi (SEO-26), GSC, `llms.txt`. KATALOG: karar 157 haberi.
+
+**Saatler (ALTYAPI önerisi, OPS onayı bekliyor; saat başına ziyaretçi ÖLÇÜLEMEDİ).** Pazartesi 19 Ekim **07:30–09:00 (TR)**: 07:30 duyuru + T0 matrisi · 07:40 env değişkeni · 07:42 B-1 yayın birleştirmesi · ~07:50 dağıtım hazır · 07:50–08:15 doğrulama · **08:15 karar kapısı** (geri alma son vakti 08:30) · 08:30 IndexNow · 08:50 GSC ve haberler · 09:00 kapanış. **Zamanlanmış işlerle çakışma** (cron'lar UTC, TR = +3, `.github/workflows` okundu 11 Ekim): `release-expired-reservations` 06:15 TR, `deploy-functions` ve haftalık `bagimlilik-denetimi` 07:17 TR (pencereden ÖNCE; GitHub tetik gecikmesi ölçülmedi), `katalog-sayim` 09:10, `stock-alert` 09:20, `dunya-durumu` 09:23, `ssr-duman-alarmi` 09:40 TR (pencereden SONRA). **Hazırlık:** Cumartesi 17 Ekim tam doğrulama; Pazar 18 Ekim 16:30 birleştirme sınırı, akşam taban ve dondurma.
+
+### 0.1 Adres kuralı: 3-C (iptal) → B-1 (karar), satır satır
+
+| Adres türü | 3-C (v0.4.4, iptal) | **B-1 (Recep kararı, 10 Ekim)** |
+|---|---|---|
+| Ana kategori (kök) | `/tr/kategori/<kök-slug>` | `/tr/kategori/<kök-slug>` (değişmez) |
+| Alt kategori | `/tr/kategori/<üst>/<alt>` | **`/tr/kategori/<alt-slug>`** (tek seviye); EN `/en/category/<alt-slug>` (EN kapalı, noindex) |
+| Eski alt kategori adresi | `/tr/category/<üst>/<alt>` → tek 308 → `/tr/kategori/<üst>/<alt>` | `/tr/category/<üst>/<alt>` → **tek 308** → `/tr/kategori/<alt-slug>` |
+| 3-C'nin iki seviyeli adresi | yeni adres (canlıda hiç yayınlanmadı) | `/tr/kategori/<üst>/<alt>` → 308 → `/tr/kategori/<alt-slug>` |
+| Eski kök adres | `/tr/category/<kök>` → 308 → `/tr/kategori/<kök-slug>` | aynı |
+| Pasif kategori (7) | — | aktif üst varsa üstün adresine 308, yoksa `/tr/urunler` |
+| Ürün ailesi | `/tr/urun/<aile-slug>` | değişmez |
+| Model | `/tr/urun/<ad>-p-<sku>` (liste boş) | değişmez; pilot en erken 22 Ekim |
+| Marka | `/tr/markalar/<slug>` | değişmez |
+| 308'lerin üretimi | harita + `next.config`'ten 25 kuralın silinmesi | iç içe eski adres 308'i **rota içinde** (`src/lib/data/kategoriSegmenti.ts` `kategoriRotasiniUygula`); `next.config`'te iç içe kategori kuralı yok (yalnız 13 satırlık eski TR slug → EN slug listesi); silinen kural sayısı ÖLÇÜLMEDİ (#1854'te `next.config.mjs` değişmedi; sayı haritadan sonra #1811'de belli olur) |
+
+Kaynak: URUN'un B-1 cevabı (Kanban ALT-53 notu, 10 Ekim 14:01 ve 17:02) ve karar belgesi §9. **Ölçülmedi:** B-1 kodu #1854'te (**birleşti**: master `286c7b2ec`, 11 Ekim akşamı, bayrak kapalı); kural URUN'un okumasıdır (URUN, 11 Ekim: bayrak açıkken iç içe adres hiçbir girdide içerik çizmez, tek 308 ya da 404); ALTYAPI kodla doğrulamadı, gerçek HTTP ölçümü önizlemede (§4.10, §4.11). **Çift sıçrama riski (URUN: kapılar #1854'te tek sıçrama kollarına taşındı, eski TR kök slug'lı iç içe adres dahil; birim düzeyinde yeşil, HTTP ölçümü önizlemede):** eski TR kök slug'lı iç içe adres (`/tr/category/fanlar/<alt>`) önce `next.config`'teki eski TR slug → EN slug kuralıyla `/category/fans/<alt>`'e, sonra rota içi 308 ile `/tr/kategori/<alt-slug>`'a gidebilir (2 sıçrama). Kapılar `korozyon-tek-sicrama` ve `kategori-tr-adlari-tek-sicrama` bunu ölçer; matris `--dilsiz-hop-en-cok 1` ile Cumartesi 17 Ekim'de ayrıca ölçer (§4.1).
+
+### 0.2 B-1'in ALTYAPI'ya yüklediği araç işleri (B-1 kod PR'ı master'a girince; şerit `scripts/adres/**`)
+
+| # | İş | Neden | Ne zaman |
+|---|---|---|---|
+| a | `scripts/adres/matris-ornekler.json` alt kategori örnekleri | `matris.cjs` yeni dinamik rota ya da şablon görürse örnek girilmeden ÇALIŞMAZ (dosya başlığı): B-1 şablonu değiştirirse matris ilk koşuda durur | PR gelince, aynı gün |
+| b | `scripts/adres/onizleme-tarama.cjs` beklenen adres listesi | 247 adres 3-C şemasına göre; alt kategori adresi ve eski adres 308 hedefleri değişir, güncellenmezse §4.2 KIRMIZI verir | PR gelince |
+| c | `scripts/adres/onizleme-adres.mjs` yama tablosu | bayrak adı/yeri değişirse önizleme aracı DURUR | PR gelince; bayrak aynıysa iş yok |
+| d | `docs/plans/onizleme-tiklama-listesi-2026-10-09.md` ve okuyucu testi | alt kategori adreslerini listeler; Recep'in 17 Ekim önizlemesi bu listeyle yapılır | 16 Ekim |
+| e | `tests/smoke/ssr-html.spec.ts` temsilci sınıfları | sınıflar (`altgruplu-kategori`, `yaprak-kategori`) B-1 alt kategori yapısında hâlâ bulunmalı; bulunmazsa yayın sonrası 09:40 alarmı kırmızı yanar (seçimin site haritasına bağımlılığı okunmadı) | PR gelince ölçülür |
+
+## 1. Ön koşullar (hepsi ✔ olmadan pencere açılmaz)
+
+| # | Ön koşul | Nasıl doğrulanır | Sahibi | Durum (10 Ekim, öğle) |
+|---|---|---|---|---|
+| 1 | Recep'in önizleme onayı (v0.4.4'te Cuma; B-1'de 17 Ekim önizlemesi) ("gördüm, tamam", karar 68) | OPS'un Recep'ten aldığı yanıt | OPS | ölçülmedi (OPS'ta); tarih: Cumartesi 17 Ekim önizlemesinden sonra |
+| 2 | **B-1 kod PR'ı hazır ve CI yeşil**: B-1 kuralı (§0.1) + bayrak + eski adres haritası + `next.config`'ten silinen kurallar + 12 maddelik düzeltme paketi (kapsamı PR açıklamasında); bayrak kapalıyken çıktı bayt bayt aynıdır ve bunu test ölçer (karar 298 kalıbı) | `gh pr view <no> --repo peckop/venthub-hvac-esite --json mergeable,statusCheckRollup`; PR açıklamasında **beklenen site haritası sayısı**, **silinen config kural sayısı**, **harita dosyasının yolu** ve **matris ucu (yeşil CI'lı kesin SHA)** yazılı | URUN / OPS | **B-1 kod PR'ı #1854 BİRLEŞTİ** (master `286c7b2ec`, 11 Ekim akşamı, OPS bildirimi; dal `urun/urn85-b1-kod`, bayrak KAPALI; son yeşil CI'lı uçlar `0901b87aa` ve `9d793abb3`; önceki uç `f2bfebb80` geçersiz; ara sonrası docs + `preload.ts` yorumu commit'iyle uç değişecek). Eski 3-C taslağı **#1811** (uç `437da0b0a`, iki seviyeli adres) B-1 koduyla güncellenip master'a rebase edilecek ve yayın günü bayrağı `true` yapacak (ayrı bayrak PR'ı açılmaz). Açık kalan (`[B-1 PR'INDAN]`): matris ucu = URUN'un son yeşil SHA mesajı, beklenen harita ve site haritası sayısı, silinen config kural sayısı (haritadan sonra #1811'de), #1738 (`CIFT-GOVDE`) durumu. Kapanan: PR no, dal adı, bayrak adı ve yeri, `generateStaticParams` kararı (rota dosyası kalıyor; 35 → 56 sayfa), yayın PR'ının yapısı (kod PR bayrak kapalı + #1811) |
+| 3 | **Sıra bağlayıcıdır:** (a) B-1 kod PR'ı **bayrak kapalı** master'a girer → (b) kategori slug benzersiz indeks migration'ı prod'a iner (kural 13) → (c) harita üretimi master'da koşar → (d) harita dosyası commit'lenir → (e) önizleme ve matris. **Neden:** harita üreteci (`src/lib/adres/haritaUret.ts`) hedef adresleri master'daki koddan ve veritabanından hesaplar; iş akışı yalnız `refs/heads/master`'da koşar (güvenlik kapısı, public repo; açılmaz). B-1 kodu master'da değilken üretilen harita eski (iki seviyeli) kategori hedeflerini taşır ve çift sıçrama yapar | (a) `gh pr view <no> --json state,mergedAt`; (b) `supabase-migrate` koşumu success + `pg_indexes` ölçümü (yalnız sayı; `categories_tr_slug_tenant_uq` ve `categories_en_slug_tenant_uq`, PR #1853); (c) `gh workflow run harita-uret.yml --repo peckop/venthub-hvac-esite --ref master -f not="ALT-53 B-1 harita"`, sonra `gh run download <koşu> -n eski-adres-haritasi -D C:/tmp/yayin-19-ekim/`; (d) ALTYAPI dosyayı sha256'sıyla URUN'a verir, URUN PR'a koyar, **elle değiştirilmez**, `--dogrula` tamam olmalı | URUN (kod, migration, commit), ALTYAPI (harita üretimi), OPS (birleştirme, migration onayı) | (a) ✔ PR #1854 birleşti (master `286c7b2ec`, 11 Ekim akşamı; OPS bildirimi, ALTYAPI `git log origin/master` ile doğruladı) · (b) ✘ PR #1853 taslak · (c) ✘ B-1 kodu master'da değil: 10 Ekim haritası (koşu 38037549974, master `518673b4f`) B-1 için **kategori hedeflerinde GEÇERSİZDİR** (aile, model, marka hedefleri değişmez) · (d) ✘. **Süre:** harita koşusu 26 sn (10 Ekim ölçüldü); asıl bekleme (a) ve (b). Katalog DB'yi değiştirirse harita yeniden üretilir ve taban yeniden alınır |
+| 4 | Taban ölçümleri alındı (§2), hepsi **migration ve harita sonrası** | `C:/tmp/yayin-19-ekim/` dosyaları | ALTYAPI | **Taban saati (ALTYAPI önerisi, OPS onayı bekliyor): Pazar 18 Ekim akşamı.** Birleştirme sınırı **16:30**; taban bu saatteki son birleşmeden sonra, **o commit'te CI success** görülüp **Production dağıtımı READY** olunca alınır (Vercel `list_deployments`, commit SHA eşleşmesi); dağıtım SHA'sı taban dosyalarının yanına yazılır; 17:00 geçerse ALTYAPI OPS'a yazar, kuyruğu OPS keser. Master'da kesintili bir CI kırmızısı çıkarsa yalnız o iş yeniden koşturulur ve sebebi taban dosyasının yanına yazılır (bkz. #1818 port testi). Aynı kural geri alma hedefinin yeniden alınmasına da uygulanır (ön koşul 5). Taban, B-1 kodu ve düzeltme paketi bayrak KAPALI iken canlıda olan dağıtımdan alınır; JSON-LD ve site haritası sayıları 10 Ekim tabanıyla (3-C dönemi) KIYASLANMAZ |
+| 5 | Geri alma hedefi bilinir: şimdiki Production dağıtımı READY ve **dağıtım numarası not edildi** | Vercel → Deployments (ya da Vercel MCP `list_deployments`) | ALTYAPI | Pazar 18 Ekim akşamı (taban saatinden sonra). **Okuma:** Vercel MCP `list_deployments` çalışır (ALTYAPI penceresi, 10 Ekim ölçüldü); env okuması MCP'de **403** verir, değişken adları Vercel CLI ile okunur (**değerler okunmaz**). **Dağıtım numarası Pazar 18 Ekim akşamı, günün son birleşmesinin dağıtımı READY olduktan sonra YENİDEN alınır** (10 Ekim öğlenki `dpl_8yV6msuoXbM1oW4Rs3xTMiuVS6Mh`, commit `518673b4f`, bayattır). **Yazım** (A3) OPS'tadır: OPS penceresi, Vercel CLI, Recep'in o penceredeki sözü (OPS kararı, 10 Ekim; önceki "MCP ile ALTYAPI penceresi" kararının yerine geçer) |
+| 6 | Production `NEXT_PUBLIC_ADRES_DILI` şimdi `0` ya da tanımsız; **Preview'a dokunulmaz** (tanımsız kalır) | Vercel → Settings → Environment Variables (ya da Vercel CLI `vercel --scope peckops-projects env ls <ortam> --project venthub-hvac-esite`; değer okunmaz) | ALTYAPI | **Ölçüldü (10 Ekim, öğle, CLI; değerler okunmadı):** `NEXT_PUBLIC_ADRES_DILI` Production'da **tanımsız** (= kapalı ✔) ve Preview'da da **tanımsız** (v0.2'deki "Preview `1`" beklentisi karşılanmıyor; B-1 PR'ının Vercel önizlemesi statik sayfa adreslerini açmaz). Değişken yok olduğu için A3'te **oluşturulur** (`vercel env add`), düzenlenmez; yazımı **OPS** yapar (OPS kararı, 10 Ekim: OPS penceresi, Vercel CLI 59.1.4, `vercel whoami` = peckop). **Preview ortamına dokunulmaz:** oradaki değişiklik bütün PR önizlemelerini değiştirir; Vercel önizlemesine bakan bir E2E ya da CI işi varsa Pazar arifesinde kırılır. MCP ile `filter_project_envs` **403** verdi (env okuma yetkisi yok). **Bu satır Pazar 18 Ekim akşamı yeniden okunur** (10 Ekim ölçümüdür) |
+| 7 | IndexNow anahtar dosyası yayında: anahtar depo sabitinden okunur ve canlı dosyayla karşılaştırılır (§5.1) | `export INDEXNOW_KEY=$(grep -oE "'[0-9a-f]{32}'" src/config/indexnow.ts \| tr -d "'")` sonra `curl -s https://venthub.com.tr/$INDEXNOW_KEY.txt \| wc -c` → **32** | GEO-SEO / ALTYAPI | Pazar 18 Ekim akşamı. GEO-SEO 10 Ekim öğle denedi: anahtar 32 karakter, canlı dosya gövdesine eşit |
+| 8 | `EN_YAYIN` **kapalı**. İngilizce adresler **TR'den önce açılamaz** (sıra kuralı); karar 327'nin 18 Ekim tarihi kayıyor, OPS önerisi en erken **22 Ekim** (Recep'e bilgi gitti, kesinleşmedi); yayın günü açılmaz | OPS kararı; master'da `EN_YAYIN = false` | OPS | karar verildi; master'da `false` (ölçüldü 10 Ekim 08:45; 19 Ekim 07:00'de yeniden okunur) |
+| 9 | Pencere açılırken **master CI yeşil**: `INV-TABAN-TAZE-1` migration sonrası master push CI'ını kırmızı yaktı (şema tabanı 09 Ekim'de kalmıştı) | `gh run list --branch master --event push -L 3`; kırmızıysa ALT-50 şema tabanı PR'ı | ALTYAPI / OPS | 10 Ekim: şema tabanı OPS'un **#1806**'sıyla yenilendi (`518673b4f`). B-1 migration'ı (kategori slug indeksi) master push CI'ını AYNI nedenle kırmızı yakabilir: migration birleşince şema tabanı (`sema-tabani-uret.yml`) yenilenir (ALT-50, OPS). **Kural:** taban ölçümü günün SON birleşmesinden sonra alınır; o commit'te CI **success** görülmeden taban alınmaz; art arda birleşmeler CI'ı iptal eder (10 Ekim: `de56ef717`, `f73b1cef7`, `cd3131f85`, `4200646b8`, `f9b083de1`), bu yüzden son birleşmeden sonra kuyruk boşalana kadar beklenir. Taban alındıktan sonra Pazartesi 07:42'ye kadar birleşme yok (OPS duyurur). Pencere açılırken yeniden okunur |
+| 10 | Birleştirme dondurması: **Pazar 18 Ekim 18:00'dan** Pazartesi 07:42'deki B-1 yayın birleştirmesine kadar başka PR birleşmez (her birleşme Production dağıtımı başlatır; env değişkeni `1` iken erken açılış riski). Pazartesi penceresinde tek birleştirme (B-1 yayın PR'ı) ve tek dağıtım kalır | OPS duyurusu | OPS | planlanacak |
+| 11 | **Veritabanı yazım dondurması.** Bayrak açıkken ürün/kategori webhook'u eski şema adreslerini de IndexNow'a veriyor (`src/lib/seo/indexnow.ts:151` süzgeç devre dışı, `tazelemeYollari.ts:24` `SEMALAR=[false,true]`, `route.ts:755`); ayrıca 2xx dışı yanıt "gonderildi" diye kaydediliyor. **Harita bayatlığı kodla değil bu dondurmayla tutulur (OPS boşluk denetimi, 11 Ekim; B-l):** eski adres haritasının güncelliğini ölçen bir kapı yok (`bayrak-kapisi.test.ts` yalnız haritanın `null` olmadığını ve varsayılan kiracıda `urunSayisi > 0` taşıdığını ölçer); harita üretildikten sonra ürün, kategori ya da aile adı değişirse hiçbir test kırmızı vermez. **OPS kararı (3-C dönemi; B-1'de aynen uygulanır, OPS onayı bekliyor):** pencere açılışından (Pazartesi 07:30) URN-10 düzeltmesi birleşene kadar (URUN) ürün, kategori ve aile yazımı **yok**; OPS canlı yazım betiği koşmaz, admin paneli için Recep'e haber verir | **Zamanlanmış yazıcı envanteri (ALTYAPI, 10 Ekim, salt okuma):** (a) `cron.job` canlıda 2 iş: `tcmb-rates-sync-daily` (12:45 UTC, `currency_rates`'e INSERT; o tabloda webhook tetiği yok) ve `arama-kuyrugu-bosalt` (5 dk'da bir; kuyruktan siler, `product_search_index`'i tazeler; `products`/`categories`/`product_families` tablolarına yazmaz); (b) GitHub Actions: `release-expired-reservations` (03:15 UTC) **`process_order_stock_restore` ile `products.stock_qty` günceller ve `inventory_movements`'a yazar → webhook tetiği ateşler**; `order-housekeeping` (30 dk) yalnız `venthub_orders`; `stock-alert` GET, DB yazımı yok; diğerleri (`katalog-sayim`, `deploy-functions`, `dunya-durumu`, `ssr-duman-alarmi`, `bagimlilik-denetimi`) DB'ye yazmaz; (c) Vercel cron yok (`vercel.json`'da `crons` yok) | ALTYAPI / OPS | `release-expired-reservations` tek riskli kalem; canlıda **son 60 günde `inventory_movements`'ta 0 satır** (ölçüldü 10 Ekim 12:1x), yani iş fiilen yazmıyor. **Durdurmayı OPS yürütür (OPS kararı, 10 Ekim):** Pazartesi 07:30'da OPS kendi penceresinde `gh workflow disable expired-reservations-cron.yml` koşar (iş 06:15 TR'de koşmuş olur; durdurma yine de açılışta yapılır) (iş akışı adı "Suresi Dolan Rezervasyonlar (gunluk)"); URN-10 birleşince OPS `gh workflow enable expired-reservations-cron.yml` ile yeniden açar. **URN-10 durumu (11 Ekim, `git log origin/master --grep URN-10`): master'da YOK** (yalnız URN-101 ve URN-105 eşleşir). **B-g (URUN, 11 Ekim):** #1854 webhook yol üreticisini (`src/lib/seo/tazelemeYollari.ts` kaynağı ve testleri) alt kategori tek seviyeli adresine uyarladı; `indexnow.ts` kaynağı değişmedi (adresi `adresUret`'ten alıyor), webhook `route.ts`'e dokunulmadı (`eskiChildPaths` döngüsü yeni yol üretmiyor, zararsız). ALTYAPI bu kodu okumadı; URN-10 kuyrukta, B-1 PR'larından sonra. Doğrulama: `gh workflow list --all` çıktısında durum `disabled_manually`. **Ölçülmedi:** admin paneli ve toplu içe aktarma betikleri (zamanlanmış değil, insan eliyle) |
+
+## 2. Hazırlık: taban ölçümleri (Pazar 18 Ekim akşamı; hepsi **kapalı** durumda, **migration ve harita sonrası**; 2.2 açık beklenen matris tam doğrulama günü Cumartesi 17 Ekim'de alınır)
+
+Komutlar güncel `master`'dan açılmış bir çalışma ağacında koşar (`git fetch origin && git merge --ff-only origin/master`); hepsi yalnız GET atar. Tek taban zamanı kuralı (URUN teyit etti): `matris-kapali-once`, `matris-kapali-t0` ve `eski-adresler.json` **migration ve harita sonrası** ve aynı akşam (Pazar 18 Ekim) alınır; böylece "kapalı önce ≡ kapalı T0" farkı ∅ kalır.
+
+| # | Ölçüm | Komut | Beklenen | Dur ölçütü |
+|---|---|---|---|---|
+| 2.1 | Kapalı matris (canlı) | `node scripts/adres/matris.cjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/matris-kapali-once.json` | çıkış 0; özet satırı `adresSayisi` ≈ **241**, `hataSayisi` **0** (09 Ekim denemesi, migration öncesi: `200: 180, 404: 61`, dilsiz hop dağılımı `{0:2, 1:16, 2:1, 3:17, 4:9}`; migration sonrası sayı **yeniden ölçülür**, kategori sayısı değişmediği için aynı beklenir) | `hataSayisi` > 0 → ağ/site sorunu, pencere ertelenir |
+| 2.2 | **Açık beklenen matris** (yayından sonra canlının eşleşeceği şey) | **B-1 PR'ının kendi dalından** önizleme derlemesi (**11 Ekim akşamı:** #1854 birleşti, B-1 kodu master `286c7b2ec`'te ve bayrak kapalı; bayrak açık önizlemenin hangi daldan alınacağı, master'a yamalı derleme mi #1811'in B-1 rebase dalı (URN-120) mı, ÖLÇÜLMEDİ; URUN'un önizleme teslimiyle netleşir ve bu satır güncellenir) (≈ 8 dk ölçüldü, 10 Ekim 13:29-13:36; 25 dk tahmindi): `node scripts/onizleme.mjs <B-1 dal adı ya da PR numarası> --port 3100 --adres` (dal adı ya da PR numarası **zorunlu**; 3-C dönemi denemesi: 10 Ekim 13:13, `urun/urn85-adres-acilis-3c-2` ucu `362e6c934`), sonra `node scripts/adres/matris.cjs --taban http://localhost:3100 --cikti C:/tmp/yayin-19-ekim/matris-acik-beklenen.json`. B-1 önizlemesi prod veritabanını okur: migration sonrası kökler yeni adla beklenir. **Yerel derlemeden alınır, Vercel Preview'dan DEĞİL** (Preview'da `NEXT_PUBLIC_ADRES_DILI` tanımsız: kategori/aile/marka açık, statik sayfa adresleri kapalı kalır; URUN da aynısını söyledi). **Ne zaman:** B-1 PR'ı yeşil olunca ve URUN "matris ucu = X" (yeşil CI'lı kesin SHA) yazınca (tam doğrulama günü Cumartesi 17 Ekim; B-1 kodu 12–16 Ekim); başlatmadan önce durum satırındaki BELLEK değerine bak: **boş bellek 2 GB'ın altındaysa başlatma, OPS'a yaz** (10 Ekim'de 0,93–4,6 GB arasında dalgalandı). Bitince adres ve saat OPS'a yazılır; aynı derlemede tıklama listesi satır 18 (`?sku=`) da ölçülür | çıkış 0 | önizleme ağacı B-1'in içeriğini taşımıyorsa (bayrak yaması ≠ B-1 PR'ı; yama tablosu `scripts/adres/onizleme-adres.mjs` bayrağı `ADRES_SEMASI_K3B = false` metniyle arar: **B-1 PR'ı bayrağı yeniden adlandırırsa araç DURUR, önce yama tablosu güncellenir**, §0.2 c) beklenen matris yanlış olur: OPS'a söyle. **Her derlemeden ÖNCE ağacın `.next` klasörü ağaç DIŞINA taşınır** (Next'in veri önbelleği `.next/cache/fetch-cache` derlemeler arası kalır; 10 Ekim'de dünden kalan bayat kategori adı `frekans-konvertorleri` için yönlendirme döngüsü üretti). Komut: `powershell -NoProfile -Command "Move-Item -LiteralPath 'C:\tmp\vh-onizleme\.next' -Destination 'C:\tmp\vh-onizleme-next-eski-<tarih>'"` (**ağacın İÇİNE yeniden adlandırma yapılmaz**: önizleme aracı ağacı "kirli" sayıp DURUR; Git Bash `mv` Windows'ta "Permission denied" verdi, PowerShell `Move-Item` çalıştı). Soğuk derleme ≈ 8 dk (10 Ekim 13:29-13:36). **İlk koşu "DURDU: ağaç commit'e çevrilemedi" derse** (10 Ekim 13:11'de oldu): `C:/Users/alize/venthub-hvac/.git/worktrees/vh-onizleme/index.lock` dosyasına bak; 0 bayt ve yaşı büyükse ve çalışan git süreci yoksa (`tasklist` ile bak) yalnız o **tek dosya** silinir, derleme yeniden başlatılır. Matris yalnız URUN'un bildirdiği yeşil SHA'dan alınır; uç değişirse yeniden alınır. **B-1 dalı** `urun/urn85-b1-kod` (PR #1854); URUN'un 11 Ekim'de bildirdiği yeşil CI'lı uç `0901b87aa`; docs + `preload.ts` yorumu commit'inden sonra uç değişir (matristeki kod davranışı değişmez ama matris ucu SHA'sı URUN'un yeni mesajıyla yeniden yazılır). **243 adreslik 3-C matrisinin beklentisi B-1 hedefleriyle yeniden üretilir** (`matris-ornekler.json`, `onizleme-tarama.cjs` listesi; sıra §1 madde 3); yeni beklenti ÖLÇÜLMEDİ. (3-C dönemi, B-1 için GEÇERSİZ: 10 Ekim uç `437da0b0a`, 243 adres, hata 0, döngü 0.) |
+| 2.3 | Eski adres evreni (migration sonrası site haritası) **+ sekiz eski adres elle** | `node scripts/seo/adres-yayin-denetim.mjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/taban`, sonra §2.6'daki sekiz eski adresi `C:/tmp/yayin-19-ekim/taban/eski-adresler.json` dizisinin sonuna ekle (tam adres, `https://venthub.com.tr/tr/category/<eski>`; dosya JSON dizisi ya da satır satır metin olabilir) | çıkış 0; `eski-adresler.json` yazılır; sekiz adres eklendikten sonra dizi uzunluğu = üretilen + 8 | çıkış 3 (EVREN-BOS) → site haritası boş okundu, durulur. Sekiz adres eklenmezse §4.3 bu sekizin "tek 308 → 200" olduğunu **ölçmez** |
+| 2.4 | Canlı kapı tabanı | 09 Ekim tabanını alan komutun aynısı (`docs/audits/rec-300-taban-2026-10-09.md` §4); komut: `node scripts/seo/canli-kapi.mjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/canli-kapi --bilinen scripts/seo/canli-kapi-bilinen.json --kayit-durum C:/tmp/yayin-19-ekim/kayit-durum.json` (JSON Kanban'dan, 8 kayıt, GEO-SEO hazırladı; ≈ 16 sn; §4.7 **aynı bayraklarla**, yoksa kapı Linear'a gider ve Linear donuktur) | 10 Ekim GEO-SEO denemesi: KIRMIZI 101 = yeni 16 + bilinen 85 (yeni 16 = `LASTMOD-BUGUN` 15 + `VITRIN-IDDIA` 1). **09 Ekim sayısı (92) ile KIYASLANMAZ:** o tabanda REC-491 ve REC-494 Linear'da Done göründüğü için 2 `BILINEN-KAYIT-KAPALI` yeni kırmızı sayılmıştı. `LASTMOD-BUGUN` tarih bağımlıdır (lastmod = koşu günü ise kırmızı): tabandaki küme ile yayın günü sonrası küme farklı çıkabilir | "tabandan yeni kırmızı kod büyümez" ölçütü ALTYAPI'nın Pazar 18 Ekim akşamı alacağı tabana göre uygulanır, 09 Ekim sayısına göre değil; taban sayısı bu tablodan farklıysa tabanı yeniden yaz |
+| 2.5 | Bağlantı taraması | `node scripts/seo/link-tara.mjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/link-once` | 09 Ekim: 92 sayfa, 1139 tekil adres, **kırık 0** | kırık > 0 → önce nedeni (REC-493 notu: iç bağlantı 308'lerini bu sayaç görmez, `canli-kapi` görür) |
+| 2.6 | **Sekiz kategori adı (URN-85), kapalı kip, elle** | Aşağıdaki döngü (sekiz çift tablonun altında) | OPS 10 Ekim ölçtü: sekiz eski adres **tek 308** ile `/tr/category/<yeni>`'ye gider, sekiz yeni adres **200**. Taban aynı akşam yeniden alınır | herhangi biri farklıysa dur, OPS'a: bu sekiz adres Pazar günü matriste 200 → 308 farkı üretir |
+
+**Sekiz çift** (kaynak: URUN planı `docs/plans/rec300-model-adres-kategori-tr-adlari-2026-10-10.md`, "Yapılacak" tablosu; EN kanonik ad değişmez):
+
+| EN kanonik | Eski TR adı | Yeni TR adı (Design CSV) |
+|---|---|---|
+| control-systems | kontrol-sistemleri | kontrol-ve-suruculer |
+| air-treatment | iklimlendirme-ve-hava-sartlandirma | hava-sartlandirma |
+| water-coil-duct-heaters | sulu-batarya-kanal-tipi | sulu-bataryalar |
+| single-room-hrv | tekil-oda-uniteleri | tek-oda-uniteleri |
+| axial-industrial-fans | aksiyel-sanayi-fanlari | aksiyel-fanlar |
+| spare-parts-sensors | yedek-parca-ve-sensorler | yedek-parcalar-ve-sensorler |
+| bathroom-toilet-fans | banyo-ve-tuvalet-fanlari | banyo-tuvalet-fanlari |
+| industrial-ceiling-fans | endustriyel-tavan-vantilatorleri | tavan-vantilatorleri |
+
+Elle ölçüm döngüsü (`<yol>` kapalı kipte `category`, Pazar açık kipte `kategori`):
+
+```
+while read eski yeni; do
+  a=$(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" "https://venthub.com.tr/tr/category/$eski")
+  b=$(curl -s -o /dev/null -w "%{http_code}" "https://venthub.com.tr/tr/<yol>/$yeni")
+  echo "$eski -> [$a] ; yeni: $b"
+done <<'EOF'
+kontrol-sistemleri kontrol-ve-suruculer
+iklimlendirme-ve-hava-sartlandirma hava-sartlandirma
+sulu-batarya-kanal-tipi sulu-bataryalar
+tekil-oda-uniteleri tek-oda-uniteleri
+aksiyel-sanayi-fanlari aksiyel-fanlar
+yedek-parca-ve-sensorler yedek-parcalar-ve-sensorler
+banyo-ve-tuvalet-fanlari banyo-tuvalet-fanlari
+endustriyel-tavan-vantilatorleri tavan-vantilatorleri
+EOF
+```
+
+## 3. Pencere (T0 ve sonrası)
+
+| Adım | Saat | Kim | Eylem / komut | Beklenen | Geri alma / dur |
+|---|---|---|---|---|---|
+| A1 | 07:30 | OPS | Pencere açıldı, birleştirme dondurması (Pazar 18:00'dan beri) sürüyor | duyuru | — |
+| A2 | 07:30 | ALTYAPI | **T0 matrisi**: `node scripts/adres/matris.cjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/matris-kapali-t0.json`, sonra `node scripts/adres/matris.cjs --karsilastir C:/tmp/yayin-19-ekim/matris-kapali-once.json C:/tmp/yayin-19-ekim/matris-kapali-t0.json` | çıkış 0 (**fark ∅**; bayrak kapalıyken canlı değişmemiş; `matris-kapali-once` migration sonrası alındığı için sekiz adres farkı çıkmaz) | çıkış 1 → fark listesi OPS'a; sebep bulunmadan açılmaz |
+| A3 | 07:40 | **OPS** (OPS penceresi, Vercel CLI; Recep'in o penceredeki "yaz" sözüyle; ALTYAPI komutu hazırlar) | Vercel → Production → `NEXT_PUBLIC_ADRES_DILI` = **`1`** (tam `1`; `true` açmaz). **A4'ten ÖNCE:** `NEXT_PUBLIC_` değişkeni derlemeye gömülür ve Vercel'de "değişiklik önceki dağıtımlara uygulanmaz, yalnız yeni dağıtımlara" (kaynak: vercel.com/docs/environment-variables); A4'te başlayan derleme değişkeni görmezse bayrak kapalı derlenir. Komut (Vercel CLI 59.1.4): `vercel env add NEXT_PUBLIC_ADRES_DILI production --value 1 --no-sensitive --yes --scope peckops-projects --project venthub-hvac-esite`. Değer `--value` ile verilir, **stdin'le değil**: Vercel belgesi (vercel.com/docs/cli/env) stdin'den gelen değerde satır sonunun kırpılıp kırpılmadığını **yazmıyor**, o yüzden `echo 1 \| ...` ve `< dosya` biçimleri KULLANILMAZ. **Preview'a dokunulmaz.** Bu adım tek başına dağıtım başlatmaz. **Ölçülmedi:** komut canlıya yazar, ALTYAPI denemedi | değişken adı Production'da listelenir: `vercel env ls production --scope peckops-projects --project venthub-hvac-esite` (**değer okunmaz**; `vercel env pull` KULLANILMAZ, bütün üretim değerlerini diske yazar). Gerçek değerin `1` olduğu A6'da davranıştan görülür (4.1, 4.9) | geri alma: `vercel env rm NEXT_PUBLIC_ADRES_DILI production --yes --scope peckops-projects --project venthub-hvac-esite`; mevcut dağıtım DEĞİŞMEZ, etki yeni dağıtımla görülür (§7 seviye 1) |
+| A4 | 07:42 | OPS | **B-1 yayın PR'ını birleştir** (#1811: bayrak `ADRES_SEMASI_K3B = true` + harita + `next.config`'ten silinen kurallar; B-1 kodu #1854'te bayrak kapalı zaten master'dadır; silinen kural sayısı haritadan sonra belli olur, ÖLÇÜLMEDİ). Production dağıtımı kendiliğinden başlar | dağıtım "Building" | A5'te kırmızı → §7 |
+| A5 | ≈07:50 | ALTYAPI | Production dağıtımı **READY** ve commit = B-1 yayın birleştirme commit'i (Vercel Deployments) | READY, derleme günlüğünde hata yok | READY olmadı / 15 dk'yı aştı → §7 seviye 2 |
+| A5b | ≈07:50 (A5'ten hemen sonra, **A6'dan ÖNCE**) | **OPS** (OPS penceresi, Vercel MCP `invalidate_by_tags`; canlı yazım; ALTYAPI komutu hazırlar; yalnız 4.10 ölçümü döngü/eski ad gösterirse) | **Kategori sayfası veri önbelleği: ÖLÇÜME BAĞLI (OPS kararı, 10 Ekim, düzeltilmiş: koşulsuz ön adım değil).** Sıra: (1) bayrak dağıtımı READY → kontrol adreslerine (4.10) **iki istek** (ısıt + ölç); (2) döngü ya da eski ad varsa aşağıdaki `invalidate_by_tags` (üç örtük etiket), yine iki istekle ölç; (3) hâlâ varsa `/api/webhook/supabase`'e `categories` UPDATE yükü; (4) hâlâ varsa §7 Seviye 2. **Gerekçe:** yeni ağaç sayfalarının canlıda önbellek girdisi büyük olasılıkla yoktur (ilk istek DB'den taze okur), eski ağaç girdileri #1802'den sonra tazelenmiş görünüyor (canlıda 8/8 ölçüldü); komutun etkisi ölçülmedi. Webhook'un `categories` dalı yeni ağaç yolunu da tazeler (`kategoriYollari`: v0.5 taslağında «iki dil × iki şema, `/tr/kategori/<üst>/<alt>` dahil» diye 3-C kodundan okunmuştu; **B-1 sonrası bayat**: URUN #1854'te `tazelemeYollari.ts` kaynağını ve testlerini tek seviyeye uyarladı, webhook `route.ts` kaynağına dokunmadı (`eskiChildPaths` döngüsü yeni yol üretmiyor, URUN: zararsız, yorumu bayat); B-1 sonrası yol listesi bu belgede kodla yeniden OKUNMADI, yani «yol boşluğu yoktur» iddiası B-1 için ÖLÇÜLMEDİ). Sebep: Next'in Data Cache'i dağıtımlar arası KALIR; 10 Ekim'de önizleme ağacında dünden kalan bayat girdi `frekans-konvertorleri` için `kontrol-ve-suruculer` ⇄ `kontrol-sistemleri` yönlendirme DÖNGÜSÜ üretti (aynı uçta soğuk önbellekle yeniden derlenince döngü kayboldu: 243 adres, hata 0, döngü 0; bayat önbellekli ilk matris `matris-acik-beklenen-bayat-onbellek.json`). Canlıda aynı bayat girdi yeni ağaç sayfalarında çıkabilir. Çağrı: `invalidate_by_tags` (`projectIdOrName`=`venthub-hvac-esite`, `slug`=`peckops-projects`, `requestBody`=`{"tags":["_N_T_/[lang]/kategori/[kok]/[[...dal]]/page","_N_T_/[lang]/category/[categorySlug]/page","_N_T_/[lang]/category/[categorySlug]/[subCategorySlug]/page"],"target":"production"}`). **Etiket adlarının kaynağı:** Next 15.5.27 `node_modules/next/dist/server/lib/implicit-tags.js` (`_N_T_` önekli, sayfa rotasından türetilir: `_N_T_` + `/[lang]/kategori/[kok]/[[...dal]]/page`); kodda kategoriye ait AÇIK etiket YOKTUR (`src/lib/cache/tags.ts`: `home-data-<kiracı>`, `products-discovery-<kiracı>`, `product-family-<slug>`, `variant-stock`; kategori sayfaları yola göre tazelenir: webhook `revalidatePath`). Kiracı ya da dil etiketin parçası DEĞİLDİR (dil `[lang]` parametresidir). **Ölçülmedi:** komut canlıya yazar; etkisi canlıda denenmedi | yanıt başarılı (HTTP 200); etiketler "bayat" işaretlenir, **ilk istek eski yanıtı döndürebilir ve arka planda tazeler** (araç açıklaması: "revalidated in the background on the next request") | Ardından kontrol adreslerine **iki kez** istek: ilk istek ısıtır, ikinci ölçer (4.10). Döngü sürerse yedek yol: `/api/webhook/supabase`'e `categories` UPDATE yükü (webhook gizli anahtarı OPS'ta; `revalidatePath` yolları üretir) ya da en çok 1 saat bekle (sayfa `revalidate = 3600`) |
+| A5c | A4'ten **hemen sonra** (A5/A6 ile paralel) | ALTYAPI | **Geri alma dalı + DRAFT PR; CI ısınsın, PR kendiliğinden birleşmez** (OPS kararı, 10 Ekim). Squash SHA'sı A4'te oluştuğu için önceden açılamaz. Komutlar: `git fetch origin master`, `git switch -c altyapi/alt53-b1-geri-al origin/master`, `git revert --no-edit <B-1 yayın PR'ı squash SHA>` (tek ebeveynli commit), `git push -u origin altyapi/alt53-b1-geri-al`, sonra `gh pr create --draft --base master --head altyapi/alt53-b1-geri-al --title "ALTYAPI (ALT-53): B-1 GERİ ALMA (yalnız geri alma için)" --body-file <dosya>`. **Gövdenin ilk satırı:** `YALNIZ GERİ ALMA İÇİN`; son satır `Kanban: ALT-53`. **Prova (3-C dönemi, 10 Ekim, geçici ağaç; B-1 yayın PR'ı gelince yeniden koşulur, v0.5.1):** 437da0b0a'nın 37 dosyalık farkı squash edilip `git revert` uygulandı: çakışma yok, `next.config.mjs` master ile birebir (eski yönlendirmeler geri geldi) | draft PR açık, CI koşuyor (yeşil olunca OPS'a tek satır) | revert çakışırsa (A4'ten önce master'a B-1'e dokunan başka bir PR girdiyse) OPS'a yaz, dalı elle çöz. **Birleştirme yalnız OPS kararıyla ve §7'deki sırayla** (Seviye 2 → env kaldır → bu PR). Pazartesi kapanışında (A10) geri alma gerekmediyse OPS PR'ı kapatır, dal silinir |
+| A6 | 07:50–08:15 | ALTYAPI | **Doğrulama** (§4), sırayla | hepsi yeşil | §4'teki dur ölçütleri |
+| A7 | **08:15** | **OPS** | **Karar kapısı:** devam (IndexNow) ya da geri al (§7) | yazılı karar | — |
+| A8 | 08:30 | GEO-SEO (yürütür) + ALTYAPI (5.1 ve sayıyı teyit eder) | IndexNow (§5) | 200/202 | gönderim geri alınamaz |
+| A9 | 08:50 | GEO-SEO / OPS | GSC ve haberler (§6) | — | — |
+| A10 | 09:00 | OPS | Kapanış: dondurma kalkar, Recep'e özet | — | — |
+
+## 4. Doğrulama (A6)
+
+| # | Ölçüm | Komut | Beklenen | Dur ölçütü |
+|---|---|---|---|---|
+| 4.1 | Açık matris = beklenen | `node scripts/adres/matris.cjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/matris-acik-sonra.json --dilsiz-hop-en-cok 1`, sonra `node scripts/adres/matris.cjs --karsilastir C:/tmp/yayin-19-ekim/matris-acik-sonra.json C:/tmp/yayin-19-ekim/matris-acik-beklenen.json` | ilk komut çıkış 0 (dilsiz adreslerde **en çok 1 hop**; kapalıyken 4'e çıkıyordu) **YALNIZ bilinen istisna 2 (aşağıda) hariç: çıkış 1 ve A9 listesinde tek satır `/destek/hesaplayicilar` = BEKLENEN, alarm değil**; ikinci komut çıkış 0 (**fark ∅**). **Bilinen istisna 2 (OPS emri 15 Ekim; ALT-85/ALT-87 ölçümü; kart ALT-89, düzeltme ALT-88 yayın sonrası):** dilsiz `/destek/hesaplayicilar` 307 → 308 = **2 sıçrama** (bayrak kapalı, `ADRES_DILI` kapalı ve açık: aynı; **canlıda da 2 sıçrama = taban eşit, gerileme değil**; statik sayfa eski adresi, kategori değil); `--dilsiz-hop-en-cok 1` altında bu tek adres A9 ihlali listesine girer. **Yanlış alarm değil «bilinen 1 ihlal, taban eşit»;** başka bir adres listede ya da bu adres 3+ sıçramada ise **KIRMIZI**, OPS'a liste. Rota tablosuna yayın dondurması boyunca dokunulmaz (düzeltme 19 Ekim sonrası, ALT-88). **Önizleme ölçümü (15 Ekim):** dilsiz `/brands` bu istisna 1'de yazılan 2 sıçramayı önizlemede (ff877aacb) **1 sıçrama** (307 → `/tr/markalar`) verdi; `/brands/<slug>` dilsiz satırı matriste yok, ÖLÇÜLMEDİ. **Bilinen istisna (OPS boşluk denetimi, 11 Ekim; URN-119, B-k):** dilsiz `/brands` ve `/brands/<slug>` bayrak açıkken 307 + 308 = **2 sıçrama** verir; bu iki satır `--dilsiz-hop-en-cok 1` altında **KIRMIZI** çıkar ve düzeltme URUN'dadır. **Beklenti satırı: «URUN düzeltmesi birleşince 1».** Düzeltme yayına yetişmezse iki satırı matristen elle ayırıp «bilinen kırmızı» diye OPS'a yazmak ALTYAPI önerisidir, karar OPS'ta | fark varsa liste OPS'a; **kritik** (aşağıdaki 4.4) → geri al, kritik değil → ileri düzeltme kararı OPS'ta |
+| 4.2 | Önizleme taraması, **canlıya karşı** (adres sayısı ÖLÇÜLMEDİ: beklenen liste B-1 hedefleriyle yeniden üretilir ve sayı 17 Ekim önizlemesinde ölçülür; kategori sayfası bayrak açıkken 35 → 56 (URUN'un okuması); 3-C dönemi 247; **beklenen liste B-1'e göre güncellenmeden bu satır KIRMIZI verir**, §0.2 b) | `node scripts/adres/onizleme-tarama.cjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/tarama-canli.json` | çıkış 0, her satır "tamam". Yeni model adresleri 404, eski model adresleri **tek 308 → ailenin sayfası**, yeni statik adresler 200, eski dilli adresler tek 308 | kırmızı satır → liste OPS'a |
+| 4.3 | Yayın denetimi (eski adresin tamamı, harita, sayfa) | `node scripts/seo/adres-yayin-denetim.mjs --taban https://venthub.com.tr --cikti C:/tmp/yayin-19-ekim/sonra --eski C:/tmp/yayin-19-ekim/taban/eski-adresler.json --harita src/data/generated/eski-adres-haritasi.json --model-beklenen 0 --sayfa-denetimi --en-harita-disi-bilincli` | çıkış 0: her eski adres 200 ya da **tek 308 → 200** (taban dosyasına elle eklenen sekiz eski adres dahil), haritadaki her adres yönlendirmesiz 200, canonical = kendi adresi, hreflang tr + x-default | çıkış 1 → KIRMIZI satırlar OPS'a; çıkış 3 → evren boş |
+| 4.4 | **Kritik elle kontrol** | `curl -s -o /dev/null -w "%{http_code}\n" https://venthub.com.tr/tr/cart` ve `.../tr/checkout` ve `.../tr` | hepsi **200** | biri 200 değil → **hemen geri al (§7 seviye 2)** |
+| 4.5 | Tek sıçrama örneği | `curl -s -o /dev/null -w "%{http_code} %{redirect_url}\n" https://venthub.com.tr/category/fanlar` | 307/308 ve hedef yeni adres; hedef `-w "%{http_code}"` ile 200 | hedef 404 ya da ikinci sıçrama → liste OPS'a |
+| 4.6 | Site haritası | `curl -s https://venthub.com.tr/sitemap.xml \| grep -c "<loc>"` | **Beklenen sayı önizlemede ölçülür** (URUN: site haritası girdi sayısı B-1 kodunda değişmez, aynı kategori kümesi, adres biçimi tek segmente döner; ÖLÇÜLMEDİ; EN alternatif yok; model adresi 0; 3-C dönemi 92). Site haritası dizin dosyası + tür bazlı dosyalara bölünürse (karar belgesi §3 madde 7) `grep -c "<loc>"` dizin girdilerini sayar: komut alt dosyaları da gezecek şekilde v0.5.1'de yazılır | sayı farklı → OPS |
+| 4.7 | Canlı kapı + bağlantı (+ #1738 `CIFT-GOVDE`) | 2.4 ve 2.5'in aynı komutları, çıktı klasörleri `canli-kapi-sonra`, `link-sonra` | kapı: KIRMIZI kod kümesi tabandakinden **büyümez** (JSON-LD ve `llms.txt` kodları başka kayıtlarda; #1738 bugün bayrak kapalıyken birleşir, bayrak açılınca `CIFT-GOVDE` burada ölçülür ve yeni kırmızı vermemelidir). **`LASTMOD-BUGUN` ayrı sayılır ve raporlanır, kırmızı kümeye GİRMEZ** (OPS kararı, 10 Ekim): yayın günü karar kapısında bilinen davranıştır, adresi değişen sayfanın lastmod'u yayın günü olur; tabandaki sayısı (10 Ekim: 15) ile sonraki sayı yan yana yazılır, fark "lastmod = koşu günü" diye not edilir. Kapı `--kayit-durum C:/tmp/yayin-19-ekim/kayit-durum.json` ile koşar (Linear'a gitmez); bağlantı: kırık **0**, zincir **0** | yeni kırmızı kod ya da kırık → liste OPS'a |
+| 4.8 | Hata gözlemi | Vercel runtime günlüğü (5xx), Sentry yeni issue (son 15 dk) | 5xx artışı yok, yeni issue yok | belirgin artış → geri al kararı OPS'ta |
+| 4.9 | **Sekiz kategori adı (URN-85), açık kip, elle** | §2.6'daki döngü, `<yol>` = `kategori` | sekiz eski adres (`/tr/category/<eski>`) **tek 308** ile `/tr/kategori/<yeni>` (B-1'de alt kategori olanlar da bu tek seviyeli adresle 200 verir); sekiz yeni adres (`/tr/kategori/<yeni>`) **200**. Ara yol `/tr/category/<yeni>` de tek 308 ile `/tr/kategori/<yeni>`'ye gider (URUN planı, "Zamanlama") | ikinci sıçrama ya da 404 → liste OPS'a |
+| 4.10 | **`frekans-konvertorleri` ayrı satır** (10 Ekim önizleme döngüsü; A5b'den SONRA, iki istek: ısıtma + ölçüm). **Beklenen değerler B-1 kuralından (§0.1) türetildi, ölçülmedi;** B-1 PR'ı (#1854) önizlemede iki istekle teyit edilir (17 Ekim). Data Cache bayatlığı kaynaklı yönlendirme döngüsü sınıfı kodla KAPANMIYOR (URUN: ÖLÇÜLEMEDİ); bu belge «kodla kapandı» demez, ölçüm kalır | `for u in /tr/kategori/frekans-konvertorleri /tr/kategori/kontrol-ve-suruculer/frekans-konvertorleri /tr/kategori/kontrol-sistemleri/frekans-konvertorleri /tr/brands/frekans-konvertoru /tr/category/kontrol-sistemleri/frekans-konvertorleri /tr/category/frekans-konvertorleri /tr/kategori/kontrol-ve-suruculer /tr/kategori/kontrol-ve-suruculer/hiz-anahtarlari /tr/kategori/hiz-anahtarlari; do curl -s -o /dev/null -L --max-redirs 5 -w "%{http_code} %{num_redirects} <- $u\n" "https://venthub.com.tr$u"; done` (iki kez koş) | `/tr/kategori/frekans-konvertorleri` **200**, `num_redirects` 0; `/tr/kategori/kontrol-ve-suruculer/frekans-konvertorleri`, `/tr/kategori/kontrol-sistemleri/frekans-konvertorleri`, `/tr/category/kontrol-sistemleri/frekans-konvertorleri`, `/tr/category/frekans-konvertorleri` ve `/tr/kategori/kontrol-ve-suruculer/hiz-anahtarlari` **200** ve `num_redirects` **1** (tek sıçrama, hedef `/tr/kategori/<alt-slug>`); `/tr/brands/frekans-konvertoru` **200**, en çok 1 sıçrama (marka kuralı değişmez); `/tr/kategori/kontrol-ve-suruculer` ve `/tr/kategori/hiz-anahtarlari` **200**, 0 sıçrama | herhangi biri `--max-redirs` aşımı (curl çıkış 47) ya da `num_redirects` > 1 → **döngü ya da çift sıçrama**: önce A5b'yi yeniden koştur; sürerse OPS'a ve URUN'a (§0.1 çift sıçrama riski), matriste `hata:"dongu"` satırı aranır |
+| 4.11 | **12 maddelik düzeltme paketi** (karar belgesi §3; **#1854 yalnız 5 ve 11'in kategori kısmını (bayrağa bağlı) ve 12'nin slug tekilliğini (#1853) kapsar; 8 breadcrumb ayrı kart URN-112; 1, 2, 3, 4, 6, 7, 9, 10 #1854'te karşılıksız ve #1811'de ya da bayrak kapalıyken canlıda olup olmadığı URUN tarafından ÖLÇÜLMEDİ: ölçüt OPS kararıyla belli (11 Ekim): maddenin B-1'in kendi adreslerine dokunup dokunmaması; karşılıksız madde hedefe ulaşmadı diye yayını durdurmaz, durduran şey gerilemedir; madde başına grup aşağıdaki «4.11 grupları» tablosundadır**; komutlar B-1 kodu olmadan **denenmedi**) | tek adım ölçümü (`-L` YOK): `for u in /tr/PRODUCTS /TR/urunler /tr/category/FANLAR /tr/kategori/kontrol-ve-suruculer/; do curl -s -o /dev/null -w "%{http_code} %{num_redirects} %{redirect_url} <- $u\n" "https://venthub.com.tr$u"; done`; breadcrumb: alt kategori sayfasının JSON-LD `BreadcrumbList` öğe sayısı (komut v0.5.1'de) | büyük harfli adresler **tek 308** ile küçük harfliye (dil öneki dahil); sondaki eğik çizgili adres tek 308 ile çizgisize; alt kategori breadcrumb'ı Ana sayfa > ana kategori > alt kategori (3 öğe, son öğe kanonik adres) | 1. grupta kırmızı → karar kapısında «devam» YOK; 2. grupta yalnız kötüleşme durdurur; 3. grup ölçülmez (4.11 grupları) |
+
+**4.11 grupları (OPS kararı, 11 Ekim; ölçüt: maddenin B-1'in kendi adreslerine dokunup dokunmaması).** Karşılıksız madde hedefe ulaşmadı diye yayını durdurmaz; durduran şey gerilemedir. «Canlı taban» sütunu 11 Ekim 13:56'da canlıya yalnız GET ile ölçüldü (bayrak kapalı, `-L` yok); yayın günü beklentileri ölçülmedi, 17 Ekim önizlemesinde ve 18 Ekim akşamı taban turunda ölçülür.
+
+| Madde | Grup | Yayın günü beklentisi | Canlı taban (11 Ekim 13:56, bayrak kapalı) |
+|---|---|---|---|
+| 5 kanonik (kategori kısmı) | **1 · DURDURUR** | yönlendirme, canonical, site haritası, iç bağlantı ve breadcrumb son öğesi aynı B-1 adresi | ölçülmedi |
+| 11 zincir tek adım (kategori kısmı) | **1 · DURDURUR** | eski ve 3-C adresleri tek 308 ile B-1 adresine (`num_redirects` 1; matris `--dilsiz-hop-en-cok 1`). **Bilinen 1 A9 ihlali, taban eşit:** dilsiz `/destek/hesaplayicilar` 2 sıçrama (statik sayfa, kategori kısmı değil); durdurucu SAYILMAZ, §4.1 «Bilinen istisna 2» | önizlemede (15 Ekim, ALT-85/87) eski kategori/aile/marka adresleri 20/20 tek 308, dilsiz 18 satırdan 17'si ≤ 1 sıçrama, tek ihlal yukarıdaki adres; canlı taban: aynı adres 2 sıçrama + `/category/fanlar` 4 sıçrama (önizlemede 1); yayın günü ölçülmedi |
+| 12 slug tekilliği | **1 · DURDURUR** | #1853 prod'da olmalı (`pg_indexes`: `categories_tr_slug_tenant_uq`, `categories_en_slug_tenant_uq`); değilse yayın yok | #1853 taslak, prod'da değil (§1 madde 3 b) |
+| 2 sondaki eğik çizgi | **1 · DURDURUR** | yeni `/tr/kategori/<alt>/` adresi tek 308 ile çizgisize gider | kök kategori, liste ve aile adreslerinde 308 → çizgisiz (3/3 ölçüldü); B-1 alt adresi ölçülmedi; #1854'te bu madde için kod yok |
+| 3 Türkçe karakter | **1 · DURDURUR** | yeni B-1 adreslerinde ve site haritasında ASCII dışı karakter 0 | canlı site haritasında ASCII dışı bayt 0 (92 `<loc>`); ASCII dışı kategori adresi 404; B-1 adresleri ölçülmedi; #1854'te bu madde için kod yok |
+| 10 kategori kolu | **1 · DURDURUR** | 17 Ekim önizlemesinde bir kategori adı değiştirilir; eski B-1 adresi tek 308 ile yeni B-1 adresine gider; deneme yalnız önizleme verisinde, prod'a yazım yok. **Önizleme ağacı prod veritabanını okur (§2.2):** adı prod'da değiştirmek yasaktır; gölge veritabanında (`scripts/db/golge-kur.mjs`, Docker) kurulup kurulamayacağı ÖLÇÜLMEDİ. Kurulamazsa satıra ÖLÇÜLEMEDİ yazılır ve OPS'a getirilir (karar OPS'ta) | ölçülmedi; #1854'te bu madde için kod yok |
+| 7 (kol: site haritasında B-1 adresleri var, eski kategori adresleri yok) | **1 · DURDURUR** | B-1 adresleri haritada, eski `/tr/category/...` adresleri haritada değil (4.6) | tek dosya, 92 `<loc>`, 28'i `/tr/category/<x>` (tek segment), `/tr/kategori/` 0 |
+| 1 büyük harf | **2 · GERİLEME** | taban ile aynı ya da daha iyi (hedef: tek 308 ile küçük harfliye, dil öneki dahil) | `/tr/PRODUCTS` 200 (0 sıçrama); `/TR/urunler` 307 → `/tr/TR/urunler`; `/tr/category/FANLAR` 404; `/tr/kategori/KONTROL-VE-SURUCULER` 404 |
+| 4 model adresi ve `?sku=` | **2 · GERİLEME** | taban ile aynı ya da daha iyi | `/tr/products/storm-serisi?sku=SEA-61143003` 200 (bayrak açıkken URN-85 ölçümü: tek 308 → `/tr/urun/storm-serisi`) |
+| 7 site haritası yapısı | **2 · GERİLEME** | tabandan kötüleşmez; bölme ve `lastmod` bu yayının işi değil (yukarıdaki kol 1. grupta) | tek dosya (dizin değil), 92 `<loc>` |
+| 8 breadcrumb | **2 · GERİLEME** (URN-112 16 Ekim'e kadar birleşirse **1. grup**) | taban ile aynı ya da daha iyi; URN-112 birleşirse Ana sayfa > ana kategori > alt kategori | ölçülmedi (alt kategori sayfası JSON-LD `BreadcrumbList`) |
+| 6 hreflang | **3 · KAPSAM DIŞI** | bu yayında ölçülmez: İngilizce yayınına ait, EN en erken 22 Ekim | — |
+| 9 görsel adresleri | **3 · KAPSAM DIŞI** | bu yayında ölçülmez: karar belgesi «yayına bağlanmaz» diyor, Katalog'un ayrı kartı | — |
+
+**1. grupta bir madde kırmızıysa karar kapısında «devam» YOKTUR;** 2. grupta yalnız tabana göre kötüleşme durdurur; 3. grup ölçülmez. **Takip (OPS):** 1 ve 7'nin hedef hâli (büyük harf tek 308, tür bazlı site haritası) için URUN'da kart yoksa ara sonrası OPS açtırır, vade yayından sonra; marka takma ad tetiği (10'un marka kolu) yayından sonra.
+
+
+## 5. IndexNow (A8; yalnız karar kapısı "devam" dedikten sonra)
+
+IndexNow **geri alınamayan dış eylemdir**: Bing'e eski adresler gitmesin diye (karar 164 A, K4) yayından sonra, doğrulamadan sonra gönderilir.
+
+**Karar 327 (kayıt güncellendi, OPS 10 Ekim):** İngilizce adresler **TR'den önce açılamaz**; yayın günü `EN_YAYIN` kapalı, IndexNow yalnız TR; yalnız adresi değişen TR sayfalar bildirilir. **Liste B-1'e göre yeniden üretilir** (GEO-SEO, SEO-26, Cuma 16 Ekim; 22 alt kategori adresi yeni adrese gider, karar belgesi §9). **N = 89 (v89b) 3-C dönemine aittir ve B-1 için GEÇERSİZDİR;** yeni N'i GEO-SEO verir (site haritası sayısıyla birlikte; sayı önizlemede ölçülür, ÖLÇÜLMEDİ). `/tr/markalar` kuralı aynıdır: bayrak açıkken `/tr/brands`'in yerine geçer ve yeni adres sayılır. 5.3'teki kuru koşum kesin kontroldür; fark çıkarsa nedeni yazılır.
+
+**Anahtarın kaynağı (GEO-SEO, 10 Ekim).** `scripts/seo/indexnow-bildir.mjs` anahtarı yalnız `INDEXNOW_KEY` ortam değişkeninden okur, betikte sabit yedek **yoktur**. Anahtar sır değildir (`src/config/indexnow.ts` başlık notu: protokol gereği kamuya açık, canlıda `https://venthub.com.tr/<anahtar>.txt` olarak durur). Aynı kabukta, komutlardan önce:
+
+```
+export INDEXNOW_KEY=$(grep -oE "'[0-9a-f]{32}'" src/config/indexnow.ts | tr -d "'")
+```
+
+Komut A8'i yürüten kişinin ağacında (master'a `--ff-only` çekilmiş) koşar. Betiğe sabit yedek eklemek **Pazar öncesi önerilmez** (kod değişikliği yayın arifesinde).
+
+| # | Adım | Komut | Beklenen |
+|---|---|---|---|
+| 5.1 | Anahtar dosyası | `curl -s https://venthub.com.tr/$INDEXNOW_KEY.txt \| wc -c` | **32**; 32 değilse 5.3 ve 5.4 **koşulmaz** |
+| 5.2 | Yerel kopya B-1 yayın birleştirmesini içerir (kapı bayrağı `src/config/features.ts` metninden okur) | `git fetch origin && git merge --ff-only origin/master` ve `grep -n "ADRES_SEMASI_K3B = " src/config/features.ts` | `= true` |
+| 5.3 | Kuru koşum (`--yalniz-yeni` kipi master'da: #1787, `970176ad3`; bayrak testi `indexnowBetikKapisi`) | `node scripts/seo/indexnow-bildir.mjs --kuru --yalniz-yeni C:/tmp/yayin-19-ekim/taban/eski-adresler.json` (anahtar yukarıdaki `export` ile gelir) | "bildirilecek URL (yeni/degisen TR): N" satırında **N, GEO-SEO'nun verdiği beklenen sayıya eşit** (**GEO-SEO'nun 16 Ekim B-1 listesi**; 3-C dönemi 89; `/tr/markalar` bayrak açıkken yeni adres sayılır); liste yalnız TR (`EN_YAYIN` kapalı, site haritasında EN yok) ve yalnız adresi değişen sayfalar. **Taban dosyası yayından önce, migration sonrası yeniden alınmış olmalı** (§2.3) |
+| 5.4 | Gönderim (TEK kez) | 5.3'ün `--kuru`suz hâli | 200 ya da 202 (202: anahtar doğrulaması bekliyor, kabul edildi). 03 Ekim gönderimi de aynı yolla (ortam değişkeni komut başında) 202 almıştı (GEO-SEO) |
+
+N eşit değilse **GÖNDERME**; nedeni yaz (yeni ya da silinen aile, liste eskimiş, taban eskimiş).
+
+## 6. Yayın sonrası (A9)
+
+1. **GSC:** `sc-domain:venthub.com.tr` site haritasını yeniden gönder (arayüz; hizmet hesabının yazma yetkisi ölçülmedi); 5 örnek adres için indeksleme iste. İsteğe bağlı: `node scripts/seo/gsc-url-denetim.mjs --cikti C:/tmp/yayin-19-ekim/gsc` (Googlebot gözüyle son getirme).
+2. **`public/llms.txt`:** statik adresler (`/tr/contact`, `/tr/about`) yeni adreslere güncellenir (GEO-SEO; eski adres 308 verir, kırık değildir; rota dili standardı §3).
+3. **Haberler (karar 157):** KATALOG ve OPS'a "katalog paketi canlı DB'den yeniden üretilir".
+4. **İki hafta izleme:** `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` §8 (GSC "bulunamadı" birikimi 0, eski adres örneklemi tek hop, karar 86 şartı tıklama karşılaştırması).
+
+## 7. Geri alma merdiveni
+
+| Seviye | Ne zaman | Eylem | Süre | Sonrası |
+|---|---|---|---|---|
+| **1 — yalnız statik sayfa adresleri** | Sorun rota dilindeki (`/tr/hakkimizda` gibi) adreslerde, kategori/aile tarafı sağlam | Vercel (OPS, OPS penceresinde): `vercel env rm NEXT_PUBLIC_ADRES_DILI production --yes --scope peckops-projects --project venthub-hvac-esite` (yokluk = kapalı; **ya da** değeri `0` yap: `vercel env add ... --value 0 --force`), sonra **yeniden dağıt**: `vercel redeploy <üretim-dağıtım-adresi-ya-da-numarası> --target production --scope peckops-projects` (CLI 59.1.4 yardımı: "Rebuild and deploy a previous deployment"). Env değişikliği yalnız **yeni** dağıtımlara uygulanır (Vercel belgesi), o yüzden yeniden dağıtım şarttır; kod değişmez. **Ölçülmedi:** komutlar canlıya yazar, denenmedi | ≈ 6 dk (yeni derleme) | Kategori/aile (B-1) açık kalır; yalnız rota dili kapanır |
+| **2 — her şey (ilk 30 dk, IndexNow gitmeden)** | Kritik kontrol (4.4) kırmızı, derleme hatalı, 5xx artışı, matris farkı büyük | Vercel → Deployments → ön koşul 5'te not edilen **önceki Production dağıtımı** → hemen geri döndür (Instant Rollback / Promote). **Sonra** değişkeni kaldır (`vercel env rm NEXT_PUBLIC_ADRES_DILI production --yes --scope peckops-projects --project venthub-hvac-esite`; yoksa sonraki herhangi bir birleşme bayrağı yeniden açık derler) | saniyeler (derleme yok); derleme çıktısı eski olduğundan iki bayrak da kapanır | Vercel'in domain atama durumunu panelde kontrol et. `matris.cjs` ile yeni matris `matris-kapali-once.json` ile **fark ∅** (taban migration sonrası alındığı için veritabanı adları geri alınmasa da fark çıkmaz). B-1 yayın PR'ı için revert PR'ı açılır; açılana kadar dondurma sürer |
+| **3 — kitlesel hata (IndexNow/GSC sonrası)** | Yayından saatler/günler sonra | Plan §11: **yalnız Recep kararıyla**; revert PR'ı + env `0`. Yeni adresler dizine girmişse 404 olur: kayıp, o yüzden ileri düzeltme esastır | — | harita ve envanter commit'li; yanlış satır düzeltilir, yeniden derlenir |
+
+**Tam geri dönüş TEK ADIM DEĞİLDİR (OPS, 10 Ekim; B-1'de de geçerli).** Bayrağı (`NEXT_PUBLIC_ADRES_DILI`) tek başına kapatmak, B-1 yayın PR'ının `next.config`'ten sildiği eski yönlendirmeleri geri getirmez (silinen kural sayısı ÖLÇÜLMEDİ, haritadan sonra #1811'de belli olur; 3-C'de 25'ti) ve bunu pinleyen test yoktur. Instant Rollback (Seviye 2) eski dağıtımı geri getirdiği için bu yönlendirmeleri de geri getirir, ama **sonraki her birleşme B-1'i yeniden derler**. Kalıcı geri dönüş iki adımdır, bu sırayla. **B-1'e özel:** iç içe kategori adreslerinin 308'i `next.config`'te değil rota içinde üretilir (`kategoriRotasiniUygula`); revert PR'ı bayrak commit'ini geri alınca eski adreslerin davranışı config'e bakılarak değil **matrisle** doğrulanır (aşağıdaki sonuç ölçümü):
+
+| Sıra | Eylem | Kim koşar | Not |
+|---|---|---|---|
+| 0 | (kanama varsa) Seviye 2: Instant Rollback ile önceki Production dağıtımı | OPS | saniyeler; yalnız durdurur, kalıcı değildir |
+| 1 | `NEXT_PUBLIC_ADRES_DILI` kaldır (Seviye 1'in komutu, **yeniden dağıtımsız**: dağıtımı aşama 2 yapar) | OPS, OPS penceresinde, Recep'in sözüyle | env değişikliği yalnız **yeni** dağıtımlara uygulanır; bu yüzden revert'ten ÖNCE yapılır |
+| 2 | **B-1 yayın PR'ının revert PR'ı** birleşir (`git revert <B-1 yayın PR'ı squash SHA>`, tek ebeveynli commit; **DRAFT PR A5c'de, A4'ün hemen ardından açılır ve CI ısınır**; squash SHA'sı Pazartesi 07:42'de oluştuğu için akşamdan açılamaz; 3-C dönemi provası temiz geçti, B-1 provası PR gelince koşulur) | ALTYAPI hazırlar, OPS birleştirir | tek yeni dağıtım hem kodu hem env'i alır (yaklaşık 6 dk); migration yok, kural 13 devreye girmez |
+
+Sonuç ölçümü: `matris.cjs` ile yeni matris `matris-kapali-once.json` ile **fark ∅**, ayrıca config'ten silinen eski yönlendirmelerin (ve rota içi 308'lerin) kapalı matriste aynı sonucu verdiği ölçülür.
+
+**Veritabanı adları (URN-85, #1802) bu merdivenle GERİ ALINMAZ.** Instant Rollback ve env `0` yalnız kodu ve bayrakları geri alır. Bu gerekli de değildir: eski kod yeni veritabanı adıyla çalışır (bayrak kapalıyken `/tr/category/<eski>` tek 308 ile `/tr/category/<yeni>`, o 200; URUN planı, "Ölçümler" madde 3). Geri alma betiği yalnız **adların kendisi yanlışsa** uygulanır: `scripts/db/geri-alma/20261010090000_kategori_tr_adlari_design_csv.geri-al.sql` (tek işlem, sekiz satır, sayı kontrollü; sayı tutmazsa betik kendisi durur). Bu canlı veritabanı yazımıdır (kural 13 ve karar 224). **Geri alma: OPS koşar, OPS penceresinde, Recep'in o penceredeki sözüyle** (OPS kararı, 10 Ekim). Betik kendi işlemini yönetir (`begin;` … `commit;`); emsaldeki çalıştırma biçimi: `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/db/geri-alma/20261010090000_kategori_tr_adlari_design_csv.geri-al.sql`; bağlantı dizesi OPS'tadır, bu belgeye yazılmaz. Betik yolu: `scripts/db/geri-alma/20261010090000_kategori_tr_adlari_design_csv.geri-al.sql`. Betik uygulanırsa `matris-kapali-once.json` yeniden alınır (sekiz adres farkı çıkar) ve §2.6 döngüsü eski adlarla koşulur. **Kategori slug benzersiz indeksi (B-1) bu merdivenle GERİ ALINMAZ:** kod geri alındığında indeks zararsız kalır (kısıt yalnız çakışan slug yazımını reddeder); kaldırılması ayrı migration'dır (kural 13); geri alma betiği #1853'te `scripts/db/geri-alma/20261011100000_kategori_slug_dil_basina_tekil.geri-al.sql` (URUN'un bildirimi; gölge koşusu ÖLÇÜLEMEDİ).
+
+Faz 1-B (kategori ağacı, 40 aile) 6 Ekim'de birleşti (#1352). Yayın günü listesinde veritabanı adımı yoktur; ama sekiz kategori adı 10 Ekim'de ayrıca değişti (yukarıdaki not).
+
+## 8. "Kapalıyken fark 0" kanıtı
+
+`onizleme-tarama.cjs` yalnız **açık** davranışı bekler (yeni adres 200, eski adres tek 308); kapalı canlıya karşı koşarsa kırmızı çıkar, bu bir kusur değildir. Bayrak kapalıyken "canlıda hiçbir şey değişmedi" kanıtı **matris karşılaştırmasıdır** (A2: T0 ile önceki matris, geri alma sonrası: önceki matris ile yeni matris, ikisi de çıkış 0). Kapalı kip için tarama betiğine ayrı bir bayrak eklemek bu belgenin kapsamında değildir.
+
+## 9. Bu belge yazılırken ölçülenler
+
+**09 Ekim (kapalı canlı, yalnız GET, migration öncesi):**
+
+- `matris.cjs --taban https://venthub.com.tr`: 43 sn, çıkış 0, `adresSayisi` 241, `hataSayisi` 0, durum dağılımı `200: 180, 404: 61`, dilsiz hop dağılımı `{0:2, 1:16, 2:1, 3:17, 4:9}`.
+- `onizleme-tarama.cjs --liste` (ağ yok): beklenen adres sayısı **247**; `matris.cjs --liste`: 241.
+
+**10 Ekim:**
+
+- #1802 (URN-85) birleşti: `c3358bc19`, `supabase-migrate` koşumu 38034894433 success (07:34Z). OPS ölçümü: sekiz kategorinin TR adı yeni değerde 8/8; sekiz eski adres tek 308; sekiz yeni adres 200 (8/8).
+- Harita iş akışı ilk kez koşturuldu (run 38035691052, 07:48Z): üretim adımı geçti, doğrulama adımı `Cannot find module '@/utils/categoryHelpers'` ile düştü (`JITI_ALIAS` yalnız üretim adımındaydı), artefakt yüklenmedi. Düzeltme ve koruyan test: **#1804**. Harita üretecinin dosya kapanışı 12 dosya; #1793 (URN-82) ve #1800 (URN-83) ile kesişim **0**, ikisinde de migration ve rota ekleyen dosya yok: harita bu iki PR'a bağlı değildir.
+- Master push CI kırmızı (run 38034894473): tek kırmızı test `taban-tazeligi-dunya` (şema tabanı 09 Ekim, en yeni migration 10 Ekim). Şema tabanı 10 Ekim'de yenilendi (`sema-tabani-uret.yml`, koşum 38036439867): sayılar 09 Ekim ile aynı (60 tablo, 167 politika); düzeltme **#1807**.
+- `--yalniz-yeni` kipi master'da (#1787, `970176ad3`).
+- Henüz **koşulmayanlar:** §2.2–2.6'nın tamamı (taban akşam alınır), §4 (açma olmadan anlamsız), §5 (kuru koşum yayından sonra).
+
+**11 Ekim (v0.5; yalnız okuma):**
+
+- Zamanlanmış işlerin saatleri `.github/workflows` dosyalarından okundu (cron UTC): `expired-reservations-cron` 03:15, `deploy-functions` 04:17, `bagimlilik-denetimi` 04:17 Pazartesi, `katalog-sayim` 06:10, `stock-alert` 06:20, `dunya-durumu` 00:23/06:23/12:23/18:23, `ssr-duman-alarmi` 06:40; TR = +3. GitHub tetik gecikmesi ölçülmedi.
+- `harita-uret.yml` yalnız `refs/heads/master`'da koşar (iş düzeyi `if`); üreteç `src/lib/adres/haritaUret.ts` hedefleri `getLocalizedCategorySlug` ve veritabanından hesaplar: B-1 kodu master'a girmeden B-1 hedefli harita üretilemez.
+- `git log origin/master --grep URN-10` (11 Ekim): URN-10 düzeltmesi master'da yok.
+- `scripts/adres/onizleme-adres.mjs` yama tablosu bayrağı `export const ADRES_SEMASI_K3B = false` metniyle arar (satır 41–42); `src/config/features.ts:130` o metni taşıyor.
+- `ssr-duman-alarmi` iş akışı adres listesi taşımaz; `pnpm test:ssr-smoke` → `tests/smoke/ssr-html.spec.ts` temsilci sınıfları (`altgruplu-kategori`, `yaprak-kategori`) kullanır. `dunya-durumu` iş akışında kategori adresi yoktur. Temsilci seçiminin site haritasına bağımlılığı kodla **okunmadı** (§0.2 e).
+- **B-1 kod PR'ı v0.5 yazılırken (11 Ekim sabah) henüz açılmamıştı; v0.5.1'de #1854 açıktı, 11 Ekim akşamı BİRLEŞTİ (master `286c7b2ec`)** (son yeşil uç `0901b87aa`, 15/15 geçti). #1811 (3-C) açık, uç `437da0b0a`, `mergeStateStatus` CLEAN, B-1 koduyla güncellenecek.
+
+## 10. OPS kararları ve açık kalanlar
+
+**B-1 dönemi (OPS, 10 Ekim; Recep kararı: adres şeması B-1)**
+
+B1. **Şema B-1:** alt kategori tek seviyeli `/tr/kategori/<alt-slug>`; ürün ailesi ve model adresleri bugünkü şemada kalır; C, B-2 ve B-3 elendi. Yayın tek seferde; 12 maddelik düzeltme paketi (adres dışı kararlar dahil) aynı yayına girer.
+B2. **Takvim:** kod + harita 12–16 Ekim (URUN) · tam doğrulama ve önizleme 17 Ekim Cumartesi · TR yayın 19 Ekim Pazartesi · İngilizce TR'den önce açılamaz (OPS önerisi en erken 22 Ekim, kesinleşmedi) · pilot model en erken 22 Ekim · yazım dondurma ve taban yayından hemen önce.
+B3. **Ürün ailesinin İngilizce adresi** (ortak/ayrı slug): Recep'e 12 Ekim'de ayrıca sorulacak (karar belgesi §9); bu runbook'u etkilemez, EN açılışını etkiler.
+B4. **Eski adres haritası** B-1 hedefleriyle yeniden üretilir: ALTYAPI üretir ve commit'lenecek dosya olarak URUN'a verir, URUN elle değiştirmez; yalnız B-1 kodu master'a girdikten sonra üretilebilir (§1 madde 3).
+
+**B-1 dönemi açık kalanlar (v0.5.1: URUN cevapladı, 11 Ekim; açık kalan maddeler işaretli)**
+
+- **B-a. ✔ (11 Ekim akşamı).** B-1 kod PR'ı **#1854 BİRLEŞTİ**: master `286c7b2ec` (OPS bildirimi; ALTYAPI `git log origin/master` ile doğruladı); bayrak KAPALI master'dadır. Son yeşil CI'lı uçlar `0901b87aa` (15/15 geçti) ve docs + yorum commit'i `9d793abb3` (URUN bildirimi: davranış değişmedi); önceki `f2bfebb80` geçersizdi. **Açık:** bayrak açık önizlemenin kaynağı (§2.2) ÖLÇÜLMEDİ: #1811'in B-1 rebase'i URN-120'de (URUN), teslim saati EN GEÇ Çarşamba 14 Ekim 18:00 (OPS emri); ALTYAPI ölçümü teslim anında koşar.
+- **B-b. ✔.** Kod PR'ı bayrak KAPALI master'a girer (`src/config/features.ts` `ADRES_SEMASI_K3B` değişmedi); yayın günü bayrağı `true` yapan ve haritayı taşıyan PR **#1811**'dir (B-1 koduyla güncellenip master'a rebase edilecek); ayrı bayrak PR'ı açılmaz.
+- **B-c. ✔ (kısmen).** Harita yolu `src/data/generated/eski-adres-haritasi.json` (ALTYAPI üretir). **ÖLÇÜLMEDİ:** #1854'te `next.config.mjs` değişmedi, silinen kural sayısı haritadan sonra #1811'de belli olur; site haritası girdi sayısı B-1 kodunda değişmez (aynı kategori kümesi, adres biçimi tek segmente döner), sayı önizlemede ölçülür.
+- **B-d. ✔ (11 Ekim, ikinci mesaj).** Rota dosyası `src/app/[lang]/kategori/[kok]/[[...dal]]/page.tsx` KALIYOR, parametre şekli `{lang, kok, dal}` aynı, A5b etiket adı etkilenmez. `generateStaticParams`: TR rotasında her aktif kategori kendi TR slug'ıyla (dal boş; üstü pasif dal dahil), EN rotasında (`category/[categorySlug]`) kök + alt; bayrak açıkken derlenen kategori sayfası 35 → 56 (28 TR + 28 EN), kapalıyken bugünkü ile aynı (URUN'un okuması; #1854 uç `0901b87aa`).
+- **B-e. ✔ (kısmen).** Kategori slug benzersiz indeks migration PR'ı **#1853** (taslak, CI 19/19 geçti, INV-MIGRATION-3 ve tip-drift dahil): `20261011100000_kategori_slug_dil_basina_tekil.sql`, indeksler `categories_tr_slug_tenant_uq` ve `categories_en_slug_tenant_uq`, geri alma `scripts/db/geri-alma/20261011100000_kategori_slug_dil_basina_tekil.geri-al.sql`. **ÖLÇÜLEMEDİ:** gölge koşusu (Docker kapalı; URUN Pazartesi koşar). Recep onayı kural 13 ve karar 224 gereği URUN penceresinde verilir, birleştirmeyi URUN yapar; birleşince aynı gün `sema-tabani-uret.yml` (OPS; tip dosyası değişmez).
+- **B-f. cevap geldi, kapsam DARALDI.** #1854 yalnız kategori adresini kapsar: 5 ve 11'in kategori kısmı bayrağa bağlı; 12'nin slug tekilliği #1853'te (rezerve kelime listesi ve tek rota kütüğü YOK); 8 (breadcrumb tek zincir) ayrı kart URN-112, #1854'te DEĞİL; 1, 2, 3, 4, 6, 7, 9, 10'un #1854'te karşılığı YOK ve #1811'de ya da bayrak kapalıyken canlıda olup olmadığı URUN tarafından ÖLÇÜLMEDİ. **OPS kararı verildi (11 Ekim):** ölçüt maddenin B-1'in kendi adreslerine dokunup dokunmaması; gruplar §4.11'dedir (1. grup yayını durdurur, 2. grup yalnız gerilemede durdurur, 3. grup kapsam dışı).
+- **B-g. ✔ (URUN'un bildirimi; ALTYAPI kodu okumadı).** `tazelemeYollari.ts` (kaynak) ve testleri, `indexnow.test.ts` ve webhook `route.tags.test.ts` #1854'te tek seviyeye uyarlandı; webhook `route.ts` kaynağına dokunulmadı (`eskiChildPaths` döngüsü yeni yol üretmiyor, URUN: zararsız, yorumu bayat); `indexnow.ts` kaynağı değişmedi (adresi `adresUret`'ten alıyor). URN-10 (IndexNow) kuyrukta, B-1 PR'larından sonra (§1 madde 11).
+- **B-h. ✔ (birim düzeyi).** Çift sıçrama kapıları `korozyon-tek-sicrama` ve `kategori-tr-adlari-tek-sicrama` #1854'te tek sıçrama kollarına taşındı (eski TR kök slug'lı iç içe adres dahil, hedef yeniden eşleşmez); birim düzeyinde yeşil. **Gerçek HTTP ölçümü önizlemede** (17 Ekim, matris `--dilsiz-hop-en-cok 1`), ÖLÇÜLMEDİ.
+- **B-i.** Pencere saati (Pazartesi 07:30–09:00) ve taban/dondurma saati (Pazar 18 Ekim akşamı) **OPS onayı** bekliyor (URUN'a ait değil); saat başına ziyaretçi ölçülemedi, öneri varsayımdır.
+- **B-j.** Açılış öncesi iki takip (`bot-karnesi.mjs` takibi GEO-SEO'nun **SEO-29** kartında; bayat belge satırları ALTYAPI'da): `scripts/seo/bot-karnesi.mjs:152` `alt-kategori` kalıbı iki seviyeli adres bekliyor ve `yeniSemadaZorunlu: true` işaretli (ALTYAPI satırı 11 Ekim'de okudu; B-1'de alt kategori tek seviyeli olduğundan bayrak açılınca sahte kırmızı vermesi beklenir, çalıştırılmadı); bayat belge satırları `docs/standards/adres-semasi-standard.md` Dal satırı ve `docs/standards/rendering-cache-standard.md`. **Webhook takibi (ALTYAPI, salt okuma, Cuma 16 Ekim 18:00):** `src/app/api/webhook/supabase/route.ts` yorum satırları (192-200) bayat ve `eskiChildPaths` döngüsü (493-495) B-1'de yeni yol üretmiyor (URUN'un bildirimi; konum master'da ölçüldü); bayrak açılmadan önce bakılır.
+- **B-k. (OPS boşluk denetimi, 11 Ekim, wf_e2493496-324; düzeltme URUN, URN-119).** Dilsiz `/brands` ve `/brands/<slug>` bayrak açıkken 307 + 308 = **2 sıçrama** verir (denetimin sebebi: `eslestirici.ts` K3B kolunda `brands` yok). **ALTYAPI okudu (11 Ekim, #1854 ucu `0901b87aa`; birleşen master `8bd267f03`'te de aynı, yeniden okundu):** `src/lib/adres/eslestirici.ts` kategori önek kümesi yalnız `category` ve `kategori` (satır 42); `brands` için kol bulunmadı. **ÖLÇÜLMEDİ:** iki sıçramanın kendisi; bayrak açık önizleme matrisi (§4.1) ölçer ve bu iki satırı kırmızı verir. Beklenti URUN düzeltmesi birleşince 1.
+- **B-l. (OPS boşluk denetimi, 11 Ekim).** Eski adres haritasının bayatlığı kodla tutulmuyor: `src/lib/adres/__tests__/bayrak-kapisi.test.ts` (ALTYAPI okudu, #1854 ucu) bayrak açıkken haritanın `null` olmadığını ve varsayılan kiracıda `urunSayisi > 0` taşıdığını ölçer, **güncelliğini ölçmez**; `haritaUret.test.ts` ile bu dosyada bayatlık karşılaştırması bulunmadı (kelime taraması; haritayı anan diğer dosyalar tek tek okunmadı). Haritayı güncel tutan tek şey §1 madde 11'deki yazım dondurmasıdır; harita üretiminden yayına kadar yazım olursa hiçbir kapı kırmızı vermez.
+
+**Karar verildi**
+
+1. *(3-C dönemi, B-1 ile yerini aldı; tarihçe)* 3-C PR'ını **URUN** hazırlıyor, **Cumartesi 14:00'e kadar**. Açıklamasında beklenen site haritası sayısı, eski→yeni harita dosyasının yolu ve #1738'in aynı yayında olup olmadığı yazılı olacak (OPS URUN'a yazdı).
+2. *(3-C dönemi, B-1 ile yerini aldı; tarihçe)* Pencere **Pazar 10:00–11:30** onaylandı; Recep'e önceden OPS haber verir.
+3. *(3-C dönemi, B-1 ile yerini aldı; tarihçe)* Vercel değişkenini (`NEXT_PUBLIC_ADRES_DILI`) **ALTYAPI** değiştirir, **Pazar günü OPS'un "şimdi" mesajından sonra**.
+4. **Karar 327:** İngilizce vitrin 18 Ekim'de açılacaktı, tarih kayıyor (OPS önerisi en erken 22 Ekim, kesinleşmedi; TR'den önce açılamaz); Pazar günü `EN_YAYIN` kapalı, IndexNow yalnız TR. Pilottaki "bildirim 0" hükmünün yerine geçmez: Pazar günü yalnız adresi değişen TR sayfalar bildirilir. Beklenen URL sayısını GEO-SEO verir.
+5. **Kategori adı yöntemi (OPS, 10 Ekim):** sekiz TR slug'ı veritabanında Design CSV adına çekilir (URN-85, ayrı migration); takma ad tetiği eski adı yazar, eski adres tek 308. Harita yeniden adlandırma tablosu yoluna **gidilmedi**.
+6. **Harita (ALT-50) ALTYAPI'da kalır** ve Pazar öncesi biter (OPS, 10 Ekim); URN-82/URN-83 birleşmesini **beklemez** (bağımlılık ölçüldü: kesişim 0).
+7. **Tek taban zamanı** = migration sonrası; `eski-adresler.json`'a sekiz eski adres elle eklenir (URUN teyit etti, 10 Ekim).
+8. **A8 anahtar yolu** (GEO-SEO önerisi, OPS isteğiyle): anahtar `src/config/indexnow.ts`'ten `export` edilir; betik değişikliği Pazar öncesi **yapılmaz**.
+8a. **Vercel değişkeni (OPS, 10 Ekim, ikinci karar; ilkinin yerine geçer):** `NEXT_PUBLIC_ADRES_DILI`'i yayın günü **OPS oluşturur**: OPS penceresinde, Vercel CLI ile, Recep'in o penceredeki "yaz" sözüyle. Gerekçe: MCP ile env okuması 403 verdi; filo kuralı canlı yazımda departmanın hazırlayıp OPS'un koşmasıdır; Recep pencere değiştirmez; OPS penceresinde CLI 59.1.4 var, `vercel whoami` = peckop (OPS ölçtü 11:4x). Komut, doğrulama ve geri alma §3 A3'tedir. Preview'a dokunulmaz.
+8b. **Veritabanı geri alma (OPS, 10 Ekim):** OPS koşar, OPS penceresinde, Recep'in o penceredeki sözüyle (canlı yazım: kural 13 ve karar 224); betik yolu §7'de.
+
+**Açık**
+
+9. *(3-C dönemi, B-1 ile yerini aldı; tarihçe)* **3-C PR'ı** (URUN, Cumartesi 14:00): taslak **#1811** açık (bayrak satırı onay gelene kadar taslak); kural sayısı 25, #1738 aynı yayında, beklenen site haritası sayısı PR açıklamasından teyit edilir (**henüz teyit edilmedi**); harita yolu `src/data/generated/eski-adres-haritasi.json` (✔ bağlandı).
+10. **Harita yeniden koşusu — ✔ yapıldı (10 Ekim):** #1804 birleşti; `gh workflow run harita-uret.yml --repo peckop/venthub-hvac-esite --ref master -f not="ALT-50 harita"` koşusu **38037549974 başarılı** (26 sn; ilk başarılı koşunun süresi ölçüldü), `gh run download 38037549974 -n eski-adres-haritasi -D C:/tmp/yayin-19-ekim/`; dosya URUN'a verildi ve `src/data/generated/eski-adres-haritasi.json` olarak 3-C taslak PR'ına (#1811) bağlandı. **Yenileme gerekirse** (Katalog DB'yi değiştirirse): aynı komut yeniden koşulur ve URUN'a verilir; harita değişirse `harita-3c-karsiliklari.test.ts` bilerek kırmızı olur.
+11. ✔ **#1804** birleşti (`1d1d7e7b7`); şema tabanı #1807 kapandı (OPS'un #1806'sı aynı işi yaptı, `518673b4f`); #1803 (test haritası) ve #1808 (bu belge, v0.3) birleşti.
+12. *(3-C dönemi, B-1 ile yerini aldı; tarihçe)* **Açık beklenen matris** (§2.2) 3-C PR'ının **kendi dalından** (`urun/urn85-adres-acilis-3c-2`) üretilmelidir. URUN bayrak commit'ini yazdı (uç `0a164f087`, `ADRES_SEMASI_K3B = true`, ayrı commit); o uçta #1811 CI **kırmızı** (test hizası: bayrak `true` olunca "kapalı kip" testleri gerçek sabite bakıyor, üretim kodunda hata yok). URUN üretim koduna dokunmayan test commit'leri ekleyecek (uç değişir, derlenen site aynı kalır) ve yeşil CI'lı kesin SHA'yı **"matris ucu = X"** diye yazacak; matris **yalnız o SHA'dan**, yerel derlemeden (`onizleme-adres.mjs`) alınır. Derleme ≈ 25 dk.
+13. ✔ Canlı kapının kayıt durumu: GEO-SEO `--kayit-durum` JSON'unu Kanban'dan hazırladı (`C:/tmp/yayin-19-ekim/kayit-durum.json`, 8 kayıt); komut §2.4'te. Kapı bayraksız koşarsa Linear'a gider ve Linear donuktur (SEO-19): §4.7 **aynı bayraklarla** koşar.
+14. ✔ **Vercel salt-okuma denemesi** yapıldı (10 Ekim): `list_deployments` çalışır, env okuması MCP'de 403, adlar CLI ile okundu (ön koşul 5, 6). Yayın günündeki **yazım** OPS'ta (karar 8a); komutu OPS koşar, **ölçülmedi** (canlıya yazar).
+15. **Veritabanı geri alma:** yürütücü belli (OPS kararı 8b); betiğin canlıda hiç koşulmadığı **ölçülmedi** (yalnız yerel/ledger testleri).
+16. **Recep'in Cuma önizleme onayı** (ön koşul 1, karar 68, TSR-7): OPS'ta, ölçülmedi. **Hangi derlemede:** belgeye göre **yerel** `node scripts/onizleme.mjs --adres` derlemesinde (`http://localhost:3100`, bayrak yamasıyla; kaynak: `docs/plans/onizleme-tiklama-listesi-2026-10-09.md`, envanter satırları `onizleme-adres.mjs`/`onizleme-tarama.cjs`), Vercel önizlemesinde **değil**; yani statik adresler açık görünür. Recep'in tarayıcıda hangi adrese baktığını ALTYAPI görmedi.
+17. **Faz 4 önizleme listesine "aile sayfasında varyant seçimi ve eski `?sku=` adresleri" satırı** (OPS emri, ALT-50) — ✔ yazıldı: `docs/plans/onizleme-tiklama-listesi-2026-10-09.md` **satır 18** (okuyucu testi 18 adres bekler). Adres ve davranış URUN'un ölçümüdür (URN-85, #1811): `/tr/products/storm-serisi?sku=SEA-61143003` → **tek 308** → `/tr/urun/storm-serisi` (aile sayfası, sorgusuz; **varyant seçili gelmez**, sorgu bilinçli düşer; model sayfaları yayın gününde kapalı; hedef yeniden eşleşmiyor); küçük harfli sku aynı. **ALTYAPI ölçmedi:** bu adresi önizleme sunucusunda ben denemedim; 3-C dalının önizlemesinde ön kontrol bu satırı sınar. Cuma önizlemesinde kural yoktur, satır orada KIRMIZI verir.
+
+
+---
 # FILE: PROJECT.md
 
 # Project: VentHub HVAC Database Service Layer DI & Security Upgrades
@@ -45478,13 +49478,16 @@ defter-defter sorup elle birleştirmeyi gerektiriyor.
 | Pencereler yeniden açılınca ne yapılır, tekrarlanan tur (loop/cron) ne zaman ve kimin onayıyla kurulur? | `standards/session-loop-ritual.md` |
 | Bir iş **hangi yöntemle** koşar (şerit / alt ajan / Workflow / maestro / skill / elle), emirde `YÖNTEM:` satırı? Alt ajanın modeli, ekip lideri, ekip (agent teams) hangi yüzeyde kurulur? | `standards/execution-method-standard.md` (§10.3 model ve mutasyon istisnası, §10.5 ekip yüzeyi) |
 | Bir şeye "**yok / bulunamadı / desteklemiyor**" demeden önce neyi, nerede, hangi yöntemle aramalıyım? | `standards/execution-method-standard.md` §9 (yokluk hükmü) |
-| Bir test **nerede koşar** (PR kapısı / master push / zamanlı)? Kırmızısı PR'dan bağımsız (dünya durumu) testler nereye taşınır, PR başlığı ya da gövdesi düzenlenince paketin tamamı neden yeniden koşmaz? | `standards/test-karnesi-standard.md` (v1.0, ALT-38; §1–§5 çalıştırma düzeni; test karnesi bölümü ikinci teslimle gelir; kapılar INV-TEST-KOSU-1, INV-CI-EDITED-1/2, INV-DUNYA-SATIRI-1; veri `scripts/ci/dunya-durumu-testleri.json`) |
+| Aynı anda birden çok pencere **ağır komut** (type-check, build, tam test, install) koşunca makine nasıl korunur, kilit ne zaman reddeder, süreç sayısı nereden ölçülür? | `standards/agir-komut-kilidi-standard.md` (ARC-81) |
+| Bir test **nerede koşar** (PR kapısı / master push / zamanlı)? Kırmızısı PR'dan bağımsız (dünya durumu) testler nereye taşınır, PR başlığı ya da gövdesi düzenlenince paketin tamamı neden yeniden koşmaz? PR'da neden yalnız değişenle ilgili testler koşar, belge PR'ında kurulum/Lint/tip neden atlanır (§4.3)? Hangi test gerçekten koruyor, hangisi kalır / birleşir / taşınır, silme listesi kuralı nedir (§7)? | `standards/test-karnesi-standard.md` (v1.2, ALT-38; §1–§6 çalıştırma düzeni ve test seçimi; §7 test karnesi; kapılar INV-TEST-KOSU-1, INV-CI-EDITED-1/2, INV-CI-SECIM-1/2, INV-DUNYA-SATIRI-1, INV-TEST-KARNE-1; veri `scripts/ci/dunya-durumu-testleri.json`, karne `docs/audits/test-karnesi-*.json`, Recep özeti `docs/audits/test-karnesi-ozet-recep-*.md`) |
 | Kanban kartının **planı nasıl yazılır, kim uygular**, hangi planlar Recep'e tek sayfa özetle gider, işe başlamadan **"daha önce yapıldı mı" nasıl aranıp yazılır** (ÖNCEKİ ÇALIŞMA)? | `standards/kart-plani-standard.md` (karar 241/243, OPS-30; kapı `scripts/belge/kart-plan-kapisi.cjs`, INV-KART-PLAN-1) |
 | Bir departmanın **amacı ve düzenli görevleri** neler, hangisinin tetiği gerçekten kurulu? | `standards/duzenli-gorevler-standard.md` (OPS-27, HRT-24; veri `scripts/belge/rol-gorevleri.json`, tablo `docs/roller/<ROL>-gorevler.md`, INV-ROL-1) |
 | **Bu iş hangi departmanın?** 16 departmanın görevi, dosya alanı ve **açılış yolu** (masaüstü mü, ekip modu için terminal mi) tek tabloda | `roller/DEPARTMAN-HARITASI.md` (üretilmiş, OPS açılışında kısa özeti gelir; HRT-29; üretici `scripts/belge/rol-karti-uret.cjs`, bayatlık kapısı INV-ROL-1; açılış yolu `scripts/board/pencere-adlari.cjs` tablosundan türer) |
 | Bir departmanın (OPS, ARAC, ALTYAPI, HARITA, URUN, ADMIN, KATALOG, GEO-SEO, BLOG, MARKA) görevi, dosyaları, yetkisi ve Recep kapıları ne? | `roller/<DEPARTMAN>.md` (rol kartı; üretici `scripts/belge/rol-karti-uret.cjs`, REC-426) |
 | Bir departmanın **çalışan** (alt ajan) tanımı hangi skill'lerle ve hangi araç sınırıyla gelir? | `.claude/agents/<departman>-<tur>.md` (üretilmiş, elle düzenleme yok; üretici `scripts/belge/ajan-tanimi-uret.cjs`, girdi `docs/audits/skill-departman-setleri-2026-09-30.json`, kapı INV-AJAN-TANIM-1). Bağlam maliyeti (ölçüm 2026-10-01): tanım başına ~96 jeton, 50 tanım ≈ 4,8k; her oturumun ve her alt ajanın ilk çağrısında bir kez; tavan 6k jeton (kapıda karakter karşılığı), aşan yeni tür OPS'a gider. |
+| Bir departmanın **müdür penceresi** hangi rol tanımıyla, hangi hafıza ve modelle açılır? | `.claude/agents/<departman>-pencere.md` (üretilmiş, elle düzenleme yok; aynı üretici `scripts/belge/ajan-tanimi-uret.cjs`, görev ve dosya alanı `scripts/belge/rol-karti-uret.cjs` ROLLER sabitinden). `memory: user`, araç kısıtı yok; pencere settings'teki `"agent"` anahtarıyla açılır (geçişi OPS yapar). Kapı INV-AJAN-TANIM-1 + INV-HAZIR-OZELLIK-1. Maliyet: 11 tanım ≈ 0,8k jeton; çalışanlarla birlikte ≈ 5,7k, aynı 6k tavanın altında (pay ≈ 0,3k). Cetvel: execution-method-standard.md §10.3. |
 | Katalogdan ticarete hat — ürün nasıl girer, CSV, fiyat, şema, kategori? | `plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan uca pano) + `standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`; veri deposu kardeş depo `venthub-pdf-ingestor` |
+| Cuma 9 Ekim **önizlemesinde adreslerim doğru mu, nereye tıklayacağım** (bugünkü adres → 11 Ekim karşılığı, "bekliyor" satırları)? | `plans/onizleme-tiklama-listesi-2026-10-09.md` (Recep için tek sayfa, ALT-37d; makine taraması ALT-37b) |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
 | Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |
