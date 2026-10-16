@@ -2,6 +2,20 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/GEO-SEO.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Arama ve sorgu verisi depoya yazılmaz (P6).** Search Console sorguları, tıklama ve gösterim satırları, sayfa bazlı arama verisi depoya, PR'a, kart dışı belgeye girmez; depo dışı arşivde durur. Depo herkese açıktır. Betikler depo içi çıktı yolunu reddeder (`gsc-arsiv.mjs`, `degisen-adres-bildir.mjs`: çıkış kodu 2). Kaynak: SEO-51, SEO-52, SEO-55.
+2. **Dizin tetiği bir insanın hatırlamasına bağlı kalmaz.** Canlıya çıkan her adres ve metin değişikliği IndexNow'a (karar 376: K4 gevşedi, bayrak kapalıyken de) ve Google kuyruğuna girer; yalnız haritada olan, 200 veren, kanoniği kendisi olan adres gönderilir. Olay: FC 101 (16 Ekim): K4 süzgeci ürün adresini düşürdü, kimse haber vermedi, Google eski adresi eski metniyle gösterdi. Kaynak: SEO-54, SEO-55.
+3. **Google günlük dizin isteği sınırı sabit varsayılmaz, ölçülür.** Ölçülen: 11 (15 Ekim gecesi, 12. istekte kota mesajı); tek gözlemdir. Kota mesajı gelene kadar gidilir, gerçek sayı kartta güncellenir. Kaynak: SEO-54.
+4. **Fiyatsız üründe işaretleme (karar 379).** Sahte fiyat, `price: 0` ve uydurma yorum/derecelendirme yazılmaz; görünür olmayan değer işaretlenmez. Fiyatsız ya da karışık aile `CollectionPage` + `ItemList` taşır, ailenin tüm modelleri fiyatlı olunca `ProductGroup` kendiliğinden döner (`urun-yapisal-veri-standard.md` §2). Olay: SEO-56: 47 aile sayfası, 441 varyantın hiçbirinde `offers` yok, Search Console KRİTİK.
+5. **`FAQPage` JSON-LD konmaz** (`src/lib/bilgiMerkezi/jsonld.ts:5`: SSS zengin sonucu 2026-05-07'de kalktı); görünür SSS kalır. Olay: URN-135 brifinde yanlış satır, OPS düzeltti.
+6. **Ölçmeden "dizinde yok", "bozuk" ya da "boş" denmez.** Canlı sayfanın ham HTML'i, Search Console canlı denetim ya da arama sonucu ölçülür; ham veritabanı alanı ya da başkasının aktarımı tek başına kanıt değildir. Olay: "kategoride sessiz 0" aktarımı yanlış çıktı (15 Ekim).
+7. **Arama sonucunda eski metin görülürse önce adres ölçülür.** Sırayla: canlı sayfanın ham HTML'i, eski adresin 308'i, yeni adresin Search Console durumu ("bilinmiyor" olabilir), sonra dizin isteği. Olay: FC 101: canlı sayfa doğruydu, Google eski adresin kaydını gösteriyordu. Kaynak: SEO-54.
+8. **Search Console "Geliştirmeler" ve "Alışveriş" raporları haftalık okunur** (SEO-17 haftalık incelemenin parçası); yeni sorunda aynı gün kart ve sahibine yazı. Olay: ürün snippet'leri sorunu Recep'in e-postasından öğrenildi, görülmemişti (SEO-56).
+
+Genel kurallardan sona alınan: İşe uyan genel kurallar sonda durur: K1 (plan önce), K17 (hreflang), K23 (llms.txt).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K17 Hreflang: Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook'u yok.
 - K23 llms.txt (geçiş, katı): Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).
@@ -27,6 +41,8 @@
 
 ## Birleştirme ve ölçüm kaydı (HRT-60)
 - Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
+- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).
+- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).
 - Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.
 
 ## Durum dosyası: standart "Yarım iş" satırı (HRT-31)

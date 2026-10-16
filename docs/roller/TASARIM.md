@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.
 
 ## Düzenli görevler
-- 6 görev, tetiğe bağlı 3: `docs/roller/TASARIM-gorevler.md`.
+- 7 görev, tetiğe bağlı 3: `docs/roller/TASARIM-gorevler.md`.
 
 ## Dosyalar
 `src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7), `docs/plans/tasarim-kod-plani-v2*` (dosya kümesi plan önerisidir, karar değil). Cetvel: marka token eşlemesi (OPS onaylı devir 09-30, önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN'da kalır.
@@ -44,11 +44,11 @@ Açık (asli görev); K36 karar 271 ile kararlı (10-03).
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.
-CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca tasarımı ve departman iyileştirmesi onayı OPS'tadır (16 Ekim), kapı gevşetme Recep'e gider. Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular.
 
 ## İletişim
-- Recep'e yalnız iş bitince ya da sorun çıkınca tek satır yaz; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
+- Recep'e yazarken kurallar dosyandaki "Recep'e mesaj kuralları" geçerlidir; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
 - Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).
 
 ## Çalışma düzeni

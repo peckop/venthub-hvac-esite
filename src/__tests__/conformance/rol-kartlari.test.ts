@@ -51,7 +51,10 @@ type Uretici = {
     varMi: (d: string) => boolean,
     oku: (d: string) => string,
     isAkislari?: string[],
+    kardesOku?: (d: string) => string | null,
   ) => string[]
+  isKurallariOku: (kok?: string) => Record<string, { kurallar: string[] }>
+  isKurallariSorunlari: (veri: Record<string, { kurallar: string[] }>, roller: string[]) => string[]
   gorevEksikRoller: () => string[]
   isAkisiMetinleri: (kok: string) => string[]
   AMAC_SINIRI: number
@@ -364,7 +367,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(blok(metin), ad).toBe(uretici.ILETISIM_ISTISNA[ad] ?? uretici.ILETISIM)
     }
     expect(blok(uretilen.OPS)).toContain('konsolide tabloyla ben veririm')
-    expect(blok(uretilen.ARAC)).toContain('yalnız iş bitince')
+    expect(blok(uretilen.ARAC)).toContain('Recep\'e mesaj kuralları')
   })
 
   it('Yönetim bloğu (karar 201, REC-518): istisna yalnız OPS için, diğer kartlarda bire bir aynı ve Görev\'in hemen altında', () => {
@@ -528,10 +531,12 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   it('karar 224: her kart canlı dışı onay yolunu (OPS) ve aktarım yetkisinin yalnız OPS\'ta olduğunu taşır; OPS kartı genel müdür', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('Kapılar 1-5 Recep\'te kalır')
-      expect(metin, ad).toContain('onayı Recep yalnız OPS penceresinde verir')
-      expect(metin, ad).toContain('aktarım yalnız OPS')
+      expect(metin, ad).toContain('Kapılar 1-5 Recep\'te kalır (söz işi koşan pencerede)')
+      expect(metin, ad).toContain('kanca tasarımı ve departman iyileştirmesi onayı OPS\'tadır')
+      expect(metin, ad).toContain('kapı gevşetme Recep\'e gider')
+      expect(metin, ad).toContain('Aktarım yalnız OPS')
       expect(metin, ad).toContain('§17 Kural 4')
-      expect(metin, ad).toContain('OPS uygular')
+      expect(metin, ad).toContain('izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular')
       expect(metin, ad).not.toContain('Recep teyidi bekliyor')
     }
     expect(uretilen.OPS).toContain('genel müdürü')
@@ -720,6 +725,88 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it("HRT-65 O2: 'Departmana özgü iş kuralları' yalnız verisi olan rollerin kurallar dosyasında (üretilen ve diskteki), tam bir kez, en çok 8 madde; K19/K20 yalnız 3D'de", () => {
+    const baslik = '## Departmana özgü iş kuralları (OPS-168)'
+    const diskMetni = (ad: string): string =>
+      fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+    const veri = uretici.isKurallariOku(KOK)
+    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'KATALOG', 'URUN'])
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      for (const [m, etiket] of [[metin, `${ad} (üretilen)`], [diskMetni(ad), `${ad} (disk)`]] as Array<[string, string]>) {
+        if (veri[ad]) {
+          expect(m.split(baslik).length - 1, `${etiket}: bölüm tam bir kez`).toBe(1)
+          expect(veri[ad].kurallar.length, `${etiket}: en çok 8 madde`).toBeLessThanOrEqual(8)
+          // Bölüm genel kurallardan ÖNCE gelir (işin kuralları önce).
+          expect(m.indexOf(baslik), etiket).toBeLessThan(m.indexOf('- K1 '))
+        } else {
+          expect(m, `${etiket}: verisi olmayan rolde bölüm yok`).not.toContain(baslik)
+        }
+      }
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain(baslik)
+    expect(kuralMetinleri.URUN, 'URUN: 3D kuralları 3D dosyasına taşındı').not.toMatch(/- K19 |- K20 /)
+    expect(kuralMetinleri['3D']).toMatch(/- K19 /)
+    expect(kuralMetinleri['3D']).toMatch(/- K20 /)
+  })
+
+  it('HRT-65 O2: iş kuralı verisi denetimi ayırt edicidir (9 madde, bilinmeyen rol, kısa madde, boş liste sorun verir)', () => {
+    const roller = Object.keys(uretici.ROLLER)
+    const uzun = 'x'.repeat(60)
+    expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: [uzun] } }, roller)).toEqual([])
+    expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: Array(9).fill(uzun) } }, roller).join()).toContain('9 madde > 8')
+    expect(uretici.isKurallariSorunlari({ YOKROL: { kurallar: [uzun] } }, roller).join()).toContain('bilinmeyen rol')
+    expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: ['kısa'] } }, roller).join()).toContain('çok kısa')
+    expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: [] } }, roller).join()).toContain('iş kuralı yok')
+  })
+
+  it('HRT-65 O9: haftalık öz-değerlendirme görevi verisi olan her rolde var; filo-ortak iyileştirme hakkı ve OPS onay makamını taşır', () => {
+    for (const ad of Object.keys(uretici.GOREVLER)) {
+      const x = (uretici.GOREVLER[ad].gorevler as Array<{ gorev: string; siklik: string }>).filter((g) => g.gorev.startsWith('Haftalık öz-değerlendirme (OPS-168 O9)'))
+      expect(x, `${ad}: tam bir öz-değerlendirme görevi`).toHaveLength(1)
+      expect(x[0].siklik).toBe('haftalik')
+    }
+    const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(ortak).toContain('İyileştirme hakkı')
+    expect(ortak).toContain('onay gelmeden uygulanmaz')
+    expect(ortak).toContain('Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, iyileştirme: metni OPS')
+    expect(ortak).toContain('İzin, hesap, MCP (allow/ask/deny, izin modu, onay veren kanca, `.mcp.json`) ve kapıyı gevşeten öneri: Recep yalnız OPS penceresinde söyler')
+    expect(ortak).toContain('deny gevşetilmez (§18)')
+    expect(ortak).toContain("Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer")
+    expect(ortak).toContain('izin modunu değiştirmek Recep kararıdır')
+    expect(ortak).toContain("OPS'un kendi kanca/ayar PR'ını ARAÇ okur")
+    // filo-ortak 10.000 bayt tavanında (hazir-ozellik-kurulumu): çapalı hafıza ve bağımsız doğrulama satırları kurallar dosyalarında.
+    for (const [ad, m] of Object.entries(kuralMetinleri)) {
+      expect(m, `${ad}: çapalı hafıza`).toContain('Çapalı hafıza okunur ve etiketlenir')
+      expect(m, `${ad}: bağımsız doğrulama`).toContain('Bağımsız doğrulama: canlı yazım betiği')
+    }
+    expect(kuralMetinleri.OPS).toContain('OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur')
+  })
+
+  it("HRT-65: kardeş depodaki 'bağlı: evet' tetiği yerelde ölçülür, kardeş depo yoksa sorun sayılmaz (ayırt edici)", () => {
+    const veri = {
+      KATALOG: {
+        amac: 'Bir cümle.',
+        gorevler: [
+          {
+            gorev: 'x',
+            komut: 'scripts/seo/canli-kapi.mjs',
+            siklik: 'olay',
+            tetik: 'actions',
+            tetikAyrinti: 'venthub-pdf-ingestor/.github/workflows/kaynak-kapilari.yml (kardeş depoda)',
+            bagli: 'evet',
+            cikti: 'c',
+            esik: 'e',
+          },
+        ],
+      },
+    }
+    const varMi = () => true
+    const oku = () => ''
+    expect(uretici.gorevSorunlari(veri, ['KATALOG'], varMi, oku, [], () => null), 'kardeş depo yok: doğrulanamaz, sorun değil').toEqual([])
+    expect(uretici.gorevSorunlari(veri, ['KATALOG'], varMi, oku, [], () => 'canli-kapi.mjs çağrılıyor')).toEqual([])
+    expect(uretici.gorevSorunlari(veri, ['KATALOG'], varMi, oku, [], () => 'boş iş akışı').join(), 'kardeş depo var ama komut çağrılmıyor').toContain('çağrılmıyor')
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
@@ -740,19 +827,20 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, isAkislari)).toEqual([])
   })
 
-  it('GEO-SEO ilk örnek: beş düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, yayın sonrası dizin isteği)', () => {
+  it('GEO-SEO ilk örnek: altı düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, yayın sonrası dizin isteği, haftalık öz-değerlendirme)', () => {
     const g = gercek['GEO-SEO']
-    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay', 'olay'])
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'haftalik', 'her-dagitim-gunluk', 'olay', 'olay'])
     expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
     expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
   })
 
   // OPS 10-11 (SEO-39): dizin isteği ve IndexNow GEO-SEO'nun görevidir; yazılı olmadığı için her yayında Recep'e onay soruluyordu
-  it('GEO-SEO yayın sonrası dizin isteği görev listesinde yazılı: komut IndexNow betiği, tetik kart kapısı (henüz kurulu değil)', () => {
-    const d = gercek['GEO-SEO'].gorevler.find((x) => x.komut === 'scripts/seo/indexnow-bildir.mjs')
-    expect(d).toMatchObject({ siklik: 'olay', tetik: 'kart-kapisi', bagli: 'hayir', baglayacak: 'HARITA' })
-    expect(d?.gorev).toMatch(/dizine eklenmesini iste/)
-    expect(d?.gorev).toMatch(/Recep'ten ayrıca onay istenmez/)
+  it('GEO-SEO yayın sonrası dizin isteği görev listesinde yazılı ve bağlı: komut değişen adres bildiricisi, tetik dizin-tetigi.yml (ALT-91, #1976)', () => {
+    const d = gercek['GEO-SEO'].gorevler.find((x) => x.komut === 'scripts/seo/degisen-adres-bildir.mjs')
+    expect(d).toMatchObject({ siklik: 'olay', tetik: 'actions', bagli: 'evet' })
+    expect(d?.tetikAyrinti).toMatch(/^\.github\/workflows\/dizin-tetigi\.yml/)
+    expect(d?.gorev).toMatch(/IndexNow ve Google kuyruğu/)
+    expect(d?.gorev).toMatch(/onay sorulmaz/)
   })
 
   // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin

@@ -2,6 +2,19 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/KATALOG.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Baskı tazeliği.** Canlı değer doğrulanmadan ya da yazılmadan önce kaynağın üreticideki SON baskısı `kaynak-dizini/katalog-envanteri.json`'dan okunur (`yerine_gecer`, `uretici_son_baski`); DB değerinin hangi baskıdan geldiği karta yazılır; eski baskı ile güncel baskı çelişirse güncel baskı kazanır. Olay: Radon CA-RM (KTL-48) canlı değerleri kaynaksız şablondu; Lineo Quiet'te (KTL-50) 12 ses değerinin 12'si Aralık 2020 baskısındandı, Şubat/Mayıs 2026 baskısı farklı yayımlıyor.
+2. **Alan değişmeden önce okuyanlar taranır.** Bir `technical_specs` anahtarının değeri değişmeden, kaldırılmadan ya da başka alana taşınmadan önce `src/` ve başka departmanların veri dosyalarında (ör. `src/data/sessizFan`) onu okuyan yerler aranır ve karta listelenir; okuyan varsa alan yerinde düzeltilir, taşıma ayrı karardır. Olay: sessiz fan sihirbazı yalnız `noise_level_db_a` okuyor ve kapsamı tam Lineo Quiet'in 12 modeli; alanı yeni ada taşımak 12 modelin ses puanını boşaltırdı (KTL-50).
+3. **Aynı sayı metinde de olabilir.** Bir sayısal özellik düzeltilince aynı sayının `description_i18n` (TR/EN), aile açıklaması ve rehber verisinde geçip geçmediği aranır. Sayıdan türeyen cümlede yalnız sayıyı KATALOG düzeltir (cümle kalıbı aynı kalır, kalıp eşleşmezse betik durur); cümlenin yapısı değişecekse iş İçerik'e (Design) gider (OPS-168 d). Olay: Lineo ses sayısı ürün açıklama cümlesinde de duruyordu (KTL-50).
+4. **Sütun ya da koşul belirsizse tahminle yazılmaz.** Kaynak aynı ölçüt için birden çok sütun veriyorsa (emme / üfleme / gövde Lp; 4/6/8/10 V) hepsi manifestte kayıtlı tutulur, yazılan sütun mevcut anlama göre seçilir ve karara açıkça yazılır; kaynak kendi içinde tutarsızsa değer yazılmaz, üretici sorusuna eklenir. Olay: CA-RM 160 ES Lp satırı katalog içinde tutarsız, yazılmadı (KTL-48); Lineo'da emme/üfleme gövdeden 6-13 dB yüksek, "sessizlik" beyanı için hangi sütun gösterilir sorusu OPS'a gitti (KTL-50).
+5. **Canlı yazım betiği kalıbı.** Kuru koşum varsayılan; bayatlık kapısı (canlı değer ölçümden sonra değiştiyse hiç yazmaz); geri alma envanteri yazımdan ÖNCE; yazım sonrası yeniden okuyup doğrulama ve bozuksa kendi yazdığını geri alma; sayı tablosunu bağımsız doğrulayıcı kaynaktan yeniden ölçer (OPS-168 O5, canlı yazım betiğinde varsayılan). Betiği KATALOG hazırlar, OPS koşar (Recep kapısı 4). Olay: KTL-48 ve KTL-50 aynı kalıpla teslim edildi; kalıp ilk Radon betiğinde kuruldu.
+6. **Önceki çalışma araması içerik anahtarıyla yapılır.** Arama alan adı ve model koduyla, kart notları dahil yapılır; yalnız kart başlığına bakmak "yok" demek için yetmez. Olay: Lineo ses bulgusu KTL-33'ün notunda 13 Ekim'de ölçülmüştü; KTL-50 açılırken "aynı iş yok" yazıldı.
+7. **Kanıt mekaniği.** Ölçüm dosyaları proje kökü dışında tutulursa doğrulayıcı okuyamaz: karta manuel kanıt (neyi nasıl ölçtüğü notta) ve birleşme için `command` kanıtı (`gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`) konur; pano yönetilen kipte olmadığından Done `update_task` ile `completed` yapılır (`transition_task` reddeder). Olay: KTL-48 kapanışı.
+
+Genel kurallardan sona alınan: İşe uymayan genel kurallar silinmez, sona alınır: K3 RLS-first, K30 Storage RLS (Faz 2 park).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K3 RLS-first: Her tablo RLS politikasıyla korunur.
 - K16 ISR + webhook: Statik vitrinde görünen her tablonun DB tetiği VE webhook handler dalı olur; HMAC geçince `revalidatePath`/`revalidateTag`; secret yoksa fail-closed (cetvel: `rendering-cache-standard.md` §3).
@@ -28,6 +41,8 @@
 
 ## Birleştirme ve ölçüm kaydı (HRT-60)
 - Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
+- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).
+- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).
 - Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.
 
 ## Durum dosyası: standart "Yarım iş" satırı (HRT-31)
