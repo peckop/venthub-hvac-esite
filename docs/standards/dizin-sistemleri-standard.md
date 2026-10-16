@@ -85,6 +85,13 @@ demesi, o ürünün **kendi** dizininde yokluğu, ya da o cevap için **hiç ara
   (saf mantık + bayrağı açık geçici ağaçta uçtan uca + iki mutasyonlu sabotaj).
   Ölçüm 2026-10-03 (canlıya karşı kuru koşu): sitemap 87 adres, 78 atıldı, 9 kaldı, 9'u 200 ve kanonik. Değişecek 78 adres yayın günü
   adres yayınıyla aynı yayında gider.
+- **K4 GEVŞEDİ (karar 376, 2026-10-16; SEO-55).** Bugün canlı olan ve site haritasında listeli adresler, adres şeması bayrağı
+  (`ADRES_SEMASI_K3B`) KAPALIYKEN de IndexNow'a gider. Gerekçe: IndexNow "bu sayfa değişti" der; yayında adres değişince eski adres
+  308 verir ve arama motorları 308'i izler; K4'ün önlemek istediği Bing'e eski şemayı öğretme maliyeti, "her canlı değişiklikte
+  dizinle" ilkesinden küçük görüldü (ölçüm: `docs/audits/geo-dizin-tetigi-olcum-2026-10-16.md`). Kapsam: (1) webhook süzgeci
+  `src/lib/seo/indexnow.ts` (URUN, ayrı PR), (2) `scripts/seo/degisen-adres-bildir.mjs` (`K4_GEVSEK = true`). **Değişmeyenler:**
+  haritada olmayan ya da 200 vermeyen/kanoniği kendisi olmayan adres hiçbir kipte gitmez; toplu eski betik `indexnow-bildir.mjs`
+  kapısı (yukarıdaki iki madde) bu kararla DEĞİŞMEDİ, çünkü o betik haritanın tamamını bir kerede gönderir.
 - Kaynak: indexnow.org/documentation, /faq; blogs.bing.com/webmaster/May-2025/… (2025-05-19).
 
 ## D5 — llms.txt hükmü
