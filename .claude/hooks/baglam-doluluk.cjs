@@ -122,6 +122,8 @@ const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') 
 const HAZIR_YAS_DK = 60
 const KART_DESENI = /\b(?:ARC|OPS|REC|ALT|URN|KTL|HRT|SEO|BLG|YTN|TSR|ADM|EDG|I18|STS)-\d{1,4}\b/g
 const KART_SATIRI = /^\s*[-*]\s*(?:ŞU AN BEKLEYEN|BEKLEYEN|AÇIK|ACIK|SIRADA|YARIM İŞ|Yarım iş|Yarim is)/i
+// filo-ortak.md "Yarım iş: yok — <kısa>" satırını madde işaretsiz yazmayı da öğretir; işaret isteğe bağlı (ARC-131 ek PR).
+const YARIM_SATIRI = /^\s*(?:[-*]\s*)?(?:YARIM İŞ|Yarım iş|Yarim is)\s*:/i
 const KART_EN_COK = 8
 const YARIM_YAZI_EN_COK = 120
 
@@ -136,7 +138,7 @@ function compactIcerigi(metin) {
   const kartlar = []
   let yarim = null
   for (const satirMetni of sonBlok(metin).split('\n')) {
-    if (!KART_SATIRI.test(satirMetni)) continue
+    if (!KART_SATIRI.test(satirMetni) && !YARIM_SATIRI.test(satirMetni)) continue
     const m = satirMetni.match(/yar[ıi]m i[şs]\s*:\s*(.+)$/i)
     if (m) yarim = m[1].replace(/\s+/g, ' ').trim().slice(0, YARIM_YAZI_EN_COK)
     for (const kart of satirMetni.match(KART_DESENI) || []) {
