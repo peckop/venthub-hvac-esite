@@ -195,6 +195,8 @@ describe('INV-KANCA-KART-ALANI-3 · kart satırları UYARISI (ARC-150, OPS 16 Ek
   })
 
   it('küçük harf ve ASCII yazım tolere edilir; açıklama hiç yoksa üçü de eksik', () => {
+    // ASCII "i" (noktalı) büyük harfte Türkçe "İ" olur: bu yazım da tolere edilmeli (dotless ı değil, düz i).
+    expect(eksikler({ description: 'kaynak/cetvel: x\nyontem: elle\nonceki calisma: y' })).toEqual([])
     expect(eksikler({ description: 'kaynak/cetvel: x\nyontem: elle\noncekı calısma: y' })).toEqual([])
     expect(eksikler({})[0]).toMatch(/KAYNAK\/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA/)
   })

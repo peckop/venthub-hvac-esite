@@ -242,7 +242,7 @@ function eksikSatirlar(girdi) {
   const eksik = []
   if (!/KAYNAK\s*\/?\s*CETVEL|KAYNAK\s*:/.test(m)) eksik.push('KAYNAK/CETVEL')
   if (!/Y[ÖO]NTEM\s*:/.test(m)) eksik.push('YÖNTEM')
-  if (!/[ÖO]NCEK[İI]\s+[ÇC]ALI[ŞS]MA\s*:/.test(m)) eksik.push('ÖNCEKİ ÇALIŞMA')
+  if (!/[ÖO]NCEK[İI]\s+[ÇC]AL[İI][ŞS]MA\s*:/.test(m)) eksik.push('ÖNCEKİ ÇALIŞMA')
   if (!eksik.length) return []
   return [
     `KART SATIRLARI UYARI: kart açıklamasında ${eksik.join(', ')} satırı yok (filo-ortak "İş ve kart": her kartta üçü bulunur; ` +
