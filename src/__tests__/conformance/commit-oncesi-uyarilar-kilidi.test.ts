@@ -103,7 +103,8 @@ describe('REC-267: commit öncesi uyarılar kancaya bağlı ve UYARI olarak kal�
     // 16 Ekim: bu uyari her committer'a `--yaz` kostururdu; GEO-SEO ARAC'in dosyasini kendi agacinda degistirdi.
     const s = oku(BETIK)
     expect(s, 'rol ayrimi (benARacMi) kayboldu — uyari yine herkese --yaz soyler').toContain('if (benARacMi(kok)) {')
-    expect(s, 'ARAC disindakine yonlendirme yok').toContain("SendMessage ile satir iste")
+    expect(s, 'ARAC disindakine "satiri kendi PR\'ina ekle" yonlendirmesi yok').toContain("KENDI PR\\'ina ekle")
+    expect(s, 'eski yonlendirme (ARAC\'a satir iste) geri geldi: satir PR ile inmeli, aksi INV-ARAC-1 kirmizi').not.toContain('SendMessage ile satir iste')
     expect(s, 'ARAC disindaki icin reddedilme bilgisi yok').toContain('reddedilir')
   })
 

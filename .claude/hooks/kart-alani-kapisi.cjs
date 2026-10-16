@@ -12,6 +12,9 @@
  *   1. Kartın atandığı departmanın Görev + Dosya alanı satırını additionalContext olarak gösterir.
  *   2. Kart metninde geçen dosya yolları BAŞKA departmanın dosya alanına düşüyorsa "bu iş X'in alanına benziyor".
  *   3. Departman çözülemezse (assignee yok/bilinmiyor, başlıkta tanınan önek yok) tek satır "departman bilinmiyor".
+ *   4. (ARC-138, karar 369) Kart BAŞLIĞI, atanan departmanın rol kartındaki "Görev değil" satırından bir ifadeyi tam
+ *      sözcük olarak geçiriyorsa "görev dışı" UYARISI. Satır biçimi rol-karti-uret.cjs GOREV_DEGIL_BASLIK sabitidir
+ *      (testle kilitli); rol kartı ya da satır yoksa bu kol SESSİZ kalır. Yol içeren öğeler (3d/**) yol kolunun işi.
  * Departman: önce `assignee`, yoksa başlık önekinden (ARC-109 · … → ARAC).
  *
  * NE YAPMAZ: reddetmez (çıkış hep 0), kartı değiştirmez, ağ/DB'ye gitmez. Veri dosyası yoksa ya da ayrıştırılamazsa
@@ -25,7 +28,12 @@ const fs = require('fs')
 const path = require('path')
 
 const ARAC_ADI = 'mcp__wrongstack-kanban__kanban_manage'
-const HARITA = path.resolve(__dirname, '..', '..', 'docs', 'roller', 'DEPARTMAN-HARITASI.md')
+const ROL_KARTLARI = path.resolve(__dirname, '..', '..', 'docs', 'roller')
+const HARITA = path.join(ROL_KARTLARI, 'DEPARTMAN-HARITASI.md')
+// Rol kartındaki satır: "Görev değil (emir buraya ... "görev dışı: <satır>" yaz): <öğe>; <öğe>." Parantez içinde ":" var;
+// bu yüzden ilk "):" değil, tembel eşleşmeyle satırdaki "):" ayracı aranır.
+const GOREV_DEGIL_SATIRI = /^Görev değil\b[^\n]*?\):\s+(.+)$/m
+const KAC_UYARI = 3
 
 // Başlık öneki → departman (docs/standards/is-kayit-duzeni-standard.md önek tablosu).
 const ONEK = {
@@ -113,6 +121,50 @@ function sahibi(yol, harita) {
   return en
 }
 
+/**
+ * Rol kartı metnindeki "Görev değil" satırını öğelere ayırır: [{ ifadeler: string[], sahip: string|null, ham }].
+ * Öğeler ";" ile ayrılır; sondaki "(SAHİP)" sahip olarak alınır; ifadeler "," / " ve " / " ya da " ile bölünür, küçük
+ * harfe çevrilir, 4 harften kısa ifade (CI, kod…) atlanır (gürültü). Yol/glob içeren öğe (3d/**) atlanır.
+ * Satır yoksa boş liste (sessiz).
+ */
+function gorevDegilOku(metin) {
+  const m = GOREV_DEGIL_SATIRI.exec(String(metin || ''))
+  if (!m) return []
+  const sonuc = []
+  for (const ham of m[1].split(';')) {
+    const parca = ham.trim().replace(/\.$/, '')
+    if (!parca || /[/*]/.test(parca)) continue
+    const sahip = /\(([^)]+)\)\s*$/.exec(parca)
+    const govde = parca.replace(/\s*\([^)]*\)\s*$/, '').trim()
+    const ifadeler = govde
+      .split(/,|\s+ve\s+|\s+ya da\s+/)
+      .map((x) => x.trim().toLocaleLowerCase('tr'))
+      .filter((x) => x.length >= 4)
+    if (ifadeler.length) sonuc.push({ ifadeler, sahip: sahip ? sahip[1].trim() : null, ham: parca })
+  }
+  return sonuc
+}
+
+function kacis(ifade) {
+  return ifade.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/** Başlıkta (tam sözcük) geçen "Görev değil" ifadeleri: [{ ifade, sahip }]. */
+function gorevDisi(baslik, ogeler) {
+  const b = String(baslik || '').toLocaleLowerCase('tr')
+  const bulunan = []
+  for (const o of ogeler) {
+    for (const ifade of o.ifadeler) {
+      const re = new RegExp(`(?<![${HARF}\\d])${kacis(ifade)}(?![${HARF}\\d])`)
+      if (re.test(b)) {
+        bulunan.push({ ifade, sahip: o.sahip })
+        break
+      }
+    }
+  }
+  return bulunan
+}
+
 function departman(girdi, harita) {
   const atanan = ad(girdi.assignee)
   if (atanan && harita[atanan]) return atanan
@@ -123,9 +175,10 @@ function departman(girdi, harita) {
 
 /**
  * Saf çekirdek (test bunu çağırır).
+ * @param {(dept: string) => (string|null)} [kartOku] departmanın rol kartı metni; yoksa "Görev değil" kolu sessiz
  * @returns {string[]} modele gidecek satırlar (boşsa sessiz)
  */
-function incele(girdi, harita) {
+function incele(girdi, harita, kartOku = () => null) {
   if (!girdi || girdi.action !== 'add_task') return []
   const satirlar = []
   const dept = departman(girdi, harita)
@@ -137,7 +190,23 @@ function incele(girdi, harita) {
   } else {
     const v = harita[dept]
     satirlar.push(`KART ALANI (${dept}): Görev: ${v.gorev} · Dosya alanı: ${v.alan}`)
+    // ARC-138 (karar 369): başlık, atanan departmanın rol kartındaki "Görev değil" ifadesini geçiriyorsa UYARI (engel yok).
+    // Rol kartı/satır yoksa gorevDegilOku [] verir → kol sessiz.
+    let kart = null
+    try {
+      kart = kartOku(dept)
+    } catch {
+      kart = null
+    }
+    for (const b of gorevDisi(girdi.title, gorevDegilOku(kart)).slice(0, KAC_UYARI)) {
+      satirlar.push(
+        `KART ALANI UYARI (görev dışı): kart başlığı "${b.ifade}" geçiriyor; ${dept} rol kartının "Görev değil" satırında ` +
+          `yazıyor${b.sahip ? ` (sahibi: ${b.sahip})` : ''}. Bu iş ${dept} rol kartında görev dışı görünüyor; sahibi doğru mu? ` +
+          `Doğruysa OPS'a "görev dışı: <satır>" yaz.`,
+      )
+    }
   }
+  satirlar.push(...eksikSatirlar(girdi))
   const metin = `${girdi.title || ''}\n${girdi.description || ''}`
   // Anahtar kelime sezgisi (4 Ekim olayı: "mod/kanca/eklenti" işi ARAÇ'ındı, YETENEK'e açılmıştı). Yalnız ARAÇ için,
   // yalnız harita ARAC'ı tanıyorsa; "model/modül" gibi sözcükleri yakalamasın diye `mod` TAM sözcük aranır.
@@ -162,6 +231,25 @@ function incele(girdi, harita) {
   return satirlar
 }
 
+/**
+ * Kart açılışında zorunlu üç satır (.claude/rules/filo-ortak.md "İş ve kart"): KAYNAK/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA.
+ * Açıklamada biri yoksa tek satır UYARI (engel yok). SAF; yalnız add_task. ARC-150 (OPS 16 Ekim "B: önleme").
+ * Büyük/küçük harf ve Türkçe harf (ö/o, ç/c, ş/s, ı/i) farkı tolere edilir.
+ */
+function eksikSatirlar(girdi) {
+  if (!girdi || girdi.action !== 'add_task') return []
+  const m = String(girdi.description || '').toLocaleUpperCase('tr')
+  const eksik = []
+  if (!/KAYNAK\s*\/?\s*CETVEL|KAYNAK\s*:/.test(m)) eksik.push('KAYNAK/CETVEL')
+  if (!/Y[ÖO]NTEM\s*:/.test(m)) eksik.push('YÖNTEM')
+  if (!/[ÖO]NCEK[İI]\s+[ÇC]ALI[ŞS]MA\s*:/.test(m)) eksik.push('ÖNCEKİ ÇALIŞMA')
+  if (!eksik.length) return []
+  return [
+    `KART SATIRLARI UYARI: kart açıklamasında ${eksik.join(', ')} satırı yok (filo-ortak "İş ve kart": her kartta üçü bulunur; ` +
+      'cetvel yoksa "cetvel yok — yazımı bu işin kapsamında" yaz, önceki çalışma yoksa aradığın beş yeri say). Kartı güncelle.',
+  ]
+}
+
 function calistir() {
   let girdi
   try {
@@ -177,7 +265,15 @@ function calistir() {
     return
   }
   if (!Object.keys(harita).length) return
-  const satirlar = incele(girdi.tool_input, harita)
+  const kartOku = (dept) => {
+    if (!/^[A-Z0-9-]+$/.test(dept)) return null
+    try {
+      return fs.readFileSync(path.join(ROL_KARTLARI, `${dept}.md`), 'utf8')
+    } catch {
+      return null
+    }
+  }
+  const satirlar = incele(girdi.tool_input, harita, kartOku)
   if (!satirlar.length) return
   try {
     fs.writeSync(
@@ -198,4 +294,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { haritayiOku, yollar, sahibi, departman, incele, ad, HARITA }
+module.exports = { haritayiOku, yollar, sahibi, departman, incele, ad, gorevDegilOku, gorevDisi, eksikSatirlar, GOREV_DEGIL_SATIRI, HARITA }

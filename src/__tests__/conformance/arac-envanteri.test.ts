@@ -501,6 +501,7 @@ describe('INV-ARAC-4: --yaz varsayilan hedefe yalniz ARAC agacinda yazar', () =>
     expect(r.kod, 'baska seridin agacinda --yaz reddedilmedi').toBe(2)
     expect(r.stderr).toContain('REDDEDILDI')
     expect(r.stderr).toContain('GEO-SEO')
+    expect(r.stderr, 'red mesaji "satiri kendi PR\'ina ekle" demiyor (ARC-149)').toContain("KENDI PR'ina ekle")
     expect(gercekBayt(), 'reddedilen --yaz yine de belgeyi degistirdi').toBe(once)
   })
 
