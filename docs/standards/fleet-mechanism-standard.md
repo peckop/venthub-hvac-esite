@@ -1119,23 +1119,16 @@ claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
    akran aktarımı onay yerine **geçmez**; yanlış adrese düşen bir GO, düştüğü şerit
    tarafından **taşınmaz** — yalnız *"teslimat kayboldu, kendi kanalından al"* denir.
    (Vaka 3 böyle kapatıldı.)
-4. **Onay yolu (karar 224, Recep 2026-10-01, OPS penceresi).** Recep'in sözü: *"canlı haricinde sen işi
-   bitirebilmelisin ama ben ister sana ister de o pencerede gidip yine onay verebilirim"*. Yani **canlı DIŞINDAKİ
-   işlerde** departman onayı doğrudan OPS'tan alınır; Recep'in OPS'ta verdiği evet için OPS sözünü ve saatini
-   aktarır ve kaydı OPS panosundaki REC-425 kartına not olarak yazar (departman doğrulayabilsin). "Canlı" =
-   Recep kapıları 1-5 (migration'lı PR, sır/anahtar/parola yazmak, geçmişi silen/zorlayan git, canlı veritabanına
-   yazım, para harcatan her şey) ve aşağıdaki liste; bunlar Recep'te kalır, OPS yalnız bunların dışındakini onaylar. Bu, madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR: adres doğrulanmıştır ve kaynak
-   Recep'in kendi sözüdür. **Recep'in onayını aktarma yetkisi YALNIZ OPS'tadır** (Recep, 2026-10-01:
-   *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*); bir departman başka bir departmana
-   Recep onayı aktaramaz (madde 3 aynen geçerlidir).
-   - **Son hâl (Recep, OPS penceresi, 2026-10-01):** *"canlı haricinde kimsenin penceresinde evet hayır yazmak zorunda
-     olmak istemiyorum."* Canlı dışındaki her onayı Recep yalnız OPS penceresinde verir. Ayar/izin/kullanıcı düzeyi
-     dosya (`recep.md`, settings gibi) değişikliği gerekiyorsa departman metni ya da komutu hazırlar, Recep OPS'ta
-     evet der, değişikliği OPS kendi penceresinde uygular (eş mesajı izin sayılmaz kuralı böyle korunur).
-     Recep dilerse departman penceresine de yazabilir (yasak değil, zorunlu da değil): o söz geçerlidir, departman
-     sözü aynı turda saatiyle OPS'a bildirir (karar defteri kancası REC-554 gelene kadar geçici kural).
-   - **Recep'in başka pencereye yazması gereken tek durum CANLI'dır:** prod, migration'lı PR, gerçek para, geri alınamaz
-     silme. Recep sözü o pencerede.
+4. **Onay yolu (karar 224, 2026-10-01; 2026-10-16'da OPS yetkisi genişledi, tüzük taslağı v2 Madde 2).** İşin sınıfı önce ölçülür, onay mercii sınıftan çıkar. Üç sınıf vardır:
+   - **a) Recep'in sözü gerekenler (DARALTILMAZ).** Recep kapıları: migration'lı PR, canlı veritabanına yazım, sır/anahtar/parola yazmak, geçmişi silen ya da zorlayan git komutu, para harcatan her şey (ücretli plan, servis, satın alma). Bunlara ek olarak izin, hesap ve MCP değişikliği (allow/ask/deny satırı, izin modu, onay veren kanca, `.mcp.json`, hesap ve kimlik) ve bir kapıyı, kancayı ya da izin kuralını GEVŞETEN her öneri de bu sınıftadır. Sözün verildiği yer:
+     - Canlıya etkili olanlarda (migration'lı PR birleştirme, gerçek para, geri alınamaz silme) söz işi koşan pencerededir ve pencereler arası taşınmaz.
+     - İzin, hesap, MCP ve gevşetme önerilerinde söz OPS penceresinde verilir. Uygulamayı OPS kendi penceresinde yapar ya da ARAÇ PR açar ve OPS tam farkı okur.
+     - `deny` listesi gevşetilmez (§18).
+   - **b) OPS onayıyla yürüyenler (2026-10-16'dan beri; Recep'e götürülmez).** Kanca tasarımı ve kurulumu (izin vermeyen, kapıyı gevşetmeyen), izin içermeyen ayar, departman iyileştirme önerisi, kural metni (Recep kapısı metni hariç), sıra ve öncelik. Departman metni ya da komutu hazırlar, OPS'a `SendMessage` ile verir; OPS tam farkı okuyup "okundu, uygun" der. **Sınır:** kapıyı SIKILAŞTIRAN öneri bu sınıfta geçer; GEVŞETEN öneri a sınıfına düşer. Sınıf belirsizse a sınıfı varsayılır.
+   - **c) Departmanın kendi kararı.** Kendi alanındaki yöntem, çalışan açma, kendi PR'ını ritüelle birleştirme. Kanca ya da ayar etkili PR'da önce OPS tam farkı okur.
+   - **Aktarma yetkisi yalnız OPS'tadır.** OPS, Recep'in OPS penceresinde verdiği sözü saatiyle aktarır ve kaydı OPS karar notuna yazar (departman doğrulayabilsin). Bir departman başka bir departmana Recep onayı aktaramaz; bu madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR, çünkü adres doğrulanmıştır ve kaynak Recep'in kendi sözüdür.
+   - Recep dilerse söz işi koşan departman penceresinde de verilebilir (yasak değil, zorunlu da değil); o söz geçerlidir ve departman aynı turda saatiyle OPS'a bildirir.
+   - Sözün aynısı ve saati depo dışı kayda gider (durum dosyası, hafıza, `scripts/board/recep-sozu-defteri.cjs`); depoya tırnakla yazılmaz (depo herkese açıktır).
    - Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
 
 ### Aracın yanıltan çıktısı — ve ailesi
