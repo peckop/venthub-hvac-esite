@@ -5,6 +5,9 @@
 ## Amaç
 Sitedeki ürün sayıları (ses, ağırlık, devir, fiyat) üreticinin güncel kataloğuyla birebir tutsun; bozulursa müşteri yanlış fan seçer, iade ve güven kaybı olur; her değer kaynak sayfasına dayanır, canlı yazımı KATALOG hazırlar, Recep onayıyla OPS koşar.
 
+## Nasıl
+catalog-ingestion-standard.md, csv-import-export-standard.md, pricing-standard.md, product-schema-standard.md
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|

@@ -149,6 +149,7 @@ const BIRLESTIRME_KURALI = [
   '- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).',
   '- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR\'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).',
   '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.',
+  '- Günlük işte Recep\'e soru sorulmaz; beş Recep kapısı (`docs/roller/OPS.md` "Recep kapıları") ve izin genişletme dışındaki her onay OPS\'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS\'a yazılır; Recep\'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).',
 ].join('\n')
 
 /**
@@ -574,10 +575,27 @@ function gorevSayilari(g) {
   return { toplam: g.gorevler.length, bagli: g.gorevler.filter((x) => x.bagli === 'evet').length }
 }
 
-/** Kartta kısa "Amaç" bölümü (verisi olmayan rolde boş dize). */
-function amacBolumu(ad, veri = GOREVLER) {
+/**
+ * Kart bayt tavanı (testlerdeki fiilî sınır: `< floor(KART_BAYT_SINIRI × 0.94)`). Amaç cümlesi karta sığmazsa (HRT-66, tüzük Madde 3:
+ * "kartta yer yoksa alan görev dosyasında durur, kart ona işaret eder") kartta yalnız işaret kalır; eşik oynatılmaz.
+ */
+const KART_AMAC_TAVANI = Math.floor(KART_BAYT_SINIRI * 0.94) - 1
+const amacKarttaOnbellek = new Map()
+
+/** Amaç metni kartın içinde mi (true) yoksa yalnız görev dosyasında mı (false) durur. */
+function amacKarttaMi(ad) {
+  if (!GOREVLER[ad]) return true
+  if (!amacKarttaOnbellek.has(ad)) {
+    amacKarttaOnbellek.set(ad, Buffer.byteLength(kart(ad, ROLLER[ad], true), 'utf8') <= KART_AMAC_TAVANI)
+  }
+  return amacKarttaOnbellek.get(ad)
+}
+
+/** Kartta kısa "Amaç" bölümü (verisi olmayan rolde boş dize). `kartta` false ise yalnız görev dosyasına işaret eder. */
+function amacBolumu(ad, veri = GOREVLER, kartta = true) {
   const g = veri[ad]
-  return g ? ['## Amaç', g.amac].join('\n') : ''
+  if (!g) return ''
+  return ['## Amaç', kartta ? g.amac : `Amaç ve Nasıl: \`docs/roller/${gorevDosyaAdi(ad)}\`.`].join('\n')
 }
 
 /** Kartta "Düzenli görevler" işaretçisi: sayılar + tablo dosyası atfı (verisi olmayan rolde boş dize). */
@@ -609,6 +627,9 @@ function gorevDosyasi(ad, veri = GOREVLER) {
     '',
     '## Amaç',
     g.amac,
+    '',
+    '## Nasıl',
+    g.nasil || 'Yazılmadı (tüzük Madde 3: docs/standards/ altından cetvel adı ya da "cetvel yok — yazımı kapsamda").',
     '',
     '## Görevler',
     '| Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |',
@@ -690,7 +711,61 @@ function gorevSorunlari(veri, roller, varMi, oku, isAkislari = [], kardesOku = (
   return s
 }
 
-function kart(ad, r) {
+/**
+ * TASLAK ROLLER (HRT-66, filo tüzüğü Madde 3): penceresi kapalı ya da hiç açılmamış departmanın Amaç, Ne zaman ve Nasıl alanları
+ * boş olabilir; kapı bunları muaf tutar, sahibi ilk açılışta doldurur. Değer: muafiyet nedeni (boş olamaz). Dolduran rol buradan
+ * silinir ve `rol-gorevleri.json`'a girer; kapı ikisini birden tutmaya izin vermez.
+ */
+const TASLAK_ROLLERI = {
+  ADMIN: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  EDGE: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  I18N: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  MARKA: 'departman kapalı (iş dondurma); açılışta sahibi Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  MEVZUAT: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  SATIS: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+}
+
+/** Nasıl alanı geçerli mi: docs/standards altında gerçekten var olan en az bir cetvel adı ya da "cetvel yok — yazımı kapsamda". */
+function nasilGecerliMi(nasil, varMi) {
+  if (typeof nasil !== 'string' || !nasil.trim()) return false
+  if (/^cetvel yok — yazımı kapsamda/.test(nasil.trim())) return true
+  const adlar = nasil.match(/(?<![\w./-])[a-z0-9][a-z0-9-]*\.md(?![\w.])/g) || []
+  return adlar.some((a) => varMi(`docs/standards/${a}`))
+}
+
+/**
+ * 5N1K kapısı (tüzük Madde 3): her rol kartında Kim, Ne, Ne zaman, Nerede, Nasıl, Neden bulunur. Kim = müdür pencere (kart başlığı),
+ * Ne = Görev, Nerede = Dosyalar, Neden = Amaç, Ne zaman = en az bir düzenli görev, Nasıl = geçerli cetvel adı. `taslak` rolleri muaftır.
+ * Boş dizi = temiz. Ayırt edicilik testi bu işlevi bilerek bozulmuş veriyle çağırır.
+ */
+function altiAlanSorunlari(kartlar, veri, roller, varMi, taslak = TASLAK_ROLLERI) {
+  const s = []
+  for (const [ad, neden] of Object.entries(taslak)) {
+    if (!roller.includes(ad)) s.push(`${ad}: taslak listesinde ama bilinmeyen rol`)
+    else if (typeof neden !== 'string' || !neden.trim()) s.push(`${ad}: taslak muafiyetinin nedeni yazılmamış`)
+    else if (veri[ad]) s.push(`${ad}: verisi var ama hâlâ taslak listesinde (muafiyet kalkmalı)`)
+  }
+  for (const ad of roller) {
+    if (taslak[ad]) continue
+    const metin = kartlar[ad] || ''
+    const bolum = (b) => {
+      const i = metin.indexOf(`## ${b}\n`)
+      if (i < 0) return ''
+      const son = metin.indexOf('\n## ', i + 1)
+      return metin.slice(i + b.length + 4, son < 0 ? undefined : son).trim()
+    }
+    if (!/^# ROL KARTI: \S+/m.test(metin)) s.push(`${ad}: Kim (kart başlığı) eksik`)
+    if (!bolum('Görev')) s.push(`${ad}: Ne (Görev) eksik`)
+    if (!bolum('Dosyalar')) s.push(`${ad}: Nerede (Dosyalar) eksik`)
+    const g = veri[ad]
+    if (!g || typeof g.amac !== 'string' || !g.amac.trim()) s.push(`${ad}: Neden (Amaç) eksik`)
+    if (!g || !Array.isArray(g.gorevler) || !g.gorevler.length) s.push(`${ad}: Ne zaman (düzenli görev) eksik`)
+    if (!g || !nasilGecerliMi(g.nasil, varMi)) s.push(`${ad}: Nasıl eksik (docs/standards altında var olan cetvel adı ya da "cetvel yok — yazımı kapsamda")`)
+  }
+  return s
+}
+
+function kart(ad, r, amacKartta = amacKarttaMi(ad)) {
   return [
     `# ROL KARTI: ${ad}`,
     '',
@@ -702,7 +777,7 @@ function kart(ad, r) {
     '',
     YONETIM_ISTISNA[ad] || YONETIM,
     '',
-    ...(GOREVLER[ad] ? [amacBolumu(ad), '', gorevBolumu(ad), ''] : []),
+    ...(GOREVLER[ad] ? [amacBolumu(ad, GOREVLER, amacKartta), '', gorevBolumu(ad), ''] : []),
     '## Dosyalar',
     r.dosyalar,
     '',
@@ -764,7 +839,7 @@ function sorunlar(kartlar) {
     if (ad === 'OPS' && !metin.includes(HARITA_ISARETCISI)) s.push('OPS: Departman haritası işaretçisi eksik/değişmiş')
     // Verisi olan rolün kartında Amaç ve Düzenli görevler bölümü bire bir bulunur (OPS-27, HRT-24).
     if (GOREVLER[ad]) {
-      for (const blok of [amacBolumu(ad), gorevBolumu(ad)]) {
+      for (const blok of [amacBolumu(ad, GOREVLER, amacKarttaMi(ad)), gorevBolumu(ad)]) {
         if (!metin.includes(blok)) s.push(`${ad}: ${blok.split('\n')[0]} bölümü eksik/değişmiş`)
       }
     }
@@ -1101,6 +1176,7 @@ function main() {
       },
     ),
     ...isKurallariSorunlari(isKurallariOku(kok), Object.keys(ROLLER)),
+    ...altiAlanSorunlari(kartlar, GOREVLER, Object.keys(ROLLER), (d) => fs.existsSync(path.join(kok, d))),
   ]
   for (const x of s) console.error(`SORUN: ${x}`)
   if (yaz) {
@@ -1130,6 +1206,11 @@ module.exports = {
   gorevDosyasi,
   gorevSorunlari,
   gorevEksikRoller,
+  altiAlanSorunlari,
+  nasilGecerliMi,
+  TASLAK_ROLLERI,
+  KART_AMAC_TAVANI,
+  amacKarttaMi,
   gorevVerisiOku,
   isAkisiMetinleri,
   amacBolumu,

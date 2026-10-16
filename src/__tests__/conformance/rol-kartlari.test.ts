@@ -56,6 +56,17 @@ type Uretici = {
   isKurallariOku: (kok?: string) => Record<string, { kurallar: string[] }>
   isKurallariSorunlari: (veri: Record<string, { kurallar: string[] }>, roller: string[]) => string[]
   gorevEksikRoller: () => string[]
+  altiAlanSorunlari: (
+    kartlar: Record<string, string>,
+    veri: Record<string, RolGorevi>,
+    roller: string[],
+    varMi: (d: string) => boolean,
+    taslak?: Record<string, string>,
+  ) => string[]
+  nasilGecerliMi: (nasil: unknown, varMi: (d: string) => boolean) => boolean
+  TASLAK_ROLLERI: Record<string, string>
+  KART_AMAC_TAVANI: number
+  amacKarttaMi: (ad: string) => boolean
   isAkisiMetinleri: (kok: string) => string[]
   AMAC_SINIRI: number
   haritaOzet: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][], planli?: Record<string, Planli>) => string
@@ -86,7 +97,7 @@ type Gorev = {
   esik: string
   taslak?: boolean
 }
-type RolGorevi = { amac: string; gorevler: Gorev[] }
+type RolGorevi = { amac: string; nasil?: string; gorevler: Gorev[] }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
 const require = createRequire(import.meta.url)
@@ -1188,5 +1199,106 @@ describe('INV-ROL-1 — arama sonuç sayfası sahipliği (HRT-32, OPS isteği 20
     expect(kartlar.ALTYAPI).toContain('rota dili satırı ve yönlendirme')
     expect(satir('ALTYAPI')).toContain('rota dili satırı ve yönlendirme')
     expect(satir('URUN')).toContain('rota dili satırı ve yönlendirmesi ALTYAPI')
+  })
+})
+
+describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-66, OPS-169)', () => {
+  const kartlar = uretici.uret()
+  const roller = Object.keys(uretici.ROLLER)
+  const varMi = (d: string) => fs.existsSync(path.join(KOK, d))
+  const kopya = () => structuredClone(uretici.GOREVLER) as Record<string, RolGorevi>
+  const kopyaKart = () => ({ ...kartlar })
+  const sorun = (f: (v: Record<string, RolGorevi>, k: Record<string, string>, t: Record<string, string>) => void) => {
+    const v = kopya()
+    const k = kopyaKart()
+    const t = { ...uretici.TASLAK_ROLLERI }
+    f(v, k, t)
+    return uretici.altiAlanSorunlari(k, v, roller, varMi, t).join('\n')
+  }
+
+  it('gerçek depoda her rol ya altı alanı doldurmuş ya da nedeniyle taslak listesinde; iki küme ayrık ve 18 rolü tamamlar', () => {
+    expect(uretici.altiAlanSorunlari(kartlar, uretici.GOREVLER, roller, varMi)).toEqual([])
+    const veri = Object.keys(uretici.GOREVLER)
+    const taslak = Object.keys(uretici.TASLAK_ROLLERI)
+    expect(veri.filter((a) => taslak.includes(a))).toEqual([])
+    expect([...veri, ...taslak].sort()).toEqual([...roller].sort())
+    expect(uretici.gorevEksikRoller().sort()).toEqual([...taslak].sort())
+  })
+
+  it('AYIRT EDİCİLİK: eksik Neden, Ne zaman, Nasıl, Ne, Nerede ve bozuk taslak kaydı yakalanır', () => {
+    expect(sorun((v) => (v.OPS.amac = ''))).toMatch(/OPS: Neden \(Amaç\) eksik/)
+    expect(sorun((v) => (v.OPS.gorevler = []))).toMatch(/OPS: Ne zaman \(düzenli görev\) eksik/)
+    expect(sorun((v) => delete v.OPS.nasil)).toMatch(/OPS: Nasıl eksik/)
+    expect(sorun((v) => (v.OPS.nasil = 'olmayan-cetvel-standard.md'))).toMatch(/OPS: Nasıl eksik/)
+    expect(sorun((_v, k) => (k.ARAC = k.ARAC.replace(/## Görev\n[\s\S]*?\n\n/, '## Görev\n\n')))).toMatch(/ARAC: Ne \(Görev\) eksik/)
+    expect(sorun((_v, k) => (k.ARAC = k.ARAC.replace(/## Dosyalar\n[\s\S]*?\n\n/, '## Dosyalar\n\n')))).toMatch(/ARAC: Nerede \(Dosyalar\) eksik/)
+    expect(sorun((_v, k) => (k.OPS = k.OPS.replace('# ROL KARTI: OPS', '# başlık')))).toMatch(/OPS: Kim/)
+    expect(sorun((v) => delete v.URUN)).toMatch(/URUN: Neden/)
+    // Taslak muafiyeti yalnız listede olan role tanınır: ADMIN listeden düşerse altı alan istenir.
+    expect(sorun((_v, _k, t) => delete t.ADMIN)).toMatch(/ADMIN: Neden \(Amaç\) eksik/)
+    expect(sorun((_v, _k, t) => (t.ADMIN = ''))).toMatch(/ADMIN: taslak muafiyetinin nedeni yazılmamış/)
+    expect(sorun((_v, _k, t) => (t.OLMAYAN = 'neden'))).toMatch(/OLMAYAN: taslak listesinde ama bilinmeyen rol/)
+    expect(sorun((_v, _k, t) => (t.OPS = 'neden'))).toMatch(/OPS: verisi var ama hâlâ taslak listesinde/)
+  })
+
+  it('Nasıl alanı: docs/standards altında var olan cetvel adı ya da "cetvel yok — yazımı kapsamda"; uydurma ad ve boş değer geçmez', () => {
+    expect(uretici.nasilGecerliMi('cetvel yok — yazımı kapsamda (ölçüm defteri)', varMi)).toBe(true)
+    expect(uretici.nasilGecerliMi('execution-method-standard.md, olmayan-standard.md', varMi)).toBe(true)
+    expect(uretici.nasilGecerliMi('olmayan-standard.md', varMi)).toBe(false)
+    expect(uretici.nasilGecerliMi('cetvel yok', varMi)).toBe(false)
+    expect(uretici.nasilGecerliMi('', varMi)).toBe(false)
+    expect(uretici.nasilGecerliMi(undefined, varMi)).toBe(false)
+  })
+
+  it('Amaç kartta sığıyorsa kartta, sığmıyorsa görev dosyasında durur; kart tavanı hiçbir rolde aşılmaz ve Nasıl görev dosyasındadır', () => {
+    const gorevDosyalari = uretici.uretGorevler()
+    for (const ad of Object.keys(uretici.GOREVLER)) {
+      const g = uretici.GOREVLER[ad]
+      expect(Buffer.byteLength(kartlar[ad], 'utf8'), `${ad} kart baytı`).toBeLessThanOrEqual(uretici.KART_AMAC_TAVANI)
+      if (uretici.amacKarttaMi(ad)) expect(kartlar[ad], `${ad} Amaç kartta`).toContain(`## Amaç\n${g.amac}`)
+      else {
+        expect(kartlar[ad], `${ad} Amaç işaretçisi`).toContain(`## Amaç\nAmaç ve Nasıl: \`docs/roller/${uretici.gorevDosyaAdi(ad)}\`.`)
+        expect(kartlar[ad], `${ad} Amaç metni karta sızmamalı`).not.toContain(g.amac)
+      }
+      expect(gorevDosyalari[ad], `${ad} görev dosyası Amaç`).toContain(`## Amaç\n${g.amac}`)
+      expect(gorevDosyalari[ad], `${ad} görev dosyası Nasıl`).toContain(`## Nasıl\n${g.nasil}`)
+    }
+    // Yol gerçekten kullanılıyor: en az bir rolün Amaç'ı karta sığmayıp görev dosyasına işaret ediyor (şu an URUN).
+    expect(Object.keys(uretici.GOREVLER).some((ad) => !uretici.amacKarttaMi(ad))).toBe(true)
+  })
+
+  it('filo tüzüğü diskte, üstünlük sırasını taşır, README haritasında ve sahiplik kaydında (sahip OPS) var', () => {
+    const tuzuk = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'filo-tuzugu.md'), 'utf8')
+    expect(tuzuk).toContain('Üstünlük sırası')
+    expect(tuzuk).toContain('Madde 3 — 5N1K')
+    expect(tuzuk).toContain('TASLAK_ROLLERI')
+    expect(fs.readFileSync(path.join(KOK, 'docs', 'README.md'), 'utf8')).toContain('standards/filo-tuzugu.md')
+    const sahiplik = JSON.parse(fs.readFileSync(path.join(KOK, 'scripts', 'belge', 'cetvel-sahipligi.json'), 'utf8')) as {
+      cetveller: Record<string, { sahip: string }>
+    }
+    expect(sahiplik.cetveller['docs/standards/filo-tuzugu.md']?.sahip).toBe('OPS')
+  })
+
+  it('OPS iki yeni görevi (Cuma filo raporu, açılış raporu) "bağlı: hayır (kuracak: ARAC)" olarak yazar; kurulmamış tetik "evet" diye geçemez', () => {
+    const ops = uretici.GOREVLER.OPS.gorevler
+    for (const parca of ['Haftalık filo raporu', 'Açılış raporu']) {
+      const x = ops.find((g) => g.gorev.startsWith(parca))
+      expect(x, parca).toBeTruthy()
+      expect(x?.bagli).toBe('hayir')
+      expect(x?.baglayacak).toBe('ARAC')
+    }
+    const v = kopya()
+    v.OPS.gorevler[1].bagli = 'evet'
+    v.OPS.gorevler[1].tetikAyrinti = '.github/workflows/olmayan-dosya.yml'
+    expect(uretici.gorevSorunlari(v, roller, varMi, () => '', []).join('\n')).toMatch(/tetik dosyası yok/)
+  })
+
+  it('"Günlük işte Recep\'e soru sorulmaz" satırı her rolün kurallar dosyasında (OPS-169, Recep 16 Ekim) ve beş Recep kapısını sayar', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain("Günlük işte Recep'e soru sorulmaz")
+      expect(kurallar[ad], ad).toContain('autoMode.allow')
+      expect(kurallar[ad], ad).toContain('docs/roller/OPS.md')
+    }
   })
 })
