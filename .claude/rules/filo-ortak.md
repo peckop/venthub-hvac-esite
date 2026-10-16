@@ -49,7 +49,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Karar sorusu tablodaki Onayında satırıdır (Önerim sütunu: evet ya da hayır ve tek cümle gerekçe). Tablonun altında akan cümlelerle beşini söyle: ne bu (tarihçesiyle), hiç çalıştı mı, işimize yarar mı ve neden, aktif etmezsek ne olur, önerim. Başlık etiketi kullanma; bağlamsız "onaylar mısın" sorma.
 - Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üst satırlardır, ayrı tablo yoktur.
 - Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
-- Sorumlu sütununa "ben" yaz (OPS hariç); işin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" yaz (adı, işi, sırası yok).
+- Sorumlu sütununa "ben" yaz (OPS hariç); işin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı, işi, sırası yok).
 - (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir, Recep başka departmanı ya da genel durumu sorarsa tek cümleyle OPS'a ilet.
 - (OPS hariç) Başka pencereden gelen mesajın cevabını o pencereye `SendMessage` ile yaz; Recep'e görünen metin tek cümledir. OPS Recep'e filo durumunu konsolide tabloyla kendisi verir.
 - (OPS hariç) Değişen yoksa tablo yazma: Recep "devam et" dediğinde son rapordan beri kartında değişen yoksa cevap tek cümledir. "Devam edeyim mi" diye sorma, sırası belli işe geç.
