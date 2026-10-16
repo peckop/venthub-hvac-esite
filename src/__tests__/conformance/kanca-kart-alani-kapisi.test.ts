@@ -97,7 +97,8 @@ describe('INV-KANCA-KART-ALANI-1 · kural', () => {
   })
 
   it('kendi alanındaki yol ve ARAC kartı için başka uyarı yok', () => {
-    const s = k.incele(ekle({ title: 'ARC-5 · x', assignee: 'ARAC', description: 'kanca .claude/hooks/a.cjs ve tools/x/y.cjs' }), harita)
+    const tamKart = 'KAYNAK/CETVEL: cetvel yok.\nYÖNTEM: elle.\nÖNCEKİ ÇALIŞMA: arandı.\nkanca .claude/hooks/a.cjs ve tools/x/y.cjs'
+    const s = k.incele(ekle({ title: 'ARC-5 · x', assignee: 'ARAC', description: tamKart }), harita)
     expect(s).toHaveLength(1)
   })
 
@@ -168,6 +169,42 @@ describe('INV-KANCA-KART-ALANI-2 · "Görev değil" uyarısı (ARC-138, karar 36
     const s = k.incele(ekle({ title: 'bağımlılık güncelle' }), harita, rolKarti)
     expect(gorevDisiSatirlari(s)).toEqual([])
     expect(s[0]).toMatch(/departman çözülemedi/)
+  })
+})
+
+describe('INV-KANCA-KART-ALANI-3 · kart satırları UYARISI (ARC-150, OPS 16 Ekim "B: önleme")', () => {
+  const tam = 'KAYNAK/CETVEL: cetvel yok.\nYÖNTEM: elle.\nÖNCEKİ ÇALIŞMA: Kanban ve git arandı.'
+  const eksikler = (o: Record<string, unknown>) =>
+    (gerek(KANCA) as { eksikSatirlar: (g: Record<string, unknown>) => string[] }).eksikSatirlar({ action: 'add_task', ...o })
+
+  it('üç satır da varsa sessiz', () => {
+    expect(eksikler({ description: tam })).toEqual([])
+  })
+
+  it('hiçbiri yoksa tek satır UYARI üçünü de sayar', () => {
+    const s = eksikler({ description: 'sadece açıklama' })
+    expect(s).toHaveLength(1)
+    expect(s[0]).toMatch(/KART SATIRLARI UYARI/)
+    expect(s[0]).toMatch(/KAYNAK\/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA/)
+  })
+
+  it('yalnız eksik olanı söyler (YÖNTEM yok)', () => {
+    const s = eksikler({ description: 'KAYNAK/CETVEL: x.\nÖNCEKİ ÇALIŞMA: y.' })
+    expect(s[0]).toMatch(/açıklamasında YÖNTEM satırı yok/)
+    expect(s[0]).not.toMatch(/KAYNAK\/CETVEL,|ÖNCEKİ ÇALIŞMA satırı/)
+  })
+
+  it('küçük harf ve ASCII yazım tolere edilir; açıklama hiç yoksa üçü de eksik', () => {
+    // ASCII "i" (noktalı) büyük harfte Türkçe "İ" olur: bu yazım da tolere edilmeli (dotless ı değil, düz i).
+    expect(eksikler({ description: 'kaynak/cetvel: x\nyontem: elle\nonceki calisma: y' })).toEqual([])
+    expect(eksikler({ description: 'kaynak/cetvel: x\nyontem: elle\noncekı calısma: y' })).toEqual([])
+    expect(eksikler({})[0]).toMatch(/KAYNAK\/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA/)
+  })
+
+  it('add_task dışındaki eylemde ve boş girdide sessiz; incele çıktısına girer, ENGEL YOK', () => {
+    expect(eksikler({ action: 'update_task', description: 'x' })).toEqual([])
+    const s = k.incele(ekle({ title: 'ARC-9 · x', assignee: 'ARAC', description: 'kısa' }), harita)
+    expect(s.some((x) => /KART SATIRLARI UYARI/.test(x))).toBe(true)
   })
 })
 

@@ -206,6 +206,7 @@ function incele(girdi, harita, kartOku = () => null) {
       )
     }
   }
+  satirlar.push(...eksikSatirlar(girdi))
   const metin = `${girdi.title || ''}\n${girdi.description || ''}`
   // Anahtar kelime sezgisi (4 Ekim olayı: "mod/kanca/eklenti" işi ARAÇ'ındı, YETENEK'e açılmıştı). Yalnız ARAÇ için,
   // yalnız harita ARAC'ı tanıyorsa; "model/modül" gibi sözcükleri yakalamasın diye `mod` TAM sözcük aranır.
@@ -228,6 +229,25 @@ function incele(girdi, harita, kartOku = () => null) {
     )
   }
   return satirlar
+}
+
+/**
+ * Kart açılışında zorunlu üç satır (.claude/rules/filo-ortak.md "İş ve kart"): KAYNAK/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA.
+ * Açıklamada biri yoksa tek satır UYARI (engel yok). SAF; yalnız add_task. ARC-150 (OPS 16 Ekim "B: önleme").
+ * Büyük/küçük harf ve Türkçe harf (ö/o, ç/c, ş/s, ı/i) farkı tolere edilir.
+ */
+function eksikSatirlar(girdi) {
+  if (!girdi || girdi.action !== 'add_task') return []
+  const m = String(girdi.description || '').toLocaleUpperCase('tr')
+  const eksik = []
+  if (!/KAYNAK\s*\/?\s*CETVEL|KAYNAK\s*:/.test(m)) eksik.push('KAYNAK/CETVEL')
+  if (!/Y[ÖO]NTEM\s*:/.test(m)) eksik.push('YÖNTEM')
+  if (!/[ÖO]NCEK[İI]\s+[ÇC]AL[İI][ŞS]MA\s*:/.test(m)) eksik.push('ÖNCEKİ ÇALIŞMA')
+  if (!eksik.length) return []
+  return [
+    `KART SATIRLARI UYARI: kart açıklamasında ${eksik.join(', ')} satırı yok (filo-ortak "İş ve kart": her kartta üçü bulunur; ` +
+      'cetvel yoksa "cetvel yok — yazımı bu işin kapsamında" yaz, önceki çalışma yoksa aradığın beş yeri say). Kartı güncelle.',
+  ]
 }
 
 function calistir() {
@@ -274,4 +294,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { haritayiOku, yollar, sahibi, departman, incele, ad, gorevDegilOku, gorevDisi, GOREV_DEGIL_SATIRI, HARITA }
+module.exports = { haritayiOku, yollar, sahibi, departman, incele, ad, gorevDegilOku, gorevDisi, eksikSatirlar, GOREV_DEGIL_SATIRI, HARITA }
