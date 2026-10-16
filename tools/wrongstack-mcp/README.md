@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.2`, `@wrongstack/codebase-index-mcp@1.1.2`, `@wrongstack/kanban-mcp@1.1.2`, `@wrongstack/mailbox-mcp@1.1.2` (ARC-127, 14 Ekim: 1.1.0'dan; dört sarmalayıcı 1.1.2, içerideki `core`/`sage`/`kanban`/`tools` paketleri 1.1.0 PİNLİ kaldı, yani çalışma kodu yalnız sarmalayıcıda değişti; core skill'leri 1.1.0 ile 1.1.2 arasında BİREBİR aynı, ölçüldü; önceki: ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.1.4`, `@wrongstack/codebase-index-mcp@1.1.4`, `@wrongstack/kanban-mcp@1.1.4`, `@wrongstack/mailbox-mcp@1.1.4` (ARC-151, 16 Ekim: 1.1.2'den; ölçüm, kesinti ve geri dönüş "1.1.2 → 1.1.4 geçişi" bölümünde; önceki: ARC-127, 14 Ekim: 1.1.0'dan; dört sarmalayıcı 1.1.2, içerideki `core`/`sage`/`kanban`/`tools` paketleri 1.1.0 PİNLİ kaldı, yani çalışma kodu yalnız sarmalayıcıda değişti; core skill'leri 1.1.0 ile 1.1.2 arasında BİREBİR aynı, ölçüldü; önceki: ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
 | **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
@@ -94,6 +94,33 @@ sürümü kur. **Sınır:** kapı yalnız sarmalayıcıdan açılan sunucuları 
 **Paket hiçbir yerde kurulu değilse (REC-466, 12 Ekim 2026):** kapı ayrıca "PAKET KURULU DEGIL" der ve çıkış 1 verir; stderr
 `node tools/wrongstack-mcp/kurulum.cjs --denetle` (eksiği söyler) ve ardından ana ağaçta `kurulum.cjs` yolunu gösterir.
 Eskiden sunucu "Cannot find module" ile ölür, istemci yalnız "Connection closed" görürdü.
+
+### 1.1.2 → 1.1.4 geçişi (ARC-151, 16 Ekim 2026): ölçülen, kesinti ve geri dönüş
+
+**Ölçüm (kopya dizinde, canlıya dokunulmadı):** dört sarmalayıcı 1.1.4; içeride `core`/`sage`/`tools`/`mcp` 1.1.2, `kanban`
+(üst düzey) 1.1.0 ve `kanban-mcp`in kendi iç içe `kanban` bağımlılığı 1.1.2. Kazanç: kanban `list_boards`/`search_tasks`
+varsayılan sınırı (`withListDefaults`: 20/10, arşiv hariç), mailbox tek çağrılık gelen kutusu, codebase-index altı yeni araç.
+Sürüm tuzağı (ARC-148): daemon `kanban-server.json` içinde `runtimeVersion: 1.1.0` der; bu paketin KENDİ sabitidir (iç içe
+`kanban` 1.1.2 iken de 1.1.0 yazdığı kopya köklü deneme daemon'unda ölçüldü), kurulum hatası değildir.
+**Yamalar:** kanban özet-dönüş yaması `kanban-mcp-1.1.2-ozet-donus.patch` 1.1.4'e UYMUYORDU (bağlam satırı `executeKanban(args…)` →
+`executeKanban(withListDefaults(action, args)…)`, satır 326→333 ve 316→320); `kanban-mcp-1.1.4-ozet-donus.patch` olarak yeniden
+tabanlandı (kopyada `git apply` ve `node --check` temiz). Sage yaması iç `sage` 1.1.2'ye olduğu gibi uygulanır, adı
+`sage-1.1.2-domain-terms-turkce.patch`. **El sıkışma (izole geçici kök, yamalı kopya):** `initialize` → `wrongstack-kanban-mcp 1.1.4`,
+`tools/list` → `kanban_read, kanban_watch, kanban_manage`, `create_board` + `list_boards` `isError: false`.
+`package-lock.json` yalnız WrongStack girdileriyle sınırlı değil: `@playwright/test` 1.64.0→1.64.1 ve `undici` 8.11.2→8.12.2
+(geçişli bağımlılık aralıkları, `npm install --package-lock-only` ile mevcut kilitten üretildi).
+
+**Yükseltme günü sırası (kesinti = TÜM pencereler):** yukarıdaki "Sürüm yükseltme" bölümü aynen geçerlidir.
+1. Posta ve sage yedeği: `node scripts/hijyen/sage-yedek.cjs` (ilk satırda `HAZIR`).
+2. Bütün Claude pencereleri kapanır (Recep, yalnız bunu söyler; OPS koordine eder).
+3. YALNIZ ARAÇ penceresi açılır: `node tools/wrongstack-mcp/kurulum.cjs` (kendi sunucularını ve daemon'ları durdurur,
+   `npm ci --ignore-scripts`, iki yama, doğrulama). Tahmini süre: kurulum ~1-2 dakika, yamalar saniyeler; toplam kesinti ~10 dakika.
+4. Son satır `HAZIR` → `node tools/wrongstack-mcp/saglik.cjs` (eski sürümlü daemon yok) ve ana ağaçta `--sunucu` doğrulaması.
+5. Öteki pencereler açılır; açılışta WRONGSTACK satırı "1.1.4" demeli.
+
+**Geri dönüş:** bu PR'ın geri alma işlemi (`git revert`) eski `package.json`, `package-lock.json` ve yamaları döndürür; sonra aynı `kurulum.cjs`
+(tüm pencereler kapalı) 1.1.2'yi yeniden kurar (~2 dakika). Veri geri dönüşü: sage ve posta yedeği (`sage-yedek.cjs --geri`);
+sage.db şeması 1.1.0'da göç etmişti (34→47 nesne). 1.1.4'te ölçüldü (16 Ekim, canlı `sage.db`'nin `VACUUM INTO` kopyası, izole köke, yamalı 1.1.4 `sage-mcp` ile açıldı, `initialize` + `memory_search` çağrıldı): `user_version` 0, 47 nesne ve 390 kayıt açmadan önce ve sonra AYNI, yani şema göçü YOK; yine de ADIM 1 yedek zorunludur.
 
 ## Yeni etiket bildirimi (ARC-24, karar 257, haftalık: karar 336) — kırmızı yanınca ne yapılır
 
