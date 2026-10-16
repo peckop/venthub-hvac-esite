@@ -110,6 +110,16 @@ export interface ProductDetailPageProps {
    * Kırıntıda marka basamağı YOKTUR; aile/model sayfasından marka sayfasına giden gövde bağlantısı budur.
    */
   markaHref: string | null
+  /**
+   * URN-135 (Design D4) — SUNUCUDA hesaplanmış görünen H1. Doluysa `familyName`in yerine H1'e yazılır (breadcrumb, JSON-LD
+   * adı ve model tablosu aile adını kullanmaya devam eder). Şablon istemci demetine girmez; yalnız hazır dize gelir.
+   */
+  gorunenBaslik?: string | null
+  /**
+   * URN-135 (Design D4) — SUNUCUDA hesaplanmış görünen ilk açıklama paragrafı (JSON-LD `description` ile aynı değer).
+   * Aile rotasında, kullanıcı `?sku=` ile belirli bir model seçmedikçe varyant açıklamasının önüne geçer.
+   */
+  gorunenAciklama?: string | null
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -152,6 +162,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   sunucuSku = null,
   kirinti,
   markaHref,
+  gorunenBaslik = null,
+  gorunenAciklama = null,
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
@@ -458,7 +470,11 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   // arızasını geri getirirdi. Doğru çözüm ikinci yazıcıyı kaldırmaktır.
   // INV-DIL-DUSUSU-1: aile metni yalnız sayfanın dilinde; yoksa açıklama bölümü hiç çizilmez
   // (aşağıda `aciklamaMetni ?` koşulu). Varyant açıklaması RPC'de zaten dile göre çözülüyor.
-  const variantDescription = selectedVariant.description || dildekiMetin(family.description, lang)
+  // URN-135 D4: sunucu geçersiz kılmayı verdiyse aile düzeyindeki açıklama odur; model seçilmemişken (`?sku=` yok) varyantın
+  // önüne de geçer — iki gövde (Suspense yedeği + `?sku=` köprüsü) aynı paragrafı gösterir.
+  const aileAciklamasi = gorunenAciklama || dildekiMetin(family.description, lang)
+  const variantDescription =
+    gorunenAciklama && skuParam === null ? gorunenAciklama : selectedVariant.description || aileAciklamasi
   /**
    * AÇIKLAMA YOKSA SATIR HİÇ ÇİZİLMEZ (REC-148 A4, 2026-09-05) — K7 / K1.
    *
@@ -615,7 +631,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 taşıyor, o yüzden İKİSİ birlikte.
                 Ölçüm: docs/audits/t099-aile-icerik-uyumu-2026-08-18.md */}
             <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-2 tracking-tight">
-              {gorunenAileAdi}
+              {gorunenBaslik || gorunenAileAdi}
             </h1>
             {showsVariantIdentity && (
               <p className="text-base font-bold text-primary-navy leading-hvac-11 mb-1">
