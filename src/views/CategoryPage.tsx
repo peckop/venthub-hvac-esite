@@ -21,6 +21,8 @@ export interface CategoryPageProps {
   vorticeKatalogSayilari?: KatalogSayilari | null;
   /** URN-135: sessiz fan anlatısındaki ses aralığı (sunucuda canlı kodlarla veri modülünün kesişiminden); yoksa ses cümleleri çizilmez. */
   sesOzeti?: SesOzeti | null;
+  /** URN-135: sessiz fan rehberinin dil önekli adresi (sunucuda, yalnız yazı kaydı varsa); yoksa bağlantı çizilmez. */
+  rehberHref?: string | null;
 }
 
 /**
@@ -28,7 +30,7 @@ export interface CategoryPageProps {
  * @description Dinamik Kategori Sayfası Giriş Noktası.
  * Tüm mantık ve sunum merkezi Unified Category Shell (CategoryMasterView) bileşenine delege edilmiştir.
  */
-const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, total, page, pageSize, initialSubCategories, initialParentCategory, vorticeKatalogSayilari, sesOzeti }) => {
+const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, total, page, pageSize, initialSubCategories, initialParentCategory, vorticeKatalogSayilari, sesOzeti, rehberHref }) => {
   return (
     <CategoryMasterView
       initialCategory={initialCategory}
@@ -40,6 +42,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory, families, 
       initialParentCategory={initialParentCategory}
       vorticeKatalogSayilari={vorticeKatalogSayilari}
       sesOzeti={sesOzeti}
+      rehberHref={rehberHref}
     />
   );
 };

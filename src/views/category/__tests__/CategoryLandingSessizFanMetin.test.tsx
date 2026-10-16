@@ -398,7 +398,8 @@ describe('(h) istemci demeti: ham ses verisi tarayıcıya gitmez', () => {
     expect(dosyalar.size).toBeGreaterThan(40)
     expect(dosyalar.has('src/components/category/sections/silent-fan/sesMetni.ts'), 'tarama sessiz fan bölümlerine ulaşıyor').toBe(true)
     expect(dosyalar.has(SES_ETIKETI), 'biçimleyici istemcide olmalı').toBe(true)
-    for (const yasak of [SES_VERISI, 'src/data/sessizFan/sesOzeti.ts', 'src/data/sessizFan/aileMetinleri.ts']) {
+    // URN-135: rehber geri bağlantısı sunucuda çözülür (`rehberHref: string | null`); büyük yazı veri modülü istemciye girmez.
+    for (const yasak of [SES_VERISI, 'src/data/sessizFan/sesOzeti.ts', 'src/data/sessizFan/aileMetinleri.ts', 'src/data/bilgiMerkezi/yazilar.ts', 'src/lib/bilgiMerkezi/sessizFanRehberi.ts']) {
       expect(dosyalar.has(yasak), `${yasak} istemci demetine giriyor`).toBe(false)
     }
     for (const dosya of dosyalar) {

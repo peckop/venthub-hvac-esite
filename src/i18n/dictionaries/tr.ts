@@ -3024,8 +3024,7 @@ export const tr = {
         { ses: 'En düşük değer {{govdeMin}} ({{govdeMinModel}}).' },
         { ses: 'Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet {{q200Govde}}; ses emici kaplaması olmayan Lineo 200 için kataloğun s.28’inde 46,9 dB(A) · gövde, 3 m yazar.' },
         'ES sürümünde pasif bir Helmholtz rezonatör grubu belirli frekanslarda ses düzeyini ayrıca düşürür.',
-        'Seri Ø100–Ø315 mm yuvarlak kanal çaplarında, AC ve 0–10 V ayarlı EC motorlu sürümlerle gelir.',
-        'Her modelin değerleri Lineo Quiet ürün sayfasındaki tabloda verilir.'
+        'Seri Ø100–Ø315 mm yuvarlak kanal çaplarında, AC ve 0–10 V ayarlı EC motorlu sürümlerle gelir.'
       ],
       source: 'Vortice LINEO kataloğu, Mayıs 2026 · s.6, 9, 12, 18, 28',
       painPoints: [
@@ -3092,6 +3091,8 @@ export const tr = {
     // sayısı taşır ve yalnız sitede canlı model kodlarının ses verisiyle kesişimi varsa çizilir. `k` kaynak notudur.
     faq: {
       title: 'Sıkça Sorulan Sorular',
+      // URN-135: rehber geri bağlantısı; yalnız yazı kaydı varsa çizilir (sunucuda hesaplanan `rehberHref`).
+      rehberBaglantisi: 'Rehber: Sessiz fan nasıl seçilir?',
       items: [
         {
           q: 'Vortice Lineo Quiet nedir?',
@@ -3108,8 +3109,7 @@ export const tr = {
           a: [
             'Katalog her model ve çalışma noktası için emiş, üfleme ve gövde ses değerini ayrı verir; ses basıncı 3 m mesafede, serbest alanda hesaplanmıştır.',
             { ses: 'En düşük gövde değeri {{govdeMin}} ({{govdeMinModel}}); en yüksek gövde değeri {{govdeMax}} ({{govdeMaxModel}}).' },
-            { ses: 'Emiş tarafında değerler {{emisMin}} ile {{emisMax}} ({{emisMaxModel}}) arasındadır.' },
-            'Her modelin değerleri Lineo Quiet ürün sayfasındaki tabloda verilir.'
+            { ses: 'Emiş tarafında değerler {{emisMin}} ile {{emisMax}} ({{emisMaxModel}}) arasındadır.' }
           ],
           k: 'Vortice LINEO kataloğu, Mayıs 2026 · s.12, 18'
         },

@@ -57,9 +57,11 @@ interface CategoryLandingProps {
     vorticeKatalogSayilari?: KatalogSayilari | null
     /** URN-135: sessiz fan metnindeki ses aralığı (sunucuda, canlı model kodları ∩ ses veri modülü); yoksa ses cümleleri çizilmez. */
     sesOzeti?: SesOzeti | null
+    /** URN-135: sessiz fan rehberinin dil önekli adresi (sunucuda, yalnız yazı kaydı varsa); yoksa bağlantı çizilmez. */
+    rehberHref?: string | null
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, vorticeKatalogSayilari, sesOzeti }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, vorticeKatalogSayilari, sesOzeti, rehberHref }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
@@ -198,7 +200,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                         <SilentFanHowItWorks />
                         <SilentFanVorticeBrand katalogSayilari={vorticeKatalogSayilari} />
                         <TrustSignals />
-                        <SilentFanFAQ sesOzeti={sesOzeti} />
+                        <SilentFanFAQ sesOzeti={sesOzeti} rehberHref={rehberHref} />
                     </>
                 )}
 

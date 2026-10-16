@@ -2977,8 +2977,7 @@ export const en: typeof tr = {
         { ses: 'The lowest value is {{govdeMin}} ({{govdeMinModel}}).' },
         { ses: 'On the Ø200 AC models at maximum speed, Lineo 200 Quiet gives {{q200Govde}}; for Lineo 200 without the sound-absorbing coating, catalogue p.28 gives 46.9 dB(A) · casing, 3 m.' },
         'In the ES version a passive Helmholtz resonator group further reduces the sound level at set frequencies.',
-        'The series covers circular duct diameters from Ø100 to Ø315 mm, with AC and 0–10 V adjustable EC motor versions.',
-        'The values of each model are in the table on the Lineo Quiet product page.'
+        'The series covers circular duct diameters from Ø100 to Ø315 mm, with AC and 0–10 V adjustable EC motor versions.'
       ],
       source: 'Vortice LINEO catalogue, May 2026 · p.6, 9, 12, 18, 28',
       painPoints: [
@@ -3046,6 +3045,7 @@ export const en: typeof tr = {
     // `k` is the source note (catalogue + page).
     faq: {
       title: 'Frequently Asked Questions',
+      rehberBaglantisi: 'Guide: How to choose a quiet fan',
       items: [
         {
           q: 'What is Vortice Lineo Quiet?',
@@ -3062,8 +3062,7 @@ export const en: typeof tr = {
           a: [
             'The catalogue gives intake, supply and casing sound values separately for every model and operating point; sound pressure is calculated at 3 m in free field.',
             { ses: 'The lowest casing value is {{govdeMin}} ({{govdeMinModel}}); the highest casing value is {{govdeMax}} ({{govdeMaxModel}}).' },
-            { ses: 'On the intake side the values range from {{emisMin}} to {{emisMax}} ({{emisMaxModel}}).' },
-            'The values of each model are in the table on the Lineo Quiet product page.'
+            { ses: 'On the intake side the values range from {{emisMin}} to {{emisMax}} ({{emisMaxModel}}).' }
           ],
           k: 'Vortice LINEO catalogue, May 2026 · p.12, 18'
         },

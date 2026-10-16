@@ -7,6 +7,7 @@ import { type SesOzeti, sesOzetiHesapla,SESSIZ_FAN_SERI_SLUGLARI } from '@/data/
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
+import { sessizFanRehberHref } from '@/lib/bilgiMerkezi/sessizFanRehberi'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
 import { getCachedKategoriUstById, type KategoriUst } from '@/lib/data/preload'
@@ -341,6 +342,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
   let subCategories: DomainCategory[] = []
   let vorticeSayilari: KatalogSayilari | null = null
   let sesOzeti: SesOzeti | null = null
+  let rehberHref: string | null = null
   let ustKategori: DomainCategory | null = null
 
   if (category) {
@@ -420,6 +422,8 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
     // `CategoryLandingView`); diğer kategorilerde canlı kod sorgusu hiç atılmaz.
     const sessizFanAilesi = families.find((f) => (SESSIZ_FAN_SERI_SLUGLARI as readonly string[]).includes(f.slug))
     if (sessizFanAilesi) sesOzeti = await sessizFanSesOzeti(lang, tenantId, sessizFanAilesi.slug)
+    // URN-135: rehber geri bağlantısı yalnız seri sayfasında ve yazı kaydı varsa (kayıt yoksa null → bağlantı çizilmez).
+    if (sessizFanAilesi) rehberHref = sessizFanRehberHref(lang)
   }
 
   // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
@@ -464,6 +468,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         initialParentCategory={ustKategori}
         vorticeKatalogSayilari={vorticeSayilari}
         sesOzeti={sesOzeti}
+        rehberHref={rehberHref}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
           slug'dır (`vh:kategori/<categories.slug>`); yazı yoksa blok basılmaz. Veri kod sabiti

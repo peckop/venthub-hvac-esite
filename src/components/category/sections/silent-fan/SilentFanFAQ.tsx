@@ -1,4 +1,6 @@
 import { HelpCircle,Minus, Plus } from 'lucide-react'
+import type { Route } from 'next'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 import type { SesOzeti } from '@/data/sessizFan/sesOzeti'
@@ -11,9 +13,11 @@ import { cumleleriDoldur, sesEtiketSozlugu, sesYerTutucular } from './sesMetni'
 interface SilentFanFAQProps {
     /** URN-135: ses aralığı (sunucudan; canlı model kodları ∩ ses verisi). Yoksa ses sayısı taşıyan cümleler çizilmez. */
     sesOzeti?: SesOzeti | null
+    /** URN-135: rehber yazısının dil önekli adresi (sunucuda, yalnız yazı kaydı varsa); yoksa bağlantı çizilmez. */
+    rehberHref?: string | null
 }
 
-const SilentFanFAQ: React.FC<SilentFanFAQProps> = ({ sesOzeti }) => {
+const SilentFanFAQ: React.FC<SilentFanFAQProps> = ({ sesOzeti, rehberHref }) => {
     const { t, dict, lang } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
@@ -83,6 +87,17 @@ const SilentFanFAQ: React.FC<SilentFanFAQProps> = ({ sesOzeti }) => {
                         )
                     })}
                 </div>
+
+                {doluMu(rehberHref) && (
+                    <p className="mt-8 text-center">
+                        <Link
+                            href={rehberHref as Route}
+                            className="font-bold text-secondary-blue underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan-ink"
+                        >
+                            {t('categorySilentFan.faq.rehberBaglantisi')}
+                        </Link>
+                    </p>
+                )}
             </div>
         </section>
     )

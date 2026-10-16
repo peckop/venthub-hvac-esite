@@ -98,6 +98,8 @@ interface CategoryMasterViewProps {
    * kesişimi). Yalnız sessiz fan serisi sayfasında doludur; yoksa ses sayıları ve cümleleri çizilmez.
    */
   sesOzeti?: SesOzeti | null
+  /** URN-135: sessiz fan rehberinin dil önekli adresi (sunucuda, yalnız yazı kaydı varsa); yoksa bağlantı çizilmez. */
+  rehberHref?: string | null
 }
 
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
@@ -110,7 +112,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   initialParentCategory,
   kategoriler,
   vorticeKatalogSayilari,
-  sesOzeti
+  sesOzeti,
+  rehberHref
 }) => {
   const { lang } = useI18n()
 
@@ -224,6 +227,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
             families={visibleFamilies}
             vorticeKatalogSayilari={vorticeKatalogSayilari}
             sesOzeti={sesOzeti}
+            rehberHref={rehberHref}
           />
         )
       case 'series':
@@ -257,6 +261,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
                 families={visibleFamilies}
                 vorticeKatalogSayilari={vorticeKatalogSayilari}
                 sesOzeti={sesOzeti}
+                rehberHref={rehberHref}
               />
             )
         }
