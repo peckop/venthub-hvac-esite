@@ -158,7 +158,7 @@ const OPS_OKUMA_KURALI_ROLLERI = ['OPS']
 const OPS_OKUMA_KURALI = [
   '## Okuma, kaynak ve defter (HRT-60)',
   '- OPS departman PR\'ını birleştirmez: tam farkı okur, "okundu, uygun" ya da düzeltmeyi yazar, sıra verir; ritüelle yalnız KENDİ PR\'ını birleştirir.',
-  '- Kanca, ayar ve departman iyileştirmesinin onay makamı OPS\'tır (Recep 16 Ekim), Recep\'e götürülmez; Recep\'te yalnız canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, gerçek para, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur ve "okundu, uygun" yazar.',
+  '- Kanca tasarımı ve kurulumu (kapıyı gevşetmeyen), departman iyileştirmesi ve kural metninin onay makamı OPS\'tır (Recep 16 Ekim). İzin kuralı, izin modu, onay veren kanca, .mcp.json ve hesap Recep sözüyle yapılır; kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, Recep\'e gider. Recep\'te ayrıca canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, gerçek para, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur ve "okundu, uygun" yazar.',
   '- Recep\'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.',
   '- Kanca, ayar ve MCP PR\'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ\'ta).',
   '- Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ\'ta).',
@@ -290,8 +290,8 @@ const RECEP_KAPILARI = [
   '4. Canlı veritabanına yazım.',
   '5. Para harcatan her şey (ücretli plan, servis, satın alma).',
   '',
-  'Kapılar 1-5 Recep\'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS\'tadır (16 Ekim). Aktarım yalnız OPS\'tan (karar 224, §17 Kural 4).',
-  'CLAUDE.md OPS kapısıdır, Recep\'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.',
+  'Kapılar 1-5 Recep\'te kalır (söz işi koşan pencerede); kanca tasarımı ve departman iyileştirmesi onayı OPS\'tadır (16 Ekim), kapı gevşetme Recep\'e gider. Aktarım yalnız OPS\'tan (karar 224, §17 Kural 4).',
+  'CLAUDE.md OPS kapısıdır, Recep\'e OPS götürür; izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular.',
 ].join('\n')
 
 const ILETISIM = [

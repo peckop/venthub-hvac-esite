@@ -38,8 +38,8 @@ Açık (asli görev). Bilinen bayat kayıt: cetvel §3.9 "E12 resolveTenantId ih
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca, ayar ve departman iyileştirmesi onayı OPS'tadır (16 Ekim). Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
-CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; settings.json ve .mcp.json kaydını OPS onaylar, uygular.
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca tasarımı ve departman iyileştirmesi onayı OPS'tadır (16 Ekim), kapı gevşetme Recep'e gider. Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular.
 
 ## İletişim
 - Recep'e yazarken kurallar dosyandaki "Recep'e mesaj kuralları" geçerlidir; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.

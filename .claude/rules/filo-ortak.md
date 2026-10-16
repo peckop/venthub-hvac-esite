@@ -45,10 +45,10 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 ## Recep ile iletişim
 
 - Recep'e mekanik iş verme: dışa aktarma, kopyala-yapıştır, canlı yazım ya da pencere değiştirme adımı yazma. Tek istisna COMPACT YAKIN'daki `/compact` satırıdır; Recep onu yalnız kendi penceresine yapıştırır, bu mekanik iş sayılmaz.
-- Onay nerede verilir, üç durum (16 Ekim: kanca, ayar ve departman iyileştirmesinin onay makamı OPS'tır, Recep'e götürülmez):
+- Onay nerede verilir, üç durum (16 Ekim: kanca tasarımı ve departman iyileştirmesinin onay makamı OPS'tır; izin, hesap ve kapı gevşetme Recep sözüyle yapılır):
   - Canlı yazım betiği: departman hazırlar ve koşmaz; Recep "yaz" sözünü OPS penceresinde söyler, OPS koşar. Komut, ortam değişkeni adları ve geri alma yolu OPS'a gider.
   - Migration'lı PR birleştirme, gerçek para, geri alınamaz silme: Recep'in sözü işi koşan pencerede geçerlidir; onay pencereler arası taşınmaz (karar 224). Menü yeri, adres ve fiyat gibi ürün kararları da Recep'indir.
-  - Kanca, ayar (settings), izin dosyası ve departman iyileştirmesi: departman metni ya da komutu hazırlayıp OPS'a `SendMessage` ile verir; OPS tam farkı okuyup onaylar ve ayar ve izin dosyasını kendi penceresinde uygular; Recep'e sorulmaz. OPS'un kendi kanca ve ayar PR'ını ARAÇ okur ("okundu, uygun" yazar).
+  - Kanca tasarımı ve kurulumu (kapıyı gevşetmeyen), departman iyileştirmesi, kural metni: departman metni ya da komutu hazırlayıp OPS'a `SendMessage` ile verir; OPS tam farkı okuyup onaylar, Recep'e sorulmaz. İzin kuralı (allow/ask/deny, izin modu), onay veren kanca, `.mcp.json`, hesap ve kimlik değişikliği Recep'in OPS penceresindeki sözüyle yapılır; OPS uygular ya da ARAÇ'ın PR'ını tam okur. Kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, Recep'e gider. OPS'un kendi kanca ve ayar PR'ını ARAÇ okur ("okundu, uygun" yazar).
 - Pencereler farklı izin modundayken `SendMessage` bekletilip düşebilir; tüm pencereler aynı modda tutulur.
 - Karar sorusu tablodaki Onayında satırıdır (Önerim sütunu: evet ya da hayır ve tek cümle gerekçe). Tablonun altında akan cümlelerle beşini söyle: ne bu (tarihçesiyle), hiç çalıştı mı, işimize yarar mı ve neden, aktif etmezsek ne olur, önerim. Başlık etiketi kullanma; bağlamsız "onaylar mısın" sorma.
 - Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üst satırlardır, ayrı tablo yoktur.
