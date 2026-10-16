@@ -173,9 +173,10 @@ function main() {
       console.log('[commit-uyari]   kos: node scripts/hijyen/arac-envanteri.cjs --yaz')
       console.log('[commit-uyari]   sonra YENI satirin durum/sahip alanlarini ELLE doldur (AXIOM 3).')
     } else {
-      // ARC-146: envanter dosyasi ARAC seridinin; baska agacta varsayilan --yaz reddedilir (16 Ekim GEO-SEO vakasi).
-      console.log('[commit-uyari]   envanter ARAC seridinin dosyasi: ARAC\'a SendMessage ile satir iste (araç adi, sahip, durum, cetvel, kanit).')
-      console.log('[commit-uyari]   bu agacta `arac-envanteri.cjs --yaz` reddedilir; yalniz acik hedefle (--envanter <yol>) yazilir.')
+      // ARC-146/149: varsayilan --yaz baska agacta reddedilir; satir dosyalarla AYNI PR'da inmeli (once inerse
+      // INV-ARAC-1 KAYIP, sonra inerse YENI: ikisi de kirmizi). 16 Ekim GEO-SEO, ALTYAPI, KATALOG vakalari.
+      console.log('[commit-uyari]   satiri KENDI PR\'ina ekle (sahip sensin; sutun sirasi icin komsu satirlara bak); ARAC "ARAC okudu" notunu yazar.')
+      console.log('[commit-uyari]   bu agacta varsayilan `--yaz` reddedilir; uretmek icin acik hedef: --yaz --envanter <docs/audits altindaki en yeni arac-envanteri-<tarih>.md>')
     }
   }
 
