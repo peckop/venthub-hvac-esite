@@ -26,10 +26,11 @@ const modul = require_(SAGLIK) as {
   daemonPaketi: (komut: string) => { klasor: string; paket: string; kok: string | null } | null
   daemonSurumleri: (
     surecler: { pid: number; komut: string }[],
-    beklenen: (paket: string) => string | null,
+    beklenen: (paket: string, klasor?: string) => string | null,
     okuSurum?: (klasor: string) => string | null,
   ) => Daemon[]
   anaAgacMi: (kok?: string) => boolean
+  beklenenSurum: (arac: string, paket: string, klasor?: string) => string | null
   sunucuSurumu: (
     cli: string,
     kok: string,
@@ -108,6 +109,26 @@ describe('INV-WRONGSTACK-SAGLIK-1 · daemon sürümü ölçülür, ölçüm arac
       [3, true],
     ])
     expect(d.find((x) => x.pid === 3)?.surum).toBeNull()
+  })
+
+  it('⭐ARC-176: beklenen sürüm, daemon sarmalayıcının İÇ kopyasını koşuyorsa o sarmalayıcının dependencies kaydıdır (üst düzey hoisted kopya değil)', () => {
+    const a = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-saglik-b-'))
+    const wg = path.join(a, 'node_modules', '@wrongstack')
+    fs.mkdirSync(path.join(wg, 'kanban'), { recursive: true })
+    fs.writeFileSync(path.join(wg, 'kanban', 'package.json'), JSON.stringify({ version: '1.1.0' }))
+    fs.mkdirSync(path.join(wg, 'kanban-mcp'), { recursive: true })
+    fs.writeFileSync(
+      path.join(wg, 'kanban-mcp', 'package.json'),
+      JSON.stringify({ version: '1.1.4', dependencies: { '@wrongstack/kanban': '1.1.2' } }),
+    )
+    const ic = path.join(wg, 'kanban-mcp', 'node_modules', '@wrongstack', 'kanban')
+    expect(modul.beklenenSurum(a, 'kanban', ic)).toBe('1.1.2')
+    // üst düzey kopya koşuyorsa üst düzey sürüm beklenir
+    expect(modul.beklenenSurum(a, 'kanban', path.join(wg, 'kanban'))).toBe('1.1.0')
+    // sarmalayıcı kaydı okunamazsa üst düzeye düşer
+    expect(
+      modul.beklenenSurum(a, 'kanban', path.join(wg, 'yok-mcp', 'node_modules', '@wrongstack', 'kanban')),
+    ).toBe('1.1.0')
   })
 
   it('anaAgacMi: .git DİZİN ise ana ağaç; DOSYA (worktree) ya da yok ise değil', () => {

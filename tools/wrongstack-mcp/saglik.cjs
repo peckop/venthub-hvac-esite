@@ -66,6 +66,28 @@ function paketSurumu(klasor) {
   }
 }
 
+/**
+ * Daemon'un koşması GEREKEN paket sürümü (ARC-176, 16 Ekim: kanban-mcp 1.1.4 kendi iç kopyası olan
+ * kanban 1.1.2'yi koşar; üst düzey kanban 1.1.0 kullanılmayan hoisted kopyadır, ona bakmak yanlış alarm verir).
+ * Daemon klasörü bir sarmalayıcının iç node_modules'ündeyse beklenen sürüm O sarmalayıcının
+ * dependencies kaydıdır; değilse üst düzey kurulu sürüm.
+ */
+function beklenenSurum(arac, paket, klasor) {
+  const m = String(klasor || '')
+    .replace(/\\/g, '/')
+    .match(/\/@wrongstack\/([a-z0-9-]+)\/node_modules\/@wrongstack\//i)
+  if (m) {
+    try {
+      const kayit = JSON.parse(fs.readFileSync(path.join(arac, 'node_modules', '@wrongstack', m[1], 'package.json'), 'utf8'))
+      const dep = kayit.dependencies && kayit.dependencies['@wrongstack/' + paket]
+      if (dep && /^\d+\.\d+\.\d+$/.test(dep)) return dep
+    } catch {
+      /* sarmalayıcı okunamadı: üst düzeye düş */
+    }
+  }
+  return paketSurumu(path.join(arac, 'node_modules', '@wrongstack', paket))
+}
+
 /** `...\@wrongstack\<paket>\...\project-server.js` komut satırından paket klasörü ve adı. */
 function daemonPaketi(komut) {
   const k = String(komut || '').replace(/\\/g, '/')
@@ -87,7 +109,7 @@ function daemonSurumleri(surecler, beklenen, okuSurum = paketSurumu) {
     const d = daemonPaketi(s.komut)
     if (!d) continue
     const surum = okuSurum(d.klasor)
-    const bek = beklenen(d.paket)
+    const bek = beklenen(d.paket, d.klasor)
     sonuc.push({
       pid: s.pid,
       paket: d.paket,
@@ -180,7 +202,7 @@ function anaAgacMi(kok = KOK) {
   }
 }
 
-module.exports = { daemonPaketi, daemonSurumleri, paketSurumu, sunucuSurumu, kanonikKok, anaAgacMi, SUNUCULAR, SUNUCU_EK, mcpOrtami }
+module.exports = { beklenenSurum, daemonPaketi, daemonSurumleri, paketSurumu, sunucuSurumu, kanonikKok, anaAgacMi, SUNUCULAR, SUNUCU_EK, mcpOrtami }
 
 if (require.main === module) {
   ;(async () => {
@@ -193,7 +215,7 @@ if (require.main === module) {
       )
       process.exit(1)
     }
-    const beklenen = (paket) => paketSurumu(path.join(ARAC, 'node_modules', '@wrongstack', paket))
+    const beklenen = (paket, klasor) => beklenenSurum(ARAC, paket, klasor)
     if (!yalnizDaemon) {
       for (const ad of SUNUCULAR) {
         const klasor = path.join(ARAC, 'node_modules', '@wrongstack', ad)
