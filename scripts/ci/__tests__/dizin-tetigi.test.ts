@@ -32,6 +32,15 @@ function kod(metin: string): string {
     .join('\n')
 }
 
+/** `jobs:` altındaki bir işin metnini döndürür (iki boşluk girintili anahtardan sonrakine kadar); yoksa null. */
+function isBlogu(k: string, ad: string): string | null {
+  const jobs = k.split(/^jobs:\n/m)[1]
+  if (jobs === undefined) return null
+  const parcalar = jobs.split(/^ {2}(?=[a-z-]+:\n)/m)
+  const p = parcalar.find((x) => x.startsWith(`${ad}:\n`))
+  return p === undefined ? null : p
+}
+
 /** Statik kural ihlallerini döndürür (boş dizi = temiz). */
 function denetle(metin: string): string[] {
   const k = kod(metin)
@@ -43,15 +52,34 @@ function denetle(metin: string): string[] {
   if (!var_(/^ {2}workflow_dispatch:/m)) ihlal.push('tetik: elle tetik (workflow_dispatch) yok')
   if (var_(/^ {2}(pull_request|pull_request_target|push):/m)) ihlal.push('tetik: pull_request/push OLMAMALI (birleşmeyi bloklamaz, fork koduyla koşmaz)')
 
-  if (!k.includes("github.event_name != 'deployment_status'")) ihlal.push("süzgeç: diğer olaylar için 'event_name != deployment_status' kolu yok")
-  if (!k.includes("github.event.deployment_status.state == 'success'")) ihlal.push("süzgeç: yalnız success durumu değil (pending/failure da tetikler)")
-  if (!k.includes("github.event.deployment.environment == 'Production'")) ihlal.push("süzgeç: yalnız Production ortamı değil (preview da tetikler)")
+  // ⭐ÖLÇÜLEN KUSUR (16 Ekim, ilk dört doğal koşu): actions/cache `deployment_status` olayında ("not tied to a branch or
+  // tag ref") restore VE save adımını ATLAR. Asıl iş bu olayda koşarsa taban hiç kaydedilmez, her koşu tabanı yeniden
+  // kurar ve değişen adres HİÇ bildirilmez, üstelik iş akışı yeşil görünür. Bu yüzden: asıl iş deployment_status'ta
+  // KOŞMAZ; yalnız `tetikle` işi dispatch eder.
+  const tetikle = isBlogu(k, 'tetikle')
+  const asil = isBlogu(k, 'dizin-tetigi')
+  if (tetikle === null) ihlal.push('iş: `tetikle` işi yok (deployment_status asıl işi dispatch etmeli)')
+  if (asil === null) ihlal.push('iş: `dizin-tetigi` (asıl iş) yok')
+  if (tetikle !== null) {
+    if (!tetikle.includes("github.event_name == 'deployment_status'")) ihlal.push("tetikle: yalnız deployment_status olayında koşmalı")
+    if (!tetikle.includes("github.event.deployment_status.state == 'success'")) ihlal.push("süzgeç: yalnız success durumu değil (pending/failure da tetikler)")
+    if (!tetikle.includes("github.event.deployment.environment == 'Production'")) ihlal.push("süzgeç: yalnız Production ortamı değil (preview da tetikler)")
+    if (!/^ {6}actions: write$/m.test(tetikle)) ihlal.push('tetikle: actions: write izni yok (gh workflow run 403 verir, hiç bildirim gitmez)')
+    if (!/gh workflow run dizin-tetigi\.yml --ref "\$VARSAYILAN_DAL"/.test(tetikle)) ihlal.push('tetikle: `gh workflow run dizin-tetigi.yml --ref "$VARSAYILAN_DAL"` yok (varsayılan dal ref\'i olmadan önbellek çalışmaz)')
+    if (!/VARSAYILAN_DAL: \$\{\{ github\.event\.repository\.default_branch \}\}/.test(tetikle)) ihlal.push('tetikle: ref varsayılan daldan okunmuyor')
+    if (/actions\/(cache|checkout)|uses:|degisen-adres-bildir/.test(tetikle)) ihlal.push('tetikle: önbelleğe/depoya/betiğe dokunmamalı (yalnız dispatch)')
+  }
+  if (asil !== null) {
+    if (!/^ {4}if: github\.event_name != 'deployment_status'$/m.test(asil)) ihlal.push("asıl iş: koşulu tam `github.event_name != 'deployment_status'` olmalı (önbellek deployment_status'ta ÇALIŞMAZ)")
+    if (/^ {4,}[a-z-]+:\s*write\s*$/m.test(asil)) ihlal.push('asıl iş: write izni VAR (yalnız tetikle işi actions: write alır)')
+    if (!/^ {6}group: dizin-tetigi$/m.test(asil)) ihlal.push('concurrency: grup dizin-tetigi değil (asıl işte olmalı)')
+    if (!/^ {6}cancel-in-progress: false$/m.test(asil)) ihlal.push('concurrency: cancel-in-progress false olmalı (tabana tek yazar, bekleyen en güncel tabanla koşar)')
+  }
+  if (var_(/^concurrency:/m)) ihlal.push('concurrency: iş akışı düzeyinde olmamalı (tetikle koşusu asıl işin sırasına girer)')
 
   if (!var_(/^permissions:\n {2}contents: read\n(?! {2}\S)/m)) ihlal.push('izin: tek izin contents: read olmalı')
-  if (var_(/^\s+[a-z-]+:\s*write\s*$/m)) ihlal.push('izin: write izni VAR')
-
-  if (!var_(/^ {2}group: dizin-tetigi$/m)) ihlal.push('concurrency: grup dizin-tetigi değil')
-  if (!var_(/^ {2}cancel-in-progress: false$/m)) ihlal.push('concurrency: cancel-in-progress false olmalı (tabana tek yazar, bekleyen en güncel tabanla koşar)')
+  const yazmalar = [...k.matchAll(/^\s+([a-z-]+):\s*write\s*$/gm)].map((m) => m[1])
+  if (yazmalar.some((a) => a !== 'actions') || yazmalar.length !== 1) ihlal.push(`izin: tek write izni tetikle işindeki actions: write olmalı (bulunan: ${yazmalar.join(',') || 'yok'})`)
 
   if (var_(/secrets\./)) ihlal.push('sır: secrets.* kullanılmamalı (IndexNow anahtarı kamuya açık)')
   if (var_(/INDEXNOW_KEY/)) ihlal.push('sır: INDEXNOW_KEY ortam değişkeni iş akışında olmamalı')
@@ -67,6 +95,12 @@ function denetle(metin: string): string[] {
   if (!var_(/key: dizin-tetigi-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}/)) ihlal.push('önbellek: anahtar run_id + run_attempt içermeli (her koşu yeni anahtar)')
   if (!var_(/restore-keys: \|\n\s+dizin-tetigi-\n/)) ihlal.push('önbellek: restore-keys dizin-tetigi- öneki yok (önceki taban geri yüklenmez)')
   if (!var_(/name: Taban ve kuyrugu onbellege yaz\n\s+if: \$\{\{ always\(\) \}\}/)) ihlal.push('önbellek: kaydetme adımı always() değil (çıkış 1 ile tabanın ilerlemesi kaybolur)')
+  // Anahtar tutarlılığı: KAYDEDİLEN anahtar, GERİ YÜKLENEN önekle başlamıyorsa kayıt var ama hiçbir koşu onu bulamaz
+  // (sessiz yeşil: her koşu tabanı yeniden kurar). Üç yer aynı öneki taşımalı: restore key, restore-keys, save key.
+  const onek = /restore-keys: \|\n\s+(\S+)\n/.exec(k)?.[1]
+  const anahtarlar = [...k.matchAll(/^\s+key: (.+)$/gm)].map((m) => m[1])
+  if (!onek) ihlal.push('önbellek: restore-keys öneki okunamadı')
+  else if (anahtarlar.length !== 2 || anahtarlar.some((a) => !a.startsWith(onek))) ihlal.push(`önbellek: restore ve save anahtarları '${onek}' önekiyle başlamalı (bulunan: ${anahtarlar.join(' | ')}); aksi hâlde kaydedilen taban bir sonraki koşuda bulunamaz`)
 
   if (!var_(/DIZIN: \$\{\{ runner\.temp \}\}\/dizin-tetigi$/m)) ihlal.push('yol: DIZIN runner.temp altında değil (taban DEPO DIŞINDA olmalı)')
   if (var_(/github\.workspace/)) ihlal.push('yol: github.workspace kullanılmamalı (betik depo içi yolu reddeder)')
@@ -75,7 +109,9 @@ function denetle(metin: string): string[] {
   if (!var_(/::warning/)) ihlal.push('betik: taban yokken açık uyarı (::warning) yok')
   if (!var_(/\[ -s "\$DIZIN\/taban\.json" \]/)) ihlal.push('betik: boş taban dosyası "taban var" sayılıyor (-s olmalı)')
 
-  if (!var_(/^ {4}timeout-minutes: \d+$/m)) ihlal.push('iş: timeout-minutes yok')
+  for (const [ad, blok] of [['tetikle', tetikle], ['dizin-tetigi', asil]] as const) {
+    if (blok !== null && !/^ {4}timeout-minutes: \d+$/m.test(blok)) ihlal.push(`iş: ${ad} işinde timeout-minutes yok`)
+  }
   if (!var_(/node-version: '24'/)) ihlal.push("iş: node-version '24' değil")
   return ihlal
 }
@@ -100,20 +136,26 @@ const GECICI = mkdtempSync(path.join(tmpdir(), 'dizin-tetigi-'))
 afterAll(() => rmSync(GECICI, { recursive: true, force: true }))
 const duz = (p: string) => p.replace(/\\/g, '/')
 
-// Sahte node: argümanları KAYIT dosyasına yazar, SAHTE_CIKIS ile çıkar.
+// Sahte node: argümanları KAYIT dosyasına yazar, SAHTE_CIKIS ile çıkar. `--taban-kur` verilince gerçek betik gibi
+// `--taban` yoluna taban dosyasını YAZAR: iki koşulu önbellek simülasyonu (birinci koşu kurar, ikincisi bulur) bunu ölçer.
 const SAHTE_BIN = path.join(GECICI, 'bin')
 mkdirSync(SAHTE_BIN, { recursive: true })
-writeFileSync(path.join(SAHTE_BIN, 'node'), '#!/usr/bin/env bash\nprintf \'%s\\n\' "$@" > "$KAYIT"\nexit "${SAHTE_CIKIS:-0}"\n', 'utf8')
+writeFileSync(
+  path.join(SAHTE_BIN, 'node'),
+  '#!/usr/bin/env bash\nprintf \'%s\\n\' "$@" > "$KAYIT"\nTABAN=""\nKUR=0\nwhile [ $# -gt 0 ]; do\n  case "$1" in\n    --taban) TABAN="$2"; shift ;;\n    --taban-kur) KUR=1 ;;\n  esac\n  shift\ndone\nif [ "$KUR" = 1 ] && [ -n "$TABAN" ]; then printf \'{"adresler":{}}\' > "$TABAN"; fi\nexit "${SAHTE_CIKIS:-0}"\n',
+  'utf8',
+)
 chmodSync(path.join(SAHTE_BIN, 'node'), 0o755)
 
-type Durum = 'yok' | 'bos' | 'dolu'
+type Durum = 'yok' | 'bos' | 'dolu' | 'mevcut'
 type KosuSonucu = { cikis: number | null; stdout: string; stderr: string; argumanlar: string[]; dizinVar: boolean; dizin: string }
 let sayac = 0
-function kos(kabuk: string, durum: Durum, sahteCikis = 0): KosuSonucu {
-  const dizin = duz(path.join(GECICI, `kosu-${++sayac}`, 'dizin-tetigi'))
-  const kayit = duz(path.join(GECICI, `kosu-${sayac}-args.txt`))
+/** `mevcut`: önceki koşunun dizini AYNEN kalır (önbellekten geri yüklenmiş gibi); `onceki` o dizinin yolunu verir. */
+function kos(kabuk: string, durum: Durum, sahteCikis = 0, onceki?: string): KosuSonucu {
+  const dizin = onceki ?? duz(path.join(GECICI, `kosu-${++sayac}`, 'dizin-tetigi'))
+  const kayit = duz(path.join(GECICI, `kosu-${++sayac}-args.txt`))
   mkdirSync(path.dirname(dizin), { recursive: true })
-  if (durum !== 'yok') {
+  if (durum !== 'yok' && durum !== 'mevcut') {
     mkdirSync(dizin, { recursive: true })
     writeFileSync(`${dizin}/taban.json`, durum === 'dolu' ? '{"adresler":{}}' : '', 'utf8')
   }
@@ -152,6 +194,15 @@ function davranis(metin: string): string[] {
 
   const kirmizi = kos(kabuk, 'dolu', 1)
   if (kirmizi.cikis !== 1) ihlal.push(`betik çıkış 1 verince adım kırmızı olmalı (${kirmizi.cikis}): hata yutulmamalı`)
+
+  // ⭐İKİ KOŞU (OPS, ALT-91 düzeltmesi): önbellek varken ikinci koşuda taban YENİDEN KURULMAZ, yalnız değişen adres
+  // bildirilir. Birinci koşu tabanı kurar (sahte node dosyayı yazar); ikinci koşu aynı dizini "geri yüklenmiş" bulur.
+  const ilk = kos(kabuk, 'yok')
+  const ikinci = kos(kabuk, 'mevcut', 0, ilk.dizin)
+  if (!ilk.argumanlar.includes('--taban-kur')) ihlal.push('iki koşu: birinci koşu tabanı kurmadı')
+  if (!ikinci.argumanlar.includes('--uygula')) ihlal.push('iki koşu: ikinci koşu --uygula vermedi (taban önbellekte var, değişen adres bildirilmeli)')
+  if (ikinci.argumanlar.includes('--taban-kur')) ihlal.push('iki koşu: ikinci koşuda taban YENİDEN KURULUYOR (önbellek işlevsiz: değişen adres hiç bildirilmez)')
+  if (ikinci.stdout.includes('::warning')) ihlal.push('iki koşu: ikinci koşuda "taban yok" uyarısı çıktı')
   return ihlal
 }
 
@@ -174,7 +225,18 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: 'pull_request tetiği eklenir', eski: 'on:\n  deployment_status:\n', yeni: 'on:\n  pull_request:\n  deployment_status:\n' },
   { ad: 'success süzgeci kalkar (pending/failure da tetikler)', eski: "github.event.deployment_status.state == 'success' && ", yeni: '' },
   { ad: 'ortam Preview olur', eski: "github.event.deployment.environment == 'Production'", yeni: "github.event.deployment.environment == 'Preview'" },
-  { ad: 'diğer olaylar kolu kalkar (cron çalışmaz)', eski: "github.event_name != 'deployment_status' || ", yeni: '' },
+  { ad: "asıl iş deployment_status'ta da koşar (önbellek orada çalışmaz: sessiz yeşil, bildirim yok)", eski: "    if: github.event_name != 'deployment_status'\n", yeni: '' },
+  { ad: 'asıl iş koşulu gevşer (deployment_status kolu geri gelir)', eski: "    if: github.event_name != 'deployment_status'\n", yeni: "    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'\n" },
+  { ad: 'tetikle işinden actions: write kalkar (gh workflow run 403 verir)', eski: '    permissions:\n      actions: write\n', yeni: '' },
+  { ad: 'tetikle ref vermez (dispatch varsayılan dal ref\'inde koşmaz)', eski: ' --ref "$VARSAYILAN_DAL"', yeni: '' },
+  { ad: 'tetikle ref\'i etkinlik ref\'inden okur (deployment_status ref\'i dal değil)', eski: '${{ github.event.repository.default_branch }}', yeni: '${{ github.ref }}' },
+  { ad: 'tetikle işi önbelleğe dokunur', eski: '        run: gh workflow run', yeni: '        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9\n        run: gh workflow run' },
+  { ad: 'concurrency kalkar (iki koşu tabanı aynı anda yazar)', eski: '    concurrency:\n      group: dizin-tetigi\n      cancel-in-progress: false\n', yeni: '' },
+  { ad: 'concurrency iş akışı düzeyine de eklenir (tetikle koşusu asıl işin sırasına girer)', eski: '\njobs:\n  tetikle:', yeni: '\nconcurrency:\n  group: dizin-tetigi\n  cancel-in-progress: false\n\njobs:\n  tetikle:' },
+  { ad: 'KAYDEDİLEN anahtar öneki bozulur (taban kaydedilir ama hiçbir koşu bulamaz)', eski: 'actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0\n        with:\n          path: ${{ runner.temp }}/dizin-tetigi\n          key: dizin-tetigi-', yeni: 'actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0\n        with:\n          path: ${{ runner.temp }}/dizin-tetigi\n          key: baska-' },
+  { ad: 'GERİ YÜKLENEN restore-keys öneki bozulur (kaydedilen taban bulunmaz)', eski: '            dizin-tetigi-\n', yeni: '            baska-\n' },
+  { ad: 'restore key öneki bozulur', eski: 'actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0\n        with:\n          path: ${{ runner.temp }}/dizin-tetigi\n          key: dizin-tetigi-', yeni: 'actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0\n        with:\n          path: ${{ runner.temp }}/dizin-tetigi\n          key: baska-' },
+  { ad: 'önbellek restore adımı silinir (her koşu tabanı yeniden kurar)', eski: 'actions/cache/restore@', yeni: 'actions/cache/restoreyok@' },
   { ad: 'contents izni write olur', eski: 'permissions:\n  contents: read\n', yeni: 'permissions:\n  contents: write\n' },
   { ad: 'ek izin eklenir', eski: 'permissions:\n  contents: read\n', yeni: 'permissions:\n  contents: read\n  id-token: write\n' },
   { ad: 'cancel-in-progress true olur', eski: 'cancel-in-progress: false', yeni: 'cancel-in-progress: true' },
@@ -187,7 +249,7 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: 'DIZIN depo içine (github.workspace) taşınır', eski: 'DIZIN: ${{ runner.temp }}/dizin-tetigi', yeni: 'DIZIN: ${{ github.workspace }}/dizin-tetigi' },
   { ad: 'sır eklenir', eski: '          DIZIN: ${{ runner.temp }}/dizin-tetigi\n', yeni: '          DIZIN: ${{ runner.temp }}/dizin-tetigi\n          ANAHTAR: ${{ secrets.INDEXNOW }}\n' },
   { ad: 'pnpm install eklenir', eski: '          set -euo pipefail\n', yeni: '          pnpm install\n          set -euo pipefail\n' },
-  { ad: 'self-hosted runner', eski: 'runs-on: ubuntu-latest', yeni: 'runs-on: self-hosted' },
+  { ad: 'self-hosted runner', eski: 'runs-on: ubuntu-latest', yeni: 'runs-on: self-hosted', hepsi: true },
   { ad: 'timeout silinir', eski: '    timeout-minutes: 20\n', yeni: '' },
   { ad: 'Node sürümü düşer', eski: "node-version: '24'", yeni: "node-version: '20'" },
   { ad: 'taban yoksa da --uygula verilir (ilk koşuda bütün harita yeni sayılır)', eski: 'KIP=--taban-kur', yeni: 'KIP=--uygula' },

@@ -10,11 +10,20 @@ name: Dizin tetigi
 #      repos/.../deployments son 12 kaydın 12'si Production, durum success).
 #   2. Günde bir `schedule`: DB yazımı ya da kaçan bir olay için yedek.
 #
+# ⚠ÖLÇÜLEN KUSUR VE DÜZELTME (16 Ekim, ilk dört doğal koşu): `deployment_status` olayı bir dala ya da etikete
+# bağlı DEĞİLDİR; actions/cache bu olayda hem restore hem save adımını "Event Validation Error: ... not tied
+# to a branch or tag ref" uyarısıyla ATLAR. Taban hiç kaydedilmedi, her koşu tabanı sıfırdan kurdu ve değişen
+# adres hiç bildirilmedi (iş akışı yeşildi, iş yapılmadı). Bu yüzden `deployment_status` koşusu işi KENDİ
+# yapmaz: yalnız `tetikle` işi `gh workflow run dizin-tetigi.yml --ref <varsayılan dal>` ile elle tetik
+# (workflow_dispatch) koşusu başlatır. Asıl iş (`dizin-tetigi`) dal ref'inde koşar ve önbellek orada çalışır.
+# GITHUB_TOKEN ile başlatılan koşular yeni koşu doğurmaz, istisnası workflow_dispatch'tir: bu yol serbesttir.
+# `actions: write` izni YALNIZ `tetikle` işindedir.
+#
 # TABAN VE KUYRUK DEPO DIŞINDADIR (P6: arama/sayfa verisi depoya yazılmaz; betik depo içi yolu reddeder):
 # `runner.temp` altında durur ve actions/cache ile koşular arasında taşınır. actions/cache KEY'i DEĞİŞMEZ,
 # bu yüzden her koşu YENİ bir anahtarla (run_id + run_attempt) kaydeder ve `dizin-tetigi-` önekiyle en
-# sonuncuyu geri yükler. Önbellek yalnız varsayılan dal koşularında yazılır (deployment_status, schedule ve
-# elle tetik varsayılan daldan koşar); fork PR'ı bu iş akışını tetikleyemez.
+# sonuncuyu geri yükler. Önbellek yalnız varsayılan dal koşularında yazılır (schedule ve elle tetik varsayılan
+# daldan koşar; deployment_status'ta önbellek ÇALIŞMAZ, yukarıdaki not); fork PR'ı bu iş akışını tetikleyemez.
 #
 # ÖNBELLEK KAYBOLURSA (7 gün erişilmezse düşer; günlük cron bunu önler ama kayıp mümkündür): taban yoktur.
 # Betik taban yokken --uygula'yı REDDEDER ("ilk koşuda bütün harita yeni" diye bildirmek ölçüm değildir).
@@ -45,16 +54,32 @@ on:
 permissions:
   contents: read
 
-# Taban dosyası tek yazarlıdır: iki koşu aynı anda tabanı ilerletmesin. Sıraya girer, İPTAL ETMEZ:
-# bekleyen koşu en güncel tabana göre fark alır.
-concurrency:
-  group: dizin-tetigi
-  cancel-in-progress: false
-
 jobs:
-  dizin-tetigi:
+  tetikle:
     # deployment_status her ortam ve her durum için gelir (preview, pending, failure...): yalnız üretim + success.
-    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    # Bu iş önbelleğe, depoya ve betiğe DOKUNMAZ; yalnız asıl işi varsayılan dalda başlatır.
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Dizin tetigi isini varsayilan dalda baslat
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VARSAYILAN_DAL: ${{ github.event.repository.default_branch }}
+        run: gh workflow run dizin-tetigi.yml --ref "$VARSAYILAN_DAL"
+
+  dizin-tetigi:
+    # YALNIZ schedule ve elle tetik: önbellek deployment_status'ta çalışmaz (yukarıdaki not).
+    if: github.event_name != 'deployment_status'
+    # Taban dosyası tek yazarlıdır: iki koşu aynı anda tabanı ilerletmesin. Sıraya girer, İPTAL ETMEZ:
+    # bekleyen koşu en güncel tabana göre fark alır (aynı anda en çok BİR bekleyen tutulur, eskisi düşer:
+    # sonraki koşu tabana göre fark aldığı için kayıp olmaz).
+    concurrency:
+      group: dizin-tetigi
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     # Site haritasındaki her adres çekilir; 20 dk bol pay.
     timeout-minutes: 20
