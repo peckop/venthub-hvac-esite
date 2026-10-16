@@ -28,7 +28,7 @@ Kod: `src/lib/seo/jsonld.ts` `buildProductGroupJsonLd`. Fiyatsız ya da teklif k
 | Seçenek | Sonuç | Hüküm |
 |---|---|---|
 | A. Fiyatı olmayan ailede ProductGroup/Product yazma; yerine kategori ve seri sayfalarında zaten kullanılan `CollectionPage` + `ItemList` (model adları) yaz | Search Console'daki ürün öğeleri sıfıra iner; fiyat sızmaz; kalıp yeni açılacak katalog sayfalarına da otomatik uygulanır | ÖNERİLEN |
-| B. Olduğu gibi bırak | Sayfa sıralaması etkilenmez (hata yalnız zengin sonuç uygunluğunu kapatır, zaten uygun değiliz), ama her taranan aile sayfası "kritik" öğe olarak eklenir, "Düzeltmeyi doğrula" başarısız olur, Recep'e e-posta gelmeye devam eder | Önerilmez |
+| B. Olduğu gibi bırak | Sıralama üzerindeki etkisi bu çalışmada ölçülmedi (hata, ürün zengin sonucu uygunluğunu kapatır; fiyatsız sayfa zaten uygun değil), ama her taranan aile sayfası "kritik" öğe olarak eklenir, "Düzeltmeyi doğrula" başarısız olur, Recep'e e-posta gelmeye devam eder | Önerilmez |
 | C. `aggregateRating` ya da `review` ekle | Gerçek, görünür yorum yok; uydurma yasak | Yasak |
 | D. `Offer` ekle, `price: 0` yaz | Belgede `price: 0` "ödemesiz erişilebilir ürün" demektir; teklif kipindeki ürünü ücretsiz ilan etmek yanlış beyan | Yasak |
 | E. `Offer` ekle, fiyatsız | `price` Offer'ın zorunlu alanıdır; hata türü değişir ("price eksik"), çözülmez | Çözmez |
