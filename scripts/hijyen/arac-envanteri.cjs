@@ -672,8 +672,8 @@ function main(argv) {
     if (!karar.izin) {
       process.stderr.write(
         '[arac-envanteri] --yaz REDDEDILDI (serit korumasi, ARC-146): ' + karar.sebep + '.\n' +
-          '  Hicbir sey yazilmadi. ARAC\'in ayni envanteri bu ayrisimi kendi agacinda yazar; baska seridin yeni araci\n' +
-          '  icin ARAC\'a (SendMessage) satir iste. Bilincli yazacaksan acik hedef ver: --yaz --envanter <yol>\n',
+          '  Hicbir sey yazilmadi. Satirin sahibi sensin: satiri KENDI PR\'ina ekle (dosyalarla AYNI PR; ARAC "ARAC okudu"\n' +
+          '  notunu yazar). Uretmek icin acik hedef ver: --yaz --envanter <docs/audits altindaki en yeni envanter yolu>\n',
       )
       return 2
     }
