@@ -134,7 +134,9 @@ function blok(): HTMLElement {
 }
 
 describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', () => {
-  it('K1 · SABOTAJ HEDEFİ — her kategori için TIKLANABİLİR /category/ bağlantısı üretir', () => {
+  // Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK → TR kategori adresi `/tr/kategori/<slug>` (EN: `/en/category/<slug>`, K3).
+  // Kapının ölçtüğü şey DEĞİŞMEDİ: her kategori kartı tıklanabilir bir kategori adresi üretir; yalnız TR bölüm adı yeni.
+  it('K1 · SABOTAJ HEDEFİ — her kategori için TIKLANABİLİR /kategori/ bağlantısı üretir', () => {
     ciz(kategoriler())
     const icinde = within(blok())
 
@@ -145,7 +147,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
     ).toBe(2)
 
     const adresler = baglantilar.map((a) => a.getAttribute('href'))
-    expect(adresler).toEqual(['/tr/category/fanlar', '/tr/category/hava-perdeleri'])
+    expect(adresler).toEqual(['/tr/kategori/fanlar', '/tr/kategori/hava-perdeleri'])
   })
 
   it('K2 · başlık SÖZLÜKTEN gelir — ham anahtar basmaz (kural 7)', () => {
@@ -195,7 +197,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
     expect(
       icinde.getAllByRole('link').map((a) => a.getAttribute('href')),
       'Kesif gorunumu kategori blogunu cizmiyor — /products sayfasindan kategori agacina gecis YOK'
-    ).toEqual(['/tr/category/fanlar', '/tr/category/hava-perdeleri'])
+    ).toEqual(['/tr/kategori/fanlar', '/tr/kategori/hava-perdeleri'])
   })
 
   it('K6 · AYIRT EDİCİ — keşif görünümü kategori YOKKEN bloğu hiç çizmez', () => {

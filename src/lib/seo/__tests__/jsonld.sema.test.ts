@@ -198,7 +198,8 @@ describe('REC-494 · ProductGroup: isPartOf YOK, başka alana dokunulmadı', () 
       ['@context', '@type', 'brand', 'description', 'hasVariant', 'name', 'productGroupID', 'url'].sort(),
     )
     expect(ld.productGroupID).toBe('storm-serisi')
-    expect(ld.url).toBe(`${BASE_URL}/tr/products/storm-serisi`)
+    // Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK → TR aile adresi `/tr/urun/<slug>` (EN: `/en/products/<slug>`).
+    expect(ld.url).toBe(`${BASE_URL}/tr/urun/storm-serisi`)
     expect(ld.hasVariant).toHaveLength(2)
   })
 })

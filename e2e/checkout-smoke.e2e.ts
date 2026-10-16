@@ -1,5 +1,7 @@
 import { expect,test } from '@playwright/test'
 
+import { urunDetayAdresiMi } from '../tests/smoke/ssr-kurallari'
+
 /**
  * Checkout funnel smoke — satınalma hunisi donma/loop bekçisi (ÖDEME ÖNCESİ DURUR).
  *
@@ -64,8 +66,17 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     // Kart metnine değil, ürünün gerçekten sepete eklenebilir olmasına bakılır. 374 ailenin
     // 348'i fiyatlı, ama İLK kartın fiyatlı olduğu garanti değil — bu yüzden ilk birkaç
     // kart sırayla denenir. (Kart metnine geri dönme: aynı hataya düşersin.)
+    //
+    // ⚠ADRES ŞEMASINDAN BAĞIMSIZ (2026-10-10, URN-85 / PR #1811): bu adım `a[href*="/products/"]` seçicisiyle
+    // yazılmıştı. K3-b adres şeması açılınca (`ADRES_SEMASI_K3B`) kartlar `/tr/urun/<aile>` adresine gider ve seçici
+    // SIFIR kart buldu: "Ürün listesi hiç kart basmadı" (log: koşu 38039237820). Sayfa doluydu, beklenti eskiydi.
+    //  · Giriş `/tr/products` KALIR: eski şemada liste sayfasıdır, açık şemada tek 308 ile `/tr/urunler`'e gider
+    //    (`src/app/[lang]/products/page.tsx`); ikisinde de aynı sayfaya varılır.
+    //  · Kart seçici `data-ssr="family-card"`: FamilyCard'ın bilerek koyduğu ölçüm kancası (adres ve metne bağlı
+    //    değil); SSR duman kapısı da aynı işareti sayar. Kart bağlantısı `urunDetayAdresiMi` ile süzülür: ESKİ
+    //    `/tr/products/<x>` ve AÇIK `/tr/urun/<x>` ikisi de geçer, liste/kategori adresi geçmez — ölçüt gevşemez.
     await page.goto('/tr/products')
-    const cardLinks = page.locator('a[href*="/products/"]')
+    const cardLinks = page.locator('a[data-ssr="family-card"]')
     await expect(cardLinks.first(), 'Ürün listesi hiç kart basmadı (liste boot olmadı?)').toBeVisible({
       timeout: 30_000,
     })
@@ -73,8 +84,11 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     const hrefs = (await cardLinks.evaluateAll((els) =>
       els.map((e) => (e as HTMLAnchorElement).getAttribute('href')).filter(Boolean),
     )) as string[]
-    const denenecek = [...new Set(hrefs)].slice(0, 6)
-    expect(denenecek.length, 'Ürün listesinden hiç href toplanamadı').toBeGreaterThan(0)
+    const denenecek = [...new Set(hrefs.filter(urunDetayAdresiMi))].slice(0, 6)
+    expect(
+      denenecek.length,
+      `Ürün listesinden hiç ürün-detay adresi toplanamadı (kart bağlantıları: ${JSON.stringify(hrefs.slice(0, 3))})`,
+    ).toBeGreaterThan(0)
 
     // ─────────────────────────────────────────────────────────────────────────
     // ⚠️ ÇAPA PAYLAŞILIYOR — bu testin en sinsi tuzağı (2026-08-28 ölçüldü)
@@ -106,7 +120,9 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
       // Karta click() YERİNE href'e DOĞRUDAN git: kartın hover-transform'u / üstteki katman
       // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (flaky).
       await page.goto(href)
-      await page.waitForURL(/\/products\//, { timeout: 25_000 })
+      // Ürün sayfasına varıldı mı: ESKİ `/tr/products/<x>` ve AÇIK `/tr/urun/<x>` (eski regex yalnız `/products/`
+      // tanıyordu: açık şemada 25 sn bekleyip patlardı — ikinci, ilkinin ARKASINDA duran gizli kırmızı).
+      await page.waitForURL((u) => urunDetayAdresiMi(u.pathname), { timeout: 25_000 })
       if (!(await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false))) continue
 
       // ⚠️ HİDRASYON YARIŞI — metni HEMEN okumak SSR'ı ölçer, kullanıcının

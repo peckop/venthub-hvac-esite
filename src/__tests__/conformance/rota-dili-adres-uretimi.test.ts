@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { bilgiMerkeziYonlendirmeleri, EN_KAPALI_LISTE_HEDEFI } from '../../config/bilgiMerkeziYonlendirmeleri.mjs'
 import { ROTA_DILI, rotaDiliHedefleriniYenile, rotaDiliYonlendirmeleri, zincirVarMi } from '../../config/rotaDili.mjs'
@@ -15,7 +15,15 @@ import { ROTA_DILI, rotaDiliHedefleriniYenile, rotaDiliYonlendirmeleri, zincirVa
  * fikstürle derin eşittir. AÇIK kip: spike'ın üç bulgusu (dil değiştirici 404, canonical eski adres,
  * iç bağlantı eski adres) test olarak sabitlenir. ALT-14 (Bilgi Merkezi dil değiştirici) anahtardan
  * BAĞIMSIZDIR ve iki kipte de ölçülür.
+ *
+ * FAZ 3-C (URN-85 2/2): KAPALI-2 fikstürü `ADRES_SEMASI_K3B` KAPALIYKEN alındı (rota dili işinden ÖNCE; `dilDegistirYolu`
+ * ve site haritası bugünkü `/tr/products` şemasını taşır). `features.ts` değeri `true` olunca o blok bayrağı KAPALIYA
+ * SABİTLER (`adresSemasi.sabit`) — rota dili anahtarı ayrı bir eksendir ve adres şemasından bağımsız olarak sıfır fark
+ * vermelidir. Diğer bloklar (açık kip, ALT-14) gerçek bayrağı okur; onların canlı bileşimi ölçülür.
  */
+
+/** KAPALI-2 bloğu içinde `true`/`false` verilir; `undefined` = gerçek `features.ts` değeri. */
+const adresSemasi: { sabit: boolean | undefined } = { sabit: undefined }
 
 const ANAHTAR = 'NEXT_PUBLIC_ADRES_DILI'
 const ilkDeger = process.env[ANAHTAR]
@@ -28,6 +36,7 @@ const FIKSTUR = JSON.parse(
 }
 
 afterEach(() => {
+  adresSemasi.sabit = undefined
   if (ilkDeger === undefined) delete process.env[ANAHTAR]
   else process.env[ANAHTAR] = ilkDeger
   vi.doUnmock('@/config/features')
@@ -46,6 +55,7 @@ async function yukle(anahtar: string | undefined, enYayin = false) {
   vi.doMock('@/config/features', async (orijinal) => ({
     ...(await orijinal<typeof import('@/config/features')>()),
     EN_YAYIN: enYayin,
+    ...(adresSemasi.sabit === undefined ? {} : { ADRES_SEMASI_K3B: adresSemasi.sabit }),
   }))
   const routes = await import('../../utils/routes')
   const yuzey = await import('../../utils/yuzeyAdresleri')
@@ -99,6 +109,11 @@ function localizedCiktilar(localizedHref: (url: string, lang: string) => string,
 }
 
 describe('INV-ROTA-DILI-KAPALI-2 — anahtar kapalı → adres üretimi işe başlamadan önceki fikstürle DERİN EŞİT', () => {
+  // Fikstür adres şeması KAPALIYKEN alındı → bu blokta bayrak KAPALIYA sabitlenir (bkz. dosya başlığı).
+  beforeEach(() => {
+    adresSemasi.sabit = false
+  })
+
   it('ÖN KOŞUL — fikstür dolu evren', () => {
     expect(Object.keys(FIKSTUR.localizedHref.tr).length).toBeGreaterThan(80)
     expect(FIKSTUR.localizedHref.tr['about()']).toBe('/tr/about')

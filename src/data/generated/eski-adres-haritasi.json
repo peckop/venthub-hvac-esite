@@ -1,0 +1,4441 @@
+{
+  "surum": 1,
+  "uretildi": "2026-10-10T08:21:09.405Z",
+  "kiracilar": {
+    "d3b07384-d113-495f-a558-8c38634e0000": {
+      "urunSayisi": 441,
+      "aileler": [
+        "avens-bvu-ls-kursun-seperator",
+        "avens-bvu-siginak-havalandirma-uniteleri",
+        "avens-dikdortgen-kanal-tipi-radyal-fanlar",
+        "avens-elektrikli-kanal-isiticilari",
+        "avens-hiz-anahtarlari",
+        "avens-hucreli-aspiratorler-hf-fw",
+        "avens-hucreli-aspiratorler-hf-s",
+        "avens-isi-geri-kazanim-cihazlari",
+        "avens-qe-b-kasa-serisi",
+        "avens-sulu-batarya-kanal-tipi",
+        "casals-enkelfan-ec-plug",
+        "casals-kentalfan-plug",
+        "casals-nimax",
+        "casals-nimus",
+        "danfoss-vlt-hvac-basic-drive-fc-101",
+        "danfoss-vlt-hvac-drive-fc-102",
+        "danfoss-vlt-micro-drive-fc-51",
+        "jet-serisi",
+        "nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar",
+        "nicotra-gebhardt-at-cift-emisli-radyal-fanlar",
+        "nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar",
+        "nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar",
+        "seat-atex-ptc-sensoru",
+        "seat-serisi",
+        "storm-serisi",
+        "vortice-ad-isiticisiz-hava-perdeleri",
+        "vortice-aksiyel-endustriyel-fanlar",
+        "vortice-bravo-s",
+        "vortice-deumido-nem-alma-cihazlari",
+        "vortice-h-ad-elektrikli-isiticili-hava-perdeleri",
+        "vortice-heatmaster-duman-egzoz-fanlari",
+        "vortice-lineo-kanal-fanlari",
+        "vortice-lineo-quiet-sessiz-kanal-fanlari",
+        "vortice-nordik-hvls-hyperblade",
+        "vortice-punto-evo-flexo-banyo-fanlari",
+        "vortice-radon-serisi-cati-fanlari",
+        "vortice-radon-serisi-kanal-fanlari",
+        "vortice-slimroof-cati-fanlari",
+        "vortice-tiracamino-somine-ve-baca-fanlari",
+        "vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari",
+        "vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari",
+        "vortice-vort-e-atex-fanlar",
+        "vortice-vort-hr-isi-geri-kazanim",
+        "vortice-vort-mono",
+        "vortice-vort-qbk-sal-kc-evo",
+        "vortice-vort-quadro-evo",
+        "vortice-vorticent-cms-atex-santrifuj-fanlar"
+      ],
+      "modeller": {
+        "AVE-01801": {
+          "aile": 4,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11560": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11561": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11562": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11563": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11564": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11565": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11566": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11567": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-11568": {
+          "aile": 8,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1200": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1250": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13010": {
+          "aile": 7,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13011": {
+          "aile": 7,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13013": {
+          "aile": 7,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13032": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13033": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13034": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13037": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13038": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13039": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13050": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13051": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13052": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13053": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13054": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13055": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13056": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-13057": {
+          "aile": 9,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1316": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1317": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1355": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1360": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-1410": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20100": {
+          "aile": 5,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20110": {
+          "aile": 5,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20120": {
+          "aile": 5,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20130": {
+          "aile": 5,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20140": {
+          "aile": 5,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20150": {
+          "aile": 5,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20200": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20210": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20220": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20230": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20240": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20250": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-20260": {
+          "aile": 6,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248312106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248314103": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248314106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248354103": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248354106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248404103": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248404106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248454106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248504106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248506106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248564106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248566106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248634106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-248636106": {
+          "aile": 11,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-30100": {
+          "aile": 1,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-30101": {
+          "aile": 1,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-30102": {
+          "aile": 1,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-30110": {
+          "aile": 0,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-30111": {
+          "aile": 0,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-60006": {
+          "aile": 4,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-80141": {
+          "aile": 16,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC155": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC190": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC250": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC310": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC355": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC450": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC500": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC560": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-ENKEC630": {
+          "aile": 10,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS10014225": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS311280": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS351290": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS351471": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS4012100": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS401480": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS4512132": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS451480": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS5012160": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS501490": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS5624100": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS6314112": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS7114132": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS8014160": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NS9014200": {
+          "aile": 13,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX10034250": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX313290": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX353290": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX353471": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX4032112": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX403480": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX4532132": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX453490": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX5032160": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX503490": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX5634100": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX6334132": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX7144160": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX8034180": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "AVE-NX9034200": {
+          "aile": 12,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80101": {
+          "aile": 16,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80102": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80103": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80104": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80105": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80106": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80107": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80108": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80109": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80110": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80111": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80112": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80113": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80114": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80115": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80116": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80117": {
+          "aile": 14,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80120": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80121": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80122": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80123": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80124": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80125": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80126": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80127": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80128": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80129": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80130": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80131": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80132": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80133": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80134": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80135": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "DAN-80136": {
+          "aile": 15,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11901": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11902": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11905": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11907": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11908": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11909": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11910": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11911": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11912": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11913": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11916": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11920": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11921": {
+          "aile": 20,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11930": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11931": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11932": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11933": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11934": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11935": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11938": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11939": {
+          "aile": 19,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11942": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11943": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11947": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11948": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11949": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11950": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11951": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11956": {
+          "aile": 18,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11960": {
+          "aile": 21,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11961": {
+          "aile": 21,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11962": {
+          "aile": 21,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11963": {
+          "aile": 21,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11964": {
+          "aile": 21,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "NIC-11969": {
+          "aile": 21,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51151000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51152000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51152003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51152010": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51153000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51153003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51153010": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51201000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51201003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51202000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51202003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51202010": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51203000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51203001": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51203003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51203010": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51251000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51251003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51252000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51252003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51252010": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51253000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51253001": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51253003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51253300": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51301000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51302000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51302003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51302010": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51350000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51351000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51351003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51352000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51352001": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51352003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51352004": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51352400": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51501000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51502000": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-51502003": {
+          "aile": 23,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61102000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61102003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61103000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61103003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61103010": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61103110": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61122000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61122003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61122010": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61123000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61123003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61123010": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61143000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61143003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61143010": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61163000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61163003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61183000": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61183003": {
+          "aile": 24,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71201000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71201003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71202000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71202003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71202010": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71203000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71203001": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71203003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71203010": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71251000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71251003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71252000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71252003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71252010": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71252055": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71253000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71253003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71301000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71302000": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71302003": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-71302010": {
+          "aile": 17,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-810105": {
+          "aile": 22,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-10911": {
+          "aile": 42,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-10930": {
+          "aile": 42,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11313": {
+          "aile": 34,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11314": {
+          "aile": 34,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11333": {
+          "aile": 34,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11334": {
+          "aile": 34,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11521": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11522": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11523": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11524": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11525": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11526": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11527": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11528": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11531": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11532": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11533": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11534": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11535": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11536": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11537": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11538": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11541": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11542": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11543": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11544": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11545": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11546": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-11547": {
+          "aile": 45,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12101": {
+          "aile": 42,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12106": {
+          "aile": 42,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12219": {
+          "aile": 42,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12431": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12432": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12434": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12435": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12436": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12437": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12443": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-12444": {
+          "aile": 43,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-13147": {
+          "aile": 27,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-13148": {
+          "aile": 27,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-13149": {
+          "aile": 27,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-13150": {
+          "aile": 27,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15000": {
+          "aile": 38,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15261": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15262": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15263": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15264": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15265": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15266": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15267": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15271": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15272": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15273": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15274": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15275": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15276": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15277": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15278": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15279": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15301": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15302": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15303": {
+          "aile": 30,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-15311": {
+          "aile": 37,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16107": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16108": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16109": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16153": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16155": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16156": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16157": {
+          "aile": 40,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16257": {
+          "aile": 35,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16258": {
+          "aile": 35,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16259": {
+          "aile": 35,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16277": {
+          "aile": 36,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16278": {
+          "aile": 36,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16279": {
+          "aile": 36,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16280": {
+          "aile": 36,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-16281": {
+          "aile": 36,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17143": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17144": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17145": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17146": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17160": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17161": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17162": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17164": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17165": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17166": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17170": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17171": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17172": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17174": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17175": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17176": {
+          "aile": 32,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17180": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17181": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17182": {
+          "aile": 31,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253080106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253090106XE": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253100106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253110106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253260106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253320106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253410106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253420106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253490106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253510106XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253530121XN": {
+          "aile": 46,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-26020": {
+          "aile": 28,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-26021": {
+          "aile": 28,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-26022": {
+          "aile": 28,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40320": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40321": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40322": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40323": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40324": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40325": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40326": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40327": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40328": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40329": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40330": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40331": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40332": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40333": {
+          "aile": 41,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40703": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-40903": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-41219": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-41459": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42259": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42302": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42304": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42308": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42314": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42324": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42327": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42334": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42335": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42336": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42344": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-42374": {
+          "aile": 26,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43151": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43152": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43153": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43154": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43155": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43156": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43157": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43158": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43159": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43160": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43161": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43162": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43163": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43164": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43165": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43166": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43167": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43168": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43169": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43170": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-43171": {
+          "aile": 44,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61181": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61182": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61186": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61187": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61188": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61189": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-61190": {
+          "aile": 33,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65155": {
+          "aile": 29,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65156": {
+          "aile": 29,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65157": {
+          "aile": 29,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65158": {
+          "aile": 29,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65195": {
+          "aile": 25,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65196": {
+          "aile": 25,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65197": {
+          "aile": 25,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-65198": {
+          "aile": 25,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-4020-ES-RECT": {
+          "aile": 39,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-5035-ES-RECT": {
+          "aile": 39,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-6040-ES-RECT": {
+          "aile": 39,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-7050-ES-RECT": {
+          "aile": 39,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-8060-ES-RECT": {
+          "aile": 39,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        }
+      },
+      "eskiSkular": {},
+      "urunSluglari": {
+        "12-kw-elektrikli-isitici-13034": "AVE-13034",
+        "15-kw-elektrikli-isitici-13038": "AVE-13038",
+        "18-kw-elektrikli-isitici-13039": "AVE-13039",
+        "3-kw-elektrikli-isitici-13037": "AVE-13037",
+        "6-kw-elektrikli-isitici-13032": "AVE-13032",
+        "9-kw-elektrikli-isitici-13033": "AVE-13033",
+        "adh-1000-k-11956": "NIC-11956",
+        "adh-200-e2-11942": "NIC-11942",
+        "adh-225-e2-11943": "NIC-11943",
+        "adh-355-e2-11947": "NIC-11947",
+        "adh-400-e2-11948": "NIC-11948",
+        "adh-450-e2-11949": "NIC-11949",
+        "adh-500-e2-11950": "NIC-11950",
+        "adh-560-e2-11951": "NIC-11951",
+        "at-10-10-11934": "NIC-11934",
+        "at-10-8-11933": "NIC-11933",
+        "at-12-9-11935": "NIC-11935",
+        "at-15-15-11938": "NIC-11938",
+        "at-18-13-11939": "NIC-11939",
+        "at-7-7-11930": "NIC-11930",
+        "at-9-7-11931": "NIC-11931",
+        "at-9-9-11932": "NIC-11932",
+        "avens-1000-isi-geri-kazanim-cihazi-13011": "AVE-13011",
+        "avens-100x50-1410": "AVE-1410",
+        "avens-2-5-a-hiz-anahtari-60006": "AVE-60006",
+        "avens-2000-isi-geri-kazanim-cihazi-13013": "AVE-13013",
+        "avens-40x20-1200": "AVE-1200",
+        "avens-5-a-hiz-anahtari-01801": "AVE-01801",
+        "avens-50x25-1250": "AVE-1250",
+        "avens-60x30-1316": "AVE-1316",
+        "avens-60x35-1317": "AVE-1317",
+        "avens-70x40-1355": "AVE-1355",
+        "avens-750-isi-geri-kazanim-cihazi-13010": "AVE-13010",
+        "avens-80x50-1360": "AVE-1360",
+        "avens-hf-fw-10-10-2-2kw-20120": "AVE-20120",
+        "avens-hf-fw-12-12-3kw-20130": "AVE-20130",
+        "avens-hf-fw-15-15-4kw-20140": "AVE-20140",
+        "avens-hf-fw-18-18-5-5kw-20150": "AVE-20150",
+        "avens-hf-fw-7-7-1-1kw-20100": "AVE-20100",
+        "avens-hf-fw-9-9-1-5kw-20110": "AVE-20110",
+        "avens-hf-s-250-1-1kw-20200": "AVE-20200",
+        "avens-hf-s-280-1-5kw-20210": "AVE-20210",
+        "avens-hf-s-315-3kw-20220": "AVE-20220",
+        "avens-hf-s-355-4kw-20230": "AVE-20230",
+        "avens-hf-s-400-5-5kw-20240": "AVE-20240",
+        "avens-hf-s-450-7-5kw-20250": "AVE-20250",
+        "avens-hf-s-500-11kw-20260": "AVE-20260",
+        "bvu-1000-230w-30100": "AVE-30100",
+        "bvu-2000-310w-30101": "AVE-30101",
+        "bvu-3000-430w-30102": "AVE-30102",
+        "bvu-ls-1000-30110": "AVE-30110",
+        "bvu-ls-2000-3000-30111": "AVE-30111",
+        "dd-10-10-373w-1f-4p-1v-6m0627-11916": "NIC-11916",
+        "dd-10-10-550w-1f-4p-3v-6m061u-11907": "NIC-11907",
+        "dd-10-10-750w-1f-4p-3v-6m06mf-11908": "NIC-11908",
+        "dd-12-12-1100w-1f-6p-1v-61091a-11920": "NIC-11920",
+        "dd-12-12-1500w-3f-4p-2v-61090p-11921": "NIC-11921",
+        "dd-12-12-1500w-3f-4p-2v-6n090p-11921": "NIC-11921",
+        "dd-12-12-735w-1f-6p-3v-6n06hx-11909": "NIC-11909",
+        "dd-7-7-147w-1f-4p-3v-6m0678-11901": "NIC-11901",
+        "dd-7-7-150w-1f-4p-1v-610982-11910": "NIC-11910",
+        "dd-9-7-300w-1f-4p-1v-6m0671-11911": "NIC-11911",
+        "dd-9-7-420w-1f-4p-3v-6m0695-11902": "NIC-11902",
+        "dd-9-9-300w-1f-4p-1v-6m0661-11913": "NIC-11913",
+        "dd-9-9-373w-1f-4p-1v-6m0642-11912": "NIC-11912",
+        "dd-9-9-750w-1f-4p-3v-6m06mh-11905": "NIC-11905",
+        "enkelfan-155-eec-enkec-155": "AVE-ENKEC155",
+        "enkelfan-190-eec-enkec-190": "AVE-ENKEC190",
+        "enkelfan-250-eec-enkec-250": "AVE-ENKEC250",
+        "enkelfan-310-eec-enkec-310": "AVE-ENKEC310",
+        "enkelfan-355-eec-enkec-355": "AVE-ENKEC355",
+        "enkelfan-450-eec-enkec-450": "AVE-ENKEC450",
+        "enkelfan-500-eec-enkec-500": "AVE-ENKEC500",
+        "enkelfan-560-eec-enkec-560": "AVE-ENKEC560",
+        "enkelfan-630-eec-enkec630": "AVE-ENKEC630",
+        "fc-101-2-2kw-frenkans-konvertoru-80103": "DAN-80103",
+        "fc-101-380v-1-5kw-frekans-konvertoru-80102": "DAN-80102",
+        "fc-101-380v-3kw-frekans-konvertoru-80104": "DAN-80104",
+        "fc-101-380v-5-5kw-frekans-konvertoru-80106": "DAN-80106",
+        "fc-51-220v-0-37kw-frekans-inventoru-80101": "DAN-80101",
+        "fc-51-230v-0-37kw-frekans-konvertoru-80141": "AVE-80141",
+        "fc101p11k-11-80108": "DAN-80108",
+        "fc101p15k-15-80109": "DAN-80109",
+        "fc101p18k-18-5-80110": "DAN-80110",
+        "fc101p22k-22-80111": "DAN-80111",
+        "fc101p30k-30-80112": "DAN-80112",
+        "fc101p37k-37-80113": "DAN-80113",
+        "fc101p45k-45-80114": "DAN-80114",
+        "fc101p4k0-4-80105": "DAN-80105",
+        "fc101p55k-55-80115": "DAN-80115",
+        "fc101p75k-75-80116": "DAN-80116",
+        "fc101p7k5-7-5-80107": "DAN-80107",
+        "fc101p90k-90-80117": "DAN-80117",
+        "fc102p11k-11-80127": "DAN-80127",
+        "fc102p15k-15-80128": "DAN-80128",
+        "fc102p18k-18-5-80129": "DAN-80129",
+        "fc102p1k1-1-1-80120": "DAN-80120",
+        "fc102p1k5-1-5-80121": "DAN-80121",
+        "fc102p22k-22-80130": "DAN-80130",
+        "fc102p2k2-2-2-80122": "DAN-80122",
+        "fc102p30k-30-80131": "DAN-80131",
+        "fc102p37k-37-80132": "DAN-80132",
+        "fc102p3k0-3-80123": "DAN-80123",
+        "fc102p45k-45-80133": "DAN-80133",
+        "fc102p4k0-4-80124": "DAN-80124",
+        "fc102p55k-55-80134": "DAN-80134",
+        "fc102p5k5-5-5-80125": "DAN-80125",
+        "fc102p75k-75-80135": "DAN-80135",
+        "fc102p7k5-7-5-80126": "DAN-80126",
+        "fc102p90k-90-80136": "DAN-80136",
+        "jet-20-71201000": "SEA-71201000",
+        "jet-20-71202000": "SEA-71202000",
+        "jet-20-71202010": "SEA-71202010",
+        "jet-20-71203000": "SEA-71203000",
+        "jet-20-71203001": "SEA-71203001",
+        "jet-20-71203010": "SEA-71203010",
+        "jet-20-atex-71201003": "SEA-71201003",
+        "jet-20-atex-71202003": "SEA-71202003",
+        "jet-20-atex-71203003": "SEA-71203003",
+        "jet-25-71251000": "SEA-71251000",
+        "jet-25-71252000": "SEA-71252000",
+        "jet-25-71252010": "SEA-71252010",
+        "jet-25-71252055": "SEA-71252055",
+        "jet-25-71253000": "SEA-71253000",
+        "jet-25-atex-71251003": "SEA-71251003",
+        "jet-25-atex-71252003": "SEA-71252003",
+        "jet-25-atex-71253003": "SEA-71253003",
+        "jet-30-71301000": "SEA-71301000",
+        "jet-30-71302000": "SEA-71302000",
+        "jet-30-71302010": "SEA-71302010",
+        "jet-30-atex-71302003": "SEA-71302003",
+        "kentalfan-315-m4-0-25kw-248314103": "AVE-248314103",
+        "kentalfan-315-t2-1-5kw-248312106": "AVE-248312106",
+        "kentalfan-315-t4-0-25kw-248314106": "AVE-248314106",
+        "kentalfan-355-m4-0-25kw-248354103": "AVE-248354103",
+        "kentalfan-355-t4-0-25kw-248354106": "AVE-248354106",
+        "kentalfan-400-m4-0-55kw-248404103": "AVE-248404103",
+        "kentalfan-400-t4-0-55kw-248404106": "AVE-248404106",
+        "kentalfan-450-t4-1-1kw-248454106": "AVE-248454106",
+        "kentalfan-500-t4-1-5kw-248504106": "AVE-248504106",
+        "kentalfan-500-t6-0-55kw-248506106": "AVE-248506106",
+        "kentalfan-560-t4-3kw-248564106": "AVE-248564106",
+        "kentalfan-560-t6-1-1kw-248566106": "AVE-248566106",
+        "kentalfan-630-t4-5-5kw-248634106": "AVE-248634106",
+        "kentalfan-630-t6-1-5kw-248636106": "AVE-248636106",
+        "nimax-1004-t4-55kw-nx10034250": "AVE-NX10034250",
+        "nimax-314-t2-1-5kw-nx313290": "AVE-NX313290",
+        "nimax-354-t2-3kw-nx353290": "AVE-NX353290",
+        "nimax-354-t4-0-37kw-nx353471": "AVE-NX353471",
+        "nimax-404-t2-5-5kw-nx4032112": "AVE-NX4032112",
+        "nimax-404-t4-0-55kw-nx403480": "AVE-NX403480",
+        "nimax-454-t2-11kw-nx4532132": "AVE-NX4532132",
+        "nimax-454-t4-1-1kw-nx453490": "AVE-NX453490",
+        "nimax-504-t2-15kw-nx5032160": "AVE-NX5032160",
+        "nimax-504-t4-2-2kw-nx503490": "AVE-NX503490",
+        "nimax-564-t4-3kw-nx5634100": "AVE-NX5634100",
+        "nimax-634-t4-5-5kw-nx6334132": "AVE-NX6334132",
+        "nimax-714-t4-11kw-nx7144160": "AVE-NX7144160",
+        "nimax-804-t4-18-5kw-nx8034180": "AVE-NX8034180",
+        "nimax-904-t4-37kw-nx9034200": "AVE-NX9034200",
+        "nimus-1001-t4-45kw-ns10014225": "AVE-NS10014225",
+        "nimus-311-t2-1-1kw-ns311280": "AVE-NS311280",
+        "nimus-351-t2-2-2kw-ns351290": "AVE-NS351290",
+        "nimus-351-t4-0-37kw-ns351471": "AVE-NS351471",
+        "nimus-401-t2-4kw-ns4012100": "AVE-NS4012100",
+        "nimus-401-t4-0-55kw-ns401480": "AVE-NS401480",
+        "nimus-451-t2-7-5kw-ns4512132": "AVE-NS4512132",
+        "nimus-451-t4-0-75kw-ns451480": "AVE-NS451480",
+        "nimus-501-t2-11kw-ns5012160": "AVE-NS5012160",
+        "nimus-501-t4-1-5kw-ns501490": "AVE-NS501490",
+        "nimus-561-t4-2-2kw-ns5624100": "AVE-NS5624100",
+        "nimus-631-t4-4kw-ns6314112": "AVE-NS6314112",
+        "nimus-711-t4-7-5kw-ns7114132": "AVE-NS7114132",
+        "nimus-801-t4-15kw-ns8014160": "AVE-NS8014160",
+        "nimus-901-t4-30kw-ns9014200": "AVE-NS9014200",
+        "ptc-sensor-810105": "SEA-810105",
+        "qe-b-i-11560": "AVE-11560",
+        "qe-b-i-k90-r-11564": "AVE-11564",
+        "qe-b-i-k90-r-2l-11567": "AVE-11567",
+        "qe-b-i-k90-r-2r-11566": "AVE-11566",
+        "qe-b-i-k90-s-11565": "AVE-11565",
+        "qe-b-i-k90-s-2r-11568": "AVE-11568",
+        "qe-b-i-vk90-11562": "AVE-11562",
+        "qe-b-m-11561": "AVE-11561",
+        "qe-b-m-vk90-11563": "AVE-11563",
+        "rdh-180-e2-11960": "NIC-11960",
+        "rdh-200-e2-11961": "NIC-11961",
+        "rdh-225-e2-11962": "NIC-11962",
+        "rdh-250-e2-11963": "NIC-11963",
+        "rdh-280-e2-11964": "NIC-11964",
+        "rdh-500-e2-11969": "NIC-11969",
+        "seat-15-51151000": "SEA-51151000",
+        "seat-15-51152000": "SEA-51152000",
+        "seat-15-51152010": "SEA-51152010",
+        "seat-15-51153000": "SEA-51153000",
+        "seat-15-51153010": "SEA-51153010",
+        "seat-15-atex-51152003": "SEA-51152003",
+        "seat-15-atex-51153003": "SEA-51153003",
+        "seat-20-51201000": "SEA-51201000",
+        "seat-20-51202000": "SEA-51202000",
+        "seat-20-51202010": "SEA-51202010",
+        "seat-20-51203000": "SEA-51203000",
+        "seat-20-51203001": "SEA-51203001",
+        "seat-20-51203010": "SEA-51203010",
+        "seat-20-atex-51201003": "SEA-51201003",
+        "seat-20-atex-51202003": "SEA-51202003",
+        "seat-20-atex-51203003": "SEA-51203003",
+        "seat-25-51251000": "SEA-51251000",
+        "seat-25-51252000": "SEA-51252000",
+        "seat-25-51252010": "SEA-51252010",
+        "seat-25-51253000": "SEA-51253000",
+        "seat-25-51253001": "SEA-51253001",
+        "seat-25-51253300": "SEA-51253300",
+        "seat-25-atex-51251003": "SEA-51251003",
+        "seat-25-atex-51252003": "SEA-51252003",
+        "seat-25-atex-51253003": "SEA-51253003",
+        "seat-30-51301000": "SEA-51301000",
+        "seat-30-51302000": "SEA-51302000",
+        "seat-30-51302010": "SEA-51302010",
+        "seat-30-atex-51302003": "SEA-51302003",
+        "seat-35-51350000": "SEA-51350000",
+        "seat-35-51351000": "SEA-51351000",
+        "seat-35-51352000": "SEA-51352000",
+        "seat-35-51352001": "SEA-51352001",
+        "seat-35-51352400": "SEA-51352400",
+        "seat-35-atex-51351003": "SEA-51351003",
+        "seat-35-atex-51352003": "SEA-51352003",
+        "seat-35-atex-51352004": "SEA-51352004",
+        "seat-50-51501000": "SEA-51501000",
+        "seat-50-51502000": "SEA-51502000",
+        "seat-50-atex-51502003": "SEA-51502003",
+        "storm-10-61102000": "SEA-61102000",
+        "storm-10-61103000": "SEA-61103000",
+        "storm-10-61103010": "SEA-61103010",
+        "storm-10-61103110": "SEA-61103110",
+        "storm-10-atex-61102003": "SEA-61102003",
+        "storm-10-atex-61103003": "SEA-61103003",
+        "storm-12-61122000": "SEA-61122000",
+        "storm-12-61122010": "SEA-61122010",
+        "storm-12-61123000": "SEA-61123000",
+        "storm-12-61123010": "SEA-61123010",
+        "storm-12-atex-61122003": "SEA-61122003",
+        "storm-12-atex-61123003": "SEA-61123003",
+        "storm-14-61143000": "SEA-61143000",
+        "storm-14-61143010": "SEA-61143010",
+        "storm-14-atex-61143003": "SEA-61143003",
+        "storm-16-61163000": "SEA-61163000",
+        "storm-16-atex-61163003": "SEA-61163003",
+        "storm-18-61183000": "SEA-61183000",
+        "storm-18-atex-61183003": "SEA-61183003",
+        "sulu-batarya-11-kw-kanal-tipi-11300-kcal-h-90-70-c-13052": "AVE-13052",
+        "sulu-batarya-14-kw-kanal-tipi-20700-kcal-h-90-70-c-13053": "AVE-13053",
+        "sulu-batarya-20-kw-kanal-tipi-33000-kcal-h-90-70-c-13054": "AVE-13054",
+        "sulu-batarya-28-kw-kanal-tipi-37400-kcal-h-90-70-c-13055": "AVE-13055",
+        "sulu-batarya-36-kw-kanal-tipi-42500-kcal-h-90-70-c-13056": "AVE-13056",
+        "sulu-batarya-40-kw-kanal-tipi-47300-kcal-h-90-70-c-13057": "AVE-13057",
+        "sulu-batarya-7-kw-kanal-tipi-4700-kcal-h-90-70-c-13050": "AVE-13050",
+        "sulu-batarya-8-kw-kanal-tipi-7000-kcal-h-90-70-c-13051": "AVE-13051",
+        "vort-qbk-sal-kc-evo-315-m4-0-25kw-43151": "VRT-43151",
+        "vort-qbk-sal-kc-evo-315-t2-1-5kw-43152": "VRT-43152",
+        "vort-qbk-sal-kc-evo-315-t4-0-25kw-43153": "VRT-43153",
+        "vort-qbk-sal-kc-evo-315-t4-8-0-25-0-03kw-43165": "VRT-43165",
+        "vort-qbk-sal-kc-evo-355-m4-0-25kw-43154": "VRT-43154",
+        "vort-qbk-sal-kc-evo-355-t4-0-25kw-43155": "VRT-43155",
+        "vort-qbk-sal-kc-evo-355-t4-8-0-25-0-03kw-43166": "VRT-43166",
+        "vort-qbk-sal-kc-evo-400-m4-0-55kw-43156": "VRT-43156",
+        "vort-qbk-sal-kc-evo-400-t4-0-55kw-43157": "VRT-43157",
+        "vort-qbk-sal-kc-evo-400-t4-8-0-75-0-12kw-43167": "VRT-43167",
+        "vort-qbk-sal-kc-evo-450-t4-1-1kw-43158": "VRT-43158",
+        "vort-qbk-sal-kc-evo-450-t4-8-1-1-0-18kw-43168": "VRT-43168",
+        "vort-qbk-sal-kc-evo-500-t4-1-5kw-43159": "VRT-43159",
+        "vort-qbk-sal-kc-evo-500-t4-8-1-5-0-25kw-43169": "VRT-43169",
+        "vort-qbk-sal-kc-evo-500-t6-0-55kw-43160": "VRT-43160",
+        "vort-qbk-sal-kc-evo-560-t4-3kw-43161": "VRT-43161",
+        "vort-qbk-sal-kc-evo-560-t4-8-3-0-55kw-43170": "VRT-43170",
+        "vort-qbk-sal-kc-evo-560-t6-1-1kw-43162": "VRT-43162",
+        "vort-qbk-sal-kc-evo-630-t4-5-5kw-43163": "VRT-43163",
+        "vort-qbk-sal-kc-evo-630-t4-8-5-5-1-1kw-43171": "VRT-43171",
+        "vort-qbk-sal-kc-evo-630-t6-1-5kw-43164": "VRT-43164",
+        "vortice-a-e-354-t-42259": "VRT-42259",
+        "vortice-a-e-454-t-42308": "VRT-42308",
+        "vortice-a-e-504-t-42327": "VRT-42327",
+        "vortice-a-e-564-t-42336": "VRT-42336",
+        "vortice-air-door-ad-1200-65196": "VRT-65196",
+        "vortice-air-door-ad-1500-65197": "VRT-65197",
+        "vortice-air-door-ad-2000-65198": "VRT-65198",
+        "vortice-air-door-ad-900-65195": "VRT-65195",
+        "vortice-air-door-ad-h-1500-t-65158": "VRT-65158",
+        "vortice-air-door-h-ad-1200-t-65157": "VRT-65157",
+        "vortice-air-door-h-ad-900-m-65155": "VRT-65155",
+        "vortice-air-door-h-ad-900-t-65156": "VRT-65156",
+        "vortice-bra-vo-s1-13147": "VRT-13147",
+        "vortice-bra-vo-s2-13148": "VRT-13148",
+        "vortice-bra-vo-s3-13149": "VRT-13149",
+        "vortice-bra-vo-s4-13150": "VRT-13150",
+        "vortice-ca-100-md-16107": "VRT-16107",
+        "vortice-ca-125-md-16108": "VRT-16108",
+        "vortice-ca-150-md-16153": "VRT-16153",
+        "vortice-ca-150-q-md-16109": "VRT-16109",
+        "vortice-ca-200-md-16155": "VRT-16155",
+        "vortice-ca-250-md-16156": "VRT-16156",
+        "vortice-ca-315-md-16157": "VRT-16157",
+        "vortice-ca-il-4020-es-rect": "VRT-CA-IL-4020-ES-RECT",
+        "vortice-ca-il-4020-es-rect-16076": "VRT-CA-IL-4020-ES-RECT",
+        "vortice-ca-il-5035-es-rect": "VRT-CA-IL-5035-ES-RECT",
+        "vortice-ca-il-5035-es-rect-16077": "VRT-CA-IL-5035-ES-RECT",
+        "vortice-ca-il-6040-es-rect": "VRT-CA-IL-6040-ES-RECT",
+        "vortice-ca-il-6040-es-rect-16078": "VRT-CA-IL-6040-ES-RECT",
+        "vortice-ca-il-7050-es-rect": "VRT-CA-IL-7050-ES-RECT",
+        "vortice-ca-il-7050-es-rect-16079": "VRT-CA-IL-7050-ES-RECT",
+        "vortice-ca-il-8060-es-rect": "VRT-CA-IL-8060-ES-RECT",
+        "vortice-ca-il-8060-es-rect-16080": "VRT-CA-IL-8060-ES-RECT",
+        "vortice-ca-rm-100-es-16277": "VRT-16277",
+        "vortice-ca-rm-125-es-16278": "VRT-16278",
+        "vortice-ca-rm-150-es-16279": "VRT-16279",
+        "vortice-ca-rm-150-rf-es-16257": "VRT-16257",
+        "vortice-ca-rm-160-es-16280": "VRT-16280",
+        "vortice-ca-rm-160-rf-es-16258": "VRT-16258",
+        "vortice-ca-rm-200-es-16281": "VRT-16281",
+        "vortice-ca-rm-200-rf-es-16259": "VRT-16259",
+        "vortice-deumido-ng-10-26020": "VRT-26020",
+        "vortice-deumido-ng-16-26021": "VRT-26021",
+        "vortice-deumido-ng-20-26022": "VRT-26022",
+        "vortice-e-254-m-atex-40320": "VRT-40320",
+        "vortice-e-254-t-atex-40325": "VRT-40325",
+        "vortice-e-304-m-atex-40321": "VRT-40321",
+        "vortice-e-304-t-atex-40326": "VRT-40326",
+        "vortice-e-354-m-40703": "VRT-40703",
+        "vortice-e-354-m-atex-40322": "VRT-40322",
+        "vortice-e-354-t-atex-40327": "VRT-40327",
+        "vortice-e-404-m-40903": "VRT-40903",
+        "vortice-e-404-m-atex-40323": "VRT-40323",
+        "vortice-e-404-t-atex-40328": "VRT-40328",
+        "vortice-e-454-m-atex-40324": "VRT-40324",
+        "vortice-e-454-t-atex-40329": "VRT-40329",
+        "vortice-e-504-m-41219": "VRT-41219",
+        "vortice-e-504-t-atex-40330": "VRT-40330",
+        "vortice-e-506-t-atex-40333": "VRT-40333",
+        "vortice-e-604-m-41459": "VRT-41459",
+        "vortice-e-604-t-atex-40331": "VRT-40331",
+        "vortice-e-606-t-atex-40332": "VRT-40332",
+        "vortice-heatmaster-f400-315-m4-0-25kw-15301": "VRT-15301",
+        "vortice-heatmaster-f400-315-t4-0-25kw-15261": "VRT-15261",
+        "vortice-heatmaster-f400-355-m4-0-25kw-15302": "VRT-15302",
+        "vortice-heatmaster-f400-355-t4-0-25kw-15262": "VRT-15262",
+        "vortice-heatmaster-f400-400-m4-0-55kw-15303": "VRT-15303",
+        "vortice-heatmaster-f400-400-t4-0-55kw-15263": "VRT-15263",
+        "vortice-heatmaster-f400-450-t4-1-1kw-15264": "VRT-15264",
+        "vortice-heatmaster-f400-500-t4-1-5kw-15265": "VRT-15265",
+        "vortice-heatmaster-f400-560-t4-3kw-15266": "VRT-15266",
+        "vortice-heatmaster-f400-630-t4-5-5kw-15267": "VRT-15267",
+        "vortice-lineo-100-17144": "VRT-17144",
+        "vortice-lineo-100-q-17143": "VRT-17143",
+        "vortice-lineo-100-quiet-17160": "VRT-17160",
+        "vortice-lineo-100-quiet-es-17170": "VRT-17170",
+        "vortice-lineo-125-17145": "VRT-17145",
+        "vortice-lineo-125-quiet-17161": "VRT-17161",
+        "vortice-lineo-125-quiet-es-17171": "VRT-17171",
+        "vortice-lineo-150-17146": "VRT-17146",
+        "vortice-lineo-150-quiet-17162": "VRT-17162",
+        "vortice-lineo-150-quiet-es-17172": "VRT-17172",
+        "vortice-lineo-200-17180": "VRT-17180",
+        "vortice-lineo-200-quiet-17164": "VRT-17164",
+        "vortice-lineo-200-quiet-es-17174": "VRT-17174",
+        "vortice-lineo-250-17181": "VRT-17181",
+        "vortice-lineo-250-quiet-17165": "VRT-17165",
+        "vortice-lineo-250-quiet-es-17175": "VRT-17175",
+        "vortice-lineo-315-17182": "VRT-17182",
+        "vortice-lineo-315-quiet-17166": "VRT-17166",
+        "vortice-lineo-315-quiet-es-17176": "VRT-17176",
+        "vortice-mp-302-t-42302": "VRT-42302",
+        "vortice-mp-304-t-42304": "VRT-42304",
+        "vortice-mp-354-t-42314": "VRT-42314",
+        "vortice-mp-404-t-42324": "VRT-42324",
+        "vortice-mp-454-t-42335": "VRT-42335",
+        "vortice-mp-504-t-42344": "VRT-42344",
+        "vortice-mp-506-t-42334": "VRT-42334",
+        "vortice-mp-604-t-42374": "VRT-42374",
+        "vortice-nordik-hvls-hyperblade-300-120-m-svt-61181": "VRT-61181",
+        "vortice-nordik-hvls-hyperblade-300-120-t-svt-61186": "VRT-61186",
+        "vortice-nordik-hvls-hyperblade-400-160-m-svt-61182": "VRT-61182",
+        "vortice-nordik-hvls-hyperblade-400-160-t-svt-61187": "VRT-61187",
+        "vortice-nordik-hvls-hyperblade-500-200-t-svt-61188": "VRT-61188",
+        "vortice-nordik-hvls-hyperblade-600-240-t-svt-61189": "VRT-61189",
+        "vortice-nordik-hvls-hyperblade-700-280-t-svt-61190": "VRT-61190",
+        "vortice-punto-evo-flexo-mex-100-4-ll-1s-11313": "VRT-11313",
+        "vortice-punto-evo-flexo-mex-100-4-ll-1s-t-11314": "VRT-11314",
+        "vortice-punto-evo-flexo-mex-120-5-ll-1s-11333": "VRT-11333",
+        "vortice-punto-evo-flexo-mex-120-5-ll-1s-t-11334": "VRT-11334",
+        "vortice-slimroof-155-m-es-15271": "VRT-15271",
+        "vortice-slimroof-190-m-es-15272": "VRT-15272",
+        "vortice-slimroof-220-m-es-15273": "VRT-15273",
+        "vortice-slimroof-250-m-es-15274": "VRT-15274",
+        "vortice-slimroof-310-m-es-15275": "VRT-15275",
+        "vortice-slimroof-355-t-es-15276": "VRT-15276",
+        "vortice-slimroof-450-t-es-15277": "VRT-15277",
+        "vortice-slimroof-500-t-es-15278": "VRT-15278",
+        "vortice-slimroof-560-t-es-15279": "VRT-15279",
+        "vortice-slimroof-630-t-es-15311": "VRT-15311",
+        "vortice-tiracamino-somine-ve-baca-fani-15000": "VRT-15000",
+        "vortice-vort-hr-300-neti-10930": "VRT-10930",
+        "vortice-vort-hr-350-avel-12106": "VRT-12106",
+        "vortice-vort-hr-350-avel-h-10911": "VRT-10911",
+        "vortice-vort-hr-450-avel-d-12101": "VRT-12101",
+        "vortice-vort-hrw-30-mono-evo-12434": "VRT-12434",
+        "vortice-vort-hrw-30-mono-evo-hcs-12436": "VRT-12436",
+        "vortice-vort-hrw-30-mono-evo-hcs-wi-fi-12443": "VRT-12443",
+        "vortice-vort-hrw-40-mono-evo-12435": "VRT-12435",
+        "vortice-vort-hrw-40-mono-evo-hcs-12437": "VRT-12437",
+        "vortice-vort-hrw-40-mono-evo-hcs-wi-fi-12444": "VRT-12444",
+        "vortice-vort-hrw-60-mono-evo-hcs-12431": "VRT-12431",
+        "vortice-vort-hrw-60-mono-evo-hcs-wi-fi-12432": "VRT-12432",
+        "vortice-vort-invisible-mini-top-12219": "VRT-12219",
+        "vortice-vort-quadro-evo-qe-100-60-35-ll-11525": "VRT-11525",
+        "vortice-vort-quadro-evo-qe-100-60-35-ll-tp-11536": "VRT-11536",
+        "vortice-vort-quadro-evo-qe-100-60-35-ll-tp-hcs-11543": "VRT-11543",
+        "vortice-vort-quadro-evo-qe-100-60-ll-11524": "VRT-11524",
+        "vortice-vort-quadro-evo-qe-100-60-ll-t-11531": "VRT-11531",
+        "vortice-vort-quadro-evo-qe-100-60-ll-t-pir-11547": "VRT-11547",
+        "vortice-vort-quadro-evo-qe-100-60-ll-tp-11535": "VRT-11535",
+        "vortice-vort-quadro-evo-qe-100-60-ll-tp-hcs-11542": "VRT-11542",
+        "vortice-vort-quadro-evo-qe-100-ll-11522": "VRT-11522",
+        "vortice-vort-quadro-evo-qe-100-ll-t-11527": "VRT-11527",
+        "vortice-vort-quadro-evo-qe-100-ll-t-pir-11545": "VRT-11545",
+        "vortice-vort-quadro-evo-qe-100-ll-tp-11533": "VRT-11533",
+        "vortice-vort-quadro-evo-qe-100-ll-tp-hcs-11538": "VRT-11538",
+        "vortice-vort-quadro-evo-qe-60-35-ll-11523": "VRT-11523",
+        "vortice-vort-quadro-evo-qe-60-35-ll-t-11528": "VRT-11528",
+        "vortice-vort-quadro-evo-qe-60-35-ll-t-pir-11546": "VRT-11546",
+        "vortice-vort-quadro-evo-qe-60-35-ll-tp-11534": "VRT-11534",
+        "vortice-vort-quadro-evo-qe-60-35-ll-tp-hcs-11541": "VRT-11541",
+        "vortice-vort-quadro-evo-qe-60-ll-11521": "VRT-11521",
+        "vortice-vort-quadro-evo-qe-60-ll-t-11526": "VRT-11526",
+        "vortice-vort-quadro-evo-qe-60-ll-t-pir-11544": "VRT-11544",
+        "vortice-vort-quadro-evo-qe-60-ll-tp-11532": "VRT-11532",
+        "vortice-vort-quadro-evo-qe-60-ll-tp-hcs-11537": "VRT-11537",
+        "vorticent-cms-atex-12-5-t4-0-09kw-253080106xn": "VRT-253080106XN",
+        "vorticent-cms-atex-14-5-t2-0-25kw-253100106xn": "VRT-253100106XN",
+        "vorticent-cms-atex-14-5-t4-0-09kw-253090106xe": "VRT-253090106XE",
+        "vorticent-cms-atex-16-6-t2-0-37kw-253110106xn": "VRT-253110106XN",
+        "vorticent-cms-atex-22-9-t4-0-37kw-253260106xn": "VRT-253260106XN",
+        "vorticent-cms-atex-25-10-t4-0-75kw-253320106xn": "VRT-253320106XN",
+        "vorticent-cms-atex-28-11-t4-1-1kw-253410106xn": "VRT-253410106XN",
+        "vorticent-cms-atex-31-12-t4-2-2kw-253420106xn": "VRT-253420106XN",
+        "vorticent-cms-atex-35-14-t4-3kw-253490106xn": "VRT-253490106XN",
+        "vorticent-cms-atex-35-14-t4-4kw-253490106xn": "VRT-253490106XN",
+        "vorticent-cms-atex-40-16-t4-7-5kw-253510106xn": "VRT-253510106XN",
+        "vorticent-cms-atex-45-18-t4-11kw-253530121xn": "VRT-253530121XN"
+      },
+      "aileSluglari": {
+        "avens-bvu-ls": 0,
+        "avens-bvu-ls-kursun-seperator": 0,
+        "avens-bvu-siginak-havalandirma-uniteleri": 1,
+        "avens-dikdortgen-kanal-radyal": 2,
+        "avens-dikdortgen-kanal-tipi-radyal-fanlar": 2,
+        "avens-elektrikli-isiticilar": 3,
+        "avens-elektrikli-kanal-isiticilari": 3,
+        "avens-enkelfan-ec-plug": 10,
+        "avens-hiz-anahtarlari": 4,
+        "avens-hucreli-aspiratorler": 5,
+        "avens-hucreli-aspiratorler-hf-fw": 5,
+        "avens-hucreli-aspiratorler-hf-s": 6,
+        "avens-hucreli-hf-s": 6,
+        "avens-isi-geri-kazanim": 7,
+        "avens-isi-geri-kazanim-cihazlari": 7,
+        "avens-nimax": 12,
+        "avens-nimus": 13,
+        "avens-plug-fanlar": 11,
+        "avens-qe-b-kasa": 8,
+        "avens-qe-b-kasa-serisi": 8,
+        "avens-siginak-havalandirma-uniteleri": 1,
+        "avens-sulu-batarya": 9,
+        "avens-sulu-batarya-kanal-tipi": 9,
+        "casals-enkelfan-ec-plug": 10,
+        "casals-kentalfan-plug": 11,
+        "casals-nimax": 12,
+        "casals-nimus": 13,
+        "danfoss-fc101": 14,
+        "danfoss-fc102": 15,
+        "danfoss-fc51": 16,
+        "danfoss-vlt-hvac-basic-drive-fc-101": 14,
+        "danfoss-vlt-hvac-drive-fc-102": 15,
+        "danfoss-vlt-micro-drive-fc-51": 16,
+        "jet-serisi": 17,
+        "nicotra-gebhardt-adh": 18,
+        "nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar": 18,
+        "nicotra-gebhardt-at": 19,
+        "nicotra-gebhardt-at-cift-emisli-radyal-fanlar": 19,
+        "nicotra-gebhardt-dd": 20,
+        "nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar": 20,
+        "nicotra-gebhardt-rdh": 21,
+        "nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar": 21,
+        "seat-atex-ptc-sensor": 22,
+        "seat-atex-ptc-sensoru": 22,
+        "seat-serisi": 23,
+        "storm-serisi": 24,
+        "vortice-ad-isiticisiz-hava-perdeleri": 25,
+        "vortice-aksiyel-endustriyel-fanlar": 26,
+        "vortice-bravo-s": 27,
+        "vortice-deumido-nem-alma-cihazlari": 28,
+        "vortice-deumido-range": 28,
+        "vortice-h-ad-elektrikli": 29,
+        "vortice-h-ad-elektrikli-isiticili-hava-perdeleri": 29,
+        "vortice-hava-perdesi": 25,
+        "vortice-heatmaster-duman-egzoz-fanlari": 30,
+        "vortice-isi-geri-kazanim": 42,
+        "vortice-lineo": 31,
+        "vortice-lineo-100-quiet": 32,
+        "vortice-lineo-125-quiet": 32,
+        "vortice-lineo-150-quiet": 32,
+        "vortice-lineo-200-quiet": 32,
+        "vortice-lineo-250-quiet": 32,
+        "vortice-lineo-315-quiet": 32,
+        "vortice-lineo-kanal-fanlari": 31,
+        "vortice-lineo-quiet": 32,
+        "vortice-lineo-quiet-sessiz-kanal-fanlari": 32,
+        "vortice-nordik-hvls-hyperblade": 33,
+        "vortice-punto-evo-flexo": 34,
+        "vortice-punto-evo-flexo-banyo-fanlari": 34,
+        "vortice-radon-range-circular": 36,
+        "vortice-radon-range-roof": 35,
+        "vortice-radon-serisi-cati-fanlari": 35,
+        "vortice-radon-serisi-kanal-fanlari": 36,
+        "vortice-slimroof-cati-fanlari": 37,
+        "vortice-tiracamino-somine-ve-baca-fanlari": 38,
+        "vortice-vort-commercial-in-line-circular": 40,
+        "vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari": 39,
+        "vortice-vort-commercial-in-line-rectangular": 39,
+        "vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari": 40,
+        "vortice-vort-e-atex": 41,
+        "vortice-vort-e-atex-fanlar": 41,
+        "vortice-vort-heatmaster-slimroof-roof": 37,
+        "vortice-vort-heatmaster-slimroof-smoke": 30,
+        "vortice-vort-hr-isi-geri-kazanim": 42,
+        "vortice-vort-industrial-ventilation-axial": 26,
+        "vortice-vort-industrial-ventilation-roof": 38,
+        "vortice-vort-mono": 43,
+        "vortice-vort-nordik-hvls": 33,
+        "vortice-vort-qbk-sal-kc-evo": 44,
+        "vortice-vort-quadro-evo": 45,
+        "vortice-vortice-bravo-s": 27,
+        "vortice-vorticent-cms-atex": 46,
+        "vortice-vorticent-cms-atex-santrifuj-fanlar": 46
+      },
+      "kategoriler": [
+        {
+          "tr": "aksesuarlar",
+          "en": "accessories",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "hava-perdeleri",
+          "en": "air-curtains",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "hava-sartlandirma",
+          "en": "air-treatment",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "aksiyel-fanlar",
+          "en": "axial-industrial-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "banyo-tuvalet-fanlari",
+          "en": "bathroom-toilet-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "hucreli-aspiratorler",
+          "en": "cabinet-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "radyal-fanlar",
+          "en": "centrifugal-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "somine-ve-baca-fanlari",
+          "en": "chimney-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "ticari-havalandirma",
+          "en": "commercial-ventilation",
+          "ust": null,
+          "aktif": false
+        },
+        {
+          "tr": "kontrol-ve-suruculer",
+          "en": "control-systems",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "korozyona-ve-aside-dayanimli-fanlar",
+          "en": "corrosion-and-acid-resistant-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "nem-alma-cihazlari",
+          "en": "dehumidifiers",
+          "ust": 2,
+          "aktif": true
+        },
+        {
+          "tr": "kanal-tipi-fanlar",
+          "en": "duct-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "kanalli-merkezi-uniteler",
+          "en": "ducted-central-hrv",
+          "ust": 19,
+          "aktif": true
+        },
+        {
+          "tr": "elektrikli-kanal-isiticilari",
+          "en": "electric-duct-heaters",
+          "ust": 2,
+          "aktif": true
+        },
+        {
+          "tr": "elektrikli-isiticili-hava-perdeleri",
+          "en": "electric-heated-air-curtains",
+          "ust": 1,
+          "aktif": true
+        },
+        {
+          "tr": "ex-proof-atex-fanlar",
+          "en": "ex-proof-atex-fans",
+          "ust": 17,
+          "aktif": false
+        },
+        {
+          "tr": "fanlar",
+          "en": "fans",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "frekans-konvertorleri",
+          "en": "frequency-converters",
+          "ust": 9,
+          "aktif": true
+        },
+        {
+          "tr": "isi-geri-kazanim",
+          "en": "heat-recovery-vmc",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "tavan-vantilatorleri",
+          "en": "industrial-ceiling-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "kanal-ici-hayalet-fanlar",
+          "en": "inline-duct-fans",
+          "ust": 26,
+          "aktif": false
+        },
+        {
+          "tr": "otopark-jet-fanlari",
+          "en": "jet-fans",
+          "ust": 17,
+          "aktif": false
+        },
+        {
+          "tr": "otopark-jet-fan",
+          "en": "parking-jet-fan",
+          "ust": 17,
+          "aktif": false
+        },
+        {
+          "tr": "plug-fanlar",
+          "en": "plug-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "dikdortgen-kanal-fanlari",
+          "en": "rectangular-duct-fans",
+          "ust": 8,
+          "aktif": false
+        },
+        {
+          "tr": "konut-tipi-havalandirma",
+          "en": "residential-ventilation",
+          "ust": null,
+          "aktif": false
+        },
+        {
+          "tr": "cati-tipi-fanlar",
+          "en": "roof-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "siginak-havalandirma",
+          "en": "shelter-ventilation",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "tek-oda-uniteleri",
+          "en": "single-room-hrv",
+          "ust": 19,
+          "aktif": true
+        },
+        {
+          "tr": "duman-egzoz-fanlari",
+          "en": "smoke-exhaust-fans",
+          "ust": 17,
+          "aktif": true
+        },
+        {
+          "tr": "yedek-parcalar-ve-sensorler",
+          "en": "spare-parts-sensors",
+          "ust": 0,
+          "aktif": true
+        },
+        {
+          "tr": "hiz-anahtarlari",
+          "en": "speed-controllers",
+          "ust": 9,
+          "aktif": true
+        },
+        {
+          "tr": "isiticisiz-hava-perdeleri",
+          "en": "unheated-air-curtains",
+          "ust": 1,
+          "aktif": true
+        },
+        {
+          "tr": "sulu-bataryalar",
+          "en": "water-coil-duct-heaters",
+          "ust": 2,
+          "aktif": true
+        }
+      ],
+      "kategoriSluglari": {
+        "accessories": {
+          "hedef": {
+            "kategori": 0
+          },
+          "bicim": "en"
+        },
+        "acid-resistant-fans": {
+          "hedef": {
+            "kategori": 10
+          },
+          "bicim": "en"
+        },
+        "air-curtains": {
+          "hedef": {
+            "kategori": 1
+          },
+          "bicim": "en"
+        },
+        "air-purifiers": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "en"
+        },
+        "air-treatment": {
+          "hedef": {
+            "kategori": 2
+          },
+          "bicim": "en"
+        },
+        "aksesuarlar": {
+          "hedef": {
+            "kategori": 0
+          },
+          "bicim": "tr"
+        },
+        "aksiyel-fanlar": {
+          "hedef": {
+            "kategori": 3
+          },
+          "bicim": "tr"
+        },
+        "aksiyel-sanayi-fanlari": {
+          "hedef": {
+            "kategori": 3
+          },
+          "bicim": "tr"
+        },
+        "asit-dayanikli-fanlar": {
+          "hedef": {
+            "kategori": 10
+          },
+          "bicim": "tr"
+        },
+        "axial-industrial-fans": {
+          "hedef": {
+            "kategori": 3
+          },
+          "bicim": "en"
+        },
+        "banyo-tuvalet-fanlari": {
+          "hedef": {
+            "kategori": 4
+          },
+          "bicim": "tr"
+        },
+        "banyo-ve-tuvalet-fanlari": {
+          "hedef": {
+            "kategori": 4
+          },
+          "bicim": "tr"
+        },
+        "bathroom-toilet-fans": {
+          "hedef": {
+            "kategori": 4
+          },
+          "bicim": "en"
+        },
+        "cabinet-fans": {
+          "hedef": {
+            "kategori": 5
+          },
+          "bicim": "en"
+        },
+        "cati-tipi-fanlar": {
+          "hedef": {
+            "kategori": 27
+          },
+          "bicim": "tr"
+        },
+        "centrifugal-fans": {
+          "hedef": {
+            "kategori": 6
+          },
+          "bicim": "en"
+        },
+        "chimney-fans": {
+          "hedef": {
+            "kategori": 7
+          },
+          "bicim": "en"
+        },
+        "commercial-ventilation": {
+          "hedef": {
+            "kategori": 8
+          },
+          "bicim": "en"
+        },
+        "control-systems": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "en"
+        },
+        "corrosion-and-acid-resistant-fans": {
+          "hedef": {
+            "kategori": 10
+          },
+          "bicim": "en"
+        },
+        "dehumidifiers": {
+          "hedef": {
+            "kategori": 11
+          },
+          "bicim": "en"
+        },
+        "dikdortgen-kanal-fanlari": {
+          "hedef": {
+            "kategori": 25
+          },
+          "bicim": "tr"
+        },
+        "duct-fans": {
+          "hedef": {
+            "kategori": 12
+          },
+          "bicim": "en"
+        },
+        "ducted-central-hrv": {
+          "hedef": {
+            "kategori": 13
+          },
+          "bicim": "en"
+        },
+        "duman-egzoz-fanlari": {
+          "hedef": {
+            "kategori": 30
+          },
+          "bicim": "tr"
+        },
+        "electric-duct-heaters": {
+          "hedef": {
+            "kategori": 14
+          },
+          "bicim": "en"
+        },
+        "electric-heated-air-curtains": {
+          "hedef": {
+            "kategori": 15
+          },
+          "bicim": "en"
+        },
+        "elektrikli-isiticili-hava-perdeleri": {
+          "hedef": {
+            "kategori": 15
+          },
+          "bicim": "tr"
+        },
+        "elektrikli-kanal-isiticilari": {
+          "hedef": {
+            "kategori": 14
+          },
+          "bicim": "tr"
+        },
+        "endustriyel-havalandirma": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "tr"
+        },
+        "endustriyel-tavan-vantilatorleri": {
+          "hedef": {
+            "kategori": 20
+          },
+          "bicim": "tr"
+        },
+        "ex-proof-atex-fanlar": {
+          "hedef": {
+            "kategori": 16
+          },
+          "bicim": "tr"
+        },
+        "ex-proof-atex-fans": {
+          "hedef": {
+            "kategori": 16
+          },
+          "bicim": "en"
+        },
+        "fanlar": {
+          "hedef": {
+            "kategori": 17
+          },
+          "bicim": "tr"
+        },
+        "fans": {
+          "hedef": {
+            "kategori": 17
+          },
+          "bicim": "en"
+        },
+        "flexible-air-ducts": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "en"
+        },
+        "flexible-hava-kanallari": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "tr"
+        },
+        "frekans-konvertorleri": {
+          "hedef": {
+            "kategori": 18
+          },
+          "bicim": "tr"
+        },
+        "frequency-converters": {
+          "hedef": {
+            "kategori": 18
+          },
+          "bicim": "en"
+        },
+        "hava-perdeleri": {
+          "hedef": {
+            "kategori": 1
+          },
+          "bicim": "tr"
+        },
+        "hava-sartlandirma": {
+          "hedef": {
+            "kategori": 2
+          },
+          "bicim": "tr"
+        },
+        "hava-temizleyiciler-anti-viral-urunler": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "tr"
+        },
+        "heat-recovery-units": {
+          "hedef": {
+            "kategori": 19
+          },
+          "bicim": "en"
+        },
+        "heat-recovery-vmc": {
+          "hedef": {
+            "kategori": 19
+          },
+          "bicim": "en"
+        },
+        "hiz-anahtarlari": {
+          "hedef": {
+            "kategori": 32
+          },
+          "bicim": "tr"
+        },
+        "hiz-kontrolu-cihazlari": {
+          "hedef": {
+            "kategori": 32
+          },
+          "bicim": "tr"
+        },
+        "hucreli-aspiratorler": {
+          "hedef": {
+            "kategori": 5
+          },
+          "bicim": "tr"
+        },
+        "iklimlendirme-ve-hava-sartlandirma": {
+          "hedef": {
+            "kategori": 2
+          },
+          "bicim": "tr"
+        },
+        "industrial-ceiling-fans": {
+          "hedef": {
+            "kategori": 20
+          },
+          "bicim": "en"
+        },
+        "industrial-ventilation": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "en"
+        },
+        "inline-duct-fans": {
+          "hedef": {
+            "kategori": 21
+          },
+          "bicim": "en"
+        },
+        "isi-geri-kazanim": {
+          "hedef": {
+            "kategori": 19
+          },
+          "bicim": "tr"
+        },
+        "isi-geri-kazanim-cihazlari": {
+          "hedef": {
+            "kategori": 19
+          },
+          "bicim": "tr"
+        },
+        "isiticisiz-hava-perdeleri": {
+          "hedef": {
+            "kategori": 33
+          },
+          "bicim": "tr"
+        },
+        "jet-fans": {
+          "hedef": {
+            "kategori": 22
+          },
+          "bicim": "en"
+        },
+        "kanal-ici-hayalet-fanlar": {
+          "hedef": {
+            "kategori": 21
+          },
+          "bicim": "tr"
+        },
+        "kanal-tipi-fanlar": {
+          "hedef": {
+            "kategori": 12
+          },
+          "bicim": "tr"
+        },
+        "kanalli-merkezi-uniteler": {
+          "hedef": {
+            "kategori": 13
+          },
+          "bicim": "tr"
+        },
+        "kontrol-sistemleri": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "tr"
+        },
+        "kontrol-ve-suruculer": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "tr"
+        },
+        "konut-tipi-havalandirma": {
+          "hedef": {
+            "kategori": 26
+          },
+          "bicim": "tr"
+        },
+        "korozyona-ve-aside-dayanimli-fanlar": {
+          "hedef": {
+            "kategori": 10
+          },
+          "bicim": "tr"
+        },
+        "nem-alma-cihazlari": {
+          "hedef": {
+            "kategori": 11
+          },
+          "bicim": "tr"
+        },
+        "otopark-jet-fan": {
+          "hedef": {
+            "kategori": 23
+          },
+          "bicim": "tr"
+        },
+        "otopark-jet-fanlari": {
+          "hedef": {
+            "kategori": 22
+          },
+          "bicim": "tr"
+        },
+        "parking-jet-fan": {
+          "hedef": {
+            "kategori": 23
+          },
+          "bicim": "en"
+        },
+        "plug-fanlar": {
+          "hedef": {
+            "kategori": 24
+          },
+          "bicim": "tr"
+        },
+        "plug-fans": {
+          "hedef": {
+            "kategori": 24
+          },
+          "bicim": "en"
+        },
+        "radyal-fanlar": {
+          "hedef": {
+            "kategori": 6
+          },
+          "bicim": "tr"
+        },
+        "rectangular-duct-fans": {
+          "hedef": {
+            "kategori": 25
+          },
+          "bicim": "en"
+        },
+        "residential-ventilation": {
+          "hedef": {
+            "kategori": 26
+          },
+          "bicim": "en"
+        },
+        "roof-fans": {
+          "hedef": {
+            "kategori": 27
+          },
+          "bicim": "en"
+        },
+        "shelter-ventilation": {
+          "hedef": {
+            "kategori": 28
+          },
+          "bicim": "en"
+        },
+        "siginak-havalandirma": {
+          "hedef": {
+            "kategori": 28
+          },
+          "bicim": "tr"
+        },
+        "single-room-hrv": {
+          "hedef": {
+            "kategori": 29
+          },
+          "bicim": "en"
+        },
+        "smoke-exhaust-fans": {
+          "hedef": {
+            "kategori": 30
+          },
+          "bicim": "en"
+        },
+        "somine-ve-baca-fanlari": {
+          "hedef": {
+            "kategori": 7
+          },
+          "bicim": "tr"
+        },
+        "spare-parts-sensors": {
+          "hedef": {
+            "kategori": 31
+          },
+          "bicim": "en"
+        },
+        "speed-controllers": {
+          "hedef": {
+            "kategori": 32
+          },
+          "bicim": "en"
+        },
+        "sulu-batarya-kanal-tipi": {
+          "hedef": {
+            "kategori": 34
+          },
+          "bicim": "tr"
+        },
+        "sulu-bataryalar": {
+          "hedef": {
+            "kategori": 34
+          },
+          "bicim": "tr"
+        },
+        "tavan-vantilatorleri": {
+          "hedef": {
+            "kategori": 20
+          },
+          "bicim": "tr"
+        },
+        "tek-oda-uniteleri": {
+          "hedef": {
+            "kategori": 29
+          },
+          "bicim": "tr"
+        },
+        "tekil-oda-uniteleri": {
+          "hedef": {
+            "kategori": 29
+          },
+          "bicim": "tr"
+        },
+        "ticari-havalandirma": {
+          "hedef": {
+            "kategori": 8
+          },
+          "bicim": "tr"
+        },
+        "unheated-air-curtains": {
+          "hedef": {
+            "kategori": 33
+          },
+          "bicim": "en"
+        },
+        "water-coil-duct-heaters": {
+          "hedef": {
+            "kategori": 34
+          },
+          "bicim": "en"
+        },
+        "yedek-parca-ve-sensorler": {
+          "hedef": {
+            "kategori": 31
+          },
+          "bicim": "tr"
+        },
+        "yedek-parcalar-ve-sensorler": {
+          "hedef": {
+            "kategori": 31
+          },
+          "bicim": "tr"
+        }
+      }
+    }
+  }
+}
