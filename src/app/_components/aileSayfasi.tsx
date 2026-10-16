@@ -259,7 +259,9 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   const subCategory = family?.subcategory ?? null
 
   // W3.1: aile bulunamadıysa (not-found) JSON-LD hiç yazılmaz — tanımlanacak bir
-  // ürün yok; ProductGroup + hasVariant[] (teklif modunda offers HİÇ yazılmaz).
+  // ürün yok. Biçim `buildProductGroupJsonLd` içinde seçilir (URN-138): tüm varyantı görünür fiyatlı aile
+  // ProductGroup + hasVariant[]; teklif kipli / fiyatsız / karışık aile CollectionPage + ItemList (offers HİÇ yazılmaz).
+  // Model rotası (`sunucuSku`) AYNI çağrıdan geçer: ayrı bir model JSON-LD'si yok, karar tek yerde.
   const jsonLd = family
     ? buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL, mainCategory })
     : null

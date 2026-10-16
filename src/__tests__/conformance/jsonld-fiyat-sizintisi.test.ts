@@ -110,8 +110,14 @@ describe('INV-FIYAT-SIZINTI-2 · yapısal veri teklif modunda fiyat yayınlamaz'
     })
     const k = anahtarlar(jsonLd)
     expect([...k].filter((x) => ['price', 'offers', 'priceCurrency'].includes(x))).toEqual([])
-    // Düğüm yine üretilir — sızıntıyı kapatmak, yapısal veriyi yok etmek değildir.
-    expect(JSON.stringify(jsonLd)).toContain('hasVariant')
+    // URN-138 (SEO-56 A): sızıntıyı kapatmak yapısal veriyi yok etmek DEĞİLDİR — ama ürün düğümü de kalmaz:
+    // Google ürün snippet'i `offers/review/aggregateRating` ister, teklif kipinde bunların hiçbiri yazılamaz.
+    // Yerine model listesi (CollectionPage + ItemList, fiyatsız) yazılır; `hasVariant` kısmi de olsa YAZILMAZ.
+    expect(jsonLd['@type']).toBe('CollectionPage')
+    expect(k.has('hasVariant')).toBe(false)
+    expect(JSON.stringify(jsonLd)).toContain('"ItemList"')
+    // Fiyat değeri de hiçbir yerde yok (anahtar silinip değer başka alana taşınmamış).
+    expect(JSON.stringify(jsonLd)).not.toContain('37773')
   })
 
   it('⭐MOD BİLİNMİYORSA (kategori null) — yine fiyat yok (güvenli duruş)', () => {
@@ -123,6 +129,24 @@ describe('INV-FIYAT-SIZINTI-2 · yapısal veri teklif modunda fiyat yayınlamaz'
       mainCategory: null,
     })
     expect([...anahtarlar(jsonLd)].includes('offers')).toBe(false)
+    expect(jsonLd['@type']).toBe('CollectionPage')
+    expect(JSON.stringify(jsonLd)).not.toContain('37773')
+  })
+
+  it('⭐KARIŞIK AİLE (biri fiyatlı, biri fiyatsız) — fiyatlı varyantın fiyatı da sızmaz, kısmi hasVariant yok', () => {
+    const fiyatli = fiyatliVaryant()
+    expect(Number(fiyatli.price)).toBeGreaterThan(0) // kurgu gerçekten fiyatlı
+    const jsonLd = buildProductGroupJsonLd({
+      family: aile(),
+      variants: [fiyatli, { ...fiyatliVaryant(), id: 'v-2', sku: 'SKU-2', price: null }],
+      lang: 'tr',
+      baseUrl: BASE_URL,
+      mainCategory: { metadata: { hide_price: false } },
+    })
+    const k = anahtarlar(jsonLd)
+    expect([...k].filter((x) => ['price', 'offers', 'priceCurrency', 'hasVariant'].includes(x))).toEqual([])
+    expect(jsonLd['@type']).toBe('CollectionPage')
+    expect(JSON.stringify(jsonLd)).not.toContain('37773')
   })
 
   it('⭐AYNA İDDİA — SATIŞ MODUNDA fiyat alanı VAR (dönüş yolculuğu güvencesi)', () => {
@@ -144,6 +168,7 @@ describe('INV-FIYAT-SIZINTI-2 · yapısal veri teklif modunda fiyat yayınlamaz'
       mainCategory: { metadata: { hide_price: false } },
     })
     const metin = JSON.stringify(jsonLd)
+    expect(jsonLd['@type']).toBe('ProductGroup')
     expect(metin).toContain('"offers"')
     expect(metin).toContain('37773.38')
   })
