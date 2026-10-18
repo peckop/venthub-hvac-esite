@@ -39,6 +39,16 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · salt-okuma komutlar geçer', () => {
     ['git branch --show-current', 'git branch --show-current'],
     ['curl durum kodu, çıktı /dev/null', 'curl -s -o /dev/null -w "%{http_code}" https://example.com/'],
     ['.env.example okunabilir', 'cat .env.example'],
+    ['arama sözcüğü token dosya adı değildir', 'grep -rn token src'],
+    ['grep -r güvenli klasörlerde', 'grep -rn foo src docs'],
+    ['grep -r -e ile desen, klasör operandı', 'grep -rn -e foo src'],
+    ['sort sade bayraklarla', 'sort -u a'],
+    ['gh api GET açık', 'gh api -X GET repos/a/b'],
+    ['gh api --method=GET', 'gh api --method=GET repos/a/b'],
+    ['gh api güvenli jq süzgeci', 'gh api repos/a/b/pulls --jq ".[0].title"'],
+    ['gh auth status', 'gh auth status'],
+    ['curl HEAD (-I) yönlendirmesiz', 'curl -sI https://example.com/'],
+    ['URL içinde token geçmesi dosya yolu değildir', 'curl -s "https://example.com/get-token?key=abc"'],
   ])('ALLOW · %s', (_ad, komut) => {
     expect(karar(komut)).toBe('allow')
   })
@@ -66,7 +76,17 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · yazan, tehlikeli ya da ayrıştırılamayan
     ['sed -i', 'sed -i s/a/b/ f'],
     ['.env oku', 'cat .env'],
     ['.env.local oku', 'cat .env.local'],
+    ['git show ile .env (ayırıcı iki nokta)', 'git show HEAD:.env'],
+    ['git show ile .env.local', 'git show main:.env.local'],
+    ['oturum anahtarı dosyası', 'cat ~/.claude/.credentials.json'],
+    ['aws kimlik dosyası', 'cat ~/.aws/credentials'],
+    ['gh hosts.yml', 'cat ~/.config/gh/hosts.yml'],
+    ['ssh dizini', 'cat ~/.ssh/config'],
+    ['adında token geçen dosya', 'cat secrets/api-token.txt'],
+    ['uzantılı token dosyası', 'cat access_token.json'],
     ['nokta-dosya glob', 'cat .e*'],
+    ['tüm nokta dosyaları glob', 'cat .*'],
+    ['köşeli parantezli nokta dosyası', 'cat .[e]nv'],
     ['arka plan &', 'sleep 5 &'],
     ['alt kabuk', '(cd x && ls)'],
     ['ortam ön eki', 'FOO=1 git status'],
@@ -78,6 +98,34 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · yazan, tehlikeli ya da ayrıştırılamayan
     ['jq env sızdırır', 'jq -n env'],
     ['node -e', 'node -e "1"'],
     ['xargs rm', 'ls | xargs rm'],
+    ['brace expansion .env dosyasını kurar', 'cat .e{nv,}'],
+    ['brace expansion bayrak üretir', 'git status{,}'],
+    ['git ls-remote komut çalıştırır', 'git ls-remote --upload-pack=sh origin'],
+    ['git ls-remote ağa çıkar', 'git ls-remote origin'],
+    ['git log --textconv', 'git log -p --textconv'],
+    ['git grep --untracked ignore edilenleri okur', 'git grep --untracked foo'],
+    ['git diff --no-index çalışma ağacı dışı okur', 'git diff --no-index a b'],
+    ['sort --compress-program komut çalıştırır', 'sort --compress-program=sh a'],
+    ['sort -o dosyaya yazar', 'sort -o x a'],
+    ['gh api --method=POST', 'gh api --method=POST repos/a/b/issues'],
+    ['gh api -X=POST', 'gh api -X=POST repos/a/b/issues'],
+    ['gh api --input', 'gh api repos/a/b --input file'],
+    ['gh api -H @dosya', 'gh api repos/a/b -H @file'],
+    ['gh api --jq env', 'gh api repos/a/b --jq env'],
+    ['gh auth status --show-token', 'gh auth status --show-token'],
+    ['curl -H @dosya', 'curl -s -H @file https://example.com/'],
+    ['curl -w @dosya', 'curl -s -w @out https://example.com/'],
+    ['curl yönlendirme izler (SSRF)', 'curl -sL https://example.com/'],
+    ['curl IPv6 IPv4-eşlemeli yerel', 'curl -s "http://[::ffff:7f00:1]/"'],
+    ['curl URL kullanıcı bilgisi', 'curl -s https://user:pw@example.com/'],
+    ['grep -r nokta dizini (.env dahil)', 'grep -rn foo .'],
+    ['grep -r ev dizini', 'grep -r token ~'],
+    ['grep -r üst dizin', 'grep -rn foo ..'],
+    ['grep -r yolsuz (stdin ya da kök belirsiz)', 'grep -rn foo'],
+    ['rg --hidden', 'rg --hidden foo'],
+    ['rg -uu ignore dosyalarını atlar', 'rg -uu foo'],
+    ['date -s saati değiştirir', 'date -s 10:00'],
+    ['tail -f sonsuz bekler', 'tail -f log.txt'],
     ['kapanmamış tırnak', 'ls "unclosed'],
     ['boş komut', ''],
   ])('DENY · %s', (_ad, komut) => {
@@ -142,6 +190,23 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · kanca süreci (stdin → stdout, kayıt)', 
     const r = calistir(null, '{bozuk json')
     expect(r.status).toBe(0)
     expect(r.stdout).toBe('')
+  })
+
+  it('kayıt: Bearer, -u parola, URL kullanıcı bilgisi, AWS ve Slack anahtarları maskelenir', () => {
+    const yerel = fs.mkdtempSync(path.join(os.tmpdir(), 'izin-kayit-gizli-'))
+    const komut =
+      'curl -s -H "Authorization: Bearer abcdef123456ghijkl" -u admin:hunter2pass https://usr:pwd9@example.com/ AKIAABCDEFGHIJKLMNOP xoxb-1234567890-abcdefghij'
+    spawnSync(process.execPath, [KANCA], {
+      input: JSON.stringify(bash(komut)),
+      encoding: 'utf8',
+      env: { ...process.env, IZIN_KAYIT_DIZINI: yerel },
+    })
+    const gun = new Date().toISOString().slice(0, 10)
+    const ham = fs.readFileSync(path.join(yerel, `${gun}.jsonl`), 'utf8')
+    for (const sir of ['abcdef123456ghijkl', 'hunter2pass', 'pwd9', 'AKIAABCDEFGHIJKLMNOP', 'xoxb-1234567890-abcdefghij']) {
+      expect(ham, `kayıtta sır kaldı: ${sir}`).not.toContain(sir)
+    }
+    expect(ham).toMatch(/GIZLI/)
   })
 
   it('her karar kayda yazılır; komuttaki sır maskelenir', () => {

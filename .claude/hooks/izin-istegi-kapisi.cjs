@@ -172,7 +172,8 @@ function ayristir(komut) {
       continue
     }
     if (c === '(' || c === ')') return { hata: 'alt kabuk / gruplama ()' }
-    if ((c === '{' || c === '}') && !basladi && (i + 1 >= s.length || /\s/.test(s[i + 1]))) return { hata: 'küme {}' }
+    // Tırnaksız { } hiçbir yerde kabul edilmez: brace expansion ({.en,v}), gruplama ve komut kümesi allowlist'i aşar.
+    if (c === '{' || c === '}') return { hata: 'tırnaksız süslü parantez (brace expansion / küme)' }
     if (c === '<') return { hata: 'girdi yönlendirmesi / here-doc / süreç ikamesi' }
     if (c === '>') {
       // yalnız /dev/null ve 2>&1 / >&2
@@ -223,15 +224,25 @@ function ayristir(komut) {
 
 // ───────────────────────── komut kuralları ─────────────────────────
 
+// Ayırıcı kümesine ':' dahil: `git show HEAD:.env` biçimi de yakalanır (OPS incelemesi, #1997).
 const HASSAS = [
-  /(^|[/\\])\.env(\.(?!example$)[^/\\]*)?$/i,
+  /(^|[/\\:])\.env(\.(?!example$)[^/\\:]*)?$/i,
   /\.(pem|key|p12|pfx)$/i,
   /id_(rsa|ed25519|ecdsa|dsa)/i,
-  /(^|[/\\])\.(git-credentials|netrc|npmrc|pgpass)$/i,
-  /service[-_]?account[^/\\]*\.json$/i,
+  /(^|[/\\:])\.(git-credentials|netrc|npmrc|pgpass)$/i,
+  /service[-_]?account[^/\\:]*\.json$/i,
+  // Kimlik dosyaları: oturum anahtarı, bulut, gh, ssh (OPS incelemesi, #1997).
+  /(^|[/\\:])\.?credentials(\.json)?$/i,
+  /hosts\.yml$/i,
+  /\.aws[/\\]/i,
+  /\.ssh[/\\]/i,
+  // Adında "token" geçen DOSYA: yol ayırıcılı ya da uzantılı argüman (arama sözcüğü `grep token` etkilenmez).
+  /[/\\:][^/\\:]*token[^/\\:]*$/i,
+  /^[^/\\:\s]*token[^/\\:\s]*\.[a-z0-9]{1,5}$/i,
 ]
 // Nokta-dosya glob'u (.e*, .env*) ya da adında env geçen glob: .env'i dolaylı okutabilir.
-const HASSAS_GLOB = /(^|[/\\])\.[^/\\]*[*?[]|[*?[][^/\\]*env/i
+// (`.e*`, `.*`, `.[e]nv`; jq süzgeci `.[0]` rakamla açıldığı için yakalanmaz.)
+const HASSAS_GLOB = /(^|[/\\])\.([A-Za-z_][^/\\]*[*?[]|[*?]|\[[A-Za-z])|[*?[][^/\\]*env/i
 const hassasMi = (a) => HASSAS.some((r) => r.test(String(a))) || HASSAS_GLOB.test(String(a))
 
 const SADE = new Set([
@@ -240,11 +251,43 @@ const SADE = new Set([
   'sha256sum', 'md5sum', 'tree', 'grep', 'egrep', 'fgrep', 'rg', 'sort', 'find', 'jq',
 ])
 
+// Özyinelemeli grep'in gezebileceği güvenli yol: nokta ya da mutlak/üst dizin ile başlamayan, glob içermeyen göreli ad.
+const GUVENLI_KLASOR = /^[A-Za-z0-9_][A-Za-z0-9_\-./]*$/
+const GREP_DEGERLI = new Set(['-e', '-f', '-m', '-A', '-B', '-C', '--include', '--exclude', '--exclude-dir', '--max-count', '--file', '--regexp'])
+
+/** grep -r / -R: .env gibi nokta dosyalarını dolaylı okutmasın diye yol operandları güvenli klasör olmalı. */
+function grepOzyinelemeli(geri) {
+  const ozy = geri.some((a) => /^-[A-Za-z]*[rR][A-Za-z]*$/.test(a) || a === '--recursive' || a === '--dereference-recursive')
+  if (!ozy) return true
+  let kalip = geri.some((a) => a === '-e' || a === '-f' || a === '--regexp' || a === '--file')
+  const yollar = []
+  for (let i = 0; i < geri.length; i += 1) {
+    const a = geri[i]
+    if (GREP_DEGERLI.has(a)) {
+      i += 1
+      continue
+    }
+    if (a.startsWith('-')) continue
+    if (!kalip) {
+      kalip = true
+      continue
+    }
+    yollar.push(a)
+  }
+  return yollar.length > 0 && yollar.every((y) => GUVENLI_KLASOR.test(y) && !y.split('/').some((p) => p.startsWith('.') ))
+}
+
 function sadeOkuma(args) {
   const ad = args[0]
   const geri = args.slice(1)
-  if (ad === 'sort' && geri.some((a) => a === '-o' || /^--output/.test(a))) return false
+  // sort: yalnız sade sıralama bayrakları; --compress-program, -T, -o, --output komut çalıştırır ya da dosya yazar.
+  if (ad === 'sort' && !geri.every((a) => !a.startsWith('-') || /^-[nruf]+$/.test(a))) return false
+  if (ad === 'date' && geri.some((a) => a === '-s' || a === '--set' || /^--set=/.test(a))) return false
+  if (ad === 'tail' && geri.some((a) => a === '-f' || a === '-F' || a === '--follow' || /^--follow=/.test(a))) return false
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep' || ad === 'rg') && geri.some((a) => /^--(pre|hostname-bin)/.test(a))) return false
+  if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepOzyinelemeli(geri)) return false
+  // rg: .gitignore'u (ve .env'i) görmezden gelen bayraklar yasak.
+  if (ad === 'rg' && geri.some((a) => /^(-u+|--unrestricted|--no-ignore.*|--hidden|-\.)$/.test(a))) return false
   if (ad === 'find' && geri.some((a) => /^-(exec|execdir|ok|okdir|delete|fprint|fprint0|fprintf|fls)$/.test(a))) return false
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
@@ -253,8 +296,11 @@ function sadeOkuma(args) {
 
 const GIT_ALT = new Set([
   'status', 'log', 'diff', 'show', 'rev-parse', 'ls-files', 'ls-tree', 'blame', 'describe', 'rev-list', 'shortlog',
-  'show-ref', 'cat-file', 'merge-base', 'diff-tree', 'name-rev', 'grep', 'count-objects', 'whatchanged', 'ls-remote',
+  'show-ref', 'cat-file', 'merge-base', 'diff-tree', 'name-rev', 'grep', 'count-objects', 'whatchanged',
 ])
+// ls-remote listede YOK: --upload-pack=<komut> ile komut çalıştırabilir ve ağa çıkar (güvenlik taraması, #1997).
+// Program çalıştıran ya da işaretli dosya dışına bakan seçenekler her alt komutta yasak.
+const GIT_YASAK_SECENEK = /^--(output|ext-diff|textconv|filters|open-files-in-pager|exec-path|exec|upload-pack|receive-pack|no-index|untracked|no-exclude-standard)(=|$)|^--[a-z-]*(program|pack)(=|$)/
 const GIT_BRANCH_YAZAN = new Set(['-d', '-D', '-m', '-M', '-c', '-C', '-u', '-f', '--delete', '--move', '--copy', '--set-upstream-to', '--unset-upstream', '--edit-description', '--force'])
 
 function gitOkuma(args) {
@@ -267,7 +313,7 @@ function gitOkuma(args) {
   const alt = args[i]
   const geri = args.slice(i + 1)
   if (!alt) return false
-  if (geri.some((a) => /^--(output|ext-diff|open-files-in-pager|exec-path)/.test(a) || a === '-O' || /^-O./.test(a))) return false
+  if (geri.some((a) => GIT_YASAK_SECENEK.test(a) || a === '-O' || /^-O./.test(a))) return false
   if (GIT_ALT.has(alt)) return true
   if (alt === 'branch') {
     if (geri.some((a) => GIT_BRANCH_YAZAN.has(a))) return false
@@ -295,40 +341,63 @@ const GH_ALT = {
 function ghOkuma(args) {
   const geri = args.slice(1)
   if (geri.some((a) => a === '--web' || a === '-w')) return false
+  // gh auth status --show-token oturum anahtarını basar.
+  if (geri[0] === 'auth' && geri.some((a) => a === '-t' || a === '--show-token')) return false
   if (geri[0] === 'api') {
     const r = geri.slice(1)
+    const DEGERLI = new Set(['-H', '--header', '--jq', '-q', '--cache', '--template', '-t'])
+    const BOOL = new Set(['--paginate', '--slurp', '-i', '--include', '--silent'])
+    let uc = 0
     for (let i = 0; i < r.length; i += 1) {
       const a = r[i]
-      if (/^(-X|--method)$/.test(a)) {
-        if (String(r[i + 1] || '').toUpperCase() !== 'GET') return false
+      const sonraki = String(r[i + 1] || '')
+      if (a === '-X' || a === '--method') {
+        if (sonraki.toUpperCase() !== 'GET') return false
         i += 1
         continue
       }
-      if (/^-X./.test(a)) {
-        if (a.slice(2).toUpperCase() !== 'GET') return false
+      if (/^--method=/.test(a)) {
+        if (a.slice(9).toUpperCase() !== 'GET') return false
         continue
       }
-      if (/^(-f|-F|--field|--raw-field|--input)/.test(a)) return false
-      if (/^(-H|--header|--jq|-q|--cache|--template|-t)$/.test(a)) {
+      if (/^-X=?./.test(a)) {
+        if (a.replace(/^-X=?/, '').toUpperCase() !== 'GET') return false
+        continue
+      }
+      if (DEGERLI.has(a)) {
+        // @dosya değeri yerel dosyayı okutur; jq süzgeci ortamı sızdırabilir.
+        if (sonraki.startsWith('@') || sonraki.startsWith('<')) return false
+        if ((a === '--jq' || a === '-q') && /\benv\b|\$ENV|input_filename/.test(sonraki)) return false
         i += 1
         continue
       }
+      if (/^--(header|jq|cache|template)=/.test(a)) {
+        if (/=[@<]/.test(a)) return false
+        continue
+      }
+      if (BOOL.has(a)) continue
+      // Tanınmayan her bayrak: allow VERİLMEZ (yazan alanlar -f/-F/--field/--input dahil).
+      if (a.startsWith('-')) return false
+      uc += 1
     }
-    const uc = r.filter((a) => !a.startsWith('-'))
-    return uc.length >= 1
+    return uc >= 1
   }
   const set = GH_ALT[geri[0]]
   return Boolean(set && set.has(geri[1]))
 }
 
-const CURL_BOOL = /^-[sSLIifk46]+$/
-const CURL_UZUN_BOOL = new Set(['--silent', '--show-error', '--location', '--head', '--include', '--fail', '--compressed', '--insecure', '--fail-with-body'])
+// -L / --location BİLEREK yok: yönlendirme zinciri özel adrese (169.254.169.254, localhost) sıçrayabilir (SSRF, #1997).
+const CURL_BOOL = /^-[sSIifk46]+$/
+const CURL_UZUN_BOOL = new Set(['--silent', '--show-error', '--head', '--include', '--fail', '--compressed', '--insecure', '--fail-with-body'])
 const CURL_DEGERLI = new Set(['-m', '--max-time', '--connect-timeout', '-w', '--write-out', '-A', '--user-agent', '-H', '--header', '--retry', '--retry-delay'])
 
 function ozelHostMu(host) {
   const h = String(host).toLowerCase().replace(/^\[|\]$/g, '')
   if (!h || h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.local') || h.endsWith('.internal')) return true
-  if (h === '::1' || h === '0.0.0.0' || h.startsWith('fc') || h.startsWith('fd') || h.startsWith('fe80')) return true
+  // Her IPv6 sabit adresi reddedilir (::ffff:7f00:1 gibi IPv4-eşlemeli ve özel aralıklar dahil); ondalık/onaltılık IPv4
+  // biçimlerini URL ayrıştırıcısı zaten 127.0.0.1 biçimine çevirir.
+  if (h.includes(':')) return true
+  if (h === '0.0.0.0') return true
   const m = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(h)
   if (m) {
     const a = Number(m[1])
@@ -364,7 +433,13 @@ function curlOkuma(args) {
       continue
     }
     if (CURL_DEGERLI.has(a)) {
+      // -H @dosya / -w @dosya yerel dosyayı okutup sunucuya gönderir ya da basar: @ ve < ile başlayan değer reddedilir.
+      if (/^[@<]/.test(String(r[i + 1] || ''))) return false
       i += 1
+      continue
+    }
+    if (/^--(max-time|connect-timeout|write-out|user-agent|header|retry|retry-delay)=/.test(a)) {
+      if (/=[@<]/.test(a)) return false
       continue
     }
     if (CURL_UZUN_BOOL.has(a) || CURL_BOOL.test(a)) continue
@@ -398,7 +473,8 @@ function nodeOkuma(args) {
 /** Tek bir komut parçası (args) salt-okuma mı. */
 function parcaOkumaMi(args) {
   const ad = args[0]
-  if (args.some(hassasMi)) return { okuma: false, sebep: 'hassas dosya yolu: ' + ad }
+  // URL'ler dosya yolu değildir (uzak adres yerel dosyayı okutmaz); yalnız yerel yol benzeri argümanlar denetlenir.
+  if (args.some((a) => !/^https?:\/\//i.test(a) && hassasMi(a))) return { okuma: false, sebep: 'hassas dosya yolu: ' + ad }
   let ok = false
   if (SADE.has(ad)) ok = sadeOkuma(args)
   else if (ad === 'git') ok = gitOkuma(args)
@@ -422,7 +498,21 @@ function siniflandir(komut) {
 
 // ───────────────────────── kayıt ─────────────────────────
 
-const GIZLI = /(gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{16,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|(?:token|key|secret|password|passwd)=[^\s&"']+)/gi
+// Kayıt dosyasına sır yazmamak için çok desenli maske (güvenlik taraması #1997): anahtar önekleri, başlıklar, -u kullanıcı:parola,
+// URL kullanıcı bilgisi, bulut/slack anahtarları.
+const GIZLI_DESENLER = [
+  /gh[pousr]_[A-Za-z0-9]{20,}/g,
+  /sk-[A-Za-z0-9_-]{16,}/g,
+  /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g,
+  /AKIA[0-9A-Z]{16}/g,
+  /xox[abprs]-[A-Za-z0-9-]{10,}/g,
+  /(?:token|key|secret|password|passwd|pwd)=[^\s&"']+/gi,
+  /\b(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{6,}/gi,
+  /\b(?:authorization|x-api-key|cookie|x-auth-token)\s*[:=]\s*[^\n"']+/gi,
+  /(?:^|\s)(?:-u|--user)\s+\S+/g,
+  /\/\/[^/\s:@]+:[^/\s@]+@/g,
+]
+const gizle = (m) => GIZLI_DESENLER.reduce((s, d) => s.replace(d, '[GIZLI]'), String(m))
 
 function kayitDizini() {
   return process.env.IZIN_KAYIT_DIZINI || path.join(os.homedir(), '.claude', 'izin-kayit')
@@ -478,7 +568,7 @@ function main() {
       sid: String(girdi.session_id || '').slice(0, 36),
       pencere: pencereAdi(girdi),
       kip: girdi.permission_mode || null,
-      komut: komut.replace(GIZLI, '[GIZLI]').slice(0, 400),
+      komut: gizle(komut).slice(0, 400),
     }
     if (opsMu(girdi)) {
       kayitYaz({ ...satir, karar: 'muaf', sebep: 'OPS penceresi' })
