@@ -21,7 +21,7 @@
  *   (2) oturumun çalışma dizini (cwd) ya da komuttaki `cd` hedefi product-data klasörünün içindedir;
  *   (3) komut metninde klasör adı `product-data` ya da klasördeki apply'li bir betiğin dosya adı geçer (değişken
  *       üzerinden dolaylı çağrı: `S=x.mjs; node $S --apply`).
- * OPS penceresi = ops-oturumu.cjs kimlikMi(session_id) ya da opsAdayiMi(cwd, agent_type). OPS'un alt ajanı OPS DEĞİLDİR.
+ * OPS penceresi = ops-oturumu.cjs kimlikMi(session_id) ya da agent_type === 'ops-pencere' (cwd'ye bakılmaz). OPS'un alt ajanı OPS DEĞİLDİR.
  *
  * ── HATA YOLLARI ──
  *
@@ -112,7 +112,8 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
   const dosyaAdiGecer = [...betikler].some((ad) => new RegExp('(^|[\\s/\\\\"\'=$])' + kacis(ad) + '($|[\\s"\';&|)])').test(kucuk))
   const klasorAdiGecer = /product-data/i.test(metin)
   let mevcut = path.resolve(gitBashYolu(cwd || process.cwd()))
-  for (const parca of metin.split(/&&|\|\||;|\r?\n|\|/)) {
+  // Ayırıcılar geniş: & ; | satır sonu, ( ) { } ters tırnak ve $( — ayrıştırıcı farkıyla parça gizlenemesin.
+  for (const parca of metin.split(/&|;|\||\r?\n|\(|\)|\{|\}|`|\$\(/)) {
     const kelimeler = kelimele(parca)
     if (!kelimeler.length) continue
     const ilk = komutKelimesi(kelimeler)
@@ -121,7 +122,9 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
       if (hedef) mevcut = path.resolve(mevcut, gitBashYolu(hedef))
       continue
     }
-    if (!CALISTIRICI.test(ilk) || !BAYRAK.test(parca)) continue
+    // Çalıştırıcı YALNIZ ilk kelime olmak zorunda değil (sudo/time/env sarmalları): parçadaki herhangi bir kelime.
+    const calistiriciVar = kelimeler.some((w) => CALISTIRICI.test(path.basename(String(w).replace(/\\/g, '/'))))
+    if (!calistiriciVar || !BAYRAK.test(parca)) continue
     // (1) betik argümanı çözülünce klasöre düşüyor mu
     for (const k of kelimeler) {
       if (!BETIK_UZANTI.test(k)) continue
@@ -140,7 +143,9 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
 
 function opsMu(girdi) {
   const o = require(path.join(kokDizin(), 'scripts', 'board', 'ops-oturumu.cjs'))
-  return Boolean(o.kimlikMi(girdi.session_id) || o.opsAdayiMi({ cwd: girdi.cwd, agentType: girdi.agent_type }))
+  // YALNIZ kayıtlı OPS oturum kimliği ya da harness'in verdiği agent_type. opsAdayiMi'nin cwd'den yukarı
+  // settings.local.json arama yolu KULLANILMAZ: cwd bir `cd` ile değişebilir, kimlik sahtelenebilirdi.
+  return Boolean(o.kimlikMi(girdi.session_id) || girdi.agent_type === 'ops-pencere')
 }
 
 function reddet(sebep) {

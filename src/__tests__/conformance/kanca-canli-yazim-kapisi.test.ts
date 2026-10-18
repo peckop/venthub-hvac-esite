@@ -42,6 +42,12 @@ describe('INV-KANCA-CANLI-YAZIM-1 · yol biçimi fark etmeksizin reddedilir', ()
     ['bash -c sarmalı', 'bash -c "node scripts/db/product-data/a.mjs --apply"'],
     ['dolaylı değişken (komutta apply\'li betiğin adı geçiyor)', 'S=a.mjs; node $S --apply'],
     ['klasör adı geçiyor, betik değişkende', 'D=scripts/db/product-data; node "$D/$S" --apply'],
+    ['alt kabuk parantezi', '(node scripts/db/product-data/a.mjs --apply)'],
+    ['süslü parantez grubu', '{ node scripts/db/product-data/a.mjs --apply; }'],
+    ['komut ikamesi', 'echo $(node scripts/db/product-data/a.mjs --apply)'],
+    ['ters tırnak ikamesi', 'echo `node scripts/db/product-data/a.mjs --apply`'],
+    ['tek & ile arka plan', 'true & node scripts/db/product-data/a.mjs --apply'],
+    ['başa sarmal komut (sudo/time)', 'time node scripts/db/product-data/a.mjs --apply'],
     ['zincirin ikinci parçası', 'git status && node scripts/db/product-data/a.mjs --apply'],
   ])('DENY · %s', (_ad, komut) => {
     expect(sor(komut)).toBe(true)
@@ -128,6 +134,18 @@ describe('INV-KANCA-CANLI-YAZIM-1 · OPS penceresi geçer, diğerleri reddedilir
   it('OPS ajan türü: geçer', () => {
     const r = kos({ session_id: digerSid, agent_type: 'ops-pencere', tool_input: { command: KOMUT } })
     expect(redMi(r.cikti)).toBe(false)
+  })
+
+  it('cwd\'de ops-pencere ayarı olsa bile kimlik sahtelenemez (yalnız oturum kimliği ve agent_type)', () => {
+    const sahte = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sahte-ops-'))
+    try {
+      fs.mkdirSync(path.join(sahte, '.claude'), { recursive: true })
+      fs.writeFileSync(path.join(sahte, '.claude', 'settings.local.json'), JSON.stringify({ agent: 'ops-pencere' }))
+      const r = kos({ session_id: digerSid, cwd: sahte, tool_input: { command: KOMUT } })
+      expect(redMi(r.cikti)).toBe(true)
+    } finally {
+      fs.rmSync(sahte, { recursive: true, force: true })
+    }
   })
 
   it('başka pencere: reddedilir, neden OPS\'a yönlendirir', () => {
