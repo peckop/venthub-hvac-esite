@@ -48,16 +48,17 @@ describe('sessizFanRehberHref: yazı kaydı yoksa bağlantı yok', () => {
     expect(sessizFanRehberHref('en', [], true)).toBeNull()
   })
 
-  it('gerçek yayın listesi rehberi henüz taşımıyorsa null (kayıt gelince bu test bilerek güncellenir)', () => {
-    expect(sessizFanRehberHref('tr')).toBeNull()
-  })
-
   it('başka slug taşıyan yazı rehber sayılmaz', () => {
     expect(sessizFanRehberHref('tr', [ornekYazi('baska-yazi', null)], true)).toBeNull()
   })
 })
 
 describe('sessizFanRehberHref: yazı kaydı varsa dil önekli adres', () => {
+  it('gerçek yayın listesi rehberi taşır (BLG-15, 17 Ekim 2026): TR adres dolu, EN kapalıyken null', () => {
+    expect(sessizFanRehberHref('tr')).toBe(`/tr/bilgi-merkezi/${SESSIZ_FAN_REHBER_SLUG}`)
+    expect(sessizFanRehberHref('en', undefined, false)).toBeNull()
+  })
+
   it('TR adresi /tr/bilgi-merkezi/<slug>', () => {
     expect(sessizFanRehberHref('tr', [ornekYazi(SESSIZ_FAN_REHBER_SLUG, null)], true)).toBe(`/tr/bilgi-merkezi/${SESSIZ_FAN_REHBER_SLUG}`)
   })
