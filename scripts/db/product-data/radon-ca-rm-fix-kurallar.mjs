@@ -27,13 +27,22 @@ const esit = (a, b) => (a === null || a === undefined || b === null || b === und
   ? (a ?? null) === (b ?? null)
   : (typeof a === 'number' || typeof b === 'number') ? Number(a) === Number(b) : String(a) === String(b)
 
-export function manifestIhlalleri(manifest) {
+/**
+ * @param {object} manifest
+ * @param {{ kodDeseni?: RegExp, kodAciklama?: string, aralik?: Record<string, [number, number]> }} [secenek]
+ *   Varsayılan (secenek yok): anahtar 5 haneli model_code, ARALIK tablosu (Radon / Air Door davranışı DEĞİŞMEZ).
+ *   KTL-55 (SEAT): anahtar `SEA-<8 hane>` sku, weight_kg aralığı geniş (SEAT 50 ≈ 138 kg).
+ */
+export function manifestIhlalleri(manifest, secenek = {}) {
   const v = []
   const items = manifest?.items
+  const kodDeseni = secenek.kodDeseni ?? /^\d{5}$/
+  const kodAciklama = secenek.kodAciklama ?? 'model_code 5 haneli sayi olmali'
+  const aralikTablosu = { ...ARALIK, ...(secenek.aralik ?? {}) }
   if (!items || typeof items !== 'object' || Object.keys(items).length === 0) return ['items bos']
   for (const [kod, it] of Object.entries(items)) {
     const s = `${kod}`
-    if (!/^\d{5}$/.test(kod)) v.push(`${s}: model_code 5 haneli sayi olmali`)
+    if (!kodDeseni.test(kod)) v.push(`${s}: ${kodAciklama}`)
     if (!it.ad) v.push(`${s}: ad yok`)
     if (!it.kaynak) v.push(`${s}: kaynak (belge + sayfa) yok`)
     const yeni = it.yeni ?? {}
@@ -48,7 +57,7 @@ export function manifestIhlalleri(manifest) {
       if (BIRIMLI.test(k) || k === 'rpm_max') {
         if (typeof val !== 'number' || !Number.isFinite(val)) v.push(`${s}: ${k} birimli alan ama SAYI degil (${JSON.stringify(val)}) — §11.6`)
       }
-      const ar = ARALIK[k]
+      const ar = aralikTablosu[k]
       if (ar && typeof val === 'number' && (val < ar[0] || val > ar[1])) v.push(`${s}: ${k}=${val} makul aralik disi [${ar[0]}, ${ar[1]}]`)
     }
     // Eski alan ancak yerine geçen alan yeni nesnede doluysa kaldırılır (veri kaybı yok).
