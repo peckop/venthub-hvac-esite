@@ -50,15 +50,21 @@ function ayristir(komut) {
   const atamalar = new Map()
   const parcalar = []
   let args = []
+  let globIdx = [] // args ile paralel: o argümanda TIRNAKSIZ glob karakteri (* ? [) var mı — kabuk yalnız onları genişletir
+  let curGlob = false
   let cur = ''
   let basladi = false
   let tirnak = null
   let i = 0
 
   const jetonBitir = () => {
-    if (basladi) args.push(cur)
+    if (basladi) {
+      args.push(cur)
+      globIdx.push(curGlob)
+    }
     cur = ''
     basladi = false
+    curGlob = false
   }
   const parcaBitir = () => {
     jetonBitir()
@@ -68,9 +74,11 @@ function ayristir(komut) {
       const eq = args[0].indexOf('=')
       atamalar.set(args[0].slice(0, eq), args[0].slice(eq + 1))
     } else {
+      args.globlu = globIdx
       parcalar.push(args)
     }
     args = []
+    globIdx = []
     return null
   }
   const degiskenOku = () => {
@@ -162,6 +170,7 @@ function ayristir(komut) {
       const r = degiskenOku()
       if (r.hata) return r
       if (/\s/.test(r.deger)) return { hata: 'tırnaksız değişken boşluk içeriyor' }
+      if (/[*?[]/.test(r.deger)) curGlob = true
       cur += r.deger
       basladi = true
       i += r.uzunluk
@@ -211,6 +220,7 @@ function ayristir(komut) {
       i += s[i + 1] === '|' ? 2 : 1
       continue
     }
+    if (c === '*' || c === '?' || c === '[') curGlob = true
     cur += c
     basladi = true
     i += 1
@@ -240,10 +250,11 @@ const HASSAS = [
   /[/\\:][^/\\:]*token[^/\\:]*$/i,
   /^[^/\\:\s]*token[^/\\:\s]*\.[a-z0-9]{1,5}$/i,
 ]
-// Nokta-dosya glob'u (.e*, .env*) ya da adında env geçen glob: .env'i dolaylı okutabilir.
-// (`.e*`, `.*`, `.[e]nv`; jq süzgeci `.[0]` rakamla açıldığı için yakalanmaz.)
-const HASSAS_GLOB = /(^|[/\\])\.([A-Za-z_][^/\\]*[*?[]|[*?]|\[[A-Za-z])|[*?[][^/\\]*env/i
-const hassasMi = (a) => HASSAS.some((r) => r.test(String(a))) || HASSAS_GLOB.test(String(a))
+// Nokta ile başlayan segmentte glob karakteri (.e*, .*, .e?v, .[!0]nv, .[0e]nv): kabuk bunu .env'e genişletebilir.
+// Yalnız TIRNAKSIZ glob içeren argümanlara uygulanır (kabuk tırnak içini genişletmez); jq süzgeci `".[0].title"` etkilenmez.
+const HASSAS_GLOB = /(^|[/\\])\.[^/\\]*[*?[]|[*?[][^/\\]*env/i
+const hassasMi = (a) => HASSAS.some((r) => r.test(String(a)))
+const globHassasMi = (a) => HASSAS_GLOB.test(String(a))
 
 const SADE = new Set([
   'ls', 'pwd', 'cat', 'head', 'tail', 'wc', 'stat', 'file', 'du', 'df', 'date', 'which', 'basename', 'dirname',
@@ -253,28 +264,49 @@ const SADE = new Set([
 
 // Özyinelemeli grep'in gezebileceği güvenli yol: nokta ya da mutlak/üst dizin ile başlamayan, glob içermeyen göreli ad.
 const GUVENLI_KLASOR = /^[A-Za-z0-9_][A-Za-z0-9_\-./]*$/
-const GREP_DEGERLI = new Set(['-e', '-f', '-m', '-A', '-B', '-C', '--include', '--exclude', '--exclude-dir', '--max-count', '--file', '--regexp'])
+const GREP_UZUN_DEGERLI = new Set([
+  '--regexp', '--file', '--max-count', '--include', '--exclude', '--exclude-dir', '--exclude-from', '--after-context',
+  '--before-context', '--context', '--label', '--binary-files', '--devices',
+])
 
 /** grep -r / -R: .env gibi nokta dosyalarını dolaylı okutmasın diye yol operandları güvenli klasör olmalı. */
 function grepOzyinelemeli(geri) {
-  const ozy = geri.some((a) => /^-[A-Za-z]*[rR][A-Za-z]*$/.test(a) || a === '--recursive' || a === '--dereference-recursive')
-  if (!ozy) return true
-  let kalip = geri.some((a) => a === '-e' || a === '-f' || a === '--regexp' || a === '--file')
-  const yollar = []
+  let ozy = false
+  let kalipBayrakla = false
+  const poz = []
   for (let i = 0; i < geri.length; i += 1) {
     const a = geri[i]
-    if (GREP_DEGERLI.has(a)) {
-      i += 1
+    if (a === '--') {
+      poz.push(...geri.slice(i + 1))
+      break
+    }
+    if (a.startsWith('--')) {
+      const ad = a.split('=')[0]
+      if (ad === '--recursive' || ad === '--dereference-recursive') ozy = true
+      if (ad === '--directories') return false // -d recurse'in uzun biçimi
+      if (ad === '--regexp' || ad === '--file') kalipBayrakla = true
+      if (!a.includes('=') && GREP_UZUN_DEGERLI.has(ad)) i += 1
       continue
     }
-    if (a.startsWith('-')) continue
-    if (!kalip) {
-      kalip = true
+    if (a.startsWith('-') && a.length > 1) {
+      // Kısa küme (-rn, -r1, -ePAT, -nrf dosya): ilk değer-alan harften sonrası değerdir.
+      for (let k = 1; k < a.length; k += 1) {
+        const ch = a[k]
+        if (ch === 'r' || ch === 'R') ozy = true
+        if (ch === 'd' || ch === 'D') return false
+        if ('efmABC'.includes(ch)) {
+          if (ch === 'e' || ch === 'f') kalipBayrakla = true
+          if (k === a.length - 1) i += 1
+          break
+        }
+      }
       continue
     }
-    yollar.push(a)
+    poz.push(a)
   }
-  return yollar.length > 0 && yollar.every((y) => GUVENLI_KLASOR.test(y) && !y.split('/').some((p) => p.startsWith('.') ))
+  if (!ozy) return true
+  const yollar = kalipBayrakla ? poz : poz.slice(1)
+  return yollar.length > 0 && yollar.every((y) => GUVENLI_KLASOR.test(y) && !y.split('/').some((p) => p.startsWith('.')))
 }
 
 function sadeOkuma(args) {
@@ -287,7 +319,9 @@ function sadeOkuma(args) {
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep' || ad === 'rg') && geri.some((a) => /^--(pre|hostname-bin)/.test(a))) return false
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepOzyinelemeli(geri)) return false
   // rg: .gitignore'u (ve .env'i) görmezden gelen bayraklar yasak.
-  if (ad === 'rg' && geri.some((a) => /^(-u+|--unrestricted|--no-ignore.*|--hidden|-\.)$/.test(a))) return false
+  // rg: -u/-. içeren her kısa küme (-uu, -nu, -.) ve ignore/gizli dosya uzun seçeneklerinin her kısaltması yasak.
+  if (ad === 'rg' && geri.some((a) => /^-[^-][^=]*$/.test(a) && /[u.]/.test(a))) return false
+  if (ad === 'rg' && geri.some((a) => uzunSecenekYasakMi(a, RG_YASAK))) return false
   if (ad === 'find' && geri.some((a) => /^-(exec|execdir|ok|okdir|delete|fprint|fprint0|fprintf|fls)$/.test(a))) return false
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
@@ -300,7 +334,24 @@ const GIT_ALT = new Set([
 ])
 // ls-remote listede YOK: --upload-pack=<komut> ile komut çalıştırabilir ve ağa çıkar (güvenlik taraması, #1997).
 // Program çalıştıran ya da işaretli dosya dışına bakan seçenekler her alt komutta yasak.
-const GIT_YASAK_SECENEK = /^--(output|ext-diff|textconv|filters|open-files-in-pager|exec-path|exec|upload-pack|receive-pack|no-index|untracked|no-exclude-standard)(=|$)|^--[a-z-]*(program|pack)(=|$)/
+const GIT_YASAK = [
+  'output', 'ext-diff', 'textconv', 'filters', 'open-files-in-pager', 'exec-path', 'exec', 'upload-pack',
+  'receive-pack', 'no-index', 'untracked', 'no-exclude-standard', 'paginate',
+]
+const RG_YASAK = [
+  'unrestricted', 'hidden', 'no-ignore', 'no-ignore-vcs', 'no-ignore-dot', 'no-ignore-parent', 'no-ignore-global',
+  'no-ignore-files', 'no-ignore-exclude', 'no-require-git', 'pre', 'hostname-bin',
+]
+/**
+ * Uzun seçenek yasak bir adın KENDİSİ ya da ÖNEKİ ise true (git ve rg tek anlamlı kısaltmaları kabul eder:
+ * `--outp`, `--ext`, `--upload`, `--hid`). Eşit uzunlukta ya da kısa her önek yasak sayılır; false-deny kabul edilir.
+ */
+function uzunSecenekYasakMi(a, yasak) {
+  if (!String(a).startsWith('--') || a === '--') return false
+  const ad = a.slice(2).split('=')[0]
+  if (!ad) return false
+  return yasak.some((f) => f.startsWith(ad)) || /(program|pack)$/.test(ad)
+}
 const GIT_BRANCH_YAZAN = new Set(['-d', '-D', '-m', '-M', '-c', '-C', '-u', '-f', '--delete', '--move', '--copy', '--set-upstream-to', '--unset-upstream', '--edit-description', '--force'])
 
 function gitOkuma(args) {
@@ -313,7 +364,7 @@ function gitOkuma(args) {
   const alt = args[i]
   const geri = args.slice(i + 1)
   if (!alt) return false
-  if (geri.some((a) => GIT_YASAK_SECENEK.test(a) || a === '-O' || /^-O./.test(a))) return false
+  if (geri.some((a) => uzunSecenekYasakMi(a, GIT_YASAK) || a === '-O' || /^-O./.test(a))) return false
   if (GIT_ALT.has(alt)) return true
   if (alt === 'branch') {
     if (geri.some((a) => GIT_BRANCH_YAZAN.has(a))) return false
@@ -453,6 +504,8 @@ function curlOkuma(args) {
 function urlTamam(u) {
   try {
     if (!/^https?:\/\//i.test(String(u))) return false
+    // curl URL globbing: {a,b} ve [1-3] tek komutta birçok istek üretir (host listesi dahil) — hiç kabul edilmez.
+    if (/[{}[\]]/.test(String(u))) return false
     const p = new URL(u)
     if (p.username || p.password) return false
     return !ozelHostMu(p.hostname)
@@ -474,7 +527,10 @@ function nodeOkuma(args) {
 function parcaOkumaMi(args) {
   const ad = args[0]
   // URL'ler dosya yolu değildir (uzak adres yerel dosyayı okutmaz); yalnız yerel yol benzeri argümanlar denetlenir.
-  if (args.some((a) => !/^https?:\/\//i.test(a) && hassasMi(a))) return { okuma: false, sebep: 'hassas dosya yolu: ' + ad }
+  const globlu = args.globlu || []
+  if (args.some((a, k) => !/^https?:\/\//i.test(a) && (hassasMi(a) || (globlu[k] && globHassasMi(a))))) {
+    return { okuma: false, sebep: 'hassas dosya yolu ya da glob: ' + ad }
+  }
   let ok = false
   if (SADE.has(ad)) ok = sadeOkuma(args)
   else if (ad === 'git') ok = gitOkuma(args)
