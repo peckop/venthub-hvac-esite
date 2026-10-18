@@ -1,0 +1,778 @@
+{
+  "surum": 1,
+  "sonDogrulama": "2026-10-09",
+  "aciklama": "Marka ve üretici olguları için TEK doğruluk kaydı (BLG-7, vitrin-genel-metin-standard.md M8). brands.ts alanları ve vitrin metnindeki marka olguları bu kayıttaki YAZILABİLİR (DOGRULANDI/TEK_KAYNAK) olgularla birebir uyuşmalıdır; DOGRULANAMADI olgu yazılamaz. Kaynak alıntıları betikle (scripts/rehber/marka-olgu-dogrula.mjs) ham metinden doğrulanır; araştırma ajanı özeti kanıt değildir.",
+  "markalar": {
+    "vortice": {
+      "ad": "Vortice",
+      "olgular": [
+        {
+          "alan": "country",
+          "durum": "TEK_KAYNAK",
+          "deger": "İtalya",
+          "degerEn": "Italy",
+          "kaynaklar": [
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf",
+              "pdf_hash": "c45a0c4e756679018c4b96f1ba2795dbb62ed9b68e3fcad100f76c9df12d45ef",
+              "sayfa": 24,
+              "alinti": "20067 Tribiano (Milano) Tel. (+39) 02 906991 Fax (+39) 02 90699625 Italia",
+              "bulundu": true,
+              "sha256": "440af641ed20bc5bfa338f2a50c914ca27fe22c9c8377164beb417bea860bc01",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.vortice.com/en/company",
+              "alinti": "The historic headquarters of VORTICE S.p.A. is located in Tribiano (Milan)",
+              "dogrudan": false,
+              "bulundu": true,
+              "sha256": "ebc0696c7f2e572473db4c8d4409b3317408efdedc526206d42deb750d91c3ed",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Ülke adı yalnız katalogun firma adresi bloğunda açık (\"Italia\"); sitedeki ikinci kaynak şehirden (Milan) çıkarımdır, bağımsız doğrulama sayılmaz."
+        },
+        {
+          "alan": "headquarters",
+          "durum": "DOGRULANDI",
+          "deger": "Tribiano, Milano",
+          "degerEn": "Tribiano, Milan",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.vortice.com/en/company",
+              "alinti": "The historic headquarters of VORTICE S.p.A. is located in Tribiano (Milan)",
+              "bulundu": true,
+              "sha256": "ebc0696c7f2e572473db4c8d4409b3317408efdedc526206d42deb750d91c3ed",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf",
+              "pdf_hash": "c45a0c4e756679018c4b96f1ba2795dbb62ed9b68e3fcad100f76c9df12d45ef",
+              "sayfa": 2,
+              "alinti": "Our current Vortice Headquarters have been located in Tribiano (Milan) since 1972",
+              "bulundu": true,
+              "sha256": "d4a6ba0391d641d61792d933759efea9874083a36c7c01ad5f7455566456c89b",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "founded",
+          "durum": "DOGRULANAMADI",
+          "neden": "Resmî kaynaklar \"Since 1954 Vortice has been synonymous with quality and excellence\" ve \"1954 - 1955 Beginnings\" diyor; \"kuruldu / founded in 1954\" ifadesi hiçbirinde yok. Kuruluş yılı olarak YAZILAMAZ; 1954 yalnız \"faaliyet başlangıcı\" (faaliyetBaslangici) olarak yazılabilir.",
+          "kaynaklar": []
+        },
+        {
+          "alan": "faaliyetBaslangici",
+          "durum": "DOGRULANDI",
+          "deger": "1954",
+          "sayilar": [
+            "1954"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "Commercial_Ventilation_in_Line_1.pdf",
+              "pdf_hash": "3bb5850c7278acb27c5882987ad5ab848cfde92e07370cdbac7711acfb49d49b",
+              "sayfa": 2,
+              "alinti": "Since 1954 Vortice has been synonymous with quality and excellence",
+              "bulundu": true,
+              "sha256": "b3f550eabbbd4d98a536c6477a5b77d79debe6e959aa1e9c2301ad5c6054c5b0",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.vortice.com/en/the_history",
+              "alinti": "1954 - 1955 Beginnings Attilio Pagani",
+              "bulundu": true,
+              "sha256": "a5dd377e0132055f8ed89144d1aba87881e16306c03236c49818a4ea8833ab6d",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Metinde \"1954 yılından bu yana\" / \"since 1954\" biçiminde yazılır; \"1954'te kuruldu\" yazılamaz (founded satırı)."
+        },
+        {
+          "alan": "website",
+          "durum": "TEK_KAYNAK",
+          "deger": "https://www.vortice.com",
+          "esdegerler": [
+            "https://www.vortice.it"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.vortice.com/en/",
+              "alinti": "Vortice - All Rights Reserved",
+              "bulundu": true,
+              "sha256": "c910daac293245b05af79d914d0b1e19da346394131e3cbef1488ba892beb847",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "vortice.it adresi 2026-10-09'da 200 ile vortice.com/en/ adresine yönlendi (curl -L ölçümü); kanonik adres vortice.com."
+        }
+      ]
+    },
+    "avens": {
+      "ad": "AVenS",
+      "olgular": [
+        {
+          "alan": "country",
+          "durum": "DOGRULANDI",
+          "deger": "Türkiye",
+          "degerEn": "Türkiye",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.avensair.com/hakkimizda",
+              "alinti": "Küçükçekmece / İstanbul",
+              "bulundu": true,
+              "sha256": "48e05dca32a6b23f16052fdc3e9c41c7ee02e56a151600c696f03c73ab3425da",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "firma-yayini",
+              "tur": "dizin",
+              "dosya": "avens_fiyat_listesi_2026_HQ.pdf",
+              "pdf_hash": "2157e80f63a72ad84d2a16b27382d291584cb7766416f35f41449a06cfd60a14",
+              "sayfa": 74,
+              "alinti": "Küçükçekmece / İstanbul",
+              "bulundu": true,
+              "sha256": "152ff24239f121d7727c137278b7d693ffb1719cca5b97d016ae21d58fe214d1",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Firmanın kendi adres bloğundan okunur (İkitelli OSB, Küçükçekmece / İstanbul); iki ayrı yayın: firma sitesi ve firma fiyat listesi."
+        },
+        {
+          "alan": "headquarters",
+          "durum": "DOGRULANDI",
+          "deger": "İstanbul",
+          "degerEn": "Istanbul",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.avensair.com/hakkimizda",
+              "alinti": "Küçükçekmece / İstanbul",
+              "bulundu": true,
+              "sha256": "48e05dca32a6b23f16052fdc3e9c41c7ee02e56a151600c696f03c73ab3425da",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "firma-yayini",
+              "tur": "dizin",
+              "dosya": "avens_fiyat_listesi_2026_HQ.pdf",
+              "pdf_hash": "2157e80f63a72ad84d2a16b27382d291584cb7766416f35f41449a06cfd60a14",
+              "sayfa": 74,
+              "alinti": "AVENS HAVALANDIRMA SİSTEMLERİ AŞ",
+              "bulundu": true,
+              "sha256": "152ff24239f121d7727c137278b7d693ffb1719cca5b97d016ae21d58fe214d1",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "founded",
+          "durum": "TEK_KAYNAK",
+          "deger": "2017",
+          "sayilar": [
+            "2017"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.avensair.com/hakkimizda",
+              "alinti": "AVenS, 2017 yılında",
+              "bulundu": true,
+              "sha256": "48e05dca32a6b23f16052fdc3e9c41c7ee02e56a151600c696f03c73ab3425da",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.avensair.com/",
+              "alinti": "2017 yılında iklimlendirme sektöründe uzun yıllar deneyim kazanmış bir ekip tarafından kurulan AVenS Havalandırma",
+              "bulundu": true,
+              "sha256": "0f5a1e1f826a2ec7352eb23b5b751937c1f3ad3ef53589a727cedf738ddb13c7",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "ÇELİŞKİ: avens.com.tr (Ankara, \"Avens, 2012 yılında kurulmuş\", bağlantı parçaları) BAŞKA şirkettir; brands.ts'teki 2010 hiçbir resmî kaynakta yok."
+        },
+        {
+          "alan": "website",
+          "durum": "TEK_KAYNAK",
+          "deger": "https://www.avensair.com",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.avensair.com/",
+              "alinti": "Avens Havalandırma - Vortice Türkiye Distribütörü",
+              "bulundu": true,
+              "sha256": "0f5a1e1f826a2ec7352eb23b5b751937c1f3ad3ef53589a727cedf738ddb13c7",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "avens.com.tr başka şirkettir (Ankara, boru bağlantı parçaları); AVenS markasının adresi avensair.com. brands.ts'te avens.com.tr YANLIŞ."
+        }
+      ]
+    },
+    "nicotra-gebhardt": {
+      "ad": "Nicotra Gebhardt",
+      "olgular": [
+        {
+          "alan": "country",
+          "durum": "DOGRULANAMADI",
+          "neden": "Resmî site tek ülke söylemiyor: \"combining German and Italian fan engineering expertise\" ve \"1950 - 1960: Founding Years in Italy and Germany\". Tek ülke menşei yazılamaz; \"Alman ve İtalyan mühendisliği\" (kokenIfadesi) yazılabilir.",
+          "kaynaklar": []
+        },
+        {
+          "alan": "kokenIfadesi",
+          "durum": "TEK_KAYNAK",
+          "deger": "Alman ve İtalyan fan mühendisliği",
+          "degerEn": "German and Italian fan engineering",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.nicotra-gebhardt.com/en/Resources/About-Us",
+              "alinti": "combining German and Italian fan engineering expertise",
+              "bulundu": true,
+              "sha256": "7a9cbd039d8e1416075c2af70079c939b15c990ab43265bfafd03ddf34db1c08",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.nicotra-gebhardt.com/en/Resources/About-Us/Our-History",
+              "alinti": "1950 - 1960: Founding Years in Italy and Germany",
+              "bulundu": true,
+              "sha256": "0a5c99e00e3dcc05b7c33ca91d3d17438c54b759233a12109c36e2f88c9c054a",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "headquarters",
+          "durum": "DOGRULANAMADI",
+          "neden": "Hiçbir kaynakta \"headquarters / merkez\" olarak Waldenburg yazmıyor. Waldenburg, kendi kataloglarında ülke ofisleri listesindeki ALMANYA adresidir (almanyaAdresi); katalog aynı listede başka ülke ofislerini de sayar.",
+          "kaynaklar": []
+        },
+        {
+          "alan": "almanyaAdresi",
+          "durum": "TEK_KAYNAK",
+          "deger": "Waldenburg",
+          "degerEn": "Waldenburg, Germany",
+          "kaynaklar": [
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "493-series-dd.pdf",
+              "pdf_hash": "5b40003bd1bd58691882952ed5add4c581ea2216ddf2757198e8e810a5b2a6ad",
+              "sayfa": 77,
+              "alinti": "74638 Waldenburg (Germany)",
+              "bulundu": true,
+              "sha256": "5a2a3618be297bf30ee3d7d59b83b0ed96ad4236f47ba9a0b3d1c5e56a6fd491",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Metinde \"Almanya'da Waldenburg adresli\" biçiminde yazılır; \"merkezli / merkez\" yazılamaz."
+        },
+        {
+          "alan": "founded",
+          "durum": "DOGRULANAMADI",
+          "neden": "brands.ts'teki 1959 hiçbir resmî kaynakta yok. Resmî site: \"Gebhardt, founded in 1958\" ve Nicotra \"early 1960s\" (gebhardtKurulus). Birleşik marka için tek kuruluş yılı yazılamaz.",
+          "kaynaklar": []
+        },
+        {
+          "alan": "gebhardtKurulus",
+          "durum": "TEK_KAYNAK",
+          "deger": "1958",
+          "sayilar": [
+            "1958"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.nicotra-gebhardt.com/en/Resources/About-Us/Our-History",
+              "alinti": "Gebhardt , founded in 1958",
+              "bulundu": true,
+              "sha256": "0a5c99e00e3dcc05b7c33ca91d3d17438c54b759233a12109c36e2f88c9c054a",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "website",
+          "durum": "TEK_KAYNAK",
+          "deger": "https://www.nicotra-gebhardt.com",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.nicotra-gebhardt.com/en/Resources/About-Us",
+              "alinti": "combining German and Italian fan engineering expertise",
+              "bulundu": true,
+              "sha256": "7a9cbd039d8e1416075c2af70079c939b15c990ab43265bfafd03ddf34db1c08",
+              "cekim": "2026-10-09"
+            }
+          ]
+        }
+      ]
+    },
+    "seat": {
+      "ad": "SEAT",
+      "olgular": [
+        {
+          "alan": "country",
+          "durum": "DOGRULANDI",
+          "deger": "Fransa",
+          "degerEn": "France",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.seat-ventilation.com/",
+              "alinti": "09340 VERNIOLLE FRANCE",
+              "bulundu": true,
+              "sha256": "b0f4b4deccda2fefa46382acbb503287bda8a89c85de6ae0384db250394d7876",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "Installation-guide_ATEX_fans_english1.pdf",
+              "pdf_hash": "ad49a6a447b040146a5e359b0ed0cde8c388e609475934facbd497e186152e33",
+              "sayfa": 1,
+              "alinti": "09340 Verniolle - France",
+              "bulundu": true,
+              "sha256": "b5f3162d13c031ed1cdc3c48dff04f1d0741881164282fcd324e5f36502b12dd",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "headquarters",
+          "durum": "DOGRULANDI",
+          "deger": "Verniolle",
+          "degerEn": "Verniolle",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.seat-ventilation.com/pages/seat-ventilation-history",
+              "alinti": "2005 : SEAT Ventilation transfers its Headquaters and factory to Verniolle",
+              "bulundu": true,
+              "sha256": "990ed9c5d260005ce5aa32d9b288aea7c6739205b96edcf59c4d725a7f9bd6a6",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "Installation-guide_ATEX_fans_english1.pdf",
+              "pdf_hash": "ad49a6a447b040146a5e359b0ed0cde8c388e609475934facbd497e186152e33",
+              "sayfa": 1,
+              "alinti": "Parc Technologique Delta Sud 09340 Verniolle - France",
+              "bulundu": true,
+              "sha256": "b5f3162d13c031ed1cdc3c48dff04f1d0741881164282fcd324e5f36502b12dd",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "founded",
+          "durum": "DOGRULANDI",
+          "deger": "1968",
+          "sayilar": [
+            "1968"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.seat-ventilation.com/pages/seat-ventilation-history",
+              "alinti": "1968 : Establishment of SEAT Ventilation in Montfermeil, France",
+              "bulundu": true,
+              "sha256": "990ed9c5d260005ce5aa32d9b288aea7c6739205b96edcf59c4d725a7f9bd6a6",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "SEAT-CATALOGUE.pdf",
+              "pdf_hash": "d246de100f5040a3b8ae9b46b099d6d78d11d97f5b4ac3f78afa110af30e625a",
+              "sayfa": 4,
+              "alinti": "1968 : Creation of SEAT by Mr. Bernard Chapel",
+              "bulundu": true,
+              "sha256": "d4c30b5a644b6f4613fa4a56f94437e07d6713fc5d96f11a9fef6dfb442546c8",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "website",
+          "durum": "TEK_KAYNAK",
+          "deger": "https://www.seat-ventilation.com",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.seat-ventilation.com/",
+              "alinti": "SEAT Ventilation provides long-lasting extraction solutions for corrosive gases and air",
+              "bulundu": true,
+              "sha256": "b0f4b4deccda2fefa46382acbb503287bda8a89c85de6ae0384db250394d7876",
+              "cekim": "2026-10-09"
+            }
+          ]
+        }
+      ]
+    },
+    "danfoss": {
+      "ad": "Danfoss",
+      "olgular": [
+        {
+          "alan": "country",
+          "durum": "TEK_KAYNAK",
+          "deger": "Danimarka",
+          "degerEn": "Denmark",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/history/",
+              "alinti": "Mads Clausen founded Danfoss in his parents",
+              "bulundu": true,
+              "sha256": "69eef614bc345756cbab030c2bdd70cf5aac41fec19988c18d18e95fed43f23a",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Alıntı \"…farmhouse in Nordborg, Denmark\" cümlesinin başıdır; ülke adı aynı cümlede."
+        },
+        {
+          "alan": "headquarters",
+          "durum": "TEK_KAYNAK",
+          "deger": "Nordborg",
+          "degerEn": "Nordborg",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/history/",
+              "alinti": "headquarters are still located right next door to the family farm",
+              "bulundu": true,
+              "sha256": "69eef614bc345756cbab030c2bdd70cf5aac41fec19988c18d18e95fed43f23a",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/history/",
+              "alinti": "farmhouse in Nordborg, Denmark",
+              "bulundu": true,
+              "sha256": "69eef614bc345756cbab030c2bdd70cf5aac41fec19988c18d18e95fed43f23a",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "founded",
+          "durum": "TEK_KAYNAK",
+          "deger": "1933",
+          "sayilar": [
+            "1933"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/history/",
+              "alinti": "began on September 1, 1933, when Mads Clausen founded Danfoss",
+              "bulundu": true,
+              "sha256": "69eef614bc345756cbab030c2bdd70cf5aac41fec19988c18d18e95fed43f23a",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/",
+              "alinti": "began in 1933 when Mads Clausen founded Danfoss",
+              "bulundu": true,
+              "sha256": "eab34f9fdaf64636dd5af59bed520aac58a9963235a2952330a9ffd96e051bf2",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "aileSirketi",
+          "durum": "TEK_KAYNAK",
+          "deger": "aile şirketi",
+          "degerEn": "family-owned company",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/",
+              "alinti": "We are a family-owned company dedicated to creating long-term value for all our stakeholders",
+              "bulundu": true,
+              "sha256": "eab34f9fdaf64636dd5af59bed520aac58a9963235a2952330a9ffd96e051bf2",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "frekansKonvertoruUretimi",
+          "durum": "TEK_KAYNAK",
+          "deger": "1968'den beri frekans konvertörü üretimi",
+          "sayilar": [
+            "1968"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/company/history/",
+              "alinti": "Mass production of frequency converters began in 1968 with the VLT",
+              "bulundu": true,
+              "sha256": "69eef614bc345756cbab030c2bdd70cf5aac41fec19988c18d18e95fed43f23a",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/our-businesses/drives/",
+              "alinti": "Pioneers of VFDs since 1968",
+              "bulundu": true,
+              "sha256": "47505f94e05f107b6535abdbba0655ea9b13c28a672ceada247b8578b8c54f2d",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "\"Pioneers of VFDs\" (öncü) Danfoss'un kendi ifadesidir; vitrinde VentHub sesiyle \"öncüsüdür\" yazılamaz (M5). Yazılabilir: \"1968'den beri frekans konvertörü üretiyor\" (seri üretim başlangıcı, resmî tarih sayfası)."
+        },
+        {
+          "alan": "enerjiTasarrufu",
+          "durum": "TEK_KAYNAK",
+          "deger": "%80'e varan",
+          "sayilar": [
+            "%80"
+          ],
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/about-danfoss/our-businesses/drives/",
+              "alinti": "reducing energy consumption by up to 80%",
+              "bulundu": true,
+              "sha256": "47505f94e05f107b6535abdbba0655ea9b13c28a672ceada247b8578b8c54f2d",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Üretici beyanıdır (\"Danfoss VFDs … up to 80%\"); vitrinde yalnız \"Danfoss'a göre\" ya da \"Danfoss'un belirttiğine göre\" atfıyla yazılır, koşulu belirsiz tek başına olgu cümlesi olmaz."
+        },
+        {
+          "alan": "website",
+          "durum": "TEK_KAYNAK",
+          "deger": "https://www.danfoss.com",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.danfoss.com/en/",
+              "alinti": "We are a family-owned company dedicated to creating long-term value for all our stakeholders",
+              "bulundu": true,
+              "sha256": "ff1a5f52db7b34045fde0e2a53ff14516abd60bb1e8a51f73a55ef4cdf21f892",
+              "cekim": "2026-10-09"
+            }
+          ]
+        }
+      ]
+    },
+    "casals": {
+      "ad": "Casals",
+      "olgular": [
+        {
+          "alan": "country",
+          "durum": "DOGRULANDI",
+          "deger": "İspanya",
+          "degerEn": "Spain",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.casals.com/en/company/",
+              "alinti": "Ctra. Camprodon, s/n 17860 Sant Joan de les Abadesses (Girona) SPAIN",
+              "bulundu": true,
+              "sha256": "980624b392c0d2acee6fe0cb099fbeb0abc553bccc2bc0ed853022f6793d0c83",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "82f7f-cata-logo-plug-fans_casals.pdf",
+              "pdf_hash": "b7c9ad9cab1e5ca13ae8d6c58350880d50ef9fb68dd46e1519fcb3a6883a8ba2",
+              "sayfa": 24,
+              "alinti": "Ctra. Camprodon, s/n 17860 Sant Joan de les Abadesses (Girona) Spain",
+              "bulundu": true,
+              "sha256": "723411905a1fbde0387c0d8ccb034f016d16ececc2cf3edc47c7b33656c0ab07",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "headquarters",
+          "durum": "DOGRULANDI",
+          "deger": "Sant Joan de les Abadesses, Girona",
+          "degerEn": "Sant Joan de les Abadesses, Girona",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.casals.com/en/company/",
+              "alinti": "Ctra. Camprodon, s/n 17860 Sant Joan de les Abadesses (Girona) SPAIN",
+              "bulundu": true,
+              "sha256": "980624b392c0d2acee6fe0cb099fbeb0abc553bccc2bc0ed853022f6793d0c83",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "82f7f-cata-logo-plug-fans_casals.pdf",
+              "pdf_hash": "b7c9ad9cab1e5ca13ae8d6c58350880d50ef9fb68dd46e1519fcb3a6883a8ba2",
+              "sayfa": 24,
+              "alinti": "Ctra. Camprodon, s/n 17860 Sant Joan de les Abadesses (Girona) Spain",
+              "bulundu": true,
+              "sha256": "723411905a1fbde0387c0d8ccb034f016d16ececc2cf3edc47c7b33656c0ab07",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "\"Merkez\" sözcüğü kaynakta yok; tek tüzel kişinin (CASALS VENTILACIÓN AIR INDUSTRIAL, SLU) firma adresidir, ülke ofisleri listesi değil. Metinde \"…adresli\" ya da \"…merkezli\" yazılabilir (M8 adres kuralı)."
+        },
+        {
+          "alan": "founded",
+          "durum": "DOGRULANAMADI",
+          "neden": "Resmî kaynakta kuruluş yılı yok: casals.com/en/company yalnız \"centenary manufacturer\" (yüzyıllık) diyor, yıl vermiyor. Eski kayıttaki 1881 ve \"140 yıl\" kaynaksız.",
+          "kaynaklar": []
+        },
+        {
+          "alan": "vorticeGrubu",
+          "durum": "DOGRULANDI",
+          "deger": "Vortice Group şirketlerinden biri",
+          "degerEn": "a Vortice Group company",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.casals.com/en/",
+              "alinti": "VORTICE Group worldwide International Italy United Kingdom China Latam Casals Vortice Industrial",
+              "bulundu": true,
+              "sha256": "688a2e70be46fbd00d0e0180d186869fb14e1b8d396ec9a321f8d25b8cb3051d",
+              "cekim": "2026-10-09"
+            },
+            {
+              "yayin": "uretici-katalogu",
+              "tur": "dizin",
+              "dosya": "82f7f-cata-logo-plug-fans_casals.pdf",
+              "pdf_hash": "b7c9ad9cab1e5ca13ae8d6c58350880d50ef9fb68dd46e1519fcb3a6883a8ba2",
+              "sayfa": 24,
+              "alinti": "VORTICE GROUP COMPANIES / SOCIEDADES DEL GRUPO VORTICE CASALS",
+              "bulundu": true,
+              "sha256": "723411905a1fbde0387c0d8ccb034f016d16ececc2cf3edc47c7b33656c0ab07",
+              "cekim": "2026-10-09"
+            }
+          ]
+        },
+        {
+          "alan": "avensDistributorlugu",
+          "durum": "TEK_KAYNAK",
+          "deger": "AVenS distribütörlüğü",
+          "degerEn": "supplied through AVenS as distributor",
+          "kaynaklar": [
+            {
+              "yayin": "ic-karar",
+              "karar": "264",
+              "alinti": "Casals markası AVenS distribütörlüğüyle sunulur (Recep kararı 264)",
+              "bulundu": true
+            }
+          ],
+          "not": "Dış resmî kaynak değil, işletme kararı (karar 264, Recep). Vitrinde marka olgusu değil, VentHub'ın satış biçimi olarak yazılır."
+        },
+        {
+          "alan": "website",
+          "durum": "TEK_KAYNAK",
+          "deger": "https://www.casals.com",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.casals.com/en/",
+              "alinti": "Casals Ventilation - Fans of innovation",
+              "bulundu": true,
+              "sha256": "688a2e70be46fbd00d0e0180d186869fb14e1b8d396ec9a321f8d25b8cb3051d",
+              "cekim": "2026-10-09"
+            }
+          ]
+        }
+      ]
+    },
+    "flexiva": {
+      "ad": "Flexiva",
+      "olgular": [
+        {
+          "alan": "markaAdi",
+          "durum": "TEK_KAYNAK",
+          "deger": "Flexiva",
+          "kaynaklar": [
+            {
+              "yayin": "marka-sitesi",
+              "tur": "web",
+              "url": "https://www.avensair.com/",
+              "alinti": "Markalar AVenS Vortice Casals Nicotra Gebhardt Flexiva",
+              "bulundu": true,
+              "sha256": "0f5a1e1f826a2ec7352eb23b5b751937c1f3ad3ef53589a727cedf738ddb13c7",
+              "cekim": "2026-10-09"
+            }
+          ],
+          "not": "Yalnız AVenS sitesinin marka menüsünde adı geçer; markanın kendi resmî sayfası bulunamadı."
+        },
+        {
+          "alan": "country",
+          "durum": "DOGRULANAMADI",
+          "kaynaklar": [],
+          "neden": "Flexiva için resmî sayfa bulunamadı; kaynak dizininde Flexiva için 0 sayfa (ölçüm 2026-10-04 ve 2026-10-09). Ülke, kuruluş, merkez ve web adresi YAZILAMAZ."
+        },
+        {
+          "alan": "founded",
+          "durum": "DOGRULANAMADI",
+          "kaynaklar": [],
+          "neden": "Flexiva için resmî sayfa bulunamadı; kaynak dizininde Flexiva için 0 sayfa (ölçüm 2026-10-04 ve 2026-10-09). Ülke, kuruluş, merkez ve web adresi YAZILAMAZ."
+        },
+        {
+          "alan": "headquarters",
+          "durum": "DOGRULANAMADI",
+          "kaynaklar": [],
+          "neden": "Flexiva için resmî sayfa bulunamadı; kaynak dizininde Flexiva için 0 sayfa (ölçüm 2026-10-04 ve 2026-10-09). Ülke, kuruluş, merkez ve web adresi YAZILAMAZ."
+        },
+        {
+          "alan": "website",
+          "durum": "DOGRULANAMADI",
+          "kaynaklar": [],
+          "neden": "Flexiva için resmî sayfa bulunamadı; kaynak dizininde Flexiva için 0 sayfa (ölçüm 2026-10-04 ve 2026-10-09). Ülke, kuruluş, merkez ve web adresi YAZILAMAZ."
+        }
+      ]
+    }
+  }
+}
