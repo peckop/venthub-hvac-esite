@@ -256,57 +256,32 @@ const HASSAS_GLOB = /(^|[/\\])\.[^/\\]*[*?[]|[*?[][^/\\]*env/i
 const hassasMi = (a) => HASSAS.some((r) => r.test(String(a)))
 const globHassasMi = (a) => HASSAS_GLOB.test(String(a))
 
+// DARALTMA (OPS, 18 Ekim): rg ve find YOK (aracın kendi glob/ignore genişletmesi tırnaklı .env* desenini okutabilir);
+// grep yalnız tek dosyalı sade biçim; özyineleme, --include/--exclude ve tanınmayan her uzun seçenek yasak.
 const SADE = new Set([
   'ls', 'pwd', 'cat', 'head', 'tail', 'wc', 'stat', 'file', 'du', 'df', 'date', 'which', 'basename', 'dirname',
   'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'uniq', 'cut', 'tr', 'diff', 'cmp',
-  'sha256sum', 'md5sum', 'tree', 'grep', 'egrep', 'fgrep', 'rg', 'sort', 'find', 'jq',
+  'sha256sum', 'md5sum', 'tree', 'grep', 'egrep', 'fgrep', 'sort', 'jq',
 ])
 
-// Özyinelemeli grep'in gezebileceği güvenli yol: nokta ya da mutlak/üst dizin ile başlamayan, glob içermeyen göreli ad.
-const GUVENLI_KLASOR = /^[A-Za-z0-9_][A-Za-z0-9_\-./]*$/
-const GREP_UZUN_DEGERLI = new Set([
-  '--regexp', '--file', '--max-count', '--include', '--exclude', '--exclude-dir', '--exclude-from', '--after-context',
-  '--before-context', '--context', '--label', '--binary-files', '--devices',
+// grep'in kabul edilen uzun seçenekleri TAM ADLARIYLA (kısaltma ve bilinmeyen ad yasak). --file ve --include/--exclude* yok.
+const GREP_UZUN_IZIN = new Set([
+  'ignore-case', 'line-number', 'count', 'files-with-matches', 'files-without-match', 'invert-match', 'no-filename',
+  'with-filename', 'fixed-strings', 'extended-regexp', 'word-regexp', 'line-regexp', 'only-matching', 'quiet', 'silent',
+  'no-messages', 'text', 'regexp', 'max-count', 'after-context', 'before-context', 'context', 'color', 'colour',
 ])
 
-/** grep -r / -R: .env gibi nokta dosyalarını dolaylı okutmasın diye yol operandları güvenli klasör olmalı. */
-function grepOzyinelemeli(geri) {
-  let ozy = false
-  let kalipBayrakla = false
-  const poz = []
-  for (let i = 0; i < geri.length; i += 1) {
-    const a = geri[i]
-    if (a === '--') {
-      poz.push(...geri.slice(i + 1))
-      break
-    }
+/** grep: özyineleme (-r -R -d -D ve her kısa kümedeki r/R/d/D) ve izinsiz uzun seçenek yasak. */
+function grepSade(geri) {
+  for (const a of geri) {
+    if (a === '--') break
     if (a.startsWith('--')) {
-      const ad = a.split('=')[0]
-      if (ad === '--recursive' || ad === '--dereference-recursive') ozy = true
-      if (ad === '--directories') return false // -d recurse'in uzun biçimi
-      if (ad === '--regexp' || ad === '--file') kalipBayrakla = true
-      if (!a.includes('=') && GREP_UZUN_DEGERLI.has(ad)) i += 1
+      if (!GREP_UZUN_IZIN.has(a.slice(2).split('=')[0])) return false
       continue
     }
-    if (a.startsWith('-') && a.length > 1) {
-      // Kısa küme (-rn, -r1, -ePAT, -nrf dosya): ilk değer-alan harften sonrası değerdir.
-      for (let k = 1; k < a.length; k += 1) {
-        const ch = a[k]
-        if (ch === 'r' || ch === 'R') ozy = true
-        if (ch === 'd' || ch === 'D') return false
-        if ('efmABC'.includes(ch)) {
-          if (ch === 'e' || ch === 'f') kalipBayrakla = true
-          if (k === a.length - 1) i += 1
-          break
-        }
-      }
-      continue
-    }
-    poz.push(a)
+    if (a.startsWith('-') && a.length > 1 && /[rRdD]/.test(a)) return false
   }
-  if (!ozy) return true
-  const yollar = kalipBayrakla ? poz : poz.slice(1)
-  return yollar.length > 0 && yollar.every((y) => GUVENLI_KLASOR.test(y) && !y.split('/').some((p) => p.startsWith('.')))
+  return true
 }
 
 function sadeOkuma(args) {
@@ -316,13 +291,7 @@ function sadeOkuma(args) {
   if (ad === 'sort' && !geri.every((a) => !a.startsWith('-') || /^-[nruf]+$/.test(a))) return false
   if (ad === 'date' && geri.some((a) => a === '-s' || a === '--set' || /^--set=/.test(a))) return false
   if (ad === 'tail' && geri.some((a) => a === '-f' || a === '-F' || a === '--follow' || /^--follow=/.test(a))) return false
-  if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep' || ad === 'rg') && geri.some((a) => /^--(pre|hostname-bin)/.test(a))) return false
-  if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepOzyinelemeli(geri)) return false
-  // rg: .gitignore'u (ve .env'i) görmezden gelen bayraklar yasak.
-  // rg: -u/-. içeren her kısa küme (-uu, -nu, -.) ve ignore/gizli dosya uzun seçeneklerinin her kısaltması yasak.
-  if (ad === 'rg' && geri.some((a) => /^-[^-][^=]*$/.test(a) && /[u.]/.test(a))) return false
-  if (ad === 'rg' && geri.some((a) => uzunSecenekYasakMi(a, RG_YASAK))) return false
-  if (ad === 'find' && geri.some((a) => /^-(exec|execdir|ok|okdir|delete|fprint|fprint0|fprintf|fls)$/.test(a))) return false
+  if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepSade(geri)) return false
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
   return true
@@ -337,10 +306,6 @@ const GIT_ALT = new Set([
 const GIT_YASAK = [
   'output', 'ext-diff', 'textconv', 'filters', 'open-files-in-pager', 'exec-path', 'exec', 'upload-pack',
   'receive-pack', 'no-index', 'untracked', 'no-exclude-standard', 'paginate',
-]
-const RG_YASAK = [
-  'unrestricted', 'hidden', 'no-ignore', 'no-ignore-vcs', 'no-ignore-dot', 'no-ignore-parent', 'no-ignore-global',
-  'no-ignore-files', 'no-ignore-exclude', 'no-require-git', 'pre', 'hostname-bin',
 ]
 /**
  * Uzun seçenek yasak bir adın KENDİSİ ya da ÖNEKİ ise true (git ve rg tek anlamlı kısaltmaları kabul eder:
@@ -365,6 +330,8 @@ function gitOkuma(args) {
   const geri = args.slice(i + 1)
   if (!alt) return false
   if (geri.some((a) => uzunSecenekYasakMi(a, GIT_YASAK) || a === '-O' || /^-O./.test(a))) return false
+  // Pathspec sihri (:(glob)**/.env* vb.) git'in kendi genişletmesidir; tırnaklı olsa da yasak.
+  if (geri.some((a) => /:\(/.test(a))) return false
   if (GIT_ALT.has(alt)) return true
   if (alt === 'branch') {
     if (geri.some((a) => GIT_BRANCH_YAZAN.has(a))) return false
