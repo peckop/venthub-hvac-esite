@@ -109,7 +109,7 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
   const kucuk = metin.toLowerCase()
   // Dosya adı BÜTÜN bir kelime olarak geçmeli ("baska.mjs" içinde "a.mjs" eşleşmesin).
   const kacis = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const dosyaAdiGecer = [...betikler].some((ad) => new RegExp('(^|[\\s/\\\\"\'=$])' + kacis(ad) + '($|[\\s"\';&|)])').test(kucuk))
+  const dosyaAdiGecer = [...betikler].some((ad) => new RegExp('(^|[\\s/\\\\"\'=$])' + kacis(ad) + '($|[\\s"\';&|)`}])').test(kucuk))
   const klasorAdiGecer = /product-data/i.test(metin)
   let mevcut = path.resolve(gitBashYolu(cwd || process.cwd()))
   // Ayırıcılar geniş: & ; | satır sonu, ( ) { } ters tırnak ve $( — ayrıştırıcı farkıyla parça gizlenemesin.
@@ -137,6 +137,13 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
     }
     // (3) klasör adı ya da apply'li bir betiğin adı komutta geçiyor (dolaylı çağrı)
     if (klasorAdiGecer || dosyaAdiGecer) return 'komutta product-data betigine dolayli isaret'
+  }
+  // Kapalı düşen yedek: parçalar ayrıldığında çalıştırıcı, bayrak ve betik parçalara dağılabilir
+  // (`node $(echo …/product-data/a.mjs) --apply`). Bütün komutta üçü birden varsa parçalamaya bakmadan reddet.
+  const tumKelimeler = kelimele(metin)
+  const tumCalistirici = tumKelimeler.some((w) => CALISTIRICI.test(path.basename(String(w).replace(/\\/g, '/'))))
+  if (tumCalistirici && BAYRAK.test(metin) && (klasorAdiGecer || dosyaAdiGecer)) {
+    return 'komutta calistirici, --apply/--rollback ve product-data birlikte (parcalanmis cagri)'
   }
   return null
 }

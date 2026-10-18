@@ -42,6 +42,8 @@ describe('INV-KANCA-CANLI-YAZIM-1 · yol biçimi fark etmeksizin reddedilir', ()
     ['bash -c sarmalı', 'bash -c "node scripts/db/product-data/a.mjs --apply"'],
     ['dolaylı değişken (komutta apply\'li betiğin adı geçiyor)', 'S=a.mjs; node $S --apply'],
     ['klasör adı geçiyor, betik değişkende', 'D=scripts/db/product-data; node "$D/$S" --apply'],
+    ['betik komut ikamesinin içinde, bayrak dışında', 'node $(echo scripts/db/product-data/a.mjs) --apply'],
+    ['betik ters tırnakta, bayrak dışında', 'node `echo a.mjs` --rollback'],
     ['alt kabuk parantezi', '(node scripts/db/product-data/a.mjs --apply)'],
     ['süslü parantez grubu', '{ node scripts/db/product-data/a.mjs --apply; }'],
     ['komut ikamesi', 'echo $(node scripts/db/product-data/a.mjs --apply)'],
