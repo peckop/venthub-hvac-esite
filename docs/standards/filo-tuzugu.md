@@ -9,6 +9,7 @@
 > **Üstünlük sırası:** Recep sözü ve CLAUDE.md Mutlak Kurallar > bu tüzük > cetveller. Tüzükle çelişen cetvel sahibine kart
 > olarak bildirilir ve SAHİBİ düzeltir; tüzük başkasının cetvelini değiştirmez.
 > **Durum:** v0.1. Taslak OPS çürütmesinden geçti. Tetiği kurulmamış görevler "bağlı: hayır" yazılır.
+> **Son doğrulama:** 2026-10-16 (HARİTA: bağımsız doğrulayıcı; beş Recep kapısı `docs/roller/OPS.md`'ye, atıflar ve yollar gerçek dosyalara karşı ölçüldü).
 >
 > **Kaynak/cetvel:** `execution-method-standard.md` §10.1 (organ ve rol tablosu), `fleet-mechanism-standard.md` §17 madde 4 ve
 > §18 (onay yolu, izin), `is-kayit-duzeni-standard.md` §2 ve RECEP YETKİSİ, `duzenli-gorevler-standard.md`,
