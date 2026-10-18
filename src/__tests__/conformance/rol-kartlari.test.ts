@@ -1298,7 +1298,8 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     for (const ad of roller) {
       expect(kurallar[ad], ad).toContain("Günlük işte Recep'e soru sorulmaz")
       expect(kurallar[ad], ad).toContain('autoMode.allow')
-      expect(kurallar[ad], ad).toContain('docs/roller/OPS.md')
+      expect(kurallar[ad], ad).toContain('filo-tuzugu.md` Madde 2.1')
+      expect(kurallar[ad], ad).toContain('ek kalemler: edge fonksiyonlu PR')
     }
   })
 })

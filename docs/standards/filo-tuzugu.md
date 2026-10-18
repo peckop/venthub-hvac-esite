@@ -41,8 +41,8 @@ iyileştirme önerisi, kural metni (Recep kapısı metni hariç), sıra ve önce
 verme (her sayısal iddianın kaynağı karar kartında).
 - **Sınır:** bir kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, 2.2 yolundan
   Recep'e gider. Kapıyı SIKILAŞTIRAN öneri OPS onayıyla geçer.
-- **Günlük iş (Recep 16 Ekim):** günlük işte Recep'e soru sorulmaz; Madde 2.1'deki beş Recep kapısı (`docs/roller/OPS.md`
-  "Recep kapıları") ve izin genişletme dışındaki her onay OPS'a gelir.
+- **Günlük iş (Recep 16 Ekim):** günlük işte Recep'e soru sorulmaz; Madde 2.1'de sayılan Recep kalemleri (beş kapı ve ek
+  kalemler) ve izin genişletme dışındaki her onay OPS'a gelir.
   Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS'a yazılır; Recep'e "şu pencereye şunu yaz" denmez, OPS kalıcı
   kuralı (`autoMode.allow`) önerir. Satır her rolün kurallar dosyasındadır (`scripts/belge/rol-karti-uret.cjs`, birleştirme bloğu).
 
@@ -129,7 +129,7 @@ yalnız `cetvel-sahipligi.json` ile ve sahibin teyidiyle değişir.
 
 Kart alanları `is-kayit-duzeni-standard.md` §2 ile birebirdir (Ne, Niçin, Kabul ölçütü, Eleme kaydı, Kim, Ne zaman, Nerede ve
 KAYNAK/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA; Recep'e bağlıysa RECEP YETKİSİ). 5N1K her iş kartının da zorunlu tanımıdır
-(Recep 16 Ekim: "her şey tam tanımlı olmalı"): Kim, Ne, Ne zaman, Nerede, Nasıl, Neden. Bitişin kanıtı `verify_completion`'dır.
+(OPS-169, 16 Ekim; kartın hangi alanı boşsa kart eksiktir): Kim, Ne, Ne zaman, Nerede, Nasıl, Neden. Bitişin kanıtı `verify_completion`'dır.
 
 ## Madde 11 — Recep ile iletişim
 
