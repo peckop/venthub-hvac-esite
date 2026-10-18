@@ -49,7 +49,23 @@
 4. `wipLimit` ve yönetilen yaşam döngüsü kararını ARC-168 pilotuna bağla.
 5. 1.1.4 sonrası çıkan sürümler (1.1.5, 1.1.7) için aynı karşılaştırma yapılmadan yükseltme önerilmez.
 
-## 4 · Ölçülmeyenler
+## 4 · 1.1.4 → 1.1.7 (18 Ekim ölçümü, OPS ek isteği)
+
+Aynı yöntem: 1.1.7 paketleri `npm pack --ignore-scripts` ile indirilip 1.1.4 kümesiyle `diff` edildi.
+
+| Paket | Fark | Okuma |
+|---|---|---|
+| sage-mcp, kanban-mcp, mailbox-mcp, codebase-index-mcp (sarmalayıcılar) | 6-12 satır, yalnız sürüm numarası | davranış aynı |
+| kanban kütüphanesi (1.1.2 → 1.1.7) | 10 dosya, yaklaşık 2200 satır | ağırlıkla yeniden düzenleme: pano normalleştirme, doğrulayıcı komut çözümü ve masaüstü vitest çözümü ayrı modüllere taşınmış; anlamı aynı görünüyor (`normalizeBoard` sıra ve varsayılan doldurma, `resolveConfiguredExecutable` yerel bin çözümü) |
+| sage kütüphanesi (1.1.2 → 1.1.7) | 4 dosya, yaklaşık 1000 satır | arama dosyası bölünmüş; hafıza geri bildirimi aracında eski daemon uyarı iletisi eklenmiş |
+| mcp, primitives | 60 ve 8 satır | küçük |
+| core, tools | 278 ve 154 dosya | paketlenmiş parça adları değişmiş; okunmadı |
+
+Hüküm: aradığımız bir özellik (sınır, ayar, anahtar) çıkmadı; yükseltmenin kazancı gösterilemiyor, bedeli bir pencere
+kapatma penceresi (yaklaşık 10 dakika) ve yeni yama doğrulaması. Önerim: 1.1.4'te kal; core ve tools farkı okunmadığı
+için "güvenli" denmez. Sürüm notu pakette yok, davranış testi koşulmadı.
+
+## 5 · Ölçülmeyenler
 
 - core ve tools paketlerindeki değişikliklerin MCP sunucularımızı ne kadar etkilediği.
 - `mailbox_read` 20 ileti sınırının `posta-kutusu.cjs` ile birlikte davranışı.
