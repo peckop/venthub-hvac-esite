@@ -17,7 +17,7 @@
  *   4. HEAD listedeki head ile AYNI (liste çıkarıldıktan sonra commit gelmemiş);
  *   5. HEAD hiçbir remote ref'te olmayan commit taşımıyor (`rev-list HEAD --not --remotes` = 0);
  *   6. YEREL-ÖZGÜN DOSYA KAPISI (ARC-190): node_modules/.next/graphify-out/coverage/test-results dışında, ana deponun git
- *      geçmişinde (`log --all --name-only`) HİÇ geçmeyen dosya (gitignore'lu ölçüm çıktısı, not, .env, csv/json dahil) yok.
+ *      geçmişinde (`log --all -m --raw`) adı HİÇ geçmeyen ya da içeriği geçmişteki hiçbir blob ile eşleşmeyen dosya (gitignore'lu ölçüm çıktısı, not, .env, csv/json dahil) yok.
  *      Varsa kopya ATLANIR, dosya listesi kayda yazılır; istisna yok. Geçmiş okunamazsa hiçbir şey silinmeden durur (çıkış 6).
  *
  * SİLME YÖNTEMİ (karar 88, 09-23 olayı: `git worktree remove` junction'dan geçip ana deponun node_modules'ünü sildi):
@@ -157,6 +157,9 @@ for (const h of hedefler) {
     }
     if (tara(yol).baglantilar.length > 0) throw new Error('bağlantı hâlâ var; git worktree remove ÇAĞRILMADI')
     if (anaBinVardi && !fs.existsSync(anaBin)) throw new Error('ANA DEPO node_modules/.bin KAYBOLDU — durduruldu')
+    // Yarış sertleştirmesi (ARC-190 doğrulama): kapıdan geçtikten sonra eklenen dosya için yıkıcı adımdan hemen önce yeniden dene.
+    const kapi2 = yerelOzgunKapisi(yol, gecmis)
+    if (!kapi2.ok) throw new Error('silme öncesi kapı yeniden koşuldu: ' + kapi2.sebep)
     git(ana, ['worktree', 'remove', '--force', yol], 30 * 60 * 1000)
     if (anaBinVardi && !fs.existsSync(anaBin)) {
       console.error('ANA DEPO node_modules/.bin silme sonrası kayboldu — DURDU. Onarım: pnpm install (ana depo).')

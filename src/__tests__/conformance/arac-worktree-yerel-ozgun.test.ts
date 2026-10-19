@@ -3,7 +3,7 @@
  *
  * Regresyon: 19 Ekim 2026, ~117 klasör `.git`siz ya da gitignore'lu yerel dosyalarına (ölçüm çıktısı, not, .env, csv/json)
  * BAKILMADAN silindi. Kural: node_modules/.next/graphify-out/coverage/test-results dışındaki her dosya için ana deponun
- * git geçmişinde (`log --all --name-only`) adı geçmeyen varsa klasör ATLANIR, istisnasız; geçmiş okunamazsa kapı KAPALI kalır.
+ * git geçmişinde (`log --all -m --raw`) adı geçmeyen ya da içeriği hiçbir blob ile eşleşmeyen varsa klasör ATLANIR, istisnasız; geçmiş okunamazsa kapı KAPALI kalır.
  */
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
@@ -172,6 +172,22 @@ describe('INV-ARAC-WT-OZGUN-1 · yerel-özgün dosya kapısı', () => {
     expect(r.sebep).toMatch(/yapılamadı/)
   })
 
+  it('blob özeti `git hash-object --no-filters` ile BİREBİR aynı (boş, LF, CRLF, ikili, UTF-8 Türkçe)', () => {
+    const t = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-hash-'))
+    try {
+      const { blobOzetleri } = gerek(path.join(KOK, 'tools', 'worktree-artik-sil.cjs')) as { blobOzetleri: (b: Buffer) => string[] }
+      const ornekler: Buffer[] = [Buffer.alloc(0), Buffer.from('a\nb\n'), Buffer.from('a\r\nb\r\n'), Buffer.from([0xff, 0x0d, 0x00, 0x0a, 0xfe]), Buffer.from('ğüşİıöç satır\n', 'utf8')]
+      ornekler.forEach((b, i) => {
+        const p = path.join(t, `d${i}.bin`)
+        fs.writeFileSync(p, b)
+        const beklenen = execFileSync('git', ['hash-object', '--no-filters', p], { encoding: 'utf8' }).trim()
+        expect(blobOzetleri(b)[0]).toBe(beklenen)
+      })
+    } finally {
+      fs.rmSync(t, { recursive: true, force: true })
+    }
+  })
+
   it('BAĞLANTI: iki araç da kapıyı silme/bağlantı kaldırma adımlarından ÖNCE çağırır ve geçmiş okunamazsa 6 ile durur', () => {
     const artik = fs.readFileSync(path.join(KOK, 'tools', 'worktree-artik-sil.cjs'), 'utf8')
     const temizle = fs.readFileSync(path.join(KOK, 'tools', 'worktree-temizle.cjs'), 'utf8')
@@ -185,5 +201,12 @@ describe('INV-ARAC-WT-OZGUN-1 · yerel-özgün dosya kapısı', () => {
     // kapı, git worktree remove / robocopy'den önce olmalı
     expect(ti).toBeLessThan(temizle.indexOf("'worktree', 'remove'"))
     expect(ai).toBeLessThan(artik.indexOf("spawnSync('robocopy'"))
+    // yarış sertleştirmesi: yıkıcı adımdan HEMEN önce kapı ikinci kez koşar
+    const a2 = artik.indexOf('const ok2 = yerelOzgunKapisi(yol, gecmis)')
+    expect(a2).toBeGreaterThan(ai)
+    expect(a2).toBeLessThan(artik.indexOf("spawnSync('robocopy'"))
+    const t2 = temizle.indexOf('const kapi2 = yerelOzgunKapisi(yol, gecmis)')
+    expect(t2).toBeGreaterThan(ti)
+    expect(t2).toBeLessThan(temizle.indexOf("'worktree', 'remove'"))
   })
 })

@@ -23,7 +23,7 @@
  *      hızlı), sonra boş kök `fs.rmdirSync`; `rmdir /s` ve `rm -rf` kullanılmaz;
  *   5. ana deponun node_modules/.bin'i her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR;
  *   6. YEREL-ÖZGÜN DOSYA KAPISI (ARC-190): node_modules/.next/graphify-out/coverage/test-results dışında, ana deponun git
- *      geçmişinde (`log --all --name-only`) HİÇ geçmeyen bir dosya varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
+ *      geçmişinde (`log --all -m --raw`) adı HİÇ geçmeyen ya da içeriği geçmişteki hiçbir blob ile eşleşmeyen bir dosya varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
  *      Geçmiş okunamazsa betik hiçbir şey silmeden durur (çıkış 6).
  * Varsayılan KURU KOŞUM (hiçbir şeye dokunmaz). Gerçek: `--gercek --geri-alinamaz-onayladim`.
  *
@@ -254,7 +254,7 @@ function yerelOzgunKapisi(yol, gecmis) {
   try {
     const r = yerelOzgunDosyalar(yol, gecmis)
     if (r.toplam > 0) {
-      return { ok: false, sebep: `yerel-özgün ${r.toplam} dosya (git geçmişinde yok): ${r.dosyalar.slice(0, 5).join(', ')}${r.toplam > 5 ? ' …' : ''}`, dosyalar: r.dosyalar, toplam: r.toplam }
+      return { ok: false, sebep: `yerel-özgün ${r.toplam} dosya (git geçmişinde yok ya da içerik değişmiş): ${r.dosyalar.slice(0, 5).join(', ')}${r.toplam > 5 ? ' …' : ''}`, dosyalar: r.dosyalar, toplam: r.toplam }
     }
     return { ok: true, sebep: '', dosyalar: [], toplam: 0 }
   } catch (e) {
@@ -377,6 +377,9 @@ function main() {
       kayitYaz({ yol, adim: 'baglantilar-kaldirildi', adet: baglantilar.length, disari: disari.length })
       if (tara(yol).baglantilar.length > 0) throw new Error('bağlantı hâlâ var; özyinelemeli silme YAPILMADI')
       if (anaBinVardi && !fs.existsSync(anaBin)) throw new Error('ANA DEPO node_modules/.bin KAYBOLDU — durduruldu')
+      // Yarış sertleştirmesi (ARC-190 doğrulama): kapıdan geçtikten sonra klasöre dosya eklenmiş olabilir; yıkıcı adımdan hemen önce yeniden dene.
+      const ok2 = yerelOzgunKapisi(yol, gecmis)
+      if (!ok2.ok) throw new Error('silme öncesi kapı yeniden koşuldu: ' + ok2.sebep)
       const bos = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-bos-'))
       try {
         const r = spawnSync('robocopy', [bos, yol, '/MIR', '/XJ', '/R:0', '/W:0', '/NFL', '/NDL', '/NJH', '/NJS', '/NP', '/MT:16'], { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024 })
@@ -411,5 +414,5 @@ function main() {
   console.log(JSON.stringify(sayac))
 }
 
-module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, gecmisKumesi, yerelOzgunDosyalar, yerelOzgunKapisi, norm }
+module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, gecmisKumesi, yerelOzgunDosyalar, yerelOzgunKapisi, blobOzetleri, norm }
 if (require.main === module) main()
