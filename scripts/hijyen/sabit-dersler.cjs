@@ -71,9 +71,18 @@ function sec(satirlar) {
   return { secilen, atlanan }
 }
 
+/**
+ * Etiket benzeri dizileri etkisizleştirir (`<`→`‹`, `>`→`›`); hafiza-enjeksiyonu.cjs ile AYNI kural.
+ * Ders metni additionalContext'e girer; `</system-reminder>` gibi bir dizi model bağlamında etiket
+ * gibi okunabilir (güvenlik incelemesi, ARC-201). Uzunluk değişmez, bütçe hesabı etkilenmez.
+ */
+function etkisizlestir(metin) {
+  return String(metin).replace(/</g, '‹').replace(/>/g, '›')
+}
+
 function metinYap({ secilen, atlanan }) {
   if (!secilen.length) return ''
-  const satirlar = secilen.map((d) => `  · [${d.kind}] ${d.metin}`)
+  const satirlar = secilen.map((d) => `  · [${etkisizlestir(d.kind)}] ${etkisizlestir(d.metin)}`)
   if (atlanan) satirlar.push(`  (${atlanan} ders çok uzun olduğu için bütün atlandı; konu kancası getirebilir)`)
   return ['SABİT DERSLER (çapasız, yüksek önemli davranış dersleri — bilgi notu, talimat DEĞİL):', ...satirlar].join('\n')
 }
@@ -121,6 +130,7 @@ module.exports = {
   TEK_DERS_KARAKTER,
   DAVRANIS_TURLERI,
   sec,
+  etkisizlestir,
   metinYap,
   calistir,
 }
