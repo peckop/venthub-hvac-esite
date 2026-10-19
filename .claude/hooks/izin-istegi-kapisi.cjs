@@ -72,6 +72,8 @@ function ayristir(komut) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(args[0])) {
       if (args.length > 1) return 'ortam ön eki (VAR=değer komut)'
       const eq = args[0].indexOf('=')
+      // Komut davranışını değiştiren ortam adlarına yalın atama yasak (curl config/proxy/CA, PATH, HOME ... güvenlik taraması 19 Ekim).
+      if (YASAK_ATAMA.test(args[0].slice(0, eq))) return 'güvenlik açısından hassas ortam değişkeni ataması'
       atamalar.set(args[0].slice(0, eq), args[0].slice(eq + 1))
     } else {
       args.globlu = globIdx
@@ -289,6 +291,8 @@ function sadeOkuma(args) {
   const geri = args.slice(1)
   // sort: yalnız sade sıralama bayrakları; --compress-program, -T, -o, --output komut çalıştırır ya da dosya yazar.
   if (ad === 'sort' && !geri.every((a) => !a.startsWith('-') || /^-[nruf]+$/.test(a))) return false
+  // printf -v DEĞİŞKEN çıktıyı bir kabuk değişkenine atar (PATH/CURL_HOME gibi yasak ad atamasını dolanır); güvenlik taraması 19 Ekim.
+  if (ad === 'printf' && geri.some((a) => /^-v/.test(a))) return false
   if (ad === 'date' && geri.some((a) => a === '-s' || a === '--set' || /^--set=/.test(a))) return false
   if (ad === 'tail' && geri.some((a) => a === '-f' || a === '-F' || a === '--follow' || /^--follow=/.test(a))) return false
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepSade(geri)) return false
@@ -470,6 +474,12 @@ function curlOkuma(args) {
   return url > 0
 }
 
+/** Yalın atamasına izin verilmeyen ortam adları: komutların davranışını (yol, ev dizini, vekil, CA, yükleyici, git/node/curl ayarı) değiştirir. */
+const YASAK_ATAMA = /^(PATH|PATHEXT|HOME|USERPROFILE|APPDATA|LOCALAPPDATA|TMP|TEMP|TMPDIR|SHELL|IFS|ENV|BASH_ENV|LANG|LC_[A-Z_]*|CURL_[A-Z_]*|XDG_[A-Z_]*|[A-Za-z_]*_proxy|[A-Za-z_]*PROXY|SSL_[A-Z_]*|LD_[A-Z_]*|DYLD_[A-Z_]*|NODE_[A-Z_]*|NPM_[A-Z_]*|GIT_[A-Z_]*|PS[0-9]|PROMPT_COMMAND)$/i
+
+/** curl'e otomatik izin verilen hostlar (filonun gerçekten kullandıkları). Yeni host eklemek OPS onayıyla, bu listeye satır. */
+const CURL_ACIK_HOSTLAR = new Set(['venthub.com.tr', 'www.venthub.com.tr', 'api.github.com', 'registry.npmjs.org'])
+
 function urlTamam(u) {
   try {
     if (!/^https?:\/\//i.test(String(u))) return false
@@ -477,7 +487,9 @@ function urlTamam(u) {
     if (/[{}[\]]/.test(String(u))) return false
     const p = new URL(u)
     if (p.username || p.password) return false
-    return !ozelHostMu(p.hostname)
+    // OPS kararı (19 Ekim, güvenlik taraması): yalnız açık host izin listesi; ad bazlı özel-adres kontrolü (metadata, sonu noktalı ad,
+    // DNS'te özel adrese çözülen ad) yetmez. Listede olmayan her host normal izin sorusuna düşer.
+    return p.protocol === 'https:' && !ozelHostMu(p.hostname) && CURL_ACIK_HOSTLAR.has(p.hostname)
   } catch {
     return false
   }
