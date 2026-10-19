@@ -268,6 +268,17 @@
             "timeout": 45
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sabit-dersler.cjs\"",
+            "timeout": 10,
+            "statusMessage": "sabit dersler"
+          }
+        ]
       }
     ],
     "SessionEnd": [
