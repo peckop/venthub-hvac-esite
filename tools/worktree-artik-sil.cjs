@@ -75,6 +75,16 @@ function tara(kok) {
 
 /** Bağlantıyı YALNIZ bağlantı olarak kaldırır. */
 function baglantiKaldir(p) {
+  // POSIX: dizine giden sembolik bağlantıya rmdir ENOTDIR verir; unlink bağlantının kendisini siler, hedefe dokunmaz.
+  if (process.platform !== 'win32') {
+    try {
+      if (!fs.lstatSync(p).isSymbolicLink()) return false
+      fs.unlinkSync(p)
+      return true
+    } catch {
+      return false
+    }
+  }
   try {
     fs.rmdirSync(p)
     return true
