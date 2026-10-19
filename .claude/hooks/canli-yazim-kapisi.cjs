@@ -21,12 +21,23 @@
  *   (2) oturumun çalışma dizini (cwd) ya da komuttaki `cd` hedefi product-data klasörünün içindedir;
  *   (3) komut metninde klasör adı `product-data` ya da klasördeki apply'li bir betiğin dosya adı geçer (değişken
  *       üzerinden dolaylı çağrı: `S=x.mjs; node $S --apply`).
- * OPS penceresi = ops-oturumu.cjs kimlikMi(session_id) ya da agent_type === 'ops-pencere' (cwd'ye bakılmaz). OPS'un alt ajanı OPS DEĞİLDİR.
+ * OPS penceresi = kanca girdisinde `agent_type === 'ops-pencere'` VE `agent_id` YOK. Ölçüm (19 Ekim, 2.1.296, başsız
+ * `claude -p --agent ops-pencere`): ana oturumda agent_type "ops-pencere", agent_id yok; alt ajan aynı session_id ile gelir,
+ * agent_id doludur, agent_type alt ajanın türüdür. Yani session_id kimliği ALT AJANI da OPS yapardı (eski sürümün deliği);
+ * artık yalnız agent_id'siz ops-pencere sayılır. Kimlik yazılabilir dosyaya (ops-oturumu.json, `--yaz` ile herkes
+ * yazabiliyor) BAĞLI DEĞİL; cwd'ye de bakılmaz. Sınır: `--agent ops-pencere` ile açılan her pencere OPS sayılır; bu ayar
+ * Recep/OPS'un elindedir (settings.local.json yazımı protect-config altında).
+ * PowerShell aracı da aynı kapıdan geçer (matcher "Bash|PowerShell"); PowerShell'de çalıştırıcı kelimesi aranmaz
+ * (Start-Process, iex, & ... çok), bayrak + product-data işareti yeter.
+ * Gizlenmiş bayrak: tırnak/ters bölü/`$`/süslü parantez sökülünce de bayrak aranır (`--appl'y'`, `--app\<satır sonu>ly`),
+ * ve `--ap`/`--ro` başlangıcı product-data bağlamında bayrak sayılır (`A=--app; node x.mjs ${A}ly`); ayrıca product-data +
+ * çalıştırıcı + değişken/komut ikamesi/`\x`/eval/base64 birlikteyse DENY (bayrak düz görünmese de).
  *
  * ── HATA YOLLARI ──
  *
  * Ayrıştırma ya da kimlik okuma çökerse: komutta hem `--apply|--rollback` hem `product-data` varsa DENY (kapalı düşer),
- * yoksa geçer. `settings.json` kaydı onFailure "block" ister (kanca süreci çökerse Claude Code komutu durdursun).
+ * yoksa geçer. `settings.json` kaydına `onFailure "block"` ARC-180 / #2004 ile gelir (kanca süreci çökerse Claude Code
+ * komutu durdursun); #2004 birleşince bu kapının satırına da eklenir.
  *
  * Bilinen sınır: betik adı ve bayrak dosyadan/ortamdan okunuyorsa (komutta hiç geçmiyorsa) yakalanmaz; o durumda
  * settings.json deny satırları ve OPS onayı son savunmadır.
@@ -34,7 +45,22 @@
 const fs = require('fs')
 const path = require('path')
 
-const BAYRAK = /(^|\s|["'])--(apply|rollback)(\s|=|$|["'])/
+const BAYRAK = /(^|\s|["'=])--(apply|rollback)(\s|=|$|["'])/
+// Söküm sonrası gevşek başlangıç: `${A}ly` gibi parçalanmış bayrağın A=--app kısmı.
+const GEVSEK = /--(ap|ro)/
+// Gizleme belirtisi: değişken/komut ikamesi, $'..', \x kaçışı, eval, base64, satır sonu kaçışı.
+const OBFUSK = /\$\{?[A-Za-z_@*#?0-9]|\$'|\$\(|`|\\x[0-9a-fA-F]{2}|\beval\b|base64|\\\r?\n/
+
+/** Tırnak, ters bölü, `$`, süslü parantez ve satır sonu kaçışını söker (gizlenmiş bayrağı düzleştirir). */
+function sokum(m) {
+  return String(m).replace(/\\\r?\n/g, '').replace(/["'`\\${}]/g, '')
+}
+/** Bayrak düz ya da gizlenmiş olarak geçiyor mu. */
+function bayrakVar(m) {
+  if (BAYRAK.test(m)) return true
+  const s = sokum(m)
+  return s !== m && (BAYRAK.test(s) || GEVSEK.test(s))
+}
 const CALISTIRICI = /^(node|nodejs|pnpm|npx|npm|yarn|tsx|ts-node|bun|deno|bash|sh|zsh|env|xargs|eval|exec|time|nohup|start|cmd|powershell|pwsh)(\.exe|\.cmd)?$/i
 const BETIK_UZANTI = /\.(mjs|cjs|js|ts|mts|cts)$/i
 const KLASOR = /scripts[\\/]+db[\\/]+product-data([\\/]|$)/i
@@ -104,7 +130,7 @@ function komutKelimesi(kelimeler) {
  * Komut product-data betiğine --apply/--rollback ile işaret ediyorsa sebep, yoksa null.
  * `cwd`: kancaya gelen çalışma dizini. `betikler`: yazanBetikAdlari() (test için dışarıdan verilebilir).
  */
-function incele(komut, cwd, betikler = yazanBetikAdlari()) {
+function incele(komut, cwd, betikler = yazanBetikAdlari(), ps = false) {
   const metin = String(komut || '')
   const kucuk = metin.toLowerCase()
   // Dosya adı BÜTÜN bir kelime olarak geçmeli ("baska.mjs" içinde "a.mjs" eşleşmesin).
@@ -123,8 +149,8 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
       continue
     }
     // Çalıştırıcı YALNIZ ilk kelime olmak zorunda değil (sudo/time/env sarmalları): parçadaki herhangi bir kelime.
-    const calistiriciVar = kelimeler.some((w) => CALISTIRICI.test(path.basename(String(w).replace(/\\/g, '/'))))
-    if (!calistiriciVar || !BAYRAK.test(parca)) continue
+    const calistiriciVar = ps || kelimeler.some((w) => CALISTIRICI.test(path.basename(String(w).replace(/\\/g, '/'))))
+    if (!calistiriciVar || !bayrakVar(parca)) continue
     // (1) betik argümanı çözülünce klasöre düşüyor mu
     for (const k of kelimeler) {
       if (!BETIK_UZANTI.test(k)) continue
@@ -141,18 +167,23 @@ function incele(komut, cwd, betikler = yazanBetikAdlari()) {
   // Kapalı düşen yedek: parçalar ayrıldığında çalıştırıcı, bayrak ve betik parçalara dağılabilir
   // (`node $(echo …/product-data/a.mjs) --apply`). Bütün komutta üçü birden varsa parçalamaya bakmadan reddet.
   const tumKelimeler = kelimele(metin)
-  const tumCalistirici = tumKelimeler.some((w) => CALISTIRICI.test(path.basename(String(w).replace(/\\/g, '/'))))
-  if (tumCalistirici && BAYRAK.test(metin) && (klasorAdiGecer || dosyaAdiGecer)) {
-    return 'komutta calistirici, --apply/--rollback ve product-data birlikte (parcalanmis cagri)'
+  const tumCalistirici = ps || tumKelimeler.some((w) => CALISTIRICI.test(path.basename(String(w).replace(/\\/g, '/'))))
+  const productVar = klasorAdiGecer || dosyaAdiGecer
+  if (tumCalistirici && productVar && bayrakVar(metin)) {
+    return 'komutta calistirici, --apply/--rollback ve product-data birlikte (parcalanmis ya da gizlenmis cagri)'
+  }
+  if (tumCalistirici && productVar && OBFUSK.test(metin)) {
+    return 'product-data betigi degisken/komut ikamesi/kacis ile cagriliyor (bayrak gorunmeyebilir)'
   }
   return null
 }
 
+/**
+ * OPS penceresi mi: harness'in verdiği agent_type "ops-pencere" ve agent_id YOK. Alt ajan ebeveynin session_id'si ile gelir
+ * ama agent_id taşır (19 Ekim ölçümü); session_id ve cwd'ye bakılmaz, yazılabilir kimlik dosyasına bağlı değil.
+ */
 function opsMu(girdi) {
-  const o = require(path.join(kokDizin(), 'scripts', 'board', 'ops-oturumu.cjs'))
-  // YALNIZ kayıtlı OPS oturum kimliği ya da harness'in verdiği agent_type. opsAdayiMi'nin cwd'den yukarı
-  // settings.local.json arama yolu KULLANILMAZ: cwd bir `cd` ile değişebilir, kimlik sahtelenebilirdi.
-  return Boolean(o.kimlikMi(girdi.session_id) || girdi.agent_type === 'ops-pencere')
+  return girdi.agent_type === 'ops-pencere' && !girdi.agent_id && !girdi.agent_id
 }
 
 function reddet(sebep) {
@@ -179,10 +210,11 @@ function main() {
     process.exit(0)
   }
   const komut = (girdi.tool_input || {}).command || ''
-  if (girdi.tool_name !== 'Bash' || !BAYRAK.test(komut)) process.exit(0)
+  const ps = girdi.tool_name === 'PowerShell'
+  if ((girdi.tool_name !== 'Bash' && !ps) || !(bayrakVar(komut) || OBFUSK.test(komut))) process.exit(0)
   let sebep = null
   try {
-    sebep = incele(komut, girdi.cwd)
+    sebep = incele(komut, girdi.cwd, undefined, ps)
   } catch (e) {
     sebep = /product-data/i.test(komut) ? 'komut ayristirilamadi (' + ((e && e.message) || 'bilinmeyen') + ')' : null
   }
@@ -191,7 +223,7 @@ function main() {
   try {
     ops = opsMu(girdi)
   } catch {
-    ops = false // kimlik okunamadi: OPS sayma (kapali dus)
+    ops = false // kimlik okunamadı: OPS sayma (kapalı düş)
   }
   if (ops) process.exit(0)
   reddet(sebep)

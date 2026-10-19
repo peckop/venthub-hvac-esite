@@ -131,13 +131,18 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/canli-yazim-kapisi.cjs\"",
-            "statusMessage": "canli-yazim-kapisi"
-          },
-          {
-            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\"",
             "statusMessage": "agir-komut-kilidi"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/canli-yazim-kapisi.cjs\"",
+            "statusMessage": "canli-yazim-kapisi"
           }
         ]
       },

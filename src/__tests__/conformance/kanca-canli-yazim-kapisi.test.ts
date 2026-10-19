@@ -50,6 +50,14 @@ describe('INV-KANCA-CANLI-YAZIM-1 · yol biçimi fark etmeksizin reddedilir', ()
     ['ters tırnak ikamesi', 'echo `node scripts/db/product-data/a.mjs --apply`'],
     ['tek & ile arka plan', 'true & node scripts/db/product-data/a.mjs --apply'],
     ['başa sarmal komut (sudo/time)', 'time node scripts/db/product-data/a.mjs --apply'],
+    ['GİZLİ: bayrak değişkende, çağrıda $A', 'A=--apply; node scripts/db/product-data/a.mjs $A'],
+    ['GİZLİ: bayrak tırnakla parçalanmış', "node scripts/db/product-data/a.mjs --appl'y'"],
+    ['GİZLİ: bayrak çift tırnakla parçalanmış', 'node scripts/db/product-data/a.mjs --ap""ply'],
+    ['GİZLİ: değişken + ek ("--app" + "ly")', 'A=--app; node scripts/db/product-data/a.mjs ${A}ly'],
+    ['GİZLİ: satır sonu kaçışıyla bölünmüş bayrak', 'node scripts/db/product-data/a.mjs --app\\\nly'],
+    ['GİZLİ: rollback değişkenle', 'R=--rollback; node scripts/db/product-data/a.mjs "$R"'],
+    ['GİZLİ: bayrak hiç görünmüyor ama değişkenli çağrı (obfüske + product-data + çalıştırıcı)', 'S=scripts/db/product-data/a.mjs; node "$S" $(cat bayrak.txt)'],
+    ['GİZLİ: ANSI-C kaçışı', "node scripts/db/product-data/a.mjs $'\\x2d\\x2dapply'"],
     ['zincirin ikinci parçası', 'git status && node scripts/db/product-data/a.mjs --apply'],
   ])('DENY · %s', (_ad, komut) => {
     expect(sor(komut)).toBe(true)
@@ -77,6 +85,8 @@ describe('INV-KANCA-CANLI-YAZIM-1 · zararsız komutlar geçer', () => {
   it.each([
     ['kuru koşum (bayraksız)', 'node --env-file=.env scripts/db/product-data/a.mjs'],
     ['kuru koşum, başka bayrak', 'node scripts/db/product-data/a.mjs --dry-run'],
+    ['düz uzun bayrak --root (apply/rollback değil, gizleme belirtisi yok)', 'node scripts/db/product-data/a.mjs --root x'],
+    ['product-data dışı betik, değişkenli çağrı', 'S=scripts/ci/baska-betik.mjs; node "$S" --apply'],
     ['başka klasörde --apply', 'node scripts/ci/baska.mjs --apply'],
     ['grep ile betik içinde arama', 'grep -n -- --apply scripts/db/product-data/a.mjs'],
     ['commit mesajında geçmesi', 'git commit -m "product-data a.mjs --apply notu"'],
@@ -127,15 +137,27 @@ describe('INV-KANCA-CANLI-YAZIM-1 · OPS penceresi geçer, diğerleri reddedilir
     return j.hookSpecificOutput?.permissionDecision === 'deny'
   }
 
-  it('OPS oturum kimliği: geçer (çıktı boş)', () => {
-    const r = kos({ session_id: opsSid, tool_input: { command: KOMUT } })
+  it('OPS penceresi (agent_type ops-pencere, agent_id yok): geçer (çıktı boş)', () => {
+    const r = kos({ session_id: digerSid, agent_type: 'ops-pencere', tool_input: { command: KOMUT } })
     expect(r.kod).toBe(0)
     expect(r.cikti).toBe('')
   })
 
-  it('OPS ajan türü: geçer', () => {
-    const r = kos({ session_id: digerSid, agent_type: 'ops-pencere', tool_input: { command: KOMUT } })
-    expect(redMi(r.cikti)).toBe(false)
+  it('DELİK B: OPS\'un ALT AJANI ebeveynin session_id\'si ve agent_id ile gelir: OPS sayılmaz', () => {
+    // 19 Ekim ölçümü: alt ajan agent_id taşır; agent_type alt ajanın türüdür ama taklit de edilebilir, agent_id yine doludur
+    expect(redMi(kos({ session_id: opsSid, agent_id: 'ae9aa80f148ad5591', agent_type: 'general-purpose', tool_input: { command: KOMUT } }).cikti)).toBe(true)
+    expect(redMi(kos({ session_id: opsSid, agent_id: 'ae9aa80f148ad5591', agent_type: 'ops-pencere', tool_input: { command: KOMUT } }).cikti)).toBe(true)
+  })
+
+  it('DELİK A: ops-oturumu.json\'a yazılmış kimlik (herkes yazabilir) OPS yapmaz', () => {
+    // dosyada opsSid kayıtlı; o session_id ile gelen ama agent_type taşımayan pencere reddedilir
+    expect(redMi(kos({ session_id: opsSid, tool_input: { command: KOMUT } }).cikti)).toBe(true)
+  })
+
+  it('PowerShell aracı da aynı kapıdan geçer: bayrak + product-data yeter, çalıştırıcı kelimesi aranmaz', () => {
+    const ps = 'Start-Process -FilePath node -ArgumentList "scripts/db/product-data/a.mjs","--apply"'
+    expect(redMi(kos({ session_id: digerSid, tool_name: 'PowerShell', tool_input: { command: ps } }).cikti)).toBe(true)
+    expect(redMi(kos({ session_id: digerSid, tool_name: 'PowerShell', agent_type: 'ops-pencere', tool_input: { command: ps } }).cikti)).toBe(false)
   })
 
   it('cwd\'de ops-pencere ayarı olsa bile kimlik sahtelenemez (yalnız oturum kimliği ve agent_type)', () => {
@@ -161,15 +183,15 @@ describe('INV-KANCA-CANLI-YAZIM-1 · OPS penceresi geçer, diğerleri reddedilir
     expect(redMi(r.cikti)).toBe(true)
   })
 
-  it('kimlik dosyası yok ya da bozuk: kapalı düşer (reddeder)', () => {
+  it('kimlik dosyası bozuk/yok olsa da OPS kararı değişmez (dosyaya bağlı değil)', () => {
     const bozuk = path.join(gecici, 'bozuk.json')
     fs.writeFileSync(bozuk, '{bozuk')
-    const r = spawnSync('node', [KANCA], {
-      input: JSON.stringify({ tool_name: 'Bash', cwd: gecici, session_id: opsSid, tool_input: { command: KOMUT } }),
+    const ops = spawnSync('node', [KANCA], {
+      input: JSON.stringify({ tool_name: 'Bash', cwd: gecici, session_id: digerSid, agent_type: 'ops-pencere', tool_input: { command: KOMUT } }),
       encoding: 'utf8',
       env: { ...process.env, VH_OPS_OTURUMU_DOSYASI: bozuk },
     })
-    expect(redMi(r.stdout.trim())).toBe(true)
+    expect(redMi(ops.stdout.trim())).toBe(false)
   })
 
   it('Bash dışı araç, bayraksız komut ve bozuk girdi: karışmaz', () => {
