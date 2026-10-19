@@ -12,7 +12,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const KOK = path.resolve(__dirname, '../../..')
-interface Kanca { type: string; command?: string; onFailure?: string }
+interface Kanca { type: string; command?: string; onFailure?: string; timeout?: number }
 interface Grup { matcher?: string; hooks: Kanca[] }
 const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8')) as { hooks: Record<string, Grup[]> }
 
@@ -38,6 +38,12 @@ describe('INV-KANCA-ONFAILURE-1', () => {
       expect(b.k.type).toBe('command')
       expect(b.k.onFailure).toBe('block')
     }
+  })
+
+  it('block taşıyan her kapı 30 sn zaman aşımı taşır (takılırsa sonsuza dek bekleyip tüm komutu kilitlemesin)', () => {
+    const blokluKancalar = tum.filter((x) => x.k.onFailure === 'block')
+    expect(blokluKancalar.length).toBeGreaterThan(0)
+    for (const b of blokluKancalar) expect([b.ad, b.k.timeout]).toEqual([b.ad, 30])
   })
 
   it('canli-yazim-kapisi.cjs ayarda kayıtlıysa o da block taşır', () => {
