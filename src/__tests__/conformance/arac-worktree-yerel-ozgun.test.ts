@@ -16,9 +16,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 const gerek = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '../../..')
 interface Arac {
-  gecmisKumesi: (ana: string) => Set<string>
-  yerelOzgunDosyalar: (kok: string, gecmis: Set<string>) => { toplam: number; dosyalar: string[] }
-  yerelOzgunKapisi: (yol: string, gecmis: Set<string>) => { ok: boolean; sebep: string; dosyalar: string[]; toplam: number }
+  gecmisKumesi: (ana: string) => Map<string, Set<string>>
+  yerelOzgunDosyalar: (kok: string, gecmis: Map<string, Set<string>>) => { toplam: number; dosyalar: string[] }
+  yerelOzgunKapisi: (yol: string, gecmis: Map<string, Set<string>>) => { ok: boolean; sebep: string; dosyalar: string[]; toplam: number }
 }
 const a = gerek(path.join(KOK, 'tools', 'worktree-artik-sil.cjs')) as Arac
 
@@ -34,7 +34,7 @@ const yaz = (kok: string, rel: string, icerik = 'x') => {
 describe('INV-ARAC-WT-OZGUN-1 · yerel-özgün dosya kapısı', () => {
   let gecici = ''
   let ana = ''
-  let gecmis: Set<string>
+  let gecmis: Map<string, Set<string>>
   beforeAll(() => {
     gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-ozgun-'))
     ana = path.join(gecici, 'ana')
@@ -47,6 +47,12 @@ describe('INV-ARAC-WT-OZGUN-1 · yerel-özgün dosya kapısı', () => {
     git(ana, 'commit', '-q', '-m', 'bir')
     git(ana, 'rm', '-q', 'silinmis.txt')
     git(ana, 'commit', '-q', '-m', 'sil')
+    yaz(ana, 'src/surum.ts', 'v1\nsatir\n')
+    git(ana, 'add', '-A')
+    git(ana, 'commit', '-q', '-m', 'surum1')
+    yaz(ana, 'src/surum.ts', 'v2\nsatir\n')
+    git(ana, 'add', '-A')
+    git(ana, 'commit', '-q', '-m', 'surum2')
     git(ana, 'checkout', '-q', '-b', 'baska-dal')
     yaz(ana, 'yalniz-baska-dalda/b.ts')
     git(ana, 'add', '-A')
@@ -109,6 +115,27 @@ describe('INV-ARAC-WT-OZGUN-1 · yerel-özgün dosya kapısı', () => {
     yaz(k, 'src/a.ts')
     yaz(k, 'tek.txt')
     expect(a.yerelOzgunKapisi(k, gecmis).ok).toBe(false)
+  })
+
+  it('İZLENEN ama yerelde DEĞİŞTİRİLMİŞ dosya (yol geçmişte var, içerik hiçbir blob ile eşleşmiyor) ÖZGÜN sayılır, kapı KAPALI', () => {
+    const k = path.join(gecici, 'degismis')
+    yaz(k, 'src/a.ts')
+    yaz(k, 'src/surum.ts', 'v2\nsatir\nCOMMIT EDILMEMIS YEREL DEGISIKLIK\n')
+    const r = a.yerelOzgunKapisi(k, gecmis)
+    expect(r.ok).toBe(false)
+    expect(r.dosyalar).toEqual(['src/surum.ts (içerik değişmiş)'])
+  })
+
+  it('izlenen dosyanın ESKİ bir sürümü (geçmişteki başka blob) ve CRLF çalışma kopyası özgün DEĞİLDİR', () => {
+    const k = path.join(gecici, 'eski-ve-crlf')
+    yaz(k, 'src/a.ts')
+    yaz(k, 'src/surum.ts', 'v1\nsatir\n') // eski commit'teki içerik
+    yaz(k, 'docs/not.md', 'x')
+    const r1 = a.yerelOzgunKapisi(k, gecmis)
+    expect(r1.ok).toBe(true)
+    yaz(k, 'src/surum.ts', 'v2\r\nsatir\r\n') // Windows autocrlf çalışma kopyası
+    const r2 = a.yerelOzgunKapisi(k, gecmis)
+    expect(r2.ok).toBe(true)
   })
 
   it('derleme klasörleri yalnız KÖKTE atlanır: iç içe coverage/ özgün dosya sayılır; node_modules içi hiç sayılmaz', () => {

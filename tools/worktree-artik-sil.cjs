@@ -147,18 +147,20 @@ function gitDosyasiKontrol(yol) {
  * adı geçmeyen dosya var mı bakılır. Böyle dosya = yalnız bu klasörde yaşayan veri (ölçüm çıktısı, not, .env, csv/json,
  * kaydedilmemiş çalışma); silinirse geri gelmez. Bir tane bile varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
  * 19 Ekim olayı: ~117 klasör `.git`siz ya da gitignore'lu yerel dosyalarına BAKILMADAN silindi.
- * Karşılaştırma yol adıyla (içerik değil); büyük/küçük harf farkı bile "özgün" sayılır (şüphede ATLA).
+ * Karşılaştırma yol adı VE içerik özetiyle (izlenen ama yerelde değiştirilmiş dosya da özgündür); büyük/küçük harf farkı bile "özgün" sayılır (şüphede ATLA).
  * Bağlantılara (junction/symlink) girilmez; bağlantının kendisi (node_modules içindekiler hariç) bir girdi sayılır.
  */
 const KOK_GORMEZ = new Set(['node_modules', '.next', 'graphify-out', 'coverage', 'test-results'])
 
 /**
- * Ana deponun TÜM dallarındaki geçmişte adı geçen yollar (posix, kökten göreli). Okunamazsa FIRLATIR (kapı kapalı kalır).
- * `-m` ŞART: birleştirme (merge) commit'inde eklenen/çözülen dosyaları `log --name-only` varsayılan olarak LİSTELEMEZ
+ * Ana deponun TÜM dallarındaki geçmişte adı geçen yollar ve her yolun geçmişteki TÜM blob özetleri:
+ * Map<posix yol, Set<blob sha1>>. Okunamazsa FIRLATIR (kapı kapalı kalır).
+ * `-m` ŞART: birleştirme (merge) commit'inde eklenen/çözülen dosyaları `log --name-only/--raw` varsayılan olarak LİSTELEMEZ
  * (ölçüm 19 Ekim: izlenen `.agent/workflows/tam-kopyala.md` ve `registry/**` kümede yoktu, kapı onları "yerel-özgün" sanıyordu).
+ * `--no-renames`: her kayıt tek yol. Blob özeti hem eski hem yeni taraftan toplanır (silinmiş 0000 hariç).
  */
 function gecmisKumesi(ana) {
-  const cikti = execFileSync('git', ['-c', 'core.quotepath=false', 'log', '--all', '-m', '--name-only', '-z', '--pretty=format:'], {
+  const cikti = execFileSync('git', ['-c', 'core.quotepath=false', 'log', '--all', '-m', '--raw', '--no-abbrev', '--no-renames', '-z', '--pretty=format:'], {
     cwd: ana,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -166,19 +168,43 @@ function gecmisKumesi(ana) {
     windowsHide: true,
     maxBuffer: 1024 * 1024 * 1024,
   })
-  const k = new Set()
-  for (const y of cikti.split('\0')) {
-    const t = y.replace(/^\n+/, '')
-    if (t) k.add(t)
+  const k = new Map()
+  const t = cikti.split('\0')
+  for (let i = 0; i < t.length; i++) {
+    const m = /^\n*:\d+ \d+ ([0-9a-f]{40}) ([0-9a-f]{40}) [A-Z]\d*$/.exec(t[i])
+    if (!m) continue
+    const yol = t[++i]
+    if (!yol) continue
+    let s = k.get(yol)
+    if (!s) k.set(yol, (s = new Set()))
+    for (const h of [m[1], m[2]]) if (!/^0+$/.test(h)) s.add(h)
   }
   if (k.size === 0) throw new Error('git geçmişi boş döndü (kapı doğrulanamaz)')
   return k
 }
 
-/** Klasörde geçmişte OLMAYAN dosyalar: { toplam, dosyalar: [ilk 200 göreli yol] }. node_modules her derinlikte, diğer dördü yalnız kökte atlanır. */
+const crypto = require('crypto')
+/** git blob özeti (sha1 "blob <boyut>\0" + içerik). CRLF çalışma kopyası için LF'ye çevrilmiş özet de döner: [ham, lf]. */
+function blobOzetleri(buf) {
+  const ozet = (b) => crypto.createHash('sha1').update('blob ' + b.length + '\0').update(b).digest('hex')
+  const ham = ozet(buf)
+  if (!buf.includes(13)) return [ham]
+  return [ham, ozet(Buffer.from(buf.toString('latin1').replace(/\r\n/g, '\n'), 'latin1'))]
+}
+
+/**
+ * Klasörde YEREL-ÖZGÜN dosyalar: { toplam, dosyalar: [ilk 200 göreli yol] }.
+ * Özgün = (a) yolu geçmişte HİÇ yok, ya da (b) yolu var ama içeriğin git blob özeti o yolun geçmişteki HİÇBİR blob'uyla
+ * eşleşmiyor (izlenen dosya yerelde değiştirilmiş, commit edilmemiş; OPS bulgusu 19 Ekim). CRLF çalışma kopyası için LF'li özet de denenir.
+ * node_modules her derinlikte, diğer dördü yalnız kökte atlanır. Okunamayan dosya özgün sayılır (şüphede ATLA).
+ */
 function yerelOzgunDosyalar(kok, gecmis) {
   const dosyalar = []
   let toplam = 0
+  const ekle = (m) => {
+    toplam++
+    if (dosyalar.length < 200) dosyalar.push(m)
+  }
   const yig = [{ d: kok, goreli: '' }]
   while (yig.length) {
     const { d, goreli } = yig.pop()
@@ -197,19 +223,27 @@ function yerelOzgunDosyalar(kok, gecmis) {
       try {
         st = fs.lstatSync(p)
       } catch {
-        // okunamayan girdi sayılır: şüphede ATLA
-        toplam++
-        if (dosyalar.length < 200) dosyalar.push(rel + ' (okunamadı)')
+        ekle(rel + ' (okunamadı)')
         continue
       }
       if (st.isDirectory() && !st.isSymbolicLink()) {
         yig.push({ d: p, goreli: rel })
         continue
       }
-      if (!gecmis.has(rel)) {
-        toplam++
-        if (dosyalar.length < 200) dosyalar.push(rel)
+      const bloblar = gecmis.get(rel)
+      if (!bloblar) {
+        ekle(rel)
+        continue
       }
+      if (st.isSymbolicLink()) continue // yolu geçmişte var; bağlantıya girilmez
+      let eslesti = false
+      try {
+        eslesti = blobOzetleri(fs.readFileSync(p)).some((h) => bloblar.has(h))
+      } catch {
+        ekle(rel + ' (okunamadı)')
+        continue
+      }
+      if (!eslesti) ekle(rel + ' (içerik değişmiş)')
     }
   }
   return { toplam, dosyalar: dosyalar.sort() }
