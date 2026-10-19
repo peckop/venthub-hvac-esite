@@ -270,9 +270,14 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · kayıt parçası ve ayar', () => {
     grupDogru(grupBul(parca.PermissionRequest ?? []))
   })
 
-  it('OPS parçayı settings.json içine aldıysa biçim yine doğru (henüz alınmadıysa test bunu zorunlu kılmaz)', () => {
+  it('settings.json PermissionRequest altında izin-istegi-kapisi KAYITLI (karar 398, Recep onayı OPS penceresinde) ve biçim doğru', () => {
     const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8'))
-    const kayitli = grupBul(ayar.hooks?.PermissionRequest ?? [])
-    if (kayitli) grupDogru(kayitli)
+    grupDogru(grupBul(ayar.hooks?.PermissionRequest ?? []))
+  })
+
+  it('ayardaki kayıt hazır parçayla AYNI (parça ile ayar ayrışmasın)', () => {
+    const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8'))
+    const parca = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'hooks', 'izin-istegi-kapisi.settings-parcasi.json'), 'utf8'))
+    expect(ayar.hooks.PermissionRequest).toEqual(parca.PermissionRequest)
   })
 })
