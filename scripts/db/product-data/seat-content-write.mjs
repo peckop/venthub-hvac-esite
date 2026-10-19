@@ -21,6 +21,7 @@
  *   node seat-content-write.mjs --url <URL> --key <SERVICE_ROLE> --apply --out <dizin>
  *   node seat-content-write.mjs --rollback <envanter.json> --url <URL> --key <SERVICE_ROLE>
  */
+import './_ops-onay.mjs'
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
