@@ -99,7 +99,9 @@ Ek (Geo-SEO kabul notu, 13 Ekim): dış oturum isteyen departmanda (Search Conso
 sitede oturumun açık olduğu ölçülür ve sonuç karta yazılır.
 
 **4.2 Departman açma listesi (tek liste).** Yeni departman açan iş, aşağıdaki yedi yeri aynı PR'da günceller; liste HRT-62'nin
-(3D) gerçek farkından çıkarıldı. Tek kaynak `ROLLER` sabitidir (`scripts/belge/rol-karti-uret.cjs`); gerisi ondan türer ya da
+(3D açılışı) farkından çıkarıldı, `rol-gorevleri.json` satırı sonradan (HRT-66) eklendi. TAKIP'te çalışan seti satırı yoktur
+(yalnız pencere tanımı); bu istisna kapıda `SET_SATIRI_YOK` ile yazılıdır. `ROLLER` girdisi ayrıca `yasak`, `yetenek` ve
+`HARITA_KISA` (açılış özeti, 2048 B tavanı) alanlarını taşır; kural satırlarının rol listeleri de ona bağlıdır. Tek kaynak `ROLLER` sabitidir (`scripts/belge/rol-karti-uret.cjs`); gerisi ondan türer ya da
 onunla karşılaştırılır. Kapı: `src/__tests__/conformance/rol-kartlari.test.ts` "departman açma tek liste".
 
 | Yer | Ne eklenir | Üretim / ölçüm |

@@ -1349,13 +1349,20 @@ describe('INV-ROL-1 — departman açma tek liste (HRT-61, O7)', () => {
     return e
   }
 
+  /** Dosyadaki `const AD = [ ... ]` dizisinin gövdesi: aynı dept adı dosyada başka yerde geçse de yalnız dizi sayılır. */
+  const diziGovdesi = (kaynak: string, ad: string): string => {
+    const bas = kaynak.indexOf(`const ${ad}`)
+    expect(bas, `${ad} dizisi bulunamadı`).toBeGreaterThanOrEqual(0)
+    return kaynak.slice(bas, kaynak.indexOf(']', bas) + 1)
+  }
+
   const kaynaklar = () => ({
     roller: Object.keys(uretici.ROLLER),
     tablo: pencereAdlari.TABLO.map((r) => r[0]),
     setSatirlari: setler.setler,
-    hazirOzellik: oku('src', '__tests__', 'conformance', 'hazir-ozellik-kurulumu.test.ts'),
+    hazirOzellik: diziGovdesi(oku('src', '__tests__', 'conformance', 'hazir-ozellik-kurulumu.test.ts'), 'ACIK_DEPARTMANLAR'),
     pencereAdiTesti: oku('src', '__tests__', 'conformance', 'sessionstart-pencere-adi.test.ts'),
-    beklenenRoller: oku('src', '__tests__', 'conformance', 'rol-kartlari.test.ts'),
+    beklenenRoller: diziGovdesi(oku('src', '__tests__', 'conformance', 'rol-kartlari.test.ts'), 'BEKLENEN_ROLLER'),
   })
 
   it('her açık (pencere tanımlı) departman listedeki yerlerin hepsinde bulunur; eksik yer Madde 4.2 atfıyla söylenir', () => {
@@ -1379,6 +1386,8 @@ describe('INV-ROL-1 — departman açma tek liste (HRT-61, O7)', () => {
     expect(eksikYerler('OPS', { ...k, tablo: k.tablo.filter((x) => x !== 'OPS') })).toEqual(['pencere-adlari.cjs TABLO'])
     expect(eksikYerler('OPS', { ...k, setSatirlari: k.setSatirlari.filter((s) => !(s.dept === 'OPS' && s.tur === 'uygulayici')) })).toEqual(['skill-departman-setleri (uygulayici)'])
     expect(eksikYerler('OPS', { ...k, hazirOzellik: k.hazirOzellik.replaceAll("'OPS'", "'X'") })).toEqual(['hazir-ozellik-kurulumu.test.ts ACIK_DEPARTMANLAR'])
+    expect(eksikYerler('3D', { ...k, beklenenRoller: k.beklenenRoller.replaceAll("'3D'", "'X'") })).toEqual(['rol-kartlari.test.ts BEKLENEN_ROLLER'])
+    expect(eksikYerler('3D', { ...k, pencereAdiTesti: k.pencereAdiTesti.replaceAll("['3D',", "['X',") })).toEqual(['sessionstart-pencere-adi.test.ts tablo'])
   })
 
   it('tüzük Madde 4.2 listesindeki her yer gerçek bir dosya ve Madde 4.1 beş adımı ile Geo-SEO ek notunu taşır', () => {

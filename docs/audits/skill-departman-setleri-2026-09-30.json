@@ -1935,5 +1935,5 @@
    "ne": "Rehber yazısının yayın akışı (cetvel R10): basamak, sahibi, kapı; müdür çalıştırır, çalışana ön yüklenmez."
   }
  ],
- "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; ön yükleme boş, adıyla çağırma listeleri aynı)"
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla)"
 }
