@@ -21,7 +21,10 @@
  *      kendisini siler, hedefe dokunmaz; olmazsa `cmd /c rmdir`, `/s` YOK);
  *   4. bağlantı kalmadığı DOĞRULANINCA içerik robocopy /MIR /XJ ile boş klasöre eşlenerek silinir (uzun yola dayanıklı,
  *      hızlı), sonra boş kök `fs.rmdirSync`; `rmdir /s` ve `rm -rf` kullanılmaz;
- *   5. ana deponun node_modules/.bin'i her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR.
+ *   5. ana deponun node_modules/.bin'i her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR;
+ *   6. YEREL-ÖZGÜN DOSYA KAPISI (ARC-190): node_modules/.next/graphify-out/coverage/test-results dışında, ana deponun git
+ *      geçmişinde (`log --all --name-only`) HİÇ geçmeyen bir dosya varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
+ *      Geçmiş okunamazsa betik hiçbir şey silmeden durur (çıkış 6).
  * Varsayılan KURU KOŞUM (hiçbir şeye dokunmaz). Gerçek: `--gercek --geri-alinamaz-onayladim`.
  *
  * KULLANIM: node tools/worktree-artik-sil.cjs --liste <yollar.json> [--ilk N] [--kayit k.jsonl] [--gercek --geri-alinamaz-onayladim]
@@ -139,6 +142,92 @@ function gitDosyasiKontrol(yol) {
   return { ok: true, sebep: '' }
 }
 
+/**
+ * YEREL-ÖZGÜN DOSYA KAPISI (ARC-190, karar 88/397): silmeden ÖNCE klasörde, ana deponun git geçmişinde HİÇBİR dalda
+ * adı geçmeyen dosya var mı bakılır. Böyle dosya = yalnız bu klasörde yaşayan veri (ölçüm çıktısı, not, .env, csv/json,
+ * kaydedilmemiş çalışma); silinirse geri gelmez. Bir tane bile varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
+ * 19 Ekim olayı: ~117 klasör `.git`siz ya da gitignore'lu yerel dosyalarına BAKILMADAN silindi.
+ * Karşılaştırma yol adıyla (içerik değil); büyük/küçük harf farkı bile "özgün" sayılır (şüphede ATLA).
+ * Bağlantılara (junction/symlink) girilmez; bağlantının kendisi (node_modules içindekiler hariç) bir girdi sayılır.
+ */
+const KOK_GORMEZ = new Set(['node_modules', '.next', 'graphify-out', 'coverage', 'test-results'])
+
+/**
+ * Ana deponun TÜM dallarındaki geçmişte adı geçen yollar (posix, kökten göreli). Okunamazsa FIRLATIR (kapı kapalı kalır).
+ * `-m` ŞART: birleştirme (merge) commit'inde eklenen/çözülen dosyaları `log --name-only` varsayılan olarak LİSTELEMEZ
+ * (ölçüm 19 Ekim: izlenen `.agent/workflows/tam-kopyala.md` ve `registry/**` kümede yoktu, kapı onları "yerel-özgün" sanıyordu).
+ */
+function gecmisKumesi(ana) {
+  const cikti = execFileSync('git', ['-c', 'core.quotepath=false', 'log', '--all', '-m', '--name-only', '-z', '--pretty=format:'], {
+    cwd: ana,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 15 * 60 * 1000,
+    windowsHide: true,
+    maxBuffer: 1024 * 1024 * 1024,
+  })
+  const k = new Set()
+  for (const y of cikti.split('\0')) {
+    const t = y.replace(/^\n+/, '')
+    if (t) k.add(t)
+  }
+  if (k.size === 0) throw new Error('git geçmişi boş döndü (kapı doğrulanamaz)')
+  return k
+}
+
+/** Klasörde geçmişte OLMAYAN dosyalar: { toplam, dosyalar: [ilk 200 göreli yol] }. node_modules her derinlikte, diğer dördü yalnız kökte atlanır. */
+function yerelOzgunDosyalar(kok, gecmis) {
+  const dosyalar = []
+  let toplam = 0
+  const yig = [{ d: kok, goreli: '' }]
+  while (yig.length) {
+    const { d, goreli } = yig.pop()
+    let adlar
+    try {
+      adlar = fs.readdirSync(d)
+    } catch (e) {
+      throw new Error('klasör okunamadı: ' + d + ' (' + String((e && e.code) || e) + ')')
+    }
+    for (const a of adlar) {
+      const rel = goreli ? goreli + '/' + a : a
+      if (a === 'node_modules') continue
+      if (!goreli && (KOK_GORMEZ.has(a) || a === '.git')) continue
+      const p = path.join(d, a)
+      let st
+      try {
+        st = fs.lstatSync(p)
+      } catch {
+        // okunamayan girdi sayılır: şüphede ATLA
+        toplam++
+        if (dosyalar.length < 200) dosyalar.push(rel + ' (okunamadı)')
+        continue
+      }
+      if (st.isDirectory() && !st.isSymbolicLink()) {
+        yig.push({ d: p, goreli: rel })
+        continue
+      }
+      if (!gecmis.has(rel)) {
+        toplam++
+        if (dosyalar.length < 200) dosyalar.push(rel)
+      }
+    }
+  }
+  return { toplam, dosyalar: dosyalar.sort() }
+}
+
+/** Kapı kararı: { ok, sebep, dosyalar, toplam }. ok=false → klasör ATLANIR. Okuma hatası da ok=false. */
+function yerelOzgunKapisi(yol, gecmis) {
+  try {
+    const r = yerelOzgunDosyalar(yol, gecmis)
+    if (r.toplam > 0) {
+      return { ok: false, sebep: `yerel-özgün ${r.toplam} dosya (git geçmişinde yok): ${r.dosyalar.slice(0, 5).join(', ')}${r.toplam > 5 ? ' …' : ''}`, dosyalar: r.dosyalar, toplam: r.toplam }
+    }
+    return { ok: true, sebep: '', dosyalar: [], toplam: 0 }
+  } catch (e) {
+    return { ok: false, sebep: 'yerel-özgün denetimi yapılamadı: ' + String((e && e.message) || e).split('\n')[0], dosyalar: [], toplam: 0 }
+  }
+}
+
 function main() {
   const arg = (ad) => {
     const i = process.argv.indexOf(ad)
@@ -182,6 +271,13 @@ function main() {
       .filter((s) => s.startsWith('worktree '))
       .map((s) => norm(s.slice(9))),
   )
+  let gecmis
+  try {
+    gecmis = gecmisKumesi(ana)
+  } catch (e) {
+    console.error('git geçmişi okunamadı; yerel-özgün kapısı kurulamaz, hiçbir şey silinmedi, durdu: ' + String((e && e.message) || e).split('\n')[0])
+    process.exit(6)
+  }
   const liste = JSON.parse(fs.readFileSync(LISTE, 'utf8')).map((x) => (typeof x === 'string' ? x : x.yol))
   const yollar = ILK > 0 ? liste.slice(0, ILK) : liste
   const sayac = { silindi: 0, atlandi: 0, hata: 0, kuru: 0 }
@@ -222,6 +318,13 @@ function main() {
           console.log(`KURU  ${yol} · KÖK BAĞLANTI → yalnız bağlantı kaldırılacak`)
           kayitYaz({ yol, sonuc: 'kuru', kokBaglanti: true })
         }
+        continue
+      }
+      const ok = yerelOzgunKapisi(yol, gecmis)
+      if (!ok.ok) {
+        sayac.atlandi++
+        console.log(`ATLA  ${yol} — ${ok.sebep}`)
+        kayitYaz({ yol, sonuc: 'atlandi', sebep: 'yerel-ozgun-dosya', toplam: ok.toplam, dosyalar: ok.dosyalar, ayrinti: ok.sebep })
         continue
       }
       const { girdi, baglantilar } = tara(yol)
@@ -274,5 +377,5 @@ function main() {
   console.log(JSON.stringify(sayac))
 }
 
-module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, norm }
+module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, gecmisKumesi, yerelOzgunDosyalar, yerelOzgunKapisi, norm }
 if (require.main === module) main()
