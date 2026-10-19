@@ -6,7 +6,7 @@
  * Bayrak yoksa (kuru koşum) hiçbir şey yapmaz. Bayrak varsa şu iki şey birlikte aranır, yoksa çıkış kodu 1:
  *   1. ortam değişkeni VENTHUB_OPS_YAZIM_ONAYI dolu;
  *   2. değeri, OPS'un bir kez oluşturduğu anahtar dosyasının içeriğiyle birebir aynı
- *      (varsayılan: ~/.claude/ops-yazim-onayi.txt; sınama için VENTHUB_OPS_ONAY_DOSYASI ile değişir).
+ *      (sabit yol: ~/.claude/ops-yazim-onayi.txt; ortam değişkeniyle değiştirilemez).
  * Anahtar dosyası yoksa yazım HİÇBİR pencerede çalışmaz; OPS dosyayı oluşturup değişkeni kendi koşum kabuğunda tanımlar.
  *
  * Bu kapı metin taramasına dayanan canli-yazim-kapisi.cjs (#1998) kancasının ARKASINDAKİ ikinci katmandır:
@@ -25,11 +25,14 @@ export function yazimIsteniyor(argv) {
   return argv.some((a) => YAZIM_BAYRAGI.test(a))
 }
 
-export function onayDurumu(argv, ortam) {
+/** Anahtar dosyası SABİT (os.userInfo: USERPROFILE/HOME değişkeninden etkilenmez): ortam değişkeniyle yolu değiştirmek, ajanın kendi dosyasını göstermesine izin verirdi (güvenlik taraması, 19 Ekim). */
+export const ANAHTAR_DOSYASI = path.join(os.userInfo().homedir, '.claude', 'ops-yazim-onayi.txt')
+
+/** dosya parametresi yalnız testte işlevi doğrudan çağırmak içindir; modül düzeyindeki kontrol hep sabit yolu kullanır. */
+export function onayDurumu(argv, ortam, dosya = ANAHTAR_DOSYASI) {
   if (!yazimIsteniyor(argv)) return { izin: true, sebep: 'kuru koşum' }
   const girilen = ortam.VENTHUB_OPS_YAZIM_ONAYI
   if (!girilen) return { izin: false, sebep: 'VENTHUB_OPS_YAZIM_ONAYI tanımlı değil' }
-  const dosya = ortam.VENTHUB_OPS_ONAY_DOSYASI || path.join(os.homedir(), '.claude', 'ops-yazim-onayi.txt')
   let beklenen
   try {
     beklenen = fs.readFileSync(dosya, 'utf8').trim()
