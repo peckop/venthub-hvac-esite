@@ -24,7 +24,7 @@ const BLOK = [
   'gh-api-kapisi.cjs',
   'env-yazma-kapisi.cjs',
   'sql-yazma-kapisi.cjs',
-  // canli-yazim-kapisi.cjs: kaydı PR #1998 ile gelir; kayıt bu ayarda varsa aşağıdaki test onu da zorlar
+  'canli-yazim-kapisi.cjs',
 ]
 const adi = (k: Kanca) => (k.command ?? '').replace(/.*\.claude\/hooks\//, '').replace(/".*$/, '').split(' ')[0]
 const tum = Object.entries(ayar.hooks).flatMap(([olay, gruplar]) => gruplar.flatMap((g) => g.hooks.map((k) => ({ olay, k, ad: adi(k) }))))
