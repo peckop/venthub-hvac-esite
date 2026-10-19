@@ -11,9 +11,10 @@
  * yutulmuştu; bu betik robocopy çıktısını ve kalan dosyaları kayda yazar.
  *
  * ── ÇÖZÜM (karar 88: junction'dan geçen özyinelemeli silme YASAK) ──
- *   1. Güvenlik: yol izinli kalıpta (C:/tmp/<ad>, <ana>/.claude/worktrees/<ad>, <ev>/vh-wt/<ad>, <ev>/venthub-* (ana depo hariç)),
- *      ana depo/içi değil, açık pencerenin çalışma dizini değil, git `worktree list`te KAYIT YOK, `.git` dosyasının
- *      gitdir hedefi YOK (kayıt gerçekten silinmiş);
+ *   1. Güvenlik: yol izinli kalıpta (C:/tmp/<ad>, <ana>/.claude/worktrees/<ad>, <ev>/vh-wt/<ad>, <ev>/venthub-wt-*, <ev>/venthub-harita-*;
+ *      venthub-hvac*, venthub-pdf-ingestor ve diğer depolar REDDEDİLİR), ana depo/içi değil, açık pencerenin çalışma dizini değil,
+ *      git `worktree list`te KAYIT YOK, `.git` DİZİN DEĞİL (dizin = gerçek depo, reddedilir; okunamayan = durur) ve varsa
+ *      gitdir hedefi YOK (kayıt gerçekten silinmiş); `.git` hiç yoksa artık klasördür (ölçüm: 22'nin 20'si);
  *   2. derinlik SINIRSIZ tarama: bağlantılara (junction/symlink) GİRİLMEZ; hepsi listelenir, hedefi kopya DIŞINA düşen
  *      ya da çözülemeyenler ayrıca raporlanır (ana depoya düşen vurgulanır);
  *   3. TÜM bağlantılar yalnız bağlantı olarak kaldırılır (`fs.rmdirSync`, Windows'ta RemoveDirectoryW: bağlantının
@@ -91,7 +92,41 @@ function izinliYolMu(yol, ana, ev) {
   if (ust === 'c:/tmp') return true
   if (ust === norm(path.join(ana, '.claude', 'worktrees'))) return true
   if (ust === norm(path.join(ev, 'vh-wt'))) return true
-  return ust === norm(ev) && /^venthub-(?!hvac$)/.test(ad) // venthub-wt-*, venthub-harita-* ... (ana depo venthub-hvac hariç)
+  // Ev dizini altında YALNIZ açık liste: venthub-wt-*, venthub-harita-*. venthub-hvac*, venthub-pdf-ingestor ve
+  // diğer gerçek depolar bu kalıba UYMAZ (bağımsız doğrulama 19 Ekim: önceki olumsuz-ileri kalıp kardeş depoları kabul ediyordu).
+  return ust === norm(ev) && /^venthub-(wt|harita)-[a-z0-9._-]+$/.test(ad)
+}
+
+/**
+ * `.git` denetimi. Dönüş: { ok, sebep, artik }.
+ *   - `.git` bir DİZİN → gerçek bir depo (ingestor gibi): REDDEDİLİR.
+ *   - `.git` okunamıyor (ENOENT dışı hata) ya da gitdir satırı yok → REDDEDİLİR (hata yutulmaz, durulur).
+ *   - `.git` dosyası ve gitdir hedefi hâlâ var → git kaydı silinmemiş: REDDEDİLİR.
+ *   - `.git` dosyası ve gitdir hedefi YOK → kayıt gerçekten silinmiş: kabul.
+ *   - `.git` HİÇ YOK (ENOENT) → kabul, `artik: true`. Ölçüm (19 Ekim): `git worktree remove --force` takılınca önce `.git`
+ *     dosyasını siliyor; kalan 22 klasörün 20'sinde `.git` yok. Depo olamaz (depoda `.git` dizini vardır); yine de yol kalıbı
+ *     ve git kaydı yok denetimi ayrıca şart.
+ */
+function gitDosyasiKontrol(yol) {
+  const g = path.join(yol, '.git')
+  let st
+  try {
+    st = fs.lstatSync(g)
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return { ok: true, sebep: '.git yok (artık klasör)', artik: true }
+    return { ok: false, sebep: '.git denetlenemedi: ' + String((e && e.code) || e) }
+  }
+  if (!st.isFile()) return { ok: false, sebep: '.git bir DİZİN: gerçek bir depo, silinmez' }
+  let icerik
+  try {
+    icerik = fs.readFileSync(g, 'utf8')
+  } catch (e) {
+    return { ok: false, sebep: '.git okunamadı: ' + String((e && e.code) || e) }
+  }
+  const m = /^gitdir:\s*(.+)$/m.exec(icerik)
+  if (!m) return { ok: false, sebep: '.git dosyasında gitdir satırı yok' }
+  if (fs.existsSync(m[1].trim())) return { ok: false, sebep: '.git gitdir hedefi hâlâ var (git kaydı silinmemiş)' }
+  return { ok: true, sebep: '' }
 }
 
 function main() {
@@ -116,6 +151,10 @@ function main() {
   const anaN = norm(ana)
   const anaBin = path.join(ana, 'node_modules', '.bin')
   const anaBinVardi = fs.existsSync(anaBin)
+  if (GERCEK && !anaBinVardi) {
+    console.error('ana deponun node_modules/.bin yok: bozulma sonrası doğrulanamaz, gerçek silme için güvenli değil, durdu. (pnpm install)')
+    process.exit(5)
+  }
   let canli = []
   try {
     canli = JSON.parse(spawnSync('claude', ['agents', '--json'], { encoding: 'utf8', timeout: 30000, windowsHide: true, shell: true }).stdout || '[]').map((p) => norm(p.cwd))
@@ -157,14 +196,8 @@ function main() {
     if (!izinliYolMu(yol, ana, ev)) { atla('izinli kalıpta değil'); continue }
     if (canli.some((c) => c === yn || c.startsWith(yn + '/'))) { atla('açık pencere bu klasörde'); continue }
     if (kayitliAgaclar.has(yn)) { atla('git worktree kaydı HÂLÂ var (önce worktree-temizle)'); continue }
-    // .git dosyası: gitdir hedefi hâlâ varsa kayıt silinmemiş demektir
-    try {
-      const g = fs.readFileSync(path.join(yol, '.git'), 'utf8')
-      const m = /^gitdir:\s*(.+)$/m.exec(g)
-      if (m && fs.existsSync(m[1].trim())) { atla('.git gitdir hedefi hâlâ var'); continue }
-    } catch {
-      /* .git yok ya da dizin: devam, kayıt yok */
-    }
+    const gk = gitDosyasiKontrol(yol)
+    if (!gk.ok) { atla(gk.sebep); continue }
     try {
       const kokSt = fs.lstatSync(yol)
       if (kokSt.isSymbolicLink()) {
@@ -231,5 +264,5 @@ function main() {
   console.log(JSON.stringify(sayac))
 }
 
-module.exports = { tara, baglantiKaldir, izinliYolMu }
+module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, norm }
 if (require.main === module) main()

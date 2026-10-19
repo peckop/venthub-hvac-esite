@@ -18,8 +18,9 @@
  *   5. HEAD hiçbir remote ref'te olmayan commit taşımıyor (`rev-list HEAD --not --remotes` = 0).
  *
  * SİLME YÖNTEMİ (karar 88, 09-23 olayı: `git worktree remove` junction'dan geçip ana deponun node_modules'ünü sildi):
- *   a. kök ve node_modules üst düzeyinde bağlantı (junction/symlink) taranır; hedefi worktree DIŞINA düşen bağlantı
- *      YALNIZ bağlantı olarak kaldırılır (`cmd /c rmdir <bağlantı>`, `/s` YOK, hedefe dokunulmaz);
+ *   a. kopya DERİNLİK SINIRSIZ taranır (artik-sil `tara`, bağlantıya girmez); TÜM bağlantılar (junction/symlink, iç içe pnpm
+ *      bağlantıları dahil) YALNIZ bağlantı olarak kaldırılır (`rmdirSync`, olmazsa `cmd /c rmdir`, `/s` YOK, hedefe dokunulmaz)
+ *      ve kalmadığı yeniden taranarak doğrulanır, yoksa `git worktree remove` ÇAĞRILMAZ;
  *   b. ana deponun node_modules/.bin'i varlığı her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR;
  *   c. `git worktree remove --force <yol>`; dal SİLİNMEZ (geri alma: `git worktree add <yol> <dal|head>`, sonra pnpm install);
  *   d. hepsinden sonra `git worktree prune`.
@@ -28,6 +29,7 @@
 const { execFileSync, spawnSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
+const { tara, baglantiKaldir } = require('./worktree-artik-sil.cjs')
 
 const arg = (ad) => {
   const i = process.argv.indexOf(ad)
@@ -55,6 +57,10 @@ const ana = path.dirname(git(process.cwd(), ['rev-parse', '--path-format=absolut
 const anaN = norm(ana)
 const anaBin = path.join(ana, 'node_modules', '.bin')
 const anaBinVardi = fs.existsSync(anaBin)
+if (GERCEK && !anaBinVardi) {
+  console.error('ana deponun node_modules/.bin yok: bozulma sonrası doğrulanamaz, gerçek silme için güvenli değil, durdu. (pnpm install)')
+  process.exit(5)
+}
 
 // Açık pencerelerin çalışma dizinleri (canlı kopya dokunulmaz)
 let canli = []
@@ -80,47 +86,14 @@ for (const s of git(ana, ['worktree', 'list', '--porcelain']).split(/\r?\n/)) {
   else if (s.startsWith('locked') && sonYol) kayitliAgaclar[sonYol].kilitli = true
 }
 
-/** Kök ve node_modules üst düzeyinde, hedefi kopyanın DIŞINA düşen bağlantılar. */
-function disaBaglantilar(yol) {
-  const kok = norm(yol) + '/'
-  const bul = []
-  const tara = (dizin) => {
-    let ad
-    try {
-      ad = fs.readdirSync(dizin)
-    } catch {
-      return
-    }
-    for (const a of ad) {
-      const p = path.join(dizin, a)
-      let st
-      try {
-        st = fs.lstatSync(p)
-      } catch {
-        continue
-      }
-      if (!st.isSymbolicLink()) continue
-      let hedef
-      try {
-        hedef = fs.realpathSync(p)
-      } catch {
-        hedef = null // kırık bağlantı: dışa gitmez ama git'in takılmaması için kaldırılır
-      }
-      if (hedef === null || !(norm(hedef) + '/').startsWith(kok)) bul.push({ yol: p, hedef })
-    }
-  }
-  tara(yol)
-  // node_modules'ün KENDİSİ bağlantıysa (19 Ekim: vh-arac-87 → ana depo node_modules) içine GİRİLMEZ; yalnız o bağlantı
-  // kaldırılır. Girilirse altındaki yollar hedefteki (ana depo) dosyalara çözülür ve yanlış nesne kaldırılır.
-  const nmYol = path.join(yol, 'node_modules')
-  let nmBaglanti = false
-  try {
-    nmBaglanti = fs.lstatSync(nmYol).isSymbolicLink()
-  } catch {
-    /* yok */
-  }
-  if (!nmBaglanti) tara(nmYol)
-  return bul
+/**
+ * Kopyadaki TÜM bağlantılar, derinlik sınırsız (artik-sil `tara`: bağlantıya GİRİLMEZ; node_modules'ün kendisi bağlantıysa
+ * yalnız o bağlantı döner). Bağımsız doğrulama 19 Ekim: önceki sürüm yalnız kök ve node_modules'ün doğrudan çocuklarına bakıyordu;
+ * pnpm iç içe junction'ları (.pnpm altında) `git worktree remove --force`'a kalıyordu (09-23 olayının mekanizması).
+ * Hedefi kopya DIŞINA düşenler `disarida` işaretli döner (rapor); silmeden önce HEPSİ yalnız bağlantı olarak kaldırılır.
+ */
+function tumBaglantilar(yol) {
+  return tara(yol).baglantilar
 }
 
 const liste = JSON.parse(fs.readFileSync(LISTE, 'utf8'))
@@ -151,18 +124,20 @@ for (const h of hedefler) {
     if (h.head && head !== h.head) { atla('HEAD listeden sonra değişmiş'); continue }
     const uzaktaOlmayan = Number(git(yol, ['rev-list', '--count', 'HEAD', '--not', '--remotes']))
     if (uzaktaOlmayan > 0) { atla(`uzakta olmayan ${uzaktaOlmayan} commit`); continue }
-    const baglantilar = disaBaglantilar(yol)
+    const baglantilar = tumBaglantilar(yol)
+    const disari = baglantilar.filter((b) => b.disarida)
     if (!GERCEK) {
       sayac.kuru++
-      console.log(`KURU  ${h.yol} · dal ${h.dal} · ${head.slice(0, 9)} · dışa bağlantı ${baglantilar.length}${baglantilar.length ? ' (önce yalnız bağlantı kaldırılacak: ' + baglantilar.map((b) => path.basename(b.yol)).join(', ') + ')' : ''}`)
-      kayitYaz({ yol: h.yol, sonuc: 'kuru', dal: h.dal, head, disaBaglanti: baglantilar.length })
+      console.log(`KURU  ${h.yol} · dal ${h.dal} · ${head.slice(0, 9)} · ${baglantilar.length} bağlantı (dışa ${disari.length}); silmeden önce HEPSİ yalnız bağlantı olarak kaldırılacak`)
+      kayitYaz({ yol: h.yol, sonuc: 'kuru', dal: h.dal, head, baglanti: baglantilar.length, disaBaglanti: disari.length })
       continue
     }
     for (const b of baglantilar) {
-      const r = spawnSync('cmd', ['/c', 'rmdir', b.yol], { encoding: 'utf8', windowsHide: true })
-      kayitYaz({ yol: h.yol, adim: 'baglanti-kaldir', baglanti: b.yol, hedef: b.hedef, cikis: r.status })
-      if (r.status !== 0) throw new Error('bağlantı kaldırılamadı: ' + b.yol)
+      const ok = baglantiKaldir(b.yol)
+      kayitYaz({ yol: h.yol, adim: 'baglanti-kaldir', baglanti: b.yol, hedef: b.hedef, disarida: b.disarida, ok })
+      if (!ok) throw new Error('bağlantı kaldırılamadı: ' + b.yol)
     }
+    if (tara(yol).baglantilar.length > 0) throw new Error('bağlantı hâlâ var; git worktree remove ÇAĞRILMADI')
     if (anaBinVardi && !fs.existsSync(anaBin)) throw new Error('ANA DEPO node_modules/.bin KAYBOLDU — durduruldu')
     git(ana, ['worktree', 'remove', '--force', yol], 30 * 60 * 1000)
     if (anaBinVardi && !fs.existsSync(anaBin)) {
