@@ -138,13 +138,22 @@ const CALISAN_ACMA_KURALI = [
 ].join('\n')
 
 /**
- * TARAYICI KURALI (HRT-61, OPS notu 13 Ekim; Recep: "hangisi kolay gelirse tarayıcı ya da chrome"): kartın ve filo-ortak.md'nin bayt payını
+ * TARAYICI KURALI (HRT-61, OPS notu 13 Ekim; iki yoldan işe kolay geleni serbest): kartın ve filo-ortak.md'nin bayt payını
  * yemesin diye kurallar dosyasında durur. Sebep: 13 Ekim'de bir çalışan Playwright ile bağımsız Chrome açtı (Playwright MCP kaldırıldı).
  * Her rolün kurallar dosyasına AYNEN girer.
  */
 const TARAYICI_KURALI = [
   '## Tarayıcı (HRT-61)',
   '- Tarayıcı işinde uygulamanın iki yolundan işe kolay geleni kullanılır: uygulama içi tarayıcı (pencerenin sağ bölmesi; herkese açık sayfa) ya da Chrome eklentisi (claude-in-chrome, oturum adlı sekme grubu; giriş gereken sayfa: Search Console, Bing). Uygulama dışı tarayıcı (Playwright, başsız, kendi başlatılan Chrome) yasaktır; alt ajan görev metnine yazılır.',
+].join('\n')
+
+/**
+ * TEŞHİS KOMUTLARI (HRT-69, OPS-176): filo-ortak.md bayt tavanında (10.000) olduğu için kurallar dosyasında durur.
+ * Kaynak ölçüm: docs/audits/claude-code-yerlesik-ozellikler-2026-10-19.md. Her rolün kurallar dosyasına AYNEN girer.
+ */
+const TESHIS_KURALI = [
+  '## Teşhis komutları (HRT-69)',
+  '- Kurulum ya da ayar şüphesinde `claude doctor` ve `/status`; bağlam ya da kota sorusunda `/context` ve `/usage`; kritik PR\'da `/ultrareview` yalnız OPS kararıyla (3 ücretsiz koşu, kod buluta gider). Yerleşik özellik envanteri: docs/audits/claude-code-yerlesik-ozellikler-2026-10-19.md.',
 ].join('\n')
 
 /**
@@ -286,6 +295,8 @@ function kuralDosyasi(ad) {
     CALISAN_ACMA_KURALI,
     '',
     TARAYICI_KURALI,
+    '',
+    TESHIS_KURALI,
     '',
     BIRLESTIRME_KURALI,
     '',
@@ -882,6 +893,7 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     // Durum dosyası "Yarım iş" satırı bloğu (HRT-31): kokpit compact hazırlığı bu biçime bağlı, blok düşerse biçim unutulur.
     if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
+    if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
   }
   return s
 }
@@ -1205,6 +1217,7 @@ module.exports = {
   ROLLER,
   DURUM_SATIRI_KURALI,
   TARAYICI_KURALI,
+  TESHIS_KURALI,
   CALISMA,
   haritaOzet,
   haritaDosyasi,
