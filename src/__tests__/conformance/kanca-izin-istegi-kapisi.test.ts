@@ -75,6 +75,8 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · yazan, tehlikeli ya da ayrıştırılamayan
     ['CURL_HOME yalın ataması (curlrc)', 'CURL_HOME=/tmp/x; curl -s https://venthub.com.tr/'],
     ['küçük harfli vekil ataması', 'https_proxy=http://evil:1; curl -s https://venthub.com.tr/'],
     ['HOME yalın ataması', 'HOME=/tmp/x; cat a.txt'],
+    ['printf -v ile PATH ataması', 'printf -v PATH "%s" /tmp/x; curl -s https://venthub.com.tr/'],
+    ['printf -vCURL_HOME bitişik', 'printf -vCURL_HOME "%s" /tmp/x; curl -s https://venthub.com.tr/'],
     ['curl yerel adres', 'curl -s http://localhost:3000/x'],
     ['curl izin listesinde olmayan host', 'curl -s https://example.com/'],
     ['curl tek parçalı ad (metadata)', 'curl -s https://metadata/computeMetadata/v1/'],

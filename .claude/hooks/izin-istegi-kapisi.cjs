@@ -291,6 +291,8 @@ function sadeOkuma(args) {
   const geri = args.slice(1)
   // sort: yalnız sade sıralama bayrakları; --compress-program, -T, -o, --output komut çalıştırır ya da dosya yazar.
   if (ad === 'sort' && !geri.every((a) => !a.startsWith('-') || /^-[nruf]+$/.test(a))) return false
+  // printf -v DEĞİŞKEN çıktıyı bir kabuk değişkenine atar (PATH/CURL_HOME gibi yasak ad atamasını dolanır); güvenlik taraması 19 Ekim.
+  if (ad === 'printf' && geri.some((a) => /^-v/.test(a))) return false
   if (ad === 'date' && geri.some((a) => a === '-s' || a === '--set' || /^--set=/.test(a))) return false
   if (ad === 'tail' && geri.some((a) => a === '-f' || a === '-F' || a === '--follow' || /^--follow=/.test(a))) return false
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepSade(geri)) return false
