@@ -153,7 +153,9 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/canli-yazim-kapisi.cjs\"",
-            "statusMessage": "canli-yazim-kapisi"
+            "statusMessage": "canli-yazim-kapisi",
+            "onFailure": "block",
+            "timeout": 30
           }
         ]
       },
