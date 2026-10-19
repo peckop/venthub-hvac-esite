@@ -23,7 +23,8 @@
  *      hızlı), sonra boş kök `fs.rmdirSync`; `rmdir /s` ve `rm -rf` kullanılmaz;
  *   5. ana deponun node_modules/.bin'i her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR;
  *   6. YEREL-ÖZGÜN DOSYA KAPISI (ARC-190): node_modules/.next/graphify-out/coverage/test-results dışında, ana deponun git
- *      geçmişinde (`log --all -m --raw`) adı HİÇ geçmeyen ya da içeriği geçmişteki hiçbir blob ile eşleşmeyen bir dosya varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
+ *      geçmişinde (`log --all -m --raw`) adı HİÇ geçmeyen ya da içeriği geçmişteki hiçbir blob ile eşleşmeyen bir dosya varsa klasör ATLANIR, dosya listesi kayda yazılır.
+ *      Tek dosya istisnası: kökteki tsconfig.tsbuildinfo (yeniden üretilebilir derleme önbelleği, OPS hükmü 19 Ekim).
  *      Geçmiş okunamazsa betik hiçbir şey silmeden durur (çıkış 6).
  * Varsayılan KURU KOŞUM (hiçbir şeye dokunmaz). Gerçek: `--gercek --geri-alinamaz-onayladim`.
  *
@@ -230,6 +231,9 @@ function yerelOzgunDosyalar(kok, gecmis) {
         yig.push({ d: p, goreli: rel })
         continue
       }
+      // OPS hükmü 19 Ekim: YALNIZ kökteki tsconfig.tsbuildinfo yeniden üretilebilen derleme önbelleğidir (kullanıcı verisi değil).
+      // Alt klasördeki tsbuildinfo, bağlantı ya da klasör bu istisnaya GİRMEZ; __pycache__/.pyc de girmez.
+      if (!goreli && a === 'tsconfig.tsbuildinfo' && st.isFile()) continue
       const bloblar = gecmis.get(rel)
       if (!bloblar) {
         ekle(rel)
