@@ -37,7 +37,7 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · salt-okuma komutlar geçer', () => {
     ['gh api GET', 'gh api repos/a/b/pulls/1'],
     ['boru hattı süzgeçleri', 'ls -la | grep foo | wc -l'],
     ['git branch --show-current', 'git branch --show-current'],
-    ['curl durum kodu, çıktı /dev/null', 'curl -s -o /dev/null -w "%{http_code}" https://example.com/'],
+    ['curl çıktı /dev/null', 'curl -s -o /dev/null https://example.com/'],
     ['.env.example okunabilir', 'cat .env.example'],
     ['tırnaklı jq süzgeci glob sayılmaz', 'jq ".[0].title" a.json'],
     ['tırnaklı grep deseni glob sayılmaz', 'grep ".*foo" a.txt'],
@@ -117,6 +117,12 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · yazan, tehlikeli ya da ayrıştırılamayan
     ['gh auth status --show-token', 'gh auth status --show-token'],
     ['curl -H @dosya', 'curl -s -H @file https://example.com/'],
     ['curl -w @dosya', 'curl -s -w @out https://example.com/'],
+    ['curl -w %output dosya yazar', 'curl -s -w "%output{x.txt}" https://example.com/'],
+    ['curl --write-out=%output dosya yazar', 'curl -s --write-out=%output{x.txt} https://example.com/'],
+    ['uniq çıkış dosyası yazar', 'uniq in.txt out.txt'],
+    ['file -C magic.mgc yazar', 'file -C -m magic'],
+    ['file --comp kısaltması magic yazar', 'file --comp -m magic'],
+    ['file -0C rakamlı küme magic yazar', 'file -0C -m magic'],
     ['curl yönlendirme izler (SSRF)', 'curl -sL https://example.com/'],
     ['curl IPv6 IPv4-eşlemeli yerel', 'curl -s "http://[::ffff:7f00:1]/"'],
     ['curl URL kullanıcı bilgisi', 'curl -s https://user:pw@example.com/'],
@@ -270,9 +276,14 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · kayıt parçası ve ayar', () => {
     grupDogru(grupBul(parca.PermissionRequest ?? []))
   })
 
-  it('OPS parçayı settings.json içine aldıysa biçim yine doğru (henüz alınmadıysa test bunu zorunlu kılmaz)', () => {
+  it('settings.json PermissionRequest altında izin-istegi-kapisi KAYITLI (karar 398, Recep onayı OPS penceresinde) ve biçim doğru', () => {
     const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8'))
-    const kayitli = grupBul(ayar.hooks?.PermissionRequest ?? [])
-    if (kayitli) grupDogru(kayitli)
+    grupDogru(grupBul(ayar.hooks?.PermissionRequest ?? []))
+  })
+
+  it('ayardaki kayıt hazır parçayla AYNI (parça ile ayar ayrışmasın)', () => {
+    const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8'))
+    const parca = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'hooks', 'izin-istegi-kapisi.settings-parcasi.json'), 'utf8'))
+    expect(ayar.hooks.PermissionRequest).toEqual(parca.PermissionRequest)
   })
 })
