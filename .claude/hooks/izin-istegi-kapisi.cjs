@@ -296,6 +296,9 @@ function sadeOkuma(args) {
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepSade(geri)) return false
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
+  // cd ~/.claude (ya da glob/8.3 ad) sonraki parçadaki `cat ops*` gibi yol-bağlamsız argümanı anahtar dosyasına çevirir
+  // (güvenlik taraması 19 Ekim); bu biçimde cd otomatik izin almaz.
+  if (ad === 'cd' && geri.some((a) => /\.claude|\.cl[*?[]|~\d|[*?[]/i.test(a))) return false
   // file -C magic.mgc yazar; uniq çıkış dosyası alır (listeden çıktı); curl -w/--write-out %output{dosya} yazar (listeden çıktı).
   if (ad === 'file' && geri.some((a) => /^-[^-]*C/.test(a) || (a.startsWith('--') && a !== '--'))) return false
   return true
