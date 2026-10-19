@@ -329,6 +329,17 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-yazim-sayaci.cjs\"",
+            "timeout": 10,
+            "statusMessage": "sage yazim sayaci"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-enjeksiyonu.cjs\"",
             "timeout": 10,
             "statusMessage": "hafiza (konu)"
