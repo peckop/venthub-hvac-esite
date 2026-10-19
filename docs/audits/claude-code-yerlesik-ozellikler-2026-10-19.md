@@ -2,7 +2,7 @@
 
 **Şerit:** HARİTA · **Kart:** HRT-69 (OPS-176; karar 393) · **Cetvel:** `docs/standards/belge-yonetimi-standard.md`, `docs/standards/execution-method-standard.md`
 **Kaynak:** Claude Code resmi belgelerinden (code.claude.com/docs/en, 19 Ekim 2026 alımı) çıkarılan 349 satırlık özellik tablosunun VentHub kurulumuyla kıyası (OPS ölçümü, salt okuma; ham rapor OPS oturumunun kaydında).
-**Kapsam:** yalnız Claude Code'un YERLEŞİK özellikleri. Bizim yeteneklerimiz, eklentilerimiz ve MCP sunucularımız bu belgede yoktur; ilgili satırlar (yetenek, eklenti ve MCP kategorileri) çıkarıldı. Satır numarası ham tablodaki sıradır.
+**Kapsam:** yalnız Claude Code'un YERLEŞİK özellikleri. Bizim yeteneklerimiz, eklentilerimiz ve MCP sunucularımız bu belgede yoktur; ilgili satırlar (yetenek, eklenti ve MCP kategorileri) çıkarıldı. Satır numarası ham özellik tablosundaki dosya satır numarasıdır. Çıkarılan 25 satır yüzünden 2. ve 3. bölüm tabloları Sayım'dan kısadır (2. bölümde 39 satır, Sayım 44; 3. bölümde 92 satır, Sayım 113). Önerim sütununda yalnız yetki ifadeleri uyarlandı (satır 44, 102, 211, 325, 345).
 **Ne için:** sorun için kendi çözümünü yazmadan önce yerleşik karşılığı bu belgeden ara (filo-ortak kuralı). Bu belge ölçümdür; bir satırın "evet" olması uygulama emri değildir, uygulama için kart açılır.
 
 ## 1 · SAYIM (349 satır, 349 etiket)
@@ -43,13 +43,13 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 273 | sandbox ayarı ve /sandbox | Aynı konu (Bash izolasyonu) | Aynı | hayır |
 | 275 | sandbox.filesystem ve sandbox.network | Dosya ve ağ sınırları | Yerel Windows'ta yok | hayır |
 | 209 | GitHub Actions claude-code-action | PR'da @claude incelemesi | API maliyeti; herkese açık depoda fork PR riski; self-hosted yasağı | hayır |
-| 220 | Claude Code Review (yönetilen servis) | Her PR otomatik incelenir | Ücret; /code-review ve security-reviewer zaten var | hayır |
+| 220 | Claude Code Review (yönetilen servis) | Her PR otomatik incelenir | Ücret; yerleşik /code-review zaten kullanılıyor | hayır |
 | 215 | Bulut oturumları (--cloud) | Bilgisayar kapalıyken iş sürer | Kod buluta gider; karar 395 yerel seçti | hayır |
 | 216 | /teleport, /remote-env, /web-setup | Bulut oturumunu terminale çeker | Bulut bağımlılığı | hayır |
 | 217 | /autofix-pr | CI hatasını bulutta düzeltir | Otomatik değişiklik; kota | hayır |
 | 44 | remoteControlAtStartup, disableRemoteControl | Açılışta uzaktan erişim | Uzaktan erişim yüzeyi; karar 396 | karar bekliyor |
 | 211 | /remote-control (/rc) | Yerel oturumu telefon ya da web'den izleme | Uzaktan erişim yüzeyi; karar 396 | karar bekliyor |
-| 45 | crossSessionInbound, isolatePeerMachines, dialogExpiry | Oturumlar arası gelen mesajı kabul, bekletme ya da reddetme | Posta kutusu MCP ile çakışır; belgeye göre varsayılan tanımsız (ARC-135 §7.2) | hayır (önce farkı ölç) |
+| 45 | crossSessionInbound, isolatePeerMachines, dialogExpiry | Oturumlar arası gelen mesajı kabul, bekletme ya da reddetme | Oturumlar arası mesajlaşma başka yoldan yapılıyor; belgeye göre varsayılan tanımsız (ARC-135 §7.2) | hayır (önce farkı ölç) |
 | 110 | Worktree izolasyonu ve claude agents --json | Arka plan oturumları betikle izlenir | Ayrı bakım | hayır |
 | 150 | Kanallar (channels) | Dış olaylar (Telegram, Discord) oturuma girer | Dışarıdan komut yüzeyi | hayır |
 | 26 | advisorModel, agent, fastMode | İkinci model danışmanı; hızlı mod | Ek token; kota | hayır |
@@ -58,7 +58,7 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 53 | voice, voiceEnabled | Türkçe sesli giriş | Claude.ai hesabı; kullanım kanıtı yok | hayır |
 | 252 | /voice | Aynı konu | Aynı | hayır |
 | 74 | http kanca alanları | Olay verisini dış uca iletir | Veri dışarı çıkar; sır riski | hayır |
-| 75 | mcp_tool kanca alanları | Kanca doğrudan MCP aracı çağırır (ör. Kanban) | MCP hata yüzeyi; command kancası yeterli | hayır |
+| 75 | mcp_tool kanca alanları | Kanca doğrudan bir MCP aracı çağırır | MCP hata yüzeyi; command kancası yeterli | hayır |
 | 76 | prompt ve agent kanca alanları | Model değerlendirmesiyle kapı | Maliyet, gecikme; agent deneysel | hayır |
 
 ## 3 · KISMEN (yetenek, eklenti, MCP satırları hariç)
@@ -79,8 +79,8 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 49 | fileCheckpointingEnabled | rewind için dosya anlık görüntüsü | Disk; varsayılan açıklığı ölçülmedi | hayır |
 | 56 | prependPlugins, appendPlugins, syncClaudeAi* | Eklenti sırası ve senkron kontrolü | Düşük fayda | hayır |
 | 65 | ~/.claude.json global anahtarları | IDE, diff, kopyalama tercihleri | 10 anahtardan yalnız claudeInChromeDefaultEnabled=true ölçüldü | hayır (ölçüm yok) |
-| 87 | maxTurns, effort, experimental.cacheTtl (ajan frontmatter) | maxTurns yalnız 1/70 ajanda var | Yarım iş | evet (uygulayıcılar için effort) |
-| 88 | skills, mcpServers, hooks (ajan frontmatter) | skills 55'te var; mcpServers ve hooks 0 | Bağlam yükü | hayır |
+| 87 | maxTurns, effort, experimental.cacheTtl (ajan frontmatter) | maxTurns çok az ajanda var | Yarım iş | evet (uygulayıcılar için effort) |
+| 88 | skills, mcpServers, hooks (ajan frontmatter) | skills çoğu ajanda var; mcpServers ve hooks kullanılmıyor | Bağlam yükü | hayır |
 | 89 | memory, omitClaudeMd | memory 67'de var; omitClaudeMd yok | Kural kaçırma riski | hayır |
 | 99 | CLAUDE_CODE_SUBAGENT_MODEL_FORCE, CLAUDE_CODE_FORK_SUBAGENT | SUBAGENT_MODEL=sonnet var; FORCE ve FORK yok | Model kilidi | hayır |
 | 102 | CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS | env=1 ayarlı; ekip açılmadı. Ekip kullanımı kararlaştırıldı, karar numarası yok | Yan etki ölçülmedi (18 Ekim #11) | karar bekliyor; önce ölçüm |
@@ -110,7 +110,7 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 203 | CronCreate, CronList, CronDelete | Oturum içi cron (7 gün, 50 görev) | 18 Ekim: "No scheduled tasks"; kalıcı iş 395'te | hayır |
 | 204 | CLAUDE_CODE_DISABLE_CRON | Zamanlayıcıyı kapatır | Kullanılmıyor | hayır |
 | 205 | /goal | Koşul sağlanana kadar çalışır | Kanıt yok | hayır |
-| 227 | Çıktı stili frontmatter | keep-coding-instructions ve force-for-plugin | recep.md frontmatter ölçülmedi | ölç |
+| 227 | Çıktı stili frontmatter | keep-coding-instructions ve force-for-plugin | çıktı stili dosyasının frontmatter'ı ölçülmedi | ölç |
 | 228 | /output-style | Stili listeler, değiştirir | outputStyle zaten Recep | hayır |
 | 234 | Klavye kısayolları | Oturum içi kısayollar | interactive-mode tablosu tam okunamadı | hayır |
 | 236 | Ctrl+X kanalları | Alt ajanları durdurma, kuyruğa alma | Kanıt yok | hayır |
@@ -120,7 +120,7 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 254 | --output-format (json, stream-json) | Betik çıktısı makine tarafından okunur | Kullanım kanıtı yok | evet (betik koşuları) |
 | 259 | --allowedTools, --disallowedTools, --tools | Betik koşularında araç sınırı | Kanıt yok | evet (betik) |
 | 264 | Çıkış kodları, --bg/--exec, agents --json | Betik sonucunu okuma | Kanıt yok | hayır |
-| 268 | --mcp-config, --strict-mcp-config, --settings, --add-dir, --plugin-dir | Oturum bazlı MCP, ayar, dizin | Plugin dizini env ile yapıldı | hayır |
+| 268 | --mcp-config, --strict-mcp-config, --settings, --add-dir, --plugin-dir | Oturum bazlı MCP, ayar, dizin | Dizin ortam değişkeniyle veriliyor | hayır |
 | 269 | --agents, --agent, --effort, --model, --fallback-model, --advisor | Oturum bazlı model ve ajan | Kanıt yok | hayır |
 | 270 | --session-id, --name, --resume/--continue ile -p | Betik oturumuna kimlik | Kanıt yok | hayır |
 | 274 | Sandbox platform desteği | Yerel Windows'ta sandbox yok | Bilgi satırı | hayır |
@@ -135,13 +135,13 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 303 | Statik dosya önizlemesi | Proje dosyasını açar | Kanıt yok | hayır |
 | 306 | Bölünmüş görünüm, terminal, pane | Oturumları yan yana açar | Kanıt yok | hayır |
 | 307 | Yan sohbet, arka plan görevleri paneli | Oturumu bozmadan soru | Kanıt yok | hayır |
-| 308 | Oturumlar arası mesajlaşma | Oturumdan oturuma mesaj | Posta kutusu MCP ile çakışır | hayır |
+| 308 | Oturumlar arası mesajlaşma | Oturumdan oturuma mesaj | Mesajlaşma başka yoldan yapılıyor | hayır |
 | 312 | Bilgisayar kullanımı (computer use) | Masaüstü uygulamalarını kontrol eder | Güvenlik; kullanım kanıtı yok | hayır |
 | 315 | İstem kutusu düğmeleri ve kısayollar | Ek, model, efor değiştirme | Kanıt yok | hayır |
 | 316 | Kullanım halkası, transkript görünümü | Bağlam ve kullanım gösterimi | Kanıt yok | hayır |
 | 321 | ultrathink ve alwaysThinkingEnabled | Tek tur ya da sürekli derin düşünme | ultracode var; sürekli düşünme maliyeti | hayır |
 | 323 | /fast, fastMode | Hızlı yanıt | Ek ücret etkisi ölçülmedi | hayır |
-| 328 | /verify, /run, /run-skill-generator | Uygulamayı çalıştırarak değişikliği doğrular | Kanıt yok | evet (verify-before-done ile) |
+| 328 | /verify, /run, /run-skill-generator | Uygulamayı çalıştırarak değişikliği doğrular | Kanıt yok | evet (bitti demeden önce doğrulama) |
 | 330 | /diff | Çalışma ağacı farkı | Kanıt yok | hayır |
 | 331 | /doctor ve claude doctor | Teşhis | 15 satırında zaten önerildi | hayır (15 ile aynı) |
 | 332 | /debug, --debug | Kanca ve hata günlüğü | Kanıt yok | evet (kanca hataları için) |
@@ -151,9 +151,9 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 | 341 | /export, /rename, /resume, /rewind, /branch, /clear | Konuşma yönetimi | /rename ve /resume kullanılıyor; diğerleri kanıt yok | hayır |
 | 342 | /hooks, /ide, /keybindings, /memory, /mcp, /plugin, /skills, /agents, /tasks | Yönetim panelleri | Kanıt yok | hayır |
 | 343 | /init, /import, /terminal-setup, /theme, /tui, /statusline, /output-style, /voice | Kurulum ve görünüm | Bilgi amaçlı | hayır |
-| 344 | /goal, /loop, /schedule, /workflows, /deep-research, /btw, /stop, /background, /plan, /autocompact | Zamanlama ve workflow komutları | Kanıt yok; NotebookLM ve maestro kullanılıyor | hayır |
+| 344 | /goal, /loop, /schedule, /workflows, /deep-research, /btw, /stop, /background, /plan, /autocompact | Zamanlama ve workflow komutları | Kanıt yok; kalıcı iş masaüstü zamanlanmış görevinde (karar 395) | hayır |
 | 345 | /mobile, /remote-control, /teleport, /remote-env, /web-setup, /autofix-pr | Mobil ve bulut komutları | Karar 396 ve 215-217 ile aynı | karar bekliyor |
-| 346 | /list-agents, /subtask, /fork, /reload-plugins, /reload-skills, /skill-doctor, /auto-mode-setup | Ajan ve yetenek yardımcıları | /reload-skills 116 ile aynı | evet (/reload-skills) |
+| 346 | /list-agents, /subtask, /fork, /reload-plugins, /reload-skills, /skill-doctor, /auto-mode-setup | Ajan ve yetenek yardımcıları | Yeniden başlatmadan yükler; kullanım kanıtı yok | evet (/reload-skills) |
 | 347 | /artifacts, /design, /design-login, /design-sync, /slides, /dataviz | Artifact ve tasarım komutları | Artifact yayını var; komut kanıtı yok | hayır |
 | 352 | Kimlik doğrulama yöntemleri ve öncelik | Giriş ve kimlik sırası | Kanıt yok | hayır |
 | 354 | İstem önbelleği ve süresi | Maliyet azaltma | 48 ile aynı; promptCacheTtl yok | ölç (48 ile) |
@@ -162,7 +162,7 @@ Kısmen etiketinin büyük kısmı dosyadan kanıtlanamayan slash komutları ve 
 
 Satır numaraları parantez içinde.
 
-- **Ayarlar, KULLANILIYOR (20):** kapsamlar (7), öncelik (8), liste birleşimi (9), /config (12), ConfigChange ile canlı yükleme (16), $schema (17), ~/.claude.json (18), permissions allow/ask/deny/additionalDirectories/defaultMode (20), hooks (21), env (22), ultracode ve workflow ayarları (27), outputStyle Recep (29), autoMode (35), cleanupPeriodDays (39; değer 36500, yani temizlik fiilen kapalı), autoUpdatesChannel latest (42), otomatik bellek (46), artifact (61), ortam değişkeni kategorileri (66).
+- **Ayarlar, KULLANILIYOR (18 listelendi; 20'den eklenti ve MCP satırları çıkarıldı):** kapsamlar (7), öncelik (8), liste birleşimi (9), /config (12), ConfigChange ile canlı yükleme (16), $schema (17), ~/.claude.json (18), permissions allow/ask/deny/additionalDirectories/defaultMode (20), hooks (21), env (22), ultracode ve workflow ayarları (27), outputStyle Recep (29), autoMode (35), cleanupPeriodDays (39; değer 36500, yani temizlik fiilen kapalı), autoUpdatesChannel latest (42), otomatik bellek (46), artifact (61), ortam değişkeni kategorileri (66).
 - **Ayarlar, GEREKSIZ (21):** yönetilen ayar (10), policyHelper (11), --settings (13), CLAUDE_CONFIG_DIR (19), modelOverrides ve modelPicker (24), availableModels (25), tema ve görünüm (30), tui ve ekran okuyucu (32), tekerlek kaydırma (33), spinner (34), apiKeyHelper ve bulut kimlik (37), forceLogin (38), includeGitInstructions ve prUrlTemplate (41), remote.defaultEnvironmentId (43), respondToBashCommands ve defaultShell (51), kurum kanca ve izin sınırları (58, 59, 60), feedback ve skip prompts (62), SSH (64), env çifti öncelik kuralı (67).
 - **Ayarlar, KARARLI (1):** worktree ayarları (52; karar 391).
 - **Kancalar, KULLANILIYOR (4):** eşleştirici matcher (77), çıktı alanları hookSpecificOutput ve systemMessage, çıkış kodu 2 (78, 79), ${CLAUDE_PROJECT_DIR} (81). **GEREKSIZ (2):** /hooks menüsü (80), kılavuz örnekleri (82).
@@ -170,6 +170,7 @@ Satır numaraları parantez içinde.
 - **Ajan ekipleri:** KULLANILIYOR ve GEREKSIZ yok (102-106 KISMEN ya da YARAR).
 - **Ajan görünümü, GEREKSIZ (1):** kabuktan attach, logs, stop vb. (108).
 - **Workflow'lar, KULLANILIYOR (2):** Workflow aracı (111), ultracode (114). **GEREKSIZ (1):** /deep-research (112).
+- **Bellek, KULLANILIYOR (4):** CLAUDE.md (164), otomatik bellek (167), InstructionsLoaded (172), sıkıştırma sonrası kalıcılık (175). **GEREKSIZ (4):** /init ve yeni akış (169), /import (170), kurum CLAUDE.md (171), sistem istemi bayrakları (173).
 - **Worktree ve oturum, KULLANILIYOR (4):** --continue ve --resume (183), oturum adlandırma (186), transcript konumu (189), /clear ve /compact (190). **KARARLI (2):** claude --worktree (176; karar 391), EnterWorktree ve ExitWorktree (178; karar 391). **GEREKSIZ (5):** --tmux (177), WorktreeCreate ve WorktreeRemove kancaları (180), --from-pr (184), --fork-session, /branch, /fork (185), /export ve purge (188).
 - **Zamanlama ve uzaktan, KARARLI (5):** Routines (206), sınırları (207), masaüstü zamanlanmış görevleri (208; karar 395, sabah-ozeti kuruldu), mobil (213), mobil bildirimler (214; karar 396, inputNeededNotifEnabled=false). **GEREKSIZ (4):** uzaktan kontrol önek (212), GitLab CI (210), Claude Projects (219), bulut ortamları (218).
 - **Bildirim ve görünüm, KULLANILIYOR (2):** statusLine (224), çıktı stilleri (226). **GEREKSIZ (7):** iTerm2 bildirimleri (223), footerLinksRegexes (225), tema (229), renk (230), focus ve scroll (231), --ax-screen-reader (232), tam ekran kaydırma (233).
@@ -177,9 +178,9 @@ Satır numaraları parantez içinde.
 - **IDE ve entegrasyon, KULLANILIYOR (1):** Claude in Chrome (249). **GEREKSIZ (5):** VS Code (245), JetBrains (246), derin bağlantılar (250), GitHub ve Slack uygulama kurulumu (251), diffTool ve IDE dışı yollar (248).
 - **Headless ve SDK, KULLANILIYOR (1):** claude -p (253). **GEREKSIZ (12):** --json-schema (255), partial messages ve hook events (256), --bare (258), --permission-mode ve --dangerously-skip-permissions (260), --permission-prompts (261), --restricted ve --safe-mode (262), --no-session-persistence (263), CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS (265), Agent SDK (266), --init ve Setup kancası (267), append-subagent sistem istemi (271), stdin boru hattı (272).
 - **Sandbox, GEREKSIZ (3):** kaynaklar (276), oto modda alan adları (277), sandbox kipleri ve credentials (278).
-- **İzin modları, KULLANILIYOR (5):** "Yes, and don't ask again" kuralı (286), kural sözdizimi (287), additionalDirectories (288), autoMode sınıflandırıcı (289), kurum izin istisnası değil, ancak izin kuralı sözdizimi için 287 ile aynı. **GEREKSIZ (4):** acceptEdits (280), dontAsk (283), bypassPermissions (284), kurum izin sınırları (293).
+- **İzin modları, KULLANILIYOR (4):** "Yes, and don't ask again" kuralı (286), kural sözdizimi (287), additionalDirectories (288), autoMode sınıflandırıcı (289). **GEREKSIZ (4):** acceptEdits (280), dontAsk (283), bypassPermissions (284), kurum izin sınırları (293).
 - **Masaüstü, KULLANILIYOR (5):** oturum türleri Local (296), kenar çubuğu (297), önizleme ve tarayıcı bölmesi (301), bağlayıcılar ve eklentiler (311), artifacts (317). **KARARLI (3):** paralel oturumlar ve worktree (298; karar 391), kod incelemesi (304; karar 393), uzaktan kontrol ve Dispatch (309; karar 396). **GEREKSIZ (4):** bulut projeleri (310), iOS simülatör (313), kurulum sayfaları (314), kurum kontrolleri (318).
-- **Komut ve kullanım, KULLANILIYOR (4):** /model (319), /effort (320), /login, /logout, auth (338), claude update ve install (339). **KARARLI (2):** /code-review (324; karar 393), /simplify (327; karar 393). **GEREKSIZ (7):** /security-review (326; security-reviewer ajanı zaten var), /batch (329; maestro var), /feedback ve heapdump (333), /insights ve team-onboarding (335), /setup-bedrock ve vertex (337), /chrome vb. eğlence ve kurulum (348), kaldırılanlar (349).
+- **Komut ve kullanım, KULLANILIYOR (4):** /model (319), /effort (320), /login, /logout, auth (338), claude update ve install (339). **KARARLI (2):** /code-review (324; karar 393), /simplify (327; karar 393). **GEREKSIZ (7):** /security-review (326), /batch (329), /feedback ve heapdump (333), /insights ve team-onboarding (335), /setup-bedrock ve vertex (337), /chrome vb. eğlence ve kurulum (348), kaldırılanlar (349).
 - **Kurum ve sınırlar, GEREKSIZ (4):** sunucu tarafı yönetilen ayarlar (350), kurum dağıtımı (351), veri kullanımı ve sağlayıcılar (353), eklenti ve MCP önbellek bilgisi (355).
 
 ## 5 · KARAR NUMARALARI VE DURUMLARI
@@ -200,7 +201,7 @@ Satır numaraları parantez içinde.
 - "Kalıcı zamanlama yok" iddiası geçersiz: masaüstü zamanlanmış görevleri var (karar 395).
 - Proje deny kuralları 19'dan 26'ya çıktı.
 - Varsayılandan sapan değerler: cleanupPeriodDays 36500 (varsayılan 30; transcript birikimi fiilen temizlenmiyor), eşzamanlı alt ajan üst sınırı 50 (belge varsayılanı 20), MCP çıktı sınırı 6000 jeton (belge varsayılanı 25.000), API zaman aşımı 3.000.000 ms.
-- Listede ayrı satırı olmayan ama kurulumda bulunan ayarlar: otomatik sıkıştırma eşiği ortam değişkeni (%60; ikinci bir sıkıştırma mekanizması ile birlikte iki eşik var, etkili eşik ölçülmedi), function kancası anahtarı, eklenti dizini ortam değişkeni.
+- Listede ayrı satırı olmayan ama kurulumda bulunan ayarlar: otomatik sıkıştırma eşiği ortam değişkeni (%60; ikinci bir sıkıştırma mekanizması ile birlikte iki eşik var, etkili eşik ölçülmedi) ve function kancası anahtarı.
 
 ## 7 · ÖLÇÜLEMEYENLER
 
@@ -213,4 +214,4 @@ Satır numaraları parantez içinde.
 
 ## 8 · FİLO İÇİN SONUÇ
 
-Teşhis komutları kuralı (aynı PR, ortak blok): kurulum ya da ayar şüphesinde `claude doctor` ve `/status` (ayar kaynakları), bağlam ya da kota sorusunda `/context` ve `/usage`, kritik PR'da `/ultrareview` (yalnız OPS kararıyla; 3 ücretsiz koşu, kod buluta gider). Bu dört komut yukarıdaki 2. bölümde "evet" etiketli satırlardır (14, 15, 198, 191, 325).
+Teşhis komutları kuralı (aynı PR, ortak blok): kurulum ya da ayar şüphesinde `claude doctor` ve `/status` (ayar kaynakları), bağlam ya da kota sorusunda `/context` ve `/usage`, kritik PR'da `/ultrareview` (yalnız OPS kararıyla; 3 ücretsiz koşu, kod buluta gider). Bu beş komutun satırları: 14, 15 ve 325 (2. bölüm, kullanılmıyor ama işe yarar) ile 191 ve 198 (3. bölüm, kısmen; önerim evet). Ücretsiz koşu sayısı aşılır ve para harcatırsa karar Recep'indir.
