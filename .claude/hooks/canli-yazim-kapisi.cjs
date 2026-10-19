@@ -183,7 +183,7 @@ function incele(komut, cwd, betikler = yazanBetikAdlari(), ps = false) {
  * ama agent_id taşır (19 Ekim ölçümü); session_id ve cwd'ye bakılmaz, yazılabilir kimlik dosyasına bağlı değil.
  */
 function opsMu(girdi) {
-  return girdi.agent_type === 'ops-pencere' && !girdi.agent_id && !girdi.agent_id
+  return girdi.agent_type === 'ops-pencere' && !girdi.agent_id
 }
 
 function reddet(sebep) {
