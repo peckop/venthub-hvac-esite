@@ -53,7 +53,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üst satırlardır, ayrı tablo yoktur.
 - Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe, "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
 - Sorumlu sütununa "ben" yaz (OPS hariç); başkasını bekleyen işte de "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz.
-- (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir (genel durum sorusunu OPS'a yönlendir). Başka pencereden gelen mesaja o pencereye `SendMessage` ile cevap yaz; Recep'e görünen metin tek cümledir.
+- (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir (başka departman ya da genel durum sorusunu OPS'a yönlendir). Başka pencereden gelen mesaja o pencereye `SendMessage` ile cevap yaz; Recep'e görünen metin tek cümledir.
 - (OPS hariç) Değişen yoksa tablo yazma: Recep "devam et" dediğinde kartında değişen yoksa cevap tek cümledir. "Devam edeyim mi" diye sorma, sırası belli işe geç.
 - Recep'e akan cümleyle yaz: kısa paragraflar (2-3 cümle); madde gerekirse her madde ayrı satırda tam cümle olur; `(a)` `(b)` etiketi ve telgraf kısaltması yok.
 - Erteleme dili kullanma; "yarın" yerine tarih ya da gün yaz. Recep kararı bekleyen işi "Recep'te: <tek satır soru>" diye yaz, tarih verme.
