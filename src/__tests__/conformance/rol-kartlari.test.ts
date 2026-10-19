@@ -1293,6 +1293,16 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     expect(uretici.gorevSorunlari(v, roller, varMi, () => '', []).join('\n')).toMatch(/tetik dosyası yok/)
   })
 
+  it('HRT-67 (OPS-176): filo-ortak yerleşik /code-review ve /simplify kuralını, security-reviewer koşulunu ve mevcut yeteneklerin silinmediğini yazar', () => {
+    const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
+    for (const parca of ['yerleşik `/code-review` ve `/simplify`', '`security-reviewer` ajanı', 'ödeme, auth, RLS ya da webhook', 'code-review, diff-review, security-scanner, refactor-planner yetenekleri silinmez']) {
+      expect(ortak, parca).toContain(parca)
+    }
+    for (const yetenek of ['code-review', 'diff-review', 'security-scanner', 'refactor-planner']) {
+      expect(fs.existsSync(path.join(KOK, '.claude', 'skills', yetenek, 'SKILL.md')), `${yetenek} skill'i silinmemiş olmalı`).toBe(true)
+    }
+  })
+
   it('"Günlük işte Recep\'e soru sorulmaz" satırı her rolün kurallar dosyasında (OPS-169, Recep 16 Ekim) ve beş Recep kapısını sayar', () => {
     const kurallar = uretici.uretKurallar()
     for (const ad of roller) {
