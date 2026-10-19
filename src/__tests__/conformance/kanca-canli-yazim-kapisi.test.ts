@@ -149,6 +149,28 @@ describe('INV-KANCA-CANLI-YAZIM-1 · OPS penceresi geçer, diğerleri reddedilir
     expect(redMi(kos({ session_id: opsSid, agent_id: 'ae9aa80f148ad5591', agent_type: 'ops-pencere', tool_input: { command: KOMUT } }).cikti)).toBe(true)
   })
 
+  it('OPS kimliği taklidi: başka pencere `claude --agent ops-pencere` başlatamaz (bayraktan bağımsız)', () => {
+    for (const c of ['claude -p "x" --agent ops-pencere', 'claude --agent=ops-pencere -p x', "claude --agent 'ops-pencere'", 'claude.exe -p x --agent ops-pencere']) {
+      expect(redMi(kos({ session_id: digerSid, tool_input: { command: c } }).cikti)).toBe(true)
+    }
+    expect(redMi(kos({ session_id: digerSid, tool_name: 'PowerShell', tool_input: { command: 'claude -p x --agent ops-pencere' } }).cikti)).toBe(true)
+    expect(redMi(kos({ session_id: digerSid, agent_type: 'ops-pencere', tool_input: { command: 'claude -p x --agent ops-pencere' } }).cikti)).toBe(false) // OPS'un kendisi
+    expect(redMi(kos({ session_id: digerSid, tool_input: { command: 'claude --agent arac-pencere -p x' } }).cikti)).toBe(false) // başka ajan serbest
+  })
+
+  it('PowerShell kurucuları: dize birleştirme, iex, [char], -join ile kurulan çağrı product-data işaretiyle DENY', () => {
+    for (const c of [
+      '$f = "--ap" + "ply"; node scripts/db/product-data/a.mjs $f',
+      'iex "node scripts/db/product-data/a.mjs --a*"',
+      '$f = [char]45 + [char]45 + "apply"; & node scripts/db/product-data/a.mjs $f',
+      '$a = @("--ap","ply") -join ""; node scripts/db/product-data/a.mjs $a',
+    ]) {
+      expect(redMi(kos({ session_id: digerSid, tool_name: 'PowerShell', tool_input: { command: c } }).cikti)).toBe(true)
+    }
+    // product-data içermeyen PowerShell komutu karışmaz
+    expect(redMi(kos({ session_id: digerSid, tool_name: 'PowerShell', tool_input: { command: 'Get-ChildItem | Select-Object -First 3' } }).cikti)).toBe(false)
+  })
+
   it('DELİK A: ops-oturumu.json\'a yazılmış kimlik (herkes yazabilir) OPS yapmaz', () => {
     // dosyada opsSid kayıtlı; o session_id ile gelen ama agent_type taşımayan pencere reddedilir
     expect(redMi(kos({ session_id: opsSid, tool_input: { command: KOMUT } }).cikti)).toBe(true)

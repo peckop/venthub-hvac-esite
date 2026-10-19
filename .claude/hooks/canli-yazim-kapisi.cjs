@@ -45,7 +45,11 @@
 const fs = require('fs')
 const path = require('path')
 
-const BAYRAK = /(^|\s|["'=])--(apply|rollback)(\s|=|$|["'])/
+const BAYRAK = /(^|\s|["'=,(])--(apply|rollback)(\s|=|$|["'),])/
+// PowerShell kurucuları: dize birleştirme, iex, [char], -join, -f: bayrak düz görünmez, product-data işareti varsa DENY.
+const PSKUR = /\biex\b|Invoke-Expression|Invoke-Command|\bicm\b|\[char\]|-join\b|\[string\]::|\+\s*["']|["']\s*\+|-f\s+["']/i
+// OPS kimliği taklidi: başka pencere `claude --agent ops-pencere` ile kendini OPS yapıp komut koşturamaz.
+const OPS_TAKLIT = /\bclaude(\.exe|\.cmd)?\b[\s\S]*--agent[\s=]+["']?ops-pencere/i
 // Söküm sonrası gevşek başlangıç: `${A}ly` gibi parçalanmış bayrağın A=--app kısmı.
 const GEVSEK = /--(ap|ro)/
 // Gizleme belirtisi: değişken/komut ikamesi, $'..', \x kaçışı, eval, base64, satır sonu kaçışı.
@@ -175,7 +179,24 @@ function incele(komut, cwd, betikler = yazanBetikAdlari(), ps = false) {
   if (tumCalistirici && productVar && OBFUSK.test(metin)) {
     return 'product-data betigi degisken/komut ikamesi/kacis ile cagriliyor (bayrak gorunmeyebilir)'
   }
+  // PowerShell: bayrak sayısız yolla kurulabilir; product-data işareti + kurucu yapı varsa çalıştırıcı/bayrak aranmadan DENY
+  if (ps && productVar && PSKUR.test(metin)) {
+    return 'PowerShell: product-data betigi dize birlestirme/iex/[char]/-join ile cagriliyor (bayrak gorunmeyebilir)'
+  }
   return null
+}
+
+/** OPS kimliği taklidi: `claude ... --agent ops-pencere` (sökülmüş halde de). */
+function opsTaklidi(metin) {
+  // Yalnız komutun KENDİSİ claude (ya da bir çalıştırıcı sarmalının içinde claude) ise: `git commit -m "... claude --agent ..."`
+  // gibi metinler yanlış alarm vermesin.
+  for (const parca of String(metin).split(/&|;|\||\r?\n|`|\$\(/)) {
+    const ilk = komutKelimesi(kelimele(parca))
+    const claudeMi = /^claude(\.exe|\.cmd)?$/i.test(ilk)
+    const sarmal = CALISTIRICI.test(ilk) && /\bclaude\b/i.test(parca)
+    if ((claudeMi || sarmal) && (OPS_TAKLIT.test(parca) || OPS_TAKLIT.test(sokum(parca)))) return true
+  }
+  return false
 }
 
 /**
@@ -211,10 +232,12 @@ function main() {
   }
   const komut = (girdi.tool_input || {}).command || ''
   const ps = girdi.tool_name === 'PowerShell'
-  if ((girdi.tool_name !== 'Bash' && !ps) || !(bayrakVar(komut) || OBFUSK.test(komut))) process.exit(0)
+  if (girdi.tool_name !== 'Bash' && !ps) process.exit(0)
   let sebep = null
   try {
-    sebep = incele(komut, girdi.cwd, undefined, ps)
+    if (opsTaklidi(komut)) sebep = 'OPS kimligi taklidi: claude --agent ops-pencere baska pencereden baslatilamaz'
+    // Ön süzgeç: gizleme belirtisi/bayrak/PowerShell kurucusu yoksa (ve PowerShell'de product-data de yoksa) karışma
+    else if (ps || bayrakVar(komut) || OBFUSK.test(komut)) sebep = incele(komut, girdi.cwd, undefined, ps)
   } catch (e) {
     sebep = /product-data/i.test(komut) ? 'komut ayristirilamadi (' + ((e && e.message) || 'bilinmeyen') + ')' : null
   }
