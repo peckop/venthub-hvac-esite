@@ -246,6 +246,8 @@ const HASSAS = [
   // Kimlik dosyaları: oturum anahtarı, bulut, gh, ssh (OPS incelemesi, #1997).
   /(^|[/\\:])\.?credentials(\.json)?$/i,
   /hosts\.yml$/i,
+  // Canlı yazım onay anahtarı (ARC-181): ajanlara otomatik okuma izni verilmez; normal izin sorusuna düşer.
+  /ops-yazim-onayi/i,
   /\.aws[/\\]/i,
   /\.ssh[/\\]/i,
   // Adında "token" geçen DOSYA: yol ayırıcılı ya da uzantılı argüman (arama sözcüğü `grep token` etkilenmez).
@@ -262,7 +264,7 @@ const globHassasMi = (a) => HASSAS_GLOB.test(String(a))
 // grep yalnız tek dosyalı sade biçim; özyineleme, --include/--exclude ve tanınmayan her uzun seçenek yasak.
 const SADE = new Set([
   'ls', 'pwd', 'cat', 'head', 'tail', 'wc', 'stat', 'file', 'du', 'df', 'date', 'which', 'basename', 'dirname',
-  'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'cut', 'tr', 'diff', 'cmp',
+  'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'cut', 'tr', 'cmp',
   'sha256sum', 'md5sum', 'tree', 'grep', 'egrep', 'fgrep', 'sort', 'jq',
 ])
 
@@ -298,6 +300,11 @@ function sadeOkuma(args) {
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepSade(geri)) return false
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
+  // cd ~/.claude (ya da glob/8.3 ad) sonraki parçadaki `cat ops*` gibi yol-bağlamsız argümanı anahtar dosyasına çevirir
+  // (güvenlik taraması 19 Ekim); bu biçimde cd otomatik izin almaz.
+  if (ad === 'cd' && geri.some((a) => /\.claude|\.cl[*?[]|~\d|[*?[]/i.test(a))) return false
+  // Argümansız cd, `cd -` ve `cd ~` ev dizinine/önceki dizine gider; HOME/OLDPWD yalın ataması yasak (#2011) olsa da bu biçimler de otomatik izin almaz.
+  if (ad === 'cd' && (geri.length === 0 || geri.some((a) => a.startsWith('-') || a.startsWith('~')))) return false
   // file -C magic.mgc yazar; uniq çıkış dosyası alır (listeden çıktı); curl -w/--write-out %output{dosya} yazar (listeden çıktı).
   if (ad === 'file' && geri.some((a) => /^-[^-]*C/.test(a) || (a.startsWith('--') && a !== '--'))) return false
   return true
@@ -509,6 +516,13 @@ function parcaOkumaMi(args) {
   const ad = args[0]
   // URL'ler dosya yolu değildir (uzak adres yerel dosyayı okutmaz); yalnız yerel yol benzeri argümanlar denetlenir.
   const globlu = args.globlu || []
+  // Güvenlik taraması 19 Ekim: ~/.claude içine uzanan tırnaksız glob (ops-yazim-onay?.txt, ops*) ve Windows 8.3 kısa adı (OPS-YA~1.TXT)
+  // ad desenini atlatır; bu iki biçim otomatik izin almaz (normal izin sorusuna düşer).
+  const claudeGlobu = (a, k) => globlu[k] && /\.claude/i.test(a)
+  const kisaAd = (a) => /~\d/.test(a)
+  if (args.some((a, k) => !/^https?:\/\//i.test(a) && (claudeGlobu(a, k) || kisaAd(a)))) {
+    return { okuma: false, sebep: 'glob ile ~/.claude yolu ya da 8.3 kısa ad: ' + ad }
+  }
   if (args.some((a, k) => !/^https?:\/\//i.test(a) && (hassasMi(a) || (globlu[k] && globHassasMi(a))))) {
     return { okuma: false, sebep: 'hassas dosya yolu ya da glob: ' + ad }
   }
