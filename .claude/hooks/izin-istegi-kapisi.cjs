@@ -295,7 +295,7 @@ function sadeOkuma(args) {
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
   // file -C magic.mgc yazar; uniq çıkış dosyası alır (listeden çıktı); curl -w/--write-out %output{dosya} yazar (listeden çıktı).
-  if (ad === 'file' && geri.some((a) => /^-[A-Za-z]*C/.test(a) || a === '--compile')) return false
+  if (ad === 'file' && geri.some((a) => /^-[A-Za-z]*C/.test(a) || (a.startsWith('--') && a !== '--'))) return false
   return true
 }
 
