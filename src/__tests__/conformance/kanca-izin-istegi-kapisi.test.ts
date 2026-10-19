@@ -274,6 +274,20 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · kanca süreci (stdin → stdout, kayıt)', 
     expect(ham).toMatch(/GIZLI/)
   })
 
+  it('kayıt: OPS yazım onay anahtarı atamasının değeri maskelenir (ad ONAYI ile biter)', () => {
+    const yerel = fs.mkdtempSync(path.join(os.tmpdir(), 'izin-kayit-onay-'))
+    const sir = 'ornekonaydegeri987654'
+    spawnSync(process.execPath, [KANCA], {
+      input: JSON.stringify(bash(`VENTHUB_OPS_YAZIM_ONAYI=${sir} node scripts/db/product-data/x.mjs --apply`)),
+      encoding: 'utf8',
+      env: { ...process.env, IZIN_KAYIT_DIZINI: yerel },
+    })
+    const gun = new Date().toISOString().slice(0, 10)
+    const ham = fs.readFileSync(path.join(yerel, `${gun}.jsonl`), 'utf8')
+    expect(ham, 'kayıtta onay anahtarı değeri kaldı').not.toContain(sir)
+    expect(ham).toMatch(/GIZLI/)
+  })
+
   it('her karar kayda yazılır; komuttaki sır maskelenir', () => {
     calistir(bash('curl -s https://venthub.com.tr/?token=abc123supersecret'))
     const gun = new Date().toISOString().slice(0, 10)
