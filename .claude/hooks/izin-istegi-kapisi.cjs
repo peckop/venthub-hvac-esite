@@ -558,6 +558,8 @@ const GIZLI_DESENLER = [
   /AKIA[0-9A-Z]{16}/g,
   /xox[abprs]-[A-Za-z0-9-]{10,}/g,
   /(?:token|key|secret|password|passwd|pwd)=[^\s&"']+/gi,
+  // OPS yazım onay anahtarı (ARC-181): ad "ONAYI" ile biter, yukarıdaki desen yakalamaz (güvenlik taraması 19 Ekim).
+  /\b[A-Za-z0-9_]*(?:ONAYI|ONAY)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s&;|]+)/gi,
   /\b(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{6,}/gi,
   /\b(?:authorization|x-api-key|cookie|x-auth-token)\s*[:=]\s*[^\n"']+/gi,
   /(?:^|\s)(?:-u|--user)\s+\S+/g,
@@ -574,7 +576,8 @@ function kayitYaz(satir) {
     const d = kayitDizini()
     fs.mkdirSync(d, { recursive: true })
     const gun = new Date().toISOString().slice(0, 10)
-    fs.appendFileSync(path.join(d, gun + '.jsonl'), JSON.stringify(satir) + '\n')
+    // Her metin alanı maskelenir (yalnız `komut` değil: `sebep` da "salt-okuma listesinde değil: <ham komut>" taşır).
+    fs.appendFileSync(path.join(d, gun + '.jsonl'), JSON.stringify(satir, (_k, v) => (typeof v === 'string' ? gizle(v) : v)) + '\n')
   } catch {
     // kayıt hatası kararı etkilemez
   }
