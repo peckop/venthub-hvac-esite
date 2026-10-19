@@ -138,6 +138,30 @@ describe('INV-ARAC-WT-OZGUN-1 · yerel-özgün dosya kapısı', () => {
     expect(r2.ok).toBe(true)
   })
 
+  it('YALNIZ kökteki tsconfig.tsbuildinfo geçer; alt klasörde tsbuildinfo, klasör/bağlantı olan ve .pyc ÖZGÜN sayılır', () => {
+    const k = path.join(gecici, 'tsb')
+    yaz(k, 'src/a.ts')
+    yaz(k, 'tsconfig.tsbuildinfo', '{"derleme":1}')
+    expect(a.yerelOzgunKapisi(k, gecmis).ok).toBe(true) // kökte: geçer
+
+    const alt = path.join(gecici, 'tsb-alt')
+    yaz(alt, 'src/a.ts')
+    yaz(alt, 'tsconfig.tsbuildinfo', '{}')
+    yaz(alt, 'paket/tsconfig.tsbuildinfo', '{}')
+    const r = a.yerelOzgunDosyalar(alt, gecmis)
+    expect(r.dosyalar).toEqual(['paket/tsconfig.tsbuildinfo']) // altta: atlatır, kökteki geçer
+
+    const diger = path.join(gecici, 'tsb-diger')
+    yaz(diger, 'src/a.ts')
+    yaz(diger, 'tsconfig.app.tsbuildinfo', '{}')
+    yaz(diger, 'scripts/__pycache__/x.cpython-311.pyc', 'pyc')
+    expect(a.yerelOzgunDosyalar(diger, gecmis).dosyalar).toEqual(['scripts/__pycache__/x.cpython-311.pyc', 'tsconfig.app.tsbuildinfo'])
+
+    const klasor = path.join(gecici, 'tsb-klasor')
+    yaz(klasor, 'tsconfig.tsbuildinfo/icerik.txt', 'veri') // aynı adlı KLASÖR istisna değil
+    expect(a.yerelOzgunKapisi(klasor, gecmis).ok).toBe(false)
+  })
+
   it('derleme klasörleri yalnız KÖKTE atlanır: iç içe coverage/ özgün dosya sayılır; node_modules içi hiç sayılmaz', () => {
     const k = path.join(gecici, 'ic')
     yaz(k, 'src/a.ts')
