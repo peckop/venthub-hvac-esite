@@ -262,7 +262,7 @@ const globHassasMi = (a) => HASSAS_GLOB.test(String(a))
 // grep yalnız tek dosyalı sade biçim; özyineleme, --include/--exclude ve tanınmayan her uzun seçenek yasak.
 const SADE = new Set([
   'ls', 'pwd', 'cat', 'head', 'tail', 'wc', 'stat', 'file', 'du', 'df', 'date', 'which', 'basename', 'dirname',
-  'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'cut', 'tr', 'diff', 'cmp',
+  'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'cut', 'tr', 'cmp',
   'sha256sum', 'md5sum', 'tree', 'grep', 'egrep', 'fgrep', 'sort', 'jq',
 ])
 
@@ -499,6 +499,13 @@ function parcaOkumaMi(args) {
   const ad = args[0]
   // URL'ler dosya yolu değildir (uzak adres yerel dosyayı okutmaz); yalnız yerel yol benzeri argümanlar denetlenir.
   const globlu = args.globlu || []
+  // Güvenlik taraması 19 Ekim: ~/.claude içine uzanan tırnaksız glob (ops-yazim-onay?.txt, ops*) ve Windows 8.3 kısa adı (OPS-YA~1.TXT)
+  // ad desenini atlatır; bu iki biçim otomatik izin almaz (normal izin sorusuna düşer).
+  const claudeGlobu = (a, k) => globlu[k] && /\.claude/i.test(a)
+  const kisaAd = (a) => /~\d/.test(a)
+  if (args.some((a, k) => !/^https?:\/\//i.test(a) && (claudeGlobu(a, k) || kisaAd(a)))) {
+    return { okuma: false, sebep: 'glob ile ~/.claude yolu ya da 8.3 kısa ad: ' + ad }
+  }
   if (args.some((a, k) => !/^https?:\/\//i.test(a) && (hassasMi(a) || (globlu[k] && globHassasMi(a))))) {
     return { okuma: false, sebep: 'hassas dosya yolu ya da glob: ' + ad }
   }
