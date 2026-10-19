@@ -122,6 +122,7 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · yazan, tehlikeli ya da ayrıştırılamayan
     ['uniq çıkış dosyası yazar', 'uniq in.txt out.txt'],
     ['file -C magic.mgc yazar', 'file -C -m magic'],
     ['file --comp kısaltması magic yazar', 'file --comp -m magic'],
+    ['file -0C rakamlı küme magic yazar', 'file -0C -m magic'],
     ['curl yönlendirme izler (SSRF)', 'curl -sL https://example.com/'],
     ['curl IPv6 IPv4-eşlemeli yerel', 'curl -s "http://[::ffff:7f00:1]/"'],
     ['curl URL kullanıcı bilgisi', 'curl -s https://user:pw@example.com/'],
