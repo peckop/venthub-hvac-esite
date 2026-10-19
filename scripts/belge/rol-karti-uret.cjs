@@ -138,6 +138,16 @@ const CALISAN_ACMA_KURALI = [
 ].join('\n')
 
 /**
+ * TARAYICI KURALI (HRT-61, OPS notu 13 Ekim; Recep: "hangisi kolay gelirse tarayıcı ya da chrome"): kartın ve filo-ortak.md'nin bayt payını
+ * yemesin diye kurallar dosyasında durur. Sebep: 13 Ekim'de bir çalışan Playwright ile bağımsız Chrome açtı (Playwright MCP kaldırıldı).
+ * Her rolün kurallar dosyasına AYNEN girer.
+ */
+const TARAYICI_KURALI = [
+  '## Tarayıcı (HRT-61)',
+  '- Tarayıcı işinde uygulamanın iki yolundan işe kolay geleni kullanılır: uygulama içi tarayıcı (pencerenin sağ bölmesi; herkese açık sayfa) ya da Chrome eklentisi (claude-in-chrome, oturum adlı sekme grubu; giriş gereken sayfa: Search Console, Bing). Uygulama dışı tarayıcı (Playwright, başsız, kendi başlatılan Chrome) yasaktır; alt ajan görev metnine yazılır.',
+].join('\n')
+
+/**
  * BİRLEŞTİRME VE ÖLÇÜM KAYDI (HRT-60, OPS emri 2026-10-12): kartın bayt payını yemesin diye kurallar dosyasında durur
  * (kart tavanında pay yok). Yazılı kaynaklar: karar 98 (departman migrationsız kendi PR'ını birleştirir), fleet-mechanism §20.1-a/b
  * (`gh pr merge` doğrudan çağrılmaz; migration'lı PR `--onay`), karar 224 (onay işi koşan pencerede). Her rolün dosyasına AYNEN girer
@@ -175,6 +185,7 @@ const OPS_OKUMA_KURALI = [
  */
 const DURUM_SATIRI_KURALI = [
   '## Durum dosyası: standart "Yarım iş" satırı (HRT-31)',
+  '- Durum dosyasının adı `lane-day`, `state` ya da `durum` içerir (örnek: `<rol>-lane-day-<tarih>.md`, Geo-SEO\'da `geoseo-lane-state.md`); kanca dosyayı bu ad kalıbıyla ve frontmatter `metadata.originSessionId` (TAM oturum kimliği) ile bulur. Rolün sürekli dosyası sürdürülür, ortak adla ikinci dosya açılmaz (HRT-61).',
   '- Durum dosyasının SONUNA (DEVİR bloğunun içine) her güncellemede ve compact öncesinde tam bu iki biçimden biri yazılır: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Kokpit compact hazırlığı bunu okur; ifade yoksa "ölçülemedi" görünür.',
   '- Kanca dosyanın son 24 KB\'ındaki SON `yarım iş yok|var` ifadesini okur: satır en sonda durur, altına aynı ifadeyi taşıyan başka cümle yazılmaz. `yok` derken yarım iş listelenmez; belirsizse `var` yazılır. Ayrıntı AÇIK KUYRUK alanındadır (hafiza-yazma-duzeni-standard §9b madde 7).',
   '- Recep compact hazırlığı istediğinde (ya da "COMPACT YAKIN" uyarısında) üç maddelik not (durum dosyası güncel mi + saat / yarım iş / hüküm) ve iki aşamalı compact cümlesi KENDİ penceresinde Recep\'e yazılır; OPS\'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu OPS\'a yazıp Recep\'e yazmamak kuralı çiğner (OPS 2026-10-05: iki departman bunu yaptı).',
@@ -273,6 +284,8 @@ function kuralDosyasi(ad) {
     KART_PLAN_KURALI,
     '',
     CALISAN_ACMA_KURALI,
+    '',
+    TARAYICI_KURALI,
     '',
     BIRLESTIRME_KURALI,
     '',
@@ -868,6 +881,7 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     }
     // Durum dosyası "Yarım iş" satırı bloğu (HRT-31): kokpit compact hazırlığı bu biçime bağlı, blok düşerse biçim unutulur.
     if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
+    if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
   }
   return s
 }
@@ -1190,6 +1204,7 @@ module.exports = {
   GOREV_DEGIL_BASLIK,
   ROLLER,
   DURUM_SATIRI_KURALI,
+  TARAYICI_KURALI,
   CALISMA,
   haritaOzet,
   haritaDosyasi,

@@ -82,6 +82,36 @@ Her rol kartında altı alan zorunludur:
 - Geçici iş oturumu (departman değil, OPS işi) OPS açabilir; aynı mesajda Recep'e ne için açıldığı ve ne zaman kapanacağı yazılır,
   iş bitince kapanır.
 
+**4.1 Geçiş protokolü (yeni düzene geçiş ve her yeni pencere açılışı).** Kaynak: OPS-122 kabul notları (12-13 Ekim). Departmanlar
+tek tek açılır; biri kabul edilmeden sonraki açılmaz, elinde yarım işi olan önce onu bitirir.
+1. **Kimlik:** pencere kendi ajan tanımıyla (`settings.local.json` içinde `"agent": "<rol>-pencere"`) ve kendi worktree klasöründe
+   açılır; açılış çıktısındaki ROL KARTI satırı doğru rolü gösterir.
+2. **Bağlantı:** Kanban panosu, ajan hafızası (`~/.claude/agent-memory/<rol>-pencere/`), mesajlaşma (SendMessage ve posta
+   kutusu) ve kokpit kaydı çalışır; her biri ölçülür, varsayılmaz.
+3. **Kaldığı yer:** durum dosyası bulunur (adı `lane-day`, `state` ya da `durum` içerir, frontmatter `originSessionId` oturum
+   kimliğidir), son bloğu ve "Yarım iş" satırı okunur.
+4. **İlk gün OPS çıktı denetimi:** OPS, pencerenin ilk gününün kartlarını, PR'larını ve Recep'e giden metinlerini bağımsız
+   doğrulayıcı çalışanla okur.
+5. **Geri dönüş:** adımlardan biri kırmızıysa ajan anahtarı kaldırılır, pencere eski düzende sürer, bulgu karta yazılır; yeniden
+   açılış bulgu kapanınca yapılır. (Bu adımı HARİTA yazdı; OPS düzeltebilir.)
+
+Ek (Geo-SEO kabul notu, 13 Ekim): dış oturum isteyen departmanda (Search Console, Bing) kabule oturum ölçümü eklenir: ilgili
+sitede oturumun açık olduğu ölçülür ve sonuç karta yazılır.
+
+**4.2 Departman açma listesi (tek liste).** Yeni departman açan iş, aşağıdaki yedi yeri aynı PR'da günceller; liste HRT-62'nin
+(3D) gerçek farkından çıkarıldı. Tek kaynak `ROLLER` sabitidir (`scripts/belge/rol-karti-uret.cjs`); gerisi ondan türer ya da
+onunla karşılaştırılır. Kapı: `src/__tests__/conformance/rol-kartlari.test.ts` "departman açma tek liste".
+
+| Yer | Ne eklenir | Üretim / ölçüm |
+|---|---|---|
+| `scripts/belge/rol-karti-uret.cjs` (`ROLLER`) | Görev, Görev değil, Dosyalar, Yetki, Durum | `node scripts/belge/rol-karti-uret.cjs --yaz` (kart, kurallar dosyası, harita) |
+| `scripts/belge/rol-gorevleri.json` ya da `TASLAK_ROLLERI` | Amaç, Nasıl, düzenli görev (taslaksa muafiyet nedeni) | 5N1K kapısı (Madde 3) |
+| `docs/audits/skill-departman-setleri-2026-09-30.json` | Dört çalışan türü satırı ve ön yükleme | `node scripts/belge/ajan-tanimi-uret.cjs` |
+| `scripts/belge/ajan-tanimi-uret.cjs` (`PENCERE_DEPARTMANLARI`) | Pencere ve çalışan tanımları (`.claude/agents`) | `node scripts/belge/ajan-tanimi-uret.cjs --yaz` |
+| `scripts/belge/cetvel-sahipligi.json` | Devredilen cetveller | `rol-karti-uret.cjs --kontrol` |
+| `scripts/board/pencere-adlari.cjs` | Görünen pencere adı | `departman-ac-kapat.test.ts` (INV-DEPARTMAN-AC-9) |
+| Elle tutulan test listeleri | `hazir-ozellik-kurulumu.test.ts` (`ACIK_DEPARTMANLAR`, model tablosu), `sessionstart-pencere-adi.test.ts`, `sessionstart-tavan.test.ts`, `departman-ac-kapat.test.ts`, `rol-kartlari.test.ts` (`BEKLENEN_ROLLER`) | Bağımsız çapraz kontroldür; bilerek elle yazılıdır ve yeni departmanda kırmızı verir |
+
 ## Madde 5 — Vekâlet: pencere kapalıyken
 
 - Kapalı departmanın işi OPS'a gelir; OPS işi SAHİBİNİN panosuna kart açar ve gerekiyorsa departmanın açılmasını Recep'e önerir.

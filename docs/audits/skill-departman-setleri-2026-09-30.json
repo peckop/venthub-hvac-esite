@@ -470,17 +470,19 @@
   {
    "dept": "BLOG",
    "tur": "uygulayici",
-   "uret": false,
-   "onYukle": [],
-   "toplamKB": 0,
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "write-seo-geo-content",
+     "kb": 21.9,
+     "kaynak": "departman"
+    }
+   ],
+   "toplamKB": 21.9,
    "adiylaCagir": [
     {
      "ad": "diagram",
      "kb": 16
-    },
-    {
-     "ad": "write-seo-geo-content",
-     "kb": 21.9
     }
    ],
    "bekleyen": []
@@ -705,19 +707,21 @@
   {
    "dept": "GEO-SEO",
    "tur": "uygulayici",
-   "uret": false,
-   "onYukle": [],
-   "toplamKB": 0,
-   "adiylaCagir": [
-    {
-     "ad": "web-performance",
-     "kb": 6.4
-    },
+   "uret": true,
+   "onYukle": [
     {
      "ad": "geo-fundamentals",
-     "kb": 7
+     "kb": 7,
+     "kaynak": "departman"
+    },
+    {
+     "ad": "web-performance",
+     "kb": 6.4,
+     "kaynak": "departman"
     }
    ],
+   "toplamKB": 13.4,
+   "adiylaCagir": [],
    "bekleyen": []
   },
   {
@@ -1607,21 +1611,24 @@
   {
    "dept": "YETENEK",
    "tur": "arastirmaci",
-   "uret": false,
-   "onYukle": [],
-   "toplamKB": 0,
-   "adiylaCagir": [
+   "uret": true,
+   "onYukle": [
     {
      "ad": "find-skills",
-     "kb": 7.4
-    },
-    {
-     "ad": "task-observer",
-     "kb": 7.4
+     "kb": 7.4,
+     "kaynak": "departman"
     },
     {
      "ad": "research-web",
-     "kb": 7.3
+     "kb": 7.3,
+     "kaynak": "departman"
+    }
+   ],
+   "toplamKB": 14.7,
+   "adiylaCagir": [
+    {
+     "ad": "task-observer",
+     "kb": 7.4
     }
    ],
    "bekleyen": []
@@ -1928,5 +1935,5 @@
    "ne": "Rehber yazısının yayın akışı (cetvel R10): basamak, sahibi, kapı; müdür çalıştırır, çalışana ön yüklenmez."
   }
  ],
- "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO)"
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; ön yükleme boş, adıyla çağırma listeleri aynı)"
 }
