@@ -25,8 +25,13 @@ const cagri = vi.hoisted(() => ({
 // REC-300 3e-3: hreflang artık `EN_YAYIN` bayrağına bağlı (kapalıyken yalnız canonical). Bu dosya
 // hreflang ADRES ŞEKLİNİ (tr/en/x-default) ölçer → bayrak AÇIK taklit edilir; KAPALI hâl ve iki
 // yönlü bağ `src/lib/seo/__tests__/enYayinHreflangNoindex.test.ts`'te.
+//
+// FAZ 3-C (URN-85 2/2): `features.ts` `ADRES_SEMASI_K3B` değerini `true` yaptı. Bu dosya KAPALI kolun (bayrak
+// kapalıyken eski rotalar bugünkü gibi, yeni rotalar 404) kapısıdır ve geri alma merdiveninin (runbook §7) kodu
+// hâlâ canlıdır → bayrak burada KAPALIYA SABİTLENİR. AÇIK kolun tablosu: `kategoriMarkaRotalariK3b.test.tsx`.
 vi.mock('@/config/features', async (orijinal) => ({
   ...(await orijinal<typeof import('@/config/features')>()),
+  ADRES_SEMASI_K3B: false,
   EN_YAYIN: true,
 }))
 
