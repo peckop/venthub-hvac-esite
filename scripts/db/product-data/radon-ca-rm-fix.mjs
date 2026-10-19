@@ -23,6 +23,7 @@
  *   node radon-ca-rm-fix.mjs --apply --out <dizin>                   # yazım (envanter ÖNCE yazılır)
  *   node radon-ca-rm-fix.mjs --rollback <envanter.json>              # geri alma
  */
+import './_ops-onay.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
