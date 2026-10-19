@@ -470,6 +470,9 @@ function curlOkuma(args) {
   return url > 0
 }
 
+/** curl'e otomatik izin verilen hostlar (filonun gerçekten kullandıkları). Yeni host eklemek OPS onayıyla, bu listeye satır. */
+const CURL_ACIK_HOSTLAR = new Set(['venthub.com.tr', 'www.venthub.com.tr', 'api.github.com', 'registry.npmjs.org'])
+
 function urlTamam(u) {
   try {
     if (!/^https?:\/\//i.test(String(u))) return false
@@ -477,7 +480,9 @@ function urlTamam(u) {
     if (/[{}[\]]/.test(String(u))) return false
     const p = new URL(u)
     if (p.username || p.password) return false
-    return !ozelHostMu(p.hostname)
+    // OPS kararı (19 Ekim, güvenlik taraması): yalnız açık host izin listesi; ad bazlı özel-adres kontrolü (metadata, sonu noktalı ad,
+    // DNS'te özel adrese çözülen ad) yetmez. Listede olmayan her host normal izin sorusuna düşer.
+    return p.protocol === 'https:' && !ozelHostMu(p.hostname) && CURL_ACIK_HOSTLAR.has(p.hostname)
   } catch {
     return false
   }
