@@ -20,6 +20,7 @@
  *   node family-description-write.mjs --manifest <dosya> --url <URL> --key <SERVICE> --apply --out <dizin>
  *   node family-description-write.mjs --rollback <envanter.json> --url <URL> --key <SERVICE>
  */
+import './_ops-onay.mjs'
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
