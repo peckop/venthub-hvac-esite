@@ -89,7 +89,9 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/protect-config.cjs\"",
             "statusMessage": "config-protection",
-            "onFailure": "block"
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
@@ -99,7 +101,9 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sensitive-path-guard.cjs\"",
-            "onFailure": "block"
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
@@ -120,19 +124,25 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/silme-baglanti-kapisi.cjs\"",
             "statusMessage": "silme-baglanti-kapisi",
-            "onFailure": "block"
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gh-api-kapisi.cjs\"",
             "statusMessage": "gh-api-kapisi",
-            "onFailure": "block"
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/env-yazma-kapisi.cjs\"",
             "statusMessage": "env-yazma-kapisi",
-            "onFailure": "block"
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
@@ -158,7 +168,9 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sql-yazma-kapisi.cjs\"",
             "statusMessage": "sql-yazma-kapisi",
-            "onFailure": "block"
+            "onFailure": "block",
+
+            "timeout": 30
           }
         ]
       },
