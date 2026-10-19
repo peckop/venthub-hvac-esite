@@ -21,7 +21,10 @@
  *      kendisini siler, hedefe dokunmaz; olmazsa `cmd /c rmdir`, `/s` YOK);
  *   4. bağlantı kalmadığı DOĞRULANINCA içerik robocopy /MIR /XJ ile boş klasöre eşlenerek silinir (uzun yola dayanıklı,
  *      hızlı), sonra boş kök `fs.rmdirSync`; `rmdir /s` ve `rm -rf` kullanılmaz;
- *   5. ana deponun node_modules/.bin'i her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR.
+ *   5. ana deponun node_modules/.bin'i her kopyadan önce ve sonra doğrulanır; kaybolursa betik DURUR;
+ *   6. YEREL-ÖZGÜN DOSYA KAPISI (ARC-190): node_modules/.next/graphify-out/coverage/test-results dışında, ana deponun git
+ *      geçmişinde (`log --all -m --raw`) adı HİÇ geçmeyen ya da içeriği geçmişteki hiçbir blob ile eşleşmeyen bir dosya varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
+ *      Geçmiş okunamazsa betik hiçbir şey silmeden durur (çıkış 6).
  * Varsayılan KURU KOŞUM (hiçbir şeye dokunmaz). Gerçek: `--gercek --geri-alinamaz-onayladim`.
  *
  * KULLANIM: node tools/worktree-artik-sil.cjs --liste <yollar.json> [--ilk N] [--kayit k.jsonl] [--gercek --geri-alinamaz-onayladim]
@@ -139,6 +142,126 @@ function gitDosyasiKontrol(yol) {
   return { ok: true, sebep: '' }
 }
 
+/**
+ * YEREL-ÖZGÜN DOSYA KAPISI (ARC-190, karar 88/397): silmeden ÖNCE klasörde, ana deponun git geçmişinde HİÇBİR dalda
+ * adı geçmeyen dosya var mı bakılır. Böyle dosya = yalnız bu klasörde yaşayan veri (ölçüm çıktısı, not, .env, csv/json,
+ * kaydedilmemiş çalışma); silinirse geri gelmez. Bir tane bile varsa klasör ATLANIR, dosya listesi kayda yazılır; istisna yok.
+ * 19 Ekim olayı: ~117 klasör `.git`siz ya da gitignore'lu yerel dosyalarına BAKILMADAN silindi.
+ * Karşılaştırma yol adı VE içerik özetiyle (izlenen ama yerelde değiştirilmiş dosya da özgündür); büyük/küçük harf farkı bile "özgün" sayılır (şüphede ATLA).
+ * Bağlantılara (junction/symlink) girilmez; bağlantının kendisi (node_modules içindekiler hariç) bir girdi sayılır.
+ */
+const KOK_GORMEZ = new Set(['node_modules', '.next', 'graphify-out', 'coverage', 'test-results'])
+
+/**
+ * Ana deponun TÜM dallarındaki geçmişte adı geçen yollar ve her yolun geçmişteki TÜM blob özetleri:
+ * Map<posix yol, Set<blob sha1>>. Okunamazsa FIRLATIR (kapı kapalı kalır).
+ * `-m` ŞART: birleştirme (merge) commit'inde eklenen/çözülen dosyaları `log --name-only/--raw` varsayılan olarak LİSTELEMEZ
+ * (ölçüm 19 Ekim: izlenen `.agent/workflows/tam-kopyala.md` ve `registry/**` kümede yoktu, kapı onları "yerel-özgün" sanıyordu).
+ * `--no-renames`: her kayıt tek yol. Blob özeti hem eski hem yeni taraftan toplanır (silinmiş 0000 hariç).
+ */
+function gecmisKumesi(ana) {
+  const cikti = execFileSync('git', ['-c', 'core.quotepath=false', 'log', '--all', '-m', '--raw', '--no-abbrev', '--no-renames', '-z', '--pretty=format:'], {
+    cwd: ana,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 15 * 60 * 1000,
+    windowsHide: true,
+    maxBuffer: 1024 * 1024 * 1024,
+  })
+  const k = new Map()
+  const t = cikti.split('\0')
+  for (let i = 0; i < t.length; i++) {
+    const m = /^\n*:\d+ \d+ ([0-9a-f]{40}) ([0-9a-f]{40}) [A-Z]\d*$/.exec(t[i])
+    if (!m) continue
+    const yol = t[++i]
+    if (!yol) continue
+    let s = k.get(yol)
+    if (!s) k.set(yol, (s = new Set()))
+    for (const h of [m[1], m[2]]) if (!/^0+$/.test(h)) s.add(h)
+  }
+  if (k.size === 0) throw new Error('git geçmişi boş döndü (kapı doğrulanamaz)')
+  return k
+}
+
+const crypto = require('crypto')
+/** git blob özeti (sha1 "blob <boyut>\0" + içerik). CRLF çalışma kopyası için LF'ye çevrilmiş özet de döner: [ham, lf]. */
+function blobOzetleri(buf) {
+  const ozet = (b) => crypto.createHash('sha1').update('blob ' + b.length + '\0').update(b).digest('hex')
+  const ham = ozet(buf)
+  if (!buf.includes(13)) return [ham]
+  return [ham, ozet(Buffer.from(buf.toString('latin1').replace(/\r\n/g, '\n'), 'latin1'))]
+}
+
+/**
+ * Klasörde YEREL-ÖZGÜN dosyalar: { toplam, dosyalar: [ilk 200 göreli yol] }.
+ * Özgün = (a) yolu geçmişte HİÇ yok, ya da (b) yolu var ama içeriğin git blob özeti o yolun geçmişteki HİÇBİR blob'uyla
+ * eşleşmiyor (izlenen dosya yerelde değiştirilmiş, commit edilmemiş; OPS bulgusu 19 Ekim). CRLF çalışma kopyası için LF'li özet de denenir.
+ * node_modules her derinlikte, diğer dördü yalnız kökte atlanır. Okunamayan dosya özgün sayılır (şüphede ATLA).
+ */
+function yerelOzgunDosyalar(kok, gecmis) {
+  const dosyalar = []
+  let toplam = 0
+  const ekle = (m) => {
+    toplam++
+    if (dosyalar.length < 200) dosyalar.push(m)
+  }
+  const yig = [{ d: kok, goreli: '' }]
+  while (yig.length) {
+    const { d, goreli } = yig.pop()
+    let adlar
+    try {
+      adlar = fs.readdirSync(d)
+    } catch (e) {
+      throw new Error('klasör okunamadı: ' + d + ' (' + String((e && e.code) || e) + ')')
+    }
+    for (const a of adlar) {
+      const rel = goreli ? goreli + '/' + a : a
+      if (a === 'node_modules') continue
+      if (!goreli && (KOK_GORMEZ.has(a) || a === '.git')) continue
+      const p = path.join(d, a)
+      let st
+      try {
+        st = fs.lstatSync(p)
+      } catch {
+        ekle(rel + ' (okunamadı)')
+        continue
+      }
+      if (st.isDirectory() && !st.isSymbolicLink()) {
+        yig.push({ d: p, goreli: rel })
+        continue
+      }
+      const bloblar = gecmis.get(rel)
+      if (!bloblar) {
+        ekle(rel)
+        continue
+      }
+      if (st.isSymbolicLink()) continue // yolu geçmişte var; bağlantıya girilmez
+      let eslesti = false
+      try {
+        eslesti = blobOzetleri(fs.readFileSync(p)).some((h) => bloblar.has(h))
+      } catch {
+        ekle(rel + ' (okunamadı)')
+        continue
+      }
+      if (!eslesti) ekle(rel + ' (içerik değişmiş)')
+    }
+  }
+  return { toplam, dosyalar: dosyalar.sort() }
+}
+
+/** Kapı kararı: { ok, sebep, dosyalar, toplam }. ok=false → klasör ATLANIR. Okuma hatası da ok=false. */
+function yerelOzgunKapisi(yol, gecmis) {
+  try {
+    const r = yerelOzgunDosyalar(yol, gecmis)
+    if (r.toplam > 0) {
+      return { ok: false, sebep: `yerel-özgün ${r.toplam} dosya (git geçmişinde yok ya da içerik değişmiş): ${r.dosyalar.slice(0, 5).join(', ')}${r.toplam > 5 ? ' …' : ''}`, dosyalar: r.dosyalar, toplam: r.toplam }
+    }
+    return { ok: true, sebep: '', dosyalar: [], toplam: 0 }
+  } catch (e) {
+    return { ok: false, sebep: 'yerel-özgün denetimi yapılamadı: ' + String((e && e.message) || e).split('\n')[0], dosyalar: [], toplam: 0 }
+  }
+}
+
 function main() {
   const arg = (ad) => {
     const i = process.argv.indexOf(ad)
@@ -182,6 +305,13 @@ function main() {
       .filter((s) => s.startsWith('worktree '))
       .map((s) => norm(s.slice(9))),
   )
+  let gecmis
+  try {
+    gecmis = gecmisKumesi(ana)
+  } catch (e) {
+    console.error('git geçmişi okunamadı; yerel-özgün kapısı kurulamaz, hiçbir şey silinmedi, durdu: ' + String((e && e.message) || e).split('\n')[0])
+    process.exit(6)
+  }
   const liste = JSON.parse(fs.readFileSync(LISTE, 'utf8')).map((x) => (typeof x === 'string' ? x : x.yol))
   const yollar = ILK > 0 ? liste.slice(0, ILK) : liste
   const sayac = { silindi: 0, atlandi: 0, hata: 0, kuru: 0 }
@@ -224,6 +354,13 @@ function main() {
         }
         continue
       }
+      const ok = yerelOzgunKapisi(yol, gecmis)
+      if (!ok.ok) {
+        sayac.atlandi++
+        console.log(`ATLA  ${yol} — ${ok.sebep}`)
+        kayitYaz({ yol, sonuc: 'atlandi', sebep: 'yerel-ozgun-dosya', toplam: ok.toplam, dosyalar: ok.dosyalar, ayrinti: ok.sebep })
+        continue
+      }
       const { girdi, baglantilar } = tara(yol)
       const disari = baglantilar.filter((b) => b.disarida)
       const anayaDusen = disari.filter((b) => b.hedef && (norm(b.hedef) + '/').startsWith(anaN + '/'))
@@ -240,6 +377,9 @@ function main() {
       kayitYaz({ yol, adim: 'baglantilar-kaldirildi', adet: baglantilar.length, disari: disari.length })
       if (tara(yol).baglantilar.length > 0) throw new Error('bağlantı hâlâ var; özyinelemeli silme YAPILMADI')
       if (anaBinVardi && !fs.existsSync(anaBin)) throw new Error('ANA DEPO node_modules/.bin KAYBOLDU — durduruldu')
+      // Yarış sertleştirmesi (ARC-190 doğrulama): kapıdan geçtikten sonra klasöre dosya eklenmiş olabilir; yıkıcı adımdan hemen önce yeniden dene.
+      const ok2 = yerelOzgunKapisi(yol, gecmis)
+      if (!ok2.ok) throw new Error('silme öncesi kapı yeniden koşuldu: ' + ok2.sebep)
       const bos = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-bos-'))
       try {
         const r = spawnSync('robocopy', [bos, yol, '/MIR', '/XJ', '/R:0', '/W:0', '/NFL', '/NDL', '/NJH', '/NJS', '/NP', '/MT:16'], { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024 })
@@ -274,5 +414,5 @@ function main() {
   console.log(JSON.stringify(sayac))
 }
 
-module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, norm }
+module.exports = { tara, baglantiKaldir, izinliYolMu, gitDosyasiKontrol, gecmisKumesi, yerelOzgunDosyalar, yerelOzgunKapisi, blobOzetleri, norm }
 if (require.main === module) main()

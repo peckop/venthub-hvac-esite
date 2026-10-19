@@ -15,7 +15,10 @@
  *   2. yol `git worktree list`te kayıtlı, kilitli değil;
  *   3. `git status --porcelain` boş (kayıtsız değişiklik yok);
  *   4. HEAD listedeki head ile AYNI (liste çıkarıldıktan sonra commit gelmemiş);
- *   5. HEAD hiçbir remote ref'te olmayan commit taşımıyor (`rev-list HEAD --not --remotes` = 0).
+ *   5. HEAD hiçbir remote ref'te olmayan commit taşımıyor (`rev-list HEAD --not --remotes` = 0);
+ *   6. YEREL-ÖZGÜN DOSYA KAPISI (ARC-190): node_modules/.next/graphify-out/coverage/test-results dışında, ana deponun git
+ *      geçmişinde (`log --all -m --raw`) adı HİÇ geçmeyen ya da içeriği geçmişteki hiçbir blob ile eşleşmeyen dosya (gitignore'lu ölçüm çıktısı, not, .env, csv/json dahil) yok.
+ *      Varsa kopya ATLANIR, dosya listesi kayda yazılır; istisna yok. Geçmiş okunamazsa hiçbir şey silinmeden durur (çıkış 6).
  *
  * SİLME YÖNTEMİ (karar 88, 09-23 olayı: `git worktree remove` junction'dan geçip ana deponun node_modules'ünü sildi):
  *   a. kopya DERİNLİK SINIRSIZ taranır (artik-sil `tara`, bağlantıya girmez); TÜM bağlantılar (junction/symlink, iç içe pnpm
@@ -29,7 +32,7 @@
 const { execFileSync, spawnSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
-const { tara, baglantiKaldir } = require('./worktree-artik-sil.cjs')
+const { tara, baglantiKaldir, gecmisKumesi, yerelOzgunKapisi } = require('./worktree-artik-sil.cjs')
 
 const arg = (ad) => {
   const i = process.argv.indexOf(ad)
@@ -96,6 +99,14 @@ function tumBaglantilar(yol) {
   return tara(yol).baglantilar
 }
 
+let gecmis
+try {
+  gecmis = gecmisKumesi(ana)
+} catch (e) {
+  console.error('git geçmişi okunamadı; yerel-özgün kapısı kurulamaz, hiçbir şey silinmedi, durdu: ' + String((e && e.message) || e).split('\n')[0])
+  process.exit(6)
+}
+
 const liste = JSON.parse(fs.readFileSync(LISTE, 'utf8'))
 const hedefler = ILK > 0 ? liste.slice(0, ILK) : liste
 const sayac = { silindi: 0, atlandi: 0, hata: 0, kuru: 0 }
@@ -124,6 +135,13 @@ for (const h of hedefler) {
     if (h.head && head !== h.head) { atla('HEAD listeden sonra değişmiş'); continue }
     const uzaktaOlmayan = Number(git(yol, ['rev-list', '--count', 'HEAD', '--not', '--remotes']))
     if (uzaktaOlmayan > 0) { atla(`uzakta olmayan ${uzaktaOlmayan} commit`); continue }
+    const kapi = yerelOzgunKapisi(yol, gecmis)
+    if (!kapi.ok) {
+      sayac.atlandi++
+      console.log(`ATLA  ${h.yol} — ${kapi.sebep}`)
+      kayitYaz({ yol: h.yol, sonuc: 'atlandi', sebep: 'yerel-ozgun-dosya', toplam: kapi.toplam, dosyalar: kapi.dosyalar, ayrinti: kapi.sebep })
+      continue
+    }
     const baglantilar = tumBaglantilar(yol)
     const disari = baglantilar.filter((b) => b.disarida)
     if (!GERCEK) {
@@ -139,6 +157,9 @@ for (const h of hedefler) {
     }
     if (tara(yol).baglantilar.length > 0) throw new Error('bağlantı hâlâ var; git worktree remove ÇAĞRILMADI')
     if (anaBinVardi && !fs.existsSync(anaBin)) throw new Error('ANA DEPO node_modules/.bin KAYBOLDU — durduruldu')
+    // Yarış sertleştirmesi (ARC-190 doğrulama): kapıdan geçtikten sonra eklenen dosya için yıkıcı adımdan hemen önce yeniden dene.
+    const kapi2 = yerelOzgunKapisi(yol, gecmis)
+    if (!kapi2.ok) throw new Error('silme öncesi kapı yeniden koşuldu: ' + kapi2.sebep)
     git(ana, ['worktree', 'remove', '--force', yol], 30 * 60 * 1000)
     if (anaBinVardi && !fs.existsSync(anaBin)) {
       console.error('ANA DEPO node_modules/.bin silme sonrası kayboldu — DURDU. Onarım: pnpm install (ana depo).')
