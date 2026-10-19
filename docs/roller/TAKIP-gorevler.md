@@ -5,6 +5,9 @@
 ## Amaç
 Kullandığımız dış araçların (Claude Code, WrongStack, notebooklm-py) yeni sürümünü ve bağlantı kopukluğunu işimizi aksatmadan yakalar; faydasını, riskini ve işin kime düştüğünü ölçüp yazar, böylece yükseltme sürpriz, kopukluk sessiz kalmaz.
 
+## Nasıl
+cetvel yok — yazımı kapsamda (WrongStack sürüm ve özellik ölçümü; ölçüm defteri docs/olcum/wrongstack-ozellik-envanteri.md)
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|

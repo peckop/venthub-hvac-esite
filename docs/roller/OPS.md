@@ -11,6 +11,12 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Kendi işlerimde (ölçüm, denetim, kayıt temizliği) ben de müdürüm: alt ajanlara böler, bağımsız doğrulatırım.
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
+## Amaç
+Filo tek yönle ilerler: sıra, öncelik ve verilen sözler yazılı tutulur; Recep'e giden her cümle kaynağıyla ve tek yüzle gider.
+
+## Düzenli görevler
+- 3 görev, tetiğe bağlı 0: `docs/roller/OPS-gorevler.md`.
+
 ## Dosyalar
 Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.
 

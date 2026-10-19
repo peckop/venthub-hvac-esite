@@ -5,6 +5,9 @@
 ## Amaç
 Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandığımız paketlerdeki bilinen güvenlik açıklarının zamanında kapanmasını sağlar; bozulursa hatalı kod canlıya girer ya da açık fark edilmeden kalır.
 
+## Nasıl
+migration-safety-standard.md, barindirma-standard.md, rls-yetki-karari-standard.md
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|
