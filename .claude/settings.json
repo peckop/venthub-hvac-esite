@@ -58,6 +58,7 @@
     ],
     "deny": [
       "Bash(node --env-file=.env *..*)",
+      "Read(**/ops-yazim-onayi.txt)",
       "Bash(git push * master*)",
       "Bash(git push * main*)",
       "Bash(git push *--force*)",
