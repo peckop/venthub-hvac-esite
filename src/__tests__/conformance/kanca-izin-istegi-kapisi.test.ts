@@ -37,7 +37,7 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · salt-okuma komutlar geçer', () => {
     ['gh api GET', 'gh api repos/a/b/pulls/1'],
     ['boru hattı süzgeçleri', 'ls -la | grep foo | wc -l'],
     ['git branch --show-current', 'git branch --show-current'],
-    ['curl durum kodu, çıktı /dev/null', 'curl -s -o /dev/null -w "%{http_code}" https://example.com/'],
+    ['curl çıktı /dev/null', 'curl -s -o /dev/null https://example.com/'],
     ['.env.example okunabilir', 'cat .env.example'],
     ['tırnaklı jq süzgeci glob sayılmaz', 'jq ".[0].title" a.json'],
     ['tırnaklı grep deseni glob sayılmaz', 'grep ".*foo" a.txt'],

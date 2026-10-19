@@ -260,7 +260,7 @@ const globHassasMi = (a) => HASSAS_GLOB.test(String(a))
 // grep yalnız tek dosyalı sade biçim; özyineleme, --include/--exclude ve tanınmayan her uzun seçenek yasak.
 const SADE = new Set([
   'ls', 'pwd', 'cat', 'head', 'tail', 'wc', 'stat', 'file', 'du', 'df', 'date', 'which', 'basename', 'dirname',
-  'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'uniq', 'cut', 'tr', 'diff', 'cmp',
+  'realpath', 'readlink', 'echo', 'printf', 'true', 'false', 'test', '[', 'cd', 'cut', 'tr', 'diff', 'cmp',
   'sha256sum', 'md5sum', 'tree', 'grep', 'egrep', 'fgrep', 'sort', 'jq',
 ])
 
@@ -294,6 +294,8 @@ function sadeOkuma(args) {
   if ((ad === 'grep' || ad === 'egrep' || ad === 'fgrep') && !grepSade(geri)) return false
   if (ad === 'jq' && geri.some((a) => /\benv\b|\$ENV|input_filename/.test(a))) return false
   if (ad === 'tree' && geri.some((a) => a === '-o')) return false
+  // file -C magic.mgc yazar; uniq çıkış dosyası alır (listeden çıktı); curl -w/--write-out %output{dosya} yazar (listeden çıktı).
+  if (ad === 'file' && geri.some((a) => /^-[A-Za-z]*C/.test(a) || a === '--compile')) return false
   return true
 }
 
@@ -407,7 +409,7 @@ function ghOkuma(args) {
 // -L / --location BİLEREK yok: yönlendirme zinciri özel adrese (169.254.169.254, localhost) sıçrayabilir (SSRF, #1997).
 const CURL_BOOL = /^-[sSIifk46]+$/
 const CURL_UZUN_BOOL = new Set(['--silent', '--show-error', '--head', '--include', '--fail', '--compressed', '--insecure', '--fail-with-body'])
-const CURL_DEGERLI = new Set(['-m', '--max-time', '--connect-timeout', '-w', '--write-out', '-A', '--user-agent', '-H', '--header', '--retry', '--retry-delay'])
+const CURL_DEGERLI = new Set(['-m', '--max-time', '--connect-timeout', '-A', '--user-agent', '-H', '--header', '--retry', '--retry-delay'])
 
 function ozelHostMu(host) {
   const h = String(host).toLowerCase().replace(/^\[|\]$/g, '')
@@ -456,7 +458,7 @@ function curlOkuma(args) {
       i += 1
       continue
     }
-    if (/^--(max-time|connect-timeout|write-out|user-agent|header|retry|retry-delay)=/.test(a)) {
+    if (/^--(max-time|connect-timeout|user-agent|header|retry|retry-delay)=/.test(a)) {
       if (/=[@<]/.test(a)) return false
       continue
     }
