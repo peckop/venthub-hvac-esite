@@ -299,6 +299,8 @@ function sadeOkuma(args) {
   // cd ~/.claude (ya da glob/8.3 ad) sonraki parçadaki `cat ops*` gibi yol-bağlamsız argümanı anahtar dosyasına çevirir
   // (güvenlik taraması 19 Ekim); bu biçimde cd otomatik izin almaz.
   if (ad === 'cd' && geri.some((a) => /\.claude|\.cl[*?[]|~\d|[*?[]/i.test(a))) return false
+  // Argümansız cd, `cd -` ve `cd ~` ev dizinine/önceki dizine gider; HOME/OLDPWD yalın ataması yasak (#2011) olsa da bu biçimler de otomatik izin almaz.
+  if (ad === 'cd' && (geri.length === 0 || geri.some((a) => a === '-' || a === '~' || a === '~/' || a === '--'))) return false
   // file -C magic.mgc yazar; uniq çıkış dosyası alır (listeden çıktı); curl -w/--write-out %output{dosya} yazar (listeden çıktı).
   if (ad === 'file' && geri.some((a) => /^-[^-]*C/.test(a) || (a.startsWith('--') && a !== '--'))) return false
   return true
