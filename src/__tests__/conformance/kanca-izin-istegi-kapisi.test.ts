@@ -274,17 +274,22 @@ describe('INV-KANCA-IZIN-ISTEGI-1 · kanca süreci (stdin → stdout, kayıt)', 
     expect(ham).toMatch(/GIZLI/)
   })
 
-  it('kayıt: OPS yazım onay anahtarı atamasının değeri maskelenir (ad ONAYI ile biter)', () => {
+  it.each([
+    ['yalın', 'VENTHUB_OPS_YAZIM_ONAYI=ornekonaydegeri987654 node scripts/db/product-data/x.mjs --apply'],
+    ['çift tırnaklı', 'VENTHUB_OPS_YAZIM_ONAYI="ornekonaydegeri987654" node scripts/db/product-data/x.mjs --apply'],
+    ['tek tırnaklı', "VENTHUB_OPS_YAZIM_ONAYI='ornekonaydegeri987654' node scripts/db/product-data/x.mjs --apply"],
+    ['tırnaklı boşluklu değer', 'VENTHUB_OPS_YAZIM_ONAYI="ornekonay degeri987654" node scripts/db/product-data/x.mjs --apply'],
+    ['export', 'export VENTHUB_OPS_YAZIM_ONAYI=ornekonaydegeri987654; node scripts/db/product-data/x.mjs --apply'],
+  ])('kayıt: OPS yazım onay anahtarı atamasının değeri maskelenir (%s)', (_ad, komut) => {
     const yerel = fs.mkdtempSync(path.join(os.tmpdir(), 'izin-kayit-onay-'))
-    const sir = 'ornekonaydegeri987654'
     spawnSync(process.execPath, [KANCA], {
-      input: JSON.stringify(bash(`VENTHUB_OPS_YAZIM_ONAYI=${sir} node scripts/db/product-data/x.mjs --apply`)),
+      input: JSON.stringify(bash(komut)),
       encoding: 'utf8',
       env: { ...process.env, IZIN_KAYIT_DIZINI: yerel },
     })
     const gun = new Date().toISOString().slice(0, 10)
     const ham = fs.readFileSync(path.join(yerel, `${gun}.jsonl`), 'utf8')
-    expect(ham, 'kayıtta onay anahtarı değeri kaldı').not.toContain(sir)
+    expect(ham, 'kayıtta onay anahtarı değeri kaldı').not.toMatch(/ornekonay ?degeri987654/)
     expect(ham).toMatch(/GIZLI/)
   })
 
