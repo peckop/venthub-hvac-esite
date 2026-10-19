@@ -332,6 +332,12 @@
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-yazim-sayaci.cjs\"",
             "timeout": 10,
             "statusMessage": "sage yazim sayaci"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/duzeltme-isaretle.cjs\"",
+            "timeout": 10,
+            "statusMessage": "duzeltme isaretle"
           }
         ]
       },
@@ -443,6 +449,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-beklenti-kapisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/duzeltme-dersi-kapisi.cjs\"",
+            "timeout": 15
           },
           {
             "type": "command",
