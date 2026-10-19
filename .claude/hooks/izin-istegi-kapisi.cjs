@@ -244,6 +244,8 @@ const HASSAS = [
   // Kimlik dosyaları: oturum anahtarı, bulut, gh, ssh (OPS incelemesi, #1997).
   /(^|[/\\:])\.?credentials(\.json)?$/i,
   /hosts\.yml$/i,
+  // Canlı yazım onay anahtarı (ARC-181): ajanlara otomatik okuma izni verilmez; normal izin sorusuna düşer.
+  /ops-yazim-onayi/i,
   /\.aws[/\\]/i,
   /\.ssh[/\\]/i,
   // Adında "token" geçen DOSYA: yol ayırıcılı ya da uzantılı argüman (arama sözcüğü `grep token` etkilenmez).
