@@ -58,11 +58,15 @@ export type OrderBoardStatus =
  * - `refunded` / `partial_refunded` / `cancelled` TERMİNAL.
  * - `paid` DB'de bir sipariş statüsü değil (ödeme statüsünden türer); panoda
  *   "Yeni" sütununda göründüğü için kaynak olarak ele alınır, hedef olarak asla.
+ * - `shipped`e YALNIZ `processing`ten girilir (karar 221, 2026-10-01): "ödeme alınır,
+ *   ürün hazırlanır ve kargoya verilir". `confirmed → shipped` kestirmesi vardı ve
+ *   "hazırlanıyor" adımını atlatıyordu; müşteri o adımı hiç görmeden "kargoda"ya
+ *   düşüyordu. Cetvel: `docs/standards/siparis-durum-akisi-standard.md`.
  */
 const TRANSITIONS: Record<OrderBoardStatus, readonly OrderBoardStatus[]> = {
   pending: ['confirmed', 'cancelled', 'refunded', 'partial_refunded'],
   paid: ['confirmed', 'cancelled', 'refunded', 'partial_refunded'],
-  confirmed: ['processing', 'shipped', 'cancelled', 'refunded', 'partial_refunded'],
+  confirmed: ['processing', 'cancelled', 'refunded', 'partial_refunded'],
   processing: ['shipped', 'cancelled', 'refunded', 'partial_refunded'],
   shipped: ['delivered', 'cancelled', 'refunded', 'partial_refunded'],
   delivered: ['refunded', 'partial_refunded'],
