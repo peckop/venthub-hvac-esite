@@ -7,7 +7,7 @@
     "Kaynakta olan her cümle aynen kalır; yalnız not, üretim artığı ve iç etiket kalkar. Yeni iddia yok."
   ],
   "_kaynak": "docs/standards/vitrin-metni-standard.md K2 · scripts/icerik-hatti/aile-blok-duzelt-kurallar.mjs (K1-K5)",
-  "_not": "CANLIYA YAZILMAZ; yazım Recep'in 'yaz' sözüyle OPS penceresinde (KTL-61 kalıbı). Kapsam dışı bırakılanlar (OPS'a soruldu): Montaj bloklarındaki '---' artığı (FC-101, FC-102), FC-102 maddeler_tr 'Katalogda ... listelenir', FC-101 Montaj 'Katalogda'.",
+  "_not": "CANLIYA YAZILMAZ; yazım Recep'in 'yaz' sözüyle OPS penceresinde (KTL-61 kalıbı). OPS onayıyla (26 Ekim) üç kalem daha: Montaj bloklarındaki '---' artığı (FC-101, FC-102) ve 'Katalogda ... verilir/listelenir' tonu (FC-101 Montaj, FC-102 maddeler_tr[0]); sayı ve ölçüler aynen, yeni iddia yok. Kaynak çelişkisi (üretici sorusu adayı): AVenS 'FLC' ↔ Danfoss FC101 föyü 'FLN Apogee'; AVenS 'nümerik panel' ↔ Danfoss '2-line alphanumeric'.",
   "kalemler": [
     {
       "slug": "danfoss-vlt-hvac-basic-drive-fc-101",
@@ -22,6 +22,12 @@
       "yeni": "Metasys N2, FC ve FLC'dir."
     },
     {
+      "slug": "danfoss-vlt-hvac-basic-drive-fc-101",
+      "yol": ["bloklar_tr", "Montaj"],
+      "eski": "Katalogda tesisat kısıtı olarak yalnız kablo mesafesi verilir: maksimum kablo mesafesi 50 metredir. ---",
+      "yeni": "Tesisat kısıtı olarak kablo mesafesi en çok 50 metredir."
+    },
+    {
       "slug": "danfoss-vlt-hvac-drive-fc-102",
       "yol": ["bloklar_tr", "Koruma"],
       "eski": "Katalog bu aile için ayrı bir koruma bilgisi vermez; EMC filtre ibaresi FC101 satırında geçer, FC102 satırında geçmez. Üretici föyüne göre taban gövde koruma sınıfı IP20 / Chassis'tir [MANIFEST]. **Kontrol (bu ailenin asıl bloğu).** Standart",
@@ -32,6 +38,18 @@
       "yol": ["bloklar_tr", "Koruma"],
       "eski": "Metasys N2 ve FC olarak listelenir; FC101'deki FLC protokolü bu listede **yoktur**.",
       "yeni": "Metasys N2 ve FC'dir."
+    },
+    {
+      "slug": "danfoss-vlt-hvac-drive-fc-102",
+      "yol": ["bloklar_tr", "Montaj"],
+      "eski": "maksimum kablo mesafesi 150 metredir. ---",
+      "yeni": "kablo mesafesi en çok 150 metredir."
+    },
+    {
+      "slug": "danfoss-vlt-hvac-drive-fc-102",
+      "yol": ["maddeler_tr", 0],
+      "eski": "Katalogda motor gücü 1,1 kW ile 90 kW arasında 17 model olarak listelenir.",
+      "yeni": "Motor gücü 1,1 kW ile 90 kW arasında 17 model vardır."
     },
     {
       "slug": "vortice-tiracamino-somine-ve-baca-fanlari",

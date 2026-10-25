@@ -25,10 +25,25 @@ describe('KTL-62 plan', () => {
   const { hatalar, kalemler } = planDogrula(PLAN)
   const aile = aileyeGore(kalemler)
 
-  it('plan biçimi geçerli, üç aile altı kalem', () => {
+  it('plan biçimi geçerli, üç aile dokuz kalem', () => {
     expect(hatalar).toEqual([])
     expect([...aile.keys()]).toEqual([FC101, FC102, TIRA])
-    expect(kalemler).toHaveLength(6)
+    expect(kalemler).toHaveLength(9)
+  })
+
+  it('Montaj: "---" üretim artığı ve "Katalogda … verilir/listelenir" tonu kalkar, sayılar aynen', () => {
+    const m101 = blok(ailePlani(CANLI[FC101], aile.get(FC101)!).aciklama, 'Montaj')
+    const m102 = blok(ailePlani(CANLI[FC102], aile.get(FC102)!).aciklama, 'Montaj')
+    // "maksimum" sözcüğü K3 abartı kalıbına takılır; "en çok" aynı sınırı söyler (sayılar aynen).
+    expect(m101).toBe('Tesisat kısıtı olarak kablo mesafesi en çok 50 metredir.')
+    expect(m102).toBe('Tesisat kısıtı olarak kablo mesafesi en çok 150 metredir.')
+    for (const m of [m101, m102]) expect(m).not.toMatch(/---|Katalog/)
+  })
+
+  it('FC-102 maddeler_tr[0]: "Katalogda … listelenir" kalkar, sayılar aynen; diğer iki madde aynı', () => {
+    const m = ailePlani(CANLI[FC102], aile.get(FC102)!).aciklama.maddeler_tr as string[]
+    expect(m[0]).toBe('Motor gücü 1,1 kW ile 90 kW arasında 17 model vardır.')
+    expect(m.slice(1)).toEqual((CANLI[FC102].maddeler_tr as string[]).slice(1))
   })
 
   it('her kalem kurallardan geçer (K1-K5), hiçbiri RED değil', () => {
@@ -75,11 +90,12 @@ describe('KTL-62 plan', () => {
   it('planın dokunmadığı alanlar aynı (diğer bloklar, maddeler_tr, en, tr)', () => {
     for (const slug of [FC101, FC102, TIRA]) {
       const s = ailePlani(CANLI[slug], aile.get(slug)!).aciklama
-      const dokunulan = slug === TIRA ? 'Gövde' : 'Koruma'
+      const dokunulan = slug === TIRA ? ['Gövde'] : ['Koruma', 'Montaj']
       for (const [ad, v] of Object.entries(CANLI[slug].bloklar_tr as Record<string, string>)) {
-        if (ad !== dokunulan) expect(blok(s, ad), `${slug}.${ad}`).toBe(v)
+        if (!dokunulan.includes(ad)) expect(blok(s, ad), `${slug}.${ad}`).toBe(v)
       }
-      expect(s.maddeler_tr).toEqual(CANLI[slug].maddeler_tr)
+      if (slug !== FC102) expect(s.maddeler_tr).toEqual(CANLI[slug].maddeler_tr)
+      else expect((s.maddeler_tr as string[]).slice(1)).toEqual((CANLI[slug].maddeler_tr as string[]).slice(1))
       expect(s.en).toBe(CANLI[slug].en)
       expect(s.tr).toBe(CANLI[slug].tr)
     }
