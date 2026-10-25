@@ -106,6 +106,10 @@ set -u
 # sınıfının ta kendisi (bkz. yukarıdaki FAIL-SAFE DALLARI). Bilmiyorsak DERLERİZ.
 URETIM_DALI="${VERCEL_GIT_REPO_DEFAULT_BRANCH:-master}"
 MEVCUT_REF="${VERCEL_GIT_COMMIT_REF:-}"
+if [ "$MEVCUT_REF" = "onizleme-yeni-site" ]; then
+  echo "ignore-build: onizleme-yeni-site (URN-143, yalniz bu dal) -> BUILD"
+  exit 1
+fi
 if [ -z "$MEVCUT_REF" ]; then
   echo "ignore-build: VERCEL_GIT_COMMIT_REF BOS -> dal olculemedi, ATLAMIYORUM (fail-safe)"
 elif [ "$MEVCUT_REF" != "$URETIM_DALI" ]; then
