@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5 ve R11'i oku.
+Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5, R10.5 (ders listesi), R10.6 (yayın öncesi kontrol) ve R11'i oku.
 Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): arama görünürlük ölçümü (GEO-SEO); sayfa kodu (URUN); mevzuat hükmü üretmek (MEVZUAT).
 
 ## Yönetim (karar 201)
