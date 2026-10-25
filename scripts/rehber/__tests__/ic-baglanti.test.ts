@@ -38,6 +38,16 @@ describe('INV-REHBER-IC-BAGLANTI-1 · ağsız yarı (metin)', () => {
     expect(sinif('[x](vh:model/FC51!)')).toEqual(['IC-KIMLIK-BICIMI'])
     expect(sinif('[x](vh:model/-fc51)')).toEqual(['IC-KIMLIK-BICIMI'])
   })
+  it('rehberden rehbere kimlik (vh:yazi/<kimlik>) geçer; bozuk biçim KIRMIZI', () => {
+    expect(icBaglantiDenetle('[sessiz fan seçimi](vh:yazi/sessiz-fan-secimi)')).toEqual([])
+    expect(icBaglantiDenetle('[frekans](vh:yazi/frekans-konvertoru) ve [radyal](vh:yazi/radyal-aksiyel-fan-secimi)')).toEqual([])
+    expect(sinif('[x](vh:yazi)')).toEqual(['IC-KIMLIK-BICIMI'])
+    expect(sinif('[x](vh:makale/sessiz-fan-secimi)')).toEqual(['IC-KIMLIK-BICIMI'])
+  })
+  it('yazıya düz site adresi yine KIRMIZI (vh:yazi türü düz adrese izin vermez)', () => {
+    expect(sinif('[sessiz](/tr/bilgi-merkezi/sessiz-fan-nasil-secilir)')).toEqual(['IC-ADRES-DUZ'])
+    expect(sinif('[sessiz](https://venthub.com.tr/tr/bilgi-merkezi/sessiz-fan-nasil-secilir)')).toEqual(['IC-ADRES-DUZ'])
+  })
   it('büyük harfli SKU geçer (çözücü harf duyarsız)', () => {
     expect(icBaglantiDenetle('[FC 51](vh:model/VRT-253490106XN)')).toEqual([])
   })
