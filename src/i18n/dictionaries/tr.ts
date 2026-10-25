@@ -91,7 +91,8 @@ export const tr = {
       ac: 'İklimlendirme (Klima)',
       heating: 'Elektrikli Isıtma',
       hvls: 'Endüstriyel Tavan Vantilatörleri',
-      accessories: 'Aksesuarlar ve Bileşenler',
+      // Karar 409 (Recep, KTL-63): ad `categories.name`/`menu_label` ile aynı dize; EN slug (`accessories`) ve anahtar değişmez.
+      accessories: 'Elektrik Aksesuarları',
       'smart-home': 'Kontrol Sistemleri',
       'parking-jet': 'Otopark Jet Fanları',
       // REC-104/REC-103 (2026-09-01): DB'deki 23 aktif kategorinin 8'inin
@@ -119,7 +120,7 @@ export const tr = {
         exproof: 'Ex-Proof (ATEX) Fanlar',
         shelter: 'Sığınak Havalandırma Sistemleri',
         'acid-fans': 'Asit Dayanımlı Fanlar',
-        'freq-converters': 'Frekans Konvertörleri',
+        'freq-converters': 'Frekans Konvertörleri (İnvertör)',
         'duct-heaters': 'Elektrikli Kanal Isıtıcıları',
         dehumidifier: 'Nem Alma Cihazları',
         // REC-103: eksik 6 alt kategori (bkz. üstteki not).
@@ -140,7 +141,7 @@ export const tr = {
         'cabinet-fans': 'Hücreli Aspiratörler',
         'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
         'electric-curtain': 'Elektrikli Isıtıcılı Hava Perdeleri',
-        'spare-parts': 'Yedek Parça ve Sensörler'
+        'spare-parts': 'Sensörler ve Koruma'
       }
     },
     viewAll: 'Tümü',

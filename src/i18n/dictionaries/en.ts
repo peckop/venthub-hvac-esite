@@ -79,7 +79,8 @@ export const en: typeof tr = {
       ac: 'Air Conditioning',
       heating: 'Electric Heating',
       hvls: 'Industrial Ceiling Fans',
-      accessories: 'Accessories and Components',
+      // Decision 409 (KTL-63): see tr.ts; the English slug (`accessories`) and the key do not change.
+      accessories: 'Electrical Accessories',
       'smart-home': 'Control Systems',
       'parking-jet': 'Car Park Jet Fans',
       // REC-103: see tr.ts — 8 of the 23 active DB categories had no key here at all,
@@ -122,7 +123,7 @@ export const en: typeof tr = {
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
         'electric-curtain': 'Electrically Heated Air Curtains',
-        'spare-parts': 'Spare Parts and Sensors'
+        'spare-parts': 'Sensors and Protection'
       }
     },
     viewAll: 'View all',

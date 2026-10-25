@@ -112,7 +112,7 @@ Ingestor CSV'lerindeki 230 satırlık slug sapması canlı DB'ye hizalandı; kar
 | Yeni kategori | Slug (üst/alt) | Kapsam | Gerekçe |
 |---|---|---|---|
 | Asit-dayanımlı fanlar | `industrial-ventilation` / `acid-resistant-fans` | Seat/Storm/Jet, 81 ürün | 81 ürün tek alt'a (`radyal-fanlar`) yığılmaz; kimyasal/asit ortam = net alıcı niyeti. **Yerine geçti: karar 292 (10-05):** EN adres `corrosion-and-acid-resistant-fans`; eski EN adres `acid-resistant-fans` 308 yönlendirmesi verir |
-| Frekans konvertörleri | `accessories` / `frequency-converters` | Danfoss FC101/FC102, 34 ürün | Fan kontrol cihazı = aksesuar doğası; yeni ana dal gerektirmez |
+| Frekans konvertörleri | `accessories` / `frequency-converters` | Danfoss FC101/FC102, 34 ürün | Fan kontrol cihazı = aksesuar doğası; yeni ana dal gerektirmez. **Karar 409 (Recep, 2026-10-26, KTL-63):** ana kategori "Elektrik Aksesuarları / Electrical Accessories" (`accessories`, TR adres `elektrik-aksesuarlari`); alt kategoriler "Frekans Konvertörleri (İnvertör)" (`frequency-converters`), "Hız Anahtarları" (`speed-controllers`), "Sensörler ve Koruma" (`spare-parts-sensors`, TR adres `sensorler-ve-koruma`). Eski `control-systems` kökü pasif, üstü `accessories` (eski adresler tek 308 ile ana kategoriye gider). EN kanonik slug'lar değişmedi. Migration: `20261026090000_kontrol_urunleri_elektrik_aksesuarlari_karar409.sql` |
 | Elektrikli kanal ısıtıcıları | `electric-heating` / `electric-duct-heaters` | Avens, 14 ürün | Mevcut `electric-heating` iskeleti tam bu iş için bekliyordu; HRV'ye gömmek yanlış raf |
 
 Mekanik hizalamalar (karar değil): hücreli aspiratör + davlumbaz → `industrial-ventilation/radyal-fanlar`

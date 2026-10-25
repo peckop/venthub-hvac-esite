@@ -496,12 +496,12 @@ describe('INV-MARKA-KAYNAK-1 (d): listeden çıkan slug\'ların 308 yönlendirme
 
       if (k3b) {
         it('3-C eski adres eşleyicisiyle çakışmaz: kaynaklar eşleyiciye düşmez, hedefler kanonik (eşleyici null)', () => {
-          // Paylaşılan eşleyici fikstürü `control-systems`'i taşıyor ama dalını taşımıyor (fikstür
+          // Paylaşılan eşleyici fikstürü `accessories`'i (dalın yeni üstü, KTL-63) taşıyor ama dalını taşımıyor (fikstür
           // alt kümedir). Gerçek harita DB'den üretilir; DB'de ölçülen dal (DB_KATEGORILERI) buraya
           // aynı biçimde eklenir — yoksa eşleyici bilinmeyen dalı düşürüp köke yönlendirirdi.
           const h = fiksturHaritasi()
-          const kokIndeksi = h.kategoriler.findIndex((k) => k.en === 'control-systems')
-          expect(kokIndeksi, 'fikstürde control-systems yok').toBeGreaterThanOrEqual(0)
+          const kokIndeksi = h.kategoriler.findIndex((k) => k.en === 'accessories')
+          expect(kokIndeksi, 'fikstürde accessories yok').toBeGreaterThanOrEqual(0)
           const dalOlcum = DB_KATEGORILERI['frequency-converters']
           const dalIndeksi = h.kategoriler.push({ ...dalOlcum.slug, ust: kokIndeksi, aktif: dalOlcum.aktif }) - 1
           h.kategoriSluglari[dalOlcum.slug.en] = { hedef: { kategori: dalIndeksi }, bicim: 'en' }
@@ -510,7 +510,7 @@ describe('INV-MARKA-KAYNAK-1 (d): listeden çıkan slug\'ların 308 yönlendirme
           // 20261010090000 kökü `kontrol-ve-suruculer` yapar. Ölçülen yeni ad buraya da yazılmazsa hedefin ilk
           // parçası haritada bulunmaz, eşleyici hiçbir şeyi çözmeden null döner ve "çakışmaz" iddiası boşuna
           // geçerdi (URN-85 çürütme bulgusu). Yeni ad eklenir, eski ad (fikstürde) takma ad olarak kalır.
-          const kokOlcum = DB_KATEGORILERI['control-systems']
+          const kokOlcum = DB_KATEGORILERI.accessories
           h.kategoriler[kokIndeksi] = { ...h.kategoriler[kokIndeksi], tr: kokOlcum.slug.tr }
           h.kategoriSluglari[kokOlcum.slug.tr] = { hedef: { kategori: kokIndeksi }, bicim: 'tr' }
           const esle = (yol: string) => eskiAdresEsle(h, { yol, sku: null, dilTespit: () => 'tr' })
