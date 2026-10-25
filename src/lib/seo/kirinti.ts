@@ -44,9 +44,15 @@ export interface AileKirintisiGirdisi {
   /** Sözlükten: `category.breadcrumbHome`. */
   anasayfaAdi: string
   /** Ana kategori (görünen ad + dile göre slug). Çözülemediyse `null` → basamak yok, zincir kısalır. */
-  ana: KirintiAd | null
+  ana?: KirintiAd | null
   /** Alt kategori; ana ile aynı slug'sa ya da ana yoksa eklenmez. */
-  alt: KirintiAd | null
+  alt?: KirintiAd | null
+  /**
+   * URN-144 (karar 410): kategori zinciri, kökten yaprağa (yaprak DAHİL), `parent_id` zincirinden. Verilirse
+   * `ana`/`alt` yok sayılır (karma sütunlarda ana/alt yanlış kademeyi gösterirdi). İki kademede çıktı
+   * `ana`/`alt` ile birebir aynıdır. Çözülemeyen basamak atlanır; art arda aynı slug tek basamak olur.
+   */
+  zincir?: readonly KirintiAd[] | null
   /** Aile: görünen ad (`familyName`) + slug. */
   aile: KirintiAd
   /** Model sayfasında seçili modelin görünen etiketi; aile sayfasında `null`. */
@@ -68,16 +74,20 @@ export interface AileKirintisiGirdisi {
  * aile basamağı bağlantıdır.
  */
 export function aileKirintiAdimlari(girdi: AileKirintisiGirdisi): KirintiAdimi[] {
-  const { dil, anasayfaAdi, ana, alt, aile, model, bayrak = ADRES_SEMASI_K3B } = girdi
-  const gecerli = (k: KirintiAd | null): k is KirintiAd => !!k && !!k.ad.trim() && !!k.slug
+  const { dil, anasayfaAdi, ana, alt, zincir, aile, model, bayrak = ADRES_SEMASI_K3B } = girdi
+  const gecerli = (k: KirintiAd | null | undefined): k is KirintiAd => !!k && !!k.ad.trim() && !!k.slug
   const rotalar = adresRotalari(dil, bayrak)
 
   const adimlar: KirintiAdimi[] = [{ name: anasayfaAdi, path: '/' }]
-  if (gecerli(ana)) {
-    adimlar.push({ name: ana.ad, path: kategoriKirintiYolu(ana.slug, null, dil, bayrak) })
-    if (gecerli(alt) && alt.slug !== ana.slug) {
-      adimlar.push({ name: alt.ad, path: kategoriKirintiYolu(ana.slug, alt.slug, dil, bayrak) })
-    }
+  // `ana`/`alt` iki basamaklı özel durumdur; kendi zincirine çevrilip aynı döngüden geçer (tek kural).
+  // Eski sözleşme korunur: ana çözülemediyse alt de eklenmez (zincir kısalır).
+  const kategoriler = zincir ? zincir.filter(gecerli) : gecerli(ana) ? [ana, alt].filter(gecerli) : []
+  let onceki: KirintiAd | null = null
+  for (const k of kategoriler) {
+    if (onceki && onceki.slug === k.slug) continue
+    // Kök basamak üstsüz yola gider; sonrakiler (üst, kendisi) çiftiyle: tek segment şemada dalın kendi adresi.
+    adimlar.push({ name: k.ad, path: kategoriKirintiYolu(onceki ? onceki.slug : k.slug, onceki ? k.slug : null, dil, bayrak) })
+    onceki = k
   }
 
   if (model && model.etiket.trim()) {

@@ -85,7 +85,8 @@ export const en: typeof tr = {
       // REC-103: see tr.ts — 8 of the 23 active DB categories had no key here at all,
       // so /en pages silently fell back to the Turkish `menu_label`.
       fans: 'Fans',
-      'control-systems': 'Control Systems',
+      // Decision 409 (KTL-63): the `control-systems` row became "Electrical Accessories" (key and English slug unchanged).
+      'control-systems': 'Electrical Accessories',
       sub: {
         bathroom: 'Bathroom and Toilet Fans',
         window: 'Window and Wall Fans',
@@ -122,7 +123,9 @@ export const en: typeof tr = {
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
         'electric-curtain': 'Electrically Heated Air Curtains',
-        'spare-parts': 'Spare Parts and Sensors'
+        'spare-parts': 'Sensors and Protection',
+        // Decision 410 (Recep, KTL-63): second subcategory of the Accessories root; the key is bound by the database migration.
+        'mechanical-accessories': 'Mechanical Accessories'
       }
     },
     viewAll: 'View all',

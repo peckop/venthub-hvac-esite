@@ -11,6 +11,7 @@ import {
   PRODUCTS_DISCOVERY_TAG,
   variantStockTag,
 } from '@/lib/cache/tags'
+import { AZAMI_ZINCIR_DERINLIGI } from '@/lib/data/kategoriZinciri'
 import { SATIS_KIPI_TAG } from '@/lib/kip/satisKipi'
 import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
@@ -264,10 +265,31 @@ function istekKategoriCozucu(): KategoriCozucu {
 async function revalidateCategoryTree(
   category: CategoryRow,
   kategoriSatiri: KategoriCozucu,
-  zatenTazelenen?: readonly string[]
+  zatenTazelenen?: readonly string[],
+  atalarDahil = false
 ): Promise<string[]> {
   const parent = await kategoriSatiri(category.parent_id ?? undefined)
-  const paths = categoryPathsFor(category, parent).filter((p) => !zatenTazelenen?.includes(p))
+  const kume = categoryPathsFor(category, parent)
+  /**
+   * URN-144 (karar 410): ürün/stok değişimi, kategorinin TÜM ata sayfalarının listesini de etkiler (kök sayfası alt
+   * ağaçtaki aileleri listeler). Ürünün sütunları karma olabilir (`category_id` orta kademe, `subcategory_id` yaprak):
+   * kök kimliği sütunda bulunmayabilir, bu yüzden ata zinciri `parent_id`'den yürünür. Döngü korumalı, derinlik sınırlı.
+   * Yalnız ürün/stok dallarında açılır (`atalarDahil`); `categories` dalı kendi kuralını korur. Canlı iki kademede
+   * ürünün `category_id` sütunu zaten kök olduğundan küme değişmez (üst yolu `zatenTazelenen` ile süzülür).
+   */
+  if (atalarDahil) {
+    const gorulen = new Set<string>(category.id ? [category.id] : [])
+    let ata = parent
+    for (let adim = 0; ata && adim < AZAMI_ZINCIR_DERINLIGI; adim++) {
+      if (ata.id) {
+        if (gorulen.has(ata.id)) break
+        gorulen.add(ata.id)
+      }
+      for (const p of categoryPathsFor(ata, null)) if (!kume.includes(p)) kume.push(p)
+      ata = await kategoriSatiri(ata.parent_id ?? undefined)
+    }
+  }
+  const paths = kume.filter((p) => !zatenTazelenen?.includes(p))
   for (const p of paths) revalidatePath(p)
   return paths
 }
@@ -438,7 +460,7 @@ export async function POST(request: NextRequest) {
       for (const kategoriId of kategoriKimlikleri) {
         const category = await kategoriSatiri(kategoriId)
         if (category) {
-          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths)))
+          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths, true)))
         }
       }
     }
@@ -534,6 +556,40 @@ export async function POST(request: NextRequest) {
             revalidatedPaths.push(...eskiChildPaths)
           }
         }
+
+        /**
+         * URN-144 (karar 410) — TORUNLAR. Üç kademede KÖK değişince yaprak sayfalarının kırıntısında kökün adı ve
+         * bağlantısı da yer alır; yalnız doğrudan çocukları tazelemek yaprakları bayat bırakırdı. Yalnız KÖK satırda
+         * (`parent_id` boş) bir halka daha inilir: orta kademenin çocukları yapraktır, yaprağın çocuğu olmaz. İki
+         * kademede kökün çocukları yapraktır (çocuk sorgusu boş döner) ve küme DEĞİŞMEZ. Okuma çocuk başına TEK ve
+         * küçüktür (bir üstün en çok birkaç çocuğu var); toplam torun sayısı `MAX_KATEGORI_COCUK` ile sınırlıdır.
+         * Sorgu hatası çocuk sorgusuyla aynı biçimde yutulmaz: yanıt 500 olur.
+         */
+        if (self.parent_id === null && cocuklar.length > 0) {
+          let torunSayisi = 0
+          torunDongusu: for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
+            if (!child.id) continue
+            const { data: torunlar, error: torunHatasi } = await supabase
+              .from('categories')
+              .select('id, slug, metadata, parent_id')
+              .eq('parent_id', child.id)
+            if (torunHatasi) {
+              kategoriCocukHatasi = `categories torun sorgusu düştü (parent_id=${child.id}): ${torunHatasi.message}`
+              console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+              continue
+            }
+            for (const torun of torunlar ?? []) {
+              if (torunSayisi >= MAX_KATEGORI_COCUK) {
+                fanoutTruncated = true
+                break torunDongusu
+              }
+              torunSayisi++
+              const torunYollari = categoryPathsFor(torun, child).filter((p) => !revalidatedPaths.includes(p))
+              for (const p of torunYollari) revalidatePath(p)
+              revalidatedPaths.push(...torunYollari)
+            }
+          }
+        }
       }
 
       // Revalidate listing caches since categorization structure changed
@@ -566,7 +622,7 @@ export async function POST(request: NextRequest) {
           if (product.category_id) {
             const category = await kategoriSatiri(product.category_id)
             if (category) {
-              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri)))
+              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, undefined, true)))
             }
           }
         }

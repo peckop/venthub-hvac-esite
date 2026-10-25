@@ -5,6 +5,7 @@
 > anlatı hangi kademede elle yazılır. Veri taşıma / aile birleştirme bu cetvelin konusu
 > DEĞİLDİR (Recep kapısı); burada yalnız kural ve ölçülmüş durum yazılır.
 > **Karar sahibi:** Recep (2026-08-23 onayı). Ölçüm ve yazım: URUN. §2 I18N ile ortak.
+> **Tarihçe:** 2026-10-25 karar 410: kategori ağacı üç kademe (§1 notu); adres tek segment (karar 407); URN-144.
 
 ## 0. Niçin var — aynı katalog, aynı hafta, iki farklı cevap
 
@@ -32,7 +33,15 @@ Kategori sayfası          → anlatı + seçim (kartlar, karşılaştırma, sih
        └─ (ürün adresi)   → satın alma ucu; gezinme hedefi DEĞİL
 ```
 
-**Üçüncü bir gezinme kademesi açılmaz.** Ürünün kendi adresi vardır ve olmalıdır — arama
+> **Karar 410 (2026-10-25) — kategori AĞACI üç kademe olabilir:** kök → orta → yaprak
+> (örn. Aksesuarlar → Elektrik Aksesuarları → Frekans Konvertörleri). Yukarıdaki "iki kademe"
+> sayfa türü derinliğidir (kategori sayfası → aile sayfası) ve DEĞİŞMEDİ; üçüncü kademe
+> kategori ağacının içindedir. Adres TEK SEGMENT kalır (karar 407; `adres-semasi-standard.md`).
+> Kök/orta/yaprak kimliği **kod sütununa (`category_id`/`subcategory_id` eşitliğine) değil
+> `categories.parent_id` zincirine** dayanır; ürün/aile sütunlarının anlamını KATALOG göçü belirler,
+> kod onlara varsayım yapmaz. Mevcut canlı ağaç iki kademedir, fark 0.
+
+**Üçüncü bir gezinme kademesi açılmaz** (sayfa türü olarak: kategori → aile → ürün). Ürünün kendi adresi vardır ve olmalıdır — arama
 motoru ürünleri ancak kendi adresleriyle listeler, müşteri paylaşırken o adrese ihtiyaç duyar.
 Ama **vitrinde gezen kimse oraya düşmez**: aile sayfası varyantı yerinde seçtirir.
 

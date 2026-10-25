@@ -18,18 +18,23 @@ export function buildCategoryBreadcrumb(
     parentCategory?: DomainCategory | null,
     homeLabel = 'Ana Sayfa',
     lang = 'tr',
-    t?: (key: string) => string
+    t?: (key: string) => string,
+    ancestors?: readonly DomainCategory[] | null
 ): BreadcrumbItem[] {
     const items: BreadcrumbItem[] = [
         { label: homeLabel, href: '/' }
     ]
 
-    if (parentCategory) {
+    // URN-144 (karar 410): üç kademede zincirin TÜM atları kökten başa basılır (`ancestors`, kategori dahil değil).
+    // Verilmezse bugünkü tek üst (`parentCategory`) — iki kademede çıktı birebir aynıdır. Her ata kendi TEK segmentli
+    // adresine gider (karar 407).
+    const atalar = ancestors && ancestors.length > 0 ? ancestors : parentCategory ? [parentCategory] : []
+    for (const ata of atalar) {
         items.push({
-            label: getCategoryDisplayName(parentCategory, t),
+            label: getCategoryDisplayName(ata, t),
             // REC-300 Faz 3d: K3-b açıkken `adresUret` (dil önekli; Breadcrumb önek eklemez —
             // `localizedHref` idempotent). Kapalıyken bugünkü dilsiz `Routes.category`.
-            href: kategoriKirintiYolu(getLocalizedCategorySlug(parentCategory, lang), null, adresDili(lang))
+            href: kategoriKirintiYolu(getLocalizedCategorySlug(ata, lang), null, adresDili(lang))
         })
     }
 
