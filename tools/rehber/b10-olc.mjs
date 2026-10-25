@@ -144,7 +144,7 @@ if (buDosya === cagrilan) {
     process.exit(2)
   }
   const s = await b10Olc({ adres, yayin: bayrak('--yayin'), harita: bayrak('--harita') })
-  for (const m of s.maddeler) console.log(`${m.durum} | ${m.ad} | ${m.ayrinti}`)
-  console.log(`SONUÇ: ${s.durum} | ${adres}`)
+  for (const m of s.maddeler) process.stdout.write(`${m.durum} | ${m.ad} | ${m.ayrinti}\n`)
+  process.stdout.write(`SONUÇ: ${s.durum} | ${adres}\n`)
   process.exit(s.durum === GECTI ? 0 : s.durum === KALDI ? 1 : 3)
 }
