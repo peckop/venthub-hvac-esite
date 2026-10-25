@@ -1,0 +1,85 @@
+{
+  "_nicin": [
+    "KTL-61 GERİ ALMA planı: ana planın her kaleminde eski↔yeni yer değiştirir, sıra tersine çevrilir. Yalnız yazımdan SONRA ve OPS kararıyla koşulur."
+  ],
+  "_not": "Yedek dosyası (--yedek) eski değerlerin tam kopyasını da tutar.",
+  "kalemler": [
+    {
+      "slug": "vortice-vorticent-cms-atex-santrifuj-fanlar",
+      "yol": [
+        "tr"
+      ],
+      "eski": "santrifüj fanlardır. Gövdesi haddelenmiş",
+      "yeni": "santrifüj fanlardır; gövdesi haddelenmiş"
+    },
+    {
+      "slug": "vortice-vorticent-cms-atex-santrifuj-fanlar",
+      "yol": [
+        "en"
+      ],
+      "eski": "classified as ATEX. The housing is a rolling",
+      "yeni": "classified as ATEX; the housing is a rolling"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "maddeler_tr",
+        0
+      ],
+      "eski": "Bu fan modelleriyle eşleşen sürücülerde 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.",
+      "yeni": "Katalogda 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi listelenir."
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "bloklar_tr",
+        "Koruma"
+      ],
+      "eski": "HEATMASTER F400 315 M4 0,25kW modelinin iki satırında (2590 ve 3610 m³/h) hız anahtarı olarak FC-51 220V 0,37 kW gösterilir.",
+      "yeni": "HEATMASTER F400 315 M4 0,25kW ve F400 355 M4 0,25kW modellerinde hız anahtarı olarak FC-51 220V 0,37 kW gösterilir."
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "bloklar_tr",
+        "Koruma"
+      ],
+      "eski": "VORT QBK SAL KC EVO 315 T4 0,25kW ve 355 T4 0,25kW modellerinde hız anahtarı olarak FC-51 380V 0,37 kW gösterilir.",
+      "yeni": "VORT QBK SAL KC EVO 315 T4 0,25kW ve 355 T4 0,25kW modellerinde hız anahtarı olarak FC-51 380V 0,37 kW gösterilir. Kontrol paneli, haberleşme protokolü ve çalışma modları **kaynakta yok**."
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "bloklar_tr",
+        "Koruma"
+      ],
+      "eski": "**Uygulama:**",
+      "yeni": "**Kaynakta yok.** **Uygulama:**"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "bloklar_tr",
+        "Koruma"
+      ],
+      "eski": "**Uygulama:**",
+      "yeni": "**Kontrol (bu ailenin asıl bloğu — ve kaynakta olan tek şey uygulamadır).**"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "tr"
+      ],
+      "eski": "bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız kontrol cihazı olarak eşleştirilen kompakt",
+      "yeni": "AVenS fiyat listesinde bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için listelenen kompakt"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "en"
+      ],
+      "eski": "paired as the speed controller with some",
+      "yeni": "listed in the AVenS price list for speed control of some"
+    }
+  ]
+}
