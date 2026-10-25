@@ -112,6 +112,18 @@ describe('SearchOverlay — seri önerisi (URN-139)', () => {
     expect(ekranMetni()).not.toContain('Sonuç bulunamadı')
   })
 
+  it('TR: name_i18n.tr doluysa o görünür (SSOT familyName), boşsa ad', async () => {
+    oneriCagrisi.mockResolvedValue([
+      { type: 'family', label: 'SEAT Serisi', url: '/products/seat-serisi', metadata: { slug: 'seat-serisi', name_i18n: { tr: 'SEAT Storm Jet Asit Dayanımlı Fanlar', en: 'SEAT Storm Jet Acid-Resistant Fans' } } },
+      { type: 'family', label: 'Vortice Bravo S', url: '/products/vortice-bravo-s', metadata: { slug: 'vortice-bravo-s', name_i18n: { tr: '', en: 'Vortice Bravo S' } } },
+    ])
+    await ara()
+
+    await waitFor(() => expect(ekranMetni()).toContain('SEAT Storm Jet Asit Dayanımlı Fanlar'), { timeout: 3000 })
+    expect(ekranMetni()).toContain('Vortice Bravo S')
+    expect(ekranMetni()).not.toContain('SEAT Serisi')
+  })
+
   it('TR: tıklayınca DİL ÖNEKLİ seri adresine gider (ham adres değil)', async () => {
     oneriCagrisi.mockResolvedValue([JET_SERISI])
     await ara()

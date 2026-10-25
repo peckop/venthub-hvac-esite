@@ -9,6 +9,7 @@ import type { FtsProductResult, SearchSuggestion } from '@/types/ui-models'
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { familyName } from '../lib/i18n/familyName'
 import { resolveProductImageUrl } from '../lib/images/productImage'
 import { supabaseBrowserClient } from '../lib/supabase/client'
 import type { DbCategory } from '../types/db-rows'
@@ -270,13 +271,21 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
    */
   const oneriEtiketi = (s: SearchSuggestion): string => {
     if (s.type === 'family') {
-      // Seri (URN-139): RPC `label` olarak ailenin birincil adını (TR) verir, çeviriler
-      // `metadata.name_i18n` içindedir. EN'de çeviri varsa o, yoksa ad (bugünkü davranış).
+      // Seri (URN-139): RPC `label` olarak ailenin birincil adını verir, çeviriler
+      // `metadata.name_i18n` içindedir. Dil çözümü SSOT'ta (INV-AILE-ADI-1).
       const meta = s.metadata
       const adlar = meta && typeof meta === 'object' && !Array.isArray(meta) ? meta.name_i18n : undefined
-      const en = adlar && typeof adlar === 'object' && !Array.isArray(adlar) ? adlar.en : undefined
-      if (lang === 'en' && typeof en === 'string' && en.trim() !== '') return en
-      return s.label ?? ''
+      const ceviriler = adlar && typeof adlar === 'object' && !Array.isArray(adlar) ? adlar : undefined
+      return familyName(
+        {
+          name: s.label,
+          name_i18n: {
+            tr: typeof ceviriler?.tr === 'string' ? ceviriler.tr : null,
+            en: typeof ceviriler?.en === 'string' ? ceviriler.en : null,
+          },
+        },
+        lang
+      )
     }
     if (s.type === 'category' && s.url) {
       const slug = s.url.split('/').filter(Boolean).pop()

@@ -34,15 +34,17 @@
 --   kök mantığı gövdede satır içi; yardımcı eklenmedi.
 --
 -- ZAMAN AŞIMI (K13.4 m.1): `create or replace function` + DO bloğu. Canlı RPC uçtan uca
---   ölçüm 2026-10-25: 154-265 ms (ağ dahil, ilk soğuk çağrı 1,3 sn). Guard ~10 RPC çağrısı =
---   <5 sn; lock_timeout 5 sn (fonksiyon tanımı kilidi anlık), statement_timeout 60 sn pay ile.
+--   bağımsız ölçüm 2026-10-25: 383-2863 ms (ağ dahil, istemci tarafı). Guard 12 RPC çağrısı
+--   yapar; en kötü durumda 12 x 2,9 sn = ~35 sn (veritabanı içinde ağ yok, gerçekte daha kısa).
+--   lock_timeout 5 sn (fonksiyon tanımı kilidi anlık); statement_timeout 90 sn: en kötü ~35 sn'nin
+--   2,5 katı pay, soğuk pgroonga duraklaması (ölçülen 0,4-10 sn) tek çağrıda bile sığar.
 --
 -- GUARD (K13.2/9/10): ziyaretçi (anon) rolüyle ÇAĞIRIR; sabit satır sayısı yok (K8.3); boş
 --   veritabanında NOTICE ile atlar; veri-bağımlı vakalar ilgili kategori/aile yoksa NOTICE ile
 --   atlanır (katalog silerse kapı kırmızıya dönmesin, sessizce de geçmesin: atlanan NOTICE'ta yazar).
 
 set lock_timeout = '5s';
-set statement_timeout = '60s';
+set statement_timeout = '90s';
 
 begin;
 
