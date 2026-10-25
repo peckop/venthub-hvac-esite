@@ -6,19 +6,19 @@
     "Ölçüm: ikisinin canlı değeri 25 Ekim 2026'da SELECT ile okundu (description->>'en'/'tr'); is_description_manual=true, updated_at 2026-10-06 11:46:21Z."
   ],
   "_kaynak": "docs/standards/catalog-ingestion-standard.md · scripts/icerik-hatti/aile-blok-duzelt-kurallar.mjs (K1-K5)",
-  "_not": "Bu plan CANLIYA YAZILMAZ; yazım Recep'in 'yaz' sözüyle OPS penceresinde koşar (CANLI_YAZIM_ONAYI=evet + --yaz). Önce kuru koşum: node scripts/icerik-hatti/aile-blok-duzelt.mjs --plan <bu dosya>. FC-51 bloklar_tr.Koruma iç kayıt tonu (OPS onayı 25 Ekim): 'Kontrol (bu ailenin asıl bloğu ...)' etiketi 'Uygulama:' olur, baştaki 'Kaynakta yok.' hangi konuda olduğunu söyler (Koruma bilgisi); kaynakta olmayan hiçbir iddia eklenmez, mevcut cümleler aynen kalır.",
+  "_not": "Bu plan CANLIYA YAZILMAZ; yazım Recep'in 'yaz' sözüyle OPS penceresinde koşar (CANLI_YAZIM_ONAYI=evet + --yaz). Önce kuru koşum: node scripts/icerik-hatti/aile-blok-duzelt.mjs --plan <bu dosya>. FC-51 bloklar_tr.Koruma iç kayıt tonu (OPS onayı 25 Ekim): 'Kontrol (bu ailenin asıl bloğu ...)' etiketi 'Uygulama:' olur; baştaki 'Kaynakta yok.' ve sondaki 'Kontrol paneli, haberleşme protokolü ve çalışma modları kaynakta yok' cümleleri KALKAR çünkü kaynak dizinindeki FC51-DataSheet.pdf (sayfalar.jsonl s.1-2) kontrol paneli, FC protokolü/Modbus RTU ve VVC+/U/f modlarını veriyor (bağımsız doğrulayıcı bulgusu); yeni iddia eklenmez, kalan cümleler (AVenS fiyat listesi s.34/36 hız anahtarı eşleşmeleri) aynen kalır. FC-51 cümlesi kaynağa sadık: 'hız anahtarı olarak gösterilen'. Açık not: Koruma cümlesindeki 'F400 355 M4' kaynakta 315 M4 satırı (dokunulmadı, OPS'a bildirildi).",
   "kalemler": [
     {
       "slug": "danfoss-vlt-micro-drive-fc-51",
       "yol": ["en"],
       "eski": "listed in the AVenS price list for speed control of some",
-      "yeni": "offered for speed control of some"
+      "yeni": "shown as the speed switch for some"
     },
     {
       "slug": "danfoss-vlt-micro-drive-fc-51",
       "yol": ["tr"],
       "eski": "AVenS fiyat listesinde bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için listelenen kompakt",
-      "yeni": "bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için sunulan kompakt"
+      "yeni": "bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız anahtarı olarak gösterilen kompakt"
     },
     {
       "slug": "danfoss-vlt-micro-drive-fc-51",
@@ -30,7 +30,13 @@
       "slug": "danfoss-vlt-micro-drive-fc-51",
       "yol": ["bloklar_tr", "Koruma"],
       "eski": "**Kaynakta yok.** **Uygulama:**",
-      "yeni": "Koruma bilgisi **kaynakta yok.** **Uygulama:**"
+      "yeni": "**Uygulama:**"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": ["bloklar_tr", "Koruma"],
+      "eski": "VORT QBK SAL KC EVO 315 T4 0,25kW ve 355 T4 0,25kW modellerinde hız anahtarı olarak FC-51 380V 0,37 kW gösterilir. Kontrol paneli, haberleşme protokolü ve çalışma modları **kaynakta yok**.",
+      "yeni": "VORT QBK SAL KC EVO 315 T4 0,25kW ve 355 T4 0,25kW modellerinde hız anahtarı olarak FC-51 380V 0,37 kW gösterilir."
     },
     {
       "slug": "vortice-vorticent-cms-atex-santrifuj-fanlar",

@@ -1,69 +1,75 @@
 /**
- * KTL-61 · FC-51 ve CMS ATEX aile açıklaması düzeltme planı — canlı değerler 25 Ekim 2026'da SELECT ile okundu;
- * burada yalnız `en`/`tr` alanları kopyadır. Plan dosyası kuralları (K1-K5) geçer ve sonuç metni okura dönük kalır.
- * Canlıya çıkmaz.
+ * KTL-61 · FC-51 ve CMS ATEX aile açıklaması düzeltme planı — canlı değerlerin BİREBİR kopyası
+ * (`ktl61-canli-2026-10-25.json`, 25 Ekim 2026 SELECT çıktısı; description jsonb'unun ilgili alanları).
+ * Plan dosyası kuralları (K1-K5) geçer, her `eski` dizge canlı alanda tam 1 kez geçer, sonuç metni okura dönük kalır
+ * ve kaynakta olmayan iddia eklenmez. Canlıya çıkmaz.
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { ailePlani, aileyeGore, planDogrula } from '../aile-blok-duzelt-kurallar.mjs'
+import { ailePlani, aileyeGore, planDogrula, say } from '../aile-blok-duzelt-kurallar.mjs'
 
 type Aciklama = Record<string, unknown>
 const PLAN = JSON.parse(readFileSync(join(__dirname, '..', 'duzeltmeler', 'ktl61-fc51-cms-atex-aciklama-2026-10-25.json'), 'utf8'))
-
-const FC51: Aciklama = {
-  en: 'Danfoss FC-51 is a compact frequency converter listed in the AVenS price list for speed control of some low-power roof-type (HEATMASTER F400) and hood (VORT QBK SAL KC EVO) fan models.',
-  tr: 'Danfoss FC-51, AVenS fiyat listesinde bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için listelenen kompakt bir frekans konvertörüdür.',
-  bloklar_tr: {
-    Motor: 'Ürün motor değil, motor sürücüsüdür.',
-    Koruma: '**Kaynakta yok.** **Kontrol (bu ailenin asıl bloğu — ve kaynakta olan tek şey uygulamadır).** HEATMASTER F400 315 M4 0,25kW ve F400 355 M4 0,25kW modellerinde hız anahtarı olarak FC-51 220V 0,37 kW gösterilir. Kontrol paneli, haberleşme protokolü ve çalışma modları **kaynakta yok**.',
-  },
-}
-const CMS: Aciklama = {
-  en: 'The Vortice VORTICENT CMS ATEX series comprises centrifugal medium pressure ATEX fans designed for inline installation in indoor environments classified as ATEX; the housing is a rolling, completely joined or welded steel sheet, the impeller is a galvanised steel sheet simple inlet forward curved type, and the inlet sparkproof ring is made of copper or aluminium. They are manufactured with a standard ATEX asynchronous motor with IP55 protection and class F insulation.',
-  tr: "Vortice VORTICENT CMS ATEX serisi, ATEX'e uygun sınıflandırılmış iç mekânlarda kanala bağlı kurulum için tasarlanmış orta basınçlı santrifüj fanlardır; gövdesi haddelenmiş, tamamen birleştirilmiş veya kaynaklı çelik sacdan, pervanesi galvanizli çelik sacdan basit girişli öne eğik tiptir, giriş halkası ise kıvılcım önleyici bakır veya alüminyumdandır. IP55 korumalı, F yalıtım sınıflı standart ATEX asenkron motorla üretilir.",
-}
+const CANLI = JSON.parse(readFileSync(join(__dirname, 'ktl61-canli-2026-10-25.json'), 'utf8')) as Record<string, Aciklama>
+const FC = 'danfoss-vlt-micro-drive-fc-51'
+const CMS = 'vortice-vorticent-cms-atex-santrifuj-fanlar'
 const ilkCumle = (m: unknown) => String(m).split(/(?<=[.!?])\s/)[0]
+const blok = (a: Aciklama) => String((a.bloklar_tr as Record<string, string>).Koruma)
 
 describe('KTL-61 plan', () => {
   const { hatalar, kalemler } = planDogrula(PLAN)
   const aile = aileyeGore(kalemler)
 
-  it('plan biçimi geçerli, iki aile altı kalem', () => {
+  it('plan biçimi geçerli, iki aile yedi kalem', () => {
     expect(hatalar).toEqual([])
-    expect([...aile.keys()]).toEqual(['danfoss-vlt-micro-drive-fc-51', 'vortice-vorticent-cms-atex-santrifuj-fanlar'])
-    expect(kalemler).toHaveLength(6)
+    expect([...aile.keys()]).toEqual([FC, CMS])
+    expect(kalemler).toHaveLength(7)
   })
 
-  it('FC-51 Koruma bloğu: iç ton kalkar, mevcut cümleler aynen kalır, yeni iddia eklenmez', () => {
-    const s = ailePlani(FC51, aile.get('danfoss-vlt-micro-drive-fc-51')!)
-    const blok = String((s.aciklama.bloklar_tr as Record<string, string>).Koruma)
-    expect(blok).not.toMatch(/asıl blok|Kontrol \(/)
-    expect(blok.startsWith('Koruma bilgisi **kaynakta yok.** **Uygulama:** HEATMASTER F400 315 M4')).toBe(true)
-    expect(blok.endsWith('Kontrol paneli, haberleşme protokolü ve çalışma modları **kaynakta yok**.')).toBe(true)
-    expect((blok.match(/\*\*/g) ?? []).length % 2).toBe(0)
-    expect((s.aciklama.bloklar_tr as Record<string, string>).Motor).toBe('Ürün motor değil, motor sürücüsüdür.')
-    const ikinci = ailePlani(s.aciklama, aile.get('danfoss-vlt-micro-drive-fc-51')!)
-    expect(ikinci.red).toBe(false)
-    expect(ikinci.degisti).toBe(false)
+  it('canlı kopya dolu: tam metinler (kısaltma yok)', () => {
+    expect(String(CANLI[CMS].en)).toHaveLength(885)
+    expect(String(CANLI[CMS].tr)).toHaveLength(815)
+    expect(CANLI[FC].maddeler_tr).toHaveLength(3)
   })
 
-  it('FC-51: iç kayıt tonu kalkar, ürün ne işe yarıyorsa o söylenir', () => {
-    const s = ailePlani(FC51, aile.get('danfoss-vlt-micro-drive-fc-51')!)
+  it('FC-51: iç kayıt tonu kalkar, cümle kaynağa sadık ("hız anahtarı olarak gösterilen")', () => {
+    const s = ailePlani(CANLI[FC], aile.get(FC)!)
     expect(s.red).toBe(false)
     expect(s.degisti).toBe(true)
-    expect(s.aciklama.en).toBe('Danfoss FC-51 is a compact frequency converter offered for speed control of some low-power roof-type (HEATMASTER F400) and hood (VORT QBK SAL KC EVO) fan models.')
+    expect(s.aciklama.en).toBe('Danfoss FC-51 is a compact frequency converter shown as the speed switch for some low-power roof-type (HEATMASTER F400) and hood (VORT QBK SAL KC EVO) fan models.')
+    expect(s.aciklama.tr).toBe('Danfoss FC-51, bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız anahtarı olarak gösterilen kompakt bir frekans konvertörüdür.')
     expect(String(s.aciklama.tr)).not.toMatch(/AVenS|fiyat listesi/i)
     expect(String(s.aciklama.en)).not.toMatch(/AVenS|price list/i)
   })
 
+  it('FC-51 Koruma: iç ton ve kaynakla çelişen "kaynakta yok" cümleleri kalkar, kaynaklı eşleşme cümleleri aynen kalır', () => {
+    const once = blok(CANLI[FC])
+    const s = ailePlani(CANLI[FC], aile.get(FC)!)
+    const sonra = blok(s.aciklama)
+    expect(sonra).not.toMatch(/asıl blok|Kontrol \(|kaynakta yok/i)
+    expect(sonra.startsWith('**Uygulama:** HEATMASTER F400 315 M4')).toBe(true)
+    expect(sonra.endsWith('FC-51 380V 0,37 kW gösterilir.')).toBe(true)
+    expect((sonra.match(/\*\*/g) ?? []).length % 2).toBe(0)
+    // Kalan her cümle eski blokta zaten vardı (yeni iddia yok).
+    const cumleler = sonra.replace('**Uygulama:** ', '').split(/(?<=\.)\s/)
+    expect(cumleler).toHaveLength(4)
+    for (const c of cumleler) expect(say(once, c)).toBe(1)
+  })
+
+  it('FC-51: planın dokunmadığı alanlar aynı (Motor, maddeler_tr)', () => {
+    const s = ailePlani(CANLI[FC], aile.get(FC)!)
+    expect((s.aciklama.bloklar_tr as Record<string, string>).Motor).toBe((CANLI[FC].bloklar_tr as Record<string, string>).Motor)
+    expect(s.aciklama.maddeler_tr).toEqual(CANLI[FC].maddeler_tr)
+  })
+
   it('CMS ATEX: ilk cümle bölünür, hiçbir sözcük eklenmez ya da çıkmaz', () => {
-    const s = ailePlani(CMS, aile.get('vortice-vorticent-cms-atex-santrifuj-fanlar')!)
+    const s = ailePlani(CANLI[CMS], aile.get(CMS)!)
     expect(s.red).toBe(false)
     for (const dil of ['en', 'tr'] as const) {
-      const once = String(CMS[dil])
+      const once = String(CANLI[CMS][dil])
       const sonra = String(s.aciklama[dil])
       expect(ilkCumle(once).length).toBeGreaterThan(300)
       expect(ilkCumle(sonra).length).toBeLessThan(200)
@@ -72,10 +78,12 @@ describe('KTL-61 plan', () => {
     }
   })
 
-  it('ikinci koşum zararsız (K5 idempotent)', () => {
-    const bir = ailePlani(CMS, aile.get('vortice-vorticent-cms-atex-santrifuj-fanlar')!)
-    const iki = ailePlani(bir.aciklama, aile.get('vortice-vorticent-cms-atex-santrifuj-fanlar')!)
-    expect(iki.red).toBe(false)
-    expect(iki.degisti).toBe(false)
+  it('ikinci koşum zararsız (K5 idempotent), iki ailede de', () => {
+    for (const slug of [FC, CMS]) {
+      const bir = ailePlani(CANLI[slug], aile.get(slug)!)
+      const iki = ailePlani(bir.aciklama, aile.get(slug)!)
+      expect(iki.red).toBe(false)
+      expect(iki.degisti).toBe(false)
+    }
   })
 })
