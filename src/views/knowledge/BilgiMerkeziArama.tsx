@@ -88,7 +88,7 @@ export default function BilgiMerkeziArama({ kartlar, dil, metin }: Props) {
                   )}
                 </span>
                 <h2 className="mt-3 text-xl font-bold tracking-tight text-primary-navy">{k.baslik}</h2>
-                {k.kartOzeti ? <p className="mt-3 flex-1 text-base text-industrial-gray">{k.kartOzeti}</p> : <span className="flex-1" />}
+                {k.kartOzeti ? <span data-nosnippet className="mt-3 block flex-1 text-base text-industrial-gray">{k.kartOzeti}</span> : <span className="flex-1" />}
                 <span className="mt-6 text-sm font-semibold text-brand-cyan-ink">{metin.oku}</span>
               </Link>
             </li>

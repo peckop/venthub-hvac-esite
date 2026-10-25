@@ -42,6 +42,7 @@ export type RehberHedefi = `vh:kategori/${string}` | `vh:aile/${string}`
 export function yazininHedefleri(yazi: RehberYazisi, dil: YaziDili): Set<string> {
   const metin = yazi.diller[dil]
   const hedefler = new Set<string>(yazi.urunler.filter((k) => k.startsWith('vh:aile/')))
+  for (const k of yazi.ilgiliKategoriler ?? []) hedefler.add(k)
   if (!metin) return hedefler
   for (const h of baglantilariTopla(markdownAyristir(metin.govde))) {
     if (h.startsWith('vh:kategori/') || h.startsWith('vh:aile/')) hedefler.add(h)
