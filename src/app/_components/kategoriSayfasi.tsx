@@ -28,6 +28,7 @@ import {
 
 import { SITE_URL } from '../../config/siteUrl'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
+import { listeFiyatiniSuz } from '../../lib/pricing/teklifModuSuzgeci'
 import type { DomainCategory } from '../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
@@ -408,7 +409,8 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
     const familiesPage = await getCachedFamilies(lang, tenantId, category.id, page, categoryIds)
     // INV-DIL-DUSUSU-1: aile satırı {tr,en} açıklamayı taşır; kart göstermese de istemciye
     // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
-    families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
+    // URN-142: teklif modunda min_price RSC yüküne girmez (karar `quoteModeHesapla`, kategori metadata'sından).
+    families = listeFiyatiniSuz(familiesPage.items, category).map((f) => aileMetniniIndir(f, lang))
     total = familiesPage.total
 
     // URN-95: Vortice anlatısı yalnız hava perdesi kategorisinde ve Vortice ailesi listeleyen sayfada çizilebilir

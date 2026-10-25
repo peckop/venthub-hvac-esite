@@ -14,6 +14,7 @@ import { type CategoryViewModelLite } from '../../components/home/GuidedCategory
 import { TenantProvider } from '../../hooks/useTenant'
 import { compareText } from '../../i18n/sort'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
+import { listeFiyatiniSuz } from '../../lib/pricing/teklifModuSuzgeci'
 import { toUICategoryList } from '../../lib/type-converters'
 import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
@@ -148,7 +149,8 @@ export async function UrunlerSayfasi({ lang }: { lang: string }) {
   let total = 0
   try {
     const sonuc = await getCachedFamilies(lang, tenantId, page)
-    families = sonuc.items
+    // URN-142: kategori bağlamı yok → mod bilinmiyor → teklif modu; min_price istemci demetine girmez.
+    families = listeFiyatiniSuz(sonuc.items, null)
     total = sonuc.total
   } catch (error) {
     console.warn('Aile listesi alinamadi (/products):', error)
