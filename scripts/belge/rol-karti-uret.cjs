@@ -288,6 +288,71 @@ function isKurallariSorunlari(veri, roller) {
   return s
 }
 
+/**
+ * YOL KAPSAMLI İŞARETÇİ KURAL DOSYASI (HRT-71, OPS 25 Ekim): rolün iş kuralı başlıkları, rolün işine dokunulan dosyada
+ * kendiliğinden bağlama gelsin ("oku" talimatına bağımlı olmasın). `.claude/rules/<rol>.md` ön bölümünde `paths:` taşır;
+ * Claude Code eşleşen dosya Read/Write/Edit ile açılınca yükler (açılışta DEĞİL; `InstructionsLoaded` günlüğünde
+ * `load_reason=path_glob_match`, 25 Ekim başsız deneme). Veri `rol-is-kurallari.json` rol girdisindeki `yollar` alanı;
+ * içerik aynı girdinin madde başlıklarıdır (tam metin ve olaylar kurallar dosyasında). BLOG'un `.claude/rules/blog.md`
+ * dosyası elle yazılır (R10.5 ders başlıkları cetvelden), bu yüzden `YOL_KURALI_ELLE` listesindedir.
+ */
+const YOL_KURALI_DIZINI = '.claude/rules'
+const YOL_KURALI_ELLE = ['filo-ortak.md', 'blog.md']
+const YOL_KURALI_BAYT_SINIRI = 2048
+function yolKuraliAdi(ad) {
+  return `${ad.toLowerCase()}.md`
+}
+/** Madde başlığı: kalın başlık; 50 karakterden kısaysa (tek başına anlamsız) ilk cümlenin başı eklenir. */
+function yolKuraliBaslik(madde) {
+  const m = /^\*\*(.+?)\*\*\s*(.*)$/s.exec(madde)
+  if (!m) return madde.slice(0, 120)
+  const baslik = m[1].trim()
+  if (baslik.length >= 50) return baslik
+  let govde = m[2].split(/\s\(|\.\s/)[0].trim()
+  // Kesik cümle yazılmaz: 150 karakteri aşan ya da yarım kalan (tek sayıda ters tırnak, iki nokta ile biten) gövde atılır.
+  if (govde.length > 150 || (govde.match(/`/g) || []).length % 2 === 1 || /[:+,;]$/.test(govde)) govde = ''
+  return govde ? `${baslik} ${govde.replace(/[.:]$/, '')}.` : baslik
+}
+function yolKurali(ad, veri = IS_KURALLARI) {
+  const r = veri[ad]
+  if (!r || !Array.isArray(r.yollar) || !r.yollar.length) return null
+  return [
+    '---',
+    'paths:',
+    ...r.yollar.map((y) => `  - "${y}"`),
+    '---',
+    '',
+    `# ${ad}: departmana özgü iş kuralları (başlıklar; yol kapsamlı, üretilmiş)`,
+    '',
+    `Üretilmiştir (\`scripts/belge/rol-karti-uret.cjs\`, veri \`scripts/belge/rol-is-kurallari.json\`); elle düzenleme. Yukarıdaki yollardaki dosyaya dokununca yüklenir. Gerekçeli tam metin ve olaylar: \`docs/roller/${ad}-kurallar.md\` "Departmana özgü iş kuralları"; ders listesi aynı dosyada "Aynı ders ikinci kez".`,
+    '',
+    ...r.kurallar.map((k, i) => `${i + 1}. ${yolKuraliBaslik(k)}`),
+    '',
+  ].join('\n')
+}
+function uretYolKurallari(veri = IS_KURALLARI) {
+  const c = {}
+  for (const ad of Object.keys(veri)) {
+    const m = yolKurali(ad, veri)
+    if (m) c[yolKuraliAdi(ad)] = m
+  }
+  return c
+}
+/** Yol kuralı sorunları (boş = temiz): bayt sınırı, ön bölümde paths, elle yazılanlar dışında sahipsiz dosya. */
+function yolKuraliSorunlari(uretilen, diskDosyalari) {
+  const s = []
+  for (const [dosya, metin] of Object.entries(uretilen)) {
+    const bayt = Buffer.byteLength(metin, 'utf8')
+    if (bayt > YOL_KURALI_BAYT_SINIRI) s.push(`${YOL_KURALI_DIZINI}/${dosya}: ${bayt} B > ${YOL_KURALI_BAYT_SINIRI}`)
+    if (!/^---\npaths:\n(  - ".+"\n)+---\n/.test(metin)) s.push(`${YOL_KURALI_DIZINI}/${dosya}: ön bölümde paths yok`)
+    if (YOL_KURALI_ELLE.includes(dosya)) s.push(`${YOL_KURALI_DIZINI}/${dosya}: elle yazılan dosya üreticiden çıkamaz`)
+  }
+  for (const d of diskDosyalari) {
+    if (!YOL_KURALI_ELLE.includes(d) && !uretilen[d]) s.push(`${YOL_KURALI_DIZINI}/${d}: üreticide karşılığı yok (sahipsiz kural dosyası)`)
+  }
+  return s
+}
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -1180,6 +1245,18 @@ function main() {
       console.error(`FARK: docs/roller/${gorevDosyaAdi(ad)}`)
     }
   }
+  const yolKurallari = uretYolKurallari(isKurallariOku(kok))
+  const kuralDizini = path.join(kok, YOL_KURALI_DIZINI)
+  if (yaz) fs.mkdirSync(kuralDizini, { recursive: true })
+  for (const [dosya, metin] of Object.entries(yolKurallari)) {
+    const yol = path.join(kuralDizini, dosya)
+    if (yaz) {
+      fs.writeFileSync(yol, metin, 'utf8')
+    } else if (!fs.existsSync(yol) || fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n') !== metin) {
+      fark++
+      console.error(`FARK: ${YOL_KURALI_DIZINI}/${dosya}`)
+    }
+  }
   const haritaMetin = haritaDosyasi()
   const haritaYol = path.join(dizin, HARITA_DOSYASI)
   if (yaz) {
@@ -1215,6 +1292,10 @@ function main() {
       },
     ),
     ...isKurallariSorunlari(isKurallariOku(kok), Object.keys(ROLLER)),
+    ...yolKuraliSorunlari(
+      yolKurallari,
+      fs.existsSync(kuralDizini) ? fs.readdirSync(kuralDizini).filter((d) => d.endsWith('.md')) : [],
+    ),
     ...altiAlanSorunlari(kartlar, GOREVLER, Object.keys(ROLLER), (d) => fs.existsSync(path.join(kok, d))),
   ]
   for (const x of s) console.error(`SORUN: ${x}`)
@@ -1289,6 +1370,12 @@ module.exports = {
   isKurallariOku,
   isKurallariBolumu,
   isKurallariSorunlari,
+  YOL_KURALI_BAYT_SINIRI,
+  YOL_KURALI_ELLE,
+  yolKurali,
+  yolKuraliAdi,
+  uretYolKurallari,
+  yolKuraliSorunlari,
 }
 
 if (require.main === module) main()
