@@ -170,6 +170,8 @@ const YEDEK_YOKLAMA_ARALIGI_MS = 1000
 const KULLANIM_PENCERESI_MS = 2 * 60 * 60 * 1000
 /** Transcript'in yalnız SONU okunur (ölçüldü: gerçek oturum kaydı 681 MB). */
 const TRANSKRIPT_KUYRUK_BAYT = 600_000
+/** ARC-204: dosya düzenleyen araçlar (kullanım eşleşmesi son düzenleme sonrasına sınırlanır). */
+const DUZENLEME_ARACLARI = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit'])
 /** Stop kilidi bundan eskiyse bayat sayılır ve düşer. */
 const KILIT_BAYATLIK_MS = 60_000
 /**
@@ -226,6 +228,26 @@ function katla(metin) {
 /** Yukarı akım `normalizeTextKey` eşdeğeri (katlamalı). */
 function anahtar(metin) {
   return katla(metin).replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * ARC-204: kullanım eşleşmesinde SAYILMAYAN jenerik sözcükler (katlanmış). Durum tablosu ve rapor
+ * başlıkları her mesajda geçer; bunlarla çakışan ders "kullanıldı" sayılmamalı (HRT-68 kalibrasyonu:
+ * elle doğrulamada uyuşma 2/7). Liste kasıtlı dar: gerçek içerik sözcükleri buraya GİRMEZ.
+ */
+const JENERIK_BELIRTEC = new Set(
+  (
+    'beklemede recep sorumlu durum onerim sirada bitti suruyor kirmizi onayinda baslamadi tablo ' +
+    'senden istenen istemiyor kart karar departman pencere kanban rapor ozet sonuc ders ' +
+    'dosya kanit olculdu olculmedi yapildi yapilacak'
+  ).split(' '),
+)
+/** Kullanım eşleşmesi için en az ortak AYIRT EDİCİ belirteç (OPS: ≥3). */
+const ASGARI_AYIRT_EDICI = 3
+
+/** Belirteç eşleşmede sayılır mı: ≥4 karakter, durak ya da jenerik değil, saf rakam değil. */
+function ayirtEdiciMi(b) {
+  return b.length >= 4 && !DURAK.has(b) && !JENERIK_BELIRTEC.has(b) && !/^[\d.-]+$/.test(b)
 }
 
 /** Yukarı akım `tokenize` eşdeğeri (katlamalı): ≥3 karakter, benzersiz. */
@@ -481,6 +503,7 @@ function transkriptMesajlari(yol, kuyrukBayt = TRANSKRIPT_KUYRUK_BAYT) {
     let ham = tampon.toString('utf8')
     if (size > n) ham = ham.slice(ham.indexOf('\n') + 1)
     const mesajlar = []
+    let sonDuzenleme = null
     for (const satir of ham.split('\n')) {
       if (!satir.trim()) continue
       let o
@@ -492,6 +515,11 @@ function transkriptMesajlari(yol, kuyrukBayt = TRANSKRIPT_KUYRUK_BAYT) {
       if (!o || o.type !== 'assistant' || o.isSidechain === true) continue
       const icerik = o.message && o.message.content
       if (!Array.isArray(icerik)) continue
+      // ARC-204: son Edit/Write/MultiEdit çağrısının zamanı (dosya-kaynaklı dersin kullanımı yalnız bundan SONRA aranır).
+      if (icerik.some((b) => b && b.type === 'tool_use' && DUZENLEME_ARACLARI.has(String(b.name)))) {
+        const te = Date.parse(o.timestamp)
+        if (Number.isFinite(te)) sonDuzenleme = Math.max(sonDuzenleme === null ? te : sonDuzenleme, te)
+      }
       const text = icerik
         .filter((b) => b && b.type === 'text' && typeof b.text === 'string')
         .map((b) => b.text)
@@ -500,6 +528,8 @@ function transkriptMesajlari(yol, kuyrukBayt = TRANSKRIPT_KUYRUK_BAYT) {
       const t = Date.parse(o.timestamp)
       mesajlar.push({ t: Number.isFinite(t) ? t : null, text })
     }
+    // Düzenleme yoksa ya da zaman bilinmiyorsa HİÇBİR mesaj "düzenleme sonrası" değildir (dosya dersi için kullanım sayılmaz).
+    for (const m of mesajlar) m.duzenlemedenSonra = sonDuzenleme !== null && m.t !== null && m.t >= sonDuzenleme
     return mesajlar
   } finally {
     try {
@@ -526,10 +556,14 @@ function eslesirMi(dersMetni, asistanMetni, id) {
   const asistanBelirteci = new Set(belirtecler(asistanMetni))
   if (!asistanBelirteci.size) return false
   if (dersAnahtar.length >= 24 && asistanAnahtar.includes(dersAnahtar.slice(0, 80))) return true
+  // ARC-204 (HRT-68 kalibrasyonu): kesişimde JENERİK belirteçler (durum/tablo sözcükleri) sayılmaz.
+  // Ölçüm: "kullanıldı" denen 7 satırın 5'i yalnız tablo/başlık sözcükleriyle çakışıyordu.
+  const dersAyirt = new Set([...dersBelirteci].filter(ayirtEdiciMi))
+  const asistanAyirt = new Set([...asistanBelirteci].filter(ayirtEdiciMi))
   let kesisim = 0
-  for (const b of dersBelirteci) if (asistanBelirteci.has(b)) kesisim++
-  const kucuk = Math.min(dersBelirteci.size, asistanBelirteci.size)
-  return kesisim >= 3 && kucuk > 0 && kesisim / kucuk >= 0.5
+  for (const b of dersAyirt) if (asistanAyirt.has(b)) kesisim++
+  const kucuk = Math.min(dersAyirt.size, asistanAyirt.size)
+  return kesisim >= ASGARI_AYIRT_EDICI && kucuk > 0 && kesisim / kucuk >= 0.5
 }
 
 /** Aynı ID'nin birden çok satırını turlara böler: her tur ID başına TEK satır (tek sayım). */
@@ -636,7 +670,15 @@ async function sayacIsle({
         // ⭐HER YANIT AYRI (yukarı akım gibi): mesajlar birleştirilmez — bkz. başlık, ORTA-1.
         eslesen = pencere.filter((s) => {
           const t0 = Date.parse(s.t)
-          return mesajlar.some((m) => (m.t === null || m.t >= t0 - 1000) && eslesirMi(s.metin, m.text, s.id))
+          // ARC-204: dosya-kaynaklı ders yalnız SON Edit/Write sonrası asistan metninde aranır (açıkça false ise atla;
+          // enjekte edilen test okuyucularında alan yoksa eski davranış). Konu-kaynaklı ders düzenlemeye bağlı değildir.
+          const duzenlemeSart = s.kaynak === 'dosya'
+          return mesajlar.some(
+            (m) =>
+              (m.t === null || m.t >= t0 - 1000) &&
+              !(duzenlemeSart && m.duzenlemedenSonra === false) &&
+              eslesirMi(s.metin, m.text, s.id),
+          )
         })
       }
     }
@@ -930,6 +972,9 @@ async function hijyenKancasi() {
 
 module.exports = {
   sorguMetni,
+  ayirtEdiciMi,
+  JENERIK_BELIRTEC,
+  ASGARI_AYIRT_EDICI,
   ASGARI_ISTEM_KARAKTER,
   ARAMA_LIMITI,
   EN_FAZLA_DERS,
