@@ -26,6 +26,10 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['vortice-aksiyel-endustriyel-fanlar', 'Vortice Aksiyel Endüstriyel Fanlar'],
     // Sessiz fan nasıl seçilir yazısı (BLG-15, 2026-10-17): aile canlı site haritasında 200 verir.
     ['vortice-lineo-quiet-sessiz-kanal-fanlari', 'Vortice Lineo Quiet Sessiz Kanal Fanları'],
+    // Kanal tipi fan nedir yazısı (BLG-18, 2026-10-26): aile sayfaları canlıda 200 verir (25 Ekim ölçümü).
+    ['vortice-lineo-kanal-fanlari', 'Vortice Lineo Kanal Fanları'],
+    ['vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari', 'Vortice VORT Commercial In-Line Yuvarlak Kanal Fanları'],
+    ['vortice-radon-serisi-kanal-fanlari', 'Vortice Radon Serisi Kanal Fanları'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {

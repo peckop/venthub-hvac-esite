@@ -9,7 +9,7 @@ import BilgiMerkeziListe from '../../../views/knowledge/BilgiMerkeziListe'
 import IlgiliRehberler from '../../../views/knowledge/IlgiliRehberler'
 import RehberYazisiSayfasi from '../../../views/knowledge/RehberYazisiSayfasi'
 import { yaziSayfasiHazirla } from '../sayfa'
-import { ilgiliRehberler } from '../tersDizin'
+import { enYeniRehberler, ilgiliRehberler } from '../tersDizin'
 import { ORNEK_YAZI } from './ornekYazi'
 import { sahteKaynak } from './sahteKaynak'
 
@@ -90,7 +90,10 @@ describe('kart özeti data-nosnippet içinde basılır — her yüzey', () => {
 
   it('⭐ana sayfa Bilgi bloğu', () => {
     const { container } = render(<KnowledgeBlock dictionary={tr.home.knowledge} finalCtaDict={tr.home.finalCta} lang="tr" />)
-    for (const o of OZETLER) expect(container.textContent).toContain(o)
+    // Blok yalnız en yeni rehberleri basar (varsayılan 3); dördüncü yazıyla en eski çıkar (BLG-18).
+    const blokOzetleri = enYeniRehberler('tr').map((r) => r.kartOzeti)
+    expect(blokOzetleri.length).toBeGreaterThan(0)
+    for (const o of blokOzetleri) expect(container.textContent).toContain(o)
     expect(nosnippetDisindakiOzetler(container, OZETLER)).toEqual([])
     expect(container.querySelectorAll('a[data-nosnippet]').length).toBe(0)
   })
