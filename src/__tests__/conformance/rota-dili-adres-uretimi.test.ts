@@ -34,6 +34,7 @@ afterEach(() => {
   vi.doUnmock('@/lib/supabase/static')
   vi.doUnmock('@/lib/services/category.service')
   vi.doUnmock('@/lib/services/family.service')
+  vi.doUnmock('@/config/legal')
   vi.unstubAllEnvs()
   vi.resetModules()
 })
@@ -57,6 +58,13 @@ async function yukle(anahtar: string | undefined, enYayin = false) {
 /** Sahte katalogla site haritası (sitemapModel.test.ts kalıbı). */
 async function siteHaritasi(anahtar: string | undefined, enYayin: boolean) {
   const m = await yukle(anahtar, enYayin)
+  // URN-140 (SEO-61): taslak yasal sayfalar (`yasalDizinDisi()`) site haritasında YOK. Bu dosya ADRES ÜRETİMİNİ ölçer ve fikstür
+  // yasal satırları da taşır; o satırların adresleri kapsamda kalsın diye dizin kararı burada "dizine açık" sabitlenir.
+  // Dizin kararının kendisi (iki durum) `src/app/__tests__/sitemapYasalDizin.test.ts`'te ölçülür.
+  vi.doMock('@/config/legal', async (orijinal) => ({
+    ...(await orijinal<typeof import('@/config/legal')>()),
+    yasalDizinDisi: () => false,
+  }))
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://gercek.supabase.co')
   vi.doMock('@/lib/supabase/static', () => {
     const zincir = {

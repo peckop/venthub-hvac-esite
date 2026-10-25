@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
+import { yasalDizinDisi } from '../config/legal'
 import { SITE_URL } from '../config/siteUrl'
 import { sitemapModelMi } from '../config/yayindaModeller'
 import { HVAC_BRANDS } from '../data/brands'
@@ -27,6 +28,8 @@ import { adresDili, adresRotalari, kategoriArgumanlari } from '../utils/yuzeyAdr
  */
 export const revalidate = 21600
 
+/** Arama dizinine girebilen yasal sayfalar (haritaya yalnız `yasalDizinDisi()` false iken yazılır; bkz. `staticRoutesList`). */
+const YASAL_HARITA_ROTALARI = ['/legal/kvkk', '/legal/gizlilik-politikasi', '/legal/cerez-politikasi']
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
@@ -113,9 +116,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // `/cart` YOK (PR-1, bot karnesi 2026-09-24): sepet X-Robots noindex taşır; dizine
     // kapalı adresi site haritasında ilan etmek Search Console'da "gönderildi ama noindex"
     // hatası üretir.
-    '/legal/kvkk',
-    '/legal/gizlilik-politikasi',
-    '/legal/cerez-politikasi',
+    // Yasal sayfalar (KVKK, gizlilik, çerez) AYNI KURALLA: taslakken `noindex, follow` basarlar (URN-97,
+    // `yasalDizinDisi`), bu yüzden haritada YOK (URN-140, GEO-SEO SEO-61: üçü canlı haritada duruyordu). Hukukçu teyidi ve
+    // satıcı bilgileri tamamlanınca `yasalDizinDisi()` false olur ve satırlar kendiliğinden geri gelir (sayfanın robots'u
+    // ile harita AYNI işlevden okur; ayrışamaz). EN karşılıkları aynı listeden `locales` ile üretildiği için aynı kurala bağlı.
+    ...(yasalDizinDisi() ? [] : YASAL_HARITA_ROTALARI),
   ]
 
   // REC-300 Faz 3e-1: TÜM ürün/kategori/marka/aile adresleri `adresUret` katmanından (`yuzeyAdresleri`) gelir;

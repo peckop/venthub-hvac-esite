@@ -267,7 +267,11 @@ describe('4. ADRES ÜRETİMİ (açık kip) — iç bağlantı, kanonik, hreflang
     const { satirlar, SITE_URL } = await siteHaritasi(true)
     const urller = new Set(satirlar.map((s) => s.url))
     const sitemapteki = TABLO.filter((s) => [...urller].some((u) => u === `${SITE_URL}/tr/${s.tr}`))
-    expect(sitemapteki.map((s) => s.id)).toEqual(expect.arrayContaining(['hakkimizda', 'iletisim', 'secici', 'yasal-kvkk', 'yasal-gizlilik', 'yasal-cerez']))
+    // URN-140 (SEO-61): taslak yasal sayfalar `noindex` olduğu için haritada YOK (`yasalDizinDisi`); hazır olunca geri gelir.
+    const yasalUc = ['yasal-kvkk', 'yasal-gizlilik', 'yasal-cerez']
+    const ids = sitemapteki.map((s) => s.id)
+    expect(ids).toEqual(expect.arrayContaining(['hakkimizda', 'iletisim', 'secici', ...(isLegalContentReady() ? yasalUc : [])]))
+    if (!isLegalContentReady()) for (const id of yasalUc) expect(ids, `${id} taslakken haritada olmamalı`).not.toContain(id)
     for (const s of sitemapteki) {
       for (const dil of DILLER) {
         expect(urller.has(`${SITE_URL}/${dil}/${s[dil]}`), `${s.id} ${dil} yeni adres`).toBe(true)

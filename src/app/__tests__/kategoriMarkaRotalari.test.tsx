@@ -301,8 +301,9 @@ describe('eski marka rotası — bugünküyle aynı', () => {
   it('üst veri BİREBİR bugünkü', async () => {
     const m = await markaEskiUst(p({ lang: 'tr', slug: 'avens' }))
     // REC-497: şablon kalktı; açıklama markanın kendi kaydından, marka adı başta, ilk cümlede biter.
-    // BLG-6 (10-09): kayıt metni kanıtlı katalog olgusuna çevrildi; 160 karakterde kırpılır.
-    const aciklama = 'Avens: Türkiye merkezli havalandırma markası. Katalogda kanal ısıtıcıları, sulu bataryalar, ısı geri kazanım cihazları, sığınak havalandırma üniteleri ve…'
+    // BLG-6 (10-09): kayıt metni kanıtlı katalog olgusuna çevrildi. URN-140 (SEO-61): azami (155) içinde cümle sonu olmayan tek
+    // uzun cümle "…" ile kesilmez, esnek tavana (300) kadar TAM cümle olarak gider (eski beklenti "…üniteleri ve…" idi).
+    const aciklama = 'Avens: Türkiye merkezli havalandırma markası. Katalogda kanal ısıtıcıları, sulu bataryalar, ısı geri kazanım cihazları, sığınak havalandırma üniteleri ve radyal fanlar yer alır.'
     expect(m).toEqual({
       title: 'Avens Ürünleri ve Çözümleri | VentHub',
       description: aciklama,

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { HVAC_BRANDS } from '@/data/brands'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
-import { ACIKLAMA_ASGARI, ACIKLAMA_AZAMI, aciklamaKirp } from '@/lib/seo/aciklamaKirp'
+import { ACIKLAMA_ASGARI, ACIKLAMA_AZAMI, ACIKLAMA_ESNEK_AZAMI, aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { ovguVarMi } from '@/lib/seo/ovguAyikla'
 import type { DomainCategory } from '@/lib/type-converters'
 
@@ -73,7 +73,11 @@ describe('marka açıklaması', () => {
       const aciklamalar = HVAC_BRANDS.map((b) => ({ ad: b.name, d: String(markaUstVerisi(lang, b.slug).description) }))
       for (const { ad, d } of aciklamalar) {
         expect(d.length, `${ad}: ${d}`).toBeGreaterThanOrEqual(ACIKLAMA_ASGARI)
-        expect(d.length, `${ad}: ${d}`).toBeLessThanOrEqual(ACIKLAMA_AZAMI)
+        // URN-140 (SEO-61): azami içinde cümle sonu olmayan tek uzun cümle esnek tavana kadar TAM cümle olarak gider;
+        // "…" ile cümle ortasında kesilmiş marka açıklaması kalmaz.
+        expect(d.length, `${ad}: ${d}`).toBeLessThanOrEqual(ACIKLAMA_ESNEK_AZAMI)
+        expect(d, `${ad}: cümle ortasında kesik`).not.toMatch(/…$/)
+        expect(d, `${ad}: cümle işaretiyle bitmeli`).toMatch(/[.!?]$/)
         expect(d.toLowerCase(), `${ad} adı geçmeli`).toContain(ad.toLowerCase())
         expect(d, `${ad} övgü kalıbı`).not.toMatch(YASAK_OVGU)
         expect(ovguVarMi(d), `${ad} üstünlük iddiası (üretici sitesinden gelen "lider/en geniş/öncü"): ${d}`).toBe(false)
