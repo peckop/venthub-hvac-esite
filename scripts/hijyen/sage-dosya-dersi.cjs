@@ -121,6 +121,51 @@ function capaGucu(anchors, goreli) {
   return en
 }
 
+/** Küçük harf + Türkçe harfleri ASCII'ye katlar (alaka karşılaştırması için). */
+function katlaKucuk(s) {
+  return String(s || '')
+    .replace(/İ/g, 'i')
+    .toLowerCase()
+    .replace(/[çğıöşü]/g, (h) => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u' })[h])
+}
+
+/** Yol parçalarından çıkarılan ama AYIRT ETMEYEN sözcükler (her dosyada geçer). */
+const JENERIK_YOL_PARCASI = new Set([
+  'src', 'docs', 'scripts', 'tests', 'test', 'hooks', 'claude', 'conformance', 'index', 'types', 'lib',
+  'components', 'utils', 'app', 'views', 'agents', 'rules', 'skills', 'tools', 'board', 'hijyen', 'audits', 'plans',
+  'standards', 'node', 'json', 'cjs', 'mjs', 'tsx', 'spec', 'kurallar', 'roller', 'standard', 'gorevler', 'audit',
+  'envanteri', 'durum', 'serit', 'product', 'data',
+])
+
+/**
+ * ARC-204 (HRT-68 kalibrasyonu): rastgele 15 gösterimin 10'unda ders dosyanın işiyle ilgisizdi — geniş
+ * DİZİN çapası (ör. `docs`, `src`, `scripts`) altındaki her dosyada basılıyordu. Kural: ders DOSYA çapasıyla
+ * (güç ≥ 0,9) eşleşmişse alakalıdır. Yalnız dizin/paket çapasıyla eşleşmişse ŞU ikisinden biri aranır:
+ *  (a) eşleşen çapa yolu ≥3 parçalı (dar dizin: `src/lib/services` gibi; 1-2 parçalı `src`, `docs/audits`,
+ *      `.claude/hooks` onlarca dosyayı kapsar — ölçüm: son 7 gün, 75 dosya, eski 236 gösterimin 113'ü elendi) ya da
+ *  (b) ders metni dosyanın yolundaki en az bir AYIRT EDİCİ sözcüğü (≥4 karakter, jenerik değil) taşır.
+ * İkisi de yoksa ders basılmaz (sessiz: sıcak yol bu kancanın sözleşmesi).
+ */
+function alakaliMi(anchors, goreli, metin) {
+  const g = capaGucu(anchors, goreli)
+  if (g >= CAPA_GUCU.file) return true
+  let enDar = 0
+  for (const a of anchors || []) {
+    if (!a || typeof a.path !== 'string' || a.type === 'file') continue
+    const p = a.path.split(path.sep).join('/').replace(/^\.\//, '')
+    if (goreli === p || goreli.startsWith(p + '/')) enDar = Math.max(enDar, p.split('/').filter(Boolean).length)
+  }
+  if (enDar >= 3) return true
+  const govde = katlaKucuk(metin)
+  const parcalar = katlaKucuk(goreli)
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t.length >= 4 && !/^\d+$/.test(t) && !JENERIK_YOL_PARCASI.has(t))
+  // Tek kısa sözcük çakışması (ör. "canli", "izin") tesadüftür: ≥2 ayırt edici sözcük YA DA ≥7 karakterlik bir sözcük şart.
+  const eslesen = [...new Set(parcalar)].filter((t) => new RegExp(`(^|[^a-z0-9])${t}`).test(govde))
+  // Yolda tek ayırt edici sözcük varsa (ör. `hedef.ts`) tek eşleşme yeter.
+  return (eslesen.length > 0 && eslesen.length >= Math.min(2, parcalar.length)) || eslesen.some((t) => t.length >= 7)
+}
+
 /**
  * Ders metnini TEK SATIRA indirir — ama KIRPMAZ.
  *
@@ -181,6 +226,7 @@ function dersleriBul(kok, dosya, simdi = Date.now(), dbKok = kok) {
       }
       const g = capaGucu(d.anchors, goreli)
       if (!g) continue
+      if (!alakaliMi(d.anchors, goreli, d.text)) continue // ARC-204: geniş dizin çapasıyla gelen ilgisiz ders basılmaz
       // Puan yalnız SIRALAMA için; süzgeç `asgari önem` (bkz. başlık, 0.72 niçin alınmadı).
       const puan = g * Number(s.importance || 0)
       dersler.push({ id: s.id, kind: s.kind, puan, metin: tekSatir(d.text) })
@@ -344,6 +390,7 @@ module.exports = {
   goreliYol,
   yolAdaylari,
   capaGucu,
+  alakaliMi,
   tekSatir,
   dersleriBul,
   bicimlendir,

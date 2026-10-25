@@ -83,7 +83,12 @@ function depoKur(): string {
     { type: 'file', path: 'src/lib/hedef.ts' },
   ])
   // Dizin çapası: önem 0.6 ≥ 0.5 → GÖRÜNÜR. (0.72 puan eşiği alınmadı; sebebi modül başlığında.)
-  ekle('m-dizin', 'DIZIN DERSI: dizin capasi da gorunur.', 'command_note', 0.6, [
+  // ARC-204 (HRT-68): geniş dizin çapası YALNIZ ders dosyanın işiyle ilgiliyse görünür ("hedef" dosya adı metinde geçer).
+  ekle('m-dizin', 'DIZIN DERSI: hedef modulu icin dizin capasi da gorunur.', 'command_note', 0.6, [
+    { type: 'directory', path: 'src/lib' },
+  ])
+  // Aynı dizin çapası, ama dosyayla İLGİSİZ metin: basılmamalı (rastgele 15 gösterimin 10'u ilgisizdi).
+  ekle('m-dizin-ilgisiz', 'ILGISIZ DIZIN DERSI: tamamen baska bir konu anlatir.', 'command_note', 0.9, [
     { type: 'directory', path: 'src/lib' },
   ])
   // Önem tabanının ALTINDA: tek süzgeç bu ve gerçekten süzmeli.
@@ -148,6 +153,7 @@ describe('INV-SAGE-DERS-1 · capali sage dersi dokunulan dosyada gorunur', () =>
     // Önem tabanı ve silinmiş kayıt: ikisi de görünmez.
     expect(birinci.stdout, 'onem tabaninin ALTINDAKI ders basildi').not.toContain('ONEMSIZ DERS')
     expect(birinci.stdout, 'status=deleted kayit gorundu').not.toContain('SILINMIS DERS')
+    expect(birinci.stdout, 'dosyayla ilgisiz genis dizin dersi basildi (ARC-204)').not.toContain('ILGISIZ DIZIN DERSI')
 
     const ikinci = kancayiKos(kok, pano, 'oturum-a', hedef)
     expect(ikinci.stdout, 'ayni dosya IKINCI kez ders basti — dosya basina bir kez kurali yok').toBe('')

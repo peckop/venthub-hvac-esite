@@ -174,8 +174,44 @@ for (const b of [...belgeler.values()].sort((x, y) => x.dosya.localeCompare(y.do
   }
 }
 
+// ── --liste=<belge-listesi.csv> (KTL-59): kanıtlı birleşik liste (belge-listesi-birlestir.mjs) VARSA,
+// listedeki belgelerin aile bağı o listeden gelir (sha256 ile eşleşir); heuristik yalnız listede
+// OLMAYAN belgelere (web metinleri) kalır. Liste, bağı model simgesinin PDF metninde geçtiği sayfayla
+// sınar; heuristik dizin adından tahmin eder. İki kaynak çelişirse liste kazanır.
+const LISTE = arg('liste', '')
+const EK = ['doc_type', 'dil', 'dil_sayfa_dagilimi', 'baski_durumu', 'baski_kiyasi', 'baski_kiyasi_kanit', 'yayin_onerisi', 'bag_kaniti']
+if (LISTE) {
+  if (!existsSync(LISTE)) { console.error(`ÖLÇÜLEMEDİ — liste yok: ${LISTE}`); process.exit(2) }
+  const t = readFileSync(LISTE, 'utf8').replace(/^﻿/, '').split(/\r?\n/).filter(Boolean)
+  const kolonlar = t[0].split(';')
+  const satir = (l) => { const c = []; let cur = '', q = false; for (const ch of l) { if (ch === '"') q = !q; else if (ch === ';' && !q) { c.push(cur); cur = '' } else cur += ch } c.push(cur); return Object.fromEntries(kolonlar.map((k, i) => [k, c[i]])) }
+  const liste = t.slice(1).map(satir)
+  const listeSha = new Set(liste.map(r => r.sha256))
+  const aileAd = new Map(aileler.map(a => [a.slug, a]))
+  const dosyaOf = new Map([...belgeler.values()].map(b => [b.sha256, b]))
+  for (let i = satirlar.length - 1; i >= 0; i--) if (listeSha.has(satirlar[i].sha256)) satirlar.splice(i, 1)
+  bagli = 0; bagsiz = 0
+  for (const r of liste) {
+    const b = dosyaOf.get(r.sha256)
+    if (!b) { console.error(`ÖLÇÜLEMEDİ — liste sha256'sı kaynak dizininde yok: ${r.kaynak_yol}`); process.exit(2) }
+    const a = r.aile_slug ? aileAd.get(r.aile_slug) : null
+    if (r.aile_slug && !a) { console.error(`ÖLÇÜLEMEDİ — canlıda aile yok: ${r.aile_slug}`); process.exit(2) }
+    const parcalar = b.dosya.split('/')
+    satirlar.push({
+      dosya: b.dosya, dosya_adi: parcalar[parcalar.length - 1], tur: b.tur, marka: markaAdi(b.dosya),
+      sayfa_sayisi: b.sayfa, aile: a ? a.name : '', aile_slug: r.aile_slug, urun_sayisi: a ? (urunSayisi.get(a.id) || 0) : '',
+      eslesme_kaynagi: a ? 'kanitli (KTL-58)' : 'marka geneli', sha256: b.sha256, url: b.url, url_kaynagi: b.url_kaynagi,
+      doc_type: r.tur, dil: r.dil, dil_sayfa_dagilimi: r.dil_sayfa_dagilimi, baski_durumu: r.baski_durumu,
+      baski_kiyasi: r.baski_kiyasi, baski_kiyasi_kanit: r.baski_kiyasi_kanit,
+      yayin_onerisi: r.yayin_onerisi, bag_kaniti: r.kanit,
+    })
+    a ? bagli++ : bagsiz++
+  }
+  satirlar.sort((x, y) => x.dosya.localeCompare(y.dosya) || x.aile_slug.localeCompare(y.aile_slug))
+}
+
 const BASLIK = ['dosya', 'dosya_adi', 'tur', 'marka', 'sayfa_sayisi', 'aile', 'aile_slug',
-  'urun_sayisi', 'eslesme_kaynagi', 'sha256', 'url', 'url_kaynagi']
+  'urun_sayisi', 'eslesme_kaynagi', 'sha256', 'url', 'url_kaynagi', ...(LISTE ? EK : [])]
 const yol = join(HEDEF, 'belgeler.csv')
 writeFileSync(yol, BOM + [BASLIK.join(';'),
   ...satirlar.map(r => BASLIK.map(b => csvHucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')

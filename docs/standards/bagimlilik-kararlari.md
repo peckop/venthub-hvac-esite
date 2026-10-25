@@ -251,9 +251,11 @@ imkânsız; yol derleme zamanı araçları: `@sentry/webpack-plugin` → `unplug
 `fast-glob`/`micromatch`/`chokidar`. Desenleri **bizim yapılandırma dosyalarımız** verir, kullanıcı girdisi
 braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk kabul satırı tavanı 0 → 1 yaptı (OPS hükmü, 10-05).
 
+⭐**2026-10-25 — BEŞİNCİ KAYIT, KAPATILAMADI (ALT-100):** `braces` kaydı kapandı (audit artık vermiyor, bayat kabul silindi). Yerine `GHSA-mrhx-c7xc-m3w5` (`zod` <4.6.6, bellek tüketimi) girdi: düzeltme yalnız ana sürümde (zod 4), bizde `^3.24.1`. Tavan 1 kalır (braces çıktı, zod girdi). Kabul OPS hükmüne bağlıdır. Aynı gün `dompurify` 3.4.16→3.4.17 (iki kayıt: `GHSA-cg2g-xh64-v4q7` kritik, `GHSA-mrv2-3pqr-j5jr` yüksek) ve `undici` 7.29.1→7.30.1 (`GHSA-xjj6-f33q-929c`) kilit dosyasında geçişli paket olarak yükseltilerek kapandı (override yok); `next` iki kaydı #1999 ile kapanır.
+
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
-| `GHSA-vfj7-8cjw-p6xm` | braces | high | 2026-10-05 | derleme zamanı (sentry webpack-plugin, tailwind); düzeltme sürümü yok; desenler bizim dosyalarımızdan, kullanıcı girdisi ulaşmaz | `npm view braces version` 3.0.3'ten büyük VE `pnpm why braces` çıktısındaki tüm tüketiciler onu çekiyor; ya da `pnpm audit --prod` bu kaydı artık vermiyor |
+| `GHSA-mrhx-c7xc-m3w5` | zod 3.25.76 | high | 2026-10-25 | zod <4.6.6 sınırlı koleksiyon doğrulamasında bellek tüketimi (DoS); düzeltme yalnız 4.6.6+ (ana sürüm, bizde `^3.24.1`, 3.x'te yama yok). Kullanım yalnız 8 dosya: admin form pencereleri ve admin görünümleri (istemci tarafı alan doğrulama); depoda `z.array(` kullanımı YOK, sunucu yanıt yolunda ve herkese açık girdide yok | zod 4 göçü (kendi işi: şema sözdizimi ve `zodResolver` uyumu ölçülür) VE `pnpm audit --prod` bu kaydı artık vermiyor |
 
 ## 7a · KABUL EDİLMİŞ ORTA ÖNEMLİ KAYITLAR — ALT-95 (OPS hükmü, 2026-10-16)
 

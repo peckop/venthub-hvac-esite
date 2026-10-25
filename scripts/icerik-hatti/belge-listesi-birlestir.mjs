@@ -74,7 +74,7 @@ const SIMGE = {
   'vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari': /CA[\s-]*IL\s*\d{4}|RECT/i,
   'vortice-ad-isiticisiz-hava-perdeleri': /\bAD\s*(900|1200|1500)\b/,
   'vortice-h-ad-elektrikli-isiticili-hava-perdeleri': /\bH\s*AD\s*\d/,
-  'vortice-vort-hr-isi-geri-kazanim': /AVEL|NETI|INVISIBLE/i,
+  'vortice-vort-hr-isi-geri-kazanim': /\b(AVEL|NETI|INVISIBLE)\b/i,   // \b: "magNETIc" içindeki NETI yanlış pozitifti (bağımsız doğrulayıcı, KTL-59)
   'vortice-deumido-nem-alma-cihazlari': /DEUMIDO\s*NG|\bNG\s*(10|16|20)\b/i,
   'vortice-lineo-kanal-fanlari': /LINEO\s*\d{3}(?!\s*QUIET)/i,
   'vortice-lineo-quiet-sessiz-kanal-fanlari': /QUIET/i,
@@ -101,9 +101,9 @@ const BAG = {
   'AJ275648114271en-001201.pdf': { a: ['danfoss-vlt-hvac-basic-drive-fc-101'], tur: 'kilavuz', yayin: Y, not: 'tasarım kılavuzu' },
   'AJ275648114271en-US1001.pdf': { a: ['danfoss-vlt-hvac-basic-drive-fc-101'], tur: 'kilavuz', yayin: 'hayir: eski baskı (ABD), yerini AJ275648114271en-001201 aldı' },
   'AJ361178983102en-000401.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'kilavuz', yayin: Y, not: 'tasarım kılavuzu' },
-  'AM447245614445en-000101.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'teknik_foy', yayin: Y },
+  'AM447245614445en-000101.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'teknik_foy', yayin: 'dogrulanacak: 2014.09 fact sheet; Danfoss'+"'"+'ta 31 Mart 2023 fact sheet var, kodla eşleşmedi', not: 'FC51-DataSheet.pdf ile aynı ürünün iki eski fact sheet baskısı' },
   'AQ276736419659en-000101.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'kilavuz', yayin: Y, not: 'kullanım kılavuzu; belgeler.csv marka geneli diyordu' },
-  'FC51-DataSheet.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'teknik_foy', yayin: Y },
+  'FC51-DataSheet.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'teknik_foy', yayin: 'dogrulanacak: 2019.11 datasheet (afi-systems aynası); Danfoss'+"'"+'ta 31 Mart 2023 fact sheet var', not: 'AM447245614445 ile aynı ürünün iki eski fact sheet baskısı' },
   'fc51Design-Guide.pdf': { a: ['danfoss-vlt-micro-drive-fc-51'], tur: 'kilavuz', yayin: 'hayir: eski baskı, yerini AJ361178983102en-000401 aldı' },
   'AJ361178969194en-000301.pdf': { a: ['danfoss-vlt-hvac-drive-fc-102'], tur: 'kilavuz', yayin: Y, not: '110–800 kW' },
   'FC102_1.1-90kW_DesignGuide_AJ299549559248en-002001.pdf': { a: ['danfoss-vlt-hvac-drive-fc-102'], tur: 'kilavuz', yayin: Y, not: '1,1–90 kW' },
@@ -116,8 +116,8 @@ const BAG = {
   'MCC_NIG_ADH-AT-RDE-RZR_Catalog_EN.pdf': { a: ['nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar', 'nicotra-gebhardt-at-cift-emisli-radyal-fanlar', 'nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar'], tur: 'katalog', yayin: Y },
   '481-series-rdh.pdf': { a: ['nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar'], tur: 'katalog', yayin: Y },
   '479-series-adh.pdf': { a: ['nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar'], tur: 'katalog', yayin: Y },
-  'FXQejq7tfTOtLQypNJrYMGjORsBaF6yz0G208fqW.pdf': { a: ['seat-serisi'], tur: 'teknik_foy', yayin: Y, not: 'SEAT serisi özellik föyü; dosya adı anlamsız, yayında yeniden adlandırılmalı; belgeler.csv marka geneli diyordu' },
-  'Installation-guide_ATEX_fans_english1.pdf': { a: [], tur: 'kilavuz', yayin: Y, not: 'marka geneli: SEAT ATEX fan kurulum kılavuzu (2011), marka sayfasında; envanter "eski" diyor ama yerine geçen kurulum kılavuzu yok' },
+  'FXQejq7tfTOtLQypNJrYMGjORsBaF6yz0G208fqW.pdf': { a: ['seat-serisi'], tur: 'teknik_foy', yayin: 'dogrulanacak: SEAT serisi özellik föyü ama üreticideki karşılığı bulunamadı (kimlik ve baskı belirsiz, sha 8f5bd46b…)', not: 'dosya adı anlamsız; belgeler.csv marka geneli diyordu' },
+  'Installation-guide_ATEX_fans_english1.pdf': { a: [], tur: 'kilavuz', yayin: 'dogrulanacak: SEAT ATEX fan kurulum kılavuzu (2011); envanter "eski" diyor, yerine geçen kılavuz ölçülmedi (2024 broşürü kurulum içeriği taşımayabilir)', not: 'marka geneli, güvenlik (ATEX) içerikli; yayından önce üreticide güncel kılavuz aranmalı' },
   'JET-20-Specifications.pdf': { a: ['jet-serisi'], tur: 'teknik_foy', yayin: 'hayir: eski baskı, yerini seat-brochure-2024-11 aldı' },
   'JET-25-Specifications.pdf': { a: ['jet-serisi'], tur: 'teknik_foy', yayin: 'hayir: eski baskı, yerini seat-brochure-2024-11 aldı' },
   'JET-30-Specifications.pdf': { a: ['jet-serisi'], tur: 'teknik_foy', yayin: 'hayir: eski baskı, yerini seat-brochure-2024-11 aldı' },
@@ -152,7 +152,7 @@ const BAG = {
   'Doc_Pubblicita_VORT_HR_W-ALL_100_DF_193392.pdf': { a: [], tur: 'katalog', yayin: 'hayir: canlıdaki VORT HR modelleri bu katalogda yok', not: 'Design eşlemesi doğrulanmadı' },
   'nrg-range-175696-isi-geri-kazanim.pdf': { a: [], tur: 'katalog', yayin: 'hayir: eski baskı ve canlı modeller yok' },
   'vort-hr-w-all-100-df.pdf': { a: [], tur: 'katalog', yayin: 'hayir: eski baskı ve canlı modeller yok' },
-  'vortice-brochure-mev.pdf': { a: ['vortice-vort-hr-isi-geri-kazanim'], tur: 'katalog', yayin: 'hayir: mükerrer (vortice_vort_mono_range_new.pdf ile aynı belge), güncel baskı MEV 188510' },
+  'vortice-brochure-mev.pdf': { a: ['vortice-vort-mono'], tur: 'katalog', yayin: 'hayir: eski baskı (VORT MONO RANGE), yerini vortice-vort-mono-wifi-189860 aldı; vortice_vort_mono_range_new.pdf ile aynı bayt', not: 'dosya adı yanlış: içerik MEV değil VORT MONO; KTL-59 doğrulayıcısı düzeltti (önceki sürüm VORT HR bağı kurmuştu, regex "magNETIc" yanlış pozitifi)' },
   'vortice-mev-iot-188510.pdf': { a: ['vortice-vort-hr-isi-geri-kazanim'], tur: 'katalog', yayin: Y, not: 'Design bu dosyayı iki parçaya bölmüş (s.1–82, s.83–164); yayında tek dosya' },
   'Doc_Pubblicita_Residential_Ventilation2024_186926.pdf': { a: ['vortice-punto-evo-flexo-banyo-fanlari', 'vortice-vort-quadro-evo'], tur: 'katalog', yayin: Y, not: 'Design Bravo S ailesine de bağlıyordu; katalogda BRA.VO 0 sayfa, bağ kaldırıldı' },
   'ResidentialVentilation.pdf': { a: [], tur: 'katalog', yayin: 'hayir: eski baskı, yerini Residential Ventilation 2024 186926 aldı', not: 'marka geneli' },
@@ -166,7 +166,7 @@ const BAG = {
   '2022-11-en-ca-rm-es-radon.pdf': { a: ['vortice-radon-serisi-kanal-fanlari', 'vortice-radon-serisi-cati-fanlari'], tur: 'katalog', yayin: 'hayir: eski baskı (2022-11), yerini CA RADON 178112 aldı' },
   'Doc_Pubblicita_CA_RADON_178112.pdf': { a: ['vortice-radon-serisi-kanal-fanlari', 'vortice-radon-serisi-cati-fanlari'], tur: 'katalog', yayin: Y },
   'vortice-vort-mono-wifi-189860.pdf': { a: ['vortice-vort-mono'], tur: 'katalog', yayin: Y, not: 'Design bu dosyayı iki parçaya bölmüş; yayında tek dosya' },
-  'vortice_vort_mono_range_new.pdf': { a: [], tur: 'katalog', yayin: 'hayir: dosya adı yanlış (içerik MEV broşürü), vortice-brochure-mev.pdf ile mükerrer' },
+  'vortice_vort_mono_range_new.pdf': { a: ['vortice-vort-mono'], tur: 'katalog', yayin: 'hayir: eski baskı (VORT MONO RANGE), yerini vortice-vort-mono-wifi-189860 aldı; vortice-brochure-mev.pdf ile aynı bayt' },
   'Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_179649.pdf': { a: ['vortice-vort-quadro-evo'], tur: 'katalog', yayin: Y },
   'Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_4.pdf': { a: ['vortice-vort-quadro-evo'], tur: 'katalog', yayin: 'hayir: eski baskı, yerini 179649 aldı' },
   'vortice-bravo-s.pdf': { a: ['vortice-bravo-s'], tur: 'teknik_foy', yayin: 'dogrulanacak: tek sayfalık hava kalitesi ölçer broşürü; envanter de üreticide karşılığını ölçemedi (OPS-119)', kanit: 'dosya adı ve dizin adı (tek sayfa, model adı görselde, metinde yok)' },
@@ -178,13 +178,35 @@ for (const s of envanter.satirlar) {
   if (/^avensair-ADH-/.test(s.dosya)) BAG[s.dosya] = { a: ['nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar'], tur: 'teknik_foy', yayin: 'hayir: resmi değil (bayi föyü)' }
 }
 
-// ── Dil: ilk 8 sayfadaki işlev kelimelerinden (en az 3 eşleşme). Tahmindir; sütun adı bunu söyler.
-const DIL = { tr: /\b(ve|için|ile|bir|fiyat|liste)\b/gi, en: /\b(the|and|with|for|technical)\b/gi, es: /\b(los|las|para|del|técnico)\b/gi, it: /\b(della|delle|per|il|gli)\b/gi, fr: /\b(les|des|pour|avec)\b/gi, de: /\b(und|der|die|mit|für)\b/gi }
-const dilTahmin = (pg) => {
-  const t = pg.slice(0, 8).map(p => p.t).join(' ')
-  return Object.entries(DIL).map(([k, re]) => [k, (t.match(re) || []).length]).sort((a, b) => b[1] - a[1])
-    .filter(([, n], _i, arr) => n >= 3 && n >= arr[0][1] * 0.4).map(([k]) => k).join('+') || 'belirsiz'
+// ── Dil: TÜM sayfalar tek tek sınıflanır (REC-145 devamı, KTL-59). Her sayfada altı dilin işlev
+// kelimeleri sayılır; en yüksek sayı en az 4 ve ikincisinin en az 1,5 katı ise sayfa o dildedir,
+// değilse "belirsiz" (tablo ve sayı yoğun sayfa). Belgenin dili = sınıflanan sayfaların en az %10'unu
+// tutan diller (çoktan aza). Dağılım sütunu ham sayıyı yazar: hüküm okunabilir, tahmin gizlenmez.
+const DIL = {
+  tr: /\b(ve|için|ile|bir|veya|olarak|daha|kadar|fiyat|liste|adet|ürün|tip)\b/gi,
+  en: /\b(the|and|with|for|of|to|is|are|can|this|that|from|by|on|technical|data)\b/gi,
+  es: /\b(los|las|el|para|del|con|una|por|que|más|técnico|ventiladores)\b/gi,
+  it: /\b(della|delle|degli|per|con|il|gli|sono|che|ventilatori|più)\b/gi,
+  fr: /\b(les|des|pour|avec|dans|est|sont|une|et|ventilateur|technique)\b/gi,
+  de: /\b(und|der|die|das|mit|für|ist|nicht|von|auf|zu|ventilator)\b/gi,
 }
+const dilOlc = (pg) => {
+  const say = {}
+  let sinif = 0
+  for (const p of pg) {
+    const sk = Object.entries(DIL).map(([k, re]) => [k, (p.t.match(re) || []).length]).sort((a, b) => b[1] - a[1])
+    if (sk[0][1] >= 4 && sk[0][1] >= sk[1][1] * 1.5) { say[sk[0][0]] = (say[sk[0][0]] || 0) + 1; sinif++ }
+  }
+  const diller = Object.entries(say).sort((a, b) => b[1] - a[1]).filter(([, n]) => n >= sinif * 0.1).map(([k]) => k)
+  return {
+    dil: diller.join('+') || 'belirsiz',
+    dagilim: Object.entries(say).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}:${n}`).join('|') + `|belirsiz:${pg.length - sinif}`,
+  }
+}
+
+// ── Üretici baskı kıyası (KTL-59): --baski=<json>; anahtar dosya adı. Yoksa sütunlar boş kalır.
+const BASKI_YOL = arg('baski')
+const BASKI = BASKI_YOL && existsSync(BASKI_YOL) ? JSON.parse(readFileSync(BASKI_YOL, 'utf8')).kayitlar : {}
 
 const urunSay = new Map()
 for (const p of canli.prods) urunSay.set(p.family_id, (urunSay.get(p.family_id) || 0) + 1)
@@ -199,7 +221,7 @@ for (const s of envanter.satirlar) {
   const b = BAG[s.dosya]
   if (!b) { eksikBag++; console.error(`BAĞ KARARI YOK: ${s.dosya}`); continue }
   const pg = hashSayfa.get(s.sha256) || []
-  const dil = dilTahmin(pg)
+  const { dil, dagilim } = dilOlc(pg)
   const hedefler = b.a.length ? b.a : ['']
   for (const slug of hedefler) {
     let kanit = 'marka geneli'
@@ -213,7 +235,8 @@ for (const s of envanter.satirlar) {
     }
     cikti.push({
       aile_slug: slug, aile_urun: slug ? aileler.get(slug).urun : '', marka: s.marka,
-      tur: b.tur, dil_tahmini: dil, sayfa: s.sayfa, baski_durumu: s.durum,
+      tur: b.tur, dil, dil_sayfa_dagilimi: dagilim, sayfa: s.sayfa, baski_durumu: s.durum,
+      baski_kiyasi: (BASKI[s.dosya] || {}).hukum || '', baski_kiyasi_kanit: (BASKI[s.dosya] || {}).kanit || '',
       yayin_onerisi: b.yayin, kanit, sha256: s.sha256, boyut_bayt: s.boyut_bayt,
       kaynak_yol: `venthub/${s.yol}`, not: b.not || '',
     })

@@ -37,7 +37,8 @@ export interface YaziMetni {
    * KART METNİ — her kart yüzeyi bunu basar: liste kartı ve araması (BilgiMerkeziListe, BilgiMerkeziArama),
    * ana sayfa Bilgi bloğu (KnowledgeBlock), kategori ve aile sayfasının "ilgili rehberler" kartları
    * (tersDizin.ts → IlgiliRehberler) ve yazı altı "ilgili yazılar" (sayfa.ts → RehberYazisiSayfasi).
-   * ZORUNLU ve `ozet`ten FARKLI olmalıdır: kart ile meta açıklaması aynı alandan geliyordu ve tam başlık
+   * ZORUNLU, `ozet`ten FARKLI ve gövde cümlelerini tekrarlamayan kısa YÖNLENDİRME cümlesi olmalıdır
+   * (URN-140; her yüzeyde `data-nosnippet` içinde basılır): kart ile meta açıklaması aynı alandan geliyordu ve tam başlık
    * aramasında yazı yerine liste sayfası görünüyordu (SEO-30). Yazının KENDİ metninden yazılır; gövdede
    * olmayan sayı, marka ya da iddia eklenmez. Kapılar: src/lib/bilgiMerkezi/__tests__/kartOzeti.test.tsx
    * ve kartOzetiYuzeyler.test.tsx.
@@ -56,6 +57,12 @@ export interface RehberYazisi {
   guncellemeTarihi: string
   /** Ürün kartı olarak basılacak kimlikler (`vh:aile/…`, `vh:model/…`). Fiyat basılmaz (R3). */
   urunler: readonly string[]
+  /**
+   * Gövdede bağlantısı olmayan, ama bu rehbere bağlanacak kategoriler (`vh:kategori/<categories.slug>`;
+   * URN-140). Ters dizin (tersDizin.ts) gövdedeki `vh:kategori/…` bağlantılarına bunları ekler; gövdeye
+   * dokunmadan kategori sayfasından rehbere yol açar.
+   */
+  ilgiliKategoriler?: readonly `vh:kategori/${string}`[]
   /** Yalnız yazılmış diller. Olmayan dilde sayfa YOKTUR (başka dile düşme yasak, K10). */
   diller: Partial<Record<YaziDili, YaziMetni>>
 }
@@ -78,9 +85,8 @@ export const YAZILAR: readonly RehberYazisi[] = [
       tr: {
         slug: 'frekans-konvertoru-nedir',
         ozet: 'Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır.',
-        // Kart metni yazının kendi bölüm başlıklarından ve seçim ölçütlerinden derlenir: yeni iddia, sayı ya da marka yok.
-        kartOzeti:
-          'Frekans konvertörünün nasıl çalıştığı, fan ve pompada neden kullanıldığı ve seçimde bakılacak ölçütler: besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği.',
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ya da konu listesini tekrarlamaz; yeni iddia, sayı ya da marka yok.
+        kartOzeti: 'Konvertör seçimine nereden başlayacağınızı bu rehberde bulun.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
 
 Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
@@ -263,9 +269,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       tr: {
         slug: 'radyal-fan-mi-aksiyel-fan-mi',
         ozet: 'Radyal ve aksiyel fanın farkı, kanat tipleri, fan eğrisinin okunması, çalışma noktası, montajın etkisi ve fanlar için güncel verimlilik şartları.',
-        // Kart metni yazının kendi bölüm başlıklarından derlenir (meta açıklamasından AYRI alan, SEO-30): yeni iddia, sayı ya da marka yok.
-        kartOzeti:
-          'Radyal ve aksiyel fanların çalışma biçimi, radyal fanlarda kanat tipleri, kayışlı ve doğrudan tahrik arasındaki fark, fan eğrisinden çalışma noktasının okunması, hava yoğunluğu düzeltmesi ve fanlara ilişkin AB ile Türkiye verimlilik düzenlemeleri.',
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140; meta açıklamasından AYRI alan, SEO-30): rehberin cümlelerini tekrarlamaz; yeni iddia, sayı ya da marka yok.
+        kartOzeti: 'Uygulamanıza hangi fan tipinin uyduğunu bu rehberde bulun.',
         govde: `# Radyal fan mı aksiyel fan mı? Fan nasıl seçilir?
 
 Aksiyel fan havayı pervane gibi fan ekseni doğrultusunda iter; radyal (santrifüj) fan ise havayı radyal yönde hızlandırıp kinetik enerjiyi basınca çevirir [1]. Pervane tipi aksiyel fanlar düşük basınçta yüksek debi üretir [1]; radyal düz kanatlı fanlar ise yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1]. Doğru fan, sistemin gerektirdiği debi ve basıncın fan eğrisinde üreticinin önerdiği kararlı ve verimli bölgeye düştüğü fandır [2].
@@ -436,13 +441,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-10-17',
     guncellemeTarihi: '2026-10-17',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
+    // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
+    ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
     diller: {
       tr: {
         slug: 'sessiz-fan-nasil-secilir',
         ozet: 'Sessiz fan seçerken ses basıncı ile ses gücü farkını, ölçüm koşulunu ve yatak odası değerlerini okuyun; Vortice Lineo Quiet katalog değerleri örnek.',
-        // Kart metni yazının kendi bölüm başlıklarından derlenir: yeni iddia, sayı ya da marka yok.
-        kartOzeti:
-          'Sessiz fan seçerken ses basıncı ile ses gücü farkı, ölçüm koşulunun (yol, ayar noktası, mesafe) okunması, yatak odası ve ofis için resmî ses değerleri ve kanal fanında sessizliği sağlayan yöntemler.',
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ya da konu listesini tekrarlamaz; yeni iddia, sayı ya da marka yok.
+        kartOzeti: 'Ses değerini hangi koşulda okuyacağınızı bu rehberde bulun.',
         govde: `# Sessiz fan nasıl seçilir? dB(A), ses gücü ve kanal fanı seçimi
 
 Sessiz fan seçimi, katalogdaki ses değerinin hangi koşulda verildiğini okumakla başlar: ses basıncı düzeyi ölçüm noktasındaki sesi, ses gücü düzeyi ses kaynağının yaydığı sesi anlatır [1]. Vortice'nin Lineo Quiet kanal fanında ses değeri ayar noktasına göre çok değişir: Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].

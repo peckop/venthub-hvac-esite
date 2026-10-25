@@ -195,7 +195,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                     <span className="block text-lg font-bold text-white">{r.baslik}</span>
                     {/* Ham gri yasak (storefront-design-standard §2.2, INV-9); koyu zeminde saydam beyaz.
                         Kart metni `kartOzeti`dir (meta açıklaması DEĞİL); boşsa çizilmez, yerine meta konmaz. */}
-                    {r.kartOzeti ? <span className="mt-2 block text-base font-light text-white/70">{r.kartOzeti}</span> : null}
+                    {r.kartOzeti ? <span data-nosnippet className="mt-2 block text-base font-light text-white/70">{r.kartOzeti}</span> : null}
                   </Link>
                 </li>
               ))}

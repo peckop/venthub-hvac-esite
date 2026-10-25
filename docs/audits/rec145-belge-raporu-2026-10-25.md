@@ -11,13 +11,16 @@ Liste: [`rec145-belge-listesi-2026-10-25.csv`](rec145-belge-listesi-2026-10-25.c
 |---|---|
 | Bugünkü PDF klasörü (kaynak dizini katalog envanteri) | 97 PDF, 97'sinin sha256'sı diskten yeniden hesaplandı, fark 0 |
 | Listedeki satır (aile × PDF) | 116 |
-| Yayınlanabilir PDF (tekil sha256) | 52 dosya, toplam 265 MB |
+| Yayınlanabilir PDF (tekil sha256, yayin_onerisi=evet) | 48 dosya, 62 satır, toplam 263,7 MB (1 MB = 1e6 bayt) |
+| Yayın kararı bekleyen (yayin_onerisi=dogrulanacak) | 5 dosya: FC51 iki eski fact sheet, SEAT ATEX kurulum kılavuzu, kimliği belirsiz SEAT föyü, Bravo S |
 | Yayınlanabilir belgesi olan aile | 34 / 47 (ürün 383 / 442) |
 | Belgesi olmayan aile | 13 (10'u AVenS; AVenS'in üretici kataloğu yok, tek kaynak fiyat listesi) |
-| Kanıtsız bağ | 0 (her bağ, ailenin model simgesinin PDF metninde geçtiği sayfa sayısıyla yazılı) |
-| Dil | Yayınlanabilir belgelerin tamamı İngilizce (2'si İngilizce + İspanyolca). Türkçe üretici belgesi yok |
+| Kanıtsız bağ | 0 (her bağ, ailenin anahtar sözcüğünün PDF metninde geçtiği sayfa sayısıyla yazılı; sözcük düzeyi kanıttır, model kodu düzeyi değil) |
+| Dil | PDF metninden ölçüldü (sayfa sayfa sınıflama): yayınlanabilir 48 belgenin tamamı İngilizce. Türkçe üretici belgesi yok |
 
-Tür dağılımı (yayınlanabilir satırlar): katalog 40, teknik föy 20, kılavuz 6, diğer 1.
+Tür dağılımı (yayınlanabilir 62 satır): katalog 40, teknik föy 16, kılavuz 5, diğer 1.
+
+İlk sürümdeki üç sayı (teknik föy 20, "2'si İngilizce + İspanyolca", 37 satır baskı kontrolsüz) KTL-59 bağımsız doğrulamasında CSV'den yeniden hesaplanınca tutmadı; yukarıdaki değerler düzeltilmiş hâlidir.
 
 ## 1. paket/belgeler.csv tazelik kontrolü (§6.7): BAYAT
 
@@ -76,6 +79,30 @@ Design'ın "PDF'i olmayan" dediği 16 aileden 5'inin güncel PDF'i klasörde var
 
 ## Ölçmediğim
 
-- Dil sütunu ilk 8 sayfadaki işlev kelimelerinden tahmindir; tek sayfalık görsel PDF'lerde (Bravo S) belirsiz çıkar.
-- "kontrol-edilmedi" baskı durumundaki 37 yayınlanabilir satır üreticideki son baskıyla kıyaslanmadı (katalog envanterinin sütunu); bu iş o kıyası yapmadı.
+- Üretici baskı kıyasının 15 ÖLÇÜLEMEDİ dosyası (Chrome ve flipbook turu yapılmadı); web'den sha256 eşitliği yalnız SEAT için ajan tarafından alındı, ben yeniden doğrulamadım.
 - Design'daki dosyaların sha256'sı alınmadı (DesignSync dosya okuması 256 KB sınırlı ve PDF'i bağlama taşır).
+- Dil ölçümü görsel-yalnız sayfalarda (Bravo S) sonuç vermez.
+
+## 6. KTL-59 (OPS devam emri): paket, dil, üretici baskısı, bağımsız okuma
+
+**Paket yeniden üretildi.** `paket/` (ingestor, git dışı) canlıdan sıfırdan alındı: ham yarı + 8 CSV + `belgeler.csv`; eski dosyalar `paket/yedek-2026-09-25/` altında. Sınamalar: ham ↔ canlı round-trip SIFIR FARK (2724 satır), CSV katmanı SIFIR FARK, görseller depoyla doğrulandı (1146/1146), `katalog-karnesi --kapi` "Katalog paketi tazeliği TAZE". `belgeler.csv` artık bu listeden üretiliyor (`paket-belgeler-uret.mjs --liste=`; sha256 ile eşleşir, 12 sütun korunur, 8 sütun eklenir). Listede olmayan 16 web metni eski dizin-adı yöntemiyle bağlı kalır.
+
+**Dil ölçüldü.** Her sayfa altı dilin işlev kelimeleriyle sınıflanır; belgenin dili sayfaların en az %10'unu tutan diller (dağılım `dil_sayfa_dagilimi` sütununda). Yayınlanabilir 48 belgenin tamamı İngilizce; tek Türkçe belge AVenS fiyat listesi (yayınlanmaz). 12 arşiv PDF'inin sayfa metni dizinde eski yolla durduğu için o dosyalarda dil taraması yapılamadı (hepsi yayınlanmaz).
+
+**Üretici baskı kıyası (29 dosya, 4 araştırmacı, salt okuma, PDF indirilmedi).** Veri: `rec145-baski-kiyasi-2026-10-25.json`.
+
+| Hüküm | Dosya | Hangileri |
+|---|---|---|
+| GÜNCEL | 11 | SEAT 2024-11 broşürü ve 6 model föyü (üretici dosyasıyla bayt/sha256 eşit); Danfoss FC102 1,1–90 kW (2025.07), FC101 design guide (2025.07), FC51 design guide, FC101 seçim kılavuzu |
+| GÜNCEL-ZAYIF | 2 | Danfoss FC102 110–800 kW (yalnız arama özeti, 10 MB sınırı); FC51 operating guide (daha yeni AQ383124996793 kodlu bir kılavuz görüldü, yerine geçtiği doğrulanmadı) |
+| AYNI-DOSYA | 1 | Casals NIMUS/NIMAX broşürü (bayt eşit, ama baskı kodu yok) |
+| ÖLÇÜLEMEDİ | 15 | Danfoss 3 (FC51 seçim kılavuzu, fact sheet, datasheet), Casals plug fan kataloğu, Nicotra 6, SEAT özellik föyü, Vortice 4. Merdivenin 3. (flipbook) ve 6. (Chrome) basamakları bu turda denenmedi; "bulunamadı" hükmü verilmedi |
+
+Ek bulgular: Casals AF 2024 kesiti (yayınlanmayan) ESKİ: bizde CV092024, üreticinin flipbook'unda CV032025. Deumido NG güncel Vortice listelerinde yok, yalnız Deumido EVO (26025-27) var. Danfoss FC51 ürün sayfası "son sipariş 30 Haziran 2026, son teslim 30 Eylül 2026" diyor (ürün yaşam döngüsü, belge baskısından bağımsız). Bir web PDF'inde ajana yönelik talimat metni vardı, veri olarak okundu.
+
+**Bağımsız doğrulama (katalog-dogrulayici, ilk sürüm üzerinde).** sha256 96/96 diskten yeniden hesaplandı, tuttu. 62 "evet" aile satırı ürün adı ve sayfa taramasıyla sınandı. Yanlış dışlama yok; dört "canlı modeli katalogda yok" hükmü katalog metninde yeniden ölçüldü, tuttu. Düzeltilenler:
+- `vortice-brochure-mev.pdf` ve `vortice_vort_mono_range_new.pdf` (aynı bayt) VORT MONO RANGE eski baskısı; MEV değil. VORT HR bağı kaldırıldı, aile `vortice-vort-mono`, "eski baskı, yerini 189860 aldı". Eski kanıt "1/30" `magNETIc` içindeki NETI yanlış pozitifiydi; regex `\b` sınırlı yapıldı.
+- Kimliği belirsiz SEAT föyü, SEAT ATEX kurulum kılavuzu (2011, yerine geçeni ölçülmedi) ve FC51'in iki eski fact sheet'i "evet"ten "dogrulanacak"a alındı.
+- Rapor sayıları CSV'den yeniden hesaplandı (yukarıdaki tablo).
+- Zayıf ama yanlış olmayan bağlar: Casals 77854 broşürü NIMUS/NIMAX'a model değil aile sözcüğüyle bağlı; Nicotra ADH-AT-RDE-RZR kataloğunda AT yalnız 3 sayfada, 78/97 sayfa RZR.
+- Karar gerektiren: `avensair-ADH-*` 8 föy "resmi değil (bayi föyü)" diye dışlandı; doğrulayıcıya göre AVenS'in (İkitelli) kendi föyleri. Yayınlanıp yayınlanmayacağı OPS/Recep kararı.
