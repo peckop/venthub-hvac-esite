@@ -57,7 +57,7 @@ MEVZUAT penceresi kapalıyken üç şartlı birincil metin hükmü ve madde/ek n
 R5.1.1 tur klasörü bağımsızlığı, başlıkların bağımsız okunması ve atıf kümesi ↔ kaynak alanı ölçümü; R5.5'e düzeltme
 türüne göre tur ve başlık-yalnız revizyon; R10.3'e ölçülen tur sayısı (hedef karşılanmadı); R10.5 ders listesi.
 Kırmızı kural getirmez; yeni kapı yazmaz (K0–K5 hâlâ aday).
-**v0.11 (2026-10-26, BLG-19, OPS emri):** dördüncü yazının (BLG-18) beş doğrulama turundan ve yayın öncesi ölçümden
+**v0.11 (2026-10-25, BLG-19, OPS emri):** dördüncü yazının (BLG-18) beş doğrulama turundan ve yayın öncesi ölçümden
 çıkan dersler: R10.5'e rehber kartı meta kopyası (sessiz fan, BLG-15), katalog-canlı sayı karşılaştırması (bölünmüş aile,
 olmayan seri adı), `hide_price` kategorisinde RSC fiyatı, DOE/Vortice künye dersleri, tuzaklı + temiz kopya zorunluluğu,
 ana sayfa blok adedi ve site haritası fikstürleri; yeni **R10.6 yayın öncesi kontrol listesi** (sekiz madde, her madde
@@ -742,7 +742,7 @@ basamakta uygulanır; uygulandığı B8 öncesinde R10.6 tablosuyla kanıtlanır
 
 ### R10.6 Yayın öncesi kontrol listesi (B8'den önce, her madde kanıtlı)
 
-**Tetik (OPS, 26 Ekim 2026):** sessiz fan dersi (R10.5, rehber kutusu meta kopyası) cetvelde yoktu ve kontrol edilmeden
+**Tetik (OPS, 25 Ekim 2026):** sessiz fan dersi (R10.5, rehber kutusu meta kopyası) cetvelde yoktu ve kontrol edilmeden
 dördüncü yazı yayına gidiyordu; Recep "geçen hatalar tekrar etmesin" dedi. Aşağıdaki sekiz madde her yeni yazının B8
 PR'ında **PR gövdesinde** tablo olarak doldurulur: her satırda durum (UYGULANDI / AÇIK) ve kanıt (dosya:satır, komut
 çıktısı ya da canlı ölçüm). **Kanıtı olmayan madde AÇIK sayılır ve yayın çıkmaz.** B7 onayı bu tablodan önce alınabilir;
