@@ -17,6 +17,8 @@ import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/cat
 interface CategorySeriesViewProps {
     category: DomainCategory
     parentCategory?: DomainCategory | null
+    /** URN-144 (karar 410): kırıntı için tüm aktif atalar, kökten başa; verilmezse `parentCategory` tek üst sayılır. */
+    ancestors?: DomainCategory[]
     /** REC-471: bu kategorinin alt kategorileri; doluysa ürün listesinin üstünde GERÇEK bağlantı olarak basılır. */
     subCategories?: DomainCategory[]
     /** F5-B W2.1: seri grupları kalktı — liste doğrudan AİLE satırlarıdır. */
@@ -31,6 +33,7 @@ interface CategorySeriesViewProps {
 const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     category,
     parentCategory,
+    ancestors,
     subCategories = [],
     families
 }) => {
@@ -39,12 +42,15 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     const { wrapCategory } = useCategoryViewModel()
 
     const vm = wrapCategory(category)
-    const parentVm = wrapCategory(parentCategory)
+    // URN-144 (karar 410): kırıntıda tüm atalar kökten başa; verilmezse bugünkü tek üst.
+    const kirintiAtalari = (ancestors && ancestors.length > 0 ? ancestors : parentCategory ? [parentCategory] : [])
+        .map((a) => wrapCategory(a))
+        .filter((a): a is NonNullable<typeof a> => !!a)
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
-        ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(getLocalizedCategorySlug(parentVm.raw, lang)) }] : []),
+        ...kirintiAtalari.map((ata) => ({ label: ata.displayName, href: Routes.category(getLocalizedCategorySlug(ata.raw, lang)) })),
         { label: vm?.displayName || getCategoryDisplayName(category, t), href: '' }
     ]
 
