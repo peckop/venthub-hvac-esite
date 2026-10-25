@@ -1,6 +1,8 @@
 import type { Route } from 'next'
 
+import { dildekiYazilar, type RehberYazisi, YAZILAR } from '../../data/bilgiMerkezi/yazilar'
 import { type AdresDili,adresUret } from '../../utils/adresUret'
+import { bilgiMerkeziYaziHref } from '../../utils/bilgiMerkezi'
 import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { localizedHref, Routes } from '../../utils/routes'
 import { KIMLIK_DESENI, type KimlikTuru } from './markdown'
@@ -78,7 +80,12 @@ function kategoriAdresi(k: KategoriKaynagi, dil: AdresDili): Route {
 }
 
 /** Tek kimliği bugünkü dil önekli adrese çözer; çözemezse ATAR. */
-export async function icBaglantiCoz(kimlik: string, dil: AdresDili, kaynak: IcBaglantiKaynagi): Promise<Route> {
+export async function icBaglantiCoz(
+  kimlik: string,
+  dil: AdresDili,
+  kaynak: IcBaglantiKaynagi,
+  yazilar: readonly RehberYazisi[] = YAZILAR,
+): Promise<Route> {
   const { tur, anahtar } = kimlikAyristir(kimlik)
   switch (tur) {
     case 'model': {
@@ -121,6 +128,19 @@ export async function icBaglantiCoz(kimlik: string, dil: AdresDili, kaynak: IcBa
       }
       return localizedHref(Routes.destek.hesaplayicilar(anahtar), dil)
     }
+    case 'yazi': {
+      // `vh:yazi/<yazı kimliği>` (URN-140): başka rehber yazısı. Anahtar `RehberYazisi.kimlik` (dilden bağımsız,
+      // ör. 'sessiz-fan-secimi'); adres slug'ı DEĞİL. Adres o dilin `slug`'ından `bilgiMerkeziYaziHref` ile üretilir.
+      // Hedef yazının o dilde metni yoksa ATAR: başka dile düşme yok (K10), 404'e giden bağlantı yok.
+      const hedef = yazilar.find((y) => y.kimlik === anahtar)
+      if (!hedef) {
+        const mevcut = dildekiYazilar(dil, yazilar).map((y) => y.kimlik)
+        throw new IcBaglantiHatasi(kimlik, `rehber yazısı yok (anahtar yazı kimliğidir, slug değil; ${dil} dilindekiler: ${mevcut.join(', ') || 'yok'})`)
+      }
+      const metin = hedef.diller[dil]
+      if (!metin) throw new IcBaglantiHatasi(kimlik, `"${anahtar}" yazısı ${dil} dilinde yok (başka dile düşme yasak)`)
+      return bilgiMerkeziYaziHref(metin.slug, dil)
+    }
     case 'sayfa': {
       const uret = SAYFALAR[anahtar]
       if (!uret) throw new IcBaglantiHatasi(kimlik, `sayfa yok (izinli: ${Object.keys(SAYFALAR).join(', ')})`)
@@ -142,12 +162,13 @@ export async function icBaglantilariCoz(
   kimlikler: readonly string[],
   dil: AdresDili,
   kaynak: IcBaglantiKaynagi,
+  yazilar: readonly RehberYazisi[] = YAZILAR,
 ): Promise<Map<string, Route>> {
   const sonuc = new Map<string, Route>()
   const hatalar: string[] = []
   for (const k of new Set(kimlikler)) {
     try {
-      sonuc.set(k, await icBaglantiCoz(k, dil, kaynak))
+      sonuc.set(k, await icBaglantiCoz(k, dil, kaynak, yazilar))
     } catch (e) {
       hatalar.push(e instanceof Error ? e.message : String(e))
     }

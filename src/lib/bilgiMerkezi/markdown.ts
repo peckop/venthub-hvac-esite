@@ -13,10 +13,11 @@
  *
  * İZİNLİ BAĞLANTILAR (BLOG kapısı `icBaglantiDenetle` ile aynı biçim, scripts/rehber/rehber-denetim.mjs):
  *   · site içi → `vh:<tür>/<anahtar>` (tür ∈ KIMLIK_TURLERI), düz site adresi YASAK
+ *     (`vh:yazi/<yazı kimliği>` = başka bir rehber yazısı, URN-140; anahtar `RehberYazisi.kimlik`)
  *   · dış kaynak → `https://…` (venthub.com.tr değil) · sayfa içi → `#çapa` · `mailto:` · `tel:`
  */
 
-export const KIMLIK_TURLERI = ['model', 'aile', 'kategori', 'marka', 'hesaplayici', 'sayfa'] as const
+export const KIMLIK_TURLERI = ['model', 'aile', 'kategori', 'marka', 'hesaplayici', 'sayfa', 'yazi'] as const
 export type KimlikTuru = (typeof KIMLIK_TURLERI)[number]
 
 /** BLOG kapısıyla birebir: `^vh:([a-z]+)\/([A-Za-z0-9][A-Za-z0-9._-]*)$` */

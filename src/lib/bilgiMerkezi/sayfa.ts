@@ -81,7 +81,11 @@ export async function yaziSayfasiHazirla(
   if (!metin) throw new Error(`[bilgi merkezi] "${yazi.kimlik}" yazısı ${dil} dilinde yok`)
   const ayrismis = markdownAyristir(metin.govde)
   const kimlikler = [...baglantilariTopla(ayrismis).filter((h) => h.startsWith('vh:')), ...yazi.urunler]
-  const hrefler = await icBaglantilariCoz(kimlikler, dil, kaynak)
+  // Yazı kendine bağlanamaz (URN-140): kendi sayfasına giden bağlantı boş tıklamadır, ters dizine de sayılmaz.
+  if (kimlikler.includes(`vh:yazi/${yazi.kimlik}`)) {
+    throw new IcBaglantiHatasi(`vh:yazi/${yazi.kimlik}`, 'yazı kendine bağlanamaz (self-link)')
+  }
+  const hrefler = await icBaglantilariCoz(kimlikler, dil, kaynak, yazilar)
 
   const urunKartlari: UrunKarti[] = []
   for (const k of yazi.urunler) {
