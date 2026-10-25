@@ -266,7 +266,10 @@ export function baslikDenetle(md) {
  * aile = aile slug'ı (Faz 1-B'de değişirse çözücü `url_takma_adlari`'na bakar). Çözülemeyen bağlantı
  * derlemeyi düşürür (URUN, adresUret).
  */
-export const KIMLIK_TURLERI = ['model', 'aile', 'kategori', 'marka', 'hesaplayici', 'sayfa']
+export const KIMLIK_TURLERI = ['model', 'aile', 'kategori', 'marka', 'hesaplayici', 'sayfa', 'yazi']
+// yazi = rehberden rehbere bağlantı (URUN, PR #2046): anahtar slug DEĞİL RehberYazisi.kimlik
+// (`frekans-konvertoru`, `radyal-aksiyel-fan-secimi`, `sessiz-fan-secimi`); çözücü TR/EN adrese çevirir,
+// hedef yazı o dilde yoksa ya da yazı kendine bağlanırsa DERLEME düşer (ağsız kapı yalnız biçimi sınar).
 const SITE = /^https?:\/\/(?:www\.)?venthub\.com\.tr(?:[/?#]|$)/i
 
 export function icBaglantiDenetle(govde) {
