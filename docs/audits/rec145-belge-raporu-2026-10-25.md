@@ -11,14 +11,14 @@ Liste: [`rec145-belge-listesi-2026-10-25.csv`](rec145-belge-listesi-2026-10-25.c
 |---|---|
 | Bugünkü PDF klasörü (kaynak dizini katalog envanteri) | 97 PDF, 97'sinin sha256'sı diskten yeniden hesaplandı, fark 0 |
 | Listedeki satır (aile × PDF) | 116 |
-| Yayınlanabilir PDF (tekil sha256, yayin_onerisi=evet) | 56 dosya, 70 satır, toplam 266,5 MB (1 MB = 1e6 bayt); 8'i AVenS ADH föyü (Recep kararı) |
+| Yayınlanabilir PDF (tekil sha256, yayin_onerisi=evet) | 53 dosya, 67 satır, toplam 228,5 MB (1 MB = 1e6 bayt); 8'i AVenS ADH föyü (Recep kararı). Önceki 56/70/266,5; üç ESKİ/FARKLI dosya `dogrulanacak`a alındı (KTL-60, OPS kararı) |
 | Yayın kararı bekleyen (yayin_onerisi=dogrulanacak) | 5 dosya: FC51 iki eski fact sheet, SEAT ATEX kurulum kılavuzu, kimliği belirsiz SEAT föyü, Bravo S |
 | Yayınlanabilir belgesi olan aile | 34 / 47 (ürün 383 / 442) |
 | Belgesi olmayan aile | 13 (10'u AVenS; AVenS'in üretici kataloğu yok, tek kaynak fiyat listesi) |
 | Kanıtsız bağ | 0 (her bağ, ailenin anahtar sözcüğünün PDF metninde geçtiği sayfa sayısıyla yazılı; sözcük düzeyi kanıttır, model kodu düzeyi değil) |
-| Dil | PDF metninden ölçüldü (sayfa sayfa sınıflama): yayınlanabilir 56 belgenin tamamı İngilizce. Türkçe üretici belgesi yok |
+| Dil | PDF metninden ölçüldü (sayfa sayfa sınıflama): yayınlanabilir 53 belgenin tamamı İngilizce. Türkçe üretici belgesi yok |
 
-Tür dağılımı (yayınlanabilir 70 satır): katalog 40, teknik föy 24, kılavuz 5, diğer 1. Aile ve ürün kapsamı değişmedi: ADH föyleri zaten belgesi olan ADH ailesine eklendi (34/47 aile, 383/442 ürün).
+Tür dağılımı (yayınlanabilir 67 satır): katalog 37, teknik föy 24, kılavuz 5, diğer 1. Kapsam: 33/47 aile, 380/442 ürün (ADH föyleri zaten belgesi olan ADH ailesine eklenmişti, kapsamı değiştirmedi; KTL-60'ta Deumido ailesi tek yayınlanabilir belgesini yitirdi: 34/47 → 33/47, 383 → 380 ürün).
 
 İlk sürümdeki üç sayı (teknik föy 20, "2'si İngilizce + İspanyolca", 37 satır baskı kontrolsüz) KTL-59 bağımsız doğrulamasında CSV'den yeniden hesaplanınca tutmadı; yukarıdaki değerler düzeltilmiş hâlidir.
 
@@ -74,7 +74,7 @@ Design'ın "PDF'i olmayan" dediği 16 aileden 5'inin güncel PDF'i klasörde var
 2. CAD ve CE/ErP beyanı türünde klasörde tek dosya yok; bu iki tür boş başlar.
 3. `lang` için bugün yalnız `en` dolu; Türkçe belge yok.
 4. Ürün düzeyi föyler (Vorticent CMS ATEX 10 föy, SEAT 15…50 6 föy) için `product_id` doldurulabilir; dosya adındaki model bunu taşıyor, eşleme ayrı bir doğrulama adımı ister (bu listede aile düzeyinde).
-5. Toplam boyut 265 MB; en büyükleri Danfoss kılavuzları ve MEV kataloğu.
+5. Toplam boyut 228,5 MB (KTL-60 sonrası); en büyükleri Danfoss kılavuzları ve MEV kataloğu.
 6. `FXQejq7tfTOtLQypNJrYMGjORsBaF6yz0G208fqW.pdf` gibi anlamsız adlar kova yolunda sha256 ile adlandırıldığı için sorun çıkarmaz; `title_i18n` elle yazılmalı.
 
 ## Ölçmediğim
@@ -87,7 +87,7 @@ Design'ın "PDF'i olmayan" dediği 16 aileden 5'inin güncel PDF'i klasörde var
 
 **Paket yeniden üretildi.** `paket/` (ingestor, git dışı) canlıdan sıfırdan alındı: ham yarı + 8 CSV + `belgeler.csv`; eski dosyalar `paket/yedek-2026-09-25/` altında. Sınamalar: ham ↔ canlı round-trip SIFIR FARK (2724 satır), CSV katmanı SIFIR FARK, görseller depoyla doğrulandı (1146/1146), `katalog-karnesi --kapi` "Katalog paketi tazeliği TAZE". `belgeler.csv` artık bu listeden üretiliyor (`paket-belgeler-uret.mjs --liste=`; sha256 ile eşleşir, 12 sütun korunur, 8 sütun eklenir). Listede olmayan 16 web metni eski dizin-adı yöntemiyle bağlı kalır.
 
-**Dil ölçüldü.** Her sayfa altı dilin işlev kelimeleriyle sınıflanır; belgenin dili sayfaların en az %10'unu tutan diller (dağılım `dil_sayfa_dagilimi` sütununda). Yayınlanabilir 56 belgenin tamamı İngilizce (ilk ölçümde 48; sonradan eklenen 8 ADH föyü de İngilizce); tek Türkçe belge AVenS fiyat listesi (yayınlanmaz). 12 arşiv PDF'inin sayfa metni dizinde eski yolla durduğu için o dosyalarda dil taraması yapılamadı (hepsi yayınlanmaz).
+**Dil ölçüldü.** Her sayfa altı dilin işlev kelimeleriyle sınıflanır; belgenin dili sayfaların en az %10'unu tutan diller (dağılım `dil_sayfa_dagilimi` sütununda). Yayınlanabilir 53 belgenin tamamı İngilizce (ilk ölçümde 48; sonradan eklenen 8 ADH föyü de İngilizce); tek Türkçe belge AVenS fiyat listesi (yayınlanmaz). 12 arşiv PDF'inin sayfa metni dizinde eski yolla durduğu için o dosyalarda dil taraması yapılamadı (hepsi yayınlanmaz).
 
 **Üretici baskı kıyası (29 dosya, 4 araştırmacı, salt okuma, PDF indirilmedi).** Veri: `rec145-baski-kiyasi-2026-10-25.json`.
 
@@ -102,14 +102,14 @@ Design'ın "PDF'i olmayan" dediği 16 aileden 5'inin güncel PDF'i klasörde var
 
 | Hüküm | Dosya | Hangileri |
 |---|---|---|
-| GÜNCEL | 13 | önceki 11 + Vortice Why Ventilate (üreticide güncel listede, bayt sayısı eşit) + Casals plug fan kataloğu (bayt sayısı eşit, üretici dosyası Eylül 2024 = yerel CV092024) |
-| GÜNCEL-ZAYIF | 7 | önceki 2 + Nicotra Gebhardt 5 katalog (493 DD, 480 AT, 481 RDH, 479 ADH, ADH-AT-RDE-RZR): Download Center'daki dosya boyutu iki ondalıkta eşit (MiB), sha256 ve baskı kodu yok |
+| GÜNCEL | 11 | ilk turdakiler (sha256 ya da kod eşit) |
+| GÜNCEL-ZAYIF | 9 | önceki 2 + Vortice Why Ventilate ve Casals plug fan kataloğu (HEAD bayt sayısı eşit, last-modified üretici tarihiyle uyumlu, sha256 yok; bağımsız doğrulayıcı önerisiyle GÜNCEL'den indirildi) + Nicotra Gebhardt 5 katalog (493 DD, 480 AT, 481 RDH, 479 ADH, ADH-AT-RDE-RZR): Download Center'daki dosya boyutu iki ondalıkta eşit (MiB), sha256 ve baskı kodu yok |
 | AYNI-DOSYA | 1 | Casals NIMUS/NIMAX broşürü |
 | ESKİ-GÖRÜNÜYOR | 3 | Danfoss seçim kılavuzu (AD397545239678, üreticide aynı kodla 19 Kasım 2021 kaydı) ve fact sheet (AM447245614445, üreticide 31 Mart 2023 kaydı); Vortice Deumido NG kataloğu (üreticide yalnız Deumido EVO 177678 var). Üretici PDF'i açılmadı, hüküm tarih ve boyut farkına dayanır |
 | FARKLI-DOSYA | 1 | Nicotra DD/DDM/DMB kataloğu: üreticide 18,04 MiB, bizde 16,68 MiB; yeni sürüm olabilir, güncellik hükmü verilmedi |
 | ÖLÇÜLEMEDİ | 4 | SEAT özellik föyü (bu turda yeniden denenmedi), Danfoss FC51 datasheet (kod aramada yok), Vortice Heatmaster/Slimroof (iki üretici sitesinde görünmedi, ürün sayfası taranmadı), Vortice Punto Evo Flexo (2024 kataloğunda sayfa doğrulanmadı) |
 
-Yayın önerisi sütunu DEĞİŞMEDİ: bu turda hiçbir dosyanın evet/hayır hükmü kaydırılmadı. Dikkat: ESKİ-GÖRÜNÜYOR üç dosyadan ikisi (Danfoss FC51 seçim kılavuzu, Vortice Deumido NG kataloğu) ve FARKLI-DOSYA Nicotra DD/DDM/DMB kataloğu listede hâlâ `evet`. Yayın kararı (yeni baskıyı bulup değiştirmek, `dogrulanacak`a almak ya da bu haliyle tutmak) OPS'tadır; sayılar (56 PDF, 34/47 aile, 383/442 ürün) bu yüzden değiştirilmedi.
+OPS kararıyla (25 Ekim) üç dosya `evet`ten `dogrulanacak`a alındı: Danfoss FC51 seçim kılavuzu (AD397545239678), Vortice Deumido NG kataloğu, Nicotra DD/DDM/DMB kataloğu; güncel baskı bulununca değişir. Yeni sayılar: yayınlanabilir 53 PDF / 67 satır / 228,5 MB, 33/47 aile, 380/442 ürün. Bağımsız doğrulayıcı notu: hâlâ `evet` olan iki dosyanın (Vortice Heatmaster/Slimroof ve Punto Evo Flexo) baskı güncelliği ÖLÇÜLEMEDİ; çelişen kanıt yok ama güncellik bilinmiyor.
 
 Ek bulgular: Casals AF 2024 kesiti (yayınlanmayan) ESKİ: bizde CV092024, üreticinin flipbook'unda CV032025. Deumido NG güncel Vortice listelerinde yok, yalnız Deumido EVO (26025-27) var. Danfoss FC51 ürün sayfası "son sipariş 30 Haziran 2026, son teslim 30 Eylül 2026" diyor (ürün yaşam döngüsü, belge baskısından bağımsız). Bir web PDF'inde ajana yönelik talimat metni vardı, veri olarak okundu.
 

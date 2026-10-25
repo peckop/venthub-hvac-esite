@@ -75,7 +75,7 @@
       "kanit": "casals.com/assets/uploads/cat_pdf/77854-ns-nx-casals-en.pdf bayt ve sha256 eşit (860e368d…); belgede ve sayfada baskı kodu yok, güncellik kıyası yapılamadı"
     },
     "82f7f-cata-logo-plug-fans_casals.pdf": {
-      "hukum": "GUNCEL",
+      "hukum": "GUNCEL-ZAYIF",
       "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): casals.com Plug fans catalogue sayfasındaki PDF bağlantısı; HEAD content-length 2644826 = yerel bayt sayısı, last-modified 27 Eylül 2024 (yerel kod CV092024 ile uyumlu; sha256 hesaplanmadı)"
     },
     "493-series-dd.pdf": {
@@ -107,12 +107,12 @@
       "kanit": "bizde baskı kodu yok ('November 2024'); vortice.com, vortice.it ve casals.com katalog listelerinde Heatmaster/Slimroof yok; flipbook ve Chrome basamakları denenmedi | Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com katalog listesinde ve vorticeindustrial.com ana sayfasında Heatmaster/Slimroof yok; ürün sayfası taranmadı. \"Bulunamadı\" hükmü verilmedi"
     },
     "Why-Ventilate-Brochure.pdf": {
-      "hukum": "GUNCEL",
+      "hukum": "GUNCEL-ZAYIF",
       "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com/en/catalogues güncel listesinde Doc_Pubblicita_Why_Ventilate_172062.pdf; HEAD content-length 582244 = yerel bayt sayısı, last-modified 15 Ocak 2024 (sha256 hesaplanmadı)"
     },
     "Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf": {
       "hukum": "ESKI-GORUNUYOR",
-      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com güncel katalog listesinde yalnız Deumido_Evo_Range (Doc_Pubblicita_Deumido_Evo_Range_177678.pdf, 10283042 B, 15 Ocak 2024); NG serisi listede yok. Yerel 11614673 B, baskı 5.170.084.467 Mayıs 2018"
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com güncel katalog listesinde yalnız Deumido_Evo_Range (Doc_Pubblicita_Deumido_Evo_Range_177678.pdf, 10283042 B, 15 Ocak 2024); NG serisi listede yok (katalog sayfasının sayfalama/filtre tamlığı ayrıca doğrulanmadı; eski NG PDF'i arşivde olabilir). Yerel 11614673 B, baskı 5.170.084.467 Mayıs 2018"
     },
     "Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf": {
       "hukum": "OLCULEMEDI",
