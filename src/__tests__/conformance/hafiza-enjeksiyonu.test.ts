@@ -1529,3 +1529,91 @@ describe('INV-HAFIZA-ENJEKSIYONU-20 · OPS sartlari: yukleme tavani · gosterim 
     }
   })
 })
+
+// ── ARC-204 · HRT-68 kalibrasyonu: kullanım sayacı daraltması ─────────────────────────────
+
+describe('INV-HAFIZA-ENJEKSIYONU-8 · kullanım eşleşmesi: jenerik sözcük sayılmaz, dosya dersi son düzenleme SONRASINA bağlı', () => {
+  function duzenlemeKayitli(
+    olaylar: { t: number; text?: string; arac?: string }[],
+  ): string {
+    const dizin = geciciDizin('transkript-duzenleme')
+    const yol = path.join(dizin, 'oturum.jsonl')
+    const satirlar = olaylar.map((o) =>
+      JSON.stringify({
+        type: 'assistant',
+        isSidechain: false,
+        timestamp: new Date(o.t).toISOString(),
+        message: {
+          role: 'assistant',
+          content: o.arac
+            ? [{ type: 'tool_use', name: o.arac, input: { file_path: 'x.ts' } }]
+            : [{ type: 'text', text: o.text ?? '' }],
+        },
+      }),
+    )
+    fs.writeFileSync(yol, satirlar.join('\n') + '\n')
+    return yol
+  }
+
+  it('yalnız JENERİK (durum/tablo) sözcüklerle çakışan ders "kullanıldı" SAYILMAZ', () => {
+    const ders =
+      'Beklemede Recep Sorumlu Durum Onerim Sirada Bitti Kirmizi tablo basliklari her raporda ayni sekilde yazilir'
+    const asistan = 'Beklemede Recep Sorumlu Durum Onerim Sirada Bitti Kirmizi tablo satirlari guncellendi'
+    expect(M.eslesirMi(ders, asistan)).toBe(false)
+  })
+
+  it('en az 3 AYIRT EDİCİ ortak belirteç: 2 ayırt edici + jenerik kalabalık yetmez, 3 yeter', () => {
+    const ders = 'Migration merge onayi Recep Sorumlu Durum Onerim Sirada bekleyen islerde gecerlidir'
+    expect(M.eslesirMi(ders, 'migration merge Recep Sorumlu Durum Onerim Sirada')).toBe(false)
+    expect(M.eslesirMi(ders, 'migration merge onayi Recep Sorumlu Durum Onerim Sirada')).toBe(true)
+  })
+
+  it('DOSYA-kaynaklı ders yalnız SON Edit/Write SONRASI asistan metninde aranır; öncesindeki eşleşme sayılmaz', async () => {
+    const t = Date.now()
+    const pano = defterKur([{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], t)
+    const yol = duzenlemeKayitli([
+      { t: t + 1000, text: DERS_A }, // düzenlemeden ÖNCE söylenmiş
+      { t: t + 2000, arac: 'Edit' },
+      { t: t + 3000, text: 'Dosyayi duzelttim, baska konu.' },
+    ])
+    const f = sahtePort()
+    await M.sayacTopla({ girdi: { session_id: OTURUM, transcript_path: yol }, portAc: f.portAc, daemonCanli: () => true, pano })
+    expect(f.cagrilar.use, 'düzenleme ÖNCESİ metin kullanım sayıldı').toHaveLength(0)
+  })
+
+  it('DOSYA-kaynaklı ders son düzenleme SONRASI metinde geçerse kullanım SAYILIR', async () => {
+    const t = Date.now()
+    const pano = defterKur([{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], t)
+    const yol = duzenlemeKayitli([
+      { t: t + 2000, arac: 'Write' },
+      { t: t + 3000, text: DERS_A },
+    ])
+    const f = sahtePort()
+    await M.sayacTopla({ girdi: { session_id: OTURUM, transcript_path: yol }, portAc: f.portAc, daemonCanli: () => true, pano })
+    expect(f.cagrilar.use).toHaveLength(1)
+  })
+
+  it('düzenleme hiç yoksa dosya-kaynaklı ders kullanım sayılmaz; KONU-kaynaklı ders düzenlemeye bağlı DEĞİL', async () => {
+    const t = Date.now()
+    const yol = duzenlemeKayitli([{ t: t + 1000, text: DERS_A }])
+    const dosyaPano = defterKur([{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], t)
+    const f1 = sahtePort()
+    await M.sayacTopla({ girdi: { session_id: OTURUM, transcript_path: yol }, portAc: f1.portAc, daemonCanli: () => true, pano: dosyaPano })
+    expect(f1.cagrilar.use).toHaveLength(0)
+    const konuPano = defterKur([{ id: '01A', metin: DERS_A, kaynak: 'konu' }], t)
+    const f2 = sahtePort()
+    await M.sayacTopla({ girdi: { session_id: OTURUM, transcript_path: yol }, portAc: f2.portAc, daemonCanli: () => true, pano: konuPano })
+    expect(f2.cagrilar.use).toHaveLength(1)
+  })
+
+  it('defter: aynı kancanın aynı dersi aynı dakikada çift satır yazması TEKİLLEŞİR; farklı kaynak ayrı enjeksiyon kalır', () => {
+    const pano = geciciDizin('defter-tekil')
+    const t = Date.now()
+    D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: t })
+    D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: t + 5000 }) // aynı dakika, aynı kaynak → atlanır
+    D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'konu' }], { pano, simdi: t + 6000 }) // farklı kaynak → ayrı enjeksiyon
+    D.yaz(OTURUM, [{ id: '01B', metin: DERS_B, kaynak: 'dosya' }, { id: '01B', metin: DERS_B, kaynak: 'dosya' }], { pano, simdi: t + 7000 }) // aynı çağrıda çift
+    const idler = D.oku(OTURUM, { pano }).satirlar.map((s: { id: string; kaynak: string }) => `${s.kaynak}|${s.id}`)
+    expect(idler.sort()).toEqual(['dosya|01A', 'dosya|01B', 'konu|01A'])
+  })
+})

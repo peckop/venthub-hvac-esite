@@ -70,9 +70,32 @@ function defterYolu(oturum, nesilNo, pano = panoDizini()) {
  */
 function yaz(oturum, kayitlar, { pano = panoDizini(), simdi = Date.now() } = {}) {
   try {
-    const liste = (kayitlar || []).filter((k) => k && typeof k.id === 'string' && k.id)
+    let liste = (kayitlar || []).filter((k) => k && typeof k.id === 'string' && k.id)
     if (!liste.length) return true
     const t = new Date(simdi).toISOString()
+    // ARC-204 (HRT-68): aynı ders aynı dakikada birden çok defter satırı yazıyordu (sayım şişiyordu).
+    // Aynı oturum+nesilde, aynı dakikada, aynı id zaten yazılmışsa tekrar yazılmaz (tek enjeksiyon).
+    const yol = defterYolu(oturum, nesil(oturum, pano), pano)
+    const dakika = t.slice(0, 16)
+    const mevcut = new Set()
+    try {
+      for (const satir of fs.readFileSync(yol, 'utf8').split('\n').slice(-400)) {
+        if (!satir) continue
+        try {
+          const o = JSON.parse(satir)
+          if (o && typeof o.t === 'string' && o.t.slice(0, 16) === dakika) mevcut.add(`${o.kaynak}|${o.id}`)
+        } catch {
+          /* bozuk satır dedup'u engellemez */
+        }
+      }
+    } catch {
+      /* defter henüz yok */
+    }
+    // ⛔YALNIZ AYNI KAYNAK: konu + dosya kancasının aynı dersi ayrı basması İKİ enjeksiyondur (yukarı akım eşdeğeri,
+    // INV-HAFIZA-ENJEKSIYONU-5 "iki tur, her turda tek kayıt"); tekilleşen şey aynı kancanın aynı dakikadaki çift satırıdır.
+    const anahtarOf = (k) => `${k.kaynak === 'dosya' ? 'dosya' : 'konu'}|${k.id}`
+    liste = liste.filter((k, i, tum) => !mevcut.has(anahtarOf(k)) && tum.findIndex((x) => anahtarOf(x) === anahtarOf(k)) === i)
+    if (!liste.length) return true
     const govde = liste
       .map((k) =>
         JSON.stringify({
