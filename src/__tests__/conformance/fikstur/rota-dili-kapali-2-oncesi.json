@@ -317,6 +317,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/kanal-tipi-fan-nedir-nerede-kullanilir",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -526,6 +530,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/sessiz-fan-nasil-secilir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/kanal-tipi-fan-nedir-nerede-kullanilir",
         "alternates": null
       },
       {
