@@ -1,0 +1,48 @@
+{
+  "_nicin": [
+    "KTL-61 (OPS emri, ÜRÜN bulgusu 25 Ekim 2026): iki canlı aile açıklamasında okur için yazılmamış söz var.",
+    "1) danfoss-vlt-micro-drive-fc-51: ilk cümle 'AVenS fiyat listesinde ... listelenen' diyor; bu iç kayıt tonudur (okura kaynak belgenin adı değil, ürünün ne işe yaradığı söylenir).",
+    "2) vortice-vorticent-cms-atex-santrifuj-fanlar: ilk cümle EN 352 / TR 365 karakter, tek cümlede kanal, gövde, pervane ve giriş halkası. Cümle ikiye bölünür; hiçbir sözcük eklenmez ya da çıkarılmaz (yalnız noktalama ve büyük harf).",
+    "Ölçüm: ikisinin canlı değeri 25 Ekim 2026'da SELECT ile okundu (description->>'en'/'tr'); is_description_manual=true, updated_at 2026-10-06 11:46:21Z."
+  ],
+  "_kaynak": "docs/standards/catalog-ingestion-standard.md · scripts/icerik-hatti/aile-blok-duzelt-kurallar.mjs (K1-K5)",
+  "_not": "Bu plan CANLIYA YAZILMAZ; yazım Recep'in 'yaz' sözüyle OPS penceresinde koşar (CANLI_YAZIM_ONAYI=evet + --yaz). Önce kuru koşum: node scripts/icerik-hatti/aile-blok-duzelt.mjs --plan <bu dosya>. FC-51 bloklar_tr.Koruma iç kayıt tonu (OPS onayı 25 Ekim): 'Kontrol (bu ailenin asıl bloğu ...)' etiketi 'Uygulama:' olur, baştaki 'Kaynakta yok.' hangi konuda olduğunu söyler (Koruma bilgisi); kaynakta olmayan hiçbir iddia eklenmez, mevcut cümleler aynen kalır.",
+  "kalemler": [
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": ["en"],
+      "eski": "listed in the AVenS price list for speed control of some",
+      "yeni": "offered for speed control of some"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": ["tr"],
+      "eski": "AVenS fiyat listesinde bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için listelenen kompakt",
+      "yeni": "bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için sunulan kompakt"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": ["bloklar_tr", "Koruma"],
+      "eski": "**Kontrol (bu ailenin asıl bloğu — ve kaynakta olan tek şey uygulamadır).**",
+      "yeni": "**Uygulama:**"
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": ["bloklar_tr", "Koruma"],
+      "eski": "**Kaynakta yok.** **Uygulama:**",
+      "yeni": "Koruma bilgisi **kaynakta yok.** **Uygulama:**"
+    },
+    {
+      "slug": "vortice-vorticent-cms-atex-santrifuj-fanlar",
+      "yol": ["en"],
+      "eski": "classified as ATEX; the housing is a rolling",
+      "yeni": "classified as ATEX. The housing is a rolling"
+    },
+    {
+      "slug": "vortice-vorticent-cms-atex-santrifuj-fanlar",
+      "yol": ["tr"],
+      "eski": "santrifüj fanlardır; gövdesi haddelenmiş",
+      "yeni": "santrifüj fanlardır. Gövdesi haddelenmiş"
+    }
+  ]
+}
