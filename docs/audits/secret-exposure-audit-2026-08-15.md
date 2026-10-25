@@ -47,10 +47,23 @@ desenlerini ayıklıyor.
 
 ## 3. Zaten kapanmış olan iki şey (tekrar açılmasın)
 
-- **Superuser DB şifresi:** 2026-08-15'te Recep **yeniden rotate etti**. HEAD'de sabit-kodlu şifre
-  YOK — kalan tüm `postgres://` satırları `${password}` şablonu, değer env'den geliyor.
+- **Superuser DB şifresi:** ~~2026-08-15'te Recep **yeniden rotate etti**.~~ ⛔**DÜZELTME (2026-10-25,
+  OPS-177, ALT-101): bu iddia YANLIŞTI.** 2026-10-18'de ölçüldü: geçmişteki bir commit'te
+  (`2fef64a1c`, `.agents/*/handoff.md`) okunabilen Postgres süper kullanıcı şifresi HÂLÂ GEÇERLİYDİ
+  (pooler'a `select 1` ile bağlanıldı). Şifre 2026-10-18'de Supabase panelinde sıfırlandı; eski
+  değerin reddedildiği aynı gün ölçüldü, yeni değer yerel `.env` dosyalarına ve GitHub secret'larına
+  (`SUPABASE_DB_PASSWORD`, `SUPABASE_DB_URL`) dağıtıldı ve bağlantı doğrulandı. Ders: "rotate edildi"
+  beyanı o gün eski değerle bağlantı denenerek ölçülmemişti; rotasyon kapanışı ancak "eski değer
+  reddedilir, yeni değer çalışır" ölçümüyle yazılır. HEAD'de sabit-kodlu şifre YOK — kalan tüm
+  `postgres://` satırları `${password}` şablonu, değer env'den geliyor.
 - **Geçmiş temizliği:** **zaten yapılmış.** `.git/filter-repo/` mevcut, **2026-06-07**'de koşmuş;
   23 commit'te `***REMOVED***` yer tutucusu duruyor. Bu borç ödenmişti ve bilmiyorduk.
+  ⚠**EKSİK ÇIKTI (2026-10-25 düzeltmesi):** "borç ödenmişti" ifadesi doğru değildi. Süper kullanıcı
+  şifresini taşıyan `2fef64a1c` (2026-06-02, `.agents/*/handoff.md`) temizlikten (06-07) ÖNCE
+  yazılmış bir commit'tir ve geçmişte okunabilir kalmıştır; yani temizlik bu commit'i yakalamadı.
+  Depo herkese açıktır. "Geçmiş temiz" ifadesi yalnız `***REMOVED***` ile işaretlenen 23 commit için
+  doğrudur; kalan geçmişte her sır imzası yeniden taranmalıdır (ayrı iş; şifre artık geçersiz
+  olduğu için bu belirli değer zarar vermez).
 
 ---
 
