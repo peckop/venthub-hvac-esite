@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
-import { createRequire } from 'node:module'
 
 import { describe, expect, it } from 'vitest'
 
