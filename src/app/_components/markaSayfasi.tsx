@@ -9,13 +9,15 @@ import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '@/lib/cache/tags'
 import { familyName } from '@/lib/i18n/familyName'
+import { listeFiyatiniSuz } from '@/lib/pricing/teklifModuSuzgeci'
 import { ACIKLAMA_ASGARI, aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani, NOINDEX_FOLLOW } from '@/lib/seo/enYayinKurali'
 import { type MarkaUrunSayaci, markaUrunsuzMu as markaAdiUrunsuzMu } from '@/lib/seo/markaUrunDurumu'
 import { ovguCumleleriniAt, ovguVarMi } from '@/lib/seo/ovguAyikla'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
-import { type BrandCatalogSummary, getBrandCatalogSummary, getBrandFamilyCount } from '@/lib/services/family.service'
+import { type BrandCatalogSummary, getBrandCatalogSummary, getBrandFamilyCount, getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient } from '@/lib/supabase/static'
+import type { FamilyListItem } from '@/types/ui-models'
 import { adresUret } from '@/utils/adresUret'
 import { getCategoryDisplayName } from '@/utils/categoryHelpers'
 import { Routes } from '@/utils/routes'
@@ -210,6 +212,38 @@ async function markaKatalogVerisi(
   }
 }
 
+/** Marka sayfasında kart olarak çizilen en çok aile sayısı (eskiden istemci çağrısındaki `limit: 12`). */
+export const MARKA_AILE_AZAMI = 12
+
+/**
+ * Markanın vitrin aileleri önbelleği (URN-145). Eskiden `BrandDetailPage` bu listeyi tarayıcıdan çekiyordu: XHR yanıtı
+ * teklif modundaki ailenin gerçek `min_price`'ını açıkça taşıyordu (INV-FIYAT-SIZINTI-3 yüzeyi). Artık sunucuda okunur,
+ * `getCachedMarkaKatalogOzeti` ile AYNI etiketler ve emniyet kemeri: `PRODUCTS_DISCOVERY_TAG` + kiracı etiketi, anahtar
+ * `lang` VE `tenantId` içerir (kural 12). Hata FIRLATILIR (önbelleğe hata yazılmaz).
+ */
+export const getCachedMarkaAileleri = (lang: string, tenantId: string, markaAdi: string) => unstable_cache(
+  async () => (await getFamiliesEnriched(supabaseStaticClient, { brand: markaAdi, limit: MARKA_AILE_AZAMI })).items,
+  ['brand-families', lang, tenantId, markaAdi],
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+)()
+
+/** Markanın vitrin ailelerini okur; okuyamazsa FIRLATIR. Testte enjekte edilir (`MarkaSayfasi` → `aileler`). */
+export type MarkaAileOkuyucu = (markaAdi: string) => Promise<FamilyListItem[]>
+
+/**
+ * Marka sayfasının aile kartları. Kategori bağlamı YOK → mod bilinmiyor → teklif modu (`listeFiyatiniSuz(…, null)`):
+ * `min_price`/`max_price` istemci bileşenine hiç verilmez (`/products` listesiyle aynı hüküm). Okunamazsa sayfa boş
+ * listeyle çizilir (uyarı basılır, sessiz yutulmaz); hata önbelleğe yazılmaz, sonraki yenilemede kendiliğinden döner.
+ */
+async function markaAileVerisi(brand: Marka, oku: MarkaAileOkuyucu): Promise<FamilyListItem[]> {
+  try {
+    return listeFiyatiniSuz(await oku(brand.name), null)
+  } catch (hata) {
+    console.warn(`[markaSayfasi] ${brand.name} aileleri okunamadı; sayfa kartsız çiziliyor`, hata)
+    return []
+  }
+}
+
 const OG_GORSELI = [{ url: '/images/og-default.jpg', width: 1200, height: 630 }]
 
 /**
@@ -307,14 +341,20 @@ export async function MarkaSayfasi({
   slug,
   sayac,
   katalogOzeti,
+  aileler,
 }: {
   lang: string
   slug: string
   sayac?: MarkaUrunSayaci
   katalogOzeti?: MarkaKatalogOzetiOkuyucu
+  aileler?: MarkaAileOkuyucu
 }) {
   const brand = HVAC_BRANDS.find(b => b.slug === slug)
   const urunsuz = await markaUrunsuzMu(lang, slug, sayac)
+  // URN-145: aile kartları sunucuda okunur ve fiyatı süzülür; ürünsüz markada okuma HİÇ atılmaz.
+  const initialFamilies = brand && !urunsuz
+    ? await markaAileVerisi(brand, aileler ?? ((ad) => getCachedMarkaAileleri(lang, DEFAULT_TENANT_ID, ad)))
+    : []
   // Ürünsüz markada (DB'de aktif ürün 0) listelenecek aile yok → özet sorgusu hiç atılmaz.
   const { urunOzeti, katalogSayilari } = brand && !urunsuz
     ? await markaKatalogVerisi(lang, brand, katalogOzeti ?? ((ad) => getCachedMarkaKatalogOzeti(lang, DEFAULT_TENANT_ID, ad)))
@@ -340,7 +380,7 @@ export async function MarkaSayfasi({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <PageComponent initialBrandSlug={slug} urunsuz={urunsuz} urunOzeti={urunOzeti} katalogSayilari={katalogSayilari} />
+      <PageComponent initialBrandSlug={slug} urunsuz={urunsuz} urunOzeti={urunOzeti} katalogSayilari={katalogSayilari} initialFamilies={initialFamilies} />
     </>
   )
 }

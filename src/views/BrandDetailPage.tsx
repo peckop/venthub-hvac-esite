@@ -4,9 +4,7 @@ import { ArrowRight, ExternalLink,Package } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
-
-import { supabaseBrowserClient } from '@/lib/supabase/client'
+import React from 'react'
 
 import { BrandIcon } from '../components/HVACIcons'
 import Breadcrumb from '../components/navigation/Breadcrumb'
@@ -15,7 +13,6 @@ import { type BrandText,brandText, HVAC_BRANDS } from '../data/brands'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
-import { getFamiliesEnriched } from '../lib/services/family.service'
 import type { FamilyListItem } from '../types/ui-models'
 import { doluMu } from '../utils/bosDegerKorumasi'
 
@@ -90,9 +87,14 @@ export interface BrandDetailPageProps {
    * Verilmezse kutu hiç çizilmez: sözlük cümlesi `{{aile}}`/`{{model}}` ister, sayı yokken ham şablon basılmaz.
    */
   katalogSayilari?: { aile: number; model: number } | null
+  /**
+   * URN-145: marka kartları, sunucuda okunmuş ve teklif modunda fiyatı (`min_price`) süzülmüş aileler
+   * (`markaSayfasi.tsx` → `listeFiyatiniSuz`). Verilmezse boş liste (boş-durum dalı çizilir).
+   */
+  initialFamilies?: FamilyListItem[]
 }
 
-const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false, urunOzeti = '', katalogSayilari = null }) => {
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false, urunOzeti = '', katalogSayilari = null, initialFamilies = [] }) => {
   const { t, lang } = useI18n()
   // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
   const Routes = useLocalizedRoutes()
@@ -118,28 +120,8 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
     .filter(({ etiket }) => doluMu(etiket))
   const ozetVar = ozetSatirlari.length > 0 || !!brand?.headquarters || !!brand?.website
 
-  const [families, setFamilies] = useState<FamilyListItem[]>([])
-  const [loading, setLoading] = useState(true)
-
-  // --- GATEWAY ADAPTATION: CENTRAL FAMILY ENGINE (F5-B) ---
-  useEffect(() => {
-    const loadFamilies = async () => {
-      if (!brand) return
-      setLoading(true)
-      try {
-        const { items } = await getFamiliesEnriched(supabaseBrowserClient, {
-          brand: brand.name,
-          limit: 12
-        })
-        setFamilies(items)
-      } catch (e) {
-        console.error('Error loading brand families:', e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadFamilies()
-  }, [brand])
+  // URN-145: aile kartları sunucuda okunur ve fiyatı süzülür (`markaSayfasi.tsx`); bu bileşen tarayıcıdan veri ÇEKMEZ.
+  const families = initialFamilies
 
   const breadcrumbItems = [
     { label: t('category.breadcrumbHome'), href: Routes.home() },
@@ -351,11 +333,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
             </Link>
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-slate-200 rounded-hvac-xl animate-pulse" />)}
-            </div>
-          ) : families.length > 0 ? (
+          {families.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* priority=false — cetvel §R7/§R9 gereği karar YAZILI. Marka sayfası için
                   fold ölçümü YAPILMADI; mevcut davranış korunuyor. Ölçülür ve fold üstünde

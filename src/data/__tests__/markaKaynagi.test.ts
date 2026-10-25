@@ -142,7 +142,7 @@ describe('INV-MARKA-KAYNAK-1: marka listesi = DB\'de ürünü olan markalar', ()
     // Gövde kararı aynı `markaUrunsuzMu` ile alır ve istemci görünümüne prop geçirir.
     expect(sayfa).toMatch(/const urunsuz = await markaUrunsuzMu\(lang, slug, sayac\)/)
     // URN-79: aynı görünüme DB'den türeyen `urunOzeti` de geçer (ürünsüz markada boş; karar `urunsuz`dan gelir).
-    expect(sayfa).toMatch(/<PageComponent initialBrandSlug=\{slug\} urunsuz=\{urunsuz\} urunOzeti=\{urunOzeti\} katalogSayilari=\{katalogSayilari\} \/>/)
+    expect(sayfa).toMatch(/<PageComponent initialBrandSlug=\{slug\} urunsuz=\{urunsuz\} urunOzeti=\{urunOzeti\} katalogSayilari=\{katalogSayilari\} initialFamilies=\{initialFamilies\} \/>/)
     // Her iki üst veri rotası kararı yardımcıdan alıp üst veri kurucusuna geçirir (atlayıp doğrudan çağırmak kırmızı).
     for (const yol of [
       ['src', 'app', '[lang]', 'brands', '[slug]', 'page.tsx'],
