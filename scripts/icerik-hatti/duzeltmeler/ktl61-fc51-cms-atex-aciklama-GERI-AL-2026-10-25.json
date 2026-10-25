@@ -23,6 +23,24 @@
     {
       "slug": "danfoss-vlt-micro-drive-fc-51",
       "yol": [
+        "maddeler_tr",
+        0
+      ],
+      "eski": "0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.",
+      "yeni": "Katalogda 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi listelenir."
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
+        "bloklar_tr",
+        "Koruma"
+      ],
+      "eski": "HEATMASTER F400 315 M4 0,25kW modelinin iki satırında (2590 ve 3610 m³/h) hız anahtarı olarak FC-51 220V 0,37 kW gösterilir.",
+      "yeni": "HEATMASTER F400 315 M4 0,25kW ve F400 355 M4 0,25kW modellerinde hız anahtarı olarak FC-51 220V 0,37 kW gösterilir."
+    },
+    {
+      "slug": "danfoss-vlt-micro-drive-fc-51",
+      "yol": [
         "bloklar_tr",
         "Koruma"
       ],

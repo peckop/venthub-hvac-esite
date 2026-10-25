@@ -23,10 +23,10 @@ describe('KTL-61 plan', () => {
   const { hatalar, kalemler } = planDogrula(PLAN)
   const aile = aileyeGore(kalemler)
 
-  it('plan biçimi geçerli, iki aile yedi kalem', () => {
+  it('plan biçimi geçerli, iki aile dokuz kalem', () => {
     expect(hatalar).toEqual([])
     expect([...aile.keys()]).toEqual([FC, CMS])
-    expect(kalemler).toHaveLength(7)
+    expect(kalemler).toHaveLength(9)
   })
 
   it('canlı kopya dolu: tam metinler (kısaltma yok)', () => {
@@ -53,16 +53,26 @@ describe('KTL-61 plan', () => {
     expect(sonra.startsWith('**Uygulama:** HEATMASTER F400 315 M4')).toBe(true)
     expect(sonra.endsWith('FC-51 380V 0,37 kW gösterilir.')).toBe(true)
     expect((sonra.match(/\*\*/g) ?? []).length % 2).toBe(0)
-    // Kalan her cümle eski blokta zaten vardı (yeni iddia yok).
+    // Dört cümle kalır: üçü eski blokta aynen vardı, biri (F400 315 M4) kaynak s.34'e göre yazıldı.
     const cumleler = sonra.replace('**Uygulama:** ', '').split(/(?<=\.)\s/)
     expect(cumleler).toHaveLength(4)
-    for (const c of cumleler) expect(say(once, c)).toBe(1)
+    const duzeltilen = cumleler.filter((c) => say(once, c) === 0)
+    expect(duzeltilen).toEqual(['HEATMASTER F400 315 M4 0,25kW modelinin iki satırında (2590 ve 3610 m³/h) hız anahtarı olarak FC-51 220V 0,37 kW gösterilir.'])
+    expect(sonra).not.toContain('355 M4')
+    expect(cumleler.filter((c) => say(once, c) === 1)).toHaveLength(3)
+  })
+
+  it('FC-51 maddeler_tr[0]: "Katalogda … listelenir" kalıntısı kalkar, diğer iki madde aynı', () => {
+    const s = ailePlani(CANLI[FC], aile.get(FC)!)
+    const m = s.aciklama.maddeler_tr as string[]
+    expect(m[0]).toBe('0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.')
+    expect(m.slice(1)).toEqual((CANLI[FC].maddeler_tr as string[]).slice(1))
   })
 
   it('FC-51: planın dokunmadığı alanlar aynı (Motor, maddeler_tr)', () => {
     const s = ailePlani(CANLI[FC], aile.get(FC)!)
     expect((s.aciklama.bloklar_tr as Record<string, string>).Motor).toBe((CANLI[FC].bloklar_tr as Record<string, string>).Motor)
-    expect(s.aciklama.maddeler_tr).toEqual(CANLI[FC].maddeler_tr)
+    expect(Object.keys(s.aciklama)).toEqual(Object.keys(CANLI[FC]))
   })
 
   it('CMS ATEX: ilk cümle bölünür, hiçbir sözcük eklenmez ya da çıkmaz', () => {
