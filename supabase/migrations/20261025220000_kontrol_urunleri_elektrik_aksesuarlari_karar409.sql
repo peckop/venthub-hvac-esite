@@ -207,8 +207,13 @@ begin
 
   -- ADIM 6b: SEO başlığı ve açıklama metninde ESKİ AD geçen yerler yeni adla değişir (OPS 25 Ekim: tutarlılık onarımı;
   -- cümle yapısı aynı kalır, yalnız ad değişir). Tam dizeler: önce/sonra listesi docs/audits/ktl63-...-onerisi-2026-10-25.md §7.
-  update public.categories set seo_title = replace(seo_title, 'Kanallı Merkezi Üniteler', 'Kanallı Isı Geri Kazanım Cihazları')
-   where slug = 'ducted-central-hrv';
+  -- ducted-central-hrv: yeni ad "Isı Geri Kazanım" sözcüklerini zaten taşıdığı için ": Isı Geri Kazanım" soneki çıkar (OPS 25 Ekim).
+  update public.categories set seo_title = 'Kanallı Isı Geri Kazanım Cihazları'
+   where slug = 'ducted-central-hrv' and seo_title = 'Kanallı Merkezi Üniteler: Isı Geri Kazanım';
+  get diagnostics v_adet = row_count;
+  if v_adet <> 1 then
+    raise exception 'KTL-63 adım 6b (ducted-central-hrv başlığı): % satır güncellendi (beklenen 1); işlem geri alınır', v_adet;
+  end if;
   update public.categories set seo_title = replace(seo_title, 'Sulu Batarya Kanal Tipi', 'Sulu Bataryalı Kanal Isıtıcıları')
    where slug = 'water-coil-duct-heaters';
   update public.categories c

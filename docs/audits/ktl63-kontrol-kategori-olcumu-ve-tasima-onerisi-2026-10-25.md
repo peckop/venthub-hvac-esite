@@ -120,7 +120,7 @@ Canlı SELECT (25 Ekim): dört kategoride ve `authority_content` dahil tüm kate
 
 | Kategori | Alan | Önce | Sonra |
 |---|---|---|---|
-| `ducted-central-hrv` | seo_title | Kanallı Merkezi Üniteler: Isı Geri Kazanım | Kanallı Isı Geri Kazanım Cihazları: Isı Geri Kazanım |
+| `ducted-central-hrv` | seo_title | Kanallı Merkezi Üniteler: Isı Geri Kazanım | Kanallı Isı Geri Kazanım Cihazları (tekrar eden ": Isı Geri Kazanım" soneki çıkarıldı, OPS onayı) |
 | `water-coil-duct-heaters` | seo_title | Sulu Batarya Kanal Tipi: Sıcak Su ile Kanal Isıtma | Sulu Bataryalı Kanal Isıtıcıları: Sıcak Su ile Kanal Isıtma |
 | `heat-recovery-vmc` | seo_title | Isı Geri Kazanım (VMC): Tekil ve Merkezi Üniteler | Isı Geri Kazanım: Tekil ve Merkezi Üniteler |
 | `heat-recovery-vmc` | seo_desc | …eşanjör üzerinden aktarılır. Tekil oda üniteleri ve kanallı merkezi üniteler bu kategoridedir. | …eşanjör üzerinden aktarılır. Oda tipi ısı geri kazanım cihazları ve kanallı ısı geri kazanım cihazları bu kategoridedir. |

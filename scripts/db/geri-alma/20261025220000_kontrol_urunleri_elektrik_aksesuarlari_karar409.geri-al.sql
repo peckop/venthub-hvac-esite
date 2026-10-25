@@ -82,8 +82,8 @@ begin
    where c.id = k_acc;
 
   -- SEO başlığı/açıklama metinlerindeki ad değişimi geri (adım 6b'nin tersi; yeni dizeler tam eşleşmeyle eski dizelere döner).
-  update public.categories set seo_title = replace(seo_title, 'Kanallı Isı Geri Kazanım Cihazları', 'Kanallı Merkezi Üniteler')
-   where slug = 'ducted-central-hrv';
+  update public.categories set seo_title = 'Kanallı Merkezi Üniteler: Isı Geri Kazanım'
+   where slug = 'ducted-central-hrv' and seo_title = 'Kanallı Isı Geri Kazanım Cihazları';
   update public.categories set seo_title = replace(seo_title, 'Sulu Bataryalı Kanal Isıtıcıları', 'Sulu Batarya Kanal Tipi')
    where slug = 'water-coil-duct-heaters';
   update public.categories c
