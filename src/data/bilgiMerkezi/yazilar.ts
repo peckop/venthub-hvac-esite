@@ -650,7 +650,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
   },
   {
     // BLOG (BLG-18), doğrulanmış metin sha 4ced15b8860d; B8'de yalnız sessiz fan rehberine tek gezinme cümlesi eklendi
-    // (iddia içermez), kayıtlı metin sha 18c1865e5740, gövde sha 390244c03fa1 (2026-10-26). Beş bağımsız doğrulama turu
+    // (iddia içermez) ve CA MD canlı ürün sayfası cümlesi ve H2 konu terimi (R11), kayıtlı metin sha 402fb77960ca, gövde sha 549f91804b16 (2026-10-26). Beş bağımsız doğrulama turu
     // (hedef üçtü, karşılanmadı); her turda tuzaklı kopya yakalandı. Mevzuat ve sessizlik/dB iddiası yok (R2.6 gerekmez).
     // Yayın: Recep onayı (OPS penceresi, 2026-10-26). Fiyat yok: kategori fiyat göstermiyor, yazı teklife yönlendirir.
     kimlik: 'kanal-tipi-fan-nedir',
@@ -689,7 +689,7 @@ ABD Enerji Bakanlığı rehberi, tüp tipi aksiyel (tubeaxial) fanları orta bas
 
 ## Kanal tipi fan nerede kullanılır?
 
-Vortice, plastik reçine gövdeli CA V0 serisini asma tavana ya da çatı arasına monte edilen bir kanal fanı olarak sunar; kataloğa göre mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygundur [2]. Aynı katalog boyalı sac çelik gövdeli CA MD serisini de asma tavan ve çatı arası kurulumu için tanımlar [2].
+Vortice, plastik reçine gövdeli CA V0 serisini asma tavana ya da çatı arasına monte edilen bir kanal fanı olarak sunar; kataloğa göre mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygundur [2]. Aynı katalog boyalı sac çelik gövdeli CA MD serisini de asma tavan ve çatı arası kurulumu için tanımlar [2]. VentHub'ın Vortice In-Line yuvarlak kanal fanları ailesi sayfasında bu serinin CA MD modelleri listelenir.
 
 Kanalın ucuna takılan türler de vardır. Çelik sac duvar tipi fanlar kanalın ucuna monte edilir ve laboratuvar, bar, restoran, çamaşırhane, spor salonu gibi ticari ya da endüstriyel mekânların havalandırma ihtiyacını karşılar [2]. Çatı tipi fanlar da kanal ucuna monte edilir ve çatıdan atış yapan ticari ve endüstriyel mekânlar için tanımlanmıştır [2]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [2].
 
@@ -733,7 +733,7 @@ Hesaplanan eğri gerçek sistemde yukarı kayabilir. DOE rehberi buna sistem etk
 
 Ses düzeyi seçimde belirleyiciyse [sessiz fan seçimi rehberi](vh:yazi/sessiz-fan-secimi) dB(A) değerlerinin hangi koşulda okunacağını anlatır.
 
-## Montaj seçenekleri ve sistem etkisi
+## Kanal tipi fan montaj seçenekleri ve sistem etkisi
 
 DOE rehberi, sistem etkisinin akış profilini mümkün olduğunca düzgün tutacak bir düzenle azaltılabileceğini belirtir; alan kısıtı buna engel olursa sistem etkisinin fan seçimine katılması gerektiğini söyler [7].
 
