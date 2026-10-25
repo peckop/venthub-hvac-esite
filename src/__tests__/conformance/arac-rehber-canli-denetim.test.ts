@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { canliDenetle, cakismaOlc, fiyatOlc, gorunurMetin, ifadeVarMi, uclular } from '../../../tools/rehber/canli-denetim.mjs'
+import { cakismaOlc, canliDenetle, fiyatOlc, gorunurMetin, ifadeVarMi, uclular } from '../../../tools/rehber/canli-denetim.mjs'
 
 /**
  * INV-REHBER-CANLI-DENETIM-1 · ağlı rehber denetim kolu (ARC-206 İŞ 2, HRT-70; rehber-yazisi-standard.md R10.6 madde 1-3).
@@ -113,6 +113,39 @@ describe('INV-REHBER-CANLI-DENETIM-1 · fiyat / hide_price (BLG-18 dersi)', () =
 
   it('fiyatOlc ₺/TL ve Teklif sayar', () => {
     expect(fiyatOlc('1.250 TL ve 300 ₺ ... Teklif al, teklif iste')).toEqual({ fiyat: 2, teklif: 2 })
+  })
+})
+
+describe('INV-REHBER-CANLI-DENETIM-1 · BLOG iddia tablosu (--iddia)', () => {
+  const tablo = {
+    iddialar: [
+      { no: 1, tur: 'genel', metin: 'Genel cümle [1] 150 mm yok sayılır çünkü tur genel.' },
+      { no: 21, tur: 'sayi', metin: 'Radon serisi 100, 125 ve 150 mm çaplarında, IP45 koruma sınıfıyla sunulur [5].' },
+      { no: 23, tur: 'sayi', metin: 'Radon ürün grubu 8 modelden oluşur [6].' },
+      { no: 24, tur: 'sayi', metin: 'Sayısı olmayan sayi satırı [7].' },
+    ],
+  }
+  const AILE_SAYFA = sayfaHtml('<p>Çap 150 mm • IP45 • 5 model</p>')
+
+  it('sayı+birim ifadeleri çıkarılır; atıf numaraları ve genel tur atılır', async () => {
+    const { sayiIddialari, sayiTokenleri } = await import('../../../tools/rehber/canli-denetim.mjs')
+    expect(sayiTokenleri('150 mm, IP45 ve 26,1 dB(A) [3, 4] ile 8 model')).toEqual(['IP45', '150 mm', '26,1 dB(A)', '8 model'])
+    expect(sayiIddialari(tablo).map((i: { no: number }) => i.no)).toEqual([21, 23])
+  })
+
+  it('canlıda olmayan sayı (8 model) UYARI, tamamı canlıda olan GEÇTİ; evren boşsa sessiz geçmez', async () => {
+    const s = await canliDenetle({ sayfalar: [AILE], iddiaTablosu: tablo }, { getir: ag({ [AILE]: cevap(200, AILE_SAYFA) }) })
+    const t = s.maddeler.filter((m: { ad: string }) => m.ad === 'iddia-tablo')
+    expect(t.map((m: { durum: string }) => m.durum)).toEqual(['GEÇTİ', 'UYARI']) // #21: 150 mm + IP45 canlıda var; #23: 8 model yok (5 model)
+    expect(t[1].ayrinti).toContain('8 model')
+    const tam = await canliDenetle(
+      { sayfalar: [AILE], iddiaTablosu: { iddialar: [{ no: 9, tur: 'sayi', metin: 'Çap 150 mm ve IP45 [2].' }] } },
+      { getir: ag({ [AILE]: cevap(200, AILE_SAYFA) }) },
+    )
+    expect(durumlar(tam, 'iddia-tablo')).toEqual(['GEÇTİ'])
+    const bos = await canliDenetle({ sayfalar: [AILE], iddiaTablosu: tablo }, { getir: ag({}) })
+    expect(durumlar(bos, 'iddia-tablo')).toEqual([])
+    expect(bos.durum).toBe('ÖLÇÜLEMEDİ')
   })
 })
 
