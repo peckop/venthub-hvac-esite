@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.10 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.11 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -57,6 +57,13 @@ MEVZUAT penceresi kapalıyken üç şartlı birincil metin hükmü ve madde/ek n
 R5.1.1 tur klasörü bağımsızlığı, başlıkların bağımsız okunması ve atıf kümesi ↔ kaynak alanı ölçümü; R5.5'e düzeltme
 türüne göre tur ve başlık-yalnız revizyon; R10.3'e ölçülen tur sayısı (hedef karşılanmadı); R10.5 ders listesi.
 Kırmızı kural getirmez; yeni kapı yazmaz (K0–K5 hâlâ aday).
+**v0.11 (2026-10-26, BLG-19, OPS emri):** dördüncü yazının (BLG-18) beş doğrulama turundan ve yayın öncesi ölçümden
+çıkan dersler: R10.5'e rehber kartı meta kopyası (sessiz fan, BLG-15), katalog-canlı sayı karşılaştırması (bölünmüş aile,
+olmayan seri adı), `hide_price` kategorisinde RSC fiyatı, DOE/Vortice künye dersleri, tuzaklı + temiz kopya zorunluluğu,
+ana sayfa blok adedi ve site haritası fikstürleri; yeni **R10.6 yayın öncesi kontrol listesi** (sekiz madde, her madde
+kanıtlı, B8 PR gövdesinde doldurulur) ve hangi maddenin kapıya çevrilebileceği önerisi. Kırmızı kural ve kapı getirmez
+(kapıyı ARAÇ yazar). Tetik: Recep "bu dersler neden departmanın kendi kuralında yok" diye sordu; sessiz fan dersi
+cetvelde hiç yoktu.
 
 ---
 
@@ -659,7 +666,7 @@ flowchart TD
 | **B5** Doğrulama turu | 3a kapsam çıkarımı (tabloyu görmeden), 3b atıf betiği, 3c alıntı betiği, 3d sınıflama, 3e sabotaj kolu (tuzak yalnız kopyada), 3f örnekleme, 3g MEVZUAT kontrolü | BLOG (doğrulayıcı alt ajanlar bağımsız; hüküm BLOG'da); 3g MEVZUAT | R5.3: eşlenmeyen 0 · DESTEKSİZ 0 · ÇELİŞİYOR 0 · BAYAT 0 · açılamayan 0 · sabotaj N/N (N ≥ 3) | B6 | karta tur notu: tur no, kırmızı sayısı, tuzak sayısı ve yakalanan |
 | **B6** Düzeltme + tam yeniden tur | R5.1 adım 4–5: düzelt, tuzakları çıkar, **tüm metin** yeniden 3a'dan geçer | BLOG | R5.1 adım 5 ("tüm metin"); tur sayacı (R10.3) | tur sayısı 3'ü aşarsa kök sebep notu: her bulgunun hangi aday kapıyla yakalanacağı (R10.2) | karta tur notu |
 | **B7** Önizleme + onay | R5.4 iki parça: önizleme (sha256 ilk 12 hane) + düz cümle özet; tek soru "yayınlayalım mı?" | BLOG sunar, Recep onaylar (kendi sözü, bu pencerede) | sha256 doğrulananla aynı; yayına giremeyecek metnin onayı sorulmaz (R5.7) | metin değişirse durum taslak, B5 | durum dosyası + karta onay kaydı (kim, ne zaman, sha256) |
-| **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı; **PR açılınca yazı adresi GEO-SEO'ya SendMessage ile verilir** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
+| **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı **ve R10.6 yayın öncesi kontrol tablosu (sekiz madde, her madde kanıtlı; kanıtsız madde AÇIK, yayın çıkmaz)**; **PR açılınca yazı adresi GEO-SEO'ya SendMessage ile verilir** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
 | **B9** Birleşme | PR birleşmeden önce OPS'a gösterilir; `scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` | OPS onaylar; ritüeli emri veren pencere koşar | ritüel çıkış 0; `mergeStateStatus` CLEAN; `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` 204; karta "GEO-SEO taban aldı" notu (ne zaman gerektiği ve kip: Y2.1) | birleşme yapılmaz; kırmızı kapı B8'e döner | karta PR no + birleşme ölçümü |
 | **B10** Canlı doğrulama | Dağıtım bitince: yazı adresi **200**; site haritasında adres, `lastmod` = yayın tarihi; bilgi merkezi liste kartı **tarayıcı bölmesiyle** görülür (ham HTML yetmez); ters bağlantı yerinde; iç bağlantılar doğrudan 200 | BLOG | `curl` 200; harita satırı; `ic-baglanti-denetle.mjs`; `bot-karnesi.mjs` yazı adresinde temiz | düzeltme R5.5 revizyonu; B11–B12 başlamaz | karta not: adres, 200, `lastmod`, liste kartı (tarayıcı). ⚠Kart doğrulayıcısı `curl` ve kabuk operatörünü reddeder: "canlı 200" ölçütü elle işaretlenir, kanıt kart notundadır |
 | **B11** Google dizin isteği | B10'dan sonra **aynı tur**. Metin, kapı, komut ve süre sınırı **tek kaynakta**: `yayin-gorunurluk-denetim-standard.md` Y2 ("her yeni yazı ya da düzeltilmiş sayfa yayını" satırı; genişletme Y2.1, GEO-SEO'nun SEO-45 PR'ı). R10 yalnız sırayı gösterir, burada yeniden yazılmaz | GEO-SEO (Recep'ten ayrıca onay istenmez) | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B11 kaydı aranır (R10.3) |
@@ -716,7 +723,8 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
 ### R10.5 Önceki yazıların ders listesi (yeni yazı başlarken OKUNUR)
 
 Yeni bir rehber yazısına başlarken işbaşı notuna bu listenin okunduğu yazılır. Her satır ölçülmüş bir olaya dayanır;
-kapıya dönen ders yoktur (K0–K5 aday).
+kapıya dönen ders yoktur (K0–K5 aday); hangisinin kapıya çevrilebileceği R10.6'da önerilir. Her ders "Yer" sütunundaki
+basamakta uygulanır; uygulandığı B8 öncesinde R10.6 tablosuyla kanıtlanır.
 
 | Ders | Yer | Dayanak |
 |---|---|---|
@@ -724,7 +732,37 @@ kapıya dönen ders yoktur (K0–K5 aday).
 | Yazının canlıdan ölçümü sırasında yan dosya yolu: Git Bash `/tmp` ile Node `/tmp` AYNI klasör DEĞİL; ölçüm dosyası scratchpad'e yazılır | B10 | BLG-15: Node başka oturumun eski dosyasını okudu |
 | Birleşmeden sonra `verify_completion` kanıt komutu ana dizindeki dosyaya bakar; ana dizin master'ı almadan kırmızı verir | B10, kart kapanışı | BLG-15 kapanışı |
 | Yeni yazı ana sayfa kartını artırırsa axe belirsiz-kontrast tavanı etkilenir (ana sayfa son 3 rehber kartını basar; BLG-15 ile 19 → 21, OPS 16 Ekim); PR'dan ÖNCE tavan etkisi ölçülür | B8 | BLG-3 (17 → 19), BLG-15 (19 → 21) |
-| Test fikstürleri yeni yazıyla değişir: sahte katalog (aile, kategori), site haritası altın dosyası, conformance fikstürü; geri bağlantı testi "rehber yok → null" notu | B8 | BLG-15 PR'ı ilk çalıştırmada üç yerde kırmızıydı |
+| Test fikstürleri yeni yazıyla değişir: sahte katalog (aile, kategori), site haritası altın dosyası (`src/app/__tests__/fixtures/sitemapAltin.json`) ve `sitemapAdresUret.test.ts` satır sayıları, rota-dili conformance fikstürü (`rota-dili-kapali-2-oncesi.json`); geri bağlantı testi "rehber yok → null" notu | B8 | BLG-15 PR'ı ilk çalıştırmada üç yerde kırmızıydı; BLG-18'de site haritası testleri (24 → 25, 44 → 45) ve rota-dili fikstürü yeniden kırmızıydı |
+| Ana sayfa Bilgi bloğu yalnız en yeni 3 rehberi basar (`enYeniRehberler` adet = 3): dördüncü yazıyla en eski rehber bloktan çıkar; bloğun tüm yazıları basmasını bekleyen testler (`kartOzetiYuzeyler`, `kartNosnippet`) bloğun gösterdiği kümeye göre yazılır, yazı sayısına göre değil | B8 | BLG-18: dördüncü yazı eklenince iki test kırıldı (frekans rehberi bloktan çıktı) |
+| **Rehber kartı yazının meta açıklamasını kopyalamaz.** Kategori, aile ve ana sayfa kartı `kartOzeti` basar (ayrı, kısa yönlendirme cümlesi, `data-nosnippet` içinde); meta açıklaması (`ozet`) kartta ve rehber kutusunda görünmez. Başlık, meta açıklaması ve `kartOzeti` yazıyı gösterecek kategori ve aile sayfalarının metniyle çakışmaz (3'lü kelime dizilimi ortak sayısı canlı sayfadan ölçülür) | B3, B4, B8 | Sessiz fan rehberi (BLG-15): 18–22 Ekim ölçümünde rehber 0 gösterim aldı; rehber kutusu yazının meta açıklamasını kopyaladığı için Google kategori ve ürün sayfasını rehber başlığıyla gösterdi. Düzeltme URN-140: `kartOzeti` alanı, `data-nosnippet`, INV-BILGI-MERKEZI-KART-3 (PR #2043). BLG-18'de ölçüm: kartOzeti ve başlık canlı kategori ve üç aile sayfasıyla ortak 3'lü dizilim 0/9 (başlıkta yalnız konu terimi) |
+| Katalog sayısı ile canlı ürün sayfası sayısı karşılaştırılırken **ailenin bölünüp bölünmediği** de bakılır; katalogdaki seri adı (ör. CA V0) canlıda hangi ailede olduğu ölçülür, olmayan seri adı yazıdaki sayıyla sitedeki sayfayı eşleştirmez | B4, B10 | BLG-18: radon "8 model" (katalog [6] s.8) ile canlı "5 model" ilk okumada fark sanıldı; canlıda iki aile var: kanal 5 (CA-RM ES) + çatı 3 (CA-RM RF ES) = 8. Gerçek fark: sitede CA V0 yok, In-Line yuvarlak aile CA MD (7 model; katalogda CA MD 8) |
+| Kategori `hide_price` ise aile sayfasında görünür fiyat yoktur ("Teklif İste"), ama gömülü RSC verisinde ürün fiyatı bulunabilir; "fiyat yalnız ürün sayfasında görünür" (R3) varsayımı bu kategoride YANLIŞTIR. Yazıda fiyat cümlesi yazılmadan önce canlı aile sayfasında ölçülür (₺/TL sayısı, "Teklif" sayısı) | B3, B4 | BLG-18: kanal-tipi-fanlar altında 6 aile sayfasında görünür metinde ₺/TL 0, "Teklif" 12 (curl, script/style çıkarılmış, 25 Ekim); Lineo ve In-Line aile sayfalarının gömülü RSC verisinde fiyat var, radon sayfalarında yok. Yazı "Bu yazıda fiyat verilmez; teklif isteyin" der. RSC fiyatı için karar KATALOG/ÜRÜN'de |
+| Üretici/DOE belgesi sayfa künyesi **sayfada yazılı numaradan** ölçülür: DOE sourcebook'ta basılı numara = PDF indeksi − 3 (ilk varsayım −4 künyeyi kaydırdı); belgede basılı numara yoksa (radon belgesi) PDF sırası yazılır ve künye notuna eklenir; Vortice CA katalog başlığı "centrifugal", gövde metni "mixed flow" olabilir, akış türü seri adından çıkarılmaz | B2, B3, B5 | BLG-18 tur 1 ve tur 2 temiz kopya bulguları |
+| **Tuzaklı kopya yanında temiz kopya zorunludur.** Tuzaklı kopya doğrulayıcının çalıştığını gösterir (BLG-18'de beş turun beşinde 4/4–5/5 tuzak yakalandı); yazının gerçek hatalarını (örtük fiyat nedenselliği, kaynak kapsamını aşan "ölçüt" çerçevesi, olumsuz iddia, "aynı seri") temiz kopyayı okuyan doğrulayıcı buldu. Zorunlu başlık `## Fiyatı belirleyen etkenler` birebir kalır; kaynaklar fiyatı anlatmıyorsa altı bunu dürüstçe söyler | B5 | BLG-18: 5 tur, hedef ≤ 3 karşılanmadı (BLG-15: 7) |
+
+### R10.6 Yayın öncesi kontrol listesi (B8'den önce, her madde kanıtlı)
+
+**Tetik (OPS, 26 Ekim 2026):** sessiz fan dersi (R10.5, rehber kutusu meta kopyası) cetvelde yoktu ve kontrol edilmeden
+dördüncü yazı yayına gidiyordu; Recep "geçen hatalar tekrar etmesin" dedi. Aşağıdaki sekiz madde her yeni yazının B8
+PR'ında **PR gövdesinde** tablo olarak doldurulur: her satırda durum (UYGULANDI / AÇIK) ve kanıt (dosya:satır, komut
+çıktısı ya da canlı ölçüm). **Kanıtı olmayan madde AÇIK sayılır ve yayın çıkmaz.** B7 onayı bu tablodan önce alınabilir;
+tablo OPS'a B8 PR'ıyla birlikte gider, OPS bağımsız doğrulayıcıyla ayrıca ölçer, yayın iki taraf da yeşilken çıkar.
+
+| # | Madde | Kanıt biçimi | Kapıya çevrilebilir mi (öneri; kapıyı ARAÇ yazar, HRT-70) |
+|---|---|---|---|
+| 1 | Rehber kartı meta açıklamasını kopyalamıyor; `data-nosnippet` ve INV-BILGI-MERKEZI-KART-3 bu yazı için de yeşil; yazıyı gösterecek kategori ve aile sayfaları listelenir | `kartOzeti`, `kartOzetiYuzeyler`, `kartNosnippet` testleri; yazıyı gösterecek sayfa listesi (ters dizin); kartOzeti ve başlığın canlı kategori/aile metniyle 3'lü dizilim çakışması | **Evet, zaten kapı:** INV-BILGI-MERKEZI-KART-3 testi yeni yazıyı kendiliğinden kapsar. Eksik: canlı sayfa çakışması ölçümü betiği (`rehber-denetim` ağlı kol) |
+| 2 | Yazıdaki her sayı katalog ve canlı ürün sayfasıyla aynı; katalog-canlı fark KATALOG/ÜRÜN'e kartla gider; bölünmüş ailede toplam alınır | iddia tablosu (ham alıntı), 3f örnekleme, canlı aile sayfası sayıları | **Kısmen:** iddia tablosundaki sayı iddialarını canlı aile sayfasıyla karşılaştıran ağlı betik; seri adının canlıda var olup olmadığı |
+| 3 | Yazıda fiyat ya da fiyat ima eden cümle yok (`hide_price` kategoride fiyat cümlesi yazılmaz) | gövde taraması (₺, TL, fiyat sözcükleri) ve canlı aile sayfası ölçümü | **Kısmen kapı var:** `FIYAT` deseni (para birimi + rakam) kalıp kapısında KIRMIZI verir; eksik olan fiyat ima eden cümle UYARI kolu ve canlı aile sayfası ölçümü (₺/TL sayısı, "Teklif" sayısı) |
+| 4 | R10.5 beş madde: axe kontrast tavanı PR'dan ÖNCE ölçüldü; fikstürler (sahte katalog, site haritası altın dosyası ve satır sayıları, rota-dili conformance) güncellendi; ölçüm dosyası depo dışı (`/tmp` değil) | axe e2e sonucu (CI), fikstür testlerinin yeşil çıktısı | **Kısmen:** fikstür kırıklarını yeni yazı kaydı eklendiğinde yerelde koşan tek `test:ilgili` kümesi; axe e2e CI'da zaten kapı |
+| 5 | R11 başlık kuralı: her H2 tek başına aranınca konuyu söylüyor | `baslikDenetle` çıktısı (H2 sayısı, konulu oran, uyarı) | **Evet, kapı var:** `baslikDenetle` UYARI kolu (zorunlu başlıklar muaf) |
+| 6 | Site haritasında yeni adres var; canonical ve hreflang doğru; noindex yok | `sitemapAltin.json` ve `ustVeriHarita` testi (yerel); birleşmeden sonra canlı `curl` (B10) | **Evet:** B10 canlı ölçüm betiği (200, haritada adres + `lastmod`, canonical, noindex yok) |
+| 7 | İç bağlantılar: `vh:yazi` kimlikleri çözülüyor, 404 bağlantı 0; ön koşul PR'lar (ör. çözücü) birleşmiş | `icBaglanti.test` (derleme), `ic-baglanti-denetle.mjs` (canlı), ağsız kapı çıktısı | **Evet:** `ic-baglanti-denetle.mjs` B10 sonrası otomatik; ağsız yarı `yazi` türünü tanır (PR #2053) |
+| 8 | Marka, sertifika ve performans iddiaları resmî kaynakta birebir var | iddia tablosunda sınıf ve ham alıntı; sertifika/ödül/üstünlük deseni taraması | **Kısmen:** sertifika ve üstünlük sözcük deseni UYARI kolu; "kaynakta birebir var" kısmı doğrulayıcıda kalır |
+
+**Kapı önerisi özeti (OPS'a, BLG-19):** tamamen kapıya çevrilebilen üç iş vardır: (a) ağlı `rehber-denetim` kolu
+(madde 1 canlı kategori/aile çakışması + madde 2 canlı sayı karşılaştırması + madde 3 canlı fiyat deseni), (b) B10 canlı
+ölçüm betiği (madde 6 ve 7, tek komut), (c) `test:ilgili` ön kontrolü (madde 4 fikstür kırıkları). Madde 8'in
+"birebir var" yarısı ve axe ölçümü insan ya da CI'da kalır. Kapıyı ARAÇ yazar; bu cetvel kapı yazmaz (K0–K5 aday kalır).
 
 ## R11 — Başlık ve içerik yapısı: Google'ın resmî belgelerine dayanan kural (BLG-12, 2026-10-14)
 
