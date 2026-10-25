@@ -2,7 +2,7 @@
   "_aciklama": "Rol kurallar dosyalarının 'Departmana özgü iş kuralları' bölümünün verisi (OPS-168 O2, HRT-65). Her departman kendi metnini hazırlar (side-session-notes rol-metni-<DEP>-2026-10-16.md), HARİTA buraya işler; üretici (scripts/belge/rol-karti-uret.cjs) docs/roller/<ROL>-kurallar.md dosyasına yazar, o dosyalar elle düzenlenmez. Sınır: rol başına en çok 8 madde, her madde ölçülmüş bir olaya dayanır (olay maddenin içinde yazılı). Depo herkese açık: gizli değer, kişisel veri, sorgu verisi yazılmaz.",
   "roller": {
     "ALTYAPI": {
-      "yollar": [".github/workflows/**", "package.json", "scripts/ci/**"],
+      "yollar": [".github/workflows/**", ".github/dependabot.yml", "package.json", "pnpm-lock.yaml", "scripts/ci/**", "docs/standards/bagimlilik-kararlari.md"],
       "kurallar": [
         "**İzin bloğu.** İş akışına `permissions:` yazılınca `contents: read` ZORUNLUDUR (herkese açık depoda varsayılanlar düşer, yoksa checkout \"Repository not found\" verir). Ek izin yalnız gerekçeyle yazılır (örnek: dağıtım kapısında `statuses: read`). Kaynak: CLAUDE.md Notlar; `dagitim-hazir.yml` (ALT-82).",
         "**Aksiyonlar ve sırlar.** Her `uses:` tam 40 haneli commit'e sabitlenir (sürüm yorumda); `secrets.*`, `self-hosted` ve `pnpm install` yazılmaz (yabancı fork kodu kendi sunucuda çalışır; kurulum yüzeyi büyür). Kaynak: CLAUDE.md (herkese açık depo); `INV-DAGITIM-HAZIR-1` ve `INV-DIZIN-TETIGI-1` bunu ölçer.",
@@ -79,7 +79,7 @@
       "sonaAlinan": "İşe uymayan genel kurallar silinmez, sona alınır: K3 RLS-first, K30 Storage RLS (Faz 2 park)."
     },
     "URUN": {
-      "yollar": ["src/components/products/**", "src/views/category/**", "src/lib/services/**"],
+      "yollar": ["src/components/products/*.tsx", "src/views/category/**", "src/lib/services/**", "src/lib/seo/jsonld.ts", "src/lib/pricing/**", "src/app/_components/{aileSayfasi,ProductDetailPageView,kategoriSayfasi,urunlerSayfasi}.tsx"],
       "kurallar": [
         "**Servis katmanında DI (Mutlak Kural 2).** `src/lib/services/*` fonksiyonu ilk parametre `supabase` alır, modül düzeyi client yok; her yeni servis için sahte fetch ile süzgeç/hata yolu testi yazılır. Olay: URN-135'te `sessizFanKodlari.service.ts` bu desenle yazıldı, ilk yazımda status/silinmiş süzgeci testle sabitlendi.",
         "**Fiyat görünmüyorsa şemada da yok.** Yapısal veride `offers` yalnız vitrinde görünen geçerli fiyat için; teklif kipinde, fiyatsız ya da karışık ailede `ProductGroup/Product/hasVariant/offers` yazılmaz, `CollectionPage` + `ItemList` yazılır; `price: 0`, uydurma `review/aggregateRating` yasak. Olay: REC-111 (80 ürün adresinin 72'sinde gerçek fiyat yayınlandı) ve URN-138 (Search Console KRİTİK, 47 aile / 441 varyant).",

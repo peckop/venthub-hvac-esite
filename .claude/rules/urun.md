@@ -1,8 +1,11 @@
 ---
 paths:
-  - "src/components/products/**"
+  - "src/components/products/*.tsx"
   - "src/views/category/**"
   - "src/lib/services/**"
+  - "src/lib/seo/jsonld.ts"
+  - "src/lib/pricing/**"
+  - "src/app/_components/{aileSayfasi,ProductDetailPageView,kategoriSayfasi,urunlerSayfasi}.tsx"
 ---
 
 # URUN: departmana özgü iş kuralları (başlıklar; yol kapsamlı, üretilmiş)

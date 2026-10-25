@@ -1,8 +1,11 @@
 ---
 paths:
   - ".github/workflows/**"
+  - ".github/dependabot.yml"
   - "package.json"
+  - "pnpm-lock.yaml"
   - "scripts/ci/**"
+  - "docs/standards/bagimlilik-kararlari.md"
 ---
 
 # ALTYAPI: departmana özgü iş kuralları (başlıklar; yol kapsamlı, üretilmiş)
