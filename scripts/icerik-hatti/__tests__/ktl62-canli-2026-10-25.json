@@ -1,0 +1,43 @@
+{
+  "danfoss-vlt-hvac-basic-drive-fc-101": {
+    "en": "The Danfoss VLT HVAC Basic Drive FC101 is a frequency converter (motor drive) series offering functions dedicated to HVAC applications, an EMC filter, automatic energy optimization, and a smart logic controller.",
+    "tr": "Danfoss VLT HVAC Basic Drive FC101, HVAC uygulamalarına özel fonksiyonlar, EMC filtre, otomatik enerji optimizasyonu ve akıllı logic kontrolör sunan bir frekans konvertörü (motor sürücüsü) serisidir.",
+    "bloklar_tr": {
+      "Motor": "Ürünün kendisi motor değil, motor **sürücüsüdür**; sürdüğü motorun gücü Kimlik bölümündeki kW aralığıyla karşılanır.",
+      "Gövde": "Üretici föyünden gelen taban gövde bilgisi: IP20 / Open type, H1–H8 gövde boyları, 2,1–51 kg ağırlık aralığı.",
+      "Koruma": "Katalog, seri için EMC filtre ve akıllı logic kontrolör dışında koruma bilgisi vermez. Üretici föyüne göre taban gövde koruma sınıfı IP20 / Open type'tır [MANIFEST]. **Kontrol (bu ailenin asıl bloğu).** Standart yangın modu bulunur. Çift satır nümerik kontrol panosu ile gelir. Otomatik enerji optimizasyonu ve akıllı logic kontrolör standarttır. Standart haberleşme protokolleri Modbus RTU, BacNet, Metasys N2, FC ve FLC olarak listelenir.",
+      "Montaj": "Katalogda tesisat kısıtı olarak yalnız kablo mesafesi verilir: maksimum kablo mesafesi 50 metredir. ---"
+    },
+    "maddeler_tr": ["Modeller motor gücüne göre ayrılır."]
+  },
+  "danfoss-vlt-hvac-drive-fc-102": {
+    "en": "Danfoss VLT HVAC Drive FC102 is a frequency converter (motor drive) series offering functions specific to HVAC applications, 98% base energy efficiency, sleep mode, and automatic energy optimization.",
+    "tr": "Danfoss VLT HVAC Drive FC102, HVAC uygulamalarına özel fonksiyonlar, %98 temel enerji verimliliği, uyku modu ve otomatik enerji optimizasyonu sunan bir frekans konvertörü (motor sürücüsü) serisidir.",
+    "bloklar_tr": {
+      "Motor": "Ürün motor değil, motor sürücüsüdür.",
+      "Gövde": "Üretici föyünden gelen taban gövde bilgisi: IP20 / Chassis, A2–C4 gövde boyları, 4,8–50 kg ağırlık aralığı.",
+      "Koruma": "Katalog bu aile için ayrı bir koruma bilgisi vermez; EMC filtre ibaresi FC101 satırında geçer, FC102 satırında geçmez. Üretici föyüne göre taban gövde koruma sınıfı IP20 / Chassis'tir [MANIFEST]. **Kontrol (bu ailenin asıl bloğu).** Standart yangın modu bulunur. LCD operatör paneli ile gelir. Uyku modu ve otomatik enerji optimizasyonu standarttır. Standart haberleşme protokolleri Modbus RTU, BacNet, Metasys N2 ve FC olarak listelenir; FC101'deki FLC protokolü bu listede **yoktur**.",
+      "Montaj": "Tesisat kısıtı olarak maksimum kablo mesafesi 150 metredir. ---"
+    },
+    "maddeler_tr": [
+      "Katalogda motor gücü 1,1 kW ile 90 kW arasında 17 model olarak listelenir.",
+      "Besleme gerilimi satırlarda 380V olarak verilir.",
+      "Temel enerji verimliliği %98 olarak belirtilir."
+    ]
+  },
+  "vortice-tiracamino-somine-ve-baca-fanlari": {
+    "en": "Radial flue fan designed to draw out smoke from fireplaces. Continuous operation at 200°C. Includes speed controller. Flue suction fan model TIRACAMINO (750 m3/h).",
+    "tr": "Şömine ve baca fanları grubunda yer alan, sürekli 200ºC dayanımlı, radyal fanlı, baca gazı tahliyelerine uygun fan.",
+    "bloklar_tr": {
+      "Çark": "Radyal (santrifüj) fanlıdır.",
+      "Gövde": "Katalog gövde malzemesini yazmaz; verdiği tek gövde verisi ölçü tablosudur — ⌀A 405, ⌀B 410, ⌀C 357, ⌀D 10, E 38, F 518, G 480, A1 401, B1 357, C1 140, D1 40. > *Ölçü tablosunda **birim yazmıyor** (büyük olasılıkla mm, ama kaynak söylemiyor) — bu yüzden > birim eklenmedi. Vitrine yazılmadan önce doğrulanmalı.*",
+      "Koruma": "Sürekli 200ºC sıcaklığa dayanır; baca gazı tahliyesine uygunluğu bu dayanıma dayanır.",
+      "Kontrol": "Hız anahtarı ürünle birlikte verilir; debi bu anahtarla ayarlanır."
+    },
+    "maddeler_tr": [
+      "Hava debisi 750 m³/h.",
+      "Hız anahtarı ürüne **dahildir** (ayrıca satın alınmaz).",
+      "Katalog kodu 15000."
+    ]
+  }
+}
