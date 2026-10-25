@@ -175,7 +175,7 @@ const BAG = {
 // Vorticent CMS ATEX model föyleri (10 dosya, 11 üründen 10'u): ürün düzeyi föy, aileye de bağlanır.
 for (const s of envanter.satirlar) {
   if (/VORTICENT-CMS-ATEX-/.test(s.dosya)) BAG[s.dosya] = { a: ['vortice-vorticent-cms-atex-santrifuj-fanlar'], tur: 'teknik_foy', yayin: Y, not: 'model föyü (baskı 2026-03-05); Design: PDF yok diyordu' }
-  if (/^avensair-ADH-/.test(s.dosya)) BAG[s.dosya] = { a: ['nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar'], tur: 'teknik_foy', yayin: 'hayir: resmi değil (bayi föyü)' }
+  if (/^avensair-ADH-/.test(s.dosya)) BAG[s.dosya] = { a: ['nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar'], tur: 'teknik_foy', yayin: Y, not: 'Recep kararı (25 Ekim 2026): yayınlanabilir; AVenS'+"'"+'in kendi föyü (KTL-59 doğrulayıcısı teyit etti); envanter durumu resmi-degil, üretici belgesi değil' }
 }
 
 // ── Dil: TÜM sayfalar tek tek sınıflanır (REC-145 devamı, KTL-59). Her sayfada altı dilin işlev
