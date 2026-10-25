@@ -138,6 +138,35 @@ const CALISAN_ACMA_KURALI = [
 ].join('\n')
 
 /**
+ * TARAYICI KURALI (HRT-61, OPS notu 13 Ekim; iki yoldan işe kolay geleni serbest): kartın ve filo-ortak.md'nin bayt payını
+ * yemesin diye kurallar dosyasında durur. Sebep: 13 Ekim'de bir çalışan Playwright ile bağımsız Chrome açtı (Playwright MCP kaldırıldı).
+ * Her rolün kurallar dosyasına AYNEN girer.
+ */
+const TARAYICI_KURALI = [
+  '## Tarayıcı (HRT-61)',
+  '- Tarayıcı işinde uygulamanın iki yolundan işe kolay geleni kullanılır: uygulama içi tarayıcı (pencerenin sağ bölmesi; herkese açık sayfa) ya da Chrome eklentisi (claude-in-chrome, oturum adlı sekme grubu; giriş gereken sayfa: Search Console, Bing). Uygulama dışı tarayıcı (Playwright, başsız, kendi başlatılan Chrome) yasaktır; alt ajan görev metnine yazılır.',
+].join('\n')
+
+/**
+ * TEŞHİS KOMUTLARI (HRT-69, OPS-176): filo-ortak.md bayt tavanında (10.000) olduğu için kurallar dosyasında durur.
+ * Kaynak ölçüm: docs/audits/claude-code-yerlesik-ozellikler-2026-10-19.md. Her rolün kurallar dosyasına AYNEN girer.
+ */
+const TESHIS_KURALI = [
+  '## Teşhis komutları (HRT-69)',
+  '- Kurulum ya da ayar şüphesinde `claude doctor` ve `/status`; bağlam ya da kota sorusunda `/context` ve `/usage`; kritik PR\'da `/ultrareview` yalnız OPS kararıyla (3 ücretsiz koşu, kod buluta gider). Yerleşik özellik envanteri: docs/audits/claude-code-yerlesik-ozellikler-2026-10-19.md.',
+].join('\n')
+
+/**
+ * AYNI DERS İKİNCİ KEZ (HRT-70, OPS emri 19 Ekim): HRT-68 ölçümü dersin yazılsa bile açıklama olarak kaldığını gösterdi.
+ * Kapının tasarımı ARAÇ'ındır; burada yalnız kural metni durur. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
+ * filo-ortak.md bayt tavanında olduğu için kurallar dosyasında durur; her rolün dosyasına AYNEN girer.
+ */
+const DERS_TEKRAR_KURALI = [
+  '## Aynı ders ikinci kez (HRT-70)',
+  '- Bir ders ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir: aynı ders sage\'de ya da bir kartta yazılıydı ve aynı sebepten ikinci kez kırmızı CI, kısmi iş ya da geri alınan işlem çıktıysa, çiğneyen departman kontrol önerisini (kanca ya da araç içi kapı) OPS\'a tek mesajla yazar: hangi ders, hangi iki vaka, önerilen kontrol. OPS ARAÇ\'a kart verir; kapının tasarımı ARAÇ\'ındır. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.',
+].join('\n')
+
+/**
  * BİRLEŞTİRME VE ÖLÇÜM KAYDI (HRT-60, OPS emri 2026-10-12): kartın bayt payını yemesin diye kurallar dosyasında durur
  * (kart tavanında pay yok). Yazılı kaynaklar: karar 98 (departman migrationsız kendi PR'ını birleştirir), fleet-mechanism §20.1-a/b
  * (`gh pr merge` doğrudan çağrılmaz; migration'lı PR `--onay`), karar 224 (onay işi koşan pencerede). Her rolün dosyasına AYNEN girer
@@ -149,6 +178,7 @@ const BIRLESTIRME_KURALI = [
   '- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).',
   '- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR\'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).',
   '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.',
+  '- Günlük işte Recep\'e soru sorulmaz; `docs/standards/filo-tuzugu.md` Madde 2.1\'de sayılan Recep kalemleri (`docs/roller/OPS.md` "Recep kapıları" ve ek kalemler: edge fonksiyonlu PR, dış yazışma, ürün kararları, departman açma/kapama) ve izin genişletme dışındaki her onay OPS\'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS\'a yazılır; Recep\'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).',
 ].join('\n')
 
 /**
@@ -174,6 +204,7 @@ const OPS_OKUMA_KURALI = [
  */
 const DURUM_SATIRI_KURALI = [
   '## Durum dosyası: standart "Yarım iş" satırı (HRT-31)',
+  '- Durum dosyasının adı `lane-day`, `state` ya da `durum` içerir (örnek: `<rol>-lane-day-<tarih>.md`, Geo-SEO\'da `geoseo-lane-state.md`); kanca dosyayı bu ad kalıbıyla ve frontmatter `metadata.originSessionId` (TAM oturum kimliği) ile bulur. Rolün sürekli dosyası sürdürülür, ortak adla ikinci dosya açılmaz (HRT-61).',
   '- Durum dosyasının SONUNA (DEVİR bloğunun içine) her güncellemede ve compact öncesinde tam bu iki biçimden biri yazılır: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Kokpit compact hazırlığı bunu okur; ifade yoksa "ölçülemedi" görünür.',
   '- Kanca dosyanın son 24 KB\'ındaki SON `yarım iş yok|var` ifadesini okur: satır en sonda durur, altına aynı ifadeyi taşıyan başka cümle yazılmaz. `yok` derken yarım iş listelenmez; belirsizse `var` yazılır. Ayrıntı AÇIK KUYRUK alanındadır (hafiza-yazma-duzeni-standard §9b madde 7).',
   '- Recep compact hazırlığı istediğinde (ya da "COMPACT YAKIN" uyarısında) üç maddelik not (durum dosyası güncel mi + saat / yarım iş / hüküm) ve iki aşamalı compact cümlesi KENDİ penceresinde Recep\'e yazılır; OPS\'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu OPS\'a yazıp Recep\'e yazmamak kuralı çiğner (OPS 2026-10-05: iki departman bunu yaptı).',
@@ -272,6 +303,12 @@ function kuralDosyasi(ad) {
     KART_PLAN_KURALI,
     '',
     CALISAN_ACMA_KURALI,
+    '',
+    TARAYICI_KURALI,
+    '',
+    TESHIS_KURALI,
+    '',
+    DERS_TEKRAR_KURALI,
     '',
     BIRLESTIRME_KURALI,
     '',
@@ -574,10 +611,27 @@ function gorevSayilari(g) {
   return { toplam: g.gorevler.length, bagli: g.gorevler.filter((x) => x.bagli === 'evet').length }
 }
 
-/** Kartta kısa "Amaç" bölümü (verisi olmayan rolde boş dize). */
-function amacBolumu(ad, veri = GOREVLER) {
+/**
+ * Kart bayt tavanı (testlerdeki fiilî sınır: `< floor(KART_BAYT_SINIRI × 0.94)`). Amaç cümlesi karta sığmazsa (HRT-66, tüzük Madde 3:
+ * "kartta yer yoksa alan görev dosyasında durur, kart ona işaret eder") kartta yalnız işaret kalır; eşik oynatılmaz.
+ */
+const KART_AMAC_TAVANI = Math.floor(KART_BAYT_SINIRI * 0.94) - 1
+const amacKarttaOnbellek = new Map()
+
+/** Amaç metni kartın içinde mi (true) yoksa yalnız görev dosyasında mı (false) durur. */
+function amacKarttaMi(ad) {
+  if (!GOREVLER[ad]) return true
+  if (!amacKarttaOnbellek.has(ad)) {
+    amacKarttaOnbellek.set(ad, Buffer.byteLength(kart(ad, ROLLER[ad], true), 'utf8') <= KART_AMAC_TAVANI)
+  }
+  return amacKarttaOnbellek.get(ad)
+}
+
+/** Kartta kısa "Amaç" bölümü (verisi olmayan rolde boş dize). `kartta` false ise yalnız görev dosyasına işaret eder. */
+function amacBolumu(ad, veri = GOREVLER, kartta = true) {
   const g = veri[ad]
-  return g ? ['## Amaç', g.amac].join('\n') : ''
+  if (!g) return ''
+  return ['## Amaç', kartta ? g.amac : `Amaç ve Nasıl: \`docs/roller/${gorevDosyaAdi(ad)}\`.`].join('\n')
 }
 
 /** Kartta "Düzenli görevler" işaretçisi: sayılar + tablo dosyası atfı (verisi olmayan rolde boş dize). */
@@ -609,6 +663,9 @@ function gorevDosyasi(ad, veri = GOREVLER) {
     '',
     '## Amaç',
     g.amac,
+    '',
+    '## Nasıl',
+    g.nasil || 'Yazılmadı (tüzük Madde 3: docs/standards/ altından cetvel adı ya da "cetvel yok — yazımı kapsamda").',
     '',
     '## Görevler',
     '| Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |',
@@ -690,7 +747,61 @@ function gorevSorunlari(veri, roller, varMi, oku, isAkislari = [], kardesOku = (
   return s
 }
 
-function kart(ad, r) {
+/**
+ * TASLAK ROLLER (HRT-66, filo tüzüğü Madde 3): penceresi kapalı ya da hiç açılmamış departmanın Amaç, Ne zaman ve Nasıl alanları
+ * boş olabilir; kapı bunları muaf tutar, sahibi ilk açılışta doldurur. Değer: muafiyet nedeni (boş olamaz). Dolduran rol buradan
+ * silinir ve `rol-gorevleri.json`'a girer; kapı ikisini birden tutmaya izin vermez.
+ */
+const TASLAK_ROLLERI = {
+  ADMIN: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  EDGE: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  I18N: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  MARKA: 'departman kapalı (iş dondurma); açılışta sahibi Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  MEVZUAT: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+  SATIS: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
+}
+
+/** Nasıl alanı geçerli mi: docs/standards altında gerçekten var olan en az bir cetvel adı ya da "cetvel yok — yazımı kapsamda". */
+function nasilGecerliMi(nasil, varMi) {
+  if (typeof nasil !== 'string' || !nasil.trim()) return false
+  if (/^cetvel yok — yazımı kapsamda/.test(nasil.trim())) return true
+  const adlar = nasil.match(/(?<![\w./-])[a-z0-9][a-z0-9-]*\.md(?![\w.])/g) || []
+  return adlar.some((a) => varMi(`docs/standards/${a}`))
+}
+
+/**
+ * 5N1K kapısı (tüzük Madde 3): her rol kartında Kim, Ne, Ne zaman, Nerede, Nasıl, Neden bulunur. Kim = müdür pencere (kart başlığı),
+ * Ne = Görev, Nerede = Dosyalar, Neden = Amaç, Ne zaman = en az bir düzenli görev, Nasıl = geçerli cetvel adı. `taslak` rolleri muaftır.
+ * Boş dizi = temiz. Ayırt edicilik testi bu işlevi bilerek bozulmuş veriyle çağırır.
+ */
+function altiAlanSorunlari(kartlar, veri, roller, varMi, taslak = TASLAK_ROLLERI) {
+  const s = []
+  for (const [ad, neden] of Object.entries(taslak)) {
+    if (!roller.includes(ad)) s.push(`${ad}: taslak listesinde ama bilinmeyen rol`)
+    else if (typeof neden !== 'string' || !neden.trim()) s.push(`${ad}: taslak muafiyetinin nedeni yazılmamış`)
+    else if (veri[ad]) s.push(`${ad}: verisi var ama hâlâ taslak listesinde (muafiyet kalkmalı)`)
+  }
+  for (const ad of roller) {
+    if (taslak[ad]) continue
+    const metin = kartlar[ad] || ''
+    const bolum = (b) => {
+      const i = metin.indexOf(`## ${b}\n`)
+      if (i < 0) return ''
+      const son = metin.indexOf('\n## ', i + 1)
+      return metin.slice(i + b.length + 4, son < 0 ? undefined : son).trim()
+    }
+    if (!/^# ROL KARTI: \S+/m.test(metin)) s.push(`${ad}: Kim (kart başlığı) eksik`)
+    if (!bolum('Görev')) s.push(`${ad}: Ne (Görev) eksik`)
+    if (!bolum('Dosyalar')) s.push(`${ad}: Nerede (Dosyalar) eksik`)
+    const g = veri[ad]
+    if (!g || typeof g.amac !== 'string' || !g.amac.trim()) s.push(`${ad}: Neden (Amaç) eksik`)
+    if (!g || !Array.isArray(g.gorevler) || !g.gorevler.length) s.push(`${ad}: Ne zaman (düzenli görev) eksik`)
+    if (!g || !nasilGecerliMi(g.nasil, varMi)) s.push(`${ad}: Nasıl eksik (docs/standards altında var olan cetvel adı ya da "cetvel yok — yazımı kapsamda")`)
+  }
+  return s
+}
+
+function kart(ad, r, amacKartta = amacKarttaMi(ad)) {
   return [
     `# ROL KARTI: ${ad}`,
     '',
@@ -702,7 +813,7 @@ function kart(ad, r) {
     '',
     YONETIM_ISTISNA[ad] || YONETIM,
     '',
-    ...(GOREVLER[ad] ? [amacBolumu(ad), '', gorevBolumu(ad), ''] : []),
+    ...(GOREVLER[ad] ? [amacBolumu(ad, GOREVLER, amacKartta), '', gorevBolumu(ad), ''] : []),
     '## Dosyalar',
     r.dosyalar,
     '',
@@ -764,7 +875,7 @@ function sorunlar(kartlar) {
     if (ad === 'OPS' && !metin.includes(HARITA_ISARETCISI)) s.push('OPS: Departman haritası işaretçisi eksik/değişmiş')
     // Verisi olan rolün kartında Amaç ve Düzenli görevler bölümü bire bir bulunur (OPS-27, HRT-24).
     if (GOREVLER[ad]) {
-      for (const blok of [amacBolumu(ad), gorevBolumu(ad)]) {
+      for (const blok of [amacBolumu(ad, GOREVLER, amacKarttaMi(ad)), gorevBolumu(ad)]) {
         if (!metin.includes(blok)) s.push(`${ad}: ${blok.split('\n')[0]} bölümü eksik/değişmiş`)
       }
     }
@@ -793,6 +904,9 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     }
     // Durum dosyası "Yarım iş" satırı bloğu (HRT-31): kokpit compact hazırlığı bu biçime bağlı, blok düşerse biçim unutulur.
     if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
+    if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
+    if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
+    if (!metin.includes(DERS_TEKRAR_KURALI)) s.push(`${ad}: kurallar dosyasında "Aynı ders ikinci kez" bloğu eksik/değişmiş (HRT-70)`)
   }
   return s
 }
@@ -1101,6 +1215,7 @@ function main() {
       },
     ),
     ...isKurallariSorunlari(isKurallariOku(kok), Object.keys(ROLLER)),
+    ...altiAlanSorunlari(kartlar, GOREVLER, Object.keys(ROLLER), (d) => fs.existsSync(path.join(kok, d))),
   ]
   for (const x of s) console.error(`SORUN: ${x}`)
   if (yaz) {
@@ -1114,6 +1229,9 @@ module.exports = {
   GOREV_DEGIL_BASLIK,
   ROLLER,
   DURUM_SATIRI_KURALI,
+  TARAYICI_KURALI,
+  TESHIS_KURALI,
+  DERS_TEKRAR_KURALI,
   CALISMA,
   haritaOzet,
   haritaDosyasi,
@@ -1130,6 +1248,11 @@ module.exports = {
   gorevDosyasi,
   gorevSorunlari,
   gorevEksikRoller,
+  altiAlanSorunlari,
+  nasilGecerliMi,
+  TASLAK_ROLLERI,
+  KART_AMAC_TAVANI,
+  amacKarttaMi,
   gorevVerisiOku,
   isAkisiMetinleri,
   amacBolumu,

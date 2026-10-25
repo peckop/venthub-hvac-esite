@@ -3,6 +3,7 @@
   "roller": {
     "GEO-SEO": {
       "amac": "Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.",
+      "nasil": "canonical-url-standard.md, geo-olcum-standard.md",
       "gorevler": [
         {
           "gorev": "Dağıtım sonrası canlı kapı: yayındaki siteyi tek geçişte ölç (adres, başlık, açıklama, hreflang, yetim sayfa, llms.txt)",
@@ -72,6 +73,7 @@
     },
     "HARITA": {
       "amac": "Belge ve hafıza düzenini güncel, bulunabilir ve tutarlı tutar; bayat belge, kırık yol ya da cetvelsiz iş yüzünden bir ekibin yanlış bilgiyle çalışması önce mesaj satırında, sonra kartta görünür.",
+      "nasil": "hafiza-yazma-duzeni-standard.md, belge-yonetimi-standard.md",
       "gorevler": [
         {
           "gorev": "Belge tazelik ölçümü: çekirdek belge yaşı (CLAUDE.md, docs/README.md), bu iki belgedeki kırık yol, kod haritası yaşı ve hafıza indeksi (MEMORY.md) boyutu",
@@ -118,6 +120,7 @@
     },
     "TAKIP": {
       "amac": "Kullandığımız dış araçların (Claude Code, WrongStack, notebooklm-py) yeni sürümünü ve bağlantı kopukluğunu işimizi aksatmadan yakalar; faydasını, riskini ve işin kime düştüğünü ölçüp yazar, böylece yükseltme sürpriz, kopukluk sessiz kalmaz.",
+      "nasil": "cetvel yok — yazımı kapsamda (WrongStack sürüm ve özellik ölçümü; ölçüm defteri docs/olcum/wrongstack-ozellik-envanteri.md)",
       "gorevler": [
         {
           "gorev": "WrongStack sürüm farkı: kurulu sürümle GitHub son etiketini karşılaştır, yeni sürümün faydasını, riskini ve işin kime düştüğünü yaz",
@@ -176,6 +179,7 @@
     },
     "ALTYAPI": {
       "amac": "Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandığımız paketlerdeki bilinen güvenlik açıklarının zamanında kapanmasını sağlar; bozulursa hatalı kod canlıya girer ya da açık fark edilmeden kalır.",
+      "nasil": "migration-safety-standard.md, barindirma-standard.md, rls-yetki-karari-standard.md",
       "gorevler": [
         {
           "gorev": "PR kapıları: her pull request'te kayıt kapısı, lint, tip denetimi, edge korumaları, test ve derleme (ayrıca admin-smoke ve catalog-integrity)",
@@ -252,6 +256,7 @@
     },
     "TASARIM": {
       "amac": "Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.",
+      "nasil": "marka-token-eslemesi-standard.md",
       "gorevler": [
         {
           "gorev": "Token, palet ve görünüm kapılarını her değişiklikte koştur: marka paleti (INV-PALET-1), Tailwind sınıf geçerliliği ve AA kontrast, storefront stil çıtası, admin tema değişmezleri, görünüm anahtarı testi",
@@ -329,6 +334,7 @@
     },
     "KATALOG": {
       "amac": "Sitedeki ürün sayıları (ses, ağırlık, devir, fiyat) üreticinin güncel kataloğuyla birebir tutsun; bozulursa müşteri yanlış fan seçer, iade ve güven kaybı olur; her değer kaynak sayfasına dayanır, canlı yazımı KATALOG hazırlar, Recep onayıyla OPS koşar.",
+      "nasil": "catalog-ingestion-standard.md, csv-import-export-standard.md, pricing-standard.md, product-schema-standard.md",
       "gorevler": [
         {
           "gorev": "Kaynak dizini tazelik kapısı: dizin PDF'lerle ve çıktı CSV'leriyle örtüşüyor mu (kardeş depo scripts/kaynak_dizini/tazelik.py ve cikti_tazelik.py)",
@@ -380,6 +386,132 @@
           "cikti": "Karta ölçüm notu (neyi, nasıl ölçtüm, sonuç)",
           "esik": "Yazılan alanların tamamı sayfada beklenen değerde; sapma 0"
         },
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        }
+      ]
+    },
+    "OPS": {
+      "amac": "Filo tek yönle ilerler: sıra, öncelik ve verilen sözler yazılı tutulur; Recep'e giden her cümle kaynağıyla ve tek yüzle gider.",
+      "nasil": "execution-method-standard.md, is-kayit-duzeni-standard.md, filo-tuzugu.md",
+      "gorevler": [
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        },
+        {
+          "gorev": "Haftalık filo raporu (tüzük Madde 7): departman karnesi (scripts/board/kanban-uyum.cjs) ve açık kalan işler tek tabloda Recep'e",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"filo raporu: N gün\" (7 gün eşik); satırı ARAÇ kuracak (OPS-169)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Recep'e tek tablo (Cuma); karne eşiğini aşan departman satırı kırmızıdır",
+          "esik": "Kanıtsız Done 0; kırmızı karne satırı aynı raporda sahibine kartla bağlanır"
+        },
+        {
+          "gorev": "Açılış raporu (tüzük Madde 7): Recep'in ilk mesajında kırmızılar, onay bekleyenler ve günün sırası",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "Recep'in günün ilk mesajı; tetiği oturum açılış kancasına ARAÇ kuracak (OPS-169)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Tek tablo: Onayında satırları en üstte; değişen yoksa tek cümle",
+          "esik": "İlk mesajdan sonraki ilk cevapta; gün içinde yinelenmez"
+        }
+      ]
+    },
+    "ARAC": {
+      "amac": "Filonun araçları (kanca, pano, ayar, ritüel) bozulmadan ve ölçülerek çalışır; bir kapı ya da kanca sessizce ölürse aynı gün görünür ve sahibine yazılır.",
+      "nasil": "fleet-mechanism-standard.md, arac-envanteri-standard.md, hafiza-kancalari-standard.md",
+      "gorevler": [
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        }
+      ]
+    },
+    "URUN": {
+      "amac": "Vitrin doğru, hızlı ve satış getirir: sayfada görünen her değer doğru kaynaktan gelir ve veri değişince sayfa da değişir.",
+      "nasil": "rendering-cache-standard.md, adres-semasi-standard.md, kategori-adlandirma-standard.md",
+      "gorevler": [
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        }
+      ]
+    },
+    "BLOG": {
+      "amac": "Kaynaklı rehber yazılarıyla güven ve arama trafiği kazandırır: yazıdaki her sayı ve iddia resmî kaynağa bağlıdır.",
+      "nasil": "rehber-yazisi-standard.md",
+      "gorevler": [
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        }
+      ]
+    },
+    "YETENEK": {
+      "amac": "Doğru skill doğru departmanda ve iş türünde kullanılır; kullanılmayan ya da kusurlu skill ölçülür, kaynağıyla kaydedilir ve kapatılır.",
+      "nasil": "cetvel yok — yazımı kapsamda (skill atama tablosu iskeleti HARİTA'da, REC-509; komşu cetvel tasarim-yetenek-standard.md ARAÇ'ın)",
+      "gorevler": [
+        {
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
+          "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        },
+        {
+          "gorev": "Haftalık skill kullanım ölçümü: atanmış ama kullanılmayan skill'i bul, kusurlu skill'i (bayat yol, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydet",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"skill ölçümü: N gün\" (7 gün eşik); ölçüm kaynağı ve satır ARAÇ'ta kurulacak",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Atanmış ama kullanılmayan skill listesi; kusur kaydı kaynak dosya:satır ile",
+          "esik": "Kullanılmayan atanmış skill 0 ya da her biri için yazılı gerekçe"
+        }
+      ]
+    },
+    "3D": {
+      "amac": "Ürünler üç boyutlu görülür ve sayfa hızlı açılır: model dosyası, ışık ve yükleme bütçesi ölçülerek korunur.",
+      "nasil": "3d-webgl-standard.md",
+      "gorevler": [
         {
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",

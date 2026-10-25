@@ -15,6 +15,7 @@
  *   node t138-model-split.mjs --family vortice-lineo-quiet --url <URL> --key <ANON>        # dry-run
  *   node t138-model-split.mjs --family ... --apply --url <URL> --key <SERVICE_ROLE>        # Recep GO sonrası
  */
+import './_ops-onay.mjs'
 import fs from 'node:fs';
 import path from 'node:path';
 

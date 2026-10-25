@@ -242,6 +242,25 @@ function tekSatir(metin) {
 
 // ── KONU KOLU ─────────────────────────────────────────────────────────────────
 
+/**
+ * ARC-201 (HRT-68): ders sorgusu SİSTEM ZARFINDAN değil, Recep'in ya da emrin metninden kurulur.
+ * Ölçüm: sorgu çoğu kez "task-notification", "cross-session-message" gibi zarf başlıklarından
+ * ve uuid/oturum kimliklerinden kuruluyordu; 399 istemin 182'sinde hiç ders dönmedi.
+ *  - <system-reminder>…</system-reminder> blokları atılır (harness bilgisi, istem değil).
+ *  - <task-notification>, <ci-monitor-event>, <side-sessions-event> ile başlayan istem saf sistem
+ *    bildirimidir: sorgu YOK ('' döner).
+ *  - <cross-session-message …>GÖVDE</…> ve <agent-message …>GÖVDE</…>: yalnız GÖVDE (emrin metni)
+ *    kalır; etiket ve öznitelikleri (from=, local_ kimlikleri) atılır.
+ */
+function sorguMetni(istem) {
+  if (typeof istem !== 'string') return ''
+  let t = istem.replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, ' ').trim()
+  if (/^<(task-notification|ci-monitor-event|side-sessions-event)\b/.test(t)) return ''
+  const zarf = t.match(/^<(cross-session-message|agent-message)\b[^>]*>([\s\S]*?)(?:<\/\1>|$)/)
+  if (zarf) t = zarf[2].trim()
+  return t
+}
+
 /** İstem konu aramasını tetikler mi? Kısa istem ya da `/komut` tetiklemez. */
 function istemUygunMu(istem) {
   if (typeof istem !== 'string') return false
@@ -375,7 +394,7 @@ async function konuEnjekte({
 }) {
   try {
     const t0 = simdi()
-    const istem = girdi && girdi.prompt
+    const istem = sorguMetni(girdi && girdi.prompt)
     if (!istemUygunMu(istem)) return ''
     if (!daemonCanli()) return ''
     const terimler = icerikTerimleri(istem)
@@ -857,7 +876,7 @@ function logaYaz(satir, pano = defter.panoDizini()) {
 async function konuKancasi(girdi, bag = {}) {
   // ⭐İSTEM KAPILARI `anaKok()`TAN ÖNCE: `anaKok` senkron `git rev-parse` koşar (5 sn timeout);
   // kısa/komut/terimsiz her istemde o süreç doğumunu ödemek gereksizdi. Ucuz kapılar önce.
-  const istem = girdi && girdi.prompt
+  const istem = sorguMetni(girdi && girdi.prompt)
   if (!istemUygunMu(istem)) return ''
   if (icerikTerimleri(istem).length < ASGARI_ORTAK_TERIM) return ''
   const dbKok = (bag.anaKok || require('./ana-kok.cjs').anaKok)()
@@ -910,6 +929,7 @@ async function hijyenKancasi() {
 }
 
 module.exports = {
+  sorguMetni,
   ASGARI_ISTEM_KARAKTER,
   ARAMA_LIMITI,
   EN_FAZLA_DERS,

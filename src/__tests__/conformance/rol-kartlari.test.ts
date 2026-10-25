@@ -20,6 +20,7 @@ import { describe, expect, it } from 'vitest'
 
 type Uretici = {
   GOREV_DEGIL_BASLIK: string
+  DERS_TEKRAR_KURALI: string
   uret: () => Record<string, string>
   uretKurallar: () => Record<string, string>
   kuralDosyaAdi: (ad: string) => string
@@ -56,6 +57,17 @@ type Uretici = {
   isKurallariOku: (kok?: string) => Record<string, { kurallar: string[] }>
   isKurallariSorunlari: (veri: Record<string, { kurallar: string[] }>, roller: string[]) => string[]
   gorevEksikRoller: () => string[]
+  altiAlanSorunlari: (
+    kartlar: Record<string, string>,
+    veri: Record<string, RolGorevi>,
+    roller: string[],
+    varMi: (d: string) => boolean,
+    taslak?: Record<string, string>,
+  ) => string[]
+  nasilGecerliMi: (nasil: unknown, varMi: (d: string) => boolean) => boolean
+  TASLAK_ROLLERI: Record<string, string>
+  KART_AMAC_TAVANI: number
+  amacKarttaMi: (ad: string) => boolean
   isAkisiMetinleri: (kok: string) => string[]
   AMAC_SINIRI: number
   haritaOzet: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][], planli?: Record<string, Planli>) => string
@@ -86,7 +98,7 @@ type Gorev = {
   esik: string
   taslak?: boolean
 }
-type RolGorevi = { amac: string; gorevler: Gorev[] }
+type RolGorevi = { amac: string; nasil?: string; gorevler: Gorev[] }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
 const require = createRequire(import.meta.url)
@@ -1188,5 +1200,234 @@ describe('INV-ROL-1 — arama sonuç sayfası sahipliği (HRT-32, OPS isteği 20
     expect(kartlar.ALTYAPI).toContain('rota dili satırı ve yönlendirme')
     expect(satir('ALTYAPI')).toContain('rota dili satırı ve yönlendirme')
     expect(satir('URUN')).toContain('rota dili satırı ve yönlendirmesi ALTYAPI')
+  })
+})
+
+describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-66, OPS-169)', () => {
+  const kartlar = uretici.uret()
+  const roller = Object.keys(uretici.ROLLER)
+  const varMi = (d: string) => fs.existsSync(path.join(KOK, d))
+  const kopya = () => structuredClone(uretici.GOREVLER) as Record<string, RolGorevi>
+  const kopyaKart = () => ({ ...kartlar })
+  const sorun = (f: (v: Record<string, RolGorevi>, k: Record<string, string>, t: Record<string, string>) => void) => {
+    const v = kopya()
+    const k = kopyaKart()
+    const t = { ...uretici.TASLAK_ROLLERI }
+    f(v, k, t)
+    return uretici.altiAlanSorunlari(k, v, roller, varMi, t).join('\n')
+  }
+
+  it('gerçek depoda her rol ya altı alanı doldurmuş ya da nedeniyle taslak listesinde; iki küme ayrık ve 18 rolü tamamlar', () => {
+    expect(uretici.altiAlanSorunlari(kartlar, uretici.GOREVLER, roller, varMi)).toEqual([])
+    const veri = Object.keys(uretici.GOREVLER)
+    const taslak = Object.keys(uretici.TASLAK_ROLLERI)
+    expect(veri.filter((a) => taslak.includes(a))).toEqual([])
+    expect([...veri, ...taslak].sort()).toEqual([...roller].sort())
+    expect(uretici.gorevEksikRoller().sort()).toEqual([...taslak].sort())
+  })
+
+  it('AYIRT EDİCİLİK: eksik Neden, Ne zaman, Nasıl, Ne, Nerede ve bozuk taslak kaydı yakalanır', () => {
+    expect(sorun((v) => (v.OPS.amac = ''))).toMatch(/OPS: Neden \(Amaç\) eksik/)
+    expect(sorun((v) => (v.OPS.gorevler = []))).toMatch(/OPS: Ne zaman \(düzenli görev\) eksik/)
+    expect(sorun((v) => delete v.OPS.nasil)).toMatch(/OPS: Nasıl eksik/)
+    expect(sorun((v) => (v.OPS.nasil = 'olmayan-cetvel-standard.md'))).toMatch(/OPS: Nasıl eksik/)
+    expect(sorun((_v, k) => (k.ARAC = k.ARAC.replace(/## Görev\n[\s\S]*?\n\n/, '## Görev\n\n')))).toMatch(/ARAC: Ne \(Görev\) eksik/)
+    expect(sorun((_v, k) => (k.ARAC = k.ARAC.replace(/## Dosyalar\n[\s\S]*?\n\n/, '## Dosyalar\n\n')))).toMatch(/ARAC: Nerede \(Dosyalar\) eksik/)
+    expect(sorun((_v, k) => (k.OPS = k.OPS.replace('# ROL KARTI: OPS', '# başlık')))).toMatch(/OPS: Kim/)
+    expect(sorun((v) => delete v.URUN)).toMatch(/URUN: Neden/)
+    // Taslak muafiyeti yalnız listede olan role tanınır: ADMIN listeden düşerse altı alan istenir.
+    expect(sorun((_v, _k, t) => delete t.ADMIN)).toMatch(/ADMIN: Neden \(Amaç\) eksik/)
+    expect(sorun((_v, _k, t) => (t.ADMIN = ''))).toMatch(/ADMIN: taslak muafiyetinin nedeni yazılmamış/)
+    expect(sorun((_v, _k, t) => (t.OLMAYAN = 'neden'))).toMatch(/OLMAYAN: taslak listesinde ama bilinmeyen rol/)
+    expect(sorun((_v, _k, t) => (t.OPS = 'neden'))).toMatch(/OPS: verisi var ama hâlâ taslak listesinde/)
+  })
+
+  it('Nasıl alanı: docs/standards altında var olan cetvel adı ya da "cetvel yok — yazımı kapsamda"; uydurma ad ve boş değer geçmez', () => {
+    expect(uretici.nasilGecerliMi('cetvel yok — yazımı kapsamda (ölçüm defteri)', varMi)).toBe(true)
+    expect(uretici.nasilGecerliMi('execution-method-standard.md, olmayan-standard.md', varMi)).toBe(true)
+    expect(uretici.nasilGecerliMi('olmayan-standard.md', varMi)).toBe(false)
+    expect(uretici.nasilGecerliMi('cetvel yok', varMi)).toBe(false)
+    expect(uretici.nasilGecerliMi('', varMi)).toBe(false)
+    expect(uretici.nasilGecerliMi(undefined, varMi)).toBe(false)
+  })
+
+  it('Amaç kartta sığıyorsa kartta, sığmıyorsa görev dosyasında durur; kart tavanı hiçbir rolde aşılmaz ve Nasıl görev dosyasındadır', () => {
+    const gorevDosyalari = uretici.uretGorevler()
+    for (const ad of Object.keys(uretici.GOREVLER)) {
+      const g = uretici.GOREVLER[ad]
+      expect(Buffer.byteLength(kartlar[ad], 'utf8'), `${ad} kart baytı`).toBeLessThanOrEqual(uretici.KART_AMAC_TAVANI)
+      if (uretici.amacKarttaMi(ad)) expect(kartlar[ad], `${ad} Amaç kartta`).toContain(`## Amaç\n${g.amac}`)
+      else {
+        expect(kartlar[ad], `${ad} Amaç işaretçisi`).toContain(`## Amaç\nAmaç ve Nasıl: \`docs/roller/${uretici.gorevDosyaAdi(ad)}\`.`)
+        expect(kartlar[ad], `${ad} Amaç metni karta sızmamalı`).not.toContain(g.amac)
+      }
+      expect(gorevDosyalari[ad], `${ad} görev dosyası Amaç`).toContain(`## Amaç\n${g.amac}`)
+      expect(gorevDosyalari[ad], `${ad} görev dosyası Nasıl`).toContain(`## Nasıl\n${g.nasil}`)
+    }
+    // Yol gerçekten kullanılıyor: en az bir rolün Amaç'ı karta sığmayıp görev dosyasına işaret ediyor (şu an URUN).
+    expect(Object.keys(uretici.GOREVLER).some((ad) => !uretici.amacKarttaMi(ad))).toBe(true)
+  })
+
+  it('filo tüzüğü diskte, üstünlük sırasını taşır, README haritasında ve sahiplik kaydında (sahip OPS) var', () => {
+    const tuzuk = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'filo-tuzugu.md'), 'utf8')
+    expect(tuzuk).toContain('Üstünlük sırası')
+    expect(tuzuk).toContain('Madde 3 — 5N1K')
+    expect(tuzuk).toContain('TASLAK_ROLLERI')
+    expect(fs.readFileSync(path.join(KOK, 'docs', 'README.md'), 'utf8')).toContain('standards/filo-tuzugu.md')
+    const sahiplik = JSON.parse(fs.readFileSync(path.join(KOK, 'scripts', 'belge', 'cetvel-sahipligi.json'), 'utf8')) as {
+      cetveller: Record<string, { sahip: string }>
+    }
+    expect(sahiplik.cetveller['docs/standards/filo-tuzugu.md']?.sahip).toBe('OPS')
+  })
+
+  it('OPS iki yeni görevi (Cuma filo raporu, açılış raporu) "bağlı: hayır (kuracak: ARAC)" olarak yazar; kurulmamış tetik "evet" diye geçemez', () => {
+    const ops = uretici.GOREVLER.OPS.gorevler
+    for (const parca of ['Haftalık filo raporu', 'Açılış raporu']) {
+      const x = ops.find((g) => g.gorev.startsWith(parca))
+      expect(x, parca).toBeTruthy()
+      expect(x?.bagli).toBe('hayir')
+      expect(x?.baglayacak).toBe('ARAC')
+    }
+    const v = kopya()
+    v.OPS.gorevler[1].bagli = 'evet'
+    v.OPS.gorevler[1].tetikAyrinti = '.github/workflows/olmayan-dosya.yml'
+    expect(uretici.gorevSorunlari(v, roller, varMi, () => '', []).join('\n')).toMatch(/tetik dosyası yok/)
+  })
+
+  it('HRT-67 (OPS-176): filo-ortak yerleşik /code-review ve /simplify kuralını, security-reviewer koşulunu ve mevcut yeteneklerin silinmediğini yazar', () => {
+    const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
+    for (const parca of ['yerleşik `/code-review` ve `/simplify`', '`security-reviewer` ajanı', 'ödeme, auth, RLS ya da webhook', 'code-review, diff-review, security-scanner, refactor-planner yetenekleri silinmez']) {
+      expect(ortak, parca).toContain(parca)
+    }
+    for (const yetenek of ['code-review', 'diff-review', 'security-scanner', 'refactor-planner']) {
+      expect(fs.existsSync(path.join(KOK, '.claude', 'skills', yetenek, 'SKILL.md')), `${yetenek} skill'i silinmemiş olmalı`).toBe(true)
+    }
+  })
+
+  it('"Günlük işte Recep\'e soru sorulmaz" satırı her rolün kurallar dosyasında (OPS-169, Recep 16 Ekim) ve beş Recep kapısını sayar', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain("Günlük işte Recep'e soru sorulmaz")
+      expect(kurallar[ad], ad).toContain('autoMode.allow')
+      expect(kurallar[ad], ad).toContain('filo-tuzugu.md` Madde 2.1')
+      expect(kurallar[ad], ad).toContain('ek kalemler: edge fonksiyonlu PR')
+    }
+  })
+
+  it('HRT-70: "Aynı ders ikinci kez" bloğu her rolün kurallar dosyasında, düşerse sorunlar() yakalar ve vaka belgesi diskte', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain(uretici.DERS_TEKRAR_KURALI)
+      expect(kurallar[ad], ad).toContain('ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir')
+    }
+    expect(uretici.DERS_TEKRAR_KURALI).toContain('OPS ARAÇ\'a kart verir')
+    expect(fs.existsSync(path.join(KOK, 'docs', 'audits', 'ders-tekrar-vakalari-2026-10-19.md'))).toBe(true)
+    const ad = roller[0]
+    const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.DERS_TEKRAR_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Aynı ders ikinci kez/)
+  })
+})
+
+/**
+ * HRT-61 / O7 — DEPARTMAN AÇMA TEK LİSTE (filo-tuzugu.md Madde 4.2). HRT-62 (3D) açılırken yedi yer elle bulundu; liste yazıldı ve
+ * bu kapı listedeki her yerin gerçekten var olduğunu, her açık departmanın o yerlerde bulunduğunu ölçer. Eksik yer adıyla ve
+ * "Madde 4.2" atfıyla kırılır; yeni departman açan iş neyi unuttuğunu tek bakışta görür.
+ */
+describe('INV-ROL-1 — departman açma tek liste (HRT-61, O7)', () => {
+  const ajan = require(path.join(KOK, 'scripts', 'belge', 'ajan-tanimi-uret.cjs')) as { PENCERE_DEPARTMANLARI: string[] }
+  const pencereAdlari = require(path.join(KOK, 'scripts', 'board', 'pencere-adlari.cjs')) as { TABLO: ReadonlyArray<readonly [string, string]> }
+  const oku = (...yol: string[]) => fs.readFileSync(path.join(KOK, ...yol), 'utf8').replace(/\r\n/g, '\n')
+  const setler = JSON.parse(oku('docs', 'audits', 'skill-departman-setleri-2026-09-30.json')) as { setler: Array<{ dept: string; tur: string }> }
+  const TURLER = ['arastirmaci', 'uygulayici', 'curutucu', 'dogrulayici']
+  /**
+   * Çalışan skill seti satırı HENÜZ olmayan açık departmanlar (neden yazılı). Ölçüldü 2026-10-19 (HRT-61): TAKIP HRT-35'te açılırken
+   * setler JSON'una satır eklenmedi, `.claude/agents` altında yalnız takip-pencere var. Satırlar eklenince bu kayıt silinmek ZORUNDA
+   * (aşağıdaki test eski istisnayı kırmızı yapar); takip: OPS'a açık soru, çalışan seti YETENEK ölçümüdür.
+   */
+  const SET_SATIRI_YOK: Record<string, string> = { TAKIP: 'HRT-35: çalışan seti ölçülmedi (YETENEK)' }
+
+  /** Bir departmanın açma listesindeki eksik yerleri (boş = tam). Kaynaklar parametre: ayırt edicilik testi bozulmuş kopya verir. */
+  function eksikYerler(
+    dept: string,
+    k: { roller: string[]; tablo: string[]; setSatirlari: Array<{ dept: string; tur: string }>; hazirOzellik: string; pencereAdiTesti: string; beklenenRoller: string },
+  ): string[] {
+    const e: string[] = []
+    if (!k.roller.includes(dept)) e.push('rol-karti-uret.cjs ROLLER')
+    if (!k.tablo.includes(dept)) e.push('pencere-adlari.cjs TABLO')
+    if (!SET_SATIRI_YOK[dept]) {
+      for (const tur of TURLER) if (!k.setSatirlari.some((s) => s.dept === dept && s.tur === tur)) e.push(`skill-departman-setleri (${tur})`)
+    }
+    if (!k.hazirOzellik.includes(`'${dept}'`)) e.push('hazir-ozellik-kurulumu.test.ts ACIK_DEPARTMANLAR')
+    if (!k.pencereAdiTesti.includes(`['${dept}',`)) e.push('sessionstart-pencere-adi.test.ts tablo')
+    if (!k.beklenenRoller.includes(`'${dept}'`)) e.push('rol-kartlari.test.ts BEKLENEN_ROLLER')
+    return e
+  }
+
+  /** Dosyadaki `const AD = [ ... ]` dizisinin gövdesi: aynı dept adı dosyada başka yerde geçse de yalnız dizi sayılır. */
+  const diziGovdesi = (kaynak: string, ad: string): string => {
+    const bas = kaynak.indexOf(`const ${ad}`)
+    expect(bas, `${ad} dizisi bulunamadı`).toBeGreaterThanOrEqual(0)
+    return kaynak.slice(bas, kaynak.indexOf(']', bas) + 1)
+  }
+
+  const kaynaklar = () => ({
+    roller: Object.keys(uretici.ROLLER),
+    tablo: pencereAdlari.TABLO.map((r) => r[0]),
+    setSatirlari: setler.setler,
+    hazirOzellik: diziGovdesi(oku('src', '__tests__', 'conformance', 'hazir-ozellik-kurulumu.test.ts'), 'ACIK_DEPARTMANLAR'),
+    pencereAdiTesti: oku('src', '__tests__', 'conformance', 'sessionstart-pencere-adi.test.ts'),
+    beklenenRoller: diziGovdesi(oku('src', '__tests__', 'conformance', 'rol-kartlari.test.ts'), 'BEKLENEN_ROLLER'),
+  })
+
+  it('her açık (pencere tanımlı) departman listedeki yerlerin hepsinde bulunur; eksik yer Madde 4.2 atfıyla söylenir', () => {
+    const k = kaynaklar()
+    const sorunlar = ajan.PENCERE_DEPARTMANLARI.flatMap((d) => eksikYerler(d, k).map((y) => `${d}: ${y} (filo-tuzugu.md Madde 4.2)`))
+    expect(sorunlar).toEqual([])
+    expect(ajan.PENCERE_DEPARTMANLARI.length, 'kapı boş kümeyi geçmesin').toBeGreaterThanOrEqual(12)
+  })
+
+  it('istisna listesi bayatlamaz: set satırı hâlâ olmayan departman gerçekten açık ve satırsızdır, satırı gelen listeden silinir', () => {
+    const k = kaynaklar()
+    for (const dept of Object.keys(SET_SATIRI_YOK)) {
+      expect(ajan.PENCERE_DEPARTMANLARI, `${dept} artık açık departman değil: istisnayı sil`).toContain(dept)
+      expect(k.setSatirlari.some((s) => s.dept === dept), `${dept} için set satırı eklenmiş: SET_SATIRI_YOK kaydını sil`).toBe(false)
+    }
+  })
+
+  it('AYIRT EDİCİLİK: listeden düşen yer ve uydurma departman adıyla yakalanır', () => {
+    const k = kaynaklar()
+    expect(eksikYerler('YENIDEP', k).join('|')).toMatch(/ROLLER.*pencere-adlari.*skill-departman-setleri \(arastirmaci\)/)
+    expect(eksikYerler('OPS', { ...k, tablo: k.tablo.filter((x) => x !== 'OPS') })).toEqual(['pencere-adlari.cjs TABLO'])
+    expect(eksikYerler('OPS', { ...k, setSatirlari: k.setSatirlari.filter((s) => !(s.dept === 'OPS' && s.tur === 'uygulayici')) })).toEqual(['skill-departman-setleri (uygulayici)'])
+    expect(eksikYerler('OPS', { ...k, hazirOzellik: k.hazirOzellik.replaceAll("'OPS'", "'X'") })).toEqual(['hazir-ozellik-kurulumu.test.ts ACIK_DEPARTMANLAR'])
+    expect(eksikYerler('3D', { ...k, beklenenRoller: k.beklenenRoller.replaceAll("'3D'", "'X'") })).toEqual(['rol-kartlari.test.ts BEKLENEN_ROLLER'])
+    expect(eksikYerler('3D', { ...k, pencereAdiTesti: k.pencereAdiTesti.replaceAll("['3D',", "['X',") })).toEqual(['sessionstart-pencere-adi.test.ts tablo'])
+  })
+
+  it('tüzük Madde 4.2 listesindeki her yer gerçek bir dosya ve Madde 4.1 beş adımı ile Geo-SEO ek notunu taşır', () => {
+    const tuzuk = oku('docs', 'standards', 'filo-tuzugu.md')
+    const bolum = tuzuk.slice(tuzuk.indexOf('**4.2 Departman açma listesi'), tuzuk.indexOf('## Madde 5'))
+    const yollar = [...bolum.matchAll(/`((?:scripts|docs)\/[A-Za-z0-9_./-]+\.(?:cjs|json))`/g)].map((m) => m[1])
+    expect(yollar.length).toBeGreaterThanOrEqual(5)
+    for (const y of new Set(yollar)) expect(fs.existsSync(path.join(KOK, y)), `${y} Madde 4.2'de yazılı ama yok`).toBe(true)
+    const protokol = tuzuk.slice(tuzuk.indexOf('**4.1 Geçiş protokolü'), tuzuk.indexOf('**4.2 Departman açma listesi'))
+    for (const adim of ['**Kimlik:**', '**Bağlantı:**', '**Kaldığı yer:**', '**İlk gün OPS çıktı denetimi:**', '**Geri dönüş:**', 'oturum ölçümü']) {
+      expect(protokol, adim).toContain(adim)
+    }
+  })
+
+  it('HRT-61: blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları var ve ilgili pencere tanımı onları anar; tarayıcı kuralı ve durum dosyası adı kurallar dosyalarında', () => {
+    for (const ad of ['blog-uygulayici', 'geo-seo-uygulayici', 'yetenek-arastirmaci']) {
+      expect(fs.existsSync(path.join(KOK, '.claude', 'agents', `${ad}.md`)), ad).toBe(true)
+    }
+    expect(oku('.claude', 'agents', 'blog-pencere.md')).toContain('blog-uygulayici')
+    expect(oku('.claude', 'agents', 'geo-seo-pencere.md')).toContain('geo-seo-uygulayici')
+    expect(oku('.claude', 'agents', 'yetenek-pencere.md')).toContain('yetenek-arastirmaci')
+    const kurallar = uretici.uretKurallar()
+    for (const ad of Object.keys(kurallar)) {
+      expect(kurallar[ad], `${ad}: tarayıcı kuralı`).toContain('Uygulama dışı tarayıcı (Playwright, başsız, kendi başlatılan Chrome) yasaktır')
+      expect(kurallar[ad], `${ad}: durum dosyası adı`).toContain('adı `lane-day`, `state` ya da `durum` içerir')
+    }
   })
 })

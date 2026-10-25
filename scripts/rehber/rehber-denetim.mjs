@@ -340,6 +340,18 @@ export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
   for (const c of mevzuatlar) if (!eslesen(c, 'mevzuat')) ekle('MEVZUAT-IDDIA-TABLODA-YOK', c)
   for (const i of iddialar) for (const n of i.kaynak || []) if (!kaynaklar.has(n)) ekle('IDDIA-KAYNAGI-LISTEDE-YOK', `${i.metin} → [${n}]`)
 
+  // 4b. Atıf kümesi ↔ kaynak alanı (BLG-10, R5.1.1): metninde [n] taşıyan iddia satırında metindeki
+  //     numara kümesi ile `kaynak` alanı birebir aynı olmalı. Biri değişip öteki unutulunca atıf yanlış
+  //     kaynağa bağlanır (BLG-3 bulgularının üç kalıbından üçüncüsü). BLG-15'te depo dışında elle koştu
+  //     (94 satır, 0 fark). Metni numarasız satır (cümlenin yalnız özü) bu kolda sınanmaz.
+  const kume = (dizi) => [...new Set(dizi)].sort((x, y) => x - y).join(', ')
+  for (const i of iddialar) {
+    const metinde = kume(atifNumaralari(i.metin || ''))
+    if (!metinde) continue
+    const alanda = kume(i.kaynak || [])
+    if (metinde !== alanda) ekle('IDDIA-ATIF-KAYNAK-UYUSMAZ', `${i.metin} → metinde [${metinde}], kaynak alanında [${alanda}]`)
+  }
+
   // 5. R3 kalıbı (zorunlu bölümler; Kaynaklar yoksa zaten 1. adımda kırmızı — tekrar yazılmaz)
   for (const k of kalipDenetle(md)) if (!(k.sinif === 'ZORUNLU-BOLUM-YOK' && k.ayrinti === '`## Kaynaklar`')) kirmizi.push(k)
 

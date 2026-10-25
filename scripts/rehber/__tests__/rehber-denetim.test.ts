@@ -189,6 +189,36 @@ describe('INV-REHBER-DENETIM-1 · iddia tablosu', () => {
   })
 })
 
+describe('INV-REHBER-DENETIM-1 · atıf kümesi ↔ kaynak alanı (BLG-10)', () => {
+  const ATIFLI = [
+    ...IDDIALAR,
+    { metin: 'Çıkış hızı genellikle 7–9 m/s aralığındadır [1].', kaynak: [1], alinti: 'Outlet velocity 7–9 m/s.', tur: 'sayi' },
+    { metin: 'Koruma sınıfı IP45 ve hız 7–9 m/s [1, 2].', kaynak: [2, 1], alinti: 'IP45', tur: 'sayi' },
+  ]
+  const uyusmaz = (iddialar: typeof ATIFLI) => denetle(TEMIZ, { iddialar }).kirmizi.filter((x: { sinif: string }) => x.sinif === 'IDDIA-ATIF-KAYNAK-UYUSMAZ')
+
+  it('AYIRT EDER: küme aynıysa (sıra farkı dahil) ve metin numarasızsa temiz', () => {
+    expect(uyusmaz(ATIFLI)).toEqual([])
+  })
+  it('SABOTAJ: metindeki numara değişip kaynak alanı unutulursa KIRMIZI (ayrıntıda iki küme)', () => {
+    const bozuk = ATIFLI.map((i) => (i.tur === 'sayi' && i.kaynak.length === 1 ? { ...i, metin: i.metin.replace('[1]', '[2]') } : i))
+    const k = uyusmaz(bozuk)
+    expect(k).toHaveLength(1)
+    expect(k[0].ayrinti).toContain('metinde [2], kaynak alanında [1]')
+  })
+  it('SABOTAJ: kaynak alanına fazladan numara eklenirse KIRMIZI', () => {
+    const bozuk = ATIFLI.map((i) => (i.tur === 'sayi' && i.kaynak.length === 1 ? { ...i, kaynak: [1, 3] } : i))
+    expect(uyusmaz(bozuk)).toHaveLength(1)
+  })
+  it('SABOTAJ: kaynak alanı boş ama metin atıflıysa KIRMIZI', () => {
+    const bozuk = ATIFLI.map((i) => (i.tur === 'sayi' && i.kaynak.length === 1 ? { ...i, kaynak: [] } : i))
+    expect(uyusmaz(bozuk)).toHaveLength(1)
+  })
+  it('aralıklı atıf açılır: [1–3] ile kaynak [1, 2, 3] eşleşir', () => {
+    expect(uyusmaz([{ metin: 'Üç kaynak aynı şeyi söyler [1–3].', kaynak: [3, 2, 1], alinti: 'x', tur: 'genel' }])).toEqual([])
+  })
+})
+
 describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
   const sss = (n: number) => Array.from({ length: n }, (_, i) => `### Soru ${i + 1}?\n\nCevap ${i + 1} [1].\n`).join('\n')
   const sssKoy = (n: number) => TEMIZ.replace(/## Sık sorulan sorular\n[\s\S]*?(?=## Kaynaklar)/, `## Sık sorulan sorular\n\n${sss(n)}\n`)

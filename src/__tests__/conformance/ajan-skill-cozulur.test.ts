@@ -41,6 +41,8 @@ const DIS_BAGIMLILIK: Record<string, { kaynak: Kaynak; olcum: string }> = {
   browse: { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/browse (adıyla çağır; dosya var)' },
   canary: { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/canary (adıyla çağır; dosya var)' },
   'design-dna': { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/design-dna (adıyla çağır; dosya var)' },
+  // HRT-61: BLOG uygulayıcı satırı artık üretilir (uret: true), adıyla çağır listesindeki diagram taranır
+  diagram: { kaynak: 'kullanici', olcum: '2026-10-19: ~/.claude/skills/diagram/SKILL.md var (adıyla çağır; BLOG uygulayıcı)' },
 }
 
 const kok = path.resolve(__dirname, '..', '..', '..')

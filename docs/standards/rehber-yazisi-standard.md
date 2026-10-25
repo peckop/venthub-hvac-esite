@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.9 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.10 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -52,6 +52,11 @@ canlıda 200 iken "yok" sanıldı).
 derlenen 13 satır (adresli, belge tarihli, ham HTML'de doğrulanmış alıntı), Google'ın YAZMADIĞI şeyler
 (alt başlıkta konu ifadesi şartı ve sayısal eşik yok) ve bunların üstüne kurulan İLKE sınıfı kurallar;
 R3'e alt başlık satırı; kapıya `baslikDenetle` UYARI kolu. Kırmızı kural getirmez.
+**v0.10 (2026-10-25, BLG-17, OPS onayı O1):** üçüncü yazının (BLG-15) yedi doğrulama turundan ölçülen dersler: R2.6'ya
+MEVZUAT penceresi kapalıyken üç şartlı birincil metin hükmü ve madde/ek numarası ile değiştirici yönetmelik ölçümü;
+R5.1.1 tur klasörü bağımsızlığı, başlıkların bağımsız okunması ve atıf kümesi ↔ kaynak alanı ölçümü; R5.5'e düzeltme
+türüne göre tur ve başlık-yalnız revizyon; R10.3'e ölçülen tur sayısı (hedef karşılanmadı); R10.5 ders listesi.
+Kırmızı kural getirmez; yeni kapı yazmaz (K0–K5 hâlâ aday).
 
 ---
 
@@ -248,6 +253,21 @@ Teknik mevzuat ve standart kaydının sahibi MEVZUAT şerididir. BLOG yönetmeli
 kadar eski tebliğ geçerli). Bir TR tebliğinin kendi metninde basılı AB tarihi AB metniyle çelişirse AB
 tarihi AB metninden yazılır; çelişki MEVZUAT paketinde belirtilir (MEVZUAT bulgusu, SGM 2021/16).
 
+**MEVZUAT penceresi kapalıyken (OPS hükmü, BLG-14 ve BLG-15, 2026-10-16).** Paket verilemiyorsa mevzuat cümlesi yalnız şu
+üç şartla yazılır; biri eksikse cümle yazıdan çıkar:
+
+1. Her mevzuat cümlesi için iddia tablosunda birincil kaynak satırı: Resmî Gazete bağlantısı + ek PDF sayfa ya da tablo
+   numarası + birebir alıntı.
+2. Bağımsız doğrulayıcı aynı satırları birincil metinden ikinci kez okur; eşleşmeyen satır yazıdan çıkar.
+3. İddia tablosunda şu not kalır: "MEVZUAT kontrolü yapılmadı (pencere kapalı), birincil metin BLOG + doğrulayıcı".
+
+**Madde, ek numarası ve değiştirici yönetmelik özetten alınmaz, ham metinden ölçülür.** Tetik ölçüm: BLG-15'te
+tanımlar maddesi "md. 3" yazılmıştı, doğrusu md. 4; 2018 değişikliği (RG 30437) atıfsız kalmıştı. Künyede, atıf yapılan
+maddeleri değiştiren yönetmelik olup olmadığı yazılır ("bu atıf maddelerine dokunmaz" de bir ölçüm sonucudur).
+Taranmış ek PDF'in metin katmanı yoksa değer sayfa görüntüsünden okunur ve iddia satırında `gorsel` diye işaretlenir.
+EUR-Lex bot doğrulaması isterse ham metin Cellar adresinden (`publications.europa.eu/resource/celex/<CELEX>`,
+`Accept: application/xhtml+xml`, `Accept-Language: en`) alınır.
+
 ## R3 — Yazı kalıbı
 
 Kalıp rakip ölçümünden (n = 1) çıkarıldı; bu yüzden **sayı hedefi değil ölçüttür**: konunun yan
@@ -392,6 +412,18 @@ yazının sitedeki görünüşüne yakın önizleme eklenir (R5.4).
 | 4. Düzeltme | BLOG | DESTEKSİZ / ÇELİŞİYOR / BAYAT satırlar düzeltilir ya da silinir; tuzaklar çıkarılır |
 | 5. İkinci tur | aynı doğrulayıcı | **Tüm metin** 3a'dan yeniden geçer (yalnız değişen satırlar değil: düzeltmede eklenen yeni iddia tabloya girmemiş olabilir) |
 
+### R5.1.1 Tur düzeni (BLG-15, yedi turdan ölçülen; kural değil KAYIT DİSİPLİNİ)
+
+1. **Tur klasörü.** Bağımsız doğrulamaya giden klasöre yalnız o turun kopyası (taslak + iddia tablosu + satır listesi)
+   konur. Dayanak: BLG-15 tur 1 klasöründe tuzaksız temiz kopya kalmıştı, bağımsızlık bozulmuştu.
+2. **Başlıklar içerikten ayrı okunur.** Sahte hatalı kopya yazarın yeni başlıklarını sınamaz; başlıklar ve H3'ler
+   bağımsız bir okumadan geçer (BLG-13 tur 2: üç zayıf başlık; BLG-15: sekiz zayıf başlık, ikisi içerik riski).
+3. **Yeni başlık eklenince altındaki paragraf yeniden okunur.** Başlık ekleme ya da taşıma, paragrafın zamirini
+   ("Bu sınırlar" gibi) başka cümleye bağlayabilir (BLG-15 tur 6: iki yerleşim hatası).
+4. **Atıf kümesi ↔ kaynak alanı betikle ölçülür.** İddia tablosunda `kaynak` alanı cümledeki atıf kümesinden üretilir ve
+   aralarındaki fark betikle gösterilir; elle okuma yetmez (BLG-15 tur 4: doğrulayıcı iki satır buldu, betik toplam yedi
+   satırda eksik gösterdi).
+
 ### R5.2 Model ve bağımsızlık
 
 Doğrulayıcı **Opus** alt ajanıdır (`execution-method-standard.md` §5.2: çürütme → opus). Ölçüm
@@ -435,6 +467,20 @@ Onay Recep'in kendi sözüyle ve bu pencerede alınır; başka pencereden aktar�
 Metin doğrulamadan sonra **tek karakter** değişirse durum taslağa düşer. Yayındaki yazı güncellenecekse
 canlı satır ezilmez, taslağa da çekilmez: güncelleme **ayrı revizyon** olarak aynı akıştan geçer, onaylanınca
 yayındaki sürümün yerine geçer; o ana kadar eski sürüm yayında kalır.
+
+**Düzeltme türüne göre tur (BLG-15, sha üç kez değişti).** Doğrulanmış metinde tek karakter değişince sha256 yenilenir ve
+durum taslağa düşer; hangi turun koşacağı düzeltmenin türüne bağlıdır:
+
+| Düzeltme | Tur |
+|---|---|
+| Yalnız doğrulayıcının önerisiyle yapılan düzeltme | değişen satırlar + tam okuma teyit turu |
+| Başlık ya da anlam değişikliği | bağımsız TAM okuma |
+
+**Başlık-yalnız revizyon.** Yayındaki yazıda yalnız başlıklar değişecekse: (a) fark kanıtı: eski ve yeni gövde arasındaki
+farkın yalnız başlık satırları olduğu betikle gösterilir; (b) `rehber-denetim.mjs` çıktısında eski ve yeni iddia kümesi
+aynıdır; (c) iki bağımsız tur (başlıkların okunması + tam okuma). İçerik cümlesi değişiyorsa bu madde uygulanmaz, tam
+revizyon (R5.1) gerekir. Dayanak: BLG-13. **Yayın ya da revizyon PR'ında** yazı kaydındaki güncelleme tarihi aynı PR'da
+değişir; birleşmeden sonra canlı site haritası `lastmod` değeri ölçülür (BLG-13'te eski kalmıştı, ayrı PR gerekti).
 
 ### R5.6 Önizleme
 
@@ -648,6 +694,10 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
 
 - **Tur sayısı:** üçüncü yazıda B5–B6 toplamı ≤ 3 tur (BLG-3'te 10 tur sürdü). Ölçü, her turun karttaki
   tur notundan okunur. Hangi adayların yazıldığına bağlıdır; yazılmayan aday için ölçü verilmez.
+  **ÖLÇÜLDÜ (BLG-15, 2026-10-18): B5–B6 toplamı 7 tur, hedef (≤3) KARŞILANMADI.** Hiçbir aday kapı (K0–K5) yazılmamıştı,
+  bu yüzden ölçü kapıların etkisini göstermez; ayrıca BLG-15 mevzuat ağırdı (116 iddia satırı, Yönetmelik ek tabloları
+  görüntüden okundu, AB dar ek). Turlarda bulunan gerçek hata kalıpları R5.1.1 ve R2.6'ya yazıldı.
+  Hedef kalkmadı: R5.1.1 ve R2.6 maddeleri sonraki yazıda sınanır.
 - **Yazı kartının kapanışı:** yazı kartı Done'a B10, B11 ve B12 kayıtları kartta olmadan taşınmaz
   (kanıt: kart notunda canlı 200, Search Console isteği, IndexNow yanıtı). Frekans yazısında bu halka
   eksik kaldığı için bu madde var.
@@ -662,6 +712,19 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
 | B11–B15 metni, kapıları ve komutları | GEO-SEO (Y2'nin sahibi) | **ONAYLANDI (GEO-SEO, 13 Ekim): şema doğru, kapı komutları betiklerle uyuşuyor.** Tek kaynak `yayin-gorunurluk-denetim-standard.md` Y2 (genişletme Y2.1: aynı tur, Bing Webmaster, IndexNow kipi, günlük sınır, öncelik, satır biçimi). R10 yalnız sıra, sahip ve bağlantı taşır; Y2'yi BLOG değiştirmez |
 | Y2.1'den R10'a bağ | GEO-SEO | Kabul edildi; Y2.1 PR'ında (SEO-45, OPS onayı ve #1917 birleşmesi sonrası) konur. Numara kesinleşince bu satır numarayla güncellenir |
 | EN yayını (`EN_YAYIN`) açılınca B10–B12 EN adresleri için tekrarlanır | GEO-SEO + URUN | bayrak kapalı, kapsam dışı |
+
+### R10.5 Önceki yazıların ders listesi (yeni yazı başlarken OKUNUR)
+
+Yeni bir rehber yazısına başlarken işbaşı notuna bu listenin okunduğu yazılır. Her satır ölçülmüş bir olaya dayanır;
+kapıya dönen ders yoktur (K0–K5 aday).
+
+| Ders | Yer | Dayanak |
+|---|---|---|
+| Ürün/kategori sayfası yalnız durum koduyla değil **içeriğiyle** ölçülür; sayfadaki sayılar yazıdaki tabloyla karşılaştırılır, fark KATALOG/ÜRÜN'e kartla gider | B4, B10 | BLG-15: ürün sayfası AC modellerde 26,1/25/30,7/40,2/40,1/45,4 dB(A) verirken katalog farklıydı |
+| Yazının canlıdan ölçümü sırasında yan dosya yolu: Git Bash `/tmp` ile Node `/tmp` AYNI klasör DEĞİL; ölçüm dosyası scratchpad'e yazılır | B10 | BLG-15: Node başka oturumun eski dosyasını okudu |
+| Birleşmeden sonra `verify_completion` kanıt komutu ana dizindeki dosyaya bakar; ana dizin master'ı almadan kırmızı verir | B10, kart kapanışı | BLG-15 kapanışı |
+| Yeni yazı ana sayfa kartını artırırsa axe belirsiz-kontrast tavanı etkilenir (ana sayfa son 3 rehber kartını basar; BLG-15 ile 19 → 21, OPS 16 Ekim); PR'dan ÖNCE tavan etkisi ölçülür | B8 | BLG-3 (17 → 19), BLG-15 (19 → 21) |
+| Test fikstürleri yeni yazıyla değişir: sahte katalog (aile, kategori), site haritası altın dosyası, conformance fikstürü; geri bağlantı testi "rehber yok → null" notu | B8 | BLG-15 PR'ı ilk çalıştırmada üç yerde kırmızıydı |
 
 ## R11 — Başlık ve içerik yapısı: Google'ın resmî belgelerine dayanan kural (BLG-12, 2026-10-14)
 
