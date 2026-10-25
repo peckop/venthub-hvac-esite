@@ -1,8 +1,13 @@
 ---
 paths:
   - ".claude/hooks/**"
+  - ".claude/settings.json"
   - "scripts/board/**"
   - "scripts/hijyen/**"
+  - "tools/**"
+  - "src/__tests__/conformance/kanca-*.test.ts"
+  - "src/__tests__/conformance/arac-*.test.ts"
+  - "docs/audits/arac-envanteri-*"
 ---
 
 # ARAC: departmana özgü iş kuralları (başlıklar; yol kapsamlı, üretilmiş)
