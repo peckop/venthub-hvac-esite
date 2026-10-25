@@ -1608,12 +1608,22 @@ describe('INV-HAFIZA-ENJEKSIYONU-8 · kullanım eşleşmesi: jenerik sözcük sa
 
   it('defter: aynı kancanın aynı dersi aynı dakikada çift satır yazması TEKİLLEŞİR; farklı kaynak ayrı enjeksiyon kalır', () => {
     const pano = geciciDizin('defter-tekil')
-    const t = Date.now()
+    // Dakika başına hizalı sabit an: Date.now()+5 sn dakikanın son 5 sn'sinde dakika atlıyordu (~%8 kararsız, ARC-205).
+    const t = Math.floor(Date.now() / 60000) * 60000 + 10000
     D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: t })
     D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: t + 5000 }) // aynı dakika, aynı kaynak → atlanır
     D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'konu' }], { pano, simdi: t + 6000 }) // farklı kaynak → ayrı enjeksiyon
     D.yaz(OTURUM, [{ id: '01B', metin: DERS_B, kaynak: 'dosya' }, { id: '01B', metin: DERS_B, kaynak: 'dosya' }], { pano, simdi: t + 7000 }) // aynı çağrıda çift
     const idler = D.oku(OTURUM, { pano }).satirlar.map((s: { id: string; kaynak: string }) => `${s.kaynak}|${s.id}`)
     expect(idler.sort()).toEqual(['dosya|01A', 'dosya|01B', 'konu|01A'])
+  })
+
+  it('defter: tekilleştirme saatten bağımsız — dakikanın son saniyesi aynı dakika sayılır, ertesi dakika ayrı satırdır', () => {
+    const pano = geciciDizin('defter-dakika-siniri')
+    const dakika = Math.floor(Date.now() / 60000) * 60000
+    D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: dakika + 53000 })
+    D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: dakika + 59000 }) // aynı dakika → atlanır
+    D.yaz(OTURUM, [{ id: '01A', metin: DERS_A, kaynak: 'dosya' }], { pano, simdi: dakika + 61000 }) // ertesi dakika → yeni satır
+    expect(D.oku(OTURUM, { pano }).satirlar).toHaveLength(2)
   })
 })
