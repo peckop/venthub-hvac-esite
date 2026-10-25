@@ -36,12 +36,17 @@ const path = require('node:path')
 const GUN_MS = 24 * 60 * 60 * 1000
 const PENCERE_GUN = 7
 
-/** `blog-pencere` → `blog`; büyük/küçük harf ve boşluk affedilir. */
+/**
+ * `blog-pencere` → `blog`; büyük/küçük harf ve boşluk affedilir. Çıktı bağlama girer ve `audience.roles`
+ * sage kaydından gelir: yalnız [a-z0-9çğıöşü_-] kalır (`<` `>` satır sonu düşer), en çok 32 karakter (ARC-203).
+ */
 function rolAdi(r) {
   return String(r || '')
     .trim()
     .toLowerCase()
     .replace(/-pencere$/, '')
+    .replace(/[^a-z0-9çğıöşü_-]/g, '')
+    .slice(0, 32)
 }
 
 /** Beklenen departmanlar: `.claude/agents/<rol>-pencere.md` dosyalarından (SSOT: ajan tanımları). */
