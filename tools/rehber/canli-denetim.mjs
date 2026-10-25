@@ -186,7 +186,7 @@ if (buDosya === cagrilan) {
     process.exit(2)
   }
   const s = await canliDenetle(JSON.parse(readFileSync(yol, 'utf8')))
-  for (const m of s.maddeler) console.log(`${m.durum} | ${m.ad} | ${m.ayrinti}`)
-  console.log(`SONUÇ: ${s.durum}`)
+  for (const m of s.maddeler) process.stdout.write(`${m.durum} | ${m.ad} | ${m.ayrinti}\n`)
+  process.stdout.write(`SONUÇ: ${s.durum}\n`)
   process.exit(s.durum === 'GEÇTİ' ? 0 : s.durum === 'KALDI' ? 1 : 3)
 }
