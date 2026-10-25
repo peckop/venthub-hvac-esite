@@ -44,9 +44,9 @@ export interface AileKirintisiGirdisi {
   /** Sözlükten: `category.breadcrumbHome`. */
   anasayfaAdi: string
   /** Ana kategori (görünen ad + dile göre slug). Çözülemediyse `null` → basamak yok, zincir kısalır. */
-  ana: KirintiAd | null
+  ana?: KirintiAd | null
   /** Alt kategori; ana ile aynı slug'sa ya da ana yoksa eklenmez. */
-  alt: KirintiAd | null
+  alt?: KirintiAd | null
   /**
    * URN-144 (karar 410): kategori zinciri, kökten yaprağa (yaprak DAHİL), `parent_id` zincirinden. Verilirse
    * `ana`/`alt` yok sayılır (karma sütunlarda ana/alt yanlış kademeyi gösterirdi). İki kademede çıktı
@@ -75,7 +75,7 @@ export interface AileKirintisiGirdisi {
  */
 export function aileKirintiAdimlari(girdi: AileKirintisiGirdisi): KirintiAdimi[] {
   const { dil, anasayfaAdi, ana, alt, zincir, aile, model, bayrak = ADRES_SEMASI_K3B } = girdi
-  const gecerli = (k: KirintiAd | null): k is KirintiAd => !!k && !!k.ad.trim() && !!k.slug
+  const gecerli = (k: KirintiAd | null | undefined): k is KirintiAd => !!k && !!k.ad.trim() && !!k.slug
   const rotalar = adresRotalari(dil, bayrak)
 
   const adimlar: KirintiAdimi[] = [{ name: anasayfaAdi, path: '/' }]

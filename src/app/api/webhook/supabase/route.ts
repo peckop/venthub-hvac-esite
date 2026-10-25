@@ -567,7 +567,7 @@ export async function POST(request: NextRequest) {
          */
         if (self.parent_id === null && cocuklar.length > 0) {
           let torunSayisi = 0
-          for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
+          torunDongusu: for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
             if (!child.id) continue
             const { data: torunlar, error: torunHatasi } = await supabase
               .from('categories')
@@ -581,7 +581,7 @@ export async function POST(request: NextRequest) {
             for (const torun of torunlar ?? []) {
               if (torunSayisi >= MAX_KATEGORI_COCUK) {
                 fanoutTruncated = true
-                break
+                break torunDongusu
               }
               torunSayisi++
               const torunYollari = categoryPathsFor(torun, child).filter((p) => !revalidatedPaths.includes(p))
