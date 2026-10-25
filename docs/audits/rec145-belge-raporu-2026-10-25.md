@@ -105,4 +105,4 @@ Ek bulgular: Casals AF 2024 kesiti (yayınlanmayan) ESKİ: bizde CV092024, üret
 - Kimliği belirsiz SEAT föyü, SEAT ATEX kurulum kılavuzu (2011, yerine geçeni ölçülmedi) ve FC51'in iki eski fact sheet'i "evet"ten "dogrulanacak"a alındı.
 - Rapor sayıları CSV'den yeniden hesaplandı (yukarıdaki tablo).
 - Zayıf ama yanlış olmayan bağlar: Casals 77854 broşürü NIMUS/NIMAX'a model değil aile sözcüğüyle bağlı; Nicotra ADH-AT-RDE-RZR kataloğunda AT yalnız 3 sayfada, 78/97 sayfa RZR.
-- Karar gerektiren: `avensair-ADH-*` 8 föy "resmi değil (bayi föyü)" diye dışlandı; doğrulayıcıya göre AVenS'in (İkitelli) kendi föyleri. Yayınlanıp yayınlanmayacağı OPS/Recep kararı.
+- `avensair-ADH-*` 8 föy: doğrulayıcıya göre AVenS'in (İkitelli) kendi föyleri; Recep kararı (25 Ekim 2026, OPS penceresi): iptal, yayınlanmaz, konu kapandı. Listede `yayin_onerisi` "hayir: Recep kararı".
