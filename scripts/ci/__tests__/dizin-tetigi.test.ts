@@ -261,14 +261,36 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: '--kuyruk yolu depo içine kayar', eski: '--kuyruk "$DIZIN/google-kuyruk.jsonl"', yeni: '--kuyruk "./google-kuyruk.jsonl"' },
 ]
 
+// Sabitlenmiş kullanımlar (`actions/x@<40 hane sha> # vN.N.N`) dependabot ile değişir. Sabotaj
+// metinleri bu sha ve sürüm numaralarını elle taşıyordu; checkout 4→7 yükseltmesinde (#2001) sabotaj
+// noktası bulunamayıp test kırmızı oldu. Bu yüzden eski sabitler gerçek kaynaktaki güncel sabitle
+// değiştirilir; sabotajın ne bozduğu değişmez, yalnız aranan satırın sürümü kaynaktan okunur.
+function sabitOku(yol: string): { sha: string; surum: string } {
+  const m = new RegExp(`${yol}@([0-9a-f]{40}) # (v[0-9.]+)`).exec(GERCEK)
+  if (!m) throw new Error(`iş akışında sabitlenmiş kullanım bulunamadı: ${yol}`)
+  return { sha: m[1], surum: m[2] }
+}
+const ESKI_CHECKOUT = '11d5960a326750d5838078e36cf38b85af677262 # v4.4.0'
+const ESKI_CACHE_SHA = '55cc8345863c7cc4c66a329aec7e433d2d1c52a9'
+function sabitle(metin: string): string {
+  const co = sabitOku('actions/checkout')
+  const ca = sabitOku('actions/cache/save')
+  return metin
+    .split(ESKI_CHECKOUT).join(`${co.sha} # ${co.surum}`)
+    .split(`${ESKI_CACHE_SHA} # v6.1.0`).join(`${ca.sha} # ${ca.surum}`)
+    .split(ESKI_CACHE_SHA).join(ca.sha)
+}
+
 function sabotajli(s: Sabotaj): string {
-  const parca = GERCEK.split(s.eski)
+  const eski = sabitle(s.eski)
+  const yeni = sabitle(s.yeni)
+  const parca = GERCEK.split(eski)
   if (s.hepsi) {
     if (parca.length < 2) throw new Error(`sabotaj noktası kaynakta bulunamadı: ${s.ad}`)
-    return parca.join(s.yeni)
+    return parca.join(yeni)
   }
   if (parca.length !== 2) throw new Error(`sabotaj noktası kaynakta TAM BİR KEZ bulunmalı (${parca.length - 1} kez): ${s.ad}`)
-  return parca.join(s.yeni)
+  return parca.join(yeni)
 }
 
 describe('INV-DIZIN-TETIGI-1 · 2. sabotaj: iş akışına konan her tek hata en az bir kuralı ya da senaryoyu KIRMIZIYA çevirir', () => {
