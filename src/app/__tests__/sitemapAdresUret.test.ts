@@ -57,6 +57,13 @@ async function harita(
     EN_YAYIN: enYayin,
     ADRES_SEMASI_K3B: k3b,
   }))
+  // URN-140 (SEO-61): taslak yasal sayfalar (`yasalDizinDisi()`) site haritasında YOK. Altın veri ADRES ÜRETİMİNİ sabitler ve
+  // yasal satırları da taşır; dizin kararı burada "dizine açık" sabitlenir ki gerçek yapılandırma değişince altın veri oynamasın.
+  // Dizin kararının kendisi (iki durum, iki dil) `sitemapYasalDizin.test.ts`'te ölçülür.
+  vi.doMock('@/config/legal', async (orijinal) => ({
+    ...(await orijinal<typeof import('@/config/legal')>()),
+    yasalDizinDisi: () => false,
+  }))
   const { SITE_URL } = await import('../../config/siteUrl')
   const { default: sitemap } = await import('../sitemap')
   const ham = await sitemap()
@@ -77,6 +84,7 @@ const altinaCevir = (satirlar: Satir[], base: string) =>
 describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => {
   afterEach(() => {
     vi.doUnmock('@/config/features')
+    vi.doUnmock('@/config/legal')
     vi.resetModules()
   })
 
