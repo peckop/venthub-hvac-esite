@@ -338,7 +338,9 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı TARAMASI (O2): kişisel kalıba uyan
   })
 
   it('JSON: belirgin tolerans adı (tc_kimlik_no) TEK dolu satırda bile R1', () => {
-    expect(kurallar('d.json', JSON.stringify({ tc_kimlik_no: 'dolu' }))).toEqual(['R1'])
+    // ALT-105: değer artık RAKAMLI olmalı (rakamsız metin arayüz etiketidir, numara değil); rakamsız etiket davranışı
+    // depo-dokum-kapisi-r1-onizleme.test.ts'te pinli.
+    expect(kurallar('d.json', JSON.stringify({ tc_kimlik_no: 'dolu1' }))).toEqual(['R1'])
   })
 
   it('JSON: aynı tolerans anahtarı 3 kez geçmeli; her biri bir kez geçen FARKLI anahtarlar toplanmaz (i18n sözlüğü yanlış alarm vermez)', () => {
