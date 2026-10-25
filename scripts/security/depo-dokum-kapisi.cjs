@@ -373,6 +373,12 @@ function kisiselParcaMi(parcalar) {
  */
 const urlDegeriMi = (v) => typeof v === 'string' && /^\s*(?:\/|https?:\/\/)/i.test(v)
 
+/** Kimlik numarası alanı mı: belirgin TOLERANS kökü eşleşir ama tam sözlük adı DEĞİL (`tckn`, `tcno` kökü; `customer_name` değil). */
+function kimlikNumarasiKokuMu(ad) {
+  const nk = norm(String(ad))
+  return !KISISEL_NORM.has(nk) && KISISEL_BELIRGIN_KOKLER.some((k) => nk.includes(k))
+}
+
 const sinifOnbellek = new Map()
 
 /**
@@ -659,6 +665,9 @@ function jsonGez(belgeler, satirDizisi) {
     const sinif = kisiselAlanSinifi(k)
     if (sinif === null || !doluMu(v)) return
     if (sinif === 'genel' && urlDegeriMi(v)) return
+    // ALT-105 (öneri A): kimlik NUMARASI alanında (tolerans kökü; tam sözlük adı değil) hiç rakam içermeyen metin değer numara
+    // olamaz: arayüz etiketi/sözlük girdisidir (`tx.e_tcNoN` → "TC Kimlik No"). Sayı ve nesne değerleri etkilenmez.
+    if (sinif === 'belirgin' && kimlikNumarasiKokuMu(k) && typeof v === 'string' && !/\d/.test(v)) return
     if (sinif === 'belirgin') alanlar.add(alanEtiketi(k))
     else {
       const nk = norm(k)
