@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Uygulama alanı" description="Uygulama alanı sayfası (iş emri #14; 9 alan, alanId ile; bölüm kural + seri etiketi, VHKatalog.alan; ad ve sayılar katalogdan): SectionRail konum → PageCover (UYGULAMA ALANI, bölüm çipleri ↓) → ihtiyaç bölümleri (başlık + ürün türleri + SeriesCard ızgarası). Veri ve metin props ile." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-uygulama-alani][data-mob="1"]{padding:0 18px 40px !important}</style></helmet>
+<div data-vh-uygulama-alani="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:24px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));padding:0 40px 40px">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<div style="width:100%;max-width:1060px;min-width:0;margin:-6px auto 0"><x-import component-from-global-scope="DesignSystem_4f7164.PageCover" dc-props="{{ kapak }}" hint-size="100%,360px"></x-import></div>
+<sc-if value="{{ masa }}" hint-placeholder-val="{{ true }}"><div style="width:100%;max-width:1060px;min-width:0;margin:8px auto 0;display:flex;flex-direction:column;gap:40px">
+<sc-for list="{{ bolumler }}" as="b" hint-placeholder-count="5">
+<x-import component-from-global-scope="DesignSystem_4f7164.UygulamaBolumu" dc-props="{{ b }}" hint-size="100%,260px"></x-import>
+</sc-for>
+</div></sc-if>
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><div style="width:100%;min-width:0;display:flex;flex-direction:column;gap:28px">
+<sc-for list="{{ bolumler }}" as="b" hint-placeholder-count="5">
+<x-import component-from-global-scope="DesignSystem_4f7164.UygulamaBolumu" dc-props="{{ b }}" hint-size="100%,260px"></x-import>
+</sc-for>
+</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;2000px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;alanId&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ticari-alan-ofis&quot;,&quot;kimya-laboratuvari&quot;,&quot;galvaniz&quot;,&quot;ilac-kimya-tesisi&quot;,&quot;atex&quot;,&quot;kapali-havuz-spa&quot;,&quot;magaza-girisi&quot;,&quot;siginak&quot;,&quot;konut-havalandirmasi&quot;],&quot;default&quot;:&quot;konut-havalandirmasi&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;alan&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;{ id: string; ad: { tr: string; en?: string }; bolumler: { id: string; ad: { tr: string; en?: string }; icerik: string[] }[] }&quot;},&quot;veri&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;{ ad: string; bolumler: { id: string; ad: string; turler: string[]; seriler: object[] }[] }&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, veri: null, dil: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    Promise.all([this.props.metin ? null : Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json')]).then(([a, b]) => ({ ...a, ...b })), this.props.metin ? null : null, this.props.alan ? null : al('../../assets/veri/uygulama-alani.json')]).then(([s, ek, v]) => {
+      const m = s ? { ...s } : null; if (m && ek) for (const k in ek) if (k !== '_damga' && !(k in m) && ek[k] != null) m[k] = ek[k];
+      this.setState({ metin: m, alanVeri: v && v.alanlar ? v : null });
+    });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, M = P.metin || this.state.metin || {}, KT = window.VHKatalog;
+    /* B-3: 9 alanın hepsi; alanId ile seçilir (önizlemede seçici). */
+    const LS = KT && this.state.alanVeri ? KT.alanlar(this.state.alanVeri) : [], AL = P.alan || LS.find((x) => x.id === P.alanId) || LS[0];
+    const V = P.veri || (AL && KT ? KT.alan(AL, P.dil || 'TR') : null); /* ad ve sayılar katalogdan; bölüm adı uygulama-alani.json'dan */
+    const A = (k, v) => { let s = M[k]; if (s == null) return '\u27E6' + k + '\u27E7'; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+    const D = (s, yol) => (s == null ? '\u27E6' + yol + '\u27E7' : s);
+    const base = { lang: (P.dil || 'TR').toLowerCase(), mob, masa: !mob, mobA: mob ? '1' : '0' }; /* oluk 40 / mobil 18; konum + kapak + bölümler aynı 1060 sütunda (Ürün şablonuyla aynı) */
+    if (!V || !V.bolumler) return { ...base, rail: { bolumler: [] }, kapak: { baslik: '' }, bolumler: [] };
+    const B = V.bolumler.filter((b) => (b.seriler || []).length);
+    const ilk = (B[0] && B[0].seriler.find((s) => s.foto)) || {};
+    const model = B.reduce((a, b) => a + b.seriler.reduce((x, s) => x + (s.modelSayisi || 0), 0), 0);
+    const aile = B.reduce((a, b) => a + b.seriler.length, 0);
+    const tur = new Set(B.flatMap((b) => b.turler || [])).size;
+    const baslik = D(V.ad, 'uygulama-alani.ad');
+    return {
+      ...base,
+      rail: { metin: M, yapiskan: true, bolumler: [], mobil: mob, konum: [A('tx.e_anasayfa'), A('ds.uygulama-alanlari'), baslik].join(' › '), geri: mob ? { ad: A('ds.uygulama-alanlari'), href: '#' } : undefined },
+      kapak: { metin: M, mobil: mob, dil: (P.dil || 'TR').toUpperCase(), seviye: 'uygulama-alani', baslik, enCokCip: B.length, cipler: B.map((b, i) => ({ ad: D(b.ad, 'uygulama-alani.bolumler[' + i + '].ad') + ' ↓', href: '#' + (b.id || 'b-' + (i + 1)) })), foto: ilk.foto ? { src: ilk.foto, alt: ilk.ad || '' } : null, children: React.createElement('span', { style: { fontSize: '14px', color: 'hsl(var(--text-body))', fontVariantNumeric: 'tabular-nums' } }, A('ds.uygulama-ozet', { seri: aile, model, tur })) },
+      bolumler: B.map((b, i) => ({ id: b.id || 'b-' + (i + 1), baslik: D(b.ad, 'uygulama-alani.bolumler[' + i + '].ad'), turler: (b.turler || []).map((t, j) => D(t, 'katalog.dal.en')), seriler: b.seriler.map((s) => ({ ...s, href: s.href || '#' })) /* B-2: seri kartı seri sayfasını açar; konum satırı ürün ağacından (alan dal değildir) */, mobil: mob, metin: M, dil: (P.dil || 'TR').toUpperCase() }))
+    };
+  }
+}
+</script>
+</body>
+</html>

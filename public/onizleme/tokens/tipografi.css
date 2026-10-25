@@ -1,0 +1,24 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  --font-sans: 'Onest', system-ui, -apple-system, 'Helvetica Neue', sans-serif;   /* arayüz, uzun metin, teknik değer */
+  --font-baslik: 'Schibsted Grotesk', 'Onest', system-ui, sans-serif;             /* başlık */
+  --font-serif: var(--font-sans);        /* eski ad, depo okuyor: artık Onest */
+  --font-mono: var(--font-sans);         /* eski ad: teknik değer Onest + tabular-nums */
+  --font-wordmark: 'Archivo', sans-serif;/* YALNIZ logo dosyalarının <text>'i; 700 ağırlık yüklenir */
+  --wordmark-weight: 700;
+  --wordmark-tracking: -0.03em;
+  --size-overline: 13px; /* #10 madde 5.6: sayfada 13 px altı yazı yok (12.5 → 13) */
+  --lh-overline: 1.4; /* @kind other */
+  --track-overline: 0.08em;
+  --weight-overline: 600;
+  --size-caption: 14px;
+  --size-body-small: 15px;
+  --size-body: 16px;
+  --size-editorial: 17px;
+  --weight-baslik: 600;                  /* h3 ve altı başlık, kart başlığı (S5) */
+  /* S5 veri/token.css (DESIGN-MENU 21 Ekim) */
+  --weight-govde: 400;
+  --weight-h1: 800;                      /* h1, h2 */
+  --lh-editorial: 1.6; /* @kind other */
+  --size-h3: 18px;
+}

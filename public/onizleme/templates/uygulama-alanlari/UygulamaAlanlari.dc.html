@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Uygulama alanları" description="İş emri #20-11: DESIGN-MENU Eksik Sayfalar (1). 9 alan kartı (simge 64 · ad → · bölümler · 'n seri · n model'), eşit boy, kartın tamamı basılır; Konut simgesiz + 2 px petrol üst kural; teklif/sepet yok. Ad ve sayı veriden (uygulama-alani.json, katalog)." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-ual][data-mob="1"]{padding:0 18px 28px !important}[data-vh-ual][data-mob="1"] h1{font-size:32px !important}[data-ual-kart][data-simge="false"]{border-top:2px solid hsl(var(--primary-navy)) !important}</style></helmet>
+<div data-vh-ual="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:20px;padding:0 40px 40px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<div style="width:100%;max-width:1160px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<section data-screen-label="Uygulama alanları" style="width:100%;max-width:1160px;min-width:0;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;max-width:760px"><h1 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:44px;letter-spacing:-0.025em;line-height:1.08">{{ u.baslik }}</h1><span style="font-size:16px;line-height:1.5;color:hsl(var(--text-body))">{{ u.alt }}</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;align-items:stretch"><sc-for list="{{ u.kartlar }}" as="c" hint-placeholder-count="9"><a data-ual-kart="" data-simge="{{ c.simgeA }}" href="{{ c.href }}" onClick="{{ c.ac }}" style="display:flex;flex-direction:column;gap:10px;padding:18px;box-sizing:border-box;border-radius:16px;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));color:hsl(var(--text-strong));text-decoration:none" style-hover="border-color:hsl(var(--primary-navy))"><sc-if value="{{ c.simgeVar }}" hint-placeholder-val="{{ true }}"><img src="{{ c.simge }}" alt="" width="64" height="64" style="display:block;width:64px;height:64px"></sc-if><b style="font-family:var(--font-baslik);font-size:18px;line-height:1.25;min-height:2.5em">{{ c.ad }} →</b><span style="font-size:14px;line-height:1.45;color:hsl(var(--text-body))">{{ c.bol }}</span><span style="margin-top:auto;font-size:14px;color:hsl(var(--text-body));font-variant-numeric:tabular-nums">{{ c.sayi }}</span></a></sc-for></div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;900px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null, ua: null, et: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null), O = '../../assets/ornek/', V = '../../assets/veri/';
+    Promise.all([al(O + 'sozluk-s5.' + dil + '.json'), al(O + 'sozluk-ek.' + dil + '.json'), null, this.state.ua ? null : al(V + 'uygulama-alani.json'), this.state.et ? null : al(V + 'seri-uygulama-etiket.json')]).then(([a, b, c, ua, et]) => { const m = { ...(a || {}), ...(b || {}) }; if (c) for (const k in c) if (k[0] !== '_' && m[k] == null) m[k] = c[k]; const o = { metin: m }; if (ua) o.ua = ua; if (et) o.et = et.seri || {}; this.setState(o); });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, s = this.state, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), en = DIL === 'EN', M = P.metin || s.metin || {}, git = P.onGit || (() => {});
+    const A = (k, v) => { let x = M[k]; if (x == null) return '\u27E6' + k + '\u27E7'; if (v) for (const z in v) x = x.split('{' + z + '}').join(v[z]); return x; };
+    const nf = (n) => String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
+    const KT = window.VHKatalog, k = KT ? KT.katalog() : null, ua = s.ua, et = s.et || {};
+    const SIM = ['ticari-alan-ofis', 'kimya-laboratuvari', 'galvaniz', 'ilac-kimya-tesisi', 'atex', 'kapali-havuz-spa', 'magaza-girisi', 'siginak'];
+    /* Eksik Sayfalar alanSeri: 'tur:seri' → o seri; 'tur' → türün etiketli serileri (n > 0). */
+    const alanSeri = (Al) => { const z = new Set(); for (const b of Al.bolumler || []) for (const t of b.icerik || []) { if (t.includes(':')) { z.add(t.split(':')[1]); continue; } const d = k.dal[t]; if (d) for (const a of d.aile || []) if (k.aile[a] && k.aile[a].n > 0 && (et[a] || []).includes(Al.id)) z.add(a); } return [...z]; };
+    const kartlar = ua && k ? ua.alanlar.slice().sort((a, b) => (a.sira || 0) - (b.sira || 0)).map((Al) => { const S = alanSeri(Al), n = S.reduce((t, x) => t + ((k.aile[x] || {}).n || 0), 0), sv = SIM.includes(Al.id); return { ad: Al.ad[en ? 'en' : 'tr'], bol: (Al.bolumler || []).map((b) => b.ad[en ? 'en' : 'tr']).join(' \u00B7 '), sayi: A('ds.n-model-n-seri', { s: nf(S.length), n: nf(n) }), simgeVar: sv, simgeA: sv ? 'true' : 'false', simge: sv ? '../../brand/icons/venthub-sen-' + Al.id + '-64-tamrenk.svg' : '', href: '#', ac: (e) => { e.preventDefault(); git('uygulama-alani', Al.id); } }; }) : [];
+    return {
+      lang: DIL.toLowerCase(), mobA: mob ? '1' : '0',
+      u: { baslik: A('ds.uygulama-alanlari'), alt: A('ds.ua-liste-alt'), kartlar },
+      rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [{ ad: A('ds.anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }, { ad: A('ds.uygulama-alanlari') }] }
+    };
+  }
+}
+</script>
+</body>
+</html>

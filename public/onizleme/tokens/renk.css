@@ -1,0 +1,19 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  /* Arayüz rengi: tek petrol. Üç ad korunur (depo okuyor), değer tek. */
+  --primary-navy: 197.9 81.5% 23.3%; /* @kind color */     /* #0B4F6C · yapı, bağlantı, seçili hâl · beyazda 8.94 · sayfada 8.28 */
+  --brand-cyan: 197.9 81.5% 23.3%; /* @kind color */       /* #0B4F6C */
+  --brand-cyan-ink: 197.9 81.5% 23.3%; /* @kind color */   /* #0B4F6C · küçük metin ve sayaç/rozet zemini (beyaz metinle 8.94) */
+  /* Kiremit */
+  --action-terracotta: 23 88% 45%; /* @kind color */       /* #D95D0E · logo üst dilimi, P-Q çalışma noktası. Metin zemini değil (beyazla 3.80) */
+  --action-terracotta-deep: 24 91% 39%; /* @kind color */  /* #BF5309 · sayfanın tek dolu ana eylem düğmesi · beyaz etiketle 4.71 */
+  /* Markaya ait olmayan iki vurgu */
+  --accent-air-green: 100 61% 30%; /* @kind color */       /* #3D7A1E · yalnız Hava Arıtma kategori sayfaları */
+  --warn-amber: 38 92% 50%; /* @kind color */              /* #F59E0B · yalnız uyarı kutusu (kenar/kural; metin değil) */
+  /* Çok modelli P-Q eğrisi renk dizisi, açıktan koyuya (veri/token.css · Recep 10-22). FeatureSlot çubuğu da pq-ton-1'den başlar. */
+  --pq-ton-1: 199 36% 64%; /* @kind color */ /* #7FB0C6 */
+  --pq-ton-2: 197 54% 40%; /* @kind color */ /* #2F7F9F */
+  --pq-ton-3: 197.9 81.5% 23.3%; /* @kind color */ /* #0B4F6C = primary-navy */
+  --pq-ton-4: 199 81% 17%; /* @kind color */ /* #08384D */
+  --pq-soluk: 199 23% 82%; /* @kind color */ /* #C5D6DE · seçili olmayan eğri */
+}

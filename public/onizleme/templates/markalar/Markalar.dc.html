@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Markalar" description="İş emri #20-2: S5 'Markalar' birebir; 7 marka §8 sırasıyla; ürünsüz marka (Flexiva) bilgi + 'Bu marka için teklif iste'. Marka satırları ve fotoğraflar katalogdan (kt.marka, aile.g)." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-markalar][data-mob="1"]{padding:0 18px 30px !important}[data-vh-markalar][data-mob="1"] h1{font-size:28px !important}[data-vh-markalar][data-mob="1"] [data-mk-izgara]{grid-template-columns:minmax(0,1fr) !important}</style></helmet>
+<div data-vh-markalar="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:22px;padding:0 40px 44px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<section data-screen-label="Markalar" style="width:100%;max-width:1060px;min-width:0;margin:0 auto;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-direction:column;gap:12px;max-width:760px"><h1 style="margin:0;font-family:var(--font-baslik);font-size:40px;font-weight:700;letter-spacing:-0.025em;line-height:1.15">{{ m.baslik }}</h1><p style="margin:0;font-size:17px;line-height:1.6;color:hsl(var(--text-body));max-width:66ch;text-wrap:pretty">{{ m.alt }}</p></div>
+<div data-mk-izgara="" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px"><sc-for list="{{ mk }}" as="b" hint-placeholder-count="7"><a href="#" onClick="{{ b.ac }}" aria-label="{{ b.ad }}" style="display:flex;flex-direction:column;height:100%;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-radius:16px;overflow:hidden;text-decoration:none;color:hsl(var(--text-strong));transition:border-color 160ms ease" style-hover="border-color:hsl(var(--primary-navy))"><div style="display:flex;align-items:center;min-height:84px;padding:0 22px;border-bottom:1px solid hsl(var(--border-hairline))"><img src="{{ b.logo }}" alt="{{ b.ad }}" width="150" height="40" style="display:block;width:150px;height:40px;object-fit:contain;object-position:left center"></div>
+<sc-if value="{{ b.fotoVar }}" hint-placeholder-val="{{ true }}"><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:hsl(var(--border-hairline));border-bottom:1px solid hsl(var(--border-hairline))"><sc-for list="{{ b.fotolar }}" as="f" hint-placeholder-count="3"><span style="display:flex;align-items:center;justify-content:center;aspect-ratio:1 / 1;background:hsl(var(--surface-subtle))"><img src="{{ f.src }}" alt="{{ f.ad }}" title="{{ f.ad }}" width="120" height="120" loading="lazy" style="width:78%;height:78%;object-fit:contain;mix-blend-mode:multiply"></span></sc-for></div></sc-if>
+<div style="flex:1 1 auto;display:flex;flex-direction:column;gap:14px;padding:18px 22px 20px"><sc-if value="{{ b.grVar }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ b.gr }}" as="k" hint-placeholder-count="3"><button type="button" onClick="{{ k.ac }}" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px 0 10px;border:1px solid hsl(var(--border-control));border-radius:20px;background:hsl(var(--surface-card));font:inherit;font-size:15px;font-weight:600;white-space:nowrap;color:hsl(var(--text-strong));cursor:pointer" style-hover="border-color:hsl(var(--primary-navy))"><img src="{{ k.ikon }}" alt="" aria-hidden="true" width="20" height="20" style="width:20px;height:20px">{{ k.ad }}</button></sc-for></div></sc-if><sc-if value="{{ b.urunsuz }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;line-height:1.55;color:hsl(var(--text-body))">{{ b.ozet }}</span></sc-if><span style="margin-top:auto;font-size:16px;font-weight:600;color:hsl(var(--brand-cyan-ink))">{{ b.et }}</span></div></a></sc-for></div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;1300px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string | object) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json')]).then(([a, b]) => this.setState({ metin: { ...(a || {}), ...(b || {}) } }));
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || this.state.metin || {}, git = P.onGit || (() => {});
+    const A = (k) => (M[k] == null ? '\u27E6' + k + '\u27E7' : M[k]);
+    const KT = window.VHKatalog, kt = KT ? KT.katalog() : null;
+    /* §8 sırası ve görünen ad; logo assets/marka-logolari. Satırlar (grup · seri · model) katalogdan: kt.marka[].satir. */
+    const MK = [['vortice', 'Vortice', 'vortice-yatay.png'], ['seat', 'SEAT', 'seat.png'], ['avens', 'AVenS', 'avens.svg'], ['nicotra-gebhardt', 'Nicotra Gebhardt', 'nicotra-gebhardt.webp'], ['danfoss', 'Danfoss', 'danfoss.svg'], ['casals', 'Casals', 'casals.png'], ['flexiva', 'Flexiva', 'flexiva.png']];
+    const IKON = { fanlar: 'fan', kontrol: 'kontrol-suruculer', sartlandirma: 'hava-sartlandirma', igk: 'isi-geri-kazanim', perde: 'hava-perdesi', siginak: 'siginak-havalandirma', aksesuar: 'aksesuarlar' };
+    const mk = MK.map(([id, ad, logo]) => {
+      const K = kt && (kt.marka || []).find((x) => x.id === id), satir = (K && K.satir) || [];
+      const fam = kt ? Object.keys(kt.aile).filter((a) => kt.aile[a].m === id && kt.aile[a].g && kt.aile[a].n > 0).sort((x, y) => kt.aile[y].n - kt.aile[x].n).slice(0, 3) : [];
+      const gr = satir.map(([g]) => { const G = KT.grup(g, DIL); return { ad: G ? G.ad : g, ikon: '../../assets/icons/venthub-kat-' + (IKON[g] || 'fan') + '-24-lacivert.svg', ac: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } git('urunler', { grup: g, marka: id }); } }; });
+      const urunlu = satir.length > 0;
+      return { ad, logo: '../../assets/marka-logolari/' + logo, fotolar: fam.map((a) => ({ src: KT.foto(kt.aile[a].g), ad: (DIL === 'EN' && kt.aile[a].en) || kt.aile[a].ad })), fotoVar: fam.length > 0, gr, grVar: gr.length > 0, urunsuz: !urunlu, ozet: urunlu ? '' : A('t.bu-markanin-sitede-kayitli-urunu-yok-ihtiyaciniz'), et: urunlu ? A('t.markayi-incele') : A('t.bu-marka-icin-teklif-iste'), ac: (e) => { if (e) e.preventDefault(); git(urunlu ? 'marka' : 'teklif', id); } };
+    });
+    return { lang: DIL.toLowerCase(), mobA: mob ? '1' : '0', m: { baslik: A('tx.markalarB'), alt: A('tx.markalarA') }, mk, rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }, { ad: A('tx.markalarB') }] } };
+  }
+}
+</script>
+</body>
+</html>

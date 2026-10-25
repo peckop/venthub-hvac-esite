@@ -1,0 +1,153 @@
+{
+ "_kaynak": "Site S5.dc.html MARKA_BILGI + MARKA_BILGI_EN (birebir). Şablon §8 gereği cumle ve Alan satırını çizmez (marka iddiası).",
+ "bilgi": {
+  "vortice": {
+   "satir": [
+    [
+     "Menşei",
+     "İtalya"
+    ],
+    [
+     "Kuruluş",
+     "1954"
+    ],
+    [
+     "Merkez",
+     "Tribiano, Milano"
+    ],
+    [
+     "Grup",
+     "Vortice Group"
+    ],
+    [
+     "Alan",
+     "Aspiratörler & Isı Geri Kazanım"
+    ]
+   ],
+   "cumle": "Vortice, 1954 yılında İtalya'da kurulmuş bir havalandırma çözümleri üreticisidir.",
+   "web": "https://www.vortice.it"
+  },
+  "seat": {
+   "satir": [
+    [
+     "Menşei",
+     "Fransa"
+    ],
+    [
+     "Kuruluş",
+     "1968"
+    ],
+    [
+     "Merkez",
+     "Verniolle"
+    ],
+    [
+     "Alan",
+     "Korozyona Dayanıklı PP Fanlar"
+    ],
+    [
+     "Uygulama alanları",
+     "laboratuvar, kimya ve ilaç sanayi, yüzme havuzu, atık su arıtma, ATEX ortamları"
+    ]
+   ],
+   "cumle": "",
+   "web": "https://www.seat-ventilation.com"
+  },
+  "avens": {
+   "satir": [
+    [
+     "Menşei",
+     "Türkiye"
+    ],
+    [
+     "Alan",
+     "Endüstriyel Klima Santralleri"
+    ]
+   ],
+   "cumle": "Endüstriyel havalandırma ve klima santralleri çözümleri.",
+   "web": ""
+  },
+  "casals": {
+   "satir": [
+    [
+     "Menşei",
+     "İspanya"
+    ],
+    [
+     "Merkez",
+     "Sant Joan de les Abadesses, Girona"
+    ],
+    [
+     "Grup",
+     "Vortice Group"
+    ],
+    [
+     "Alan",
+     "Endüstriyel Fanlar"
+    ]
+   ],
+   "cumle": "İspanya'da Sant Joan de les Abadesses (Girona) merkezli endüstriyel fan markası; Vortice Group şirketlerinden biridir.",
+   "web": "https://www.casals.com"
+  },
+  "nicotra-gebhardt": {
+   "satir": [
+    [
+     "Menşei",
+     "Almanya"
+    ],
+    [
+     "Kuruluş",
+     "1959"
+    ],
+    [
+     "Merkez",
+     "Waldenburg"
+    ],
+    [
+     "Grup",
+     "Regal Rexnord"
+    ],
+    [
+     "Alan",
+     "Yüksek Verimli Santrifüj Fanlar"
+    ]
+   ],
+   "cumle": "",
+   "web": "https://www.nicotra-gebhardt.com"
+  },
+  "danfoss": {
+   "satir": [
+    [
+     "Menşei",
+     "Danimarka"
+    ],
+    [
+     "Kuruluş",
+     "1933"
+    ],
+    [
+     "Merkez",
+     "Nordborg"
+    ],
+    [
+     "Alan",
+     "Frekans Konvertörleri"
+    ]
+   ],
+   "cumle": "1933'te Danimarka'da kurulan bir aile şirketi.",
+   "web": "https://www.danfoss.com"
+  }
+ },
+ "en": {
+  "Menşei": "Origin",
+  "Kuruluş": "Founded",
+  "Merkez": "Headquarters",
+  "Grup": "Group",
+  "İtalya": "Italy",
+  "Fransa": "France",
+  "Türkiye": "Türkiye",
+  "İspanya": "Spain",
+  "Almanya": "Germany",
+  "Danimarka": "Denmark"
+ }
+}

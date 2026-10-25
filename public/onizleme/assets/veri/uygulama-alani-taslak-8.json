@@ -1,0 +1,224 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · TASLAK, Recep onayı bekler. Uygulama alanı bölüm verisi (8 alan; konut-havalandirmasi veri/uygulama-alani.json'da onaylı). Tür kimliği katalog dal kimliği. Bölüm yalnız katalogda ürünü olan türle kurulur (K7). Uygunluk iddiası yok: bölüm 'bu alanda kullanılan ürün türleri' listesidir; teknik uygunluk ürün sayfasında katalogdan. ? işaretli bölüm Recep'e sorulur. · Recep 10-25: Mağaza girişi yalnız Hava perdesi (onaylı). Öteki alanlar tek tek kontrol edilecek. · 10-25: İçerik projesi seri kayıtlarıyla doğrulandı (ATEX, havuz); dayanağı olmayan \"Genel hava değişimi\" ve \"Santral fanları\" kalktı.",
+ "alanlar": [
+  {
+   "id": "ticari-alan-ofis",
+   "ad": {
+    "tr": "Ticari alan ve ofis",
+    "en": "Commercial and office"
+   },
+   "bolumler": [
+    {
+     "id": "kanal",
+     "ad": {
+      "tr": "Kanal havalandırması",
+      "en": "Duct ventilation"
+     },
+     "icerik": [
+      "duct-fans"
+     ]
+    },
+    {
+     "id": "isi-geri-kazanim",
+     "ad": {
+      "tr": "Isı geri kazanım",
+      "en": "Heat recovery"
+     },
+     "icerik": [
+      "ducted-central-hrv"
+     ]
+    },
+    {
+     "id": "wc",
+     "ad": {
+      "tr": "WC ve ıslak hacim",
+      "en": "WC and wet rooms"
+     },
+     "icerik": [
+      "bathroom-toilet-fans"
+     ]
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "icerik": [
+      "speed-controllers",
+      "frequency-converters"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kimya-laboratuvari",
+   "ad": {
+    "tr": "Kimya laboratuvarı",
+    "en": "Chemistry laboratory"
+   },
+   "bolumler": [
+    {
+     "id": "ceker-ocak",
+     "ad": {
+      "tr": "Çeker ocak egzozu",
+      "en": "Fume cupboard exhaust"
+     },
+     "icerik": [
+      "acid-resistant-fans"
+     ]
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "icerik": [
+      "frequency-converters"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "galvaniz",
+   "ad": {
+    "tr": "Galvaniz ve kaplama",
+    "en": "Galvanising and plating"
+   },
+   "bolumler": [
+    {
+     "id": "banyo-egzozu",
+     "ad": {
+      "tr": "Kaplama banyosu egzozu",
+      "en": "Plating bath exhaust"
+     },
+     "icerik": [
+      "acid-resistant-fans"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ilac-kimya-tesisi",
+   "ad": {
+    "tr": "İlaç ve kimya tesisi",
+    "en": "Pharmaceutical and chemical plant"
+   },
+   "bolumler": [
+    {
+     "id": "proses",
+     "ad": {
+      "tr": "Proses egzozu",
+      "en": "Process exhaust"
+     },
+     "icerik": [
+      "acid-resistant-fans"
+     ]
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "icerik": [
+      "frequency-converters"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "atex",
+   "ad": {
+    "tr": "Patlayıcı ortam (ATEX)",
+    "en": "Explosive atmosphere (ATEX)"
+   },
+   "bolumler": [
+    {
+     "id": "atex-fan",
+     "ad": {
+      "tr": "ATEX fanlar",
+      "en": "ATEX fans"
+     },
+     "icerik": [
+      "axial-industrial-fans:vortice-vort-e-atex",
+      "centrifugal-fans:vortice-vorticent-cms-atex",
+      "acid-resistant-fans:seat-serisi"
+     ],
+     "kaynak": "Vortice E-ATEX kataloğu (187721) s.4, 6–7 · Vortice Industrial Ventilation (163043) s.104–105 · SEAT serisinde ATEX modeller (katalog)"
+    }
+   ]
+  },
+  {
+   "id": "kapali-havuz-spa",
+   "ad": {
+    "tr": "Kapalı havuz ve spa",
+    "en": "Indoor pool and spa"
+   },
+   "bolumler": [
+    {
+     "id": "nem",
+     "ad": {
+      "tr": "Nem alma",
+      "en": "Dehumidification"
+     },
+     "icerik": [
+      "dehumidifiers"
+     ]
+    },
+    {
+     "id": "egzoz",
+     "ad": {
+      "tr": "Korozif ortam egzozu",
+      "en": "Corrosive exhaust"
+     },
+     "icerik": [
+      "acid-resistant-fans:seat-serisi"
+     ],
+     "kaynak": "SEAT beyanı: uygulama alanları arasında yüzme havuzu (marka bilgisi, S5)"
+    }
+   ]
+  },
+  {
+   "id": "magaza-girisi",
+   "ad": {
+    "tr": "Mağaza girişi",
+    "en": "Shop entrance"
+   },
+   "bolumler": [
+    {
+     "id": "perde",
+     "ad": {
+      "tr": "Hava perdesi",
+      "en": "Air curtain"
+     },
+     "icerik": [
+      "unheated-air-curtains",
+      "electric-heated-air-curtains"
+     ]
+    }
+   ],
+   "onay": "Recep 10-25"
+  },
+  {
+   "id": "siginak",
+   "ad": {
+    "tr": "Sığınak havalandırma",
+    "en": "Shelter ventilation"
+   },
+   "bolumler": [
+    {
+     "id": "unite",
+     "ad": {
+      "tr": "Sığınak Havalandırma Üniteleri",
+      "en": "Shelter Ventilation Units"
+     },
+     "icerik": [
+      "shelter-ventilation"
+     ]
+    }
+   ]
+  }
+ ]
+}

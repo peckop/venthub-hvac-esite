@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Ürün ailesi" description="İş emri #20-1: S5 'Aile' + DESIGN-MENU Aile Sayfası Şablonu (paket kartı 'Ürün ailesi sayfası (Lineo)' ile aynı dizilim): SectionRail → PageCover (ÜRÜN AİLESİ, logo, Katalog modu) → SeriesPicker → Seriler arasındaki fark (CompareTable) → motor tipi (FeatureSlot) → kesit (CutawayView) → seri özeti + 'Ne zaman uygun değil' → ürün seçimi (DutyPointGate + Performance) → ModelListesi → ses (SoundTable) → teknik veri → SSS; mobilde FloatingNav. seri prop = seri adresi, aile o seri seçili açılır (§6). Bölümler veriye bağlı (K7): kapak, seri seçimi, fark, modeller katalogdan; özet, sınır, SSS, kesit, motor tipi, kademe eğrisi, Katalog modu yalnız içerik dosyası olan ailede. Aile listesi OPS'tan gelene kadar yalnız Lineo (AILELER)." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-aile]{display:flex;flex-direction:column;gap:40px;padding-bottom:40px}[data-vh-aile][data-mob="1"]{gap:28px;padding-bottom:120px}[data-al-ic]{padding:0 var(--space-page);display:flex;flex-direction:column;gap:40px}[data-vh-aile][data-mob="1"] [data-al-ic]{padding:0 var(--space-page-mobile);gap:28px}[data-vh-aile][data-mob="1"] h2{font-size:20px !important}[data-vh-aile][data-mob="1"] [data-al-ozet]{font-size:15px !important}</style></helmet>
+<div data-vh-aile="" data-mob="{{ mobA }}" lang="{{ lang }}" style="background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<sc-if value="{{ katalogAcik }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="DesignSystem_4f7164.CatalogMode" dc-props="{{ katalog }}" hint-size="100%,800px"></x-import></sc-if>
+<sc-if value="{{ sayfaVar }}" hint-placeholder-val="{{ true }}">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import>
+<section data-screen-label="Aile · kapak"><x-import component-from-global-scope="DesignSystem_4f7164.PageCover" dc-props="{{ kapak }}" hint-size="100%,420px"><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;font-variant-numeric:tabular-nums"><sc-for list="{{ tekSatir }}" as="t" hint-placeholder-count="3"><span data-kaynak-alt="{{ t.alt }}" data-kaynak-ust="{{ t.ust }}"><span style="color:hsl(var(--text-body))">{{ t.e }} </span><b>{{ t.v }}</b></span></sc-for></div><div style="display:flex;flex-wrap:wrap;gap:10px"><x-import component-from-global-scope="DesignSystem_4f7164.CerceveliDugme" href="#modeller" hint-size="auto,44px">{{ uygunL }}</x-import></div></div></x-import></section>
+<div data-al-ic="">
+<section data-screen-label="Aile · seri seçimi"><x-import component-from-global-scope="DesignSystem_4f7164.SeriesPicker" dc-props="{{ seciciP }}" hint-size="100%,96px"></x-import></section>
+<sc-if value="{{ farkVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · seriler arasındaki fark"><x-import component-from-global-scope="DesignSystem_4f7164.CompareTable" dc-props="{{ fark }}" hint-size="100%,64px"></x-import></section></sc-if>
+<sc-if value="{{ motorVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · motor tipi"><x-import component-from-global-scope="DesignSystem_4f7164.FeatureSlot" dc-props="{{ motor }}" hint-size="100%,360px"></x-import></section></sc-if>
+<sc-if value="{{ kesitVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · kesit"><x-import component-from-global-scope="DesignSystem_4f7164.CutawayView" dc-props="{{ kesit }}" hint-size="100%,420px"></x-import></section></sc-if>
+<sc-if value="{{ ozetVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · seri özeti"><h2 style="margin:0 0 14px;font-family:var(--font-baslik);font-size:24px;font-weight:700">{{ ozet.ad }}</h2><div style="display:flex;flex-direction:column;gap:12px;max-width:760px"><p data-al-ozet="" style="margin:0;font-size:16px;line-height:1.6;color:hsl(var(--text-body));text-wrap:pretty">{{ ozet.metin }}</p><x-import component-from-global-scope="DesignSystem_4f7164.HukumKutusu" hal="bilgi" etiket="{{ ozet.sinirB }}" dil="{{ dilB }}" hint-size="100%,72px">{{ ozet.sinir }}</x-import><span style="font-size:12px;color:hsl(var(--text-body))">{{ ozet.kaynak }}</span></div></section></sc-if>
+<section data-screen-label="Aile · ürün seçimi"><h2 style="margin:0 0 14px;font-family:var(--font-baslik);font-size:24px;font-weight:700">{{ secimB }}</h2><div style="display:flex;flex-direction:column;gap:16px"><x-import component-from-global-scope="DesignSystem_4f7164.DutyPointGate" dc-props="{{ kapi }}" hint-size="100%,120px"></x-import><sc-if value="{{ perfVar }}" hint-placeholder-val="{{ true }}"><x-import component-from-global-scope="DesignSystem_4f7164.Performance" dc-props="{{ perf }}" hint-size="100%,360px"></x-import></sc-if></div></section>
+<section id="modeller" data-screen-label="Aile · modeller"><x-import component-from-global-scope="DesignSystem_4f7164.ModelListesi" dc-props="{{ modeller }}" hint-size="100%,800px"></x-import></section>
+<sc-if value="{{ sesVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · ses"><h2 style="margin:0 0 14px;font-family:var(--font-baslik);font-size:24px;font-weight:700">{{ sesB }}</h2><x-import component-from-global-scope="DesignSystem_4f7164.SoundTable" dc-props="{{ ses }}" hint-size="100%,320px"></x-import></section></sc-if>
+<sc-if value="{{ teknikVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · teknik veri"><x-import component-from-global-scope="DesignSystem_4f7164.TabbedPanel" dc-props="{{ teknik }}" hint-size="100%,120px"></x-import></section></sc-if>
+<sc-if value="{{ sssVar }}" hint-placeholder-val="{{ true }}"><section data-screen-label="Aile · SSS"><x-import component-from-global-scope="DesignSystem_4f7164.FAQ" dc-props="{{ sss }}" hint-size="100%,320px"></x-import></section></sc-if>
+</div>
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="DesignSystem_4f7164.FloatingNav" dc-props="{{ nav }}" hint-size="100%,56px"></x-import></sc-if>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;2400px&quot;},&quot;aile&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;lineo&quot;],&quot;default&quot;:&quot;lineo&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;seri&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;lineo&quot;,&quot;lineo-quiet&quot;,&quot;lineo-quiet-es&quot;],&quot;default&quot;:&quot;lineo-quiet&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string) =&gt; void&quot;},&quot;onSeri&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(seri: string) =&gt; void&quot;}}">
+/* Aile tanımı (ds-gecerli-20 'Aile sayfası · karar'): hangi seriler bir aile — katalog belirler (§6, en az 2 seri, AC/EC ayırır). Liste OPS'tan gelene kadar yalnız Lineo.
+ * seriler: id · tur (katalog dal) · f (kart-dili-modeller seri slug) · motor (AC/EC süzgeci, yoksa hepsi). icerik: assets/ornek/<icerik>.<dil>.json (özet, sınır, SSS, kesit, motor tipi, katalog); null → o bloklar çizilmez (K7). */
+const AILELER = { lineo: { tur: 'duct-fans', marka: 'vortice', icerik: 'lineo', seriler: [{ id: 'lineo', f: 'vortice-lineo' }, { id: 'lineo-quiet', f: 'vortice-lineo-quiet', motor: 'AC' }, { id: 'lineo-quiet-es', f: 'vortice-lineo-quiet', motor: 'EC' }], varsayilan: 'lineo-quiet' } };
+const LOGO = { vortice: 'vortice-yatay.png', seat: 'seat.png', avens: 'avens.svg', 'nicotra-gebhardt': 'nicotra-gebhardt.webp', danfoss: 'danfoss.svg', casals: 'casals.png', flexiva: 'flexiva.png' };
+class Component extends DCLogic {
+  state = { metin: null, dil: null, L: null, j: null, seri: null, kat: false, kp: null, d: { debi: null, basinc: null }, ih: { debi: 300, basinc: 80 } };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null), O = '../../assets/ornek/';
+    /* kart-metin.js isaretle: null alan ⟦yol⟧ olur, TR'ye düşülmez. */
+    const isaretle = (o, yol) => { if (o === null) return '\u27E6' + yol + '\u27E7'; if (Array.isArray(o)) return o.map((v, i) => isaretle(v, yol + '[' + i + ']')); if (o && typeof o === 'object') { const r = {}; for (const k in o) r[k] = isaretle(o[k], yol ? yol + '.' + k : k); return r; } return o; };
+    const AI = AILELER[this.props.aile] || AILELER.lineo, ic = AI.icerik;
+    Promise.all([al(O + 'sozluk-s5.' + dil + '.json'), al(O + 'sozluk-ek.' + dil + '.json'), null, null, ic ? al(O + ic + '.' + dil + '.json') : null, ic ? al(O + ic + '-katalog.' + dil + '.json') : null, this.state.j ? null : al('../../assets/veri/kart-dili-modeller-2026-10-23.json')]).then(([a, b, c, c6, l, lk, j]) => {
+      const m = { ...(a || {}), ...(b || {}) }; for (const e of [c, c6]) if (e) for (const k in e) if (k[0] !== '_' && m[k] == null && e[k] != null) m[k] = e[k];
+      const L = l ? isaretle(l, ic) : {}; const kt = lk ? isaretle(lk, ic + '.katalog') : {}; L.katalog = L.katalog || {}; L.katalog.sayfalar = (kt.sayfalar || []).map((p) => ({ ...p, zemin: O + p.zemin }));
+      this.setState(j ? { metin: m, L, j } : { metin: m, L });
+    });
+  }
+  componentDidMount() { this.yukle(); window.VHAileKaynak = () => this._kapakKaynak || null; }
+  componentDidUpdate(pp) { if (pp.aile !== this.props.aile) this.setState({ dil: null, L: null, seri: null, kp: null }); this.yukle(); if (pp.seri !== this.props.seri) this.setState({ seri: null, kp: null }); }
+  renderVals() {
+    const P = this.props, st = this.state, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || st.metin || {}, git = P.onGit || (() => {}), kip = P.kip === 'satis' ? 'satis' : 'teklif', h = React.createElement;
+    const A = (k, v) => { let s = M[k]; if (s == null) return '\u27E6' + k + '\u27E7'; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+    const D = (s, v) => { if (v) for (const x in v) s = String(s).split('{' + x + '}').join(v[x]); return s; };
+    const base = { lang: DIL.toLowerCase(), dilB: DIL, mob, mobA: mob ? '1' : '0', sayfaVar: false, katalogAcik: false };
+    const L = st.L, j = st.j, KT = window.VHKatalog;
+    if (!L || !j || !KT) return base;
+    const AI = AILELER[P.aile] || AILELER.lineo, ICV = !!L.aile;
+    const nf = (v, d) => (v == null ? null : new Intl.NumberFormat(DIL === 'EN' ? 'en-GB' : 'tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d }).formatToParts(Number(v)).map((p) => (p.type === 'group' ? '\u00A0' : p.value)).join(''));
+    const O = '../../assets/ornek/', LOGOU = '../../assets/marka-logolari/' + (LOGO[AI.marka] || '');
+    const GAD = (id) => (KT.grup(id, DIL) || {}).ad ?? '\u27E6katalog.kok.' + id + '\u27E7', TAD = (id) => (KT.tur(id, DIL) || {}).ad ?? '\u27E6katalog.dal.' + id + '\u27E7';
+    const DV = (j.dal || {})[AI.tur] || {}, S = {}; AI.seriler.forEach((x) => { const t = DV[x.f] || []; S[x.id] = x.motor ? t.filter((u) => (x.motor === 'EC' ? u[7] === 'EC' : u[7] !== 'EC')) : t; });
+    const SF = {}; AI.seriler.forEach((x) => { SF[x.id] = x.f; });
+    const ad = (k) => ((L.seriler || {})[k] || {}).ad || ((KT.seri(SF[k], DIL) || {}).ad ?? '\u27E6katalog.aile.' + SF[k] + '\u27E7');
+    const SR = Object.keys(S).filter((k) => S[k].length).map((k) => ({ id: k, ad: ad(k) }));
+    const s = st.seri || (S[P.seri] && S[P.seri].length ? P.seri : (S[AI.varsayilan] && S[AI.varsayilan].length ? AI.varsayilan : (SR[0] || {}).id)), su = S[s] || [];
+    const sec = (id) => { this.setState({ seri: id, kp: null }); (P.onSeri || (() => {}))(id); };
+    const tum = SR.reduce((a, x) => a + S[x.id].length, 0);
+    const rg = (X, f) => { const v = X.map(f).filter((x) => x != null); return v.length ? (Math.min(...v) === Math.max(...v) ? nf(Math.min(...v), 0) : nf(Math.min(...v), 0) + '\u2013' + nf(Math.max(...v), 0)) : null; };
+    const Ms = su.map((u) => { const V = u[9] || {}, dg = (x, k) => (x ? { v: nf(x[0], k), birim: x[1] } : null); return { sku: u[1], ad: u[0], kod: u[1], motor: u[7] || undefined, gorseller: u[2] ? [KT.foto(u[2])] : [], fiyat: kip === 'satis' ? u[8] : null, degerler: [dg(V.debi, 0), dg(V.basinc, 0), dg(V.ses, 1)], suz: { motor: u[7] || '\u2014', cap: u[6] || '\u2014' } }; });
+    const G = [{ id: 'motor', baslik: A('t.motor-3'), secenekler: [...new Set(Ms.map((m) => m.suz.motor))].map((m) => ({ deger: m, ad: m })) }, { id: 'cap', baslik: A('t.cap'), secenekler: [...new Set(Ms.map((m) => m.suz.cap))].sort((a, b) => a - b).map((c) => ({ deger: c, ad: '\u00D8' + c + ' mm' })) }];
+    const sesL = su.filter((u) => u[5] != null).map((u) => ({ sku: u[1], ad: u[0], foto: u[2] ? KT.foto(u[2]) : undefined, hizlar: [{ ad: A('ds.en-yuksek'), db: u[5] }] }));
+    const KAD = [[[0, 103.1], [54.7, 76.1], [109.3, 51.2], [164, 28.7], [218.6, 11.8], [255.1, 0.1]], [[0, 151.9], [75, 119.2], [150, 83], [225, 53], [300, 22.3], [350, 0.1]], [[0, 210.7], [109.3, 167.4], [218.5, 134.4], [327.8, 99.1], [437.1, 45.3], [509.9, 0.1]]].map((pq, i) => ({ ad: A('ds.n-hiz', { n: i + 1 }), pq }));
+    const K = L.katalog || {}, KS = K.sayfa || {}, kadVar = ICV && !!L.aile; /* Performance kademe eğrileri yalnız içerik dosyası olan ailede (paket kartıyla aynı Lineo örneği) */
+    const KV = (K.sayfalar || []).some((p) => Array.isArray(p.katman)), kp = st.kp ?? ((KS[s] || [1])[0]);
+    if (st.kat && KV) return { ...base, katalogAcik: true, katalog: { metin: M, baslik: K.baslik, toplam: K.toplam, sayfa: kp, onSayfa: (n) => this.setState({ kp: n }), atlamalar: [{ ad: A('ds.tablo'), no: (KS[s] || [1])[0] }, { ad: A('t.egri'), no: (KS[s] || [1, 1])[1] }], onSiteyeDon: () => this.setState({ kat: false }), onModel: () => this.setState({ kat: false }), mobil: mob, sayfalar: K.sayfalar } };
+    const tumL = [].concat(...Object.values(S)), m0 = tumL.find((u) => u[2]), mk = (KT.seri(SF[s], DIL) || {}).marka;
+    const aile = L.aile || { ad: (KT.seri(SF[s], DIL) || {}).ad, marka: mk };
+    const gizli = { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)' };
+    const baslikIcerik = h(React.Fragment, null, h('img', { src: LOGOU, alt: '', style: { height: mob ? '22px' : '28px', display: 'block', marginBottom: '8px' } }), h('span', { style: gizli }, aile.marka + ' '), aile.ad);
+    const motorlar = [...new Set(tumL.map((u) => u[7]).filter(Boolean))].join(' \u00B7 '), capR = rg(tumL, (u) => u[6]), debR = rg(tumL, (u) => u[3]);
+    /* §1.15 (ds-gecerli-20, 3. bildirim): aralığın iki ucu = model kaydı + katalog sayfası. Sayfa: içerik dosyasının katalog katmanında model kodunun (VRT- öneksiz) geçtiği sayfa; katalog yoksa yalnız model. Yeni değer üretilmez. */
+    const kSayfa = (sku) => { const kod = String(sku).replace(/^[A-Z]+-/, ''); const p = ((L.katalog || {}).sayfalar || []).find((x) => Array.isArray(x.katman) && x.katman.some((k) => String(k[3]).trim() === kod)); return p ? p.no : null; };
+    const uc = (f) => { const v = tumL.filter((u) => f(u) != null); if (!v.length) return null; const a = v.reduce((m, u) => (f(u) < f(m) ? u : m)), b = v.reduce((m, u) => (f(u) > f(m) ? u : m)); const q = (u) => ({ sku: u[1], deger: f(u), sayfa: kSayfa(u[1]) }); return { alt: q(a), ust: q(b) }; };
+    const ucMetin = (x) => (x ? x.sku + ' \u00B7 ' + nf(x.deger, 0) + (x.sayfa ? ' \u00B7 s.' + x.sayfa : '') : '');
+    const kapakKaynak = { cap: uc((u) => u[6]), debi: uc((u) => u[3]) };
+    const tekSatir = [[A('t.cap'), capR ? '\u00D8' + capR + ' mm' : null, kapakKaynak.cap], [A('ds.en-cok-debi'), debR ? debR + ' m\u00B3/h' : null, kapakKaynak.debi], [A('t.motor-3'), motorlar || null, null]].filter(([, v]) => v).map(([e, v, k]) => ({ e, v, alt: k ? ucMetin(k.alt) : '', ust: k ? ucMetin(k.ust) : '' }));
+    this._kapakKaynak = kapakKaynak;
+    const kokId = ((KT.katalog().kok || []).find((k) => (k.dal || []).includes(AI.tur)) || {}).id;
+    const konum = mob ? { geri: { ad: TAD(AI.tur), href: '#', onClick: (e) => { e.preventDefault(); git('tur', AI.tur); } } } : { konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }, { ad: A('tx.e_urunler'), href: '#', onClick: (e) => { e.preventDefault(); git('urunler'); } }, { ad: GAD(kokId), href: '#', onClick: (e) => { e.preventDefault(); git('grup', kokId); } }, { ad: TAD(AI.tur), href: '#', onClick: (e) => { e.preventDefault(); git('tur', AI.tur); } }, { ad: aile.ad }] };
+    const i = SR.findIndex((x) => x.id === s);
+    return {
+      ...base, sayfaVar: true,
+      rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], ...konum },
+      kapak: { dil: DIL, metin: M, mobil: mob, seviye: 'urun-ailesi', marka: aile.marka, baslikIcerik, altSatir: A('ds.aile-alt', { s: SR.length, m: tum }), cipler: KV ? [{ ad: A('ds.katalog-modu'), onClick: () => this.setState({ kat: true }) }] : [], foto: m0 ? { src: KT.foto(m0[2]), alt: aile.ad } : undefined, fotoBoy: 'kapak' },
+      tekSatir, uygunL: A('ds.uygun-modeli-bul'),
+      seciciP: { metin: M, seriler: SR, secili: s, onSec: sec, mobil: mob },
+      fark: { dil: DIL, metin: M, mobil: mob, baslik: A('t.seriler-arasindaki-fark'), altBaslik: A('ds.n-seri-yan-yana', { n: SR.length }), kolonlar: SR.map((x) => ({ marka: aile.marka, kisa: x.ad, onAc: () => sec(x.id) })), satirlar: [{ ad: A('t.cap'), birim: 'mm', degerler: SR.map((x) => rg(S[x.id], (u) => u[6])) }, { ad: A('ds.en-cok-debi'), birim: 'm\u00B3/h', degerler: SR.map((x) => rg(S[x.id], (u) => u[3])) }, { ad: A('t.ses'), birim: 'dB(A)', degerler: SR.map((x) => rg(S[x.id], (u) => u[5])) }, { ad: A('t.motor-3'), degerler: SR.map((x) => [...new Set(S[x.id].map((u) => u[7]).filter(Boolean))].join(' \u00B7 ')) }] },
+      farkVar: SR.length >= 2, motorVar: !!(L.motorTipi && (L.motorTipi.gorseller || []).length), kesitVar: !!(L.kesit && L.kesit.gorsel), ozetVar: !!((L.ozet || {})[s] && (L.ozet || {})[s].metin), perfVar: kadVar, teknikVar: !!L.teknikOzet, sssVar: !!(L.sss && L.sss.length),
+      motor: { mobil: mob, baslik: (L.motorTipi || {}).baslik, gorseller: ((L.motorTipi || {}).gorseller || []).map((g) => ({ ...g, src: O + g.src })), atif: (L.motorTipi || {}).atif },
+      kesit: { metin: M, gorsel: O + (L.kesit || {}).gorsel, alt: (L.kesit || {}).alt, isaretler: (L.kesit || {}).isaretler, mobil: mob },
+      ozet: { ad: ad(s), metin: ((L.ozet || {})[s] || {}).metin, sinirB: A('ds.ne-zaman-uygun-degil'), sinir: ((L.ozet || {})[s] || {}).sinir, kaynak: L.kaynak },
+      secimB: A('t.urun-secimi'),
+      kapi: { dil: DIL, metin: M, deger: st.d, onDegisim: (d) => this.setState({ d }), mobil: mob },
+      perf: { dil: DIL, metin: M, kademeler: KAD, ihtiyac: st.ih, onIhtiyac: (ih) => this.setState({ ih }) },
+      modeller: { dil: DIL, metin: M, modeller: Ms, gruplar: G, sutunlar: [A('ds.en-cok-debi'), A('ds.basinc'), A('t.ses')], kip, mobil: mob, filtreDugmesi: mob, style: { paddingBottom: 0 } },
+      sesVar: sesL.length > 0, sesB: A('t.ses'), ses: { metin: M, modeller: sesL, mobil: mob },
+      teknik: { metin: M, mobil: mob, bolumler: [{ id: 'teknik', baslik: A('t.teknik-veri-2'), icerik: D(L.teknikOzet, { cap: rg(su, (u) => u[6]), debi: rg(su, (u) => u[3]), basinc: rg(su, (u) => u[4]) }) }] },
+      sss: { metin: M, baslik: A('t.sik-sorulan-sorular'), sorular: L.sss },
+      nav: { metin: M, sabit: true, yer: ad(s), seviye: 'seri', onYer: () => {}, onFiltrele: () => {}, seriGecis: { sira: i + 1, toplam: SR.length, onOnceki: () => { if (i > 0) sec(SR[i - 1].id); }, onSonraki: () => { if (i < SR.length - 1) sec(SR[i + 1].id); } }, style: { bottom: '16px' } }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!-- @dsCard group="Bileşen" viewport="1700x6400" name="Ürün ailesi sayfası (Lineo)" subtitle="sayfa-sablonu-aile: kapak (ÜRÜN AİLESİ · VORTICE, logo, Katalog modu) · seri seçimi · fark · kesit · ürün seçimi · modeller 4c · ses · teknik veri · SSS · 1240 + 390, teklif + satış" -->
+<!DOCTYPE html><html lang="tr"><head>
+<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><title>Lineo</title><link rel="stylesheet" href="../../styles.css"><script src="/onizleme/_vendor/react.production.min.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script><script src="/onizleme/_vendor/react-dom.production.min.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script><script src="/onizleme/_vendor/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script><script src="../../_ds_bundle.js"></script><script src="../../templates/_kart/kart-metin.js"></script><style>html,body{margin:0}body{background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));padding:20px;-webkit-font-smoothing:antialiased}a{color:hsl(var(--primary-navy))}a:hover{color:hsl(var(--text-strong))}.e{font-size:var(--size-overline);font-weight:600;letter-spacing:var(--track-overline);text-transform:uppercase;color:hsl(var(--text-body));margin-bottom:9px}.tel{width:390px;box-sizing:border-box;background:hsl(var(--surface-page));border:8px solid #10242E;border-radius:24px;position:relative;overflow:hidden;transform:translateZ(0)}</style></head><body><div id="kok"></div><script type="text/babel">
+const NS = window.DesignSystem_4f7164;
+const KT = window.VHKatalog, DL = window.KART_DIL, GAD = (id) => (KT.grup(id, DL) || {}).ad ?? '⟦katalog.kok.' + id + '⟧', KAD = (id) => (KT.tur(id, DL) || {}).ad ?? '⟦katalog.dal.' + id + '⟧', SAD = (f) => (KT.seri(f, DL) || {}).ad ?? '⟦katalog.aile.' + f + '⟧'; /* ürün adları yalnız katalogdan */
+const railKonum = (k, mob) => { const L = (Array.isArray(k) ? k : [k]).filter(Boolean); if (mob) { const g = L[L.length - 1]; const ad = typeof g === 'string' ? g : g.ad; return { geri: { ad: String(ad).replace(/^‹\s*/, ''), href: '#' } }; } return { konum: L.map((x) => (typeof x === 'string' ? x : x.ad)).join(' › ') }; }; /* iş emri #6 madde 4: konum kapakta değil, SectionRail'de */
+const B = 'https://tnofewwkwlyjsqgwjjga.supabase.co/storage/v1/object/public/product-images/d3b07384-d113-495f-a558-8c38634e0000/';
+const L = window.LINEO, ME = window.METIN, O = window.ORNEK_KOK;
+const KAY = L.kaynak;
+const nf = (v, d) => v == null ? null : Number(v).toLocaleString(window.KART_DIL === 'EN' ? 'en-GB' : 'tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const { FeatureSlot, HukumKutusu, PageCover, SeriesPicker, CompareTable, CutawayView, DutyPointGate, Performance, ModelListesi, SoundTable, TabbedPanel, FAQ, CatalogMode, CerceveliDugme, FloatingNav, SectionRail } = NS;
+const LOGO = '../../assets/marka-logolari/vortice-yatay.png';
+const KAD = [[[0,103.1],[54.7,76.1],[109.3,51.2],[164,28.7],[218.6,11.8],[255.1,0.1]], [[0,151.9],[75,119.2],[150,83],[225,53],[300,22.3],[350,0.1]], [[0,210.7],[109.3,167.4],[218.5,134.4],[327.8,99.1],[437.1,45.3],[509.9,0.1]]].map((pq, i) => ({ ad: A('ds.n-hiz', { n: i + 1 }), pq }));
+const H2 = ({ c, mobil }) => <h2 style={{ margin: '0 0 14px', fontFamily: 'var(--font-baslik)', fontSize: mobil ? '20px' : '24px', fontWeight: 700 }}>{c}</h2>;
+function Sayfa({ mobil, kip }) {
+  const [j, setJ] = React.useState(null);
+  const [s, setS] = React.useState('lineo-quiet');
+  const [kat, setKat] = React.useState(false);
+  const KS = L.katalog.sayfa;
+  const [kp, setKp] = React.useState(KS['lineo-quiet'][0]);
+  const [d, setD] = React.useState({ debi: null, basinc: null });
+  const [ih, setIh] = React.useState({ debi: 300, basinc: 80 });
+  React.useEffect(() => setKp(KS[s][0]), [s]);
+  React.useEffect(() => { fetch('../../assets/veri/kart-dili-modeller-2026-10-23.json').then((r) => r.json()).then(setJ); }, []);
+  if (!j) return null;
+  const DV = j.dal['duct-fans'], LL = DV['vortice-lineo'], Q = DV['vortice-lineo-quiet'];
+  const S = { lineo: LL, 'lineo-quiet': Q.filter((u) => u[7] !== 'EC'), 'lineo-quiet-es': Q.filter((u) => u[7] === 'EC') };
+  const ad = (k) => L.seriler[k].ad;
+  const SR = Object.keys(S).filter((k) => S[k].length).map((k) => ({ id: k, ad: ad(k) }));
+  const tum = SR.reduce((a, x) => a + S[x.id].length, 0), su = S[s];
+  const rg = (X, f) => { const v = X.map(f).filter((x) => x != null); return v.length ? (Math.min(...v) === Math.max(...v) ? nf(Math.min(...v), 0) : nf(Math.min(...v), 0) + '–' + nf(Math.max(...v), 0)) : null; };
+  const M = su.map((u) => { const V = u[9] || {}, dg = (x, k) => x ? { v: nf(x[0], k), birim: x[1] } : null; return { sku: u[1], ad: u[0], kod: u[1], motor: u[7] || undefined, gorseller: u[2] ? [B + u[2]] : [], fiyat: u[8], degerler: [dg(V.debi, 0), dg(V.basinc, 0), dg(V.ses, 1)], suz: { motor: u[7] || '—', cap: u[6] || '—' } }; });
+  const G = [{ id: 'motor', baslik: A('t.motor-3'), secenekler: [...new Set(M.map((m) => m.suz.motor))].map((m) => ({ deger: m, ad: m })) }, { id: 'cap', baslik: A('t.cap'), secenekler: [...new Set(M.map((m) => m.suz.cap))].sort((a, b) => a - b).map((c) => ({ deger: c, ad: 'Ø' + c + ' mm' })) }];
+  const ses = su.filter((u) => u[5] != null).map((u) => ({ sku: u[1], ad: u[0], foto: u[2] ? B + u[2] : undefined, hizlar: [{ ad: A('ds.en-yuksek'), db: u[5] }] }));
+  const pad = mobil ? '0 var(--space-page-mobile)' : '0 var(--space-page)';
+  const K = L.katalog, KV = (K.sayfalar || []).some((p) => Array.isArray(p.katman)); /* EN katmanı yoksa Katalog modu girişi çizilmez (K7) */
+  if (kat && KV) return <CatalogMode metin={ME} baslik={K.baslik} toplam={K.toplam} sayfa={kp} onSayfa={setKp} atlamalar={[{ ad: A('ds.tablo'), no: KS[s][0] }, { ad: A('t.egri'), no: KS[s][1] }]} onSiteyeDon={() => setKat(false)} onModel={() => setKat(false)} mobil={mobil} sayfalar={K.sayfalar} />;
+  const tek = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 18px', fontSize: '14px' }}>{[[A('t.cap'), 'Ø' + rg([...LL, ...Q], (u) => u[6]) + ' mm'], [A('t.debi'), rg([...LL, ...Q], (u) => u[3]) + ' m³/h'], [A('t.motor-3'), 'AC · EC']].map(([e, v]) => <span key={e}><span style={{ color: 'hsl(var(--text-body))' }}>{e} </span><b>{v}</b></span>)}</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}><CerceveliDugme href="#modeller">{A('ds.uygun-modeli-bul')}</CerceveliDugme></div>
+    </div>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: mobil ? '28px' : '40px', paddingBottom: mobil ? '120px' : '40px' }}>
+      <><SectionRail metin={ME} yapiskan={false} bolumler={[]} mobil={mobil} {...railKonum(mobil ? [{ ad: '‹ ' + KAD('duct-fans'), href: '#' }] : [A('tx.e_anasayfa'), { ad: A('tx.e_urunler'), href: '#' }, { ad: GAD('fanlar'), href: '#' }, { ad: KAD('duct-fans'), href: '#' }, L.aile.ad], mobil)} /><PageCover dil={window.KART_DIL} metin={ME} mobil={mobil} seviye="urun-ailesi" marka={L.aile.marka} baslikIcerik={<><img src={LOGO} alt="" style={{ height: mobil ? '22px' : '28px', display: 'block', marginBottom: '8px' }} /><span style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>{L.aile.marka + ' '}</span>{L.aile.ad}</>} altSatir={A('ds.aile-alt', { s: SR.length, m: tum })} cipler={KV ? [{ ad: A('ds.katalog-modu'), onClick: () => setKat(true) }] : []} foto={{ src: B + (Q[0][2]) }} fotoBoy="kapak"></>{tek}</PageCover>
+      <div style={{ padding: pad, display: 'flex', flexDirection: 'column', gap: mobil ? '28px' : '40px' }}>
+        <SeriesPicker metin={ME} seriler={SR} secili={s} onSec={setS} mobil={mobil} />
+        <CompareTable dil={window.KART_DIL} metin={window.METIN} mobil={mobil} baslik={A('t.seriler-arasindaki-fark')} altBaslik={A('ds.n-seri-yan-yana', { n: SR.length })} kolonlar={SR.map((x) => ({ marka: L.aile.marka, kisa: x.ad, onAc: () => setS(x.id) }))} satirlar={[{ ad: A('t.cap'), birim: 'mm', degerler: SR.map((x) => rg(S[x.id], (u) => u[6])) }, { ad: A('t.debi'), birim: 'm³/h', degerler: SR.map((x) => rg(S[x.id], (u) => u[3])) }, { ad: A('t.ses'), birim: 'dB(A)', degerler: SR.map((x) => rg(S[x.id], (u) => u[5])) }, { ad: A('t.motor-3'), degerler: SR.map((x) => [...new Set(S[x.id].map((u) => u[7]).filter(Boolean))].join(' · ')) }]} />
+        <FeatureSlot mobil={mobil} baslik={L.motorTipi.baslik} gorseller={L.motorTipi.gorseller.map((g) => ({ ...g, src: O + g.src }))} atif={L.motorTipi.atif} />
+        <CutawayView metin={ME} gorsel={O + L.kesit.gorsel} alt={L.kesit.alt} isaretler={L.kesit.isaretler} mobil={mobil} />
+        <section><H2 c={ad(s)} mobil={mobil} /><div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '760px' }}><p style={{ margin: 0, fontSize: mobil ? '15px' : '16px', lineHeight: 1.6, color: 'hsl(var(--text-body))', textWrap: 'pretty' }}>{L.ozet[s].metin}</p><HukumKutusu dil={window.KART_DIL} hal="bilgi" etiket={A('ds.ne-zaman-uygun-degil')}>{L.ozet[s].sinir}</HukumKutusu><span style={{ fontSize: '12px', color: 'hsl(var(--text-body))' }}>{KAY}</span></div></section>
+        <section><H2 c={A('t.urun-secimi')} mobil={mobil} /><div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}><DutyPointGate dil={window.KART_DIL} metin={window.METIN} deger={d} onDegisim={setD} mobil={mobil} /><Performance dil={window.KART_DIL} metin={window.METIN} kademeler={KAD} ihtiyac={ih} onIhtiyac={setIh} /></div></section>
+        <div id="modeller"><ModelListesi dil={window.KART_DIL} metin={ME} modeller={M} gruplar={G} sutunlar={[A('t.debi'), A('ds.basinc'), A('t.ses')]} kip={kip} mobil={mobil} filtreDugmesi={mobil} style={{ paddingBottom: 0 }} /></div>
+        {ses.length ? <section><H2 c={A('t.ses')} mobil={mobil} /><SoundTable metin={window.METIN} modeller={ses} mobil={mobil} /></section> : null}
+        <TabbedPanel metin={window.METIN} mobil={mobil} bolumler={[{ id: 'teknik', baslik: A('t.teknik-veri-2'), icerik: <span style={{ fontSize: '15px' }}>{D(L.teknikOzet, { cap: rg(su, (u) => u[6]), debi: rg(su, (u) => u[3]), basinc: rg(su, (u) => u[4]) })}</span> }]} />
+        <FAQ metin={window.METIN} baslik={A('t.sik-sorulan-sorular')} sorular={L.sss} />
+      </div>
+      {mobil ? <FloatingNav metin={ME} sabit yer={ad(s)} seviye="seri" onYer={() => {}} onFiltrele={() => {}} seriGecis={{ sira: SR.findIndex((x) => x.id === s) + 1, toplam: SR.length, onOnceki: () => { const i = SR.findIndex((x) => x.id === s); if (i > 0) setS(SR[i - 1].id); }, onSonraki: () => { const i = SR.findIndex((x) => x.id === s); if (i < SR.length - 1) setS(SR[i + 1].id); } }} style={{ bottom: '16px' }} /> : null}
+    </div>
+  );
+}
+function Prova() {
+  const [kip, setKip] = React.useState('satis');
+  const b = (k) => <button key={k} type="button" onClick={() => setKip(k)} style={{ minHeight: '36px', padding: '0 14px', borderRadius: '18px', border: '1px solid hsl(var(--primary-navy))', background: kip === k ? 'hsl(var(--primary-navy))' : '#fff', color: kip === k ? '#fff' : 'hsl(var(--primary-navy))', font: 'inherit', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>{k === 'satis' ? A('ds.satis') : A('t.teklif')}</button>;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <div style={{ display: 'flex', gap: '6px' }}>{b('teklif')}{b('satis')}</div>
+      <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start' }}>
+        <div style={{ width: '1240px', flex: 'none', background: 'hsl(var(--surface-page))', boxShadow: '0 8px 24px rgba(16,36,46,.10)', borderRadius: '16px', overflow: 'hidden' }}><Sayfa kip={kip} /></div>
+        <div className="tel" style={{ flex: 'none', height: '844px', overflowY: 'auto' }}><Sayfa mobil kip={kip} /></div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('kok')).render(<Prova />);
+</script></body></html>

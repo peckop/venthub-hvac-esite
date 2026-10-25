@@ -1,0 +1,167 @@
+{
+ "_damga": "Lineo product family card sample data (EN). Source: Content project 7ac1dcef lineo-sayfa/icerik.js (read only) · Vortice LINEO catalogue, May 2026 (193047). EN written by DESIGN-MENU 10-24, awaiting Recep approval. Numbers in EN format.",
+ "kaynak": "Source: Vortice LINEO catalogue, May 2026 (193047)",
+ "aile": {
+  "ad": "Lineo",
+  "marka": "Vortice"
+ },
+ "seriler": {
+  "lineo": {
+   "ad": "Lineo"
+  },
+  "lineo-quiet": {
+   "ad": "Lineo Quiet"
+  },
+  "lineo-quiet-es": {
+   "ad": "Lineo Quiet ES"
+  }
+ },
+ "ozet": {
+  "lineo": {
+   "metin": "A series with a short, light body and no sound-absorbing shell. Ø100–150 have two speeds, Ø200–315 three; the speed is chosen with the DUO or TRIO-LINEO 503 selector or an electronic regulator (p. 28, 37).",
+   "sinir": "Where sound matters, Quiet is the better fit: at Ø200 and top speed the casing sound pressure is 46.9 dB(A) for Lineo and 35.5 dB(A) for Quiet (3 m). In ducted installation the protection rating is IP44 for Ø100–150 and IPX5 for Ø200–315 (p. 28)."
+  },
+  "lineo-quiet": {
+   "metin": "The outer body carries an integrated sound-absorbing lining; according to Vortice its purpose is to reduce the sound radiated to the surroundings (p. 6). Models with an AC motor have a red impeller ring. In the T version a timer runs the fan at top speed, adjustable from 3 to 20 min (p. 5, 18).",
+   "sinir": "The lining makes the body longer and heavier: at Ø100, Quiet ES is 639 mm and 3.8 kg, Lineo ES 303 mm and 2.3 kg (p. 12–13, 34–35). If space is tight and sound is secondary, Lineo is enough."
+  },
+  "lineo-quiet-es": {
+   "metin": "The EC-motor version has a green impeller ring. The table gives 4, 6, 8 and 10 V steps; speed is set at installation or driven by a 0–10 V signal (p. 10, 12). It draws less power than the AC version of the same size: Ø150 at 10 V takes 31 W, the AC model 50 W at top speed.",
+   "sinir": "The T version with timer exists only with the AC motor (Ø100–Ø200). For a simple installation where speed is set by a selector or a sensor, the AC version is enough."
+  }
+ },
+ "kesit": {
+  "gorsel": "lineo-quiet-yapi-kesit.png",
+  "alt": "Lineo Quiet cutaway",
+  "isaretler": [
+   {
+    "x": 62,
+    "y": 50,
+    "ad": "Central motor housing",
+    "aciklama": "Surrounds the motor and impeller; the electrical connection is outside the body and is made without opening the fan (p. 5)."
+   },
+   {
+    "x": 30,
+    "y": 16,
+    "ad": "Rotating main body",
+    "aciklama": "The body turns on its own axis, so in tight spaces the cable entry can face the accessible side (p. 5)."
+   },
+   {
+    "x": 9,
+    "y": 46,
+    "ad": "Removal without touching the duct",
+    "aciklama": "The fan comes out without dismantling the surrounding duct, giving easy access to motor and impeller (p. 4–5)."
+   },
+   {
+    "x": 53,
+    "y": 34,
+    "ad": "Flow straighteners",
+    "aciklama": "Work with the impeller on the discharge side; according to Vortice they reduce swirl, raise efficiency and lower sound (p. 5)."
+   },
+   {
+    "x": 40,
+    "y": 56,
+    "ad": "Mixed-flow impeller",
+    "aciklama": "Combines the airflow of a helical fan with the pressure of a centrifugal fan; directly coupled to the motor, on ball bearings (p. 5)."
+   },
+   {
+    "x": 84,
+    "y": 22,
+    "ad": "Technopolymer body",
+    "aciklama": "According to Vortice, fire class E2 to EN ISO 11925-2:2010; the protection rating applies only when correctly installed (p. 5, 28)."
+   }
+  ]
+ },
+ "motorTipi": {
+  "baslik": "Tell the motor type from the picture",
+  "atif": "Source: Vortice LINEO catalogue, May 2026 (193047), p. 5, 10 · manufacturer statement",
+  "gorseller": [
+   {
+    "src": "lineo-quiet-ac.png",
+    "alt": "Lineo Quiet, AC motor",
+    "isaret": {
+     "x": 66,
+     "y": 46
+    },
+    "etiket": "AC · red impeller ring",
+    "aciklama": "Lineo Quiet AC models have a red impeller ring (p. 5)."
+   },
+   {
+    "src": "lineo-quiet-es-ec.png",
+    "alt": "Lineo Quiet ES, EC motor",
+    "isaret": {
+     "x": 66,
+     "y": 46
+    },
+    "etiket": "EC · green impeller ring",
+    "aciklama": "ES (EC motor) versions have a green impeller ring (p. 10)."
+   }
+  ]
+ },
+ "sss": [
+  {
+   "soru": "What is the difference between Lineo and Lineo Quiet?",
+   "cevap": "Lineo has no sound-absorbing shell; its body is shorter and lighter. At Ø200 and top speed the casing sound pressure is 46.9 dB(A) for Lineo and 35.5 dB(A) for Quiet (3 m)."
+  },
+  {
+   "soru": "How many speeds are there and how are they selected?",
+   "cevap": "Lineo 100–150 have two speeds, 200–315 three. Selection is by DUO, TRIO-LINEO 503 or an electronic regulator; ES models use a 0–10 V signal or the POT potentiometer."
+  },
+  {
+   "soru": "EC (ES) or AC for Quiet?",
+   "cevap": "ES comes with 4·6·8·10 V steps and 0–10 V control and draws less power at the same size (Ø150: 31 W; AC 50 W at top speed). For a simple installation with a selector or sensor, AC is enough."
+  },
+  {
+   "soru": "How is it installed and maintained?",
+   "cevap": "It is installed in the duct horizontally or vertically. The body turns on its axis; the fan is removed without touching the duct, giving access to motor and impeller (p. 4–5)."
+  },
+  {
+   "soru": "What does the timer (T) model do?",
+   "cevap": "The timer runs the fan at top speed; the time is set at installation between 3 and 20 min. T exists only with the AC motor, Ø100–Ø200 (p. 5, 18)."
+  },
+  {
+   "soru": "What certifications does it have?",
+   "cevap": "According to the Vortice catalogue it is CE marked; safety and EMC compliance are IMQ certified. The catalogue refers to ErP 327/2011/EU (p. 3–4)."
+  }
+ ],
+ "sesNot": "Catalogue value: sound pressure, intake side, 3 m.",
+ "teknikOzet": "Diameter Ø{cap} mm · Airflow {debi} m³/h · Pressure {basinc} Pa",
+ "katalog": {
+  "baslik": "Lineo · catalogue",
+  "toplam": 40,
+  "sayfa": {
+   "lineo": [
+    28,
+    30
+   ],
+   "lineo-quiet": [
+    18,
+    21
+   ],
+   "lineo-quiet-es": [
+    12,
+    15
+   ]
+  },
+  "giris": {
+   "no": 4,
+   "baslik": "In-line mixed-flow duct fans",
+   "metin": [
+    "LINEO connects in series to circular ducts. The mixed-flow impeller combines the high airflow of an axial fan with the high pressure of a centrifugal fan (p. 5).",
+    "The catalogue offers three series: plain-bodied Lineo, Lineo Quiet with sound-absorbing lining, and the EC-motor ES versions."
+   ],
+   "kaynakSayfa": "p. 4–5"
+  },
+  "tabloBaslik": "{seri} · technical table",
+  "tabloMetin": "Catalogue values for the {n} models in the series. Sound pressure on the intake side, at 3 m.",
+  "sutunlar": [
+   "Model",
+   "Code",
+   "Airflow m³/h",
+   "Pressure Pa",
+   "Sound dB(A)"
+  ],
+  "egriBaslik": "{seri} · performance curves",
+  "egriMetin": "Curves from the catalogue measurements; product selection on the site uses the same points."
+ }
+}

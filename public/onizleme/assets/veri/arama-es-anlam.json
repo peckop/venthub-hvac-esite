@@ -1,0 +1,1028 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · öneri, Recep onayı: 'önemli, detaylı çalışılsın' (10-25). Kural kurallar/arama.md §Eş anlam. Hedef = katalog id (dal/kok); ad katalogdan gelir, burada yazılmaz.",
+ "_kural": [
+  "Eş anlam yalnız bulur, ekranda ürün adını değiştirmez; öneride katalog adı yazılır, altında 'aradığınız: <sözcük>' gösterilmez.",
+  "Karşılaştırma eşleştirme kuralıyla (tr-TR küçült, ı/i ş/s ğ/g ç/c ö/o ü/u sadeleş, ek at); bu yüzden harfli/harfsiz yazımı ayrıca listelemeye gerek yok.",
+  "tur: 'esit' = aynı şey (hedef 'Doğrudan git' olur) · 'genis' = hedefin üst kavramı (hedefler liste olarak önerilir, doğrudan gitmez) · 'eski' = eski ad, 301 ile aynı hedef · 'yazim' = sık yanlış yazım / kısaltma · 'ihtiyac' = sorun anlatan sözcük (hedef ürün türleri listesi).",
+  "Kıyas markası, rakip ürün adı, 'en iyi/ucuz' gibi sözcük listeye girmez (§8).",
+  "Marka adları sapmasız yazılır (AVenS, SEAT); 'avens', 'seat' marka sayfasına gider, kod 'STORM' SEAT serisine.",
+  "Yeni ürün türü gelince: o türün TR ve EN sözcükleri bu dosyaya eklenir, Kisa Seri Adlari ile aynı turda; eksik eş anlam teslim engeli değildir ama ölçüm listesine girer.",
+  "Yön (awesome-search L-35): 'esit' iki yönlü, 'genis'/'ihtiyac' tek yönlü (sözcük → hedef; hedefin adı aranınca sözcük çıkmaz). Belirsiz sözcük 'esit' olmaz.",
+  "Ölçüm (L-36/37): her satır tıklama verisiyle izlenir; genişleyen sonuca tıklanmıyorsa satır silinir; üç ayda bir gözden geçirilir; sonuçsuz arama hedefi < %2.",
+  "Yazım düzeltmesi alan terimine dokunmaz (L-40): plug, AVenS, SEAT, ES, EC, model kodları."
+ ],
+ "tr": [
+  {
+   "s": [
+    "aspiratör",
+    "aspirator",
+    "egzoz fanı",
+    "emiş fanı",
+    "havalandırma fanı",
+    "vantilatör",
+    "fan"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:fanlar"
+   ]
+  },
+  {
+   "s": [
+    "kanal fanı",
+    "kanal tipi fan",
+    "boru fanı",
+    "inline fan",
+    "in-line fan",
+    "hat fanı",
+    "kanal aspiratörü",
+    "sessiz kanal fanı"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:duct-fans"
+   ]
+  },
+  {
+   "s": [
+    "banyo fanı",
+    "banyo aspiratörü",
+    "tuvalet fanı",
+    "wc fanı",
+    "wc aspiratörü",
+    "lavabo aspiratörü",
+    "duvar aspiratörü",
+    "pencere aspiratörü",
+    "cam aspiratörü"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:bathroom-toilet-fans"
+   ]
+  },
+  {
+   "s": [
+    "radyal fan",
+    "santrifüj fan",
+    "salyangoz fan",
+    "salyangoz aspiratör",
+    "sentrifüj",
+    "santrifuj",
+    "radyal aspiratör"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:centrifugal-fans"
+   ]
+  },
+  {
+   "s": [
+    "aksiyel fan",
+    "eksenel fan",
+    "pervane fan",
+    "duvar tipi aksiyel"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:axial-industrial-fans"
+   ]
+  },
+  {
+   "s": [
+    "çatı fanı",
+    "çatı aspiratörü",
+    "çatı tipi aspiratör",
+    "çatı havalandırma"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:roof-fans"
+   ]
+  },
+  {
+   "s": [
+    "duman egzoz fanı",
+    "duman tahliye fanı",
+    "yangın fanı",
+    "f400",
+    "f300",
+    "duman fanı"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:smoke-exhaust-fans"
+   ]
+  },
+  {
+   "s": [
+    "aside dayanıklı fan",
+    "asit fanı",
+    "korozyon fanı",
+    "plastik fan",
+    "pp fan",
+    "pvc fan",
+    "laboratuvar fanı",
+    "çeker ocak fanı",
+    "kimyasal fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:acid-resistant-fans"
+   ]
+  },
+  {
+   "s": [
+    "plug fan",
+    "serbest çarklı fan",
+    "free wheel fan",
+    "çıplak çark"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:plug-fans"
+   ]
+  },
+  {
+   "s": [
+    "hücreli aspiratör",
+    "kabinli fan",
+    "kutu fan",
+    "box fan",
+    "izoleli aspiratör",
+    "mutfak aspiratörü",
+    "davlumbaz fanı"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:cabinet-fans"
+   ]
+  },
+  {
+   "s": [
+    "tavan vantilatörü",
+    "endüstriyel tavan fanı",
+    "hvls",
+    "büyük tavan fanı"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:industrial-ceiling-fans"
+   ]
+  },
+  {
+   "s": [
+    "baca fanı",
+    "şömine fanı",
+    "baca aspiratörü",
+    "soba fanı"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:chimney-fans"
+   ]
+  },
+  {
+   "s": [
+    "hava perdesi",
+    "kapı perdesi",
+    "kapı üstü perde",
+    "hava bariyeri",
+    "rüzgar perdesi"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:perde"
+   ]
+  },
+  {
+   "s": [
+    "ısıtıcılı hava perdesi",
+    "elektrikli hava perdesi",
+    "rezistanslı hava perdesi"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:electric-heated-air-curtains"
+   ]
+  },
+  {
+   "s": [
+    "ısıtıcısız hava perdesi",
+    "soğuk hava perdesi",
+    "ortam havalı perde"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:unheated-air-curtains"
+   ]
+  },
+  {
+   "s": [
+    "ısı geri kazanım",
+    "eşanjör",
+    "reküperatör",
+    "hrv",
+    "erv",
+    "taze hava ünitesi",
+    "havalandırma santrali",
+    "ısı geri kazanımlı havalandırma"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:igk"
+   ]
+  },
+  {
+   "s": [
+    "merkezi ısı geri kazanım",
+    "kanallı ısı geri kazanım",
+    "tavan tipi ısı geri kazanım"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:ducted-central-hrv"
+   ]
+  },
+  {
+   "s": [
+    "oda tipi ısı geri kazanım",
+    "duvar tipi ısı geri kazanım",
+    "tekil oda",
+    "odalık ısı geri kazanım",
+    "kanalsız ısı geri kazanım"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:single-room-hrv"
+   ]
+  },
+  {
+   "s": [
+    "frekans konvertörü",
+    "frekans invertörü",
+    "inverter",
+    "invertör",
+    "vfd",
+    "sürücü",
+    "hız sürücüsü",
+    "motor sürücü",
+    "inverör",
+    "konvertör",
+    "konverter",
+    "frekans inverteri",
+    "hız konvertörü",
+    "frekans çevirici"
+   ],
+   "tur": "eski",
+   "hedef": [
+    "dal:frequency-converters"
+   ]
+  },
+  {
+   "s": [
+    "hız kontrol",
+    "hız anahtarı",
+    "devir ayarı",
+    "fan regülatörü",
+    "trafo kontrol",
+    "triyak"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:speed-controllers"
+   ]
+  },
+  {
+   "s": [
+    "sensör",
+    "nem sensörü",
+    "co2 sensörü",
+    "termostat",
+    "yedek parça"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:spare-parts-sensors"
+   ]
+  },
+  {
+   "s": [
+    "kanal ısıtıcı",
+    "elektrikli kanal ısıtıcısı",
+    "rezistans",
+    "kanal tipi ısıtıcı"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:electric-duct-heaters"
+   ]
+  },
+  {
+   "s": [
+    "sulu batarya",
+    "su bataryası",
+    "sıcak su bataryası",
+    "kanal bataryası"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:water-coil-duct-heaters"
+   ]
+  },
+  {
+   "s": [
+    "nem alma",
+    "nem alıcı",
+    "nem giderici",
+    "rutubet alma"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:dehumidifiers"
+   ]
+  },
+  {
+   "s": [
+    "sığınak",
+    "sığınak fanı",
+    "sığınak havalandırma",
+    "abc filtre",
+    "nbc",
+    "sivil savunma"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:shelter-ventilation"
+   ]
+  },
+  {
+   "s": [
+    "aksesuar",
+    "menfez",
+    "panjur",
+    "susturucu",
+    "kelepçe",
+    "flex kanal",
+    "esnek kanal",
+    "filtre",
+    "geri tepme klapesi"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:aksesuar"
+   ]
+  },
+  {
+   "s": [
+    "ec",
+    "ec motor",
+    "ec fan",
+    "tasarruflu fan",
+    "fırçasız motor"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:duct-fans",
+    "dal:plug-fans",
+    "dal:centrifugal-fans"
+   ],
+   "not": "süzgeç: motor = EC"
+  },
+  {
+   "s": [
+    "ac motor"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:duct-fans",
+    "dal:centrifugal-fans"
+   ],
+   "not": "süzgeç: motor = AC"
+  },
+  {
+   "s": [
+    "sessiz fan",
+    "sessiz aspiratör",
+    "düşük sesli fan",
+    "akustik fan"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:duct-fans",
+    "dal:bathroom-toilet-fans",
+    "dal:cabinet-fans"
+   ],
+   "not": "sıralama: ses artan"
+  },
+  {
+   "s": [
+    "koku",
+    "rutubet",
+    "küf",
+    "buhar",
+    "nem"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:bathroom-toilet-fans",
+    "dal:dehumidifiers"
+   ]
+  },
+  {
+   "s": [
+    "mutfak",
+    "davlumbaz",
+    "yağlı hava"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:cabinet-fans",
+    "dal:centrifugal-fans"
+   ]
+  },
+  {
+   "s": [
+    "otopark",
+    "garaj"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:smoke-exhaust-fans",
+    "dal:axial-industrial-fans"
+   ]
+  },
+  {
+   "s": [
+    "depo",
+    "fabrika",
+    "atölye",
+    "sera",
+    "ahır",
+    "kümes"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:axial-industrial-fans",
+    "dal:industrial-ceiling-fans",
+    "dal:roof-fans"
+   ]
+  },
+  {
+   "s": [
+    "lnieo",
+    "lineoo",
+    "linio",
+    "lino"
+   ],
+   "tur": "yazim",
+   "hedef": [
+    "aile:vortice-lineo"
+   ]
+  },
+  {
+   "s": [
+    "vortis",
+    "vortiçe",
+    "vortıce"
+   ],
+   "tur": "yazim",
+   "hedef": [
+    "marka:vortice"
+   ]
+  },
+  {
+   "s": [
+    "nicotra",
+    "gebhardt",
+    "nikotra"
+   ],
+   "tur": "yazim",
+   "hedef": [
+    "marka:nicotra-gebhardt"
+   ]
+  },
+  {
+   "s": [
+    "storm"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "marka:seat"
+   ],
+   "not": "STORM SEAT serisidir, marka değil (§8)"
+  },
+  {
+   "s": [
+    "m3/h",
+    "m³/h",
+    "m3h",
+    "metreküp"
+   ],
+   "tur": "genis",
+   "hedef": [],
+   "not": "birim; sayıyla birlikteyse debi süzgecine yönlenir ('500 m3/h' → debi ≥ 500), tek başına arama değil"
+  },
+  {
+   "s": [
+    "sanayi fanı"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:axial-industrial-fans"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  },
+  {
+   "s": [
+    "jet fan"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:smoke-exhaust-fans"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  },
+  {
+   "s": [
+    "dimmer"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:speed-controllers"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  }
+ ],
+ "en": [
+  {
+   "s": [
+    "fan",
+    "exhaust fan",
+    "extractor",
+    "extractor fan",
+    "ventilator",
+    "ventilation fan",
+    "blower"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:fanlar"
+   ]
+  },
+  {
+   "s": [
+    "inline fan",
+    "in-line fan",
+    "duct fan",
+    "duct booster",
+    "tube fan",
+    "mixed flow fan",
+    "quiet duct fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:duct-fans"
+   ]
+  },
+  {
+   "s": [
+    "bathroom fan",
+    "bath fan",
+    "toilet fan",
+    "wc fan",
+    "window fan",
+    "wall extractor"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:bathroom-toilet-fans"
+   ]
+  },
+  {
+   "s": [
+    "centrifugal fan",
+    "radial fan",
+    "squirrel cage",
+    "scroll fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:centrifugal-fans"
+   ]
+  },
+  {
+   "s": [
+    "axial fan",
+    "propeller fan",
+    "wall fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:axial-industrial-fans"
+   ]
+  },
+  {
+   "s": [
+    "roof fan",
+    "roof extractor",
+    "rooftop fan",
+    "roof ventilator"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:roof-fans"
+   ]
+  },
+  {
+   "s": [
+    "smoke exhaust fan",
+    "smoke extraction fan",
+    "fire fan",
+    "f400",
+    "f300"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:smoke-exhaust-fans"
+   ]
+  },
+  {
+   "s": [
+    "acid resistant fan",
+    "corrosion resistant fan",
+    "chemical fan",
+    "plastic fan",
+    "pp fan",
+    "fume hood fan",
+    "lab fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:acid-resistant-fans"
+   ]
+  },
+  {
+   "s": [
+    "plug fan",
+    "free wheel fan",
+    "plenum fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:plug-fans"
+   ]
+  },
+  {
+   "s": [
+    "cabinet fan",
+    "box fan",
+    "cased fan",
+    "acoustic box fan",
+    "kitchen extract"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:cabinet-fans"
+   ]
+  },
+  {
+   "s": [
+    "hvls",
+    "ceiling fan",
+    "industrial ceiling fan",
+    "big ceiling fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:industrial-ceiling-fans"
+   ]
+  },
+  {
+   "s": [
+    "chimney fan",
+    "flue fan",
+    "fireplace fan"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:chimney-fans"
+   ]
+  },
+  {
+   "s": [
+    "air curtain",
+    "door curtain",
+    "air door",
+    "air barrier"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:perde"
+   ]
+  },
+  {
+   "s": [
+    "heated air curtain",
+    "electric air curtain"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:electric-heated-air-curtains"
+   ]
+  },
+  {
+   "s": [
+    "ambient air curtain",
+    "unheated air curtain",
+    "cold air curtain"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:unheated-air-curtains"
+   ]
+  },
+  {
+   "s": [
+    "heat recovery",
+    "hrv",
+    "erv",
+    "mvhr",
+    "heat exchanger",
+    "recuperator",
+    "energy recovery ventilator",
+    "ahu"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:igk"
+   ]
+  },
+  {
+   "s": [
+    "central hrv",
+    "ducted hrv",
+    "ducted mvhr"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:ducted-central-hrv"
+   ]
+  },
+  {
+   "s": [
+    "single room hrv",
+    "decentralised hrv",
+    "decentralized mvhr",
+    "through-wall hrv",
+    "ductless hrv"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:single-room-hrv"
+   ]
+  },
+  {
+   "s": [
+    "frequency converter",
+    "vfd",
+    "vsd",
+    "inverter",
+    "ac drive",
+    "drive",
+    "variable speed drive",
+    "converter",
+    "frequency inverter"
+   ],
+   "tur": "eski",
+   "hedef": [
+    "dal:frequency-converters"
+   ]
+  },
+  {
+   "s": [
+    "speed controller",
+    "fan speed control",
+    "transformer controller",
+    "triac"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:speed-controllers"
+   ]
+  },
+  {
+   "s": [
+    "sensor",
+    "humidity sensor",
+    "co2 sensor",
+    "thermostat",
+    "spare part"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:spare-parts-sensors"
+   ]
+  },
+  {
+   "s": [
+    "duct heater",
+    "electric duct heater",
+    "inline heater"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:electric-duct-heaters"
+   ]
+  },
+  {
+   "s": [
+    "water coil",
+    "hot water coil",
+    "duct coil",
+    "lphw coil"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:water-coil-duct-heaters"
+   ]
+  },
+  {
+   "s": [
+    "dehumidifier",
+    "dehumidification",
+    "moisture removal"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:dehumidifiers"
+   ]
+  },
+  {
+   "s": [
+    "shelter",
+    "bunker ventilation",
+    "nbc filter",
+    "cbrn",
+    "civil defence"
+   ],
+   "tur": "esit",
+   "hedef": [
+    "dal:shelter-ventilation"
+   ]
+  },
+  {
+   "s": [
+    "accessory",
+    "grille",
+    "louvre",
+    "louver",
+    "silencer",
+    "attenuator",
+    "clamp",
+    "flexible duct",
+    "filter",
+    "backdraft damper"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "kok:aksesuar"
+   ]
+  },
+  {
+   "s": [
+    "ec",
+    "ec motor",
+    "ec fan",
+    "brushless",
+    "energy saving fan"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:duct-fans",
+    "dal:plug-fans",
+    "dal:centrifugal-fans"
+   ],
+   "not": "filter: motor = EC"
+  },
+  {
+   "s": [
+    "quiet fan",
+    "silent fan",
+    "low noise fan",
+    "acoustic fan"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:duct-fans",
+    "dal:bathroom-toilet-fans",
+    "dal:cabinet-fans"
+   ],
+   "not": "sort: sound ascending"
+  },
+  {
+   "s": [
+    "odour",
+    "odor",
+    "damp",
+    "mould",
+    "mold",
+    "condensation",
+    "steam"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:bathroom-toilet-fans",
+    "dal:dehumidifiers"
+   ]
+  },
+  {
+   "s": [
+    "car park",
+    "parking",
+    "garage"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:smoke-exhaust-fans",
+    "dal:axial-industrial-fans"
+   ]
+  },
+  {
+   "s": [
+    "warehouse",
+    "factory",
+    "workshop",
+    "greenhouse",
+    "barn",
+    "poultry"
+   ],
+   "tur": "ihtiyac",
+   "hedef": [
+    "dal:axial-industrial-fans",
+    "dal:industrial-ceiling-fans",
+    "dal:roof-fans"
+   ]
+  },
+  {
+   "s": [
+    "cfm",
+    "m3/h",
+    "m³/h",
+    "l/s"
+   ],
+   "tur": "genis",
+   "hedef": [],
+   "not": "unit; with a number goes to airflow filter (CFM converted, labelled 'converted'), never a standalone search"
+  },
+  {
+   "s": [
+    "blower"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:centrifugal-fans"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  },
+  {
+   "s": [
+    "industrial fan"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:axial-industrial-fans"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  },
+  {
+   "s": [
+    "jet fan"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:smoke-exhaust-fans"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  },
+  {
+   "s": [
+    "dimmer",
+    "regulator"
+   ],
+   "tur": "genis",
+   "hedef": [
+    "dal:speed-controllers"
+   ],
+   "not": "tek yönlü (L-35): belirsiz sözcük"
+  }
+ ],
+ "_sayim": {
+  "tr_sozcuk": 190,
+  "en_sozcuk": 158,
+  "tr_satir": 38,
+  "en_satir": 32,
+  "urun_turu_kapsanan": 22,
+  "urun_turu_toplam": 22,
+  "not": "10-25 L-35 ile belirsiz sözcükler tek yönlüye alındı"
+ }
+}

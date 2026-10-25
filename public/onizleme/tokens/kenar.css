@@ -1,0 +1,7 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  /* Beyaz üstünde: control 1.65 > hairline 1.31 > row 1.19 > inset 1.14 */
+  --border-control: 198 26.8% 78%; /* @kind color */       /* #B8CDD6 · düğme ve giriş kenarı */
+  --border-hairline: 198.9 30.2% 87.6%; /* @kind color */  /* #D6E3E9 · kart kenarı */
+  --border-row: 197.1 33.3% 91.8%; /* @kind color */       /* #E3EDF1 · tablo/liste satır ayırıcısı */
+}

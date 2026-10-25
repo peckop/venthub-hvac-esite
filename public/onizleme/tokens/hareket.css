@@ -1,0 +1,19 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  --hareket-hizli: 120ms; /* @kind other */                /* arayüz tepkisi: üstüne gelme, düğme */
+  --hareket-normal: 200ms; /* @kind other */
+  --hareket-acilis: 280ms; /* @kind other */               /* açılır bölüm (grid-template-rows) */
+  --hareket-egri: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --hareket-gecis: 600ms; /* @kind other */                /* geçiş sınıfı 500–800 ms: sayfa geçişi, sahne, teklif uçuşu */
+  --hareket-gecis-egri: cubic-bezier(0.2, 0.9, 0.25, 1); /* @kind other */
+  --hareket-egri-gecis: var(--hareket-gecis-egri); /* @kind other */ /* S5 token.css adı, aynı değer */
+}
+/* Kaynak kuralı: prefers-reduced-motion: reduce → bütün süreler 0 */
+@media (prefers-reduced-motion: reduce){
+  :root{
+    --hareket-hizli: 0ms; /* @kind other */
+    --hareket-normal: 0ms; /* @kind other */
+    --hareket-acilis: 0ms; /* @kind other */
+    --hareket-gecis: 0ms; /* @kind other */
+  }
+}

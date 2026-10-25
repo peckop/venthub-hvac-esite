@@ -1,0 +1,77 @@
+{
+ "_kaynak": "Site S5.dc.html REHBER (birebir). Yalnız TR; S5 EN dilinde Mühendislik bölümünü göstermiyor (rehberGoster).",
+ "rehber": [
+  {
+   "id": "kanal-kaybi",
+   "tarih": "18.09.2026",
+   "raf": "Hesap",
+   "tur": "Hesap yöntemi",
+   "ad": "Kanal kaybı nasıl hesaplanır?",
+   "cevap": "Debi iki katına çıkarsa kanal kaybı yaklaşık dört katına çıkar.",
+   "ilgili": "Kanal fanları",
+   "govde": true
+  },
+  {
+   "id": "ach",
+   "tarih": "02.09.2026",
+   "raf": "Hesap",
+   "tur": "Standart özeti",
+   "ad": "Saatte kaç hava değişimi?",
+   "cevap": "Ofis 6 · banyo 8 · mutfak 15 değişim; küçük mahalde en az debi geçerli.",
+   "ilgili": "Ürün Seçici"
+  },
+  {
+   "id": "radyal-aksiyel",
+   "slug": "radyal-fan-mi-aksiyel-fan-mi",
+   "tarih": "11.10.2026",
+   "raf": "Seçim",
+   "tur": "Rehber",
+   "ad": "Radyal fan mı aksiyel fan mı? Fan nasıl seçilir?",
+   "cevap": "Radyal ve aksiyel fanların çalışma biçimi, kanat tipleri, kayışlı ve doğrudan tahrik farkı, fan eğrisinden çalışma noktasının okunması ve verimlilik düzenlemeleri.",
+   "ilgili": "Radyal fanlar · Aksiyel fanlar"
+  },
+  {
+   "id": "korozif",
+   "tarih": "12.08.2026",
+   "raf": "Seçim",
+   "tur": "Rehber",
+   "ad": "Korozif ortamda gövde seçimi",
+   "cevap": "Asit buharında malzeme, çark tipinden önce gelir.",
+   "ilgili": "Korozyon dayanımlı fanlar"
+  },
+  {
+   "id": "ses",
+   "slug": "sessiz-fan-nasil-secilir",
+   "tarih": "17.10.2026",
+   "raf": "Ses ve konfor",
+   "tur": "Rehber",
+   "ad": "Sessiz fan nasıl seçilir? dB(A), ses gücü ve kanal fanı seçimi",
+   "cevap": "Katalogdaki ses değerinin hangi yolda (emiş, üfleme, gövde), hangi ayar noktasında ve hangi mesafede verildiğini okumakla başlar.",
+   "ilgili": "Kanal tipi fanlar · Vortice Lineo Quiet",
+   "okuma": "17 dakika okuma",
+   "uzun": true
+  },
+  {
+   "id": "montaj",
+   "tarih": "15.07.2026",
+   "raf": "Montaj",
+   "tur": "Rehber",
+   "ad": "Kanal fanı nereye konur?",
+   "cevap": "Emişte en az bir çap boyu düz kanal bırakın; dirsekle girmek debiyi düşürür.",
+   "ilgili": "Kanal fanları · Aksesuarlar"
+  },
+  {
+   "id": "frekans-konvertoru",
+   "slug": "frekans-konvertoru-nedir",
+   "tarih": "25.09.2026",
+   "raf": "Verimlilik ve kontrol",
+   "tur": "Rehber",
+   "ad": "Frekans konvertörü nedir, fan ve pompada nasıl seçilir?",
+   "seoAd": "Frekans konvertörü nedir, nasıl seçilir?",
+   "cevap": "Fan ve pompada hızı %20 azaltmak, üretici belgesindeki örnekte elektrik tüketimini %50 azaltır; cihaz motora giden gerilimi ve frekansı değiştirir.",
+   "ilgili": "Frekans konvertörleri · Danfoss",
+   "okuma": "12 dakika okuma",
+   "uzun": true
+  }
+ ]
+}

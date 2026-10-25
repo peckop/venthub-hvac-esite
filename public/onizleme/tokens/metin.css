@@ -1,0 +1,9 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  /* Tam opak; soluk hâl ayrı token, alfa değil */
+  --text-strong: 200 48.4% 12.2%; /* @kind color */        /* #10242E · beyazda 15.98 */
+  --text-body: 200.6 27.1% 25.3%; /* @kind color */        /* #2F4652 · beyazda 9.91 · sayfada 9.18 */
+  --text-muted: 200.6 16.3% 38.4%; /* @kind color */       /* #526772 · beyazda 5.93 · sayfada 5.49 · inset 5.19 */
+  --text-on-dark: 0 0% 100%; /* @kind color */             /* koyu bantta 15.98 · dark-inset 7.06 */
+  --text-on-dark-muted: 196 54.2% 83.7%; /* @kind color */ /* #BFE0EC · koyu bantta 11.48 · dark-inset 5.07 */
+}

@@ -1,0 +1,530 @@
+{
+ "_kaynak": "Site S5.dc.html (DESIGN-MENU, donuk) · YASAL_AD, YK, YV, YICERIK, yasalVals YB/FORM — birebir. ‹alan› = şirket alanı (YV dolu ise değer, değilse YK etiketi).",
+ "ad": {
+  "kvkk": [
+   "KVKK aydınlatma metni",
+   "Privacy notice (KVKK)"
+  ],
+  "gizlilik": [
+   "Gizlilik politikası",
+   "Privacy policy"
+  ],
+  "cerez": [
+   "Çerez politikası",
+   "Cookie policy"
+  ],
+  "mesafeli": [
+   "Mesafeli satış sözleşmesi",
+   "Distance sales contract"
+  ],
+  "iade": [
+   "İptal ve iade koşulları",
+   "Cancellation and returns"
+  ],
+  "kullanim": [
+   "Kullanım koşulları",
+   "Terms of use"
+  ],
+  "onbilgi": [
+   "Ön bilgilendirme formu",
+   "Pre-contract information form"
+  ],
+  "garanti": [
+   "Garanti ve servis",
+   "Warranty and service"
+  ],
+  "teslimat": [
+   "Teslimat ve kargo",
+   "Delivery and shipping"
+  ]
+ },
+ "alan": {
+  "sellerTitle": [
+   "Ticari unvan",
+   "Trade name"
+  ],
+  "sellerAddress": [
+   "Adres",
+   "Address"
+  ],
+  "sellerEmail": [
+   "E-posta",
+   "E-mail"
+  ],
+  "sellerPhone": [
+   "Telefon",
+   "Phone"
+  ],
+  "kepAddress": [
+   "KEP adresi",
+   "KEP address"
+  ],
+  "taxOffice": [
+   "Vergi dairesi",
+   "Tax office"
+  ],
+  "taxNumber": [
+   "Vergi no",
+   "Tax no."
+  ],
+  "mersis": [
+   "MERSİS no",
+   "MERSİS no."
+  ],
+  "tradeRegistryNo": [
+   "Ticaret sicil no",
+   "Trade registry no."
+  ],
+  "chamberOfCommerce": [
+   "Ticaret odası",
+   "Chamber of commerce"
+  ],
+  "etbisNo": [
+   "ETBİS no",
+   "ETBİS no."
+  ],
+  "returnAddress": [
+   "İade adresi",
+   "Return address"
+  ],
+  "cargoCompanies": [
+   "Anlaşmalı kargo firması",
+   "Contracted carrier"
+  ],
+  "returnShippingBearer": [
+   "İade kargo masrafı",
+   "Return shipping cost"
+  ],
+  "afterSalesService": [
+   "Yetkili servis iletişimi",
+   "Authorized service contact"
+  ]
+ },
+ "deger": {
+  "shippingFee": "Sipariş özetinde gösterilir",
+  "deliveryTime": "sipariş onayında ürün ve stok durumuna göre bildirilir",
+  "refundTime": "14 gün",
+  "warrantyPeriod": "2 yıl",
+  "usefulLife": "10 yıl",
+  "lastUpdated": "2026-08-15",
+  "websiteUrl": "venthub.com.tr"
+ },
+ "icerik": {
+  "garanti": {
+   "gr": "destek",
+   "cta": 1,
+   "tr": [
+    {
+     "b": [
+      "Garanti kapsamı üretici/ithalatçı firmaya göre değişiklik gösterebilir. Lütfen garanti belgesi ve kullanım kılavuzunu saklayınız.",
+      "Servis bilgisi veya arıza kaydı için destek ekibimizle iletişime geçin."
+     ]
+    }
+   ],
+   "en": [
+    {
+     "b": [
+      "Warranty coverage may vary by manufacturer/importer. Please keep the warranty card and user manual.",
+      "For service info or malfunction records, contact our support team."
+     ]
+    }
+   ]
+  },
+  "teslimat": {
+   "gr": "destek",
+   "tr": [
+    {
+     "b": [
+      "Teslim süresi sipariş onayında ürün ve stok durumuna göre bildirilir.",
+      "Kargo ücreti ve firması teklifinizde belirtilir. Takip numarası e-posta ile iletilir."
+     ]
+    }
+   ],
+   "en": [
+    {
+     "b": [
+      "The delivery time is notified at order confirmation, depending on the product and stock status.",
+      "The shipping fee and carrier are stated in your quote. Tracking number will be sent via email."
+     ]
+    }
+   ]
+  },
+  "iade": {
+   "gr": "yasal",
+   "cta": 1,
+   "not": 1,
+   "tr": [
+    {
+     "b": [
+      "14 gün içinde cayma hakkınızı kullanabilirsiniz. Ürün kullanılmamış, faturası ve tüm aksesuarlarıyla birlikte yeniden satılabilir durumda olmalıdır.",
+      "İade talebi için lütfen sipariş numaranızla birlikte destek ekibimize ulaşın. Onay sonrası kargo talimatları paylaşılacaktır."
+     ]
+    }
+   ],
+   "en": [
+    {
+     "b": [
+      "You may use your right of withdrawal within 14 days. The product must be unused and resalable with invoice and all accessories included.",
+      "Please contact our support team with your order number for a return request. After approval, shipping instructions will be provided."
+     ]
+    }
+   ]
+  },
+  "kullanim": {
+   "gr": "yasal",
+   "taslak": 1,
+   "enH": [
+    "Service Provider and Acceptance",
+    "Scope of Service",
+    "Membership and Account Security",
+    "Product Information and Technical Tools",
+    "Price and Stock",
+    "Intellectual Property",
+    "Prohibited Use",
+    "Disclaimer",
+    "Personal Data",
+    "Dispute Resolution",
+    "Changes"
+   ],
+   "tr": [
+    {
+     "h": "Hizmet Sağlayıcı ve Kabul",
+     "b": [
+      "www.‹websiteUrl› sitesi ‹sellerTitle› tarafından işletilmektedir. Siteyi kullanarak bu koşulları kabul etmiş sayılırsınız.",
+      {
+       "s": "Adres: ‹sellerAddress› | E-posta: ‹sellerEmail› | Telefon: ‹sellerPhone›"
+      },
+      {
+       "s": "MERSİS: ‹mersis› | Ticaret Sicil No: ‹tradeRegistryNo› | ETBİS Kayıt No: ‹etbisNo›"
+      }
+     ]
+    },
+    {
+     "h": "Hizmet Kapsamı",
+     "b": [
+      "Site üzerinden ürün bilgileri, teknik hesaplama araçları, sipariş işlemleri ve müşteri destek hizmetleri sunulur. Satış işlemleri Mesafeli Satış Sözleşmesi ve Ön Bilgilendirme Formu hükümlerine tabidir."
+     ]
+    },
+    {
+     "h": "Üyelik ve Hesap Güvenliği",
+     "b": [
+      "Üyelik sırasında verdiğiniz bilgilerin doğru ve güncel olmasından siz sorumlusunuz. Hesap parolanızın gizliliğini korumak ve hesabınız üzerinden yapılan işlemlerden sorumlu olmak kullanıcıya aittir. Yetkisiz bir kullanım fark ettiğinizde derhâl ‹sellerEmail› adresine bildiriniz."
+     ]
+    },
+    {
+     "h": "Ürün Bilgileri ve Teknik Araçlar",
+     "b": [
+      "Ürün görselleri tanıtım amaçlıdır; üretici kaynaklı revizyonlar nedeniyle görsel ile teslim edilen ürün arasında renk/detay farkı bulunabilir. Bağlayıcı olan, sipariş özetindeki marka-model-teknik veri bilgisidir.",
+      "Site’de sunulan hesaplama araçları (debi, kanal, ısı geri kazanım vb.) **ön boyutlandırma** amaçlıdır; proje hesabı, uygulama uygunluğu ve mevzuata uyum sorumluluğu kullanıcıya/proje müellifine aittir. Kesin hesaplar için bir HVAC mühendisine danışınız."
+     ]
+    },
+    {
+     "h": "Fiyat ve Stok",
+     "b": [
+      "Fiyatlar ve stok bilgileri güncel tutulmaya çalışılır; ancak sistem veya besleme kaynaklı bariz maddi hata hâlinde Satıcı, siparişi iptal ederek tahsil edilmiş bedeli eksiksiz iade etme hakkını saklı tutar. Ayrıntı için Mesafeli Satış Sözleşmesi §5’e bakınız."
+     ]
+    },
+    {
+     "h": "Fikri Mülkiyet",
+     "b": [
+      "Sitedeki tüm içerikler (metin, görsel, tasarım, yazılım, veri tabanı vb.) ‹sellerTitle› veya lisans verenlerine aittir; izinsiz kopyalanamaz, çoğaltılamaz, dağıtılamaz veya türev çalışma üretiminde kullanılamaz. Ürün marka ve model adları ilgili hak sahiplerine aittir."
+     ]
+    },
+    {
+     "h": "Yasaklı Kullanım",
+     "b": [
+      [
+       "Hukuka aykırı içerik paylaşımı veya sistem güvenliğini tehlikeye atacak eylemler",
+       "Veri kazıma (scraping), otomatik toplu erişim ve yetkisiz otomasyon",
+       "Tersine mühendislik, güvenlik önlemlerini aşma girişimleri",
+       "Spam, yanıltıcı içerik ve kötüye kullanım"
+      ],
+      {
+       "s": "Bu koşulların ihlali hâlinde Şirket, hesabı geçici olarak askıya alabilir veya kapatabilir ve gerekli hukuki yollara başvurabilir."
+      }
+     ]
+    },
+    {
+     "h": "Sorumluluk Reddi",
+     "b": [
+      "Site “olduğu gibi” sunulur; kesintisiz veya hatasız çalışacağı taahhüt edilmez. Dolaylı ve sonuçsal zararlardan ‹sellerTitle› sorumlu tutulamaz. Tüketici mevzuatından doğan haklarınız ile Şirketin kast ve ağır ihmalinden doğan sorumluluğu saklıdır; bu bölüm söz konusu hakları sınırlandıracak şekilde yorumlanamaz."
+     ]
+    },
+    {
+     "h": "Kişisel Veriler",
+     "b": [
+      "Kişisel verilerinizin işlenmesine ilişkin bilgi için KVKK Aydınlatma Metni ve Gizlilik Politikası metinlerimizi inceleyiniz."
+     ]
+    },
+    {
+     "h": "Uyuşmazlık Çözümü",
+     "b": [
+      "Uyuşmazlıklarda Türk hukuku uygulanır. Tüketici sıfatına sahip kullanıcılar, ilan edilen parasal sınırlar çerçevesinde Tüketici Hakem Heyetlerine veya Tüketici Mahkemelerine başvurabilir; diğer hâllerde Satıcının merkezinin bulunduğu yer mahkemeleri ve icra daireleri yetkilidir."
+     ]
+    },
+    {
+     "h": "Değişiklikler",
+     "b": [
+      "Bu koşullar ‹lastUpdated› tarihinde güncellenmiştir. Siteyi kullanmaya devam ederek güncel koşulları kabul etmiş sayılırsınız."
+     ]
+    }
+   ]
+  },
+  "onbilgi": {
+   "gr": "yasal",
+   "taslak": 1,
+   "enH": [
+    "Seller Information",
+    "Contact for Complaints and Applications",
+    "Main Characteristics of the Product or Service",
+    "Total Price and Additional Costs",
+    "Payment Method",
+    "Delivery",
+    "Right of Withdrawal",
+    "Return Costs and Refund",
+    "Cases Where the Right of Withdrawal Cannot Be Used",
+    "Sample Withdrawal Form",
+    "Warranty and After-Sales Service",
+    "Dispute Resolution",
+    "Retention of the Contract",
+    "Your Personal Data",
+    "Entry into Force"
+   ],
+   "tr": [
+    {
+     "h": "Satıcı Bilgileri",
+     "b": [
+      {
+       "f": [
+        "Ünvan: ‹sellerTitle›",
+        "Adres: ‹sellerAddress›",
+        "Telefon: ‹sellerPhone› | E-posta: ‹sellerEmail›",
+        "KEP Adresi: ‹kepAddress›",
+        "MERSİS No: ‹mersis› | Ticaret Sicil No: ‹tradeRegistryNo›",
+        "Kayıtlı Olduğu Oda: ‹chamberOfCommerce›",
+        "Vergi Dairesi/No: ‹taxOffice› / ‹taxNumber›",
+        "ETBİS Kayıt No: ‹etbisNo›"
+       ]
+      },
+      {
+       "s": "Site: www.‹websiteUrl›"
+      }
+     ]
+    },
+    {
+     "h": "Şikâyet ve Başvuru İçin İletişim",
+     "b": [
+      "Sipariş, teslimat, iade ve her türlü talebinizi ‹sellerEmail› adresine veya ‹sellerPhone› numarasına iletebilirsiniz. Yazılı tebligat için KEP adresimiz: ‹kepAddress›."
+     ]
+    },
+    {
+     "h": "Ürün/Hizmetin Temel Nitelikleri",
+     "b": [
+      "Sipariş konusu ürünün markası, modeli, teknik özellikleri (debi, basınç, ses seviyesi, güç, bağlantı ölçüleri vb.), adedi ve varsa aksesuarları, ürün detay sayfasında ve onayladığınız sipariş özetinde gösterilir. Bu Form, ilgili sipariş özetiyle birlikte bir bütün oluşturur.",
+      {
+       "s": "Ürün görselleri tanıtım amaçlıdır; üretici kaynaklı revizyonlar nedeniyle görsel ile teslim edilen ürün arasında renk/detay farkı olabilir. Bağlayıcı olan, sipariş özetindeki marka-model-teknik veri bilgisidir."
+      }
+     ]
+    },
+    {
+     "h": "Toplam Bedel ve Ek Masraflar",
+     "b": [
+      [
+       "Tüm vergiler dâhil toplam satış bedeli sipariş özetinde ve ödeme adımında açıkça gösterilir.",
+       "Kargo/teslimat ücreti: ‹shippingFee›",
+       "Gösterilen toplam bedel dışında Tüketiciden herhangi bir ek masraf talep edilmez."
+      ]
+     ]
+    },
+    {
+     "h": "Ödeme Yöntemi",
+     "b": [
+      "Ödemeler, kredi/banka kartı ile **iyzico** ödeme altyapısı üzerinden alınır. Kart bilgileriniz Satıcı tarafından görülmez ve saklanmaz."
+     ]
+    },
+    {
+     "h": "Teslimat",
+     "b": [
+      [
+       "Teslim yeri: Tüketicinin sipariş sırasında bildirdiği adres.",
+       "Öngörülen teslim süresi: ‹deliveryTime› (kargoya veriliş süresi).",
+       "Teslimat, her hâlükârda siparişin Satıcıya ulaşmasından itibaren yasal azami **30 gün** içinde yapılır.",
+       "Taşıyıcı: ‹cargoCompanies›"
+      ],
+      {
+       "s": "Ürünü teslim alırken paketi kontrol ediniz; hasarlı paketi kabul etmeyerek taşıyıcıya tutanak tutturunuz."
+      }
+     ]
+    },
+    {
+     "h": "Cayma Hakkı",
+     "b": [
+      "Tüketici, malı teslim aldığı (birden fazla parça hâlinde teslimde son parçanın teslim edildiği) tarihten itibaren **14 gün** içinde, hiçbir gerekçe göstermeksizin ve cezai şart ödemeksizin sözleşmeden cayma hakkına sahiptir. Cayma hakkı, sözleşmenin kurulduğu tarih ile teslim tarihi arasında da kullanılabilir.",
+      "Cayma bildirimini aşağıdaki §10’da yer alan örnek formu kullanarak veya açık bir beyanla ‹sellerEmail› adresine iletebilirsiniz. Bildirimin süresi içinde gönderilmiş olması yeterlidir.",
+      "Cayma bildirimi ulaştıktan sonra ürün, faturası ve tüm aksesuarlarıyla birlikte, kullanılmamış ve yeniden satılabilir durumda ‹returnAddress› adresine **10 gün** içinde gönderilmelidir."
+     ]
+    },
+    {
+     "h": "İade Masrafı ve Bedel İadesi",
+     "b": [
+      "Cayma hakkının kullanılması hâlinde iade kargo masrafı: ‹returnShippingBearer›.",
+      {
+       "s": "Ürünü, yukarıda belirtilen anlaşmalı taşıyıcı (‹cargoCompanies›) ile iade ettiğiniz takdirde, Mesafeli Sözleşmeler Yönetmeliği m.12 uyarınca iade masrafından sorumlu tutulmazsınız. Anlaşmalı taşıyıcı dışında bir firmayla gönderim yapmanız hâlinde aradaki fark tarafınıza ait olabilir."
+      },
+      "Cayma bildiriminin Satıcıya ulaşmasından itibaren ‹refundTime› içinde, teslimat masrafları da dâhil olmak üzere tahsil edilen tüm ödemeler, ödemede kullanılan araca uygun şekilde ve Tüketiciye ek bir masraf yüklenmeksizin iade edilir."
+     ]
+    },
+    {
+     "h": "Cayma Hakkının Kullanılamayacağı Hâller",
+     "b": [
+      "Mesafeli Sözleşmeler Yönetmeliği m.15 uyarınca, özellikle aşağıdaki ürünlerde cayma hakkı kullanılamaz:",
+      [
+       "Tüketicinin istekleri veya kişisel ihtiyaçları doğrultusunda hazırlanan mallar — projeye özel ölçüde üretilen hava kanalı, özel imalat damper/menfez, özel renk veya özel motor konfigürasyonuyla sipariş edilen fanlar bu kapsamdadır.",
+       "Tesliminden sonra ambalaj, bant, mühür gibi koruyucu unsurları açılmış olan ve iadesi sağlık/hijyen açısından uygun olmayan mallar — açılmış filtre ve filtre kartuşları bu kapsamdadır.",
+       "Tesliminden sonra başka ürünlerle ayrılamayacak şekilde karışan mallar — uygulanmış izolasyon ve sızdırmazlık malzemeleri gibi.",
+       "Elektronik ortamda anında ifa edilen hizmetler ve Tüketiciye anında teslim edilen gayrimaddi mallar."
+      ],
+      {
+       "s": "Kurulumu/montajı Satıcı veya yetkili servis tarafından yapılmış cihazlarda, cayma hâlinde ürünün sökülmesi ve kullanılmamış-yeniden satılabilir durumda iadesi gerekir; Tüketicinin ürünü niteliğine ve işleyişine uygun kullanım dışında kullanması sonucu oluşan değer kaybından Tüketici sorumludur."
+      }
+     ]
+    },
+    {
+     "h": "Örnek Cayma Formu",
+     "b": [
+      {
+       "s": "(Bu formu yalnızca sözleşmeden caymak istediğinizde doldurup gönderiniz.)"
+      },
+      {
+       "f": [
+        "Kime: ‹sellerTitle› — ‹sellerAddress› — ‹sellerEmail›",
+        "Bu formla, aşağıdaki mallara ilişkin sözleşmeden caydığımı bildiririm:",
+        "Sipariş tarihi / Teslim tarihi: ____________________",
+        "Sipariş numarası: ____________________",
+        "Ürün(ler): ____________________",
+        "Tüketicinin adı-soyadı: ____________________",
+        "Tüketicinin adresi: ____________________",
+        "İade edilecek tutarın gönderileceği hesap/kart: ____________________",
+        "Tüketicinin imzası (yalnızca kâğıt üzerinde gönderiliyorsa): ____________________",
+        "Tarih: ____________________"
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Garanti ve Satış Sonrası Hizmet",
+     "b": [
+      [
+       "Garanti süresi: ‹warrantyPeriod› (üretici/ithalatçı garantisi saklıdır).",
+       "Bakanlıkça belirlenen kullanım ömrü: ‹usefulLife›.",
+       "Yetkili servis / satış sonrası hizmet: ‹afterSalesService›."
+      ],
+      {
+       "s": "Ayıplı mal hâlinde 6502 sayılı Kanun m.11 kapsamındaki seçimlik haklarınız (ücretsiz onarım, ayıpsız misli ile değişim, bedel indirimi, sözleşmeden dönme) saklıdır."
+      }
+     ]
+    },
+    {
+     "h": "Uyuşmazlıkların Çözümü",
+     "b": [
+      "Şikâyet ve itirazlarınızı, her takvim yılı başında Ticaret Bakanlığı tarafından ilan edilen parasal sınırlar çerçevesinde, ikametgâhınızın veya işlemin yapıldığı yerin **Tüketici Hakem Heyetine** ya da **Tüketici Mahkemesine** iletebilirsiniz."
+     ]
+    },
+    {
+     "h": "Sözleşmenin Saklanması",
+     "b": [
+      "Onayladığınız Ön Bilgilendirme Formu ve Mesafeli Satış Sözleşmesi, siparişinize bağlı olarak Satıcı nezdinde saklanır; hesabınızın sipariş detay sayfasından erişebilir ve ‹sellerEmail› adresine talep göndererek bir kopyasını isteyebilirsiniz."
+     ]
+    },
+    {
+     "h": "Kişisel Verileriniz",
+     "b": [
+      "Sipariş sürecinde işlenen kişisel verileriniz hakkında ayrıntılı bilgi için KVKK Aydınlatma Metni ve Gizlilik Politikası metinlerimizi inceleyiniz."
+     ]
+    },
+    {
+     "h": "Yürürlük",
+     "b": [
+      "Bu Ön Bilgilendirme Formu ‹lastUpdated› tarihli olup, siparişinizin onaylanmasından önce Tüketiciye sunulmuştur. Tüketici, bu Formu okuyup bilgi sahibi olduğunu elektronik ortamda teyit eder."
+     ]
+    }
+   ]
+  }
+ },
+ "baslikYedek": {
+  "tr": {
+   "kvkk": [
+    "Veri sorumlusu",
+    "İşlenen veriler",
+    "İşleme amacı ve hukuki sebep",
+    "Aktarım",
+    "Saklama süresi",
+    "Haklarınız ve başvuru"
+   ],
+   "gizlilik": [
+    "Topladığımız bilgiler",
+    "Bilgilerin kullanımı",
+    "Paylaşım",
+    "Güvenlik",
+    "İletişim"
+   ],
+   "cerez": [
+    "Kullandığımız çerezler",
+    "Zorunlu çerezler",
+    "Tercih ve analiz çerezleri",
+    "Tercihlerinizi yönetme"
+   ],
+   "mesafeli": [
+    "Taraflar",
+    "Ürün ve fiyat",
+    "Teslimat",
+    "Cayma hakkı",
+    "Uyuşmazlık"
+   ],
+   "iade": [
+    "İptal",
+    "İade koşulları",
+    "İade süreci"
+   ]
+  },
+  "en": {
+   "kvkk": [
+    "Data controller",
+    "Data processed",
+    "Purpose and legal basis",
+    "Transfers",
+    "Retention",
+    "Your rights and how to apply"
+   ],
+   "gizlilik": [
+    "Information we collect",
+    "How it is used",
+    "Sharing",
+    "Security",
+    "Contact"
+   ],
+   "cerez": [
+    "Cookies we use",
+    "Strictly necessary cookies",
+    "Preference and analytics cookies",
+    "Managing your choices"
+   ],
+   "mesafeli": [
+    "Parties",
+    "Product and price",
+    "Delivery",
+    "Right of withdrawal",
+    "Disputes"
+   ],
+   "iade": [
+    "Cancellation",
+    "Return conditions",
+    "Return process"
+   ]
+  }
+ },
+ "kvkkForm": {
+  "tr": "Teklif ve destek formlarına yazdığınız ad, e-posta, telefon, şirket ve mesaj bilgileri ile yüklediğiniz dosyalar.",
+  "en": "The name, e-mail, phone, company and message you type into the quote and support forms, and the files you upload."
+ }
+}

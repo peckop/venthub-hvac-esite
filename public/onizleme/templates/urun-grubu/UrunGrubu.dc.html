@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Ürün grubu" description="Ürün grubu sayfası (iş emri #7 · kaynak DESIGN-MENU paket-B/Kombin Urun Grubu): SectionRail (konum + Ne tür… / Tüm modeller) → PageCover (ürün grubu, özel ihtiyaç çipleri, ürün türü gezintisi) → ürün türü kartları → ModelListesi (24/sayfa). Ad ve sayılar katalogdan." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}</style></helmet>
+<sc-if value="{{ masa }}" hint-placeholder-val="{{ true }}"><div data-vh-urun-grubu="" lang="{{ lang }}" data-screen-label="Ürün grubu" style="display:flex;flex-direction:column;gap:24px;padding:0 40px 60px;background:hsl(var(--surface-page));font-family:var(--font-sans)">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import>
+<x-import component-from-global-scope="DesignSystem_4f7164.PageCover" dc-props="{{ kapak }}" hint-size="100%,360px"></x-import>
+<section id="k-turler" style="display:flex;flex-direction:column;gap:14px;padding-top:10px">
+<h2 style="margin:0;font-family:var(--font-baslik);font-weight:var(--weight-h1);font-size:clamp(24px,3vw,34px);letter-spacing:-0.02em;color:hsl(var(--text-strong))">{{ katBaslik }}</h2>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+<sc-for list="{{ kartlar }}" as="k" hint-placeholder-count="8"><x-import component-from-global-scope="DesignSystem_4f7164.CategoryCard" dc-props="{{ k }}" hint-size="100%,260px"></x-import></sc-for>
+</div>
+</section>
+<div id="k-modeller"><x-import component-from-global-scope="DesignSystem_4f7164.ModelListesi" dc-props="{{ liste }}" hint-size="100%,900px"></x-import></div>
+</div></sc-if>
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><div data-vh-urun-grubu="" lang="{{ lang }}" data-screen-label="Ürün grubu" style="display:flex;flex-direction:column;gap:24px;padding:0 18px 40px;background:hsl(var(--surface-page));font-family:var(--font-sans)">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import>
+<x-import component-from-global-scope="DesignSystem_4f7164.PageCover" dc-props="{{ kapak }}" hint-size="100%,560px"></x-import>
+<section id="k-turler" style="display:flex;flex-direction:column;gap:14px;padding-top:10px">
+<h2 style="margin:0;font-family:var(--font-baslik);font-weight:var(--weight-h1);font-size:24px;letter-spacing:-0.02em;color:hsl(var(--text-strong))">{{ katBaslik }}</h2>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+<sc-for list="{{ kartlar }}" as="k" hint-placeholder-count="8"><x-import component-from-global-scope="DesignSystem_4f7164.CategoryCard" dc-props="{{ k }}" hint-size="100%,220px"></x-import></sc-for>
+</div>
+</section>
+<div id="k-modeller"><x-import component-from-global-scope="DesignSystem_4f7164.ModelListesi" dc-props="{{ liste }}" hint-size="100%,900px"></x-import></div>
+</div></sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;2400px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;kapakTur&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;buyuk&quot;,&quot;sade&quot;],&quot;default&quot;:&quot;buyuk&quot;,&quot;tsType&quot;:&quot;'buyuk' | 'sade'&quot;},&quot;grup&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: 'urunler' | 'tur' | 'seri' | 'model', id?: string) =&gt; void&quot;}}">class Component extends DCLogic {
+  state = { metin: null, dil: null, secili: {}, sayfa: 1, etkin: 'k-turler' };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    if (this.props.metin) return;
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json')]).then(([a, b]) => this.setState({ metin: { ...a, ...b } }));
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || this.state.metin || {}, kip = P.kip || 'teklif', git = P.onGit || (() => {});
+    const A = (k) => (M[k] == null ? '\u27E6' + k + '\u27E7' : M[k]);
+    const KT = window.VHKatalog, grupId = P.grup || 'fanlar';
+    const base = { lang: DIL.toLowerCase(), mob, masa: !mob, katBaslik: A('ds.ne-tur-fan') };
+    const G = KT ? KT.grup(grupId, DIL) : null;
+    if (!G) return { ...base, rail: { bolumler: [] }, kapak: { baslik: '' }, kartlar: [], liste: { modeller: [] } };
+    const D = (s, yol) => (s == null ? '\u27E6' + yol + '\u27E7' : s);
+    const grupAd = D(G.ad, 'katalog.kok.' + grupId + '.en');
+    const foto = (t) => KT.temsil(t.id) || t.foto;
+    const ac = (tip, id) => (e) => { if (e && e.preventDefault) e.preventDefault(); git(tip, id); };
+    const kaydir = (id) => { this.setState({ etkin: id }); const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 12, behavior: 'smooth' }); };
+    const turSay = G.turler.filter((t) => t.model > 0);
+    const rail = { konum: [A('tx.e_anasayfa'), A('tx.e_urunler'), grupAd].join(' › '), bolumler: [{ id: 'k-turler', ad: A('ds.ne-tur-fan') }, { id: 'k-modeller', ad: A('t.tum-modeller-2') }], etkin: this.state.etkin, onSec: kaydir, yapiskan: this.state.etkin !== 'k-modeller', geri: { ad: A('tx.e_urunler'), href: '#', onClick: ac('urunler') }, sayfaAdi: grupAd, mobil: mob, metin: M };
+    const sade = P.kapakTur === 'sade';
+    const kapak = { seviye: 'urun-grubu', baslik: grupAd, altSatir: A('ds.fanlar-kapak-alt'), cipBaslik: A('ds.ozel-ihtiyac'), cipler: [{ ad: A('ds.ihtiyac-sessiz'), onClick: ac('tur', 'duct-fans') }, { ad: A('ds.ihtiyac-duman') }, { ad: A('js.Patlayıcı ortam (ATEX)') }, { ad: A('ds.ihtiyac-radon'), onClick: ac('tur', 'duct-fans') }], gezinti: sade ? undefined : turSay.map((t) => ({ ad: D(t.ad, 'katalog.dal.' + t.id + '.en'), foto: foto(t), onClick: ac('tur', t.id) })), sade, fotoBoy: 'kapak', fotoTaraf: 'sag', mobil: mob, metin: M, dil: DIL };
+    const kartlar = turSay.map((t) => ({ kategori: { slug: t.id, ad: D(t.ad, 'katalog.dal.' + t.id + '.en'), foto: foto(t), modelSayisi: t.model }, onAc: () => git('tur', t.id), mobil: mob, metin: M, yerel: DIL === 'EN' ? 'en-GB' : 'tr-TR' }));
+    const modeller = [].concat(...turSay.map((t) => KT.modeller(t.id, ['debi', 'basinc'], kip, DIL)));
+    const turAd = {}; turSay.forEach((t) => { turAd[t.id] = D(t.ad, 'katalog.dal.' + t.id + '.en'); });
+    const gruplar = [
+      { id: 'tur', baslik: A('ds.urun-turu'), secenekler: KT.secenek(modeller, 'tur').map((o) => ({ ...o, ad: turAd[o.deger] || o.ad })) },
+      { id: 'marka', baslik: A('tx.e_marka'), secenekler: KT.secenek(modeller, 'marka') },
+      { id: 'motor', baslik: A('t.motor-3'), secenekler: KT.secenek(modeller, 'motor') }
+    ];
+    const liste = { baslik: A('t.tum-modeller-2'), modeller, gruplar, sutunlar: [A('ds.en-cok-debi'), A('ds.basinc')], serit: 'tur', secili: this.state.secili, onSecili: (s) => this.setState({ secili: s, sayfa: 1 }), sayfa: this.state.sayfa, onSayfa: (n) => this.setState({ sayfa: n }), sayfaBoyutu: 24, kip, onAc: (sku) => git('model', sku), seriGoster: true, mobil: mob, filtreDugmesi: mob, metin: M, dil: DIL, yerel: DIL === 'EN' ? 'en-GB' : 'tr-TR' };
+    return { ...base, rail, kapak, kartlar, liste };
+  }
+}</script>
+</body>
+</html>

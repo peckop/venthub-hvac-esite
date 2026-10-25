@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Nasıl teklif alınır" description="İş emri #20-4: S5 'Nasıl teklif alınır' birebir; konum SectionRail'de (§4); serif/mono → Onest; süreç cümlesi, süre/söz yok (§8). Satış kipinde 'Nasıl sipariş verilir'." -->
+<helmet><script src="./ds-base.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-nasil][data-mob="1"]{padding:0 18px 30px !important}[data-vh-nasil][data-mob="1"] h1{font-size:28px !important}</style></helmet>
+<div data-vh-nasil="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:22px;padding:0 40px 44px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<section data-screen-label="Nasıl teklif alınır" style="width:100%;max-width:1060px;min-width:0;margin:0 auto;display:flex;flex-direction:column;gap:22px">
+<h1 style="margin:0;font-family:var(--font-baslik);font-size:40px;font-weight:700;letter-spacing:-0.025em;line-height:1.15">{{ baslik }}</h1>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+<sc-for list="{{ adimlar }}" as="a" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:10px;padding:20px;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-top:2px solid hsl(var(--primary-navy));border-radius:16px"><span style="font-size:13px;font-weight:600;letter-spacing:0.12em;font-variant-numeric:tabular-nums;color:hsl(var(--brand-cyan-ink))">{{ a.no }}</span><h2 style="margin:0;font-family:var(--font-baslik);font-size:20px;font-weight:600">{{ a.ad }}</h2><p style="margin:0;font-size:17px;line-height:1.6;color:hsl(var(--text-body));text-wrap:pretty">{{ a.ne }}</p><div style="margin-top:auto"><x-import component-from-global-scope="DesignSystem_4f7164.CerceveliDugme" onClick="{{ a.ac }}" hint-size="auto,44px">{{ a.btn }} →</x-import></div></div></sc-for>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;700px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json'), null]).then(([a, b, c]) => { const m = { ...(a || {}), ...(b || {}) }; if (c) for (const k in c) if (k[0] !== '_' && m[k] == null) m[k] = c[k]; this.setState({ metin: m }); });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || this.state.metin || {}, git = P.onGit || (() => {}), SAT = P.kip === 'satis';
+    const A = (k) => (M[k] == null ? '\u27E6' + k + '\u27E7' : M[k]);
+    const baslik = SAT ? A('t.nasil-siparis-verilir') : A('t.nasil-teklif-alinir');
+    /* S5 adımları birebir (01 Seçin · 02 Listeye ekleyin · 03 Teklifi isteyin); satış kipinde sipariş adımları (ds.siparis-adim-*). */
+    const adimlar = SAT
+      ? [1, 2, 3].map((n) => ({ no: '0' + n, ad: A('ds.nasil-satis-' + n + '-ad'), ne: A('ds.siparis-adim-' + n), btn: A(['tx.e_urunler', 'tx.e_kategorilerN', 't.sepetim'][n - 1]), ac: () => git(['urunler', 'urunler', 'sepet'][n - 1]) }))
+      : [
+        { no: '01', ad: A('tx.hak1b'), ne: A('ds.nasil-1-ne'), btn: A('tx.e_urunler'), ac: () => git('urunler') },
+        { no: '02', ad: A('t.listeye-ekleyin'), ne: A('ds.nasil-2-ne'), btn: A('tx.e_kategorilerN'), ac: () => git('urunler') },
+        { no: '03', ad: A('ds.nasil-3-ad'), ne: A('ds.nasil-3-ne'), btn: A('js.Teklif listesi'), ac: () => git('teklif-listesi') }
+      ];
+    return { lang: DIL.toLowerCase(), mobA: mob ? '1' : '0', baslik, adimlar, rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }, { ad: baslik }] } };
+  }
+}
+</script>
+</body>
+</html>

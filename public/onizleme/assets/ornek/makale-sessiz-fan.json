@@ -1,0 +1,334 @@
+{
+ "id": "ses",
+ "kaynak": "https://venthub.com.tr/tr/bilgi-merkezi/sessiz-fan-nasil-secilir",
+ "ad": "Sessiz fan nasıl seçilir? dB(A), ses gücü ve kanal fanı seçimi",
+ "tarih": "17 Ekim 2026",
+ "okuma": "17 dakika okuma",
+ "kisa": "Sessiz fan seçimi, katalogdaki ses değerinin hangi koşulda verildiğini okumakla başlar: ses basıncı düzeyi ölçüm noktasındaki sesi, ses gücü düzeyi ses kaynağının yaydığı sesi anlatır [1]. Vortice'nin Lineo Quiet kanal fanında ses değeri ayar noktasına göre çok değişir: Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].",
+ "bolumlar": [
+  {
+   "id": "ne",
+   "ad": "Sessiz fan ne demek?",
+   "bloklar": [
+    {
+     "t": "p",
+     "x": "Vortice, LINEO QUIET ürünlerini ses emici kaplamayla tanımlar: kaplama dış gövdeye bütünleşiktir ve çevreye yayılan ses emisyonunu en aza indirmek için optimize edilmiştir [2]."
+    },
+    {
+     "t": "p",
+     "x": "Fan sesi dB(A) ile verilir. dB(A), insan işitme sisteminin en çok hassas olduğu orta ve yüksek frekanslara daha fazla ağırlık veren A-ağırlık şebekesiyle elde edilen tek sayılı bir ses düzeyi birimidir [1]."
+    },
+    {
+     "t": "p",
+     "x": "Dünya Sağlık Örgütü'nün 1999 tarihli topluluk gürültüsü rehberi, uyku bölünmesini önlemek için yatak odası iç mekân değerini sürekli gürültüde 30 dB LAeq, tek tek ses olaylarında 45 dB LAmax olarak verir [3]."
+    }
+   ]
+  },
+  {
+   "id": "lw-lp",
+   "ad": "Ses gücü ile ses basıncı arasındaki fark nedir?",
+   "bloklar": [
+    {
+     "t": "p",
+     "x": "Ses basıncı belirli bir noktadaki ses düzeyini, ses gücü kaynağın yaydığı sesi anlatır [1]. Vortice kataloğu iki büyüklüğü ayrı yayınlar: Lineo Quiet için ses gücünü Lw dB(A), ses basıncını Lp dB(A) olarak verir [2]."
+    },
+    {
+     "t": "p",
+     "x": "Katalogdaki 3 m mesafede hesaplanmış ses basıncı [2] ile oda içi LAeq,nT değeri [1] aynı koşulda verilmediği için doğrudan karşılaştırılmamalıdır."
+    }
+   ]
+  },
+  {
+   "id": "kosul",
+   "ad": "Vortice kataloğunda ses değeri hangi koşulda verilir?",
+   "bloklar": [
+    {
+     "t": "p",
+     "x": "Vortice kataloğu ses basıncını 3 m mesafede, serbest alanda hesaplanmış olarak verir; veriler 50 Hz besleme içindir [2]."
+    },
+    {
+     "t": "p",
+     "x": "Lineo Quiet modellerinde katalog sesi üç yol için ayrı verir: emiş, üfleme ve gövde yayını [2]. Bu yazıda her ses değeri koşuluyla yazılır: önce değer, sonra ayar noktası, yol ve mesafe [2]."
+    },
+    {
+     "t": "yol",
+     "baslik": "Üç ses yolu · Lineo 100 Quiet ES (17170)",
+     "ogeler": [
+      {
+       "id": "emis",
+       "ad": "Emiş",
+       "kat": "INTAKE",
+       "tanim": "Havanın çekildiği giriş ağzından kanala yayılan ses [2].",
+       "lp": [
+        20.2,
+        25.4,
+        35.9,
+        38.1
+       ]
+      },
+      {
+       "id": "govde",
+       "ad": "Gövde",
+       "kat": "BREAKOUT",
+       "tanim": "Fan gövdesinin dışından, fanın kurulduğu tavan boşluğuna yayılan ses [2].",
+       "lp": [
+        9.9,
+        15.9,
+        24.8,
+        30.9
+       ]
+      },
+      {
+       "id": "ufleme",
+       "ad": "Üfleme",
+       "kat": "SUPPLY",
+       "tanim": "Havanın basıldığı çıkış ağzından kanala ve menfeze taşınan ses [2].",
+       "lp": [
+        20.6,
+        26.1,
+        36.7,
+        40.7
+       ]
+      }
+     ],
+     "kademeler": [
+      "4 V",
+      "6 V",
+      "8 V",
+      "10 V"
+     ],
+     "olcum": "Ses basıncı Lp, 3 m serbest alan, katalog s. 12 [2]"
+    }
+   ]
+  },
+  {
+   "id": "belirler",
+   "ad": "Fanın sesini neler belirler?",
+   "bloklar": [
+    {
+     "t": "p",
+     "x": "Bir fanın ürettiği gürültü fan tipine, debiye ve basınca bağlıdır; fazla büyük seçilen fanlar yüksek hava akımı gürültüsü oluşturur [4]."
+    },
+    {
+     "t": "ayar",
+     "baslik": "Lineo 100 Quiet ES (17170) · ayar noktası",
+     "b": [
+      "Ayar noktası",
+      "Azami debi (m³/h)",
+      "Üfleme Lp (dB(A))",
+      "Gövde Lp (dB(A))"
+     ],
+     "s": [
+      [
+       "4 V",
+       "135",
+       "20,6",
+       "9,9"
+      ],
+      [
+       "6 V",
+       "175",
+       "26,1",
+       "15,9"
+      ],
+      [
+       "8 V",
+       "250",
+       "36,7",
+       "24,8"
+      ],
+      [
+       "10 V",
+       "300",
+       "40,7",
+       "30,9"
+      ]
+     ],
+     "etk": [
+      "Azami debi",
+      "Üfleme Lp",
+      "Gövde Lp"
+     ],
+     "birim": [
+      "m³/h",
+      "dB(A)",
+      "dB(A)"
+     ]
+    },
+    {
+     "t": "p",
+     "x": "Lineo 100 Quiet ES (17170), 3 m serbest alan [2]. Aynı modelin sesi ayar noktasına göre üfleme ve gövde yollarında yaklaşık 20 dB(A) değişir; sessizlik model seçimi kadar çalıştırılan ayara da bağlıdır [2]."
+    }
+   ]
+  },
+  {
+   "id": "kanal",
+   "ad": "Kanal fanında sessizlik nasıl sağlanır?",
+   "bloklar": [
+    {
+     "t": "ul",
+     "li": [
+      [
+       "Fan tipi ve yerleşim.",
+       "Gürültü emisyonu azaltılmış fan tipi seçilir; gürültüye çok hassas mekânların tavanında önlem alınmadan fan yerleştirilmez [1]."
+      ],
+      [
+       "Titreşim yalıtımı.",
+       "Zemin, boru ve kanal bağlantılarında titreşim yalıtımı ve esnek yastık kullanılır [1][4]."
+      ],
+      [
+       "Susturucu.",
+       "Kanal içi gürültü hesaplanır; sınır aşılırsa kanal içi ses yalıtımı yapılır [1]."
+      ],
+      [
+       "Hız ayarı.",
+       "ES sürümünde hız 0–10 V sinyaliyle, AC sürümünde hız seçici ya da ayarlayıcıyla ayarlanır [2]."
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sinir",
+   "ad": "Yatak odası, yaşam alanı ve ofiste ses sınırı kaç dB?",
+   "bloklar": [
+    {
+     "t": "cetvel",
+     "baslik": "İzin verilen en yüksek iç gürültü · mekân seçin",
+     "b": [
+      "Mekân",
+      "Zaman dilimi",
+      "C sınıfı",
+      "D sınıfı"
+     ],
+     "s": [
+      [
+       "Konut, yatak odası",
+       "Gece (23.00–07.00)",
+       "30 dB",
+       "34 dB"
+      ],
+      [
+       "Konut, yaşam alanı",
+       "24 saat",
+       "35 dB",
+       "39 dB"
+      ],
+      [
+       "Büro, özel oda",
+       "07.00–23.00",
+       "40 dB",
+       "44 dB"
+      ],
+      [
+       "Büro, toplantı odası",
+       "07.00–23.00",
+       "35 dB",
+       "39 dB"
+      ]
+     ],
+     "who": [
+      0
+     ]
+    },
+    {
+     "t": "p",
+     "x": "Sürekli gürültü için LAeq,nT; yeni binalarda en az C sınıfı sağlanır [1]. Bu değerler odada ölçülür; katalogdaki 3 m serbest alan değeriyle aynı koşulda verilmez [1][2]."
+    }
+   ]
+  },
+  {
+   "id": "kontrol",
+   "ad": "Sessiz fan seçerken kontrol listesi",
+   "bloklar": [
+    {
+     "t": "kl",
+     "li": [
+      [
+       "",
+       "Ses değerinin koşulunu okuyun: yol, ayar noktası ve mesafe [2]."
+      ],
+      [
+       "",
+       "Katalogdaki 3 m değerini oda içi hedefle doğrudan karşılaştırmayın [1][2]."
+      ],
+      [
+       "",
+       "Fanın sürekli çalışacağı ayarın satırını okuyun [2]."
+      ],
+      [
+       "",
+       "Gereğinden büyük fan seçmeyin [4]."
+      ],
+      [
+       "",
+       "Fanı ve kanal bağlantılarını titreşim yalıtımıyla kurun [1][4]."
+      ],
+      [
+       "",
+       "Kanal içi ses yalıtımı ihtiyacını ses hesabıyla belirleyin [1]."
+      ],
+      [
+       "",
+       "Hız kumandasını baştan planlayın [2]."
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "sss": [
+  {
+   "q": "En sessiz fan hangisidir?",
+   "a": "Tek bir fan “en sessiz” diye gösterilemez; ses değeri model, ayar noktası, yol ve mesafe koşuluyla verilir [1][2]. Lineo Quiet ailesinde katalogdaki en düşük gövde değeri 9,9 dB(A) · 4 V · gövde, 3 m'dir (Lineo 100 Quiet ES) [2]."
+  },
+  {
+   "q": "Katalogdaki ses değeri neden odada duyulandan farklı olabilir?",
+   "a": "Katalog ses basıncını 3 m mesafede, serbest alanda hesaplanmış olarak verir [2]; Yönetmeliğin hedefi odada ölçülen LAeq,nT değeridir [1]."
+  },
+  {
+   "q": "Devri düşürünce fan sessizleşir mi?",
+   "a": "Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken üfleme Lp 40,7'den 20,6 dB(A)'ya, gövde 30,9'dan 9,9 dB(A)'ya düşer; azami debi 300'den 135 m³/h'e iner [2]."
+  },
+  {
+   "q": "Kanal fanında susturucu gerekir mi?",
+   "a": "Sistemin ses hesabına bağlıdır; sınır aşılırsa kanal içi ses yalıtımı yapılır [1]."
+  }
+ ],
+ "kaynaklar": [
+  "T.C. Resmî Gazete, 31.05.2017, Sayı 30082, Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik, EK-5 Tablo 5.1, EK-8.",
+  "Vortice, LINEO Range kataloğu, Cod. 5.170.084.547 – Mayıs 2026 (üretici belgesi).",
+  "Dünya Sağlık Örgütü (WHO), Guidelines for Community Noise, 1999, bölüm 4.3.",
+  "U.S. Department of Energy, AMCA International, Improving Fan System Performance, 2003."
+ ],
+ "not": "Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Katalogdaki ses basıncı değerleri 3 m mesafede, serbest alanda hesaplanmıştır; odanızdaki ses düzeyi montaja, kanal sistemine ve mekânın akustiğine göre farklı çıkabilir.",
+ "ilgili": [
+  "vortice-lineo-quiet",
+  "vortice-lineo"
+ ],
+ "vurgu": {
+  "deger": "9,9 → 30,9 dB(A)",
+  "not": "Lineo 100 Quiet ES · gövde yayını · 3 m · ayar 4 V → 10 V [2]"
+ },
+ "sorular": [
+  {
+   "no": "01",
+   "q": "Hangi yol?",
+   "a": "Emiş, üfleme, gövde",
+   "hedef": "kosul"
+  },
+  {
+   "no": "02",
+   "q": "Hangi ayar?",
+   "a": "4 V ile 10 V arası",
+   "hedef": "belirler"
+  },
+  {
+   "no": "03",
+   "q": "Hangi mesafe?",
+   "a": "3 m, serbest alan",
+   "hedef": "kosul"
+  }
+ ],
+ "sorularB": "“Kaç dB?” sorusu üç soruyla birlikte cevaplanır"
+}

@@ -1,0 +1,19 @@
+<!-- @dsCard group="Bileşen" viewport="1000x720" name="FeatureSlot" subtitle="Öne çıkan değer yuvası · kutusuz, kapak zemininde · ses (SoundCard) · genişlik (WidthCard) · mobil kompakt · görsel varyant (motor tipi)" -->
+<!DOCTYPE html><html lang="tr"><head>
+<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><title>FeatureSlot</title><link rel="stylesheet" href="../../styles.css"><script src="/onizleme/_vendor/react.production.min.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script><script src="/onizleme/_vendor/react-dom.production.min.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script><script src="/onizleme/_vendor/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script><script src="../../_ds_bundle.js"></script><style>html,body{margin:0}body{background:var(--foto-sahne-zemin);font-family:var(--font-sans);color:hsl(var(--text-strong));padding:20px;-webkit-font-smoothing:antialiased}a{color:hsl(var(--primary-navy))}a:hover{color:hsl(var(--text-strong))}.e{font-size:var(--size-overline);font-weight:600;letter-spacing:var(--track-overline);text-transform:uppercase;color:hsl(var(--text-body));margin-bottom:9px}</style></head><body><div id="kok"></div><script type="text/babel">
+const NS = window.DesignSystem_4f7164;
+const B = 'https://tnofewwkwlyjsqgwjjga.supabase.co/storage/v1/object/public/product-images/d3b07384-d113-495f-a558-8c38634e0000/';
+const LOGO = '../../assets/marka-logolari/vortice-yatay.png';
+const { FeatureSlot } = NS;
+function Prova() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-start' }}>
+      <FeatureSlot genislik="460px" deger="27,4" birim="dB(A)" etiket="katalog ses seviyesi, 3 m" olcek={{ min: 20, max: 60, etiketler: ['20', '30', '40', '50', '60 dB(A)'] }} isaret={{ tur: 'nokta', deger: 27.4 }} />
+      <FeatureSlot genislik="460px" deger="900" birim="mm" etiket="perde genişliği" olcek={{ min: 0, max: 2000, etiketler: ['0', '500', '1000', '1500', '2000 mm'] }} isaret={{ tur: 'bolum', bas: 0, son: 900 }} not="Kapı genişliğinize eşit ya da daha geniş perde seçin." />
+      <FeatureSlot genislik="940px" baslik="Motor tipini görselden tanıyın" gorseller={[{ src: '../../assets/ornek/lineo-quiet-ac.png', alt: 'Lineo Quiet, AC motor', isaret: { x: 66, y: 46 }, etiket: 'AC · kırmızı pervane halkası', aciklama: 'Lineo Quiet AC modellerinde pervane halkası kırmızı (s.5).' }, { src: '../../assets/ornek/lineo-quiet-es-ec.png', alt: 'Lineo Quiet ES, EC motor', isaret: { x: 66, y: 46 }, etiket: 'EC · yeşil pervane halkası', aciklama: 'ES sürümlerde pervane halkası yeşil (s.10).' }]} atif="Kaynak: Vortice LINEO kataloğu, Mayıs 2026, s.5, 10 · üretici beyanı" />
+      <FeatureSlot kompakt genislik="354px" deger="27,4" birim="dB(A)" etiket="katalog ses seviyesi, 3 m" olcek={{ min: 20, max: 60 }} isaret={{ tur: 'nokta', deger: 27.4 }} />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('kok')).render(<Prova />);
+</script></body></html>

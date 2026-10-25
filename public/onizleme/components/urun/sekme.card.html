@@ -1,0 +1,20 @@
+<!-- @dsCard group="Bileşen" viewport="1120x420" name="TabbedPanel" subtitle="Ürün sayfası altı · tek beyaz kart, sekmeler, tek bölüm görünür · mobilde açılır satırlar" -->
+<!DOCTYPE html><html lang="tr"><head>
+<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><title>TabbedPanel</title><link rel="stylesheet" href="../../styles.css"><script src="/onizleme/_vendor/react.production.min.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script><script src="/onizleme/_vendor/react-dom.production.min.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script><script src="/onizleme/_vendor/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script><script src="../../_ds_bundle.js"></script><script src="../../templates/_kart/kart-metin.js"></script><style>html,body{margin:0}body{background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));padding:20px;-webkit-font-smoothing:antialiased}a{color:hsl(var(--primary-navy))}a:hover{color:hsl(var(--text-strong))}.e{font-size:var(--size-overline);font-weight:600;letter-spacing:var(--track-overline);text-transform:uppercase;color:hsl(var(--text-body));margin-bottom:9px}</style></head><body><div id="kok"></div><script type="text/babel">
+const NS = window.DesignSystem_4f7164;
+const B = 'https://tnofewwkwlyjsqgwjjga.supabase.co/storage/v1/object/public/product-images/d3b07384-d113-495f-a558-8c38634e0000/';
+const LOGO = '../../assets/marka-logolari/vortice-yatay.png';
+const { TabbedPanel } = NS;
+const satir = (a, b) => <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid hsl(var(--border-row))', fontSize: '15px' }}><span>{a}</span><b>{b}</b></div>;
+const teknik = <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', columnGap: '56px' }}>{satir(A('t.cap'), 'Ø100 mm')}{satir(K('teknik.besleme'), K('teknik.besleme-v'))}{satir(K('teknik.debi-max'), '300 m³/h · 83,33 l/s')}{satir(K('teknik.guc-akim'), '23 W · 0,26 A')}{satir(K('teknik.basinc-max'), '243,2 Pa')}{satir(K('teknik.koruma'), K('teknik.koruma-v'))}</div>;
+const B4 = [{ id: 'teknik', baslik: K('sekme.teknik'), icerik: teknik }, { id: 'performans', baslik: K('sekme.performans'), icerik: <span>{K('sekme.performans-i')}</span> }, { id: 'hakkinda', baslik: K('sekme.hakkinda'), icerik: <span>{K('sekme.hakkinda-i')}</span> }, { id: 'belgeler', baslik: K('sekme.belgeler'), icerik: <span>{K('sekme.belgeler-i')}</span> }];
+function Prova() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 354px', gap: '20px', alignItems: 'start' }}>
+      <TabbedPanel metin={window.METIN} bolumler={B4} />
+      <TabbedPanel metin={window.METIN} mobil bolumler={B4} />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('kok')).render(<Prova />);
+</script></body></html>

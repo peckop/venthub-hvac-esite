@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Ürünler (ürün haritası)" description="Ürünler sayfası (iş emri #6 madde 3): SectionRail yalnız konum → başlık + n model → mobilde arama (SearchBox) → ürün haritası (UrunHaritasi). Veri ve metin props ile." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}</style></helmet>
+<sc-if value="{{ masa }}" hint-placeholder-val="{{ true }}"><div data-vh-urunler="" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:20px;padding:0 40px 60px;background:hsl(var(--surface-page));font-family:var(--font-sans)">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,48px"></x-import>
+<div style="display:flex;flex-direction:column;gap:5px">
+<h1 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:44px;line-height:1.02;letter-spacing:-0.02em;color:hsl(var(--text-strong))">{{ baslik }}</h1>
+<span style="font-family:var(--font-sans);font-size:15px;font-variant-numeric:tabular-nums;color:hsl(var(--text-muted))">{{ altSatir }}</span>
+</div>
+<x-import component-from-global-scope="DesignSystem_4f7164.UrunHaritasi" dc-props="{{ harita }}" hint-size="100%,900px"></x-import>
+</div></sc-if>
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><div data-vh-urunler="" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:20px;padding:0 18px 40px;background:hsl(var(--surface-page));font-family:var(--font-sans)">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,48px"></x-import>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;gap:5px">
+<h1 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:34px;line-height:1.02;letter-spacing:-0.02em;color:hsl(var(--text-strong))">{{ baslik }}</h1>
+<span style="font-family:var(--font-sans);font-size:15px;font-variant-numeric:tabular-nums;color:hsl(var(--text-muted))">{{ altSatir }}</span>
+</div>
+<div style="width:100%;min-width:0"><x-import component-from-global-scope="DesignSystem_4f7164.SearchBox" dc-props="{{ arama }}" hint-size="100%,44px"></x-import></div>
+</div>
+<x-import component-from-global-scope="DesignSystem_4f7164.UrunHaritasi" dc-props="{{ harita }}" hint-size="100%,900px"></x-import>
+</div></sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;1100px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;veri&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;{ gruplar: object[] }&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: 'grup' | 'tur' | 'seri', id: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { q: '', acik: false, metin: null, veri: null, dil: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    Promise.all([this.props.metin ? null : Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json')]).then(([a, b]) => ({ ...a, ...b })), this.props.metin ? null : null]).then(([s, ek]) => {
+      const m = s ? { ...s } : null; if (m && ek) for (const k in ek) if (k !== '_damga' && !(k in m) && ek[k] != null) m[k] = ek[k];
+      this.setState({ metin: m });
+    });
+  }
+  componentDidMount() { this.yukle(); try { const l = JSON.parse(localStorage.getItem('vh-son-gez') || '[]'); if (Array.isArray(l)) this.setState({ sonGez: l }); } catch (e) {} fetch('../../assets/veri/arama-sayfa.json').then((r) => (r.ok ? r.json() : null)).then((x) => this.setState({ sayfa: x })).catch(() => {}); fetch('../../assets/veri/arama-es-anlam.json').then((r) => (r.ok ? r.json() : null)).then((x) => this.setState({ esAnlam: x })).catch(() => {}); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, M = P.metin || this.state.metin || {}, V = P.veri || (window.VHKatalog ? { gruplar: window.VHKatalog.gruplar(P.dil || 'TR') } : null) /* ad ve sayılar yalnız katalogdan */, git = P.onGit || (() => {});
+    const A = (k, v) => { let s = M[k]; if (s == null) return '\u27E6' + k + '\u27E7'; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+    const yerel = (P.dil || 'TR').toUpperCase() === 'EN' ? 'en-GB' : 'tr-TR';
+    const nModel = (n) => A('ds.n-model', { n: Number(n || 0).toLocaleString(yerel) });
+    const D = (s, yol) => (s == null ? '\u27E6' + yol + '\u27E7' : s);
+    const base = { lang: (P.dil || 'TR').toLowerCase(), mob, masa: !mob, baslik: A('tx.e_urunler') };
+    if (!V || !V.gruplar) return { ...base, altSatir: '', rail: { bolumler: [] }, arama: {}, harita: { gruplar: [] } };
+    const ac = (tip, id) => (e) => { e.preventDefault(); git(tip, id); };
+    const G = V.gruplar.map((g, i) => ({ id: g.id, ad: D(g.ad, 'katalog.kok.' + g.id + '.en'), kisa: g.kisa, model: g.model, foto: g.foto, href: g.href || '#', onClick: ac('grup', g.id),
+      turler: (g.turler || []).map((t, j) => { const sr = (t.seri || []).filter((s) => s.modelSayisi > 0); const tek = sr.length === 1; return { id: t.id, ad: D(t.ad, 'katalog.dal.' + t.id + '.en'), model: t.model, seri: t.seri, href: t.href || '#', onClick: tek ? ac('seri', sr[0].slug) : ac('tur', t.id) }; }) }));
+    const top = G.reduce((a, g) => a + (g.model || 0), 0);
+    /* #16: eşleştirme VHKatalog.ara'da (tek yer); burada yalnız satır biçimi. */
+    const KT = window.VHKatalog, R = KT && KT.ara ? KT.ara(this.state.qAra ?? this.state.q ?? '', P.dil || 'TR', this.state.sayfa, this.state.esAnlam) : null, kt = KT ? KT.katalog() : null;
+    const satT = (t) => ({ ad: t.ad, alt: (t.grup ? t.grup + ' · ' : '') + nModel(t.model), foto: t.foto, onClick: ac('tur', t.id + (t.parca || '')) }); /* #16 E-2/3: süzgeç # parçası */
+    const satS = (s) => ({ ad: s.konumAd || s.ad, alt: (s.tur ? s.tur + ' · ' : '') + nModel(s.model != null ? s.model : s.modelSayisi), foto: s.foto, onClick: ac('seri', s.slug) });
+    const sonuc = !R || R.dogrudan ? [] /* #16 B-2: doğrudan git varken öteki gruplar yok */ : [
+      { seviye: 'urun-grubu', ad: A('t.urun-gruplari-2'), sonuclar: R.grup.map((g) => ({ ad: g.ad, alt: nModel(g.model), foto: g.foto, onClick: ac('grup', g.id) })), sinir: 2 },
+      { seviye: 'urun-turu', ad: A('ds.urun-turleri'), sonuclar: R.tur.map(satT), sinir: 3 },
+      { seviye: 'model', ad: A('t.modeller'), sonuclar: R.model.map((m, i) => ({ ad: m.ad, alt: m.sku + (m.seri ? ' · ' + m.seri : ''), foto: m.foto, vurgu: R.rakam && i === 0, onClick: ac('urun', m.sku) })), sinir: 4 },
+      { seviye: 'seri', ad: A('t.seriler'), sonuclar: R.seri.map(satS), sinir: 3 },
+      { seviye: 'urun-grubu', ad: A('ds.arama-sayfalar'), sonuclar: R.sayfa.map((x) => ({ ad: A(x.anahtar), onClick: ac('sayfa', x.id) })), sinir: 4 }
+    ].filter((x) => x.sonuclar.length);
+    if (R && R.marka && R.marka.length && !R.dogrudan) sonuc.unshift({ seviye: 'urun-grubu', ad: A('t.markalar'), sonuclar: R.marka.map((m) => ({ ad: m.ad, foto: '../../assets/marka-logolari/' + m.logo, href: '#', onClick: ac('marka', m.id) })), sinir: 3 }); /* #16 Durum-3: /tr/markalar/<marka> */
+    const bunuMu = R && R.bunuMu ? { metin: A('ds.arama-bunu-mu', { ad: R.bunuMu.ad }), onClick: () => this.setState({ q: R.bunuMu.q, qAra: R.bunuMu.q, acik: true }) } : undefined;
+    const uyari = R && R.gevsek ? A('ds.arama-gevsek', { q: R.gevsek.q, q2: R.gevsek.q2 }) : undefined;
+    const dogrudan = R && R.dogrudan ? { ...satT(R.dogrudan), seriler: R.dogrudan.seriler.map((s) => satS({ ...s, tur: R.dogrudan.ad })) } : undefined;
+    const son = kt ? (this.state.sonGez || []).filter((x) => kt.urun[x]).slice(0, 3).map((sku) => { const u = kt.urun[sku], g = Array.isArray(u.g) ? u.g[0] : u.g; return { ad: ((P.dil || 'TR').toUpperCase() === 'EN' ? u.e : u.a) || u.a, alt: sku, foto: g ? KT.foto(g) : null, onClick: ac('urun', sku) }; }) : [];
+    const bos = { gruplar: G.map((g) => ({ ad: g.kisa || g.ad, onClick: g.onClick })), onTeklif: ac('teklif') };
+    return {
+      ...base,
+      altSatir: nModel(top),
+      rail: { konum: A('tx.e_anasayfa') + ' › ' + A('tx.e_urunler'), bolumler: [], geri: { ad: A('tx.e_anasayfa'), href: '#' }, sayfaAdi: A('tx.e_urunler'), yapiskan: false, mobil: mob, metin: M, style: { padding: mob ? '8px 0' : '10px 0', margin: 0, borderBottom: 0 } },
+      arama: { deger: this.state.q, onDeger: (v) => { this.setState({ q: v, acik: true }); clearTimeout(this._zm); this._zm = setTimeout(() => this.setState({ qAra: v }), 30); } /* #16 F-4: 30 ms */, acik: this.state.acik, onAcik: (a) => this.setState({ acik: a }), gruplar: sonuc, dogrudan, sonBakilan: son, bos, bunuMu, uyari, yerTutucu: A('tx.aramaIpucu'), mobil: false, dil: (P.dil || 'TR').toUpperCase(), metin: { ...M, 'ds.arama-ph': A('tx.aramaIpucu') } },
+      harita: { gruplar: G, mobil: mob, metin: M, yerel }
+    };
+  }
+}
+</script>
+</body>
+</html>

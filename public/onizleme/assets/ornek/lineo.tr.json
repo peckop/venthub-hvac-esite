@@ -1,0 +1,167 @@
+{
+ "_damga": "Lineo ürün ailesi kart örnek verisi (TR). Kaynak: İçerik projesi 7ac1dcef lineo-sayfa/icerik.js (yalnız okundu) · Vortice LINEO kataloğu, Mayıs 2026 (193047). Parça dosyalarında metin yok (ds-kural-metin 10-24).",
+ "kaynak": "Kaynak: Vortice LINEO kataloğu, Mayıs 2026 (193047)",
+ "aile": {
+  "ad": "Lineo",
+  "marka": "Vortice"
+ },
+ "seriler": {
+  "lineo": {
+   "ad": "Lineo"
+  },
+  "lineo-quiet": {
+   "ad": "Lineo Quiet"
+  },
+  "lineo-quiet-es": {
+   "ad": "Lineo Quiet ES"
+  }
+ },
+ "ozet": {
+  "lineo": {
+   "metin": "Ses emici kabuk taşımayan, kısa ve hafif gövdeli seri. Ø100–150 iki, Ø200–315 üç hızlı; hız DUO ya da TRIO-LINEO 503 seçiciyle veya elektronik ayarlayıcıyla seçilir (s.28, 37).",
+   "sinir": "Sesin önemli olduğu hatta Quiet daha uygun: Ø200, en yüksek hızda gövde ses basıncı Lineo’da 46,9, Quiet’te 35,5 dB(A) (3 m). Kanallı kurulumda koruma Ø100–150 IP44, Ø200–315 IPX5 (s.28)."
+  },
+  "lineo-quiet": {
+   "metin": "Dış gövdede bütünleşik ses emici kaplama vardır; Vortice’e göre amaç çevreye yayılan sesi azaltmak (s.6). AC motorlu modellerde pervane halkası kırmızı. T sürümünde zamanlayıcı fanı en yüksek hızda çalıştırır, süre 3–20 dk ayarlanır (s.5, 18).",
+   "sinir": "Kaplama gövdeyi uzatır ve ağırlaştırır: Ø100’de Quiet ES 639 mm ve 3,8 kg, Lineo ES 303 mm ve 2,3 kg (s.12–13, 34–35). Yer dar ve ses ikincilse Lineo yeterli."
+  },
+  "lineo-quiet-es": {
+   "metin": "EC motorlu sürümde pervane halkası yeşil. Tabloda 4, 6, 8 ve 10 V kademeleri verilir; hız kurulumda ayarlanır ya da 0–10 V sinyaliyle sürülür (s.10, 12). Aynı çapta AC’den az güç çeker: Ø150, 10 V’ta 31 W, AC en yüksek hızda 50 W.",
+   "sinir": "Zamanlayıcılı T sürümü yalnız AC motorda (Ø100–Ø200) var. Hızın seçici ya da sensörle ayarlandığı basit kurulumda AC sürüm yeterli."
+  }
+ },
+ "kesit": {
+  "gorsel": "lineo-quiet-yapi-kesit.png",
+  "alt": "Lineo Quiet kesit görseli",
+  "isaretler": [
+   {
+    "x": 62,
+    "y": 50,
+    "ad": "Merkezi motor yuvası",
+    "aciklama": "Motor ile pervaneyi çevreler; elektrik bağlantısı gövdenin dışında, fan açılmadan yapılır (s.5)."
+   },
+   {
+    "x": 30,
+    "y": 16,
+    "ad": "Dönen ana gövde",
+    "aciklama": "Gövde kendi ekseninde döner; dar yerde kablo girişi ulaşılır yöne çevrilir (s.5)."
+   },
+   {
+    "x": 9,
+    "y": 46,
+    "ad": "Boruya dokunmadan söküm",
+    "aciklama": "Fan çevredeki boruyu sökmeden çıkar; motora ve pervaneye erişim kolaylaşır (s.4–5)."
+   },
+   {
+    "x": 53,
+    "y": 34,
+    "ad": "Akış doğrultucular",
+    "aciklama": "Basma tarafında pervaneyle birlikte çalışır; Vortice’e göre girdabı azaltır, verimi artırır, sesi düşürür (s.5)."
+   },
+   {
+    "x": 40,
+    "y": 56,
+    "ad": "Karışık akışlı pervane",
+    "aciklama": "Helisel fanın debisini santrifüj fanın basıncıyla birleştirir; motora doğrudan akuple, bilyalı yataklı (s.5)."
+   },
+   {
+    "x": 84,
+    "y": 22,
+    "ad": "Teknopolimer gövde",
+    "aciklama": "Vortice’e göre EN ISO 11925-2:2010’a göre E2 yangın sınıfında; koruma sınıfı yalnız doğru kurulumda geçerli (s.5, 28)."
+   }
+  ]
+ },
+ "motorTipi": {
+  "baslik": "Motor tipini görselden tanıyın",
+  "atif": "Kaynak: Vortice LINEO kataloğu, Mayıs 2026 (193047), s.5, 10 · üretici beyanı",
+  "gorseller": [
+   {
+    "src": "lineo-quiet-ac.png",
+    "alt": "Lineo Quiet, AC motor",
+    "isaret": {
+     "x": 66,
+     "y": 46
+    },
+    "etiket": "AC · kırmızı pervane halkası",
+    "aciklama": "Lineo Quiet AC modellerinde pervane halkası kırmızı (s.5)."
+   },
+   {
+    "src": "lineo-quiet-es-ec.png",
+    "alt": "Lineo Quiet ES, EC motor",
+    "isaret": {
+     "x": 66,
+     "y": 46
+    },
+    "etiket": "EC · yeşil pervane halkası",
+    "aciklama": "ES (EC motorlu) sürümlerde pervane halkası yeşil (s.10)."
+   }
+  ]
+ },
+ "sss": [
+  {
+   "soru": "Lineo ile Lineo Quiet farkı nedir?",
+   "cevap": "Lineo’da ses emici kabuk yok; gövde daha kısa ve hafif. Ø200, en yüksek hızda gövde ses basıncı Lineo’da 46,9, Quiet’te 35,5 dB(A) (3 m)."
+  },
+  {
+   "soru": "Kaç hız var, nasıl seçilir?",
+   "cevap": "Lineo 100–150 iki, 200–315 üç hızlı. Seçim DUO, TRIO-LINEO 503 ya da elektronik ayarlayıcıyla; ES modellerinde 0–10 V sinyali ya da POT potansiyometre."
+  },
+  {
+   "soru": "Quiet’te EC (ES) mi AC mi?",
+   "cevap": "ES 4·6·8·10 V kademeleri ve 0–10 V ayarıyla gelir, aynı çapta daha az güç çeker (Ø150: 31 W; AC en yüksek hızda 50 W). Seçici ya da sensörlü basit kurulumda AC yeterli."
+  },
+  {
+   "soru": "Nasıl kurulur, bakım nasıl yapılır?",
+   "cevap": "Kanalda yatay ya da dikey kurulur. Gövde ekseninde döner; fan boruya dokunmadan sökülür, motor ve pervaneye erişilir (s.4–5)."
+  },
+  {
+   "soru": "Zamanlayıcılı (T) model ne yapar?",
+   "cevap": "Zamanlayıcı fanı en yüksek hızda çalıştırır; süre kurulumda 3–20 dk. T yalnız AC motorda, Ø100–Ø200 (s.5, 18)."
+  },
+  {
+   "soru": "Belgeleri nelerdir?",
+   "cevap": "Vortice kataloğuna göre CE işaretli; güvenlik ve EMC uyumu IMQ belgeli. Katalog ErP 327/2011/EU’ya atıf yapar (s.3–4)."
+  }
+ ],
+ "sesNot": "Katalog değeri: ses basıncı, emiş, 3 m.",
+ "teknikOzet": "Çap Ø{cap} mm · Debi {debi} m³/h · Basınç {basinc} Pa",
+ "katalog": {
+  "baslik": "Lineo · katalog",
+  "toplam": 40,
+  "sayfa": {
+   "lineo": [
+    28,
+    30
+   ],
+   "lineo-quiet": [
+    18,
+    21
+   ],
+   "lineo-quiet-es": [
+    12,
+    15
+   ]
+  },
+  "giris": {
+   "no": 4,
+   "baslik": "Hat içi karışık akışlı kanal fanları",
+   "metin": [
+    "LINEO yuvarlak kanala seri bağlanır. Karışık akışlı pervane aksiyel fanın yüksek debisini santrifüj fanın yüksek basıncıyla birleştirir (s.5).",
+    "Katalog üç seri sunar: sade gövdeli Lineo, ses emici kaplamalı Lineo Quiet ve EC motorlu ES sürümleri."
+   ],
+   "kaynakSayfa": "s.4–5"
+  },
+  "tabloBaslik": "{seri} · teknik tablo",
+  "tabloMetin": "Serideki {n} modelin katalog değerleri. Ses basıncı emiş tarafında, 3 m mesafede.",
+  "sutunlar": [
+   "Model",
+   "Kod",
+   "Debi m³/h",
+   "Basınç Pa",
+   "Ses dB(A)"
+  ],
+  "egriBaslik": "{seri} · performans eğrileri",
+  "egriMetin": "Eğriler katalogdaki ölçümlerden; sitedeki ürün seçimi aynı noktaları kullanır."
+ }
+}

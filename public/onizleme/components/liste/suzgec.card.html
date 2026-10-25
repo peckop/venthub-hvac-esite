@@ -1,0 +1,33 @@
+<!-- @dsCard group="Bileşen" viewport="700x700" name="CategoryFilters" subtitle="S5 süzgeç paneli · arama, kategori ağacı, marka/çap/debi/motor çipleri · debi dağılım sütunları" -->
+<!DOCTYPE html><html lang="tr"><head>
+<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><title>CategoryFilters</title><link rel="stylesheet" href="../../styles.css"><script src="/onizleme/_vendor/react.production.min.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script><script src="/onizleme/_vendor/react-dom.production.min.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script><script src="/onizleme/_vendor/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script><script src="../../_ds_bundle.js"></script><script src="../../templates/_kart/kart-metin.js"></script><style>html,body{margin:0}body{background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));padding:20px;-webkit-font-smoothing:antialiased}a{color:hsl(var(--primary-navy))}a:hover{color:hsl(var(--text-strong))}.e{font-size:var(--size-overline);font-weight:600;letter-spacing:var(--track-overline);text-transform:uppercase;color:hsl(var(--text-body));margin-bottom:9px}</style></head><body><div id="kok"></div><script type="text/babel">
+const NS = window.DesignSystem_4f7164;
+const KT = window.VHKatalog, DL = window.KART_DIL, GAD = (id) => (KT.grup(id, DL) || {}).ad ?? '⟦katalog.kok.' + id + '⟧', KAD = (id) => (KT.tur(id, DL) || {}).ad ?? '⟦katalog.dal.' + id + '⟧', SAD = (f) => (KT.seri(f, DL) || {}).ad ?? '⟦katalog.aile.' + f + '⟧'; /* ürün adları yalnız katalogdan */
+const { CategoryFilters } = NS;
+const agac = [
+  { ad: 'Fanlar', n: 357, acik: true },
+  { ad: KAD('duct-fans'), n: 43, seviye: 1, secili: true },
+  { ad: KAD('bathroom-toilet-fans'), n: 61, seviye: 1 },
+  { ad: KAD('centrifugal-fans'), n: 38, seviye: 1 },
+  { ad: GAD('igk'), n: 52 },
+  { ad: GAD('perde'), n: 24 }
+];
+const gruplar = [
+  { id: 'marka', baslik: 'Marka', secenekler: [{ deger: 'vortice', ad: 'Vortice', n: 28 }, { deger: 'seat', ad: 'SEAT', n: 9 }, { deger: 'avens', ad: 'AVenS', n: 6 }] },
+  { id: 'cap', baslik: A('t.cap'), secenekler: [{ deger: '100', ad: 'Ø100', n: 12 }, { deger: '125', ad: 'Ø125', n: 10 }, { deger: '160', ad: 'Ø160', n: 8 }, { deger: '315', ad: 'Ø315', n: 0 }] },
+  { id: 'debi', baslik: 'Debi (m³/h)', dagilim: true, secenekler: [['0-100', 4], ['100-200', 11], ['200-300', 9], ['300-400', 7], ['400-600', 6], ['600-900', 3], ['900+', 1]].map(([d, n]) => ({ deger: d, ad: d, n })) },
+  { id: 'motor', baslik: 'Motor', secenekler: [{ deger: 'AC', ad: 'AC', n: 31 }, { deger: 'EC', ad: 'EC', n: 12 }] }
+];
+function Prova() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '300px minmax(0,1fr)', gap: '20px', alignItems: 'start' }}>
+      <CategoryFilters metin={window.METIN} agac={agac} gruplar={gruplar} secili={undefined} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="e">Mobil tetik</div>
+        <CategoryFilters metin={window.METIN} mobil agac={agac} gruplar={gruplar} gorunurSayi={43} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('kok')).render(<Prova />);
+</script></body></html>

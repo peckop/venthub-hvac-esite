@@ -1,0 +1,27 @@
+<!-- @dsCard group="Bileşen" viewport="700x390" name="Çip, rozet ve kart" subtitle="Oval çip, seçili dolu petrol + ✓ · rozet üç sınıf · 16 px kart, üstüne gelince gölge" -->
+<!DOCTYPE html><html lang="tr"><head>
+<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><title>Çip ve kart</title><link rel="stylesheet" href="../../styles.css"><script src="/onizleme/_vendor/react.production.min.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script><script src="/onizleme/_vendor/react-dom.production.min.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script><script src="/onizleme/_vendor/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script><script src="../../_ds_bundle.js"></script><script src="../../templates/_kart/kart-metin.js"></script><style>html,body{margin:0}body{background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));padding:20px;-webkit-font-smoothing:antialiased}a{color:hsl(var(--primary-navy))}a:hover{color:hsl(var(--text-strong))}.e{font-size:var(--size-overline);font-weight:600;letter-spacing:var(--track-overline);text-transform:uppercase;color:hsl(var(--text-body));margin-bottom:9px}</style></head><body><div id="kok"></div><script type="text/babel">
+const NS = window.DesignSystem_4f7164;
+const { Cip, Kart, Rozet } = NS;
+function Prova() {
+  const [s, setS] = React.useState(['Kanal tipi']);
+  const t = (k) => setS((a) => a.includes(k) ? a.filter((x) => x !== k) : a.concat(k));
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        {['Kanal tipi', 'Çatı tipi', 'Duvar tipi', 'Aksiyel'].map((k) => <Cip key={k} secili={s.includes(k)} onClick={() => t(k)}>{k}</Cip>)}
+        <Cip disabled>ATEX</Cip>
+      </div>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <Rozet dil={window.KART_DIL}>IP54</Rozet><Rozet dil={window.KART_DIL}>ErP</Rozet><Rozet dil={window.KART_DIL} sinif="hukum">Önerilen</Rozet><Rozet dil={window.KART_DIL} sinif="soluk">Arşiv</Rozet>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: '14px', alignItems: 'start' }}>
+        <Kart href="#" onClick={(e) => e.preventDefault()} marka="Vortice" baslik="Lineo 100 Q" ozet="175 m³/h · 34 dB(A)" />
+        <Kart href="#" onClick={(e) => e.preventDefault()} marka="AVenS" baslik="AKF 315 M" ozet="2 400 m³/h · 400 Pa" />
+        <Kart><div style={{ fontFamily: 'var(--font-baslik)', fontWeight: 700, fontSize: '17px' }}>Genel kart</div><div style={{ fontSize: 'var(--size-body-small)', color: 'hsl(var(--text-body))', lineHeight: 1.5 }}>16 px köşe, 1 px kenar, 20 px dolgu.</div></Kart>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('kok')).render(<Prova />);
+</script></body></html>

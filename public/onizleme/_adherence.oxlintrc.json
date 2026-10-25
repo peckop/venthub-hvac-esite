@@ -1,0 +1,680 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "brand/**",
+              "components/aile/**",
+              "components/anasayfa/**",
+              "components/dugme/**",
+              "components/form/**",
+              "components/foto/**",
+              "components/gezinti/**",
+              "components/hiyerarsi/**",
+              "components/icerik/**",
+              "components/kabuk/**",
+              "components/kapak/**",
+              "components/liste/**",
+              "components/urun/**",
+              "components/veri/**",
+              "components/yuzey/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Onest|Schibsted Grotesk|Archivo))/i]",
+        "message": "Font not provided by the design system. Available: Onest, Schibsted Grotesk, Archivo."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='AdetKontrolu'] > JSXAttribute > JSXIdentifier[name!=/^(?:deger|varsayilan|min|max|adim|onDegisim|etiket|style|key|ref|className|style|children)$/]",
+        "message": "<AdetKontrolu> doesn't accept that prop. Declared props: deger, varsayilan, min, max, adim, onDegisim, etiket, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='AnaEylemDugmesi'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|onClick|href|tam|disabled|type|style|key|ref|className|style|children)$/]",
+        "message": "<AnaEylemDugmesi> doesn't accept that prop. Declared props: children, onClick, href, tam, disabled, type, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='AnaEylemDugmesi'] > JSXAttribute[name.name='type'] > Literal[value!=/^(?:button|submit)$/]",
+        "message": "<AnaEylemDugmesi> type must be one of 'button' | 'submit'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='AnaSayfaSahneUrun'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|foto|alt|kelime|kisaAd|olcek|hava|golge|onAc|key|ref|className|style|children)$/]",
+        "message": "<AnaSayfaSahneUrun> doesn't accept that prop. Declared props: id, ad, foto, alt, kelime, kisaAd, olcek, hava, golge, onAc."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CatalogSayfa'] > JSXAttribute > JSXIdentifier[name!=/^(?:no|zemin|alt|katman|key|ref|className|style|children)$/]",
+        "message": "<CatalogSayfa> doesn't accept that prop. Declared props: no, zemin, alt, katman."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CategoryCardKategori'] > JSXAttribute > JSXIdentifier[name!=/^(?:slug|ad|foto|modelSayisi|key|ref|className|style|children)$/]",
+        "message": "<CategoryCardKategori> doesn't accept that prop. Declared props: slug, ad, foto, modelSayisi."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CategoryFiltersAgacOgesi'] > JSXAttribute > JSXIdentifier[name!=/^(?:ad|n|seviye|secili|acik|onSec|key|ref|className|style|children)$/]",
+        "message": "<CategoryFiltersAgacOgesi> doesn't accept that prop. Declared props: ad, n, seviye, secili, acik, onSec."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CerceveliDugme'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|ton|koyuZemin|onClick|href|tam|disabled|type|style|key|ref|className|style|children)$/]",
+        "message": "<CerceveliDugme> doesn't accept that prop. Declared props: children, ton, koyuZemin, onClick, href, tam, disabled, type, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CerceveliDugme'] > JSXAttribute[name.name='ton'] > Literal[value!=/^(?:petrol|sade)$/]",
+        "message": "<CerceveliDugme> ton must be one of 'petrol' | 'sade'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CerceveliDugme'] > JSXAttribute[name.name='type'] > Literal[value!=/^(?:button|submit)$/]",
+        "message": "<CerceveliDugme> type must be one of 'button' | 'submit'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Cip'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|secili|onClick|disabled|style|key|ref|className|style|children)$/]",
+        "message": "<Cip> doesn't accept that prop. Declared props: children, secili, onClick, disabled, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CompareButton'] > JSXAttribute > JSXIdentifier[name!=/^(?:secili|boyut|onClick|metin|yazili|style|key|ref|className|style|children)$/]",
+        "message": "<CompareButton> doesn't accept that prop. Declared props: secili, boyut, onClick, metin, yazili, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CompareButton'] > JSXAttribute[name.name='boyut'] > Literal[value!=/^(?:ikon|etiket)$/]",
+        "message": "<CompareButton> boyut must be one of 'ikon' | 'etiket'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CompareTableKolon'] > JSXAttribute > JSXIdentifier[name!=/^(?:marka|kisa|tam|onAc|key|ref|className|style|children)$/]",
+        "message": "<CompareTableKolon> doesn't accept that prop. Declared props: marka, kisa, tam, onAc."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CutawayIsaret'] > JSXAttribute > JSXIdentifier[name!=/^(?:x|y|ad|aciklama|key|ref|className|style|children)$/]",
+        "message": "<CutawayIsaret> doesn't accept that prop. Declared props: x, y, ad, aciklama."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DutyPointGateDeger'] > JSXAttribute > JSXIdentifier[name!=/^(?:debi|basinc|key|ref|className|style|children)$/]",
+        "message": "<DutyPointGateDeger> doesn't accept that prop. Declared props: debi, basinc."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FamilyCardDeger'] > JSXAttribute > JSXIdentifier[name!=/^(?:e|v|key|ref|className|style|children)$/]",
+        "message": "<FamilyCardDeger> doesn't accept that prop. Declared props: e, v."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FamilyHeader'] > JSXAttribute > JSXIdentifier[name!=/^(?:ad|seriSayisi|modelSayisi|metin|style|key|ref|className|style|children)$/]",
+        "message": "<FamilyHeader> doesn't accept that prop. Declared props: ad, seriSayisi, modelSayisi, metin, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FAQSoru'] > JSXAttribute > JSXIdentifier[name!=/^(?:soru|cevap|key|ref|className|style|children)$/]",
+        "message": "<FAQSoru> doesn't accept that prop. Declared props: soru, cevap."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FeatureSlotOlcek'] > JSXAttribute > JSXIdentifier[name!=/^(?:min|max|etiketler|key|ref|className|style|children)$/]",
+        "message": "<FeatureSlotOlcek> doesn't accept that prop. Declared props: min, max, etiketler."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FloatingNavSeriGecis'] > JSXAttribute > JSXIdentifier[name!=/^(?:sira|toplam|oncekiAd|sonrakiAd|onOnceki|onSonraki|key|ref|className|style|children)$/]",
+        "message": "<FloatingNavSeriGecis> doesn't accept that prop. Declared props: sira, toplam, oncekiAd, sonrakiAd, onOnceki, onSonraki."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HeaderTeklifPaneliUrun'] > JSXAttribute > JSXIdentifier[name!=/^(?:sku|ad|kod|foto|adet|key|ref|className|style|children)$/]",
+        "message": "<HeaderTeklifPaneliUrun> doesn't accept that prop. Declared props: sku, ad, kod, foto, adet."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HiyerarsiSimgesi'] > JSXAttribute > JSXIdentifier[name!=/^(?:seviye|boyut|renk|style|key|ref|className|style|children)$/]",
+        "message": "<HiyerarsiSimgesi> doesn't accept that prop. Declared props: seviye, boyut, renk, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HukumKutusu'] > JSXAttribute > JSXIdentifier[name!=/^(?:hal|etiket|children|dil|style|key|ref|className|style|children)$/]",
+        "message": "<HukumKutusu> doesn't accept that prop. Declared props: hal, etiket, children, dil, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HukumKutusu'] > JSXAttribute[name.name='hal'] > Literal[value!=/^(?:yeter|sinirda|yetmez|bilgi)$/]",
+        "message": "<HukumKutusu> hal must be one of 'yeter' | 'sinirda' | 'yetmez' | 'bilgi'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HukumKutusu'] > JSXAttribute[name.name='dil'] > Literal[value!=/^(?:TR|EN)$/]",
+        "message": "<HukumKutusu> dil must be one of 'TR' | 'EN'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='KabukBandiKategori'] > JSXAttribute > JSXIdentifier[name!=/^(?:ad|ikon|etkin|onClick|key|ref|className|style|children)$/]",
+        "message": "<KabukBandiKategori> doesn't accept that prop. Declared props: ad, ikon, etkin, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='KarsilastirmaSatiri'] > JSXAttribute > JSXIdentifier[name!=/^(?:alan|degerler|key|ref|className|style|children)$/]",
+        "message": "<KarsilastirmaSatiri> doesn't accept that prop. Declared props: alan, degerler."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Kart'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|gorsel|gorselAlt|marka|baslik|ozet|href|onClick|etkilesimli|dolgu|style|key|ref|className|style|children)$/]",
+        "message": "<Kart> doesn't accept that prop. Declared props: children, gorsel, gorselAlt, marka, baslik, ozet, href, onClick, etkilesimli, dolgu, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='KatliCagriSatiri'] > JSXAttribute > JSXIdentifier[name!=/^(?:baslik|children|no|acik|onDegisim|sonSatir|style|key|ref|className|style|children)$/]",
+        "message": "<KatliCagriSatiri> doesn't accept that prop. Declared props: baslik, children, no, acik, onDegisim, sonSatir, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ListToolbar'] > JSXAttribute > JSXIdentifier[name!=/^(?:sayi|kapsam|sira|onSira|grup|onGrup|gorunum|onGorunum|arama|onArama|sutunlar|onSutunlar|mobil|metin|yerel|style|key|ref|className|style|children)$/]",
+        "message": "<ListToolbar> doesn't accept that prop. Declared props: sayi, kapsam, sira, onSira, grup, onGrup, gorunum, onGorunum, arama, onArama, sutunlar, onSutunlar, mobil, metin, yerel, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ListToolbar'] > JSXAttribute[name.name='kapsam'] > Literal[value!=/^(?:kat|dal|aile)$/]",
+        "message": "<ListToolbar> kapsam must be one of 'kat' | 'dal' | 'aile'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ListToolbar'] > JSXAttribute[name.name='gorunum'] > Literal[value!=/^(?:liste|kart)$/]",
+        "message": "<ListToolbar> gorunum must be one of 'liste' | 'kart'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MetinGirisi'] > JSXAttribute > JSXIdentifier[name!=/^(?:etiket|deger|onDeger|yerTutucu|cokSatir|zorunlu|ek|aciklama|metin|id|style|key|ref|className|style|children)$/]",
+        "message": "<MetinGirisi> doesn't accept that prop. Declared props: etiket, deger, onDeger, yerTutucu, cokSatir, zorunlu, ek, aciklama, metin, id, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MobileBuyBarEksen'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|secenekler|secili|key|ref|className|style|children)$/]",
+        "message": "<MobileBuyBarEksen> doesn't accept that prop. Declared props: id, ad, secenekler, secili."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MobileTreeDugum'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|seviye|n|href|onClick|cocuklar|key|ref|className|style|children)$/]",
+        "message": "<MobileTreeDugum> doesn't accept that prop. Declared props: id, ad, seviye, n, href, onClick, cocuklar."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MobileTreeDugum'] > JSXAttribute[name.name='seviye'] > Literal[value!=/^(?:urunler|urun-grubu|urun-turu|urun-ailesi|seri|model)$/]",
+        "message": "<MobileTreeDugum> seviye must be one of 'urunler' | 'urun-grubu' | 'urun-turu' | 'urun-ailesi' | 'seri' | 'model'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ModelListesiUrun'] > JSXAttribute > JSXIdentifier[name!=/^(?:suz|key|ref|className|style|children)$/]",
+        "message": "<ModelListesiUrun> doesn't accept that prop. Declared props: suz."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ModelRowUrun'] > JSXAttribute > JSXIdentifier[name!=/^(?:sku|ad|marka|kod|motor|seri|degerler|gorseller|fiyat|key|ref|className|style|children)$/]",
+        "message": "<ModelRowUrun> doesn't accept that prop. Declared props: sku, ad, marka, kod, motor, seri, degerler, gorseller, fiyat."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PageCoverBag'] > JSXAttribute > JSXIdentifier[name!=/^(?:ad|href|onClick|key|ref|className|style|children)$/]",
+        "message": "<PageCoverBag> doesn't accept that prop. Declared props: ad, href, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Pagination'] > JSXAttribute > JSXIdentifier[name!=/^(?:toplam|boyut|sayfa|onSayfa|kisa|metin|style|key|ref|className|style|children)$/]",
+        "message": "<Pagination> doesn't accept that prop. Declared props: toplam, boyut, sayfa, onSayfa, kisa, metin, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PerformanceKademe'] > JSXAttribute > JSXIdentifier[name!=/^(?:ad|pq|pw|key|ref|className|style|children)$/]",
+        "message": "<PerformanceKademe> doesn't accept that prop. Declared props: ad, pq, pw."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PhotoStage'] > JSXAttribute > JSXIdentifier[name!=/^(?:src|alt|boy|yukseklik|genislik|zemin|sahneZemini|mobil|kose|children|style|key|ref|className|style|children)$/]",
+        "message": "<PhotoStage> doesn't accept that prop. Declared props: src, alt, boy, yukseklik, genislik, zemin, sahneZemini, mobil, kose, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PhotoStage'] > JSXAttribute[name.name='boy'] > Literal[value!=/^(?:satir|kart|kapak|seri|urun|buyuk)$/]",
+        "message": "<PhotoStage> boy must be one of 'satir' | 'kart' | 'kapak' | 'seri' | 'urun' | 'buyuk'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PhotoStage'] > JSXAttribute[name.name='zemin'] > Literal[value!=/^(?:otomatik|zeminsiz|beyaz)$/]",
+        "message": "<PhotoStage> zemin must be one of 'otomatik' | 'zeminsiz' | 'beyaz'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PqEgriKaynagi'] > JSXAttribute > JSXIdentifier[name!=/^(?:noktaSay|kaynakTur|key|ref|className|style|children)$/]",
+        "message": "<PqEgriKaynagi> doesn't accept that prop. Declared props: noktaSay, kaynakTur."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PQNoktasi'] > JSXAttribute > JSXIdentifier[name!=/^(?:q|p|key|ref|className|style|children)$/]",
+        "message": "<PQNoktasi> doesn't accept that prop. Declared props: q, p."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProductCardUrun'] > JSXAttribute > JSXIdentifier[name!=/^(?:sku|ad|seri|marka|kod|motor|degerler|gorseller|fiyat|key|ref|className|style|children)$/]",
+        "message": "<ProductCardUrun> doesn't accept that prop. Declared props: sku, ad, seri, marka, kod, motor, degerler, gorseller, fiyat."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProductCoverEksen'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|secenekler|secili|key|ref|className|style|children)$/]",
+        "message": "<ProductCoverEksen> doesn't accept that prop. Declared props: id, ad, secenekler, secili."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='QuoteRequestButton'] > JSXAttribute > JSXIdentifier[name!=/^(?:kip|fiyatVar|boyut|listede|onClick|tam|metin|style|key|ref|className|style|children)$/]",
+        "message": "<QuoteRequestButton> doesn't accept that prop. Declared props: kip, fiyatVar, boyut, listede, onClick, tam, metin, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='QuoteRequestButton'] > JSXAttribute[name.name='kip'] > Literal[value!=/^(?:teklif|satis)$/]",
+        "message": "<QuoteRequestButton> kip must be one of 'teklif' | 'satis'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='QuoteRequestButton'] > JSXAttribute[name.name='boyut'] > Literal[value!=/^(?:ikon|etiket)$/]",
+        "message": "<QuoteRequestButton> boyut must be one of 'ikon' | 'etiket'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Rozet'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|sinif|dil|style|key|ref|className|style|children)$/]",
+        "message": "<Rozet> doesn't accept that prop. Declared props: children, sinif, dil, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Rozet'] > JSXAttribute[name.name='sinif'] > Literal[value!=/^(?:nesnel|hukum|soluk)$/]",
+        "message": "<Rozet> sinif must be one of 'nesnel' | 'hukum' | 'soluk'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Rozet'] > JSXAttribute[name.name='dil'] > Literal[value!=/^(?:TR|EN)$/]",
+        "message": "<Rozet> dil must be one of 'TR' | 'EN'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SearchBoxSonuc'] > JSXAttribute > JSXIdentifier[name!=/^(?:ad|alt|sag|foto|href|onClick|vurgu|key|ref|className|style|children)$/]",
+        "message": "<SearchBoxSonuc> doesn't accept that prop. Declared props: ad, alt, sag, foto, href, onClick, vurgu."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SectionRailBolum'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|kisa|key|ref|className|style|children)$/]",
+        "message": "<SectionRailBolum> doesn't accept that prop. Declared props: id, ad, kisa."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SeriesCardSeri'] > JSXAttribute > JSXIdentifier[name!=/^(?:slug|ad|kisaAd|marka|modelSayisi|foto|ailede|key|ref|className|style|children)$/]",
+        "message": "<SeriesCardSeri> doesn't accept that prop. Declared props: slug, ad, kisaAd, marka, modelSayisi, foto, ailede."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SeriesHeader'] > JSXAttribute > JSXIdentifier[name!=/^(?:marka|markaLogo|markaHref|seriAdi|seriTanimi|tanimHref|konum|degerler|foto|onBul|bulEtiketi|mobil|metin|sessiz|dil|style|key|ref|className|style|children)$/]",
+        "message": "<SeriesHeader> doesn't accept that prop. Declared props: marka, markaLogo, markaHref, seriAdi, seriTanimi, tanimHref, konum, degerler, foto, onBul, bulEtiketi, mobil, metin, sessiz, dil, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SeriesHeader'] > JSXAttribute[name.name='dil'] > Literal[value!=/^(?:TR|EN)$/]",
+        "message": "<SeriesHeader> dil must be one of 'TR' | 'EN'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SeriesPickerSeri'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|href|key|ref|className|style|children)$/]",
+        "message": "<SeriesPickerSeri> doesn't accept that prop. Declared props: id, ad, href."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SoundTableModel'] > JSXAttribute > JSXIdentifier[name!=/^(?:sku|ad|foto|hizlar|fiyat|key|ref|className|style|children)$/]",
+        "message": "<SoundTableModel> doesn't accept that prop. Declared props: sku, ad, foto, hizlar, fiyat."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TabbedPanelBolum'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|baslik|icerik|key|ref|className|style|children)$/]",
+        "message": "<TabbedPanelBolum> doesn't accept that prop. Declared props: id, baslik, icerik."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TeknikTabloSatiri'] > JSXAttribute > JSXIdentifier[name!=/^(?:alan|deger|anlam|key|ref|className|style|children)$/]",
+        "message": "<TeknikTabloSatiri> doesn't accept that prop. Declared props: alan, deger, anlam."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='UrunHaritasiTur'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|ad|model|foto|href|onClick|key|ref|className|style|children)$/]",
+        "message": "<UrunHaritasiTur> doesn't accept that prop. Declared props: id, ad, model, foto, href, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='UygulamaBolumu'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|baslik|turler|seriler|mobil|metin|onSeri|dil|style|key|ref|className|style|children)$/]",
+        "message": "<UygulamaBolumu> doesn't accept that prop. Declared props: id, baslik, turler, seriler, mobil, metin, onSeri, dil, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='UygulamaBolumu'] > JSXAttribute[name.name='dil'] > Literal[value!=/^(?:TR|EN)$/]",
+        "message": "<UygulamaBolumu> dil must be one of 'TR' | 'EN'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='VariantPickerSecenek'] > JSXAttribute > JSXIdentifier[name!=/^(?:deger|ad|liste|ek|pasif|key|ref|className|style|children)$/]",
+        "message": "<VariantPickerSecenek> doesn't accept that prop. Declared props: deger, ad, liste, ek, pasif."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "AdetKontrolu": {
+        "replaces": []
+      },
+      "AnaEylemDugmesi": {
+        "replaces": []
+      },
+      "AnaSayfaSahneUrun": {
+        "replaces": []
+      },
+      "CatalogSayfa": {
+        "replaces": []
+      },
+      "CategoryCardKategori": {
+        "replaces": []
+      },
+      "CategoryFiltersAgacOgesi": {
+        "replaces": []
+      },
+      "CerceveliDugme": {
+        "replaces": []
+      },
+      "Cip": {
+        "replaces": []
+      },
+      "CompareButton": {
+        "replaces": []
+      },
+      "CompareTableKolon": {
+        "replaces": []
+      },
+      "CutawayIsaret": {
+        "replaces": []
+      },
+      "DutyPointGateDeger": {
+        "replaces": []
+      },
+      "FamilyCardDeger": {
+        "replaces": []
+      },
+      "FamilyHeader": {
+        "replaces": []
+      },
+      "FAQSoru": {
+        "replaces": []
+      },
+      "FeatureSlotOlcek": {
+        "replaces": []
+      },
+      "FloatingNavSeriGecis": {
+        "replaces": []
+      },
+      "HeaderTeklifPaneliUrun": {
+        "replaces": []
+      },
+      "HiyerarsiSimgesi": {
+        "replaces": []
+      },
+      "HukumKutusu": {
+        "replaces": []
+      },
+      "KabukBandiKategori": {
+        "replaces": []
+      },
+      "KarsilastirmaSatiri": {
+        "replaces": []
+      },
+      "Kart": {
+        "replaces": []
+      },
+      "KatliCagriSatiri": {
+        "replaces": []
+      },
+      "ListToolbar": {
+        "replaces": []
+      },
+      "MetinGirisi": {
+        "replaces": []
+      },
+      "MobileBuyBarEksen": {
+        "replaces": []
+      },
+      "MobileTreeDugum": {
+        "replaces": []
+      },
+      "ModelListesiUrun": {
+        "replaces": []
+      },
+      "ModelRowUrun": {
+        "replaces": []
+      },
+      "PageCoverBag": {
+        "replaces": []
+      },
+      "Pagination": {
+        "replaces": []
+      },
+      "PerformanceKademe": {
+        "replaces": []
+      },
+      "PhotoStage": {
+        "replaces": []
+      },
+      "PqEgriKaynagi": {
+        "replaces": []
+      },
+      "PQNoktasi": {
+        "replaces": []
+      },
+      "ProductCardUrun": {
+        "replaces": []
+      },
+      "ProductCoverEksen": {
+        "replaces": []
+      },
+      "QuoteRequestButton": {
+        "replaces": []
+      },
+      "Rozet": {
+        "replaces": []
+      },
+      "SearchBoxSonuc": {
+        "replaces": []
+      },
+      "SectionRailBolum": {
+        "replaces": []
+      },
+      "SeriesCardSeri": {
+        "replaces": []
+      },
+      "SeriesHeader": {
+        "replaces": []
+      },
+      "SeriesPickerSeri": {
+        "replaces": []
+      },
+      "SoundTableModel": {
+        "replaces": []
+      },
+      "TabbedPanelBolum": {
+        "replaces": []
+      },
+      "TeknikTabloSatiri": {
+        "replaces": []
+      },
+      "UrunHaritasiTur": {
+        "replaces": []
+      },
+      "UygulamaBolumu": {
+        "replaces": []
+      },
+      "VariantPickerSecenek": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--accent-air-green",
+      "--action-terracotta",
+      "--action-terracotta-deep",
+      "--border-control",
+      "--border-hairline",
+      "--border-row",
+      "--brand-cyan",
+      "--brand-cyan-ink",
+      "--font-baslik",
+      "--font-mono",
+      "--font-sans",
+      "--font-serif",
+      "--font-wordmark",
+      "--foto-sahne-zemin",
+      "--hareket-acilis",
+      "--hareket-egri",
+      "--hareket-egri-gecis",
+      "--hareket-gecis",
+      "--hareket-gecis-egri",
+      "--hareket-hizli",
+      "--hareket-normal",
+      "--hedef-min",
+      "--lh-editorial",
+      "--lh-overline",
+      "--p2-tint",
+      "--pq-soluk",
+      "--pq-ton-1",
+      "--pq-ton-2",
+      "--pq-ton-3",
+      "--pq-ton-4",
+      "--primary-navy",
+      "--radius-dugme",
+      "--radius-kart",
+      "--radius-kart-buyuk",
+      "--radius-kucuk",
+      "--radius-panel",
+      "--sahne-ton-1",
+      "--sahne-ton-10",
+      "--sahne-ton-11",
+      "--sahne-ton-12",
+      "--sahne-ton-13",
+      "--sahne-ton-2",
+      "--sahne-ton-3",
+      "--sahne-ton-4",
+      "--sahne-ton-5",
+      "--sahne-ton-6",
+      "--sahne-ton-7",
+      "--sahne-ton-8",
+      "--sahne-ton-9",
+      "--shadow-foto",
+      "--shadow-foto-kucuk",
+      "--shadow-ince",
+      "--shadow-kart-hover",
+      "--shadow-overlay",
+      "--shadow-urun-gorsel",
+      "--size-body",
+      "--size-body-small",
+      "--size-caption",
+      "--size-editorial",
+      "--size-h3",
+      "--size-overline",
+      "--space-block",
+      "--space-card",
+      "--space-card-loose",
+      "--space-grid",
+      "--space-inline",
+      "--space-page",
+      "--space-page-mobile",
+      "--space-stack",
+      "--space-tight",
+      "--surface-card",
+      "--surface-dark-inset",
+      "--surface-inset",
+      "--surface-page",
+      "--surface-subtle",
+      "--text-body",
+      "--text-muted",
+      "--text-on-dark",
+      "--text-on-dark-muted",
+      "--text-strong",
+      "--track-overline",
+      "--warn-amber",
+      "--weight-baslik",
+      "--weight-govde",
+      "--weight-h1",
+      "--weight-overline",
+      "--wordmark-tracking",
+      "--wordmark-weight"
+    ],
+    "tokenKinds": {
+      "--primary-navy": "color",
+      "--brand-cyan": "color",
+      "--brand-cyan-ink": "color",
+      "--action-terracotta": "color",
+      "--action-terracotta-deep": "color",
+      "--accent-air-green": "color",
+      "--warn-amber": "color",
+      "--pq-ton-1": "color",
+      "--pq-ton-2": "color",
+      "--pq-ton-3": "color",
+      "--pq-ton-4": "color",
+      "--pq-soluk": "color",
+      "--surface-page": "color",
+      "--surface-card": "color",
+      "--surface-subtle": "color",
+      "--surface-inset": "color",
+      "--p2-tint": "color",
+      "--surface-dark-inset": "color",
+      "--border-control": "color",
+      "--border-hairline": "color",
+      "--border-row": "color",
+      "--text-strong": "color",
+      "--text-body": "color",
+      "--text-muted": "color",
+      "--text-on-dark": "color",
+      "--text-on-dark-muted": "color",
+      "--radius-dugme": "radius",
+      "--radius-kart": "radius",
+      "--radius-kart-buyuk": "radius",
+      "--radius-kucuk": "radius",
+      "--radius-panel": "radius",
+      "--shadow-ince": "shadow",
+      "--shadow-kart-hover": "shadow",
+      "--shadow-overlay": "shadow",
+      "--shadow-urun-gorsel": "shadow",
+      "--foto-sahne-zemin": "color",
+      "--shadow-foto": "shadow",
+      "--shadow-foto-kucuk": "shadow",
+      "--hareket-hizli": "other",
+      "--hareket-normal": "other",
+      "--hareket-acilis": "other",
+      "--hareket-egri": "other",
+      "--hareket-gecis": "other",
+      "--hareket-gecis-egri": "other",
+      "--hareket-egri-gecis": "other",
+      "--font-sans": "font",
+      "--font-baslik": "font",
+      "--font-serif": "font",
+      "--font-mono": "font",
+      "--font-wordmark": "font",
+      "--wordmark-weight": "font",
+      "--wordmark-tracking": "font",
+      "--size-overline": "spacing",
+      "--lh-overline": "other",
+      "--track-overline": "spacing",
+      "--weight-overline": "font",
+      "--size-caption": "spacing",
+      "--size-body-small": "spacing",
+      "--size-body": "spacing",
+      "--size-editorial": "spacing",
+      "--weight-baslik": "font",
+      "--weight-govde": "font",
+      "--weight-h1": "font",
+      "--lh-editorial": "other",
+      "--size-h3": "spacing",
+      "--space-tight": "spacing",
+      "--space-inline": "spacing",
+      "--space-grid": "spacing",
+      "--space-stack": "spacing",
+      "--space-card": "spacing",
+      "--space-card-loose": "spacing",
+      "--space-page-mobile": "spacing",
+      "--space-block": "spacing",
+      "--space-page": "spacing",
+      "--hedef-min": "spacing",
+      "--sahne-ton-1": "color",
+      "--sahne-ton-2": "color",
+      "--sahne-ton-3": "color",
+      "--sahne-ton-4": "color",
+      "--sahne-ton-5": "color",
+      "--sahne-ton-6": "color",
+      "--sahne-ton-7": "color",
+      "--sahne-ton-8": "color",
+      "--sahne-ton-9": "color",
+      "--sahne-ton-10": "color",
+      "--sahne-ton-11": "color",
+      "--sahne-ton-12": "color",
+      "--sahne-ton-13": "color"
+    },
+    "fontFamilies": [
+      "Archivo",
+      "Onest",
+      "Schibsted Grotesk"
+    ]
+  }
+}

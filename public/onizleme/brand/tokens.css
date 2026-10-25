@@ -1,0 +1,99 @@
+/* VentHub marka tokenları — KARAR 405 (21 Ekim 2026): S4 dili bütün sitenin dili.
+ * Kaynak: karar 405 · DESIGN-MENU marka-cevap-14-madde-2026-10-21.md · Linear 21 Ekim 17:21
+ * token listesi (kiremit satırları yerine 18:28 düzeltmesi). Eski hâl: ARSIV brand 2026-10-21 oncesi/.
+ * Biçim depo düzenine uyar: renkler HSL üçlüsü, Tailwind hsl(var(--x) / <alpha-value>) ile okur.
+ * Ham hex koda yazılmaz. Logo ve ikon dosyaları değişmedi; lacivert #1A2B4A, turkuaz #0088B0
+ * ve logo kiremiti #D95D0E yalnız o dosyaların içinde yaşar.
+ */
+
+:root {
+  /* ---- Arayüz rengi: tek petrol ----
+   * Lacivert/turkuaz ayrımı arayüzde kalktı; üç ad korunur (depo okuyor), değer tek. */
+  --primary-navy: 197.9 81.5% 23.3%;     /* #0B4F6C · yapı, bağlantı, seçili hâl · beyazda 8.94 · sayfada 8.28 */
+  --brand-cyan: 197.9 81.5% 23.3%;       /* #0B4F6C */
+  --brand-cyan-ink: 197.9 81.5% 23.3%;   /* #0B4F6C · küçük metin ve sayaç/rozet zemini (beyaz metinle 8.94) */
+
+  /* ---- Kiremit (değişmedi · Recep 21 Ekim, 18:28) ---- */
+  --action-terracotta: 23 88% 45%;       /* #D95D0E · logo üst dilimi, P-Q çalışma noktası. Metin zemini değil (beyazla 3.80) */
+  --action-terracotta-deep: 24 91% 39%;  /* #BF5309 · sayfanın tek dolu ana eylem düğmesi · beyaz etiketle 4.71 */
+
+  /* ---- Markaya ait olmayan iki vurgu (değişmedi) ---- */
+  --accent-air-green: 100 61% 30%;       /* #3D7A1E · yalnız Hava Arıtma kategori sayfaları */
+  --warn-amber: 38 92% 50%;              /* #F59E0B · yalnız uyarı kutusu (kenar/kural; metin değil) */
+
+  /* ---- Yüzey ---- */
+  --surface-page: 197.1 36.8% 96.3%;     /* #F2F7F9 · sayfa zemini */
+  --surface-card: 0 0% 100%;             /* #FFFFFF · kart, header */
+  --surface-subtle: 195 33.3% 97.6%;     /* #F7FAFB · kart içi ikincil bölge, fotoğraf kutusu */
+  --surface-inset: 198 31.3% 93.7%;      /* #EAF1F4 · gömülü alan, soluk rozet */
+  --p2-tint: 198 41.7% 90.6%;            /* #DDEBF1 · çip ve rozet açık zemini (yeni) */
+  --surface-dark: 200 48.4% 12.2%;       /* #10242E · koyu bant — YALNIZ alt bilgi (footer) */
+  --surface-dark-inset: 198 72% 29%;     /* #155F7F · koyu bant içinde gömülü alan */
+
+  /* ---- Kenar (beyaz üstünde: control 1.65 > hairline 1.31 > row 1.19 > inset 1.14) ---- */
+  --border-control: 198 26.8% 78%;       /* #B8CDD6 · düğme ve giriş kenarı */
+  --border-hairline: 198.9 30.2% 87.6%;  /* #D6E3E9 · kart kenarı */
+  --border-row: 197.1 33.3% 91.8%;       /* #E3EDF1 · tablo/liste satır ayırıcısı */
+
+  /* ---- Metin (tam opak; soluk hâl ayrı token, alfa değil) ---- */
+  --text-strong: 200 48.4% 12.2%;        /* #10242E · beyazda 15.98 */
+  --text-body: 200.6 27.1% 25.3%;        /* #2F4652 · beyazda 9.91 · sayfada 9.18 */
+  --text-muted: 200.6 16.3% 38.4%;       /* #526772 · beyazda 5.93 · sayfada 5.49 · inset 5.19 */
+  --text-on-dark: 0 0% 100%;             /* koyu bantta 15.98 · dark-inset 7.06 */
+  --text-on-dark-muted: 196 54.2% 83.7%; /* #BFE0EC · koyu bantta 11.48 · dark-inset 5.07 */
+
+  /* ---- Köşe ---- */
+  --radius-dugme: 999px;                 /* düğme, çip, rozet, arama kutusu — oval */
+  --radius-kart: 16px;                   /* kart */
+  --radius-kart-buyuk: 24px;             /* yüzen panel, yan panel, sahne, büyük blok */
+  --radius-kucuk: 12px;                  /* giriş alanı, fotoğraf kutusu, küçük kutu */
+  --radius-panel: 8px 8px 0 0;           /* mobil alt panel üst köşeleri */
+  /* logo dairesi 50% — dosyanın içinde */
+
+  /* ---- Gölge (yalnız bu dört yerde) ---- */
+  --shadow-ince: 0 1px 3px hsl(var(--text-strong) / 0.10);          /* seçili düğme/çip */
+  --shadow-kart-hover: 0 10px 28px hsl(var(--text-strong) / 0.10);  /* kart üstüne gelince */
+  --shadow-overlay: 0 8px 24px hsl(var(--primary-navy) / 0.14);     /* açılır katman, yan panel, menü */
+  --shadow-urun-gorsel: drop-shadow(0 16px 14px hsl(var(--text-strong) / 0.18)); /* filter: yalnız ürün fotoğrafı */
+
+  /* ---- Hareket ---- */
+  --hareket-hizli: 120ms;                /* arayüz tepkisi: üstüne gelme, düğme */
+  --hareket-normal: 200ms;
+  --hareket-acilis: 280ms;               /* açılır bölüm (grid-template-rows) */
+  --hareket-egri: cubic-bezier(0.2, 0, 0, 1);
+  --hareket-gecis: 600ms;                /* geçiş sınıfı 500–800 ms: sayfa geçişi, sahne, teklif uçuşu */
+  --hareket-gecis-egri: cubic-bezier(0.2, 0.9, 0.25, 1);
+  /* prefers-reduced-motion: reduce → bütün süreler 0 */
+
+  /* ---- Yazı ---- */
+  --font-sans: 'Onest', system-ui, -apple-system, 'Helvetica Neue', sans-serif;   /* arayüz, uzun metin, teknik değer */
+  --font-baslik: 'Schibsted Grotesk', 'Onest', system-ui, sans-serif;             /* başlık */
+  --font-serif: var(--font-sans);        /* eski ad, depo okuyor: artık Onest */
+  --font-mono: var(--font-sans);         /* eski ad: teknik değer Onest + tabular-nums */
+  --font-wordmark: 'Archivo', sans-serif;/* YALNIZ logo dosyalarının <text>'i; 700 ağırlık yüklenir */
+  --wordmark-weight: 700;
+  --wordmark-tracking: -0.03em;
+
+  --size-overline: 12.5px;
+  --lh-overline: 1.4;
+  --track-overline: 0.08em;
+  --weight-overline: 600;
+  --size-caption: 14px;
+  --size-body-small: 15px;
+  --size-body: 16px;
+  --size-editorial: 17px;
+  --weight-baslik: 600;                  /* h3 ve altı başlık, kart başlığı (S5) */
+  --weight-h1: 800;                      /* h1, h2 */
+
+  /* ---- Boşluk: rol tokenı (K37, değişmedi) ---- */
+  --space-tight: 5px;
+  --space-inline: 7px;
+  --space-grid: 10px;
+  --space-stack: 14px;
+  --space-card: 16px;
+  --space-card-loose: 20px;
+  --space-page-mobile: 18px;
+  --space-block: 30px;
+  --space-page: 40px;
+  /* 44 px dokunma hedefi · 1060 px içerik sütunu: kural, token değil */
+}

@@ -1,0 +1,17 @@
+/* Ana sayfa sahnesi tonları (iş emri #6 madde 1). Kaynak: DESIGN-MENU Ana Sayfa Sahne S5.dc.html ham renkleri, birebir. Yalnız AnaSayfaSahne kullanır.
+ * 1–4 iş emrindeki dört ana ton (zemin geçişi + yan duvar); 5–13 aynı sahnenin ara tonları (kaynak ↔ parça fark 0 için ayrı tutuldu). */
+:root{
+  --sahne-ton-1: 200 28.3% 89.6%; /* @kind color */ /* #DDE7EC · zemin üst (geçiş başı) */
+  --sahne-ton-2: 202.5 30.8% 94.9%; /* @kind color */ /* #EEF3F6 · zemin orta */
+  --sahne-ton-3: 195 33.3% 97.6%; /* @kind color */ /* #F7FAFB · zemin alt / ışık */
+  --sahne-ton-4: 200.9 24.2% 81.4%; /* @kind color */ /* #C4D3DB · yan duvar koyu */
+  --sahne-ton-5: 201.2 28.8% 88.4%; /* @kind color */ /* #D9E4EA · yan duvar açık */
+  --sahne-ton-6: 200 31.6% 92.5%; /* @kind color */ /* #E6EEF2 · arka duvar üst */
+  --sahne-ton-7: 200 33.3% 94.7%; /* @kind color */ /* #EDF3F6 · arka duvar orta */
+  --sahne-ton-8: 197.1 33.3% 95.9%; /* @kind color */ /* #F1F6F8 · arka duvar alt */
+  --sahne-ton-9: 200 33.3% 96.5%; /* @kind color */ /* #F3F7F9 · ufuk çizgisi */
+  --sahne-ton-10: 200 25.3% 83.7%; /* @kind color */ /* #CBD9E0 · tavan gölgesi */
+  --sahne-ton-11: 198.5 31.7% 92%; /* @kind color */ /* #E4EDF1 · taban orta */
+  --sahne-ton-12: 200 29% 87.8%; /* @kind color */ /* #D7E3E9 · taban kenar */
+  --sahne-ton-13: 200 37.5% 96.9%; /* @kind color */ /* #F4F8FA · geçiş beyazı (radyal kenar) */
+}

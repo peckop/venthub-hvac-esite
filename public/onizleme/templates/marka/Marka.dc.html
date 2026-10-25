@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Marka" description="İş emri #20-3: S5 'Marka detay' birebir; marka iddiası yok (§8: S5 cümlesi ve 'Alan' satırı çizilmez); seriler SeriesCard, ürün grubuna göre; ad ve sayı katalogdan; konum SectionRail'de. Ürünsüz marka (Flexiva) bilgi kutusu + teklif." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-marka][data-mob="1"]{padding:0 18px 30px !important;gap:28px !important}[data-vh-marka][data-mob="1"] [data-mr-hero]{grid-template-columns:minmax(0,1fr) !important;padding:22px 18px !important}[data-vh-marka][data-mob="1"] [data-mr-hero] h1{font-size:40px !important}[data-vh-marka][data-mob="1"] [data-mr-metin]{order:2 !important}[data-vh-marka][data-mob="1"] [data-mr-logo]{order:1 !important;height:140px !important}[data-vh-marka][data-mob="1"] [data-mr-logo] img{max-width:200px !important}[data-vh-marka][data-mob="1"] [data-mr-cip]{flex-wrap:nowrap !important}[data-vh-marka][data-mob="1"] [data-mr-grup]{padding-top:8px !important}[data-vh-marka][data-mob="1"] [data-mr-grup] h3{font-size:20px !important}[data-vh-marka][data-mob="1"] [data-mr-izgara]{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important}[data-vh-marka][data-mob="1"] [data-mr-bilgi]{grid-template-columns:minmax(0,1fr) !important;padding:22px 18px !important}</style></helmet>
+<div data-vh-marka="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:40px;padding:0 40px 44px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto 0"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<section data-screen-label="Marka detay" style="width:100%;max-width:1060px;min-width:0;margin:-18px auto 0;display:flex;flex-direction:column;gap:inherit">
+<div data-mr-hero="" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px 40px;align-items:center;padding:40px 44px;background:hsl(var(--p2-tint));border-radius:24px;min-width:0">
+<div data-mr-metin="" style="display:flex;flex-direction:column;gap:14px;min-width:0;order:1">
+<h1 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:clamp(44px,5vw,64px);letter-spacing:-0.035em;line-height:1.02;color:hsl(var(--text-strong))">{{ mrk.ad }}</h1>
+<sc-if value="{{ mrk.urunlu }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:var(--size-editorial);line-height:1.55;color:hsl(var(--text-body));max-width:52ch;text-wrap:pretty">{{ mrk.ozet }}</p></sc-if>
+<div style="display:flex;flex-wrap:wrap;gap:10px;padding-top:6px"><sc-if value="{{ mrk.urunlu }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ mrk.seriGit }}" style="flex:none;display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border:0;border-radius:24px;background:hsl(var(--primary-navy));color:#fff;font:inherit;font-size:var(--size-body-small);font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:hsl(var(--text-strong))">{{ mrk.seriEt }}</button><button type="button" onClick="{{ mrk.modelGit }}" style="flex:none;display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border:1px solid hsl(var(--primary-navy));border-radius:24px;background:hsl(var(--surface-card));color:hsl(var(--primary-navy));font:inherit;font-size:var(--size-body-small);font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;white-space:nowrap" style-hover="background:hsl(var(--primary-navy));color:#fff">{{ mrk.modelEt }}</button></sc-if><sc-if value="{{ mrk.urunsuz }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ mrk.teklifGit }}" style="flex:none;display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border:1px solid hsl(var(--primary-navy));border-radius:24px;background:hsl(var(--surface-card));color:hsl(var(--primary-navy));font:inherit;font-size:var(--size-body-small);font-weight:600;cursor:pointer;white-space:nowrap">{{ mrk.teklifEt }}</button></sc-if></div>
+</div>
+<div data-mr-logo="" style="order:2;display:flex;align-items:center;justify-content:center;height:230px;padding:28px;box-sizing:border-box;background:hsl(var(--surface-card));border-radius:20px;min-width:0"><img src="{{ mrk.logo }}" alt="{{ mrk.ad }}" width="230" height="174" style="display:block;width:100%;max-width:230px;height:100%;object-fit:contain"></div>
+</div>
+<sc-if value="{{ mrk.urunsuz }}" hint-placeholder-val="{{ false }}"><div style="max-width:720px"><x-import component-from-global-scope="DesignSystem_4f7164.HukumKutusu" hal="bilgi" etiket="{{ mrk.ad }}" dil="{{ dilB }}" hint-size="100%,80px">{{ mrk.urunsuzM }}</x-import></div></sc-if>
+<sc-if value="{{ mrk.urunlu }}" hint-placeholder-val="{{ true }}"><div id="mrk-seriler" style="display:flex;flex-direction:column;gap:16px;scroll-margin-top:90px;min-width:0">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:clamp(24px,2.4vw,32px);letter-spacing:-0.025em;line-height:1.15">{{ s.b }}</h2><sc-if value="{{ s.cipVar }}" hint-placeholder-val="{{ false }}"><span style="font-size:var(--size-body-small);line-height:1.5;color:hsl(var(--text-body))">{{ s.alt }}</span></sc-if></div>
+<sc-if value="{{ s.cipVar }}" hint-placeholder-val="{{ false }}"><div data-mr-cip="" role="group" aria-label="{{ s.b }}" style="display:flex;flex-wrap:wrap;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px"><sc-for list="{{ s.cipler }}" as="c" hint-placeholder-count="4"><button type="button" onClick="{{ c.sec }}" style="flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:1px solid hsl(var(--border-control));border-radius:22px;background:hsl(var(--surface-card));color:hsl(var(--text-strong));font:inherit;font-size:var(--size-body-small);font-weight:600;cursor:pointer;white-space:nowrap" style-hover="border-color:hsl(var(--primary-navy))"><span>{{ c.ad }}</span><span style="font-size:13px;font-weight:400;font-variant-numeric:tabular-nums;color:hsl(var(--text-body))">{{ c.n }}</span></button></sc-for></div></sc-if>
+<sc-for list="{{ s.gruplar }}" as="gr" hint-placeholder-count="2"><div data-mr-grup="" id="{{ gr.id }}" style="display:flex;flex-direction:column;gap:14px;padding-top:14px;scroll-margin-top:90px;min-width:0"><div style="display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid hsl(var(--border-hairline))"><h3 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:24px;letter-spacing:-0.02em;line-height:1.2">{{ gr.ad }}</h3><span style="font-size:13px;font-variant-numeric:tabular-nums;color:hsl(var(--text-body))">{{ gr.n }}</span></div><div data-mr-izgara="" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px"><sc-for list="{{ gr.kartlar }}" as="k" hint-placeholder-count="4"><x-import component-from-global-scope="DesignSystem_4f7164.SeriesCard" dc-props="{{ k }}" hint-size="100%,240px"></x-import></sc-for></div></div></sc-for>
+</div></sc-if>
+<sc-if value="{{ b.var }}" hint-placeholder-val="{{ false }}"><div data-mr-bilgi="" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px 48px;padding:40px 44px;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-radius:24px;min-width:0"><h2 style="margin:0;font-family:var(--font-baslik);font-weight:800;font-size:clamp(22px,2.2vw,28px);letter-spacing:-0.025em;line-height:1.15">{{ b.b }}</h2><div style="display:flex;flex-direction:column;min-width:0"><sc-for list="{{ b.satir }}" as="z" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:16px;padding:12px 0;border-bottom:1px solid hsl(var(--border-row));font-size:var(--size-body-small);line-height:1.5"><span style="color:hsl(var(--text-body))">{{ z.k }}</span><span style="font-variant-numeric:tabular-nums;color:hsl(var(--text-strong))">{{ z.v }}</span></div></sc-for><sc-if value="{{ b.webVar }}" hint-placeholder-val="{{ false }}"><div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:16px;align-items:center;padding:4px 0;font-size:var(--size-body-small)"><span style="color:hsl(var(--text-body))">{{ b.webK }}</span><a href="{{ b.web }}" target="_blank" rel="noopener" aria-label="{{ b.webEt }}" style="justify-self:start;display:inline-flex;align-items:center;min-height:44px;font-size:var(--size-body-small);color:hsl(var(--brand-cyan-ink));text-decoration:underline;text-underline-offset:4px" style-hover="color:hsl(var(--text-strong))">{{ b.webAd }} ↗</a></div></sc-if></div></div></sc-if>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;1800px&quot;},&quot;markaId&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vortice&quot;,&quot;seat&quot;,&quot;avens&quot;,&quot;nicotra-gebhardt&quot;,&quot;danfoss&quot;,&quot;casals&quot;,&quot;flexiva&quot;],&quot;default&quot;:&quot;vortice&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string | object) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null, mb: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json'), null, this.state.mb ? null : al('../../assets/ornek/marka-bilgi.json')]).then(([a, b, c, y]) => { const m = { ...(a || {}), ...(b || {}) }; if (c) for (const k in c) if (k[0] !== '_' && m[k] == null) m[k] = c[k]; this.setState(y ? { metin: m, mb: y } : { metin: m }); });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  kaydir(id) { const el = document.getElementById(id); if (!el) return; const sc = document.scrollingElement || document.documentElement; sc.scrollTo({ top: el.getBoundingClientRect().top + sc.scrollTop - (this.props.mobil ? 70 : 90), behavior: 'smooth' }); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), en = DIL === 'EN', M = P.metin || this.state.metin || {}, git = P.onGit || (() => {});
+    const A = (k, v) => { let s = M[k]; if (s == null) return '\u27E6' + k + '\u27E7'; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+    const sayi = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+    const KT = window.VHKatalog, kt = KT ? KT.katalog() : null;
+    const MK = { vortice: ['Vortice', 'vortice-yatay.png'], seat: ['SEAT', 'seat.png'], avens: ['AVenS', 'avens.svg'], 'nicotra-gebhardt': ['Nicotra Gebhardt', 'nicotra-gebhardt.webp'], danfoss: ['Danfoss', 'danfoss.svg'], casals: ['Casals', 'casals.png'], flexiva: ['Flexiva', 'flexiva.png'] };
+    const id = MK[P.markaId] ? P.markaId : 'vortice', [ad, logo] = MK[id];
+    const K = kt && (kt.marka || []).find((x) => x.id === id), satir = (K && K.satir) || [], urunlu = satir.length > 0;
+    const nModel = satir.reduce((a, r) => a + (r[2] || 0), 0);
+    /* Seriler: katalogdaki bu markanın serileri (model > 0), ürün grubuna göre (§6 sıra = katalog kök sırası), çoktan aza. */
+    const kok = (kt && kt.kok) || [], grupOf = (d) => (kok.find((k) => (k.dal || []).includes(d)) || {}).id;
+    const fam = kt ? Object.keys(kt.aile).filter((f) => kt.aile[f].m === id && kt.aile[f].n > 0) : [];
+    const gruplar = kok.map((k) => {
+      const ss = fam.filter((f) => grupOf(kt.aile[f].d) === k.id).sort((x, y) => kt.aile[y].n - kt.aile[x].n).map((f) => KT.seri(f, DIL)).filter(Boolean);
+      const G = KT.grup(k.id, DIL);
+      return { id: 'mrk-g-' + k.id, ad: G && G.ad != null ? G.ad : '\u27E6katalog.kok.' + k.id + '\u27E7', n: A('ds.n-seri', { n: sayi(ss.length) }), sayi: ss.length, kartlar: ss.map((sr) => ({ seri: sr, mobil: mob, metin: M, dil: DIL, href: '#', onAc: () => git('seri', sr.slug) })) };
+    }).filter((g) => g.kartlar.length);
+    const nSeri = gruplar.reduce((a, g) => a + g.sayi, 0);
+    const cipler = gruplar.length > 1 ? gruplar.map((g) => ({ ad: g.ad, n: sayi(g.sayi), sec: () => this.kaydir(g.id) })) : [];
+    /* Marka bilgisi (S5 MARKA_BILGI): §8 → cümle ve 'Alan' satırı çizilmez. Satır adı sözlükten; değerin EN'i yoksa satır EN'de çizilmez (S5 gibi). */
+    const MB = (this.state.mb || {}), BI = (MB.bilgi || {})[id], BE = MB.en || {};
+    const ETK = { 'Menşei': 'ds.marka-mensei', 'Kuruluş': 'ds.marka-kurulus', 'Merkez': 'ds.marka-merkez', 'Grup': 'ds.marka-grup', 'Uygulama alanları': 'ds.uygulama-alanlari' };
+    /* §1.15 + K7 (ds-gecerli-kurulum 3): her satır değeri kaynağıyla durur — satır [ad, değer, { kaynak, sayfa? }]; kaynağı olmayan satır çizilmez. S5 MARKA_BILGI kaynak taşımıyor → bugün satır 0, yalnız resmî web bağlantısı (kaynağın kendisi). */
+    const bs = BI ? BI.satir.filter((z) => ETK[z[0]] && z[2] && z[2].kaynak).map((z) => ({ k: A(ETK[z[0]]), v: en ? (/^\d+$/.test(z[1]) ? z[1] : BE[z[1]] || null) : z[1], kaynak: z[2].kaynak })).filter((z) => z.v) : [];
+    return {
+      lang: DIL.toLowerCase(), dilB: DIL, mobA: mob ? '1' : '0',
+      mrk: { ad, logo: '../../assets/marka-logolari/' + logo, urunlu, urunsuz: !urunlu, ozet: satir.map(([g]) => { const G = KT && KT.grup(g, DIL); return G ? G.ad : null; }).filter(Boolean).join(' · '), seriEt: A('ds.marka-serileri-gor'), seriGit: () => this.kaydir('mrk-seriler'), modelEt: A('t.tum-modeller-3') + sayi(nModel) + ')', modelGit: () => git('urunler', { marka: id }), teklifEt: A('tx.markaTeklif'), teklifGit: () => git('teklif', id), urunsuzM: A('tx.flexivaM') },
+      s: { b: A('t.seriler'), alt: A('ds.marka-seri-alt', { n: sayi(nSeri) }), cipVar: cipler.length > 0, cipler, gruplar },
+      b: { var: bs.length > 0 || !!(BI && BI.web), b: A('t.marka-bilgisi'), satir: bs, webVar: !!(BI && BI.web), web: BI && BI.web ? BI.web : '#', webK: A('t.web'), webEt: A('t.resmi-web-sitesi'), webAd: BI && BI.web ? String(BI.web).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '') : '' },
+      rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }, { ad: A('tx.markalarB'), href: '#', onClick: (e) => { e.preventDefault(); git('markalar'); } }, { ad }] }
+    };
+  }
+}
+</script>
+</body>
+</html>

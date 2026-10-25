@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Durum (404 · yükleniyor · hata)" description="İş emri #20-10: S5 '404' + 'Durum · yükleniyor / hata' birebir; mono → Onest tabular. 404'te ürün grupları + arama + teklif yolu. durum='404'|'yukleniyor'|'hata'." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-durum][data-mob="1"]{padding:0 18px 30px !important}[data-vh-durum][data-mob="1"] h1{font-size:28px !important}</style></helmet>
+<div data-vh-durum="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:20px;padding:0 40px 44px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));min-height:60vh;box-sizing:border-box">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto">
+<sc-if value="{{ d404 }}" hint-placeholder-val="{{ true }}"><section data-screen-label="404" style="display:flex;flex-direction:column;gap:16px;max-width:720px">
+<span style="font-size:13px;font-weight:600;letter-spacing:0.12em;font-variant-numeric:tabular-nums;color:hsl(var(--brand-cyan-ink))">404 · {{ adres }}</span>
+<h1 style="margin:0;font-family:var(--font-baslik);font-size:40px;font-weight:700;letter-spacing:-0.025em;line-height:1.15">{{ m.nf1 }}</h1>
+<p style="margin:0;font-size:17px;line-height:1.6;color:hsl(var(--text-body));max-width:60ch;text-wrap:pretty">{{ m.nf2 }}</p>
+<div style="display:flex;flex-direction:column;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-radius:16px;overflow:hidden">
+<sc-for list="{{ cikislar }}" as="c" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:10px;padding:14px 18px;border-bottom:1px solid hsl(var(--border-row))"><button type="button" onClick="{{ c.ac }}" style="display:grid;grid-template-columns:36px 1fr;gap:12px;min-height:44px;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;font:inherit"><span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:hsl(var(--text-strong))">{{ c.no }}</span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:16px;font-weight:600;color:hsl(var(--text-strong))">{{ c.ad }}</span><span style="font-size:15px;color:hsl(var(--text-body))">{{ c.ne }}</span></span></button><sc-if value="{{ c.ciplerVar }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-wrap:wrap;gap:8px;padding-left:48px"><sc-for list="{{ c.cipler }}" as="g" hint-placeholder-count="7"><x-import component-from-global-scope="DesignSystem_4f7164.Cip" onClick="{{ g.ac }}" hint-size="auto,44px">{{ g.ad }}</x-import></sc-for></div></sc-if></div></sc-for>
+</div>
+</section></sc-if>
+<sc-if value="{{ dYuk }}" hint-placeholder-val="{{ false }}"><section data-screen-label="Durum · yükleniyor" aria-busy="true" style="display:flex;flex-direction:column;gap:18px">
+<span role="status" style="font-size:15px;color:hsl(var(--text-body))">{{ m.yuk }}</span>
+<div style="width:40%;height:34px;border-radius:8px;background:hsl(var(--surface-inset))"></div><div style="width:60%;height:14px;border-radius:6px;background:hsl(var(--surface-inset))"></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px"><sc-for list="{{ iskelet }}" as="x" hint-placeholder-count="6"><div style="background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px"><div style="height:160px;border-radius:12px;background:hsl(var(--surface-inset))"></div><div style="width:75%;height:18px;border-radius:6px;background:hsl(var(--surface-inset))"></div><div style="width:45%;height:12px;border-radius:6px;background:hsl(var(--surface-inset))"></div></div></sc-for></div>
+</section></sc-if>
+<sc-if value="{{ dHata }}" hint-placeholder-val="{{ false }}"><section data-screen-label="Durum · hata" style="display:flex;flex-direction:column;gap:16px;max-width:720px">
+<x-import component-from-global-scope="DesignSystem_4f7164.HukumKutusu" hal="yetmez" etiket="{{ m.hataB }}" dil="{{ dil }}" hint-size="100%,80px">{{ m.hataM }}</x-import>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><x-import component-from-global-scope="DesignSystem_4f7164.CerceveliDugme" onClick="{{ tekrar }}" hint-size="auto,44px">{{ m.tekrar }}</x-import><x-import component-from-global-scope="DesignSystem_4f7164.CerceveliDugme" onClick="{{ bildir }}" hint-size="auto,44px">{{ m.bildir }}</x-import></div>
+<span style="font-size:13px;font-variant-numeric:tabular-nums;color:hsl(var(--text-body))">{{ m.hataKod }} {{ hataKod }}</span>
+</section></sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;900px&quot;},&quot;durum&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;404&quot;,&quot;yukleniyor&quot;,&quot;hata&quot;],&quot;default&quot;:&quot;404&quot;,&quot;tsType&quot;:&quot;'404' | 'yukleniyor' | 'hata'&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;adres&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;hataKod&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onTekrar&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json'), null]).then(([a, b, c]) => { const m = { ...(a || {}), ...(b || {}) }; if (c) for (const k in c) if (k[0] !== '_' && m[k] == null) m[k] = c[k]; this.setState({ metin: m }); });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || this.state.metin || {}, git = P.onGit || (() => {}), D = P.durum || '404';
+    const A = (k, v) => { let s = M[k]; if (s == null) return '\u27E6' + k + '\u27E7'; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+    const KT = window.VHKatalog;
+    /* 404 çıkışları (#20-10): arama · ürün grupları (çipler, katalogdan) · teklif yolu. S5'teki "Mahalinizi söyleyin" ve "Sorunuzu yazın" kural gereği çıktı. */
+    const cikislar = [
+      { no: '01', ad: A('js.Aramayı kullanın'), ne: A('ds.404-arama-ne'), ac: () => git('arama'), ciplerVar: false, cipler: [] },
+      { no: '02', ad: A('ds.404-gruplar-ad'), ne: A('ds.404-gruplar-ne'), ac: () => git('urunler'), ciplerVar: !!KT, cipler: KT ? KT.gruplar(DIL).filter((g) => g.model > 0).map((g) => ({ ad: g.ad, ac: () => git('grup', g.id) })) : [] },
+      { no: '03', ad: A('t.teklif-iste'), ne: A('ds.404-teklif-ne'), ac: () => git('teklif'), ciplerVar: false, cipler: [] }
+    ];
+    return {
+      lang: DIL.toLowerCase(), dil: DIL, mobA: mob ? '1' : '0',
+      d404: D === '404', dYuk: D === 'yukleniyor', dHata: D === 'hata',
+      rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }] },
+      m: { nf1: A('tx.e_nf1'), nf2: A('tx.e_nf2'), yuk: A('tx.yukleniyor'), hataB: String(A('tx.hataB')).replace(/^✗\s*/, ''), hataM: A('tx.hataM'), tekrar: A('tx.tekrar'), bildir: A('tx.bildir'), hataKod: A('tx.hataKod') },
+      adres: P.adres || '/tr/…', hataKod: P.hataKod || 'VH-ERR-0000',
+      cikislar, iskelet: [1, 2, 3, 4, 5, 6],
+      tekrar: () => (P.onTekrar ? P.onTekrar() : git('yenile')), bildir: () => git('destek')
+    };
+  }
+}
+</script>
+</body>
+</html>

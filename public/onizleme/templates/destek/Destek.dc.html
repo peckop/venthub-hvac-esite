@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Destek" description="İş emri #20-7: S5 'Destek' birebir. Konu çipleri (Seçim · Montaj · Arıza · Belge talebi), 'Soruya eklenecek' bağlam kutusu, soru · e-posta · dosya, 'Destek iste'; yanda 'Önce bunlara bakın' kısa yolları. Konum SectionRail'de; metin sözlükten." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-destek][data-mob="1"]{padding:0 18px 30px !important}[data-vh-destek][data-mob="1"] h1{font-size:28px !important}[data-vh-destek][data-mob="1"] [data-ds-form]{padding:16px !important}</style></helmet>
+<div data-vh-destek="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:22px;padding:0 40px 44px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<section data-screen-label="Destek" style="width:100%;max-width:1060px;min-width:0;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+<h1 style="margin:0;font-family:var(--font-baslik);font-size:40px;font-weight:700;letter-spacing:-0.025em">{{ d.baslik }}</h1>
+<p style="margin:0;font-size:var(--size-editorial);line-height:1.6;color:hsl(var(--text-body));max-width:66ch;text-wrap:pretty">{{ d.not }}</p>
+<div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+<div data-ds-form="" style="flex:1 1 440px;min-width:0;max-width:600px;display:flex;flex-direction:column;gap:14px;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));padding:20px">
+<span style="font-size:var(--size-body-small)">{{ d.konuB }}</span>
+<div role="group" aria-label="{{ d.konuB }}" style="display:flex;flex-wrap:wrap;gap:7px"><sc-for list="{{ d.konular }}" as="c" hint-placeholder-count="4"><x-import component-from-global-scope="DesignSystem_4f7164.Cip" rol="varyant" secili="{{ c.secili }}" onClick="{{ c.sec }}" hint-size="auto,44px">{{ c.ad }}</x-import></sc-for></div>
+<sc-if value="{{ d.bagVar }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;background:hsl(var(--surface-subtle));border:1px solid hsl(var(--border-hairline));border-left:3px solid hsl(var(--brand-cyan))"><span style="font-size:var(--size-caption);font-weight:600;letter-spacing:0.08em;color:hsl(var(--brand-cyan-ink))">{{ d.bagB }}</span><sc-for list="{{ d.bag }}" as="b" hint-placeholder-count="1"><span style="font-size:var(--size-body-small);line-height:1.5;font-variant-numeric:tabular-nums">{{ b }}</span></sc-for></div></sc-if>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:var(--size-body-small)">{{ d.soruB }}<textarea rows="4" placeholder="{{ d.ph }}" style="border:1px solid hsl(var(--border-control));padding:10px 12px;font:inherit;font-size:var(--size-body);color:hsl(var(--text-strong));background:hsl(var(--surface-card));outline:none;resize:vertical"></textarea></label>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:var(--size-body-small)"><span>{{ d.epostaB }} <span style="font-size:var(--size-caption);color:hsl(var(--text-body))">{{ d.zorunlu }}</span></span><input type="email" placeholder="{{ d.epostaPh }}" style="border:1px solid hsl(var(--border-control));min-height:44px;padding:0 12px;font:inherit;font-size:var(--size-body);color:hsl(var(--text-strong));background:hsl(var(--surface-card));outline:none"></label>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:var(--size-body-small)">{{ d.dosyaB }}<input type="file" style="font:inherit;font-size:var(--size-body-small);min-height:44px"></label>
+<x-import component-from-global-scope="DesignSystem_4f7164.AnaEylemDugmesi" onClick="{{ d.gonder }}" tam-genislik="{{ true }}" hint-size="100%,48px">{{ d.gonderL }}</x-import>
+</div>
+<div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:12px">
+<span style="font-size:18px;font-weight:600">{{ d.kisaB }}</span>
+<div style="display:flex;flex-direction:column;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline))"><sc-for list="{{ d.kisa }}" as="b" hint-placeholder-count="4"><button type="button" onClick="{{ b.ac }}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:56px;padding:12px 16px;border:0;border-bottom:1px solid hsl(var(--border-row));background:transparent;text-align:left;font:inherit;cursor:pointer" style-hover="background:hsl(var(--surface-subtle))"><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:var(--size-body);font-weight:600;color:hsl(var(--text-strong))">{{ b.ad }}</span><span style="font-size:var(--size-caption);line-height:1.5;color:hsl(var(--text-body))">{{ b.ne }}</span></span><span aria-hidden="true" style="font-size:var(--size-caption);color:hsl(var(--text-body))">→</span></button></sc-for></div>
+<span style="font-size:var(--size-body-small);line-height:1.5;color:hsl(var(--text-body))">{{ d.belgeNot }}</span>
+</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;900px&quot;},&quot;konu&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Seçim&quot;,&quot;Montaj&quot;,&quot;Arıza&quot;,&quot;Belge talebi&quot;],&quot;default&quot;:&quot;Seçim&quot;,&quot;tsType&quot;:&quot;'Seçim' | 'Montaj' | 'Arıza' | 'Belge talebi'&quot;},&quot;model&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;liste&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Array&lt;{ sku: string }&gt;&quot;},&quot;hesapOzet&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, ek?: string | object) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null, konu: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json'), null]).then(([a, b, c]) => { const m = { ...(a || {}), ...(b || {}) }; if (c) for (const k in c) if (k[0] !== '_' && m[k] == null) m[k] = c[k]; this.setState({ metin: m }); });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, s = this.state, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || s.metin || {}, git = P.onGit || (() => {});
+    const A = (k) => (M[k] == null ? '\u27E6' + k + '\u27E7' : M[k]);
+    const KONU = ['Seçim', 'Montaj', 'Arıza', 'Belge talebi'];
+    const PH = { 'Seçim': 'js.Örn. bu fan 15 m kanal ve filtreyle yeter mi?', 'Montaj': 'js.Örn. dikey kanala monte edilebilir mi?', 'Arıza': 'js.Model, kurulum tarihi ve belirti…', 'Belge talebi': 'js.Hangi model için hangi belge (föy, CAD, CE)?' };
+    const konu = s.konu || (KONU.includes(P.konu) ? P.konu : 'Seçim');
+    let son = null;
+    if (P.model) { const KT = window.VHKatalog, r = KT ? (KT.ara(P.model, DIL).model || []).find((x) => x.sku === P.model) : null; son = { sku: P.model, ad: r ? r.ad : P.model }; }
+    const liste = Array.isArray(P.liste) ? P.liste : [];
+    const bag = [son ? A('ds.destek-model') + son.ad + ' \u00B7 ' + son.sku : null, P.hesapOzet ? A('t.hattiniz') + P.hesapOzet : null, liste.length ? A('t.teklif-listesi-2') + liste.length + A('t.kalem') : null].filter(Boolean);
+    return {
+      lang: DIL.toLowerCase(), mobA: mob ? '1' : '0',
+      d: {
+        baslik: A('tx.e_destekB'), not: A('tx.e_destekNot'), konuB: A('tx.e_konuN'),
+        konular: KONU.map((k) => ({ ad: A('js.' + k), secili: konu === k, sec: () => this.setState({ konu: k }) })),
+        bagVar: bag.length > 0, bagB: A('tx.e_soruyaEklenecekN'), bag,
+        soruB: A('tx.e_sorunuzN'), ph: A(PH[konu]), epostaB: A('tx.e_epostaKN'), zorunlu: A('tx.e_zorunluN'), epostaPh: A('tx.e_epostaPhN'), dosyaB: A('tx.e_dosyaEkle'),
+        gonderL: A('tx.e_destekIsteN'), gonder: () => git('alindi', { talepTur: 'destek', konu }),
+        kisaB: A('t.once-bunlara-bakin'),
+        kisa: [['t.sik-sorulan-sorular', 't.teklif-fiyat-uyelik', () => git('sss')], ['js.Nasıl teklif alınır', 't.uc-adimda', () => git('nasil')], ['t.garanti-ve-servis', 't.kosullar', () => git('metin', 'garanti')], ['t.teslimat-ve-kargo', 't.kosullar', () => git('metin', 'teslimat')]].map(([a, n, ac]) => ({ ad: A(a), ne: A(n), ac })),
+        belgeNot: A('t.urun-belgeleri-katalog-teknik-foy-cad-kilavuz-il')
+      },
+      rail: { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } }, { ad: A('t.destek') }] }
+    };
+  }
+}
+</script>
+</body>
+</html>

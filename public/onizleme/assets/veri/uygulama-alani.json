@@ -1,0 +1,520 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · Uygulama alanı verisi, tek dosya (9 alan; eski uygulama-alani-taslak-8.json buraya katıldı, arsiv/veri/'de). Yapı (Recep 10-25, surec/arastirma-2026-10-25-koleksiyon.md): bölüm `kural` ile dolar = seri etiketi `kural.etiket` VE ürün türü `kural.tur` içinde (hepsi); seri etiketleri veri/seri-uygulama-etiket.json'da (DB'de seri kaydı `uygulama[]` gelene kadar; OPS isteği surec/ops-istek-2026-10-25-uygulama-etiket.md). `icerik` = kuralın bugünkü elle karşılığı ve istisna ekleme; `cikar` = istisna çıkarma. `anaSayfa` = ana sayfada 'Uygulama alanlarından' bloğu (iş emri #13). Tür kimliği katalog `dal`, 'tür:seri' yalnız o seri. Ad ve sayı katalogdan. 9 alanın hepsi onaylı (Recep 10-25); sonraki değişiklik Venthub New üzerinden. `tanim` ve `gorsel` henüz yok (K63 metni kaynaklı yazılacak). Uygulama alanı ürün ağacına dal değildir; ürünün konumu değişmez. Alan sayfasında bölüm altında seri kartları (modeller seri sayfasında). · 10-25: `kume` (ana sayfada aynı seri kümesine sahip alanlar tek blok) ve `kumeler`; ana sayfada bir seri bir kez (kurallar: CLAUDE.md §12).",
+ "alanlar": [
+  {
+   "id": "konut-havalandirmasi",
+   "sira": 9,
+   "ad": {
+    "tr": "Konut havalandırması",
+    "en": "Residential ventilation"
+   },
+   "durum": "onayli",
+   "onay": "Recep 10-24",
+   "yol": {
+    "tr": "/tr/uygulama-alani/konut-havalandirmasi",
+    "en": "/en/application/residential-ventilation",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "banyo-tuvalet",
+     "ad": {
+      "tr": "Banyo ve tuvalet",
+      "en": "Bathroom and toilet"
+     },
+     "kural": {
+      "etiket": "konut-havalandirmasi",
+      "tur": [
+       "bathroom-toilet-fans"
+      ]
+     },
+     "icerik": [
+      "bathroom-toilet-fans"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    },
+    {
+     "id": "isi-geri-kazanim",
+     "ad": {
+      "tr": "Isı geri kazanım",
+      "en": "Heat recovery"
+     },
+     "kural": {
+      "etiket": "konut-havalandirmasi",
+      "tur": [
+       "single-room-hrv",
+       "ducted-central-hrv"
+      ]
+     },
+     "icerik": [
+      "single-room-hrv",
+      "ducted-central-hrv:vortice-isi-geri-kazanim"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    },
+    {
+     "id": "mutfak-kanal",
+     "ad": {
+      "tr": "Mutfak ve kanal",
+      "en": "Kitchen and duct"
+     },
+     "kural": {
+      "etiket": "konut-havalandirmasi",
+      "tur": [
+       "duct-fans"
+      ]
+     },
+     "icerik": [
+      "duct-fans:vortice-lineo",
+      "duct-fans:vortice-lineo-quiet"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    },
+    {
+     "id": "nem-alma",
+     "ad": {
+      "tr": "Nem alma",
+      "en": "Dehumidification"
+     },
+     "kural": {
+      "etiket": "konut-havalandirmasi",
+      "tur": [
+       "dehumidifiers"
+      ]
+     },
+     "icerik": [
+      "dehumidifiers"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "kural": {
+      "etiket": "konut-havalandirmasi",
+      "tur": [
+       "speed-controllers"
+      ]
+     },
+     "icerik": [
+      "speed-controllers"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    }
+   ]
+  },
+  {
+   "id": "ticari-alan-ofis",
+   "ad": {
+    "tr": "Ticari alan ve ofis",
+    "en": "Commercial and office"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/ticari-alan-ve-ofis",
+    "en": "/en/application/commercial-and-office",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "kanal",
+     "ad": {
+      "tr": "Kanal havalandırması",
+      "en": "Duct ventilation"
+     },
+     "kural": {
+      "etiket": "ticari-alan-ofis",
+      "tur": [
+       "duct-fans"
+      ]
+     },
+     "icerik": [
+      "duct-fans"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    },
+    {
+     "id": "isi-geri-kazanim",
+     "ad": {
+      "tr": "Isı geri kazanım",
+      "en": "Heat recovery"
+     },
+     "kural": {
+      "etiket": "ticari-alan-ofis",
+      "tur": [
+       "ducted-central-hrv"
+      ]
+     },
+     "icerik": [
+      "ducted-central-hrv"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    },
+    {
+     "id": "wc",
+     "ad": {
+      "tr": "WC ve ıslak hacim",
+      "en": "WC and wet rooms"
+     },
+     "kural": {
+      "etiket": "ticari-alan-ofis",
+      "tur": [
+       "bathroom-toilet-fans"
+      ]
+     },
+     "icerik": [
+      "bathroom-toilet-fans"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "kural": {
+      "etiket": "ticari-alan-ofis",
+      "tur": [
+       "speed-controllers",
+       "frequency-converters"
+      ]
+     },
+     "icerik": [
+      "speed-controllers",
+      "frequency-converters"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    }
+   ],
+   "onay": "Recep 10-25"
+  },
+  {
+   "id": "kimya-laboratuvari",
+   "ad": {
+    "tr": "Kimya laboratuvarı",
+    "en": "Chemistry laboratory"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/kimya-laboratuvari",
+    "en": "/en/application/chemistry-laboratory",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "ceker-ocak",
+     "ad": {
+      "tr": "Çeker ocak egzozu",
+      "en": "Fume cupboard exhaust"
+     },
+     "kural": {
+      "etiket": "kimya-laboratuvari",
+      "tur": [
+       "acid-resistant-fans"
+      ]
+     },
+     "icerik": [
+      "acid-resistant-fans"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "kural": {
+      "etiket": "kimya-laboratuvari",
+      "tur": [
+       "frequency-converters"
+      ]
+     },
+     "icerik": [
+      "frequency-converters"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    }
+   ],
+   "onay": "Recep 10-25",
+   "kume": "kimyasal-ortam"
+  },
+  {
+   "id": "galvaniz",
+   "ad": {
+    "tr": "Galvaniz ve kaplama",
+    "en": "Galvanising and plating"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/galvaniz-ve-kaplama",
+    "en": "/en/application/galvanising-and-plating",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "banyo-egzozu",
+     "ad": {
+      "tr": "Kaplama banyosu egzozu",
+      "en": "Plating bath exhaust"
+     },
+     "kural": {
+      "etiket": "galvaniz",
+      "tur": [
+       "acid-resistant-fans"
+      ]
+     },
+     "icerik": [
+      "acid-resistant-fans"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    }
+   ],
+   "onay": "Recep 10-25",
+   "kume": "kimyasal-ortam"
+  },
+  {
+   "id": "ilac-kimya-tesisi",
+   "ad": {
+    "tr": "İlaç ve kimya tesisi",
+    "en": "Pharmaceutical and chemical plant"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/ilac-ve-kimya-tesisi",
+    "en": "/en/application/pharmaceutical-and-chemical-plant",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "proses",
+     "ad": {
+      "tr": "Proses egzozu",
+      "en": "Process exhaust"
+     },
+     "kural": {
+      "etiket": "ilac-kimya-tesisi",
+      "tur": [
+       "acid-resistant-fans"
+      ]
+     },
+     "icerik": [
+      "acid-resistant-fans"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    },
+    {
+     "id": "kontrol",
+     "ad": {
+      "tr": "Kontrol",
+      "en": "Controls"
+     },
+     "kural": {
+      "etiket": "ilac-kimya-tesisi",
+      "tur": [
+       "frequency-converters"
+      ]
+     },
+     "icerik": [
+      "frequency-converters"
+     ],
+     "cikar": [],
+     "anaSayfa": false
+    }
+   ],
+   "onay": "Recep 10-25",
+   "kume": "kimyasal-ortam"
+  },
+  {
+   "id": "atex",
+   "ad": {
+    "tr": "Patlayıcı ortam (ATEX)",
+    "en": "Explosive atmosphere (ATEX)"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/patlayici-ortam-atex",
+    "en": "/en/application/explosive-atmosphere-atex",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "atex-fan",
+     "ad": {
+      "tr": "ATEX fanlar",
+      "en": "ATEX fans"
+     },
+     "kural": {
+      "etiket": "atex",
+      "tur": [
+       "axial-industrial-fans",
+       "centrifugal-fans",
+       "acid-resistant-fans"
+      ]
+     },
+     "icerik": [
+      "axial-industrial-fans:vortice-vort-e-atex",
+      "centrifugal-fans:vortice-vorticent-cms-atex",
+      "acid-resistant-fans:seat-serisi"
+     ],
+     "cikar": [],
+     "anaSayfa": true,
+     "kaynak": "Vortice E-ATEX kataloğu (187721) s.4, 6–7 · Vortice Industrial Ventilation (163043) s.104–105 · SEAT serisinde ATEX modeller (katalog)"
+    }
+   ],
+   "onay": "Recep 10-25"
+  },
+  {
+   "id": "kapali-havuz-spa",
+   "ad": {
+    "tr": "Kapalı havuz ve spa",
+    "en": "Indoor pool and spa"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/kapali-havuz-ve-spa",
+    "en": "/en/application/indoor-pool-and-spa",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "nem",
+     "ad": {
+      "tr": "Nem alma",
+      "en": "Dehumidification"
+     },
+     "kural": {
+      "etiket": "kapali-havuz-spa",
+      "tur": [
+       "dehumidifiers"
+      ]
+     },
+     "icerik": [
+      "dehumidifiers"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    },
+    {
+     "id": "egzoz",
+     "ad": {
+      "tr": "Korozif ortam egzozu",
+      "en": "Corrosive exhaust"
+     },
+     "kural": {
+      "etiket": "kapali-havuz-spa",
+      "tur": [
+       "acid-resistant-fans"
+      ]
+     },
+     "icerik": [
+      "acid-resistant-fans:seat-serisi"
+     ],
+     "cikar": [],
+     "anaSayfa": false,
+     "kaynak": "SEAT beyanı: uygulama alanları arasında yüzme havuzu (marka bilgisi, S5)"
+    }
+   ],
+   "onay": "Recep 10-25"
+  },
+  {
+   "id": "magaza-girisi",
+   "ad": {
+    "tr": "Mağaza girişi",
+    "en": "Shop entrance"
+   },
+   "durum": "onayli",
+   "onay": "Recep 10-25",
+   "yol": {
+    "tr": "/tr/uygulama-alani/magaza-girisi",
+    "en": "/en/application/shop-entrance",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "perde",
+     "ad": {
+      "tr": "Hava perdesi",
+      "en": "Air curtain"
+     },
+     "kural": {
+      "etiket": "magaza-girisi",
+      "tur": [
+       "unheated-air-curtains",
+       "electric-heated-air-curtains"
+      ]
+     },
+     "icerik": [
+      "unheated-air-curtains",
+      "electric-heated-air-curtains"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    }
+   ]
+  },
+  {
+   "id": "siginak",
+   "ad": {
+    "tr": "Sığınak havalandırma",
+    "en": "Shelter ventilation"
+   },
+   "durum": "onayli",
+   "yol": {
+    "tr": "/tr/uygulama-alani/siginak-havalandirma",
+    "en": "/en/application/shelter-ventilation",
+    "durum": "öneri · Recep + OPS (§9)"
+   },
+   "bolumler": [
+    {
+     "id": "unite",
+     "ad": {
+      "tr": "Sığınak Havalandırma Üniteleri",
+      "en": "Shelter Ventilation Units"
+     },
+     "kural": {
+      "etiket": "siginak",
+      "tur": [
+       "shelter-ventilation"
+      ]
+     },
+     "icerik": [
+      "shelter-ventilation"
+     ],
+     "cikar": [],
+     "anaSayfa": true
+    }
+   ],
+   "onay": "Recep 10-25"
+  }
+ ],
+ "kumeler": {
+  "kimyasal-ortam": {
+   "anahtar": "ds.anasayfa-kume-kimyasal",
+   "alanlar": [
+    "kimya-laboratuvari",
+    "galvaniz",
+    "ilac-kimya-tesisi"
+   ],
+   "onay": "Recep 10-25",
+   "not": "Ana sayfada tek blok; alan sayfaları ayrı kalır."
+  }
+ }
+}

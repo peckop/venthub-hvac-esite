@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Seri" description="Seri sayfası (iş emri #7 · kaynak DESIGN-MENU paket-B/Kombin Seri): SectionRail (konum + Modeller) → PageCover (seri, marka, n model, değer satırı; fotoğraf solda) → ModelListesi (24/sayfa). Ad ve sayılar katalogdan." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}</style></helmet>
+<sc-if value="{{ masa }}" hint-placeholder-val="{{ true }}"><div data-vh-seri="" lang="{{ lang }}" data-screen-label="Seri" style="display:flex;flex-direction:column;gap:24px;padding:0 40px 60px;background:hsl(var(--surface-page));font-family:var(--font-sans)">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import>
+<x-import component-from-global-scope="DesignSystem_4f7164.PageCover" dc-props="{{ kapak }}" hint-size="100%,420px"></x-import>
+<div id="k-modeller"><x-import component-from-global-scope="DesignSystem_4f7164.ModelListesi" dc-props="{{ liste }}" hint-size="100%,900px"></x-import></div>
+</div></sc-if>
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><div data-vh-seri="" lang="{{ lang }}" data-screen-label="Seri" style="display:flex;flex-direction:column;gap:24px;padding:0 18px 40px;background:hsl(var(--surface-page));font-family:var(--font-sans)">
+<x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import>
+<x-import component-from-global-scope="DesignSystem_4f7164.PageCover" dc-props="{{ kapak }}" hint-size="100%,560px"></x-import>
+<div id="k-modeller"><x-import component-from-global-scope="DesignSystem_4f7164.ModelListesi" dc-props="{{ liste }}" hint-size="100%,900px"></x-import></div>
+</div></sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;1800px&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;seri&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: 'urunler' | 'grup' | 'tur' | 'model', id?: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null, secili: {}, sayfa: 1 };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    if (this.props.metin) return;
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json')]).then(([a, b]) => this.setState({ metin: { ...a, ...b } }));
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), M = P.metin || this.state.metin || {}, kip = P.kip || 'teklif', git = P.onGit || (() => {});
+    const A = (k, v) => { let s = M[k]; if (s == null) return '\u27E6' + k + '\u27E7'; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+    const D = (s, yol) => (s == null ? '\u27E6' + yol + '\u27E7' : s);
+    const KT = window.VHKatalog, f = P.seri || 'vortice-lineo-quiet', yerel = DIL === 'EN' ? 'en-GB' : 'tr-TR';
+    const base = { lang: DIL.toLowerCase(), mob, masa: !mob };
+    const S = KT ? KT.seri(f, DIL) : null;
+    if (!S) return { ...base, rail: { bolumler: [] }, kapak: { baslik: '' }, liste: { modeller: [] } };
+    const T = KT.tur(S.tur, DIL), kok = KT.katalog().kok.find((k) => (k.dal || []).includes(S.tur)) || {}, G = KT.grup(kok.id, DIL) || {};
+    const seriAd = D(S.ad, 'kart-dili-veri.seri.' + f + '.ad'), seriTam = D(S.konumAd, 'kart-dili-veri.seri.' + f + '.kisa'), turAd = D(T && T.ad, 'katalog.dal.' + S.tur + '.en'), grupAd = D(G.ad, 'katalog.kok.' + kok.id + '.en');
+    const ham = KT.ham(S.tur, f);
+    const motor = [...new Set(ham.map((r) => r[7]).filter(Boolean))].sort().join(' · ');
+    const ozet = [
+      { ad: A('js.Çap'), v: KT.aralik(ham, 6, 'Ø', 'mm', DIL) }, { ad: A('js.Debi'), v: KT.aralik(ham, 3, '', 'm³/h', DIL) },
+      { ad: A('ds.basinc'), v: KT.aralik(ham, 4, '', 'Pa', DIL) }, { ad: A('js.Ses'), v: KT.aralik(ham, 5, '', 'dB(A)', DIL) },
+      { ad: A('t.motor-3'), v: motor || null }
+    ].filter((o) => o.v);
+    const ac = (tip, x) => (e) => { if (e && e.preventDefault) e.preventDefault(); git(tip, x); };
+    const kaydir = (x) => { const el = document.getElementById(x); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 12, behavior: 'smooth' }); };
+    const rail = { konum: [{ ad: A('tx.e_anasayfa'), href: '#', onClick: ac('anasayfa') }, { ad: A('tx.e_urunler'), href: '#', onClick: ac('urunler') }, { ad: grupAd, href: '#', onClick: ac('grup', kok.id) }, { ad: turAd, href: '#', onClick: ac('tur', S.tur) }, { ad: seriTam }], bolumler: [{ id: 'k-modeller', ad: A('t.modeller') }], onSec: kaydir, geri: { ad: turAd, href: '#', onClick: ac('tur', S.tur) }, sayfaAdi: seriAd, yapiskan: false, mobil: mob, metin: M };
+    const kapak = { seviye: 'seri', marka: S.marka, baslik: seriAd, altSatir: A('ds.n-model', { n: S.modelSayisi.toLocaleString(yerel) }), ozet, fotoBoy: 'seri', fotoTaraf: 'sol', foto: S.foto ? { src: S.foto, alt: seriAd } : null, mobil: mob, metin: M, dil: DIL };
+    const modeller = KT.modeller(S.tur, ['debi', 'ses'], kip, DIL).filter((m) => m.suz.seri === f);
+    const gruplar = [{ id: 'motor', baslik: A('t.motor-3'), secenekler: KT.secenek(modeller, 'motor') }, { id: 'cap', baslik: A('js.Çap'), secenekler: KT.secenek(modeller, 'cap') }].filter((g) => g.secenekler.length > 1);
+    const liste = { baslik: A('t.modeller'), modeller, gruplar, sutunlar: [A('ds.en-cok-debi'), A('js.Ses')], secili: this.state.secili, onSecili: (x) => this.setState({ secili: x, sayfa: 1 }), sayfa: this.state.sayfa, onSayfa: (n) => this.setState({ sayfa: n }), sayfaBoyutu: 24, kip, onAc: (sku) => git('model', sku), seriGoster: false, mobil: mob, filtreDugmesi: mob, metin: M, dil: DIL, yerel };
+    return { ...base, rail, kapak, liste };
+  }
+}
+</script>
+</body>
+</html>

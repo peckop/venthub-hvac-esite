@@ -1,0 +1,149 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · Venthub New 25i B-4 önerisi kabul. Ad sözlükten (anahtar), adres §9. Sözcük kural A-1 ile sadeleşir.",
+ "tr": [
+  {
+   "anahtar": "t.teklif-iste",
+   "adres": "/tr/teklif-iste",
+   "s": [
+    "teklif",
+    "teklif iste",
+    "fiyat",
+    "fiyat teklifi",
+    "proforma",
+    "kac para",
+    "ne kadar"
+   ]
+  },
+  {
+   "anahtar": "t.nasil-teklif-alinir",
+   "adres": "/tr/nasil-teklif-alinir",
+   "s": [
+    "nasil teklif",
+    "teklif nasil",
+    "adimlar",
+    "surec"
+   ]
+  },
+  {
+   "anahtar": "t.iletisim",
+   "adres": "panel:iletisim",
+   "s": [
+    "iletisim",
+    "telefon",
+    "e-posta",
+    "eposta",
+    "mail",
+    "adres",
+    "ulasim",
+    "whatsapp"
+   ]
+  },
+  {
+   "anahtar": "t.bilgi-merkezi",
+   "adres": "/tr/bilgi-merkezi",
+   "s": [
+    "bilgi",
+    "rehber",
+    "nasil secilir",
+    "hesap",
+    "hesaplama",
+    "debi hesabi",
+    "kanal hesabi"
+   ]
+  },
+  {
+   "anahtar": "t.sss",
+   "adres": "/tr/sss",
+   "s": [
+    "sss",
+    "sik sorulan",
+    "soru"
+   ]
+  },
+  {
+   "anahtar": "t.destek",
+   "adres": "/tr/destek",
+   "s": [
+    "destek",
+    "yardim"
+   ]
+  },
+  {
+   "anahtar": "t.markalar",
+   "adres": "/tr/markalar",
+   "s": [
+    "marka",
+    "markalar"
+   ]
+  }
+ ],
+ "en": [
+  {
+   "anahtar": "t.teklif-iste",
+   "adres": "/en/request-quote",
+   "s": [
+    "quote",
+    "request a quote",
+    "price",
+    "pricing",
+    "cost",
+    "rfq"
+   ]
+  },
+  {
+   "anahtar": "t.nasil-teklif-alinir",
+   "adres": "/en/how-to-get-a-quote",
+   "s": [
+    "how to get a quote",
+    "steps",
+    "process"
+   ]
+  },
+  {
+   "anahtar": "t.iletisim",
+   "adres": "panel:iletisim",
+   "s": [
+    "contact",
+    "phone",
+    "email",
+    "address",
+    "whatsapp"
+   ]
+  },
+  {
+   "anahtar": "t.bilgi-merkezi",
+   "adres": "/en/knowledge-hub",
+   "s": [
+    "guide",
+    "knowledge",
+    "how to choose",
+    "calculator",
+    "airflow calculation"
+   ]
+  },
+  {
+   "anahtar": "t.sss",
+   "adres": "/en/faq",
+   "s": [
+    "faq",
+    "questions"
+   ]
+  },
+  {
+   "anahtar": "t.destek",
+   "adres": "/en/support",
+   "s": [
+    "support",
+    "help"
+   ]
+  },
+  {
+   "anahtar": "t.markalar",
+   "adres": "/en/brands",
+   "s": [
+    "brand",
+    "brands"
+   ]
+  }
+ ]
+}

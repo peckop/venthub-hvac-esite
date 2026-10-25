@@ -1,0 +1,10 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  --surface-page: 197.1 36.8% 96.3%; /* @kind color */     /* #F2F7F9 · sayfa zemini */
+  --surface-card: 0 0% 100%; /* @kind color */             /* #FFFFFF · kart, header */
+  --surface-subtle: 195 33.3% 97.6%; /* @kind color */     /* #F7FAFB · kart içi ikincil bölge, fotoğraf kutusu */
+  --surface-inset: 198 31.3% 93.7%; /* @kind color */      /* #EAF1F4 · gömülü alan, soluk rozet */
+  --p2-tint: 198 41.7% 90.6%; /* @kind color */            /* #DDEBF1 · çip ve rozet açık zemini */
+  /* --surface-dark (#10242E) kaldırıldı 23 Ekim: S5'te kullanılmıyor; alt bilgi --primary-navy (DESIGN-MENU ds-cevap-2026-10-23). */
+  --surface-dark-inset: 198 72% 29%; /* @kind color */     /* #155F7F · petrol alt bilgi, tam ekran menü, ürün sayfası, makale ve bildirimlerde gömülü alan (S5'te 20 yerde) — kalır */
+}

@@ -1,0 +1,102 @@
+{
+ "_damga": "Ana sayfa sahnesi örnek verisi (EN). Kaynak: DESIGN-MENU Ana Sayfa Sahne S5.dc.html (katalog-2026-10-04.json kok/dal; ölçek, hava, gölge sabitleri), birebir.",
+ "urunler": [
+  {
+   "id": "fanlar",
+   "ad": "Fans",
+   "alt": [
+    "In-Duct Fans",
+    "Corrosion- and Acid-Resistant Fans",
+    "Smoke Exhaust Fans"
+   ],
+   "foto": "sahne/grup-fan.png",
+   "olcek": 0.88,
+   "hava": 0,
+   "golge": [
+    22,
+    78
+   ],
+   "kisaAd": "Fans"
+  },
+  {
+   "id": "kontrol",
+   "ad": "Controls and Drives",
+   "alt": [
+    "Frequency Converters",
+    "Speed Controllers"
+   ],
+   "foto": "sahne/grup-kontrol.png",
+   "olcek": 0.8,
+   "hava": 0,
+   "golge": [
+    14,
+    86
+   ],
+   "kisaAd": "Controls and Drives"
+  },
+  {
+   "id": "sartlandirma",
+   "ad": "Air Treatment",
+   "alt": [
+    "Water Coil Duct Heaters",
+    "Electric Duct Heaters",
+    "Dehumidifiers"
+   ],
+   "foto": "sahne/grup-sartlandirma.png",
+   "olcek": 1.08,
+   "hava": 0,
+   "golge": [
+    26,
+    74
+   ],
+   "kisaAd": "Air Treatment"
+  },
+  {
+   "id": "igk",
+   "ad": "Heat Recovery",
+   "alt": [
+    "Ducted Central Units",
+    "Single-Room Units"
+   ],
+   "foto": "sahne/grup-igk.png",
+   "olcek": 1.12,
+   "hava": 0,
+   "golge": [
+    10,
+    90
+   ],
+   "kisaAd": "Heat Recovery"
+  },
+  {
+   "id": "perde",
+   "ad": "Air Curtains",
+   "alt": [
+    "Unheated Air Curtains",
+    "Electrically Heated Air Curtains"
+   ],
+   "foto": "sahne/grup-perde.png",
+   "olcek": 1.4,
+   "hava": 78,
+   "golge": [
+    6,
+    94
+   ],
+   "kisaAd": "Air Curtains"
+  },
+  {
+   "id": "siginak",
+   "ad": "Shelter Ventilation",
+   "alt": [
+    "Shelter Ventilation Units"
+   ],
+   "foto": "sahne/grup-siginak.png",
+   "olcek": 1,
+   "hava": 0,
+   "golge": [
+    16,
+    84
+   ],
+   "kisaAd": "Shelter"
+  }
+ ]
+}

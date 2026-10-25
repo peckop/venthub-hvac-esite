@@ -1,0 +1,102 @@
+{
+ "_damga": "Ana sayfa sahnesi örnek verisi (TR). Kaynak: DESIGN-MENU Ana Sayfa Sahne S5.dc.html (katalog-2026-10-04.json kok/dal; ölçek, hava, gölge sabitleri), birebir.",
+ "urunler": [
+  {
+   "id": "fanlar",
+   "ad": "Fanlar ve Aspiratörler",
+   "alt": [
+    "Kanal Tipi Fanlar",
+    "Korozyona ve Aside Dayanımlı Fanlar",
+    "Duman Egzoz Fanları"
+   ],
+   "foto": "sahne/grup-fan.png",
+   "olcek": 0.88,
+   "hava": 0,
+   "golge": [
+    22,
+    78
+   ],
+   "kisaAd": "Fanlar"
+  },
+  {
+   "id": "kontrol",
+   "ad": "Kontrol ve Sürücüler",
+   "alt": [
+    "Frekans Konvertörleri",
+    "Hız Anahtarları"
+   ],
+   "foto": "sahne/grup-kontrol.png",
+   "olcek": 0.8,
+   "hava": 0,
+   "golge": [
+    14,
+    86
+   ],
+   "kisaAd": "Kontrol ve Sürücüler"
+  },
+  {
+   "id": "sartlandirma",
+   "ad": "Hava Şartlandırma",
+   "alt": [
+    "Sulu Batarya Kanal Tipi",
+    "Elektrikli Kanal Isıtıcıları",
+    "Nem Alma Cihazları"
+   ],
+   "foto": "sahne/grup-sartlandirma.png",
+   "olcek": 1.08,
+   "hava": 0,
+   "golge": [
+    26,
+    74
+   ],
+   "kisaAd": "Hava Şartlandırma"
+  },
+  {
+   "id": "igk",
+   "ad": "Isı Geri Kazanım (VMC)",
+   "alt": [
+    "Kanallı Merkezi Üniteler",
+    "Tekil Oda Üniteleri"
+   ],
+   "foto": "sahne/grup-igk.png",
+   "olcek": 1.12,
+   "hava": 0,
+   "golge": [
+    10,
+    90
+   ],
+   "kisaAd": "Isı Geri Kazanım"
+  },
+  {
+   "id": "perde",
+   "ad": "Hava Perdeleri",
+   "alt": [
+    "Isıtıcısız Hava Perdeleri",
+    "Elektrikli Isıtıcılı Hava Perdeleri"
+   ],
+   "foto": "sahne/grup-perde.png",
+   "olcek": 1.4,
+   "hava": 78,
+   "golge": [
+    6,
+    94
+   ],
+   "kisaAd": "Hava Perdeleri"
+  },
+  {
+   "id": "siginak",
+   "ad": "Sığınak Havalandırma",
+   "alt": [
+    "Sığınak Havalandırma Fanları"
+   ],
+   "foto": "sahne/grup-siginak.png",
+   "olcek": 1,
+   "hava": 0,
+   "golge": [
+    16,
+    84
+   ],
+   "kisaAd": "Sığınak"
+  }
+ ]
+}

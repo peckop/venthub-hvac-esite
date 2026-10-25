@@ -1,0 +1,56 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · Ana sayfa Bilgi Merkezi öne çıkan 3 rehber. Kaynak: Site S5 REHBER (anaRehber). EN metin yok → EN sayfada bölüm çizilmez (K7).",
+ "rehberler": [
+  {
+   "id": "radyal-aksiyel",
+   "slug": "radyal-fan-mi-aksiyel-fan-mi",
+   "raf": {
+    "tr": "Seçim",
+    "en": null
+   },
+   "ad": {
+    "tr": "Radyal fan mı aksiyel fan mı? Fan nasıl seçilir?",
+    "en": null
+   },
+   "ozet": {
+    "tr": "Çalışma biçimi, kanat tipleri ve fan eğrisinden çalışma noktasının okunması.",
+    "en": null
+   },
+   "tarih": "2026-10-11"
+  },
+  {
+   "id": "ses",
+   "slug": "sessiz-fan-nasil-secilir",
+   "raf": {
+    "tr": "Ses ve konfor",
+    "en": null
+   },
+   "ad": {
+    "tr": "Sessiz fan nasıl seçilir?",
+    "en": null
+   },
+   "ozet": {
+    "tr": "Katalogdaki ses değerinin hangi yolda, hangi ayarda ve hangi mesafede verildiğini okumakla başlar.",
+    "en": null
+   },
+   "tarih": "2026-10-17"
+  },
+  {
+   "id": "kanal-kaybi",
+   "slug": "kanal-kaybi-nasil-hesaplanir",
+   "raf": {
+    "tr": "Hesap",
+    "en": null
+   },
+   "ad": {
+    "tr": "Kanal kaybı nasıl hesaplanır?",
+    "en": null
+   },
+   "ozet": {
+    "tr": "Debi iki katına çıkarsa kanal kaybı yaklaşık dört katına çıkar.",
+    "en": null
+   },
+   "tarih": "2026-09-18"
+  }
+ ]
+}

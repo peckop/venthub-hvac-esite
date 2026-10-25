@@ -1,0 +1,15 @@
+/* Kaynak: brand/tokens.css (Karar 405 · 21 Ekim 2026). Değerler birebir; burada yeni değer yazılmaz. */
+:root{
+  /* Boşluk: rol tokenı (K37). 44 px dokunma hedefi · 1060 px içerik sütunu: kural, token değil */
+  --space-tight: 5px;
+  --space-inline: 7px;
+  --space-grid: 10px;
+  --space-stack: 14px;
+  --space-card: 16px;
+  --space-card-loose: 20px;
+  --space-page-mobile: 18px;
+  --space-block: 30px;
+  --space-page: 40px;
+  /* S5 veri/token.css (DESIGN-MENU 21 Ekim) */
+  --hedef-min: 44px;                     /* etkileşimli öğe en az */
+}

@@ -1,0 +1,106 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · Seri → uygulama alanı etiketleri (geçici; kalıcı yeri DB seri kaydı `uygulama[]`). veri/uygulama-alani.json bölüm içeriğinden türetildi; elle düzeltilir. Etiket = uygulama alanı kimliği.",
+ "seri": {
+  "avens-dikdortgen-kanal-radyal": [
+   "ticari-alan-ofis"
+  ],
+  "avens-hiz-anahtarlari": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "avens-isi-geri-kazanim": [
+   "ticari-alan-ofis"
+  ],
+  "avens-qe-b-kasa": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "avens-siginak-havalandirma-uniteleri": [
+   "siginak"
+  ],
+  "danfoss-fc101": [
+   "ticari-alan-ofis",
+   "kimya-laboratuvari",
+   "ilac-kimya-tesisi"
+  ],
+  "danfoss-fc102": [
+   "ticari-alan-ofis",
+   "kimya-laboratuvari",
+   "ilac-kimya-tesisi"
+  ],
+  "danfoss-fc51": [
+   "ticari-alan-ofis",
+   "kimya-laboratuvari",
+   "ilac-kimya-tesisi"
+  ],
+  "jet-serisi": [
+   "kimya-laboratuvari",
+   "galvaniz",
+   "ilac-kimya-tesisi"
+  ],
+  "seat-serisi": [
+   "kimya-laboratuvari",
+   "galvaniz",
+   "ilac-kimya-tesisi",
+   "atex",
+   "kapali-havuz-spa"
+  ],
+  "storm-serisi": [
+   "kimya-laboratuvari",
+   "galvaniz",
+   "ilac-kimya-tesisi"
+  ],
+  "vortice-deumido-range": [
+   "konut-havalandirmasi",
+   "kapali-havuz-spa"
+  ],
+  "vortice-h-ad-elektrikli": [
+   "magaza-girisi"
+  ],
+  "vortice-hava-perdesi": [
+   "magaza-girisi"
+  ],
+  "vortice-isi-geri-kazanim": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "vortice-lineo": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "vortice-lineo-quiet": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "vortice-punto-evo-flexo": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "vortice-radon-range-circular": [
+   "ticari-alan-ofis"
+  ],
+  "vortice-vort-commercial-in-line-circular": [
+   "ticari-alan-ofis"
+  ],
+  "vortice-vort-commercial-in-line-rectangular": [
+   "ticari-alan-ofis"
+  ],
+  "vortice-vort-e-atex": [
+   "atex"
+  ],
+  "vortice-vort-mono": [
+   "konut-havalandirmasi"
+  ],
+  "vortice-vort-quadro-evo": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "vortice-vortice-bravo-s": [
+   "konut-havalandirmasi",
+   "ticari-alan-ofis"
+  ],
+  "vortice-vorticent-cms-atex": [
+   "atex"
+  ]
+ }
+}

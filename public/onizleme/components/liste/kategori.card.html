@@ -1,0 +1,18 @@
+<!-- @dsCard group="Bileşen" viewport="1700x420" name="CategoryCard" subtitle="Sade kart: fotoğraf · ad → · n model (A+ noktalı kart iptal) · masaüstü 4 sütun + 390'da 2 sütun" -->
+<!DOCTYPE html><html lang="tr"><head>
+<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><title>CategoryCard</title><link rel="stylesheet" href="../../styles.css"><script src="/onizleme/_vendor/react.production.min.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script><script src="/onizleme/_vendor/react-dom.production.min.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script><script src="/onizleme/_vendor/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script><script src="../../_ds_bundle.js"></script><script src="../../templates/_kart/kart-metin.js"></script><style>html,body{margin:0}body{background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong));padding:20px;-webkit-font-smoothing:antialiased}a{color:hsl(var(--primary-navy))}a:hover{color:hsl(var(--text-strong))}.e{font-size:var(--size-overline);font-weight:600;letter-spacing:var(--track-overline);text-transform:uppercase;color:hsl(var(--text-body));margin-bottom:9px}.tel{width:390px;box-sizing:border-box;padding:16px 18px;background:hsl(var(--surface-page));border:8px solid #10242E;border-radius:24px;position:relative;overflow:hidden}</style></head><body><div id="kok"></div><script type="text/babel">
+const NS = window.DesignSystem_4f7164;
+const KT = window.VHKatalog, DL = window.KART_DIL, GAD = (id) => (KT.grup(id, DL) || {}).ad ?? '⟦katalog.kok.' + id + '⟧', KAD = (id) => (KT.tur(id, DL) || {}).ad ?? '⟦katalog.dal.' + id + '⟧', SAD = (f) => (KT.seri(f, DL) || {}).ad ?? '⟦katalog.aile.' + f + '⟧'; /* ürün adları yalnız katalogdan */
+const B = 'https://tnofewwkwlyjsqgwjjga.supabase.co/storage/v1/object/public/product-images/d3b07384-d113-495f-a558-8c38634e0000/';
+const { CategoryCard } = NS;
+const KAT = [[KAD('duct-fans'), 'e90a2a23-6de2-4bf2-8cd0-f5b96306e226/foto.webp', 43], [KAD('roof-fans'), '72734879-95cb-4935-800d-10da897d88a5/00.webp', 61], [KAD('axial-industrial-fans'), '49d777d3-9352-45f6-b08d-f29b802ece74/00.webp', 38], [KAD('centrifugal-fans'), '0985fe63-f7c5-4b56-8924-9f876a0fcf84/foto.webp', 27]];
+function Prova() {
+  return (
+    <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start' }}>
+      <div style={{ width: '1240px', flex: 'none' }}><div className="e">Masaüstü 1240 · 4 sütun · gap 16</div><div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: '16px' }}>{KAT.map(([ad, p, n], i) => <CategoryCard metin={window.METIN} key={i} kategori={{ slug: 'k' + i, ad, foto: B + p, modelSayisi: n }} />)}</div></div>
+      <div><div className="e">Mobil 390 · 2 sütun · gap 10</div><div className="tel"><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: '10px' }}>{KAT.map(([ad, p, n], i) => <CategoryCard metin={window.METIN} key={i} mobil kategori={{ slug: 'm' + i, ad, foto: B + p, modelSayisi: n }} />)}</div></div></div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('kok')).render(<Prova />);
+</script></body></html>

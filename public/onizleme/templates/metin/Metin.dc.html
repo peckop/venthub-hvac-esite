@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Metin (yasal · hakkımızda)" description="İş emri #20-8: S5 'Yasal' + 'Hakkımızda' tek kalıp; sayfa = hakkimizda | kvkk | gizlilik | cerez | kullanim | iade | mesafeli | onbilgi | garanti | teslimat. Şirket alanları etiketli boşluk; Hakkımızda kişisiz; konum SectionRail'de." -->
+<helmet><script src="./ds-base.js"></script><script src="../_kart/katalog.js"></script><style>body{margin:0;-webkit-font-smoothing:antialiased}[data-vh-metin][data-mob="1"]{padding:0 18px 30px !important}[data-vh-metin][data-mob="1"] h1{font-size:28px !important}</style></helmet>
+<div data-vh-metin="" data-mob="{{ mobA }}" lang="{{ lang }}" style="display:flex;flex-direction:column;gap:22px;padding:0 40px 44px;background:hsl(var(--surface-page));font-family:var(--font-sans);color:hsl(var(--text-strong))">
+<div style="width:100%;max-width:1060px;min-width:0;margin:0 auto"><x-import component-from-global-scope="DesignSystem_4f7164.SectionRail" dc-props="{{ rail }}" hint-size="100%,61px"></x-import></div>
+<sc-if value="{{ yasalVar }}" hint-placeholder-val="{{ true }}">
+<section data-screen-label="Yasal" style="width:100%;max-width:1060px;min-width:0;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-wrap:wrap;gap:7px"><sc-for list="{{ yasal.sekmeler }}" as="t" hint-placeholder-count="5"><x-import component-from-global-scope="DesignSystem_4f7164.Cip" secili="{{ t.secili }}" onClick="{{ t.sec }}" hint-size="auto,44px">{{ t.ad }}</x-import></sc-for></div>
+<h1 style="margin:0;font-family:var(--font-baslik);font-size:40px;font-weight:700;letter-spacing:-0.025em;line-height:1.15">{{ yasal.ad }}</h1>
+<sc-if value="{{ yasal.durumVar }}" hint-placeholder-val="{{ false }}"><div style="max-width:66ch"><x-import component-from-global-scope="DesignSystem_4f7164.HukumKutusu" hal="bilgi" etiket="{{ yasal.durumB }}" dil="{{ dilB }}" hint-size="100%,72px">{{ yasal.durumM }}</x-import></div></sc-if>
+<div style="display:flex;flex-direction:column;max-width:66ch">
+<sc-for list="{{ yasal.bolumler }}" as="b" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;gap:10px;padding:14px 0;border-bottom:1px solid hsl(var(--border-row))">
+<sc-if value="{{ b.basVar }}" hint-placeholder-val="{{ true }}"><h2 style="margin:0;font-size:18px;font-weight:600">{{ b.baslik }}</h2></sc-if>
+<sc-for list="{{ b.bloklar }}" as="bl" hint-placeholder-count="1">
+<sc-if value="{{ bl.pn }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:var(--size-editorial);line-height:1.6;color:hsl(var(--text-body));text-wrap:pretty"><sc-for list="{{ bl.seg }}" as="g" hint-placeholder-count="3"><sc-if value="{{ g.duz }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.kalin }}" hint-placeholder-val="{{ false }}"><strong style="font-weight:600;color:hsl(var(--text-strong))">{{ g.t }}</strong></sc-if><sc-if value="{{ g.etiket }}" hint-placeholder-val="{{ false }}"><span style="font-size:var(--size-caption);font-variant-numeric:tabular-nums;padding:1px 6px;white-space:nowrap;border:1px solid hsl(var(--border-control));background:hsl(var(--surface-card));color:hsl(var(--brand-cyan-ink))">{{ g.t }}</span></sc-if></sc-for></p></sc-if>
+<sc-if value="{{ bl.pk }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:var(--size-body-small);line-height:1.55;color:hsl(var(--text-body))"><sc-for list="{{ bl.seg }}" as="g" hint-placeholder-count="3"><sc-if value="{{ g.duz }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.kalin }}" hint-placeholder-val="{{ false }}"><strong style="font-weight:600;color:hsl(var(--text-strong))">{{ g.t }}</strong></sc-if><sc-if value="{{ g.etiket }}" hint-placeholder-val="{{ false }}"><span style="font-size:var(--size-caption);font-variant-numeric:tabular-nums;padding:1px 6px;white-space:nowrap;border:1px solid hsl(var(--border-control));background:hsl(var(--surface-card));color:hsl(var(--brand-cyan-ink))">{{ g.t }}</span></sc-if></sc-for></p></sc-if>
+<sc-if value="{{ bl.li }}" hint-placeholder-val="{{ false }}"><ul style="margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:var(--size-editorial);line-height:1.6;color:hsl(var(--text-body))"><sc-for list="{{ bl.items }}" as="it" hint-placeholder-count="3"><li><sc-for list="{{ it.seg }}" as="g" hint-placeholder-count="3"><sc-if value="{{ g.duz }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.kalin }}" hint-placeholder-val="{{ false }}"><strong style="font-weight:600;color:hsl(var(--text-strong))">{{ g.t }}</strong></sc-if><sc-if value="{{ g.etiket }}" hint-placeholder-val="{{ false }}"><span style="font-size:var(--size-caption);font-variant-numeric:tabular-nums;padding:1px 6px;white-space:nowrap;border:1px solid hsl(var(--border-control));background:hsl(var(--surface-card));color:hsl(var(--brand-cyan-ink))">{{ g.t }}</span></sc-if></sc-for></li></sc-for></ul></sc-if>
+<sc-if value="{{ bl.form }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px;padding:14px 16px;background:hsl(var(--surface-subtle));border:1px solid hsl(var(--border-hairline));font-size:var(--size-body-small);line-height:1.5;color:hsl(var(--text-body))"><sc-for list="{{ bl.satirlar }}" as="f" hint-placeholder-count="4"><span><sc-for list="{{ f.seg }}" as="g" hint-placeholder-count="3"><sc-if value="{{ g.duz }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.kalin }}" hint-placeholder-val="{{ false }}"><strong style="font-weight:600;color:hsl(var(--text-strong))">{{ g.t }}</strong></sc-if><sc-if value="{{ g.etiket }}" hint-placeholder-val="{{ false }}"><span style="font-size:var(--size-caption);font-variant-numeric:tabular-nums;padding:1px 6px;white-space:nowrap;border:1px solid hsl(var(--border-control));background:hsl(var(--surface-card));color:hsl(var(--brand-cyan-ink))">{{ g.t }}</span></sc-if></sc-for></span></sc-for></div></sc-if>
+</sc-for>
+</div></sc-for>
+</div>
+<sc-if value="{{ yasal.ctaVar }}" hint-placeholder-val="{{ false }}"><div><x-import component-from-global-scope="DesignSystem_4f7164.CerceveliDugme" onClick="{{ goDestek }}" hint-size="auto,44px">{{ yasal.cta }} →</x-import></div></sc-if>
+</section>
+</sc-if>
+<sc-if value="{{ hakVar }}" hint-placeholder-val="{{ false }}">
+<section data-screen-label="Hakkımızda" style="width:100%;max-width:1060px;min-width:0;margin:0 auto;display:flex;flex-direction:column;gap:26px">
+<div style="display:flex;flex-direction:column;gap:12px;max-width:760px"><h1 style="margin:0;font-family:var(--font-baslik);font-size:40px;font-weight:700;letter-spacing:-0.025em;line-height:1.15">{{ hak.b }}</h1><p style="margin:0;font-size:var(--size-editorial);line-height:1.6;color:hsl(var(--text-body));max-width:66ch;text-wrap:pretty">{{ hak.lead }}</p></div>
+<div style="display:flex;flex-direction:column;gap:14px"><span style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:hsl(var(--brand-cyan-ink))">{{ hak.nasilB }}</span><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;max-width:980px"><sc-for list="{{ hak.adim }}" as="a" hint-placeholder-count="3"><div style="background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-top:2px solid hsl(var(--primary-navy));border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:hsl(var(--text-body))">{{ a.no }}</span><span style="font-size:18px;font-weight:600">{{ a.b }}</span><span style="font-size:var(--size-body-small);line-height:1.55;color:hsl(var(--text-body))">{{ a.m }}</span></div></sc-for></div></div>
+<sc-if value="{{ hak.veriVar }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-direction:column;gap:14px"><span style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:hsl(var(--brand-cyan-ink))">{{ hak.veriB }}</span><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px"><sc-for list="{{ hak.veri }}" as="v" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-top:2px solid hsl(var(--primary-navy));border-radius:16px"><span style="font-size:26px;font-weight:600;font-variant-numeric:tabular-nums">{{ v.n }}</span><span style="font-size:var(--size-body-small);color:hsl(var(--text-body))">{{ v.e }}</span></div></sc-for></div><span style="font-size:var(--size-caption);line-height:1.5;color:hsl(var(--text-body));max-width:66ch">{{ hak.veriNot }}</span></div></sc-if>
+<div style="display:flex;flex-direction:column;gap:14px"><span style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:hsl(var(--brand-cyan-ink))">{{ hak.markaB }}</span><div style="display:flex;flex-wrap:wrap;gap:12px"><sc-for list="{{ hak.marka }}" as="b" hint-placeholder-count="7"><button type="button" onClick="{{ b.ac }}" aria-label="{{ b.ad }}" style="height:48px;padding:8px 14px;background:hsl(var(--surface-card));border:1px solid hsl(var(--border-hairline));border-radius:12px;display:flex;align-items:center;cursor:pointer" style-hover="border-color:hsl(var(--primary-navy))"><img src="{{ b.logo }}" alt="{{ b.ad }}" width="108" height="28" style="display:block;width:108px;height:28px;object-fit:contain;object-position:left center"></button></sc-for></div></div>
+</section>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1240px&quot;,&quot;height&quot;:&quot;1100px&quot;},&quot;sayfa&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hakkimizda&quot;,&quot;kvkk&quot;,&quot;gizlilik&quot;,&quot;cerez&quot;,&quot;kullanim&quot;,&quot;iade&quot;,&quot;mesafeli&quot;,&quot;onbilgi&quot;,&quot;garanti&quot;,&quot;teslimat&quot;],&quot;default&quot;:&quot;kullanim&quot;,&quot;tsType&quot;:&quot;'hakkimizda' | 'kvkk' | 'gizlilik' | 'cerez' | 'kullanim' | 'iade' | 'mesafeli' | 'onbilgi' | 'garanti' | 'teslimat'&quot;},&quot;mobil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;TR&quot;,&quot;EN&quot;],&quot;default&quot;:&quot;TR&quot;,&quot;tsType&quot;:&quot;'TR' | 'EN'&quot;},&quot;kip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;teklif&quot;,&quot;satis&quot;],&quot;default&quot;:&quot;teklif&quot;,&quot;tsType&quot;:&quot;'teklif' | 'satis'&quot;},&quot;metin&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string, string | null&gt;&quot;},&quot;onGit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(tip: string, id?: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { metin: null, dil: null, yi: null, sayfa: null };
+  yukle() {
+    const dil = (this.props.dil || 'TR').toUpperCase() === 'EN' ? 'en' : 'tr';
+    if (this.state.dil === dil) return;
+    this.setState({ dil });
+    const al = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([al('../../assets/ornek/sozluk-s5.' + dil + '.json'), al('../../assets/ornek/sozluk-ek.' + dil + '.json'), null, this.state.yi ? null : al('../../assets/ornek/yasal-icerik.json')]).then(([a, b, c, y]) => { const m = { ...(a || {}), ...(b || {}) }; if (c) for (const k in c) if (k[0] !== '_' && m[k] == null) m[k] = c[k]; this.setState(y ? { metin: m, yi: y } : { metin: m }); });
+  }
+  componentDidMount() { this.yukle(); }
+  componentDidUpdate() { this.yukle(); }
+  /* S5 yseg: ‹alan› → YV değeri (kalın) ya da YK etiketi (etiketli boşluk); ** kalın. */
+  seg(str, en) {
+    const Y = this.state.yi || {}, YV = Y.deger || {}, YK = Y.alan || {}, out = []; let kalin = false;
+    String(str).split(/(‹[A-Za-z]+›|\*\*)/).forEach((p) => {
+      if (!p) return;
+      if (p === '**') { kalin = !kalin; return; }
+      const m = p.match(/^‹([A-Za-z]+)›$/);
+      if (m) { const k = m[1]; if (YV[k] != null) out.push({ t: YV[k], kalin: true, duz: false, etiket: false }); else out.push({ t: (YK[k] || [k, k])[en ? 1 : 0], kalin: false, duz: false, etiket: true }); }
+      else out.push({ t: p, kalin, duz: !kalin, etiket: false });
+    });
+    return out;
+  }
+  blok(b, en) {
+    const o = { pn: false, pk: false, li: false, form: false, seg: [], items: [], satirlar: [] };
+    if (typeof b === 'string') { o.pn = true; o.seg = this.seg(b, en); }
+    else if (Array.isArray(b)) { o.li = true; o.items = b.map((x) => ({ seg: this.seg(x, en) })); }
+    else if (b && b.s) { o.pk = true; o.seg = this.seg(b.s, en); }
+    else if (b && b.f) { o.form = true; o.satirlar = b.f.map((x) => ({ seg: this.seg(x, en) })); }
+    return o;
+  }
+  renderVals() {
+    const P = this.props, mob = !!P.mobil, DIL = (P.dil || 'TR').toUpperCase(), en = DIL === 'EN', M = P.metin || this.state.metin || {}, git = P.onGit || (() => {}), SAT = P.kip === 'satis';
+    const A = (k) => (M[k] == null ? '\u27E6' + k + '\u27E7' : M[k]);
+    const id = this.state.sayfa || P.sayfa || 'kvkk', hakVar = id === 'hakkimizda';
+    const sec = (k) => () => { this.setState({ sayfa: k }); git('metin', k); };
+    const LAB = { kvkk: 't.kvkk-aydinlatma-metni', gizlilik: 't.gizlilik-politikasi', cerez: 't.cerez-politikasi', kullanim: 't.kullanim-kosullari', iade: 't.iptal-ve-iade-kosullari', mesafeli: 't.mesafeli-satis-sozlesmesi', onbilgi: 'f.onbilgi', garanti: 't.garanti-ve-servis', teslimat: 't.teslimat-ve-kargo' };
+    const ana = { ad: A('tx.e_anasayfa'), href: '#', onClick: (e) => { e.preventDefault(); git('anasayfa'); } };
+    const out = { lang: DIL.toLowerCase(), dilB: DIL, mobA: mob ? '1' : '0', yasalVar: !hakVar, hakVar, goDestek: () => git('destek') };
+    if (hakVar) {
+      const KT = window.VHKatalog, kt = KT ? KT.katalog() : null;
+      const MK = [['vortice', 'Vortice', 'vortice-yatay.png'], ['seat', 'SEAT', 'seat.png'], ['avens', 'AVenS', 'avens.svg'], ['nicotra-gebhardt', 'Nicotra Gebhardt', 'nicotra-gebhardt.webp'], ['danfoss', 'Danfoss', 'danfoss.svg'], ['casals', 'Casals', 'casals.png'], ['flexiva', 'Flexiva', 'flexiva.png']];
+      const sayi = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+      out.hak = {
+        b: A('tx.hakB'), lead: A('tx.hakLead'), nasilB: A('tx.hakNasilB'),
+        adim: [1, 2, 3].map((n) => ({ no: '0' + n, b: A('tx.hak' + n + 'b'), m: A('tx.hak' + n + 'm') })),
+        veriVar: !!kt, veriB: A('t.katalog-kaydi'), veriNot: A('t.sayilar-katalog-kaydindan-okunur-kayitta-olmayan'),
+        veri: kt ? [[Object.keys(kt.urun || {}).length, 't.model'], [Object.keys(kt.aile || {}).length, 'ds.teklif-tur-seri'], [(kt.kok || []).length, 'ds.teklif-tur-urun-grubu'], [Object.keys(kt.dal || {}).length, 'ds.teklif-tur-urun-turu']].map(([n, k]) => ({ n: sayi(n), e: A(k) })) : [],
+        markaB: A('tx.markalarB'),
+        marka: MK.map(([mid, ad, logo]) => ({ ad, logo: '../../assets/marka-logolari/' + logo, ac: () => git('marka', mid) }))
+      };
+      out.rail = { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: [ana, { ad: A('tx.hakB') }] };
+      return out;
+    }
+    const Y = this.state.yi || {}, I = (Y.icerik || {})[id], dk = en ? 'en' : 'tr', ad = A(LAB[id] || LAB.kvkk);
+    let bolumler = [];
+    if (I && (!en || I.en)) { const sc = en ? I.en : I.tr; bolumler = sc.map((x, k) => ({ basVar: !!x.h, baslik: x.h ? (sc.length > 1 ? (k + 1) + ') ' : '') + x.h : '', bloklar: x.b.map((b) => this.blok(b, en)) })); }
+    else if (I && I.enH) bolumler = I.enH.map((h, k) => ({ basVar: true, baslik: (k + 1) + ') ' + h, bloklar: [] }));
+    else if (Y.baslikYedek) { const YB = Y.baslikYedek[dk]; bolumler = (YB[id] || YB.kvkk).map((b, k) => ({ basVar: true, baslik: (k + 1) + '. ' + b, bloklar: id === 'kvkk' && k === 1 ? [this.blok(Y.kvkkForm[dk], en)] : [] })); }
+    const gr = I ? I.gr : 'yasal';
+    let ids = gr === 'destek' ? ['garanti', 'teslimat'] : ['kvkk', 'gizlilik', 'cerez', 'kullanim', 'iade'].concat(SAT ? ['mesafeli', 'onbilgi'] : []);
+    if (!ids.includes(id)) ids = ids.concat(id);
+    out.yasal = { ad, bolumler, sekmeler: ids.map((k) => ({ ad: A(LAB[k]), secili: id === k, sec: sec(k) })), durumVar: !!(I && I.not) && !SAT, durumB: A('t.online-satis-su-an-kapalidir'), durumM: A('t.asagidaki-kosullar-online-satis-acildiginda-gece'), ctaVar: !!(I && I.cta), cta: A('tx.e_destekIsteN') };
+    out.rail = { metin: M, mobil: mob, yapiskan: false, bolumler: [], konum: gr === 'destek' ? [ana, { ad: A('t.destek'), href: '#', onClick: (e) => { e.preventDefault(); git('destek'); } }, { ad }] : [ana, { ad: A('t.yasal') }, { ad }] };
+    return out;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+ "_damga": "DESIGN-MENU 2026-10-25 · Recep onaylı. Uygulama alanından gelinince Adım 1 sektör çipi (değer = sözlük anahtarı). Eşlemesi olmayan alan (siginak) seçilmeden gelir. Kaynak Venthub New #15 C-10 önerisi.",
+ "alan": {
+  "konut-havalandirmasi": "ds.teklif-konut",
+  "ticari-alan-ofis": "ds.teklif-ofis",
+  "kimya-laboratuvari": "ds.teklif-laboratuvar",
+  "galvaniz": "ds.teklif-fabrika-uretim",
+  "ilac-kimya-tesisi": "ds.teklif-fabrika-uretim",
+  "atex": "ds.teklif-fabrika-uretim",
+  "kapali-havuz-spa": "ds.teklif-spor-havuz",
+  "magaza-girisi": "ds.teklif-avm-magaza"
+ }
+}
