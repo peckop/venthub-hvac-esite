@@ -86,6 +86,16 @@ describe('INV-DEPO-DOKUM-1 · uçtan uca: sahte git deposunda CLI (DEĞER BASMAZ
     expect(r.cikti).not.toContain(GIZLI_SON4)
   })
 
+  // ALT-107: iyzico test verisi yolları secret-scan'in kapatma listesinde "yol_kayitlari" olarak görünür; bu KAPIYI gevşetmez.
+  it('R5 KIRMIZI kalır: kapatılmış geçmiş yolu (support/) altına yeni ödeme parçası girerse kapı yine durdurur', { timeout: 60_000 }, () => {
+    const d = sahteDepo({ 'support/yanit.json': JSON.stringify({ binNumber: GIZLI_BIN, lastFourDigits: GIZLI_SON4 }) })
+    const r = kapiyiKos(d)
+    expect(r.kod).toBe(1)
+    expect(r.cikti).toContain('odeme-parcasi')
+    expect(r.cikti).not.toContain(GIZLI_BIN)
+    expect(r.cikti).not.toContain(GIZLI_SON4)
+  })
+
   it('başlıksız CSV: ölçülemedi → çıkış 2 (ihlal DEĞİL, yeşil de DEĞİL), değer basılmaz', { timeout: 60_000 }, () => {
     const d = sahteDepo({ 'veri/d.csv': `${GIZLI_EPOSTA},Ad,5\nb@ornek.test,Ad2,6\n` })
     const r = kapiyiKos(d)

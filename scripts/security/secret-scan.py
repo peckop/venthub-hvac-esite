@@ -122,6 +122,9 @@ def parmak_izi(v):
     return hashlib.sha256(v.encode('utf-8', 'replace')).hexdigest()[:8]
 
 
+YOL_KAYITLARI = []
+
+
 def kapatilmis_yukle(yol):
     """{(imza, parmak_izi): durum}. Dosya yoksa bos liste (hicbir sey kapatilmis degildir);
     bozuksa cikis 2 — okunamayan liste sessizce 'hepsi kirmizi' ya da 'hepsi yesil' olmaz."""
@@ -133,6 +136,12 @@ def kapatilmis_yukle(yol):
         sonuc = {}
         for k in veri['kayitlar']:
             sonuc[(k['imza'], k['parmak_izi'])] = k['durum']
+        # ALT-107: imza bulgusu OLMAYAN, kapatilmis GECMIS YOLLARI. Zorunlu degil; varsa her satir
+        # kapsam + durum (bos olmayan metin) tasimali, yoksa liste bozuk sayilir (cikis 2).
+        for y in veri.get('yol_kayitlari', []):
+            if not (isinstance(y['kapsam'], str) and isinstance(y['durum'], str) and y['kapsam'] and y['durum']):
+                raise TypeError('yol_kayitlari satiri')
+            YOL_KAYITLARI.append((y['kapsam'], y['durum']))
         return sonuc
     except (OSError, ValueError, KeyError, TypeError) as e:
         print(f"HATA: kapatma listesi okunamadi ({yol}): {type(e).__name__}", file=sys.stderr)
@@ -244,6 +253,11 @@ def main():
                     say(f"        - {c}")
                 if _args.tam_deger:
                     rep.write(f"        DEGER: {e['v']}\n")
+
+    if YOL_KAYITLARI:
+        say("\n=== KAPATILMIS GECMIS YOLLARI (bilgi; imza bulgusu degil, SIR bulgusunu kapatmaz) ===")
+        for kapsam_y, durum_y in YOL_KAYITLARI:
+            say(f"    {kapsam_y} -> {durum_y}")
 
     say(f"\n==== TARAMA BITTI — acik (kapatilmamis): {acik} · kapatilmis: {kapali} ====")
     rep.close()

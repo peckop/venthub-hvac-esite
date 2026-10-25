@@ -99,6 +99,15 @@ Ağaçtan silinen döküm **git geçmişinde durmaya devam eder**; bu cetvel ve 
 dökümdeki değerlerin açıkta olduğu varsayılır; riskin büyüklüğünü ALT-41 değerlendirir, bu cetvel derecelendirmez. Burada
 `filter-repo`, `rebase -i`, `reset --hard`, zorla push yoktur.
 
+**Karar (Recep, 26 Ekim, ALT-41 kapandı):** geçmişteki sipariş, ad, adres, telefon ve kart parçası kayıtlarının hepsi iyzico
+TEST verisidir, gerçek kişi/kart değildir. Geçmiş yeniden yazılmaz, zorla push ve ikinci GitHub talebi yoktur. Kapanmış yollar
+`scripts/security/secret-scan-kapatildi.json` içindeki `yol_kayitlari` bölümündedir (`docs/archive/db-backup-pre-kademe2`,
+`support/`, `docs/kayitlar_master.md` örnek satırları, 2025-08-24 commit mesajları) ve `secret-scan.py` raporunda
+"KAPATILDI: iyzico test verisi, gerçek kişi/kart değil (Recep 26 Ekim, ALT-41)" gerekçesiyle görünür. ⚠Bu kayıt YALNIZ
+rapordaki bilgidir: **kapıyı gevşetmez** (bu yollara yeni kişisel veri/ödeme parçası girerse R1/R5 yine KIRMIZI; R1/R2/R4/R5
+izin listesi yine yok) ve **sır bulgusunu kapatmaz** (bu yollarda gerçek bir anahtar çıkarsa yine KIRMIZI). Testler:
+`sir-taramasi-ulasilamayan.test.ts` (ALT-107 kolu), `depo-dokum-kapisi-uctan-uca.test.ts` ("R5 KIRMIZI kalır").
+
 ## 7. Kapı nerede koşar — DÜRÜST SINIR
 
 **Master'a birleşmeyi CI durdurur; ağa çıkışı yalnız `pre-push` yakalar ve o atlanabilir (`git push --no-verify`).** İkisi aynı şeyi
