@@ -11,7 +11,8 @@ import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
-import { getCachedFamilyDetail, preloadFamily } from '@/lib/data/preload'
+import { aileKategoriZinciri } from '@/lib/data/kategoriZinciri'
+import { getCachedFamilyDetail, getCachedKategoriUstById, preloadFamily } from '@/lib/data/preload'
 import type { ProductRouteResolution } from '@/lib/data/productRoute'
 import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
@@ -315,10 +316,14 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   const dict = lang === 'en' ? en : tr
   const t = (key: string) => getDictValue(dict, key)
 
-  const mainName = mainCategory ? getCategoryDisplayName(mainCategory, t) : ''
-  const mainSlug = mainCategory ? getLocalizedCategorySlug(mainCategory, lang) : ''
-  const subName = subCategory ? getCategoryDisplayName(subCategory, t) : ''
-  const subSlug = subCategory ? getLocalizedCategorySlug(subCategory, lang) : ''
+  // URN-144 (karar 410): kategori zinciri `parent_id`'den kurulur; ürün/aile sütunlarının anlamına (kök = category_id)
+  // dayanılmaz — göç sonrası sütunlar karma olabilir. Yaprak = en derin satır (alt kategori varsa o, yoksa ana);
+  // (`aileKategoriZinciri`: eksik halkalar React.cache'li üst okuyucudan; iki kademede ek okuma yok, hata fırlar).
+  const kategoriZinciri = await aileKategoriZinciri(mainCategory, subCategory, (id) => getCachedKategoriUstById(id))
+  const zincirAdimlari = kategoriZinciri.map((k) => ({
+    ad: getCategoryDisplayName(k, t),
+    slug: getLocalizedCategorySlug(k, lang),
+  }))
 
   // Kategori çözülemezse basamak HİÇ eklenmez (zincir kısalır, kırılmaz) — görsel
   // breadcrumb'ın ve CategoryLandingView'ın "parentVm yoksa basamak yok" kuralıyla aynı.
@@ -340,8 +345,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
       ? aileKirintiAdimlari({
           dil: adresDili(lang),
           anasayfaAdi: t('category.breadcrumbHome'),
-          ana: { ad: mainName, slug: mainSlug },
-          alt: { ad: subName, slug: subSlug },
+          zincir: zincirAdimlari,
           aile: { ad: gorunenAileAdi, slug: family.slug },
           model: seciliModel
             ? { etiket: getProductModelLabel(seciliModel) ?? getProductDisplayName(seciliModel, family, lang) }

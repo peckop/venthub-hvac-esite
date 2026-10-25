@@ -53,6 +53,8 @@ interface CategoryLandingProps {
     families: FamilyListItem[]
     /** Breadcrumb hiyerarşisi için üst kategori (gateway'den gelir). */
     parentCategory?: DomainCategory | null
+    /** URN-144 (karar 410): kırıntı için tüm aktif atalar, kökten başa; verilmezse `parentCategory` tek üst sayılır. */
+    ancestors?: DomainCategory[]
     /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucu özetinden); iki marka bölümünün sayaç kartlarını besler. */
     vorticeKatalogSayilari?: KatalogSayilari | null
     /** URN-135: sessiz fan metnindeki ses aralığı (sunucuda, canlı model kodları ∩ ses veri modülü); yoksa ses cümleleri çizilmez. */
@@ -61,7 +63,7 @@ interface CategoryLandingProps {
     rehberHref?: string | null
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, vorticeKatalogSayilari, sesOzeti, rehberHref }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, ancestors, vorticeKatalogSayilari, sesOzeti, rehberHref }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
@@ -76,8 +78,10 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     // subCategories içinde parent aramak ÖLÜ mantıktı (leaf'te o liste kendi alt
     // kategorileri = boş) → breadcrumb üst katmanı hiç basamıyordu; gateway'in
     // parentCategory'si kullanılır.
-    const parentVm = wrapCategory(parentCategory ?? undefined)
-    
+    const kirintiAtalari = (ancestors && ancestors.length > 0 ? ancestors : parentCategory ? [parentCategory] : [])
+        .map((a) => wrapCategory(a))
+        .filter((a): a is NonNullable<typeof a> => !!a)
+
     const isAirCurtain = category.slug === 'air-curtains'
     // ⭐SESSİZ FAN ANLATISI — TETİKLEYİCİ KATEGORİ DEĞİL **SERİ** (REC-85, Recep kararı 2026-08-28).
     //
@@ -109,7 +113,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
-        ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(getLocalizedCategorySlug(parentVm.raw, lang)) }] : []),
+        // URN-144 (karar 410): tüm atalar kökten başa; verilmezse bugünkü tek üst. Her biri kendi tek segmentli adresine gider.
+        ...kirintiAtalari.map((ata) => ({ label: ata.displayName, href: Routes.category(getLocalizedCategorySlug(ata.raw, lang)) })),
         { label: vm?.displayName || getCategoryDisplayName(category, t), href: '' }
     ]
 

@@ -7,6 +7,7 @@ import { useCategories } from '../contexts/CategoryContext'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { useI18n } from '../i18n/I18nProvider'
 import { compareText } from '../i18n/sort'
+import { ataZinciri } from '../lib/data/kategoriZinciri'
 import { DomainCategory } from '../lib/type-converters'
 import { useIsMounted } from './useIsMounted'
 
@@ -42,7 +43,8 @@ const DEFAULT_FILTERS: CategoryFilters = {
 export function useCategoryGateway(
   initialCategory?: DomainCategory | null,
   initialSubCategories?: DomainCategory[],
-  initialParentCategory?: DomainCategory | null
+  initialParentCategory?: DomainCategory | null,
+  initialAncestors?: DomainCategory[]
 ) {
   const isMounted = useIsMounted()
   const router = useRouter()
@@ -113,11 +115,26 @@ export function useCategoryGateway(
   // URN-112: üst önce SUNUCUDAN gelen prop'tan okunur (ham HTML'de kırıntı üst halkası dolu çıksın); bağlam
   // yalnız prop verilmediğinde (ör. `/products` ya da eski çağıranlar) devreye girer. Prop, kategorinin
   // `parent_id`'siyle eşleşmiyorsa (başka sayfadan kalan değer) kullanılmaz.
-  const parentCategory = useMemo(() => {
-    if (!category?.parent_id) return null
-    if (initialParentCategory && initialParentCategory.id === category.parent_id) return initialParentCategory
-    return categoryMaps.byId.get(category.parent_id) ?? null
-  }, [category, categoryMaps, initialParentCategory])
+  // URN-144 (karar 410): kırıntı TÜM atalardan kurulur (kökten başa, kendisi hariç). Kaynak sırası: sunucudan gelen
+  // `initialAncestors` (kendi kimliğini içermiyorsa) → doğrudan üst (prop ya da bağlam) + bağlamdaki üst zinciri.
+  // İki kademede zincir tek elemanlıdır ve eski `parentCategory` ile aynıdır.
+  const ancestors = useMemo<DomainCategory[]>(() => {
+    if (!category?.parent_id) return []
+    if (initialAncestors && initialAncestors.length > 0 && initialAncestors.every((a) => a.id !== category.id)) {
+      return initialAncestors
+    }
+    const dogrudan =
+      initialParentCategory && initialParentCategory.id === category.parent_id
+        ? initialParentCategory
+        : (categoryMaps.byId.get(category.parent_id) ?? null)
+    if (!dogrudan) return []
+    // Doğrudan üst prop'tan geldiyse bağlam haritasında olmayabilir: zincir onun KENDİ `parent_id`'sinden yürür.
+    const harita = categoryMaps.byId.has(dogrudan.id) ? categoryMaps.byId : new Map(categoryMaps.byId).set(dogrudan.id, dogrudan)
+    return [...ataZinciri(dogrudan.id, harita), dogrudan]
+  }, [category, categoryMaps, initialParentCategory, initialAncestors])
+
+  // Geriye uyum: `parentCategory` zincirin SON halkasıdır (bugünkü tek üst); kök kategoride null.
+  const parentCategory = ancestors.length > 0 ? ancestors[ancestors.length - 1] : null
 
   const subCategories = useMemo(() => {
     if (initialSubCategories && initialSubCategories.length > 0) return initialSubCategories
@@ -132,6 +149,7 @@ export function useCategoryGateway(
   return {
     category,
     parentCategory,
+    ancestors,
     subCategories,
     // Liste sunucudan geldiği için istemcide bekleme durumu yoktur; yalnız global kategori
     // context'i (breadcrumb/alt kategori süsü) yüklenirken true olur ve listeyi bloklamaz.

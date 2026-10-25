@@ -5,6 +5,7 @@ import type { DomainCategory } from '@/lib/type-converters'
 import { type AdresDili, adresUret } from '@/utils/adresUret'
 import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
+import { ilkAktifAtaGetir } from './kategoriZinciri'
 import { eskiKategoriHedefi, getCachedCategoryData, getCachedKategoriUstById, type KategoriUst } from './preload'
 
 /**
@@ -90,9 +91,10 @@ export async function kategoriSegmentleriniCoz<K extends KategoriSatiri>(
   if (!kategori) return { tur: 'yok' }
 
   if (kategori.is_active !== true) {
-    // Pasif kategori (O4): bugün 7 satır canlıda 200 dönüyor. Aktif üst varsa oraya, yoksa tüm ürünler.
-    const ust = kategori.parent_id ? await bag.ustGetir(kategori.parent_id) : null
-    if (ust && ust.is_active === true) return { tur: 'yonlendir', hedef: kategoriKanonikAdresi(ust, dil) }
+    // Pasif kategori (O4): bugün 7 satır canlıda 200 dönüyor. İlk AKTİF ata varsa oraya, yoksa tüm ürünler.
+    // Üç kademede (karar 410) pasif ara kademe atlanır; eşleyicinin tırmanışıyla (`eslestirici.ts`) aynı hüküm.
+    const ust = await ilkAktifAtaGetir(kategori.parent_id, bag.ustGetir)
+    if (ust) return { tur: 'yonlendir', hedef: kategoriKanonikAdresi(ust, dil) }
     return { tur: 'yonlendir', hedef: adresUret({ tur: 'urunler' }, dil) }
   }
 
