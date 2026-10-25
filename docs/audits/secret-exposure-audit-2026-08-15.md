@@ -123,11 +123,24 @@ baseline SQL'e de girmişti. Yapılanlar:
 ## 5. Bu denetim nasıl tekrarlanır
 
 ```bash
-python scripts/security/secret-scan.py
+python scripts/security/secret-scan.py                  # dallardan erişilebilen geçmiş
+python scripts/security/secret-scan.py --ulasilamayan   # + hiçbir daldan erişilemeyen (dangling) commit'ler
 ```
 
-Çıktı: konsola **maskeli** özet, `TAM-RAPOR.txt`'ye tam değerler.
-Rapor `.gitignore`'da — commit edilemez, ama yine de kontrol edip **sil**.
+Çıktı: konsola ve rapora **değer YAZILMAZ**; yalnız sha256 öneki (8 hane = parmak izi), uzunluk, commit ve dosya.
+Tam değer gerekirse `--tam-deger` ile yalnız `TAM-RAPOR.txt`'ye yazılır. Rapor `.gitignore`'da — commit
+edilemez, ama yine de kontrol edip **sil**. Çıkış kodu: 0 = açık bulgu yok · 1 = kapatılmamış bulgu var · 2 = kapatma listesi okunamadı.
+
+> **Neden `--ulasilamayan` (ALT-102, 25 Ekim 2026):** 15 Ağustos taraması `git log --all` kullandı; bu, hiçbir dal ya da
+> etiketten erişilemeyen ama GitHub'ın SHA ile sunmaya devam ettiği commit'leri **görmez**. Bir `service_role` JWT'si ve
+> iki eski veritabanı şifresi tam orada duruyordu ve ilk taramada çıkmadı. `--ulasilamayan`, `git fsck --unreachable
+> --no-reflogs` ile o commit'leri listeler ve aynı imzaları onlarda koşar. Aynı iş için iki imza eklendi: Postgres
+> bağlantı dizesi (`kullanici:sifre@`) ve `SUPABASE_DB_PASSWORD` ataması (ilk taramada bu ikisi yoktu).
+>
+> **Kapatma listesi:** `scripts/security/secret-scan-kapatildi.json` döndürülmüş (eski anahtarı artık ölü) bulguları
+> imza adı + parmak izi + durum ile tutar; değer taşımaz. Listedeki bulgu yeniden bulunursa "KAPATILDI" sayılır ve
+> uyarı üretmez. Listede olmayan her gerçek görünümlü değer **kırmızıdır**: yeni bir sızıntı kapatılmış sayılmaz.
+> Yeni bir bulgu döndürüldüğünde listeye satır eklemek o işin parçasıdır; testi `INV-SIR-TARAMA-1`.
 
 > **Betik 2026-08-15'te repoya alındı.** Önceden yalnız `C:/Users/alize/venthub-secret-tarama/`
 > altında duruyordu; yani bu belgenin "nasıl tekrarlanır" yordamı **tek makinede** çalışıyordu
@@ -142,8 +155,8 @@ GitHub   : GET https://api.github.com/user            Authorization: Bearer <ghp
 401/403 = ölü · 200 = CANLI
 ```
 
-Yeni bir sır türü eklemek için `scan.py` içindeki `SIGS` listesine
-`(ad, git -S için sabit dize, tam değeri çıkaran regex)` üçlüsü ekle.
+Yeni bir sır türü eklemek için `secret-scan.py` içindeki `SIGS` listesine
+`(ad, kip, git log için dize/regex, tam değeri çıkaran regex, regex grubu)` beşlisini ekle (kip `S` = sabit dize, `G` = regex).
 
 ---
 
