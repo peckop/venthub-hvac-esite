@@ -36,10 +36,42 @@ function tekSatir(metin) {
 }
 
 /**
- * Saf seçim: satırlar { id, kind, importance, updated_at, data(JSON dizesi) }.
+ * Rol adı: `arac-pencere` / `arac-arastirmaci` / `ARAC` → `arac`. Yalnız [a-z0-9çğıöşü_-] kalır, en çok 32 karakter;
+ * `<` `>` satır sonu gibi her şey düşer (ders `audience.roles` alanı sage kaydından gelir, bağlama girer — ARC-203).
+ * Geçersiz / boş girdi '' döner (= rol bilinmiyor).
+ */
+function rolAdi(r) {
+  return String(r || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-(pencere|arastirmaci|curutucu|dogrulayici|uygulayici)$/, '')
+    .replace(/[^a-z0-9çğıöşü_-]/g, '')
+    .slice(0, 32)
+}
+
+/** Dersin hedef rolleri: `audience` (kolon, JSON dizesi ya da nesne) ya da `data.audience`; boş liste = rolsüz ders. */
+function dersRolleri(satir, d) {
+  let a = satir.audience
+  if (typeof a === 'string') {
+    try {
+      a = JSON.parse(a)
+    } catch {
+      a = null
+    }
+  }
+  if (!a) a = d && d.audience
+  const liste = a && Array.isArray(a.roles) ? a.roles : []
+  return [...new Set(liste.map(rolAdi).filter(Boolean))]
+}
+
+/**
+ * Saf seçim: satırlar { id, kind, importance, updated_at, data(JSON dizesi), audience? }.
+ * `rol` açan pencerenin rolü: ders yalnız rolsüzse (audience.roles boş) ya da rolü içeriyorsa görünür;
+ * rol bilinmiyorsa ('' / undefined) YALNIZ rolsüz dersler görünür (ARC-203).
  * @returns {{secilen: {id:string, kind:string, metin:string}[], atlanan: number}}
  */
-function sec(satirlar) {
+function sec(satirlar, rol) {
+  const benimRol = rolAdi(rol)
   const adaylar = []
   for (const s of satirlar || []) {
     if (!DAVRANIS_TURLERI.includes(s.kind)) continue
@@ -51,6 +83,8 @@ function sec(satirlar) {
       continue
     }
     if (Array.isArray(d.anchors) && d.anchors.length) continue
+    const roller = dersRolleri(s, d)
+    if (roller.length && !(benimRol && roller.includes(benimRol))) continue
     const metin = tekSatir(d.text)
     if (!metin) continue
     adaylar.push({ id: s.id, kind: s.kind, imp: Number(s.importance), guncel: String(s.updated_at || ''), metin })
@@ -96,7 +130,7 @@ function dbSatirlari(dbYolu) {
     const kosul = DAVRANIS_TURLERI.map(() => '?').join(',')
     return db
       .prepare(
-        `select id, kind, importance, updated_at, data from memories
+        `select id, kind, importance, updated_at, data, audience from memories
           where status = 'active' and importance >= ? and kind in (${kosul})
           order by importance desc, updated_at desc limit 300`,
       )
@@ -110,14 +144,14 @@ function dbSatirlari(dbYolu) {
   }
 }
 
-/** Kanca girişi: sessiz ve bloklamaz. Vana: VENTHUB_SABIT_DERSLER_KAPALI=1. */
-function calistir(env = process.env) {
+/** Kanca girişi: sessiz ve bloklamaz. Vana: VENTHUB_SABIT_DERSLER_KAPALI=1. `rol` SessionStart girdisindeki agent adıdır. */
+function calistir(env = process.env, rol = '') {
   if (env.VENTHUB_SABIT_DERSLER_KAPALI === '1') return ''
   try {
     const dbKok = env.VENTHUB_SAGE_DB_KOKU || require('./ana-kok.cjs').anaKok()
     const yol = path.join(dbKok, '.wrongstack', 'memories', 'sage.db')
     if (!fs.existsSync(yol)) return ''
-    return metinYap(sec(dbSatirlari(yol)))
+    return metinYap(sec(dbSatirlari(yol), rol))
   } catch {
     return ''
   }
@@ -129,6 +163,7 @@ module.exports = {
   TOPLAM_KARAKTER,
   TEK_DERS_KARAKTER,
   DAVRANIS_TURLERI,
+  rolAdi,
   sec,
   etkisizlestir,
   metinYap,

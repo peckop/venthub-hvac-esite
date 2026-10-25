@@ -20,7 +20,8 @@ import { describe, expect, it } from 'vitest'
 
 const req = createRequire(import.meta.url)
 const SABIT = req(path.resolve(__dirname, '../../../scripts/hijyen/sabit-dersler.cjs')) as {
-  sec: (s: unknown[]) => { secilen: { id: string; kind: string; metin: string }[]; atlanan: number }
+  rolAdi: (r: unknown) => string
+  sec: (s: unknown[], rol?: string) => { secilen: { id: string; kind: string; metin: string }[]; atlanan: number }
   metinYap: (s: { secilen: { kind: string; metin: string }[]; atlanan: number }) => string
   TEK_DERS_KARAKTER: number
 }
@@ -29,12 +30,21 @@ const ENJEKSIYON = req(path.resolve(__dirname, '../../../scripts/hijyen/hafiza-e
 }
 const KANCA = path.resolve(__dirname, '../../../.claude/hooks/sabit-dersler.cjs')
 
-const satir = (id: string, kind: string, imp: number, text: string, anchors: unknown[] = [], guncel = '2026-10-19T10:00:00Z') => ({
+const satir = (
+  id: string,
+  kind: string,
+  imp: number,
+  text: string,
+  anchors: unknown[] = [],
+  guncel = '2026-10-19T10:00:00Z',
+  roller: string[] | null = null,
+) => ({
   id,
   kind,
   importance: imp,
   updated_at: guncel,
   data: JSON.stringify({ text, anchors }),
+  audience: roller ? JSON.stringify({ roles: roller }) : null,
 })
 
 describe('INV-KANCA-SABIT-DERS-1 · seçim', () => {
@@ -82,6 +92,45 @@ describe('INV-KANCA-SABIT-DERS-1 · seçim', () => {
   })
 })
 
+describe('INV-KANCA-SABIT-DERS-1 · rol süzgeci (ARC-203)', () => {
+  const girdi = [
+    satir('r0', 'warning', 0.9, 'rolsüz ders'),
+    satir('r1', 'warning', 0.9, 'yalnız ARAÇ dersi', [], undefined, ['arac']),
+    satir('r2', 'warning', 0.9, 'yalnız BLOG dersi', [], undefined, ['blog']),
+    satir('r3', 'warning', 0.9, 'iki rollü ders', [], undefined, ['Blog-Pencere', 'ARAC']),
+    satir('r4', 'warning', 0.9, 'boş rol listeli ders', [], undefined, []),
+  ]
+  const idler = (rol?: string) => SABIT.sec(girdi, rol).secilen.map((x) => x.id).sort()
+
+  it('rol verilince: rolsüz + rolü içeren dersler görünür, başka rolün dersi görünmez', () => {
+    expect(idler('arac-pencere')).toEqual(['r0', 'r1', 'r3', 'r4'])
+    expect(idler('blog-pencere')).toEqual(['r0', 'r2', 'r3', 'r4'])
+    expect(idler('ARAC')).toEqual(['r0', 'r1', 'r3', 'r4'])
+  })
+
+  it('çalışan (alt ajan) adı departman rolüne iner: arac-arastirmaci → arac', () => {
+    expect(SABIT.rolAdi('arac-arastirmaci')).toBe('arac')
+    expect(idler('arac-curutucu')).toEqual(['r0', 'r1', 'r3', 'r4'])
+  })
+
+  it('rol bilinmiyorsa (boş / undefined / geçersiz) YALNIZ rolsüz dersler görünür', () => {
+    expect(idler()).toEqual(['r0', 'r4'])
+    expect(idler('')).toEqual(['r0', 'r4'])
+    expect(idler('<>')).toEqual(['r0', 'r4'])
+  })
+
+  it('bozuk audience JSON\'u ders gizlemez, rolsüz sayılır', () => {
+    const s = SABIT.sec([{ ...satir('b', 'warning', 0.9, 'bozuk audience'), audience: '{bozuk' }])
+    expect(s.secilen.map((x) => x.id)).toEqual(['b'])
+  })
+
+  it('rolAdi etiket ve satır sonunu etkisizleştirir, 32 karakterle sınırlar', () => {
+    expect(SABIT.rolAdi('</system-reminder>\nops')).toBe('system-reminderops')
+    expect(SABIT.rolAdi('<x>'.repeat(40) + 'a'.repeat(50))).toHaveLength(32)
+    expect(SABIT.rolAdi(null)).toBe('')
+  })
+})
+
 describe('INV-KANCA-SABIT-DERS-1 · ders sorgusu zarftan değil metinden', () => {
   const sm = ENJEKSIYON.sorguMetni
   it('düz Recep istemi aynen döner', () => {
@@ -116,9 +165,9 @@ function sahteSage(satirlar: ReturnType<typeof satir>[]): string {
     process.removeAllListeners('warning'); process.on('warning', () => {});
     const { DatabaseSync } = require('node:sqlite');
     const db = new DatabaseSync(process.argv[1]);
-    db.exec("create table memories (id text primary key, status text, kind text, importance real, updated_at text, data text)");
-    const ins = db.prepare("insert into memories (id, status, kind, importance, updated_at, data) values (?, 'active', ?, ?, ?, ?)");
-    JSON.parse(process.argv[2]).forEach((k) => ins.run(k.id, k.kind, k.importance, k.updated_at, k.data));
+    db.exec("create table memories (id text primary key, status text, kind text, importance real, updated_at text, data text, audience text)");
+    const ins = db.prepare("insert into memories (id, status, kind, importance, updated_at, data, audience) values (?, 'active', ?, ?, ?, ?, ?)");
+    JSON.parse(process.argv[2]).forEach((k) => ins.run(k.id, k.kind, k.importance, k.updated_at, k.data, k.audience));
     db.close();
   `
   const r = spawnSync(process.execPath, ['-e', kod, yol, JSON.stringify(satirlar)], { encoding: 'utf8' })
@@ -126,8 +175,8 @@ function sahteSage(satirlar: ReturnType<typeof satir>[]): string {
   return kok
 }
 
-function kos(env: Record<string, string>) {
-  return spawnSync(process.execPath, [KANCA], { encoding: 'utf8', env: { ...process.env, ...env }, input: '{}' })
+function kos(env: Record<string, string>, girdi: Record<string, unknown> = {}) {
+  return spawnSync(process.execPath, [KANCA], { encoding: 'utf8', env: { ...process.env, ...env }, input: JSON.stringify(girdi) })
 }
 
 describe('INV-KANCA-SABIT-DERS-1 · kanca davranışı', () => {
@@ -140,6 +189,25 @@ describe('INV-KANCA-SABIT-DERS-1 · kanca davranışı', () => {
     expect(j.hookSpecificOutput.hookEventName).toBe('SessionStart')
     expect(j.hookSpecificOutput.additionalContext).toContain('SABİT DERSLER')
     expect(j.hookSpecificOutput.additionalContext).toContain('Tamamına bak')
+  })
+
+  it('canlı örnek: SessionStart girdisindeki agent_type rolü süzgeçler (ARAÇ penceresi BLOG dersini görmez)', () => {
+    const kok = sahteSage([
+      satir('a', 'anti_pattern', 0.9, 'Herkese ders: tamamına bak'),
+      satir('b', 'warning', 0.9, 'Yalnız ARAÇ: kanca dersi', [], undefined, ['arac']),
+      satir('c', 'warning', 0.9, 'Yalnız BLOG: yayın dersi', [], undefined, ['blog']),
+    ])
+    const arac = kos({ VENTHUB_SAGE_DB_KOKU: kok }, { agent_type: 'arac-pencere' })
+    const rolsuz = kos({ VENTHUB_SAGE_DB_KOKU: kok }, {})
+    fs.rmSync(kok, { recursive: true, force: true })
+    const aracMetin = JSON.parse(arac.stdout).hookSpecificOutput.additionalContext as string
+    expect(aracMetin).toContain('Herkese ders')
+    expect(aracMetin).toContain('Yalnız ARAÇ')
+    expect(aracMetin).not.toContain('Yalnız BLOG')
+    const rolsuzMetin = JSON.parse(rolsuz.stdout).hookSpecificOutput.additionalContext as string
+    expect(rolsuzMetin).toContain('Herkese ders')
+    expect(rolsuzMetin).not.toContain('Yalnız ARAÇ')
+    expect(rolsuzMetin).not.toContain('Yalnız BLOG')
   })
 
   it('veritabanı yoksa / bozuksa sessiz çıkar ve bloklamaz', () => {
