@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { canliDenetle, cakismaOlc, fiyatOlc, gorunurMetin, ifadeVarMi, uclular } from '../../../tools/rehber/canli-denetim.mjs'
+import { cakismaOlc, canliDenetle, fiyatOlc, gorunurMetin, ifadeVarMi, uclular } from '../../../tools/rehber/canli-denetim.mjs'
 
 /**
  * INV-REHBER-CANLI-DENETIM-1 · ağlı rehber denetim kolu (ARC-206 İŞ 2, HRT-70; rehber-yazisi-standard.md R10.6 madde 1-3).
