@@ -54,8 +54,14 @@ type Uretici = {
     isAkislari?: string[],
     kardesOku?: (d: string) => string | null,
   ) => string[]
-  isKurallariOku: (kok?: string) => Record<string, { kurallar: string[] }>
+  isKurallariOku: (kok?: string) => Record<string, { kurallar: string[]; yollar?: string[] }>
   isKurallariSorunlari: (veri: Record<string, { kurallar: string[] }>, roller: string[]) => string[]
+  YOL_KURALI_BAYT_SINIRI: number
+  YOL_KURALI_ELLE: string[]
+  yolKurali: (ad: string, veri?: Record<string, { kurallar: string[]; yollar?: string[] }>) => string | null
+  yolKuraliAdi: (ad: string) => string
+  uretYolKurallari: (veri?: Record<string, { kurallar: string[]; yollar?: string[] }>) => Record<string, string>
+  yolKuraliSorunlari: (uretilen: Record<string, string>, diskDosyalari: string[]) => string[]
   gorevEksikRoller: () => string[]
   altiAlanSorunlari: (
     kartlar: Record<string, string>,
@@ -742,7 +748,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     const diskMetni = (ad: string): string =>
       fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
     const veri = uretici.isKurallariOku(KOK)
-    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'KATALOG', 'URUN'])
+    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'HARITA', 'KATALOG', 'URUN'])
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       for (const [m, etiket] of [[metin, `${ad} (üretilen)`], [diskMetni(ad), `${ad} (disk)`]] as Array<[string, string]>) {
         if (veri[ad]) {
@@ -769,6 +775,48 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(uretici.isKurallariSorunlari({ YOKROL: { kurallar: [uzun] } }, roller).join()).toContain('bilinmeyen rol')
     expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: ['kısa'] } }, roller).join()).toContain('çok kısa')
     expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: [] } }, roller).join()).toContain('iş kuralı yok')
+  })
+
+  it('HRT-71: yol kapsamlı işaretçi kural dosyaları üreticiyle diskte bire bir, paths taşır, 2 KB altında, sahipsiz dosya yok', () => {
+    const uretilen = uretici.uretYolKurallari()
+    expect(Object.keys(uretilen).sort(), 'yollar alanı olan beş rol').toEqual(['altyapi.md', 'arac.md', 'harita.md', 'katalog.md', 'urun.md'])
+    const dizin = path.join(KOK, '.claude', 'rules')
+    for (const [dosya, metin] of Object.entries(uretilen)) {
+      const disk = fs.readFileSync(path.join(dizin, dosya), 'utf8').replace(/\r\n/g, '\n')
+      expect(disk, `${dosya}: disk ile üretici bire bir (elle düzenleme yok)`).toBe(metin)
+      expect(Buffer.byteLength(metin, 'utf8'), `${dosya}: bayt sınırı`).toBeLessThanOrEqual(uretici.YOL_KURALI_BAYT_SINIRI)
+      expect(metin, dosya).toMatch(/^---\npaths:\n(  - ".+"\n)+---\n/)
+    }
+    const diskDosyalari = fs.readdirSync(dizin).filter((d) => d.endsWith('.md'))
+    expect(uretici.yolKuraliSorunlari(uretilen, diskDosyalari)).toEqual([])
+    // BLOG elle yazılır ama paths taşır (R10.5/R10.6 işaretçisi).
+    expect(uretici.YOL_KURALI_ELLE).toEqual(['filo-ortak.md', 'blog.md'])
+    const blog = fs.readFileSync(path.join(dizin, 'blog.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(blog).toMatch(/^---\npaths:\n/)
+    expect(blog).toContain('R10.5')
+    expect(blog).toContain('R10.6')
+    // Her yol kuralı maddesi kurallar dosyasındaki bir iş kuralından gelir (başlık kurallar dosyasında geçer).
+    const veri = uretici.isKurallariOku()
+    for (const ad of Object.keys(veri)) {
+      if (!veri[ad].yollar) continue
+      const kurallar = fs.readFileSync(path.join(KOK, 'docs', 'roller', `${ad}-kurallar.md`), 'utf8').replace(/\r\n/g, '\n')
+      for (const k of veri[ad].kurallar) {
+        const baslik = /^\*\*(.+?)\*\*/.exec(k)?.[1] ?? ''
+        expect(baslik.length, `${ad}: başlık okunur`).toBeGreaterThan(5)
+        expect(kurallar, `${ad}: başlık kurallar dosyasında`).toContain(baslik)
+      }
+    }
+  })
+
+  it('HRT-71 sabotaj: yol kuralı denetimi ayırt edicidir (elle düzenlenen, sahipsiz, paths\'siz, 2 KB üstü dosya sorun verir)', () => {
+    const iyi = '---\npaths:\n  - "a/**"\n---\n\nx\n'
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': iyi }, ['altyapi.md', 'blog.md', 'filo-ortak.md'])).toEqual([])
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': iyi }, ['altyapi.md', 'sahipsiz.md']).join()).toContain('sahipsiz kural dosyası')
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': 'paths yok\n' }, ['altyapi.md']).join()).toContain('ön bölümde paths yok')
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': iyi + 'y'.repeat(2100) }, ['altyapi.md']).join()).toContain('> 2048')
+    expect(uretici.yolKuraliSorunlari({ 'blog.md': iyi }, ['blog.md']).join()).toContain('elle yazılan dosya')
+    // yollar alanı olmayan rol dosya üretmez (BLOG, GEO-SEO): sessizce dosya doğmaz.
+    expect(uretici.yolKurali('BLOG')).toBeNull()
   })
 
   it('HRT-65 O9: haftalık öz-değerlendirme görevi verisi olan her rolde var; filo-ortak iyileştirme hakkı ve OPS onay makamını taşır', () => {
