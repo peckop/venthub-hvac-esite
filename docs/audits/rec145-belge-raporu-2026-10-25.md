@@ -11,14 +11,14 @@ Liste: [`rec145-belge-listesi-2026-10-25.csv`](rec145-belge-listesi-2026-10-25.c
 |---|---|
 | Bugünkü PDF klasörü (kaynak dizini katalog envanteri) | 97 PDF, 97'sinin sha256'sı diskten yeniden hesaplandı, fark 0 |
 | Listedeki satır (aile × PDF) | 116 |
-| Yayınlanabilir PDF (tekil sha256, yayin_onerisi=evet) | 48 dosya, 62 satır, toplam 263,7 MB (1 MB = 1e6 bayt) |
+| Yayınlanabilir PDF (tekil sha256, yayin_onerisi=evet) | 56 dosya, 70 satır, toplam 266,5 MB (1 MB = 1e6 bayt); 8'i AVenS ADH föyü (Recep kararı) |
 | Yayın kararı bekleyen (yayin_onerisi=dogrulanacak) | 5 dosya: FC51 iki eski fact sheet, SEAT ATEX kurulum kılavuzu, kimliği belirsiz SEAT föyü, Bravo S |
 | Yayınlanabilir belgesi olan aile | 34 / 47 (ürün 383 / 442) |
 | Belgesi olmayan aile | 13 (10'u AVenS; AVenS'in üretici kataloğu yok, tek kaynak fiyat listesi) |
 | Kanıtsız bağ | 0 (her bağ, ailenin anahtar sözcüğünün PDF metninde geçtiği sayfa sayısıyla yazılı; sözcük düzeyi kanıttır, model kodu düzeyi değil) |
-| Dil | PDF metninden ölçüldü (sayfa sayfa sınıflama): yayınlanabilir 48 belgenin tamamı İngilizce. Türkçe üretici belgesi yok |
+| Dil | PDF metninden ölçüldü (sayfa sayfa sınıflama): yayınlanabilir 56 belgenin tamamı İngilizce. Türkçe üretici belgesi yok |
 
-Tür dağılımı (yayınlanabilir 62 satır): katalog 40, teknik föy 16, kılavuz 5, diğer 1.
+Tür dağılımı (yayınlanabilir 70 satır): katalog 40, teknik föy 24, kılavuz 5, diğer 1. Aile ve ürün kapsamı değişmedi: ADH föyleri zaten belgesi olan ADH ailesine eklendi (34/47 aile, 383/442 ürün).
 
 İlk sürümdeki üç sayı (teknik föy 20, "2'si İngilizce + İspanyolca", 37 satır baskı kontrolsüz) KTL-59 bağımsız doğrulamasında CSV'den yeniden hesaplanınca tutmadı; yukarıdaki değerler düzeltilmiş hâlidir.
 
@@ -87,7 +87,7 @@ Design'ın "PDF'i olmayan" dediği 16 aileden 5'inin güncel PDF'i klasörde var
 
 **Paket yeniden üretildi.** `paket/` (ingestor, git dışı) canlıdan sıfırdan alındı: ham yarı + 8 CSV + `belgeler.csv`; eski dosyalar `paket/yedek-2026-09-25/` altında. Sınamalar: ham ↔ canlı round-trip SIFIR FARK (2724 satır), CSV katmanı SIFIR FARK, görseller depoyla doğrulandı (1146/1146), `katalog-karnesi --kapi` "Katalog paketi tazeliği TAZE". `belgeler.csv` artık bu listeden üretiliyor (`paket-belgeler-uret.mjs --liste=`; sha256 ile eşleşir, 12 sütun korunur, 8 sütun eklenir). Listede olmayan 16 web metni eski dizin-adı yöntemiyle bağlı kalır.
 
-**Dil ölçüldü.** Her sayfa altı dilin işlev kelimeleriyle sınıflanır; belgenin dili sayfaların en az %10'unu tutan diller (dağılım `dil_sayfa_dagilimi` sütununda). Yayınlanabilir 48 belgenin tamamı İngilizce; tek Türkçe belge AVenS fiyat listesi (yayınlanmaz). 12 arşiv PDF'inin sayfa metni dizinde eski yolla durduğu için o dosyalarda dil taraması yapılamadı (hepsi yayınlanmaz).
+**Dil ölçüldü.** Her sayfa altı dilin işlev kelimeleriyle sınıflanır; belgenin dili sayfaların en az %10'unu tutan diller (dağılım `dil_sayfa_dagilimi` sütununda). Yayınlanabilir 56 belgenin tamamı İngilizce (ilk ölçümde 48; sonradan eklenen 8 ADH föyü de İngilizce); tek Türkçe belge AVenS fiyat listesi (yayınlanmaz). 12 arşiv PDF'inin sayfa metni dizinde eski yolla durduğu için o dosyalarda dil taraması yapılamadı (hepsi yayınlanmaz).
 
 **Üretici baskı kıyası (29 dosya, 4 araştırmacı, salt okuma, PDF indirilmedi).** Veri: `rec145-baski-kiyasi-2026-10-25.json`.
 
@@ -105,4 +105,4 @@ Ek bulgular: Casals AF 2024 kesiti (yayınlanmayan) ESKİ: bizde CV092024, üret
 - Kimliği belirsiz SEAT föyü, SEAT ATEX kurulum kılavuzu (2011, yerine geçeni ölçülmedi) ve FC51'in iki eski fact sheet'i "evet"ten "dogrulanacak"a alındı.
 - Rapor sayıları CSV'den yeniden hesaplandı (yukarıdaki tablo).
 - Zayıf ama yanlış olmayan bağlar: Casals 77854 broşürü NIMUS/NIMAX'a model değil aile sözcüğüyle bağlı; Nicotra ADH-AT-RDE-RZR kataloğunda AT yalnız 3 sayfada, 78/97 sayfa RZR.
-- Karar gerektiren: `avensair-ADH-*` 8 föy "resmi değil (bayi föyü)" diye dışlandı; doğrulayıcıya göre AVenS'in (İkitelli) kendi föyleri. Yayınlanıp yayınlanmayacağı OPS/Recep kararı.
+- `avensair-ADH-*` 8 föy: ilk sürümde "resmi değil (bayi föyü)" diye dışlanmıştı; doğrulayıcıya göre AVenS'in (İkitelli) kendi föyleri. Recep kararı (25 Ekim 2026, OPS penceresi): yayınlanabilir. Listede `yayin_onerisi` evet, aile `nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar`; envanter durumu `resmi-degil` kalır (üretici belgesi değil, AVenS föyü).
