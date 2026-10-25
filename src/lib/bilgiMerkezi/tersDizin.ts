@@ -36,9 +36,14 @@ export interface RehberBaglantisi {
   href: Route
 }
 
-export type RehberHedefi = `vh:kategori/${string}` | `vh:aile/${string}`
+export type RehberHedefi = `vh:kategori/${string}` | `vh:aile/${string}` | `vh:yazi/${string}`
 
-/** Yazının o dildeki metninin bağlandığı kategori ve aile kimlikleri (+ ürün kartları). */
+/**
+ * Yazının o dildeki metninin bağlandığı kategori, aile ve YAZI kimlikleri (+ ürün kartları).
+ * `vh:yazi/<kimlik>` (URN-140) yazıdan yazıya bağlantıdır. Kendine bağlantı (self-link) sayılmaz; sayfa
+ * üretimi zaten kırmızı verir (sayfa.ts). Karşılıklı bağlantı (A→B ve B→A) serbesttir: her biri ötekinin
+ * "bu yazıya bağlananlar" kümesine girer.
+ */
 export function yazininHedefleri(yazi: RehberYazisi, dil: YaziDili): Set<string> {
   const metin = yazi.diller[dil]
   const hedefler = new Set<string>(yazi.urunler.filter((k) => k.startsWith('vh:aile/')))
@@ -46,6 +51,7 @@ export function yazininHedefleri(yazi: RehberYazisi, dil: YaziDili): Set<string>
   if (!metin) return hedefler
   for (const h of baglantilariTopla(markdownAyristir(metin.govde))) {
     if (h.startsWith('vh:kategori/') || h.startsWith('vh:aile/')) hedefler.add(h)
+    if (h.startsWith('vh:yazi/') && h !== `vh:yazi/${yazi.kimlik}`) hedefler.add(h)
   }
   return hedefler
 }
@@ -81,6 +87,8 @@ export function ilgiliRehberler(
       const hedefler = yazininHedefleri(y, dil)
       return aranan.some((h) => hedefler.has(h))
     })
+    // Yazı kendi "bu yazıya bağlananlar" kümesinde çıkmaz.
+    .filter((y) => !aranan.includes(`vh:yazi/${y.kimlik}`))
     .slice(0, adet)
     .map((y) => baglanti(y, dil))
 }
