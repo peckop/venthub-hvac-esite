@@ -78,6 +78,18 @@ describe('KTL-61 plan', () => {
     }
   })
 
+  it('geri alma planı: ileri + geri = canlı değerin aynısı, iki ailede de', () => {
+    const geri = planDogrula(JSON.parse(readFileSync(join(__dirname, '..', 'duzeltmeler', 'ktl61-fc51-cms-atex-aciklama-GERI-AL-2026-10-25.json'), 'utf8')))
+    expect(geri.hatalar).toEqual([])
+    const geriAile = aileyeGore(geri.kalemler)
+    for (const slug of [FC, CMS]) {
+      const ileri = ailePlani(CANLI[slug], aile.get(slug)!)
+      const donus = ailePlani(ileri.aciklama, geriAile.get(slug)!)
+      expect(donus.red).toBe(false)
+      expect(donus.aciklama).toEqual(CANLI[slug])
+    }
+  })
+
   it('ikinci koşum zararsız (K5 idempotent), iki ailede de', () => {
     for (const slug of [FC, CMS]) {
       const bir = ailePlani(CANLI[slug], aile.get(slug)!)
