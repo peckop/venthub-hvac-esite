@@ -157,6 +157,16 @@ const TESHIS_KURALI = [
 ].join('\n')
 
 /**
+ * AYNI DERS İKİNCİ KEZ (HRT-70, OPS emri 19 Ekim): HRT-68 ölçümü dersin yazılsa bile açıklama olarak kaldığını gösterdi.
+ * Kapının tasarımı ARAÇ'ındır; burada yalnız kural metni durur. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
+ * filo-ortak.md bayt tavanında olduğu için kurallar dosyasında durur; her rolün dosyasına AYNEN girer.
+ */
+const DERS_TEKRAR_KURALI = [
+  '## Aynı ders ikinci kez (HRT-70)',
+  '- Bir ders ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir: aynı ders sage\'de ya da bir kartta yazılıydı ve aynı sebepten ikinci kez kırmızı CI, kısmi iş ya da geri alınan işlem çıktıysa, çiğneyen departman kontrol önerisini (kanca ya da araç içi kapı) OPS\'a tek mesajla yazar: hangi ders, hangi iki vaka, önerilen kontrol. OPS ARAÇ\'a kart verir; kapının tasarımı ARAÇ\'ındır. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.',
+].join('\n')
+
+/**
  * BİRLEŞTİRME VE ÖLÇÜM KAYDI (HRT-60, OPS emri 2026-10-12): kartın bayt payını yemesin diye kurallar dosyasında durur
  * (kart tavanında pay yok). Yazılı kaynaklar: karar 98 (departman migrationsız kendi PR'ını birleştirir), fleet-mechanism §20.1-a/b
  * (`gh pr merge` doğrudan çağrılmaz; migration'lı PR `--onay`), karar 224 (onay işi koşan pencerede). Her rolün dosyasına AYNEN girer
@@ -297,6 +307,8 @@ function kuralDosyasi(ad) {
     TARAYICI_KURALI,
     '',
     TESHIS_KURALI,
+    '',
+    DERS_TEKRAR_KURALI,
     '',
     BIRLESTIRME_KURALI,
     '',
@@ -894,6 +906,7 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
     if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
+    if (!metin.includes(DERS_TEKRAR_KURALI)) s.push(`${ad}: kurallar dosyasında "Aynı ders ikinci kez" bloğu eksik/değişmiş (HRT-70)`)
   }
   return s
 }
@@ -1218,6 +1231,7 @@ module.exports = {
   DURUM_SATIRI_KURALI,
   TARAYICI_KURALI,
   TESHIS_KURALI,
+  DERS_TEKRAR_KURALI,
   CALISMA,
   haritaOzet,
   haritaDosyasi,

@@ -20,6 +20,7 @@ import { describe, expect, it } from 'vitest'
 
 type Uretici = {
   GOREV_DEGIL_BASLIK: string
+  DERS_TEKRAR_KURALI: string
   uret: () => Record<string, string>
   uretKurallar: () => Record<string, string>
   kuralDosyaAdi: (ad: string) => string
@@ -1311,6 +1312,20 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
       expect(kurallar[ad], ad).toContain('filo-tuzugu.md` Madde 2.1')
       expect(kurallar[ad], ad).toContain('ek kalemler: edge fonksiyonlu PR')
     }
+  })
+
+  it('HRT-70: "Aynı ders ikinci kez" bloğu her rolün kurallar dosyasında, düşerse sorunlar() yakalar ve vaka belgesi diskte', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain(uretici.DERS_TEKRAR_KURALI)
+      expect(kurallar[ad], ad).toContain('ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir')
+    }
+    expect(uretici.DERS_TEKRAR_KURALI).toContain('OPS ARAÇ\'a kart verir')
+    expect(fs.existsSync(path.join(KOK, 'docs', 'audits', 'ders-tekrar-vakalari-2026-10-19.md'))).toBe(true)
+    const ad = roller[0]
+    const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.DERS_TEKRAR_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Aynı ders ikinci kez/)
   })
 })
 
