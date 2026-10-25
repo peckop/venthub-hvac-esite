@@ -39,8 +39,8 @@ describe('KTL-61 plan', () => {
     const s = ailePlani(CANLI[FC], aile.get(FC)!)
     expect(s.red).toBe(false)
     expect(s.degisti).toBe(true)
-    expect(s.aciklama.en).toBe('Danfoss FC-51 is a compact frequency converter shown as the speed switch for some low-power roof-type (HEATMASTER F400) and hood (VORT QBK SAL KC EVO) fan models.')
-    expect(s.aciklama.tr).toBe('Danfoss FC-51, bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız anahtarı olarak gösterilen kompakt bir frekans konvertörüdür.')
+    expect(s.aciklama.en).toBe('Danfoss FC-51 is a compact frequency converter paired as the speed controller with some low-power roof-type (HEATMASTER F400) and hood (VORT QBK SAL KC EVO) fan models.')
+    expect(s.aciklama.tr).toBe('Danfoss FC-51, bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız kontrol cihazı olarak eşleştirilen kompakt bir frekans konvertörüdür.')
     expect(String(s.aciklama.tr)).not.toMatch(/AVenS|fiyat listesi/i)
     expect(String(s.aciklama.en)).not.toMatch(/AVenS|price list/i)
   })
@@ -62,10 +62,11 @@ describe('KTL-61 plan', () => {
     expect(cumleler.filter((c) => say(once, c) === 1)).toHaveLength(3)
   })
 
-  it('FC-51 maddeler_tr[0]: "Katalogda … listelenir" kalıntısı kalkar, diğer iki madde aynı', () => {
+  it('FC-51 maddeler_tr[0]: "Katalogda … listelenir" kalıntısı kalkar, kapsam fan eşleşmesine bağlı kalır (veri sayfası genel aralığı 0,18-22 kW), diğer iki madde aynı', () => {
     const s = ailePlani(CANLI[FC], aile.get(FC)!)
     const m = s.aciklama.maddeler_tr as string[]
-    expect(m[0]).toBe('0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.')
+    expect(m[0]).toBe('Bu fan modelleriyle eşleşen sürücülerde 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.')
+    expect(m[0]).not.toMatch(/Katalogda|listelenir/)
     expect(m.slice(1)).toEqual((CANLI[FC].maddeler_tr as string[]).slice(1))
   })
 

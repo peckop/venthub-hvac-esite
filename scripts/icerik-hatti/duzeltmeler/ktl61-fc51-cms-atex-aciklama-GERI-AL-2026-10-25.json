@@ -26,7 +26,7 @@
         "maddeler_tr",
         0
       ],
-      "eski": "0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.",
+      "eski": "Bu fan modelleriyle eşleşen sürücülerde 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi bulunur.",
       "yeni": "Katalogda 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi listelenir."
     },
     {
@@ -70,7 +70,7 @@
       "yol": [
         "tr"
       ],
-      "eski": "bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız anahtarı olarak gösterilen kompakt",
+      "eski": "bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modelleri için hız kontrol cihazı olarak eşleştirilen kompakt",
       "yeni": "AVenS fiyat listesinde bazı küçük güçlü çatı tipi (HEATMASTER F400) ve davlumbaz (VORT QBK SAL KC EVO) fan modellerinde hız kontrolü için listelenen kompakt"
     },
     {
@@ -78,7 +78,7 @@
       "yol": [
         "en"
       ],
-      "eski": "shown as the speed switch for some",
+      "eski": "paired as the speed controller with some",
       "yeni": "listed in the AVenS price list for speed control of some"
     }
   ]
