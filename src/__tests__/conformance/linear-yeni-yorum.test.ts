@@ -248,6 +248,59 @@ describe('INV-LINEAR-YORUM-7: sorgu proje listesinden bağımsız', () => {
   })
 })
 
+const YENI_KANALLAR = [
+  { kisa: '3D', id: '414eb227-fa10-4f6e-ae62-27df23847ee5', ad: '3D Ürün Modelleri (DESIGN-3D)', imza: 'DESIGN-3D' },
+  { kisa: 'ICERIK', id: '0f60f263-6ff2-44a2-9dc4-c6c6605224d4', ad: 'Ürün İçeriği Hazırlama (DESIGN-ICERIK)', imza: 'DESIGN-ICERIK' },
+]
+
+describe.each(YENI_KANALLAR)('INV-LINEAR-YORUM-12: $imza kanalı zile girer (ARC-145)', ({ kisa, id, ad, imza }) => {
+  const eskiAnahtar = process.env.LINEAR_API_KEY
+  beforeEach(() => {
+    process.env.LINEAR_API_KEY = 'x'.repeat(30)
+  })
+  afterEach(() => {
+    if (eskiAnahtar === undefined) delete process.env.LINEAR_API_KEY
+    else process.env.LINEAR_API_KEY = eskiAnahtar
+    vi.unstubAllGlobals()
+  })
+
+  it('PROJELER kanalı kısa adıyla içerir ve kimlikler tekrarsızdır', () => {
+    expect(m.PROJELER).toContainEqual({ id, kisa })
+    expect(new Set(m.PROJELER.map((p) => p.id)).size).toBe(m.PROJELER.length)
+  })
+
+  it('cek() sunucuya giden proje süzgecine kimliği koyar (listede yoksa zil hiç çalmaz)', async () => {
+    const fetchSahte = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: { comments: { nodes: [] } } }) })
+    vi.stubGlobal('fetch', fetchSahte)
+    await m.cek()
+    const govde = JSON.parse(String((fetchSahte.mock.calls[0]?.[1] as { body: string }).body)) as { variables: { ids: string[] } }
+    expect(govde.variables.ids).toContain(id)
+  })
+
+  it('bu projeden gelen Design yorumu kalem olur ve zil satırı "<kısa ad> 1" yazar (Design imzası DESIGN* sayılır)', async () => {
+    const yorum = { createdAt: onceki(1), body: `Teslim.\n\n— ${imza} (Opus)`, project: { id, name: ad } }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: { comments: { nodes: [yorum] } } }) }))
+    const s = await m.cek()
+    expect(s.kalemler).toHaveLength(1)
+    expect(s.kalemler?.[0]).toMatchObject({ proje: kisa, serit: imza })
+    expect(m.ozetle(s.kalemler ?? [], s.belirsiz)).toContain(`(${kisa} 1)`)
+  })
+
+  it('aynı turda iki kanaldan yorum gelirse ikisi de sayılır', async () => {
+    const digeri = YENI_KANALLAR.find((k) => k.id !== id)!
+    const nodes = [
+      { createdAt: onceki(2), body: `x\n\n— ${imza}`, project: { id, name: ad } },
+      { createdAt: onceki(1), body: `y\n\n— ${digeri.imza}`, project: { id: digeri.id, name: digeri.ad } },
+    ]
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: { comments: { nodes } } }) }))
+    const s = await m.cek()
+    const satir = String(m.ozetle(s.kalemler ?? [], s.belirsiz))
+    expect(satir).toContain('2 yeni yorum')
+    expect(satir).toContain(`${kisa} 1`)
+    expect(satir).toContain(`${digeri.kisa} 1`)
+  })
+})
+
 describe('INV-LINEAR-YORUM-8: varsayılan çıktı geriye uyumlu', () => {
   it('anahtarsız satir() null döner (yüklü zil "yok" okur, yeni metin çıkmaz)', async () => {
     const eski = process.env.LINEAR_API_KEY

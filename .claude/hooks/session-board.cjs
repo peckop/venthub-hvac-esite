@@ -142,9 +142,10 @@ const source = input.source || 'startup'
 // OPS OTURUM KİMLİĞİ (ARC-99): OPS penceresi (agent: ops-pencere) açılışta kimliğini TEK dosyaya yazar; kokpit
 // düğmeleri, linear-zil ve aşağıdaki lider testi buradan okur (kodda sabit kimlik YOK). Hata açılışı bozmaz.
 let opsOturumu = null
+let opsYazma = null
 try {
   opsOturumu = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'ops-oturumu.cjs'))
-  opsOturumu.acilistaYaz({ sid, kaynak: source, cwd: input.cwd, agentType: input.agent_type })
+  opsYazma = opsOturumu.acilistaYaz({ sid, kaynak: source, cwd: input.cwd, agentType: input.agent_type })
 } catch {
   opsOturumu = null
 }
@@ -213,6 +214,17 @@ const bolumler = []
  */
 function bolum(ad, oncelik, tam, ozet = '', daralt = null) {
   if (tam) bolumler.push({ ad, oncelik, tam, ozet, daralt })
+}
+// ARC-140: OPS adayı bir pencere açıldı ama dosyadaki OPS kimliği CANLI başka pencerede → yazılmadı. Sessiz kalma:
+// bu pencere gerçekten yeni OPS ise insan karar verir (eskisini kapat ya da elle yaz); kokpit düğmeleri eskide kalır.
+if (opsYazma && opsYazma.yazildi === false && opsYazma.sebep === 'kayitli-kimlik-canli') {
+  const kisa = (s) => String(s || '').slice(0, 8)
+  bolum(
+    'ops-kimlik',
+    1,
+    `⚠OPS KİMLİĞİ: kokpit düğmeleri ${kisa(opsYazma.mevcut)} penceresine bağlı ve o pencere CANLI; bu pencere (${kisa(sid)}) OPS adayı ama kimliği ezmedi. ` +
+      `Yeni OPS bu penceredir diyorsan eski OPS'u kapat ve yeniden aç, ya da: node scripts/board/ops-oturumu.cjs --yaz ${sid}\n`,
+  )
 }
 /**
  * Bölümleri EKLEME sırasıyla birleştirir. Tavan aşılırsa SIRAYLA:

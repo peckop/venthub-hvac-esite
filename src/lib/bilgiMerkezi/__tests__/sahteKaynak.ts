@@ -24,6 +24,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar', 'Nicotra Gebhardt RDH Seyrek Kanatlı Radyal Fanlar'],
     ['nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar', 'Nicotra Gebhardt DD Direkt Akuple Radyal Fanlar'],
     ['vortice-aksiyel-endustriyel-fanlar', 'Vortice Aksiyel Endüstriyel Fanlar'],
+    // Sessiz fan nasıl seçilir yazısı (BLG-15, 2026-10-17): aile canlı site haritasında 200 verir.
+    ['vortice-lineo-quiet-sessiz-kanal-fanlari', 'Vortice Lineo Quiet Sessiz Kanal Fanları'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
@@ -38,6 +40,11 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     'axial-industrial-fans': {
       slug: 'axial-industrial-fans',
       metadata: { slug: { tr: 'aksiyel-fanlar', en: 'axial-industrial-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'duct-fans': {
+      slug: 'duct-fans',
+      metadata: { slug: { tr: 'kanal-tipi-fanlar', en: 'duct-fans' } },
       ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
     },
     'smoke-exhaust-fans': {

@@ -15,6 +15,15 @@
       "Bash(pnpm vitest *)",
       "Bash(pnpm type-check *)",
       "Bash(pnpm lint)",
+      "Bash(node --env-file=.env scripts/db/product-data/*.mjs)",
+      "Bash(node --env-file=.env scripts/db/product-data/*.mjs *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push origin *)",
+      "Bash(git push -u origin *)",
+      "Bash(git -C * add *)",
+      "Bash(git -C * commit *)",
+      "Bash(gh pr create *)",
       "mcp__claude_ai_Vercel__list_deployments",
       "mcp__codegraph__codegraph_explore",
       "mcp__github__get_file_contents",
@@ -46,9 +55,51 @@
       "mcp__plugin_supabase_supabase__generate_typescript_types",
       "mcp__plugin_supabase_supabase__get_advisors",
       "mcp__codegraph__codegraph_status"
+    ],
+    "deny": [
+      "Bash(node --env-file=.env *..*)",
+      "Read(**/ops-yazim-onayi.txt)",
+      "Bash(git push * master*)",
+      "Bash(git push * main*)",
+      "Bash(git push *--force*)",
+      "Bash(git push * -f *)",
+      "Bash(git push * -f)",
+      "Bash(git push * :*)",
+      "Bash(git push *--delete*)",
+      "Bash(git push *+*)",
+      "Bash(git push *--mirror*)",
+      "Bash(git push *:master*)",
+      "Bash(git push *:main*)",
+      "Bash(git push *refs/heads/master*)",
+      "Bash(git push *refs/heads/main*)",
+      "Bash(git -C * push *:master*)",
+      "Bash(git -C * push *:main*)",
+      "Bash(git -C * push *refs/heads/master*)",
+      "Bash(git -C * push *refs/heads/main*)",
+      "Bash(git -C * push * master*)",
+      "Bash(git -C * push * main*)",
+      "Bash(git -C * push *--force*)",
+      "Bash(git -C * push * -f *)",
+      "Bash(git -C * push * -f)",
+      "Bash(git -C * push * :*)",
+      "Bash(git -C * push *--delete*)",
+      "Bash(git -C * push *+*)",
+      "Bash(git -C * push *--mirror*)"
     ]
   },
   "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/izin-istegi-kapisi.cjs\"",
+            "statusMessage": "izin-istegi-kapisi"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
@@ -56,7 +107,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/protect-config.cjs\"",
-            "statusMessage": "config-protection"
+            "statusMessage": "config-protection",
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
@@ -65,7 +119,10 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sensitive-path-guard.cjs\""
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sensitive-path-guard.cjs\"",
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
@@ -85,17 +142,26 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/silme-baglanti-kapisi.cjs\"",
-            "statusMessage": "silme-baglanti-kapisi"
+            "statusMessage": "silme-baglanti-kapisi",
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gh-api-kapisi.cjs\"",
-            "statusMessage": "gh-api-kapisi"
+            "statusMessage": "gh-api-kapisi",
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/env-yazma-kapisi.cjs\"",
-            "statusMessage": "env-yazma-kapisi"
+            "statusMessage": "env-yazma-kapisi",
+            "onFailure": "block",
+
+            "timeout": 30
           },
           {
             "type": "command",
@@ -105,12 +171,27 @@
         ]
       },
       {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/canli-yazim-kapisi.cjs\"",
+            "statusMessage": "canli-yazim-kapisi",
+            "onFailure": "block",
+            "timeout": 30
+          }
+        ]
+      },
+      {
         "matcher": "mcp__.*[Ss]upabase.*__(execute_sql|apply_migration|deploy_edge_function|merge_branch|reset_branch|delete_branch|pause_project|restore_project)",
         "hooks": [
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sql-yazma-kapisi.cjs\"",
-            "statusMessage": "sql-yazma-kapisi"
+            "statusMessage": "sql-yazma-kapisi",
+            "onFailure": "block",
+
+            "timeout": 30
           }
         ]
       },
@@ -159,6 +240,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kart-alani-kapisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/done-kanit-kapisi.cjs\""
           }
         ]
       }
@@ -181,6 +266,17 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-yedek.cjs\"",
             "timeout": 45
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sabit-dersler.cjs\"",
+            "timeout": 10,
+            "statusMessage": "sabit dersler"
           }
         ]
       }
@@ -236,6 +332,17 @@
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/defter-tazelik-satiri.cjs\"",
             "timeout": 10,
             "statusMessage": "defter tazelik satiri"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-yazim-sayaci.cjs\"",
+            "timeout": 10,
+            "statusMessage": "sage yazim sayaci"
           }
         ]
       },
@@ -413,6 +520,56 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ayar-degisti-bekci.cjs\"",
             "statusMessage": "ayar-degisti-bekci"
+          }
+        ]
+      }
+    ],
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/talimat-yuklendi-gunlugu.cjs\""
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/olay-kaydi.cjs\""
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/olay-kaydi.cjs\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/olay-kaydi.cjs\""
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/olay-kaydi.cjs\""
           }
         ]
       }

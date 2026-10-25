@@ -1,6 +1,6 @@
 ---
 name: ops-curutucu
-description: OPS departmanının çürütücü çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
+description: OPS departmanının çürütücü çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.
 model: sonnet
 memory: user
 disallowedTools: Edit, Write, NotebookEdit

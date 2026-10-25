@@ -3,7 +3,8 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi. Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI'da kalır.
+Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi, yapısal veri (JSON-LD) üreticisi (GEO-SEO ölçer). Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI'da kalır. İşe başlarken urun-yapisal-veri-standard §2 ve rendering-cache-standard oku.
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): 3d/** (3D); çeviri altyapısı ve toplu göç (I18N, vitrin içeriğinin sözlük girişi ÜRÜN'dür); token ve yazı tipi (TASARIM); ürün verisi (KATALOG); CI (ALTYAPI).
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -11,8 +12,14 @@ Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA ad
 - Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır (hangi rol hangisini kullanır: YETENEK atar).
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
+## Amaç
+Amaç ve Nasıl: `docs/roller/URUN-gorevler.md`.
+
+## Düzenli görevler
+- 1 görev, tetiğe bağlı 0: `docs/roller/URUN-gorevler.md`.
+
 ## Dosyalar
-src/components/products/**, src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*.
+src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*, src/lib/seo/jsonld.ts, src/lib/seo/indexnow.ts, src/app/_components/aileSayfasi.tsx, src/app/_components/ProductDetailPageView.tsx, src/data/sessizFan/**, src/lib/services/sessizFanKodlari.service.ts, src/components/category/sections/silent-fan/**.
 
 ## Yetki
 Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").
@@ -23,8 +30,8 @@ Adres şeması değişikliği tek başına Recep'e sorulur (paketlenmez); canlı
 ## Yetenek ve araç
 rendering-cache cetveli, i18n-conventions, Playwright ölçümü.
 
-## Kurallar (18)
-- K1 Plan önce; K2 Tip güvenliği; K7 i18n; K9 MVVM/Gateway; K10 Design token; K11 content-auto; K12 focus-visible; K13 Typography prose; K14 Suspense sınırı; K15 Önbellek anahtarı: dil; K16 ISR + webhook; K17 Hreflang; K19 3D gölge; K20 CSP 3D CDN; K21 React Compiler (geçiş, uyarı); K22 React.cache (geçiş, katı); K27 Feature flag / RSC; K28 Önbellek anahtarı: tenant.
+## Kurallar (16)
+- K1 Plan önce; K2 Tip güvenliği; K7 i18n; K9 MVVM/Gateway; K10 Design token; K11 content-auto; K12 focus-visible; K13 Typography prose; K14 Suspense sınırı; K15 Önbellek anahtarı: dil; K16 ISR + webhook; K17 Hreflang; K21 React Compiler (geçiş, uyarı); K22 React.cache (geçiş, katı); K27 Feature flag / RSC; K28 Önbellek anahtarı: tenant.
 - Gerekçeli özet: `docs/roller/URUN-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
@@ -37,11 +44,11 @@ Açık.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.
-CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca tasarımı ve departman iyileştirmesi onayı OPS'tadır (16 Ekim), kapı gevşetme Recep'e gider. Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular.
 
 ## İletişim
-- Recep'e yalnız iş bitince ya da sorun çıkınca tek satır yaz; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
+- Recep'e yazarken kurallar dosyandaki "Recep'e mesaj kuralları" geçerlidir; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
 - Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).
 
 ## Çalışma düzeni

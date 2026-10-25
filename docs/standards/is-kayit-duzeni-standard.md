@@ -73,13 +73,20 @@ yorum) kurulursa bu madde o zaman yeniden yazılır.
 
 ## 2. Kart AÇMA şablonu (Kanban)
 
-Zorunlu dört alan — dördü de açılış anında **dürüstçe** doldurulabilir olanlardır
+Zorunlu yedi alan — yedisi de açılış anında **dürüstçe** doldurulabilir olanlardır
 (ORION §2: açılışta zorunlu kanıt alanı uydurma üretir — `required-field-pressures-fabrication`):
 
 1. **Ne** — iş tanımı.
 2. **Niçin** — değer cümlesi (satan platforma / SaaS hedefine / ekip verimine katkı).
 3. **Kabul ölçütü** — "bittiğini nereden anlayacağız." Kapanışı ölçülebilir kılan asıl alan.
 4. **Eleme kaydı** — mükerrer adayları ve eleme gerekçeleri (§3).
+5. **Kim** — işin sahibi departman; Recep kapısına giriyorsa hangi kapı (Filo Tüzüğü Madde 2.1) ayrıca yazılır.
+6. **Ne zaman** — vade tarihi ya da tetik; ikisi de yoksa "vade yok, sırada" yazılır (boş bırakılmaz).
+7. **Nerede** — işin dokunduğu dosya ya da sistem alanı (yol ya da alan adı).
+
+Kartın zorunlu alanları, rol kartının 5N1K'sı ile aynı altılıdır (Filo Tüzüğü Madde 3: Kim, Ne, Ne zaman, Nerede, Nasıl, Neden).
+Eşleşme: Ne = Ne; Niçin = Neden; Nasıl = KAYNAK/CETVEL ve `YÖNTEM:` satırı (aşağıda); Kim, Ne zaman, Nerede = 5, 6, 7.
+Eksik alanı kart açılışında uyaran kontrol ARAÇ'tadır (ARC-174); bu cetvel alanları, kontrol uygulamayı tanımlar.
 
 `Kanıt-Referans` açılışta ZORUNLU DEĞİL (varsa yazılır); **kapanışta zorunludur** (§4).
 
@@ -263,8 +270,8 @@ açıklamasında satır başında şu satır bulunur:
 RECEP YETKİSİ: <gerekçe>
 ```
 
-Gerekçe YALNIZ şu altı sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
-yazımı fark etmez):
+Gerekçe YALNIZ şu yedi sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
+yazımı fark etmez; yedincisi ARC-142 ile 15 Ekim'de eklendi):
 
 | Gerekçe | Ne zaman |
 |---|---|
@@ -274,6 +281,7 @@ yazımı fark etmez):
 | geri alınamaz silme | Geri dönüşü olmayan silme |
 | yeni görünüm/iddia/yapı kararı | Vitrinde/metinde yeni görünüm, yeni iddia ya da yapı kararı (üç biçim de geçerli) |
 | hesap/ayar dosyası | Hesap, kimlik ya da izin/ayar dosyası değişikliği |
+| dış kişiye Recep adına yazışma | Tedarikçi, üretici, kurum ya da başka bir dış kişiye Recep adına mesaj, e-posta ya da belge isteği göndermek (kullanıcı adına mesaj göndermek açık izin ister). Gerekçede "Recep adına" geçer; örnek: `tedarikçiye Recep adına yazışma — AVenS belge isteği` |
 
 Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerekçe liste dışıysa kapı kırmızı verir
 ("bu işin yetkisi zaten verilmiş, yap").

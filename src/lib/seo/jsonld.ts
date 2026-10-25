@@ -8,6 +8,9 @@
  * JSON-LD'si tek-Product değil schema.org ProductGroup + hasVariant[] üretir.
  * Fiyatı NULL olan varyanta (Teklif Alın modeli) `offers` alanı HİÇ yazılmaz —
  * eski koddaki fiyatsız "0.00" beyanı (Merchant uyumsuzluğu) burada biter.
+ * URN-138 (SEO-56 A): ProductGroup YALNIZ ailenin tüm varyantlarında görünür fiyat varsa; aksi halde
+ * (teklif kipi / fiyatsız / karışık aile) Product düğümü hiç yazılmaz, CollectionPage + ItemList yazılır
+ * (Google ürün snippet'i `offers/review/aggregateRating` ister; uydurma yasak).
  *
  * W4b (T001-VH): `variant.price` ham `products.price` DEĞİL — `get_family_detail`
  * RPC'si onu `display_price(products)` ile motor cache'inden türetir (INV-PRICE-1).
@@ -53,10 +56,15 @@ function buildWebSiteRef(baseUrl: string) {
   }
 }
 
-/** `ItemList` içindeki tek satır: konum + dil önekli mutlak adres (fiyat/offers YAZILMAZ). */
+/**
+ * `ItemList` içindeki tek satır: konum + dil önekli mutlak adres (fiyat/offers YAZILMAZ).
+ * `name` ve `url` ayrı ayrı isteğe bağlıdır: kategori/seri satırı yalnız `url`, fiyatsız aile satırı (URN-138)
+ * `name` taşır, `url`'i yalnız dizine açık model adresi varsa ekler. Yazılmayan alan anahtar olarak da bulunmaz.
+ */
 interface ListeSatiri {
   position: number
-  url: string
+  url?: string
+  name?: string
 }
 
 /**
@@ -70,10 +78,11 @@ function buildItemList(numberOfItems: number, satirlar: ListeSatiri[]) {
   return {
     '@type': 'ItemList' as const,
     numberOfItems,
-    itemListElement: satirlar.map(({ position, url }) => ({
+    itemListElement: satirlar.map(({ position, url, name }) => ({
       '@type': 'ListItem' as const,
       position,
-      url,
+      ...(name ? { name } : {}),
+      ...(url ? { url } : {}),
     })),
   }
 }
@@ -97,11 +106,97 @@ export interface BuildProductGroupJsonLdParams {
 }
 
 /**
- * Aile → schema.org ProductGroup.
+ * Varyantın yayınlanacak `Offer`ı; teklif modu ya da geçerli fiyat yoksa `null`.
+ *
+ * ⭐TEKLİF MODU — vitrinle AYNI FONKSİYON, ayrı bir kopya DEĞİL (REC-111).
+ *
+ * Burada eskiden yalnız "fiyat geçerli mi" sorusu vardı ve yorumu "eşik vitrinle
+ * AYNIDIR" diyordu. Değildi: vitrinin hükmü üç dallı (kategori çözülemedi ·
+ * kategori hide_price · fiyat geçersiz), burada yalnız üçüncüsü uygulanıyordu.
+ * Canlı sonuç: 80 ürün adresinin 72'sinde JSON-LD gerçek fiyat yayınlıyordu.
+ * Artık karar `quoteModeHesapla`ya sorulur; iki yüzey aynı kaynaktan besleniyor.
+ *
+ * URN-138: bu fonksiyon hem varyant düğümünün `offers`ını hem de AİLE KARARINI (ProductGroup mu,
+ * CollectionPage mi) besler — iki yer aynı hükmü ayrı ayrı yazamaz (A3).
+ */
+function varyantTeklifi(
+  variant: FamilyVariant,
+  mainCategory: { metadata?: unknown } | null,
+): Record<string, unknown> | null {
+  const teklifModu = quoteModeHesapla(mainCategory, variant)
+  const offerPrice = variant.price == null ? null : Number(variant.price)
+  if (teklifModu || offerPrice == null || !Number.isFinite(offerPrice) || offerPrice <= 0) return null
+  return {
+    '@type': 'Offer',
+    price: offerPrice.toFixed(2),
+    priceCurrency: 'TRY',
+    availability:
+      (variant.stock_qty ?? 0) > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+  }
+}
+
+/**
+ * URN-138 (SEO-56 A) — ailenin ürün işaretlemesini (`ProductGroup`) hak edip etmediğine karar veren TEK kural.
+ *
+ * Google ürün snippet'i `offers`, `review` ya da `aggregateRating`dan en az birini ZORUNLU tutar (GSC KRİTİK:
+ * "hasVariant.offers, review veya aggregateRating belirtilmelidir"; 16 Ekim 2026, canlıda 47 aile / 441 varyant,
+ * 0 offers). Fiyatı vitrinde gösterilmeyen varyanta `Offer` YAZILMAZ (REC-111), uydurma `review`/`aggregateRating`
+ * ve `price: 0` YASAK (A1) — dolayısıyla çözüm "daha çok alan" değil, ürün işaretlemesini HİÇ yazmamaktır.
+ *
+ * `true` yalnız ailenin TÜM varyantlarında geçerli ve görünür teklif varsa. Varyantsız aile `false`: boş
+ * `ProductGroup` zaten zorunlu alanı karşılayamaz. Kısmi `hasVariant` YAZILMAZ (grubu eksik gösterirdi).
+ */
+export function tumVaryantlarFiyatliMi(
+  variants: FamilyVariant[],
+  mainCategory: { metadata?: unknown } | null,
+): boolean {
+  return variants.length > 0 && variants.every((v) => varyantTeklifi(v, mainCategory) !== null)
+}
+
+/** Varyantın ilk görselinin mutlak adresi; görsel yoksa `undefined` (alan hiç yazılmaz). */
+function varyantGorseli(variant: FamilyVariant): string | undefined {
+  const imagePath = variant.images[0]?.path
+  return imagePath ? storagePathToUrl(imagePath) : undefined
+}
+
+/**
+ * ⭐GRUP GÖRSELİ (REC-269 bulgu 3). Google'ın ürün zengin sonuçlarında görsel fiilen
+ * zorunludur; görselsiz kayıt çoğu yüzeyde HİÇ gösterilmez. Ölçüldü (2026-09-07,
+ * canlı): üç aile sayfasının ÜÇÜNDE de `ProductGroup.image` yoktu.
+ *
+ * KURAL ÜÇÜNCÜ KEZ YAZILMADI — VAR OLAN KAPAK KURALI KULLANILDI: "varyant sırasına
+ * göre ilk varyantın ilk görseli" (`family.service.ts` `getSeriesLanding`, ve aynı
+ * kuralı RPC de uyguluyor). Ayrı bir "grup kapağı" kuralı icat etmek üçüncü bir doğruluk
+ * kaynağı olurdu ve gün gelir üçü ayrışırdı. URN-138: iki dal (ProductGroup ve fiyatsız
+ * CollectionPage) AYNI yardımcıyı kullanır.
+ *
+ * GÖRSEL YOKSA ALAN HİÇ YAZILMAZ — `mpn` ile aynı ilke: eksik alan, uydurulmuş
+ * alandan iyidir. Yedek/temsili bir görsel koymak, arama motoruna o ailenin ürünü
+ * buymuş gibi YANLIŞ BEYAN olurdu.
+ * ÖLÇÜLDÜ (canlı, 2026-09-08): 47 ailenin 34'ü bu kuralla görsel türetir, 13'ünde
+ * hiç ürün görseli YOK — o 13'ü kod değil KATALOG VERİSİ kapatır (ilgili: REC-269).
+ */
+function grupGorseliBul(variants: FamilyVariant[]): string | undefined {
+  for (const variant of variants) {
+    const gorsel = varyantGorseli(variant)
+    if (typeof gorsel === 'string') return gorsel
+  }
+  return undefined
+}
+
+/**
+ * Aile → schema.org. İki biçim, TEK karar (`tumVaryantlarFiyatliMi`):
+ *
+ * A) Ailenin TÜM varyantlarında geçerli ve görünür fiyat var → `ProductGroup`:
  *   - productGroupID = family.slug
  *   - url = `${baseUrl}/${lang}/products/${family.slug}` (varyant URL'i YAZILMAZ)
- *   - hasVariant: her varyant için Product {name, sku, mpn, image?, offers?}
- *   - fiyatı olmayan (NULL veya ≤ 0) varyanta offers alanı HİÇ yazılmaz.
+ *   - hasVariant: her varyant için Product {name, mpn?, image?, offers}
+ *
+ * B) En az bir varyantta teklif kipi ya da geçerli fiyat yok (bugün canlıdaki 47 ailenin 47'si) →
+ *   `Product`/`ProductGroup`/`hasVariant`/`offers` HİÇ yazılmaz; `buildSeriesLandingJsonLd` ile AYNI şekilde
+ *   `CollectionPage` + `mainEntity` `ItemList` (fiyat YOK) yazılır (bkz. `buildFiyatsizAileJsonLd`).
  *
  * Fiyat eşiği vitrinin "Teklif Alın" eşiğiyle AYNIDIR: 0/negatif fiyat, fiyatı olmayan
  * ürünün başka bir yazılışıdır — beyan edilirse arama sonucunda "0,00 ₺" görünür.
@@ -113,8 +208,11 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     pickLocalized(family.description, lang) ||
     (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
 
+  if (!tumVaryantlarFiyatliMi(variants, mainCategory)) {
+    return buildFiyatsizAileJsonLd({ family, variants, lang, baseUrl, bayrak, url, description })
+  }
+
   const hasVariant = variants.map((variant) => {
-    const imagePath = variant.images[0]?.path
     // REC-110: ham `variant.name` YAZILMAZ — bu düğüm arama motoruna gider ve /en
     // sayfasının JSON-LD'si Türkçe ad taşıyordu (SEO'ya dil sızıntısı, #936'daki fiyat
     // sızıntısının kardeşi). Vitrinle AYNI çözücü, ayrı bir kopya değil.
@@ -155,51 +253,23 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
       productNode.mpn = modelKodu
     }
 
-    if (imagePath) {
-      productNode.image = storagePathToUrl(imagePath)
+    const gorsel = varyantGorseli(variant)
+    if (gorsel) {
+      productNode.image = gorsel
     }
 
-    // ⭐TEKLİF MODU — vitrinle AYNI FONKSİYON, ayrı bir kopya DEĞİL (REC-111).
-    //
-    // Burada eskiden yalnız "fiyat geçerli mi" sorusu vardı ve yorumu "eşik vitrinle
-    // AYNIDIR" diyordu. Değildi: vitrinin hükmü üç dallı (kategori çözülemedi ·
-    // kategori hide_price · fiyat geçersiz), burada yalnız üçüncüsü uygulanıyordu.
-    // Canlı sonuç: 80 ürün adresinin 72'sinde JSON-LD gerçek fiyat yayınlıyordu.
-    // Artık karar `quoteModeHesapla`ya sorulur; iki yüzey aynı kaynaktan besleniyor.
-    const teklifModu = quoteModeHesapla(mainCategory, variant)
-    const offerPrice = variant.price == null ? null : Number(variant.price)
-    if (!teklifModu && offerPrice != null && Number.isFinite(offerPrice) && offerPrice > 0) {
-      productNode.offers = {
-        '@type': 'Offer',
-        price: offerPrice.toFixed(2),
-        priceCurrency: 'TRY',
-        availability:
-          (variant.stock_qty ?? 0) > 0
-            ? 'https://schema.org/InStock'
-            : 'https://schema.org/OutOfStock',
-      }
+    // Teklif: `varyantTeklifi` (vitrinle aynı `quoteModeHesapla`). Bu dala yalnız TÜM varyantlar teklif
+    // taşıyorsa girilir (`tumVaryantlarFiyatliMi`); fiyatsız varyantlı aile `buildFiyatsizAileJsonLd`e gider.
+    const offers = varyantTeklifi(variant, mainCategory)
+    if (offers) {
+      productNode.offers = offers
     }
 
     return productNode
   })
 
-  // ⭐GRUP GÖRSELİ (REC-269 bulgu 3). Google'ın ürün zengin sonuçlarında görsel fiilen
-  // zorunludur; görselsiz kayıt çoğu yüzeyde HİÇ gösterilmez. Ölçüldü (2026-09-07,
-  // canlı): üç aile sayfasının ÜÇÜNDE de `ProductGroup.image` yoktu.
-  //
-  // KURAL ÜÇÜNCÜ KEZ YAZILMADI — VAR OLAN KAPAK KURALI KULLANILDI: "varyant sırasına
-  // göre ilk varyantın ilk görseli" (`family.service.ts` `getSeriesLanding`, ve aynı
-  // kuralı RPC de uyguluyor). Burada `hasVariant` zaten o sırayı koruyor ve her düğüme
-  // görselini yazmış durumda; ilk görselli düğümü seçmek, kuralı KOPYALAMADAN aynı
-  // sonucu verir. Ayrı bir "grup kapağı" kuralı icat etmek üçüncü bir doğruluk kaynağı
-  // olurdu ve gün gelir üçü ayrışırdı.
-  //
-  // GÖRSEL YOKSA ALAN HİÇ YAZILMAZ — `mpn` ile aynı ilke: eksik alan, uydurulmuş
-  // alandan iyidir. Yedek/temsili bir görsel koymak, arama motoruna o ailenin ürünü
-  // buymuş gibi YANLIŞ BEYAN olurdu.
-  // ÖLÇÜLDÜ (canlı, 2026-09-08): 47 ailenin 34'ü bu kuralla görsel türetir, 13'ünde
-  // hiç ürün görseli YOK — o 13'ü kod değil KATALOG VERİSİ kapatır (ilgili: REC-269).
-  const grupGorseli = hasVariant.find((v) => typeof v.image === 'string')?.image
+  // Grup görseli: `grupGorseliBul` (kapak kuralı ve gerekçesi orada; iki dal aynı yardımcıyı kullanır).
+  const grupGorseli = grupGorseliBul(variants)
 
   return {
     '@context': 'https://schema.org',
@@ -221,6 +291,64 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     // (canlı kapı `JSONLD-ISPARTOF`, 47 aile sayfasında ölçüldü). Site ilişkisi CollectionPage
     // düğümlerinde (kategori + seri) kalır; onlar bir WebPage'dir.
     hasVariant,
+  }
+}
+
+interface FiyatsizAileParams {
+  family: FamilyDetail['family']
+  variants: FamilyVariant[]
+  lang: string
+  baseUrl: string
+  bayrak: boolean
+  url: string
+  description: string
+}
+
+/**
+ * URN-138 (SEO-56 A) — fiyatsız / teklif kipli / karışık aile → `CollectionPage` + `mainEntity` `ItemList`.
+ *
+ * Şekil `buildSeriesLandingJsonLd` ile AYNI (CollectionPage, `isPartOf` WebSite, liste `mainEntity` ItemList içinde);
+ * eklenen yalnız: `image` (grup görseli kuralı, varsa), `about` Brand (marka varsa). `Product`, `ProductGroup`,
+ * `productGroupID`, `hasVariant`, `offers`, `price`, `review`, `aggregateRating` HİÇ yazılmaz — Google ürün snippet'i
+ * bu düğümlerde `offers/review/aggregateRating` ister, elimizde gerçek biri yok (A1).
+ *
+ * LİSTE SATIRI: her varyant için `ListItem {position, name}` (görünen ürün adı, `getProductDisplayName`; `mpn`/`sku`
+ * YAZILMAZ — INV-SKU-GORUNMEZ-1). `url` YALNIZ bayrak AÇIKKEN ve varyantın model sayfası dizine açıksa (`sitemapModelMi`)
+ * eklenir. Bayrak KAPALIYKEN varyant başına benzersiz adres yoktur (tek adres aile adresi, `?sku=` kanoniğe girmez);
+ * aile adresini her satıra yinelemek ya da kısmi/yinelenen url ile doldurmak yanlış beyan olurdu — `name` + `position`
+ * schema.org için yeterlidir. `numberOfItems` her zaman varyant sayısıdır.
+ */
+function buildFiyatsizAileJsonLd(params: FiyatsizAileParams): Record<string, unknown> {
+  const { family, variants, lang, baseUrl, bayrak, url, description } = params
+  const grupGorseli = grupGorseliBul(variants)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    // REC-108: yapısal veri de dili bilir — bot EN sayfada TR ad görmemeli.
+    name: familyName(family, lang),
+    description,
+    url,
+    ...(grupGorseli ? { image: grupGorseli } : {}),
+    ...(family.brand_name && {
+      about: {
+        '@type': 'Brand',
+        name: family.brand_name,
+      },
+    }),
+    isPartOf: buildWebSiteRef(baseUrl),
+    mainEntity: buildItemList(
+      variants.length,
+      variants.map((variant, index) => ({
+        position: index + 1,
+        name: getProductDisplayName(variant, family, lang),
+        // K3-b + URN-31: yalnız DİZİNE AÇIK model adresi (liste dışı / sürüm varyantta url YOK).
+        url:
+          bayrak && sitemapModelMi(variant.sku)
+            ? `${baseUrl}${adresRotalari(dilOf(lang), true).product(family.slug, variant.sku)}`
+            : undefined,
+      })),
+    ),
   }
 }
 

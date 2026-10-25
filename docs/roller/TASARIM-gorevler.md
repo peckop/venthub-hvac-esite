@@ -5,6 +5,9 @@
 ## Amaç
 Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.
 
+## Nasıl
+marka-token-eslemesi-standard.md
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|
@@ -14,5 +17,6 @@ Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasa
 | Tasarım sistemi kopyasının koddaki adlarla eşitliği: Design'daki adlar (bugün 66) ile :root ve Tailwind adlarını karşılaştır (INV-TOKEN-PARITE-1) | her dağıtım | Actions: Design kopyası (ds-kaynak) ve kapı henüz yok; yeni iş akışı ya da ci içinde test olarak kurulacak (kuracak: ALTYAPI) | hayır (kuracak: ALTYAPI) | Eksik ya da değeri farklı ad için Kanban kartı TASARIM'a; Design önerisi "öneri" diye kayda geçer | TASLAK: eksik ve farklı değerli ad 0; ALTYAPI ile teyit |
 | Design'ın yeni yorumunu ve cevabını oku ve kayda geçir (öneri diye işaretle, karar sayma; OPS'a bildir) (`scripts/board/linear-okundu.cjs`) | olay | istem satırı tazelik: scripts/board/linear-yeni-yorum.cjs istem satırındaki "LINEAR: N yeni yorum" satırını üretir ve metni okundu komutunu verir (kanca .claude/hooks/board-brief.cjs, .claude/settings.json'da bağlı); sayaç dört Design projesinin (MENU, KATALOG, MARKA, BELGE) ve ALTYAPI'nın proje yorumlarını sayar, aynı şeridin kendi yorumlarını saymaz | evet | Kanban kartı notu ve OPS'a mesaj; karar OPS'tan | TASLAK: okunmamış Design yorumu 0; süre eşiğini OPS belirler |
 | Yapılan ekranı Design karesiyle yan yana ölç (kare kabul ölçüm satırı, skill venthub-tasarim-dili) | olay | kart kapısı: scripts/belge/kart-plan-kapisi.cjs kare kabul satırını istemiyor (henüz yok; kuracak: HARİTA); bir ekranı değiştiren her PR'da | hayır (kuracak: HARITA) | PR gövdesine kare numarası ve ölçüm satırı; fark Kanban kartı ÜRÜN'e (sayfa) ya da TASARIM'a (token, bileşen) | TASLAK: geçti/kaldı ölçütü venthub-tasarim-dili skill'indeki ölçüm satırıdır; TASARIM teyit eder |
+| Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir | haftalık | istem satırı tazelik: istem satırında "öz-değerlendirme: N gün" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6) | hayır (kuracak: ARAC) | OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır | En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır |
 
-6 görev, tetiğe bağlı 3. Tetiğin kurulmasını bekleyen: HARITA 2 · ALTYAPI 1.
+7 görev, tetiğe bağlı 3. Tetiğin kurulmasını bekleyen: HARITA 2 · ALTYAPI 1 · ARAC 1.

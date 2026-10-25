@@ -43,6 +43,8 @@ const TABLO = Object.freeze([
   Object.freeze(['MEVZUAT', 'Mevzuat']),
   // HRT-35 (karar 322, OPS-93, 2026-10-09): TAKİP departmanı etkin. MÜHENDİSLİK planlı ve kapalıdır (karar 315, ad kesinleşmedi): tabloya girmez.
   Object.freeze(['TAKIP', 'Takip']),
+  // HRT-62 (karar 372, OPS-150, 2026-10-15): 3D departmanı (Claude Design 3D modelleri, R3F parça fabrikası) etkin.
+  Object.freeze(['3D', '3D']),
 ])
 
 /** Aramalar Map üzerinden yapılır (nesne prototipi adlarına karşı ek güvence; anahtarlar zaten büyük harf). */

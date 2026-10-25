@@ -1,0 +1,126 @@
+name: Dizin tetigi
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ALT-91 — canlıya çıkan her değişiklikte arama motorlarına KENDİLİĞİNDEN haber ver (SEO-55 Parça C).
+#
+# NİÇİN: webhook yalnız veritabanı yazımını görür ve kod deploy'unu hiç görmez (şablon, başlık formülü,
+# meta kırpma değişince hiçbir bildirim üretmezdi). Ölçüm ve tasarım: docs/audits/geo-dizin-tetigi-olcum-2026-10-16.md.
+# Bu iş akışı betiği (scripts/seo/degisen-adres-bildir.mjs, GEO-SEO'nun) iki yerden tetikler:
+#   1. `deployment_status`: Vercel üretim dağıtımı BAŞARIYLA bitince (ortam adı "Production", ölçüldü 16 Ekim:
+#      repos/.../deployments son 12 kaydın 12'si Production, durum success).
+#   2. Günde bir `schedule`: DB yazımı ya da kaçan bir olay için yedek.
+#
+# ⚠ÖLÇÜLEN KUSUR VE DÜZELTME (16 Ekim, ilk dört doğal koşu): `deployment_status` olayı bir dala ya da etikete
+# bağlı DEĞİLDİR; actions/cache bu olayda hem restore hem save adımını "Event Validation Error: ... not tied
+# to a branch or tag ref" uyarısıyla ATLAR. Taban hiç kaydedilmedi, her koşu tabanı sıfırdan kurdu ve değişen
+# adres hiç bildirilmedi (iş akışı yeşildi, iş yapılmadı). Bu yüzden `deployment_status` koşusu işi KENDİ
+# yapmaz: yalnız `tetikle` işi `gh workflow run dizin-tetigi.yml --ref <varsayılan dal>` ile elle tetik
+# (workflow_dispatch) koşusu başlatır. Asıl iş (`dizin-tetigi`) dal ref'inde koşar ve önbellek orada çalışır.
+# GITHUB_TOKEN ile başlatılan koşular yeni koşu doğurmaz, istisnası workflow_dispatch'tir: bu yol serbesttir.
+# `actions: write` izni YALNIZ `tetikle` işindedir.
+#
+# TABAN VE KUYRUK DEPO DIŞINDADIR (P6: arama/sayfa verisi depoya yazılmaz; betik depo içi yolu reddeder):
+# `runner.temp` altında durur ve actions/cache ile koşular arasında taşınır. actions/cache KEY'i DEĞİŞMEZ,
+# bu yüzden her koşu YENİ bir anahtarla (run_id + run_attempt) kaydeder ve `dizin-tetigi-` önekiyle en
+# sonuncuyu geri yükler. Önbellek yalnız varsayılan dal koşularında yazılır (schedule ve elle tetik varsayılan
+# daldan koşar; deployment_status'ta önbellek ÇALIŞMAZ, yukarıdaki not); fork PR'ı bu iş akışını tetikleyemez.
+#
+# ÖNBELLEK KAYBOLURSA (7 gün erişilmezse düşer; günlük cron bunu önler ama kayıp mümkündür): taban yoktur.
+# Betik taban yokken --uygula'yı REDDEDER ("ilk koşuda bütün harita yeni" diye bildirmek ölçüm değildir).
+# Bu iş akışı o durumda --taban-kur koşar ve açık bir ::warning:: yazar: o koşuda değişen adres BİLDİRİLMEDİ.
+#
+# DEPLOYMENT_STATUS GECİKME PAYI: dağıtım Ready olduğunda eski sayfa kısa süre daha sunulabilir. Bu bir
+# kayıp DEĞİLDİR: betik farkı bulamazsa tabanı eski bırakır, değişiklik sonraki tetikte (en geç ertesi
+# günkü cron) yakalanır. Bu gecikmenin süresi ölçülmedi; kayıp olmaması tasarımla güvence altındadır.
+#
+# KIRMIZI: betik çıkış 1 verirse (site haritası okunamadı, okunamayan adres oranı eşiği aştı, IndexNow
+# kabul etmedi) iş akışı kırmızıdır ve tabanı o koşuda ilerletilmemiştir; sonraki tetik yeniden dener.
+# Çıkış 2 yanlış kullanım/yapılandırmadır. Bu iş akışı birleşmeyi BLOKLAMAZ (pull_request tetiği yok).
+#
+# Sır YOK: IndexNow anahtarı kamuya açıktır (src/config/indexnow.ts, sitede <anahtar>.txt olarak yayımlı).
+# `pnpm install` YOK, self-hosted runner YOK: betik yalnız Node yerleşiklerini kullanır.
+# Cetvel: docs/standards/yayin-gorunurluk-denetim-standard.md Y2.1 · docs/standards/fleet-mechanism-standard.md.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  deployment_status:
+  schedule:
+    # Günde bir, tam saat DEĞİL (GitHub tam saatlerde zamanlanmış işleri geciktiriyor): 05:37 UTC = 08:37 TR.
+    - cron: '37 5 * * *'
+  workflow_dispatch:
+
+# Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU
+# (CLAUDE.md Notlar — yoksa checkout "Repository not found" verir). Önbellek için ek izin gerekmez.
+permissions:
+  contents: read
+
+jobs:
+  tetikle:
+    # deployment_status her ortam ve her durum için gelir (preview, pending, failure...): yalnız üretim + success.
+    # Bu iş önbelleğe, depoya ve betiğe DOKUNMAZ; yalnız asıl işi varsayılan dalda başlatır.
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Dizin tetigi isini varsayilan dalda baslat
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VARSAYILAN_DAL: ${{ github.event.repository.default_branch }}
+        run: gh workflow run dizin-tetigi.yml --ref "$VARSAYILAN_DAL"
+
+  dizin-tetigi:
+    # YALNIZ schedule ve elle tetik: önbellek deployment_status'ta çalışmaz (yukarıdaki not).
+    if: github.event_name != 'deployment_status'
+    # Taban dosyası tek yazarlıdır: iki koşu aynı anda tabanı ilerletmesin. Sıraya girer, İPTAL ETMEZ:
+    # bekleyen koşu en güncel tabana göre fark alır (aynı anda en çok BİR bekleyen tutulur, eskisi düşer:
+    # sonraki koşu tabana göre fark aldığı için kayıp olmaz).
+    concurrency:
+      group: dizin-tetigi
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    # Site haritasındaki her adres çekilir; 20 dk bol pay.
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Taban ve kuyrugu onbellekten getir
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/dizin-tetigi
+          key: dizin-tetigi-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            dizin-tetigi-
+
+      - name: Degisen adresleri bildir
+        env:
+          DIZIN: ${{ runner.temp }}/dizin-tetigi
+        run: |
+          set -euo pipefail
+          mkdir -p "$DIZIN"
+          if [ -s "$DIZIN/taban.json" ]; then
+            KIP=--uygula
+          else
+            KIP=--taban-kur
+            echo "::warning title=Dizin tetigi::Taban onbellekte YOK (ilk koşu ya da onbellek düştü): taban yeniden kuruluyor, bu koşuda değişen adres BİLDİRİLMEDİ."
+          fi
+          node scripts/seo/degisen-adres-bildir.mjs --taban "$DIZIN/taban.json" --kuyruk "$DIZIN/google-kuyruk.jsonl" "$KIP"
+
+      # Betik tabanı kısmen ilerletip çıkış 1 verse bile (IndexNow reddetti: yeniden denenecekler tabanda eski kalır)
+      # ilerleme kaybolmasın: başarısız koşuda da kaydet. Dizin yoksa kaydetme uyarı verir, hata vermez.
+      - name: Taban ve kuyrugu onbellege yaz
+        if: ${{ always() }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/dizin-tetigi
+          key: dizin-tetigi-${{ github.run_id }}-${{ github.run_attempt }}

@@ -1,0 +1,1143 @@
+{
+  "_ad": "SEAT / STORM / JET (SEA-*) NET agirlik duzeltmesi (karar 384, OPS-173, KTL-55)",
+  "_kaynak": "SEAT broşürü Kasim 2024 (seat-brochure-2024-11.pdf; kaynak dizini venthub-pdf-ingestor/kaynak-dizini/sayfalar.jsonl): SEAT s.8/13/17/19, STORM s.22/33, JET s.34/37/39 tablolarinin \"Weight (kg)\" sutunu; her satirda kod hemen ardindan gelir. Sutun sirasi gorselden s.22 icin dogrulandi.",
+  "_olcum": "Canli degerler 18 Ekim 2026 salt-okuma SELECT ile okundu. `onceki` o olcumdur; canli deger farkliysa betik BAYAT diye durur.",
+  "_karar": "Karar 384: sitede NET uretici agirligi gosterilir. technical_specs.weight_kg ve products.weight_kg kolonu ayni degere cekilir. AVenS sevk/brut agirligi ayri alanda SAKLANMAZ (ayri karar).",
+  "_haric": {
+    "61183000": "STORM 18: broşürde 70,4 kg; AVenS listesi 22,6 kg; kendi icinde supheli, uretici sorusu",
+    "61183003": "STORM 18 ATEX: broşürde s.22 7,7 kg, s.33 77 kg (ayni belgede celisiyor), uretici sorusu D1",
+    "celisen_kodlar": [
+      "SEA-71253000 [{\"kg\":26.2,\"sayfa\":34},{\"kg\":26.4,\"sayfa\":39}]"
+    ],
+    "brosurde_olmayan": [
+      "SEA-51201003",
+      "SEA-61103110",
+      "SEA-810105 (8 haneli degil)"
+    ],
+    "SEA-71201003": "JET 20 ATEX 930 d/dk: broşürde 22,3 kg; aynı güçteki 1450 d/dk ATEX (71202003) 12 kg; eski JET.pdf degerine (22,8) yakin, eski tablodan kalmis olabilir; uretici sorusu",
+    "SEA-71251003": "JET 25 ATEX 930 d/dk: broşürde 29 kg; 1450 d/dk ATEX (71252003) 14,6 kg; eski JET.pdf degerine (30) yakin; uretici sorusu",
+    "not": "JET.pdf (eski, yildizli approximate) JET 20: 19,5-25,9; JET 25: 25,5-35; JET 30: 38,2-61,8 kg verir; Kasim 2024 broşürü (12-24 kg) ile yaklasik 2 kat celisir; karar 384 yeni broşürü secer. Ayni degerlerin AVenS listesinde de gorunmesi eski tablodan geldigini dusunduruyor (yorum, olculmedi)."
+  },
+  "items": {
+    "SEA-51151000": {
+      "ad": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51151000)",
+      "onceki": {
+        "weight_kg": 8.14
+      },
+      "yeni": {
+        "weight_kg": 8.14
+      },
+      "kolon_onceki": {
+        "weight_kg": 8.3
+      },
+      "kolon": {
+        "weight_kg": 8.14
+      }
+    },
+    "SEA-51152000": {
+      "ad": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51152000)",
+      "onceki": {
+        "weight_kg": 8.24
+      },
+      "yeni": {
+        "weight_kg": 8.24
+      },
+      "kolon_onceki": {
+        "weight_kg": 7.7
+      },
+      "kolon": {
+        "weight_kg": 8.24
+      }
+    },
+    "SEA-51152003": {
+      "ad": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51152003)",
+      "onceki": {
+        "weight_kg": 7.9
+      },
+      "yeni": {
+        "weight_kg": 7.9
+      },
+      "kolon_onceki": {
+        "weight_kg": 11.3
+      },
+      "kolon": {
+        "weight_kg": 7.9
+      }
+    },
+    "SEA-51152010": {
+      "ad": "SEAT 15 · 1400 d/dk · 0,25 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51152010)",
+      "onceki": {
+        "weight_kg": 8.53
+      },
+      "yeni": {
+        "weight_kg": 8.53
+      },
+      "kolon_onceki": {
+        "weight_kg": 8.3
+      },
+      "kolon": {
+        "weight_kg": 8.53
+      }
+    },
+    "SEA-51153000": {
+      "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51153000)",
+      "onceki": {
+        "weight_kg": 8.23
+      },
+      "yeni": {
+        "weight_kg": 8.23
+      },
+      "kolon_onceki": {
+        "weight_kg": 8
+      },
+      "kolon": {
+        "weight_kg": 8.23
+      }
+    },
+    "SEA-51153003": {
+      "ad": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51153003)",
+      "onceki": {
+        "weight_kg": 10.45
+      },
+      "yeni": {
+        "weight_kg": 10.45
+      },
+      "kolon_onceki": {
+        "weight_kg": 10.2
+      },
+      "kolon": {
+        "weight_kg": 10.45
+      }
+    },
+    "SEA-51153010": {
+      "ad": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 11 (Weight (kg) sutunu, Reference Number 51153010)",
+      "onceki": {
+        "weight_kg": 8.23
+      },
+      "yeni": {
+        "weight_kg": 8.23
+      },
+      "kolon_onceki": {
+        "weight_kg": 8.1
+      },
+      "kolon": {
+        "weight_kg": 8.23
+      }
+    },
+    "SEA-51201000": {
+      "ad": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 13 (Weight (kg) sutunu, Reference Number 51201000)",
+      "onceki": {
+        "weight_kg": 8.23
+      },
+      "yeni": {
+        "weight_kg": 8.9
+      },
+      "kolon_onceki": {
+        "weight_kg": 9.7
+      },
+      "kolon": {
+        "weight_kg": 8.9
+      }
+    },
+    "SEA-51202003": {
+      "ad": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 13 (Weight (kg) sutunu, Reference Number 51202003)",
+      "onceki": {
+        "weight_kg": 7.9
+      },
+      "yeni": {
+        "weight_kg": 8.6
+      },
+      "kolon_onceki": {
+        "weight_kg": 12
+      },
+      "kolon": {
+        "weight_kg": 8.6
+      }
+    },
+    "SEA-51202010": {
+      "ad": "SEAT 20 · 1400 d/dk · 0,25 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 13 (Weight (kg) sutunu, Reference Number 51202010)",
+      "onceki": {
+        "weight_kg": 9.3
+      },
+      "yeni": {
+        "weight_kg": 9.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 9
+      },
+      "kolon": {
+        "weight_kg": 9.3
+      }
+    },
+    "SEA-51203000": {
+      "ad": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 13 (Weight (kg) sutunu, Reference Number 51203000)",
+      "onceki": {
+        "weight_kg": 12.5
+      },
+      "yeni": {
+        "weight_kg": 12.5
+      },
+      "kolon_onceki": {
+        "weight_kg": 11.4
+      },
+      "kolon": {
+        "weight_kg": 12.5
+      }
+    },
+    "SEA-51203001": {
+      "ad": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 13 (Weight (kg) sutunu, Reference Number 51203001)",
+      "onceki": {
+        "weight_kg": 13.5
+      },
+      "yeni": {
+        "weight_kg": 13.5
+      },
+      "kolon_onceki": {
+        "weight_kg": 15.9
+      },
+      "kolon": {
+        "weight_kg": 13.5
+      }
+    },
+    "SEA-51203003": {
+      "ad": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 13 (Weight (kg) sutunu, Reference Number 51203003)",
+      "onceki": {
+        "weight_kg": 13.5
+      },
+      "yeni": {
+        "weight_kg": 13.5
+      },
+      "kolon_onceki": {
+        "weight_kg": 13.2
+      },
+      "kolon": {
+        "weight_kg": 13.5
+      }
+    },
+    "SEA-51251000": {
+      "ad": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51251000)",
+      "onceki": {
+        "weight_kg": 10.8
+      },
+      "yeni": {
+        "weight_kg": 10.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 11.4
+      },
+      "kolon": {
+        "weight_kg": 10.8
+      }
+    },
+    "SEA-51251003": {
+      "ad": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51251003)",
+      "onceki": {
+        "weight_kg": 12.8
+      },
+      "yeni": {
+        "weight_kg": 12.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 11.1
+      },
+      "kolon": {
+        "weight_kg": 12.8
+      }
+    },
+    "SEA-51252000": {
+      "ad": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51252000)",
+      "onceki": {
+        "weight_kg": 11.3
+      },
+      "yeni": {
+        "weight_kg": 11.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 11.5
+      },
+      "kolon": {
+        "weight_kg": 11.3
+      }
+    },
+    "SEA-51252003": {
+      "ad": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51252003)",
+      "onceki": {
+        "weight_kg": 12.3
+      },
+      "yeni": {
+        "weight_kg": 12.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 12.1
+      },
+      "kolon": {
+        "weight_kg": 12.3
+      }
+    },
+    "SEA-51253001": {
+      "ad": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51253001)",
+      "onceki": {
+        "weight_kg": 19.9
+      },
+      "yeni": {
+        "weight_kg": 19.9
+      },
+      "kolon_onceki": {
+        "weight_kg": 22.1
+      },
+      "kolon": {
+        "weight_kg": 19.9
+      }
+    },
+    "SEA-51253003": {
+      "ad": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51253003)",
+      "onceki": {
+        "weight_kg": 20.9
+      },
+      "yeni": {
+        "weight_kg": 20.9
+      },
+      "kolon_onceki": {
+        "weight_kg": 23
+      },
+      "kolon": {
+        "weight_kg": 20.9
+      }
+    },
+    "SEA-51253300": {
+      "ad": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 15 (Weight (kg) sutunu, Reference Number 51253300)",
+      "onceki": {
+        "weight_kg": 27.7
+      },
+      "yeni": {
+        "weight_kg": 27.7
+      },
+      "kolon_onceki": {
+        "weight_kg": 36
+      },
+      "kolon": {
+        "weight_kg": 27.7
+      }
+    },
+    "SEA-51301000": {
+      "ad": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 17 (Weight (kg) sutunu, Reference Number 51301000)",
+      "onceki": {
+        "weight_kg": 18.7
+      },
+      "yeni": {
+        "weight_kg": 18.7
+      },
+      "kolon_onceki": {
+        "weight_kg": 19.5
+      },
+      "kolon": {
+        "weight_kg": 18.7
+      }
+    },
+    "SEA-51302000": {
+      "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 17 (Weight (kg) sutunu, Reference Number 51302000)",
+      "onceki": {
+        "weight_kg": 37.8
+      },
+      "yeni": {
+        "weight_kg": 21.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 23.7
+      },
+      "kolon": {
+        "weight_kg": 21.2
+      }
+    },
+    "SEA-51302003": {
+      "ad": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 17 (Weight (kg) sutunu, Reference Number 51302003)",
+      "onceki": {
+        "weight_kg": 45.1
+      },
+      "yeni": {
+        "weight_kg": 20.7
+      },
+      "kolon_onceki": {
+        "weight_kg": 27.15
+      },
+      "kolon": {
+        "weight_kg": 20.7
+      }
+    },
+    "SEA-51302010": {
+      "ad": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 17 (Weight (kg) sutunu, Reference Number 51302010)",
+      "onceki": {
+        "weight_kg": 20.7
+      },
+      "yeni": {
+        "weight_kg": 20.7
+      },
+      "kolon_onceki": {
+        "weight_kg": 13.9
+      },
+      "kolon": {
+        "weight_kg": 20.7
+      }
+    },
+    "SEA-51350000": {
+      "ad": "SEAT 35 · 750 d/dk · 1,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51350000)",
+      "onceki": {
+        "weight_kg": 21.2
+      },
+      "yeni": {
+        "weight_kg": 37.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 46
+      },
+      "kolon": {
+        "weight_kg": 37.8
+      }
+    },
+    "SEA-51351000": {
+      "ad": "SEAT 35 · 950 d/dk · 2,2 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51351000)",
+      "onceki": {
+        "weight_kg": 47.7
+      },
+      "yeni": {
+        "weight_kg": 47.7
+      },
+      "kolon_onceki": {
+        "weight_kg": 43.2
+      },
+      "kolon": {
+        "weight_kg": 47.7
+      }
+    },
+    "SEA-51351003": {
+      "ad": "SEAT 35 ATEX · 950 d/dk · 2,2 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51351003)",
+      "onceki": {
+        "weight_kg": 45.1
+      },
+      "yeni": {
+        "weight_kg": 45.1
+      },
+      "kolon_onceki": {
+        "weight_kg": 46
+      },
+      "kolon": {
+        "weight_kg": 45.1
+      }
+    },
+    "SEA-51352000": {
+      "ad": "SEAT 35 · 1400 d/dk · 5,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51352000)",
+      "onceki": {
+        "weight_kg": 62.2
+      },
+      "yeni": {
+        "weight_kg": 62.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 53
+      },
+      "kolon": {
+        "weight_kg": 62.2
+      }
+    },
+    "SEA-51352001": {
+      "ad": "SEAT 35 · 1400 d/dk · 7,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51352001)",
+      "onceki": {
+        "weight_kg": 70.4
+      },
+      "yeni": {
+        "weight_kg": 70.4
+      },
+      "kolon_onceki": {
+        "weight_kg": 53
+      },
+      "kolon": {
+        "weight_kg": 70.4
+      }
+    },
+    "SEA-51352003": {
+      "ad": "SEAT 35 ATEX · 1400 d/dk · 5,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51352003)",
+      "onceki": {
+        "weight_kg": 66.6
+      },
+      "yeni": {
+        "weight_kg": 66.6
+      },
+      "kolon_onceki": {
+        "weight_kg": 50
+      },
+      "kolon": {
+        "weight_kg": 66.6
+      }
+    },
+    "SEA-51352004": {
+      "ad": "SEAT 35 ATEX · 1400 d/dk · 7,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51352004)",
+      "onceki": {
+        "weight_kg": 70.2
+      },
+      "yeni": {
+        "weight_kg": 70.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 50
+      },
+      "kolon": {
+        "weight_kg": 70.2
+      }
+    },
+    "SEA-51352400": {
+      "ad": "SEAT 35 · 1400 d/dk · 4 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 19 (Weight (kg) sutunu, Reference Number 51352400)",
+      "onceki": {
+        "weight_kg": 50.2
+      },
+      "yeni": {
+        "weight_kg": 50.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 43.6
+      },
+      "kolon": {
+        "weight_kg": 50.2
+      }
+    },
+    "SEA-51501000": {
+      "ad": "SEAT 50 · 950 d/dk · 4 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 21 (Weight (kg) sutunu, Reference Number 51501000)",
+      "onceki": {
+        "weight_kg": 138.2
+      },
+      "yeni": {
+        "weight_kg": 138.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 53
+      },
+      "kolon": {
+        "weight_kg": 138.2
+      }
+    },
+    "SEA-51502000": {
+      "ad": "SEAT 50 · 1400 d/dk · 5,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 21 (Weight (kg) sutunu, Reference Number 51502000)",
+      "onceki": {
+        "weight_kg": 133.8
+      },
+      "yeni": {
+        "weight_kg": 133.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 53
+      },
+      "kolon": {
+        "weight_kg": 133.8
+      }
+    },
+    "SEA-51502003": {
+      "ad": "SEAT 50 ATEX · 1400 d/dk · 5,5 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.8, 21 (Weight (kg) sutunu, Reference Number 51502003)",
+      "onceki": {
+        "weight_kg": 133.8
+      },
+      "yeni": {
+        "weight_kg": 133.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 50
+      },
+      "kolon": {
+        "weight_kg": 133.8
+      }
+    },
+    "SEA-61102000": {
+      "ad": "STORM 10 · 1400 d/dk · 0,06 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 25 (Weight (kg) sutunu, Reference Number 61102000)",
+      "onceki": {
+        "weight_kg": 4
+      },
+      "yeni": {
+        "weight_kg": 4.17
+      },
+      "kolon_onceki": {
+        "weight_kg": 3.5
+      },
+      "kolon": {
+        "weight_kg": 4.17
+      }
+    },
+    "SEA-61102003": {
+      "ad": "STORM 10 ATEX · 1400 d/dk · 0,06 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 25 (Weight (kg) sutunu, Reference Number 61102003)",
+      "onceki": {
+        "weight_kg": 4.33
+      },
+      "yeni": {
+        "weight_kg": 6
+      },
+      "kolon_onceki": {
+        "weight_kg": 4.33
+      },
+      "kolon": {
+        "weight_kg": 6
+      }
+    },
+    "SEA-61102010": {
+      "ad": "STORM 10 XRM · 1400 d/dk · 0,06 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 25 (Weight (kg) sutunu, Reference Number 61102010)",
+      "onceki": {
+        "weight_kg": 3
+      },
+      "yeni": {
+        "weight_kg": 4.17
+      },
+      "kolon_onceki": {
+        "weight_kg": 2.1
+      },
+      "kolon": {
+        "weight_kg": 4.17
+      }
+    },
+    "SEA-61103000": {
+      "ad": "STORM 10 · 2800 d/dk · 0,09 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 25 (Weight (kg) sutunu, Reference Number 61103000)",
+      "onceki": {
+        "weight_kg": 4.33
+      },
+      "yeni": {
+        "weight_kg": 4.17
+      },
+      "kolon_onceki": {
+        "weight_kg": 5.33
+      },
+      "kolon": {
+        "weight_kg": 4.17
+      }
+    },
+    "SEA-61103003": {
+      "ad": "STORM 10 ATEX · 2800 d/dk · 0,12 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 25 (Weight (kg) sutunu, Reference Number 61103003)",
+      "onceki": {
+        "weight_kg": 4.33
+      },
+      "yeni": {
+        "weight_kg": 6.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 4.33
+      },
+      "kolon": {
+        "weight_kg": 6.2
+      }
+    },
+    "SEA-61103010": {
+      "ad": "STORM 10 · 2800 d/dk · 0,09 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 25 (Weight (kg) sutunu, Reference Number 61103010)",
+      "onceki": {
+        "weight_kg": 4.43
+      },
+      "yeni": {
+        "weight_kg": 3.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 4.43
+      },
+      "kolon": {
+        "weight_kg": 3.8
+      }
+    },
+    "SEA-61122000": {
+      "ad": "STORM 12 · 1400 d/dk · 0,25 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 27 (Weight (kg) sutunu, Reference Number 61122000)",
+      "onceki": {
+        "weight_kg": 7.3
+      },
+      "yeni": {
+        "weight_kg": 7.5
+      },
+      "kolon_onceki": {
+        "weight_kg": 7.33
+      },
+      "kolon": {
+        "weight_kg": 7.5
+      }
+    },
+    "SEA-61122003": {
+      "ad": "STORM 12 ATEX · 1400 d/dk · 0,25 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 27 (Weight (kg) sutunu, Reference Number 61122003)",
+      "onceki": {
+        "weight_kg": 13.6
+      },
+      "yeni": {
+        "weight_kg": 12
+      },
+      "kolon_onceki": {
+        "weight_kg": 10.33
+      },
+      "kolon": {
+        "weight_kg": 12
+      }
+    },
+    "SEA-61122010": {
+      "ad": "STORM 12 · 1400 d/dk · 0,25 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 27 (Weight (kg) sutunu, Reference Number 61122010)",
+      "onceki": {
+        "weight_kg": 7.03
+      },
+      "yeni": {
+        "weight_kg": 7.84
+      },
+      "kolon_onceki": {
+        "weight_kg": 7.8
+      },
+      "kolon": {
+        "weight_kg": 7.84
+      }
+    },
+    "SEA-61123000": {
+      "ad": "STORM 12 · 2800 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 27 (Weight (kg) sutunu, Reference Number 61123000)",
+      "onceki": {
+        "weight_kg": 7.4
+      },
+      "yeni": {
+        "weight_kg": 7.54
+      },
+      "kolon_onceki": {
+        "weight_kg": 7.4
+      },
+      "kolon": {
+        "weight_kg": 7.54
+      }
+    },
+    "SEA-61123003": {
+      "ad": "STORM 12 ATEX · 2800 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 27 (Weight (kg) sutunu, Reference Number 61123003)",
+      "onceki": {
+        "weight_kg": 16.6
+      },
+      "yeni": {
+        "weight_kg": 9.75
+      },
+      "kolon_onceki": {
+        "weight_kg": 9.23
+      },
+      "kolon": {
+        "weight_kg": 9.75
+      }
+    },
+    "SEA-61123010": {
+      "ad": "STORM 12 · 2800 d/dk · 0,37 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 27 (Weight (kg) sutunu, Reference Number 61123010)",
+      "onceki": {
+        "weight_kg": 7.53
+      },
+      "yeni": {
+        "weight_kg": 7.54
+      },
+      "kolon_onceki": {
+        "weight_kg": 5.6
+      },
+      "kolon": {
+        "weight_kg": 7.54
+      }
+    },
+    "SEA-61143000": {
+      "ad": "STORM 14 · 2800 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 29 (Weight (kg) sutunu, Reference Number 61143000)",
+      "onceki": {
+        "weight_kg": 15.8
+      },
+      "yeni": {
+        "weight_kg": 13.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 15.8
+      },
+      "kolon": {
+        "weight_kg": 13.3
+      }
+    },
+    "SEA-61143003": {
+      "ad": "STORM 14 ATEX · 2800 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 29 (Weight (kg) sutunu, Reference Number 61143003)",
+      "onceki": {
+        "weight_kg": 23.1
+      },
+      "yeni": {
+        "weight_kg": 13.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 15.8
+      },
+      "kolon": {
+        "weight_kg": 13.2
+      }
+    },
+    "SEA-61143010": {
+      "ad": "STORM 14 · 2800 d/dk · 1,1 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 29 (Weight (kg) sutunu, Reference Number 61143010)",
+      "onceki": {
+        "weight_kg": 12.8
+      },
+      "yeni": {
+        "weight_kg": 13.73
+      },
+      "kolon_onceki": {
+        "weight_kg": 12.8
+      },
+      "kolon": {
+        "weight_kg": 13.73
+      }
+    },
+    "SEA-61163000": {
+      "ad": "STORM 16 · 2800 d/dk · 2,2 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 31 (Weight (kg) sutunu, Reference Number 61163000)",
+      "onceki": {
+        "weight_kg": 20.59
+      },
+      "yeni": {
+        "weight_kg": 23.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 22.6
+      },
+      "kolon": {
+        "weight_kg": 23.2
+      }
+    },
+    "SEA-61163003": {
+      "ad": "STORM 16 ATEX · 2800 d/dk · 2,2 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.22, 31 (Weight (kg) sutunu, Reference Number 61163003)",
+      "onceki": {
+        "weight_kg": 33.7
+      },
+      "yeni": {
+        "weight_kg": 20.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 20.59
+      },
+      "kolon": {
+        "weight_kg": 20.2
+      }
+    },
+    "SEA-71201000": {
+      "ad": "JET 20 · 950 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71201000)",
+      "onceki": {
+        "weight_kg": 21.7
+      },
+      "yeni": {
+        "weight_kg": 12.4
+      },
+      "kolon_onceki": {
+        "weight_kg": 21.7
+      },
+      "kolon": {
+        "weight_kg": 12.4
+      }
+    },
+    "SEA-71202000": {
+      "ad": "JET 20 · 1400 d/dk · 0,25 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71202000)",
+      "onceki": {
+        "weight_kg": 21
+      },
+      "yeni": {
+        "weight_kg": 12.5
+      },
+      "kolon_onceki": {
+        "weight_kg": 21
+      },
+      "kolon": {
+        "weight_kg": 12.5
+      }
+    },
+    "SEA-71202003": {
+      "ad": "JET 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71202003)",
+      "onceki": {
+        "weight_kg": 22.8
+      },
+      "yeni": {
+        "weight_kg": 12
+      },
+      "kolon_onceki": {
+        "weight_kg": 22.8
+      },
+      "kolon": {
+        "weight_kg": 12
+      }
+    },
+    "SEA-71202010": {
+      "ad": "JET 20 · 1400 d/dk · 0,18 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71202010)",
+      "onceki": {
+        "weight_kg": 35
+      },
+      "yeni": {
+        "weight_kg": 12.75
+      },
+      "kolon_onceki": {
+        "weight_kg": 35
+      },
+      "kolon": {
+        "weight_kg": 12.75
+      }
+    },
+    "SEA-71203000": {
+      "ad": "JET 20 · 2800 d/dk · 0,75 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71203000)",
+      "onceki": {
+        "weight_kg": 23.4
+      },
+      "yeni": {
+        "weight_kg": 15.93
+      },
+      "kolon_onceki": {
+        "weight_kg": 23.4
+      },
+      "kolon": {
+        "weight_kg": 15.93
+      }
+    },
+    "SEA-71203001": {
+      "ad": "JET 20 · 2800 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71203001)",
+      "onceki": {
+        "weight_kg": 26
+      },
+      "yeni": {
+        "weight_kg": 16.93
+      },
+      "kolon_onceki": {
+        "weight_kg": 26
+      },
+      "kolon": {
+        "weight_kg": 16.93
+      }
+    },
+    "SEA-71203003": {
+      "ad": "JET 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71203003)",
+      "onceki": {
+        "weight_kg": 24
+      },
+      "yeni": {
+        "weight_kg": 16.9
+      },
+      "kolon_onceki": {
+        "weight_kg": 24
+      },
+      "kolon": {
+        "weight_kg": 16.9
+      }
+    },
+    "SEA-71203010": {
+      "ad": "JET 20 · 2800 d/dk · 0,75 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 37 (Weight (kg) sutunu, Reference Number 71203010)",
+      "onceki": {
+        "weight_kg": 42.65
+      },
+      "yeni": {
+        "weight_kg": 13.93
+      },
+      "kolon_onceki": {
+        "weight_kg": 42.65
+      },
+      "kolon": {
+        "weight_kg": 13.93
+      }
+    },
+    "SEA-71251000": {
+      "ad": "JET 25 · 950 d/dk · 0,18 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 39 (Weight (kg) sutunu, Reference Number 71251000)",
+      "onceki": {
+        "weight_kg": 21.4
+      },
+      "yeni": {
+        "weight_kg": 13.1
+      },
+      "kolon_onceki": {
+        "weight_kg": 21.4
+      },
+      "kolon": {
+        "weight_kg": 13.1
+      }
+    },
+    "SEA-71252000": {
+      "ad": "JET 25 · 1400 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 39 (Weight (kg) sutunu, Reference Number 71252000)",
+      "onceki": {
+        "weight_kg": 21.2
+      },
+      "yeni": {
+        "weight_kg": 13.6
+      },
+      "kolon_onceki": {
+        "weight_kg": 21.2
+      },
+      "kolon": {
+        "weight_kg": 13.6
+      }
+    },
+    "SEA-71252003": {
+      "ad": "JET 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 39 (Weight (kg) sutunu, Reference Number 71252003)",
+      "onceki": {
+        "weight_kg": 25.5
+      },
+      "yeni": {
+        "weight_kg": 14.6
+      },
+      "kolon_onceki": {
+        "weight_kg": 25.5
+      },
+      "kolon": {
+        "weight_kg": 14.6
+      }
+    },
+    "SEA-71252010": {
+      "ad": "JET 25 · 1400 d/dk · 0,37 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 39 (Weight (kg) sutunu, Reference Number 71252010)",
+      "onceki": {
+        "weight_kg": 23
+      },
+      "yeni": {
+        "weight_kg": 14.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 23
+      },
+      "kolon": {
+        "weight_kg": 14.2
+      }
+    },
+    "SEA-71252055": {
+      "ad": "JET 25 · 1400 d/dk · 0,55 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 39 (Weight (kg) sutunu, Reference Number 71252055)",
+      "onceki": {
+        "weight_kg": 35.75
+      },
+      "yeni": {
+        "weight_kg": 14.7
+      },
+      "kolon_onceki": {
+        "weight_kg": 35.75
+      },
+      "kolon": {
+        "weight_kg": 14.7
+      }
+    },
+    "SEA-71253003": {
+      "ad": "JET 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 39 (Weight (kg) sutunu, Reference Number 71253003)",
+      "onceki": {
+        "weight_kg": 35
+      },
+      "yeni": {
+        "weight_kg": 23.2
+      },
+      "kolon_onceki": {
+        "weight_kg": 35
+      },
+      "kolon": {
+        "weight_kg": 23.2
+      }
+    },
+    "SEA-71301000": {
+      "ad": "JET 30 · 950 d/dk · 0,55 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 41 (Weight (kg) sutunu, Reference Number 71301000)",
+      "onceki": {
+        "weight_kg": 43.5
+      },
+      "yeni": {
+        "weight_kg": 21.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 43.5
+      },
+      "kolon": {
+        "weight_kg": 21.3
+      }
+    },
+    "SEA-71302000": {
+      "ad": "JET 30 · 1500 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 41 (Weight (kg) sutunu, Reference Number 71302000)",
+      "onceki": {
+        "weight_kg": 45.5
+      },
+      "yeni": {
+        "weight_kg": 23.8
+      },
+      "kolon_onceki": {
+        "weight_kg": 45.5
+      },
+      "kolon": {
+        "weight_kg": 23.8
+      }
+    },
+    "SEA-71302003": {
+      "ad": "JET 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 41 (Weight (kg) sutunu, Reference Number 71302003)",
+      "onceki": {
+        "weight_kg": 42.65
+      },
+      "yeni": {
+        "weight_kg": 23.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 42.65
+      },
+      "kolon": {
+        "weight_kg": 23.3
+      }
+    },
+    "SEA-71302010": {
+      "ad": "JET 30 · 1400 d/dk · 1,1 kW · 220V",
+      "kaynak": "seat-brochure-2024-11.pdf s.34, 41 (Weight (kg) sutunu, Reference Number 71302010)",
+      "onceki": {
+        "weight_kg": 41.8
+      },
+      "yeni": {
+        "weight_kg": 23.3
+      },
+      "kolon_onceki": {
+        "weight_kg": 41.8
+      },
+      "kolon": {
+        "weight_kg": 23.3
+      }
+    }
+  }
+}

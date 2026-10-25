@@ -4,6 +4,7 @@
 
 ## Görev
 Supabase Edge Function katmanı (`supabase/functions/**`, 29 fonksiyon + `_shared/`): güvenlik duruşu, deploy hattı, repo↔prod sapma denetimi; her fonksiyon çağıran sınıfına (a/b/c/d) yazılı bağlanır.
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): ödeme ve bildirim iş kuralı (ALTYAPI kayıtları); e-posta şablonu kodu (URUN); CI (ALTYAPI).
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -37,11 +38,11 @@ Açık (asli görev). Bilinen bayat kayıt: cetvel §3.9 "E12 resolveTenantId ih
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Kapılar 1-5 Recep'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.
-CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
+Kapılar 1-5 Recep'te kalır (söz işi koşan pencerede); kanca tasarımı ve departman iyileştirmesi onayı OPS'tadır (16 Ekim), kapı gevşetme Recep'e gider. Aktarım yalnız OPS'tan (karar 224, §17 Kural 4).
+CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Recep sözüyle, kaydı OPS uygular.
 
 ## İletişim
-- Recep'e yalnız iş bitince ya da sorun çıkınca tek satır yaz; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
+- Recep'e yazarken kurallar dosyandaki "Recep'e mesaj kuralları" geçerlidir; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
 - Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).
 
 ## Çalışma düzeni

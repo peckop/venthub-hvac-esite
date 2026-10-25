@@ -5,6 +5,9 @@
 ## Amaç
 Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandığımız paketlerdeki bilinen güvenlik açıklarının zamanında kapanmasını sağlar; bozulursa hatalı kod canlıya girer ya da açık fark edilmeden kalır.
 
+## Nasıl
+migration-safety-standard.md, barindirma-standard.md, rls-yetki-karari-standard.md
+
 ## Görevler
 | Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
 |---|---|---|---|---|---|
@@ -14,5 +17,6 @@ Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandı�
 | Font ön yükleme ölçümü: derlemede beklenen fontun ön yüklendiği doğrulanır (`scripts/ci/font-preload-olc.cjs`) | olay | Actions: .github/workflows/e2e-smoke.yml (pull_request) font ölçümünü çağırır | evet | Kırmızıda PR durur | Kapalı kipte yalnız Inter; TASARIM Faz 2b'de Archivo beklenir, o PR'da eşik değişir |
 | Dependabot PR'ları: haftalık açılan PR'ları gözden geçirip birleştir ya da gerekçeyle kapat | haftalık | Actions: Dependabot PR'ları haftalık açılıyor; bunları ele alan kendiliğinden bir tetik kurulu değil (kuracak: ALTYAPI) | hayır (kuracak: ALTYAPI) | Birleşme ya da gerekçeli kapatma (bagimlilik-kararlari.md §7 kaydı) | TASLAK: açık Dependabot PR'ı 7 günden eski kalmaz (eşik cetvelde yok, teyidi ALTYAPI'da) |
 | Canlı adres matrisi: yayın ya da anahtar açılışı sonrası canlıda her adresin son durumu ve sıçrama sayısı (`scripts/adres/matris.cjs`) | olay | kart kapısı: Yayın ya da anahtar açılışı kartında matris koşusunu kendiliğinden isteyen kapı yok (kuracak: HARİTA, scripts/belge/kart-plan-kapisi.cjs) | hayır (kuracak: HARITA) | docs/audits/adres-matrisi-<tarih>.json ve kusur için Kanban kartı | TASLAK: hata satırı 0 ve dilsiz adreslerde --dilsiz-hop-en-cok değerinin altı (rota-dili-standard.md; ölçüt ALT-14 canlı ölçümünden) |
+| Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir | haftalık | istem satırı tazelik: istem satırında "öz-değerlendirme: N gün" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6) | hayır (kuracak: ARAC) | OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır | En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır |
 
-6 görev, tetiğe bağlı 4. Tetiğin kurulmasını bekleyen: ALTYAPI 1 · HARITA 1.
+7 görev, tetiğe bağlı 4. Tetiğin kurulmasını bekleyen: ALTYAPI 1 · HARITA 1 · ARAC 1.

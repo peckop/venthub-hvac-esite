@@ -648,6 +648,61 @@ geri yükleme ya da slug/Faz 2 karşılaştırması o yazımları **sessizce ger
 - Canlıya onaylı bir katalog yazımı yapan iş, yazımdan sonra paketi yeniden üretir ya da raporunda "paket
   bayatladı" diye yazar.
 
+## 6.8 ARAMA MERDİVENİ — "bulunamadı" hükmünün koşulu (KTL-44, Recep'in 15 Ekim 2026 bulgusu)
+
+Bir ürünün resmî üretici belgesi için **"bulunamadı" hükmü altı basamağın hepsi denenip her biri için denenen
+adres yazılmadan verilemez.** Kök sebep ölçüldü: iki belge "bulunamadı" listesindeydi ve ikisi de resmî
+sitedeydi — Casals AF Catálogo técnico 2024 (1153 s., casals.com flipbook görüntüleyicisinin içinde, indirme
+adı sayfa kaynağında yok) ve Nicotra `Katalog-DDMB-DDM-DD-eng.pdf` (181 s., üreticinin İsveç ülke sitesinde).
+**Asıl ders menü gezintisidir:** Casals kataloğu sitenin kendi menüsünde duruyordu (casals.com/en → Documentation →
+Document library → ATEX fans; kapaktaki "Technical Catalogue" flipbook'u açıp indirmeyi oradan veriyor); arama
+kutusuyla ve tek sayfa okumayla yetinildi, Documentation altındaki Certificates, Manuals, Standards, Document
+library ve Price lists bölümleri açılmadı. Arama ayrıca tek kanallıydı: küresel site + İngilizce dosya adı.
+
+| Basamak | Nereye bakılır | Not |
+|---|---|---|
+| 1 | **Menü gezintisi:** üreticinin sitesinde menüden belge bölümüne in (Documentation, Downloads, Document library, Descargas, Katalog…), **her ürün grubunun belge sayfasını tek tek aç** | arama kutusu ve dosya adı araması YETMEZ; başlık araması PDF gövdesini kapsamaz, "0 sonuç" kanıt değil |
+| 2 | Üreticinin ülke/bölge siteleri (`.se` `.de` `.it` `.es` `.fr` `.co.uk` `.com.tr` …) | yalnız üreticinin kendi alan adları; distribütör ve bayi sitesi sayılmaz |
+| 3 | Çevrimiçi katalog / flipbook görüntüleyicileri (FlippingBook, Issuu, `…/flipbook/…`) | indirme düğmesi çoğu kez adres olarak sayfa kaynağında yok; tarayıcı indirme kaydından (Zone.Identifier `HostUrl`) okunur |
+| 4 | Üreticinin kendi dilinde dosya adı ve arama sözcüğü | Catálogo técnico, Katalog, Catalogo generale, fiche technique, Datenblatt |
+| 5 | Arama motoru: `site:<üretici alanı> filetype:pdf <seri adı>` | alan adı basamak 1-2'den bilinen üretici alanıdır |
+| 6 | Chrome ile 403 / oturum aşımı (claude-in-chrome) | basamak 1-5'te 403 alınan adres varsa denenir; yoksa "denenmedi: 403 yok" yazılır |
+
+**Kurallar**
+
+- Her basamak için en az bir **denenen adres** (ya da "denenmedi: <neden>") ve **sonuç** yazılır; boş basamak
+  hüküm vermeyi engeller. Yazılmamış basamak "denenmedi"dir, "yok" değildir.
+- "Yok / bulunamadı" hükmünden önce arama kökünün var olduğu ve beklenen sayıda sonuç döndüğü ölçülür
+  (var olmayan klasör ya da boş sonuç sessizce "yok" verir; §6.5 patinaj dersi).
+- Hüküm dört değerden biridir: **indirildi** (resmî adres, bayt, sha256, klasör yolu) · **gerçekten yok**
+  (altı basamağın adresleri + çekirdek ad araması) · **seçici yazılımında** (hesap/oturum gerekir; seçici adresi +
+  hesap yok notu) · **aksesuar, veri broşürde** (kalem bağımsız ürün değil, örn. fanın montaj kasası; kod ve açıklama
+  üreticinin broşüründe: dosya + sayfa + açıklama yazılır; "gerçekten yok" denmez ve Design'a giden listede
+  "veri yok" görünmez).
+- Yalnız üreticinin kendi alanı ve yalnız PDF; yönlendirme resmî sayfadan üreticinin kendi belge CDN'ine
+  giderse kayda "resmî sayfa → üreticinin belge CDN'i" yazılır, bilinmeyen üçüncü alanda durulur.
+- Araştırmacı (alt ajan) raporundaki varlık/sayı/adres iddiası ham kaynağa bakılarak doğrulanmadan hükme girmez.
+- **Model kodu bulunamazsa satıcı ekini at.** Distribütörün kodu (motor/sipariş kodu, örn. AVenS `6M06MH`) üreticinin
+  belgesinde yazmaz; üretici kendi kodunu yazar (Nicotra `M942`). Önce çekirdek adla ara (seri + boyut: "DD 9/9"),
+  sonra kutup/faz/hız/güçle (W) eşle ve **her eşleşmeyi güçle doğrula**; güç uyuşmuyorsa "eşleşti" yazılmaz
+  (Nicotra DD: 11909 = M9F0 736 W eşleşti; 11905/11908 750 W satırı için katalogda 750 W motor yok; 11910 iki aday).
+  Kod eşleşmesi tabloya yazılır, kod aramasının "yok" sonucu hüküm sayılmaz (KTL-44 düzeltmesi, OPS 15 Ekim).
+  Kayıtta ayrı **çekirdek ad araması** sütunu bulunur (aranan çekirdek adlar + sonuç); boşsa kapı KIRMIZI verir.
+- **Görülen yeni ya da farklı baskı, içine bakılmadan geçilmez.** Listede ya da sitede görülen farklı boyutlu,
+  yeni adlı ya da yeni tarihli dosya "içerik farkı ölçülmedi" denerek bırakılmaz: indirilir, kaynak dizinine
+  alınır, içeriği (seri, baskı, model satırları) ölçülür; ancak ondan sonra "aynı" ya da "ilgisiz" denir.
+  Boyut eşleşmesi aynı sürüm kanıtı değildir (KTL-42: 18 MB DDDDM görüldü, içine bakılmadan geçildi; Recep'in
+  bulduğu belgenin ailesiydi).
+
+**Kapı:** ingestor `kaynak-dizini/bulunamayanlar.json` + `scripts/kaynak_dizini/bulunamayan_kapisi.py`
+(CI "kapılar" işinde). `gercekten-yok` ya da `seciciede` satırında altı basamaktan biri ya da `cekirdek_ad`
+(çekirdek ad araması: aranan adlar + sonuç) boşsa **KIRMIZI**;
+`indirildi` satırında envanterde olmayan dosya yolu **KIRMIZI**. Kapı sabotajla sınanır
+(`tests/test_bulunamayan_kapisi.py`: boş basamak, eksik basamak, olmayan dosya).
+
+**Dürüst sınır:** kapı basamakların *doldurulduğunu* ölçer, denenen adresin gerçekten açıldığını ölçmez;
+adres doğruluğu yazanın ve incelemecinin işidir.
+
 ---
 
 ## 7. Provenance / ilişki
@@ -667,3 +722,5 @@ skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `ca
 > v1.1 · 2026-08-18 · §6.1 INV-CATALOG-1 (aile↔içerik bütünlüğü, cırcır tabanlı) — T099.
 > v1.2 · 2026-08-19 · §6.1 kapı ÖLÇTÜ (07:38Z, PR #666). Kök sertifikanın tek kaynağı depo;
 >   `SUPABASE_CA_CERT` sırrı kaldırıldı, sır-üstüne-geçer yolu testle kapatıldı.
+> v1.3 · 2026-10-15 · §6.8 ARAMA MERDİVENİ (KTL-44): "bulunamadı" hükmü altı basamak denenmeden verilemez;
+>   Casals AF 2024 (flipbook) ve Nicotra DD (ülke sitesi) bulgusundan.

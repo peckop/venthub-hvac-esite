@@ -36,13 +36,16 @@ const GERCEK_ENVANTER = 'docs/audits/arac-envanteri-2026-09-07.md'
 type Cikti = { kod: number; stdout: string; stderr: string }
 
 /** Betiği koşturur; çıkış kodunu ASLA yutmaz (kod da bir ölçümdür). */
-function kostur(args: string[], depo: string = KOK): Cikti {
+function kostur(args: string[], hedef: string | Record<string, string> = KOK): Cikti {
+  // ARC-139: ikinci argüman bir depo YOLU (geçici depoda koş) ya da ek ORTAM DEĞİŞKENLERİ (master, ARC-141) olabilir.
+  const depo = typeof hedef === 'string' ? hedef : KOK
+  const ekEnv = typeof hedef === 'string' ? {} : hedef
   try {
     const stdout = execFileSync(process.execPath, [BETIK, ...args], {
       cwd: depo,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, VENTHUB_REPO: depo },
+      env: { ...process.env, VENTHUB_REPO: depo, ...ekEnv },
     })
     return { kod: 0, stdout, stderr: '' }
   } catch (e) {
@@ -76,7 +79,8 @@ function geciciDepo(): { kok: string; belge: string; temizle: () => void } {
   fs.copyFileSync(path.join(KOK, GERCEK_ENVANTER), belge)
   execFileSync('git', ['init', '-q'], { cwd: kok, stdio: 'ignore' })
   // Tabana oturt: kopya belgedeki satırların çoğu temp depoda yok (KAYIP); --yaz sonrası fark 0 olur.
-  kostur(['--yaz', '--bugun', '2026-09-07'], kok)
+  // Açık hedef şart: master'da (ARC-141) varsayılan hedefe yazma yalnız ARAÇ ağacında serbest; temp depo değildir.
+  kostur(['--yaz', '--envanter', belge, '--bugun', '2026-09-07'], kok)
   return { kok, belge, temizle: () => fs.rmSync(kok, { recursive: true, force: true }) }
 }
 
@@ -504,5 +508,60 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
     const a = kostur(['--json', '--bugun', '2026-09-07']).stdout
     const b = kostur(['--json', '--bugun', '2026-09-07']).stdout
     expect(b, 'ciktida zaman damgasi ya da sirasiz kume olabilir').toBe(a)
+  })
+})
+
+/**
+ * INV-ARAC-4 — SERIT KORUMASI (ARC-146, 16 Ekim). Envanter belgesi ARAC seridinin dosyasidir; GEO-SEO kendi
+ * worktree'sinde `--yaz` kosunca o dosyayi degistirdi (bash-write-audit alarmi, kapi geri almayi reddetti).
+ * Kural: `--yaz` VARSAYILAN hedefe yalniz ARAC penceresinin agacinda yazar; baska agacta ya da pencere disinda
+ * ACIK `--envanter <yol>` gerekir. Rol `VENTHUB_PENCERE_AGENT` ile sabitlenir (testler gercek worktree'den bagimsiz).
+ *
+ * ⛔Reddeden kollar gercek belgeye YAZMAZ (reddedilmezse bile bayt karsilastirmasi yakalar); "ARAC yazar" kolu
+ * saf fonksiyonla sinanir (surec kolu canli belgeye yazma riski tasirdi).
+ */
+describe('INV-ARAC-4: --yaz varsayilan hedefe yalniz ARAC agacinda yazar', () => {
+  const yazma = (rol: string, args: string[] = ['--yaz']): Cikti => kostur(args, { VENTHUB_PENCERE_AGENT: rol })
+  const gercekBayt = (): string => fs.readFileSync(path.join(KOK, GERCEK_ENVANTER), 'utf8')
+
+  it('KARAR TABLOSU: ARAC serbest · baska rol/pencere disi RED · acik hedef herkese serbest', () => {
+    const { yazimaIzinliMi } = createRequire(import.meta.url)(BETIK) as {
+      yazimaIzinliMi: (g: { verilen: string | null; rol: string }) => { izin: boolean; sebep: string }
+    }
+    expect(yazimaIzinliMi({ verilen: null, rol: 'ARAC' }).izin).toBe(true)
+    expect(yazimaIzinliMi({ verilen: null, rol: 'GEO-SEO' }).izin, 'baska seridin agaci yazdi').toBe(false)
+    expect(yazimaIzinliMi({ verilen: null, rol: '' }).izin, 'kimligi olculemeyen "ARAC" sayildi').toBe(false)
+    expect(yazimaIzinliMi({ verilen: 'x/y.md', rol: 'GEO-SEO' }).izin, 'acik hedef serbest olmali').toBe(true)
+    expect(yazimaIzinliMi({ verilen: null, rol: 'GEO-SEO' }).sebep).toContain('GEO-SEO')
+  })
+
+  it('SABOTAJ — baska seridin agacinda varsayilan --yaz: cikis 2, hicbir sey yazilmaz, belge BAYT ayni', () => {
+    const once = gercekBayt()
+    const r = yazma('geo-seo-pencere')
+    expect(r.kod, 'baska seridin agacinda --yaz reddedilmedi').toBe(2)
+    expect(r.stderr).toContain('REDDEDILDI')
+    expect(r.stderr).toContain('GEO-SEO')
+    expect(r.stderr, 'red mesaji "satiri kendi PR\'ina ekle" demiyor (ARC-149)').toContain("KENDI PR'ina ekle")
+    expect(gercekBayt(), 'reddedilen --yaz yine de belgeyi degistirdi').toBe(once)
+  })
+
+  it('pencere olmayan kosu (rol yok) varsayilan hedefe yazamaz: fail-closed', () => {
+    const once = gercekBayt()
+    const r = yazma('')
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('taninmadi')
+    expect(gercekBayt()).toBe(once)
+  })
+
+  it('ACIK HEDEFLE herkes yazabilir (bilincli secim): baska rol + --envanter fikstur → cikis 0', () => {
+    const belge = fiksturBelgesi((m) => m)
+    const r = yazma('geo-seo-pencere', ['--yaz', '--envanter', belge])
+    expect(r.kod, r.stderr).toBe(0)
+    expect(r.stdout).toContain('fark YOK')
+  })
+
+  it('--kontrol (varsayilan kip) rol sormaz: baska rol da OLCER', () => {
+    const r = kostur(['--bugun', '2026-09-07'], { VENTHUB_PENCERE_AGENT: 'geo-seo-pencere' })
+    expect(r.kod, r.stdout + r.stderr).toBe(0)
   })
 })

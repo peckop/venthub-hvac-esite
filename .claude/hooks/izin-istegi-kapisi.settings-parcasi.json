@@ -1,0 +1,15 @@
+{
+  "_aciklama": "ARC-179: bu parca .claude/settings.json icindeki \"hooks\" nesnesine (PreToolUse'un yanina) OPS tarafindan eklenir. Departman ayar dosyasina kendisi yazmaz (filo-ortak: ayar ve izin dosyasini OPS uygular). onFailure BILEREK yok: kanca bozulursa karar vermez, normal izin akisi surer.",
+  "PermissionRequest": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/izin-istegi-kapisi.cjs\"",
+          "statusMessage": "izin-istegi-kapisi"
+        }
+      ]
+    }
+  ]
+}

@@ -135,6 +135,16 @@ function kol2SeritDaliAnaAgacta(kok) {
   return onek ? dal : null
 }
 
+/** Bu ağaç ARAÇ penceresinin mi? Kimlik ölçülemezse false (envanter ARAÇ şeridinin: başkasına `--yaz` söylenmez). */
+function benARacMi(kok) {
+  try {
+    const pencereKimligi = require('../board/pencere-kimligi.cjs')
+    return pencereKimligi.rolAdi(pencereKimligi.agentAdi({ cwd: kok })) === 'ARAC'
+  } catch {
+    return false
+  }
+}
+
 function main() {
   let kok
   try {
@@ -159,8 +169,15 @@ function main() {
   for (const y of ilansiz) {
     // Betik ADI ve KOMUT yazılır — "envanter eksik" demek vakit kaybettiriyordu.
     console.log(`[commit-uyari] ⚠ ${y} arac envanterinde ILAN EDILMEMIS (INV-ARAC-1 CI'da KIRMIZI verir).`)
-    console.log('[commit-uyari]   kos: node scripts/hijyen/arac-envanteri.cjs --yaz')
-    console.log('[commit-uyari]   sonra YENI satirin durum/sahip alanlarini ELLE doldur (AXIOM 3).')
+    if (benARacMi(kok)) {
+      console.log('[commit-uyari]   kos: node scripts/hijyen/arac-envanteri.cjs --yaz')
+      console.log('[commit-uyari]   sonra YENI satirin durum/sahip alanlarini ELLE doldur (AXIOM 3).')
+    } else {
+      // ARC-146/149: varsayilan --yaz baska agacta reddedilir; satir dosyalarla AYNI PR'da inmeli (once inerse
+      // INV-ARAC-1 KAYIP, sonra inerse YENI: ikisi de kirmizi). 16 Ekim GEO-SEO, ALTYAPI, KATALOG vakalari.
+      console.log('[commit-uyari]   satiri KENDI PR\'ina ekle (sahip sensin; sutun sirasi icin komsu satirlara bak); ARAC "ARAC okudu" notunu yazar.')
+      console.log('[commit-uyari]   bu agacta varsayilan `--yaz` reddedilir; uretmek icin acik hedef: --yaz --envanter <docs/audits altindaki en yeni arac-envanteri-<tarih>.md>')
+    }
   }
 
   const seritDali = kol2SeritDaliAnaAgacta(kok)

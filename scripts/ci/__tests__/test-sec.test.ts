@@ -492,6 +492,35 @@ const SENARYOLAR: Senaryo[] = [
       )
     },
   },
+  {
+    // ALT-83b: bayat + kayıtsız oranı yüzde 10'u AŞARSA "her zaman koşan" satırı tazeleme uyarısı taşır (bloklamaz: seçim aynı); sınırda (tam yüzde 10) ve küçük listede yok.
+    ad: 'harita bayat uyarısı: oran yüzde 10\'u aşınca "her zaman koşan" satırına tazele komutu eklenir; sınırda ve 100\'den küçük listede eklenmez; seçimi değiştirmez',
+    kos: (m) => {
+      const KOMUT = 'node scripts/ci/test-haritasi-uret.cjs --bayat'
+      const kur = (toplam: number, kayitsiz: number) => {
+        const liste = Array.from({ length: toplam }, (_, i) => `src/lib/__tests__/toplu-${String(i).padStart(3, '0')}.test.ts`)
+        const h = haritaKur()
+        const testler: Record<string, string> = {}
+        const kayit: Harita['testler'] = {}
+        liste.slice(kayitsiz).forEach((t) => {
+          kayit[t] = { sha: `sha-${t}` }
+          testler[t] = `sha-${t}`
+        })
+        h.testler = kayit
+        const s = m.sec({ degisenDosyalar: ['docs/a.md'], testDosyalari: liste, harita: h, ilgili: () => [], tazelik: { arac: h.arac, testler } })
+        const satir = s.neden.find((n) => n.startsWith('her zaman koşan'))
+        return { s, satir: satir ?? '' }
+      }
+      const sinir = kur(120, 12)
+      darMi(sinir.s, 'sınır')
+      dogru(sinir.satir.includes('haritada yok 12') && !sinir.satir.includes('UYARI'), `tam yüzde 10 uyarı vermemeli: ${sinir.satir}`)
+      const asan = kur(120, 13)
+      darMi(asan.s, 'eşik aşımı')
+      dogru(asan.satir.includes('UYARI') && asan.satir.includes('yüzde 11') && asan.satir.includes('13/120') && asan.satir.includes(KOMUT), `uyarı + komut beklenir: ${asan.satir}`)
+      esit(asan.s.secilen.length, 13, 'uyarı seçimi değiştirmez: yalnız 13 kayıtsız test koşar')
+      dogru(!kur(99, 99).satir.includes('UYARI'), '100\'den küçük listede uyarı verilmez')
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------------------------------------------------------
@@ -545,6 +574,9 @@ const SABOTAJLAR: Sabotaj[] = [
   { ad: 'çıktı sıralanmaz (girdi sırasına bağımlı)', eski: 'const sirali = [...secilen].sort();', yeni: 'const sirali = [...secilen];' },
   { ad: 'tam sonucu sıralanmaz', eski: "testDosyalari.filter((t) => typeof t === 'string').sort()", yeni: "testDosyalari.filter((t) => typeof t === 'string')" },
   { ad: 'alt ağaç eşleşmesi önek sınırını kaybeder (standards-ekstra eşleşir)', eski: 'for (const u of uste) tumu(indeks.ozy.get(u));', yeni: 'for (const [k, v] of indeks.ozy) if (yol.startsWith(k)) tumu(v);' },
+  { ad: 'bayat uyarısı tam sınırda da verilir (> yerine >=)', eski: 'bayatKayitsiz / liste.size > BAYAT_UYARI_ORANI', yeni: 'bayatKayitsiz / liste.size >= BAYAT_UYARI_ORANI' },
+  { ad: 'bayat uyarısı küçük listede de verilir', eski: 'liste.size >= BAYAT_UYARI_ASGARI_TEST && ', yeni: '' },
+  { ad: 'bayat uyarısı tazeleme komutunu yazmaz', eski: 'tazele: node scripts/ci/test-haritasi-uret.cjs --bayat`', yeni: 'tazele`' },
 ]
 
 function sabotajliModul(sabotaj: Sabotaj, dizin: string, sira: number): Modul {
@@ -974,6 +1006,49 @@ describe('INV-TEST-SEC-1 · 5. CLI (calistir): çıktı sözleşmesi, hata → t
       const s = await yerelKos(kok, 'docs/a.md\0', '', {}, ['--yerel', '--kuru', '--taban', 'release/x'])
       expect(s.komutlar.find((c) => c.includes('merge-base'))).toEqual(['-C', kok, 'merge-base', 'HEAD', 'release/x'])
       expect(s.kosulan).toEqual([])
+    })
+
+    // ARC-143 (15 Ekim): worktree'de izlenmeyen bir PowerShell önbellek dosyası seçimi TAM'a düşürüp hiç test koşturmuyordu.
+    it('ARC-143: kökü haritaca bilinmeyen İZLENMEYEN dosya değişen sayılmaz (uyarı yazılır), ilgili testler yine seçilir ve koşar', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      const s = await yerelKos(kok, 'docs/a.md\0', 'Microsoft/Windows/PowerShell/ModuleAnalysisCache\0')
+      expect(s.sonuc.tam).toBe(false)
+      expect(s.kosulan).toEqual([[T_BELGE]])
+      expect(s.yazilan).toMatch(/Uyarı: izlenmeyen ve haritanın bilmediği kökte 1 dosya yok sayıldı \(Microsoft\/Windows\/PowerShell\/ModuleAnalysisCache\)/)
+    })
+
+    it('ARC-143: aynı bilinmeyen kök İZLENEN (kayıtlı/eklenmiş) değişiklikteyse hâlâ TAM: gerçek değişiklik kapanmaz', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      const s = await yerelKos(kok, 'Microsoft/yeni.ts\0', '')
+      expect(s.sonuc.tam).toBe(true)
+      expect(s.yazilan).toMatch(/^TAM: Microsoft\/yeni\.ts: haritanın bilmediği kök/)
+      expect(s.kosulan).toEqual([])
+    })
+
+    it('ARC-143: yalnız bilinmeyen kökte izlenmeyen dosya varsa "değişiklik yok" der (TAM değil), uyarı yazar', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      const s = await yerelKos(kok, '', 'Microsoft/Windows/x\0')
+      expect(s.yazilan).toMatch(/Uyarı: izlenmeyen/)
+      expect(s.yazilan).toMatch(/Değişiklik yok/)
+      expect(s.sonuc.tam).toBe(false)
+      expect(s.kosulan).toEqual([])
+    })
+
+    it('ARC-143: --yerel ile bilinmeyen argüman açık HATA verir (çıkış 2, hiçbir test koşmaz, oturum açılmaz); CI kolu eskisi gibi TAM', async () => {
+      const kok = kokKur()
+      haritaYaz(kok)
+      let oturumAcildi = false
+      const s = await yerelKos(kok, 'docs/a.md\0', '', { oturumAc: async () => { oturumAcildi = true; throw new Error('açılmamalı') } }, ['--yerel', '--maxWorkers=3'])
+      expect(s.sonuc.cikisKodu).toBe(2)
+      expect(s.sonuc.tam).toBe(false)
+      expect(s.yazilan).toMatch(/^HATA: bilinmeyen argüman: --maxWorkers=3/)
+      expect(s.kosulan).toEqual([])
+      expect(oturumAcildi).toBe(false)
+      const ci = await M.calistir(['--bilinmeyen-bayrak'], { gitCalistir: () => '', oturumAc: oturum([T_BELGE]), kok, yaz: () => undefined })
+      expect(ci.tam).toBe(true)
     })
   })
 

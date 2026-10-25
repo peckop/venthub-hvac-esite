@@ -110,6 +110,155 @@ function sonBaglam(kayitYolu) {
 const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') + 'M' : Math.round(t / 1000) + 'k')
 
 /**
+ * ── COMPACT HAZIRLIĞI KENDİLİĞİNDEN (ARC-131 madde 1, OPS-134, karar 363) ──
+ *
+ * Bağlam eşiğe gelince pencere hazırlığı elle kurmak zorunda kalıyordu: "durum dosyam güncel mi", "yarım iş var mı",
+ * "/compact satırı nasıl". Üçü de deterministik: kanca durum dosyasının yaşını ve "Yarım iş" satırını zaten okuyor.
+ * Bu bölüm hükmü (HAZIR / DEĞİL + nedeni) ve /compact metnini KANCA üretir; pencere yalnız DEĞİL ise durum dosyasını
+ * günceller. Hüküm ölçütü kokpitteki `compactHazirlik` ile AYNI: durum dosyası ≤60 dk VE "Yarım iş yok".
+ * Belirsizlik (satır yok, dosya yok) "HAZIR" demez. Metin dosya içeriğinden gelir ama yalnız kart numarası deseni
+ * ve "Yarım iş" satırının ilk 120 karakteri alınır (keyfi dosya metni istem satırına taşınmaz).
+ */
+const HAZIR_YAS_DK = 60
+const KART_DESENI = /\b(?:ARC|OPS|REC|ALT|URN|KTL|HRT|SEO|BLG|YTN|TSR|ADM|EDG|I18|STS)-\d{1,4}\b/g
+const KART_SATIRI = /^\s*[-*]\s*(?:ŞU AN BEKLEYEN|BEKLEYEN|AÇIK|ACIK|SIRADA|YARIM İŞ|Yarım iş|Yarim is)/i
+// filo-ortak.md "Yarım iş: yok — <kısa>" satırını madde işaretsiz yazmayı da öğretir; işaret isteğe bağlı (ARC-131 ek PR).
+const YARIM_SATIRI = /^\s*(?:[-*]\s*)?(?:YARIM İŞ|Yarım iş|Yarim is)\s*:/i
+const KART_EN_COK = 8
+const YARIM_YAZI_EN_COK = 120
+
+/** Durum dosyasının SON bloğu ("## " başlıklı en son bölüm); başlık yoksa tüm metin. */
+function sonBlok(metin) {
+  const i = String(metin).lastIndexOf('\n## ')
+  return i >= 0 ? String(metin).slice(i + 1) : String(metin)
+}
+
+/** Son bloktan { kartlar, yarim } — kart numaraları (tekil, en çok 8) ve "Yarım iş:" satırının kısa metni. */
+function compactIcerigi(metin) {
+  const kartlar = []
+  let yarim = null
+  for (const satirMetni of sonBlok(metin).split('\n')) {
+    if (!KART_SATIRI.test(satirMetni) && !YARIM_SATIRI.test(satirMetni)) continue
+    const m = satirMetni.match(/yar[ıi]m i[şs]\s*:\s*(.+)$/i)
+    if (m) yarim = m[1].replace(/\s+/g, ' ').trim().slice(0, YARIM_YAZI_EN_COK)
+    for (const kart of satirMetni.match(KART_DESENI) || []) {
+      if (!kartlar.includes(kart) && kartlar.length < KART_EN_COK) kartlar.push(kart)
+    }
+  }
+  return { kartlar, yarim }
+}
+
+/**
+ * Pencerenin yapıştıracağı /compact satırı; kalıp .claude/rules/filo-ortak.md "Compact" bölümüyle AYNI.
+ * Kart durumu (Sürüyor, Sırada...) dosyadan güvenle çıkmaz; metne yazılmaz, "ayrıntı durum dosyamda" der.
+ */
+function compactMetni(icerik) {
+  const kartlar = icerik.kartlar.length > 0 ? icerik.kartlar.join(', ') : 'açık kartlar'
+  const yarim = icerik.yarim && !/^yok\b/i.test(icerik.yarim) ? icerik.yarim : 'yok'
+  return (
+    "/compact Recep'in son sözlerini aynen koru. Şunları koru: " + kartlar + ', yarım işler (' + yarim + '). ' +
+    'Ayrıntı durum dosyamda. Araç çıktılarını ve eski ölçüm ayrıntılarını at.'
+  )
+}
+
+/**
+ * Hüküm. `yasMs` null ise dosya yok/okunamadı. Dönüş: { hazir: boolean, neden: string }.
+ * İlk bozan koşul nedeni belirler; sıra kokpitteki `compactHazirlik` ile aynı.
+ */
+function hazirlikHukmu(yasMs, yarimIs) {
+  if (yasMs === null || yasMs === undefined) return { hazir: false, neden: 'durum dosyasi bulunamadi' }
+  const dk = Math.max(0, Math.round(yasMs / 60000))
+  if (yasMs > HAZIR_YAS_DK * 60000) return { hazir: false, neden: 'durum dosyasi bayat (' + dk + ' dk once guncellendi)' }
+  if (yarimIs === 'var') return { hazir: false, neden: 'yarim is var' }
+  if (yarimIs !== 'yok') return { hazir: false, neden: "durum dosyasinda 'Yarim is yok/var' satiri yok" }
+  return { hazir: true, neden: 'durum dosyasi ' + dk + ' dk once guncellendi, yarim is yok' }
+}
+
+/** COMPACT YAKIN satırına eklenen hüküm cümlesi; hazirlik yoksa '' (eski davranış). */
+function hazirlikCumlesi(h) {
+  if (!h || typeof h !== 'object' || typeof h.hazir !== 'boolean') return ''
+  if (h.hazir) {
+    return ' HAZIRLIK: HAZIR (' + h.neden + '). Recep icin /compact satiri kancadan hazir: ' + (h.compactMetni || '(uretilemedi)')
+  }
+  return ' HAZIRLIK: DEGIL (' + (h.neden || 'olculemedi') + '). Once durum dosyasini guncelle (sonuna "Yarim is: yok/var" satiri), sonra compact.'
+}
+
+/**
+ * ── DÖNÜŞTE İLK SATIR KONTROLÜ (ARC-131 madde 4) ──
+ *
+ * Kural: compact dönüşünde İLK GÖRÜNÜR satır "bana ulaşan son girdin: …" olur (geçiş anındaki mesaj yutulabilir;
+ * kaybı bir turda ortaya çıkarmak için). Bugüne dek uyulup uyulmadığını kimse ölçmüyordu. Kayıtta son
+ * `compact_boundary`tan sonraki İLK gerçek (usage > 0, isSidechain değil) assistant METNİNİN ilk dolu satırına bakılır.
+ *
+ * Sıfır kullanımlı kopya satırlar (hata 09-28) atlanır. Sınır kaydın son 512 KB'ında değilse ölçülmez (null).
+ * Dönüş: null (ölçülemedi / cevap yok) | { anahtar: sınır kimliği, tamam: boolean }.
+ * Aynı sınır için uyarı BİR kez çıksın diye çağıran `anahtar`ı pencere dosyasına yazar.
+ */
+const DONUS_DESENI = /^\W*bana ula[şs]an son girdin\b/
+function donusKontrolu(kayitYolu) {
+  if (!kayitYolu || !fs.existsSync(kayitYolu)) return null
+  const boy = fs.statSync(kayitYolu).size
+  const n = Math.min(boy, OKUMA_BAYT)
+  const tampon = Buffer.alloc(n)
+  const fd = fs.openSync(kayitYolu, 'r')
+  try {
+    fs.readSync(fd, tampon, 0, n, boy - n)
+  } finally {
+    fs.closeSync(fd)
+  }
+  const nesneler = []
+  for (const s of tampon.toString('utf8').split('\n')) {
+    try {
+      nesneler.push(JSON.parse(s))
+    } catch {
+      // kesilmiş ilk satır ya da boş satır
+    }
+  }
+  let sinir = -1
+  for (let i = nesneler.length - 1; i >= 0; i--) {
+    const o = nesneler[i]
+    if (o && o.type === 'system' && o.subtype === 'compact_boundary' && !o.isSidechain) {
+      sinir = i
+      break
+    }
+  }
+  if (sinir < 0) return null
+  const anahtar = String(nesneler[sinir].uuid || nesneler[sinir].timestamp || 'sinir-' + sinir)
+  for (let i = sinir + 1; i < nesneler.length; i++) {
+    const o = nesneler[i]
+    if (!o || o.type !== 'assistant' || o.isSidechain || !o.message) continue
+    const u = o.message.usage
+    if (!u || (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0) === 0) continue
+    const icerik = Array.isArray(o.message.content) ? o.message.content : []
+    const blok = icerik.find((c) => c && c.type === 'text' && String(c.text || '').trim() !== '')
+    if (!blok) continue // araç çağrısı satırı; metin sonraki satırda
+    const ilk = String(blok.text).split('\n').find((x) => x.trim() !== '') || ''
+    return { anahtar, tamam: DONUS_DESENI.test(ilk.toLocaleLowerCase('tr')) }
+  }
+  return null
+}
+
+/** Pencere dosyasında önceden bildirilen sınır kimliği; dosya yok/bozuksa null. sid UUID değilse null (yol enjeksiyonu yok). */
+function donusBildirilenOku(klasor, sid) {
+  try {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(sid || ''))) return null
+    const k = JSON.parse(fs.readFileSync(path.join(klasor, String(sid).toLowerCase() + '.json'), 'utf8'))
+    return typeof k.donusBildirilen === 'string' && k.donusBildirilen !== '' ? k.donusBildirilen : null
+  } catch {
+    return null
+  }
+}
+
+/** İstem satırı: eksikse uyarı; tamam, ölçülemedi ya da bu sınır zaten bildirilmişse null. `bildirilen` önceki anahtardır. */
+function donusSatiri(sonuc, bildirilen) {
+  if (!sonuc || sonuc.tamam || sonuc.anahtar === bildirilen) return null
+  return (
+    "⚠DONUS: compact sonrasi ilk cevapta 'bana ulasan son girdin: <ozet>' satiri YOK. " +
+    "Recep'e simdi o satiri yaz (durum dosyasinin son blogundaki BANA ULASAN SON GIRDI), sonra isine don."
+  )
+}
+
+/**
  * COMPACT HAZIRLIK NOTU talimatı (Recep 09-29: "diğer pencerelerin compact açıklaması yaptığını görmedim,
  * bu önemli"). Kanca ve durum dosyası yazımı pencerelerde ÇALIŞIYOR ama Recep'e görünen tek cümle üretmiyordu;
  * yalnız Ops elle açıklıyordu. Bu satır eşik üstünde HER istemde gelir → not "bir kez" değil, compact
@@ -138,14 +287,22 @@ const HAZIRLIK_NOTU =
   'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz." ' +
   'Compact yapilana kadar her cevapta kisaca tekrarla.'
 
-/** Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı. */
-function satir(token, pencere) {
+/**
+ * Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı.
+ * `hazirlik` (ARC-131 madde 1) verilirse COMPACT YAKIN satırı hükmü ve kancanın kendi ürettiği /compact metnini taşır:
+ * pencere metni sıfırdan yazmaz, yalnız "DEĞİL" ise durum dosyasını günceller.
+ */
+function satir(token, pencere, hazirlik = null) {
   if (token === null || token === undefined) return null
   if (token === COMPACT_SONRASI) return 'BAGLAM: compact sonrasi — olcum ilk cevaptan sonra'
   const e = esikler(pencere)
   const oran = k(token) + '/' + k(pencere)
   if (token >= e.yakin) {
-    return '⛔BAGLAM: ' + oran + ' — COMPACT YAKIN. Durum dosyasini ve acik sozleri SIMDI yaz; buyuk okuma yapma.' + HAZIRLIK_NOTU
+    return (
+      '⛔BAGLAM: ' + oran + ' — COMPACT YAKIN. Durum dosyasini ve acik sozleri SIMDI yaz; buyuk okuma yapma.' +
+      hazirlikCumlesi(hazirlik) +
+      HAZIRLIK_NOTU
+    )
   }
   if (token >= e.doluyor) {
     return '⚠BAGLAM: ' + oran + ' — doluyor. Isi toparlamaya basla; compact ' + k(e.yakin) + "'da uyarilir."
@@ -227,7 +384,9 @@ function kayitSatiri(boyMb) {
  * yarım dosya görmez. sid yalnız UUID ise yazılır (yol enjeksiyonu yok).
  */
 const SID_BICIMI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const BOS_DURUM = Object.freeze({ durumDosyasi: null, durumBulundu: null, yarimIs: 'bilinmiyor' })
+// ARC-131: hüküm alanları YALNIZ ölçüldüğünde bulunur (eşik altı ve bulunamayan durum dosyası eski biçimi korur).
+const HAZIRLIK_YOK = Object.freeze({})
+const BOS_DURUM = Object.freeze({ durumDosyasi: null, durumBulundu: null, yarimIs: 'bilinmiyor', ...HAZIRLIK_YOK })
 
 /**
  * ── COMPACT HAZIRLIK VERİSİ (ARC-31 madde 2, 10-05) ──
@@ -289,14 +448,26 @@ function pencereDurumOzeti(klasor, sid, transcriptPath, token, pencere, simdi = 
       yol = r && typeof r.tam === 'string' ? r.tam : null
       bulundu = simdi
     }
-    if (yol === null) return { durumDosyasi: null, durumBulundu: bulundu, yarimIs: 'bilinmiyor' }
-    return { durumDosyasi: yol, durumBulundu: bulundu, yarimIs: yarimIsOku(sonBaytlar(yol, DURUM_OKUMA_BAYT)) }
+    if (yol === null) return { durumDosyasi: null, durumBulundu: bulundu, yarimIs: 'bilinmiyor', ...HAZIRLIK_YOK }
+    const metin = sonBaytlar(yol, DURUM_OKUMA_BAYT)
+    const yarimIs = yarimIsOku(metin)
+    // ARC-131: hüküm ve /compact metni yalnız hazırlık eşiğinde (≥%40) üretilir; altında alanlar yazılmaz.
+    if (oran < HAZIRLIK_ESIGI) return { durumDosyasi: yol, durumBulundu: bulundu, yarimIs, ...HAZIRLIK_YOK }
+    const h = hazirlikHukmu(simdi - fs.statSync(yol).mtimeMs, yarimIs)
+    return {
+      durumDosyasi: yol,
+      durumBulundu: bulundu,
+      yarimIs,
+      hazir: h.hazir,
+      hazirNeden: h.neden,
+      compactMetni: compactMetni(compactIcerigi(metin)),
+    }
   } catch {
     return BOS_DURUM
   }
 }
 
-function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date(), durum = BOS_DURUM) {
+function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date(), durum = BOS_DURUM, donusBildirilen = null) {
   try {
     if (!SID_BICIMI.test(String(sid || ''))) return null
     if (token === null || token === undefined) return null
@@ -313,6 +484,15 @@ function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date(),
       durumBulundu: typeof durum.durumBulundu === 'number' ? durum.durumBulundu : null,
       yarimIs: durum.yarimIs === 'yok' || durum.yarimIs === 'var' ? durum.yarimIs : 'bilinmiyor',
     }
+    // ARC-131: hüküm ve hazır /compact metni; kokpit HAZIR/DEĞİL satırını ve kopyalanabilir metni bundan kurar.
+    // Alanlar yalnız ölçüldüyse yazılır (eşik altındaki pencere dosyası eski biçimini korur).
+    if (typeof durum.hazir === 'boolean') {
+      kayit.hazir = durum.hazir
+      kayit.hazirNeden = typeof durum.hazirNeden === 'string' ? durum.hazirNeden : null
+      kayit.compactMetni = typeof durum.compactMetni === 'string' ? durum.compactMetni : null
+    }
+    // Dönüş uyarısı bir sınır için bir kez çıksın diye bildirilen sınır kimliği dosyada kalır.
+    if (typeof donusBildirilen === 'string' && donusBildirilen !== '') kayit.donusBildirilen = donusBildirilen
     fs.mkdirSync(klasor, { recursive: true })
     const hedef = path.join(klasor, kayit.sid + '.json')
     const gecici = hedef + '.' + process.pid + '.tmp'
@@ -348,4 +528,12 @@ module.exports = {
   YAKIN,
   OKUMA_BAYT,
   HAZIRLIK_NOTU,
+  compactIcerigi,
+  compactMetni,
+  hazirlikHukmu,
+  hazirlikCumlesi,
+  donusKontrolu,
+  donusSatiri,
+  donusBildirilenOku,
+  HAZIR_YAS_DK,
 }

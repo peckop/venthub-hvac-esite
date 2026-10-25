@@ -1,6 +1,6 @@
 ---
 name: admin-uygulayici
-description: ADMIN departmanının uygulayıcı çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
+description: ADMIN departmanının uygulayıcı çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.
 model: sonnet
 memory: user
 skills:

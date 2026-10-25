@@ -1,16 +1,36 @@
 import { HelpCircle,Minus, Plus } from 'lucide-react'
+import type { Route } from 'next'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
+import type { SesOzeti } from '@/data/sessizFan/sesOzeti'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMu } from '@/utils/bosDegerKorumasi'
 
-const SilentFanFAQ: React.FC = () => {
-    const { t, dict } = useI18n()
+import { cumleleriDoldur, sesEtiketSozlugu, sesYerTutucular } from './sesMetni'
+
+interface SilentFanFAQProps {
+    /** URN-135: ses aralığı (sunucudan; canlı model kodları ∩ ses verisi). Yoksa ses sayısı taşıyan cümleler çizilmez. */
+    sesOzeti?: SesOzeti | null
+    /** URN-135: rehber yazısının dil önekli adresi (sunucuda, yalnız yazı kaydı varsa); yoksa bağlantı çizilmez. */
+    rehberHref?: string | null
+}
+
+const SilentFanFAQ: React.FC<SilentFanFAQProps> = ({ sesOzeti, rehberHref }) => {
+    const { t, dict, lang } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
-    
+
     const tr = (key: string) => t(`categorySilentFan.faq.${key}`)
-    const items = dict.categorySilentFan.faq.items || []
+
+    // URN-135 (Design D2): yedi soru. Cevap CÜMLE dizisidir; ses sayısı taşıyan cümle yalnız canlı kodların ses
+    // verisiyle kesişimi varsa çizilir. Hiç cümlesi kalmayan soru çizilmez (boş cevap kutusu basılmaz).
+    const yerTutucular = sesYerTutucular(sesOzeti, lang, sesEtiketSozlugu(dict.categorySilentFan.ses))
+    const items = (dict.categorySilentFan.faq.items || []).flatMap((item) => {
+        const cevap = cumleleriDoldur(item.a || [], yerTutucular).join(' ')
+        return doluMu(item.q) && doluMu(cevap) ? [{ q: item.q, a: cevap, k: item.k }] : []
+    })
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-50">
@@ -28,7 +48,7 @@ const SilentFanFAQ: React.FC = () => {
                     {items.map((item, index: number) => {
                         const isOpen = openIndex === index
                         return (
-                            <div 
+                            <div
                                 key={index}
                                 className={`bg-white rounded-2xl border transition-colors duration-300 ${isOpen ? 'border-blue-500 shadow-xl shadow-blue-500/5' : 'border-slate-200 shadow-sm'} ${scrollAnimationClasses.fadeUp(isVisible)}`}
                                 style={{ transitionDelay: `${index * 100}ms` }}
@@ -47,8 +67,8 @@ const SilentFanFAQ: React.FC = () => {
                                         {isOpen ? <Minus size={18} /> : <Plus size={18} />}
                                     </div>
                                 </button>
-                                
-                                <div 
+
+                                <div
                                     id={`silent-faq-content-${index}`}
                                     className={`overflow-hidden transition-colors duration-300 ease-in-out ${isOpen ? 'max-h-500px opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
@@ -56,12 +76,28 @@ const SilentFanFAQ: React.FC = () => {
                                         <div className="pt-4">
                                             {item.a}
                                         </div>
+                                        {doluMu(item.k) && (
+                                            <p className="mt-3 text-xs text-steel-gray">
+                                                {dict.categorySilentFan.ses.kaynakEtiketi}: {item.k}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         )
                     })}
                 </div>
+
+                {doluMu(rehberHref) && (
+                    <p className="mt-8 text-center">
+                        <Link
+                            href={rehberHref as Route}
+                            className="font-bold text-secondary-blue underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan-ink"
+                        >
+                            {t('categorySilentFan.faq.rehberBaglantisi')}
+                        </Link>
+                    </p>
+                )}
             </div>
         </section>
     )

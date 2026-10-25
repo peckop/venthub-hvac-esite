@@ -100,7 +100,7 @@ gelmese de GEO-SEO canlı haritayı tabanla karşılaştırıp yeni adresi kendi
 
 | Kanal | Sınır | Kaynak ve ölçüm durumu | Dolunca |
 |---|---|---|---|
-| Google dizin isteği | Panelde yazmıyor (ölçüldü: URL denetimi sonuç sayfasında yalnız düğme var). **Planlama tabanı günde 10 adres**; gerçek sayı ilk "kota aşıldı" hatasında bu satıra yazılır | Search Console URL denetimi, 2026-10-13; Recep "sanırım 15" dedi, ölçülmedi | kalanlar ertesi gün ilk iş, aynı sıra |
+| Google dizin isteği | Panelde yazmıyor (ölçüldü: URL denetimi sonuç sayfasında yalnız düğme var). **ÖLÇÜLDÜ 2026-10-16: günde 11 istek kabul edildi, 12. istek "Kota Aşıldı: günlük kotanızı aştığınız için bu isteği işleyemedik, yarın tekrar deneyin" verdi** (SEO-54, tek gün, tek mülk). Planlama tabanı **günde 10** kalır (1 adres payı); sayı değişirse bu satır yeniden ölçülür | Search Console URL denetimi, 2026-10-13; Recep "sanırım 15" dedi, ölçülmedi | kalanlar ertesi gün ilk iş, aynı sıra |
 | Bing URL Gönder | **Günlük 100, aylık 1800** (ÖLÇÜLDÜ 2026-10-14: `bing-url-gonder.mjs --kota` → DailyQuota 100 · MonthlyQuota 1800, hiç gönderim yapılmadan; Recep panelde 100 görmüştü, doğrulandı). Gönderim sonrası bu sayıların "kalan" olarak düşüp düşmediği ilk gerçek gönderimde ölçülür | Bing Webmaster API belgesi: toplu gönderim en çok 500 adres ve kotayı aşamaz; betik `min(günlük, aylık)` kadarını gönderir | aynı |
 | IndexNow | pratikte sınırsız (betikte istek başına 10 000 adres) | `indexnow-bildir.mjs` | — |
 
@@ -116,6 +116,16 @@ gelmese de GEO-SEO canlı haritayı tabanla karşılaştırıp yeni adresi kendi
 21 alt] + 6 marka + 47 aile; liste yeni şemadan 16 Ekim'de yeniden üretilir). Google tabanı günde 10 ise ilk 18 adres
 (5 sayfa + 7 üst + 6 marka) ilk iki güne, 21 alt kategori sonraki üç güne, 47 aile ardından beş güne düşer; Google
 tarafı yaklaşık 10 günde biter. Bing 100 ve IndexNow ile 89 adresin hepsi yayın günü gider.
+
+**Adres yeniden adlandırma sonrası (SEO-54, 2026-10-16).** Bir adres 308 ile yeni slug'a taşındığında Google yeni
+adresi kendiliğinden bilmez: Search Console URL denetimi yeni adres için "URL Google'da yok, URL Google tarafından
+bilinmiyor, son tarama yok" der; eski adres indeksli kalır ve arama sonucundaki başlık/metin **eski kayıttan** gelir
+(ölçüm: ürün sayfası metni düzeltilmiş ve canlıda doğru olduğu hâlde sonuç metni eski yazımı gösterdi). Bu yüzden her
+yeniden adlandırmada: (1) canlıda eski → yeni 308'ler ve yeni adresin 200 + kendi kanoniği doğrulanır; (2) IndexNow'a
+yeni **ve** eski adresler birlikte gider; (3) Bing URL Gönder'e yeni adresler gider; (4) Google dizin isteği yeni
+adreslere, gösterimi çok olandan başlayarak, günlük sınırla verilir ve kalanlar ertesi günün ilk işidir. Etkilenen
+adres kümesi, gösterimi olan sayfaların güncel yönlendirme durumundan (GSC sayfa listesi × canlı GET) çıkarılır;
+yalnız "yayın günü listesi"ne güvenilmez. Haritada olmayan yeni adres (TR) sahibine bildirilir.
 
 **Okuma** (aynı kayıt, her adres için): 3., 7. ve 14. gün. `gsc-url-denetim.mjs` (son tarama, dizin durumu),
 `bing-webmaster-oku.mjs --taban` (fark kipi, SEO-43), `sayfa-kalite.mjs` (+7). 14. günde gösterim, tık, sıra

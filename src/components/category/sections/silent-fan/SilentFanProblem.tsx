@@ -2,9 +2,17 @@ import { Activity, Info,VolumeX, Zap } from 'lucide-react'
 import React from 'react'
 
 import VentImage from '@/components/ui/VentImage'
+import type { SesOzeti } from '@/data/sessizFan/sesOzeti'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 import { doluMu } from '@/utils/bosDegerKorumasi'
+
+import { cumleleriDoldur, sesEtiketSozlugu, sesYerTutucular } from './sesMetni'
+
+interface SilentFanProblemProps {
+    /** URN-135: ses aralığı (sunucudan; canlı model kodları ∩ ses verisi). Yoksa ses sayısı taşıyan cümleler çizilmez. */
+    sesOzeti?: SesOzeti | null
+}
 
 interface PainPoint {
     title: string
@@ -14,11 +22,18 @@ interface PainPoint {
 /** Kart sayısına göre geniş ekran sütunu (Tailwind sınıfı TAM dize olmalı, birleştirilmez). */
 const KART_SUTUNLARI: Record<number, string> = { 1: 'lg:grid-cols-1', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3' }
 
-const SilentFanProblem: React.FC = () => {
-    const { t, dict } = useI18n()
+const SilentFanProblem: React.FC<SilentFanProblemProps> = ({ sesOzeti }) => {
+    const { t, dict, lang } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const tr = (key: string) => t(`categorySilentFan.problem.${key}`)
     const pDict = dict.categorySilentFan.problem
+
+    // URN-135 (Design D3): kategori sayfasının sessiz fan H2'si + giriş metni. Ses sayısı taşıyan cümle yalnız canlı
+    // kodların ses verisiyle kesişimi varsa çizilir (boş kesişimde cümle hiç çizilmez; bölümün kalanı durur).
+    const giris = cumleleriDoldur(
+        pDict.intro || [],
+        sesYerTutucular(sesOzeti, lang, sesEtiketSozlugu(dict.categorySilentFan.ses))
+    ).join(' ')
 
     const icons = [VolumeX, Zap, Activity, Info]
     const colors = [
@@ -45,9 +60,16 @@ const SilentFanProblem: React.FC = () => {
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                         {String(tr('title'))}
                     </h2>
-                    <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                        {String(tr('subtitle'))}
-                    </p>
+                    {doluMu(giris) && (
+                        <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4 text-left">
+                            {giris}
+                        </p>
+                    )}
+                    {doluMu(pDict.source) && (
+                        <p className="mt-3 text-xs text-steel-gray max-w-3xl mx-auto px-4 text-left">
+                            {dict.categorySilentFan.ses.kaynakEtiketi}: {pDict.source}
+                        </p>
+                    )}
                 </div>
 
                 {/* Problem Cards Grid */}
