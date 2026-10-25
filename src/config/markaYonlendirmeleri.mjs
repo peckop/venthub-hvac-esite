@@ -26,8 +26,9 @@
  * `control-systems` (metadata.slug.tr = `kontrol-sistemleri`, aktif).
  * 2026-10-10 (URN-85): üstün TR slug'ı Design CSV adına çekildi (`kontrol-ve-suruculer`,
  * supabase/migrations/20261010090000_kategori_tr_adlari_design_csv.sql).
- * 2026-10-26 (KTL-63, karar 409): dalın üstü `accessories` oldu (TR `elektrik-aksesuarlari`); `control-systems` pasif.
- * Hedef adres yalnız dalı kullanır (tek segment), bu yüzden marka adresi DEĞİŞMEZ; `kok` testin ölçtüğü üsttür.
+ * 2026-10-25 (KTL-63, karar 409): aynı satır "Elektrik Aksesuarları" oldu, TR slug `elektrik-aksesuarlari`
+ * (supabase/migrations/20261025220000_kontrol_urunleri_elektrik_aksesuarlari_karar409.sql); `kok.tr` aşağıda buna uyar.
+ * Hedef adres yalnız dalı kullanır (tek segment): marka adresi DEĞİŞMEZ.
  */
 
 /**
@@ -37,7 +38,7 @@
 export const KALDIRILAN_MARKALAR = Object.freeze({
   'frekans-konvertoru': {
     tur: 'kategori',
-    kok: { tr: 'elektrik-aksesuarlari', en: 'accessories' },
+    kok: { tr: 'elektrik-aksesuarlari', en: 'control-systems' },
     dal: { tr: 'frekans-konvertorleri', en: 'frequency-converters' },
   },
 })

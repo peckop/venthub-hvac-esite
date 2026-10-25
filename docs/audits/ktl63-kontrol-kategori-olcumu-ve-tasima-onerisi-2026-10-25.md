@@ -1,6 +1,6 @@
 # KTL-63 · Kontrol ürünleri kategori taşıması — canlı ölçüm ve taşıma önerisi
 
-Tarih: 2026-10-26 (canlı SELECT, bugün). Emir: OPS, Recep KARAR 409. Cetvel: `docs/standards/category-taxonomy-standard.md` §6.1 (eski satır "Frekans konvertörleri · `accessories`/`frequency-converters`" bu karara göre güncellenir), `docs/plans/slug-localization-2026-08-10.md`, `docs/standards/migration-safety-standard.md`. Durum: ÖLÇÜM TAMAM, PLAN ÖNERİ (yazım yok, migration yok).
+Tarih: 2026-10-25 (canlı SELECT, bugün). Emir: OPS, Recep KARAR 409. Cetvel: `docs/standards/category-taxonomy-standard.md` §6.1 (eski satır "Frekans konvertörleri · `accessories`/`frequency-converters`" bu karara göre güncellenir), `docs/plans/slug-localization-2026-08-10.md`, `docs/standards/migration-safety-standard.md`. Durum: ÖLÇÜM TAMAM (§1-§2, §6 döküm geçerli). **§3-§5 (A yöntemi: accessories ana kategori olur) ARTIK GEÇERSİZ:** Recep 25 Ekim: "Elektrik Aksesuarları yeni açılır; mevcut Aksesuarlar genel mekanik aksesuar grubu olarak durur" (Model B). Uygulanan yöntem §7'de. Yazım yok.
 
 ## 1. Karar 409'un hedefi
 
@@ -68,7 +68,7 @@ Etki: migration içerir → CLAUDE.md kural 13 (master'a birleşince prod'a otom
 2. EN slug değişsin mi? Öneri: hayır; `accessories` ve `spare-parts-sensors` EN slug'ları kalsın (10 Ekim emsali, EN yayın kapalı, fikstür/tohum değişikliği küçük); yalnız görünen ad ve TR slug değişir. Menü farklı bir EN slug istiyorsa DESIGN-MENU önerisi gelince karşılaştırılır.
 3. "Frekans Konvertörleri (İnvertör)" görünen adında parantez var; TR slug parantezsiz kalır (`frekans-konvertorleri`). Menü etiketi için ayrı kısa ad mı gerekir?
 
-## 5. OPS kararları (2026-10-26) ve uygulama
+## 5. OPS kararları (2026-10-25) ve uygulama
 
 - EN slug'lar değişmez, onay. Menü'nün EN önerisi gelince karşılaştırılacak, fark çıkarsa OPS'a yazılır.
 - Parantezli ad yalnız görünen adda; TR slug parantezsiz, onay.
@@ -101,3 +101,15 @@ Aileler (taşınanlar: ilk dört; kategori `control-systems` → `accessories`, 
 | `61a657c1-1e4e-48c9-838f-7a43c7492dd6` | `avens-bvu-ls-kursun-seperator` (taşınmaz) | spare-parts-sensors | 2 |
 
 Taşınan 37 ürün kimliği (aile kimliği ile süzülür): FC 51: `24e6c073-6a4b-4503-8976-4497179a3f79`, `c76aefa5-501a-4ced-b856-749a78f0b699`. AVenS Hız Anahtarları: `e3dc34e5-bc06-4d1f-b303-f554d7339a16`, `e8d96abe-7f3b-4453-84f8-a59623ac7cce`. FC 101 (16) ve FC 102 (17) ürün kimlikleri canlıda `product_families` → `products.family_id` ile okunur; migration kimlik listesi yerine aile kimliğiyle ve `category_id = control-systems` koşuluyla sayılır (guard 4: 37 ürün, aksi halde durur).
+
+## 7. UYGULANAN YÖNTEM: Model B (Recep 25 Ekim) ve B DÖKÜMÜ
+
+Migration `supabase/migrations/20261025220000_kontrol_urunleri_elektrik_aksesuarlari_karar409.sql`, geri alma `scripts/db/geri-alma/20261025220000_kontrol_urunleri_elektrik_aksesuarlari_karar409.geri-al.sql`, testler `src/lib/adres/__tests__/kontrol-urunleri-elektrik-aksesuarlari-karar409.test.ts` (K3-b harita + sözleşme) ve `src/lib/data/__tests__/eskiKategoriHedefiKarar409.test.ts` (canlı kip).
+
+Neden A bırakıldı (bağımsız okuma, 25 Ekim): canlıda adres şeması bayrağı (`ADRES_SEMASI_K3B`) kapalı; "pasif kök üstüne tırmanır" eşleyicisi yalnız açık kipte çalışır. Canlı kipte pasif kategori kendi slug'ıyla 200 ve noindex çizilir (ölçüm: `/tr/category/ticari-havalandirma`), yani eski kök adresi 308 yerine boş sayfaya düşerdi. Model B kategoriyi pasifleştirmez, yeniden adlandırır; yeniden adlanan adresler canlıda zaten doğru çalışan takma ad yolundan geçer (ölçüm: aksesuarlar ve yedek-parcalar-ve-sensorler emsali).
+
+Yapılanlar: `control-systems` → "Elektrik Aksesuarları" (TR `elektrik-aksesuarlari`, metne tek cümle: motor koruma sensörleri); `spare-parts-sensors` → "Sensörler ve Koruma" (TR `sensorler-ve-koruma`), üstü `control-systems`; `frequency-converters` görünen adı "(İnvertör)"; SEAT PTC ailesi (1 aile / 1 ürün) `category_id` → control-systems; BVU-LS ailesi (1 aile / 2 ürün) `subcategory_id` → boş (Aksesuarlar kökünde kalır); Aksesuarlar metninden alt kategori cümlesi çıkar; Menü 10-25 görünen adları (4 kategori, adres aynı). Taşınan: 2 aile / 3 ürün (A'da 4 aile / 37 ürün). Eski adres kaynakları (308): `kontrol-ve-suruculer`, `kontrol-sistemleri` (zaten takma adda) → `elektrik-aksesuarlari`; `yedek-parcalar-ve-sensorler`, `yedek-parca-ve-sensorler` → `sensorler-ve-koruma` (EN slug kararı gelince EN kaynaklar eklenir).
+
+B DÖKÜMÜ (yazımdan ÖNCE; §6 tablosuna ek): aileler SEAT PTC `55937a21-b3f4-4aea-b0c3-4a19f54d9006` (ürün `fd189d5e-a966-4d38-8bf6-4302e26afa70`, kategori accessories → control-systems), BVU-LS `61a657c1-1e4e-48c9-838f-7a43c7492dd6` (ürünler `d585cb3d-30a2-46f4-a7b7-4fb5c95d96ea`, `f347d28f-c219-440c-8164-696bdbc8befc`, alt kategori spare-parts-sensors → boş). Yeniden adlanan dört kategori, önceki adlar: heat-recovery-vmc "Isı Geri Kazanım (VMC)", ducted-central-hrv "Kanallı Merkezi Üniteler", single-room-hrv "Tekil Oda Üniteleri", water-coil-duct-heaters "Sulu Batarya Kanal Tipi" (menü etiketi adla aynı). Bu kategorilerin SEO başlığı ve açıklama metinleri eski adı hâlâ taşıyor ve bu migration'da DEĞİŞMEZ (Menü'ye "metinde eski adı geçen içerik" listesi olarak gidecek).
+
+Kod referansı taraması (bağımsız okuma): menü ve alt liste `is_active` süzer, boş kök riski yok; `getCategoryIcon` EN slug'a göre (değişmedi); `eski-adres-tohum.json` hedefleri EN slug (değişmedi). Yazımdan SONRA ölçülecek (canlı): `/tr/category/kontrol-ve-suruculer` ve `/tr/category/yedek-parcalar-ve-sensorler` tek 308, yeni sayfaların başlığı/adı (TR+EN), menüde Elektrik Aksesuarları ve Aksesuarlar kökleri, site haritası.

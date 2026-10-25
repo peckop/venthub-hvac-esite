@@ -84,15 +84,15 @@ export const tr = {
       residential: 'Konut Tipi Havalandırma',
       commercial: 'Ticari Havalandırma',
       industrial: 'Endüstriyel Havalandırma',
-      hrv: 'Isı Geri Kazanım Üniteleri (VMC)',
+      // Menü 10-25 (Recep 10-25): grup adı kısa, uzun ad alt türde; DB `name`/`menu_label` ile aynı dize (KTL-63 migration'ı).
+      hrv: 'Isı Geri Kazanım',
       'air-treatment': 'Hava Şartlandırma',
       hygiene: 'Hijyen ve Sanitasyon',
       summer: 'Yaz Havalandırması (Vantilatörler)',
       ac: 'İklimlendirme (Klima)',
       heating: 'Elektrikli Isıtma',
       hvls: 'Endüstriyel Tavan Vantilatörleri',
-      // Karar 409 (Recep, KTL-63): ad `categories.name`/`menu_label` ile aynı dize; EN slug (`accessories`) ve anahtar değişmez.
-      accessories: 'Elektrik Aksesuarları',
+      accessories: 'Aksesuarlar',
       'smart-home': 'Kontrol Sistemleri',
       'parking-jet': 'Otopark Jet Fanları',
       // REC-104/REC-103 (2026-09-01): DB'deki 23 aktif kategorinin 8'inin
@@ -102,7 +102,8 @@ export const tr = {
       // "Air Curtains"/"Accessories" İngilizce). TR değerleri uydurma DEĞİL — DB'deki
       // mevcut `menu_label`'ların birebir kendisi, yani görünen TR ad değişmiyor.
       fans: 'Fanlar',
-      'control-systems': 'Kontrol Sistemleri',
+      // Karar 409 (Recep, KTL-63): `control-systems` satırı "Elektrik Aksesuarları" oldu (anahtar ve EN slug aynı kalır).
+      'control-systems': 'Elektrik Aksesuarları',
       sub: {
         bathroom: 'Banyo ve Tuvalet Fanları',
         window: 'Cam ve Pencere Tipi Fanlar',
@@ -128,10 +129,10 @@ export const tr = {
         // ⭐`water-coils` ile `duct-heaters` AYRI: biri sulu batarya, diğeri elektrikli.
         chimney: 'Şömine ve Baca Fanları',
         'duct-fans': 'Kanal Tipi Fanlar',
-        'ducted-central-hrv': 'Kanallı Merkezi Üniteler',
-        'single-room-hrv': 'Tekil Oda Üniteleri',
+        'ducted-central-hrv': 'Kanallı Isı Geri Kazanım Cihazları',
+        'single-room-hrv': 'Oda Tipi Isı Geri Kazanım Cihazları',
         'speed-controllers': 'Hız Anahtarları',
-        'water-coils': 'Sulu Batarya Kanal Tipi',
+        'water-coils': 'Sulu Bataryalı Kanal Isıtıcıları',
         // REC-300 Faz 1-B (K17 ağacı, karar 78b + 84): anahtarı veritabanı migration'ı bağlar.
         // Korozyon dalı YENİ anahtara geçer (`acid-fans` değişmez) → ad ile adres aynı anda döner.
         // Karar 287 (Recep, OPS-74): ad `categories.name`/`menu_label` ve TR adresiyle (`korozyona-ve-aside-dayanimli-fanlar`) aynı.

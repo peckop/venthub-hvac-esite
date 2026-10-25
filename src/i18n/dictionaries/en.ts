@@ -79,14 +79,14 @@ export const en: typeof tr = {
       ac: 'Air Conditioning',
       heating: 'Electric Heating',
       hvls: 'Industrial Ceiling Fans',
-      // Decision 409 (KTL-63): see tr.ts; the English slug (`accessories`) and the key do not change.
-      accessories: 'Electrical Accessories',
+      accessories: 'Accessories and Components',
       'smart-home': 'Control Systems',
       'parking-jet': 'Car Park Jet Fans',
       // REC-103: see tr.ts — 8 of the 23 active DB categories had no key here at all,
       // so /en pages silently fell back to the Turkish `menu_label`.
       fans: 'Fans',
-      'control-systems': 'Control Systems',
+      // Decision 409 (KTL-63): the `control-systems` row became "Electrical Accessories" (key and English slug unchanged).
+      'control-systems': 'Electrical Accessories',
       sub: {
         bathroom: 'Bathroom and Toilet Fans',
         window: 'Window and Wall Fans',

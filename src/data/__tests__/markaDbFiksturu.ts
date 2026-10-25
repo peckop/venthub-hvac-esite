@@ -47,12 +47,12 @@ export const DB_KATEGORILERI: Readonly<
   /** `aktifUrun: null` = ölçülmedi (üst kategori yalnız adresin kök parçası olarak kullanılır). */
   Record<string, { slug: { tr: string; en: string }; aktif: boolean; aktifUrun: number | null; ust: string | null }>
 > = {
-  // KTL-63 (karar 409, 2026-10-26): dalın üstü artık `accessories` (TR `elektrik-aksesuarlari`); `control-systems` pasif.
-  accessories: { slug: { tr: 'elektrik-aksesuarlari', en: 'accessories' }, aktif: true, aktifUrun: null, ust: null },
+  // KTL-63 (karar 409, 2026-10-25): üstün TR slug'ı `elektrik-aksesuarlari` (görünen ad "Elektrik Aksesuarları").
+  'control-systems': { slug: { tr: 'elektrik-aksesuarlari', en: 'control-systems' }, aktif: true, aktifUrun: null, ust: null },
   'frequency-converters': {
     slug: { tr: 'frekans-konvertorleri', en: 'frequency-converters' },
     aktif: true,
     aktifUrun: 35,
-    ust: 'accessories',
+    ust: 'control-systems',
   },
 }
