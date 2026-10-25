@@ -69,7 +69,7 @@ jobs:
       count: ${{ steps.pick.outputs.count }}
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Değişen dosyaları hesaplayabilmek için önceki commit'e erişim şart.
           fetch-depth: 0
@@ -144,7 +144,7 @@ jobs:
       SLUGS: ${{ needs.select.outputs.slugs }}
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Surum PINLI: `@v1` yalnizca action'i sabitler, KURULAN CLI'yi degil — runner
       # bugune kadar 2.20.3 kuruyordu. drift-check.mjs `functions download --use-api`
@@ -216,7 +216,7 @@ jobs:
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
