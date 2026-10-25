@@ -1,35 +1,122 @@
 {
-  "_not": "REC-145 / KTL-59: baskısı 'kontrol-edilmedi' olan 29 yayınlanabilir dosyanın üretici sitesiyle kıyası (25 Ekim 2026). Anahtar: dosya adı. hukum: GUNCEL (üreticideki dosya/baskı kodu ile aynı, kanıtlı) | GUNCEL-ZAYIF (yalnız arama özeti) | AYNI-DOSYA (bayt eşit, baskı kodu yok) | ESKI (yenisi yazılı) | OLCULEMEDI (merdiven tamamlanmadı; BULUNAMADI hükmü değildir). Kanıt cümlesi ajan raporlarından özetlenmiştir; ajanlar salt okuma yaptı, PDF indirmedi.",
+  "_not": "REC-145 / KTL-59: baskısı 'kontrol-edilmedi' olan 29 yayınlanabilir dosyanın üretici sitesiyle kıyası (25 Ekim 2026). Anahtar: dosya adı. hukum: GUNCEL (üreticideki dosya/baskı kodu ile aynı, kanıtlı) | GUNCEL-ZAYIF (yalnız arama özeti) | AYNI-DOSYA (bayt eşit, baskı kodu yok) | ESKI (yenisi yazılı) | OLCULEMEDI (merdiven tamamlanmadı; BULUNAMADI hükmü değildir). Kanıt cümlesi ajan raporlarından özetlenmiştir; ajanlar salt okuma yaptı, PDF indirmedi. KTL-60 (25 Ekim 2026): 15 OLCULEMEDI dosyadan 11'i claude-in-chrome ile üretici sitelerinden ölçüldü; hüküm sözlüğüne ESKI-GORUNUYOR (üreticide aynı kodla daha yeni tarihli/farklı boyutlu kayıt var, üretici PDF'i açılmadı) ve FARKLI-DOSYA (üreticide farklı boyutlu dosya, güncellik hükmü yok) eklendi. Boyut karşılaştırmasında MB = MiB (Nicotra için 5 dosyada ölçülmüş), indirme yapılmadı.",
   "tarih": "2026-10-25",
   "kayitlar": {
-    "seat-brochure-2024-11.pdf": { "hukum": "GUNCEL", "kanit": "seat-ventilation.com/pages/download-catalogs EN broşürü bayt ve sha256 eşit; 2025 sürümü bulunamadı" },
-    "seat-15-fiche-technique-en-03-2024.pdf": { "hukum": "GUNCEL", "kanit": "products/seat-15 CDN dosyası sha256 eşit" },
-    "seat-20-fiche-technique-gb-03-2024.pdf": { "hukum": "GUNCEL", "kanit": "products/seat-20 CDN dosyası sha256 eşit" },
-    "seat-25-fiche-technique-gb-03-2024.pdf": { "hukum": "GUNCEL", "kanit": "products/seat-25 CDN dosyası sha256 eşit" },
-    "seat-30-fiche-technique-gb-03-2024.pdf": { "hukum": "GUNCEL", "kanit": "seat-30-series sayfasındaki bağlantı CDN dosyası sha256 eşit" },
-    "seat-35-fiche-technique-gb-03-2024.pdf": { "hukum": "GUNCEL", "kanit": "products/seat-35 CDN dosyası sha256 eşit" },
-    "seat-50-fiche-technique-gb-03-2024.pdf": { "hukum": "GUNCEL", "kanit": "products/seat-50 CDN dosyası sha256 eşit" },
-    "FXQejq7tfTOtLQypNJrYMGjORsBaF6yz0G208fqW.pdf": { "hukum": "OLCULEMEDI", "kanit": "kimliği ve kaynağı belirsiz; documentation sayfasındaki 26 PDF'te adı/boyutu eşleşen yok; .fr indirme sayfası 429" },
-    "FC102_1.1-90kW_DesignGuide_AJ299549559248en-002001.pdf": { "hukum": "GUNCEL", "kanit": "assets.danfoss.com AJ299549559248en-002001, 130R0084, 2025.07; web kopyasının son sayfası okundu" },
-    "AJ275648114271en-001201.pdf": { "hukum": "GUNCEL", "kanit": "assets.danfoss.com AJ275648114271en-001201, 130R0222, 2025.07; son sayfa okundu" },
-    "AJ361178983102en-000401.pdf": { "hukum": "GUNCEL", "kanit": "files.danfoss.com MG02K402 yönlendirmesi AJ361178983102en-000401; MG02K402 01/2016, 132R0059" },
-    "AD449962666883en-010201.pdf": { "hukum": "GUNCEL", "kanit": "assets.danfoss.com AD449962666883en-010201; basım kodu -000201 © 2023.12 (dosya adı ile basım kodu farklı)" },
-    "AQ276736419659en-000101.pdf": { "hukum": "GUNCEL-ZAYIF", "kanit": "assets.danfoss.com AQ276736419659en-000101, 132R0029, 2021.05 aynı kod ve baskı, son sayfa okundu; ama bağımsız doğrulayıcı aramada daha yeni AQ383124996793en-000101 Operating Guide gördü (A3 çerçeve kılavuzu olabilir, yerine geçtiği doğrulanmadı)" },
-    "AJ361178969194en-000301.pdf": { "hukum": "GUNCEL-ZAYIF", "kanit": "assets.danfoss.com/documents/273431 arama özeti 15 Ocak 2018; web PDF'i 10 MB sınırına takıldı, son sayfa okunamadı" },
-    "AD397545239678en-000101.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde kod yok (2017.04); ürün sayfasında 'Selection Guide 19 Kasım 2021' kodla eşleşmedi; danfoss.com ürün sayfaları 403" },
-    "AM447245614445en-000101.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde kod yok (2014.09); ürün sayfasında 'Fact sheet 31 Mart 2023' kodla eşleşmedi" },
-    "FC51-DataSheet.pdf": { "hukum": "OLCULEMEDI", "kanit": "afi-systems aynası, USDD.PFP.500.A2.22 2019.11; Danfoss'ta aynı kodlu dosya açılmadı, fact sheet 31 Mart 2023 var" },
-    "77854-ns-nx-casals-en.pdf": { "hukum": "AYNI-DOSYA", "kanit": "casals.com/assets/uploads/cat_pdf/77854-ns-nx-casals-en.pdf bayt ve sha256 eşit (860e368d…); belgede ve sayfada baskı kodu yok, güncellik kıyası yapılamadı" },
-    "82f7f-cata-logo-plug-fans_casals.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde CV092024; casals.com PDF ECONNREFUSED iki denemede; belge sayfasında kod yok" },
-    "493-series-dd.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde Issue 1.3 Kasım 2012; seri sayfası tarayıcıda 404; boyut eşleşmesi (5.02 MB) kanıt değil" },
-    "Katalog-DDMB-DDM-DD-eng.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde Issue 1, tarih yok; 181 sayfalık üretici dosyası bulunamadı, altı basamak tam değil" },
-    "480-series-at.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde Issue 2.5 EN Ağustos 2013; ürün sayfasında PDF bağlantısı yok" },
-    "MCC_NIG_ADH-AT-RDE-RZR_Catalog_EN.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde Issue 2.5 EN Ağustos 2013; RZR ürün sayfasında PDF bağlantısı yok" },
-    "481-series-rdh.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde Issue 2.5 EN Ağustos 2013; seri sayfası açılamadı; boyut eşleşmesi kanıt değil" },
-    "479-series-adh.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde Issue 2.5 EN Ağustos 2013; seri sayfası 404; boyut eşleşmesi kanıt değil" },
-    "heat-master-slimroof-cati-fanlari-yeni.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde baskı kodu yok ('November 2024'); vortice.com, vortice.it ve casals.com katalog listelerinde Heatmaster/Slimroof yok; flipbook ve Chrome basamakları denenmedi" },
-    "Why-Ventilate-Brochure.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde kod yok; vortice.com'da Doc_Pubblicita_Why_Ventilate_172062.pdf var, metni okunamadı" },
-    "Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde 5.170.084.467 Mayıs 2018; güncel listede yalnız Deumido EVO (26025-27) var, NG kodları 26020-22 listelerde yok; NG'nin 141613 ve 143903 baskıları okunamadı" },
-    "Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf": { "hukum": "OLCULEMEDI", "kanit": "bizde 5.170.084.678, 01/15; Residential Ventilation 2024 (186926) kataloğunda Punto Evo Flexo var (s.24, açılıp doğrulanmadı)" }
+    "seat-brochure-2024-11.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "seat-ventilation.com/pages/download-catalogs EN broşürü bayt ve sha256 eşit; 2025 sürümü bulunamadı"
+    },
+    "seat-15-fiche-technique-en-03-2024.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "products/seat-15 CDN dosyası sha256 eşit"
+    },
+    "seat-20-fiche-technique-gb-03-2024.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "products/seat-20 CDN dosyası sha256 eşit"
+    },
+    "seat-25-fiche-technique-gb-03-2024.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "products/seat-25 CDN dosyası sha256 eşit"
+    },
+    "seat-30-fiche-technique-gb-03-2024.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "seat-30-series sayfasındaki bağlantı CDN dosyası sha256 eşit"
+    },
+    "seat-35-fiche-technique-gb-03-2024.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "products/seat-35 CDN dosyası sha256 eşit"
+    },
+    "seat-50-fiche-technique-gb-03-2024.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "products/seat-50 CDN dosyası sha256 eşit"
+    },
+    "FXQejq7tfTOtLQypNJrYMGjORsBaF6yz0G208fqW.pdf": {
+      "hukum": "OLCULEMEDI",
+      "kanit": "kimliği ve kaynağı belirsiz; documentation sayfasındaki 26 PDF'te adı/boyutu eşleşen yok; .fr indirme sayfası 429 | Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): bu turda yeniden denenmedi (SEAT özellik föyü, kimliği belirsiz)"
+    },
+    "FC102_1.1-90kW_DesignGuide_AJ299549559248en-002001.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "assets.danfoss.com AJ299549559248en-002001, 130R0084, 2025.07; web kopyasının son sayfası okundu"
+    },
+    "AJ275648114271en-001201.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "assets.danfoss.com AJ275648114271en-001201, 130R0222, 2025.07; son sayfa okundu"
+    },
+    "AJ361178983102en-000401.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "files.danfoss.com MG02K402 yönlendirmesi AJ361178983102en-000401; MG02K402 01/2016, 132R0059"
+    },
+    "AD449962666883en-010201.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "assets.danfoss.com AD449962666883en-010201; basım kodu -000201 © 2023.12 (dosya adı ile basım kodu farklı)"
+    },
+    "AQ276736419659en-000101.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "assets.danfoss.com AQ276736419659en-000101, 132R0029, 2021.05 aynı kod ve baskı, son sayfa okundu; ama bağımsız doğrulayıcı aramada daha yeni AQ383124996793en-000101 Operating Guide gördü (A3 çerçeve kılavuzu olabilir, yerine geçtiği doğrulanmadı)"
+    },
+    "AJ361178969194en-000301.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "assets.danfoss.com/documents/273431 arama özeti 15 Ocak 2018; web PDF'i 10 MB sınırına takıldı, son sayfa okunamadı"
+    },
+    "AD397545239678en-000101.pdf": {
+      "hukum": "ESKI-GORUNUYOR",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): danfoss.com belge araması aynı kodla \"VLT Micro Drive FC 51 Selection Guide\" gösteriyor: 19 Kasım 2021, 8,03 MB; yerel 8929586 B (8,52 MiB), baskı 2017.04. Boyut ve tarih farklı; üretici PDF'i açılmadı"
+    },
+    "AM447245614445en-000101.pdf": {
+      "hukum": "ESKI-GORUNUYOR",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): danfoss.com belge araması aynı kodla \"VLT Micro Drive\" Fact sheet gösteriyor: 31 Mart 2023, 869,66 KB; yerel 378052 B, baskı 2014.09. Boyut ve tarih farklı; üretici PDF'i açılmadı"
+    },
+    "FC51-DataSheet.pdf": {
+      "hukum": "OLCULEMEDI",
+      "kanit": "afi-systems aynası, USDD.PFP.500.A2.22 2019.11; Danfoss'ta aynı kodlu dosya açılmadı, fact sheet 31 Mart 2023 var | Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): danfoss.com belge aramasında USDD.PFP.500.A2.22 için sonuç yok; FC 51 listesinde datasheet yok (fact sheet 2023 ve operating guide 2021 var). Hüküm verilmedi"
+    },
+    "77854-ns-nx-casals-en.pdf": {
+      "hukum": "AYNI-DOSYA",
+      "kanit": "casals.com/assets/uploads/cat_pdf/77854-ns-nx-casals-en.pdf bayt ve sha256 eşit (860e368d…); belgede ve sayfada baskı kodu yok, güncellik kıyası yapılamadı"
+    },
+    "82f7f-cata-logo-plug-fans_casals.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): casals.com Plug fans catalogue sayfasındaki PDF bağlantısı; HEAD content-length 2644826 = yerel bayt sayısı, last-modified 27 Eylül 2024 (yerel kod CV092024 ile uyumlu; sha256 hesaplanmadı)"
+    },
+    "493-series-dd.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Nicotra Gebhardt Download Center \"Centrifugal Fans - direct driven with scroll\" EN PDF 5,02 MB (MiB); yerel 5265708 B = 5,02 MiB. Boyut eşleşmesi, baskı kodu ve sha256 yok"
+    },
+    "Katalog-DDMB-DDM-DD-eng.pdf": {
+      "hukum": "FARKLI-DOSYA",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Download Center \"DD DDM DMB Catalog ENG\" EN PDF 18,04 MB (MiB); yerel 17486675 B = 16,68 MiB. Üreticideki dosya farklı boyutta (yeni sürüm olabilir); baskı kodu yok, güncellik hükmü verilmedi"
+    },
+    "480-series-at.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Download Center \"AT Fan - Catalog English\" EN PDF 8,58 MB (MiB); yerel 8992145 B = 8,58 MiB. Boyut eşleşmesi, sha256 yok"
+    },
+    "MCC_NIG_ADH-AT-RDE-RZR_Catalog_EN.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Download Center \"ADH, AT, RDE, RZR Fan Catalog ENG\" EN PDF 9,24 MB (MiB); yerel 9692069 B = 9,24 MiB. Boyut eşleşmesi, sha256 yok"
+    },
+    "481-series-rdh.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Download Center \"RDH Fan Catalog\" EN PDF 7,88 MB (MiB); yerel 8259637 B = 7,88 MiB. Boyut eşleşmesi, sha256 yok"
+    },
+    "479-series-adh.pdf": {
+      "hukum": "GUNCEL-ZAYIF",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Download Center \"ADH Fan Catalog English\" EN PDF 8,22 MB (MiB); yerel 8616605 B = 8,22 MiB. Boyut eşleşmesi, sha256 yok"
+    },
+    "heat-master-slimroof-cati-fanlari-yeni.pdf": {
+      "hukum": "OLCULEMEDI",
+      "kanit": "bizde baskı kodu yok ('November 2024'); vortice.com, vortice.it ve casals.com katalog listelerinde Heatmaster/Slimroof yok; flipbook ve Chrome basamakları denenmedi | Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com katalog listesinde ve vorticeindustrial.com ana sayfasında Heatmaster/Slimroof yok; ürün sayfası taranmadı. \"Bulunamadı\" hükmü verilmedi"
+    },
+    "Why-Ventilate-Brochure.pdf": {
+      "hukum": "GUNCEL",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com/en/catalogues güncel listesinde Doc_Pubblicita_Why_Ventilate_172062.pdf; HEAD content-length 582244 = yerel bayt sayısı, last-modified 15 Ocak 2024 (sha256 hesaplanmadı)"
+    },
+    "Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf": {
+      "hukum": "ESKI-GORUNUYOR",
+      "kanit": "Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): vortice.com güncel katalog listesinde yalnız Deumido_Evo_Range (Doc_Pubblicita_Deumido_Evo_Range_177678.pdf, 10283042 B, 15 Ocak 2024); NG serisi listede yok. Yerel 11614673 B, baskı 5.170.084.467 Mayıs 2018"
+    },
+    "Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf": {
+      "hukum": "OLCULEMEDI",
+      "kanit": "bizde 5.170.084.678, 01/15; Residential Ventilation 2024 (186926) kataloğunda Punto Evo Flexo var (s.24, açılıp doğrulanmadı) | Chrome turu 25 Ekim 2026 (KTL-60, indirme yok, HEAD/sayfa okuma): Residential_Ventilation2024 (186926, 11146401 B, 30 Eylül 2024) güncel listede; Punto Evo Flexo'nun içinde olduğu sayfa açılıp doğrulanmadı. Hüküm verilmedi"
+    }
   }
 }

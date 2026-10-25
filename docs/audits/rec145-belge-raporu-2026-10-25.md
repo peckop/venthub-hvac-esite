@@ -98,6 +98,19 @@ Design'ın "PDF'i olmayan" dediği 16 aileden 5'inin güncel PDF'i klasörde var
 | AYNI-DOSYA | 1 | Casals NIMUS/NIMAX broşürü (bayt eşit, ama baskı kodu yok) |
 | ÖLÇÜLEMEDİ | 15 | Danfoss 3 (FC51 seçim kılavuzu, fact sheet, datasheet), Casals plug fan kataloğu, Nicotra 6, SEAT özellik föyü, Vortice 4. Merdivenin 3. (flipbook) ve 6. (Chrome) basamakları bu turda denenmedi; "bulunamadı" hükmü verilmedi |
 
+**KTL-60 (Chrome turu, aynı gün).** 15 ölçülemeyen dosya claude-in-chrome ile üretici sitelerinde tarandı (indirme yok; sayfa metni ve HEAD isteği). 11 dosyada hüküm çıktı, 4'ü hâlâ ölçülemedi. Güncel dağılım (29 dosya):
+
+| Hüküm | Dosya | Hangileri |
+|---|---|---|
+| GÜNCEL | 13 | önceki 11 + Vortice Why Ventilate (üreticide güncel listede, bayt sayısı eşit) + Casals plug fan kataloğu (bayt sayısı eşit, üretici dosyası Eylül 2024 = yerel CV092024) |
+| GÜNCEL-ZAYIF | 7 | önceki 2 + Nicotra Gebhardt 5 katalog (493 DD, 480 AT, 481 RDH, 479 ADH, ADH-AT-RDE-RZR): Download Center'daki dosya boyutu iki ondalıkta eşit (MiB), sha256 ve baskı kodu yok |
+| AYNI-DOSYA | 1 | Casals NIMUS/NIMAX broşürü |
+| ESKİ-GÖRÜNÜYOR | 3 | Danfoss seçim kılavuzu (AD397545239678, üreticide aynı kodla 19 Kasım 2021 kaydı) ve fact sheet (AM447245614445, üreticide 31 Mart 2023 kaydı); Vortice Deumido NG kataloğu (üreticide yalnız Deumido EVO 177678 var). Üretici PDF'i açılmadı, hüküm tarih ve boyut farkına dayanır |
+| FARKLI-DOSYA | 1 | Nicotra DD/DDM/DMB kataloğu: üreticide 18,04 MiB, bizde 16,68 MiB; yeni sürüm olabilir, güncellik hükmü verilmedi |
+| ÖLÇÜLEMEDİ | 4 | SEAT özellik föyü (bu turda yeniden denenmedi), Danfoss FC51 datasheet (kod aramada yok), Vortice Heatmaster/Slimroof (iki üretici sitesinde görünmedi, ürün sayfası taranmadı), Vortice Punto Evo Flexo (2024 kataloğunda sayfa doğrulanmadı) |
+
+Yayın önerisi sütunu DEĞİŞMEDİ: bu turda hiçbir dosyanın evet/hayır hükmü kaydırılmadı. Dikkat: ESKİ-GÖRÜNÜYOR üç dosyadan ikisi (Danfoss FC51 seçim kılavuzu, Vortice Deumido NG kataloğu) ve FARKLI-DOSYA Nicotra DD/DDM/DMB kataloğu listede hâlâ `evet`. Yayın kararı (yeni baskıyı bulup değiştirmek, `dogrulanacak`a almak ya da bu haliyle tutmak) OPS'tadır; sayılar (56 PDF, 34/47 aile, 383/442 ürün) bu yüzden değiştirilmedi.
+
 Ek bulgular: Casals AF 2024 kesiti (yayınlanmayan) ESKİ: bizde CV092024, üreticinin flipbook'unda CV032025. Deumido NG güncel Vortice listelerinde yok, yalnız Deumido EVO (26025-27) var. Danfoss FC51 ürün sayfası "son sipariş 30 Haziran 2026, son teslim 30 Eylül 2026" diyor (ürün yaşam döngüsü, belge baskısından bağımsız). Bir web PDF'inde ajana yönelik talimat metni vardı, veri olarak okundu.
 
 **Bağımsız doğrulama (katalog-dogrulayici, ilk sürüm üzerinde).** sha256 96/96 diskten yeniden hesaplandı, tuttu. 62 "evet" aile satırı ürün adı ve sayfa taramasıyla sınandı. Yanlış dışlama yok; dört "canlı modeli katalogda yok" hükmü katalog metninde yeniden ölçüldü, tuttu. Düzeltilenler:
