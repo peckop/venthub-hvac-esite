@@ -650,13 +650,13 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
   },
   {
     // BLOG (BLG-18), doğrulanmış metin sha 4ced15b8860d; B8'de yalnız sessiz fan rehberine tek gezinme cümlesi eklendi
-    // (iddia içermez) ve CA MD canlı ürün sayfası cümlesi ve H2 konu terimi (R11), kayıtlı metin sha 402fb77960ca, gövde sha 549f91804b16 (2026-10-26). Beş bağımsız doğrulama turu
+    // (iddia içermez) ve CA MD canlı ürün sayfası cümlesi ve H2 konu terimi (R11), kayıtlı metin sha 402fb77960ca, gövde sha 549f91804b16 (2026-10-25). Beş bağımsız doğrulama turu
     // (hedef üçtü, karşılanmadı); her turda tuzaklı kopya yakalandı. Mevzuat ve sessizlik/dB iddiası yok (R2.6 gerekmez).
-    // Yayın: Recep onayı (OPS penceresi, 2026-10-26). Fiyat yok: kategori fiyat göstermiyor, yazı teklife yönlendirir.
+    // Yayın: Recep yayın onayı (25 Ekim, OPS penceresi). Fiyat yok: kategori fiyat göstermiyor, yazı teklife yönlendirir.
     kimlik: 'kanal-tipi-fan-nedir',
     konu: 'konfor',
-    yayinTarihi: '2026-10-26',
-    guncellemeTarihi: '2026-10-26',
+    yayinTarihi: '2026-10-25',
+    guncellemeTarihi: '2026-10-25',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari',

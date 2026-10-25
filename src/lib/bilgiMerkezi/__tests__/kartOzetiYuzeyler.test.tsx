@@ -49,11 +49,12 @@ describe('ana sayfa Bilgi bloğu — kart özetini basar', () => {
     expect(GERCEK.length).toBeGreaterThan(0)
     const { container } = render(anaBlok())
     const metinler = kartMetinleri(container, 'section[aria-labelledby="son-rehberler"]')
-    // Ana sayfa blok en yeni `enYeniRehberler` adedi kadar rehber basar (varsayılan 3); dördüncü yazıyla (BLG-18)
-    // en eski yazı bloktan çıkar, bu yüzden beklenen küme yalnız bloğun gösterdiği en yeni yazılardır.
-    const blokta = new Set(enYeniRehberler('tr').map((r) => r.kartOzeti))
-    expect(blokta.size).toBeGreaterThan(0)
-    for (const { y, m } of GERCEK.filter((g) => blokta.has(g.m.kartOzeti))) {
+    // Ana sayfa blok en yeni 3 rehberi basar; dördüncü yazıyla (BLG-18) en eski yazı bloktan çıkar. Beklenen küme
+    // `enYeniRehberler`den DEĞİL, yazıların yayın tarihinden bağımsız hesaplanır (döngüsel beklenti olmasın).
+    const sirali = [...GERCEK].sort((a, b) => b.y.yayinTarihi.localeCompare(a.y.yayinTarihi) || a.y.kimlik.localeCompare(b.y.kimlik))
+    const adet = Math.min(3, GERCEK.length)
+    for (const { y, m } of sirali.slice(adet)) expect(metinler, `${y.kimlik}: bloktan çıkmış olmalı`).not.toContain(m.kartOzeti)
+    for (const { y, m } of sirali.slice(0, adet)) {
       expect(metinler, `${y.kimlik}: kart özeti blokta yok`).toContain(m.kartOzeti)
       expect(metinler, `${y.kimlik}: meta açıklaması blokta basılmış`).not.toContain(m.ozet)
     }

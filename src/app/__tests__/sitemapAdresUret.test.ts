@@ -94,7 +94,7 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
     // BLG-3 (2026-10-11): ikinci rehber yazısı yayına girdi → +1 satır (kapalı 22 → 23, açık 42 → 43; EN_YAYIN açıkken
     // Bilgi Merkezi yazıları yalnız TR'de yazıldığı için tek satır).
     // BLG-15 (2026-10-17): üçüncü rehber yazısı (sessiz-fan-nasil-secilir) → +1 satır (kapalı 23 → 24, açık 43 → 44).
-    // BLG-18 (2026-10-26): dördüncü rehber yazısı (kanal-tipi-fan-nedir-nerede-kullanilir) → +1 satır (kapalı 24 → 25, açık 44 → 45).
+    // BLG-18 (2026-10-25): dördüncü rehber yazısı (kanal-tipi-fan-nedir-nerede-kullanilir) → +1 satır (kapalı 24 → 25, açık 44 → 45).
     it('EN_YAYIN kapalı: 25 satır, altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(false, false)
       expect(satirlar).toHaveLength(25)

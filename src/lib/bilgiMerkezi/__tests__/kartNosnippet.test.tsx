@@ -9,7 +9,7 @@ import BilgiMerkeziListe from '../../../views/knowledge/BilgiMerkeziListe'
 import IlgiliRehberler from '../../../views/knowledge/IlgiliRehberler'
 import RehberYazisiSayfasi from '../../../views/knowledge/RehberYazisiSayfasi'
 import { yaziSayfasiHazirla } from '../sayfa'
-import { enYeniRehberler, ilgiliRehberler } from '../tersDizin'
+import { ilgiliRehberler } from '../tersDizin'
 import { ORNEK_YAZI } from './ornekYazi'
 import { sahteKaynak } from './sahteKaynak'
 
@@ -90,11 +90,15 @@ describe('kart özeti data-nosnippet içinde basılır — her yüzey', () => {
 
   it('⭐ana sayfa Bilgi bloğu', () => {
     const { container } = render(<KnowledgeBlock dictionary={tr.home.knowledge} finalCtaDict={tr.home.finalCta} lang="tr" />)
-    // Blok yalnız en yeni rehberleri basar (varsayılan 3); dördüncü yazıyla en eski çıkar (BLG-18).
-    const blokOzetleri = enYeniRehberler('tr').map((r) => r.kartOzeti)
-    expect(blokOzetleri.length).toBeGreaterThan(0)
-    for (const o of blokOzetleri) expect(container.textContent).toContain(o)
-    expect(nosnippetDisindakiOzetler(container, OZETLER)).toEqual([])
+    // Blok yalnız en yeni 3 rehberi basar; dördüncü yazıyla en eski çıkar (BLG-18). Beklenen küme `enYeniRehberler`den
+    // DEĞİL, yazıların kendi yayın tarihinden bağımsız hesaplanır (döngüsel beklenti olmasın).
+    const siralı = [...TR_METINLER].sort((a, b) => b.y.yayinTarihi.localeCompare(a.y.yayinTarihi) || a.y.kimlik.localeCompare(b.y.kimlik))
+    const beklenen = siralı.slice(0, Math.min(3, TR_METINLER.length)).map((x) => x.m.kartOzeti)
+    const disarida = siralı.slice(Math.min(3, TR_METINLER.length)).map((x) => x.m.kartOzeti)
+    expect(beklenen.length).toBeGreaterThan(0)
+    for (const o of beklenen) expect(container.textContent).toContain(o)
+    for (const o of disarida) expect(container.textContent).not.toContain(o)
+    expect(nosnippetDisindakiOzetler(container, beklenen)).toEqual([])
     expect(container.querySelectorAll('a[data-nosnippet]').length).toBe(0)
   })
 
@@ -106,6 +110,10 @@ describe('kart özeti data-nosnippet içinde basılır — her yüzey', () => {
       'vh:kategori/axial-industrial-fans',
       'vh:aile/danfoss-vlt-micro-drive-fc-51',
       'vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari',
+      // BLG-18: kanal tipi fan rehberinin üç aile kartı (urunler).
+      'vh:aile/vortice-lineo-kanal-fanlari',
+      'vh:aile/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari',
+      'vh:aile/vortice-radon-serisi-kanal-fanlari',
     ] as const) {
       const rehberler = ilgiliRehberler(hedef, 'tr', 3, YAZILAR, false)
       expect(rehberler.length, hedef).toBeGreaterThan(0)
