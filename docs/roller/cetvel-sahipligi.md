@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.
 > **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.
 
-Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 11 · SATIS 5 · TASARIM 1 · URUN 16
+Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 11 · SATIS 5 · TASARIM 1 · URUN 17
 
 | Cetvel | Sahip | Durum | Dayanak |
 |---|---|---|---|
@@ -74,6 +74,7 @@ Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · 
 | customer-account-standard.md | URUN | teyitli | OPS sahipsiz alan kuralı: müşteri yüzü (müşteri hesabı) |
 | email-template-standard.md | URUN | teyitli | alt ajan sınıflandırması (orta güven), OPS onaylı |
 | form-submission-standard.md | URUN | teyitli | OPS sahipsiz alan kuralı: müşteri yüzü (form gönderimi) |
+| foy-yazi-tipi-standard.md | URUN | teyitli | OPS emri HRT-59 (2026-10-12): föy yazı tipi kuralı, sahip URUN |
 | i18n-ters-yon-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | kategori-adlandirma-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | matris-gorunum-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
