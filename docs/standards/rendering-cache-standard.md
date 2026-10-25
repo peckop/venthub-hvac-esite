@@ -240,6 +240,14 @@ yeterli): `getTenantConfig()` → `headers()`, ve gövdedeki `searchParams` (`?p
 Ana sayfanın etiketi (`HOME_DATA_TAG`) bilerek KULLANILMIYOR: bir yüzeyin tazelenmesi
 ötekini sessizce ısıtır/soğuturdu (PS-042). Keşif yüzeyinin kendi etiketi var.
 
+**Fiyat RSC yükünde de taşınmaz (INV-FIYAT-SIZINTI-3, URN-142, ölçüm 2026-10-25).** Teklif modunda
+(`quoteModeHesapla`, mod bilinmiyorsa dahil) ham varyant `price` ve liste `min_price` alanları
+'use client' sınırından ÖNCE sunucuda `src/lib/pricing/teklifModuSuzgeci.ts` ile çıkarılır; kapı
+`src/__tests__/conformance/rsc-yuku-fiyat-sizintisi.test.ts`. Süzgeç `unstable_cache`'in DIŞINDA
+uygulanır: önbelleğe giren veri değişmez, bu yüzden etiket/webhook yolu değişmez ve ayrı bir
+`revalidateTag` gerekmez; yeni yayın (deploy) ISR sayfalarını yeniden üretir. Yeni bir sayfa
+istemci bileşenine fiyatlı nesne verecekse aynı yardımcıdan geçirir.
+
 **Sayfalama kalktı, adres DEĞİŞMEDİ.** `?page=` ve `parsePageParam` kaldırıldı, `PAGE_SIZE`
 24 → 72 yükseltildi. Ölçüm (prod SELECT, 2026-09-14): `product_families` = **47** satır, yani
 tamamı tek sayfaya sığıyor. Eski `?page=2` adresi **bizim verdiğimiz sinyalde hiç yoktu**

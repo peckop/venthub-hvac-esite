@@ -17,6 +17,7 @@ import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
+import { varyantFiyatiniSuz } from '@/lib/pricing/teklifModuSuzgeci'
 import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
@@ -374,7 +375,8 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
           category: family.category ? kategoriMetniniIndir(family.category, lang) : null,
           subcategory: family.subcategory ? kategoriMetniniIndir(family.subcategory, lang) : null,
         } : family}
-        variants={variants}
+        // URN-142: gerçek fiyat teklif modunda 'use client' sınırını geçmez (JSON-LD yukarıda süzülmemiş veriyle kuruldu).
+        variants={varyantFiyatiniSuz(variants, mainCategory)}
         priceTaxIncluded={detail?.price_tax_included ?? null}
         sunucuSku={sunucuSku}
         kirinti={kirinti}
