@@ -470,7 +470,7 @@ const ROLLER = {
     durum: 'Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.',
   },
   BLOG: {
-    gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5 ve R11\'i oku.',
+    gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5, R10.5 (ders listesi), R10.6 (yayın öncesi kontrol) ve R11\'i oku.',
     gorevDegil: 'arama görünürlük ölçümü (GEO-SEO); sayfa kodu (URUN); mevzuat hükmü üretmek (MEVZUAT).',
     dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydının gövde ve tarih alanları; liste ve rota kodu URUN), src/lib/bilgiMerkezi/__tests__/kartGuncellemeTarihi.test.tsx.',
     yetki: 'Taslak yazma, kaynak ve mevzuat paketi isteme (MEVZUAT girdisi), kalıp kapısı.',
