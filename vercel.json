@@ -40,5 +40,17 @@
       "consul-*": false,
       "blog/**": false
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/onizleme/",
+      "permanent": false
+    },
+    {
+      "source": "/:lang(tr|en)",
+      "destination": "/onizleme/",
+      "permanent": false
+    }
+  ]
 }
