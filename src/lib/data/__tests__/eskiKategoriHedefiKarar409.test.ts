@@ -1,9 +1,10 @@
 /**
- * KTL-63 · KARAR 409 (Model B) — CANLI KİPTE (ADRES_SEMASI_K3B kapalı) eski kategori adresi tek yönlendirmeyle yeni adrese gider.
+ * KTL-63 · KARAR 410 (Model C, üç kademe) — CANLI KİPTE (ADRES_SEMASI_K3B kapalı) eski kategori adresi tek yönlendirmeyle yeni adrese gider.
  *
- * Migration (supabase/migrations/20261025220000_kontrol_urunleri_elektrik_aksesuarlari_karar409.sql) `control-systems`
+ * Migration (supabase/migrations/20261025230000_kontrol_urunleri_elektrik_aksesuarlari_uc_kademe_karar410.sql) `control-systems`
  * satırının TR slug'ını kontrol-ve-suruculer → elektrik-aksesuarlari, `spare-parts-sensors` satırınınkini
- * yedek-parcalar-ve-sensorler → sensorler-ve-koruma yapar. Faz 1-A tetiği eski adları `url_takma_adlari`'na yazar.
+ * yedek-parcalar-ve-sensorler → sensorler-ve-koruma yapar (üst-alt ilişkisi değişir, alt kategori adresi tek segmentli kalır).
+ * Faz 1-A tetiği eski adları `url_takma_adlari`'na yazar.
  * Canlı kipte harita/eşleyici DEVREDE DEĞİL (bayrak kapalı, harita null): kategori sayfası bulunamayınca yalnız
  * `eskiKategoriHedefi` çalışır. Bağımsız okuma (25 Ekim) K3-b fikstürünün bu yolu ÖLÇMEDİĞİNİ bulmuştu; bu test o boşluğu kapatır.
  *
@@ -75,8 +76,8 @@ describe('canlı kip: eski kategori adresi → yeni TR slug (tek yönlendirme)',
     expect(await eskiKategoriHedefi('yedek-parcalar-ve-sensorler', 'en')).toBe('spare-parts-sensors')
   })
 
-  it('Aksesuarlar kökü ve alt kategoriler (aksesuarlar, frekans-konvertorleri, hiz-anahtarlari) takma ad satırı almaz', async () => {
-    for (const slug of ['aksesuarlar', 'frekans-konvertorleri', 'hiz-anahtarlari']) {
+  it('Aksesuarlar kökü ve alt kategoriler (aksesuarlar, frekans-konvertorleri, hiz-anahtarlari, mekanik-aksesuarlar) takma ad satırı almaz', async () => {
+    for (const slug of ['aksesuarlar', 'frekans-konvertorleri', 'hiz-anahtarlari', 'mekanik-aksesuarlar']) {
       expect(await eskiKategoriHedefi(slug, 'tr'), slug).toBeNull()
     }
   })

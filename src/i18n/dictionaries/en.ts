@@ -123,7 +123,9 @@ export const en: typeof tr = {
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
         'electric-curtain': 'Electrically Heated Air Curtains',
-        'spare-parts': 'Sensors and Protection'
+        'spare-parts': 'Sensors and Protection',
+        // Decision 410 (Recep, KTL-63): second subcategory of the Accessories root; the key is bound by the database migration.
+        'mechanical-accessories': 'Mechanical Accessories'
       }
     },
     viewAll: 'View all',

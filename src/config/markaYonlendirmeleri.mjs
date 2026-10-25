@@ -26,8 +26,9 @@
  * `control-systems` (metadata.slug.tr = `kontrol-sistemleri`, aktif).
  * 2026-10-10 (URN-85): üstün TR slug'ı Design CSV adına çekildi (`kontrol-ve-suruculer`,
  * supabase/migrations/20261010090000_kategori_tr_adlari_design_csv.sql).
- * 2026-10-25 (KTL-63, karar 409): aynı satır "Elektrik Aksesuarları" oldu, TR slug `elektrik-aksesuarlari`
- * (supabase/migrations/20261025220000_kontrol_urunleri_elektrik_aksesuarlari_karar409.sql); `kok.tr` aşağıda buna uyar.
+ * 2026-10-25 (KTL-63, karar 409 + 410): aynı satır "Elektrik Aksesuarları" oldu ve `accessories` kökünün altına geçti
+ * (üç kademe), TR slug `elektrik-aksesuarlari`
+ * (supabase/migrations/20261025230000_kontrol_urunleri_elektrik_aksesuarlari_uc_kademe_karar410.sql); `kok.tr` aşağıda buna uyar.
  * Hedef adres yalnız dalı kullanır (tek segment): marka adresi DEĞİŞMEZ.
  */
 

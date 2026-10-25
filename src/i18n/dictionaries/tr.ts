@@ -142,7 +142,9 @@ export const tr = {
         'cabinet-fans': 'Hücreli Aspiratörler',
         'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
         'electric-curtain': 'Elektrikli Isıtıcılı Hava Perdeleri',
-        'spare-parts': 'Sensörler ve Koruma'
+        'spare-parts': 'Sensörler ve Koruma',
+        // Karar 410 (Recep, KTL-63): Aksesuarlar kökünün ikinci alt kategorisi; anahtarı veritabanı migration'ı bağlar.
+        'mechanical-accessories': 'Mekanik Aksesuarlar'
       }
     },
     viewAll: 'Tümü',

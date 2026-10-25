@@ -1,29 +1,37 @@
--- KTL-63 · KARAR 409 (MODEL B) — "ELEKTRİK AKSESUARLARI" AYRI ANA KATEGORİ; "AKSESUARLAR" GENEL GRUP OLARAK KALIR
+-- KTL-63 · KARAR 410 (MODEL C, ÜÇ KADEME) — AKSESUARLAR KÖKÜ ALTINDA "ELEKTRİK AKSESUARLARI" VE "MEKANİK AKSESUARLAR"
 --
--- NİÇİN: Recep kararı 409 (2026-10-25) ve aynı gün OPS penceresinde verdiği ek karar: "Elektrik Aksesuarları yeni açılır;
--- mevcut Aksesuarlar genel mekanik aksesuar grubu olarak durur." BVU-LS kurşun seperatör elektrik parçası değildir
--- (Recep, Menü penceresi): Aksesuarlar'da kalır. "Sensörler ve Koruma" yalnız SEAT PTC'dir. Menü'nün 10-25 görünen ad
--- kararları (Recep) aynı pakette. Ölçüm ve karşılaştırma: docs/audits/ktl63-kontrol-kategori-olcumu-ve-tasima-onerisi-2026-10-25.md,
+-- NİÇİN: Recep kararı 409 (2026-10-25) ve aynı gün OPS penceresinde verdiği karar 410: Systemair gibi ÜÇ KADEME.
+-- Kök "Aksesuarlar" (genel) → alt "Elektrik Aksesuarları" → Frekans Konvertörleri (İnvertör), Hız Anahtarları,
+-- Sensörler ve Koruma; kök "Aksesuarlar" → alt "Mekanik Aksesuarlar" → BVU-LS ve ileride gelecek mekanik aksesuarlar.
+-- Model B (iki ayrı ana kategori) İPTAL. BVU-LS kurşun seperatör elektrik parçası değildir (Recep, Menü penceresi):
+-- mekanik tarafta kalır. "Sensörler ve Koruma" yalnız SEAT PTC'dir. Menü'nün 10-25 görünen ad kararları (Recep) aynı pakette.
+-- Ölçüm ve karşılaştırma: docs/audits/ktl63-kontrol-kategori-olcumu-ve-tasima-onerisi-2026-10-25.md,
 -- docs/audits/ktl63-kategori-envanteri-menu-karsilastirma-2026-10-25.md (canlı SELECT 2026-10-25). Cetvel:
 -- docs/standards/category-taxonomy-standard.md §6.1 ve §9, docs/standards/migration-safety-standard.md.
 --
--- NE YAPAR (kategori KİMLİKLERİ korunur; yeni satır YOK, silme YOK, pasifleştirme YOK):
---   1. `control-systems` (kök) "Elektrik Aksesuarları" olur: ad + menü etiketi, TR slug kontrol-ve-suruculer → elektrik-aksesuarlari,
---      açıklama/SEO metni (TR+EN: motor koruma sensörü cümlesi eklenir). `translation_key` aynı kalır (sözlük anahtarı
---      `control-systems`; sözlükteki ad kodda değişir). EN kanonik slug DEĞİŞMEZ (bu migration'da; EN slug kararı Recep'te).
---   2. `spare-parts-sensors` "Sensörler ve Koruma" olur ve "Aksesuarlar"dan "Elektrik Aksesuarları"nın altına geçer: TR slug
---      yedek-parcalar-ve-sensorler → sensorler-ve-koruma; metni BVU-LS'siz yeniden yazılır. Alt kategori adresi tek segmentli
---      (SEO-35 B-1), üst değişimi adresini değiştirmez.
+-- NE YAPAR (mevcut kategori KİMLİKLERİ korunur; silme YOK, pasifleştirme YOK; TEK yeni satır: Mekanik Aksesuarlar):
+--   0. `mechanical-accessories` ("Mekanik Aksesuarlar", TR slug mekanik-aksesuarlar) `accessories` altında yeni alt kategori.
+--   1. `control-systems` (eski kök) "Elektrik Aksesuarları" olur ve `accessories` altına geçer (parent_id = accessories):
+--      ad + menü etiketi, TR slug kontrol-ve-suruculer → elektrik-aksesuarlari, açıklama/SEO metni (TR+EN: motor koruma
+--      sensörü cümlesi eklenir). `translation_key` aynı kalır. EN kanonik slug DEĞİŞMEZ (EN slug kararı Recep'te).
+--      Görsel ve `display_mode` korunur. 37 ürün yerinde kalır (ürün `category_id` zaten bu satır).
+--   2. `spare-parts-sensors` "Sensörler ve Koruma" olur ve `accessories`tan `control-systems`in (Elektrik Aksesuarları) altına
+--      geçer: TR slug yedek-parcalar-ve-sensorler → sensorler-ve-koruma; metni BVU-LS'siz yeniden yazılır.
 --   3. `frequency-converters` görünen adı "Frekans Konvertörleri (İnvertör)"; TR slug parantezsiz, aynı kalır.
---   4. SEAT PTC ailesi (1 aile / 1 ürün) `category_id` accessories → control-systems (alt kategori aynı).
---      BVU-LS ailesi (1 aile / 2 ürün) alt kategoriden ayrılır: `subcategory_id` boş, `category_id` accessories (kökün
---      doğrudan ailesi; canlıda emsali var: avens-bvu-siginak-havalandirma-uniteleri, kök shelter-ventilation, alt boş).
---   5. `accessories`: alt kategorisi kalmadığı için açıklama/SEO metninden "yedek parçalar ve sensörler alt kategoride" cümlesi çıkar.
+--   4. SEAT PTC ailesi (1 aile / 1 ürün) `category_id` accessories → control-systems (alt kategori sensör aynı).
+--      BVU-LS ailesi (1 aile / 2 ürün) `category_id` accessories → mechanical-accessories, `subcategory_id` boş
+--      (alt kategorisiz doğrudan aile; canlıda emsali var: avens-bvu-siginak-havalandirma-uniteleri).
+--      ÜRÜN SÜTUNU KURALI (öneri (ii), ÜRÜN ile birlikte): `category_id` = 1. kademe, `subcategory_id` = 2. kademe yaprak.
+--   5. `accessories` kökü: açıklama/SEO metni iki alt kategoriyi söyler (yedek parça cümlesi çıkar).
 --   6. Menü 10-25 görünen ad kararları (Recep 10-25), yalnız `name` ve `menu_label` (adres DEĞİŞMEZ): heat-recovery-vmc
 --      "Isı Geri Kazanım", ducted-central-hrv "Kanallı Isı Geri Kazanım Cihazları", single-room-hrv "Oda Tipi Isı Geri
 --      Kazanım Cihazları", water-coil-duct-heaters "Sulu Bataryalı Kanal Isıtıcıları"; bu dört kategoride SEO başlığı ve
 --      açıklama metninde geçen ESKİ AD de yeni adla değişir (adım 6b; OPS 25 Ekim, cümle yapısı aynı). Sığınak (shelter-ventilation) bu
 --      migration'da YOK: iki kademeli yapı kararı Recep'te.
+--
+-- SEVİYE (level): `tg_categories_set_level` yalnız DEĞİŞEN satırı yeniden hesaplar (çocuklara yayılmaz). Bu yüzden
+-- control-systems taşındıktan SONRA çocukları (frekans, hız, sensör) `parent_id`yi yeniden yazarak tetikler: level 1 → 2.
+-- Sonda seviyeler ve üst-alt ilişkisi SAYILIR (guard 5d).
 --
 -- ESKİ ADRES: `url_takma_ad_kategori` tetiği (20260923083021) TR slug değişince eski adı `url_takma_adlari`'na yazar
 -- (kontrol-ve-suruculer, yedek-parcalar-ve-sensorler). Canlı kipte (ADRES_SEMASI_K3B kapalı) sayfa katmanı eski adresi
@@ -31,9 +39,13 @@
 -- iki takma ad satırının DOĞRU kategoriye işaret ettiğini apply anında SAYAR (guard 5c). Satırlar PASİFLEŞTİRİLMEZ:
 -- bağımsız okuma (25 Ekim) canlı kipte pasif kategorinin 200+noindex çizildiğini ölçtü; yeniden adlandırma bu sorunu taşımaz.
 --
+-- SIRA (kural 13): ÜRÜN'ün üç kademe KOD desteği (menü, kategori sayfası, kırıntı, site haritası, adres üretimi, arama
+-- süzgeci) birleşmeden bu migration birleşmez; kod önce, sonra Recep onayıyla bu dosya. Üç kademe sayfa katmanında
+-- kırılırsa bu migration'ı geri alma dosyası döndürür.
+--
 -- KOD TARAFI (aynı PR): sözlük adları (tr/en), marka yönlendirmesi kök adı, uyum testleri.
 -- İDEMPOTENT: ağaç zaten yeni durumdaysa NOTICE ile çıkar; kısmî/beklenmeyen durumda DURUR (kör yazım yok).
--- GERİ ALMA (tek işlem, elle): scripts/db/geri-alma/20261025220000_kontrol_urunleri_elektrik_aksesuarlari_karar409.geri-al.sql
+-- GERİ ALMA (tek işlem, elle): scripts/db/geri-alma/20261025230000_kontrol_urunleri_elektrik_aksesuarlari_uc_kademe_karar410.geri-al.sql
 -- TİP DOSYASI: şema değişmez. ŞEMA TABANI: birleşme sonrası aynı gün `sema-tabani-uret.yml` (INV-TABAN-TAZE-1).
 -- ATOMİKLİK: dosyada BEGIN/COMMIT YOK; çalıştırıcı `psql --single-transaction` ile sarar (INV-MIGRATION-1, biçim b).
 
@@ -42,7 +54,7 @@ set statement_timeout = '60s';
 
 do $migration$
 declare
-  k_acc  uuid; k_ctl uuid; k_fc uuid; k_hiz uuid; k_sens uuid;
+  k_acc  uuid; k_ctl uuid; k_fc uuid; k_hiz uuid; k_sens uuid; k_mek uuid;
   f_ptc  uuid; f_bvu uuid;
   v_adet integer;
   v_aile integer;
@@ -65,6 +77,7 @@ begin
   select id into k_fc   from public.categories where slug = 'frequency-converters';
   select id into k_hiz  from public.categories where slug = 'speed-controllers';
   select id into k_sens from public.categories where slug = 'spare-parts-sensors';
+  select id into k_mek  from public.categories where slug = 'mechanical-accessories';
   select id into f_ptc  from public.product_families where slug = 'seat-atex-ptc-sensoru';
   select id into f_bvu  from public.product_families where slug = 'avens-bvu-ls-kursun-seperator';
   if f_ptc is null or f_bvu is null then
@@ -72,13 +85,17 @@ begin
   end if;
 
   -- İDEMPOTANS: yeni durumun işaretleri hep birlikte tutuyorsa çık.
-  select (c.name = 'Elektrik Aksesuarları' and s.name = 'Sensörler ve Koruma' and s.parent_id = k_ctl)
+  select (c.name = 'Elektrik Aksesuarları' and c.parent_id = k_acc and s.name = 'Sensörler ve Koruma' and s.parent_id = k_ctl
+          and k_mek is not null)
     into v_zaten
     from public.categories c, public.categories s
    where c.id = k_ctl and s.id = k_sens;
   if v_zaten then
     raise notice 'KTL-63: ağaç zaten yeni durumda; hiçbir şey yazılmadı';
     return;
+  end if;
+  if k_mek is not null then
+    raise exception 'KTL-63 guard 1c: mechanical-accessories zaten var ama ağaç yeni durumda değil (kısmî durum); hiçbir şey yazılmadı';
   end if;
 
   -- GUARD 2: BUGÜNKÜ durum tam ölçülen durum (başka bir şey görürsek DURUR).
@@ -95,15 +112,25 @@ begin
      or not exists (select 1 from public.categories where slug = 'water-coil-duct-heaters'   and name = 'Sulu Batarya Kanal Tipi') then
     raise exception 'KTL-63 guard 2: kategori ağacı ölçülen durumda değil; hiçbir şey yazılmadı';
   end if;
+  -- Aksesuarlar kökünün bugünkü tek çocuğu spare-parts-sensors (ölçüm 2026-10-25).
+  select count(*) into v_adet from public.categories where parent_id = k_acc;
+  if v_adet <> 1 then
+    raise exception 'KTL-63 guard 2b: accessories altında % alt kategori var (beklenen 1: spare-parts-sensors); hiçbir şey yazılmadı', v_adet;
+  end if;
 
-  -- GUARD 3: yeni TR adres adları başka bir kategoride kullanılmıyor.
+  -- GUARD 3: yeni TR/EN adres adları başka bir kategoride kullanılmıyor.
   select count(*) into v_adet from public.categories c
    where c.id not in (k_ctl, k_sens)
-     and (lower(c.slug) in ('elektrik-aksesuarlari','sensorler-ve-koruma')
-          or lower(coalesce(c.metadata -> 'slug' ->> 'tr', '')) in ('elektrik-aksesuarlari','sensorler-ve-koruma')
-          or lower(coalesce(c.metadata -> 'slug' ->> 'en', '')) in ('elektrik-aksesuarlari','sensorler-ve-koruma'));
+     and (lower(c.slug) in ('elektrik-aksesuarlari','sensorler-ve-koruma','mekanik-aksesuarlar','mechanical-accessories')
+          or lower(coalesce(c.metadata -> 'slug' ->> 'tr', '')) in ('elektrik-aksesuarlari','sensorler-ve-koruma','mekanik-aksesuarlar','mechanical-accessories')
+          or lower(coalesce(c.metadata -> 'slug' ->> 'en', '')) in ('elektrik-aksesuarlari','sensorler-ve-koruma','mekanik-aksesuarlar','mechanical-accessories'));
   if v_adet > 0 then
-    raise exception 'KTL-63 guard 3: yeni TR adres adı başka kategoride kullanılıyor; hiçbir şey yazılmadı';
+    raise exception 'KTL-63 guard 3: yeni adres adı başka kategoride kullanılıyor; hiçbir şey yazılmadı';
+  end if;
+  select count(*) into v_adet from public.url_takma_adlari t
+   where t.tur = 'kategori' and lower(t.eski_slug) in ('elektrik-aksesuarlari','sensorler-ve-koruma','mekanik-aksesuarlar','mechanical-accessories');
+  if v_adet > 0 then
+    raise exception 'KTL-63 guard 3b: yeni adres adı takma ad tablosunda duruyor; hiçbir şey yazılmadı';
   end if;
 
   -- GUARD 4: taşınacak aileler tam ölçülen küme: spare-parts-sensors'ta TAM bu iki aile (PTC 1 ürün, BVU-LS 2 ürün).
@@ -120,15 +147,39 @@ begin
 
   -- METADATA KORUMA SAYACI (10 Ekim dersi: metadata nesnesi baştan yazılmaz). Aşağıdaki yazımların hepsi `jsonb_set` ile
   -- YOL BAZLIDIR (kardeş anahtarlar ve `slug.en` korunur); sonda dokunulan kategorilerin metadata ÜST anahtar sayısı
-  -- aynı çıkmazsa işlem geri alınır.
+  -- aynı çıkmazsa işlem geri alınır. Yeni satır (adım 0) sayaca girmez (slug listesinde yok).
   select count(*) into v_anahtar_once
     from public.categories c cross join lateral jsonb_object_keys(c.metadata) as k
    where c.slug in ('accessories','control-systems','spare-parts-sensors','heat-recovery-vmc','ducted-central-hrv',
                     'single-room-hrv','water-coil-duct-heaters');
 
-  -- ADIM 1: Elektrik Aksesuarları (eski control-systems). Açıklama/SEO metni mevcut metnin DEVAMIdır (yeni iddia yok).
+  -- ADIM 0: Mekanik Aksesuarlar (YENİ alt kategori, accessories altında). Kiracı kökten alınır (jwt_tenant_id() migration'da boş).
+  -- Metin yeni iddia taşımaz: kök metni + BVU-LS'nin Recep kararındaki yeri (sığınak havalandırma tamamlayıcısı, kurşun seperatör).
+  insert into public.categories
+    (tenant_id, name, slug, parent_id, is_active, sort_order, is_featured, display_mode, translation_key, menu_label, seo_title, seo_desc, metadata)
+  select a.tenant_id, 'Mekanik Aksesuarlar', 'mechanical-accessories', a.id, true, 10, false, 'series',
+         'sub.mechanical-accessories', 'Mekanik Aksesuarlar',
+         'Mekanik Aksesuarlar: Tamamlayıcı Mekanik Parçalar',
+         'Ana cihazın kendisi değil, onu tamamlayan mekanik parçalar: sığınak havalandırma sistemleri için kurşun seperatör.',
+         jsonb_build_object(
+           'slug', jsonb_build_object('en', 'mechanical-accessories', 'tr', 'mekanik-aksesuarlar'),
+           'hide_price', true,
+           'seo_title_en', 'Mechanical Accessories: Complementary Mechanical Parts',
+           'seo_desc_en', 'Not the main units themselves but the mechanical parts that complement them: the lead separator for shelter ventilation systems.',
+           'description_i18n', jsonb_build_object(
+             'tr', 'Ana cihazın kendisi değil, onu tamamlayan mekanik parçalar bu kategoridedir. Sığınak havalandırma sistemlerinin tamamlayıcı ekipmanı olan kurşun seperatör burada yer alır.',
+             'en', 'These are not the main units themselves but the mechanical parts that complement them. The lead separator, the complementary equipment for shelter ventilation systems, is in this category.'))
+    from public.categories a
+   where a.id = k_acc
+  returning id into k_mek;
+  if k_mek is null then
+    raise exception 'KTL-63 adım 0: Mekanik Aksesuarlar eklenemedi; işlem geri alınır';
+  end if;
+
+  -- ADIM 1: Elektrik Aksesuarları (eski control-systems): accessories altına geçer. Açıklama/SEO metni mevcut metnin DEVAMIdır.
   update public.categories c
-     set name = 'Elektrik Aksesuarları',
+     set parent_id = k_acc,
+         name = 'Elektrik Aksesuarları',
          menu_label = 'Elektrik Aksesuarları',
          seo_title = 'Elektrik Aksesuarları: Hız Anahtarı, Konvertör ve Sensör',
          seo_desc = 'Fanı çalıştırmak yetmez; ne zaman ve hangi hızda çalışacağına karar veren katman burada: hız anahtarları, frekans konvertörleri ve motor koruma sensörleri.',
@@ -140,7 +191,7 @@ begin
            '{seo_desc_en}', to_jsonb('Running a fan is not enough; the layer that decides when and at what speed it runs is here: speed controllers, frequency converters and motor protection sensors.'::text), true)
    where c.id = k_ctl;
 
-  -- ADIM 2: Sensörler ve Koruma (eski spare-parts-sensors): yeni üst, ad, TR slug, BVU-LS'siz metin.
+  -- ADIM 2: Sensörler ve Koruma (eski spare-parts-sensors): yeni üst (Elektrik Aksesuarları), ad, TR slug, BVU-LS'siz metin.
   update public.categories c
      set parent_id = k_ctl,
          name = 'Sensörler ve Koruma',
@@ -154,8 +205,10 @@ begin
            '{seo_desc_en}', to_jsonb('Not the device itself, but parts that protect it: motor protection sensors.'::text), true)
    where c.id = k_sens;
 
-  -- ADIM 3: frekans konvertörleri görünen adı (TR slug aynı).
-  update public.categories set name = 'Frekans Konvertörleri (İnvertör)' where id = k_fc;
+  -- ADIM 3: frekans konvertörleri görünen adı (TR slug aynı) ve SEVİYE yayılımı: control-systems artık seviye 1; çocukları
+  -- (frekans, hız) `parent_id`yi yeniden yazarak tetiklenir → seviye 2 (tetik yalnız değişen satırı hesaplar).
+  update public.categories set name = 'Frekans Konvertörleri (İnvertör)', parent_id = k_ctl where id = k_fc;
+  update public.categories set parent_id = k_ctl where id = k_hiz;
 
   -- ADIM 4: aileler ve ürünler.
   update public.product_families set category_id = k_ctl, updated_at = now()
@@ -167,23 +220,23 @@ begin
   if v_aile <> 1 or v_urun <> 1 then
     raise exception 'KTL-63 adım 4a (SEAT PTC): % aile, % ürün (beklenen 1, 1); işlem geri alınır', v_aile, v_urun;
   end if;
-  update public.product_families set subcategory_id = null, updated_at = now()
+  update public.product_families set category_id = k_mek, subcategory_id = null, updated_at = now()
    where id = f_bvu and category_id = k_acc and subcategory_id = k_sens;
   get diagnostics v_aile = row_count;
-  update public.products set subcategory_id = null, updated_at = now()
+  update public.products set category_id = k_mek, subcategory_id = null, updated_at = now()
    where family_id = f_bvu and category_id = k_acc and subcategory_id = k_sens;
   get diagnostics v_urun = row_count;
   if v_aile <> 1 or v_urun <> 2 then
     raise exception 'KTL-63 adım 4b (BVU-LS): % aile, % ürün (beklenen 1, 2); işlem geri alınır', v_aile, v_urun;
   end if;
 
-  -- ADIM 5: Aksesuarlar kökü artık alt kategorisiz; metinden alt kategori cümlesi çıkar.
+  -- ADIM 5: Aksesuarlar kökü artık iki alt kategoriyi söyler (yedek parça cümlesi çıkar).
   update public.categories c
-     set seo_desc = 'Ana cihazın kendisi değil, onu tamamlayan parçalar ve ekipman.',
+     set seo_desc = 'Ana cihazın kendisi değil, onu tamamlayan parçalar ve ekipman: elektrik aksesuarları ve mekanik aksesuarlar.',
          metadata = jsonb_set(jsonb_set(jsonb_set(c.metadata,
-           '{description_i18n,tr}', to_jsonb('Ana cihazın kendisi değil, onu tamamlayan parçalar bu kategoridedir.'::text), true),
-           '{description_i18n,en}', to_jsonb('These are not the main units themselves but the parts that complement them.'::text), true),
-           '{seo_desc_en}', to_jsonb('These are not the main units themselves but the parts and equipment that complement them.'::text), true)
+           '{description_i18n,tr}', to_jsonb('Ana cihazın kendisi değil, onu tamamlayan parçalar bu kategoridedir. Elektrik aksesuarları ve mekanik aksesuarlar alt kategorilerde yer alır.'::text), true),
+           '{description_i18n,en}', to_jsonb('These are not the main units themselves but the parts that complement them. Electrical accessories and mechanical accessories are in the subcategories.'::text), true),
+           '{seo_desc_en}', to_jsonb('These are not the main units themselves but the parts and equipment that complement them; electrical and mechanical accessories are in the subcategories.'::text), true)
    where c.id = k_acc;
 
   -- ADIM 6: Menü 10-25 görünen ad kararları (adres DEĞİŞMEZ).
@@ -247,10 +300,15 @@ begin
   if v_aile <> 5 or v_urun <> 38 then
     raise exception 'KTL-63 guard 5a: Elektrik Aksesuarları altında % aile, % ürün (beklenen 5, 38); işlem geri alınır', v_aile, v_urun;
   end if;
+  select count(*) into v_aile from public.product_families where category_id = k_mek and subcategory_id is null;
+  select count(*) into v_urun from public.products where category_id = k_mek and subcategory_id is null;
+  if v_aile <> 1 or v_urun <> 2 or exists (select 1 from public.product_families where id = f_bvu and category_id <> k_mek) then
+    raise exception 'KTL-63 guard 5b: Mekanik Aksesuarlar altında % aile, % ürün (beklenen 1 aile BVU-LS, 2 ürün, alt kategorisiz); işlem geri alınır', v_aile, v_urun;
+  end if;
   select count(*) into v_aile from public.product_families where category_id = k_acc;
   select count(*) into v_urun from public.products where category_id = k_acc;
-  if v_aile <> 1 or v_urun <> 2 or exists (select 1 from public.product_families where id = f_bvu and subcategory_id is not null) then
-    raise exception 'KTL-63 guard 5b: Aksesuarlar altında % aile, % ürün (beklenen 1 aile BVU-LS, 2 ürün, alt kategorisiz); işlem geri alınır', v_aile, v_urun;
+  if v_aile <> 0 or v_urun <> 0 then
+    raise exception 'KTL-63 guard 5b2: Aksesuarlar kökünde doğrudan % aile, % ürün kaldı (beklenen 0, 0); işlem geri alınır', v_aile, v_urun;
   end if;
   for r in
     select * from (values
@@ -264,5 +322,21 @@ begin
       raise exception 'KTL-63 guard 5c: eski ad % takma ad tablosunda % satırla duruyor (beklenen 1); işlem geri alınır', r.eski_tr, v_takma;
     end if;
   end loop;
+
+  -- GUARD 5d: ÜÇ KADEME YAPISI (üst-alt ilişkisi ve seviyeler): kök 0; Elektrik ve Mekanik 1; frekans, hız, sensör 2.
+  select count(*) into v_adet from public.categories
+   where (id = k_acc  and parent_id is null and level = 0)
+      or (id = k_ctl  and parent_id = k_acc and level = 1)
+      or (id = k_mek  and parent_id = k_acc and level = 1)
+      or (id = k_fc   and parent_id = k_ctl and level = 2)
+      or (id = k_hiz  and parent_id = k_ctl and level = 2)
+      or (id = k_sens and parent_id = k_ctl and level = 2);
+  if v_adet <> 6 then
+    raise exception 'KTL-63 guard 5d: üç kademe yapısı kurulamadı (% / 6 satır doğru); işlem geri alınır', v_adet;
+  end if;
+  select count(*) into v_adet from public.categories where parent_id = k_acc;
+  if v_adet <> 2 then
+    raise exception 'KTL-63 guard 5e: Aksesuarlar altında % alt kategori (beklenen 2: Elektrik, Mekanik); işlem geri alınır', v_adet;
+  end if;
 end
 $migration$;
