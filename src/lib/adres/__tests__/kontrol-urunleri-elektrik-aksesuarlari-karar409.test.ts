@@ -191,6 +191,33 @@ describe('B. sözleşme: sözlük adı = migration adı; silme/ekleme/pasifleşt
     expect(GERI_AL).toMatch(/v_aile <> 1 or v_urun <> 2/)
   })
 
+  it('metadata YOL BAZLI yazılır (jsonb_set), nesne baştan atanmaz; üst anahtar sayısı korunur (10 Ekim dersi)', () => {
+    for (const metin of [MIGRATION, GERI_AL]) {
+      expect(metin).not.toMatch(/metadata\s*=\s*'/)
+      expect(metin).not.toMatch(/metadata\s*=\s*(jsonb_build_object|to_jsonb|'\{)/i)
+      expect(metin).not.toMatch(/metadata\s*=\s*(c\.)?metadata\s*\|\|/)
+    }
+    expect(MIGRATION).toContain('jsonb_set(')
+    expect(MIGRATION).toContain('guard 4b')
+    expect(MIGRATION).toContain('jsonb_object_keys(c.metadata)')
+  })
+
+  it('SEO başlığı/açıklamada eski ad yeni adla değişir (OPS 25 Ekim); cümle yapısı aynı, yalnız ad', () => {
+    for (const [eski, yeni] of [
+      ['Kanallı Merkezi Üniteler', 'Kanallı Isı Geri Kazanım Cihazları'],
+      ['Sulu Batarya Kanal Tipi', 'Sulu Bataryalı Kanal Isıtıcıları'],
+      ['Isı Geri Kazanım (VMC)', 'Isı Geri Kazanım'],
+      ['Tekil oda üniteleri', 'Oda tipi ısı geri kazanım cihazları'],
+      ['kanallı merkezi üniteler', 'kanallı ısı geri kazanım cihazları'],
+    ] as const) {
+      expect(MIGRATION, `${eski} → ${yeni}`).toContain(`'${eski}'`)
+      expect(MIGRATION, `${eski} → ${yeni}`).toContain(`'${yeni}'`)
+      expect(GERI_AL, `geri: ${yeni} → ${eski}`).toContain(`'${yeni}'`)
+      expect(GERI_AL, `geri: ${yeni} → ${eski}`).toContain(`'${eski}'`)
+    }
+    expect(MIGRATION).toContain("raise exception 'KTL-63 adım 6b")
+  })
+
   it('geri alma eski değerleri ve aynı kimlikleri yazar', () => {
     for (const eski of [
       "'Kontrol Sistemleri'",

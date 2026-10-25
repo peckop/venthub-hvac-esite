@@ -113,3 +113,18 @@ Yapılanlar: `control-systems` → "Elektrik Aksesuarları" (TR `elektrik-aksesu
 B DÖKÜMÜ (yazımdan ÖNCE; §6 tablosuna ek): aileler SEAT PTC `55937a21-b3f4-4aea-b0c3-4a19f54d9006` (ürün `fd189d5e-a966-4d38-8bf6-4302e26afa70`, kategori accessories → control-systems), BVU-LS `61a657c1-1e4e-48c9-838f-7a43c7492dd6` (ürünler `d585cb3d-30a2-46f4-a7b7-4fb5c95d96ea`, `f347d28f-c219-440c-8164-696bdbc8befc`, alt kategori spare-parts-sensors → boş). Yeniden adlanan dört kategori, önceki adlar: heat-recovery-vmc "Isı Geri Kazanım (VMC)", ducted-central-hrv "Kanallı Merkezi Üniteler", single-room-hrv "Tekil Oda Üniteleri", water-coil-duct-heaters "Sulu Batarya Kanal Tipi" (menü etiketi adla aynı). Bu kategorilerin SEO başlığı ve açıklama metinleri eski adı hâlâ taşıyor ve bu migration'da DEĞİŞMEZ (Menü'ye "metinde eski adı geçen içerik" listesi olarak gidecek).
 
 Kod referansı taraması (bağımsız okuma): menü ve alt liste `is_active` süzer, boş kök riski yok; `getCategoryIcon` EN slug'a göre (değişmedi); `eski-adres-tohum.json` hedefleri EN slug (değişmedi). Yazımdan SONRA ölçülecek (canlı): `/tr/category/kontrol-ve-suruculer` ve `/tr/category/yedek-parcalar-ve-sensorler` tek 308, yeni sayfaların başlığı/adı (TR+EN), menüde Elektrik Aksesuarları ve Aksesuarlar kökleri, site haritası.
+
+### SEO başlığı ve açıklama: eski ad → yeni ad (adım 6b; OPS 25 Ekim, tutarlılık onarımı) — önce / sonra
+
+Canlı SELECT (25 Ekim): dört kategoride ve `authority_content` dahil tüm kategorilerde eski ad (tam ad, büyük/küçük harf duyarsız) taraması; bulunan her yer aşağıda, başka yer yok. Yalnız ad değişir, cümle yapısı aynı kalır.
+
+| Kategori | Alan | Önce | Sonra |
+|---|---|---|---|
+| `ducted-central-hrv` | seo_title | Kanallı Merkezi Üniteler: Isı Geri Kazanım | Kanallı Isı Geri Kazanım Cihazları: Isı Geri Kazanım |
+| `water-coil-duct-heaters` | seo_title | Sulu Batarya Kanal Tipi: Sıcak Su ile Kanal Isıtma | Sulu Bataryalı Kanal Isıtıcıları: Sıcak Su ile Kanal Isıtma |
+| `heat-recovery-vmc` | seo_title | Isı Geri Kazanım (VMC): Tekil ve Merkezi Üniteler | Isı Geri Kazanım: Tekil ve Merkezi Üniteler |
+| `heat-recovery-vmc` | seo_desc | …eşanjör üzerinden aktarılır. Tekil oda üniteleri ve kanallı merkezi üniteler bu kategoridedir. | …eşanjör üzerinden aktarılır. Oda tipi ısı geri kazanım cihazları ve kanallı ısı geri kazanım cihazları bu kategoridedir. |
+| `heat-recovery-vmc` | description_i18n.tr | …Tekil oda üniteleri duvara açılan tek bir delikle çalışır… Kanallı merkezi üniteler ise tüm daireyi… | …Oda tipi ısı geri kazanım cihazları duvara açılan tek bir delikle çalışır… Kanallı ısı geri kazanım cihazları ise tüm daireyi… |
+
+Değişmeyenler (not): `single-room-hrv` seo_title "Tekil Oda: Merkezi Olmayan Isı Geri Kazanım" eski adın tam hâlini ("Tekil Oda Üniteleri") taşımıyor, kısa biçim; DEĞİŞMEZ (metin kararı Menü'de). `ducted-central-hrv` seo_title yeni biçimde "Isı Geri Kazanım" iki kez geçiyor ("Kanallı Isı Geri Kazanım Cihazları: Isı Geri Kazanım"); OPS talimatı gereği yapı korundu, sadeleştirme önerisi: sonek çıkarılabilir. EN metinler değişmez (EN adlar değişmedi).
+Metadata yazımı: tüm `metadata` değişiklikleri `jsonb_set` ile yol bazlıdır (kardeş anahtarlar ve `slug.en` korunur); `||` kullanılmadı çünkü iç içe nesnede (`slug`, `description_i18n`) üst düzey birleştirme iç anahtarları siler. Migration sonunda guard 4b dokunulan 7 kategorinin metadata üst anahtar sayısının DEĞİŞMEDİĞİNİ sayar.

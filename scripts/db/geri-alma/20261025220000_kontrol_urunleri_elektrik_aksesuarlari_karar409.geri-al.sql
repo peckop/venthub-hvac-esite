@@ -81,6 +81,21 @@ begin
            '{seo_desc_en}', to_jsonb('These are not the main units themselves but the parts and equipment that complement them; spare parts and sensors are in the subcategory.'::text), true)
    where c.id = k_acc;
 
+  -- SEO başlığı/açıklama metinlerindeki ad değişimi geri (adım 6b'nin tersi; yeni dizeler tam eşleşmeyle eski dizelere döner).
+  update public.categories set seo_title = replace(seo_title, 'Kanallı Isı Geri Kazanım Cihazları', 'Kanallı Merkezi Üniteler')
+   where slug = 'ducted-central-hrv';
+  update public.categories set seo_title = replace(seo_title, 'Sulu Bataryalı Kanal Isıtıcıları', 'Sulu Batarya Kanal Tipi')
+   where slug = 'water-coil-duct-heaters';
+  update public.categories c
+     set seo_title = replace(c.seo_title, 'Isı Geri Kazanım: Tekil', 'Isı Geri Kazanım (VMC): Tekil'),
+         seo_desc = replace(replace(c.seo_desc,
+           'Oda tipi ısı geri kazanım cihazları', 'Tekil oda üniteleri'),
+           'kanallı ısı geri kazanım cihazları', 'kanallı merkezi üniteler'),
+         metadata = jsonb_set(c.metadata, '{description_i18n,tr}', to_jsonb(replace(replace(c.metadata #>> '{description_i18n,tr}',
+           'Oda tipi ısı geri kazanım cihazları', 'Tekil oda üniteleri'),
+           'Kanallı ısı geri kazanım cihazları', 'Kanallı merkezi üniteler')), true)
+   where c.slug = 'heat-recovery-vmc';
+
   -- Menü 10-25 görünen adları geri.
   for r in
     select * from (values

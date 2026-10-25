@@ -21,7 +21,8 @@
 --   5. `accessories`: alt kategorisi kalmadığı için açıklama/SEO metninden "yedek parçalar ve sensörler alt kategoride" cümlesi çıkar.
 --   6. Menü 10-25 görünen ad kararları (Recep 10-25), yalnız `name` ve `menu_label` (adres DEĞİŞMEZ): heat-recovery-vmc
 --      "Isı Geri Kazanım", ducted-central-hrv "Kanallı Isı Geri Kazanım Cihazları", single-room-hrv "Oda Tipi Isı Geri
---      Kazanım Cihazları", water-coil-duct-heaters "Sulu Bataryalı Kanal Isıtıcıları". Sığınak (shelter-ventilation) bu
+--      Kazanım Cihazları", water-coil-duct-heaters "Sulu Bataryalı Kanal Isıtıcıları"; bu dört kategoride SEO başlığı ve
+--      açıklama metninde geçen ESKİ AD de yeni adla değişir (adım 6b; OPS 25 Ekim, cümle yapısı aynı). Sığınak (shelter-ventilation) bu
 --      migration'da YOK: iki kademeli yapı kararı Recep'te.
 --
 -- ESKİ ADRES: `url_takma_ad_kategori` tetiği (20260923083021) TR slug değişince eski adı `url_takma_adlari`'na yazar
@@ -48,6 +49,8 @@ declare
   v_urun integer;
   v_takma integer;
   v_zaten boolean;
+  v_anahtar_once integer;
+  v_anahtar_sonra integer;
   r record;
 begin
   -- GUARD 1: dokunulan dokuz kategori TAM BİR tane (slug küresel benzersiz; yoksa kör yazılmaz).
@@ -114,6 +117,14 @@ begin
     raise exception 'KTL-63 guard 4: sensör kategorisinde aile % (eşleşen %), ürün % (beklenen 2, 2, 3); hiçbir şey yazılmadı',
       v_adet, v_aile, v_urun;
   end if;
+
+  -- METADATA KORUMA SAYACI (10 Ekim dersi: metadata nesnesi baştan yazılmaz). Aşağıdaki yazımların hepsi `jsonb_set` ile
+  -- YOL BAZLIDIR (kardeş anahtarlar ve `slug.en` korunur); sonda dokunulan kategorilerin metadata ÜST anahtar sayısı
+  -- aynı çıkmazsa işlem geri alınır.
+  select count(*) into v_anahtar_once
+    from public.categories c cross join lateral jsonb_object_keys(c.metadata) as k
+   where c.slug in ('accessories','control-systems','spare-parts-sensors','heat-recovery-vmc','ducted-central-hrv',
+                    'single-room-hrv','water-coil-duct-heaters');
 
   -- ADIM 1: Elektrik Aksesuarları (eski control-systems). Açıklama/SEO metni mevcut metnin DEVAMIdır (yeni iddia yok).
   update public.categories c
@@ -193,6 +204,37 @@ begin
       raise exception 'KTL-63 adım 6: % için % satır güncellendi (beklenen 1); işlem geri alınır', r.en_slug, v_adet;
     end if;
   end loop;
+
+  -- ADIM 6b: SEO başlığı ve açıklama metninde ESKİ AD geçen yerler yeni adla değişir (OPS 25 Ekim: tutarlılık onarımı;
+  -- cümle yapısı aynı kalır, yalnız ad değişir). Tam dizeler: önce/sonra listesi docs/audits/ktl63-...-onerisi-2026-10-25.md §7.
+  update public.categories set seo_title = replace(seo_title, 'Kanallı Merkezi Üniteler', 'Kanallı Isı Geri Kazanım Cihazları')
+   where slug = 'ducted-central-hrv';
+  update public.categories set seo_title = replace(seo_title, 'Sulu Batarya Kanal Tipi', 'Sulu Bataryalı Kanal Isıtıcıları')
+   where slug = 'water-coil-duct-heaters';
+  update public.categories c
+     set seo_title = replace(c.seo_title, 'Isı Geri Kazanım (VMC)', 'Isı Geri Kazanım'),
+         seo_desc = replace(replace(c.seo_desc,
+           'Tekil oda üniteleri', 'Oda tipi ısı geri kazanım cihazları'),
+           'kanallı merkezi üniteler', 'kanallı ısı geri kazanım cihazları'),
+         metadata = jsonb_set(c.metadata, '{description_i18n,tr}', to_jsonb(replace(replace(c.metadata #>> '{description_i18n,tr}',
+           'Tekil oda üniteleri', 'Oda tipi ısı geri kazanım cihazları'),
+           'Kanallı merkezi üniteler', 'Kanallı ısı geri kazanım cihazları')), true)
+   where c.slug = 'heat-recovery-vmc';
+  if exists (select 1 from public.categories c
+              where c.slug in ('heat-recovery-vmc','ducted-central-hrv','single-room-hrv','water-coil-duct-heaters')
+                and (coalesce(c.seo_title,'') || ' ' || coalesce(c.seo_desc,'') || ' ' || coalesce(c.metadata #>> '{description_i18n,tr}',''))
+                    ~* '(Isı Geri Kazanım \(VMC\)|Kanallı Merkezi Üniteler|Tekil Oda Üniteleri|Sulu Batarya Kanal Tipi|Tekil oda üniteleri|kanallı merkezi üniteler)') then
+    raise exception 'KTL-63 adım 6b: SEO/açıklamada eski ad kaldı; işlem geri alınır';
+  end if;
+
+  -- GUARD 4b: metadata üst anahtarları korundu.
+  select count(*) into v_anahtar_sonra
+    from public.categories c cross join lateral jsonb_object_keys(c.metadata) as k
+   where c.slug in ('accessories','control-systems','spare-parts-sensors','heat-recovery-vmc','ducted-central-hrv',
+                    'single-room-hrv','water-coil-duct-heaters');
+  if v_anahtar_once is distinct from v_anahtar_sonra then
+    raise exception 'KTL-63 guard 4b: metadata üst anahtar sayısı % → % değişti; işlem geri alınır', v_anahtar_once, v_anahtar_sonra;
+  end if;
 
   -- GUARD 5: sonuç sayımı.
   select count(*) into v_aile from public.product_families where category_id = k_ctl;
