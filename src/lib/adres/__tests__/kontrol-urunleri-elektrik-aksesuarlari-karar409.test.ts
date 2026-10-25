@@ -282,4 +282,26 @@ describe('B. sözleşme: sözlük adı = migration adı; silme/ekleme/pasifleşt
       expect(GERI_AL, id).toContain(id)
     }
   })
+
+  // Bağımsız okuma (KTL-63): seviye tetiği çocuklara yayılmaz; sıra bozulursa 3. kademe yanlış seviyede kalır.
+  it('sıra: önce control-systems altına, sonra fc/hız anahtarı parent_id yeniden yazılır (seviye 2)', () => {
+    const ctlYukselt = MIGRATION.indexOf('update public.categories c')
+    const fcYaz = MIGRATION.indexOf("update public.categories set name = 'Frekans Konvertörleri (İnvertör)', parent_id = k_ctl where id = k_fc;")
+    const hizYaz = MIGRATION.indexOf('update public.categories set parent_id = k_ctl where id = k_hiz;')
+    expect(ctlYukselt).toBeGreaterThan(-1)
+    expect(fcYaz).toBeGreaterThan(ctlYukselt)
+    expect(hizYaz).toBeGreaterThan(fcYaz)
+  })
+
+  it('yeni Mekanik Aksesuarlar satırı kiracıyı accessories satırından alır (jwt_tenant_id değil)', () => {
+    const ekle = MIGRATION.slice(MIGRATION.indexOf('insert into public.categories'))
+    expect(ekle.slice(0, 700)).toContain('select a.tenant_id')
+    expect(ekle.slice(0, 700)).not.toContain('jwt_tenant_id()')
+  })
+
+  it('apply kapıları yorum satırına çevrilmemiş: seviye ve sayı kapıları etkin kodda', () => {
+    const kodSatirlari = MIGRATION.split('\n').filter((s) => !s.trim().startsWith('--')).join('\n')
+    expect(kodSatirlari).toContain('level = 2')
+    expect(kodSatirlari).toContain('v_adet <> 6')
+  })
 })
