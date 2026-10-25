@@ -39,6 +39,8 @@ const KAYIT = 'docs/standards/bagimlilik-kararlari.md'
  * kapattı (Sentry'yi beklemeden, yine bayat-kabul kapısı sayesinde). Liste BOŞ ve boş kalmalı.
  * 0 → 1 (2026-10-05, ALT-32, OPS hükmü): `braces` ≤3.0.3 (GHSA-vfj7-8cjw-p6xm) için düzeltme sürümü
  * YOK; yükseltilemiyor, tek kabul. Yamalı sürüm çıkınca bayat-kabul kapısı satırı sildirir, tavan 0'a iner.
+ * 1 → 1 (2026-10-25, ALT-100): `braces` kaydı kapandı (satır silindi), yerine `zod` <4.6.6
+ * (GHSA-mrhx-c7xc-m3w5) girdi: düzeltme yalnız zod 4 ana sürümünde. Tavan değişmez; OPS hükmü şarttır.
  */
 const KABUL_TAVANI = 1
 
