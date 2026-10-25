@@ -297,6 +297,8 @@ export const tr = {
     failed: 'Arama şu an yapılamadı.',
     retry: 'Tekrar dene',
     brandPrefix: 'Marka: ',
+    // Öneri kutusunda seri (ürün ailesi) satırının altındaki küçük etiket (URN-139).
+    familyCaption: 'Ürün serisi',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.',
     // Arama 600 ms'yi geçince (karar 59 ölçümü: sunucu ara sıra 1–3 sn duraklıyor) önceki
     // sonuçlar ekranda kalır, üstünde bu satır belirir — boş ekran + dönen yuvarlak yerine.

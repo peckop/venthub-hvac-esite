@@ -195,6 +195,7 @@ export const en: typeof tr = {
     failed: 'Search is unavailable right now.',
     retry: 'Try again',
     brandPrefix: 'Brand: ',
+    familyCaption: 'Product series',
     fuzzyMatchNotice: 'No exact match found, showing similar results.',
     slowHint: 'Searching, results on the way…'
   },

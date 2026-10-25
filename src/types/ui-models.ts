@@ -35,7 +35,8 @@ export type Product = DomainProduct;
 export interface SearchSuggestion {
   text?: string;
   label: string;
-  type: 'product' | 'category' | 'brand';
+  /** `family` = seri / ürün ailesi (URN-139): url `/products/<aile-slug>`, metadata `{ slug, name_i18n }`. */
+  type: 'product' | 'category' | 'brand' | 'family';
   slug?: string;
   url: string;
   metadata?: Json;

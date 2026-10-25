@@ -178,6 +178,20 @@ sıralanır.
 **K6.3 — Sıralı alt-dize eşleştirmesi tek dal olarak bırakılmaz.** `ILIKE '%a%b%'` biçimi
 kelimelerin metinde **o sırada** geçmesini şart koşar. Bu, K6.1'i tek başına ihlal eder.
 
+**⭐K6.3a — ÖNERİ KUTUSUNDA KATEGORİ VE SERİ KÖK EŞLEŞMEYLE BULUNUR (URN-139, 2026-10-25 ölçümü).**
+`get_search_suggestions` kategori dalı sıralı alt-dize idi (K6.3 ihlali): `hava perdesi` →
+"Hava Perdeleri" bulmuyordu (perdesi ≠ perdeleri), `çatı fanı` ve `kanal fanı` de ("Tipi" araya
+giriyor); seri (ürün ailesi) dalı hiç yoktu (`jet fan` → "JET Serisi" önerilmiyordu). Kural:
+sorgu `arama_normalize`'dan geçer, kelimelere bölünür; her kelimenin **kökü** (uzunluk ≥ 6 → son 2
+harf kırpılır · 4-5 → son 1 · ≤ 3 → aynen) metnin bir kelimesinin **başında** geçmelidir; **tüm**
+kelimeler eşleşir, sıra önemsizdir. Kategori metni = normalize ad + TR slug + EN slug + kanonik
+slug (tire → boşluk) — **K3.1d sınırı öneri yüzeyinde EN slug üzerinden kısmen kapanır**: `air
+curtain`, `roof fan`, `duct fan` kategori bulur; kategori adının EN çevirisi hâlâ DB'de yoktur,
+slug yoktaysa EN terim bulunmaz. Seri metni = normalize `product_families.name` + `name_i18n`
+TR/EN; yalnız silinmemiş ve en az bir aktif ürünü olan aile önerilir. Dal sırası: kategori (≤2) →
+seri (≤2) → marka (≤2) → ürün (≤4) ve **açık sütunla** kurulur (UNION ALL satır sırası garanti
+değildir). Aynı aileler arasında sıra: aile ADINDA eşleşen kök sayısı ↓ · metin kısalığı ↑ · ad ↑.
+
 **K6.4 — Yazım hatası toleransı zorunludur.** `vortis` yazan kullanıcı `Vortice` ürünlerini
 bulmalıdır. İki ölçülmüş tuzak:
 - Trigram indeksini tetikleyen **`%` operatörüdür**; `similarity(...) > eşik` yazımı indeksi
@@ -300,6 +314,12 @@ Aşağıdaki vakalar **taban**dır; genişletilebilir, daraltılamaz.
 | 13 | `jet fan` | ad isabeti sırası (K3.1e) | ilk satırın ad isabeti = kümedeki **en yüksek** ad isabeti (ada göre değil davranışa göre; katalog "Jet …" adlı başka ürün eklese de kırılmaz) |
 | 15 | `ISI GERİ KAZANIM`, `İNLİNE` | büyük İ (K5.2a) | küçük harfli yazımla **aynı sayı** |
 | 14 | `vortis` | marka tavanı (K8.4a) | ≤ Vortice aktif ürün sayısı, marka dışı **0** |
+| 16 | `hava perdesi` (öneri) | Türkçe ek + kök eşleşme (K6.3a) | ilk öneri **kategori**, adı `air-curtains` kategorisinin adı; `perde hava` ile **aynı kategori kümesi** (K6.1) |
+| 17 | `çatı fanı`, `kanal fanı` (öneri) | araya giren kelime + ek (K6.3a) | `roof-fans` / `duct-fans` kategorisi önerilir |
+| 18 | `air curtain`, `roof fan`, `duct fan` (öneri) | EN slug yoluyla kategori (K3.1d) | ilgili kategori önerilir |
+| 19 | `jet fan`, `sessiz fan` (öneri) | seri dalı (K6.3a) | `jet-serisi` ve `vortice-lineo-quiet-sessiz-kanal-fanlari` serisi önerilir; `jet fan`'da **ilk seri** JET Serisi |
+| 20 | `zzzqqq` (öneri) · `fan` (öneri) | anlamsız sorgu · kategori tavanı | **0 öneri** · kategori **≤ 2** |
+| 21 | tüm öneri vakaları | dal sırası | kategori → seri → marka → ürün, **geriye dönüş yok** (migration guard'ı anon rolüyle ölçer) |
 
 ## 9. Hata yolları (kural 14)
 

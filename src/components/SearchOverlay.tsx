@@ -269,6 +269,15 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
    * Eşleşme bulunamazsa `s.label`'a düşülür — bugünkü davranış, yani regresyon yok.
    */
   const oneriEtiketi = (s: SearchSuggestion): string => {
+    if (s.type === 'family') {
+      // Seri (URN-139): RPC `label` olarak ailenin birincil adını (TR) verir, çeviriler
+      // `metadata.name_i18n` içindedir. EN'de çeviri varsa o, yoksa ad (bugünkü davranış).
+      const meta = s.metadata
+      const adlar = meta && typeof meta === 'object' && !Array.isArray(meta) ? meta.name_i18n : undefined
+      const en = adlar && typeof adlar === 'object' && !Array.isArray(adlar) ? adlar.en : undefined
+      if (lang === 'en' && typeof en === 'string' && en.trim() !== '') return en
+      return s.label ?? ''
+    }
     if (s.type === 'category' && s.url) {
       const slug = s.url.split('/').filter(Boolean).pop()
       const kategori = slug ? getCategoryBySlug(slug) : undefined
@@ -335,6 +344,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       )
     ) : s.type === 'category' ? (
       <svg className="w-5 h-5 text-primary-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+    ) : s.type === 'family' ? (
+      <svg className="w-5 h-5 text-primary-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4L3 9l9 5 9-5-9-5zM3 14l9 5 9-5M3 17l9 5 9-5" /></svg>
     ) : (
       <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
     )
@@ -359,6 +370,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           {/* URN-32: ürün önerisinin altında yalnız MARKA yazılır — eskiden `marka • sku` basılıyordu
               (müşteriye iç kod). Öneri satırı model kodu taşımıyor; "kodu olmayan satırı hiç çizme"
               hükmü (getProductModelLabel) gereği kod yerine hiçbir şey konmaz. INV-SKU-GORUNMEZ-1. */}
+          {s.type === 'family' && (
+            <div className="text-xs text-steel-gray mt-0.5">{t('search.familyCaption')}</div>
+          )}
           {s.type === 'product' && (s.metadata as Record<string, string>)?.brand && (
             <div className="text-xs text-steel-gray mt-0.5">
               <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>
