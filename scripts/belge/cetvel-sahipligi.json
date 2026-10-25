@@ -306,6 +306,11 @@
       "dogrulanacak": false,
       "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
     },
+    "docs/standards/foy-yazi-tipi-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "OPS emri HRT-59 (2026-10-12): föy yazı tipi kuralı, sahip URUN"
+    },
     "docs/standards/subagent-delegation-standard.md": {
       "sahip": "OPS",
       "dogrulanacak": false,
