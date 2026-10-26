@@ -275,9 +275,18 @@ const ENJEKSIYON_BLOKLARI = [
   /<side-sessions-event[\s\S]*?<\/side-sessions-event>/gi,
 ]
 
-/** İstemden Recep'in kendi yazdığı kısmı bırakır (enjeksiyon blokları atılır). */
+/**
+ * İstemden Recep'in kendi yazdığı kısmı bırakır.
+ *  · `<cross-session-message` AÇILIŞ etiketinden itibaren HER ŞEY Recep sayılmaz. Tembel regex ile blok kesmek, mesaj
+ *    gövdesine gömülmüş sahte bir kapanış etiketinden sonrasını "Recep metni" yapardı (güvenlik incelemesi, ARC-213);
+ *    başka bir departman mesajı bile kilidi koyup kaldıramaz. Bedel: Recep'in sözü departman mesajından SONRA gelirse
+ *    kaçırılır (kilit konmaz); aynı istemde sözü önce yazıldığında yakalanır.
+ *  · Diğer enjeksiyon blokları (sistem hatırlatması, görev bildirimi vb.) tam blok olarak atılır.
+ */
 function recepMetni(istem) {
   let m = String(istem || '')
+  const ilk = m.search(/<cross-session-message\b/i)
+  if (ilk >= 0) m = m.slice(0, ilk)
   for (const re of ENJEKSIYON_BLOKLARI) m = m.replace(re, ' ')
   return m.replace(/\s+/g, ' ').trim()
 }
@@ -286,6 +295,7 @@ function recepMetni(istem) {
 const HARF = 'a-z0-9'
 const kelime = (s) => new RegExp(`(?<![${HARF}])${s}(?![${HARF}])`)
 const YASAK_IFADELERI = [kelime('pencere acma'), kelime('baska pencere'), kelime('dokunma'), /(?<![a-z0-9])yola cik/, kelime('simdi degil'), kelime('baslamasin')]
+const KALDIRMA_SOZCUK_TAVANI = 8
 const SERBEST_IFADELERI = [kelime('yasak kalkti'), kelime('yasak yok'), kelime('baslat'), kelime('baslatabilirsin'), kelime('devam'), kelime('serbest'), kelime('izin verdim')]
 
 /**
@@ -299,9 +309,12 @@ function recepSozu(istem) {
     const e = re.exec(m)
     if (e) return { tip: 'koy', ifade: e[0] }
   }
-  for (const re of SERBEST_IFADELERI) {
-    const e = re.exec(m)
-    if (e) return { tip: 'kaldir', ifade: e[0] }
+  // Kaldırma yalnız KISA mesajda (en çok 8 sözcük): uzun bir metindeki rastgele "devam" kilidi kaldırmasın.
+  if (m.split(' ').length <= KALDIRMA_SOZCUK_TAVANI) {
+    for (const re of SERBEST_IFADELERI) {
+      const e = re.exec(m)
+      if (e) return { tip: 'kaldir', ifade: e[0] }
+    }
   }
   return { tip: null, ifade: '' }
 }
@@ -309,17 +322,28 @@ function recepSozu(istem) {
 /** İstemdeki departman mesajlarının göndericileri (rol). `from-name` önce, yoksa `from-session` (local_) çözülür. */
 function gelenMesajlar(istem, secenek = {}) {
   const roller = []
-  const re = /<cross-session-message\b([^>]*)>/gi
-  let e
-  while ((e = re.exec(String(istem || ''))) !== null) {
+  const metin = String(istem || '')
+  const ac = /<cross-session-message\b([^>]*)>/gi
+  const kapa = /<\/cross-session-message[^>]*>/gi
+  let konum = 0
+  // YALNIZ en dıştaki başlıklar: bir mesajın GÖVDESİNE gömülü sahte açılış etiketi atlanır (güvenlik incelemesi, ARC-213).
+  for (;;) {
+    ac.lastIndex = konum
+    const e = ac.exec(metin)
+    if (!e) break
+    kapa.lastIndex = ac.lastIndex
+    const k = kapa.exec(metin)
+    konum = k ? kapa.lastIndex : metin.length
     const ad = /from-name="([^"]*)"/.exec(e[1])
     const oturum = /from-session="([^"]*)"/.exec(e[1])
-    let rol = ad ? rolCoz(basliktanSusAt(ad[1])) : ''
-    if (!rol && oturum) {
-      const c = aliciCoz(oturum[1], secenek)
-      if (c.tip === 'rol') rol = c.rol
-    }
-    if (rol && !roller.includes(rol)) roller.push(rol)
+    // Kimlik OTURUM numarasından (uygulamanın kaydıyla doğrulanır); from-name yalnız çapraz kontrol. İkisi çelişirse ya
+    // da oturum çözülemezse kayıt YOK (cevap hakkı doğmaz: sıkı yön).
+    if (!oturum) continue
+    const c = aliciCoz(oturum[1], secenek)
+    if (c.tip !== 'rol') continue
+    const adRol = ad ? rolCoz(basliktanSusAt(ad[1])) : ''
+    if (adRol && adRol !== c.rol) continue
+    if (!roller.includes(c.rol)) roller.push(c.rol)
   }
   return roller
 }
