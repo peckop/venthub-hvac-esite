@@ -749,8 +749,29 @@ bolum('yontem', 6,
 // POSTA KUTUSU SAYACI (karar 54, 2026-09-21): açılışta kutuya bakılmazsa kapalı pencereye
 // bırakılan mesaj yine kaybolur. 0 → satır yok; ölçülemezse "ölçülemedi" satırı (temiz sayılmaz).
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
+/**
+ * ÖNCE BUNLAR / SIRADA (ARC-217): departman penceresi açılınca elindeki In Progress/Review kartlar yeni emirden ÖNCE
+ * görünür. Rol kartının hemen arkasına (üçüncü sıra) girer. Kanban okunamazsa ya da rol kartsızsa (OPS dahil) sessiz.
+ */
+function onceBunlarEkle() {
+  try {
+    if (!rolSeridi || String(rolSeridi).trim().toUpperCase() === 'OPS') return
+    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).acilisMetni(rolSeridi)
+    if (!metin) return
+    bolumler.splice(2, 0, {
+      ad: 'once-bunlar',
+      oncelik: 2,
+      tam: metin,
+      ozet: 'ÖNCE BUNLAR: elindeki In Progress/Review kartlar yeni emirden önce — node scripts/board/kanban-anlik.cjs --pano <departman> --acik --kisa\n',
+    })
+  } catch {
+    /* Kanban okunamadı: açılış bloklanmaz */
+  }
+}
+
 const yaz = () => {
   rolBolumuEkle()
+  onceBunlarEkle()
   haritaBolumuEkle()
   const cikti = {
     hookEventName: 'SessionStart',
