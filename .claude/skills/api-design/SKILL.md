@@ -159,6 +159,25 @@ Check error/content-type semantics against [RFC 9457](https://www.rfc-editor.org
 Use the latest stable specification supported by the project's tooling; verify
 the current OpenAPI release before choosing its schema dialect.
 
+## YTN-21 eki: idempotency anahtarını onurlandırmak (VentHub'a uyarlanmış)
+
+Anahtarı kabul etmek sözleşmedir; onurlandırmak uygulamadır ve para orada kaybolur. Özensiz işlenen anahtar, hiç anahtar olmamasından kötüdür: istemci artık yeniden denemenin güvenli olduğuna inanır. Ödeme ve iade uçları (İyzico) için bağlayıcıdır.
+
+1. **Anahtar niyetten türer, denemeden değil.** Aynı niyetin yeniden denemelerinde sabit, farklı niyetlerde farklı olmalı. Yanlış: her denemede `randomUUID()`; `${userId}:${amount}` (iki meşru ödemeyi birleştirir); `${orderId}:${Date.now()}`. Doğru: istemcinin bir kez üretip tekrar kullandığı başlık ya da değişmez bir kimlikten türeyen anahtar (`charge:v1:${orderId}`). Anahtarı yeniden denemeyi yapan katman üretmez.
+2. **Talep atomik olur; "var mı bak, sonra yap" yarıştır.** İki eşzamanlı deneme ikisi de "görülmedi" okuyup iki kez tahsil eder. Kazananı veritabanındaki benzersiz kısıt seçer: önce `(tenant, anahtar, istek_özeti, durum='işleniyor')` satırı eklenir, benzersiz ihlalinde mevcut sonuç tekrar verilir ya da reddedilir. Tek işlemde benzersizlik zorlayamayan bir depo bunu taşıyamaz. Anahtar kapsamı tenant'a bağlıdır (kural 12). Kısıt bir migration gerektirirse kural 13: Recep onayı olmadan merge yok.
+3. **Yükü koru.** Aynı anahtar farklı gövdeyle gelirse istemci hatasıdır: 422 ile yüksek sesle reddedilir, ilk yanıt ikinci isteğe verilmez.
+4. **Süren kopyaya ne verildiği bilinçli seçimdir:** `409 Conflict` (en basit ve güvenli), sınırlı bekleme ya da `202` + durum adresi. İlk deneme "takıldı gibi" diye ikinciyi içeri alma; kaderi bilinmeyen deneme, kopyalamanın en pahalı olduğu andır.
+5. **Her çağrının üç sonucu vardır: başarı, hata ve bilinmeyen.** Zaman aşımı etkinin uygulanıp uygulanmadığını söylemez. Niyet dışarı çağrıdan ÖNCE kaydedilir; çağrı ile yanıt arasındaki çöküş, sessizce yeniden denenen bir tahsilat yerine çözülmesi gereken bir iz bırakır.
+6. **Saklama süresi en uzun yeniden-dağıtım zincirinden hesaplanır**, disk maliyetinden değil: 7 gün sonra yeniden oynatılan bir ölü-mektup kuyruğunun ya da sağlayıcı itiraz penceresinin arkasında 24 saatlik anahtar ömrü, bekleyen bir çifte tahsilattır.
+7. **Kural 11 ile bağ:** sipariş/iade durumları monotondur (yalnız ileri). Yeniden oynatılan istek durumu geri sarmaz; tekrarda saklanan sonuç döner. Webhook tarafı HMAC-SHA256 + replay guard ayrı kuraldır, bu bölüm onun yerine geçmez.
+8. **Para alanı hâlâ `pricing-standard.md`'ye bağlıdır:** istek özeti ve saklanan yanıt tutarı oradaki biçimde (DB `numeric(14,4)`) taşır; bu bölüm tutarın tel biçimini dayatmaz.
+
+Kırmızı bayraklar (diff'te görülürse bulgu): anahtar için `SELECT` sonra `INSERT`; anahtarın UUID, zaman damgası ya da her denemede yeniden üretilen bir değerden türemesi; aynı anahtarın farklı gövdeyle kabul edilip ilk yanıtın sessizce dönmesi; saklama süresinin en uzun yeniden-dağıtım yolundan kısa olması.
+
+Doğrulama (uç bitmeden): durum değiştiren uç ya anahtarı onurlandırır ya da "yeniden denemek güvensiz" diye yazılıdır; anahtar tek işlemde, benzersiz kısıtla talep edilir; yeniden kullanılan anahtar + farklı yük yüksek sesle reddedilir; süren kopya yanıtı (409/bekle/202) bilinçli seçilmiştir; saklama ölü-mektup yeniden oynatmasını aşar.
+
+Kaynak: addyosmani/agent-skills api-and-interface-design @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
 ## Skills in scope
 
 - `security-scanner` — for authorization, injection, and exposure review

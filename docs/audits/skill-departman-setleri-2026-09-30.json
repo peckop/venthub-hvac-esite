@@ -93,7 +93,7 @@
     },
     {
      "ad": "api-design",
-     "kb": 10
+     "kb": 13.7
     }
    ],
    "bekleyen": []
@@ -165,7 +165,7 @@
    "adiylaCagir": [
     {
      "ad": "code-review",
-     "kb": 9.6
+     "kb": 12.8
     }
    ],
    "bekleyen": [
@@ -306,7 +306,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "kaynak": "yetenek"
     }
    ],
@@ -444,7 +444,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "kaynak": "yetenek"
     }
    ],
@@ -583,7 +583,7 @@
     },
     {
      "ad": "api-design",
-     "kb": 10
+     "kb": 13.7
     },
     {
      "ad": "payments-webhooks",
@@ -649,7 +649,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "kaynak": "yetenek"
     }
    ],
@@ -761,7 +761,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "kaynak": "yetenek"
     }
    ],
@@ -944,7 +944,7 @@
    "adiylaCagir": [
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "uyari": "35 KB set bütçesi (YTN-18, 1.1.0 gövdesi büyüdü): ön yüklenmez, görev metninde adı yazılır"
     }
    ],
@@ -1039,7 +1039,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "kaynak": "yetenek"
     }
    ],
@@ -1246,7 +1246,7 @@
     },
     {
      "ad": "api-design",
-     "kb": 10
+     "kb": 13.7
     },
     {
      "ad": "payments-webhooks",
@@ -1314,7 +1314,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6,
+     "kb": 12.8,
      "kaynak": "yetenek"
     }
    ],
@@ -1594,7 +1594,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 9.6
+     "kb": 12.8
     },
     {
      "ad": "web-performance",
