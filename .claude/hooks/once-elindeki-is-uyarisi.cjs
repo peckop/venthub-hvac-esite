@@ -28,7 +28,7 @@ function baslatmaMi(girdi) {
   const a = String((girdi && girdi.action) || '')
   if (a === 'start_task' || a === 'claim_task') return true
   if (a === 'transition_task') return String(girdi.lifecycleStage || '').toLowerCase() === 'running'
-  if (a === 'move_task') return /in[-_ ]?progress/i.test(String(girdi.targetColumnId || ''))
+  if (a === 'move_task') return /in[-_ ]?progress/i.test(String(girdi.targetColumnId || girdi.columnId || ''))
   return false
 }
 
