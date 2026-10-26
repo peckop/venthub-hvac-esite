@@ -192,6 +192,29 @@ const BIRLESTIRME_KURALI = [
 ].join('\n')
 
 /**
+ * VENTHUB SEO EK KURALLARI (HRT-75, karar 417, 2026-10-26): claude-seo paketi (AgriciDaniel, MIT) yalnız GEO-SEO ve BLOG için kurulur;
+ * paket skill'leri çalışırken bu maddeler paket metninden ÖNCE okunur, çelişirse bunlar kazanır. Ham liste YETENEK notudur
+ * (yetenek-seo-ek-kurallari-2026-10-26); OPS düzeltmeleri işlendi: dizin isteği GEO-SEO görevidir (SEO-39), Search Console pencere
+ * iddiası ölçümle teyit edilir, teklif modunda fiyat yazılmaz. Paket ya da sürüm değişince YETENEK listeyi yeniden ölçer.
+ * Yalnız SEO_EK_KURALI_ROLLERI kurallar dosyalarına AYNEN girer.
+ */
+const SEO_EK_KURALI_ROLLERI = ['GEO-SEO', 'BLOG']
+const SEO_EK_KURALI = [
+  '## VentHub SEO ek kuralları (karar 417, HRT-75)',
+  '- claude-seo paketinin skill\'leri çalışırken bu maddeler paket metninden önce okunur; çelişirse bunlar kazanır. Rehber standardı (`docs/standards/rehber-yazisi-standard.md`) bu maddelerin üstündedir; uydurma sayı ve kaynaksız iddia yasağı geçerlidir.',
+  '- FAQPage işaretlemesi konmaz (Google SSS zengin sonucu 2026-05-07\'de kalktı, rehber standardı R6). SSS bölümü okuyucu için kalır, şema kalkar; paketin şema ve içerik skill\'leri FAQPage önerirse uygulanmaz.',
+  '- TR/EN eşlik: her sayfanın TR/EN karşılığı ve hreflang karşılıklı çift olur; denetim GEO-SEO\'nundur, düzeltme URUN ya da I18N\'e kart olarak gider. Kanonik adres venthub.com.tr (www\'suz); alt alan adı ya da vercel.app müşteriye verilmez.',
+  '- Dizin ve canlı yazım: paketin kendi `index`, `index-batch` ve Indexing API komutları kendiliğinden koşulmaz (Indexing API yalnız JobPosting ve BroadcastEvent içindir). IndexNow ve Search Console dizin isteği GEO-SEO\'nun kendi görevidir: her canlı değişiklikte `docs/standards/yayin-gorunurluk-denetim-standard.md` Y2.1 zinciriyle koşar (SEO-39), Recep\'e sorulmaz. Paketin PostToolUse kancası (`hooks.json`) ve `install.*` betikleri kurulmaz.',
+  '- Ücretli servis Recep kapısıdır: DataForSEO (`seo-dataforseo`, `seo-backlinks`, `seo-local`, `seo-maps`, `seo-ecommerce` Merchant ve Amazon bölümleri), görsel üretim (`seo-image-gen`, `seo-images` üretken kısmı), Bright Data ve bakiye harcayan benzeri hizmetler Recep sözü olmadan çağrılmaz; ücretsiz modda kalmayan komut ücretli diye durur ve OPS\'a yazılır.',
+  '- Search Console ölçüm penceresi: paketin `seo-google` skill\'i 2025-05-13 ile 2026-04-27 arası gösterim, tıklama oranı ve konum verisini güvenilmez sayıyor; bu iddia Google belgesiyle doğrulanmadı, GEO-SEO ölçümle teyit eder. Teyit edilene kadar bu pencereyi kapsayan önce/sonra kıyası tek başına kanıt yapılmaz. GSC Generative AI raporu yalnız gösterim verir (tıklama ya da kanıt değildir). Erişim: hizmet hesabı yolu (`search-console` skill\'i), oturum isteyen sayfa claude-in-chrome ile.',
+  '- Meta açıklama 150-160 karakterdir (OPS listesi; paketin farklı sayısı çıkarsa bizimki kazanır). Başlık uzunluğunda mevcut GEO-SEO kuralı geçerlidir.',
+  '- Yazı brief\'i (BLOG): `seo-content-brief` ve `seo-sxo` adım 2-3 yazıdan önce koşulur: bu site arama niyetine cevap verecek kaynağa ve ölçüme sahip mi; rakip sonuçlara göre bilgi kazancı nedir; SERP\'te çıkan sayfa türü (rehber, karşılaştırma, ürün, araç) bizim sayfa türümüzle uyumlu mu. SERP ölçümü GEO-SEO\'nundur, kararı BLOG verir.',
+  '- Yapısal veri `docs/standards/urun-yapisal-veri-standard.md` ile uyumludur: `Offer` (AggregateOffer değil), `price` sıfırdan büyük, `priceCurrency` TRY; sıfır fiyat örneği hiçbir sayfaya girmez. Teklif modundaki ürünün fiyatı görünmez (standart §3.2): fiyatı olmayan ürüne `Offer` ve `price` yazılmaz. `seo-schema` tür listesi yalnız referanstır; yeni tür eklemek URUN kararıdır.',
+  '- Ajan tarama dürüstlüğü: `seo-agentic` P0 ve P1 maddeleri ölçülür, sayı uydurulmaz; AI motorunda alıntılandık iddiası canlı sayfa ya da yanıt ölçülmeden yazılmaz. Claude için güncel botlar ClaudeBot, Claude-SearchBot ve Claude-User\'dır (Claude-Web bayat).',
+  '- Teknik kontrol: `seo-technical` listesi uygulanır; PHP ve WordPress CVE maddeleri Next.js\'e uymadığı için atlanır. Alınmayan paket parçaları: üst komut `seo`, `backlinks`, `dataforseo`, `flow`, `image-gen`, `images`, `local`, `maps`, `plan`, `drift`.',
+].join('\n')
+
+/**
  * OPS OKUMA KURALLARI (HRT-60, OPS-120 ek 2, 2026-10-12): yalnız OPS'un kurallar dosyasına girer. OPS birleştirmez, okur ve sıra verir;
  * Recep'e giden metin kaynaklı olur; kanca/ayar farkı okumasının sabit sorusu (13:07 olayı, kapısı ARC-103); defter eşitleme (kapısı ARAÇ).
  * Depo herkese açık: olayların ayrıntısı buraya YAZILMAZ; kartlarda durur.
@@ -393,6 +416,7 @@ function kuralDosyasi(ad) {
     DURUM_SATIRI_KURALI,
     '',
     ...(OPS_OKUMA_KURALI_ROLLERI.includes(ad) ? [OPS_OKUMA_KURALI, ''] : []),
+    ...(SEO_EK_KURALI_ROLLERI.includes(ad) ? [SEO_EK_KURALI, ''] : []),
     ...(ICERIK_KURALI_ROLLERI.includes(ad) ? [ICERIK_KURALI, ''] : []),
     ...(UNVAN_OLCUM_KURALI_ROLLERI.includes(ad) ? [UNVAN_OLCUM_KURALI, ''] : []),
     ...(OPS_YANIT_KURALI_ROLLERI.includes(ad) ? [OPS_YANIT_KURALI, ''] : []),
@@ -985,6 +1009,8 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
     if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
     if (!metin.includes(SUREN_IS_KORUMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Süren iş koruması" bloğu eksik/değişmiş (HRT-73)`)
+    if (SEO_EK_KURALI_ROLLERI.includes(ad) && !metin.includes(SEO_EK_KURALI)) s.push(`${ad}: kurallar dosyasında "VentHub SEO ek kuralları" bloğu eksik/değişmiş (HRT-75)`)
+    if (!SEO_EK_KURALI_ROLLERI.includes(ad) && metin.includes('## VentHub SEO ek kuralları')) s.push(`${ad}: "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasına girer (HRT-75)`)
     if (!metin.includes(DERS_TEKRAR_KURALI)) s.push(`${ad}: kurallar dosyasında "Aynı ders ikinci kez" bloğu eksik/değişmiş (HRT-70)`)
   }
   return s
@@ -1328,6 +1354,8 @@ module.exports = {
   TESHIS_KURALI,
   DERS_TEKRAR_KURALI,
   SUREN_IS_KORUMA_KURALI,
+  SEO_EK_KURALI,
+  SEO_EK_KURALI_ROLLERI,
   CALISMA,
   haritaOzet,
   haritaDosyasi,

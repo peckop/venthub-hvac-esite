@@ -163,6 +163,16 @@ kadar vekil ölçü kullanılır.
    bakar.
 4. Bu işler kullanıcının "oturum sonu / gün sonu" demesine bağlı değildir: PreCompact ve SessionEnd'de koşar.
 5. `MEMORY.md` yalnız kısa işaretçi taşır; ayrıntı konu dosyalarındadır ve konuya göre yönlendiriciyle gelir.
+6. **Bağlam hiyerarşisi (HRT-75):** bilgi çatıştığında güvenilirlik sırası kural dosyası, cetvel (spec), kaynak kod, hata çıktısı,
+   sohbettir; üstteki kazanır. Bağlam penceresinin yaklaşık %75'i dolmadan iş toparlanır ve gereksiz bölümler budanır. Bizde karşılığı
+   açılıştaki BAĞLAM satırı ile COMPACT YAKIN uyarısıdır; eşik değeri kancada (ARAÇ), burada yalnız ilke durur.
+7. **Yeniden başlama kontratı (HRT-75):** durum dosyası oturum sınırında üç şeyi taşır: karar özeti (bu oturumda verilen kararlar, neden
+   ve kim onayladı), açık işler, doğrulanmış olgular (ölçülmüş, kaynağıyla). Karar özeti alanı denetimde henüz aranmaz (madde 3'ün dört
+   alanına dahil değil; kapısı için ARAÇ'a öneri, §B9).
+8. **Karar kaydı biçimi (HRT-75):** karar defteri satırı bağlam, karar, alternatifler, sonuçlar ve durum alanlarını taşır; mevcut karar
+   defterinin alanlarıyla eşlenir, ayrı `docs/decisions/` dizini açılmaz.
+
+Kaynak: addyosmani/agent-skills `context-engineering` @f3400940 (MIT) madde 6-7; `documentation-and-adrs` @f3400940 (MIT) madde 8.
 
 ## B9 — Uygulama durumu
 
@@ -193,3 +203,5 @@ Dilim listesi ve ölçütler REC-400 planındadır.
 
 - **v0.1 (2026-09-27, REC-400 D1):** ilk taslak. Kaynak: belge taraması (163 bulgu), 37 uzman videosu, araç
   kıyası (22 araç), kanca ölçümü (7 gün). Eşikler başlangıç değeridir.
+- **v0.2 (2026-10-26, HRT-75):** B8'e madde 6-8 (bağlam hiyerarşisi, yeniden başlama kontratı, karar kaydı biçimi). Kaynak:
+  addyosmani/agent-skills (MIT). Kapısı yok; karar özeti alanının denetimi için ARAÇ'a öneri.
