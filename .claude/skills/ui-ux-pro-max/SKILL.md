@@ -242,8 +242,8 @@ These are frequently overlooked issues that make UI look unprofessional:
 | Rule | Do | Don't |
 |------|----|----- |
 | **Glass card light mode** | Use `bg-white/80` or higher opacity | Use `bg-white/10` (too transparent) |
-| **Text contrast light** | Use `#0F172A` (slate-900) for text | Use `#94A3B8` (slate-400) for body text |
-| **Muted text light** | Use `#475569` (slate-600) minimum | Use gray-400 or lighter |
+| **Text contrast light** | Use the foreground token for body text (e.g. `text-foreground`; HSL custom property, not a literal hex) | Use a low-contrast muted token (or gray-400) for body text |
+| **Muted text light** | Use the muted-foreground token at its darkest light-mode value (about slate-600 contrast, 4.5:1 minimum) | Use gray-400 or lighter |
 | **Border visibility** | Use `border-gray-200` in light mode | Use `border-white/10` (invisible) |
 
 ### Layout & Spacing
@@ -255,6 +255,39 @@ These are frequently overlooked issues that make UI look unprofessional:
 | **Consistent max-width** | Use same `max-w-6xl` or `max-w-7xl` | Mix different container widths |
 
 ---
+
+## YTN-21 eklemeleri: yapay zekâ görünümü, durumlar, erişilebilirlik
+
+> Kaynak: addyosmani/agent-skills frontend-ui-engineering @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT); VentHub'a uyarlandı, 26 Ekim 2026, YTN-21. Kural 8 geçerli: renkler HEX değil CSS özel özelliği (HSL token).
+
+**Yapay zekâ görünümünden kaçın.**
+
+| Varsayılan | Sorun | Bizde |
+|---|---|---|
+| Her yerde mor/çivit | Her uygulama aynı görünür | Projenin gerçek paleti (token) |
+| Aşırı gradyan | Gürültü, tasarım sistemiyle çatışır | Düz ya da tasarım sisteminin tanımladığı |
+| Her şey çok yuvarlak (`rounded-2xl`) | Köşe hiyerarşisini yok sayar | Tasarım sisteminin köşe ölçeği |
+| Jenerik hero | İçerikle ilgisiz şablon | Önce içerik, ürün/ihtiyaç odaklı |
+| Lorem ipsum | Gerçek içeriğin gösterdiği taşma ve sarmayı gizler | Gerçekçi içerik (gerçek ürün adı, gerçek uzunluk) |
+| Her yerde büyük dolgu | Hiyerarşiyi bozar | `tokens.js` aralık ölçeği |
+| Hep aynı kart ızgarası | Bilgi önceliğini yok sayar | Amaca göre düzen |
+| Ağır gölge | İçerikle yarışır, zayıf cihazı yavaşlatır | Tasarım sistemi öngörmedikçe hafif ya da yok |
+
+**Aralık ve tipografi.** Ölçekte olmayan değer uydurma (`13px`, `2.3rem` gibi); kural 8: arbitrary değer yasak. Başlık düzeyi atlama,
+başlık stilini başlık olmayan içerikte kullanma; sayfada tek `h1`.
+
+**Renk.** Anlamsal token kullan (`text-foreground`, `bg-surface` gibi proje adları), ham HEX değil. Kontrast: normal metin 4.5:1,
+büyük metin 3:1. Bilgiyi yalnız renkle taşıma (simge, metin ya da desen ekle).
+
+**Erişilebilirlik (WCAG AA).**
+- Klavye: etkileşimli her öğe odaklanabilir; öncelik `<button>`, `<div onClick>` yasak. `role="button"` zorunluysa `tabIndex={0}`, Enter ve Boşluk
+  (Boşlukta `keyup` ile tetikle, `keydown`da kaydırmayı engelle) işlenir.
+- Etiket: görünür metni olmayan düğmeye `aria-label` (sözlükten, kural 7); form alanına `<label htmlFor>`; arama gibi görünür etiketi olmayan alana `aria-label`.
+- Odak yönetimi: içerik değişince (modal açılışı) odağı taşı, modal açıkken odağı içeride tut, kapanınca tetikleyiciye geri ver; `focus-visible:` kullan.
+- Anlamlı boş ve hata durumu: boş ekran gösterme; `role="status"`, kısa başlık, bir sonraki adım (ör. eylem düğmesi). Metinler sözlükten.
+
+**Durum maddesi.** Bileşen bitmeden: yükleme, boş, hata, başarı ve yetki durumları (uygulanabildiği kadar) ele alınmış; 320/768/1024/1440 genişlikte
+çalışıyor; konsolda hata yok; Tab ile sayfa gezilebiliyor; axe uyarısı yok.
 
 ## Pre-Delivery Checklist
 
