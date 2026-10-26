@@ -285,9 +285,13 @@ const ENJEKSIYON_BLOKLARI = [
  */
 function recepMetni(istem) {
   let m = String(istem || '')
+  // Önce TAM enjeksiyon blokları atılır, sonra ilk departman mesajı açılışından kesilir, sonra kapanmamış herhangi bir
+  // enjeksiyon açılışından itibaren her şey atılır (kapanmamış blok Recep metni olarak sızmasın; güvenlik incelemesi turu 2).
   const ilk = m.search(/<cross-session-message\b/i)
   if (ilk >= 0) m = m.slice(0, ilk)
   for (const re of ENJEKSIYON_BLOKLARI) m = m.replace(re, ' ')
+  const acik = m.search(/<(?:system-reminder|task-notification|local-command-caveat|local-command-stdout|command-(?:name|message|args)|ci-monitor-event|side-sessions-event)\b/i)
+  if (acik >= 0) m = m.slice(0, acik)
   return m.replace(/\s+/g, ' ').trim()
 }
 
@@ -326,7 +330,11 @@ function gelenMesajlar(istem, secenek = {}) {
   const ac = /<cross-session-message\b([^>]*)>/gi
   const kapa = /<\/cross-session-message[^>]*>/gi
   let konum = 0
-  // YALNIZ en dıştaki başlıklar: bir mesajın GÖVDESİNE gömülü sahte açılış etiketi atlanır (güvenlik incelemesi, ARC-213).
+  // YALNIZ en dıştaki başlıklar. Gönderenin kontrol ettiği kapanış etiketine güvenilmez: iki başlık arasında kapanış
+  // etiketi bulunsa da, gövdede (ilk kapanıştan sonra) başka bir kapanış daha varsa ya da araya gömülü açılış girerse
+  // sonraki başlık SAYILMAZ (güvenlik incelemesi, tur 1 ve 2). Sonuç: yalnız ilk başlık güvenilir; sonrakiler yalnız
+  // aralarında hiçbir ek kapanış/açılış etiketi yoksa kabul edilir.
+  let ilkMi = true
   for (;;) {
     ac.lastIndex = konum
     const e = ac.exec(metin)
@@ -334,6 +342,11 @@ function gelenMesajlar(istem, secenek = {}) {
     kapa.lastIndex = ac.lastIndex
     const k = kapa.exec(metin)
     konum = k ? kapa.lastIndex : metin.length
+    const govde = metin.slice(ac.lastIndex, k ? k.index : metin.length)
+    const sahteIc = /<\/?cross-session-message\b/i.test(govde)
+    if (!ilkMi) break // yalnız İLK başlık güvenilir: sonrası sahte kapanış etiketiyle üretilmiş olabilir
+    ilkMi = false
+    if (sahteIc) continue
     const ad = /from-name="([^"]*)"/.exec(e[1])
     const oturum = /from-session="([^"]*)"/.exec(e[1])
     // Kimlik OTURUM numarasından (uygulamanın kaydıyla doğrulanır); from-name yalnız çapraz kontrol. İkisi çelişirse ya
