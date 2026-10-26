@@ -180,6 +180,24 @@ testine bağla" diye KALICI katman öner — hand-patch değil.]
 - **A7 — "ÇIKAR" hükmü GEREKÇESİZ verilmez, "KALSIN" da.** Her hüküm S1'in sayısına dayanır. Sayı
   yoksa hüküm yoktur; o adım `ÖLÇÜLEMEDİ` ile geçer ve bu raporun kendi sınırı olarak yazılır.
 
+## YTN-21 eki: iddia, ayıklama ve bulgu sınıflandırması
+
+Kaynak: addyosmani/agent-skills doubt-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
+**İddia önce yazılır.** Çürütmeden önce planın savunduğu şeyi kısa bir iddia olarak çıkar: ne yapılıyor, hangi varsayıma dayanıyor, ne yanlışsa bozulur. İddiayı bu kadar kısa yazamıyorsan elindeki karar değil sezgidir; önce sezgiyi yüzeye çıkar, sonra çürüt.
+
+**Ayıklama: en küçük incelenebilir birim.** Bağımsız çürütücüye (`Agent` ile açılan salt-okuma çalışan) yolculuk değil ürün ve sözleşme verilir: plan için 3-5 cümle + uyması gereken kısıtlar; kod için diff ya da fonksiyon, tüm dosya değil. **Akıl yürütmeni çıkar:** sonuçlarını verirsen sonuçlarının onayını geri alırsın. 500 satırlık parça bir okumaya sığmaz; önce böl. Çürütücüye ARTIFACT + CONTRACT verilir, **iddia (CLAIM) verilmez**: sonucunu eline tutuşturmak onu onaya iter. Çürütücü istemi düşmancadır ("hatayı bul, doğrulama, özetleme; bulamıyorsan kapsamlı baktıktan sonra bulamadığını açıkça yaz"); persona dengeli hüküm üretmeye yatkınsa istem aynen yapıştırılır, olmuyorsa genel alt ajana düşülür.
+
+**Bulgu sınıflandırması (ilk eşleşen kazanır).** Çürütücünün çıktısı veridir, hüküm değil; sınıflamadan önce bulguyu artifact metnine karşı yeniden oku (damga basmak yok saymakla aynı hatadır):
+1. **Yanlış okuma:** bulgu, verdiğin sözleşmenin eksik ya da belirsiz olmasından doğdu. Önce sözleşmeyi düzelt, sonraki turda yeniden sınıfla.
+2. **Geçerli, uygulanabilir:** gerçek sorun, değişiklik gerektirir. Değiştir, yeniden döngü.
+3. **Geçerli ödünleşim:** sorun gerçek ama düzeltme maliyeti kabul etme maliyetinden büyük; ödünleşimi açıkça yaz ki Recep görsün.
+4. **Gürültü:** çürütücünün sahip olmadığı bağlamda aslında doğru. Not düş; "bu bağlam sözleşmede olsaydı yanlış alarm olur muydu" diye sor.
+
+Taze bağlam da yanılır, bağlamı eksiktir; "taze" diye teslim olma. Üç turdan fazla dönme, Recep'e çık. Değişmemiş artifact için çürütücüyü yeniden açma (oyalanmaktır).
+
+**Şüphe tiyatrosu (denetlenebilir işaret).** Çürütücünün özlü bulgu verdiği iki ya da daha çok turda hiçbiri "geçerli, uygulanabilir" sınıfına girmiyorsa doğrulama yapıyorsun, çürütmüyorsun: dur ve Recep'e çık. Diğer hatalar: çürütücüye "bu iyi mi" diye sormak; yüksek riskte zaman baskısıyla çürütmeyi atlamak; kararı verdikten sonra şüphelenmek (o `/code-review`'dur, çürütme değil).
+
 ## İlgili Skiller (sınır)
 - Kod bütünlüğü / mimari integrity taraması → **venthub-auditor**
 - Enterprise teslim (10/10) denetimi → **venthub-enterprise-audit**

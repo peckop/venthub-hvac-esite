@@ -151,6 +151,18 @@ pre-existing edits. Use merge-base semantics for branch intent and exact-head
 CI for release decisions. A green check for an older revision cannot approve
 the current diff. Separate source-supported concerns from tested failures.
 
+## YTN-21 eki: yapısal çare, değişiklik boyu, bağımlılık disiplini
+
+Filo kuralı: önce yerleşik `/code-review`; bu bölüm onunla çakışmaz, yalnız yapısal çare, boyut eşiği ve bağımlılık bakışını ekler.
+
+**Yapısal çare.** Yapısal sorun bulunduğunda yalnız sorunu değil hamleyi de öner; "karmaşık" demek yazarı tahmine bırakır. Adlandırılmış çareler: koşul zincirini tipli modele ya da açık dağıtıcıya çevir; yinelenen dalları tek akışa indir; orkestrasyonu iş mantığından ayır; kavrama özgü mantığı paylaşılan modülden sahibi olan pakete taşı; yakın kopya yerine kanonik yardımcıyı kullan; tip sınırını açık yaz ki aşağı akıştaki dallanma kaybolsun; açıklık katmayan geçiş sarmalayıcısını sil; yardımcı çıkar ya da büyük dosyayı odaklı modüllere böl. Hareketli parçayı azaltan çareyi, aynı karmaşıklığı başka yere yayan çareye tercih et.
+
+**Değişiklik boyu.** Yaklaşık 100 satır iyi (tek oturumda okunur), yaklaşık 300 satır tek mantıksal değişiklikse kabul edilebilir, yaklaşık 1000 satır fazla büyüktür: böl. Dosya boyuna da bak: tek dosyanın toplam 1000 satırı civarı sert sınır değil inceleme sinyalidir; zaten büyük dosyayı büyüten değişiklikte önce çıkarma/ayırma sor. "Tek değişiklik" = tek şeyi çözen, ilgili testi taşıyan, teslimden sonra sistemi çalışır bırakan değişiklik. Bölme yolları: üst üste yığ (ardışık bağımlılık), dosya grubuna göre (farklı gözden geçiren), yatay (önce paylaşılan kod, sonra tüketici), dikey (özelliğin dilimleri). Büyüğü kabul edilebilir kılanlar: tam dosya silme ve gözden geçirenin yalnız niyeti doğruladığı otomatik yeniden düzenleme. Yeniden düzenleme ile yeni davranış iki ayrı değişikliktir. Bu eşikler ret gerekçesi değil bölme önerisidir; kural 14 gereği testi sonraya bırakmak için bölme kullanılmaz.
+
+**Bağımlılık disiplini.** Yeni bağımlılık: standart kütüphane ve mevcut yardımcılar öncelikli, her bağımlılık bir yüktür; bakım durumu, bilinen açık, lisans uyumu sorulur. Mevcut bağımlılık yükseltmesi sıradan bir kod değişikliğidir; "bump deps" toplu birleştirmeleri en riskli olanıdır: (1) sürüm numarası değil değişiklik günlüğü okunur, majör yükseltmede geçiş notları; (2) değişiklik başına tek bağımlılık (kırılırsa suçlu belli, geri alma temiz); (3) kararı testler verir, "kuruldu" kanıt değildir, bağımlılığın davranışı etrafında kapsam inceyse asıl bulgu odur, önce test eklenir; (4) geçişli grafiğe bak, `package.json` değil kilit dosyası farkını incele; (5) kilit dosyasını dürüst tut, commit'le, elle düzenleme. Yerelde `pnpm install` ağır komuttur (BELLEK uyarısı varsa koşma); kilit dosyası farkı PR'da okunur. Güvenlik hükmü (typosquatting, ele geçirilmiş bakımcı) için `security-scanner`.
+
+Kaynak: addyosmani/agent-skills code-review-and-quality @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
 ## Skills in scope
 
 - `security-scanner` — for a deeper pass on security-sensitive changes
