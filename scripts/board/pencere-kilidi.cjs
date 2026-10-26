@@ -57,6 +57,14 @@ function oturumKaydiDizini() {
   )
 }
 
+/**
+ * Pencere başlığındaki süsleri atar: "(yeni düzen)" parantezi VE ListAgents'in eklediği "[d83e92]" köşeli ref.
+ * Ref atılmazsa "Ürün (yeni düzen) [d83e92]" departmana çözülmez, alt ajan sayılıp kilitten GEÇERDİ (OPS bulgusu).
+ */
+function basliktanSusAt(metin) {
+  return String(metin).replace(/\[[^\]]*\]/g, ' ').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 /** Tablodaki geçerli rol anahtarları (ASCII, büyük harf). */
 function bilinenRoller() {
   return pa.TABLO.map((s) => s[0])
@@ -165,14 +173,14 @@ function aliciCoz(alici, secenek = {}) {
   if (local) {
     const kayit = localKayit(ham, secenek.oturumKok)
     if (!kayit) return { tip: 'kimlik-cozulemedi' }
-    const rol = rolOturumdan(kayit.cliSessionId, secenek.rolKayit) || rolCoz(String(kayit.title || '').replace(/\(.*\)/, ''))
+    const rol = rolOturumdan(kayit.cliSessionId, secenek.rolKayit) || rolCoz(basliktanSusAt(String(kayit.title || '')))
     return rol ? { tip: 'rol', rol } : { tip: 'rolsuz-pencere' }
   }
   if (UUID.test(ham)) {
     const rol = rolOturumdan(ham, secenek.rolKayit)
     return rol ? { tip: 'rol', rol } : { tip: 'kimlik-cozulemedi' }
   }
-  const ad = pa.katla(ham.replace(/\(.*\)/, '')).replace(SONEK, '')
+  const ad = pa.katla(basliktanSusAt(ham)).replace(SONEK, '')
   const rol = rolCoz(ad)
   return rol ? { tip: 'rol', rol } : { tip: 'ad' }
 }

@@ -7,8 +7,8 @@
  * kanıtları kapının gevşemesini gerçekten yakalar.
  */
 import { spawnSync } from 'node:child_process'
-import { createRequire } from 'node:module'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -97,6 +97,10 @@ describe('INV-KANCA-PENCERE-KILIDI-1 · alıcı → departman eşlemesi', () => 
     for (const a of ['ARAC', 'arac', 'Araç', 'ARAÇ', 'arac-pencere', 'arac-curutucu', 'Araç (yeni düzen)']) {
       expect(coz(a), a).toEqual({ tip: 'rol', rol: 'ARAC' })
     }
+    // ListAgents adı köşeli ref ile de gelebilir: ad tipine düşüp kilidi DELMESİN
+    for (const a of ['Ürün (yeni düzen) [d83e92]', 'Ürün [d83e92]', 'urun-pencere [d83e92]', 'Ürün (yeni düzen)']) {
+      expect(coz(a), a).toEqual({ tip: 'rol', rol: 'URUN' })
+    }
     expect(coz('geo-seo-pencere')).toEqual({ tip: 'rol', rol: 'GEO-SEO' })
     expect(coz('OPS')).toEqual({ tip: 'rol', rol: 'OPS' })
   })
@@ -138,7 +142,7 @@ describe('INV-KANCA-PENCERE-KILIDI-1 · karar', () => {
     expect(k('Araç').izin).toBe(true)
     expect(k(LOCAL_ARAC).izin).toBe(true)
     expect(k('OPS', 'ARAC').izin).toBe(true)
-    for (const a of ['URUN', 'Ürün', SID_URUN, LOCAL_URUN, 'urun-pencere']) {
+    for (const a of ['URUN', 'Ürün', SID_URUN, LOCAL_URUN, 'urun-pencere', 'Ürün (yeni düzen) [d83e92]']) {
       const s = k(a)
       expect(s.izin, a).toBe(false)
       expect(s.sebep).toContain('URUN')
@@ -223,7 +227,7 @@ describe('INV-KANCA-PENCERE-KILIDI-1 · gerçek kanca süreci (kabul ölçüsü)
   it('KİLİT ARAC: URUN reddedilir (ad, UUID, local_); ARAC ve OPS gider; ret mesajı izinlileri söyler', () => {
     m.kilitYaz({ roller: ['ARAC'], dosya: kilitDosyasi })
     const env = ortam(kilitDosyasi)
-    for (const a of ['URUN', 'Ürün', SID_URUN, LOCAL_URUN]) {
+    for (const a of ['URUN', 'Ürün', SID_URUN, LOCAL_URUN, 'Ürün (yeni düzen) [d83e92]']) {
       const r = kos(KOK, mesaj(a), env)
       expect(r.status).toBe(0)
       const c = red(r)
