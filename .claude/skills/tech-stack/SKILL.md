@@ -102,7 +102,7 @@ do not infer latest from the first array item or highest lexicographic string.
 For current npm targets and preview-tag detection, run the read-only helper:
 
 ~~~powershell
-bun run packages/core/skills/tech-stack/scripts/check-versions.mjs expo react-native prisma @prisma/client
+node .claude/skills/tech-stack/scripts/check-versions.mjs next react @supabase/supabase-js
 ~~~
 
 It reports selected stable version, latest tag, engines, peers, source and checked

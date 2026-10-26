@@ -224,7 +224,7 @@ When you do include FAQ:
 - Each answer: 2-4 sentences, direct and complete — standalone without surrounding context
 - Cover: pricing/cost questions, comparison questions ("vs. [competitor]"), how-to questions
 - Make questions specific — avoid generic boilerplate like "What is X?" on every page
-- Add FAQPage JSON-LD schema markup for this section
+- VentHub: do NOT add FAQPage JSON-LD (Google removed the FAQ rich result on 2026-05-07; rehber-yazisi-standard.md "FAQPage işaretlemesi konmaz"). The FAQ section stays for readers and retrieval
 
 ### Block 9: Conclusion (100-150 words)
 - Summarize the transformation: before state → after state using the solution
@@ -347,7 +347,7 @@ Before delivering the article, confirm every item:
 - [ ] Numbered How It Works steps included when the page is a guide or workflow page
 - [ ] 3+ distinct use cases included when the page type calls for scenarios
 - [ ] FAQ included only where it adds retrieval value (comparisons, learn pages, complex topics) — not forced onto every page
-- [ ] If FAQ is included: 3-6 specific questions targeting real PAA queries, with FAQPage JSON-LD schema
+- [ ] If FAQ is included: 3-6 specific questions targeting real PAA queries (no FAQPage JSON-LD on VentHub: rehber-yazisi-standard.md)
 - [ ] 5-8 authoritative external citations, all linked inline
 - [ ] Zero fabricated statistics — every number has a source URL
 - [ ] 3+ internal links with descriptive anchor text
