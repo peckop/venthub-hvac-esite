@@ -195,6 +195,38 @@ copy; do not temporarily overwrite a concurrently edited production file.
 Drive async races with barriers/deferred completion and reserve real-system
 checks for the boundary they actually verify. Serialize shared build/coverage writers.
 
+## YTN-21 eklemeleri (VentHub'a uyarlandı)
+
+> Kaynak: addyosmani/agent-skills test-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT); VentHub'a uyarlandı, 26 Ekim 2026, YTN-21.
+
+**Durumu doğrula, çağrı sırasını değil.** İşlemin **sonucuna** assert et; hangi iç yöntemin çağrıldığına değil. Çağrı sırasını
+doğrulayan test, davranış aynı kalsa bile yeniden düzenlemede kırılır.
+
+```ts
+// İyi: ne yaptığını sınar (durum tabanlı)
+it('siparişleri en yeniden eskiye döner', async () => {
+  const rows = await listOrders(supabase, { sortBy: 'createdAt', sortOrder: 'desc' })
+  expect(rows[0].createdAt.getTime()).toBeGreaterThan(rows[1].createdAt.getTime())
+})
+
+// Kötü: nasıl çalıştığını sınar (etkileşim tabanlı)
+it('supabase.order("created_at") çağırır', async () => {
+  await listOrders(supabase, { sortBy: 'createdAt', sortOrder: 'desc' })
+  expect(supabase.order).toHaveBeenCalledWith('created_at', { ascending: false })
+})
+```
+
+Etkileşim doğrulaması yalnız çağrının kendisi sözleşmeyse meşrudur (ör. webhook'un ikinci kez işlenmediği, e-postanın
+bir kez gönderildiği); o zaman nedenini teste yaz.
+
+**Hata onarımında yeniden üretim testini bağımsız yazdır.** Karmaşık hata onarımında kırmızı testi, onarımı bilmeyen ayrı bir
+çalışana yazdırmak testi sağlamlaştırır: çalışan yalnız hata tarifinden testi yazar ve mevcut kodla **kırmızı** olduğunu gösterir;
+sonra sen onarımı yaparsın ve aynı testin yeşile döndüğünü doğrularsın. Test dosyasını yazan çalışan `name` ile açılan
+uygulayıcıdır (dosya yazar), görev metninde "açık PR dalına push yok" yazılır; kart açmaz, kanıtı açana raporlar.
+
+**Koşu komutu.** Yerelde tam paket koşulmaz: `pnpm test:ilgili` ve değişen test dosyası için `pnpm exec vitest run <yol>`; tam paket CI'dadır.
+CI kırmızıyken "yerelde geçti" kanıt değildir, ama kırmızıyı kapatmak için eşiği düşürmek ya da `.skip` koymak da çözüm değildir.
+
 ## Skills in scope
 
 - `debugging` — when a failing test's cause is unknown
