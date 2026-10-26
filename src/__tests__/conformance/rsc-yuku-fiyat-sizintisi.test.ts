@@ -137,3 +137,22 @@ describe('INV-FIYAT-SIZINTI-3 · (c) serileştirilmiş yükte fiyat sayısı', (
     expect(fiyatSayisi(satis, 'min_price')).toBeGreaterThan(0)
   })
 })
+
+describe('INV-FIYAT-SIZINTI-3 · (d) PDP ilgili aileler (URN-147)', () => {
+  const oku = (yol: string) => readFileSync(join(process.cwd(), yol), 'utf8')
+
+  it('aileSayfasi: PageComponent `initialRelatedFamilies` ilgiliAileVerisi çıktısından gelir; süzgeç listeFiyatiniSuz(aday, kategori)', () => {
+    const k = oku('src/app/_components/aileSayfasi.tsx')
+    expect(k).toMatch(/initialRelatedFamilies\s*=\s*await ilgiliAileVerisi\(/)
+    expect(k).toMatch(/initialRelatedFamilies=\{initialRelatedFamilies\}/)
+    expect(k).toMatch(/return listeFiyatiniSuz\(aday\.map\(\(f\) => \(\{ \.\.\.f, description: null \}\)\),\s*kategori\)/)
+    // Sayfa, kategori olarak kendi ana kategorisini verir (varyant süzgeciyle aynı hüküm).
+    expect(k).toMatch(/ilgiliAileVerisi\(\s*family,\s*mainCategory,/)
+  })
+
+  it('ProductDetailPageView: tarayıcıdan aile çekmez (getFamiliesEnriched / state yok)', () => {
+    const k = oku('src/app/_components/ProductDetailPageView.tsx')
+    expect(k).not.toMatch(/getFamiliesEnriched|setRelatedFamilies/)
+    expect(k).toMatch(/initialRelatedFamilies\??:\s*FamilyListItem\[\]/)
+  })
+})

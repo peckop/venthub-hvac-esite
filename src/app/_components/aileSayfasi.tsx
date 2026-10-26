@@ -1,4 +1,5 @@
 import type { Metadata, Route } from 'next'
+import { unstable_cache } from 'next/cache'
 import { notFound, permanentRedirect } from 'next/navigation'
 
 import { sesEtiketSozlugu } from '@/components/category/sections/silent-fan/sesMetni'
@@ -11,6 +12,7 @@ import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
+import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '@/lib/cache/tags'
 import { aileKategoriZinciri } from '@/lib/data/kategoriZinciri'
 import { getCachedFamilyDetail, getCachedKategoriUstById, preloadFamily } from '@/lib/data/preload'
 import type { ProductRouteResolution } from '@/lib/data/productRoute'
@@ -18,7 +20,7 @@ import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
-import { varyantFiyatiniSuz } from '@/lib/pricing/teklifModuSuzgeci'
+import { listeFiyatiniSuz, varyantFiyatiniSuz } from '@/lib/pricing/teklifModuSuzgeci'
 import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
@@ -28,12 +30,16 @@ import {
   buildSeriesLandingJsonLd,
 } from '@/lib/seo/jsonld'
 import { aileKirintiAdimlari, type KirintiAdimi } from '@/lib/seo/kirinti'
+import { getFamiliesEnriched } from '@/lib/services/family.service'
+import { supabaseStaticClient } from '@/lib/supabase/static'
+import type { FamilyListItem } from '@/types/ui-models'
 import { adresUret } from '@/utils/adresUret'
 import { getCategoryDisplayName, getLocalizedCategorySlug, kategoriMetniniIndir } from '@/utils/categoryHelpers'
 import { aileMetniniIndir, dildekiMetin } from '@/utils/dilMetni'
 import { musteriyeGorunurAciklama } from '@/utils/icIngestNotu'
 import { getProductDisplayName, getProductModelLabel } from '@/utils/productHelpers'
 import { Routes } from '@/utils/routes'
+import { DEFAULT_TENANT_ID } from '@/utils/tenantConstants'
 import { adresDili } from '@/utils/yuzeyAdresleri'
 import SeriesLandingView from '@/views/category/SeriesLandingView'
 import IlgiliRehberler from '@/views/knowledge/IlgiliRehberler'
@@ -198,6 +204,50 @@ export async function aileSayfasiUstVerisi(
   }
 }
 
+/** İlgili aileler: kategoriden okunan aday sayısı (eskiden istemci çağrısındaki `limit: 12`) ve gösterilen kart sayısı. */
+export const ILGILI_AILE_ADAY_AZAMI = 12
+export const ILGILI_AILE_GOSTERILEN = 4
+
+/**
+ * Bir kategorinin vitrin aileleri önbelleği (URN-147). Eskiden `ProductDetailPageView` ('use client') bu listeyi
+ * tarayıcıdan çekiyordu: XHR yanıtı teklif modundaki ailenin gerçek `min_price`'ını taşıyordu (INV-FIYAT-SIZINTI-3 yüzeyi).
+ * Anahtar `lang` VE `tenantId` içerir (kural 12) ve kategori kimliğiyle sınırlıdır (mevcut aileyi çıkarma önbellekten
+ * SONRA yapılır; kategorideki tüm ailelerin sayfaları tek girdiyi paylaşır). Etiketler KEŞİF alanıdır
+ * (`PRODUCTS_DISCOVERY_TAG` + kiracı etiketi): webhook aile/ürün/kategori değişiminde bunu zaten tazeler. Hata FIRLATILIR
+ * (önbelleğe hata yazılmaz).
+ */
+export const getCachedKategoriAileleri = (lang: string, tenantId: string, kategoriId: string) => unstable_cache(
+  async () => (await getFamiliesEnriched(supabaseStaticClient, { categoryIds: [kategoriId], limit: ILGILI_AILE_ADAY_AZAMI })).items,
+  ['pdp-related-families', lang, tenantId, kategoriId],
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+)()
+
+/** Kategorinin vitrin ailelerini okur; okuyamazsa FIRLATIR. Testte enjekte edilir (`AileSayfasi` → `ilgiliAileler`). */
+export type IlgiliAileOkuyucu = (kategoriId: string) => Promise<FamilyListItem[]>
+
+/**
+ * PDP "İlgili aileler" kartları (URN-147). Kural istemci davranışıyla BİREBİR: alt kategori (yoksa ana kategori) kimliği,
+ * 12 aday, mevcut aile hariç, ilk 4. Fiyat sayfanın ana kategorisinin hükmüyle süzülür (`listeFiyatiniSuz`): teklif
+ * modunda `min_price` istemciye hiç verilmez. Okunamazsa boş liste + uyarı (sayfa kırılmaz, hata önbelleğe yazılmaz).
+ */
+export async function ilgiliAileVerisi(
+  family: { id: string; subcategory_id?: string | null; category_id?: string | null } | null,
+  kategori: { metadata?: unknown } | null,
+  oku: IlgiliAileOkuyucu,
+): Promise<FamilyListItem[]> {
+  const kategoriId = family?.subcategory_id ?? family?.category_id ?? null
+  if (!family || !kategoriId) return []
+  try {
+    const aday = (await oku(kategoriId)).filter((f) => f.id !== family.id).slice(0, ILGILI_AILE_GOSTERILEN)
+    // FamilyCard `description` OKUMAZ; ham {tr,en} nesnesi istemciye inerse RSC yükünde EN sayfada TR metin kalır
+    // (INV-DIL-DUSUSU-1, e2e/dil-dususu.e2e.ts). Kart için gereksiz alan sunucuda atılır.
+    return listeFiyatiniSuz(aday.map((f) => ({ ...f, description: null })), kategori)
+  } catch (hata) {
+    console.warn(`[aileSayfasi] ilgili aileler okunamadı (${kategoriId}); kartsız çiziliyor`, hata)
+    return []
+  }
+}
+
 export interface AileSayfasiProps {
   lang: string
   slug: string
@@ -206,10 +256,12 @@ export interface AileSayfasiProps {
    * bakmaz; teknik tablo, başlık, görsel ilk HTML'de o modelden çizilir. Aile rotası vermez.
    */
   sunucuSku?: string | null
+  /** Testte enjekte edilen ilgili aile okuyucu; verilmezse önbellekli üretim okuyucusu kullanılır. */
+  ilgiliAileler?: IlgiliAileOkuyucu
 }
 
 /** Aile sayfası gövdesi — rota kararı + JSON-LD + görünüm. */
-export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiProps) {
+export async function AileSayfasi({ lang, slug, sunucuSku = null, ilgiliAileler }: AileSayfasiProps) {
   preloadFamily(slug, lang)
 
   // T138 K1: zincir kararı `resolveProductRoute`'ta (saf, DI'lı, test edilebilir);
@@ -357,6 +409,13 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
 
   if (breadcrumbJsonLd) assertNoUuid(breadcrumbJsonLd)
 
+  // URN-147: ilgili aileler sunucuda okunur ve fiyatı süzülür (eskiden tarayıcıdan çekiliyordu).
+  const initialRelatedFamilies = await ilgiliAileVerisi(
+    family,
+    mainCategory,
+    ilgiliAileler ?? ((kategoriId) => getCachedKategoriAileleri(lang, DEFAULT_TENANT_ID, kategoriId)),
+  )
+
   return (
     <>
       {jsonLd && (
@@ -387,6 +446,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
         markaHref={markaHref}
         gorunenBaslik={ozelMetin?.h1 ?? null}
         gorunenAciklama={ozelMetin?.ilkParagraf ?? null}
+        initialRelatedFamilies={initialRelatedFamilies}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): aile → o aileye bağlanan rehber. Aile bulunamadıysa
           (unavailable) blok yok; yazı yoksa `IlgiliRehberler` hiçbir şey basmaz. */}
