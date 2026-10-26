@@ -294,4 +294,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { haritayiOku, yollar, sahibi, departman, incele, ad, gorevDegilOku, gorevDisi, eksikSatirlar, GOREV_DEGIL_SATIRI, HARITA }
+module.exports = { haritayiOku, yollar, sahibi, departman, incele, ad, gorevDegilOku, gorevDisi, eksikSatirlar, GOREV_DEGIL_SATIRI, HARITA, ONEK }
