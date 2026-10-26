@@ -204,7 +204,7 @@ const OPS_OKUMA_KURALI = [
   '- Recep\'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.',
   '- Kanca, ayar ve MCP PR\'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ\'ta).',
   '- Emir yazmadan önce alıcının rol kartına bakılır (Görev satırı, "Görev değil" satırı); görev dışı emir yazılmaz (HRT-73: kural eskiden ortak dosyadaydı, OPS kuralı olduğu için buraya taşındı).',
-  '- Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ\'ta).',
+  '- NotebookLM takip defteri emekli (karar 419, salt okunur arşiv): gün kapanışında eşitlenmez; açılıştaki DEFTER bayatlık satırını kaldırmak ARAÇ\'ın işidir.',
   '- Tabloda Sorumlu = işi yürüten departmanın adı (OPS\'un kendi işiyse OPS); Recep kararı bekleyen satırda Durum Onayında, Önerim dolu, Sorumlu yine kararı uygulayacak departmandır; "sen" yazılmaz.',
 ].join('\n')
 

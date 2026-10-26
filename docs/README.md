@@ -22,9 +22,9 @@
 | Kod + **veritabanı** ilişkisi (tablo, FK, sembol toplulukları) | **graphify** + Supabase şema grafı (`graphify query/path/explain`) | `graphify-out/` üretilmiştir; kurulum ve kural `../CLAUDE.md` "graphify" |
 | Kod içinde metin/sembol araması | **WrongStack kod dizini** (MCP `wrongstack-codebase-index`) | dizin elle tazelenir; yaşı ölçülmeden güvenme |
 | Bir dosyaya dokununca geçmiş ders | **sage** (kanca dosyaya dokununca kendiliğinden getirir) | `standards/hafiza-kancalari-standard.md` §6 |
-| "Konuşmuş muyduk / ne karar vermiştik / niçin" | NotebookLM takip defteri `a5f382a4-b4e7-450c-84e0-9b7c082e2502` + Linear "Kararlar" belgesi (REC-554'e kadar; sonra dosya) | `standards/proje-takip-defteri-standard.md` |
-| Kural / niçin / mimari (kod hafızası) | NotebookLM dijital ikiz `235043eb-970f-4a52-9f39-1d02b2621e9c` | snapshot'tır; çelişirse kod kazanır |
-| Bütün belgelerde tarama | NotebookLM "VentHub Belgeler" `f503a886-3e2f-4234-8455-ee57c66f9488` | tek başına güvenilmez; bulgu dosyada doğrulanır |
+| "Konuşmuş muyduk / ne karar vermiştik / niçin" | **Kanban** kartları + Linear "Kararlar" arşivi (REC-554'e kadar; sonra dosya). Eski NotebookLM takip defteri `a5f382a4-b4e7-450c-84e0-9b7c082e2502` salt okunur arşiv (karar 419) | `standards/proje-takip-defteri-standard.md` |
+| Kural / niçin / mimari (kod hafızası) | Bu harita + `standards/` cetvelleri + CodeGraph. Eski NotebookLM dijital ikiz `235043eb-970f-4a52-9f39-1d02b2621e9c` salt okunur arşiv (karar 419) | arşiv snapshot'tır; çelişirse kod kazanır |
+| Bütün belgelerde tarama | Arşiv: NotebookLM "VentHub Belgeler" `f503a886-3e2f-4234-8455-ee57c66f9488` (salt okunur, karar 419); yeni iş için WrongStack dizini ve grep | tek başına güvenilmez; bulgu dosyada doğrulanır |
 | İş ne durumda, kimde? | **Kanban** (WrongStack panoları; iş kaydının tek kaynağı, karar 219; Linear donuk arşiv) | `standards/is-kayit-duzeni-standard.md` |
 | Ajanın kalıcı dersleri | hafıza dizini `MEMORY.md` (depo dışı, oturum açılışında yüklenir) | `standards/hafiza-kancalari-standard.md` |
 | Hafızaya ya da talimat dosyasına (`CLAUDE.md`, rol kartı) kim, nereye yazabilir? Günlük dosyası nerede durur ve nasıl döndürülür? Hafızadaki bilgiye tarih ve kaynak nasıl yazılır? | katmanlı model: ortak çekirdek (OPS onaylı) + departman klasörü + ayrı günlük klasörü; §9b günlük döndürme (DEVİR bloğu + `gecmis/`), §12 künye (yazıldı + kaynak) | `standards/hafiza-yazma-duzeni-standard.md` |
@@ -118,8 +118,6 @@
 ## Üretilen vs küratörlü (karıştırma)
 
 - **Üretilen** (kök master'lar): orion pipeline yazar; elle düzenleme — bir sonraki sync ezer.
-- **Küratörlü** (alt klasörler): elle yazılır; twin'e milestone'da sync edilir (bkz. `.claude/skills/notebooklm-sync`).
-- Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip NotebookLM "VentHub Proje
-  Hafızası" defterine (dijital ikiz) yüklenir.
+- **Küratörlü** (alt klasörler): elle yazılır; NotebookLM'e artık sync edilmez (emekli, karar 419).
 - Yetenek ağaçları: `.claude/skills/` = Claude Code, `.agent/skills/` = Antigravity işçisi — **ikisi de aktif ve
   kasıtlı** (çift ağaç); işçi çekirdek kuralı `../AGENTS.md` köprüsüyle okur.
