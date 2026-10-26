@@ -93,7 +93,19 @@ describe('MarkaSayfasi: aile kartları sunucuda okunur, fiyat süzülür (URN-14
     const k = readFileSync(join(process.cwd(), 'src/app/_components/markaSayfasi.tsx'), 'utf8')
     expect(k).toMatch(/\['brand-families',\s*lang,\s*tenantId,\s*markaAdi\]/)
     expect(k).toMatch(/getCachedMarkaAileleri[\s\S]{0,400}tags:\s*\[PRODUCTS_DISCOVERY_TAG,\s*discoveryTag\(tenantId\)\]/)
-    expect(k).toMatch(/listeFiyatiniSuz\(\s*await oku\(brand\.name\)\s*,\s*null\s*\)/)
+    expect(k).toMatch(/listeFiyatiniSuz\(\s*\(await oku\(brand\.name\)\)\.map\(\(f\) => \(\{ \.\.\.f, description: null \}\)\)\s*,\s*null\s*\)/)
+  })
+})
+
+describe('MarkaSayfasi: açıklama (TR+EN) istemciye inmez (INV-DIL-DUSUSU-1)', () => {
+  it('FamilyCard description okumaz; ham {tr,en} nesnesi görünüme gitmez', async () => {
+    const aciklamali = { ...aile('1', 100), description: { tr: 'Çelik gövdeli, direkt akuple, orta basınçlı fan', en: 'Steel casing fan' } }
+    expect(JSON.stringify(aciklamali)).toContain('Çelik gövdeli')
+    const { initialFamilies } = gorunum(
+      await MarkaSayfasi({ lang: 'en', slug: 'vortice', sayac: async () => 5, katalogOzeti: async () => null, aileler: async () => [aciklamali] }),
+    )
+    expect(initialFamilies.every((f) => f.description === null)).toBe(true)
+    expect(JSON.stringify(initialFamilies)).not.toContain('Çelik gövdeli')
   })
 })
 

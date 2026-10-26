@@ -237,7 +237,8 @@ export type MarkaAileOkuyucu = (markaAdi: string) => Promise<FamilyListItem[]>
  */
 async function markaAileVerisi(brand: Marka, oku: MarkaAileOkuyucu): Promise<FamilyListItem[]> {
   try {
-    return listeFiyatiniSuz(await oku(brand.name), null)
+    // FamilyCard `description` OKUMAZ; {tr,en} nesnesi istemciye inerse RSC yükünde EN sayfada TR metin kalır (INV-DIL-DUSUSU-1).
+    return listeFiyatiniSuz((await oku(brand.name)).map((f) => ({ ...f, description: null })), null)
   } catch (hata) {
     console.warn(`[markaSayfasi] ${brand.name} aileleri okunamadı; sayfa kartsız çiziliyor`, hata)
     return []

@@ -119,7 +119,7 @@ describe('INV-FIYAT-SIZINTI-3 · (b) sayfa kökleri istemciye süzülmüş veri 
   it('markaSayfasi (URN-145): PageComponent (BrandDetailPage) `initialFamilies` listeFiyatiniSuz(…, null) çıktısından gelir; görünüm tarayıcıdan aile çekmez', () => {
     const k = oku('src/app/_components/markaSayfasi.tsx')
     expect(jsxOznitelik(k, 'PageComponent', 'initialFamilies')).toBe('initialFamilies')
-    expect(k).toMatch(/return listeFiyatiniSuz\(\s*await oku\(brand\.name\)\s*,\s*null\s*\)/)
+    expect(k).toMatch(/return listeFiyatiniSuz\(\s*\(await oku\(brand\.name\)\)\.map\(\(f\) => \(\{ \.\.\.f, description: null \}\)\)\s*,\s*null\s*\)/)
     expect(k).toMatch(/initialFamilies\s*=\s*brand\s*&&\s*!urunsuz\s*\?\s*await markaAileVerisi\(/)
     const gorunum = oku('src/views/BrandDetailPage.tsx')
     expect(gorunum).not.toMatch(/supabaseBrowserClient|getFamiliesEnriched/)
