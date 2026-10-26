@@ -36,7 +36,10 @@ interface Modul {
     simdi?: number
     oturumler?: string
     yasiyor?: (pid: number) => boolean
+    gorevler?: string
   }) => { yazildi: boolean; sebep: string; mevcut?: string; mevcutCanli?: boolean | null }
+  zamanlanmisMi: (sid: string, o?: { dizin?: string; gorevler?: string; env?: Record<string, string> }) => boolean
+  adiKatla: (s: string) => string
 }
 
 const KOK = process.cwd()
@@ -276,5 +279,70 @@ describe('INV-OPS-OTURUMU-4: kayıtlı kimlik ölüyse canlı aday devralır, ca
     const kaynak = fs.readFileSync(path.resolve(KOK, '.claude', 'hooks', 'session-board.cjs'), 'utf8')
     expect(kaynak).toContain("opsYazma.sebep === 'kayitli-kimlik-canli'")
     expect(kaynak).toContain('--yaz')
+  })
+})
+
+describe('INV-OPS-OTURUMU-5: zamanlanmış görev oturumu OPS kimliği almaz (ARC-211, 26 Ekim "Sabah özeti" vakası)', () => {
+  const SABAH = '32b47859-a3e5-429f-8381-a187351d70df'
+  /** Pencere kayıt dizini: { sessionId, name }. */
+  const adliKayit = (girdiler: Array<{ sid: string; ad?: string }>): string => {
+    const d = path.join(kok, 'sessions-ad-' + ++n)
+    fs.mkdirSync(d, { recursive: true })
+    girdiler.forEach((g, i) => {
+      const j: Record<string, unknown> = { sessionId: g.sid, pid: 9000 + i, kind: 'interactive' }
+      if (g.ad !== undefined) j.name = g.ad
+      fs.writeFileSync(path.join(d, `${9000 + i}.json`), JSON.stringify(j))
+    })
+    return d
+  }
+  /** Zamanlanmış görev klasörü: ~/.claude/scheduled-tasks/<görev-kimliği>/SKILL.md */
+  const gorevDizini = (kimlikler: string[]): string => {
+    const d = path.join(kok, 'gorevler-' + ++n)
+    for (const k of kimlikler) {
+      fs.mkdirSync(path.join(d, k), { recursive: true })
+      fs.writeFileSync(path.join(d, k, 'SKILL.md'), '---\nname: ' + k + '\n---\n')
+    }
+    return d
+  }
+
+  it('SABOTAJ-YENİDEN OYNATMA: ops-pencere klasöründe açılan "Sabah özeti (yalnız ölçüm)" oturumu kimliği ALAMAZ, dosya değişmez', () => {
+    const d = yeni()
+    fs.writeFileSync(d, JSON.stringify({ sid: OLU, ts: 1, kaynak: 'startup' })) // eski OPS ölü: ARC-140 kuralı olsa devralırdı
+    const oturumler = adliKayit([{ sid: SABAH, ad: 'Sabah özeti (yalnız ölçüm)' }])
+    const gorevler = gorevDizini(['sabah-ozeti'])
+    const r = mod.acilistaYaz({ sid: SABAH, kaynak: 'startup', cwd: pencere('ops-pencere'), dosya: d, oturumler, yasiyor, gorevler })
+    expect(r).toMatchObject({ yazildi: false, sebep: 'zamanlanmis-gorev' })
+    expect(mod.oku(d)).toBe(OLU)
+  })
+
+  it('gerçek OPS ("OPS" adlı pencere) aynı koşulda yazmaya devam eder', () => {
+    const d = yeni()
+    fs.writeFileSync(d, JSON.stringify({ sid: OLU, ts: 1, kaynak: 'startup' }))
+    const oturumler = adliKayit([{ sid: YENI, ad: 'OPS' }])
+    const gorevler = gorevDizini(['sabah-ozeti'])
+    const r = mod.acilistaYaz({ sid: YENI, kaynak: 'startup', cwd: pencere('ops-pencere'), dosya: d, oturumler, yasiyor, gorevler })
+    expect(r.yazildi).toBe(true)
+    expect(mod.oku(d)).toBe(YENI)
+  })
+
+  it('ad eşleşmesi: görev kimliği sözcük olarak adın içinde olmalı; "OPS (yeni düzen)" ve adsız pencere zamanlanmış sayılmaz', () => {
+    const gorevler = gorevDizini(['sabah-ozeti', 'gsc-erisim-deneme'])
+    const say = (ad?: string) => mod.zamanlanmisMi(SABAH, { dizin: adliKayit([{ sid: SABAH, ad }]), gorevler, env: {} })
+    expect(say('Sabah özeti (yalnız ölçüm)')).toBe(true)
+    expect(say('sabah ozeti')).toBe(true)
+    expect(say('GSC erişim deneme')).toBe(true)
+    expect(say('OPS (yeni düzen)')).toBe(false)
+    expect(say('Sabah')).toBe(false)
+    expect(say(undefined)).toBe(false)
+  })
+
+  it('fail-open: görev klasörü yok/okunamıyorsa HAYIR (eski davranış); VENTHUB_ZAMANLANMIS=1 kesin işarettir', () => {
+    const oturumler = adliKayit([{ sid: SABAH, ad: 'Sabah özeti' }])
+    expect(mod.zamanlanmisMi(SABAH, { dizin: oturumler, gorevler: path.join(kok, 'yok-gorevler'), env: {} })).toBe(false)
+    expect(mod.zamanlanmisMi(SABAH, { dizin: oturumler, gorevler: path.join(kok, 'yok-gorevler'), env: { VENTHUB_ZAMANLANMIS: '1' } })).toBe(true)
+  })
+
+  it('adiKatla Türkçe katlar ve noktalamayı atar', () => {
+    expect(mod.adiKatla('Sabah özeti (yalnız ölçüm)')).toBe('sabah ozeti yalniz olcum')
   })
 })
