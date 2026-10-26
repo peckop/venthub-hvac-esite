@@ -201,6 +201,7 @@ describe('MarkaSayfasi: gövde özet paragrafı (d)', () => {
         katalogOzeti: async () => {
           throw new Error('ağ yok')
         },
+        aileler: async () => [], // URN-145: aile okuması bu testin konusu değil; gerçek önbelleğe gidip ikinci uyarı basmasın
       }),
     )
     expect(gorunum.urunOzeti).toBe('')

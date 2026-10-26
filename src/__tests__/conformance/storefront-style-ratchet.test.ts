@@ -224,7 +224,9 @@ const RATCHETS: Ratchet[] = [
     // 2026-10-10 · URN-82 yenileme: iki dalın kazancı birleşti; birleşik değer master üstünde ÖLÇÜLDÜ (aşağıdaki sayı).
     // 2026-10-10 · 1420 -> 1418: URN-82 yer tutucu düzeltmesi — Markalar sayfası güven şeridindeki iki sayaç (sabit "%100"
     // ve ham `{marka}` değeri; ikisi de kaynaksız/ham) kalktı, ikisinin `text-slate-500` etiketi gitti. Kazanç yan ürün.
-    tavan: 1418,
+    // 2026-10-26 · 1418 -> 1417: URN-145 — BrandDetailPage'in yükleme iskeleti (bir `bg-slate-*` satırı) tarayıcı çağrısıyla
+    // birlikte kalktı. Kazanç yan ürün.
+    tavan: 1417,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
