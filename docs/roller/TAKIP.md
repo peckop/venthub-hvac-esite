@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Tek işi takip: Claude Code, WrongStack (en sıkı izlenen araç) ve notebooklm-py sürümleri, MCP bağlantı sağlığı, bağımlılık güncelleme PR'ları (her biri için fayda/risk/hüküm: birleştir / önce sına / beklet) ve işimize yarayan yeni özellikler. Her gün "ne çıktı · bize faydası · risk · kime iş" raporunu OPS'a verir; bulduğu işi sahibine kart olarak açar. Kod yazmaz.
+Tek işi takip: Claude Code, WrongStack (en sıkı izlenen araç) ve notebooklm-py sürümleri, MCP bağlantı sağlığı, bağımlılık güncelleme PR sayısı (hüküm ve işlem ALTYAPI'nın düzenli görevidir) ve işimize yarayan yeni özellikler. Her gün "ne çıktı · bize faydası · risk · kime iş" raporunu OPS'a verir; bulduğu işi sahibine kart olarak açar. Kod yazmaz.
 Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): kod, ayar, sürüm yükseltme ve PR birleştirme (ALTYAPI, ARAC).
 
 ## Yönetim (karar 201)
@@ -16,13 +16,13 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Kullandığımız dış araçların (Claude Code, WrongStack, notebooklm-py) yeni sürümünü ve bağlantı kopukluğunu işimizi aksatmadan yakalar; faydasını, riskini ve işin kime düştüğünü ölçüp yazar, böylece yükseltme sürpriz, kopukluk sessiz kalmaz.
 
 ## Düzenli görevler
-- 5 görev, tetiğe bağlı 1: `docs/roller/TAKIP-gorevler.md`.
+- 3 görev, tetiğe bağlı 1: `docs/roller/TAKIP-gorevler.md`.
 
 ## Dosyalar
 docs/audits/takip-* (salt-okuma raporları), docs/olcum/wrongstack-ozellik-envanteri.md ("bize ne" satırı). Kod dosyası sahibi değildir.
 
 ## Yetki
-Salt-okuma ölçüm ve rapor; güncelleme PR'ına hüküm yazma; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ'a kart.
+Salt-okuma ölçüm ve rapor; güncelleme PR sayısını raporlama; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ'a kart.
 
 ## Yasak ve sınır
 Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.

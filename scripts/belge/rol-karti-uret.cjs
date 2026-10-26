@@ -623,10 +623,10 @@ const ROLLER = {
   },
   // HRT-35 (karar 322, OPS-93, 2026-10-09): tek işi takip; kod yazmaz, işi az olsun ki her zaman açık tutulabilsin.
   TAKIP: {
-    gorev: 'Tek işi takip: Claude Code, WrongStack (en sıkı izlenen araç) ve notebooklm-py sürümleri, MCP bağlantı sağlığı, bağımlılık güncelleme PR\'ları (her biri için fayda/risk/hüküm: birleştir / önce sına / beklet) ve işimize yarayan yeni özellikler. Her gün "ne çıktı · bize faydası · risk · kime iş" raporunu OPS\'a verir; bulduğu işi sahibine kart olarak açar. Kod yazmaz.',
+    gorev: 'Tek işi takip: Claude Code, WrongStack (en sıkı izlenen araç) ve notebooklm-py sürümleri, MCP bağlantı sağlığı, bağımlılık güncelleme PR sayısı (hüküm ve işlem ALTYAPI\'nın düzenli görevidir) ve işimize yarayan yeni özellikler. Her gün "ne çıktı · bize faydası · risk · kime iş" raporunu OPS\'a verir; bulduğu işi sahibine kart olarak açar. Kod yazmaz.',
     gorevDegil: 'kod, ayar, sürüm yükseltme ve PR birleştirme (ALTYAPI, ARAC).',
     dosyalar: 'docs/audits/takip-* (salt-okuma raporları), docs/olcum/wrongstack-ozellik-envanteri.md ("bize ne" satırı). Kod dosyası sahibi değildir.',
-    yetki: 'Salt-okuma ölçüm ve rapor; güncelleme PR\'ına hüküm yazma; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ\'a kart.',
+    yetki: 'Salt-okuma ölçüm ve rapor; güncelleme PR sayısını raporlama; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ\'a kart.',
     yasak: 'Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.',
     yetenek: 'wrongstack-kanban, research-web, security-scanner, bagimlilik-guvenlik-yukseltme cetveli.',
     durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu ve takip-arastirmaci çalışan tanımı henüz yok (ALT-45).',
