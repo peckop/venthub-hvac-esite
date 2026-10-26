@@ -55,7 +55,7 @@ describe('INV-KANBAN-KANIT-YOLU-1', () => {
     expect(reddedilir({ action: 'add_check', checkType: 'manual', checkNotes: 'C:/tmp/x.md' })).toBe(false)
     // JSON gövdesi file_matches gibi görünse de tip file_matches değilse karışılmaz.
     expect(reddedilir({ action: 'add_check', checkType: 'manual', checkNotes: JSON.stringify({ file: 'C:/tmp/x.md' }) })).toBe(false)
-    expect(reddedilir({ action: 'add_check', checkType: 'command', checkNotes: JSON.stringify({ file: '/etc/hosts' }) })).toBe(false)
+    expect(reddedilir({ action: 'add_check', checkType: 'metric', checkNotes: JSON.stringify({ file: '/etc/hosts' }) })).toBe(false)
     expect(reddedilir({ action: 'add_note', checkType: 'file_exists', checkNotes: 'C:/tmp/x.md' })).toBe(false)
     expect(k.incele(cagri({ action: 'add_check', checkType: 'file_exists', checkNotes: 'C:/x' }, 'Bash'))).toBeNull()
     expect(k.incele(null)).toBeNull()

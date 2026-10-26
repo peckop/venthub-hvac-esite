@@ -247,6 +247,10 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kanban-kanit-yolu-kapisi.cjs\""
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/done-kanit-kapisi.cjs\""
           }
         ]
