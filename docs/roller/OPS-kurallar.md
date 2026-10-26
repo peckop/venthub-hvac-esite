@@ -32,6 +32,10 @@
 ## Aynı ders ikinci kez (HRT-70)
 - Bir ders ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir: aynı ders sage'de ya da bir kartta yazılıydı ve aynı sebepten ikinci kez kırmızı CI, kısmi iş ya da geri alınan işlem çıktıysa, çiğneyen departman kontrol önerisini (kanca ya da araç içi kapı) OPS'a tek mesajla yazar: hangi ders, hangi iki vaka, önerilen kontrol. OPS ARAÇ'a kart verir; kapının tasarımı ARAÇ'ındır. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
 
+## Süren iş koruması (HRT-73)
+- Departmanın elinde süren iş varken gelen yeni emir o işi bölmez: emri kartına alırsın, sıraya koyarsın ve OPS'a "elimde X var, bitince başlarım" diye dönersin.
+- Süren iş ancak OPS açıkça "X'i bırak" derse bırakılır; OPS bırak derse sebebini yazar, sen de bıraktığın işin durumunu kartına işlersin. Kendi kendine iş değiştirmek bu kurala aykırıdır.
+
 ## Birleştirme ve ölçüm kaydı (HRT-60)
 - Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
 - Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).
@@ -50,6 +54,7 @@
 - Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, departman iyileştirmesi ve kural metninin onay makamı OPS'tır (Recep 16 Ekim); deny listesi gevşetilmez. İzin kuralı, izin modu, onay veren kanca, .mcp.json ve hesap Recep sözüyle yapılır; kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, Recep'e gider. Recep'te ayrıca canlı veritabanı yazımı ("yaz"), migration'lı birleştirme, para harcatan her şey, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS'un kendi kanca ve ayar PR'ını ARAÇ okur ve "okundu, uygun" yazar.
 - Recep'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.
 - Kanca, ayar ve MCP PR'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ'ta).
+- Emir yazmadan önce alıcının rol kartına bakılır (Görev satırı, "Görev değil" satırı); görev dışı emir yazılmaz (HRT-73: kural eskiden ortak dosyadaydı, OPS kuralı olduğu için buraya taşındı).
 - Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ'ta).
 - Tabloda Sorumlu = işi yürüten departmanın adı (OPS'un kendi işiyse OPS); Recep kararı bekleyen satırda Durum Onayında, Önerim dolu, Sorumlu yine kararı uygulayacak departmandır; "sen" yazılmaz.
 

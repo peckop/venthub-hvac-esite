@@ -167,6 +167,16 @@ const DERS_TEKRAR_KURALI = [
 ].join('\n')
 
 /**
+ * SÜREN İŞ KORUMASI (HRT-73, OPS-181 Toparlama turu madde 1, OPS emri 26 Ekim): departmanın elinde süren iş varken gelen yeni emir işi bölmesin.
+ * Tüzük 4.1 genişletmesi; kısa hâli filo-ortak.md "İş ve kart" bölümündedir (bayt tavanı), tam hâli burada. Her rolün kurallar dosyasına AYNEN girer.
+ */
+const SUREN_IS_KORUMA_KURALI = [
+  '## Süren iş koruması (HRT-73)',
+  '- Departmanın elinde süren iş varken gelen yeni emir o işi bölmez: emri kartına alırsın, sıraya koyarsın ve OPS\'a "elimde X var, bitince başlarım" diye dönersin.',
+  '- Süren iş ancak OPS açıkça "X\'i bırak" derse bırakılır; OPS bırak derse sebebini yazar, sen de bıraktığın işin durumunu kartına işlersin. Kendi kendine iş değiştirmek bu kurala aykırıdır.',
+].join('\n')
+
+/**
  * BİRLEŞTİRME VE ÖLÇÜM KAYDI (HRT-60, OPS emri 2026-10-12): kartın bayt payını yemesin diye kurallar dosyasında durur
  * (kart tavanında pay yok). Yazılı kaynaklar: karar 98 (departman migrationsız kendi PR'ını birleştirir), fleet-mechanism §20.1-a/b
  * (`gh pr merge` doğrudan çağrılmaz; migration'lı PR `--onay`), karar 224 (onay işi koşan pencerede). Her rolün dosyasına AYNEN girer
@@ -193,6 +203,7 @@ const OPS_OKUMA_KURALI = [
   '- Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, departman iyileştirmesi ve kural metninin onay makamı OPS\'tır (Recep 16 Ekim); deny listesi gevşetilmez. İzin kuralı, izin modu, onay veren kanca, .mcp.json ve hesap Recep sözüyle yapılır; kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, Recep\'e gider. Recep\'te ayrıca canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, para harcatan her şey, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur ve "okundu, uygun" yazar.',
   '- Recep\'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.',
   '- Kanca, ayar ve MCP PR\'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ\'ta).',
+  '- Emir yazmadan önce alıcının rol kartına bakılır (Görev satırı, "Görev değil" satırı); görev dışı emir yazılmaz (HRT-73: kural eskiden ortak dosyadaydı, OPS kuralı olduğu için buraya taşındı).',
   '- Gün kapanışında NotebookLM takip defteri eşitlenir (`esitle`); 7 günü geçen defter durum satırında kırmızıdır (kapı ARAÇ\'ta).',
   '- Tabloda Sorumlu = işi yürüten departmanın adı (OPS\'un kendi işiyse OPS); Recep kararı bekleyen satırda Durum Onayında, Önerim dolu, Sorumlu yine kararı uygulayacak departmandır; "sen" yazılmaz.',
 ].join('\n')
@@ -374,6 +385,8 @@ function kuralDosyasi(ad) {
     TESHIS_KURALI,
     '',
     DERS_TEKRAR_KURALI,
+    '',
+    SUREN_IS_KORUMA_KURALI,
     '',
     BIRLESTIRME_KURALI,
     '',
@@ -971,6 +984,7 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
     if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
+    if (!metin.includes(SUREN_IS_KORUMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Süren iş koruması" bloğu eksik/değişmiş (HRT-73)`)
     if (!metin.includes(DERS_TEKRAR_KURALI)) s.push(`${ad}: kurallar dosyasında "Aynı ders ikinci kez" bloğu eksik/değişmiş (HRT-70)`)
   }
   return s
@@ -1313,6 +1327,7 @@ module.exports = {
   TARAYICI_KURALI,
   TESHIS_KURALI,
   DERS_TEKRAR_KURALI,
+  SUREN_IS_KORUMA_KURALI,
   CALISMA,
   haritaOzet,
   haritaDosyasi,

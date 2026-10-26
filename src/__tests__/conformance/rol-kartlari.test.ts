@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest'
 type Uretici = {
   GOREV_DEGIL_BASLIK: string
   DERS_TEKRAR_KURALI: string
+  SUREN_IS_KORUMA_KURALI: string
   uret: () => Record<string, string>
   uretKurallar: () => Record<string, string>
   kuralDosyaAdi: (ad: string) => string
@@ -1360,6 +1361,26 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
       expect(kurallar[ad], ad).toContain('filo-tuzugu.md` Madde 2.1')
       expect(kurallar[ad], ad).toContain('ek kalemler: edge fonksiyonlu PR')
     }
+  })
+
+  it('HRT-73 (OPS-181): Süren iş koruması her rolün kurallar dosyasında, kısa hâli filo-ortakta; düşerse kuralDosyaSorunlari yakalar; Done kanıtı vitest yolunu söyler', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain(uretici.SUREN_IS_KORUMA_KURALI)
+    }
+    expect(uretici.SUREN_IS_KORUMA_KURALI).toContain('elimde X var, bitince başlarım')
+    expect(uretici.SUREN_IS_KORUMA_KURALI).toContain('OPS bırak derse sebebini yazar')
+    const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(ortak).toContain('elimde X var, bitince başlarım')
+    // OPS emir yazmadan önce alıcının rol kartına bakar: kural filo-ortaktan OPS'a özel bloğa taşındı, düşmemeli.
+    expect(kurallar.OPS).toContain('Emir yazmadan önce alıcının rol kartına bakılır')
+    expect(ortak).toContain('pnpm exec vitest run <göreli test yolu>')
+    expect(ortak).toContain('depo dışı iş için elle kontrol + kanıt notudur')
+    expect(ortak).not.toContain('kod için `pnpm test:ilgili` çıktısıdır')
+    const ad = roller[0]
+    const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.SUREN_IS_KORUMA_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Süren iş koruması/)
   })
 
   it('HRT-70: "Aynı ders ikinci kez" bloğu her rolün kurallar dosyasında, düşerse sorunlar() yakalar ve vaka belgesi diskte', () => {
