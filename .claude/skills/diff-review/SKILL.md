@@ -60,6 +60,22 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması.
 8. **useSearchParams Suspense İhlali (⚠BETİK BUNU ÖLÇMEZ — yalnız elle/gözle bakılır; betiğe ekleme ayrı iş, D11):** Git diff'te yeni eklenen veya değiştirilen bir dosyada `useSearchParams` hook'unun kullanıldığı, ancak dosya içerisinde `<Suspense>` sarmalının veya wrapper'ının yer almadığı durumlar riskli kabul edilerek uyarılır.
 
+## Çıtayı düşürerek yeşil (YTN-21 eki, elle okunur)
+
+Ajan akıllıca kaçak aramaz; kırmızı bir kapıyla karşılaşınca yeşile en ucuz yolu seçer. Diff okunurken şu beş hareket aranır (betik çoğunu ölçmez; `git diff <taban>...HEAD` ile gözle bakılır, betiğe ekleme ayrı iş):
+
+1. **Eşik oynadı.** Bütçe düşürüldü, ciddiyet indirildi, bir kontrol hızlı aşamadan çıkarıldı. Kısıt/eşik dosyası dal noktasındaki hâliyle karşılaştırılır.
+2. **Test kolaylaştı.** `.skip`/`.only` eklendi, test dosyası silindi, kalan testlerden assert çıkarıldı.
+3. **Denetleyici susturuldu.** Yeni `@ts-ignore`, `@ts-expect-error`, `eslint-disable`. Bir kontrolü kapattıkları için ayrıca dikkat: kapsamdan düşüren `istanbul ignore`, hayatta kalan mutantı saklayan `Stryker disable`, güvenlik bulgusunu susturan `nosemgrep` ve `gitleaks:allow`.
+4. **İş yarım.** Fırlatan taslak, hatayı sessizliğe çeviren boş `catch`, uygulamanın yerinde duran `TODO`.
+5. **Yeni istisna.** Kimsenin tartışmadığı bir istisna satırı.
+
+**İstisna tablosu:** her istisna (`// diff-ignore` dahil) yanında sahip + bitiş tarihi + gerekçe taşır; sahibi ve tarihi olmayan istisna bulgudur. Eşiği sıkılaştırmak sessiz geçer, gevşetmek yüksek sesle raporlanır.
+
+Her bulgu bir kırılma girdisi ve sonucuyla yazılır (`code-review` ile aynı kural). Tam test/tsc yerelde koşmadığımız için çıtası düşürülmüş bir değişiklik CI'da da yeşil görünür; fark ancak bu elle okumada yakalanır.
+
+Kaynak: addyosmani/agent-skills constraint-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
 <!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
 ## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt
 
