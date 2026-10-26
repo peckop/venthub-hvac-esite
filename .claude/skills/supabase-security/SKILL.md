@@ -28,7 +28,7 @@ exclusions: []
 Bu skill'i kullanmadan önce aşağıdaki kontrolleri sırayla yap. Herhangi biri başarısızsa, **DUR** (devam etme) ve kullanıcıya bildir.
 
 1. **Supabase Proje Bağlantısı:**
-   - `GEMINI.md` veya `.env.local` dosyasında `NEXT_PUBLIC_SUPABASE_URL` tanımlı mı kontrol et.
+   - Worktree'nin `.env.local` dosyasında (ya da CI/Vercel ortamında) `NEXT_PUBLIC_SUPABASE_URL` tanımlı mı kontrol et (`GEMINI.md` bizde yok; atıf bayattı, 26 Ekim düzeltildi).
    - Boş veya placeholder ise → ❌ DUR. Kullanıcıdan gerçek proje URL'sini iste.
 
 2. **Migration Dizini:**
