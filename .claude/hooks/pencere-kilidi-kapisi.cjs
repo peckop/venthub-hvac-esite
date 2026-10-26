@@ -69,14 +69,15 @@ function calistir() {
     return
   }
 
-  const sonuc = kilit.karar({ kilit: o.kilit, alici, gonderenRol: gonderenRoluBul(girdi, kilit) })
+  const mesaj = girdi.tool_input && typeof girdi.tool_input.message === 'string' ? girdi.tool_input.message : ''
+  const sonuc = kilit.karar({ kilit: o.kilit, alici, gonderenRol: gonderenRoluBul(girdi, kilit), mesaj, gelen: kilit.gelenOku() })
   if (sonuc.izin) return
 
   const koyulma = kilit.saatOnce(o.kilit.koyulma)
   const neden =
     `PENCERE KİLİDİ: Recep "başka pencere açma" dedi${koyulma ? ` (${koyulma} kondu)` : ''}. İzinli departmanlar: ${sonuc.izinliler.join(', ')}. ` +
-    `"${alici}" gönderilmedi (${sonuc.sebep}). Mesaj gerekiyorsa önce Recep'ten izin al; kilidi yalnız Recep'in sözüyle ` +
-    'node scripts/board/pencere-kilidi.cjs --kaldir ile kaldır.'
+    `"${alici}" gönderilmedi (${sonuc.sebep}). Kartı yaz; göndermek gerekiyorsa Recep'e cevabında sor. Departman sana yazdıysa ` +
+    'ona 30 dakika boyunca cevap verebilirsin. Kilidi yalnız Recep\'in sözüyle node scripts/board/pencere-kilidi.cjs --kaldir ile kaldır.'
   yaz({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: neden } })
 }
 

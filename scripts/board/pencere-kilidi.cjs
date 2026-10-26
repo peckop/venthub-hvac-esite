@@ -45,6 +45,10 @@ const LOCAL = /^local_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const SONEK = /-(?:pencere|arastirmaci|curutucu|dogrulayici|uygulayici)$/
 /** OPS her zaman izinlidir: Recep onunla konuşur, departmanlar ona rapor verir. */
 const DAIMA_IZINLI = 'OPS'
+/** Kart numarası kalıbı: kartsız emir kancasıyla TEK kaynak (departman önekleri orada). */
+const KART_NO = new RegExp(require('../../.claude/hooks/kartsiz-emir-uyarisi.cjs').KART_NO.source, 'g')
+/** Bir departman OPS'a yazdıysa OPS ona bu süre boyunca kilitten bağımsız cevap verebilir. */
+const CEVAP_PENCERESI_MS = 30 * 60 * 1000
 
 function kilitDosyasi() {
   return process.env.VH_PENCERE_KILIDI_DOSYASI || path.join(os.homedir(), '.claude', 'mod-durum', 'pencere-kilidi.json')
@@ -93,23 +97,37 @@ function kilitOku(dosya = kilitDosyasi()) {
     const j = JSON.parse(ham)
     const liste = j && Array.isArray(j.izinliler) ? j.izinliler : null
     if (!liste || liste.some((r) => typeof r !== 'string')) return { durum: 'bozuk', sebep: 'izinliler listesi yok' }
-    return { durum: 'var', kilit: { ...j, izinliler: [...new Set(liste.map((r) => rolCoz(r) || String(r).toUpperCase()))] } }
+    const kilit = { ...j, izinliler: [...new Set(liste.map((r) => rolCoz(r) || String(r).toUpperCase()))] }
+    // kartlar: ARC-213. Yoksa kart kuralı YOK (yalnız departman kuralı); VARSA (boş liste dahil) OPS'un departmana
+    // mesajı yalnız bu kart numaralarını anabilir.
+    if (Array.isArray(j.kartlar)) kilit.kartlar = [...new Set(j.kartlar.map((k) => String(k).toUpperCase()))]
+    return { durum: 'var', kilit }
   } catch {
     return { durum: 'bozuk', sebep: 'JSON değil' }
   }
 }
 
 /** Atomik yazım (tmp + rename). Dönüş: kilit nesnesi. Geçersiz rol → fırlatır (yazma tarafı sıkıdır). */
-function kilitYaz({ roller, koyan = 'OPS', not, simdi = Date.now(), dosya = kilitDosyasi() }) {
+function kilitYaz({ roller, kartlar, koyan = 'OPS', not, ifade, simdi = Date.now(), dosya = kilitDosyasi() }) {
   const izinliler = []
   for (const r of roller) {
     const rol = rolCoz(r)
     if (!rol) throw new Error(`bilinmeyen departman: "${r}" (geçerli: ${bilinenRoller().join(', ')})`)
     if (!izinliler.includes(rol)) izinliler.push(rol)
   }
-  if (izinliler.length === 0) throw new Error('en az bir izinli departman gerekir (örn. --koy ARAC)')
-  const kilit = { surum: 1, izinliler, koyan, koyulma: new Date(simdi).toISOString() }
+  // Recep sözüyle otomatik konan kilit (koyan 'recep-sozu') izinlisiz olabilir: herkes kapalı, yalnız OPS ve cevaplar.
+  if (izinliler.length === 0 && koyan !== 'recep-sozu') throw new Error('en az bir izinli departman gerekir (örn. --koy ARAC)')
+  const kilit = { surum: 2, izinliler, koyan, koyulma: new Date(simdi).toISOString() }
+  if (Array.isArray(kartlar)) {
+    kilit.kartlar = []
+    for (const k of kartlar) {
+      const no = String(k).trim().toUpperCase()
+      if (!/^[A-Z0-9]{2,4}-\d{1,5}$/.test(no)) throw new Error(`geçersiz kart numarası: "${k}" (örn. ARC-212)`)
+      if (!kilit.kartlar.includes(no)) kilit.kartlar.push(no)
+    }
+  }
   if (typeof not === 'string' && not.trim()) kilit.not = not.trim().slice(0, 200)
+  if (typeof ifade === 'string' && ifade.trim()) kilit.ifade = ifade.trim().slice(0, 120)
   fs.mkdirSync(path.dirname(dosya), { recursive: true })
   const gecici = `${dosya}.${process.pid}.tmp`
   fs.writeFileSync(gecici, JSON.stringify(kilit, null, 2) + '\n')
@@ -189,19 +207,121 @@ function aliciCoz(alici, secenek = {}) {
  * Saf karar. @returns {{izin:boolean, sebep:string, izinliler:string[]}}
  * `kilit` null ise (dosya yok) izin verilir.
  */
-function karar({ kilit, alici, gonderenRol, cozum }) {
+function karar({ kilit, alici, gonderenRol, cozum, mesaj, gelen, simdi = Date.now() }) {
   if (!kilit) return { izin: true, sebep: 'kilit yok', izinliler: [] }
   const izinliler = [...new Set([...kilit.izinliler, DAIMA_IZINLI, ...(gonderenRol ? [gonderenRol] : [])])]
   const c = cozum || aliciCoz(alici)
   if (c.tip === 'ad') return { izin: true, sebep: 'departman adına çözülmedi (alt ajan adı)', izinliler }
   if (c.tip === 'rol') {
-    return izinliler.includes(c.rol)
-      ? { izin: true, sebep: `${c.rol} izinli`, izinliler }
-      : { izin: false, sebep: `${c.rol} izinli değil`, izinliler }
+    // CEVAP (ARC-213): departman OPS'a yazdıysa OPS ona kilitten bağımsız cevap verir (yalnız son 30 dk).
+    if (gonderenRol === DAIMA_IZINLI && gelen && Number.isFinite(gelen[c.rol]) && simdi - gelen[c.rol] <= CEVAP_PENCERESI_MS && gelen[c.rol] >= Date.parse(kilit.koyulma || 0)) {
+      return { izin: true, sebep: `${c.rol} OPS'a yazdı: cevap serbest`, izinliler }
+    }
+    if (!izinliler.includes(c.rol)) return { izin: false, sebep: `${c.rol} izinli değil`, izinliler }
+    // KART KURALI (ARC-213): kilitte `kartlar` varsa OPS'un departmana mesajı yalnız izinli kart numaralarını anar.
+    if (Array.isArray(kilit.kartlar) && gonderenRol === DAIMA_IZINLI && c.rol !== DAIMA_IZINLI) {
+      const anilan = [...new Set((String(mesaj || '').match(KART_NO) || []).map((k) => k.toUpperCase()))]
+      const yabanci = anilan.filter((k) => !kilit.kartlar.includes(k))
+      if (anilan.length === 0) return { izin: false, sebep: `${c.rol} için mesajda izinli bir kart numarası yok (izinli kartlar: ${kilit.kartlar.join(', ') || 'yok'})`, izinliler }
+      if (yabanci.length > 0) return { izin: false, sebep: `izinli olmayan kart numarası: ${yabanci.join(', ')} (izinli kartlar: ${kilit.kartlar.join(', ') || 'yok'})`, izinliler }
+    }
+    return { izin: true, sebep: `${c.rol} izinli`, izinliler }
   }
   if (c.tip === 'yayin') return { izin: false, sebep: 'yayın (*) tüm pencerelere ulaşır', izinliler }
   if (c.tip === 'rolsuz-pencere') return { izin: false, sebep: 'alıcı bir departmana bağlı değil', izinliler }
   return { izin: false, sebep: 'alıcının kimliği bir departmana çözülemedi', izinliler }
+}
+
+// ── ARC-213: kilidi RECEP'İN SÖZÜ açar/kaldırır; departmandan gelen mesaj "cevap hakkı" doğurur ──
+
+function gelenDosyasi() {
+  return process.env.VH_PENCERE_GELEN_DOSYASI || path.join(os.homedir(), '.claude', 'mod-durum', 'pencere-gelen.json')
+}
+
+/** { ROL: epochMs } — OPS'a en son mesaj yazan departmanlar. Okunamazsa {}. */
+function gelenOku(dosya = gelenDosyasi()) {
+  try {
+    const j = JSON.parse(fs.readFileSync(dosya, 'utf8'))
+    return j && typeof j === 'object' && !Array.isArray(j) ? j : {}
+  } catch {
+    return {}
+  }
+}
+
+/** Departmanın OPS'a yazdığı anı kaydeder (atomik). Hata fırlatmaz. */
+function gelenKaydet(roller, simdi = Date.now(), dosya = gelenDosyasi()) {
+  try {
+    if (!roller.length) return
+    const k = gelenOku(dosya)
+    for (const r of roller) k[r] = simdi
+    fs.mkdirSync(path.dirname(dosya), { recursive: true })
+    const gecici = `${dosya}.${process.pid}.tmp`
+    fs.writeFileSync(gecici, JSON.stringify(k) + '\n')
+    fs.renameSync(gecici, dosya)
+  } catch {
+    /* kayıt yazılamadı: cevap hakkı doğmaz, kilit daha sıkı kalır */
+  }
+}
+
+// Recep'in OLMAYAN metin blokları: kanca/araç/yardımcı enjeksiyonları. Bunlar Recep sözü sayılmaz.
+const ENJEKSIYON_BLOKLARI = [
+  /<system-reminder[\s\S]*?<\/system-reminder[^>]*>/gi,
+  /<cross-session-message[\s\S]*?<\/cross-session-message[^>]*>/gi,
+  /<task-notification[\s\S]*?<\/task-notification>/gi,
+  /<local-command-caveat[\s\S]*?<\/local-command-caveat>/gi,
+  /<local-command-stdout[\s\S]*?<\/local-command-stdout>/gi,
+  /<command-(?:name|message|args)>[\s\S]*?<\/command-(?:name|message|args)>/gi,
+  /<ci-monitor-event[\s\S]*?<\/ci-monitor-event>/gi,
+  /<side-sessions-event[\s\S]*?<\/side-sessions-event>/gi,
+]
+
+/** İstemden Recep'in kendi yazdığı kısmı bırakır (enjeksiyon blokları atılır). */
+function recepMetni(istem) {
+  let m = String(istem || '')
+  for (const re of ENJEKSIYON_BLOKLARI) m = m.replace(re, ' ')
+  return m.replace(/\s+/g, ' ').trim()
+}
+
+// Katlanmış (ASCII, küçük harf) metin üzerinde. "dokunmadan" gibi ekli sözcükler yakalanmasın diye sözcük sınırı.
+const HARF = 'a-z0-9'
+const kelime = (s) => new RegExp(`(?<![${HARF}])${s}(?![${HARF}])`)
+const YASAK_IFADELERI = [kelime('pencere acma'), kelime('baska pencere'), kelime('dokunma'), /(?<![a-z0-9])yola cik/, kelime('simdi degil'), kelime('baslamasin')]
+const SERBEST_IFADELERI = [kelime('yasak kalkti'), kelime('yasak yok'), kelime('baslat'), kelime('baslatabilirsin'), kelime('devam'), kelime('serbest'), kelime('izin verdim')]
+
+/**
+ * Recep'in sözünden kilit kararı. Yasak ifadesi serbest ifadesinden ÖNCE bakılır ("devam et ama başka pencere açma" = yasak).
+ * @returns {{tip:'koy'|'kaldir'|null, ifade:string}}
+ */
+function recepSozu(istem) {
+  const m = pa.katla(recepMetni(istem))
+  if (!m) return { tip: null, ifade: '' }
+  for (const re of YASAK_IFADELERI) {
+    const e = re.exec(m)
+    if (e) return { tip: 'koy', ifade: e[0] }
+  }
+  for (const re of SERBEST_IFADELERI) {
+    const e = re.exec(m)
+    if (e) return { tip: 'kaldir', ifade: e[0] }
+  }
+  return { tip: null, ifade: '' }
+}
+
+/** İstemdeki departman mesajlarının göndericileri (rol). `from-name` önce, yoksa `from-session` (local_) çözülür. */
+function gelenMesajlar(istem, secenek = {}) {
+  const roller = []
+  const re = /<cross-session-message\b([^>]*)>/gi
+  let e
+  while ((e = re.exec(String(istem || ''))) !== null) {
+    const ad = /from-name="([^"]*)"/.exec(e[1])
+    const oturum = /from-session="([^"]*)"/.exec(e[1])
+    let rol = ad ? rolCoz(basliktanSusAt(ad[1])) : ''
+    if (!rol && oturum) {
+      const c = aliciCoz(oturum[1], secenek)
+      if (c.tip === 'rol') rol = c.rol
+    }
+    if (rol && !roller.includes(rol)) roller.push(rol)
+  }
+  return roller
 }
 
 function saatOnce(isoMetin, simdi = Date.now()) {
@@ -220,16 +340,21 @@ function cli(argv) {
   }
   if (komut === '--koy') {
     const roller = []
+    const kartlar = []
     let not
     for (let i = 0; i < kalan.length; i += 1) {
       if (kalan[i] === '--not') {
         not = kalan[i + 1]
         i += 1
+      } else if (kalan[i] === '--kart') {
+        kartlar.push(kalan[i + 1])
+        i += 1
       } else roller.push(kalan[i])
     }
     try {
-      const k = kilitYaz({ roller, not })
-      process.stdout.write(`Pencere kilidi KONDU. İzinli: ${k.izinliler.join(', ')} (+ OPS her zaman). Kaldırmak için: --kaldir\n`)
+      const k = kilitYaz({ roller, kartlar: kartlar.length ? kartlar : undefined, not })
+      const kartMetni = k.kartlar ? ` Yalnız şu kart numaralarını anan mesajlar gider: ${k.kartlar.join(', ')}.` : ''
+      process.stdout.write(`Pencere kilidi KONDU. İzinli: ${k.izinliler.join(', ')} (+ OPS her zaman).${kartMetni} Kaldırmak için: --kaldir\n`)
       return 0
     } catch (e) {
       process.stderr.write(`${e.message}\n`)
@@ -240,10 +365,14 @@ function cli(argv) {
     const o = kilitOku()
     if (o.durum === 'yok') process.stdout.write('Kilit yok: tüm pencerelere mesaj gider.\n')
     else if (o.durum === 'bozuk') process.stdout.write(`Kilit dosyası BOZUK (${o.sebep}): ${kilitDosyasi()}\n`)
-    else process.stdout.write(`Kilit VAR. İzinli: ${o.kilit.izinliler.join(', ')} (+ OPS). Koyulma: ${saatOnce(o.kilit.koyulma) || 'bilinmiyor'}.\n`)
+    else {
+      const kart = o.kilit.kartlar ? ` Kartlar: ${o.kilit.kartlar.join(', ') || 'yok'}.` : ''
+      const kim = o.kilit.koyan === 'recep-sozu' ? ` Recep sözüyle kondu ("${o.kilit.ifade || ''}").` : ''
+      process.stdout.write(`Kilit VAR. İzinli: ${o.kilit.izinliler.join(', ') || 'yok'} (+ OPS).${kart}${kim} Koyulma: ${saatOnce(o.kilit.koyulma) || 'bilinmiyor'}.\n`)
+    }
     return 0
   }
-  process.stderr.write('Kullanım: pencere-kilidi.cjs --koy ROL [ROL...] [--not metin] | --kaldir | --goster\n')
+  process.stderr.write('Kullanım: pencere-kilidi.cjs --koy ROL [ROL...] [--kart ARC-NN ...] [--not metin] | --kaldir | --goster\n')
   return 2
 }
 
@@ -251,4 +380,23 @@ if (require.main === module) {
   process.exit(cli(process.argv.slice(2)))
 }
 
-module.exports = { kilitDosyasi, kilitOku, kilitYaz, kilitKaldir, aliciCoz, karar, rolCoz, rolOturumdan, localKayit, saatOnce, DAIMA_IZINLI }
+module.exports = {
+  kilitDosyasi,
+  kilitOku,
+  kilitYaz,
+  kilitKaldir,
+  aliciCoz,
+  karar,
+  rolCoz,
+  rolOturumdan,
+  localKayit,
+  saatOnce,
+  DAIMA_IZINLI,
+  gelenDosyasi,
+  gelenOku,
+  gelenKaydet,
+  recepMetni,
+  recepSozu,
+  gelenMesajlar,
+  CEVAP_PENCERESI_MS,
+}
