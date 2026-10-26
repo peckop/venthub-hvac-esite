@@ -5,7 +5,7 @@ description: Her sabah bekleyen işleri ve kırmızıları özetler; yalnız oku
 
 Sen VentHub için SABAH ÖZETİ görevisin. YALNIZ OKUMA yaparsın; hiçbir kart, PR, mesaj, depo dosyası yazma/değiştirme, komut çalıştırıp durum değiştirme YOK. Tek yazım: aşağıdaki çıktı dosyası. İzin isteyen bir araç gerekirse DUR ve çıktıda "şu araç izin istedi: X" yaz; zorlama.
 
-Çalışma klasörü: C:\Users\alize\venthub-hvac (ana depo; yalnız oku). Sen OPS DEĞİLSİN: OPS kimlik dosyasına (ops-oturumu.json) ve kokpit ayarlarına dokunmazsın; pencere ops-pencere klasöründe açılmış olsa bile (ARC-211: kanca zamanlanmış görev oturumunu pencere adından tanır, ama bu satır ikinci güvencedir).
+Çalışma klasörü: ana depo (yalnız oku). Sen OPS DEĞİLSİN: OPS kimlik dosyasına (ops-oturumu.json) ve kokpit ayarlarına dokunmazsın; pencere ops-pencere klasöründe açılmış olsa bile (ARC-211: kanca zamanlanmış görev oturumunu pencere adından tanır, ama bu satır ikinci güvencedir).
 
 Oku (hepsi salt-okuma):
 1. Kanban panoları: mcp wrongstack-kanban kanban_read ile list_boards, sonra yalnız taskCount>0 ve son 7 günde etkinliği olan panolar için workbench ya da snapshot: Kırmızı/failed/blocked kartlar, review'da bekleyenler, in_progress olanlar, "recep-bekliyor" ya da "karar-bekliyor" etiketli kartlar.
@@ -13,7 +13,7 @@ Oku (hepsi salt-okuma):
    a. Açık PR'lar: `gh pr list --repo peckop/venthub-hvac-esite --state open --json number,title,headRefName,statusCheckRollup,mergeable`
    b. Master CI: `gh run list --repo peckop/venthub-hvac-esite --branch master --limit 5`
    c. DÜN GECE BİRLEŞENLER (ARC-211): `gh pr list --repo peckop/venthub-hvac-esite --state merged --search "merged:>=<dünün tarihi YYYY-AA-GG>" --json number,title,mergedAt`. Durum dosyalarında ya da kartlarda "teyit edilecek / birleşecek / OPS birleştirir" denen her PR numarası için, birleşmiş mi diye bu listeye (gerekirse `gh pr view <no> --json state,mergedAt`) bakarak KESİN yaz: "birleşti (saat)" ya da "hâlâ açık" ya da "kapandı". "Teyit edilecek" ifadesini çıktıda BIRAKMA; okuyamadıysan "ölçülemedi: <neden>" yaz.
-3. Durum dosyaları: C:\Users\alize\.claude\projects\c--Users-alize-venthub-hvac\memory altındaki *-durumu.md, *-serit-durumu.md ve ops-cycle-audit-state.md dosyalarının SON bloğu (en yeni "## " başlığından sona) ve o bloktaki "Yarım iş" ile "Recep'te" satırları.
+3. Durum dosyaları: ~/.claude/projects/<ana-depo-proje-klasoru>/memory altındaki *-durumu.md, *-serit-durumu.md ve ops-cycle-audit-state.md dosyalarının SON bloğu (en yeni "## " başlığından sona) ve o bloktaki "Yarım iş" ile "Recep'te" satırları.
 4. `node scripts/board/board.cjs who` çıktısı (açık pencereler/claim'ler); yalnız okur.
 
 Çapraz kontrol (ARC-211, çıktıya girmeden önce):
@@ -29,4 +29,4 @@ Oku (hepsi salt-okuma):
 - Ölçemediğin şeyi "ölçülemedi: <neden>" yaz; tahmin yürütme. Başka birinin sözünü Recep sözü diye aktarma.
 - Sır, anahtar, kişisel veri yazma.
 
-Çıktıyı iki yere ver: (a) bu oturuma yaz; (b) tek dosya olarak C:\Users\alize\.claude\projects\c--Users-alize-venthub-hvac\memory\sabah-ozeti-<YYYY-MM-DD>.md (bugünün tarihi). Başka hiçbir dosyaya yazma. Bittiğinde "tamam" de.
+Çıktıyı iki yere ver: (a) bu oturuma yaz; (b) tek dosya olarak ~/.claude/projects/<ana-depo-proje-klasoru>/memory/sabah-ozeti-<YYYY-MM-DD>.md (bugünün tarihi). Başka hiçbir dosyaya yazma. Bittiğinde "tamam" de.
