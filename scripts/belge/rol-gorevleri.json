@@ -144,28 +144,6 @@
           "taslak": true
         },
         {
-          "gorev": "MCP bağlantı sağlığı: bağlanamayan ya da kimlik bekleyen sunucuyu bul, sebebini ölç, sahibine kart aç (claude mcp list)",
-          "siklik": "olay",
-          "tetik": "istem-tazelik",
-          "tetikAyrinti": "Tekrarlanan satır ya da kapı yok: Claude Code açılışta \"bağlanamadı\" bildirimini bir kez gösteriyor; notebooklm-py bu yüzden 09-09'dan beri kopuk kaldı ve kimse sebebini aramadı (ARC-70); pencere açılışında koşması hedeflenir",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
-          "cikti": "Sahibine sebebi ölçülmüş Kanban kartı",
-          "esik": "TASLAK: bağlanamayan sunucu 0; kimlik bekleyen ayrı sayılır",
-          "taslak": true
-        },
-        {
-          "gorev": "Bağımlılık güncelleme önerileri: her açık güncelleme PR'ı için birleştir / önce sına / kapat hükmü yaz",
-          "siklik": "olay",
-          "tetik": "istem-tazelik",
-          "tetikAyrinti": "⚠BAGIMLILIK satırı son tarama süresini ve high sayısını gösteriyor, açık güncelleme PR sayısını göstermiyor (TAKİP satır metninden çıkardı, kanca okunmadı); sayıyı gösteren satırı HARİTA tasarlayacak, kanca altyapısı gerekirse ARAÇ",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
-          "cikti": "PR'a hüküm notu ve OPS'a tek tablo; birleştirmeyi ya da kapatmayı ARAÇ ya da OPS yapar, TAKİP yapmaz",
-          "esik": "TASLAK: hükümsüz açık güncelleme PR'ı 0",
-          "taslak": true
-        },
-        {
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
@@ -220,10 +198,10 @@
           "esik": "Kapalı kipte yalnız Inter; TASARIM Faz 2b'de Archivo beklenir, o PR'da eşik değişir"
         },
         {
-          "gorev": "Dependabot PR'ları: haftalık açılan PR'ları gözden geçirip birleştir ya da gerekçeyle kapat",
+          "gorev": "Bağımlılık güncelleme PR'ları (Dependabot dahil): haftalık açılan PR'ların her biri için hüküm yaz (birleştir / önce sına / kapat), sonra birleştir ya da gerekçeyle kapat",
           "siklik": "haftalik",
           "tetik": "actions",
-          "tetikAyrinti": "Dependabot PR'ları haftalık açılıyor; bunları ele alan kendiliğinden bir tetik kurulu değil (kuracak: ALTYAPI)",
+          "tetikAyrinti": "Dependabot PR'ları haftalık açılıyor; bunları ele alan kendiliğinden bir tetik kurulu değil (kuracak: ALTYAPI). Tek sahip ALTYAPI (tüzük Madde 3; HRT-74: TAKİP'in aynı işi taşıyan görevi kaldırıldı). ⚠BAGIMLILIK satırı açık güncelleme PR sayısını göstermiyor; sayı eklenirse tetik istem-tazelik olabilir (ARC-216 kapsamında ARAÇ ile konuşulur)",
           "bagli": "hayir",
           "baglayacak": "ALTYAPI",
           "cikti": "Birleşme ya da gerekçeli kapatma (bagimlilik-kararlari.md §7 kaydı)",
@@ -285,17 +263,6 @@
           "baglayacak": "HARITA",
           "cikti": "Ölçüm tablosu PR gövdesine; fark Kanban kartı TASARIM'a, admin farkı ADMIN'e",
           "esik": "TASLAK: bayrak kapalıyken fark 0; açıkken preload ve axe tavanını ALTYAPI (M6, M3) belirler, ALTYAPI teyit eder",
-          "taslak": true
-        },
-        {
-          "gorev": "Tasarım sistemi kopyasının koddaki adlarla eşitliği: Design'daki adlar (bugün 66) ile :root ve Tailwind adlarını karşılaştır (INV-TOKEN-PARITE-1)",
-          "siklik": "her-dagitim",
-          "tetik": "actions",
-          "tetikAyrinti": "Design kopyası (ds-kaynak) ve kapı henüz yok; yeni iş akışı ya da ci içinde test olarak kurulacak (kuracak: ALTYAPI)",
-          "bagli": "hayir",
-          "baglayacak": "ALTYAPI",
-          "cikti": "Eksik ya da değeri farklı ad için Kanban kartı TASARIM'a; Design önerisi \"öneri\" diye kayda geçer",
-          "esik": "TASLAK: eksik ve farklı değerli ad 0; ALTYAPI ile teyit",
           "taslak": true
         },
         {
