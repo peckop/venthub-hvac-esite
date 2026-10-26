@@ -5,8 +5,8 @@
  * Betik: scripts/board/kanit-donustur.cjs · kural aynı: .claude/hooks/kanban-kanit-yolu-kapisi.cjs
  */
 import { spawnSync } from 'node:child_process'
-import { createRequire } from 'node:module'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
