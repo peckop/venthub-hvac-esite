@@ -102,6 +102,16 @@ describe('ilgiliAileVerisi: kural istemci davranışıyla birebir (URN-147)', ()
     expect(fiyatSayisi(satis)).toBe(2)
   })
 
+  it('açıklama (TR+EN) istemciye inmez: FamilyCard okumaz, EN sayfada TR metin kalmasın (INV-DIL-DUSUSU-1)', async () => {
+    const aciklamali = { ...aile('1', 100), description: { tr: 'Çelik gövdeli, direkt akuple, orta basınçlı fan', en: 'Steel casing fan' } }
+    expect(JSON.stringify(aciklamali)).toContain('Çelik gövdeli')
+    for (const kategori of [GIZLI, ACIK]) {
+      const sonuc = await ilgiliAileVerisi(ben, kategori, async () => [aciklamali])
+      expect(sonuc.every((f) => f.description === null)).toBe(true)
+      expect(JSON.stringify(sonuc)).not.toContain('Çelik gövdeli')
+    }
+  })
+
   it('kategori bağlamı yoksa mod bilinmiyor → teklif modu (fiyat çıkar)', async () => {
     const sonuc = await ilgiliAileVerisi(ben, null, async () => [aile('1', 100)])
     expect(fiyatSayisi(sonuc)).toBe(0)
@@ -183,7 +193,7 @@ describe('kaynak kapıları (URN-147)', () => {
     const k = readFileSync(join(process.cwd(), 'src/app/_components/aileSayfasi.tsx'), 'utf8')
     expect(k).toMatch(/\['pdp-related-families',\s*lang,\s*tenantId,\s*kategoriId\]/)
     expect(k).toMatch(/getCachedKategoriAileleri[\s\S]{0,500}tags:\s*\[PRODUCTS_DISCOVERY_TAG,\s*discoveryTag\(tenantId\)\]/)
-    expect(k).toMatch(/return listeFiyatiniSuz\(aday,\s*kategori\)/)
+    expect(k).toMatch(/return listeFiyatiniSuz\(aday\.map\(\(f\) => \(\{ \.\.\.f, description: null \}\)\),\s*kategori\)/)
   })
 
   it('ProductDetailPageView tarayıcıdan aile çekmez; initialRelatedFamilies prop u var', () => {

@@ -239,7 +239,9 @@ export async function ilgiliAileVerisi(
   if (!family || !kategoriId) return []
   try {
     const aday = (await oku(kategoriId)).filter((f) => f.id !== family.id).slice(0, ILGILI_AILE_GOSTERILEN)
-    return listeFiyatiniSuz(aday, kategori)
+    // FamilyCard `description` OKUMAZ; ham {tr,en} nesnesi istemciye inerse RSC yükünde EN sayfada TR metin kalır
+    // (INV-DIL-DUSUSU-1, e2e/dil-dususu.e2e.ts). Kart için gereksiz alan sunucuda atılır.
+    return listeFiyatiniSuz(aday.map((f) => ({ ...f, description: null })), kategori)
   } catch (hata) {
     console.warn(`[aileSayfasi] ilgili aileler okunamadı (${kategoriId}); kartsız çiziliyor`, hata)
     return []

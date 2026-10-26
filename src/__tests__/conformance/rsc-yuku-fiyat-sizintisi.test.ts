@@ -145,7 +145,7 @@ describe('INV-FIYAT-SIZINTI-3 · (d) PDP ilgili aileler (URN-147)', () => {
     const k = oku('src/app/_components/aileSayfasi.tsx')
     expect(k).toMatch(/initialRelatedFamilies\s*=\s*await ilgiliAileVerisi\(/)
     expect(k).toMatch(/initialRelatedFamilies=\{initialRelatedFamilies\}/)
-    expect(k).toMatch(/return listeFiyatiniSuz\(aday,\s*kategori\)/)
+    expect(k).toMatch(/return listeFiyatiniSuz\(aday\.map\(\(f\) => \(\{ \.\.\.f, description: null \}\)\),\s*kategori\)/)
     // Sayfa, kategori olarak kendi ana kategorisini verir (varyant süzgeciyle aynı hüküm).
     expect(k).toMatch(/ilgiliAileVerisi\(\s*family,\s*mainCategory,/)
   })
