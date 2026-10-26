@@ -208,4 +208,59 @@ describe('INV-SIR-TARAMA-1 · ulaşılamayan commit taraması ve kapatma listesi
       for (const alan of Object.keys(k)) expect(['durum', 'imza', 'not', 'parmak_izi']).toContain(alan)
     }
   })
+
+  // ── ALT-107 · kapatılmış GEÇMİŞ YOLLARI (iyzico test verisi, ALT-41 kapanışı) ───────────────────────────────
+  const YOL_GEREKCE = 'KAPATILDI: iyzico test verisi, gerçek kişi/kart değil (Recep 26 Ekim, ALT-41)'
+  const BEKLENEN_YOLLAR = [
+    'docs/archive/db-backup-pre-kademe2',
+    'support/',
+    'docs/kayitlar_master.md (örnek satırlar)',
+    'commit mesajları 2025-08-24 (f67531f46 dahil)',
+  ]
+
+  it('gerçek listede dört kapatılmış geçmiş yolu gerekçesiyle durur; yalnız kapsam/durum/not alanı, değer yok', () => {
+    const veri = JSON.parse(fs.readFileSync(KAPATMA_LISTESI, 'utf8')) as {
+      yol_kayitlari: { kapsam: string; durum: string; not?: string }[]
+    }
+    expect(veri.yol_kayitlari.map((y) => y.kapsam)).toEqual(BEKLENEN_YOLLAR)
+    for (const y of veri.yol_kayitlari) {
+      expect(y.durum).toBe(YOL_GEREKCE)
+      for (const alan of Object.keys(y)) expect(['durum', 'kapsam', 'not']).toContain(alan)
+      // değer taşıma yasağı: uzun rakam dizisi (kart/telefon/kimlik biçimi) ve e-posta yok
+      expect(JSON.stringify(y)).not.toMatch(/\d{6,}/)
+      expect(JSON.stringify(y)).not.toMatch(/@/)
+    }
+  })
+
+  it('tarama raporunda kapatılmış yollar GEREKÇELERİYLE görünür (konsol + rapor); temiz depoda çıkış 0', () => {
+    const repo = danglingDepo({ 'b.txt': 'temiz\n' })
+    const r = tara(repo, ['--ulasilamayan'], KAPATMA_LISTESI)
+    expect(r.kod).toBe(0)
+    for (const kapsam of BEKLENEN_YOLLAR) {
+      expect(r.konsol).toContain(`${kapsam} -> ${YOL_GEREKCE}`)
+      expect(r.rapor).toContain(`${kapsam} -> ${YOL_GEREKCE}`)
+    }
+  })
+
+  it('yol kaydı SIR bulgusunu kapatmaz: kapsamı eşleşse bile listede olmayan değer KIRMIZI kalır', () => {
+    const repo = danglingDepo({ 'x.env': `TOKEN=${DEGER_A}\n` })
+    const yol = path.join(repo, '..', path.basename(repo) + '-yolkayitli.json')
+    gecici.push(yol)
+    fs.writeFileSync(
+      yol,
+      JSON.stringify({ surum: 1, kayitlar: [], yol_kayitlari: [{ kapsam: 'x.env', durum: YOL_GEREKCE }] }),
+    )
+    const r = tara(repo, ['--ulasilamayan'], yol)
+    expect(r.kod).toBe(1)
+    expect(r.konsol).toContain('ACIK')
+    expect(r.konsol).toContain(`x.env -> ${YOL_GEREKCE}`) // bilgi olarak görünür ama bulguyu kapatmaz
+  })
+
+  it('bozuk yol kaydı (gerekçe yok) çıkış 2 verir; sessizce yeşil/kırmızı olmaz', () => {
+    const repo = danglingDepo({ 'b.txt': 'temiz\n' })
+    const yol = path.join(repo, '..', path.basename(repo) + '-bozukyol.json')
+    gecici.push(yol)
+    fs.writeFileSync(yol, JSON.stringify({ surum: 1, kayitlar: [], yol_kayitlari: [{ kapsam: 'support/' }] }))
+    expect(tara(repo, ['--ulasilamayan'], yol).kod).toBe(2)
+  })
 })
