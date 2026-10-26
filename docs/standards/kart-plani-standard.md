@@ -101,7 +101,7 @@ Recep'e doğrudan götürmez.
 | XS | 1 | tek kart |
 | S | 1-2 | tek kart |
 | M | 3-5 | tek kart |
-| L | 5-8 | çalışan tanımı bölünmeden verilmez |
+| L | 6-8 | bölünmeden tek çalışana verilmez |
 | XL | 8 ve üstü | çok büyük, bölünür |
 
   Bölme işaretleri: iki saati aşan çalışma, üçten fazla kabul ölçütü, iki bağımsız alt sistem, kart başlığında "ve".
