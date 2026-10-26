@@ -94,6 +94,10 @@
     {
      "ad": "api-design",
      "kb": 10
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -249,6 +253,10 @@
     {
      "ad": "database-migrations",
      "kb": 6.8
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -378,6 +386,10 @@
     {
      "ad": "mcp-builder",
      "kb": 9.1
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": [
@@ -592,6 +604,10 @@
     {
      "ad": "database-migrations",
      "kb": 6.8
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -895,6 +911,10 @@
     {
      "ad": "debugging",
      "kb": 13
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -994,6 +1014,10 @@
      "ad": "supabase",
      "kb": 18.8,
      "uyari": "ad çakışması: proje supabase (19K) ile eklenti supabase:supabase (13K); alanın hangisini çözdüğü ölçülmedi"
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -1251,6 +1275,10 @@
     {
      "ad": "payments-webhooks",
      "kb": 6.6
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": [
@@ -1386,6 +1414,10 @@
     {
      "ad": "design-dna",
      "kb": 8.3
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -1523,6 +1555,10 @@
     {
      "ad": "observability",
      "kb": 8.6
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -1728,6 +1764,10 @@
     {
      "ad": "web-performance",
      "kb": 6.4
+    },
+    {
+     "ad": "incremental-implementation",
+     "kb": 7.7
     }
    ],
    "bekleyen": []
@@ -1935,5 +1975,5 @@
    "ne": "Rehber yazısının yayın akışı (cetvel R10): basamak, sahibi, kapı; müdür çalıştırır, çalışana ön yüklenmez."
   }
  ],
- "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla)"
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır"
 }
