@@ -1372,6 +1372,8 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     expect(uretici.SUREN_IS_KORUMA_KURALI).toContain('OPS bırak derse sebebini yazar')
     const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
     expect(ortak).toContain('elimde X var, bitince başlarım')
+    // OPS emir yazmadan önce alıcının rol kartına bakar: kural filo-ortaktan OPS'a özel bloğa taşındı, düşmemeli.
+    expect(kurallar.OPS).toContain('Emir yazmadan önce alıcının rol kartına bakılır')
     expect(ortak).toContain('pnpm exec vitest run <göreli test yolu>')
     expect(ortak).toContain('depo dışı iş için elle kontrol + kanıt notudur')
     expect(ortak).not.toContain('kod için `pnpm test:ilgili` çıktısıdır')
