@@ -324,6 +324,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/board-brief.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gorev-tazelik-satiri.cjs\""
           }
         ]
       },
