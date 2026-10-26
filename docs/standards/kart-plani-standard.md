@@ -1,4 +1,4 @@
-# Kart Planı Standardı (v1.1 — 2026-10-03)
+# Kart Planı Standardı (v1.2 — 2026-10-26)
 
 > **Ne yönetir:** Kanban kartının içindeki PLAN bölümünün nasıl yazıldığı, kimin uyguladığı ve eksiksiz
 > olduğunun nasıl ölçüldüğü. İş emri kartının KAYNAK/CETVEL bloğu (CLAUDE.md kural 1) ayrı kalır; bu cetvel
@@ -9,7 +9,7 @@
 > kontrolü yazılamayan kural girmez; bu yüzden kural bir betikle ölçülür.
 > **Sahibi:** HARİTA. Kartı Kanban'a taşıma düzeni (`is-kayit-duzeni-standard.md`) OPS'undur, buna dokunulmaz.
 > **Son doğrulama:** 2026-10-03.
-> **Kayıt:** HRT-14 (OPS-13); v1.1 HRT-26 (OPS-30, ÖNCEKİ ÇALIŞMA satırı). **İlgili:** `execution-method-standard.md` §10 (çalışan tanımları).
+> **Kayıt:** HRT-14 (OPS-13); v1.1 HRT-26 (OPS-30, ÖNCEKİ ÇALIŞMA satırı); v1.2 HRT-75 (dilimleme, boyut, açık planı koruma). **İlgili:** `execution-method-standard.md` §10 (çalışan tanımları).
 
 ## Kural
 
@@ -88,6 +88,30 @@ sayfa özetin karar numarası ya da tarihidir ("Recep özeti: karar 243 sunuldu"
 ekip üyesi dosyaya dokunmaz. Özeti Recep'e sunmak OPS'un işidir; departman müdürü kartı hazırlar, özeti
 Recep'e doğrudan götürmez.
 
+## Dilimleme, boyut ve açık planı koruma (v1.2, HRT-75)
+
+İlke olarak yazılır; kapı ölçmez (aşağıdaki "Ölçülmeyenler").
+
+- **Dikey dilim:** iş önce tüm şema, sonra tüm API, sonra tüm arayüz diye yatay değil, kullanıcının görebileceği bir yol
+  (şema + API + arayüz) halinde dilimlenir. Bağımlılık sırası alttan yukarıdır: şema, tipler, uçlar, istemci, arayüz.
+- **Boyut tablosu:**
+
+| Boyut | Dokunulan dosya | Kural |
+|---|---|---|
+| XS | 1 | tek kart |
+| S | 1-2 | tek kart |
+| M | 3-5 | tek kart |
+| L | 6-8 | bölünmeden tek çalışana verilmez |
+| XL | 8 ve üstü | çok büyük, bölünür |
+
+  Bölme işaretleri: iki saati aşan çalışma, üçten fazla kabul ölçütü, iki bağımsız alt sistem, kart başlığında "ve".
+- **Açık planı ezme yasağı:** plan yazmadan önce aynı konuda açık kart ya da plan var mı bakılır (`ÖNCEKİ ÇALIŞMA:` satırı ve
+  Kanban `search_tasks`). Aynı işse yerinde güncellenir; farklı işse durulur ve OPS'a sorulur. Başkasının açık kartı, yeni plana yer
+  açmak için toplu kapatılmaz ya da silinmez.
+
+Kaynak: addyosmani/agent-skills `planning-and-task-breakdown` @f3400940 (MIT). `tasks/plan.md` ve `tasks/todo.md` yolları alınmadı
+(görev listesi Kanban kartıdır).
+
 ## Kontrol: kart-plan kapısı
 
 Betik: `scripts/belge/kart-plan-kapisi.cjs`. Kimliği INV-KART-PLAN-1, testi
@@ -147,3 +171,4 @@ değil kökün varlığını ölçer, bilerek güvenli taraftadır; ilk takılan
 - Kapının CI'ya ya da birleştirme ritüeline bağlanması (ARAÇ).
 - Mevcut kartların toplu taranması (bu cetvel yeni kartları yönetir).
 - Üyenin plan onayı olmadan dosyaya dokunamaması (karar 242; URUN'da deneme).
+- Dikey dilim, boyut tablosu ve açık planı ezme yasağı (v1.2): kapı ölçmez; ilke olarak okunur, ihlali kart incelemesinde yakalanır.
