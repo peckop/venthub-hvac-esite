@@ -141,6 +141,16 @@ Bound exporter buffers and shutdown flush; telemetry failure must not create
 unbounded work or silently break the primary task. Record sampling and missing
 signals when interpreting incident counts or latency distributions.
 
+## YTN-21 eklemeleri (VentHub'a uyarlandı)
+
+> Kaynak: addyosmani/agent-skills observability-and-instrumentation @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT); ayrıntı
+> `references/soru-alarm-runbook.md`. Yığınımız Sentry + Vercel logları; ikinci gözlem yığını eklenmez; kişisel veri (KVKK) loglanmaz.
+
+- **Önce soru:** ölçüm eklemeden önce nöbetçinin soracağı 2-4 soruyu yaz; her sinyal birine cevap versin.
+- **Giriş noktası:** cron, webhook, Edge Function ya da elle tetikleme aynı log'a yazıyorsa korelasyon kimliğinin yanına `entryPoint` yaz.
+- **Alarm:** kullanıcının hissettiği belirtiye, eyleme dönük, runbook bağlantılı, gerekçeli eşikli; yalnız iki şiddet (sayfa, kart).
+- **Telemetriyi doğrula:** bilinçli hata üret, Sentry/Vercel logunda `requestId` ile bul; kişisel veri sızmadığını aynı bakışta kontrol et.
+
 ## Skills in scope
 
 - `security-scanner` — for confirming nothing sensitive reaches logs

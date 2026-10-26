@@ -328,6 +328,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/board-brief.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gorev-tazelik-satiri.cjs\""
           }
         ]
       },
@@ -406,6 +410,12 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/accumulate-edits.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/duzenleme-ani-lint.cjs\"",
+            "asyncRewake": true,
+            "timeout": 60
           }
         ]
       },

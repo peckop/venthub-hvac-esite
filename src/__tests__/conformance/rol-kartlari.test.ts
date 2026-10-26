@@ -22,6 +22,8 @@ type Uretici = {
   GOREV_DEGIL_BASLIK: string
   DERS_TEKRAR_KURALI: string
   SUREN_IS_KORUMA_KURALI: string
+  SEO_EK_KURALI: string
+  SEO_EK_KURALI_ROLLERI: string[]
   uret: () => Record<string, string>
   uretKurallar: () => Record<string, string>
   kuralDosyaAdi: (ad: string) => string
@@ -1361,6 +1363,28 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
       expect(kurallar[ad], ad).toContain('filo-tuzugu.md` Madde 2.1')
       expect(kurallar[ad], ad).toContain('ek kalemler: edge fonksiyonlu PR')
     }
+  })
+
+  it('HRT-75 (karar 417): "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasında; OPS düzeltmeleri metinde; düşerse ya da sızarsa kuralDosyaSorunlari yakalar', () => {
+    const kurallar = uretici.uretKurallar()
+    expect(uretici.SEO_EK_KURALI_ROLLERI).toEqual(['GEO-SEO', 'BLOG'])
+    for (const ad of roller) {
+      if (uretici.SEO_EK_KURALI_ROLLERI.includes(ad)) expect(kurallar[ad], ad).toContain(uretici.SEO_EK_KURALI)
+      else expect(kurallar[ad], ad).not.toContain('## VentHub SEO ek kuralları')
+    }
+    // OPS düzeltmeleri: dizin isteği GEO-SEO görevidir, Recep'e sorulmaz; GSC pencere iddiası ölçümle teyit; teklif modunda Offer/price yok.
+    expect(uretici.SEO_EK_KURALI).toContain("IndexNow ve Search Console dizin isteği GEO-SEO'nun kendi görevidir")
+    expect(uretici.SEO_EK_KURALI).toContain("Recep'e sorulmaz")
+    expect(uretici.SEO_EK_KURALI).not.toContain('canlı yazım onayı')
+    expect(uretici.SEO_EK_KURALI).toContain('GEO-SEO ölçümle teyit eder')
+    expect(uretici.SEO_EK_KURALI).toContain('fiyatı olmayan ürüne `Offer` ve `price` yazılmaz')
+    expect(uretici.SEO_EK_KURALI).toContain('FAQPage işaretlemesi konmaz')
+    const geo = 'GEO-SEO'
+    const bozuk = { ...kurallar, [geo]: kurallar[geo].replace(uretici.SEO_EK_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/VentHub SEO ek kuralları/)
+    const sizinti = { ...kurallar, URUN: `${kurallar.URUN}\n${uretici.SEO_EK_KURALI}` }
+    expect(uretici.kuralDosyaSorunlari(sizinti).join('\n')).toMatch(/yalnız GEO-SEO ve BLOG/)
   })
 
   it('HRT-73 (OPS-181): Süren iş koruması her rolün kurallar dosyasında, kısa hâli filo-ortakta; düşerse kuralDosyaSorunlari yakalar; Done kanıtı vitest yolunu söyler', () => {
