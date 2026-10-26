@@ -29,6 +29,7 @@ const m = req(KANCA) as {
     gun?: number,
   ) => { toplam: number; rolsuz: number; roller: Record<string, number>; sifir: string[] }
   satir: (s: ReturnType<typeof m.say>) => string
+  daemonUyarisi: (dbKok: string, p?: { oku?: () => string; canliMi?: (pid: number) => boolean }) => string
 }
 
 const SIMDI = Date.parse('2026-10-19T12:00:00.000Z')
@@ -134,6 +135,8 @@ describe('INV-KANCA-SAGE-YAZIM-1 · kanca davranışı', () => {
     const kok = sahteSage([
       { audience: '{"roles":["arac"]}', created_at: new Date(simdi - 86_400_000).toISOString() },
     ])
+    // ARC-207: daemon canlı sayılsın diye server.json'a bu test sürecinin pid'i yazılır (yaşayan pid)
+    fs.writeFileSync(path.join(kok, '.wrongstack', 'memories', 'server.json'), JSON.stringify({ pid: process.pid }))
     const r = kos({ VENTHUB_SAGE_DB_KOKU: kok })
     fs.rmSync(kok, { recursive: true, force: true })
     expect(r.status).toBe(0)
@@ -142,6 +145,37 @@ describe('INV-KANCA-SAGE-YAZIM-1 · kanca davranışı', () => {
     expect(r.stdout).toContain('arac 1')
     // pencere ajanı olan ama yazmayan departmanlar adıyla uyarılır
     expect(r.stdout.startsWith('⚠')).toBe(true)
+    expect(r.stdout).not.toContain('SAGE KAPALI')
+  })
+
+  it('ARC-207: server.json yok ya da pid ölüyse "⚠SAGE KAPALI: dersler yüklenmiyor" satırı başa eklenir, sayaç satırı yine basılır', () => {
+    const simdi = Date.now()
+    const kayit = [{ audience: '{"roles":["arac"]}', created_at: new Date(simdi - 86_400_000).toISOString() }]
+    const yok = sahteSage(kayit) // server.json yok
+    const olu = sahteSage(kayit)
+    fs.writeFileSync(path.join(olu, '.wrongstack', 'memories', 'server.json'), JSON.stringify({ pid: 2_000_000_000 }))
+    const bozuk = sahteSage(kayit)
+    fs.writeFileSync(path.join(bozuk, '.wrongstack', 'memories', 'server.json'), '{bozuk')
+    const r1 = kos({ VENTHUB_SAGE_DB_KOKU: yok })
+    const r2 = kos({ VENTHUB_SAGE_DB_KOKU: olu })
+    const r3 = kos({ VENTHUB_SAGE_DB_KOKU: bozuk })
+    for (const k of [yok, olu, bozuk]) fs.rmSync(k, { recursive: true, force: true })
+    for (const r of [r1, r2, r3]) {
+      expect(r.status).toBe(0)
+      const satirlar = r.stdout.trim().split('\n')
+      expect(satirlar[0]).toMatch(/^⚠SAGE KAPALI: dersler yüklenmiyor \(/)
+      expect(satirlar.slice(1).join('\n')).toContain('SAGE-YAZIM: ') // sayaç sessizce düşmez
+    }
+    expect(r1.stdout).toContain('server.json yok')
+    expect(r2.stdout).toContain('daemon pid 2000000000 ölü')
+    expect(r3.stdout).toContain('server.json okunamadı')
+  })
+
+  it('ARC-207: daemonUyarisi saf — canlı pid için boş, enjekte okuyucu/ölçü ile deterministik', () => {
+    const oku = () => JSON.stringify({ pid: 4242 })
+    expect(m.daemonUyarisi('X', { oku, canliMi: () => true })).toBe('')
+    expect(m.daemonUyarisi('X', { oku, canliMi: () => false })).toBe('⚠SAGE KAPALI: dersler yüklenmiyor (daemon pid 4242 ölü)')
+    expect(m.daemonUyarisi('X', { oku: () => JSON.stringify({}), canliMi: () => false })).toContain('pid ? ölü')
   })
 
   it('veritabanı yoksa "ölçülemedi" yazar (sessiz değil) ve bloklamaz', () => {
