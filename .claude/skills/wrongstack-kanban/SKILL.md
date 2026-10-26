@@ -74,6 +74,28 @@ metadata:
    - Gerçek kapı için araçta `adopt_managed_lifecycle` eylemi var; sonucu YTN-4 (atılabilir pano) ve YTN-6/YTN-12 (YETENEK panosu, canlı pilot) ölçtü; geçiş kararı OPS'undur. Yönetilmeyen panoda Done kapısı disiplindir.
 7. **Hata dalları** (kural 14): panoya yazma başarısız olursa söyle ve işe devam et (pano işi izler, iş panoyu beklemez); kanıt komutu kırmızıysa kart Done'a GİTMEZ, `record_activity` ile `blocker` yazılır; doğrulayıcı komutu `needs_human` verirse komutun bu kuralları ihlal edip etmediğine bak (aşağıda C).
 
+### B2. Kanıt biçimleri (ARC-78, OPS ölçümü 26 Ekim; kaynak kod: `@wrongstack/kanban` 1.1.x `command-security`)
+
+Doğrulayıcı arızalı değil, güvenlik politikası **bilerek dar**. Kanıt açma anında bu dört biçimden biri seçilir; kapı (`.claude/hooks/kanban-kanit-yolu-kapisi.cjs`) koşmayacak olanı kart açılırken reddeder ve bu listeyi söyler.
+
+| Ne kanıtlanıyor | `checkType` | Gövde (`checkNotes`) | Sonuç |
+|---|---|---|---|
+| PR birleşti | `command` | `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` | birleşmişse 204 (çıkış 0), değilse 404 (çıkış 1) |
+| Kod çalışıyor | `command` | `pnpm exec vitest run <proje-göreli test yolu> [...]` (isteğe `--root .`); tür için `pnpm exec tsc --noEmit --project <göreli tsconfig>` | test geçerse çıkış 0 |
+| Belge/dosya doğru | `file_matches` | `{"file":"<proje-göreli yol>","pattern":"...","flags":""}`; dosya varlığı için `file_exists` + göreli yol | 64 KiB sonrasını görmez: aranan satır başta olmalı ya da `gh api` ile içerik |
+| Depo dışı iş (canlı veritabanı yazımı, ayar, Search Console, yerel ölçüm) | `manual` | kanıt notu: ölçüm çıktısı, kim onayladı, ne zaman | `verify_completion` manual kontrolü `skipped` yapar ve hüküm `needs_human` olur; Done kapısı (ARC-150) bu kartı durdurur. Kapanış: OPS kanıt notunu kabul edip `kanit-muaf` etiketini verir (26 Ekim ölçüldü) |
+
+**KOŞMAYAN şeyler** (hepsi 26 Ekim'de `verify_completion` ile ölçüldü ya da kaynakta doğrulandı):
+
+- `git ...`: izin listesinde yok. **Eklenmez**: doğrulayıcı alt komut süzmez, `git push` ve `git reset` de koşabilir. `gh api` yetiyor, Recep onayı gerekmez.
+- `node`, `npm`, `npx`, `bash`, `sh`, `cmd`, `powershell`, `curl`, `rm`, `python`...: kesin engel listesinde; ayarla da açılmaz.
+- `pnpm test:ilgili`, `pnpm vitest ...`, `pnpm exec eslint`: yalnız yukarıdaki iki `pnpm exec` biçimi geçer.
+- `|`, `&&`, `||`, `;`, `>`, `<`, `` ` ``, `$()`, `$VAR`, `%VAR%`, satır sonu: komut tek ve çıplaktır, çıktı metnine bakan `grep` yoktur.
+- Mutlak yol (`C:/...`, `/...`, `~`) ve kökten çıkan `..`: `file_exists`/`file_matches` ve `test -f` için yol **proje köküne göreli** olmalı. `test -s` desteklenmez; yalnız `test -e|-f|-d <göreli yol>`.
+- Çalıştırılabilir ad çıplak olmalı (yol içeremez). İzin listesi `.mcp.json` `WRONGSTACK_KANBAN_VERIFIER_COMMANDS` (bugün `+gh`).
+
+**Eski kartlar:** açık kartlardaki geçersiz kanıtlar `scripts/board/kanit-donustur.cjs` ile mekanik olarak `manual` türüne çevrilir (açıklama korunur, nota "eski kanıt biçimi, kapanışta geçerli biçimle ölçülür" yazılır). **Kırmızı kanıt `passed` yapılmaz**; yalnız tür değişir.
+
 ### C. Ölçülmüş tuzaklar (kaynak: `docs/standards/is-kayit-duzeni-standard.md` §6.1; her satır sahada ölçüldü)
 
 | Tuzak | Ölçüm | Karşılık |
@@ -88,7 +110,7 @@ metadata:
 | **`release_managed_lifecycle` kapıyı tamamen kaldırır** | Geri dönüşten sonra kırmızı kanıtlı kart `move_task` ile Done'a geçti | Gerçek panoda **çağrılmaz** |
 | **Kiralama kendiliğinden temizlenmez** (yönetilmeyen pano; yönetilen panoda otomatik kurtarma **ölçülmedi**, pilotta ölçülür) | Süre dolunca kart "running" kalır (2 dk sonra hâlâ); `recover_stale` elle çağrılınca To Do'ya döner, deneme sayısı 1→2 (üst sınır 3) | Çöken çalışanın kartını oturum açılışında `recover_stale` ile kurtar; kendiliğinden toparlanacağını varsayma |
 | **Yanlış aşamadaki kart panonun yeniden adopt'unu kilitler** | `update_task status=archived` kartı `done` sütununa taşır; aşaması `todo` kalan kart `adopt_managed_lifecycle`'ı `stage-mismatch` ile REFUSED yaptırdı (10-01) | Deneme panosu tek kullanımlıktır; adopt'tan önce kartların aşaması ile sütunu eşleşmeli |
-| **`file_exists` kanıtı proje dışı yolu görmedi** | `C:/tmp/…` ve `C:\tmp\…` ikisinde de "dosya yok" (dosya vardı) | Kanıtı repo içi yola ya da `gh api` kalıbına bağla; sebep ölçülmedi |
+| **`file_exists` kanıtı proje dışı yolu görmedi** | `C:/tmp/…` ve `C:\tmp\…` ikisinde de "dosya yok" (dosya vardı) | Kanıtı repo içi **göreli** yola ya da `gh api` kalıbına bağla. Sebep ölçüldü (ARC-93): doğrulayıcı `resolveProjectPath` mutlak yolu kök kontrolünden önce reddeder, `C:/tmp` yüzünden değil; ayrıntı B2 |
 | **`verify_completion` zaman aşımı** | 10-01'de iki kez `domainCall timed out`; ikinci denemede koştu | Tekrar güvenli (okuma/çalıştırma); önce `get_task` ile kartın durumuna bak |
 
 **"PR birleşti mi" kanıt kalıbı:** `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` (GitHub 204 → çıkış 0; 404 → çıkış 1). Birleşmiş PR'da 0, açık PR'da 1 ölçüldü.
