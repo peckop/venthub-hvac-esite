@@ -81,4 +81,28 @@ if [ $LANE_RC -ne 0 ]; then
     exit $LANE_RC
 fi
 
+# -------------------------------------------------- STAGED DOSYALARA ESLINT (ALT-108)
+# `lint-staged` yüklüydü ve ayarı VARDI (`.lintstagedrc.json`: staged .ts/.tsx/.js/.cjs/.mjs/.jsx dosyalarına
+# `eslint --fix`, `src/i18n/dictionaries/*.ts` değişince `pnpm run test:i18n`) ama husky kalkınca (kancalar
+# `.githooks/`a taşındı) HİÇBİR kancaya bağlı kalmamıştı: ayar ölü duruyordu (ölçüldü 26 Ekim, ALT-108).
+# Bu blok onu OLDUĞU GİBİ bağlar; yapılandırma dosyası korumalıdır (`protect-config`), değiştirilmedi.
+# UYARI-ONLY, commit'i ENGELLEMEZ: ölçülen maliyet dosya sayısından bağımsız ~14-16 sn (eslint yapılandırması +
+# tailwind eklentisi yüklenir); bu kanca "hızlı, çevrimdışı" ilkesindedir ve gerçek kapı CI'daki `pnpm run lint`
+# adımıdır. Bloklamak istenirse önce süre düşürülmeli (ALT-108 kart notu).
+# `--no-stash`: lint-staged varsayılanı git stash ile yedek alır; stash yığını worktree'ler arasında PAYLAŞILIR
+# (başka oturumun girdisine dokunma riski). `--fix` düzeltmeleri commit'e kendiliğinden eklenir.
+# Atlama: VH_LINT_STAGED=0 git commit ... (yalnız bu uyarı adımını atlar; hiçbir kapıyı atlamaz).
+# Kurulum yoksa (node_modules yok) sessiz geçmez ama durdurmaz: tek satır bilgi.
+if [ "${VH_LINT_STAGED:-1}" != "0" ]; then
+    LINT_STAGED_BIN="$REPO_ROOT/node_modules/lint-staged/bin/lint-staged.js"
+    if [ -f "$LINT_STAGED_BIN" ]; then
+        node "$LINT_STAGED_BIN" --no-stash --concurrent false || {
+            echo "[LINT-STAGED] Bilgi: staged dosyalarda ESLint HATASI var (yukarıda). Commit engellenmedi;"
+            echo "[LINT-STAGED] CI'daki lint adımı bunu kırmızı sayar. Önce düzelt: pnpm exec eslint <dosya>"
+        }
+    else
+        echo "[LINT-STAGED] Bilgi: node_modules/lint-staged yok (pnpm install çalışmamış); staged lint atlandı."
+    fi
+fi
+
 exit 0
