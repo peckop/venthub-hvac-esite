@@ -323,7 +323,7 @@ describe('INV-E2E-HIZLI-2 · anahtar YALNIZ e2e Build adımında (sızıntı yok
 
   /** Derlemeyi ya da onu çağıran süreçleri etkileyebilecek yüzeyler: kök ayarlar, `.env*`, `scripts/` (testler hariç). */
   function yuzeyListesi(): string[] {
-    const yuzeyler: string[] = ['package.json', 'vercel.json', 'playwright.config.ts', 'vitest.config.ts', 'sentry.client.config.ts', 'sentry.edge.config.ts']
+    const yuzeyler: string[] = ['package.json', 'vercel.json', 'playwright.config.ts', 'vitest.config.ts', 'src/instrumentation-client.ts', 'sentry.edge.config.ts']
     for (const f of readdirSync(KOK)) if (/^\.env/.test(f)) yuzeyler.push(f)
     const betikDizini = (dizin: string): void => {
       for (const ent of readdirSync(path.join(KOK, dizin), { withFileTypes: true })) {
