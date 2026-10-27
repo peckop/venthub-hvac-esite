@@ -325,7 +325,8 @@ try {
 try {
   const dk = require(path.join(__dirname, 'dis-kaynak-satirlari.cjs'))
   const simdi = Date.now()
-  for (const s of dk.satir(dk.oku(dk.onbellekYolu(PANO)), simdi)) process.stdout.write(s + '\n')
+  // Yalnız durum DEĞİŞİNCE bir kez (OPS şartı): aynı durum her mesajda tekrar etmez. Gerekçe: dis-kaynak-satirlari.cjs gosterilecek().
+  for (const s of dk.gosterilecek(dk.satir(dk.oku(dk.onbellekYolu(PANO)), simdi), String(girdi.session_id || ''), PANO)) process.stdout.write(s + '\n')
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
     dk.gerekirseTazele(PANO, simdi)
   }

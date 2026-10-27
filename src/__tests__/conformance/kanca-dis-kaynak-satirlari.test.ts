@@ -130,6 +130,69 @@ describe('INV-KANCA-DIS-KAYNAK-1 · satır kararları (eşikli)', () => {
   })
 })
 
+describe('INV-KANCA-DIS-KAYNAK-1 · YALNIZ DURUM DEĞİŞİNCE (OPS şartı: her turda basmaz)', () => {
+  const SATIR_CLAUDE = '⚠CLAUDE CODE: bizde 2.1.296, son 2.1.311 · 15 surum geride'
+  const SID = 'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa'
+  const gosterilecek = (m as unknown as { gosterilecek: (s: string[], sid: string, pano: string) => string[] }).gosterilecek
+  const yeniPano = (): string => fs.mkdtempSync(path.join(gecici, 'gosterildi-'))
+
+  it('⭐ASIL ŞART — aynı durum ikinci mesajda TEKRAR ETMEZ; ilk mesajda bir kez basılır', () => {
+    const pano = yeniPano()
+    expect(gosterilecek([SATIR_CLAUDE], SID, pano)).toEqual([SATIR_CLAUDE])
+    expect(gosterilecek([SATIR_CLAUDE], SID, pano)).toEqual([])
+    expect(gosterilecek([SATIR_CLAUDE], SID, pano)).toEqual([])
+  })
+
+  it('durum DEĞİŞİNCE (yeni sürüm çıktı) yeniden basılır', () => {
+    const pano = yeniPano()
+    gosterilecek([SATIR_CLAUDE], SID, pano)
+    const yeni = '⚠CLAUDE CODE: bizde 2.1.296, son 2.1.320 · 24 surum geride'
+    expect(gosterilecek([yeni], SID, pano)).toEqual([yeni])
+  })
+
+  it('durum NORMALE DÖNÜP yeniden bozulunca yeniden basılır ("yeni koptu", "eşiği yeni aştı")', () => {
+    const pano = yeniPano()
+    gosterilecek([SATIR_CLAUDE], SID, pano)
+    expect(gosterilecek([], SID, pano)).toEqual([])
+    expect(gosterilecek([SATIR_CLAUDE], SID, pano)).toEqual([SATIR_CLAUDE])
+  })
+
+  it('PR sayısı oynarken (8 → 9) yeni durum sayılmaz; saat sayısı oynayan bayat/ölçüm satırı da', () => {
+    const pano = yeniPano()
+    expect(gosterilecek(['⚠GUNCELLEME PR: 8 acik bagimlilik PR (esik 8)'], SID, pano)).toHaveLength(1)
+    expect(gosterilecek(['⚠GUNCELLEME PR: 9 acik bagimlilik PR (esik 8)'], SID, pano)).toEqual([])
+    expect(gosterilecek(['⚠DIS KAYNAK: onbellek 80 saat bayat (olcum calismiyor olabilir)'], SID, pano)).toHaveLength(1)
+    expect(gosterilecek(['⚠DIS KAYNAK: onbellek 81 saat bayat (olcum calismiyor olabilir)'], SID, pano)).toEqual([])
+  })
+
+  it('kayıt PENCERE (oturum) başınadır — başka pencere durumu kendi ilk mesajında bir kez görür', () => {
+    const pano = yeniPano()
+    gosterilecek([SATIR_CLAUDE], SID, pano)
+    expect(gosterilecek([SATIR_CLAUDE], 'bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb', pano)).toEqual([SATIR_CLAUDE])
+  })
+
+  it('oturum kimliği yoksa süzme YAPILMAZ (elle koşu/test hepsini görür); yazılamayan kayıt satırı yutmaz', () => {
+    const pano = yeniPano()
+    expect(gosterilecek([SATIR_CLAUDE], '', pano)).toEqual([SATIR_CLAUDE])
+    expect(gosterilecek([SATIR_CLAUDE], '', pano)).toEqual([SATIR_CLAUDE])
+    expect(gosterilecek([SATIR_CLAUDE], SID, path.join(pano, 'yok', '\0bozuk'))).toEqual([SATIR_CLAUDE])
+  })
+
+  it('⭐hook bütünleşmesi — aynı pencere aynı durumda ikinci mesajda SATIR GÖRMEZ', () => {
+    const pano = fs.mkdtempSync(path.join(gecici, 'pano-ikinci-'))
+    fs.writeFileSync(m.onbellekYolu(pano), JSON.stringify({ olculdu: new Date().toISOString(), claude: { kurulu: '2.1.296', son: '2.1.311' } }))
+    const kos = () =>
+      spawnSync(process.execPath, [path.resolve(KOK, '.claude', 'hooks', 'defter-tazelik-satiri.cjs')], {
+        input: JSON.stringify({ session_id: 'test1234' }),
+        encoding: 'utf8',
+        env: { ...process.env, VENTHUB_BOARD_DIR: pano, VENTHUB_REPO: KOK },
+        timeout: 30000,
+      }).stdout
+    expect(kos()).toContain('⚠CLAUDE CODE')
+    expect(kos(), 'aynı durum ikinci mesajda tekrar etti: OPS şartı çiğnendi').not.toContain('⚠CLAUDE CODE')
+  })
+})
+
 describe('INV-KANCA-DIS-KAYNAK-1 · ayrıştırma (CANLI biçim)', () => {
   const CANLI = [
     'Checking MCP server health…',
@@ -176,6 +239,7 @@ describe('INV-KANCA-DIS-KAYNAK-1 · işçi (sahte ağ ve sahte komut)', () => {
   const calistir = async (komut: string, args: string[]): Promise<string> => {
     if (komut === 'claude' && args[0] === '--version') return '2.1.296 (Claude Code)\n'
     if (komut === 'claude') return 'x: https://a - ✔ Connected\ny: https://b - ✗ Failed to connect\nz: https://c - ! Needs authentication\n'
+    if (komut === 'gh' && args[0] === 'api') throw new Error('gh api yok (fetch yedeği denensin)')
     if (komut === 'gh') return JSON.stringify([{ author: { login: 'dependabot[bot]' } }, { author: { login: 'peckop' } }, { author: { login: 'app/renovate' } }])
     throw new Error('beklenmeyen komut')
   }
@@ -220,6 +284,34 @@ describe('INV-KANCA-DIS-KAYNAK-1 · işçi (sahte ağ ve sahte komut)', () => {
     const v = await m.olc({ fetchFn: sahteAg('ahead'), calistir, depo: depoKur(), kurulumDosyasi: kurulum(), bellekGB: 1.5 })
     expect(v.mcp).toBeUndefined()
     expect(v.hata).toMatch(/mcp bellek dusuk/)
+  })
+
+  it('⭐GitHub okuması önce KİMLİK DOĞRULAMALI gh api ile (anahtarsız sınır canlıda 403 verdi); fetch yalnız yedek', async () => {
+    const ghCagrilari: string[] = []
+    const ghApiVar = async (komut: string, args: string[]) => {
+      if (komut === 'gh' && args[0] === 'api') {
+        ghCagrilari.push(args[1])
+        if (args[1].includes('releases/latest')) return JSON.stringify({ tag_name: 'v2.7.0' })
+        if (args[1].includes('/compare/')) return JSON.stringify({ status: 'ahead' })
+        if (args[1].includes('/commits')) return JSON.stringify([{ sha: sha('b') }])
+      }
+      return calistir(komut, args)
+    }
+    const yasakAg = async (adres: string) => {
+      if (adres.includes('api.github.com')) throw new Error('gh api varken GitHub fetch\'i çağrılmamalı')
+      return sahteAg('ahead')(adres)
+    }
+    const v = await m.olc({ fetchFn: yasakAg, calistir: ghApiVar, depo: depoKur(), kurulumDosyasi: kurulum() })
+    expect(v.seo?.son).toBe('2.7.0')
+    expect(v.skills?.[0].degisti).toBe(false)
+    expect(v.hata).toBeUndefined()
+    expect(ghCagrilari.length).toBe(3)
+  })
+
+  it('gh api düşerse anahtarsız fetch yedeği çalışır (hata değil)', async () => {
+    const v = await m.olc({ fetchFn: sahteAg('ahead'), calistir, depo: depoKur(), kurulumDosyasi: kurulum() })
+    expect(v.seo?.son).toBe('2.6.0')
+    expect(v.hata).toBeUndefined()
   })
 
   it('npm çağrısı GitHub accept başlığı GÖNDERMEZ (canlıda 406)', async () => {

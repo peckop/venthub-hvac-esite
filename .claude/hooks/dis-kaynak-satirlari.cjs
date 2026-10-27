@@ -177,6 +177,45 @@ function satir(sonuc, simdi = Date.now()) {
   return satirlar(sonuc.veri, simdi)
 }
 
+/**
+ * ⭐YALNIZ DURUM DEĞİŞİNCE (OPS şartı, 27 Ekim; Recep "her mesajdaki ilgisiz uyarı" gürültüsünü kıstı): satır, bu PENCERENİN
+ * gördüğü son durumdan FARKLIYSA bir kez basılır; aynı durum tekrar etmez. Durum normale dönerse kayıt silinir, yeniden
+ * bozulunca (yeni sürüm çıktı, PR eşiği yeni aşıldı, bağlantı yeni koptu) tekrar konuşur. Kayıt pencere (oturum) başınadır:
+ * her pencere durumu kendi ilk mesajında bir kez görür. Oturum kimliği yoksa (elle koşu, test) süzme YAPILMAZ, hepsi basılır.
+ * İmza: PR sayısı ve saat gibi oynak rakamlar çıkarılır ("8 → 9 PR" yeni durum değildir); diğer satırlar metnin kendisidir.
+ * @returns {string[]} basılacak satırlar
+ */
+function gosterilecek(satirlar, sid, pano) {
+  const kimlik = String(sid || '').replace(/[^0-9a-z-]/gi, '').slice(0, 40)
+  if (!kimlik || !pano) return satirlar
+  const yol = path.join(pano, '.dis-kaynak-gosterildi.' + kimlik + '.json')
+  let kayit = {}
+  try {
+    const j = JSON.parse(fs.readFileSync(yol, 'utf8'))
+    if (j && typeof j === 'object' && !Array.isArray(j)) kayit = j
+  } catch {
+    /* kayıt yok: ilk mesaj */
+  }
+  const yeniKayit = {}
+  const bas = []
+  for (const metin of satirlar) {
+    const olcum = /OLCULEMEDI|OLCULMEDI|bayat/.test(metin)
+    const anahtar = (olcum ? 'olcum' : metin.split(':')[0]).slice(0, 40)
+    const imza = olcum || /GUNCELLEME PR/.test(metin) ? metin.replace(/\d+/g, '#') : metin
+    yeniKayit[anahtar] = imza
+    if (kayit[anahtar] !== imza) bas.push(metin)
+  }
+  try {
+    if (JSON.stringify(kayit) !== JSON.stringify(yeniKayit)) {
+      fs.mkdirSync(pano, { recursive: true })
+      fs.writeFileSync(yol, JSON.stringify(yeniKayit))
+    }
+  } catch {
+    /* yazılamadı: bir sonraki mesajda yeniden basılır (sessiz kaybolmaktan iyi) */
+  }
+  return bas
+}
+
 // ───────────────────────────── ÖLÇÜM İŞÇİSİ (yalnız `--yaz` ile, arka planda) ─────────────────────────────
 
 async function getir(fetchFn, adres, zamanAsimiMs = 8000) {
@@ -185,6 +224,19 @@ async function getir(fetchFn, adres, zamanAsimiMs = 8000) {
   const y = await fetchFn(adres, { headers: { accept, 'user-agent': 'venthub-dis-kaynak' }, signal: AbortSignal.timeout(zamanAsimiMs) })
   if (!y.ok) throw new Error('HTTP ' + y.status)
   return y.json()
+}
+
+/**
+ * GitHub okuması: önce KİMLİK DOĞRULAMALI `gh api` (saatte 5000), olmazsa anahtarsız fetch (saatte 60). Canlıda ölçüldü: 14 skill × 2
+ * çağrı + claude-seo anahtarsız sınırı birkaç koşuda tüketti (`HTTP 403`); günde bir koşuda bile sınır paylaşımlı IP'de kırılgan.
+ */
+async function githubGetir(girdi, yolu) {
+  try {
+    return JSON.parse(await girdi.calistir('gh', ['api', yolu], 30000))
+  } catch {
+    /* gh yok / kimlik yok: anahtarsız fetch'e düş */
+  }
+  return getir(girdi.fetchFn, 'https://api.github.com/' + yolu)
 }
 
 /**
@@ -224,7 +276,7 @@ async function olc(girdi) {
     const kurulular = ((kayit.plugins || kayit)['claude-seo@agricidaniel-claude-seo'] || []).map((k) => k && k.version).filter((x) => surumAyir(x))
     if (kurulular.length > 0) {
       kurulular.sort((a, b) => (surumAyir(a)[0] - surumAyir(b)[0]) || (surumAyir(a)[1] - surumAyir(b)[1]) || (surumAyir(a)[2] - surumAyir(b)[2]))
-      const son = await getir(fetchFn, 'https://api.github.com/repos/AgriciDaniel/claude-seo/releases/latest')
+      const son = await githubGetir(girdi, 'repos/AgriciDaniel/claude-seo/releases/latest')
       sonuc.seo = { kurulu: surumTemiz(kurulular[0]), son: surumTemiz(son && son.tag_name) }
     }
   } catch (e) {
@@ -234,13 +286,13 @@ async function olc(girdi) {
     const kaynaklar = skillKaynaklari(depo)
     const skills = []
     for (const [skill, kaynak] of Object.entries(kaynaklar)) {
-      const k = await getir(fetchFn, 'https://api.github.com/repos/' + AGENT_SKILLS_DEPO + '/commits?per_page=1&path=' + encodeURIComponent('skills/' + skill + '/SKILL.md'))
+      const k = await githubGetir(girdi, 'repos/' + AGENT_SKILLS_DEPO + '/commits?per_page=1&path=' + encodeURIComponent('skills/' + skill + '/SKILL.md'))
       const son = shaTemiz(Array.isArray(k) && k[0] && k[0].sha)
       if (!son) continue
       // ⭐`kaynak` deponun O ANKİ HEAD'idir, dosyayı değiştiren commit değil: "son commit ≠ kaynak" HER ZAMAN fark gösterirdi
       // (canlıda 13/13 yanlış alarm). Doğru soru: dosyanın son commit'i kaynak sha'nın ATASI mı? compare son...kaynak:
       // 'ahead' (kaynak ilerde) ya da 'identical' = dosya kaynaktan sonra DEĞİŞMEMİŞ; 'diverged'/'behind' = değişmiş.
-      const c = await getir(fetchFn, 'https://api.github.com/repos/' + AGENT_SKILLS_DEPO + '/compare/' + son + '...' + kaynak)
+      const c = await githubGetir(girdi, 'repos/' + AGENT_SKILLS_DEPO + '/compare/' + son + '...' + kaynak)
       skills.push({ skill, kaynak, son, degisti: !(c && (c.status === 'ahead' || c.status === 'identical')) })
     }
     sonuc.skills = skills
@@ -289,13 +341,16 @@ function gerekirseTazele(pano, simdi = Date.now()) {
   }
 }
 
-module.exports = { onbellekYolu, claudeGeride, mcpAyristir, skillKaynaklari, satirlar, satir, oku, olc, yaz, gerekirseTazele, PR_ESIK, BAYAT_SAAT }
+module.exports = { onbellekYolu, claudeGeride, mcpAyristir, skillKaynaklari, satirlar, satir, gosterilecek, oku, olc, yaz, gerekirseTazele, PR_ESIK, BAYAT_SAAT }
 
 if (require.main === module && process.argv.includes('--yaz')) {
   const { execFile } = require('child_process')
   const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  // Windows'ta kabuk (.cmd/.exe çözümü) argümanları ayırmadan birleştirir: `&`, `?`, boşluk içerenler (gh api yolu) tırnaklanmazsa cmd böler.
+  const kabuk = process.platform === 'win32'
+  const tirnakla = (a) => (kabuk && /[&?|<>^ ]/.test(a) ? '"' + a + '"' : a)
   const calistir = (komut, args, ms) =>
-    new Promise((coz, red) => execFile(komut, args, { encoding: 'utf8', timeout: ms, windowsHide: true, shell: process.platform === 'win32' }, (e, o) => (e ? red(e) : coz(String(o)))))
+    new Promise((coz, red) => execFile(komut, args.map(tirnakla), { encoding: 'utf8', timeout: ms, windowsHide: true, shell: kabuk }, (e, o) => (e ? red(e) : coz(String(o)))))
   yaz(pano, {
     fetchFn: globalThis.fetch,
     calistir,
