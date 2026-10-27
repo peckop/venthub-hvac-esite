@@ -382,12 +382,16 @@ jobs:
         run: |
           echo "map-sayisi-static: $(find .next/static -name '*.map' | wc -l)"
           echo "map-sayisi-server: $(find .next/server -name '*.map' | wc -l)"
-          echo "sentry-sdk-izi-istemci: $(grep -rl 'sentry.javascript.nextjs' .next/static --include='*.js' | wc -l)"
-          echo "sentry-sdk-izi-sunucu: $(grep -rl 'sentry.javascript.nextjs' .next/server --include='*.js' | wc -l)"
+          echo "sentry-sdk-izi-istemci(sentry.javascript): $(grep -rli 'sentry.javascript' .next/static --include='*.js' | wc -l)"
+          echo "sentry-herhangi-istemci(sentry): $(grep -rli 'sentry' .next/static --include='*.js' | wc -l)"
+          echo "sentry-sdk-izi-sunucu(sentry.javascript): $(grep -rli 'sentry.javascript' .next/server --include='*.js' | wc -l)"
+          echo "sentry-herhangi-sunucu(sentry): $(grep -rli 'sentry' .next/server --include='*.js' | wc -l)"
+          echo "dsn-gomulu-istemci(placeholder@sentry.io): $(grep -rl 'placeholder@sentry.io' .next/static .next/server --include='*.js' | wc -l)"
           echo "instrumentation-dosyasi: $(ls .next/server/instrumentation.js 2>/dev/null | wc -l)"
-          echo "monitoring-yonlendirmesi:"; grep -o '"/monitoring[^"]*"' .next/routes-manifest.json | sort -u | head -5
+          echo "monitoring-yonlendirmesi:"; grep -o '"/monitoring[^"]*"' .next/routes-manifest.json | sort -u | head -5 || true
+          echo "server-map-dosyalari:"; find .next/server -name '*.map' | head -5 || true
           echo "--- build günlüğünde sentry satırları ---"
-          grep -i "sentry" ci-build.log | cut -c1-260 | head -20
+          grep -i "sentry" ci-build.log | cut -c1-260 | head -20 || true
 
       # ALT-80 — LINT SONUCU (paralel başlayan Lint'in KAPISI). `Lint (arka planda başlat)` ile AYNI koşul (başlatılmayan komut beklenmez: aksi `bekle` 125 verirdi) artı `!cancelled()`:
       # Build ya da bir önceki adım KIRMIZI olsa da Lint sonucu yine yazılır (iş zaten kırmızı; geliştirici iki hatayı birden görür); iptalde koşmaz. `bekle` komutun KENDİ çıkış koduyla
