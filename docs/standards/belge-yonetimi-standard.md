@@ -41,7 +41,7 @@ döneceği §B9'dadır. Kapısı doğmamış madde "uygulanıyor" sayılmaz.
 | 0 Çekirdek | Her oturum | `CLAUDE.md`: kimlik, mutlak kurallar (kısa), **tek giriş haritasının adresi**. `AGENTS.md`: tek satır köprü (diğer ajanlar aynı kuralı okur) | Hikâye ("Niçin: …" paragrafları → ilgili cetvele), ikinci harita, değişen sayı |
 | 1 Yer | O klasörde çalışınca | Seçilmiş klasör `CLAUDE.md`'leri (yalnız o klasöre özgü mutlak kural) | Genel kural tekrarı. Klasör dosyası yalnız ölçülmüş ihtiyaçla eklenir |
 | 2 Konu | Konu açılınca, kendiliğinden | Yönlendirici kancası (§B6) ve skill'ler | Belgenin kendisi; yalnız adres |
-| 3 Başvuru | Sorulunca | Cetveller, planlar, ölçümler; NotebookLM defterleri | Geçerliliği bitmiş tarihçe (gövdede) |
+| 3 Başvuru | Sorulunca | Cetveller, planlar, ölçümler; NotebookLM defterleri (salt okunur arşiv, karar 419) | Geçerliliği bitmiş tarihçe (gövdede) |
 | 4 Kilit | Okunmaz, çiğnenemez | 3-4 kez tekrar eden hata → test, CI kapısı ya da kanca | Metin olarak ikinci kopya |
 | 5 Olgu | Kendiliğinden | Sayılar ve durumlar betikle üretilir (satır, tablo, belge sayısı, tarih) | Elle yazılmış sayı |
 
@@ -52,7 +52,7 @@ gider; 0'a ancak her oturumda gerekiyorsa girer.
 
 1. Tek giriş haritası `docs/README.md`'dir. Diğer haritaların adresini ve **hangi soruda hangisinin**
    kullanılacağını söyler: belge haritası (kendisi), kod haritaları (graphify + şema grafı, CodeGraph,
-   WrongStack dizini), hafıza dizini (`MEMORY.md`), NotebookLM defterleri, iş kaydı (Kanban + Kararlar belgesi).
+   WrongStack dizini), hafıza dizini (`MEMORY.md`), NotebookLM defterleri (emekli arşiv, karar 419), iş kaydı (Kanban + Kararlar belgesi).
 2. `CLAUDE.md` tek giriş haritasını açıkça gösterir. **Karar 159 (Recep, 2026-09-27):** `CLAUDE.md`'nin mevcut içeriği
    (kurallar, gerekçe cümleleri, kendi "Doküman Haritası" bölümü) kısaltılmaz ve taşınmaz; yalnız harita bölümü
    EKLENİR. Sebep: pencerenin kendiliğinden gördüğü bilgiyi aynı anda azaltan değişikliklerin toplam etkisi
