@@ -49,6 +49,17 @@ try {
 }
 
 /**
+ * ARC-220 (karar 420): tüm satırlar önce tamponlanır, sonda pencere başına YALNIZ DURUM DEĞİŞİNCE basılır
+ * (uyari-susturma.cjs). Eşikler ve satır içerikleri aynen; kayıt okunamazsa hepsi basılır.
+ */
+const gercekYaz = process.stdout.write.bind(process.stdout)
+const tampon = []
+process.stdout.write = (s) => {
+  tampon.push(String(s))
+  return true
+}
+
+/**
  * ── BAĞIMLILIK TARAMASI TAZELİĞİ (REC-345) ──
  *
  * NİÇİN AYNI KANCA: ölçüm zaten yazılı bir kayıtta duruyor
@@ -383,4 +394,12 @@ try {
   process.stdout.write('⚠AYAR DEGISTI: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+process.stdout.write = gercekYaz
+let cikti = tampon.join('')
+try {
+  cikti = require(path.join(__dirname, 'uyari-susturma.cjs')).suz(cikti, String(girdi.session_id || ''), PANO)
+} catch {
+  /* süzme bozulduysa hepsi basılır */
+}
+if (cikti) gercekYaz(cikti)
 process.exit(0)

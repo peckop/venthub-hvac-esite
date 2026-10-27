@@ -174,7 +174,20 @@ function calistir(env = process.env, simdi = Date.now(), { daemonOku, daemonCanl
 
 if (require.main === module) {
   try {
-    const cikti = calistir()
+    let cikti = calistir()
+    // ARC-220 (karar 420): sayaç satırı pencere başına yalnız durum değişince (⚠ departman kümesi) basılır; sayılar oynaktır.
+    try {
+      let sid = ''
+      try {
+        sid = String(JSON.parse(fs.readFileSync(0, 'utf8') || '{}').session_id || '')
+      } catch {
+        /* girdi yok: süzme yapılmaz */
+      }
+      const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+      if (cikti) cikti = require(path.join(__dirname, 'uyari-susturma.cjs')).suz(cikti, sid, pano, Date.now(), 'sage').replace(/\n$/, '')
+    } catch {
+      /* süzme bozulduysa satır olduğu gibi basılır */
+    }
     if (cikti) process.stdout.write(cikti + '\n')
   } catch {
     /* kanca turu asla bloklamaz */
