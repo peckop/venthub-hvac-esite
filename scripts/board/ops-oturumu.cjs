@@ -79,7 +79,8 @@ function opsAdayiMi({ cwd, agentType } = {}) {
       const f = path.join(d, '.claude', 'settings.local.json')
       if (fs.existsSync(f)) {
         const j = JSON.parse(fs.readFileSync(f, 'utf8'))
-        return Boolean(j) && j.agent === AJAN_ADI
+        // ARC-223: başka adlı bir worktree'deki `ops-pencere` anahtarı start_session kopyasıdır → aday DEĞİL.
+        return Boolean(j) && j.agent === AJAN_ADI && !require('./pencere-kimligi.cjs').opsMirasMi(d, j.agent)
       }
       const ust = path.dirname(d)
       if (ust === d) break
