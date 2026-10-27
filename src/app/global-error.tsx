@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 
 import { en } from '../i18n/dictionaries/en'
 import { tr } from '../i18n/dictionaries/tr'
-import { type Lang, VARSAYILAN_DIL, yoldanDilCoz } from '../i18n/yoldanDil'
+import type { Lang } from '../i18n/I18nContext'
+import { VARSAYILAN_DIL, yoldanDilCoz } from '../i18n/yoldanDil'
 
 /**
  * Kök düzende yakalanamayan çizim hatalarının son sınırı (ALT-46). Sentry'ye `captureException`
