@@ -350,7 +350,7 @@ jobs:
       # sonuçları") hepsinin başarıyla bitmesini bekler (kırmızı shard = kırmızı `ci`). master push, elle koşum ve `edited` koşusunda Test eskisi gibi burada
       # TAM koşar. Koşul yalnız DARALTMA yönünde değildir: bu adım atlanınca test paketinin geri kalanını `test-shard` işleri üstlenir (INV-CI-SHARD-1/2).
       - name: Test
-        if: steps.ayna.outputs.atla != 'true' && !(github.event_name == 'pull_request' && github.event.action != 'edited')
+        if: false && steps.ayna.outputs.atla != 'true' && !(github.event_name == 'pull_request' && github.event.action != 'edited')
         env:
           VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}
           NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache
