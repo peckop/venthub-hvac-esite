@@ -782,7 +782,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
 
   it('HRT-71: yol kapsamlı işaretçi kural dosyaları üreticiyle diskte bire bir, paths taşır, 2 KB altında, sahipsiz dosya yok', () => {
     const uretilen = uretici.uretYolKurallari()
-    expect(Object.keys(uretilen).sort(), 'yollar alanı olan beş rol').toEqual(['altyapi.md', 'arac.md', 'harita.md', 'katalog.md', 'urun.md'])
+    expect(Object.keys(uretilen).sort(), 'yollar alanı olan altı rol').toEqual(['altyapi.md', 'arac.md', 'geo-seo.md', 'harita.md', 'katalog.md', 'urun.md'])
     const dizin = path.join(KOK, '.claude', 'rules')
     for (const [dosya, metin] of Object.entries(uretilen)) {
       const disk = fs.readFileSync(path.join(dizin, dosya), 'utf8').replace(/\r\n/g, '\n')
