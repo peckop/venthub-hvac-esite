@@ -318,6 +318,23 @@ try {
 }
 
 /**
+ * ── DIŞ KAYNAK (ARC-216 kalan kollar, KARAR 417) — EŞİKLİ ──
+ * Claude Code sürümü, açık güncelleme PR sayısı, MCP bağlantı sağlığı, claude-seo / agent-skills sapması. Yalnız önbellek okunur;
+ * ağ ve `claude mcp list` yalnız arka plan işçisinde, günde en çok bir kez. Eşik altında SATIR YOK. BLOKLAMAZ. Gerekçe: dis-kaynak-satirlari.cjs.
+ */
+try {
+  const dk = require(path.join(__dirname, 'dis-kaynak-satirlari.cjs'))
+  const simdi = Date.now()
+  // Yalnız durum DEĞİŞİNCE bir kez (OPS şartı): aynı durum her mesajda tekrar etmez. Gerekçe: dis-kaynak-satirlari.cjs gosterilecek().
+  for (const s of dk.gosterilecek(dk.satir(dk.oku(dk.onbellekYolu(PANO)), simdi), String(girdi.session_id || ''), PANO)) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    dk.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠DIS KAYNAK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
  * ── DÜNYA DURUMU (ALT-38) — EŞİKLİ ──
  * PR kapısından çıkan dünya durumu testlerinin zamanlı koşusu (dunya-durumu.yml) kırmızı, iptal ya da
  * sessizce ölmüşse konuşur; yoluna girdiğinde susar. Yalnız önbellek okunur, ölçüm arka planda
