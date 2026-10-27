@@ -272,6 +272,10 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-board.cjs\"",
             "statusMessage": "board"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-daemon-ac.cjs\""
           }
         ]
       },
