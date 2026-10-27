@@ -350,7 +350,7 @@ jobs:
       # sonuçları") hepsinin başarıyla bitmesini bekler (kırmızı shard = kırmızı `ci`). master push, elle koşum ve `edited` koşusunda Test eskisi gibi burada
       # TAM koşar. Koşul yalnız DARALTMA yönünde değildir: bu adım atlanınca test paketinin geri kalanını `test-shard` işleri üstlenir (INV-CI-SHARD-1/2).
       - name: Test
-        if: steps.ayna.outputs.atla != 'true' && !(github.event_name == 'pull_request' && github.event.action != 'edited')
+        if: false && steps.ayna.outputs.atla != 'true' && !(github.event_name == 'pull_request' && github.event.action != 'edited')
         env:
           VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}
           NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache
@@ -375,6 +375,23 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
+
+      # ALT-46 ÖLÇÜM (yalnız ölçüm dalı, master'a girmez): Sentry 11 derleme izi.
+      - name: Sentry kanıtı (ALT-46 ölçüm)
+        if: always()
+        run: |
+          echo "map-sayisi-static: $(find .next/static -name '*.map' | wc -l)"
+          echo "map-sayisi-server: $(find .next/server -name '*.map' | wc -l)"
+          echo "sentry-sdk-izi-istemci(sentry.javascript): $(grep -rli 'sentry.javascript' .next/static --include='*.js' | wc -l)"
+          echo "sentry-herhangi-istemci(sentry): $(grep -rli 'sentry' .next/static --include='*.js' | wc -l)"
+          echo "sentry-sdk-izi-sunucu(sentry.javascript): $(grep -rli 'sentry.javascript' .next/server --include='*.js' | wc -l)"
+          echo "sentry-herhangi-sunucu(sentry): $(grep -rli 'sentry' .next/server --include='*.js' | wc -l)"
+          echo "dsn-gomulu-istemci(placeholder@sentry.io): $(grep -rl 'placeholder@sentry.io' .next/static .next/server --include='*.js' | wc -l)"
+          echo "instrumentation-dosyasi: $(ls .next/server/instrumentation.js 2>/dev/null | wc -l)"
+          echo "monitoring-yonlendirmesi:"; grep -o '"/monitoring[^"]*"' .next/routes-manifest.json | sort -u | head -5 || true
+          echo "server-map-dosyalari:"; find .next/server -name '*.map' | head -5 || true
+          echo "--- build günlüğünde sentry satırları ---"
+          grep -i "sentry" ci-build.log | cut -c1-260 | head -20 || true
 
       # ALT-80 — LINT SONUCU (paralel başlayan Lint'in KAPISI). `Lint (arka planda başlat)` ile AYNI koşul (başlatılmayan komut beklenmez: aksi `bekle` 125 verirdi) artı `!cancelled()`:
       # Build ya da bir önceki adım KIRMIZI olsa da Lint sonucu yine yazılır (iş zaten kırmızı; geliştirici iki hatayı birden görür); iptalde koşmaz. `bekle` komutun KENDİ çıkış koduyla
