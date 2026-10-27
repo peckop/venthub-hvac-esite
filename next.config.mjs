@@ -39,6 +39,8 @@ const nextConfig = {
     typedRoutes: true,
     // ALT-38f: anahtar kapalıyken BOŞ nesne (anahtar eklenmez); açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds`.
     ...e2eHizliDerlemeAyari(E2E_TIP_LINT_ATLA),
+    // ALT-115 DENEY (birleşmez): arka plandaki tsc .next/types okurken Build onu silmesin.
+    ...(process.env.VENTHUB_CI_DIST_KORU === '1' ? { cleanDistDir: false } : {}),
     images: {
         // KÖPRÜ (2026-08-30, Recep butonla onayladı): Vercel görsel optimizasyonu KAPALI.
         // Sebep: Hobby planın aylık kaynak-görsel sınırı doldu (katalog 1042 görsel) →

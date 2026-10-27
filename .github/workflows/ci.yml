@@ -263,9 +263,14 @@ jobs:
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: bash scripts/ci/arka-plan.sh baslat lint -- pnpm run lint
 
-      - name: Type check
+      # ALT-115 DENEY (birleşmez): rota tipleri üretilir, tip denetimi ARKA PLANDA başlar; kapı Build sonrası "Tip denetimi sonucu" adımı.
+      - name: Rota tipleri (next typegen)
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
-        run: pnpm exec tsc --noEmit 2>&1 | tee ci-typecheck.log
+        run: pnpm exec next typegen
+
+      - name: Tip denetimi (arka planda başlat)
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
+        run: bash scripts/ci/arka-plan.sh baslat tip -- pnpm exec tsc --noEmit
 
       # Edge Functions (Deno) Next.js tsc kapsamı DIŞINDA — tsconfig supabase/'i hariç tutar.
       # Bu adım 2026-05'te maskesiz kalan edge bozulmasını (T011) yakalamak için eklendi: kalıcı kapı.
@@ -375,6 +380,8 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
+          VENTHUB_E2E_TIP_LINT_ATLA: '1'
+          VENTHUB_CI_DIST_KORU: '1'
 
       # ALT-80 — LINT SONUCU (paralel başlayan Lint'in KAPISI). `Lint (arka planda başlat)` ile AYNI koşul (başlatılmayan komut beklenmez: aksi `bekle` 125 verirdi) artı `!cancelled()`:
       # Build ya da bir önceki adım KIRMIZI olsa da Lint sonucu yine yazılır (iş zaten kırmızı; geliştirici iki hatayı birden görür); iptalde koşmaz. `bekle` komutun KENDİ çıkış koduyla
@@ -384,6 +391,10 @@ jobs:
       - name: Lint sonucu (bekle, blocking)
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true' && !cancelled()
         run: bash scripts/ci/arka-plan.sh bekle lint 600
+
+      - name: Tip denetimi sonucu (bekle, blocking)
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true' && !cancelled()
+        run: bash scripts/ci/arka-plan.sh bekle tip 600
 
       # ALT-38c-2 — TEST SHARD SONUÇLARI (mantık ve test: scripts/ci/test-shard-bekle.cjs). pull_request'te (edited hariç) Test aşağıdaki `test-shard` işlerinde koşar;
       # bu adım AYNI koşunun AYNI denemesindeki shard işlerinin HEPSİNİN `success` olmasını bekler (Lint ve Build ile üst üste ilerlediği için son adımdır).
