@@ -32,7 +32,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Kartı kanıt komutuyla aç (`add_check`: `command` ya da `file_matches`). Done'a taşımadan önce `verify_completion` koştur; rapor `passed` değilse taşıma. PR için kanıt `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`, kod için `pnpm exec vitest run <göreli test yolu>`, depo dışı iş için elle kontrol + kanıt notudur.
 - PR gövdesinde `Kanban: <ÖN EK>-<sayı>` satırı bulunur (taşınan kartta `Kanban: REC-nn`). `Fixes REC-nn` ya da Linear numarası yazma.
 - Migration içeren PR'ı yalnız Recep onayıyla birleştir (master'a birleşince prod'a otomatik uygulanır).
-- Kanca ve ayar etkili PR'ı (.claude/hooks, scripts/board, settings.json) OPS tam diff okumadan birleştirme.
+- Kanca ve ayar etkili PR'ı (.claude/hooks, scripts/board, settings.json) OPS tam diff okumadan birleştirme; PR'a not et.
 - Süren işin varken gelen emri karta al, sıraya koy, OPS'a "elimde X var, bitince başlarım" dön; OPS "X'i bırak" demedikçe geçme.
 - Salt-okuma alt ajanı (araştırmacı, çürütücü, doğrulayıcı) `name` vermeden aç; uygulayıcıyı `name` ile aç.
 - Alt ajanın görev metnine "açık PR dalına push yok" yaz.
@@ -62,15 +62,14 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - "Yapıldı mı, kullandık mı" sorusuna önce hafızaya, Kanban'a, git geçmişine bak.
 - Ölçmediysen "bilmiyorum, bakıyorum" de. Niyeti anlamadıysan ölçmeden önce tek netleştirme sorusu sor; veride ya da kodda olanı sorma, araştır.
 - Kategori, ürün ya da "görünmüyor" iddiasını canlı sayfa ölçülmeden Recep'e taşıma; ham veritabanı alanı kanıt değildir. Tarayıcı yolu: "Tarayıcı (HRT-61)" kuralı.
-- Vitrin, föy ya da metinde marka, adres, sertifika ve performans sayısını resmi kaynaktan doğrula; kaynakta yoksa yazma.
+- Vitrin, föy ya da metinde marka, adres, sertifika ve performans sayısını resmi kaynaktan doğrula; kaynakta birebir yoksa yazma.
 - Depo herkese açıktır: commit, PR ve dosyada Recep'in sözlerini tırnakla yazma, ölçülmüş gerçeği ve kaynağı yaz. Sözün aynısı yalnız depo dışı kayda gider (durum dosyası, hafıza, scripts/board/recep-sozu-defteri.cjs).
 - Gün sonunu yalnız Recep ilan eder; her compact bir kayıt üretir.
 
 ## Test ve bellek
 
 - Yerelde yalnız `pnpm test:ilgili` koş; seçici TAM derse hiçbir test koşmaz, CI koşar. Değişen test dosyalarını `pnpm vitest <dosya> --run` ile ekle. Tam paket, tam type-check ve build yerelde koşturulmaz.
-- PR açtıktan sonra CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok); sonuç bildirimle gelir. Done kanıtı için tek okuma serbest.
-- Site koduyla ilgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
+- PR açtıktan sonra CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok); sonuç bildirimle gelir.- Site koduyla ilgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
 - Durum satırında BELLEK uyarısı varsa (boş bellek 2 GB altı, tek süreç 3 GB üstü) tam vitest, tsc, `next build`, `pnpm install`, Docker gibi ağır komut başlatma; OPS'a yaz.
 
 ## Bilgi sırası ve açılış
