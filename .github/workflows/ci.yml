@@ -263,6 +263,11 @@ jobs:
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: bash scripts/ci/arka-plan.sh baslat lint -- pnpm run lint
 
+      # ALT-114 DENEME (birleşmez): rota tipleri Type check'te de görünsün.
+      - name: Rota tipleri (next typegen)
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
+        run: pnpm exec next typegen
+
       - name: Type check
         if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: pnpm exec tsc --noEmit 2>&1 | tee ci-typecheck.log
