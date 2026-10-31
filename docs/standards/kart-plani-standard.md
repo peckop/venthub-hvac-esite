@@ -150,6 +150,17 @@ bulunur, salt okunur açılır; şema: tablo `kanban_boards(id, payload, revisio
 PR gövdesindeki "Kanban: <NO>" satırından kartı okur. CI'da KOŞMAZ: Kanban verisi git dışıdır ve depo
 public'tir. Kapıyı birleştirme ritüeline bağlamak ARAÇ'ın ayrı işidir.
 
+## Kart gövdesi alanları, migration dilimi ve geniş yeniden düzenleme (HRT-82)
+
+Planı kartlara bölen araç (`to-issues` skill'i) bu bölüme atıf yapar; alan listesi başka yerde tekrarlanmaz.
+
+- **Alan listesi (tek yer):** `KAYNAK/CETVEL`, `ÖNCEKİ ÇALIŞMA`, `YÖNTEM`, `PLAN` (yedi etiket, §ŞABLON), `BİTİŞ ÖLÇÜTÜ`
+  (kanıt komutuyla `add_check`), engelleyenler (`dependsOn`) ve kabul kutu listesi (`successCriteria`). Dilim kartı bu alanların hepsini taşır.
+- **Migration içeren dilim ayrı karttır** ve yalnız Recep onayıyla birleşir: migration içeren dal master'a birleşince prod'a otomatik
+  uygulanır (CLAUDE.md kural 13). Migration'ı kod diliminin içine gömme; kodu geri alınabilir tut.
+- **Geniş yeniden düzenleme (genişlet–daralt, expand–contract):** sıra önce eskiyi bozmadan yenisini eklemek, sonra kullanıcıları
+  taşımak, en son eskiyi kaldırmaktır. Her adım ayrı dilim ve kart olur, her biri tek başına birleşebilir ve geri alınabilir durumda kalır.
+
 ## Kart sınıfına göre ölçüm satırı (HRT-78)
 
 Bazı kart sınıfları plandan bağımsız bir ölçüm ister (yayın öncesi liste, canlı adres matrisi, bayrak kıyası, kare kabul, veri çıkarımı, yazım sonrası canlı ölçüm). Kural verisi `scripts/belge/kart-sinif-olcum.json`, değerlendirici `kart-plan-kapisi.cjs` içindeki `olcumEksikleri()`; kancadaki okuma ARAÇ'ındır. PLAN başlığı İSTEMEZ (ARC-220 gürültüsü geri gelmez).
