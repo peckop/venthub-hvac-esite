@@ -104,10 +104,13 @@ describe('INV-DEP-DENETIM-1 · karar 52 düzeneği', () => {
     expect(y, 'güvenlik güncellemeleri gruplanmamış').toMatch(/applies-to:\s*security-updates/)
   })
 
-  it('Sentry ana sürüm ertelemesi KALDIRMA ŞARTIYLA yazılı (karar 17)', () => {
+  it('Sentry ana sürüm ertelemesi KALKTI: ignore bloğu yok, kurulu ana sürüm 11 (ALT-46, karar 17)', () => {
     const y = oku('.github/dependabot.yml')
-    expect(y).toMatch(/dependency-name:\s*'@sentry\/\*'/)
-    expect(y, 'ertelemenin kaldırma şartı yazılmamış — erteleme kalıcılaşır').toMatch(/KALDIRMA ŞARTI/)
+    expect(y, 'Sentry ertelemesi geri geldi — kaldırma şartı oluşmuştu (11.9.0 kuruldu)').not.toMatch(
+      /dependency-name:\s*'@sentry\/\*'/,
+    )
+    const paket = JSON.parse(oku('package.json')) as { dependencies: Record<string, string> }
+    expect(paket.dependencies['@sentry/nextjs'], '@sentry/nextjs ana sürüm 11 olmalı').toMatch(/^\^11\./)
   })
 
   it('CI iş akışı: contents:read, pnpm install YOK, betiği koşar, kilit dosyası + haftalık tetik', () => {
