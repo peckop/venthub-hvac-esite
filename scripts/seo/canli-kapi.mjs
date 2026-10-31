@@ -72,6 +72,8 @@ export const KURAL_NO = {
   'JSONLD-BREADCRUMB': '20,62',
   'ROBOTS-HARITA-ALAN': '16',
   'HARITA-ADRES-DURUM': '73',
+  'HARITA-KANONIK': '73',
+  'HARITA-NOINDEX': '73',
   'LLMS-SAYFA': '-',
   'LLMS-DIL': '-',
   'VITRIN-IDDIA': '-',
@@ -146,6 +148,7 @@ export function sayfaAlanlari(html) {
     h1: h1 ? bosluksuz(h1[1]) : null,
     lang: htmlEt ? (ozellikler(htmlEt[1]).lang ?? null) : null,
     metaRobots: robots,
+    kanonik: (linkler.find((l) => (l.rel || '').toLowerCase().split(/\s+/).includes('canonical') && (l.href || '').trim() !== '')?.href ?? '').trim() || null,
     ikonVar: linkler.some((l) => (l.rel || '').toLowerCase().split(/\s+/).includes('icon') && (l.href || '').trim() !== ''),
   }
 }
@@ -538,6 +541,36 @@ function yonlendirmeKontrolleri(sayfalar, ek, taban, cikti) {
   }
 }
 
+/** Karşılaştırma için adres: ana makine küçük harf, sondaki eğik çizgi ve # parçası atılır (sorgu KALIR: ?sku= ayrı adrestir). */
+function adresDenk(a) {
+  try {
+    const u = new URL(a)
+    return u.protocol + '//' + u.host.toLowerCase() + u.pathname.replace(/\/+$/, '') + u.search
+  } catch {
+    return String(a)
+  }
+}
+
+/**
+ * Harita kapısı kolu (SEO-69, REC-397 dersi): haritadaki her adres dizine girmek için söz verir. 200 yetmez; kanonik
+ * etiketi KENDİSİNİ göstermeli (yoksa harita yinelenen/kalkan adresi dizine önerir) ve sayfa noindex taşımamalı
+ * (meta robots ya da X-Robots-Tag). 200 olmayan adres HARITA-ADRES-DURUM'da zaten kırmızıdır.
+ */
+function haritaAdresKontrolleri(sayfalar, taban, cikti) {
+  for (const s of sayfalar) {
+    if (s.durum !== 200 || s.html == null) continue
+    const kendi = s.adres || taban + s.yol
+    const a = sayfaAlanlari(s.html)
+    if (!a.kanonik) cikti.push(bulgu('HARITA-KANONIK', 'KIRMIZI', s.yol, 'haritadaki adreste <link rel="canonical"> yok'))
+    else if (adresDenk(new URL(a.kanonik, kendi).href) !== adresDenk(kendi)) {
+      cikti.push(bulgu('HARITA-KANONIK', 'KIRMIZI', s.yol, `kanonik kendisini göstermiyor: ${kisalt(a.kanonik)}`))
+    }
+    const baslik = s.basliklar?.['x-robots-tag'] || ''
+    if (/noindex/i.test(a.metaRobots)) cikti.push(bulgu('HARITA-NOINDEX', 'KIRMIZI', s.yol, `haritadaki adreste meta robots noindex: ${kisalt(a.metaRobots)}`))
+    else if (/noindex/i.test(baslik)) cikti.push(bulgu('HARITA-NOINDEX', 'KIRMIZI', s.yol, `haritadaki adreste X-Robots-Tag noindex: ${kisalt(baslik)}`))
+  }
+}
+
 /**
  * Ağsız çekirdek. `harita` {satirlar:[{loc,lastmod,changefreq}]} · `sayfalar` [{adres, yol, durum, html}] (yol = indirgenmiş
  * site içi yol; html yalnız 200'de) · `ek` {taban, bugun, robots, enSayfalar, varliklar, gizli, yanitlar, yonlendirmeler,
@@ -553,6 +586,8 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   for (const s of sayfalar) {
     if (s.durum !== 200) cikti.push(bulgu('HARITA-ADRES-DURUM', 'KIRMIZI', s.yol, `haritadaki adres HTTP ${s.durum} (200 beklenir)`))
   }
+
+  haritaAdresKontrolleri(sayfalar, taban, cikti)
 
   const gelen = gelenSay(Object.fromEntries(sayfalar.map((s) => [s.yol, s.html ?? null])), taban)
   for (const [yol, n] of Object.entries(gelen)) {
@@ -762,7 +797,7 @@ async function topla(taban, bugun) {
   const sayfalar = []
   await havuz([...evren], EN_COK_ESZAMANLI, async ([yol, hamYol]) => {
     const r = await dene(yol, () => istek(taban + hamYol, { govde: 'metin' }))
-    if (r) sayfalar.push({ adres: taban + hamYol, yol, durum: r.durum, html: r.durum === 200 ? r.html : null })
+    if (r) sayfalar.push({ adres: taban + hamYol, yol, durum: r.durum, basliklar: r.basliklar, html: r.durum === 200 ? r.html : null })
   })
   sayfalar.sort((a, b) => a.yol.localeCompare(b.yol))
 
