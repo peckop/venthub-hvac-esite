@@ -33,6 +33,7 @@ export const en: typeof tr = {
     update: 'Update',
     unitMeters: '{{v}} m',
     unitCubicMeters: '{{v}} m³',
+    unitCubicMetersPerHour: '{{v}} m³/h',
     unitNewton: '{{v}} N',
     dimensions3D: '{{l}}m × {{w}}m × {{h}}m',
     dimensions2D: '{{w}}m × {{h}}m',
