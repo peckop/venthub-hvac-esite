@@ -1,5 +1,6 @@
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
+import { formatNumber } from '@/i18n/format'
 
 /**
  * AİLE SAYFASI BAŞLIĞINA DEBİ ARALIĞI (URN-149).
@@ -37,10 +38,11 @@ export function aileDebiAraligi(variants: ReadonlyArray<DebiKaynagi> | null | un
   if (degerler.length === 0) return null
   const min = Math.min(...degerler)
   const max = Math.max(...degerler)
-  const bicim = new Intl.NumberFormat(lang === 'en' ? 'en' : 'tr', { maximumFractionDigits: 1 })
+  // Sayı biçimi SSOT helper'dan (INV-3 numeric-format-ssot: ham Intl yasak).
+  const dil = lang === 'en' ? 'en' : 'tr'
   // Karşılaştırma BİÇİMLENMİŞ dizede: 100,04 ve 100 gösterimde aynıdır, "100–100" yazılmaz.
-  const minYazi = bicim.format(min)
-  const maxYazi = bicim.format(max)
+  const minYazi = formatNumber(min, dil, { maximumFractionDigits: 1 })
+  const maxYazi = formatNumber(max, dil, { maximumFractionDigits: 1 })
   const aralik = minYazi === maxYazi ? minYazi : `${minYazi}${TIRE}${maxYazi}`
   const dict = lang === 'en' ? en : tr
   return dict.common.unitCubicMetersPerHour.replace('{{v}}', aralik)
