@@ -38,7 +38,10 @@ export function aileDebiAraligi(variants: ReadonlyArray<DebiKaynagi> | null | un
   const min = Math.min(...degerler)
   const max = Math.max(...degerler)
   const bicim = new Intl.NumberFormat(lang === 'en' ? 'en' : 'tr', { maximumFractionDigits: 1 })
-  const aralik = min === max ? bicim.format(min) : `${bicim.format(min)}${TIRE}${bicim.format(max)}`
+  // Karşılaştırma BİÇİMLENMİŞ dizede: 100,04 ve 100 gösterimde aynıdır, "100–100" yazılmaz.
+  const minYazi = bicim.format(min)
+  const maxYazi = bicim.format(max)
+  const aralik = minYazi === maxYazi ? minYazi : `${minYazi}${TIRE}${maxYazi}`
   const dict = lang === 'en' ? en : tr
   return dict.common.unitCubicMetersPerHour.replace('{{v}}', aralik)
 }

@@ -23,6 +23,12 @@ describe('aileDebiAraligi', () => {
     expect(aileDebiAraligi([v({ max_delivery_m3h: 260 })], 'en')).toBe('260 m³/h')
   })
 
+  it('(b2) biçimlenmiş değerler eşitse tek değer: 100,04 ve 100 → "100 m³/h", "100–100" çıkmaz', () => {
+    expect(aileDebiAraligi([v({ max_delivery_m3h: 100.04 }), v({ max_delivery_m3h: 100 })], 'tr')).toBe('100 m³/h')
+    expect(aileDebiAraligi([v({ max_delivery_m3h: 100.04 }), v({ max_delivery_m3h: 100 })], 'en')).toBe('100 m³/h')
+    expect(aileDebiAraligi([v({ max_delivery_m3h: 100.4 }), v({ max_delivery_m3h: 100 })], 'tr')).toBe('100–100,4 m³/h')
+  })
+
   it('(d) TR binlik nokta, EN virgül; aralık en dash', () => {
     const girdi = [v({ max_delivery_m3h: 22100 }), v({ max_delivery_m3h: 2540 })]
     expect(aileDebiAraligi(girdi, 'tr')).toBe('2.540–22.100 m³/h')

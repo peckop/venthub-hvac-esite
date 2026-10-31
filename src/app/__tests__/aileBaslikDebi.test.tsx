@@ -54,6 +54,8 @@ vi.mock('../../components/product/ProductSmartInference', () => ({ ProductSmartI
 vi.mock('../../components/products', () => ({ AddToProjectModal: () => null }))
 vi.mock('../../components/quotes/QuoteRequestModal', () => ({ default: () => null }))
 
+import { LINEO_QUIET_AILE_SLUG } from '@/data/sessizFan/aileMetinleri'
+
 import { AileSayfasi, aileSayfasiUstVerisi } from '../_components/aileSayfasi'
 
 type Specs = Record<string, string | number | boolean | null> | null
@@ -73,13 +75,13 @@ function varyant(kod: string, technical_specs: Specs) {
   }
 }
 
-function detayKur(ad: string, specler: Specs[], metaTitle: { tr: string; en: string } | null = null) {
+function detayKur(ad: string, specler: Specs[], metaTitle: { tr: string; en: string } | null = null, slug = 'test-ailesi') {
   return {
     family: {
       id: 'f1',
       name: ad,
       name_i18n: { tr: ad, en: ad },
-      slug: 'test-ailesi',
+      slug,
       series_code: null,
       description: { tr: 'Aile açıklaması.', en: 'Family description.' },
       brand_name: 'Vortice',
@@ -101,11 +103,11 @@ const jsonLdler = (h: string): Array<Record<string, unknown>> =>
     JSON.parse(m[1].replace(/\\u003c/g, '<').replace(/\\u003e/g, '>')),
   )
 
-async function sayfa(lang: 'tr' | 'en', detay: unknown) {
+async function sayfa(lang: 'tr' | 'en', detay: unknown, sunucuSku: string | null = null, slug = 'test-ailesi') {
   durum.dil = lang
   durum.detail = detay
-  const meta = await aileSayfasiUstVerisi(lang, 'test-ailesi')
-  const h = renderToStaticMarkup(await AileSayfasi({ lang, slug: 'test-ailesi', sunucuSku: null }))
+  const meta = await aileSayfasiUstVerisi(lang, slug, sunucuSku)
+  const h = renderToStaticMarkup(await AileSayfasi({ lang, slug, sunucuSku }))
   return { title: String(meta.title), h1: h1ler(h), jsonLd: jsonLdler(h) }
 }
 
@@ -161,5 +163,46 @@ describe('URN-149 aile başlığı debi aralığı', () => {
     const adlar = s.jsonLd.map((j) => j.name).filter((n): n is string => typeof n === 'string')
     expect(adlar).toContain(AD)
     expect(adlar.some((n) => n.includes('m³/h'))).toBe(false)
+  })
+
+  it('(g) BreadcrumbList son öğe adı ve tüm itemListElement adları debisiz', async () => {
+    const s = await sayfa('tr', detayKur(AD, DEBILI))
+    const kirinti = s.jsonLd.find((j) => j['@type'] === 'BreadcrumbList')
+    expect(kirinti).toBeDefined()
+    const ogeler = (kirinti?.itemListElement ?? []) as Array<{ name?: string }>
+    expect(ogeler.length).toBeGreaterThan(0)
+    expect(ogeler[ogeler.length - 1].name).toBe(AD)
+    expect(ogeler.every((o) => !String(o.name).includes('m³/h'))).toBe(true)
+    const liste = s.jsonLd.flatMap((j) => ((j.itemListElement ?? []) as Array<{ name?: string; item?: { name?: string } }>))
+    expect(liste.every((o) => !String(o.name ?? o.item?.name ?? '').includes('m³/h'))).toBe(true)
+  })
+
+  it('(h) model rotası (sunucuSku dolu) aile rotasıyla AYNI title ve H1', async () => {
+    for (const lang of ['tr', 'en'] as const) {
+      const aile = await sayfa(lang, detayKur(AD, DEBILI))
+      const model = await sayfa(lang, detayKur(AD, DEBILI), 'SKU-1')
+      expect(model.title).toBe(aile.title)
+      expect(model.h1).toEqual(aile.h1)
+      expect(model.h1).toEqual([`${AD} 60–100 m³/h`])
+    }
+  })
+
+  it('(i) Lineo Quiet: H1 debili, title şablonu DEĞİŞMEZ (TR ve EN)', async () => {
+    const kodlar = ['17160', '17161', '17162', '17164', '17165', '17166', '17170', '17171', '17172', '17174', '17175', '17176']
+    const detay = detayKur('Vortice Lineo Quiet Sessiz Kanal Fanları', [], null, LINEO_QUIET_AILE_SLUG)
+    detay.variants = kodlar.map((k, i) => ({ ...varyant(k, { max_delivery_m3h: i === 0 ? 260 : i === 11 ? 2890 : 1000 }), sku: `VRT-${k}` }))
+    const tr = await sayfa('tr', detay, null, LINEO_QUIET_AILE_SLUG)
+    expect(tr.title).toBe('Vortice Lineo Quiet Sessiz Kanal Fanı: 12 Model | VentHub')
+    expect(tr.h1).toEqual(['Vortice Lineo Quiet Sessiz Kanal Tipi Fan 260–2.890 m³/h'])
+    const en = await sayfa('en', detay, null, LINEO_QUIET_AILE_SLUG)
+    expect(en.title).toBe('Vortice Lineo Quiet Silent Duct Fan: 12 Models | VentHub')
+    expect(en.h1).toEqual(['Vortice Lineo Quiet Silent In-Line Duct Fan 260–2,890 m³/h'])
+  })
+
+  it('(j) EN title ≤60 ise EN sayı biçimiyle debi alır', async () => {
+    const ad = 'Vortice VORT QBK SAL KC Evo'
+    const s = await sayfa('en', detayKur(ad, [{ max_delivery_m3h: 2540 }, { max_delivery_m3h: 22100 }]))
+    expect(s.title).toBe(`${ad} 2,540–22,100 m³/h | VentHub`)
+    expect(s.title.length).toBeLessThanOrEqual(60)
   })
 })
