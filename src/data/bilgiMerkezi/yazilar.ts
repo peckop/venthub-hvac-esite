@@ -439,23 +439,25 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'sessiz-fan-secimi',
     konu: 'konfor',
     yayinTarihi: '2026-10-17',
-    guncellemeTarihi: '2026-10-17',
+    // Güncelleme tarihi 2026-10-31: yalnız başlıkların yenilenmesi (BLG-25, SEO-71 sonucu: başlık ve H1'de "kanal fanı"; adres
+    // değişmez). İçerik cümlesi değişmedi (R5.5 başlık-yalnız revizyon). Site haritası lastmod'u ve Article `dateModified` buradan.
+    guncellemeTarihi: '2026-10-31',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
     diller: {
       tr: {
         slug: 'sessiz-fan-nasil-secilir',
-        ozet: 'Sessiz fan seçerken ses basıncı ile ses gücü farkını, ölçüm koşulunu ve yatak odası değerlerini okuyun; Vortice Lineo Quiet katalog değerleri örnek.',
+        ozet: 'Sessiz kanal fanı seçerken ses basıncı ile ses gücü farkını, ölçüm koşulunu ve yatak odası değerlerini okuyun; örnek: Vortice Lineo Quiet katalog değerleri.',
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ya da konu listesini tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Ses değerini hangi koşulda okuyacağınızı bu rehberde bulun.',
-        govde: `# Sessiz fan nasıl seçilir? dB(A), ses gücü ve kanal fanı seçimi
+        govde: `# Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü
 
 Sessiz fan seçimi, katalogdaki ses değerinin hangi koşulda verildiğini okumakla başlar: ses basıncı düzeyi ölçüm noktasındaki sesi, ses gücü düzeyi ses kaynağının yaydığı sesi anlatır [1]. Vortice'nin Lineo Quiet kanal fanında ses değeri ayar noktasına göre çok değişir: Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].
 
 Bu yüzden "kaç dB?" sorusu tek başına cevaplanmaz; hangi yol (emiş, üfleme, gövde), hangi ayar noktası ve hangi mesafe sorularıyla birlikte cevaplanır. Aşağıda bu üç koşul, yatak odası ve ofis gibi mekânların resmî değerleri ve Lineo Quiet'in katalog değerleri birlikte okunuyor.
 
-## Sessiz fan ne demek?
+## Sessiz kanal fanı ne demek? Bir üretici örneği
 
 Vortice, LINEO QUIET ürünlerini ses emici kaplamayla tanımlar: kaplama dış gövdeye bütünleşiktir ve çevreye yayılan ses emisyonunu en aza indirmek için optimize edilmiştir [2].
 
@@ -473,7 +475,7 @@ Kısacası ses basıncı belirli bir noktadaki ses düzeyini, ses gücü kaynağ
 
 Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelik servis ekipmanından kaynaklanan iç gürültüyü sürekli ses için LAeq,nT, kesikli ses için LAF,max,nT göstergesiyle değerlendirir [1]. Katalogdaki 3 m mesafede hesaplanmış ses basıncı [2] ile oda içi LAeq,nT değeri [1] aynı koşulda verilmediği için doğrudan karşılaştırılmamalıdır.
 
-### Ses gücü beyanı ve AB fan tüzükleri
+### Ses gücü beyanı ve AB ekotasarım tüzükleri
 
 Avrupa Birliği'nde ses gücü beyanı ürün türüne bağlıdır. (AB) 1253/2014 sayılı Komisyon Tüzüğü, havalandırma ünitelerinin ürün bilgisinde konut havalandırma ünitelerinde A ağırlıklı ses gücü düzeyinin (LWA), iç mekânda kullanılması belirtilen konut dışı ünitelerde ise gövde ses gücü düzeyinin tam sayıya yuvarlanarak verilmesini ister [5]. Aynı Tüzük, (AB) 327/2011 tanımındaki, yalnızca bir gövde ile donatılmış eksenel ya da santrifüj fanları kapsamının dışında tutar [5].
 
@@ -576,7 +578,7 @@ Aynı çapta Quiet olmayan Lineo ile karşılaştırma: Ø200 AC modellerinde en
 
 Ürün sayfasında genel bilgiler, modellerin teknik özellikleri ve model listesi bulunur: [Vortice Lineo Quiet kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari). Kanal içi kurulum için diğer modeller [kanal tipi fanlar](vh:kategori/duct-fans) kategorisindedir.
 
-## Sessiz fan seçerken kontrol listesi
+## Sessiz kanal fanı seçerken kontrol listesi
 
 1. Ses değerinin koşulunu okuyun: yol (emiş, üfleme, gövde), ayar noktası ve mesafe [2].
 2. Katalogdaki 3 m serbest alan değerini oda içi hedefle doğrudan karşılaştırmayın; hedef mekânın oda içi değeridir [1][2].
