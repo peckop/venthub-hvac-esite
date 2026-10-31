@@ -38,20 +38,20 @@ export const buildPricingSettingsSchema = (t: (key: string) => string) => {
       .min(1, v('atLeastOneCurrency'))
       .refine((arr) => arr.includes('TRY'), { message: v('tryRequired') }),
     default_vat_rate_pct: z
-      .coerce.number({ invalid_type_error: v('invalidNumber') })
+      .coerce.number({ error: v('invalidNumber') })
       .min(0, v('vatRange'))
       .max(100, v('vatRange')),
     default_price_is_vat_inclusive: z.boolean(),
     default_round_to: z
-      .coerce.number({ invalid_type_error: v('invalidNumber') })
+      .coerce.number({ error: v('invalidNumber') })
       .gt(0, v('positiveNumber')),
     default_charm_ending: z.preprocess((val) => {
       if (val === '' || val === null || val === undefined) return null
       const num = typeof val === 'number' ? val : Number(val)
       return Number.isNaN(num) ? val : num
-    }, z.number({ invalid_type_error: v('invalidNumber') }).gte(0, v('charmRange')).lt(1, v('charmRange')).nullable()),
+    }, z.number({ error: v('invalidNumber') }).gte(0, v('charmRange')).lt(1, v('charmRange')).nullable()),
     display_spread_pct: z
-      .coerce.number({ invalid_type_error: v('invalidNumber') })
+      .coerce.number({ error: v('invalidNumber') })
       .min(-50, v('spreadRange'))
       .max(50, v('spreadRange')),
   })

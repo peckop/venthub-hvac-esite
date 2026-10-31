@@ -29,7 +29,7 @@ const getProductSchema = (t: (key: string) => string) => z.object({
     stock_qty: z.number().min(0),
     low_stock_threshold: z.number().min(0),
     description: z.string().optional(),
-    technical_specs: z.record(z.unknown()).optional()
+    technical_specs: z.record(z.string(), z.unknown()).optional()
 })
 
 type ProductFormValues = z.infer<ReturnType<typeof getProductSchema>>

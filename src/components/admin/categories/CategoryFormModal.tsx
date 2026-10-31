@@ -37,7 +37,7 @@ const buildCategorySchema = (t: (key: string) => string) =>
         seo_desc: z.string().optional().nullable(),
         is_featured: z.boolean().optional().default(false),
         sort_order: z
-            .number({ invalid_type_error: t('admin.categories.sortOrderInvalid') })
+            .number({ error: t('admin.categories.sortOrderInvalid') })
             .int(t('admin.categories.sortOrderInvalid'))
             .optional()
             .default(0),
