@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandığımız paketlerdeki bilinen güvenlik açıklarının zamanında kapanmasını sağlar; bozulursa hatalı kod canlıya girer ya da açık fark edilmeden kalır.
 
 ## Düzenli görevler
-- 7 görev, tetiğe bağlı 4: `docs/roller/ALTYAPI-gorevler.md`.
+- 7 görev, tetiğe bağlı 5: `docs/roller/ALTYAPI-gorevler.md`.
 
 ## Dosyalar
 package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md.

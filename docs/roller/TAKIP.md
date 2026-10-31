@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Kullandığımız dış araçların (Claude Code, WrongStack, notebooklm-py) yeni sürümünü ve bağlantı kopukluğunu işimizi aksatmadan yakalar; faydasını, riskini ve işin kime düştüğünü ölçüp yazar, böylece yükseltme sürpriz, kopukluk sessiz kalmaz.
 
 ## Düzenli görevler
-- 3 görev, tetiğe bağlı 1: `docs/roller/TAKIP-gorevler.md`.
+- 3 görev, tetiğe bağlı 2: `docs/roller/TAKIP-gorevler.md`.
 
 ## Dosyalar
 docs/audits/takip-* (salt-okuma raporları), docs/olcum/wrongstack-ozellik-envanteri.md ("bize ne" satırı). Kod dosyası sahibi değildir.

@@ -907,13 +907,14 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
   })
 
   // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin
-  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı', () => {
+  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı (HRT-80: haftalık bağlı)', () => {
     const g = gercek['GEO-SEO'].gorevler
     const ara = (s: string) => g.find((x) => x.siklik === s)
     expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'evet' })
     expect(ara('her-dagitim-gunluk')?.tetikAyrinti).toMatch(/günlük schedule/)
-    expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', baglayacak: 'ARAC' })
-    expect(ara('haftalik')?.tetikAyrinti).toMatch(/ARC-28/)
+    expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', bagli: 'evet' })
+    expect(ara('haftalik')?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
+    expect(ara('haftalik')?.tetikAyrinti).toMatch(/SEO haftalık: N gün/)
     expect(ara('aylik')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC' })
     expect(ara('aylik')?.tetikAyrinti).toMatch(/ARC-27/)
     expect(JSON.stringify(g)).not.toMatch(/REC-502/)
@@ -983,7 +984,12 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(s((v) => (v['GEO-SEO'].gorevler[0].tetik = 'elle'))).toMatch(/tetik geçersiz/)
     expect(s((v) => (v['GEO-SEO'].gorevler[0].bagli = 'belki'))).toMatch(/bağlı alanı geçersiz/)
     expect(s((v) => (v.OLMAYANROL = v['GEO-SEO']))).toMatch(/OLMAYANROL: bilinmeyen rol/)
-    expect(s((v) => delete v['GEO-SEO'].gorevler[1].baglayacak)).toMatch(/kuracak rol/)
+    expect(
+      s((v) => {
+        v['GEO-SEO'].gorevler[1].bagli = 'hayir'
+        delete v['GEO-SEO'].gorevler[1].baglayacak
+      }),
+    ).toMatch(/kuracak rol/)
     expect(s((v) => (v['GEO-SEO'].amac = 'a'.repeat(uretici.AMAC_SINIRI + 1)))).toMatch(/amaç .* aşıyor/)
     expect(s((v) => (v['GEO-SEO'].gorevler[1].esik = 'Eşik belli'))).toMatch(/TASLAK ile başlamalı/)
     expect(s((v) => (v['GEO-SEO'].gorevler[0].komut = 'scripts/seo/yok.mjs'))).toMatch(/komut dosyası yok/)
@@ -1333,14 +1339,15 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     expect(sahiplik.cetveller['docs/standards/filo-tuzugu.md']?.sahip).toBe('OPS')
   })
 
-  it('OPS iki yeni görevi (Cuma filo raporu, açılış raporu) "bağlı: hayır (kuracak: ARAC)" olarak yazar; kurulmamış tetik "evet" diye geçemez', () => {
+  it('OPS Cuma filo raporu görev tazelik kancasına bağlıdır (HRT-80); açılış raporu "bağlı: hayır (kuracak: ARAC)" kalır; kurulmamış tetik "evet" diye geçemez', () => {
     const ops = uretici.GOREVLER.OPS.gorevler
-    for (const parca of ['Haftalık filo raporu', 'Açılış raporu']) {
-      const x = ops.find((g) => g.gorev.startsWith(parca))
-      expect(x, parca).toBeTruthy()
-      expect(x?.bagli).toBe('hayir')
-      expect(x?.baglayacak).toBe('ARAC')
-    }
+    const filo = ops.find((g) => g.gorev.startsWith('Haftalık filo raporu'))
+    expect(filo?.bagli).toBe('evet')
+    expect(filo?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
+    const acilis = ops.find((g) => g.gorev.startsWith('Açılış raporu'))
+    expect(acilis, 'Açılış raporu').toBeTruthy()
+    expect(acilis?.bagli).toBe('hayir')
+    expect(acilis?.baglayacak).toBe('ARAC')
     const v = kopya()
     v.OPS.gorevler[1].bagli = 'evet'
     v.OPS.gorevler[1].tetikAyrinti = '.github/workflows/olmayan-dosya.yml'

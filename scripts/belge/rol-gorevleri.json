@@ -20,9 +20,8 @@
           "gorev": "Haftalık veri incelemesi: Search Console ve Bing verisini kendi verimizden oku (aynı aramada yarışan sayfalar, dizinlenme oranı, düşen ve ilk 10'a giren sayfalar, son 60 günde değişene dokunma kuralı); Search Console Geliştirmeler ve Alışveriş raporları (ürün snippet'leri, sayfa dizine ekleme, Core Web Vitals) da okunur, yeni sorunda aynı gün kart ve sahibine yazı",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"SEO haftalık: N gün\" (7 gün eşik); satırı ARAÇ kuruyor, ARC-28; incelemenin kendisi SEO-17",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"SEO haftalık: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); incelemenin kendisi SEO-17",
+          "bagli": "evet",
           "cikti": "Tek rapor (docs/audits/seo-haftalik-<tarih>.md) ve en önemli 5 iş; her iş için kart önerisi OPS'a",
           "esik": "TASLAK: geçti/kaldı ölçütünü GEO-SEO belirler (SEO-17); kural: son 60 günde değişen sayfa için iş önerilmez.",
           "taslak": true
@@ -63,9 +62,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -110,9 +108,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -147,9 +144,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -224,9 +220,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -291,9 +286,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -336,9 +330,8 @@
           "gorev": "Baskı tazelik taraması: canlı değer ile üreticinin SON baskısı aile aile karşılaştırılır; önce ses, ağırlık, devir, sonra diğer alanlar (KTL-51)",
           "siklik": "aylik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"katalog baskı: N gün\" (30 gün eşik); satırı ARAÇ kuracak; üreticiden yeni baskı gelince de koşar",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"katalog baskı: N gün\" (30 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); üreticiden yeni baskı gelince de koşar",
+          "bagli": "evet",
           "cikti": "Sapma tablosu (aile, alan, canlı değer, güncel baskı ve tarihi) ve her sapma için düzeltme betiği kartı",
           "esik": "TASLAK: sapma 0 ya da her sapma bir kartla; eşiği KATALOG belirler",
           "taslak": true
@@ -357,9 +350,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -373,9 +365,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         },
@@ -383,9 +374,8 @@
           "gorev": "Haftalık filo raporu (tüzük Madde 7): departman karnesi (scripts/board/kanban-uyum.cjs) ve açık kalan işler tek tabloda Recep'e",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"filo raporu: N gün\" (7 gün eşik); satırı ARAÇ kuracak (OPS-169)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"filo raporu: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "Recep'e tek tablo (Cuma); karne eşiğini aşan departman satırı kırmızıdır",
           "esik": "Kanıtsız Done 0; kırmızı karne satırı aynı raporda sahibine kartla bağlanır"
         },
@@ -409,9 +399,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -425,9 +414,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -441,9 +429,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -457,9 +444,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         },
@@ -467,9 +453,8 @@
           "gorev": "Haftalık skill kullanım ölçümü: atanmış ama kullanılmayan skill'i bul, kusurlu skill'i (bayat yol, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydet",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"skill ölçümü: N gün\" (7 gün eşik); ölçüm kaynağı ve satır ARAÇ'ta kurulacak",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"skill ölçümü: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "Atanmış ama kullanılmayan skill listesi; kusur kaydı kaynak dosya:satır ile",
           "esik": "Kullanılmayan atanmış skill 0 ya da her biri için yazılı gerekçe"
         }
@@ -483,9 +468,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
