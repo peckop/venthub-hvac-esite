@@ -150,6 +150,15 @@ bulunur, salt okunur açılır; şema: tablo `kanban_boards(id, payload, revisio
 PR gövdesindeki "Kanban: <NO>" satırından kartı okur. CI'da KOŞMAZ: Kanban verisi git dışıdır ve depo
 public'tir. Kapıyı birleştirme ritüeline bağlamak ARAÇ'ın ayrı işidir.
 
+## Kart sınıfına göre ölçüm satırı (HRT-78)
+
+Bazı kart sınıfları plandan bağımsız bir ölçüm ister (yayın öncesi liste, canlı adres matrisi, bayrak kıyası, kare kabul, veri çıkarımı, yazım sonrası canlı ölçüm). Kural verisi `scripts/belge/kart-sinif-olcum.json`, değerlendirici `kart-plan-kapisi.cjs` içindeki `olcumEksikleri()`; kancadaki okuma ARAÇ'ındır. PLAN başlığı İSTEMEZ (ARC-220 gürültüsü geri gelmez).
+
+- **Satır biçimi:** açıklamada `ÖLÇÜM: <sınıf adı> — <ölçülen sonuç>`; ölçüm gerekmiyorsa sonuç `gerekmez: <sebep>` olur. Sonuç en az 8 karakterdir.
+- **Sınıf tanıma:** kartta `olcum-<sınıf adı>` etiketi (kesin) ya da yalnız BAŞLIKTA dar anahtar sözcük. Açıklamada aranmaz: kuralı konu eden kartlar yanlış eşleşmesin.
+- **Geniş sınıflar yalnız etiketle:** `yayin-oncesi` ve `yazim-sonrasi` (açıklamada aranınca 1362 kartın 71 ve 48'i eşleşti, 27 Ekim ölçümü).
+- **Yeni sınıf:** JSON'a eklenir; `rol-gorevleri.json`'da o rolün `kart-kapisi` görevine bağlanır (test `belge-kart-sinif-olcum` bağı ölçer).
+
 ## Sınır: plansız iş
 
 Gelişigüzel kısa kart ya da plan gerektirmeyen iş için tek istisna satırı vardır:
