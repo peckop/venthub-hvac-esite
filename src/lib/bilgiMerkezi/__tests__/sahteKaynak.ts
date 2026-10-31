@@ -31,11 +31,26 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     // BLG-22 (31 Ekim 2026): yuvarlak aile REC-397 ile arşivlendi; rehber aynı serinin aktif dikdörtgen ailesine bağlanır.
     ['vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari', 'Vortice VORT Commercial In-Line Dikdörtgen Kanal Fanları'],
     ['vortice-radon-serisi-kanal-fanlari', 'Vortice Radon Serisi Kanal Fanları'],
+    // Isı geri kazanım cihazı nedir yazısı (BLG-20, 2026-11): üç aile sayfası canlıda 200 verir (31 Ekim ölçümü).
+    ['vortice-vort-hr-isi-geri-kazanim', 'Vortice VORT HR Isı Geri Kazanım'],
+    ['vortice-vort-mono', 'Vortice VORT Mono'],
+    ['avens-isi-geri-kazanim-cihazlari', 'AVenS Isı Geri Kazanım Cihazları'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
     'air-curtains': { slug: 'air-curtains', metadata: { slug: { tr: 'hava-perdeleri', en: 'air-curtains' } }, ust: null },
     'heat-recovery-vmc': { slug: 'heat-recovery-vmc', metadata: { slug: { tr: 'isi-geri-kazanim', en: 'heat-recovery-vmc' } }, ust: null },
+    // Isı geri kazanım yazısı (BLG-20, 2026-10-31): alt kategoriler canlıda 200 verir, kanonik EN slug TR görünür adrese yönlenir.
+    'ducted-central-hrv': {
+      slug: 'ducted-central-hrv',
+      metadata: { slug: { tr: 'kanalli-merkezi-uniteler', en: 'ducted-central-hrv' } },
+      ust: { slug: 'heat-recovery-vmc', metadata: { slug: { tr: 'isi-geri-kazanim', en: 'heat-recovery-vmc' } } },
+    },
+    'single-room-hrv': {
+      slug: 'single-room-hrv',
+      metadata: { slug: { tr: 'tek-oda-uniteleri', en: 'single-room-hrv' } },
+      ust: { slug: 'heat-recovery-vmc', metadata: { slug: { tr: 'isi-geri-kazanim', en: 'heat-recovery-vmc' } } },
+    },
     'frequency-converters': { slug: 'frequency-converters', metadata: { slug: { tr: 'frekans-konvertorleri', en: 'frequency-converters' } }, ust: null },
     'centrifugal-fans': {
       slug: 'centrifugal-fans',
