@@ -58,6 +58,12 @@ Google ve Bing'e dizin isteğini gönderir. Recep'ten ya da OPS'tan ayrıca onay
 bekleme yoktur. Günlük sınır dolarsa kalan adresler ertesi günün ilk işidir, aşağıdaki öncelik sırasıyla. Süre,
 bildirim anından değil **canlıda doğrulanma anından** sayılır.
 
+**Yandex adımı (SEO-64, 31 Ekim 2026).** Zincirdeki IndexNow gönderimi Yandex'e de gider (protokol katılımcılarla paylaşır).
+Yandex Webmaster'da site doğrulanmıştır; yeniden tarama isteği ve site haritası gönderimi paneldeki araçlarla yapılır,
+ancak 31 Ekim'de araç Yandex tarafında salt okunurdu: o durumda adres IndexNow ile yetinilir, karta "Yandex paneli salt okunur"
+yazılır ve araç açılınca sıradaki yayında panelden de gönderilir. Yandex Webmaster'ın dizindeki sayfa sayısı haftalık okuma
+satırına eklenir. Günlük sınır ölçülmedi.
+
 **Tetik** (biri yeterli). "Canlıda doğrulandı" = adres GET 200, kanonik kendisi, `noindex` ve robots engeli yok;
 yönlendirmede eski adres 308 ile yeni adrese gider ve yeni adres 200 verir.
 
