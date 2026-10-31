@@ -18,15 +18,43 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 
 // ─── saf yardımcılar (testlenir) ───────────────────────────────────────────────
+/**
+ * Adlandırılmış HTML varlıkları. Türkçe harfler (üç ölçüm: BLG-20, 31 Ekim 2026, avensair.com
+ * "al&uuml;minyum" → alıntı doğru olduğu hâlde KALDI verdi) ve rehber metinlerinde geçen simgeler.
+ * Tabloda olmayan adlı varlık olduğu gibi kalır (sessizce silinmez), sayısal varlıklar her zaman çözülür.
+ */
+const ADLI_VARLIK = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  rsquo: "'", lsquo: "'", ldquo: '"', rdquo: '"', sbquo: "'", bdquo: '"',
+  ndash: '–', mdash: '—', hellip: '…', middot: '·', bull: '•',
+  deg: '°', plusmn: '±', times: '×', divide: '÷', micro: 'µ', permil: '‰',
+  sup1: '¹', sup2: '²', sup3: '³', frac12: '½', frac14: '¼', frac34: '¾',
+  laquo: '«', raquo: '»', copy: '©', reg: '®', trade: '™', euro: '€', pound: '£',
+  uuml: 'ü', Uuml: 'Ü', ouml: 'ö', Ouml: 'Ö', ccedil: 'ç', Ccedil: 'Ç',
+  gbreve: 'ğ', Gbreve: 'Ğ', scedil: 'ş', Scedil: 'Ş', Idot: 'İ', imath: 'ı',
+  auml: 'ä', Auml: 'Ä', eacute: 'é', Eacute: 'É', egrave: 'è', agrave: 'à', aacute: 'á', iacute: 'í', oacute: 'ó', uacute: 'ú', szlig: 'ß',
+}
+
+/** Tek geçişte varlık çöz ("&amp;lt;" iki kez çözülüp "<" olmaz). */
+export function varlikCoz(s) {
+  return s.replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z][a-z0-9]*);/gi, (tam, ad) => {
+    if (ad[0] === '#') {
+      const kod = ad[1] === 'x' || ad[1] === 'X' ? parseInt(ad.slice(2), 16) : parseInt(ad.slice(1), 10)
+      if (!Number.isInteger(kod) || kod < 1 || kod > 0x10ffff || (kod >= 0xd800 && kod <= 0xdfff)) return tam
+      return kod === 160 ? ' ' : String.fromCodePoint(kod)
+    }
+    return Object.prototype.hasOwnProperty.call(ADLI_VARLIK, ad) ? ADLI_VARLIK[ad] : tam
+  })
+}
+
 /** HTML → görünür metin (script/style atılır, etiket soyulur, varlıklar çözülür). */
 export function htmlMetin(html) {
-  return html
-    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;|&#160;/g, ' ')
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&#x27;|&rsquo;|&lsquo;/g, "'")
-    .replace(/&ldquo;|&rdquo;/g, '"')
+  return varlikCoz(
+    html
+      .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' '),
+  )
     .replace(/\s+/g, ' ')
     .trim()
 }
