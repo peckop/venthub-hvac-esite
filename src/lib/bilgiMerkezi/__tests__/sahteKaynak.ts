@@ -28,7 +28,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['vortice-lineo-quiet-sessiz-kanal-fanlari', 'Vortice Lineo Quiet Sessiz Kanal Fanları'],
     // Kanal tipi fan nedir yazısı (BLG-18, 2026-10-25): aile sayfaları canlıda 200 verir (25 Ekim ölçümü).
     ['vortice-lineo-kanal-fanlari', 'Vortice Lineo Kanal Fanları'],
-    ['vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari', 'Vortice VORT Commercial In-Line Yuvarlak Kanal Fanları'],
+    // BLG-22 (31 Ekim 2026): yuvarlak aile REC-397 ile arşivlendi; rehber aynı serinin aktif dikdörtgen ailesine bağlanır.
+    ['vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari', 'Vortice VORT Commercial In-Line Dikdörtgen Kanal Fanları'],
     ['vortice-radon-serisi-kanal-fanlari', 'Vortice Radon Serisi Kanal Fanları'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
