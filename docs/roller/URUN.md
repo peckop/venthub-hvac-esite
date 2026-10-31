@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Amaç ve Nasıl: `docs/roller/URUN-gorevler.md`.
 
 ## Düzenli görevler
-- 1 görev, tetiğe bağlı 0: `docs/roller/URUN-gorevler.md`.
+- 1 görev, tetiğe bağlı 1: `docs/roller/URUN-gorevler.md`.
 
 ## Dosyalar
 src/components/products/** (3d/** hariç: 3D), src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*, src/lib/seo/jsonld.ts, src/lib/seo/indexnow.ts, src/app/_components/aileSayfasi.tsx, src/app/_components/ProductDetailPageView.tsx, src/data/sessizFan/**, src/lib/services/sessizFanKodlari.service.ts, src/components/category/sections/silent-fan/**.
