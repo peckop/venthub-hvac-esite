@@ -169,8 +169,9 @@ geçmiş karar → Kanban + Linear Kararlar arşivi (NotebookLM defterleri salt 
   repoda fork PR'ı yabancı kodu makinede çalıştırır; (3) `permissions:` bloğu yazıyorsan
   `contents: read` yine ZORUNLU (varsayılanlar düşer, checkout "Repository not found" verir).
 - **Worktree `node_modules` (karar 88, 2026-09-23):** her worktree **kendi** kurulumunu yapar:
-  `pnpm install --frozen-lockfile --offline` (pnpm sabit bağlantı kullanır → disk maliyeti ~0, ölçüldü;
-  kilit dosyası değişmemeli). Ana depoya **junction/symlink ile paylaşım YASAK** — 09-23'te `git worktree remove`
+  `pnpm install --frozen-lockfile --prefer-offline` (pnpm sabit bağlantı kullanır → disk maliyeti ~0, ölçüldü;
+  kilit dosyası değişmemeli; `--offline` DEĞİL: yükseltmeyle gelen paket mağazada yoksa `--offline`
+  ERR_PNPM_NO_OFFLINE_TARBALL ile düşer, 2026-10-31 fallow 3.38.1 — `--prefer-offline` mağazadakini kullanır, eksiği indirir). Ana depoya **junction/symlink ile paylaşım YASAK** — 09-23'te `git worktree remove`
   junction'dan geçip ana deponun node_modules'unu sildi. Eski bağlantı varsa önce YALNIZ bağlantı kaldırılır
   (`cmd //c "rmdir <yol>"`, `/s` YOK), ana deponun `.bin`'i doğrulanır. Özyinelemeli silmeyi
   `silme-baglanti-kapisi` kancası dışa giden bağlantı varken durdurur.
