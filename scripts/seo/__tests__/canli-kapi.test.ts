@@ -19,7 +19,7 @@ import { join } from 'node:path'
 const TABAN = 'https://venthub.com.tr'
 const ACIKLAMA_OK = 'Bu sayfa ürünün teknik özelliklerini, ölçülerini ve kullanım alanlarını ayrıntılı biçimde anlatır.'
 
-type Sayfa = { adres: string; yol: string; durum: number; html: string | null }
+type Sayfa = { adres: string; yol: string; durum: number; html: string | null; basliklar?: Record<string, string> }
 type Kayit = {
   durum: number; konum?: string | null; ilk?: number[]; tur?: string; html?: string | null
   sicrama?: number; adimlar?: Array<{ adres: string; durum: number }>; sonDurum?: number; yol?: string
@@ -34,14 +34,19 @@ type Ek = {
 type Satir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
 type Veri = { harita: { satirlar: Satir[]; hreflangSayisi?: number }; sayfalar: Sayfa[]; ek: Ek }
 type Bulgu = { kod: string; seviye: string; adres: string; kanit: string; bilinen?: string }
-type HtmlSecenek = { title?: string | null; desc?: string | null; h1?: string; lang?: string | null; icon?: boolean; ld?: unknown[]; links?: string[] }
+type HtmlSecenek = {
+  title?: string | null; desc?: string | null; h1?: string; lang?: string | null; icon?: boolean; ld?: unknown[]; links?: string[]
+  canon?: string | null; robots?: string | null
+}
 
 function html(o: HtmlSecenek = {}): string {
-  const { title = 'Sayfa | VentHub', desc = ACIKLAMA_OK, h1 = 'Sayfa', lang = 'tr', icon = false, ld = [], links = [] } = o
+  const { title = 'Sayfa | VentHub', desc = ACIKLAMA_OK, h1 = 'Sayfa', lang = 'tr', icon = false, ld = [], links = [], canon = null, robots = null } = o
   return [
     '<!DOCTYPE html>', lang === null ? '<html>' : `<html lang="${lang}">`, '<head>',
     title === null ? '' : `<title>${title}</title>`,
     desc === null ? '' : `<meta name="description" content="${desc}"/>`,
+    canon === null ? '' : `<link rel="canonical" href="${canon}"/>`,
+    robots === null ? '' : `<meta name="robots" content="${robots}"/>`,
     icon ? '<link rel="icon" href="/favicon.ico"/>' : '',
     ...ld.map((x) => '<script type="application/ld+json">' + (typeof x === 'string' ? x : JSON.stringify(x)) + '</script>'),
     '</head><body>', `<h1>${h1}</h1>`, ...links.map((l) => `<a href="${l}">bağlantı</a>`), '</body></html>',
@@ -49,7 +54,7 @@ function html(o: HtmlSecenek = {}): string {
 }
 
 const sayfa = (yol: string, o: HtmlSecenek = {}, durum = 200): Sayfa => ({
-  adres: TABAN + yol, yol, durum, html: durum === 200 ? html(o) : null,
+  adres: TABAN + yol, yol, durum, html: durum === 200 ? html({ canon: TABAN + yol, ...o }) : null,
 })
 
 /** Temiz taban çizgisi: 3 sayfa birbirine bağlı, benzersiz title/açıklama, doğru lang, ikon var, ek ölçümler sağlıklı. */
@@ -327,9 +332,63 @@ describe('INV-CANLI-KAPI-1 · olmayan adres, yönlendirme (kural 1/54/12/14)', (
   })
 })
 
+describe('INV-CANLI-KAPI-1 · harita kolu: kanonik kendisi, noindex yok (SEO-69, REC-397)', () => {
+  const sabotaj = (yol: string, o: HtmlSecenek, basliklar?: Record<string, string>): Veri => {
+    const v = temiz()
+    const i = v.sayfalar.findIndex((s) => s.yol === yol)
+    v.sayfalar[i] = { ...sayfa(yol, { links: v.sayfalar.map((s) => s.yol).filter((z) => z !== yol), ...o }), basliklar }
+    return v
+  }
+  it('temiz taban çizgisi: kanonik kendisi, noindex yok → 0 bulgu', () => {
+    const v = temiz()
+    expect(kodlar(v, 'HARITA-KANONIK')).toEqual([])
+    expect(kodlar(v, 'HARITA-NOINDEX')).toEqual([])
+  })
+  it('kalkan sayfa: kanonik başka adresi gösteriyorsa KIRMIZI', () => {
+    const v = sabotaj('/tr/a', { canon: TABAN + '/tr/b' })
+    expect(adresler(v, 'HARITA-KANONIK')).toEqual(['/tr/a'])
+  })
+  it('kanonik etiketi yoksa KIRMIZI', () => {
+    const v = sabotaj('/tr/a', { canon: null })
+    expect(adresler(v, 'HARITA-KANONIK')).toEqual(['/tr/a'])
+    expect(kodlar(v, 'HARITA-KANONIK')[0].kanit).toContain('yok')
+  })
+  it('sorgulu kanonik (?sku=) ayrı adres sayılır: KIRMIZI', () => {
+    const v = sabotaj('/tr/a', { canon: TABAN + '/tr/a?sku=X1' })
+    expect(adresler(v, 'HARITA-KANONIK')).toEqual(['/tr/a'])
+  })
+  it('sondaki eğik çizgi, büyük harfli ana makine ve göreli kanonik kendisi sayılır', () => {
+    expect(kodlar(sabotaj('/tr/a', { canon: TABAN + '/tr/a/' }), 'HARITA-KANONIK')).toEqual([])
+    expect(kodlar(sabotaj('/tr/a', { canon: 'https://VentHub.com.tr/tr/a' }), 'HARITA-KANONIK')).toEqual([])
+    expect(kodlar(sabotaj('/tr/a', { canon: '/tr/a' }), 'HARITA-KANONIK')).toEqual([])
+  })
+  it('meta robots noindex KIRMIZI', () => {
+    const v = sabotaj('/tr/a', { robots: 'noindex, follow' })
+    expect(adresler(v, 'HARITA-NOINDEX')).toEqual(['/tr/a'])
+  })
+  it('X-Robots-Tag noindex başlığı KIRMIZI', () => {
+    const v = sabotaj('/tr/a', {}, { 'x-robots-tag': 'noindex' })
+    expect(adresler(v, 'HARITA-NOINDEX')).toEqual(['/tr/a'])
+  })
+  it('index,follow noindex sayılmaz', () => {
+    expect(kodlar(sabotaj('/tr/a', { robots: 'index, follow' }), 'HARITA-NOINDEX')).toEqual([])
+  })
+  it('200 olmayan adreste kanonik/noindex ölçülmez (yalnız HARITA-ADRES-DURUM)', () => {
+    const v = temiz()
+    v.sayfalar.push(sayfa('/tr/kirik', {}, 404))
+    expect(kodlar(v, 'HARITA-KANONIK')).toEqual([])
+    expect(kodlar(v, 'HARITA-NOINDEX')).toEqual([])
+  })
+  it('kodlar KURAL_NO tablosunda ve kırmızı çıkış verir', () => {
+    expect((KURAL_NO as Record<string, string>)['HARITA-KANONIK']).toBeTruthy()
+    expect((KURAL_NO as Record<string, string>)['HARITA-NOINDEX']).toBeTruthy()
+    expect(cikisKodu(kodlar(sabotaj('/tr/a', { canon: TABAN + '/tr/b' })) as never)).toBe(1)
+  })
+})
+
 describe('INV-CANLI-KAPI-1 · JSON-LD (kural 66/18/17/58/59/20/62)', () => {
   const koy = (v: Veri, ld: unknown[]): void => {
-    v.sayfalar[1].html = html({ title: 'Alfa | VentHub', desc: 'Alfa ürün ailesinin teknik özelliklerini, ölçülerini ve kullanım alanlarını ayrıntılı biçimde anlatır.', h1: 'Alfa', ld, links: ['/tr', '/tr/b'] })
+    v.sayfalar[1].html = html({ title: 'Alfa | VentHub', desc: 'Alfa ürün ailesinin teknik özelliklerini, ölçülerini ve kullanım alanlarını ayrıntılı biçimde anlatır.', h1: 'Alfa', ld, links: ['/tr', '/tr/b'], canon: TABAN + '/tr/a' })
   }
   it('JSONLD-PARSE: bozuk JSON KIRMIZI; geçerli blok temiz', () => {
     const v = temiz(); koy(v, ['{"@context": "https://schema.org", bozuk'])
