@@ -1,0 +1,66 @@
+name: Canli kapi
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ARC-216 C kolu (HRT-74 C, REC-502) — yayındaki siteyi her üretim dağıtımından sonra ve günde bir ölç.
+#
+# NİÇİN: canlı tarama kapısı (scripts/seo/canli-kapi.mjs, GEO-SEO'nun) 82 kuralın canlıyı ÖLÇEN kısmını tek geçişte koşar;
+# ama onu kendiliğinden çağıran iş akışı yoktu (cetvel yayin-gorunurluk-denetim-standard.md Y2: "workflow ALTYAPI tarafından
+# eklenecek"). Kod testleri yeşilken canlıda kalan kusur (yanlış lang, bozuk favicon, yönlendirme zinciri) ancak biri
+# elle koşunca görünüyordu.
+#
+# SINIR (ALTYAPI ile): "dağıtım gerçekten çıktı mı" sorusu ALTYAPI'nın `dagitim-hazir.yml` kapısıdır (ALT-82). Bu iş akışı
+# o soruyu TEKRAR sormaz: `Dagitim hazir` iş akışı başarıyla BİTİNCE (`workflow_run`, sonuç success) canlıyı ölçer. Dağıtım
+# düştüyse (failure) site eski sürümdedir; eski sürümü ölçmek sahte bulgu üretir, bu yüzden o koşu atlanır.
+# Günlük `schedule` yedektir: dağıtım dışı değişimi (veritabanı verisi, harici hizmet) de yakalar.
+#
+# BİRLEŞMEYİ BLOKLAMAZ: `pull_request` YOK; zorunlu çekirdeğe girmez (merge-ritueli türetmesi `pull_request` tetiği arar).
+# Kırmızısı ölçülmüş bir CANLI kusurdur; kime gittiği OPS kararıdır, ilgili Kanban kartı GEO-SEO'dadır.
+# `--bilinen`: onarımı henüz gelmemiş kırmızılar kart numarasıyla listelenir ve çıkışı 1 YAPMAZ (yeni kırmızı yapar).
+# Kayıt durumu (Linear) sorgulanmaz: anahtar yok, kayıt "ölçülemedi" UYARISI olur ve susturma geçerli sayılır.
+#
+# Çıktı depoya YAZILMAZ (pazar-olcum P6): `--cikti` runner.temp altındadır, artifact olarak YÜKLENMEZ.
+# `pnpm install` YOK, sır YOK, self-hosted runner YOK: betik yalnız Node yerleşiklerini kullanır, yalnız GET/HEAD atar.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_run:
+    workflows: ['Dagitim hazir']
+    types: [completed]
+  schedule:
+    # Günde bir, tam saat DEĞİL: 06:07 UTC = 09:07 TR (dizin-tetigi 05:37'den sonra).
+    - cron: '7 6 * * *'
+  workflow_dispatch:
+
+# Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU
+# (CLAUDE.md Notlar — yoksa checkout "Repository not found" verir).
+permissions:
+  contents: read
+
+# İki koşu aynı anda canlıyı taramasın; sıradaki bekler, çalışan iptal edilmez (ölçüm yarıda kesilmesin).
+concurrency:
+  group: canli-kapi
+  cancel-in-progress: false
+
+jobs:
+  canli-kapi:
+    # workflow_run her sonuç için gelir (success, failure, cancelled...): yalnız başarılı dağıtım ölçümü.
+    # schedule ve elle tetikte `github.event.workflow_run` YOKTUR: koşul "olay workflow_run DEĞİLSE geç" biçiminde yazılır.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    # Site haritasındaki her adres çekilir (6 eşzamanlı); 20 dk bol pay.
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Yayindaki siteyi olc
+        env:
+          CIKTI: ${{ runner.temp }}/canli-kapi
+        run: node scripts/seo/canli-kapi.mjs --taban https://venthub.com.tr --bilinen scripts/seo/canli-kapi-bilinen.json --cikti "$CIKTI"
