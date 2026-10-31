@@ -36,6 +36,7 @@ const TAM_PLAN = [
 ].join('\n')
 const EKSIK_PLAN = 'PLAN\nAmaç: çok kısa'
 const PLANSIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: arandı, yok'
+const OLCUM_SATIRI = 'ÖLÇÜM: yayin-oncesi — taban ölçüldü, on izleme koşusu temiz'
 const YENI = '2026-10-27T10:00:00.000Z'
 
 let dizin = ''
@@ -49,13 +50,19 @@ beforeAll(() => {
   }
   const db = new DatabaseSync(dbYolu)
   db.exec('create table kanban_boards (id text primary key, payload text, revision integer, updated_at text)')
-  const kart = (id: string, baslik: string, description: string) => ({ id, title: baslik, description, columnId: 'in-progress', createdAt: YENI })
+  const kart = (id: string, baslik: string, description: string, labels: string[] = []) => ({ id, title: baslik, description, columnId: 'in-progress', createdAt: YENI, labels })
   db.prepare('insert into kanban_boards values (?,?,?,?)').run(
     'p1',
     JSON.stringify({
       id: 'p1',
       title: 'VentHub TEST',
-      tasks: [kart('tam', 'ARC-901 · tam plan', TAM_PLAN), kart('eksik', 'ARC-902 · eksik plan', EKSIK_PLAN), kart('plansiz', 'ARC-903 · plansız', PLANSIZ)],
+      tasks: [
+        kart('tam', 'ARC-901 · tam plan', TAM_PLAN),
+        kart('eksik', 'ARC-902 · eksik plan', EKSIK_PLAN),
+        kart('plansiz', 'ARC-903 · plansız', PLANSIZ),
+        kart('olcumsuz', 'ARC-905 · yayın', PLANSIZ, ['olcum-yayin-oncesi']),
+        kart('olcumlu', 'ARC-906 · yayın', `${PLANSIZ}\n${OLCUM_SATIRI}`, ['olcum-yayin-oncesi']),
+      ],
     }),
     1,
     '2026-10-27',
@@ -109,6 +116,14 @@ function senaryolar(kancaYolu: string): string[] {
   dogru(sessiz(calistir(kancaYolu, acilis(PLANSIZ))), 'add_task: PLAN başlığı olmayan açıklama sessiz olmalı')
   dogru(sessiz(calistir(kancaYolu, acilis(TAM_PLAN))), 'add_task: tam PLAN sessiz olmalı')
 
+  // ARC-230: kart sınıfı ölçüm satırı (olcum-<ad> etiketi); PLAN başlığı gerekmez
+  const olcumsuz = calistir(kancaYolu, reviewTasi('olcumsuz'))
+  dogru(olcumsuz.status === 0 && /ÖLÇÜM UYARI/.test(baglam(olcumsuz)) && /ARC-905/.test(baglam(olcumsuz)), 'etiketli kartta ÖLÇÜM satırı yoksa Review geçişinde uyarmalı')
+  dogru(sessiz(calistir(kancaYolu, reviewTasi('olcumlu'))), 'ÖLÇÜM satırı tam kart sessiz olmalı')
+  const acOlcumsuz = calistir(kancaYolu, arac({ action: 'add_task', title: 'ARC-907 · yayın', description: PLANSIZ, labels: ['olcum-yayin-oncesi'] }))
+  dogru(/ÖLÇÜM UYARI/.test(baglam(acOlcumsuz)), 'add_task: etiketli kartta ÖLÇÜM satırı yoksa açılışta uyarmalı')
+  dogru(sessiz(calistir(kancaYolu, arac({ action: 'add_task', title: 'ARC-908 · yayın', description: `${PLANSIZ}\n${OLCUM_SATIRI}`, labels: ['olcum-yayin-oncesi'] }))), 'add_task: ÖLÇÜM satırı tam kart sessiz olmalı')
+
   dogru(sessiz(calistir(kancaYolu, reviewTasi('eksik'), { VENTHUB_KART_PLAN_BAGI_KAPALI: '1' })), 'vana kapatmalı')
   dogru(sessiz(calistir(kancaYolu, reviewTasi('eksik'), { VENTHUB_KANBAN_DB: path.join(dizin, 'yok.sqlite') })), 'fail-open: veritabanı yoksa sessiz')
   dogru(sessiz(calistir(kancaYolu, reviewTasi('yok-boyle-kart'))), 'fail-open: bilinmeyen kart sessiz')
@@ -138,6 +153,9 @@ describe('INV-KANCA-KART-PLAN-BAGI-1 · SABOTAJ: kancaya konan her tek hata en a
     ['add_task kolu kaldırıldı', "t.action === 'add_task'", "t.action === 'add_task_kapali'"],
     ['vana yok sayılır', "process.env[VANA] === '1'", 'false'],
     ['kanca reddeder', "hookEventName: 'PreToolUse', additionalContext", "hookEventName: 'PreToolUse', permissionDecision: 'deny', additionalContext"],
+    ['etiketler okunmaz (Review yolunda sınıf tanınmaz)', "etiketler: etiketCoz(satir.etiketler)", 'etiketler: []'],
+    ['add_task etiketleri yok sayılır', "etiketler = Array.isArray(t.labels) ? t.labels.map(String) : []", 'etiketler = []'],
+    ['ÖLÇÜM uyarısı hiç üretilmez', "return [`KART ÖLÇÜM UYARI (ARC-230;", "return []; [`KART ÖLÇÜM UYARI (ARC-230;"],
     ['okunamayan kart sessiz geçmez', 'if (!k) return', 'if (!k) { fs.writeSync(1, "kart yok\\n"); return }'],
   ]
 
