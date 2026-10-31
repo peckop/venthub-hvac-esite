@@ -52,7 +52,7 @@ Her biletin **engelleyen biletleri** yazılır; engelleyeni olmayan hemen başla
 Önerilen dökümü numaralı liste olarak göster. Her bilet için: **Başlık**, **Engelleyen** biletler, **Neyi teslim ediyor** (uçtan uca davranış). Sonra **tek soruyla, tek öneriyle** sor (bir turda bir soru): önce ayrıntı düzeyi (çok kaba / çok ince), onay gelince engelleme kenarları, sonra birleştirme/bölme. Recep'e giden soru tek önerili ve numaralıdır; döküm onaylanana kadar yinele.
 
 ### 5. Kartları aç
-Onaylanan biletleri **kendi departman panonda, engelleyenler önce** olacak sırayla Kanban kartı olarak aç. Numara pano sayacından gelir, uydurulmaz (`<ÖN EK>-<sayı>`). Her kartın açıklaması `docs/standards/is-kayit-duzeni-standard.md` ve `filo-ortak.md` "İş ve kart" kurallarındaki PLAN biçimindedir:
+Onaylanan biletleri **kendi departman panonda, engelleyenler önce** olacak sırayla Kanban kartı olarak aç. Numara pano sayacından gelir, uydurulmaz (`<ÖN EK>-<sayı>`). Her kartın açıklaması `docs/standards/kart-plani-standard.md` "Kart gövdesi alanları" bölümündeki alan listesine uyar (tek yer; ayrıca `filo-ortak.md` "İş ve kart"). Özet:
 
 - **KAYNAK/CETVEL:** yöneten cetvel dosya adı, yoksa "cetvel yok, yazımı bu işin kapsamında".
 - **ÖNCEKİ ÇALIŞMA:** Kanban, git geçmişi, `docs/plans` ve `docs/audits`, sage, Linear arşivi aranarak; ifadesiz "yok" yazma.
