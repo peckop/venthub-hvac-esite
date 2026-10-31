@@ -22,7 +22,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 ## İş ve kart
 
-- Her iş bir Kanban kartıdır; numara `<ÖN EK>-<sayı>` biçimindedir (`OPS-101`; Linear'dan taşınan kartta `REC-nn`). Numara pano sayacından alınır, uydurulmaz.
+- Her iş bir Kanban kartıdır; numara `<ÖN EK>-<sayı>` biçimindedir (`OPS-101`; Linear'dan taşınan kartta `REC-nn`). Numara pano sayacından alınır, uydurulmaz. Kartsız iş başlatma.
 - Emri alan müdür kartı kendi panosunda aynı turda aç ve kart numarasını emri verene dön; numarasız emri kabul etme.
 - Her emirde `YÖNTEM:` satırını (önerilen yöntem ve bir cümle gerekçe) ve `KAYNAK/CETVEL:` satırını oku; ikisi yoksa emri eksik say.
 - Emir rol kartındaki Görev satırının dışındaysa ya da "Görev değil" satırına giriyorsa işe başlama; OPS'a "görev dışı: <hangi satır>" diye tek satır dön.
@@ -39,7 +39,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`).
 - Recep'in onayladığı işi bekletmek için ölçülmüş engel gerekir; karta "ölçüldü mü?" satırı yazılır.
 - Önce Claude Code'un yerleşik karşılığını ara; genel inceleme ve sadeleştirmede önce yerleşik `/code-review` ve `/simplify`, ödeme, auth, RLS ya da webhook koduna dokunan farkta ayrıca `security-reviewer` ajanı. Mevcut code-review, diff-review, security-scanner, refactor-planner yetenekleri silinmez, VentHub'a özel kontrol için kalır.
-- Dış araç kararı dört kapılıdır: ihtiyaç, örtüşme, deneme, benimseme; her kapıda dur ya da devam (arac-envanteri-standard.md).
+- Dış araç kararı dört kapılıdır: ihtiyaç 5 dk, örtüşme 10 dk, deneme 30 dk, benimseme; her kapıda dur ya da devam (arac-envanteri-standard.md).
 - İyileştirme hakkı: kendi alanındaki iyileştirmeyi OPS'a tek mesajla öner (ne, kazanç, bedel); onay gelmeden uygulanmaz. Cuma çürütücü haftayı kart ve kurallara karşı okur, en çok 3 öneri OPS'a gider. Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer.
 
 ## Recep ile iletişim
@@ -69,7 +69,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 ## Test ve bellek
 
 - Yerelde yalnız `pnpm test:ilgili` koş; seçici TAM derse hiçbir test koşmaz, CI koşar. Değişen test dosyalarını `pnpm vitest <dosya> --run` ile ekle. Tam paket, type-check ve build yerelde koşturulmaz.
-- PR açınca `mcp__ccd_pr__bind_pr` ile PR'ı asıl PR olarak bağla (pencere tek PR'ı izler); CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok). CI yeşili için bildirim GELMEZ (uyandırma yalnız hata, çakışma, yorum; auto_fix kapalı): yeşil gerekirse `get_status` ya da `gh pr view` ile TEK SEFERLİK oku, ya da OPS dürter.
+- PR açınca `mcp__ccd_pr__bind_pr` ile PR'ı asıl PR olarak bağla; CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok). CI yeşili için bildirim GELMEZ: yeşil gerekirse `get_status` ya da `gh pr view` ile TEK SEFERLİK oku, ya da OPS dürter.
 - Site koduyla ilgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
 - Durum satırında BELLEK uyarısı varsa (boş bellek 2 GB altı, tek süreç 3 GB üstü) tam vitest, tsc, `next build`, `pnpm install`, Docker gibi ağır komut başlatma; OPS'a yaz.
 
