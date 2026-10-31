@@ -1,0 +1,57 @@
+{
+  "_aciklama": "HRT-78 (ARC-216 B kolu isteği): kart sınıfına göre zorunlu ÖLÇÜM satırı kural verisi. Okuyan: scripts/belge/kart-plan-kapisi.cjs olcumEksikleri(); kancadaki bağı ARAÇ ekler. Yeni kart biçimine PLAN başlığı zorunluluğu GETİRMEZ (ARC-220 gürültüsü geri gelmez).",
+  "satirBicimi": "ÖLÇÜM: <ad> — <ölçülen sonuç ya da: gerekmez: <sebep>>",
+  "asgariSonucKarakter": 8,
+  "tanimaOzeti": "Sınıf iki yoldan tanınır: (1) kartta `olcum-<ad>` etiketi (kesin, geniş sınıflar yalnız bununla); (2) yalnız BAŞLIKTA dar anahtar sözcük (açıklamada aranmaz: kuralı konu eden kartlar yanlış eşleşmesin). 27 Ekim ölçümü: 1362 kartta başlık eşleşmesi adres-matrisi 1, bayrak-kiyas 1, kare-kabul 2, veri-cikarim 0; açıklamada aranınca yayin-oncesi 71 ve yazim-sonrasi 48 kart çıktığı için bu ikisi yalnız etiketle.",
+  "siniflar": [
+    {
+      "ad": "yayin-oncesi",
+      "rol": "GEO-SEO",
+      "gorevBasi": "Yayın öncesi liste",
+      "etiket": "olcum-yayin-oncesi",
+      "baslikKalibi": null,
+      "ne": "Adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2)"
+    },
+    {
+      "ad": "adres-matrisi",
+      "rol": "ALTYAPI",
+      "gorevBasi": "Canlı adres matrisi",
+      "etiket": "olcum-adres-matrisi",
+      "baslikKalibi": "adres matris|anahtar acil|canli adres",
+      "ne": "Yayın ya da anahtar açılışı sonrası canlıda her adresin son durumu ve sıçrama sayısı"
+    },
+    {
+      "ad": "bayrak-kiyas",
+      "rol": "TASARIM",
+      "gorevBasi": "Yeni görünüm bayrağını",
+      "etiket": "olcum-bayrak-kiyas",
+      "baslikKalibi": "yeni_gorunum|yeni gorunum bayrag|font preload|yazi tipi degis",
+      "ne": "Bayrak AÇIK geçici dal ile KAPALI dalı kıyasla: erişilebilirlik tabanı, font preload sayımı, admin ekranı yazı tipi aynı"
+    },
+    {
+      "ad": "kare-kabul",
+      "rol": "TASARIM",
+      "gorevBasi": "Yapılan ekranı Design karesiyle",
+      "etiket": "olcum-kare-kabul",
+      "baslikKalibi": "kare kabul|design karesi|karesiyle",
+      "ne": "Yapılan ekran Design karesiyle yan yana ölçülür (skill venthub-tasarim-dili)"
+    },
+    {
+      "ad": "veri-cikarim",
+      "rol": "KATALOG",
+      "gorevBasi": "Veri çıkarım kapısı",
+      "etiket": "olcum-veri-cikarim",
+      "baslikKalibi": "veri cikarim|veri_cikarim|design teslim",
+      "ne": "Design'ın teslim ettiği CSV kaynağa karşı doğrulanır (veri_cikarim_kapisi.py --csv)"
+    },
+    {
+      "ad": "yazim-sonrasi",
+      "rol": "KATALOG",
+      "gorevBasi": "Yazım sonrası canlı sayfa ölçümü",
+      "etiket": "olcum-yazim-sonrasi",
+      "baslikKalibi": null,
+      "ne": "OPS canlı yazımı bitirince yazılan değerin sayfada göründüğünü ölç (sunucu HTML veri yükü, tarayıcıda model seçimi)"
+    }
+  ],
+  "kapsamDisi": "Yedinci kart-kapisi görevi (HARITA, Kart plan kapısı) bağı #2110 ile kuruldu; ÖLÇÜM satırı istemez."
+}
