@@ -910,7 +910,7 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
   it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı (HRT-80: haftalık bağlı)', () => {
     const g = gercek['GEO-SEO'].gorevler
     const ara = (s: string) => g.find((x) => x.siklik === s)
-    expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'hayir' })
+    expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'evet' })
     expect(ara('her-dagitim-gunluk')?.tetikAyrinti).toMatch(/günlük schedule/)
     expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', bagli: 'evet' })
     expect(ara('haftalik')?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
@@ -969,7 +969,9 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
 
   it('AYIRT EDİCİLİK: iş akışı komutu çağırmaya başlayınca "bağlı: hayır" kaydı bayat sayılır', () => {
     const sahte = [`jobs:\n  canli:\n    steps:\n      - run: node scripts/seo/canli-kapi.mjs --taban https://venthub.com.tr`]
-    expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, sahte).join('\n')).toMatch(/bağlı: evet yazılmalı \(kayıt bayat\)/)
+    const v = kopya()
+    Object.assign(v['GEO-SEO'].gorevler[0], { bagli: 'hayir', tetikAyrinti: '.github/workflows/canli-kapi.yml' })
+    expect(uretici.gorevSorunlari(v, roller, varMi, oku, sahte).join('\n')).toMatch(/bağlı: evet yazılmalı \(kayıt bayat\)/)
   })
 
   it('AYIRT EDİCİLİK: geçersiz alan, bilinmeyen rol, eksik kuracak rol, uzun amaç, taslak eşik, yok komut ve çift görev yakalanır', () => {
@@ -982,7 +984,7 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(s((v) => (v['GEO-SEO'].gorevler[0].tetik = 'elle'))).toMatch(/tetik geçersiz/)
     expect(s((v) => (v['GEO-SEO'].gorevler[0].bagli = 'belki'))).toMatch(/bağlı alanı geçersiz/)
     expect(s((v) => (v.OLMAYANROL = v['GEO-SEO']))).toMatch(/OLMAYANROL: bilinmeyen rol/)
-    expect(s((v) => delete v['GEO-SEO'].gorevler[0].baglayacak)).toMatch(/kuracak rol/)
+    expect(s((v) => delete v['GEO-SEO'].gorevler[1].baglayacak)).toMatch(/kuracak rol/)
     expect(s((v) => (v['GEO-SEO'].amac = 'a'.repeat(uretici.AMAC_SINIRI + 1)))).toMatch(/amaç .* aşıyor/)
     expect(s((v) => (v['GEO-SEO'].gorevler[1].esik = 'Eşik belli'))).toMatch(/TASLAK ile başlamalı/)
     expect(s((v) => (v['GEO-SEO'].gorevler[0].komut = 'scripts/seo/yok.mjs'))).toMatch(/komut dosyası yok/)

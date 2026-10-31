@@ -10,8 +10,8 @@
           "komut": "scripts/seo/canli-kapi.mjs",
           "siklik": "her-dagitim-gunluk",
           "tetik": "actions",
-          "tetikAyrinti": ".github/workflows altında workflow_run (başarılı production dağıtımı) + günlük schedule; karar 260 ve 261, iskelet ARC-26 (iş akışı sahibi ARAÇ), kontrol içeriği SEO-15",
-          "bagli": "hayir",
+          "tetikAyrinti": ".github/workflows/canli-kapi.yml workflow_run (başarılı production dağıtımı) + günlük schedule; karar 260 ve 261, iskelet ARC-26 (iş akışı sahibi ARAÇ), kontrol içeriği SEO-15",
+          "bagli": "evet",
           "baglayacak": "ARAC",
           "cikti": "Her yeni KIRMIZI için ilgili Kanban kartı (bilinen kırmızılar --bilinen ile kart numarasıyla taşınır)",
           "esik": "Yeni KIRMIZI 0 (cetvel Y3)"
