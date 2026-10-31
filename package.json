@@ -100,7 +100,7 @@
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-tailwindcss": "^3.18.3",
     "eslint-plugin-unused-imports": "^4.4.1",
-    "fallow": "^2.88.3",
+    "fallow": "^3.34.0",
     "globals": "^17.13.0",
     "happy-dom": "^20.14.6",
     "jiti": "^2.7.0",
