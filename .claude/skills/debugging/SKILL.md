@@ -238,6 +238,21 @@ gömebilir. Kurallar:
 Üretilemezse Kural 1 geçerlidir: üretim koduna dokunulmaz, rapor neyin denendiğini yazar. Canlı ortamda deneme yasağı
 (VentHub ek kuralı 1) bu ağacın her dalı için de geçerlidir: yalnız okuma ve yerel/yalıtılmış kanıt.
 
+## Sıkı geri besleme döngüsü ve disiplin (VentHub uyarlaması)
+
+Zor hatanın asıl işi **sıkı bir geçti/kaldı sinyali** kurmaktır: hatanın *bu* hatada kırmızıya düştüğü bir sinyal varsa neden bulunur; bisect, hipotez ve araç koyma hep onu tüketir. Yoksa koda bakmak kurtarmaz. Çabanın büyük kısmı burada harcanır.
+
+- **Faz 1 bitti sayılır** yalnız şunlar sağlanınca: tek bir komut (test çağrısı, betik yolu, curl) var, **en az bir kez koşuldu** (komut ve sansürlenmiş çıktı gösterilir) ve o komut (a) kullanıcının tam belirtisini sınar, yani bu hatada kırmızıya düşebilir ("hatasız çalışıyor" değil); (b) her koşuda aynı hükmü verir (kararsız hatada yeniden üretim oranı sabitlenmiş ve yüksek); (c) saniyeler sürer; (d) gözetimsiz koşar. Bu komut yokken kod okuyup kuram kurmak bu skill'in önlemeye çalıştığı hatadır. Sinyal kurulamıyorsa dur, neyi denediğini yaz ve kullanıcıdan ortama erişim, sansürlü bir kayıt (HAR, günlük, çökme dökümü) ya da geçici üretim ölçümü iste; döngüsüz hipoteze geçme.
+- **Küçült.** Kırmızı olunca yeniden üretimi hâlâ kırmızı kalan en küçük senaryoya indir: girdi, çağıran, yapılandırma, veri ve adımları teker teker çıkar, her çıkarmadan sonra koş. Kalan her öğe yük taşıyıcı olmalı (birini çıkarmak yeşile döndürüyor).
+- **3-5 sıralı hipotez, sınamadan önce**, hepsi yanlışlanabilir ve tahmini yazılı ("X neden ise Y'yi değiştirmek hatayı yok eder"). Tahmini yazılamayan hipotez sezgidir: at ya da keskinleştir. Sıralı listeyi sınamadan önce göster; kullanıcının alan bilgisi sırayı hemen değiştirebilir. Beklemeyi gerektirmez, yoksa kendi sıranla sürdür.
+- **Araç koyma:** her prob bir tahmine bağlı, bir seferde tek değişken; önce hata ayıklayıcı, sonra sınır noktalarında hedefli günlük, asla "her şeyi logla sonra grep". Her geçici günlük benzersiz önekle etiketlenir (`[DEBUG-a4f2]`), temizlik tek grep olur. Başarım gerilemesinde günlük yanlış araçtır: önce taban ölçüm, sonra bisect.
+- **Doğru dikiş yoksa bu bir bulgudur.** Regresyon testi, hatanın çağrı noktasında gerçek örüntüyle oluştuğu bir dikişte yazılır; tek çağıranlı yüzeysel dikişte yazılan test yanlış güven verir. Doğru dikiş yoksa bunu yaz, mimari hatanın kilitlenmesini engelliyor demektir. Zorlayarak kırmızı yaptıysan (kod/fikstür bozarak) bozmanın gerçekten uygulandığını temiz kopyayla `diff` ile göster.
+- **Sansür.** Gösterdiğin komut, çıktı ve yakalanan kayıtlarda her sır önce `<REDACTED>` ile değişir; döngüyü sırrı ortam değişkeninde tutacak biçimde kur. Yakalanan kayıtlarda yalnız sinyali taşıyan satırları alıntıla (yetki başlıkları taşırlar).
+- **Kapanış kontrolü:** özgün yeniden üretim artık üretmiyor, regresyon testi geçiyor (ya da dikiş yokluğu yazılı), tüm `[DEBUG-...]` önekli kod silinmiş, geçici prototipler silinmiş ya da açıkça işaretli bir yere taşınmış, doğru çıkan hipotez commit/PR iletisinde yazılı.
+- **Daraltma:** yukarıdaki maddeler bu skill'in "Reproduce before fixing" ve "Proof-grade reproduction" bölümlerini ÖNCELEYEN sıkılaştırmadır; çakıştıkları yerde sıkı olan kazanır. (Mevcut bölümlerden satır silinmedi; tekrarın temizliği bir sonraki skill gövdesi bakımında, bu işin kapsamı dışında.)
+
+Kaynak: mattpocock/skills diagnosing-bugs @5beb35b0.
+
 ## Skills in scope
 
 - `testing` — for the regression test that pins the fix
