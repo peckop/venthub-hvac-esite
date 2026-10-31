@@ -84,6 +84,8 @@ describe('INV-AGIR-KILIT-1: hangi komut ağır sayılır', () => {
     ['pnpm build', 'build'],
     ['next build', 'build'],
     ['pnpm install --frozen-lockfile --offline', 'install'],
+    // ALT-120: karar 88 tarifi (worktree kurulumu) da kilit sınıfına girer.
+    ['pnpm install --frozen-lockfile --prefer-offline', 'install'],
     ['pnpm add -D foo', 'install'],
     ['pnpm test -- --run', 'tam test'],
     ['pnpm vitest run', 'tam test'],

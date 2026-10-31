@@ -12,7 +12,7 @@
  *      Kaynak YEREL daldır (push edilmemiş iş ön izlenebilir; yalnız commit'li değişiklikler görünür), ANCAK yerel dal
  *      origin'in gerisindeyse origin alınır (ölçüldü: ana deponun yerel master'ı origin'in gerisinde kalıyor ve eski
  *      kod ön izlenirdi). Yerelde yoksa origin. Dalın sahibinin ağacına ve dalına dokunulmaz.
- *   2. `pnpm install --frozen-lockfile --offline` (karar 88: her ağaç kendi kurulumu; bağlantı YOK).
+ *   2. `pnpm install --frozen-lockfile --prefer-offline` (karar 88: her ağaç kendi kurulumu; bağlantı YOK).
  *   3. `next build` + `next start -p <port>`. Aynı commit + aynı kip ile 12 saat içinde derlenmişse derleme KORUNUR.
  *
  * --adres KİPİ (ALT-37c; Cuma ADRES önizlemesi, karar 68): yeni adres şemasını YALNIZ bu ön izleme ağacında açar.
@@ -296,7 +296,7 @@ async function ana(argv) {
   if (adres) surecOrtami.NEXT_PUBLIC_ADRES_DILI = '1' // derleme sabiti; izin listesine EKLENMEZ, yalnız bu kipte sürece verilir
   const secenek = { cwd: ONIZLEME_AGACI, env: surecOrtami }
 
-  kos('pnpm', ['install', '--frozen-lockfile', '--offline'], secenek)
+  kos('pnpm', ['install', '--frozen-lockfile', '--prefer-offline'], secenek)
 
   // `.next` kipler arasında paylaşılır: iz, derlemenin HANGİ commit ve HANGİ kiple yapıldığını söyler.
   const beklenen = { commit, adres, yamaOzeti: adres ? yamaOzeti() : '' }

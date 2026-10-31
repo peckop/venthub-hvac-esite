@@ -51,7 +51,7 @@ Kapsam somut dosya yollarına eşlenmiyorsa ("testler", "hepsi") dur: hafif bir 
 
 ```
 git worktree add C:/tmp/vh-mut-<slug> -b mut/<slug> origin/master
-cd C:/tmp/vh-mut-<slug> && pnpm install --frozen-lockfile --offline
+cd C:/tmp/vh-mut-<slug> && pnpm install --frozen-lockfile --prefer-offline
 node .claude/skills/mutasyon-testi/mutasyon-kosucu.cjs --repo C:/tmp/vh-mut-<slug> --plan scratch/mutasyon/<slug>/plan.json --out scratch/mutasyon/<slug>/taban.json --taban
 ```
 
