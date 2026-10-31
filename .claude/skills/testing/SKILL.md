@@ -227,6 +227,21 @@ uygulayıcıdır (dosya yazar), görev metninde "açık PR dalına push yok" yaz
 **Koşu komutu.** Yerelde tam paket koşulmaz: `pnpm test:ilgili` ve değişen test dosyası için `pnpm exec vitest run <yol>`; tam paket CI'dadır.
 CI kırmızıyken "yerelde geçti" kanıt değildir, ama kırmızıyı kapatmak için eşiği düşürmek ya da `.skip` koymak da çözüm değildir.
 
+## Dikiş, tautolojik test, dikey dilim (VentHub uyarlaması)
+
+**Alan dili için önce `docs/README.md`.** Test adları ve arayüz sözcükleri projenin alan diliyle eşleşsin diye dokunulan alanın cetveli ve haritası okunur (kaynaktaki `GLOSSARY.md`/`CONTEXT.md` bizde yok, `CONTEXT.md` emekli); dokunulan alandaki karar belgelerine uyulur.
+
+**Test yalnız önceden kararlaştırılmış dikişlerde yazılır.** Dikiş (seam), davranışı içeri girmeden gözlediğin genel arayüzdür (tanım: `codebase-navigation` "Kod tasarımı sözlüğü"). Teste başlamadan önce sınanacak dikişleri yaz, işi veren/kullanıcıyla netleştir; onaylanmamış dikişte test yazılmaz. Her önerilen dikişe tek satır: neyi yakalar, neyi kaçırır. Her uç durumu sınamak mümkün değil; dikişleri baştan anlaşmak çabayı kritik yollara ve karmaşık mantığa yöneltir. Arayüzün şekli tartışmalıysa (modül ne kadar derin, dikiş nerede) önce tasarım sözlüğüne bak. Bizde dikişin tipik yeri `src/lib/services/*` fonksiyonlarının arayüzüdür (kural 2: ilk parametre `supabase`).
+
+**Üç kötü örüntü:**
+- **Uygulamaya bağlı:** iç işbirlikçileri taklit eder, özel yöntemi sınar ya da yan kanaldan doğrular (arayüz yerine doğrudan veritabanını sorgulamak). Kokusu: davranış değişmediği hâlde yeniden düzenlemede kırılır.
+- **Totolojik:** beklenen değeri kodun yaptığı gibi yeniden hesaplar (`expect(topla(a, b)).toBe(a + b)`, aynı yolla elle türetilmiş anlık görüntü, kendine eşit sabit); yapı gereği geçer ve kodla asla çelişemez. Beklenen değer bağımsız bir kaynaktan gelir: bilinen doğru bir sabit, çözülmüş bir örnek, spec. Bizde fiyat/vergi/yuvarlama testlerinde beklenen değer koddaki formülden değil, elle çözülmüş sabit bir örnekten alınır (kaynak: `docs/standards/pricing-standard.md` kuralları).
+- **Yatay dilimleme:** önce bütün testleri, sonra bütün kodu yazmak. Toplu testler *hayal edilen* davranışı sınar, gerçek değişikliğe duyarsızlaşır ve gövdeyi anlamadan test yapısına bağlanır. Bunun yerine **dikey dilim**: bir test → bir uygulama → tekrar; her test bir izleyici mermi gibi bir önceki turun öğrettiğine yanıt verir.
+
+**Döngü kuralları:** önce kırmızı, sonra yeşil (yalnız geçecek kadar kod; ileride gelecek testi ya da spekülatif özelliği önceden yazma); her turda bir dikiş, bir test, bir en küçük uygulama; yeniden düzenleme döngünün parçası değildir, inceleme aşamasına aittir (`code-review`).
+
+Kaynak: mattpocock/skills tdd @5beb35b0.
+
 ## Skills in scope
 
 - `debugging` — when a failing test's cause is unknown

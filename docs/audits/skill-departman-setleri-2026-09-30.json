@@ -27,7 +27,7 @@
    "adiylaCagir": [
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     },
     {
      "ad": "web-platform-baseline",
@@ -73,11 +73,11 @@
     },
     {
      "ad": "testing",
-     "kb": 12.2
+     "kb": 17
     },
     {
      "ad": "debugging",
-     "kb": 13
+     "kb": 18.9
     },
     {
      "ad": "react-modern",
@@ -169,7 +169,7 @@
    "adiylaCagir": [
     {
      "ad": "code-review",
-     "kb": 12.8
+     "kb": 15.7
     }
    ],
    "bekleyen": [
@@ -207,7 +207,7 @@
     },
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     },
     {
      "ad": "tech-stack",
@@ -228,7 +228,7 @@
     },
     {
      "ad": "testing",
-     "kb": 12.2,
+     "kb": 17,
      "kaynak": "yetenek"
     }
    ],
@@ -236,7 +236,7 @@
    "adiylaCagir": [
     {
      "ad": "debugging",
-     "kb": 13
+     "kb": 18.9
     },
     {
      "ad": "node-modern",
@@ -314,7 +314,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "kaynak": "yetenek"
     }
    ],
@@ -367,7 +367,7 @@
     },
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     },
     {
      "ad": "tech-stack",
@@ -456,7 +456,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "kaynak": "yetenek"
     }
    ],
@@ -549,7 +549,7 @@
    "adiylaCagir": [
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     }
    ],
    "bekleyen": []
@@ -566,7 +566,7 @@
     },
     {
      "ad": "testing",
-     "kb": 12.2,
+     "kb": 17,
      "kaynak": "yetenek"
     }
    ],
@@ -579,7 +579,7 @@
     },
     {
      "ad": "debugging",
-     "kb": 13
+     "kb": 18.9
     },
     {
      "ad": "typescript-strict",
@@ -665,7 +665,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "kaynak": "yetenek"
     }
    ],
@@ -777,7 +777,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "kaynak": "yetenek"
     }
    ],
@@ -813,7 +813,7 @@
     },
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     }
    ],
    "bekleyen": []
@@ -881,7 +881,7 @@
    "adiylaCagir": [
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     },
     {
      "ad": "web-platform-baseline",
@@ -902,7 +902,7 @@
     },
     {
      "ad": "testing",
-     "kb": 12.2,
+     "kb": 17,
      "kaynak": "yetenek"
     }
    ],
@@ -910,7 +910,7 @@
    "adiylaCagir": [
     {
      "ad": "debugging",
-     "kb": 13
+     "kb": 18.9
     },
     {
      "ad": "incremental-implementation",
@@ -964,7 +964,7 @@
    "adiylaCagir": [
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "uyari": "35 KB set bütçesi (YTN-18, 1.1.0 gövdesi büyüdü): ön yüklenmez, görev metninde adı yazılır"
     }
    ],
@@ -989,7 +989,7 @@
     },
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     }
    ],
    "bekleyen": [
@@ -1063,7 +1063,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "kaynak": "yetenek"
     }
    ],
@@ -1150,7 +1150,7 @@
    "adiylaCagir": [
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     }
    ],
    "bekleyen": []
@@ -1227,7 +1227,7 @@
     },
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     }
    ],
    "bekleyen": [
@@ -1249,7 +1249,7 @@
     },
     {
      "ad": "testing",
-     "kb": 12.2,
+     "kb": 17,
      "kaynak": "yetenek"
     }
    ],
@@ -1262,7 +1262,7 @@
     },
     {
      "ad": "debugging",
-     "kb": 13
+     "kb": 18.9
     },
     {
      "ad": "typescript-strict",
@@ -1342,7 +1342,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8,
+     "kb": 15.7,
      "kaynak": "yetenek"
     }
    ],
@@ -1492,7 +1492,7 @@
    "adiylaCagir": [
     {
      "ad": "codebase-navigation",
-     "kb": 9
+     "kb": 11.9
     },
     {
      "ad": "web-platform-baseline",
@@ -1538,11 +1538,11 @@
     },
     {
      "ad": "testing",
-     "kb": 12.2
+     "kb": 17
     },
     {
      "ad": "debugging",
-     "kb": 13
+     "kb": 18.9
     },
     {
      "ad": "react-modern",
@@ -1630,7 +1630,7 @@
     },
     {
      "ad": "code-review",
-     "kb": 12.8
+     "kb": 15.7
     },
     {
      "ad": "web-performance",

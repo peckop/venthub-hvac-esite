@@ -44,6 +44,24 @@ describe('INV-DENETIM-MODEL-1 · denetim işleri Opus', () => {
     expect(b).not.toHaveProperty('tools')
   })
 
+  // HRT-79 (YTN-22, agnix CC-AG-007): düz YAML değerinde ": " ayrıştırmayı bozar ("mapping values are not allowed"); denetim-opus açıklaması `context: fork` anıyordu.
+  it('HRT-79: hiçbir ajan tanımında düz (tırnaksız) frontmatter değeri ": " içermez', () => {
+    const bozuk: string[] = []
+    for (const ad of fs.readdirSync(AJANLAR).filter((f) => f.endsWith('.md'))) {
+      const s = fs.readFileSync(path.join(AJANLAR, ad), 'utf8').replace(/\r\n/g, '\n')
+      const m = s.match(/^---\n([\s\S]*?)\n---/)
+      if (!m) continue
+      for (const satir of m[1].split('\n')) {
+        const k = satir.match(/^([A-Za-z][\w-]*):[ \t]+(.+)$/)
+        if (!k) continue
+        const deger = k[2].trim()
+        if (/^["'>|[{]/.test(deger)) continue // tırnaklı, blok ya da akış değeri
+        if (/:\s/.test(deger)) bozuk.push(`${ad}: ${k[1]}`)
+      }
+    }
+    expect(bozuk, 'düz değerde ": " var; çift tırnağa al').toEqual([])
+  })
+
   it.each(DENETIM_YETENEKLERI)('%s: context: fork + agent: denetim-opus', (ad) => {
     const b = yetenek(ad)
     expect(b.context).toBe('fork')
