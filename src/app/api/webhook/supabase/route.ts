@@ -15,6 +15,7 @@ import { AZAMI_ZINCIR_DERINLIGI } from '@/lib/data/kategoriZinciri'
 import { SATIS_KIPI_TAG } from '@/lib/kip/satisKipi'
 import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import { imzaDogrula, imzaTekrariMi } from '@/lib/webhook/imza'
 // Yalnız `type` import eden saf yardımcı (React/i18n/client bağımlılığı YOK — ölçüldü),
 // bu yüzden route handler'da güvenle kullanılır.
 import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
@@ -296,7 +297,9 @@ async function revalidateCategoryTree(
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = (await request.json()) as SupabaseWebhookPayload
+    // ALT-76: imza HAM gövde üzerinden doğrulanır; gövde bir kez okunur, JSON olarak sonra çözülür.
+    const hamGovde = await request.text()
+    const payload = JSON.parse(hamGovde) as SupabaseWebhookPayload
     const webhookSecret = request.headers.get('x-webhook-secret')
 
     /**
@@ -332,7 +335,31 @@ export async function POST(request: NextRequest) {
       )
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
+    /**
+     * ALT-76 · HMAC-SHA256 imza + replay koruması (CLAUDE.md kural 11), GEÇİŞ AŞAMASI.
+     * İmza başlığı VARSA karar yalnız imzaya bağlıdır: geçersiz ya da pencere dışı imza,
+     * düz secret doğru olsa bile 401 alır (imzalı istek düz secret ile kurtarılamaz) ve aynı
+     * imzanın pencere içinde tekrarı da 401'dir. İmza YOKSA eski düz secret yolu sürer;
+     * veritabanı tetiği imza üretene kadar (ayrı migration, Recep onayı) bu yol açık kalır.
+     */
+    const simdiMs = Date.now()
+    const imzaSonucu = imzaDogrula({
+      secrets: acceptedSecrets,
+      zamanSn: request.headers.get('x-webhook-timestamp'),
+      imza: request.headers.get('x-webhook-signature'),
+      hamGovde,
+      simdiMs,
+    })
+    if (imzaSonucu === 'gecersiz' || imzaSonucu === 'bayat') {
+      console.warn(`Unauthorized Supabase webhook attempt blocked (imza: ${imzaSonucu}).`)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (imzaSonucu === 'gecerli') {
+      if (imzaTekrariMi(request.headers.get('x-webhook-signature') ?? '', simdiMs)) {
+        console.warn('Unauthorized Supabase webhook attempt blocked (imza tekrarı).')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    } else if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
       console.warn('Unauthorized Supabase webhook attempt blocked.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -533,8 +560,12 @@ export async function POST(request: NextRequest) {
           .limit(MAX_KATEGORI_COCUK + 1)
         if (cocukHatasi) {
           // Üstün kendi yolları, etiketler ve site haritası yine tazelenir; hata yanıt sonunda 500 ile bildirilir.
-          kategoriCocukHatasi = `categories çocuk sorgusu düştü (parent_id=${self.id}): ${cocukHatasi.message}`
-          console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+          // ALT-76: yanıta yalnız AŞAMA adı girer (genel mesaj); parent_id ve veritabanı hata metni
+          // yalnız sunucu günlüğüne yazılır, çağırana dönmez.
+          kategoriCocukHatasi = 'categories çocuk sorgusu düştü'
+          console.error(
+            `[Supabase Webhook] ${kategoriCocukHatasi} (parent_id=${self.id}): ${cocukHatasi.message}`,
+          )
         }
         const cocuklar = children ?? []
         if (cocuklar.length > MAX_KATEGORI_COCUK) {
@@ -574,8 +605,10 @@ export async function POST(request: NextRequest) {
               .select('id, slug, metadata, parent_id')
               .eq('parent_id', child.id)
             if (torunHatasi) {
-              kategoriCocukHatasi = `categories torun sorgusu düştü (parent_id=${child.id}): ${torunHatasi.message}`
-              console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+              kategoriCocukHatasi = 'categories torun sorgusu düştü'
+              console.error(
+                `[Supabase Webhook] ${kategoriCocukHatasi} (parent_id=${child.id}): ${torunHatasi.message}`,
+              )
               continue
             }
             for (const torun of torunlar ?? []) {
