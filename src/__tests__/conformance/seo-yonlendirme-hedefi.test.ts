@@ -3,6 +3,12 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import tohumHam from '@/data/eski-adres-tohum.json'
+import { eskiAdresEsle } from '@/lib/adres/eslestirici'
+import { ESKI_ADRES_HARITASI } from '@/lib/adres/haritaKaynagi'
+import { tohumDogrula } from '@/lib/adres/tohum'
+import { modelAdresiCoz } from '@/utils/adresUret'
+
 /**
  * INV-YONLENDIRME-HEDEF-1 — Kalıcı yönlendirmenin hedefi BUGÜN de yaşayan bir adres olmalı.
  *
@@ -30,6 +36,11 @@ import { describe, expect, it } from 'vitest'
  * ⚠BU KAPININ SINIRI, ADIYLA: ağa çıkmaz, adresin canlıda 200 döndüğünü ÖLÇMEZ. Yalnız
  * yukarıda ölçülmüş kusur SINIFININ geri gelmesini engeller. Canlı doğrulama duman
  * kapısının ve yayın sonrası ölçümün işidir.
+ *
+ * FAZ 3-C (URN-85 2/2) — TAŞIYICI DEĞİŞTİ: `next.config.mjs`'teki 12 ürün/aile kuralı (6 Lineo çap + 6 eski
+ * ürün) KALKTI; tek taşıyıcıları eski adres haritasıdır (`src/data/eski-adres-tohum.json` → üretilmiş harita →
+ * middleware). Sınıf aynı kalır, ölçüldüğü yer genişler: `next.config` tarafı (bir ürün kuralı geri gelirse
+ * kapı canlıdır) + YENİ taşıyıcı (tohumdaki her eski adresin hedefi varyant slug'ı değil, yaşayan sayfa).
  */
 
 const KOK = path.resolve(__dirname, '../../..')
@@ -60,9 +71,12 @@ interface Kural {
   destination: string
 }
 
-/** `next.config.mjs`ten `source`/`destination` çiftlerini çıkarır (yorumsuz metinden). */
-function urunYonlendirmeleri(): Kural[] {
-  const kod = yorumsuz(fs.readFileSync(NEXT_CONFIG, 'utf8'))
+/**
+ * `next.config.mjs`ten `source`/`destination` çiftlerini çıkarır (yorumsuz metinden). `metin` verilmezse gerçek dosya
+ * okunur; sentetik metin çıkarıcının KÖR OLMADIĞINI kanıtlamak içindir (ÖN KOŞUL).
+ */
+function urunYonlendirmeleri(metin: string = fs.readFileSync(NEXT_CONFIG, 'utf8')): Kural[] {
+  const kod = yorumsuz(metin)
   const kurallar: Kural[] = []
   const desen = /source:\s*'([^']+)'\s*,\s*destination:\s*'([^']+)'/g
   let m: RegExpExecArray | null
@@ -73,12 +87,47 @@ function urunYonlendirmeleri(): Kural[] {
 }
 
 describe('INV-YONLENDIRME-HEDEF-1 — yönlendirme hedefi bugün de yaşamalı', () => {
-  it('ÖN KOŞUL — ürün yönlendirmesi GERÇEKTEN bulundu (boş evrende koşan kapı ölçüm değildir)', () => {
+  it('ÖN KOŞUL — evren boş DEĞİL: ayıklayıcı sentetik kuralı tanır ve ürün yönlendirmesi en az bir taşıyıcıda var (boş evrende koşan kapı ölçüm değildir)', () => {
+    // (a) Ayıklayıcı AYIRT EDER (yorum içindeki kural sayılmaz, ürün kuralı sayılır, kategori kuralı sayılmaz).
+    const sentetik = `
+      // { source: '/tr/products/yorumdaki-kural', destination: '/tr/products/x' },
+      { source: '/:lang(tr|en)/products/eski-urun-12345', destination: '/:lang/products/yeni-aile?sku=ABC-1', permanent: true },
+      { source: '/category/fanlar/:path*', destination: '/category/fans/:path*', permanent: true },
+    `
+    expect(urunYonlendirmeleri(sentetik)).toEqual([
+      { source: '/:lang(tr|en)/products/eski-urun-12345', destination: '/:lang/products/yeni-aile?sku=ABC-1' },
+    ])
+
+    // (b) Evren config'te boş olabilir (Faz 3-C) ama taşıyıcı boş olamaz: kurallar tohumda durur.
+    const tohum = tohumDogrula(tohumHam)
     expect(
-      urunYonlendirmeleri().length,
-      'next.config.mjs icinde /products/ yonlendirmesi bulunamadi — ayiklayici bozulmus olmali, ' +
-        'kapi bos evrende yesil kaliyor.'
+      urunYonlendirmeleri().length + tohum.urunler.length + tohum.aileler.length,
+      'next.config.mjs icinde /products/ yonlendirmesi yok VE tohum da bos — kapi bos evrende yesil kaliyor.'
     ).toBeGreaterThan(0)
+  })
+
+  it('YENİ TAŞIYICI — tohumdaki hiçbir eski adres VARYANT slug\'ına gitmez (hedef aile ya da yayındaki modelin sayfası)', () => {
+    const tohum = tohumDogrula(tohumHam)
+    const harita = ESKI_ADRES_HARITASI?.kiracilar[tohum.kiraci]
+    if (!harita) throw new Error('eski adres haritası bağlı değil ya da tohumun kiracısı haritada yok (BOŞ EVREN)')
+    const eskiler = [...tohum.urunler.map((u) => u.eski), ...tohum.aileler.map((a) => a.eski)]
+    expect(eskiler.length, 'BOŞ EVREN: tohumda eski ürün/aile adresi yok').toBeGreaterThan(0)
+
+    const kotu: string[] = []
+    for (const eski of eskiler) {
+      for (const dil of ['tr', 'en'] as const) {
+        const yol = `/${dil}/products/${eski}`
+        const s = eskiAdresEsle(harita, { yol, sku: null, dilTespit: () => dil })
+        if (!s) {
+          kotu.push(`${yol} -> haritada YOK (404)`)
+          continue
+        }
+        const son = s.hedef.split('?')[0].replace(/\/$/, '').split('/').pop() ?? ''
+        // Model adresi (`<metin>-p-<sku>`) yayındaki modelin SAYFASIDIR; bunun dışında varyant biçimi ölü uçtur.
+        if (modelAdresiCoz(son) === null && VARYANT_SLUG.test(son)) kotu.push(`${yol} -> ${s.hedef}`)
+      }
+    }
+    expect(kotu, 'Bir eski adresin hedefi VARYANT slug biciminde (varyant adresleri sayfa degildir).').toEqual([])
   })
 
   it('SABOTAJ HEDEFİ — hiçbir ürün yönlendirmesi VARYANT slug\'ına gitmez', () => {

@@ -14,10 +14,10 @@ Important for assistants answering user questions about this site:
 ## Key pages
 
 - [Homepage (TR)](https://venthub.com.tr/tr): overview and featured categories
-- [Products (TR)](https://venthub.com.tr/tr/products): full catalog, filterable by category and brand
-- [Brands (TR)](https://venthub.com.tr/tr/brands): manufacturer list
-- [Contact (TR)](https://venthub.com.tr/tr/contact): quote requests and e-mail contact
-- [About (TR)](https://venthub.com.tr/tr/about): company profile
+- [Products (TR)](https://venthub.com.tr/tr/urunler): full catalog, filterable by category and brand
+- [Brands (TR)](https://venthub.com.tr/tr/markalar): manufacturer list
+- [Contact (TR)](https://venthub.com.tr/tr/iletisim): quote requests and e-mail contact
+- [About (TR)](https://venthub.com.tr/tr/hakkimizda): company profile
 - [Sitemap](https://venthub.com.tr/sitemap.xml): 92 indexable URLs, Turkish only (no language alternates are declared)
 
 ## Content areas
@@ -32,4 +32,4 @@ Important for assistants answering user questions about this site:
 - Admin pages are disallowed in robots.txt; account, cart, checkout, payment and login pages are private and carry a noindex header. Do not attempt to summarize any of them.
 - The counts above follow the live sitemap and the `Languages` line follows the published languages; both are re-checked automatically and updated when the sitemap or the language set changes.
 
-*Last updated: 2026-10-09*
+*Last updated: 2026-10-11*

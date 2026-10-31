@@ -9,11 +9,9 @@ vi.mock('../categoryHelpers', () => ({
   getLocalizedCategorySlug: vi.fn((cat: DomainCategory) => cat.slug)
 }))
 
-vi.mock('../../utils/routes', () => ({
-  Routes: {
-    category: vi.fn((slug: string) => `/category/${slug}`)
-  }
-}))
+// Faz 3-C (URN-85 2/2): kırıntıdaki üst kategori adresi `adresUret`'ten (plan §2: `/<dil>/kategori/<slug>` TR,
+// `/<dil>/category/<slug>` EN) gelir; eski `Routes` sahtesi `localizedHref`'i eksik bırakıp üreticiyi kırıyordu.
+// Adres burada GERÇEK üreticiyle ölçülür (sahte yok) — bu dosyanın konusu kırıntının BASAMAK YAPISIDIR.
 
 describe('buildCategoryBreadcrumb', () => {
   const parentCategory: DomainCategory = {
@@ -80,7 +78,15 @@ describe('buildCategoryBreadcrumb', () => {
     expect(result).toHaveLength(2)
     expect(result[1]).toEqual({
       label: 'HVAC Systems',
-      href: '/category/hvac'
+      href: '/tr/kategori/hvac'
+    })
+  })
+
+  it('should build the parent href with the active language section name (EN: /en/category)', () => {
+    const result = buildCategoryBreadcrumb(null, parentCategory, 'Home', 'en')
+    expect(result[1]).toEqual({
+      label: 'HVAC Systems',
+      href: '/en/category/hvac'
     })
   })
 
@@ -98,7 +104,7 @@ describe('buildCategoryBreadcrumb', () => {
     expect(result).toHaveLength(3)
     expect(result[1]).toEqual({
       label: 'HVAC Systems',
-      href: '/category/hvac'
+      href: '/tr/kategori/hvac'
     })
     expect(result[2]).toEqual({
       label: 'Air Curtains',
