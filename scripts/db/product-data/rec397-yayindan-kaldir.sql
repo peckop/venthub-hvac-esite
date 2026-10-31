@@ -3,6 +3,9 @@
 -- (emsal: SEA-61102010, 19 Ekim). Yeni alan / migration YOK.
 -- CANLI YAZIM: OPS koşar. Her blok AYRI calistirilir. Once 1 (kuru kosu), sonra 2 (yaz), sonra 4 (olc).
 -- Geri alma: 3.
+-- ON-KONTROL NOTU (KTL-68, 31 Ekim): bu yazim 15:44-15:46Z'de kanal tipi fan rehberini 500'e dusurdu (rehberin vh:aile
+-- baglari aktif urunu 0 kalan yuvarlak-kanal ailesini bulamadi). Bundan sonra arsivleyen/silen her paket once
+-- scripts/db/product-data/yazim-paketi-arsiv-on-kontrol.sql (0. adim) + rehber-bagi-onkontrol.mjs ile kosulur.
 
 -- ───────── 1) KURU KOSU (yazmaz): 10 satir beklenir, hepsi active ─────────
 select sku, status as eski_deger, 'archived' as yeni_deger, updated_at
