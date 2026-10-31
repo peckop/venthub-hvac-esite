@@ -866,8 +866,10 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
 
       expect(res.status).toBe(500)
       expect(json.revalidated).toBe(false)
-      expect(json.error).toContain('parent_id=ust-1')
-      expect(json.error).toContain('baglanti kesildi')
+      // ALT-76: yanıta yalnız aşama adı girer; parent_id ve veritabanı hata metni SIZMAZ (günlüğe gider).
+      expect(json.error).toBe('categories çocuk sorgusu düştü')
+      expect(json.error).not.toContain('parent_id')
+      expect(json.error).not.toContain('baglanti kesildi')
       // Üstün KENDİ sayfası ve keşif etiketleri hata yüzünden düşmez.
       expect(yollarOf()).toEqual(expect.arrayContaining(['/tr/category/fanlar']))
       expect(revalidateTagMock.mock.calls.map(([t]) => t)).toEqual(expect.arrayContaining(['products-discovery']))
