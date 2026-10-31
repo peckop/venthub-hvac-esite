@@ -10,7 +10,8 @@
  * ⛔GÜRÜLTÜ SINIRI (ÖLÇÜLDÜ 27 Ekim): son 8 günde açılan 55 kartın HİÇBİRİNDE "PLAN" başlığı yok (filonun kart biçimi KAYNAK/YÖNTEM/
  * ÖNCEKİ ÇALIŞMA satırlarıdır). Kapıyı her karta uygulamak her Review geçişinde "plan-yok" uyarısı demekti; ARC-220'nin kaldırdığı
  * gürültünün aynısı. Bu yüzden bağ YALNIZ kartın açıklamasında PLAN başlığı VARKEN iskeleti ölçer; başlık yoksa SESSİZ kalır.
- * Kart sınıfına göre zorunlu ölçüm satırı (yayın öncesi liste, canlı adres matrisi, kare kabul...) HARİTA kural verisini verince eklenir.
+ * Kart sınıfına göre zorunlu ÖLÇÜM satırı (ARC-230, HRT-78 kural verisi #2115): `olcum-<ad>` etiketi ya da dar başlık sözcüğüyle tanınan sınıfta
+ * satır yoksa uyarır; PLAN başlığı İSTEMEZ, tanınan sınıf yoksa sessiz.
  *
  * NE YAPAR: (1) `add_task` açıklamasında, (2) bir kartı Review'a taşıyan `move_task`/`transition_task`/`update_task`ta kartın
  * kayıtlı açıklamasında PLAN başlığı varsa `degerlendir` çalıştırır; iskelet eksikse eksikleri additionalContext olarak UYARIR.
@@ -19,7 +20,7 @@
  * VANA: `VENTHUB_KART_PLAN_BAGI_KAPALI=1` kapatır. `VENTHUB_KANBAN_DB` veritabanı yolunu ezer (test).
  * KURULUM: `.claude/settings.json` PreToolUse kaydı (ayarı OPS tam fark okuyarak birleştirir).
  *
- * stdin: { tool_name, tool_input: { action, taskId, description, columnId|targetColumnId|lifecycleStage|status } }
+ * stdin: { tool_name, tool_input: { action, taskId, description, labels, columnId|targetColumnId|lifecycleStage|status } }
  */
 const fs = require('node:fs')
 const path = require('node:path')
@@ -55,12 +56,37 @@ function satirlar(aciklama, ad, kapi, olusturuldu) {
   ]
 }
 
+/**
+ * Kart sınıfı ölçüm satırı (HRT-78, ARC-230): `olcum-<ad>` etiketi ya da dar başlık sözcüğüyle tanınan sınıfta `ÖLÇÜM: <ad> — <sonuç>`
+ * satırı yoksa uyarır. PLAN başlığı İSTEMEZ; tanınan sınıf yoksa [] (sessiz). SAF.
+ */
+function olcumSatirlari(kart, ad, kapi) {
+  let eksik
+  try {
+    eksik = typeof kapi.olcumEksikleri === 'function' ? kapi.olcumEksikleri(kart) : []
+  } catch {
+    return []
+  }
+  if (!Array.isArray(eksik) || eksik.length === 0) return []
+  return [`KART ÖLÇÜM UYARI (ARC-230; ${ad}): kart sınıfı için zorunlu ölçüm satırı eksik (kural verisi scripts/belge/kart-sinif-olcum.json):`, ...eksik.slice(0, AZAMI_SATIR).map((e) => `  - ${e}`)]
+}
+
 /** Veritabanı yolu: ortam ezmesi, yoksa kanonik (ana ağaç) kök (done-kanit-kapisi.cjs ile aynı çözümleme). */
 function veritabaniYolu(ortam = process.env, cwd = process.cwd()) {
   return require('./done-kanit-kapisi.cjs').veritabaniYolu(ortam, cwd)
 }
 
-/** Kartın başlığı, açıklaması ve açılış zamanı; her sorunda null (fail-open). SALT-OKUMA. */
+/** sqlite json_extract çıktısı (JSON metni) → etiket dizisi; bozuksa []. */
+function etiketCoz(ham) {
+  try {
+    const a = JSON.parse(String(ham || '[]'))
+    return Array.isArray(a) ? a.map(String) : []
+  } catch {
+    return []
+  }
+}
+
+/** Kartın başlığı, açıklaması, açılış zamanı ve etiketleri; her sorunda null (fail-open). SALT-OKUMA. */
 function kartiOku(dbYolu, taskId) {
   let db
   try {
@@ -70,11 +96,11 @@ function kartiOku(dbYolu, taskId) {
     db = new DatabaseSync(dbYolu, { readOnly: true })
     const satir = db
       .prepare(
-        "select json_extract(t.value,'$.title') as baslik, json_extract(t.value,'$.description') as aciklama, json_extract(t.value,'$.createdAt') as olusturuldu " +
+        "select json_extract(t.value,'$.title') as baslik, json_extract(t.value,'$.description') as aciklama, json_extract(t.value,'$.createdAt') as olusturuldu, json_extract(t.value,'$.labels') as etiketler " +
           "from kanban_boards b, json_each(b.payload, '$.tasks') t where json_extract(t.value,'$.id') = ? limit 1",
       )
       .get(taskId)
-    return satir ? { baslik: String(satir.baslik || ''), aciklama: String(satir.aciklama || ''), olusturuldu: satir.olusturuldu || undefined } : null
+    return satir ? { baslik: String(satir.baslik || ''), aciklama: String(satir.aciklama || ''), olusturuldu: satir.olusturuldu || undefined, etiketler: etiketCoz(satir.etiketler) } : null
   } catch {
     return null
   } finally {
@@ -105,20 +131,26 @@ function main() {
   let aciklama = null
   let ad = ''
   let olusturuldu
+  let baslik = ''
+  let etiketler = []
   if (t.action === 'add_task') {
     aciklama = t.description
+    baslik = String(t.title || '')
+    etiketler = Array.isArray(t.labels) ? t.labels.map(String) : []
     ad = kisaAd(t.title, 'yeni kart')
   } else if (reviewIstegiMi(t)) {
     const k = kartiOku(veritabaniYolu(), t.taskId)
     if (!k) return
     aciklama = k.aciklama
+    baslik = k.baslik
+    etiketler = k.etiketler
     ad = kisaAd(k.baslik, t.taskId)
     olusturuldu = k.olusturuldu
   } else {
     return
   }
   const kapi = require(path.join(__dirname, '..', '..', 'scripts', 'belge', 'kart-plan-kapisi.cjs'))
-  const satir = satirlar(aciklama, ad, kapi, olusturuldu)
+  const satir = [...satirlar(aciklama, ad, kapi, olusturuldu), ...olcumSatirlari({ baslik, aciklama: String(aciklama || ''), etiketler }, ad, kapi)]
   if (satir.length === 0) return
   fs.writeSync(1, JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: satir.join('\n') } }) + '\n')
 }
@@ -132,4 +164,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { reviewIstegiMi, satirlar, kartiOku, kisaAd, veritabaniYolu }
+module.exports = { reviewIstegiMi, satirlar, olcumSatirlari, etiketCoz, kartiOku, kisaAd, veritabaniYolu }
