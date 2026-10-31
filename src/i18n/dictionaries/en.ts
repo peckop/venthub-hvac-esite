@@ -3049,7 +3049,7 @@ export const en: typeof tr = {
     // `k` is the source note (catalogue + page).
     faq: {
       title: 'Frequently Asked Questions',
-      rehberBaglantisi: 'Guide: How to choose a quiet fan',
+      rehberBaglantisi: 'Guide: How to choose a quiet duct fan',
       items: [
         {
           q: 'What is Vortice Lineo Quiet?',
