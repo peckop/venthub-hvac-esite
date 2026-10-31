@@ -25,20 +25,29 @@ where deleted_at is null
 order by sku;
 -- Beklenen: Mono 8 satir filtre G4; 12101 ses 57; 10930 ses 57.2; 10911 ve 12106 koruma 'Class II'.
 
--- ───────── 2) description_i18n / name_i18n TARAMASI (yazmaz): bos donmeli; satir donerse once o metin duzeltilir ─────────
-select sku, 'description' as yer, description as metin
+-- ───────── 2) METIN TARAMASI (yazmaz): bos donmeli; satir donerse once o metin duzeltilir ─────────
+-- products metin kolonlari (src/types/database.types.ts): name, name_i18n, description_i18n.
+-- "description" kolonu YOK (ilk surum 42703 verdi, OPS 31 Ekim olctu). Taranan: G3/G4, 57 ya da 57,2, class I, dB.
+select sku, 'name' as yer, name as metin
 from public.products
 where deleted_at is null
   and sku in ('VRT-12431','VRT-12432','VRT-12434','VRT-12435','VRT-12436','VRT-12437','VRT-12443','VRT-12444',
               'VRT-12101','VRT-10930','VRT-10911','VRT-12106')
-  and description ~* '(\mG[34]\m|\m57[.,]?2?\m|class i|dB)'
+  and name ~* '(\mG[34]\M|\m57[.,]?2?\M|class i|dB)'
+union all
+select sku, 'name_i18n', name_i18n::text
+from public.products
+where deleted_at is null
+  and sku in ('VRT-12431','VRT-12432','VRT-12434','VRT-12435','VRT-12436','VRT-12437','VRT-12443','VRT-12444',
+              'VRT-12101','VRT-10930','VRT-10911','VRT-12106')
+  and name_i18n::text ~* '(\mG[34]\M|\m57[.,]?2?\M|class i|dB)'
 union all
 select sku, 'description_i18n', description_i18n::text
 from public.products
 where deleted_at is null
   and sku in ('VRT-12431','VRT-12432','VRT-12434','VRT-12435','VRT-12436','VRT-12437','VRT-12443','VRT-12444',
               'VRT-12101','VRT-10930','VRT-10911','VRT-12106')
-  and description_i18n::text ~* '(\mG[34]\m|\m57[.,]?2?\m|class i|dB)';
+  and description_i18n::text ~* '(\mG[34]\M|\m57[.,]?2?\M|class i|dB)';
 
 -- ───────── 3) YAZ (tek islem; satir sayisi tutmazsa RAISE ile tamamen geri doner) ─────────
 do $$
