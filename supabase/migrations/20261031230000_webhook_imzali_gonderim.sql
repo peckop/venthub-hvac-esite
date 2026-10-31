@@ -33,6 +33,10 @@
 
 begin;
 
+-- Tek bir CREATE OR REPLACE FUNCTION: fonksiyon kilidi kısa tutulur, bekleyen yazımı uzun süre tıkamaz.
+set lock_timeout = '5s';
+set statement_timeout = '30s';
+
 create or replace function public.handle_supabase_webhook()
 returns trigger
 language plpgsql

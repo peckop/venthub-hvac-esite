@@ -8,6 +8,9 @@
 
 begin;
 
+set lock_timeout = '5s';
+set statement_timeout = '30s';
+
 create or replace function public.handle_supabase_webhook()
 returns trigger
 language plpgsql
