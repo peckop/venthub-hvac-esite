@@ -321,6 +321,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/isi-geri-kazanim-cihazi-nedir-nasil-secilir",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -534,6 +538,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/kanal-tipi-fan-nedir-nerede-kullanilir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/isi-geri-kazanim-cihazi-nedir-nasil-secilir",
         "alternates": null
       },
       {

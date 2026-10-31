@@ -791,6 +791,195 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-20), doğrulanmış metin: taslak v5 sha 91bd6d389be1 (v4 sha 51065cd98f80 dört turda doğrulandı; v4→v5 farkı üç kaynaklı küçük değişiklik, OPS kararıyla tur 5 yok).
+    // Kayıtlı gövde sha 5ddb2b9bdb57. Dört bağımsız doğrulama turu (hedef üçtü, karşılanmadı); her turda tuzaklı kopya yakalandı.
+    // Mevzuat, enerji sınıfı (A/A+) ve sessizlik iddiası yok (R2.6 gerekmez; REC-392 Mevzuat yorumu bekliyor). Fiyat yok: ürün sayfaları teklife yönlendirir.
+    // Yayın: Recep yayın onayı sonrası (OPS penceresi). Konu: Recep onayı 31 Ekim 2026 (OPS önerisi).
+    kimlik: 'isi-geri-kazanim-cihazi-nedir',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-10-31',
+    guncellemeTarihi: '2026-10-31',
+    urunler: [
+      'vh:aile/vortice-vort-hr-isi-geri-kazanim',
+      'vh:aile/vortice-vort-mono',
+      'vh:aile/avens-isi-geri-kazanim-cihazlari',
+    ],
+    diller: {
+      tr: {
+        slug: 'isi-geri-kazanim-cihazi-nedir-nasil-secilir',
+        ozet: "Isı geri kazanım cihazı egzoz havasının ısısını taze havaya aktarır. Çalışma prensibi, eşanjör türleri ve seçimde bakılacak debi, filtre, verim ve ses.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz; yeni iddia, sayı ya da marka yok.
+        kartOzeti: 'Isı geri kazanım cihazı seçmeden önce türleri ve seçim ölçütlerini bu rehberde karşılaştırın.',
+        govde: `# Isı geri kazanım cihazı nedir, nasıl seçilir?
+
+Isı geri kazanım cihazı, binadan atılan egzoz havasının ısısını içeri alınan taze havaya aktaran havalandırma cihazıdır [1][2].
+
+Bu yazı cihazın nasıl çalıştığını, eşanjör türlerini, verimin nasıl okunacağını ve seçerken hangi değerlere bakılacağını Eurovent, ABD Enerji Bakanlığı, Kanada Doğal Kaynaklar Bakanlığı, REHVA ve Passive House Institute kaynaklarına ve üretici belgelerine dayanarak anlatır. VentHub kataloğundaki 16 ısı geri kazanım modelinden 13'ü Vortice tablosunda, AVenS'in üç modeli ise tablonun altındaki paragrafta yer alır.
+
+## Isı geri kazanım cihazı nedir?
+
+İngilizce kaynaklarda bu cihaza heat-recovery ventilator denir, kısaltması HRV'dir; Türkçe karşılığı ısı geri kazanımlı havalandırıcıdır. Kanada Doğal Kaynaklar Bakanlığı HRV'yi iç ortamdaki bayat hava ile dış ortamdaki taze hava arasında ısı aktaran mekanik bir cihaz olarak tanımlar [2]. Nemi de aktaran türüne enerji geri kazanımlı havalandırıcı (ERV) denir [4][1]. Bu yazıda ısı geri kazanım cihazı, HRV ve ERV'nin ikisini de kapsar.
+
+## Nasıl çalışır: egzoz ısısı taze havaya nasıl geçer?
+
+Cihaz fanlar ya da üfleyiciler ve bir hava-hava ısı eşanjörü içerir; HRV'de eşanjör iki yalıtılmış hava akımı arasında ısı aktarır [2]. İşleyiş üç adımda özetlenir:
+
+1. Binadan alınan egzoz havası ile dışarıdan alınan taze hava cihazdan geçer; HRV'de bu iki akım birbirinden yalıtılmış kalır [2], depolamalı oda tipi ünitelerde ise aynı eşanjör paketi iki yönde sırayla kullanılır [9].
+2. Kışın sıcak egzoz havasının ısısı daha soğuk taze havaya geçer; yazın iç hava, daha sıcak taze havayı soğutur [1].
+3. Dengeli sistemlerde taze hava normalde oturma ve yatak odalarına verilir, egzoz havası mutfak ve banyo gibi ıslak hacimlerden alınır [3].
+
+Eurovent kılavuzu aynı işlevi şöyle tarif eder: eşanjör egzoz havasındaki enerjiyi dış hava akımına aktarır; bu enerji aksi hâlde atmosfere atılacaktır [3]. Enerji, havalandırma havasını kışın ya da ara mevsimde ısıtmak, yazın soğutmak için geri kazanılır [3].
+
+## Isı geri kazanım ne işe yarar, nerelerde kullanılır?
+
+Cihaz, havalandırmayla dışarı atılacak ısıyı taze havaya aktarır; ERV türleri nemi, yani gizli ısıyı da aktarır [3][4]. Vortice kataloğu ürün aileleri için evleri, konut ve ticari mekânları, küçük daireleri, ofisleri ve otel odalarını kullanım alanı olarak sayar [8]. ABD Enerji Bakanlığı'na göre enerji geri kazanımlı havalandırma sistemleri evin kontrollü havalandırılmasını sağlarken enerji kaybını en aza indirir [1]. Eurovent kılavuzu geri kazanımın havayı koşullandırmak için dış kaynaklardan çekilen enerji tüketimini önemli ölçüde azalttığını, bazı durumlarda tamamen ortadan kaldırdığını yazar [3].
+
+Nem de önemlidir. Kışın dış havanın mutlak nemi düşük olduğu için havalandırma, iç ortamın bağıl nemini yaklaşık yüzde 30'luk hijyenik sınırın altına çekebilir; kılavuz bu nedenle ısı geri kazanımının yanında nem geri kazanımını da avantaj sayar [3].
+
+Alan sınırları modele göre değişir. Vortice kataloğuna göre VORT HR 350 AVEL ailesi evler, konutlar ve ticari mekânların havalandırması için, 240 m²'ye kadar tasarlanmıştır [8]. VORT HR 300 NETI 180 m²'ye, VORT HR 450 AVEL D 260 m²'ye kadar; VORT INVISIBLE MINI TOP ise küçük daireler, ofisler ve otel odaları için 80 m²'ye kadar tarif edilir [8].
+
+## Eşanjör türleri nelerdir: duyulur, entalpi, plakalı ve döner
+
+Eşanjörler iki ayrı ölçüte göre ayrılır: neyi aktardıkları ve nasıl yapıldıkları.
+
+| Eşanjörün aktardığı | Kaynaktaki ifade | Kaynak |
+|---|---|---|
+| Yalnız duyulur ısı (HRV) | Duyulur ısıyı aktarır, nemi aktarmaz | [4] |
+| Duyulur ısı ve nem (ERV) | Sıcaklıkla birlikte nemi (gizli ısıyı) da aktarır | [4][1] |
+
+Eurovent kılavuzu plakalı eşanjörlerin normalde nemi geri kazanmadığını, nem geçiren plakalı "entalpi" eşanjörlerinin bunun istisnası olduğunu belirtir; döner çarklarda ise nem geri kazanımı mümkündür ve nem geri kazanım verimi çark tipine bağlıdır [3].
+
+| Eşanjörün yapısı | Kaynaktaki ifade | Kaynak |
+|---|---|---|
+| Plakalı (sabit plakalı) | Sabit plakalar üzerinden ısı geri kazanır; avantajları hava sızdırmazlığı ve hareketli parça olmamasıdır | [3] |
+| Çapraz akışlı ve karşı akışlı | Hava akış düzenine göre ikiye ayrılır; en verimli olanlar karşı akışlı eşanjörlerdir | [3] |
+| Döner çarklı | Dönen çarklar ısıyı kütlede biriktirerek geri kazanır | [3] |
+
+ABD Enerji Bakanlığı'nın Nisan 2021 tarihli bir araştırma raporu, mevcut en verimli ERV'lerin birçoğunun altıgen, karşı akışlı çekirdek kullandığını, bu çekirdeklerin benzer taban alanında daha yüksek geri kazanım sağladığını ancak basınç düşümünü artırdığını yazar [5].
+
+## Eşanjör verimi nasıl okunur?
+
+Verimi okurken önce hangi koşulda ölçüldüğüne bakılır. Passive House Institute, 2009 tarihli sertifika ölçütünde koşulları açıkça yazar: dengeli debi, eksi 15 ile artı 10 °C arasındaki dış hava sıcaklığı ve iç ortamdan çekilen yaklaşık 20 °C'lik kuru havada etkin kuru ısı geri kazanımı yüzde 75'ten yüksek olmalıdır [6]. Bu değer, bir sertifika ölçütünün eşiğidir [6].
+
+ABD Enerji Bakanlığı'nın 2014 tarihli Aldrich rehberine göre soğuk havada en sık yayımlanan geri kazanım ölçüsü görünür duyulur etkinliktir (ASEF) [4].
+
+Verim debiyle değişir. ABD Enerji Bakanlığı'nın Nisan 2021 tarihli raporunda test edilen bir ERV çekirdeğinde kışın duyulur etkinlik 40 cfm'de (yaklaşık 68 m³/h) yüzde 80'in üzerindeyken 120 cfm'de (yaklaşık 204 m³/h) yüzde 65–70'e düşmüştür [5]. Rapor, havalandırma debisinin çekirdek performansını sıcaklık değişimlerinden daha çok etkilediğini de belirtir [5]. Bu sayılar raporda test edilen çekirdeğin ölçümüdür [5].
+
+İç sızıntı da ölçülen verimi etkiler: Eurovent kılavuzu iç sızıntının ölçülen sıcaklık verimini saptırdığını ve değerin gerçeğe düzeltilmesi gerektiğini yazar [3]. Aynı kılavuza göre plakalı eşanjörlerde iç sızıntı genellikle döner çarklardan belirgin biçimde düşüktür [3]. İç sızıntı eşanjörün içindeki ve cihaz gövdesindeki küçük açıklıklardan, dış sızıntı ise gövdeden olur [7][3].
+
+Üreticiler verimi farklı koşul ibareleriyle verir. Vortice kataloğu ısıl verimi HRS referans debisinde verir ve referans debiyi ve referans basınç farkını aynı sayfada yazar [8]; AVenS teknik belgesi verimi dengeli debide dipnotuyla verir [11]. İki değeri karşılaştırmadan önce koşulu okumak gerekir.
+
+## Kanallı mı, oda tipi mi: iki kurulum türü nasıl ayrılır?
+
+Kanallı merkezi ünite kanal bağlantılı tek bir cihazla, Vortice kataloğunda 80, 180, 240 ve 260 m²'ye kadar mahalleri havalandırmak için tarif edilir [8]; oda tipi ünite ise merkezsizdir (decentralized) ve yatak odası, banyo, oturma odası ile mutfak, çalışma odası gibi ayrı mahallere yerleştirilir [9]. Eurovent kılavuzu dengeli ısı geri kazanımlı sistemlerde besleme ve egzoz debilerinin terminal cihazlı tüm odalara göre boyutlandırıldığını yazar [3].
+
+VentHub'daki [ısı geri kazanım kategorisi](vh:kategori/heat-recovery-vmc) iki alt kategoriye ayrılır: [kanallı ısı geri kazanım cihazları](vh:kategori/ducted-central-hrv) ve [oda tipi ısı geri kazanım cihazları](vh:kategori/single-room-hrv).
+
+| Ölçüt | Kanallı merkezi ünite | Oda tipi ünite |
+|---|---|---|
+| Kapsadığı alan | Vortice kataloğu modellere göre 80, 180, 240 ve 260 m²'ye kadar olan mahaller için tarif eder [8] | Katalogda m² değeri verilmez; Vortice bu seriyi merkezsiz (decentralized) ısı geri kazanım ünitesi olarak adlandırır ve ayrı mahallere yerleştirir; Wi-Fi'li modeller yerel ağ üzerinden birbirleriyle haberleşebilir [9] |
+| Isı geri kazanım yöntemi | Kataloglarda plastik, entalpi ve alüminyum plakalı eşanjörler geçer [8][11] | Seramik depolamalı eşanjör: fanın dönüş yönü periyodik değişir, eşanjör önce egzoz havasıyla ısınır, sonra bu ısıyı gelen soğuk havaya verir [9] |
+
+## Isı geri kazanım cihazı seçerken hangi değerlere bakılır?
+
+Seçim beş başlıkta ele alınır: debi ve basınç, ses seviyesi, filtre ve bakım, by-pass ve buzlanma, kurulum yeri. Her biri aşağıda ayrı anlatılır.
+
+### Debi ve basınç
+
+Eurovent kılavuzu, kişi başı havalandırma debilerinin konutun tamamı için saatte ortalama 0,5 hava değişimi hedefiyle birlikte boyutlandırmanın temelini oluşturduğunu yazar [3]. Kanalların, yüksek hava hızının yol açacağı gürültü ve basınç kaybını önleyecek büyüklükte olması gerekir [3]. Altıgen karşı akışlı çekirdekler daha yüksek geri kazanım sağlar ama basınç düşümünü artırır [5].
+
+Vortice kataloğu her modelin en yüksek debisini ve basıncını teknik tabloda verir; bu değerler "VentHub kataloğundaki ısı geri kazanım cihazları" bölümündeki tabloda toplanmıştır [8][9].
+
+### Ses seviyesi
+
+Eurovent kılavuzu ses basıncı ile ses gücünü ayırır: ses basıncı insan kulağını doğrudan etkileyen ölçüdür, ses gücü ise havalandırma ekipmanının akustik performansını sınamak için kullanılır ve genellikle ürünün teknik belgesinde beyan edilir [3]. Tedarikçiler çoğu zaman ses basıncını oda emilimini 10 m² Sabin varsayarak verir; bu, ses basıncının ses gücünden 4 dB düşük çıkması demektir [3]. Vortice kataloğu teknik tabloda ses basıncını 3 m uzaklıkta, ses gücünü ise ayrı bir alanda verir [8]. dB(A) değerlerinin hangi koşulda okunacağı [sessiz fan seçimi rehberinde](vh:yazi/sessiz-fan-secimi) anlatılır.
+
+ABD Enerji Bakanlığı rehberi birçok ERV ve HRV cihazının hatırı sayılır ses ürettiğini, yatak odası gibi hassas alanların yakınına kurulacaksa bunun dikkate alınmasını söyler [4].
+
+### Filtre ve bakım
+
+Eurovent kılavuzuna göre filtreler zamanında değiştirilmezse hijyen sorunları, aşırı enerji tüketimi ve debide düşüş yaşanabilir; konut havalandırma cihazları görsel filtre değişim uyarısıyla donatılır ve genel öneri filtrenin en az yılda bir değiştirilmesidir [3]. Aynı kılavuz eşanjörün iki yılda bir temizlenmesini önerir [3]. ABD Enerji Bakanlığı rehberi ise bakımın sistemden sisteme değiştiğini, bazı sistemlerin filtre ve ısı değişim ortamının üç ayda bir değiştirilmesini ya da temizlenmesini gerektirdiğini söyler [4]. Kaynaklar farklı aralıklar verdiği için geçerli aralık cihazın üretici kılavuzundan okunur.
+
+### By-pass ve buzlanma
+
+Termal by-pass, ısı geri kazanımına gerek olmadığında geri kazanımı devre dışı bırakır ve yazın dış hava iç havadan soğukken serbest soğutma sağlar [3]. Dış hava sıcaklığı 0 °C'nin altına inince eşanjörde yoğuşan suyun donma riski vardır; donma sınırı iç bağıl neme ve eşanjör verimine bağlıdır [3]. Eurovent kılavuzuna göre plakalı eşanjörlerde donma yaklaşık eksi 5 °C'de, döner çarklarda yaklaşık eksi 15 °C'de başlar; entalpi plakalı eşanjör kullanımı donma sınırını belirgin biçimde düşürebilir [3]. ABD Enerji Bakanlığı rehberi çoğu ERV ve HRV cihazında yoğuşma suyu tahliyesi ve buzlanma koruması bulunduğunu, bazı çözme aygıtlarının ek özellik olarak sipariş edildiğini yazar [4]. Vortice kataloğu VORT HR 350 AVEL ailesini otomatik mekanik by-pass ve otomatik buzlanma koruması ile, VORT HR 450 AVEL D modelini mekanik by-pass ve otomatik devreye giren buzlanma koruması ile tanımlar [8].
+
+### Kurulum yeri ve erişim
+
+ABD Enerji Bakanlığı rehberi bodrum ve çatı arasını ERV ve HRV cihazları için yaygın yerleşim yerleri olarak sayar [4]. Eurovent kılavuzu filtrelere ve eşanjöre kolay erişimin bakım için önemli olduğunu, tipik bir cihazda eşanjörü çıkarmanın 10-20 dakika sürdüğünü yazar [3].
+
+## VentHub kataloğundaki ısı geri kazanım cihazları
+
+Aşağıdaki tablodaki en yüksek debi, en yüksek basınç ve güç değerleri Vortice kataloğunun teknik tablolarından alınmıştır ve ürün sayfalarıyla aynıdır. Model adındaki sayı en yüksek debiyle aynı olmayabilir; örneğin VORT HR 450 AVEL D için katalogdaki teknik tabloda en yüksek debi 400 m³/h'dir [8]. Katalogun enerji verisi sayfalarında farklı referans değerler de yer alır [8]. Ses, verim ve filtre değerleri model teknik föylerinde yer alır; karşılaştırırken ölçüm koşuluna bakın.
+
+| Aile ve model (katalog adı) | Kod | Kapsadığı alan | Eşanjör (katalog ifadesi) | En yüksek debi (m³/h) | En yüksek basınç (Pa) | Güç (W) | Kaynak |
+|---|---|---|---|---|---|---|---|
+| [Vort HR](vh:aile/vortice-vort-hr-isi-geri-kazanim): VORT HR 350 AVEL | 12106 | 240 m²'ye kadar [8] | Plastik (PS) karşı akışlı | 350 | 880 | 165 | [8] |
+| Vort HR: VORT HR 350 AVEL H | 10911 | 240 m²'ye kadar [8] | Entalpi eşanjörü | 350 | 880 | 165 | [8] |
+| Vort HR: VORT HR 450 AVEL D | 12101 | 260 m²'ye kadar [8] | Karşı akışlı çapraz akış, plastik reçine | 400 | 680 | 350 | [8] |
+| Vort HR: VORT HR 300 NETI | 10930 | 180 m²'ye kadar [8] | Plastik (PS) karşı akışlı | 300 | 735 | 190 | [8] |
+| Vort HR: VORT INVISIBLE MINI TOP | 12219 | 80 m²'ye kadar [8] | Karşı akışlı çapraz akış, plastik reçine | 120 | 375 | 64 | [8] |
+| [Vort Mono](vh:aile/vortice-vort-mono): VORT HRW 30 MONO EVO, EVO HCS, EVO HCS Wi-Fi | 12434, 12436, 12443 | Oda tipi | Seramik depolamalı | 38 | 130 | 4 | [9] |
+| Vort Mono: VORT HRW 40 MONO EVO, EVO HCS, EVO HCS Wi-Fi | 12435, 12437, 12444 | Oda tipi | Seramik depolamalı | 40 | 47 | 5 | [9] |
+| Vort Mono: VORT HRW 60 MONO EVO HCS | 12431 | Oda tipi | Seramik depolamalı | 60 | 120 | 7 | [9] |
+| Vort Mono: VORT HRW 60 MONO EVO HCS Wi-Fi | 12432 | Oda tipi | Seramik depolamalı | 60 | 120 | 8 | [9] |
+
+[AVenS ısı geri kazanım cihazları](vh:aile/avens-isi-geri-kazanim-cihazlari) ailesinde AVenS 750, AVenS 1000 ve AVenS 2000 olmak üzere üç model vardır. Üretici ürün sayfası ise 750-5000 m³/h aralığında daha fazla model listeler; aynı sayfa G4 sınıfı temizlenebilir kaset filtreleri ve plug fanlı seçenekleri sayar [10], teknik belgeler eşanjörü alüminyum plakalı olarak tanımlar [11]. Modellerin taze hava debileri üretici teknik belgelerinde 750, 1000 ve 2000 m³/h olarak yazılıdır [11].
+
+## Fiyatı belirleyen etkenler
+
+Bu yazıda fiyat verilmez. Kaynaklarda maliyete şu iki yerde değinilir: ABD Enerji Bakanlığı raporu altıgen karşı akışlı çekirdeklerin daha yüksek maliyetle geldiğini [5], Aldrich rehberi düşük güç tüketimli sistemlerin çoğu zaman daha pahalı olduğunu belirtir [4]. Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. [Isı geri kazanım kategorisi](vh:kategori/heat-recovery-vmc) ürün ailelerini listeler.
+
+## Sık sorulan sorular
+
+### Isı geri kazanım cihazı nem de geri kazanır mı?
+
+Nem geri kazanımı cihaz türüne bağlıdır: ısı geri kazanımlı havalandırıcılar (HRV) nemi aktarmaz, enerji geri kazanımlı havalandırıcılar (ERV) aktarır [4]. Eurovent kılavuzuna göre nem geçiren entalpi plakalı eşanjörler ve döner çarklar nem geri kazanımı sağlayabilir [3]. Vortice kataloğu VORT HR 350 AVEL H modelini entalpi eşanjörüyle duyulur ve gizli ısıyı geri kazanan bir ünite olarak tanımlar [8].
+
+### Kanallı ünite mi, oda tipi ünite mi seçilmeli?
+
+Tüm konutu ya da tek bir mahalli, katalogdaki 80, 180, 240 ve 260 m²'ye kadar sınıflara göre tek cihaz ve kanalla havalandırmak isteyenler için kanallı merkezi ünite, yatak odası ya da oturma odası gibi ayrı mahallere birer merkezsiz ünite yerleştirmek isteyenler için oda tipi ünite uygundur [8][9]. Bu ayrım Vortice'in merkezi ve merkezsiz ünite tarifine dayanır; yukarıdaki karşılaştırma tablosu iki türün alan tanımını ve eşanjör yöntemini yan yana verir.
+
+### Isı geri kazanım cihazı soğukta donar mı?
+
+Dış hava 0 °C'nin altına inince eşanjörde yoğuşan su donabilir; donma sınırı iç bağıl neme ve eşanjör verimine bağlıdır [3]. Plakalı eşanjörlerde donma yaklaşık eksi 5 °C'de başlar; entalpi plakalı eşanjör kullanımı bu sınırı belirgin biçimde düşürebilir [3]. Çoğu cihazda buzlanma koruması bulunur, bazı çözme aygıtları ek özellik olarak sipariş edilir [4].
+
+### Isı geri kazanım cihazının filtresi ne sıklıkla değişir?
+
+Eurovent kılavuzunun genel önerisi filtrenin en az yılda bir değiştirilmesidir [3]; ABD Enerji Bakanlığı rehberi bazı sistemler için üç ayda bir değiştirme ya da temizleme belirtir [4]. Geçerli aralık için cihazın üretici kılavuzuna bakılır.
+
+### Isı geri kazanım cihazı ses çıkarır mı?
+
+ABD Enerji Bakanlığı rehberi birçok ERV ve HRV cihazının hatırı sayılır ses ürettiğini söyler [4]. Ses basıncı ve ses gücü ayrı ölçülerdir; üreticinin hangisini hangi uzaklıkta verdiğine bakılır [3].
+
+### Isı geri kazanım cihazının fiyatı nedir?
+
+Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin.
+
+## Kaynaklar
+
+Eurovent kılavuzunda ve ABD Enerji Bakanlığı belgelerinde verilen sayfa numaraları PDF sayfa sırasıdır; Eurovent kılavuzunun basılı numaraları yanda belirtilmiştir. Vortice belgelerinde basılı sayfa numarası ile PDF sırası aynıdır.
+
+1. U.S. Department of Energy, Building Science Education Solution Center, "HVAC Energy Recovery Ventilation", https://bsesc.energy.gov/energy-basics/hvac-energy-recovery-ventilation (erişim 31.10.2026).
+2. Natural Resources Canada, "Heat-recovery ventilators and energy-recovery ventilators", Mayıs 2017 (sayfa değişiklik tarihi 16.01.2025; sayfa kendini güncel olmayan bülten olarak işaretler, yalnız cihaz tarifi için kullanıldı), https://natural-resources.canada.ca/energy-efficiency/energy-efficiency-regulations/heat-recovery-ventilators-energy-recovery-ventilators (erişim 31.10.2026).
+3. Eurovent, "Residential Heat Recovery Ventilation Units Guidebook", ilk baskı, Eylül 2021, PDF s. 4, 7, 13, 14, 16 (basılı s. 6-7, 12-13, 24-25, 26-27, 30-31), https://www.eurovent.eu/wp-content/uploads/2021-09-23-eurovent-rahu-guidebook-first-edition-en-web.pdf (erişim 31.10.2026).
+4. U.S. Department of Energy, Building America, R. Aldrich, "Measure Guideline: Selecting Ventilation Systems for Existing Homes", Şubat 2014, PDF s. 12, 42, 44, 45, 46, https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/measure_guide_ventilation_systems.pdf (erişim 31.10.2026).
+5. U.S. Department of Energy, Steven Winter Associates, "Research and Development of a Ventilation-Integrated Comfort System", Nisan 2021, PDF s. 26, 45, https://www1.eere.energy.gov/buildings/pdfs/78352.pdf (erişim 31.10.2026).
+6. Passive House Institute, "Requirements and testing procedures for energetic and acoustical assessment of Passive House ventilation systems < 600 m³/h for Certification as 'Passive House suitable component'" (belge tarihi 24.09.2009), s. 4, https://passivehouse.com/media/filer_public/61/3d/613dd3bb-c939-4f6e-8c85-ce80867333ad/03_reqs_and_testing_procedures_ventilation_en.pdf (erişim 31.10.2026).
+7. REHVA Journal, W. Lawrance, "Internal leakage in air handling units: the outdoor air correction factor (OACF) and exhaust air transfer ratio (EATR)", https://www.rehva.eu/rehva-journal/chapter/internal-leakage-in-air-handling-units-the-outdoor-air-correction-factor-oacf-and-exhaust-air-transfer-ratio-eatr (erişim 31.10.2026).
+8. Vortice, "Mechanical extract ventilation and heat recovery" kataloğu (dosya adı vortice-mev-iot-188510.pdf, Ocak 2025), s. 32, 33, 34, 36, 46, 47, 48, 52, 53, 55, 58, 59, 60 (üretici belgesi).
+9. Vortice, "VORT MONO RANGE" kataloğu (dosya adı vortice-vort-mono-wifi-189860.pdf, Ocak 2025), s. 4, 14, 17 (üretici belgesi).
+10. AVenS (Avensair), "Alüminyum eşanjörlü ısı geri kazanım cihazları AVenS 1000" ürün sayfası, https://www.avensair.com/aluminyum-esanjorlu-isi-geri-kazanim-cihazlari-avens-1000 (erişim 31.10.2026).
+11. AVenS (Avensair), "Cihaz teknik bilgileri": AVENS 750 IGK (23.09.2024), AVENS 1000 IGK (13.11.2017, revizyon 15.11.2017; ürün sayfasında aynı metne sahip, 11.03.2026'da yüklenmiş ikinci bir dosya da bağlıdır), AVENS 2000 IGK (30.01.2024), her biri 4 sayfa, s. 1/4 ve 4/4, https://www.avensair.com/uploads/ (üretici belgesi, erişim 31.10.2026).
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Katalog değerleri model ve çalışma noktasına göre değişebilir; kendi sisteminizde farklı çıkabilir. Kurulum yetkili personel tarafından yapılmalıdır.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
