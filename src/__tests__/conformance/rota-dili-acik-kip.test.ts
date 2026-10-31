@@ -31,6 +31,7 @@ const ilkDeger = process.env[ANAHTAR]
 const KOK = process.cwd()
 const APP = join(KOK, 'src', 'app', '[lang]')
 const DILLER = ['tr', 'en'] as const
+const TUNEL_YOLU = '/monitoring' // Sentry tünel yolu (next.config.mjs `tunnelRoute`, ALT-46)
 const TR_CHROME = 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
 const EN = 'en-US,en;q=0.9'
 
@@ -67,9 +68,13 @@ async function yapilandirma(anahtar: string | undefined) {
   vi.resetModules()
   const { default: cfg } = await import('../../../next.config.mjs')
   const rewrites = await cfg.rewrites?.()
-  const beforeFiles = (Array.isArray(rewrites) ? [] : (rewrites?.beforeFiles ?? [])) as Kural[]
+  const tumBeforeFiles = (Array.isArray(rewrites) ? [] : (rewrites?.beforeFiles ?? [])) as Kural[]
+  // Sentry 11 `tunnelRoute` için `beforeFiles` altına iki `/monitoring` yeniden yazımı ekler (ALT-46). Bunlar rota
+  // diliyle ilgisizdir; rota dili kuralları ile ayrı tutulur, tünelin varlığı ayrı bir testle korunur.
+  const beforeFiles = tumBeforeFiles.filter((k) => !k.source.startsWith(TUNEL_YOLU))
+  const tunel = tumBeforeFiles.filter((k) => k.source.startsWith(TUNEL_YOLU))
   const redirects = ((await cfg.redirects?.()) ?? []) as Kural[]
-  return { redirects, beforeFiles }
+  return { redirects, beforeFiles, tunel }
 }
 
 /** Adres üreten modülleri anahtar + EN yayın kipiyle TAZE yükler. */
@@ -191,6 +196,14 @@ describe('2. GERÇEK next.config (anahtar 1) — tek hop, rewrite, zincir yok', 
       }
     }
     expect(beforeFiles).toEqual(rotaDiliYenidenYazimlari(true))
+  }, 60_000)
+
+  it('Sentry tüneli: /monitoring için yeniden yazım VAR, hedefi Sentry giriş adresi (rota dili kuralı DEĞİL)', async () => {
+    const { tunel, redirects } = await yapilandirma('1')
+    expect(tunel.length, 'tunnelRoute yeniden yazımı kayıp: tarayıcıdan Sentry\'ye yol kapanır').toBeGreaterThan(0)
+    for (const k of tunel) expect(k.destination).toMatch(/^https:\/\/o:orgid\.ingest\.(:region\.)?sentry\.io\/api\/:projectid\/envelope\//)
+    // tünel adresi bir yönlendirmeye de girmemeli (POST gövdesi 307 ile kaybolur)
+    expect(redirects.filter((k) => k.source.startsWith(TUNEL_YOLU))).toEqual([])
   }, 60_000)
 
   it('rewrite zinciri YOK; hiçbir redirect rewrite\'ın iç hedefine (klasör adresine) varmaz', async () => {

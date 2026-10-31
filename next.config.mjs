@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 import bundleAnalyzer from '@next/bundle-analyzer';
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
 import { E2E_TIP_LINT_ATLA_ANAHTARI, e2eHizliDerlemeAyari, e2eTipLintAtlaOku } from './src/config/e2eHizliDerleme.mjs';
@@ -304,15 +304,9 @@ export default withSentryConfig(
     silent: true,
     org: "peckop",
     project: "venthub-hvac",
-  },
-  {
-    widenClientBounds: true,
     tunnelRoute: "/monitoring",
-    hideSourceMaps: true,
-    disableLogger: true,
-    automaticVercelMonitors: true,
-    disableServerWebpackPlugin: true,
-    disableClientWebpackPlugin: true,
+    sourcemaps: { disable: true },
+    webpack: { treeshake: { removeDebugLogging: true } },
   }
 );
 

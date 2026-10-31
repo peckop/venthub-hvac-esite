@@ -59,12 +59,8 @@ updates:
       kucuk-ve-yama:
         update-types: [minor, patch]
     ignore:
-      # KABUL EDİLMİŞ ERTELEME — karar 17: Sentry sıranın EN SONUNDA, Recep 2026-09-19.
-      # 11 yüksek güvenlik kaydının hepsi bunun altından geliyor ve hepsi DERLEME aracında
-      # (docs/audits/bagimlilik-2026-09-19.md). Bot her hafta 8→10 PR'ı açmasın.
-      # KALDIRMA ŞARTI: Sentry işi (karar 17) başladığı gün bu blok silinir.
-      - dependency-name: '@sentry/*'
-        update-types: ['version-update:semver-major']
+      # (Sentry ana sürüm ertelemesi — karar 17 — ALT-46'da kaldırıldı: @sentry/nextjs 11.9.0 kuruldu,
+      # kaldırma şartı oluştu. Bot bundan sonra @sentry/* ana sürümlerini normal PR olarak açar.)
       # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
       # kayıt §4 react satırı). Bot React'i 19.3'e çekerse 3D sahneleri kırılabilir.
       # KALDIRMA ŞARTI: fiber'ın peer aralığı 19.3'ü kapsadığı gün bu dört satır silinir.
