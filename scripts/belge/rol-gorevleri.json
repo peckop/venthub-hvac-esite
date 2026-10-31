@@ -29,10 +29,9 @@
         {
           "gorev": "Aylık resmi belge incelemesi: Google Search Central ve Bing Webmaster belgelerinde değişen hüküm var mı, cetvellerimiz hâlâ uyuyor mu",
           "siklik": "aylik",
-          "tetik": "actions",
-          "tetikAyrinti": ".github/workflows altında aylık schedule (karar 260); iş akışı ARAÇ'ta ARC-27, resmi kaynak listesi SEO-16 (GEO-SEO)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"SEO aylık belge: N gün\" (30 gün eşik); cron yok, karar 260 bu yönde; damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); resmi kaynak listesi SEO-16 (GEO-SEO)",
+          "bagli": "evet",
           "cikti": "Değişen hüküm başına Kanban kartı ve cetvel güncellemesi (cetvel sahibi GEO-SEO)",
           "esik": "TASLAK: hangi belgelerin kapsandığını GEO-SEO teyit eder.",
           "taslak": true
@@ -378,16 +377,6 @@
           "bagli": "evet",
           "cikti": "Recep'e tek tablo (Cuma); karne eşiğini aşan departman satırı kırmızıdır",
           "esik": "Kanıtsız Done 0; kırmızı karne satırı aynı raporda sahibine kartla bağlanır"
-        },
-        {
-          "gorev": "Açılış raporu (tüzük Madde 7): Recep'in ilk mesajında kırmızılar, onay bekleyenler ve günün sırası",
-          "siklik": "olay",
-          "tetik": "istem-tazelik",
-          "tetikAyrinti": "Recep'in günün ilk mesajı; tetiği oturum açılış kancasına ARAÇ kuracak (OPS-169)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
-          "cikti": "Tek tablo: Onayında satırları en üstte; değişen yoksa tek cümle",
-          "esik": "İlk mesajdan sonraki ilk cevapta; gün içinde yinelenmez"
         }
       ]
     },
