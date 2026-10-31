@@ -58,6 +58,22 @@ Checked Stripe Node SDK target: 23.0.0 on 2026-10-09. Provider API version is a 
 4. Test invalid signatures, replay, ordering, partial failure and ambiguous retries using local/sandbox inputs.
 5. Verify checkout/entitlement experience and report sandbox versus live evidence separately.
 
+## Dayanıklı gelen kutusu ve dört sınır testi (VentHub uyarlaması)
+
+Doğrulanmış olayı `2xx` dönmeden **önce** kalıcı bir gelen kutusuna yaz. Yalnız olay kimliğini eklemek "işlendi" işareti değildir: kimlik yazıldıktan sonra karşılama çökerse yeniden gönderim hâlâ bekleyen iş bulmalıdır. Gelen kutusunun üç garantisi:
+
+- **Kabul:** olay kimliği ile tam yük (payload) tek atomik yazımla `pending` yazılır, `UNIQUE(event_id)`. Kopya, yükü ezmez ve biten işi sıfırlamaz. Yalnız kalıcı commit'ten sonra `2xx` dön; depolama hatasında `503` dön ki sağlayıcı yeniden denesin. İmza hatası `400`.
+- **Kiralama:** işçi bekleyen ya da süresi dolmuş işi atomik kiralar (`FOR UPDATE SKIP LOCKED`), deneme sayısını artırır, çöken işçinin kirasını geri alır, hakkı biten işi sonsuz denemek yerine incelenebilir bir "ölü kuyruk" durumuna taşır.
+- **Tamamlama:** yan etkiler başarılı olduktan sonra işaretlenir; `finally` içinde asla. Hata olursa geri çekilmeli yeniden deneme.
+
+İşleyici, olay sırasının bozulabileceğini varsayıp işlem yapmadan önce sağlayıcıdan **güncel durumu** yeniden okur (örnek: iyzico ödeme sorgusu). Karşılama (sipariş onayı) tek işlemde karşılamayı ve çıkış kutusunu yazar ya da aşağı akışta idempotency anahtarı kullanır: yan etkiden sonra ama `complete`ten önce çökme olayı yeniden oynatır. Aynı siparişe ait farklı olay kimlikleri tek karşılamaya birleşmelidir (olay kimliği ile iş işlemi kimliği ayrı tekilleştirme sorunlarıdır).
+
+**Dört sınır testi** (her birinde bekleyen olay en sonunda tam bir karşılamayla tamamlanmalıdır): (1) gelen kutusu commit'inden önce hata, (2) bekleyen iken kopya teslim, (3) karşılamadan önce işçi hatası, (4) karşılamadan sonra ama tamamlamadan önce işçi çökmesi.
+
+Bizde: tutar `numeric(14,4)` (kural 4), sipariş/iade durumları yalnız ileri (kural 11), canlı sağlayıcı ve canlı yazım bu skill'in kapsamı dışında. Kaynaktaki Stripe sınıfları, `constructEvent` ve ortam değişkeni adları alınmadı; imza doğrulaması bizim `iyzico-callback` işleyicimizin ham gövde doğrulamasıdır (önce kod okunur, kural 2). Mevcut `*_webhook_events` tabloları (kargo, iade) kayıt tutar, kiralama yapmaz; ödeme yolunda bir gelen kutusu kurmak migration gerektirir ve Recep onaylı, ayrı iştir (kural 13).
+
+Kaynak: msitarzewski/agency-agents engineering-payments-billing-engineer @b37b5bb3 (MIT).
+
 ## Before returning
 
 Provider authenticity and account/API scope explicit; replay/order/idempotency covered; entitlements reconcile; real financial actions remain authorized.
