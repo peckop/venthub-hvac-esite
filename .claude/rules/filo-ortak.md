@@ -15,14 +15,14 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 ```
 
 - Üçüncü parça, en altta, iki aşamalı compact cümlesi: "Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz."
-- Üç parça KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu yalnız OPS'a yazmak kuralı çiğner.
+- Üç parça KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider ("hazır" ya da "X bitince hazır").
 - `/compact` satırını vermeden önce durum dosyasını güncelle ve sonuna tek satır yaz: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`.
 - Compact dönüşünde ilk tool çağrısı durum dosyasını okumaktır; ilk görünür satır "bana ulaşan son girdin: <özet>" olur.
 - Konuşmada verilen her kalıcı söz kalıcı yere yazılır; yazılmadıysa verilmemiştir.
 
 ## İş ve kart
 
-- Her iş bir Kanban kartıdır; numara `<ÖN EK>-<sayı>` biçimindedir (`OPS-101`; Linear'dan taşınan kartta `REC-nn`). Numara pano sayacından alınır, uydurulmaz. Kartsız iş başlatma.
+- Her iş bir Kanban kartıdır; numara `<ÖN EK>-<sayı>` biçimindedir (`OPS-101`; Linear'dan taşınan kartta `REC-nn`). Numara pano sayacından alınır, uydurulmaz.
 - Emri alan müdür kartı kendi panosunda aynı turda aç ve kart numarasını emri verene dön; numarasız emri kabul etme.
 - Her emirde `YÖNTEM:` satırını (önerilen yöntem ve bir cümle gerekçe) ve `KAYNAK/CETVEL:` satırını oku; ikisi yoksa emri eksik say.
 - Emir rol kartındaki Görev satırının dışındaysa ya da "Görev değil" satırına giriyorsa işe başlama; OPS'a "görev dışı: <hangi satır>" diye tek satır dön.
@@ -39,7 +39,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`).
 - Recep'in onayladığı işi bekletmek için ölçülmüş engel gerekir; karta "ölçüldü mü?" satırı yazılır.
 - Önce Claude Code'un yerleşik karşılığını ara; genel inceleme ve sadeleştirmede önce yerleşik `/code-review` ve `/simplify`, ödeme, auth, RLS ya da webhook koduna dokunan farkta ayrıca `security-reviewer` ajanı. Mevcut code-review, diff-review, security-scanner, refactor-planner yetenekleri silinmez, VentHub'a özel kontrol için kalır.
-- Dış araç kararı dört kapılıdır (OPS-191): ihtiyaç (hangi kartın sorunu, 5 dk), örtüşme (mevcut araç ya da yerleşik özellik, 10 dk), deneme (aracı çalıştır, kendi sayılarını al, 30 dk), benimseme (lisans, güvenlik, bakım; derin inceleme yalnız burada). Her kapıda dur ya da devam; ayrıntı arac-envanteri-standard.md.
+- Dış araç kararı dört kapılıdır: ihtiyaç, örtüşme, deneme, benimseme; her kapıda dur ya da devam (arac-envanteri-standard.md).
 - İyileştirme hakkı: kendi alanındaki iyileştirmeyi OPS'a tek mesajla öner (ne, kazanç, bedel); onay gelmeden uygulanmaz. Cuma çürütücü haftayı kart ve kurallara karşı okur, en çok 3 öneri OPS'a gider. Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer.
 
 ## Recep ile iletişim
@@ -51,7 +51,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
   - Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, iyileştirme: metni OPS'a `SendMessage` ile ver; OPS tam farkı okuyup onaylar, uygular; Recep'e sorulmaz. OPS'un kendi kanca/ayar PR'ını ARAÇ okur.
   - İzin, hesap, MCP (allow/ask/deny, izin modu, onay veren kanca, `.mcp.json`) ve kapıyı gevşeten öneri: Recep yalnız OPS penceresinde söyler, OPS uygular ya da ARAÇ PR'ını okur; deny gevşetilmez (§18).
 - Farklı izin modunda doğrudan mesaj düşebilir: posta kutusu (tam kimlik) kullan; izin modunu değiştirmek Recep kararıdır.
-- Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe). Altında akan cümlelerle söyle: ne bu, hiç çalıştı mı, işimize yarar mı, aktif etmezsek ne olur, önerim. Bağlamsız "onaylar mısın" sorma.
+- Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe). Altında akan cümlelerle söyle: ne bu, hiç çalıştı mı, işimize yarar mı, aktif etmezsek ne olur, önerim.
 - Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üstte, ayrı tablo yok.
 - Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe, "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
 - Sorumlu sütununa "ben" yaz (OPS hariç); başkasını bekleyen işte de "ben" kalır, Sırada'ya yalnız "başka bir departmanın işini bekliyor" yaz.
@@ -68,8 +68,9 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 ## Test ve bellek
 
-- Yerelde yalnız `pnpm test:ilgili` koş; seçici TAM derse hiçbir test koşmaz, CI koşar. Değişen test dosyalarını `pnpm vitest <dosya> --run` ile ekle. Tam paket, tam type-check ve build yerelde koşturulmaz.
-- PR açtıktan sonra CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok); sonuç bildirimle gelir.- Site koduyla ilgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
+- Yerelde yalnız `pnpm test:ilgili` koş; seçici TAM derse hiçbir test koşmaz, CI koşar. Değişen test dosyalarını `pnpm vitest <dosya> --run` ile ekle. Tam paket, type-check ve build yerelde koşturulmaz.
+- PR açınca `mcp__ccd_pr__bind_pr` ile PR'ı asıl PR olarak bağla (pencere tek PR'ı izler); CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok). CI yeşili için bildirim GELMEZ (uyandırma yalnız hata, çakışma, yorum; auto_fix kapalı): yeşil gerekirse `get_status` ya da `gh pr view` ile TEK SEFERLİK oku, ya da OPS dürter.
+- Site koduyla ilgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
 - Durum satırında BELLEK uyarısı varsa (boş bellek 2 GB altı, tek süreç 3 GB üstü) tam vitest, tsc, `next build`, `pnpm install`, Docker gibi ağır komut başlatma; OPS'a yaz.
 
 ## Bilgi sırası ve açılış
