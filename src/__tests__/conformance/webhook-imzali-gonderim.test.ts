@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
  *
  * Fonksiyonu en son tanımlayan migration okunur (sıra = dosya adı damgası). Ölçülen: düz secret
  * başlığı gitmiyor, zaman + imza başlıkları gidiyor, mesaj biçimi sunucudaki `imzaUret` ile aynı
- * (`<zaman>.<ham gövde>`), imza hatası veri yazımını engellemiyor. Davranışın kendisi (canlıda
+ * (`<zaman>.<ham gövde>`), toplu yazımı yavaşlatan alt işlem bloğu yok. Davranışın kendisi (canlıda
  * pg_net → rota) birleştirme sonrası net._http_response ile ölçülür; bu kapı yalnız kaynağın
  * geri dönmesini (düz secret'e dönüş, başlık adı kayması) yakalar.
  */
@@ -54,13 +54,17 @@ describe('INV-WEBHOOK-2 imzalı gönderim', () => {
     expect(kod).toMatch(/encode\([\s\S]*?'hex'\s*\)/)
   })
 
-  it('imza hatası veri yazımını engellemez (EXCEPTION → WARNING, RETURN NEW)', () => {
-    expect(kod).toMatch(/EXCEPTION\s+WHEN\s+OTHERS\s+THEN\s+RAISE\s+WARNING/i)
-    expect(kod).toMatch(/RETURN\s+NEW/i)
+  it('satır başına alt işlem açan EXCEPTION bloğu YOK (toplu yazımda snapshot maliyeti)', () => {
+    expect(kod).not.toMatch(/EXCEPTION\s+WHEN/i)
   })
 
-  it('search_path extensions şemasını içerir ve fonksiyon SECURITY DEFINER kalır', () => {
-    expect(govde).toMatch(/set\s+search_path\s+to[^\n]*'extensions'/i)
+  it('Vault’ta sır yoksa yazımı engellemez (WARNING + RETURN NEW)', () => {
+    expect(kod).toMatch(/RAISE\s+WARNING[\s\S]*?RETURN\s+NEW/i)
+  })
+
+  it('search_path eskisiyle aynı (extensions yok; hmac şema ile nitelenmiş), SECURITY DEFINER kalır', () => {
+    expect(govde).toMatch(/set\s+search_path\s+to\s+'pg_catalog',\s*'public',\s*'net',\s*'vault'\s*\r?\n/i)
+    expect(kod).toMatch(/extensions\.hmac\(/)
     expect(govde).toMatch(/security\s+definer/i)
   })
 })

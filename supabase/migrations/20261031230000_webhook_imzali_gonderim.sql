@@ -18,9 +18,18 @@
 -- GERİ ALMA: scripts/db/rollback/20261031230000_webhook_imzali_gonderim_geri_al.sql (otomatik uygulanmaz).
 -- Sunucu imzasız isteği (eski düz secret yolu) hâlâ kabul ettiği için geri alma güvenlidir.
 --
--- HATA YOLU (kural 14): imza üretimi ya da gönderim bir nedenle patlarsa tetiğin asıl işi (veri yazımı)
--- ENGELLENMEZ; WARNING günlüğe düşer ve sayfa yenileme o olay için atlanır. Düz secret'e GERİ DÜŞÜLMEZ
--- (imzalı yolun amacı o başlığın hiç gitmemesi).
+-- HATA YOLU (kural 14): Vault'ta sır yoksa tetik WARNING verip atlar (veri yazımı sürer; T031-VH ile aynı).
+-- İmza üretimi ve net.http_post için EXCEPTION bloğu YOKTUR, bilerek: blok her satırda alt işlem (subtransaction)
+-- açar; tek işlemde yüzlerce satır yazan toplu işlerde (1044 fiyat satırı örneği) bu snapshot maliyeti getirir.
+-- Girdiler doğrulandı (metin anahtar + metin mesaj, extensions.hmac erişilebilir); net.http_post eski sürümde de
+-- korumasızdı. Bu çağrılar beklenmedik biçimde patlarsa AFTER tetik yazımı geri alır; bu eski davranışla aynıdır.
+-- Düz secret'e GERİ DÜŞÜLMEZ (imzalı yolun amacı o başlığın hiç gitmemesi).
+--
+-- BİLİNEN SINIRLAR (security-reviewer, PR #2150):
+--   1) Zaman damgası TETİK anında alınır, pg_net isteği COMMIT sonrası gönderir: 5 dakikadan uzun tek işlem
+--      ya da birikmiş kuyruk olayları sunucuya 'bayat' (401) varır; ilgili sayfalar ISR yedeğine (1 saat) kalır.
+--      İzleme: net._http_response.status_code = 401.
+--   2) Aynı saniyede gövdesi birebir aynı iki olay aynı imzayı üretir; ikincisi aynı örnekte tekrar sayılır.
 
 begin;
 
@@ -28,7 +37,7 @@ create or replace function public.handle_supabase_webhook()
 returns trigger
 language plpgsql
 security definer
-set search_path to 'pg_catalog', 'public', 'net', 'vault', 'extensions'
+set search_path to 'pg_catalog', 'public', 'net', 'vault'
 as $function$
     DECLARE
       payload jsonb;
@@ -57,27 +66,23 @@ as $function$
         'old_record', CASE WHEN TG_OP = 'INSERT' THEN NULL ELSE to_jsonb(OLD) END
       );
 
-      BEGIN
-        zaman_sn := floor(extract(epoch FROM clock_timestamp()))::bigint::text;
-        -- Mesaj: `<zaman>.<ham gövde>`; ham gövde pg_net'in ağa yazdığı metinle aynıdır (payload::text).
-        imza := encode(
-          extensions.hmac(zaman_sn || '.' || payload::text, webhook_secret, 'sha256'),
-          'hex'
-        );
+      zaman_sn := floor(extract(epoch FROM clock_timestamp()))::bigint::text;
+      -- Mesaj: `<zaman>.<ham gövde>`; ham gövde pg_net'in ağa yazdığı metinle aynıdır (payload::text).
+      imza := encode(
+        extensions.hmac(zaman_sn || '.' || payload::text, webhook_secret, 'sha256'),
+        'hex'
+      );
 
-        SELECT net.http_post(
-          url := webhook_url,
-          body := payload,
-          headers := jsonb_build_object(
-            'Content-Type', 'application/json',
-            'x-webhook-timestamp', zaman_sn,
-            'x-webhook-signature', imza
-          ),
-          timeout_milliseconds := 5000
-        ) INTO req_id;
-      EXCEPTION WHEN OTHERS THEN
-        RAISE WARNING '[handle_supabase_webhook] imzali gonderim basarisiz — sayfa yenileme atlandi (tablo: %, hata: %)', TG_TABLE_NAME, SQLERRM;
-      END;
+      SELECT net.http_post(
+        url := webhook_url,
+        body := payload,
+        headers := jsonb_build_object(
+          'Content-Type', 'application/json',
+          'x-webhook-timestamp', zaman_sn,
+          'x-webhook-signature', imza
+        ),
+        timeout_milliseconds := 5000
+      ) INTO req_id;
 
       RETURN NEW;
     END;
