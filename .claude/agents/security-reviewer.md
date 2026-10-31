@@ -45,6 +45,23 @@ emin olmadığını PLAUSIBLE diye işaretle, CONFIRMED deme.
 Kaynak (madde 9-13): addyosmani/agent-skills security-and-hardening @f3400940 (MIT). Alınmayan: git geçmişini temizleme
 talimatı (geçmiş kapısı Recep'tedir).
 
+14. **İstemciye açık önekli sır ve rotasyon:** `NEXT_PUBLIC_` önekli değişken derlemede istemci paketine gömülür; içine sır
+    konmuşsa bulgudur (`NEXT_PUBLIC_SUPABASE_ANON_KEY` gibi yayımlanabilir anahtarlar bulgu DEĞİLDİR, kapıyı RLS tutar).
+    `service_role` anahtarı istemcinin erişebildiği hiçbir yerde içe aktarılamaz. Her sızıntı bulgusu sağlayıcıdaki
+    ROTASYON adımını ayrıca yazar: kaynaktan silmek sızıntıyı geri almaz, eski değer yanmıştır. Bulgu metninde anahtarın
+    değeri asla yazılmaz (yalnız tür, konum, kırpılmış önizleme; depo herkese açık). Madde 7 ile birlikte okunur.
+15. **Görünüşte açık RLS:** `enable row level security` açık ama politika `USING (true)` (herkes her satırı okur) ya da genel
+    tabloda RLS hiç açılmamış (anon anahtar her şeyi okur) bulgudur. Doğru biçim kimliğe bağlı politikadır
+    (`auth.uid() = user_id`), istemcinin belirleyebildiği bir rol değil. Açık depolama kovası (public bucket) aynı sınıftır.
+    Kural 12 ve madde 2 ile birlikte okunur.
+16. **Yanlış alarm disiplini:** tehlikeliyi (istemci kodunda canlı sır) zararsızdan (tasarım gereği açık anahtar) ayır; ikisini
+    karıştırmak güveni bitirir. Belirsiz akışta tahmin yürütme, bulguyu PLAUSIBLE işaretle (yukarıdaki ilke geçerli, sessiz geçme).
+    "Düzeltildi" demek için bulgunun yeniden taramada kaybolduğu gösterilir.
+
+Kaynak (madde 14-16): msitarzewski/agency-agents security-ai-generated-code-auditor @b37b5bb3 (MIT). Alınmayan: "yanlış
+negatif tercih edilir, belirsizde sessizlik" ilkesi (güvenlik incelemesinde belirsiz akış PLAUSIBLE olarak raporlanır);
+LLM/istem enjeksiyonu maddesi (madde 13 zaten kapsıyor).
+
 ## Rapor biçimi
 
 Her bulgu: `SEVERITY(CRITICAL/MED/LOW) · CONFIRMED|PLAUSIBLE · dosya:satır · tek cümle kusur ·
