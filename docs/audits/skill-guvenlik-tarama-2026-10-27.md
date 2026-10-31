@@ -1,6 +1,6 @@
 # Skill güvenlik taraması: agnix ve SkillSpector (YTN-22, 27 Ekim 2026)
 
-Kaynak/cetvel: cetvel yok, yazımı bu işin kapsamında (OPS-190). Hızlı tarama; OPS daraltması: araçların kendi sayıları tabloda, "gerçek mi yanlış alarm mı" incelemesi yok, elle yalnız yüksek ve kritik bulgulara tek satır, alt ajan yok, süre tavanı 30 dk. Ham çıktılar depo dışında: `C:/tmp/ytn22/` (agnix.json, ss-depo.json, ss-kullanici.log). Düzeltme uygulanmadı.
+Kaynak/cetvel: cetvel yok, yazımı bu işin kapsamında (OPS-190). Hızlı tarama; OPS daraltması: araçların kendi sayıları tabloda, "gerçek mi yanlış alarm mı" incelemesi yok, elle yalnız yüksek ve kritik bulgulara tek satır, alt ajan yok, süre tavanı 30 dk. Ham çıktılar depo dışında, geçici dizindeki `ytn22/` klasöründe (agnix.json, ss-depo.json, ss-kullanici.log). Düzeltme uygulanmadı.
 
 ## Tablo 1: agnix (agent-sh/agnix, `--target claude-code`, yalnız rapor)
 
@@ -12,7 +12,7 @@ Koşum 14:35, 368 dosyada 1099 bulgu: 570 hata, 380 uyarı, 149 bilgi. Aşağıd
 | CC-SK-017 | uyarı | 330 | SKILL.md frontmatter'ında bilinmeyen alan `category` (.agent/skills 168, .claude/skills 160) |
 | AS-020 | bilgi | 68 | Açıklama ne yaptığını söylüyor, ne zaman kullanılacağını söylemiyor |
 | AS-024 | bilgi | 30 | Komut `skills` sürüm sabitlemeden çalışıyor |
-| CC-SK-021 | uyarı | 23 | Sabit kullanıcı yolu (`c:/Users/alize`) kimliği sızdırıyor, taşınabilir değil |
+| CC-SK-021 | uyarı | 23 | Sabit kullanıcı klasörü yolu kimliği sızdırıyor, taşınabilir değil |
 | CC-AG-022 | bilgi | 22 | Alt ajan ne `tools` ne `disallowedTools` veriyor, tüm araçları devralıyor |
 | CC-SK-008 | hata | 18 | Bilinmeyen araç adı (4 dosya; örnek `call_mcp_tool`, `.agent/skills` altında) |
 | AS-023 | bilgi | 8 | |
@@ -27,7 +27,7 @@ Elle bakılan yüksek düzey (hata) bulgular, her biri tek satır:
 - CC-AG-007 (1): `.claude/agents/denetim-opus.md` frontmatter'ı ayrıştırılamıyor ("mapping values are not allowed"); ajan tanımı geçerli sayılmıyor, tek gerçek yapısal hata bu.
 - file::read (1): `.archive/legacy_superpowers_artifacts/execution.md` okunamadı.
 
-## Tablo 2: SkillSpector (NVIDIA, `--no-llm`, toplu tarama, C:/tmp sanal ortam)
+## Tablo 2: SkillSpector (NVIDIA, `--no-llm`, toplu tarama, geçici dizinde sanal ortam)
 
 | Kapsam | Taranan | Paket riski (aracın puanı) | Bulgu şiddeti |
 |---|---|---|---|
@@ -56,4 +56,4 @@ Kullanıcı klasörü kritik/yüksek listesinin neredeyse tamamı gstack (`caref
 
 1. **`denetim-opus.md` frontmatter'ını düzelt** (agnix CC-AG-007): ajan tanımı ayrıştırılamıyor; tek gerçek yapısal hata; ARAÇ/HARİTA alanı, küçük iş.
 2. **SkillSpector'ı depo skill'lerinde kapı yapma, kural olarak değil bilgi olarak kullan**: bakılan yüksek bulguların çoğu metin anlatımına benziyor (komut örneği, `.env` anılması; doğrulanmadı); sırf puan yüzünden `graphify` ve `venthub-enterprise-audit` kaldırılmamalı. İstenirse "yeni dışarıdan alınan skill'i kurmadan önce tara" adımı olarak kalsın.
-3. **gstack'in kritik puanlı 36 paketi için karar**: depo dışı, bizim değil; bunları kurulu tutmak ya da set kapalı listesine almak OPS kararı. Eklenti klasörü taraması için kopyalama izni (C:/tmp) verilirse 12 dakikalık iş.
+3. **gstack'in kritik puanlı 36 paketi için karar**: depo dışı, bizim değil; bunları kurulu tutmak ya da set kapalı listesine almak OPS kararı. Eklenti klasörü taraması için kopyalama izni (geçici dizin) verilirse 12 dakikalık iş.
