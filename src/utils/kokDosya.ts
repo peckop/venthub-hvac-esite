@@ -28,6 +28,12 @@ export const BILINEN_KOK_METIN_DOSYALARI: ReadonlySet<string> = new Set([
  */
 const INDEXNOW_ANAHTAR_DOSYASI = /^[0-9a-f]{32}\.txt$/
 
+/**
+ * Yandex Webmaster doğrulama dosyası: `public/yandex_<16 onaltılık hane>.html` (SEO-64). Adı Yandex'in
+ * verdiği koddur; biçim dar tutuldu, başka kök `.html` adları muaf OLMAZ (eskisi gibi dile yönlenir).
+ */
+const YANDEX_DOGRULAMA_DOSYASI = /^yandex_[0-9a-f]{16}\.html$/
+
 /** Sitemap tek rota: `src/app/sitemap.ts` yalnız `/sitemap.xml` üretir (`generateSitemaps` yok). */
 const BILINEN_KOK_XML_YOLU = '/sitemap.xml'
 
@@ -46,6 +52,7 @@ export function kokDosyaKarari(pathname: string, segments: readonly string[]): K
 
   if (segments.length !== 1) return 'dosya-degil'
   const ad = segments[0]
+  if (YANDEX_DOGRULAMA_DOSYASI.test(ad)) return 'bilinen'
   if (!/\.(txt|xml)$/.test(ad)) return 'dosya-degil'
 
   if (BILINEN_KOK_METIN_DOSYALARI.has(ad) || INDEXNOW_ANAHTAR_DOSYASI.test(ad)) return 'bilinen'
