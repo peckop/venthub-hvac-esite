@@ -55,3 +55,13 @@ Ağırlık, IP, l/s alanları ve 12214/10935 kod tutarsızlığı bu turda doğr
 ## 4. Yazım paketi durumu
 
 Yazılacak değerler kesin olanlar: Mono filtre G4→G3 (8 ürün), 12101 ve 10930 ses değerleri (canlı değer tür olarak LwA, föyde LwA var: 47,2 ve 53), AVEL (10911/12106) elektrik koruma Class II→Class I. Kuru koşu ve geri alma SQL'i hazırlanmadı: ürünlerin ilgili alanları, `description_i18n` metinlerinde aynı sayı geçip geçmediği ve alan değişmeden okuyan kodlar taranmadı (KATALOG-kurallar 2 ve 3), bu yüzden paket "hazır" sayılmaz.
+
+## 5. Tur 2: yazım paketi (HAZIR, canlıya yazılmadı)
+
+Dosya: `scripts/db/product-data/ktl67-isi-geri-kazanim-duzelt.sql` (kuru koşu, description taraması, yaz, geri alma, ölçüm; her blok ayrı). Yalnız "kesin" satırlar: Mono 8 ürün filtre G4→G3, VRT-12101 ses 57→47,2, VRT-10930 ses 57,2→53, VRT-10911 ve VRT-12106 koruma sınıfı Class II→Class I. Birleştirme `technical_specs || '{...}'` ile, sayaç 8/1/1/2 tutmazsa işlem tamamen geri döner.
+
+- Baskı tazeliği (kural 1): MEV IoT 188510 ve Mono 189860 ikisi de `katalog-envanteri.json`'da "güncel", baskı Ocak 2025.
+- Okuyucu taraması (kural 2): `filter_classes`, `noise_level_db_a`, `electrical_protection_class` anahtarlarını `src/` içinde yalnız genel okuyucular okuyor (`productHelpers`, `wizard.service`, `ductFanSelection`, `engineeringIntelligence`, uyumluluk testleri); bu 12 SKU kodda ya da `scripts/db` dosyalarında sabit yazılı değil. Değer yönü (G4→G3, ses düşüşü) `ductFanSelection` gibi seçim mantığını etkileyebilir: yazımdan sonra ilgili seçici testlerinin `pnpm test:ilgili` ile koşması gerekir, bu turda koşulmadı.
+- Metin taraması (kural 3): canlı sayfadaki 12 açıklamada G3/G4, 57, dB, Class geçmiyor (ölçüldü). `description_i18n` canlı sayfadan ayrıca okunmadı; paketin 2. bloğu bunu veritabanında ölçer, satır dönerse yazılmaz.
+- Ses türü: HR ailesi LwA (enerji sayfası) taşıyor; yeni değerler de LwA'dır (47,2 ve 53). Mono Lp kalır. Tür etiketlemesi ayrı iş.
+- Yazım sonrası ISR tazelenmesi `rendering-cache-standard.md` gereği ölçülmeli.
