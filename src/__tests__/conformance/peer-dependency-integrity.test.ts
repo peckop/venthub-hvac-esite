@@ -35,6 +35,15 @@ const MUAFIYETLER: ReadonlyArray<{ paket: string; peer: string; gerekce: string 
   // KENDI onarimlariyla dustu: react-day-picker -> {date-fns, react} ikilisi #698 in v9
   // yukseltmesiyle, @eslint/js -> eslint ise bu daldaki surum hizalamasiyla. Yani su an
   // depoda BILINEN peer ihlali YOK; yeni bir ihlal dogarsa kapi dogrudan kirmizi verir.
+  {
+    paket: '@hookform/resolvers',
+    peer: 'ajv-formats',
+    gerekce:
+      '2026-10-31 (ALT-118, resolvers 5.9.2): ajv-formats isteğe bağlı peer (^2.1.1), kurulu 3.0.1; ' +
+      'onu webpack zinciri getirir (schema-utils). Ölçüm: src altında ajv ve resolvers/ajv içe aktarımı 0, ' +
+      'yalnız @hookform/resolvers/zod kullanılıyor; yani ajv yolu çalışmaz. 2.x sabitlemek schema-utils ' +
+      'zincirini bozar. Resolvers ajv-formats 3 desteği verince ya da ajvResolver kullanılırsa yeniden bak.',
+  },
 ]
 
 type Surum = { ana: number; orta: number; kucuk: number; on: string | null }
