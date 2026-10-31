@@ -255,7 +255,6 @@ braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk 
 
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
-| `GHSA-mrhx-c7xc-m3w5` | zod 3.25.76 | high | 2026-10-25 | zod <4.6.6 sınırlı koleksiyon doğrulamasında bellek tüketimi (DoS); düzeltme yalnız 4.6.6+ (ana sürüm, bizde `^3.24.1`, 3.x'te yama yok). Kullanım yalnız 8 dosya: admin form pencereleri ve admin görünümleri (istemci tarafı alan doğrulama); depoda `z.array(` kullanımı YOK, sunucu yanıt yolunda ve herkese açık girdide yok | zod 4 göçü (kendi işi: şema sözdizimi ve `zodResolver` uyumu ölçülür) VE `pnpm audit --prod` bu kaydı artık vermiyor |
 
 ## 7a · KABUL EDİLMİŞ ORTA ÖNEMLİ KAYITLAR — ALT-95 (OPS hükmü, 2026-10-16)
 

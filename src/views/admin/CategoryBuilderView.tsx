@@ -43,10 +43,20 @@ interface CategoryBuilderViewProps {
 interface CategoryFormValues {
   name: string;
   slug: string;
-  parent_id: string | null;
+  parent_id?: string | null;
   sort_order: number;
-  description: string;
+  description?: string | null;
   is_active: boolean;
+}
+
+// zod 4 + resolvers 5: form alanları GİRDİ tipiyle (default öncesi), gönderilen değer yukarıdaki ÇIKTI tipiyle tanımlanır.
+interface CategoryFormInput {
+  name: string;
+  slug: string;
+  parent_id?: string | null;
+  sort_order?: number;
+  description?: string | null;
+  is_active?: boolean;
 }
 
 const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId }) => {
@@ -72,7 +82,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     is_active: z.boolean().optional().default(true),
   }), [t]);
 
-  const form = useForm<CategoryFormValues>({
+  const form = useForm<CategoryFormInput, unknown, CategoryFormValues>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: '',
@@ -257,9 +267,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         ...(category as DbCategory),
         name: values.name,
         slug: values.slug,
-        parent_id: values.parent_id,
+        parent_id: values.parent_id ?? null,
         sort_order: values.sort_order,
-        description: values.description,
+        description: values.description ?? null,
         is_active: values.is_active,
         authority_content: blocks,
       };

@@ -104,10 +104,10 @@ const createCouponSchema = z.object({
       message: 'admin.coupons.validation.codeLength',
     }),
   type: z.enum(['percent', 'fixed'], {
-    errorMap: () => ({ message: 'admin.coupons.validation.typeRequired' }),
+    error: 'admin.coupons.validation.typeRequired',
   }),
   value: z
-    .number({ invalid_type_error: 'admin.coupons.validation.valuePositive' })
+    .number({ error: 'admin.coupons.validation.valuePositive' })
     .positive({ message: 'admin.coupons.validation.valuePositive' }),
   starts_at: z.string().nullable().optional(),
   ends_at: z.string().nullable().optional(),
@@ -265,8 +265,8 @@ const CouponsTableBody: React.FC = () => {
       const fieldErrors: Record<string, string> = {}
       result.error.issues.forEach((issue) => {
         const path = issue.path[0]
-        if (path) {
-          fieldErrors[path] = issue.message
+        if (path !== undefined) {
+          fieldErrors[String(path)] = issue.message
         }
       })
       setErrors(fieldErrors)
