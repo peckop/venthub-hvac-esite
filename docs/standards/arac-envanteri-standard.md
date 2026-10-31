@@ -146,6 +146,26 @@ canlı mı" sorusuna envanter satırıyla cevap verir; cevap veremiyorsa envante
 3. **Karantina/silme:** AXIOM 3.
 4. **Şerit devri:** claim değişince envanterdeki `sahip` aynı PR'da değişir.
 
+## 4b · Giriş kapısı (dış araç kararı, OPS-191)
+
+AXIOM'lar aracın **çıkış** tarafını yönetir (envanter, sahip, ölü aday). Bu bölüm **giriş**
+tarafını yönetir: dışarıdan gelen bir aracı denemek ya da benimsemek için hangi kapılardan,
+ne kadar derinlikle geçileceği. Derinlik kapıyla artar; erken kapıda derin inceleme yapılmaz.
+
+| Kapı | Soru | Süre tavanı | Dur koşulu | Devam koşulu |
+|---|---|---|---|---|
+| 1 · İhtiyaç | Hangi kartın hangi sorununu çözüyor? | 5 dk | Karta bağlanamıyor | Kart numarası ve sorun tek cümle |
+| 2 · Örtüşme | Mevcut araç ya da Claude Code yerleşik özelliği aynı işi yapıyor mu? | 10 dk | Mevcut olan yetiyor | Kapatılan boşluk yazılı |
+| 3 · Deneme | Aracı çalıştır; kendi çıktısındaki sayılar ne diyor? | 30 dk | Sayılar ihtiyacı karşılamıyor | Sayılar karta yazıldı |
+| 4 · Benimseme | Lisans, güvenlik, bakım uygun mu? | Kartın kendi tavanı | Lisans ya da güvenlik engeli | Envanter satırı (§1) ve sahip yazıldı |
+
+- Deneme (3. kapı) hafiftir: kısa okuma (ne yapar, lisans, nereye yazar, geri alma), aracı
+  çalıştır, aracın kendi sayılarını al. Bulgu bulgu inceleme yapılmaz; yalnız yüksek ve kritik
+  bulguya tek satır yazılır. Rapor iki tablo ve en çok 3 öneridir.
+- Derin inceleme **yalnız 4. kapıda** yapılır.
+- Her kapıda karar "dur" ya da "devam"dır; karara karta tek satır yazılır. Kapı atlanmaz; dur
+  denen araç yeni kanıtla 1. kapıdan yeniden başlar.
+
 ## 5 · Neden bu biçim (kısa)
 
 - **Betik üretir, insan hükmeder:** sayım elle yapılınca evren kayıyor (27 vs 14 kanca).
