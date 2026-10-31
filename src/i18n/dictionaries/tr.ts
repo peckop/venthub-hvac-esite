@@ -3097,7 +3097,7 @@ export const tr = {
     faq: {
       title: 'Sıkça Sorulan Sorular',
       // URN-135: rehber geri bağlantısı; yalnız yazı kaydı varsa çizilir (sunucuda hesaplanan `rehberHref`).
-      rehberBaglantisi: 'Rehber: Sessiz fan nasıl seçilir?',
+      rehberBaglantisi: 'Rehber: Sessiz kanal fanı nasıl seçilir?',
       items: [
         {
           q: 'Vortice Lineo Quiet nedir?',
