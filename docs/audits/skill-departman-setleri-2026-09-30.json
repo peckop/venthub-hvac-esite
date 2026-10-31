@@ -126,7 +126,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     },
     {
      "ad": "security-scanner",
@@ -285,7 +285,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     },
     {
      "ad": "security-scanner",
@@ -435,7 +435,7 @@
    "adiylaCagir": [
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     },
     {
      "ad": "security-scanner",
@@ -599,7 +599,7 @@
     },
     {
      "ad": "payments-webhooks",
-     "kb": 6.6
+     "kb": 9
     },
     {
      "ad": "database-migrations",
@@ -636,7 +636,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     },
     {
      "ad": "security-scanner",
@@ -673,7 +673,7 @@
    "adiylaCagir": [
     {
      "ad": "payments-webhooks",
-     "kb": 6.6
+     "kb": 9
     }
    ],
    "bekleyen": [
@@ -760,7 +760,7 @@
    "adiylaCagir": [
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     }
    ],
    "bekleyen": []
@@ -939,7 +939,7 @@
    "adiylaCagir": [
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     }
    ],
    "bekleyen": []
@@ -1046,7 +1046,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     }
    ],
    "bekleyen": []
@@ -1274,7 +1274,7 @@
     },
     {
      "ad": "payments-webhooks",
-     "kb": 6.6
+     "kb": 9
     },
     {
      "ad": "incremental-implementation",
@@ -1312,7 +1312,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     },
     {
      "ad": "security-scanner",
@@ -1350,7 +1350,7 @@
    "adiylaCagir": [
     {
      "ad": "payments-webhooks",
-     "kb": 6.6
+     "kb": 9
     }
    ],
    "bekleyen": [
@@ -1587,7 +1587,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 12.3
+     "kb": 14.5
     }
    ],
    "bekleyen": []
