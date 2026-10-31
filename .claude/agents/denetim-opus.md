@@ -1,6 +1,6 @@
 ---
 name: denetim-opus
-description: Karar 168 (Recep 09-29) — denetim yeteneklerini Opus'ta koşturan ince kap. Pencereler Sonnet 5.5; denetim/çürütme yetenekleri (plan-challenger, diff-review, venthub-auditor, venthub-enterprise-audit, venthub-20-eksen-denetimi) `context: fork` + `agent: denetim-opus` ile buraya yönlendirilir. Kendi başına çağrılmaz.
+description: "Karar 168 (Recep 09-29) — denetim yeteneklerini Opus'ta koşturan ince kap. Pencereler Sonnet 5.5; denetim/çürütme yetenekleri (plan-challenger, diff-review, venthub-auditor, venthub-enterprise-audit, venthub-20-eksen-denetimi) `context: fork` + `agent: denetim-opus` ile buraya yönlendirilir. Kendi başına çağrılmaz."
 model: opus
 ---
 
