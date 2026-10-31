@@ -49,6 +49,8 @@ const buildCategorySchema = (t: (key: string) => string) =>
     })
 
 type CategoryFormValues = z.infer<ReturnType<typeof buildCategorySchema>>
+// zod 4 + resolvers 5: form alanları GİRDİ tipiyle (default/coerce öncesi), gönderilen değer ÇIKTI tipiyle tanımlanır.
+type CategoryFormInput = z.input<ReturnType<typeof buildCategorySchema>>
 
 /* ---------------------------------------------------------------------------
  * ALAN SEVİYESİ HATA GERİ BİLDİRİMİ (cetvel `docs/standards/admin-design-standard.md` §4.6)
@@ -70,7 +72,7 @@ const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message })
     ) : null
 
 /** Submit'te odak taşınacak alanların DOM sırası (yukarıdan aşağı). */
-const FIELD_FOCUS_ORDER: { name: keyof CategoryFormValues; id: string }[] = [
+const FIELD_FOCUS_ORDER: { name: keyof CategoryFormInput; id: string }[] = [
     { name: 'name', id: 'category-name' },
     { name: 'slug', id: 'category-slug' },
     { name: 'sort_order', id: 'category-sort-order' },
@@ -81,7 +83,7 @@ const FIELD_FOCUS_ORDER: { name: keyof CategoryFormValues; id: string }[] = [
  * ilk bozuk alana odak taşınır (`shouldFocusError:false` ile RHF'nin kendi
  * odak denemesi kapatıldı — sıra DETERMİNİSTİK olsun diye).
  */
-function focusFirstInvalid(errs: FieldErrors<CategoryFormValues>): void {
+function focusFirstInvalid(errs: FieldErrors<CategoryFormInput>): void {
     const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
     if (!first) return
     document.getElementById(first.id)?.focus()
@@ -111,7 +113,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     const [parentIdOptions, setParentIdOptions] = useState<{ id: string, name: string }[]>([])
 
     const schema = React.useMemo(() => buildCategorySchema(t), [t])
-    const form = useForm<CategoryFormValues>({
+    const form = useForm<CategoryFormInput, unknown, CategoryFormValues>({
         resolver: zodResolver(schema),
         // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid).
         shouldFocusError: false,
