@@ -907,7 +907,7 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
   })
 
   // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin
-  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı (HRT-80: haftalık bağlı)', () => {
+  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı Actions, haftalık ve aylık belge istem satırı (HRT-80 ve HRT-81)', () => {
     const g = gercek['GEO-SEO'].gorevler
     const ara = (s: string) => g.find((x) => x.siklik === s)
     expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'evet' })
@@ -915,8 +915,9 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', bagli: 'evet' })
     expect(ara('haftalik')?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
     expect(ara('haftalik')?.tetikAyrinti).toMatch(/SEO haftalık: N gün/)
-    expect(ara('aylik')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC' })
-    expect(ara('aylik')?.tetikAyrinti).toMatch(/ARC-27/)
+    expect(ara('aylik')).toMatchObject({ tetik: 'istem-tazelik', bagli: 'evet' })
+    expect(ara('aylik')?.tetikAyrinti).toMatch(/SEO aylık belge: N gün"\s*\(30 gün eşik\)/)
+    expect(ara('aylik')?.tetikAyrinti).toMatch(/cron yok/)
     expect(JSON.stringify(g)).not.toMatch(/REC-502/)
   })
 
@@ -1339,15 +1340,12 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     expect(sahiplik.cetveller['docs/standards/filo-tuzugu.md']?.sahip).toBe('OPS')
   })
 
-  it('OPS Cuma filo raporu görev tazelik kancasına bağlıdır (HRT-80); açılış raporu "bağlı: hayır (kuracak: ARAC)" kalır; kurulmamış tetik "evet" diye geçemez', () => {
+  it('OPS Cuma filo raporu görev tazelik kancasına bağlıdır (HRT-80); açılış raporu görevi silindi (HRT-81); kurulmamış tetik "evet" diye geçemez', () => {
     const ops = uretici.GOREVLER.OPS.gorevler
     const filo = ops.find((g) => g.gorev.startsWith('Haftalık filo raporu'))
     expect(filo?.bagli).toBe('evet')
     expect(filo?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
-    const acilis = ops.find((g) => g.gorev.startsWith('Açılış raporu'))
-    expect(acilis, 'Açılış raporu').toBeTruthy()
-    expect(acilis?.bagli).toBe('hayir')
-    expect(acilis?.baglayacak).toBe('ARAC')
+    expect(ops.find((g) => g.gorev.startsWith('Açılış raporu')), 'Açılış raporu görevi silindi (HRT-81, OPS hükmü)').toBeUndefined()
     const v = kopya()
     v.OPS.gorevler[1].bagli = 'evet'
     v.OPS.gorevler[1].tetikAyrinti = '.github/workflows/olmayan-dosya.yml'

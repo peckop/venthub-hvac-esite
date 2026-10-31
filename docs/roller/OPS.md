@@ -15,7 +15,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Filo tek yönle ilerler: sıra, öncelik ve verilen sözler yazılı tutulur; Recep'e giden her cümle kaynağıyla ve tek yüzle gider.
 
 ## Düzenli görevler
-- 3 görev, tetiğe bağlı 2: `docs/roller/OPS-gorevler.md`.
+- 2 görev, tetiğe bağlı 2: `docs/roller/OPS-gorevler.md`.
 
 ## Dosyalar
 Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.
