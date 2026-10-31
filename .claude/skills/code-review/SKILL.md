@@ -163,6 +163,19 @@ Filo kuralı: önce yerleşik `/code-review`; bu bölüm onunla çakışmaz, yal
 
 Kaynak: addyosmani/agent-skills code-review-and-quality @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
+## İkinci eksen: Spec ve kod kokusu tabanı (VentHub uyarlaması)
+
+Bir değişiklik bir ekseni geçip ötekini kaldırabilir: bütün standartlara uyup yanlış şeyi yapan kod (Standards geçer, Spec kalır) ya da istenen şeyi yapıp proje düzenini bozan kod (Spec geçer, Standards kalır). İkisi **ayrı raporlanır, birleştirilmez, yeniden sıralanmaz**; tek bir "en kötü" seçilmez, eksen başına en kötü bulgu yazılır.
+
+- **Sabit nokta:** kullanıcının verdiği ref, verilmediyse `origin/master`. `git diff <ref>...HEAD` (üç nokta, merge-base'e karşı) ve `git log <ref>..HEAD --oneline` bir kez alınır; ref çözülmüyor ya da fark boşsa burada dur.
+- **Spec kaynağı, sırayla:** (1) PR gövdesindeki `Kanban: <ÖN EK>-<sayı>` kartı (KAYNAK/CETVEL, BİTİŞ ölçütü, kabul satırları); (2) kullanıcının verdiği yol; (3) `docs/plans/` ya da `docs/standards/` altında dal/özellik adıyla eşleşen belge. Hiçbiri yoksa Spec ekseni atlanır ve raporda "spec yok" yazılır.
+- **Standards kaynağı:** `CLAUDE.md` kuralları 1-14, ilgili `docs/standards/*` ve `docs/roller/*-kurallar.md`. Belgelenmiş standart her zaman kazanır; araç (lint, tip, test) zaten zorluyorsa bulgu yazılmaz.
+- **Kod kokusu tabanı (Fowler, *Refactoring* bölüm 3):** belgelenmiş standart olmasa da Standards eksenine her zaman eklenir; her biri "olası X" diye etiketli bir **yargı çağrısıdır**, sert ihlal değildir, belgelenmiş standart bir kokuyu onaylıyorsa susturulur. Gizemli ad → yeniden adlandır; Yinelenen kod → ortak şekli çıkar; Özellik kıskançlığı → yöntemi verinin yanına taşı; Veri öbekleri → tek tipte topla; İlkel takıntı → kavrama küçük tip ver; Tekrarlı switch → çok biçimlilik ya da paylaşılan tek harita; Dağınık değişiklik (Shotgun Surgery: bir değişiklik çok dosyada dağınık düzenleme gerektiriyor) → birlikte değişenleri tek modülde topla; Iraksak değişiklik (Divergent Change: bir modül birkaç ilgisiz sebeple düzenleniyor) → böl; Spekülatif genellik (spec'in istemediği soyutlama/parametre/kanca) → sil; Mesaj zincirleri (`a.b().c().d()`) → yürüyüşü birinci nesnenin arkasına sakla; Aracı sınıf (çoğunlukla devreden) → kes, asıl hedefi çağır; Reddedilen miras → kalıtımı bırak, bileşim kullan.
+- **Alt ajan:** iki eksen paralel, salt-okuma ve `name` verilmeden açılabilir (her biri 400 sözcük altı). Standards ajanına kokular tam metin verilir; Spec ajanına her bulgu için spec satırı alıntılatılır. Uygulama gerekmiyorsa tek geçişte de yapılabilir; ayrım eksenleri ayırmaktır, ajan sayısı değil.
+- **Bizim kural 14 ile:** "spec'te olmayan davranış" (kapsam kayması) bulgusu, kural 14'e göre ayrı kayıt gerektiren gerçekten ilgisiz bir iş mi, yoksa spec'i yarım bırakıp testi sonraya atan bir eksik mi diye ayrıca ayrılır.
+
+Kaynak: mattpocock/skills code-review @5beb35b0.
+
 ## Skills in scope
 
 - `security-scanner` — for a deeper pass on security-sensitive changes

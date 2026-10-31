@@ -138,6 +138,20 @@ dist entrypoints and index freshness. Search dynamic registries/config keys when
 symbol references are empty; generated public APIs can have external consumers.
 Prefer bounded rg searches for exact text when no indexed surface is available.
 
+## Kod tasarımı sözlüğü: derin modül, dikiş, derinlik (VentHub uyarlaması)
+
+Modül tasarlarken ya da yeniden düzenlerken bu terimler tam anlamıyla kullanılır; "bileşen", "servis", "API", "sınır" ile karıştırılmaz. Amaç: çağıran için kaldıraç, bakım yapan için yerellik, herkes için sınanabilirlik.
+
+- **Modül:** arayüzü ve gövdesi olan her şey (fonksiyon, sınıf, paket, katmanları kesen dilim). **Arayüz:** çağıranın doğru kullanmak için bilmesi gereken HER ŞEY: tip imzası, ayrıca değişmezler, sıra kısıtları, hata kipleri, gerekli yapılandırma, başarım özellikleri ("imza" ve "API" fazla dar). **Dikiş (seam, Feathers):** davranışı o yerde düzenlemeden değiştirebildiğin yer; modülün arayüzünün durduğu *konum*. **Adaptör:** dikişte arayüzü karşılayan somut şey; ne olduğunu değil hangi yuvayı doldurduğunu anlatır. **Derinlik:** arayüz birimi başına çağıranın (ya da testin) kullanabildiği davranış miktarı; küçük arayüzün arkasında çok davranış = derin, arayüz gövde kadar karmaşıksa = sığ. **Kaldıraç:** derinliğin çağırana verdiği; **yerellik:** bakım yapana verdiği (değişiklik, hata, bilgi ve doğrulama tek yerde toplanır).
+- **Silme testi:** modülü sildiğini düşün. Karmaşıklık yok oluyorsa modül geçiş katmanıydı; N çağıranda yeniden beliriyorsa yerini hak ediyordu.
+- **Arayüz test yüzeyidir.** Çağıran ve test aynı dikişten geçer; arayüzün ötesini sınamak istiyorsan modülün şekli yanlıştır.
+- **Tek adaptör varsayımsal dikiş, iki adaptör gerçek dikiş.** Üzerinde gerçekten bir şey değişmiyorsa dikiş açma.
+- **Sınanabilirlik için:** bağımlılığı kabul et, kendin üretme; sonuç döndür, yan etki üretme; yüzey küçük kalsın (az yöntem = az test, az parametre = kolay kurulum). Bizde kural 2 bunun hazır hâlidir: `src/lib/services/*` fonksiyonları ilk parametre olarak `supabase` alır, modül düzeyinde statik istemci yoktur; yeni servis bu kalıba uymak zorundadır, kalıbı sığlaştıran bir sarmalayıcı eklenmez.
+- **Reddedilen çerçeveler:** derinliği "gövde satırı / arayüz satırı" oranı saymak (gövdeyi şişirmeyi ödüllendirir; biz derinliği kaldıraç sayarız); "arayüz"ü TypeScript `interface` anahtar sözcüğü ya da sınıfın genel yöntemleri saymak; "sınır" demek (DDD'nin sınırlı bağlamıyla karışır; dikiş ya da arayüz de).
+- **Bölüm sınırı:** bu bölüm yalnız tasarım dilidir. Derinleştirme ve alternatif arayüz keşfi için kaynaktaki iki yan belge (`DEEPENING.md`, `DESIGN-IT-TWICE.md`) alınmadı; gerekirse ayrı karar.
+
+Kaynak: mattpocock/skills codebase-design @5beb35b0.
+
 ## Skills in scope
 
 - `refactor-planner` — when the map feeds a multi-file change
