@@ -37,13 +37,11 @@
           "taslak": true
         },
         {
-          "gorev": "Yayın öncesi liste: adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2 taban ve ön izleme satırları)",
-          "komut": "scripts/seo/adres-yayin-denetim.mjs",
+          "gorev": "Yayın öncesi liste: adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2 taban ve ön izleme satırları; komut scripts/seo/adres-yayin-denetim.mjs)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs: arama görünürlüğüne dokunan kartta Y2 koşu notunu istemek; kural verisi hazır (kart-sinif-olcum.json, HRT-78: `olcum-yayin-oncesi` etiketli kartta `ÖLÇÜM: yayin-oncesi` satırı), kancada okuma bekleniyor",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: `olcum-yayin-oncesi` etiketli kartta `ÖLÇÜM: yayin-oncesi` satırı)",
+          "bagli": "evet",
           "cikti": "Kusur listesi sahibine (cetvel Y4); taban dosyasının yolu Kanban kartına",
           "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
         },
@@ -97,10 +95,9 @@
           "komut": "scripts/belge/kart-plan-kapisi.cjs",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kart açılırken ya da Review'a geçerken kendiliğinden çağıran bağ yok: kapı yalnız elle (kart sahibi) ve conformance testinde koşuyor (HARİTA ölçümü 10-09: iş akışı, kanca ve scripts/board içinde çağrı yok); kanca altyapısı gerekirse ARAÇ'ın",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
-          "cikti": "Eksik alanların listesi kart sahibine; kurulunca planı eksik kart Review'a geçmez",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs add_task açıklamasında ve Review'a geçişte kapıyı çağırır (ARC-216 B, #2110); uyarır, reddetmez; açıklamada PLAN başlığı yoksa sessiz kalır (27 Ekim ölçümü: son 8 günde açılan 55 kartın hiçbirinde PLAN başlığı yok)",
+          "bagli": "evet",
+          "cikti": "Eksik alanların listesi kart sahibine (uyarı, Review'a geçişi engellemez)",
           "esik": "GEÇTİ: plan iskeleti eksiksiz (docs/standards/kart-plani-standard.md)"
         },
         {
@@ -205,12 +202,10 @@
         },
         {
           "gorev": "Canlı adres matrisi: yayın ya da anahtar açılışı sonrası canlıda her adresin son durumu ve sıçrama sayısı",
-          "komut": "scripts/adres/matris.cjs",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kural verisi hazır (kart-sinif-olcum.json, HRT-78: başlıkta adres matrisi ya da `olcum-adres-matrisi` etiketli kartta `ÖLÇÜM: adres-matrisi` satırı), kancada okuma bekleniyor",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: başlıkta adres matrisi ya da `olcum-adres-matrisi` etiketli kartta `ÖLÇÜM: adres-matrisi` satırı)",
+          "bagli": "evet",
           "cikti": "docs/audits/adres-matrisi-<tarih>.json ve kusur için Kanban kartı",
           "esik": "TASLAK: hata satırı 0 ve dilsiz adreslerde --dilsiz-hop-en-cok değerinin altı (rota-dili-standard.md; ölçüt ALT-14 canlı ölçümünden)",
           "taslak": true
@@ -252,9 +247,8 @@
           "gorev": "Yeni görünüm bayrağını (YENI_GORUNUM) ya da yazı tipini değiştiren her işte bayrak AÇIK geçici dalla KAPALI dalı kıyasla: erişilebilirlik tabanı, font preload sayımı (M6, Linux/CI), admin ekranı yazı tipi aynı",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kural verisi hazır (kart-sinif-olcum.json, HRT-78: başlıkta bayrak ya da yazı tipi sözcüğü ya da `olcum-bayrak-kiyas` etiketi, `ÖLÇÜM: bayrak-kiyas` satırı), kancada okuma bekleniyor",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: başlıkta bayrak ya da yazı tipi sözcüğü ya da `olcum-bayrak-kiyas` etiketi, `ÖLÇÜM: bayrak-kiyas` satırı)",
+          "bagli": "evet",
           "cikti": "Ölçüm tablosu PR gövdesine; fark Kanban kartı TASARIM'a, admin farkı ADMIN'e",
           "esik": "TASLAK: bayrak kapalıyken fark 0; açıkken preload ve axe tavanını ALTYAPI (M6, M3) belirler, ALTYAPI teyit eder",
           "taslak": true
@@ -274,9 +268,8 @@
           "gorev": "Yapılan ekranı Design karesiyle yan yana ölç (kare kabul ölçüm satırı, skill venthub-tasarim-dili)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kural verisi hazır (kart-sinif-olcum.json, HRT-78: başlıkta kare kabul ya da `olcum-kare-kabul` etiketi, `ÖLÇÜM: kare-kabul` satırı), kancada okuma bekleniyor",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: başlıkta kare kabul ya da `olcum-kare-kabul` etiketi, `ÖLÇÜM: kare-kabul` satırı)",
+          "bagli": "evet",
           "cikti": "PR gövdesine kare numarası ve ölçüm satırı; fark Kanban kartı ÜRÜN'e (sayfa) ya da TASARIM'a (token, bileşen)",
           "esik": "TASLAK: geçti/kaldı ölçütü venthub-tasarim-dili skill'indeki ölçüm satırıdır; TASARIM teyit eder",
           "taslak": true
@@ -319,9 +312,8 @@
           "gorev": "Veri çıkarım kapısı: Design'ın teslim ettiği CSV kaynağa karşı doğrulanır (venthub-pdf-ingestor veri_cikarim_kapisi.py --csv <yol>)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kural verisi hazır (kart-sinif-olcum.json, HRT-78: Design teslimi başlıklı ya da `olcum-veri-cikarim` etiketli kartta `ÖLÇÜM: veri-cikarim` satırı), kancada okuma bekleniyor",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: Design teslimi başlıklı ya da `olcum-veri-cikarim` etiketli kartta `ÖLÇÜM: veri-cikarim` satırı)",
+          "bagli": "evet",
           "cikti": "OPS'a tek tablo; ihlaller Design'a",
           "esik": "Kapı çıkışı 0; tablo hücresi kaynakta birebir yoksa yazılmaz"
         },
@@ -339,9 +331,8 @@
           "gorev": "Yazım sonrası canlı sayfa ölçümü: OPS canlı yazımı bitirince yazılan değerin sayfada göründüğünü ölç (sunucu HTML'in veri yükü ve tarayıcıda model seçimi)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kural verisi hazır (kart-sinif-olcum.json, HRT-78: `olcum-yazim-sonrasi` etiketli yazım kartında `ÖLÇÜM: yazim-sonrasi` satırı), kancada okuma bekleniyor",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: `olcum-yazim-sonrasi` etiketli yazım kartında `ÖLÇÜM: yazim-sonrasi` satırı)",
+          "bagli": "evet",
           "cikti": "Karta ölçüm notu (neyi, nasıl ölçtüm, sonuç)",
           "esik": "Yazılan alanların tamamı sayfada beklenen değerde; sapma 0"
         },
