@@ -22,6 +22,7 @@ import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
 import { listeFiyatiniSuz, varyantFiyatiniSuz } from '@/lib/pricing/teklifModuSuzgeci'
 import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
+import { aileBasligiDebili, aileDebiAraligi, aileTitleDebili } from '@/lib/seo/aileDebiAraligi'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
@@ -149,7 +150,12 @@ export async function aileSayfasiUstVerisi(
       // REC-108: sekme başlığı ve arama sonucu başlığı da dili bilir.
       // URN-135 D4: Lineo Quiet aile sayfası için geçersiz kılma varsa title/description ONDAN gelir (OpenGraph aynı değerler).
       const ozelMetin = sunucuSku ? null : lineoAileMetni(lang, family, variants)
-      const title = ozelMetin?.title || pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
+      // URN-149: debi aralığı yalnız şablon-dışı yedek zincirinde ve toplam ≤60 karakter kalırsa title'a girer.
+      // Lineo geçersiz kılması ve dolu `meta_title` sabittir (dokunulmaz).
+      const title =
+        ozelMetin?.title ||
+        pickLang(family.meta_title, lang) ||
+        aileTitleDebili(familyName(family, lang), aileDebiAraligi(variants, lang))
       // ⭐İÇ INGEST NOTU ARAMA SONUCUNA DA ÇIKAMAZ (canlı olay, 2026-09-05): aile
       // açıklaması bu zincirin İKİNCİ halkası, yani 11/40 ailede Google'a "Avensair 2026
       // fiyat listesinden aktarılan temel ürün (Tier C)." diye açıklama gidebilirdi.
@@ -444,7 +450,11 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null, ilgiliAileler 
         sunucuSku={sunucuSku}
         kirinti={kirinti}
         markaHref={markaHref}
-        gorunenBaslik={ozelMetin?.h1 ?? null}
+        gorunenBaslik={
+          family
+            ? aileBasligiDebili(ozelMetin?.h1 ?? gorunenAileAdi, aileDebiAraligi(variants, lang))
+            : (ozelMetin?.h1 ?? null)
+        }
         gorunenAciklama={ozelMetin?.ilkParagraf ?? null}
         initialRelatedFamilies={initialRelatedFamilies}
       />
