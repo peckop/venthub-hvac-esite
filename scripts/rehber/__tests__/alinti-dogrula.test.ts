@@ -74,6 +74,19 @@ describe('INV-REHBER-ALINTI-1', () => {
   it('bitişik "shielded/armored" parçalayıcı sayılmaz (boşluklu " / " değil)', () => {
     expect(alintiBul('Maximum motor cable length, shielded/armored 15 m', 'shielded/armored 15 m').bulundu).toBe(true)
   })
+  it('adlandırılmış Türkçe varlıklar çözülür (avensair al&uuml;minyum vakası, BLG-20)', () => {
+    const html = '<p>Eurovent sertifikalı al&uuml;minyum ısı geri kazanım e&scedil;anjörleri, &Ouml;rnek &ccedil;ap 150&nbsp;mm</p>'
+    expect(htmlMetin(html)).toBe('Eurovent sertifikalı alüminyum ısı geri kazanım eşanjörleri, Örnek çap 150 mm')
+    expect(alintiBul(htmlMetin(html), 'sertifikalı alüminyum ısı geri kazanım').bulundu).toBe(true)
+  })
+  it('sayısal varlıklar (onaltılı ve onlu) çözülür, geçersiz kod olduğu gibi kalır', () => {
+    expect(htmlMetin('a&#252;b &#xFC;c &#8211; d')).toBe('aüb üc – d')
+    expect(htmlMetin('x &#0; y &#xD800; z')).toBe('x &#0; y &#xD800; z')
+  })
+  it('bilinmeyen adlı varlık silinmez; çift çözme yok (&amp;lt; → &lt;)', () => {
+    expect(htmlMetin('a &bilinmeyenvarlik; b')).toBe('a &bilinmeyenvarlik; b')
+    expect(htmlMetin('&amp;lt;')).toBe('&lt;')
+  })
   it('script içeriği görünür metne girmez', () => {
     expect(htmlMetin('<p>a</p><script>gizli metin</script>')).toBe('a')
   })
