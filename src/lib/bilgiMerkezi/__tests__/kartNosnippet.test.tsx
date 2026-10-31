@@ -112,7 +112,7 @@ describe('kart özeti data-nosnippet içinde basılır — her yüzey', () => {
       'vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari',
       // BLG-18: kanal tipi fan rehberinin üç aile kartı (urunler).
       'vh:aile/vortice-lineo-kanal-fanlari',
-      'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
+      'vh:aile/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari',
       'vh:aile/vortice-radon-serisi-kanal-fanlari',
     ] as const) {
       const rehberler = ilgiliRehberler(hedef, 'tr', 3, YAZILAR, false)

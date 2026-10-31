@@ -653,16 +653,13 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // (iddia içermez) ve CA MD canlı ürün sayfası cümlesi ve H2 konu terimi (R11), kayıtlı metin sha 402fb77960ca, gövde sha 549f91804b16 (2026-10-25). Beş bağımsız doğrulama turu
     // (hedef üçtü, karşılanmadı); her turda tuzaklı kopya yakalandı. Mevzuat ve sessizlik/dB iddiası yok (R2.6 gerekmez).
     // Yayın: Recep yayın onayı (25 Ekim, OPS penceresi). Fiyat yok: kategori fiyat göstermiyor, yazı teklife yönlendirir.
-    // BLG-22 (31 Ekim 2026, REC-397 sonrası): arşivlenen Vort Commercial In-Line yuvarlak kanal ailesi (sayfa 404) yerine aynı serinin
-    // aktif dikdörtgen kanal ailesi; ölçüm: 200, canonical kendisi, noindex yok, 5 model (CA IL ... ES RECT), görünür ₺/TL 0, Teklif var.
-    // Gövdede CA MD modellerinin yuvarlak ailede listelendiğini söyleyen artık yanlış cümle çıkarıldı; metin iddiası eklenmedi.
     kimlik: 'kanal-tipi-fan-nedir',
     konu: 'konfor',
     yayinTarihi: '2026-10-25',
-    guncellemeTarihi: '2026-10-31',
+    guncellemeTarihi: '2026-10-25',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
-      'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
+      'vh:aile/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari',
       'vh:aile/vortice-radon-serisi-kanal-fanlari',
     ],
     diller: {
@@ -692,11 +689,11 @@ ABD Enerji Bakanlığı rehberi, tüp tipi aksiyel (tubeaxial) fanları orta bas
 
 ## Kanal tipi fan nerede kullanılır?
 
-Vortice, plastik reçine gövdeli CA V0 serisini asma tavana ya da çatı arasına monte edilen bir kanal fanı olarak sunar; kataloğa göre mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygundur [2]. Aynı katalog boyalı sac çelik gövdeli CA MD serisini de asma tavan ve çatı arası kurulumu için tanımlar [2].
+Vortice, plastik reçine gövdeli CA V0 serisini asma tavana ya da çatı arasına monte edilen bir kanal fanı olarak sunar; kataloğa göre mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygundur [2]. Aynı katalog boyalı sac çelik gövdeli CA MD serisini de asma tavan ve çatı arası kurulumu için tanımlar [2]. VentHub'ın Vortice In-Line yuvarlak kanal fanları ailesi sayfasında bu serinin CA MD modelleri listelenir.
 
 Kanalın ucuna takılan türler de vardır. Çelik sac duvar tipi fanlar kanalın ucuna monte edilir ve laboratuvar, bar, restoran, çamaşırhane, spor salonu gibi ticari ya da endüstriyel mekânların havalandırma ihtiyacını karşılar [2]. Çatı tipi fanlar da kanal ucuna monte edilir ve çatıdan atış yapan ticari ve endüstriyel mekânlar için tanımlanmıştır [2]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [2].
 
-Yüksekliği düşük fanlar da vardır: CA IN-LINE serisi çok kısa yüksekliği sayesinde kısa asma tavanlara monte edilmeye elverişlidir [2]. VentHub'da dikdörtgen kanal modelleri için [Vortice VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari) sayfasına bakabilirsiniz. İç mekânda duvara monte edilen, havalandırma kanallarının ucuna bağlanan fanlar konutlarda ve fabrika, hastane, spor salonu, restoran gibi endüstriyel ortamlarda kullanılır [2].
+Yüksekliği düşük fanlar da vardır: CA IN-LINE serisi çok kısa yüksekliği sayesinde kısa asma tavanlara monte edilmeye elverişlidir [2]. İç mekânda duvara monte edilen, havalandırma kanallarının ucuna bağlanan fanlar konutlarda ve fabrika, hastane, spor salonu, restoran gibi endüstriyel ortamlarda kullanılır [2].
 
 Radon gazı tahliyesi için ayrılmış bir seri de kanal tipi fan sunar: Vortice'nin radona özel serisi kanal tipi egzoz fanını 100, 125, 150, 160 ve 200 mm çaplarında, seri montaj imkânıyla verir [5]. Aynı seri çatı tipi emiş ünitesini 150, 160 ve 200 mm çaplarında ve dış mekâna uygun IP45 koruma sınıfıyla sunar [5]. Vortice kataloğuna göre radon ürün grubu kanal içi (CA-RM ES) ve çatı (CA-RM RF ES) olmak üzere 8 modelden oluşur [6]. Radona özel seri fırçasız ve elektronik kontrollü motorlarla ve özel kontrol paneliyle birlikte kullanılabilir [5].
 
