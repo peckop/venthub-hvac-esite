@@ -122,6 +122,13 @@ describe('INV-WEBHOOK-2 · HMAC imza + replay', () => {
     expect((await post(istek(baslik))).status).toBe(401)
   })
 
+  it('SABOTAJ replay büyük/küçük harf farkıyla atlatılamaz: aynı imzanın BÜYÜK harfli hâli 401', async () => {
+    const baslik = imzali(SECRET, simdiSn())
+    expect((await post(istek(baslik))).status).toBe(200)
+    const buyuk = { ...baslik, 'x-webhook-signature': baslik['x-webhook-signature'].toUpperCase() }
+    expect((await post(istek(buyuk))).status).toBe(401)
+  })
+
   it('SABOTAJ imzalı ama geçersiz istek DOĞRU düz secret ile kurtarılamaz: 401', async () => {
     const res = await post(
       istek({ ...imzali('baska-secret', simdiSn()), 'x-webhook-secret': SECRET }),
@@ -132,6 +139,18 @@ describe('INV-WEBHOOK-2 · HMAC imza + replay', () => {
   it('GEÇİŞ: imzasız istek eski düz secret ile hâlâ kabul edilir (INV-WEBHOOK-1 ile uyumlu)', async () => {
     const res = await post(istek({ 'x-webhook-secret': SECRET }))
     expect(res.status).toBe(200)
+  })
+
+  it('SABOTAJ kimliksiz istekte bozuk JSON 401 döner (500 ve ayrıştırma mesajı sızmaz)', async () => {
+    const res = await post(istek({}, 'xyz'))
+    expect(res.status).toBe(401)
+    expect(JSON.stringify(await res.json())).not.toContain('JSON')
+  })
+
+  it('kimliği doğrulanmış çağırana bozuk JSON 400 döner, iç mesaj yok', async () => {
+    const res = await post(istek({ 'x-webhook-secret': SECRET }, 'xyz'))
+    expect(res.status).toBe(400)
+    expect(await res.json()).toEqual({ error: 'Invalid JSON body' })
   })
 
   it('imzasız ve secret yok: 401', async () => {

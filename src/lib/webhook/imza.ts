@@ -69,6 +69,10 @@ export function imzaTekrariMi(imza: string, simdiMs: number): boolean {
   if (gorulen.size >= AZAMI_KAYIT) {
     const ilk = gorulen.keys().next().value
     if (ilk !== undefined) gorulen.delete(ilk)
+    console.warn(
+      `[Webhook imza] tekrar kümesi ${AZAMI_KAYIT} kaydı aştı; pencere içi en eski imza atıldı ` +
+        '(bu örnekte o imzanın tekrarı artık yakalanmaz; kalıcı DB tekilleştirmesi ayrı iş).',
+    )
   }
   gorulen.set(imza, simdiMs + IMZA_PENCERESI_MS)
   return false

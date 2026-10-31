@@ -299,7 +299,6 @@ export async function POST(request: NextRequest) {
   try {
     // ALT-76: imza HAM gövde üzerinden doğrulanır; gövde bir kez okunur, JSON olarak sonra çözülür.
     const hamGovde = await request.text()
-    const payload = JSON.parse(hamGovde) as SupabaseWebhookPayload
     const webhookSecret = request.headers.get('x-webhook-secret')
 
     /**
@@ -355,13 +354,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     if (imzaSonucu === 'gecerli') {
-      if (imzaTekrariMi(request.headers.get('x-webhook-signature') ?? '', simdiMs)) {
+      // Doğrulama imzayı küçük harfe çevirir; tekrar anahtarı da AYNI kanonik biçimden alınır
+      // (aksi hâlde büyük harfli hex ile aynı imza tekrar korumasını atlatırdı).
+      if (imzaTekrariMi((request.headers.get('x-webhook-signature') ?? '').toLowerCase(), simdiMs)) {
         console.warn('Unauthorized Supabase webhook attempt blocked (imza tekrarı).')
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
     } else if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
       console.warn('Unauthorized Supabase webhook attempt blocked.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Gövde YALNIZ kimlik doğrulandıktan sonra çözülür: kimliksiz çağıran ayrıştırma hatasıyla
+    // iç durum öğrenemez; doğrulanmış çağırana bozuk JSON 400 döner.
+    let payload: SupabaseWebhookPayload
+    try {
+      payload = JSON.parse(hamGovde) as SupabaseWebhookPayload
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+    if (payload === null || typeof payload !== 'object') {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
     console.warn(`[Supabase Webhook] Received ${payload.type} event on table "${payload.table}"`)
@@ -902,10 +915,10 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     }, { status: kategoriCocukHatasi === null ? 200 : 500 })
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
+    // ALT-76: iç hata metni çağırana dönmez; ayrıntı yalnız sunucu günlüğündedir.
     console.error('[Supabase Webhook Error]:', error)
     return NextResponse.json(
-      { error: errorMsg },
+      { error: 'Internal error' },
       { status: 500 }
     )
   }
