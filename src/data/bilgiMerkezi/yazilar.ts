@@ -990,8 +990,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Yayın: karar 121/c (profesyonel yazı AYNI adreste döner); birleşme ayrı OPS ve Recep onayıyla. yayinTarihi birleşme gününe göre güncellenir.
     kimlik: 'hava-perdesi',
     konu: 'verimlilik',
-    yayinTarihi: '2026-11-02',
-    guncellemeTarihi: '2026-11-02',
+    yayinTarihi: '2026-11-01',
+    guncellemeTarihi: '2026-11-01',
     urunler: ['vh:aile/vortice-ad-isiticisiz-hava-perdeleri', 'vh:aile/vortice-h-ad-elektrikli-isiticili-hava-perdeleri'],
     diller: {
       tr: {
