@@ -49,7 +49,7 @@ function interfaceAlanlari(kaynak: string, ad: string): Set<string> {
       break
     }
   }
-  let govde = kaynak.slice(ac + 1, son).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+  let govde = kaynak.slice(ac + 1, son).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/.*$/gm, '')
   for (let i = 0; i < 10 && /\{[^{}]*\}/.test(govde); i++) govde = govde.replace(/\{[^{}]*\}/g, '')
   return new Set([...govde.matchAll(/(\w+)\??\s*:/g)].map((m) => m[1]))
 }

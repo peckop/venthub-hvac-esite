@@ -64,7 +64,7 @@ function tipAlanlari(kaynak: string, ad: string): string[] {
       break
     }
   }
-  let govde = kaynak.slice(ac + 1, son).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+  let govde = kaynak.slice(ac + 1, son).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/.*$/gm, '')
   for (let i = 0; i < 5 && /\{[^{}]*\}/.test(govde); i++) govde = govde.replace(/\{[^{}]*\}/g, '')
   return [...govde.matchAll(/(\w+)\??\s*:/g)].map((x) => x[1])
 }
