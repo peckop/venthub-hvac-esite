@@ -85,7 +85,10 @@ Pick the first measurement from the symptom:
 | High CLS | images without dimensions, late content, font shifts | layout-shift attribution |
 | Poor INP | heavy main-thread JS, large DOM updates | long tasks in the trace |
 
+Saha ölçümünde (RUM) `web-vitals` kütüphanesinin ayrıntılı derlemesi `web-vitals/attribution` yolundan gelir. Aynı dosyada hem ana paketten hem bu yoldan `onINP` alınırsa ad çakışır; ayrıntılı olanı takma adla al (`import { onINP as onINPAttribution } from 'web-vitals/attribution'`). İki ölçüm yolu aynı etkileşimi iki kez raporlamasın diye tek yol seçilir.
+
 Kaynak: addyosmani/agent-skills performance-optimization @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+Kaynak: addyosmani/agent-skills references/performance-checklist.md @8bfcc1f9916f2eea55494d8c1fa7f4bde867dd9e (MIT)
 
 ## Backend (Supabase / PostgreSQL)
 

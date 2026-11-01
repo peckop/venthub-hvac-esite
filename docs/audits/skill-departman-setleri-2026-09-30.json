@@ -69,11 +69,11 @@
     },
     {
      "ad": "ui-ux-pro-max",
-     "kb": 13.6
+     "kb": 16.7
     },
     {
      "ad": "testing",
-     "kb": 17
+     "kb": 17.4
     },
     {
      "ad": "debugging",
@@ -89,11 +89,11 @@
     },
     {
      "ad": "observability",
-     "kb": 8.6
+     "kb": 11.8
     },
     {
      "ad": "api-design",
-     "kb": 13.7
+     "kb": 13.8
     },
     {
      "ad": "incremental-implementation",
@@ -109,7 +109,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -118,7 +118,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 29,
+   "toplamKB": 31.7,
    "adiylaCagir": [
     {
      "ad": "chimera",
@@ -126,11 +126,11 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     },
     {
      "ad": "security-scanner",
-     "kb": 8.5
+     "kb": 9.9
     },
     {
      "ad": "data-governance",
@@ -169,7 +169,7 @@
    "adiylaCagir": [
     {
      "ad": "code-review",
-     "kb": 15.7
+     "kb": 16.9
     }
    ],
    "bekleyen": [
@@ -228,11 +228,11 @@
     },
     {
      "ad": "testing",
-     "kb": 17,
+     "kb": 17.4,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 18.5,
+   "toplamKB": 18.9,
    "adiylaCagir": [
     {
      "ad": "debugging",
@@ -244,7 +244,7 @@
     },
     {
      "ad": "observability",
-     "kb": 8.6
+     "kb": 11.8
     },
     {
      "ad": "tech-stack",
@@ -252,7 +252,7 @@
     },
     {
      "ad": "database-migrations",
-     "kb": 6.8
+     "kb": 8.4
     },
     {
      "ad": "incremental-implementation",
@@ -268,7 +268,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -277,7 +277,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 29,
+   "toplamKB": 31.7,
    "adiylaCagir": [
     {
      "ad": "chimera",
@@ -285,11 +285,11 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     },
     {
      "ad": "security-scanner",
-     "kb": 8.5
+     "kb": 9.9
     },
     {
      "ad": "data-governance",
@@ -297,7 +297,7 @@
     },
     {
      "ad": "database-migrations",
-     "kb": 6.8
+     "kb": 8.4
     }
    ],
    "bekleyen": []
@@ -314,11 +314,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 22.1,
+   "toplamKB": 23.3,
    "adiylaCagir": [],
    "bekleyen": [
     {
@@ -422,7 +422,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -431,15 +431,15 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 27.5,
+   "toplamKB": 30.2,
    "adiylaCagir": [
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     },
     {
      "ad": "security-scanner",
-     "kb": 8.5
+     "kb": 9.9
     }
    ],
    "bekleyen": []
@@ -456,11 +456,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 22.1,
+   "toplamKB": 23.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -486,11 +486,11 @@
    "onYukle": [
     {
      "ad": "write-seo-geo-content",
-     "kb": 21.9,
+     "kb": 24.2,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 21.9,
+   "toplamKB": 24.2,
    "adiylaCagir": [
     {
      "ad": "diagram",
@@ -506,11 +506,11 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 14.6,
+   "toplamKB": 17.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -566,11 +566,11 @@
     },
     {
      "ad": "testing",
-     "kb": 17,
+     "kb": 17.4,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 18.5,
+   "toplamKB": 18.9,
    "adiylaCagir": [
     {
      "ad": "supabase",
@@ -591,11 +591,11 @@
     },
     {
      "ad": "observability",
-     "kb": 8.6
+     "kb": 11.8
     },
     {
      "ad": "api-design",
-     "kb": 13.7
+     "kb": 13.8
     },
     {
      "ad": "payments-webhooks",
@@ -603,7 +603,7 @@
     },
     {
      "ad": "database-migrations",
-     "kb": 6.8
+     "kb": 8.4
     },
     {
      "ad": "incremental-implementation",
@@ -619,7 +619,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -628,7 +628,7 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 29,
+   "toplamKB": 31.7,
    "adiylaCagir": [
     {
      "ad": "chimera",
@@ -636,11 +636,11 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     },
     {
      "ad": "security-scanner",
-     "kb": 8.5
+     "kb": 9.9
     },
     {
      "ad": "data-governance",
@@ -648,7 +648,7 @@
     },
     {
      "ad": "database-migrations",
-     "kb": 6.8
+     "kb": 8.4
     }
    ],
    "bekleyen": []
@@ -665,11 +665,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 22.1,
+   "toplamKB": 23.3,
    "adiylaCagir": [
     {
      "ad": "payments-webhooks",
@@ -732,11 +732,11 @@
     },
     {
      "ad": "web-performance",
-     "kb": 11.9,
+     "kb": 12.4,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 13.4,
+   "toplamKB": 13.9,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -747,7 +747,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -756,11 +756,11 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 27.5,
+   "toplamKB": 30.2,
    "adiylaCagir": [
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     }
    ],
    "bekleyen": []
@@ -777,11 +777,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 22.1,
+   "toplamKB": 23.3,
    "adiylaCagir": [
     {
      "ad": "accessibility",
@@ -789,7 +789,7 @@
     },
     {
      "ad": "web-performance",
-     "kb": 11.9
+     "kb": 12.4
     }
    ],
    "bekleyen": []
@@ -843,11 +843,11 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 14.6,
+   "toplamKB": 17.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -902,11 +902,11 @@
     },
     {
      "ad": "testing",
-     "kb": 17,
+     "kb": 17.4,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 26.4,
+   "toplamKB": 26.8,
    "adiylaCagir": [
     {
      "ad": "debugging",
@@ -926,7 +926,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "yetenek"
     },
     {
@@ -935,11 +935,11 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 27.5,
+   "toplamKB": 30.2,
    "adiylaCagir": [
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     }
    ],
    "bekleyen": []
@@ -964,7 +964,7 @@
    "adiylaCagir": [
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "uyari": "35 KB set bütçesi (YTN-18, 1.1.0 gövdesi büyüdü): ön yüklenmez, görev metninde adı yazılır"
     }
    ],
@@ -1029,7 +1029,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -1038,7 +1038,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 29,
+   "toplamKB": 31.7,
    "adiylaCagir": [
     {
      "ad": "chimera",
@@ -1046,7 +1046,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     }
    ],
    "bekleyen": []
@@ -1063,11 +1063,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 22.1,
+   "toplamKB": 23.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -1112,11 +1112,11 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 14.6,
+   "toplamKB": 17.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -1176,11 +1176,11 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 14.6,
+   "toplamKB": 17.3,
    "adiylaCagir": [],
    "bekleyen": [
     {
@@ -1249,11 +1249,11 @@
     },
     {
      "ad": "testing",
-     "kb": 17,
+     "kb": 17.4,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 18.5,
+   "toplamKB": 18.9,
    "adiylaCagir": [
     {
      "ad": "supabase",
@@ -1270,7 +1270,7 @@
     },
     {
      "ad": "api-design",
-     "kb": 13.7
+     "kb": 13.8
     },
     {
      "ad": "payments-webhooks",
@@ -1295,7 +1295,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -1304,7 +1304,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 29,
+   "toplamKB": 31.7,
    "adiylaCagir": [
     {
      "ad": "chimera",
@@ -1312,11 +1312,11 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     },
     {
      "ad": "security-scanner",
-     "kb": 8.5
+     "kb": 9.9
     },
     {
      "ad": "data-governance",
@@ -1342,11 +1342,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7,
+     "kb": 16.9,
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 26,
+   "toplamKB": 27.2,
    "adiylaCagir": [
     {
      "ad": "payments-webhooks",
@@ -1409,7 +1409,7 @@
    "adiylaCagir": [
     {
      "ad": "ui-ux-pro-max",
-     "kb": 13.6
+     "kb": 16.7
     },
     {
      "ad": "design-dna",
@@ -1429,7 +1429,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -1438,7 +1438,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 18.6,
+   "toplamKB": 21.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -1538,7 +1538,7 @@
     },
     {
      "ad": "testing",
-     "kb": 17
+     "kb": 17.4
     },
     {
      "ad": "debugging",
@@ -1554,7 +1554,7 @@
     },
     {
      "ad": "observability",
-     "kb": 8.6
+     "kb": 11.8
     },
     {
      "ad": "incremental-implementation",
@@ -1570,7 +1570,7 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     },
     {
@@ -1579,7 +1579,7 @@
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 29,
+   "toplamKB": 31.7,
    "adiylaCagir": [
     {
      "ad": "chimera",
@@ -1587,7 +1587,7 @@
     },
     {
      "ad": "bug-hunter",
-     "kb": 14.5
+     "kb": 16
     }
    ],
    "bekleyen": []
@@ -1630,11 +1630,11 @@
     },
     {
      "ad": "code-review",
-     "kb": 15.7
+     "kb": 16.9
     },
     {
      "ad": "web-performance",
-     "kb": 11.9
+     "kb": 12.4
     }
    ],
    "bekleyen": [
@@ -1695,11 +1695,11 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 14.6,
+   "toplamKB": 17.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -1738,7 +1738,7 @@
    "adiylaCagir": [
     {
      "ad": "web-performance",
-     "kb": 11.9
+     "kb": 12.4
     }
    ],
    "bekleyen": []
@@ -1763,7 +1763,7 @@
    "adiylaCagir": [
     {
      "ad": "web-performance",
-     "kb": 11.9
+     "kb": 12.4
     },
     {
      "ad": "incremental-implementation",
@@ -1779,11 +1779,11 @@
    "onYukle": [
     {
      "ad": "plan-challenger",
-     "kb": 14.6,
+     "kb": 17.3,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 14.6,
+   "toplamKB": 17.3,
    "adiylaCagir": [],
    "bekleyen": []
   },
@@ -1799,11 +1799,11 @@
     },
     {
      "ad": "web-performance",
-     "kb": 11.9,
+     "kb": 12.4,
      "kaynak": "departman"
     }
    ],
-   "toplamKB": 18.9,
+   "toplamKB": 19.4,
    "adiylaCagir": [],
    "bekleyen": []
   }

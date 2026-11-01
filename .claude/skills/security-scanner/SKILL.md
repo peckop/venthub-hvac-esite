@@ -100,6 +100,14 @@ Include examined scope, rejected candidates, dependency-audit availability and
 missing live configuration. “No confirmed findings in this scope” is a valid
 result; do not claim the application is universally secure.
 
+## YTN-24 eki: raporlamadan önce çürüt, doğrulanınca ailesini ara
+
+1. **Çürütmeyi dene.** Şüpheli bulguyu yazmadan önce kendi aleyhine oku: o koda dışarıdan gerçekten ulaşılabiliyor mu (çağıranları izle, ölü ya da yalnız yönetici yolu olabilir), üstte onu zaten durduran bir koruma var mı (RLS, doğrulama, yetki kontrolü, middleware), saldırganın bu noktaya gelmeden elinde ne var. Tehlikeli görünen bir örüntü tek başına bulgu değildir; kaynaktan hedefe giden yol kodda gösterilemiyorsa bulgu "doğrulanmadı" diye yazılır, ciddiyet şişirilmez.
+2. **Aynı örüntüyü başka yerde ara.** Bir kusur doğrulanınca kök nedeni tek cümleyle yaz, sonra depoda aynı hatanın başka yüzlerini ara: aynı yardımcı, kardeş uç, başka tablo ya da bucket, aynı işlevin başka dil/tenant yolu. Önce yalnız bilinen örneği yakalayan dar bir arama kur, sonra tek öğeyi gevşeterek genişlet; gürültü yarıyı geçince dur. Bulunan her ek örnek ayrı satırdır; aranıp bulunmayan yerler de rapora "arandı, yok" diye girer.
+
+Fikir kaynağı: trailofbits/skills fp-check @2be6433b39e009cd2b6fd3be1895f6b1faa5af9a (CC-BY-SA-4.0; metin kopyalanmadı)
+Fikir kaynağı: trailofbits/skills variant-analysis @2be6433b39e009cd2b6fd3be1895f6b1faa5af9a (CC-BY-SA-4.0; metin kopyalanmadı)
+
 ## Acceptance checks
 
 - Verify defensive findings and fixes against scoped source evidence; state unresolved claims.

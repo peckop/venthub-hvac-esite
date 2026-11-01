@@ -277,7 +277,8 @@ These are frequently overlooked issues that make UI look unprofessional:
 başlık stilini başlık olmayan içerikte kullanma; sayfada tek `h1`.
 
 **Renk.** Anlamsal token kullan (`text-foreground`, `bg-surface` gibi proje adları), ham HEX değil. Kontrast: normal metin 4.5:1,
-büyük metin 3:1. Bilgiyi yalnız renkle taşıma (simge, metin ya da desen ekle).
+büyük metin 3:1. Büyük metin en az 18pt (24 CSS px) ya da kalın 14pt (yaklaşık 18,67 px) demektir; bundan küçüğü normal metin eşiğine tabidir. Başarısız bir kontrast oranı eşiğe yuvarlanmaz (4,48 geçmiş sayılmaz). Bilgiyi yalnız renkle taşıma (simge, metin ya da desen ekle).
+Kaynak: addyosmani/agent-skills references/accessibility-checklist.md @8bfcc1f9916f2eea55494d8c1fa7f4bde867dd9e (MIT)
 
 **Erişilebilirlik (WCAG AA).**
 - Klavye: etkileşimli her öğe odaklanabilir; öncelik `<button>`, `<div onClick>` yasak. `role="button"` zorunluysa `tabIndex={0}`, Enter ve Boşluk

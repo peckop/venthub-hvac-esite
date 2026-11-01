@@ -74,6 +74,8 @@ değeri). Dış alan adına fetch/XHR atma, uzak betik yükleme, sayfa verisini 
 anahtarı ya da kimlik malzemesi okuma; yalnız görevle ilgili kod çalıştır, keyfi sayfalarda keşif betiği koşma. DOM'u
 değiştirmen ya da yan etki tetiklemen gerekiyorsa (ör. hatayı üretmek için düğmeye programlı tıklama) önce sor.
 
+**Yerleşim ölçümü.** Görünüm penceresi ya da yazı tipi değiştikten sonra yerleşimi hemen ölçme; yazı tipleri yüklenip resize observer'lar oturunca ölç, yoksa kayık sayılar sahte bulgu üretir.
+
 **Ağ teşhisi.** İşlemi tetikle ve isteği yakala; adres, yöntem, başlık ve gövdeyi beklentiyle karşılaştır; durum kodunu ve yanıt
 gövdesini oku; süreye bak. 4xx istemci yanlış veri/adres yolluyor; 5xx sunucu hatası (Vercel/Supabase loglarına bak); CORS
 başlıklarına bak; zaman aşımı yanıt süresi ya da yük boyutu; istek hiç görünmüyorsa kod gerçekten göndermiyor. Düzelt, eylemi
