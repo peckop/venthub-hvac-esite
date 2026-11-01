@@ -36,6 +36,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Süren işin varken gelen emri karta al, sıraya koy, OPS'a "elimde X var, bitince başlarım" dön; OPS "X'i bırak" demedikçe geçme.
 - Salt-okuma alt ajanı (araştırmacı, çürütücü, doğrulayıcı) `name` vermeden aç; uygulayıcıyı `name` ile aç.
 - Alt ajanın görev metnine "açık PR dalına push yok" yaz.
+- Toplu MCP yazımı (sync_task_graph, add_check, transition_task ve benzeri) alt ajana verilmez; yazmayı çağıran pencere yapar.
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`).
 - Recep'in onayladığı işi bekletmek için ölçülmüş engel gerekir; karta "ölçüldü mü?" satırı yazılır.
 - Önce Claude Code'un yerleşik karşılığını ara; genel inceleme ve sadeleştirmede önce yerleşik `/code-review` ve `/simplify`, ödeme, auth, RLS ya da webhook koduna dokunan farkta ayrıca `security-reviewer` ajanı. Mevcut code-review, diff-review, security-scanner, refactor-planner yetenekleri silinmez, VentHub'a özel kontrol için kalır.
