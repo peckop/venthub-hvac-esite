@@ -550,6 +550,14 @@ if (require.main === module) {
       } catch (e) {
         yaz('MERGE COMMIT: OKUNAMADI — ' + String(e.message).split('\n')[0].slice(0, 120))
       }
+      // ARC-235: PR birleşince kartı kapatmayı tetikleyen adım yoktu. Satır YALNIZ hatırlatır (otomatik Done yok);
+      // ayrı try: bu blok patlarsa "gh pr merge BASARISIZ" demesin, merge zaten yapıldı.
+      try {
+        const govde = JSON.parse(gh(['pr', 'view', pr, '--repo', depo, '--json', 'body'])).body
+        for (const s of require(path.join(__dirname, '..', 'board', 'kart-kapat.cjs')).kartKapatSatirlari(pr, govde, depo)) yaz(s)
+      } catch (e) {
+        yaz('KART KAPAT: OLCEMEDI — ' + String(e.message).split('\n')[0].slice(0, 120) + ' (PR govdesindeki Kanban: satirina elle bak)')
+      }
     } catch (e) {
       process.stderr.write('merge-ritueli: kapi YESIL ama gh pr merge BASARISIZ: ' +
         String(e.message).slice(0, 200) + '\n')
