@@ -213,9 +213,9 @@ describe('VADESİ GELEN (ARC-236, OPS açılışı)', () => {
     kart('ARC-902', 'Backlog', { title: 'vadesiz' }),
   ]
 
-  it('vade ≤ bugün ve Done olmayan kartlar, en eski önce; saatli vade de sayılır', () => {
+  it('vade ≤ bugün ve Done olmayan kartlar, en yeni vade önce (bugün → geriye); saatli vade de sayılır', () => {
     const metin = m.vadeMetni(BUGUN, vadeli)
-    expect(metin.split('\n').filter(Boolean).map((s) => s.split(' · ')[0].replace('VADESİ GELEN: ', ''))).toEqual(['ARC-31', 'ALT-76', 'OPS-197'])
+    expect(metin.split('\n').filter(Boolean).map((s) => s.split(' · ')[0].replace('VADESİ GELEN: ', ''))).toEqual(['OPS-197', 'ALT-76', 'ARC-31'])
     expect(metin).toContain('VADESİ GELEN: OPS-197 · bugün vadeli · 2026-11-02')
   })
 

@@ -183,7 +183,7 @@ function vadeKartlariCalistir(bugun) {
 }
 
 /**
- * VADESİ GELEN (ARC-236, OPS 1 Kasım): dueDate ≤ bugün olan ve Done olmayan kartlar, en eski vade önce, en çok 10.
+ * VADESİ GELEN (ARC-236, OPS 1 Kasım): dueDate ≤ bugün olan ve Done olmayan kartlar, en YENİ vade önce (bugün → geriye; bayat kartlar bugünü gömmesin, OPS 1 Kasım), en çok 10.
  * Kanban 1.3.0'da vade yalnız veridir, hatırlatma yoktur; zamanlayıcı da yok (karar 53) — OPS açılışında görünür.
  * Okunamazsa ya da vadeli kart yoksa '' (fail-open). `kartlar` testte verilir; `bugun` yerel gün "YYYY-MM-DD".
  */
@@ -192,7 +192,7 @@ function vadeMetni(bugun, kartlar = acikKartlar(() => vadeKartlariCalistir(bugun
   const gunu = (k) => (typeof k.dueDate === 'string' ? k.dueDate.slice(0, 10) : '')
   const vadeli = kartlar
     .filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(gunu(k)) && gunu(k) <= bugun && k.sutun !== 'Done')
-    .sort((a, b) => gunu(a).localeCompare(gunu(b)) || kartNo(a.title).localeCompare(kartNo(b.title)))
+    .sort((a, b) => gunu(b).localeCompare(gunu(a)) || kartNo(a.title).localeCompare(kartNo(b.title)))
   if (vadeli.length === 0) return ''
   const satirlar = vadeli
     .slice(0, VADE_TAVANI)
