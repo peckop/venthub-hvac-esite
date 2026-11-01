@@ -2,7 +2,7 @@
 
 > **DURUM: TASLAK 1** (1 Kasım 2026). Geçiş planı **ADIM 2: Recep doğrulaması bekliyor.**
 > Kaynak: OPS ortak notu `ops180-tek-resim-taslak-2026-11-01.md` (§1-9), depoya HARİTA aldı.
-> **§8 düzeltildi:** "yerinde sıkılaştırma" önerisi geçersiz (aşağıdaki not). Yeni şema taslağı gelince OPS ekler.
+> **§8 düzeltildi:** "yerinde sıkılaştırma" önerisi geçersiz; yerine geçen sıfırdan şema §10'da.
 > Bu belge iş kaydı değildir; iş durumu Kanban OPS-180 kartındadır.
 
 Kaynaklar: Kanban OPS-180 kartı (83 iptal kartından taşınan şart + 6 şart + karar 407/410/412/413 notları + HRT-90 ekleri), master 67022fc89 üzerinde arka uç envanteri (grep düzeyi; CodeGraph kullanılmadı). Tasarım kaynağı TEK: Claude Design "Venthub New" (4f7164e6); S4/S5 atıfları geçersiz.
@@ -99,7 +99,7 @@ Vitrin yenilenince kırılacak yol-bağlı testler (amaçları yeni dosya adlar�
 > - Katalog tabloları Supabase'te **sıfırdan yeni tablolarla** kurulur.
 > - Geçmiş sipariş ve ödeme kayıtları iyzico testinden geldiği için products.id'ye bağlı **14 FK engel sayılmaz**.
 > - Korunan yalnız **iş mantığıdır** (yönetici paneli, sepet, ödeme, teklif); bu mantık yeni tablolara yeniden bağlanır.
-> - Yeni şema taslağı gelince OPS bu bölüme ekler. Aşağıdaki metin, ölçülen sorunlar ve kavramlar için başvuru olarak kalır; "kimlikler değişmez" hükmü ve S1 sorusu düşmüştür.
+> - **Yerine geçen şema: §10** ([yeni-site-katalog-sema-taslak-2026-11-01.md](yeni-site-katalog-sema-taslak-2026-11-01.md)). Aşağıdaki metin, ölçülen sorunlar ve kavramlar için başvuru olarak kalır; "kimlikler değişmez" hükmü ve S1 sorusu düşmüştür.
 
 Eski taslak (Plan ajanı, 1 Kasım ~18:20; dosya/migration yazılmadı):
 
@@ -116,3 +116,14 @@ Eski taslak (Plan ajanı, 1 Kasım ~18:20; dosya/migration yazılmadı):
 - Sitenin 55 sayfasından 30'unun ŞABLONU YOK: Hakkımızda, hesabım alt sayfaları (13), giriş/kayıt (5), sepet, ödeme, ödeme başarılı, destek alt sayfaları (4), dört hesaplayıcı. → Design'dan tasarım gerekecek (Recep'e karar: hangileri şablonlansın, hangileri mevcut tasarımla kalsın).
 - Sitede ikiz ağaçlar: category/kategori, brands/markalar, products/urun, knowledge-hub/bilgi-merkezi (kanonik hangisi ölçülmedi). K3B bayrağı kapalı.
 - Şablonların istediği ama DB'de olmayan veri: marka içeriği (logo, özet, foto, web), uygulama alanları (5 şablon besliyor), rehber/SSS/yasal içerik tabloları, teknik özellik sözlüğü + ses verisi, garanti yılı, EN slug/ikon/kısa ad, il listesi, teklif sektör eşlemesi. Yeni şema bunları kapsamalı (marka, özellik, uygulama alanı, içerik tabloları).
+
+## 10. Sıfırdan katalog şeması (1 Kasım ~18:25; §8'in yerine geçer)
+
+Tam metin: [yeni-site-katalog-sema-taslak-2026-11-01.md](yeni-site-katalog-sema-taslak-2026-11-01.md) (TASLAK; dosya ve migration yok).
+
+- ~25 yeni Türkçe adlı tablo (katalog_*, uygulama_*, icerik_*, vitrin_ayari), her satırda tenant.
+- Fiyat yalnız `vitrin_fiyat` RPC'sinden; anon fiyat tablosuna erişemez, listeleyen RPC'ler fiyat döndürmez.
+- Tek doğrulama fonksiyonu tetikte: panel, CSV ve betik aynı kapıdan geçer (karar 413).
+- Sipariş, teklif, sepet, stok ve fiyat motoru FK'leri yeni tablolara döner; test verisi devirde depo dışına dökülüp temizlenir.
+- Geçiş M1-M5, her migration Recep onayıyla (kural 13).
+- Recep'e 8 açık soru (tam metnin §7'si), ADIM 2'de sorulacak.
