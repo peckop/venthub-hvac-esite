@@ -70,7 +70,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 ## Test ve bellek
 
 - Yerelde yalnız `pnpm test:ilgili` koş; seçici TAM derse hiçbir test koşmaz, CI koşar. Değişen test dosyalarını `pnpm vitest <dosya> --run` ile ekle. Tam paket, type-check ve build yerelde koşturulmaz.
-- PR açınca `mcp__ccd_pr__bind_pr` ile PR'ı asıl PR olarak bağla; CI'ı bekleme (`gh pr watch`, döngü, `sleep` yok). CI yeşili için bildirim GELMEZ: yeşil gerekirse `get_status` ya da `gh pr view` ile TEK SEFERLİK oku, ya da OPS dürter.
+- PR açınca `ccd_pr get_status` ile bağla (görünmüyorsa `bind_pr`), `set_monitor` ile CI izlemesini aç: CI bitince uygulama pencereyi uyandırır, OPS dürtmesini bekleme. Yoklama, `sleep`, `gh pr watch` yok.
 - Site koduyla ilgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
 - Durum satırında BELLEK uyarısı varsa (boş bellek 2 GB altı, tek süreç 3 GB üstü) tam vitest, tsc, `next build`, `pnpm install`, Docker gibi ağır komut başlatma; OPS'a yaz.
 
