@@ -46,7 +46,7 @@
           "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
         },
         {
-          "gorev": "Yayın sonrası dizin isteği: canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda IndexNow ve Google kuyruğu (değişen adres bildiricisi); Google günlük sınırı sabit değil ölçülür (bugüne dek 11), sınıra takılan adres sonraki gün ilk iş; GEO-SEO'nundur, onay sorulmaz",
+          "gorev": "Yayın sonrası dizin isteği: canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda IndexNow ve Google kuyruğu (değişen adres bildiricisi); Google günlük sınırı sabit değil ölçülür (bugüne dek 11), sınıra takılan adres sonraki gün ilk iş; GEO-SEO'nundur, onay sorulmaz. Aynı turda Bing Webmaster URL İnceleme'den dizin oluşturma isteği (günlük kota 100) ve Yandex Webmaster Yeniden tarama aracından adres gönderimi (günlük 10 adres); Yandex paneli salt okunur ya da oturum kapalıysa IndexNow ile yetinilir, karta 'Yandex paneli kapalı' yazılır",
           "komut": "scripts/seo/degisen-adres-bildir.mjs",
           "siklik": "olay",
           "tetik": "actions",
@@ -63,6 +63,15 @@
           "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
+        },
+        {
+          "gorev": "Haftalık üç motor tek tablo: Google (Search Console), Bing (Webmaster URL İnceleme), Yandex (Webmaster Dizin) için son 7 günde yayımlanan her adresin dizin durumu ve toplam dizindeki adres sayısı tek tabloda; bir motorda dizinli olup ötekinde olmayan adres bulgu olarak sahibine yazılır",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"SEO üç motor: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); iş tanımı SEO panosu üç motor kartı",
+          "bagli": "evet",
+          "cikti": "Tablo satırı durum dosyasında; sapma varsa kart",
+          "esik": "Ardışık iki hafta bir motorda dizinde olmayan adres"
         }
       ]
     },
