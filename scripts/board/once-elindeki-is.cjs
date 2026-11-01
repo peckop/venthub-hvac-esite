@@ -169,7 +169,40 @@ function baslatmaUyarisi(hedef, kartlar = acikKartlar(), onek = onekTablosu()) {
   )
 }
 
+const VADE_TAVANI = 10
+
+function vadeKartlariCalistir(bugun) {
+  const r = spawnSync(process.execPath, [KANBAN_ANLIK, '--acik', '--kisa', '--vade-son', bugun], {
+    encoding: 'utf8',
+    timeout: 8000,
+    maxBuffer: 32 * 1024 * 1024,
+    windowsHide: true,
+  })
+  if (r.error || r.status !== 0) throw new Error('kanban-anlik çalışmadı')
+  return r.stdout
+}
+
+/**
+ * VADESİ GELEN (ARC-236, OPS 1 Kasım): dueDate ≤ bugün olan ve Done olmayan kartlar, en eski vade önce, en çok 10.
+ * Kanban 1.3.0'da vade yalnız veridir, hatırlatma yoktur; zamanlayıcı da yok (karar 53) — OPS açılışında görünür.
+ * Okunamazsa ya da vadeli kart yoksa '' (fail-open). `kartlar` testte verilir; `bugun` yerel gün "YYYY-MM-DD".
+ */
+function vadeMetni(bugun, kartlar = acikKartlar(() => vadeKartlariCalistir(bugun))) {
+  if (!kartlar || !/^\d{4}-\d{2}-\d{2}$/.test(String(bugun))) return ''
+  const gunu = (k) => (typeof k.dueDate === 'string' ? k.dueDate.slice(0, 10) : '')
+  const vadeli = kartlar
+    .filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(gunu(k)) && gunu(k) <= bugun && k.sutun !== 'Done')
+    .sort((a, b) => gunu(a).localeCompare(gunu(b)) || kartNo(a.title).localeCompare(kartNo(b.title)))
+  if (vadeli.length === 0) return ''
+  const satirlar = vadeli
+    .slice(0, VADE_TAVANI)
+    .map((k) => `VADESİ GELEN: ${kartNo(k.title) || k.id} · ${kisalt(k.title.replace(/^\s*[A-Za-z0-9]{2,4}-\d+\s*[·:-]?\s*/, ''))} · ${gunu(k)}`)
+  if (vadeli.length > VADE_TAVANI) satirlar.push(`  … +${vadeli.length - VADE_TAVANI} vadesi gelen kart daha (node scripts/board/kanban-anlik.cjs --acik --kisa --vade-son ${bugun})`)
+  return satirlar.join('\n') + '\n'
+}
+
 module.exports = {
+  vadeMetni,
   acilisMetni,
   baslatmaUyarisi,
   grupla,

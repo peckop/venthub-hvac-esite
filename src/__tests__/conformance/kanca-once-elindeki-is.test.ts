@@ -25,8 +25,10 @@ interface Kart {
   status?: string
   priority?: string
   labels?: string[]
+  dueDate?: string | null
 }
 interface Modul {
+  vadeMetni: (bugun: string, kartlar: Kart[] | null) => string
   acilisMetni: (rol: string, kartlar: Kart[] | null, onek?: Record<string, string>) => string
   baslatmaUyarisi: (hedef: string, kartlar: Kart[] | null, onek?: Record<string, string>) => string
   grupla: (k: Kart[], rol: string, onek?: Record<string, string>) => { surenler: Kart[]; bekleyenler: Kart[]; incelemede: Kart[]; sirada: Kart[] }
@@ -197,5 +199,47 @@ describe('kanca (PreToolUse)', () => {
     )
     expect(r.status).toBe(0)
     expect(r.stdout).toBe('')
+  })
+})
+
+describe('VADESİ GELEN (ARC-236, OPS açılışı)', () => {
+  const BUGUN = '2026-11-02'
+  const vadeli = [
+    kart('OPS-197', 'In Progress', { title: 'bugün vadeli', dueDate: '2026-11-02' }),
+    kart('ALT-76', 'To Do', { title: 'saatli vade', dueDate: '2026-10-23T18:00:00+03:00' }),
+    kart('ARC-31', 'Backlog', { title: 'en eski', dueDate: '2026-10-06' }),
+    kart('ARC-900', 'Backlog', { title: 'yarın vadeli', dueDate: '2026-11-03' }),
+    kart('ARC-901', 'Done', { title: 'bitmiş', dueDate: '2026-10-01' }),
+    kart('ARC-902', 'Backlog', { title: 'vadesiz' }),
+  ]
+
+  it('vade ≤ bugün ve Done olmayan kartlar, en eski önce; saatli vade de sayılır', () => {
+    const metin = m.vadeMetni(BUGUN, vadeli)
+    expect(metin.split('\n').filter(Boolean).map((s) => s.split(' · ')[0].replace('VADESİ GELEN: ', ''))).toEqual(['ARC-31', 'ALT-76', 'OPS-197'])
+    expect(metin).toContain('VADESİ GELEN: OPS-197 · bugün vadeli · 2026-11-02')
+  })
+
+  it('gelecek vade, Done ve vadesiz kart görünmez', () => {
+    const metin = m.vadeMetni(BUGUN, vadeli)
+    for (const yok of ['ARC-900', 'ARC-901', 'ARC-902']) expect(metin).not.toContain(yok)
+  })
+
+  it('en çok 10 satır, fazlası "+N" notu', () => {
+    const cok = Array.from({ length: 13 }, (_, i) => kart(`ARC-${100 + i}`, 'Backlog', { dueDate: '2026-10-01' }))
+    const satirlar = m.vadeMetni(BUGUN, cok).split('\n').filter(Boolean)
+    expect(satirlar).toHaveLength(11)
+    expect(satirlar[10]).toContain('+3 vadesi gelen kart daha')
+  })
+
+  it('Kanban okunamazsa (null), vade yoksa ya da bugün geçersizse boş (fail-open)', () => {
+    expect(m.vadeMetni(BUGUN, null)).toBe('')
+    expect(m.vadeMetni(BUGUN, [kart('ARC-902', 'Backlog')])).toBe('')
+    expect(m.vadeMetni('yarın', vadeli)).toBe('')
+  })
+
+  it('SABOTAJ: süzgeci gevşeten kopya (gelecek + Done dahil) bu testlerde KIRMIZI verir', () => {
+    const gevsek = vadeli.filter((k) => k.dueDate).map((k) => k.title)
+    expect(gevsek.join()).toContain('ARC-900') // gevşek kopya yarını da sayardı
+    expect(m.vadeMetni(BUGUN, vadeli)).not.toContain('ARC-900')
   })
 })
