@@ -38,6 +38,7 @@ export const HASSAS_KOLONLAR = [
   'last_purchase_currency',
   'last_purchased_at',
   'supplier_name', // tedarikçi adı: canlıda VAR (2026-11-01 ölçüldü), maliyet/tedarik sınıfı
+  'warehouse_location', // depo konumu: iç bilgi, vitrinden bilinçle çıkarıldı (product.columns.ts, REC-140)
 ]
 
 /** Vitrinin her sayfada seçtiği; okunamazsa site kırılır. */
@@ -110,9 +111,14 @@ async function main() {
 
   const o = degerlendir(satirlar, { uygulandi })
   if (o.beklemede) {
+    // PR koşumunda "uygulanmadı" beklenen durumdur (migration birleşmeden prod'a inmez): bildirim.
+    // PR DIŞINDA (master push, elle) uygulanmamış olması ya migrate ile yarış ya da kilidin yokluğudur:
+    // sessiz geçilmez, ::warning verilir (kırmızı değil: birleşme anındaki yarış masum olabilir).
+    const pr = process.env.GITHUB_EVENT_NAME === 'pull_request'
+    const seviye = pr ? 'notice' : 'warning'
     console.error(
-      '::notice title=maliyet kolon nobetcisi::ALT-73 migration\'i canli veritabanina HENUZ UYGULANMAMIS (display_price(uuid) yok) — ' +
-        'olcum BEKLEMEDE, gecmis sayilmaz. Birlesme + supabase-migrate sonrasi ilk kosumda gercek olcum yapilir.',
+      `::${seviye} title=maliyet kolon nobetcisi::ALT-73 migration'i canli veritabanina HENUZ UYGULANMAMIS (display_price(uuid) yok) — ` +
+        `olcum BEKLEMEDE, gecmis sayilmaz.${pr ? ' Birlesme + supabase-migrate sonrasi ilk kosumda gercek olcum yapilir.' : ' PR disi kosumda bu beklenmez: supabase-migrate bitmeden mi kostu, yoksa kilit hic inmedi mi? Elle bak.'}`,
     )
     return
   }

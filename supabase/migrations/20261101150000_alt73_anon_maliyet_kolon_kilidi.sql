@@ -6,7 +6,8 @@
 --   anon, public.products üzerinde tablo düzeyi SELECT'e sahipti; 7 maliyet kolonu + supplier_name (tedarikçi adı)
 --   okunabiliyordu (purchase_price 442/442 dolu, cost_in_base 348 dolu). Sitenin istemci paketindeki genel anahtar yeter.
 --   supplier_name canlıda VAR (information_schema, 2026-11-01 yeniden ölçüldü; ilk ölçüm yanlıştı, güvenlik
---   incelemesi yakaladı) ve hassas sayılır: KİLİT 8 KOLONU kapatır.
+--   incelemesi yakaladı) ve hassas sayılır. warehouse_location (depo konumu) da vitrinden bilinçle çıkarılmıştı
+--   (product.columns.ts, REC-140) ve iç bilgidir: hassas sayılır. KİLİT 9 KOLONU kapatır (7 maliyet + 2 iç bilgi).
 --   products hiçbir yayında (Realtime) yok. Vitrin (anon) kodu 7 kolonun HİÇBİRİNİ sorgulamıyor
 --   (açık kolon listeleri, src/lib/services/product.columns.ts); Edge fonksiyonlarında adları geçmiyor.
 --
@@ -18,7 +19,7 @@
 --      get_product_families_enriched) display_price(p.id) çağıracak biçimde yeniden yazılır. YALNIZ o çağrı
 --      satırı değişir; gövdenin geri kalanı canlıdaki tanımla birebir aynıdır.
 --      display_price(p products) DEĞİŞMEZ (service_role/Edge hesaplanan kolon olarak kullanabilir).
---   2) anon'dan products tablo düzeyi SELECT alınır; 8 hassas kolon DIŞINDAKİ her kolon için kolon düzeyi
+--   2) anon'dan products tablo düzeyi SELECT alınır; 9 hassas kolon DIŞINDAKİ her kolon için kolon düzeyi
 --      SELECT verilir (kolon listesi information_schema'dan üretilir, elle yazılmaz).
 --   3) Koruma bloğu (Guard E): migration KENDİ İÇİNDE anon rolüne geçip hassas kolon okumanın reddedildiğini
 --      ve vitrin RPC'lerinin çalıştığını sınar; biri başarısızsa migration TAMAMEN geri döner.
@@ -263,17 +264,18 @@ $function$;
 do $kilit$
 declare
   v_hassas  text[] := array['purchase_price', 'purchase_currency', 'purchase_rate_to_base', 'cost_in_base',
-                            'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name'];
+                            'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name',
+                            'warehouse_location'];
   v_var     int;
   v_izinli  text;
   v_izinli_n int;
 begin
-  -- Guard A (fail-closed): beklenen 8 hassas kolon canlıda TAM olarak var mı? Değilse varsayım yanlış, dur.
+  -- Guard A (fail-closed): beklenen 9 hassas kolon canlıda TAM olarak var mı? Değilse varsayım yanlış, dur.
   select count(*) into v_var
     from information_schema.columns
    where table_schema = 'public' and table_name = 'products' and column_name = any(v_hassas);
-  if v_var <> 8 then
-    raise exception 'DURDU: products üzerinde % hassas kolon bulundu (beklenen 8) — plan §1.2 ile canlı ayrışmış', v_var;
+  if v_var <> 9 then
+    raise exception 'DURDU: products üzerinde % hassas kolon bulundu (beklenen 9) — plan §1.2 ile canlı ayrışmış', v_var;
   end if;
 
   select string_agg(format('%I', column_name), ', ' order by ordinal_position), count(*)
@@ -295,7 +297,8 @@ $kilit$;
 do $guard$
 declare
   v_hassas text[] := array['purchase_price', 'purchase_currency', 'purchase_rate_to_base', 'cost_in_base',
-                           'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name'];
+                           'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name',
+                           'warehouse_location'];
   v_k       text;
   v_ids     uuid[];
   v_n       int;

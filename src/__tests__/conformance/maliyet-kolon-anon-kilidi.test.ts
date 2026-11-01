@@ -128,10 +128,11 @@ describe('ALT-73 migration ve geri alma betiği', () => {
   const ham = fs.readFileSync(path.join(MIG_DIZIN, ALT73), 'utf8')
   const kod = sqlYorumsuz(ham)
 
-  it('8 hassas kolonun (7 maliyet + supplier_name) hepsi migration listesinde ve nöbetçi listesiyle aynı', async () => {
+  it('9 hassas kolonun (7 maliyet + supplier_name + warehouse_location) hepsi migration listesinde ve nöbetçi listesiyle aynı', async () => {
     const n = await nobetciYukle()
-    expect(n.HASSAS_KOLONLAR).toHaveLength(8)
+    expect(n.HASSAS_KOLONLAR).toHaveLength(9)
     expect(n.HASSAS_KOLONLAR).toContain('supplier_name')
+    expect(n.HASSAS_KOLONLAR).toContain('warehouse_location')
     for (const k of n.HASSAS_KOLONLAR) {
       expect(kod.includes(`'${k}'`), `${k} migration listesinde yok`).toBe(true)
     }
@@ -263,7 +264,7 @@ describe('INV-MALIYET-KOLON-2 nöbetçi karar fonksiyonu', () => {
     const n = await nobetciYukle()
     const o = n.degerlendir(saglikli(n).map((x) => ({ ...x, okunabilir: true })))
     expect(o.kirmizi).toBe(true)
-    expect(o.acik).toHaveLength(8)
+    expect(o.acik).toHaveLength(9)
   })
 
   it('hassas kolon katalogda yoksa (yeniden adlandırma) KIRMIZI (fail-closed)', async () => {
