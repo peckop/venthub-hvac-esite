@@ -801,7 +801,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'isi-geri-kazanim-cihazi-nedir',
     konu: 'verimlilik',
     yayinTarihi: '2026-10-31',
-    guncellemeTarihi: '2026-10-31',
+    // 1 Kasım 2026 (BLG-27): ısı geri kazanım yazısında kurulum türü adı "kanal tipi" terimine çevrildi (başlık, bağlantı metni, tablo, SSS); iddia kümesi aynı. Gövde sha yukarıdaki değerden farklıdır.
+    guncellemeTarihi: '2026-11-01',
     urunler: [
       'vh:aile/vortice-vort-hr-isi-geri-kazanim',
       'vh:aile/vortice-vort-mono',
@@ -872,13 +873,13 @@ Verim debiyle değişir. ABD Enerji Bakanlığı'nın Nisan 2021 tarihli raporun
 
 Üreticiler verimi farklı koşul ibareleriyle verir. Vortice kataloğu ısıl verimi HRS referans debisinde verir ve referans debiyi ve referans basınç farkını aynı sayfada yazar [8]; AVenS teknik belgesi verimi dengeli debide dipnotuyla verir [11]. İki değeri karşılaştırmadan önce koşulu okumak gerekir.
 
-## Kanallı mı, oda tipi mi: iki kurulum türü nasıl ayrılır?
+## Kanal tipi mi, oda tipi mi: iki kurulum türü nasıl ayrılır?
 
-Kanallı merkezi ünite kanal bağlantılı tek bir cihazla, Vortice kataloğunda 80, 180, 240 ve 260 m²'ye kadar mahalleri havalandırmak için tarif edilir [8]; oda tipi ünite ise merkezsizdir (decentralized) ve yatak odası, banyo, oturma odası ile mutfak, çalışma odası gibi ayrı mahallere yerleştirilir [9]. Eurovent kılavuzu dengeli ısı geri kazanımlı sistemlerde besleme ve egzoz debilerinin terminal cihazlı tüm odalara göre boyutlandırıldığını yazar [3].
+Kanal tipi merkezi ünite kanal bağlantılı tek bir cihazla, Vortice kataloğunda 80, 180, 240 ve 260 m²'ye kadar mahalleri havalandırmak için tarif edilir [8]; oda tipi ünite ise merkezsizdir (decentralized) ve yatak odası, banyo, oturma odası ile mutfak, çalışma odası gibi ayrı mahallere yerleştirilir [9]. Eurovent kılavuzu dengeli ısı geri kazanımlı sistemlerde besleme ve egzoz debilerinin terminal cihazlı tüm odalara göre boyutlandırıldığını yazar [3].
 
-VentHub'daki [ısı geri kazanım kategorisi](vh:kategori/heat-recovery-vmc) iki alt kategoriye ayrılır: [kanallı ısı geri kazanım cihazları](vh:kategori/ducted-central-hrv) ve [oda tipi ısı geri kazanım cihazları](vh:kategori/single-room-hrv).
+VentHub'daki [ısı geri kazanım kategorisi](vh:kategori/heat-recovery-vmc) iki alt kategoriye ayrılır: [kanal tipi ısı geri kazanım cihazları](vh:kategori/ducted-central-hrv) ve [oda tipi ısı geri kazanım cihazları](vh:kategori/single-room-hrv).
 
-| Ölçüt | Kanallı merkezi ünite | Oda tipi ünite |
+| Ölçüt | Kanal tipi merkezi ünite | Oda tipi ünite |
 |---|---|---|
 | Kapsadığı alan | Vortice kataloğu modellere göre 80, 180, 240 ve 260 m²'ye kadar olan mahaller için tarif eder [8] | Katalogda m² değeri verilmez; Vortice bu seriyi merkezsiz (decentralized) ısı geri kazanım ünitesi olarak adlandırır ve ayrı mahallere yerleştirir; Wi-Fi'li modeller yerel ağ üzerinden birbirleriyle haberleşebilir [9] |
 | Isı geri kazanım yöntemi | Kataloglarda plastik, entalpi ve alüminyum plakalı eşanjörler geçer [8][11] | Seramik depolamalı eşanjör: fanın dönüş yönü periyodik değişir, eşanjör önce egzoz havasıyla ısınır, sonra bu ısıyı gelen soğuk havaya verir [9] |
@@ -939,9 +940,9 @@ Bu yazıda fiyat verilmez. Kaynaklarda maliyete şu iki yerde değinilir: ABD En
 
 Nem geri kazanımı cihaz türüne bağlıdır: ısı geri kazanımlı havalandırıcılar (HRV) nemi aktarmaz, enerji geri kazanımlı havalandırıcılar (ERV) aktarır [4]. Eurovent kılavuzuna göre nem geçiren entalpi plakalı eşanjörler ve döner çarklar nem geri kazanımı sağlayabilir [3]. Vortice kataloğu VORT HR 350 AVEL H modelini entalpi eşanjörüyle duyulur ve gizli ısıyı geri kazanan bir ünite olarak tanımlar [8].
 
-### Kanallı ünite mi, oda tipi ünite mi seçilmeli?
+### Kanal tipi ünite mi, oda tipi ünite mi seçilmeli?
 
-Tüm konutu ya da tek bir mahalli, katalogdaki 80, 180, 240 ve 260 m²'ye kadar sınıflara göre tek cihaz ve kanalla havalandırmak isteyenler için kanallı merkezi ünite, yatak odası ya da oturma odası gibi ayrı mahallere birer merkezsiz ünite yerleştirmek isteyenler için oda tipi ünite uygundur [8][9]. Bu ayrım Vortice'in merkezi ve merkezsiz ünite tarifine dayanır; yukarıdaki karşılaştırma tablosu iki türün alan tanımını ve eşanjör yöntemini yan yana verir.
+Tüm konutu ya da tek bir mahalli, katalogdaki 80, 180, 240 ve 260 m²'ye kadar sınıflara göre tek cihaz ve kanalla havalandırmak isteyenler için kanal tipi merkezi ünite, yatak odası ya da oturma odası gibi ayrı mahallere birer merkezsiz ünite yerleştirmek isteyenler için oda tipi ünite uygundur [8][9]. Bu ayrım Vortice'in merkezi ve merkezsiz ünite tarifine dayanır; yukarıdaki karşılaştırma tablosu iki türün alan tanımını ve eşanjör yöntemini yan yana verir.
 
 ### Isı geri kazanım cihazı soğukta donar mı?
 
