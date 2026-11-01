@@ -26,6 +26,8 @@ exclusions: []
 
 # Git Commit with Conventional Commits
 
+> **VentHub: bu skill'in biçimi git-flow ve filo-ortak kurallarıyla çelişirse onlar kazanır** (26 Ekim, YTN-21). Commit mesajı `ŞERİT (REC-nn): ne oldu — niçin (#PR)` biçimindedir, Türkçe, tür öneki (`fix:`) yok, 72 karakter sınırı yok (`git-flow` ek kuralları). `Closes #123` / `Fixes REC-nn` YAZILMAZ: kapanmaması gereken kayıt kapanır; PR gövdesinde yalnız `Kanban: <ÖN EK>-<sayı>`. Aşağıdaki Conventional Commits biçimi yalnız bir tür-seçme kılavuzu olarak okunur. Commit yalnız istenince atılır.
+
 ## Overview
 
 Create standardized, semantic git commits using the Conventional Commits specification. Analyze the actual diff to determine appropriate type, scope, and message.
@@ -131,7 +133,7 @@ EOF
 - One logical change per commit
 - Present tense: "add" not "added"
 - Imperative mood: "fix bug" not "fixes bug"
-- Reference issues: `Closes #123`, `Refs #456`
+- Reference issues: VentHub'da kullanılmaz (`Closes`/`Fixes` yasak; bkz. üstteki not)
 - Keep description under 72 characters
 
 ## Git Safety Protocol

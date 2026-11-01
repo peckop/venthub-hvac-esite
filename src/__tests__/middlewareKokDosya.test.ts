@@ -24,6 +24,23 @@ async function iste(yol: string) {
 }
 
 const INDEXNOW_DOSYASI = '/e4468e39c3131f38c51ffc73fab38c99.txt'
+const YANDEX_DOSYASI = '/yandex_7febcb8920840a50.html'
+
+describe('middleware — Yandex doğrulama dosyası (SEO-64)', () => {
+  it('yandex_<16 hane>.html dil önekinden muaf, 404 ve yönlendirme yok', async () => {
+    const r = await iste(YANDEX_DOSYASI)
+    expect(r.durum).toBe(200)
+    expect(r.yol).toBeNull()
+  })
+
+  it.each(['/yandex_7febcb892084.html', '/yandex_7febcb8920840a50x.html', '/baska.html'])(
+    '%s muaf DEĞİL: dil önekiyle yönlenir',
+    async (yol) => {
+      const r = await iste(yol)
+      expect(r.durum).toBe(307)
+    },
+  )
+})
 
 describe('middleware — bilinen kök dosyalar dil önekinden muaf', () => {
   it.each(['/robots.txt', '/llms.txt', '/use.txt', '/sitemap.xml', INDEXNOW_DOSYASI])(

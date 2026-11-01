@@ -10,8 +10,8 @@
           "komut": "scripts/seo/canli-kapi.mjs",
           "siklik": "her-dagitim-gunluk",
           "tetik": "actions",
-          "tetikAyrinti": ".github/workflows altında workflow_run (başarılı production dağıtımı) + günlük schedule; karar 260 ve 261, iskelet ARC-26 (iş akışı sahibi ARAÇ), kontrol içeriği SEO-15",
-          "bagli": "hayir",
+          "tetikAyrinti": ".github/workflows/canli-kapi.yml workflow_run (başarılı production dağıtımı) + günlük schedule; karar 260 ve 261, iskelet ARC-26 (iş akışı sahibi ARAÇ), kontrol içeriği SEO-15",
+          "bagli": "evet",
           "baglayacak": "ARAC",
           "cikti": "Her yeni KIRMIZI için ilgili Kanban kartı (bilinen kırmızılar --bilinen ile kart numarasıyla taşınır)",
           "esik": "Yeni KIRMIZI 0 (cetvel Y3)"
@@ -20,9 +20,8 @@
           "gorev": "Haftalık veri incelemesi: Search Console ve Bing verisini kendi verimizden oku (aynı aramada yarışan sayfalar, dizinlenme oranı, düşen ve ilk 10'a giren sayfalar, son 60 günde değişene dokunma kuralı); Search Console Geliştirmeler ve Alışveriş raporları (ürün snippet'leri, sayfa dizine ekleme, Core Web Vitals) da okunur, yeni sorunda aynı gün kart ve sahibine yazı",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"SEO haftalık: N gün\" (7 gün eşik); satırı ARAÇ kuruyor, ARC-28; incelemenin kendisi SEO-17",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"SEO haftalık: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); incelemenin kendisi SEO-17",
+          "bagli": "evet",
           "cikti": "Tek rapor (docs/audits/seo-haftalik-<tarih>.md) ve en önemli 5 iş; her iş için kart önerisi OPS'a",
           "esik": "TASLAK: geçti/kaldı ölçütünü GEO-SEO belirler (SEO-17); kural: son 60 günde değişen sayfa için iş önerilmez.",
           "taslak": true
@@ -30,22 +29,19 @@
         {
           "gorev": "Aylık resmi belge incelemesi: Google Search Central ve Bing Webmaster belgelerinde değişen hüküm var mı, cetvellerimiz hâlâ uyuyor mu",
           "siklik": "aylik",
-          "tetik": "actions",
-          "tetikAyrinti": ".github/workflows altında aylık schedule (karar 260); iş akışı ARAÇ'ta ARC-27, resmi kaynak listesi SEO-16 (GEO-SEO)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"SEO aylık belge: N gün\" (30 gün eşik); cron yok, karar 260 bu yönde; damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); resmi kaynak listesi SEO-16 (GEO-SEO)",
+          "bagli": "evet",
           "cikti": "Değişen hüküm başına Kanban kartı ve cetvel güncellemesi (cetvel sahibi GEO-SEO)",
           "esik": "TASLAK: hangi belgelerin kapsandığını GEO-SEO teyit eder.",
           "taslak": true
         },
         {
-          "gorev": "Yayın öncesi liste: adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2 taban ve ön izleme satırları)",
-          "komut": "scripts/seo/adres-yayin-denetim.mjs",
+          "gorev": "Yayın öncesi liste: adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2 taban ve ön izleme satırları; komut scripts/seo/adres-yayin-denetim.mjs)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs: arama görünürlüğüne dokunan kartta Y2 koşu notunu istemek (henüz yok)",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: `olcum-yayin-oncesi` etiketli kartta `ÖLÇÜM: yayin-oncesi` satırı)",
+          "bagli": "evet",
           "cikti": "Kusur listesi sahibine (cetvel Y4); taban dosyasının yolu Kanban kartına",
           "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
         },
@@ -63,9 +59,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -100,19 +95,17 @@
           "komut": "scripts/belge/kart-plan-kapisi.cjs",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Kart açılırken ya da Review'a geçerken kendiliğinden çağıran bağ yok: kapı yalnız elle (kart sahibi) ve conformance testinde koşuyor (HARİTA ölçümü 10-09: iş akışı, kanca ve scripts/board içinde çağrı yok); kanca altyapısı gerekirse ARAÇ'ın",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
-          "cikti": "Eksik alanların listesi kart sahibine; kurulunca planı eksik kart Review'a geçmez",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs add_task açıklamasında ve Review'a geçişte kapıyı çağırır (ARC-216 B, #2110); uyarır, reddetmez; açıklamada PLAN başlığı yoksa sessiz kalır (27 Ekim ölçümü: son 8 günde açılan 55 kartın hiçbirinde PLAN başlığı yok)",
+          "bagli": "evet",
+          "cikti": "Eksik alanların listesi kart sahibine (uyarı, Review'a geçişi engellemez)",
           "esik": "GEÇTİ: plan iskeleti eksiksiz (docs/standards/kart-plani-standard.md)"
         },
         {
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -144,34 +137,11 @@
           "taslak": true
         },
         {
-          "gorev": "MCP bağlantı sağlığı: bağlanamayan ya da kimlik bekleyen sunucuyu bul, sebebini ölç, sahibine kart aç (claude mcp list)",
-          "siklik": "olay",
-          "tetik": "istem-tazelik",
-          "tetikAyrinti": "Tekrarlanan satır ya da kapı yok: Claude Code açılışta \"bağlanamadı\" bildirimini bir kez gösteriyor; notebooklm-py bu yüzden 09-09'dan beri kopuk kaldı ve kimse sebebini aramadı (ARC-70); pencere açılışında koşması hedeflenir",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
-          "cikti": "Sahibine sebebi ölçülmüş Kanban kartı",
-          "esik": "TASLAK: bağlanamayan sunucu 0; kimlik bekleyen ayrı sayılır",
-          "taslak": true
-        },
-        {
-          "gorev": "Bağımlılık güncelleme önerileri: her açık güncelleme PR'ı için birleştir / önce sına / kapat hükmü yaz",
-          "siklik": "olay",
-          "tetik": "istem-tazelik",
-          "tetikAyrinti": "⚠BAGIMLILIK satırı son tarama süresini ve high sayısını gösteriyor, açık güncelleme PR sayısını göstermiyor (TAKİP satır metninden çıkardı, kanca okunmadı); sayıyı gösteren satırı HARİTA tasarlayacak, kanca altyapısı gerekirse ARAÇ",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
-          "cikti": "PR'a hüküm notu ve OPS'a tek tablo; birleştirmeyi ya da kapatmayı ARAÇ ya da OPS yapar, TAKİP yapmaz",
-          "esik": "TASLAK: hükümsüz açık güncelleme PR'ı 0",
-          "taslak": true
-        },
-        {
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -220,10 +190,10 @@
           "esik": "Kapalı kipte yalnız Inter; TASARIM Faz 2b'de Archivo beklenir, o PR'da eşik değişir"
         },
         {
-          "gorev": "Dependabot PR'ları: haftalık açılan PR'ları gözden geçirip birleştir ya da gerekçeyle kapat",
+          "gorev": "Bağımlılık güncelleme PR'ları (Dependabot dahil): haftalık açılan PR'ların her biri için hüküm yaz (birleştir / önce sına / kapat), sonra birleştir ya da gerekçeyle kapat",
           "siklik": "haftalik",
           "tetik": "actions",
-          "tetikAyrinti": "Dependabot PR'ları haftalık açılıyor; bunları ele alan kendiliğinden bir tetik kurulu değil (kuracak: ALTYAPI)",
+          "tetikAyrinti": "Dependabot PR'ları haftalık açılıyor; bunları ele alan kendiliğinden bir tetik kurulu değil (kuracak: ALTYAPI). Tek sahip ALTYAPI (tüzük Madde 3; HRT-74: TAKİP'in aynı işi taşıyan görevi kaldırıldı). ⚠BAGIMLILIK satırı açık güncelleme PR sayısını göstermiyor; sayı eklenirse tetik istem-tazelik olabilir (ARC-216 kapsamında ARAÇ ile konuşulur)",
           "bagli": "hayir",
           "baglayacak": "ALTYAPI",
           "cikti": "Birleşme ya da gerekçeli kapatma (bagimlilik-kararlari.md §7 kaydı)",
@@ -232,12 +202,10 @@
         },
         {
           "gorev": "Canlı adres matrisi: yayın ya da anahtar açılışı sonrası canlıda her adresin son durumu ve sıçrama sayısı",
-          "komut": "scripts/adres/matris.cjs",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Yayın ya da anahtar açılışı kartında matris koşusunu kendiliğinden isteyen kapı yok (kuracak: HARİTA, scripts/belge/kart-plan-kapisi.cjs)",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: başlıkta adres matrisi ya da `olcum-adres-matrisi` etiketli kartta `ÖLÇÜM: adres-matrisi` satırı)",
+          "bagli": "evet",
           "cikti": "docs/audits/adres-matrisi-<tarih>.json ve kusur için Kanban kartı",
           "esik": "TASLAK: hata satırı 0 ve dilsiz adreslerde --dilsiz-hop-en-cok değerinin altı (rota-dili-standard.md; ölçüt ALT-14 canlı ölçümünden)",
           "taslak": true
@@ -246,9 +214,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -280,22 +247,10 @@
           "gorev": "Yeni görünüm bayrağını (YENI_GORUNUM) ya da yazı tipini değiştiren her işte bayrak AÇIK geçici dalla KAPALI dalı kıyasla: erişilebilirlik tabanı, font preload sayımı (M6, Linux/CI), admin ekranı yazı tipi aynı",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs'e bu ölçüm satırını istetmek (henüz yok; kuracak: HARİTA)",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: başlıkta bayrak ya da yazı tipi sözcüğü ya da `olcum-bayrak-kiyas` etiketi, `ÖLÇÜM: bayrak-kiyas` satırı)",
+          "bagli": "evet",
           "cikti": "Ölçüm tablosu PR gövdesine; fark Kanban kartı TASARIM'a, admin farkı ADMIN'e",
           "esik": "TASLAK: bayrak kapalıyken fark 0; açıkken preload ve axe tavanını ALTYAPI (M6, M3) belirler, ALTYAPI teyit eder",
-          "taslak": true
-        },
-        {
-          "gorev": "Tasarım sistemi kopyasının koddaki adlarla eşitliği: Design'daki adlar (bugün 66) ile :root ve Tailwind adlarını karşılaştır (INV-TOKEN-PARITE-1)",
-          "siklik": "her-dagitim",
-          "tetik": "actions",
-          "tetikAyrinti": "Design kopyası (ds-kaynak) ve kapı henüz yok; yeni iş akışı ya da ci içinde test olarak kurulacak (kuracak: ALTYAPI)",
-          "bagli": "hayir",
-          "baglayacak": "ALTYAPI",
-          "cikti": "Eksik ya da değeri farklı ad için Kanban kartı TASARIM'a; Design önerisi \"öneri\" diye kayda geçer",
-          "esik": "TASLAK: eksik ve farklı değerli ad 0; ALTYAPI ile teyit",
           "taslak": true
         },
         {
@@ -313,9 +268,8 @@
           "gorev": "Yapılan ekranı Design karesiyle yan yana ölç (kare kabul ölçüm satırı, skill venthub-tasarim-dili)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs kare kabul satırını istemiyor (henüz yok; kuracak: HARİTA); bir ekranı değiştiren her PR'da",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: başlıkta kare kabul ya da `olcum-kare-kabul` etiketi, `ÖLÇÜM: kare-kabul` satırı)",
+          "bagli": "evet",
           "cikti": "PR gövdesine kare numarası ve ölçüm satırı; fark Kanban kartı ÜRÜN'e (sayfa) ya da TASARIM'a (token, bileşen)",
           "esik": "TASLAK: geçti/kaldı ölçütü venthub-tasarim-dili skill'indeki ölçüm satırıdır; TASARIM teyit eder",
           "taslak": true
@@ -324,9 +278,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -359,9 +312,8 @@
           "gorev": "Veri çıkarım kapısı: Design'ın teslim ettiği CSV kaynağa karşı doğrulanır (venthub-pdf-ingestor veri_cikarim_kapisi.py --csv <yol>)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "Design teslimini işleyen kartta kapı satırı (henüz yok); o zamana dek OPS teslimi bildirince elle",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: Design teslimi başlıklı ya da `olcum-veri-cikarim` etiketli kartta `ÖLÇÜM: veri-cikarim` satırı)",
+          "bagli": "evet",
           "cikti": "OPS'a tek tablo; ihlaller Design'a",
           "esik": "Kapı çıkışı 0; tablo hücresi kaynakta birebir yoksa yazılmaz"
         },
@@ -369,9 +321,8 @@
           "gorev": "Baskı tazelik taraması: canlı değer ile üreticinin SON baskısı aile aile karşılaştırılır; önce ses, ağırlık, devir, sonra diğer alanlar (KTL-51)",
           "siklik": "aylik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"katalog baskı: N gün\" (30 gün eşik); satırı ARAÇ kuracak; üreticiden yeni baskı gelince de koşar",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"katalog baskı: N gün\" (30 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu); üreticiden yeni baskı gelince de koşar",
+          "bagli": "evet",
           "cikti": "Sapma tablosu (aile, alan, canlı değer, güncel baskı ve tarihi) ve her sapma için düzeltme betiği kartı",
           "esik": "TASLAK: sapma 0 ya da her sapma bir kartla; eşiği KATALOG belirler",
           "taslak": true
@@ -380,9 +331,8 @@
           "gorev": "Yazım sonrası canlı sayfa ölçümü: OPS canlı yazımı bitirince yazılan değerin sayfada göründüğünü ölç (sunucu HTML'in veri yükü ve tarayıcıda model seçimi)",
           "siklik": "olay",
           "tetik": "kart-kapisi",
-          "tetikAyrinti": "yazım kartında ölçüm notu satırı (henüz yok); OPS canlı yazımı sonrası",
-          "bagli": "hayir",
-          "baglayacak": "HARITA",
+          "tetikAyrinti": ".claude/hooks/kart-plan-baglantisi.cjs okuma (ARC-230, #2124): kart açılırken ve Review'a geçerken eksik ÖLÇÜM satırını uyarır, reddetmez; kural verisi (kart-sinif-olcum.json, HRT-78: `olcum-yazim-sonrasi` etiketli yazım kartında `ÖLÇÜM: yazim-sonrasi` satırı)",
+          "bagli": "evet",
           "cikti": "Karta ölçüm notu (neyi, nasıl ölçtüm, sonuç)",
           "esik": "Yazılan alanların tamamı sayfada beklenen değerde; sapma 0"
         },
@@ -390,9 +340,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -406,9 +355,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         },
@@ -416,21 +364,10 @@
           "gorev": "Haftalık filo raporu (tüzük Madde 7): departman karnesi (scripts/board/kanban-uyum.cjs) ve açık kalan işler tek tabloda Recep'e",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"filo raporu: N gün\" (7 gün eşik); satırı ARAÇ kuracak (OPS-169)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"filo raporu: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "Recep'e tek tablo (Cuma); karne eşiğini aşan departman satırı kırmızıdır",
           "esik": "Kanıtsız Done 0; kırmızı karne satırı aynı raporda sahibine kartla bağlanır"
-        },
-        {
-          "gorev": "Açılış raporu (tüzük Madde 7): Recep'in ilk mesajında kırmızılar, onay bekleyenler ve günün sırası",
-          "siklik": "olay",
-          "tetik": "istem-tazelik",
-          "tetikAyrinti": "Recep'in günün ilk mesajı; tetiği oturum açılış kancasına ARAÇ kuracak (OPS-169)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
-          "cikti": "Tek tablo: Onayında satırları en üstte; değişen yoksa tek cümle",
-          "esik": "İlk mesajdan sonraki ilk cevapta; gün içinde yinelenmez"
         }
       ]
     },
@@ -442,9 +379,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -458,9 +394,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -474,9 +409,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }
@@ -490,9 +424,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         },
@@ -500,9 +433,8 @@
           "gorev": "Haftalık skill kullanım ölçümü: atanmış ama kullanılmayan skill'i bul, kusurlu skill'i (bayat yol, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydet",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"skill ölçümü: N gün\" (7 gün eşik); ölçüm kaynağı ve satır ARAÇ'ta kurulacak",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"skill ölçümü: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "Atanmış ama kullanılmayan skill listesi; kusur kaydı kaynak dosya:satır ile",
           "esik": "Kullanılmayan atanmış skill 0 ya da her biri için yazılı gerekçe"
         }
@@ -516,9 +448,8 @@
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); satırı ARAÇ kuruyor (OPS-168 O6)",
-          "bagli": "hayir",
-          "baglayacak": "ARAC",
+          "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
+          "bagli": "evet",
           "cikti": "OPS'a tek mesaj (O1); onaylanan uygulanır ya da metni HARİTA'ya bırakılır",
           "esik": "En çok 3 öneri; aynı hata iki kez döndüyse hafta beklenmez, o gün yapılır"
         }

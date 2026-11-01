@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Sitedeki ürün sayıları (ses, ağırlık, devir, fiyat) üreticinin güncel kataloğuyla birebir tutsun; bozulursa müşteri yanlış fan seçer, iade ve güven kaybı olur; her değer kaynak sayfasına dayanır, canlı yazımı KATALOG hazırlar, Recep onayıyla OPS koşar.
 
 ## Düzenli görevler
-- 6 görev, tetiğe bağlı 2: `docs/roller/KATALOG-gorevler.md`.
+- 6 görev, tetiğe bağlı 6: `docs/roller/KATALOG-gorevler.md`.
 
 ## Dosyalar
 scripts/icerik-hatti/**, scripts/db/product-data/**, catalog-ingestion / csv-import-export / pricing / product-schema standartları; kardeş depo venthub-pdf-ingestor.

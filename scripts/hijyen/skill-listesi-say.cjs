@@ -90,7 +90,7 @@ function main() {
   let kendiUrettigi = null
   if (!dokum) {
     const sid = crypto.randomUUID()
-    const r = spawnSync('claude', ['-p', '--model', model, '--session-id', sid], {
+    const r = spawnSync('claude', ['-p', '--model', model, '--session-id', sid, '--max-turns', '1', '--max-budget-usd', '1.00'], {
       cwd: depo,
       input: 'tamam de',
       encoding: 'utf8',

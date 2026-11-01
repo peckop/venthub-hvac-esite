@@ -2,6 +2,16 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/HARITA.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Ortak satır 17 kartı birden büyütür; kart baytı ve açılış özeti önce ölçülür.** Kart bayt tavanı fiilî 6.255 B (testte iki eşik), açılış özeti 2.048 B; ölçüm `node scripts/belge/rol-karti-uret.cjs --harita-ozet | wc -c` ve en büyük kart. Olay: HRT-36'da iki ortak satır TASARIM kartını 6.324 B'a çıkardı, TAKIP satırı özeti 2.039 B'a getirdi.
+2. **Satır kısaltmadan önce o ifadeyi bağlayan test aranır.** `rol-kartlari.test.ts` içindeki tüm `toContain` dizgilerine karşı grep yapılır, yalnız `src/__tests__` genelinde değil. Olay: HRT-36'da "yolları 10-08'de kapandı" ifadesi kısaltmada silindi, karar 324 testi düştü.
+3. **Yeni cetvel başlığı Sahibi ve Son doğrulama taşır; README satırı, sahiplik kaydı ve araç envanteri satırı aynı PR'da gelir.** Yerelde `belge-tazelik`, `rol-kartlari` ve `arac-envanteri` testleri koşulur. Olay: #1991 (Son doğrulama eksik, CI kırmızı), HRT-59 (#2040, envanter satırı için INV-ARAC-1 uyarısı).
+4. **JSON ya da cetvel okuyan her test koşulur, yalnız yazdığın değil.** Bir veri dosyasını okuyan tüm testler (dış bağımlılık beyanı, sahiplik, görev verisi) PR'dan önce çalışır. Olay: #2018 (`diagram` skill'i dış bağımlılık tablosunda beyansızdı, `ajan-skill-cozulur` CI'da kırmızı).
+5. **Üretici `--yaz` CRLF checkout'ta fazladan dosya değiştirir; yalnız gerçek değişenler tutulur.** `git diff --ignore-space-at-eol --stat` ile ayır, kalanı `git checkout -- <dosya>` ile geri al; yeni üretici kolu eklenince bunu tekrar ölç. Olay: HRT-59 ve HRT-71'de 17 kurallar dosyası sahte değişti.
+6. **Ağır test dosyaları paralel değil tek tek koşulur.** Bellek darken beş dosya birlikte `sessionstart-pencere-adi`'ni 60 sn sınırında düşürür (tek başına 65/65). Olay: HRT-45 (25 Ekim).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K23 llms.txt (geçiş, katı): Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).
 
@@ -32,6 +42,10 @@
 
 ## Aynı ders ikinci kez (HRT-70)
 - Bir ders ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir: aynı ders sage'de ya da bir kartta yazılıydı ve aynı sebepten ikinci kez kırmızı CI, kısmi iş ya da geri alınan işlem çıktıysa, çiğneyen departman kontrol önerisini (kanca ya da araç içi kapı) OPS'a tek mesajla yazar: hangi ders, hangi iki vaka, önerilen kontrol. OPS ARAÇ'a kart verir; kapının tasarımı ARAÇ'ındır. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
+
+## Süren iş koruması (HRT-73)
+- Departmanın elinde süren iş varken gelen yeni emir o işi bölmez: emri kartına alırsın, sıraya koyarsın ve OPS'a "elimde X var, bitince başlarım" diye dönersin.
+- Süren iş ancak OPS açıkça "X'i bırak" derse bırakılır; OPS bırak derse sebebini yazar, sen de bıraktığın işin durumunu kartına işlersin. Kendi kendine iş değiştirmek bu kurala aykırıdır.
 
 ## Birleştirme ve ölçüm kaydı (HRT-60)
 - Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).

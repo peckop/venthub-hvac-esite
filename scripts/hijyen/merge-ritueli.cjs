@@ -383,7 +383,27 @@ function okumaSorusuGerekli(dosyalar) {
     OKUMA_SORUSU_YOLLARI.some((onek) => d.replace(/\\/g, '/').startsWith(onek)))
 }
 
+/**
+ * ÖZ-DOĞRULAMA (ARC-194 öneri 3b, Recep OPS-198): `--merge` YALNIZ master'daki betikle koşar. İzin kuralı ritüeli
+ * ADIYLA güveniyor; oturumda düzenlenmiş (kapıyı gevşetmiş) bir kopya aynı adla koşmasın. Saf: iki metin alır.
+ * CRLF/LF farkı sayılmaz (Windows checkout'u). master metni yoksa (çevrimdışı/okunamadı) fail-closed.
+ * @returns {{tamam:boolean, sebep:string}}
+ */
+function ozDogrulama(yerelMetin, masterMetin) {
+  if (typeof masterMetin !== 'string' || masterMetin.length === 0) {
+    return { tamam: false, sebep: 'origin/master\'daki betik okunamadi (cevrimdisi mi?) — fail-closed' }
+  }
+  const norm = (s) => String(s).replace(/\r\n/g, '\n').trimEnd() // git() cikisi kirpilmis gelir
+  if (norm(yerelMetin) === norm(masterMetin)) return { tamam: true, sebep: '' }
+  return {
+    tamam: false,
+    sebep: 'bu betik origin/master\'dakinden FARKLI (oturumda duzenlenmis ya da ritueli degistiren bir dalda). ' +
+      '--merge reddedildi; ritueli degistiren PR\'i OPS-192 yolundan (OPS tam fark UYGUN) gh pr merge ile birlestir',
+  }
+}
+
 module.exports = {
+  ozDogrulama,
   turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
@@ -443,6 +463,18 @@ if (require.main === module) {
   yaz('== MERGE RITUELI — PR #' + pr + ' / ' + dal + ' ==')
 
   try { git(['fetch', 'origin', 'master', '-q']) } catch { yaz('  ⚠fetch basarisiz — olcum BAYAT olabilir') }
+
+  // ÖZ-DOĞRULAMA (ARC-194 3b): --merge yalniz master'daki betikle. Okuma olcumunden ONCE, eylemden hep once.
+  if (MERGE) {
+    let masterMetin = null
+    try { masterMetin = git(['show', 'origin/master:scripts/hijyen/merge-ritueli.cjs']) } catch { /* fail-closed asagida */ }
+    const oz = ozDogrulama(fs.readFileSync(__filename, 'utf8'), masterMetin)
+    if (!oz.tamam) {
+      yaz('  KIRMIZI OZ-DOGRULAMA: ' + oz.sebep)
+      yaz('SONUC: KIRMIZI — --merge verildi ama MERGE YAPILMADI.')
+      process.exit(1)
+    }
+  }
 
   let pv = null
   let pvHata
@@ -549,6 +581,14 @@ if (require.main === module) {
           (mc && mc.oid ? mc.oid.slice(0, 9) : 'OKUNAMADI'))
       } catch (e) {
         yaz('MERGE COMMIT: OKUNAMADI — ' + String(e.message).split('\n')[0].slice(0, 120))
+      }
+      // ARC-235: PR birleşince kartı kapatmayı tetikleyen adım yoktu. Satır YALNIZ hatırlatır (otomatik Done yok);
+      // ayrı try: bu blok patlarsa "gh pr merge BASARISIZ" demesin, merge zaten yapıldı.
+      try {
+        const govde = JSON.parse(gh(['pr', 'view', pr, '--repo', depo, '--json', 'body'])).body
+        for (const s of require(path.join(__dirname, '..', 'board', 'kart-kapat.cjs')).kartKapatSatirlari(pr, govde, depo)) yaz(s)
+      } catch (e) {
+        yaz('KART KAPAT: OLCEMEDI — ' + String(e.message).split('\n')[0].slice(0, 120) + ' (PR govdesindeki Kanban: satirina elle bak)')
       }
     } catch (e) {
       process.stderr.write('merge-ritueli: kapi YESIL ama gh pr merge BASARISIZ: ' +

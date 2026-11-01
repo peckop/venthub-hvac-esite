@@ -32,7 +32,27 @@ function pencereAjani(deger) {
   return PENCERE_SONEKI.test(s) && s.length > '-pencere'.length ? s : ''
 }
 
-/** cwd'den yukarı (en çok 6 basamak) ilk settings.local.json'daki `agent`. Bulunamazsa ''. */
+const OPS_AJANI = 'ops-pencere'
+
+/**
+ * ⭐MİRAS OPS ANAHTARI (ARC-223, 27 Ekim): `start_session` Desktop'ta rastgele adlı bir worktree
+ * (`.claude/worktrees/clever-mayer-b2d2d2`) açar ve açan oturumun `settings.local.json`'ını OLDUĞU GİBİ kopyalar.
+ * OPS'tan açılan Yetenek penceresi bu yüzden `agent: ops-pencere` taşıdı → "OPS KİMLİĞİ: OPS adayı" ve
+ * "MODEL SAPMASI: ops-pencere tanımı" yanlış alarmı (Recep Yetenek panelinde gördü). Anahtar DOSYADA ama o pencerenin
+ * kimliği DEĞİL. Gerçek OPS'un worktree'si SABİTTİR (`.claude/worktrees/ops-pencere`) ya da ana depodur.
+ * Kural yalnız `ops-pencere` için: o anahtar, başka adlı bir `.claude/worktrees/<ad>` içinde bulunduysa MİRASTIR.
+ * Diğer rollerin anahtarlarına dokunulmaz (bir departman penceresi başka adlı worktree'de meşru olabilir).
+ * @param {string} settingsKoku `settings.local.json`'ın bulunduğu `.claude` dizininin ÜSTÜ (worktree/depo kökü)
+ * @param {string} agent dosyadaki ham `agent` değeri
+ */
+function opsMirasMi(settingsKoku, agent) {
+  if (pencereAjani(agent) !== OPS_AJANI) return false
+  const kok = path.resolve(String(settingsKoku || ''))
+  const worktreeMi = path.basename(path.dirname(kok)) === 'worktrees' && path.basename(path.dirname(path.dirname(kok))) === '.claude'
+  return worktreeMi && path.basename(kok) !== OPS_AJANI
+}
+
+/** cwd'den yukarı (en çok 6 basamak) ilk settings.local.json'daki `agent`. Bulunamazsa ''. Miras OPS anahtarı '' döner. */
 function agentAnahtari(cwd) {
   // cwd verilmediyse SÜREÇ dizinine DÜŞÜLMEZ: çalıştığı dizin pencereyi tanıtmaz (testler, elle koşan betikler); kanca
   // girdisi her zaman `cwd` taşır. Düşseydik, kapıyı gerçek bir worktree'de koşturan her test o pencerenin rolünü alırdı.
@@ -43,6 +63,7 @@ function agentAnahtari(cwd) {
       const f = path.join(d, '.claude', 'settings.local.json')
       if (fs.existsSync(f)) {
         const j = JSON.parse(fs.readFileSync(f, 'utf8'))
+        if (j && typeof j.agent === 'string' && opsMirasMi(d, j.agent)) return ''
         return j && typeof j.agent === 'string' ? pencereAjani(j.agent) : ''
       }
       const ust = path.dirname(d)
@@ -203,6 +224,7 @@ if (require.main === module) {
 
 module.exports = {
   pencereAjani,
+  opsMirasMi,
   agentAnahtari,
   agentAdi,
   rolAdi,

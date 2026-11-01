@@ -8,7 +8,8 @@ metadata:
 ---
 
 > **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/web-performance/SKILL.md`, MIT lisansı. Aşağıdaki
-> "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
+> "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde WrongStack metnidir. addyosmani kaynaklı bölümlerin altında kendi
+> kaynak satırı var. VentHub'a uyarlandı, 26 Ekim 2026, YTN-21.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
 
@@ -25,6 +26,9 @@ metadata:
 2. Sunucu gövdesi ile istemci performansı ayrı ölçülür: `useSearchParams` sınırı sayfa köküne konursa sunucu gövdeyi 0 kelime verir (CLAUDE.md kural 5, REC-150 ölçümü); performans düzeltmesi bu sınırı bozmaz.
 3. Çekirdek Web Vitals eşikleri (2,5 s / 200 ms / 0,1) kaynağın web.dev referansıdır; Recep'e kendi ölçümünü ve koşulunu yaz, eşik tablosunu bizim sonucumuz diye sunma.
 4. Düzeltme kural 8 (design token) ve kural 10 (`.content-auto`, `<Image/>` width/height) ile çelişmez; çelişirse önce kural.
+5. Önbellek anahtarı (`unstable_cache`, `revalidateTag`, CDN) `lang` **ve** `tenantId` içerir (kural 12); görüntüleyene bağlı veri anahtarda eksikse bir kullanıcının verisi ötekine gider. Veri değişince hangi yüzeyin tazelendiği `rendering-cache-standard.md` ile okunur.
+6. Dev sunucusu ölçümü kanıt değildir: önce/sonra aynı üretim derlemesinde ve aynı koşulda alınır. Yerelde tam test/build koşmaz; `pnpm test:ilgili` ya da `pnpm exec vitest run <yol>`, tam paket CI'da. Veri çekme RSC'de kalır (kural 4); "performans için" istemciye taşıma yapılmaz.
+7. Bütçe evrensel sayıyla değil, ürün ve cihaz ihtiyacından ve ölçülmüş tabandan konur (aşağıdaki kural 6); hazır bundle/Lighthouse puanı hedefi kopyalanmaz.
 
 ---
 
@@ -66,6 +70,52 @@ at the 75th percentile. Field evidence and local lab runs answer different quest
 5. Repeat the same measurement and report sample count, conditions, results
    and tradeoffs. Run affected build/tests.
 
+## Where to start measuring
+
+Pick the first measurement from the symptom:
+
+- **First load slow:** bundle size and code splitting; TTFB in the network waterfall (DNS long: preconnect; TCP/TLS long: HTTP/2, edge; server wait long: profile backend, queries, caching); render-blocking CSS/JS.
+- **Interaction sluggish:** UI freezes on click: main-thread long tasks (over 50 ms); input lag: re-renders and controlled-input cost; animation jank: layout thrashing, forced reflow.
+- **After navigation:** data loading: API times and request waterfalls; client rendering: component render time, N+1 fetches.
+- **Backend/API:** one endpoint slow: queries and indexes; all endpoints slow: connection pool, memory, CPU; intermittent: lock contention, GC pauses, external dependencies.
+
+| Symptom | Likely cause | Check |
+|---|---|---|
+| Slow LCP | large images, render-blocking resources, slow server | waterfall, image sizes |
+| High CLS | images without dimensions, late content, font shifts | layout-shift attribution |
+| Poor INP | heavy main-thread JS, large DOM updates | long tasks in the trace |
+
+Saha ölçümünde (RUM) `web-vitals` kütüphanesinin ayrıntılı derlemesi `web-vitals/attribution` yolundan gelir. Aynı dosyada hem ana paketten hem bu yoldan `onINP` alınırsa ad çakışır; ayrıntılı olanı takma adla al (`import { onINP as onINPAttribution } from 'web-vitals/attribution'`). İki ölçüm yolu aynı etkileşimi iki kez raporlamasın diye tek yol seçilir.
+
+Kaynak: addyosmani/agent-skills performance-optimization @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+Kaynak: addyosmani/agent-skills references/performance-checklist.md @8bfcc1f9916f2eea55494d8c1fa7f4bde867dd9e (MIT)
+
+## Backend (Supabase / PostgreSQL)
+
+- **N+1:** one query per row is the commonest backend bottleneck; fetch the relation in the same query (join/embedded select), not in a loop. Lists paginate with a limit and a stable order.
+- **Index claims need a plan.** `EXPLAIN ANALYZE` measures, "add an index" guesses. `Seq Scan` where an index was expected, a `rows=` estimate off by an order of magnitude (stale statistics: run `ANALYZE`, do not add an index), or a `Sort` above the scan each call for a different fix. Index for the query shape (equality columns first, then range/sort); a plain index does not help a low-selectivity value, a leading wildcard, or a function on the column (index the expression). Every index taxes writes. Re-run the plan afterwards; an index that did not change it is a revert. Migration is prod (kural 13): index migrations follow `create-migration`.
+- **Pool exhaustion:** every endpoint slows at once and sessions sit idle; raising the pool only moves the queue. Serverless: multiplex through the pooler instead of raising `max`.
+- **Caching:** cache only what is expensive and read far more than written; state the staleness window and one invalidation strategy; never cache what must be fresh (stock and price at checkout, permissions). Key contents: see ek kural 5.
+
+Kaynak: addyosmani/agent-skills performance-optimization @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
+## Keep or revert
+
+A fix is a hypothesis until re-measured with the same command, conditions and sample budget as the baseline (cold versus warm cache measures the cache, not the change). Change one thing at a time. Compare the delta against run-to-run variance: a 3% gain inside ±5% noise is not a gain.
+
+| Result vs. baseline | Action |
+|---|---|
+| Past the threshold, tests green | Keep; put before/after numbers in the PR |
+| Within noise | Revert |
+| Worse | Revert |
+| Improved but a test went red | Revert |
+
+Neutral is a revert: code you keep, you maintain. Correctness gates the metric; a win that drops needed work (skipped validation, caching fresh-only data, removing a load-bearing `await`) is a regression.
+
+**Attempt ledger.** Reverted work leaves no trace in git, so log every attempt in the Kanban card (or PR description): idea, baseline → result, verdict (kept/reverted), why. Read it before proposing an experiment so a dead idea stays dead.
+
+Kaynak: addyosmani/agent-skills performance-optimization @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
 ## Sources
 
 [Web Vitals](https://web.dev/articles/vitals), reviewed 2026-10-09.
@@ -74,6 +124,17 @@ Refresh thresholds and measurement tooling before consequential claims.
 ## Acceptance checks
 
 - Compare the same route and conditions before/after; verify observed user-visible improvement.
+- [ ] Before and after numbers exist, measured the same way (same command, conditions, production build)
+- [ ] The improvement exceeds run-to-run variance, not just the mean
+- [ ] Changes that did not beat the baseline were reverted; every attempt is in the ledger
+- [ ] The specific bottleneck is identified and addressed; one change measured at a time
+- [ ] Core Web Vitals reported with own measurement and condition (ek kural 3)
+- [ ] Bundle size has not grown unreviewed; no N+1 in new data fetching
+- [ ] Any new index has a before/after plan and a stated write cost; any new cache states its key (`lang`, `tenantId`) and staleness
+- [ ] The measured user-facing metric has a budget or field monitor that can detect regression
+- [ ] Existing tests still pass; no test was changed, skipped or deleted to get the win
+
+Kaynak: addyosmani/agent-skills performance-optimization @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
 ## Skills in scope
 

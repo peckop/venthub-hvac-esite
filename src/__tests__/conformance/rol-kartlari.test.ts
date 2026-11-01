@@ -21,6 +21,9 @@ import { describe, expect, it } from 'vitest'
 type Uretici = {
   GOREV_DEGIL_BASLIK: string
   DERS_TEKRAR_KURALI: string
+  SUREN_IS_KORUMA_KURALI: string
+  SEO_EK_KURALI: string
+  SEO_EK_KURALI_ROLLERI: string[]
   uret: () => Record<string, string>
   uretKurallar: () => Record<string, string>
   kuralDosyaAdi: (ad: string) => string
@@ -54,8 +57,14 @@ type Uretici = {
     isAkislari?: string[],
     kardesOku?: (d: string) => string | null,
   ) => string[]
-  isKurallariOku: (kok?: string) => Record<string, { kurallar: string[] }>
+  isKurallariOku: (kok?: string) => Record<string, { kurallar: string[]; yollar?: string[] }>
   isKurallariSorunlari: (veri: Record<string, { kurallar: string[] }>, roller: string[]) => string[]
+  YOL_KURALI_BAYT_SINIRI: number
+  YOL_KURALI_ELLE: string[]
+  yolKurali: (ad: string, veri?: Record<string, { kurallar: string[]; yollar?: string[] }>) => string | null
+  yolKuraliAdi: (ad: string) => string
+  uretYolKurallari: (veri?: Record<string, { kurallar: string[]; yollar?: string[] }>) => Record<string, string>
+  yolKuraliSorunlari: (uretilen: Record<string, string>, diskDosyalari: string[]) => string[]
   gorevEksikRoller: () => string[]
   altiAlanSorunlari: (
     kartlar: Record<string, string>,
@@ -742,7 +751,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     const diskMetni = (ad: string): string =>
       fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
     const veri = uretici.isKurallariOku(KOK)
-    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'KATALOG', 'URUN'])
+    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'HARITA', 'KATALOG', 'URUN'])
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       for (const [m, etiket] of [[metin, `${ad} (üretilen)`], [diskMetni(ad), `${ad} (disk)`]] as Array<[string, string]>) {
         if (veri[ad]) {
@@ -769,6 +778,48 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(uretici.isKurallariSorunlari({ YOKROL: { kurallar: [uzun] } }, roller).join()).toContain('bilinmeyen rol')
     expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: ['kısa'] } }, roller).join()).toContain('çok kısa')
     expect(uretici.isKurallariSorunlari({ BLOG: { kurallar: [] } }, roller).join()).toContain('iş kuralı yok')
+  })
+
+  it('HRT-71: yol kapsamlı işaretçi kural dosyaları üreticiyle diskte bire bir, paths taşır, 2 KB altında, sahipsiz dosya yok', () => {
+    const uretilen = uretici.uretYolKurallari()
+    expect(Object.keys(uretilen).sort(), 'yollar alanı olan altı rol').toEqual(['altyapi.md', 'arac.md', 'geo-seo.md', 'harita.md', 'katalog.md', 'urun.md'])
+    const dizin = path.join(KOK, '.claude', 'rules')
+    for (const [dosya, metin] of Object.entries(uretilen)) {
+      const disk = fs.readFileSync(path.join(dizin, dosya), 'utf8').replace(/\r\n/g, '\n')
+      expect(disk, `${dosya}: disk ile üretici bire bir (elle düzenleme yok)`).toBe(metin)
+      expect(Buffer.byteLength(metin, 'utf8'), `${dosya}: bayt sınırı`).toBeLessThanOrEqual(uretici.YOL_KURALI_BAYT_SINIRI)
+      expect(metin, dosya).toMatch(/^---\npaths:\n(  - ".+"\n)+---\n/)
+    }
+    const diskDosyalari = fs.readdirSync(dizin).filter((d) => d.endsWith('.md'))
+    expect(uretici.yolKuraliSorunlari(uretilen, diskDosyalari)).toEqual([])
+    // BLOG elle yazılır ama paths taşır (R10.5/R10.6 işaretçisi).
+    expect(uretici.YOL_KURALI_ELLE).toEqual(['filo-ortak.md', 'blog.md'])
+    const blog = fs.readFileSync(path.join(dizin, 'blog.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(blog).toMatch(/^---\npaths:\n/)
+    expect(blog).toContain('R10.5')
+    expect(blog).toContain('R10.6')
+    // Her yol kuralı maddesi kurallar dosyasındaki bir iş kuralından gelir (başlık kurallar dosyasında geçer).
+    const veri = uretici.isKurallariOku()
+    for (const ad of Object.keys(veri)) {
+      if (!veri[ad].yollar) continue
+      const kurallar = fs.readFileSync(path.join(KOK, 'docs', 'roller', `${ad}-kurallar.md`), 'utf8').replace(/\r\n/g, '\n')
+      for (const k of veri[ad].kurallar) {
+        const baslik = /^\*\*(.+?)\*\*/.exec(k)?.[1] ?? ''
+        expect(baslik.length, `${ad}: başlık okunur`).toBeGreaterThan(5)
+        expect(kurallar, `${ad}: başlık kurallar dosyasında`).toContain(baslik)
+      }
+    }
+  })
+
+  it('HRT-71 sabotaj: yol kuralı denetimi ayırt edicidir (elle düzenlenen, sahipsiz, paths\'siz, 2 KB üstü dosya sorun verir)', () => {
+    const iyi = '---\npaths:\n  - "a/**"\n---\n\nx\n'
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': iyi }, ['altyapi.md', 'blog.md', 'filo-ortak.md'])).toEqual([])
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': iyi }, ['altyapi.md', 'sahipsiz.md']).join()).toContain('sahipsiz kural dosyası')
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': 'paths yok\n' }, ['altyapi.md']).join()).toContain('ön bölümde paths yok')
+    expect(uretici.yolKuraliSorunlari({ 'altyapi.md': iyi + 'y'.repeat(2100) }, ['altyapi.md']).join()).toContain('> 2048')
+    expect(uretici.yolKuraliSorunlari({ 'blog.md': iyi }, ['blog.md']).join()).toContain('elle yazılan dosya')
+    // yollar alanı olmayan rol dosya üretmez (BLOG, GEO-SEO): sessizce dosya doğmaz.
+    expect(uretici.yolKurali('BLOG')).toBeNull()
   })
 
   it('HRT-65 O9: haftalık öz-değerlendirme görevi verisi olan her rolde var; filo-ortak iyileştirme hakkı ve OPS onay makamını taşır', () => {
@@ -856,15 +907,17 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
   })
 
   // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin
-  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı', () => {
+  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı Actions, haftalık ve aylık belge istem satırı (HRT-80 ve HRT-81)', () => {
     const g = gercek['GEO-SEO'].gorevler
     const ara = (s: string) => g.find((x) => x.siklik === s)
-    expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'hayir' })
+    expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'evet' })
     expect(ara('her-dagitim-gunluk')?.tetikAyrinti).toMatch(/günlük schedule/)
-    expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', baglayacak: 'ARAC' })
-    expect(ara('haftalik')?.tetikAyrinti).toMatch(/ARC-28/)
-    expect(ara('aylik')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC' })
-    expect(ara('aylik')?.tetikAyrinti).toMatch(/ARC-27/)
+    expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', bagli: 'evet' })
+    expect(ara('haftalik')?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
+    expect(ara('haftalik')?.tetikAyrinti).toMatch(/SEO haftalık: N gün/)
+    expect(ara('aylik')).toMatchObject({ tetik: 'istem-tazelik', bagli: 'evet' })
+    expect(ara('aylik')?.tetikAyrinti).toMatch(/SEO aylık belge: N gün"\s*\(30 gün eşik\)/)
+    expect(ara('aylik')?.tetikAyrinti).toMatch(/cron yok/)
     expect(JSON.stringify(g)).not.toMatch(/REC-502/)
   })
 
@@ -917,7 +970,9 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
 
   it('AYIRT EDİCİLİK: iş akışı komutu çağırmaya başlayınca "bağlı: hayır" kaydı bayat sayılır', () => {
     const sahte = [`jobs:\n  canli:\n    steps:\n      - run: node scripts/seo/canli-kapi.mjs --taban https://venthub.com.tr`]
-    expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, sahte).join('\n')).toMatch(/bağlı: evet yazılmalı \(kayıt bayat\)/)
+    const v = kopya()
+    Object.assign(v['GEO-SEO'].gorevler[0], { bagli: 'hayir', tetikAyrinti: '.github/workflows/canli-kapi.yml' })
+    expect(uretici.gorevSorunlari(v, roller, varMi, oku, sahte).join('\n')).toMatch(/bağlı: evet yazılmalı \(kayıt bayat\)/)
   })
 
   it('AYIRT EDİCİLİK: geçersiz alan, bilinmeyen rol, eksik kuracak rol, uzun amaç, taslak eşik, yok komut ve çift görev yakalanır', () => {
@@ -930,7 +985,12 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(s((v) => (v['GEO-SEO'].gorevler[0].tetik = 'elle'))).toMatch(/tetik geçersiz/)
     expect(s((v) => (v['GEO-SEO'].gorevler[0].bagli = 'belki'))).toMatch(/bağlı alanı geçersiz/)
     expect(s((v) => (v.OLMAYANROL = v['GEO-SEO']))).toMatch(/OLMAYANROL: bilinmeyen rol/)
-    expect(s((v) => delete v['GEO-SEO'].gorevler[0].baglayacak)).toMatch(/kuracak rol/)
+    expect(
+      s((v) => {
+        v['GEO-SEO'].gorevler[1].bagli = 'hayir'
+        delete v['GEO-SEO'].gorevler[1].baglayacak
+      }),
+    ).toMatch(/kuracak rol/)
     expect(s((v) => (v['GEO-SEO'].amac = 'a'.repeat(uretici.AMAC_SINIRI + 1)))).toMatch(/amaç .* aşıyor/)
     expect(s((v) => (v['GEO-SEO'].gorevler[1].esik = 'Eşik belli'))).toMatch(/TASLAK ile başlamalı/)
     expect(s((v) => (v['GEO-SEO'].gorevler[0].komut = 'scripts/seo/yok.mjs'))).toMatch(/komut dosyası yok/)
@@ -1280,14 +1340,12 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     expect(sahiplik.cetveller['docs/standards/filo-tuzugu.md']?.sahip).toBe('OPS')
   })
 
-  it('OPS iki yeni görevi (Cuma filo raporu, açılış raporu) "bağlı: hayır (kuracak: ARAC)" olarak yazar; kurulmamış tetik "evet" diye geçemez', () => {
+  it('OPS Cuma filo raporu görev tazelik kancasına bağlıdır (HRT-80); açılış raporu görevi silindi (HRT-81); kurulmamış tetik "evet" diye geçemez', () => {
     const ops = uretici.GOREVLER.OPS.gorevler
-    for (const parca of ['Haftalık filo raporu', 'Açılış raporu']) {
-      const x = ops.find((g) => g.gorev.startsWith(parca))
-      expect(x, parca).toBeTruthy()
-      expect(x?.bagli).toBe('hayir')
-      expect(x?.baglayacak).toBe('ARAC')
-    }
+    const filo = ops.find((g) => g.gorev.startsWith('Haftalık filo raporu'))
+    expect(filo?.bagli).toBe('evet')
+    expect(filo?.tetikAyrinti).toMatch(/^\.claude\/hooks\/gorev-tazelik-satiri\.cjs /)
+    expect(ops.find((g) => g.gorev.startsWith('Açılış raporu')), 'Açılış raporu görevi silindi (HRT-81, OPS hükmü)').toBeUndefined()
     const v = kopya()
     v.OPS.gorevler[1].bagli = 'evet'
     v.OPS.gorevler[1].tetikAyrinti = '.github/workflows/olmayan-dosya.yml'
@@ -1312,6 +1370,48 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
       expect(kurallar[ad], ad).toContain('filo-tuzugu.md` Madde 2.1')
       expect(kurallar[ad], ad).toContain('ek kalemler: edge fonksiyonlu PR')
     }
+  })
+
+  it('HRT-75 (karar 417): "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasında; OPS düzeltmeleri metinde; düşerse ya da sızarsa kuralDosyaSorunlari yakalar', () => {
+    const kurallar = uretici.uretKurallar()
+    expect(uretici.SEO_EK_KURALI_ROLLERI).toEqual(['GEO-SEO', 'BLOG'])
+    for (const ad of roller) {
+      if (uretici.SEO_EK_KURALI_ROLLERI.includes(ad)) expect(kurallar[ad], ad).toContain(uretici.SEO_EK_KURALI)
+      else expect(kurallar[ad], ad).not.toContain('## VentHub SEO ek kuralları')
+    }
+    // OPS düzeltmeleri: dizin isteği GEO-SEO görevidir, Recep'e sorulmaz; GSC pencere iddiası ölçümle teyit; teklif modunda Offer/price yok.
+    expect(uretici.SEO_EK_KURALI).toContain("IndexNow ve Search Console dizin isteği GEO-SEO'nun kendi görevidir")
+    expect(uretici.SEO_EK_KURALI).toContain("Recep'e sorulmaz")
+    expect(uretici.SEO_EK_KURALI).not.toContain('canlı yazım onayı')
+    expect(uretici.SEO_EK_KURALI).toContain('GEO-SEO ölçümle teyit eder')
+    expect(uretici.SEO_EK_KURALI).toContain('fiyatı olmayan ürüne `Offer` ve `price` yazılmaz')
+    expect(uretici.SEO_EK_KURALI).toContain('FAQPage işaretlemesi konmaz')
+    const geo = 'GEO-SEO'
+    const bozuk = { ...kurallar, [geo]: kurallar[geo].replace(uretici.SEO_EK_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/VentHub SEO ek kuralları/)
+    const sizinti = { ...kurallar, URUN: `${kurallar.URUN}\n${uretici.SEO_EK_KURALI}` }
+    expect(uretici.kuralDosyaSorunlari(sizinti).join('\n')).toMatch(/yalnız GEO-SEO ve BLOG/)
+  })
+
+  it('HRT-73 (OPS-181): Süren iş koruması her rolün kurallar dosyasında, kısa hâli filo-ortakta; düşerse kuralDosyaSorunlari yakalar; Done kanıtı vitest yolunu söyler', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain(uretici.SUREN_IS_KORUMA_KURALI)
+    }
+    expect(uretici.SUREN_IS_KORUMA_KURALI).toContain('elimde X var, bitince başlarım')
+    expect(uretici.SUREN_IS_KORUMA_KURALI).toContain('OPS bırak derse sebebini yazar')
+    const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(ortak).toContain('elimde X var, bitince başlarım')
+    // OPS emir yazmadan önce alıcının rol kartına bakar: kural filo-ortaktan OPS'a özel bloğa taşındı, düşmemeli.
+    expect(kurallar.OPS).toContain('Emir yazmadan önce alıcının rol kartına bakılır')
+    expect(ortak).toContain('pnpm exec vitest run <göreli test yolu>')
+    expect(ortak).toContain('depo dışı iş için elle kontrol + kanıt notudur')
+    expect(ortak).not.toContain('kod için `pnpm test:ilgili` çıktısıdır')
+    const ad = roller[0]
+    const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.SUREN_IS_KORUMA_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Süren iş koruması/)
   })
 
   it('HRT-70: "Aynı ders ikinci kez" bloğu her rolün kurallar dosyasında, düşerse sorunlar() yakalar ve vaka belgesi diskte', () => {

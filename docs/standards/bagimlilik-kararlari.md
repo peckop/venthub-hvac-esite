@@ -136,7 +136,7 @@ kuralı: `0.x` ana sürüm garantisi vermez). `three` 0.183.2 → 0.186.0 bu yü
 
 | paket | kurulu | son | not |
 |---|---|---|---|
-| `@sentry/nextjs` | 8.55.2 | 10.75.0 | 11 yüksek güvenlik kaydının tamamı bunun altından geliyor (`bagimlilik-2026-09-19.md`); karar 17'ye bağlı, Recep sıralamada sona bıraktı |
+| `@sentry/nextjs` | 11.9.0 | 11.9.0 | ALT-46 (27 Ekim 2026): 8.55.2 → 11.9.0 geçildi, karar 17 ertelemesi kalktı; Sentry zincirindeki yedi güvenlik kaydı (iki OpenTelemetry kaydı dahil) kapandı, `pnpm audit --prod` 13 → 6 |
 | `next` | 15.5.28 | 16.3.5 | tek başına bir iş; App Router davranışı değişir |
 | `tailwindcss` | 3.4.19 | 4.3.3 | v4 yapılandırma biçimini tamamen değiştirdi (tasarım token'ları etkilenir) |
 | `zod` | 3.25.76 | 4.6.5 | doğrulama şemaları uçtan uca yeniden sınanmalı |
@@ -255,7 +255,6 @@ braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk 
 
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
-| `GHSA-mrhx-c7xc-m3w5` | zod 3.25.76 | high | 2026-10-25 | zod <4.6.6 sınırlı koleksiyon doğrulamasında bellek tüketimi (DoS); düzeltme yalnız 4.6.6+ (ana sürüm, bizde `^3.24.1`, 3.x'te yama yok). Kullanım yalnız 8 dosya: admin form pencereleri ve admin görünümleri (istemci tarafı alan doğrulama); depoda `z.array(` kullanımı YOK, sunucu yanıt yolunda ve herkese açık girdide yok | zod 4 göçü (kendi işi: şema sözdizimi ve `zodResolver` uyumu ölçülür) VE `pnpm audit --prod` bu kaydı artık vermiyor |
 
 ## 7a · KABUL EDİLMİŞ ORTA ÖNEMLİ KAYITLAR — ALT-95 (OPS hükmü, 2026-10-16)
 
@@ -269,8 +268,6 @@ braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk 
 
 | kimlik | paket (kilitli) | kabul | gerekçe | kaldırma şartı | son tarih |
 |---|---|---|---|---|---|
-| GHSA-8988-4f7v-96qf | @opentelemetry/core 1.30.1 | 2026-10-16 (10-05'ten beri bilinen) | düzeltme ≥2.8.0 (ana sürüm); `@sentry/node` ve `@sentry/opentelemetry` 8.55.2 `^1.30.1` ister; override ana sürüm atlatır (cetvel §4 yasak) | `@sentry/nextjs` 10.x (karar 17) ya da `pnpm audit --prod` bu kaydı artık vermiyor | 2026-11-16 |
-| GHSA-qqmp-wf37-98f9 | @opentelemetry/instrumentation-pg 0.50.0, -mysql2 0.45.0, -mysql 0.45.0, -mongoose 0.46.0, -knex 0.44.0, -tedious 0.18.0 | 2026-10-16 | düzeltme ≥0.65–0.73; `@sentry/node` 8.55.2 altısını TAM SÜRÜM sabitler, düzeltilmiş hat `@opentelemetry/core ^2.9.0` ister (Sentry 8'in 1.x sözleşmesiyle çakışır) | `@sentry/nextjs` 10.x ya da `pnpm audit --prod` bu kaydı artık vermiyor | 2026-11-16 |
 | GHSA-rj75-hqrm-r3gf | postcss-selector-parser 6.1.4 | 2026-10-16 | düzeltme ≥7.1.6 (ana sürüm); tüketici `postcss-nested` (tailwindcss 3.4); yalnız derleme zamanı CSS derleyicisi, kullanıcı girdisi ulaşmaz | Tailwind 4 göçü ya da `pnpm why postcss-selector-parser` çıktısında 6.x tüketicisi kalmadı | 2026-11-16 |
 
 ## 8 · OVERRIDE KALDIRMA ŞARTI — karar 52

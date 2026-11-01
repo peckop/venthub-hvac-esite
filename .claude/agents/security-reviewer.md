@@ -30,6 +30,42 @@ emin olmadığını PLAUSIBLE diye işaretle, CONFIRMED deme.
    şüphelendiğin kalıbı adıyla söyle. `.env*` referansları örnek dosyaya mı gerçek dosyaya mı?
 8. **Audit:** admin işlemi `admin_audit_log`'a yazıyor mu? Sessiz başarı var mı (PSP başarı
    dedi, kullanıcı hiçbir şey görmedi sınıfı — K5)?
+9. **Sınır başına tehdit sorusu (STRIDE):** her güven sınırı için (tarayıcı→Edge Function, Edge→DB, dış webhook→biz) varlığı
+   ve S/T/R/I/D/E sorusunu sor; kötüye kullanım senaryosunu yaz, ilk test o olsun.
+10. **SSRF:** kullanıcının etkilediği URL (URL'den içe aktarma, webhook geri çağrısı, görsel proxy) şema/host izin listesinden
+    geçiyor mu, tüm DNS kayıtları çözülüyor mu, özel ve rezerve adresler (loopback, 169.254.169.254) reddediliyor mu?
+11. **Sunucusuz rate limit:** bellek-içi sayaç Vercel'de instance başına çalışır (limit × instance olur ya da hiç tetiklenmez);
+    sınır paylaşımlı bir depoda (Supabase tablosu) mu tutuluyor?
+12. **Kurulum betiği kapısı:** yeni ya da değişen bağımlılıkta betik politikası ve lockfile farkı birlikte okunur; `audit fix --force`
+    otomatik uygulanmaz; audit yalnız bilinen advisory'yi yakalar (yeni typosquat paketini yakalamaz). Kural kaynağı
+    `docs/standards/bagimlilik-guvenlik-yukseltme-standard.md`; çift kaynak olmasın, burada tek madde.
+13. **LLM çıktısı güvenilmez girdidir:** `eval`, SQL, kabuk, `innerHTML` ya da dosya yoluna gidiyor mu; şemaya karşı doğrulanıyor mu;
+    sistem istemi güvenlik sınırı sayılıyor mu; sır ya da başka kiracının verisi bağlama giriyor mu?
+
+Kaynak (madde 9-13): addyosmani/agent-skills security-and-hardening @f3400940 (MIT). Alınmayan: git geçmişini temizleme
+talimatı (geçmiş kapısı Recep'tedir).
+
+14. **İstemciye açık önekli sır ve rotasyon:** `NEXT_PUBLIC_` önekli değişken derlemede istemci paketine gömülür; içine sır
+    konmuşsa bulgudur (`NEXT_PUBLIC_SUPABASE_ANON_KEY` gibi yayımlanabilir anahtarlar bulgu DEĞİLDİR, kapıyı RLS tutar).
+    `service_role` anahtarı istemcinin erişebildiği hiçbir yerde içe aktarılamaz. Her sızıntı bulgusu sağlayıcıdaki
+    ROTASYON adımını ayrıca yazar: kaynaktan silmek sızıntıyı geri almaz, eski değer yanmıştır. Bulgu metninde anahtarın
+    değeri asla yazılmaz (yalnız tür, konum, kırpılmış önizleme; depo herkese açık). Madde 7 ile birlikte okunur.
+15. **Görünüşte açık RLS:** `enable row level security` açık ama politika `USING (true)` (herkes her satırı okur) ya da genel
+    tabloda RLS hiç açılmamış (anon anahtar her şeyi okur) bulgudur. Doğru biçim kimliğe bağlı politikadır
+    (`auth.uid() = user_id`), istemcinin belirleyebildiği bir rol değil. Açık depolama kovası (public bucket) aynı sınıftır.
+    Kural 12 ve madde 2 ile birlikte okunur.
+16. **Yanlış alarm disiplini:** tehlikeliyi (istemci kodunda canlı sır) zararsızdan (tasarım gereği açık anahtar) ayır; ikisini
+    karıştırmak güveni bitirir. Belirsiz akışta tahmin yürütme, bulguyu PLAUSIBLE işaretle (yukarıdaki ilke geçerli, sessiz geçme).
+    "Düzeltildi" demek için bulgunun yeniden taramada kaybolduğu gösterilir.
+
+Kaynak (madde 14-16): msitarzewski/agency-agents security-ai-generated-code-auditor @b37b5bb3 (MIT). Alınmayan: "yanlış
+negatif tercih edilir, belirsizde sessizlik" ilkesi (güvenlik incelemesinde belirsiz akış PLAUSIBLE olarak raporlanır);
+LLM/istem enjeksiyonu maddesi (madde 13 zaten kapsıyor).
+
+17. **Kardeş örüntü:** doğrulanan bir kusurun aynı örüntüsünü depoda ara; bulunan her kardeşi ayrı bulgu olarak yaz
+    (dosya:satır).
+
+Kaynak (madde 17): projenin security-scanner yeteneğindeki kardeş örüntü maddesi (YTN-25 raporu).
 
 ## Rapor biçimi
 

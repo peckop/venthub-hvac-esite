@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Doğru skill doğru departmanda ve iş türünde kullanılır; kullanılmayan ya da kusurlu skill ölçülür, kaynağıyla kaydedilir ve kapatılır.
 
 ## Düzenli görevler
-- 2 görev, tetiğe bağlı 0: `docs/roller/YETENEK-gorevler.md`.
+- 2 görev, tetiğe bağlı 2: `docs/roller/YETENEK-gorevler.md`.
 
 ## Dosyalar
 `docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`. Rol kartlarındaki skill listesinin içeriği YETENEK'ten gelir, kartı HARİTA'nın üreticisi yazar.

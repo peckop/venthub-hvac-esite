@@ -6,7 +6,11 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-KANCA-DEFTER-1 · defter tazelik satırının KARARI ölçülür (REC-342).
+ * KARAR 419 (2026-10-26, ARC-216 eki): NotebookLM defterleri emekli → DEFTER satırı ve onu besleyen
+ * Stop kancası (defter-bayatlik-olcumu) kaldırıldı. Aşağıdaki tarihçe o satırın NİÇİN VAR OLDUĞUNU anlatır;
+ * INV-KANCA-DEFTER-1 bölümü artık "geri gelmez" kolunu ölçer, DEFTER-2 (olc çıkış 3) silindi. DEFTER-3 ve -4 sürer.
+ *
+ * INV-KANCA-DEFTER-1 (eski) · defter tazelik satırının KARARI ölçülür (REC-342).
  *
  * ── ÖLÇÜLMÜŞ KUSUR VE KAYDIN YANLIŞ VARSAYIMI ──
  *
@@ -38,7 +42,6 @@ import { describe, expect, it } from 'vitest'
  */
 
 const SATIR_KANCA = path.resolve(__dirname, '../../../.claude/hooks/defter-tazelik-satiri.cjs')
-const OLCUM_KANCA = path.resolve(__dirname, '../../../.claude/hooks/defter-bayatlik-olcumu.cjs')
 
 /** Bütçe: kaydın koyduğu tavan. Ölçülen node açılışı ~187 ms, kancanın kendi işi ~80-110 ms. */
 const BUTCE_MS = 900
@@ -109,83 +112,34 @@ function kos(kanca: string, depo: string, pano: string, ek: Record<string, strin
 
 const TAZE_ONBELLEK = { ts: new Date().toISOString(), degisen: 0, toplam: 22, hata: null }
 
-describe('INV-KANCA-DEFTER-1 · defter tazelik satiri', () => {
-  it('⭐ASIL İDDİA — defter BAYATSA satır ⚠ ile başlar ve GÜN SAYISINI yazar', () => {
-    const depo = depoKur(7, new Date().toISOString().slice(0, 10))
-    const pano = panoKur(TAZE_ONBELLEK)
-    const r = kos(SATIR_KANCA, depo, pano)
+describe('INV-KANCA-DEFTER-1 · KARAR 419: DEFTER satırı emekli, kanca diğer satırları basmaya devam eder', () => {
+  /** Eski satırın üç ölçüm girdisinden her birini en kötü hâle getirir: satır geri gelirse hiçbiri onu gizleyemez. */
+  const kotuHaller: Array<[string, () => string, () => string]> = [
+    ['defter 7 gün bayat + önbellek yok', () => depoKur(7, new Date().toISOString().slice(0, 10)), () => panoKur(null)],
+    ['değişen demet 14', () => depoKur(0, new Date().toISOString().slice(0, 10)), () => panoKur({ ts: new Date().toISOString(), degisen: 14, toplam: 22, hata: null })],
+    ['git ölçümü yok (boş dizin)', () => fs.mkdtempSync(path.join(os.tmpdir(), 'vh-bos-')), () => panoKur(TAZE_ONBELLEK)],
+  ]
 
-    expect(r.kod, 'kanca turu BLOKLAMAMALI (fail-open)').toBe(0)
-    expect(r.stdout).toMatch(/^⚠DEFTER:/)
-    expect(r.stdout, 'gun sayisi yazili olmali').toMatch(/son esitleme \d{4}-\d{2}-\d{2} \(7 gun\)/)
-  })
-
-  it('⭐DÖNÜŞ YÖNÜ — defter TAZEYSE satır ⚠ TAŞIMAZ (kapı iki yönlü)', () => {
-    // Yalnız kırmızı veren bir kapı ölçüm değildir: eşitleme koşunca satırın yeşile
-    // döndüğü ÖLÇÜLÜR. Dönmezse ekip satırı gürültü sayıp görmezden gelir.
-    const depo = depoKur(0, new Date().toISOString().slice(0, 10))
-    const pano = panoKur(TAZE_ONBELLEK)
-    const r = kos(SATIR_KANCA, depo, pano)
-
-    // ⚠YALNIZ DEFTER SATIRI ÖLÇÜLÜR: kanca REC-345'te ikinci bir satır (BAĞIMLILIK) daha
-    // basmaya başladı. Tüm stdout'ta ⚠ aramak, KOMŞU satırın uyarısını bu kolun kusuru
-    // sayardı — ölçüt doğru, evren yanlış olurdu. Kol bu yüzden satırı ADIYLA seçer.
-    const defterSatiri = r.stdout.split('\n').find((s) => s.includes('DEFTER:')) ?? ''
-    expect(defterSatiri, `satir hala uyarili: ${r.stdout}`).toMatch(/^DEFTER:/)
-    expect(defterSatiri).not.toMatch(/⚠/)
-  })
-
-  it('DEĞİŞEN DEMET ≥ 1 tek başına UYARI sebebidir (yaş taze olsa bile)', () => {
-    // İki eşik VE ile değil VEYA ile bağlı: defter bugün eşitlenmiş olsa bile içerik
-    // kaymışsa "taze" demek yanlış olur.
-    const depo = depoKur(0, new Date().toISOString().slice(0, 10))
-    const pano = panoKur({ ts: new Date().toISOString(), degisen: 14, toplam: 22, hata: null })
-    const r = kos(SATIR_KANCA, depo, pano)
-
-    expect(r.stdout).toMatch(/^⚠DEFTER:/)
-    expect(r.stdout).toContain('olc 14 degisen/22')
-  })
-
-  it('⭐ÖLÇEMEDİ ≠ TAZE — önbellek yoksa satır SEBEBİ YAZAR, sessiz kalmaz', () => {
-    const depo = depoKur(0, new Date().toISOString().slice(0, 10))
-    const pano = panoKur(null)
-    const r = kos(SATIR_KANCA, depo, pano)
-
-    expect(r.kod).toBe(0)
-    expect(r.stdout).toMatch(/^⚠DEFTER:/)
-    expect(r.stdout, 'sebep yazilmali').toContain('olc OLCULMEDI (onbellek yok)')
-  })
-
-  it('⭐BAYAT ÖNBELLEK SAYI OLARAK KULLANILMAZ — eski sayı taze gibi gösterilmez', () => {
-    // Bu kol olmasa kanca 10 gün önceki "0 degisen" sayısını bugünmüş gibi basar ve
-    // yanlış GÜVEN üretir. Eski sayıyı göstermemek, göstermekten iyidir.
-    const depo = depoKur(0, new Date().toISOString().slice(0, 10))
-    const pano = panoKur({
-      ts: new Date(Date.now() - 10 * 86_400_000).toISOString(),
-      degisen: 0,
-      toplam: 22,
-      hata: null,
+  for (const [ad, depoFn, panoFn] of kotuHaller) {
+    it(`⭐DEFTER satırı GERİ GELMEZ — ${ad}`, () => {
+      const r = kos(SATIR_KANCA, depoFn(), panoFn())
+      expect(r.kod, 'kanca turu BLOKLAMAMALI (fail-open)').toBe(0)
+      expect(r.stdout, `DEFTER satırı basıldı: ${r.stdout}`).not.toMatch(/DEFTER:/)
+      expect(r.stdout, 'eski ölçüm parçaları duruyor').not.toMatch(/son esitleme|Kararlar kopyasi|olc \d+ degisen/)
     })
-    const r = kos(SATIR_KANCA, depo, pano)
+  }
 
-    expect(r.stdout).toContain('olc OLCULMEDI (onbellek bayat)')
-    expect(r.stdout).not.toContain('0 degisen')
+  it('kanca diğer açılış satırlarını BASMAYA DEVAM EDER (kaldırma kancayı susturmadı)', () => {
+    const r = kos(SATIR_KANCA, depoKur(0, null), panoKur(TAZE_ONBELLEK))
+    expect(r.stdout).toContain('BAGIMLILIK:')
+    expect(r.stdout).toContain('TABAN:')
   })
 
-  it('KARARLAR KOPYASI ölçülüyor ve yokluğu SEBEBİYLE yazılıyor', () => {
-    const depo = depoKur(0, null)
-    const pano = panoKur(TAZE_ONBELLEK)
-    const r = kos(SATIR_KANCA, depo, pano)
-
-    expect(r.stdout).toMatch(/Kararlar kopyasi OLCULEMEDI/)
-  })
-
-  it('GIT ÖLÇÜMÜ BAŞARISIZSA sebep yazılır (origin/master ref yok)', () => {
-    // Boş bir dizin: `git log origin/master` sonuç vermez. Kanca "taze" DEMEZ.
-    const bos = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-bos-'))
-    const r = kos(SATIR_KANCA, bos, panoKur(TAZE_ONBELLEK))
-    expect(r.kod).toBe(0)
-    expect(r.stdout).toMatch(/son esitleme OLCULEMEDI/)
+  it('Stop kancası defter-bayatlik-olcumu EMEKLİ: dosya yok ve settings.json kaydı yok', () => {
+    const kok = path.resolve(__dirname, '../../..')
+    expect(fs.existsSync(path.join(kok, '.claude/hooks/defter-bayatlik-olcumu.cjs')), 'emekli kanca dosyası geri geldi').toBe(false)
+    const ayar = fs.readFileSync(path.join(kok, '.claude/settings.json'), 'utf8')
+    expect(ayar, 'settings.json emekli kancayı hâlâ çağırıyor').not.toContain('defter-bayatlik-olcumu')
   })
 
   it('BÜTÇE — kanca dış servise çıkmaz ve süre tavanın altında', () => {
@@ -364,44 +318,6 @@ describe('INV-KANCA-DEFTER-3 · bagimlilik tarama tazeligi satiri', () => {
     expect(cetvel, 'gevsetme oldugu yazilmamis').toMatch(/GEVŞET/i)
     expect(cetvel, 'eski satirin ne oldugu yazilmamis').toMatch(/haftada bir/i)
     expect(cetvel, 'reddedilen oneri kayitta degil').toMatch(/ALTYAPI'NIN ÖNERİSİ AKSİ YÖNDEYDİ/i)
-  })
-})
-
-/**
- * INV-KANCA-DEFTER-2 — Stop kancasının `olc` ÇIKIŞ 3 sözleşmesi.
- *
- * Bu bölüm tek bir şeyi ölçer ve o şey bu işin en sessiz kusuruydu: çıkış kodu 3 bir
- * CEVAPTIR, arıza değil. Kol, sözleşmenin hem BETİKTE hem CETVELDE yazılı olduğunu da
- * ölçer — çünkü kod bir sözleşmeye dayanıyorsa, sözleşmenin yazılı olduğu da ölçülmelidir.
- * Yazılı olmayan bir sözleşmeye dayanan kod, bir sonraki okuyucu için tuzaktır.
- */
-describe('INV-KANCA-DEFTER-2 · olc cikis 3 bir CEVAPTIR, ariza degil', () => {
-  const KOK = path.resolve(__dirname, '../../..')
-
-  it('STOP KANCASI kod 3 ü gecerli cevap sayiyor', () => {
-    const src = fs.readFileSync(OLCUM_KANCA, 'utf8')
-    expect(src, 'gecerli kod listesi yok').toMatch(/OLC_GECERLI_KODLAR\s*=\s*\[\s*0\s*,\s*3\s*\]/)
-    expect(src, 'kod 3 te stdout okunmuyor').toMatch(/e\.status.*e\.stdout|e\.stdout/)
-    expect(src, 'OZET satiri sozlesme olarak okunmuyor').toMatch(/OZET/)
-  })
-
-  it('STOP KANCASI onbellegi OTURUMDAN BAGIMSIZ yaziyor', () => {
-    // Oturuma bağlı bir önbellek, açılış satırı başka oturumda koştuğunda okunamaz.
-    const src = fs.readFileSync(OLCUM_KANCA, 'utf8')
-    expect(src).toContain('.defter-olc-onbellek.json')
-    const satir = src.split('\n').find((s) => s.includes('.defter-olc-onbellek.json')) ?? ''
-    expect(satir, 'onbellek adinda oturum kimligi var').not.toContain('sid')
-  })
-
-  it('SOZLESME BETIKTE VE CETVELDE YAZILI (koda gomulu varsayim kalmasin)', () => {
-    const betik = fs.readFileSync(path.join(KOK, 'scripts', 'nlm', 'proje_takip_sync.py'), 'utf8')
-    expect(betik, 'betik cikis 3 sozlesmesini yazmiyor').toMatch(/3\s*=\s*degisen var/i)
-
-    const cetvel = fs.readFileSync(
-      path.join(KOK, 'docs', 'standards', 'proje-takip-defteri-standard.md'),
-      'utf8',
-    )
-    expect(cetvel, 'cetvel cikis 3 sozlesmesini yazmiyor').toMatch(/çıkış 3 = değişen var/i)
   })
 })
 

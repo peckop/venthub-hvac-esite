@@ -79,7 +79,8 @@ function opsAdayiMi({ cwd, agentType } = {}) {
       const f = path.join(d, '.claude', 'settings.local.json')
       if (fs.existsSync(f)) {
         const j = JSON.parse(fs.readFileSync(f, 'utf8'))
-        return Boolean(j) && j.agent === AJAN_ADI
+        // ARC-223: başka adlı bir worktree'deki `ops-pencere` anahtarı start_session kopyasıdır → aday DEĞİL.
+        return Boolean(j) && j.agent === AJAN_ADI && !require('./pencere-kimligi.cjs').opsMirasMi(d, j.agent)
       }
       const ust = path.dirname(d)
       if (ust === d) break
@@ -158,13 +159,76 @@ function yazmaKarari({ mevcut, sid, kaynak, mevcutCanli }) {
   return { yaz: false, sebep: 'baska-kimlik-var-' + (kaynak || 'bilinmiyor') }
 }
 
+/** Türkçe katlama + yalnız harf/rakam: "Sabah özeti (yalnız ölçüm)" → "sabah ozeti yalniz olcum". */
+function adiKatla(s) {
+  return String(s || '')
+    .toLocaleLowerCase('tr')
+    .replace(/ı/g, 'i')
+    .replace(/ö/g, 'o')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ç/g, 'c')
+    .replace(/ğ/g, 'g')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function gorevDizini() {
+  return process.env.VENTHUB_ZAMANLANMIS_DIZINI || path.join(os.homedir(), '.claude', 'scheduled-tasks')
+}
+
+/**
+ * ARC-211: zamanlanmış görev (scheduled task) oturumu mu? Zamanlanmış görev ops-pencere klasöründe açılınca
+ * `settings.local.json` agent ayarı onu OPS ADAYI yapıyordu (26 Ekim 07:51: "Sabah özeti" oturumu kimliği aldı, kokpit
+ * düğmeleri ona bağlandı). Çözüm iki işaretle, ikisi de açılışta (SessionStart) elde:
+ *   (a) VENTHUB_ZAMANLANMIS=1 ortam değişkeni (ileride görev tetikleyicisi koyarsa kesin işaret);
+ *   (b) oturumun pencere kaydındaki `name`, `~/.claude/scheduled-tasks/<görev-kimliği>/` klasör adının sözcükleriyle
+ *       eşleşir ("sabah-ozeti" → "sabah ozeti" ⊂ "sabah ozeti yalniz olcum"). Gerçek OPS penceresinin adı "OPS" ve
+ *       hiçbir görev kimliği değildir; görev klasörü okunamazsa HAYIR (eski davranış: fail-open).
+ * Ad bu pencere kaydında SessionStart anında henüz yoksa (kayıt gecikmesi) sonuç HAYIR olur; geç yakalama
+ * için kokpit durum çıktısı kimliğin kaynağını da gösterir (`ops-oturumu.cjs` argümansız).
+ */
+/**
+ * ARC-234: görev klasörü "gsc-gunluk-dizin-istegi", pencere adı "Günlük dizin isteği (Google + IndexNow)": klasör önekleri
+ * (gsc-) pencere adında yok, bütün-sözcük eşleşmesi kaçırıyordu. Görevin en az 2 sözcüğü adda geçiyor ve görev
+ * sözcüklerinin en az 2/3'ü karşılanıyorsa zamanlanmış sayılır. Tek sözcüklü ad ("OPS") hiçbir zaman eşleşmez.
+ * shortcut: sözcük sırası bakılmaz, iki sözcüklü bir görev klasörü adı yalnız ikisi birden geçince eşleşir.
+ */
+function sozcukKumesiEslesir(ad, gorev) {
+  const adSozcuk = new Set(ad.split(' ').filter(Boolean))
+  const gorevSozcuk = gorev.split(' ').filter(Boolean)
+  const bulunan = gorevSozcuk.filter((s) => adSozcuk.has(s)).length
+  return bulunan >= 2 && bulunan * 3 >= gorevSozcuk.length * 2
+}
+
+function zamanlanmisMi(sid, { dizin, gorevler = gorevDizini(), env = process.env } = {}) {
+  if (env.VENTHUB_ZAMANLANMIS === '1') return true
+  try {
+    const hedef = String(sid || '').toLowerCase()
+    const kayitlar = pencereKayitlari(dizin)
+    const k = kayitlar && kayitlar.find((x) => x.sessionId.toLowerCase() === hedef)
+    const ad = k && typeof k.name === 'string' ? adiKatla(k.name) : ''
+    if (!ad) return false
+    for (const e of fs.readdirSync(gorevler, { withFileTypes: true })) {
+      if (!e.isDirectory()) continue
+      const gorev = adiKatla(e.name)
+      if (gorev && (ad === gorev || ad.startsWith(gorev + ' ') || ad.includes(' ' + gorev + ' ') || ad.endsWith(' ' + gorev))) return true
+      if (sozcukKumesiEslesir(ad, gorev)) return true
+    }
+  } catch {
+    /* okunamadı: zamanlanmış sayılmaz */
+  }
+  return false
+}
+
 /**
  * Açılışta çağrılır: aday ve karar uygunsa yazar. Hata yutulur (açılışı bozmaz).
  * Dönüş: { yazildi, sebep, mevcut?, mevcutCanli? } — session-board "canlı başka kimlik var" uyarısını buradan basar.
  */
-function acilistaYaz({ sid, kaynak, cwd, agentType, dosya = dosyaYolu(), simdi = Date.now(), oturumler, yasiyor } = {}) {
+function acilistaYaz({ sid, kaynak, cwd, agentType, dosya = dosyaYolu(), simdi = Date.now(), oturumler, yasiyor, gorevler, env } = {}) {
   try {
     if (!opsAdayiMi({ cwd, agentType })) return { yazildi: false, sebep: 'aday-degil' }
+    if (zamanlanmisMi(sid, { dizin: oturumler, gorevler, env })) return { yazildi: false, sebep: 'zamanlanmis-gorev' }
     if (!etkilesimliMi(sid, { dizin: oturumler })) return { yazildi: false, sebep: 'etkilesimli-degil' }
     const yeniSid = String(sid || '').toLowerCase()
     const kayit = kayitOku(dosya)
@@ -219,6 +283,8 @@ module.exports = {
   canliMi,
   etkilesimliMi,
   yazmaKarari,
+  zamanlanmisMi,
+  adiKatla,
   acilistaYaz,
   AJAN_ADI,
 }

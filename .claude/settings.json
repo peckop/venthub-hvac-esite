@@ -230,6 +230,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pencere-kilidi-kapisi.cjs\""
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-emir-uyarisi.cjs\""
           }
         ]
@@ -240,6 +244,22 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kart-alani-kapisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kart-plan-baglantisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/onceki-calisma-kapisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/once-elindeki-is-uyarisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kanban-kanit-yolu-kapisi.cjs\""
           },
           {
             "type": "command",
@@ -256,6 +276,10 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-board.cjs\"",
             "statusMessage": "board"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-daemon-ac.cjs\""
           }
         ]
       },
@@ -312,6 +336,19 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/board-brief.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gorev-tazelik-satiri.cjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pencere-kilidi-recep.cjs\""
           }
         ]
       },
@@ -381,6 +418,12 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/accumulate-edits.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/duzenleme-ani-lint.cjs\"",
+            "asyncRewake": true,
+            "timeout": 60
           }
         ]
       },
@@ -396,6 +439,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/merge-sonrasi-ileri-sar.cjs\"",
             "statusMessage": "merge-sonrasi-ileri-sar"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pr-birlesti-kart.cjs\"",
+            "statusMessage": "pr-birlesti-kart"
           }
         ]
       },
@@ -472,13 +520,6 @@
             "timeout": 120,
             "statusMessage": "verify (eslint --fix + tsc)",
             "async": true
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/defter-bayatlik-olcumu.cjs\"",
-            "timeout": 90,
-            "async": true,
-            "statusMessage": "defter bayatlik olcumu"
           },
           {
             "type": "command",

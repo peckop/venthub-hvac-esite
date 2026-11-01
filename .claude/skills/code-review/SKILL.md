@@ -151,6 +151,37 @@ pre-existing edits. Use merge-base semantics for branch intent and exact-head
 CI for release decisions. A green check for an older revision cannot approve
 the current diff. Separate source-supported concerns from tested failures.
 
+## YTN-21 eki: yapısal çare, değişiklik boyu, bağımlılık disiplini
+
+Filo kuralı: önce yerleşik `/code-review`; bu bölüm onunla çakışmaz, yalnız yapısal çare, boyut eşiği ve bağımlılık bakışını ekler.
+
+**Yapısal çare.** Yapısal sorun bulunduğunda yalnız sorunu değil hamleyi de öner; "karmaşık" demek yazarı tahmine bırakır. Adlandırılmış çareler: koşul zincirini tipli modele ya da açık dağıtıcıya çevir; yinelenen dalları tek akışa indir; orkestrasyonu iş mantığından ayır; kavrama özgü mantığı paylaşılan modülden sahibi olan pakete taşı; yakın kopya yerine kanonik yardımcıyı kullan; tip sınırını açık yaz ki aşağı akıştaki dallanma kaybolsun; açıklık katmayan geçiş sarmalayıcısını sil; yardımcı çıkar ya da büyük dosyayı odaklı modüllere böl. Hareketli parçayı azaltan çareyi, aynı karmaşıklığı başka yere yayan çareye tercih et.
+
+**Değişiklik boyu.** Yaklaşık 100 satır iyi (tek oturumda okunur), yaklaşık 300 satır tek mantıksal değişiklikse kabul edilebilir, yaklaşık 1000 satır fazla büyüktür: böl. Dosya boyuna da bak: tek dosyanın toplam 1000 satırı civarı sert sınır değil inceleme sinyalidir; zaten büyük dosyayı büyüten değişiklikte önce çıkarma/ayırma sor. "Tek değişiklik" = tek şeyi çözen, ilgili testi taşıyan, teslimden sonra sistemi çalışır bırakan değişiklik. Bölme yolları: üst üste yığ (ardışık bağımlılık), dosya grubuna göre (farklı gözden geçiren), yatay (önce paylaşılan kod, sonra tüketici), dikey (özelliğin dilimleri). Büyüğü kabul edilebilir kılanlar: tam dosya silme ve gözden geçirenin yalnız niyeti doğruladığı otomatik yeniden düzenleme. Yeniden düzenleme ile yeni davranış iki ayrı değişikliktir. Bu eşikler ret gerekçesi değil bölme önerisidir; kural 14 gereği testi sonraya bırakmak için bölme kullanılmaz.
+
+**Bağımlılık disiplini.** Yeni bağımlılık: standart kütüphane ve mevcut yardımcılar öncelikli, her bağımlılık bir yüktür; bakım durumu, bilinen açık, lisans uyumu sorulur. Mevcut bağımlılık yükseltmesi sıradan bir kod değişikliğidir; "bump deps" toplu birleştirmeleri en riskli olanıdır: (1) sürüm numarası değil değişiklik günlüğü okunur, majör yükseltmede geçiş notları; (2) değişiklik başına tek bağımlılık (kırılırsa suçlu belli, geri alma temiz); (3) kararı testler verir, "kuruldu" kanıt değildir, bağımlılığın davranışı etrafında kapsam inceyse asıl bulgu odur, önce test eklenir; (4) geçişli grafiğe bak, `package.json` değil kilit dosyası farkını incele; (5) kilit dosyasını dürüst tut, commit'le, elle düzenleme. Yerelde `pnpm install` ağır komuttur (BELLEK uyarısı varsa koşma); kilit dosyası farkı PR'da okunur. Güvenlik hükmü (typosquatting, ele geçirilmiş bakımcı) için `security-scanner`.
+
+Kaynak: addyosmani/agent-skills code-review-and-quality @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
+## Gelen inceleme yorumunu uygulamadan önce doğrula
+
+Bu bölüm sana gelen yorumlar içindir (inceleyen sen değilsin). Sıra: yorumun tamamını oku, her maddeyi kendi cümlenle yeniden söyle, sonra **kodla doğrula** (öneri bu depoda gerçekten doğru mu, mevcut davranışı bozar mı, mevcut yazımın bir nedeni var mı, inceleyen tam bağlamı görmüş mü). Yanlışsa uygulama; teknik gerekçeyle ve mümkünse çalışan bir test ya da kod parçasına işaret ederek itiraz et. Doğrulayamıyorsan bunu açıkça yaz ve nasıl ilerleyeceğini sor. Belirsiz bir madde varsa tahminle uygulama: ilişkili maddeler birlikte yanlış anlaşılır, belirsiz olanlar netleşene kadar hiçbirini uygulama. Netleşince sıra: önce bozucu ve güvenlik maddeleri, sonra basit düzeltmeler, sonra karmaşık olanlar; her biri ayrı sınanır. Öneri "düzgün yapalım" türündense önce kullanımına bak: çağıranı olmayan ucu genişletme, silmeyi öner. Doğru yorumda gösterişli teşekkür yerine yapılan düzeltmeyi yaz. Tartışma GitHub'da satır yorumunun kendi iş parçacığında yürür, üst düzey PR yorumunda değil.
+
+Kaynak: obra/superpowers receiving-code-review @2ce8aa15d05bd57213e6f746f953aafb7ded7a8b (MIT)
+
+## İkinci eksen: Spec ve kod kokusu tabanı (VentHub uyarlaması)
+
+Bir değişiklik bir ekseni geçip ötekini kaldırabilir: bütün standartlara uyup yanlış şeyi yapan kod (Standards geçer, Spec kalır) ya da istenen şeyi yapıp proje düzenini bozan kod (Spec geçer, Standards kalır). İkisi **ayrı raporlanır, birleştirilmez, yeniden sıralanmaz**; tek bir "en kötü" seçilmez, eksen başına en kötü bulgu yazılır.
+
+- **Sabit nokta:** kullanıcının verdiği ref, verilmediyse `origin/master`. `git diff <ref>...HEAD` (üç nokta, merge-base'e karşı) ve `git log <ref>..HEAD --oneline` bir kez alınır; ref çözülmüyor ya da fark boşsa burada dur.
+- **Spec kaynağı, sırayla:** (1) PR gövdesindeki `Kanban: <ÖN EK>-<sayı>` kartı (KAYNAK/CETVEL, BİTİŞ ölçütü, kabul satırları); (2) kullanıcının verdiği yol; (3) `docs/plans/` ya da `docs/standards/` altında dal/özellik adıyla eşleşen belge. Hiçbiri yoksa Spec ekseni atlanır ve raporda "spec yok" yazılır.
+- **Standards kaynağı:** `CLAUDE.md` kuralları 1-14, ilgili `docs/standards/*` ve `docs/roller/*-kurallar.md`. Belgelenmiş standart her zaman kazanır; araç (lint, tip, test) zaten zorluyorsa bulgu yazılmaz.
+- **Kod kokusu tabanı (Fowler, *Refactoring* bölüm 3):** belgelenmiş standart olmasa da Standards eksenine her zaman eklenir; her biri "olası X" diye etiketli bir **yargı çağrısıdır**, sert ihlal değildir, belgelenmiş standart bir kokuyu onaylıyorsa susturulur. Gizemli ad → yeniden adlandır; Yinelenen kod → ortak şekli çıkar; Özellik kıskançlığı → yöntemi verinin yanına taşı; Veri öbekleri → tek tipte topla; İlkel takıntı → kavrama küçük tip ver; Tekrarlı switch → çok biçimlilik ya da paylaşılan tek harita; Dağınık değişiklik (Shotgun Surgery: bir değişiklik çok dosyada dağınık düzenleme gerektiriyor) → birlikte değişenleri tek modülde topla; Iraksak değişiklik (Divergent Change: bir modül birkaç ilgisiz sebeple düzenleniyor) → böl; Spekülatif genellik (spec'in istemediği soyutlama/parametre/kanca) → sil; Mesaj zincirleri (`a.b().c().d()`) → yürüyüşü birinci nesnenin arkasına sakla; Aracı sınıf (çoğunlukla devreden) → kes, asıl hedefi çağır; Reddedilen miras → kalıtımı bırak, bileşim kullan.
+- **Alt ajan:** iki eksen paralel, salt-okuma ve `name` verilmeden açılabilir (her biri 400 sözcük altı). Standards ajanına kokular tam metin verilir; Spec ajanına her bulgu için spec satırı alıntılatılır. Uygulama gerekmiyorsa tek geçişte de yapılabilir; ayrım eksenleri ayırmaktır, ajan sayısı değil.
+- **Bizim kural 14 ile:** "spec'te olmayan davranış" (kapsam kayması) bulgusu, kural 14'e göre ayrı kayıt gerektiren gerçekten ilgisiz bir iş mi, yoksa spec'i yarım bırakıp testi sonraya atan bir eksik mi diye ayrıca ayrılır.
+
+Kaynak: mattpocock/skills code-review @5beb35b0.
+
 ## Skills in scope
 
 - `security-scanner` — for a deeper pass on security-sensitive changes

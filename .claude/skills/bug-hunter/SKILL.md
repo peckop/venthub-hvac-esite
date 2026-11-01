@@ -132,6 +132,25 @@ reader's trust in every other line.
 
 ---
 
+## Ek tarama kalıbı: benzemeyen iki taraftaki kusurlar (VentHub uyarlaması)
+
+Ters yedek zinciri ve çifte işlem kusurları iki tarafı birbirine benzediği için yan yana okumada yakalanır. Aşağıdaki iki sınıf benzemez; **ayrı bir geçiş** olarak, her taramada bilerek aranır:
+
+1. **Olay işleyiciler arası durum varsayımı.** Her olay, webhook ya da arka plan işi işleyicisi için: işleyicinin okuduğu ama aynı fonksiyonda kendisinin oluşturmadığı her durumu (kayıt, önbellek girdisi, alan) listele. Her biri için o durumu hangi işleyicinin yarattığını ve önce çalışacağının **kodda** garanti edilip edilmediğini sor (varlık denetimi, upsert, kuyruk sırası sözleşmesi, işlem). "Genelde bu sırayla gelir" garanti değildir; garanti yoksa bulgudur. Garanti varsa "denetlendi, sorun yok" diye yaz, sessizce atlama. Bizde ilk bakılacaklar: iyzico geri çağrımı ile sipariş durumu geçişleri (sıra kural 11: durumlar yalnız ileri).
+2. **Para, miktar ve ölçü biriminin uçtan uca izi.** Tutar, fiyat, ağırlık, süre, yüzde için değerin ilk üretildiği/saklandığı yeri ve **birimini** yaz (tam kuruş mu, `numeric(14,4)` mi, 0-1 kesri mi). Aşağı akıştaki her okuma noktasında (değişken adı değişse de) aritmetiğin o birimle tutarlı olup olmadığına bak. Hata fırlatılmasa bile farklı birimle kullanılan değer bulgudur. İki taraf kod olarak birbirine benzemez; benzememesi bu kusur sınıfının gözden kaçma sebebidir.
+
+İki yardımcı kural: yeni görünen kod en doğru kod demek değildir (daha eski bir katmanın artık sağlamadığı varsayıma sessizce dayanabilir); bir değer bir kez normalize/dönüştürüldükten sonra sonradan eklenen kod aynı dönüşümü bir daha uygulamış olabilir (çifte kodlama, çifte dönüşüm, çifte kaçış). Yedek zincirinde (`??`, `||`, üçlü işleç) hangi tarafın yedek olması gerektiğine bak; ters sıra `null`, `0` ya da boş değeri kritik alana uzun süre fark edilmeden geçirir.
+
+Kaynak: msitarzewski/agency-agents specialized-codebase-archaeologist @b37b5bb3 (MIT).
+
+## YTN-24 eki: bulguyu çürütmeyi dene, doğrulanınca ailesini ara
+
+1. **Raporlamadan önce çürüt.** Kusur adayı için kırılma girdisini gerçekten oraya taşıyan bir yol var mı diye bak: çağıranlar bu girdiyi üretebiliyor mu, üstte bir doğrulama, kısıt ya da yetki koruması onu eliyor mu. Yol kodda gösterilemiyorsa aday "doğrulanmadı" olarak kalır; "benzer kod başka yerde patlamıştı" gerekçe değildir, her örnek kendi bağlamında sınanır.
+2. **Doğrulanınca ailesini ara.** Kök nedeni tek cümleyle yaz (kod ne yapıyor değil, neden yanlış), sonra aynı hatanın başka yüzlerini depoda ara: kardeş işleyiciler, aynı yardımcıyı çağıran diğer yerler, boş/sıfır/sınır girdiler. Aramayı bilinen örneği tam yakalayan dar bir desenle başlat, sonra her adımda tek öğeyi gevşet; eşleşmelerin yarısından fazlası gürültüyse dur. Yalnız ilk hatanın bulunduğu modülde aramak en sık düşülen tuzaktır.
+
+Fikir kaynağı: trailofbits/skills fp-check @2be6433b39e009cd2b6fd3be1895f6b1faa5af9a (CC-BY-SA-4.0; metin kopyalanmadı)
+Fikir kaynağı: trailofbits/skills variant-analysis @2be6433b39e009cd2b6fd3be1895f6b1faa5af9a (CC-BY-SA-4.0; metin kopyalanmadı)
+
 ## Patterns and report
 
 For scanning patterns, severity-ranked report examples and output shape, [Read the detailed workflow](references/patterns-and-report.md).

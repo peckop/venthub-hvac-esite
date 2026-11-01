@@ -224,7 +224,7 @@ When you do include FAQ:
 - Each answer: 2-4 sentences, direct and complete — standalone without surrounding context
 - Cover: pricing/cost questions, comparison questions ("vs. [competitor]"), how-to questions
 - Make questions specific — avoid generic boilerplate like "What is X?" on every page
-- Add FAQPage JSON-LD schema markup for this section
+- VentHub: do NOT add FAQPage JSON-LD (Google removed the FAQ rich result on 2026-05-07; rehber-yazisi-standard.md "FAQPage işaretlemesi konmaz"). The FAQ section stays for readers and retrieval
 
 ### Block 9: Conclusion (100-150 words)
 - Summarize the transformation: before state → after state using the solution
@@ -303,6 +303,16 @@ When you do include FAQ:
 
 ---
 
+## İçerik denetimi: E-E-A-T farkı ve anlamsal boşluk (YTN-24; GEO-SEO kullanır)
+
+Yukarıdaki E-E-A-T listesi yazım içindir; denetimde yalnız şu farklar eklenir.
+- **Deneyim gösterilir, beyan edilmez.** Yazarın "denedim" demesi kanıt sayılmaz; kanıt gerçek bir iz taşır (kurulum fotoğrafı, saha ölçümü, katalogdan sayfa atfı). İzi olmayan deneyim cümlesi uydurulmaz, eksik olarak raporlanır. Yazar özgeçmişi tek başına yetmez; içeriğin kendisi konuya hâkim görünmelidir.
+- **Dört eksen için "var / zayıf / yok" yaz, sayısal puan uydurma.** Her zayıf ya da yok için kanıtı olan somut bir ek öner (kaynaklı sayı, kaynak dizininden sayfa atfı, sınırlılık notu). Kaynaksız sayı eklemek öneri sayılmaz.
+- **Anlamsal boşluk (rakip sayfalara karşı).** Hedef sorgunun üst sonuçlarındaki sayfaların işlediği varlıkları ve alt konuları, sayfanın işlediğiyle yan yana koy ve her farkı sınıfla: çekirdek (hepsinde var, bizde yok), ayırt edici (bir iki rakipte var), sıradan (herkes yüzeysel geçer), fırsat (rakipler atlamış). Her boşluk için hangi başlığa ve ne derinlikte (paragraf, alt başlık, bölüm) ekleneceği yazılır. Boşluk, doldurma değil bilgi taşıyan bölümdür.
+- **Sınırlar.** Rakip sayfa okuması elle ve insan onayıyla yapılır; sayfa tarayan komut ya da betik eklenmez. Search Console verisi depoya girmez. Rakip adı ve rakam doğrulanmadan yazılmaz. SSS şeması (FAQPage) önerilmez. Bölüm GEO-SEO departmanının çürütücü ve araştırmacı çalışanlarınca da kullanılır.
+
+Fikir kaynağı: inhouseseo/superseo-skills eeat-audit ve semantic-gap-analysis @9cf22cc065a294bf0077ea6af6b4ea0eb7f89cdc (Apache-2.0; kendi cümlelerimizle yazıldı)
+
 ## Quality Standards
 
 - **Length**: 2,500 words minimum; 3,000+ for comparison and guide pages
@@ -347,7 +357,7 @@ Before delivering the article, confirm every item:
 - [ ] Numbered How It Works steps included when the page is a guide or workflow page
 - [ ] 3+ distinct use cases included when the page type calls for scenarios
 - [ ] FAQ included only where it adds retrieval value (comparisons, learn pages, complex topics) — not forced onto every page
-- [ ] If FAQ is included: 3-6 specific questions targeting real PAA queries, with FAQPage JSON-LD schema
+- [ ] If FAQ is included: 3-6 specific questions targeting real PAA queries (no FAQPage JSON-LD on VentHub: rehber-yazisi-standard.md)
 - [ ] 5-8 authoritative external citations, all linked inline
 - [ ] Zero fabricated statistics — every number has a source URL
 - [ ] 3+ internal links with descriptive anchor text

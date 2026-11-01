@@ -131,7 +131,12 @@ describe('INV-KANCA-BOARD-BRIEF-1 · PANO özet satırı pencere adını göster
     // (b) dizin yerine DOSYA verilmiş (okuma hata verir)
     const dosya = path.join(tmp('vh-brief-kok-'), 'dizin-degil')
     fs.writeFileSync(dosya, 'x')
-    const b = panoSatiri(pano, dosya)
+    // ARC-220: aynı pano+oturum ikinci çağrıda "pencere bu durumu gördü" diye susturulur (ayrı davranış, kendi testi
+    // uyari-susturma testinde); bu vaka oturum KAYIT dizini hatasını ölçer, bu yüzden taze pano (taze ledger) kurulur.
+    const pano2 = tmp('vh-brief-pano-')
+    talep(pano2, 'benim1', 'ALTYAPI')
+    talep(pano2, 'digeri1', 'URUN')
+    const b = panoSatiri(pano2, dosya)
     expect(b.kod).toBe(0)
     expect(b.satir).toContain('URUN=digeri1')
   })

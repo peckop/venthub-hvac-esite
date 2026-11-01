@@ -2,6 +2,7 @@
   "_aciklama": "Rol kurallar dosyalarının 'Departmana özgü iş kuralları' bölümünün verisi (OPS-168 O2, HRT-65). Her departman kendi metnini hazırlar (side-session-notes rol-metni-<DEP>-2026-10-16.md), HARİTA buraya işler; üretici (scripts/belge/rol-karti-uret.cjs) docs/roller/<ROL>-kurallar.md dosyasına yazar, o dosyalar elle düzenlenmez. Sınır: rol başına en çok 8 madde, her madde ölçülmüş bir olaya dayanır (olay maddenin içinde yazılı). Depo herkese açık: gizli değer, kişisel veri, sorgu verisi yazılmaz.",
   "roller": {
     "ALTYAPI": {
+      "yollar": [".github/workflows/**", ".github/dependabot.yml", "package.json", "pnpm-lock.yaml", "scripts/ci/**", "docs/standards/bagimlilik-kararlari.md"],
       "kurallar": [
         "**İzin bloğu.** İş akışına `permissions:` yazılınca `contents: read` ZORUNLUDUR (herkese açık depoda varsayılanlar düşer, yoksa checkout \"Repository not found\" verir). Ek izin yalnız gerekçeyle yazılır (örnek: dağıtım kapısında `statuses: read`). Kaynak: CLAUDE.md Notlar; `dagitim-hazir.yml` (ALT-82).",
         "**Aksiyonlar ve sırlar.** Her `uses:` tam 40 haneli commit'e sabitlenir (sürüm yorumda); `secrets.*`, `self-hosted` ve `pnpm install` yazılmaz (yabancı fork kodu kendi sunucuda çalışır; kurulum yüzeyi büyür). Kaynak: CLAUDE.md (herkese açık depo); `INV-DAGITIM-HAZIR-1` ve `INV-DIZIN-TETIGI-1` bunu ölçer.",
@@ -15,6 +16,7 @@
       "sonaAlinan": "K3, K4, K6, K8, K15, K16, K18, K20, K24, K25, K26, K28 site koduna aittir (ALTYAPI bunlara yalnız inceleyen olarak dokunur); K29, K30, K31 ikinci faz (park). K1 ve K2 yerinde kalır."
     },
     "ARAC": {
+      "yollar": [".claude/hooks/**", ".claude/settings.json", "scripts/board/**", "scripts/hijyen/**", "tools/**", "src/__tests__/conformance/kanca-*.test.ts", "src/__tests__/conformance/arac-*.test.ts", "docs/audits/arac-envanteri-*"],
       "kurallar": [
         "**Kapı ve kanca testi sabotajla doğrulanır.** Yeni kapının testinde kapıyı bozan en az bir sabotaj kolu bulunur; sabotajsız yeşil kanıt sayılmaz. Olay: ARC-150 (#1966) sabotaj testi ilk yazıldığında kör çıktı, çünkü aranan ifade tanım satırında da geçiyordu; kontrol çağrı satırına sıkılaştırılınca sabotajı yakaladı.",
         "**Kanca, ayar ve scripts/board değişikliği OPS tam fark okumadan birleşmez.** PR gövdesine \"OPS tam fark okur\" notu yazılır; settings.json kaydını yalnız OPS yapar. Olay: #1966 ve karar 378 (kanca PR'ı birleşti, kayıt OPS'ta bekledi).",
@@ -32,13 +34,22 @@
         "**Metin değişince sha256 yenilenir ve tur türü seçilir.** Doğrulanmış metinden sonra tek karakter değişirse sha256 yenilenir; yalnız doğrulayıcı önerisiyle yapılan düzeltmede \"değişen satırlar + tam okuma\" teyit turu, başlık ya da anlam değişikliğinde bağımsız tam okuma koşar. Olay: BLG-15 tur 4, 5, 6 (üç kez sha değişti).",
         "**Başlıklar içerikten ayrı, bağımsız okunur.** Sahte hatalı kopya yazarın yeni başlıklarını sınamaz. Olay: BLG-13 (tur 2'de üç zayıf başlık) ve BLG-15 (başlık okumasında 8 zayıf başlık, 2 içerik riski).",
         "**Mevzuat atfı ham metinden ölçülür.** Madde ve ek numarası ile değiştirici yönetmelikler ham metinden alınır, özetten alınmaz. Olay: BLG-15 (tanımlar md.3 yazılmış, doğrusu md.4; 2018 değişikliği atıfsız kalmıştı).",
-        "**MEVZUAT penceresi kapalıyken mevzuat cümlesi üç şartla yazılır:** her cümle için Resmî Gazete bağlantısı + ek PDF sayfa/tablo no + birebir alıntı; bağımsız doğrulayıcı aynı satırları birincil metinden ikinci kez okur, eşleşmeyen satır yazıdan çıkar; iddia tablosunda \"MEVZUAT kontrolü yapılmadı (pencere kapalı), birincil metin BLOG + doğrulayıcı\" notu kalır (R2.6'ya ayrı PR ile yazılacak). Dayanak: OPS hükmü, BLG-14 ve BLG-15.",
+        "**MEVZUAT penceresi kapalıyken mevzuat cümlesi üç şartla yazılır:** her cümle için Resmî Gazete bağlantısı + ek PDF sayfa/tablo no + birebir alıntı; bağımsız doğrulayıcı aynı satırları birincil metinden ikinci kez okur, eşleşmeyen satır yazıdan çıkar; iddia tablosunda \"MEVZUAT kontrolü yapılmadı (pencere kapalı), birincil metin BLOG + doğrulayıcı\" notu kalır (rehber-yazisi-standard.md R2.6, MEVZUAT penceresi kapalıyken bölümü). Dayanak: OPS hükmü, BLG-14 ve BLG-15.",
         "**Bağlanan sayfa içeriğiyle ölçülür.** Yazının bağlandığı ürün ve kategori sayfası yalnız durum koduyla değil içeriğiyle ölçülür: sayfadaki sayı alanları yazıdaki tabloyla karşılaştırılır, fark ilgili departmana (KATALOG/ÜRÜN) kartla gider. Olay: BLG-15 (ürün sayfası AC modellerde 26,1/25/30,7/40,2/40,1/45,4 dB(A) verirken katalog farklı).",
         "**Güncelleme tarihi aynı PR'da değişir.** Yayın ya da revizyon PR'ında yazı kaydındaki güncelleme tarihi aynı PR'da değişir; birleşmeden sonra canlı site haritası lastmod'u curl ile ölçülür. Olay: BLG-13 (lastmod eski kaldı, ayrı PR gerekti).",
         "**İddia tablosunda kaynak alanı betikle ölçülür.** Kaynak alanı cümledeki atıf kümesinden üretilir. Olay: BLG-15 (tur 4'te doğrulayıcı iki satırda, betikle ölçünce toplam yedi satırda kaynak alanı cümledeki atıflardan eksikti)."
       ]
     },
     "GEO-SEO": {
+      "yollar": [
+        "scripts/seo/**",
+        "src/lib/seo/**",
+        "src/lib/bilgiMerkezi/jsonld.ts",
+        "src/app/{robots,sitemap}.ts",
+        "public/llms.txt",
+        "docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md",
+        "docs/audits/{geo,seo}-*"
+      ],
       "kurallar": [
         "**Arama ve sorgu verisi depoya yazılmaz (P6).** Search Console sorguları, tıklama ve gösterim satırları, sayfa bazlı arama verisi depoya, PR'a, kart dışı belgeye girmez; depo dışı arşivde durur. Depo herkese açıktır. Betikler depo içi çıktı yolunu reddeder (`gsc-arsiv.mjs`, `degisen-adres-bildir.mjs`: çıkış kodu 2). Kaynak: SEO-51, SEO-52, SEO-55.",
         "**Dizin tetiği bir insanın hatırlamasına bağlı kalmaz.** Canlıya çıkan her adres ve metin değişikliği IndexNow'a (karar 376: K4 gevşedi, bayrak kapalıyken de) ve Google kuyruğuna girer; yalnız haritada olan, 200 veren, kanoniği kendisi olan adres gönderilir. Olay: FC 101 (16 Ekim): K4 süzgeci ürün adresini düşürdü, kimse haber vermedi, Google eski adresi eski metniyle gösterdi. Kaynak: SEO-54, SEO-55.",
@@ -51,7 +62,19 @@
       ],
       "sonaAlinan": "İşe uyan genel kurallar sonda durur: K1 (plan önce), K17 (hreflang), K23 (llms.txt)."
     },
+    "HARITA": {
+      "yollar": ["scripts/belge/**", "docs/roller/**"],
+      "kurallar": [
+        "**Ortak satır 17 kartı birden büyütür; kart baytı ve açılış özeti önce ölçülür.** Kart bayt tavanı fiilî 6.255 B (testte iki eşik), açılış özeti 2.048 B; ölçüm `node scripts/belge/rol-karti-uret.cjs --harita-ozet | wc -c` ve en büyük kart. Olay: HRT-36'da iki ortak satır TASARIM kartını 6.324 B'a çıkardı, TAKIP satırı özeti 2.039 B'a getirdi.",
+        "**Satır kısaltmadan önce o ifadeyi bağlayan test aranır.** `rol-kartlari.test.ts` içindeki tüm `toContain` dizgilerine karşı grep yapılır, yalnız `src/__tests__` genelinde değil. Olay: HRT-36'da \"yolları 10-08'de kapandı\" ifadesi kısaltmada silindi, karar 324 testi düştü.",
+        "**Yeni cetvel başlığı Sahibi ve Son doğrulama taşır; README satırı, sahiplik kaydı ve araç envanteri satırı aynı PR'da gelir.** Yerelde `belge-tazelik`, `rol-kartlari` ve `arac-envanteri` testleri koşulur. Olay: #1991 (Son doğrulama eksik, CI kırmızı), HRT-59 (#2040, envanter satırı için INV-ARAC-1 uyarısı).",
+        "**JSON ya da cetvel okuyan her test koşulur, yalnız yazdığın değil.** Bir veri dosyasını okuyan tüm testler (dış bağımlılık beyanı, sahiplik, görev verisi) PR'dan önce çalışır. Olay: #2018 (`diagram` skill'i dış bağımlılık tablosunda beyansızdı, `ajan-skill-cozulur` CI'da kırmızı).",
+        "**Üretici `--yaz` CRLF checkout'ta fazladan dosya değiştirir; yalnız gerçek değişenler tutulur.** `git diff --ignore-space-at-eol --stat` ile ayır, kalanı `git checkout -- <dosya>` ile geri al; yeni üretici kolu eklenince bunu tekrar ölç. Olay: HRT-59 ve HRT-71'de 17 kurallar dosyası sahte değişti.",
+        "**Ağır test dosyaları paralel değil tek tek koşulur.** Bellek darken beş dosya birlikte `sessionstart-pencere-adi`'ni 60 sn sınırında düşürür (tek başına 65/65). Olay: HRT-45 (25 Ekim)."
+      ]
+    },
     "KATALOG": {
+      "yollar": ["scripts/icerik-hatti/**", "scripts/db/product-data/**"],
       "kurallar": [
         "**Baskı tazeliği.** Canlı değer doğrulanmadan ya da yazılmadan önce kaynağın üreticideki SON baskısı `kaynak-dizini/katalog-envanteri.json`'dan okunur (`yerine_gecer`, `uretici_son_baski`); DB değerinin hangi baskıdan geldiği karta yazılır; eski baskı ile güncel baskı çelişirse güncel baskı kazanır. Olay: Radon CA-RM (KTL-48) canlı değerleri kaynaksız şablondu; Lineo Quiet'te (KTL-50) 12 ses değerinin 12'si Aralık 2020 baskısındandı, Şubat/Mayıs 2026 baskısı farklı yayımlıyor.",
         "**Alan değişmeden önce okuyanlar taranır.** Bir `technical_specs` anahtarının değeri değişmeden, kaldırılmadan ya da başka alana taşınmadan önce `src/` ve başka departmanların veri dosyalarında (ör. `src/data/sessizFan`) onu okuyan yerler aranır ve karta listelenir; okuyan varsa alan yerinde düzeltilir, taşıma ayrı karardır. Olay: sessiz fan sihirbazı yalnız `noise_level_db_a` okuyor ve kapsamı tam Lineo Quiet'in 12 modeli; alanı yeni ada taşımak 12 modelin ses puanını boşaltırdı (KTL-50).",
@@ -65,6 +88,7 @@
       "sonaAlinan": "İşe uymayan genel kurallar silinmez, sona alınır: K3 RLS-first, K30 Storage RLS (Faz 2 park)."
     },
     "URUN": {
+      "yollar": ["src/components/products/*.tsx", "src/views/category/**", "src/lib/services/**", "src/lib/seo/jsonld.ts", "src/lib/pricing/**", "src/app/_components/{aileSayfasi,ProductDetailPageView,kategoriSayfasi,urunlerSayfasi}.tsx"],
       "kurallar": [
         "**Servis katmanında DI (Mutlak Kural 2).** `src/lib/services/*` fonksiyonu ilk parametre `supabase` alır, modül düzeyi client yok; her yeni servis için sahte fetch ile süzgeç/hata yolu testi yazılır. Olay: URN-135'te `sessizFanKodlari.service.ts` bu desenle yazıldı, ilk yazımda status/silinmiş süzgeci testle sabitlendi.",
         "**Fiyat görünmüyorsa şemada da yok.** Yapısal veride `offers` yalnız vitrinde görünen geçerli fiyat için; teklif kipinde, fiyatsız ya da karışık ailede `ProductGroup/Product/hasVariant/offers` yazılmaz, `CollectionPage` + `ItemList` yazılır; `price: 0`, uydurma `review/aggregateRating` yasak. Olay: REC-111 (80 ürün adresinin 72'sinde gerçek fiyat yayınlandı) ve URN-138 (Search Console KRİTİK, 47 aile / 441 varyant).",

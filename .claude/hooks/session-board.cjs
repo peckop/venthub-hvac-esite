@@ -749,8 +749,49 @@ bolum('yontem', 6,
 // POSTA KUTUSU SAYACI (karar 54, 2026-09-21): açılışta kutuya bakılmazsa kapalı pencereye
 // bırakılan mesaj yine kaybolur. 0 → satır yok; ölçülemezse "ölçülemedi" satırı (temiz sayılmaz).
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
+/**
+ * ÖNCE BUNLAR / SIRADA (ARC-217): departman penceresi açılınca elindeki In Progress/Review kartlar yeni emirden ÖNCE
+ * görünür. Rol kartının hemen arkasına (üçüncü sıra) girer. Kanban okunamazsa ya da rol kartsızsa (OPS dahil) sessiz.
+ */
+function onceBunlarEkle() {
+  try {
+    if (!rolSeridi || String(rolSeridi).trim().toUpperCase() === 'OPS') return
+    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).acilisMetni(rolSeridi)
+    if (!metin) return
+    bolumler.splice(2, 0, {
+      ad: 'once-bunlar',
+      oncelik: 2,
+      tam: metin,
+      ozet: 'ÖNCE BUNLAR: elindeki In Progress/Review kartlar yeni emirden önce — node scripts/board/kanban-anlik.cjs --pano <departman> --acik --kisa\n',
+    })
+  } catch {
+    /* Kanban okunamadı: açılış bloklanmaz */
+  }
+}
+
+/** VADESİ GELEN (ARC-236): yalnız OPS penceresi açılışında; Kanban okunamazsa sessiz (fail-open). */
+function vadeEkle() {
+  try {
+    if (!rolSeridi || String(rolSeridi).trim().toUpperCase() !== 'OPS') return
+    const t = new Date()
+    const bugun = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
+    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).vadeMetni(bugun)
+    if (!metin) return
+    bolumler.splice(2, 0, {
+      ad: 'vade',
+      oncelik: 2,
+      tam: metin,
+      ozet: 'VADESİ GELEN kartlar var — node scripts/board/kanban-anlik.cjs --acik --kisa --vade-son <bugün>\n',
+    })
+  } catch {
+    /* Kanban okunamadı: açılış bloklanmaz */
+  }
+}
+
 const yaz = () => {
   rolBolumuEkle()
+  onceBunlarEkle()
+  vadeEkle()
   haritaBolumuEkle()
   const cikti = {
     hookEventName: 'SessionStart',

@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.
 
 ## Düzenli görevler
-- 7 görev, tetiğe bağlı 3: `docs/roller/TASARIM-gorevler.md`.
+- 6 görev, tetiğe bağlı 6: `docs/roller/TASARIM-gorevler.md`.
 
 ## Dosyalar
 `src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7), `docs/plans/tasarim-kod-plani-v2*` (dosya kümesi plan önerisidir, karar değil). Cetvel: marka token eşlemesi (OPS onaylı devir 09-30, önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN'da kalır.

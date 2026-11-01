@@ -13,9 +13,12 @@ import { type DesteklenenDil, tercihEdilenDil } from './utils/dilTespiti'
 import { kokDosyaKarari } from './utils/kokDosya'
 import { Routes } from './utils/routes'
 
+// `/monitoring` = Sentry tünel rotası (next.config.mjs `tunnelRoute`). Sentry 11 webpack derlemesi
+// artık tüneli ara katmandan kaçırmıyor; dışlanmazsa tarayıcının Sentry POST'u `/tr/monitoring`'e
+// 307 ile yönlenir ve olay kaybolur (ALT-46, canlıda POST /monitoring → 307 ölçüldü).
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|ttf|woff|woff2|otf|hdr|exr|glb|gltf|mp4|webm)).*)',
+    '/((?!_next/static|_next/image|favicon.ico|images|fonts|monitoring(?:/|$)|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|ttf|woff|woff2|otf|hdr|exr|glb|gltf|mp4|webm)).*)',
   ],
 }
 

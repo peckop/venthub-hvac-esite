@@ -11,9 +11,11 @@ import {
   PRODUCTS_DISCOVERY_TAG,
   variantStockTag,
 } from '@/lib/cache/tags'
+import { AZAMI_ZINCIR_DERINLIGI } from '@/lib/data/kategoriZinciri'
 import { SATIS_KIPI_TAG } from '@/lib/kip/satisKipi'
 import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import { imzaDogrula, imzaTekrariMi } from '@/lib/webhook/imza'
 // Yalnız `type` import eden saf yardımcı (React/i18n/client bağımlılığı YOK — ölçüldü),
 // bu yüzden route handler'da güvenle kullanılır.
 import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
@@ -264,17 +266,39 @@ function istekKategoriCozucu(): KategoriCozucu {
 async function revalidateCategoryTree(
   category: CategoryRow,
   kategoriSatiri: KategoriCozucu,
-  zatenTazelenen?: readonly string[]
+  zatenTazelenen?: readonly string[],
+  atalarDahil = false
 ): Promise<string[]> {
   const parent = await kategoriSatiri(category.parent_id ?? undefined)
-  const paths = categoryPathsFor(category, parent).filter((p) => !zatenTazelenen?.includes(p))
+  const kume = categoryPathsFor(category, parent)
+  /**
+   * URN-144 (karar 410): ürün/stok değişimi, kategorinin TÜM ata sayfalarının listesini de etkiler (kök sayfası alt
+   * ağaçtaki aileleri listeler). Ürünün sütunları karma olabilir (`category_id` orta kademe, `subcategory_id` yaprak):
+   * kök kimliği sütunda bulunmayabilir, bu yüzden ata zinciri `parent_id`'den yürünür. Döngü korumalı, derinlik sınırlı.
+   * Yalnız ürün/stok dallarında açılır (`atalarDahil`); `categories` dalı kendi kuralını korur. Canlı iki kademede
+   * ürünün `category_id` sütunu zaten kök olduğundan küme değişmez (üst yolu `zatenTazelenen` ile süzülür).
+   */
+  if (atalarDahil) {
+    const gorulen = new Set<string>(category.id ? [category.id] : [])
+    let ata = parent
+    for (let adim = 0; ata && adim < AZAMI_ZINCIR_DERINLIGI; adim++) {
+      if (ata.id) {
+        if (gorulen.has(ata.id)) break
+        gorulen.add(ata.id)
+      }
+      for (const p of categoryPathsFor(ata, null)) if (!kume.includes(p)) kume.push(p)
+      ata = await kategoriSatiri(ata.parent_id ?? undefined)
+    }
+  }
+  const paths = kume.filter((p) => !zatenTazelenen?.includes(p))
   for (const p of paths) revalidatePath(p)
   return paths
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = (await request.json()) as SupabaseWebhookPayload
+    // ALT-76: imza HAM gövde üzerinden doğrulanır; gövde bir kez okunur, JSON olarak sonra çözülür.
+    const hamGovde = await request.text()
     const webhookSecret = request.headers.get('x-webhook-secret')
 
     /**
@@ -310,9 +334,47 @@ export async function POST(request: NextRequest) {
       )
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
+    /**
+     * ALT-76 · HMAC-SHA256 imza + replay koruması (CLAUDE.md kural 11), GEÇİŞ AŞAMASI.
+     * İmza başlığı VARSA karar yalnız imzaya bağlıdır: geçersiz ya da pencere dışı imza,
+     * düz secret doğru olsa bile 401 alır (imzalı istek düz secret ile kurtarılamaz) ve aynı
+     * imzanın pencere içinde tekrarı da 401'dir. İmza YOKSA eski düz secret yolu sürer;
+     * veritabanı tetiği imza üretene kadar (ayrı migration, Recep onayı) bu yol açık kalır.
+     */
+    const simdiMs = Date.now()
+    const imzaSonucu = imzaDogrula({
+      secrets: acceptedSecrets,
+      zamanSn: request.headers.get('x-webhook-timestamp'),
+      imza: request.headers.get('x-webhook-signature'),
+      hamGovde,
+      simdiMs,
+    })
+    if (imzaSonucu === 'gecersiz' || imzaSonucu === 'bayat') {
+      console.warn(`Unauthorized Supabase webhook attempt blocked (imza: ${imzaSonucu}).`)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (imzaSonucu === 'gecerli') {
+      // Doğrulama imzayı küçük harfe çevirir; tekrar anahtarı da AYNI kanonik biçimden alınır
+      // (aksi hâlde büyük harfli hex ile aynı imza tekrar korumasını atlatırdı).
+      if (imzaTekrariMi((request.headers.get('x-webhook-signature') ?? '').toLowerCase(), simdiMs)) {
+        console.warn('Unauthorized Supabase webhook attempt blocked (imza tekrarı).')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    } else if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
       console.warn('Unauthorized Supabase webhook attempt blocked.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Gövde YALNIZ kimlik doğrulandıktan sonra çözülür: kimliksiz çağıran ayrıştırma hatasıyla
+    // iç durum öğrenemez; doğrulanmış çağırana bozuk JSON 400 döner.
+    let payload: SupabaseWebhookPayload
+    try {
+      payload = JSON.parse(hamGovde) as SupabaseWebhookPayload
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+    if (payload === null || typeof payload !== 'object') {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
     console.warn(`[Supabase Webhook] Received ${payload.type} event on table "${payload.table}"`)
@@ -438,7 +500,7 @@ export async function POST(request: NextRequest) {
       for (const kategoriId of kategoriKimlikleri) {
         const category = await kategoriSatiri(kategoriId)
         if (category) {
-          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths)))
+          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths, true)))
         }
       }
     }
@@ -511,8 +573,12 @@ export async function POST(request: NextRequest) {
           .limit(MAX_KATEGORI_COCUK + 1)
         if (cocukHatasi) {
           // Üstün kendi yolları, etiketler ve site haritası yine tazelenir; hata yanıt sonunda 500 ile bildirilir.
-          kategoriCocukHatasi = `categories çocuk sorgusu düştü (parent_id=${self.id}): ${cocukHatasi.message}`
-          console.error(`[Supabase Webhook] ${kategoriCocukHatasi}`)
+          // ALT-76: yanıta yalnız AŞAMA adı girer (genel mesaj); parent_id ve veritabanı hata metni
+          // yalnız sunucu günlüğüne yazılır, çağırana dönmez.
+          kategoriCocukHatasi = 'categories çocuk sorgusu düştü'
+          console.error(
+            `[Supabase Webhook] ${kategoriCocukHatasi} (parent_id=${self.id}): ${cocukHatasi.message}`,
+          )
         }
         const cocuklar = children ?? []
         if (cocuklar.length > MAX_KATEGORI_COCUK) {
@@ -532,6 +598,42 @@ export async function POST(request: NextRequest) {
             const eskiChildPaths = categoryPathsFor(child, eskiSelf).filter((p) => !revalidatedPaths.includes(p))
             for (const p of eskiChildPaths) revalidatePath(p)
             revalidatedPaths.push(...eskiChildPaths)
+          }
+        }
+
+        /**
+         * URN-144 (karar 410) — TORUNLAR. Üç kademede KÖK değişince yaprak sayfalarının kırıntısında kökün adı ve
+         * bağlantısı da yer alır; yalnız doğrudan çocukları tazelemek yaprakları bayat bırakırdı. Yalnız KÖK satırda
+         * (`parent_id` boş) bir halka daha inilir: orta kademenin çocukları yapraktır, yaprağın çocuğu olmaz. İki
+         * kademede kökün çocukları yapraktır (çocuk sorgusu boş döner) ve küme DEĞİŞMEZ. Okuma çocuk başına TEK ve
+         * küçüktür (bir üstün en çok birkaç çocuğu var); toplam torun sayısı `MAX_KATEGORI_COCUK` ile sınırlıdır.
+         * Sorgu hatası çocuk sorgusuyla aynı biçimde yutulmaz: yanıt 500 olur.
+         */
+        if (self.parent_id === null && cocuklar.length > 0) {
+          let torunSayisi = 0
+          torunDongusu: for (const child of cocuklar.slice(0, MAX_KATEGORI_COCUK)) {
+            if (!child.id) continue
+            const { data: torunlar, error: torunHatasi } = await supabase
+              .from('categories')
+              .select('id, slug, metadata, parent_id')
+              .eq('parent_id', child.id)
+            if (torunHatasi) {
+              kategoriCocukHatasi = 'categories torun sorgusu düştü'
+              console.error(
+                `[Supabase Webhook] ${kategoriCocukHatasi} (parent_id=${child.id}): ${torunHatasi.message}`,
+              )
+              continue
+            }
+            for (const torun of torunlar ?? []) {
+              if (torunSayisi >= MAX_KATEGORI_COCUK) {
+                fanoutTruncated = true
+                break torunDongusu
+              }
+              torunSayisi++
+              const torunYollari = categoryPathsFor(torun, child).filter((p) => !revalidatedPaths.includes(p))
+              for (const p of torunYollari) revalidatePath(p)
+              revalidatedPaths.push(...torunYollari)
+            }
           }
         }
       }
@@ -566,7 +668,7 @@ export async function POST(request: NextRequest) {
           if (product.category_id) {
             const category = await kategoriSatiri(product.category_id)
             if (category) {
-              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri)))
+              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, undefined, true)))
             }
           }
         }
@@ -813,10 +915,10 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     }, { status: kategoriCocukHatasi === null ? 200 : 500 })
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
+    // ALT-76: iç hata metni çağırana dönmez; ayrıntı yalnız sunucu günlüğündedir.
     console.error('[Supabase Webhook Error]:', error)
     return NextResponse.json(
-      { error: errorMsg },
+      { error: 'Internal error' },
       { status: 500 }
     )
   }

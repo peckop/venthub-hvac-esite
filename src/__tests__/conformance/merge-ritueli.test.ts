@@ -398,3 +398,32 @@ describe('INV-RITUEL-2 · okuma sorusu (kanca/ayar/MCP sınıfı)', () => {
       .not.toMatch(/\bkirmizi\s*(\+\+|\+=|=(?!=))|process\.exit/)
   })
 })
+
+describe('INV-RITUEL-3 · öz-doğrulama: --merge yalnız master\'daki betikle (ARC-194 3b)', () => {
+  const oz = (ritual as unknown as { ozDogrulama: (a: string, b: unknown) => { tamam: boolean; sebep: string } }).ozDogrulama
+  const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+
+  it('aynı içerik geçer; CRLF/LF ve sondaki satır sonu farkı sayılmaz', () => {
+    expect(oz('a\nb\n', 'a\nb').tamam).toBe(true)
+    expect(oz('a\r\nb\r\n', 'a\nb').tamam).toBe(true)
+  })
+
+  it('SABOTAJ: tek karakter farkı (kapıyı gevşeten düzenleme) reddedilir', () => {
+    const r = oz('const MIGRASYON_KONTROLU = false\n', 'const MIGRASYON_KONTROLU = true\n')
+    expect(r.tamam).toBe(false)
+    expect(r.sebep).toContain('FARKLI')
+  })
+
+  it('fail-closed: master metni yok/boş/okunamadıysa geçmez', () => {
+    for (const m of [null, undefined, '', 42]) expect(oz('x', m).tamam).toBe(false)
+  })
+
+  it('CLI: öz-doğrulama yalnız --merge ile ve gh pr merge\'DEN ÖNCE çalışır', () => {
+    const i = kaynak.indexOf('ozDogrulama(fs.readFileSync(__filename')
+    const merge = kaynak.indexOf("'pr', 'merge'")
+    expect(i, 'CLI çağrısı kaybolmuş').toBeGreaterThan(0)
+    expect(merge, 'gh pr merge çağrısı bulunamadı').toBeGreaterThan(0)
+    expect(i).toBeLessThan(merge)
+    expect(kaynak.slice(Math.max(0, i - 400), i)).toContain('if (MERGE)')
+  })
+})

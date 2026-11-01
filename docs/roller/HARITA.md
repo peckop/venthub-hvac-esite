@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Belge ve hafıza düzenini güncel, bulunabilir ve tutarlı tutar; bayat belge, kırık yol ya da cetvelsiz iş yüzünden bir ekibin yanlış bilgiyle çalışması önce mesaj satırında, sonra kartta görünür.
 
 ## Düzenli görevler
-- 4 görev, tetiğe bağlı 2: `docs/roller/HARITA-gorevler.md`.
+- 4 görev, tetiğe bağlı 4: `docs/roller/HARITA-gorevler.md`.
 
 ## Dosyalar
 CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**.

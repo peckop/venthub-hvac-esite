@@ -236,6 +236,8 @@ describe('skills-eval CLI yolu SADE bağlamda koşar (EK-1)', () => {
   it('koşucu sabiti claude spawn argümanlarına yayıyor', () => {
     const kaynak = fs.readFileSync(path.resolve(__dirname, '../../../scripts/skills-eval-run.mjs'), 'utf8')
     expect(kaynak).toMatch(/import\s*\{[^}]*CLI_SADE_BAYRAKLAR[^}]*\}\s*from '\.\/skills-eval\/lib\.mjs'/)
-    expect(kaynak).toMatch(/spawnSync\('claude',\s*\['-p',\s*'--model',\s*MODEL,\s*\.\.\.CLI_SADE_BAYRAKLAR\]/)
+    expect(kaynak).toMatch(/spawnSync\('claude',\s*\['-p',\s*'--model',\s*MODEL,\s*\.\.\.CLI_SADE_BAYRAKLAR(?:,\s*'--max-budget-usd',\s*'0\.50')?\]/)
+    // ARC-237: bütçe sınırı çağrıda durmalı (sade bayrak dizisini bozmadan sonuna eklenir)
+    expect(kaynak).toContain("'--max-budget-usd', '0.50'")
   })
 })

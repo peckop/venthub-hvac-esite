@@ -38,20 +38,20 @@ export const buildPricingSettingsSchema = (t: (key: string) => string) => {
       .min(1, v('atLeastOneCurrency'))
       .refine((arr) => arr.includes('TRY'), { message: v('tryRequired') }),
     default_vat_rate_pct: z
-      .coerce.number({ invalid_type_error: v('invalidNumber') })
+      .coerce.number({ error: v('invalidNumber') })
       .min(0, v('vatRange'))
       .max(100, v('vatRange')),
     default_price_is_vat_inclusive: z.boolean(),
     default_round_to: z
-      .coerce.number({ invalid_type_error: v('invalidNumber') })
+      .coerce.number({ error: v('invalidNumber') })
       .gt(0, v('positiveNumber')),
     default_charm_ending: z.preprocess((val) => {
       if (val === '' || val === null || val === undefined) return null
       const num = typeof val === 'number' ? val : Number(val)
       return Number.isNaN(num) ? val : num
-    }, z.number({ invalid_type_error: v('invalidNumber') }).gte(0, v('charmRange')).lt(1, v('charmRange')).nullable()),
+    }, z.number({ error: v('invalidNumber') }).gte(0, v('charmRange')).lt(1, v('charmRange')).nullable()),
     display_spread_pct: z
-      .coerce.number({ invalid_type_error: v('invalidNumber') })
+      .coerce.number({ error: v('invalidNumber') })
       .min(-50, v('spreadRange'))
       .max(50, v('spreadRange')),
   })
@@ -61,6 +61,8 @@ export const buildPricingSettingsSchema = (t: (key: string) => string) => {
 export const pricingSettingsSchema = buildPricingSettingsSchema((key) => key)
 
 export type PricingSettingsValues = z.infer<typeof pricingSettingsSchema>
+// zod 4 + resolvers 5: form alanları GİRDİ tipiyle (coerce/preprocess öncesi), gönderilen değer ÇIKTI tipiyle tanımlanır.
+type PricingSettingsInput = z.input<typeof pricingSettingsSchema>
 
 export const DEFAULT_PRICING_SETTINGS: PricingSettingsValues = {
   base_currency: 'TRY',
@@ -90,7 +92,7 @@ const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message })
   ) : null
 
 /** Submit'te odak taşınacak alanların DOM sırası (yukarıdan aşağı). */
-const FIELD_FOCUS_ORDER: { name: keyof PricingSettingsValues; id: string }[] = [
+const FIELD_FOCUS_ORDER: { name: keyof PricingSettingsInput; id: string }[] = [
   // Para birimi grubunda TRY kapatılamaz → odak ilk DEĞİŞTİRİLEBİLİR kutuya gider.
   { name: 'enabled_currencies', id: 'pricing-settings-currency-EUR' },
   { name: 'default_vat_rate_pct', id: 'pricing-settings-vat-rate' },
@@ -100,7 +102,7 @@ const FIELD_FOCUS_ORDER: { name: keyof PricingSettingsValues; id: string }[] = [
 ]
 
 /** İlk bozuk alana odak (`shouldFocusError:false` — sıra DETERMİNİSTİK olsun diye). */
-function focusFirstInvalid(errs: FieldErrors<PricingSettingsValues>): void {
+function focusFirstInvalid(errs: FieldErrors<PricingSettingsInput>): void {
   const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
   if (!first) return
   document.getElementById(first.id)?.focus()
@@ -126,7 +128,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
   const [saving, setSaving] = useState(false)
 
   const schema = React.useMemo(() => buildPricingSettingsSchema(t), [t])
-  const form = useForm<PricingSettingsValues>({
+  const form = useForm<PricingSettingsInput, unknown, PricingSettingsValues>({
     resolver: zodResolver(schema),
     // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid).
     shouldFocusError: false,
@@ -134,7 +136,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
   })
 
   /** Hata mesajını string olarak çeker (`any` YOK). */
-  const fieldError = (name: keyof PricingSettingsValues): string | undefined => {
+  const fieldError = (name: keyof PricingSettingsInput): string | undefined => {
     const message = form.formState.errors[name]?.message
     return typeof message === 'string' ? message : undefined
   }

@@ -188,6 +188,18 @@ useEffectEvent is for non-reactive logic called from Effects; it is not a way
 to hide reactive dependencies or create an ordinary click handler.
 Check its [current semantics](https://react.dev/reference/react/useEffectEvent).
 
+## YTN-21 eklemeleri: bileşen erişilebilirliği ve durumlar
+
+> Kaynak: addyosmani/agent-skills frontend-ui-engineering @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT); VentHub'a uyarlandı, 26 Ekim 2026, YTN-21. Veri çekme kütüphanesi (React Query vb.) alınmadı: veri RSC'de çekilir (kural 4).
+> Görsel kalite, yapay zekâ görünümü ve renk kuralları için `ui-ux-pro-max`.
+
+- **Klavye:** etkileşimli öğe `<button>`/`<a>` olur; `<div onClick>` odaklanamaz. `role="button"` kaçınılmaz ise `tabIndex={0}`, Enter ve Boşluk işlenir.
+- **Etiket:** görünür metni olmayan düğmede `aria-label` (sözlükten), form alanında `<label htmlFor>`.
+- **Odak:** içerik değişince (diyalog açılışı, adım değişimi) odağı bilinçli taşı; diyalog içinde odak tuzağı, kapanışta tetikleyiciye dönüş.
+  Odak taşıma efektine yalnız DOM ile senkron için izin var; bu bir dış sistemle eşitleme sayılır, temizliği yazılır.
+- **Durumlar:** her bileşende yükleme, boş, hata, başarı ve yetkisiz durumu ele alınır; boş ekran bırakma. Hata ve boş durum metinleri sözlükten gelir.
+- **Bitmeden:** Tab ile gezinti çalışıyor, konsol hatasız, axe uyarısı yok (`pnpm exec vitest run <yol>` ile a11y testi).
+
 ## Skills in scope
 
 - `typescript-strict` — for component and hook typing

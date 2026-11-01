@@ -122,15 +122,51 @@ function dbSatirlari(dbYolu, simdi = Date.now(), gun = PENCERE_GUN) {
   }
 }
 
-function calistir(env = process.env, simdi = Date.now()) {
+/**
+ * ARC-207: sage daemon canlı mı? `server.json` var VE içindeki pid yaşıyor (hafiza-enjeksiyonu.cjs `daemonCanliMi` ile AYNI
+ * ölçü). Konu ve dosya kancaları daemon yoksa SESSİZCE ders basmaz; bu satır o sessizliği görünür yapar.
+ * Hiçbir bağlantı açmaz, hiçbir süreç başlatmaz; uyarı yalnız bilgidir, hiçbir kapıyı gevşetmez/sıkmaz.
+ * @returns {string} '' (canlı) ya da "⚠SAGE KAPALI: dersler yüklenmiyor (sebep)"
+ */
+function daemonUyarisi(dbKok, { oku = fs.readFileSync, canliMi = null } = {}) {
+  const yasiyor =
+    canliMi ||
+    ((pid) => {
+      if (!Number.isInteger(pid) || pid <= 0) return false
+      try {
+        process.kill(pid, 0)
+        return true
+      } catch (e) {
+        return Boolean(e && e.code === 'EPERM') // var ama sahibi başka: yaşıyor
+      }
+    })
+  let j
+  try {
+    j = JSON.parse(oku(path.join(dbKok, '.wrongstack', 'memories', 'server.json'), 'utf8'))
+  } catch (e) {
+    const sebep = e && e.code === 'ENOENT' ? 'server.json yok' : 'server.json okunamadı'
+    return `⚠SAGE KAPALI: dersler yüklenmiyor (${sebep})`
+  }
+  const pid = Number(j && j.pid)
+  return yasiyor(pid) ? '' : `⚠SAGE KAPALI: dersler yüklenmiyor (daemon pid ${Number.isInteger(pid) ? pid : '?'} ölü)`
+}
+
+function calistir(env = process.env, simdi = Date.now(), { daemonOku, daemonCanliMi } = {}) {
   if (env.VENTHUB_SAGE_YAZIM_SAYACI_KAPALI === '1') return ''
   try {
     const { anaKok, agacKoku } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs'))
     const dbKok = env.VENTHUB_SAGE_DB_KOKU || anaKok()
+    let uyari = ''
+    try {
+      uyari = daemonUyarisi(dbKok, { oku: daemonOku, canliMi: daemonCanliMi })
+    } catch {
+      uyari = '' // uyarı üretilemezse sayaç satırı yine de basılır
+    }
+    const onek = uyari ? `${uyari}\n` : ''
     const yol = path.join(dbKok, '.wrongstack', 'memories', 'sage.db')
-    if (!fs.existsSync(yol)) return 'SAGE-YAZIM: ölçülemedi (sage.db yok)'
+    if (!fs.existsSync(yol)) return `${onek}SAGE-YAZIM: ölçülemedi (sage.db yok)`
     const beklenen = beklenenRoller(path.join(agacKoku(), '.claude', 'agents'))
-    return satir(say(dbSatirlari(yol, simdi), beklenen, simdi))
+    return onek + satir(say(dbSatirlari(yol, simdi), beklenen, simdi))
   } catch (e) {
     return `SAGE-YAZIM: ölçülemedi (${String((e && e.message) || e).split('\n')[0].slice(0, 80)})`
   }
@@ -138,7 +174,20 @@ function calistir(env = process.env, simdi = Date.now()) {
 
 if (require.main === module) {
   try {
-    const cikti = calistir()
+    let cikti = calistir()
+    // ARC-220 (karar 420): sayaç satırı pencere başına yalnız durum değişince (⚠ departman kümesi) basılır; sayılar oynaktır.
+    try {
+      let sid = ''
+      try {
+        sid = String(JSON.parse(fs.readFileSync(0, 'utf8') || '{}').session_id || '')
+      } catch {
+        /* girdi yok: süzme yapılmaz */
+      }
+      const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+      if (cikti) cikti = require(path.join(__dirname, 'uyari-susturma.cjs')).suz(cikti, sid, pano, Date.now(), 'sage').replace(/\n$/, '')
+    } catch {
+      /* süzme bozulduysa satır olduğu gibi basılır */
+    }
     if (cikti) process.stdout.write(cikti + '\n')
   } catch {
     /* kanca turu asla bloklamaz */
@@ -146,4 +195,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { rolAdi, beklenenRoller, say, satir, dbSatirlari, calistir }
+module.exports = { rolAdi, beklenenRoller, say, satir, dbSatirlari, daemonUyarisi, calistir }

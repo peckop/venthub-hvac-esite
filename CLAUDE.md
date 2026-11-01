@@ -116,7 +116,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 
 **Nereye bakılacağını bilmiyorsan önce `docs/README.md`'yi aç.** Orada iki tablo var: "haritaların haritası"
 (kod → CodeGraph, kod + veritabanı → graphify + şema grafı, metin arama → WrongStack dizini, dosya dersi → sage,
-geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar), iş durumu → Kanban, tazelik → durum satırları) ve
+geçmiş karar → Kanban + Linear Kararlar arşivi (NotebookLM defterleri salt okunur arşiv, karar 419), iş durumu → Kanban, tazelik → durum satırları) ve
 "hangi soru → hangi cetvel". Yeni cetvel oraya satırı eklenmeden bitmiş sayılmaz. Belge bayatlığı her mesajdaki
 `BELGE` satırında görünür (`docs/standards/belge-yonetimi-standard.md`).
 
@@ -138,13 +138,11 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar),
   sorusu → önce KAYNAK DİZİNİ:** `<ingestor>/kaynak-dizini/sayfalar.jsonl` (+ `manifest.json`);
   **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`<ingestor>/scripts/kaynak_dizini/cikar.py`,
   tazelik kapısı `tazelik.py`). Cetvel: `catalog-ingestion-standard.md` §6.3.
-  NLM auth bozulursa → memory `nlm-auth-issue`
-  (**2026-08-17 ürün değişti:** paket `notebooklm-py`, CLI `notebooklm`, MCP sunucusu `notebooklm-py`;
-  çözüm `notebooklm login`. `auth check` tek başına kanıt DEĞİL — `notebooklm list` ile ölç).
+  NotebookLM emekli (karar 419): defterler salt okunur arşivdir, oturumu yenilenmez, yeni kaynak yüklenmez.
 - `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
 - `.claude/skills/` = Claude Code yetenekleri · `.agent/skills/` = Antigravity/worker yetenekleri — **İKİSİ DE AKTİF ve KASITLI** (çift ağaç); birleştirme/silme ÖNERME.
 
-## Bilgi Kaynağı İş Akışı (dört katman)
+## Bilgi Kaynağı İş Akışı (üç katman)
 
 - **Kod yapısı / "ne çağırıyor, neyi etkiler, nerede" sorusu** → önce **CodeGraph** (AST grafiği,
   ~1sn taze, kesin). grep'ten önce buna bak.
@@ -153,9 +151,9 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar),
   deterministik). Dizinde yoksa **önce dizine eklenir** (`<ingestor>/scripts/kaynak_dizini/cikar.py`);
   tazelik `tazelik.py` ile ölçülür. Cetvel: `catalog-ingestion-standard.md` §6.3.
   *(Niçin kural: PDF'i doğrudan tarayan her iş, aynı kataloğu üçüncü kez okur — patinajın sebebi buydu.)*
-- **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
-  ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `docs/README.md` haritası.
-- **Çelişirse kod kazanır.** NLM ikizi snapshot'tır, drift edebilir (ör. tablo sayısı); kod
+- **Kural / niçin / mimari karar / SaaS plan sorusu** → `docs/README.md` haritası, `docs/standards/` cetvelleri ve Kanban + Linear
+  Kararlar arşivi. (NotebookLM dijital ikiz ve takip defteri emekli: salt okunur arşiv, karar 419.)
+- **Çelişirse kod kazanır.** Arşivdeki NotebookLM defterleri snapshot'tır, drift eder (ör. tablo sayısı); kod
   yapısı için daima CodeGraph/gerçek kaynağı doğrula. CLAUDE.md = her oturum yüklü çekirdek katman.
 
 ## Notlar
@@ -171,8 +169,9 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar),
   repoda fork PR'ı yabancı kodu makinede çalıştırır; (3) `permissions:` bloğu yazıyorsan
   `contents: read` yine ZORUNLU (varsayılanlar düşer, checkout "Repository not found" verir).
 - **Worktree `node_modules` (karar 88, 2026-09-23):** her worktree **kendi** kurulumunu yapar:
-  `pnpm install --frozen-lockfile --offline` (pnpm sabit bağlantı kullanır → disk maliyeti ~0, ölçüldü;
-  kilit dosyası değişmemeli). Ana depoya **junction/symlink ile paylaşım YASAK** — 09-23'te `git worktree remove`
+  `pnpm install --frozen-lockfile --prefer-offline` (pnpm sabit bağlantı kullanır → disk maliyeti ~0, ölçüldü;
+  kilit dosyası değişmemeli; `--offline` DEĞİL: yükseltmeyle gelen paket mağazada yoksa `--offline`
+  ERR_PNPM_NO_OFFLINE_TARBALL ile düşer, 2026-10-31 fallow 3.38.1 — `--prefer-offline` mağazadakini kullanır, eksiği indirir). Ana depoya **junction/symlink ile paylaşım YASAK** — 09-23'te `git worktree remove`
   junction'dan geçip ana deponun node_modules'unu sildi. Eski bağlantı varsa önce YALNIZ bağlantı kaldırılır
   (`cmd //c "rmdir <yol>"`, `/s` YOK), ana deponun `.bin`'i doğrulanır. Özyinelemeli silmeyi
   `silme-baglanti-kapisi` kancası dışa giden bağlantı varken durdurur.
@@ -182,8 +181,6 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar),
   Eskisi rastgele reddediyordu (aynı dosya 80/100 ↔ 100/100) ve 3 dalından 2'si sessizce ölüydü.
 
 - **CONTEXT.md emekli** — yönlendirme sayfası olarak duruyor; "iyileştirme" adına yeniden doldurma.
-- Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
-  NotebookLM "VentHub Proje Hafızası" defterine (dijital ikiz) yüklenir.
 
 ## graphify
 

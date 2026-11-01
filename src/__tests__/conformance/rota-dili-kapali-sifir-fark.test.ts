@@ -56,7 +56,9 @@ async function yukle(anahtar: string | undefined) {
   return {
     redirects: (await yapilandirma.redirects?.()) ?? [],
     headers: (await yapilandirma.headers?.()) ?? [],
-    beforeFiles: rewriteListesi?.beforeFiles ?? [],
+    // Sentry 11 `tunnelRoute` için `beforeFiles` altına `/monitoring` yeniden yazımları ekler (ALT-46); rota dili
+    // ile ilgisizdir. Bu kapı rota dili kurallarını ölçer, bu yüzden tünel kuralları ayrılır.
+    beforeFiles: (rewriteListesi?.beforeFiles ?? []).filter((k: { source: string }) => !k.source.startsWith('/monitoring')),
     afterFiles: rewriteListesi?.afterFiles ?? [],
     fallback: rewriteListesi?.fallback ?? [],
   }

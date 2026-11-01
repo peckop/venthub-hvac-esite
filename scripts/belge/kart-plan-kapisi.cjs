@@ -409,7 +409,32 @@ function main(argv) {
   return kod
 }
 
-module.exports = { degerlendir, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
+/**
+ * KART SINIFI ÖLÇÜM SATIRI (HRT-78, ARC-216 B kolu isteği). Kural verisi scripts/belge/kart-sinif-olcum.json.
+ * Kart bir sınıfa girerse (etiket `olcum-<ad>` ya da yalnız BAŞLIKTA dar anahtar sözcük) açıklamada
+ * `ÖLÇÜM: <ad> — <sonuç>` satırı aranır. PLAN başlığı İSTEMEZ (ARC-220 gürültüsü geri gelmesin). SAF; kartı okumak çağıranın işi.
+ * @param {{baslik?: string, aciklama?: string, etiketler?: string[]}} kart
+ * @param {object} [veri] test için ezme; yoksa JSON dosyası okunur
+ * @returns {string[]} eksik satır mesajları ([] = tanınan sınıf yok ya da hepsi tamam)
+ */
+function olcumEksikleri(kart, veri) {
+  const v = veri || JSON.parse(fs.readFileSync(path.join(__dirname, 'kart-sinif-olcum.json'), 'utf8'))
+  const baslik = asciiKatla((kart && kart.baslik) || '')
+  const etiketler = ((kart && kart.etiketler) || []).map((e) => String(e).trim().toLowerCase())
+  const satirlar = govdeyiTemizle((kart && kart.aciklama) || '').split('\n').map(sus)
+  const eksikler = []
+  for (const s of v.siniflar) {
+    const taniniyor = etiketler.includes(s.etiket) || (s.baslikKalibi != null && new RegExp(s.baslikKalibi).test(baslik))
+    if (!taniniyor) continue
+    const kalip = new RegExp(`^[Öö][Ll][Çç][Üü][Mm][ \\t]*:[ \\t]*${kacis(s.ad)}[ \\t]*[—–-]+[ \\t]*(.*)$`)
+    const satir = satirlar.map((x) => x.match(kalip)).find(Boolean)
+    if (!satir) eksikler.push(`ÖLÇÜM: ${s.ad} satırı yok (${s.ne}); biçim: ${v.satirBicimi}`)
+    else if (bosluksuz(satir[1]) < v.asgariSonucKarakter) eksikler.push(`ÖLÇÜM: ${s.ad} sonucu çok kısa (${bosluksuz(satir[1])}/${v.asgariSonucKarakter} karakter)`)
+  }
+  return eksikler
+}
+
+module.exports = { olcumEksikleri, degerlendir, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
 
 if (require.main === module) {
   process.exitCode = main(process.argv.slice(2))

@@ -115,7 +115,8 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
   const [saving, setSaving] = useState(false)
 
   // Determine active schema dynamically
-  const schema = React.useMemo(() => {
+  // zod 4 + resolvers 5: bölüme göre değişen şemalar tek geniş tipte buluşur (form değerleri Record).
+  const schema = React.useMemo<z.ZodType<Record<string, unknown>, Record<string, unknown>>>(() => {
     const v = (key: string) => t(`admin.settings.validation.${key}`)
     if (!section) return buildGeneralSchema(v)
     switch (section) {

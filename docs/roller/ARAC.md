@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Filonun araçları (kanca, pano, ayar, ritüel) bozulmadan ve ölçülerek çalışır; bir kapı ya da kanca sessizce ölürse aynı gün görünür ve sahibine yazılır.
 
 ## Düzenli görevler
-- 1 görev, tetiğe bağlı 0: `docs/roller/ARAC-gorevler.md`.
+- 1 görev, tetiğe bağlı 1: `docs/roller/ARAC-gorevler.md`.
 
 ## Dosyalar
 .claude/hooks/**, scripts/board/**, scripts/hijyen/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.

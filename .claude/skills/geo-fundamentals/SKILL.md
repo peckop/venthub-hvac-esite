@@ -15,8 +15,8 @@ metadata:
 | Kaynak metin | Bizde |
 |---|---|
 | `scripts/geo_checker.py` | `python .claude/skills/geo-fundamentals/scripts/geo_checker.py <yol>` (Windows'ta `python`, `python3` değil). **Skor yanıltıcıdır:** betik yalnız `./` ve `../` göreli import'ları izler; bizde görünen metin `@/views/…` takma adıyla ve sözlükten (i18n) geldiği için ince sayfa kabuğunu puanlar. Skoru kanıt sayma, ipucu say |
-| "Claude-Web" tarayıcı adı (Bölüm 7) | Kaynak listesi eski olabilir; `robots.txt` kararı `docs/standards/geo-olcum-standard.md` ve GEO-SEO rol kuralıyla verilir |
-| Article/Person/FAQPage şeması | JSON-LD üretimi `src/lib/seo/` altındadır; var olan bileşen kullanılır, yenisi yazılmaz |
+| Tarayıcı adları (Bölüm 7) | Claude için güncel adlar ClaudeBot, Claude-SearchBot, Claude-User ("Claude-Web" bayat, düzeltildi 26 Ekim); diğer adlar eski olabilir; `robots.txt` kararı `docs/standards/geo-olcum-standard.md` ve GEO-SEO rol kuralıyla verilir |
+| Article/Person şeması | JSON-LD üretimi `src/lib/seo/` altındadır; var olan bileşen kullanılır, yenisi yazılmaz. **FAQPage konmaz** (`rehber-yazisi-standard.md`: zengin sonuç 2026-05-07'de kalktı) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -106,7 +106,7 @@ How AI engines select content to cite:
 
 - [ ] Article schema with dates
 - [ ] Person schema for author
-- [ ] FAQPage schema
+- [ ] (FAQPage şeması konmaz: Google SSS zengin sonucunu 2026-05-07'de kaldırdı, `rehber-yazisi-standard.md`)
 - [ ] Fast loading (< 2.5s)
 - [ ] Clean HTML structure
 
@@ -130,7 +130,7 @@ How AI engines select content to cite:
 | Crawler | Engine |
 |---------|--------|
 | GPTBot | ChatGPT/OpenAI |
-| Claude-Web | Claude |
+| ClaudeBot / Claude-SearchBot / Claude-User | Claude (eğitim / arama dizini / kullanıcı isteğiyle getirme; eski ad "Claude-Web" bayat) |
 | PerplexityBot | Perplexity |
 | Googlebot | Gemini (shared) |
 

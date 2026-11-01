@@ -44,7 +44,6 @@ import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/produc
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
 import type { KirintiAdimi } from '../../lib/seo/kirinti'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
-import { getFamiliesEnriched } from '../../lib/services/family.service'
 import { getProductById } from '../../lib/services/product.service'
 import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
@@ -120,6 +119,12 @@ export interface ProductDetailPageProps {
    * Aile rotasında, kullanıcı `?sku=` ile belirli bir model seçmedikçe varyant açıklamasının önüne geçer.
    */
   gorunenAciklama?: string | null
+  /**
+   * URN-147 — "İlgili aileler" kartları SUNUCUDA okunur ve fiyatı süzülür (`ilgiliAileVerisi`, aileSayfasi.tsx). Eskiden bu
+   * bileşen listeyi tarayıcıdan çekiyordu; XHR yanıtı teklif modundaki ailenin gerçek `min_price`'ını taşıyordu.
+   * Boş liste = blok çizilmez.
+   */
+  initialRelatedFamilies?: FamilyListItem[]
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -164,6 +169,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   markaHref,
   gorunenBaslik = null,
   gorunenAciklama = null,
+  initialRelatedFamilies = [],
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
@@ -175,7 +181,6 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const { refreshProjects } = useProjectLists()
   const { categories } = useCategories()
 
-  const [relatedFamilies, setRelatedFamilies] = useState<FamilyListItem[]>([])
   const [actionProduct, setActionProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('general')
@@ -262,24 +267,6 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
       .catch((err) => { console.warn('Error fetching variant product row:', err) })
     return () => { cancelled = true }
   }, [selectedVariantId])
-
-  // İlgili aileler — bu ailenin alt kategorisinden (yoksa ana kategoriden), kendisi hariç.
-  const relatedCategoryId = family?.subcategory_id ?? family?.category_id ?? null
-  useEffect(() => {
-    if (!relatedCategoryId || !family) {
-      setRelatedFamilies([])
-      return
-    }
-    let cancelled = false
-    const ownFamilyId = family.id
-    getFamiliesEnriched(supabase, { categoryIds: [relatedCategoryId], limit: 12 })
-      .then(({ items }) => {
-        if (cancelled) return
-        setRelatedFamilies(items.filter((f) => f.id !== ownFamilyId).slice(0, 4))
-      })
-      .catch((err) => { console.warn('Error fetching related families:', err) })
-    return () => { cancelled = true }
-  }, [relatedCategoryId, family])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1097,7 +1084,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
       <div className="bg-white py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {relatedFamilies.length > 0 && (
+          {initialRelatedFamilies.length > 0 && (
             <>
               <h2 className="text-xl sm:text-2xl font-black text-industrial-gray mb-10 uppercase tracking-tight">
                 {t('pdp.relatedProducts')}
@@ -1105,7 +1092,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {/* priority=false — "ilgili seriler" bloğu PDP'nin en altında, yani her
                     kırılımda fold ALTINDA (cetvel §R7). Karar §R9 gereği açıkça yazılı. */}
-                {relatedFamilies.map((f) => <FamilyCard key={f.id} family={f} compact priority={false} />)}
+                {initialRelatedFamilies.map((f) => <FamilyCard key={f.id} family={f} compact priority={false} />)}
               </div>
             </>
           )}

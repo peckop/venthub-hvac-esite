@@ -10,6 +10,7 @@ import { getDictValue } from '@/i18n/getDictValue'
 import { sessizFanRehberHref } from '@/lib/bilgiMerkezi/sessizFanRehberi'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
+import { altAgacKimlikleri, ataZinciriGetir, cocuklarHaritasi } from '@/lib/data/kategoriZinciri'
 import { getCachedKategoriUstById, type KategoriUst } from '@/lib/data/preload'
 import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
@@ -28,6 +29,7 @@ import {
 
 import { SITE_URL } from '../../config/siteUrl'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
+import { listeFiyatiniSuz } from '../../lib/pricing/teklifModuSuzgeci'
 import type { DomainCategory } from '../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
@@ -93,9 +95,28 @@ const getCachedKategoriSayimlari = (lang: string, tenantId: string) => unstable_
 )()
 
 /**
+ * Kategori ağacının iskeleti (kimlik + üst + aktiflik; URN-144, karar 410). Üç kademede kök sayfası orta VE yaprak
+ * kategorilerin ailelerini de listeler; torunları bulmak için tüm ağaç gerekir (30-40 satır). `lang` × `tenantId`
+ * başına TEK okuma, hata FIRLATILIR (önbelleğe hata yazılmaz); etiketler kategori yapısı değişince tazelenen KEŞİF
+ * etiketleridir (`categories` webhook'u `PRODUCTS_DISCOVERY_TAG`'i tazeler).
+ */
+const getCachedKategoriAgaci = (lang: string, tenantId: string) => unstable_cache(
+  async () => {
+    const { data, error } = await supabase.from('categories').select('id, parent_id, is_active')
+    if (error) throw error
+    return (data ?? []) as { id: string; parent_id: string | null; is_active: boolean | null }[]
+  },
+  ['category-tree', lang, tenantId],
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+)()
+
+/**
  * Aile listesi önbelleği. Anahtar SaaS kuralı gereği hem `lang` hem `tenantId`
  * hem de kategori + sayfa içerir (kural 12); etiketler ana sayfa (home-data) değil
  * KEŞİF (discovery) alanıdır — stok hareketi bu listeyi thrash etmez (PS-042).
+ *
+ * URN-144: anahtara `categoryIds` ÖZETİ de girer. Liste yalnız kategori kimliğine değil KÜMEYE bağlıdır (kök sayfası
+ * alt ağaçtaki tüm aileleri listeler); küme değişince (yeni yaprak, göç) aynı kimlikli eski liste dönmesin.
  */
 const getCachedFamilies = (
   lang: string,
@@ -109,7 +130,7 @@ const getCachedFamilies = (
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE
   }),
-  ['category-families', lang, tenantId, categoryId, String(page)],
+  ['category-families', lang, tenantId, categoryId, String(page), [...categoryIds].sort().join(',')],
   // revalidate: 3600 = emniyet kemeri (webhook sinyali kaçarsa en fazla 1 saat bayat).
   { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
 )()
@@ -344,6 +365,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
   let sesOzeti: SesOzeti | null = null
   let rehberHref: string | null = null
   let ustKategori: DomainCategory | null = null
+  let atalar: DomainCategory[] = []
 
   if (category) {
     // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59). Eskiden `(await getTenantConfig()).id`
@@ -369,7 +391,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
     // SSR: Alt kategorilerin tam verisini çek — client-side hydration race'ini ortadan kaldır
     // URN-112: alt kategorinin ÜSTÜ de sunucuda okunur (kırıntı ham HTML'de dolu gelsin). `getCachedKategoriUstById`
     // React.cache'li ve HATA FIRLATIR: üstsüz sayfa "üst yok" diye önbelleğe yazılmasın. Kök kategoride sorgu yok.
-    const [{ data: subsData }, countsData, ustSatiri] = await Promise.all([
+    const [{ data: subsData }, countsData, ustSatiri, agacSatirlari] = await Promise.all([
       supabase
         .from('categories')
         // `marketing_title` KASITEN YOK — emekli alan (REC-297); gerekçe `preload.ts`
@@ -379,9 +401,17 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         .eq('is_active', true)
         .order('sort_order', { ascending: true }),
       getCachedKategoriSayimlari(lang, tenantId),
-      category.parent_id ? getCachedKategoriUstById(category.parent_id) : Promise.resolve(null)
+      category.parent_id ? getCachedKategoriUstById(category.parent_id) : Promise.resolve(null),
+      getCachedKategoriAgaci(lang, tenantId)
     ])
     ustKategori = ustKategoriSatiri(ustSatiri)
+    // URN-144 (karar 410): kırıntı TAM zincirdir (kök → … → doğrudan üst). Doğrudan üst yukarıda okundu; daha
+    // yukarısı varsa React.cache'li okuyucuyla tırmanılır (iki kademede ek okuma YOK: üstün `parent_id`'si boş).
+    // Okuma hatası fırlar (yukarıdaki gerekçe). Pasif ata kırıntıya basılmaz (`ustKategoriSatiri`: null).
+    if (ustSatiri) {
+      const ustlerKokten = [...(await ataZinciriGetir(ustSatiri.parent_id, getCachedKategoriUstById)), ustSatiri]
+      atalar = ustlerKokten.map(ustKategoriSatiri).filter((a): a is DomainCategory => a !== null)
+    }
 
     // Ürünü OLMAYAN alt kategoriler gizlenir — CategoryContext istemcide aynı count>0
     // süzgeçini uyguluyordu; SSR'da uygulanmayınca hydration'da kart zıplaması oluyordu.
@@ -403,12 +433,24 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         authority_content: s.authority_content as AuthorityContent | null
       } as DbCategory))
 
-    const categoryIds = [category.id, ...subCategories.map(s => s.id)]
+    // URN-144: liste kümesi = kendisi + alt AĞAÇTAKİ aktif ve ürünlü kategoriler (doğrudan çocuklar + torunlar).
+    // Kök/orta/yaprak kimliği `parent_id` zincirinden gelir; aile sütunlarının karma olması kümeyi etkilemez
+    // (RPC `category_id = any(ids) OR subcategory_id = any(ids)` ile eşler). Pasif ara kademe geçilir ama kümeye girmez.
+    // İki kademede torun yoktur: küme eskisiyle aynıdır (kendisi + sayımı olan aktif doğrudan çocuklar).
+    const agacSatiri = new Map((agacSatirlari ?? []).map((s) => [s.id, s]))
+    const torunKimlikleri = altAgacKimlikleri(category.id, cocuklarHaritasi(agacSatirlari ?? [])).slice(1)
+    // Sıra: kendisi, doğrudan çocuk kartları (bugünkü sıra), sonra daha derin torunlar. Çocuk kartları iskelette
+    // görünmese bile (iskelet bayat/boş) bugünkü küme yitirilmez.
+    const categoryIds = [category.id, ...subCategories.map((s) => s.id)]
+    for (const id of torunKimlikleri) {
+      if (!categoryIds.includes(id) && agacSatiri.get(id)?.is_active === true && (countMap.get(id) ?? 0) > 0) categoryIds.push(id)
+    }
 
     const familiesPage = await getCachedFamilies(lang, tenantId, category.id, page, categoryIds)
     // INV-DIL-DUSUSU-1: aile satırı {tr,en} açıklamayı taşır; kart göstermese de istemciye
     // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
-    families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
+    // URN-142: teklif modunda min_price RSC yüküne girmez (karar `quoteModeHesapla`, kategori metadata'sından).
+    families = listeFiyatiniSuz(familiesPage.items, category).map((f) => aileMetniniIndir(f, lang))
     total = familiesPage.total
 
     // URN-95: Vortice anlatısı yalnız hava perdesi kategorisinde ve Vortice ailesi listeleyen sayfada çizilebilir
@@ -466,6 +508,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
         pageSize={PAGE_SIZE}
         initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
         initialParentCategory={ustKategori}
+        initialAncestors={atalar}
         vorticeKatalogSayilari={vorticeSayilari}
         sesOzeti={sesOzeti}
         rehberHref={rehberHref}

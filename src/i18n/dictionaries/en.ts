@@ -33,6 +33,7 @@ export const en: typeof tr = {
     update: 'Update',
     unitMeters: '{{v}} m',
     unitCubicMeters: '{{v}} m³',
+    unitCubicMetersPerHour: '{{v}} m³/h',
     unitNewton: '{{v}} N',
     dimensions3D: '{{l}}m × {{w}}m × {{h}}m',
     dimensions2D: '{{w}}m × {{h}}m',
@@ -85,7 +86,8 @@ export const en: typeof tr = {
       // REC-103: see tr.ts — 8 of the 23 active DB categories had no key here at all,
       // so /en pages silently fell back to the Turkish `menu_label`.
       fans: 'Fans',
-      'control-systems': 'Control Systems',
+      // Decision 409 (KTL-63): the `control-systems` row became "Electrical Accessories" (key and English slug unchanged).
+      'control-systems': 'Electrical Accessories',
       sub: {
         bathroom: 'Bathroom and Toilet Fans',
         window: 'Window and Wall Fans',
@@ -122,7 +124,9 @@ export const en: typeof tr = {
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
         'electric-curtain': 'Electrically Heated Air Curtains',
-        'spare-parts': 'Spare Parts and Sensors'
+        'spare-parts': 'Sensors and Protection',
+        // Decision 410 (Recep, KTL-63): second subcategory of the Accessories root; the key is bound by the database migration.
+        'mechanical-accessories': 'Mechanical Accessories'
       }
     },
     viewAll: 'View all',
@@ -3045,7 +3049,7 @@ export const en: typeof tr = {
     // `k` is the source note (catalogue + page).
     faq: {
       title: 'Frequently Asked Questions',
-      rehberBaglantisi: 'Guide: How to choose a quiet fan',
+      rehberBaglantisi: 'Guide: How to choose a quiet duct fan',
       items: [
         {
           q: 'What is Vortice Lineo Quiet?',

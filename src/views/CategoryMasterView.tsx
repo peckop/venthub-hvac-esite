@@ -82,6 +82,8 @@ interface CategoryMasterViewProps {
    * beklemeden ham HTML'de dolu gelir; bağlam yüklenince aynı kategoriyi verir.
    */
   initialParentCategory?: DomainCategory | null
+  /** URN-144 (karar 410): kırıntı için tüm aktif atalar, kökten başa (kendisi hariç); sunucudan. */
+  initialAncestors?: DomainCategory[]
   /**
    * REC-213-A — YALNIZ keşif (kategorisiz) hâlinde kullanılır: `/products` sayfasının
    * kategori kapısı. Kategori sayfalarında anlamsızdır ve oraya geçilmez; kırıntı yolu
@@ -110,6 +112,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   pageSize = 24,
   initialSubCategories,
   initialParentCategory,
+  initialAncestors,
   kategoriler,
   vorticeKatalogSayilari,
   sesOzeti,
@@ -121,11 +124,12 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   const {
     category: rawCategory,
     parentCategory: rawParentCategory,
+    ancestors,
     subCategories: rawSubCategories,
     loading,
     filters,
     updateFilters
-  } = useCategoryGateway(initialCategory, initialSubCategories, initialParentCategory)
+  } = useCategoryGateway(initialCategory, initialSubCategories, initialParentCategory, initialAncestors)
 
   // 2. Presentation Layer (ViewModel)
   const { wrapCategory } = useCategoryViewModel()
@@ -224,6 +228,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
           <CategoryLandingView
             category={category.raw}
             parentCategory={parentCategory?.raw}
+            ancestors={ancestors}
             families={visibleFamilies}
             vorticeKatalogSayilari={vorticeKatalogSayilari}
             sesOzeti={sesOzeti}
@@ -236,6 +241,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
           <CategorySeriesView
             category={category.raw}
             parentCategory={parentCategory?.raw}
+            ancestors={ancestors}
             subCategories={rawSubCategories}
             families={visibleFamilies}
           />
@@ -247,6 +253,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
                 <CategorySeriesView
                   category={category.raw}
                   parentCategory={parentCategory?.raw}
+                  ancestors={ancestors}
+                  subCategories={rawSubCategories}
                   families={visibleFamilies}
                 />
             )
@@ -258,6 +266,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
               <CategoryLandingView
                 category={category.raw}
                 parentCategory={parentCategory?.raw}
+                ancestors={ancestors}
                 families={visibleFamilies}
                 vorticeKatalogSayilari={vorticeKatalogSayilari}
                 sesOzeti={sesOzeti}

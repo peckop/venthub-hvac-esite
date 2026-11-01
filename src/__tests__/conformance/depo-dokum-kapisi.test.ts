@@ -53,8 +53,8 @@ describe('INV-DEPO-DOKUM-1 · kapının kendi sözleşmesi', () => {
     expect(kapi.FIYAT_ESIGI).toBe(5)
   })
 
-  it('kural kimlikleri R1..R6', () => {
-    expect(Object.keys(kapi.KURALLAR)).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6'])
+  it('kural kimlikleri R1..R7', () => {
+    expect(Object.keys(kapi.KURALLAR)).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7'])
   })
 
   it('taranan uzantılar: json/jsonl/ndjson/csv/tsv/sql', () => {
@@ -338,7 +338,9 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı TARAMASI (O2): kişisel kalıba uyan
   })
 
   it('JSON: belirgin tolerans adı (tc_kimlik_no) TEK dolu satırda bile R1', () => {
-    expect(kurallar('d.json', JSON.stringify({ tc_kimlik_no: 'dolu' }))).toEqual(['R1'])
+    // ALT-105: değer artık RAKAMLI olmalı (rakamsız metin arayüz etiketidir, numara değil); rakamsız etiket davranışı
+    // depo-dokum-kapisi-r1-onizleme.test.ts'te pinli.
+    expect(kurallar('d.json', JSON.stringify({ tc_kimlik_no: 'dolu1' }))).toEqual(['R1'])
   })
 
   it('JSON: aynı tolerans anahtarı 3 kez geçmeli; her biri bir kez geçen FARKLI anahtarlar toplanmaz (i18n sözlüğü yanlış alarm vermez)', () => {

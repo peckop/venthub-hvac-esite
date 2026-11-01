@@ -7,32 +7,29 @@ metadata:
   uyarlama: "YETENEK 2026-10-01 (REC-519, WrongStack alımı PR 2) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi; 1.1.0'a taşındı: YETENEK 2026-10-12 (YTN-18), kaynak gövde 1.1.0 ile yeniden eşitlendi, ek bölümler korundu"
 ---
 
-> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0, `skills/sdd/SKILL.md`, MIT lisansı. Aşağıdaki
-> "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
+> **Kaynak:** WrongStack `@wrongstack/core` 1.1.0 `skills/sdd` (MIT) çekirdeği; addyosmani kaynaklı bölümlerin altında
+> kendi kaynak satırı var. VentHub'a uyarlandı, 26 Ekim 2026, YTN-21. "Araç eşlemesi" ve "VentHub ek kuralları" bize aittir.
 
 ## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
 
 | Kaynak metin | Bizde |
 |---|---|
-| `codebase-context` / `codebase-search` / `codebase-stats` | `codebase_context` / `codebase_search` / `codebase_stats` (tire yerine alt çizgi; `mcp__wrongstack-codebase-index__*`) |
+| `codebase-context` / `codebase-search` / `codebase-stats` | `codebase_context` / `codebase_search` / `codebase_stats` (alt çizgi; `mcp__wrongstack-codebase-index__*`) |
 | `codebase-repo-map` | `codebase_package_graph` ya da `graphify` |
 | `codebase-incoming-calls` / `codebase-outgoing-calls` | `codebase_symbol_graph` ya da `codegraph_explore` |
-| `codebase-impact-analysis` | `graphify affected "sembol()"` (**parantez şart**: parantezsiz "No unique node match" verir) |
-| `codebase-targeted-test`, `codebase-skeleton` | Yok. Kapsayan testi değişen dosyanın yanında / `src/__tests__/` altında elle bul; iskelet için aralıklı `Read` |
-| `<nextsteps>` etiketi | **Hiç üretilmez.** Bizde ayrıştırıcı yok; Recep'e rapor akan cümledir |
-| `/sdd …` komutları (satır ~37-58) ve görev yaşam döngüsü komutları | WrongStack ana programının; Claude Code'da **yok**. Spec elle `docs/plans/<ad>-<tarih>.md` olarak yazılır; görev durumları (satır ~91-98) `/sdd` deposunda değil **Kanban alt kartında** tutulur |
-| **"Goal & Eternal Mode" bölümü (satır 108-123: `/goal`, `/autonomy eternal`)** | **UYGULANMAZ, çıkarılmış say.** Sebep: bu komutlar Claude Code'da yok (bölüm zaten çalışmaz) ve sonsuz `decide→execute→reflect→sleep` döngüsü karar 53 (zamanlayıcı/döngü önce Recep'le) ile "kuyruk bitince dur" sözüyle çelişir. Yalnız Recep AÇIKÇA isterse konuşulur |
-| `output-standards` atfı | Bizde yok (1.1.0 paketinde var, alınmadı); atıf yok sayılır. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu ve Recep çıktı stili |
+| `codebase-impact-analysis` | `graphify affected "sembol()"` (**parantez şart**) |
+| `/sdd …` komutları, görev yaşam döngüsü, `/goal`, `/autonomy eternal` | Claude Code'da **yok**, gövdeden çıkarıldı. Spec elle `docs/plans/<ad>-<tarih>.md`; görev listesi ve durumları **Kanban kartı / alt kartı** (`tasks/todo.md` gibi yeni dizin açılmaz; kart planı: `docs/standards/kart-plani-standard.md`). Sonsuz döngü karar 53 ile çelişir; yalnız Recep açıkça isterse konuşulur |
+| `<nextsteps>` etiketi, `output-standards` atfı | Hiç üretilmez / bizde yok. Rapor biçimi: aşağıdaki Bitiş Durumu bloğu |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
 1. Spec yapısının başına **"0. Cetvel / YÖNTEM"** bölümü eklenir (kural 1): hangi cetvel yönetiyor, iş hangi yöntemle koşacak.
 2. Spec veritabanı değişikliği içeriyorsa `create-migration` ve `plan-challenger` ZORUNLU (kural 13).
-3. Çekirdek (ölçülebilir kabul ölçütü, gerçek bağımlılık, kritik yol) olduğu gibi alındı.
+3. Çekirdek (ölçülebilir kabul ölçütü, gerçek bağımlılık, kritik yol) olduğu gibi alındı. Yerelde komut örneği `pnpm test:ilgili` ya da `pnpm exec vitest run <yol>`; tam paket CI'da. Commit yalnız istenince atılır.
 
 ---
 
-# Spec-Driven Development — WrongStack
+# Spec-Driven Development
 
 ## Selection card
 - Task: Define acceptance criteria and dependent tasks.
@@ -41,88 +38,73 @@ metadata:
 
 ## Overview
 
-For an SDD task, start with a spec proportionate to its scope. The spec is the source of truth — it defines what to build, how to verify it, and what counts as done. SDD uses `/sdd` slash commands to create specs, generate task graphs, and track execution.
+The spec is the source of truth: it defines what to build, how to verify it, and what counts as done. Code without a spec is guessing. Size the spec to the task: a small concrete fix proceeds directly with a two-line acceptance; do not open a planning ceremony solely to satisfy this skill. Write a spec when the change touches several files or modules, an architectural decision is pending, requirements are ambiguous, or the work exceeds about an hour.
 
 ## Rules
 
-1. Use SDD for requested specifications or tasks that benefit from explicit acceptance and dependency tracking.
-2. Spec must have acceptance criteria — without them, you can't know when it's done.
-3. Record real dependencies between tasks, and only real ones — unchained tasks are the ones that can run in parallel.
-4. Spec must be specific: "Users authenticate via OAuth2 with PKCE" not "improve auth".
-5. For urgent work, keep acceptance and recovery explicit without forcing unnecessary ceremony.
-6. When the spec reveals a refactor, apply the refactor-planner skill to sequence it.
+1. Spec must have observable acceptance criteria (command or user-journey check); without them you cannot know when it is done.
+2. Record real dependencies between tasks, and only real ones; unchained tasks can run in parallel.
+3. Spec must be specific: "Users authenticate via OAuth2 with PKCE" not "improve auth".
+4. For urgent work keep acceptance and recovery explicit without forcing ceremony.
+5. When the spec reveals a refactor, apply the `refactor-planner` skill to sequence it.
+6. Planning-only requests return the spec; an already authorized implementation request continues into execution and checks. Do not start goals, loops or scheduled work without authorization.
 
-## When to use
+## Gated workflow
 
-- New feature implementation
-- Bug fix with complexity
-- Refactoring with scope
-- Any task requiring more than 1 hour
+SPECIFY → PLAN → TASKS → IMPLEMENT. Do not advance until the current phase is reviewed by the human.
 
-## The SDD workflow
+### Phase 0: Scope check (module map)
 
-```
-1. /sdd new [title]          → Build spec from questions
-2. /sdd tasks <id>           → Generate task graph from spec
-3. /sdd graph <id>           → Visualize dependencies
-4. /sdd critical <id>        → Find bottlenecks
-5. /sdd execute <id>         → Run tasks (or execute manually)
-```
+Skip when the request is one capability. Decompose first when one request bundles several independently testable capabilities (own consumers or data, acceptance criteria that cluster and could ship separately, one part cuttable without rewriting the others). Propose a small capability map before any spec: a table of `Module id | Responsibility | Depends on` plus a build order (e.g. `identity → billing, notifications → reporting`).
 
-## Task lifecycle commands
+- Stable kebab-case module ids, chosen once, never renamed mid-initiative.
+- Dependency direction without cycles; two modules that need each other are one module.
+- The contract between modules belongs in the provider module's spec.
+- The map is gated: the human reviews boundaries, direction and build order before any module spec. Then Specify → Plan → Tasks → Implement per module, in dependency order; specs are named by module id.
 
-| Command | What it does |
-|---------|--------------|
-| `/sdd tasks` | Show task list with progress bar (sorted: in_progress → pending → review → blocked → failed → completed) |
-| `/sdd next` | Show next executable task + blockers |
-| `/sdd done <N>` | Complete a task (by number or fuzzy title match) |
-| `/sdd skip <N>` | Skip a task back to pending |
-| `/sdd fail <N>` | Mark a task as failed |
-| `/sdd review <N>` | Send a task to review |
-| `/sdd edit <N> <text>` | Edit task title (short text) or description (long text) |
-| `/sdd undo` | Undo last task completion |
-| `/sdd graph` | ASCII task dependency visualization |
-| `/sdd critical` | Critical path analysis + bottlenecks |
+Kaynak: addyosmani/agent-skills spec-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
-## Spec templates
+### Phase 1: Specify
 
-| Template | Best for |
-|---|---|
-| `feature` | New feature development |
-| `bugfix` | Bug fix with root cause analysis |
-| `refactor` | Code refactoring with goals |
-| `infra` | Infrastructure/tooling changes |
-| `integration` | External service integration |
-| `cli-command` | New CLI commands/slash commands |
-
-## Spec structure
-
-A complete spec has:
-1. **Overview** — What problem does this solve?
-2. **Requirements** — `[priority] description` format
-3. **Architecture** — High-level design (if needed)
-4. **API Design** — Endpoints, inputs, outputs (if applicable)
-5. **Acceptance Criteria** — How do we know it's done?
-
-### Requirement format
+**Surface assumptions first.** Before writing spec content, list them and ask for correction:
 
 ```
-[critical] Users can authenticate with OAuth2
-[high] Rate limiting: 100 req/min per user  
-[medium] Response time < 200ms p95
-[low] Support dark mode
+VARSAYIMLAR:
+1. Web uygulaması (yerel mobil değil)
+2. Yetki kararı app_metadata üzerinden (kural 12)
+3. Veritabanı Supabase PostgreSQL (mevcut şemaya göre)
+→ Yanlışsa şimdi düzelt, yoksa bunlarla ilerliyorum.
 ```
 
-## Task graph generation
+Never silently fill an ambiguous requirement; assumptions are the most dangerous misunderstanding.
 
-Each requirement generates one or more tasks. Tasks have states:
+**Six core areas:** Objective (what, why, for whom, what success looks like) · Commands (full executable commands) · Project structure (where code, tests, docs go) · Code style (one real snippet beats three paragraphs) · Testing strategy (framework, location, levels) · Boundaries (Always / Ask first / Never).
+
+**Reframe vague requirements as measurable ones:**
+
 ```
-pending → in_progress → review → completed
-              ↓
-           blocked (waiting on dependencies)
-              ↓
-           failed
+İSTEK: "Panel daha hızlı olsun"
+ÖLÇÜLEBİLİR: LCP < 2,5 s (üretim derlemesi, aynı koşul) · ilk veri yükü < 500 ms · CLS < 0,1
+→ Hedefler doğru mu?
 ```
+
+If the project already uses another spec format, keep its artifact format; this skill owns the clarification, content and approval gates.
+
+**Stop after writing the spec.** Summarize it, list Open Questions, ask for approval, and END THE TURN. Do not start the plan or code in the same turn; planning starts after approval in a later turn.
+
+Kaynak: addyosmani/agent-skills spec-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+
+### Phase 2: Plan
+
+Components and dependencies, build order, risks and mitigations, what is parallel versus sequential, verification checkpoints. Plan and task list go on the **Kanban card** (not `tasks/plan.md`); the card states which standard governs it.
+
+### Phase 3: Tasks
+
+Each task: completable in one session, explicit acceptance, a verification step, ordered by dependency (not perceived importance), about five files at most. Template: `- [ ] Görev: <ne> · Kabul: <ne doğru olmalı> · Doğrula: <komut ya da elle kontrol> · Dosyalar: <hangileri>`.
+
+### Phase 4: Implement
+
+One task at a time, test-first where it fits (`testing` skill), loading only the spec sections and files each step needs.
 
 ## Critical path
 
@@ -132,54 +114,35 @@ The critical path finds:
 - **Ready tasks** that can start immediately
 - **Execution order** respecting all dependencies
 
-## Goal & Eternal Mode
+## Keeping the spec alive
 
-`/sdd` pairs with `/goal` for autonomous execution:
+Update the spec first when a decision or scope changes, then implement. The spec lives in the repo (`docs/plans/`) next to the code, and the PR body links the section it implements (`Kanban: <ön ek>-<sayı>`).
 
-| Command | What it does |
-|---------|--------------|
-| `/goal set <text>` | Set an autonomous mission |
-| `/goal pause` | Pause at end of current iteration |
-| `/goal resume` | Resume a paused goal |
-| `/goal journal [N]` | Show recent journal entries |
-| `/goal clear` | Clear goal and stop eternal mode |
-| `/autonomy eternal` | Run goal loop indefinitely |
-| `/autonomy stop` | Stop eternal mode |
-
-**Eternal stage flow:** `decide → execute → reflect → sleep | paused | stopped`
-Stage shown in real-time. Pause stops after current iteration completes.
+Kaynak: addyosmani/agent-skills spec-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
 ## Boundaries
 
-Use explicit acceptance for SDD work. Avoid invented dependencies, vague
-requirements and implicit goals/schedules. Planning-only work returns the spec;
-an implementation request continues into the authorized execution and checks.
+Avoid invented dependencies, vague requirements and implicit goals or schedules. A migration inside a task slice is a Recep approval point (kural 13). Kural 14: test and error paths are part of the slice, not a later task.
+
+## Red flags
+
+- Code before any written requirement; "should I just start?" before "done" is defined
+- Features not in any spec or card; architecture decisions undocumented
+- Spec written and plan or code started in the same turn
+- One spec spanning several independently testable capabilities, with no module map approved
 
 ## Before returning
 
-- [ ] Spec has observable acceptance criteria with commands or user-journey checks
-- [ ] Every requirement is specific enough to be tested, not "improve X"
-- [ ] Real dependencies recorded; independent tasks left unchained so they can run in parallel
-- [ ] Spec template matches the work type (feature/bugfix/refactor/infra/integration/cli-command)
-- [ ] Multi-file refactors use refactor-planner sequencing while preserving task scope
+- [ ] Spec covers the six areas and has observable, testable acceptance criteria
+- [ ] Assumptions were listed and the turn ended after the spec (approval in a later turn)
+- [ ] Real dependencies recorded; independent tasks left unchained
+- [ ] Multi-capability request: module map approved before module specs
+- [ ] Multi-file refactors sequenced with `refactor-planner`
 - [ ] Critical path called out; bottlenecks named; parallel groups identified
-
-## Proportional scope and execution
-
-Use a written spec when the task needs it or the user requested the SDD workflow.
-A small concrete fix can proceed directly; do not open a planning ceremony solely
-to satisfy this skill. Separate planning-only requests from implementation:
-when execution is already authorized, continue through the task graph and verify.
-Record acceptance behavior, environment boundaries and requirement-to-evidence
-links. Commands are valuable checks but not every product criterion is a command.
-Do not start goals, eternal mode or scheduled work without the required authorization.
 
 ## Skills in scope
 
-- `refactor-planner` — when the spec reveals a multi-file refactor
-- `bug-hunter` — when a bugfix spec needs a root cause analysis section
-- `multi-agent` — for executing parallel task groups
-- `output-standards` — for standardized `<nextsteps>` formatting
+- `refactor-planner` for multi-file refactors · `bug-hunter` for root-cause sections in bugfix specs · `multi-agent` for parallel task groups · `create-migration` and `plan-challenger` for DB changes
 
 <!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
 ## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt

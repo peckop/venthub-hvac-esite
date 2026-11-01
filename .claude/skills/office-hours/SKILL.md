@@ -41,8 +41,8 @@ bir tasarım notudur. Onaydan sonraki adım plan modu / plan-challenger'dır, uy
 
 ## Adım 0 — Bağlam (5 dakika, salt okuma)
 
-1. `CLAUDE.md`, `docs/DURUM-TAKIP.md` (canlı "neredeyiz" + şerit panosu), ilgili
-   `docs/standards/*` cetvelini oku.
+1. `CLAUDE.md`, Kanban panoları ve claim panosu (`board.cjs who`; canlı "neredeyiz" + şerit durumu,
+   `docs/DURUM-TAKIP.md` 2026-09-29'da emekli oldu), ilgili `docs/standards/*` cetvelini oku.
 2. `git log --oneline -30` — yakın geçmişte aynı alana dokunulmuş mu?
 3. **Önceki karar var mı?** `docs/plans/` ve Kararlar defterinde (REC-* / K-* başlıkları) fikrin
    anahtar kelimelerini ara. Varsa **önce onu söyle**: "Bu konu REC-nn'de şöyle karara bağlanmış —
@@ -57,6 +57,27 @@ bir tasarım notudur. Onaydan sonraki adım plan modu / plan-challenger'dır, uy
 - **Mühendislik modu:** iç araç, mekanizma, cetvel, hook, CI. Yalnız S2 (mevcut çözüm) ve
   S4 (en dar dilim) sorulur; S1 yerine "hangi ölçülmüş arıza bunu istiyor?" sorulur
   (CLAUDE.md'deki her kural bir arızadan doğdu — yeni mekanizma da öyle doğmalı).
+
+### Niyet ön turu (YTN-21; fikir muğlaksa, sorulardan önce)
+
+> Kaynak: addyosmani/agent-skills interview-me @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+> Kaynak: addyosmani/agent-skills idea-refine @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
+> VentHub'a uyarlandı, 26 Ekim 2026, YTN-21.
+
+Fikir bir cümlede bile anlaşılmıyorsa altı sorudan önce şunu yap:
+
+1. **Tek cümlelik varsayım + güven yüzdesi yaz:** "Senin istediğin şu sanırım: ... Güven: yaklaşık %30, eksik: kimin için, başarı neyle ölçülür."
+   Savunamayacağın yüksek sayı yazma; %70'in altındaysa eksik olanı aynı satıra ekle.
+2. **Her soruya tahminini ekle** (soru + "tahminim: ..., çünkü ..."). Yanlış tahmine tepki vermek sıfırdan cevap üretmekten kolaydır.
+   Soru sayısı yine filo-ortak "tek soru" kuralıyla sınırlıdır: her turda bir soru, cevap gelmeden ikincisi yok.
+3. **"İstediğim" ile "istemem gereken" ayrımını dinle:** "ölçeklenebilir olsun", "standart yöntem", "iyi mühendislik böyle" gibi
+   somut sonuç içermeyen cevaplarda tek soruyu sor: "Kimseye gerekçe göstermek zorunda olmasan gerçekte ne isterdin?"
+4. **Niyeti kendi sözleriyle geri yaz** (5-8 satır): Sonuç · Kim kazanır · Neden şimdi · Başarı nasıl anlaşılır · Bağlayıcı sınır ·
+   **Kapsam dışı** (zorunlu; yanlış anlaşılmanın yarısı neyin yapılmadığındaki sessiz görüş ayrılığıdır).
+5. **Açık "evet" iste.** "Sen ne iyi bulursan", "iyi görünüyor", "tamam başlayalım" evet sayılmaz: ilki yetki devri, ötekiler
+   nazik çıkıştır. İki somut seçenekle ya da "değiştirmek istediğin satır var mı?" diye yeniden sor. Evet gelmeden Adım 2'ye geçme.
+
+Etkileşimsiz bağlamda (zamanlanmış koşu, otomatik döngü) bu skill çalıştırılmaz; muğlak istek engel olarak raporlanır.
 
 ## Adım 2 — Altı zorlayıcı soru (ürün modu)
 
@@ -139,6 +160,10 @@ YOL A: [ad]
 YOL B: …
 YOL C: … (isteğe bağlı, yan çerçeve)
 ```
+
+Alternatif üretirken mercekleri tek tek dene (hepsini mekanik koşma; fikre uyanı seç): **tersine çevirme** (tam tersini yapsak?),
+**kısıt kaldırma** (süre/bütçe/teknik sınır olmasa?), **kitle kaydırma** (başka bir kullanıcı için olsa?), **birleştirme**
+(yan bir fikirle?), **10 kat sadeleştirme**, **10 kat ölçek**, **uzman merceği** (sektör uzmanının açık bulduğu, dışarıdakinin görmediği şey).
 
 Biri **"asgari uygulanabilir"** (en az dosya, en hızlı), biri **"ideal mimari"** olmalı.
 **ÖNERİ:** [X] çünkü [Recep'in söylediği hedefe bağlanan tek cümle].

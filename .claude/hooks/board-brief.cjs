@@ -213,10 +213,22 @@ if (notes.length > 0) {
   try { board.markSeen(sid, notes) } catch { /* işaretlenemedi: not tekrar gelir, zararsız */ }
 }
 
+// ARC-220 (karar 420): yalnız genel durum satırları (PANO özeti, YÖNTEM işareti) pencere başına durum değişince basılır; aynı
+// hayalet şerit ("katalog BAYAT 750dk") her mesajda tekrar etmez. LINEAR, defter sözü, LOOP ve NOT her zaman gelir (iş/karar).
+let cikanSatirlar = lines
+try {
+  const susturma = require(path.join(__dirname, 'uyari-susturma.cjs'))
+  const durumMu = (s) => /^(PANO|YÖNTEM):/.test(s)
+  const sureklilik = lines.filter((s) => !durumMu(s))
+  const suzulen = susturma.suz(lines.filter(durumMu).join('\n'), sid, process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board', Date.now(), 'brief')
+  cikanSatirlar = [...sureklilik, ...suzulen.split('\n').filter(Boolean)]
+} catch { cikanSatirlar = lines /* süzme bozulduysa hepsi basılır */ }
+if (cikanSatirlar.length === 0) process.exit(0)
+
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: 'UserPromptSubmit',
-    additionalContext: lines.join('\n'),
+    additionalContext: cikanSatirlar.join('\n'),
   },
 }))
 })()

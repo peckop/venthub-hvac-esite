@@ -65,6 +65,11 @@ Bu kaynakların çoğunun resmi PDF'i **yok**; ama NLM'e PDF'ten **daha iyi** be
 | B3 | Origin UI / shadcn Blocks | MIT — **doğrulanacak** (blok bazında) | araç; blok alınırsa kod | alınırsa evet |
 | — | 21st.dev bileşen havuzu (2026-09-19 değerlendirmesi) | **bileşen bazında** — havuz karışık; depo MIT ama bileşenlerin kendi lisansı yok, şartlar "yazarların ve 21st Labs'in münhasır mülkiyeti" | **bileşenin KENDİ kaynağında** açık MIT/Apache/BSD ibaresi varsa kod alınır; yoksa **yalnız referans** | kod alınırsa **evet** |
 | D1 | WrongStack `@wrongstack/core` 1.0.26 (Ersin Koç) — dört skill (2026-09-28, karar 165 W3) | MIT (npm `license` alanı, 2026-09-28 ölçüldü) | kod (skill metni olduğu gibi) | **evet** — NOTICE'ta |
+| D2 | `addyosmani/agent-skills` @f3400940f6 (Addy Osmani) — skill bölümleri (2026-10-26, karar 416) | MIT (depo LICENSE, OPS okuması 2026-10-26) | skill metni, VentHub'a uyarlanmış | **evet** — NOTICE'ta |
+| D2b | `addyosmani/agent-skills` @8bfcc1f991 — ek bölümler (2026-11-01, YTN-24) | MIT (GitHub lisans alanı, 2026-11-01 ölçüldü) | skill metni, VentHub'a uyarlanmış | **evet** — NOTICE'ta |
+| D3 | `trailofbits/skills` @2be6433b39 (Trail of Bits) — `fp-check`, `variant-analysis` (2026-11-01, YTN-24) | CC-BY-SA-4.0 (GitHub lisans alanı, 2026-11-01 ölçüldü) | **yalnız fikir**; metin kopyalanmadı (paylaşım-aynı-lisans yükümlülüğü doğmasın diye) | **evet** — NOTICE'ta |
+| D4 | `obra/superpowers` @2ce8aa15d0 — `receiving-code-review` (2026-11-01, YTN-24) | MIT (GitHub lisans alanı, 2026-11-01 ölçüldü) | yöntem, kendi cümlelerimizle | **evet** — NOTICE'ta |
+| D5 | `inhouseseo/superseo-skills` @9cf22cc065 — `eeat-audit`, `semantic-gap-analysis` (2026-11-01, YTN-24) | Apache-2.0 (GitHub lisans alanı, 2026-11-01 ölçüldü) | yöntem, kendi cümlelerimizle; metin ve betik alınmadı | **evet** — NOTICE'ta |
 
 ### C.1 Kalıp: lisans HAVUZDA değil, BİLEŞENDE aranır (Recep kararı, 2026-09-19)
 

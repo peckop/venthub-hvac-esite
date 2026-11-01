@@ -141,6 +141,44 @@ Bound exporter buffers and shutdown flush; telemetry failure must not create
 unbounded work or silently break the primary task. Record sampling and missing
 signals when interpreting incident counts or latency distributions.
 
+## YTN-21 eklemeleri (VentHub'a uyarlandı)
+
+> Kaynak: addyosmani/agent-skills observability-and-instrumentation @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT); ayrıntı
+> `references/soru-alarm-runbook.md`. Yığınımız Sentry + Vercel logları; ikinci gözlem yığını eklenmez; kişisel veri (KVKK) loglanmaz.
+
+- **Önce soru:** ölçüm eklemeden önce nöbetçinin soracağı 2-4 soruyu yaz; her sinyal birine cevap versin.
+- **Giriş noktası:** cron, webhook, Edge Function ya da elle tetikleme aynı log'a yazıyorsa korelasyon kimliğinin yanına `entryPoint` yaz.
+- **Alarm:** kullanıcının hissettiği belirtiye, eyleme dönük, runbook bağlantılı, gerekçeli eşikli; yalnız iki şiddet (sayfa, kart).
+- **Telemetriyi doğrula:** bilinçli hata üret, Sentry/Vercel logunda `requestId` ile bul; kişisel veri sızmadığını aynı bakışta kontrol et.
+
+## YTN-24 eki: yayın sonrası ilk saat, geri alma planı, yutturmaca tablosu (VentHub'a uyarlandı)
+
+Tek operatörlü canlı sitede (`venthub.com.tr`) yayın, izlemenin ilk gerçek sınavıdır. Yüzde eşikleri, özellik bayrağı ve kademeli yayın bu bölümün konusu değildir.
+
+**Yayın sonrası ilk saat.** Birleşme canlıya indikten sonra ilk saat içinde, sırayla:
+1. Sağlık ucu cevap veriyor (ana sayfa ve kritik bir ürün sayfası canlıda açılıyor).
+2. Sentry'de yeni bir hata türü yok; yalnız hata sayısına değil, daha önce görülmemiş imzaya bak.
+3. Kritik akış elle yürütülür (sepete ekle, ödeme adımına kadar; gerçek para hareketi başlatma).
+4. Geri alma yolu hazır: kim, hangi adımla, ne kadar sürede (aşağıdaki şablon doldurulmuş).
+Bu dört madde bitmeden iş "yayında doğrulandı" diye kapatılmaz; ölçmediğin maddeyi "ölçemedim" diye yaz.
+
+**Geri alma planı şablonu.** Yayından ÖNCE kartta yazılı olur:
+- Tetik koşulu: hangi gözlem geri almayı başlatır (ör. ödeme akışında yeni hata türü, kritik sayfa açılmıyor).
+- Adımlar: önceki dağıtıma dönüş yolu ve kimin yaptığı; adımlar komut ya da adres olarak yazılır.
+- Veritabanı notu: geri alma veriyi geri getirmez. Migration içeren yayında kod geri dönse de şema ve yazılmış veri yerinde kalır; ileri düzeltme (forward fix) planı ayrıca yazılır. Migration=prod (kural 13): bu not `database-migrations` ile birlikte okunur.
+- Süre hedefi: tetikten geri dönüşe kaç dakika; ölçülmemiş süre "bilinmiyor" diye yazılır.
+
+**Yutturmaca tablosu.**
+| Cümle | Gerçek |
+|---|---|
+| "Staging'de çalışıyor" | Canlıda veri, trafik ve ayar farklıdır; yayından sonra canlıda ölç. |
+| "İzlemeyi sonra ekleriz" | Göremediğini ayıklayamazsın; izleme yayından önce kurulur. |
+| "Cuma öğleden sonra yayınlayalım" | Tek operatörün olay anında yanında kimse yoktur; geri alma süresini bilmiyorsan ertele. |
+
+Yeni siteye geçiş (OPS-180) planı yazılırken bu bölüm `database-migrations`'daki YTN-24 eki ile birlikte okunur.
+
+Kaynak: addyosmani/agent-skills shipping-and-launch @8bfcc1f9916f2eea55494d8c1fa7f4bde867dd9e (MIT)
+
 ## Skills in scope
 
 - `security-scanner` — for confirming nothing sensitive reaches logs

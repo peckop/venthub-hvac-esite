@@ -388,6 +388,36 @@ describe('INV-AJAN-TANIM-1 — model kaydı (karar 314): üretici sabiti = diskt
     expect(diskModel('security-reviewer.md')).toBe('opus')
   })
 
+  // HRT-82 (YTN-23, karar 416): agency-agents ekleri. Kaynak satırı ve açıklamanın değişmemesi (maliyet tavanı) ölçülür.
+  it('HRT-82: security-reviewer madde 14-16 ve geo-seo-curutucu kanibalizasyon kontrolü kaynak satırıyla yazılı; açıklama değişmedi', () => {
+    const oku = (ad: string) => fs.readFileSync(path.join(kok, '.claude', 'agents', ad), 'utf8').replace(/\r\n/g, '\n')
+    const guvenlik = oku('security-reviewer.md')
+    for (const parca of ['14. **İstemciye açık önekli sır ve rotasyon', '15. **Görünüşte açık RLS', '16. **Yanlış alarm disiplini', 'agency-agents security-ai-generated-code-auditor @b37b5bb3 (MIT)']) {
+      expect(guvenlik, parca).toContain(parca)
+    }
+    expect(guvenlik, 'belirsiz akış PLAUSIBLE işaretlenir, sessiz geçilmez').toMatch(/bulguyu PLAUSIBLE işaretle/)
+    expect(guvenlik, 'anahtar değeri bulguya yazılmaz').toMatch(/anahtarın\s+değeri asla yazılmaz/)
+    const curutucu = oku('geo-seo-curutucu.md')
+    for (const parca of ['Kanibalizasyon kontrolü', 'Başlık ve H1 kopyasızlığı', 'veri depoya GİRMEZ', 'agency-agents marketing-seo-specialist @b37b5bb3 (MIT)']) {
+      expect(curutucu, parca).toContain(parca)
+    }
+    expect(curutucu).toContain('description: GEO-SEO departmanının çürütücü çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.')
+    expect(oku('security-reviewer.md')).toMatch(/^description: VentHub'a özel güvenlik gözden geçirici\./m)
+  })
+
+  // HRT-86 (YTN-24 madde 11): addyosmani çürütme disiplini YALNIZ ops-curutucu için; başka çürütücüye taşınmaz.
+  it('HRT-86: ops-curutucu çürütme disiplini bölümü kaynak satırıyla yazılı; başka çürütücüde yok; açıklama değişmedi', () => {
+    const oku = (ad: string) => fs.readFileSync(path.join(kok, '.claude', 'agents', ad), 'utf8').replace(/\r\n/g, '\n')
+    const ops = oku('ops-curutucu.md')
+    for (const parca of ['Çürütme disiplini', 'Yalnız bulgu yaz', 'İddiayı ayıkla', 'Bulguyu sınıfla', 'Şüphe tiyatrosu yapma', 'Emin olmadığını söyle', 'addyosmani/agent-skills doubt-driven-development @f3400940f6 (MIT)']) {
+      expect(ops, parca).toContain(parca)
+    }
+    expect(ops).toContain('description: OPS departmanının çürütücü çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.')
+    for (const ad of fs.readdirSync(path.join(kok, '.claude', 'agents')).filter((f) => f.endsWith('-curutucu.md') && f !== 'ops-curutucu.md')) {
+      expect(oku(ad), `${ad} çürütme disiplini taşımaz`).not.toContain('Çürütme disiplini')
+    }
+  })
+
   it('cetveldeki "Rol → model tablosu" TUR_MODEL ile birebir aynıdır (kayıt: yeni departman bu plana uyar)', () => {
     const cetvel = fs.readFileSync(path.join(kok, 'docs', 'standards', 'execution-method-standard.md'), 'utf8')
     expect(belgeModelTablosu(cetvel)).toEqual(uretici.TUR_MODEL)

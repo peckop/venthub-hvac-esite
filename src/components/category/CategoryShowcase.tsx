@@ -22,9 +22,11 @@ interface CategoryShowcaseProps {
     category: DomainCategory
     subCategories: DomainCategory[]
     parentCategory?: DomainCategory | null
+    /** URN-144 (karar 410): kırıntı için tüm aktif atalar, kökten başa; verilmezse `parentCategory` tek üst sayılır. */
+    ancestors?: DomainCategory[]
 }
 
-const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory }) => {
+const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory, ancestors }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     // URL'de görünen kategori slug'ı dile göre çözülür (kanonik slug karşılaştırmalarda kalır)
@@ -51,7 +53,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     // Build breadcrumb items
     // REC-103: 'Ana Sayfa' burada SABİT Türkçe yazılıydı ve `t` hiç geçilmiyordu —
     // İngilizce sayfada hem "Ana Sayfa" hem Türkçe kategori adı basıyordu.
-    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, t('common.homeLabel'), lang, t)
+    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, t('common.homeLabel'), lang, t, ancestors)
 
     return (
         <div className="min-h-screen bg-white">

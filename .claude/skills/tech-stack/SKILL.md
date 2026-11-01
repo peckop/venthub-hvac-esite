@@ -17,7 +17,7 @@ metadata:
 | `bun run packages/core/skills/tech-stack/scripts/check-versions.mjs …` | `node .claude/skills/tech-stack/scripts/check-versions.mjs <paket> …` (bun bizde kullanılmaz; betik yalnız `registry.npmjs.org`'a GET atar, yönlendirme reddedilir, kurmaz, ortam değişkeni okumaz) |
 | "version snapshot" (`references/current-versions.md`) | 2026-10-09 tarihli anlık görüntü; **güncel değildir**, canlı sorgu esastır |
 | `ci-cd` atfı (Skills in scope) | Bizde yok; atıf yok sayılır. Yerine `.github/workflows` ve kapı belgeleri |
-| "package manager / lockfile" | `pnpm` ve `pnpm-lock.yaml`; kurulum `pnpm install --frozen-lockfile --offline` (karar 88) |
+| "package manager / lockfile" | `pnpm` ve `pnpm-lock.yaml`; kurulum `pnpm install --frozen-lockfile --prefer-offline` (karar 88) |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -102,7 +102,7 @@ do not infer latest from the first array item or highest lexicographic string.
 For current npm targets and preview-tag detection, run the read-only helper:
 
 ~~~powershell
-bun run packages/core/skills/tech-stack/scripts/check-versions.mjs expo react-native prisma @prisma/client
+node .claude/skills/tech-stack/scripts/check-versions.mjs next react @supabase/supabase-js
 ~~~
 
 It reports selected stable version, latest tag, engines, peers, source and checked
