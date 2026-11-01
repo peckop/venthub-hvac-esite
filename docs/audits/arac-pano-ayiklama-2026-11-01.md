@@ -2,7 +2,7 @@
 
 Kaynak: ARAÇ panosunun 117 açık kartı (Backlog 100, To Do 11, Review 6). Yöntem: salt-okuma yardımcı ajan, her kart numarası `git log origin/master` konu ve gövdesinde ve kart notlarında arandı (3672 commit). Cetvel: `docs/standards/is-kayit-duzeni-standard.md`.
 
-**Sınırlar (dürüstlük):** "bitti" kanıtı commit konusudur; `gh api .../merge` ile PR doğrulaması kart kapatılırken ayrıca yapılır, ajan yapmadı. Commit'in master'da olması kartın TÜM kapsamının bittiği demek değildir; kapatma kartın kendi BİTİŞ maddesine bakılarak yapılır. Mod kartları depo dışı (`C:/Users/alize/mods`) olduğu için master'dan doğrulanamaz.
+**Sınırlar (dürüstlük):** "bitti" kanıtı commit konusudur; `gh api .../merge` ile PR doğrulaması kart kapatılırken ayrıca yapılır, ajan yapmadı. Commit'in master'da olması kartın TÜM kapsamının bittiği demek değildir; kapatma kartın kendi BİTİŞ maddesine bakılarak yapılır. Mod kartları depo dışı (`~/mods`) olduğu için master'dan doğrulanamaz.
 
 ## Sayım
 
