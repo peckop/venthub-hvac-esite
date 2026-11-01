@@ -41,6 +41,12 @@ const motor = require_(path.join(KOK, 'scripts', 'hijyen', 'yesil-pr.cjs')) as {
   siniflandir: (pr: Pr, cekirdek: string[], simdi?: number) => { kova: string; sebep: string }
   tara: (prler: Pr[], cekirdek: string[]) => { satirlar: Satir[]; sayim: Record<string, number> }
   sahip: (dal: string) => string
+  unknownlariTazele: (
+    prler: Pr[],
+    oku: (no: number) => Promise<string | null>,
+    bekle: (ms: number) => Promise<void>,
+    bekleMs?: number,
+  ) => Promise<number>
 }
 
 const CEKIRDEK = ['ci', 'advisor']
@@ -103,6 +109,37 @@ describe('INV-YESIL-PR-1 yeşil PR tarayıcı', () => {
     expect(motor.siniflandir({ ...pr(), govde }, CEKIRDEK, simdi).kova).toBe('bekletilen')
     const eski = 'bekle: 2026-10-01 eski engel'
     expect(motor.siniflandir({ ...pr(), govde: eski }, CEKIRDEK, simdi).kova).toBe('hazir')
+  })
+
+  it('UNKNOWN PR bir kez beklenip yeniden sorulur; taslak ve bilinen durum sorulmaz; okunamazsa eski değer kalır', async () => {
+    const beklemeler: number[] = []
+    const sorulan: number[] = []
+    const prler = [
+      pr({ number: 1, mergeStateStatus: 'UNKNOWN' }),
+      pr({ number: 2, mergeStateStatus: 'UNKNOWN' }),
+      pr({ number: 3, mergeStateStatus: 'CLEAN' }),
+      pr({ number: 4, mergeStateStatus: 'UNKNOWN', isDraft: true }),
+    ]
+    const n = await motor.unknownlariTazele(
+      prler,
+      async (no) => {
+        sorulan.push(no)
+        if (no === 2) throw new Error('ag yok')
+        return 'CLEAN'
+      },
+      async (ms) => {
+        beklemeler.push(ms)
+      },
+    )
+    expect(n).toBe(2)
+    expect(beklemeler).toEqual([5000])
+    expect(sorulan.sort()).toEqual([1, 2])
+    expect(prler.map((p) => p.mergeStateStatus)).toEqual(['CLEAN', 'UNKNOWN', 'CLEAN', 'UNKNOWN'])
+    const bos = await motor.unknownlariTazele([pr()], async () => 'CLEAN', async (ms) => {
+      beklemeler.push(ms)
+    })
+    expect(bos).toBe(0)
+    expect(beklemeler).toEqual([5000])
   })
 
   it('taslak ayrı kovadadır; sahip dal adından okunur', () => {

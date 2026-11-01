@@ -113,6 +113,26 @@ async function gh(args, ms = 20000) {
   return JSON.parse(r.stdout)
 }
 
+/**
+ * mergeStateStatus UNKNOWN = GitHub hâlâ hesaplıyor (master yeni ilerlemişse çoğu PR böyle döner).
+ * Taslak olmayan UNKNOWN PR'lar için bir kez `bekleMs` bekleyip durumu yeniden sorar; ikinci kez sormaz.
+ * oku(no) → yeni mergeStateStatus; okunamazsa eski değer kalır (fail-open, "olculemedi" kovası korur).
+ */
+async function unknownlariTazele(prler, oku, bekle = (ms) => new Promise((r) => setTimeout(r, ms)), bekleMs = 5000) {
+  const hedef = prler.filter((p) => !p.isDraft && String(p.mergeStateStatus || '').toUpperCase() === 'UNKNOWN')
+  if (hedef.length === 0) return 0
+  await bekle(bekleMs)
+  await Promise.all(hedef.map(async (p) => {
+    try {
+      const yeni = await oku(p.number)
+      if (yeni) p.mergeStateStatus = yeni
+    } catch {
+      /* okunamadı: eski değer kalır */
+    }
+  }))
+  return hedef.length
+}
+
 async function olc(kok = path.join(__dirname, '..', '..')) {
   const liste = await gh(['pr', 'list', '--state', 'open', '--limit', '100', '--json',
     'number,title,headRefName,isDraft,mergeStateStatus,files,comments,labels,body'])
@@ -129,11 +149,13 @@ async function olc(kok = path.join(__dirname, '..', '..')) {
       kapilar,
     }
   }))
+  await unknownlariTazele(prler, async (no) =>
+    (await gh(['pr', 'view', String(no), '--json', 'mergeStateStatus'])).mergeStateStatus)
   const { kapilar: cekirdek, sinirlar } = ritu.turetCekirdek(kok)
   return { ...tara(prler, cekirdek), cekirdek, sinirlar, olculdu: new Date().toISOString() }
 }
 
-module.exports = { siniflandir, tara, sahip, KOVA_SIRASI, KOVA_ADI, BEKLET_ETIKETI }
+module.exports = { siniflandir, tara, sahip, unknownlariTazele, KOVA_SIRASI, KOVA_ADI, BEKLET_ETIKETI }
 
 if (require.main === module) {
   olc().then((s) => {
