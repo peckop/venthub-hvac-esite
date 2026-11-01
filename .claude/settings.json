@@ -533,6 +533,11 @@
             "timeout": 30,
             "async": true,
             "statusMessage": "hafiza kullanim sayaci"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kaynaksiz-hukum-uyarisi.cjs\"",
+            "timeout": 15
           }
         ]
       }
