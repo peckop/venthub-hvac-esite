@@ -15,9 +15,9 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 ```
 
 - Üçüncü parça, en altta, iki aşamalı compact cümlesi: "Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz."
-- Üç parça KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider ("hazır" ya da "X bitince hazır").
-- `/compact` satırını vermeden önce durum dosyasını güncelle ve sonuna tek satır yaz: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`.
-- Compact dönüşünde ilk tool çağrısı durum dosyasını okumaktır; ilk görünür satır "bana ulaşan son girdin: <özet>" olur.
+- Üç parça KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider.
+- `/compact` satırını vermeden önce durum dosyasını güncelle ve sonuna tek satır yaz (yalnız durum dosyasına, Recep'e görünen cevaba değil): `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`.
+- Compact dönüşünde ilk çağrı durum dosyasını okumaktır; ilk görünür satır "bana ulaşan son girdin: <özet>" olur.
 - Konuşmada verilen her kalıcı söz kalıcı yere yazılır; yazılmadıysa verilmemiştir.
 
 ## İş ve kart
@@ -55,7 +55,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe). Altında akan cümlelerle söyle: ne bu, hiç çalıştı mı, işimize yarar mı, aktif etmezsek ne olur, önerim.
 - Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üstte, ayrı tablo yok.
 - Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe, "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
-- (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir (başka departman ya da genel durumu OPS'a yönlendir). Tablonun üstüne kalın tek satır "**<DEPARTMAN> — kendi kartlarım**" yaz, ilk sütun başlığı "<ÖN EK> No" olur (ör. "SEO No"). Sorumlu hep "ben" (başkasını bekleyen işte de), Sırada'ya yalnız "başka bir departmanın işini bekliyor" yaz. Başka pencereden gelen mesaja o pencereye `SendMessage` ile cevap yaz; Recep'e görünen metin tek cümledir.
+- (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir (başka departman ya da genel durumu OPS'a yönlendir). Tablonun üstüne kalın tek satır "**<DEPARTMAN> — kendi kartlarım**" yaz, ilk sütun başlığı "<ÖN EK> No" olur. Sorumlu hep "ben" (başkasını bekleyen işte de), Sırada'ya yalnız "başka bir departmanın işini bekliyor" yaz. Başka pencereden gelen mesaja o pencereye `SendMessage` ile cevap yaz; Recep'e görünen metin tek cümledir.
 - (OPS hariç) Kartında değişen yoksa tablo yazma; Recep "devam et" derse cevap tek cümledir. "Devam edeyim mi" diye sorma, sırası belli işe geç.
 - Recep'e akan cümleyle yaz: kısa paragraflar (2-3 cümle); madde gerekirse her madde ayrı satırda tam cümle; `(a)` etiketi, telgraf kısaltması yok.
 - Erteleme dili kullanma; "yarın" yerine tarih ya da gün yaz. Recep kararı bekleyen işi "Recep'te: <tek satır soru>" diye yaz, tarih verme.
