@@ -405,6 +405,19 @@ describe('INV-AJAN-TANIM-1 — model kaydı (karar 314): üretici sabiti = diskt
     expect(oku('security-reviewer.md')).toMatch(/^description: VentHub'a özel güvenlik gözden geçirici\./m)
   })
 
+  // HRT-86 (YTN-24 madde 11): addyosmani çürütme disiplini YALNIZ ops-curutucu için; başka çürütücüye taşınmaz.
+  it('HRT-86: ops-curutucu çürütme disiplini bölümü kaynak satırıyla yazılı; başka çürütücüde yok; açıklama değişmedi', () => {
+    const oku = (ad: string) => fs.readFileSync(path.join(kok, '.claude', 'agents', ad), 'utf8').replace(/\r\n/g, '\n')
+    const ops = oku('ops-curutucu.md')
+    for (const parca of ['Çürütme disiplini', 'Yalnız bulgu yaz', 'İddiayı ayıkla', 'Bulguyu sınıfla', 'Şüphe tiyatrosu yapma', 'Emin olmadığını söyle', 'addyosmani/agent-skills doubt-driven-development @f3400940f6 (MIT)']) {
+      expect(ops, parca).toContain(parca)
+    }
+    expect(ops).toContain('description: OPS departmanının çürütücü çalışanı. Müdür konu başına açar; sonucu yalnız açana döner.')
+    for (const ad of fs.readdirSync(path.join(kok, '.claude', 'agents')).filter((f) => f.endsWith('-curutucu.md') && f !== 'ops-curutucu.md')) {
+      expect(oku(ad), `${ad} çürütme disiplini taşımaz`).not.toContain('Çürütme disiplini')
+    }
+  })
+
   it('cetveldeki "Rol → model tablosu" TUR_MODEL ile birebir aynıdır (kayıt: yeni departman bu plana uyar)', () => {
     const cetvel = fs.readFileSync(path.join(kok, 'docs', 'standards', 'execution-method-standard.md'), 'utf8')
     expect(belgeModelTablosu(cetvel)).toEqual(uretici.TUR_MODEL)
