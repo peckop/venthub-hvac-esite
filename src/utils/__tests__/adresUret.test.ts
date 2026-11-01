@@ -22,8 +22,8 @@ beforeEach(() =>
 )
 
 describe('bayrak', () => {
-  it('Faz 3-C öncesi KAPALI — açılışı yalnız Faz 4 onaylı tek PR yapar', () => {
-    expect(ADRES_SEMASI_K3B).toBe(false)
+  it('Faz 3-C sonrası AÇIK — kapatmak yalnız runbook §7 merdivenidir (config satırları silindi, tek satırlık geri alma temiz değil)', () => {
+    expect(ADRES_SEMASI_K3B).toBe(true)
   })
 })
 
@@ -124,9 +124,11 @@ describe('SEO-35 B-1 — kategori adresi iki dilde TEK segment', () => {
     expect(adresUret(kategori('fanlar'), 'tr', false)).toBe('/tr/category/fanlar')
     expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr', false)).toBe('/tr/category/kanal-tipi-fanlar')
     expect(adresUret(kategori('fans', 'duct-fans'), 'en', false)).toBe('/en/category/duct-fans')
-    // Üretim varsayılanı bayrağı okur ve bayrak kapalıyken bugünkü adresi verir.
-    expect(ADRES_SEMASI_K3B).toBe(false)
-    expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr')).toBe('/tr/category/kanal-tipi-fanlar')
+    // Üretim varsayılanı bayrağı okur: bayrak neyse o kipin adresini verir (3-C dalında bayrak true, B-1 master'ında
+    // false; test iki durumda da doğrudur ve varsayılanın bayrakla tutarlı olduğunu sabitler).
+    expect(adresUret(kategori('fanlar', 'kanal-tipi-fanlar'), 'tr')).toBe(
+      ADRES_SEMASI_K3B ? '/tr/kategori/kanal-tipi-fanlar' : '/tr/category/kanal-tipi-fanlar',
+    )
   })
 
   it('kodlanır: boşluk ve eğik çizgi iç içe adres üretemez', () => {

@@ -46,10 +46,14 @@ function yonlendirmeHedefleri(): string[] {
 describe('INV-ESKI-ADRES-YENI-SLUG-1 — eski adres yönlendirmeleri yeni aile slug\'ına gider', () => {
   const hedefler = yonlendirmeHedefleri()
 
-  it('ön koşul: yönlendirme hedefleri okunabiliyor ve üç aile de en az bir hedefte anılıyor', () => {
-    // 1 Lineo çap şablonu + 1 nicotra-dd + 5 commercial-in-line-rectangular = 7 (çap kuralı tek `.map` şablonudur).
-    expect(hedefler.length).toBeGreaterThanOrEqual(7)
-    for (const [, yeni] of CIFTLER) expect(hedefler, `${yeni} hiçbir yönlendirmenin hedefi değil`).toContain(yeni)
+  it('ön koşul (Faz 3-C): next.config artık `/products/<aile>` hedefli kural taşımaz; Lineo çaplarının tek taşıyıcısı tohum ve hedefi YENİ aile slug\'ı', () => {
+    // Faz 3-C 6 Lineo + 6 ürün kuralını config'ten sildi (tek taşıyıcı: tohum → eski adres haritası). Config'e bu
+    // biçimde bir kural geri eklenirse aşağıdaki "ESKİ slug'a gitmez" kolu onu hâlâ yakalar.
+    expect(hedefler).toHaveLength(0)
+    const tohum = JSON.parse(oku('src/data/eski-adres-tohum.json')) as { aileler: Array<{ eski: string; hedef: string }> }
+    const lineoHedefleri = tohum.aileler.filter((a) => a.eski.startsWith('vortice-lineo-')).map((a) => a.hedef)
+    expect(lineoHedefleri).toHaveLength(6)
+    for (const hedef of lineoHedefleri) expect(hedef).toBe('vortice-lineo-quiet-sessiz-kanal-fanlari')
   })
 
   it.each(CIFTLER)('hiçbir yönlendirme ESKİ aile slug\'ına (%s) gitmez', (eski) => {

@@ -13,6 +13,9 @@ vi.mock('@supabase/ssr', () => ({
     return { from: () => ({ select: () => ({ eq: () => ({ single: db.tek }) }) }) }
   },
 }))
+// Faz 3-C (URN-85 2/2) gerçek bayrağı `true` yaptı; bu dosyanın konusu KAPALI kol (geri alma merdiveni, runbook §7)
+// olduğundan bayrak burada KAPALIYA sabitlenir. Açık kol: `middleware-uuid.acik.test.ts`.
+vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: false }))
 
 const UUID = '0b0e6a52-6d0c-4f4f-9d5d-2f7a9b6b1c11'
 const eskiEnv = { url: process.env.NEXT_PUBLIC_SUPABASE_URL, anahtar: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY }

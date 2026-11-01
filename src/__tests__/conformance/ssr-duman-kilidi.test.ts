@@ -29,7 +29,9 @@ import {
   PDP_BILINCLI_ADALAR,
   PDP_MAX_BAILOUT,
   temsilcileriSec,
+  urunDetayAdresiMi,
 } from '../../../tests/smoke/ssr-kurallari'
+import { modelSegmentiUret } from '../../utils/modelAdresBicimi'
 
 /** Depo kökü GIT'ten türetilir — sabit yol yazmak INV-MUTLAK-YOL-1 ihlalidir. */
 function repoKoku(): string {
@@ -684,5 +686,208 @@ describe('INV-DUMAN-8: gövde gizli akış bloğuna itilmez (URN-25 çalışma-z
     // Kapanmayan blok HTML sonuna kadar sayılır: sonrasındaki h1 de gizli kabul edilir (güvenli taraf).
     expect(gorunurH1Sayisi('<div hidden id="S:1"><div><h1>x</h1>')).toBe(0)
     expect(gizliAkisBloklari('<main><h1>x</h1></main>')).toEqual([])
+  })
+})
+
+/**
+ * INV-DUMAN-9 — KAPI İKİ ADRES ŞEMASINI DA TANIR (URN-85, Faz 3-C 2/2, 2026-10-10).
+ *
+ * NİÇİN BU KOL VAR: `ADRES_SEMASI_K3B` açılınca site haritası `/tr/kategori/<kök>[/<dal>]`, `/tr/urun/<aile>`,
+ * `/tr/markalar/<marka>` ve `/tr/urunler` yazar (`src/app/__tests__/sitemapAdresUret.test.ts`: eski şema adresi hiçbir
+ * satırda kalmaz). Kapı ise yalnız `/tr/category/…`, `/tr/products/…`, `/tr/brands/…` kalıbını tanıyordu. PR #1811'in
+ * CI'ında (E2E Smoke, koşu 38039237820) sayımlar `kategori=0, iki-segmentli=0, pdp=0`, `denenen aday=0/24` çıktı ve kapı
+ * KIRMIZI verdi: sayfalar dolu, kusur kapının ADRES KALIBINDAydı (üretim kodunda değil).
+ *
+ * ÖLÇTÜĞÜ: (1) açık şema haritası → her sınıfın temsilcisi bulunur ve ölçüt SIKI kalır (içerikten seçim, gevşek
+ * kola düşmez); (2) eski şema haritası hâlâ geçer (bayrak kapalıyken de yeşil); (3) ölçüm aracı ölçülür: açık fikstür
+ * eski kalıpların HİÇBİRİNE uymaz, yani yalnız eski şemayı tanıyan bir kapı bu fikstürde kırmızı verirdi.
+ */
+describe('INV-DUMAN-9: kapı İKİ adres şemasını da tanır (K3-b açık ve kapalı)', () => {
+  // ⚠Burada `INV-DUMAN-7`deki `SITEMAP` yardımcısı KULLANILMAZ: o, marka yolu yoksa eski `/tr/brands/<slug>` biçimini
+  // KENDİLİĞİNDEN ekler; açık şema fikstüründe bu, marka yokluğunu sessizce örterdi.
+  const sitemapXml = (yollar: string[]): string =>
+    `<urlset>${yollar.map((y) => `<loc>https://x${y}</loc>`).join('')}</urlset>`
+
+  const ag = (yollar: string[], govdeler: Record<string, string>) => {
+    const cekilen: string[] = []
+    return {
+      cekilen,
+      getir: async (u: string) => {
+        if (u.endsWith('/sitemap.xml')) return { ok: true, status: 200, text: async () => sitemapXml(yollar) }
+        cekilen.push(u)
+        const g = govdeler[u]
+        if (g === undefined) return { ok: false, status: 404, text: async () => '' }
+        return { ok: true, status: 200, text: async () => g }
+      },
+    }
+  }
+
+  const ALTGRUPLU = '<html><h1>Fanlar</h1><h2>Alt Ürün Grupları</h2></html>'
+  const YAPRAK = '<html><h1>Aksesuarlar</h1><div data-ssr="family-card"></div></html>'
+
+  /** AÇIK şema (ADRES_SEMASI_K3B=true) site haritasının TR yolları — sitemapAdresUret.test.ts'in açık kip çıktısı biçiminde. */
+  const ACIK = [
+    '/tr',
+    '/tr/urunler',
+    '/tr/markalar',
+    '/tr/kategori/fanlar',
+    '/tr/kategori/fanlar/aksiyel-sanayi-fanlari',
+    '/tr/kategori/hava-perdeleri',
+    '/tr/urun/vortice-lineo-quiet',
+    '/tr/markalar/vortice',
+  ]
+  /** ESKİ şema (bugünkü canlı; REC-205 sonrası tek seviyeli kategori) site haritasının TR yolları. */
+  const ESKI = [
+    '/tr',
+    '/tr/products',
+    '/tr/brands',
+    '/tr/category/fanlar',
+    '/tr/category/aksiyel-sanayi-fanlari',
+    '/tr/category/hava-perdeleri',
+    '/tr/products/vortice-lineo-quiet',
+    '/tr/brands/vortice',
+  ]
+
+  it('⭐ÖLÇÜM ARACI ÖLÇÜLÜR: açık şema fikstürü eski kalıpların HİÇBİRİNE uymaz (yalnız-eski kapı burada KIRMIZI olurdu)', () => {
+    const eskiKalip = /^\/tr\/(category|products\/|brands\/)/
+    expect(ACIK.filter((y) => eskiKalip.test(y)), 'açık fikstür eski şema adresi taşıyor — sabotaj anlamını yitirir').toEqual([])
+    // Tersi: eski fikstür açık şema bölüm adı taşımaz (iki yönde de ayrık).
+    expect(ESKI.filter((y) => /^\/tr\/(kategori|urun|urunler|markalar)(\/|$)/.test(y))).toEqual([])
+  })
+
+  it('⭐AÇIK şema: her sınıfın temsilcisi bulunur, seçim İÇERİKTEN, kök/dal derinliği açık şemadan sayılır', async () => {
+    const { getir, cekilen } = ag(ACIK, {
+      '/tr/kategori/fanlar': ALTGRUPLU,
+      '/tr/kategori/fanlar/aksiyel-sanayi-fanlari': YAPRAK,
+    })
+    const t = await temsilcileriSec('', getir)
+    // `/tr/kategori/<kök>/<dal>` KANONİK adrestir; REC-205 öncesi "iki seviyeli eski biçim" gibi adresten seçilmez.
+    expect(t.secim.icerikten, 'açık şemanın kök/dal adresi eski iki-seviyeli kola düştü (ölçüt gevşer)').toBe(true)
+    expect(t.altgrupluKategori).toBe('/tr/kategori/fanlar')
+    expect(t.yaprakKategori, 'dal sayfası (iki segment) aday olmalı').toBe('/tr/kategori/fanlar/aksiyel-sanayi-fanlari')
+    expect(t.pdp).toBe('/tr/urun/vortice-lineo-quiet')
+    expect(t.marka).toBe('/tr/markalar/vortice')
+    // Sayımlar AÇIK şemanın derinliğini yansıtır: 2 kök, 1 dal (kategori = kök sayısı, iki-segmentli = dal sayısı).
+    expect(t.sayimlar).toEqual({ kategori: 2, ikiSegmentli: 1, pdp: 1, marka: 1 })
+    expect(t.atlananlar, 'her sınıf bulundu, atlanan olmamalı').toEqual([])
+    // Erken çıkış korunur: iki sınıf dolunca aday indirilmez (maliyet tavanı değişmedi).
+    expect(cekilen.length).toBe(2)
+  })
+
+  it('AÇIK şema: ürün listesi ve marka listesi yolu haritadan gelir (`/tr/urunler`, `/tr/markalar`)', async () => {
+    const { getir } = ag(ACIK, {
+      '/tr/kategori/fanlar': ALTGRUPLU,
+      '/tr/kategori/fanlar/aksiyel-sanayi-fanlari': YAPRAK,
+    })
+    const k = kurallar(await temsilcileriSec('', getir), true)
+    expect(k.find((x) => x.sinif === 'liste')?.yol).toBe('/tr/urunler')
+    expect(k.find((x) => x.sinif === 'marka-listesi')?.yol).toBe('/tr/markalar')
+    // EN listesi iki şemada da `/en/products` (EN'de önek değişmez).
+    expect(k.find((x) => x.sinif === 'liste-en')?.yol).toBe('/en/products')
+    // Marka listesi ölçütü açık şemanın bağlantı biçimini tanır; eski biçimi de tanır.
+    const markaListesi = k.find((x) => x.sinif === 'marka-listesi')
+    if (!markaListesi) throw new Error('marka-listesi kuralı kayıp')
+    const govde = (href: string) => `<html><h1>Markalar</h1><a href="${href}">Vortice</a></html>`
+    expect(ihlaller(markaListesi, govde('/tr/markalar/vortice'))).toEqual([])
+    expect(ihlaller(markaListesi, govde('/tr/brands/vortice'))).toEqual([])
+    // Bağlantısı olmayan liste (boş kabuk) KIRMIZI kalır: ölçüt gevşemedi, yalnız adres biçimi genişledi.
+    expect(ihlaller(markaListesi, '<html><h1>Markalar</h1></html>').length).toBe(1)
+  })
+
+  it('⭐AÇIK şema: yaprak ölçütü SIKI kalır (alt grup başlığı basan gövde yaprak sınıfını GEÇMEZ — ratchet kaybı yok)', async () => {
+    const { getir } = ag(ACIK, {
+      '/tr/kategori/fanlar': ALTGRUPLU,
+      '/tr/kategori/fanlar/aksiyel-sanayi-fanlari': YAPRAK,
+    })
+    const yaprak = kurallar(await temsilcileriSec('', getir), true).find((k) => k.sinif === 'yaprak-kategori')
+    if (!yaprak) throw new Error('yaprak kuralı kayıp')
+    expect(yaprak.yol).toBe('/tr/kategori/fanlar/aksiyel-sanayi-fanlari')
+    expect(ihlaller(yaprak, ALTGRUPLU).length, 'açık şemada ölçüt gevşemiş').toBe(1)
+    expect(ihlaller(yaprak, YAPRAK)).toEqual([])
+  })
+
+  it('AÇIK şema SABOTAJ: aile kartı basan hiçbir kategori yoksa kapı KIRMIZI (fail-closed korunur)', async () => {
+    const { getir } = ag(ACIK, { '/tr/kategori/fanlar': ALTGRUPLU })
+    await expect(temsilcileriSec('', getir)).rejects.toThrow(/KAPIDA koşan sınıfların temsilcisi YOK/)
+  })
+
+  it('AÇIK şema SABOTAJ: sitemap\'te marka adresi yoksa kapı KIRMIZI (marka sınıfı açık biçimde de zorunlu)', async () => {
+    const markasiz = ACIK.filter((y) => !/^\/tr\/markalar\/[^/]+$/.test(y))
+    const { getir } = ag(markasiz, {
+      '/tr/kategori/fanlar': ALTGRUPLU,
+      '/tr/kategori/fanlar/aksiyel-sanayi-fanlari': YAPRAK,
+    })
+    await expect(temsilcileriSec('', getir)).rejects.toThrow(/MARKA sinifinin temsilcisi YOK/)
+  })
+
+  it('TANINMAYAN şema SESSİZ DEĞİL: hata metni sitemap bölüm dağılımını taşır (adres kalıbı mı, boş harita mı ayrılır)', async () => {
+    // Üçüncü bir şema (bugün yok) geldiğinde `0/0/0` sayımı tek başına "adres kalıbı mı, boş harita mı" sorusunu
+    // cevaplamıyordu (#1811'de bu soru koddan okunarak cevaplandı); bölüm dağılımı bunu hata metninde söyler.
+    const { getir } = ag(['/tr', '/tr/yeni-sema/fanlar', '/tr/yeni-sema/urun/x', '/tr/contact'], {})
+    await expect(temsilcileriSec('', getir)).rejects.toThrow(/bölüm dağılımı:.*yeni-sema=2/)
+  })
+
+  it('ESKİ şema hâlâ geçer: tek seviyeli kategori, /tr/products/<aile>, /tr/brands/<marka>, liste yolları eski', async () => {
+    const { getir } = ag(ESKI, {
+      '/tr/category/aksiyel-sanayi-fanlari': YAPRAK,
+      '/tr/category/fanlar': ALTGRUPLU,
+    })
+    const t = await temsilcileriSec('', getir)
+    expect(t.secim.icerikten).toBe(true)
+    expect(t.altgrupluKategori).toBe('/tr/category/fanlar')
+    expect(t.yaprakKategori).toBe('/tr/category/aksiyel-sanayi-fanlari')
+    expect(t.pdp).toBe('/tr/products/vortice-lineo-quiet')
+    expect(t.marka).toBe('/tr/brands/vortice')
+    expect(t.sayimlar).toEqual({ kategori: 3, ikiSegmentli: 0, pdp: 1, marka: 1 })
+    const k = kurallar(t, true)
+    expect(k.find((x) => x.sinif === 'liste')?.yol).toBe('/tr/products')
+    expect(k.find((x) => x.sinif === 'marka-listesi')?.yol).toBe('/tr/brands')
+  })
+
+  it('haritada ürün listesi yolu hiç yoksa eski yola düşülür (mevcut fikstürlerin davranışı korunur)', async () => {
+    const { getir } = ag(['/tr/category/a', '/tr/products/x', '/tr/brands/x'], { '/tr/category/a': YAPRAK })
+    const k = kurallar(await temsilcileriSec('', getir), true)
+    expect(k.find((x) => x.sinif === 'liste')?.yol).toBe('/tr/products')
+    expect(k.find((x) => x.sinif === 'marka-listesi')?.yol).toBe('/tr/brands')
+  })
+
+  it('PDP temsilcisi AİLE adresidir: aynı haritada model adresi de varsa sıra sabit, aile önce gelir', async () => {
+    // Açık kipte harita aile (`/tr/urun/<aile>`) ve yayındaki modeller (`/tr/urun/<aile>-<ayırıcı>-<sku>`) birlikte yazar.
+    // Ayırıcı metni burada yazılmaz: biçim modülünden gelir (INV-YAYINDA-MODEL-6a tek nokta).
+    const model = `/tr/urun/${modelSegmentiUret('vortice-lineo-quiet', 'LQ-100')}`
+    const { getir } = ag(
+      ['/tr/kategori/a', '/tr/markalar/x', model, '/tr/urun/vortice-lineo-quiet', '/tr/urun/zzz-baska-aile'],
+      { '/tr/kategori/a': YAPRAK },
+    )
+    const t = await temsilcileriSec('', getir)
+    expect(t.pdp).toBe('/tr/urun/vortice-lineo-quiet')
+    expect(t.sayimlar.pdp).toBe(3)
+  })
+
+  it('urunDetayAdresiMi: ürün DETAY adreslerini iki şemada da tanır, liste/kategori/marka/yardımcı sayfaları tanımaz', () => {
+    for (const evet of [
+      '/tr/products/vortice-lineo-quiet',
+      '/en/products/vortice-lineo-quiet',
+      '/tr/urun/vortice-lineo-quiet',
+      `/tr/urun/${modelSegmentiUret('vortice-lineo-quiet', 'LQ-100')}`,
+      '/tr/products/vortice-lineo-quiet?sku=LQ-100',
+      '/tr/urun/vortice-lineo-quiet#model',
+    ]) {
+      expect(urunDetayAdresiMi(evet), evet).toBe(true)
+    }
+    for (const hayir of [
+      '/tr/products',
+      '/en/products',
+      '/tr/urunler',
+      '/tr/urun',
+      '/tr/urun-secici',
+      '/tr/kategori/fanlar',
+      '/tr/category/fanlar',
+      '/tr/markalar/vortice',
+      '/tr/urun/vortice/ek-segment',
+      '',
+    ]) {
+      expect(urunDetayAdresiMi(hayir), hayir || '(boş)').toBe(false)
+    }
   })
 })

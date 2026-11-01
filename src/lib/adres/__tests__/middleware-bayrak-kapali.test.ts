@@ -10,6 +10,9 @@ import { middleware } from '@/middleware'
  */
 const esleyiciCagrisi = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/adres/eslestirici', () => ({ eskiAdresEsle: esleyiciCagrisi }))
+// Faz 3-C (URN-85 2/2) gerçek bayrağı `true` yaptı; bu dosyanın konusu KAPALI kol (geri alma merdiveni, runbook §7)
+// olduğundan bayrak burada KAPALIYA sabitlenir. Açık kol: `middleware-bayrak-acik.test.ts`.
+vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: false }))
 
 const TR_CHROME = 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
 
