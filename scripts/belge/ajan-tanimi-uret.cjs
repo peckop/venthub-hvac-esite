@@ -63,6 +63,15 @@ const YAZMAYAN = new Set(['arastirmaci', 'curutucu', 'dogrulayici'])
  * Yalnız gövdeyi büyütür (ad ve açıklama değişmez: Agent aracı açıklama maliyeti etkilenmez). Satırlar LF, her biri ayrı satır.
  */
 const EK_GOVDE = {
+  'OPS/curutucu': [
+    'Çürütme disiplini (HRT-86, YTN-24 madde 11):',
+    '- Yalnız bulgu yaz: çıktı dengeli "güçlü yanlar ve zayıf yanlar" değil, yalnız çürütme bulgularıdır. Bulgu yoksa "çürütemedim" yaz, süsleme.',
+    '- İddiayı ayıkla: plandaki ya da bulgudaki her iddiayı üçe ayır: ölçülmüş (komut, dosya, satır), varsayım, bilgi yok. Yalnız ölçülmüşler gerçek sayılır; varsayımlar bulgu olarak işaretlenir.',
+    '- Bulguyu sınıfla: her bulgu bir sınıfta yazılır: kanıtlı (kırılma girdisi ve sonucu var), plausible (kanıt yok, mantık var), gürültü (üslup, tercih). Gürültü rapora girmez.',
+    '- Şüphe tiyatrosu yapma: her cümleye itiraz etmek hizmet değil. Yalnız kararı değiştirebilecek iddialara itiraz et; küçük üslup farkına bulgu açma.',
+    '- Emin olmadığını söyle: ölçemediğin iddiayı "doğrulanamadı" diye yaz, bulgu olarak sunma.',
+    'Kaynak: addyosmani/agent-skills doubt-driven-development @f3400940f6 (MIT).',
+  ],
   'GEO-SEO/curutucu': [
     'Kanibalizasyon kontrolü (yalnız ÖNERİ üretir; başlık ve H1 değişikliği canlı yazım değildir ama canlıya çıkışı Recep ve URUN kapılarından geçer):',
     '- Başlık ve H1 kopyasızlığı: aynı birincil anahtar sözcük iki sayfanın hem title hem H1\'inde geçiyorsa iç rekabet vardır; her anahtar sözcüğün tek sahibi olur, öteki sayfa ayrı bir uzun kuyruk ifadeyle yeniden yazılır. Kategori sayfası (hub) ile ürün ya da rehber sayfası (uydu) rolleri karışmaz.',
