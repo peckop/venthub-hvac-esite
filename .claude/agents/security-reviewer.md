@@ -62,6 +62,11 @@ Kaynak (madde 14-16): msitarzewski/agency-agents security-ai-generated-code-audi
 negatif tercih edilir, belirsizde sessizlik" ilkesi (güvenlik incelemesinde belirsiz akış PLAUSIBLE olarak raporlanır);
 LLM/istem enjeksiyonu maddesi (madde 13 zaten kapsıyor).
 
+17. **Kardeş örüntü:** doğrulanan bir kusurun aynı örüntüsünü depoda ara; bulunan her kardeşi ayrı bulgu olarak yaz
+    (dosya:satır).
+
+Kaynak (madde 17): projenin security-scanner yeteneğindeki kardeş örüntü maddesi (YTN-25 raporu).
+
 ## Rapor biçimi
 
 Her bulgu: `SEVERITY(CRITICAL/MED/LOW) · CONFIRMED|PLAUSIBLE · dosya:satır · tek cümle kusur ·
