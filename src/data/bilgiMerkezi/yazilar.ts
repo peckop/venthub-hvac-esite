@@ -79,7 +79,8 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // 2026'da birleşti). Liste kartı ve yazı künyesi "Güncelleme" olarak basar; site haritası lastmod'u ve Article
     // `dateModified` buradan. Önceki değerler: 2026-10-10 (URN-90), 2026-10-08 (#1755, "Fiyatı belirleyen etkenler"
     // giriş cümlesi), 2026-10-06 (#1733).
-    guncellemeTarihi: '2026-10-14',
+    // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Frekans konvertörü motorda ses yapar mı?").
+    guncellemeTarihi: '2026-11-01',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
@@ -211,7 +212,7 @@ Tasarruf uygulamaya bağlıdır. Fan ve pompada hızı %20 azaltmak, üretici ö
 
 ### Frekans konvertörü motorda ses yapar mı?
 
-Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5].
+Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5]. Fan uygulamalarında katalogdaki ses değerinin hangi koşulda okunacağı [sessiz fan seçimi rehberinde](vh:yazi/sessiz-fan-secimi) anlatılır.
 
 ### Yangın modunda frekans konvertörü fanı durdurur mu?
 
@@ -257,7 +258,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-10-14: gövdenin son değişikliği, alt başlıkların yenilenmesi (BLG-13, #1945; 14 Ekim
     // 2026'da birleşti); yayın günü 2026-10-11'di. Site haritası lastmod'u ve Article `dateModified` buradan
     // (INV-BILGI-MERKEZI-KART-1).
-    guncellemeTarihi: '2026-10-14',
+    // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Fan ses gücü seviyesi nasıl okunur?").
+    guncellemeTarihi: '2026-11-01',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
       'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
@@ -339,7 +341,7 @@ Fan eğrilerinin çoğu standart hava yoğunluğu varsayımıyla çizilir [1]. N
 
 ## Fan ses gücü seviyesi nasıl okunur?
 
-Ses gücü seviyesi, bir ses kaynağından yayılan akustik güçtür ve watt ya da desibel cinsinden verilir [1]. Nicotra Gebhardt AT kataloğunda 1 m mesafedeki yaklaşık A ağırlıklı ses basıncı seviyesi, A ağırlıklı ses gücü seviyesinden 7 dB çıkarılarak bulunur [2].
+Ses gücü seviyesi, bir ses kaynağından yayılan akustik güçtür ve watt ya da desibel cinsinden verilir [1]. Nicotra Gebhardt AT kataloğunda 1 m mesafedeki yaklaşık A ağırlıklı ses basıncı seviyesi, A ağırlıklı ses gücü seviyesinden 7 dB çıkarılarak bulunur [2]. Ses basıncı ile ses gücü farkı ve dB(A) değerinin hangi koşulda okunacağı [sessiz fan seçimi rehberinde](vh:yazi/sessiz-fan-secimi) anlatılır.
 
 ## Fanlar için verimlilik mevzuatı
 
@@ -441,14 +443,16 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-10-17',
     // Güncelleme tarihi 2026-10-31: yalnız başlıkların yenilenmesi (BLG-25, SEO-71 sonucu: başlık ve H1'de "kanal fanı"; adres
     // değişmez). İçerik cümlesi değişmedi (R5.5 başlık-yalnız revizyon). Site haritası lastmod'u ve Article `dateModified` buradan.
-    guncellemeTarihi: '2026-10-31',
+    // Güncelleme tarihi 2026-11-01 (BLG-29): "Sessiz fan nedir?" ara başlığı ve çalışma tanımı cümlesi (üretici beyanına dayalı, tek üreticiye genellenmez), meta açıklamada "sessiz fan", kardeş yazılara
+    // üç iç bağlantı. H1 ve title değişmedi (Recep kararı). Önceki değer: 2026-10-31 (BLG-25).
+    guncellemeTarihi: '2026-11-01',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
     diller: {
       tr: {
         slug: 'sessiz-fan-nasil-secilir',
-        ozet: 'Sessiz kanal fanı seçerken ses basıncı ile ses gücü farkını, ölçüm koşulunu ve yatak odası değerlerini okuyun; örnek: Vortice Lineo Quiet katalog değerleri.',
+        ozet: 'Sessiz fan nedir ve nasıl seçilir? Ses basıncı ile ses gücü farkını, ölçüm koşulunu ve yatak odası değerlerini okuyun; örnek: Vortice Lineo Quiet.',
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ya da konu listesini tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Ses değerini hangi koşulda okuyacağınızı bu rehberde bulun.',
         govde: `# Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü
@@ -457,9 +461,9 @@ Sessiz fan seçimi, katalogdaki ses değerinin hangi koşulda verildiğini okuma
 
 Bu yüzden "kaç dB?" sorusu tek başına cevaplanmaz; hangi yol (emiş, üfleme, gövde), hangi ayar noktası ve hangi mesafe sorularıyla birlikte cevaplanır. Aşağıda bu üç koşul, yatak odası ve ofis gibi mekânların resmî değerleri ve Lineo Quiet'in katalog değerleri birlikte okunuyor.
 
-## Sessiz kanal fanı ne demek? Bir üretici örneği
+## Sessiz fan nedir? Bir üretici örneği
 
-Vortice, LINEO QUIET ürünlerini ses emici kaplamayla tanımlar: kaplama dış gövdeye bütünleşiktir ve çevreye yayılan ses emisyonunu en aza indirmek için optimize edilmiştir [2].
+Bu rehberde "sessiz fan", üreticisi yaydığı sesi azaltmak için tasarladığını belirten fan anlamında kullanılır; örnek Vortice LINEO QUIET'tir [2]. Vortice, LINEO QUIET ürünlerini ses emici kaplamayla tanımlar: kaplama dış gövdeye bütünleşiktir ve çevreye yayılan ses emisyonunu en aza indirmek için optimize edilmiştir [2].
 
 Fan sesi dB(A) ile verilir. dB(A), insan işitme sisteminin en çok hassas olduğu orta ve yüksek frekanslara daha fazla ağırlık veren A-ağırlık şebekesiyle elde edilen tek sayılı bir ses düzeyi birimidir [1].
 
@@ -471,7 +475,7 @@ Dünya Sağlık Örgütü'nün 1999 tarihli topluluk gürültüsü rehberi, uyku
 
 Yönetmelik ses basıncı düzeyini (Lp), ortamda belli bir noktada ölçülen ses basıncının 20 µPa referans ses basıncına oranından hesaplanan ve dB cinsinden verilen değer olarak tanımlar [1]. Ses gücü düzeyi (Lw) ise ses kaynağının yaydığı ses gücünün 10⁻¹² watt referans ses gücüne oranından hesaplanan değerdir [1].
 
-Kısacası ses basıncı belirli bir noktadaki ses düzeyini, ses gücü kaynağın yaydığı sesi anlatır [1]. Vortice kataloğu iki büyüklüğü ayrı yayınlar: Lineo Quiet için ses gücünü Lw dB(A), ses basıncını Lp dB(A) olarak verir [2].
+Kısacası ses basıncı belirli bir noktadaki ses düzeyini, ses gücü kaynağın yaydığı sesi anlatır [1]. Vortice kataloğu iki büyüklüğü ayrı yayınlar: Lineo Quiet için ses gücünü Lw dB(A), ses basıncını Lp dB(A) olarak verir [2]. Isı geri kazanım cihazlarında aynı iki büyüklüğün nasıl verildiği [ısı geri kazanım cihazı rehberinde](vh:yazi/isi-geri-kazanim-cihazi-nedir) anlatılır.
 
 Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelik servis ekipmanından kaynaklanan iç gürültüyü sürekli ses için LAeq,nT, kesikli ses için LAF,max,nT göstergesiyle değerlendirir [1]. Katalogdaki 3 m mesafede hesaplanmış ses basıncı [2] ile oda içi LAeq,nT değeri [1] aynı koşulda verilmediği için doğrudan karşılaştırılmamalıdır.
 
@@ -524,7 +528,7 @@ Yönetmelik, kanal tasarımı sırasında kanal içi gürültü düzeyinin de he
 
 ### Hız kumandası ve devir ayarı
 
-Katalog LINEO QUIET ES sürümünü iki hızlı, elektronik kontrollü EC fırçasız motorlu olarak tanımlar; her hız kurulumda ayarlanır, cihaz alternatif olarak tek hızda çalışabilir ve bu hız kullanıcı tarafından 0–10 V sinyaliyle ayarlanır [2]. AC sürümlü LINEO QUIET'te motor modele göre 2 ya da 3 hızlıdır [2]. Katalog hız kontrolü için AC modellerde TRIO-LINEO 503 üç hız seçiciyi, C5 0.5 ve C 1.5 hız ayarlayıcılarını, yalnız Ø250 ve Ø315 modeller için de C 2.5 hız ayarlayıcısını, ES modellerde POT-IT ve POT potansiyometrelerini aksesuar olarak listeler [2]. Katalog bu kumandaları İngilizce SPEED SELECTOR (hız seçici), SPEED CONTROLLER (hız ayarlayıcı) ve POTENTIOMETER (potansiyometre) diye adlandırır [2]. ABD Enerji Bakanlığı kılavuzu ise değişken hız sürücülerinin (VFD) düşük sistem talebinde hava akımı gürültüsünü azalttığını belirtir [4].
+Katalog LINEO QUIET ES sürümünü iki hızlı, elektronik kontrollü EC fırçasız motorlu olarak tanımlar; her hız kurulumda ayarlanır, cihaz alternatif olarak tek hızda çalışabilir ve bu hız kullanıcı tarafından 0–10 V sinyaliyle ayarlanır [2]. AC sürümlü LINEO QUIET'te motor modele göre 2 ya da 3 hızlıdır [2]. Katalog hız kontrolü için AC modellerde TRIO-LINEO 503 üç hız seçiciyi, C5 0.5 ve C 1.5 hız ayarlayıcılarını, yalnız Ø250 ve Ø315 modeller için de C 2.5 hız ayarlayıcısını, ES modellerde POT-IT ve POT potansiyometrelerini aksesuar olarak listeler [2]. Katalog bu kumandaları İngilizce SPEED SELECTOR (hız seçici), SPEED CONTROLLER (hız ayarlayıcı) ve POTENTIOMETER (potansiyometre) diye adlandırır [2]. ABD Enerji Bakanlığı kılavuzu ise değişken hız sürücülerinin (VFD) düşük sistem talebinde hava akımı gürültüsünü azalttığını belirtir [4]. Motor hızını gerilimi ve frekansı değiştirerek ayarlayan sürücülerin ne olduğu [frekans konvertörü rehberinde](vh:yazi/frekans-konvertoru) anlatılır.
 
 
 ## Yatak odası, yaşam alanı ve ofiste ses sınırı kaç dB?
@@ -622,7 +626,7 @@ Cevap sistemin ses hesabına bağlıdır. Yönetmelik kanal tasarımında kanal 
 
 ### Aksiyel fan mı santrifüj (radyal) fan mı daha sessizdir?
 
-ABD Enerji Bakanlığı kılavuzuna göre aksiyel fanlar aynı kapasitedeki hat içi santrifüj fanlardan biraz daha gürültü çıkarma eğilimindedir; bu gürültüde yüksek frekanslar baskın olma eğilimindedir ve yüksek frekanslar daha kolay azaltılır [4]. Kılavuz endüstriyel ve ticari fan uygulamalarını ele alır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4].
+ABD Enerji Bakanlığı kılavuzuna göre aksiyel fanlar aynı kapasitedeki hat içi santrifüj fanlardan biraz daha gürültü çıkarma eğilimindedir; bu gürültüde yüksek frekanslar baskın olma eğilimindedir ve yüksek frekanslar daha kolay azaltılır [4]. Kılavuz endüstriyel ve ticari fan uygulamalarını ele alır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4]. İki fan türünün farkı, fan eğrisi ve çalışma noktası [radyal fan mı aksiyel fan mı rehberinde](vh:yazi/radyal-aksiyel-fan-secimi) anlatılır.
 
 ### Vortice Lineo Quiet kaç dB(A) ses çıkarır?
 
