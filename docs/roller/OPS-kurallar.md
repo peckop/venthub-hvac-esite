@@ -56,6 +56,7 @@
 - Kanca, ayar ve MCP PR'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ'ta).
 - Emir yazmadan önce alıcının rol kartına bakılır (Görev satırı, "Görev değil" satırı); görev dışı emir yazılmaz (HRT-73: kural eskiden ortak dosyadaydı, OPS kuralı olduğu için buraya taşındı).
 - NotebookLM takip defteri emekli (karar 419, salt okunur arşiv): gün kapanışında eşitlenmez; açılıştaki DEFTER bayatlık satırını kaldırmak ARAÇ'ın işidir.
+- Açılış ve tur sonu rutini: açık PR'ların durumu için `node scripts/hijyen/yesil-pr.cjs` koşulur (ARC-170); hazır kovadaki PR'ın sahibi aynı turda dürtülür.
 - Tabloda Sorumlu = işi yürüten departmanın adı (OPS'un kendi işiyse OPS); Recep kararı bekleyen satırda Durum Onayında, Önerim dolu, Sorumlu yine kararı uygulayacak departmandır; "sen" yazılmaz.
 
 ## Design yorumuna yanıt (ARC-51)
