@@ -68,7 +68,10 @@ function parseRowColumns(typesSource: string, table: string): Set<string> | null
  */
 function parseComputedFields(typesSource: string, table: string): Set<string> {
   const alanlar = new Set<string>()
-  const re = new RegExp(`\\b(\\w+):\\s*\\{\\s*Args:\\s*\\{\\s*\\w+:\\s*Database\\["public"\\]\\["Tables"\\]\\["${table}"\\]\\["Row"\\]\\s*\\}`, 'g')
+  // `(?:\\|\\s*)?`: aşırı yüklenmiş fonksiyon (ör. display_price(p) + display_price(uuid), ALT-73) üretilince
+  // CLI birleşim yazar: `display_price:\n | { Args: { p: …Row } … } | { Args: { p_product_id: … } … }`.
+  // SINIR: tabloya bağlı aşırı yükleme birleşimin İLK üyesi olmalı (CLI mevcut imzayı başa yazar; ölçüldü).
+  const re = new RegExp(`\\b(\\w+):\\s*(?:\\|\\s*)?\\{\\s*Args:\\s*\\{\\s*\\w+:\\s*Database\\["public"\\]\\["Tables"\\]\\["${table}"\\]\\["Row"\\]\\s*\\}`, 'g')
   for (const m of typesSource.matchAll(re)) alanlar.add(m[1])
   return alanlar
 }
