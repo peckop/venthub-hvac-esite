@@ -56,14 +56,20 @@ const ZAMAN_ASIMI_MS = 3000
  * ⚠NİÇİN depo içinde izlenen bir dosya değil: damga her okumada değişir, yani
  * izlenen bir dosya olsa her turda kirli ağaç üretirdi.
  */
+/**
+ * ⭐ARC-241 (1 Kasım, OPS ölçümü): git BETİĞİN KENDİ DİZİNİNDE koşar, süreç cwd'sinde DEĞİL.
+ * Kanca cwd'si git deposu değilse (kullanıcının projects klasörü, git deposu değil) eski kod %TEMP% altındaki bayat
+ * damgaya (10-25) düşüyordu: aynı komut cwd'ye göre 0 ya da 9 yorum veriyordu. `--path-format=absolute`
+ * ana ağaçta dönen göreli ".git"i de mutlak yapar (aksi halde damga cwd'ye göre farklı dosyaya giderdi).
+ */
 function damgaYolu() {
   try {
-    const ortak = execFileSync('git', ['rev-parse', '--git-common-dir'], {
+    const ortak = execFileSync('git', ['-C', __dirname, 'rev-parse', '--path-format=absolute', '--git-common-dir'], {
       encoding: 'utf8',
       timeout: 2000,
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
-    if (ortak) return path.join(ortak, 'venthub-linear-son-okuma.json')
+    if (ortak) return path.join(path.resolve(ortak), 'venthub-linear-son-okuma.json')
   } catch {
     /* git yok ya da depo değil: aşağıdaki yedeğe düş */
   }
@@ -199,7 +205,8 @@ function ozetle(kalemler, belirsiz = 0) {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'tr'))
     .map(([ad, n]) => `${ad} ${n}`)
     .join(' · ')
-  const saat = enEski ? `${enEski.slice(11, 16)}Z` : '?'
+  // ⭐Gün de basılır (ARC-241): yalnız saat yazınca bir haftalık yorum "gelecekten" geliyormuş gibi okundu.
+  const saat = enEski ? `${enEski.slice(5, 10)} ${enEski.slice(11, 16)}Z` : '?'
   const belirsizYazi = belirsiz > 0 ? ` · belirsiz ${belirsiz} (imza ile başlık çelişiyor)` : ''
   return `LINEAR: ${kalemler.length} yeni yorum (${dagilim})${belirsizYazi}, en eski ${saat} — okudum: node scripts/board/linear-okundu.cjs`
 }
