@@ -89,7 +89,7 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 | rollup@4 | >=4.59.0 | — | BORÇ | — |
 | rollup | >=4.22.4 | — | BORÇ | — |
 | flatted | 3.4.2 | 2026-07-xx | KARAR | Commit `966043401`: yüksek önemde `flatted` güvenlik kaydı kapatıldı. 3.4.2 sabit yazıldı; dolaylı bağımlılık olduğu için doğrudan yükseltilemiyor, override şart. |
-| happy-dom | >=20.8.8 | — | BORÇ | — |
+| happy-dom | >=21.0.4 <22.0.0 | 2026-11-01 | KARAR | ALT-127: eski `>=20.8.8` override'ı, `package.json`'daki `^21.0.4`'ü (ALT-119, #2137) ezdi ve kilit 20.14.6'da kaldı; Dependabot #80 (import alias ile host kod çalıştırma, CVE-2026-33943 eksik düzeltme) ve #86 (SSRF) açık kaldı. Alt sınır 21.0.4 = iki kaydın düzeltildiği sürüm; üst sınır `<22.0.0` cetvel §4 gereği. Yalnız test ortamı (vitest `happy-dom` ortamı), canlıya girmez. Kaldırma şartı §8'de. |
 | dompurify | >=3.4.0 | 2026-07-xx | KARAR | Commit `39fe49991` (PR #126): XSS ve JSON-LD enjeksiyon açığı kapatıldı. Paket depoya `isomorphic-dompurify` üzerinden dolaylı giriyor, o yüzden override şart; alt sınır 3.4.0. |
 | ws | >=8.20.1 | — | BORÇ | — |
 | uuid | >=11.1.1 | — | BORÇ | — |
@@ -283,6 +283,7 @@ gerekçe ölçülür (§4).
 | override | kaldırma şartı (ölçüm komutuyla) |
 |---|---|
 | flatted | `pnpm why flatted` çıktısındaki her tüketici 3.4.2 ve üstünü **kendi aralığıyla** çekiyor |
+| happy-dom | `pnpm why happy-dom` yalnız doğrudan geliştirme bağımlılığını gösteriyor ve `package.json` aralığının tabanı 21.0.4 ve üstü (override o zaman tekrardır; ALT-127) |
 | dompurify | `isomorphic-dompurify`'nin kendi `dompurify` aralığının tabanı 3.4.0 ve üstü (`pnpm view isomorphic-dompurify dependencies`) |
 | postcss | `pnpm why postcss` çıktısındaki her tüketicinin aralığı 8.5.19 ve üstünü zorluyor |
 | brace-expansion@4 | `pnpm why brace-expansion` çıktısında 4.x hattını çeken tüketici kalmadı ya da 5.0.6 ve üstünü kendisi çekiyor |
