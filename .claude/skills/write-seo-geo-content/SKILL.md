@@ -303,6 +303,16 @@ When you do include FAQ:
 
 ---
 
+## İçerik denetimi: E-E-A-T farkı ve anlamsal boşluk (YTN-24; GEO-SEO kullanır)
+
+Yukarıdaki E-E-A-T listesi yazım içindir; denetimde yalnız şu farklar eklenir.
+- **Deneyim gösterilir, beyan edilmez.** Yazarın "denedim" demesi kanıt sayılmaz; kanıt gerçek bir iz taşır (kurulum fotoğrafı, saha ölçümü, katalogdan sayfa atfı). İzi olmayan deneyim cümlesi uydurulmaz, eksik olarak raporlanır. Yazar özgeçmişi tek başına yetmez; içeriğin kendisi konuya hâkim görünmelidir.
+- **Dört eksen için "var / zayıf / yok" yaz, sayısal puan uydurma.** Her zayıf ya da yok için kanıtı olan somut bir ek öner (kaynaklı sayı, kaynak dizininden sayfa atfı, sınırlılık notu). Kaynaksız sayı eklemek öneri sayılmaz.
+- **Anlamsal boşluk (rakip sayfalara karşı).** Hedef sorgunun üst sonuçlarındaki sayfaların işlediği varlıkları ve alt konuları, sayfanın işlediğiyle yan yana koy ve her farkı sınıfla: çekirdek (hepsinde var, bizde yok), ayırt edici (bir iki rakipte var), sıradan (herkes yüzeysel geçer), fırsat (rakipler atlamış). Her boşluk için hangi başlığa ve ne derinlikte (paragraf, alt başlık, bölüm) ekleneceği yazılır. Boşluk, doldurma değil bilgi taşıyan bölümdür.
+- **Sınırlar.** Rakip sayfa okuması elle ve insan onayıyla yapılır; sayfa tarayan komut ya da betik eklenmez. Search Console verisi depoya girmez. Rakip adı ve rakam doğrulanmadan yazılmaz. SSS şeması (FAQPage) önerilmez. Bölüm GEO-SEO departmanının çürütücü ve araştırmacı çalışanlarınca da kullanılır.
+
+Fikir kaynağı: inhouseseo/superseo-skills eeat-audit ve semantic-gap-analysis @9cf22cc065a294bf0077ea6af6b4ea0eb7f89cdc (Apache-2.0; kendi cümlelerimizle yazıldı)
+
 ## Quality Standards
 
 - **Length**: 2,500 words minimum; 3,000+ for comparison and guide pages

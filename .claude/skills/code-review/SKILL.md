@@ -163,6 +163,12 @@ Filo kuralı: önce yerleşik `/code-review`; bu bölüm onunla çakışmaz, yal
 
 Kaynak: addyosmani/agent-skills code-review-and-quality @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
+## Gelen inceleme yorumunu uygulamadan önce doğrula
+
+Bu bölüm sana gelen yorumlar içindir (inceleyen sen değilsin). Sıra: yorumun tamamını oku, her maddeyi kendi cümlenle yeniden söyle, sonra **kodla doğrula** (öneri bu depoda gerçekten doğru mu, mevcut davranışı bozar mı, mevcut yazımın bir nedeni var mı, inceleyen tam bağlamı görmüş mü). Yanlışsa uygulama; teknik gerekçeyle ve mümkünse çalışan bir test ya da kod parçasına işaret ederek itiraz et. Doğrulayamıyorsan bunu açıkça yaz ve nasıl ilerleyeceğini sor. Belirsiz bir madde varsa tahminle uygulama: ilişkili maddeler birlikte yanlış anlaşılır, belirsiz olanlar netleşene kadar hiçbirini uygulama. Netleşince sıra: önce bozucu ve güvenlik maddeleri, sonra basit düzeltmeler, sonra karmaşık olanlar; her biri ayrı sınanır. Öneri "düzgün yapalım" türündense önce kullanımına bak: çağıranı olmayan ucu genişletme, silmeyi öner. Doğru yorumda gösterişli teşekkür yerine yapılan düzeltmeyi yaz. Tartışma GitHub'da satır yorumunun kendi iş parçacığında yürür, üst düzey PR yorumunda değil.
+
+Kaynak: obra/superpowers receiving-code-review @2ce8aa15d05bd57213e6f746f953aafb7ded7a8b (MIT)
+
 ## İkinci eksen: Spec ve kod kokusu tabanı (VentHub uyarlaması)
 
 Bir değişiklik bir ekseni geçip ötekini kaldırabilir: bütün standartlara uyup yanlış şeyi yapan kod (Standards geçer, Spec kalır) ya da istenen şeyi yapıp proje düzenini bozan kod (Spec geçer, Standards kalır). İkisi **ayrı raporlanır, birleştirilmez, yeniden sıralanmaz**; tek bir "en kötü" seçilmez, eksen başına en kötü bulgu yazılır.
