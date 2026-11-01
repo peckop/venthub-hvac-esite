@@ -53,8 +53,8 @@ describe('INV-DEPO-DOKUM-1 · kapının kendi sözleşmesi', () => {
     expect(kapi.FIYAT_ESIGI).toBe(5)
   })
 
-  it('kural kimlikleri R1..R6', () => {
-    expect(Object.keys(kapi.KURALLAR)).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6'])
+  it('kural kimlikleri R1..R7', () => {
+    expect(Object.keys(kapi.KURALLAR)).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7'])
   })
 
   it('taranan uzantılar: json/jsonl/ndjson/csv/tsv/sql', () => {

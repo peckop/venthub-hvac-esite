@@ -27,6 +27,8 @@ export type TaramaSonucu = {
 }
 export type Kapi = {
   VERI_UZANTILARI: readonly string[]
+  BELGE_UZANTILARI: readonly string[]
+  belgeMi: (yol: string) => boolean
   KISISEL_ALANLAR: readonly string[]
   KISISEL_GENEL_ALANLAR: readonly string[]
   KISISEL_ESIK: number

@@ -656,4 +656,118 @@ describe('INV-DEPO-DOKUM-1 · GERÇEK AĞAÇ taraması', () => {
     // imza kolunun kanıtı: uzantısı .db OLMAYAN en az bir kayıt imzayla bulundu (uzantı süzgeci geri gelirse kırmızı)
     expect(isabetler).toContain('R6 .cc/memory.db.pre_qwen.20260524_1830')
   })
+
+  it('R7 (ALT-64): gerçek ağaçta belge/yedek dosyalarında gerçek biçimli kimlik-anahtar isabeti YOK ve belge evreni boş değil', { timeout: 180_000 }, () => {
+    const izlenen = (spawnSync('git', ['ls-files', '-z'], { cwd: KOK, env: temizOrtam(), encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 }).stdout ?? '')
+      .split('\0')
+      .filter(Boolean)
+    const belgeler = izlenen.filter((y) => kapi.belgeMi(y))
+    expect(belgeler.length).toBeGreaterThan(500) // kanarya: uzantı süzgeci bozulursa evren boşalır
+    const s = kapi.tara({ dosyalar: izlenen, oku: kapi.diskOkuyucu(KOK), izin: [], ikili: kapi.sqliteImzasiMi(KOK) })
+    expect(s.ihlaller.filter((k) => k.kural === 'R7').map((k) => `${k.dosya} ${k.ayrinti}`)).toEqual([])
+  })
+})
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════
+// R7 (ALT-64): belge / uzantısı değiştirilmiş metinde GERÇEK BİÇİMLİ kimlik-anahtar. Değerler çalışma anında parçalardan
+// kurulur (sahte ama algoritması tutan); bu dosyaya düz yazılan kimlik yoktur. Beklenen değerler kapının işlevlerinden DEĞİL,
+// aşağıdaki bağımsız hesaplardan gelir (tautoloji yok).
+function sahteTckn(): string {
+  const d = [4, 3, 2, 1, 5, 6, 7, 8, 9]
+  const d10 = ((((d[0] + d[2] + d[4] + d[6] + d[8]) * 7 - (d[1] + d[3] + d[5] + d[7])) % 10) + 10) % 10
+  const d11 = (d.reduce((a, b) => a + b, 0) + d10) % 10
+  return [...d, d10, d11].join('')
+}
+function sahteIban(): string {
+  const bban = ['0006', '1000', '0000', '1234', '5678', '90'].join('') // TR BBAN'ı 22 hane, uydurma
+  const sayi = `${bban}292700` // T=29, R=27, kontrol 00
+  let kalan = 0
+  for (const h of sayi) kalan = (kalan * 10 + Number(h)) % 97
+  const kontrol = String(98 - kalan).padStart(2, '0')
+  return `TR${kontrol}${bban}`.replace(/(.{4})/g, '$1 ').trim()
+}
+const birlestir = (...p: string[]) => p.join('')
+const SAHTE_ANAHTAR = birlestir('sk', '_li', 've_', 'A1b2C3d4E5f6G7h8', 'I9j0')
+const SAHTE_JWT = birlestir('ey', 'JhbGciOiJIUzI1NiJ9', '.', 'ey', 'Jyb2xlIjoic2VydmljZV9yb2xlIn0', '.', 'c2FoYXRlSW1semFLb3J1bWE')
+const SAHTE_PEM = `${birlestir('-----BEGIN ', 'PRIVATE', ' KEY-----')}\n${'QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo'.repeat(2)}\n${birlestir('-----END ', 'PRIVATE', ' KEY-----')}\n`
+
+describe('INV-DEPO-DOKUM-1 · R7 belgede gerçek biçimli kimlik/anahtar (ALT-64)', () => {
+  it('TCKN (kimlik bağlamında, algoritması tutan) üretilmiş .md belgede: çıkış 1, dosya + kural basılır, DEĞER BASILMAZ', { timeout: 60_000 }, () => {
+    const tc = sahteTckn()
+    const d = sahteDepo({ 'docs/musteri_master.md': `# Müşteri\n\nT.C. Kimlik No: ${tc}\n` })
+    const r = kapiyiKos(d)
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.cikti).toContain('docs/musteri_master.md')
+    expect(r.cikti).toContain('belgede-kimlik-anahtar')
+    expect(r.cikti).toContain('T.C. kimlik numarası')
+    expect(r.cikti).not.toContain(tc)
+  })
+
+  it('IBAN (mod-97 tutan) .md belgede: çıkış 1; değer basılmaz', { timeout: 60_000 }, () => {
+    const iban = sahteIban()
+    const d = sahteDepo({ 'docs/odeme_master.md': `Hesap: ${iban}\n` })
+    const r = kapiyiKos(d)
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.cikti).toContain('IBAN')
+    expect(r.cikti).not.toContain(iban)
+    expect(r.cikti).not.toContain(iban.replace(/ /g, ''))
+  })
+
+  it.each([
+    ['docs/not.md', 'anahtar'],
+    ['yedek/ayar.json.bak', 'anahtar'],
+    ['yedek/rapor.md.20261007', 'anahtar'],
+    ['yedek/cfg.yaml', 'anahtar'],
+    ['yedek/notlar.txt', 'anahtar'],
+    ['yedek/rapor.html.orig', 'anahtar'],
+    ['docs/jwt.md', 'jwt'],
+    ['docs/pem.md', 'pem'],
+  ])('uzantısı değiştirilmiş/belge dosyası %s → R7 KIRMIZI', { timeout: 60_000 }, (yol, tur) => {
+    const icerik = tur === 'jwt' ? `token: ${SAHTE_JWT}\n` : tur === 'pem' ? SAHTE_PEM : `key=${SAHTE_ANAHTAR}\n`
+    const d = sahteDepo({ [yol]: icerik })
+    const r = kapiyiKos(d)
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.cikti).toContain(yol)
+    expect(r.cikti).toContain('belgede-kimlik-anahtar')
+    for (const gizli of [SAHTE_ANAHTAR, SAHTE_JWT, 'A1b2C3d4E5f6G7h8', 'QUJDREVGR0hJ']) expect(r.cikti).not.toContain(gizli)
+  })
+
+  it("BOM'suz UTF-16 gövde (NUL baytlı) belge ölçülemedi DEĞİL: NUL atılıp taranır, anahtar yine yakalanır", { timeout: 60_000 }, () => {
+    const d = sahteDepo({ 'yedek/gizli.txt': Buffer.from(`key=${SAHTE_ANAHTAR}\n`, 'utf16le') })
+    const r = kapiyiKos(d)
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.cikti).toContain('belgede-kimlik-anahtar')
+  })
+
+  it('TEMİZ: bağlamsız geçerli 11 haneli sayı, sağlamasız TCKN, geçersiz IBAN, yalnız adı geçen anahtar biçimi, kod dosyası → çıkış 0', { timeout: 60_000 }, () => {
+    const tc = sahteTckn()
+    const bozukTc = `${tc.slice(0, 10)}${(Number(tc[10]) + 1) % 10}`
+    const bozukIban = sahteIban().replace(/\d$/, (c) => String((Number(c) + 1) % 10))
+    const d = sahteDepo({
+      'docs/a.md': `Sipariş no ${tc} oluşturuldu.\n`, // bağlam yok
+      'docs/b.md': `TCKN: ${bozukTc} (sağlaması tutmayan)\n`,
+      'docs/c.md': `Hesap: ${bozukIban}\n`,
+      'docs/d.md': 'Canlı anahtar biçimi sk_live_ ile başlar; AKIA kısa; -----BEGIN PRIVATE KEY----- başlığı tek başına örnek.\n',
+      'src/e.ts': `export const anahtar = '${SAHTE_ANAHTAR}'\n`, // kod dosyası R7 kapsamı DIŞI (secret-scan işi)
+    })
+    const r = kapiyiKos(d)
+    expect(r.kod, r.cikti).toBe(0)
+    expect(r.cikti).toMatch(/ihlal 0/)
+  })
+
+  it('--yeni-nesneler: sonradan silinen .md içindeki anahtar da yakalanır', { timeout: 90_000 }, () => {
+    const d = geciciDizin('depo-dokum-r7-')
+    git(d, 'init', '-q')
+    yaz(d, 'README.md', '# proje')
+    const taban = commitle(d, 'taban')
+    yaz(d, 'docs/sizinti.md', `key=${SAHTE_ANAHTAR}\n`)
+    commitle(d, 'sizinti eklendi')
+    fs.rmSync(path.join(d, 'docs/sizinti.md'))
+    const uc = commitle(d, 'sizinti silindi')
+    expect(kapiyiKos(d).kod).toBe(0) // uçtaki ağaç temiz
+    const r = kapiyiKos(d, ['--yeni-nesneler', uc, '--haric', taban])
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.cikti).toContain('belgede-kimlik-anahtar')
+    expect(r.cikti).not.toContain(SAHTE_ANAHTAR)
+  })
 })

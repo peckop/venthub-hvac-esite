@@ -38,6 +38,10 @@
  *   R6  izlenen ikili veritabanı (.db/.sqlite/.sqlite3 ya da SQLite imzası): içine bakılamaz. ⭐İmza UZANTIDAN
  *       BAĞIMSIZ okunur (2. tur, O1): ağaç kipinde her izlenen dosyanın ilk baytları, itilen nesne kipinde her
  *       aday blob'un başlığı (`app.db.20261006`, `x.sqlite.orig` gibi yedek adları görünmez kalmasın).
+ *   R7  belge/uzantısı değiştirilmiş metin (`BELGE_UZANTILARI`: .md .txt .bak .orig .yaml .log … dosya adının HER noktalı parçası)
+ *       içinde GERÇEK BİÇİMLİ kimlik/anahtar (ALT-64): özel anahtar bloğu, JWT, canlı ödeme/AWS/GitHub/Slack/Google/Supabase
+ *       anahtarı; kimlik bağlamında algoritması tutan TCKN; mod-97 tutan TR IBAN. Değer aranmaz, BİÇİM ve SAĞLAMA aranır
+ *       (rastgele 11 haneli sayı ya da örnek-olmayan sayı takılmaz). İzin listesi YOK (R1/R2/R4/R5 gibi).
  *   Ölçülemedi (çıkış 2): başlıksız CSV/TSV, ayrıştırılamayan veri dosyası, NUL baytlı veri dosyası.
  *   R3 ve R6 dosya bazlı İZİN LİSTESİ alır (gerekçe + kanıt); R1/R2/R4/R5 ASLA (R5: ödeme kartı parçası; tek izinli
  *   örnek `support/` ağaçtan silindi, kartın izin yolu da kapandı).
@@ -61,8 +65,8 @@
  *
  * ⛔DEĞER BASMAZ: çıktıda yalnız DOSYA ADI, KURAL ADI, ALAN ADI ve SAYI vardır.
  *
- * ⚠KAPSAM DIŞI (insan incelemesi): sütun/satır biçimli JSON, SKU anahtarlı fiyat haritası, uzantı
- * değiştirme (`.bak`, `.md`), base64, dosyayı parçalara bölme. Cetvel §8 bunları adıyla yazar.
+ * ⚠KAPSAM DIŞI (insan incelemesi): sütun/satır biçimli JSON, SKU anahtarlı fiyat haritası, base64, dosyayı parçalara bölme,
+ * uzantısız ya da listede olmayan uzantıyla saklanan dosya, belgede kişisel alan adı+değer (R7 yalnız kimlik/anahtar BİÇİMİ arar). Cetvel §8 bunları adıyla yazar.
  * ⚠Bu kapı GEÇMİŞİ temizlemez; geçmiş temizliği ayrı iştir (ALT-41).
  */
 'use strict'
@@ -75,6 +79,17 @@ const path = require('node:path')
 
 /** İçeriği taranan uzantılar. Yol kuralları (R4/R6) uzantıdan bağımsız, her izlenen yola uygulanır. */
 const VERI_UZANTILARI = Object.freeze(['json', 'jsonl', 'ndjson', 'csv', 'tsv', 'sql'])
+
+/**
+ * R7 (ALT-64): UZANTISI DEĞİŞTİRİLMİŞ ya da belge sayılan metin dosyaları. Veri uzantısı olmayan ama kimlik/anahtar taşıyabilen
+ * üretilmiş belge (`docs/*_master.md`), yedek (`x.json.bak`, `x.md.orig`), yapılandırma/günlük metni. Kod dosyaları (ts/js/...) YOK:
+ * fikstür taşırlar, yanlış alarm üretirler; kod içindeki sır `secret-scan.py`'nin işidir.
+ * Eşleşme dosya adının noktadan sonraki HER parçasına bakar (`rapor.md.20261007`, `veri.csv.bak`, `x.yaml.old`).
+ */
+const BELGE_UZANTILARI = Object.freeze([
+  'md', 'mdx', 'markdown', 'txt', 'text', 'rst', 'log', 'bak', 'orig', 'old', 'tmp', 'save', 'swp', 'yaml', 'yml',
+  'ini', 'conf', 'cfg', 'toml', 'env', 'html', 'htm', 'xml', 'rtf',
+])
 
 /** Bundan büyük veri dosyası TARANAMAZ → ölçülemedi (fail-closed). */
 const BUYUK_DOSYA_SINIRI = 64 * 1024 * 1024
@@ -228,6 +243,7 @@ const KURALLAR = Object.freeze({
   R4: 'dokum-yolu',
   R5: 'odeme-parcasi',
   R6: 'ikili-veritabani',
+  R7: 'belgede-kimlik-anahtar',
 })
 
 /** R4 uzantı kalıpları (sıkıştırılmış, arşiv, ikili döküm, tablo). */
@@ -1372,10 +1388,83 @@ function sqlKisisel(sql) {
  * Bir veri dosyasının içeriğini kurallara göre değerlendirir. SAF: dosya sistemine dokunmaz.
  * @returns {{bulgular: Array<{kural:string, ayrinti:string}>, olculemedi: string[]}} — ayrıntıda DEĞER YOKTUR.
  */
+/** Yol, R7 belge taramasına girer mi? Dosya adında (dizin hariç) ilk noktadan sonraki herhangi bir parça BELGE_UZANTILARI'nda. */
+function belgeMi(yol) {
+  const ad = yol.slice(yol.lastIndexOf('/') + 1).toLowerCase()
+  const parcalar = ad.split('.').slice(1)
+  return parcalar.some((p) => BELGE_UZANTILARI.includes(p))
+}
+
+/** Veri uzantılı ya da belge sayılan yol: içeriği taranır. */
+function taranirMi(yol) {
+  return VERI_UZANTILARI.includes(uzanti(yol)) || belgeMi(yol)
+}
+
+/** T.C. kimlik numarası algoritması (11 hane, ilk hane 0 değil, 10. ve 11. hane sağlaması). Rastgele 11 haneli sayıyı eler. */
+function tcknGecerliMi(s) {
+  if (!/^[1-9]\d{10}$/.test(s)) return false
+  const d = [...s].map(Number)
+  const tek = d[0] + d[2] + d[4] + d[6] + d[8]
+  const cift = d[1] + d[3] + d[5] + d[7]
+  const d10 = (((tek * 7 - cift) % 10) + 10) % 10
+  const d11 = d.slice(0, 10).reduce((a, b) => a + b, 0) % 10
+  return d[9] === d10 && d[10] === d11
+}
+
+/** IBAN mod-97 sağlaması (harfler 10..35 sayısına çevrilir; parçalı hesap, BigInt yok). */
+function ibanGecerliMi(bosluksuz) {
+  const tasi = bosluksuz.slice(4) + bosluksuz.slice(0, 4)
+  let kalan = 0
+  for (const c of tasi) {
+    const kod = c >= 'A' && c <= 'Z' ? String(c.charCodeAt(0) - 55) : c
+    for (const h of kod) kalan = (kalan * 10 + Number(h)) % 97
+  }
+  return kalan === 1
+}
+
+/** R7 anahtar/belirteç imzaları (hepsi sınırlı uzunluk; doğrusal). Ad çıktıda görünür, değer ASLA. */
+const R7_ANAHTAR_IMZALARI = Object.freeze([
+  { ad: 'özel anahtar bloğu', desen: /-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----[\r\n ]*[A-Za-z0-9+/=]{40,}/g },
+  { ad: 'JWT', desen: /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g },
+  { ad: 'canlı ödeme/API anahtarı', desen: /\b[sr]k_live_[A-Za-z0-9]{16,}/g },
+  { ad: 'AWS erişim anahtarı', desen: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g },
+  { ad: 'GitHub belirteci', desen: /\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{50,})/g },
+  { ad: 'Slack belirteci', desen: /\bxox[abprs]-[A-Za-z0-9-]{20,}/g },
+  { ad: 'Google API anahtarı', desen: /\bAIza[0-9A-Za-z_-]{35}\b/g },
+  { ad: 'Supabase gizli anahtar', desen: /\b(?:sbp_[0-9a-f]{40}|sb_secret_[A-Za-z0-9_-]{20,})/g },
+])
+
+const R7_TCKN_BAGLAMI = /(?:t\.?\s?c\.?\s*kimlik|tckn|tc\s*no|kimlik\s*(?:no|numaras[ıi])|identity[_ ]?number)[^\n\d]{0,40}([1-9]\d{10})(?!\d)/gi
+const R7_IBAN = /\bTR\d{2}(?: ?\d{4}){5} ?\d{2}\b/g
+
+/**
+ * R7: belge/uzantısı değiştirilmiş metinde GERÇEK BİÇİMLİ kimlik ya da anahtar. Değere değil biçime ve sağlamaya bakar:
+ * TCKN yalnız kimlik bağlamında VE algoritması tutuyorsa, IBAN mod-97 tutuyorsa, anahtar bilinen imza + uzunlukla.
+ * @returns {string[]} 'tür (sayı)' satırları; boşsa temiz. Değer basılmaz.
+ */
+function belgeKimlikTara(metin) {
+  const say = new Map()
+  const ekle = (ad, n) => n > 0 && say.set(ad, (say.get(ad) || 0) + n)
+  for (const { ad, desen } of R7_ANAHTAR_IMZALARI) ekle(ad, (metin.match(desen) || []).length)
+  let tc = 0
+  for (const m of metin.matchAll(R7_TCKN_BAGLAMI)) if (tcknGecerliMi(m[1])) tc++
+  ekle('T.C. kimlik numarası (sağlamalı)', tc)
+  let iban = 0
+  for (const m of metin.matchAll(R7_IBAN)) if (ibanGecerliMi(m[0].replace(/ /g, ''))) iban++
+  ekle('IBAN (mod-97 sağlamalı)', iban)
+  return [...say].map(([ad, n]) => `${ad} (${n})`)
+}
+
 function dosyaDegerlendir(yol, metin) {
   const uz = uzanti(yol)
   const bulgular = []
   const olculemedi = []
+  if (!VERI_UZANTILARI.includes(uz)) {
+    // Belgede NUL ölçülemedi DEĞİLDİR: BOM'suz UTF-16 ya da yarı bozuk metin NUL'ları atılıp taranır (ASCII kimlik/anahtar biçimi kalır).
+    const r7 = belgeMi(yol) ? belgeKimlikTara(metin.split(String.fromCharCode(0)).join('')) : []
+    if (r7.length > 0) bulgular.push({ kural: 'R7', ayrinti: `belgede gerçek biçimli kimlik/anahtar: ${r7.join(', ')}` })
+    return { bulgular, olculemedi }
+  }
   const kisiselEkle = (alanlar, genel, ek = '') => {
     if (alanlar.length > 0) bulgular.push({ kural: 'R1', ayrinti: `alan: ${alanlar.join(', ')}${ek}` })
     if (genel.length > 0) bulgular.push({ kural: 'R1', ayrinti: `genel alan (≥${KISISEL_ESIK} dolu satır): ${genel.join(', ')}${ek}` })
@@ -1466,11 +1555,11 @@ function tara({ dosyalar, oku, izin = IZIN_LISTESI, ikili, blobOf }) {
     } else if (ikili && ikili(yol)) {
       kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'izlenen ikili veritabanı (SQLite imzası ya da pg_dump arşiv imzası)' })
     }
-    if (!VERI_UZANTILARI.includes(uz)) continue
+    if (!taranirMi(yol)) continue
     const metin = oku(yol)
     if (metin === null) continue
     veriDosyasi++
-    if (metin.includes(String.fromCharCode(0))) {
+    if (VERI_UZANTILARI.includes(uz) && metin.includes(String.fromCharCode(0))) {
       olculemedi.push({ dosya: yol, ayrinti: 'veri dosyasında NUL baytı (BOM\'suz UTF-16 ya da ikili içerik); okunamadı' })
       continue
     }
@@ -1661,7 +1750,7 @@ function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = I
       }
     }
     const yolListesi = [...kumeler]
-    const veriYollari = yolListesi.filter((y) => VERI_UZANTILARI.includes(uzanti(y)))
+    const veriYollari = yolListesi.filter((y) => taranirMi(y))
     // Uzantısı zaten R6 olan yollar yukarıda kaydedildi; AYNI içeriği taşıyan BAŞKA yollar (a-yedek, veri.json) imzayla ayrıca ölçülür.
     const digerYollar = yolListesi.filter((y) => !ikiliUzantiMi(y))
     if (veriYollari.length > 0 && b.boyut > BUYUK_DOSYA_SINIRI) {
@@ -1715,7 +1804,7 @@ function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = I
       if (g.veriYollari.length === 0) continue
       veriBlob++
       const icerik = metneCevir(ham)
-      if (icerik.includes(String.fromCharCode(0))) {
+      if (g.veriYollari.some((y) => VERI_UZANTILARI.includes(uzanti(y))) && icerik.includes(String.fromCharCode(0))) {
         olculemedi.push({ dosya: g.veriYollari[0], ayrinti: "veri blob'unda NUL baytı (BOM'suz UTF-16 ya da ikili içerik); okunamadı" })
         continue
       }
@@ -1886,6 +1975,11 @@ function calistir(argv, ortam = {}) {
 
 module.exports = {
   VERI_UZANTILARI,
+  BELGE_UZANTILARI,
+  belgeMi,
+  belgeKimlikTara,
+  tcknGecerliMi,
+  ibanGecerliMi,
   BUYUK_DOSYA_SINIRI,
   NESNE_TAVANI,
   OKUMA_TAVANI,
