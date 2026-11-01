@@ -26,6 +26,8 @@ interface Pr {
   dosyalar: string[] | null
   yorumlar: string[]
   kapilar: Kapi[] | null
+  etiketler?: string[]
+  govde?: string
 }
 interface Satir {
   no: number
@@ -36,7 +38,7 @@ interface Satir {
 }
 
 const motor = require_(path.join(KOK, 'scripts', 'hijyen', 'yesil-pr.cjs')) as {
-  siniflandir: (pr: Pr, cekirdek: string[]) => { kova: string; sebep: string }
+  siniflandir: (pr: Pr, cekirdek: string[], simdi?: number) => { kova: string; sebep: string }
   tara: (prler: Pr[], cekirdek: string[]) => { satirlar: Satir[]; sayim: Record<string, number> }
   sahip: (dal: string) => string
 }
@@ -92,6 +94,15 @@ describe('INV-YESIL-PR-1 yeşil PR tarayıcı', () => {
     const k = pr({ dosyalar: ['.claude/hooks/x.cjs'] })
     expect(motor.siniflandir(k, CEKIRDEK).kova).toBe('ops-onayi')
     expect(motor.siniflandir({ ...k, yorumlar: ['OPS: tam fark UYGUN'] }, CEKIRDEK).kova).toBe('hazir')
+  })
+
+  it('bekletiliyor etiketi ya da tarihi geçmemiş bekle: satırı hazır saymaz; tarihi geçmiş satır saymaz', () => {
+    const simdi = Date.parse('2026-11-01T12:00:00Z')
+    expect(motor.siniflandir({ ...pr(), etiketler: ['bekletiliyor'] }, CEKIRDEK, simdi).kova).toBe('bekletilen')
+    const govde = 'Kanban: URN-85\nbekle: 2026-11-20 urun icerigiyle birlikte acilir'
+    expect(motor.siniflandir({ ...pr(), govde }, CEKIRDEK, simdi).kova).toBe('bekletilen')
+    const eski = 'bekle: 2026-10-01 eski engel'
+    expect(motor.siniflandir({ ...pr(), govde: eski }, CEKIRDEK, simdi).kova).toBe('hazir')
   })
 
   it('taslak ayrı kovadadır; sahip dal adından okunur', () => {
