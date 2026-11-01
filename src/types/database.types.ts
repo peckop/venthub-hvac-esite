@@ -4385,10 +4385,12 @@ export type Database = {
         Returns: string
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
-      display_price: {
-        Args: { p: Database["public"]["Tables"]["products"]["Row"] }
-        Returns: number
-      }
+      display_price:
+        | {
+            Args: { p: Database["public"]["Tables"]["products"]["Row"] }
+            Returns: number
+          }
+        | { Args: { p_product_id: string }; Returns: number }
       display_price_tax_included: {
         Args: { p: Database["public"]["Tables"]["products"]["Row"] }
         Returns: boolean
@@ -4605,6 +4607,7 @@ export type Database = {
         Args: { p_order_id: string; p_reason: string }
         Returns: Json
       }
+      rate_limits_temizle: { Args: { p_saklama?: string }; Returns: number }
       reverse_inventory_batch:
         | { Args: { p_batch_id: string }; Returns: undefined }
         | {
