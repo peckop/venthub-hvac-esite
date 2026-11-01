@@ -769,9 +769,29 @@ function onceBunlarEkle() {
   }
 }
 
+/** VADESİ GELEN (ARC-236): yalnız OPS penceresi açılışında; Kanban okunamazsa sessiz (fail-open). */
+function vadeEkle() {
+  try {
+    if (!rolSeridi || String(rolSeridi).trim().toUpperCase() !== 'OPS') return
+    const t = new Date()
+    const bugun = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
+    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).vadeMetni(bugun)
+    if (!metin) return
+    bolumler.splice(2, 0, {
+      ad: 'vade',
+      oncelik: 2,
+      tam: metin,
+      ozet: 'VADESİ GELEN kartlar var — node scripts/board/kanban-anlik.cjs --acik --kisa --vade-son <bugün>\n',
+    })
+  } catch {
+    /* Kanban okunamadı: açılış bloklanmaz */
+  }
+}
+
 const yaz = () => {
   rolBolumuEkle()
   onceBunlarEkle()
+  vadeEkle()
   haritaBolumuEkle()
   const cikti = {
     hookEventName: 'SessionStart',
