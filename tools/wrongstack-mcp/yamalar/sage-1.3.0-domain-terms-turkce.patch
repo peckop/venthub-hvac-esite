@@ -1,7 +1,6 @@
-diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js
 --- a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js
 +++ b/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js
-@@ -488,7 +488,7 @@ var COMMON_WORD_STOPLIST = /* @__PURE__ */ new Set([
+@@ -628,7 +628,7 @@
  function extractCandidatesFromMessage(text, role) {
    const out = [];
    const source = role;
@@ -10,7 +9,7 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/
    if (!cleaned) return out;
    const claimed = [];
    const claim = (match, term) => {
-@@ -501,7 +501,7 @@ function extractCandidatesFromMessage(text, role) {
+@@ -641,7 +641,7 @@
      const key = normalizeTerm(term);
      return claimed.some((c) => c.key === key && start < c.end && end > c.start);
    };
@@ -19,7 +18,7 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/
      const term = match[1];
      if (isStoplisted(term)) continue;
      claim(match, term);
-@@ -529,7 +529,7 @@ function extractCandidatesFromMessage(text, role) {
+@@ -669,7 +669,7 @@
        sources: [source]
      });
    }
@@ -28,7 +27,7 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/
      const term = match[1];
      if (!hasCamelBoundary(term)) continue;
      if (isStoplisted(term)) continue;
-@@ -544,7 +544,7 @@ function extractCandidatesFromMessage(text, role) {
+@@ -684,7 +684,7 @@
      });
    }
    for (const match of cleaned.matchAll(
@@ -37,7 +36,7 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/
    )) {
      const raw = match[0];
      const term = raw.replace(/^(?:the|a|an)\s+/i, "").trim();
-@@ -564,7 +564,7 @@ function extractCandidatesFromMessage(text, role) {
+@@ -704,7 +704,7 @@
    for (const cand of out) {
      if (cand.definition) continue;
      const sentenceRegex = new RegExp(
@@ -46,7 +45,7 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/
        "i"
      );
      const m = stream.match(sentenceRegex);
-@@ -601,9 +601,8 @@ function isStoplisted(term) {
+@@ -741,9 +741,8 @@
    return false;
  }
  function hasCamelBoundary(identifier) {
@@ -58,11 +57,11 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/sage/dist/index.js b/
    return false;
  }
  function cleanBoldedCandidate(raw) {
-@@ -639,7 +638,7 @@ function pickBetter(a, b) {
+@@ -779,7 +778,7 @@
    return a.length >= b.length ? a : b;
  }
  function normalizeTerm(term) {
--  return term.toLowerCase().replace(/[^a-z0-9\s\-_]+/g, " ").replace(/\s+/g, " ").trim();
+-  return term.toLowerCase().replace(/[^\p{L}\p{N}\s\-_]+/gu, " ").replace(/\s+/g, " ").trim();
 +  return term.normalize("NFC").toLowerCase().replace(/\u0307/g, "").replace(/[^\p{L}\p{N}\s\-_]+/gu, " ").replace(/\s+/g, " ").trim();
  }
  async function renderDomainTermsMarkdown(projectRoot, terms) {

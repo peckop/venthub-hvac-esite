@@ -231,6 +231,10 @@ function kur() {
   // düşmek pencerelerin sunucusunu kapatıp yamasız paket bırakırdı).
   const kilitFarki = yamaSurumFarki(yamalar(), kilitSurumOku, 'kilitli')
   if (kilitFarki.length) throw new Error(kilitFarki.join(' · '))
+  // 1.3.0 npm'de yok: kilit `~/.claude/venthub-wrongstack-130/` tarball'larına bakar. Eksik/farklıysa süreçleri
+  // durdurmadan düş (npm ci sonrası düşmek pencerelerin sunucusunu kapatıp paketsiz bırakırdı).
+  const tarballFarki = require('./uret-1.3.0.cjs').denetle()
+  if (tarballFarki.length) throw new Error(tarballFarki.join(' · ') + ' — node tools/wrongstack-mcp/uret-1.3.0.cjs')
   const surecler = surecleriOku()
   const { kendi, yabanci, daemon } = siniflandir(surecler, kendiClaudeBul(surecler))
   if (yabanci.length) {

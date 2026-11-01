@@ -73,6 +73,13 @@
       "nicin": "Dosyanin bas yorumu tam bu kusuru anlatiyor (bir bulgunun mutlak yol gostermesi). Yani yol bir KUSUR degil, kusurun BELGESI. Metin yeniden yazilabilir ama bilgi kaybi olur.",
       "kapanacagi_taraf": "ALTYAPI (dusuk oncelik)",
       "kayit": "REC-102"
+    },
+    {
+      "yol": "tools/wrongstack-mcp/package-lock.json",
+      "sinif": "kilitteki yerel tarball adresi",
+      "nicin": "WrongStack 1.3.0 npm'de YOK; kilitin `resolved` alani bu makinedeki derlenmis tarball dizinini (home altinda venthub-wrongstack-130) gosterir ve `npm ci` kilitteki adresten ceker. npm kilidinde ortam degiskeni ya da `~` yoktur; goreli yol worktree derinligine gore degisir. Kod degil, makine-okunur kilit; yalniz bu makinede calisir (README 'Niçin kaynaktan' bolumunde yazili). Kurulum tarball saglamasini npm ci'dan once denetler.",
+      "kapanacagi_taraf": "ARAC (1.3.0 npm'e cikinca ya da yukseltme sonrasi kilit npm adreslerine doner)",
+      "kayit": "ARC-199"
     }
   ],
   "prose_mandali": {

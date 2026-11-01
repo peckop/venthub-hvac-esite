@@ -1,8 +1,7 @@
-diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js
 --- a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js
 +++ b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js
-@@ -330,7 +330,7 @@
-         const result = await executeKanban(withListDefaults(action, args), context, signal);
+@@ -357,7 +357,7 @@
+         const result = await executeKanban(withListDefaults(action, checked.args), context, signal);
          signal.throwIfAborted();
          const failed = !!result && typeof result === "object" && !Array.isArray(result) && result["ok"] === false;
 -        return { content: result, isError: failed };
@@ -10,11 +9,10 @@ diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.j
        } catch (error) {
          return { content: mcpErrorContent(error), isError: true };
        }
-diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
 --- a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
 +++ b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
-@@ -317,7 +317,7 @@
-         const result = await executeKanban(withListDefaults(action, args), context, signal);
+@@ -344,7 +344,7 @@
+         const result = await executeKanban(withListDefaults(action, checked.args), context, signal);
          signal.throwIfAborted();
          const failed = !!result && typeof result === "object" && !Array.isArray(result) && result["ok"] === false;
 -        return { content: result, isError: failed };
