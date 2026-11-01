@@ -93,4 +93,21 @@ describe('INV-WRONGSTACK-KURULUM-1 · kurulum betiği', () => {
     expect(kaynak).toMatch(/ilk cagrida kendiliginden acilir/)
     expect(kaynak).toMatch(/HAZIR/)
   })
+
+  it('⭐SAĞLAMA dosyası CRLF checkout\'ta da okunur (1 Kasım: \\r dosya adına karışıp 15 doğru tarball reddedildi)', () => {
+    const { saglamaOku } = createRequire(import.meta.url)(path.resolve(process.cwd(), 'tools', 'wrongstack-mcp', 'uret-1.3.0.cjs')) as {
+      saglamaOku: (m: string) => Map<string, string>
+    }
+    const h = 'a'.repeat(64)
+    const b = 'b'.repeat(64)
+    for (const eol of ['\n', '\r\n']) {
+      const m = saglamaOku(`${h}  wrongstack-core-1.3.0.tgz${eol}${b}  wrongstack-sage-1.3.0.tgz${eol}`)
+      expect([...m.entries()], `satır sonu ${JSON.stringify(eol)}`).toEqual([
+        ['wrongstack-core-1.3.0.tgz', h],
+        ['wrongstack-sage-1.3.0.tgz', b],
+      ])
+    }
+    // sabotaj kolu: geçersiz sağlama satırı sessizce kabul edilmez
+    expect(saglamaOku('abc  wrongstack-core-1.3.0.tgz\r\n').size).toBe(0)
+  })
 })

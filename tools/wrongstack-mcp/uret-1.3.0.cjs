@@ -111,10 +111,23 @@ function uret() {
   process.stdout.write(dizinler.length + ' tarball yazildi: ' + PAKET_DIZINI + '\nsaglama: ' + SAGLAMA + '\n')
 }
 
+/**
+ * `<sha256>  <dosya>` satırları → Map(dosya → sha256). CRLF dayanıklı: Windows'ta git bu dosyayı CRLF'e çevirir
+ * (1 Kasım: ayrıştırıcı `\r`yi dosya adına katıp 15 doğru tarball'ı "saglama farkli" saydı, kurulum düştü).
+ */
+function saglamaOku(metin) {
+  const harita = new Map()
+  for (const satir of String(metin).split(/\r?\n/)) {
+    const m = satir.trim().match(/^([0-9a-f]{64})\s+\*?(\S+)$/i)
+    if (m) harita.set(m[2], m[1].toLowerCase())
+  }
+  return harita
+}
+
 /** Tarball'ların toplamları depodaki listeyle aynı mı? Farkları döndürür. */
 function denetle() {
   const fark = []
-  const beklenen = new Map(fs.readFileSync(SAGLAMA, 'utf8').split('\n').filter(Boolean).map((s) => s.split(/\s+/).reverse()))
+  const beklenen = saglamaOku(fs.readFileSync(SAGLAMA, 'utf8'))
   for (const d of PAKETLER) {
     const dosya = path.join(PAKET_DIZINI, tarballAdi(d))
     if (!fs.existsSync(dosya)) fark.push('tarball yok: ' + dosya)
@@ -152,7 +165,7 @@ function kilitUret() {
   process.stdout.write('package.json + package-lock.json yazildi (resolved = ' + PAKET_DIZINI + '/…)\n')
 }
 
-module.exports = { kapanis, tarballAdi, sha256, denetle, PAKETLER, SUNUCULAR, PAKET_DIZINI, SURUM }
+module.exports = { kapanis, tarballAdi, sha256, denetle, saglamaOku, PAKETLER, SUNUCULAR, PAKET_DIZINI, SURUM }
 
 if (require.main === module) {
   try {
