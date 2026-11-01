@@ -219,6 +219,8 @@ it('supabase.order("created_at") çağırır', async () => {
 Etkileşim doğrulaması yalnız çağrının kendisi sözleşmeyse meşrudur (ör. webhook'un ikinci kez işlenmediği, e-postanın
 bir kez gönderildiği); o zaman nedenini teste yaz.
 
+**Çökme ve rollback gerçek sınırda sınanır.** Enjekte edilen istisna süreç sonlanması değildir, mock'lanmış transaction çağrısı veritabanı rollback'i değildir; migration=prod (kural 13) ve sipariş durumu monotonluğu (kural 11) bu davranışa dayandığından ikisi gerçek veritabanı sınırında ölçülür, mock yeşili bu iddiaya kanıt sayılmaz.
+
 **Hata onarımında yeniden üretim testini bağımsız yazdır.** Karmaşık hata onarımında kırmızı testi, onarımı bilmeyen ayrı bir
 çalışana yazdırmak testi sağlamlaştırır: çalışan yalnız hata tarifinden testi yazar ve mevcut kodla **kırmızı** olduğunu gösterir;
 sonra sen onarımı yaparsın ve aynı testin yeşile döndüğünü doğrularsın. Test dosyasını yazan çalışan `name` ile açılan

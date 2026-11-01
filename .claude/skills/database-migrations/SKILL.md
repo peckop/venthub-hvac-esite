@@ -79,6 +79,20 @@ and exact version for operational decisions.
 
 - Prove old/new application compatibility, backfill repeatability, migration ordering and a recovery path.
 
+## YTN-24 eki: kaldırma kanıtı, yıkıcı adım ayrı, sınırlı doldurma (VentHub'a uyarlandı)
+
+Kural 2-3'ün ve ek kural 2'nin üstüne yalnız eksik üç madde:
+
+1. **Kaldırmadan önce kullanım sıfır kanıtı.** Sütun, tablo ya da fonksiyon düşmeden önce okuyan/yazan kalmadığı ölçülür: kod tarafında CodeGraph ya da graphify ile çağıranlar ve referanslar, çalışma tarafında Sentry ve log kayıtlarında erişim izi. "Aramada çıkmadı" yetmez; hangi araçla neye bakıldığı karta yazılır, ölçülemeyen kısım "ölçemedim" diye geçer.
+2. **Ekleme güvenli, yıkıcı adım ayrı ve sonraki PR.** Yeni nullable sütun, yeni tablo, yeni index gibi eklemeler tek başına güvenlidir. Sütun düşürme ve yeniden adlandırma ayrı bir migration PR'ıdır ve kodda eski şekle referans kalmadıktan SONRA açılır; aynı PR'a "ekle ve eskisini düşür" konmaz.
+3. **Doldurma toplu ve sınırlı, büyük index eşzamanlı.** Backfill tek `UPDATE` ile değil, sınırlı parçalarla ve hız kısıtıyla yürür. Büyük tabloda index yazmayı kilitlemeden `CREATE INDEX CONCURRENTLY` ile kurulur; bu komut işlem bloğu içinde çalışmaz, o yüzden migration aracının onu nasıl yürüttüğü önce doğrulanır.
+
+Geri dönüş planı yazılıdır (geri alma veriyi geri getirmez): her migration için yanlış giderse ne yapılacağı, ileri düzeltme ya da yedekten dönüş olarak karta yazılır.
+
+Yeni siteye geçiş (OPS-180) planı yazılırken bu bölüm `observability`'deki YTN-24 eki ile birlikte okunur.
+
+Kaynak: addyosmani/agent-skills deprecation-and-migration @8bfcc1f9916f2eea55494d8c1fa7f4bde867dd9e (MIT)
+
 ## Skills in scope
 
 - data-governance — ownership, retention and classification.

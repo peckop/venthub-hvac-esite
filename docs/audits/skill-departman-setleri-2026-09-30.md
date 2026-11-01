@@ -372,7 +372,7 @@ REC-515 aday tablosundan (`docs/audits/skills-dis-tarama-2026-10.md`) OPS onayı
 |---|---|---|---|
 | web-performance | WrongStack 1.1.0 (MIT) | 6,4 | GEO-SEO/uygulayici, GEO-SEO/dogrulayici, URUN/dogrulayici |
 | geo-fundamentals | vudovn/ag-kit (MIT) | 7 | GEO-SEO/uygulayici, GEO-SEO/arastirmaci |
-| write-seo-geo-content | onvoyage-ai/gtm-engineer-skills (MIT) | 21,9 | BLOG/uygulayici |
+| write-seo-geo-content | onvoyage-ai/gtm-engineer-skills (MIT) | 24,2 | BLOG/uygulayici (YTN-24: "İçerik denetimi: E-E-A-T farkı ve anlamsal boşluk" bölümü GEO-SEO araştırmacı ve çürütücüsünce de adıyla okunur; set bağı eklenmedi, çünkü `adiylaCagir` ajan tanımını değiştirir, karar müdürde) |
 | tech-stack | WrongStack 1.1.0 (MIT) | 9,4 | ALTYAPI/arastirmaci, ALTYAPI/uygulayici, ARAC/arastirmaci |
 | payments-webhooks | WrongStack 1.1.0 (MIT) | 6,6 | SATIS/uygulayici, SATIS/dogrulayici, EDGE/uygulayici, EDGE/dogrulayici |
 | database-migrations | WrongStack 1.1.0 (MIT) | 6,8 | ALTYAPI/uygulayici, ALTYAPI/curutucu, EDGE/uygulayici, EDGE/curutucu |

@@ -143,6 +143,14 @@ Ters yedek zinciri ve çifte işlem kusurları iki tarafı birbirine benzediği 
 
 Kaynak: msitarzewski/agency-agents specialized-codebase-archaeologist @b37b5bb3 (MIT).
 
+## YTN-24 eki: bulguyu çürütmeyi dene, doğrulanınca ailesini ara
+
+1. **Raporlamadan önce çürüt.** Kusur adayı için kırılma girdisini gerçekten oraya taşıyan bir yol var mı diye bak: çağıranlar bu girdiyi üretebiliyor mu, üstte bir doğrulama, kısıt ya da yetki koruması onu eliyor mu. Yol kodda gösterilemiyorsa aday "doğrulanmadı" olarak kalır; "benzer kod başka yerde patlamıştı" gerekçe değildir, her örnek kendi bağlamında sınanır.
+2. **Doğrulanınca ailesini ara.** Kök nedeni tek cümleyle yaz (kod ne yapıyor değil, neden yanlış), sonra aynı hatanın başka yüzlerini depoda ara: kardeş işleyiciler, aynı yardımcıyı çağıran diğer yerler, boş/sıfır/sınır girdiler. Aramayı bilinen örneği tam yakalayan dar bir desenle başlat, sonra her adımda tek öğeyi gevşet; eşleşmelerin yarısından fazlası gürültüyse dur. Yalnız ilk hatanın bulunduğu modülde aramak en sık düşülen tuzaktır.
+
+Fikir kaynağı: trailofbits/skills fp-check @2be6433b39e009cd2b6fd3be1895f6b1faa5af9a (CC-BY-SA-4.0; metin kopyalanmadı)
+Fikir kaynağı: trailofbits/skills variant-analysis @2be6433b39e009cd2b6fd3be1895f6b1faa5af9a (CC-BY-SA-4.0; metin kopyalanmadı)
+
 ## Patterns and report
 
 For scanning patterns, severity-ranked report examples and output shape, [Read the detailed workflow](references/patterns-and-report.md).
