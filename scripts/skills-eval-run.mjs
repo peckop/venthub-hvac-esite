@@ -105,7 +105,7 @@ function agaciOku(agac) {
  */
 function cliyeSor(istem) {
   // Sade bağlam (EK-1): bayraksız çağrı tam oturum açar, ölçümü kirletir — lib.mjs'teki gerekçe.
-  const r = spawnSync('claude', ['-p', '--model', MODEL, ...CLI_SADE_BAYRAKLAR], {
+  const r = spawnSync('claude', ['-p', '--model', MODEL, ...CLI_SADE_BAYRAKLAR, '--max-budget-usd', '0.50'], {
     input: istem,
     encoding: 'utf8',
     timeout: 120_000,

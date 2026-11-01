@@ -101,7 +101,7 @@ function haiku(aday = null) {
         `Yalnız JSON döndür: {"puan":{"<no>":<0-100>, ...}} — listedeki dersin HEPSİ için puan ver; ilgisizse 0-10.\n\nDERSLER:\n${katalog}\n\nSORU: ${q}`
       // ⚠Sade bayraklar ZORUNLU (ölçüldü 09-22): bayraksız `claude -p` bu makinede ~257k jeton bağlam taşıyıp
       // "Prompt is too long" veriyor (eklenti/MCP/skill tanımları). --bare OAuth'u kapatıyor (API anahtarı ister).
-      const cikti = execFileSync('claude', ['-p', '--model', 'haiku', '--output-format', 'json', '--max-turns', '1', '--tools', '',
+      const cikti = execFileSync('claude', ['-p', '--model', 'haiku', '--output-format', 'json', '--max-turns', '1', '--max-budget-usd', '0.50', '--tools', '',
         '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--disable-slash-commands', '--setting-sources', '',
         '--system-prompt', 'Sen bir sıralama aracısın. Yalnız istenen JSON\'u döndür.'], {
         input: istem, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout: 180000,
