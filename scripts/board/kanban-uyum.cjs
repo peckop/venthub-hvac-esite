@@ -7,7 +7,9 @@
  *   · açılan kartların KAYNAK/CETVEL, YÖNTEM ve ÖNCEKİ ÇALIŞMA satırı oranı (.claude/rules/filo-ortak.md "İş ve kart");
  *   · açılan kartların kanıt komutu oranı (successCriteria içinde manual OLMAYAN en az bir kontrol);
  *   · Done'a giren kartların verify_completion `passed` raporu taşıma oranı (kanit-muaf / karar-verildi etiketli kart paydadan düşer);
- *   · In Progress / Review'da 5+ gündür hareketsiz kartlar.
+ *   · In Progress / Review'da 5+ gündür hareketsiz kartlar;
+ *   · (ARC-235) birleşmiş PR'i olup hâlâ açık kartlar: PR gövdesinde `Kanban: <no>` olan birleşmiş PR'ler `gh pr list` ile okunur
+ *     (ağ/gh yoksa bu ölçüm ATLANIR ve çıktıya `birlesmisPrliAcik: null` yazılır, kırmızı üretmez).
  * KIRMIZI: oran eşiğin altındaysa VE örneklem en az EN_AZ_ORNEK ise (3 kartlık pano kırmızı üretmesin). Eşik departman başına:
  * ESIK_DEPARTMAN; satırı olmayan departman ESIK_VARSAYILAN kullanır (şimdilik hepsi aynı; ayrım gerekince buraya yazılır).
  *
@@ -21,6 +23,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const { spawnSync } = require('node:child_process')
+const { birlesmisPrliAcikKartlar } = require('./kart-kapat.cjs')
 
 const GUN_MS = 24 * 60 * 60 * 1000
 const EN_AZ_ORNEK = 3
@@ -105,6 +108,14 @@ function uyumHesapla(panolar, simdiMs, secenek = {}) {
     if (done.length >= EN_AZ_ORNEK && doneOran < esik.doneVerify) kirmizi.push(`doneVerify ${yuzde(doneOran)} (eşik ${yuzde(esik.doneVerify)}, ${done.length} kart)`)
     if (hareketsiz.length > 0) kirmizi.push(`hareketsiz ${hareketsiz.length} kart (${HAREKETSIZ_GUN}+ gün)`)
 
+    // ARC-235 (B): birleşmiş PR'i olup hâlâ açık kart = "PR birleşince kartı kapatan adım yok" boşluğunun ölçüsü.
+    // Yalnız `secenek.prler` verilirse ölçülür (ağ gerekir; verilmediyse sessiz, kırmızı üretmez).
+    let birlesmis = null
+    if (Array.isArray(secenek.prler)) {
+      birlesmis = birlesmisPrliAcikKartlar(kartlar.map((t) => ({ no: kartNo(t.title), columnId: t.columnId, status: t.status })), secenek.prler)
+      if (birlesmis.tek.length > 0) kirmizi.push(`birlesmisPrliAcik ${birlesmis.tek.length} kart (PR birleşti, kart açık: ${birlesmis.tek.slice(0, 8).map((k) => k.no).join(', ')})`)
+    }
+
     sonuc.push({
       ad: pano.title,
       departman: departmanAnahtari(pano.title),
@@ -112,6 +123,7 @@ function uyumHesapla(panolar, simdiMs, secenek = {}) {
       oranlar,
       done: { n: done.length, verifyli: verifyli.length, oran: doneOran },
       hareketsiz: { n: hareketsiz.length, kartlar: hareketsiz.slice(0, 10).map((t) => kartNo(t.title)) },
+      birlesmisPrliAcik: birlesmis && { tek: birlesmis.tek.map((k) => k.no), cok: birlesmis.cok.map((k) => k.no) },
       kirmizi,
     })
   }
@@ -169,6 +181,18 @@ function argumanlar(argv) {
   return a
 }
 
+/** Son 300 birleşmiş PR (numara, gövde, birleşme zamanı); gh yoksa/ağ yoksa null (ölçüm atlanır). */
+function birlesmisPrleriOku() {
+  try {
+    const r = spawnSync('gh', ['pr', 'list', '--state', 'merged', '--limit', '300', '--json', 'number,body,mergedAt'], { encoding: 'utf8', timeout: 20000, windowsHide: true })
+    if (r.status !== 0) return null
+    const v = JSON.parse(r.stdout)
+    return Array.isArray(v) ? v : null
+  } catch {
+    return null
+  }
+}
+
 function main() {
   const a = argumanlar(process.argv.slice(2))
   let panolar
@@ -178,7 +202,7 @@ function main() {
     process.stdout.write(JSON.stringify({ hata: e instanceof Error ? e.message : String(e) }) + '\n')
     process.exit(1)
   }
-  let sonuc = uyumHesapla(panolar, Date.now(), { gun: a.gun })
+  let sonuc = uyumHesapla(panolar, Date.now(), { gun: a.gun, prler: birlesmisPrleriOku() })
   if (a.pano) sonuc = sonuc.filter((p) => p.ad.toLowerCase().includes(a.pano))
   if (a.metin) process.stdout.write(metinTablosu(sonuc) + '\n')
   else process.stdout.write(JSON.stringify({ uretildi: new Date().toISOString(), gun: a.gun, panolar: sonuc }) + '\n')
@@ -186,4 +210,4 @@ function main() {
 
 if (require.main === module) main()
 
-module.exports = { uyumHesapla, esikler, departmanAnahtari, satirVarMi, kanitKomutuVarMi, metinTablosu, ESIK_VARSAYILAN, ESIK_DEPARTMAN, EN_AZ_ORNEK, HAREKETSIZ_GUN }
+module.exports = { birlesmisPrleriOku, uyumHesapla, esikler, departmanAnahtari, satirVarMi, kanitKomutuVarMi, metinTablosu, ESIK_VARSAYILAN, ESIK_DEPARTMAN, EN_AZ_ORNEK, HAREKETSIZ_GUN }
