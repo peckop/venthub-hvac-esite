@@ -9,6 +9,8 @@
  *
  * KOVALAR (ilk tutan kazanır, sıra önemlidir):
  *   taslak       draft PR (yalnız sayılır)
+ *   bekletilen   bilerek bekletilen PR: `bekletiliyor` etiketi ya da gövdede tarihi geçmemiş
+ *                `bekle: <YYYY-MM-DD> <engel>` satırı (sahipsiz-pr.cjs ile aynı ayrıştırıcı); hazır sayılmaz
  *   kirmizi      en az bir kapı `fail` kovasında
  *   cakisma      mergeStateStatus DIRTY
  *   olculemedi   kapılar okunamadı ya da mergeStateStatus UNKNOWN (GitHub hesaplıyor)
@@ -30,9 +32,10 @@ const path = require('node:path')
 const { execFile } = require('node:child_process')
 const { promisify } = require('node:util')
 const ritu = require('./merge-ritueli.cjs')
+const { bekleMuaf } = require('./sahipsiz-pr.cjs')
 
 const execFileAsync = promisify(execFile)
-const KOVA_SIRASI = ['hazir', 'ops-onayi', 'recep-onayi', 'eski-taban', 'kirmizi', 'cakisma', 'ci-suruyor', 'olculemedi', 'taslak']
+const KOVA_SIRASI = ['hazir', 'ops-onayi', 'recep-onayi', 'eski-taban', 'kirmizi', 'cakisma', 'ci-suruyor', 'olculemedi', 'bekletilen', 'taslak']
 const KOVA_ADI = {
   hazir: 'yesil ve birlesmeye hazir',
   'ops-onayi': 'OPS fark okumasi bekliyor',
@@ -42,8 +45,10 @@ const KOVA_ADI = {
   cakisma: 'cakisma',
   'ci-suruyor': 'CI suruyor',
   olculemedi: 'olculemedi',
+  bekletilen: 'bilerek bekletiliyor',
   taslak: 'taslak',
 }
+const BEKLET_ETIKETI = 'bekletiliyor'
 const OPS_UYGUN = /\bOPS\b[^\n]{0,80}\bUYGUN\b/
 
 function sahip(dal) {
@@ -53,10 +58,13 @@ function sahip(dal) {
 
 /**
  * Saf karar. pr: {number,title,headRefName,isDraft,mergeStateStatus,dosyalar:string[]|null,
- * yorumlar:string[], kapilar:[{name,bucket}]|null}; cekirdek: zorunlu kapı adları.
+ * yorumlar:string[], kapilar:[{name,bucket}]|null, etiketler?:string[], govde?:string};
+ * cekirdek: zorunlu kapı adları.
  */
-function siniflandir(pr, cekirdek) {
+function siniflandir(pr, cekirdek, simdi = Date.now()) {
   if (pr.isDraft) return { kova: 'taslak', sebep: '' }
+  if ((pr.etiketler || []).includes(BEKLET_ETIKETI)) return { kova: 'bekletilen', sebep: 'etiket ' + BEKLET_ETIKETI }
+  if (bekleMuaf(pr.govde, simdi)) return { kova: 'bekletilen', sebep: 'bekle: satiri' }
   const kapilar = pr.kapilar
   if (!Array.isArray(kapilar)) return { kova: 'olculemedi', sebep: 'kapilar okunamadi' }
   const dusen = kapilar.filter((k) => ritu.DUSEN_KOVALARI.includes(k.bucket)).map((k) => k.name)
@@ -82,9 +90,9 @@ function siniflandir(pr, cekirdek) {
 }
 
 /** Saf: PR'ları kovalara dağıtır, sahibe mesaj önerisini ekler. */
-function tara(prler, cekirdek) {
+function tara(prler, cekirdek, simdi = Date.now()) {
   const satirlar = (Array.isArray(prler) ? prler : []).map((pr) => {
-    const s = siniflandir(pr, cekirdek)
+    const s = siniflandir(pr, cekirdek, simdi)
     const kim = sahip(pr.headRefName)
     let oneri = ''
     if (s.kova === 'hazir') oneri = `${kim}: #${pr.number} yesil, ritüelle birlestir`
@@ -105,9 +113,29 @@ async function gh(args, ms = 20000) {
   return JSON.parse(r.stdout)
 }
 
+/**
+ * mergeStateStatus UNKNOWN = GitHub hâlâ hesaplıyor (master yeni ilerlemişse çoğu PR böyle döner).
+ * Taslak olmayan UNKNOWN PR'lar için bir kez `bekleMs` bekleyip durumu yeniden sorar; ikinci kez sormaz.
+ * oku(no) → yeni mergeStateStatus; okunamazsa eski değer kalır (fail-open, "olculemedi" kovası korur).
+ */
+async function unknownlariTazele(prler, oku, bekle = (ms) => new Promise((r) => setTimeout(r, ms)), bekleMs = 5000) {
+  const hedef = prler.filter((p) => !p.isDraft && String(p.mergeStateStatus || '').toUpperCase() === 'UNKNOWN')
+  if (hedef.length === 0) return 0
+  await bekle(bekleMs)
+  await Promise.all(hedef.map(async (p) => {
+    try {
+      const yeni = await oku(p.number)
+      if (yeni) p.mergeStateStatus = yeni
+    } catch {
+      /* okunamadı: eski değer kalır */
+    }
+  }))
+  return hedef.length
+}
+
 async function olc(kok = path.join(__dirname, '..', '..')) {
   const liste = await gh(['pr', 'list', '--state', 'open', '--limit', '100', '--json',
-    'number,title,headRefName,isDraft,mergeStateStatus,files,comments'])
+    'number,title,headRefName,isDraft,mergeStateStatus,files,comments,labels,body'])
   const prler = await Promise.all(liste.map(async (p) => {
     let kapilar = null
     try { kapilar = await gh(['pr', 'checks', String(p.number), '--json', 'name,bucket']) } catch { kapilar = null }
@@ -116,14 +144,18 @@ async function olc(kok = path.join(__dirname, '..', '..')) {
       mergeStateStatus: p.mergeStateStatus,
       dosyalar: (p.files || []).map((f) => f.path),
       yorumlar: (p.comments || []).map((c) => c.body),
+      etiketler: (p.labels || []).map((l) => l.name),
+      govde: p.body || '',
       kapilar,
     }
   }))
+  await unknownlariTazele(prler, async (no) =>
+    (await gh(['pr', 'view', String(no), '--json', 'mergeStateStatus'])).mergeStateStatus)
   const { kapilar: cekirdek, sinirlar } = ritu.turetCekirdek(kok)
   return { ...tara(prler, cekirdek), cekirdek, sinirlar, olculdu: new Date().toISOString() }
 }
 
-module.exports = { siniflandir, tara, sahip, KOVA_SIRASI, KOVA_ADI }
+module.exports = { siniflandir, tara, sahip, unknownlariTazele, KOVA_SIRASI, KOVA_ADI, BEKLET_ETIKETI }
 
 if (require.main === module) {
   olc().then((s) => {
