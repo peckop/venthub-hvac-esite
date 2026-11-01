@@ -3,8 +3,10 @@
 --         migration-safety-standard.md (Guard A/E) · db-grant-hygiene-standard.md · CLAUDE.md kural 12/13/14.
 --
 -- ÖLÇÜLEN DURUM (canlı DB, salt okuma, 2026-11-01; değerler hiçbir yere yazılmadı, yalnız sayı):
---   anon, public.products üzerinde tablo düzeyi SELECT'e sahipti; 7 maliyet kolonu okunabiliyordu
---   (purchase_price 442/442 dolu, cost_in_base 348 dolu). Sitenin istemci paketindeki genel anahtar yeter.
+--   anon, public.products üzerinde tablo düzeyi SELECT'e sahipti; 7 maliyet kolonu + supplier_name (tedarikçi adı)
+--   okunabiliyordu (purchase_price 442/442 dolu, cost_in_base 348 dolu). Sitenin istemci paketindeki genel anahtar yeter.
+--   supplier_name canlıda VAR (information_schema, 2026-11-01 yeniden ölçüldü; ilk ölçüm yanlıştı, güvenlik
+--   incelemesi yakaladı) ve hassas sayılır: KİLİT 8 KOLONU kapatır.
 --   products hiçbir yayında (Realtime) yok. Vitrin (anon) kodu 7 kolonun HİÇBİRİNİ sorgulamıyor
 --   (açık kolon listeleri, src/lib/services/product.columns.ts); Edge fonksiyonlarında adları geçmiyor.
 --
@@ -16,7 +18,7 @@
 --      get_product_families_enriched) display_price(p.id) çağıracak biçimde yeniden yazılır. YALNIZ o çağrı
 --      satırı değişir; gövdenin geri kalanı canlıdaki tanımla birebir aynıdır.
 --      display_price(p products) DEĞİŞMEZ (service_role/Edge hesaplanan kolon olarak kullanabilir).
---   2) anon'dan products tablo düzeyi SELECT alınır; 7 hassas kolon DIŞINDAKİ her kolon için kolon düzeyi
+--   2) anon'dan products tablo düzeyi SELECT alınır; 8 hassas kolon DIŞINDAKİ her kolon için kolon düzeyi
 --      SELECT verilir (kolon listesi information_schema'dan üretilir, elle yazılmaz).
 --   3) Koruma bloğu (Guard E): migration KENDİ İÇİNDE anon rolüne geçip hassas kolon okumanın reddedildiğini
 --      ve vitrin RPC'lerinin çalıştığını sınar; biri başarısızsa migration TAMAMEN geri döner.
@@ -261,23 +263,17 @@ $function$;
 do $kilit$
 declare
   v_hassas  text[] := array['purchase_price', 'purchase_currency', 'purchase_rate_to_base', 'cost_in_base',
-                            'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at'];
+                            'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name'];
   v_var     int;
   v_izinli  text;
   v_izinli_n int;
 begin
-  -- Guard A (fail-closed): beklenen 7 maliyet kolonu canlıda TAM olarak var mı? Değilse varsayım yanlış, dur.
+  -- Guard A (fail-closed): beklenen 8 hassas kolon canlıda TAM olarak var mı? Değilse varsayım yanlış, dur.
   select count(*) into v_var
     from information_schema.columns
    where table_schema = 'public' and table_name = 'products' and column_name = any(v_hassas);
-  if v_var <> 7 then
-    raise exception 'DURDU: products üzerinde % maliyet kolonu bulundu (beklenen 7) — plan §1.2 ile canlı ayrışmış', v_var;
-  end if;
-
-  -- supplier_name canlıda yok (ölçüldü); ileride dönerse hassas sayılır.
-  if exists (select 1 from information_schema.columns
-              where table_schema = 'public' and table_name = 'products' and column_name = 'supplier_name') then
-    v_hassas := v_hassas || 'supplier_name';
+  if v_var <> 8 then
+    raise exception 'DURDU: products üzerinde % hassas kolon bulundu (beklenen 8) — plan §1.2 ile canlı ayrışmış', v_var;
   end if;
 
   select string_agg(format('%I', column_name), ', ' order by ordinal_position), count(*)
@@ -299,7 +295,7 @@ $kilit$;
 do $guard$
 declare
   v_hassas text[] := array['purchase_price', 'purchase_currency', 'purchase_rate_to_base', 'cost_in_base',
-                           'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at'];
+                           'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name'];
   v_k       text;
   v_ids     uuid[];
   v_n       int;
@@ -351,9 +347,17 @@ begin
     raise exception 'DURDU: get_product_families_enriched anon ile boş döndü';
   end if;
   perform 1 from public.fts_search_products('fan', 5, '{}'::jsonb);
-  select slug into v_slug from public.product_families where deleted_at is null limit 1;
-  if v_slug is null or public.get_family_detail(v_slug, 'tr') is null then
-    raise exception 'DURDU: get_family_detail anon ile boş döndü';
+  -- Aile: örneklenen AKTİF ürünlerden birinin ailesi (display_price(p.id) satırı gerçekten çalışsın).
+  select f.slug into v_slug
+    from public.products p
+    join public.product_families f on f.id = p.family_id and f.deleted_at is null
+    join public.brands b on b.id = f.brand_id
+   where p.id = any(v_ids)
+   limit 1;
+  if v_slug is null then
+    raise notice 'ALT-73 guard: örneklenen aktif ürünlerde aileli ürün yok, get_family_detail sınaması atlandı';
+  elsif coalesce(jsonb_array_length(public.get_family_detail(v_slug, 'tr') -> 'variants'), 0) = 0 then
+    raise exception 'DURDU: get_family_detail anon ile boş varyant döndürdü';
   end if;
 
   reset role;

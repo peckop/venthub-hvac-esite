@@ -37,6 +37,7 @@ export const HASSAS_KOLONLAR = [
   'last_purchase_cost',
   'last_purchase_currency',
   'last_purchased_at',
+  'supplier_name', // tedarikçi adı: canlıda VAR (2026-11-01 ölçüldü), maliyet/tedarik sınıfı
 ]
 
 /** Vitrinin her sayfada seçtiği; okunamazsa site kırılır. */
@@ -51,11 +52,29 @@ const SORGU = `
      and not a.attisdropped
 `
 
+/** Migration uygulandı mı? display_price(uuid) aşırı yüklemesi yalnız ALT-73 migration'ıyla gelir. */
+const UYGULANDI_SORGU = "select to_regprocedure('public.display_price(uuid)') is not null as uygulandi"
+
 /**
  * Saf karar: katalog satırlarından hüküm çıkarır (ağ/DB yok; testlenir).
+ * `uygulandi === false` (migration henüz prod'a inmedi): PR koşumunda canlı katalog doğal olarak eski durumdadır;
+ * bu KIRMIZI sayılmaz, açıkça "beklemede" denir (birleşme + supabase-migrate sonrası ilk koşum gerçek ölçümdür).
  * @param {Array<{kolon: string, okunabilir: boolean}>} satirlar
+ * @param {{uygulandi?: boolean}} [baglam]
  */
-export function degerlendir(satirlar) {
+export function degerlendir(satirlar, baglam = {}) {
+  if (baglam.uygulandi === false) {
+    return {
+      toplam: satirlar.length,
+      acik: [],
+      eksik: [],
+      cekirdekKapali: [],
+      digerKapali: [],
+      kirmizi: false,
+      uyari: false,
+      beklemede: true,
+    }
+  }
   const harita = new Map(satirlar.map((s) => [s.kolon, s.okunabilir === true]))
   const acik = HASSAS_KOLONLAR.filter((k) => harita.get(k) === true)
   const eksik = HASSAS_KOLONLAR.filter((k) => !harita.has(k))
@@ -65,7 +84,7 @@ export function degerlendir(satirlar) {
     .map(([k]) => k)
   const kirmizi = acik.length > 0 || eksik.length > 0 || cekirdekKapali.length > 0
   const uyari = !kirmizi && digerKapali.length > 0
-  return { toplam: satirlar.length, acik, eksik, cekirdekKapali, digerKapali, kirmizi, uyari }
+  return { toplam: satirlar.length, acik, eksik, cekirdekKapali, digerKapali, kirmizi, uyari, beklemede: false }
 }
 
 async function main() {
@@ -81,13 +100,22 @@ async function main() {
   const client = new pg.Client({ connectionString: temizUrl, ssl: resolveTls() })
   await client.connect()
   let satirlar
+  let uygulandi
   try {
     satirlar = (await client.query(SORGU)).rows
+    uygulandi = (await client.query(UYGULANDI_SORGU)).rows[0]?.uygulandi === true
   } finally {
     await client.end()
   }
 
-  const o = degerlendir(satirlar)
+  const o = degerlendir(satirlar, { uygulandi })
+  if (o.beklemede) {
+    console.error(
+      '::notice title=maliyet kolon nobetcisi::ALT-73 migration\'i canli veritabanina HENUZ UYGULANMAMIS (display_price(uuid) yok) — ' +
+        'olcum BEKLEMEDE, gecmis sayilmaz. Birlesme + supabase-migrate sonrasi ilk kosumda gercek olcum yapilir.',
+    )
+    return
+  }
   console.error(
     `maliyet-kolon-nobetcisi: ${o.toplam} kolon olculdu; anon'a acik hassas kolon sayisi=${o.acik.length}, eksik hassas=${o.eksik.length}`,
   )

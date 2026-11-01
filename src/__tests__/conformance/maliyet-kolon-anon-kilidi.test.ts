@@ -44,10 +44,12 @@ const sqlYorumsuz = (m: string): string =>
 export function anonKararsizKolonlar(sql: string): string[] {
   const kod = sqlYorumsuz(sql)
   const eklenen = new Set<string>()
-  const ifade = /alter\s+table\s+(?:if\s+exists\s+)?(?:only\s+)?(?:public\.)?products\b([^;]*);/gi
+  // Tablo adı tırnaklı olabilir ("public"."products"); `column` sözcüğü isteğe bağlıdır (Postgres: ADD x text).
+  const ifade = /alter\s+table\s+(?:if\s+exists\s+)?(?:only\s+)?(?:"?public"?\.)?"?products"?\b([^;]*);/gi
+  const KISIT = new Set(['constraint', 'primary', 'foreign', 'unique', 'check', 'exclude'])
   for (const m of kod.matchAll(ifade)) {
-    for (const k of m[1].matchAll(/add\s+column\s+(?:if\s+not\s+exists\s+)?"?([a-z_][a-z0-9_]*)"?/gi)) {
-      eklenen.add(k[1].toLowerCase())
+    for (const k of m[1].matchAll(/\badd\s+(?:column\s+)?(?:if\s+not\s+exists\s+)?"?([a-z_][a-z0-9_]*)"?/gi)) {
+      if (!KISIT.has(k[1].toLowerCase())) eklenen.add(k[1].toLowerCase())
     }
   }
   const verilen = new Set<string>()
@@ -58,6 +60,17 @@ export function anonKararsizKolonlar(sql: string): string[] {
   const kapali = new Set<string>()
   for (const k of sql.matchAll(/--\s*anon-kapali:\s*([a-z_][a-z0-9_]*)/gi)) kapali.add(k[1].toLowerCase())
   return [...eklenen].filter((k) => !verilen.has(k) && !kapali.has(k))
+}
+
+/**
+ * Sonraki bir migration anon'a products için TABLO düzeyi SELECT (ya da ALL) verirse kilit tümüyle açılır.
+ * Statik kapı bunu yakalar (canlı nöbetçi yalnız bir sonraki push'ta görür). Saf fonksiyon.
+ */
+export function anonTabloGrantVar(sql: string): boolean {
+  const kod = sqlYorumsuz(sql)
+  const urun = /grant\s+(?:select|all)(?:\s+privileges)?\s+on\s+(?:table\s+)?(?:"?public"?\.)?"?products"?\s+to\s+[^;]*\banon\b/i
+  const toplu = /grant\s+(?:select|all)(?:\s+privileges)?\s+on\s+all\s+tables\s+in\s+schema\s+"?public"?\s+to\s+[^;]*\banon\b/i
+  return urun.test(kod) || toplu.test(kod)
 }
 
 interface Satir {
@@ -73,7 +86,7 @@ interface Ozet {
   uyari: boolean
 }
 interface Nobetci {
-  degerlendir: (s: Satir[]) => Ozet
+  degerlendir: (s: Satir[], baglam?: { uygulandi?: boolean }) => Ozet & { beklemede: boolean }
   HASSAS_KOLONLAR: string[]
   CEKIRDEK_KOLONLAR: string[]
 }
@@ -115,9 +128,10 @@ describe('ALT-73 migration ve geri alma betiği', () => {
   const ham = fs.readFileSync(path.join(MIG_DIZIN, ALT73), 'utf8')
   const kod = sqlYorumsuz(ham)
 
-  it('7 maliyet kolonunun hepsi migration listesinde ve nöbetçi listesiyle aynı', async () => {
+  it('8 hassas kolonun (7 maliyet + supplier_name) hepsi migration listesinde ve nöbetçi listesiyle aynı', async () => {
     const n = await nobetciYukle()
-    expect(n.HASSAS_KOLONLAR).toHaveLength(7)
+    expect(n.HASSAS_KOLONLAR).toHaveLength(8)
+    expect(n.HASSAS_KOLONLAR).toContain('supplier_name')
     for (const k of n.HASSAS_KOLONLAR) {
       expect(kod.includes(`'${k}'`), `${k} migration listesinde yok`).toBe(true)
     }
@@ -147,10 +161,11 @@ describe('ALT-73 migration ve geri alma betiği', () => {
     expect(/products\s+(from|to)\s+authenticated/i.test(kod)).toBe(false)
   })
 
-  it('geri alma betiği var: tablo SELECT anon\'a geri, eski çağrı, uuid aşırı yüklemesi düşer', () => {
+  it('geri alma betiği var: tablo SELECT anon\'a geri, eski çağrı, uuid aşırı yüklemesi KALIR, vitrin sınanır', () => {
     const geri = sqlYorumsuz(fs.readFileSync(path.join(KOK, GERI_AL), 'utf8'))
     expect(/grant select on public\.products to anon/i.test(geri)).toBe(true)
-    expect(/drop function if exists public\.display_price\(uuid\)/i.test(geri)).toBe(true)
+    expect(/drop function[^;]*display_price\(uuid\)/i.test(geri), 'uuid aşırı yüklemesi düşürülüyor').toBe(false)
+    expect(/set local role anon/i.test(geri), 'geri alma vitrini anon ile sınamıyor').toBe(true)
     expect(/display_price\(\s*p\s*\)/i.test(geri)).toBe(true)
     expect(/display_price\(p\.id\)/i.test(geri), 'geri alma hâlâ id çağrısı taşıyor').toBe(false)
   })
@@ -189,6 +204,29 @@ describe('ALT-73 kilidin bedeli: ALT-73 sonrası yeni products kolonu karar iste
     ).toEqual(['b'])
   })
 
+  it('SABOTAJ: tırnaklı tablo adı ve `column` sözcüğüsüz ekleme yakalanır; kısıt eklemesi kolon sayılmaz', () => {
+    expect(anonKararsizKolonlar('alter table "public"."products" add column x text;')).toEqual(['x'])
+    expect(anonKararsizKolonlar('alter table products add y text;')).toEqual(['y'])
+    expect(anonKararsizKolonlar('alter table public.products add constraint c check (true), add primary key (id);')).toEqual([])
+  })
+
+  it('SABOTAJ: anon\'a tablo düzeyi SELECT/ALL (kilidi geri açan) grant yakalanır', () => {
+    expect(anonTabloGrantVar('grant select on public.products to anon;')).toBe(true)
+    expect(anonTabloGrantVar('GRANT ALL ON TABLE "public"."products" TO anon, authenticated;')).toBe(true)
+    expect(anonTabloGrantVar('grant select on all tables in schema public to anon;')).toBe(true)
+    // kolon düzeyi ve başka rol zararsız
+    expect(anonTabloGrantVar('grant select (a) on public.products to anon;')).toBe(false)
+    expect(anonTabloGrantVar('grant select on public.products to authenticated;')).toBe(false)
+  })
+
+  it('depodaki ALT-73 sonrası hiçbir migration anon\'a tablo düzeyi products yetkisi vermez', () => {
+    const sonrasi = fs
+      .readdirSync(MIG_DIZIN)
+      .filter((f) => /^\d{14}_/.test(f) && f.slice(0, 14) > ALT73.slice(0, 14) && f.endsWith('.sql'))
+    const kirli = sonrasi.filter((f) => anonTabloGrantVar(fs.readFileSync(path.join(MIG_DIZIN, f), 'utf8')))
+    expect(kirli, 'kilidi geri açan tablo düzeyi grant').toEqual([])
+  })
+
   it('depodaki ALT-73 sonrası tüm migration\'lar temiz', () => {
     const sonrasi = fs
       .readdirSync(MIG_DIZIN)
@@ -225,7 +263,7 @@ describe('INV-MALIYET-KOLON-2 nöbetçi karar fonksiyonu', () => {
     const n = await nobetciYukle()
     const o = n.degerlendir(saglikli(n).map((x) => ({ ...x, okunabilir: true })))
     expect(o.kirmizi).toBe(true)
-    expect(o.acik).toHaveLength(7)
+    expect(o.acik).toHaveLength(8)
   })
 
   it('hassas kolon katalogda yoksa (yeniden adlandırma) KIRMIZI (fail-closed)', async () => {
@@ -240,6 +278,18 @@ describe('INV-MALIYET-KOLON-2 nöbetçi karar fonksiyonu', () => {
     const o = n.degerlendir(saglikli(n).map((x) => (x.kolon === 'sku' ? { ...x, okunabilir: false } : x)))
     expect(o.kirmizi).toBe(true)
     expect(o.cekirdekKapali).toEqual(['sku'])
+  })
+
+  it('migration henüz uygulanmamışsa (PR koşumu) KIRMIZI değil, BEKLEMEDE; uygulanmışsa gerçek ölçüm', async () => {
+    const n = await nobetciYukle()
+    const acikDurum = saglikli(n).map((x) => ({ ...x, okunabilir: true }))
+    const bekleyen = n.degerlendir(acikDurum, { uygulandi: false })
+    expect(bekleyen.kirmizi).toBe(false)
+    expect(bekleyen.beklemede).toBe(true)
+    // aynı (açık) katalog migration UYGULANMIŞKEN kırmızıdır: bekleme yolu gerçek ölçümü gizlemez
+    const olculen = n.degerlendir(acikDurum, { uygulandi: true })
+    expect(olculen.kirmizi).toBe(true)
+    expect(olculen.beklemede).toBe(false)
   })
 
   it('hassas olmayan başka kolon kapalıysa yalnız UYARI', async () => {

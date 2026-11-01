@@ -1,5 +1,5 @@
 -- ALT-73 AŞAMA A GERİ ALMA — anon'a products tablo düzeyi SELECT geri verilir, dört fonksiyon
--- eski `display_price(p)` (tüm-satır) çağrısına döner, display_price(uuid) düşer.
+-- eski `display_price(p)` (tüm-satır) çağrısına döner; display_price(uuid) KALIR (zararsız).
 -- OTOMATİK UYGULANMAZ (supabase/migrations dışında). Elle, Recep sözüyle koşulur.
 --
 -- Ne zaman: kilitten sonra vitrinde products okuyan bir istek 42501 (permission denied) veriyorsa
@@ -198,8 +198,26 @@ $function$;
 -- Tablo düzeyi SELECT geri (kolon düzeyi yetkiler zararsız kalır).
 grant select on public.products to anon;
 
--- Eski çağıranlar artık uuid aşırı yüklemesini kullanmıyor; düşürmek güvenli.
-drop function if exists public.display_price(uuid);
+-- display_price(uuid) BİLİNÇLİ DÜŞÜRÜLMEZ: zararsız bir fiyat fonksiyonudur ve sonraki kod (ör. Aşama B) onu
+-- çağırıyor olabilir; düşürmek çağıranları çalışma anında sessizce kırar (SQL/plpgsql bağımlılık kaydı tutmaz).
+
+-- Geri almanın vitrini bozmadığını anon rolüyle sına (başarısızsa betik tamamen geri döner).
+do $dogrula$
+declare
+  v_ids uuid[];
+  v_n   int;
+begin
+  set local role anon;
+  select coalesce(array_agg(id), array[]::uuid[]) into v_ids
+    from (select id from public.products where status = 'active' and deleted_at is null limit 20) s;
+  select count(*) into v_n from public.get_display_prices(v_ids);
+  if v_n <> coalesce(array_length(v_ids, 1), 0) then
+    raise exception 'DURDU: geri alma sonrası get_display_prices % satır döndürdü (beklenen %)', v_n, coalesce(array_length(v_ids, 1), 0);
+  end if;
+  perform 1 from public.get_product_families_enriched(null, 5, 0, null, null);
+  reset role;
+end
+$dogrula$;
 
 notify pgrst, 'reload schema';
 
