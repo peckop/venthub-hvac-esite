@@ -95,6 +95,17 @@ describe('INV-KART-PLAN-1 · degerlendir (saf işlev)', () => {
     expect(K.degerlendir(`<!--\n${TAM_PLAN}\n-->`)).toMatchObject({ gecti: false, tur: 'plan-yok' })
   })
 
+  // HRT-25: Windows'ta kart açıklaması ya da cetvel CRLF gelebilir (depodaki blob LF, çalışma ağacı CRLF); kapı iki satır sonunda da AYNI hükmü vermeli.
+  it('CRLF satır sonlu plan LF ile aynı hükmü alır: tam plan geçer, eksik etiket ve kod çiti içindeki plan yine kırmızıdır', () => {
+    const crlf = (m: string) => m.replace(/\n/g, '\r\n')
+    expect(K.degerlendir(crlf(TAM_PLAN))).toEqual(K.degerlendir(TAM_PLAN))
+    expect(K.degerlendir(crlf(TAM_PLAN)).gecti).toBe(true)
+    const eksik = K.degerlendir(crlf(etiketiSil(TAM_PLAN, 'Bitti ölçütü')))
+    expect(eksik.gecti).toBe(false)
+    expect(eksik.eksikler.join('\n')).toMatch(/Bitti ölçütü/)
+    expect(K.degerlendir(crlf(['Şablon örneği:', '```', TAM_PLAN, '```'].join('\n')))).toMatchObject({ gecti: false, tur: 'plan-yok' })
+  })
+
   it('hiç PLAN yoksa tur plan-yok', () => {
     expect(K.degerlendir('Sadece bir açıklama.')).toMatchObject({ gecti: false, tur: 'plan-yok' })
     expect(K.degerlendir('')).toMatchObject({ gecti: false, tur: 'plan-yok' })
