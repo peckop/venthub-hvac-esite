@@ -408,6 +408,18 @@ jobs:
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/webhook-yanit-nobetcisi.mjs
 
+      # ⭐INV-MALIYET-KOLON-2 (ALT-73) — kardes adimlarin gerekcesi AYNEN gecerli (yeni IS ADI yok, `advisor`a
+      # konmadi, ayni sir ve kok sertifika). Konu: anon rolu products'in 7 maliyet kolonunu okuyamaz ve vitrin
+      # cekirdek kolonlari okunabilir. Olcum CANLI KATALOGDAN (has_column_privilege): panelden/elle verilen GRANT
+      # hicbir migration'da gorunmez. SINIR: yalniz anon; authenticated Asama B'nin konusu.
+      - name: Maliyet kolon nobetcisi (INV-MALIYET-KOLON-2)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/maliyet-kolon-nobetcisi.mjs
+
       # ⭐INV-RLS-SARMA-1 — NICIN BU ISE ADIM OLARAK EKLENDI (REC-216):
       # Kardes adim `Anon yazma nobetcisi`nin gerekcesi burada da AYNEN gecerli ve o gerekce
       # zaten yukarida yazili: yeni bir IS ADI acmak acik PR'lari "beklenen kontrol gelmedi"de

@@ -66,6 +66,10 @@ as $function$
    limit 1
 $function$;
 
+-- Yeni fonksiyon: yetki AÇIKÇA yazılır (varsayılana güvenilmez); display_price(products) ile aynı kitle.
+revoke all on function public.display_price(uuid) from public;
+grant execute on function public.display_price(uuid) to anon, authenticated, service_role;
+
 -- ============================================================================
 -- 2) Anon'un çağırdığı dört fonksiyon: YALNIZ display_price(p) -> display_price(p.id)
 -- ============================================================================
