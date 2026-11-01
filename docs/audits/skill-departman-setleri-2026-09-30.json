@@ -716,6 +716,10 @@
     {
      "ad": "geo-fundamentals",
      "kb": 7
+    },
+    {
+     "ad": "write-seo-geo-content",
+     "kb": 24.2
     }
    ],
    "bekleyen": []
@@ -761,6 +765,10 @@
     {
      "ad": "bug-hunter",
      "kb": 16
+    },
+    {
+     "ad": "write-seo-geo-content",
+     "kb": 24.2
     }
    ],
    "bekleyen": []
@@ -1975,5 +1983,5 @@
    "ne": "Rehber yazısının yayın akışı (cetvel R10): basamak, sahibi, kapı; müdür çalıştırır, çalışana ön yüklenmez."
   }
  ],
- "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır"
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır; 2026-11-01 (YTN-24): write-seo-geo-content GEO-SEO araştırmacı ve çürütücü setlerinde adıyla çağır (E-E-A-T farkı ve anlamsal boşluk denetimi)"
 }
