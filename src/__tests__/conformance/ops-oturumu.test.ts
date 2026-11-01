@@ -336,6 +336,17 @@ describe('INV-OPS-OTURUMU-5: zamanlanmış görev oturumu OPS kimliği almaz (AR
     expect(say(undefined)).toBe(false)
   })
 
+  it('ARC-234: klasör öneki adda yoksa da sözcük kümesi (≥2 sözcük ve ≥2/3) eşleşir; kısmi/tek sözcük eşleşmez', () => {
+    const gorevler = gorevDizini(['sabah-ozeti', 'gsc-erisim-deneme', 'gsc-dizin-istegi-deneme', 'gsc-gunluk-dizin-istegi'])
+    const say = (ad?: string) => mod.zamanlanmisMi(SABAH, { dizin: adliKayit([{ sid: SABAH, ad }]), gorevler, env: {} })
+    expect(say('Sabah özeti (yalnız ölçüm)')).toBe(true)
+    expect(say('Günlük dizin isteği (Google + IndexNow)')).toBe(true)
+    expect(say('Dizin isteği günlük')).toBe(true)
+    expect(say('Dizin isteği')).toBe(false) // yalnız 2/4 (deneme klasörü) ve 2/4 (günlük klasörü): eşik altı
+    expect(say('Günlük')).toBe(false)
+    expect(say('OPS')).toBe(false)
+  })
+
   it('fail-open: görev klasörü yok/okunamıyorsa HAYIR (eski davranış); VENTHUB_ZAMANLANMIS=1 kesin işarettir', () => {
     const oturumler = adliKayit([{ sid: SABAH, ad: 'Sabah özeti' }])
     expect(mod.zamanlanmisMi(SABAH, { dizin: oturumler, gorevler: path.join(kok, 'yok-gorevler'), env: {} })).toBe(false)

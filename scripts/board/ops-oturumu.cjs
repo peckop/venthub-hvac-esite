@@ -188,6 +188,19 @@ function gorevDizini() {
  * Ad bu pencere kaydında SessionStart anında henüz yoksa (kayıt gecikmesi) sonuç HAYIR olur; geç yakalama
  * için kokpit durum çıktısı kimliğin kaynağını da gösterir (`ops-oturumu.cjs` argümansız).
  */
+/**
+ * ARC-234: görev klasörü "gsc-gunluk-dizin-istegi", pencere adı "Günlük dizin isteği (Google + IndexNow)": klasör önekleri
+ * (gsc-) pencere adında yok, bütün-sözcük eşleşmesi kaçırıyordu. Görevin en az 2 sözcüğü adda geçiyor ve görev
+ * sözcüklerinin en az 2/3'ü karşılanıyorsa zamanlanmış sayılır. Tek sözcüklü ad ("OPS") hiçbir zaman eşleşmez.
+ * shortcut: sözcük sırası bakılmaz, iki sözcüklü bir görev klasörü adı yalnız ikisi birden geçince eşleşir.
+ */
+function sozcukKumesiEslesir(ad, gorev) {
+  const adSozcuk = new Set(ad.split(' ').filter(Boolean))
+  const gorevSozcuk = gorev.split(' ').filter(Boolean)
+  const bulunan = gorevSozcuk.filter((s) => adSozcuk.has(s)).length
+  return bulunan >= 2 && bulunan * 3 >= gorevSozcuk.length * 2
+}
+
 function zamanlanmisMi(sid, { dizin, gorevler = gorevDizini(), env = process.env } = {}) {
   if (env.VENTHUB_ZAMANLANMIS === '1') return true
   try {
@@ -200,6 +213,7 @@ function zamanlanmisMi(sid, { dizin, gorevler = gorevDizini(), env = process.env
       if (!e.isDirectory()) continue
       const gorev = adiKatla(e.name)
       if (gorev && (ad === gorev || ad.startsWith(gorev + ' ') || ad.includes(' ' + gorev + ' ') || ad.endsWith(' ' + gorev))) return true
+      if (sozcukKumesiEslesir(ad, gorev)) return true
     }
   } catch {
     /* okunamadı: zamanlanmış sayılmaz */
