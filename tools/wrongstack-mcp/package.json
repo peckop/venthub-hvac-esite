@@ -7,9 +7,9 @@
     "node": ">=22.5.0"
   },
   "dependencies": {
-    "@wrongstack/codebase-index-mcp": "1.1.4",
-    "@wrongstack/kanban-mcp": "1.1.4",
-    "@wrongstack/mailbox-mcp": "1.1.4",
-    "@wrongstack/sage-mcp": "1.1.4"
+    "@wrongstack/codebase-index-mcp": "1.1.11",
+    "@wrongstack/kanban-mcp": "1.1.11",
+    "@wrongstack/mailbox-mcp": "1.1.11",
+    "@wrongstack/sage-mcp": "1.1.11"
   }
 }
