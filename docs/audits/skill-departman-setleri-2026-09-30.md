@@ -125,9 +125,9 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 0,0K | research-web (7,3K, y), web-platform-baseline (10,5K, y), geo-fundamentals (7K, y) | — |
+| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 0,0K | research-web (7,3K, y), web-platform-baseline (10,5K, y), geo-fundamentals (7K, y), write-seo-geo-content (24,2K, y) | — |
 | Uygulayıcı | — | — | web-performance (6,4K, y), geo-fundamentals (7K, y) | — |
-| Çürütücü | plan-challenger (14,6K), chimera (12,9K, y) | 12,9K | bug-hunter (12,3K, y) | — |
+| Çürütücü | plan-challenger (14,6K), chimera (12,9K, y) | 12,9K | bug-hunter (12,3K, y), write-seo-geo-content (24,2K, y) | — |
 | Doğrulayıcı | verify-before-done (12,5K), code-review (9,6K, y) | 9,6K | accessibility (14,5K, y), web-performance (6,4K, y) | — |
 
 Bu bölümdeki skill'lerde dikkat:
@@ -372,7 +372,7 @@ REC-515 aday tablosundan (`docs/audits/skills-dis-tarama-2026-10.md`) OPS onayı
 |---|---|---|---|
 | web-performance | WrongStack 1.1.0 (MIT) | 6,4 | GEO-SEO/uygulayici, GEO-SEO/dogrulayici, URUN/dogrulayici |
 | geo-fundamentals | vudovn/ag-kit (MIT) | 7 | GEO-SEO/uygulayici, GEO-SEO/arastirmaci |
-| write-seo-geo-content | onvoyage-ai/gtm-engineer-skills (MIT) | 24,2 | BLOG/uygulayici (YTN-24: "İçerik denetimi: E-E-A-T farkı ve anlamsal boşluk" bölümü GEO-SEO araştırmacı ve çürütücüsünce de adıyla okunur; set bağı eklenmedi, çünkü `adiylaCagir` ajan tanımını değiştirir, karar müdürde) |
+| write-seo-geo-content | onvoyage-ai/gtm-engineer-skills (MIT) | 24,2 | BLOG/uygulayici, GEO-SEO/arastirmaci ve GEO-SEO/curutucu adıyla çağır (YTN-24, OPS onayı 1 Kasım: "İçerik denetimi: E-E-A-T farkı ve anlamsal boşluk" bölümü GEO-SEO denetiminde okunur; ajan tanımı bağını HARİTA HRT-89 ile üretir) |
 | tech-stack | WrongStack 1.1.0 (MIT) | 9,4 | ALTYAPI/arastirmaci, ALTYAPI/uygulayici, ARAC/arastirmaci |
 | payments-webhooks | WrongStack 1.1.0 (MIT) | 6,6 | SATIS/uygulayici, SATIS/dogrulayici, EDGE/uygulayici, EDGE/dogrulayici |
 | database-migrations | WrongStack 1.1.0 (MIT) | 6,8 | ALTYAPI/uygulayici, ALTYAPI/curutucu, EDGE/uygulayici, EDGE/curutucu |
