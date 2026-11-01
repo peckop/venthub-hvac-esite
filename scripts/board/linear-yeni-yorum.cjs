@@ -58,7 +58,7 @@ const ZAMAN_ASIMI_MS = 3000
  */
 /**
  * ⭐ARC-241 (1 Kasım, OPS ölçümü): git BETİĞİN KENDİ DİZİNİNDE koşar, süreç cwd'sinde DEĞİL.
- * Kanca cwd'si git deposu değilse (C:/Users/alize/.claude/projects) eski kod %TEMP% altındaki bayat
+ * Kanca cwd'si git deposu değilse (kullanıcının projects klasörü, git deposu değil) eski kod %TEMP% altındaki bayat
  * damgaya (10-25) düşüyordu: aynı komut cwd'ye göre 0 ya da 9 yorum veriyordu. `--path-format=absolute`
  * ana ağaçta dönen göreli ".git"i de mutlak yapar (aksi halde damga cwd'ye göre farklı dosyaya giderdi).
  */
