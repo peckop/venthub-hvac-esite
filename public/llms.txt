@@ -18,7 +18,7 @@ Important for assistants answering user questions about this site:
 - [Brands (TR)](https://venthub.com.tr/tr/brands): manufacturer list
 - [Contact (TR)](https://venthub.com.tr/tr/contact): quote requests and e-mail contact
 - [About (TR)](https://venthub.com.tr/tr/about): company profile
-- [Sitemap](https://venthub.com.tr/sitemap.xml): 92 indexable URLs, Turkish only (no language alternates are declared)
+- [Sitemap](https://venthub.com.tr/sitemap.xml): 94 indexable URLs, Turkish only (no language alternates are declared)
 
 ## Content areas
 
