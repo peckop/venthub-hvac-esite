@@ -80,7 +80,7 @@ export function enYayinOku(kaynak) {
  * olursa yazı erişilmez olur — test (`yonlendirmeler.test.ts`) bu çakışmada kırmızı yanar.
  */
 export const YAYINDAN_KALKAN = /** @type {const} */ ({
-  tr: ['hava-perdesi', 'otopark-jet-fan', 'isi-geri-kazanim'],
+  tr: ['otopark-jet-fan', 'isi-geri-kazanim'],
   en: ['air-curtain', 'car-park-jet-fan', 'heat-recovery'],
 })
 

@@ -66,7 +66,7 @@ async function yukle(anahtar: string | undefined) {
 
 describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres farkı', () => {
   it('ÖN KOŞUL — fikstür dolu evren (boş evrende yeşil kapı ölçüm değildir)', () => {
-    expect(FIKSTUR.redirects).toHaveLength(45)
+    expect(FIKSTUR.redirects).toHaveLength(44)
     expect(FIKSTUR.headers).toHaveLength(3)
   })
 

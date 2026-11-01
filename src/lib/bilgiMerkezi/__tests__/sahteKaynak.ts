@@ -35,6 +35,9 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['vortice-vort-hr-isi-geri-kazanim', 'Vortice VORT HR Isı Geri Kazanım'],
     ['vortice-vort-mono', 'Vortice VORT Mono'],
     ['avens-isi-geri-kazanim-cihazlari', 'AVenS Isı Geri Kazanım Cihazları'],
+    // Hava perdesi nedir yazısı (BLG-28, 2026-11): iki aile sayfası canlıda 200 verir (kategori sayfasından, 1 Kasım ölçümü).
+    ['vortice-ad-isiticisiz-hava-perdeleri', 'Vortice AD Isıtıcısız Hava Perdeleri'],
+    ['vortice-h-ad-elektrikli-isiticili-hava-perdeleri', 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
