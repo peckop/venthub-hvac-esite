@@ -1,5 +1,9 @@
+// Çağıran sınıfı: (a) oturumlu müşteri tarayıcısı — resolveCaller (getUser) + sepet sahipliği
+//
+// Ödeme öncesi sepet doğrulaması: fiyat ve stok yeniden hesaplanır. Sepet yalnız doğrulanmış
+// kullanıcının ve tenant'ının sepeti olabilir (karne 2026-11 Y1).
 import { getCorsHeaders } from '../_shared/cors.ts'
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
+import { resolveCaller, type CallerContext } from '../_shared/caller.ts'
 interface CartItem { product_id: string; quantity: number | string; unit_price?: number | string; price_list_id?: string | null }
 interface Product {
   id: string;
@@ -13,7 +17,7 @@ interface ProductPrice { base_price?: number | string | null; sale_price?: numbe
 // (price_segment, yoksa hook'un enjekte ettiği user_role) — user_profiles.role OKUNMAZ.
 // pricing.service.ts::getUserPriceSegment ve public.jwt_price_segment() ile birebir aynı kural.
 type PriceSegment = 'individual' | 'dealer' | 'corporate'
-function segmentFromUser(u: { app_metadata?: Record<string, unknown> } | null): PriceSegment {
+function segmentFromUser(u: { app_metadata?: Record<string, unknown> | null } | null): PriceSegment {
   const md = u?.app_metadata ?? {}
   for (const c of [md['price_segment'], md['user_role']]) {
     if (c === 'dealer' || c === 'corporate') return c
@@ -42,19 +46,22 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'config_error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing Authorization header' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    // KİMLİK + TENANT (karne 2026-11 Y1 · kök 2): ortak `resolveCaller` kapısı. Kullanıcı
+    // ve tenant DOĞRULANMIŞ JWT'den gelir; gövdedeki hiçbir alan kimlik ya da tenant değildir.
+    let caller: CallerContext;
+    try {
+      caller = await resolveCaller(req);
+    } catch (err) {
+      console.warn('order-validate: kimlik kapısı ölçülemedi:', err instanceof Error ? err.name : 'hata');
+      return new Response(JSON.stringify({ error: 'auth_check_failed' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
-
-    const authClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    const { data: { user }, error: authErr } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''));
-    if (authErr || !user) {
-      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    const user = caller.user;
+    if (caller.kind !== 'user' || !user) {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing, invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
+    // Her service_role adresi `&tenant_id=eq.` LİTERALİNİ taşır (R13 · E16 dedektörü
+    // koşullu değişkeni kabul etmez — boş olabilen filtre zorunlu değildir).
+    const tenantId = caller.tenantId;
 
     const headers = {
       Authorization: `Bearer ${serviceRoleKey}`,
@@ -64,7 +71,8 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(()=>({}));
     const userId = user.id;
-    let cartId = (body?.cart_id || body?.cartId || '').toString();
+    const istenenCartId = (body?.cart_id || body?.cartId || '').toString();
+    let cartId = '';
 
     async function getJson<T>(_path: string): Promise<T> {
       const res = await fetch(`${supabaseUrl}${_path}`, { headers });
@@ -75,17 +83,26 @@ Deno.serve(async (req) => {
 
     function nowIso() { return new Date().toISOString(); }
 
-    // Resolve cart_id by user if needed
-    if (!cartId && userId) {
-      const carts = await getJson(`/rest/v1/shopping_carts?select=id&user_id=eq.${encodeURIComponent(userId)}&limit=1`);
-      cartId = Array.isArray(carts) && carts[0]?.id || '';
+    // SEPET SAHİPLİĞİ (karne 2026-11 Y1): eskiden istemcinin verdiği `cart_id` doğrudan
+    // `cart_items` sorgusuna giriyordu — service_role RLS'i atladığı için başkasının sepeti
+    // (UUID bilinirse) okunabiliyordu. Artık sepet DAİMA doğrulanmış kullanıcı + tenant ile
+    // seçilir; istemcinin verdiği kimlik yalnız DARALTIR. Eşleşmezse 404: başkasının sepeti
+    // ile var olmayan sepet aynı cevabı alır (varlık sızmaz).
+    {
+      const idFiltresi = istenenCartId ? `&id=eq.${encodeURIComponent(istenenCartId)}` : '';
+      const carts = await getJson<{ id?: string }[]>(`/rest/v1/shopping_carts?select=id&user_id=eq.${encodeURIComponent(userId)}${idFiltresi}&tenant_id=eq.${encodeURIComponent(tenantId)}&limit=1`);
+      const ilk = Array.isArray(carts) ? carts[0] : undefined;
+      cartId = typeof ilk?.id === 'string' ? ilk.id : '';
     }
     if (!cartId) {
+      if (istenenCartId) {
+        return new Response(JSON.stringify({ error: 'cart_not_found' }), { status: 404, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
       return new Response(JSON.stringify({ error: 'missing_cart', hint: 'Provide cart_id or user_id' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     // Load cart items
-    const items = await getJson<CartItem[]>(`/rest/v1/cart_items?select=product_id,quantity,unit_price,price_list_id&cart_id=eq.${encodeURIComponent(cartId)}`) || [];
+    const items = await getJson<CartItem[]>(`/rest/v1/cart_items?select=product_id,quantity,unit_price,price_list_id&cart_id=eq.${encodeURIComponent(cartId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`) || [];
     if (!Array.isArray(items) || items.length === 0) {
       return new Response(JSON.stringify({ ok: true, items: [], mismatches: [], totals: { subtotal: 0 } }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
@@ -104,7 +121,7 @@ Deno.serve(async (req) => {
     const segment = segmentFromUser(user);
 
     const n = nowIso();
-    const lists = await getJson<PriceList[]>(`/rest/v1/price_lists?select=id,user_type,effective_from&is_active=eq.true&effective_from=lte.${encodeURIComponent(n)}&or=(effective_to.is.null,effective_to.gte.${encodeURIComponent(n)})`);
+    const lists = await getJson<PriceList[]>(`/rest/v1/price_lists?select=id,user_type,effective_from&is_active=eq.true&effective_from=lte.${encodeURIComponent(n)}&or=(effective_to.is.null,effective_to.gte.${encodeURIComponent(n)})&tenant_id=eq.${encodeURIComponent(tenantId)}`);
     const flists = (Array.isArray(lists)?lists:[]).filter((pl: PriceList)=> pl.user_type === segment || !pl.user_type);
     flists.sort((a: PriceList, b: PriceList)=>{
       if (!a.user_type !== !b.user_type) return a.user_type ? -1 : 1; // spesifik user_type önce
@@ -115,7 +132,7 @@ Deno.serve(async (req) => {
     async function priceFor(product: Product): Promise<{unit:number, listId:string|null}> {
       // price_list_id canlı şemada NOT NULL → eski "is.null fallback" sorgusu ölüydü, kaldırıldı.
       if (chosenListId) {
-        const _path = `/rest/v1/product_prices?select=base_price,sale_price,discount_percentage,is_active,valid_from,valid_until,net_price,gross_price&product_id=eq.${encodeURIComponent(product.id)}&is_active=eq.true&price_list_id=eq.${encodeURIComponent(chosenListId)}`;
+        const _path = `/rest/v1/product_prices?select=base_price,sale_price,discount_percentage,is_active,valid_from,valid_until,net_price,gross_price&product_id=eq.${encodeURIComponent(product.id)}&is_active=eq.true&price_list_id=eq.${encodeURIComponent(chosenListId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`;
         const rows = await getJson<ProductPrice[]>(_path);
         if (Array.isArray(rows) && rows.length>0) {
           const pick = rows.find((r: ProductPrice)=>{ const f=!r.valid_from||Date.parse(r.valid_from)<=Date.now(); const t=!r.valid_until||Date.parse(r.valid_until)>=Date.now(); return f&&t; }) || rows[0];
