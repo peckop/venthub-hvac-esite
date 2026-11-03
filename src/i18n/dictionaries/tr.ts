@@ -962,7 +962,7 @@ export const tr = {
       lower: 'En az bir küçük harf',
       upper: 'En az 1 büyük harf',
       digit: 'En az 1 rakam',
-      special: 'En az 1 özel karakter',
+      special: 'En az 1 sembol (örn. ! @ # $ ?). Türkçe harf ve boşluk sayılmaz',
       allRequired: 'Şifreniz tüm güvenlik kurallarını karşılamalıdır',
     },
     forgot: {
@@ -2399,7 +2399,7 @@ export const tr = {
     },
     security: {
       pageSubtitle: 'Hesap güvenliğiniz için şifrenizi güncel tutun ve bağlı giriş yöntemlerinizi yönetin.',
-      changePasswordDesc: 'Hesap güvenliğiniz için harf, rakam ve özel karakter içeren güçlü bir şifre seçin.',
+      changePasswordDesc: 'Hesap güvenliğiniz için harf, rakam ve sembol içeren güçlü bir şifre seçin.',
       strengthPrefix: 'Güvenlik:',
       strengthWeak: 'Zayıf',
       strengthMedium: 'Orta',
@@ -2409,7 +2409,7 @@ export const tr = {
       ruleLower: 'En az bir küçük harf',
       ruleUpper: 'En az 1 büyük harf',
       ruleDigit: 'En az 1 rakam',
-      ruleSpecial: 'En az 1 özel karakter',
+      ruleSpecial: 'En az 1 sembol (örn. ! @ # $ ?). Türkçe harf ve boşluk sayılmaz',
       googleLabel: 'Google',
       title: 'Şifre Değiştir',
       currentLabel: 'Mevcut şifre',

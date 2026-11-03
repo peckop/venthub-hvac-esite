@@ -1666,7 +1666,7 @@ export const en: typeof tr = {
       lower: 'At least one lowercase letter',
       upper: 'At least 1 uppercase letter',
       digit: 'At least 1 digit',
-      special: 'At least 1 special character',
+      special: 'At least 1 symbol (e.g. ! @ # $ ?). Accented letters and spaces do not count',
       allRequired: 'Your password must meet all security requirements',
     },
     forgot: {
@@ -2415,7 +2415,7 @@ export const en: typeof tr = {
     },
     security: {
       pageSubtitle: 'Keep your password up to date and manage your linked sign-in methods for account security.',
-      changePasswordDesc: 'Choose a strong password with letters, numbers and special characters for account security.',
+      changePasswordDesc: 'Choose a strong password with letters, numbers and symbols for account security.',
       strengthPrefix: 'Strength:',
       strengthWeak: 'Weak',
       strengthMedium: 'Medium',
@@ -2425,7 +2425,7 @@ export const en: typeof tr = {
       ruleLower: 'At least one lowercase letter',
       ruleUpper: 'At least 1 uppercase letter',
       ruleDigit: 'At least 1 number',
-      ruleSpecial: 'At least 1 special character',
+      ruleSpecial: 'At least 1 symbol (e.g. ! @ # $ ?). Accented letters and spaces do not count',
       googleLabel: 'Google',
       title: 'Change Password',
       currentLabel: 'Current password',
