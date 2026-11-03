@@ -59,6 +59,16 @@
 - Açılış ve tur sonu rutini: açık PR'ların durumu için `node scripts/hijyen/yesil-pr.cjs` koşulur (ARC-170); hazır kovadaki PR'ın sahibi aynı turda dürtülür.
 - Tabloda Sorumlu = işi yürüten departmanın adı (OPS'un kendi işiyse OPS); Recep kararı bekleyen satırda Durum Onayında, Önerim dolu, Sorumlu yine kararı uygulayacak departmandır; "sen" yazılmaz.
 
+## Yeni departman penceresi açılış kontrol listesi (HRT-101)
+- Neden: MEVZUAT açılırken pencere Opus modelinde açıldı, kendini OPS sandı ve compact düzeni kurulmadı (Recep 3 Kasım). Sıra aşağıdadır, atlanmaz; her adımın kanıtı kart notuna yazılır.
+- 1. Pencere tanımı var mı: `.claude/agents/<ad>-pencere.md` ve `scripts/belge/ajan-tanimi-uret.cjs` PENCERE_DEPARTMANLARI listesinde departman bulunur. Yoksa önce HARİTA'ya kart açılır; elle yazılmış kopya sayılmaz, tanım üreticiden gelir.
+- 2. `start_session` çağrısına `model` verilir: PENCERE_MODEL değeri (departman Sonnet, `claude-sonnet-5-5`; yalnız OPS Opus). Model verilmezse pencere açanın modelini devralır.
+- 3. Açılıştan hemen sonra, ilk mesajdan önce, o pencerenin KENDİ ağacındaki kopyayla `node scripts/board/pencere-rol-yaz.cjs <worktree-dizini> <rol> --yaz` koşulur. Betik depo kökünü kendi konumundan çözer; OPS ağacındaki kopya yanlış ağaca bakar (OPS ölçümü, 3 Kasım). Yazım yeniden başlatmada etkilidir.
+- 4. Pencere kilidi varsa `node scripts/board/pencere-kilidi.cjs --koy <mevcut izinliler> <YENİ>` ile departman izinli listeye eklenir; yoksa SendMessage kancası pencereye gönderimi reddeder.
+- 5. İlk mesajda durum dosyasının adı (`<rol>-lane-state.md` ya da `<rol>-lane-day-<tarih>.md`) ve `metadata.originSessionId` alanına yazılacak TAM oturum kimliği söylenir; compact kapısı dosyayı bu kimlikle bulur.
+- 6. Rol kimliği kaydı: açılış özetinde pencerenin rolü görünür ve `rol-kimlikleri.json` satırı oluşur; oluşmadıysa `node scripts/board/pencere-kimligi.cjs --devret <ROL> <ESKİ_SID> <YENİ_SID>` koşulur. Kontrol: pencereden "kimliğin ne" sorulur, cevap OPS ise rol yazımı (3. adım) tekrarlanır.
+- Tetik: bu listenin uygulanmasını hatırlatan kanca ARAÇ'ın alanıdır (kart ayrı açılır); kanca gelene kadar listeyi OPS elle uygular.
+
 ## Design yorumuna yanıt (ARC-51)
 - Design'a iş veren (yeni istek, sorulan soru, bekleyen karar) OPS yanıtının gövdesine "CEVAP BEKLİYOR" yazılır (büyük/küçük harf fark etmez). Yazılmayan OPS yanıtı, Design'ın hemen önceki yorumuna verilmiş kapanış sayılır ve `--durum` "OPS N yorum yanıtsız" sayacında yanıtsız sayılmaz.
 - Okuyucu ve sınır: `scripts/board/linear-yeni-yorum.cjs`. İşaretsiz yazılan iş veren yanıt için sessizlik uyarısı çalmaz; işaret OPS'un yazım kuralıdır, kod bunu tahmin etmez.
