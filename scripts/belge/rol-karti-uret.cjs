@@ -648,8 +648,8 @@ const ROLLER = {
     durum: 'Açık (asli görev; iş azlığı kapatma sebebi değildir). İşler OPS\'tan gelir. Son şerit günü notu 2026-08-28; Linear\'da I18N etiketli kayıt yok. Admin (~256) ve legal (~235) literal sayıları Haziran ölçümü, bayat.',
   },
   YETENEK: {
-    gorev: 'Skill\'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill\'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Departmanların kendi işini ölçmesi departmanların işidir.',
-    gorevDegil: 'departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS).',
+    gorev: 'Skill\'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill\'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Departmanların kendi işini ölçmesi departmanların işidir. Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.',
+    gorevDegil: 'departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS); elle SKILL.md yazmak.',
     dosyalar: '`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`. Rol kartlarındaki skill listesinin içeriği YETENEK\'ten gelir, kartı HARİTA\'nın üreticisi yazar.',
     yetki: 'Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını önerir; skill kusurlarını (bayat yol/araç adı, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydeder, `.claude/skills/**` düzeltmesini ayrı PR\'la yapar; haftalık kullanım ölçümü (atanmış ama kullanılmayan kırmızı); amaca bağlanamayan skill\'i kapatır (silmez).',
     yasak: '`.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.',
