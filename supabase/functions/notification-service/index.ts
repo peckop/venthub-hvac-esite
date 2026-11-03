@@ -2,6 +2,9 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
+// Kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
+import { kacir } from '../_shared/kodlama.ts'
+import { mask } from '../_shared/maske.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -154,7 +157,7 @@ serve(async (req) => {
         throw new Error(`Unsupported notification type: ${type}`)
     }
 
-    console.warn(`📱 Notification sent: ${type} to ${to} - Priority: ${priority}`)
+    console.warn(`📱 Notification sent: ${type} to ${mask(to)} - Priority: ${priority}`)
     
     return new Response(JSON.stringify({ 
       success: true, 
@@ -270,7 +273,7 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
       to: [to],
       subject: subject,
       text: finalMessage,
-      html: `<p>${finalMessage.replace(/\n/g, '<br>')}</p>`,
+      html: `<p>${kacir(finalMessage).replace(/\n/g, '<br>')}</p>`,
     }),
   })
   

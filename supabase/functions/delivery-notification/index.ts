@@ -2,6 +2,8 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
+// Şablon motoru + kaçış tek yerde (güvenlik karnesi 2026-11 G1; cetvel email-template-standard.md §2).
+import { kacir, renderTemplate } from '../_shared/kodlama.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -104,28 +106,6 @@ async function damgala(supabaseUrl: string, serviceKey: string, satirId: string 
   } catch {
     return 'yazilamadi'
   }
-}
-
-/**
- * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. BAŞKA HİÇBİR ŞEY.
- *
- * REC-154: bu işlevdeki sürüm `{{#if}}` DESTEKLEMİYORDU; diğer üç uçtaki `renderTemplate`
- * destekliyordu. Aynı isimli iki farklı motor demek, aynı şablonun hangi dosyadan
- * çağrıldığına göre farklı HTML üretmesi demek. Birebir aynıya çekildi — motor
- * BÜYÜTÜLMEDİ, EŞİTLENDİ. Döngü (`each`) bilerek yoktur:
- * cetvel `docs/standards/email-template-standard.md` §2.
- */
-function renderTemplate(tpl: string, data: Record<string, unknown>): string {
-  tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
-    const v = data[key]
-    const truthy = !!(typeof v === 'string' ? v : v)
-    return truthy ? inner : ''
-  })
-  tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
-    const v = data[key]
-    return v == null ? '' : String(v)
-  })
-  return tpl
 }
 
 async function loadTemplate() {
@@ -233,12 +213,12 @@ serve(async (req) => {
     if (!html) {
       html = [
         '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">',
-        `<h2 style="color: ${brandPrimary};">${brandName} — Teslimat Tamamlandı</h2>`,
-        `<p>Merhaba <strong>${customer_name}</strong>,</p>`,
-        `<p><strong>${siparisNo}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>`,
-        `<p>Herhangi bir sorunuz olursa <a href="mailto:${supportEmail}">${supportEmail}</a> adresinden bizimle iletişime geçebilirsiniz.</p>`,
-        `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
-        companyFooter ? `<p style="color:#6b7280;font-size:12px;">${companyFooter}</p>` : '',
+        `<h2 style="color: ${kacir(brandPrimary)};">${kacir(brandName)} — Teslimat Tamamlandı</h2>`,
+        `<p>Merhaba <strong>${kacir(customer_name)}</strong>,</p>`,
+        `<p><strong>${kacir(siparisNo)}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>`,
+        `<p>Herhangi bir sorunuz olursa <a href="mailto:${kacir(supportEmail)}">${kacir(supportEmail)}</a> adresinden bizimle iletişime geçebilirsiniz.</p>`,
+        `<p>Teşekkürler,<br><strong>${kacir(brandName)} Ekibi</strong></p>`,
+        companyFooter ? `<p style="color:#6b7280;font-size:12px;">${kacir(companyFooter)}</p>` : '',
         '</div>'
       ].join('')
     } else {

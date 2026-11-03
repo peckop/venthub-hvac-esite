@@ -2,6 +2,9 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
+// Kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
+import { guvenliUrl, kacir } from '../_shared/kodlama.ts'
+import { maskEposta } from '../_shared/maske.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -272,39 +275,42 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
 ${companyFooter}
     `.trim()
 
+    // Her değer `kacir`dan geçer (güvenlik karnesi 2026-11 G1): `reason` ve `description`
+    // müşterinin iade formundan gelir; ham basılırsa VentHub göndericisinden oltalama HTML'i olur.
+    const logoUrl = guvenliUrl(brandLogoUrl)
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: ${brandPrimary};">${brandName} — İade Durumu Güncellendi</h2>
-        ${brandLogoUrl ? `<p><img src="${brandLogoUrl}" alt="${brandName}" style="max-height:40px;"/></p>` : ''}
-        <p>Merhaba <strong>${customer_name}</strong>,</p>
-        <p><strong>${siparisNo}</strong> numaralı siparişinizin iade durumu güncellendi.</p>
+        <h2 style="color: ${kacir(brandPrimary)};">${kacir(brandName)} — İade Durumu Güncellendi</h2>
+        ${logoUrl ? `<p><img src="${kacir(logoUrl)}" alt="${kacir(brandName)}" style="max-height:40px;"/></p>` : ''}
+        <p>Merhaba <strong>${kacir(customer_name)}</strong>,</p>
+        <p><strong>${kacir(siparisNo)}</strong> numaralı siparişinizin iade durumu güncellendi.</p>
 
         <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="margin-top: 0; color: #374151;">İade Bilgileri</h3>
-          <p><strong>📦 İade Sebebi:</strong> ${reason}</p>
-          ${description ? `<p><strong>📝 Açıklama:</strong> ${description}</p>` : ''}
-          <div style="background-color: #dbeafe; border-left: 4px solid ${brandPrimary}; padding: 12px; margin: 12px 0;">
-            <p style="margin: 0;"><strong>🔄 Yeni Durum:</strong> <span style="color: ${brandPrimary}; font-weight: bold;">${statusLabel}</span></p>
+          <p><strong>📦 İade Sebebi:</strong> ${kacir(reason)}</p>
+          ${description ? `<p><strong>📝 Açıklama:</strong> ${kacir(description)}</p>` : ''}
+          <div style="background-color: #dbeafe; border-left: 4px solid ${kacir(brandPrimary)}; padding: 12px; margin: 12px 0;">
+            <p style="margin: 0;"><strong>🔄 Yeni Durum:</strong> <span style="color: ${kacir(brandPrimary)}; font-weight: bold;">${kacir(statusLabel)}</span></p>
           </div>
         </div>
 
         <div style="background-color: #ecfccb; padding: 16px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 0; color: #365314;"><strong>${message}</strong></p>
+          <p style="margin: 0; color: #365314;"><strong>${kacir(message)}</strong></p>
         </div>
 
         ${nextSteps ? `
         <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0;">
           <h4 style="margin-top: 0; color: #92400e;">📋 Sonraki Adımlar:</h4>
-          <p style="margin-bottom: 0; color: #92400e;">${nextSteps}</p>
+          <p style="margin-bottom: 0; color: #92400e;">${kacir(nextSteps)}</p>
         </div>
         ` : ''}
 
-        <p>İade süreci ile ilgili sorularınız için <a href="mailto:${supportEmail}">${supportEmail}</a> adresinden destek ekibimizle iletişime geçebilirsiniz.</p>
-        <p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>
+        <p>İade süreci ile ilgili sorularınız için <a href="mailto:${kacir(supportEmail)}">${kacir(supportEmail)}</a> adresinden destek ekibimizle iletişime geçebilirsiniz.</p>
+        <p>Teşekkürler,<br><strong>${kacir(brandName)} Ekibi</strong></p>
 
         <hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
-        ${companyFooter ? `<p style="color: #6b7280; font-size: 12px;">${companyFooter}</p>` : ''}
+        ${companyFooter ? `<p style="color: #6b7280; font-size: 12px;">${kacir(companyFooter)}</p>` : ''}
       </div>
     `
 
@@ -336,7 +342,7 @@ ${companyFooter}
 
     const result = await emailResponse.json().catch(() => ({})) as ResendResult
 
-    console.warn(`📧 Notification sent to ${customer_email} for return ${return_id}: ${old_status} → ${new_status}`)
+    console.warn(`📧 Notification sent to ${maskEposta(customer_email)} for return ${return_id}: ${old_status} → ${new_status}`)
 
     return new Response(JSON.stringify({
       success: true,

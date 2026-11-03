@@ -25,7 +25,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { checkRateLimit } from '../_shared/rate_limit.ts'
 import { DEFAULT_TENANT_ID } from '../_shared/tenant.ts'
 import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
-import { icBildirimOlustur, kacir, musteriOnayAnahtari } from './ic_bildirim.ts'
+import { kacir } from '../_shared/kodlama.ts'
+import { icBildirimOlustur, musteriOnayAnahtari } from './ic_bildirim.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (returns-webhook ile aynı pencere)
 const KULLANICI_SAATLIK = 5 // REC-380: oturumlu kullanıcı başına saatlik teklif e-postası (misafir e-posta sınırıyla aynı)
@@ -197,10 +198,10 @@ Deno.serve(async (req: Request) => {
     // adresini, ürün adına `<a href="https://evil.tld">Ödemeyi tamamlayın</a>` yazar ve
     // kurban VentHub alan adından bir KİMLİK AVI e-postası alırdı. İki kapı birden kondu:
     // misafir uçta ad artık DB'den çözülüyor (istemciden alınmıyor) ve burada kaçış var.
-    // İkisi ayrı katman: biri kaynağı, diğeri çıktıyı korur. (`kacir` artık `ic_bildirim.ts`'te;
-    // iç bildirim de aynı kaçışı kullanır ve kapı onu orada test eder.)
+    // İkisi ayrı katman: biri kaynağı, diğeri çıktıyı korur. (`kacir` artık `_shared/kodlama.ts`'te;
+    // iç bildirim de aynı kaçışı kullanır. Kapı: INV-CIKTI-KODLAMA-1.)
 
-    const kalemler = (items ?? [])
+    const kalemlerHtml = (items ?? [])
       .map((i) => `<li>${kacir(i.product_name)} — ${kacir(i.qty)} adet</li>`)
       .join('')
     const kisaId = quote.id.slice(0, 8).toUpperCase()
@@ -208,8 +209,8 @@ Deno.serve(async (req: Request) => {
     const html = [
       '<div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6">',
       '<h2>Teklif talebiniz bize ulaştı</h2>',
-      `<p><strong>#${kisaId}</strong> numaralı teklif talebinizi aldık. Ekibimiz kalemleri fiyatlandırıp size dönecek.</p>`,
-      kalemler ? `<p>Talebinizdeki ürünler:</p><ul>${kalemler}</ul>` : '',
+      `<p><strong>#${kacir(kisaId)}</strong> numaralı teklif talebinizi aldık. Ekibimiz kalemleri fiyatlandırıp size dönecek.</p>`,
+      kalemlerHtml ? `<p>Talebinizdeki ürünler:</p><ul>${kalemlerHtml}</ul>` : '',
       // ⭐MİSAFİR DALI (güvenlik incelemesi, bulgu 9): metin "hesabınızdaki Tekliflerim
       // sayfasından" diyordu — ama misafirin hesabı YOK ve prospect belge cetvel §7/R17
       // gereği müşteri portalında GÖRÜNMEZ. Yani e-posta, var olmayan bir yere yönlendirip

@@ -209,12 +209,13 @@ describe('INV-EPOSTA-SABLON-1 · e-posta şablonu ↔ render alan sözleşmesi',
       } else {
         // Sablonsuz uc (return-status-notification): olcut evreni MUSTERIYE GIDEN HTML
         // govdesidir — dosyanin tamami DEGIL. Dosyaya bakmak ayirt etmiyordu (yorum: ust taraf).
+        // Değer `kacir(…)` ile sarılı basılır (INV-CIKTI-KODLAMA-1, karne 2026-11 G1).
         expect(
-          /\$\{supportEmail\}/.test(o.satirIciHtml),
-          `${o.islev}: satir-ici HTML govdesinde \${supportEmail} yok — musteri nereye yazacak?`,
+          /\$\{kacir\(supportEmail\)\}/.test(o.satirIciHtml),
+          `${o.islev}: satir-ici HTML govdesinde \${kacir(supportEmail)} yok — musteri nereye yazacak?`,
         ).toBe(true)
         expect(
-          /\$\{companyFooter\}/.test(o.satirIciHtml),
+          /\$\{kacir\(companyFooter\)\}/.test(o.satirIciHtml),
           `${o.islev}: satir-ici HTML govdesinde \${companyFooter} yok.`,
         ).toBe(true)
       }
