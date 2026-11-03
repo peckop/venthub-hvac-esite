@@ -1,6 +1,6 @@
 # Ölçüm defteri: PIM / UnoPIM
 
-Sahibi: OPS · Son doğrulama: 2026-09-29 · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
+Sahibi: OPS · Son doğrulama: 2026-11-02 · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
 Son ölçüm: 2026-09-29 (OPS, Sonnet). Önceki: REC-357 (In Review), karar 36 EVET (09-22), 81/82 EVET.
 
 | Konu | Bulgu |
@@ -11,6 +11,16 @@ Son ölçüm: 2026-09-29 (OPS, Sonnet). Önceki: REC-357 (In Review), karar 36 E
 | Açıklar | Tek yazıcı bugün İHLAL (admin form/CSV/kategori ekranı PIM alanlarına yazıyor); köprü DB rolü (migration); SKU/slug/ad politikası; 24 ürün teknik verisi boş; tek makine/tek kişi. |
 | Olgunluk | 11.013 yıldız, MIT, v3.1.2 (09-24), 2 ayda 5 sürüm, 32 katkıcı. PHP 8.4 + MySQL/PG16 + Redis + kuyruk (+Elasticsearch) → AYRI sunucu. |
 | Alternatif | Akeneo CE (destek bitişi doğrulanmadı), Pimcore (lisans, elendi), AtroPIM (küçük), "PIM yok" (Supabase tabloları). |
+
+## Ölçüm 2026-11-02 (ALTYAPI, ALT-129 / OPS-202)
+| Konu | Bulgu |
+|---|---|
+| Ayağa kalkış | Docker Desktop 4.43.2 (motor 28.3.2) bayat `run/dockerInference` soketiyle açılışta çöküyordu; `wsl --shutdown` + `run` klasörü kenara taşınarak açıldı. Kapsayıcılar yeniden kurulmadan `docker start` ile başlatıldı; 7/7 sağlıklı (app, queue, scheduler, pgsql 16, redis 7.2, elasticsearch 8.17, mailpit). |
+| Sürüm | Görüntüler `webkul/unopim:3.1.1` (Laravel 13.30.1). 09-29 kaydıyla aynı; yükseltme yapılmadı. |
+| Veri | 442 ürün (hepsi simple), 48 aile, 97 öznitelik, 1 kategori, 1 kanal, 2 etkin dil. En kalabalık aileler seat_serisi 40, vortice_vort_quadro_evo 23. Son ürün güncellemesi 2026-09-23; o günden beri veri değişmemiş. |
+| Görsel alanı | Tek görsel özniteliği `image` (tip image, zorunlu değil); galeri ya da dosya tipi öznitelik yok. Görseli dolu ürün 0/442. |
+| API | Yönetim paneli `/admin/login` 200; REST kimliksiz 401, mevcut anahtarla `GET products` 200 (total=442), `GET attributes/image` 200. 2 API anahtarı, 2 OAuth istemcisi tanımlı. |
+| Sınır | Ölçüm salt okumadır: UnoPIM'e ürün verisi yazılmadı, canlı Supabase'e dokunulmadı. |
 
 ## Hüküm (09-29)
 441 ürün, tek kanal → ayrı PIM zorunlu değil; asıl acı veri disiplini. UnoPIM YEREL TEZGÂH olarak devam, yazma kolu açılmaz. 4 hafta koşulu (~10-27): 24 boş ürün + 2 hafta fark 0 + challenger 5 koşulu; sağlanmazsa Supabase tabloları.
