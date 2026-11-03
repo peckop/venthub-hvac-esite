@@ -59,6 +59,8 @@
 -- Cetvel: CLAUDE.md kural 11, docs/standards/migration-safety-standard.md.
 
 begin;
+set lock_timeout = '1s';
+set statement_timeout = '5s';
 
 create or replace function public.venthub_orders_monoton_durum()
 returns trigger
