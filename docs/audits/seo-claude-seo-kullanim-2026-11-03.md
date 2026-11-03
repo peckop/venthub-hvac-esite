@@ -38,4 +38,18 @@ Kaynak: kurulu sürüm 2.5.0 (agricidaniel-claude-seo, MIT) klasörü okundu; `s
 ## 5. Açık sorular (Recep/OPS)
 
 - Python ortamı (`/seo setup`) kurulsun mu? Kurulursa `seo-sitemap`, `seo-sxo` ve `seo-page` tam çalışır; kurulum karar 417 kapsamı dışında, ARAÇ uygular. Önerim: önce üç denemeyi (SEO-71 sessiz fan için `seo-sxo`, SEO-76 için `seo-sitemap`, bir yeni rehber için `seo-geo`) ortamsız metin akışıyla yap, değer görülürse kurulum sorulur.
-- `seo-programmatic` ile `programmatic-seo-gate` aynı işi yapıyor: biri kapatılsın mı? Her ikisinin skill açıklaması her pencerenin bağlamına girer.
+- `seo-programmatic` ile `programmatic-seo-gate` aynı işi yapıyor: biri kapatılsın mı? Her ikisinin skill açıklaması her pencerenin bağlamına girer. (Aşağıdaki denemelerde sınanmadı.)
+
+## 6. Üç denemenin sonucu (3 Kasım, OPS UYGUN, ortamsız, yalnız metin akışı)
+
+Hiçbir deneme Python ortamına ihtiyaç duymadı: skill'lerin kontrol listesini okudum, ölçümü kendi betik ve Chrome'umla yaptım.
+
+| Deneme | Ne yapıldı | Bulgu | Eklentinin katkısı |
+|---|---|---|---|
+| `seo-sxo` (SEO-71) | "sessiz kanal fanı nasıl seçilir" Google TR sonuçları (pws=0), sayfa türü sınıflaması | Organik 8 sonucun 8'i rehber/blog türü, 3 reklam ticari. VentHub yazısı rehber türünde ve organik 1. sırada: sayfa türü uyumsuzluğu YOK | Sınıflama çerçevesi hazır; SERP verisini eklentinin WebSearch adımı yerine Chrome'dan aldım. Yeni bilgi vermedi: 3 haftalık görünmezliğin sebebi sayfa türü değildi |
+| `seo-sitemap` (SEO-76) | Canlı site haritasına kontrol listesi uygulandı | 95 adres tek dosyada, hepsi 200, yönlendiren 0, noindex 0, kanonik hep kendisi, https, kopya 0, robots'ta Sitemap satırı var; `<priority>` etiketi kullanılıyor (Google yok sayar, bilgi düzeyi); 12 adreste `lastmod` yok (ana sayfa, ürünler listesi, 7 marka, iletişim, hakkında, ürün seçici), 83 adreste var ve 38 farklı değer (tek tip değil) | Kontrol listesi net ve işe yarar; tür başına bölme kararı bu denemenin konusu değil (SEO-76) |
+| `seo-geo` (yeni rehber `fan-cesitleri`, 3 Kasım yayın) | robots'ta yapay zekâ tarayıcıları, yazı yapısı, kardeş yazıyla karşılaştırma | Yapay zekâ botları için ayrı engel yok, genel kural `Allow: /` (yönetim, hesap, ödeme kapalı): erişim açık. Yazı 1.894 kelime, 9 H2 (2'si soru biçiminde), 1 tablo, 6 liste, yazar ve tarih işaretli, Article ve Breadcrumb JSON-LD var, FAQ işaretlemesi yok (doğru). İlk bölüm 610 kelime. Ana gövdede dış bağlantı sayısı 0 (Kaynaklar bölümü var; bağlantılı mı metin mi bakılmadı) | Erişim ve yapı kontrol listesi işe yaradı. 130-170 kelimelik blok ölçütü bir sezgi, Google kuralı değil: BLOG'a öneri olarak gider, ölçüm olarak değil |
+
+Yeni rehber için kayıt (Y2.1): Google'a Search Console isteği bugün **kota aşıldı** diye gitmedi (4 Kasım'da tekrar); IndexNow dizin tetiğiyle gitti (koşu 41603634040, yeni 1 adres, HTTP 200); Bing API ile gönderildi; Yandex günlük sınırı dolu.
+
+**Hüküm:** Python ortamına şimdilik gerek görülmedi; eksikliği hiçbir denemede hissedilmedi. En çok değer: `seo-sitemap` kontrol listesi ve `seo-geo` erişim/yapı listesi. `seo-sxo` çerçevesi bu vakada doğrulama dışında bir şey eklemedi. `seo-programmatic` ve `programmatic-seo-gate` tekilleştirmesi denenmedi.
