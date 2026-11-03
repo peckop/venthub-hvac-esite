@@ -189,7 +189,10 @@ function tabloHatalari(zincir: Mig[]): string[] {
         continue
       }
       if (!dogdu) continue
-      if (politikaDes.test(ifade)) politika++
+      // ALT-135: açık RESTRICTIVE deny politikası kimseye erişim VERMEZ (Advisor "RLS açık politikasız" uyarısı); sayılmaz.
+      // İzin veren (permissive) ya da using (false) olmayan her politika karar 310'u bozar ve sayılır.
+      const denyAll = new RegExp(`^\\s*create policy ${TABLO}_deny_all on ${tabloAd} as restrictive for all to anon, authenticated using \\( ?false ?\\)`)
+      if (politikaDes.test(ifade) && !denyAll.test(ifade)) politika++
       if (rlsAcDes.test(ifade)) rls = true
       if (rlsKapaDes.test(ifade)) rls = false
       if (!hedefDes.test(ifade)) continue
@@ -437,7 +440,13 @@ async function katalogHatalari(db: PgliteDb): Promise<string[]> {
     ).rows
     if (acilan.length > 0) h.push(`(C) ${rol} tabloda yetkili: ${acilan.map((a) => a.y).join(',')}`)
   }
-  const politika = (await db.query<{ n: number }>(`select count(*)::int as n from pg_policies where tablename = '${TABLO}'`)).rows[0].n
+  // ALT-135: açık RESTRICTIVE deny politikası (erişim vermez) sayılmaz; izin veren her politika sayılır.
+  const politika = (
+    await db.query<{ n: number }>(
+      `select count(*)::int as n from pg_policies where tablename = '${TABLO}'
+          and not (policyname = '${TABLO}_deny_all' and permissive = 'RESTRICTIVE' and qual = 'false')`,
+    )
+  ).rows[0].n
   if (politika !== 0) h.push(`(C) tabloda ${politika} politika var`)
   const rls = (await db.query<{ v: boolean }>(`select relrowsecurity as v from pg_class where oid = 'public.${TABLO}'::regclass`)).rows[0].v
   if (!rls) h.push('(C) tabloda RLS kapali')
@@ -576,14 +585,16 @@ describe('INV-TAKMA-AD-LISTE-1 · url_takma_adlari_listele() sözleşmesi', () =
         (s) => s.replace(/comment on function/i, 'create policy x on public.url_takma_adlari for select using (true);\ncomment on function'),
         /\(l\) url_takma_adlari uzerinde 1 politika var/,
       ],
-      [
-        'tabloda RLS kapatıldı',
-        (s) => s.replace(/comment on function/i, 'alter table public.url_takma_adlari disable row level security;\ncomment on function'),
-        /\(l\) url_takma_adlari icin RLS son durumda acik degil/,
-      ],
     ]
     it.each(MUTASYONLAR)('%s → KIRMIZI', (_ad, donustur, desen) => {
       expect(statikHatalar(bozuk(donustur), tipMetni).join('\n')).toMatch(desen)
+    })
+
+    // ALT-135 sonrası zincirin sonunda RLS'i yeniden açan bir migration var (20261103140000); bu yüzden RLS sabotajı
+    // işlev migration'ının İÇİNE değil, zincirin SONUNA eklenir: son durum ölçülür.
+    it('tabloda RLS kapatıldı (zincirin sonunda) → KIRMIZI', () => {
+      const sonuna = [...zincir, { ad: 'zz_rls_kapat.sql', sql: 'alter table public.url_takma_adlari disable row level security;' }]
+      expect(statikHatalar(sonuna, tipMetni).join('\n')).toMatch(/\(l\) url_takma_adlari icin RLS son durumda acik degil/)
     })
 
     it('tip dosyasında kolon eksik (tenant_id) → KIRMIZI', () => {
