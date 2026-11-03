@@ -7,6 +7,7 @@ import {
   countPassedPasswordRules,
   PASSWORD_MIN_LENGTH,
   PASSWORD_RULES,
+  PASSWORD_SYMBOLS,
   passwordMeetsAllRules,
   passwordStrengthLevel,
 } from '../../utils/passwordRules'
@@ -70,6 +71,44 @@ describe('INV-AUTH-PWPOLICY-1: istemci kuralı sunucu kuralını kapsar', () => 
   it('güç seviyesi yalnız tüm kurallar geçince 4', () => {
     expect(passwordStrengthLevel('ABCDEF1!')).toBeLessThan(4)
     expect(passwordStrengthLevel('')).toBe(0)
+  })
+})
+
+describe('INV-AUTH-PWPOLICY-1: özel karakter = sunucunun ASCII sembol kümesi (ALT-140)', () => {
+  // Bağımsız kaynak: Supabase Auth belgesi "allowed symbols" (koddaki sabitten türetilmedi).
+  const SERVER_SYMBOLS = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '[', ']', '{', '}', ';', "'", '\\', ':', '"', '|', '<', '>', '?', ',', '.', '/', '`', '~']
+
+  it('Türkçe harf özel sayılmaz', () => {
+    expect(passwordMeetsAllRules('Abcdef1ç')).toBe(false)
+    expect(PASSWORD_RULES.find(r => r.key === 'special')?.test('Abcdef1ç')).toBe(false)
+  })
+
+  it('boşluk özel sayılmaz', () => {
+    expect(passwordMeetsAllRules('Abcdef1 ')).toBe(false)
+    expect(PASSWORD_RULES.find(r => r.key === 'special')?.test('Abcdef1 ')).toBe(false)
+  })
+
+  it('ASCII sembol geçer', () => {
+    expect(passwordMeetsAllRules('Abcdef1!')).toBe(true)
+  })
+
+  it('küme tam 32 sembol ve sabit bu kümeyle aynı', () => {
+    expect(SERVER_SYMBOLS).toHaveLength(32)
+    expect([...PASSWORD_SYMBOLS].sort()).toEqual([...SERVER_SYMBOLS].sort())
+  })
+
+  it.each(SERVER_SYMBOLS)('sembol %s tek başına özel kuralını sağlar', s => {
+    expect(passwordMeetsAllRules(`Abcdef1${s}`)).toBe(true)
+  })
+
+  it.each(['ç', 'ş', 'ğ', 'ü', 'ö', 'ı', 'İ', 'Ç', ' ', '€', '£', '§', 'é', '\t'])('ASCII-dışı/boşluk %j özel sayılmaz', c => {
+    expect(passwordMeetsAllRules(`Abcdef1${c}`)).toBe(false)
+  })
+
+  it('Türkçe harf küçük/büyük harf kuralını sağlamaz (sunucu a-z / A-Z arar)', () => {
+    expect(passwordMeetsAllRules('ÇŞĞÜÖİ1!')).toBe(false) // ASCII büyük/küçük yok
+    expect(passwordMeetsAllRules('çşğüöı1!A')).toBe(false) // ASCII küçük yok
+    expect(passwordMeetsAllRules('ÇŞĞÜÖİ1!a')).toBe(false) // ASCII büyük yok
   })
 })
 
