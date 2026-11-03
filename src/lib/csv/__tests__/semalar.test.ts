@@ -68,3 +68,59 @@ describe('stokSatirlariniHazirla', () => {
     })
   })
 })
+
+/** ADM-7 — #2202 incelemesinde çıkan stok içe aktarma bulguları. */
+describe('stokSatirlariniHazirla — ADM-7', () => {
+  it('aynı SKU iki kez geçerse HİÇBİRİ uygulanmaz; her satırı duplicateSku hatası olur (madde 2)', () => {
+    const s = stokSatirlariniHazirla(
+      ['sku', 'qty'],
+      [
+        { sku: 'A-1', qty: '5' },
+        { sku: 'A-2', qty: '3' },
+        { sku: 'A-3', qty: 'on' },
+        { sku: ' A-1 ', qty: '9' },
+      ],
+      [2, 3, 4, 5],
+    )
+    expect(s).toEqual({
+      ok: true,
+      satirlar: [{ line: 3, sku: 'A-2', newQty: 3 }],
+      hatalar: [
+        { line: 2, sku: 'A-1', kod: 'duplicateSku' },
+        { line: 4, sku: 'A-3', kod: 'qtyMustBeNumber' },
+        { line: 5, sku: 'A-1', kod: 'duplicateSku' },
+      ],
+    })
+  })
+
+  it('tekrar, miktarı geçersiz satırla olsa da sayılır (hangisi kastedildi belli değil)', () => {
+    const s = stokSatirlariniHazirla(['sku', 'qty'], [{ sku: 'A-1', qty: '5' }, { sku: 'A-1', qty: 'x' }], [2, 3])
+    expect(s).toEqual({
+      ok: true,
+      satirlar: [],
+      hatalar: [
+        { line: 2, sku: 'A-1', kod: 'duplicateSku' },
+        { line: 3, sku: 'A-1', kod: 'duplicateSku' },
+      ],
+    })
+  })
+
+  it.each([
+    ['0x10', 'qtyMustBeNumber'],
+    ['1e3', 'qtyMustBeNumber'],
+    ['Infinity', 'qtyMustBeNumber'],
+    ['1 2', 'qtyMustBeNumber'],
+    ['5.0', 'qtyOutOfRange'],
+    ['2,5', 'qtyOutOfRange'],
+    ['+4', 'qtyOutOfRange'],
+    ['-0', 'qtyOutOfRange'],
+  ])('miktar %j → %s; ürün şemasıyla aynı desen (madde 3)', (qty, kod) => {
+    const s = stokSatirlariniHazirla(['sku', 'qty'], [{ sku: 'A-1', qty }], [2])
+    expect(s).toEqual({ ok: true, satirlar: [], hatalar: [{ line: 2, sku: 'A-1', kod }] })
+  })
+
+  it('kırpılmış tam sayı kabul edilir (ürün şemasıyla aynı)', () => {
+    const s = stokSatirlariniHazirla(['sku', 'qty'], [{ sku: 'A-1', qty: ' 007 ' }], [2])
+    expect(s.ok && s.satirlar).toEqual([{ line: 2, sku: 'A-1', newQty: 7 }])
+  })
+})
