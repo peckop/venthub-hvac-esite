@@ -149,7 +149,7 @@ serve(async (req) => {
     type SiparisOkuma = { durum: 'ok'; satir: KargoSatiri } | { durum: 'yok' } | { durum: 'hata' }
     async function siparisSatiriOku(id: string): Promise<SiparisOkuma> {
       try {
-        const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at`, {
+        const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at,payment_status`, {
           headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
         })
         if (!cur.ok) return { durum: 'hata' }
@@ -163,6 +163,7 @@ serve(async (req) => {
           satir: {
             status: typeof rec.status === 'string' ? rec.status : null,
             shipped_at: typeof rec.shipped_at === 'string' ? rec.shipped_at : null,
+            payment_status: typeof rec.payment_status === 'string' ? rec.payment_status : null,
           },
         }
       } catch {
@@ -296,7 +297,7 @@ serve(async (req) => {
       patchBody['status'] = 'shipped'
     }
     // Karar satirina bagli yazim: ilk kargoda yalniz confirmed/processing satir guncellenir (arada iptal/teslim olduysa 0 satir).
-    const shipFiltre = isFirstShip ? '&status=in.(confirmed,processing)' : '&status=in.(confirmed,processing,shipped,delivered)'
+    const shipFiltre = isFirstShip ? '&status=in.(confirmed,processing)&payment_status=eq.paid' : '&status=in.(confirmed,processing,shipped,delivered)'
     const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}${shipFiltre}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=representation' },

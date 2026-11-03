@@ -62,6 +62,8 @@ export type KargoKarari =
 export interface KargoSatiri {
   status: string | null
   shipped_at: string | null
+  /** İlk kargo için 'paid' şart (ALT-131 devam); alan verilmezse ödenmemiş sayılır. */
+  payment_status?: string | null
 }
 
 /**
@@ -85,7 +87,18 @@ export function kargolamaKarari(satir: KargoSatiri): KargoKarari {
   if (satir.shipped_at !== null || durum === 'shipped' || durum === 'delivered') {
     return { islem: 'takip_guncelle' }
   }
-  if (durum === 'confirmed' || durum === 'processing') return { islem: 'ilk_kargo' }
+  if (durum === 'confirmed' || durum === 'processing') {
+    // Ödemesi 'paid' olmayan sipariş kargoya verilemez (pending/cancelled kontrolünden AYRI kod).
+    if (satir.payment_status !== 'paid') {
+      return {
+        islem: 'reddet',
+        kod: 'ORDER_NOT_PAID',
+        http: 409,
+        mesaj: `Ödeme durumu '${satir.payment_status ?? 'pending'}' iken kargoya verilemez`,
+      }
+    }
+    return { islem: 'ilk_kargo' }
+  }
   return {
     islem: 'reddet',
     kod: 'ORDER_STATUS_UNKNOWN',

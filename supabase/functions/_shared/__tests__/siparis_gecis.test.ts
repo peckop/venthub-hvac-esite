@@ -51,7 +51,21 @@ describe('kargolamaKarari — pending/cancelled kargoya verilemez', () => {
   })
 
   it.each(['confirmed', 'processing'])('%s + shipped_at boş: ilk kargo', (status) => {
-    expect(kargolamaKarari({ status, shipped_at: null })).toEqual({ islem: 'ilk_kargo' })
+    expect(kargolamaKarari({ status, shipped_at: null, payment_status: 'paid' })).toEqual({ islem: 'ilk_kargo' })
+  })
+
+  it.each(['confirmed', 'processing'])('%s + ödeme pending: ORDER_NOT_PAID (pending/cancelled kodundan ayrı)', (status) => {
+    expect(kargolamaKarari({ status, shipped_at: null, payment_status: 'pending' })).toMatchObject({
+      islem: 'reddet', http: 409, kod: 'ORDER_NOT_PAID',
+    })
+  })
+
+  it.each(['failed', 'refunded', 'partial_refunded', null, undefined])('ödeme %s iken ilk kargo reddedilir', (odeme) => {
+    expect(kargolamaKarari({ status: 'confirmed', shipped_at: null, payment_status: odeme })).toMatchObject({ kod: 'ORDER_NOT_PAID' })
+  })
+
+  it('takip güncellemesi ödeme şartına bağlı değil (zaten kargolanmış sipariş)', () => {
+    expect(kargolamaKarari({ status: 'shipped', shipped_at: '2026-11-01T10:00:00Z', payment_status: 'refunded' })).toEqual({ islem: 'takip_guncelle' })
   })
 
   it.each(['shipped', 'delivered'])('%s: yalnız takip güncellenir, durum değişmez', (status) => {
@@ -65,7 +79,7 @@ describe('kargolamaKarari — pending/cancelled kargoya verilemez', () => {
 
   it('kargo kararı her zaman izin tablosuna uyar: ilk kargo yalnız izinli bir geçiş yazar', () => {
     for (const status of ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']) {
-      const k = kargolamaKarari({ status, shipped_at: null })
+      const k = kargolamaKarari({ status, shipped_at: null, payment_status: 'paid' })
       if (k.islem === 'ilk_kargo') expect(siparisGecisiIzinliMi(status, 'shipped')).toBe(true)
     }
   })

@@ -235,7 +235,8 @@ describe('INV-SIPARIS-MONOTON-1 — yazıcılar kapıya uyuyor', () => {
     expect(s).not.toMatch(/status:\s*'confirmed'/)
     // karar satırına bağlı koşullu yazım
     expect(s).toContain('status=eq.shipped')
-    expect(s).toContain('status=in.(confirmed,processing)')
+    expect(s).toContain('status=in.(confirmed,processing)&payment_status=eq.paid')
+    expect(s).toContain('select=status,shipped_at,payment_status')
   })
 
   it('admin-update-order: varsayılan `paid` kalktı, sözlük doğrulaması ve 409 eşlemesi var', () => {
