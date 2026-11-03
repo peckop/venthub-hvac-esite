@@ -11,10 +11,15 @@
  * venthub_orders.payment_status → pending | paid | failed | refunded | partial_refunded
  *
  * "refunded" bir sipariş statüsü DEĞİL, ödeme statüsüdür.
- * Bu yüzden iade durumunda: status=cancelled + payment_status=refunded yapılır.
+ * İade durumunda (ALT-131, veritabanı tetiği `trg_orders_monoton_durum` ile uyumlu):
+ *   - yalnız ÖDENMİŞ siparişe yazılır;
+ *   - payment_status=refunded/partial_refunded yazılır;
+ *   - status yalnız KARGOLANMAMIŞ siparişin tam iadesinde cancelled olur; kargolanmış/teslim
+ *     edilmiş siparişin status'u korunur (teslim sonrası iade: delivered + refunded).
  */
 
 import type { Database } from '../types/database.types'
+import { isOrderDbTransitionAllowed, isPaymentDbTransitionAllowed, planRefundFields } from './admin/orderStatusDomain'
 import { canTransitionOrder } from './admin/orderStatusMachine'
 import { logAdminAction } from './audit'
 import { supabase } from './supabase'
@@ -50,17 +55,13 @@ interface UpdateOrderStatusResult {
 /**
  * UI statüsünü DB'ye uygun status + payment_status çiftine çevirir.
  *
+ * İade değerleri (`refunded`, `partial_refunded`) buraya GELMEZ: onların alanları siparişin
+ * mevcut durumuna bağlıdır ve `planRefundFields` ile çözülür.
+ *
  * Örnek:
- * "refunded" → { status: "cancelled", payment_status: "refunded" }
- * "shipped"  → { status: "shipped", payment_status: undefined }
+ * "shipped"  → { status: "shipped" }
  */
 function resolveDbFields(uiStatus: string): { status: string; payment_status?: string } {
-    if (uiStatus === 'refunded') {
-        return { status: 'cancelled', payment_status: 'refunded' }
-    }
-    if (uiStatus === 'partial_refunded') {
-        return { status: 'cancelled', payment_status: 'partial_refunded' }
-    }
     // Geçerli sipariş statüsü mü kontrol et
     if ((VALID_ORDER_STATUSES as readonly string[]).includes(uiStatus)) {
         return { status: uiStatus }
@@ -110,10 +111,26 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
         // --- 1. Sipariş statüsünü güncelle ---
         let deliveredNow = false
         if (!skipOrdersSync) {
-            const dbFields = resolveDbFields(newStatus)
-            const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = { status: dbFields.status }
-            if (dbFields.payment_status) {
-                updatePayload.payment_status = dbFields.payment_status
+            const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = {}
+            if (newStatus === 'refunded' || newStatus === 'partial_refunded') {
+                // Alanlar siparişin GERÇEK durumundan çözülür (oldStatus kanban birleşik değeri olabilir).
+                const { data: cur, error: curErr } = await supabase
+                    .from('venthub_orders')
+                    .select('status, payment_status')
+                    .eq('id', orderId)
+                    .maybeSingle()
+                if (curErr) throw new Error('Sipariş okunamadı: ' + curErr.message)
+                if (!cur) return { ok: false, error: 'Sipariş bulunamadı' }
+                const plan = planRefundFields(newStatus, cur)
+                if (!plan.ok) return { ok: false, error: plan.error }
+                if (plan.status) updatePayload.status = plan.status
+                updatePayload.payment_status = plan.payment_status
+            } else {
+                const dbFields = resolveDbFields(newStatus)
+                updatePayload.status = dbFields.status
+                if (dbFields.payment_status) {
+                    updatePayload.payment_status = dbFields.payment_status
+                }
             }
 
             /*
@@ -125,7 +142,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
               entegrasyonu gelince webhook asıl kaynak olur ve buradaki yazım
               idempotent kalır (aşağıdaki `is('delivered_at', null)` koşulu).
             */
-            if (dbFields.status === 'delivered') {
+            if (updatePayload.status === 'delivered') {
                 const { data: stamped, error: deliverErr } = await supabase
                     .from('venthub_orders')
                     .update({ ...updatePayload, delivered_at: new Date().toISOString() })
@@ -248,21 +265,66 @@ export async function syncOrderFromReturn(orderId: string, returnStatus: string)
       `processing` oldu. İade kendi tablosunda yaşar; onaylanması siparişin kargo
       durumu hakkında hiçbir şey söylemez. Cetvel: siparis-durum-akisi-standard.md.
     */
-    const orderStatusMap: Record<string, { status: string; payment_status?: string }> = {
-        refunded: { status: 'cancelled', payment_status: 'refunded' },
+    /*
+      ALT-131 — VERİTABANI ARTIK MONOTON (`trg_orders_monoton_durum`): eşleme siparişin MEVCUT
+      durumuna bakar ve izin tablosunun dışına çıkan alanı YAZMAZ.
+
+        · `refunded`  → ödeme `refunded` (yalnız ödenmiş siparişte); durum yalnız kargolanmamışsa
+                        `cancelled`, teslim edilmişse `delivered` KALIR (OPS kararı).
+        · `cancelled` → iade talebinin iptali; teslim edilmiş siparişi iptal edemez (durum kalır).
+        · `received`  → ürün depoya ulaştı; teslim edilmiş sipariş `delivered` KALIR.
+        · `rejected`  → sipariş `delivered` olmalı; zaten `delivered` ise yazım yok.
+
+      Yazılamayan alan sessizce yutulmaz: `warning` olarak döner (`ok: true`; iade kaydı kendi
+      tablosunda zaten güncellendi).
+    */
+    const hedefler: Record<string, { status: string; refund?: true }> = {
+        refunded: { status: 'cancelled', refund: true },
         cancelled: { status: 'cancelled' },
         rejected: { status: 'delivered' },
         received: { status: 'cancelled' },
     }
 
-    const mapped = orderStatusMap[returnStatus]
+    const mapped = hedefler[returnStatus]
     if (!mapped) return { ok: true }
 
     try {
-        const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = { status: mapped.status }
-        if (mapped.payment_status) {
-            updatePayload.payment_status = mapped.payment_status
+        const { data: cur, error: curErr } = await supabase
+            .from('venthub_orders')
+            .select('status, payment_status')
+            .eq('id', orderId)
+            .maybeSingle()
+        if (curErr) throw curErr
+        if (!cur) return { ok: false, error: 'Sipariş bulunamadı' }
+
+        const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = {}
+        const uyarilar: string[] = []
+
+        if (mapped.refund) {
+            const plan = planRefundFields('refunded', cur)
+            if (plan.ok) {
+                updatePayload.payment_status = plan.payment_status
+                if (plan.status) updatePayload.status = plan.status
+            } else {
+                uyarilar.push(plan.error)
+            }
+        } else if (cur.status !== mapped.status) {
+            if (cur.status === 'delivered') {
+                // Teslim edilmiş sipariş iptal/iade ile geri alınmaz: durum KALIR, uyarı gerekmez.
+            } else if (isOrderDbTransitionAllowed(cur.status, mapped.status)) {
+                updatePayload.status = mapped.status
+            } else {
+                uyarilar.push(`Sipariş durumu değişmedi: ${cur.status} → ${mapped.status} geçişi izinli değil`)
+            }
         }
+
+        if (updatePayload.payment_status && !isPaymentDbTransitionAllowed(cur.payment_status, updatePayload.payment_status)) {
+            uyarilar.push(`Ödeme durumu değişmedi: ${cur.payment_status ?? 'pending'} → ${updatePayload.payment_status} geçişi izinli değil`)
+            delete updatePayload.payment_status
+        }
+
+        const warning = uyarilar.length > 0 ? uyarilar.join('; ') : undefined
+        if (Object.keys(updatePayload).length === 0) return warning ? { ok: true, warning } : { ok: true }
 
         const { error } = await supabase
             .from('venthub_orders')
@@ -281,7 +343,7 @@ export async function syncOrderFromReturn(orderId: string, returnStatus: string)
             })
         } catch { /* swallow */ }
 
-        return { ok: true }
+        return warning ? { ok: true, warning } : { ok: true }
     } catch (err: unknown) {
         return { ok: false, error: (err as Error).message }
     }

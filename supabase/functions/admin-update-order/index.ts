@@ -7,6 +7,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
+import { SIPARIS_DURUM_IZIN, monotonIhlaliMi } from '../_shared/siparis_gecis.ts'
 
 /**
  * PostgREST dizisinden ilk profil satırını RUNTIME kontrolüyle daraltır.
@@ -108,7 +109,12 @@ Deno.serve(async (req: Request) => {
 
     const body = await req.json().catch(() => ({}));
     const { id, conversation_id, status, display_code } = body || {};
-    const newStatus = (status || 'paid').toString();
+    // ALT-131: varsayilan 'paid' KALDIRILDI (status kolonunda 'paid' yok, CHECK reddederdi) ve gecersiz
+    // sozluk degeri veritabanina gitmeden 400 ile doner. Gecis monotonlugunu veritabani tetigi denetler.
+    const newStatus = typeof status === 'string' ? status.trim() : '';
+    if (!Object.prototype.hasOwnProperty.call(SIPARIS_DURUM_IZIN, newStatus)) {
+      return new Response(JSON.stringify({ error: 'invalid_status', allowed: Object.keys(SIPARIS_DURUM_IZIN) }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
 
     async function patch(filter: string) {
       return await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
@@ -154,6 +160,11 @@ Deno.serve(async (req: Request) => {
 
     const ok = resp && resp.ok;
     const text = resp ? await resp.text() : '';
+
+    // Monotonluk tetigi reddetti: 500 degil 409 (istemci hatasi), net kod.
+    if (!ok && monotonIhlaliMi(text)) {
+      return new Response(JSON.stringify({ ok: false, error: 'INVALID_TRANSITION', response: text }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
 
     return new Response(JSON.stringify({ ok, response: text }), { status: ok ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   } catch (_e) {
