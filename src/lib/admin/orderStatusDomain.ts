@@ -79,3 +79,72 @@ export function isPaymentDbStatus(value: string): value is PaymentDbStatus {
 export function isRefundedPayment(paymentStatus: string | null | undefined): boolean {
   return paymentStatus === 'refunded' || paymentStatus === 'partial_refunded'
 }
+
+/**
+ * VERİTABANI geçiş tabloları — `trg_orders_monoton_durum` (migration
+ * `20261103120000_venthub_orders_monoton_durum.sql`) ile AYNI olmak ZORUNDA.
+ * Kopyaların ayrışmasını INV-SIPARIS-MONOTON-1 yakalar (SQL ↔ bu dosya ↔ edge ortak modülü).
+ *
+ * Kanban makinesi (`orderStatusMachine.ts`) bundan GENİŞ olabilir (panoda 'paid'/'refunded' birleşik
+ * sütunlar var); veritabanı tablosu son sözü söyler.
+ */
+export const ORDER_DB_TRANSITIONS: Readonly<Record<OrderDbStatus, readonly OrderDbStatus[]>> = {
+  pending: ['confirmed', 'cancelled'],
+  confirmed: ['processing', 'shipped', 'cancelled'],
+  processing: ['shipped', 'cancelled'],
+  shipped: ['delivered', 'cancelled'],
+  delivered: [],
+  cancelled: [],
+}
+
+export const PAYMENT_DB_TRANSITIONS: Readonly<Record<PaymentDbStatus, readonly PaymentDbStatus[]>> = {
+  pending: ['paid', 'failed'],
+  failed: ['paid'],
+  paid: ['partial_refunded', 'refunded'],
+  partial_refunded: ['refunded'],
+  refunded: [],
+}
+
+/** Aynı değer her zaman serbest; bilinmeyen değer kilitli. */
+export function isOrderDbTransitionAllowed(from: string, to: string): boolean {
+  if (!isOrderDbStatus(from)) return false
+  return from === to || ORDER_DB_TRANSITIONS[from].includes(to as OrderDbStatus)
+}
+
+/** `null` ödeme durumu 'pending' sayılır (kolon NULL'a izin verir). */
+export function isPaymentDbTransitionAllowed(from: string | null, to: string | null): boolean {
+  const a = from ?? 'pending'
+  const b = to ?? 'pending'
+  if (!isPaymentDbStatus(a)) return false
+  return a === b || PAYMENT_DB_TRANSITIONS[a].includes(b as PaymentDbStatus)
+}
+
+export type RefundPlan =
+  | { ok: true; status?: OrderDbStatus; payment_status: 'refunded' | 'partial_refunded' }
+  | { ok: false; error: string }
+
+/**
+ * İade yazımının DB alanları (ALT-131, OPS kararı).
+ *
+ *  · İade yalnız ÖDENMİŞ siparişe yazılır (`paid`; tam iade için `partial_refunded` de olur).
+ *  · Sipariş durumu yalnız tam iadede ve yalnız kargolanmamış siparişte `cancelled` olur
+ *    (`iyzico-refund` ile aynı kural). Kargolanmış ya da TESLİM EDİLMİŞ siparişin durumu korunur:
+ *    teslim sonrası iade `status=delivered`, `payment_status=refunded` bırakır.
+ *  · Kısmi iade sipariş durumunu hiç değiştirmez.
+ */
+export function planRefundFields(
+  kind: 'refunded' | 'partial_refunded',
+  current: { status: string | null; payment_status: string | null },
+): RefundPlan {
+  const odeme = current.payment_status ?? 'pending'
+  // `refunded` + tam iade: aynı değerin yeniden yazımı (iyzico-refund önce yazmış olabilir) serbest.
+  const odemeUygun = odeme === 'paid' || odeme === 'partial_refunded' || (kind === 'refunded' && odeme === 'refunded')
+  if (!odemeUygun) {
+    return { ok: false, error: `İade yalnız ödenmiş siparişe yazılabilir (ödeme durumu: ${odeme})` }
+  }
+  const kargolanmamis = current.status === 'pending' || current.status === 'confirmed' || current.status === 'processing'
+  if (kind === 'refunded' && kargolanmamis) {
+    return { ok: true, status: 'cancelled', payment_status: 'refunded' }
+  }
+  return { ok: true, payment_status: kind }
+}

@@ -10,6 +10,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { PASSWORD_RULES, passwordMeetsAllRules, type PasswordRuleKey, passwordStrengthLevel } from '../utils/passwordRules'
 import { hibpPwnedCount } from '../utils/passwordSecurity'
 
 /**
@@ -40,20 +41,23 @@ const ResetPasswordPage: React.FC = () => {
     return () => { cancelled = true }
   }, [])
 
-  const passwordRules = [
-    { key: 'length',  label: t('auth.pwRule.length'),  test: (p: string) => p.length >= 8 },
-    { key: 'upper',   label: t('auth.pwRule.upper'),   test: (p: string) => /[A-Z]/.test(p) },
-    { key: 'digit',   label: t('auth.pwRule.digit'),   test: (p: string) => /[0-9]/.test(p) },
-    { key: 'special', label: t('auth.pwRule.special'), test: (p: string) => /[^A-Za-z0-9]/.test(p) },
-  ]
-  const passedRules = passwordRules.filter(r => r.test(password)).length
+  const ruleLabels: Record<PasswordRuleKey, string> = {
+    length: t('auth.pwRule.length'),
+    lower: t('auth.pwRule.lower'),
+    upper: t('auth.pwRule.upper'),
+    digit: t('auth.pwRule.digit'),
+    special: t('auth.pwRule.special'),
+  }
+  const passwordRules = PASSWORD_RULES.map(r => ({ ...r, label: ruleLabels[r.key] }))
+  const passedRules = passwordStrengthLevel(password)
+  const allRulesMet = passwordMeetsAllRules(password)
   const strengthColor = passedRules <= 1 ? 'bg-red-500' : passedRules === 2 ? 'bg-orange-400' : passedRules === 3 ? 'bg-yellow-400' : 'bg-green-500'
   const strengthLabel = passedRules <= 1 ? t('auth.pwStrength.weak') : passedRules === 2 ? t('auth.pwStrength.fair') : passedRules === 3 ? t('auth.pwStrength.good') : t('auth.pwStrength.strong')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (passedRules < 4) {
+    if (!allRulesMet) {
       toast.error(t('auth.pwRule.allRequired'))
       return
     }

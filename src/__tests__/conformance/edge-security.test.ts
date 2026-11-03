@@ -27,7 +27,9 @@ import { describe, expect, it } from 'vitest'
  * Test kuralı ↔ cetvel maddesi eşlemesi (R-numarası ile E-numarası AYNI DEĞİLDİR):
  *   R1→E1 · R2→E3 · R3→E4 · R4→E5 · R5→E6 · R6→E2 ·
  *   R7→E7 (config kapsamı) · R8→E9 (admin rol kontrolü) · R9→E10 (webhook fail-closed) ·
- *   R10→E11 (çağıran sınıfı beyanı) · R11→E12 (tenant_id önceliği)
+ *   R10→E11 (çağıran sınıfı beyanı) · R11→E12 (tenant_id önceliği) ·
+ *   R13→E16 (service_role REST adresinde tenant filtresi) · R14→E17 (sabit zamanlı sır karşılaştırması)
+ *   (R8-EK, R8'in E9'unu önek dışı ayrıcalıklı uçlara adla genişletir.)
  * (E8 kod değil hat kuralıdır — `scripts/edge/select-functions.mjs` ile karşılanır.)
  *
  * §3.11 kuralları AYRI bir kapıdadır (`config-fail-closed.test.ts`, INV-CONFIG-1):
@@ -163,14 +165,12 @@ const KNOWN_VIOLATIONS = {
     // geçti → beş ad da SİLİNDİ.
     'supabase/functions/admin-iyzico-reconcile/index.ts',
     'supabase/functions/admin-order-inspect/index.ts',
-    'supabase/functions/admin-orders-latest/index.ts',
+    // OPS-211 (2026-11-03): admin-orders-latest · order-housekeeping · order-validate ·
+    // release-expired-reservations ortak `resolveCaller` kapısına geçti ve beyanını aldı → SİLİNDİ.
     'supabase/functions/apply-coupon/index.ts',
     // healthz 2026-08-19'da listeden ÇIKTI (T100-VH): dosya başına "Çağıran sınıfı: (d) izleme ucu"
     // beyanı yazıldı; uç aynı turda ölçemediğinde yeşil dönmeyecek biçimde yeniden kuruldu.
     'supabase/functions/log-client-error/index.ts',
-    'supabase/functions/order-housekeeping/index.ts',
-    'supabase/functions/order-validate/index.ts',
-    'supabase/functions/release-expired-reservations/index.ts',
     // stock-alert 2026-08-17'de listeden ÇIKTI (T061-VH): elle yazılmış yetki kopyası
     // `resolveCaller` kapısına göçtü ve dosya başına çağıran-sınıfı beyanı eklendi.
     'supabase/functions/tcmb-rates-sync/index.ts',
@@ -197,6 +197,37 @@ const KNOWN_VIOLATIONS = {
   // doğrulaması taşımalı. Bugün tek çağıran `_shared/caller.ts` ve orada
   // `timingSafeEquals(token, serviceRoleKey)` kapısı var → baseline BOŞ.
   R11D: [] as string[],
+
+  // R13 (E16) — service_role ile kurulan PostgREST adresinde, tenant kapsamlı tabloya
+  // `tenant_id=eq.` filtresi YOK. Kimlik biçimi: `<dosya> · <tablo>`.
+  // Karne 2026-11 kök 2 / Y2. Bugün tek tenant canlı olduğu için zarar yok; Faz 2'de her
+  // satır kiracılar arası okuma/yazma olur. Liste YALNIZ küçülür.
+  // OPS-211 (2026-11-03) kapattı: order-validate (4 tablo, Y1), iyzico-refund (Y6),
+  // admin-orders-latest (Y2'nin ölçülen kalemi). Kalan beş satırın her biri adıyla:
+  R13: [
+    // Tenant'ı TÜRETMEK için yapılan okuma: satırın kendisi tenant'ı söyler (sınıf c deseni).
+    'supabase/functions/_shared/refund_guard.ts · venthub_orders',
+    // DOKUNULMADI: ödeme durum makinesi PR'ı (kök 1) bu dosyada çalışıyor; filtre koşullu
+    // (`${orderTenantFilter}` tenant türetilemezse boş) ve bir adres `${filter}` ile kuruluyor.
+    'supabase/functions/iyzico-callback/index.ts · venthub_orders',
+    // Zamanlanmış süpürme TÜM kiracıları gezer; Faz 2'de kiracı başına döngü gerekir (Y2).
+    'supabase/functions/order-housekeeping/index.ts · venthub_orders',
+    // İade satırı tenant'ı TÜRETMEK için okunur (imza sonrası); sipariş adresi o türetmeye
+    // bağlı koşullu filtre taşır — türetme başarısızsa boş kalır (Faz 2'de zorunlu hâle gelmeli).
+    'supabase/functions/returns-webhook/index.ts · venthub_orders',
+    'supabase/functions/returns-webhook/index.ts · venthub_returns',
+  ],
+
+  // R14 (E17) — sır, imza ya da anahtar `===`/`!==` ile karşılaştırılıyor (sabit zamanlı
+  // değil). Karne 2026-11 K4. Doğrusu `_shared/sabit_zaman.ts::timingSafeEquals`.
+  // Kimlik biçimi: `<dosya>` (dosya başına bir). OPS-211 (2026-11-03) dört ucu kapattı:
+  // shipping-webhook, returns-webhook, release-expired-reservations, order-housekeeping.
+  R14: [
+    // DOKUNULMADI: iyzico-callback ödeme kapısı (#2204) ve kök-1 durum makinesi PR'ı bu
+    // dosyada çalışıyor. `istekToken !== siparisToken` iyzico ödeme token'ı karşılaştırması;
+    // token tek kullanımlık ve İyzico retrieve ile ayrıca doğrulanıyor — yine de borçtur.
+    'supabase/functions/_shared/odeme_yazim_kapisi.ts',
+  ],
 } as const
 
 /** R5 muafiyeti — çağıran Authorization header'ı GÖNDEREMEZ. Ada göre, kapsam değil. */
@@ -1263,6 +1294,253 @@ describe('R11-D · gövdeden tenant okuyan dosya service_role doğrulaması taş
         '`timingSafeEquals(token, serviceRoleKey)` kapısı koy (bkz. `_shared/caller.ts`), ya da ' +
         'gövdeyi hiç okuma — `tenantFromRow` ile kaynak satırından türet.',
     )
+  })
+})
+
+/* ================================================================== *
+ * R13 (E16) — service_role REST adresinde tenant filtresi ZORUNLU
+ * ================================================================== */
+
+/**
+ * NİÇİN VAR (karne 2026-11 kök 2, Y1 · Y2)
+ *
+ * Edge uçları service_role anahtarıyla PostgREST'e gider; o anahtar RLS'i tümüyle atlar.
+ * Yani tenant sınırını çizen TEK şey adresin kendisidir. Karne, kapının her uçta elle ve
+ * tutarsız yazıldığını ölçtü: kardeş uçlar `&tenant_id=eq.` taşırken `order-validate`
+ * istemcinin verdiği `cart_id` ile başka kullanıcının sepetini, `iyzico-refund` tenant'sız
+ * sipariş satırını okuyordu. Tek tenant canlıyken bunun bedeli küçük; Faz 2'de her satır
+ * kiracılar arası sızıntıdır (CLAUDE.md kural 12).
+ *
+ * DEDEKTÖR: `/rest/v1/<tablo>?` ile başlayan URL ifadesi (şablon + `+` ile eklenen
+ * parçalar) tenant kapsamlı bir tabloya gidiyorsa, ifadenin içinde `tenant_id=eq.`
+ * LİTERALİ bulunmalı. Koşullu filtre değişkeni (`${orderTenantFilter}`) SAYILMAZ: boş
+ * dize olabildiği sürece filtre zorunlu değildir — tam olarak ölçülen açık budur.
+ *
+ * KAPSAM DIŞI (bilinçli): SDK zinciri (`.from('x')`) — istemcinin service_role mu kullanıcı
+ * JWT'si mi taşıdığı statik olarak ayırt edilemiyor; INSERT adresleri (`?` yok, filtre
+ * anlamsız). Tablo listesi karnenin saydıkları + aynı ticari zincirin halkalarıdır;
+ * `user_profiles` bilerek yok (yalnız doğrulanmış `user.id` ile kendi satırını okur).
+ */
+const TENANT_KAPSAMLI_TABLOLAR = [
+  'venthub_orders',
+  'venthub_order_items',
+  'venthub_returns',
+  'coupons',
+  'cart_items',
+  'shopping_carts',
+  'price_lists',
+  'product_prices',
+] as const
+
+const REST_TABLO_RE = /\/rest\/v1\/([a-z_]+)\?/g
+
+/**
+ * `idx` bir şablon dizesinin İÇİNDE. İfadenin tamamını döndürür: şablonun kapanışına
+ * kadar (`${...}` iç içeliği sayılarak), ardından `+` ile eklenen her dize parçası.
+ */
+function urlIfadesi(code: string, idx: number): string {
+  const dizeSonu = (bas: number, tirnak: string): number => {
+    let derinlik = 0
+    for (let i = bas; i < code.length; i++) {
+      const c = code[i]
+      if (c === '\\') {
+        i++
+        continue
+      }
+      if (tirnak === '`' && c === '$' && code[i + 1] === '{') {
+        derinlik++
+        i++
+        continue
+      }
+      if (derinlik > 0 && c === '}') {
+        derinlik--
+        continue
+      }
+      if (derinlik === 0 && c === tirnak) return i
+    }
+    return code.length - 1
+  }
+  // Başlangıç dizesinin tırnağını geriye doğru bul.
+  let bas = idx
+  while (bas > 0 && !['`', "'", '"'].includes(code[bas])) bas--
+  let son = dizeSonu(idx, code[bas] ?? '`')
+  let ifade = code.slice(bas, son + 1)
+  // `+` ile devam eden parçalar.
+  for (;;) {
+    const m = /^\s*\+\s*([`'"])/.exec(code.slice(son + 1))
+    if (!m) break
+    const parcaBas = son + 1 + m[0].length - 1
+    son = dizeSonu(parcaBas + 1, m[1])
+    ifade += code.slice(parcaBas, son + 1)
+  }
+  return ifade
+}
+
+function tenantFiltresizAdresler(code: string): string[] {
+  const out = new Set<string>()
+  for (const m of code.matchAll(REST_TABLO_RE)) {
+    const tablo = m[1]
+    if (!(TENANT_KAPSAMLI_TABLOLAR as readonly string[]).includes(tablo)) continue
+    const ifade = urlIfadesi(code, m.index ?? 0)
+    if (!/tenant_id=eq\./.test(ifade)) out.add(tablo)
+  }
+  return [...out]
+}
+
+describe('R13 · service_role REST adresinde tenant_id=eq. zorunlu (E16)', () => {
+  it('dedektör çalışıyor: filtreli/filtresiz/koşullu/birleştirilmiş adresi ayırt ediyor', () => {
+    const filtresiz = 'fetch(`${u}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(id)}`, { headers })'
+    const filtreli =
+      'fetch(`${u}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(id)}&tenant_id=eq.${encodeURIComponent(t)}`)'
+    const kosullu = 'fetch(`${u}/rest/v1/venthub_orders?id=eq.${x}${orderTenantFilter}`)'
+    const birlesik =
+      "fetch(`${u}/rest/v1/cart_items?cart_id=eq.${c}` +\n  `&tenant_id=eq.${t}`, { headers })"
+    const birlesikFiltresiz = "fetch(`${u}/rest/v1/cart_items?cart_id=eq.${c}` +\n  '&select=a')"
+    const kapsamDisi = 'fetch(`${u}/rest/v1/user_profiles?id=eq.${user.id}&select=role`)'
+    expect(tenantFiltresizAdresler(filtresiz)).toEqual(['venthub_orders'])
+    expect(tenantFiltresizAdresler(filtreli)).toEqual([])
+    expect(tenantFiltresizAdresler(kosullu)).toEqual(['venthub_orders'])
+    expect(tenantFiltresizAdresler(birlesik)).toEqual([])
+    expect(tenantFiltresizAdresler(birlesikFiltresiz)).toEqual(['cart_items'])
+    expect(tenantFiltresizAdresler(kapsamDisi)).toEqual([])
+  })
+
+  it('KAPSAM KANARYASI — en az bir filtreli adres gerçekten bulunuyor', () => {
+    let filtreli = 0
+    for (const s of SOURCES) {
+      for (const m of s.code.matchAll(REST_TABLO_RE)) {
+        if (!(TENANT_KAPSAMLI_TABLOLAR as readonly string[]).includes(m[1])) continue
+        if (/tenant_id=eq\./.test(urlIfadesi(s.code, m.index ?? 0))) filtreli++
+      }
+    }
+    expect(filtreli, 'Hiç filtreli adres görülmedi — dedektör ölçmüyor.').toBeGreaterThan(5)
+  })
+
+  it('tenant kapsamlı tabloya giden her REST adresi tenant_id=eq. taşıyor', () => {
+    const found: string[] = []
+    for (const s of SOURCES) {
+      for (const tablo of tenantFiltresizAdresler(s.code)) found.push(`${s.path} · ${tablo}`)
+    }
+    assertRatchet(
+      'R13',
+      found.sort(),
+      'NEDEN: service_role RLS\'i atlar; tenant sınırını çizen tek şey adrestir. Filtresiz adres ' +
+        "Faz 2'de kiracılar arası okuma/yazmadır (kural 12). ÇÖZÜM: tenant'ı `resolveCaller` " +
+        '(sınıf a/b) ya da `tenantFromRow` (sınıf c) ile DOĞRULANMIŞ kaynaktan al ve adrese ' +
+        '`&tenant_id=eq.${encodeURIComponent(tenantId)}` ekle. Koşullu (boş olabilen) filtre yetmez.',
+    )
+  })
+})
+
+/* ================================================================== *
+ * R14 (E17) — sır karşılaştırması sabit zamanlı olmalı
+ * ================================================================== */
+
+/**
+ * NİÇİN VAR (karne 2026-11 K4)
+ *
+ * `===` ilk farklı baytta döner; süre farkı, beklenen değerin önekini ölçülebilir kılar.
+ * `_shared/caller.ts` service_role anahtarını sabit zamanlı karşılaştırıyordu, ama dört
+ * uç (`shipping-webhook`, `returns-webhook`, `release-expired-reservations`,
+ * `order-housekeeping`) aynı anahtarı ya da HMAC imzasını `===` ile karşılaştırıyordu.
+ * Disiplin tek yerde yazılıydı, uçlara yayılmamıştı.
+ *
+ * DEDEKTÖR: `===`/`!==` işlecinin iki yanındaki ifadeden biri sır adı taşıyorsa (secret,
+ * token, signature, key, hmac, computed, expected, given, `Bearer ${..}`) ve öbür yan bir
+ * literal (null/undefined/sayı/düz dize) DEĞİLSE ihlaldir. `typeof x === ...`, `.length`
+ * karşılaştırmaları sır karşılaştırması değildir, elenir.
+ */
+const SIR_ADI_RE =
+  /(secret|token|signature|\bsig\b|\bsign\b|computed|expected|api_?key|service_?(?:role)?_?key|supabase_?key|hmac|\bbearer\b|\bgiven\b)/i
+const KARSILASTIRMA_RE = new RegExp(
+  String.raw`(\x60[^\x60]*\x60|'[^']*'|"[^"]*"|[\w$.?!\[\]]+)\s*(===|!==)\s*(\x60[^\x60]*\x60|'[^']*'|"[^"]*"|[\w$.?!\[\]]+)`,
+  'g',
+)
+const DUZ_LITERAL_RE = /^(null|undefined|true|false|\d[\d.]*|'[^']*'|"[^"]*"|\x60[^$\x60]*\x60)$/
+
+function sabitZamansizKarsilastirmalar(code: string): string[] {
+  const out: string[] = []
+  code.split('\n').forEach((satir, i) => {
+    for (const m of satir.matchAll(KARSILASTIRMA_RE)) {
+      const sol = m[1]
+      const sag = m[3]
+      if (DUZ_LITERAL_RE.test(sol) || DUZ_LITERAL_RE.test(sag)) continue
+      if (/\.length$|\.status$/.test(sol) || /\.length$/.test(sag)) continue
+      if (/typeof\s+$/.test(satir.slice(0, m.index ?? 0))) continue
+      if (SIR_ADI_RE.test(sol) || SIR_ADI_RE.test(sag)) out.push(`${i + 1}: ${m[0].trim()}`)
+    }
+  })
+  return out
+}
+
+describe('R14 · sır karşılaştırmasında === yasak, sabit zamanlı karşılaştırma (E17)', () => {
+  it('dedektör çalışıyor: sır karşılaştırmasını yakalıyor, literal/tip kontrolünü yakalamıyor', () => {
+    expect(sabitZamansizKarsilastirmalar('return given === computed')).toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('if (expected && token === expected) ok = true')).toHaveLength(1)
+    expect(
+      sabitZamansizKarsilastirmalar('if (authHeader !== `Bearer ${serviceRoleKey}`) {'),
+    ).toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('if (token === null) return ANON')).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar("if (kind === 'service_role') x()")).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('if (typeof token === x) y()')).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('if (token.length === n) y()')).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('return timingSafeEquals(given, computed)')).toHaveLength(0)
+  })
+
+  it('hiçbir edge kaynağı sırrı === ile karşılaştırmıyor', () => {
+    const found: string[] = []
+    const ayrinti: string[] = []
+    for (const s of SOURCES) {
+      const isabet = sabitZamansizKarsilastirmalar(s.code)
+      if (isabet.length > 0) {
+        found.push(s.path)
+        ayrinti.push(`${s.path}\n    ${isabet.join('\n    ')}`)
+      }
+    }
+    if (found.some((f) => !(KNOWN_VIOLATIONS.R14 as readonly string[]).includes(f))) {
+      console.error('R14 isabetleri:\n  ' + ayrinti.join('\n  '))
+    }
+    assertRatchet(
+      'R14',
+      found.sort(),
+      'NEDEN: `===` ilk farklı baytta döner; yanıt süresi beklenen sırrın önekini sızdırır ' +
+        '(karne 2026-11 K4). ÇÖZÜM: `import { timingSafeEquals } from "../_shared/sabit_zaman.ts"` ' +
+        've `timingSafeEquals(gelen, beklenen)` kullan. Webhook imzası için HMAC çıktısını da ' +
+        'aynı yardımcıyla karşılaştır.',
+    )
+  })
+})
+
+/* ================================================================== *
+ * R8-EK — admin-* öneki taşımayan ayrıcalıklı uçlar (karne 2026-11 §10, Y6 · Y7)
+ * ================================================================== */
+
+/**
+ * R8 yalnız `admin-` önekli uçları tarıyordu; karne dört ayrıcalıklı ucun dışarıda kaldığını
+ * ölçtü. Bu kapsam ADLA genişler (önek kuralı bozulmasın diye ayrı liste): her biri rol
+ * kapısı taşımalı. `healthz`'in kapısı ayrıntı görünürlüğü içindir (Y7): ayrıcalıksız
+ * çağırana yalnız hüküm döner.
+ */
+const R8_EK_KAPSAM = [
+  'healthz',
+  'iyzico-refund',
+  'order-housekeeping',
+  'release-expired-reservations',
+] as const
+
+describe('R8-EK · önek dışı ayrıcalıklı uçlar da rol kontrolü yapmalı', () => {
+  it('listedeki her uç var ve admin/super_admin rol kapısı taşıyor', () => {
+    const eksik: string[] = []
+    for (const ad of R8_EK_KAPSAM) {
+      const s = INDEX_SOURCES.find((x) => x.fn === ad)
+      expect(s, `${ad} bulunamadı — liste bayat`).toBeDefined()
+      if (!s) continue
+      const rolKapisi =
+        (/['"]admin['"]/.test(s.code) && /['"]super_admin['"]/.test(s.code)) ||
+        /\b(?:ayricalikliMi|yoneticiKullaniciMi)\s*\(/.test(s.code)
+      if (!rolKapisi) eksik.push(ad)
+    }
+    expect(eksik, 'Rol kapısı olmayan ayrıcalıklı uç(lar)').toEqual([])
   })
 })
 

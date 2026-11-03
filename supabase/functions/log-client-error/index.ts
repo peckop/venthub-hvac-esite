@@ -1,6 +1,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { z } from 'https://esm.sh/zod@3.23.8'
+import { metniMaskele, nesneyiMaskele } from '../_shared/maske.ts'
 
 const clientErrorSchema = z.object({
   msg: z.string().default(''),
@@ -69,29 +70,36 @@ Deno.serve(async (req: Request) => {
     }
     const payload = parsed.data
 
-    // Very small sanitizer to mask potential PII
-    const mask = (s: string) => String(s)
-      .slice(0, 4000)
-      .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+/gi, '***@***')
-      .replace(/[A-Za-z0-9_\-]{20,}/g, '***')
-
+    // S6 (güvenlik karnesi 2026-11): istemcinin gönderdiği HER alan burada, TEK kez maskelenir;
+    // aşağıda (DB, gruplama, Slack) yalnız `temiz` kullanılır. Eskiden yerel bir `mask` DB
+    // satırını maskeliyor ama Slack'e `msg`/`url` ham gidiyor, `extra` DB'ye dokunulmadan iniyordu.
+    const temiz = {
+      msg: metniMaskele(payload.msg),
+      stack: metniMaskele(payload.stack),
+      url: metniMaskele(payload.url),
+      ua: metniMaskele(payload.ua),
+      release: metniMaskele(payload.release),
+      env: metniMaskele(payload.env),
+      level: metniMaskele(payload.level || 'error'),
+      extra: nesneyiMaskele(payload.extra),
+    }
 
     // Build signature from message + first stack line + url _path
-    const firstLine = String(payload.stack || '').split('\n')[0] || ''
-    const urlObj = (()=>{ try { return new URL(String(payload.url||'')) } catch { return null } })()
+    const firstLine = temiz.stack.split('\n')[0] || ''
+    const urlObj = (()=>{ try { return new URL(temiz.url) } catch { return null } })()
     const _path = urlObj?.pathname || ''
-    const signature = mask(`${String(payload.msg||'')}`.slice(0,300) + ' :: ' + `${firstLine}`.slice(0,300) + ' :: ' + `${_path}`.slice(0,200))
+    const signature = metniMaskele(temiz.msg.slice(0,300) + ' :: ' + firstLine.slice(0,300) + ' :: ' + _path.slice(0,200))
 
     // Upsert group (best-effort: do not fail request if grouping fails)
     let groupId: string | null = null
     try {
       const groupPayload = {
         signature,
-        level: mask(String(payload.level || 'error')),
-        last_message: mask(String(payload.msg || '')),
-        url_sample: mask(String(payload.url || '')),
-        env: mask(String(payload.env || '')),
-        release: mask(String(payload.release || '')),
+        level: temiz.level,
+        last_message: temiz.msg,
+        url_sample: temiz.url,
+        env: temiz.env,
+        release: temiz.release,
         last_seen: new Date().toISOString(),
       }
       const { data: upsertRow } = await supabase
@@ -141,40 +149,39 @@ Deno.serve(async (req: Request) => {
 
     const row: Record<string, unknown> = {
       at: new Date().toISOString(),
-      url: mask(String(payload.url || '')),
-      message: mask(String(payload.msg || '')),
-      stack: mask(String(payload.stack || '')),
-      user_agent: mask(String(payload.ua || '')),
-      release: mask(String(payload.release || '')),
-      env: mask(String(payload.env || '')),
-      level: mask(String(payload.level || 'error')),
-      extra: (typeof payload.extra === 'object' && payload.extra !== null) ? payload.extra : null,
+      url: temiz.url,
+      message: temiz.msg,
+      stack: temiz.stack,
+      user_agent: temiz.ua,
+      release: temiz.release,
+      env: temiz.env,
+      level: temiz.level,
+      extra: temiz.extra,
     }
     // Only include group_id if available; avoid failures if column doesn't exist
     if (groupId) (row as Record<string, unknown>).group_id = groupId
 
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {
-      // As a last resort, avoid failing the function; report error in body for observability
-      console.error('Log client error insert failed:', error);
-      const msg = error instanceof Error ? error.message : typeof error === 'object' && error !== null && 'message' in error ? String((error as { message: unknown }).message) : String(error);
-      return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+      // S5: DB hata metni istemciye DÖNMEZ; ayrıntı yalnız logda, istek kimliğiyle.
+      console.error('Log client error insert failed:', requestId, error);
+      return new Response(JSON.stringify({ error: 'insert_failed', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
     // Slack notification for critical levels or first occurrence
     try {
-      const level = String(payload.level || 'error').toLowerCase()
-      const env = String(payload.env || '')
+      const level = temiz.level.toLowerCase()
+      const env = temiz.env
       const notifyEnabled = ((Deno.env.get('SLACK_WEBHOOK_URL') || '') !== '')
       const isCritical = (level === 'fatal' || level === 'error')
       if (notifyEnabled && isCritical) {
         const { slackNotify } = await import('../_shared/notify.ts')
-        const shortMsg = String(payload.msg || '').slice(0, 200)
+        const shortMsg = temiz.msg.slice(0, 200)
         const fields = [
           { title: 'Signature', value: signature, short: false },
           { title: 'Level', value: level, short: true },
           { title: 'Env', value: env || '-', short: true },
-          { title: 'URL', value: String(payload.url || '-').slice(0, 180), short: false },
+          { title: 'URL', value: (temiz.url || '-').slice(0, 180), short: false },
           { title: 'Request-Id', value: requestId, short: true },
         ]
         await slackNotify(`Client error reported${env ? ` (${env})` : ''}: ${shortMsg}`, fields)
@@ -183,8 +190,8 @@ Deno.serve(async (req: Request) => {
 
     return new Response('ok', { status: 200, headers: cors })
   } catch (_e) {
-    console.error('Log client error outer catch:', _e);
-    const msg = _e instanceof Error ? _e.message : String(_e);
+    console.error('Log client error outer catch:', requestId, _e);
+    const msg = metniMaskele(_e instanceof Error ? _e.message : String(_e), 500);
     try {
       const { slackNotify } = await import('../_shared/notify.ts')
       await slackNotify('log-client-error failed', [
@@ -192,7 +199,8 @@ Deno.serve(async (req: Request) => {
         { title: 'Request-Id', value: requestId, short: true },
       ])
     } catch {}
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    // S5: iç hata metni istemciye DÖNMEZ (yukarıda Slack + log).
+    return new Response(JSON.stringify({ error: 'internal_error', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })
 
