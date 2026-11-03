@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import VentImage from '@/components/ui/VentImage'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { adminSearchProducts } from '@/lib/services/product.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { DbAdminSearchResult } from '@/types/db-rows'
@@ -863,26 +864,16 @@ const ProductsTableBody: React.FC = () => {
     // yazıyordu; dışa aktarılan dosya geri yüklendiğinde satış fiyatı emekli alana dökülmesin diye
     // ad ayrı. Değer: satış fiyatı (KDV dahil) · boş = teklif · `?` = okunamadı.
     const cols = ['id', 'name', 'sku', 'category_id', 'status', 'satis_fiyati_kdv_dahil', 'stock_qty']
-    const header = cols.join(',')
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        `"${(r.name || '').replace(/"/g, '""')}"`,
-        r.sku,
-        r.category_id || '',
-        r.status || '',
-        r.satis_fiyati === undefined ? '?' : r.satis_fiyati === null ? '' : String(r.satis_fiyati),
-        r.stock_qty != null ? String(r.stock_qty) : '',
-      ].join(','),
-    )
-    const csv = '﻿' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'products.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.name || '',
+      r.sku,
+      r.category_id || '',
+      r.status || '',
+      r.satis_fiyati === undefined ? '?' : r.satis_fiyati === null ? '' : String(r.satis_fiyati),
+      r.stock_qty != null ? String(r.stock_qty) : '',
+    ])
+    tabloIndir(csvBelgesi(cols, lines), 'products.csv', 'csv')
   }, [table])
 
   return (

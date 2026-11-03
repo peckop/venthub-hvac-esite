@@ -39,5 +39,16 @@ export const dataTable = {
       export: {
         csv: 'CSV olarak indir',
         fileFormat: 'Dosya Formatı'
+      },
+      // CSV içe aktarma dosya kapısı (ADM-6, csv-import-export-standard §1.2). Ürün ve stok
+      // içe aktarıcıları ortak kullanır; metin teşhis değil yol tarifi verir.
+      csvImport: {
+        wrongExtension: 'Yalnız .csv uzantılı dosya yüklenebilir.',
+        wrongType: 'Dosya CSV metni değil. Tabloyu "CSV UTF-8" olarak kaydedip yeniden yükleyin.',
+        fileTooLarge: 'Dosya {{maxMb}} MB sınırını aşıyor. Dosyayı bölerek yükleyin.',
+        empty: 'Dosyada başlık satırı ve en az bir veri satırı olmalı.',
+        tooManyRows: 'Dosyada {{maxRows}} satırdan fazla veri var. Dosyayı bölerek yükleyin.',
+        unclosedQuote: 'Dosyada kapanmamış bir tırnak (") var; dosya okunamadı.',
+        duplicateHeader: 'Başlık satırında aynı sütun adı birden fazla geçiyor.'
       }
 };

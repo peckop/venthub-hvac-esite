@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { csvHucre, csvSatir, formulMu } from '../csvHucre'
+import { csvHucre, csvSatir, formulMu } from '../hucre'
 
 /**
  * VULN-006 — CSV formül enjeksiyonu nötrlemesi. Cetvel: csv-import-export-standard.md §1.1.

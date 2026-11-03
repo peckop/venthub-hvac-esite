@@ -17,6 +17,7 @@ import { useRole } from '@/hooks/useRole'
 import { formatDateTime } from '@/i18n/datetime'
 import { useI18n } from '@/i18n/I18nProvider'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { ensureSessionFresh } from '@/lib/ensureSessionFresh'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
@@ -263,26 +264,13 @@ const AdminLogisticsTableBody: React.FC = () => {
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
     const cols = ['order_number', 'customer_name', 'created_at', 'carrier', 'tracking_number']
-    const header = cols.map((c) => t(`admin.logistics.table.${c === 'order_number' ? 'order' : c === 'customer_name' ? 'customer' : c === 'created_at' ? 'date' : c === 'tracking_number' ? 'tracking' : c === 'carrier' ? 'carrier' : c}`)).join(',')
+    const header = cols.map((c) => t(`admin.logistics.table.${c === 'order_number' ? 'order' : c === 'customer_name' ? 'customer' : c === 'created_at' ? 'date' : c === 'tracking_number' ? 'tracking' : c === 'carrier' ? 'carrier' : c}`))
     const lines = rows.map((r) => {
       const currentCarrier = drafts[r.id]?.carrier ?? r.carrier ?? 'Yurtiçi'
       const currentTracking = drafts[r.id]?.tracking_number ?? r.tracking_number ?? ''
-      return [
-        r.order_number || '',
-        `"${(r.customer_name || '').replace(/"/g, '""')}"`,
-        r.created_at || '',
-        `"${currentCarrier.replace(/"/g, '""')}"`,
-        `"${currentTracking.replace(/"/g, '""')}"`,
-      ].join(',')
+      return [r.order_number || '', r.customer_name || '', r.created_at || '', currentCarrier, currentTracking]
     })
-    const csv = '﻿' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'logistics.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    tabloIndir(csvBelgesi(header, lines), 'logistics.csv', 'csv')
   }, [table, drafts, t])
 
   const columns = useMemo<AdminColumn<LogisticsRow>[]>(

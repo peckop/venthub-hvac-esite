@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { Activity, CheckCircle2, Clock, Code, SearchX, XCircle } from 'lucide-react'
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import type { DbWebhookEvent } from '@/types/db-rows'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -112,26 +113,17 @@ const WebhookEventsTableBody: React.FC = () => {
       t('admin.webhooks.export.headers.status'),
       t('admin.webhooks.export.headers.date'),
       t('admin.webhooks.export.headers.errorMessage'),
-    ].join(',')
+    ]
 
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        `"${(r.event_type || '').replace(/"/g, '""')}"`,
-        `"${(r.provider || '').replace(/"/g, '""')}"`,
-        r.status,
-        r.created_at,
-        `"${(r.error_message || '').replace(/"/g, '""')}"`,
-      ].join(','),
-    )
-    const csv = '\ufeff' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = t('admin.webhooks.export.filename')
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.event_type || '',
+      r.provider || '',
+      r.status,
+      r.created_at,
+      r.error_message || '',
+    ])
+    tabloIndir(csvBelgesi(header, lines), t('admin.webhooks.export.filename'), 'csv')
   }, [table, t])
 
 

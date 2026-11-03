@@ -8,6 +8,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AccessDenied from '../../components/admin/AccessDenied'
@@ -481,20 +482,18 @@ const PricingRulesTableBody: React.FC = () => {
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
     const cols = ['id', 'scope', 'target', 'method', 'margin_pct', 'fixed_price', 'priority', 'valid_from', 'valid_to']
-    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-    const lines = rows.map((r) =>
-      [r.id, r.scope, r.targetName, r.method, r.marginPct ?? '', r.fixedPrice ?? '', r.priority, r.validFrom ?? '', r.validTo ?? '']
-        .map(escape)
-        .join(','),
-    )
-    const csv = '﻿' + [cols.join(','), ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'pricing-rules.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.scope,
+      r.targetName,
+      r.method,
+      r.marginPct ?? '',
+      r.fixedPrice ?? '',
+      r.priority,
+      r.validFrom ?? '',
+      r.validTo ?? '',
+    ])
+    tabloIndir(csvBelgesi(cols, lines), 'pricing-rules.csv', 'csv')
   }, [table])
 
   /**

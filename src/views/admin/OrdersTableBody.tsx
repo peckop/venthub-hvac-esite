@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { isRefundedPayment,ORDER_DB_STATUSES, type OrderDbStatus } from '@/lib/admin/orderStatusDomain'
 import { orderStatusLabel } from '@/lib/admin/orderStatusLabels'
+import { csvBelgesi, tabloIndir, xlsBelgesi } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { invokeShippingUpdate, SharedTrackingDeclinedError } from '@/utils/adminShipping'
 
@@ -1068,31 +1069,16 @@ const OrdersTableBody: React.FC = () => {
     [t],
   )
 
-  const downloadBlob = (blob: Blob, filename: string): void => {
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
-    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-    const lines = rows.map((r) => [r.id, r.status, r.total_amount].map(escape).join(','))
-    const csv = '﻿' + [exportHeaders.join(','), ...lines].join('\n')
-    downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), 'orders.csv')
+    const lines = rows.map((r) => [r.id, r.status, r.total_amount])
+    tabloIndir(csvBelgesi(exportHeaders, lines), 'orders.csv', 'csv')
   }, [table, exportHeaders])
 
   const exportXls = useCallback(async () => {
     const rows = await table.fetchAllForExport()
-    const head = exportHeaders.map((h) => `<th>${h}</th>`).join('')
-    const body = rows
-      .map((r) => `<tr><td>${r.id}</td><td>${r.status}</td><td>${r.total_amount ?? ''}</td></tr>`)
-      .join('')
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></body></html>`
-    downloadBlob(new Blob([html], { type: 'application/vnd.ms-excel' }), 'orders.xls')
+    const lines = rows.map((r) => [r.id, r.status, r.total_amount ?? ''])
+    tabloIndir(xlsBelgesi(exportHeaders, lines), 'orders.xls', 'xls')
   }, [table, exportHeaders])
 
   /* ---- kolonlar (SSOT) ---- */

@@ -18,6 +18,7 @@
  * şikâyetini geri getirir.
  */
 import { foldForSearch } from '@/i18n/case'
+import { urunSatiriDogrula } from '@/lib/csv/semalar'
 import type { Database } from '@/types/database.types'
 
 type UrunYazimi = Database['public']['Tables']['products']['Insert']
@@ -97,9 +98,18 @@ export interface ReddedilenSatir {
   deger: string
 }
 
+/** Şema doğrulamasından geçmeyen satır (ADM-6, cetvel §1.2). `alan` = ilk hatalı sütun. */
+export interface GecersizSatir {
+  satir: number
+  sku: string
+  alan: string
+}
+
 export interface HazirlamaSonucu {
   payloads: UrunYazimi[]
   reddedilen: ReddedilenSatir[]
+  /** Çağıran bu liste boş değilse HİÇBİR satırı yazmaz (kısmi yazım yok). */
+  gecersiz: GecersizSatir[]
   /**
    * `price` sütunu DOLU gelip YOK SAYILAN satır sayısı (2026-09-24). Emekli `products.price`'a
    * yazılmaz: vitrin o alanı okumuyor, satış fiyatını fiyat motoru hesaplıyor
@@ -119,44 +129,64 @@ export interface HazirlamaSonucu {
  *
  * SÖZLEŞME: kategori değeri verilmiş ama canlı DB'de karşılığı yoksa satır `payloads`a
  * GİRMEZ, `reddedilen`e düşer. Sessiz `null` YOK.
+ *
+ * ADM-6 (cetvel §1.2): her satır önce zod şemasından geçer (`gecersiz`). `category_id`
+ * doğrudan verilse bile `kategoriler` listesinde olmalıdır: liste çağıranın kendi tenant'ının
+ * okumasıdır, dışındaki kimlik (başka tenant ya da uydurma) reddedilir.
+ *
+ * `satirNolari`: her satırın dosyadaki satır numarası (ayrıştırıcıdan); verilmezse sıra + 2.
  */
 export function hazirlaUrunSatirlari(
   rows: readonly Record<string, string>[],
   kategoriler: readonly KategoriSecenegi[],
+  satirNolari: readonly number[] = [],
 ): HazirlamaSonucu {
   const payloads: UrunYazimi[] = []
   const reddedilen: ReddedilenSatir[] = []
+  const gecersiz: GecersizSatir[] = []
+  const kategoriKimlikleri = new Set(kategoriler.map((k) => k.id))
   let yoksayilanFiyat = 0
 
-  for (const r of rows) {
-    if (!r['sku'] || !r['name']) continue
-    const p: UrunYazimi = {
-      sku: r['sku'].trim(),
-      name: r['name'].trim(),
-      slug: urunSlugUret(r['name']),
-      brand: r['brand']?.trim() || 'Generic',
+  rows.forEach((r, i) => {
+    // sku ya da name boş satır atlanır (mevcut davranış; önizleme geçerli satır sayısını gösterir).
+    if (!r['sku']?.trim() || !r['name']?.trim()) return
+    const dogrulama = urunSatiriDogrula(r)
+    if (!dogrulama.ok) {
+      gecersiz.push({ satir: satirNolari[i] ?? i + 2, sku: r['sku'].trim(), alan: dogrulama.alan })
+      return
     }
-    if (r['model_code']) p.model_code = r['model_code'].trim()
-    else if (r['model']) p.model_code = r['model'].trim()
-    if (r['brand']) p.brand = r['brand'].trim()
-    if (r['status']) p.status = r['status'].trim() as UrunYazimi['status']
+    const v = dogrulama.veri
+    const p: UrunYazimi = {
+      sku: v.sku,
+      name: v.name,
+      slug: urunSlugUret(v.name),
+      brand: v.brand || 'Generic',
+    }
+    const modelKodu = v.model_code ?? v.model
+    if (modelKodu) p.model_code = modelKodu
+    if (v.status) p.status = v.status
     // ⛔`price` → emekli alan YAZILMAZ (bkz. HazirlamaSonucu.yoksayilanFiyat). Sayılır, uyarılır.
     if (r['price']?.trim()) yoksayilanFiyat++
-    if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
-    if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
+    if (v.stock_qty !== undefined) p.stock_qty = v.stock_qty
+    if (v.low_stock_threshold !== undefined) p.low_stock_threshold = v.low_stock_threshold
 
-    if (r['category_id']) p.category_id = r['category_id'] || null
-    else if (r['category_slug'] || r['category']) {
-      const deger = r['category_slug'] || r['category']
+    if (v.category_id) {
+      if (!kategoriKimlikleri.has(v.category_id)) {
+        reddedilen.push({ sku: v.sku, deger: v.category_id })
+        return
+      }
+      p.category_id = v.category_id
+    } else if (v.category_slug || v.category) {
+      const deger = v.category_slug || v.category || ''
       const id = kategoriIdBul(deger, kategoriler)
       if (!id) {
-        reddedilen.push({ sku: r['sku'].trim(), deger: deger.trim() })
-        continue
+        reddedilen.push({ sku: v.sku, deger })
+        return
       }
       p.category_id = id
     }
     payloads.push(p)
-  }
+  })
 
-  return { payloads, reddedilen, yoksayilanFiyat }
+  return { payloads, reddedilen, gecersiz, yoksayilanFiyat }
 }

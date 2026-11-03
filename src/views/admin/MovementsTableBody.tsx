@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 
+import { csvBelgesi, tabloIndir, xlsBelgesi } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -269,36 +270,16 @@ const MovementsTableBody: React.FC = () => {
     [t],
   )
 
-  const downloadBlob = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
   const exportCsv = useCallback(async () => {
     const data = buildExportRows(await table.fetchAllForExport())
-    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-    const lines = data.map((r) =>
-      [r.date, r.product, r.sku, r.delta, r.reason, r.ref].map(escape).join(','),
-    )
-    const csv = '﻿' + [exportHeaders.join(','), ...lines].join('\n')
-    downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), 'inventory_movements.csv')
+    const lines = data.map((r) => [r.date, r.product, r.sku, r.delta, r.reason, r.ref])
+    tabloIndir(csvBelgesi(exportHeaders, lines), 'inventory_movements.csv', 'csv')
   }, [buildExportRows, exportHeaders, table])
 
   const exportXls = useCallback(async () => {
     const data = buildExportRows(await table.fetchAllForExport())
-    const head = exportHeaders.map((h) => `<th>${h}</th>`).join('')
-    const body = data
-      .map(
-        (r) =>
-          `<tr><td>${r.date}</td><td>${r.product}</td><td>${r.sku}</td><td>${r.delta}</td><td>${r.reason}</td><td>${r.ref}</td></tr>`,
-      )
-      .join('')
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></body></html>`
-    downloadBlob(new Blob([html], { type: 'application/vnd.ms-excel' }), 'inventory_movements.xls')
+    const lines = data.map((r) => [r.date, r.product, r.sku, r.delta, r.reason, r.ref])
+    tabloIndir(xlsBelgesi(exportHeaders, lines), 'inventory_movements.xls', 'xls')
   }, [buildExportRows, exportHeaders, table])
 
   /* ---- kolonlar (SSOT) ---- */
