@@ -11,7 +11,12 @@
     "skills-creator kullanarak manifest'e yeni giriş ekle",
     "how do I skill yarat for a custom workflow?",
     "yetenek ekle: deployment otomasyonu",
-    "skill optimize et ile evals kalitesini artır"
+    "skill optimize et ile evals kalitesini artır",
+    "yeni yetenek yazalım, adı ne olsun",
+    "skil oluşturmak istiyorum",
+    "bu skill'in açıklamasını güncelleyelim, tetiklenmiyor",
+    "YENİ YETENEK EKLE",
+    "yetenege turkce tetik sinavi koy"
   ],
   "should_not_trigger": [
     "mevcut skill'leri listele ve ara",
@@ -21,6 +26,9 @@
     "change button colors in the design system",
     "translate component labels to English",
     "run lighthouse performance audit",
-    "generate a PRD document"
+    "generate a PRD document",
+    "bu skill'i çağır ve çalıştır",
+    "hangi skill hangi departmanda kullanılıyor göster",
+    "ISIL kayıp hesabını yap"
   ]
 }
