@@ -959,6 +959,7 @@ export const tr = {
     },
     pwRule: {
       length: 'En az 8 karakter',
+      lower: 'En az bir küçük harf',
       upper: 'En az 1 büyük harf',
       digit: 'En az 1 rakam',
       special: 'En az 1 özel karakter',
@@ -2405,6 +2406,7 @@ export const tr = {
       strengthGood: 'İyi',
       strengthStrong: 'Güçlü',
       ruleLength: 'En az 8 karakter',
+      ruleLower: 'En az bir küçük harf',
       ruleUpper: 'En az 1 büyük harf',
       ruleDigit: 'En az 1 rakam',
       ruleSpecial: 'En az 1 özel karakter',
