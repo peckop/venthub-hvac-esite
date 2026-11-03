@@ -201,13 +201,17 @@ describe('E2E Test Infrastructure - High-Fidelity Mocks Sanity Test', () => {
 
       expect(body.durum).toBe('olculemedi')
       expect(body.ok).toBe(false)
-      expect(body.sebep).toBe('db_erisim_degiskenleri_yok')
-      expect(body.release).toBe('v1.0.0-test')
-      expect(body.commit).toBe('abc123commit')
       expect(body.time).toBeDefined()
-      // Pozitif öz-denetim ölçüm yapılamasa bile koşar: yapılandırma bölümü GELMELİ.
+      // Pozitif öz-denetim ölçüm yapılamasa bile koşar: ödeme ortamı hükmü GELMELİ.
       expect(body.config).toBeDefined()
       expect(body.config.odeme_ortami).toBe('bilinmiyor')
+      // OPS-211 (karne 2026-11 Y7): istek kimliksiz → AYRINTI YOK. Eskiden bu satırlar
+      // `sebep`, `release`, `commit` alanlarının kimliksiz çağırana dönmesini KİLİTLİYORDU;
+      // bulgunun kendisi buydu. Ayrıntılı gövdenin kilidi: tests/e2e/edge-yetki-kapisi.test.ts.
+      expect(body.sebep).toBeUndefined()
+      expect(body.release).toBeUndefined()
+      expect(body.commit).toBeUndefined()
+      expect(body.config.sorunlu).toBeUndefined()
     })
 
     it('should handle method_not_allowed on POST requests', async () => {
