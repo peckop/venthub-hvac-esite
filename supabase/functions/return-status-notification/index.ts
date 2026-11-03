@@ -3,7 +3,7 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 // Kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
-import { guvenliUrl, kacir } from '../_shared/kodlama.ts'
+import { guvenliRenk, guvenliUrl, kacir } from '../_shared/kodlama.ts'
 import { maskEposta } from '../_shared/maske.ts'
 import {
   CallerConfigError,
@@ -182,7 +182,8 @@ serve(async (req) => {
     }
 
     const brandName = branding.brandName
-    const brandPrimary = branding.brandPrimaryColor
+    // CSS bağlamı: yalnız hex renk (cetvel cikti-kodlama-maske K2).
+    const brandPrimary = guvenliRenk(branding.brandPrimaryColor)
     const brandLogoUrl = branding.brandLogoUrl
     // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
     // ⚠Bu uçta HTML ŞABLON DOSYASI YOK; gövde satır-içi şablon değişmeziyle kuruluyor.

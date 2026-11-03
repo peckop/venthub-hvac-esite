@@ -47,42 +47,65 @@ export function mask(v: unknown): string {
   return maskAd(s)
 }
 
-const EPOSTA_METIN = /[A-Z0-9._%+-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)+/gi
-// En az 10 rakamlı, araya boşluk/nokta/tire/parantez girebilen dizi (TR GSM 10-12 rakam).
-const TELEFON_METIN = /\+?\d[\d\s().-]{8,}\d/g
+// Yerel kısım: boşluk, `@`, tırnak, köşeli parantez, ayırıcı dışında HER karakter (Türkçe harf dahil;
+// `[A-Z0-9…]` sınıfı `ayşe@x.com`'da yalnız `e@x.com`'u yakalayıp `ayş`'yi açıkta bırakıyordu).
+const EPOSTA_METIN = /[^\s@<>"'(),;:/?#&=[\]]+@[\p{L}0-9-]+(?:\.[\p{L}0-9-]+)+/gu
+// Yalnız TR mobil biçimi (5xx xxx xx xx, isteğe bağlı +90 / 0 öneki). Genel "10+ rakam" kuralı
+// sipariş numarasını (`20260818-4215`) ve epoch ms değerlerini de telefon sanıyordu.
+const TELEFON_METIN = /(?<!\d)(?:\+?90[\s.-]?|\(?0[\s.-]?)?\(?5\d{2}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}(?!\d)/g
 // Oturum belirteci, JWT, API anahtarı gibi uzun tek parça değerler.
 const UZUN_BELIRTEC = /[A-Za-z0-9_-]{20,}/g
 
 /**
  * Serbest metin içindeki e-posta, telefon ve uzun belirteçleri maskeler; `sinir` karaktere keser.
  * İstemciden gelen hata mesajı, adres (sorgu dizgesi e-posta taşıyabilir) ve yığın izi içindir.
+ * Adreste yüzde-kodlu `@` (`%40`) önce çözülür: `?email=ayse%40example.com` da maskelenir.
  */
 export function metniMaskele(s: unknown, sinir = 4000): string {
   return String(s ?? '')
     .slice(0, sinir)
+    .replace(/%40/gi, '@')
     .replace(EPOSTA_METIN, (m) => maskEposta(m))
-    .replace(TELEFON_METIN, (m) => (m.replace(/\D/g, '').length >= 10 ? maskTelefon(m) : m))
+    .replace(TELEFON_METIN, (m) => maskTelefon(m))
     .replace(UZUN_BELIRTEC, YILDIZ)
 }
 
+/** `nesneyiMaskele` toplam bütçesi: istemcinin keyfi nesnesi CPU ve DB'yi sınırsız kullanamaz. */
+const NESNE_BUTCESI = { yaprak: 200, karakter: 16_000 }
+
 /**
  * JSON değerini derinlemesine dolaşır, her dizge yaprağını `metniMaskele`den geçirir.
- * Derinlik ve eleman sayısı sınırlı: istemcinin gönderdiği keyfi nesne DB'ye sınırsız inmez.
+ * Derinlik (4), düğüm başına eleman (50) ve TOPLAM bütçe (200 yaprak, 16 000 karakter) sınırlı:
+ * bütçe biter bitmez kalan yapraklar `***` olur (güvenlik incelemesi 2026-11-03: 50^4 yaprak ×
+ * 1000 karakter gönderen oturumlu bir çağıran uç CPU sınırını aşabiliyordu).
  */
-export function nesneyiMaskele(v: unknown, derinlik = 0): unknown {
-  if (v == null) return null
-  if (typeof v === 'string') return metniMaskele(v, 1000)
-  if (typeof v === 'number' || typeof v === 'boolean') return v
-  if (derinlik >= 4) return YILDIZ
-  if (Array.isArray(v)) return v.slice(0, 50).map((x) => nesneyiMaskele(x, derinlik + 1))
-  if (typeof v === 'object') {
-    const cikti: Record<string, unknown> = {}
-    for (const [k, x] of Object.entries(v as Record<string, unknown>).slice(0, 50)) {
-      cikti[metniMaskele(k, 100)] = nesneyiMaskele(x, derinlik + 1)
+export function nesneyiMaskele(v: unknown): unknown {
+  const kalan = { ...NESNE_BUTCESI }
+  const gez = (x: unknown, derinlik: number): unknown => {
+    if (x == null) return null
+    if (kalan.yaprak <= 0 || kalan.karakter <= 0) return YILDIZ
+    if (typeof x === 'string') {
+      kalan.yaprak--
+      const kesik = x.slice(0, Math.min(1000, kalan.karakter))
+      kalan.karakter -= kesik.length
+      return metniMaskele(kesik, kesik.length)
     }
-    return cikti
+    if (typeof x === 'number' || typeof x === 'boolean') {
+      kalan.yaprak--
+      return x
+    }
+    if (derinlik >= 4) return YILDIZ
+    if (Array.isArray(x)) return x.slice(0, 50).map((e) => gez(e, derinlik + 1))
+    if (typeof x === 'object') {
+      const cikti: Record<string, unknown> = {}
+      for (const [k, e] of Object.entries(x as Record<string, unknown>).slice(0, 50)) {
+        cikti[metniMaskele(k, 100)] = gez(e, derinlik + 1)
+      }
+      return cikti
+    }
+    return YILDIZ
   }
-  return YILDIZ
+  return gez(v, 0)
 }
 
 /**

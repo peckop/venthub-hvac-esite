@@ -30,6 +30,17 @@ export function guvenliUrl(u: unknown): string {
 }
 
 /**
+ * `style="color: …"` için renk süzgeci: yalnız `#rgb`, `#rrggbb` (ve alfa'lı biçimleri) geçer, gerisi
+ * `yedek` olur. Niçin: `kacir` tırnaktan çıkmayı engeller ama CSS bildirimi enjeksiyonunu
+ * (`red;background-image:url(https://…)` → izleme pikseli) engellemez. Değer tenant yapılandırmasından
+ * gelir; yazmak yönetici yetkisi ister, yine de e-postaya doğrulanmadan girmez (güvenlik incelemesi 2026-11-03).
+ */
+export function guvenliRenk(r: unknown, yedek = '#2563eb'): string {
+  const s = String(r ?? '').trim()
+  return /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(s) ? s : yedek
+}
+
+/**
  * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. Başka hiçbir şey (döngü YOK, cetvel §2).
  *
  * ⭐Her `{{alan}}` değeri `kacir`dan geçer. Ham HTML basma yolu bilerek yoktur: bugün hiçbir

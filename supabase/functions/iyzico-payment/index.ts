@@ -19,7 +19,7 @@ import {
 } from '../_shared/caller.ts'
 import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
 // Maske + hata ayıklama bayrağı tek yerde (güvenlik karnesi 2026-11 S1).
-import { hataAyiklamaAcik, maskAd, maskEposta, maskTelefon, sirDurumu } from '../_shared/maske.ts'
+import { hataAyiklamaAcik, maskAd, maskEposta, maskTelefon, metniMaskele, sirDurumu } from '../_shared/maske.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { denemeSiparisiKaydet, satisKipiKarari } from '../_shared/satis_kipi.ts'
@@ -589,7 +589,8 @@ Deno.serve(async (req: Request) => {
                     body: JSON.stringify(withoutShipMethod)
                 });
             } else {
-                console.error('Order creation failed:', errorText);
+                // PostgREST kısıt ihlali metni satır değeri (e-posta, telefon) taşıyabilir.
+                console.error('Order creation failed:', metniMaskele(errorText, 1000));
             }
         }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { guvenliUrl, kacir, renderTemplate } from '../kodlama'
+import { guvenliRenk, guvenliUrl, kacir, renderTemplate } from '../kodlama'
 import {
   hataAyiklamaAcik,
   mask,
@@ -50,6 +50,14 @@ describe('kodlama · kacir + renderTemplate (G1)', () => {
     expect(kacir(undefined)).toBe('')
   })
 
+  it('guvenliRenk yalnız hex renk geçirir; CSS bildirimi enjeksiyonu yedeğe düşer', () => {
+    expect(guvenliRenk('#2563EB')).toBe('#2563EB')
+    expect(guvenliRenk('#abc')).toBe('#abc')
+    expect(guvenliRenk('red;background-image:url(https://evil.tld/px)')).toBe('#2563eb')
+    expect(guvenliRenk('#2563eb;x:y')).toBe('#2563eb')
+    expect(guvenliRenk(undefined, '#000000')).toBe('#000000')
+  })
+
   it('guvenliUrl yalnız http(s) kabul eder', () => {
     expect(guvenliUrl('https://kargo.example/takip?no=1')).toBe('https://kargo.example/takip?no=1')
     expect(guvenliUrl('javascript:alert(1)')).toBe('')
@@ -97,11 +105,31 @@ describe('maske · kişisel veri (S1, S2, S6)', () => {
     expect(metniMaskele('ab '.repeat(2000), 100)).toHaveLength(100)
   })
 
+  it('metniMaskele: yüzde-kodlu @ ve Türkçe harfli yerel kısım da maskelenir', () => {
+    const url = metniMaskele('https://venthub.com.tr/giris?email=ayse%40example.com&x=1')
+    expect(url).not.toContain('ayse')
+    expect(url).toContain('a***@example.com')
+    expect(metniMaskele('alıcı: ayşe.yılmaz@örnek.com.tr')).toBe('alıcı: a***@örnek.com.tr')
+  })
+
+  it('metniMaskele sipariş numarası ve zaman damgasını telefon sanmaz', () => {
+    expect(metniMaskele('siparis VH-20260818-4215 t=1730620800000')).toBe('siparis VH-20260818-4215 t=1730620800000')
+    expect(metniMaskele('tel +905551234567 ve (0532) 111 22 33')).toBe('tel ***67 ve ***33')
+  })
+
   it('nesneyiMaskele dizge yapraklarını maskeler, derinliği sınırlar', () => {
     const cikti = nesneyiMaskele({ kullanici: { eposta: 'ayse@example.com', yas: 3 }, liste: ['b@c.co'] })
     expect(cikti).toEqual({ kullanici: { eposta: 'a***@example.com', yas: 3 }, liste: ['b***@c.co'] })
     expect(nesneyiMaskele({ a: { b: { c: { d: { e: 'derin' } } } } })).toEqual({ a: { b: { c: { d: '***' } } } })
     expect(nesneyiMaskele(null)).toBeNull()
+  })
+
+  it('nesneyiMaskele toplam bütçeyi aşan yaprakları keser (yaprak ve karakter)', () => {
+    const genis = Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`k${i}`, Array(50).fill('a'.repeat(1000))]))
+    const cikti = JSON.stringify(nesneyiMaskele(genis))
+    expect(cikti.length).toBeLessThan(40_000)
+    const yaprak = nesneyiMaskele(Array(50).fill(Array(50).fill(1))) as number[][]
+    expect(yaprak.flat().filter((x) => x === 1)).toHaveLength(200)
   })
 
   it('sirDurumu anahtarın hiçbir karakterini döndürmez', () => {

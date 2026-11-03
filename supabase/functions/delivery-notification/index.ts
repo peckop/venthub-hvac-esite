@@ -3,7 +3,7 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 // Şablon motoru + kaçış tek yerde (güvenlik karnesi 2026-11 G1; cetvel email-template-standard.md §2).
-import { kacir, renderTemplate } from '../_shared/kodlama.ts'
+import { guvenliRenk, kacir, renderTemplate } from '../_shared/kodlama.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -197,7 +197,8 @@ serve(async (req) => {
     }
 
     const brandName = branding.brandName
-    const brandPrimary = branding.brandPrimaryColor
+    // CSS bağlamı: yalnız hex renk (cetvel cikti-kodlama-maske K2).
+    const brandPrimary = guvenliRenk(branding.brandPrimaryColor)
     // REC-382: logo bu e-postada BASILMAZ — başlık şeridi marka renginde, lacivert logo orada
     // okunmuyor ve yanında h1 {{brand_name}} zaten var (tek görünüm). Diğer üç e-posta logoyu basar.
     // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.

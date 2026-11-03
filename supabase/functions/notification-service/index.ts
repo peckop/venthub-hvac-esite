@@ -4,7 +4,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
 // Kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
 import { kacir } from '../_shared/kodlama.ts'
-import { mask } from '../_shared/maske.ts'
+import { mask, metniMaskele } from '../_shared/maske.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -171,10 +171,11 @@ serve(async (req) => {
     })
 
   } catch (error: unknown) {
-    console.error('Notification service error:', error)
-    
-    const msg = error instanceof Error ? error.message : 'Unknown error'
-    return new Response(JSON.stringify({ 
+    // Twilio/Resend hata metni alıcı numarasını ya da adresini taşıyabilir ("The 'To' number +90… is
+    // not valid"): hem log hem çağırana dönen gövde maskeden geçer (güvenlik incelemesi 2026-11-03).
+    const msg = metniMaskele(error instanceof Error ? error.message : 'Unknown error', 500)
+    console.error('Notification service error:', msg)
+    return new Response(JSON.stringify({
       error: msg,
       success: false 
     }), {

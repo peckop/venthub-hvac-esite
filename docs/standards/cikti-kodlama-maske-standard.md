@@ -7,6 +7,7 @@
 > **Yardımcılar:** `supabase/functions/_shared/kodlama.ts` (kaçış, adres süzgeci, şablon motoru) ve
 > `supabase/functions/_shared/maske.ts` (e-posta/telefon/ad maskesi, serbest metin ve nesne maskesi, sır durumu,
 > hata ayıklama bayrağı).
+> **Sahibi:** EDGE · **Son doğrulama:** 2026-11-03.
 > **Kayıt:** Kanban: OPS-211 · **Doğuş:** `docs/audits/guvenlik-karnesi-2026-11.md` §2 kök 3, §9 madde 3
 > (bulgular G1, S1, S2, S4, S5, S6) · **İlk yazım:** 2026-11-03.
 > **Komşu cetveller:** `email-template-standard.md` (şablon alan sözleşmesi), `edge-function-security-standard.md`
@@ -33,8 +34,10 @@ farklı biçimde yazılmıştı, `_shared`'de ikisi de yoktu. Ölçülen sonuçl
 (`${x ? `…` : ''}`, içteki parça yine kaçar) ve adı `…Html` ile biten, kaçışla kurulmuş hazır parça (`kalemlerHtml`).
 Motor ya da `kacir` uçta yeniden yazılmaz.
 
-**K2 · `href` ve `src` yalnız `http(s)`.** Adres değerleri `guvenliUrl` süzgecinden geçer; geçmeyen değer boş dizge olur ve
-şablondaki `{{#if}}` bloğu silinir. Süzgeç kaçışın yerine geçmez, ikisi birlikte uygulanır.
+**K2 · `href`/`src` yalnız `http(s)`, `style` içi renk yalnız hex.** Adres değerleri `guvenliUrl` süzgecinden geçer; geçmeyen
+değer boş dizge olur ve şablondaki `{{#if}}` bloğu silinir. `style="color: …"` içine giren marka rengi `guvenliRenk`ten geçer
+(`#rgb`/`#rrggbb`, değilse sistem varsayılanı): `kacir` tırnaktan çıkmayı engeller ama `red;background-image:url(…)` gibi CSS
+bildirimi enjeksiyonunu engellemez. Süzgeçler kaçışın yerine geçmez, ikisi birlikte uygulanır.
 
 **K3 · Logda alıcı yok, maskesi var.** `console.*` çağrısında alıcı değişkeni (`to`, `toList`, `customer_email`, `phone`,
 `customer_name` vb.) yalnız `maskEposta` / `maskTelefon` / `maskAd` / `mask` içinde geçer. Sipariş numarası, iade kimliği
@@ -53,14 +56,19 @@ admin/service_role çağıranlı); taban yalnız küçülür, yeni uç eklenemez
 
 **K7 · İstemcinin gönderdiği alan tek yerde maskelenir.** İstemci hata kaydı gibi serbest metin alan uçlarda her alan girişte
 bir kez `metniMaskele` (nesne için `nesneyiMaskele`) ile temizlenir; aşağıdaki DB, gruplama ve Slack yolları yalnız temiz
-değeri kullanır.
+değeri kullanır. `metniMaskele` yüzde-kodlu `@`'yi çözer, telefon olarak yalnız TR mobil biçimini (5xx…) sayar (sipariş
+numarası ve zaman damgası korunur); `nesneyiMaskele` toplam bütçelidir (200 yaprak, 16 000 karakter).
+
+**K8 · Sağlayıcı/DB hata metni de serbest metindir.** Twilio, Resend ya da PostgREST hata metni alıcı numarasını, adresini ya da
+satır değerini taşıyabilir; loga ve (tabandaki uçlarda) yanıta `metniMaskele` ile gider.
 
 ## 3. Kapının sınırı (adıyla)
 
 | Ölçer | Ölçmez |
 |---|---|
 | E-posta HTML satırlarında kaçışsız `${…}` (yedi dosya, evren boş kalırsa kırmızı) | Şablon dosyasının içinde ham HTML basan yeni bir motor sözdizimi (motor `_shared`'de tek; `{{{…}}}` yok) |
-| `_shared/kodlama.ts` dışında `renderTemplate`/`kacir` tanımı | Kaçışın **doğru bağlamda** olduğunu (ör. `<script>` ya da CSS içi) — bugün öyle bağlam yok |
+| `_shared/kodlama.ts` dışında `renderTemplate`/`kacir` tanımı | `<script>` bağlamı (bugün yok); CSS bağlamı yalnız `brandPrimary` tanımı üzerinden ölçülür, başka bir değer `style` içine girerse görülmez |
+| Üçlü ifadenin dalının şablon değişmezi/dizge olduğunu | HTML etiketi taşımayan satırdaki `${…}` (çok satırlı değişmezin etiketsiz satırı) |
 | `console.*` içinde alıcı değişkeni ve sır değişkeni | Değişken adı farklı olan kişisel veri (ör. `x = customer.email; console.log(x)`) |
 | Yanıt gövdesinde `.message` / `String(e)` / türetilmiş değişken | Hata metnini başka yolla (ör. `JSON.stringify(err)`) dönen gövde |
 | `log-client-error`'da her `payload.*` kullanımının maskeden geçtiği | Sentry `beforeSend` temizleyicisi (karne §6, ayrı ölçüm) |

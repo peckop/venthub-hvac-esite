@@ -130,7 +130,9 @@ const EPOSTA_EVRENI = DOSYALAR.filter(
 /** `${…}` HTML satırında güvenli sayılan biçimler. */
 const GUVENLI_INTERP = [
   /^kacir\(/, // ortak kaçış
-  /^[\w.]+\s*\?/, // koşul: `${x ? `…` : ''}` — içteki parça ayrıca taranır
+  // Koşul: `${x ? `…` : ''}` — dal şablon değişmezi ya da dizge olmalı (içteki `${…}` ayrıca taranır);
+  // `${ad ? ad : ''}` gibi ham değer döndüren üçlü ifade güvenli SAYILMAZ.
+  /^[\w.]+\s*\?\s*[`'"]/,
   /^\w+Html\s*$/, // adı `…Html` ile biten değer: kaçışla KURULMUŞ hazır HTML parçası
 ]
 
@@ -173,6 +175,14 @@ describe('INV-CIKTI-KODLAMA-1 · G1 e-posta HTML kaçışı', () => {
     for (const islev of ['order-confirmation', 'shipping-notification', 'delivery-notification']) {
       expect(islevKodu(islev), `${islev}: renderTemplate _shared/kodlama.ts'ten gelmiyor`).toMatch(
         /import\s*\{[^}]*\brenderTemplate\b[^}]*\}\s*from\s*'\.\.\/_shared\/kodlama\.ts'/,
+      )
+    }
+  })
+
+  it('CSS bağlamındaki marka rengi `guvenliRenk` süzgecinden geçer', () => {
+    for (const islev of ['order-confirmation', 'shipping-notification', 'delivery-notification', 'return-status-notification']) {
+      expect(islevKodu(islev), `${islev}: brandPrimary süzülmüyor`).toMatch(
+        /const brandPrimary = guvenliRenk\(branding\.brandPrimaryColor\)/,
       )
     }
   })

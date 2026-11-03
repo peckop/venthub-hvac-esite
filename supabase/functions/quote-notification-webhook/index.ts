@@ -357,7 +357,7 @@ Deno.serve(async (req: Request) => {
       contactPhone: quote.contact_phone,
       kalemler: items ?? [],
       panelTabanUrl: siteUrl,
-    })
+    }, kacir)
     if (icIzinli) {
       const icResp = await resendGonder(
         { from: marka.emailFrom || emailFrom, to: [icAlici], reply_to: to, subject: ic.subject, html: ic.html, text: ic.text },
