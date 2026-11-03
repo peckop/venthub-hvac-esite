@@ -65,6 +65,10 @@
    "priority": 0.6
   },
   {
+   "url": "{BASE}/tr/bilgi-merkezi/fan-cesitleri",
+   "priority": 0.6
+  },
+  {
    "url": "{BASE}/tr/category/fanlar",
    "priority": 0.7
   },
@@ -316,6 +320,10 @@
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi/hava-perdesi",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi/fan-cesitleri",
    "priority": 0.6
   },
   {

@@ -138,7 +138,7 @@ function uret(setler) {
  * Bu betik YALNIZ tanım dosyasını üretir; hiçbir pencerenin settings dosyasına dokunmaz (geçişi OPS yapar).
  *
  * LİSTE DURUMDAN TÜRETİLMEZ: `ROLLER[...].durum` metni KATALOG ve BLOG için "Kapalı" diyor ama pencereleri açık (OPS emri 11 departman
- * sayıyor); kapalı departmanlar (ADMIN, EDGE, I18N, MARKA, MEVZUAT, SATIS) pencere açıldığında listeye eklenir. Her listeli departmanın
+ * sayıyor); kapalı departmanlar (ADMIN, EDGE, I18N, MARKA, SATIS) pencere açıldığında listeye eklenir. Her listeli departmanın
  * ROLLER kaydı ve docs/roller/<ROL>.md dosyası bulunmalıdır (hazir-ozellik-kurulumu.test.ts bunu ölçer).
  *
  * İÇERİK TEK KAYNAKTAN: görev ve dosya alanı `scripts/belge/rol-karti-uret.cjs` ROLLER sabitinden gelir (rol kartıyla AYNI veri, kopya yok);
@@ -147,7 +147,7 @@ function uret(setler) {
  * ve ayrıntıyı rol kartına bırakır. Açıklama kısa: tüm tanımların ad+açıklaması her oturumun Agent aracı açıklamasına girer (tavan
  * INV-AJAN-TANIM-1 maliyet kapısı, çalışan + pencere birlikte ölçülür).
  */
-const PENCERE_DEPARTMANLARI = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK', '3D']
+const PENCERE_DEPARTMANLARI = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK', '3D', 'MEVZUAT']
 /** Pencere modeli = pencerenin bugünkü modeli (OPS emri: departmanlar Sonnet 5.5, OPS Opus 5.5); TAM kimlik, takma ad kayar. */
 const PENCERE_MODEL = { OPS: 'claude-opus-5-5' }
 const PENCERE_MODEL_VARSAYILAN = 'claude-sonnet-5-5'
