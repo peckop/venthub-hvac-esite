@@ -149,6 +149,18 @@ Y2.1 yayın bildirimine bağlıdır (R10 B8 ve B10'da BLOG, GEO-SEO'ya tek satı
 
 `dizin-tetigi` iş akışı (`degisen-adres-bildir.mjs`) aynı farkı IndexNow için zaten koşar; bu madde onun Google/Bing/Yandex ve kart tarafındaki yedeğidir, yerine geçmez.
 
+### Y2.3 Rehber taslak okumasında eklenti ajanı: bağımsız okuma, her bulgu doğrulanır (SEO-80, 2026-11-03, OPS UYGUN)
+
+claude-seo eklentisi karar 417 ile yalnız yerel kapsamda kuruludur; kullanım haritası `docs/audits/seo-claude-seo-kullanim-2026-11-03.md`. Eklenti kendiliğinden devreye girmez, bu madde onu rehber akışına sabit bir adım olarak bağlar. Her rehber taslağı R10 B6a okumasına geldiğinde:
+
+1. Eklentinin kendi `claude-seo:seo-geo` ajanı taslağın yerel dosyasına salınır. Ajan yalnız dosyayı okur: ağ, Python betiği, dosya yazma ve `/seo setup` yoktur. GEO-SEO'nun ve BLOG'un kendi bulguları ajana verilmez (bağımsız okuma).
+2. Ajanın her bulgusu bir iddiadır. Taslak satırına ve atıf yapılan kaynağın metnine karşı doğrulanmadan bulgu sayılmaz ve BLOG'a iletilmez. Doğrulanamayan ya da çürüyen bulgu "yanlış pozitif" olarak kalır. Ajanın verdiği puan (ör. 55/100) karar girdisi ya da hedef değildir.
+3. Kartta her ajan bulgusu için üç alan tutulur: doğrulandı / yanlış pozitif; GEO-SEO ve BLOG kapılarında da bulundu mu (ortak) ya da yalnız ajan mı buldu (ek); yazının hangi satırı.
+4. İlk 3 rehber taslağında isabet oranı (doğrulanan bulgu / ajanın toplam bulgusu) ve ajan turunun süre ve jeton maliyeti kartta yazılır. Üçüncü yazıdan sonra devam, daraltma ya da bırakma önerisi bu veriyle OPS'a gider.
+5. Yazı yayınlandığı halde aramada görünmüyorsa `seo-sxo` (sayfa türü uyumu), site haritası değiştiyse `seo-sitemap` ile bakılır. Eklentinin öteki araçları kullanılmaz; Python ortamı (`/seo setup`, karar 417'de yasak) kararı sonuçla birlikte OPS'a gider.
+
+İlk veri noktası (3 Kasım 2026, BLG-33 taslağı v1k): ajan 6 bulgu verdi; 3'ü GEO-SEO okumasıyla ortak, 2'si doğrulanan ek bulgu (çalışma ilkesi bölümü havanın çark yolunu anlatmıyor; seçim paragrafı yanlış bölümde), 1'i yanlış pozitif (iki kaynağın aynı bilgiyi yazdığı bir yerde atıf çelişkisi sanıldı). Ajan, GEO-SEO okumasının bulduğu iki şeyi kaçırdı: seçim tablosunda aynı cümleyi tekrarlayan satırlar ve iki ürün serisi arasında seçim sorusunun cevapsızlığı (katalog bilgisi gerekir). İsabet 5/6; süre ve jeton ölçülmedi, ilk 3 yazıda ölçülecek.
+
 ## Y3 — Kabul (yayın günü ve sonrası)
 
 - Eski adres: `AYNI` ya da `TEK-308` (dil öneki olmayan eski adreste tek 307 meşru, plan §4); **ZINCIR 0 ·
