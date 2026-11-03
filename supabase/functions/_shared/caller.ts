@@ -46,6 +46,8 @@ import {
   type TenantSource,
   type VerifiedUser,
 } from './tenant.ts'
+// Sabit zamanlı karşılaştırma ortak modülde (karne 2026-11 K4): uçlar da aynısını kullanır.
+import { timingSafeEquals } from './sabit_zaman.ts'
 
 /** Çağıran, `TenantMismatchError`'ı 403'e çevirir; ayrıca import etmek zorunda kalmasın. */
 export { TenantMismatchError } from './tenant.ts'
@@ -96,22 +98,6 @@ function bearerToken(request: Request): string | null {
   if (!header) return null
   const token = header.replace(BEARER_PREFIX_RE, '').trim()
   return token.length > 0 ? token : null
-}
-
-/**
- * Sabit-zamanlı dize karşılaştırması. Uzunluk farkı da zamanlamaya sızmasın diye döngü
- * UZUN olanın boyunda döner ve uzunluk farkı biriktirilen farka XOR'lanır.
- */
-function timingSafeEquals(a: string, b: string): boolean {
-  const encoder = new TextEncoder()
-  const left = encoder.encode(a)
-  const right = encoder.encode(b)
-  let diff = left.length ^ right.length
-  const length = Math.max(left.length, right.length)
-  for (let i = 0; i < length; i++) {
-    diff |= (left[i] ?? 0) ^ (right[i] ?? 0)
-  }
-  return diff === 0
 }
 
 /**
@@ -215,4 +201,20 @@ export async function resolveCaller(
     tenantId: decision.tenantId,
     source: decision.source,
   }
+}
+
+/**
+ * Kanonik yönetici rolleri — DB sözlüğünden (`user_profiles_role_check`). Rol kapısı her
+ * uçta yeniden yazılmasın diye tek yer (karne 2026-11 kök 2).
+ */
+const YONETICI_ROLLERI: readonly string[] = ['admin', 'super_admin']
+
+/** Doğrulanmış kullanıcı VE rolü yönetici mi? service_role burada SAYILMAZ. */
+export function yoneticiKullaniciMi(ctx: CallerContext): boolean {
+  return ctx.kind === 'user' && typeof ctx.role === 'string' && YONETICI_ROLLERI.includes(ctx.role)
+}
+
+/** Ayrıcalıklı çağıran: service_role anahtarı (sınıf b) ya da yönetici kullanıcı (sınıf a). */
+export function ayricalikliMi(ctx: CallerContext): boolean {
+  return ctx.kind === 'service_role' || yoneticiKullaniciMi(ctx)
 }
