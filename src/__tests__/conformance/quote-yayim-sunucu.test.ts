@@ -16,7 +16,7 @@ import { describe, expect, it } from 'vitest'
  *   (b) sayaç tablosu: RLS açık, politika YOK, public/anon/authenticated'dan REVOKE.
  *   (c) bildirim: AFTER tetiği WHEN draft→quoted; ortak yardımcı Vault bayrağını okur; yeniden gönderim
  *       aynı yardımcıyı ZORUNLU kipte çağırır (bayrak kapalıyken hata).
- *   (d) yetkiler: yardımcı üç rolden kapalı; yeniden gönderim anon kapalı, authenticated açık.
+ *   (d) yetkiler: yardımcı üç rolden kapalı; yeniden gönderim anon kapalı, authenticated kapalı (ALT-135; yalnız service_role).
  *   (e) kalem kilidi: yayımlanmış belgenin kalemi değişmez.
  * İstemci çağrısının kaldırılması (Vault bayrağı açıldıktan sonra, ayrı PR) bu kapıya o PR'da eklenir.
  */
@@ -105,7 +105,12 @@ function degerlendir(zincir: Mig[]): string[] {
   const tum = zincir.map((m) => tek(m.sql)).join(' ')
   if (!/alter table public\.quote_number_counters enable row level security/.test(tum)) h.push('(b) sayac tablosunda RLS acik degil')
   if (!/revoke all on public\.quote_number_counters from public, anon, authenticated/.test(tum)) h.push('(b) sayac tablosu REVOKE eksik')
-  if (/create policy [^;]* on public\.quote_number_counters/.test(tum)) h.push('(b) sayac tablosunda politika var — erisim yalniz DEFINER olmali')
+  // ALT-135: tek istisna açık RESTRICTIVE deny politikası (kimseye erişim VERMEZ, Advisor "RLS açık politikasız" uyarısını kapatır).
+  // Erişim hâlâ yalnız DEFINER'dan; izin veren (permissive) ya da using (false) olmayan her politika kırmızı.
+  for (const pol of tum.matchAll(/create policy (\S+) on public\.quote_number_counters ([^;]*)/g)) {
+    const denyAll = /_deny_all$/.test(pol[1]) && /\bas restrictive\b/.test(pol[2]) && /using \( ?false ?\)/.test(pol[2])
+    if (!denyAll) h.push('(b) sayac tablosunda politika var — erisim yalniz DEFINER olmali')
+  }
 
   // (c) bildirim
   const bildirimTetik = sonTetik(zincir, 'trg_notify_quote_published')
@@ -130,7 +135,8 @@ function degerlendir(zincir: Mig[]): string[] {
     if (sonYetki(zincir, kuyrukH, rol) !== 'revoke') h.push(`(d) gonderim yardimcisi ${rol} icin kapali degil`)
   const tekrarH = /on function (?:public\.)?admin_resend_quote_published\b/
   if (sonYetki(zincir, tekrarH, 'anon') !== 'revoke') h.push('(d) yeniden gonderim anon icin kapali degil')
-  if (sonYetki(zincir, tekrarH, 'authenticated') !== 'grant') h.push('(d) yeniden gonderim authenticated icin acik degil')
+  // ALT-135 (2026-11-03): istemci çağıranı yok → authenticated KAPALI, yalnız service_role. Admin ekranı bağlanırsa GRANT ile açılır.
+  if (sonYetki(zincir, tekrarH, 'authenticated') !== 'revoke') h.push('(d) yeniden gonderim authenticated icin acik (ALT-135: kapali olmali)')
 
   // (e) kalem kilidi
   const kilit = sonTetik(zincir, 'trg_quote_items_durum_kilidi')
@@ -150,11 +156,12 @@ describe('INV-QUOTE-YAYIM-1 · teklif yayımının yan etkileri sunucuda', () =>
 
   describe('AYIRT EDİCİLİK — her ihlal yakalanıyor', () => {
     const iyi = zincir.find((m) => m.ad.endsWith('_quote_yayim_sunucu.sql'))
-    const bozuk = (d: (s: string) => string): Mig[] => {
+    const bozuk = (d: (s: string) => string, alt135Dahil = true): Mig[] => {
       expect(iyi, 'REC-384 migration bulunamadi').toBeDefined()
       const yeni = d((iyi as Mig).sql)
       expect(yeni, 'sabotaj metni degistirmedi').not.toBe((iyi as Mig).sql)
-      return [{ ad: 'x.sql', sql: yeni }]
+      // ALT-135 sıkılaştırması (yeniden gönderim authenticated'ı kapatır) zincirin parçası: sabotaj tabanına eklenir.
+      return [{ ad: 'x.sql', sql: yeni }, ...(alt135Dahil ? zincir.filter((m) => m.ad.endsWith('_alt135_definer_yetki_sikilastirma.sql')) : [])]
     }
     const sabotajlar: [string, (s: string) => string, RegExp][] = [
       ['WHEN koşulu kalktı', (s) => s.replace(/when \(old\.status = 'draft' and new\.status = 'quoted'\)\n  execute function public\.stamp_quote_published/, 'execute function public.stamp_quote_published'), /\(a\) damga tetiginde WHEN/],
@@ -175,7 +182,8 @@ describe('INV-QUOTE-YAYIM-1 · teklif yayımının yan etkileri sunucuda', () =>
     })
     for (const [ad, d, beklenen] of sabotajlar) {
       it(ad, () => {
-        expect(degerlendir(bozuk(d)).join(' | ')).toMatch(beklenen)
+        // anon sabotajı: ALT-135 zincire girerse anon'u yeniden kapatıp sabotajı örter; bu kolda yalnız x.sql sınanır.
+        expect(degerlendir(bozuk(d, !ad.includes('anon'))).join(' | ')).toMatch(beklenen)
       })
     }
   })

@@ -1,4 +1,9 @@
+// Çağıran sınıfı: (b) zamanlanmış iş (service_role) — ya da (a) yönetici; ortak resolveCaller kapısı
+//
+// Süresi dolan stok rezervasyonlarını bırakır. Çağıranlar: `.github/workflows/expired-reservations-cron.yml`
+// (Bearer service_role) ve yönetici paneli. TENANT: tüm kiracıları süpürür (Faz 2 borcu, R13).
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { ayricalikliMi, resolveCaller } from '../_shared/caller.ts'
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
@@ -35,31 +40,19 @@ serve(async (req: Request) => {
     }
 
 
-    const authHeader = req.headers.get('Authorization')
+    // KAPI (karne 2026-11 kök 2 · K4): eskiden service_role anahtarı `authHeader ===
+    // \`Bearer ${key}\`` ile (sabit zamanlı DEĞİL) karşılaştırılıyor, admin dalı ise kendi
+    // `getUser` + `user_profiles` kopyasını taşıyordu. Artık ortak `resolveCaller`: anahtar
+    // sabit zamanlı, rol ve tenant tek satırdan. Profil okunamazsa sessiz geçiş YOK → 500.
     let isAuthorized = false
-    if (authHeader === `Bearer ${supabaseKey}`) {
-      isAuthorized = true
-    } else if (authHeader) {
-      try {
-        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
-        const { createClient: createClientAuth } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
-        const authClient = createClientAuth(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
-        const { data: { user } } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
-        if (user) {
-          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
-            headers: { Authorization: `Bearer ${supabaseKey}`, apikey: supabaseKey }
-          })
-          if (roleCheck.ok) {
-            const arr = await roleCheck.json().catch(() => [])
-            const role = arr[0]?.role
-            if (role === 'admin' || role === 'super_admin') {
-              isAuthorized = true
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('Auth fallback error:', err)
-      }
+    try {
+      isAuthorized = ayricalikliMi(await resolveCaller(req))
+    } catch (err) {
+      console.warn('release-expired-reservations: kimlik kapısı ölçülemedi:', err instanceof Error ? err.name : 'hata')
+      return new Response(JSON.stringify({ error: 'auth_check_failed' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
     if (!isAuthorized) {

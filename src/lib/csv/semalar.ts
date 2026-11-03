@@ -11,6 +11,10 @@
 import { z } from 'zod'
 
 const SKU_DESENI = /^[A-Z0-9-]+$/
+/** Adet alanı: yalnız rakam. Ürün ve stok içe aktarımı AYNI deseni kullanır (ADM-7). */
+const ADET_DESENI = /^\d+$/
+/** Sayıya benzeyen ama tam sayı olmayan (negatif, ondalık, işaretli) — aralık hatası sayılır. */
+const SAYIYA_BENZER = /^[+-]?\d+(?:[.,]\d+)?$/
 /** Tek satırdaki tamsayı alanlarının üst sınırı (stok, eşik). */
 const MAKS_ADET = 1_000_000
 
@@ -23,7 +27,7 @@ const adet = z.preprocess(
   z
     .string()
     .trim()
-    .regex(/^\d+$/)
+    .regex(ADET_DESENI)
     .transform(Number)
     .refine((n) => n <= MAKS_ADET)
     .optional(),
@@ -62,7 +66,7 @@ export function urunSatiriDogrula(satir: Readonly<Record<string, string>>): Dogr
 const MIKTAR_SUTUNLARI = ['qty', 'quantity', 'stock', 'new_stock'] as const
 
 /** Hata kodu = `admin.inventory.import.errors.<kod>` sözlük anahtarı. */
-export type StokHataKodu = 'missingSku' | 'invalidSku' | 'qtyMustBeNumber' | 'qtyOutOfRange'
+export type StokHataKodu = 'missingSku' | 'invalidSku' | 'qtyMustBeNumber' | 'qtyOutOfRange' | 'duplicateSku'
 
 export interface StokSatiri {
   line: number
@@ -85,17 +89,27 @@ export function stokSatirlariniHazirla(
   const sonuc: StokSatiri[] = []
   const hatalar: { line: number; sku: string; kod: StokHataKodu }[] = []
 
+  // Aynı SKU birden çok satırda geçerse HİÇBİRİ uygulanmaz (ADM-7): eskiden fark iki kez
+  // uygulanıyordu ve hangi miktarın kastedildiği belli değil. Miktarı geçersiz satır da sayılır.
+  const skuSayisi = new Map<string, number>()
+  for (const r of satirlar) {
+    const sku = (r.sku ?? '').trim()
+    if (sku) skuSayisi.set(sku, (skuSayisi.get(sku) ?? 0) + 1)
+  }
+
   satirlar.forEach((r, i) => {
     const line = satirNolari[i] ?? i + 2
     const sku = (r.sku ?? '').trim()
     const miktar = (r[miktarSutunu] ?? '').trim()
     if (!sku) return void hatalar.push({ line, sku, kod: 'missingSku' })
     if (!skuSemasi.safeParse(sku).success) return void hatalar.push({ line, sku, kod: 'invalidSku' })
-    if (miktar === '' || !Number.isFinite(Number(miktar))) {
-      return void hatalar.push({ line, sku, kod: 'qtyMustBeNumber' })
+    if ((skuSayisi.get(sku) ?? 0) > 1) return void hatalar.push({ line, sku, kod: 'duplicateSku' })
+    // Ürün şemasıyla aynı desen: `Number()` `0x10`, `1e3`, `5.0` kabul ediyordu (ADM-7).
+    if (!ADET_DESENI.test(miktar)) {
+      return void hatalar.push({ line, sku, kod: SAYIYA_BENZER.test(miktar) ? 'qtyOutOfRange' : 'qtyMustBeNumber' })
     }
     const n = Number(miktar)
-    if (!Number.isInteger(n) || n < 0 || n > MAKS_ADET) return void hatalar.push({ line, sku, kod: 'qtyOutOfRange' })
+    if (n > MAKS_ADET) return void hatalar.push({ line, sku, kod: 'qtyOutOfRange' })
     sonuc.push({ line, sku, newQty: n })
   })
 

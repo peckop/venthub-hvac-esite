@@ -18,6 +18,8 @@ import {
     TenantMismatchError,
 } from '../_shared/caller.ts'
 import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
+// Maske + hata ayıklama bayrağı tek yerde (güvenlik karnesi 2026-11 S1).
+import { hataAyiklamaAcik, maskAd, maskEposta, maskTelefon, metniMaskele, sirDurumu } from '../_shared/maske.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { denemeSiparisiKaydet, satisKipiKarari } from '../_shared/satis_kipi.ts'
@@ -77,10 +79,9 @@ Deno.serve(async (req: Request) => {
 
     let debugEnabled = false;
     try {
-        const url = new URL(req.url);
-        debugEnabled = ((Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true')
-            || (url.searchParams.get('debug') === '1')
-            || ((req.headers.get('x-debug') || '') === '1');
+        // S1 (güvenlik karnesi 2026-11): bayrak YALNIZ ortamdan. Eskiden `?debug=1` ya da
+        // `x-debug: 1` gönderen her çağıran sunucu loguna istek dökümü yazdırabiliyordu.
+        debugEnabled = hataAyiklamaAcik(Deno.env.get('IYZICO_DEBUG'));
 
         // Per-IP rate limiting
         try {
@@ -112,15 +113,16 @@ Deno.serve(async (req: Request) => {
             console.error('rate_limit COKTU — odeme ucu bu istekte sinirsiz gecti:', _e)
         }
 
-        const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
-        type BuyerMin = { email?: string; gsmNumber?: string; registrationAddress?: string; ip?: string }
-        type AddressMin = { address?: string }
+        // S1: ad/soyad ve teslim alıcısı adı da maskelenir (eskiden yalnız e-posta ve telefon).
+        type BuyerMin = { name?: string; surname?: string; email?: string; gsmNumber?: string; registrationAddress?: string; ip?: string }
+        type AddressMin = { contactName?: string; address?: string }
         type PaymentMin = { buyer?: BuyerMin; shippingAddress?: AddressMin; billingAddress?: AddressMin;[k: string]: unknown }
+        const adresMaskele = (a?: AddressMin) => a ? { ...a, contactName: maskAd(a.contactName), address: '***' } : undefined;
         const sanitize = (obj: PaymentMin) => ({
             ...obj,
-            buyer: obj?.buyer ? { ...obj.buyer, email: mask(obj.buyer.email), gsmNumber: mask(obj.buyer.gsmNumber), registrationAddress: '***', ip: '***' } : undefined,
-            shippingAddress: obj?.shippingAddress ? { ...obj.shippingAddress, address: '***' } : undefined,
-            billingAddress: obj?.billingAddress ? { ...obj.billingAddress, address: '***' } : undefined,
+            buyer: obj?.buyer ? { ...obj.buyer, name: maskAd(obj.buyer.name), surname: maskAd(obj.buyer.surname), email: maskEposta(obj.buyer.email), gsmNumber: maskTelefon(obj.buyer.gsmNumber), registrationAddress: '***', ip: '***' } : undefined,
+            shippingAddress: adresMaskele(obj?.shippingAddress),
+            billingAddress: adresMaskele(obj?.billingAddress),
         });
         if (debugEnabled) console.warn('İyzico Payment Request Started');
 
@@ -161,9 +163,10 @@ Deno.serve(async (req: Request) => {
                 });
             }
             requestData = JSON.parse(bodyText);
-        } catch (e) {
+        } catch {
+            // S5: ayrıştırıcının iç hata metni istemciye dönmez; kod ve sabit mesaj yeterli.
             return new Response(JSON.stringify({
-                error: { code: 'VALIDATION_ERROR', message: 'Geçersiz JSON formatı', details: e instanceof Error ? e.message : String(e) }
+                error: { code: 'VALIDATION_ERROR', message: 'Geçersiz JSON formatı' }
             }), {
                 status: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
@@ -459,14 +462,9 @@ Deno.serve(async (req: Request) => {
 
         const iyzicoBaseUrl = iyzicoCfg.base;
 
-        // Maskeli anahtar logu (güvenli): ilk 6 + … + son 4
-        const maskKey = (k?: string | null) => {
-            if (!k) return '(missing)';
-            const s = String(k);
-            if (s.length <= 10) return s;
-            return s.slice(0, 6) + '…' + s.slice(-4);
-        };
-        if (debugEnabled) console.warn('Iyzico keys (masked):', maskKey(iyzicoApiKey), maskKey(iyzicoSecretKey));
+        // S1: anahtarın hiçbir karakteri loga girmez (eskiden ilk 6 + son 4; 10 karakterden kısa
+        // anahtar TAMAMEN basılıyordu). Teşhis için yalnız "tanımlı mı" bilgisi yeterli.
+        if (debugEnabled) console.warn('Iyzico keys:', sirDurumu(iyzicoApiKey), sirDurumu(iyzicoSecretKey));
 
         // Generate unique identifiers
         const orderId = `VH-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -591,7 +589,8 @@ Deno.serve(async (req: Request) => {
                     body: JSON.stringify(withoutShipMethod)
                 });
             } else {
-                console.error('Order creation failed:', errorText);
+                // PostgREST kısıt ihlali metni satır değeri (e-posta, telefon) taşıyabilir.
+                console.error('Order creation failed:', metniMaskele(errorText, 1000));
             }
         }
 
@@ -962,7 +961,9 @@ Deno.serve(async (req: Request) => {
         }
 
     } catch (error) {
-        if (debugEnabled) console.error('Critical Error:', error);
+        // KOŞULSUZ: iç hata metni artık yanıtta değil (S5), tek izi bu log + Slack.
+        // İstemci `X-Request-Id` ile bu satırı bulur.
+        console.error('Critical Error:', requestId, error);
         try {
             const { slackNotify } = await import('../_shared/notify.ts')
             const errMsg = error instanceof Error ? error.message : String(error)
@@ -976,11 +977,10 @@ Deno.serve(async (req: Request) => {
             error: {
                 code: 'INTERNAL_ERROR',
                 message: 'Sunucu hatası oluştu',
-                details: error instanceof Error ? error.message : String(error)
             }
         }), {
             status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
         });
     }
 });

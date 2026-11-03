@@ -95,3 +95,12 @@ verify_jwt = false
 # kimlikli bir izleyici olabilir; bu bir ürün kararıdır ve Recep'e bırakılmıştır.
 [functions."healthz"]
 verify_jwt = true
+
+# --- Auth parola kuralı: PROD PANEL DEĞERİYLE EŞİT (OPS-212, 3 Kasım 2026) ---
+# Prod Supabase Auth panelinde: minimum 8 karakter + küçük harf, büyük harf, rakam, sembol.
+# Bunlardan birini değiştirirsen prod paneli ve istemci kuralı (src/utils/passwordRules.ts)
+# AYNI işte değişir. Bekçi: src/__tests__/conformance/auth-password-policy.test.ts.
+# Yalnız bu iki anahtar yazılır; [auth] içindeki diğer alanlar CLI varsayılanında kalır.
+[auth]
+minimum_password_length = 8
+password_requirements = "lower_upper_letters_digits_symbols"

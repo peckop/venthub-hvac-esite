@@ -37,12 +37,34 @@ export function formulMu(metin: string): boolean {
 }
 
 /**
+ * Metin önek almalı mı? Formülse evet. Ayrıca `'` + (önek alacak metin) ise de evet (ADM-7):
+ * yoksa özgün `'=x` ile nötrlenmiş `=x` çıktıda aynı (`'=x`) olur ve içe aktarma ikisini
+ * ayıramaz. Bu ek kural yalnız ÖNEK EKLER; formül kararını gevşetmez.
+ */
+function onekGerekli(metin: string): boolean {
+  if (formulMu(metin)) return true
+  let i = 0
+  while (metin.charAt(i) === "'") i++
+  return i > 0 && formulMu(metin.slice(i))
+}
+
+/**
  * Hücrenin nötrlenmiş METNİ (tırnaksız). CSV ve XLS aynı kararı buradan alır.
  * Sayı tipi kesin sayıdır: `-5` formül değil; metne çevrilince önek almasın.
  */
 export function notrMetin(deger: CsvDeger): string {
   const metin = metneCevir(deger)
-  return typeof deger !== 'number' && formulMu(metin) ? `'${metin}` : metin
+  return typeof deger !== 'number' && onekGerekli(metin) ? `'${metin}` : metin
+}
+
+/**
+ * `notrMetin`'in tersi — içe aktarma (ADM-7). Önek YALNIZ nötrlemenin koyacağı yerde düşer:
+ * `'- Fan` → `- Fan`, ama elle yazılmış `'abc` ya da `'-12,50` olduğu gibi kalır.
+ * Her metin için `notrlemeyiGeriAl(notrMetin(x)) === x`. Veritabanına giden ham değer budur;
+ * yeniden dışa aktarılınca `notrMetin` öneki yine koyar (koruma çıkıştadır, §1.1).
+ */
+export function notrlemeyiGeriAl(metin: string): string {
+  return metin.charAt(0) === "'" && onekGerekli(metin.slice(1)) ? metin.slice(1) : metin
 }
 
 /** Tek CSV hücresi: gerekirse tek tırnak önekli, `"` → `""` kaçışlı, çift tırnaklı. */

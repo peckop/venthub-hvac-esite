@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.
 > **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.
 
-Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 11 · SATIS 5 · TASARIM 1 · URUN 17
+Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 2 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 11 · SATIS 5 · TASARIM 1 · URUN 17
 
 | Cetvel | Sahip | Durum | Dayanak |
 |---|---|---|---|
@@ -38,6 +38,7 @@ Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 1 · GEO-SEO 1 · 
 | hafiza-kancalari-standard.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | pano-orion-koprusu-standardi.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | tasarim-yetenek-standard.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
+| cikti-kodlama-maske-standard.md | EDGE | Sahip (doğrulanacak) | OPS-211 (güvenlik karnesi 2026-11 kök 3): konu edge çıktısı, edge-function-security-standard ile aynı sahip; EDGE ilk dokunuşta teyit eder |
 | edge-function-security-standard.md | EDGE | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; önceki sahip ALTYAPI; ALTYAPI ve URUN dokunuşu kartta sınır satırı) |
 | canonical-url-standard.md | GEO-SEO | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
 | hafiza-yazma-duzeni-standard.md | HARITA | teyitli | Recep modeli 2026-09-30 (OPS iletti), REC-530: düzeni HARİTA kurar, kancayı ARAÇ kurar |

@@ -3,6 +3,9 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
+// Şablon motoru + kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
+import { guvenliRenk, guvenliUrl, kacir, renderTemplate } from '../_shared/kodlama.ts'
+import { maskEposta } from '../_shared/maske.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -28,26 +31,6 @@ function callerFailure(error: unknown): { status: number; error: string } | null
   if (error instanceof CallerConfigError) return { status: 500, error: 'CONFIG_MISSING' }
   if (error instanceof CallerLookupError) return { status: 503, error: 'profile_lookup_failed' }
   return null
-}
-
-/**
- * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. Döngü (`each`) YOKTUR ve
- * EKLENMEYECEKTİR: liste gerekiyorsa HTML'i çağıran taraf hazırlar.
- * Cetvel: `docs/standards/email-template-standard.md` §2.
- */
-function renderTemplate(tpl: string, data: Record<string, unknown>): string {
-  // if-blocks
-  tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
-    const v = data[key]
-    const truthy = !!(typeof v === 'string' ? v : v)
-    return truthy ? inner : ''
-  })
-  // variables
-  tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
-    const v = data[key]
-    return v == null ? '' : String(v)
-  })
-  return tpl
 }
 
 async function loadShippingTemplate(): Promise<string | null> {
@@ -230,7 +213,8 @@ serve(async (req) => {
     }
 
     const brandName = branding.brandName
-    const brandPrimary = branding.brandPrimaryColor
+    // CSS bağlamı: yalnız hex renk (cetvel cikti-kodlama-maske K2).
+    const brandPrimary = guvenliRenk(branding.brandPrimaryColor)
     const brandLogoUrl = branding.brandLogoUrl
     // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
     const supportEmail = branding.supportEmail
@@ -272,10 +256,11 @@ ${companyFooter}
           order_number: siparisNo,
           carrier,
           tracking_number,
-          tracking_url,
+          // href/src yalnız http(s): `javascript:` ya da `data:` adresi bloğu siler (`{{#if}}`).
+          tracking_url: guvenliUrl(tracking_url),
           brand_name: brandName,
           brand_primary_color: brandPrimary,
-          brand_logo_url: brandLogoUrl,
+          brand_logo_url: guvenliUrl(brandLogoUrl),
           support_email: supportEmail,
           company_footer: companyFooter,
         })
@@ -283,23 +268,25 @@ ${companyFooter}
     } catch { /* ignore, fall back to inline */ }
 
     if (!html) {
+      const takipUrl = guvenliUrl(tracking_url)
+      const logoUrl = guvenliUrl(brandLogoUrl)
       html = [
         '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">',
-        `<h2 style="color: ${brandPrimary};">${brandName} — Siparişiniz kargoya verildi! 📦</h2>`,
-        brandLogoUrl ? `<p><img src="${brandLogoUrl}" alt="${brandName}" style="max-height:40px;"/></p>` : '',
-        `<p>Merhaba <strong>${customer_name || ''}</strong>,</p>`,
-        `<p><strong>${siparisNo}</strong> numaralı siparişiniz kargoya verildi!</p>`,
+        `<h2 style="color: ${kacir(brandPrimary)};">${kacir(brandName)} — Siparişiniz kargoya verildi! 📦</h2>`,
+        logoUrl ? `<p><img src="${kacir(logoUrl)}" alt="${kacir(brandName)}" style="max-height:40px;"/></p>` : '',
+        `<p>Merhaba <strong>${kacir(customer_name)}</strong>,</p>`,
+        `<p><strong>${kacir(siparisNo)}</strong> numaralı siparişiniz kargoya verildi!</p>`,
         '<div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">',
         '<h3 style="margin-top: 0; color: #374151;">Kargo Bilgileri</h3>',
-        `<p><strong>🚛 Kargo Firması:</strong> ${carrier}</p>`,
-        `<p><strong>📋 Takip Numarası:</strong> <code style="background-color: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${tracking_number}</code></p>`,
-        tracking_url ? `<p><strong>🔗 Takip Linki:</strong> <a href="${tracking_url}" target="_blank" style="background: ${brandPrimary}; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Kargomu Takip Et</a></p>` : '',
+        `<p><strong>🚛 Kargo Firması:</strong> ${kacir(carrier)}</p>`,
+        `<p><strong>📋 Takip Numarası:</strong> <code style="background-color: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${kacir(tracking_number)}</code></p>`,
+        takipUrl ? `<p><strong>🔗 Takip Linki:</strong> <a href="${kacir(takipUrl)}" target="_blank" style="background: ${kacir(brandPrimary)}; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Kargomu Takip Et</a></p>` : '',
         '</div>',
         '<p>Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.</p>',
-        `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
+        `<p>Teşekkürler,<br><strong>${kacir(brandName)} Ekibi</strong></p>`,
         '<hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">',
-        `<p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın. Sorularınız için <a href="mailto:${supportEmail}">${supportEmail}</a> adresine yazabilirsiniz.</p>`,
-        companyFooter ? `<p style="color: #6b7280; font-size: 12px;">${companyFooter}</p>` : '',
+        `<p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın. Sorularınız için <a href="mailto:${kacir(supportEmail)}">${kacir(supportEmail)}</a> adresine yazabilirsiniz.</p>`,
+        companyFooter ? `<p style="color: #6b7280; font-size: 12px;">${kacir(companyFooter)}</p>` : '',
         '</div>'
       ].join('')
     }
@@ -426,7 +413,7 @@ ${companyFooter}
       }
     } catch { /* best effort */ }
 
-    console.warn(`📧 Shipping notification sent to ${toList[0]} for order ${siparisNo}`)
+    console.warn(`📧 Shipping notification sent to ${maskEposta(toList[0])} for order ${siparisNo}`)
 
     return new Response(JSON.stringify({
       success: true,

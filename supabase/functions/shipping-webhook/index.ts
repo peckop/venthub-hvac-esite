@@ -12,6 +12,8 @@
 // `isMockEnv` dalıyla testlerde tamamen atlanıyordu — yani kapı test edilmiyordu (cetvel §3.9).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
+import { hmacImzaGecerli, timingSafeEquals } from '../_shared/sabit_zaman.ts'
+import { kargoHedefiCoz, kargoYazimKarari, tetikReddiMi } from '../_shared/kargo_webhook_gecis.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {
@@ -20,31 +22,12 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   })
 }
 
-async function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
-  try {
-    const key = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
-    )
-    const sigBytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw))
-    const computed = btoa(String.fromCharCode(...new Uint8Array(sigBytes)))
-    // Accept base64 or hex signatures; normalize
-    const normalize = (s: string) => s.trim().replace(/^sha256=/i, '')
-    const given = normalize(signatureHeader)
-    return given === computed
-  } catch {
-    return false
-  }
-}
-
-function mapCarrierStatus(input?: string): { status?: string; setShipped?: boolean; setDelivered?: boolean } {
-  const s = (input || '').toLowerCase()
-  // Generic mapping across carriers
-  if (!s) return {}
-  if (['label_created','created','ready','processing','info_received'].includes(s)) return { status: 'paid' }
-  if (['accepted','picked_up','in_transit','transit','out_for_delivery','dispatched'].includes(s)) return { status: 'shipped', setShipped: true }
-  if (['delivered','completed'].includes(s)) return { status: 'delivered', setDelivered: true }
-  if (['failed','exception','return_to_sender','cancelled','canceled'].includes(s)) return { status: 'failed' }
-  return { status: s }
+// İmza ve token karşılaştırması SABİT ZAMANLI (karne 2026-11 K4, cetvel §3.5 · E17).
+// Eskiden `given === computed` ve `token === expected` idi: ilk farklı baytta dönen
+// karşılaştırma beklenen değerin önekini yanıt süresiyle sızdırır.
+// Yalnız BASE64 imza kabul edilir (hex kabul EDİLMEZ); `sha256=` öneki normalize edilir (sabit_zaman.ts).
+function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
+  return hmacImzaGecerli(secret, raw, signatureHeader)
 }
 
 function normalizePayload(carrierHint: string, obj: unknown) {
@@ -83,7 +66,6 @@ async function sha256Base64(input: string): Promise<string> {
   return btoa(String.fromCharCode(...new Uint8Array(hash)))
 }
 
-const RANK: Record<string, number> = { pending: 0, paid: 1, confirmed: 2, shipped: 3, delivered: 4 }
 const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
 Deno.serve(async (req: Request) => {
@@ -111,7 +93,7 @@ Deno.serve(async (req: Request) => {
     if (!authorized) {
       const token = req.headers.get('x-webhook-token') || ''
       const expected = Deno.env.get('SHIPPING_WEBHOOK_TOKEN') || ''
-      if (expected && token === expected) authorized = true
+      if (expected && token && timingSafeEquals(token, expected)) authorized = true
     }
 
     if (!authorized) {
@@ -202,10 +184,10 @@ Deno.serve(async (req: Request) => {
     }
 
     // Fetch current to enforce monotonic status progression and for idempotency
-    interface OrderRow { id: string; tenant_id?: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
+    interface OrderRow { id: string; tenant_id?: string; status?: string; payment_status?: string | null; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
     const { data: current, error: curErr } = await supabase
       .from('venthub_orders')
-      .select('id, tenant_id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
+      .select('id, tenant_id, status, payment_status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
       .eq('id', orderId)
       .single()
     if (curErr || !current) return jsonResponse({ error: 'Order not found' }, { status: 404 })
@@ -219,37 +201,15 @@ Deno.serve(async (req: Request) => {
     if (typeof p.tracking_number === 'string' && p.tracking_number) patch.tracking_number = p.tracking_number
     if (typeof p.tracking_url === 'string' && p.tracking_url) patch.tracking_url = p.tracking_url
 
-    // Map external status to internal and enforce monotonic upgrade
-    const mapped = mapCarrierStatus(p.status)
+    // ALT-134 — status'a YAZMA kararı saf modülde (`_shared/kargo_webhook_gecis.ts`): taşıyıcı kelimesi yalnız
+    // shipped/delivered hedefine çözülür (ham değer, 'paid', 'failed' ASLA status'a gitmez); cancelled çıkışsız;
+    // delivered, sipariş henüz shipped değilse iki adım; her adım okunan kaynak duruma bağlı yazılır.
     const curStatus = String(current.status || 'pending').toLowerCase()
-    if (mapped.status) {
-      const next = mapped.status.toLowerCase()
-      const curRank = RANK[curStatus] ?? 0
-      const nextRank = RANK[next] ?? curRank
-      if (nextRank >= curRank) {
-        patch.status = next
-        // Timestamps: allow explicit dates from payload, otherwise set now if transitioning
-        const parseDate = (s?: string) => (s ? new Date(s).toISOString() : undefined)
-        if (next === 'shipped' && !current.shipped_at) {
-          patch.shipped_at = parseDate(p.shipped_at) || new Date().toISOString()
-        }
-        if (next === 'delivered' && !current.delivered_at) {
-          patch.delivered_at = parseDate(p.delivered_at) || new Date().toISOString()
-        }
-      }
+    const cozum = kargoHedefiCoz(p.status)
+    if (cozum.tur === 'durum_yok' && cozum.neden === 'bilinmeyen') {
+      console.warn('[shipping-webhook] tanınmayan taşıyıcı durumu, status yazılmadı', { order_id: orderId, status_raw: p.status })
     }
-
-    // If no effective changes, short‑circuit
-    const noChange =
-      (patch.status == null || patch.status === curStatus) &&
-      (patch.tracking_number == null || patch.tracking_number === current.tracking_number) &&
-      (patch.tracking_url == null || patch.tracking_url === current.tracking_url) &&
-      (patch.carrier == null || patch.carrier === current.carrier) &&
-      (patch.shipped_at == null) &&
-      (patch.delivered_at == null)
-
-    if (noChange) {
-      // Log event as unchanged
+    async function olayKaydet(statusMapped: string) {
       try {
         const bodyHash = await sha256Base64(raw)
         if (eventId) {
@@ -258,7 +218,7 @@ Deno.serve(async (req: Request) => {
             order_id: orderId,
             carrier: p.carrier || null,
             status_raw: p.status || null,
-            status_mapped: (patch.status as string) || curStatus,
+            status_mapped: statusMapped,
             body_hash: bodyHash,
             received_at: new Date().toISOString(),
             processed_at: new Date().toISOString(),
@@ -266,20 +226,119 @@ Deno.serve(async (req: Request) => {
           })
         }
       } catch {}
-      return jsonResponse({ ok: true, order_id: current.id, shipping: current, unchanged: true })
     }
 
-    const { data, error } = await supabase
-      .from('venthub_orders')
-      .update(patch)
-      .eq('id', orderId)
-      .select('id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name')
-      .single()
-
-    if (error || !data) {
-      const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
-      return jsonResponse({ error: msg }, { status: 500 })
+    // Cevap SINIRLI: yalnız { ok, order_id, status }. payment_status, tenant_id, müşteri bilgisi cevaba girmez;
+    // yoksayma nedeni yalnız log'da ve olay kaydında (status_mapped `ignored:<neden>`), cevapta genel `ignored: true`.
+    async function yoksay(neden: string, durumu: string) {
+      console.error('[shipping-webhook] olay yoksayıldı', { code: neden, order_id: orderId, status: durumu, status_raw: p.status })
+      await olayKaydet(`ignored:${neden}`)
+      return jsonResponse({ ok: true, order_id: orderId, status: durumu, ignored: true, unchanged: true })
     }
+
+    const parseDate = (s?: string) => {
+      if (!s) return undefined
+      const t = Date.parse(s)
+      return Number.isFinite(t) ? new Date(t).toISOString() : undefined
+    }
+    const SELECT_KOLONLAR = 'id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name'
+    type YazilanSatir = Record<string, unknown> & { status?: string }
+
+    // Okunan sipariş durumu; kaynak durum koşulu tutmazsa (satır arada ilerledi) BİR KEZ yeniden okunur ve karar
+    // taze durumla tekrar verilir — aksi halde ilerleyen yarışta teslim sinyali (tekrar gelmeyebilir) kaybolurdu.
+    let okunan = {
+      status: curStatus,
+      payment_status: current.payment_status ?? null,
+      shipped_at: current.shipped_at ?? null,
+      delivered_at: current.delivered_at ?? null,
+      tracking_number: current.tracking_number ?? null,
+      tracking_url: current.tracking_url ?? null,
+      carrier: current.carrier ?? null,
+    }
+    let data: YazilanSatir | null = null
+    const yazilan: string[] = []
+
+    for (let deneme = 0; deneme < 2; deneme++) {
+      const karar = kargoYazimKarari({ status: okunan.status, payment_status: okunan.payment_status }, cozum)
+      // Yoksayılan olay: 200 (taşıyıcı sonsuz yeniden denemesin), olay kaydı + günlük; siparişe HİÇBİR şey yazılmaz.
+      if (karar.islem === 'yoksay') return await yoksay(karar.neden, okunan.status)
+
+      // Yazım planı: adım yoksa tek (takip) yazımı; adım varsa her biri kendi kaynak durumuna bağlı.
+      const plan: Array<{ kaynak: string; govde: Record<string, unknown> }> = []
+      if (karar.islem === 'yalniz_takip') {
+        plan.push({ kaynak: okunan.status, govde: { ...patch } })
+      } else {
+        karar.adimlar.forEach((adim, i) => {
+          const govde: Record<string, unknown> = i === 0 ? { ...patch } : {}
+          govde.status = adim.hedef
+          if (adim.hedef === 'shipped' && !okunan.shipped_at) govde.shipped_at = parseDate(p.shipped_at) || new Date().toISOString()
+          if (adim.hedef === 'delivered' && !okunan.delivered_at) govde.delivered_at = parseDate(p.delivered_at) || new Date().toISOString()
+          plan.push({ kaynak: adim.kaynak, govde })
+        })
+      }
+
+      // Etkisiz istek (takip alanları aynı, status adımı yok): yazmadan çık.
+      const etkisiz = karar.islem === 'yalniz_takip' &&
+        (patch.tracking_number == null || patch.tracking_number === okunan.tracking_number) &&
+        (patch.tracking_url == null || patch.tracking_url === okunan.tracking_url) &&
+        (patch.carrier == null || patch.carrier === okunan.carrier)
+      if (etkisiz) {
+        await olayKaydet(okunan.status)
+        return jsonResponse({ ok: true, order_id: current.id, status: okunan.status, unchanged: true })
+      }
+
+      let yeniden = false
+      for (const adim of plan) {
+        const { data: satirlar, error } = await supabase
+          .from('venthub_orders')
+          .update(adim.govde)
+          .eq('id', orderId)
+          .eq('status', adim.kaynak)
+          .select(SELECT_KOLONLAR)
+        if (error) {
+          if (tetikReddiMi(error)) {
+            // Veritabanı monotonluk tetiği reddetti: fail-closed yazım (reddedilen adım yazılmadı), fail-safe cevap (200),
+            // aksi halde taşıyıcı aynı olayı sonsuza kadar yeniden dener. Önceki adım yazıldıysa o durum raporlanır.
+            console.error('[shipping-webhook] monotonluk tetiği reddetti', { code: 'MONOTON_REJECTED', order_id: orderId, status: okunan.status, status_raw: p.status })
+            if (yazilan.length === 0) return await yoksay('MONOTON_REJECTED', okunan.status)
+            break
+          }
+          const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
+          return jsonResponse({ error: msg }, { status: 500 })
+        }
+        const ilk = Array.isArray(satirlar) ? satirlar[0] : null
+        if (!ilk) {
+          // Kaynak durum tutmadı: satır okuma ile yazma arasında başka bir yazıcıyla ilerledi.
+          if (yazilan.length > 0) break // önceki adım yazıldı; o durum raporlanır
+          if (deneme === 0) {
+            const { data: taze } = await supabase
+              .from('venthub_orders')
+              .select('id, status, payment_status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
+              .eq('id', orderId)
+              .single()
+            if (taze) {
+              okunan = {
+                status: String(taze.status || 'pending').toLowerCase(),
+                payment_status: taze.payment_status ?? null,
+                shipped_at: taze.shipped_at ?? null,
+                delivered_at: taze.delivered_at ?? null,
+                tracking_number: taze.tracking_number ?? null,
+                tracking_url: taze.tracking_url ?? null,
+                carrier: taze.carrier ?? null,
+              }
+              yeniden = true
+              break
+            }
+          }
+          return await yoksay('STATE_CHANGED', okunan.status)
+        }
+        yazilan.push(String(adim.govde.status ?? 'takip'))
+        data = ilk as YazilanSatir
+      }
+      if (!yeniden) break
+    }
+    if (!data) return jsonResponse({ error: 'Update failed' }, { status: 500 })
+    // İki adımın yalnız ilki yazıldıysa cevap/kayıt GERÇEKLEŞEN son durumu söyler (unchanged yalnız hiç adım yazılmadıysa).
 
     // Insert event audit
     try {
@@ -301,7 +360,7 @@ Deno.serve(async (req: Request) => {
 
     // On delivered, send delivery notification (best effort)
     try {
-      if ((data?.status || '').toLowerCase() === 'delivered') {
+      if ((data?.status || '').toLowerCase() === 'delivered' && yazilan.includes('delivered')) {
         await fetch(`${SUPABASE_URL}/functions/v1/delivery-notification`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
@@ -316,7 +375,7 @@ Deno.serve(async (req: Request) => {
       }
     } catch {}
 
-    return jsonResponse({ ok: true, order_id: data?.id, shipping: data })
+    return jsonResponse({ ok: true, order_id: data?.id, status: data?.status })
   } catch (_e) {
     console.error('Shipping webhook error:', _e);
     return jsonResponse({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })

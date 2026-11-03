@@ -7,6 +7,7 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
+import { kargoIptaliKarari, kargolamaKarari, monotonIhlaliMi, type KargoSatiri } from '../_shared/siparis_gecis.ts'
 
 /**
  * PostgREST dizisinden ilk profil satırını RUNTIME kontrolüyle daraltır.
@@ -143,40 +144,69 @@ serve(async (req) => {
       throw tenantErr
     }
 
-    // Read current order status to allow implicit cancel (if already shipped and no carrier/tracking provided)
-    let isCurrentlyShipped = false
-    if (order_id) {
+    // Mevcut siparis satiri (status + shipped_at): hem ortulu iptal tespiti hem kargolama karari buna dayanir.
+    // ALT-131: okunamayan satir icin "ilk kargo" varsayilmaz (eskiden okuma basarisiz olunca status shipped'a yaziliyordu).
+    type SiparisOkuma = { durum: 'ok'; satir: KargoSatiri } | { durum: 'yok' } | { durum: 'hata' }
+    async function siparisSatiriOku(id: string): Promise<SiparisOkuma> {
       try {
-        const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at`, {
+        const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at,payment_status`, {
           headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
         })
-        if (cur.ok) {
-          const arr = await cur.json().then(x => Array.isArray(x) ? x : []).catch(() => [])
-          const row = arr[0]
-          if (row && (row.shipped_at !== null || String(row.status) === 'shipped')) {
-            isCurrentlyShipped = true
-          }
+        if (!cur.ok) return { durum: 'hata' }
+        const arr: unknown = await cur.json().catch(() => null)
+        if (!Array.isArray(arr)) return { durum: 'hata' }
+        const row: unknown = arr[0]
+        if (typeof row !== 'object' || row === null) return { durum: 'yok' }
+        const rec = row as Record<string, unknown>
+        return {
+          durum: 'ok',
+          satir: {
+            status: typeof rec.status === 'string' ? rec.status : null,
+            shipped_at: typeof rec.shipped_at === 'string' ? rec.shipped_at : null,
+            payment_status: typeof rec.payment_status === 'string' ? rec.payment_status : null,
+          },
         }
-      } catch {}
+      } catch {
+        return { durum: 'hata' }
+      }
     }
+    function jsonHata(http: number, kod: string, mesaj?: string): Response {
+      return new Response(JSON.stringify({ error: kod, ...(mesaj ? { message: mesaj } : {}) }), { status: http, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    }
+
+    const mevcut: SiparisOkuma = order_id ? await siparisSatiriOku(order_id) : { durum: 'yok' }
+    const isCurrentlyShipped = mevcut.durum === 'ok'
+      && (mevcut.satir.shipped_at !== null || mevcut.satir.status === 'shipped' || mevcut.satir.status === 'delivered')
 
     const wantCancel = cancel || (isCurrentlyShipped && (!carrier || !tracking_number))
 
-    // Cancel flow: revert shipping
+    // Cancel flow: kargo iptali. ALT-131: siparis durumu GERI SARILMAZ (eskiden status 'confirmed'e donuyor,
+    // teslim edilmis siparis de geri aliniyordu). Yalniz takip bilgisi temizlenir; status ve shipped_at kalir.
     if (wantCancel) {
       if (!order_id) {
         return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
       }
-      const updCancel = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
+      if (mevcut.durum === 'hata') return jsonHata(503, 'order_read_failed', 'Siparis okunamadi; kargo iptali yapilmadi')
+      if (mevcut.durum === 'yok') return jsonHata(404, 'order_not_found')
+      const karar = kargoIptaliKarari(mevcut.satir)
+      if (karar.islem === 'reddet') return jsonHata(karar.http, karar.kod, karar.mesaj)
+
+      // Karar satirina bagli yazim: arada teslim edildiyse (status != shipped) satir degismez.
+      const updCancel = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&status=eq.shipped`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({ carrier: null, tracking_number: null, tracking_url: null, shipped_at: null, status: 'confirmed' })
+        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        body: JSON.stringify({ carrier: null, tracking_number: null, tracking_url: null })
       })
       if (!updCancel.ok) {
         const txt = await updCancel.text()
+        if (monotonIhlaliMi(txt)) return jsonHata(409, 'INVALID_TRANSITION', 'Siparis durumu bu islemi kabul etmiyor')
         return new Response(JSON.stringify({ error: 'cancel_failed', status: updCancel.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
       }
-      return new Response(JSON.stringify({ ok: true, action: 'cancel' }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
+      const iptalSatirlari: unknown = await updCancel.json().catch(() => [])
+      if (!Array.isArray(iptalSatirlari) || iptalSatirlari.length === 0) {
+        return jsonHata(409, 'ORDER_STATE_CHANGED', 'Siparis durumu arada degisti; kargo iptali yapilmadi')
+      }
+      return new Response(JSON.stringify({ ok: true, action: 'cancel', status_unchanged: true }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
     // Validate for ship/update _path
@@ -240,20 +270,13 @@ serve(async (req) => {
       }
     }
 
-    // Fetch current order to decide first-time vs update (preserve shipped_at if already set)
-    let isFirstShip = true
-    try {
-      const cur = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=status,shipped_at`, {
-        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-      })
-      if (cur.ok) {
-        const arr = await cur.json().then(x => Array.isArray(x) ? x : []).catch(() => [])
-        const row = arr[0]
-        if (row && (row.shipped_at !== null || String(row.status) === 'shipped')) {
-          isFirstShip = false
-        }
-      }
-    } catch {}
+    // Kargolama karari: ALT-131 — pending/cancelled kargoya verilemez, okunamayan satir icin ilk kargo varsayilmaz.
+    const shipOkuma = await siparisSatiriOku(order_id)
+    if (shipOkuma.durum === 'hata') return jsonHata(503, 'order_read_failed', 'Siparis okunamadi; kargolama yapilmadi')
+    if (shipOkuma.durum === 'yok') return jsonHata(404, 'order_not_found')
+    const shipKarar = kargolamaKarari(shipOkuma.satir)
+    if (shipKarar.islem === 'reddet') return jsonHata(shipKarar.http, shipKarar.kod, shipKarar.mesaj)
+    const isFirstShip = shipKarar.islem === 'ilk_kargo'
 
     // Idempotency key (optional but recommended)
     async function computeIdemKey(action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null) {
@@ -273,15 +296,22 @@ serve(async (req) => {
       patchBody['shipped_at'] = new Date().toISOString()
       patchBody['status'] = 'shipped'
     }
-    const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
+    // Karar satirina bagli yazim: ilk kargoda yalniz confirmed/processing satir guncellenir (arada iptal/teslim olduysa 0 satir).
+    const shipFiltre = isFirstShip ? '&status=in.(confirmed,processing)&payment_status=eq.paid' : '&status=in.(confirmed,processing,shipped,delivered)'
+    const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&tenant_id=eq.${encodeURIComponent(tenantId)}${shipFiltre}`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=representation' },
       body: JSON.stringify(patchBody)
     })
 
     if (!upd.ok) {
       const txt = await upd.text()
+      if (monotonIhlaliMi(txt)) return jsonHata(409, 'INVALID_TRANSITION', 'Siparis durumu bu islemi kabul etmiyor')
       return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    }
+    const guncellenen: unknown = await upd.json().catch(() => [])
+    if (!Array.isArray(guncellenen) || guncellenen.length === 0) {
+      return jsonHata(409, 'ORDER_STATE_CHANGED', 'Siparis durumu arada degisti; kargolama yapilmadi')
     }
 
     // Record idempotency after successful update (best-effort)
