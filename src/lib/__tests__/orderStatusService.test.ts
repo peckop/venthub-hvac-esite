@@ -26,6 +26,32 @@ vi.mock('../audit', () => ({
   logAdminAction: vi.fn().mockResolvedValue(true)
 }))
 
+/** `venthub_orders` için okuma (select→eq→maybeSingle) + yazma (update→eq) sahte zinciri. */
+function mockOrders(current: { status: string; payment_status: string | null } | null) {
+  const mockEq = vi.fn().mockResolvedValue({ error: null })
+  const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
+  ;(supabase.from as import('vitest').Mock).mockImplementation((table: string) => {
+    if (table === 'venthub_orders') {
+      return {
+        update: mockUpdate,
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({ maybeSingle: vi.fn().mockResolvedValue({ data: current, error: null }) }),
+        }),
+      }
+    }
+    if (table === 'venthub_returns') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({ maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+        }),
+        insert: vi.fn().mockResolvedValue({ error: null }),
+      }
+    }
+    return {}
+  })
+  return { mockUpdate, mockEq }
+}
+
 describe('orderStatusService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -55,27 +81,8 @@ describe('orderStatusService', () => {
       expect(audit.logAdminAction).toHaveBeenCalled()
     })
 
-    it('should handle refunded status correctly', async () => {
-      const mockEq = vi.fn().mockResolvedValue({ error: null })
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
-      const mockFrom = vi.fn((table) => {
-        if (table === 'venthub_orders') return { update: mockUpdate }
-        if (table === 'venthub_returns') return {
-            select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockReturnValue({
-                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null })
-                })
-            }),
-            insert: vi.fn().mockResolvedValue({ error: null })
-        }
-        if (table === 'venthub_order_items') return {
-            select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({ data: [], error: null })
-            })
-        }
-        return {}
-      })
-      ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
+    it('tam iade: ödenmiş + kargolanmamış sipariş → cancelled + refunded', async () => {
+      const { mockUpdate } = mockOrders({ status: 'processing', payment_status: 'paid' })
 
       const result = await updateOrderStatus({
         orderId: 'order-1',
@@ -87,37 +94,61 @@ describe('orderStatusService', () => {
       expect(mockUpdate).toHaveBeenCalledWith({ status: 'cancelled', payment_status: 'refunded' })
     })
 
-    it('should handle partial_refunded status correctly', async () => {
-        const mockEq = vi.fn().mockResolvedValue({ error: null })
-        const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
-        const mockFrom = vi.fn((table) => {
-          if (table === 'venthub_orders') return { update: mockUpdate }
-          if (table === 'venthub_returns') return {
-              select: vi.fn().mockReturnValue({
-                  eq: vi.fn().mockReturnValue({
-                      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null })
-                  })
-              }),
-              insert: vi.fn().mockResolvedValue({ error: null })
-          }
-          if (table === 'venthub_order_items') return {
-              select: vi.fn().mockReturnValue({
-                  eq: vi.fn().mockResolvedValue({ data: [], error: null })
-              })
-          }
-          return {}
-        })
-        ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
+    it('kısmi iade sipariş durumunu DEĞİŞTİRMEZ (yalnız ödeme durumu yazılır)', async () => {
+      const { mockUpdate } = mockOrders({ status: 'processing', payment_status: 'paid' })
 
-        const result = await updateOrderStatus({
-          orderId: 'order-1',
-          newStatus: 'partial_refunded',
-          oldStatus: 'processing'
-        })
-
-        expect(result.ok).toBe(true)
-        expect(mockUpdate).toHaveBeenCalledWith({ status: 'cancelled', payment_status: 'partial_refunded' })
+      const result = await updateOrderStatus({
+        orderId: 'order-1',
+        newStatus: 'partial_refunded',
+        oldStatus: 'processing'
       })
+
+      expect(result.ok).toBe(true)
+      expect(mockUpdate).toHaveBeenCalledWith({ payment_status: 'partial_refunded' })
+    })
+
+    it('teslim sonrası iade: status delivered KALIR, yalnız payment_status refunded olur (ALT-131)', async () => {
+      const { mockUpdate } = mockOrders({ status: 'delivered', payment_status: 'paid' })
+
+      const result = await updateOrderStatus({
+        orderId: 'order-1',
+        newStatus: 'refunded',
+        oldStatus: 'delivered'
+      })
+
+      expect(result.ok).toBe(true)
+      expect(mockUpdate).toHaveBeenCalledTimes(1)
+      const payload = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+      expect(payload).toEqual({ payment_status: 'refunded' })
+      expect('status' in payload, 'teslim edilmiş siparişin status alanı yazılmamalı').toBe(false)
+    })
+
+    it('ÖDENMEMİŞ siparişe iade yazılmaz — veritabanına hiç dokunulmaz (ALT-131)', async () => {
+      const { mockUpdate } = mockOrders({ status: 'confirmed', payment_status: 'pending' })
+
+      const result = await updateOrderStatus({
+        orderId: 'order-1',
+        newStatus: 'refunded',
+        oldStatus: 'confirmed'
+      })
+
+      expect(result.ok).toBe(false)
+      expect(result.error).toContain('yalnız ödenmiş siparişe')
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('sipariş okunamazsa iade yazılmaz', async () => {
+      const { mockUpdate } = mockOrders(null)
+
+      const result = await updateOrderStatus({
+        orderId: 'order-1',
+        newStatus: 'refunded',
+        oldStatus: 'confirmed'
+      })
+
+      expect(result.ok).toBe(false)
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
 
       /*
         SÖZLEŞME DEĞİŞTİ (2026-08-15, T058-VH). Eski davranış: BİLİNMEYEN her statü
@@ -167,19 +198,86 @@ describe('orderStatusService', () => {
   })
 
   describe('syncOrderFromReturn', () => {
-    it('should map return status to order status correctly', async () => {
-      const mockEq = vi.fn().mockResolvedValue({ error: null })
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
-      const mockFrom = vi.fn((table) => {
-        if (table === 'venthub_orders') return { update: mockUpdate }
-        return {}
-      })
-      ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
+    it('iade (refunded) kargolanmamış ödenmiş siparişte cancelled + refunded yazar', async () => {
+      const { mockUpdate } = mockOrders({ status: 'confirmed', payment_status: 'paid' })
 
       const result = await syncOrderFromReturn('order-1', 'refunded')
 
       expect(result.ok).toBe(true)
       expect(mockUpdate).toHaveBeenCalledWith({ status: 'cancelled', payment_status: 'refunded' })
+    })
+
+    it('iade (refunded) TESLİM EDİLMİŞ siparişte status delivered KALIR (ALT-131)', async () => {
+      const { mockUpdate } = mockOrders({ status: 'delivered', payment_status: 'paid' })
+
+      const result = await syncOrderFromReturn('order-1', 'refunded')
+
+      expect(result.ok).toBe(true)
+      expect(mockUpdate).toHaveBeenCalledWith({ payment_status: 'refunded' })
+    })
+
+    it('iade (refunded) ödemesi zaten refunded olan teslim edilmiş siparişi bozmaz (tekrar yazım aynı değer)', async () => {
+      const { mockUpdate } = mockOrders({ status: 'delivered', payment_status: 'refunded' })
+
+      const result = await syncOrderFromReturn('order-1', 'refunded')
+
+      expect(result.ok).toBe(true)
+      expect(mockUpdate).toHaveBeenCalledWith({ payment_status: 'refunded' })
+    })
+
+    it('iade (refunded) ÖDENMEMİŞ siparişe yazılmaz — uyarı döner, siparişe dokunulmaz', async () => {
+      const { mockUpdate } = mockOrders({ status: 'confirmed', payment_status: 'pending' })
+
+      const result = await syncOrderFromReturn('order-1', 'refunded')
+
+      expect(result.ok).toBe(true)
+      expect(result.warning).toContain('yalnız ödenmiş siparişe')
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('received: teslim edilmiş sipariş iptal EDİLMEZ (delivered cikissiz) — yazım yok', async () => {
+      const { mockUpdate } = mockOrders({ status: 'delivered', payment_status: 'paid' })
+
+      const result = await syncOrderFromReturn('order-1', 'received')
+
+      expect(result).toEqual({ ok: true })
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('cancelled (iade talebi iptali): teslim edilmiş siparişi iptal etmez', async () => {
+      const { mockUpdate } = mockOrders({ status: 'delivered', payment_status: 'paid' })
+
+      const result = await syncOrderFromReturn('order-1', 'cancelled')
+
+      expect(result).toEqual({ ok: true })
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('rejected: teslim edilmiş sipariş zaten delivered → yazım yok', async () => {
+      const { mockUpdate } = mockOrders({ status: 'delivered', payment_status: 'paid' })
+
+      const result = await syncOrderFromReturn('order-1', 'rejected')
+
+      expect(result).toEqual({ ok: true })
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('rejected: izinli ilerleme (shipped → delivered) yazılır', async () => {
+      const { mockUpdate } = mockOrders({ status: 'shipped', payment_status: 'paid' })
+
+      await syncOrderFromReturn('order-1', 'rejected')
+
+      expect(mockUpdate).toHaveBeenCalledWith({ status: 'delivered' })
+    })
+
+    it('rejected: izinsiz geçiş (confirmed → delivered) yazılmaz, uyarı döner', async () => {
+      const { mockUpdate } = mockOrders({ status: 'confirmed', payment_status: 'paid' })
+
+      const result = await syncOrderFromReturn('order-1', 'rejected')
+
+      expect(result.ok).toBe(true)
+      expect(result.warning).toContain('confirmed → delivered')
+      expect(mockUpdate).not.toHaveBeenCalled()
     })
 
     it('should do nothing for unknown return status', async () => {
@@ -219,11 +317,8 @@ describe('orderStatusService', () => {
     })
 
     it.each(['received', 'cancelled', 'rejected'])('should NOT write payment_status for %s (no money moved)', async (returnStatus) => {
-      const mockEq = vi.fn().mockResolvedValue({ error: null })
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
-      ;(supabase.from as import("vitest").Mock).mockImplementation((table: string) =>
-        table === 'venthub_orders' ? { update: mockUpdate } : {},
-      )
+      // kargolanmış sipariş: üç dalda da izinli bir status yazımı olur (shipped→cancelled / shipped→delivered)
+      const { mockUpdate } = mockOrders({ status: 'shipped', payment_status: 'paid' })
 
       await syncOrderFromReturn('order-1', returnStatus as string)
 
@@ -236,11 +331,7 @@ describe('orderStatusService', () => {
     })
 
     it('should write payment_status ONLY on the refunded branch (money actually moved)', async () => {
-      const mockEq = vi.fn().mockResolvedValue({ error: null })
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
-      ;(supabase.from as import("vitest").Mock).mockImplementation((table: string) =>
-        table === 'venthub_orders' ? { update: mockUpdate } : {},
-      )
+      const { mockUpdate } = mockOrders({ status: 'confirmed', payment_status: 'paid' })
 
       await syncOrderFromReturn('order-1', 'refunded')
 
@@ -252,13 +343,8 @@ describe('orderStatusService', () => {
     })
 
     it('should return error if update fails', async () => {
-      const mockEq = vi.fn().mockResolvedValue({ error: new Error('Update failed') })
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
-      const mockFrom = vi.fn((table) => {
-        if (table === 'venthub_orders') return { update: mockUpdate }
-        return {}
-      })
-      ;(supabase.from as import("vitest").Mock).mockImplementation(mockFrom)
+      const { mockEq } = mockOrders({ status: 'shipped', payment_status: 'paid' })
+      mockEq.mockResolvedValue({ error: new Error('Update failed') })
 
       const result = await syncOrderFromReturn('order-1', 'received')
 
@@ -428,10 +514,16 @@ describe('restoreStockForOrder — kanıta bağlı RPC (T052-VH)', () => {
   function mockOrderUpdate() {
     const eq = vi.fn().mockResolvedValue({ error: null })
     const update = vi.fn().mockReturnValue({ eq })
-    ;(supabase.from as import('vitest').Mock).mockImplementation(() => ({
+    ;(supabase.from as import('vitest').Mock).mockImplementation((table: string) => ({
       update,
       select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({ maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+        eq: vi.fn().mockReturnValue({
+          // siparişin kendisi: ödenmiş + kargolanmış (iade yazımı ALT-131'de mevcut durumu okur)
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: table === 'venthub_orders' ? { status: 'shipped', payment_status: 'paid' } : null,
+            error: null,
+          }),
+        }),
       }),
       insert: vi.fn().mockResolvedValue({ error: null }),
     }))

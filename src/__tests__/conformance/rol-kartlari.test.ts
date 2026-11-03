@@ -751,7 +751,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     const diskMetni = (ad: string): string =>
       fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
     const veri = uretici.isKurallariOku(KOK)
-    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'HARITA', 'KATALOG', 'URUN'])
+    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'HARITA', 'KATALOG', 'MEVZUAT', 'URUN'])
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       for (const [m, etiket] of [[metin, `${ad} (üretilen)`], [diskMetni(ad), `${ad} (disk)`]] as Array<[string, string]>) {
         if (veri[ad]) {
@@ -782,7 +782,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
 
   it('HRT-71: yol kapsamlı işaretçi kural dosyaları üreticiyle diskte bire bir, paths taşır, 2 KB altında, sahipsiz dosya yok', () => {
     const uretilen = uretici.uretYolKurallari()
-    expect(Object.keys(uretilen).sort(), 'yollar alanı olan altı rol').toEqual(['altyapi.md', 'arac.md', 'geo-seo.md', 'harita.md', 'katalog.md', 'urun.md'])
+    expect(Object.keys(uretilen).sort(), 'yollar alanı olan yedi rol').toEqual(['altyapi.md', 'arac.md', 'geo-seo.md', 'harita.md', 'katalog.md', 'mevzuat.md', 'urun.md'])
     const dizin = path.join(KOK, '.claude', 'rules')
     for (const [dosya, metin] of Object.entries(uretilen)) {
       const disk = fs.readFileSync(path.join(dizin, dosya), 'utf8').replace(/\r\n/g, '\n')

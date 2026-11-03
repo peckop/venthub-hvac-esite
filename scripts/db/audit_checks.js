@@ -248,8 +248,9 @@ async function run() {
             { sig: 'process_order_stock_reduction(text)', type: 'sensitive' },
             { sig: 'reverse_inventory_batch(uuid, integer)', type: 'sensitive' },
             { sig: 'reverse_inventory_batch(uuid)', type: 'sensitive' },
-            { sig: 'set_stock(uuid, integer, text, uuid)', type: 'admin' },
-            { sig: 'set_stock(uuid, integer, text)', type: 'admin' },
+            // ALT-135 (2026-11-03): istemci çağıranı yok; anon+authenticated kapalı, yalnız service_role.
+            { sig: 'set_stock(uuid, integer, text, uuid)', type: 'sensitive' },
+            { sig: 'set_stock(uuid, integer, text)', type: 'sensitive' },
             { sig: 'set_user_admin_role(uuid, text)', type: 'admin' },
             { sig: 'set_user_role(uuid, text)', type: 'sensitive' },
             { sig: 'update_inventory_settings(integer)', type: 'sensitive' },

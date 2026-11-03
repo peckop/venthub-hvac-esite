@@ -76,6 +76,11 @@
       "dogrulanacak": false,
       "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
     },
+    "docs/standards/cikti-kodlama-maske-standard.md": {
+      "sahip": "EDGE",
+      "dogrulanacak": true,
+      "dayanak": "OPS-211 (güvenlik karnesi 2026-11 kök 3): konu edge çıktısı, edge-function-security-standard ile aynı sahip; EDGE ilk dokunuşta teyit eder"
+    },
     "docs/standards/ci-runner-install-standard.md": {
       "sahip": "ALTYAPI",
       "dogrulanacak": false,

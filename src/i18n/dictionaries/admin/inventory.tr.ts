@@ -202,6 +202,8 @@ export const inventory = {
       // ADM-6: eskiden negatif miktar sessizce 0'a, ondalık sessizce tamsayıya kırpılıyordu.
       qtyOutOfRange: 'Miktar 0 ile 1.000.000 arasında bir tam sayı olmalı',
       invalidSku: 'SKU yalnız büyük harf, rakam ve tire içerebilir',
+      // ADM-7: aynı SKU iki kez geçince stok farkı iki kez uygulanıyordu.
+      duplicateSku: 'Bu SKU dosyada birden fazla satırda geçiyor; hiçbiri uygulanmadı',
       skuNotMatched: 'SKU eşleşmedi',
       unknown: 'Bilinmeyen hata',
       rowsSkippedDetail: '{{count}} satır atlandı. Örnek: {{examples}}',
