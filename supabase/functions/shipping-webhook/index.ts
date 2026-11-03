@@ -28,7 +28,7 @@ async function hmacValid(secret: string, raw: string, signatureHeader: string): 
     )
     const sigBytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw))
     const computed = btoa(String.fromCharCode(...new Uint8Array(sigBytes)))
-    // Accept base64 or hex signatures; normalize
+    // Yalnız BASE64 imza kabul edilir (hex kabul EDİLMEZ); yalnız `sha256=` öneki normalize edilir
     const normalize = (s: string) => s.trim().replace(/^sha256=/i, '')
     const given = normalize(signatureHeader)
     return given === computed
@@ -216,8 +216,6 @@ Deno.serve(async (req: Request) => {
     if (cozum.tur === 'durum_yok' && cozum.neden === 'bilinmeyen') {
       console.warn('[shipping-webhook] tanınmayan taşıyıcı durumu, status yazılmadı', { order_id: orderId, status_raw: p.status })
     }
-    const karar = kargoYazimKarari({ status: curStatus, payment_status: current.payment_status ?? null }, cozum)
-
     async function olayKaydet(statusMapped: string) {
       try {
         const bodyHash = await sha256Base64(raw)
@@ -237,11 +235,12 @@ Deno.serve(async (req: Request) => {
       } catch {}
     }
 
-    // Yoksayılan olay: 200 (taşıyıcı sonsuz yeniden denemesin), olay kaydı + alarm günlüğü; siparişe HİÇBİR şey yazılmaz.
-    if (karar.islem === 'yoksay') {
-      console.error('[shipping-webhook] olay yoksayıldı', { code: karar.neden, order_id: orderId, status: curStatus, status_raw: p.status })
-      await olayKaydet(curStatus)
-      return jsonResponse({ ok: true, order_id: current.id, ignored: karar.neden, unchanged: true })
+    // Cevap SINIRLI: yalnız { ok, order_id, status }. payment_status, tenant_id, müşteri bilgisi cevaba girmez;
+    // yoksayma nedeni yalnız log'da ve olay kaydında (status_mapped `ignored:<neden>`), cevapta genel `ignored: true`.
+    async function yoksay(neden: string, durumu: string) {
+      console.error('[shipping-webhook] olay yoksayıldı', { code: neden, order_id: orderId, status: durumu, status_raw: p.status })
+      await olayKaydet(`ignored:${neden}`)
+      return jsonResponse({ ok: true, order_id: orderId, status: durumu, ignored: true, unchanged: true })
     }
 
     const parseDate = (s?: string) => {
@@ -252,58 +251,101 @@ Deno.serve(async (req: Request) => {
     const SELECT_KOLONLAR = 'id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name'
     type YazilanSatir = Record<string, unknown> & { status?: string }
 
-    // Yazım planı: adım yoksa tek (takip) yazımı; adım varsa her biri kendi kaynak durumuna bağlı.
-    const plan: Array<{ kaynak: string; govde: Record<string, unknown> }> = []
-    if (karar.islem === 'yalniz_takip') {
-      plan.push({ kaynak: curStatus, govde: { ...patch } })
-    } else {
-      karar.adimlar.forEach((adim, i) => {
-        const govde: Record<string, unknown> = i === 0 ? { ...patch } : {}
-        govde.status = adim.hedef
-        if (adim.hedef === 'shipped' && !current.shipped_at) govde.shipped_at = parseDate(p.shipped_at) || new Date().toISOString()
-        if (adim.hedef === 'delivered' && !current.delivered_at) govde.delivered_at = parseDate(p.delivered_at) || new Date().toISOString()
-        plan.push({ kaynak: adim.kaynak, govde })
-      })
+    // Okunan sipariş durumu; kaynak durum koşulu tutmazsa (satır arada ilerledi) BİR KEZ yeniden okunur ve karar
+    // taze durumla tekrar verilir — aksi halde ilerleyen yarışta teslim sinyali (tekrar gelmeyebilir) kaybolurdu.
+    let okunan = {
+      status: curStatus,
+      payment_status: current.payment_status ?? null,
+      shipped_at: current.shipped_at ?? null,
+      delivered_at: current.delivered_at ?? null,
+      tracking_number: current.tracking_number ?? null,
+      tracking_url: current.tracking_url ?? null,
+      carrier: current.carrier ?? null,
     }
-
-    // Etkisiz istek (takip alanları aynı, status adımı yok): yazmadan çık.
-    const etkisiz = karar.islem === 'yalniz_takip' &&
-      (patch.tracking_number == null || patch.tracking_number === current.tracking_number) &&
-      (patch.tracking_url == null || patch.tracking_url === current.tracking_url) &&
-      (patch.carrier == null || patch.carrier === current.carrier)
-    if (etkisiz) {
-      await olayKaydet(curStatus)
-      return jsonResponse({ ok: true, order_id: current.id, shipping: current, unchanged: true })
-    }
-
     let data: YazilanSatir | null = null
-    for (const adim of plan) {
-      const { data: satirlar, error } = await supabase
-        .from('venthub_orders')
-        .update(adim.govde)
-        .eq('id', orderId)
-        .eq('status', adim.kaynak)
-        .select(SELECT_KOLONLAR)
-      if (error) {
-        if (tetikReddiMi(error)) {
-          // Veritabanı monotonluk tetiği reddetti: fail-closed yazım (satır değişmedi), fail-safe cevap (200),
-          // aksi halde taşıyıcı aynı olayı sonsuza kadar yeniden dener.
-          console.error('[shipping-webhook] monotonluk tetiği reddetti', { code: 'MONOTON_REJECTED', order_id: orderId, status: curStatus, status_raw: p.status })
-          await olayKaydet(curStatus)
-          return jsonResponse({ ok: true, order_id: current.id, ignored: 'MONOTON_REJECTED', unchanged: true })
+    const yazilan: string[] = []
+
+    for (let deneme = 0; deneme < 2; deneme++) {
+      const karar = kargoYazimKarari({ status: okunan.status, payment_status: okunan.payment_status }, cozum)
+      // Yoksayılan olay: 200 (taşıyıcı sonsuz yeniden denemesin), olay kaydı + günlük; siparişe HİÇBİR şey yazılmaz.
+      if (karar.islem === 'yoksay') return await yoksay(karar.neden, okunan.status)
+
+      // Yazım planı: adım yoksa tek (takip) yazımı; adım varsa her biri kendi kaynak durumuna bağlı.
+      const plan: Array<{ kaynak: string; govde: Record<string, unknown> }> = []
+      if (karar.islem === 'yalniz_takip') {
+        plan.push({ kaynak: okunan.status, govde: { ...patch } })
+      } else {
+        karar.adimlar.forEach((adim, i) => {
+          const govde: Record<string, unknown> = i === 0 ? { ...patch } : {}
+          govde.status = adim.hedef
+          if (adim.hedef === 'shipped' && !okunan.shipped_at) govde.shipped_at = parseDate(p.shipped_at) || new Date().toISOString()
+          if (adim.hedef === 'delivered' && !okunan.delivered_at) govde.delivered_at = parseDate(p.delivered_at) || new Date().toISOString()
+          plan.push({ kaynak: adim.kaynak, govde })
+        })
+      }
+
+      // Etkisiz istek (takip alanları aynı, status adımı yok): yazmadan çık.
+      const etkisiz = karar.islem === 'yalniz_takip' &&
+        (patch.tracking_number == null || patch.tracking_number === okunan.tracking_number) &&
+        (patch.tracking_url == null || patch.tracking_url === okunan.tracking_url) &&
+        (patch.carrier == null || patch.carrier === okunan.carrier)
+      if (etkisiz) {
+        await olayKaydet(okunan.status)
+        return jsonResponse({ ok: true, order_id: current.id, status: okunan.status, unchanged: true })
+      }
+
+      let yeniden = false
+      for (const adim of plan) {
+        const { data: satirlar, error } = await supabase
+          .from('venthub_orders')
+          .update(adim.govde)
+          .eq('id', orderId)
+          .eq('status', adim.kaynak)
+          .select(SELECT_KOLONLAR)
+        if (error) {
+          if (tetikReddiMi(error)) {
+            // Veritabanı monotonluk tetiği reddetti: fail-closed yazım (reddedilen adım yazılmadı), fail-safe cevap (200),
+            // aksi halde taşıyıcı aynı olayı sonsuza kadar yeniden dener. Önceki adım yazıldıysa o durum raporlanır.
+            console.error('[shipping-webhook] monotonluk tetiği reddetti', { code: 'MONOTON_REJECTED', order_id: orderId, status: okunan.status, status_raw: p.status })
+            if (yazilan.length === 0) return await yoksay('MONOTON_REJECTED', okunan.status)
+            break
+          }
+          const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
+          return jsonResponse({ error: msg }, { status: 500 })
         }
-        const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
-        return jsonResponse({ error: msg }, { status: 500 })
+        const ilk = Array.isArray(satirlar) ? satirlar[0] : null
+        if (!ilk) {
+          // Kaynak durum tutmadı: satır okuma ile yazma arasında başka bir yazıcıyla ilerledi.
+          if (yazilan.length > 0) break // önceki adım yazıldı; o durum raporlanır
+          if (deneme === 0) {
+            const { data: taze } = await supabase
+              .from('venthub_orders')
+              .select('id, status, payment_status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
+              .eq('id', orderId)
+              .single()
+            if (taze) {
+              okunan = {
+                status: String(taze.status || 'pending').toLowerCase(),
+                payment_status: taze.payment_status ?? null,
+                shipped_at: taze.shipped_at ?? null,
+                delivered_at: taze.delivered_at ?? null,
+                tracking_number: taze.tracking_number ?? null,
+                tracking_url: taze.tracking_url ?? null,
+                carrier: taze.carrier ?? null,
+              }
+              yeniden = true
+              break
+            }
+          }
+          return await yoksay('STATE_CHANGED', okunan.status)
+        }
+        yazilan.push(String(adim.govde.status ?? 'takip'))
+        data = ilk as YazilanSatir
       }
-      const ilk = Array.isArray(satirlar) ? satirlar[0] : null
-      if (!ilk) {
-        // Satır okuma ile yazma arasında başka bir yazıcıyla ilerledi (kaynak durum tutmadı): zararsız.
-        await olayKaydet(curStatus)
-        return jsonResponse({ ok: true, order_id: current.id, ignored: 'STATE_CHANGED', unchanged: true })
-      }
-      data = ilk as YazilanSatir
+      if (!yeniden) break
     }
     if (!data) return jsonResponse({ error: 'Update failed' }, { status: 500 })
+    // İki adımın yalnız ilki yazıldıysa cevap/kayıt GERÇEKLEŞEN son durumu söyler (unchanged yalnız hiç adım yazılmadıysa).
 
     // Insert event audit
     try {
@@ -325,7 +367,7 @@ Deno.serve(async (req: Request) => {
 
     // On delivered, send delivery notification (best effort)
     try {
-      if ((data?.status || '').toLowerCase() === 'delivered' && plan.some((a) => a.govde.status === 'delivered')) {
+      if ((data?.status || '').toLowerCase() === 'delivered' && yazilan.includes('delivered')) {
         await fetch(`${SUPABASE_URL}/functions/v1/delivery-notification`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
@@ -340,7 +382,7 @@ Deno.serve(async (req: Request) => {
       }
     } catch {}
 
-    return jsonResponse({ ok: true, order_id: data?.id, shipping: data })
+    return jsonResponse({ ok: true, order_id: data?.id, status: data?.status })
   } catch (_e) {
     console.error('Shipping webhook error:', _e);
     return jsonResponse({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })

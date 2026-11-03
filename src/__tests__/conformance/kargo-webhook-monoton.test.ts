@@ -75,6 +75,9 @@ let patchOncesi: (() => void) | null = null
 /** true ise sahte DB, ALT-131 tetiği gibi izin dışı status geçişini VH409 ile reddeder. */
 let tetikAktif = true
 let zorlaHata: { code?: string; message: string } | null = null
+/** verilirse hata yalnız bu koşulu sağlayan yazımlara uygulanır (ör. yalnız ikinci adım). */
+let zorlaHataKosul: ((govde: Record<string, unknown>) => boolean) | null = null
+let olayDurumlari: string[] = []
 
 const IZIN: Record<string, string[]> = {
   pending: ['confirmed', 'cancelled'],
@@ -120,13 +123,21 @@ function sahteIstemci() {
         eq(k: string, v: unknown) { durum.filtreler.push([k, v]); return b },
         update(g: Record<string, unknown>) { durum.op = 'update'; durum.govde = g; return b },
         insert(g: Record<string, unknown>) {
-          if (tablo === 'shipping_webhook_events') olaylar.push(String(g.event_id))
+          if (tablo === 'shipping_webhook_events') {
+            olaylar.push(String(g.event_id))
+            olayDurumlari.push(String(g.status_mapped))
+          }
           return Promise.resolve({ data: null, error: null })
         },
         then(coz: (v: unknown) => unknown) { return Promise.resolve(calistir()).then(coz) },
       }
       const uyar = (r: Record<string, unknown>) => durum.filtreler.every(([k, v]) => r[k] === v)
       function calistir(): { data: unknown; error: unknown } {
+        if (tablo === 'shipping_webhook_events') {
+          // tekrar kontrolü: daha önce işlenmiş event_id var mı
+          const varMi = durum.filtreler.some(([k, v]) => k === 'event_id' && olaylar.includes(String(v)))
+          return { data: varMi ? [{ event_id: durum.filtreler[0][1] }] : [], error: null }
+        }
         if (tablo !== 'venthub_orders') return { data: [], error: null }
         if (durum.op === 'select') {
           const bulunan = uyar(kayit()) ? [structuredClone(satir)] : []
@@ -137,7 +148,7 @@ function sahteIstemci() {
         patchOncesi?.()
         const eslesti = uyar(kayit())
         patchlar.push({ govde: durum.govde, filtreler: durum.filtreler, guncellenen: eslesti ? 1 : 0 })
-        if (zorlaHata) return { data: null, error: zorlaHata }
+        if (zorlaHata && (zorlaHataKosul?.(durum.govde) ?? true)) return { data: null, error: zorlaHata }
         if (!eslesti) return { data: [], error: null }
         const yeniStatus = durum.govde.status
         if (tetikAktif && typeof yeniStatus === 'string' && yeniStatus !== satir.status && !(IZIN[satir.status] ?? []).includes(yeniStatus)) {
@@ -237,6 +248,8 @@ beforeEach(() => {
   satir = yeniSatir()
   patchlar = []
   olaylar = []
+  olayDurumlari = []
+  zorlaHataKosul = null
   bildirimler = 0
   patchOncesi = null
   tetikAktif = true
@@ -290,7 +303,8 @@ describe('INV-KARGO-WEBHOOK-1 · handler: iptal çıkışsız, sözlük dışı 
     satir = yeniSatir({ status: 'cancelled' })
     const r = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-1', carrier: 'yurtici' })
     expect(r.http).toBe(200)
-    expect(r.json.ignored).toBe('ORDER_CANCELLED')
+    expect(r.json.ignored).toBe(true)
+    expect(olayDurumlari).toEqual([])
     expect(yazildi()).toBe(false)
     expect(satir.status).toBe('cancelled')
     expect(satir.tracking_number).toBeNull()
@@ -372,14 +386,14 @@ describe('INV-KARGO-WEBHOOK-1 · handler: yalnız ileri, delivered iki adım', (
   it('ödemesi paid olmayan sipariş taşıyıcı olayıyla shipped OLMAZ', async () => {
     satir = yeniSatir({ status: 'confirmed', payment_status: 'pending' })
     const r = await cagir(yeni, { status: 'in_transit' })
-    expect(r.json.ignored).toBe('ORDER_NOT_PAID')
+    expect(r.json.ignored).toBe(true)
     expect(yazildi()).toBe(false)
   })
 
   it('pending sipariş: yoksayılır', async () => {
     satir = yeniSatir({ status: 'pending', payment_status: 'pending' })
     const r = await cagir(yeni, { status: 'delivered' })
-    expect(r.json.ignored).toBe('ORDER_NOT_CONFIRMED')
+    expect(r.json.ignored).toBe(true)
     expect(yazildi()).toBe(false)
   })
 
@@ -391,24 +405,90 @@ describe('INV-KARGO-WEBHOOK-1 · handler: yalnız ileri, delivered iki adım', (
 })
 
 describe('INV-KARGO-WEBHOOK-1 · yarış ve tetik: fail-closed yazım, fail-safe cevap', () => {
-  it('okuma ile yazma arasında satır ilerlerse 0 satır güncellenir; 200 + STATE_CHANGED', async () => {
+  it('okuma ile yazma arasında araya İPTAL girerse: yeniden okunur, iptal görülür, 0 satır yazılır, 200 + ignored:true', async () => {
     patchOncesi = () => {
       satir = { ...satir, status: 'cancelled' } // araya iptal girdi
       patchOncesi = null
     }
-    const r = await cagir(yeni, { status: 'in_transit' })
+    const r = await cagir(yeni, { status: 'in_transit' }, { 'x-event-id': 'evt-y' })
     expect(r.http).toBe(200)
-    expect(r.json.ignored).toBe('STATE_CHANGED')
+    expect(r.json.ignored).toBe(true)
     expect(satir.status).toBe('cancelled')
     expect(patchlar[0].guncellenen).toBe(0)
+    expect(olayDurumlari).toEqual(['ignored:ORDER_CANCELLED'])
+  })
+
+  it('İLERİ yarış: confirmed iken delivered gelir, araya admin shipped yazar → teslim sinyali KAYBOLMAZ (delivered + bildirim bir kez)', async () => {
+    patchOncesi = () => {
+      satir = { ...satir, status: 'shipped', shipped_at: '2026-11-03T09:00:00.000Z' } // admin araya girdi
+      patchOncesi = null
+    }
+    const r = await cagir(yeni, { status: 'delivered' })
+    expect(r.http).toBe(200)
+    expect(satir.status).toBe('delivered')
+    expect(satir.delivered_at).not.toBeNull()
+    expect(satir.shipped_at).toBe('2026-11-03T09:00:00.000Z') // admin'in damgası ezilmedi
+    expect(r.json.status).toBe('delivered')
+    expect(bildirimler).toBe(1)
+  })
+
+  it('yeniden deneme EN ÇOK bir kez: durum yine tutmazsa yoksayılır, döngü yok', async () => {
+    let kez = 0
+    patchOncesi = () => {
+      kez++
+      satir = { ...satir, status: kez === 1 ? 'processing' : 'cancelled' } // her yazımdan önce satır kayar
+    }
+    const r = await cagir(yeni, { status: 'in_transit' })
+    expect(r.http).toBe(200)
+    expect(r.json.ignored).toBe(true)
+    expect(patchlar.length).toBeLessThanOrEqual(2)
   })
 
   it('veritabanı tetiği (VH409) reddederse webhook 500 DEĞİL 200 döner (taşıyıcı sonsuz yeniden denemez)', async () => {
     zorlaHata = { code: 'VH409', message: 'ALT131_MONOTON: siparis durumu confirmed -> delivered gecisi yasak' }
     const r = await cagir(yeni, { status: 'in_transit' }, { 'x-event-id': 'evt-1' })
     expect(r.http).toBe(200)
-    expect(r.json.ignored).toBe('MONOTON_REJECTED')
+    expect(r.json.ignored).toBe(true)
     expect(olaylar).toContain('evt-1')
+    expect(olayDurumlari).toEqual(['ignored:MONOTON_REJECTED'])
+  })
+
+  it('iki adımda 1. adım yazılır, 2. adım reddedilir: cevap ve kayıt GERÇEK son durumu (shipped) söyler, unchanged değil, bildirim yok', async () => {
+    zorlaHata = { code: 'VH409', message: 'ALT131_MONOTON: x' }
+    zorlaHataKosul = (g) => g.status === 'delivered'
+    const r = await cagir(yeni, { status: 'delivered' }, { 'x-event-id': 'evt-2' })
+    expect(r.http).toBe(200)
+    expect(satir.status).toBe('shipped')
+    expect(r.json.status).toBe('shipped')
+    expect(r.json.unchanged).toBeUndefined()
+    expect(r.json.ignored).toBeUndefined()
+    expect(olayDurumlari).toEqual(['shipped'])
+    expect(bildirimler).toBe(0)
+  })
+
+  it('aynı x-event-id tekrar gelirse yazmadan döner (duplicate)', async () => {
+    await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-7' }, { 'x-event-id': 'evt-3' })
+    const ilkPatch = patchlar.length
+    const r = await cagir(yeni, { status: 'delivered' }, { 'x-event-id': 'evt-3' })
+    expect(r.http).toBe(200)
+    expect(r.json.duplicate).toBe(true)
+    expect(patchlar).toHaveLength(ilkPatch)
+    expect(satir.status).toBe('shipped')
+  })
+
+  it('cevap SINIRLI: yalnız ok/order_id/status; payment_status, tenant_id, müşteri bilgisi sızmaz', async () => {
+    const r = await cagir(yeni, { status: 'in_transit' })
+    expect(Object.keys(r.json).sort()).toEqual(['ok', 'order_id', 'status'])
+    const yoksayilan = await cagir(yeni, { status: 'delivered' }) // shipped → delivered normal; yoksayılan için iptal
+    expect(Object.keys(yoksayilan.json)).not.toContain('shipping')
+    satir = yeniSatir({ status: 'cancelled' })
+    const y = await cagir(yeni, { status: 'in_transit' })
+    expect(Object.keys(y.json).sort()).toEqual(['ignored', 'ok', 'order_id', 'status', 'unchanged'])
+    expect(y.json.ignored).toBe(true) // neden cevapta yok
+    const metin = JSON.stringify([r.json, yoksayilan.json, y.json])
+    for (const sizinti of ['payment_status', 'tenant_id', 'customer_email', 'musteri@example.com', 'ORDER_CANCELLED']) {
+      expect(metin).not.toContain(sizinti)
+    }
   })
 
   it('ilgisiz veritabanı hatası hâlâ 500 (gerçek arıza gizlenmez)', async () => {

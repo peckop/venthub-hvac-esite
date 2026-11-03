@@ -9,7 +9,8 @@
 //     kabul etmez, UPDATE düşer ve webhook 500 verirdi; bilinmeyen kelime HAM yazılıyordu;
 //   · `confirmed → delivered` gibi atlayışlar rütbeyle geçiyordu.
 // Veritabanı tetiği (ALT-131, `trg_orders_monoton_durum`) bu geçişleri artık reddeder (SQLSTATE VH409);
-// bu modül YAZMADAN ÖNCE aynı kararı verir, tetik ikinci savunma hattıdır.
+// bu modül YAZMADAN ÖNCE aynı kararı verir. Tetik ayrı bir PR'la (#2208) gelir: bu değişiklik tek başına
+// UYGULAMA kapısıyla güvenlidir (okunan duruma bağlı koşullu yazım); tetik canlıya girince ikinci hat olur.
 //
 // Geçiş tablosu (ALT-131 ile aynı): confirmed→{processing,shipped,cancelled}, processing→{shipped,cancelled},
 // shipped→{delivered,cancelled}. Webhook yalnız İLERİ taşıma yapar: shipped ve delivered. İptal ve
