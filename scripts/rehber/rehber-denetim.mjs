@@ -226,7 +226,12 @@ export function konuTerimleri(md) {
  * Sabit liste ile başlar; brands tablosu ve kaynak dizini seri adlarından genişletilir (genişletme = bu diziye ekleme + test).
  * Uzun ad önce gelir (CLIBOS-TR, CLIBOS'tan önce eşleşsin).
  */
-export const MARKA_SERI_ADLARI = ['Casals', 'ENKELFAN', 'KENTALFAN', 'CLIBOS-TR', 'CLIBOS', 'CIKSTORM', 'Nicotra', 'Systemair', 'Soler & Palau', 'Ziehl-Abegg', 'ebm-papst']
+export const MARKA_SERI_ADLARI = [
+  // markalar (sitede aile kimliği taşıyanlar: Avens, Casals, Danfoss, Nicotra/Gebhardt, Vortice) ve sitede satılmayan ama anılabilecek büyük markalar
+  'Casals', 'Vortice', 'Nicotra', 'Gebhardt', 'Danfoss', 'Avens', 'Systemair', 'Soler & Palau', 'Ziehl-Abegg', 'ebm-papst',
+  // seri adları (sitede aile adı olarak geçenler). "Radon" gaz adı olarak da geçtiği için listeye ALINMAZ (yanlış pozitif).
+  'ENKELFAN', 'KENTALFAN', 'CLIBOS-TR', 'CLIBOS', 'CIKSTORM', 'LINEO', 'VORT', 'VLT',
+]
 /** Tüm yazıda marka + seri adı toplamı en çok bu kadar olabilir (genel rehber türü). */
 export const MARKA_TOPLAM_TAVAN = 8
 /** "Genel rehber" türü bu başlıkla tanınır; marka ve seri adları yalnız bu bölümde ve `## Kaynaklar`da serbesttir. */
