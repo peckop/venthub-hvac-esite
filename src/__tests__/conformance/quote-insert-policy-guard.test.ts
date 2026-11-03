@@ -158,8 +158,13 @@ describe('INV-QUOTE-3 · teklif INSERT politikaları durumu çiviler', () => {
         'listeyi bilerek güncelle. Bu ratchet, 3. testin ölçemediği durumun ' +
         '(şartın bir `or` dalında kalması) tek bekçisidir.',
     ).toEqual([
+      // ALT-142 (20261103160000): admin + müşteri INSERT politikaları tek birleşik politikada toplandı
+      // (multiple_permissive_policies). Birleşikler `is_admin_user()` ve `'requested'` çivisini birlikte taşır;
+      // eski dört ad tarihsel migration'larda durduğu için listede kalır (kapı DROP'u görmez).
+      'quote_items_insert',
       'quote_items_insert_admin',
       'quote_items_insert_own_requested',
+      'quotes_insert',
       'quotes_insert_admin_draft',
       'quotes_insert_own_requested',
     ])
