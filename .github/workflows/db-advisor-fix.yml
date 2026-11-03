@@ -3,6 +3,12 @@ name: DB Advisor Fixes
 on:
   workflow_dispatch:
 
+# Güvenlik karnesi 2026-11 C8 (OPS-211): en dar izin. Akış yalnız depoyu okur ve DB'ye bağlanır; GitHub API'ye
+# yazmaz. Depo PUBLIC: `permissions:` yazılınca `contents: read` ZORUNLU.
+# Bekçi: INV-IS-AKISI-IZIN-1 (src/__tests__/conformance/is-akisi-izin-blogu.test.ts).
+permissions:
+  contents: read
+
 jobs:
   apply_fixes:
     runs-on: ubuntu-latest

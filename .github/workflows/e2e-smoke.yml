@@ -40,6 +40,14 @@ on:
     branches: [master]
   workflow_dispatch:
 
+# Güvenlik karnesi 2026-11 C8 (OPS-211): en dar izin, `ci.yml` ile aynı ölçü. Depo PUBLIC: `permissions:` yazılınca
+# `contents: read` ZORUNLU. `pull-requests: read`: elle tetiklemede `gh pr list` (merge-ref çözümü, aşağıda).
+# Önbellek ve artefakt adımları GITHUB_TOKEN izni değil koşucu belirteci kullanır; ek izin istemez.
+# Bekçi: INV-IS-AKISI-IZIN-1 (src/__tests__/conformance/is-akisi-izin-blogu.test.ts).
+permissions:
+  contents: read
+  pull-requests: read
+
 concurrency:
   group: e2e-smoke-${{ github.ref }}
   cancel-in-progress: true

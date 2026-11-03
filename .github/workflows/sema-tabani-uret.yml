@@ -126,6 +126,14 @@ jobs:
           fi
           echo "doküm dolu — artefakt olarak yuklenebilir."
 
+      # ⭐SIR TARAMASI YÜKLEMEDEN ÖNCE (güvenlik karnesi 2026-11 S3, OPS-211).
+      # Depo PUBLIC: artefakt da herkese açık ve döküm sonra PR ile depoya girer. Şema dökümü fonksiyon
+      # gövdelerini taşır; gövdeye gömülü bir anahtar (JWT, webhook sırrı, parolalı bağlantı dizesi)
+      # dökümle dışarı çıkardı. Bulgu varsa çıkış 1, dosya okunamazsa çıkış 2: ikisi de yüklemeyi DURDURUR.
+      # Çıktıda değer YOK, yalnız imza adı ve sayı. Sıra bekçisi: INV-SEMA-TABAN-1.
+      - name: SIR TARAMASI (fail-closed; bulgu varsa artefakt yuklenmez)
+        run: node scripts/security/dokum-sir-taramasi.cjs cikti/public_schema.sql canli-sayilar.txt
+
       - name: Artefakt yukle
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

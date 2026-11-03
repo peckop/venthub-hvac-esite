@@ -37,6 +37,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
     reactStrictMode: true,
     typedRoutes: true,
+    // Güvenlik karnesi 2026-11 C4 (OPS-211): `X-Powered-By: Next.js` başlığı çerçeveyi her yanıtta ilan
+    // ediyordu. Bekçi: INV-CSP-RAPOR-1 (src/app/api/csp-rapor/__tests__/basliklar.test.ts).
+    poweredByHeader: false,
     // ALT-38f: anahtar kapalıyken BOŞ nesne (anahtar eklenmez); açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds`.
     ...e2eHizliDerlemeAyari(E2E_TIP_LINT_ATLA),
     images: {
@@ -227,6 +230,12 @@ const nextConfig = {
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
                     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
                     {
+                        // C1 (OPS-211): CSP `report-to csp-ucu` adının karşılığı. Göreli adres yanıtın adresine göre
+                        // çözülür; önizleme dağıtımı kendi ucuna raporlar, canlıya değil.
+                        key: 'Reporting-Endpoints',
+                        value: 'csp-ucu="/api/csp-rapor"',
+                    },
+                    {
                         // ALT-57 (OPS-104 K-038) · cetvel: docs/standards/csp-standard.md §8 ·
                         // bekçi: INV-PERMISSIONS-POLICY-1
                         // (src/__tests__/conformance/permissions-policy-baslik.test.ts).
@@ -252,8 +261,10 @@ const nextConfig = {
                         // aşağıdaki origin'lerin eksik olması bugün GÖRÜNMEZ — ama `Content-Security-Policy`
                         // anahtarına geçildiği an eksik olan her origin SESSİZCE ölür (konsolda blok,
                         // panelde veri yok, sebep görünmez). Enforce'a geçiş AYRI karardır; cetvel §5.
+                        // Rapor ucu (güvenlik karnesi 2026-11 C1, OPS-211; cetvel §9): `report-uri` eski tarayıcılar,
+                        // `report-to csp-ucu` Reporting API içindir; ikisi de /api/csp-rapor'a gider.
                         key: 'Content-Security-Policy-Report-Only',
-                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.iyzipay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://raw.githubusercontent.com https://raw.githack.com https://*.google-analytics.com https://api.pwnedpasswords.com https://*.iyzipay.com; frame-src 'self' https://www.youtube.com https://*.cloudflarestream.com https://*.iyzipay.com; frame-ancestors 'none'; form-action 'self' https://*.iyzipay.com; base-uri 'self'; object-src 'none'"
+                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.iyzipay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://raw.githubusercontent.com https://raw.githack.com https://*.google-analytics.com https://api.pwnedpasswords.com https://*.iyzipay.com; frame-src 'self' https://www.youtube.com https://*.cloudflarestream.com https://*.iyzipay.com; frame-ancestors 'none'; form-action 'self' https://*.iyzipay.com; base-uri 'self'; object-src 'none'; report-uri /api/csp-rapor; report-to csp-ucu"
                     },
                 ],
             },
