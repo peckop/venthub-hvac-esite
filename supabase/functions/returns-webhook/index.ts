@@ -12,21 +12,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { canCarrierTransition } from '../_shared/return_transitions.ts'
+import { hmacImzaGecerli, timingSafeEquals } from '../_shared/sabit_zaman.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), { status: init.status || 200, headers: { 'content-type': 'application/json; charset=utf-8', ...(init.headers||{}) } })
 }
 
-async function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
-  try {
-    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
-    const sigBytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw))
-    const computed = btoa(String.fromCharCode(...new Uint8Array(sigBytes)))
-    const given = signatureHeader.trim().replace(/^sha256=/i, '')
-    return given === computed
-  } catch {
-    return false
-  }
+// İmza ve token karşılaştırması SABİT ZAMANLI (karne 2026-11 K4, cetvel §3.5 · E17).
+// Eskiden `given === computed` ve `tok === token` idi.
+function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
+  return hmacImzaGecerli(secret, raw, signatureHeader)
 }
 
 function mapReturnStatus(input?: string): { status?: string; setReceived?: boolean } {
@@ -79,7 +74,7 @@ Deno.serve(async (req: Request) => {
     const tok = req.headers.get('x-webhook-token') || ''
     let ok = false
     if (secret && sign) ok = await hmacValid(secret, raw, sign)
-    if (!ok && token && tok && tok === token) ok = true
+    if (!ok && token && tok && timingSafeEquals(tok, token)) ok = true
     if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
 
     // Enforce replay guard - mandatory timestamp header
