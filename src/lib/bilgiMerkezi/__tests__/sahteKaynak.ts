@@ -121,6 +121,11 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     takmaAd: async (tur, slug) => takma[`${tur}:${slug}`] ?? null,
     marka: (slug) => slug === 'vortice',
     aileKarti: async (slug) => (aileler.has(slug) ? { slug, ad: aileler.get(slug) as string } : null),
+    // URN-151: görünen ad slug'dan türetilen sentetik ad; kısa metin yalnız TR'de dolu (canlıda EN çoğu kategoride boş).
+    kategoriKarti: async (slug, dil) =>
+      kategoriler[slug]
+        ? { slug, ad: `${dil === 'en' ? 'Category' : 'Kategori'} ${slug}`, aciklama: dil === 'en' ? '' : `${slug} kategorisinin kısa metni.` }
+        : null,
     ...ek,
   }
 }

@@ -49,7 +49,7 @@ function Icindekiler({ ogeler, baslik }: { ogeler: YaziSayfasi['icindekiler']; b
 }
 
 export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
-  const { dil, yazi, ayrismis, hrefler, icindekiler, okumaSuresi, urunKartlari, ilgiliYazilar } = sayfa
+  const { dil, yazi, ayrismis, hrefler, icindekiler, okumaSuresi, urunKartlari, kategoriKartlari, ilgiliYazilar } = sayfa
   const dict = dil === 'en' ? en : tr
   const t = (anahtar: string) => getDictValue(dict, anahtar)
   const listeHref = bilgiMerkeziListeHref(dil)
@@ -126,6 +126,30 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
                 çelişkili (DS 66ch/16px ↔ Menü v18 720px/17px); TASARIM geri aldı (c64cafc4, 2026-09-25),
                 karar DS geçişinde token düzeyinde uygulanır — burada tek seferlik sınıf açma. */}
             <RehberGovdesi bloklar={ayrismis.bloklar} hrefler={hrefler} />
+
+            {/* URN-151: kategori kartları (markasız, R3.3) aile kartlarından ÖNCE: genelden özele. Boş liste görünmez. */}
+            {kategoriKartlari.length > 0 && (
+              <section aria-labelledby="ilgili-kategoriler" className="mt-16">
+                <h2 id="ilgili-kategoriler" className="text-2xl font-bold tracking-tight text-primary-navy">
+                  {t('bilgiMerkezi.yazi.kategorilerBaslik')}
+                </h2>
+                <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {kategoriKartlari.map((k) => (
+                    <li key={k.href}>
+                      <Link
+                        href={k.href}
+                        className={`block h-full rounded-hvac-sm border border-light-gray p-5 transition-colors hover:border-brand-cyan-ink ${odakSinifi}`}
+                      >
+                        <span className="block font-semibold text-primary-navy">{k.ad}</span>
+                        {/* Kısa metin yoksa (EN'de çoğu kategori) satır hiç basılmaz; Türkçe metin yedeği konmaz. */}
+                        {k.aciklama ? <span className="mt-2 block text-sm text-industrial-gray line-clamp-2">{k.aciklama}</span> : null}
+                        <span className="mt-2 block text-sm text-brand-cyan-ink">{t('bilgiMerkezi.yazi.kategoriDugme')}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {urunKartlari.length > 0 && (
               <section aria-labelledby="ilgili-urunler" className="mt-16">

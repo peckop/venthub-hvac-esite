@@ -300,6 +300,8 @@ export const en: typeof tr = {
       icindekiler: 'Contents',
       urunlerBaslik: 'Related product families',
       urunDugme: 'View family',
+      kategorilerBaslik: 'Related product categories',
+      kategoriDugme: 'View category',
       ilgiliBaslik: 'Related articles',
       teklifBaslik: 'Get a quote for your project',
       teklifAciklama: 'Describe your needs in the contact form; we will prepare a quote for the right product.',

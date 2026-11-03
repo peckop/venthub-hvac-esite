@@ -409,6 +409,8 @@ export const tr = {
       icindekiler: 'İçindekiler',
       urunlerBaslik: 'İlgili ürün aileleri',
       urunDugme: 'Aileyi incele',
+      kategorilerBaslik: 'İlgili ürün kategorileri',
+      kategoriDugme: 'Kategoriyi incele',
       ilgiliBaslik: 'İlgili yazılar',
       teklifBaslik: 'Projeniz için teklif alın',
       teklifAciklama: 'İhtiyacınızı iletişim formundan yazın; uygun ürün için teklif hazırlayalım.',
