@@ -70,7 +70,7 @@ function geciciTaban(icerik: string): string {
   return p
 }
 
-/** Tabandaki 11 bilinen borcu fikstür satırına çevirir (gerçek ölçümün aynası). */
+/** Tabandaki 9 bilinen borcu fikstür satırına çevirir (gerçek ölçümün aynası). */
 function tabandanSatirlar(): Satir[] {
   const t = JSON.parse(fs.readFileSync(TABAN, 'utf8')) as { girdiler: Record<string, number> }
   return Object.entries(t.girdiler).map(([k, sarma]) => {
@@ -105,7 +105,7 @@ describe('INV-RLS-SARMA-1: RLS politikalarinda ic ice sarma', () => {
     expect(fs.existsSync(BETIK), 'kapi betigi yok').toBe(true)
     expect(fs.existsSync(TABAN), 'taban dosyasi yok — bilinen borc kaydi kaybolmus').toBe(true)
     const t = JSON.parse(fs.readFileSync(TABAN, 'utf8')) as { girdiler: Record<string, number> }
-    expect(Object.keys(t.girdiler).length, 'taban BOS — onarim indi mi? indiyse bu kol guncellenmeli').toBe(11)
+    expect(Object.keys(t.girdiler).length, 'taban BOS — onarim indi mi? indiyse bu kol guncellenmeli').toBe(9)
   })
 
   /**
@@ -133,7 +133,7 @@ describe('INV-RLS-SARMA-1: RLS politikalarinda ic ice sarma', () => {
     expect(r.kod, 'saglikli politikalar kapiyi kizartti').toBe(0)
   })
 
-  it('BILINEN BORC tabanda: 11 politika kirmizi VERMEZ (master kilitlenmesin)', () => {
+  it('BILINEN BORC tabanda: 9 politika kirmizi VERMEZ (master kilitlenmesin)', () => {
     const r = kostur(['--fikstur', fikstur([...tabandanSatirlar(), ...saglikliDolgu(12)])])
     expect(r.stdout, 'bilinen borc bildirilmedi — okuyan neyin susturuldugunu goremez').toContain('BILINEN BORC')
     expect(r.kod, 'tabandaki borc kapiyi kizartti — butun filo kilitlenirdi').toBe(0)
@@ -156,7 +156,7 @@ describe('INV-RLS-SARMA-1: RLS politikalarinda ic ice sarma', () => {
    * yeniden şişebilir ve taban onu örter — taban, kapının kendi fail-open kapısı olurdu.
    */
   it('ANTI-CURUME: gercekle eslesmeyen TABAN satiri KIRMIZI verir', () => {
-    // Tabandaki 11'in yalnız biri hâlâ şişmiş; kalan 10 onarılmış gibi davranıyor.
+    // Tabandaki 9'un yalnız biri hâlâ şişmiş; kalan 8 onarılmış gibi davranıyor.
     const r = kostur(['--fikstur', fikstur([tabandanSatirlar()[0], ...saglikliDolgu(22)])])
     expect(r.kod, 'bayat taban satiri kapidan GECTI — taban kapiyi korlestirirdi').toBe(1)
     expect(r.stderr).toContain('TABAN SATIRI artik gercekle eslesmiyor')
