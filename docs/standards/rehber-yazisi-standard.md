@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.13 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.14 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -78,6 +78,12 @@ kapı getirmez; iki basamağın kapısı yoktur (aday). Ayrıntı metni GEO-SEO'
 yeni Y numarası); numara kesinleşince R10.4'teki satır güncellenir. Aynı sürümde GEO-SEO'nun B8 ve B10 bildirim ve yedek
 paragrafı (OPS-215, kopya OPS'ta) B8 ve B10 satırlarına işlendi: BLOG B8'de adres, PR numarası ve ana terimi, B10 bitince
 "canlı, adres, lastmod" satırını GEO-SEO'ya yazar; yedek kuralın tam metni Y2.2'dedir (GEO-SEO, PR #2221).
+
+**v0.14 (2026-11-03, BLG-35, OPS-216 kararı):** yeni **R3.3 Genel rehber: makale tarzı**: markasız genel tanım ve ilke tarafsız
+kaynaktan akıcı; marka ve seri en sonda tek kısa "VentHub'da hangi seriler var" bölümü; SSS'de en çok bir VentHub sorusu; atıf
+paragraf sonunda, "katalog der" kalıbı yok; seri ayrıntısı yazıda değil aile ve ürün sayfasında. Kapsam: plug fan (BLG-33) ve
+fan çeşitleri (BLG-36, R5.5 revizyonu). Tetik: BLG-33 v1f'in makale değil katalog özeti gibi okunması (GEO-SEO SEO-79, Recep).
+Kırmızı kural getirmez; kapı uyumu AÇIK (R3.3 sonu: paragraf sonu atıf, fiyat başlığı).
 
 ---
 
@@ -386,6 +392,31 @@ yeni rehberlere (en çok 3) doğrudan bağlanır. Bağlantı sunucuda çizilir (
 Search Console "Google tarafından bilinmiyor" dedi, 09-29'da aramada yazı değil yalnız liste sayfası
 çıktı. Yazıya sitenin içinden bağlanan TEK sayfa listeydi (ana sayfa 0, kategori 0, aileler 0). Bu satır
 v0.4'ten beri "URUN'un sayfa işi" diye yazılıydı ama emre bağlanmamıştı — yapılmadı.
+
+### R3.3 Genel rehber: makale tarzı (v0.14, BLG-35, OPS-216 kararı, Recep 2026-11-03)
+
+**Kapsam.** Bir ürün grubunu ya da fan çeşidini anlatan genel rehber ("plug fan nedir", "fan çeşitleri nelerdir"). Hesaplayıcıyla
+birleşen yazı (R2.5) ve mevzuatı anlatan yazı bu bölümün dışında kendi kalıbını korur; bu bölüm yalnız "yazı katalog ya da
+marka metni gibi okunuyor" sorununu çözer. **Niçin:** BLG-33 taslağı (v1f) doğruydu ama makale değil katalog özeti gibi okunuyordu:
+girişte markasız genel tanım yoktu, gövdenin çoğu iki serinin tablo satırlarıydı, "katalogda yazılı değildir" kalıbı 8 kez
+geçiyordu, SSS gövdeyi tekrarlıyordu (GEO-SEO ölçümü, SEO-79; Recep: "ilk yazılar makale tarzıydı, bu katalog ağırlıklı").
+
+| # | Kural |
+|---|---|
+| 1 | **Sıra:** doğrudan cevap (markasız genel tanım) → nasıl çalışır / ilke → türler ve seçim ölçütleri → kullanım → **en sonda tek kısa "VentHub'da hangi seriler var" bölümü** (seri adı, bir cümlelik nitelik, aile ve ürün sayfası bağlantısı `vh:aile/…`). Seri ayrıntısı (çap, sıcaklık, koruma ve model sayısı tabloları) yazıya girmez; aile ve ürün sayfasındadır |
+| 2 | **Kaynak ayrımı:** tanım ve ilke tarafsız kaynaktan yazılır (standart, kamu ya da akademik kılavuz; R2.2 erişim sınıfı yazılı). Üretici kataloğu yalnız seri bölümündeki seri olgusunda kullanılır. Tarafsız kaynak bulunamayan tanım yazılmaz ya da "üretici anlatımı" etiketiyle sınırlanır (R5.1 kapsam alanı) |
+| 3 | **Anlatım:** akıcı makale; her cümleyi "katalog der / yazar / belirtir" ile bitirmek yasak. Atıf paragrafın sonunda toplanır; iddia tablosu (R5.1) cümle düzeyinde kalır, metinde atıf yoğunluğu azalır, iddia tablosu azalmaz |
+| 4 | **Tablo:** seriden bağımsız ilke ya da seçim tablosu (örnek: türler ve ayırt edici nitelik). Seri karşılaştırma tablosu bu tür yazıda zorunlu değildir; R3'ün "en az bir tablo" şartı ilke tablosuyla karşılanır |
+| 5 | **SSS:** gövdeyi tekrarlamaz; en çok bir soru VentHub'a ilişkindir (serilerimiz, teklif); kalan sorular konunun yan soruları (R1 arama önerileri). Sayı aralığı R3 tablosundaki gibi 5–8 kalır (kapı `SSS_ARALIGI`) |
+| 6 | **Sınırlar:** "kaynakta yazılı değil" türü olumsuz iddialar metne dağılmaz; bir "Sınırlar" kutusunda ya da bölüm sonunda toplanır (R5.1 olumsuz iddia kuralı geçerli) |
+| 7 | **Revizyon:** yayındaki yazı bu kalıba geçerken R5.5 revizyonu uygulanır; adres ve slug değişmez, `guncellemeTarihi` güncellenir |
+
+**Kapı uyumu (AÇIK, OPS kararı):** (a) `ATIFSIZ-IDDIA` kapısı cümle düzeyinde çalışır; "atıf paragraf sonunda" kuralı, kapı paragraf
+sonu atfını kabul edene kadar yazılarda cümle sonu atfıyla birlikte uygulanır (iddia sayılı, olumsuz ya da mevzuat cümlesinde atıf
+cümle içinde kalır, diğerlerinde paragraf sonuna toplanır). (b) Zorunlu başlık `## Fiyatı belirleyen etkenler` birebir kalır
+(kapı `kalipDenetle`); hub kalıbı (v0.12) yalnız çeşit ve kategori sıralayan hub yazısında geçerlidir, makale tarzı genel rehberde
+bölüm kaynaklı etkenleri anlatır, kaynak yoksa R3 Fiyat satırındaki dürüst söylem kalır. (c) GEO-SEO'nun "başlık Teklif için hangi bilgiler gerekir?" önerisi
+kapıyı değiştirmeyi gerektirir; OPS karar verir. Kırmızı kural ve yeni kapı getirmez; kapıyı ARAÇ yazar.
 
 ## R4 — Yasaklar
 
