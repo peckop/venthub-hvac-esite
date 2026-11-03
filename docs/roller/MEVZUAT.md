@@ -12,6 +12,12 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır (hangi rol hangisini kullanır: YETENEK atar).
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
+## Amaç
+Amaç ve Nasıl: `docs/roller/MEVZUAT-gorevler.md`.
+
+## Düzenli görevler
+- 4 görev, tetiğe bağlı 1: `docs/roller/MEVZUAT-gorevler.md`.
+
 ## Dosyalar
 docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.
 

@@ -589,7 +589,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('(OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
       expect(metin, ad).toContain('(OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde')
       expect(metin, ad).toContain("Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok)")
-      expect(metin, ad).toContain('Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok) (OPS hariç)')
+      expect(metin, ad).toContain('Sorumlu yine "ben" kalır, Sırada sütununa "<DEPARTMAN ADI> işini bekliyor" yaz (bekleyen departmanın adı yazılır, "başka departman" denmez; departman değilse neyi beklediği yazılır: CI, Recep onayı, dış kişi) (OPS hariç)')
       expect(metin, ad).toContain("İşi kalmayan departman bunu Recep'e değil OPS'a yazar")
     }
   })

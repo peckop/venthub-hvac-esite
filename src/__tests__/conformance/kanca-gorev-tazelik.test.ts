@@ -84,11 +84,11 @@ describe('görev verisi ayrıştırma', () => {
     ])
   })
 
-  it('gerçek rol-gorevleri.json: 12 rolde öz-değerlendirme + SEO haftalık, katalog baskı, filo raporu, skill ölçümü', () => {
+  it('gerçek rol-gorevleri.json: 13 rolde öz-değerlendirme + SEO haftalık, katalog baskı, filo raporu, skill ölçümü', () => {
     const gercek = gerek(path.join(KOK, 'scripts', 'belge', 'rol-gorevleri.json'))
     const g = z.gorevleriOku(gercek)
     const adlar = Object.values(g).flat().map((x) => x.ad)
-    expect(adlar.filter((a) => a === 'öz-değerlendirme').length).toBe(12)
+    expect(adlar.filter((a) => a === 'öz-değerlendirme').length).toBe(13)
     for (const a of ['SEO haftalık', 'katalog baskı', 'filo raporu', 'skill ölçümü']) expect(adlar).toContain(a)
     expect(g.KATALOG?.find((x) => x.ad === 'katalog baskı')?.esik).toBe(30)
   })
