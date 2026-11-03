@@ -174,7 +174,7 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
       'hüküm "Şimdi compact yapabilirsin" ya da "X bitince söyleyeceğim"',
       'Yarım iş: yok — <kısa>',
       'Yarım iş: var — <ne>, <ne zaman güvenli>',
-      'başka bir departmanın işini bekliyor',
+      '<DEPARTMAN ADI> işini bekliyor',
     ]
     const kancaParcalari = [
       'Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir.',
