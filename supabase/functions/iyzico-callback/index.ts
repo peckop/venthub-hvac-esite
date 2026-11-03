@@ -15,6 +15,15 @@ import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '.
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { odemeSiparisleEslesiyorMu, type SiparisSatiri } from '../_shared/odeme_eslesme.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
+import {
+  BASARI_ONCESI,
+  basariYazilabilirMi,
+  debugBirlestir,
+  kosulFiltresi,
+  RET_ONCESI,
+  retYazilabilirMi,
+  type YazimSatiri,
+} from '../_shared/odeme_yazim_kapisi.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -116,7 +125,10 @@ Deno.serve(async (req) => {
     // ⭐EŞLEŞME KAPISININ GİRDİSİ — AYNI SORGUDA ÇEKİLİR, İKİNCİ İSTEK YOK (REC-355).
     // Niçin burada: tenant türetmesi zaten bu satırı okuyor. Eşleşme alanlarını ayrı bir
     // istekle çekmek, aynı satırı iki kez okuyup ARADA DEĞİŞEBİLECEĞİ bir pencere açar.
-    let siparisSatiri: SiparisSatiri | null = null
+    let siparisSatiri: (SiparisSatiri & YazimSatiri) | null = null
+    // ⭐İSTEĞİN KENDİ TOKEN'I — aşağıdaki DB fallback'inden ÖNCE saklanır (ALT-131). Ret yazımı
+    // yalnız bu token siparişin kendi token'ıysa yapılır; fallback'le gelen token zaten siparişinkidir.
+    const istekToken: string | undefined = token || undefined
     if (orderId || conversationId) {
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
@@ -125,7 +137,9 @@ Deno.serve(async (req) => {
           const filter = orderId
             ? `id=eq.${encodeURIComponent(orderId)}`
             : `conversation_id=eq.${encodeURIComponent(conversationId as string)}`
-          const alanlar = 'id,tenant_id,payment_token,conversation_id,total_amount,currency,payment_status'
+          // `status` ve `payment_debug` ALT-131 yazım kapısı için: mevcut durum sorulmadan yazılmaz,
+          // önceki debug (iade defteri) ezilmez.
+          const alanlar = 'id,tenant_id,payment_token,conversation_id,total_amount,currency,payment_status,status,payment_debug'
           const got = await fetch(`${su}/rest/v1/venthub_orders?${filter}&select=${alanlar}`, {
             headers: { Authorization: `Bearer ${sk}`, apikey: sk }
           })
@@ -136,7 +150,7 @@ Deno.serve(async (req) => {
           tenantId = decision.tenantId
           tenantIsDerived = decision.source === 'resource_row'
           if (row?.payment_token) orderPaymentToken = String(row.payment_token)
-          if (row) siparisSatiri = row as SiparisSatiri
+          if (row) siparisSatiri = row as SiparisSatiri & YazimSatiri
         }
       } catch {}
     }
@@ -332,12 +346,19 @@ Deno.serve(async (req) => {
     // denemeyi kapatırdı (CLAUDE.md §11: durumlar monoton). Süresi dolan rezervasyonları
     // `release-expired-reservations` zaten `payment_status='failed'` ile temizliyor —
     // aynı sözlük, aynı kolon, tutarlı.
-    async function patchOrder(fields: { status?: string; payment_status?: string; payment_token?: string }) {
+    // ⭐ALT-131: PATCH artık (1) satırın MEVCUT durumunu filtreye koyar — okuma ile yazma arasında
+    // satır ilerlediyse 0 satır güncellenir; (2) `payment_debug`'ı birleştirir, ezmez (iade defteri
+    // ve iadenin okuduğu `raw` korunur); (3) kaç satır yazıldığını döndürür — `resp.ok` tek başına
+    // yazım kanıtı DEĞİL, PostgREST 0 satırlık PATCH'e de 200 döner.
+    async function patchOrder(
+      fields: { status?: string; payment_status?: string; payment_token?: string },
+      kosul: string,
+    ): Promise<{ ok: boolean; status: number | null; satir: number }> {
       const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
       const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
       const filter = filterById || filterByConv;
-      if (!filter) return null;
-      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}${orderTenantFilter}`, {
+      if (!filter) return { ok: false, status: null, satir: 0 };
+      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}${orderTenantFilter}${kosul}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
@@ -345,23 +366,38 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
-        body: JSON.stringify({ ...fields, payment_debug: debugInfo }),
+        body: JSON.stringify({ ...fields, payment_debug: debugBirlestir(siparisSatiri?.payment_debug, debugInfo) }),
       });
-      return resp;
+      const donen = await resp.json().catch(() => null);
+      return { ok: resp.ok, status: resp.status, satir: Array.isArray(donen) ? donen.length : 0 };
     }
 
     let updateOk = false;
     let _stockResult: unknown = null;
-    if (paid) {
+    // Başarı dalının yan etkileri (kupon kullanımı, stok, sepet) YALNIZ bu çağrı satırı gerçekten
+    // ilerlettiyse koşar. İyzico'nun POST'u ile tarayıcı dönüş sayfası aynı ödemeyi iki kez bildirir;
+    // ikinci çağrı kupon kullanımını ikinci kez artırmamalı.
+    let gecisYapildi = false;
+    const basariKarari = basariYazilabilirMi(siparisSatiri);
+    if (paid && !basariKarari.yaz) {
+      // Ödeme gerçek ve bu siparişe ait, ama satır artık 'pending' değil (zaten ödendi, kargolandı,
+      // iade edildi). Geri sarılmaz (kural 11). Cevap yine 'success': ödeme başarılıdır.
+      console.warn(`[iyzico-callback] odeme zaten islenmis ya da siparis ilerlemis; yazilmadi (${basariKarari.sebep}).`);
+    } else if (paid) {
       // Yaşam döngüsü: 'confirmed' · Ödeme: 'paid'. Tek PATCH, deneme-yanılma yok.
       // ⭐`payment_token` ARTIK BURADA YAZILIYOR — doğrulamadan ÖNCE değil (REC-355).
       // Aynı PATCH'e binmesi bilinçli: ayrı bir istek, birinin geçip diğerinin düştüğü
       // bir ara durum üretir. Denetim izi tek atomik yazımda tamamlanır.
-      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid', payment_token: token });
-      updateOk = !!(r && r.ok);
-      if (!updateOk) {
-        console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r ? r.status : 'yok'}) — para cekildi, siparis guncellenmedi.`);
+      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid', payment_token: token }, kosulFiltresi(BASARI_ONCESI));
+      updateOk = r.ok && r.satir > 0;
+      gecisYapildi = updateOk;
+      if (!r.ok) {
+        console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r.status ?? 'yok'}) — para cekildi, siparis guncellenmedi.`);
+      } else if (r.satir === 0) {
+        console.warn('[iyzico-callback] siparis okuma ile yazma arasinda ilerledi; yazilmadi (kural 11).');
       }
+    }
+    if (gecisYapildi) {
       
       // T137-VH (2026-08-20): BURADAKI ATESLE-UNUT ONAY E-POSTASI CAGRISI KALDIRILDI.
       //
@@ -478,7 +514,8 @@ Deno.serve(async (req) => {
 
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
-              const updatedDebugInfo = { ...debugInfo, stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
+              // ALT-131: burası da birleştirir — önceki anahtarlar (iade defteri) ezilmez.
+              const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, { ...debugInfo, stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson });
               await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
                 method: 'PATCH',
                 headers: {
@@ -577,6 +614,9 @@ Deno.serve(async (req) => {
           }
         }
       } catch { /* best-effort */ }
+    }
+    if (paid) {
+      // Başarı dalı yukarıda bitti (yazıldı ya da kural 11 gereği yazılmadı).
     } else if (odemeBasarili && !eslesme.gecti) {
       // ⛔EŞLEŞMEYEN ÖDEME: SİPARİŞE HİÇBİR ŞEY YAZILMAZ — `payment_status='failed'` DAHİL.
       //
@@ -594,10 +634,18 @@ Deno.serve(async (req) => {
       console.error('[iyzico-callback] ESLESMEYEN ODEME — siparise YAZILMADI, alarm kaydedildi.');
     } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
       // Yalnız ödeme durumu yazılır; `status` 'pending' kalır (tekrar deneme açık).
-      const r = await patchOrder({ payment_status: 'failed' });
-      updateOk = !!(r && r.ok);
-      if (!updateOk) {
-        console.error(`[iyzico-callback] BASARISIZ odeme isaretlenemedi (status=${r ? r.status : 'yok'}) — siparis 'pending' gorunmeye devam edecek.`);
+      // ⛔ALT-131: ret, eşleşme kapısından geçmiyordu. Saldırgan KENDİ reddedilen ödemesinin token'ını
+      // kurbanın `orderId`'siyle POST edince kurbanın ödenmiş siparişi 'failed' oluyordu. Artık iki şart:
+      // token siparişin kendi token'ı ve sipariş hâlâ 'pending'/'pending'. İkisi PATCH filtresinde de var.
+      const retKarari = retYazilabilirMi(siparisSatiri, istekToken ?? token);
+      if (!retKarari.yaz) {
+        console.warn(`[iyzico-callback] odeme reddi siparise YAZILMADI (${retKarari.sebep}).`);
+      } else {
+        const r = await patchOrder({ payment_status: 'failed' }, kosulFiltresi(RET_ONCESI));
+        updateOk = r.ok && r.satir > 0;
+        if (!r.ok) {
+          console.error(`[iyzico-callback] BASARISIZ odeme isaretlenemedi (status=${r.status ?? 'yok'}) — siparis 'pending' gorunmeye devam edecek.`);
+        }
       }
     }
 
