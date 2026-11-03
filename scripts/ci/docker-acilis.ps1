@@ -7,7 +7,7 @@
 #   Remove-Item / del / fsutil aynı hatayı verir; Test-Path YANLIŞ NEGATİF verir (dosya "yok" görünür).
 #   Çalışan yol: wsl --shutdown + run klasörünü [IO.Directory]::Move ile kenara taşı + boş run aç.
 #
-# NE YAPAR (oturum açılışında, zamanlanmış görevden):
+# NE YAPAR (oturum açılışında, HKCU Run kaydından):
 #   1. Docker Desktop zaten çalışıyorsa HİÇBİR ŞEYE dokunmaz (açık kapsayıcıları korur), çıkar.
 #   2. run içinde öğe varsa (kanıt: GetFileSystemEntries, Test-Path değil): wsl --shutdown, run → run.bayat-<zaman>, boş run.
 #   3. 7 günden eski run.bayat-* / run.bozuk-* klasörlerini günlüğe YAZAR, SİLMEZ.

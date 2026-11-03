@@ -32,6 +32,8 @@ Remove-ItemProperty -Path $k -Name 'Docker Desktop'
 Set-ItemProperty -Path $k -Name 'VentHub Docker acilis' -Value ('powershell.exe -NoProfile -WindowStyle Hidden -File "' + (Join-Path $h 'docker-acilis.ps1') + '"')
 ```
 
+Docker sürüm güncellemesinden sonra Run kaydı yeniden denetlenir: güncelleyici `Docker Desktop` kaydını geri yazabilir; Run altında yalnız `VentHub Docker acilis` kalmalıdır.
+
 ## Geri alma
 ```powershell
 $k = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
