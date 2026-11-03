@@ -31,6 +31,11 @@
 --   3-4) drop policy <tablo>_deny_all on public.<tablo>; _migration_ledger için grant all ... to anon, authenticated ·
 --   5) enforce_role_change gövdesi 2026-11-01 tabanındaki sürüme döndürülür (CREATE OR REPLACE).
 
+-- Tek işlem: ya hepsi ya hiçbiri (yarım kalan sıkılaştırma yok). Kilit/süre sınırı: bekleyen ALTER vitrini durdurmasın.
+begin;
+set lock_timeout = '5s';
+set statement_timeout = '5s';
+
 -- ───────── 1) yalnız-tetik fonksiyonlar ─────────
 revoke execute on function public.denetim_izi_yaz() from public, anon, authenticated;
 revoke execute on function public.notify_order_paid() from public, anon, authenticated;
@@ -196,6 +201,7 @@ end;
 $$;
 
 
+commit;
 
 -- Merge sonrası canlı doğrulama (salt okuma):
 --   select p.proname, has_function_privilege('anon', p.oid, 'execute') anon, has_function_privilege('authenticated', p.oid, 'execute') auth
