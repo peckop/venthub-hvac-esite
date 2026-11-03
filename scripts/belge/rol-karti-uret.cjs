@@ -870,7 +870,6 @@ const TASLAK_ROLLERI = {
   EDGE: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
   I18N: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
   MARKA: 'departman kapalı (iş dondurma); açılışta sahibi Amaç, Ne zaman ve Nasıl alanlarını yazar',
-  MEVZUAT: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
   SATIS: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
 }
 
