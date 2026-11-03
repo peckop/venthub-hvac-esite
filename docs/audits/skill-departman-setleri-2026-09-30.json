@@ -1988,7 +1988,12 @@
     "MEVZUAT"
    ],
    "ne": "Firma ürünü için CE uygunluk dosyası taslağı (uygunluk beyanı, risk çerçevesi, eksik belge listesi); müdür çalıştırır, çalışana ön yüklenmez. pdf girdi, docx çıktı tarafı."
+  },
+  {
+   "ad": "calisma-kopyasi-sil",
+   "departmanlar": "HEPSI",
+   "ne": "Çalışma kopyası (worktree, C:/tmp/vh-*) silme akışı: envanter, sahiplik, silme kapısı, ilan, güvenli silme sırası; yalnız kendi departmanının kopyası, kuralı kaynağa işaret eder. Müdür çalıştırır, çalışana ön yüklenmez."
   }
  ],
- "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır; 2026-11-01 (YTN-24): write-seo-geo-content GEO-SEO araştırmacı ve çürütücü setlerinde adıyla çağır (E-E-A-T farkı ve anlamsal boşluk denetimi); 2026-11-03 (YTN-26): ce-uygunluk-dosyasi yeni skill, MEVZUAT müdür çekirdeğinde"
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır; 2026-11-01 (YTN-24): write-seo-geo-content GEO-SEO araştırmacı ve çürütücü setlerinde adıyla çağır (E-E-A-T farkı ve anlamsal boşluk denetimi); 2026-11-03 (YTN-26): ce-uygunluk-dosyasi yeni skill, MEVZUAT müdür çekirdeğinde; 2026-11-03 (YTN-27): calisma-kopyasi-sil yeni skill, müdür çekirdeği (HEPSI)"
 }
