@@ -50,15 +50,14 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
   - Canlı yazım betiği: departman hazırlar ve koşmaz; Recep "yaz" sözünü OPS penceresinde söyler, OPS koşar. Komut, değişken adları, geri alma yolu OPS'a gider.
   - Migration'lı PR birleştirme, gerçek para, geri alınamaz silme: Recep'in sözü işi koşan pencerede geçerli, onay pencereler arası taşınmaz (karar 224). Menü yeri, adres, fiyat gibi ürün kararları da Recep'indir.
   - Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, iyileştirme: metni OPS'a `SendMessage` ile ver; OPS tam farkı okuyup onaylar, uygular; Recep'e sorulmaz. OPS'un kendi kanca/ayar PR'ını ARAÇ okur.
-  - İzin, hesap, MCP (allow/ask/deny, izin modu, onay veren kanca, `.mcp.json`) ve kapıyı gevşeten öneri: Recep yalnız OPS penceresinde söyler, OPS uygular ya da ARAÇ PR'ını okur; deny gevşetilmez (§18).
-- Farklı izin modunda doğrudan mesaj düşebilir: posta kutusu (tam kimlik) kullan; izin modunu değiştirmek Recep kararıdır.
-- Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe). Altında akan cümlelerle söyle: ne bu, hiç çalıştı mı, işimize yarar mı, aktif etmezsek ne olur, önerim.
-- Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`. Onay bekleyenler en üstte, ayrı tablo yok.
-- Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe, "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
-- (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir. Tablonun üstüne kalın tek satır "**<DEPARTMAN> — kendi kartlarım**" yaz, ilk sütun başlığı "<ÖN EK> No" olur. Sorumlu hep "ben", Sırada'ya "<DEPARTMAN ADI> işini bekliyor" yaz; departman değilse neyi beklediğini yaz (CI, Recep onayı, dış kişi); "başka departman" deme. Başka pencereden gelen mesaja o pencereye `SendMessage` ile cevap yaz; Recep'e görünen metin tek cümledir.
+  - İzin, hesap, MCP (allow/ask/deny, izin modu, onay veren kanca, `.mcp.json`) ve kapıyı gevşeten öneri: Recep yalnız OPS penceresinde söyler, OPS uygular ya da ARAÇ PR'ını okur; izin modunu değiştirmek Recep kararıdır; deny gevşetilmez (§18).
+- Departman Recep'e karar sorusu ya da "Recep'te:" satırı yazmaz: karar gereken konu OPS'a `SendMessage` ile gider (kart no, soru, önerim); OPS sorar, cevabı iletir. Recep departmana yazarsa cevap ver, karar sorusunu OPS'tan yürüt.
+- (OPS) Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe); altında: ne bu, işimize yarar mı, aktif etmezsek ne olur, önerim.
+- Durum mesajı tek tablodur: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`.- Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe, "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
+- (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir. Tablonun üstüne kalın tek satır "**<DEPARTMAN> — kendi kartlarım**" yaz, ilk sütun başlığı "<ÖN EK> No" olur. Sorumlu hep "ben", Sırada'ya "<DEPARTMAN ADI> işini bekliyor" yaz; departman değilse neyi beklediğini yaz (CI, Recep onayı, dış kişi); "başka departman" deme. Başka pencereden gelen mesaja cevabı o pencereye `SendMessage` ile yaz; Recep'e tek cümle.
 - (OPS hariç) Kartında değişen yoksa tablo yazma; Recep "devam et" derse cevap tek cümledir. "Devam edeyim mi" diye sorma, sırası belli işe geç.
-- Recep'e akan cümleyle yaz: kısa paragraflar (2-3 cümle); madde gerekirse her madde ayrı satırda tam cümle; `(a)` etiketi, telgraf kısaltması yok.
-- Erteleme dili kullanma; "yarın" yerine tarih ya da gün yaz. Recep kararı bekleyen işi "Recep'te: <tek satır soru>" diye yaz, tarih verme.
+- Recep'e akan cümleyle, kısa paragraflarla yaz; madde gerekirse tam cümleler ayrı satırda; `(a)` etiketi, telgraf kısaltması yok.
+- Erteleme dili kullanma; "yarın" yerine tarih ya da gün yaz. (OPS) Recep kararı bekleyen işi "Recep'te: <soru>" yaz, tarih verme.
 - "Yapıldı mı, kullandık mı" sorusuna önce hafızaya, Kanban'a, git geçmişine bak.
 - Ölçmediysen "bilmiyorum, bakıyorum" de. Niyeti anlamadıysan ölçmeden önce tek netleştirme sorusu sor; veride ya da kodda olanı sorma, araştır.
 - Kategori, ürün ya da "görünmüyor" iddiasını canlı sayfa ölçülmeden Recep'e taşıma; ham veritabanı alanı kanıt değildir. Tarayıcı: HRT-61 kuralı.
