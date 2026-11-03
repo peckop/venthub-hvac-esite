@@ -75,6 +75,42 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
       metadata: { slug: { tr: 'duman-egzoz-fanlari', en: 'smoke-exhaust-fans' } },
       ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
     },
+    // Fan çeşitleri yazısı (BLG-31, 2026-11): yedi fan alt kategorisi canlıda 200 verir (3 Kasım 2026 ölçümü, TR adresleri).
+    'roof-fans': {
+      slug: 'roof-fans',
+      metadata: { slug: { tr: 'cati-tipi-fanlar', en: 'roof-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'bathroom-toilet-fans': {
+      slug: 'bathroom-toilet-fans',
+      metadata: { slug: { tr: 'banyo-tuvalet-fanlari', en: 'bathroom-toilet-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'cabinet-fans': {
+      slug: 'cabinet-fans',
+      metadata: { slug: { tr: 'hucreli-aspiratorler', en: 'cabinet-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'plug-fans': {
+      slug: 'plug-fans',
+      metadata: { slug: { tr: 'plug-fanlar', en: 'plug-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'corrosion-and-acid-resistant-fans': {
+      slug: 'corrosion-and-acid-resistant-fans',
+      metadata: { slug: { tr: 'korozyona-ve-aside-dayanimli-fanlar', en: 'corrosion-and-acid-resistant-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'chimney-fans': {
+      slug: 'chimney-fans',
+      metadata: { slug: { tr: 'somine-ve-baca-fanlari', en: 'chimney-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'industrial-ceiling-fans': {
+      slug: 'industrial-ceiling-fans',
+      metadata: { slug: { tr: 'tavan-vantilatorleri', en: 'industrial-ceiling-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
   }
   const takma: Record<string, string> = { 'aile:eski-aile-adi': 'yeni-aile-adi', 'kategori:eski-kategori': 'air-curtains' }
 

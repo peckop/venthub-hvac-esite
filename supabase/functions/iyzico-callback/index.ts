@@ -15,6 +15,16 @@ import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '.
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { odemeSiparisleEslesiyorMu, type SiparisSatiri } from '../_shared/odeme_eslesme.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
+import {
+  BASARI_ONCESI,
+  basariYazilabilirMi,
+  debugBirlestir,
+  kosulFiltresi,
+  RET_ONCESI,
+  retYazilabilirMi,
+  yazilmayanBasari,
+  type YazimSatiri,
+} from '../_shared/odeme_yazim_kapisi.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -116,7 +126,10 @@ Deno.serve(async (req) => {
     // ⭐EŞLEŞME KAPISININ GİRDİSİ — AYNI SORGUDA ÇEKİLİR, İKİNCİ İSTEK YOK (REC-355).
     // Niçin burada: tenant türetmesi zaten bu satırı okuyor. Eşleşme alanlarını ayrı bir
     // istekle çekmek, aynı satırı iki kez okuyup ARADA DEĞİŞEBİLECEĞİ bir pencere açar.
-    let siparisSatiri: SiparisSatiri | null = null
+    let siparisSatiri: (SiparisSatiri & YazimSatiri) | null = null
+    // ⭐İSTEĞİN KENDİ TOKEN'I — aşağıdaki DB fallback'inden ÖNCE saklanır (ALT-131). Ret yazımı
+    // yalnız bu token siparişin kendi token'ıysa yapılır; fallback'le gelen token zaten siparişinkidir.
+    const istekToken: string | undefined = token || undefined
     if (orderId || conversationId) {
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
@@ -125,7 +138,9 @@ Deno.serve(async (req) => {
           const filter = orderId
             ? `id=eq.${encodeURIComponent(orderId)}`
             : `conversation_id=eq.${encodeURIComponent(conversationId as string)}`
-          const alanlar = 'id,tenant_id,payment_token,conversation_id,total_amount,currency,payment_status'
+          // `status` ve `payment_debug` ALT-131 yazım kapısı için: mevcut durum sorulmadan yazılmaz,
+          // önceki debug (iade defteri) ezilmez.
+          const alanlar = 'id,tenant_id,payment_token,conversation_id,total_amount,currency,payment_status,status,payment_debug'
           const got = await fetch(`${su}/rest/v1/venthub_orders?${filter}&select=${alanlar}`, {
             headers: { Authorization: `Bearer ${sk}`, apikey: sk }
           })
@@ -136,7 +151,7 @@ Deno.serve(async (req) => {
           tenantId = decision.tenantId
           tenantIsDerived = decision.source === 'resource_row'
           if (row?.payment_token) orderPaymentToken = String(row.payment_token)
-          if (row) siparisSatiri = row as SiparisSatiri
+          if (row) siparisSatiri = row as SiparisSatiri & YazimSatiri
         }
       } catch {}
     }
@@ -332,12 +347,20 @@ Deno.serve(async (req) => {
     // denemeyi kapatırdı (CLAUDE.md §11: durumlar monoton). Süresi dolan rezervasyonları
     // `release-expired-reservations` zaten `payment_status='failed'` ile temizliyor —
     // aynı sözlük, aynı kolon, tutarlı.
-    async function patchOrder(fields: { status?: string; payment_status?: string; payment_token?: string }) {
-      const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
-      const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
-      const filter = filterById || filterByConv;
-      if (!filter) return null;
-      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}${orderTenantFilter}`, {
+    // ⭐ALT-131: PATCH artık (1) satırın MEVCUT durumunu filtreye koyar — okuma ile yazma arasında
+    // satır ilerlediyse 0 satır güncellenir; (2) `payment_debug`'ı birleştirir, ezmez (iade defteri
+    // ve iadenin okuduğu `raw` korunur); (3) kaç satır yazıldığını döndürür — `resp.ok` tek başına
+    // yazım kanıtı DEĞİL, PostgREST 0 satırlık PATCH'e de 200 döner.
+    async function patchOrder(
+      fields: { status?: string; payment_status?: string; payment_token?: string },
+      kosul: string,
+    ): Promise<{ ok: boolean; status: number | null; satir: number }> {
+      // Hedef, kararın verildiği satırın KENDİ kimliği (security-reviewer bulgu 3): filtreyi istekten
+      // ya da İyzico yanıtındaki conversationId'den yeniden türetmek, kararı bir satıra yazımı başka
+      // satıra bağlayabilirdi (`conversation_id` tekil değil: CONV-<epoch-ms>).
+      const hedefId = siparisSatiri?.id;
+      if (!hedefId) return { ok: false, status: null, satir: 0 };
+      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefId)}${orderTenantFilter}${kosul}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
@@ -345,23 +368,62 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
-        body: JSON.stringify({ ...fields, payment_debug: debugInfo }),
+        body: JSON.stringify({ ...fields, payment_debug: debugBirlestir(siparisSatiri?.payment_debug, debugInfo) }),
       });
-      return resp;
+      const donen = await resp.json().catch(() => null);
+      return { ok: resp.ok, status: resp.status, satir: Array.isArray(donen) ? donen.length : 0 };
     }
 
     let updateOk = false;
     let _stockResult: unknown = null;
-    if (paid) {
+    // Başarı dalının yan etkileri (kupon kullanımı, stok, sepet) YALNIZ bu çağrı satırı gerçekten
+    // ilerlettiyse koşar. İyzico'nun POST'u ile tarayıcı dönüş sayfası aynı ödemeyi iki kez bildirir;
+    // ikinci çağrı kupon kullanımını ikinci kez artırmamalı.
+    let gecisYapildi = false;
+    // Aynı ödemenin ikinci bildirimi: satır zaten bu ödemeyle 'paid'. Stok RPC'si ve sepet temizliği
+    // tekrar edilebilir (idempotent) olduğu için yine koşar — ilk çağrı RPC'den önce düştüyse bu çağrı
+    // tamamlar. Kupon artırımı idempotent DEĞİL, yalnız `gecisYapildi`da koşar.
+    let tekrarZararsiz = false;
+    // Ödeme gerçek, kayıt tutmuyor (iptal edilmiş siparişe ödeme ya da ikinci tahsilat): cevap needs_review.
+    let incelemeGerek = false;
+    const basariKarari = basariYazilabilirMi(siparisSatiri);
+    if (paid && !basariKarari.yaz) {
+      // Ödeme gerçek ve bu siparişe ait, ama satır artık 'pending' değil. Geri sarılmaz (kural 11).
+      // ⭐Sessiz kalmaz (security-reviewer bulgu 1): zararsız tekrar ile "para var, kayıt yok" ayrılır.
+      const durum = yazilmayanBasari(siparisSatiri, result?.paymentId);
+      if (durum.tur === 'tekrar') {
+        // Kimliksiz uç: tekrar bildirim herkes tarafından yeniden gönderilebilir. Bu yüzden tekrarda
+        // YALNIZ yarım kalmış stok düşümü onarılır (DB RPC'si idempotent); sepet temizliği ve kupon
+        // yalnız gerçek geçişte koşar (otomatik güvenlik incelemesi, 3 Kasım).
+        const dbg = (siparisSatiri?.payment_debug ?? {}) as Record<string, unknown>;
+        tekrarZararsiz = siparisSatiri?.payment_status === 'paid' && dbg.stock_processed !== true;
+        console.warn(`[iyzico-callback] ayni odemenin tekrar bildirimi; yazilmadi (${basariKarari.sebep}).`);
+      } else {
+        incelemeGerek = true;
+        await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+          fn: 'iyzico-callback',
+          code: durum.kod,
+          message: 'Odeme BASARILI ve siparisle eslesti ama siparis artik pending degil; YAZILMADI, insan bakmali.',
+          // Değer yok: yalnız durum sebebi ve hedef sipariş kimliği.
+          extra: { sebep: basariKarari.sebep, order_id: siparisSatiri?.id ?? null },
+        })
+        console.error(`[iyzico-callback] ${durum.kod}: para cekildi, siparis ${basariKarari.sebep}; alarm kaydedildi.`);
+      }
+    } else if (paid) {
       // Yaşam döngüsü: 'confirmed' · Ödeme: 'paid'. Tek PATCH, deneme-yanılma yok.
       // ⭐`payment_token` ARTIK BURADA YAZILIYOR — doğrulamadan ÖNCE değil (REC-355).
       // Aynı PATCH'e binmesi bilinçli: ayrı bir istek, birinin geçip diğerinin düştüğü
       // bir ara durum üretir. Denetim izi tek atomik yazımda tamamlanır.
-      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid', payment_token: token });
-      updateOk = !!(r && r.ok);
-      if (!updateOk) {
-        console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r ? r.status : 'yok'}) — para cekildi, siparis guncellenmedi.`);
+      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid', payment_token: token }, kosulFiltresi(BASARI_ONCESI));
+      updateOk = r.ok && r.satir > 0;
+      gecisYapildi = updateOk;
+      if (!r.ok) {
+        console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r.status ?? 'yok'}) — para cekildi, siparis guncellenmedi.`);
+      } else if (r.satir === 0) {
+        console.warn('[iyzico-callback] siparis okuma ile yazma arasinda ilerledi; yazilmadi (kural 11).');
       }
+    }
+    if (gecisYapildi || tekrarZararsiz) {
       
       // T137-VH (2026-08-20): BURADAKI ATESLE-UNUT ONAY E-POSTASI CAGRISI KALDIRILDI.
       //
@@ -380,8 +442,9 @@ Deno.serve(async (req) => {
       // bakmaz. Migration: supabase/migrations/20260820140000_order_paid_notification.sql
       
       // Kuponu finalize et: order row'dan coupon_code'yi al, varsa usage increment ve discount hesapla (best-effort)
+      // ALT-131: yalnız satırı BU çağrı ilerlettiyse — kullanım artırımı idempotent değil.
       try {
-        if (orderId) {
+        if (gecisYapildi && orderId) {
           const su = Deno.env.get('SUPABASE_URL') || ''
           const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
           if (su && sk) {
@@ -478,8 +541,14 @@ Deno.serve(async (req) => {
 
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
-              const updatedDebugInfo = { ...debugInfo, stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
-              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
+              // ALT-131: burası da birleştirir — önceki anahtarlar (iade defteri) ezilmez.
+              // Tekrar bildirimde (gecisYapildi=false) bu çağrının ödeme alanları (paymentId, raw) deftere
+              // GİRMEZ, yalnız stok alanları: doğrulanmamış bir ödemenin raw'ı iadeyi yanlış ödemeye yöneltir.
+              const stokAlanlari = { stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
+              const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, gecisYapildi ? { ...debugInfo, ...stokAlanlari } : stokAlanlari);
+              // `payment_status=eq.paid` koşulu: arada iade yazıldıysa (refunded/partial_refunded) eski
+              // görüntüyle iade defteri ezilmez (security-reviewer bulgu 4).
+              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&payment_status=eq.paid`, {
                 method: 'PATCH',
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
@@ -538,10 +607,12 @@ Deno.serve(async (req) => {
       }
       
       // After a successful payment, clear ALL server carts for this user (defensive against duplicates)
+      // ALT-131: yalnız gerçek geçişte — tekrar bildirim kimliksiz yeniden gönderilebilir, müşterinin
+      // o anki sepetini boşaltmamalı.
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
         const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-        if (su && sk) {
+        if (gecisYapildi && su && sk) {
           // Fetch order row to get user_id
           let uid: string | null = null
           if (orderId) {
@@ -577,6 +648,9 @@ Deno.serve(async (req) => {
           }
         }
       } catch { /* best-effort */ }
+    }
+    if (paid) {
+      // Başarı dalı yukarıda bitti (yazıldı ya da kural 11 gereği yazılmadı).
     } else if (odemeBasarili && !eslesme.gecti) {
       // ⛔EŞLEŞMEYEN ÖDEME: SİPARİŞE HİÇBİR ŞEY YAZILMAZ — `payment_status='failed'` DAHİL.
       //
@@ -594,10 +668,18 @@ Deno.serve(async (req) => {
       console.error('[iyzico-callback] ESLESMEYEN ODEME — siparise YAZILMADI, alarm kaydedildi.');
     } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
       // Yalnız ödeme durumu yazılır; `status` 'pending' kalır (tekrar deneme açık).
-      const r = await patchOrder({ payment_status: 'failed' });
-      updateOk = !!(r && r.ok);
-      if (!updateOk) {
-        console.error(`[iyzico-callback] BASARISIZ odeme isaretlenemedi (status=${r ? r.status : 'yok'}) — siparis 'pending' gorunmeye devam edecek.`);
+      // ⛔ALT-131: ret, eşleşme kapısından geçmiyordu. Saldırgan KENDİ reddedilen ödemesinin token'ını
+      // kurbanın `orderId`'siyle POST edince kurbanın ödenmiş siparişi 'failed' oluyordu. Artık iki şart:
+      // token siparişin kendi token'ı ve sipariş hâlâ 'pending'/'pending'. İkisi PATCH filtresinde de var.
+      const retKarari = retYazilabilirMi(siparisSatiri, istekToken ?? token);
+      if (!retKarari.yaz) {
+        console.warn(`[iyzico-callback] odeme reddi siparise YAZILMADI (${retKarari.sebep}).`);
+      } else {
+        const r = await patchOrder({ payment_status: 'failed' }, kosulFiltresi(RET_ONCESI));
+        updateOk = r.ok && r.satir > 0;
+        if (!r.ok) {
+          console.error(`[iyzico-callback] BASARISIZ odeme isaretlenemedi (status=${r.status ?? 'yok'}) — siparis 'pending' gorunmeye devam edecek.`);
+        }
       }
     }
 
@@ -615,9 +697,9 @@ Deno.serve(async (req) => {
      * `order-housekeeping` bu değeri sonlandırma sebebi SAYMAZ — orada da adıyla yazılı.
      */
     const responseBody = {
-      status: paid
+      status: paid && !incelemeGerek
         ? "success"
-        : (odemeBasarili && !eslesme.gecti)
+        : (odemeBasarili && (!eslesme.gecti || incelemeGerek))
           ? "needs_review"
           : (result ? "failure" : "pending"),
       iyzico: result,
@@ -645,7 +727,7 @@ Deno.serve(async (req) => {
         // yüz "ödemeniz alındı, doğrulama sürüyor" der (yeniden ödeme düğmesi kapalı).
         target.searchParams.set(
           'status',
-          paid ? 'success' : (odemeBasarili && !eslesme.gecti) ? 'needs_review' : 'failure',
+          paid && !incelemeGerek ? 'success' : (odemeBasarili && (!eslesme.gecti || incelemeGerek)) ? 'needs_review' : 'failure',
         );
         const t = target.toString();
         const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(_e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;

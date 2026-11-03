@@ -195,12 +195,12 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
     ).toBe(false)
   })
 
-  it('⭐admin_resend_quote_published: anon KAPALI, authenticated AÇIK', () => {
+  it('⭐admin_resend_quote_published: anon KAPALI, authenticated KAPALI (ALT-135: istemci çağıranı yok, yalnız service_role)', () => {
     expect(sonHalKapali(zincir, 'admin_resend_quote_published', 'anon', ['uuid']), 'admin_resend_quote_published anon icin acik').toBe(true)
     expect(
       sonHalKapali(zincir, 'admin_resend_quote_published', 'authenticated', ['uuid']),
-      'admin_resend_quote_published authenticated icin KAPANMIS — yonetici yeniden gonderemez',
-    ).toBe(false)
+      'admin_resend_quote_published authenticated icin ACIK — ALT-135 yalniz service_role birakti',
+    ).toBe(true)
   })
 
   // REC-168 (Ç6, plan-challenger 2026-09-29): bu kapı yalnız "kapalı OLMALI" olanları sınıyordu. Ters yön de bir

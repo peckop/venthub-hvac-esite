@@ -34,47 +34,44 @@ jenerik gövdesi — onlar `notification-standard.md`'nin alanıdır.
 
 ## 2. ⛔ MOTOR DÖNGÜ İÇERMEZ (asıl kural)
 
-Şablon motoru **tam olarak iki şey** yapar:
+Şablon motoru **tek yerdedir:** `supabase/functions/_shared/kodlama.ts` `renderTemplate`
+(2026-11-03, OPS-211; eskiden üç uçta kopyaydı). **Tam olarak iki şey** yapar:
 
 ```
-{{alan}}                       →  değeri basar (yoksa boş dizge)
+{{alan}}                       →  değeri KAÇIŞLA basar (yoksa boş dizge)
 {{#if alan}} … {{/if}}         →  değer doğruysa bloğu tutar, değilse siler
 ```
 
+### 2.1 Her değer kaçar — ham HTML deliği yok
+
+Motor her `{{alan}}` değerini `kacir`dan geçirir (`&`, `<`, `>`, `"`, `'`). Niçin: müşteri adı ve
+iade sebebi HTML'e ham giriyordu ve ödeme yapan biri VentHub göndericisinden oltalama HTML'i
+gönderebiliyordu (güvenlik karnesi 2026-11, G1). `href`/`src` alanı ayrıca `guvenliUrl` süzgecinden
+geçirilerek verilir (yalnız `http(s)`). Ayrıntı ve satır içi HTML kuralı: `cikti-kodlama-maske-standard.md` K1-K2.
+
+Ham HTML basan bir delik **yoktur**: bugün hiçbir şablon hazır HTML parçası almıyor (ölçüldü). Gerekirse
+ham-HTML türü motorun içine, `_shared/kodlama.ts`'te tek yerde eklenir; uca kopyalanmaz.
+
 **Döngü (`{{#each}}`) YOKTUR ve EKLENMEYECEKTİR.**
-**Liste gerekiyorsa HTML'i ÇAĞIRAN TARAF hazırlar** ve tek bir `{{alan}}` olarak geçer:
-
-```ts
-// DOĞRU — satırlar TypeScript'te kurulur, şablon tek delik görür
-const kalem_satirlari = items
-  .map((k) => `<tr><td>${esc(k.ad)}</td><td>${esc(k.adet)}</td></tr>`)
-  .join('')
-html = renderTemplate(tpl, { /* … */, kalem_satirlari })
-```
-
-```html
-<!-- DOĞRU — şablonda tek delik -->
-<table>{{kalem_satirlari}}</table>
-```
+Liste gerekiyorsa satırlar TypeScript'te `kacir` ile kurulur; o gün §2.1'deki ham-HTML türü motora eklenir.
 
 ### Niçin döngü eklenmiyor — bedeli adıyla
 
-1. **Motor dört yerde KOPYALIDIR.** Edge işlevleri ayrı Deno bundle'larıdır ve `src/`'den
-   import edemezler; `_shared`'a çıkarılmadıkça her `each` eklemesi **dört dosyada** aynı
-   regex'i tutturmak demektir. REC-154'te ölçüldü: `delivery-notification`'ın motoru
-   `{{#if}}`'i **hiç desteklemiyordu** — yani kopyalar zaten sessizce ayrışmıştı.
+1. **Motor dört yerde KOPYALIYDI.** REC-154'te ölçüldü: `delivery-notification`'ın motoru
+   `{{#if}}`'i **hiç desteklemiyordu** — kopyalar sessizce ayrışmıştı. 2026-11-03'ten beri motor
+   `_shared/kodlama.ts`'te tektir (kapı INV-CIKTI-KODLAMA-1 uçta yeni kopyayı reddeder); bu madde
+   artık döngüye karşı değil, motoru yeniden kopyalamaya karşı gerekçedir.
 2. **Regex ile döngü = iç içe geçme tuzağı.** `{{#each}}` içinde `{{#if}}`, non-greedy
    `[\s\S]*?` ile doğru eşleşmez; ilk `{{/if}}`'te kapanır ve **sessizce yanlış HTML** üretir.
    Yanlış HTML müşteriye gider ve geri alınamaz (`notification-standard.md` B1).
-3. **Kaçış (escaping) sorumluluğu belirsizleşir.** Bugün her değer `String(v)` ile basılır
-   ve kaçış çağıranın işidir. Döngü, kaçışı motorun içine iter; motor da kaçış yapmadığı
-   için ürün adındaki bir `<` HTML'i bozar.
+3. **Kaçış (escaping) sorumluluğu.** 2026-11-03'e kadar her değer `String(v)` ile basılıyor,
+   kaçış çağıranın işiydi ve hiçbir çağıran yapmıyordu (G1). Kaçış artık motorun içinde (§2.1).
 4. **İhtiyaç ÖLÇÜLMEDİ.** Bugün hiçbir şablonda liste yoktur (`{{#each` isabeti: **0**).
    Kullanılmayan bir yetenek, bakımı olan ama kanıtı olmayan koddur.
 
 ⚖**Ne zaman yeniden açılır:** aynı listeyi **üçten fazla** yer basmaya başladığında.
-O gün doğru hamle motoru büyütmek değil, motoru `_shared/email_template.ts`'e **taşımak**
-ve döngüyü orada TEK yerde yazmaktır. Bu paragraf o kararın kapısıdır.
+Motor artık `_shared/kodlama.ts`'tedir; döngü gerekirse orada TEK yerde yazılır.
+Bu paragraf o kararın kapısıdır.
 
 ---
 
@@ -156,7 +153,7 @@ tenant config (DB)  →  Deno ortam değişkeni  →  sistem varsayılanı
 | Render çağrısında geçilen her alanın şablonda kullanıldığını | Üretilen HTML'in **doğru göründüğünü** (görsel/istemci uyumu) |
 | Dört işlevin de `supportEmail`/`companyFooter` okuduğunu | `companyFooter`'ın **dolu** olduğunu — bugün bilerek boş (§4) |
 | Şablonlarda sabit `VentHub` metni / `#2563eb` HEX'i kalmadığını | `_shared` dışındaki bildirim uçlarını (`notification-service` vb.) |
-| Hiçbir motorda/şablonda `each` olmadığını (§2) | Motorun **doğru çalıştığını** — o ayrı bir birim testi işidir |
+| Hiçbir motorda/şablonda `each` olmadığını (§2) | Motorun **doğru çalıştığını** — birim testi `supabase/functions/_shared/__tests__/kodlama_maske.test.ts` |
 | `{{order_number}}`ın tam numarayla beslendiğini | Numaranın **tekil üretildiğini** → INV-SIPARIS-NO-1 + SQL kanıtı |
 
 ⚠**"Kapı yeşil" ≠ "e-posta doğru görünüyor".** Kapı statiktir; alan sözleşmesini ölçer,
