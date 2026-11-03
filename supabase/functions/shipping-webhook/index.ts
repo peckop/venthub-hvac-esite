@@ -12,6 +12,7 @@
 // `isMockEnv` dalıyla testlerde tamamen atlanıyordu — yani kapı test edilmiyordu (cetvel §3.9).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
+import { hmacImzaGecerli, timingSafeEquals } from '../_shared/sabit_zaman.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {
@@ -20,20 +21,11 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   })
 }
 
-async function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
-  try {
-    const key = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
-    )
-    const sigBytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw))
-    const computed = btoa(String.fromCharCode(...new Uint8Array(sigBytes)))
-    // Accept base64 or hex signatures; normalize
-    const normalize = (s: string) => s.trim().replace(/^sha256=/i, '')
-    const given = normalize(signatureHeader)
-    return given === computed
-  } catch {
-    return false
-  }
+// İmza ve token karşılaştırması SABİT ZAMANLI (karne 2026-11 K4, cetvel §3.5 · E17).
+// Eskiden `given === computed` ve `token === expected` idi: ilk farklı baytta dönen
+// karşılaştırma beklenen değerin önekini yanıt süresiyle sızdırır.
+function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
+  return hmacImzaGecerli(secret, raw, signatureHeader)
 }
 
 function mapCarrierStatus(input?: string): { status?: string; setShipped?: boolean; setDelivered?: boolean } {
@@ -111,7 +103,7 @@ Deno.serve(async (req: Request) => {
     if (!authorized) {
       const token = req.headers.get('x-webhook-token') || ''
       const expected = Deno.env.get('SHIPPING_WEBHOOK_TOKEN') || ''
-      if (expected && token === expected) authorized = true
+      if (expected && token && timingSafeEquals(token, expected)) authorized = true
     }
 
     if (!authorized) {
