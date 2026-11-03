@@ -8,6 +8,7 @@ import { useI18n } from '@/i18n/I18nProvider'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../../hooks/useAuth'
+import { PASSWORD_RULES, passwordMeetsAllRules, type PasswordRuleKey, passwordStrengthLevel } from '../../utils/passwordRules'
 import { hibpPwnedCount } from '../../utils/passwordSecurity'
 export default function AccountSecurityPage() {
   const router = useRouter()
@@ -35,13 +36,16 @@ export default function AccountSecurityPage() {
 
   useEffect(() => { refreshIdentities() }, [])
 
-  const passwordRules = [
-    { key: 'length',  label: t('account.security.ruleLength'),  test: (p: string) => p.length >= 8 },
-    { key: 'upper',   label: t('account.security.ruleUpper'),   test: (p: string) => /[A-Z]/.test(p) },
-    { key: 'digit',   label: t('account.security.ruleDigit'),   test: (p: string) => /[0-9]/.test(p) },
-    { key: 'special', label: t('account.security.ruleSpecial'), test: (p: string) => /[^A-Za-z0-9]/.test(p) },
-  ]
-  const passedRules = passwordRules.filter(r => r.test(password)).length
+  const ruleLabels: Record<PasswordRuleKey, string> = {
+    length: t('account.security.ruleLength'),
+    lower: t('account.security.ruleLower'),
+    upper: t('account.security.ruleUpper'),
+    digit: t('account.security.ruleDigit'),
+    special: t('account.security.ruleSpecial'),
+  }
+  const passwordRules = PASSWORD_RULES.map(r => ({ ...r, label: ruleLabels[r.key] }))
+  const passedRules = passwordStrengthLevel(password)
+  const allRulesMet = passwordMeetsAllRules(password)
   const strengthColor = passedRules <= 1 ? 'bg-red-500' : passedRules === 2 ? 'bg-orange-400' : passedRules === 3 ? 'bg-yellow-400' : 'bg-green-500'
   const strengthLabel = passedRules <= 1 ? t('account.security.strengthWeak') : passedRules === 2 ? t('account.security.strengthMedium') : passedRules === 3 ? t('account.security.strengthGood') : t('account.security.strengthStrong')
 
@@ -51,7 +55,7 @@ export default function AccountSecurityPage() {
       toast.error(t('account.security.currentRequired'))
       return
     }
-    if (passedRules < 4) {
+    if (!allRulesMet) {
       toast.error(t('account.security.rulesNotMet'))
       return
     }

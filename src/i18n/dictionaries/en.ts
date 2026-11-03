@@ -1663,6 +1663,7 @@ export const en: typeof tr = {
     },
     pwRule: {
       length: 'At least 8 characters',
+      lower: 'At least one lowercase letter',
       upper: 'At least 1 uppercase letter',
       digit: 'At least 1 digit',
       special: 'At least 1 special character',
@@ -2421,6 +2422,7 @@ export const en: typeof tr = {
       strengthGood: 'Good',
       strengthStrong: 'Strong',
       ruleLength: 'At least 8 characters',
+      ruleLower: 'At least one lowercase letter',
       ruleUpper: 'At least 1 uppercase letter',
       ruleDigit: 'At least 1 number',
       ruleSpecial: 'At least 1 special character',
