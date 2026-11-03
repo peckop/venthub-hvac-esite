@@ -333,6 +333,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/plug-fan-nedir",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -558,6 +562,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/fan-cesitleri",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/plug-fan-nedir",
         "alternates": null
       },
       {
