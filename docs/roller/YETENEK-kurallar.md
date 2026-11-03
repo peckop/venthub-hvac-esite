@@ -2,6 +2,13 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/YETENEK.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.** Yeni skill yazma ve mevcut skill'i değiştirme Claude Code'un kendi skill-creator yeteneğiyle yapılır (`anthropic-skills:skill-creator` ya da `skill-creator:skill-creator`): taslak, eval, tetik açıklaması optimizasyonu ve ölçüm onunla koşar. Elle SKILL.md yazmak yasaktır; projedeki yerel `skills-creator` bunun yerine geçmez. Olay: YETENEK skill'leri elle yazmıştı; kural 3 Kasım 2026'da OPS penceresinde konuldu.
+2. **Türkçe tetik duyarlılığı eval ile ölçülür.** Tetik açıklaması Türkçe yazılan kelimelerle de tetiklenir: yazım hatalı, eksiz ya da ekli, büyük-küçük harf ve ı/İ varyantları dahil. skill-creator eval setinde Türkçe tetik cümleleri zorunludur ve ölçülür: tetiklenmesi gereken ve tetiklenmemesi gereken Türkçe örnekler birlikte bulunur. Olay: aynı kural (3 Kasım 2026, OPS penceresi); skill'ler Türkçe yazılan istekle tetiklenmeli.
+3. **Kanıt PR gövdesinde durur.** Skill ekleyen ya da değiştiren PR'ın gövdesinde skill-creator eval raporu (Türkçe tetik isabeti: tetiklenmesi gerekenlerin ve gerekmeyenlerin sonucu) bulunur; raporsuz skill PR'ı eksiktir. Olay: aynı kural (3 Kasım 2026, OPS penceresi).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 
 ## Recep'e mesaj kuralları (ayrıntı; yöneten metin `~/.claude/output-styles/recep.md`)
