@@ -376,12 +376,21 @@ describe('INV-ODEME-CALLBACK-2 · başarı geri saramaz (karne kilit a, kural 11
     expect(satir).toMatchObject({ status: 'confirmed', payment_status: 'paid' })
   })
 
-  it('kayıtlı paymentId olmayan eski ödenmiş satır: tekrar bildirim sahte DUPLICATE_CHARGE alarmı üretmez', async () => {
+  it('kayıtlı paymentId olmayan eski ödenmiş satır: fail-closed, PAYMENT_UNVERIFIED_LEGACY, defter değişmez', async () => {
     satir = yeniSatir({ status: 'confirmed', payment_status: 'paid' })
     iyziYanit = basarili
     const c = await cagir(yeni, { orderId: SIPARIS })
-    expect(c.status).toBe('success')
-    expect(alarmlar).toEqual([])
+    expect(c.status).toBe('needs_review')
+    expect(alarmlar).toEqual(['PAYMENT_UNVERIFIED_LEGACY'])
+    expect(satir.payment_debug).toEqual(DEFTER)
+  })
+
+  it('tekrar bildirimde stok onarımı deftere yalnız stok alanı yazar; raw ve paymentId değişmez', async () => {
+    const kayit = { refunded_total: 0, paymentId: 'yeni-odeme', raw: { paymentId: 'yeni-odeme', ozgun: true }, stock_processed: false }
+    satir = yeniSatir({ status: 'confirmed', payment_status: 'paid', payment_debug: kayit })
+    iyziYanit = basarili
+    await cagir(yeni, { orderId: SIPARIS })
+    expect(satir.payment_debug).toMatchObject({ raw: { paymentId: 'yeni-odeme', ozgun: true }, stock_processed: true })
   })
 })
 

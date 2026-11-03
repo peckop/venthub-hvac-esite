@@ -542,7 +542,10 @@ Deno.serve(async (req) => {
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
               // ALT-131: burası da birleştirir — önceki anahtarlar (iade defteri) ezilmez.
-              const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, { ...debugInfo, stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson });
+              // Tekrar bildirimde (gecisYapildi=false) bu çağrının ödeme alanları (paymentId, raw) deftere
+              // GİRMEZ, yalnız stok alanları: doğrulanmamış bir ödemenin raw'ı iadeyi yanlış ödemeye yöneltir.
+              const stokAlanlari = { stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
+              const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, gecisYapildi ? { ...debugInfo, ...stokAlanlari } : stokAlanlari);
               // `payment_status=eq.paid` koşulu: arada iade yazıldıysa (refunded/partial_refunded) eski
               // görüntüyle iade defteri ezilmez (security-reviewer bulgu 4).
               await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&payment_status=eq.paid`, {

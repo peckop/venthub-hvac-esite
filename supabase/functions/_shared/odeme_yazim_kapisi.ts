@@ -81,7 +81,7 @@ export type YazilmayanBasari =
   /** Aynı ödemenin ikinci bildirimi (İyzico POST + tarayıcı dönüşü): sorun yok. */
   | { tur: 'tekrar' }
   /** Para çekildi, kayıt tutmuyor: insan bakmalı. Cevap 'needs_review', gelir alarmı kalkar. */
-  | { tur: 'inceleme'; kod: 'DUPLICATE_CHARGE' | 'PAYMENT_ON_TERMINATED_ORDER' }
+  | { tur: 'inceleme'; kod: 'DUPLICATE_CHARGE' | 'PAYMENT_ON_TERMINATED_ORDER' | 'PAYMENT_UNVERIFIED_LEGACY' }
 
 /**
  * Başarılı + eşleşmiş ödeme, satır 'pending' olmadığı için YAZILMADIĞINDA ne olduğu (ALT-131,
@@ -98,9 +98,11 @@ export function yazilmayanBasari(satir: YazimSatiri | null, paymentId: unknown):
   const kayitli = metin(dbg.paymentId)
   const gelen = metin(paymentId)
   if (p && ISLENMIS_ODEME.includes(p)) {
-    // Kayıtlı paymentId YOKSA (eski satır) "farklı ödeme" kanıtlanamaz: tekrar sayılır. Aksi hâlde
-    // sipariş kimliğini bilen biri her çağrıda sahte DUPLICATE_CHARGE alarmı üretebilirdi.
-    if (!kayitli || (gelen && kayitli === gelen)) return { tur: 'tekrar' }
+    // Tekrar YALNIZ iki kimlik de var ve eşitse. Kayıtlı paymentId yoksa (eski satır) aynı ödeme olduğu
+    // kanıtlanamaz: fail-closed inceleme, ayrı ve daha düşük önemli kodla (gerçek çift tahsilat
+    // sessizleşmesin; alarm gürültüsü `error_groups` gruplamasıyla taşınır).
+    if (kayitli && gelen && kayitli === gelen) return { tur: 'tekrar' }
+    if (!kayitli) return { tur: 'inceleme', kod: 'PAYMENT_UNVERIFIED_LEGACY' }
     return { tur: 'inceleme', kod: 'DUPLICATE_CHARGE' }
   }
   return { tur: 'inceleme', kod: 'PAYMENT_ON_TERMINATED_ORDER' }
