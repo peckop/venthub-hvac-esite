@@ -1263,9 +1263,9 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     },
   },
   {
-    // BLOG (BLG-33), doğrulanmış metin: taslak v1f (sha e594dd317aa1); üç turda doğrulandı (v1c, v1d, v1e; her turda tuzaklı kopya 5/5 yakalandı, toplam 15/15). v1e → v1f farkı dört satırdır ve olgu değiştirmez (ErP ifadesi daraltıldı, atıf yeri düzeltildi, DOE sınırlama cümlesi eklendi).
-    // Kaynaklar: Casals plug fan kataloğu CV092024 (VentHub kaynak dizini), ABD Enerji Bakanlığı fan kılavuzu, VentHub kategori ve ürün sayfaları (3 Kasım 2026 ölçümü). Kayıtlı gövde sha 44fb55f20066. Fiyat yok: kategori sayfası teklife yönlendirir.
-    // Yayın: birleşme ayrı OPS onayıyla; yayinTarihi birleşme gününe göre güncellenir.
+    // BLOG (BLG-33), doğrulanmış metin: taslak v1m (sha aacd0e7bbd24). Makale çerçevesi (OPS-216, cetvel R3.3): markasız gövde, seri adları yalnız "VentHub'da hangi plug fan serileri var?" bölümünde ve Kaynaklar'da (toplam 4 ad; kapı en çok 8).
+    // Kaynaklar: ASHRAE Terminology (plenum fan), IIR kaydı (Coward 1997), ABD Enerji Bakanlığı fan kılavuzu, Casals plug fan kataloğu CV092024 (VentHub kaynak dizini), VentHub kategori ve ürün sayfaları (3 Kasım 2026). Kayıtlı gövde sha 9fe065f9c225. Fiyat yok: kategori sayfası teklife yönlendirir.
+    // Doğrulama: v1c-v1m, her turda tuzaklı + temiz kopya; son tur (9) tuzaklı 5/5, temiz yanlış 0. Recep okudu, yayın kararı Recep'te: birleşme ayrı OPS onayıyla; yayinTarihi birleşme gününe göre güncellenir.
     kimlik: 'plug-fan-nedir',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-03',
@@ -1275,86 +1275,81 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     diller: {
       tr: {
         slug: 'plug-fan-nedir',
-        ozet: "VentHub'daki plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahriklidir. ENKELFAN ve KENTALFAN serileri, motor tipleri, kullanım alanları ve seçim girdileri.",
+        ozet: "Plug fan nedir? Çark ve tahrik yapısı, kullanım yerleri, seçim girdileri ve VentHub'daki plug fan serileri.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Plug fanın ne olduğunu, VentHub'daki iki seriyi ve seçimde gereken girdileri görmek için bu rehberden başlayın.",
-        govde: `# Plug fan nedir, nerede kullanılır?
+        govde: `# Plug fan nedir, nasıl çalışır, nerede kullanılır?
 
-Plug fan, Casals kataloğunda ENKELFAN ve KENTALFAN serileri için geriye eğik kanatlı, tek emişli ve doğrudan tahrikli bir fan olarak tarif edilir [1]. Bu seriler katalogda doğrudan tahrikli olarak yazılıdır ve katalog serileri klima cihazı, kompresör ve kurutucu gibi makinelere entegre edilmesi için uygun görür [1]. Aynı katalogda kayış tahrikli bir plug fan serisi de (CLIBOS-TR) bulunur [1]; bu yazı VentHub'daki iki doğrudan tahrikli seriyi kapsar [3].
+Plug fan, ASHRAE Journal'da 1997'de yayımlanan bir makalenin başlığında "unhoused (plug/plenum) fans" ifadesiyle geçen kasasız bir fan türüdür [2]; bir üreticinin kataloğundaki EC ve IEC motorlu plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli çarkı olan merkezkaç fanlardır [4]. ASHRAE sözlüğünde plenum fan girdisi vardır: tek girişli bir çarkla hava dağıtım sistemindeki bir plenum haznesini basınçlandıran fan düzeneği olarak tanımlanır [1]. Bu yazı fanın nasıl çalıştığını, nerelerde kullanıldığını ve seçimde hangi bilgilerin gerektiğini anlatır; VentHub'daki seriler en sonda kısaca sıralanır.
 
-Bu yazı plug fanın nasıl tarif edildiğini, VentHub'ın plug fan kategorisindeki iki seriyi (EC motorlu ENKELFAN ve IEC standart asenkron motorlu KENTALFAN), kataloğun saydığı kullanım alanlarını ve seçimde hangi girdilerin gerektiğini anlatır. Tanımlar ve teknik değerler Casals plug fan kataloğuna ve ABD Enerji Bakanlığı kılavuzuna, seri adları, model sayıları ve seçim girdileri VentHub kategori ve ürün sayfalarına dayanır. Bu yazı seriler arasında bir üstünlük sıralaması yapmaz; iki seri katalogda birbiriyle karşılaştırılmamıştır [1].
+## Plug fan nasıl çalışır?
 
-## Plug fan nasıl tarif edilir?
+ABD Enerji Bakanlığı kılavuzunun sözlüğü merkezkaç fanı, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımı olarak tanımlar; kanatları dönüş yönünden geriye doğru açılı fanlar bu kılavuzda merkezkaç fanların bir grubudur [3]. Katalogdaki EC ve IEC motorlu plug fanlarda çark geriye eğik kanatlı ve tek emişlidir [4]. ASHRAE sözlüğü plenum fan girdisinde çarkın tipik olarak kanat profilli ya da geriye eğik tasarımda olduğunu yazar; bu bilgi plenum fan içindir [1].
 
-Casals kataloğu ENKELFAN'ı geriye eğik kanatlı, tek emişli, doğrudan tahrikli, kendi kendini temizleyen çarklı bir plug fan olarak tanımlar [1]. KENTALFAN için de aynı çark nitelikleri (geriye eğik, tek emişli, doğrudan tahrikli) yazılıdır [1]. Katalog ENKELFAN'ı "Centrifugal fan with external rotor EC motor" (harici rotorlu EC motorlu merkezkaç fan) başlığıyla sunar [1]. ABD Enerji Bakanlığı kılavuzu merkezkaç fanı, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımı olarak tanımlar ve kanatları dönüş yönünden geriye doğru açılı merkezkaç fanları ayrı bir grup sayar [2]. Plug fanın akış yolu bakımından yeri için [fan çeşitleri rehberine](vh:yazi/fan-cesitleri) ve merkezkaç ile eksenel farkı için [radyal fan mı aksiyel fan mı rehberine](vh:yazi/radyal-aksiyel-fan-secimi) bakılabilir.
+ABD Enerji Bakanlığı kılavuzu, çarkın motor miline doğrudan bağlandığı düzenin kayışlı tahrike göre daha yüksek verim, daha az yer ve daha az bakım gibi avantajları olduğunu belirtir [3]. Aynı kılavuz doğrudan tahrikli fanların motorun devrinde dönmesi gerektiğini ve bunun kullanılabilecekleri uygulamaları sınırladığını da yazar [3]. Plug fanların hepsi doğrudan tahrikli değildir: aynı katalogda doğrudan tahrikli serilerin yanında kayış tahrikli bir seri de yer alır [4].
 
-ABD Enerji Bakanlığı kılavuzuna göre doğrudan tahrikli sistemde fan motor miline bağlanır [2]; katalog ENKELFAN ve KENTALFAN için yalnızca "doğrudan tahrikli" der [1]. Aynı kılavuz doğrudan tahrikin kayışlı tahrike göre daha yüksek verim, daha az yer ve daha az bakım gibi üstünlükleri olduğunu belirtir [2]. Aynı kılavuz doğrudan tahrikli fanların motorun devrinde dönmesi gerektiğini ve bunun kullanılabilecekleri uygulamaları sınırladığını da yazar [2].
-
-## VentHub'da hangi seriler var?
-
-VentHub'ın [plug fanlar](vh:kategori/plug-fans) kategorisi iki ürün ailesinden oluşur: [ENKELFAN](vh:aile/casals-enkelfan-ec-plug) ve [KENTALFAN](vh:aile/casals-kentalfan-plug) [3]. ENKELFAN dokuz, KENTALFAN on dört model içerir [3].
-
-| Özellik | ENKELFAN | KENTALFAN |
-|---|---|---|
-| Motor | Harici rotorlu EC motor [1] | IEC standart asenkron sincap kafesli motor [1] |
-| Çap aralığı | Ø155 ile Ø630 arası [1] | Ø315 ile Ø630 mm arası [1] |
-| Besleme | 155–310 modellerinde tek fazlı 230 V, 355–630 modellerinde üç fazlı 400 V [1] | 4 kW'a kadar üç fazlı motorlarda 230/400 V, daha yüksek güçlerde 400/690 V; 315, 355 ve 400 boyutlarındaki M4 modelleri tek fazlı 230 V [1] |
-| Koruma ve yalıtım | IP54 motor, B sınıfı yalıtım [1] | IP55 koruma, F sınıfı elektrik yalıtımı [1] |
-| Hız kontrolü | 0-10 V veya PWM sinyali [1] | Aksesuar olarak frekans dönüştürücü (SFC) [1] |
-| Çalışma sıcaklığı | Model boyutuna göre -20 °C ile 60 °C, -25 °C ile 60 °C, -30 °C ile 50 °C ve -30 °C ile 40 °C aralıkları [1] | En yüksek sürekli 60 °C [1] |
-| Motor verim sınıfı | Üç fazlı motorlarda IE4, tek fazlı motorlarda IE5 [1] | IE sınıfı katalogda yazılı değildir; katalog sistemin gelecekteki Avrupa verimlilik düzenlemelerine (ErP) uyum için hazırlandığını yazar [1] |
-
-ENKELFAN için katalog, motorun düşük gürültülü olduğunu ve çarkın gürültü ile titreşimi en aza indirecek biçimde dinamik olarak dengelendiğini yazar; bu ifade üretici anlatımıdır [1]. KENTALFAN için de çarkın dinamik dengeleme ifadesi geçer [1]. Model tablolarında devir, akım, anma gücü, debi, ağırlık ve bazı tablolarda ses seviyesi (dB(A)) değerleri listelenir [1]. Ses değerinin ölçüm koşulu (mesafe, ortam) katalogda yazılı değildir [1]; bu nedenle ses değerleri seriler arasında doğrudan karşılaştırılmamalıdır.
-
-KENTALFAN için katalog, sipariş üzerine 100 °C'ye kadar ve IP66'ya kadar farklı üretim yapılabileceğini belirtir [1]. Bu seçeneğin VentHub'da sunulup sunulmadığı ürün sayfasından kontrol edilmelidir.
+ABD Enerji Bakanlığı kılavuzu doğrudan tahrikli fanın hız ayarını kayışlı düzene göre daha az esnek bulur; bu esnekliği eklemenin bir yolu olarak ayarlanabilir hız sürücüsünü gösterir [3]. Frekans dönüştürücünün ne işe yaradığı için [frekans konvertörü rehberine](vh:yazi/frekans-konvertoru), ürünler için [frekans konvertörleri kategorisine](vh:kategori/frequency-converters) bakılabilir.
 
 ## Hangi makinelerde kullanılır?
 
-Casals kataloğu ENKELFAN ve KENTALFAN için aynı kullanım listesini verir: klima cihazlarına, plenumlara, kompresörlere, kurutuculara, kabinlere ve fotovoltaik invertörlere entegre edilmek üzere uygundur [1]. VentHub'ın ENKELFAN ürün sayfası aynı listeyi "klima santralleri, plenum kutuları, kompresörler, kurutucular, kabinler ve fotovoltaik invertörler" biçiminde verir [3]. VentHub'ın plug fanlar kategori sayfası ise uygulama alanları arasında klima santralleri, ısı geri kazanım cihazları ve plenum kutularını sayar [3]; ısı geri kazanım cihazı katalogdaki kullanım listesinde yer almaz [1]. Katalogdaki ifade "air conditioners" olduğundan bu yazıda "klima cihazı" denir; santrale ya da ısı geri kazanım cihazına özgü bir kullanım için ürün sayfasındaki bilgiye ve üreticinin teyidine başvurulmalıdır. Katalog bu kullanımların hangisinde hangi serinin tercih edileceğini söylemez.
+Katalogdaki EC ve IEC motorlu plug fanlar klima cihazlarına, plenumlara, kompresörlere, kurutuculara, kabinlere ve fotovoltaik invertörlere entegre edilmek üzere uygun görülür [4]. Bu kullanımlardan hangisinde hangi serinin tercih edileceği katalogda yazılı değildir [4].
 
-## Seçimde hangi girdiler gerekir?
+Fan seçimi, ABD Enerji Bakanlığı kılavuzuna göre sistemin çalışma koşullarını bilerek başlar: hava özellikleri, hava debisi, basınç ve sistem yerleşimi [3]. Hava özellikleri nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri kapsar [3].
 
-VentHub plug fan kategorisi seçimi belirleyen soruları gereken hava debisi ve basınç, motor tipi (EC ya da IEC asenkron), besleme tipi (tek faz ya da üç faz) ve model boyutları olarak sıralar [3]. ABD Enerji Bakanlığı kılavuzu fan seçiminin hava özellikleri, debi, basınç ve sistem yerleşimini bilerek başlamasını söyler [2]. Katalogdaki model tabloları devir, akım, anma gücü, debi ve ağırlık sütunlarını içerir; ses seviyesi sütunu bazı tablolarda yer alır [1].
+## Seçimde hangi bilgiler gerekir?
 
-## Fiyatı belirleyen etkenler
+Tablonun ilk üç satırı ABD Enerji Bakanlığı kılavuzunun fan seçimi ve doğrudan tahrikli fanda hız ayarı için verdiği bilgileri, son üç satır VentHub'ın plug fan kategorisinde seçimi belirleyen soruları gösterir.
 
-Bu yazı fiyat vermez ve fiyatı belirleyen etkenleri kaynakla sayamaz. Seçimi belirleyen girdiler yukarıda sıralanmıştır: debi ve basınç, motor tipi, besleme tipi ve model boyutu [3]. Teklif isterken bu girdileri belirtin; plug fanlar kategorisindeki ürün aileleri için "Teklif İste" düğmesi bulunur [3].
+| Girdi | Neyi belirler | Hangi kaynak sayıyor |
+|---|---|---|
+| Hava özellikleri, hava debisi, basınç ve sistem yerleşimi | Merkezkaç ya da eksenel fan türünden hangisinin gerektiğini birlikte belirler | ABD Enerji Bakanlığı kılavuzu [3] |
+| Tahrik düzeni | Doğrudan tahrikli fan motorun devrinde döner, kayışlı düzene göre hız ayarı daha az esnektir | ABD Enerji Bakanlığı kılavuzu [3] |
+| Hız ayarı ihtiyacı | Doğrudan tahrikte esnekliği ayarlanabilir hız sürücüsü ekler | ABD Enerji Bakanlığı kılavuzu [3] |
+| Motor tipi | EC ya da IEC asenkron motor ailesi | VentHub plug fanlar kategorisi [5] |
+| Besleme tipi | Tek faz ya da üç faz bağlantısı | VentHub plug fanlar kategorisi [5] |
+| Model boyutu | Seri içinde model seçimi | VentHub plug fanlar kategorisi [5] |
+
+## VentHub'da hangi plug fan serileri var?
+
+VentHub'ın [plug fanlar](vh:kategori/plug-fans) kategorisinde iki Casals serisi bulunur: harici rotorlu EC motorlu [ENKELFAN](vh:aile/casals-enkelfan-ec-plug) ve IEC standart asenkron motorlu [KENTALFAN](vh:aile/casals-kentalfan-plug) [5]. İkisi de geriye eğik kanatlı, tek emişli ve doğrudan tahriklidir [4]. Model, besleme ve sıcaklık ayrıntıları ürün sayfalarındadır; ürün sayfalarında "Teknik Teklif İste" düğmesi bulunur [5].
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez. VentHub'ın plug fan kategorisi seçimi hava debisi ve basınç, motor tipi, besleme tipi ve model boyutuna bağlar [5]; bu girdiler yukarıdaki tabloda toplanmıştır.
+
+## Bu yazının sınırları nelerdir?
+
+ASHRAE'nin tanımı plenum fan içindir; sözlükte plug fan adıyla yapılan sorguda girdi bulunamadı (tek yöntem: adres sorgusu) ve plug fan ile plenum fan arasındaki ilişki bu yazıda yalnızca bir makale başlığına dayanır; makalenin metnine erişilemediği için ayrıntıya girilmemiştir [1][2]. Katalogda ses değerinin ölçüm koşulu (mesafe, ortam) yazılı değildir, bu yüzden ses değerleri seriler arasında karşılaştırılmamalıdır [4]. İki motor tipi katalogda birbiriyle karşılaştırılmamıştır; bu yazı da bir üstünlük sonucu çıkarmaz [4].
 
 ## Sık sorulan sorular
 
-### Plug fan nedir?
+### Plug fan ile plenum fan aynı şey midir?
 
-Plug fan, Casals kataloğunda ENKELFAN ve KENTALFAN serileri için geriye eğik kanatlı, tek emişli ve doğrudan tahrikli bir fan olarak tarif edilir [1]. Katalog bu serileri doğrudan tahrikli olarak yazar [1]; doğrudan tahrikte fan motor miline bağlanır [2].
+ASHRAE sözlüğündeki tanım plenum fan içindir [1]. ASHRAE Journal'daki bir makalenin başlığı iki adı "plug/plenum" diye yan yana kullanır [2]; bu, iki adın yakın bir fan türü için kullanıldığına dair tek kaynaklı bir işarettir, bir tanım değildir.
 
-### Plug fan merkezkaç mı, eksenel mi?
+### Plug fan her zaman doğrudan tahrikli midir?
 
-Casals kataloğu ENKELFAN'ı "Centrifugal fan with external rotor EC motor" başlığıyla sunar, yani merkezkaç fan olarak adlandırır [1]. KENTALFAN başlığı "PLUG FAN with IEC motor" biçimindedir ve merkezkaç sözcüğünü içermez [1]; ABD Enerji Bakanlığı kılavuzu ise geriye eğik kanatlı fanları merkezkaç fanlar grubunda sayar [2]. Aynı kılavuz merkezkaç fanda havanın çarkın dönme eksenine dik yönde boşaltıldığını söyler [2].
+Hayır. Katalogdaki EC ve IEC motorlu seriler doğrudan tahriklidir, bir seri ise kayış tahriklidir [4].
 
-### EC motorlu plug fan ile asenkron motorlu plug fan arasındaki fark nedir?
+### Plug fanın koruma sınıfı nedir?
 
-VentHub'da EC motorlu seri ENKELFAN, IEC standart asenkron motorlu seri KENTALFAN'dır [1][3]. Katalog ENKELFAN için üç fazlı motorlarda IE4, tek fazlı motorlarda IE5 verim sınıfını yazar; KENTALFAN için verim sınıfı belirtmez [1]. İki motor tipi katalogda birbiriyle karşılaştırılmamıştır [1]; bu yazı da bir üstünlük sonucu çıkarmaz.
+Katalogdaki EC motorlu plug fanın motoru IP54 korumalı ve B sınıfı yalıtımlıdır, IEC asenkron motorlu olanın motoru IP55 korumalı ve F sınıfı yalıtımlıdır [4]. IEC asenkron motorlu seri için talep üzerine 100 °C'ye ve IP66'ya kadar farklı üretim de mümkündür [4].
 
-### VentHub'daki plug fanların hızı nasıl kontrol edilir?
+### Plug fan hangi sıcaklıkta çalışır?
 
-Katalog, ENKELFAN için 0-10 V veya PWM sinyaliyle hız kontrolünü, KENTALFAN için aksesuar olarak frekans dönüştürücüyü (SFC) listeler [1]. Frekans dönüştürücünün ne işe yaradığı için [frekans konvertörü rehberine](vh:yazi/frekans-konvertoru) bakılabilir.
+Katalogdaki EC motorlu plug fanın çalışma sıcaklığı modele göre -20 ile 60 °C arasından -30 ile 40 °C arasına kadar değişir, IEC asenkron motorlu olanın sürekli çalışma sıcaklığı en çok 60 °C'dir [4].
 
-### VentHub'daki plug fanlar hangi sıcaklıkta çalışır?
+### VentHub'da hangi plug fan serileri var, teklif nasıl istenir?
 
-ENKELFAN için katalogdaki çalışma sıcaklığı aralığı model boyutuna göre -20 °C ile 60 °C, -25 °C ile 60 °C, -30 °C ile 50 °C ve -30 °C ile 40 °C arasında değişir [1]. KENTALFAN için en yüksek sürekli çalışma sıcaklığı 60 °C olarak yazılıdır; bu değerin ortam, motor ya da gaz sıcaklığı olduğu katalogda yazılı değildir [1].
-
-### VentHub'daki plug fanlar nerelerde kullanılır?
-
-Katalog ENKELFAN ve KENTALFAN için klima cihazlarına, plenumlara, kompresörlere, kurutuculara, kabinlere ve fotovoltaik invertörlere entegre edilmeyi uygun görür [1].
-
-### Plug fan seçimine nereden başlanır?
-
-Hava debisi ve basıncı, motor tipini, besleme tipini ve model boyutunu belirleyerek başlanır [3]. Projeye özel seçim için "Teklif İste" düğmesini kullanın.
+VentHub'ın plug fanlar kategorisinde EC motorlu ve IEC asenkron motorlu iki seri bulunur; ürün sayfalarında "Teknik Teklif İste" düğmesi vardır [5].
 
 ## Kaynaklar
 
-1. Casals, Plug fans — Technical Catalogue / Catálogo técnico (revizyon kodu CV092024), PDF s. 12, 16, 20 ve 21 (basılı s. 10, 14, 18 ve 19); VentHub kaynak dizininde kayıtlıdır (pdf_hash b7c9ad9cab1e).
-2. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 8, 15, 21, 51, 79 ve 80. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
-3. VentHub, plug fanlar kategori sayfası ile Casals ENKELFAN ve KENTALFAN ürün ailesi sayfaları, canlı sitede 3 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/plug-fanlar, https://venthub.com.tr/tr/products/casals-enkelfan-ec-plug ve https://venthub.com.tr/tr/products/casals-kentalfan-plug
+1. ASHRAE, ASHRAE Terminology (A Comprehensive Glossary of Terms for the Built Environment), "plenum fan" girdisi; "plug fan" ve "unhoused fan" sorgularında girdi bulunamadı (tek yöntem: adres sorgusu). https://terminology.ashrae.org/?entry=plenum%20fan (erişim 03.11.2026)
+2. C. W. Coward, "Unhoused (plug/plenum) fans: is their performance predictable?", ASHRAE Journal, cilt 39, sayı 10, Ekim 1997. Bibliyografik kayıt: International Institute of Refrigeration, kayıt no 1998-3086, https://iifiir.org/en/fridoc/unhoused-plug-plenum-fans-is-their-performance-predictable-109693 (yalnız kayıt okundu; makale metnine erişilmedi; erişim 03.11.2026)
+3. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 8, 15, 21, 51, 79 ve 80 (basılı s. 4, 11, 17, 47, 75 ve 76). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
+4. Casals, Plug fans — Technical Catalogue / Catálogo técnico (revizyon kodu CV092024), PDF s. 12, 16, 20 ve 21 (basılı s. 10, 14, 18 ve 19); VentHub kaynak dizininde kayıtlıdır (pdf_hash b7c9ad9cab1e).
+5. VentHub, plug fanlar kategori sayfası ile iki ürün ailesi sayfası, canlı sitede 3 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/plug-fanlar, https://venthub.com.tr/tr/products/casals-enkelfan-ec-plug ve https://venthub.com.tr/tr/products/casals-kentalfan-plug
 
 ## Teknik sorumluluk notu
 
