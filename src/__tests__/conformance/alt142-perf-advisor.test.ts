@@ -233,15 +233,28 @@ const BIRLESIK_ICERIK: ReadonlyArray<{ ad: string; var: RegExp[]; yok?: RegExp[]
   },
   {
     ad: 'quote_items_insert',
-    var: [/is_admin_user/, /status = 'draft'/, /status = 'requested'/, /q\.user_id = \(select auth\.uid\(\)\)/],
+    var: [
+      /tenant_id = public\.jwt_tenant_id\(\)\s+and\s+\(/,
+      /is_admin_user/,
+      /status = 'draft'/,
+      /status = 'requested'/,
+      /q\.user_id = \(select auth\.uid\(\)\)/,
+    ],
   },
   {
     ad: 'quotes_insert',
-    var: [/is_admin_user/, /status = 'draft'/, /status = 'requested'/, /user_id = \(select auth\.uid\(\)\)/],
+    var: [
+      /tenant_id = public\.jwt_tenant_id\(\)\s+and\s+\(/,
+      /is_admin_user/,
+      /status = 'draft'/,
+      /status = 'requested'/,
+      /user_id = \(select auth\.uid\(\)\)/,
+    ],
   },
   {
     ad: 'quotes_update',
     var: [
+      /tenant_id = public\.jwt_tenant_id\(\)\s+and\s+\(/,
       /is_admin_user/,
       /status = 'quoted'/,
       /status = 'rejected'/,
@@ -346,7 +359,7 @@ function denetle(sql: string): string[] {
 
   // 4) çıplak auth çağrısı (yorumlar ve dizgeler dışında zaten ifadelerde; dizge içeriği de taranır)
   const tumu = ifadeler.join(' ; ')
-  const cipak = tumu.match(/(?<!\bselect\s+)auth\.(?:uid|jwt)\(\)/gi)
+  const cipak = tumu.match(/(?<!\(select\s+)auth\.\w+\(\)/gi)
   if (cipak) ihlal.push(`çıplak auth çağrısı: ${cipak.length} adet`)
 
   // 5) birleşik politikaların içeriği (eskilerin VEYA'sı)
@@ -422,7 +435,7 @@ describe('ALT-142 · Performance Advisor migration kapısı', () => {
 
   it('(c) çıplak auth.uid() / auth.jwt() yok', () => {
     const ifadeler = ifadelereBol(MIGRATION).join(' ; ')
-    expect(ifadeler.match(/(?<!\bselect\s+)auth\.(?:uid|jwt)\(\)/gi)).toBeNull()
+    expect(ifadeler.match(/(?<!\(select\s+)auth\.\w+\(\)/gi)).toBeNull()
     // Dolu evren: sarılı çağrılar gerçekten var (regex boş ölçmesin).
     expect((ifadeler.match(/\(select auth\.(?:uid|jwt)\(\)/gi) ?? []).length).toBeGreaterThan(10)
   })
@@ -492,6 +505,19 @@ describe('ALT-142 · Performance Advisor migration kapısı', () => {
         'create policy brands_admin_delete on public.brands for delete to authenticated using ((select public.is_admin_user()));\n',
       )
       expect(denetle(bozuk).join('\n')).toMatch(/brands_admin_delete: admin kaynağı user_profiles olmalı/)
+    })
+
+    it('kiracı koşulu silinmiş (quotes_insert, kiracılar arası sızıntı)', () => {
+      const bas = MIGRATION.indexOf('create policy quotes_insert')
+      const blok = MIGRATION.slice(bas).replace(/tenant_id = public\.jwt_tenant_id\(\)\s+and \(/, '(')
+      const bozuk = MIGRATION.slice(0, bas) + blok
+      expect(bozuk).not.toBe(MIGRATION)
+      expect(denetle(bozuk).join('\n')).toMatch(/quotes_insert: eksik koşul/)
+    })
+
+    it('çıplak auth.role() (uid/jwt dışı)', () => {
+      const bozuk = degistir(MIGRATION, '(select auth.uid())', 'auth.role()')
+      expect(denetle(bozuk).join('\n')).toMatch(/çıplak auth çağrısı/)
     })
 
     it('bir dizin eksik', () => {
