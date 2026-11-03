@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.12 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.16 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -68,6 +68,29 @@ cetvelde hiç yoktu.
 (R3 tablosu, Fiyat satırı): kaynak etken anlatmıyorsa başlık korunur, bölüm bunu dürüstçe söyler ve teklif için istenen seçim
 girdilerini kaynak atfıyla yazar. Tetik: BLG-31 tur 2 ve tur 3'te iki bağımsız doğrulayıcı, fiyat etkeni anlatmayan bölümü
 başlık-içerik uyumsuzluğu olarak buldu. Kırmızı kural ve kapı getirmez (başlık sabit kalır, `kalipDenetle` değişmez).
+
+**v0.13 (2026-11-03, BLG-34, OPS-215):** R10.1 şemasına iki basamak girer: **B1a** (konu kartı açılınca GEO-SEO'dan arama
+talebi özeti ve yazıda adıyla geçmesi gereken marka, seri ve model listesi) ve **B6a** (B5 temiz çıkınca, taslak Recep'e
+gitmeden GEO-SEO taslak okuması). Tetik: Recep'in "yazı hazırlanırken GEO-SEO'ya bilgi gelmiyor" eleştirisi; R10'da GEO-SEO
+yalnız yayından sonra (B11–B15) vardı. BLG-33 ölçümü: yazı Casals'ın iki serisine dayandı, Nicotra Gebhardt'ın katalogda
+"plug fan" diye tanıttığı seriler (RLM, RLE) yazım sırasında kimsenin elinde olmadığı için kapsama girmedi. Kırmızı kural ve
+kapı getirmez; iki basamağın kapısı yoktur (aday). Ayrıntı metni GEO-SEO'nundur (`yayin-gorunurluk-denetim-standard.md`,
+yeni Y numarası); numara kesinleşince R10.4'teki satır güncellenir. Aynı sürümde GEO-SEO'nun B8 ve B10 bildirim ve yedek
+paragrafı (OPS-215, kopya OPS'ta) B8 ve B10 satırlarına işlendi: BLOG B8'de adres, PR numarası ve ana terimi, B10 bitince
+"canlı, adres, lastmod" satırını GEO-SEO'ya yazar; yedek kuralın tam metni Y2.2'dedir (GEO-SEO, PR #2221).
+
+**v0.14 (2026-11-03, BLG-35, OPS-216 kararı):** yeni **R3.3 Genel rehber: makale tarzı**: markasız genel tanım ve ilke tarafsız
+kaynaktan akıcı; marka ve seri en sonda tek kısa "VentHub'da hangi seriler var" bölümü; SSS'de en çok bir VentHub sorusu; atıf
+paragraf sonunda, "katalog der" kalıbı yok; seri ayrıntısı yazıda değil aile ve ürün sayfasında. Kapsam: plug fan (BLG-33) ve
+fan çeşitleri (BLG-36, R5.5 revizyonu). Tetik: BLG-33 v1f'in makale değil katalog özeti gibi okunması (GEO-SEO SEO-79, Recep).
+Kırmızı kural getirmez; fiyat başlığı kapısı kapandı (`## Teklif için hangi bilgiler gerekir?` kabul, `kalipDenetle`), paragraf sonu atıf AÇIK.
+
+**v0.15 (2026-11-03, BLG-35, OPS kararı):** `kalipDenetle` `## Fiyatı belirleyen etkenler` yerine `## Teklif için hangi bilgiler gerekir?`
+başlığını da kabul eder (R3.3 kapı uyumu (c) kapandı); test eklendi. Zorunlu bölüm listesi ve diğer kalıp kırmızıları değişmedi.
+
+**v0.16 (2026-11-03, BLG-35, OPS kararı):** R3.3'e 8. madde: **marka yoğunluğu kapısı** `markaDenetle` (gövdede marka ve seri adı 0,
+toplam en çok 8, KIRMIZI; genel rehber türü `VentHub'da hangi … serileri var?` başlığıyla tanınır). Tetik: BLG-33 v1k/v1l
+metinlerinde marka adlarının yoğunlaşması, kuralın yazılı olup kapısının olmaması. Testler eklendi (55/55).
 
 ---
 
@@ -377,6 +400,37 @@ Search Console "Google tarafından bilinmiyor" dedi, 09-29'da aramada yazı değ
 çıktı. Yazıya sitenin içinden bağlanan TEK sayfa listeydi (ana sayfa 0, kategori 0, aileler 0). Bu satır
 v0.4'ten beri "URUN'un sayfa işi" diye yazılıydı ama emre bağlanmamıştı — yapılmadı.
 
+### R3.3 Genel rehber: makale tarzı (v0.14, BLG-35, OPS-216 kararı, Recep 2026-11-03)
+
+**Kapsam.** Bir ürün grubunu ya da fan çeşidini anlatan genel rehber ("plug fan nedir", "fan çeşitleri nelerdir"). Hesaplayıcıyla
+birleşen yazı (R2.5) ve mevzuatı anlatan yazı bu bölümün dışında kendi kalıbını korur; bu bölüm yalnız "yazı katalog ya da
+marka metni gibi okunuyor" sorununu çözer. **Niçin:** BLG-33 taslağı (v1f) doğruydu ama makale değil katalog özeti gibi okunuyordu:
+girişte markasız genel tanım yoktu, gövdenin çoğu iki serinin tablo satırlarıydı, "katalogda yazılı değildir" kalıbı 8 kez
+geçiyordu, SSS gövdeyi tekrarlıyordu (GEO-SEO ölçümü, SEO-79; Recep: "ilk yazılar makale tarzıydı, bu katalog ağırlıklı").
+
+| # | Kural |
+|---|---|
+| 1 | **Sıra:** doğrudan cevap (markasız genel tanım) → nasıl çalışır / ilke → türler ve seçim ölçütleri → kullanım → **en sonda tek kısa "VentHub'da hangi seriler var" bölümü** (seri adı, bir cümlelik nitelik, aile ve ürün sayfası bağlantısı `vh:aile/…`). Seri ayrıntısı (çap, sıcaklık, koruma ve model sayısı tabloları) yazıya girmez; aile ve ürün sayfasındadır |
+| 2 | **Kaynak ayrımı:** tanım ve ilke tarafsız kaynaktan yazılır (standart, kamu ya da akademik kılavuz; R2.2 erişim sınıfı yazılı). Üretici kataloğu yalnız seri bölümündeki seri olgusunda kullanılır. Tarafsız kaynak bulunamayan tanım yazılmaz ya da "üretici anlatımı" etiketiyle sınırlanır (R5.1 kapsam alanı) |
+| 3 | **Anlatım:** akıcı makale; her cümleyi "katalog der / yazar / belirtir" ile bitirmek yasak. Atıf paragrafın sonunda toplanır; iddia tablosu (R5.1) cümle düzeyinde kalır, metinde atıf yoğunluğu azalır, iddia tablosu azalmaz |
+| 4 | **Tablo:** seriden bağımsız ilke ya da seçim tablosu (örnek: türler ve ayırt edici nitelik). Seri karşılaştırma tablosu bu tür yazıda zorunlu değildir; R3'ün "en az bir tablo" şartı ilke tablosuyla karşılanır |
+| 5 | **SSS:** gövdeyi tekrarlamaz; en çok bir soru VentHub'a ilişkindir (serilerimiz, teklif); kalan sorular konunun yan soruları (R1 arama önerileri). Sayı aralığı R3 tablosundaki gibi 5–8 kalır (kapı `SSS_ARALIGI`) |
+| 6 | **Sınırlar:** "kaynakta yazılı değil" türü olumsuz iddialar metne dağılmaz; bir "Sınırlar" kutusunda ya da bölüm sonunda toplanır (R5.1 olumsuz iddia kuralı geçerli) |
+| 7 | **Revizyon:** yayındaki yazı bu kalıba geçerken R5.5 revizyonu uygulanır; adres ve slug değişmez, `guncellemeTarihi` güncellenir |
+| 8 | **Marka yoğunluğu (v0.16, kapı `markaDenetle`, KIRMIZI):** `## VentHub'da hangi … serileri var?` bölümü olan yazıda (genel rehber türü) marka ve seri adı **seri bölümü ile `## Kaynaklar` dışında 0** olmalıdır (`MARKA-GOVDEDE`); giriş, çalışma ilkesi, kullanım, seçim tablosu, sınırlar ve SSS adı taşımaz, kaynak gerekiyorsa `[n]` atfı yazılır, ad yazılmaz ("bir üreticinin kataloğu"). **Tüm yazıda** marka + seri adı toplamı **en çok 8** olabilir (`MARKA_TOPLAM_TAVAN`, `MARKA-TOPLAM`); hedef 6 civarı. Sayım yalnız görünen metni okur (adres ve `vh:` hedefleri sayılmaz). Liste `MARKA_SERI_ADLARI` sabit dizisidir (Casals, ENKELFAN, KENTALFAN, CLIBOS, CLIBOS-TR, CIKSTORM, Nicotra ve diğer büyük markalar); brands tablosu ve kaynak dizini seri adlarıyla genişletilir, her ekleme teste girer. **Niçin:** BLG-33 v1l 1145 kelimede Casals 21, ENKELFAN 16, KENTALFAN 17 kez geçti (v1k: 17/11/11); kural 1. maddede yazılıydı, kapı olmadığı için iki sürüm geçti. Ölçüm: v1l kapıda KIRMIZI (gövdede 40, toplam 47), v1m yeşil |
+
+**Kapı uyumu (AÇIK, OPS kararı):** (a) `ATIFSIZ-IDDIA` kapısı cümle düzeyinde çalışır; "atıf paragraf sonunda" kuralı, kapı paragraf
+sonu atfını kabul edene kadar yazılarda cümle sonu atfıyla birlikte uygulanır (iddia sayılı, olumsuz ya da mevzuat cümlesinde atıf
+cümle içinde kalır, diğerlerinde paragraf sonuna toplanır). (b) Zorunlu başlık `## Fiyatı belirleyen etkenler` birebir kalır
+(kapı `kalipDenetle`); hub kalıbı (v0.12) yalnız çeşit ve kategori sıralayan hub yazısında geçerlidir, makale tarzı genel rehberde
+bölüm kaynaklı etkenleri anlatır, kaynak yoksa R3 Fiyat satırındaki dürüst söylem kalır. (c) **KAPANDI (2026-11-03, OPS kararı,
+BLG-35):** makale tarzı genel rehberde fiyat bölümü yerine `## Teklif için hangi bilgiler gerekir?` başlığı kabul edilir
+(GEO-SEO SEO-79 önerisi). `kalipDenetle` ikisinden birini arar (`FIYAT_BOLUMU_ADLARI`); ikisi de yoksa kırmızı eski adla
+(`ZORUNLU-BOLUM-YOK`, `## Fiyatı belirleyen etkenler`) verilir; `h2Basliklari` yeni başlığı da zorunlu bölüm sayar. Bölümün
+içeriği R3 Fiyat satırına tabidir: rakam yok, kaynak fiyat etkeni saymıyorsa bunu açıkça söyler, seçim girdileri kaynak atfıyla
+yazılır. Test: `scripts/rehber/__tests__/rehber-denetim.test.ts` ("R3.3" durumu). (a) ve (b) maddelerindeki paragraf sonu atıf
+konusu AÇIK kalır.
+
 ## R4 — Yasaklar
 
 1. **Toplu üretim yok.** Google spam politikası: *"Scaled content abuse is when many pages are generated
@@ -639,13 +693,16 @@ yazılmamış kapıdır; var sayılmaz (R8.1).
 ```mermaid
 flowchart TD
   subgraph ONCE["Yayından önce (BLOG)"]
-    B1["B1 Konu seçimi<br/>R1"] --> B2["B2 Kaynak ve mevzuat paketi<br/>R2, R2.6"]
+    B1["B1 Konu seçimi<br/>R1"] --> B1a["B1a GEO-SEO girdisi<br/>R10.1"]
+    B1a --> B2["B2 Kaynak ve mevzuat paketi<br/>R2, R2.6"]
     B2 --> B3["B3 Taslak + iddia tablosu<br/>R3, R5.1 adım 2"]
     B3 --> B4["B4 Yayın yolu ölçümü<br/>R5.7"]
     B4 --> B5["B5 Doğrulama turu<br/>R5.1 3a–3g"]
     B5 -->|"R5.3 kırmızı"| B6["B6 Düzeltme + tam yeniden tur<br/>R5.1 adım 4–5"]
     B6 --> B5
-    B5 -->|"R5.3 temiz"| B7["B7 Önizleme + onay<br/>R5.4, R5.7"]
+    B5 -->|"R5.3 temiz"| B6a["B6a GEO-SEO taslak okuması<br/>R10.1"]
+    B6a -->|"uygun"| B7["B7 Önizleme + onay<br/>R5.4, R5.7"]
+    B6a -->|"düzeltme"| B6
   end
   B7 -->|"onay"| B8["B8 Yazı kaydı + PR + kapılar<br/>R6, R8"]
   B7 -->|"değişiklik"| B3
@@ -664,15 +721,17 @@ flowchart TD
 | Basamak | Ne yapılır | Sahibi | Kapı (neyle ölçülür) | Olmazsa | Kayıt |
 |---|---|---|---|---|---|
 | **B1** Konu seçimi | R1.2 ölçüt tablosu; konu başına tek yazı (R1.3); sıra R1.4 | BLOG önerir, Recep sırayı belirler | R1.3 tek yazı/konu. Toplu üretim kapısı (R4.1, R8.1) henüz yok; ritim R9 | konu elenir ya da başka yazıyla birleşir | Kanban kartı (BLG-n) + R1.2 tablosu karta not |
+| **B1a** GEO-SEO girdisi (yazım öncesi) | Konu kartı açılınca BLOG konu adını ve kart numarasını GEO-SEO'ya verir. GEO-SEO iki şey döner: (1) o konu kümesi için arama talebi özeti (biçim ve veri kuralı GEO-SEO metninde; arama verisi depoya, PR'a, kart dışı belgeye girmez, GEO-SEO kuralı P6), (2) yazıda ADIYLA geçmesi gereken marka, seri ve model listesi. Liste taslağın kapsam girdisidir; listedeki bir ad yazıya girmiyorsa nedeni taslak notuna yazılır | GEO-SEO verir; BLOG ister ve kullanır | **Kapı yok (aday).** Kartta GEO-SEO girdisinin iki parçası bulunur; liste ↔ taslak ad farkı taslak notunda | Girdi gelmeden B2'ye geçilmez; GEO-SEO bir gün içinde dönmezse BLOG OPS'a "GEO-SEO girdisi yok" diye tek satır yazar | karta tek satır + ad listesi (arama verisi yazılmaz). Ayrıntı metni GEO-SEO'nun (`yayin-gorunurluk-denetim-standard.md`, yeni Y numarası); numara kesinleşince bu satır numarayla güncellenir |
 | **B2** Kaynak ve mevzuat paketi | Araştırmacı alt ajan (salt-okuma) kaynakları açar: erişim sınıfı (R2.2), ham alıntı (R2.3); mevzuat iddiası MEVZUAT paketinden (R2.6 adım 1) | BLOG + MEVZUAT | `alinti-dogrula.mjs` KALDI 0; açılamayan kaynak 0 (R5.3) | kaynak elenir, iddia düşer; kaynak yoksa yazı yazılmaz | depo dışı klasör + karta not (R5.7) |
 | **B3** Taslak + iddia tablosu | R3 kalıbı; her iddia → kaynak no + birebir alıntı + tür; mevzuat yalnız paketten (R2.6 adım 2) | BLOG | `rehber-denetim.mjs` kırmızı 0 (kalıp, atıf, iç bağlantı-metin, vaat, olumsuz iddia, mevzuat). Adaylar: K0, K0b, K1, K3, K4, K5 (R10.2) | kırmızı 0 olmadan B5'e gidilmez | depo dışı taslak + iddia tablosu + betik çıktısı |
 | **B4** Yayın yolu ölçümü | Bağlanan aile ve kategori kimlikleri güncel slug'a çözülür (son yeniden adlandırma migration'ının eski-yeni çiftleri); site içi bağlantı hedefleri canlıda 200; yayını bloke eden açık karar yok | BLOG | R5.7 kimlik şartı; `ic-baglanti-denetle.mjs` (hedefler); açık karar yok | derleme durur; onay sorulmaz (R5.7 sınırı) | karta not: komut + çıktı |
 | **B5** Doğrulama turu | 3a kapsam çıkarımı (tabloyu görmeden), 3b atıf betiği, 3c alıntı betiği, 3d sınıflama, 3e sabotaj kolu (tuzak yalnız kopyada), 3f örnekleme, 3g MEVZUAT kontrolü | BLOG (doğrulayıcı alt ajanlar bağımsız; hüküm BLOG'da); 3g MEVZUAT | R5.3: eşlenmeyen 0 · DESTEKSİZ 0 · ÇELİŞİYOR 0 · BAYAT 0 · açılamayan 0 · sabotaj N/N (N ≥ 3) | B6 | karta tur notu: tur no, kırmızı sayısı, tuzak sayısı ve yakalanan |
 | **B6** Düzeltme + tam yeniden tur | R5.1 adım 4–5: düzelt, tuzakları çıkar, **tüm metin** yeniden 3a'dan geçer | BLOG | R5.1 adım 5 ("tüm metin"); tur sayacı (R10.3) | tur sayısı 3'ü aşarsa kök sebep notu: her bulgunun hangi aday kapıyla yakalanacağı (R10.2) | karta tur notu |
+| **B6a** GEO-SEO taslak okuması | B5 temiz çıkınca taslak (sha256 ilk 12 hane) Recep'e gitmeden GEO-SEO'ya verilir. GEO-SEO okur ve yazılı görüş döner: B1a'daki arama talebi ve ad listesi karşılanıyor mu, başlık, giriş ve H2'ler arama dilini taşıyor mu, aynı sorguda sitedeki başka yazıyla çakışma (R1.3) var mı. Görüş "uygun" ya da düzeltme listesidir; düzeltme metni değiştirirse B6 (tam yeniden tur) geçerlidir | GEO-SEO okur; BLOG işler | **Kapı yok (aday).** GEO-SEO yazılı görüşü kartta, taslak sha256'sıyla; B7'ye giden metnin sha256'sı görüştekiyle aynı | Görüş gelmeden B7'ye geçilmez; GEO-SEO bir gün içinde dönmezse BLOG OPS'a tek satır yazar | karta tek satır (görüş + sha256). Ayrıntı metni GEO-SEO'nun (B1a ile aynı Y numarası) |
 | **B7** Önizleme + onay | R5.4 iki parça: önizleme (sha256 ilk 12 hane) + düz cümle özet; tek soru "yayınlayalım mı?" | BLOG sunar, Recep onaylar (kendi sözü, bu pencerede) | sha256 doğrulananla aynı; yayına giremeyecek metnin onayı sorulmaz (R5.7) | metin değişirse durum taslak, B5 | durum dosyası + karta onay kaydı (kim, ne zaman, sha256) |
-| **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı **ve R10.6 yayın öncesi kontrol tablosu (sekiz madde, her madde kanıtlı; kanıtsız madde AÇIK, yayın çıkmaz)**; **PR açılınca yazı adresi GEO-SEO'ya SendMessage ile verilir** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
+| **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı **ve R10.6 yayın öncesi kontrol tablosu (sekiz madde, her madde kanıtlı; kanıtsız madde AÇIK, yayın çıkmaz)**; **PR açılınca BLOG yazı adresini, PR numarasını ve ana terimi GEO-SEO'ya tek satır SendMessage ile yazar** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
 | **B9** Birleşme | PR birleşmeden önce OPS'a gösterilir; `scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` | OPS onaylar; ritüeli emri veren pencere koşar | ritüel çıkış 0; `mergeStateStatus` CLEAN; `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` 204; karta "GEO-SEO taban aldı" notu (ne zaman gerektiği ve kip: Y2.1) | birleşme yapılmaz; kırmızı kapı B8'e döner | karta PR no + birleşme ölçümü |
-| **B10** Canlı doğrulama | Dağıtım bitince: yazı adresi **200**; site haritasında adres, `lastmod` = yayın tarihi; bilgi merkezi liste kartı **tarayıcı bölmesiyle** görülür (ham HTML yetmez); ters bağlantı yerinde; iç bağlantılar doğrudan 200 | BLOG | `curl` 200; harita satırı; `ic-baglanti-denetle.mjs`; `bot-karnesi.mjs` yazı adresinde temiz | düzeltme R5.5 revizyonu; B11–B12 başlamaz | karta not: adres, 200, `lastmod`, liste kartı (tarayıcı). ⚠Kart doğrulayıcısı `curl` ve kabuk operatörünü reddeder: "canlı 200" ölçütü elle işaretlenir, kanıt kart notundadır |
+| **B10** Canlı doğrulama | Dağıtım bitince: yazı adresi **200**; site haritasında adres, `lastmod` = yayın tarihi; bilgi merkezi liste kartı **tarayıcı bölmesiyle** görülür (ham HTML yetmez); ters bağlantı yerinde; iç bağlantılar doğrudan 200 | BLOG | `curl` 200; harita satırı; `ic-baglanti-denetle.mjs`; `bot-karnesi.mjs` yazı adresinde temiz | düzeltme R5.5 revizyonu; B11–B12 başlamaz | karta not: adres, 200, `lastmod`, liste kartı (tarayıcı); **B10 bitince BLOG GEO-SEO'ya ikinci tek satır yazar: "canlı, adres, lastmod"** (GEO-SEO aynı turda B11 ve B12'yi koşar). Yedek: bildirim gelmese de GEO-SEO her açılışta canlı site haritasını son kayıtla karşılaştırır, yeni adres bulursa aynı turda B11–B12'yi koşar, kart açar ve BLOG'a "bildirim gelmedi" yazar; tam metin `yayin-gorunurluk-denetim-standard.md` Y2.2'dedir (GEO-SEO'nun, PR #2221), R10 yalnız sırayı gösterir. ⚠Kart doğrulayıcısı `curl` ve kabuk operatörünü reddeder: "canlı 200" ölçütü elle işaretlenir, kanıt kart notundadır |
 | **B11** Google dizin isteği | B10'dan sonra **aynı tur**. Metin, kapı, komut ve süre sınırı **tek kaynakta**: `yayin-gorunurluk-denetim-standard.md` Y2 ("her yeni yazı ya da düzeltilmiş sayfa yayını" satırı; genişletme Y2.1, GEO-SEO'nun SEO-45 PR'ı). R10 yalnız sırayı gösterir, burada yeniden yazılmaz | GEO-SEO (Recep'ten ayrıca onay istenmez) | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B11 kaydı aranır (R10.3) |
 | **B12** IndexNow ve Bing | B11 ile aynı tur. Aynı kaynak: Y2 (IndexNow, Bing Webmaster, kip ve günlük sınır). R10'da komut satırı, kip ya da anahtar dosyası yolu yazılmaz | GEO-SEO | Y2 | Y2 | Y2'nin kayıt kuralı; kart notunda B12 kaydı aranır (R10.3) |
 | **B13** 3. gün | Ölçüm içeriği Y2'de (gün sayıları ve evren orada) | GEO-SEO | Y2; kıyas ölçütü R7 | Y2; düzeltme gerekirse BLOG'a SendMessage | karta tek satır + sayı; satır biçimi Y2.1 |
@@ -722,6 +781,7 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
 |---|---|---|
 | B11–B15 metni, kapıları ve komutları | GEO-SEO (Y2'nin sahibi) | **ONAYLANDI (GEO-SEO, 13 Ekim): şema doğru, kapı komutları betiklerle uyuşuyor.** Tek kaynak `yayin-gorunurluk-denetim-standard.md` Y2 (genişletme Y2.1: aynı tur, Bing Webmaster, IndexNow kipi, günlük sınır, öncelik, satır biçimi). R10 yalnız sıra, sahip ve bağlantı taşır; Y2'yi BLOG değiştirmez |
 | Y2.1'den R10'a bağ | GEO-SEO | Kabul edildi; Y2.1 PR'ında (SEO-45, OPS onayı ve #1917 birleşmesi sonrası) konur. Numara kesinleşince bu satır numarayla güncellenir |
+| B1a ve B6a ayrıntı metni (arama talebi özeti biçimi, ad listesi biçimi, okuma ölçütü, süre) ve Y numarası | GEO-SEO (Y2'nin sahibi) | **AÇIK (OPS-215, 3 Kasım):** GEO-SEO kendi basamak metnini `yayin-gorunurluk-denetim-standard.md`'ye yazar; numara kesinleşince B1a ve B6a satırlarındaki "yeni Y numarası" ifadesi numarayla güncellenir. Kapı yok (aday), kapıyı ARAÇ yazar |
 | EN yayını (`EN_YAYIN`) açılınca B10–B12 EN adresleri için tekrarlanır | GEO-SEO + URUN | bayrak kapalı, kapsam dışı |
 
 ### R10.5 Önceki yazıların ders listesi (yeni yazı başlarken OKUNUR)
@@ -871,7 +931,7 @@ değişeceği için R5.5 gereği sha256 değişir ve doğrulama turu yeniden ko�
 
 | Nokta | Sahibi | Durum |
 |---|---|---|
-| Zorunlu başlıklara ("Fiyatı belirleyen etkenler" vb.) konu teriminin eklenmesi: kapı başlığı birebir arıyor, değişirse `ZORUNLU_BOLUMLER` ve `kalipDenetle` birlikte değişir | BLOG + OPS kararı | AÇIK: Y4 şimdilik muaf tutar; değişiklik ayrı karar (R3 kalıbını etkiler) |
+| Zorunlu başlıklara ("Fiyatı belirleyen etkenler" vb.) konu teriminin eklenmesi: kapı başlığı birebir arıyor, değişirse `ZORUNLU_BOLUMLER` ve `kalipDenetle` birlikte değişir | BLOG + OPS kararı | KISMEN KAPANDI (v0.15): makale tarzı genel rehberde `Teklif için hangi bilgiler gerekir?` kabul; diğer başlıklara konu terimi eklemek AÇIK (Y4 muaf tutar) |
 | Search Central blogu ve Search Off the Record taraması (H2/H3 için resmî ek kanıt) | BLOG | YAPILMADI, ayrı iş |
 | Mueller açıklamasının birincil kaydı | BLOG | YAPILMADI; satır GÖRÜŞ olarak kalır |
 | Uyarı eşiklerinin üçüncü yazıda yeniden ayarı | BLOG | üçüncü yazıdan sonra |

@@ -360,6 +360,7 @@ Bunlar departman penceresinin (müdürün) kendi aracıdır; `Skill` aracıyla a
 | office-hours (11,4K) | OPS | Fikir/özellik önerisi plandan önce: karar öncesi tartışma, çalışan işi değil. |
 | to-prd (3,0K) | OPS | Konuşmayı PRD’ye çevirir: müdür/OPS düzeyi. |
 | video-kaynak (4,8K) | OPS | Video bulup NotebookLM’e kaynak ekler: seçimi Recep yapar, çalışan işi değil. |
+| ce-uygunluk-dosyasi (6,4K) | MEVZUAT | Firma ürünü için CE uygunluk dosyası taslağı (YTN-26, MVZ-2): girdi özeti, rejim doğrulaması, beyan taslağı, risk çerçevesi, eksik belge listesi. MEVZUAT'ın uygulayıcısı yok; iş müdür penceresinde yürür, çalışana ön yüklenmez. `pdf` girdi (araştırmacıda ön yüklü), `docx` çıktı tarafı (depo dışı kullanıcı skill'i). |
 
 Hiçbir departmana bağlanmayanlar (eski not): docker-deploy, plugin-author, audit-log (bu depoda skill klasörü yok); alınamayan: auto-review (çalıştıracak ana program yok).
 

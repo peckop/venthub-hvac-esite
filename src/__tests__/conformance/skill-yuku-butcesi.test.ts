@@ -55,7 +55,14 @@ const OTURUMA_GIREN = new Set(['name', 'description', 'argument-hint'])
  * ✅OPS onayı 12 Ekim 2026, YTN-18 (OPS, +1,9 KB; Recep: "alacaklarımız varsa alalım"). Bundan sonraki her yükseltme
  * aynı yoldan gider: ölçüm + OPS kararı, bu bloğa yeni tarihli satır.
  */
-const BUTCE_BAYT = 26 * 1024
+/**
+ * ⭐BÜTÇE 26 → 26,5 KB (YTN-26, ölçüm 2026-11-03). ce-uygunluk-dosyasi (MEVZUAT müdür çekirdeği) oturum listesine
+ * +0,3 KB ekledi: önceki toplam ~26,6 KB (pay ~9 bayt), yeni toplam 26 905 bayt (26,3 KB, 72 skill). Açıklama 230 karakter
+ * (tavan 300); daha fazla kısaltma tetik cümlelerini siler, başka skill'lerin açıklamasını kısaltmak tetik kaybı riski taşır.
+ * 26,5 KB (27 136 bayt) = bugünkü toplam + ~0,2 KB baş payı.
+ * ✅OPS onayı 3 Kasım 2026, YTN-26. Bundan sonraki her yükseltme aynı yoldan gider: ölçüm + OPS kararı, bu bloğa yeni tarihli satır.
+ */
+const BUTCE_BAYT = 26.5 * 1024
 
 /** Tek bir açıklamanın tavanı. Yeni skill'ler için geçerli; bugünkü aşanlar aşağıda ADIYLA. */
 const ACIKLAMA_TAVANI = 300
