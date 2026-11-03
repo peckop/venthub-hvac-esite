@@ -603,13 +603,13 @@ const ROLLER = {
   // REC-522: kartı olmayan altı departman. İçerik 5 salt-okuma araştırmacı taslağından; işi yapmamış bağımsız
   // doğrulayıcı atıfları yeniden ölçtü (8 düzeltme kalemi, kartlara düzeltilmiş hâliyle yazıldı). Ölçülmeyen "ölçülmedi" der.
   MEVZUAT: {
-    gorev: 'Teknik mevzuat ve standart kaydı: ürünlerimize dokunan AB tüzük/direktif, TR yönetmelik/tebliğ ve EN/ISO/IEC hükümlerini kanıtlı tutmak; KATALOG, BLOG ve SATIS\'a ürün ailesi × hüküm paketi vermek.',
-    gorevDegil: 'ürün sayfası ve veri yazımı (KATALOG); KVKK, mesafeli satış, fatura (OPS).',
-    dosyalar: 'docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya).',
+    gorev: 'Teknik mevzuat ve standart kaydı: ürünlerimize dokunan AB tüzük/direktif, TR yönetmelik/tebliğ ve EN/ISO/IEC hükümlerini kanıtlı tutmak; KATALOG, BLOG ve SATIS\'a ürün ailesi × hüküm paketi vermek. Ayrıca firma ürünü için CE uygunluk dosyası: beyan taslağı, risk çerçevesi, eksik belge listesi, kurum talebine cevabın ekleri; imza üreticide ya da Recep\'tedir.',
+    gorevDegil: 'ürün sayfası ve veri yazımı (KATALOG); KVKK, mesafeli satış, fatura (OPS); dış yazışma göndermek, taslak mail ya da yanıt yazmak (Recep); beyan imzalamak, test raporu ya da risk sonucu uydurmak.',
+    dosyalar: 'docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.',
     yetki: 'Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirsiz" hükmü verir; BLOG yazısındaki mevzuat cümlelerini kontrol eder (R5.1); kayıt değişince ilgili departmana bildirir; "ilk anlatan" konu önerir, sırayı Recep belirler.',
     yasak: 'Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).',
     yetenek: 'Önce NotebookLM (`notebooklm ask`; takip defteri a5f382a4, katalog 8bb600d9); Yayın Ofisi CELEX + SPARQL (EUR-Lex\'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini. Skill: notebook-navigator.',
-    durum: 'Açık, beklemede: tohum işi bitti, BLOG ya da KATALOG ihtiyacı doğunca yeniden açılır. ErP liste hükmü KATALOG donuğunu (karar 165) bekliyor. Cetvel v0.1 taslak, Recep onay kaydı bulunamadı; REC-393 "42 kalem" diyor, kayıt 46.',
+    durum: 'Açık (pencere 3 Kasım\'da açıldı, OPS-210).',
   },
   SATIS: {
     gorev: 'Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, müşteri e-postaları, KVKK ve roller; satış kipi şirket kurulana dek kapalı-hazır.',
