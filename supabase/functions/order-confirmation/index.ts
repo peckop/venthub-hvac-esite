@@ -3,6 +3,8 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
+// Şablon motoru + kaçış tek yerde (güvenlik karnesi 2026-11 G1; cetvel email-template-standard.md §2).
+import { guvenliRenk, guvenliUrl, kacir, renderTemplate } from '../_shared/kodlama.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -28,24 +30,6 @@ function callerFailure(error: unknown): { status: number; error: string } | null
   if (error instanceof CallerConfigError) return { status: 500, error: 'CONFIG_MISSING' }
   if (error instanceof CallerLookupError) return { status: 503, error: 'profile_lookup_failed' }
   return null
-}
-
-/**
- * Şablon motoru — `{{alan}}` + `{{#if alan}}…{{/if}}`. Döngü (`each`) YOKTUR ve
- * EKLENMEYECEKTİR: liste gerekiyorsa HTML'i çağıran taraf hazırlar.
- * Cetvel: `docs/standards/email-template-standard.md` §2.
- */
-function renderTemplate(tpl: string, _data: Record<string, unknown>): string {
-  tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
-    const v = _data[key]
-    const truthy = !!(typeof v === 'string' ? v : v)
-    return truthy ? inner : ''
-  })
-  tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
-    const v = _data[key]
-    return v == null ? '' : String(v)
-  })
-  return tpl
 }
 
 async function loadTemplate(): Promise<string | null> {
@@ -118,7 +102,8 @@ serve(async (req) => {
     const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || '').split(',').map(s=>s.trim()).filter(Boolean)
 
     const brandName = branding.brandName
-    const brandPrimary = branding.brandPrimaryColor
+    // CSS bağlamı: yalnız hex renk (cetvel cikti-kodlama-maske K2).
+    const brandPrimary = guvenliRenk(branding.brandPrimaryColor)
     const brandLogoUrl = branding.brandLogoUrl
     // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
     const supportEmail = branding.supportEmail
@@ -186,7 +171,7 @@ serve(async (req) => {
       if (tpl) html = renderTemplate(tpl, {
         brand_name: brandName,
         brand_primary_color: brandPrimary,
-        brand_logo_url: brandLogoUrl,
+        brand_logo_url: guvenliUrl(brandLogoUrl),
         customer_name,
         order_number: siparisNo,
         support_email: supportEmail,
@@ -196,12 +181,12 @@ serve(async (req) => {
     if (!html) {
       html = [
         '<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;">',
-        `<h2 style=\"color:${brandPrimary}\">${brandName} — Siparişiniz alındı</h2>`,
-        `<p>Merhaba <strong>${customer_name || ''}</strong>,</p>`,
-        `<p><strong>${siparisNo}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>`,
-        `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
-        `<p style="color:#6b7280;font-size:14px;">Sorularınız için <a href="mailto:${supportEmail}">${supportEmail}</a> adresine yazabilirsiniz.</p>`,
-        companyFooter ? `<p style="color:#6b7280;font-size:12px;">${companyFooter}</p>` : '',
+        `<h2 style=\"color:${kacir(brandPrimary)}\">${kacir(brandName)} — Siparişiniz alındı</h2>`,
+        `<p>Merhaba <strong>${kacir(customer_name)}</strong>,</p>`,
+        `<p><strong>${kacir(siparisNo)}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>`,
+        `<p>Teşekkürler,<br><strong>${kacir(brandName)} Ekibi</strong></p>`,
+        `<p style="color:#6b7280;font-size:14px;">Sorularınız için <a href="mailto:${kacir(supportEmail)}">${kacir(supportEmail)}</a> adresine yazabilirsiniz.</p>`,
+        companyFooter ? `<p style="color:#6b7280;font-size:12px;">${kacir(companyFooter)}</p>` : '',
         '</div>'
       ].join('')
     }

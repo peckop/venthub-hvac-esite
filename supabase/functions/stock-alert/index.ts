@@ -2,6 +2,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { teklifModundaMi } from './teklif_modu.ts'
 import { supabaseSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
+import { mask } from '../_shared/maske.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import {
@@ -422,7 +423,7 @@ async function sendNotification(type: string, to: string, data: AlertData, prior
 
     return { type, recipient: to, success: response.ok }
   } catch (err) {
-    console.error(`[ERROR] Notification failed (${type} to ${to}):`, err)
+    console.error(`[ERROR] Notification failed (${type} to ${mask(to)}):`, err)
     return { type, recipient: to, success: false }
   }
 }
