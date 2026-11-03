@@ -6,7 +6,12 @@
  * bölüyor, satır sayısı sınırı yok, kapanmamış tırnak sessizce yutuluyordu. Bu tek geçişli
  * durum makinesi RFC 4180'in temel kurallarını uygular ve sınırı AYRIŞTIRIRKEN denetler
  * (sınırı aşan dosya belleğe kayıt kayıt dolmadan durur).
+ *
+ * DIŞA → İÇE DÖNGÜSÜ (ADM-7): dışa aktarma formül gibi başlayan metne `'` öneki koyar
+ * (`hucre.ts`, §1.1). Veri hücreleri burada `notrlemeyiGeriAl`'dan geçer; yoksa adı `- Fan`
+ * olan ürün dışa aktarılıp geri yüklenince `'- Fan` diye yazılırdı.
  */
+import { notrlemeyiGeriAl } from './hucre'
 
 export type AyristirmaHatasi = 'bos' | 'cokSatir' | 'kapanmamisTirnak' | 'tekrarBaslik'
 
@@ -35,6 +40,8 @@ export function csvAyristir(metin: string, { maksSatir, ayrac = ',' }: Ayristirm
   let hucre = ''
   let hucreler: string[] = []
   let tirnakta = false
+  /** Hücreye henüz hiçbir karakter (tırnak dahil) okunmadı mı? */
+  let hucreBasi = true
   let satir = 1
   let kayitBasi = 1
 
@@ -66,18 +73,24 @@ export function csvAyristir(metin: string, { maksSatir, ayrac = ',' }: Ayristirm
       }
       continue
     }
-    if (k === '"') {
+    if (k === '"' && hucreBasi) {
+      // Tırnak YALNIZ hücre başında açılır (RFC 4180). Ortadaki `"` metindir: `Fan 5" çap`
+      // eskiden tırnak modunu açıp sonraki satırları tek kayda yutuyordu (ADM-7).
       tirnakta = true
+      hucreBasi = false
     } else if (k === ayrac) {
       hucreler.push(hucre)
       hucre = ''
+      hucreBasi = true
     } else if (k === '\n' || k === '\r') {
       if (k === '\r' && kaynak[i + 1] === '\n') i++
       if (!kayitBitir()) return { ok: false, hata: 'cokSatir' }
       satir++
       kayitBasi = satir
+      hucreBasi = true
     } else {
       hucre += k
+      hucreBasi = false
     }
   }
   if (tirnakta) return { ok: false, hata: 'kapanmamisTirnak' }
@@ -86,13 +99,20 @@ export function csvAyristir(metin: string, { maksSatir, ayrac = ',' }: Ayristirm
   if (kayitlar.length < 2) return { ok: false, hata: 'bos' }
 
   const baslik = kayitlar[0].hucreler.map((h) => h.trim().toLowerCase())
-  if (new Set(baslik).size !== baslik.length) return { ok: false, hata: 'tekrarBaslik' }
+  // Boş başlık (Excel'in sona eklediği `sku,name,,`) tekrar sayılmaz ve okunmaz (ADM-7):
+  // adı olmayan sütunu hiçbir içe aktarıcı kullanmaz. Dolu başlık tekrarı yine reddedilir.
+  const dolu = baslik.filter((b) => b !== '')
+  if (new Set(dolu).size !== dolu.length) return { ok: false, hata: 'tekrarBaslik' }
 
   const veri = kayitlar.slice(1)
   return {
     ok: true,
     baslik,
-    satirlar: veri.map(({ hucreler: h }) => Object.fromEntries(baslik.map((b, j) => [b, h[j] ?? '']))),
+    satirlar: veri.map(({ hucreler: h }) =>
+      Object.fromEntries(
+        baslik.flatMap((b, j) => (b === '' ? [] : [[b, notrlemeyiGeriAl(h[j] ?? '')] as const])),
+      ),
+    ),
     satirNolari: veri.map((k) => k.satir),
   }
 }

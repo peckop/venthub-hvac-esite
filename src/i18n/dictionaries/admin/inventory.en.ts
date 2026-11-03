@@ -201,6 +201,7 @@ export const inventory = {
       qtyMustBeNumber: 'Quantity must be a number',
       qtyOutOfRange: 'Quantity must be a whole number between 0 and 1,000,000',
       invalidSku: 'SKU may contain only uppercase letters, digits and hyphens',
+      duplicateSku: 'This SKU appears on more than one row; none of them was applied',
       skuNotMatched: 'SKU not matched',
       unknown: 'Unknown error',
       rowsSkippedDetail: '{{count}} rows were skipped. Example: {{examples}}',
