@@ -22,7 +22,7 @@ metadata:
 
 - Uzak ya da yerel **dal** silmek: ayrı iştir (cetvel madde 30), bu skill'in dışında.
 - **Başka departmanın** kopyası: silinmez, liste olarak OPS'a gider.
-- Tek seferlik `git worktree remove` ile kendi bitmiş işini kaldırmak: yine de kapıdan geçirilir, ama ilan gerekmez.
+- Tek seferlik kendi bitmiş ağacın da kapıdan ve ilandan geçer; istisna yok.
 
 ## Tek kaynaklar
 
@@ -30,7 +30,7 @@ metadata:
 |---|---|
 | Karar üreten kapı (silmez) | `scripts/hijyen/agac-silme-kapisi.cjs` (kipler: `--agac a,b --json`, `--ilan a,b`, `--sahiplik <ad>`), açıklaması `scripts/hijyen/agac-silme-kapisi.md` |
 | Kapının testi | `src/__tests__/conformance/agac-silme-kapisi.test.ts` (INV-AGAC-SILME-1) |
-| Cetvel (sahibi ALTYAPI) | `docs/standards/fleet-mechanism-standard.md` özet tablo, madde 30 ve 12 |
+| Cetvel (sahibi ALTYAPI) | `docs/standards/fleet-mechanism-standard.md` özet tablo, madde 30 |
 | Silen araçlar (kuru koşum varsayılan) | `tools/worktree-temizle.cjs` (kayıtlı ağaç), `tools/worktree-artik-sil.cjs` (git kaydı gitmiş artık klasör) |
 | Junction kuralı | `CLAUDE.md` "Worktree `node_modules` (karar 88)" notu |
 
@@ -42,8 +42,8 @@ metadata:
 4. **Kapı.** `agac-silme-kapisi.cjs --agac <liste> --json`. Engelli ağaç bu turda silinmez; sayıyı kapının çıktısından al, elle sayma.
 5. **İlan.** Kapıdan geçenler için `--ilan` ve `board.cjs note --to herkes`. Dosya tek başına ilan değildir; itiraz penceresinin süresi betikte yazılı.
 6. **Pencere kapanınca kapıyı yeniden koş.** Yalnız karar `SILINEBILIR` olanlar kalır.
-7. **Sil, her ağaç için satır basarak.** Önce kuru koşum, sonra gerçek; araçlar `node_modules` bağlantılarına girmez. Ana depodaki `node_modules/.bin` sayısı değişirse **dur**. Sonda `git worktree prune`; ana `.bin` sayısı önce = sonra.
-8. **Git'siz klasör.** İçi boşsa silinir; dolu ve yedeği ölçülemiyorsa **silinmez**, ayrı karar.
+7. **Sil, her ağaç için satır basarak.** Kapıdan `SILINEBILIR` çıkan liste `tools/worktree-temizle.cjs --liste` biçimine (`{yol, dal, head}`) çevrilir; önce kuru koşum, gerçek koşum `--gercek --geri-alinamaz-onayladim`. **Elle silme betiği yazılmaz; araç yoksa ya da hata verirse dur.** Araçlar `node_modules` bağlantılarına girmez. Ana depodaki `node_modules/.bin` sayısı değişirse **dur**. Sonda `git worktree prune`; ana `.bin` sayısı önce = sonra.
+8. **Git kaydı olmayan klasör.** `tools/worktree-artik-sil.cjs` ile kuru koşulur; araç yerel-özgün dosya bulursa klasör **atlanır** ve ayrı karara gider. Silme kapısı bu klasörleri görmez.
 9. **Push edilmemiş commit'li ağaç.** Önce commit'ler `yedek/<ad>-<tarih>` dalına itilir (başkasının dal ucu oynatılmaz), sonra kapı yeniden.
 10. **Rapor.** Silinen, atlanan (sebebiyle), ana `.bin` önce ve sonra. Recep'e sayı kapının çıktısından gider.
 
