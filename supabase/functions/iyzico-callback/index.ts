@@ -392,7 +392,11 @@ Deno.serve(async (req) => {
       // ⭐Sessiz kalmaz (security-reviewer bulgu 1): zararsız tekrar ile "para var, kayıt yok" ayrılır.
       const durum = yazilmayanBasari(siparisSatiri, result?.paymentId);
       if (durum.tur === 'tekrar') {
-        tekrarZararsiz = siparisSatiri?.payment_status === 'paid';
+        // Kimliksiz uç: tekrar bildirim herkes tarafından yeniden gönderilebilir. Bu yüzden tekrarda
+        // YALNIZ yarım kalmış stok düşümü onarılır (DB RPC'si idempotent); sepet temizliği ve kupon
+        // yalnız gerçek geçişte koşar (otomatik güvenlik incelemesi, 3 Kasım).
+        const dbg = (siparisSatiri?.payment_debug ?? {}) as Record<string, unknown>;
+        tekrarZararsiz = siparisSatiri?.payment_status === 'paid' && dbg.stock_processed !== true;
         console.warn(`[iyzico-callback] ayni odemenin tekrar bildirimi; yazilmadi (${basariKarari.sebep}).`);
       } else {
         incelemeGerek = true;
@@ -600,10 +604,12 @@ Deno.serve(async (req) => {
       }
       
       // After a successful payment, clear ALL server carts for this user (defensive against duplicates)
+      // ALT-131: yalnız gerçek geçişte — tekrar bildirim kimliksiz yeniden gönderilebilir, müşterinin
+      // o anki sepetini boşaltmamalı.
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
         const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-        if (su && sk) {
+        if (gecisYapildi && su && sk) {
           // Fetch order row to get user_id
           let uid: string | null = null
           if (orderId) {

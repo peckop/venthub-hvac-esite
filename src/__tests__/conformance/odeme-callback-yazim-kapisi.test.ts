@@ -57,13 +57,15 @@ type Satir = {
 const SIPARIS = '11111111-1111-4111-8111-111111111111'
 const KURBAN_TOKEN = 'tok-kurban'
 const SALDIRGAN_TOKEN = 'tok-saldirgan'
-const DEFTER = { refunded_total: 120, refunds: [{ id: 'r1', amount: 120 }], raw: { paymentId: 'gercek-odeme' } }
+const DEFTER = { refunded_total: 120, refunds: [{ id: 'r1', amount: 120 }], raw: { paymentId: 'gercek-odeme' }, stock_processed: true }
 
 let satir: Satir
 let patchlar: { url: URL; govde: Record<string, unknown>; guncellenen: number }[] = []
 let rpcCagrilari: string[] = []
 /** Gelir alarmı kodları (`client_errors` POST gövdesindeki `extra.code`). */
 let alarmlar: string[] = []
+/** Müşteri sepetinden kalem silme çağrısı sayısı. */
+let sepetSilme = 0
 /** PATCH anında satırın başka bir yazıcı tarafından değiştirildiği yarış senaryosu için. */
 let patchOncesi: (() => void) | null = null
 /** İyzico retrieve'in vereceği yanıt (token'a göre). */
@@ -133,7 +135,12 @@ async function sahteFetch(girdi: RequestInfo | URL, secenek?: RequestInit): Prom
   if (url.pathname.endsWith('/rest/v1/coupons')) {
     return Response.json([{ discount_type: 'percentage', discount_value: 10, is_active: true, used_count: 0, usage_limit: null }])
   }
-  // shopping_carts, products: içerik bu testin konusu değil.
+  if (url.pathname.endsWith('/rest/v1/shopping_carts')) return Response.json([{ id: 'sepet-1' }])
+  if (url.pathname.endsWith('/rest/v1/cart_items') && yontem === 'DELETE') {
+    sepetSilme++
+    return new Response(null, { status: 204 })
+  }
+  // products: içerik bu testin konusu değil.
   if (yontem === 'POST') return new Response(null, { status: 201 })
   return Response.json([])
 }
@@ -235,6 +242,7 @@ beforeEach(() => {
   patchlar = []
   rpcCagrilari = []
   alarmlar = []
+  sepetSilme = 0
   patchOncesi = null
   iyziYanit = () => ({})
 })
@@ -343,14 +351,36 @@ describe('INV-ODEME-CALLBACK-2 · başarı geri saramaz (karne kilit a, kural 11
     expect(rpcCagrilari).not.toContain('process_order_stock_reduction')
   })
 
-  it('aynı ödemenin ikinci bildirimi (İyzico POST + tarayıcı dönüşü): kupon bir kez, stok RPC\'si yine koşar (kendini onarma)', async () => {
-    satir = yeniSatir({ coupon_code: 'YUZDE10' })
+  it('aynı ödemenin ikinci bildirimi (İyzico POST + tarayıcı dönüşü): kupon, stok ve sepet ikinci kez dokunulmaz', async () => {
+    satir = yeniSatir({ coupon_code: 'YUZDE10', user_id: 'musteri-1' })
     iyziYanit = basarili
     const c1 = await cagir(yeni, { token: KURBAN_TOKEN, orderId: SIPARIS })
+    const sepetIlk = sepetSilme
+    expect(sepetIlk).toBeGreaterThan(0)
     const c2 = await cagir(yeni, { token: KURBAN_TOKEN, orderId: SIPARIS })
     expect([c1.status, c2.status]).toEqual(['success', 'success'])
     expect(rpcCagrilari.filter((r) => r === 'increment_coupon_usage')).toHaveLength(1)
-    expect(rpcCagrilari.filter((r) => r === 'process_order_stock_reduction')).toHaveLength(2)
+    expect(rpcCagrilari.filter((r) => r === 'process_order_stock_reduction')).toHaveLength(1)
+    expect(sepetSilme).toBe(sepetIlk)
+    expect(alarmlar).toEqual([])
+  })
+
+  it('kimliksiz tekrar bildirim: stok düşümü yarım kaldıysa YALNIZ stok onarılır, müşterinin sepeti boşaltılmaz', async () => {
+    const kayit = { refunded_total: 0, paymentId: 'yeni-odeme', stock_processed: false }
+    satir = yeniSatir({ status: 'confirmed', payment_status: 'paid', payment_debug: kayit, coupon_code: 'YUZDE10', user_id: 'musteri-1' })
+    iyziYanit = basarili
+    const c = await cagir(yeni, { orderId: SIPARIS })
+    expect(c.status).toBe('success')
+    expect(rpcCagrilari).toEqual(['process_order_stock_reduction'])
+    expect(sepetSilme).toBe(0)
+    expect(satir).toMatchObject({ status: 'confirmed', payment_status: 'paid' })
+  })
+
+  it('kayıtlı paymentId olmayan eski ödenmiş satır: tekrar bildirim sahte DUPLICATE_CHARGE alarmı üretmez', async () => {
+    satir = yeniSatir({ status: 'confirmed', payment_status: 'paid' })
+    iyziYanit = basarili
+    const c = await cagir(yeni, { orderId: SIPARIS })
+    expect(c.status).toBe('success')
     expect(alarmlar).toEqual([])
   })
 })

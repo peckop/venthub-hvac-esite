@@ -98,7 +98,9 @@ export function yazilmayanBasari(satir: YazimSatiri | null, paymentId: unknown):
   const kayitli = metin(dbg.paymentId)
   const gelen = metin(paymentId)
   if (p && ISLENMIS_ODEME.includes(p)) {
-    if (kayitli && gelen && kayitli === gelen) return { tur: 'tekrar' }
+    // Kayıtlı paymentId YOKSA (eski satır) "farklı ödeme" kanıtlanamaz: tekrar sayılır. Aksi hâlde
+    // sipariş kimliğini bilen biri her çağrıda sahte DUPLICATE_CHARGE alarmı üretebilirdi.
+    if (!kayitli || (gelen && kayitli === gelen)) return { tur: 'tekrar' }
     return { tur: 'inceleme', kod: 'DUPLICATE_CHARGE' }
   }
   return { tur: 'inceleme', kod: 'PAYMENT_ON_TERMINATED_ORDER' }
