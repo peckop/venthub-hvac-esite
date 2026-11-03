@@ -78,10 +78,13 @@ describe('logAdminAction', () => {
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     mockSupabase.auth.getSession.mockRejectedValueOnce(new Error('Auth failed'))
 
-    // It should proceed and just use actor: null
+    // OPS-211 (karne K5): oturum okunamazsa `actor` alanı HİÇ gönderilmez — kolon varsayılanı
+    // `auth.uid()` doldurur. `actor: null` gönderilseydi `actor = auth.uid()` politikası satırı reddederdi.
     await logAdminAction(mockSupabase as never as SupabaseClient, { table_name: 'test', action: 'INSERT' })
 
-    expect(mockSupabase.insert).toHaveBeenCalledWith([{ table_name: 'test', action: 'INSERT', actor: null }])
+    expect(mockSupabase.insert).toHaveBeenCalledWith([{ table_name: 'test', action: 'INSERT' }])
+    const gonderilen = mockSupabase.insert.mock.calls.at(-1)?.[0]?.[0] ?? {}
+    expect(Object.prototype.hasOwnProperty.call(gonderilen, 'actor')).toBe(false)
 
     // Now test if insert itself throws an exception
     mockSupabase.select.mockRejectedValueOnce(new Error('Insert failed DB'))

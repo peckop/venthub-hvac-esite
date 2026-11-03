@@ -37,10 +37,13 @@ export async function logAdminAction(
       userId = null
     }
 
+    // OPS-211 (karne 2026-11 K5): INSERT politikası `actor = auth.uid()` ister. Oturum okunamadıysa
+    // `actor: null` GÖNDERİLMEZ — alan hiç yazılmaz ve kolon varsayılanı `auth.uid()` sunucuda
+    // istekteki JWT'den doldurur. null gönderilseydi satır RLS ile reddedilir, iz sessizce kaybolurdu.
     const prepared = rows.map((r) => {
-      // Only set actor if not explicitly provided
-      const hasActor = Object.prototype.hasOwnProperty.call(r, 'actor') && r.actor != null
-      return hasActor ? r : { ...r, actor: userId }
+      const { actor, ...rest } = r
+      const kimlik = actor ?? userId
+      return kimlik ? { ...rest, actor: kimlik } : rest
     })
 
     // Chain .select() to satisfy TS and to ensure request executes immediately
