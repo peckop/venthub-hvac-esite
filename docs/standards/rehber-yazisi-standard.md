@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.14 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.15 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -83,7 +83,10 @@ paragrafı (OPS-215, kopya OPS'ta) B8 ve B10 satırlarına işlendi: BLOG B8'de 
 kaynaktan akıcı; marka ve seri en sonda tek kısa "VentHub'da hangi seriler var" bölümü; SSS'de en çok bir VentHub sorusu; atıf
 paragraf sonunda, "katalog der" kalıbı yok; seri ayrıntısı yazıda değil aile ve ürün sayfasında. Kapsam: plug fan (BLG-33) ve
 fan çeşitleri (BLG-36, R5.5 revizyonu). Tetik: BLG-33 v1f'in makale değil katalog özeti gibi okunması (GEO-SEO SEO-79, Recep).
-Kırmızı kural getirmez; kapı uyumu AÇIK (R3.3 sonu: paragraf sonu atıf, fiyat başlığı).
+Kırmızı kural getirmez; fiyat başlığı kapısı kapandı (`## Teklif için hangi bilgiler gerekir?` kabul, `kalipDenetle`), paragraf sonu atıf AÇIK.
+
+**v0.15 (2026-11-03, BLG-35, OPS kararı):** `kalipDenetle` `## Fiyatı belirleyen etkenler` yerine `## Teklif için hangi bilgiler gerekir?`
+başlığını da kabul eder (R3.3 kapı uyumu (c) kapandı); test eklendi. Zorunlu bölüm listesi ve diğer kalıp kırmızıları değişmedi.
 
 ---
 
@@ -415,8 +418,13 @@ geçiyordu, SSS gövdeyi tekrarlıyordu (GEO-SEO ölçümü, SEO-79; Recep: "ilk
 sonu atfını kabul edene kadar yazılarda cümle sonu atfıyla birlikte uygulanır (iddia sayılı, olumsuz ya da mevzuat cümlesinde atıf
 cümle içinde kalır, diğerlerinde paragraf sonuna toplanır). (b) Zorunlu başlık `## Fiyatı belirleyen etkenler` birebir kalır
 (kapı `kalipDenetle`); hub kalıbı (v0.12) yalnız çeşit ve kategori sıralayan hub yazısında geçerlidir, makale tarzı genel rehberde
-bölüm kaynaklı etkenleri anlatır, kaynak yoksa R3 Fiyat satırındaki dürüst söylem kalır. (c) GEO-SEO'nun "başlık Teklif için hangi bilgiler gerekir?" önerisi
-kapıyı değiştirmeyi gerektirir; OPS karar verir. Kırmızı kural ve yeni kapı getirmez; kapıyı ARAÇ yazar.
+bölüm kaynaklı etkenleri anlatır, kaynak yoksa R3 Fiyat satırındaki dürüst söylem kalır. (c) **KAPANDI (2026-11-03, OPS kararı,
+BLG-35):** makale tarzı genel rehberde fiyat bölümü yerine `## Teklif için hangi bilgiler gerekir?` başlığı kabul edilir
+(GEO-SEO SEO-79 önerisi). `kalipDenetle` ikisinden birini arar (`FIYAT_BOLUMU_ADLARI`); ikisi de yoksa kırmızı eski adla
+(`ZORUNLU-BOLUM-YOK`, `## Fiyatı belirleyen etkenler`) verilir; `h2Basliklari` yeni başlığı da zorunlu bölüm sayar. Bölümün
+içeriği R3 Fiyat satırına tabidir: rakam yok, kaynak fiyat etkeni saymıyorsa bunu açıkça söyler, seçim girdileri kaynak atfıyla
+yazılır. Test: `scripts/rehber/__tests__/rehber-denetim.test.ts` ("R3.3" durumu). (a) ve (b) maddelerindeki paragraf sonu atıf
+konusu AÇIK kalır.
 
 ## R4 — Yasaklar
 
@@ -918,7 +926,7 @@ değişeceği için R5.5 gereği sha256 değişir ve doğrulama turu yeniden ko�
 
 | Nokta | Sahibi | Durum |
 |---|---|---|
-| Zorunlu başlıklara ("Fiyatı belirleyen etkenler" vb.) konu teriminin eklenmesi: kapı başlığı birebir arıyor, değişirse `ZORUNLU_BOLUMLER` ve `kalipDenetle` birlikte değişir | BLOG + OPS kararı | AÇIK: Y4 şimdilik muaf tutar; değişiklik ayrı karar (R3 kalıbını etkiler) |
+| Zorunlu başlıklara ("Fiyatı belirleyen etkenler" vb.) konu teriminin eklenmesi: kapı başlığı birebir arıyor, değişirse `ZORUNLU_BOLUMLER` ve `kalipDenetle` birlikte değişir | BLOG + OPS kararı | KISMEN KAPANDI (v0.15): makale tarzı genel rehberde `Teklif için hangi bilgiler gerekir?` kabul; diğer başlıklara konu terimi eklemek AÇIK (Y4 muaf tutar) |
 | Search Central blogu ve Search Off the Record taraması (H2/H3 için resmî ek kanıt) | BLOG | YAPILMADI, ayrı iş |
 | Mueller açıklamasının birincil kaydı | BLOG | YAPILMADI; satır GÖRÜŞ olarak kalır |
 | Uyarı eşiklerinin üçüncü yazıda yeniden ayarı | BLOG | üçüncü yazıdan sonra |

@@ -235,6 +235,15 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
       expect(k, b).toContainEqual({ sinif: 'ZORUNLU-BOLUM-YOK', ayrinti: `\`## ${b}\`` })
     }
   })
+  it('R3.3: "Teklif için hangi bilgiler gerekir?" başlığı fiyat bölümü yerine kabul edilir; ikisi de yoksa KIRMIZI', () => {
+    const teklif = TEMIZ.replace('## Fiyatı belirleyen etkenler', '## Teklif için hangi bilgiler gerekir?')
+    expect(kalipDenetle(teklif)).toEqual([])
+    expect(kalipDenetle(TEMIZ.replace('## Fiyatı belirleyen etkenler', '## Başka bir başlık'))).toContainEqual({
+      sinif: 'ZORUNLU-BOLUM-YOK',
+      ayrinti: '`## Fiyatı belirleyen etkenler`',
+    })
+    expect(h2Basliklari(teklif)).not.toContain('Teklif için hangi bilgiler gerekir?')
+  })
   it('⭐09-24 vakası: fiyat bölümü yok, sorumluluk yalnız "> Not:" satırı → iki KIRMIZI', () => {
     const vaka = TEMIZ.replace(/## Fiyatı belirleyen etkenler\n[\s\S]*?(?=## Sık sorulan)/, '').replace(/\n## Teknik sorumluluk notu\n[\s\S]*$/, '\n')
     const k = denetle(vaka, { iddialar: IDDIALAR }).kirmizi.filter((x: { sinif: string }) => x.sinif === 'ZORUNLU-BOLUM-YOK')

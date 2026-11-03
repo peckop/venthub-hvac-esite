@@ -141,6 +141,11 @@ export const IC_NOT = new RegExp(
  * bulunması gerekenler var.
  */
 export const ZORUNLU_BOLUMLER = ['Fiyatı belirleyen etkenler', 'Sık sorulan sorular', 'Kaynaklar', 'Teknik sorumluluk notu']
+/**
+ * R3.3 (BLG-35, OPS kararı 2026-11-03): fiyat bölümü yerine genel rehberde "Teklif için hangi bilgiler gerekir?"
+ * başlığı kabul edilir. İkisinden biri zorunludur; ikisi de yoksa kırmızı `Fiyatı belirleyen etkenler` adıyla verilir.
+ */
+export const FIYAT_BOLUMU_ADLARI = ['Fiyatı belirleyen etkenler', 'Teklif için hangi bilgiler gerekir?']
 /** R3: sorumluluk notunun ilk cümlesi her yazıda aynıdır; ardından yazıya özgü uyarılar gelebilir. */
 export const SORUMLULUK_ILK_CUMLE =
   'Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz.'
@@ -162,7 +167,10 @@ export function kalipDenetle(md) {
   const metin = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '')
   const h1 = metin.split('\n').filter((s) => /^#\s/.test(s)).length
   if (h1 !== 1) ekle('H1-SAYISI', `${h1} adet \`# \` başlığı (tam 1 olmalı)`)
-  for (const b of ZORUNLU_BOLUMLER) if (bolumMetni(metin, b) === null) ekle('ZORUNLU-BOLUM-YOK', `\`## ${b}\``)
+  for (const b of ZORUNLU_BOLUMLER) {
+    const adlar = b === FIYAT_BOLUMU_ADLARI[0] ? FIYAT_BOLUMU_ADLARI : [b]
+    if (adlar.every((a) => bolumMetni(metin, a) === null)) ekle('ZORUNLU-BOLUM-YOK', `\`## ${b}\``)
+  }
   if (!/^\|.*\|\s*\n\|?\s*:?-{3,}/m.test(metin)) ekle('TABLO-YOK', 'en az bir tablo (kıyas ya da boyutlandırma) zorunlu')
   const sss = bolumMetni(metin, 'Sık sorulan sorular')
   if (sss !== null) {
@@ -221,7 +229,7 @@ export function h2Basliklari(md) {
     .map((s) => s.match(/^##\s+(.+?)\s*$/))
     .filter(Boolean)
     .map((m) => m[1])
-    .filter((b) => !ZORUNLU_BOLUMLER.includes(b))
+    .filter((b) => !ZORUNLU_BOLUMLER.includes(b) && !FIYAT_BOLUMU_ADLARI.includes(b))
 }
 
 /**
