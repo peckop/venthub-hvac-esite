@@ -11,12 +11,17 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { kacir } from '../../../supabase/functions/_shared/kodlama'
 import {
   icBildirimAnahtari,
-  icBildirimOlustur,
+  type IcBildirimGirdisi,
+  icBildirimOlustur as icBildirimOlusturKacisla,
   musteriOnayAnahtari,
   panelLinki,
 } from '../../../supabase/functions/quote-notification-webhook/ic_bildirim'
+
+/** Uçla AYNI kaçış: `_shared/kodlama.ts` (INV-CIKTI-KODLAMA-1). */
+const icBildirimOlustur = (g: IcBildirimGirdisi) => icBildirimOlusturKacisla(g, kacir)
 
 const KAYNAK = fs.readFileSync(
   path.resolve(__dirname, '../../../supabase/functions/quote-notification-webhook/index.ts'),

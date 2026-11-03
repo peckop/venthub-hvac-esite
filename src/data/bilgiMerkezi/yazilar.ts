@@ -1125,6 +1125,143 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-31), doğrulanmış metin: taslak v7 (sha 728066b03deb) beş turda doğrulandı (v1-v7; hedef üçtü, karşılanmadı; her turda tuzaklı kopya 5/5 yakalandı).
+    // v7 → v8 farkı iki cümledir ve ikisi de iddiayı daraltır (2037 geçiş tarihi çıkarıldı: 2025/2481 değişikliği doğrulanmadı ve kardeş rehber farklı tarih verir; giriş cümlesinde Vortice kapsamı karma akışlı üretici anlatımıyla sınırlandı). Taslak v8 sha 2917711c943b; kayıtlı gövde sha 141c5116ed7a.
+    // Mevzuat: tür tanımları (AB) 2024/1834 madde 2(17)-(20), (25), madde 9(1), Ek III nokta 4 (OPS, EUR-Lex ham metni, 3 Kasım 2026); yürürlükten kalkan 327/2011 yalnız gaz yolu anlatımı için [5]. Fiyat yok: ürün sayfaları teklife yönlendirir.
+    // Yayın: karar 121/c (profesyonel yazı AYNI adreste döner); birleşme ayrı OPS onayıyla. yayinTarihi birleşme gününe göre güncellenir.
+    kimlik: 'fan-cesitleri',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-03',
+    guncellemeTarihi: '2026-11-03',
+    urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
+    diller: {
+      tr: {
+        slug: 'fan-cesitleri',
+        ozet: "Akış yoluna göre aksiyel, radyal ve karma akışlı fanlar ile VentHub kataloğundaki kanal tipi, çatı tipi, banyo ve duman egzoz gibi fan kategorileri.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Fan türlerini akış yoluna ve VentHub kategorilerine göre karşılaştırmak için bu rehberden başlayın; kategori sayfalarına buradan geçin.",
+        govde: `# Havalandırmada kullanılan fan çeşitleri nelerdir?
+
+Bu yazı havalandırma fanlarını iki açıdan ele alır: havanın fandan nasıl geçtiği (akış yolu) ve fanın nerede, hangi iş için kullanıldığı. ABD Enerji Bakanlığı kılavuzu fanları havanın izlediği yola göre iki ana türe ayırır: santrifüj ve aksiyel [2]. İkinci açı akış yolu değil, VentHub kataloğunun kategori düzenidir.
+
+Yazı önce akış yoluna göre aksiyel, radyal ve karma akışlı fanı anlatır, sonra VentHub kataloğundaki fan kategorilerini sıralar. Tür tanımları AB'nin (AB) 2024/1834 sayılı fan tüzüğüne (gaz yolu anlatımı için yürürlükten kalkan 327/2011 sayılı tüzüğe) ve ABD Enerji Bakanlığı kılavuzuna, karma akışlı fanın üretici anlatımı Vortice kataloğuna; kategori bölümleri VentHub kategori sayfalarına dayanır. Bir projede hangi türün uygun olduğu hava özellikleri, debi, basınç ve sistem yerleşimine bağlıdır [2]; bu yazı projeye özel seçimin yerine geçmez.
+
+## Fanlar akış yoluna göre nasıl ayrılır?
+
+AB'nin (AB) 2024/1834 sayılı fan tüzüğü fanları gazın çarktan geçen akış açısına göre ayırır: eksenel (bu yazıda aksiyel) fan, akış açısı 20 dereceden küçük olan fandır; karma akışlı fan, akış açısı 20 derece ve üzeri, 70 dereceden küçük olan fandır; santrifüj fan, akış açısı 70 derece ve üzeri olan fandır (madde 2(18), 2(20), 2(19)) [1]. Akış açısı, çarka giren ve çıkan gaz akışı yönleri arasındaki açıdır (madde 2(17)); hesapta kanat çıkış kenarında göbekteki ve dış çaptaki açıların ortalaması alınır (Ek III, nokta 4) [1]. Tüzük bunlara ek olarak, gaz yolu çarkın eksenine esasen dik olan ve çarka çevresinden girip çevresinden çıkan çapraz akışlı fanı da tanımlar (madde 2(25)) [1]; incelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur, bu yüzden yazıda ele alınmaz [4]. Bu tüzük, önceki 327/2011 sayılı tüzüğü 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır; eski tüzüğün ekleri bazı ürünler için geçiş süresince uygulanmaya devam eder (madde 9(1)) [1]; ayrıntıyı VentHub'ın [radyal fan mı aksiyel fan mı rehberi](vh:yazi/radyal-aksiyel-fan-secimi) verir. Aşağıdaki tabloda gaz yolunu anlatan sütun okur için bir açıklamadır; hukuki tanım değildir ve yürürlükten kalkan 327/2011 madde 2'nin anlatımına dayanır [5].
+
+| Tür | Akış açısı (2024/1834 madde 2) | Gazın çarktaki yolu (açıklama) | Kılavuz ve katalog notu | VentHub kategorisi |
+|---|---|---|---|---|
+| Aksiyel | 20 dereceden küçük [1] | Çarkın dönme ekseni doğrultusunda (eksenel) [5] | Hafif ve kompakt olma eğilimi [2] | Aksiyel sanayi fanları [4] |
+| Radyal (santrifüj) | 70 derece ve üzeri [1] | Çarka büyük ölçüde eksenel girer, eksene dik çıkar [5] | Havayı radyal yönde hızlandırır [2] | Radyal (santrifüj) fanlar [4] |
+| Karma akışlı | 20 derece ve üzeri, 70 dereceden küçük [1] | Santrifüj ve aksiyel tiplerin gaz yollarının arasında [5] | Üretici anlatımı (LINEO): helisel fanın yüksek debisi ile santrifüjün yüksek basıncını birleştirir [3] | Kanal tipi fanlar içinde Lineo ailesi [4] |
+
+### Aksiyel fanlar
+
+2024/1834 madde 2(18)'e göre eksenel (aksiyel) fan, akış açısı 20 dereceden küçük olan fandır [1]. Yürürlükten kalkan 327/2011 madde 2 aynı fanı, gazı çarkın dönme ekseni doğrultusunda (eksenel yönde) iten fan olarak anlatıyordu [5]. ABD Enerji Bakanlığı kılavuzu aksiyel fanların havayı fanın dönme ekseni boyunca, bir pervane gibi hareket ettirdiğini ve hafif ve kompakt olma eğiliminde olduğunu belirtir [2]. VentHub'daki [aksiyel sanayi fanları](vh:kategori/axial-industrial-fans) kategorisi, duvara monte edilen, düşük ve orta basınçlı aksiyel fan serilerini kapsar [4]. Patlayıcı ortam (ATEX) gerektiren uygulamalar için ayrı bir aile vardır [4].
+
+### Radyal (santrifüj) fanlar
+
+2024/1834 madde 2(19)'a göre santrifüj fan, akış açısı 70 derece ve üzeri olan fandır [1]. Yürürlükten kalkan 327/2011 madde 2 aynı fanı, gazın çarka büyük ölçüde eksenel yönde girdiği ve bu eksene dik yönde çıktığı fan olarak anlatıyordu [5]. ABD Enerji Bakanlığı kılavuzu santrifüj fanların havayı radyal yönde hızlandırarak havanın yönünü değiştirdiğini, sağlam, sessiz ve güvenilir olduklarını ve geniş bir koşul aralığında çalışabildiklerini belirtir [2]. VentHub'daki [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans) kategorisinin sayfası hücreli, plug ve gövdeli olmak üzere üç yapıyı tanıtır; hücreli aspiratörler ve plug fanlar kendi kategorilerinde de bulunur [4]. İki türün farkı, fan eğrisi ve çalışma noktası [radyal fan mı aksiyel fan mı rehberinde](vh:yazi/radyal-aksiyel-fan-secimi) anlatılır.
+
+### Karma akışlı fanlar
+
+2024/1834 madde 2(20)'ye göre karma akışlı fan, akış açısı 20 derece ve üzeri, 70 dereceden küçük olan fandır [1]. Yürürlükten kalkan 327/2011 madde 2 aynı fanı, çarktan geçen gaz yolu santrifüj ve aksiyel tiplerin gaz yolları arasında olan fan olarak anlatıyordu [5]. Vortice, LINEO serisini karma akışlı (mixed flow) kanal fanları olarak adlandırır [3]. Üretici anlatımı: Vortice kataloğu LINEO serisinin özellikleri arasında karma akışlı çarkın, helisel fanların avantajı olan yüksek debiyi ve çarkın ekseni çevresindeki akışı santrifüj fanların yüksek basıncıyla birleştirdiğini sayar [3]. Bu cümle bir üretici beyanıdır; karma akışlı fanları aksiyel ve santrifüj fanlarla karşılaştıran bağımsız bir kaynak bu yazıda kullanılmamıştır. VentHub'daki karma akışlı Lineo ailesi kanal tipi fanlar kategorisindedir [4]. Kategori sayfalarında aynı tür "karışık akışlı" diye de yazılır [4].
+
+## VentHub kataloğundaki fan kategorileri nelerdir?
+
+Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölçüte göre ayrılmamıştır: bazıları kullanım yerini (çatı, banyo, duman egzoz, şömine), bazıları yapıyı ya da malzemeyi (hücreli, plug, korozyona dayanımlı), biri işlevi (tavan vantilatörü) anlatır. Bu sınıflama yazara aittir. Bir fan hem bir akış yoluna hem bir kategoriye girebilir; örneğin hücreli aspiratör, kayış kasnaklı bir radyal fandır [4].
+
+### Kanal tipi fanlar
+
+Kanal tipi fan, havayı kanal hattının içinde taşır ve kanala seri bağlanır; yuvarlak ve dikdörtgen kesitli modelleri vardır [4]. Bu kategoride karma akışlı Lineo ailesi de bulunur [3][4]. Ayrıntı için [kanal tipi fan nedir rehberine](vh:yazi/kanal-tipi-fan-nedir), ses değeri için [sessiz fan rehberine](vh:yazi/sessiz-fan-secimi) bakın. Modeller: [kanal tipi fanlar](vh:kategori/duct-fans).
+
+### Çatı tipi fanlar
+
+Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır; seçimi çatı tipi ve eğimi, gereken debi ve tahliye edilen havanın niteliği belirler [4]. Modeller: [çatı tipi fanlar](vh:kategori/roof-fans).
+
+### Banyo ve tuvalet fanları
+
+Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır; duvara, tavana ya da kanala bağlanabilir, kimi modeller nem ve hareket sensörüyle kendi kendine çalışır [4]. Modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans).
+
+### Duman egzoz fanları
+
+Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır; sınıf bilgisi ürün sayfasında kaynağıyla verilir [4]. Modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
+
+### Hücreli aspiratörler
+
+Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır; iki seri vardır: sık kanatlı HF/FW ve seyrek kanatlı HF/S [4]. Modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans).
+
+### Plug fanlar
+
+Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır; iki seri vardır: EC motorlu ENKELFAN ve IEC standartlı asenkron motorlu KENTALFAN [4]. Modeller: [plug fanlar](vh:kategori/plug-fans).
+
+### Korozyona ve aside dayanımlı fanlar
+
+Korozyona ve aside dayanımlı fanlar SEAT, STORM ve JET serilerinin santrifüj fanlarıdır; JET serisi laboratuvar egzozu ve kimya endüstrisi gibi korozif uygulamalarda kullanılır [4]. Modeller: [korozyona ve aside dayanımlı fanlar](vh:kategori/corrosion-and-acid-resistant-fans).
+
+### Şömine ve baca fanları
+
+Şömine ve baca fanları bacanın çekişini mekanik olarak destekleyen fanlardır; doğal çekişin yetmediği şömine ve baca hatlarında kullanılır [4]. Kategori tek ürünlük bir başlıktır ve dar bir seçim sunar [4]. Modeller: [şömine ve baca fanları](vh:kategori/chimney-fans).
+
+### Endüstriyel tavan vantilatörleri
+
+Endüstriyel tavan vantilatörleri büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; depo, spor salonu, fabrika ve showroom tipik uygulamadır [4]. Bu fanlar havayı dışarı atmaz, içerideki havayı karıştırır [4]. Modeller: [endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans).
+
+## Fiyatı belirleyen etkenler
+
+Bu yazı fiyat vermez ve fiyatı belirleyen etkenleri kaynakla sayamaz. Seçimi belirleyen girdiler hava özellikleri, debi, basınç ve sistem yerleşimidir [2]; kategoriye göre kanal çapı veya kesiti, çatı tipi ve eğimi ya da baca kesiti gibi girdiler eklenir [4]. Teklif isterken bu girdileri belirtin; kategori sayfalarındaki ürünler için "Teklif İste" düğmesi bulunur [4].
+
+## Sık sorulan sorular
+
+### Havalandırmada kullanılan fan çeşitleri nelerdir?
+
+Akış yoluna göre 2024/1834 madde 2 eksenel (aksiyel), santrifüj (radyal) ve karma akışlı fanı akış açısıyla tanımlar [1]; ABD Enerji Bakanlığı kılavuzu iki ana tür sayar: santrifüj ve aksiyel [2]. VentHub kataloğunda aksiyel sanayi, radyal (santrifüj), kanal tipi, çatı tipi, banyo ve tuvalet, duman egzoz, hücreli, plug, korozyona ve aside dayanımlı, şömine ve baca fanları ile endüstriyel tavan vantilatörleri bulunur [4].
+
+### Aksiyel fan ile radyal fan arasındaki fark nedir?
+
+ABD Enerji Bakanlığı kılavuzuna göre iki tür havanın fandan geçerken izlediği yolla ayrılır: aksiyel fanlar havayı dönme ekseni boyunca hareket ettirir, santrifüj fanlar havayı radyal yönde hızlandırır [2]. Kılavuza göre hangisinin gerektiğini hava özellikleri, debi, basınç ve sistem yerleşimi belirler [2].
+
+### Radyal fan mı santrifüj fan mı denir?
+
+VentHub kataloğunda kategori "Radyal (Santrifüj)" adıyla anılır; iki ad aynı fan türü için birlikte kullanılır [4]. AB tüzüğü tür adı olarak santrifüj (centrifugal) terimini kullanır [1]; yürürlükten kalkan 327/2011'de "radial" sözcüğü kanat biçimi için de geçiyordu [5].
+
+### Karma akışlı fan nedir?
+
+2024/1834 madde 2(20)'ye göre karma akışlı fan, akış açısı 20 derece ve üzeri, 70 dereceden küçük olan fandır [1].
+
+### Karma akışlı fanın avantajı nedir?
+
+Vortice kataloğu LINEO serisinin özellikleri arasında karma akışlı çarkın helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştirdiğini sayar [3]. Bu bir üretici beyanıdır; bu yazının kaynakları karma akışlı fanı diğer türlerle karşılaştırmaz.
+
+### Kanal tipi fan hangi akış yoluna girer?
+
+Kanal tipi, bir kategoridir. VentHub'ın kanal tipi fan kategorisinde karma akışlı Lineo ailesi ile dikdörtgen kanal tipi radyal fanlar ailesi bulunur [3][4]. Sayfada başka aileler de listelenir; onların akış yolu bu yazının kaynaklarında yoktur [4].
+
+### Hücreli aspiratör hangi fan türüdür?
+
+Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4].
+
+### Fan seçimine nereden başlanır?
+
+ABD Enerji Bakanlığı kılavuzu fan seçimine hava özellikleri, debi, basınç ve sistem yerleşimini bilerek başlanmasını söyler [2]. Kategori sayfaları kendi seçim sorularını verir; örneğin kanal tipi fanda seçimi kanal çapı veya kesiti, gereken debi, gürültü hassasiyeti ve hattın radon gibi özel bir tahliye görevi olup olmadığı belirler [4]. Projeye özel teklif için "Teklif İste" düğmesini kullanın.
+
+## Kaynaklar
+
+1. Avrupa Komisyonu, (AB) 2024/1834 sayılı Komisyon Tüzüğü, madde 2(17)-(20), 2(25), madde 9(1) ve Ek III nokta 4, EUR-Lex (CELEX:32024R1834), ilk yayımlanan metin; (AB) 2025/2481 değişikliğinin bu bentlere etkisi doğrulanmadı: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 03.11.2026)
+2. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 7 ve 21. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
+3. Vortice S.p.A., LINEO In-line mixed flow fans kataloğu, Cod. 5.170.084.547, Mayıs 2026, s. 1, 4 ve 5 (herkese açık bir adresi yoktur; VentHub kaynak dizininde kayıtlıdır).
+4. VentHub, fan alt kategorilerinin sayfaları (aksiyel, radyal, kanal tipi, çatı tipi, banyo ve tuvalet, duman egzoz, hücreli, plug, korozyona ve aside dayanımlı, şömine ve baca, endüstriyel tavan vantilatörleri), canlı sitede 3 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/kanal-tipi-fanlar ve diğerleri aynı yol altında.
+5. Avrupa Komisyonu, 327/2011 sayılı (AB) Tüzüğü, 2. madde (tanımlar: aksiyel fan, santrifüj fan, karma akışlı fan, çapraz akışlı fan, santrifüj radyal kanatlı fan); yürürlükten kalkmıştır, yalnız gaz yolu anlatımı için kullanıldı; Birleşik Krallık mevzuat sitesinde yayımlanan, Birleşik Krallık için değiştirilmiş sürüm, AB Resmî Gazete metniyle karşılaştırılmadı: https://www.legislation.gov.uk/eur/2011/327/article/2 (erişim 03.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Fan seçimi debi, basınç, ortam ve güvenlik gereklerine bağlıdır. Kurulum ve elektrik bağlantısı yetkili personelle yapılmalıdır. Katalog ve kategori bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */

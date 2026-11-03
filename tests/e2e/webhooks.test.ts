@@ -15,8 +15,8 @@ class WebhookMockDb {
 
   from(table: string) {
     let dataset = table === 'venthub_orders' ? this.orders : this.events
-    let filterColumn: string = ''
-    let filterValue: any = null
+    // Birden çok .eq() filtresi BİRLEŞİR (PostgREST gibi): kaynak durum koşulu (.eq('status', ...)) id filtresini ezmemeli.
+    const filters: Array<[string, unknown]> = []
     let limitVal = 0
     let patchObject: any = null
 
@@ -25,8 +25,7 @@ class WebhookMockDb {
         return chain
       },
       eq: (col: string, val: any) => {
-        filterColumn = col
-        filterValue = val
+        filters.push([col, val])
         return chain
       },
       limit: (l: number) => {
@@ -38,7 +37,7 @@ class WebhookMockDb {
         return chain
       },
       single: async () => {
-        const filtered = dataset.filter(r => r[filterColumn] === filterValue)
+        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
         if (filtered.length === 0) {
           return { data: null, error: { message: 'Not found', code: 'PGRST116' } }
         }
@@ -52,7 +51,7 @@ class WebhookMockDb {
         return { data: row, error: null }
       },
       then: (resolve: any) => {
-        const filtered = dataset.filter(r => r[filterColumn] === filterValue)
+        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
         if (patchObject) {
           filtered.forEach(r => Object.assign(r, patchObject))
         }
@@ -113,7 +112,8 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
   it('1. should accept secure shipping webhook update when presented with a valid HMAC-SHA256 signature', async () => {
     mockDbInstance.orders.push({
       id: 'order-eng-1',
-      status: 'pending',
+      status: 'confirmed', // ALT-134: yalnız onaylı + ödenmiş sipariş kargolanır
+      payment_status: 'paid',
       order_number: 'ORD-901',
       carrier: null,
       tracking_number: null
@@ -226,13 +226,15 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     // Both Tenant A and Tenant B have an order number ORD-COL-999
     mockDbInstance.orders.push({
       id: 'order-a',
-      status: 'pending',
+      status: 'confirmed',
+      payment_status: 'paid',
       order_number: 'ORD-COL-999',
       tenant_id: 'tenant-a'
     })
     mockDbInstance.orders.push({
       id: 'order-b',
-      status: 'pending',
+      status: 'confirmed',
+      payment_status: 'paid',
       order_number: 'ORD-COL-999',
       tenant_id: 'tenant-b'
     })
@@ -275,7 +277,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
       expect(res.status).toBe(200)
 
       expect(mockDbInstance.orders.find(o => o.id === 'order-a').status).toBe('shipped')
-      expect(mockDbInstance.orders.find(o => o.id === 'order-b').status).toBe('pending') // Unchanged
+      expect(mockDbInstance.orders.find(o => o.id === 'order-b').status).toBe('confirmed') // Unchanged (diğer tenant'ın aynı numaralı siparişi)
     } finally {
       // Restore original from
       mockDbInstance.from = originalFrom
@@ -285,7 +287,8 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
   it('7. should fall back to legacy sandbox token when HMAC signature header is absent', async () => {
     mockDbInstance.orders.push({
       id: 'order-sandbox',
-      status: 'pending',
+      status: 'confirmed',
+      payment_status: 'paid',
       order_number: 'ORD-SANDBOX',
       carrier: null
     })
@@ -408,7 +411,8 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
     mockDbInstance.orders.push({
       id: 'order-derive',
-      status: 'pending',
+      status: 'confirmed',
+      payment_status: 'paid',
       order_number: 'ORD-DERIVE',
       tenant_id: ORDER_TENANT,
       carrier: null,

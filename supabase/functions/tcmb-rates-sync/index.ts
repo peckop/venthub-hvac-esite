@@ -81,8 +81,11 @@ serve(async (req: Request) => {
   }
 
   const { data: tenants, error: tenantsError } = await supabase.from('tenants').select('id')
+  // S4 (güvenlik karnesi 2026-11): uç `verify_jwt=false`; DB'nin iç hata metni yanıta DÖNMEZ,
+  // yalnız loga yazılır. Yanıtta sabit kod ve Postgres hata kodu kalır (teşhis için yeterli).
   if (tenantsError || !tenants) {
-    return new Response(JSON.stringify({ ok: false, error: tenantsError?.message ?? 'tenants-read-failed' }), {
+    console.error('[tcmb-rates-sync] tenants okunamadi:', tenantsError)
+    return new Response(JSON.stringify({ ok: false, error: 'tenants-read-failed' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
@@ -102,7 +105,8 @@ serve(async (req: Request) => {
         .eq('source', 'tcmb')
         .limit(1)
       if (readError) {
-        errors.push(`${code}: ${readError.message}`)
+        console.error(`[tcmb-rates-sync] ${code} okunamadi:`, readError)
+        errors.push(`${code}: read-failed (${readError.code ?? '?'})`)
         continue
       }
       if (existing && existing.length > 0) {
@@ -120,7 +124,10 @@ serve(async (req: Request) => {
       if (insertError) {
         // Yarış durumunda unique index ikinci yazımı engeller → no-op say
         if (insertError.code === '23505') skipped++
-        else errors.push(`${code}: ${insertError.message}`)
+        else {
+          console.error(`[tcmb-rates-sync] ${code} yazilamadi:`, insertError)
+          errors.push(`${code}: insert-failed (${insertError.code ?? '?'})`)
+        }
       } else {
         inserted++
       }
