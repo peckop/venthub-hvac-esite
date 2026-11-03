@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.15 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.16 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -87,6 +87,10 @@ Kırmızı kural getirmez; fiyat başlığı kapısı kapandı (`## Teklif için
 
 **v0.15 (2026-11-03, BLG-35, OPS kararı):** `kalipDenetle` `## Fiyatı belirleyen etkenler` yerine `## Teklif için hangi bilgiler gerekir?`
 başlığını da kabul eder (R3.3 kapı uyumu (c) kapandı); test eklendi. Zorunlu bölüm listesi ve diğer kalıp kırmızıları değişmedi.
+
+**v0.16 (2026-11-03, BLG-35, OPS kararı):** R3.3'e 8. madde: **marka yoğunluğu kapısı** `markaDenetle` (gövdede marka ve seri adı 0,
+toplam en çok 8, KIRMIZI; genel rehber türü `VentHub'da hangi … serileri var?` başlığıyla tanınır). Tetik: BLG-33 v1k/v1l
+metinlerinde marka adlarının yoğunlaşması, kuralın yazılı olup kapısının olmaması. Testler eklendi (55/55).
 
 ---
 
@@ -413,6 +417,7 @@ geçiyordu, SSS gövdeyi tekrarlıyordu (GEO-SEO ölçümü, SEO-79; Recep: "ilk
 | 5 | **SSS:** gövdeyi tekrarlamaz; en çok bir soru VentHub'a ilişkindir (serilerimiz, teklif); kalan sorular konunun yan soruları (R1 arama önerileri). Sayı aralığı R3 tablosundaki gibi 5–8 kalır (kapı `SSS_ARALIGI`) |
 | 6 | **Sınırlar:** "kaynakta yazılı değil" türü olumsuz iddialar metne dağılmaz; bir "Sınırlar" kutusunda ya da bölüm sonunda toplanır (R5.1 olumsuz iddia kuralı geçerli) |
 | 7 | **Revizyon:** yayındaki yazı bu kalıba geçerken R5.5 revizyonu uygulanır; adres ve slug değişmez, `guncellemeTarihi` güncellenir |
+| 8 | **Marka yoğunluğu (v0.16, kapı `markaDenetle`, KIRMIZI):** `## VentHub'da hangi … serileri var?` bölümü olan yazıda (genel rehber türü) marka ve seri adı **seri bölümü ile `## Kaynaklar` dışında 0** olmalıdır (`MARKA-GOVDEDE`); giriş, çalışma ilkesi, kullanım, seçim tablosu, sınırlar ve SSS adı taşımaz, kaynak gerekiyorsa `[n]` atfı yazılır, ad yazılmaz ("bir üreticinin kataloğu"). **Tüm yazıda** marka + seri adı toplamı **en çok 8** olabilir (`MARKA_TOPLAM_TAVAN`, `MARKA-TOPLAM`); hedef 6 civarı. Sayım yalnız görünen metni okur (adres ve `vh:` hedefleri sayılmaz). Liste `MARKA_SERI_ADLARI` sabit dizisidir (Casals, ENKELFAN, KENTALFAN, CLIBOS, CLIBOS-TR, CIKSTORM, Nicotra ve diğer büyük markalar); brands tablosu ve kaynak dizini seri adlarıyla genişletilir, her ekleme teste girer. **Niçin:** BLG-33 v1l 1145 kelimede Casals 21, ENKELFAN 16, KENTALFAN 17 kez geçti (v1k: 17/11/11); kural 1. maddede yazılıydı, kapı olmadığı için iki sürüm geçti. Ölçüm: v1l kapıda KIRMIZI (gövdede 40, toplam 47), v1m yeşil |
 
 **Kapı uyumu (AÇIK, OPS kararı):** (a) `ATIFSIZ-IDDIA` kapısı cümle düzeyinde çalışır; "atıf paragraf sonunda" kuralı, kapı paragraf
 sonu atfını kabul edene kadar yazılarda cümle sonu atfıyla birlikte uygulanır (iddia sayılı, olumsuz ya da mevzuat cümlesinde atıf

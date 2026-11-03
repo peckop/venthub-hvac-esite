@@ -221,6 +221,48 @@ export function konuTerimleri(md) {
   return [...new Set([...adaylar, ...ek].map(kok))]
 }
 
+/**
+ * R3.3 marka yoğunluğu kapısı (BLG-35, OPS kararı 2026-11-03; tetik: BLG-33 v1l 1145 kelimede 21 Casals + 33 seri adı).
+ * Sabit liste ile başlar; brands tablosu ve kaynak dizini seri adlarından genişletilir (genişletme = bu diziye ekleme + test).
+ * Uzun ad önce gelir (CLIBOS-TR, CLIBOS'tan önce eşleşsin).
+ */
+export const MARKA_SERI_ADLARI = ['Casals', 'ENKELFAN', 'KENTALFAN', 'CLIBOS-TR', 'CLIBOS', 'CIKSTORM', 'Nicotra', 'Systemair', 'Soler & Palau', 'Ziehl-Abegg', 'ebm-papst']
+/** Tüm yazıda marka + seri adı toplamı en çok bu kadar olabilir (genel rehber türü). */
+export const MARKA_TOPLAM_TAVAN = 8
+/** "Genel rehber" türü bu başlıkla tanınır; marka ve seri adları yalnız bu bölümde ve `## Kaynaklar`da serbesttir. */
+export const SERI_BOLUMU_KALIBI = /^VentHub'da hangi .+ serileri var\?$/
+const kacis = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+export function markaDenetle(md) {
+  const metin = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '')
+  const satirlar = metin.split('\n')
+  const baslik = (s) => (s.match(/^##\s+(.+?)\s*$/) || [])[1]
+  if (!satirlar.some((s) => SERI_BOLUMU_KALIBI.test(baslik(s) || ''))) return []
+  const ad = new RegExp(
+    `(?<![\\p{L}\\p{N}-])(${[...MARKA_SERI_ADLARI].sort((a, b) => b.length - a.length).map(kacis).join('|')})(?![\\p{L}\\p{N}-])`,
+    'giu',
+  )
+  const dis = new Map()
+  let toplam = 0
+  let bolum = ''
+  for (const ham of satirlar) {
+    if (/^#\s/.test(ham)) bolum = ''
+    else if (baslik(ham) !== undefined) bolum = baslik(ham)
+    // adres ve vh: bağlantı hedefleri marka sözcüğü içerir (casals-...); yalnız görünen metin sayılır
+    const s = ham.replace(/https?:\/\/\S+/g, ' ').replace(/\]\([^)]*\)/g, ']')
+    const bulunan = [...s.matchAll(ad)].map((m) => m[1])
+    toplam += bulunan.length
+    if (bolum === 'Kaynaklar' || SERI_BOLUMU_KALIBI.test(bolum)) continue
+    for (const b of bulunan) dis.set(b, (dis.get(b) || 0) + 1)
+  }
+  const kirmizi = []
+  if (dis.size) {
+    const sayi = [...dis.values()].reduce((a, b) => a + b, 0)
+    kirmizi.push({ sinif: 'MARKA-GOVDEDE', ayrinti: `${sayi} adet (seri bölümü ve Kaynaklar dışında 0 olmalı): ${[...dis].map(([k, n]) => `${k} ×${n}`).join(', ')}` })
+  }
+  if (toplam > MARKA_TOPLAM_TAVAN) kirmizi.push({ sinif: 'MARKA-TOPLAM', ayrinti: `${toplam} adet (en çok ${MARKA_TOPLAM_TAVAN})` })
+  return kirmizi
+}
+
 /** Zorunlu bölümler hariç `## ` başlıkları (üçüncü seviye ve H1 hariç). */
 export function h2Basliklari(md) {
   const metin = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '')
@@ -365,6 +407,9 @@ export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
 
   // 5. R3 kalıbı (zorunlu bölümler; Kaynaklar yoksa zaten 1. adımda kırmızı — tekrar yazılmaz)
   for (const k of kalipDenetle(md)) if (!(k.sinif === 'ZORUNLU-BOLUM-YOK' && k.ayrinti === '`## Kaynaklar`')) kirmizi.push(k)
+
+  // 5b. R3.3 marka yoğunluğu (genel rehber türü: "VentHub'da hangi ... serileri var?" bölümü olan yazı)
+  kirmizi.push(...markaDenetle(md))
 
   // 6. İç bağlantı kimlikle (R3; ağlı yarısı `ic-baglanti-denetle.mjs`)
   kirmizi.push(...icBaglantiDenetle(taranan))

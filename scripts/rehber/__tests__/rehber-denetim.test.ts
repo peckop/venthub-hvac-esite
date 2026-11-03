@@ -20,7 +20,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, bolumMetni, SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari } from '../rehber-denetim.mjs'
+import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, bolumMetni, SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari, markaDenetle } from '../rehber-denetim.mjs'
 
 const TEMIZ = `---
 baslik: Örnek cihaz nedir, nasıl seçilir?
@@ -243,6 +243,43 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
       ayrinti: '`## Fiyatı belirleyen etkenler`',
     })
     expect(h2Basliklari(teklif)).not.toContain('Teklif için hangi bilgiler gerekir?')
+  })
+  describe('R3.3 marka yoğunluğu (BLG-33 v1l vakası: gövdede marka ve seri adı)', () => {
+    const SERI = "## VentHub'da hangi plug fan serileri var?"
+    const kur = (govde: string, seri: string, kaynak: string) =>
+      `# Başlık\n\n${govde}\n\n${SERI}\n\n${seri}\n\n## Kaynaklar\n\n${kaynak}\n`
+    const KAYNAK = '1. Casals, Plug fans katalogu. https://example.com/casals-enkelfan\n'
+    it('v1m benzeri: adlar yalnız seri bölümünde ve Kaynaklar\'da → yeşil', () => {
+      const md = kur('Plug fan, kasasız bir fan türüdür [1].', "İki Casals serisi var: [ENKELFAN](vh:aile/casals-enkelfan) ve KENTALFAN [1].", KAYNAK)
+      expect(markaDenetle(md)).toEqual([])
+    })
+    it('v1l benzeri: gövdede marka ve seri adı → MARKA-GOVDEDE KIRMIZI, adlar sayılarıyla yazılır', () => {
+      const md = kur("Casals'ın ENKELFAN serisinde çark geriye eğiktir [1]. KENTALFAN da öyledir [1]. Casals bunu yazar [1].", 'İki seri var [1].', KAYNAK)
+      expect(markaDenetle(md)).toEqual([
+        { sinif: 'MARKA-GOVDEDE', ayrinti: '4 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): Casals ×2, ENKELFAN ×1, KENTALFAN ×1' },
+      ])
+    })
+    it('seri bölümü ve Kaynaklar dahil toplam 8 üstü → MARKA-TOPLAM KIRMIZI, 8 geçer', () => {
+      const seri = (n: number) => Array.from({ length: n }, () => 'Casals').join(' ve ') + ' [1].'
+      expect(markaDenetle(kur('Genel bilgi [1].', seri(7), KAYNAK)).map((k: { sinif: string }) => k.sinif)).toEqual([])
+      expect(markaDenetle(kur('Genel bilgi [1].', seri(8), KAYNAK))).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }])
+    })
+    it('adres ve vh: bağlantı hedefleri sayılmaz; CLIBOS-TR tek ad sayılır, uzun ad önce eşleşir', () => {
+      const md = kur('Bilgi [1].', '[ENKELFAN](vh:aile/casals-enkelfan-ec-plug) ve CLIBOS-TR [1].', '1. Kaynak https://venthub.com.tr/tr/products/casals-kentalfan-plug\n')
+      expect(markaDenetle(md)).toEqual([])
+      expect(markaDenetle(md.replace('Bilgi [1].', 'CLIBOS-TR [1].'))).toEqual([
+        { sinif: 'MARKA-GOVDEDE', ayrinti: '1 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): CLIBOS-TR ×1' },
+      ])
+    })
+    it('"VentHub\'da hangi ... serileri var?" bölümü olmayan yazıda (genel rehber değil) kapı çalışmaz', () => {
+      expect(markaDenetle('# Başlık\n\nCasals ENKELFAN KENTALFAN Casals ENKELFAN KENTALFAN Casals ENKELFAN KENTALFAN [1].\n')).toEqual([])
+    })
+    it('denetle() kapıyı çalıştırır (MARKA-GOVDEDE kırmızı olarak çıkar)', () => {
+      const md = TEMIZ.replace('## Sık sorulan sorular', `${SERI}\n\nİki seri var.\n\n## Sık sorulan sorular`)
+      const sinif = (m: string) => denetle(m, { iddialar: IDDIALAR }).kirmizi.map((k: { sinif: string }) => k.sinif)
+      expect(sinif(md)).not.toContain('MARKA-GOVDEDE')
+      expect(sinif(md.replace('# ', '# Casals '))).toContain('MARKA-GOVDEDE')
+    })
   })
   it('⭐09-24 vakası: fiyat bölümü yok, sorumluluk yalnız "> Not:" satırı → iki KIRMIZI', () => {
     const vaka = TEMIZ.replace(/## Fiyatı belirleyen etkenler\n[\s\S]*?(?=## Sık sorulan)/, '').replace(/\n## Teknik sorumluluk notu\n[\s\S]*$/, '\n')
