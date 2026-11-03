@@ -583,3 +583,24 @@ describe('INV-LINEAR-YORUM-13: OPS thread yanıtı konuşmayı kapatır, yanıts
     expect(kaynak).toMatch(/nodes \{ id createdAt body parent \{ id \} project \{ id name \} \}/)
   })
 })
+
+describe('INV-LINEAR-YORUM-10 (ARC-241): damga yolu çalışma dizininden bağımsız, satır günü basar', () => {
+  it('damgaYolu() git deposu OLMAYAN bir cwd\'de de aynı mutlak yolu verir (bayat %TEMP% damgasına düşmez)', () => {
+    const { tmpdir } = require_('node:os') as typeof import('node:os')
+    const yol = (require_(BETIK) as { damgaYolu: () => string }).damgaYolu()
+    const cocuk = spawnSync(
+      process.execPath,
+      ['-e', `process.stdout.write(require(${JSON.stringify(BETIK)}).damgaYolu())`],
+      { cwd: tmpdir(), encoding: 'utf8' },
+    )
+    expect(cocuk.status).toBe(0)
+    expect(cocuk.stdout).toBe(yol)
+    expect(yol).toMatch(/venthub-linear-son-okuma\.json$/)
+    expect(require_('node:path').isAbsolute(yol)).toBe(true)
+  })
+
+  it('ozetle "en eski" için gün ve saat basar: bir haftalık yorum saat gibi okunup gelecekten sanılmaz', () => {
+    const satir = String(m.ozetle([{ proje: 'MENU', createdAt: '2026-10-25T18:37:47.746Z' }]))
+    expect(satir).toContain('en eski 10-25 18:37Z')
+  })
+})

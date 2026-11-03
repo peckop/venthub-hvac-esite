@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 import VentImage from '@/components/ui/VentImage'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -207,26 +208,16 @@ const CategoriesTableBody: React.FC = () => {
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
     const cols = ['id', 'name', 'slug', 'parent_id', 'is_active', 'sort_order', 'description']
-    const header = cols.join(',')
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        `"${(r.name || '').replace(/"/g, '""')}"`,
-        r.slug || '',
-        r.parent_id || '',
-        r.is_active ? 'true' : 'false',
-        r.sort_order != null ? String(r.sort_order) : '',
-        `"${(r.description || '').replace(/"/g, '""')}"`,
-      ].join(','),
-    )
-    const csv = '\ufeff' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'categories.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.name || '',
+      r.slug || '',
+      r.parent_id || '',
+      r.is_active ? 'true' : 'false',
+      r.sort_order != null ? String(r.sort_order) : '',
+      r.description || '',
+    ])
+    tabloIndir(csvBelgesi(cols, lines), 'categories.csv', 'csv')
   }, [table])
 
   /* ---- toplu durum güncelleme — UPDATE, mutateWithAudit kapısından ---- */

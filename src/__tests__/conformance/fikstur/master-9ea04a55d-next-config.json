@@ -137,13 +137,13 @@
     },
     {
       "source": "/tr/destek/konular/hava-perdesi",
-      "destination": "/tr/bilgi-merkezi",
-      "permanent": false
+      "destination": "/tr/bilgi-merkezi/hava-perdesi",
+      "permanent": true
     },
     {
       "source": "/tr/destek/konular/air-curtain",
-      "destination": "/tr/bilgi-merkezi",
-      "permanent": false
+      "destination": "/tr/bilgi-merkezi/hava-perdesi",
+      "permanent": true
     },
     {
       "source": "/tr/destek/konular/jet-fan",
@@ -164,11 +164,6 @@
       "source": "/tr/destek/konular/:eski*",
       "destination": "/tr/bilgi-merkezi",
       "permanent": true
-    },
-    {
-      "source": "/tr/bilgi-merkezi/hava-perdesi",
-      "destination": "/tr/bilgi-merkezi",
-      "permanent": false
     },
     {
       "source": "/tr/bilgi-merkezi/otopark-jet-fan",

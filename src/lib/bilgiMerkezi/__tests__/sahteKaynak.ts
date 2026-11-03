@@ -35,6 +35,9 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['vortice-vort-hr-isi-geri-kazanim', 'Vortice VORT HR Isı Geri Kazanım'],
     ['vortice-vort-mono', 'Vortice VORT Mono'],
     ['avens-isi-geri-kazanim-cihazlari', 'AVenS Isı Geri Kazanım Cihazları'],
+    // Hava perdesi nedir yazısı (BLG-28, 2026-11): iki aile sayfası canlıda 200 verir (kategori sayfasından, 1 Kasım ölçümü).
+    ['vortice-ad-isiticisiz-hava-perdeleri', 'Vortice AD Isıtıcısız Hava Perdeleri'],
+    ['vortice-h-ad-elektrikli-isiticili-hava-perdeleri', 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
@@ -70,6 +73,42 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     'smoke-exhaust-fans': {
       slug: 'smoke-exhaust-fans',
       metadata: { slug: { tr: 'duman-egzoz-fanlari', en: 'smoke-exhaust-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    // Fan çeşitleri yazısı (BLG-31, 2026-11): yedi fan alt kategorisi canlıda 200 verir (3 Kasım 2026 ölçümü, TR adresleri).
+    'roof-fans': {
+      slug: 'roof-fans',
+      metadata: { slug: { tr: 'cati-tipi-fanlar', en: 'roof-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'bathroom-toilet-fans': {
+      slug: 'bathroom-toilet-fans',
+      metadata: { slug: { tr: 'banyo-tuvalet-fanlari', en: 'bathroom-toilet-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'cabinet-fans': {
+      slug: 'cabinet-fans',
+      metadata: { slug: { tr: 'hucreli-aspiratorler', en: 'cabinet-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'plug-fans': {
+      slug: 'plug-fans',
+      metadata: { slug: { tr: 'plug-fanlar', en: 'plug-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'corrosion-and-acid-resistant-fans': {
+      slug: 'corrosion-and-acid-resistant-fans',
+      metadata: { slug: { tr: 'korozyona-ve-aside-dayanimli-fanlar', en: 'corrosion-and-acid-resistant-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'chimney-fans': {
+      slug: 'chimney-fans',
+      metadata: { slug: { tr: 'somine-ve-baca-fanlari', en: 'chimney-fans' } },
+      ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+    },
+    'industrial-ceiling-fans': {
+      slug: 'industrial-ceiling-fans',
+      metadata: { slug: { tr: 'tavan-vantilatorleri', en: 'industrial-ceiling-fans' } },
       ust: { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
     },
   }

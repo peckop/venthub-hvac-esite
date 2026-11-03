@@ -167,14 +167,24 @@ describe('INV-CSV-MAP-1 · satır hazırlama DAVRANIŞI', () => {
     expect(payloads[0].slug).toBe('siginak-fani')
   })
 
-  it('category_id doğrudan verilmişse eşleme denenmez', () => {
+  it('category_id doğrudan verilmişse slug eşlemesi denenmez (kimlik kendi listesinde olmalı, ADM-6)', () => {
     const { payloads, reddedilen } = hazirlaUrunSatirlari(
-      [{ sku: 'A-1', name: 'Fan', category_id: 'elle-verilen-id', category_slug: 'boyle-bir-kategori-yok' }],
+      [{ sku: 'A-1', name: 'Fan', category_id: 'kat-sig', category_slug: 'boyle-bir-kategori-yok' }],
       KATEGORILER,
     )
 
     expect(reddedilen).toHaveLength(0)
-    expect(payloads[0].category_id).toBe('elle-verilen-id')
+    expect(payloads[0].category_id).toBe('kat-sig')
+  })
+
+  it('listede olmayan category_id yazılmaz (başka tenant / uydurma kimlik, ADM-6)', () => {
+    const { payloads, reddedilen } = hazirlaUrunSatirlari(
+      [{ sku: 'A-1', name: 'Fan', category_id: 'elle-verilen-id' }],
+      KATEGORILER,
+    )
+
+    expect(payloads).toHaveLength(0)
+    expect(reddedilen).toEqual([{ sku: 'A-1', deger: 'elle-verilen-id' }])
   })
 
   it('kategori sütunu hiç yoksa satır normal yazılır (kategori zorunlu değil)', () => {

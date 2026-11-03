@@ -1,6 +1,7 @@
 /**
  * CSV hücre kaçışı + formül enjeksiyonu nötrlemesi (VULN-006, REC-355).
  * Cetvel: docs/standards/csv-import-export-standard.md §1.1.
+ * Yer: `src/lib/csv/` — ADM-6'da `src/utils/csvHucre.ts`'ten taşındı; dışa/içe aktarmanın tek kapısı.
  *
  * NİÇİN: bir hücre `= + - @ TAB CR` ile başlarsa tablolama yazılımı onu FORMÜL sayar. Müşterinin
  * kayıtta yazdığı ad ya da istemciden gelen bir hata mesajı yönetici Excel'de CSV'yi açtığında
@@ -35,12 +36,18 @@ export function formulMu(metin: string): boolean {
   return FORMUL_BASLANGICI.has(metin.normalize('NFKC').charAt(0))
 }
 
+/**
+ * Hücrenin nötrlenmiş METNİ (tırnaksız). CSV ve XLS aynı kararı buradan alır.
+ * Sayı tipi kesin sayıdır: `-5` formül değil; metne çevrilince önek almasın.
+ */
+export function notrMetin(deger: CsvDeger): string {
+  const metin = metneCevir(deger)
+  return typeof deger !== 'number' && formulMu(metin) ? `'${metin}` : metin
+}
+
 /** Tek CSV hücresi: gerekirse tek tırnak önekli, `"` → `""` kaçışlı, çift tırnaklı. */
 export function csvHucre(deger: CsvDeger): string {
-  const metin = metneCevir(deger)
-  // Sayı tipi kesin sayıdır: `-5` formül değil; metne çevrilince önek almasın.
-  const guvenli = typeof deger !== 'number' && formulMu(metin) ? `'${metin}` : metin
-  return `"${guvenli.replace(/"/g, '""')}"`
+  return `"${notrMetin(deger).replace(/"/g, '""')}"`
 }
 
 /** Tek CSV satırı. Ayraç çağıranın seçimidir (`,` ya da `;`); davranış sayfalar arasında korunur. */

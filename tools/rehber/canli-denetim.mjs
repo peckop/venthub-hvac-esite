@@ -26,7 +26,12 @@
  *   4. fiyat:    her sayfada ₺/TL desenli sayı ve "Teklif" sayısı (BİLGİ). yazidaFiyatVar=true iken sayfada
  *                görünür fiyat 0 ve "Teklif" > 0 ise KALDI (hide_price: yazıda fiyat cümlesi olmaz).
  *
- * Kullanım:  node tools/rehber/canli-denetim.mjs <girdi.json>
+ * BLOG iddia tablosu (`--iddia <json>`; şema {iddialar:[{no, metin, tur:"sayi"|"genel", …}]}): tur "sayi" satırlarındaki
+ * sayı+birim ifadeleri (150 mm, IP45, 8 model…) verilen canlı sayfaların birleşik metninde aranır; bulunmayan UYARI
+ * (katalog-canlı farkı KATALOG/ÜRÜN'e kartla gider, KALDI değil). Aile eşleşmesi alanı tabloda yok: bir sonraki yazıdan
+ * "canli":{"aile","alan","deger"} eklenirse kesin KALDI kolu ayrıca kurulur.
+ *
+ * Kullanım:  node tools/rehber/canli-denetim.mjs <girdi.json> [--iddia <iddia-tablosu.json>]
  * Çıkış: 0 GEÇTİ (UYARI olabilir) · 1 KALDI · 3 ölçülemedi (KALDI yoksa). BLOG dosyalarına dokunmaz.
  */
 import { readFileSync } from 'node:fs'
@@ -81,6 +86,34 @@ export function ifadeVarMi(metin, ifade) {
   return norm(metin).includes(norm(ifade))
 }
 
+/**
+ * Cümle → denetlenecek sayı ifadeleri: "[n]" atıf numaraları ve düz yıl/sıra sayıları atılır; sayı + birim
+ * ("150 mm", "IP45", "26,1 dB(A)", "8 model") ya da birimsiz ondalık sayı kalır. Tekil, sıra korunur.
+ */
+export function sayiTokenleri(metin) {
+  const t = String(metin || '').replace(/\[[\d,\s–-]+\]/g, ' ')
+  const out = []
+  const desenler = [
+    /\bIP\s?\d{2}\b/g,
+    /\d+(?:[.,]\d+)?\s?(?:mm|cm|m³\/h|m3\/h|m\/s|dB\(A\)|dB|kW|W|V|Hz|Pa|rpm|dev\/dk|°C|%)(?![\p{L}])/gu,
+    /(?<![\p{L}\p{N}.,])\d+[.,]\d+(?![\p{N}])/gu,
+  ]
+  for (const d of desenler) for (const m of t.matchAll(d)) out.push(m[0].trim())
+  // sayım sözcükleri Türkçe ek alır ("8 modelden", "5 adet"): sayı + gövde tutulur
+  for (const m of t.matchAll(/(?<![\p{L}\p{N}.,])(\d+)\s?(model|adet|kademe)\p{L}*/giu)) out.push(`${m[1]} ${m[2].toLocaleLowerCase('tr')}`)
+  const tekil = [...new Set(out)]
+  // başka bir ifadenin içinde zaten geçen ("26,1" ⊂ "26,1 dB(A)") parça ayrıca aranmaz
+  return tekil.filter((x) => !tekil.some((y) => y !== x && y.includes(x)))
+}
+
+/** BLOG iddia tablosu JSON'u → tur "sayi" satırları { no, sayilar[] } (sayısı olmayan satır atılır). */
+export function sayiIddialari(tablo) {
+  return (tablo?.iddialar || [])
+    .filter((i) => i && i.tur === 'sayi')
+    .map((i) => ({ no: i.no, sayilar: sayiTokenleri(i.metin) }))
+    .filter((i) => i.sayilar.length)
+}
+
 /** Sayfa metninde ₺/TL desenli geçiş sayısı ve "Teklif" geçiş sayısı. */
 export function fiyatOlc(metin) {
   const fiyat = (metin.match(new RegExp(FIYAT.source, 'giu')) || []).length
@@ -93,7 +126,7 @@ const madde = (ad, durum, ayrinti) => ({ ad, durum, ayrinti })
 /**
  * @typedef {{ status: number, headers?: { get(ad: string): string | null }, text(): Promise<string> }} Cevap
  * @typedef {(adres: string, secenek?: { redirect?: 'manual' }) => Promise<Cevap>} Getir
- * @param {{ yazi?: { baslik?: string, metaAciklama?: string, kartOzeti?: string }, sayfalar?: string[], iddialar?: { sayfa: string, metin: string }[], seriler?: string[], yazidaFiyatVar?: boolean, yayinlandi?: boolean }} girdi
+ * @param {{ yazi?: { baslik?: string, metaAciklama?: string, kartOzeti?: string }, sayfalar?: string[], iddialar?: { sayfa: string, metin: string }[], seriler?: string[], yazidaFiyatVar?: boolean, yayinlandi?: boolean, iddiaTablosu?: { iddialar?: { no: number, metin: string, tur?: string }[] } }} girdi
  * @param {{ getir?: Getir }} [secenek]
  */
 export async function canliDenetle(girdi, { getir = fetch } = {}) {
@@ -155,6 +188,20 @@ export async function canliDenetle(girdi, { getir = fetch } = {}) {
     )
   }
 
+  // 3b: BLOG iddia tablosu (`--iddia`): tur "sayi" satırlarındaki sayılar canlı sayfa metinlerinde var mı
+  if (girdi.iddiaTablosu) {
+    const hepsi = [...metinler.values()].join(' ')
+    for (const i of sayiIddialari(girdi.iddiaTablosu)) {
+      if (!metinler.size) break
+      const yok = i.sayilar.filter((t) => !ifadeVarMi(hepsi, t))
+      maddeler.push(
+        yok.length
+          ? madde('iddia-tablo', 'UYARI', `#${i.no}: canlı sayfalarda bulunmayan sayı: ${yok.join(', ')} — katalog-canlı farkı olabilir; KATALOG/ÜRÜN'e kartla gider`)
+          : madde('iddia-tablo', 'GEÇTİ', `#${i.no}: ${i.sayilar.length} sayının hepsi canlıda var`),
+      )
+    }
+  }
+
   // 4: fiyat
   for (const [s, m] of metinler) {
     if (!(girdi.sayfalar || []).includes(s)) continue
@@ -180,12 +227,16 @@ export async function canliDenetle(girdi, { getir = fetch } = {}) {
 const buDosya = import.meta.url.replace(/\\/g, '/').toLowerCase()
 const cagrilan = process.argv[1] ? `file:///${process.argv[1].replace(/\\/g, '/').replace(/^\//, '')}`.toLowerCase() : ''
 if (buDosya === cagrilan) {
-  const yol = process.argv[2]
+  const arg = process.argv.slice(2)
+  const yol = arg.find((a, i) => !a.startsWith('--') && !arg[i - 1]?.startsWith('--'))
+  const iddiaYolu = arg[arg.indexOf('--iddia') + 1]
   if (!yol) {
-    console.error('Kullanım: node tools/rehber/canli-denetim.mjs <girdi.json>')
+    console.error('Kullanım: node tools/rehber/canli-denetim.mjs <girdi.json> [--iddia <iddia-tablosu.json>]')
     process.exit(2)
   }
-  const s = await canliDenetle(JSON.parse(readFileSync(yol, 'utf8')))
+  const girdi = JSON.parse(readFileSync(yol, 'utf8'))
+  if (arg.includes('--iddia') && iddiaYolu) girdi.iddiaTablosu = JSON.parse(readFileSync(iddiaYolu, 'utf8'))
+  const s = await canliDenetle(girdi)
   for (const m of s.maddeler) process.stdout.write(`${m.durum} | ${m.ad} | ${m.ayrinti}\n`)
   process.stdout.write(`SONUÇ: ${s.durum}\n`)
   process.exit(s.durum === 'GEÇTİ' ? 0 : s.durum === 'KALDI' ? 1 : 3)

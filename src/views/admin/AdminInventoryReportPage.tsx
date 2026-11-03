@@ -8,6 +8,7 @@ import { DateRange } from 'react-day-picker'
 import { Area, AreaChart, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts'
 
 import { useI18n } from '@/i18n/I18nProvider'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { getInventoryMovements, type InventoryMovementRow } from '@/lib/services/inventoryReport.service'
 import { useSupabaseClient } from '@/providers/SupabaseProvider'
 
@@ -201,23 +202,19 @@ function InventoryReportContent() {
             t('admin.inventory.export.headers.reason'),
             t('admin.inventory.export.headers.productId')
         ]
+        const urunAdi = (m: InventoryMovementRow): string => {
+            const ad = (m.products as Record<string, unknown> | null)?.name
+            return typeof ad === 'string' && ad ? ad : m.product_id
+        }
         const csvRows = movementsData.map(m => [
             m.id,
             format(new Date(m.created_at as string), 'yyyy-MM-dd HH:mm'),
-            (m.products as Record<string, unknown>)?.name || m.product_id,
+            urunAdi(m),
             m.delta,
             m.reason,
             m.product_id
-        ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-
-        const csvString = '\ufeff' + [header.join(','), ...csvRows].join('\n')
-        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `stok-raporu-${format(new Date(), 'yyyy-MM-dd')}.csv`
-        a.click()
-        URL.revokeObjectURL(url)
+        ])
+        tabloIndir(csvBelgesi(header, csvRows), `stok-raporu-${format(new Date(), 'yyyy-MM-dd')}.csv`, 'csv')
     }
 
     const filteredMovements = React.useMemo(() => {

@@ -78,6 +78,9 @@ export const products = {
     unknownCategoryTitle: 'Rows whose category was not found in the database: {{count}}',
     unknownCategoryHelp: 'The category value on these rows does not match any category in the live database, so nothing was written. The category value in the CSV must match the live category slug exactly (for example: cati-tipi-fan). Fix the values and upload the file again.',
     unknownCategoryExamples: 'Unmatched value: {{skus}}',
+    invalidRowsTitle: 'Rows with invalid values: {{count}}',
+    invalidRowsHelp: 'Nothing was written. SKU contains only uppercase letters, digits and hyphens; status is active, draft or archived; stock_qty and low_stock_threshold are zero or positive whole numbers. Fix the values and upload the file again.',
+    invalidRowsExamples: 'Row and column: {{examples}}',
   },
   edit: {
     editing: 'Editing',

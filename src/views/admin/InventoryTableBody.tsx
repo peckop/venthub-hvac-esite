@@ -6,6 +6,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
 
@@ -284,26 +285,16 @@ const InventoryTableBody: React.FC = () => {
       t('admin.inventory.table.locationCol'),
       t('admin.inventory.table.supplierCol'),
     ]
-    const header = cols.join(',')
-    const lines = allRows.map((r) =>
-      [
-        `"${(r.name || '').replace(/"/g, '""')}"`,
-        r.physical_stock,
-        r.reserved_stock,
-        r.available_stock,
-        r.low_stock_threshold ?? 5,
-        `"${(r.warehouse_location || '').replace(/"/g, '""')}"`,
-        `"${(r.supplier_name || '').replace(/"/g, '""')}"`,
-      ].join(','),
-    )
-    const csv = '\uFEFF' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `inventory_${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = allRows.map((r) => [
+      r.name || '',
+      r.physical_stock,
+      r.reserved_stock,
+      r.available_stock,
+      r.low_stock_threshold ?? 5,
+      r.warehouse_location || '',
+      r.supplier_name || '',
+    ])
+    tabloIndir(csvBelgesi(cols, lines), `inventory_${new Date().toISOString().slice(0, 10)}.csv`, 'csv')
   }, [table, t])
 
   return (

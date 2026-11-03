@@ -6,6 +6,9 @@ import React, { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useI18n } from '@/i18n/I18nProvider'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
+import { CSV_HATA_ANAHTARI, CSV_MAKS_BAYT, CSV_MAKS_SATIR, csvDosyasiOku } from '@/lib/csv/dosyaKapisi'
+import { stokSatirlariniHazirla } from '@/lib/csv/semalar'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
@@ -58,51 +61,47 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
 
     if (!isOpen) return null
 
+    /**
+     * SKU listesiyle ürün okuması, 200'lük parçalarla (ADM-6). Tek `in(...)` sorgusu binlerce
+     * SKU'da istek adresini aşıyordu. Okuma RLS ile kendi tenant'ımızla sınırlıdır
+     * (`prod_public_read_opt`); buradan çıkan kimlikler `adjust_stock`'a gider.
+     */
+    const skuIleUrunGetir = async (skus: readonly string[]) => {
+        const sonuc: Array<{ id: string; sku: string; name: string; stock_qty: number | null }> = []
+        for (let i = 0; i < skus.length; i += 200) {
+            const { data, error } = await supabase
+                .from('products')
+                .select('id, sku, name, stock_qty')
+                .in('sku', skus.slice(i, i + 200))
+            if (error) throw error
+            for (const p of data ?? []) if (p.sku) sonuc.push({ id: p.id, sku: p.sku, name: p.name, stock_qty: p.stock_qty })
+        }
+        return sonuc
+    }
+
     const handleCsvImport = async (file: File) => {
         setCsvPreview([])
         try {
-            const textRaw = await file.text()
-            const text = textRaw.replace(/^\uFEFF/, '')
-            const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0)
-            if (lines.length < 2) {
-                toast.error(t('admin.inventory.import.errors.needHeaderAndRow'))
+            /* ADM-6 (cetvel \u00A71.2): dosya kap\u0131s\u0131 (uzant\u0131, t\u00FCr, boyut, sat\u0131r s\u0131n\u0131r\u0131) OKUMADAN \u00F6nce;
+             * ayr\u0131\u015Ft\u0131r\u0131c\u0131 t\u0131rnak i\u00E7i virg\u00FCl/sat\u0131r sonunu do\u011Fru i\u015Fler; sat\u0131rlar \u015Femadan ge\u00E7er.
+             * Eskiden negatif miktar sessizce 0'a, ondal\u0131k sessizce tamsay\u0131ya k\u0131rp\u0131l\u0131yordu. */
+            const okuma = await csvDosyasiOku(file)
+            if (!okuma.ok) {
+                toast.error(t(CSV_HATA_ANAHTARI[okuma.hata], { maxMb: CSV_MAKS_BAYT / (1024 * 1024), maxRows: CSV_MAKS_SATIR }))
                 return
             }
 
-            const split = (s: string) =>
-                s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
-
-            const headerRaw = split(lines[0]).map(h => h.trim().toLowerCase())
-            const skuIdx = headerRaw.indexOf('sku')
-            let qtyIdx = headerRaw.indexOf('qty')
-            if (qtyIdx === -1) qtyIdx = headerRaw.indexOf('quantity')
-            if (qtyIdx === -1) qtyIdx = headerRaw.indexOf('stock')
-            if (qtyIdx === -1) qtyIdx = headerRaw.indexOf('new_stock')
-
-            if (skuIdx === -1 || qtyIdx === -1) {
+            const hazirlik = stokSatirlariniHazirla(okuma.baslik, okuma.satirlar, okuma.satirNolari)
+            if (!hazirlik.ok) {
                 toast.error(t('admin.inventory.import.errors.missingColumns'))
                 return
             }
-
-            const parsedRows: Array<{ line: number; sku: string; newQty: number }> = []
-            const errors: Array<{ line: number; sku: string; message: string }> = []
-
-            for (let i = 1; i < lines.length; i++) {
-                const cells = split(lines[i])
-                if (cells.every(c => (c ?? '').trim() === '')) continue
-                const sku = String(cells[skuIdx] || '').trim()
-                const qtyStr = String(cells[qtyIdx] || '').trim()
-                const newQty = qtyStr === '' ? NaN : Number(qtyStr)
-                if (!sku) {
-                    errors.push({ line: i + 1, sku: '', message: t('admin.inventory.import.errors.missingSku') })
-                    continue
-                }
-                if (!Number.isFinite(newQty)) {
-                    errors.push({ line: i + 1, sku, message: t('admin.inventory.import.errors.qtyMustBeNumber') })
-                    continue
-                }
-                parsedRows.push({ line: i + 1, sku, newQty: Math.max(0, Math.trunc(newQty)) })
-            }
+            const parsedRows = hazirlik.satirlar
+            const errors: Array<{ line: number; sku: string; message: string }> = hazirlik.hatalar.map(h => ({
+                line: h.line,
+                sku: h.sku,
+                message: t(`admin.inventory.import.errors.${h.kod}`),
+            }))
 
             if (parsedRows.length === 0) {
                 toast.error(t('admin.inventory.import.errors.noValidRows'))
@@ -110,19 +109,15 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
             }
 
             const skus = Array.from(new Set(parsedRows.map(r => r.sku)))
-            const { data: products } = await supabase
-                .from('products')
-                .select('id, sku, name, stock_qty')
-                .in('sku', skus as string[])
+            const products = await skuIleUrunGetir(skus)
 
-            if (!products || products.length === 0) {
+            if (products.length === 0) {
                 toast.error(t('admin.inventory.import.errors.noMatchingSku'))
                 return
             }
 
             const skuToProduct = new Map(
-                (products as Array<{ sku: string; id: string; name: string; stock_qty: number | null }>)
-                    .map(p => [p.sku, { id: p.id, name: p.name, stock: Number(p.stock_qty || 0) }])
+                products.map(p => [p.sku, { id: p.id, name: p.name, stock: Number(p.stock_qty || 0) }])
             )
 
             const preview: CsvPreviewRow[] = []
@@ -149,7 +144,9 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
 
             setCsvPreview(preview)
             if (errors.length > 0) {
-                toast(t('admin.inventory.import.errors.someRowsSkipped'))
+                // Atlanan satır SESSİZ kalmaz: sayı + ilk örnekler (satır · SKU · neden).
+                const ornek = errors.slice(0, 3).map(e => `${e.line} · ${e.sku || '—'} · ${e.message}`).join('; ')
+                toast(t('admin.inventory.import.errors.rowsSkippedDetail', { count: errors.length, examples: ornek }))
             }
         } catch (err) {
             console.error('CSV parse error:', err)
@@ -179,13 +176,13 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
         setCsvProgress(0)
         try {
             const skus = csvPreview.map(item => item.sku)
-            const { data: products } = await supabase.from('products').select('id, sku').in('sku', skus as string[])
+            const products = await skuIleUrunGetir(skus)
 
-            if (!products || products.length === 0) {
+            if (products.length === 0) {
                 throw new Error(t('admin.inventory.import.errors.noMatchingProduct'))
             }
 
-            const skuToId = new Map((products as Array<{ sku: string; id: string }>).map((p) => [p.sku, p.id]))
+            const skuToId = new Map(products.map((p) => [p.sku, p.id]))
 
             if (dryRun) {
                 toast.success(t('admin.inventory.import.dryRunSuccess'))
@@ -236,15 +233,12 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
             const downloadErrors = () => {
                 if (errors.length === 0) return
                 const header = [t('admin.inventory.import.errorCsv.sku'), t('admin.inventory.import.errorCsv.message')]
-                const lines = errors.map(e => ['"' + e.sku.replace(/"/g, '""') + '"', '"' + e.message.replace(/"/g, '""') + '"'].join(','))
-                const csv = '\uFEFF' + [header.join(','), ...lines].join('\n')
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `inventory_errors_${new Date().toISOString().split('T')[0]}.csv`
-                a.click()
-                URL.revokeObjectURL(url)
+                // SKU ve hata mesajı dosyadan / veritabanından gelir → ortak kapı (formül nötrleme).
+                tabloIndir(
+                    csvBelgesi(header, errors.map(e => [e.sku, e.message])),
+                    `inventory_errors_${new Date().toISOString().split('T')[0]}.csv`,
+                    'csv',
+                )
             }
 
             toast.custom((id) => (

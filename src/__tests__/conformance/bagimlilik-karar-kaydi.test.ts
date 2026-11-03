@@ -67,15 +67,19 @@ const KAYIT_YOLU = path.join(KOK, 'docs', 'standards', 'bagimlilik-kararlari.md'
  *
  * 20 → 16 (2026-09-21): dört React satırı `^19.3.0`'a gevşetildi, evrenden çıktı — ilk sıkışma.
  * 16 → 15 (2026-09-22): `eslint-config-next` `next` ile aynı sürüme (15.5.25) geldi, KARAR oldu (#1293).
+ * 15 → 10 (2026-11-03, OPS-209): `minimatch` üç satırı tek KARAR'a, `glob@10` `glob` KARAR'ına indi.
  */
-const BORC_TAVANI = 15
+const BORC_TAVANI = 10
 
 /**
  * Cetvel §4: override DAİMA aralıklıdır, açık uçlu değil (">=7.29.0" ana sürüm atlatır —
  * 2026-09-13'te `undici`yi 8.10.2'ye çıkardı). Bugün bu kural 17 yerde çiğneniyor: kural
  * YAZILIYDI, hiçbir kapı ölçmüyordu. Tavan dondurulmuştur, yalnız AZALABİLİR.
+ *
+ * 17 → 14 (2026-11-03, OPS-209): `minimatch@3` ve `glob@10` açık uçluydu; ikisi de üst sınırlı
+ * seçicisiz override'a çevrildi (ölçülen sayı 14).
  */
-const ACIK_UCLU_TAVANI = 17
+const ACIK_UCLU_TAVANI = 14
 
 /**
  * ⭐GEVŞETME ADAYI = gerekçesi ölçülmemiş TAM PİN (kayıt §2.1, Recep kuralı 2026-09-19:
@@ -88,8 +92,10 @@ const ACIK_UCLU_TAVANI = 17
  * bunu kimse ölçmemişti (köken: 18→19 göçünün temkini, `06e940580`, 2026-03-17).
  *
  * 7 → 3 (2026-09-21): o dört pin gevşetildi (`^19.3.0`). Kalan üç aday aynı sınamayı bekler.
+ * 3 → 0 (2026-11-03, OPS-209): son iki aday `minimatch` 9.0.7 ve `minimatch@9` 9.0.7 idi; yerlerini
+ * gerekçeli `>=11.0.1 <12.0.0` aldı. Gerekçesiz tam pin kalmadı.
  */
-const GEVSETME_ADAYI_TAVANI = 3
+const GEVSETME_ADAYI_TAVANI = 0
 
 type Satir = { paket: string; aralik: string; tarih: string; durum: string; gerekce: string }
 
@@ -161,7 +167,9 @@ describe('INV-DEP-KARAR-1 · sürüm kararı gerekçesiz değişemez', () => {
     // Sessiz-boş sınıfı: tablo biçimi bozulursa ayrıştırıcı 0 satır döner ve aşağıdaki
     // testlerin hepsi boş küme üzerinde koşup GEÇER. O yüzden taban burada ölçülür.
     expect(KAYIT.length, 'karar kaydı tablosu ayrıştırılamadı ya da boşaldı').toBeGreaterThan(25)
-    expect(EVREN.size, 'package.json evreni boş — ayrıştırma kırık').toBeGreaterThan(25)
+    // Taban 25 → 20 (2026-11-03, OPS-209): evren 27'den 25'e indi, çünkü üç `minimatch`
+    // override'ı teke indi. Bu satır tavan değil, "ayrıştırma çöktü mü" tabanıdır.
+    expect(EVREN.size, 'package.json evreni boş — ayrıştırma kırık').toBeGreaterThan(20)
   })
 
   it('⭐override\'lar pnpm-workspace.yaml\'da — package.json\'a GERİ DÖNMEZ (Dependabot/pnpm 11)', () => {

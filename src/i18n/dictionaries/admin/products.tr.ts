@@ -126,6 +126,10 @@ export const products = {
     unknownCategoryTitle: 'Kategorisi veritabanında bulunamayan satır: {{count}}',
     unknownCategoryHelp: 'Bu satırların kategori değeri canlı veritabanındaki hiçbir kategoriyle eşleşmiyor; bu yüzden hiçbir satır yazılmadı. CSV dosyasındaki kategori değeri canlı kategori slug değeriyle birebir aynı olmalıdır (örnek: cati-tipi-fan). Değerleri düzeltip dosyayı yeniden yükleyin.',
     unknownCategoryExamples: 'Eşleşmeyen değer: {{skus}}',
+    // Şema doğrulaması (ADM-6, csv-import-export-standard §1.2): aynı üç parçalı kalıp.
+    invalidRowsTitle: 'Geçersiz değer içeren satır: {{count}}',
+    invalidRowsHelp: 'Hiçbir satır yazılmadı. SKU yalnız büyük harf, rakam ve tire içerir; status active, draft ya da archived olur; stock_qty ve low_stock_threshold 0 veya pozitif tam sayıdır. Değerleri düzeltip dosyayı yeniden yükleyin.',
+    invalidRowsExamples: 'Satır ve sütun: {{examples}}',
   },
   statusLabels: {
     active: 'Aktif',

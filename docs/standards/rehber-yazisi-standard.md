@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.11 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.12 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -64,6 +64,10 @@ ana sayfa blok adedi ve site haritası fikstürleri; yeni **R10.6 yayın öncesi
 kanıtlı, B8 PR gövdesinde doldurulur) ve hangi maddenin kapıya çevrilebileceği önerisi. Kırmızı kural ve kapı getirmez
 (kapıyı ARAÇ yazar). Tetik: Recep "bu dersler neden departmanın kendi kuralında yok" diye sordu; sessiz fan dersi
 cetvelde hiç yoktu.
+**v0.12 (2026-11-03, BLG-31, OPS kararı):** çeşit/hub yazısında zorunlu `## Fiyatı belirleyen etkenler` bölümü için kalıp
+(R3 tablosu, Fiyat satırı): kaynak etken anlatmıyorsa başlık korunur, bölüm bunu dürüstçe söyler ve teklif için istenen seçim
+girdilerini kaynak atfıyla yazar. Tetik: BLG-31 tur 2 ve tur 3'te iki bağımsız doğrulayıcı, fiyat etkeni anlatmayan bölümü
+başlık-içerik uyumsuzluğu olarak buldu. Kırmızı kural ve kapı getirmez (başlık sabit kalır, `kalipDenetle` değişmez).
 
 ---
 
@@ -295,7 +299,7 @@ değildir. Fark ancak emsal yazıyla elle kıyasla bulundu (OPS).
 | Doğrudan cevap | İlk 2–3 cümle sorunun cevabı; giriş cümlesi yok |
 | Gövde | Konuya uyan bölümler: nedir / nasıl çalışır · türleri · uygulamalar · seçim ve boyutlandırma · hesap örneği (R2.5 + hesaplayıcı bağlantısı) · alternatiflerle kıyas · montaj · bakım · güvenlik ve mevzuat · fiyatı belirleyen etkenler · izlenecek yol. Her yan soru bir bölüme bağlanır |
 | Tablo | En az bir (kıyas ya da boyutlandırma); hücreler de iddiadır (R5.1) |
-| Fiyat | **Rakam yok.** "Fiyatı belirleyen etkenler" bölümü etkenleri anlatır; fiyat yalnız ürün sayfasında görünür (`rendering-cache-standard.md` §2) |
+| Fiyat | **Rakam yok.** "Fiyatı belirleyen etkenler" bölümü etkenleri anlatır; fiyat yalnız ürün sayfasında görünür (`rendering-cache-standard.md` §2). **Hub kalıbı (v0.12, BLG-31):** çeşitleri ve kategorileri sıralayan hub yazısında kaynaklar fiyat etkenlerini anlatmıyorsa başlık birebir kalır, altı bunu açıkça söyler ("fiyatı belirleyen etkenleri kaynakla sayamaz"), teklifte hangi seçim girdilerinin istendiği kaynak atfıyla yazılır, uydurma etken yazılmaz |
 | SSS | 5–8 soru; her cevap tek başına anlamlı (okuyucu için; işaretleme için değil — R6) |
 | İç bağlantı | İlgili ürün aileleri (kart, fiyatsız) · ana kategori · varsa hesaplayıcı. Ters yön (kategoriden ve aileden yazıya, ana sayfadan en yeni yazılara) **R3.2**'dedir. **Adres değil kimlik yazılır** (v0.4, Recep 2026-09-24: "URL değişirse sorun olmaz mı?"): metinde `[metin](vh:<tür>/<anahtar>)`, tür ∈ model · aile · kategori · marka · hesaplayici · sayfa; anahtar (URUN ile kesinleşti, 2026-09-24) model için **SKU** (harf duyarsız), kategori için **kanonik EN slug** (CLAUDE.md kural 7), aile için **aile slug'ı** — slug Faz 1-B'de değişirse çözücü `url_takma_adlari` tablosuna bakar. Sayfa üretilirken kimlik `adresUret` ile **güncel** adrese çözülür; **çözülemeyen bağlantı derlemeyi düşürür** (URUN). Metne düz site adresi (`/tr/…`, `https://venthub.com.tr/…`) yazılmaz. Niçin: adres ağacı tek yayında değişecek (`docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md`); eski adres kırılmaz, 308 verir, ama her tıklama bir durak daha yapar ve yazı eski adresi kalıcı taşır. Şablonun kendi kartları ve teklif bağlantısı da aynı çözücüyü kullanır |
 | Kaynaklar | R2.4 |

@@ -190,19 +190,21 @@ export const inventory = {
       message: 'mesaj',
     },
     errors: {
-      needHeaderAndRow: 'CSV dosyası en az bir başlık satırı ve bir veri satırı içermelidir.',
       missingColumns: 'Başlık satırında sku ve qty/quantity/stock sütunları bulunmalı.',
       noValidRows: 'Geçerli satır bulunamadı.',
       noMatchingSku: 'Eşleşen SKU bulunamadı.',
       noMatchingProduct: 'Eşleşen ürün bulunamadı.',
-      someRowsSkipped: 'Bazı satırlar atlandı; önizlemeyi kontrol edin.',
       parseFailed: 'CSV dosyası işlenirken hata oluştu.',
       nothingToProcess: 'İşlenecek veri yok.',
       processFailed: 'CSV işlenirken hata oluştu.',
       missingSku: 'SKU eksik',
       qtyMustBeNumber: 'Miktar sayı olmalı',
+      // ADM-6: eskiden negatif miktar sessizce 0'a, ondalık sessizce tamsayıya kırpılıyordu.
+      qtyOutOfRange: 'Miktar 0 ile 1.000.000 arasında bir tam sayı olmalı',
+      invalidSku: 'SKU yalnız büyük harf, rakam ve tire içerebilir',
       skuNotMatched: 'SKU eşleşmedi',
       unknown: 'Bilinmeyen hata',
+      rowsSkippedDetail: '{{count}} satır atlandı. Örnek: {{examples}}',
     },
   },
   qrLabel: {
