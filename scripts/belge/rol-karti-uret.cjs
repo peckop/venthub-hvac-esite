@@ -609,7 +609,7 @@ const ROLLER = {
     yetki: 'Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirsiz" hükmü verir; BLOG yazısındaki mevzuat cümlelerini kontrol eder (R5.1); kayıt değişince ilgili departmana bildirir; "ilk anlatan" konu önerir, sırayı Recep belirler.',
     yasak: 'Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).',
     yetenek: 'Önce NotebookLM (`notebooklm ask`; takip defteri a5f382a4, katalog 8bb600d9); Yayın Ofisi CELEX + SPARQL (EUR-Lex\'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini. Skill: notebook-navigator.',
-    durum: 'Açık, beklemede: tohum işi bitti, BLOG ya da KATALOG ihtiyacı doğunca yeniden açılır. ErP liste hükmü KATALOG donuğunu (karar 165) bekliyor. Cetvel v0.1 taslak, Recep onay kaydı bulunamadı; REC-393 "42 kalem" diyor, kayıt 46.',
+    durum: 'Açık (pencere 3 Kasım\'da açıldı, OPS-210).',
   },
   SATIS: {
     gorev: 'Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, müşteri e-postaları, KVKK ve roller; satış kipi şirket kurulana dek kapalı-hazır.',

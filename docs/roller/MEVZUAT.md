@@ -29,7 +29,7 @@ Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null ya
 - Gerekçeli özet: `docs/roller/MEVZUAT-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık, beklemede: tohum işi bitti, BLOG ya da KATALOG ihtiyacı doğunca yeniden açılır. ErP liste hükmü KATALOG donuğunu (karar 165) bekliyor. Cetvel v0.1 taslak, Recep onay kaydı bulunamadı; REC-393 "42 kalem" diyor, kayıt 46.
+Açık (pencere 3 Kasım'da açıldı, OPS-210).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
