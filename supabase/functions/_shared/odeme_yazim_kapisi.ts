@@ -74,6 +74,36 @@ export function retYazilabilirMi(satir: YazimSatiri | null, istekToken: string |
   return { yaz: true, sebep: null }
 }
 
+/** Ödemesi işlenmiş sayılan ödeme durumları (başarı bildiriminin TEKRARI zararsız olabilir). */
+const ISLENMIS_ODEME = ['paid', 'partial_refunded', 'refunded']
+
+export type YazilmayanBasari =
+  /** Aynı ödemenin ikinci bildirimi (İyzico POST + tarayıcı dönüşü): sorun yok. */
+  | { tur: 'tekrar' }
+  /** Para çekildi, kayıt tutmuyor: insan bakmalı. Cevap 'needs_review', gelir alarmı kalkar. */
+  | { tur: 'inceleme'; kod: 'DUPLICATE_CHARGE' | 'PAYMENT_ON_TERMINATED_ORDER' }
+
+/**
+ * Başarılı + eşleşmiş ödeme, satır 'pending' olmadığı için YAZILMADIĞINDA ne olduğu (ALT-131,
+ * security-reviewer bulgu 1). Sessiz `success` iki durumu ayırmıyordu:
+ *   - satır zaten bu ödemeyle ödenmiş → zararsız tekrar;
+ *   - satır iptal edilmiş (housekeeping 15. dakikada iptal etti, müşteri sonra ödedi) ya da başka bir
+ *     ödemeyle ödenmiş (aynı sipariş için iki form, iki tahsilat) → para var, kayıt yok.
+ * Tekrarın kanıtı kayıtlı `payment_debug.paymentId` ile bu bildirimin `paymentId`'sinin eşitliğidir;
+ * kanıt yoksa inceleme (fail-closed: yanlış alarm, kaçan tahsilattan ucuzdur).
+ */
+export function yazilmayanBasari(satir: YazimSatiri | null, paymentId: unknown): YazilmayanBasari {
+  const p = metin(satir?.payment_status)
+  const dbg = satir?.payment_debug && typeof satir.payment_debug === 'object' ? (satir.payment_debug as Record<string, unknown>) : {}
+  const kayitli = metin(dbg.paymentId)
+  const gelen = metin(paymentId)
+  if (p && ISLENMIS_ODEME.includes(p)) {
+    if (kayitli && gelen && kayitli === gelen) return { tur: 'tekrar' }
+    return { tur: 'inceleme', kod: 'DUPLICATE_CHARGE' }
+  }
+  return { tur: 'inceleme', kod: 'PAYMENT_ON_TERMINATED_ORDER' }
+}
+
 /** PostgREST in.(...) listesi. Değerler sabit sözlükten gelir, dışarıdan değil. */
 const liste = (d: readonly string[]) => (d.length === 1 ? `eq.${d[0]}` : `in.(${d.join(',')})`)
 

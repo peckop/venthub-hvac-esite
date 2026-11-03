@@ -22,6 +22,7 @@ import {
   kosulFiltresi,
   RET_ONCESI,
   retYazilabilirMi,
+  yazilmayanBasari,
   type YazimSatiri,
 } from '../_shared/odeme_yazim_kapisi.ts'
 
@@ -354,11 +355,12 @@ Deno.serve(async (req) => {
       fields: { status?: string; payment_status?: string; payment_token?: string },
       kosul: string,
     ): Promise<{ ok: boolean; status: number | null; satir: number }> {
-      const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
-      const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
-      const filter = filterById || filterByConv;
-      if (!filter) return { ok: false, status: null, satir: 0 };
-      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}${orderTenantFilter}${kosul}`, {
+      // Hedef, kararın verildiği satırın KENDİ kimliği (security-reviewer bulgu 3): filtreyi istekten
+      // ya da İyzico yanıtındaki conversationId'den yeniden türetmek, kararı bir satıra yazımı başka
+      // satıra bağlayabilirdi (`conversation_id` tekil değil: CONV-<epoch-ms>).
+      const hedefId = siparisSatiri?.id;
+      if (!hedefId) return { ok: false, status: null, satir: 0 };
+      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefId)}${orderTenantFilter}${kosul}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
@@ -378,11 +380,31 @@ Deno.serve(async (req) => {
     // ilerlettiyse koşar. İyzico'nun POST'u ile tarayıcı dönüş sayfası aynı ödemeyi iki kez bildirir;
     // ikinci çağrı kupon kullanımını ikinci kez artırmamalı.
     let gecisYapildi = false;
+    // Aynı ödemenin ikinci bildirimi: satır zaten bu ödemeyle 'paid'. Stok RPC'si ve sepet temizliği
+    // tekrar edilebilir (idempotent) olduğu için yine koşar — ilk çağrı RPC'den önce düştüyse bu çağrı
+    // tamamlar. Kupon artırımı idempotent DEĞİL, yalnız `gecisYapildi`da koşar.
+    let tekrarZararsiz = false;
+    // Ödeme gerçek, kayıt tutmuyor (iptal edilmiş siparişe ödeme ya da ikinci tahsilat): cevap needs_review.
+    let incelemeGerek = false;
     const basariKarari = basariYazilabilirMi(siparisSatiri);
     if (paid && !basariKarari.yaz) {
-      // Ödeme gerçek ve bu siparişe ait, ama satır artık 'pending' değil (zaten ödendi, kargolandı,
-      // iade edildi). Geri sarılmaz (kural 11). Cevap yine 'success': ödeme başarılıdır.
-      console.warn(`[iyzico-callback] odeme zaten islenmis ya da siparis ilerlemis; yazilmadi (${basariKarari.sebep}).`);
+      // Ödeme gerçek ve bu siparişe ait, ama satır artık 'pending' değil. Geri sarılmaz (kural 11).
+      // ⭐Sessiz kalmaz (security-reviewer bulgu 1): zararsız tekrar ile "para var, kayıt yok" ayrılır.
+      const durum = yazilmayanBasari(siparisSatiri, result?.paymentId);
+      if (durum.tur === 'tekrar') {
+        tekrarZararsiz = siparisSatiri?.payment_status === 'paid';
+        console.warn(`[iyzico-callback] ayni odemenin tekrar bildirimi; yazilmadi (${basariKarari.sebep}).`);
+      } else {
+        incelemeGerek = true;
+        await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+          fn: 'iyzico-callback',
+          code: durum.kod,
+          message: 'Odeme BASARILI ve siparisle eslesti ama siparis artik pending degil; YAZILMADI, insan bakmali.',
+          // Değer yok: yalnız durum sebebi ve hedef sipariş kimliği.
+          extra: { sebep: basariKarari.sebep, order_id: siparisSatiri?.id ?? null },
+        })
+        console.error(`[iyzico-callback] ${durum.kod}: para cekildi, siparis ${basariKarari.sebep}; alarm kaydedildi.`);
+      }
     } else if (paid) {
       // Yaşam döngüsü: 'confirmed' · Ödeme: 'paid'. Tek PATCH, deneme-yanılma yok.
       // ⭐`payment_token` ARTIK BURADA YAZILIYOR — doğrulamadan ÖNCE değil (REC-355).
@@ -397,7 +419,7 @@ Deno.serve(async (req) => {
         console.warn('[iyzico-callback] siparis okuma ile yazma arasinda ilerledi; yazilmadi (kural 11).');
       }
     }
-    if (gecisYapildi) {
+    if (gecisYapildi || tekrarZararsiz) {
       
       // T137-VH (2026-08-20): BURADAKI ATESLE-UNUT ONAY E-POSTASI CAGRISI KALDIRILDI.
       //
@@ -416,8 +438,9 @@ Deno.serve(async (req) => {
       // bakmaz. Migration: supabase/migrations/20260820140000_order_paid_notification.sql
       
       // Kuponu finalize et: order row'dan coupon_code'yi al, varsa usage increment ve discount hesapla (best-effort)
+      // ALT-131: yalnız satırı BU çağrı ilerlettiyse — kullanım artırımı idempotent değil.
       try {
-        if (orderId) {
+        if (gecisYapildi && orderId) {
           const su = Deno.env.get('SUPABASE_URL') || ''
           const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
           if (su && sk) {
@@ -516,7 +539,9 @@ Deno.serve(async (req) => {
             try {
               // ALT-131: burası da birleştirir — önceki anahtarlar (iade defteri) ezilmez.
               const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, { ...debugInfo, stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson });
-              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
+              // `payment_status=eq.paid` koşulu: arada iade yazıldıysa (refunded/partial_refunded) eski
+              // görüntüyle iade defteri ezilmez (security-reviewer bulgu 4).
+              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&payment_status=eq.paid`, {
                 method: 'PATCH',
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
@@ -663,9 +688,9 @@ Deno.serve(async (req) => {
      * `order-housekeeping` bu değeri sonlandırma sebebi SAYMAZ — orada da adıyla yazılı.
      */
     const responseBody = {
-      status: paid
+      status: paid && !incelemeGerek
         ? "success"
-        : (odemeBasarili && !eslesme.gecti)
+        : (odemeBasarili && (!eslesme.gecti || incelemeGerek))
           ? "needs_review"
           : (result ? "failure" : "pending"),
       iyzico: result,
@@ -693,7 +718,7 @@ Deno.serve(async (req) => {
         // yüz "ödemeniz alındı, doğrulama sürüyor" der (yeniden ödeme düğmesi kapalı).
         target.searchParams.set(
           'status',
-          paid ? 'success' : (odemeBasarili && !eslesme.gecti) ? 'needs_review' : 'failure',
+          paid && !incelemeGerek ? 'success' : (odemeBasarili && (!eslesme.gecti || incelemeGerek)) ? 'needs_review' : 'failure',
         );
         const t = target.toString();
         const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(_e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
