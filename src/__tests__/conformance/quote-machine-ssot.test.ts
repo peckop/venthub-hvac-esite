@@ -360,6 +360,8 @@ describe('INV-QUOTE-1 · teklif durum-makinesi SSOT', () => {
         bulunanlar.push(name)
         if (/tenant_id\s*=\s*(public\.)?jwt_tenant_id\(\)/.test(block)) continue
         if (name in TENANT_KAPSAMI_MUAFLARI) continue
+        // ALT-135: açık RESTRICTIVE deny politikası (using false) kimseye satır VERMEZ; sızıntı sınıfı değil, kilittir.
+        if (/_deny_all$/.test(name) && /as\s+restrictive/i.test(block) && /using\s*\(\s*false\s*\)/i.test(block)) continue
         ihlaller.push(`${path} · ${table}.${name}`)
       }
     }
