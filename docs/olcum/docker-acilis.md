@@ -26,7 +26,7 @@ Docker'ın kendi açılış kaydı (`HKCU\...\Run` altında `Docker Desktop`) ka
 ## Kurulum (yönetici yetkisi gerekmez; hepsi HKCU ve kullanıcı dizini)
 ```powershell
 $h = Join-Path $env:LOCALAPPDATA 'VentHub'; New-Item -ItemType Directory -Force $h | Out-Null
-Copy-Item C:\Users\alize\venthub-hvac\scripts\ci\docker-acilis.ps1 $h -Force
+Copy-Item .\scripts\ci\docker-acilis.ps1 $h -Force   # depo kökünden koşulur
 $k = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
 Remove-ItemProperty -Path $k -Name 'Docker Desktop'
 Set-ItemProperty -Path $k -Name 'VentHub Docker acilis' -Value ('powershell.exe -NoProfile -WindowStyle Hidden -File "' + (Join-Path $h 'docker-acilis.ps1') + '"')
