@@ -223,7 +223,7 @@ describe('INV-SIPARIS-MONOTON-1 — SABOTAJ kolu (kural sökülünce kapı KIRMI
 })
 
 describe('INV-SIPARIS-MONOTON-1 — yazıcılar kapıya uyuyor', () => {
-  const fonk = (ad: string): string => yorumsuz(oku(path.join(KOK, 'supabase', 'functions', ad, 'index.ts')).replace(/\/\/[^\n]*/g, ''))
+  const fonk = (ad: string): string => yorumsuz(oku(path.join(KOK, 'supabase', 'functions', ad, 'index.ts')).replace(/(?<!:)\/\/[^\n]*/g, ''))
 
   it('admin-update-shipping: kargo iptali status GERİ SARMAZ ve ortak karar modülünü kullanır', () => {
     const s = fonk('admin-update-shipping')
