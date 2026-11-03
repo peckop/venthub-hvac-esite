@@ -445,7 +445,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // değişmez). İçerik cümlesi değişmedi (R5.5 başlık-yalnız revizyon). Site haritası lastmod'u ve Article `dateModified` buradan.
     // Güncelleme tarihi 2026-11-01 (BLG-29): "Sessiz fan nedir?" ara başlığı ve çalışma tanımı cümlesi (üretici beyanına dayalı, tek üreticiye genellenmez), meta açıklamada "sessiz fan", kardeş yazılara
     // üç iç bağlantı. H1 ve title değişmedi (Recep kararı). Önceki değer: 2026-10-31 (BLG-25).
-    guncellemeTarihi: '2026-11-01',
+    // 2026-11-03 (BLG-30): terim hizası, "karışık akışlı" → "karma akışlı (karışık akışlı)" (ürün sayfalarının diliyle aynı); metin iddiası değişmedi.
+    guncellemeTarihi: '2026-11-03',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
@@ -552,7 +553,7 @@ Bu tablodaki değerler odada ölçülen servis ekipmanı gürültüsüdür; kata
 
 ## Örnek: Vortice Lineo Quiet'in ses değerleri
 
-Vortice Lineo Quiet iki sürümle gelir: 2 ya da 3 hızlı AC motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES [2]. Vortice, LINEO ürün ailesini konut, ticari ya da endüstriyel mekânların kanallı havalandırması için tasarlanmış karışık akışlı kanal fanları olarak tanıtır; karışık akışlı çarkı helisel fanların yüksek debisi ile santrifüj fanların yüksek basıncının birleşimi olarak anlatır, bu anlatım ses değeri iddiası değildir [2]. Katalog, susturmalı ürünlerde ses emici kabuğun bakım sonunda yeniden takıldığında özgün ses performansını test koşullarında geri kazandırdığını belirtir [2]. Tablolar Ø100, 125, 150, 200, 250 ve 315 mm modellerini içerir; katalogdaki Ø160 modeller tabloya alınmamıştır [2]. Ses basıncı 3 m mesafede, serbest alanda hesaplanmıştır [2].
+Vortice Lineo Quiet iki sürümle gelir: 2 ya da 3 hızlı AC motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES [2]. Vortice, LINEO ürün ailesini konut, ticari ya da endüstriyel mekânların kanallı havalandırması için tasarlanmış karma akışlı (karışık akışlı) kanal fanları olarak tanıtır; karma akışlı çarkı helisel fanların yüksek debisi ile santrifüj fanların yüksek basıncının birleşimi olarak anlatır, bu anlatım ses değeri iddiası değildir [2]. Katalog, susturmalı ürünlerde ses emici kabuğun bakım sonunda yeniden takıldığında özgün ses performansını test koşullarında geri kazandırdığını belirtir [2]. Tablolar Ø100, 125, 150, 200, 250 ve 315 mm modellerini içerir; katalogdaki Ø160 modeller tabloya alınmamıştır [2]. Ses basıncı 3 m mesafede, serbest alanda hesaplanmıştır [2].
 
 Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir; bu yazı bu sütunlara ayar noktası der [2].
 
@@ -665,7 +666,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'kanal-tipi-fan-nedir',
     konu: 'konfor',
     yayinTarihi: '2026-10-25',
-    guncellemeTarihi: '2026-10-31',
+    // 2026-11-03 (BLG-30): terim hizası, "karışık akışlı" → "karma akışlı (karışık akışlı)"; metin iddiası değişmedi.
+    guncellemeTarihi: '2026-11-03',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -679,13 +681,13 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Kanal fanı seçmeden önce türleri ve takılacağı yerleri bu rehberde karşılaştırın.',
         govde: `# Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar
 
-Kanal tipi fan, havalandırma kanalına yerleştirilmiş bir fan türüdür; Avens yuvarlak kanal tipi fanı yuvarlak bir kanala, dikdörtgen kanal tipi fanı dikdörtgen kesitli kanallara entegre fanlar olarak tanımlar [1]. Vortice LINEO serisini yatay ya da dikey kanallı montaj için tasarlanmış karışık akışlı fanlar olarak tanımlar [2].
+Kanal tipi fan, havalandırma kanalına yerleştirilmiş bir fan türüdür; Avens yuvarlak kanal tipi fanı yuvarlak bir kanala, dikdörtgen kanal tipi fanı dikdörtgen kesitli kanallara entegre fanlar olarak tanımlar [1]. Vortice LINEO serisini yatay ya da dikey kanallı montaj için tasarlanmış karma akışlı (karışık akışlı) fanlar olarak tanımlar [2].
 
 Bu yazı, fanların akış türlerini, kanal tipi fanların hangi yerleşimlerde kullanıldığını ve seçerken hangi bilgilere bakılacağını üretici belgelerine ve ABD Enerji Bakanlığı'nın 2003 tarihli, endüstriyel fan sistemlerine yönelik rehberine dayanarak anlatır [2][7].
 
 ## Fanlarda akış türleri ve kanal fanları
 
-DOE rehberi fanları iki ana türe ayırır: aksiyel ve santrifüj [7]. Aksiyel fanlar havayı fanın ekseni boyunca hareket ettirir [7]. Santrifüj fanlar yüksek basıncı yüksek verimle üretebilir [7]. Vortice kataloğu karışık akışlı çarkı, helisel fanların avantajı olan yüksek debi ve çarkın ekseni çevresindeki akışı, santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatır [2]. Aynı katalogda CA V0 ve CA MD serilerinin sayfa başlığı santrifüj kanal fanı der, gövde metni ise karışık akışlı olduğunu yazar [2]; bu nedenle akış türü yalnız seri adından çıkarılmaz.
+DOE rehberi fanları iki ana türe ayırır: aksiyel ve santrifüj [7]. Aksiyel fanlar havayı fanın ekseni boyunca hareket ettirir [7]. Santrifüj fanlar yüksek basıncı yüksek verimle üretebilir [7]. Vortice kataloğu karma akışlı çarkı, helisel fanların avantajı olan yüksek debi ve çarkın ekseni çevresindeki akışı, santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatır [2]. Aynı katalogda CA V0 ve CA MD serilerinin sayfa başlığı santrifüj kanal fanı der, gövde metni ise karma akışlı olduğunu yazar [2]; bu nedenle akış türü yalnız seri adından çıkarılmaz.
 
 ABD Enerji Bakanlığı rehberi, tüp tipi aksiyel (tubeaxial) fanları orta basınçlı ve yüksek debili uygulamalar için tanımlar ve kanallı iklimlendirme tesisatlarına uygun bulur [7].
 
@@ -693,7 +695,7 @@ ABD Enerji Bakanlığı rehberi, tüp tipi aksiyel (tubeaxial) fanları orta bas
 |---|---|---|
 | Aksiyel | Havayı fanın ekseni boyunca hareket ettirir [7] | [7] |
 | Santrifüj | Yüksek basıncı yüksek verimle üretebilir [7] | [7] |
-| Karışık akışlı | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir [2] | [2] |
+| Karma akışlı (karışık akışlı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir [2] | [2] |
 | Tüp tipi aksiyel (aksiyel fanın bir alt türü) | Orta basınç ve yüksek debili uygulamalara uygundur [7] | [7] |
 
 ## Kanal tipi fan nerede kullanılır?
