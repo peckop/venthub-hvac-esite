@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -569,34 +570,22 @@ const ErrorGroupsTableBody: React.FC = () => {
       'assigned_to',
       'notes',
     ]
-    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        r.signature,
-        r.level ?? '',
-        r.last_message ?? '',
-        r.url_sample ?? '',
-        r.env ?? '',
-        r.release ?? '',
-        r.first_seen,
-        r.last_seen,
-        r.count,
-        r.status,
-        r.assigned_to ?? '',
-        r.notes ?? '',
-      ]
-        .map(escape)
-        .join(','),
-    )
-    const csv = '﻿' + [cols.map((c) => `"${c}"`).join(','), ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'error-groups.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.signature,
+      r.level ?? '',
+      r.last_message ?? '',
+      r.url_sample ?? '',
+      r.env ?? '',
+      r.release ?? '',
+      r.first_seen,
+      r.last_seen,
+      r.count,
+      r.status,
+      r.assigned_to ?? '',
+      r.notes ?? '',
+    ])
+    tabloIndir(csvBelgesi(cols, lines), 'error-groups.csv', 'csv')
   }, [table])
 
   /* ---- bulk action: panel = status select + Apply ---- */

@@ -48,11 +48,23 @@ LLM çıkarır → flat CSV  →  [ İNSAN DENETİMİ ]  →  loader flat→JSON
 
 Tablolama yazılımı (Excel, Sheets, LibreOffice) `= + - @ TAB CR` ile başlayan hücreyi **formül** sayar. Müşterinin kayıtta yazdığı ad, istemciden gelen hata mesajı, dış sistemin olay tipi gibi **saldırganın kontrol edebildiği** her alan, yönetici CSV'yi açtığında çalışabilir (veri sızdırma, yönlendirme). Bu bölüm dışa aktarımın kuralıdır; içe alım (§2+) değişmez.
 
-* **Tek kapı:** yönetici CSV üreten HER yer hücreyi `src/utils/csvHucre.ts` (`csvHucre` / `csvSatir`) ile yazar. Yerel `escape()` ya da satır içi `.replace(/"/g, '""')` yasaktır (kapı: `INV-ADMIN-CSV-1`).
+* **Tek kapı:** yönetici CSV/XLS üreten HER yer belgeyi `src/lib/csv/belge.ts` (`csvBelgesi`, `xlsBelgesi`, `tabloIndir`) ile üretir; hücre kararı `src/lib/csv/hucre.ts`'tedir (`csvHucre` / `notrMetin`; ADM-6'da `src/utils/csvHucre.ts`'ten taşındı). Yerel `escape()`, satır içi `.replace(/"/g, '""')`, elle `new Blob(..., { type: 'text/csv' | 'application/vnd.ms-excel' })` ve şablonda ham `<td>${…}` yasaktır (kapı: `INV-ADMIN-CSV-1`, taban sıfır).
+* **XLS (HTML tablo):** hücre önce formül nötrlemesinden, sonra HTML kaçışından (`& < > "`) geçer; başlık da aynı kapıdan geçer. Excel HTML'i yorumlar: kaçışsız müşteri adı (`<img src=…>`) dosyayı açan makinede dış istek atar.
 * **Nötrleme:** hücre metninin NFKC normalize edilmiş **ilk karakteri** `= + - @ TAB CR` ise metnin başına tek tırnak (`'`) konur. Tam genişlikli `＝ ＋ － ＠` da yakalanır. Normalize edilmiş hâl çıktıya YAZILMAZ; yalnız karar içindir.
 * **Sayı/tarih DEĞİŞMEZ:** `number` tipi olduğu gibi yazılır; yalnız işaret+rakam+ayraçtan oluşan metin (`-12,50`, `+905551112233`) formül olamayacağı için önek almaz. Bedel (kabul edilen): sayı gibi görünmeyen metin ilk karakter formül karakteriyse Excel'de görünür `'` önekiyle açılır.
 * **Çıkışta yapılır, girişte bozulmaz:** veritabanındaki ham değer değiştirilmez; nötrleme yalnız CSV çıktısındadır.
 * **Her hücre çift tırnaklıdır** (mevcut dışa aktarımlarla bayt uyumu); ayraç (`,` / `;`) çağıranın seçimidir.
+
+### 1.2 Yönetici İÇE AKTARMA güvenliği (ADM-6, 2026-11-03)
+
+Yönetici panelindeki CSV içe aktarıcıları (ürün, stok) dosyayı **tek kapıdan** okur: `src/lib/csv/dosyaKapisi.ts` → `csvDosyasiOku(file)`. Kapı: `INV-ADMIN-CSV-1` kural D (`accept=".csv"` taşıyan yüzey `csvDosyasiOku` çağırmak zorunda; eski satır-bölme ifadesi yasak). Ölçüm ve gerekçe: `docs/audits/adm6-csv-yuzey-2026-11.md`.
+
+* **Dosya, okunmadan önce:** uzantı `.csv` (büyük/küçük harf farketmez); tarayıcının bildirdiği tür boş, `text/csv`, `text/plain`, `text/x-csv`, `application/csv` ya da `application/vnd.ms-excel` olmalı; boyut 0 < bayt ≤ **5 MB** (`CSV_MAKS_BAYT`). `accept` özniteliği yalnız ipucudur, denetim sayılmaz.
+* **Ayrıştırma:** `csvAyristir` (RFC 4180 temel kuralları: tırnak içi ayraç/satır sonu, `""` kaçışı, BOM, CRLF). Veri satırı üst sınırı **5.000** (`CSV_MAKS_SATIR`); aşan dosyanın TAMAMI reddedilir (kısmi okuma yok). Kapanmamış tırnak ve tekrarlı başlık reddedilir. Başlıklar kırpılır, küçük harfe indirilir.
+* **Şema (zod, `src/lib/csv/semalar.ts`):** SKU `^[A-Z0-9-]+$` (DB kısıtı `products_sku_format_check` ile aynı), en çok 64; `name` 1-300; `status` ∈ {active, draft, archived}; adet alanları 0 ≤ tam sayı ≤ 1.000.000. Boş hücre "verilmemiş" sayılır. Ürün içe aktarımında geçersiz satır varsa **hiçbir satır yazılmaz** (kategori reddiyle aynı ilke); stok içe aktarımında geçersiz satır önizlemeye girmez ve satır numarasıyla bildirilir — sessiz kırpma (negatif → 0, ondalık → tam sayı) yasaktır.
+* **Tenant kapsamı (CLAUDE.md kural 12):** `category_id` yalnız çağıranın kendi tenant'ından okunmuş kategori listesindeyse yazılır. Ön ölçümde kendi tenant'ında bulunan SKU'lar `upsert`, bulunmayanlar `insert` ile yazılır (çakışma başka tenant'ın satırını güncellemez, hata olur). SKU listesiyle okuma 200'lük parçalarla yapılır.
+* **Yetki:** istemci kapısı güvenlik sınırı DEĞİLDİR; yazma kararı veritabanındadır (RLS yazım politikaları, `adjust_stock` rol denetimi). Bu kurallar kaza ve hatalı dosyaya karşıdır.
+* **Hata metni** sözlükten gelir: `admin.dataTable.csvImport.*` (dosya kapısı), `admin.products.import.invalidRows*`, `admin.inventory.import.errors.*`.
 
 ---
 

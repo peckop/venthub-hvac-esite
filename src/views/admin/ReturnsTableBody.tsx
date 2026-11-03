@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { allowedNextStatuses } from '@/lib/admin/returnStatusMachine'
+import { csvBelgesi, tabloIndir, xlsBelgesi } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -920,7 +921,8 @@ const ReturnsTableBody: React.FC = () => {
   }, [statusCounts, t, getStatusLabel])
 
   /* ---- export (csv + xls) — fetchAllForExport, eski BOM/XLS builder'ları korur ---- */
-  const exportCsv = useCallback(async () => {
+  /** CSV ve XLS aynı başlık + satırları kullanır; biçim farkı yalnız belge üreticisinde. */
+  const exportTablosu = useCallback(async () => {
     const rows = await table.fetchAllForExport()
     const header = [
       t('admin.returns.export.headers.order'),
@@ -931,68 +933,28 @@ const ReturnsTableBody: React.FC = () => {
       t('admin.returns.export.headers.date'),
       t('admin.returns.export.headers.amount'),
     ]
-    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-    const lines = rows.map((r) =>
-      [
-        orderLabel(r),
-        r.customer_name ?? '',
-        r.customer_email ?? '',
-        r.reason ?? '',
-        getStatusLabel(r.status),
-        formatDateTime(r.created_at, lang),
-        typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang, { currency: SYSTEM_CURRENCY }) : '',
-      ]
-        .map(escape)
-        .join(','),
-    )
-    const bom = '﻿'
-    const csv = [header.map(escape).join(','), ...lines].join('\n')
-    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `returns_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      orderLabel(r),
+      r.customer_name ?? '',
+      r.customer_email ?? '',
+      r.reason ?? '',
+      getStatusLabel(r.status),
+      formatDateTime(r.created_at, lang),
+      typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang, { currency: SYSTEM_CURRENCY }) : '',
+    ])
+    const ad = `returns_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}`
+    return { header, lines, ad }
   }, [table, t, lang, getStatusLabel])
 
+  const exportCsv = useCallback(async () => {
+    const { header, lines, ad } = await exportTablosu()
+    tabloIndir(csvBelgesi(header, lines), `${ad}.csv`, 'csv')
+  }, [exportTablosu])
+
   const exportXls = useCallback(async () => {
-    const rows = await table.fetchAllForExport()
-    const rowsHtml = rows
-      .map((r) => {
-        const amount = typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang, { currency: SYSTEM_CURRENCY }) : ''
-        return (
-          `<tr>` +
-          `<td>${orderLabel(r)}</td>` +
-          `<td>${r.customer_name ?? ''}</td>` +
-          `<td>${r.customer_email ?? ''}</td>` +
-          `<td>${r.reason ?? ''}</td>` +
-          `<td>${getStatusLabel(r.status)}</td>` +
-          `<td>${formatDateTime(r.created_at, lang)}</td>` +
-          `<td>${amount}</td>` +
-          `</tr>`
-        )
-      })
-      .join('')
-    const htmlTable =
-      `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><div class="overflow-x-auto w-full">` +
-      `<table class="max-md:text-xs" border="1"><thead><tr>` +
-      `<th>${t('admin.returns.export.headers.order')}</th>` +
-      `<th>${t('admin.returns.export.headers.customer')}</th>` +
-      `<th>${t('admin.returns.export.headers.email')}</th>` +
-      `<th>${t('admin.returns.export.headers.reason')}</th>` +
-      `<th>${t('admin.returns.export.headers.status')}</th>` +
-      `<th>${t('admin.returns.export.headers.date')}</th>` +
-      `<th>${t('admin.returns.export.headers.amount')}</th>` +
-      `</tr></thead><tbody>${rowsHtml}</tbody></table></div></body></html>`
-    const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `returns_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.xls`
-    a.click()
-    URL.revokeObjectURL(url)
-  }, [table, t, lang, getStatusLabel])
+    const { header, lines, ad } = await exportTablosu()
+    tabloIndir(xlsBelgesi(header, lines), `${ad}.xls`, 'xls')
+  }, [exportTablosu])
 
   const bulkActions = useMemo<BulkAction[]>(
     () => [

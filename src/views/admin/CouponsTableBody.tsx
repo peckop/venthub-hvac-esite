@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -457,18 +458,17 @@ const CouponsTableBody: React.FC = () => {
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
     const cols = ['id', 'code', 'type', 'value', 'active', 'usage_limit', 'used_count', 'created_at']
-    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-    const lines = rows.map((r) =>
-      [r.id, r.code, r.type, r.value, r.active, r.usage_limit ?? '', r.used_count ?? '', r.created_at].map(escape).join(','),
-    )
-    const csv = '﻿' + [cols.join(','), ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'coupons.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.code,
+      r.type,
+      r.value,
+      r.active,
+      r.usage_limit ?? '',
+      r.used_count ?? '',
+      r.created_at,
+    ])
+    tabloIndir(csvBelgesi(cols, lines), 'coupons.csv', 'csv')
   }, [table])
 
   return (

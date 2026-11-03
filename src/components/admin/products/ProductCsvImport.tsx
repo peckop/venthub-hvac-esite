@@ -2,6 +2,7 @@ import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
 import { hazirlaUrunSatirlari, type KategoriSecenegi } from '@/lib/admin/csvProductMapping'
+import { CSV_HATA_ANAHTARI, CSV_MAKS_BAYT, CSV_MAKS_SATIR, csvDosyasiOku } from '@/lib/csv/dosyaKapisi'
 import { splitByExistingSku } from '@/lib/data/csvImportGuard'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
@@ -43,26 +44,32 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             unknownSkus: string[]
             /** Ayrim ON OLCUMDE bir kez yapilir; buton onu YENIDEN hesaplamaz. */
             known: Database['public']['Tables']['products']['Insert'][]
+            /** Kendi tenant'ında bulunmayan satırlar — yalnız `insert` ile yazılır (ADM-6). */
+            unknown: Database['public']['Tables']['products']['Insert'][]
         } | null
     >(null)
 
+    /** Ayr\u0131\u015ft\u0131r\u0131c\u0131n\u0131n verdi\u011fi dosya sat\u0131r numaralar\u0131 (\u015fema hatas\u0131 sat\u0131rla g\u00f6sterilir). */
+    const satirNolariRef = React.useRef<number[]>([])
+
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0]
-        if (!f) return
-        const text = await f.text()
-        const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim().length > 0)
-        const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
-        const header = split(lines[0]).map(h => h.trim().toLowerCase())
-        const rows = lines.slice(1).map(l => {
-            const cells = split(l)
-            const obj: Record<string, string> = {}
-            header.forEach((h, i) => obj[h] = cells[i] || '')
-            return obj
-        })
-        setImportRows(rows)
-        setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
         // Reset file input so same file can be selected again if needed
         e.target.value = ''
+        if (!f) return
+        /* ADM-6 (cetvel \u00a71.2): uzant\u0131, t\u00fcr, boyut ve sat\u0131r s\u0131n\u0131r\u0131 OKUMADAN \u00f6nce; ayr\u0131\u015ft\u0131rma
+         * t\u0131rnak i\u00e7i virg\u00fcl/sat\u0131r sonunu do\u011fru i\u015fler. Reddedilen dosya \u00f6nizlemeye girmez. */
+        const okuma = await csvDosyasiOku(f)
+        if (!okuma.ok) {
+            setNotice({
+                tone: 'error',
+                text: t(CSV_HATA_ANAHTARI[okuma.hata], { maxMb: CSV_MAKS_BAYT / (1024 * 1024), maxRows: CSV_MAKS_SATIR }),
+            })
+            return
+        }
+        satirNolariRef.current = okuma.satirNolari
+        setImportRows(okuma.satirlar)
+        setImportPreview({ header: okuma.baslik, rows: okuma.satirlar.slice(0, 10), total: okuma.satirlar.length })
     }
 
     const handleDryRun = () => {
@@ -103,8 +110,28 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
          * SÖZLEŞME: kategori değeri var ama canlı DB'de karşılığı yoksa satır payloads'a
          * GİRMEZ, reddedilen'e düşer (ERR_SLUG_NOT_IN_DB — sessiz null YOK).
          */
-        const { payloads, reddedilen, yoksayilanFiyat } = hazirlaUrunSatirlari(importRows, categories)
+        const { payloads, reddedilen, gecersiz, yoksayilanFiyat } = hazirlaUrunSatirlari(
+            importRows,
+            categories,
+            satirNolariRef.current,
+        )
         yoksayilanFiyatRef.current = yoksayilanFiyat
+
+        /* Şema doğrulamasından geçmeyen satır varsa YAZIM YAPILMAZ (ADM-6, cetvel §1.2) —
+         * kategori reddiyle aynı ilke: kısmi yazım yok, karar kullanıcıda. */
+        if (gecersiz.length > 0) {
+            const ornekler = gecersiz.slice(0, 5).map(g => `${g.satir}: ${g.alan}`).join(', ')
+            setNotice({
+                tone: 'error',
+                text: [
+                    t('admin.products.import.invalidRowsTitle', { count: gecersiz.length }),
+                    t('admin.products.import.invalidRowsHelp'),
+                    t('admin.products.import.invalidRowsExamples', { examples: ornekler }),
+                ].join(' ')
+            })
+            setIsProcessing(false)
+            return
+        }
 
         /* Kategorisi çözülemeyen satır varsa YAZIM YAPILMAZ. Kısmi yazım burada en kötü
          * seçenek olurdu: dosyanın bir kısmı içeri girer, geri kalanı girmez ve kullanıcı
@@ -149,28 +176,49 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             }
             const split = splitByExistingSku(payloads, existing)
             if (split.unknown.length > 0) {
-                setPendingWrite({ payloads, unknownSkus: split.unknownSkus, known: split.known })
+                setPendingWrite({ payloads, unknownSkus: split.unknownSkus, known: split.known, unknown: split.unknown })
                 setIsProcessing(false)
                 return
             }
-            await writePayloads(payloads, 0)
+            await writePayloads(payloads, [], 0)
         } catch (e) {
             setNotice({ tone: 'error', text: t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }) })
             setIsProcessing(false)
         }
     }
 
-    /** Asıl yazım. `skipped` yalnız raporlama içindir — kullanıcı neyin atlandığını görsün. */
-    const writePayloads = async (payloads: Database['public']['Tables']['products']['Insert'][], skipped: number) => {
+    /**
+     * Asıl yazım. `skipped` yalnız raporlama içindir — kullanıcı neyin atlandığını görsün.
+     *
+     * TENANT KORUMASI (ADM-6, CLAUDE.md kural 12): `mevcut` satırlar ön ölçümde KENDİ tenant'ımızın
+     * okumasında (RLS `prod_public_read_opt`, tenant-scoped) bulunan SKU'lardır → `upsert`.
+     * `yeni` satırlar `insert` ile yazılır: aynı SKU başka bir tenant'ta varsa `upsert` o satırı
+     * GÜNCELLERDİ (yazım politikası tenant denetlemiyor); `insert` ise çakışmada hata verir ve
+     * satır "başarısız" sayılır. Kopya ya da başka tenant'a yazım yerine görünür hata.
+     */
+    const writePayloads = async (
+        mevcut: Database['public']['Tables']['products']['Insert'][],
+        yeni: Database['public']['Tables']['products']['Insert'][],
+        skipped: number,
+    ) => {
         setIsProcessing(true)
         try {
-            // chunked upsert by sku
             let ok = 0, fail = 0
-            for (let i = 0; i < payloads.length; i += 100) {
-                const chunk = payloads.slice(i, i + 100)
+            for (let i = 0; i < mevcut.length; i += 100) {
+                const chunk = mevcut.slice(i, i + 100)
                 const { error } = await (supabase.from('products')).upsert(chunk, { onConflict: 'sku' })
                 if (error) {
                     console.warn('import upsert error', error)
+                    fail += chunk.length
+                } else {
+                    ok += chunk.length
+                }
+            }
+            for (let i = 0; i < yeni.length; i += 100) {
+                const chunk = yeni.slice(i, i + 100)
+                const { error } = await (supabase.from('products')).insert(chunk)
+                if (error) {
+                    console.warn('import insert error', error)
                     fail += chunk.length
                 } else {
                     ok += chunk.length
@@ -237,6 +285,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                             onClick={() => {
                                 void writePayloads(
                                     pendingWrite.known,
+                                    [],
                                     pendingWrite.payloads.length - pendingWrite.known.length,
                                 )
                             }}
@@ -246,7 +295,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                         </button>
                         <button
                             className={`${adminButtonPrimaryClass} h-10`}
-                            onClick={() => { void writePayloads(pendingWrite.payloads, 0) }}
+                            onClick={() => { void writePayloads(pendingWrite.known, pendingWrite.unknown, 0) }}
                             disabled={isProcessing}
                         >
                             {t('admin.products.import.createNewAction', { count: pendingWrite.unknownSkus.length })}

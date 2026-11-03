@@ -5,6 +5,7 @@ import { Bug, SearchX } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -153,28 +154,19 @@ const ErrorsTableBody: React.FC = () => {
       t('admin.errors.export.headers.userAgent'),
       t('admin.errors.export.headers.release'),
       t('admin.errors.export.headers.env'),
-    ].join(',')
+    ]
 
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        r.at,
-        r.level || 'error',
-        `"${(r.message || '').replace(/"/g, '""')}"`,
-        `"${(r.url || '').replace(/"/g, '""')}"`,
-        `"${(r.user_agent || '').replace(/"/g, '""')}"`,
-        `"${(r.release || '').replace(/"/g, '""')}"`,
-        `"${(r.env || '').replace(/"/g, '""')}"`,
-      ].join(','),
-    )
-    const csv = '\ufeff' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = t('admin.errors.export.filename')
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [
+      r.id,
+      r.at,
+      r.level || 'error',
+      r.message || '',
+      r.url || '',
+      r.user_agent || '',
+      r.release || '',
+      r.env || '',
+    ])
+    tabloIndir(csvBelgesi(header, lines), t('admin.errors.export.filename'), 'csv')
   }, [table, t])
 
   // env seçenekleri — etiketler JS ifadesi (JSX-literal değil); 'env' adları teknik (çeviri yok)

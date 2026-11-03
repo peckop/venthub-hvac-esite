@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { csvBelgesi, tabloIndir } from '@/lib/csv/belge'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -469,24 +470,8 @@ function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' 
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
     const cols = ['id', 'email', 'full_name', 'role', 'created_at']
-    const header = cols.join(',')
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        r.email ? `"${r.email.replace(/"/g, '""')}"` : '',
-        r.full_name ? `"${r.full_name.replace(/"/g, '""')}"` : '',
-        r.role,
-        r.created_at || '',
-      ].join(','),
-    )
-    const csv = '\uFEFF' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'users.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [r.id, r.email ?? '', r.full_name ?? '', r.role, r.created_at || ''])
+    tabloIndir(csvBelgesi(cols, lines), 'users.csv', 'csv')
   }, [table])
 
   const getRoleIcon = useCallback((roleCode: string) => {

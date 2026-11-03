@@ -14,6 +14,7 @@ import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { formatDateTime } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
+import { csvBelgesi, tabloIndir } from '../../lib/csv/belge'
 import type { Database } from '../../types/database.types'
 import { eqValue, ilikeContains, orConditions, orIlikeContains } from '../../utils/adminQueryFilters'
 import { adminButtonSecondaryClass, adminInputClass } from '../../utils/adminUi'
@@ -125,27 +126,10 @@ const AuditLogTableBody: React.FC = () => {
       t('admin.audit.export.headers.tableName'),
       t('admin.audit.export.headers.rowPk'),
       t('admin.audit.export.headers.comment'),
-    ].join(',')
+    ]
 
-    const lines = rows.map((r) =>
-      [
-        r.id,
-        r.at,
-        `"${(r.actor || '').replace(/"/g, '""')}"`,
-        r.action,
-        r.table_name,
-        `"${(r.row_pk || '').replace(/"/g, '""')}"`,
-        `"${(r.comment || '').replace(/"/g, '""')}"`,
-      ].join(','),
-    )
-    const csv = '\ufeff' + [header, ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = t('admin.audit.export.filename')
-    a.click()
-    URL.revokeObjectURL(url)
+    const lines = rows.map((r) => [r.id, r.at, r.actor || '', r.action, r.table_name, r.row_pk || '', r.comment || ''])
+    tabloIndir(csvBelgesi(header, lines), t('admin.audit.export.filename'), 'csv')
   }, [table, t])
 
   /* ---- kolonlar (SSOT) ---- */

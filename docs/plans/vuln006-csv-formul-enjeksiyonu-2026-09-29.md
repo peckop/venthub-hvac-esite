@@ -2,6 +2,7 @@
 
 > **Ne bu?** REC-355 (güvenlik koşumu v3) altındaki VULN-006 bulgusunun ölçümü ve onarım planı.
 > Sahip: ADMIN (URUN'dan devir; dosyalar `src/views/admin/**`) · Oluşturma: 2026-09-29 · Durum: **PLAN — onay bekliyor, kod YAZILMADI.**
+> **Güncelleme 2026-11-03 (ADM-6):** Faz 1 (yardımcı + kapı) daha önce birleşmişti; Faz 2 göçü ADM-6 PR'ında yapıldı. Yardımcı `src/lib/csv/`'ye taşındı (aşağıdaki `src/utils/csvHucre.ts` adı tarihsel), 3 XLS yüzeyi ve içe aktarma güvenliği eklendi. Envanter: `docs/audits/adm6-csv-yuzey-2026-11.md`. Faz 3 (Excel'de açılmış örnek kanıtı) yapılmadı.
 > Şiddet (ALTYAPI): LOW — satış kapalıyken sömürü izi yok; **satıştan önce kapanmalı** (OPS).
 
 **KAYNAK/CETVEL**
