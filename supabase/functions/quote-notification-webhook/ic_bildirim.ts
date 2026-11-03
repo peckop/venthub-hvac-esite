@@ -6,6 +6,12 @@
 // Canlıda o güne dek 1 kayıt vardı (kayıp gerçek talep yok) ama ilk gerçek talep panelde sessizce
 // bekleyecekti. Bu dosya SAF: Deno/ağ yok, vitest'ten içe aktarılır (INV-TEKLIF-IC-BILDIRIM-1).
 
+// Kaçış `_shared/kodlama.ts`'te TEK yerde (güvenlik karnesi 2026-11, kök 3); eskiden burada tanımlıydı.
+// Bu dosya onu İÇE AKTARMAZ, parametre olarak alır: dosya `src` testinden içe aktarıldığı için kök
+// `tsc` denetimine girer ve `.ts` uzantılı içe aktarma orada TS5097 verir (Deno ise uzantı ister).
+// Çağıranlar (`index.ts`, INV-TEKLIF-IC-BILDIRIM-1 testi) `_shared/kodlama.ts`'teki `kacir`ı verir.
+export type Kacis = (s: unknown) => string
+
 export interface IcBildirimGirdisi {
   quoteId: string
   source: string | null
@@ -27,13 +33,6 @@ export interface IcBildirim {
 export const icBildirimAnahtari = (quoteId: string): string => `teklif-ic/${quoteId}`
 export const musteriOnayAnahtari = (quoteId: string): string => `teklif-musteri/${quoteId}`
 
-export const kacir = (s: unknown): string =>
-  String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
 
 /** Kontrol karakterlerini (0-31, 127) boşluğa çevirir, fazla boşluğu sıkıştırır. */
 export const temizle = (s: unknown): string =>
@@ -59,7 +58,7 @@ export function panelLinki(taban: string | null | undefined): string | null {
   return `${t}/admin/quotes`
 }
 
-export function icBildirimOlustur(g: IcBildirimGirdisi): IcBildirim {
+export function icBildirimOlustur(g: IcBildirimGirdisi, kacir: Kacis): IcBildirim {
   const kisaId = g.quoteId.slice(0, 8).toUpperCase()
   // Kontrol karakteri (\r\n dahil) atılır, konuda ad 60 karakterle sınırlı (güvenlik incelemesi
   // 2026-09-23, bulgu 5: müşteri girdisi kiracının kendi alan adından gelen konu satırına giriyor).
@@ -83,7 +82,7 @@ export function icBildirimOlustur(g: IcBildirimGirdisi): IcBildirim {
 
   const html = [
     '<div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6">',
-    `<h2>Yeni teklif talebi #${kisaId}</h2>`,
+    `<h2>Yeni teklif talebi #${kacir(kisaId)}</h2>`,
     '<table cellpadding="4" style="border-collapse:collapse">',
     `<tr><td><strong>Ad</strong></td><td>${kacir(ad)}</td></tr>`,
     `<tr><td><strong>E-posta</strong></td><td>${kacir(g.contactEmail)}</td></tr>`,

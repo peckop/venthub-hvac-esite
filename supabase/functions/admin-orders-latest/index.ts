@@ -1,5 +1,6 @@
+// Çağıran sınıfı: (a) oturumlu admin tarayıcısı — resolveCaller (getUser) + rol kapısı + tenant filtresi
 import { getCorsHeaders } from '../_shared/cors.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { resolveCaller, type CallerContext } from '../_shared/caller.ts'
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -20,36 +21,28 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'unauthenticated' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
     if (!anonKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
-    const supabaseUser = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } }
-    })
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
-
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
-    if (userErr || !userRes?.user) {
+    // KİMLİK + ROL + TENANT tek kapıdan (karne 2026-11 kök 2 · Y2): eskiden rol okunuyor,
+    // tenant hiç okunmuyordu → liste TÜM kiracıların siparişlerini döndürüyordu.
+    let caller: CallerContext
+    try {
+      caller = await resolveCaller(req)
+    } catch (err) {
+      console.warn('admin-orders-latest: kimlik kapısı ölçülemedi:', err instanceof Error ? err.name : 'hata')
+      return new Response(JSON.stringify({ error: 'auth_check_failed' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+    if (caller.kind === 'anon') {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
-
-    const { data: profile, error: profErr } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role')
-      .eq('id', userRes.user.id)
-      .maybeSingle()
-
-    const userRole = profile?.role
-    if (profErr || !userRole || !['admin', 'super_admin'].includes(userRole)) {
+    const userRole = caller.role
+    if (caller.kind !== 'user' || !userRole || !['admin', 'super_admin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
+    const tenantId = caller.tenantId
 
 
     // Parse filters from query string
@@ -105,7 +98,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    const requestUrl = `${supabaseUrl}/rest/v1/venthub_orders?${params.toString()}`
+    const requestUrl = `${supabaseUrl}/rest/v1/venthub_orders?tenant_id=eq.${encodeURIComponent(tenantId)}&${params.toString()}`
 
     const resp = await fetch(requestUrl, {
       headers: {

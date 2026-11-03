@@ -1,7 +1,11 @@
+// Çağıran sınıfı: (b) zamanlanmış iş (service_role) — ya da (a) yönetici; ortak resolveCaller kapısı
+//
+// Ödenmemiş `pending` siparişleri kapatır. Çağıran: `.github/workflows/order-housekeeping-cron.yml`
+// (Bearer service_role). TENANT: tüm kiracıları süpürür — R13 tabanında adıyla (Faz 2 borcu).
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { restSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { ayricalikliMi, resolveCaller, type CallerContext } from '../_shared/caller.ts'
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -18,35 +22,21 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: false, error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing Authorization header' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    // KAPI (karne 2026-11 kök 2 · K4): eskiden `authHeader !== \`Bearer ${serviceRoleKey}\``
+    // (sabit zamanlı DEĞİL) ve elle yazılmış getUser + user_profiles kopyası vardı. Artık
+    // ortak `resolveCaller`: service_role (cron) ya da yönetici kullanıcı geçer.
+    let caller: CallerContext
+    try {
+      caller = await resolveCaller(req)
+    } catch (err) {
+      console.warn('order-housekeeping: kimlik kapısı ölçülemedi:', err instanceof Error ? err.name : 'hata')
+      return new Response(JSON.stringify({ error: 'internal_error', message: 'Failed to verify caller' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
-
-    // Allow system/cron invocation to bypass user checks
-    if (authHeader !== `Bearer ${serviceRoleKey}`) {
-      const authClient = createClient(supabaseUrl, anonKey, {
-        global: { headers: { Authorization: authHeader } }
-      })
-
-      const { data: { user }, error: authErr } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
-      if (authErr || !user) {
-        return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
-      }
-
-      const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
-        headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
-      })
-
-      if (roleCheck.ok) {
-        const arr = await roleCheck.json().catch(() => [])
-        const role = arr[0]?.role
-        if (role !== 'admin' && role !== 'super_admin') {
-          return new Response(JSON.stringify({ error: 'forbidden', message: 'Insufficient privileges' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
-        }
-      } else {
-        return new Response(JSON.stringify({ error: 'internal_error', message: 'Failed to verify user role' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
-      }
+    if (caller.kind === 'anon') {
+      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Missing or invalid token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+    if (!ayricalikliMi(caller)) {
+      return new Response(JSON.stringify({ error: 'forbidden', message: 'Insufficient privileges' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
     const now = Date.now()
