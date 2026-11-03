@@ -119,4 +119,26 @@ function ayniMi(a, b) {
   return x !== '' && x === katla(b)
 }
 
-module.exports = { ad, katla, ayniMi, TABLO, PENCERE_ADLARI, AD_TAVAN }
+/** Departman adının yanında olabilen süs kelimeleri (katlanmış): "Katalog (yeni düzen)", "mevzuat-pencere". */
+const SUS_KELIMELER = new Set(['yeni', 'duzen', 'pencere', 'penceresi', 'departman', 'departmani', 'mudur', 'muduru'])
+
+/**
+ * SIKI çözüm (ARC-245): başlık/ad YALNIZ departman adı (+ süs kelimeler) ise pano şerit anahtarını döner
+ * ("Mevzuat (yeni düzen)" → 'MEVZUAT', "geo-seo-pencere" → 'GEO-SEO'); aksi hâlde ''. "Blog yazısı PR" gibi
+ * sıradan oturum başlığı departman penceresi SAYILMAZ (yanlış alarm olmasın).
+ */
+function departmanAdindan(metin) {
+  try {
+    if (typeof metin !== 'string') return ''
+    const kalan = katla(metin).split(/[^a-z0-9]+/).filter((t) => t && !SUS_KELIMELER.has(t)).join(' ')
+    if (!kalan) return ''
+    for (const [anahtar] of TABLO) {
+      if (anahtar.toLowerCase().split(/[^a-z0-9]+/).join(' ') === kalan) return anahtar
+    }
+    return ''
+  } catch {
+    return ''
+  }
+}
+
+module.exports = { ad, katla, ayniMi, departmanAdindan, TABLO, PENCERE_ADLARI, AD_TAVAN }

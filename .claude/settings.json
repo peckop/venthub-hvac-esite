@@ -484,6 +484,16 @@
             "statusMessage": "kanban-tutarlilik-onarimi"
           }
         ]
+      },
+      {
+        "matcher": "mcp__ccd_session__start_session",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pencere-acilis-denetimi.cjs\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
