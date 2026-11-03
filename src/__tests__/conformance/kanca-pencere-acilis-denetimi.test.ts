@@ -17,15 +17,27 @@ import { afterEach, describe, expect, it } from 'vitest'
 const require_ = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '..', '..', '..')
 const KANCA = path.join(KOK, '.claude', 'hooks', 'pencere-acilis-denetimi.cjs')
+interface DenetimSecenek {
+  depo: string
+  simdi?: number
+  hafizaDizini?: string | null
+  yaz?: boolean
+  ureticiListesi?: string[]
+  kilitDosyasi?: string | null
+}
 const motor = require_(path.join(KOK, 'scripts', 'board', 'pencere-acilis-denetimi.cjs')) as {
   denetle: (
     girdi: { tool_input: Record<string, unknown> },
-    o: { depo: string; simdi?: number; hafizaDizini?: string | null; yaz?: boolean },
+    o: DenetimSecenek,
   ) => null | { rol: string; ajan: string; bulgular: string[]; komutlar: string[]; yazildi: string[] }
   blok: (s: unknown) => string
+  acmaKapisi: (girdi: { tool_input: Record<string, unknown> }) => string | null
   modelUyumlu: (v: string, b: string) => boolean
   anaDepo: (d: string) => string
 }
+// Testler gerçek kilit dosyasından ve gerçek üretici listesinden bağımsız koşar; ilgili testler kendi değerini verir.
+const asilDenetle = motor.denetle
+motor.denetle = (g, o) => asilDenetle(g, { ureticiListesi: ['MEVZUAT'], kilitDosyasi: null, ...o })
 const adlar = require_(path.join(KOK, 'scripts', 'board', 'pencere-adlari.cjs')) as {
   departmanAdindan: (m: unknown) => string
 }
@@ -140,10 +152,45 @@ describe('INV-PENCERE-ACILIS-1 denetim çekirdeği', () => {
     expect(motor.denetle(girdi(), { depo, hafizaDizini: hafiza })?.bulgular).toEqual([])
   })
 
+  it('SABOTAJ madde 1 üretici listesi: departman PENCERE_DEPARTMANLARI içinde değilse söyler', () => {
+    const { depo } = kur({ agent: 'mevzuat-pencere' })
+    const s = motor.denetle(girdi(), { depo, hafizaDizini: null, ureticiListesi: ['ARAC'] })
+    expect(s && s.bulgular.join('\n')).toContain('ÜRETİCİ LİSTESİNDE YOK')
+  })
+
+  it('SABOTAJ madde 4 pencere kilidi: kilit varken izinli olmayan departman söylenir; izinliyse susar', () => {
+    const { depo } = kur({ agent: 'mevzuat-pencere' })
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'padk-'))
+    gecici.push(dizin)
+    const kilit = path.join(dizin, 'pencere-kilidi.json')
+    fs.writeFileSync(kilit, JSON.stringify({ surum: 2, izinliler: ['ARAC'], koyan: 'test' }))
+    const kapali = motor.denetle(girdi(), { depo, hafizaDizini: null, kilitDosyasi: kilit })
+    expect(kapali && kapali.bulgular.join('\n')).toContain('MADDE 4 PENCERE KİLİDİ')
+    fs.writeFileSync(kilit, JSON.stringify({ surum: 2, izinliler: ['ARAC', 'MEVZUAT'], koyan: 'test' }))
+    expect(motor.denetle(girdi(), { depo, hafizaDizini: null, kilitDosyasi: kilit })?.bulgular).toEqual([])
+    fs.rmSync(kilit)
+    expect(motor.denetle(girdi(), { depo, hafizaDizini: null, kilitDosyasi: kilit })?.bulgular).toEqual([])
+  })
+
   it('worktree içinden koşan kanca ana depoyu çözer', () => {
     const ana = path.join(os.tmpdir(), 'repo')
     expect(motor.anaDepo(path.join(ana, '.claude', 'worktrees', 'x'))).toBe(ana)
     expect(motor.anaDepo(ana)).toBe(ana)
+  })
+})
+
+describe('INV-PENCERE-ACILIS-1 ARC-244 açma kapısı (PreToolUse)', () => {
+  it('SABOTAJ: yalnız departman adı olan başlık/ad reddedilir; kaçış bayrağı, OPS ve sıradan başlık geçer', () => {
+    const red = motor.acmaKapisi({ tool_input: { title: 'KATALOG', name: 'katalog' } })
+    expect(red).toContain('KATALOG departmanının penceresi zaten var')
+    expect(motor.acmaKapisi({ tool_input: { title: 'Altyapı (yeni düzen)' } })).toContain('ALTYAPI')
+    expect(motor.acmaKapisi({ tool_input: { name: 'geo-seo-pencere' } })).toContain('GEO-SEO')
+    const bayrakli = { title: 'MEVZUAT', prompt: 'Görev...\nYENI-DEPARTMAN-PENCERESI: Recep onayı 2026-11-03' }
+    expect(motor.acmaKapisi({ tool_input: bayrakli })).toBeNull()
+    expect(motor.acmaKapisi({ tool_input: { title: 'MEVZUAT', prompt: 'Recep onayı verdi' } })).not.toBeNull()
+    expect(motor.acmaKapisi({ tool_input: { title: 'OPS', name: 'ops' } })).toBeNull()
+    expect(motor.acmaKapisi({ tool_input: { title: 'Blog yazısı PR kontrolü' } })).toBeNull()
+    expect(motor.acmaKapisi({ tool_input: {} })).toBeNull()
   })
 })
 
@@ -186,11 +233,31 @@ describe('INV-PENCERE-ACILIS-1 kanca kabuğu', () => {
     expect(fs.readFileSync(dosya, 'utf8')).toBe(once)
   })
 
-  it('settings.json start_session için PostToolUse kaydı taşır', () => {
+  it('Pre olayında departman adı start_session reddedilir (deny JSON); vana ve kaçış bayrağı susturur; Post olayı reddetmez', () => {
+    const { depo } = kur({ agent: 'mevzuat-pencere' })
+    const pre = { tool_name: 'mcp__ccd_session__start_session', hook_event_name: 'PreToolUse', tool_input: { title: 'KATALOG' } }
+    const r = kancaKos(JSON.stringify(pre), depo)
+    expect(r.status).toBe(0)
+    const o = JSON.parse(r.stdout) as { hookSpecificOutput: { permissionDecision: string; permissionDecisionReason: string } }
+    expect(o.hookSpecificOutput.permissionDecision).toBe('deny')
+    expect(o.hookSpecificOutput.permissionDecisionReason).toContain('SendMessage')
+    const vana = kancaKos(JSON.stringify(pre), depo, { VENTHUB_PENCERE_ACMA_KAPAT: '1' })
+    expect([vana.status, vana.stdout]).toEqual([0, ''])
+    const bayrak = { ...pre, tool_input: { title: 'KATALOG', prompt: 'YENI-DEPARTMAN-PENCERESI: Recep onayı 2026-11-03' } }
+    expect(kancaKos(JSON.stringify(bayrak), depo).stdout).toBe('')
+    const sivil = { ...pre, tool_input: { title: 'Blog yazısı PR' } }
+    expect(kancaKos(JSON.stringify(sivil), depo).stdout).toBe('')
+    const post = kancaKos(JSON.stringify({ ...pre, hook_event_name: 'PostToolUse' }), depo)
+    expect(post.stdout).not.toContain('permissionDecision')
+  })
+
+  it('settings.json start_session için hem PreToolUse hem PostToolUse kaydı taşır', () => {
     const s = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8')) as {
-      hooks: { PostToolUse: Array<{ matcher: string; hooks: Array<{ command: string }> }> }
+      hooks: Record<'PreToolUse' | 'PostToolUse', Array<{ matcher: string; hooks: Array<{ command: string }> }>>
     }
-    const kayit = s.hooks.PostToolUse.find((g) => g.matcher === 'mcp__ccd_session__start_session')
-    expect(kayit && kayit.hooks.map((h) => h.command).join(' ')).toContain('pencere-acilis-denetimi.cjs')
+    for (const olay of ['PreToolUse', 'PostToolUse'] as const) {
+      const kayit = s.hooks[olay].find((g) => g.matcher === 'mcp__ccd_session__start_session')
+      expect(kayit && kayit.hooks.map((h) => h.command).join(' ')).toContain('pencere-acilis-denetimi.cjs')
+    }
   })
 })

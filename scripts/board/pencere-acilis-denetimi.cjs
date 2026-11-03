@@ -8,11 +8,14 @@
  * kurulmadı; üstelik `.claude/agents/mevzuat-pencere.md` tanımı hiç yoktu. Recep açılış adımlarının kendiliğinden
  * tetiklenmesini istedi (26 Ekim'de Yetenek penceresinde aynı model hatası olmuştu).
  *
- * NE DENETLER (hepsi SALT-OKUMA): (1) başlık/ad bir departmana SIKI çözülüyor mu (`departmanAdindan`; sıradan
- * oturum başlığı sessiz geçer); (2) o departmanın `.claude/agents/<rol>-pencere.md` tanımı var mı (yeni açılan
- * ağacın KENDİ kopyasında); (3) `start_session`a verilen `model` tanımdaki modelle aynı mı (verilmediyse açanın
- * modelini devralır); (4) açılan ağacın `settings.local.json` `agent` anahtarı `<rol>-pencere` mi;
- * (5) durum dosyası (`*<rol>*durum*.md`) hafıza dizininde var mı (bilgi).
+ * NE DENETLER (hepsi SALT-OKUMA): başlık/ad bir departmana SIKI çözülüyor mu (`departmanAdindan`; sıradan oturum
+ * başlığı sessiz geçer). Sonra OPS-kurallar "Yeni departman penceresi açılış kontrol listesi" (HRT-101) maddeleri,
+ * AYNI numarayla: MADDE 1 `.claude/agents/<rol>-pencere.md` tanımı (yeni açılan ağacın KENDİ kopyasında) ve üretici
+ * listesinde (PENCERE_DEPARTMANLARI) var mı; MADDE 2 `start_session`a verilen `model` tanımdaki modelle aynı mı
+ * (verilmediyse açanın modelini devralır); MADDE 3 açılan ağacın `settings.local.json` `agent` anahtarı
+ * `<rol>-pencere` mi; MADDE 4 pencere kilidi varsa departman izinli mi; MADDE 5 durum dosyası (`*<rol>*durum*.md`)
+ * hafızada var mı (bilgi). Madde 6 (rol-kimlikleri.json) pencere kendini tanıttıktan sonra oluşur, burada denetlenmez.
+ * Ayrıca `acmaKapisi` (ARC-244): departman adlı yeni pencere açmayı PreToolUse'ta reddeder (kaçış: açık bayrak).
  *
  * NE YAPMAZ: kimliği/izinleri değiştirmez; kapıyı gevşetmez. Eksik agent anahtarı için hazır komutu basar
  * (`pencere-rol-yaz.cjs ... --yaz`). Kendisi YAZAR yalnız vana açıksa (`VENTHUB_PENCERE_ACILIS_YAZ=1`); varsayılan
@@ -87,6 +90,47 @@ function durumDosyasiVar(hafizaDizini, rol) {
   return tara(hafizaDizini, 2)
 }
 
+/** Ajan tanımı üreticisinin departman listesi (HRT-101 madde 1); okunamazsa boş değil, "bilinmiyor" = tümünü kabul. */
+function uretici() {
+  try {
+    const l = require(path.join(__dirname, '..', 'belge', 'ajan-tanimi-uret.cjs')).PENCERE_DEPARTMANLARI
+    return Array.isArray(l) && l.length ? l : KAPSAM_BILINMIYOR
+  } catch {
+    return KAPSAM_BILINMIYOR
+  }
+}
+/** includes() her rolü kabul eder: üretici okunamazsa yanlış alarm vermez (fail-open). */
+const KAPSAM_BILINMIYOR = { includes: () => true }
+
+/** Pencere kilidi varsa { izinliler }, yoksa/bozuksa null (fail-open). `dosya` undefined → gerçek kilit dosyası. */
+function kilitDurumu(dosya) {
+  try {
+    const { kilitOku } = require('./pencere-kilidi.cjs')
+    const k = dosya ? kilitOku(dosya) : kilitOku()
+    return k.durum === 'var' ? { izinliler: k.kilit.izinliler } : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * ARC-244 kapısı (PreToolUse · start_session): başlık/ad YALNIZ bir departman adıysa açma REDDEDİLİR; departmanın
+ * "(yeni düzen)" penceresi vardır, iş ona SendMessage ile gider. Departman açmak Recep kararıdır: kaçış yalnız açık
+ * bayrak ("YENI-DEPARTMAN-PENCERESI: Recep onayı <YYYY-MM-DD>") prompt'ta. OPS ve sıradan başlık geçer.
+ * @returns {null | string} red nedeni ya da null (izin)
+ */
+const KACIS = /YENI-DEPARTMAN-PENCERESI:\s*Recep onay[ıi]\s*\d{4}-\d{2}-\d{2}/i
+function acmaKapisi(girdi) {
+  const ti = (girdi && girdi.tool_input) || {}
+  const rol = departmanAdindan(ti.name) || departmanAdindan(ti.title)
+  if (!rol || rol === 'OPS') return null
+  if (KACIS.test(String(ti.prompt || ''))) return null
+  return (
+    rol + ' departmanının penceresi zaten var ("(yeni düzen)"): `list_sessions {linked:true}` ile bulup SendMessage gönder; ' +
+    'yeni pencere açmak Recep kararıdır. Gerçekten yeni departman açılıyorsa prompt\'a `YENI-DEPARTMAN-PENCERESI: Recep onayı <YYYY-AA-GG>` yaz (ARC-244).'
+  )
+}
+
 /**
  * SAF karar (yalnız okur; vana açıksa yalnız agent anahtarını yazar).
  * @param {{tool_input?: object}} girdi
@@ -112,17 +156,20 @@ function denetle(girdi, o = {}) {
   for (const d of tanimDepolari) {
     const tanim = path.join(d, '.claude', 'agents', ajan + '.md')
     if (!fs.existsSync(tanim)) {
-      bulgular.push('TANIM YOK: ' + path.join('.claude', 'agents', ajan + '.md') + ' (' + path.basename(d) + '); pencere rolsüz/yanlış rolle açılır')
+      bulgular.push('MADDE 1 TANIM YOK: ' + path.join('.claude', 'agents', ajan + '.md') + ' (' + path.basename(d) + '); pencere rolsüz/yanlış rolle açılır; üreticiden gelmeli (HARİTA kartı)')
     } else if (!istenenModel) {
       istenenModel = tanimModeli(tanim)
     }
   }
 
+  if (!(o.ureticiListesi || uretici()).includes(rol)) {
+    bulgular.push('MADDE 1 ÜRETİCİ LİSTESİNDE YOK: ' + rol + ' (scripts/belge/ajan-tanimi-uret.cjs PENCERE_DEPARTMANLARI); elle yazılmış tanım sayılmaz, HARİTA\'ya kart')
+  }
   if (istenenModel) {
     if (!ti.model) {
-      bulgular.push('MODEL VERİLMEDİ: start_session açanın modelini devralır; tanım ' + istenenModel + ' (model parametresiyle yeniden aç)')
+      bulgular.push('MADDE 2 MODEL VERİLMEDİ:start_session açanın modelini devralır; tanım ' + istenenModel + ' (model parametresiyle yeniden aç)')
     } else if (!modelUyumlu(ti.model, istenenModel)) {
-      bulgular.push('MODEL FARKLI: verilen ' + ti.model + ', tanım ' + istenenModel + ' (yeniden aç)')
+      bulgular.push('MADDE 2 MODEL FARKLI:verilen ' + ti.model + ', tanım ' + istenenModel + ' (yeniden aç)')
     }
   }
 
@@ -138,12 +185,18 @@ function denetle(girdi, o = {}) {
       yazildi.push(path.basename(wt) + ': agent ' + (mevcut || '(yok)') + ' → ' + ajan)
       continue
     }
-    bulgular.push('AGENT ANAHTARI: ' + path.basename(wt) + ' → ' + (mevcut || '(yok)') + ', beklenen ' + ajan + (plan.ok ? '' : ' [rol-yaz reddeder: ' + plan.sebep + ']'))
+    bulgular.push('MADDE 3 AGENT ANAHTARI: ' + path.basename(wt) + ' → ' + (mevcut || '(yok)') + ', beklenen ' + ajan + (plan.ok ? '' : ' [rol-yaz reddeder: ' + plan.sebep + ']'))
     if (plan.ok) komutlar.push(komut)
   }
 
+  if (o.kilitDosyasi !== null) {
+    const k = kilitDurumu(o.kilitDosyasi)
+    if (k && !k.izinliler.includes(rol)) {
+      bulgular.push('MADDE 4 PENCERE KİLİDİ: ' + rol + ' izinli değil (' + k.izinliler.join(', ') + '); `node scripts/board/pencere-kilidi.cjs --koy ' + k.izinliler.join(' ') + ' ' + rol + '`')
+    }
+  }
   if (o.hafizaDizini && fs.existsSync(o.hafizaDizini) && !durumDosyasiVar(o.hafizaDizini, rol)) {
-    bulgular.push('DURUM DOSYASI YOK (bilgi): hafızada *' + rol.toLowerCase() + '*durum*.md bulunamadı; pencere ilk turunda kurmalı')
+    bulgular.push('MADDE 5 DURUM DOSYASI YOK (bilgi):hafızada *' + rol.toLowerCase() + '*durum*.md bulunamadı; pencere ilk turunda kurmalı')
   }
   return { rol, ajan, bulgular, komutlar, yazildi }
 }
@@ -185,4 +238,4 @@ if (require.main === module) {
   process.exit(s && !s.bulgular.length ? 0 : 1)
 }
 
-module.exports = { denetle, blok, modelUyumlu, anaDepo, adayWorktreeler, varsayilanHafizaDizini, ADAY_PENCERESI_MS }
+module.exports = { denetle, blok, acmaKapisi, modelUyumlu, anaDepo, adayWorktreeler, varsayilanHafizaDizini, ADAY_PENCERESI_MS }
