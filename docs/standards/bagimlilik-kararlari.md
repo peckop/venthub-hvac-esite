@@ -80,11 +80,9 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 | @types/react-dom | ~19.2.7 | 2026-09-21 | KARAR | `@types/react` ile aynı gerekçe; react-dom ~19.2 çizgisi. ~19.2.7. |
 | eslint-config-next | 15.5.28 | 2026-10-25 | KARAR | `next` ile AYNI sürümde tutulur: lint kuralları çalışan Next'in uyarılarını görsün. 15.1.0'da geride kalmıştı (gerekçesiz, §5 "kopukluk"); bot #1464 ikisini birlikte 15.5.26'ya taşıdı. Bot #1749 yalnız `next`i 15.5.27'ye taşıdı; kayma kalmasın diye `eslint-config-next` aynı PR'da 15.5.27'ye getirildi (ikisi de 2026-09-30'da yayımlandı). Bot #1999 ikisini birlikte 15.5.28'e taşıdı. Sabit pin, çünkü `next` sabit; ikisi aynı satırda yükselir. |
 | eslint-plugin-react-compiler | 19.1.0-rc.2 | 2026-08-19 | KARAR | RC sürümü (19.1.0-rc.2) semver garantisi taşımaz — iki RC arası kırıcı değişiklik olağandır. Sabit pin zorunludur, aralık yazılamaz. |
-| minimatch | 9.0.7 | — | BORÇ | — |
-| minimatch@3 | >=3.1.4 | — | BORÇ | — |
-| minimatch@9 | 9.0.7 | — | BORÇ | — |
+| minimatch | >=11.0.1 <12.0.0 | 2026-11-03 | KARAR | OPS-209: Dependabot orta kaydı `GHSA-g3hv-75wg-m249` (globparts büyütmesiyle hizmet engelleme) `minimatch` <11.0.1 sürümlerinin tamamını kapsıyor; ağaçtaki 9.0.7 ve 10.2.4 ikisi de etkileniyordu. Eski üç satır (`minimatch` 9.0.7, `minimatch@3` >=3.1.4, `minimatch@9` 9.0.7) tek seçicisiz override'a indirildi, kilit 11.0.4'e çözüldü. Tüketiciler ESLint zinciri, `@typescript-eslint/typescript-estree` ve `glob`; hepsi geliştirme ve derleme aracı. Alt sınır 11.0.1 = yamalı sürüm, üst sınır `<12.0.0` cetvel §4 gereği. Kaldırma şartı §8'de. |
 | basic-ftp | >=5.2.0 | — | BORÇ | — |
-| glob@10 | >=10.5.0 | — | BORÇ | — |
+| glob | >=14.0.2 <15.0.0 | 2026-11-03 | KARAR | OPS-209: Dependabot orta kaydı `GHSA-3g3m-2fjr-6pw4` (AbortSignal iptalinden sonra dosya sistemi gezintisi sürüyor) `glob` 9.0.0 ile 14.0.1 arasını kapsıyor; ağaçta 13.0.6 vardı. Eski `glob@10` >=10.5.0 satırı açık uçluydu ve 13.0.6'ya çözülüyordu; seçicisiz aralığa çevrildi, kilit 14.0.3'e çözüldü. Tüketiciler `@sentry/bundler-plugins` (derlemede kaynak haritası yükleme) ve `sucrase` (Tailwind yapılandırma derleyicisi). Alt sınır 14.0.2 = yamalı sürüm, üst sınır `<15.0.0` cetvel §4 gereği. Kaldırma şartı §8'de. |
 | @remix-run/router | >=1.23.2 | — | BORÇ | — |
 | rollup@4 | >=4.59.0 | — | BORÇ | — |
 | rollup | >=4.22.4 | — | BORÇ | — |
@@ -98,6 +96,7 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 | readdirp>picomatch | >=4.0.4 | — | BORÇ | — |
 | lodash | >=4.18.1 | — | BORÇ | — |
 | postcss | >=8.5.19 <9.0.0 | 2026-09-16 | KARAR | Commit `8e74d8c5f` XSS kaydını kapattı, REC-326 (`7e7a586d2`) zinciri baştan ölçtü. Alt sınır 8.5.19; üst sınır `<9.0.0` **zorunlu** — cetvel §4, açık uçlu `>=` ana sürüm atlatır. |
+| postcss-selector-parser@6 | >=6.1.5 <7.0.0 | 2026-11-03 | KARAR | OPS-209: Dependabot orta kaydı `GHSA-rj75-hqrm-r3gf` (düz seçici ayrıştırmada karesel karmaşıklık) için 6.x hattında yama çıktı: 6.1.5. Ağaçta 6.0.10 ve 6.1.4 vardı (Tailwind 3.4 zinciri); ikisi de 6.1.5'e toplandı. Seçici `@6`, çünkü yarın 7.x isteyen bir tüketici gelirse o hat bu override'dan etkilenmesin. Bu satır §7a'daki 2026-10-16 kabulünü kapatır. Kaldırma şartı §8'de. |
 | brace-expansion@4 | >=5.0.6 | 2026-09-19 | KARAR | Commit `8e74d8c5f` hizmet-dışı-bırakma (DoS) kayıtlarını kapattı. 2026-09-19 ölçümünde kalan üç kayıt da bu paketin altından geliyor ve **derleme aracında** yaşıyor (`docs/audits/bagimlilik-2026-09-19.md` §2). Alt sınır 5.0.6. |
 | brace-expansion@5 | >=5.0.6 | 2026-09-19 | KARAR | `brace-expansion@4` ile aynı karar; ağaçta iki ana sürüm birden bulunduğu için iki ayrı override yazılmak zorunda. Alt sınır 5.0.6. |
 | undici | >=7.29.0 <8.0.0 | 2026-09-13 | KARAR | REC-323 (`193db1437`): 7.29.0 CRITICAL kaydı kapattı. ⭐Üst sınır ölçülmüş bir dersten geliyor — açık uçlu yazıldığında `undici` **8.10.2**'ye atladı ve bu ancak kilit dosyası okunarak yakalandı (cetvel §4). |
@@ -268,7 +267,13 @@ braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk 
 
 | kimlik | paket (kilitli) | kabul | gerekçe | kaldırma şartı | son tarih |
 |---|---|---|---|---|---|
-| GHSA-rj75-hqrm-r3gf | postcss-selector-parser 6.1.4 | 2026-10-16 | düzeltme ≥7.1.6 (ana sürüm); tüketici `postcss-nested` (tailwindcss 3.4); yalnız derleme zamanı CSS derleyicisi, kullanıcı girdisi ulaşmaz | Tailwind 4 göçü ya da `pnpm why postcss-selector-parser` çıktısında 6.x tüketicisi kalmadı | 2026-11-16 |
+
+
+⭐**2026-11-03 — İLK KAPANIŞ (OPS-209):** `GHSA-rj75-hqrm-r3gf` satırı silindi. Kabul anında düzeltme
+yalnız 7.x hattındaydı; sonradan 6.x hattına 6.1.5 yaması çıktı (`pnpm audit`: yamalı `>=6.1.5`).
+Kural gereği küçük sürümle kapanan orta kayıt yükseltildi: `postcss-selector-parser@6` override'ı (§4).
+Aynı gün iki orta kayıt daha kapandı: `GHSA-g3hv-75wg-m249` (`minimatch`) ve `GHSA-3g3m-2fjr-6pw4` (`glob`).
+Tablo boş.
 
 ## 8 · OVERRIDE KALDIRMA ŞARTI — karar 52
 
@@ -282,6 +287,9 @@ gerekçe ölçülür (§4).
 
 | override | kaldırma şartı (ölçüm komutuyla) |
 |---|---|
+| minimatch | `pnpm why minimatch` çıktısındaki her tüketicinin kendi aralığı 11.0.1 ve üstünü zorluyor (bugün ESLint zinciri `^3`/`^9`/`^10` istiyor, override o yüzden şart) |
+| glob | `pnpm why glob` çıktısındaki her tüketicinin kendi aralığı 14.0.2 ve üstünü zorluyor (bugün `sucrase` `^10`, `@sentry/bundler-plugins` `^13` istiyor) |
+| postcss-selector-parser@6 | `pnpm why postcss-selector-parser` çıktısında 6.x tüketicisi kalmadı (Tailwind 4 göçü) ya da her 6.x tüketicisi 6.1.5 ve üstünü kendisi çekiyor |
 | flatted | `pnpm why flatted` çıktısındaki her tüketici 3.4.2 ve üstünü **kendi aralığıyla** çekiyor |
 | happy-dom | `pnpm why happy-dom` yalnız doğrudan geliştirme bağımlılığını gösteriyor ve `package.json` aralığının tabanı 21.0.4 ve üstü (override o zaman tekrardır; ALT-127) |
 | dompurify | `isomorphic-dompurify`'nin kendi `dompurify` aralığının tabanı 3.4.0 ve üstü (`pnpm view isomorphic-dompurify dependencies`) |
