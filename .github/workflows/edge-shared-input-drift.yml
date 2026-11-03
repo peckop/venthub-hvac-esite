@@ -42,6 +42,12 @@ on:
       - 'supabase/config.toml'
       - 'supabase/functions/_shared/**'
 
+# Guvenlik karnesi 2026-11 C8 (OPS-211): en dar izin. Akis yalniz depoyu okur, Supabase'e kendi belirteciyle
+# baglanir; GitHub API'ye yazmaz. Depo PUBLIC: `permissions:` yazilinca `contents: read` ZORUNLU.
+# Bekci: INV-IS-AKISI-IZIN-1 (src/__tests__/conformance/is-akisi-izin-blogu.test.ts).
+permissions:
+  contents: read
+
 jobs:
   # Sir yoklamasi AYRI bir is: kapi olcemedigi bir durumda ASLA YESIL DONMEMELI.
   # Sir yoksa (ornek: fork PR'i) kapi isi hic KOSMAZ, GitHub'da "skipped" gorunur.

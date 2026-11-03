@@ -1,9 +1,10 @@
 # CSP Standardı (Content-Security-Policy)
 
-> **Durum:** v1.1 · 2026-10-11 (§8 Permissions-Policy, ALT-57; sahibi ALTYAPI) · v1.0 · 2026-08-17 · Şerit: LEGAL-SEO
+> **Durum:** v1.2 · 2026-11-03 (§9 rapor ucu + `X-Powered-By` kapalı, güvenlik karnesi C1/C4, OPS-211) · v1.1 · 2026-10-11 (§8 Permissions-Policy, ALT-57; sahibi ALTYAPI) · v1.0 · 2026-08-17 · Şerit: LEGAL-SEO
 > **Bekçi:** `INV-CSP-1` → `src/__tests__/conformance/csp-origin-coverage.test.ts`
 > **Kardeş bekçi:** `INV-3D-5` → `src/__tests__/conformance/3d-csp.test.ts` (yalnız `connect-src` + 3D CDN'leri)
 > **Başlık bekçisi (§8):** `INV-PERMISSIONS-POLICY-1` → `src/__tests__/conformance/permissions-policy-baslik.test.ts`
+> **Rapor ucu bekçisi (§9):** `INV-CSP-RAPOR-1` → `src/app/api/csp-rapor/__tests__/{basliklar,route}.test.ts`
 > **SSOT:** politika metni `next.config.mjs` `headers()` içinde, TEK yerde.
 
 ## 0. Bu cetvel niçin var
@@ -95,7 +96,8 @@ Stream gömüleri enforce'a geçildiği gün sessizce boş çerçeveye dönecekt
 düzeltmesi **değildir**; koruma modunu değiştirir ve yanlışsa vitrini kırar. Ön koşullar:
 
 1. §6 tablosundaki her origin politikada, `INV-CSP-1` yeşil.
-2. Report-Only raporlarında **sıfır ihlal** kanıtlanmış (canlı trafikle, bir sürüm boyu).
+2. Report-Only raporlarında **sıfır ihlal** kanıtlanmış (canlı trafikle, bir sürüm boyu). Raporlar
+   §9'daki uca gelir; ölçüm yolu orada.
 3. `'unsafe-inline'` / `'unsafe-eval'` kararı verilmiş. Bugün ikisi de `script-src`'te açık ve
    XSS korumasının çoğunu boşa çıkarır. Bunları kaldırmak nonce/hash altyapısı ister — **ayrı iş**.
 4. **Recep onayı.** (CLAUDE.md: geri alınamaz / dışa dönük etkisi olan kararlar.)
@@ -190,3 +192,43 @@ sessizce reddederdi.
 
 **Bu cetvelin yapmadığı:** başka direktifler (`accelerometer`, `usb`, `bluetooth` vb.) ölçülmedi ve
 eklenmedi; kapsam kartın istediği üçlüdür.
+
+## 9. Rapor ucu ve başlık hijyeni (güvenlik karnesi 2026-11 C1 + C4, OPS-211)
+
+**Niçin:** politika Report-Only idi ama `report-uri` / `report-to` yoktu. Tarayıcı ihlali "raporluyordu",
+rapor hiçbir yere gitmiyordu. §5'in ikinci ön koşulu ("sıfır ihlal") bu uç olmadan ölçülemez.
+
+**Yapı:**
+
+| Parça | Yer |
+|---|---|
+| `report-uri /api/csp-rapor` (eski tarayıcılar, `application/csp-report`) | CSP değerinin sonu |
+| `report-to csp-ucu` (Reporting API, `application/reports+json`) | CSP değerinin sonu |
+| `Reporting-Endpoints: csp-ucu="/api/csp-rapor"` | `headers()` içinde ayrı başlık |
+| Uç | `src/app/api/csp-rapor/route.ts` (mantık `src/lib/security/cspRapor.ts`) |
+
+Adres göreli yazılır: önizleme dağıtımı kendi ucuna raporlar, canlıyı kirletmez.
+
+**Uçun üç freni:**
+
+1. **Gövde tavanı 16 KB.** `Content-Length` ve akış birlikte sayılır (başlık yalan söyleyebilir); aşan 413.
+   Toplu gönderimde en çok 20 rapor işlenir.
+2. **Oran sınırı.** İstemci başına dakikada 30, örnek başına dakikada 600, bellekte en çok 5 000 istemci
+   anahtarı; aşan 429. ⚠Bellek içidir ve sunucusuz örnek başınadır: bir kötüye kullanım FRENİ, kesin kota
+   değil. Kesin kota gerekirse Vercel güvenlik duvarı kuralı yazılır.
+3. **Kişisel veri loglanmaz.** Log satırı yalnız şunu taşır: `direktif`, `engellenen` (yalnız köken ya da
+   `inline`/`eval` gibi anahtar sözcük), `belge` (yalnız yol; sorgu atılır, UUID / 4+ haneli sayı / e-posta /
+   32+ karakterli belirteç parçası `:id` olur), `kip`, `durum`. IP, yönlendiren, betik örneği
+   (`script-sample` sayfa metninden parça taşır), kaynak dosya ve kullanıcı aracısı ATILIR.
+
+**Ölçüm yolu (sıfır ihlal):** Vercel günlüğünde `"tur":"csp-ihlali"` satırları süzülür; direktif ve
+engellenen köken başına sayılır. Bilinen gürültü: tarayıcı eklentileri (`engellenen` = `chrome-extension`,
+`moz-extension`) sitenin ihlali değildir, sayımdan ayrı tutulur.
+
+**C4:** `next.config.mjs` `poweredByHeader: false`. `X-Powered-By: Next.js` her yanıtta çerçeveyi ilan
+ediyordu. COOP/CORP bu işin kapsamında değil (karnede ayrı satır; iframe ve ödeme akışı ölçülmeden yazılmaz).
+
+**Canlı doğrulama (birleşmeden sonra, bu PR'da ölçülmedi):**
+`curl -sI https://venthub.com.tr/tr | grep -i "x-powered-by\|reporting-endpoints\|report-only"` →
+`x-powered-by` YOK, diğer ikisi VAR. Uç: `curl -s -o /dev/null -w "%{http_code}" -X POST -H
+"content-type: application/csp-report" -d '{"csp-report":{}}' https://venthub.com.tr/api/csp-rapor` → `204`.

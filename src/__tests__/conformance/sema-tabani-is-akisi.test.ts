@@ -150,6 +150,35 @@ describe('INV-SEMA-TABAN-1: sema tabani is akisi salt-okuma ve bos dokumu redded
     expect(/exit 1/.test(kod), 'fail-closed cikis yok — bos dokum SESSIZCE artefakt olur').toBe(true)
   })
 
+  /**
+   * ⭐SIR TARAMASI YÜKLEMEDEN ÖNCE (güvenlik karnesi 2026-11 S3, OPS-211). Depo PUBLIC: artefakt da herkese
+   * açık. Kol iki şeyi ölçer: tarama adımı VAR ve upload-artifact adımından ÖNCE (sonra koşan tarama hiçbir
+   * şeyi durdurmaz), ve yüklenen İKİ dosyayı da tarıyor. `continue-on-error` tarama adımında YASAK.
+   */
+  it('SIR TARAMASI: upload-artifact adimindan ONCE kosuyor ve yuklenen her dosyayi tariyor', () => {
+    const kod = yorumsuz(metin())
+    const tarama = kod.indexOf('node scripts/security/dokum-sir-taramasi.cjs')
+    const yukleme = kod.indexOf('actions/upload-artifact@')
+    expect(tarama, 'sir taramasi adimi yok').toBeGreaterThan(-1)
+    expect(yukleme, 'upload-artifact adimi bulunamadi — evren yanlis olabilir').toBeGreaterThan(-1)
+    expect(tarama < yukleme, 'sir taramasi upload-artifact adimindan SONRA — artefakt taranmadan yuklenir').toBe(true)
+    const taramaSatiri = kod.slice(tarama, kod.indexOf('\n', tarama))
+    for (const dosya of ['cikti/public_schema.sql', 'canli-sayilar.txt']) {
+      expect(taramaSatiri.includes(dosya), `yuklenen ${dosya} taranmiyor`).toBe(true)
+    }
+    const adim = kod.slice(kod.lastIndexOf('- name:', tarama), tarama)
+    expect(adim.includes('continue-on-error'), 'tarama adiminda continue-on-error — bulgu yuklemeyi durdurmaz').toBe(false)
+    expect(fs.existsSync(path.join(KOK, 'scripts', 'security', 'dokum-sir-taramasi.cjs')), 'tarayici betik yok').toBe(true)
+  })
+
+  it('AYIRT EDER: sira olcutu yuklemeden SONRA gelen taramayi yakaliyor (sabotaj fikstur)', () => {
+    const ters = '- uses: actions/upload-artifact@x\n- run: node scripts/security/dokum-sir-taramasi.cjs a'
+    expect(
+      ters.indexOf('node scripts/security/dokum-sir-taramasi.cjs') < ters.indexOf('actions/upload-artifact@'),
+      'olcut KOR: ters sirayi dogru sayiyor',
+    ).toBe(false)
+  })
+
   it('KENDI-KENDINE-YETER: self-hosted runner YOK (repo PUBLIC)', () => {
     const kod = yorumsuz(metin())
     expect(kod.includes('self-hosted'), 'public repoda self-hosted runner yabanci kodu makinede kosar').toBe(
