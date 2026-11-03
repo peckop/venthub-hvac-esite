@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.12 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.13 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -68,6 +68,14 @@ cetvelde hiç yoktu.
 (R3 tablosu, Fiyat satırı): kaynak etken anlatmıyorsa başlık korunur, bölüm bunu dürüstçe söyler ve teklif için istenen seçim
 girdilerini kaynak atfıyla yazar. Tetik: BLG-31 tur 2 ve tur 3'te iki bağımsız doğrulayıcı, fiyat etkeni anlatmayan bölümü
 başlık-içerik uyumsuzluğu olarak buldu. Kırmızı kural ve kapı getirmez (başlık sabit kalır, `kalipDenetle` değişmez).
+
+**v0.13 (2026-11-03, BLG-34, OPS-215):** R10.1 şemasına iki basamak girer: **B1a** (konu kartı açılınca GEO-SEO'dan arama
+talebi özeti ve yazıda adıyla geçmesi gereken marka, seri ve model listesi) ve **B6a** (B5 temiz çıkınca, taslak Recep'e
+gitmeden GEO-SEO taslak okuması). Tetik: Recep'in "yazı hazırlanırken GEO-SEO'ya bilgi gelmiyor" eleştirisi; R10'da GEO-SEO
+yalnız yayından sonra (B11–B15) vardı. BLG-33 ölçümü: yazı Casals'ın iki serisine dayandı, Nicotra Gebhardt'ın katalogda
+"plug fan" diye tanıttığı seriler (RLM, RLE) yazım sırasında kimsenin elinde olmadığı için kapsama girmedi. Kırmızı kural ve
+kapı getirmez; iki basamağın kapısı yoktur (aday). Ayrıntı metni GEO-SEO'nundur (`yayin-gorunurluk-denetim-standard.md`,
+yeni Y numarası); numara kesinleşince R10.4'teki satır güncellenir.
 
 ---
 
@@ -639,13 +647,16 @@ yazılmamış kapıdır; var sayılmaz (R8.1).
 ```mermaid
 flowchart TD
   subgraph ONCE["Yayından önce (BLOG)"]
-    B1["B1 Konu seçimi<br/>R1"] --> B2["B2 Kaynak ve mevzuat paketi<br/>R2, R2.6"]
+    B1["B1 Konu seçimi<br/>R1"] --> B1a["B1a GEO-SEO girdisi<br/>R10.1"]
+    B1a --> B2["B2 Kaynak ve mevzuat paketi<br/>R2, R2.6"]
     B2 --> B3["B3 Taslak + iddia tablosu<br/>R3, R5.1 adım 2"]
     B3 --> B4["B4 Yayın yolu ölçümü<br/>R5.7"]
     B4 --> B5["B5 Doğrulama turu<br/>R5.1 3a–3g"]
     B5 -->|"R5.3 kırmızı"| B6["B6 Düzeltme + tam yeniden tur<br/>R5.1 adım 4–5"]
     B6 --> B5
-    B5 -->|"R5.3 temiz"| B7["B7 Önizleme + onay<br/>R5.4, R5.7"]
+    B5 -->|"R5.3 temiz"| B6a["B6a GEO-SEO taslak okuması<br/>R10.1"]
+    B6a -->|"uygun"| B7["B7 Önizleme + onay<br/>R5.4, R5.7"]
+    B6a -->|"düzeltme"| B6
   end
   B7 -->|"onay"| B8["B8 Yazı kaydı + PR + kapılar<br/>R6, R8"]
   B7 -->|"değişiklik"| B3
@@ -664,11 +675,13 @@ flowchart TD
 | Basamak | Ne yapılır | Sahibi | Kapı (neyle ölçülür) | Olmazsa | Kayıt |
 |---|---|---|---|---|---|
 | **B1** Konu seçimi | R1.2 ölçüt tablosu; konu başına tek yazı (R1.3); sıra R1.4 | BLOG önerir, Recep sırayı belirler | R1.3 tek yazı/konu. Toplu üretim kapısı (R4.1, R8.1) henüz yok; ritim R9 | konu elenir ya da başka yazıyla birleşir | Kanban kartı (BLG-n) + R1.2 tablosu karta not |
+| **B1a** GEO-SEO girdisi (yazım öncesi) | Konu kartı açılınca BLOG konu adını ve kart numarasını GEO-SEO'ya verir. GEO-SEO iki şey döner: (1) o konu kümesi için arama talebi özeti (biçim ve veri kuralı GEO-SEO metninde; arama verisi depoya, PR'a, kart dışı belgeye girmez, GEO-SEO kuralı P6), (2) yazıda ADIYLA geçmesi gereken marka, seri ve model listesi. Liste taslağın kapsam girdisidir; listedeki bir ad yazıya girmiyorsa nedeni taslak notuna yazılır | GEO-SEO verir; BLOG ister ve kullanır | **Kapı yok (aday).** Kartta GEO-SEO girdisinin iki parçası bulunur; liste ↔ taslak ad farkı taslak notunda | Girdi gelmeden B2'ye geçilmez; GEO-SEO bir gün içinde dönmezse BLOG OPS'a "GEO-SEO girdisi yok" diye tek satır yazar | karta tek satır + ad listesi (arama verisi yazılmaz). Ayrıntı metni GEO-SEO'nun (`yayin-gorunurluk-denetim-standard.md`, yeni Y numarası); numara kesinleşince bu satır numarayla güncellenir |
 | **B2** Kaynak ve mevzuat paketi | Araştırmacı alt ajan (salt-okuma) kaynakları açar: erişim sınıfı (R2.2), ham alıntı (R2.3); mevzuat iddiası MEVZUAT paketinden (R2.6 adım 1) | BLOG + MEVZUAT | `alinti-dogrula.mjs` KALDI 0; açılamayan kaynak 0 (R5.3) | kaynak elenir, iddia düşer; kaynak yoksa yazı yazılmaz | depo dışı klasör + karta not (R5.7) |
 | **B3** Taslak + iddia tablosu | R3 kalıbı; her iddia → kaynak no + birebir alıntı + tür; mevzuat yalnız paketten (R2.6 adım 2) | BLOG | `rehber-denetim.mjs` kırmızı 0 (kalıp, atıf, iç bağlantı-metin, vaat, olumsuz iddia, mevzuat). Adaylar: K0, K0b, K1, K3, K4, K5 (R10.2) | kırmızı 0 olmadan B5'e gidilmez | depo dışı taslak + iddia tablosu + betik çıktısı |
 | **B4** Yayın yolu ölçümü | Bağlanan aile ve kategori kimlikleri güncel slug'a çözülür (son yeniden adlandırma migration'ının eski-yeni çiftleri); site içi bağlantı hedefleri canlıda 200; yayını bloke eden açık karar yok | BLOG | R5.7 kimlik şartı; `ic-baglanti-denetle.mjs` (hedefler); açık karar yok | derleme durur; onay sorulmaz (R5.7 sınırı) | karta not: komut + çıktı |
 | **B5** Doğrulama turu | 3a kapsam çıkarımı (tabloyu görmeden), 3b atıf betiği, 3c alıntı betiği, 3d sınıflama, 3e sabotaj kolu (tuzak yalnız kopyada), 3f örnekleme, 3g MEVZUAT kontrolü | BLOG (doğrulayıcı alt ajanlar bağımsız; hüküm BLOG'da); 3g MEVZUAT | R5.3: eşlenmeyen 0 · DESTEKSİZ 0 · ÇELİŞİYOR 0 · BAYAT 0 · açılamayan 0 · sabotaj N/N (N ≥ 3) | B6 | karta tur notu: tur no, kırmızı sayısı, tuzak sayısı ve yakalanan |
 | **B6** Düzeltme + tam yeniden tur | R5.1 adım 4–5: düzelt, tuzakları çıkar, **tüm metin** yeniden 3a'dan geçer | BLOG | R5.1 adım 5 ("tüm metin"); tur sayacı (R10.3) | tur sayısı 3'ü aşarsa kök sebep notu: her bulgunun hangi aday kapıyla yakalanacağı (R10.2) | karta tur notu |
+| **B6a** GEO-SEO taslak okuması | B5 temiz çıkınca taslak (sha256 ilk 12 hane) Recep'e gitmeden GEO-SEO'ya verilir. GEO-SEO okur ve yazılı görüş döner: B1a'daki arama talebi ve ad listesi karşılanıyor mu, başlık, giriş ve H2'ler arama dilini taşıyor mu, aynı sorguda sitedeki başka yazıyla çakışma (R1.3) var mı. Görüş "uygun" ya da düzeltme listesidir; düzeltme metni değiştirirse B6 (tam yeniden tur) geçerlidir | GEO-SEO okur; BLOG işler | **Kapı yok (aday).** GEO-SEO yazılı görüşü kartta, taslak sha256'sıyla; B7'ye giden metnin sha256'sı görüştekiyle aynı | Görüş gelmeden B7'ye geçilmez; GEO-SEO bir gün içinde dönmezse BLOG OPS'a tek satır yazar | karta tek satır (görüş + sha256). Ayrıntı metni GEO-SEO'nun (B1a ile aynı Y numarası) |
 | **B7** Önizleme + onay | R5.4 iki parça: önizleme (sha256 ilk 12 hane) + düz cümle özet; tek soru "yayınlayalım mı?" | BLOG sunar, Recep onaylar (kendi sözü, bu pencerede) | sha256 doğrulananla aynı; yayına giremeyecek metnin onayı sorulmaz (R5.7) | metin değişirse durum taslak, B5 | durum dosyası + karta onay kaydı (kim, ne zaman, sha256) |
 | **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı **ve R10.6 yayın öncesi kontrol tablosu (sekiz madde, her madde kanıtlı; kanıtsız madde AÇIK, yayın çıkmaz)**; **PR açılınca yazı adresi GEO-SEO'ya SendMessage ile verilir** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
 | **B9** Birleşme | PR birleşmeden önce OPS'a gösterilir; `scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` | OPS onaylar; ritüeli emri veren pencere koşar | ritüel çıkış 0; `mergeStateStatus` CLEAN; `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` 204; karta "GEO-SEO taban aldı" notu (ne zaman gerektiği ve kip: Y2.1) | birleşme yapılmaz; kırmızı kapı B8'e döner | karta PR no + birleşme ölçümü |
@@ -722,6 +735,7 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
 |---|---|---|
 | B11–B15 metni, kapıları ve komutları | GEO-SEO (Y2'nin sahibi) | **ONAYLANDI (GEO-SEO, 13 Ekim): şema doğru, kapı komutları betiklerle uyuşuyor.** Tek kaynak `yayin-gorunurluk-denetim-standard.md` Y2 (genişletme Y2.1: aynı tur, Bing Webmaster, IndexNow kipi, günlük sınır, öncelik, satır biçimi). R10 yalnız sıra, sahip ve bağlantı taşır; Y2'yi BLOG değiştirmez |
 | Y2.1'den R10'a bağ | GEO-SEO | Kabul edildi; Y2.1 PR'ında (SEO-45, OPS onayı ve #1917 birleşmesi sonrası) konur. Numara kesinleşince bu satır numarayla güncellenir |
+| B1a ve B6a ayrıntı metni (arama talebi özeti biçimi, ad listesi biçimi, okuma ölçütü, süre) ve Y numarası | GEO-SEO (Y2'nin sahibi) | **AÇIK (OPS-215, 3 Kasım):** GEO-SEO kendi basamak metnini `yayin-gorunurluk-denetim-standard.md`'ye yazar; numara kesinleşince B1a ve B6a satırlarındaki "yeni Y numarası" ifadesi numarayla güncellenir. Kapı yok (aday), kapıyı ARAÇ yazar |
 | EN yayını (`EN_YAYIN`) açılınca B10–B12 EN adresleri için tekrarlanır | GEO-SEO + URUN | bayrak kapalı, kapsam dışı |
 
 ### R10.5 Önceki yazıların ders listesi (yeni yazı başlarken OKUNUR)
