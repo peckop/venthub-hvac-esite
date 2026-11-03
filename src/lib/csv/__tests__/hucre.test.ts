@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { csvHucre, csvSatir, formulMu } from '../hucre'
+import { csvHucre, csvSatir, formulMu, notrlemeyiGeriAl, notrMetin } from '../hucre'
 
 /**
  * VULN-006 — CSV formül enjeksiyonu nötrlemesi. Cetvel: csv-import-export-standard.md §1.1.
@@ -95,5 +95,52 @@ describe('formulMu ve csvSatir', () => {
   it('csvSatir ayracı korur (varsayılan virgül, isteğe göre noktalı virgül)', () => {
     expect(csvSatir(['a', 1, '=x'])).toBe(`"a","1","'=x"`)
     expect(csvSatir(['a', 1, '=x'], ';')).toBe(`"a";"1";"'=x"`)
+  })
+})
+
+/** ADM-7 madde 5 — dışa → içe döngüsü kayıpsız; nötrleme zayıflamaz. */
+describe('notrlemeyiGeriAl — notrMetin ile simetrik', () => {
+  const ornekler = [
+    '- Fan',
+    '=1+1',
+    '+SUM(A1)',
+    '@x',
+    '＠x',
+    '－x',
+    '\tkomut',
+    '\rkomut',
+    '-',
+    "'",
+    "'=x",
+    "''=x",
+    "'-12,50",
+    "'abc",
+    'abc',
+    '-12,50',
+    '+905551112233',
+    '',
+    "'- Fan",
+  ]
+
+  it.each(ornekler)('%j: notrlemeyiGeriAl(notrMetin(x)) === x', (x) => {
+    expect(notrlemeyiGeriAl(notrMetin(x))).toBe(x)
+  })
+
+  it.each(ornekler)('%j: nötrlenmiş çıktı formül değildir (koruma zayıflamaz)', (x) => {
+    expect(formulMu(notrMetin(x))).toBe(false)
+  })
+
+  it('önek yalnız nötrlemenin koyduğu yerde düşer; elle yazılmış tırnak korunur', () => {
+    expect(notrlemeyiGeriAl("'- Fan")).toBe('- Fan')
+    expect(notrlemeyiGeriAl("'＠Fan")).toBe('＠Fan')
+    expect(notrlemeyiGeriAl("'abc")).toBe("'abc")
+    expect(notrlemeyiGeriAl("'-12,50")).toBe("'-12,50")
+    expect(notrlemeyiGeriAl('=x')).toBe('=x')
+  })
+
+  it("ardı formül olan baştaki tırnak da önek alır (döngü kayıpsız): \"'=x\" → \"''=x\"", () => {
+    expect(notrMetin("'=x")).toBe("''=x")
+    expect(notrMetin("'abc")).toBe("'abc")
+    expect(csvHucre("'=x")).toBe(`"''=x"`)
   })
 })

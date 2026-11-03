@@ -23,11 +23,39 @@
 // SIR SIZDIRMAZ: yapılandırma bölümü yalnız HÜKÜM ve konak adı taşır; hiçbir anahtarın
 // değeri, uzunluğu ya da öneki yazılmaz. Uç kimliksizdir — bu kısıt tasarımın parçasıdır,
 // nezaket değil.
+//
+// AYRINTI YALNIZ AYRICALIKLI ÇAĞIRANA (karne 2026-11 Y7 · kök 2)
+// -------------------------------------------------------------
+// `verify_jwt = true` yalnız "geçerli BİR JWT var" der; herhangi bir müşteri JWT'si (ya da
+// herkese açık anon anahtar) ile bu uç eksik ortam değişkenlerinin adlarını, sürüm/commit
+// bilgisini ve hata nedenlerini döndürüyordu. Artık ayrıntı yalnız service_role ve
+// admin/super_admin'e döner (`ayricalikliMi`). Ayrıcalıksız çağırana yalnız HÜKÜM (`durum`,
+// `ok`) ve `config.odeme_ortami` döner: satış açılış önkoşulu K2
+// (`scripts/kip/acilis-onkosullari.mjs`) bu alanı anon anahtarla okur ve o betiğe service_role
+// vermek bilerek yasaktır (IZINLI_ENV). Ödeme ortamının "prod/sandbox" olması müşteriye
+// ödeme sayfasında zaten görünen bilgidir; eksik değişken listesi değildir.
+import { ayricalikliMi, resolveCaller } from '../_shared/caller.ts'
 import { auditConfig, yalnizSandboxTutarsizligi } from '../_shared/config_audit.ts'
 import { dbSaglikOlc } from '../_shared/db_saglik.ts'
 import { satisDurumuOku, type SatisDurumu } from '../_shared/satis_kipi.ts'
 
 type Durum = 'saglikli' | 'bozuk' | 'olculemedi'
+
+/** Ayrıcalıksız gövdeye giden TEK yapılandırma alanı; yoksa null. */
+function odemeOrtamiOf(ek: Record<string, unknown>): unknown {
+  const config = ek.config
+  if (typeof config !== 'object' || config === null) return null
+  return (config as Record<string, unknown>).odeme_ortami ?? null
+}
+
+/** Kimlik ölçülemezse (env eksik, profil okunamadı) ayrıntı VERİLMEZ — fail-closed. */
+async function ayrintiGorebilirMi(req: Request): Promise<boolean> {
+  try {
+    return ayricalikliMi(await resolveCaller(req))
+  } catch {
+    return false
+  }
+}
 
 Deno.serve(async (req: Request) => {
   const headers: Record<string, string> = {
@@ -44,18 +72,29 @@ Deno.serve(async (req: Request) => {
   const release = env.SENTRY_RELEASE || env.RELEASE || null
   const commit = env.GITHUB_SHA || env.COMMIT_SHA || env.VITE_COMMIT_SHA || null
 
+  const ayrintili = await ayrintiGorebilirMi(req)
+
   const cevap = (durum: Durum, ek: Record<string, unknown>) =>
     new Response(
-      JSON.stringify({
-        durum,
-        // `ok` YALNIZCA sağlıklıda true. Eski istemciler bu alanı okuyor olabilir; onlar için
-        // de doğru cevap "ölçemedimse true deme"dir.
-        ok: durum === 'saglikli',
-        release,
-        commit,
-        time: new Date().toISOString(),
-        ...ek,
-      }),
+      JSON.stringify(
+        ayrintili
+          ? {
+              durum,
+              // `ok` YALNIZCA sağlıklıda true. Eski istemciler bu alanı okuyor olabilir; onlar
+              // için de doğru cevap "ölçemedimse true deme"dir.
+              ok: durum === 'saglikli',
+              release,
+              commit,
+              time: new Date().toISOString(),
+              ...ek,
+            }
+          : {
+              durum,
+              ok: durum === 'saglikli',
+              time: new Date().toISOString(),
+              config: { odeme_ortami: odemeOrtamiOf(ek) },
+            },
+      ),
       { status: durum === 'saglikli' ? 200 : 503, headers },
     )
 

@@ -1,6 +1,12 @@
 /* eslint-disable */
 interface DenoRuntimeOptions {
   env?: Record<string, string>
+  /**
+   * Derlenen kopyada import belirtecini değiştirir (ör. `npm:iyzipay` → test sahtesinin mutlak
+   * yolu). Vite `npm:` önekini yerleşik modül sanıp paketleyemiyor; bu yüzden `vi.mock` ile
+   * de yakalanamıyor. Belirteç tırnak içinde aynen eşleşir.
+   */
+  moduleRewrites?: Record<string, string>
 }
 
 // Initialize global handlers registry if not already present
@@ -11,12 +17,14 @@ if (!(globalThis as any).__edge_function_handlers__) {
 export class DenoRuntimeSimulator {
   private originalDeno: any
   private envs: Record<string, string>
+  private moduleRewrites: Record<string, string>
   private handlers = new Map<string, (req: Request) => any>()
   private activeHandler: ((req: Request) => any) | null = null
   private tempFiles: string[] = []
 
   constructor(options: DenoRuntimeOptions = {}) {
     this.envs = { ...options.env }
+    this.moduleRewrites = { ...options.moduleRewrites }
     this.originalDeno = (globalThis as any).Deno
     this.setupGlobal()
   }
@@ -116,8 +124,14 @@ export class DenoRuntimeSimulator {
       return out
     }
 
-    const inlineSupabaseUrl = (src: string): string =>
-      src.replace(/https:\/\/esm\.sh\/@supabase\/supabase-js(@[0-9a-zA-Z\.\-]+)?/g, '@supabase/supabase-js')
+    const rewrites = Object.entries(this.moduleRewrites)
+    const inlineSupabaseUrl = (src: string): string => {
+      let out = src.replace(/https:\/\/esm\.sh\/@supabase\/supabase-js(@[0-9a-zA-Z\.\-]+)?/g, '@supabase/supabase-js')
+      for (const [from, to] of rewrites) {
+        for (const q of ['"', "'"]) out = out.split(`${q}${from}${q}`).join(`${q}${to}${q}`)
+      }
+      return out
+    }
 
     const content = fs.readFileSync(functionPath, 'utf-8')
 

@@ -50,7 +50,7 @@ import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 
 import Iyzipay from "npm:iyzipay";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { resolveCaller, type CallerContext } from '../_shared/caller.ts'
 
 type PaymentTransaction = { paymentTransactionId?: string };
 type PaymentDebug = {
@@ -145,32 +145,23 @@ Deno.serve(async (req) => {
 
     if (!orderId) return json({ error: { code: "VALIDATION_ERROR", message: "order_id gerekli" } }, 400);
 
-    // ── AuthN: kimlik DOĞRULANMIŞ token'dan türetilir, gövdeden DEĞİL (§3.2/§3.3) ──
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      return json({ error: { code: "UNAUTHORIZED", message: "Authorization header required" } }, 401);
+    // ── AuthN + AuthZ: kimlik DOĞRULANMIŞ token'dan, rol ve tenant aynı profil satırından ──
+    // Ortak `resolveCaller` kapısı (§3.2/§3.3, karne 2026-11 kök 2).
+    //
+    // SIRA (karne 2026-11 Y6): eskiden sipariş yetkiden ÖNCE yükleniyordu; admin olmayan bir
+    // çağıran var olmayan sipariş için 404, var olan için 403 alıyordu — yani sipariş
+    // kimliklerinin varlığını yoklayabiliyordu. Artık önce yetki: ayrıcalıksız çağıran HER
+    // durumda 403 alır, sipariş satırına hiç dokunulmaz.
+    let caller: CallerContext;
+    try {
+      caller = await resolveCaller(req);
+    } catch (err) {
+      console.warn('iyzico-refund: kimlik kapısı ölçülemedi:', err instanceof Error ? err.name : 'hata');
+      return json({ error: { code: "AUTH_CHECK_FAILED", message: "Kimlik doğrulanamadı" } }, 500);
     }
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-    const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } });
-    const { data: { user }, error: authErr } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''));
-    if (authErr || !user) {
+    if (caller.kind === 'anon') {
       return json({ error: { code: "UNAUTHORIZED", message: "Invalid or expired token" } }, 401);
     }
-    const reqUserId: string = user.id;
-
-    // ── Siparişi yükle ────────────────────────────────────────────────────────────
-    const ordResp = await fetch(
-      `${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}` +
-        `&select=id,user_id,tenant_id,status,payment_status,total_amount,payment_debug`,
-      { headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } }
-    );
-    if (!ordResp.ok) {
-      return json({ error: { code: "DB_ERROR", message: "Order fetch failed", status: ordResp.status } }, 500);
-    }
-    const orders = await ordResp.json().catch(() => []);
-    const order = Array.isArray(orders) ? orders[0] : null;
-    if (!order) return json({ error: { code: "NOT_FOUND", message: "Order not found" } }, 404);
-
     // ── AuthZ: YALNIZ ayrıcalıklı rol (§3.2 + §3.10-G) ────────────────────────────
     //
     // T071-B1 (2026-08-17): burada eskiden `isAdmin || isOwner` vardı ve bu bir IDOR'du.
@@ -187,17 +178,29 @@ Deno.serve(async (req) => {
     // {super_admin, admin, moderator, warehouse, sales, viewer, user} kabul eder.
     // (M4 dalgası, 2026-08-17: burada duran ölü `'superadmin'` yazımı temizlendi;
     //  sözlük-dışı literali INV-EDGE-ROLE-1 kapısı artık imkânsız kılıyor.)
-    let isAdmin = false;
-    const prof = await fetch(
-      `${supabaseUrl}/rest/v1/user_profiles?id=eq.${encodeURIComponent(reqUserId)}&select=role`,
+    // service_role bilerek KABUL EDİLMEZ: para hareketi kararı insan yöneticinindir.
+    // Rol listesi bu dosyada AÇIK durur (payment-money-move kural G onu burada arar).
+    const isAdmin =
+      caller.kind === 'user' && (caller.role === 'admin' || caller.role === 'super_admin');
+    if (!isAdmin || !caller.user) {
+      return json({ error: { code: "FORBIDDEN", message: "Yetkisiz" } }, 403);
+    }
+    const reqUserId: string = caller.user.id;
+    const tenantId = caller.tenantId;
+
+    // ── Siparişi yükle — YALNIZ yöneticinin tenant'ında (R13 · E16) ─────────────────
+    const ordResp = await fetch(
+      `${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}` +
+        `&tenant_id=eq.${encodeURIComponent(tenantId)}` +
+        `&select=id,user_id,tenant_id,status,payment_status,total_amount,payment_debug`,
       { headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } }
     );
-    if (prof.ok) {
-      const arr = await prof.json().catch(() => []);
-      const profileRow = Array.isArray(arr) ? arr[0] : null;
-      isAdmin = profileRow?.role === 'admin' || profileRow?.role === 'super_admin';
+    if (!ordResp.ok) {
+      return json({ error: { code: "DB_ERROR", message: "Order fetch failed", status: ordResp.status } }, 500);
     }
-    if (!isAdmin) return json({ error: { code: "FORBIDDEN", message: "Yetkisiz" } }, 403);
+    const orders = await ordResp.json().catch(() => []);
+    const order = Array.isArray(orders) ? orders[0] : null;
+    if (!order) return json({ error: { code: "NOT_FOUND", message: "Order not found" } }, 404);
 
     const totalAmount = Number(order.total_amount) || 0;
     const prevDebug: PaymentDebug = (order?.payment_debug || {}) as PaymentDebug;
@@ -389,7 +392,7 @@ Deno.serve(async (req) => {
       last_refund_attempt_id: attemptId,
     };
 
-    const updResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+    const updResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({ payment_status: newPaymentStatus, status: newStatus, payment_debug: newDebug }),
