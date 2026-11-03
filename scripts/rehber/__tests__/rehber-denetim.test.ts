@@ -259,6 +259,18 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
         { sinif: 'MARKA-GOVDEDE', ayrinti: '4 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): Casals ×2, ENKELFAN ×1, KENTALFAN ×1' },
       ])
     })
+    it('BLG-37: sitedeki markalar ve seri adları (fan-cesitleri / radyal-aksiyel benzeri gövde) KIRMIZI; "radon" gazı adı sayılmaz', () => {
+      const md = kur(
+        'Kanal tipi fanda Vortice LINEO ve VORT HR örnek verilir [1]. Radyal fanda Nicotra Gebhardt, sürücüde Danfoss VLT, ısı geri kazanımda Avens anılır [1].',
+        'İki seri var [1].',
+        KAYNAK,
+      )
+      expect(markaDenetle(md)).toEqual([
+        { sinif: 'MARKA-GOVDEDE', ayrinti: '8 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): Vortice ×1, LINEO ×1, VORT ×1, Nicotra ×1, Gebhardt ×1, Danfoss ×1, VLT ×1, Avens ×1' },
+        { sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }, // 8 gövdede + Kaynaklar'daki Casals
+      ])
+      expect(markaDenetle(kur('Radon gazı konut havasında birikebilir [1].', 'İki seri var [1].', KAYNAK))).toEqual([])
+    })
     it('seri bölümü ve Kaynaklar dahil toplam 8 üstü → MARKA-TOPLAM KIRMIZI, 8 geçer', () => {
       const seri = (n: number) => Array.from({ length: n }, () => 'Casals').join(' ve ') + ' [1].'
       expect(markaDenetle(kur('Genel bilgi [1].', seri(7), KAYNAK)).map((k: { sinif: string }) => k.sinif)).toEqual([])
