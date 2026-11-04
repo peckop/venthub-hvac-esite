@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "eski çalışma kopyalarını temizleyelim, disk doldu",
+    "worktree sil",
+    "worktre temizle, C:/tmp altında çok klasör birikti",
+    "kopyaları sildirsek mi, hangileri güvenli bakar mısın",
+    "C:/tmp boşalt",
+    "ÇALIŞMA KOPYASINI SİL ama önce kontrol et",
+    "calisma kopyalarini temizle, makine yavaslamis",
+    "bitmiş ağaçları kaldır, git worktree prune da yap",
+    "kullanılmayan vh- klasörlerini silmek istiyorum",
+    "bu departmanın eski kopyalarını silebilir miyiz",
+    "can you clean up the old worktrees under C:/tmp?",
+    "disk dolu, eski ağaçlardan kurtulalım"
+  ],
+  "should_not_trigger": [
+    "bu dalı uzaktan sil, birleşti",
+    "node_modules'u yeniden kur, paketler bozulmuş",
+    "yeni bir worktree aç, şu dal için",
+    "sepeti temizle butonunu düzelt",
+    "ürün kopyası oluşturma ekranına doğrulama ekle",
+    "Next.js önbelleğini temizle ve yeniden derle",
+    "git stash listesini göster",
+    "PR'ı kapat ve yorum bırak"
+  ]
+}

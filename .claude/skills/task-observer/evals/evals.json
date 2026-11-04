@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bunu not al, skill olsun",
+    "gözlem yaz: bu akış tekrar ediyor",
+    "skill gözlemleri haftalık incelemesi",
+    "bir daha olmasın diye gözlem kaydet",
+    "bu düzeltmeyi bir skill kuralına çevirelim, gözlem olarak yaz",
+    "GÖZLEM YAZ",
+    "işe yarayan ama hiçbir skill'de olmayan yöntemi kaydet",
+    "haftalık skill incelemesi yap, hangi gözlem yeni skill olur",
+    "çiğnenen kuralı gözlem dosyasına yaz",
+    "tekrarlayan akışı yakala ve kaydet",
+    "write an observation so this becomes a skill later",
+    "çöp dedi, dayanağın ne, bunu gözlem olarak sakla"
+  ],
+  "should_not_trigger": [
+    "yeni skill yaz",
+    "skill'i güncelle",
+    "kodu düzelt",
+    "hafıza bakımı yap",
+    "test çalıştır",
+    "bugünün işlerini listele",
+    "kart aç",
+    "sage'e kaydet"
+  ]
+}

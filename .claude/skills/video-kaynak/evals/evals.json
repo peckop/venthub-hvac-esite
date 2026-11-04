@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "şu konuda video bul",
+    "YouTube'dan kaynak ekle",
+    "videoyu deftere yükle",
+    "montaj videosu araştır",
+    "konferans konuşması bul ve kaynak yap",
+    "VİDEO KAYNAK EKLE",
+    "ürün tanıtım videosu bulup dijital ikize ekle",
+    "bu konuda anlatan bir YouTube videosu var mı, kaynak olarak yükle",
+    "videoyu NotebookLM'e ekle ve sorgulanabilir mi bak",
+    "bir konu hakkında video arayıp liste çıkar",
+    "find a youtube video on this and add it as a source",
+    "videoyu bul, kısa liste ver, ben seçeyim"
+  ],
+  "should_not_trigger": [
+    "videoyu özetle",
+    "web araştırması yap",
+    "PDF'i dizine ekle",
+    "deftere soru sor",
+    "YouTube kanalı oluştur",
+    "ürün görseli ekle",
+    "rehber yazısı yaz",
+    "kod sorusu: bu fonksiyon ne yapıyor"
+  ]
+}
