@@ -69,7 +69,7 @@ standart/plan docs · `CHANGELOG`/git · agent-memory. **İki+ yüzey aynı bilg
 
 ## 8. İş dağılımı kuralları — 2026-09-07 (YÜRÜRLÜKTE; Recep: "sistem olana kadar iş yok", "hiçbir iş VentHub dışında değil")
 
-Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kimde, nerede" sorusuna cevap alamıyordu; sabah Linear'da 53 kayıt "yapılıyor" görünürken gerçek sayı 3'tü) + Katalog şeridinin yığın ölçümü (203 kayıt: 58 bitti · 4 iptal · 31 aktif · 110 backlog) + Recep düzeltmesi (Mart kayıtları arşivlenmez, bağlanır). Uygulayan betik: `scripts/nlm/santiye.py` (çıktı 10-01'den beri depo DIŞINDA, `~/.venthub/santiye/is-dagilimi.md`; `docs/proje-takip/is-dagilimi.md` emekli yönlendirme sayfasıdır). Kaynak 10-01'e kadar yalnız Linear (şimdi Kanban, aşağıdaki not); pano notu, sohbet, durum dosyası kaynak DEĞİLDİR.
+Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kimde, nerede" sorusuna cevap alamıyordu; sabah Linear'da 53 kayıt "yapılıyor" görünürken gerçek sayı 3'tü) + Katalog şeridinin yığın ölçümü (203 kayıt: 58 bitti · 4 iptal · 31 aktif · 110 backlog) + Recep düzeltmesi (Mart kayıtları arşivlenmez, bağlanır). Betik: `scripts/nlm/santiye.py` (elle koşulur; zamanlayıcıyla otomatik üretim sözü GERİ ALINDI, aşağıdaki 2026-11-04 notu; `docs/proje-takip/is-dagilimi.md` emekli yönlendirme sayfasıdır). Kaynak 10-01'e kadar yalnız Linear (şimdi Kanban, aşağıdaki not); pano notu, sohbet, durum dosyası kaynak DEĞİLDİR.
 
 > **2026-10-01 (karar 219) okuma notu:** bu bölümde "Linear / kayıt / etiket" yerine **Kanban / kart / kart sahibi** okunur;
 > In Progress · Todo · In Review · Done = Kanban sütunları (`in-progress`, `todo`, `review`, `done`). Yukarıdaki
@@ -79,6 +79,8 @@ Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kim
 > yapılıyor ≤3 YEŞİL · 4-5 SARI · >5 KIRMIZI (pano WIP sınırı 5); sırada (To Do) için sınır YOK (Linear'dan taşıma sonrası To Do =
 > bekleyen havuzu); OPS panosu da aynı kurala tabidir. Aşağıdaki madde 2'nin ≤1 / ≤3 rakamları yalnız eski Linear kipi içindir.
 > "Recep kapısı" etiketi Kanban kartlarında henüz kullanılmıyor.
+
+> **2026-11-04 (OPS kararı, HRT-54): şantiye tablosu sözü geri alındı.** Bu bölümün "şantiye tablosu düzenli üretilir" sözü yürürlükten kalktı: zamanlayıcı kurulmaz. Ölçüm (2026-11-04): `~/.venthub/santiye/` dizini yok, depoda üretilmiş çıktı ve zamanlayıcı yok; söz hiç uygulanmadı. Linear ve NotebookLM emekli (karar 324, 419). İş durumunun tek kaynağı Kanban panolarıdır (`is-kayit-duzeni-standard.md`); "kim neyde" için `board.cjs who`, kart durumu için Kanban okunur. `santiye.py` ve `santiye_sinirlar.py` elle koşulabilen araç olarak kalır, belge konusunda bağlayıcı değildir. Aşağıdaki maddeler (etiket, WIP sınırı, teslim = In Review) tarihçe olarak durur; yürürlükteki karşılıkları is-kayit-duzeni cetvelindedir.
 
 1. **Sahiplik = etiket.** Şerit etiketleri: URUN · URUN-KATALOG · ALTYAPI · OPS · DESIGN. Etiketsiz kayıt SAHİPSİZ'dir ve tabloyu KIRMIZI yapar; proje sessizce sahip yapmaz (09-07 ölçümü: proje ölçütü Katalog'a 8 iş sayıyordu, gerçek 1).
 2. **Şerit başına "yapılıyor" (In Progress) ≤ 1, "sırada" (Todo) ≤ 3 (eski Linear kipi; Kanban sınırları yukarıdaki 10-01 notunda).** Aşım KIRMIZI; şerit Kanban'ı gerçek duruma çekmeden yeni iş almaz. "Recep kapısı" etiketli kayıt "yapılıyor" limitinden muaftır (bekleyen Recep'tir, şerit değil).

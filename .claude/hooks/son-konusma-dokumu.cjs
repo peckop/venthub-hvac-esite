@@ -53,7 +53,23 @@ const ENJEKTE_UST_SINIR = 12_000 // açılışta ajanın önüne konan (Ops: ~12
 const OKUMA_BAYT = 16 * 1024 * 1024
 const SUPURME_GUN = 14 // başka oturumların bayat dökümü bu kadar gün sonra silinir
 
-const SISTEM_ONEKLERI = ['<command-name>', '<command-message>', '<local-command-stdout>', '<local-command-caveat>', '<task-notification>']
+// ARC-77 (4 Kasım ölçümü): düz kullanıcı satırı olarak düşen pencere mesajları ("<cross-session-message …>") ve araç yükleme
+// bildirimi ("Tool loaded.") "Recep" mesajı sayılıyordu; compact sonrası ajan OPS'un sözünü Recep sözü diye okuyabilirdi.
+const SISTEM_ONEKLERI = [
+  '<command-name>',
+  '<command-message>',
+  '<local-command-stdout>',
+  '<local-command-caveat>',
+  '<task-notification>',
+  '<cross-session-message',
+  '<agent-message',
+  '<ci-monitor-event',
+  '<side-sessions-event',
+  '[SYSTEM NOTIFICATION',
+  '[Subagent hand-back]',
+  'Another Claude session sent a message',
+]
+const SISTEM_TAM = /^Tool loaded\.?$/
 
 const SIR_DESENLERI = [
   /\bsk-[A-Za-z0-9_-]{16,}/g, // OpenAI/Anthropic tarzı
@@ -146,7 +162,7 @@ function turlar(satirlar) {
     if (ham != null) {
       const t = temizle(ham)
       if (!t) continue
-      if (SISTEM_ONEKLERI.some((p) => t.startsWith(p))) {
+      if (SISTEM_ONEKLERI.some((p) => t.startsWith(p)) || SISTEM_TAM.test(t)) {
         cari = null
         continue
       }
