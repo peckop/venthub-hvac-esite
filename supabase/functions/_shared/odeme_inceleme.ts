@@ -49,7 +49,11 @@ export async function eslesmeyenOdemeSiparisleri(
   const kimlikler = [...new Set(orderIds)].filter((id) => UUID_RE.test(id))
   for (let i = 0; i < kimlikler.length; i += PARCA) {
     const parca = kimlikler.slice(i, i + PARCA)
+    // Kaynak süzgeci (OPS-225 LOW-2): kaydı yalnız `iyzico-callback`in edge alarmı sayılır.
+    // `log-client-error` oturumlu kullanıcıya `extra` yazdırır; bugün maskesi UUID'yi bozuyor
+    // ama korunma tesadüfe dayanmasın.
     const url = `${supabaseUrl}/rest/v1/client_errors?select=extra`
+      + `&env=eq.edge&extra->>fn=eq.iyzico-callback`
       + `&extra->>code=eq.${ESLESMEYEN_ODEME_KODU}`
       + `&extra->>order_id=in.(${parca.join(',')})`
     let resp: Response

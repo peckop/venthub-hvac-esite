@@ -150,7 +150,19 @@ Deno.serve(async (req) => {
           body: JSON.stringify({ orderId: o.id })
         })
         // 5xx ya da okunamayan gövde: cevap yok sayılır (aşağıda `belirsiz`).
-        const body = (cb.ok ? await cb.json().catch(() => ({})) : {}) as { status?: string }
+        const body = (cb.ok ? await cb.json().catch(() => ({})) : {}) as {
+          status?: string
+          iyzico?: { status?: unknown; paymentStatus?: unknown } | null
+        }
+        // İyzico'nun KENDİ cevabı başarılı bir sorgu mu ve ödemeyi açıkça başarısız mı söylüyor?
+        // Callback `failure`ı İyzico'nun API hata zarfı için de döner (`status:'failure'`,
+        // `paymentStatus` yok: anahtar/imza hatası, sistem hatası). O zarf "ödeme başarısız" değil,
+        // "soramadım"dır (OPS-225 MEDIUM-1).
+        const iyzicoOdemeyiReddetti =
+          body?.iyzico?.status === 'success' &&
+          typeof body.iyzico.paymentStatus === 'string' &&
+          body.iyzico.paymentStatus !== '' &&
+          body.iyzico.paymentStatus !== 'SUCCESS'
         if (body?.status === 'success') {
           reconciled.push(o.id)
         } else if (body?.status === 'needs_review') {
@@ -168,12 +180,12 @@ Deno.serve(async (req) => {
           // Sipariş `pending` kalır ve `incelemeBekleyen` olarak RAPORLANIR — sessiz
           // bırakılmaz, çünkü insan müdahalesi gerekiyor (ödeme var, eşleşme yok).
           incelemeBekleyen.push(o.id)
-        } else if (body?.status === 'failure') {
+        } else if (body?.status === 'failure' && iyzicoOdemeyiReddetti) {
           // İyzico ödemenin başarısız olduğunu söyledi → sonlandırma ADAYI (aşağıdaki kayıt kapısından geçer).
           sonlandir = true
         } else {
-          // `pending` (callback retrieve'de ağ hatası ya da kendi hatası), 5xx ya da okunamayan
-          // gövde: ödeme durumu BİLİNMİYOR → sonlandırma yok (eskiden vardı, P2).
+          // `pending` (callback retrieve'de ağ hatası ya da kendi hatası), İyzico API hata zarfıyla
+          // gelen `failure`, 5xx ya da okunamayan gövde: ödeme durumu BİLİNMİYOR → sonlandırma yok (P2).
           belirsiz.push(o.id)
         }
       } catch {

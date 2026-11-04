@@ -306,7 +306,9 @@ describe('INV-ADMIN-SIPARIS-P11-1 · admin-update-order', () => {
 // ─────────────────────────────────────────────────────────── P2 · order-housekeeping
 
 const CALLBACK = 'https://ornek.functions.supabase.co/iyzico-callback'
-let callbackCevabi: () => Response = () => json({ status: 'failure' })
+/** İyzico'nun ödemeyi açıkça reddettiği gerçek cevap (sorgu başarılı, ödeme başarısız). */
+const ODEME_REDDI = { status: 'failure', iyzico: { status: 'success', paymentStatus: 'FAILURE' } }
+let callbackCevabi: () => Response = () => json(ODEME_REDDI)
 let mismatchKaydi: string[] = []
 let mismatchDurumu = 200
 
@@ -333,7 +335,7 @@ async function housekeepingKos(): Promise<{ http: number; json: Record<string, u
 
 describe('INV-ODEME-P2-1 · order-housekeeping ödemesi bilinmeyen/eşleşmeyen siparişi sonlandırmaz', () => {
   beforeEach(() => {
-    callbackCevabi = () => json({ status: 'failure' })
+    callbackCevabi = () => json(ODEME_REDDI)
     mismatchKaydi = []
     mismatchDurumu = 200
     yonlendirici = housekeepingYonlendirici
@@ -353,10 +355,22 @@ describe('INV-ODEME-P2-1 · order-housekeeping ödemesi bilinmeyen/eşleşmeyen 
     await housekeepingKos()
     expect(siparisPatchleri()).toHaveLength(0)
     cagrilar = []
-    callbackCevabi = () => json({ status: 'failure' }, 502)
+    callbackCevabi = () => json(ODEME_REDDI, 502)
     const r = await housekeepingKos()
     expect(siparisPatchleri()).toHaveLength(0)
     expect(r.json.belirsiz).toEqual([SIPARIS])
+  })
+
+  it.each([
+    ['İyzico API hata zarfı (status=failure, paymentStatus yok)', { status: 'failure', iyzico: { status: 'failure', errorCode: '1001' } }],
+    ['İyzico zarfı yok', { status: 'failure' }],
+    ['İyzico sorgusu başarılı ama paymentStatus boş', { status: 'failure', iyzico: { status: 'success' } }],
+  ])('OPS-225 MEDIUM-1: callback `failure` + %s → sonlandırma yok, belirsiz', async (_ad, govde) => {
+    callbackCevabi = () => json(govde)
+    const r = await housekeepingKos()
+    expect(siparisPatchleri()).toHaveLength(0)
+    expect(r.json.belirsiz).toEqual([SIPARIS])
+    expect(r.json.failed).toEqual([])
   })
 
   it('needs_review cevabı sonlandırmaz (mevcut REC-355 dalı korunur)', async () => {
@@ -396,6 +410,7 @@ describe('INV-ODEME-P2-1 · order-housekeeping ödemesi bilinmeyen/eşleşmeyen 
 
 type Guncelleme = { govde: Record<string, unknown>; filtreler: [string, unknown][] }
 let guncellemeler: Guncelleme[] = []
+let secimFiltreleri: [string, unknown][] = []
 let rpcCagrilari = 0
 
 function releaseIstemcisi() {
@@ -405,12 +420,14 @@ function releaseIstemcisi() {
       const b = {
         select() { return b },
         eq(k: string, v: unknown) { d.filtreler.push([k, v]); return b },
+        is(k: string, v: unknown) { d.filtreler.push([`${k}:is`, v]); return b },
         lt() { return b },
         limit() { return b },
         maybeSingle() { return Promise.resolve({ data: { reservation_timeout_hours: 24 }, error: null }) },
         update(g: Record<string, unknown>) { d.op = 'update'; d.govde = g; return b },
         insert() { d.op = 'insert'; return Promise.resolve({ data: null, error: null }) },
         then(coz: (v: unknown) => unknown) {
+          if (tablo === 'venthub_orders' && d.op === 'select') secimFiltreleri = [...d.filtreler]
           if (tablo === 'venthub_orders' && d.op === 'select') return Promise.resolve({ data: [{ id: SIPARIS, order_number: 'VH-1' }], error: null }).then(coz)
           if (tablo === 'venthub_orders' && d.op === 'update') {
             guncellemeler.push({ govde: d.govde, filtreler: d.filtreler })
@@ -435,6 +452,7 @@ async function releaseKos(): Promise<{ http: number; json: Record<string, unknow
 describe('INV-ODEME-P2-1 · release-expired-reservations eşleşmeyen ödemeli siparişi iptal etmez', () => {
   beforeEach(() => {
     guncellemeler = []
+    secimFiltreleri = []
     rpcCagrilari = 0
     mismatchKaydi = []
     mismatchDurumu = 200
@@ -459,6 +477,19 @@ describe('INV-ODEME-P2-1 · release-expired-reservations eşleşmeyen ödemeli s
     expect(guncellemeler).toHaveLength(1)
     expect(guncellemeler[0].govde).toMatchObject({ status: 'cancelled', payment_status: 'failed' })
     expect(guncellemeler[0].filtreler).toEqual(expect.arrayContaining([['id', SIPARIS], ['status', 'pending'], ['payment_status', 'pending']]))
+  })
+
+  it('OPS-225 MEDIUM-2: ödemesi başlamış (token’lı) sipariş seçilmez; housekeeping’in “belirsiz” beklettiği sipariş burada iptal olmaz', async () => {
+    await releaseKos()
+    expect(secimFiltreleri).toEqual(expect.arrayContaining([['payment_token:is', null], ['status', 'pending'], ['payment_status', 'pending']]))
+  })
+
+  it('kayıt sorgusu yalnız iyzico-callback edge alarmına bakar (OPS-225 LOW-2)', async () => {
+    mismatchKaydi = [SIPARIS]
+    await releaseKos()
+    const s = cagrilar.find(mismatchSorgusu)
+    expect(s?.url).toContain('env=eq.edge')
+    expect(s?.url).toContain('extra->>fn=eq.iyzico-callback')
   })
 
   it('kayıt sorgusu ölçülemezse hiçbir sipariş iptal edilmez (500)', async () => {

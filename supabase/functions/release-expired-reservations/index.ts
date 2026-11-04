@@ -87,6 +87,10 @@ Deno.serve(async (req: Request) => {
             .select('id, order_number')
             .eq('status', 'pending')
             .eq('payment_status', 'pending')
+            // Ödemesi BAŞLAMIŞ (token'lı) sipariş bu işin değil: onu `order-housekeeping` İyzico'ya
+            // sorarak kapatır. Burası sormadan iptal ettiği için, housekeeping'in "ödeme durumu
+            // bilinmiyor" deyip beklettiği siparişi 24 saatte iptal ederdi (OPS-225 MEDIUM-2).
+            .is('payment_token', null)
             .lt('created_at', timeoutDate.toISOString())
             .limit(100)
 

@@ -61,6 +61,9 @@ describe('eslesmeyenOdemeSiparisleri — PAYMENT_ORDER_MISMATCH kaydı (P2)', ()
     expect([...set]).toEqual([A])
     expect(urller[0]).toContain(`extra->>code=eq.${ESLESMEYEN_ODEME_KODU}`)
     expect(urller[0]).toContain(`extra->>order_id=in.(${A},${B})`)
+    // kaynak süzgeci: yalnız iyzico-callback'in edge alarmı kanıttır
+    expect(urller[0]).toContain('env=eq.edge')
+    expect(urller[0]).toContain('extra->>fn=eq.iyzico-callback')
   })
 
   it('istenmeyen kimliği sunucu dönse bile sayılmaz; UUID olmayan kimlik sorguya girmez', async () => {
