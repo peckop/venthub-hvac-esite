@@ -13,7 +13,7 @@ import Iyzipay from "npm:iyzipay";
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '../_shared/origins.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
-import { odemeSiparisleEslesiyorMu, type SiparisSatiri } from '../_shared/odeme_eslesme.ts'
+import { odemeSiparisleEslesiyorMu, retSiparisleEslesiyorMu, type SiparisSatiri } from '../_shared/odeme_eslesme.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import {
   BASARI_ONCESI,
@@ -380,10 +380,10 @@ Deno.serve(async (req) => {
     // ilerlettiyse koşar. İyzico'nun POST'u ile tarayıcı dönüş sayfası aynı ödemeyi iki kez bildirir;
     // ikinci çağrı kupon kullanımını ikinci kez artırmamalı.
     let gecisYapildi = false;
-    // Aynı ödemenin ikinci bildirimi: satır zaten bu ödemeyle 'paid'. Stok RPC'si ve sepet temizliği
-    // tekrar edilebilir (idempotent) olduğu için yine koşar — ilk çağrı RPC'den önce düştüyse bu çağrı
-    // tamamlar. Kupon artırımı idempotent DEĞİL, yalnız `gecisYapildi`da koşar.
-    let tekrarZararsiz = false;
+    // OPS-221 (karne P3, P5): yan etkilerin hedefi kararın verildiği satırın KENDİ kimliği. Eskiden istekteki
+    // `orderId`'ye bakılıyordu: istek yalnız `conversationId` taşıyınca satır 'paid' oluyor ama stok hiç
+    // düşmüyor, kupon hiç işlenmiyordu.
+    const hedefSiparisId = siparisSatiri?.id ? String(siparisSatiri.id) : null;
     // Ödeme gerçek, kayıt tutmuyor (iptal edilmiş siparişe ödeme ya da ikinci tahsilat): cevap needs_review.
     let incelemeGerek = false;
     const basariKarari = basariYazilabilirMi(siparisSatiri);
@@ -392,11 +392,21 @@ Deno.serve(async (req) => {
       // ⭐Sessiz kalmaz (security-reviewer bulgu 1): zararsız tekrar ile "para var, kayıt yok" ayrılır.
       const durum = yazilmayanBasari(siparisSatiri, result?.paymentId);
       if (durum.tur === 'tekrar') {
-        // Kimliksiz uç: tekrar bildirim herkes tarafından yeniden gönderilebilir. Bu yüzden tekrarda
-        // YALNIZ yarım kalmış stok düşümü onarılır (DB RPC'si idempotent); sepet temizliği ve kupon
-        // yalnız gerçek geçişte koşar (otomatik güvenlik incelemesi, 3 Kasım).
+        // ⛔OPS-221 (karne P5): tekrar bildirimde stok RPC'si ARTIK ÇAĞRILMAZ. Eskiden "yarım kalan stok
+        // düşümünü onarmak" için çağrılıyordu; ama RPC, siparişte tek bir `order_sale` hareketi görünce
+        // "already reduced" + success:true döner. Kısmi düşümde (2 kalemin 1'i yetersiz) ilk çağrının
+        // `stock_processed:false` kanıtı, kimliksiz bir tekrar POST'uyla `true`ya çevriliyordu.
+        // Yan etkiler (kupon, stok, sepet) yalnız pending→paid geçişini YAPAN çağrıda, bir kez koşar.
+        // İlk çağrı geçişten sonra stoğa varmadan düştüyse (damga hiç yok) bu sessiz kalmaz: alarm.
         const dbg = (siparisSatiri?.payment_debug ?? {}) as Record<string, unknown>;
-        tekrarZararsiz = siparisSatiri?.payment_status === 'paid' && dbg.stock_processed !== true;
+        if (siparisSatiri?.payment_status === 'paid' && !('stock_processed' in dbg)) {
+          await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+            fn: 'iyzico-callback',
+            code: 'STOCK_NOT_ATTEMPTED',
+            message: 'Siparis odendi ama stok dusumu hic denenmemis; tekrar bildirim stoga DOKUNMAZ, insan bakmali.',
+            extra: { order_id: hedefSiparisId },
+          })
+        }
         console.warn(`[iyzico-callback] ayni odemenin tekrar bildirimi; yazilmadi (${basariKarari.sebep}).`);
       } else {
         incelemeGerek = true;
@@ -423,7 +433,7 @@ Deno.serve(async (req) => {
         console.warn('[iyzico-callback] siparis okuma ile yazma arasinda ilerledi; yazilmadi (kural 11).');
       }
     }
-    if (gecisYapildi || tekrarZararsiz) {
+    if (gecisYapildi && hedefSiparisId) {
       
       // T137-VH (2026-08-20): BURADAKI ATESLE-UNUT ONAY E-POSTASI CAGRISI KALDIRILDI.
       //
@@ -444,11 +454,11 @@ Deno.serve(async (req) => {
       // Kuponu finalize et: order row'dan coupon_code'yi al, varsa usage increment ve discount hesapla (best-effort)
       // ALT-131: yalnız satırı BU çağrı ilerlettiyse — kullanım artırımı idempotent değil.
       try {
-        if (gecisYapildi && orderId) {
+        if (gecisYapildi && hedefSiparisId) {
           const su = Deno.env.get('SUPABASE_URL') || ''
           const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
           if (su && sk) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefSiparisId)}${orderTenantFilter}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
             if (oResp.ok) {
               const arr = await oResp.json().catch(()=>[])
               const row = Array.isArray(arr) ? arr[0] as { id?: string; total_amount?: number; coupon_code?: string|null; coupon_discount?: number|null } : null
@@ -473,7 +483,7 @@ Deno.serve(async (req) => {
                       if (disc > total) disc = total
                       const disc2 = Number(Number(disc).toFixed(2))
                       // Patch order with computed discount
-                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
+                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefSiparisId)}${orderTenantFilter}`, {
                         method: 'PATCH',
                         headers: { Authorization: `Bearer ${sk}`, apikey: sk, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
                         body: JSON.stringify({ coupon_discount: disc2 })
@@ -494,7 +504,7 @@ Deno.serve(async (req) => {
 
       // Process stock reduction after successful payment - Use DB RPC (idempotent)
       try {
-        if (orderId) {
+        if (hedefSiparisId) {
           // Call centralized RPC for atomic, idempotent stock reduction
           const rpcResp = await fetch(`${supabaseUrl}/rest/v1/rpc/process_order_stock_reduction`, {
             method: 'POST',
@@ -503,12 +513,12 @@ Deno.serve(async (req) => {
               'apikey': serviceRoleKey,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ p_order_id: orderId })
+            body: JSON.stringify({ p_order_id: hedefSiparisId })
           });
 
           if (rpcResp.ok) {
             const rpcJson = await rpcResp.json().catch(() => ({}));
-            _stockResult = rpcJson || { success: true, processed_count: null, order_id: orderId };
+            _stockResult = rpcJson || { success: true, processed_count: null, order_id: hedefSiparisId };
 
             // T052-VH — SAHTE DAMGA BURADAYDI.
             //
@@ -532,7 +542,7 @@ Deno.serve(async (req) => {
                   fn: 'iyzico-callback',
                   code: 'STOCK_REDUCTION_FAILED',
                   message: 'Odeme basarili ama siparis stogu dusurulemedi; envanter gercegi yansitmiyor.',
-                  extra: { order_id: orderId, rpc_result: rpcJson },
+                  extra: { order_id: hedefSiparisId, rpc_result: rpcJson },
                 });
               } catch (alarmErr) {
                 console.error('[iyzico-callback] stok alarmi yazilamadi:', alarmErr);
@@ -542,13 +552,12 @@ Deno.serve(async (req) => {
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
               // ALT-131: burası da birleştirir — önceki anahtarlar (iade defteri) ezilmez.
-              // Tekrar bildirimde (gecisYapildi=false) bu çağrının ödeme alanları (paymentId, raw) deftere
-              // GİRMEZ, yalnız stok alanları: doğrulanmamış bir ödemenin raw'ı iadeyi yanlış ödemeye yöneltir.
+              // OPS-221: bu blok yalnız geçişi yapan çağrıda koşar; tekrar bildirim deftere hiç yazmaz.
               const stokAlanlari = { stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
-              const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, gecisYapildi ? { ...debugInfo, ...stokAlanlari } : stokAlanlari);
+              const updatedDebugInfo = debugBirlestir(siparisSatiri?.payment_debug, { ...debugInfo, ...stokAlanlari });
               // `payment_status=eq.paid` koşulu: arada iade yazıldıysa (refunded/partial_refunded) eski
               // görüntüyle iade defteri ezilmez (security-reviewer bulgu 4).
-              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&payment_status=eq.paid`, {
+              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefSiparisId)}${orderTenantFilter}&payment_status=eq.paid`, {
                 method: 'PATCH',
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
@@ -562,7 +571,7 @@ Deno.serve(async (req) => {
 
             // Optional: trigger low stock alerts after RPC (best-effort, non-blocking)
             try {
-              const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=product_id,quantity`, {
+              const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${hedefSiparisId}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=product_id,quantity`, {
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
                   'apikey': serviceRoleKey
@@ -614,16 +623,11 @@ Deno.serve(async (req) => {
         const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
         if (gecisYapildi && su && sk) {
           // Fetch order row to get user_id
+          // OPS-221: hedef kararın verildiği satır. Eski `conversation_id` kolu (İyzico yanıtındaki ya da
+          // istekteki değerle) kaldırıldı: o değer tekil değil (CONV-<epoch-ms>) ve istek yansımasıdır.
           let uid: string | null = null
-          if (orderId) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&select=user_id`, {
-              headers: { Authorization: `Bearer ${sk}`, apikey: sk }
-            })
-            const arr = await oResp.json().catch(()=>[])
-            const row = Array.isArray(arr) ? arr[0] : null
-            uid = row?.user_id || null
-          } else if (result?.conversationId || conversationId) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}${orderTenantFilter}&select=user_id`, {
+          {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefSiparisId)}${orderTenantFilter}&select=user_id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
             const arr = await oResp.json().catch(()=>[])
@@ -672,8 +676,11 @@ Deno.serve(async (req) => {
       // kurbanın `orderId`'siyle POST edince kurbanın ödenmiş siparişi 'failed' oluyordu. Artık iki şart:
       // token siparişin kendi token'ı ve sipariş hâlâ 'pending'/'pending'. İkisi PATCH filtresinde de var.
       const retKarari = retYazilabilirMi(siparisSatiri, istekToken ?? token);
-      if (!retKarari.yaz) {
-        console.warn(`[iyzico-callback] odeme reddi siparise YAZILMADI (${retKarari.sebep}).`);
+      // OPS-221 (karne P1 (b)): ret de eşleşme kapısından geçer — yanıt başka siparişin kimliğini
+      // (basketId) taşıyorsa yazılmaz. Token bağı (yukarıda) ayrıca şarttır.
+      const retEslesme = retSiparisleEslesiyorMu(result, siparisSatiri);
+      if (!retKarari.yaz || !retEslesme.gecti) {
+        console.warn(`[iyzico-callback] odeme reddi siparise YAZILMADI (${retKarari.sebep ?? retEslesme.sebep}).`);
       } else {
         const r = await patchOrder({ payment_status: 'failed' }, kosulFiltresi(RET_ONCESI));
         updateOk = r.ok && r.satir > 0;
