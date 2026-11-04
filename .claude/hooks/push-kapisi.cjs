@@ -83,7 +83,7 @@ function parcala(komut) {
     const c = komut[i]
     if (tirnak) {
       if (c === tirnak) tirnak = null
-      // Çift tırnak içinde ters eğik çizgi yalnız $ ` " \ önünde kaçıştır (bash gibi); "C:\Users\..." yolu bozulmaz.
+      // Çift tırnak içinde ters eğik çizgi yalnız $ ` " \ önünde kaçıştır (bash gibi); "D:\depolar\..." yolu bozulmaz.
       else if (c === '\\' && tirnak === '"' && i + 1 < komut.length && '$`"\\'.includes(komut[i + 1])) jeton += komut[++i]
       else jeton += c
       continue
