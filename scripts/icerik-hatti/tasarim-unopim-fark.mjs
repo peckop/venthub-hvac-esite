@@ -16,13 +16,14 @@
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 
 import { dugum } from './tasarim-agac-veri.mjs'
 import { ALANLAR, bozmaUygula, eskiGoruntuler, farkHesapla } from './tasarim-unopim-fark-kurallar.mjs'
 
 const arg = (ad, varsayilan) => { const i = process.argv.indexOf(ad); return i >= 0 ? process.argv[i + 1] : varsayilan }
-const KOK = arg('--goruntu', 'C:/Users/alize/VentHub-Gorsel-Arsiv/_liste')
+const KOK = arg('--goruntu', process.env.KATALOG_GORUNTU_KOKU || join(homedir(), 'VentHub-Gorsel-Arsiv', '_liste'))
 const CIKTI = arg('--cikti', join(KOK, 'fark-raporu'))
 const ESIK = Number(arg('--eski-esik', '7'))
 const BOZMA = Boolean(process.env.BOZMA)
