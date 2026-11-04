@@ -44,7 +44,16 @@ RULES = {
     "SECRET_LEAK": {
         "description": "Supabase service_role anahtarı client koda sızıyor",
         "pattern": re.compile(r'^\+.*\b(service_role|SUPABASE_SERVICE_ROLE_KEY)\b'),
-        "severity": "BLOCKER"
+        "severity": "BLOCKER",
+        # Ortam değişkeni ADI sunucu yollarında meşrudur (Edge Function, API rotası, betik, workflow, test).
+        "skip_server_paths": True
+    },
+    "SECRET_JWT": {
+        "description": "Gerçek bir JWT/anahtar değeri (eyJ...) diff'e girmiş; yeri ne olursa olsun sır sayılır",
+        "pattern": re.compile(r'^\+.*\beyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}'),
+        "severity": "BLOCKER",
+        # .md/.json/.yml dahil her dosyada çalışır: sır değeri hangi dosyada olursa olsun sızıntıdır.
+        "all_files": True
     },
     "MOCK_DATA": {
         "description": "Mock/test verisi production koda sızıyor",
@@ -58,6 +67,9 @@ IGNORE_FLAG = "diff-ignore"
 # Taramadan hariç tutulan dosya uzantıları ve yollar
 EXCLUDED_EXTENSIONS = (".md", ".json", ".yml", ".yaml")
 EXCLUDED_PATHS = (".agent/",)
+
+# Yalnız sunucuda çalışan yollar: service_role ortam değişkeni ADI burada yanlış alarm olur.
+SERVER_PATHS = ("supabase/", "scripts/", ".scripts/", ".github/", "src/app/api/", "src/__tests__/")
 
 # --taban verilmezse sırayla denenir.
 DEFAULT_BASES = ("origin/master", "master")
@@ -147,15 +159,17 @@ def analyze_diff(diff_output: str) -> list:
                         break
             continue
 
-        # Hariç tutulan dosyayı atla
-        if skip_file:
-            continue
-
         if IGNORE_FLAG in line:
             # Satırda diff-ignore varsa kural işletilmez
             continue
 
+        server_file = bool(current_file) and current_file.startswith(SERVER_PATHS)
         for rule_id, rule_data in RULES.items():
+            # Hariç tutulan dosyada yalnız "all_files" kuralları (sır değeri) çalışır.
+            if skip_file and not rule_data.get("all_files"):
+                continue
+            if server_file and rule_data.get("skip_server_paths"):
+                continue
             if rule_data["pattern"].search(line):
                 violations.append({
                     "file": current_file,
