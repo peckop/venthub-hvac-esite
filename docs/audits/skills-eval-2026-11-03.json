@@ -1,0 +1,599 @@
+{
+  "damga": "2026-11-03T12:20:03.619Z",
+  "model": "claude-haiku-4-5-20251001",
+  "arkaUc": "cli",
+  "kuru": false,
+  "ornek": null,
+  "agaclar": [
+    {
+      "agac": ".claude/skills",
+      "skill": 73,
+      "sinavli": 29,
+      "sinavsiz": [
+        "agy-orchestrate",
+        "api-design",
+        "bug-hunter",
+        "chimera",
+        "code-review",
+        "codebase-navigation",
+        "create-migration",
+        "data-governance",
+        "database-migrations",
+        "debugging",
+        "geo-fundamentals",
+        "git-flow",
+        "graphify",
+        "incremental-implementation",
+        "llm-council",
+        "maestro",
+        "mnemosyne",
+        "multi-agent",
+        "mutasyon-testi",
+        "node-modern",
+        "observability",
+        "office-hours",
+        "payments-webhooks",
+        "prd-complexity-audit",
+        "prompt-engineering",
+        "qa",
+        "react-modern",
+        "refactor-planner",
+        "rehber-yayin",
+        "research-web",
+        "sdd",
+        "security-scanner",
+        "task-observer",
+        "tech-stack",
+        "testing",
+        "typescript-strict",
+        "venthub-20-eksen-denetimi",
+        "verify-before-done",
+        "video-kaynak",
+        "web-performance",
+        "web-platform-baseline",
+        "write-seo-geo-content",
+        "wrongstack-kanban",
+        "wrongstack-mailbox-mcp"
+      ]
+    }
+  ],
+  "istek": 29,
+  "sonuclar": [
+    {
+      "ad": "calisma-kopyasi-sil",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "ce-uygunluk-dosyasi",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "codegraph",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "diff-review",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "fallow",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "find-skills",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "git-commit",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "i18n-conventions",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "investigate",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "notebook-navigator",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "notebooklm-sync",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "orion-cli",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "plan-challenger",
+      "durum": "DUSTU",
+      "tetik": {
+        "dogru": 10,
+        "toplam": 12,
+        "oran": 0.833
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 2,
+      "dogru": 18,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "skills-creator",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 16,
+        "toplam": 17,
+        "oran": 0.941
+      },
+      "tetiklemez": {
+        "dogru": 11,
+        "toplam": 11,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 27,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "supabase",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "supabase-security",
+      "durum": "DUSTU",
+      "tetik": {
+        "dogru": 8,
+        "toplam": 12,
+        "oran": 0.667
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 4,
+      "dogru": 16,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "threejs-webgl-performance",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "to-issues",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "to-prd",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "typography",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "ui-ux-pro-max",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "venthub-architecture",
+      "durum": "DUSTU",
+      "tetik": {
+        "dogru": 10,
+        "toplam": 12,
+        "oran": 0.833
+      },
+      "tetiklemez": {
+        "dogru": 10,
+        "toplam": 10,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 2,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "venthub-auditor",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "venthub-enterprise-audit",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "venthub-global-rontgen",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "venthub-tasarim-dili",
+      "durum": "DUSTU",
+      "tetik": {
+        "dogru": 10,
+        "toplam": 12,
+        "oran": 0.833
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 2,
+      "dogru": 18,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "vercel-composition-patterns",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "vercel-react-best-practices",
+      "durum": "DUSTU",
+      "tetik": {
+        "dogru": 10,
+        "toplam": 12,
+        "oran": 0.833
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 2,
+      "dogru": 18,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "web-design-guidelines",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    }
+  ],
+  "ozet": {
+    "toplam": 29,
+    "gecti": 24,
+    "dustu": 5,
+    "olcemedi": 0,
+    "cikis": 1
+  },
+  "sureSaniye": 1031,
+  "maliyet": {
+    "girisJetonu": null,
+    "cikisJetonu": null,
+    "usd": null,
+    "not": "CLI arka ucu jeton kullanimini bildirmez -> OLCULEMEDI (abonelikten gider)"
+  }
+}
