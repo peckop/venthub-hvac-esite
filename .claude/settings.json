@@ -167,6 +167,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\"",
             "statusMessage": "agir-komut-kilidi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/push-kapisi.cjs\"",
+            "statusMessage": "push-kapisi",
+            "timeout": 15
           }
         ]
       },
