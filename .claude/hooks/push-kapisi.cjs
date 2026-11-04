@@ -43,12 +43,21 @@ function asilKomut(t) {
   while (i < t.length) {
     if (ATAMA.test(t[i])) i++
     else if (SARMALAYICI.has(komutAdi(t[i]))) {
+      // Sarmalayıcıların bayrak sözdizimi (timeout SÜRE, nice -n N, sudo -u KULLANICI ...) tek tek modellenmez:
+      // sarmalayıcıdan sonra ilk `git` tokenına atlanır (yoksa asıl komut sarmalayıcıdan sonraki ilk bayraksız token).
+      const sonraki = t.findIndex((x, k) => k > i && komutAdi(x) === 'git')
+      if (sonraki >= 0) return sonraki
       i++
       while (i < t.length && t[i].startsWith('-')) i++
     } else break
   }
   return i < t.length ? i : -1
 }
+
+/** Git davranışını ortamdan değiştiren değişkenler (inline atama ya da export): push varken fail-closed. */
+const GIT_ORTAM = /^(?:export\s+)?GIT_(?:CONFIG_PARAMETERS|CONFIG_COUNT|CONFIG_KEY_\d+|CONFIG_VALUE_\d+|CONFIG_GLOBAL|CONFIG_SYSTEM|DIR|EXEC_PATH|NAMESPACE|WORK_TREE|SSH_COMMAND)=/
+/** `-c` ile birlikte serbest olan salt-okuma alt komutları; diğerlerinde (push, alias olabilecek bilinmeyenler) reddedilir. */
+const OKUMA_ALT_KOMUTLARI = new Set(['status', 'log', 'diff', 'show', 'branch', 'rev-parse', 'rev-list', 'ls-files', 'ls-remote', 'config', 'remote', 'describe', 'blame', 'grep', 'cat-file', 'fetch'])
 
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut) {
@@ -116,9 +125,15 @@ function pushBul(t) {
       yollar.push(t[i + 1])
       i += 2
     } else if (t[i] === '-c' || /^--(git-dir|work-tree|namespace|exec-path|config-env)(=|$)/.test(t[i]) || /^-c./.test(t[i])) {
-      // push alt komutuna varıp varmadığına bakmadan, global yapılandırma/hedef değiştiren seçenek push öncesindeyse yasak
-      const kalan = t.slice(i + 1)
-      if (kalan.some((x) => x.includes('push'))) return { yasak: `git global seçeneği ${t[i]}: push hedefini/yapılandırmasını (remote.*, alias.*, url.*) değiştirebilir; seçeneksiz yaz` }
+      // Fail-closed: global yapılandırma/hedef seçeneği varsa alt komut yalnız bilinen salt-okuma komutlarından olabilir
+      // (alias.x=push ile `git -c alias.x=push x` ya da kayıtlı alias push'u gizleyebilir). Seçeneğin değeri atlanır.
+      const degerli = t[i] === '-c' || /^--(git-dir|work-tree|namespace|exec-path|config-env)$/.test(t[i])
+      let k = i + (degerli ? 2 : 1)
+      while (k < t.length && t[k].startsWith('-') && t[k] !== '-C') k += t[k] === '-c' ? 2 : 1
+      const alt = t[k]
+      if (alt === undefined || !OKUMA_ALT_KOMUTLARI.has(alt)) {
+        return { yasak: `git global seçeneği ${t[i]}: alt komut '${alt || '?'}' push/alias olabilir; seçeneksiz yaz (yalnız salt-okuma komutlarıyla serbest)` }
+      }
       return null
     } else if (/^-/.test(t[i])) i++
     else break
@@ -132,14 +147,29 @@ function pushBul(t) {
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
  */
 function degerlendir(komut, o) {
-  for (const t of parcala(String(komut || ''))) {
+  const parcalar = parcala(String(komut || ''))
+  // Tırnaklı yük da tek token olur ("git push origin master"): git sözcüğü token içinde de aranır.
+  const gitGecer = (x) => komutAdi(x) === 'git' || /(^|[\s/\\])git(\.exe)?(\s|$)/i.test(x)
+  const gitPushVar = parcalar.some((t) => t.some(gitGecer) && t.some((x) => x.includes('push')))
+  // Ortamdan git yapılandırması (inline ya da export): komutta bir git push varken fail-closed.
+  if (gitPushVar && parcalar.some((t) => t.some((x, k) => GIT_ORTAM.test(x) || (komutAdi(x) === 'export' && GIT_ORTAM.test('export ' + (t[k + 1] || '')))))) {
+    return 'GIT_CONFIG_*/GIT_DIR/GIT_EXEC_PATH/GIT_NAMESPACE/GIT_SSH_COMMAND ortam değişkeni push hedefini/yapılandırmasını değiştirebilir; değişkensiz yaz'
+  }
+  for (const t of parcalar) {
+    // xargs ve env -S: argümanlar statik görülemez → git ve push birlikte geçiyorsa fail-closed
+    const tGitPush = t.some(gitGecer) && t.some((x) => x.includes('push'))
+    if (tGitPush && t.some((x) => komutAdi(x) === 'xargs')) return 'xargs ile git push: argümanlar önceden bilinemez; push\'u doğrudan yaz'
+    if (tGitPush && t.some((x) => x === '-S' || x === '--split-string' || /^-S./.test(x))) return 'env -S ile git push: komut dizgesi önceden bilinemez; push\'u doğrudan yaz'
     // bash -c "..." / eval "..." / pwsh -Command "..." / cmd /c "..." içini de tara
     const ilk = asilKomut(t)
     const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
     if (KABUKLAR.has(ad)) {
+      if (t.some((x, k) => k > ilk && /^-(e|ec|enc|encodedcommand)$/i.test(x))) return 'kodlanmış kabuk komutu (-EncodedCommand): içerik denetlenemez; düz yaz'
       const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))
       if (ci >= 0 && t[ci + 1]) {
-        const ic = degerlendir(t.slice(ci + 1).join(' '), o)
+        const yuk = t.slice(ci + 1).join(' ')
+        if (/git/i.test(yuk) && /push/i.test(yuk) && /[$%^`]/.test(yuk)) return 'kabuk komutunda genişletme ($, %, ^) git push ile birlikte: hedef önceden bilinemez; dal adını açık yaz'
+        const ic = degerlendir(yuk, o)
         if (ic) return ic
       }
     } else if (ad === 'eval') {
