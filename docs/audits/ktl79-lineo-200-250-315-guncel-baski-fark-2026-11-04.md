@@ -1,6 +1,8 @@
 # KTL-79 — Lineo 200 / 250 / 315 (VRT-17180/81/82): canlı ≠ üreticinin güncel baskısı, 4 Kasım 2026
 
-Yöneten cetvel: `docs/standards/catalog-ingestion-standard.md` §6.3 (önce kaynak dizini), `product-schema-standard.md`. KATALOG-kurallar 1 (baskı tazeliği), 3 (aynı sayı metinde), 4 (belirsiz sütun tahminle yazılmaz). Canlıya yazılmadı; yazım paketi: `scripts/db/product-data/ktl79-lineo-200-250-315-guncel-baski.sql`.
+**Canlıya yazılmadı, yeni site verisine kaynak.** Karar (4 Kasım, OPS aktarımı, karar 412): yeni sitenin verisi sıfırdan hazırlanıyor; eski sitede güncel değerin durmasına gerek yok, bu yüzden yazım paketi hazırlandı ama PR'dan çıkarıldı. Bu belge yeni site Lineo (17180/81/82) verisinin kaynağıdır: değerler "yazılacak değer" sütununu (güncel baskı) esas alır.
+
+Yöneten cetvel: `docs/standards/catalog-ingestion-standard.md` §6.3 (önce kaynak dizini), `product-schema-standard.md`. KATALOG-kurallar 1 (baskı tazeliği), 3 (aynı sayı metinde), 4 (belirsiz sütun tahminle yazılmaz).
 
 ## Kök
 
