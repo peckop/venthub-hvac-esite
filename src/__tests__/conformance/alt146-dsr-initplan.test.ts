@@ -42,8 +42,11 @@ const yorumsuz = (s: string): string => s.replace(/--[^\n]*/g, '')
  * DO blogu icinde execute ile kurulan dinamik politika (bu depoda yok).
  */
 function politikaIfadeleri(sql: string): string {
-  return yorumsuz(sql)
-    .replace(/\$([a-z_]*)\$[\s\S]*?\$\1\$/gi, '')
+  // Tek geciste soldan saga okunur (sozcuk cozumleyici gibi): dollar-quote govdesi (etiket rakam icerebilir: $f1$),
+  // tek tirnakli literal ('a;b' ya da 'a--b' ifadeyi bolmesin) ve -- yorumu (Turkce yorumdaki kesme isareti literal
+  // sanilmasin). Hangisi once baslarsa o kazanir; ayri ayri sirali replace bu ikisinden birini yanlis yutar.
+  return sql
+    .replace(/\$(\w*)\$[\s\S]*?\$\1\$|'(?:[^']|'')*'|--[^\n]*/g, (m) => (m.startsWith("'") ? "''" : ''))
     .split(';')
     .filter((s) => /^\s*(?:create|alter)\s+policy\b/i.test(s))
     .join(';')
@@ -107,6 +110,15 @@ describe('INV-RLS-INITPLAN-2 — auth.<fn>() alt sorguda tek başına (ALT-146)'
       )
       expect(bozuk).not.toBe(asil)
       expect(initplanIhlalleri(bozuk).join('\n')).toMatch(/tek başına olmayan/)
+    })
+
+    it("SABOTAJ: politika literalinde ';' ya da '--' çıplak çağrıyı gizlemez; rakamlı dollar etiketi soyulur", () => {
+      const noktali = "alter policy p on public.t with check (x = 'a;b' and user_id = auth.uid());"
+      expect(initplanIhlalleri(noktali).join('\n')).toMatch(/tek başına olmayan/)
+      const tireli = "alter policy p on public.t with check (x = 'a--b' and user_id = auth.uid());"
+      expect(initplanIhlalleri(tireli).join('\n')).toMatch(/tek başına olmayan/)
+      const rakamli = 'create function public.f() returns uuid language sql as $f1$ select auth.uid() $f1$;'
+      expect(initplanIhlalleri(rakamli)).toEqual([])
     })
 
     it('fonksiyon gövdesindeki çıplak auth.uid() bu kapının konusu değil, politikadaki çıplak çağrı kırmızı kalır', () => {
