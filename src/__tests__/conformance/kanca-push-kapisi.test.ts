@@ -156,6 +156,22 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
       'echo "git push origin master" | sh',
       'bash <<< "git push origin master"',
     ]) expect(ret(k), k).not.toBeNull()
+    // güvenlik incelemesi (#2252, 2. tur): stdin kabuğunun diğer biçimleri ve cmd yükünde # yorum farkı
+    for (const k of [
+      'echo "git push origin master" | bash -s',
+      'echo "git push origin master" | bash -',
+      'echo "git push origin master" | bash /dev/stdin',
+      'echo "git push origin master" | bash -c "$(cat)"',
+      'echo "git push origin master" | sh -c "eval \\"$(cat)\\""',
+      'cmd /c "echo x # & git push origin master"',
+      'pwsh -Command "echo x # ; git push origin master"',
+      'git $(echo push) origin master',
+      '$(echo git) push origin master',
+      'echo "git push origin master" | ksh',
+      'bash < /dev/null; echo "git push origin master" | bash < plan.txt',
+    ]) expect(ret(k), k).not.toBeNull()
+    expect(ret('git commit -m "$(cat msg.txt)"')).toBeNull()
+    expect(ret('which git')).toBeNull()
     // yanlış pozitif olmamalı: push olmayan komutta $ ve ters tırnak, yorum ve -o değeri
     expect(ret('git commit -m "fix `git push` $x"')).toBeNull()
     expect(ret('git push origin feat-x # master')).toBeNull()

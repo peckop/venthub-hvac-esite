@@ -32,7 +32,9 @@ const YASAK_BAYRAK = new Set([
 ])
 const IZINLI_BAYRAK = new Set(['-u', '--set-upstream', '-n', '--dry-run', '--no-verify', '--verify', '-q', '--quiet', '-v', '--verbose', '--tags', '--no-tags', '--follow-tags', '--progress', '--porcelain'])
 const SARMALAYICI = new Set(['command', 'exec', 'nohup', 'time', 'builtin', 'env', 'sudo', 'nice', 'ionice', 'xargs', 'setsid', 'stdbuf', 'timeout'])
-const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash', 'pwsh', 'powershell', 'cmd'])
+const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash', 'ksh', 'fish', 'busybox', 'pwsh', 'powershell', 'cmd'])
+/** `#` yalnız bu kabuklarda (ve üst düzeyde) yorumdur; pwsh/cmd yüklerinde yorum atlama kapalı (gizlenen komut kalmasın). */
+const YORUMLU_KABUK = new Set(['bash', 'sh', 'zsh', 'dash', 'ksh', 'fish', 'busybox'])
 const ATAMA = /^[A-Za-z_][A-Za-z0-9_]*=/
 /** UNC (\\sunucu\paylaşım), // ağ yolu ve \\?\ \\.\ aygıt önekleri: kanca bunlara dokunmaz (SMB/dosya sistemi erişimi tetiklenmesin). */
 const AG_YOLU = (y) => /^[\\/]{2}/.test(String(y))
@@ -63,7 +65,7 @@ const GIT_ORTAM = /^(?:export\s+)?GIT_(?:CONFIG_PARAMETERS|CONFIG_COUNT|CONFIG_K
 const ZARARSIZ_ANAHTAR = /^(?:core\.quotepath=|color\.[a-z.]+=|advice\.[a-z.]+=|core\.pager=cat$|user\.(?:name|email)=|log\.[a-z.]+=|diff\.renames=)/i
 
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
-function parcala(komut) {
+function parcala(komut, yorumAtla = true) {
   const parcalar = []
   let tokenlar = []
   let jeton = ''
@@ -94,7 +96,7 @@ function parcala(komut) {
     } else if (c === '\\' && i + 1 < komut.length) {
       jeton += komut[++i]
       jetonVar = true
-    } else if (c === '#' && !jetonVar) {
+    } else if (c === '#' && !jetonVar && yorumAtla) {
       // Satır başı/boşluk sonrası # yorumdur (bash gibi): satır sonuna kadar atlanır; dal adı içindeki # (feat#1) etkilenmez.
       while (i + 1 < komut.length && komut[i + 1] !== '\n') i++
     } else if (c === ' ' || c === '\t') jetonuKapat()
@@ -122,7 +124,7 @@ const hedefRefsDisi = (h) => /^refs\//.test(h) && !/^refs\/heads\//.test(h)
  * Baştaki atamalar/sarmalayıcılar atlanır. git'in global seçeneklerinden yalnız -C (art arda çözülür) serbest;
  * -c, --git-dir, --work-tree, --namespace, --exec-path, --config-env push hedefini ya da kancayı değiştirebilir → reddedilir.
  */
-function pushBul(t) {
+function pushBul(t, genisletme = false) {
   let i = asilKomut(t)
   if (i < 0 || komutAdi(t[i]) !== 'git') return null
   i++
@@ -144,6 +146,8 @@ function pushBul(t) {
     } else if (/^-/.test(t[i])) i++
     else break
   }
+  // Alt komut yerine koyma ile gizlenmiş olabilir (`git $(echo push) origin master`): ayrıştırıcı `$(`'de parçayı böler, alt komut düşer.
+  if (genisletme && (t[i] === undefined || /[$`]/.test(t[i]))) return { yasak: 'git alt komutu genişletmeyle belirleniyor ($(…), `…`): push gizlenebilir; alt komutu açık yaz' }
   if (t[i] !== 'push') return null
   return { c: yollar, args: t.slice(i + 1) }
 }
@@ -155,7 +159,7 @@ function pushBul(t) {
 function degerlendir(komut, o) {
   // UNC/ağ/aygıt yolu: ayrıştırıcı ters eğik çizgileri kaçış sayıp yolu bozabileceği için HAM metinde aranır (-C ve cd hedefi).
   if (/(?:\s-C\s*|\bcd\s+)(?:["']*)[\\/]{2}/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
-  const parcalar = parcala(String(komut || ''))
+  const parcalar = parcala(String(komut || ''), !o.yorumYok)
   // Tırnaklı yük da tek token olur ("git push origin master"): git sözcüğü token içinde de aranır.
   const gitGecer = (x) => komutAdi(x) === 'git' || /(^|[\s/\\])git(\.exe)?(\s|$)/i.test(x)
   const gitPushVar = parcalar.some((t) => t.some(gitGecer) && t.some((x) => x.includes('push')))
@@ -167,7 +171,12 @@ function degerlendir(komut, o) {
   // -C yolları X'e göre çözülür. SINIR: alt kabuk `( cd X ... )` kapsamı ayrılmaz (cd sonraki parçalara sızar, konservatif);
   // `cd` argümansız ya da `cd -` ise klasör değişmedi sayılır.
   let cwd = o.cwd
+  // Tek tırnak dışında komut yerine koyma var mı ($(…) ya da ters tırnak): alt komut/komut adı gizlenebilir.
+  const genisletme = /\$\(|`/.test(String(komut || '').replace(/'[^']*'/g, ''))
   for (const t of parcalar) {
+    // Komut adı genişletmeyle belirleniyorsa (`$(echo git) push ...`, `$G push ...`) ve komutta push geçiyorsa fail-closed.
+    const ilkAd = asilKomut(t)
+    if (ilkAd >= 0 && /[$`]/.test(t[ilkAd]) && /\bpush\b/.test(String(komut || ''))) return 'komut adı genişletmeyle belirleniyor ($…) ve komutta push geçiyor: git push gizlenebilir; komutu açık yaz'
     // xargs ve env -S: argümanlar statik görülemez → git ve push birlikte geçiyorsa fail-closed
     const tGitPush = t.some(gitGecer) && t.some((x) => x.includes('push'))
     if (tGitPush && t.some((x) => komutAdi(x) === 'xargs')) return 'xargs ile git push: argümanlar önceden bilinemez; push\'u doğrudan yaz'
@@ -185,13 +194,21 @@ function degerlendir(komut, o) {
       if (t.some((x, k) => k > ilk && /^-(e|ec|enc|encodedcommand)$/i.test(x))) return 'kodlanmış kabuk komutu (-EncodedCommand): içerik denetlenemez; düz yaz'
       const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))
       // stdin'den çalışan kabuk (`... | bash`, `bash <<< "..."`): komut metni tırnaklı yük olarak başka parçada durur, içeriği değerlendirilemez.
-      if (ci < 0 && gitPushVar && (t.some((x) => x.startsWith('<<<')) || t.slice(ilk + 1).every((x) => x.startsWith('-')))) {
-        return 'stdin\'den çalışan kabuk (| bash, <<<) ile git push: komut metni denetlenemez; push\'u doğrudan yaz'
+      // Stdin göstergeleri: argümansız, -s, tek `-`, /dev/stdin, /proc/self/fd/0, <<< (kabuk betik dosyası verirse yalnız o dosya, denetlenebilir değil ama stdin değil).
+      const kabukArg = t.slice(ilk + 1)
+      const stdinKabuk = t.some((x) => x.startsWith('<<<') || x === '<' || /^<[^<]/.test(x)) || kabukArg.every((x) => x.startsWith('-')) || kabukArg.some((x) => x === '-s' || x === '-' || /^\/(dev\/stdin|proc\/self\/fd\/0|dev\/fd\/0)$/.test(x))
+      if (ci < 0 && gitPushVar && stdinKabuk) {
+        return 'stdin\'den çalışan kabuk (| bash, <<<, -s, /dev/stdin) ile git push: komut metni denetlenemez; push\'u doğrudan yaz'
       }
       if (ci >= 0 && t[ci + 1]) {
         const yuk = t.slice(ci + 1).join(' ')
+        // Yük başka yerden komut okuyor/üretiyorsa ($(…), `…`, eval, stdin) ve komutta git push varsa içerik görülemez → fail-closed.
+        if (gitPushVar && /\$\(|`|\beval\b|\/dev\/stdin|\/fd\/0|\bread\b/.test(yuk) && !(/git/i.test(yuk) && /push/i.test(yuk))) {
+          return 'kabuk -c yükü komut üretiyor/okuyor ($(…), `…`, eval, stdin) ve komutta git push var: içerik denetlenemez; push\'u doğrudan yaz'
+        }
         if (/git/i.test(yuk) && /push/i.test(yuk) && /[$%^`]/.test(yuk)) return 'kabuk komutunda genişletme ($, %, ^) git push ile birlikte: hedef önceden bilinemez; dal adını açık yaz'
-        const ic = degerlendir(yuk, oo)
+        // cmd'de # yorum değildir: yük içinde yorum atlama kapalı (yoksa `echo x # & git push origin master` gizlenirdi).
+        const ic = degerlendir(yuk, YORUMLU_KABUK.has(ad) ? oo : { ...oo, yorumYok: true })
         if (ic) return ic
       }
     } else if (ad === 'eval') {
@@ -202,7 +219,7 @@ function degerlendir(komut, o) {
     // hiçbiri master/main'e, force ile ya da dışarıya push yapmamalı.
     for (let k = 0; k < t.length; k++) {
       if (komutAdi(t[k]) !== 'git') continue
-      const p = pushBul(t.slice(k))
+      const p = pushBul(t.slice(k), genisletme)
       if (!p) continue
       if (p.yasak) return p.yasak
       // Ters tırnaklı komut yerine koyma (`echo master`) ayrıştırıcıda parçayı böler; push argümanı sessizce düşer → fail-closed.
