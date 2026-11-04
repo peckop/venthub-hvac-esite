@@ -15,7 +15,7 @@ paths:
 Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri `scripts/belge/rol-is-kurallari.json`); elle düzenleme. Yukarıdaki yollardaki dosyaya dokununca yüklenir. Gerekçeli tam metin ve olaylar: `docs/roller/ARAC-kurallar.md` "Departmana özgü iş kuralları"; ders listesi aynı dosyada "Aynı ders ikinci kez".
 
 1. Kapı ve kanca testi sabotajla doğrulanır. Yeni kapının testinde kapıyı bozan en az bir sabotaj kolu bulunur; sabotajsız yeşil kanıt sayılmaz.
-2. Kanca, ayar ve scripts/board değişikliği OPS tam fark okumadan birleşmez.
+2. Kanca, ayar ve scripts/board değişikliği bağımsız denetçi okumadan birleşmez.
 3. Yeni kanca varsayılan olarak salt-okuma, fail-open ve çıktı tavanlıdır; vanası olur.
 4. Envanter satırı dosyayla aynı PR'da gelir ve satırı PR sahibi yazar; ARAÇ okur.
 5. Araç betiği (`--yaz` gibi) başka şeridin ağacında envanter ya da ortak dosya yazmaz.
