@@ -56,8 +56,8 @@ function asilKomut(t) {
 
 /** Git davranışını ortamdan değiştiren değişkenler (inline atama ya da export): push varken fail-closed. */
 const GIT_ORTAM = /^(?:export\s+)?GIT_(?:CONFIG_PARAMETERS|CONFIG_COUNT|CONFIG_KEY_\d+|CONFIG_VALUE_\d+|CONFIG_GLOBAL|CONFIG_SYSTEM|DIR|EXEC_PATH|NAMESPACE|WORK_TREE|SSH_COMMAND)=/
-/** `-c` ile birlikte serbest olan salt-okuma alt komutları; diğerlerinde (push, alias olabilecek bilinmeyenler) reddedilir. */
-const OKUMA_ALT_KOMUTLARI = new Set(['status', 'log', 'diff', 'show', 'branch', 'rev-parse', 'rev-list', 'ls-files', 'ls-remote', 'config', 'remote', 'describe', 'blame', 'grep', 'cat-file', 'fetch'])
+/** `-c anahtar=değer` için tek serbest küme: görünüm ve kimlik adı. core.pager yalnız `cat` (başka pager komut çalıştırır). */
+const ZARARSIZ_ANAHTAR = /^(?:core\.quotepath=|color\.[a-z.]+=|advice\.[a-z.]+=|core\.pager=cat$|user\.(?:name|email)=|log\.[a-z.]+=|diff\.renames=)/i
 
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut) {
@@ -124,17 +124,16 @@ function pushBul(t) {
     if (t[i] === '-C' && i + 1 < t.length) {
       yollar.push(t[i + 1])
       i += 2
+    } else if (t[i] === '-c' && i + 1 < t.length && ZARARSIZ_ANAHTAR.test(t[i + 1])) {
+      // Yalnız zararsız (görünüm/ad) anahtarlar serbest; komut çalıştıran ya da hedef/alias değiştiren anahtar aşağıda reddedilir.
+      i += 2
     } else if (t[i] === '-c' || /^--(git-dir|work-tree|namespace|exec-path|config-env)(=|$)/.test(t[i]) || /^-c./.test(t[i])) {
-      // Fail-closed: global yapılandırma/hedef seçeneği varsa alt komut yalnız bilinen salt-okuma komutlarından olabilir
-      // (alias.x=push ile `git -c alias.x=push x` ya da kayıtlı alias push'u gizleyebilir). Seçeneğin değeri atlanır.
+      // Fail-closed: zararsız listede olmayan yapılandırma/hedef seçeneği (core.fsmonitor, core.sshCommand, alias.*, remote.*,
+      // credential.helper, core.hooksPath ...) komut çalıştırabilir ya da push'u gizleyebilir → reddedilir. Alt komut ne olursa olsun.
       const degerli = t[i] === '-c' || /^--(git-dir|work-tree|namespace|exec-path|config-env)$/.test(t[i])
       let k = i + (degerli ? 2 : 1)
       while (k < t.length && t[k].startsWith('-') && t[k] !== '-C') k += t[k] === '-c' ? 2 : 1
-      const alt = t[k]
-      if (alt === undefined || !OKUMA_ALT_KOMUTLARI.has(alt)) {
-        return { yasak: `git global seçeneği ${t[i]}: alt komut '${alt || '?'}' push/alias olabilir; seçeneksiz yaz (yalnız salt-okuma komutlarıyla serbest)` }
-      }
-      return null
+      return { yasak: `git global seçeneği ${t[i]}${degerli && t[i + 1] ? ' ' + t[i + 1] : ''}: komut çalıştırabilir ya da push hedefini/alias'ı gizleyebilir; seçeneksiz yaz (serbest: core.quotepath, color.*, advice.*, core.pager=cat, user.name/email)` }
     } else if (/^-/.test(t[i])) i++
     else break
   }
@@ -176,11 +175,16 @@ function degerlendir(komut, o) {
       const ic = degerlendir(t.slice(ilk + 1).join(' '), o)
       if (ic) return ic
     }
-    const p = pushBul(t)
-    if (!p) continue
-    if (p.yasak) return p.yasak
-    const neden = pushDegerlendir(p, o)
-    if (neden) return neden
+    // Fail-closed: parçadaki HER `git` tokeni aday komut başlangıcıdır (sarmalayıcıların bayrak sözdizimi modellenmez);
+    // hiçbiri master/main'e, force ile ya da dışarıya push yapmamalı.
+    for (let k = 0; k < t.length; k++) {
+      if (komutAdi(t[k]) !== 'git') continue
+      const p = pushBul(t.slice(k))
+      if (!p) continue
+      if (p.yasak) return p.yasak
+      const neden = pushDegerlendir(p, o)
+      if (neden) return neden
+    }
   }
   return null
 }
