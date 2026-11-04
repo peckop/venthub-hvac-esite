@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'path';
 import crypto from 'crypto';
 import pg from 'pg';
+import { pgTls } from './db/pg-tls.cjs';
 
 const { Client } = pg;
 
@@ -131,9 +132,7 @@ async function main() {
         host: config.host,
         port: config.port,
         database: config.database,
-        ssl: {
-          rejectUnauthorized: false
-        }
+        ssl: pgTls()
       });
       await client.connect();
       connected = true;

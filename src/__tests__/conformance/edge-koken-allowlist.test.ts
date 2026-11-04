@@ -22,7 +22,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+
+import { getCorsHeaders } from '../../../supabase/functions/_shared/cors'
 
 const KOK = path.resolve(__dirname, '../../..')
 const CORS_YOLU = path.join(KOK, 'supabase/functions/_shared/cors.ts')
@@ -108,10 +110,12 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
   })
 
   describe('AYIRT EDICI CIFT — kabul edilenler', () => {
+    // C5 (2026-11-04): Vercel API'den ölçülen gerçek biçimler (son 20 dağıtım) + dal takma adı.
     const kabul = [
-      'https://venthub-hvac-esite.vercel.app',
       'https://venthub-hvac-esite-1fk7v482n-peckops-projects.vercel.app',
       'https://venthub-hvac-esite-m8cog5tbe-peckops-projects.vercel.app',
+      'https://venthub-hvac-esite-2frzpxoyx-peckops-projects.vercel.app',
+      'https://venthub-hvac-esite-git-claude-ornek-dal-peckops-projects.vercel.app',
     ]
     it.each(kabul)('bizim onizlememiz KABUL: %s', (koken) => {
       expect(kalibiCikar(kaynak).test(koken)).toBe(true)
@@ -131,6 +135,11 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
       // Alt alan adi bizim degil.
       'https://evil.venthub-hvac-esite.vercel.app',
       'https://venthub.com.tr.evil.example',
+      // C5: serbest kuyruklu ön ek — başka hesabın `venthub-hvac-esite-x` projesi.
+      'https://venthub-hvac-esite-x.vercel.app',
+      'https://venthub-hvac-esite-1fk7v482n-evilteam.vercel.app',
+      'https://venthub-hvac-esite-1fk7v482n-peckops-projects-evil.vercel.app',
+      'https://venthub-hvac-esite-peckops-projects.vercel.app',
     ]
     it.each(red)('yabanci koken REDDEDILIR: %s', (koken) => {
       expect(kalibiCikar(kaynak).test(koken)).toBe(false)
@@ -142,8 +151,54 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
     expect(kaynak).toContain('https://www.venthub.com.tr')
   })
 
-  it('yerel gelistirme dali DURMALI', () => {
-    expect(kaynak).toMatch(/startsWith\(\s*['"]http:\/\/localhost:['"]\s*\)/)
+  /**
+   * C5 (güvenlik karnesi 2026-11): localhost yalnız YEREL edge'de ya da bilinçli açma
+   * bayrağıyla yansıtılır. Kol davranışı ölçer: gerçek getCorsHeaders, sahte Deno.env.
+   */
+  describe('C5 — localhost yalniz yerel calisma zamaninda', () => {
+    type DenoSahte = { env: { get(k: string): string | undefined } }
+    const g = globalThis as { Deno?: DenoSahte }
+    const onceki = g.Deno
+    afterEach(() => {
+      g.Deno = onceki
+    })
+    function acao(origin: string, env: Record<string, string>): string | null {
+      g.Deno = { env: { get: (k: string) => env[k] } }
+      const req = new Request('https://x.supabase.co/functions/v1/f', { headers: { Origin: origin } })
+      return getCorsHeaders(req)['Access-Control-Allow-Origin']
+    }
+    const PROD = { SUPABASE_URL: 'https://abcdefghijklmnop.supabase.co' }
+
+    it('prod (barindirilan) edge: localhost YANSITILMAZ, yedek adrese duser', () => {
+      expect(acao('http://localhost:3000', PROD)).toBe('https://venthub-hvac-esite.vercel.app')
+    })
+    it.each(['http://kong:8000', 'http://127.0.0.1:54321', 'http://localhost:54321'])(
+      'yerel edge (SUPABASE_URL=%s): localhost yansitilir',
+      (url) => {
+        expect(acao('http://localhost:3000', { SUPABASE_URL: url })).toBe('http://localhost:3000')
+      },
+    )
+    it('bilincli acma: EDGE_CORS_LOCALHOST=1 yalniz tam "1"', () => {
+      expect(acao('http://localhost:3000', { ...PROD, EDGE_CORS_LOCALHOST: '1' })).toBe('http://localhost:3000')
+      expect(acao('http://localhost:3000', { ...PROD, EDGE_CORS_LOCALHOST: 'true' })).not.toBe('http://localhost:3000')
+    })
+    it('yerelde bile localhost kalibi disi reddedilir', () => {
+      const yerel = { SUPABASE_URL: 'http://kong:8000' }
+      expect(acao('http://localhost:3000.evil.example', yerel)).not.toBe('http://localhost:3000.evil.example')
+      expect(acao('http://localhost', yerel)).not.toBe('http://localhost')
+    })
+    it('prod: kanonik, uretim takma adi ve ekip onizlemesi kabul; yabanci onek red', () => {
+      expect(acao('https://venthub.com.tr', PROD)).toBe('https://venthub.com.tr')
+      expect(acao('https://venthub-hvac-esite.vercel.app', PROD)).toBe('https://venthub-hvac-esite.vercel.app')
+      const onizleme = 'https://venthub-hvac-esite-2frzpxoyx-peckops-projects.vercel.app'
+      expect(acao(onizleme, PROD)).toBe(onizleme)
+      expect(acao('https://venthub-hvac-esite-x.vercel.app', PROD)).toBe('https://venthub-hvac-esite.vercel.app')
+    })
+    it('Deno yoksa (env okunamaz) localhost reddedilir — fail-closed', () => {
+      g.Deno = undefined
+      const req = new Request('https://x/f', { headers: { Origin: 'http://localhost:3000' } })
+      expect(getCorsHeaders(req)['Access-Control-Allow-Origin']).toBe('https://venthub-hvac-esite.vercel.app')
+    })
   })
 
   /**

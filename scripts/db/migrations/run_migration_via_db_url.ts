@@ -2,6 +2,7 @@ import pg from 'pg'
 import _fs from '_fs'
 import _path from '_path'
 import dotenv from 'dotenv'
+import { pgTls } from '../pg-tls.cjs';
 
 dotenv.config()
 
@@ -15,7 +16,7 @@ console.warn('🚀 Using Pooler Connection to connect...')
 
 const client = new Client({
     connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: pgTls()
 })
 
 async function run() {

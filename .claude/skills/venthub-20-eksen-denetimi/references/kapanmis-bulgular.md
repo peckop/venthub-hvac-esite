@@ -13,9 +13,11 @@
 | 2 | `auth.getUser()` argümansız — 16 fonksiyonda, edge'de daima 401 (checkout doğrulaması dâhil) | `src/__tests__/conformance/edge-security.test.ts` · **R1**, baseline BOŞ |
 | 1/18 | Codemod `_`-rename ile edge kaynaklarını bozdu, prod'a deploy edildi (tsconfig `supabase/`'i hariç tutuyor, kapı kördü) | CI `deno check --node-modules-dir=none` + grep-guard (`.github/workflows/ci.yml`) — PR #494 |
 | 18 | Codemod'un **üçüncü** zarar sınıfı: `getCorsHeaders` import edilip **çağrılmadı**, `Access-Control-Allow-Origin` silindi (9 fonksiyon) | CI "Edge CORS guard" adımı + **R2/R3** |
-| 3 | `refund-order-mock` imzasız `atob(jwt)` ile sahte `sub` kabul → iade + stok iadesi | **R6** (baseline'da yalnız `tenant_config.ts:29` kaldı) |
+| 3 | `refund-order-mock` imzasız `atob(jwt)` ile sahte `sub` kabul → iade + stok iadesi | **R6**, baseline BOŞ (`tenant_config.ts`'teki son `atob` T026-VH Adım 6'da silindi) |
+| 3 | `_shared/tenant_config.ts` — query `?tenant_id=` JWT'yi eziyordu + `atob` imzasız. T026-VH Adım 6'da `resolveTenantId` ve `atob` SİLİNDİ (`supabase/functions/_shared/tenant_config.ts:33-46` yalnız açıklama); dosyada yalnız `getTenantBranding` kaldı. Taşındı 2026-11-04 (karne 2026-11 §10) | `edge-security.test.ts` **R6** + **R11** baseline BOŞ + **R11-B** (`_shared/tenant*.ts` isteğe dokunamaz) |
+| 3 | `shipping-status` takip numarasıyla kimliksiz sipariş durumu dönüyordu | Uç emekli: her istekte **410 ENDPOINT_RETIRED** (`supabase/functions/shipping-status/index.ts:33-48`, T058-VH). ⚠R5 baseline'ında adı hâlâ duruyor (`edge-security.test.ts` R5) — baseline temizliği ayrı iş; uç veri dönmediği için açık değil |
 | 3 | 4 canlı **anonim** açık: `admin-order-inspect`, `admin-iyzico-reconcile`, `refund-order-mock`, `stock-alert` | `supabase/config.toml` `verify_jwt=true` + **R5** + prod'dan **çağırarak** doğrulama (hepsi 401) |
-| 3 | 2 **yatay yetki** açığı: `admin-orders-latest`, `admin-update-shipping` (oturumlu müşteri tüm siparişleri okuyor/yazıyordu) | cetvel §3.2 + prod doğrulaması; **statik kilit E9 HENÜZ YOK** → bu satır yarı-kapalı, ajan §3.2'yi yine denetlesin |
+| 3 | 2 **yatay yetki** açığı: `admin-orders-latest`, `admin-update-shipping` (oturumlu müşteri tüm siparişleri okuyor/yazıyordu) | cetvel §3.2 + prod doğrulaması + `edge-security.test.ts` **R8** (E9, `admin-` önekli uçlar, baseline BOŞ) ve **R8-EK** (önek dışı ayrıcalıklı uçlar adla: `healthz`, `iyzico-refund`, `order-housekeeping`, `release-expired-reservations`). Güncellendi 2026-11-04 (karne 2026-11 §10) |
 | 14 | 6 adet no-op/yanıltıcı per-fonksiyon `supabase/functions/*/supabase.toml` | **R4**, baseline BOŞ (2026-08-15'te bilerek bozulup FAIL görüldü) |
 | 14/18 | CI 26 fonksiyondan yalnız **7'sini** deploy ediyordu; 19'u prod'da 11 ay dondu | `.github/workflows/deploy-functions.yml` (kapsam dizinden türetiliyor) + `scripts/edge/{select-functions,drift-check}.mjs` |
 | 17 | PostgREST select ↔ şema uyuşmazlığı (statik select listeleri) | `src/__tests__/conformance/edge-select-columns.test.ts` (INV-8) |
@@ -33,9 +35,8 @@
 
 | Eksen | Borç | Kayıtlı olduğu yer |
 |---|---|---|
-| 3 | `_shared/tenant_config.ts` — query `?tenant_id=` JWT'yi eziyor + `atob` imzasız. **Yerine geçen modül hazır** (`_shared/tenant.ts`), uçlar Adım 2–5'te göçtü; eski modül **Adım 6**'da silinecek | cetvel **§3.9** · **R6 + R11 baseline'ında adıyla** (E12 artık CANLI) · plan `docs/plans/tenant-id-hardening-2026-08-15.md` |
 | 3 | `apply-coupon` kendi `buildCors()`'unu yazıyor | R3 baseline |
-| 3 | `iyzico-callback` (HMAC yok), `shipping-status` (yalnız IP rate-limit) | R5 baseline |
+| 3 | `iyzico-callback` (HMAC yok; karne 2026-11 P1'in zemini) | R5 baseline |
 | 15 | **npm** tarafı `@supabase/{ssr,supabase-js}` hâlâ `"latest"` (pin yok; kurulu: 0.12.4 / 2.112.3). Edge tarafı T028'de kapandı, npm tarafı AÇIK | registry **T016-VH** |
 | 5/16 | Prod hata raporlama zinciri **kod tarafında** bağlandı (T014) ama `log-client-error` varsayılan `REQUIRE_AUTH=true` → yalnız oturumlu kullanıcı hataları kaydediliyor; anonim ziyaretçi 401. Ayrıca Sentry DSN hiçbir `.env*.example`'da yok | registry **T014-VH** · pano notu LAUNCH'a |
 

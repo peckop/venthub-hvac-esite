@@ -77,6 +77,15 @@ describe('INV-AUTH-3 · oturum güvenliği', () => {
     expect(Number(ttlMatch![1])).toBeLessThanOrEqual(900)
   })
 
+  it('R5 (K1): önbellek yolu claim geçerliliğini exp/sub/damga ile denetler', () => {
+    // Davranış testi: claims-onbellek-sure.test.ts. Bu kol, kapının resolveUserClaims'ten
+    // sökülmesini yakalar (yalnız user_role'e bakan eski hâle dönüş).
+    const src = source('/src/utils/router.ts')
+    const govde = src.slice(src.indexOf('export async function resolveUserClaims'))
+    expect(govde).toMatch(/onbellekClaimGecerli\s*\(/)
+    expect(govde).not.toMatch(/if\s*\(\s*claims\s*&&\s*claims\.user_role\s*\)/)
+  })
+
   it('R4: cetvelde rate-limit politikası ve CAPTCHA karar satırı yaşıyor', () => {
     const cetvel = Object.values(STANDARDS)[0] ?? ''
     expect(cetvel, 'auth-account-standard.md okunamadı').toBeTruthy()

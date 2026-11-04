@@ -37,12 +37,50 @@ const KANONIK_ORIGINLER = [
  *   venthub-hvac-esite.vercel.app
  *   venthub-hvac-esite-1fk7v482n-peckops-projects.vercel.app
  */
-const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite[a-z0-9-]*\.vercel\.app$/;
+/**
+ * ⭐C5 (güvenlik karnesi 2026-11, 2026-11-04 daraltıldı) — ekip kapsamına ÇİVİLENDİ.
+ *
+ * ÖNCESİ: `^https://venthub-hvac-esite[a-z0-9-]*\.vercel\.app$`. Ön ek serbest kuyruklu olduğu için
+ * Vercel'de `venthub-hvac-esite-x` adlı projeyi BAŞKA bir hesabın açması yetiyordu
+ * (`venthub-hvac-esite-x.vercel.app` kalıba uyuyordu).
+ *
+ * ÖLÇÜLDÜ (Vercel API, `peckops-projects` ekibi, son 20 dağıtım, 2026-11-04): hepsi
+ * `venthub-hvac-esite-<9 küçük harf/rakam>-peckops-projects.vercel.app`. Dal önizleme takma adı
+ * Vercel biçimiyle `venthub-hvac-esite-git-<dal>-peckops-projects.vercel.app`. Üretim takma adı
+ * `venthub-hvac-esite.vercel.app` tam eşleşmeyle ayrıca kabul (aşağıda).
+ *
+ * KALAN RİSK (gizlenmiyor): son ek bir ekip adıdır, alan adı sahipliği değildir; ekip dışından
+ * biri tam olarak `venthub-hvac-esite-<9 hane>-peckops-projects` adlı bir proje açabilirse kalıba
+ * uyar. Çağrılar çerez taşımıyor (kimlik bearer token), yani köken tek başına yetki vermez.
+ */
+const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite-(?:[a-z0-9]{9}|git-[a-z0-9-]+)-peckops-projects\.vercel\.app$/;
+
+/** Üretim dağıtımının Vercel takma adı — tam eşleşme. */
+const VERCEL_URETIM_ORIGIN = 'https://venthub-hvac-esite.vercel.app';
+
+/**
+ * ⭐C5: `http://localhost:*` yalnız edge YEREL çalışırken yansıtılır (`supabase functions serve`:
+ * SUPABASE_URL yerel/kong adresidir). Barındırılan (prod) çalışma zamanında SUPABASE_URL
+ * `https://<ref>.supabase.co`'dur ve localhost reddedilir. Yerel Next'i prod edge'e bağlamak
+ * gerekirse bilinçli açma: edge secret `EDGE_CORS_LOCALHOST=1` (yalnız tam "1").
+ */
+const YEREL_KONAK = /^https?:\/\/(?:localhost|127\.0\.0\.1|kong|host\.docker\.internal)(?::\d+)?(?:\/|$)/i;
+const LOCALHOST_KOKEN = /^http:\/\/localhost:\d+$/;
+
+function envOku(ad: string): string {
+  const deno = (globalThis as { Deno?: { env?: { get(k: string): string | undefined } } }).Deno;
+  return deno?.env?.get(ad) ?? '';
+}
+
+export function localhostKabulMu(supabaseUrl: string, acmaBayragi: string): boolean {
+  return YEREL_KONAK.test(supabaseUrl.trim()) || acmaBayragi.trim() === '1';
+}
 
 export function getCorsHeaders(req: Request) {
   const origin = req.headers.get('Origin') || '';
-  const isLocal = origin.startsWith('http://localhost:');
-  const isVercel = ONIZLEME_KALIBI.test(origin);
+  const isLocal = LOCALHOST_KOKEN.test(origin) &&
+    localhostKabulMu(envOku('SUPABASE_URL'), envOku('EDGE_CORS_LOCALHOST'));
+  const isVercel = ONIZLEME_KALIBI.test(origin) || origin === VERCEL_URETIM_ORIGIN;
   const isKanonik = KANONIK_ORIGINLER.includes(origin);
   const allowed = isLocal || isVercel || isKanonik;
   return {

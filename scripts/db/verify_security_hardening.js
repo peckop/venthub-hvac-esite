@@ -2,6 +2,7 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { pgTls } from './pg-tls.cjs';
 
 const { Client } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,7 +41,7 @@ async function run() {
     const tryConnect = async (url) => {
         const client = new Client({
             connectionString: url,
-            ssl: { rejectUnauthorized: false },
+            ssl: pgTls(),
             connectionTimeoutMillis: 15000,
         });
 
