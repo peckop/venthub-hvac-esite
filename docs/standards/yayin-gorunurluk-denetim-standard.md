@@ -169,6 +169,20 @@ claude-seo eklentisi karar 417 ile yalnız yerel kapsamda kuruludur; kullanım h
 
 Toplam isabet 27/32 (%84). Karar çelişkisi olan beş öneri ajanın rehber cetvelini bilmemesinden çıktı; bu yüzden görev metnine cetvel özeti verilir (madde 1). Ajan hiçbir turda atıf yapılan kaynağın içeriğini açmadı: atıf doğruluğu bu ölçüme dahil değildir, BLOG'un doğrulama turlarındadır.
 
+### Y2.4 Rakip sayfa kıyası: adım listesi (SEO-83, 2026-11-04, OPS emri)
+
+"Şu sayfa aramada önde, bizimkini ona göre iyileştir" istendiğinde GEO-SEO bu sırayı koşar; her seferinde yeniden tarif edilmez. İlk uygulama radyal/aksiyel yazısı (SEO-81), ikincisi kanal tipi fan yazısı (SEO-83). Anlamsal boşluğun içerik sınıfları (çekirdek, ayırt edici, sıradan, fırsat) `write-seo-geo-content` yeteneğinde yazılıdır; bu liste ondan önceki ölçüm ve yazı/kategori ayrımı adımlarıdır, yerini almaz.
+
+1. **Sorgu kümesi.** Kıyasın sorguları yazılı olarak sabitlenir: ana terim, "nedir", çeşitleri, fiyatları, (varsa) "fark". Sorgu seçimi Recep'in ya da OPS'un sözüne değil ölçüme bağlanır; ölçülemeyen sorgu "ölçülmedi" diye yazılır.
+2. **Search Console, son 90 gün.** Bizim yazı ve ilgili kategori sayfası için sayfa süzgeciyle (tam eşitlik) toplam gösterim, tık, sıra ve sorgular; sitede o kelimeyi içeren sorgular hangi sayfaya gidiyor. Sonuç az satırsa "veri yok" yazılır, tahmin yürütülmez.
+3. **Trends çapalı küme** (karar 326, geo-olcum G8): her çağrıda en az 3 değeri olan bir çapa terim bulunur; çapa null ya da 3'ün altındaysa çağrı geçersizdir. Düşük hacimde değerler çağrıdan çağrıya oynar: yön okunur, oran okunmaz.
+4. **SERP, tarayıcıda** (tr, tr, kişiselleştirme kapalı): her sorgu için ilk sayfadaki organik sonuçlar sayfa türüne ayrılır (ürün-kategori, bilgi, pazaryeri); bizim ve rakip sayfanın görünüp görünmediği ayrı satırdır. Rakip adı sorguda geçiyorsa (marka sorgusu) bu, genel sorguda görünmek sayılmaz; kıyasın dayanağı genel sorgulardır.
+5. **Ham HTML.** Rakip sayfa, bizim yazı ve bizim kategori sayfası aynı çıkarıcıyla okunur: title, meta açıklama, H1, H2/H3 listesi, kelime, tablo başlıkları, iç bağlantı sayısı, JSON-LD türleri. Ham sayfa depoya girmez.
+6. **Y2.3 ajanı.** Eklenti ajanı bağımsız okur (ağ yok, dosya yazma yok); görevine cetvel özeti ve "YAZIYA / KATEGORİYE" etiketi istenir. Her bulgu sayfa satırına karşı doğrulanır; cetvelle çelişen öneri "karar çelişkisi" diye ayrılır.
+7. **Hüküm.** Her önerinin sahibi yazılır: ürün, fiyat ve çeşit sorguları kategori sayfasına, "nedir" ve "nasıl çalışır" sorguları yazıya aittir; yazı kategori sorgusunu, kategori yazı sorgusunu yememeli. Çıktı: title, H1, ilk H2, eksik bölümler, tablo, iç bağlantı; metni yazı için BLOG, kategori için URUN yazar, GEO-SEO yalnız ölçer ve hüküm verir. Kabul: 14. günde aynı ölçümler yeniden koşulur.
+
+Kurallar: rakip adı ve rakip sayfa adresi depoya girmez (kart ve depo dışı arşiv); arama ve sorgu verisi depoya yazılmaz (P6); ölçülmeyen "ölçülmedi" yazılır; Recep'in sözü depoya tırnakla yazılmaz.
+
 ## Y3 — Kabul (yayın günü ve sonrası)
 
 - Eski adres: `AYNI` ya da `TEK-308` (dil öneki olmayan eski adreste tek 307 meşru, plan §4); **ZINCIR 0 ·
