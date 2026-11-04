@@ -73,7 +73,9 @@ vi.mock('@supabase/supabase-js', () => {
   }
 })
 
-async function computeSignature(secret: string, body: string): Promise<string> {
+// ALT-138: imza `<x-timestamp>.<x-event-id>.<ham gövde>` üzerinden (sabit_zaman.ts::webhookImzaMetni).
+async function computeSignature(secret: string, rawBody: string, ts: string, eventId: string): Promise<string> {
+  const body = `${ts}.${eventId}.${rawBody}`
   const encoder = new TextEncoder()
   const key = await globalThis.crypto.subtle.importKey(
     'raw',
@@ -127,7 +129,8 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     }
 
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T1')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
@@ -135,7 +138,9 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
         // T025-VH: shipping-webhook replay guard'i artik ZORUNLU (cetvel §3.5).
         // Bu testler basari yolunu sinadigi icin taze bir timestamp gondermeleri gerekiyor;
         // eskiden guard 'varsa uygula' (fail-OPEN) oldugu icin basliksiz geciyorlardi.
-        'x-timestamp': String(Date.now()),
+        // ALT-138: zaman + olay kimligi imzanin parcasi; olay kimligi zorunlu.
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T1',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -172,17 +177,17 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
   it('3. should enforce stale replay guard and reject signatures older than 5 minutes', async () => {
     const payload = { order_number: 'ORD-901', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
-
     // Set timestamp to 10 minutes ago
     const expiredTimestamp = String(Date.now() - 10 * 60 * 1000)
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, expiredTimestamp, 'EV-T3')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-signature': signature,
-        'x-timestamp': expiredTimestamp
+        'x-timestamp': expiredTimestamp,
+        'x-event-id': 'EV-T3'
       },
       body: rawBody
     })
@@ -242,12 +247,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     // Webhook executes under Tenant A environment context
     const payload = { order_number: 'ORD-COL-999', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T6')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T6',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -300,6 +307,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
       method: 'POST',
       headers: {
         'x-timestamp': String(Date.now()),
+        'x-event-id': 'EV-T7',
         'Content-Type': 'application/json',
         'x-webhook-token': 'legacy-sandbox-token-555' // Legacy fallback
       },
@@ -320,12 +328,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-MONO', status: 'shipped' } // Demotion attempt
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T8')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T8',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -346,12 +356,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-901', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T9')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T9',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -377,12 +389,13 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-DUP', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-111222')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
         'Content-Type': 'application/json',
         'x-signature': signature,
         'x-id': 'EV-111222' // Already exists
@@ -423,14 +436,15 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     // istek YINE DE gecerli imzali. Yani "imza dogru" tenant'i dogrulamaz — kaynak satir dogrular.
     const payload = { order_number: 'ORD-DERIVE', status: 'shipped', tenant_id: ATTACKER_TENANT }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-DERIVE-1')
 
     const req = new Request(
       `https://localhost/functions/v1/shipping-webhook?tenant_id=${ATTACKER_TENANT}`,
       {
         method: 'POST',
         headers: {
-          'x-timestamp': String(Date.now()),
+          'x-timestamp': ts,
           'Content-Type': 'application/json',
           'x-signature': signature,
           'x-id': 'EV-DERIVE-1'

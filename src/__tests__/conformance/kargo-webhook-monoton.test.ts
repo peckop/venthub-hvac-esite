@@ -9,6 +9,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import {
   kargoHedefiCoz,
   kargoYazimKarari,
+  takipBaglantisiGecerli,
   tetikReddiMi,
 } from '../../../supabase/functions/_shared/kargo_webhook_gecis'
 
@@ -39,9 +40,20 @@ const SOKUMLER: [RegExp, string][] = [
   // kaynak durum koşulu yok
   [/\.eq\('status', adim\.kaynak\)/g, ''],
 ]
-function kapiyiSok(metin: string): string {
+/**
+ * ALT-138 kapılarını söken dönüşümler: delivered kilidi eski hâline (yalnız takip yazılır) döner, takip
+ * bağlantısı doğrulanmadan yazılır. Karar modülü paylaşılan dosyada olduğu için kilit handler'da sökülür.
+ */
+const SOKUMLER_ALT138: [RegExp, string][] = [
+  [
+    /kargoYazimKarari\((\{[^}]*\}), cozum\)/g,
+    "((k) => (k.islem === 'yoksay' && k.neden === 'ORDER_DELIVERED' ? { islem: 'yalniz_takip' } : k))(kargoYazimKarari($1, cozum))",
+  ],
+  [/takipBaglantisiGecerli\(p\.tracking_url\)/g, 'true'],
+]
+function kapiyiSok(metin: string, sokumler: [RegExp, string][] = SOKUMLER): string {
   let m = metin
-  for (const [desen, yerine] of SOKUMLER) {
+  for (const [desen, yerine] of sokumler) {
     if (!new RegExp(desen.source).test(m)) throw new Error(`sabotaj deseni eşleşmedi: ${desen}`)
     m = m.replace(desen, yerine)
   }
@@ -217,16 +229,26 @@ async function cagir(
   const r = await isleyici(
     new Request('https://ornek.supabase.co/functions/v1/shipping-webhook', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-webhook-token': TOKEN, 'x-timestamp': String(Date.now()), ...basliklar },
+      // x-event-id ZORUNLU (ALT-138): her çağrıya tekil bir kimlik; test isterse kendi kimliğiyle ezer.
+      headers: {
+        'content-type': 'application/json',
+        'x-webhook-token': TOKEN,
+        'x-timestamp': String(Date.now()),
+        'x-event-id': `evt-oto-${++olaySayaci}`,
+        ...basliklar,
+      },
       body: JSON.stringify({ order_id: SIPARIS, ...govde }),
     }),
   )
   return { http: r.status, json: await r.json() }
 }
 
+let olaySayaci = 0
 let yeni: Isleyici
 let eski: Isleyici | null = null
 let eskiYuklenemedi = ''
+let kilitsiz: Isleyici | null = null
+let kilitsizYuklenemedi = ''
 
 beforeAll(async () => {
   vi.stubGlobal('fetch', sahteFetch)
@@ -236,6 +258,11 @@ beforeAll(async () => {
     eski = await isleyiciYukle(nodeKopyasi('kapisiz', kapiyiSok(YENI)))
   } catch (e) {
     eskiYuklenemedi = e instanceof Error ? e.message : String(e)
+  }
+  try {
+    kilitsiz = await isleyiciYukle(nodeKopyasi('kilitsiz', kapiyiSok(YENI, SOKUMLER_ALT138)))
+  } catch (e) {
+    kilitsizYuklenemedi = e instanceof Error ? e.message : String(e)
   }
 })
 
@@ -284,8 +311,13 @@ describe('INV-KARGO-WEBHOOK-1 · saf karar modülü', () => {
     })
     expect(k('shipped', 'paid', 'delivered')).toEqual({ islem: 'adimlar', adimlar: [{ kaynak: 'shipped', hedef: 'delivered' }] })
     expect(k('shipped', 'paid', 'shipped')).toEqual({ islem: 'yalniz_takip' })
-    expect(k('delivered', 'paid', 'shipped')).toEqual({ islem: 'yalniz_takip' })
-    expect(k('delivered', 'paid', 'delivered')).toEqual({ islem: 'yalniz_takip' })
+    // ALT-138: teslim edilmiş sipariş KİLİTLİ — takip alanları dahil hiçbir şey yazılmaz.
+    expect(k('delivered', 'paid', 'shipped')).toEqual({ islem: 'yoksay', neden: 'ORDER_DELIVERED' })
+    expect(k('delivered', 'paid', 'delivered')).toEqual({ islem: 'yoksay', neden: 'ORDER_DELIVERED' })
+    expect(kargoYazimKarari({ status: 'delivered', payment_status: 'paid' }, { tur: 'durum_yok', neden: 'bilinmeyen' })).toEqual({
+      islem: 'yoksay',
+      neden: 'ORDER_DELIVERED',
+    })
     expect(kargoYazimKarari({ status: 'confirmed', payment_status: 'paid' }, { tur: 'durum_yok', neden: 'bilinmeyen' })).toEqual({ islem: 'yalniz_takip' })
     expect(kargoYazimKarari({ status: 'paid', payment_status: 'paid' }, { tur: 'hedef', hedef: 'shipped' })).toMatchObject({ islem: 'yoksay' })
   })
@@ -304,7 +336,8 @@ describe('INV-KARGO-WEBHOOK-1 · handler: iptal çıkışsız, sözlük dışı 
     const r = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-1', carrier: 'yurtici' })
     expect(r.http).toBe(200)
     expect(r.json.ignored).toBe(true)
-    expect(olayDurumlari).toEqual([])
+    // olay kimliği artık zorunlu (ALT-138): yoksayılan olay da kayda düşer, siparişe yazılmaz
+    expect(olayDurumlari).toEqual(['ignored:ORDER_CANCELLED'])
     expect(yazildi()).toBe(false)
     expect(satir.status).toBe('cancelled')
     expect(satir.tracking_number).toBeNull()
@@ -371,6 +404,85 @@ describe('INV-KARGO-WEBHOOK-1 · handler: yalnız ileri, delivered iki adım', (
     await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-5' })
     expect(satir.status).toBe('delivered')
     expect(bildirimler).toBe(0)
+  })
+
+  it('ALT-138 · teslim edilmiş siparişte takip alanları EZİLMEZ (geçerli bağlantıyla bile), 200 + ignored', async () => {
+    satir = yeniSatir({
+      status: 'delivered',
+      delivered_at: '2026-11-02T10:00:00.000Z',
+      tracking_number: 'TN-ESKI',
+      tracking_url: 'https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=TN-ESKI',
+      carrier: 'yurtici',
+    })
+    const once = structuredClone(satir)
+    const r = await cagir(yeni, {
+      status: 'delivered',
+      tracking_number: 'TN-YENI',
+      tracking_url: 'https://www.araskargo.com.tr/kargo-takip?KargoTakipNo=TN-YENI',
+      carrier: 'aras',
+    }, { 'x-event-id': 'evt-kilit' })
+    expect(r.http).toBe(200)
+    expect(r.json.ignored).toBe(true)
+    expect(yazildi()).toBe(false)
+    expect(satir).toEqual(once)
+    expect(olayDurumlari).toEqual(['ignored:ORDER_DELIVERED'])
+    expect(bildirimler).toBe(0)
+  })
+
+  it('ALT-138 · okuma ile yazma arasında sipariş delivered olursa takip yazımı 0 satır, yeniden okumada kilit görülür', async () => {
+    satir = yeniSatir({ status: 'shipped', tracking_number: 'TN-A' })
+    patchOncesi = () => {
+      satir = { ...satir, status: 'delivered', delivered_at: '2026-11-03T09:00:00.000Z' }
+      patchOncesi = null
+    }
+    const r = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-B' })
+    expect(r.json.ignored).toBe(true)
+    expect(satir.tracking_number).toBe('TN-A')
+  })
+})
+
+describe('ALT-138 · takip bağlantısı: yalnız https + izinli taşıyıcı alan adı', () => {
+  it.each([
+    'https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=1',
+    'https://yurticikargo.com/x',
+    'https://www.araskargo.com.tr/kargo-takip?KargoTakipNo=1',
+    'https://www.mngkargo.com.tr/gonderitakip?takipNo=1',
+    'https://gonderitakip.ptt.gov.tr/Track/Verify?q=1',
+    '  https://WWW.YURTICIKARGO.COM/x  ',
+  ])('kabul: %s', (u) => {
+    expect(takipBaglantisiGecerli(u)).toBe(true)
+  })
+
+  it.each([
+    ['http şeması', 'http://www.yurticikargo.com/x'],
+    ['javascript şeması', 'javascript:alert(1)'],
+    ['data şeması', 'data:text/html,<script>alert(1)</script>'],
+    ['izinsiz alan adı', 'https://kotu-site.example/takip'],
+    ['benzer alan adı (önek)', 'https://yurticikargo.com.kotu.example/x'],
+    ['benzer alan adı (sonek)', 'https://sahteyurticikargo.com/x'],
+    ['kimlik bilgisi', 'https://user:pass@www.yurticikargo.com/x'],
+    ['kullanıcı adıyla yönlendirme', 'https://www.yurticikargo.com@kotu.example/x'],
+    ['özel bağlantı noktası', 'https://www.yurticikargo.com:8443/x'],
+    ['göreli adres', '/takip/1'],
+    ['boş', ''],
+    ['çok uzun', `https://www.yurticikargo.com/${'a'.repeat(2100)}`],
+  ])('ret: %s', (_ad, u) => {
+    expect(takipBaglantisiGecerli(u)).toBe(false)
+  })
+
+  it('handler: geçersiz bağlantı yazılmaz, olay düşmez (status ve takip numarası yazılır)', async () => {
+    const r = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-U', tracking_url: 'javascript:alert(document.cookie)' })
+    expect(r.http).toBe(200)
+    expect(satir.status).toBe('shipped')
+    expect(satir.tracking_number).toBe('TN-U')
+    expect(satir.tracking_url).toBeNull()
+    expect(patchlar.every((p) => !('tracking_url' in p.govde))).toBe(true)
+  })
+
+  it('handler: izinli bağlantı yazılır', async () => {
+    const u = 'https://www.mngkargo.com.tr/gonderitakip?takipNo=TN-M'
+    await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-M', tracking_url: u })
+    expect(satir.tracking_url).toBe(u)
   })
 
   it('aynı olay tekrar: ikinci çağrı zararsız, ek yazım yok', async () => {
@@ -544,5 +656,23 @@ describe('INV-KARGO-WEBHOOK-1 · SABOTAJ kolu (karar modülü sökülünce sald�
     }
     await cagir(eski!, { status: 'shipped' })
     expect(satir.status).toBe('shipped')
+  })
+})
+
+describe('ALT-138 · SABOTAJ kolu (delivered kilidi ve bağlantı denetimi sökülünce saldırılar GEÇER)', () => {
+  it('kilitsiz kopya yüklenebildi (sahte-yeşil kilidi)', () => {
+    expect(kilitsizYuklenemedi).toBe('')
+    expect(kilitsiz).not.toBeNull()
+  })
+
+  it('kilitsiz kopyada: teslim edilmiş siparişin takip bağlantısı EZİLİR', async () => {
+    satir = yeniSatir({ status: 'delivered', tracking_url: 'https://www.yurticikargo.com/x?code=1' })
+    await cagir(kilitsiz!, { status: 'delivered', tracking_url: 'https://www.araskargo.com.tr/y' })
+    expect(satir.tracking_url, 'kilit sökülünce ezilmeli; ezilmiyorsa test kilidi ölçmüyor').toBe('https://www.araskargo.com.tr/y')
+  })
+
+  it('kilitsiz kopyada: javascript: bağlantısı YAZILIR', async () => {
+    await cagir(kilitsiz!, { status: 'in_transit', tracking_url: 'javascript:alert(1)' })
+    expect(satir.tracking_url).toBe('javascript:alert(1)')
   })
 })

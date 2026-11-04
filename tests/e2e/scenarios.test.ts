@@ -280,7 +280,9 @@ vi.mock('@supabase/supabase-js', () => {
   }
 })
 
-async function computeSignature(secret: string, body: string): Promise<string> {
+// ALT-138: imza `<x-timestamp>.<x-event-id>.<ham gövde>` üzerinden (sabit_zaman.ts::webhookImzaMetni).
+async function computeSignature(secret: string, rawBody: string, ts: string, eventId: string): Promise<string> {
+  const body = `${ts}.${eventId}.${rawBody}`
   const encoder = new TextEncoder()
   const key = await globalThis.crypto.subtle.importKey(
     'raw',
@@ -555,7 +557,8 @@ describe('Comprehensive Workload Scenarios E2E Suite (5 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-COL-100', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-S4')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
@@ -563,7 +566,9 @@ describe('Comprehensive Workload Scenarios E2E Suite (5 Test Cases)', () => {
         // T025-VH: shipping-webhook replay guard'i artik ZORUNLU (cetvel §3.5).
         // Bu testler basari yolunu sinadigi icin taze bir timestamp gondermeleri gerekiyor;
         // eskiden guard 'varsa uygula' (fail-OPEN) oldugu icin basliksiz geciyorlardi.
-        'x-timestamp': String(Date.now()),
+        // ALT-138: zaman + olay kimligi imzanin parcasi; olay kimligi zorunlu.
+        'x-timestamp': ts,
+        'x-event-id': 'EV-S4',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
