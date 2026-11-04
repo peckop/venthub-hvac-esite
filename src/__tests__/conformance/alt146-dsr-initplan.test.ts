@@ -35,9 +35,23 @@ const BU_YOL = '/supabase/migrations/20261103180000_alt146_dsr_insert_initplan.s
 
 const yorumsuz = (s: string): string => s.replace(/--[^\n]*/g, '')
 
+/**
+ * Yalniz RLS politika ifadeleri (create/alter policy) initplan kapsamindadir: advisor auth_rls_initplan politika
+ * USING/WITH CHECK ifadesine bakar. FONKSIYON GOVDESINDEKI auth.<fn>() cagrisi satir basi degil cagri basina
+ * calisir ve plpgsql'de (select ...) sarmasi anlamsizdir; dollar-quote govdeleri atilir. Bilinen kor nokta:
+ * DO blogu icinde execute ile kurulan dinamik politika (bu depoda yok).
+ */
+function politikaIfadeleri(sql: string): string {
+  return yorumsuz(sql)
+    .replace(/\$([a-z_]*)\$[\s\S]*?\$\1\$/gi, '')
+    .split(';')
+    .filter((s) => /^\s*(?:create|alter)\s+policy\b/i.test(s))
+    .join(';')
+}
+
 /** auth.<fn>() cagrisi alt sorguda tek basina degilse ihlal: `(select auth.x() ->> ...)` ya da ciplak. */
 function initplanIhlalleri(sql: string): string[] {
-  const govde = yorumsuz(sql)
+  const govde = politikaIfadeleri(sql)
   const ihlal: string[] = []
   const tumCagrilar = govde.match(/auth\.\w+\(\)/gi) ?? []
   const tekBasina = govde.match(/\(\s*select\s+auth\.\w+\(\)\s*\)/gi) ?? []
@@ -93,6 +107,13 @@ describe('INV-RLS-INITPLAN-2 — auth.<fn>() alt sorguda tek başına (ALT-146)'
       )
       expect(bozuk).not.toBe(asil)
       expect(initplanIhlalleri(bozuk).join('\n')).toMatch(/tek başına olmayan/)
+    })
+
+    it('fonksiyon gövdesindeki çıplak auth.uid() bu kapının konusu değil, politikadaki çıplak çağrı kırmızı kalır', () => {
+      const govdeli = `create or replace function public.f() returns uuid language sql as $$ select auth.uid() $$;`
+      expect(initplanIhlalleri(govdeli)).toEqual([])
+      const politikali = `${govdeli}\nalter policy p on public.t with check (user_id = auth.uid());`
+      expect(initplanIhlalleri(politikali).join('\n')).toMatch(/tek başına olmayan/)
     })
 
     it('çıplak auth.uid()', () => {
