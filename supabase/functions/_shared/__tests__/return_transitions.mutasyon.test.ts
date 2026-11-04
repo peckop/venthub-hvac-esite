@@ -34,6 +34,9 @@ const IZINLI: Readonly<Record<ReturnStatus, readonly ReturnStatus[]>> = {
 const TERMINAL: readonly ReturnStatus[] = ['rejected', 'refunded', 'cancelled']
 
 function beklenen(a: ReturnStatus, b: ReturnStatus): ReturnType<typeof canCarrierTransition> {
+  // Aynı durum serbest = BUGÜNKÜ davranış (`return_transitions.ts:84`), bilinçli onay değil.
+  // Karnedeki P6 (2026-11 güvenlik karnesi) bu satırı sorguluyor; P6 düzeltilirse bu satır
+  // ve köşegendeki 7 çift yeni karara göre güncellenir — buradaki kırmızı regresyon değildir.
   if (a === b) return { allowed: true }
   if (TERMINAL.includes(a)) return { allowed: false, reason: 'terminal' }
   return IZINLI[a].includes(b) ? { allowed: true } : { allowed: false, reason: 'not_allowed' }
