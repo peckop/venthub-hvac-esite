@@ -121,18 +121,36 @@ export const TAKIP_ALAN_ADLARI: readonly string[] = [
  * yazılan değer `javascript:` şeması ya da oltalama sitesi olabilir.
  */
 export function takipBaglantisiGecerli(ham: string | null | undefined): boolean {
+  return takipBaglantisiNormal(ham) !== null
+}
+
+/** Ters bölü, boşluk ya da denetim karakteri (U+0000–U+0020, U+007F) var mı? */
+function belirsizKarakterVar(metin: string): boolean {
+  for (let i = 0; i < metin.length; i++) {
+    const k = metin.charCodeAt(i)
+    if (k <= 0x20 || k === 0x7f || k === 0x5c) return true
+  }
+  return /\s/.test(metin)
+}
+
+/**
+ * Geçerli takip bağlantısının YAZILACAK biçimi (`URL.href`), geçersizse `null`. Ham metin yazılmaz: ters bölü,
+ * boşluk ve denetim karakteri WHATWG ayrıştırıcısında başka, SMS/e-postadaki bağlantılayıcıda başka okunabilir
+ * (`https://www.yurticikargo.com\@kotu.example/x`); bu yüzden böyle karakter taşıyan girdi baştan reddedilir.
+ */
+export function takipBaglantisiNormal(ham: string | null | undefined): string | null {
   const metin = (ham ?? '').trim()
-  if (!metin || metin.length > 2048) return false
+  if (!metin || metin.length > 2048 || belirsizKarakterVar(metin)) return null
   let url: URL
   try {
     url = new URL(metin)
   } catch {
-    return false
+    return null
   }
-  if (url.protocol !== 'https:') return false
-  if (url.username || url.password || url.port) return false
+  if (url.protocol !== 'https:') return null
+  if (url.username || url.password || url.port) return null
   const host = url.hostname.toLowerCase().replace(/\.$/, '')
-  return TAKIP_ALAN_ADLARI.some((alan) => host === alan || host.endsWith(`.${alan}`))
+  return TAKIP_ALAN_ADLARI.some((alan) => host === alan || host.endsWith(`.${alan}`)) ? url.href : null
 }
 
 /** Veritabanı monotonluk tetiği reddetti mi (PostgREST/supabase-js hata nesnesi)? */

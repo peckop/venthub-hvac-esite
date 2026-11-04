@@ -13,7 +13,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
-import { kargoHedefiCoz, kargoYazimKarari, takipBaglantisiGecerli, tetikReddiMi } from '../_shared/kargo_webhook_gecis.ts'
+import { kargoHedefiCoz, kargoYazimKarari, takipBaglantisiNormal, tetikReddiMi } from '../_shared/kargo_webhook_gecis.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {
@@ -204,7 +204,9 @@ Deno.serve(async (req: Request) => {
     // Takip bağlantısı müşteriye tıklanır gösterilir (ALT-138): yalnız https + izinli taşıyıcı alan adı yazılır.
     // Geçersiz bağlantı olayı düşürmez (durum sinyali kaybolmasın); yalnız bağlantı yazılmaz ve günlüğe düşer.
     if (typeof p.tracking_url === 'string' && p.tracking_url) {
-      if (takipBaglantisiGecerli(p.tracking_url)) patch.tracking_url = p.tracking_url.trim()
+      // Ham metin değil, ayrıştırılmış biçim yazılır (WHATWG `href`): doğrulanan ile saklanan aynı adres olsun.
+      const takipUrl = takipBaglantisiNormal(p.tracking_url)
+      if (takipUrl) patch.tracking_url = takipUrl
       else console.warn('[shipping-webhook] takip bağlantısı reddedildi (şema/alan adı)', { code: 'TRACKING_URL_REJECTED', order_id: orderId })
     }
 

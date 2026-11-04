@@ -10,6 +10,7 @@ import {
   kargoHedefiCoz,
   kargoYazimKarari,
   takipBaglantisiGecerli,
+  takipBaglantisiNormal,
   tetikReddiMi,
 } from '../../../supabase/functions/_shared/kargo_webhook_gecis'
 
@@ -49,7 +50,7 @@ const SOKUMLER_ALT138: [RegExp, string][] = [
     /kargoYazimKarari\((\{[^}]*\}), cozum\)/g,
     "((k) => (k.islem === 'yoksay' && k.neden === 'ORDER_DELIVERED' ? { islem: 'yalniz_takip' } : k))(kargoYazimKarari($1, cozum))",
   ],
-  [/takipBaglantisiGecerli\(p\.tracking_url\)/g, 'true'],
+  [/takipBaglantisiNormal\(p\.tracking_url\)/g, 'p.tracking_url'],
 ]
 function kapiyiSok(metin: string, sokumler: [RegExp, string][] = SOKUMLER): string {
   let m = metin
@@ -463,6 +464,11 @@ describe('ALT-138 · takip bağlantısı: yalnız https + izinli taşıyıcı al
     ['kimlik bilgisi', 'https://user:pass@www.yurticikargo.com/x'],
     ['kullanıcı adıyla yönlendirme', 'https://www.yurticikargo.com@kotu.example/x'],
     ['özel bağlantı noktası', 'https://www.yurticikargo.com:8443/x'],
+    ['ters bölü ile yönlendirme', 'https://www.yurticikargo.com\\@kotu.example/x'],
+    ['gömülü sekme', 'https://www.yurticikargo.com/x\ty'],
+    ['gömülü satır sonu', 'https://www.yurticikargo.com/x\nhttps://kotu.example'],
+    ['gömülü boşluk', 'https://www.yurticikargo.com/x kotu.example'],
+    ['IDN benzeri alan adı', 'https://www.yurtiçikargo.com/x'],
     ['göreli adres', '/takip/1'],
     ['boş', ''],
     ['çok uzun', `https://www.yurticikargo.com/${'a'.repeat(2100)}`],
@@ -477,6 +483,17 @@ describe('ALT-138 · takip bağlantısı: yalnız https + izinli taşıyıcı al
     expect(satir.tracking_number).toBe('TN-U')
     expect(satir.tracking_url).toBeNull()
     expect(patchlar.every((p) => !('tracking_url' in p.govde))).toBe(true)
+  })
+
+  it('yazılan biçim ayrıştırılmış href (ham metin değil); sondaki nokta zararsız', () => {
+    expect(takipBaglantisiNormal('  HTTPS://WWW.Yurticikargo.COM/x?code=1  ')).toBe('https://www.yurticikargo.com/x?code=1')
+    expect(takipBaglantisiNormal('https://www.yurticikargo.com./x')).toBe('https://www.yurticikargo.com./x')
+    expect(takipBaglantisiNormal('javascript:alert(1)')).toBeNull()
+  })
+
+  it('handler: büyük harfli izinli bağlantı normalize edilip yazılır', async () => {
+    await cagir(yeni, { status: 'in_transit', tracking_url: 'HTTPS://WWW.ARASKARGO.COM.TR/kargo-takip?KargoTakipNo=1' })
+    expect(satir.tracking_url).toBe('https://www.araskargo.com.tr/kargo-takip?KargoTakipNo=1')
   })
 
   it('handler: izinli bağlantı yazılır', async () => {

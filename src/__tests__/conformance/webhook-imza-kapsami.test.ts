@@ -295,6 +295,23 @@ describe.each(UCLAR)('INV-WEBHOOK-IMZA-1 · $ad: imza zaman + olay + gövdeyi ka
     expect(yazimlar).toBe(0)
   })
 
+  it('REPLAY: kesirli ISO zamanlı imzalı metni farklı bölüp yeni olay kimliği üretmek 401', async () => {
+    const iso = new Date().toISOString() // ör. 2026-11-04T17:00:00.123Z
+    const [onu, kesir] = iso.split('.')
+    const ham = JSON.stringify(uc.govde)
+    const imza = imzala(webhookImzaMetni(iso, 'e1', ham))
+    expect(webhookImzaMetni(onu, `${kesir}.e1`, ham)).toBe(webhookImzaMetni(iso, 'e1', ham))
+    const bolunmus = await cagir(yeni.get(uc.ad)!, uc, { 'x-timestamp': onu, 'x-event-id': `${kesir}.e1`, 'x-signature': imza })
+    expect(bolunmus.http).toBe(401)
+    const kesirli = await cagir(yeni.get(uc.ad)!, uc, { 'x-timestamp': iso, 'x-event-id': 'e1', 'x-signature': imza })
+    expect(kesirli.http).toBe(401)
+    expect(yazimlar).toBe(0)
+    // kesirsiz ISO kabul
+    const duz = `${onu}Z`
+    const ok = await cagir(yeni.get(uc.ad)!, uc, { 'x-timestamp': duz, 'x-event-id': 'e-iso', 'x-signature': imzala(webhookImzaMetni(duz, 'e-iso', ham)) })
+    expect(ok.http).toBe(200)
+  })
+
   it('x-id başlığı da olay kimliği olarak kabul edilir', async () => {
     const ts = String(Date.now())
     const ham = JSON.stringify(uc.govde)
