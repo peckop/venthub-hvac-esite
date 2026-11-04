@@ -75,6 +75,10 @@ Yeni skill yazılacağında, mevcut bir skill'in açıklaması ya da gövdesi de
 - Açıklama ne zaman çağrılacağını net söyler: çok geniş ya da çok dar olmaz.
 - Yıkıcı eylem içeren skill (silme, geri alma) açık onay ve kuru koşum basamağı taşır.
 
+## Windows'ta skill-creator test aracı
+
+`run_eval.py` Windows'ta boruyu `select` ile beklediği için WinError 10038 verir ve sahte "0 tetik" döner. Yama eklentiye dokunmaz: skill-creator klasöründen `PYTHONUTF8=1 PYTHONPATH=<depo>/.claude/skills/skills-creator/windows-yama python -m scripts.run_eval --eval-set <json> --skill-path <skill>` çalıştır (4 sorguluk deneme çalıştı). Tam katalogla yönlendirme sınavı için depo koşucusu (`scripts/skills-eval-run.mjs`) yine geçerli.
+
 ## Eski yol (kullanma)
 
 `scripts/skills-creator.py`, `scripts/compile_skills.py` ve `orion doc tree --nlm-sync` **`.agent/skills` ağacı** içindir. `.claude/skills` için manifest derlemesi ya da NotebookLM eşitlemesi gerekmez; yerel kapılar yukarıdaki tablodadır.

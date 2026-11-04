@@ -80,6 +80,27 @@ describe('INV-SON-KONUSMA-1 · tur ayrıştırma', () => {
     expect(t).toEqual([{ recep: 'soru', zaman: 't1', cevap: 'cevap' }])
   })
 
+  it('ARC-77: düz kullanıcı satırı olarak düşen pencere mesajı ve "Tool loaded." Recep mesajı sayılmaz, turu kapatır', () => {
+    const t = dk.turlar([
+      recep('gerçek soru', 't1'),
+      cevap('gerçek cevap', 'a1'),
+      recep('<cross-session-message from="OPS">emir</cross-session-message>', 't2'),
+      cevap('OPS mesajının cevabı', 'a2'),
+      recep('[SYSTEM NOTIFICATION - NOT USER INPUT]\nbildirim', 't3'),
+      cevap('bildirim cevabı', 'a3'),
+      recep('Tool loaded.', 't4'),
+      cevap('yükleme sonrası metin', 'a4'),
+      recep('<agent-message from="x">rapor</agent-message>', 't5'),
+      recep('Another Claude session sent a message:\nx', 't6'),
+    ])
+    expect(t).toEqual([{ recep: 'gerçek soru', zaman: 't1', cevap: 'gerçek cevap' }])
+  })
+
+  it('ARC-77 duyarlılık: Recep\'in "Tool loaded" geçen gerçek cümlesi sayılır (yalnız tam eşleşme sistemdir)', () => {
+    const t = dk.turlar([recep('Tool loaded. satırları neden geliyor?', 't1')])
+    expect(t).toHaveLength(1)
+  })
+
   it('<system-reminder> blokları Recep metninden silinir', () => {
     const t = dk.turlar([recep('<system-reminder>gizli</system-reminder>asıl soru', 't1')])
     expect(t[0].recep).toBe('asıl soru')
