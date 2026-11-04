@@ -215,7 +215,7 @@ async function sendWhatsApp(to: string, message: string, template?: string, data
   
   if (!response.ok) {
     const error = await response.text()
-    throw new Error(`WhatsApp send failed: ${error}`)
+    throw new Error(`WhatsApp send failed: ${metniMaskele(error, 500)}`)
   }
   
   return await response.json()
@@ -244,7 +244,7 @@ async function sendSMS(to: string, message: string, config: TwilioConfig) {
   
   if (!response.ok) {
     const error = await response.text()
-    throw new Error(`SMS send failed: ${error}`)
+    throw new Error(`SMS send failed: ${metniMaskele(error, 500)}`)
   }
   
   return await response.json()
@@ -280,7 +280,7 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
   
   if (!response.ok) {
     const error = await response.text()
-    throw new Error(`Email send failed: ${error}`)
+    throw new Error(`Email send failed: ${metniMaskele(error, 500)}`)
   }
   
   return await response.json()

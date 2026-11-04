@@ -35,6 +35,7 @@
 // çift-iade penceresini geri açar — üstelik en kötü anda, yani PSP'nin yavaş olduğu anda.
 // Bu yüzden burada fail-closed davranış, İNSAN kararı istemektir: 409 + gelir alarmı.
 
+import { metniMaskele } from './maske.ts'
 import { tenantFromRow } from './tenant.ts'
 
 export type RefundAttemptState = 'in_flight' | 'succeeded' | 'failed'
@@ -198,7 +199,7 @@ export async function claimRefund(
   return {
     outcome: 'unavailable',
     status: 503,
-    message: `defter yazilamadi (${resp.status}): ${bodyText.slice(0, 200)}`,
+    message: `defter yazilamadi (${resp.status}): ${metniMaskele(bodyText, 200)}`,
   }
 }
 
@@ -231,7 +232,7 @@ export async function settleRefund(
     )
     if (!resp.ok) {
       const detail = await resp.text().catch(() => '')
-      return { ok: false, message: `defter guncellenemedi (${resp.status}): ${detail.slice(0, 200)}` }
+      return { ok: false, message: `defter guncellenemedi (${resp.status}): ${metniMaskele(detail, 200)}` }
     }
     return { ok: true }
   } catch (e) {

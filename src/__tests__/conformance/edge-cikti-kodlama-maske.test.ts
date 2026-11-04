@@ -20,6 +20,9 @@ import { describe, expect, it } from 'vitest'
  *   S2 → (4) `console.*` içinde alıcı değişkeni maskesiz yok
  *   S4, S5 → (5) iç hata metni yanıt gövdesine dönmez (taban + ratchet)
  *   S6 → (6) `log-client-error` istemci alanlarını maskeden geçirir
+ *   K8 → (7) sağlayıcı/DB yanıt metni (`await x.text()`) maskesiz kullanılmaz (taban + ratchet)
+ *   OPS-213 → (8) `log-client-error` gövde boyutu sınırlı, Slack yükü mrkdwn kaçışlı
+ *   (G1 dedektörü OPS-213'te ayrıştırıcıya geçti: üçlü ifadenin iki dalı da taranır.)
  *
  * Cetvel: `docs/standards/cikti-kodlama-maske-standard.md`.
  */
@@ -127,32 +130,199 @@ const EPOSTA_EVRENI = DOSYALAR.filter(
     !d.ad.startsWith('supabase/functions/iyzico-callback/'),
 )
 
-/** `${…}` HTML satırında güvenli sayılan biçimler. */
-const GUVENLI_INTERP = [
-  /^kacir\(/, // ortak kaçış
-  // Koşul: `${x ? `…` : ''}` — dal şablon değişmezi ya da dizge olmalı (içteki `${…}` ayrıca taranır);
-  // `${ad ? ad : ''}` gibi ham değer döndüren üçlü ifade güvenli SAYILMAZ.
-  /^[\w.]+\s*\?\s*[`'"]/,
-  /^\w+Html\s*$/, // adı `…Html` ile biten değer: kaçışla KURULMUŞ hazır HTML parçası
-]
+/*
+ * G1 dedektörü — şablon değişmezlerini AYRIŞTIRIR (satır regex'i değil).
+ *
+ * NİÇİN (güvenlik incelemesi 2026-11-03 takibi, OPS-213): eski kapı `${` sonrasını `[^}]*` ile
+ * ilk `}`'ye kadar alıyor ve `^[\w.]+\s*\?\s*[`'"]` önekine bakıyordu. İki kör nokta vardı:
+ *   (a) `${x ? `<p>${kacir(a)}</p>` : ad}` — yakalama içteki ilk `}`'de bitiyordu, `: ad` dalı hiç
+ *       okunmuyordu; `${x ? 'a' : ad}` da önek eşleştiği için geçiyordu.
+ *   (b) Çok satırlı üçlü ifadenin `${` satırında etiket yoksa ifade hiç taranmıyordu.
+ * Şimdi her `${…}` ayraç sayılarak tümüyle okunur; üçlü ifadenin İKİ dalı da denetlenir.
+ */
+
+/** `s[i]` bir tırnak ise eşleşen kapanışın indeksi (şablonda `${…}` iç içeliği sayılır). */
+function dizgeSonu(s: string, i: number): number {
+  const q = s[i]
+  for (let j = i + 1; j < s.length; j++) {
+    if (s[j] === '\\') { j++; continue }
+    if (q === '`' && s[j] === '$' && s[j + 1] === '{') { j = ayracSonu(s, j + 1); continue }
+    if (s[j] === q) return j
+  }
+  return s.length - 1
+}
+
+/** `s[i] === '{'` için eşleşen `}` indeksi; aradaki dizge/şablonlar atlanır. */
+function ayracSonu(s: string, i: number): number {
+  let d = 0
+  for (let j = i; j < s.length; j++) {
+    const c = s[j]
+    if (c === "'" || c === '"' || c === '`') { j = dizgeSonu(s, j); continue }
+    if (c === '{') d++
+    else if (c === '}' && --d === 0) return j
+  }
+  return s.length - 1
+}
+
+type Sablon = { bas: number; son: number }
+type Interp = { bas: number; ifade: string }
+
+/** Metindeki EN DIŞ şablon değişmezleri (dizge içindekiler değil; `${…}` içindekiler ayrıca bulunur). */
+function sablonlar(s: string): Sablon[] {
+  const out: Sablon[] = []
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i]
+    if (c === "'" || c === '"') { i = dizgeSonu(s, i); continue }
+    if (c === '`') {
+      const son = dizgeSonu(s, i)
+      out.push({ bas: i, son })
+      i = son
+    }
+  }
+  return out
+}
+
+/** Bir şablon değişmezinin doğrudan `${…}` ifadeleri (iç içe şablonlarınki değil). */
+function interplar(s: string, t: Sablon): Interp[] {
+  const out: Interp[] = []
+  for (let j = t.bas + 1; j < t.son; j++) {
+    if (s[j] === '\\') { j++; continue }
+    if (s[j] === '$' && s[j + 1] === '{') {
+      const k = ayracSonu(s, j + 1)
+      out.push({ bas: j, ifade: s.slice(j + 2, k) })
+      j = k
+    }
+  }
+  return out
+}
+
+/** En üst düzeyde `kosul ? a : b` ise üç parça; değilse null. `?.` ve `??` üçlü değildir. */
+function ucluBol(e: string): [string, string, string] | null {
+  let d = 0
+  let soru = -1
+  let ic = 0
+  for (let i = 0; i < e.length; i++) {
+    const c = e[i]
+    if (c === "'" || c === '"' || c === '`') { i = dizgeSonu(e, i); continue }
+    if ('([{'.includes(c)) d++
+    else if (')]}'.includes(c)) d--
+    else if (d === 0 && c === '?') {
+      if (e[i + 1] === '.' || e[i + 1] === '?' || e[i - 1] === '?') { if (e[i + 1] === '?') i++; continue }
+      if (soru < 0) soru = i
+      else ic++
+    } else if (d === 0 && c === ':' && soru >= 0) {
+      if (ic > 0) { ic--; continue }
+      return [e.slice(0, soru), e.slice(soru + 1, i), e.slice(i + 1)]
+    }
+  }
+  return null
+}
+
+const HTML_ETIKETI = /<\/?[a-zA-Z][^>]*>?/
+
+/** `kacir(…)` sonrası izinli tek ek: SABİT dizgeyle `.replace(/…/g, '<br>')` zinciri (notification-service). */
+const KACIS_SONRASI_SERBEST = /^(?:\.replace\(\s*\/(?:[^/\\\n]|\\.)+\/[gimsuy]*\s*,\s*'[^'$]*'\s*\))*$/
+
+/**
+ * HTML bağlamındaki bir `${ifade}` güvenli mi. Güvenli biçimler:
+ *   - tek bir `kacir(…)` çağrısı (çağrıdan sonra `+ ham` gibi ek YOK),
+ *   - adı `…Html` ile biten değer (kaçışla KURULMUŞ hazır HTML parçası),
+ *   - üçlü ifade: İKİ dal da güvenli (dizge değişmezi, içi güvenli şablon değişmezi ya da yine bu kurallar).
+ */
+function ifadeGuvenli(kod: string): boolean {
+  const e = kod.trim()
+  const k = /^kacir\s*\(/.exec(e)
+  if (k) {
+    let d = 0
+    for (let i = k[0].length - 1; i < e.length; i++) {
+      const c = e[i]
+      if (c === "'" || c === '"' || c === '`') { i = dizgeSonu(e, i); continue }
+      if (c === '(') d++
+      else if (c === ')' && --d === 0) return KACIS_SONRASI_SERBEST.test(e.slice(i + 1).trim())
+    }
+    return false
+  }
+  if (/^\w+Html$/.test(e)) return true
+  const uc = ucluBol(e)
+  if (uc) return dalGuvenli(uc[1]) && dalGuvenli(uc[2])
+  return false
+}
+
+function dalGuvenli(kod: string): boolean {
+  const e = kod.trim()
+  if (/^'[^']*'$|^"[^"]*"$/.test(e)) return true
+  if (e.startsWith('`') && dizgeSonu(e, 0) === e.length - 1) {
+    return interplar(e, { bas: 0, son: e.length - 1 }).every((x) => ifadeGuvenli(x.ifade))
+  }
+  return ifadeGuvenli(e)
+}
+
+/**
+ * Kaynakta HTML bağlamında olup güvenli olmayan `${…}` listesi (`<satır>  ${<ifade başı>`).
+ * HTML bağlamı: `${`'nin satırı etiket taşır YA DA ifadenin kendisi etiket taşır (çok satırlı koşul).
+ * Bağlam dışı ifadelerin içindeki şablonlar da (ör. `.map(x => `<li>…`)`) kendi başına taranır.
+ */
+function hamInterplar(kod: string, sayac = { baglam: 0 }): string[] {
+  const satirlar = kod.split('\n')
+  const satirNo = (konum: number) => kod.slice(0, konum).split('\n').length
+  const out: string[] = []
+  const tara = (metin: string, kaydirma: number) => {
+    for (const t of sablonlar(metin)) {
+      for (const x of interplar(metin, t)) {
+        const no = satirNo(kaydirma + x.bas)
+        const baglam = HTML_ETIKETI.test(satirlar[no - 1] ?? '') || HTML_ETIKETI.test(x.ifade)
+        if (baglam) {
+          sayac.baglam++
+          if (!ifadeGuvenli(x.ifade)) out.push(`${no}  \${${x.ifade.trim().replace(/\s+/g, ' ').slice(0, 40)}`)
+        } else {
+          tara(x.ifade, kaydirma + x.bas + 2)
+        }
+      }
+    }
+  }
+  tara(kod, 0)
+  return out
+}
 
 describe('INV-CIKTI-KODLAMA-1 · G1 e-posta HTML kaçışı', () => {
   it('⭐karne kilidi: e-posta HTML satırlarında ham `${…}` interpolasyonu yok (taban boş)', () => {
     const ihlal: string[] = []
-    for (const d of EPOSTA_EVRENI) {
-      d.kod.split('\n').forEach((satir, i) => {
-        if (!/<\/?[a-zA-Z][^>]*>?/.test(satir)) return
-        for (const m of satir.matchAll(/\$\{\s*([^}]*)/g)) {
-          if (GUVENLI_INTERP.some((r) => r.test(m[1]))) continue
-          ihlal.push(`${d.ad}:${i + 1}  \${${m[1].slice(0, 40)}`)
-        }
-      })
-    }
+    for (const d of EPOSTA_EVRENI) for (const h of hamInterplar(d.kod)) ihlal.push(`${d.ad}:${h}`)
     expect(
       ihlal,
       'E-posta HTML satirinda kacissiz deger var. `kacir(…)` ile sar ya da sablon motorundan ' +
         '(`_shared/kodlama.ts` renderTemplate) gecir.\n  ' + ihlal.join('\n  '),
     ).toEqual([])
+  })
+
+  it('dedektör çalışıyor: üçlü ifadenin her iki dalı da taranır (sabotaj kolları, OPS-213)', () => {
+    const ham = (s: string) => hamInterplar(s).length
+    // Güvenli biçimler.
+    expect(ham('const h = `<p>${kacir(ad)}</p>`')).toBe(0)
+    expect(ham("const h = `<p>${x ? `<b>${kacir(ad)}</b>` : ''}</p>`")).toBe(0)
+    expect(ham("const h = `<p>${x ? 'evet' : \"hayir\"}</p>`")).toBe(0)
+    expect(ham('const h = `<ul>${satirHtml}</ul>`')).toBe(0)
+    expect(ham("const h = `<p>${a ? kacir(a) : b ? kacir(b) : '-'}</p>`")).toBe(0)
+    expect(ham("const h = `<p>${o?.x ?? '' ? 'a' : 'b'}</p>`")).toBe(0)
+    // SABOTAJ: eski kapının geçirdiği her biçim artık kırmızı.
+    expect(ham("const h = `<p>${x ? 'a' : ad}</p>`"), 'else dalı ham').toBe(1)
+    expect(ham('const h = `<p>${x ? `<b>a</b>` : ad}</p>`'), 'şablon dallı, else ham').toBe(1)
+    expect(ham("const h = `<p>${x ? `<b>${ad}</b>` : ''}</p>`"), 'iç şablonda ham').toBe(1)
+    expect(ham("const h = `<p>${a ? kacir(a) : b ? b : '-'}</p>`"), 'iç içe üçlüde ham').toBe(1)
+    expect(ham("const h = `<p>${kacir(m).replace(/\\n/g, '<br>')}</p>`")).toBe(0)
+    expect(ham('const h = `<p>${kacir(a) + ad}</p>`'), 'kacir sonrası ek').toBe(1)
+    expect(ham("const h = `<p>${kacir(a).replace(/x/g, ad)}</p>`"), 'kacir sonrası ham replace').toBe(1)
+    expect(ham('const h = `<p>${ad}</p>`'), 'düz ham').toBe(1)
+    // Çok satırlı: `${` satırında etiket yok, else dalı ham.
+    expect(ham("const h = `\n  ${notlar ? `\n  <div>${kacir(notlar)}</div>\n  ` : ad}\n`"), 'çok satırlı').toBe(1)
+    // Bağlam dışı ifadenin içindeki şablon da taranır.
+    expect(ham("const h = `\n  ${liste.map((x) => `<li>${x.ad}</li>`).join('')}\n`"), 'map içi ham').toBe(1)
+  })
+
+  it('dedektör kör değil: evrende HTML bağlamlı `${…}` gerçekten bulunuyor', () => {
+    const sayac = { baglam: 0 }
+    for (const d of EPOSTA_EVRENI) hamInterplar(d.kod, sayac)
+    expect(sayac.baglam, 'Ayristirici sablon bulamiyor — kapi olcmuyor.').toBeGreaterThan(50)
   })
 
   it('evren kör değil: yedi e-posta dosyası ölçülüyor', () => {
@@ -301,7 +471,6 @@ const HATA_GOVDESI_TABANI = new Set([
   'admin-create-coupon',
   'admin-iyzico-reconcile',
   'admin-order-inspect',
-  'admin-orders-latest', // verify_jwt=false ama yanıt admin kapısının arkasında; edge yetki işi (karne kök 2)
   'admin-update-order',
   'admin-update-shipping',
   'apply-coupon',
@@ -363,5 +532,124 @@ describe('INV-CIKTI-KODLAMA-1 · S6 log-client-error maskesi', () => {
   it('yerel `mask` kopyası kalmadı; Slack çağrılarında ham `payload` yok', () => {
     expect(kod).not.toMatch(/const\s+mask\s*=/)
     for (const c of cagrilar(kod, /slackNotify\(/g)) expect(c.metin).not.toMatch(/payload\./)
+  })
+})
+
+// ---------------------------------------------------------------- (7) K8 — sağlayıcı/DB hata metni
+
+/**
+ * `const v = await x.text()` ile okunan DIŞ yanıt metni (Resend, Twilio, İyzico, PostgREST) serbest
+ * metindir: alıcı adresi, telefon ya da satır değeri yankılanabilir. Değişkenin her kullanımı
+ * `metniMaskele(v…)` içinde olmalı; tek istisna ham metinden SINIFLANDIRMA (`v.toLowerCase()`,
+ * `v.includes(…)`) — sonuç dışarı çıkmaz. İstek gövdesi (`req.text()`) ölçüt dışıdır.
+ * Güvenlik incelemesi 2026-11-03 takibi (OPS-213): `return-status-notification` ve
+ * `shipping-notification` Resend metnini log, Sentry, yanıt ve denetim kaydına maskesiz koyuyordu.
+ */
+function maskesizSaglayiciMetni(kod: string): string[] {
+  const out: string[] = []
+  for (const m of kod.matchAll(/const\s+(\w+)\s*=\s*(metniMaskele\(\s*)?await\s+(\w+)\.text\(\)/g)) {
+    const [, ad, sarili, kaynak] = m
+    if (sarili || /^(req|request)$/.test(kaynak)) continue
+    const bildirimSonu = (m.index ?? 0) + m[0].length
+    // Kapsam yaklaşığı: aynı adın bir sonraki bildirimine kadar (başka bloktaki `const detail` ayrı değişkendir).
+    const kalan = kod.slice(bildirimSonu)
+    const yeniden = new RegExp(`\\b(?:const|let)\\s+${ad}\\b`).exec(kalan)
+    const kapsam = yeniden ? kalan.slice(0, yeniden.index) : kalan
+    const kullanimlar = [...kapsam.matchAll(new RegExp(`\\b${ad}\\b`, 'g'))]
+    const ham = kullanimlar.filter((u) => {
+      const konum = bildirimSonu + (u.index ?? 0)
+      const once = kod.slice(Math.max(0, konum - 20), konum)
+      const sonra = kod.slice(konum + ad.length, konum + ad.length + 14)
+      if (/(metniMaskele|\.test)\(\s*$/.test(once)) return false // maskeli ya da regex sınıflandırması
+      if (/(JSON\.parse|\b\w+M[iıuü])\(\s*$/.test(once)) return false // başarılı gövdeyi ayrıştırma, `…Mi(` yüklemi
+      if (/^\.(toLowerCase\(\)|includes\()/.test(sonra)) return false // sınıflandırma
+      if (/^\s*:(?!:)/.test(sonra) && /[{,]\s*$/.test(once)) return false // nesne ANAHTARI (`detail: …`)
+      return true
+    })
+    if (ham.length > 0 || kullanimlar.length === 0) out.push(`${kod.slice(0, m.index).split('\n').length}: ${ad}`)
+  }
+  return out
+}
+
+/**
+ * TABAN (ratchet): sağlayıcı/DB yanıt metnini bugün maskesiz kullanan, bu işin (OPS-213) DIŞINDA
+ * kalan dosyalar. Liste yalnız KÜÇÜLÜR; yeni bir dosya eklenemez.
+ */
+const K8_TABANI = new Set<string>([
+  // DOKUNULMADI: ödeme durum makinesi PR'ı (karne kök 1) bu dosyada çalışıyor; RPC hata metni loga gidiyor.
+  'supabase/functions/iyzico-callback/index.ts',
+])
+
+describe('INV-CIKTI-KODLAMA-1 · K8 sağlayıcı/DB hata metni maskeli', () => {
+  it('dedektör çalışıyor: ham kullanımı yakalar, maskeli ve sınıflandırma kullanımını geçirir (sabotaj kolları)', () => {
+    const ham = (s: string) => maskesizSaglayiciMetni(s).length
+    expect(ham("const t = await resp.text()\nthrow new Error(`x ${metniMaskele(t, 500)}`)")).toBe(0)
+    expect(ham("const t = metniMaskele(await resp.text().catch(() => ''), 500)\nthrow new Error(t)")).toBe(0)
+    expect(ham("const h = await resp.text()\nconst r = h.toLowerCase().includes('domain')\nconst t = metniMaskele(h, 500)")).toBe(0)
+    expect(ham('const raw = await req.text()\nJSON.parse(raw)')).toBe(0)
+    // SABOTAJ: #2215 sonrası kalan biçimler.
+    expect(ham('const errorText = await r.text()\nthrow new Error(`Email failed: ${errorText}`)'), 'throw').toBe(1)
+    expect(ham("const t = await r.text()\nconsole.error('x', metniMaskele(t, 9))\nlog({ e: t.slice(0, 500) })"), 'denetim').toBe(1)
+    expect(ham('const t = await r.text()'), 'okunup kullanılmayan da şüpheli').toBe(1)
+  })
+
+  it('⭐OPS-213: return-status-notification, shipping-notification, iyzico-payment temiz', () => {
+    for (const islev of ['return-status-notification', 'shipping-notification', 'iyzico-payment']) {
+      expect(maskesizSaglayiciMetni(islevKodu(islev)), `${islev}: saglayici metni maskesiz`).toEqual([])
+    }
+  })
+
+  it('ratchet: tabanda olmayan hiçbir dosya sağlayıcı metnini maskesiz kullanmaz', () => {
+    const bulunan = DOSYALAR.map((d) => ({ ad: d.ad, isabet: maskesizSaglayiciMetni(d.kod) }))
+      .filter((x) => x.isabet.length > 0)
+    const ihlal = bulunan.filter((x) => !K8_TABANI.has(x.ad)).map((x) => `${x.ad}  ${x.isabet.join(', ')}`)
+    expect(ihlal, 'Saglayici/DB hata metni maskesiz: metniMaskele(v, N) ile sar.\n  ' + ihlal.join('\n  ')).toEqual([])
+    const bayat = [...K8_TABANI].filter((ad) => !bulunan.some((x) => x.ad === ad))
+    expect(bayat, 'Duzelen dosyayi K8_TABANI listesinden sil.').toEqual([])
+  })
+
+  it('iyzico-payment geniş catch ve Slack alanları maskeli (OPS-213 madde 3)', () => {
+    const kod = islevKodu('iyzico-payment')
+    const kritik = cagrilar(kod, /console\.error\(\s*'Critical Error:'/g)
+    expect(kritik.length).toBe(1)
+    expect(kritik[0].metin).toMatch(/metniMaskele\(/)
+    expect(kodKismi(kritik[0].metin)).not.toMatch(/,\s*error\s*$/)
+    const slack = cagrilar(kod, /slackNotify\(/g)
+    expect(slack.length).toBeGreaterThanOrEqual(3)
+    for (const c of slack) {
+      const g = kodKismi(c.metin)
+      expect(g, `slackNotify satir ${c.satir}: ham hata metni`).not.toMatch(/\.message\b|errorMessage|String\(\s*(_?e|err|error)\s*\)/)
+    }
+    expect(kod).toMatch(/const errMsg = metniMaskele\(/)
+    expect(kod).toMatch(/const iyzicoHata = metniMaskele\(/)
+  })
+
+  it('Sentry olay mesajı merkezde maskelenir (`_shared/sentry.ts`)', () => {
+    const kod = DOSYALAR.find((d) => d.ad === 'supabase/functions/_shared/sentry.ts')?.kod ?? ''
+    expect(kod).toMatch(/import \{ metniMaskele \} from '\.\/maske\.ts'/)
+    expect(kod.match(/metniMaskele\(/g)?.length ?? 0).toBeGreaterThanOrEqual(2)
+  })
+})
+
+// ---------------------------------------------------------------- (8) OPS-213 — gövde sınırı ve Slack kaçışı
+
+describe('INV-CIKTI-KODLAMA-1 · gövde boyutu ve Slack mrkdwn', () => {
+  it('log-client-error gövdeyi yalnız `govdeyiSinirliOku` ile okur (sınırsız `req.json()` / `req.text()` yok)', () => {
+    const kod = islevKodu('log-client-error')
+    expect(kod).toMatch(/import \{ govdeyiSinirliOku \} from '\.\.\/_shared\/govde_siniri\.ts'/)
+    expect(kod).toMatch(/govdeyiSinirliOku\(req,\s*GOVDE_SINIRI_BAYT\)/)
+    expect(kod).toMatch(/const GOVDE_SINIRI_BAYT = \d+ \* 1024/)
+    expect(kod).not.toMatch(/\breq\.(json|text|arrayBuffer|formData)\(/)
+    expect(kod).toMatch(/status: buyuk \? 413 : 400/)
+  })
+
+  it('notify: Slack yükündeki metin, alan başlığı ve değeri `slackKacir`dan geçer', () => {
+    const kod = DOSYALAR.find((d) => d.ad === 'supabase/functions/_shared/notify.ts')?.kod ?? ''
+    const slack = kod.slice(kod.indexOf('async function sendSlack'), kod.indexOf('async function sendEmail'))
+    expect(slack.length, 'sendSlack bulunamadi').toBeGreaterThan(50)
+    expect(slack).toMatch(/\{\s*text:\s*slackKacir\(text\)\s*\}/)
+    expect(slack).toMatch(/title:\s*slackKacir\(f\.title\)/)
+    expect(slack).toMatch(/value:\s*slackKacir\(f\.value\)/)
+    expect(slack).not.toMatch(/String\(f\.(title|value)\)/)
   })
 })
