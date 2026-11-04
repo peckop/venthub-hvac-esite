@@ -591,6 +591,9 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain("Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok)")
       expect(metin, ad).toContain('Sorumlu yine "ben" kalır, Sırada sütununa "<DEPARTMAN ADI> işini bekliyor" yaz (bekleyen departmanın adı yazılır, "başka departman" denmez; departman değilse neyi beklediği yazılır: CI, Recep onayı, dış kişi) (OPS hariç)')
       expect(metin, ad).toContain("İşi kalmayan departman bunu Recep'e değil OPS'a yazar")
+      // HRT-100 (OPS-203): kararlar yalnız OPS penceresinde; departman Recep'e karar sorusu yazmaz.
+      expect(metin, ad).toContain('(OPS hariç) Recep\'e karar sorusu ya da "Recep\'te:" satırı yazılmaz: karar gereken konu OPS\'a SendMessage ile gider')
+      expect(metin, ad).toContain('karar sorusunu yine OPS üzerinden yürütür')
     }
   })
 
