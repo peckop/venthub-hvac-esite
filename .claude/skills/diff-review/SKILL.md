@@ -57,7 +57,8 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 4. **Console.log kalıntısı:** Geliştirme çöpünün production'a sızması engellenir.
 5. **Hardcoded URL sızıntısı (localhost:3000):** Geliştirme ortamı URL'si production bundle'a gitmemeli.
 6. **Mock data sızıntısı:** app/ path'lerinde inline object array kalıntıları (geçici test verisi).
-7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması.
+7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması. `SUPABASE_SERVICE_ROLE_KEY` ortam değişkeni ADI sunucu yollarında (`supabase/`, `scripts/`, `.github/`, `src/app/api/`, `src/__tests__/`) meşrudur ve alarm vermez; istemci yollarında BLOCKER'dır.
+7b. **Sır değeri (JWT biçimi `eyJ...`):** gerçek bir anahtar değeri diff'e girerse BLOCKER; `.md`, `.json`, `.yml` dahil HER dosyada taranır (bu üç uzantıda diğer kurallar susar, çünkü dokümanda ve workflow'da `any`, `localhost` gibi sözler meşrudur).
 8. **useSearchParams Suspense İhlali (⚠BETİK BUNU ÖLÇMEZ — yalnız elle/gözle bakılır; betiğe ekleme ayrı iş, D11):** Git diff'te yeni eklenen veya değiştirilen bir dosyada `useSearchParams` hook'unun kullanıldığı, ancak dosya içerisinde `<Suspense>` sarmalının veya wrapper'ının yer almadığı durumlar riskli kabul edilerek uyarılır.
 
 ## Çıtayı düşürerek yeşil (YTN-21 eki, elle okunur)

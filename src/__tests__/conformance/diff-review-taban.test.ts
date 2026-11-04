@@ -144,4 +144,45 @@ describe('INV-DIFF-REVIEW-TABAN-1 · diff-review betiği', () => {
     expect(yok.cikti).toContain('olmayan-dal')
     expect(yok.cikis).toBe(2)
   })
+
+  it('(f) service_role ortam değişkeni ADI sunucu yolunda yanlış alarm vermez, istemci yolunda BLOCKER verir (YTN-36)', () => {
+    const d = depoKur('master')
+    git(d, 'checkout', '-q', '-b', 'ozellik')
+    fs.mkdirSync(path.join(d, 'supabase/functions/x'), { recursive: true })
+    fs.writeFileSync(
+      path.join(d, 'supabase/functions/x/index.ts'),
+      "export const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')\n",
+    )
+    git(d, 'add', '.')
+    git(d, 'commit', '-q', '-m', 'sunucu')
+    const sunucu = betikCalistir(d)
+    expect(sunucu.cikti).not.toContain('SECRET_LEAK')
+    expect(sunucu.cikis).toBe(0)
+
+    fs.mkdirSync(path.join(d, 'src/components'), { recursive: true })
+    fs.writeFileSync(
+      path.join(d, 'src/components/A.tsx'),
+      "export const k = process.env.SUPABASE_SERVICE_ROLE_KEY\n",
+    )
+    git(d, 'add', '.')
+    git(d, 'commit', '-q', '-m', 'istemci')
+    const istemci = betikCalistir(d)
+    expect(istemci.cikti).toContain('[BLOCKER]')
+    expect(istemci.cikis).toBe(1)
+  })
+
+  it('(g) JWT biçimli sır değeri .json ve .yml dosyasında da BLOCKER verir; hariç tutulan dosyada başka kural susar (YTN-36)', () => {
+    const d = depoKur('master')
+    git(d, 'checkout', '-q', '-b', 'ozellik')
+    // Çalışma anında birleştirilir: düz yazılsaydı depo sır tarayıcıları test dosyasını işaretlerdi.
+    const jwt = ['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9', 'eyJyb2xlIjoic2VydmljZV9yb2xlIn0', 'abcdefghijklmnopqrstuvwxyz0123'].join('.')
+    fs.writeFileSync(path.join(d, 'ayar.json'), `{"anahtar": "${jwt}"}\n`)
+    fs.writeFileSync(path.join(d, 'not.md'), ihlalSatiri('n'))
+    git(d, 'add', '.')
+    git(d, 'commit', '-q', '-m', 'sir')
+    const r = betikCalistir(d)
+    expect(r.cikti).toContain('ayar.json')
+    expect(r.cikti).not.toContain('not.md')
+    expect(r.cikis).toBe(1)
+  })
 })

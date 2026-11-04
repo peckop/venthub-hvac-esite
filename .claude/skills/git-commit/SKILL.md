@@ -109,7 +109,7 @@ Analyze the diff to determine:
 
 - **Type**: What kind of change is this?
 - **Scope**: What area/module is affected?
-- **Description**: One-line summary of what changed (present tense, imperative mood, <72 chars)
+- **Description**: One-line summary of what changed (VentHub: Türkçe, `ŞERİT (REC-nn): ne oldu — niçin (#PR)` biçimi; uzunluk sınırı yok)
 
 ### 4. Execute Commit
 
@@ -131,10 +131,8 @@ EOF
 ## Best Practices
 
 - One logical change per commit
-- Present tense: "add" not "added"
-- Imperative mood: "fix bug" not "fixes bug"
+- Dil ve biçim: Türkçe, `ŞERİT (REC-nn): ne oldu — niçin (#PR)`; tür öneki (`fix:`) ve 72 karakter sınırı yok (üstteki not)
 - Reference issues: VentHub'da kullanılmaz (`Closes`/`Fixes` yasak; bkz. üstteki not)
-- Keep description under 72 characters
 
 ## Git Safety Protocol
 
