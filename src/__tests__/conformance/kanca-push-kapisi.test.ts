@@ -32,6 +32,7 @@ describe('INV-PUSH-KAPISI-1 — izin verilen tek biçim', () => {
     'git -C /depo/calisma push origin feat-x',
     'git -C C:/Users/alize/venthub-pdf-ingestor push origin kaynak-dizini-x',
     'git -C /kardes/ingestor push -u origin feat-x',
+    'git -C "C:\\Users\\alize\\venthub-pdf-ingestor" push origin feat-x',
     'cd /kardes/ingestor && git push origin feat-x',
     'git status && git push origin feat-x',
     'git push',
@@ -113,6 +114,9 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     ['pwsh -Command "git push -f origin x"', 'yasak bayrak'],
     ['cmd /c "git push origin main"', 'korunan'],
     ['git -C /baska/depo-degil -C . push origin feat-x', 'git deposu değil'],
+    ['git -C //sunucu/paylasim/depo push origin feat-x', 'UNC'],
+    ['git -C "\\\\sunucu\\paylasim" push origin feat-x', 'UNC'],
+    ['git -C \\\\?\\C:\\depo push origin feat-x', 'UNC'],
   ])('reddeder: %s', (k, parca) => {
     const sonuc = ret(k)
     expect(sonuc, k).not.toBeNull()
@@ -131,7 +135,10 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     const s = (cwd: string): Secenek => ({ cwd, mevcutDal: dal, gitDeposu: () => true })
     expect(ret('cd /depo/ana-master && git push', s(CWD))).toContain('master')
     expect(ret('cd /depo/ana-master && git push origin HEAD', s(CWD))).toContain('master')
-    expect(ret('cd /depo/ozellik && git push', s(path.resolve('/depo/ana-master')))).toBeNull()
+    // fail-closed: özgün klasör korunan dalda ise `cd` koşullu/alt kabukta kalmış olabilir → yine reddedilir (güvenlik incelemesi, 3. tur)
+    expect(ret('cd /depo/ozellik && git push', s(path.resolve('/depo/ana-master')))).toContain('master')
+    expect(ret('cd /depo/ozellik && git push', s(CWD))).toBeNull()
+    expect(ret('false || cd /depo/ana-master; git push origin HEAD', s(CWD))).toContain('master')
     expect(ret('git push', s(path.resolve('/depo/ana-master')))).toContain('master')
     expect(ret('cd /depo/ozellik; git -C ../ana-master push origin HEAD', s(CWD))).toContain('master')
   })

@@ -34,6 +34,8 @@ const IZINLI_BAYRAK = new Set(['-u', '--set-upstream', '-n', '--dry-run', '--no-
 const SARMALAYICI = new Set(['command', 'exec', 'nohup', 'time', 'builtin', 'env', 'sudo', 'nice', 'ionice', 'xargs', 'setsid', 'stdbuf', 'timeout'])
 const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash', 'pwsh', 'powershell', 'cmd'])
 const ATAMA = /^[A-Za-z_][A-Za-z0-9_]*=/
+/** UNC (\\sunucu\paylaşım), // ağ yolu ve \\?\ \\.\ aygıt önekleri: kanca bunlara dokunmaz (SMB/dosya sistemi erişimi tetiklenmesin). */
+const AG_YOLU = (y) => /^(?:\\\\|\/\/)/.test(String(y))
 
 /** Komut adı: yol ve .exe atılır, küçük harf (`/usr/bin/GIT.exe` → `git`). */
 const komutAdi = (x) => path.basename(String(x)).replace(/\.exe$/i, '').toLowerCase()
@@ -81,7 +83,8 @@ function parcala(komut) {
     const c = komut[i]
     if (tirnak) {
       if (c === tirnak) tirnak = null
-      else if (c === '\\' && tirnak === '"' && i + 1 < komut.length) jeton += komut[++i]
+      // Çift tırnak içinde ters eğik çizgi yalnız $ ` " \ önünde kaçıştır (bash gibi); "C:\Users\..." yolu bozulmaz.
+      else if (c === '\\' && tirnak === '"' && i + 1 < komut.length && '$`"\\'.includes(komut[i + 1])) jeton += komut[++i]
       else jeton += c
       continue
     }
@@ -147,6 +150,8 @@ function pushBul(t) {
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
  */
 function degerlendir(komut, o) {
+  // UNC/ağ/aygıt yolu: ayrıştırıcı ters eğik çizgileri kaçış sayıp yolu bozabileceği için HAM metinde aranır (-C ve cd hedefi).
+  if (/(?:\s-C\s*|\bcd\s+)["']?(?:\\\\|\/\/)/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
   const parcalar = parcala(String(komut || ''))
   // Tırnaklı yük da tek token olur ("git push origin master"): git sözcüğü token içinde de aranır.
   const gitGecer = (x) => komutAdi(x) === 'git' || /(^|[\s/\\])git(\.exe)?(\s|$)/i.test(x)
@@ -167,8 +172,8 @@ function degerlendir(komut, o) {
     // bash -c "..." / eval "..." / pwsh -Command "..." / cmd /c "..." içini de tara
     const ilk = asilKomut(t)
     const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
-    const oo = { ...o, cwd }
-    if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-')) cwd = path.resolve(cwd, t[ilk + 1])
+    const oo = { ...o, cwd, ekCwd: cwd !== o.cwd ? [o.cwd] : [] }
+    if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-') && !AG_YOLU(t[ilk + 1])) cwd = path.resolve(cwd, t[ilk + 1])
     if (KABUKLAR.has(ad)) {
       if (t.some((x, k) => k > ilk && /^-(e|ec|enc|encodedcommand)$/i.test(x))) return 'kodlanmış kabuk komutu (-EncodedCommand): içerik denetlenemez; düz yaz'
       const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))
@@ -202,6 +207,7 @@ function pushDegerlendir({ c, args }, o) {
     // art arda -C değerleri git gibi birikir: her biri öncekine göre çözülür, SON yol denetlenir.
     // OPS kararı (4 Kasım, #2252): -C yolu HERHANGİ bir git deposu olabilir (kardeş depo venthub-pdf-ingestor dahil);
     // kurallar (master/main, force, silme) O deponun dalında uygulanır. Git deposu olmayan yol reddedilir.
+    if (c.some(AG_YOLU)) return `git -C ${c.join(' -C ')}: UNC/ağ/aygıt yolu (\\\\, //, \\\\?\\) denetlenmez; yerel yol yaz`
     const cozulen = c.reduce((onceki, y) => path.resolve(onceki, y), o.cwd)
     const depoMu = o.gitDeposu || ((y) => git(y, 'rev-parse', '--git-dir') !== null)
     if (!depoMu(cozulen)) return `git -C ${c.join(' -C ')}: yol bir git deposu değil; push yalnız bir git deposundan yapılır`
@@ -221,9 +227,15 @@ function pushDegerlendir({ c, args }, o) {
   const uzak = konumsal[0]
   const refspecler = konumsal.slice(1)
   if (uzak !== undefined && !/^[A-Za-z0-9_][A-Za-z0-9_.-]*$/.test(uzak)) return `uzak '${uzak}' adlı bir uzak değil (adres/yol); yalnız adlı uzak (origin) geçer`
+  // Mevcut dal: izlenen klasörde VE (açık -C yoksa) komutun başladığı özgün klasörde ölçülür; ikisinden biri korunan dalsa o döner.
+  // `cd X` koşullu çalışmamış olabilir ( `false || cd X` ), alt kabukta kalmış olabilir: iki ölçümden biri master ise reddet (fail-closed).
   let mevcut
   const mevcutAl = () => {
-    if (mevcut === undefined) mevcut = o.mevcutDal ? o.mevcutDal(cwd) : null
+    if (mevcut === undefined) {
+      const klasorler = [cwd, ...(c.length === 0 ? o.ekCwd || [] : [])]
+      const dallar = klasorler.map((k) => (o.mevcutDal ? o.mevcutDal(k) : null))
+      mevcut = dallar.find((d) => d && KORUNAN.has(d)) || dallar[0] || null
+    }
     return mevcut
   }
   if (refspecler.length === 0) {
