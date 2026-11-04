@@ -239,6 +239,16 @@
         ]
       },
       {
+        "matcher": "Agent|SendMessage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/olcum-satiri-uyarisi.cjs\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "mcp__ccd_session__start_session",
         "hooks": [
           {
@@ -528,6 +538,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-beklenti-kapisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/soz-bekcisi.cjs\"",
+            "timeout": 15
           },
           {
             "type": "command",
