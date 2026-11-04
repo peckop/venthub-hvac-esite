@@ -6,28 +6,34 @@ import { pathToFileURL } from 'node:url'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * INV-ALT136-1 — DEFINER fonksiyonlarına kiracı kapısı + url_takma_adlari_listele anon REVOKE (ALT-136).
+ * INV-ALT136-1 — DEFINER fonksiyonlarına kiracı kapısı (ALT-136); url_takma_adlari_listele anon'a AÇIK KALIR.
  *
  * ⭐NİÇİN VAR: DEFINER fonksiyonun rol kapısı "çağıran admin mi" diye bakar, KİRACIYI bilmez; RLS sahip yetkisiyle
  * atlandığı için rolü uygun bir kullanıcı başka kiracının ürününe stok yazabilir, e-postalarını okuyabilir, siparişinin
  * stoğunu geri verebilir, kullanıcısının rolünü değiştirebilirdi (kural 12: data bleeding). Doğru desen
  * process_goods_receipt'te: service_role değilse hedef satırın tenant_id'si public.jwt_tenant_id()'ye eşit olmalı,
  * değilse RAISE. Bu kapı o desenin altı gövdede (adjust_stock x2, admin_list_all_users, admin_list_users,
- * process_order_stock_restore, set_user_admin_role) sökülmemesini ve iki ayrı kararın geri kaçmamasını ölçer:
- * moderator bu iki listenin ÇAĞIRAN kapısında yok, url_takma_adlari_listele anon'a kapalı.
+ * process_order_stock_restore, set_user_admin_role) sökülmemesini ve iki kararın geri kaçmamasını ölçer:
+ * moderator bu iki listenin ÇAĞIRAN kapısında yok; url_takma_adlari_listele anon'a AÇIK kalır.
+ *
+ * ⭐ANON NEDEN AÇIK (pinli): ilk taramada tek çağıran service_role'lü harita betiği sanılmıştı; scripts/onizleme.mjs
+ * (satır 185 ve 313) anon anahtarı SUPABASE_SERVICE_ROLE_KEY değişken adıyla scripts/adres/harita-uret.ts'ye verir ve
+ * üreteç bu RPC'yi ANON olarak çağırır (ön izleme: haritaUret(env.NEXT_PUBLIC_SUPABASE_ANON_KEY, ...)). REVOKE edilirse
+ * ön izlemenin ADRES kipi sessizce bozulur. Bu dosya anon'un açık kalmasını ve sebebinin (onizleme.mjs) hâlâ geçerli
+ * olduğunu pinler; ön izleme düzeltilirse pin kırmızıya döner ve REVOKE yeniden değerlendirilebilir.
  *
  * KOLLAR
  *  A. STATİK — migration METNİ: zaman sınırları, damga sırası, başlık (imza, SECURITY DEFINER, search_path, dönüş tipi)
- *     tabanla AYNI, her gövdede kiracı kapısı, rol listeleri, anon REVOKE, rollback dosyası.
+ *     tabanla AYNI, her gövdede kiracı kapısı, rol listeleri, anon'un açık kalışı, rollback dosyası.
  *  B. GÖVDE SADAKATİ — her gövde, 2026-11-03 şema tabanındaki gövdeye (admin_list_all_users için #2243 gövdesine)
  *     YALNIZ aşağıdaki DEGISIM çiftleriyle ayrışır; çiftler dışındaki her satır tabanla birebir aynıdır. Gövdeyi elle
  *     yeniden yazmak ya da sessizce değiştirmek (ör. sipariş durum mantığına dokunmak, kural 11) burada KIRMIZI verir.
  *  C. DAVRANIŞ (PGlite) — migration'ın KENDİ SQL'i iki kiracılı veride koşar: yabancı kiracı reddedilir, service_role
- *     muaf, kendi kiracı çalışır. PGlite depoya bağımlılık OLARAK EKLİ DEĞİL: yüklenemezse kol ATLANIR ve atlandığı
- *     görünür (vitest "skipped"); ATLANMIŞ KOL YEŞİL DEĞİLDİR. Yerelde:
+ *     muaf, kendi kiracı çalışır, atlanan ürün sessiz başarı vermez. PGlite depoya bağımlılık OLARAK EKLİ DEĞİL:
+ *     yüklenemezse kol ATLANIR ve atlandığı görünür (vitest "skipped"); ATLANMIŞ KOL YEŞİL DEĞİLDİR. Yerelde:
  *       PGLITE_GIRIS=<klasör>/node_modules/@electric-sql/pglite/dist/index.js PGLITE_ZORUNLU=1 pnpm exec vitest run <bu dosya>
  *  D. AYIRT EDİCİLİK — her kol, bilerek bozulmuş migration kopyasında KIRMIZI verir (vakumda yeşil yok): süzgeç
- *     silinince, moderator eklenince, anon grant geri gelince ve diğerleri.
+ *     silinince, moderator eklenince, anon REVOKE gelince, profil-yok kapısı ve atlanan-ürün kapısı silinince ve diğerleri.
  *
  * ⚠ÖLÇMEDİĞİ (adıyla): canlıdaki GERÇEK jwt_tenant_id() (PGlite'ta aynı mantıkta bir taklit var), enforce_role_change
  * tetiği (set_user_admin_role davranışı tetiksiz ölçülür), canlı ACL ve canlı kiracı sayısı. Onları merge SONRASI
@@ -199,13 +205,18 @@ function kiraciIhlalleri(sql: string): string[] {
   )
   ara(
     'process_order_stock_restore',
-    'ürün güncellemesinde tenant_id = v_order_tenant + hareketin kiracısı',
-    /update public\.products set stock_qty = coalesce\(stock_qty, 0\) \+ v_qty where id = v_item\.product_id and tenant_id = v_order_tenant; continue when not found; insert into public\.inventory_movements \(product_id, order_id, delta, reason, tenant_id\) values \(v_item\.product_id, v_order_uuid, v_qty, p_reason, v_order_tenant\);/,
+    'ürün güncellemesinde tenant_id = v_order_tenant + atlanan ürünün sayılması + hareketin kiracısı',
+    /update public\.products set stock_qty = coalesce\(stock_qty, 0\) \+ v_qty where id = v_item\.product_id and tenant_id = v_order_tenant; if not found then v_skipped := v_skipped \+ 1; continue; end if; insert into public\.inventory_movements \(product_id, order_id, delta, reason, tenant_id\) values \(v_item\.product_id, v_order_uuid, v_qty, p_reason, v_order_tenant\);/,
+  )
+  ara(
+    'process_order_stock_restore',
+    'atlanan ürün kapısı: skipped > 0 iken tarayıcıda RAISE, service_role success:false (skipped dönüşte)',
+    /end loop; if v_skipped > 0 then if coalesce\(auth\.role\(\), ''\) <> 'service_role' then raise exception '[^']*', v_skipped; end if; return jsonb_build_object\( 'success', false, 'error', 'product tenant mismatch', [^;]*'skipped', v_skipped, [^;]*\); end if; return jsonb_build_object\( 'success', true, [^;]*'skipped', v_skipped, [^;]*\);/,
   )
   ara(
     'set_user_admin_role',
-    'hedef profilin kiracı kapısı (service_role muaf)',
-    /if coalesce\(auth\.role\(\), ''\) <> 'service_role' then select up\.tenant_id into v_hedef_tenant from public\.user_profiles up where up\.id = user_id; if found and v_hedef_tenant is distinct from public\.jwt_tenant_id\(\) then raise exception 'not authorized'; end if; end if;/,
+    'hedef profilin kiracı kapısı: profil YOKSA da RAISE (service_role muaf)',
+    /if coalesce\(auth\.role\(\), ''\) <> 'service_role' then select up\.tenant_id into v_hedef_tenant from public\.user_profiles up where up\.id = user_id; if not found or v_hedef_tenant is distinct from public\.jwt_tenant_id\(\) then raise exception 'not authorized'; end if; end if;/,
   )
   ara(
     'set_user_admin_role',
@@ -264,15 +275,32 @@ function sonYetki(z: Mig[], rol: string): 'grant' | 'revoke' | null {
   return son
 }
 
-/** url_takma_adlari_listele: zincirin SON hâlinde anon ve PUBLIC kapalı; authenticated ve service_role kapatılmamış. */
-function anonIhlalleri(z: Mig[]): string[] {
+/**
+ * url_takma_adlari_listele: zincirin SON hâlinde anon, authenticated ve service_role AÇIK (kapatılmamış), PUBLIC kapalı.
+ * Anon AÇIK KALIR: scripts/onizleme.mjs anon anahtarla harita üretecini koşturur (başlıktaki ANON NEDEN AÇIK notu).
+ */
+function anonAcikIhlalleri(z: Mig[]): string[] {
   const h: string[] = []
-  if (sonYetki(z, 'anon') !== 'revoke') h.push(`anon: zincirin son olayı revoke değil (${sonYetki(z, 'anon') ?? 'olay yok'}) — anon çağırabilir`)
-  if (sonYetki(z, 'public') !== 'revoke') h.push(`public: zincirin son olayı revoke değil (${sonYetki(z, 'public') ?? 'olay yok'}) — herkese açık`)
-  for (const rol of ['authenticated', 'service_role']) {
-    if (sonYetki(z, rol) === 'revoke') h.push(`${rol}: KAPANMIŞ — eski adres haritası üretilemez`)
+  for (const rol of ['anon', 'authenticated', 'service_role']) {
+    if (sonYetki(z, rol) === 'revoke') {
+      h.push(
+        `${rol}: KAPANMIŞ — ${rol === 'anon' ? "scripts/onizleme.mjs anon anahtarla url_takma_adlari_listele'yi çağırıyor (ön izleme ADRES kipi bozulur)" : 'eski adres haritası üretilemez'}`,
+      )
+    }
   }
+  if (sonYetki(z, 'public') !== 'revoke') h.push(`public: zincirin son olayı revoke değil (${sonYetki(z, 'public') ?? 'olay yok'}) — herkese açık`)
   return h
+}
+
+/** Anon'un açık kalma SEBEBİ hâlâ geçerli mi: ön izleme betiği anon anahtarı harita üretecine SERVICE_ROLE adıyla veriyor. */
+const ONIZLEME_YOLU = path.join(KOK, 'scripts', 'onizleme.mjs')
+const ONIZLEME_KODU: string | null = fs.existsSync(ONIZLEME_YOLU) ? oku(ONIZLEME_YOLU) : null
+function onizlemeSebebiIhlalleri(kod: string | null): string[] {
+  if (kod === null) return ['scripts/onizleme.mjs yok — anon açık kalma sebebi ölçülemedi, REVOKE kararını yeniden değerlendir']
+  const h: string[] = []
+  if (!/SUPABASE_SERVICE_ROLE_KEY:\s*anonAnahtar/.test(kod)) h.push('onizleme.mjs artık anon anahtarı harita-uret.ts\'ye SERVICE_ROLE adıyla vermiyor')
+  if (!/haritaUret\(env\.NEXT_PUBLIC_SUPABASE_ANON_KEY/.test(kod)) h.push('onizleme.mjs haritaUret\'i artık anon anahtarla çağırmıyor')
+  return h.map((x) => `${x} — anon açık kalma sebebi ortadan kalkmış olabilir: REVOKE yeniden değerlendirilebilir, bu pini bilerek güncelle`)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────────────────────────
@@ -322,20 +350,25 @@ const DEGISIM: Record<Etiket, Array<[string, string]>> = {
   ],
   process_order_stock_restore: [
     ['v_order_uuid uuid;', 'v_order_uuid uuid; v_order_tenant uuid;'],
+    ['v_restored_units int := 0;', 'v_restored_units int := 0; v_skipped int := 0;'],
     [
       "perform 1 from public.venthub_orders where id = v_order_uuid for update; if not found then return jsonb_build_object('success', false, 'error', 'order not found', 'restored_count', 0); end if;",
       "select o.tenant_id into v_order_tenant from public.venthub_orders o where o.id = v_order_uuid for update; if not found then if coalesce(auth.role(), '') <> 'service_role' then raise exception 'not authorized'; end if; return jsonb_build_object('success', false, 'error', 'order not found', 'restored_count', 0); end if; if coalesce(auth.role(), '') <> 'service_role' and v_order_tenant is distinct from public.jwt_tenant_id() then raise exception 'not authorized'; end if;",
     ],
     [
       'where id = v_item.product_id; insert into public.inventory_movements (product_id, order_id, delta, reason) values (v_item.product_id, v_order_uuid, v_qty, p_reason);',
-      'where id = v_item.product_id and tenant_id = v_order_tenant; continue when not found; insert into public.inventory_movements (product_id, order_id, delta, reason, tenant_id) values (v_item.product_id, v_order_uuid, v_qty, p_reason, v_order_tenant);',
+      'where id = v_item.product_id and tenant_id = v_order_tenant; if not found then v_skipped := v_skipped + 1; continue; end if; insert into public.inventory_movements (product_id, order_id, delta, reason, tenant_id) values (v_item.product_id, v_order_uuid, v_qty, p_reason, v_order_tenant);',
+    ],
+    [
+      "end loop; return jsonb_build_object( 'success', true, 'restored_count', v_restored_count, 'restored_units', v_restored_units, 'reason', p_reason, 'order_id', p_order_id );",
+      "end loop; if v_skipped > 0 then if coalesce(auth.role(), '') <> 'service_role' then raise exception 'stock restore: % product(s) skipped (tenant mismatch)', v_skipped; end if; return jsonb_build_object( 'success', false, 'error', 'product tenant mismatch', 'restored_count', v_restored_count, 'restored_units', v_restored_units, 'skipped', v_skipped, 'reason', p_reason, 'order_id', p_order_id ); end if; return jsonb_build_object( 'success', true, 'restored_count', v_restored_count, 'restored_units', v_restored_units, 'skipped', v_skipped, 'reason', p_reason, 'order_id', p_order_id );",
     ],
   ],
   set_user_admin_role: [
     ['begin if not (', 'declare v_hedef_tenant uuid; v_etkilenen int; begin if not ('],
     [
       "raise exception 'invalid role: %', new_role; end if;",
-      "raise exception 'invalid role: %', new_role; end if; if coalesce(auth.role(), '') <> 'service_role' then select up.tenant_id into v_hedef_tenant from public.user_profiles up where up.id = user_id; if found and v_hedef_tenant is distinct from public.jwt_tenant_id() then raise exception 'not authorized'; end if; end if;",
+      "raise exception 'invalid role: %', new_role; end if; if coalesce(auth.role(), '') <> 'service_role' then select up.tenant_id into v_hedef_tenant from public.user_profiles up where up.id = user_id; if not found or v_hedef_tenant is distinct from public.jwt_tenant_id() then raise exception 'not authorized'; end if; end if;",
     ],
     [
       'insert into public.user_profiles (id, role) values (user_id, new_role) on conflict (id) do update set role = excluded.role, updated_at = now();',
@@ -371,7 +404,7 @@ function sadakatIhlalleri(sql: string): string[] {
   return h
 }
 
-/** Rollback: gövdeler kaynağa döner, anon yeniden açılır, işlem sınırları var. */
+/** Rollback: gövdeler kaynağa döner, işlem sınırları var; url_takma_adlari_listele ACL'ine (migration gibi) dokunmaz. */
 function geriIhlalleri(sql: string): string[] {
   const h: string[] = [...zamanSiniriIhlalleri(sql)]
   for (const e of ETIKETLER) {
@@ -380,8 +413,13 @@ function geriIhlalleri(sql: string): string[] {
     if (!f || !k) h.push(`${e}: rollback'te tanım ya da kaynak bulunamadı`)
     else if (f.baslik !== k.baslik || f.govde !== k.govde) h.push(`${e}: rollback gövdesi kaynağa dönmüyor`)
   }
-  if (!normalize(sql).includes(`grant execute on function public.${URL_TAKMA}() to anon;`)) h.push('rollback anon EXECUTE yetkisini geri vermiyor')
+  if (normalize(sql).includes(URL_TAKMA)) h.push(`rollback ${URL_TAKMA} ACL'ine dokunuyor (migration dokunmadı)`)
   return h
+}
+
+/** Migration url_takma_adlari_listele ACL'ine dokunmaz (anon açık kalır). */
+function urlAclDokunulmadiIhlalleri(sql: string): string[] {
+  return normalize(sql).includes(URL_TAKMA) ? [`migration ${URL_TAKMA}'e dokunuyor — anon AÇIK kalmalı (scripts/onizleme.mjs)`] : []
 }
 
 const hepsi = (sql: string): string[] => [
@@ -390,6 +428,7 @@ const hepsi = (sql: string): string[] => [
   ...kiraciIhlalleri(sql),
   ...rolIhlalleri(sql),
   ...sadakatIhlalleri(sql),
+  ...urlAclDokunulmadiIhlalleri(sql),
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────────────────────────
@@ -438,11 +477,15 @@ const URUN = {
   geriK1: '00000000-0000-4000-8000-0000000000c3',
   geriK2: '00000000-0000-4000-8000-0000000000c4',
   yok: '00000000-0000-4000-8000-0000000000cf',
+  /** Anomali: K1 siparişinin kaleminde K2 ürünü (kiracısı uyuşmuyor) ve yanında sağlam bir K1 ürünü. */
+  anomaliSaglam: '00000000-0000-4000-8000-0000000000c5',
+  anomaliYabanci: '00000000-0000-4000-8000-0000000000c6',
 }
 const SIPARIS = {
   k1: '00000000-0000-4000-8000-0000000000e1',
   k2: '00000000-0000-4000-8000-0000000000e2',
   yok: '00000000-0000-4000-8000-0000000000ef',
+  anomali: '00000000-0000-4000-8000-0000000000e3',
 }
 
 /** Roller, auth.uid()/auth.role() ve jwt_tenant_id() TAKLİTLERİ + işlevlerin dokunduğu tabloların asgari hâli + tohum. */
@@ -488,10 +531,12 @@ const KURULUM_SQL = `
     ('${U.admin1}', 'admin', '${K1}'), ('${U.admin2}', 'admin', '${K2}'), ('${U.moderator1}', 'moderator', '${K1}'),
     ('${U.user1}', 'user', '${K1}'), ('${U.user2}', 'user', '${K2}');
   insert into public.products (id, stock_qty, tenant_id) values
-    ('${URUN.k1}', 10, '${K1}'), ('${URUN.k2}', 10, '${K2}'), ('${URUN.geriK1}', 10, '${K1}'), ('${URUN.geriK2}', 10, '${K2}');
-  insert into public.venthub_orders (id, tenant_id) values ('${SIPARIS.k1}', '${K1}'), ('${SIPARIS.k2}', '${K2}');
+    ('${URUN.k1}', 10, '${K1}'), ('${URUN.k2}', 10, '${K2}'), ('${URUN.geriK1}', 10, '${K1}'), ('${URUN.geriK2}', 10, '${K2}'),
+    ('${URUN.anomaliSaglam}', 10, '${K1}'), ('${URUN.anomaliYabanci}', 10, '${K2}');
+  insert into public.venthub_orders (id, tenant_id) values ('${SIPARIS.k1}', '${K1}'), ('${SIPARIS.k2}', '${K2}'), ('${SIPARIS.anomali}', '${K1}');
   insert into public.inventory_movements (product_id, order_id, delta, reason, tenant_id) values
-    ('${URUN.geriK1}', '${SIPARIS.k1}', -3, 'order_sale', '${K1}'), ('${URUN.geriK2}', '${SIPARIS.k2}', -4, 'order_sale', '${K2}');`
+    ('${URUN.geriK1}', '${SIPARIS.k1}', -3, 'order_sale', '${K1}'), ('${URUN.geriK2}', '${SIPARIS.k2}', -4, 'order_sale', '${K2}'),
+    ('${URUN.anomaliSaglam}', '${SIPARIS.anomali}', -1, 'order_sale', '${K1}'), ('${URUN.anomaliYabanci}', '${SIPARIS.anomali}', -2, 'order_sale', '${K1}');`
 
 async function kurDb(Pglite: PgliteKurucu, migrationSql: string): Promise<PgliteDb> {
   const db = new Pglite()
@@ -614,8 +659,8 @@ async function davranisHatalari(db: PgliteDb): Promise<string[]> {
   if (!yetkisiz(yokSip)) h.push("(C) process_order_stock_restore: olmayan sipariş 'not authorized' vermedi (var olma sızıntısı)")
   const k1StokOnce = await geriStok(URUN.geriK1)
   const kendiSip = await olarak(db, 'authenticated', a1, gec(SIPARIS.k1))
-  const kendiZarf = kendiSip.ok ? (kendiSip.rows[0]?.v as { success?: boolean; restored_units?: number } | undefined) : undefined
-  if (!kendiSip.ok || kendiZarf?.success !== true || kendiZarf?.restored_units !== 3) {
+  const kendiZarf = kendiSip.ok ? (kendiSip.rows[0]?.v as { success?: boolean; restored_units?: number; skipped?: number } | undefined) : undefined
+  if (!kendiSip.ok || kendiZarf?.success !== true || kendiZarf?.restored_units !== 3 || kendiZarf?.skipped !== 0) {
     h.push(`(C) process_order_stock_restore: KENDİ kiracı siparişi beklenen zarfı vermedi: ${JSON.stringify(kendiSip.ok ? kendiSip.rows : kendiSip.mesaj)}`)
   }
   if ((await geriStok(URUN.geriK1)) !== k1StokOnce + 3) h.push('(C) process_order_stock_restore: kendi kiracı stoğu +3 artmadı')
@@ -637,6 +682,28 @@ async function davranisHatalari(db: PgliteDb): Promise<string[]> {
   )).rows
   if (geriHareket.length !== 1 || geriHareket[0].tenant_id !== K2) h.push(`(C) process_order_stock_restore: geri-verme hareketi siparişin kiracısını taşımıyor: ${JSON.stringify(geriHareket)}`)
 
+  // Atlanan ürün (K1 siparişinin kaleminde K2 ürünü + yanında sağlam K1 ürünü): sessiz başarı YOK.
+  const anSaglamOnce = await geriStok(URUN.anomaliSaglam)
+  const anYabOnce = await geriStok(URUN.anomaliYabanci)
+  const anTarayici = await olarak(db, 'authenticated', a1, gec(SIPARIS.anomali))
+  if (anTarayici.ok || !/skipped/.test(anTarayici.mesaj)) {
+    h.push(`(C) process_order_stock_restore: ATLANAN ÜRÜN tarayıcı oturumunda RAISE etmedi (sessiz başarı): ${JSON.stringify(anTarayici.ok ? anTarayici.rows : anTarayici.mesaj)}`)
+  }
+  if ((await geriStok(URUN.anomaliSaglam)) !== anSaglamOnce) h.push('(C) process_order_stock_restore: RAISE sonrası KISMİ geri-verme kaldı (işlem geri alınmadı)')
+  const anHareket = Number(
+    await skaler(db, `select count(*)::int as v from public.inventory_movements where reason = 'order_cancel' and order_id = '${SIPARIS.anomali}'`),
+  )
+  if (anHareket !== 0) h.push(`(C) process_order_stock_restore: RAISE sonrası ${anHareket} geri-verme hareketi kaldı`)
+  const anServis = await olarak(db, 'service_role', JWT_SERVICE, gec(SIPARIS.anomali))
+  const anZarf = anServis.ok
+    ? (anServis.rows[0]?.v as { success?: boolean; skipped?: number; restored_count?: number; restored_units?: number; error?: string } | undefined)
+    : undefined
+  if (!anServis.ok || anZarf?.success !== false || anZarf?.skipped !== 1 || anZarf?.restored_count !== 1 || anZarf?.restored_units !== 1) {
+    h.push(`(C) process_order_stock_restore: service_role atlanan ürün için success:false / skipped:1 / restored_count:1 zarfı vermedi (iade akışı bunu hata görmeli): ${JSON.stringify(anServis.ok ? anServis.rows : anServis.mesaj)}`)
+  }
+  if ((await geriStok(URUN.anomaliYabanci)) !== anYabOnce) h.push('(C) process_order_stock_restore: YABANCI KİRACI ürününün stoğu değişti')
+  if ((await geriStok(URUN.anomaliSaglam)) !== anSaglamOnce + 1) h.push('(C) process_order_stock_restore: sağlam kalemin stoğu service_role çağrısında +1 artmadı')
+
   // ── set_user_admin_role ────────────────────────────────────────────────────────────────────────
   const rolYaz = (u: string, r: string): string => `select public.set_user_admin_role('${u}'::uuid, '${r}') as v`
   const kendiRol = await olarak(db, 'authenticated', a1, rolYaz(U.user1, 'warehouse'))
@@ -646,8 +713,13 @@ async function davranisHatalari(db: PgliteDb): Promise<string[]> {
   if (!yetkisiz(yabRol)) h.push('(C) set_user_admin_role: YABANCI KİRACI KULLANICISI reddedilmedi')
   if ((await skaler(db, `select role as v from public.user_profiles where id = '${U.user2}'`)) !== 'user') h.push('(C) set_user_admin_role: YABANCI KİRACI ROLÜ DEĞİŞTİ')
   const profilsiz = await olarak(db, 'authenticated', a1, rolYaz(U.profilsiz, 'viewer'))
-  if (!profilsiz.ok) h.push(`(C) set_user_admin_role: profilsiz kullanıcı için profil yaratılamadı (${profilsiz.mesaj})`)
-  if ((await skaler(db, `select tenant_id as v from public.user_profiles where id = '${U.profilsiz}'`)) !== K1) h.push("(C) set_user_admin_role: yeni profil ÇAĞIRANIN kiracısını yazmadı")
+  if (!yetkisiz(profilsiz)) h.push('(C) set_user_admin_role: PROFİLİ OLMAYAN kullanıcı için tarayıcı oturumu reddedilmedi (çağıranın kiracısında profil yaratıldı)')
+  if (Number(await skaler(db, `select count(*)::int as v from public.user_profiles where id = '${U.profilsiz}'`)) !== 0) {
+    h.push('(C) set_user_admin_role: reddedilen çağrı yine de PROFİL YARATTI')
+  }
+  const servisProfil = await olarak(db, 'service_role', JWT_SERVICE, rolYaz(U.profilsiz, 'viewer'))
+  if (!servisProfil.ok) h.push(`(C) set_user_admin_role: service_role profilsiz kullanıcı için profil yaratamadı (${servisProfil.mesaj})`)
+  if ((await skaler(db, `select tenant_id as v from public.user_profiles where id = '${U.profilsiz}'`)) !== K1) h.push('(C) set_user_admin_role: service_role yeni profili jwt_tenant_id() kiracısına yazmadı')
   const servisRol = await olarak(db, 'service_role', JWT_SERVICE, rolYaz(U.user2, 'sales'))
   if (!servisRol.ok) h.push(`(C) set_user_admin_role: service_role başka kiracı kullanıcısında reddedildi (${servisRol.mesaj})`)
   if ((await skaler(db, `select tenant_id as v from public.user_profiles where id = '${U.user2}'`)) !== K2) h.push('(C) set_user_admin_role: service_role güncellemesi kullanıcının kiracısını değiştirdi')
@@ -656,16 +728,16 @@ async function davranisHatalari(db: PgliteDb): Promise<string[]> {
 
   // ── url_takma_adlari_listele ───────────────────────────────────────────────────────────────────
   const liste = `select * from public.${URL_TAKMA}()`
-  const anon = await olarak(db, 'anon', '{"role":"anon"}', liste)
-  if (anon.ok || anon.kod !== '42501') h.push(`(C) ${URL_TAKMA}: anon ÇAĞIRABİLDİ ya da 42501 dışı hata (${anon.ok ? 'ok' : `${anon.kod}: ${anon.mesaj}`})`)
+  // ACL'e DOKUNULMADI: anon AÇIK kalır (scripts/onizleme.mjs anon anahtarla çağırır). Üç rol da çağırabilmeli.
   for (const [ad, rol, claims] of [
+    ['anon', 'anon', '{"role":"anon"}'],
     ['authenticated', 'authenticated', jwt(U.admin1, K1)],
     ['service_role', 'service_role', JWT_SERVICE],
   ] as const) {
     const s = await olarak(db, rol, claims, liste)
     if (!s.ok) h.push(`(C) ${URL_TAKMA}: ${ad} KAPANMIŞ (${s.mesaj})`)
   }
-  for (const [rol, beklenen] of [['anon', false], ['authenticated', true], ['service_role', true]] as const) {
+  for (const [rol, beklenen] of [['anon', true], ['authenticated', true], ['service_role', true]] as const) {
     const v = await skaler(db, `select has_function_privilege('${rol}', 'public.${URL_TAKMA}()', 'EXECUTE') as v`)
     if (v !== beklenen) h.push(`(C) ${URL_TAKMA}: has_function_privilege(${rol}) = ${String(v)} (beklenen ${String(beklenen)})`)
   }
@@ -690,7 +762,7 @@ function bloktaDegistir(sql: string, ad: string, donustur: (blok: string) => str
 /** Zincirde ALT-136 dosyasını bozulmuş metinle değiştirilmiş kopya. */
 const zincirdeMig = (yeniSql: string): Mig[] => zincir.map((m) => (m.ad === MIG_DOSYA?.ad ? { ad: m.ad, sql: yeniSql } : m))
 
-describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_adlari_listele anon REVOKE', () => {
+describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı (url_takma_adlari_listele anon AÇIK kalır)', () => {
   it('BOŞLUK MUHAFIZI — migration, rollback, ALT-145, taban ve altı tanım gerçekten okunuyor', () => {
     expect(migAdaylar.length, 'ALT-136 migration dosyası tam bir tane olmalı').toBe(1)
     expect(geriAdaylar.length, 'ALT-136 rollback dosyası tam bir tane olmalı').toBe(1)
@@ -714,11 +786,15 @@ describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_
     expect(hepsi(MIG)).toEqual([])
   })
 
-  it('⭐url_takma_adlari_listele: zincirin son hâlinde anon ve PUBLIC KAPALI, authenticated ve service_role AÇIK', () => {
-    expect(anonIhlalleri(zincir)).toEqual([])
+  it('⭐url_takma_adlari_listele: zincirin son hâlinde anon, authenticated ve service_role AÇIK, PUBLIC KAPALI (anon: scripts/onizleme.mjs çağırır)', () => {
+    expect(anonAcikIhlalleri(zincir)).toEqual([])
   })
 
-  it('⭐geri alma dosyası: gövdeler kaynağa döner, anon yeniden açılır, işlem sınırları var', () => {
+  it('⭐anon açık kalma SEBEBİ hâlâ geçerli: scripts/onizleme.mjs anon anahtarı harita üretecine SERVICE_ROLE adıyla veriyor', () => {
+    expect(onizlemeSebebiIhlalleri(ONIZLEME_KODU)).toEqual([])
+  })
+
+  it("⭐geri alma dosyası: gövdeler kaynağa döner, işlem sınırları var, url_takma_adlari_listele ACL'ine dokunmaz", () => {
     expect(geriIhlalleri(GERI)).toEqual([])
   })
 
@@ -731,7 +807,8 @@ describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_
   describe('D · AYIRT EDİCİLİK — statik kol her bozmada KIRMIZI (vakumda yeşil yok)', () => {
     it('taban (bozulmamış kopya) temiz — vakaların anlamlı olması için ön koşul', () => {
       expect(hepsi(MIG)).toEqual([])
-      expect(anonIhlalleri(zincir)).toEqual([])
+      expect(anonAcikIhlalleri(zincir)).toEqual([])
+      expect(onizlemeSebebiIhlalleri(ONIZLEME_KODU)).toEqual([])
     })
 
     const SUZGEC_ETIKET: Array<[Etiket, string, number]> = [
@@ -796,25 +873,59 @@ describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_
       expect(rolIhlalleri(bozuk).join('\n')).toMatch(/admin_list_all_users: (çağıran kapısı beklenenden|gövdede moderator)/)
     })
 
-    it('url_takma_adlari_listele: REVOKE ... FROM anon silinirse KIRMIZI', () => {
-      const bozuk = MIG.replace(/revoke execute on function public\.url_takma_adlari_listele\(\) from anon;/i, '')
+    it('url_takma_adlari_listele: migration anon REVOKE eklerse KIRMIZI (ön izleme ADRES kipi bozulurdu)', () => {
+      const bozuk = MIG.replace(/\ncommit;\n/, `\nrevoke execute on function public.${URL_TAKMA}() from anon;\ncommit;\n`)
       expect(bozuk).not.toBe(MIG)
-      expect(anonIhlalleri(zincirdeMig(bozuk)).join('\n')).toContain('anon: zincirin son olayı revoke değil')
+      expect(anonAcikIhlalleri(zincirdeMig(bozuk)).join('\n')).toContain('anon: KAPANMIŞ — scripts/onizleme.mjs')
+      expect(hepsi(bozuk).join('\n')).toContain(`migration ${URL_TAKMA}'e dokunuyor`)
     })
 
-    it('url_takma_adlari_listele: anon grant zincirin sonunda geri gelirse KIRMIZI', () => {
-      const sonuna = [...zincir, { ad: 'zz_anon_geri.sql', sql: `grant execute on function public.${URL_TAKMA}() to anon;` }]
-      expect(anonIhlalleri(sonuna).join('\n')).toContain('anon: zincirin son olayı revoke değil')
+    it('url_takma_adlari_listele: anon REVOKE zincirin sonunda gelirse KIRMIZI', () => {
+      const sonuna = [...zincir, { ad: 'zz_anon_kapat.sql', sql: `revoke execute on function public.${URL_TAKMA}() from anon;` }]
+      expect(anonAcikIhlalleri(sonuna).join('\n')).toContain('anon: KAPANMIŞ — scripts/onizleme.mjs')
     })
 
     it('url_takma_adlari_listele: PUBLIC grant zincirin sonunda gelirse KIRMIZI', () => {
       const sonuna = [...zincir, { ad: 'zz_public.sql', sql: `grant execute on function public.${URL_TAKMA}() to public;` }]
-      expect(anonIhlalleri(sonuna).join('\n')).toContain('public: zincirin son olayı revoke değil')
+      expect(anonAcikIhlalleri(sonuna).join('\n')).toContain('public: zincirin son olayı revoke değil')
     })
 
     it('url_takma_adlari_listele: authenticated kapatılırsa KIRMIZI (eski adres haritası üretilemez)', () => {
       const sonuna = [...zincir, { ad: 'zz_auth_kapat.sql', sql: `revoke execute on function public.${URL_TAKMA}() from authenticated;` }]
-      expect(anonIhlalleri(sonuna).join('\n')).toContain('authenticated: KAPANMIŞ')
+      expect(anonAcikIhlalleri(sonuna).join('\n')).toContain('authenticated: KAPANMIŞ')
+    })
+
+    it('anon sebebi pini: onizleme.mjs anon anahtarı artık vermiyorsa KIRMIZI (REVOKE yeniden değerlendirilsin)', () => {
+      const duzeltilmis = (ONIZLEME_KODU ?? '').replace(/SUPABASE_SERVICE_ROLE_KEY:\s*anonAnahtar/, 'SUPABASE_SERVICE_ROLE_KEY: sunucuAnahtari')
+      expect(duzeltilmis).not.toBe(ONIZLEME_KODU)
+      expect(onizlemeSebebiIhlalleri(duzeltilmis).join('\n')).toContain('REVOKE yeniden değerlendirilebilir')
+      expect(onizlemeSebebiIhlalleri(null).join('\n')).toContain('scripts/onizleme.mjs yok')
+    })
+
+    it('set_user_admin_role: profil YOKSA RAISE kapısı gevşetilirse (found and ...) KIRMIZI', () => {
+      const bozuk = bloktaDegistir(MIG, 'set_user_admin_role', (b) => b.replace('if not found or v_hedef_tenant', 'if found and v_hedef_tenant'))
+      expect(hepsi(bozuk).join('\n')).toContain('set_user_admin_role: hedef profilin kiracı kapısı: profil YOKSA da RAISE')
+    })
+
+    it('process_order_stock_restore: atlanan ürün kapısı (skipped > 0) silinirse KIRMIZI', () => {
+      const bozuk = bloktaDegistir(MIG, 'process_order_stock_restore', (b) => b.replace('if v_skipped > 0 then', 'if false then'))
+      expect(hepsi(bozuk).join('\n')).toContain('process_order_stock_restore: atlanan ürün kapısı')
+    })
+
+    it('process_order_stock_restore: başarı zarfından skipped alanı silinirse KIRMIZI', () => {
+      const bozuk = bloktaDegistir(MIG, 'process_order_stock_restore', (b) => {
+        const ek = "    'skipped', v_skipped,\n"
+        const i = b.lastIndexOf(ek)
+        return i < 0 ? b : b.slice(0, i) + b.slice(i + ek.length)
+      })
+      expect(hepsi(bozuk).join('\n')).toContain('process_order_stock_restore: atlanan ürün kapısı')
+    })
+
+    it('process_order_stock_restore: atlanan ürün yine sessiz geçerse (continue when not found) KIRMIZI', () => {
+      const bozuk = bloktaDegistir(MIG, 'process_order_stock_restore', (b) =>
+        b.replace(/if not found then\s+v_skipped := v_skipped \+ 1;\s+continue;\s+end if;/, 'continue when not found;'),
+      )
+      expect(hepsi(bozuk).join('\n')).toContain('process_order_stock_restore: ürün güncellemesinde tenant_id = v_order_tenant + atlanan ürünün sayılması')
     })
 
     it('gövde sadakati: rol kapısı sessizce gevşetilirse (adjust_stock\'a viewer) KIRMIZI', () => {
@@ -843,10 +954,10 @@ describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_
       expect(zamanSiniriIhlalleri(bozuk).join('\n')).toContain('lock_timeout')
     })
 
-    it('geri alma: anon grant satırı silinirse KIRMIZI', () => {
-      const bozuk = GERI.replace(/grant execute on function public\.url_takma_adlari_listele\(\) to anon;/i, '')
+    it("geri alma: url_takma_adlari_listele ACL'ine dokunursa KIRMIZI (migration dokunmadı)", () => {
+      const bozuk = GERI.replace(/\ncommit;\n/, `\ngrant execute on function public.${URL_TAKMA}() to anon;\ncommit;\n`)
       expect(bozuk).not.toBe(GERI)
-      expect(geriIhlalleri(bozuk).join('\n')).toContain('anon EXECUTE yetkisini geri vermiyor')
+      expect(geriIhlalleri(bozuk).join('\n')).toContain("ACL'ine dokunuyor")
     })
 
     it('geri alma: bir gövde kaynağa dönmezse KIRMIZI', () => {
@@ -897,7 +1008,7 @@ describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_
       expect(hazirDb(ctx)).not.toBeNull()
     })
 
-    it('⭐yabancı kiracıya erişim reddedilir, service_role muaf, kendi kiracı çalışır, moderator kapıda, anon kapalı', async (ctx) => {
+    it('⭐yabancı kiracıya erişim reddedilir, service_role muaf, kendi kiracı çalışır, moderator kapıda, atlanan ürün sessiz geçmez, anon AÇIK', async (ctx) => {
       const d = hazirDb(ctx)
       expect(d).not.toBeNull()
       if (d) expect(await davranisHatalari(d)).toEqual([])
@@ -927,13 +1038,35 @@ describe('INV-ALT136-1 · DEFINER fonksiyonlarına kiracı kapısı + url_takma_
         }
       }, 90_000)
 
-      it('url_takma_adlari_listele: REVOKE silinirse anon çağırabilir → KIRMIZI', async (ctx) => {
+      it('url_takma_adlari_listele: migration anon REVOKE ederse anon çağıramaz → KIRMIZI', async (ctx) => {
         if (!Pglite) return ctx.skip()
-        const bozuk = MIG.replace(/revoke execute on function public\.url_takma_adlari_listele\(\) from anon;/i, '')
+        const bozuk = MIG.replace(/\ncommit;\n/, `\nrevoke execute on function public.${URL_TAKMA}() from anon;\ncommit;\n`)
         expect(bozuk).not.toBe(MIG)
         const d = await kurDb(Pglite, bozuk)
         try {
-          expect((await davranisHatalari(d)).join('\n')).toContain('anon ÇAĞIRABİLDİ')
+          expect((await davranisHatalari(d)).join('\n')).toContain('anon KAPANMIŞ')
+        } finally {
+          await d.close().catch(() => undefined)
+        }
+      }, 90_000)
+
+      it('process_order_stock_restore: atlanan ürün kapısı silinirse sessiz başarı döner → KIRMIZI', async (ctx) => {
+        if (!Pglite) return ctx.skip()
+        const bozuk = bloktaDegistir(MIG, 'process_order_stock_restore', (b) => b.replace('if v_skipped > 0 then', 'if false then'))
+        const d = await kurDb(Pglite, bozuk)
+        try {
+          expect((await davranisHatalari(d)).join('\n')).toContain('ATLANAN ÜRÜN tarayıcı oturumunda RAISE etmedi')
+        } finally {
+          await d.close().catch(() => undefined)
+        }
+      }, 90_000)
+
+      it('set_user_admin_role: profil-yok kapısı gevşetilirse çağıranın kiracısında profil yaratılır → KIRMIZI', async (ctx) => {
+        if (!Pglite) return ctx.skip()
+        const bozuk = bloktaDegistir(MIG, 'set_user_admin_role', (b) => b.replace('if not found or v_hedef_tenant', 'if found and v_hedef_tenant'))
+        const d = await kurDb(Pglite, bozuk)
+        try {
+          expect((await davranisHatalari(d)).join('\n')).toContain('PROFİLİ OLMAYAN kullanıcı için tarayıcı oturumu reddedilmedi')
         } finally {
           await d.close().catch(() => undefined)
         }

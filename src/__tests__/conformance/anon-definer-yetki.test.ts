@@ -226,21 +226,14 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
       ).toBe(false)
     })
 
-    // ALT-37e (karar 310, 2026-10-07): eski adres haritası üreteci için eklenen yalnız-okuma liste işlevi. Başta anon
-    // + authenticated + service_role AÇIKTI (url_takma_ad_coz ile aynı sınıf). ALT-136 (2026-11-04) ÇAĞIRAN taramasıyla
-    // anon'u KAPATTI: tek çağıran scripts/adres/harita-uret.ts -> src/lib/adres/haritaUret.ts ve o betik
-    // SUPABASE_SERVICE_ROLE_KEY ile istemci kurar (harita-uret.yml aynı sırrı verir); anon istemcisi
-    // (supabaseStaticClient) bu RPC'yi çağırmaz. Anon'a açık kalan TAM liste, eski slug'ların (ürün adı taşır) kiracı
-    // kapısına dayanan tek savunma olurdu. authenticated ve service_role AÇIK kalır (kapanırsa harita üretilemez),
-    // PUBLIC KAPALI. Gövde sözleşmesi `url-takma-adlari-listele.test.ts`, anon REVOKE'un davranışı ve sabotaj kolları
-    // `alt136-definer-kiraci.test.ts`'tedir.
-    it('⭐url_takma_adlari_listele: SECURITY DEFINER, anon KAPALI (ALT-136), authenticated + service_role AÇIK, PUBLIC KAPALI', () => {
+    // ALT-37e (karar 310, 2026-10-07): eski adres haritası üreteci `url_takma_adlari` tablosunu anon anahtarla,
+    // tabloyu AÇMADAN okuyabilsin diye eklenen yalnız-okuma liste işlevi. url_takma_ad_coz ile AYNI sınıf ve aynı
+    // sıkılık: DEFINER, anon + authenticated + service_role AÇIK, PUBLIC KAPALI (hedefli grant). Gövdenin kiracı
+    // süzgeci, yazma içermemesi, sabit search_path ve tablonun kapalı kalışı `url-takma-adlari-listele.test.ts`'tedir.
+    // Kapanırsa harita üretilemez (11 Ekim yönlendirmesi), açık PUBLIC ise kimlik doğrulaması bile gerekmez hâle gelir.
+    it('⭐url_takma_adlari_listele: SECURITY DEFINER, anon + authenticated + service_role AÇIK, PUBLIC KAPALI', () => {
       expect(sonKip(zincir, 'url_takma_adlari_listele'), 'url_takma_adlari_listele tanimi zincirde yok — okuyucu kor').toBe('definer')
-      expect(
-        sonHalKapali(zincir, 'url_takma_adlari_listele', 'anon', []),
-        'url_takma_adlari_listele anon icin ACIK — ALT-136 anon EXECUTE yetkisini kapatmisti (cagiran yok, tam liste anon\'a gerekmez)',
-      ).toBe(true)
-      for (const rol of ['authenticated', 'service_role']) {
+      for (const rol of ['anon', 'authenticated', 'service_role']) {
         expect(
           sonHalKapali(zincir, 'url_takma_adlari_listele', rol, []),
           `url_takma_adlari_listele ${rol} icin KAPANMIS — eski adres haritasi uretilemez (11 Ekim yonlendirmesi)`,

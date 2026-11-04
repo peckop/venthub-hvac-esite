@@ -45,14 +45,7 @@ const FONK = 'url_takma_adlari_listele'
 const TABLO = 'url_takma_adlari'
 /** `returns table` kolonları, SIRASIYLA. `sebep` (iç kimlikler) ve `created_at` BİLEREK yok. */
 const KOLONLAR = ['tenant_id uuid', 'tur text', 'dil text', 'eski_slug text', 'hedef_id uuid'] as const
-/**
- * ZİNCİRİN SON hâlinde AÇIK roller. ALT-136 (2026-11-04) anon'u KAPATTI: tek çağıran service_role ile kurulan harita
- * betiğidir (scripts/adres/harita-uret.ts); anon çağıranı yok. Anon'un kapalılığı `yetkiHatalari`da ve
- * `alt136-definer-kiraci.test.ts`'te ölçülür.
- */
-const ACIK_ROLLER = ['authenticated', 'service_role'] as const
-/** İşlevi getiren İLK migration TEK BAŞINA uygulandığında açık roller (kol C: o dosyanın kendi SQL'i; anon'u ALT-136 sonradan kapattı). */
-const ILK_MIGRATION_ACIK_ROLLER = ['anon', 'authenticated', 'service_role'] as const
+const ACIK_ROLLER = ['anon', 'authenticated', 'service_role'] as const
 /**
  * Gövdenin BEKLENEN TEK hâli (normalize: yorumsuz, küçük harf, tek boşluk, sonda `;`). Gövde bu dizeyle BİREBİR eşit
  * olmalı. Alt dize/desen eşleşmesi YETMEZ: `where t.tenant_id = (select public.jwt_tenant_id()) is not null` (IS önceliği:
@@ -170,9 +163,6 @@ function yetkiHatalari(zincir: Mig[]): string[] {
   }
   const pub = sonYetki(zincir, 'public')
   if (pub !== 'revoke') h.push(`(k) PUBLIC icin son olay revoke degil (${pub ?? 'yok'}) — herkese acik: anahtar bile gerekmez`)
-  // ALT-136: anon KAPALI (çağıranı yok; tam liste anon'a gerekmez). Kapalılığın zincir-sonu ölçümü.
-  const anon = sonYetki(zincir, 'anon')
-  if (anon !== 'revoke') h.push(`(k) anon icin son olay revoke degil (${anon ?? 'yok'}) — ALT-136 anon EXECUTE'u kapatmisti`)
   return h
 }
 
@@ -437,7 +427,7 @@ async function katalogHatalari(db: PgliteDb): Promise<string[]> {
   if (k.pronargs !== 0) h.push(`(C) uygulanan islev ${k.pronargs} parametre aliyor`)
   if (!(k.proconfig ?? []).includes('search_path=public, pg_temp')) h.push(`(C) search_path sabit degil (${JSON.stringify(k.proconfig)})`)
   if (k.acl === null || /(^|[{,])=/.test(k.acl)) h.push(`(C) PUBLIC EXECUTE acik (acl: ${String(k.acl)})`)
-  for (const rol of ILK_MIGRATION_ACIK_ROLLER) {
+  for (const rol of ACIK_ROLLER) {
     const v = (await db.query<{ v: boolean }>(`select has_function_privilege('${rol}', 'public.${FONK}()', 'EXECUTE') as v`)).rows[0].v
     if (!v) h.push(`(C) ${rol} EXECUTE yetkisi yok`)
   }
@@ -576,6 +566,11 @@ describe('INV-TAKMA-AD-LISTE-1 · url_takma_adlari_listele() sözleşmesi', () =
         /\(k\) service_role icin ACIK grant yok/,
       ],
       [
+        'anon grant\'ı kaldırıldı (harita üretilemez)',
+        (s) => s.replace(/to anon, authenticated, service_role;/i, 'to authenticated, service_role;'),
+        /\(k\) anon icin ACIK grant yok/,
+      ],
+      [
         'tabloya anon GRANT SELECT eklendi',
         (s) => s.replace(/comment on function/i, 'grant select on table public.url_takma_adlari to anon;\ncomment on function'),
         /\(l\) url_takma_adlari tablosu anon icin ACIK/,
@@ -597,12 +592,6 @@ describe('INV-TAKMA-AD-LISTE-1 · url_takma_adlari_listele() sözleşmesi', () =
 
     // ALT-135 sonrası zincirin sonunda RLS'i yeniden açan bir migration var (20261103140000); bu yüzden RLS sabotajı
     // işlev migration'ının İÇİNE değil, zincirin SONUNA eklenir: son durum ölçülür.
-    // ALT-136: anon EXECUTE zincirin sonunda KAPALI. Geri açılırsa (ya da kapatan satır silinirse) kapı KIRMIZI olmalı.
-    it('anon EXECUTE geri verildi (zincirin sonunda) → KIRMIZI', () => {
-      const sonuna = [...zincir, { ad: 'zz_anon_geri.sql', sql: `grant execute on function public.${FONK}() to anon;` }]
-      expect(statikHatalar(sonuna, tipMetni).join('\n')).toMatch(/\(k\) anon icin son olay revoke degil/)
-    })
-
     it('tabloda RLS kapatıldı (zincirin sonunda) → KIRMIZI', () => {
       const sonuna = [...zincir, { ad: 'zz_rls_kapat.sql', sql: 'alter table public.url_takma_adlari disable row level security;' }]
       expect(statikHatalar(sonuna, tipMetni).join('\n')).toMatch(/\(l\) url_takma_adlari icin RLS son durumda acik degil/)

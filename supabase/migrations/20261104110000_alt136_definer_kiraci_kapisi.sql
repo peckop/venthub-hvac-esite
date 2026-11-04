@@ -1,6 +1,5 @@
 -- Migration: 20261104110000_alt136_definer_kiraci_kapisi.sql
--- ALT-136 — authenticated rolüne açık SECURITY DEFINER fonksiyonlarına KİRACI KAPISI + url_takma_adlari_listele anon REVOKE.
--- (Kanban: ALT-136)
+-- ALT-136 — authenticated rolüne açık SECURITY DEFINER fonksiyonlarına KİRACI KAPISI. (Kanban: ALT-136)
 -- Cetvel: docs/standards/migration-safety-standard.md · CLAUDE.md kural 12 (tenant-scoped), 13, 14 · ölçüm: ALT-136 DEFINER ölçümü (2026-11-04).
 --
 -- ⚠ MIGRATION = PROD (kural 13): master'a birleşince supabase-migrate.yml canlıya OTOMATİK uygular.
@@ -27,24 +26,28 @@
 --      moderator hesapları yöneticinin personel listesinde görünmeye devam eder, yoksa rolleri düşürülemez.
 --   4) process_order_stock_restore(text,text): service_role değilse venthub_orders.tenant_id = jwt_tenant_id() (sipariş yok
 --      ya da başka kiracınınsa RAISE); ürün güncellemesi aynı kiracıyla süzülür; geri-verme hareketi kiracıyı siparişten
---      alır. Sipariş/iade durumu ve monotonluk mantığı (kural 11) DEĞİŞMEDİ. Edge release-expired-reservations ve
---      iyzico-refund service_role ile çağırır: o yol DEĞİŞMEDİ.
---   5) set_user_admin_role(uuid,text): service_role değilse hedef kullanıcının user_profiles.tenant_id'si = jwt_tenant_id();
---      upsert yeni satırda tenant_id = jwt_tenant_id() yazar. enforce_role_change tetiğine DOKUNULMADI.
---   6) url_takma_adlari_listele(): anon EXECUTE alınır. Çağıran taraması (src/, scripts/, supabase/functions/, .github/,
---      2026-11-04): tek çağıran scripts/adres/harita-uret.ts -> src/lib/adres/haritaUret.ts ve o betik
---      SUPABASE_SERVICE_ROLE_KEY ile istemci kurar (harita-uret.yml aynı sırrı verir); anon istemcisi
---      (supabaseStaticClient) bu RPC'yi çağırmaz. authenticated ve service_role AÇIK kalır.
+--      alır. Kiracısı uyuşmayan ürün SESSİZ atlanmaz: sayılır ve dönüşe 'skipped' yazılır; skipped > 0 ise tarayıcı oturumunda
+--      RAISE (işlem geri alınır), service_role'de success:false zarfı döner (iyzico-refund yalnız success'e bakar ve bunu hata
+--      sayar). Sipariş/iade durumu ve monotonluk mantığı (kural 11) DEĞİŞMEDİ. Edge release-expired-reservations ve
+--      iyzico-refund service_role ile çağırır: normal yol (skipped = 0) DEĞİŞMEDİ, zarfa yalnız 'skipped': 0 eklendi.
+--   5) set_user_admin_role(uuid,text): service_role değilse hedef kullanıcının user_profiles.tenant_id'si = jwt_tenant_id()
+--      olmalı; hedefin profili YOKSA da RAISE (tarayıcı oturumu çağıranın kiracısında profil yaratamaz). service_role
+--      profili yoksa yaratır. enforce_role_change tetiğine DOKUNULMADI.
 --
--- NE YAPMAZ: imza, SECURITY DEFINER, search_path, dönüş tipi ve GRANT'lar (6 numara hariç) aynı; CREATE OR REPLACE ACL'i korur.
+-- NE YAPMAZ: imza, SECURITY DEFINER, search_path, dönüş tipi ve GRANT'lar aynı; CREATE OR REPLACE ACL'i korur.
+--   url_takma_adlari_listele() ACL'ine DOKUNULMAZ: anon EXECUTE AÇIK kalır. Sebep: scripts/onizleme.mjs (satır 185 ve 313)
+--   anon anahtarı SUPABASE_SERVICE_ROLE_KEY değişken adıyla scripts/adres/harita-uret.ts'ye verir ve harita üreteci bu RPC'yi
+--   ANON olarak çağırır (ön izleme: haritaUret(env.NEXT_PUBLIC_SUPABASE_ANON_KEY, ...)). Çağıran taramasında (ilk geçişte
+--   scripts/ altındaki bu dosya gözden kaçmıştı) gerçek anon çağıranı budur; tam liste kiracı süzgecine dayanır
+--   (gövdede: tenant_id = jwt_tenant_id()), anon claim'inde kiracı olmadığından varsayılan kiracının satırları döner.
 --   search_path değerleri tabandaki hâliyle AYNEN kopyalandı (adjust_stock ve process_order_stock_restore'da tek
 --   tanımlayıcı olarak 'pg_catalog, public'; bu dosya onu değiştirmez, tüm başvurular zaten public. ile nitelikli).
 --   Dokunulmayanlar ve nedeni: admin_publish_quote ve process_goods_receipt (kiracı kapısı ZATEN var); set_stock x2,
 --   anonymize_user_personal_data, get_admin_users (GRANT yalnız service_role; authenticated ve anon çağıramaz);
 --   adjust_stock_v2 (yalnız service_role). src/types/database.types.ts güncellemesi GEREKMEZ (imza değişmedi).
 --
--- GERİ ALMA: scripts/db/rollback/20261104110000_alt136_definer_kiraci_kapisi_geri_al.sql — gövdeler tabana, admin_list_all_users #2243 hâline döner,
---   url_takma_adlari_listele anon'a yeniden açılır. Veri değişmez (yalnız fonksiyon gövdeleri ve bir EXECUTE yetkisi).
+-- GERİ ALMA: scripts/db/rollback/20261104110000_alt136_definer_kiraci_kapisi_geri_al.sql — gövdeler tabana, admin_list_all_users #2243 hâline döner.
+--   Veri değişmez (yalnız fonksiyon gövdeleri).
 
 begin;
 set lock_timeout = '1s';
@@ -191,7 +194,7 @@ BEGIN
 END;
 $$;
 
--- ───────── 4) process_order_stock_restore: kiracı kapısı ─────────
+-- ───────── 4) process_order_stock_restore: kiracı kapısı + atlanan ürün sayacı ─────────
 
 CREATE OR REPLACE FUNCTION "public"."process_order_stock_restore"("p_order_id" "text", "p_reason" "text") RETURNS "jsonb"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -204,6 +207,7 @@ declare
   v_qty int;
   v_restored_count int := 0;
   v_restored_units int := 0;
+  v_skipped int := 0;
 begin
   -- Yetki kapisi: `public.adjust_stock` ile BIREBIR AYNI. `user_profiles.role` mesru bir
   -- kaynak: `trg_enforce_role_change` kullanicinin KENDI rolunu degistirmesini engelliyor.
@@ -262,13 +266,18 @@ begin
     v_qty := v_item.deducted - v_item.restored;
     continue when v_qty <= 0;
 
-    -- ALT-136: ürün güncellemesi de siparişin kiracısıyla süzülür; kiracısı uyuşmayan ürün için satır etkilenmez ve
-    -- hareket YAZILMAZ (stoğa dokunmayan hareket sayaçları saptırırdı). Sonraki çağrı aynı farkı yeniden dener.
+    -- ALT-136: ürün güncellemesi de siparişin kiracısıyla süzülür. Kiracısı uyuşmayan ürün için satır etkilenmez, hareket
+    -- YAZILMAZ (stoğa dokunmayan hareket sayaçları saptırırdı) ve ürün SAYILIR (v_skipped); sessiz başarı YOKTUR, döngü
+    -- sonundaki kapı bunu hataya çevirir. Yeniden denemek aynı ürünü yine atlar: veri (ürünün ya da siparişin kiracısı)
+    -- onarılana dek her çağrı hata verir.
     update public.products
       set stock_qty = coalesce(stock_qty, 0) + v_qty
       where id = v_item.product_id
         and tenant_id = v_order_tenant;
-    continue when not found;
+    if not found then
+      v_skipped := v_skipped + 1;
+      continue;
+    end if;
 
     insert into public.inventory_movements (product_id, order_id, delta, reason, tenant_id)
     values (v_item.product_id, v_order_uuid, v_qty, p_reason, v_order_tenant);
@@ -277,17 +286,36 @@ begin
     v_restored_units := v_restored_units + v_qty;
   end loop;
 
+  -- ALT-136: atlanan ürün varsa (ürünün kiracısı siparişinkiyle uyuşmuyor) başarı DÖNMEZ. Tarayıcı oturumunda RAISE: işlem
+  -- geri alınır, kısmi geri-verme kalmaz. service_role (edge) success:false zarfı alır; iyzico-refund yalnız success'e bakar
+  -- ve bunu hata sayar (gelir alarmı). Zarfa yazılan restored_* o çağrıda GERÇEKTEN geri verilenlerdir.
+  if v_skipped > 0 then
+    if coalesce(auth.role(), '') <> 'service_role' then
+      raise exception 'stock restore: % product(s) skipped (tenant mismatch)', v_skipped;
+    end if;
+    return jsonb_build_object(
+      'success', false,
+      'error', 'Product tenant mismatch',
+      'restored_count', v_restored_count,
+      'restored_units', v_restored_units,
+      'skipped', v_skipped,
+      'reason', p_reason,
+      'order_id', p_order_id
+    );
+  end if;
+
   return jsonb_build_object(
     'success', true,
     'restored_count', v_restored_count,
     'restored_units', v_restored_units,
+    'skipped', v_skipped,
     'reason', p_reason,
     'order_id', p_order_id
   );
 end;
 $$;
 
--- ───────── 5) set_user_admin_role: kiracı kapısı ─────────
+-- ───────── 5) set_user_admin_role: kiracı kapısı (profil yoksa da RAISE) ─────────
 
 CREATE OR REPLACE FUNCTION "public"."set_user_admin_role"("user_id" "uuid", "new_role" "text") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -309,18 +337,20 @@ begin
     raise exception 'Invalid role: %', new_role;
   end if;
 
-  -- ALT-136 (kural 12) kiracı kapısı: hedef kullanıcının profili çağıranın kiracısında değilse reddedilir.
-  -- service_role sunucu tarafıdır, kapsam dışı. Profil henüz yoksa (found = false) aşağıdaki upsert onu ÇAĞIRANIN
-  -- kiracısında yaratır. enforce_role_change tetiği (rol kuralları) bu fonksiyondan bağımsızdır, DEĞİŞMEDİ.
+  -- ALT-136 (kural 12) kiracı kapısı: hedef kullanıcının profili yoksa ya da çağıranın kiracısında değilse reddedilir.
+  -- Profil YOKSA da RAISE: tarayıcı oturumu çağıranın kiracısında profil YARATAMAZ (kiracısı bilinmeyen kullanıcıyı
+  -- sahiplenmek olurdu; her kayıt trg_handle_new_user_profile ile profil alır). service_role sunucu tarafıdır, kapsam dışı
+  -- (profil yoksa onu yaratır). enforce_role_change tetiği (rol kuralları) bu fonksiyondan bağımsızdır, DEĞİŞMEDİ.
   if coalesce(auth.role(), '') <> 'service_role' then
     select up.tenant_id into v_hedef_tenant from public.user_profiles up where up.id = user_id;
-    if found and v_hedef_tenant is distinct from public.jwt_tenant_id() then
+    if not found or v_hedef_tenant is distinct from public.jwt_tenant_id() then
       raise exception 'not authorized';
     end if;
   end if;
 
-  -- Yeni satır çağıranın kiracısını yazar (sütun varsayılanı değil). DO UPDATE ... WHERE, yukarıdaki okuma ile bu yazma
-  -- arasında başka kiracının satırının doğmasına karşı yarışı kapatır: etkilenen satır 0 ise reddedilir.
+  -- Yeni satır (yalnız service_role ulaşır; tarayıcı için profil yukarıda zorunlu) jwt_tenant_id() kiracısını yazar.
+  -- DO UPDATE ... WHERE, yukarıdaki okuma ile bu yazma arasında başka kiracının satırının doğmasına karşı yarışı kapatır:
+  -- etkilenen satır 0 ise reddedilir.
   insert into public.user_profiles as up (id, role, tenant_id) values (user_id, new_role, public.jwt_tenant_id())
   on conflict (id) do update set role = excluded.role, updated_at = now()
     where coalesce(auth.role(), '') = 'service_role' or up.tenant_id = public.jwt_tenant_id();
@@ -333,11 +363,6 @@ begin
 end;
 $$;
 
--- ───────── 6) url_takma_adlari_listele: anon EXECUTE alınır ─────────
-
--- Zaten REVOKE ALL FROM PUBLIC; authenticated ve service_role kalır.
-revoke execute on function public.url_takma_adlari_listele() from anon;
-
 commit;
 
 -- Merge sonrası canlı doğrulama (salt okuma; beklenen değerler):
@@ -347,10 +372,6 @@ commit;
 --      and p.proname in ('adjust_stock','admin_list_all_users','admin_list_users','process_order_stock_restore','set_user_admin_role')
 --    order by 1, 2;
 --     -- beklenen: 6 satır, hepsinde kiraci_kapisi = true
---   select has_function_privilege('anon', 'public.url_takma_adlari_listele()', 'execute') as anon,
---          has_function_privilege('authenticated', 'public.url_takma_adlari_listele()', 'execute') as authenticated,
---          has_function_privilege('service_role', 'public.url_takma_adlari_listele()', 'execute') as service_role;
---     -- beklenen: false, true, true
 --   select (select count(*) from auth.users) as auth_kullanici, (select count(*) from public.user_profiles) as profil,
 --          (select count(distinct tenant_id) from public.user_profiles) as kiraci;
 --     -- bilgi: auth_kullanici > profil ise profilsiz satırlar admin_list_all_users'tan çıkmıştır

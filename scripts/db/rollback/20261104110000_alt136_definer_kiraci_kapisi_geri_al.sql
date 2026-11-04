@@ -3,12 +3,13 @@
 --
 -- Bu migration'ın eklediklerini geri alır:
 --   adjust_stock x2, admin_list_users, process_order_stock_restore, set_user_admin_role gövdeleri 2026-11-03 şema
---   tabanındaki hâline döner (kiracı kapısı kalkar; admin_list_users çağıran kapısına moderator geri girer).
+--   tabanındaki hâline döner (kiracı kapısı ve atlanan ürün sayacı kalkar; admin_list_users çağıran kapısına moderator
+--   geri girer).
 --   admin_list_all_users #2243 (ALT-145, 20261104100000) hâline döner: rol listesi ('admin','super_admin'),
 --   kiracı süzgeci kalkar. moderator'ü yeniden açmak için ALT-145 rollback'i ayrıca gerekir.
---   url_takma_adlari_listele anon'a yeniden açılır.
--- Etki: kiracılar arası erişim kapısı kalkar (bugün tek kiracı var, davranış farkı yok); anon, eski adres listesini
---   RPC ile yeniden okuyabilir. Veri silinmez; bu migration veriye dokunmadı.
+--   url_takma_adlari_listele'ye bu migration dokunmadı, geri alma da dokunmaz.
+-- Etki: kiracılar arası erişim kapısı kalkar (bugün tek kiracı var, davranış farkı yok). Veri silinmez; bu migration
+--   veriye dokunmadı.
 
 begin;
 set lock_timeout = '1s';
@@ -225,9 +226,5 @@ begin
   return true;
 end;
 $$;
-
--- ───────── url_takma_adlari_listele: anon yeniden açılır ─────────
-
-grant execute on function public.url_takma_adlari_listele() to anon;
 
 commit;
