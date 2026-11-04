@@ -1463,7 +1463,15 @@ const DUZ_LITERAL_RE = /^(null|undefined|true|false|\d[\d.]*|'[^']*'|"[^"]*"|\x6
 
 function sabitZamansizKarsilastirmalar(code: string): string[] {
   const out: string[] = []
-  code.split('\n').forEach((satir, i) => {
+  code.split('\n').forEach((hamSatir, i) => {
+    // Çağrı ifadesi tek işlenene indirgenir; içindeki ad korunur (inceleme bulgusu 3, OPS-213):
+    // `req.headers.get('x-signature') !== expected` → `cagri_x_signature_ !== expected`. Eskiden
+    // işlenen sınıfında `(`/`)` olmadığı için çağrılı sol yan hiç eşleşmiyordu.
+    let satir = hamSatir
+    for (let onceki = ''; onceki !== satir; ) {
+      onceki = satir
+      satir = satir.replace(/[\w$.]+\(([^()]*)\)/g, (_c, ic: string) => `cagri_${ic.replace(/[^\w]/g, '_')}`)
+    }
     for (const m of satir.matchAll(KARSILASTIRMA_RE)) {
       const sol = m[1]
       const sag = m[3]
@@ -1502,6 +1510,11 @@ describe('R14 · sır karşılaştırmasında === yasak, sabit zamanlı karşıl
     // `<=`, `>=`, `=>` eşitlik değildir.
     expect(sabitZamansizKarsilastirmalar('if (token.exp <= now) refresh()')).toHaveLength(0)
     expect(sabitZamansizKarsilastirmalar('const f = (token) => token')).toHaveLength(0)
+    // Çağrı ifadeli işlenen (inceleme bulgusu 3).
+    expect(sabitZamansizKarsilastirmalar("if (req.headers.get('x-signature') !== expected) deny()"), 'çağrı sol').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('if (hmac(body) != sig) deny()'), 'hmac çağrısı').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar("if (req.headers.get('x-signature') === null) deny()")).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('if (timingSafeEquals(given, computed) === false) deny()')).toHaveLength(0)
   })
 
   it('hiçbir edge kaynağı sırrı === ile karşılaştırmıyor', () => {

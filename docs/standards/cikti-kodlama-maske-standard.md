@@ -83,7 +83,7 @@ orada uygulanmaz.
 | E-posta HTML satırlarında kaçışsız `${…}` (yedi dosya, evren boş kalırsa kırmızı) | Şablon dosyasının içinde ham HTML basan yeni bir motor sözdizimi (motor `_shared`'de tek; `{{{…}}}` yok) |
 | `_shared/kodlama.ts` dışında `renderTemplate`/`kacir` tanımı | `<script>` bağlamı (bugün yok); CSS bağlamı yalnız `brandPrimary` tanımı üzerinden ölçülür, başka bir değer `style` içine girerse görülmez |
 | Üçlü ifadenin İKİ dalını (iç içe üçlü ve şablon dalı dahil); çok satırlı ifadede etiket ifadenin içindeyse de | HTML etiketi ne `${` satırında ne ifadenin içinde olan `${…}` (ör. etiketi başka satırda kalan değişmezin etiketsiz satırı) |
-| Dış yanıt metninin (`await x.text()`) maskesiz kullanımı (taban: `iyzico-callback`) | Metni `.text()` dışında okuyan yol (`res.json()` sonrası hata alanı) ve değişkeni başka ada kopyalayıp kullanan kod |
+| Dış yanıt metninin (`const`/`let v = await x.text()`, `.text().then(…)`) maskesiz kullanımı, `v.toLowerCase()` takma adı dahil (taban: `iyzico-callback`) | Metni `.text()` dışında okuyan yol (`res.json()` sonrası hata alanı), `JSON.parse(v)` sonucunun dışarı çıkması, değişkeni düz atamayla başka ada kopyalayan kod |
 | `log-client-error` gövde sınırı, `notify` Slack kaçışı, Sentry mesaj maskesi | Diğer uçların gövde sınırı (çoğu `verify_jwt=true` ya da imzalı) |
 | `console.*` içinde alıcı değişkeni ve sır değişkeni | Değişken adı farklı olan kişisel veri (ör. `x = customer.email; console.log(x)`) |
 | Yanıt gövdesinde `.message` / `String(e)` / türetilmiş değişken | Hata metnini başka yolla (ör. `JSON.stringify(err)`) dönen gövde |

@@ -268,9 +268,20 @@ function hamInterplar(kod: string, sayac = { baglam: 0 }): string[] {
   const out: string[] = []
   const tara = (metin: string, kaydirma: number) => {
     for (const t of sablonlar(metin)) {
-      for (const x of interplar(metin, t)) {
+      // Şablon düzeyi bağlam (güvenlik incelemesi OPS-213 bulgu 1): değişmezin KENDİ metninde (`${…}`
+      // dışında) etiket varsa bütün `${…}`'leri HTML bağlamındadır — `<p>\n  ${ad}\n</p>` gibi
+      // etiketi başka satırda kalan değer de görülür.
+      const xs = interplar(metin, t)
+      let duzMetin = metin.slice(t.bas, t.son + 1)
+      for (const x of [...xs].reverse()) {
+        const b = x.bas - t.bas
+        duzMetin = duzMetin.slice(0, b) + duzMetin.slice(b + x.ifade.length + 3)
+      }
+      const sablonHtml = HTML_ETIKETI.test(duzMetin)
+      for (const x of xs) {
         const no = satirNo(kaydirma + x.bas)
-        const baglam = HTML_ETIKETI.test(satirlar[no - 1] ?? '') || HTML_ETIKETI.test(x.ifade)
+        const baglam =
+          sablonHtml || HTML_ETIKETI.test(satirlar[no - 1] ?? '') || HTML_ETIKETI.test(x.ifade)
         if (baglam) {
           sayac.baglam++
           if (!ifadeGuvenli(x.ifade)) out.push(`${no}  \${${x.ifade.trim().replace(/\s+/g, ' ').slice(0, 40)}`)
@@ -315,6 +326,9 @@ describe('INV-CIKTI-KODLAMA-1 · G1 e-posta HTML kaçışı', () => {
     expect(ham('const h = `<p>${ad}</p>`'), 'düz ham').toBe(1)
     // Çok satırlı: `${` satırında etiket yok, else dalı ham.
     expect(ham("const h = `\n  ${notlar ? `\n  <div>${kacir(notlar)}</div>\n  ` : ad}\n`"), 'çok satırlı').toBe(1)
+    // Etiket başka satırda: şablon düzeyi bağlam (inceleme bulgusu 1).
+    expect(ham('const h = `<p>\n  ${customer_name}\n</p>`'), 'etiketsiz satır').toBe(1)
+    expect(ham('const t = `Merhaba\n  ${customer_name}\nTesekkurler`')).toBe(0)
     // Bağlam dışı ifadenin içindeki şablon da taranır.
     expect(ham("const h = `\n  ${liste.map((x) => `<li>${x.ad}</li>`).join('')}\n`"), 'map içi ham').toBe(1)
   })
@@ -545,28 +559,51 @@ describe('INV-CIKTI-KODLAMA-1 · S6 log-client-error maskesi', () => {
  * Güvenlik incelemesi 2026-11-03 takibi (OPS-213): `return-status-notification` ve
  * `shipping-notification` Resend metnini log, Sentry, yanıt ve denetim kaydına maskesiz koyuyordu.
  */
+/** Ham metni okuyup yalnız BOOLEAN dönen, adıyla bilinen sınıflandırıcılar (geniş `…Mi(` muafiyeti yok). */
+const SINIFLANDIRICILAR = ['monotonIhlaliMi']
+
+/**
+ * `ad` değişkeninin `bas` konumundan sonraki kullanımlarından biri ham mı. `const low = ad.toLowerCase()`
+ * takma adı da aynı kurallarla izlenir (inceleme bulgusu 2: `return new Response(low)` geçiyordu).
+ */
+function hamKullanimVar(kod: string, ad: string, bas: number, derinlik = 0): boolean {
+  // Kapsam yaklaşığı: aynı adın bir sonraki bildirimine kadar (başka bloktaki `const detail` ayrı değişkendir).
+  const kalan = kod.slice(bas)
+  const yeniden = new RegExp(`\\b(?:const|let)\\s+${ad}\\b`).exec(kalan)
+  const kapsam = yeniden ? kalan.slice(0, yeniden.index) : kalan
+  const kullanimlar = [...kapsam.matchAll(new RegExp(`\\b${ad}\\b`, 'g'))]
+  if (kullanimlar.length === 0) return derinlik === 0 // okunup kullanılmayan ham metin şüpheli
+  return kullanimlar.some((u) => {
+    const konum = bas + (u.index ?? 0)
+    const once = kod.slice(Math.max(0, konum - 40), konum)
+    const sonra = kod.slice(konum + ad.length, konum + ad.length + 16)
+    if (/(metniMaskele|\.test)\(\s*$/.test(once)) return false // maskeli ya da regex sınıflandırması
+    if (SINIFLANDIRICILAR.some((s) => new RegExp(`\\b${s}\\(\\s*$`).test(once))) return false
+    if (/JSON\.parse\(\s*$/.test(once)) return false // başarılı gövdeyi ayrıştırma (sınır: §3)
+    if (/^\.includes\(/.test(sonra)) return false // boolean sınıflandırma
+    if (/^\.toLowerCase\(\)/.test(sonra)) {
+      const atama = /(?:const|let)\s+(\w+)\s*=\s*$/.exec(once)
+      if (!atama) return !/^\.toLowerCase\(\)\.includes\(/.test(sonra + kod.slice(konum + ad.length + 16, konum + ad.length + 30))
+      return derinlik < 3 && hamKullanimVar(kod, atama[1], konum + ad.length + 14, derinlik + 1)
+    }
+    if (/^\s*:(?!:)/.test(sonra) && /[{,]\s*$/.test(once)) return false // nesne ANAHTARI (`detail: …`)
+    return true
+  })
+}
+
 function maskesizSaglayiciMetni(kod: string): string[] {
   const out: string[] = []
-  for (const m of kod.matchAll(/const\s+(\w+)\s*=\s*(metniMaskele\(\s*)?await\s+(\w+)\.text\(\)/g)) {
+  const satir = (i: number | undefined) => kod.slice(0, i).split('\n').length
+  for (const m of kod.matchAll(/(?:const|let)\s+(\w+)\s*=\s*(metniMaskele\(\s*)?await\s+(\w+)\.text\(\)/g)) {
     const [, ad, sarili, kaynak] = m
     if (sarili || /^(req|request)$/.test(kaynak)) continue
-    const bildirimSonu = (m.index ?? 0) + m[0].length
-    // Kapsam yaklaşığı: aynı adın bir sonraki bildirimine kadar (başka bloktaki `const detail` ayrı değişkendir).
-    const kalan = kod.slice(bildirimSonu)
-    const yeniden = new RegExp(`\\b(?:const|let)\\s+${ad}\\b`).exec(kalan)
-    const kapsam = yeniden ? kalan.slice(0, yeniden.index) : kalan
-    const kullanimlar = [...kapsam.matchAll(new RegExp(`\\b${ad}\\b`, 'g'))]
-    const ham = kullanimlar.filter((u) => {
-      const konum = bildirimSonu + (u.index ?? 0)
-      const once = kod.slice(Math.max(0, konum - 20), konum)
-      const sonra = kod.slice(konum + ad.length, konum + ad.length + 14)
-      if (/(metniMaskele|\.test)\(\s*$/.test(once)) return false // maskeli ya da regex sınıflandırması
-      if (/(JSON\.parse|\b\w+M[iıuü])\(\s*$/.test(once)) return false // başarılı gövdeyi ayrıştırma, `…Mi(` yüklemi
-      if (/^\.(toLowerCase\(\)|includes\()/.test(sonra)) return false // sınıflandırma
-      if (/^\s*:(?!:)/.test(sonra) && /[{,]\s*$/.test(once)) return false // nesne ANAHTARI (`detail: …`)
-      return true
-    })
-    if (ham.length > 0 || kullanimlar.length === 0) out.push(`${kod.slice(0, m.index).split('\n').length}: ${ad}`)
+    if (hamKullanimVar(kod, ad, (m.index ?? 0) + m[0].length)) out.push(`${satir(m.index)}: ${ad}`)
+  }
+  // `.text().then(t => …)` zinciri: değişkensiz kullanım ölçülemez → metniMaskele zincirde değilse ihlal.
+  for (const m of kod.matchAll(/\b(\w+)\.text\(\)\s*\.then\(/g)) {
+    if (/^(req|request)$/.test(m[1])) continue
+    const zincir = parantezIci(kod, (m.index ?? 0) + m[0].length - 1)
+    if (!/metniMaskele\(/.test(zincir)) out.push(`${satir(m.index)}: .then`)
   }
   return out
 }
@@ -591,6 +628,13 @@ describe('INV-CIKTI-KODLAMA-1 · K8 sağlayıcı/DB hata metni maskeli', () => {
     expect(ham('const errorText = await r.text()\nthrow new Error(`Email failed: ${errorText}`)'), 'throw').toBe(1)
     expect(ham("const t = await r.text()\nconsole.error('x', metniMaskele(t, 9))\nlog({ e: t.slice(0, 500) })"), 'denetim').toBe(1)
     expect(ham('const t = await r.text()'), 'okunup kullanılmayan da şüpheli').toBe(1)
+    // İnceleme bulgusu 2'nin atlatma yolları.
+    expect(ham('let t = await r.text()\nthrow new Error(t)'), 'let').toBe(1)
+    expect(ham('const low = (await r.text()).x; r.text().then((t) => console.error(t))'), '.then').toBe(1)
+    expect(ham("const t = await r.text()\nconst low = t.toLowerCase()\nreturn new Response(low)"), 'takma ad').toBe(1)
+    expect(ham("const t = await r.text()\nconst low = t.toLowerCase()\nif (low.includes('x')) y()\nz(metniMaskele(t, 9))")).toBe(0)
+    expect(ham('const t = await r.text()\nif (herhangiMi(t)) y()'), 'adı bilinmeyen …Mi( yüklemi').toBe(1)
+    expect(ham('const t = await r.text()\nif (monotonIhlaliMi(t)) y()\nz(metniMaskele(t, 9))')).toBe(0)
   })
 
   it('⭐OPS-213: return-status-notification, shipping-notification, iyzico-payment temiz', () => {
