@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "tüm repoda RLS taraması yapalım, agy ile paralel dağıt",
+    "admin panelini baştan sona denetle, geniş tarama için agy ajanlarını kullan",
+    "agy ile repo genelinde her X kullanımını bul ve rapora çevir",
+    "Claude kotasını harcamadan büyük bir kod taraması yaptırmak istiyorum, Antigravity CLI ile",
+    "agy orkestrasyonu başlat: güvenlik taraması, çok eksenli",
+    "kod tabanının tamamını tarat, bulguları CodeGraph ile doğrulayıp tek rapor çıkar",
+    "geniş çaplı denetim lazım, ucuz paralel ajan filosu ile yürütelim",
+    "AGY İLE ARAŞTIRMA YAP: tüm servislerde hata yönetimi nasıl",
+    "agy filosuna iş ver, sonuçları sen doğrula",
+    "bütün sayfalarda erişilebilirlik sorunlarını geniş tarama ile bul, agy kullan",
+    "Gemini Flash ile paralel tarama yapıp sonucu özetle",
+    "use agy to fan out a codebase-wide audit and verify the findings"
+  ],
+  "should_not_trigger": [
+    "şu fonksiyonu kim çağırıyor, bak",
+    "tek dosyadaki hatayı düzelt",
+    "bu PR'ı incele",
+    "git geçmişini göster",
+    "testleri çalıştır",
+    "12 sayfayı yeni tablo kitine taşı, dalgalar halinde",
+    "web'den güncel sürümü araştır",
+    "ürün sayfasına başlık ekle"
+  ]
+}
