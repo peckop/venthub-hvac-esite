@@ -56,16 +56,21 @@ describe('liste kartı — güncelleme tarihi', () => {
     expect(container.textContent).toContain(`Updated ${tarihYaz('2026-10-10', 'en')}`)
   })
 
-  it('yayındaki içerik: iki rehber yazısının güncelleme tarihi 2026-11-01 (BLG-29 iç bağlantı revizyonu; önceki değer 2026-10-14, BLG-13) ve kartı "1 Kasım 2026" basar', () => {
+  it('yayındaki içerik: rehber yazılarının güncelleme tarihi ve kartın bastığı tarih (frekans 2026-11-01, BLG-29; fan çeşitleri ve radyal-aksiyel 2026-11-04, BLG-36 ve BLG-38)', () => {
     const kartlar = listeKartlari('tr', YAZILAR)
-    for (const kimlik of ['frekans-konvertoru', 'radyal-aksiyel-fan-secimi']) {
+    const beklenen: Array<[string, string, string]> = [
+      ['frekans-konvertoru', '2026-11-01', '1 Kasım 2026'],
+      ['fan-cesitleri', '2026-11-04', '4 Kasım 2026'],
+      ['radyal-aksiyel-fan-secimi', '2026-11-04', '4 Kasım 2026'],
+    ]
+    for (const [kimlik, iso, yazili] of beklenen) {
       const yazi = YAZILAR.find((y) => y.kimlik === kimlik)
       expect(yazi, `${kimlik} yayın listesinde yok`).toBeDefined()
-      expect(yazi?.guncellemeTarihi, kimlik).toBe('2026-11-01')
+      expect(yazi?.guncellemeTarihi, kimlik).toBe(iso)
       const kart = kartlar.find((k) => k.href.endsWith(`/${yazi?.diller.tr?.slug}`))
       expect(kart, `${kimlik} kartı yok`).toBeDefined()
-      expect(kart?.guncelleme, kimlik).toBe('1 Kasım 2026')
-      expect(kart?.guncellemeIso, kimlik).toBe('2026-11-01')
+      expect(kart?.guncelleme, kimlik).toBe(yazili)
+      expect(kart?.guncellemeIso, kimlik).toBe(iso)
     }
   })
 })
