@@ -30,8 +30,25 @@ const YASAK_BAYRAK = new Set([
   '--force', '-f', '--force-with-lease', '--force-if-includes', '--delete', '-d', '--mirror', '--all', '--prune', '--tags-delete',
 ])
 const IZINLI_BAYRAK = new Set(['-u', '--set-upstream', '-n', '--dry-run', '--no-verify', '--verify', '-q', '--quiet', '-v', '--verbose', '--tags', '--no-tags', '--follow-tags', '--progress', '--porcelain'])
-const SARMALAYICI = new Set(['command', 'exec', 'nohup', 'time', 'builtin'])
-const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash'])
+const SARMALAYICI = new Set(['command', 'exec', 'nohup', 'time', 'builtin', 'env', 'sudo', 'nice', 'ionice', 'xargs', 'setsid', 'stdbuf', 'timeout'])
+const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash', 'pwsh', 'powershell', 'cmd'])
+const ATAMA = /^[A-Za-z_][A-Za-z0-9_]*=/
+
+/** Komut adı: yol ve .exe atılır, küçük harf (`/usr/bin/GIT.exe` → `git`). */
+const komutAdi = (x) => path.basename(String(x)).replace(/\.exe$/i, '').toLowerCase()
+
+/** Baştaki atama/sarmalayıcıları (ve sarmalayıcının kendi bayraklarını) atlayıp asıl komutun dizinini döner; yoksa -1. */
+function asilKomut(t) {
+  let i = 0
+  while (i < t.length) {
+    if (ATAMA.test(t[i])) i++
+    else if (SARMALAYICI.has(komutAdi(t[i]))) {
+      i++
+      while (i < t.length && t[i].startsWith('-')) i++
+    } else break
+  }
+  return i < t.length ? i : -1
+}
 
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut) {
@@ -75,31 +92,39 @@ function parcala(komut) {
   return parcalar
 }
 
+/**
+ * Hedef dal adını git'in çözdüğü gibi sadeleştirir: `refs/heads/x`, `heads/x` → `x`; `@` = HEAD.
+ * `refs/` ile başlayan ve refs/heads/ olmayan hedef (refs/tags, refs/remotes, refs/for ...) ayrıca reddedilir (hedefDurumu).
+ */
 function dalAdi(hedef) {
-  return String(hedef).replace(/^refs\/heads\//, '')
+  return String(hedef).replace(/^refs\/heads\//, '').replace(/^heads\//, '')
 }
+const hedefRefsDisi = (h) => /^refs\//.test(h) && !/^refs\/heads\//.test(h)
 
 /**
- * Bir parçadan (token dizisi) push varsa { c: -C yolu | null, args } döner; yoksa null.
- * Baştaki VAR=değer atamaları ve command/exec/nohup/time atlanır; git'in -C/-c global seçenekleri okunur.
+ * Bir parçadan (token dizisi) push varsa { c: -C yolu zinciri, args } ya da { yasak } döner; yoksa null.
+ * Baştaki atamalar/sarmalayıcılar atlanır. git'in global seçeneklerinden yalnız -C (art arda çözülür) serbest;
+ * -c, --git-dir, --work-tree, --namespace, --exec-path, --config-env push hedefini ya da kancayı değiştirebilir → reddedilir.
  */
 function pushBul(t) {
-  let i = 0
-  while (i < t.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(t[i]) || SARMALAYICI.has(t[i]))) i++
-  if (t[i] !== 'git') return null
+  let i = asilKomut(t)
+  if (i < 0 || komutAdi(t[i]) !== 'git') return null
   i++
-  let c = null
+  const yollar = []
   while (i < t.length) {
     if (t[i] === '-C' && i + 1 < t.length) {
-      c = t[i + 1]
+      yollar.push(t[i + 1])
       i += 2
-    } else if (t[i] === '-c' && i + 1 < t.length) i += 2
-    else if (/^--(git-dir|work-tree|namespace)(=|$)/.test(t[i])) i += t[i].includes('=') ? 1 : 2
-    else if (/^-/.test(t[i])) i++
+    } else if (t[i] === '-c' || /^--(git-dir|work-tree|namespace|exec-path|config-env)(=|$)/.test(t[i]) || /^-c./.test(t[i])) {
+      // push alt komutuna varıp varmadığına bakmadan, global yapılandırma/hedef değiştiren seçenek push öncesindeyse yasak
+      const kalan = t.slice(i + 1)
+      if (kalan.some((x) => x.includes('push'))) return { yasak: `git global seçeneği ${t[i]}: push hedefini/yapılandırmasını (remote.*, alias.*, url.*) değiştirebilir; seçeneksiz yaz` }
+      return null
+    } else if (/^-/.test(t[i])) i++
     else break
   }
   if (t[i] !== 'push') return null
-  return { c, args: t.slice(i + 1) }
+  return { c: yollar, args: t.slice(i + 1) }
 }
 
 /**
@@ -108,13 +133,13 @@ function pushBul(t) {
  */
 function degerlendir(komut, o) {
   for (const t of parcala(String(komut || ''))) {
-    // bash -c "..." / eval "..." içini de tara
-    const ilk = t.findIndex((x) => !/^[A-Za-z_][A-Za-z0-9_]*=/.test(x) && !SARMALAYICI.has(x))
-    const ad = ilk >= 0 ? path.basename(t[ilk]) : ''
+    // bash -c "..." / eval "..." / pwsh -Command "..." / cmd /c "..." içini de tara
+    const ilk = asilKomut(t)
+    const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
     if (KABUKLAR.has(ad)) {
-      const ci = t.indexOf('-c', ilk + 1)
+      const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))
       if (ci >= 0 && t[ci + 1]) {
-        const ic = degerlendir(t[ci + 1], o)
+        const ic = degerlendir(t.slice(ci + 1).join(' '), o)
         if (ic) return ic
       }
     } else if (ad === 'eval') {
@@ -123,6 +148,7 @@ function degerlendir(komut, o) {
     }
     const p = pushBul(t)
     if (!p) continue
+    if (p.yasak) return p.yasak
     const neden = pushDegerlendir(p, o)
     if (neden) return neden
   }
@@ -131,13 +157,14 @@ function degerlendir(komut, o) {
 
 function pushDegerlendir({ c, args }, o) {
   let cwd = o.cwd
-  if (c !== null) {
-    const cozulen = path.resolve(o.cwd, c)
+  if (c.length > 0) {
+    // art arda -C değerleri git gibi birikir: her biri öncekine göre çözülür, SON yol denetlenir
+    const cozulen = c.reduce((onceki, y) => path.resolve(onceki, y), o.cwd)
     const icinde = (o.kokler || []).some((k) => {
       const r = path.relative(k, cozulen)
       return r === '' || (!r.startsWith('..') && !path.isAbsolute(r))
     })
-    if (!icinde) return `git -C ${c}: yol bu çalışma kopyasının ve ana deponun ağacı dışında; push yalnız kendi ağacından yapılır`
+    if (!icinde) return `git -C ${c.join(' -C ')}: yol bu çalışma kopyasının ve ana deponun ağacı dışında; push yalnız kendi ağacından yapılır`
     cwd = cozulen
   }
   const konumsal = []
@@ -172,15 +199,15 @@ function pushDegerlendir({ c, args }, o) {
     const hedef = i >= 0 ? r.slice(i + 1) : r
     if (i >= 0 && hedef === '') return `${r}: boş hedef`
     if (KORUNAN.has(dalAdi(hedef))) return `${r}: hedef ${dalAdi(hedef)} korunan dal; PR ile birleşir`
-    if (i < 0 && kaynak === 'HEAD') {
-      const d = mevcutAl()
-      if (d && KORUNAN.has(d)) return `HEAD ve mevcut dal ${d}: master/main'e doğrudan push yok`
-    }
-    if (i >= 0 && kaynak === 'HEAD' && hedef === 'HEAD') {
-      const d = mevcutAl()
-      if (d && KORUNAN.has(d)) return `HEAD:HEAD ve mevcut dal ${d}: master/main'e doğrudan push yok`
-    }
+    // refs/heads/ dışındaki tam ad (refs/tags, refs/remotes, refs/for ...) ve joker/özel karakter: dal adını açık yaz
+    if (hedefRefsDisi(hedef)) return `${r}: hedef refs/heads/ dışında; yalnız dal adı ya da refs/heads/<dal> yazılır`
     if (/[*?[\]{}~^]/.test(hedef)) return `${r}: hedefte joker/özel karakter; dal adını açık yaz`
+    // HEAD ve @ aynı şeydir; kaynak ya da hedef olarak mevcut dalı gösterir
+    const basKaynak = /^(HEAD|@)$/.test(kaynak) || /^(HEAD|@)$/.test(hedef)
+    if (basKaynak) {
+      const d = mevcutAl()
+      if (d && KORUNAN.has(d)) return `${r}: HEAD/@ mevcut dal ${d}'i gösteriyor; master/main'e doğrudan push yok`
+    }
   }
   return null
 }
@@ -227,7 +254,9 @@ function main() {
       if (girdi.hook_event_name && girdi.hook_event_name !== 'PreToolUse') process.exit(0)
       if (girdi.tool_name !== 'Bash') process.exit(0)
       const komut = girdi.tool_input && girdi.tool_input.command
-      if (typeof komut !== 'string' || !/\bpush\b/.test(komut)) process.exit(0)
+      // Ön süzgeç yalnız maliyet içindir: komutta "git" hiç yoksa ayrıştırma boşuna. Karar ayrıştırılmış tokenlardadır
+      // (yol/.exe/sarmalayıcı/alias öncesi seçenek yakalanır; yapılandırma alias'ı kancanın göremediği bilinen sınırdır).
+      if (typeof komut !== 'string' || !/git/i.test(komut)) process.exit(0)
       const cwd = girdi.cwd || process.cwd()
       const neden = degerlendir(komut, { cwd, mevcutDal: mevcutDalBul, kokler: kokleriBul(cwd) })
       if (neden) deny(neden)

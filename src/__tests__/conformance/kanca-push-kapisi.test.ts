@@ -66,8 +66,26 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     ['bash -c "git push origin master"', 'korunan'],
     ['eval "git push --force origin x"', 'yasak bayrak'],
     ['FOO=1 git push origin main', 'korunan'],
-    ['git -c core.x=1 push origin master', 'korunan'],
+    ['git -c core.x=1 push origin master', 'global seçeneği'],
     ['git push --receive-pack=evil origin feat-x', 'hedefini'],
+    // Otomatik güvenlik incelemesi bulguları (PR #2252): global seçenekler, hedef çözümü, komut tanıma, kabuklar, art arda -C
+    ['git -c remote.origin.pushurl=evil push origin feat-x', 'global seçeneği'],
+    ['git -c alias.p=push p origin master', 'global seçeneği'],
+    ['git --git-dir=/x/.git push origin feat-x', 'global seçeneği'],
+    ['git push origin feat:heads/master', 'korunan'],
+    ['git push origin feat:refs/tags/v1', 'refs/heads/ dışında'],
+    ['git push origin feat:refs/for/x', 'refs/heads/ dışında'],
+    ['git push origin @:master', 'korunan'],
+    ['/usr/bin/git push origin master', 'korunan'],
+    ['"C:/Program Files/Git/cmd/git.exe" push origin master', 'korunan'],
+    ['GIT.EXE push -f origin x', 'yasak bayrak'],
+    ['env git push origin master', 'korunan'],
+    ['sudo git push -f origin x', 'yasak bayrak'],
+    ['xargs -n1 git push origin master', 'korunan'],
+    ['bash -lc "git push origin master"', 'korunan'],
+    ['pwsh -Command "git push -f origin x"', 'yasak bayrak'],
+    ['cmd /c "git push origin main"', 'korunan'],
+    ['git -C /baska -C . push origin feat-x', 'ağacı dışında'],
   ])('reddeder: %s', (k, parca) => {
     const sonuc = ret(k)
     expect(sonuc, k).not.toBeNull()
@@ -78,6 +96,7 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     expect(ret('git push', o('master'))).toContain('master')
     expect(ret('git push origin HEAD', o('main'))).toContain('main')
     expect(ret('git push origin', o('master'))).toContain('master')
+    expect(ret('git push origin @', o('master'))).toContain('master')
   })
 
   it('⛔SABOTAJ: korunan dal listesi boşalsaydı master push geçerdi (kapı gerçekten ayırt ediyor)', () => {
