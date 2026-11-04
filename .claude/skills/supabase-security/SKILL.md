@@ -1,9 +1,6 @@
 ---
 name: supabase-security
-description: Defines RLS policies, database migrations (migration yaz), policies (policy
-  oluştur), and security redirection middleware (middleware redirect). Do NOT use
-  for font/typography adjustments, creating git branches, running unit tests, or general
-  text formatting.
+description: 'RLS policy ve yetki güvenliğini yazar: "policy oluştur", "RLS kuralı", "middleware redirect", rol ve JWT claim doğrulaması. Migration DOSYASI açmak create-migration işidir. Font, git, test için kullanma.'
 category: guards
 metadata:
   triggers:

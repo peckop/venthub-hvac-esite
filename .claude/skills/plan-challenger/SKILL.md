@@ -40,8 +40,8 @@ dayanıklı bir plan oluşturulmasını sağlar. **Rapor üretir; kod yazmaz/de�
    - Yapısal/etki analizi → `codegraph_explore` (verbatim kaynak) ve `codegraph_impact` (blast radius).
    - Metin/desen arama → `Grep`; dosya keşfi → `Glob`. Tek dosya/satır onayı → `Read`.
    - **Önce CodeGraph** (AST, ~1sn taze, kesin); grep'i sadece CodeGraph'ın kapsamadığı detay için kullan.
-3. Planın uyması gereken cetvel = **`CLAUDE.md` Mutlak Kurallar (31 madde)** + `CONTEXT.md §14`. Plan
-   bunlardan birini ihlal ediyor mu, ölç.
+3. Planın uyması gereken cetvel = **`CLAUDE.md` Mutlak Kurallar (14 madde)**; gerekçeli tam liste (31 madde)
+   `docs/standards/gelistirme-kurallari-tam-liste.md`. Plan bunlardan birini ihlal ediyor mu, ölç.
 
 ### Adım 2 — DÖRT SORU: her plan ADIMI için ZORUNLU (kapsam denetimi)
 Adım 3'teki red-teaming "bu plan YANLIŞ mı" diye sorar. Bu adım farklı bir şey sorar: **"bu plan
