@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "'diff-ignore' ifadesi hangi dosyalarda geçiyor",
+    "checkout akışının giriş noktası nerede",
+    "sepet hesabını yapan dosyaları anlama göre ara",
+    "yalnız updateCart fonksiyonunun kaynağını oku, dosyanın tamamını açma",
+    "bu projede testler nerede duruyor, yön bul",
+    "Hata mesajı metni hangi dosyada üretiliyor, ara",
+    "ödeme geri dönüş mantığı hangi dosyada, dosya adını bilmiyorum, anlamına göre ara",
+    "NEREDE GEÇİYOR: SUPABASE_URL",
+    "fiyat hesabı davranışını hangi dosya yapıyor",
+    "ProductCard kelimesi hangi dosyalarda geçiyor, metne göre ara",
+    "TODO yorumları hangi dosyalarda geçiyor, metne göre ara",
+    "bu klasörde işe başlamadan önce README ve manifest dosyalarından giriş noktasını bul"
+  ],
+  "should_not_trigger": [
+    "bu fonksiyonu kim çağırıyor",
+    "etki analizi yap: orderService değişirse ne bozulur",
+    "bu hatanın kök sebebini bul",
+    "yeni bir bileşen yaz",
+    "bu PR'ı incele",
+    "paketi yükselt",
+    "kart aç",
+    "yeni migration dosyası aç"
+  ]
+}

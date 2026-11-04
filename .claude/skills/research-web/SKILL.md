@@ -1,6 +1,6 @@
 ---
 name: research-web
-description: "Web araştırmasını planlı yapar: soruyu parçala, kaynakları sırala, bulguları kaynak göstererek sentezle. Tetik: \"araştır\", \"güncel sürüm ne\", \"kaynaklı özet\", \"karşılaştırmalı araştırma\". WrongStack 1.1.0 uyarlaması."
+description: "Web araştırmasını planlı yapar: soruyu parçala, kaynakları sırala, bulguları kaynak göstererek sentezle. Tetik: \"araştır\", \"yönetmeliğin güncel hâli\", \"kaynaklı özet\", \"karşılaştırmalı araştırma\". Paket sürümü tech-stack işidir."
 category: research
 metadata:
   kaynak: "WrongStack @wrongstack/core 1.1.0 skills/research-web/SKILL.md (MIT lisansı, telif WrongStack)"

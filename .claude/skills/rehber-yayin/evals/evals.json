@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "Yeni blog yazısı yayınlıyoruz, sıradaki adım ne?",
+    "rehber yazısı yayına çıkıyor, hangi kapıdan geçmesi gerekiyor",
+    "yazı yayınlandı, şimdi ne yapmam gerekiyor",
+    "Rehberi dizine ekle",
+    "blog yazısının doğrulama turunu kim yapacak?",
+    "YAYINLANDI, doğrulama turu için ne söyleyeyim",
+    "rehber yazisi yayina cikiyor, sahibi kim",
+    "yazıyı yayınlamadan önce hangi basamaklar kaldı",
+    "bu rehber dizine eklendi mi, yayın akışı nerede",
+    "blog yazısı yayında, R10 akışında sırada ne var",
+    "Rehber yayınlandı. Dizin ve doğrulama adımlarını söyle",
+    "yeni rehber yazımız hazır, yayın akışını yönlendir"
+  ],
+  "should_not_trigger": [
+    "blog için hava perdesi rehberi yaz",
+    "bu sayfa için SEO başlığı öner",
+    "git commit at",
+    "bu PR'ı incele",
+    "kategori sayfasının H1'ini düzelt",
+    "ürün sayfasının LCP süresini düşür",
+    "karşılaştırma sayfası yaz: aksiyel ve santrifüj fan",
+    "yeni bir migration dosyası aç"
+  ]
+}
