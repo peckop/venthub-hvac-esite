@@ -1,10 +1,6 @@
 ---
 name: venthub-tasarim-dili
-description: 'VentHub''in KENDI tasarim dili: Kararlar belgelerinden K numarali sert
-  kurallar, tek kaynak adresleri, kare kabul olcum satiri ve OPS->Design emir/cevap
-  kalibi. Vitrin/menu/urun sayfasi/liste-karsilastirma/kurumsal belge/marka-logo
-  tasarimi, design token-renk kurallari, Claude Design emri yazma ve kare kabulu
-  icin. Yabanci stil recetesi ya da gorsel uretim DEGILDIR.'
+description: 'VentHub''in KENDİ tasarım dili: K numaralı sert kurallar, kare kabul ölçüm satırı, OPS→Design emir kalıbı. "bu kare kabul edilir mi", "Menü projesine emir yaz", "ürün seçici karesi", vitrin, ürün sayfası, kurumsal belge, marka-logo, design token kuralı için. Yabancı stil reçetesi ya da görsel üretim DEĞİLDİR.'
 category: guards
 metadata:
   triggers:
