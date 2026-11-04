@@ -146,6 +146,25 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     expect(ret('cd /depo/ozellik; git -C ../ana-master push origin HEAD', s(CWD))).toContain('master')
   })
 
+  it('genişletme ve stdin kabuğu atlatmaları kapalı (denetçi bulgusu 1-2, #2252)', () => {
+    for (const k of [
+      'git push origin $(echo master)',
+      'git push origin `echo master`',
+      'B=master; git push origin $B',
+      'git push origin "$BRANCH"',
+      'printf "git push origin master" | bash',
+      'echo "git push origin master" | sh',
+      'bash <<< "git push origin master"',
+    ]) expect(ret(k), k).not.toBeNull()
+    // yanlış pozitif olmamalı: push olmayan komutta $ ve ters tırnak, yorum ve -o değeri
+    expect(ret('git commit -m "fix `git push` $x"')).toBeNull()
+    expect(ret('git push origin feat-x # master')).toBeNull()
+    expect(ret('git push origin feat-x -o ci.skip')).toBeNull()
+    expect(ret('git push -o ci.skip origin feat-x')).toBeNull()
+    expect(ret('git push origin master -o ci.skip')).toContain('korunan')
+    expect(ret('git push origin feat#1')).toBeNull()
+  })
+
   it('⛔SABOTAJ: korunan dal listesi boşalsaydı master push geçerdi (kapı gerçekten ayırt ediyor)', () => {
     expect(ret('git push origin master')).not.toBeNull()
     expect(ret('git push origin feat-x')).toBeNull()

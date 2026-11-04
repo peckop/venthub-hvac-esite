@@ -94,6 +94,9 @@ function parcala(komut) {
     } else if (c === '\\' && i + 1 < komut.length) {
       jeton += komut[++i]
       jetonVar = true
+    } else if (c === '#' && !jetonVar) {
+      // Satır başı/boşluk sonrası # yorumdur (bash gibi): satır sonuna kadar atlanır; dal adı içindeki # (feat#1) etkilenmez.
+      while (i + 1 < komut.length && komut[i + 1] !== '\n') i++
     } else if (c === ' ' || c === '\t') jetonuKapat()
     else if (c === '\n' || c === ';' || c === '|' || c === '&' || c === '(' || c === ')' || c === '`') parcayiKapat()
     else {
@@ -181,6 +184,10 @@ function degerlendir(komut, o) {
     if (KABUKLAR.has(ad)) {
       if (t.some((x, k) => k > ilk && /^-(e|ec|enc|encodedcommand)$/i.test(x))) return 'kodlanmış kabuk komutu (-EncodedCommand): içerik denetlenemez; düz yaz'
       const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))
+      // stdin'den çalışan kabuk (`... | bash`, `bash <<< "..."`): komut metni tırnaklı yük olarak başka parçada durur, içeriği değerlendirilemez.
+      if (ci < 0 && gitPushVar && (t.some((x) => x.startsWith('<<<')) || t.slice(ilk + 1).every((x) => x.startsWith('-')))) {
+        return 'stdin\'den çalışan kabuk (| bash, <<<) ile git push: komut metni denetlenemez; push\'u doğrudan yaz'
+      }
       if (ci >= 0 && t[ci + 1]) {
         const yuk = t.slice(ci + 1).join(' ')
         if (/git/i.test(yuk) && /push/i.test(yuk) && /[$%^`]/.test(yuk)) return 'kabuk komutunda genişletme ($, %, ^) git push ile birlikte: hedef önceden bilinemez; dal adını açık yaz'
@@ -198,6 +205,8 @@ function degerlendir(komut, o) {
       const p = pushBul(t.slice(k))
       if (!p) continue
       if (p.yasak) return p.yasak
+      // Ters tırnaklı komut yerine koyma (`echo master`) ayrıştırıcıda parçayı böler; push argümanı sessizce düşer → fail-closed.
+      if (String(komut).includes('`')) return 'git push ile birlikte ters tırnaklı komut yerine koyma (`...`): hedef önceden bilinemez; dal adını açık yaz'
       const neden = pushDegerlendir(p, oo)
       if (neden) return neden
     }
@@ -218,7 +227,15 @@ function pushDegerlendir({ c, args }, o) {
     cwd = cozulen
   }
   const konumsal = []
-  for (const a of args) {
+  for (let ai = 0; ai < args.length; ai++) {
+    const a = args[ai]
+    // Dal/uzak adı genişletmesi ($DEĞİŞKEN, $(...), `...`): değer önceden bilinemez → fail-closed (en üst düzeyde de, kabuk -c içindeki gibi).
+    if (/[$`]/.test(a)) return `push argümanında genişletme (${a}): hedef önceden bilinemez; dal adını açık yaz`
+    // -o/--push-option ayrı değer alır (CI atlatma seçeneği gibi); değer uzak/dal sayılmaz.
+    if (a === '-o' || a === '--push-option') {
+      ai++
+      continue
+    }
     if (YASAK_BAYRAK.has(a) || /^--force/.test(a) || /^--delete/.test(a) || /^--mirror/.test(a)) return `yasak bayrak ${a} (zorla/silme/toplu push)`
     if (/^-[A-Za-z]{2,}$/.test(a) && /[fd]/.test(a.slice(1)) && !/^--/.test(a)) return `birleşik bayrak ${a} force/delete içeriyor olabilir; bayrakları ayrı yaz (-u)`
     if (a.startsWith('-')) {
