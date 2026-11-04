@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "kart aç: skill sınavı için",
+    "kanban panosuna bak, hangi kartlar açık",
+    "bu işi Done'a nasıl taşırım",
+    "iş durumu ne, hangi işler sürüyor",
+    "bu iş daha önce yapıldı mı, kanbanda ara",
+    "önceki çalışma satırını doldur",
+    "kanıt komutuyla kartı kapat",
+    "Kanbanda yeni kart acmam lazim",
+    "havuzdan iş al",
+    "KARTI DONE YAP, kanıt nedir",
+    "pano maliyeti yüksek, nasıl okumalıyım",
+    "bu konuda açık bir kart var mı"
+  ],
+  "should_not_trigger": [
+    "yeni bir migration dosyası aç",
+    "git commit at",
+    "worktree'yi sil",
+    "Supabase tablosuna kolon ekle",
+    "yönlendirme sınavını koş",
+    "sayfayı tarayıcıda test et",
+    "blog yazısı yaz",
+    "bu fonksiyonu kim çağırıyor"
+  ]
+}
