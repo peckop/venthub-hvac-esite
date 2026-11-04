@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "qa yap, siteyi tarayıcıda gez",
+    "bu dal çalışıyor mu, tarayıcıda bak",
+    "kırık bir şey var mı, ekran görüntüsüyle kanıtla",
+    "siteyi test et, konsol hatalarını bul",
+    "PR açmadan önce görsel kontrol yap",
+    "QA YAP",
+    "sayfa gerçekten açılıyor mu, sunucu HTML kelime sayısına bak",
+    "tarayıcıda gez ve kırık link bul, bulduğunu düzelt",
+    "hidrasyon hatası var mı, gerçek tarayıcıda dene",
+    "yalnız rapor: siteyi gez ve bulguları yaz",
+    "run QA on the branch and capture screenshots",
+    "butona tıklayınca çalışıyor mu, gez ve göster"
+  ],
+  "should_not_trigger": [
+    "vitest çalıştır",
+    "diff incele",
+    "kod okuyarak denetim yap",
+    "erişilebilirlik kurallarına göre kodu gözden geçir",
+    "yeni test yaz",
+    "hata ayıkla, neden çöküyor",
+    "güvenlik taraması",
+    "performans ölç"
+  ]
+}

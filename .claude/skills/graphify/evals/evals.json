@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "graphify query: ödeme akışı nerede",
+    "bu kodun mimarisini graphify ile anlat",
+    "dosyalar arası ilişkiyi göster, graphify path",
+    "affected ile bu fonksiyonu değiştirirsem ne etkilenir",
+    "god-nodes listesini çıkar",
+    "GRAPHIFY GÜNCELLE",
+    "graphify explain: sepet kavramı",
+    "bilgi grafiğinden sor: bu bileşeni kim kullanıyor",
+    "multigraph tanısı koy",
+    "kod tabanı hakkında soru: mimari nasıl, grafikten bak",
+    "use graphify to explain how the cart module connects",
+    "graph.json güncel mi, update çalıştır"
+  ],
+  "should_not_trigger": [
+    "git geçmişini göster",
+    "yeni bileşen yaz",
+    "testleri çalıştır",
+    "veritabanı şemasını sorgula",
+    "PDF katalogda ne yazıyor",
+    "hata ayıkla",
+    "migration oluştur",
+    "siteyi tarayıcıda gez"
+  ]
+}

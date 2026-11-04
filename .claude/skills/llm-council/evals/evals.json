@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bu karar için konseye sor, A mı B mi",
+    "ikinci görüş al: mimari seçim zor",
+    "emin olamıyorum, oylatalım",
+    "birden çok modelle değerlendirme yap ve muhalefet şerhi yaz",
+    "riskli bir karar, tek modele bırakmayalım",
+    "KONSEY TOPLA",
+    "bu kararı çürüttürelim, üyeler birbirinin cevabını puanlasın",
+    "karmaşık kök sebep için council kur, workflow ile",
+    "iki yaklaşım arasında kaldık, bağımsız üyelerle sentez çıkar",
+    "zor ve tek cevabı olmayan bir soru var, konsey",
+    "ask the council: should we use approach A or B",
+    "çok modelli değerlendirme istiyorum, anonim puanlamalı"
+  ],
+  "should_not_trigger": [
+    "kaç tane test var say",
+    "şu dosyayı düzelt",
+    "planı çürüt, red team yap",
+    "basit bir soru: hangi dosyada tanımlı",
+    "bu PR'ı incele",
+    "web'de araştır",
+    "kodu yaz",
+    "testleri çalıştır"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bakanlık bizden CE belgesi istiyor, uygunluk beyanı taslağı hazırlar mısın",
+    "ürün için CE dosyası çıkaralım",
+    "uygunluk beyani ve risk degerlendirmesi taslagi yaz",
+    "deklarasyon hazırla, firma ürünü için",
+    "EN ISO 12100 risk değerlendirme çerçevesini oluştur",
+    "CE için eksik belge listesi çıkar",
+    "kurumun yazışmasına cevap eki olarak CE dosyası gerekiyor",
+    "test raporu yetersiz denmiş, CE dosyasını nasıl tamamlarız",
+    "CE DOSYASI HAZIRLA",
+    "uygunluk beyanını Türkçe ve İngilizce taslakla",
+    "prepare a declaration of conformity draft for our product",
+    "denetim şubesi CE uygunluğunu soruyor, dosyayı hazırlayalım"
+  ],
+  "should_not_trigger": [
+    "ürün sayfasına teknik özellik tablosu ekle",
+    "KVKK aydınlatma metnini güncelle",
+    "mesafeli satış sözleşmesini yeniden yaz",
+    "mevzuat kaydına yeni bir kalem ekle",
+    "faturayı e-arşive nasıl göndeririz",
+    "bu PDF'i özetle",
+    "kuruma e-posta gönder ve imzala",
+    "sipariş iade akışını anlat"
+  ]
+}

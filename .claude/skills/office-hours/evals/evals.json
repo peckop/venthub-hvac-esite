@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bu fikir değer mi, önce bir tartışalım",
+    "şunu yapsak mı, buna gerek var mı",
+    "beyin fırtınası yapalım, yeni özellik fikri",
+    "office hours: fikrimi sıkıştır",
+    "iş emri açmadan önce bunu düşünelim",
+    "OFFICE HOURS",
+    "doğru problemi mi çözüyoruz diye bakalım",
+    "bir özellik önerim var, talep kanıtı var mı sor",
+    "plan yazmadan önce fikri zorlayalım",
+    "bunu yapmaya değer mi, en dar dilim ne olur",
+    "is this idea worth building? let's talk first",
+    "kafamda bir fikir var, altı soruyla sorgula"
+  ],
+  "should_not_trigger": [
+    "bu planı çürüt",
+    "kodu yaz ve PR aç",
+    "iş emri aç",
+    "hata ayıkla",
+    "PRD üret",
+    "testleri çalıştır",
+    "rehber yazısı yaz",
+    "siteyi gez ve test et"
+  ]
+}

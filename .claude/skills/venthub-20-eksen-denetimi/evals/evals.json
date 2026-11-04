@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "20 eksende kalite denetimi koş, karne çıkar",
+    "nerede zayıfız, 20 madde denetimi yapalım",
+    "lansman öncesi tüm eksenlerde denetim ve PASS FAIL karnesi lazım",
+    "karneyi güncelle, hangi maddede FAIL'dayız",
+    "kalite denetimi baştan sona, her bulguya kalıcı test iste",
+    "20 EKSEN DENETİMİ BAŞLAT",
+    "eksen eksen paralel salt okuma denetimi yap, yanlış pozitifleri ele",
+    "güvenlik ve kalite taraması, tarihli karne ile",
+    "büyük katman değişti, 20 madde denetimini yenile",
+    "proje geneli denetim yap ve her FAIL için geri gelmesini önleyecek testi söyle",
+    "run the 20-axis audit and give me the scorecard",
+    "denetle düzelt kilitle döngüsünü başlat"
+  ],
+  "should_not_trigger": [
+    "bu PR'ın diff'ini incele",
+    "tek dosyada hata ara",
+    "vizyona sadakat raporu çıkar",
+    "sprint teslimi 10/10 kontrolü yap",
+    "testleri çalıştır",
+    "bağımlılık güvenlik açığı taraması",
+    "yeni migration oluştur",
+    "performans ölçümü yap"
+  ]
+}
