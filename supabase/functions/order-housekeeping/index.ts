@@ -6,6 +6,7 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { restSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { ayricalikliMi, resolveCaller, type CallerContext } from '../_shared/caller.ts'
+import { eslesmeyenOdemeSiparisleri } from '../_shared/odeme_inceleme.ts'
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -128,6 +129,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    /**
+     * ⭐ÖDEME DURUMU BİLİNMEYEN — SONLANDIRILMAYAN SİPARİŞLER (karne 2026-11 P2 · OPS-222).
+     *
+     * `iyzico-callback` retrieve'de ağ hatası alırsa ya da kendi içinde patlarsa `status: 'pending'`
+     * döner; çağrı hiç ulaşmazsa cevap da yoktur. Eski kod bunları "success değil" sayıp siparişi
+     * 15 dakikada `cancelled + failed` yapıyordu — İyzico'ya ulaşılamadığı her dakika, parası
+     * çekilmiş siparişleri iptal etme dakikasıydı. Artık yalnız `failure` (İyzico "başarısız" DEDİ)
+     * sonlandırır; bilinmeyen sipariş `pending` kalır, sonraki koşum yeniden sorar.
+     */
+    const belirsiz: string[] = []
+    const sonlandirAdaylari: string[] = []
+
     for (const o of pendWithToken) {
       let sonlandir = false
       try {
@@ -136,7 +149,8 @@ Deno.serve(async (req) => {
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({ orderId: o.id })
         })
-        const body = await cb.json().catch(() => ({})) as { status?: string }
+        // 5xx ya da okunamayan gövde: cevap yok sayılır (aşağıda `belirsiz`).
+        const body = (cb.ok ? await cb.json().catch(() => ({})) : {}) as { status?: string }
         if (body?.status === 'success') {
           reconciled.push(o.id)
         } else if (body?.status === 'needs_review') {
@@ -154,27 +168,60 @@ Deno.serve(async (req) => {
           // Sipariş `pending` kalır ve `incelemeBekleyen` olarak RAPORLANIR — sessiz
           // bırakılmaz, çünkü insan müdahalesi gerekiyor (ödeme var, eşleşme yok).
           incelemeBekleyen.push(o.id)
-        } else {
-          // Tek deneme sonrası hâlâ success değil → siparişi sonlandır.
+        } else if (body?.status === 'failure') {
+          // İyzico ödemenin başarısız olduğunu söyledi → sonlandırma ADAYI (aşağıdaki kayıt kapısından geçer).
           sonlandir = true
+        } else {
+          // `pending` (callback retrieve'de ağ hatası ya da kendi hatası), 5xx ya da okunamayan
+          // gövde: ödeme durumu BİLİNMİYOR → sonlandırma yok (eskiden vardı, P2).
+          belirsiz.push(o.id)
         }
       } catch {
-        // Reconcile denemesi patladıysa da sipariş `pending` kalmamalı.
-        sonlandir = true
+        // Çağrı ulaşmadı: ödeme durumu BİLİNMİYOR → sonlandırma yok (eskiden vardı, P2).
+        belirsiz.push(o.id)
       }
 
-      if (sonlandir) {
-        try {
-          await odemesizSiparisiSonlandir(o.id)
-          failed.push(o.id)
-        } catch (e) {
-          // Yazma düştüyse `failed[]`'e EKLEME — o liste "sonlandırıldı" demektir.
-          // Yalanı raporda taşımaktansa görünür kıl: sipariş hâlâ `pending`.
-          const detay = e instanceof Error ? e.message : String(e)
-          console.error('[order-housekeeping] siparis sonlandirilamadi', { order_id: o.id, detay })
-          yazilamayan.push({ id: o.id, detay })
-        }
+      if (sonlandir) sonlandirAdaylari.push(o.id)
+    }
+
+    // Aynı sipariş için `PAYMENT_ORDER_MISMATCH` kaydı varsa (daha önceki bir callback ödemeyi
+    // başarılı görüp eşleştiremedi) bu çağrının `failure` cevabı tek başına yeterli kanıt değil:
+    // sipariş `pending` kalır, inceleme kovasına girer. Kayıt ölçülemezse hiçbir aday sonlandırılmaz.
+    let incelemeKaydi: Set<string> | null = null
+    if (sonlandirAdaylari.length > 0) {
+      try {
+        incelemeKaydi = await eslesmeyenOdemeSiparisleri(supabaseUrl, serviceRoleKey, sonlandirAdaylari)
+      } catch (e) {
+        const detay = e instanceof Error ? e.message : String(e)
+        console.error('[order-housekeeping] inceleme kaydi olculemedi; aday sonlandirilmadi', { adet: sonlandirAdaylari.length, detay })
+        for (const id of sonlandirAdaylari) yazilamayan.push({ id, detay: 'inceleme_kaydi_olculemedi' })
       }
+    }
+
+    for (const id of incelemeKaydi ? sonlandirAdaylari : []) {
+      if (incelemeKaydi?.has(id)) {
+        incelemeBekleyen.push(id)
+        continue
+      }
+      try {
+        await odemesizSiparisiSonlandir(id)
+        failed.push(id)
+      } catch (e) {
+        // Yazma düştüyse `failed[]`'e EKLEME — o liste "sonlandırıldı" demektir.
+        // Yalanı raporda taşımaktansa görünür kıl: sipariş hâlâ `pending`.
+        const detay = e instanceof Error ? e.message : String(e)
+        console.error('[order-housekeeping] siparis sonlandirilamadi', { order_id: id, detay })
+        yazilamayan.push({ id, detay })
+      }
+    }
+
+    if (belirsiz.length > 0) {
+      await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+        fn: 'order-housekeeping',
+        code: 'PAYMENT_STATUS_BELIRSIZ',
+        message: `${belirsiz.length} siparisin odeme durumu olculemedi (callback pending ya da ulasilamadi); sonlandirilmadi, sonraki kosum yeniden sorar.`,
+        extra: { adet: belirsiz.length, order_ids: belirsiz },
+      })
     }
 
     /**
@@ -212,6 +259,7 @@ Deno.serve(async (req) => {
       // ⭐Boşken de yazılır: alanın yokluğu "hiç olmadı" ile "hiç bakılmadı"yı ayırt
       // ettirmez. İzleyen taraf sıfırı GÖRMELİ.
       inceleme_bekleyen: incelemeBekleyen,
+      belirsiz,
       ...(yazilamayan.length > 0 ? { yazilamayan } : {})
     }
     return new Response(JSON.stringify(govde), { status: yazilamayan.length === 0 ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json' } })

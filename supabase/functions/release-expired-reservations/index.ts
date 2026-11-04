@@ -4,7 +4,8 @@
 // (Bearer service_role) ve yönetici paneli. TENANT: tüm kiracıları süpürür (Faz 2 borcu, R13).
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { ayricalikliMi, resolveCaller } from '../_shared/caller.ts'
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { eslesmeyenOdemeSiparisleri } from '../_shared/odeme_inceleme.ts'
+import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 interface InventorySettings {
@@ -20,7 +21,7 @@ interface ExpiredOrder {
 // Stok geri-vermesi `process_order_stock_restore` RPC'sine devredildi ve o, kalemlere degil
 // `inventory_movements` kanitina bakiyor (T052-VH).
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
     // CORS başlıkları req'e bağlı (origin allowlist) → modül seviyesinde tutulamaz.
     const corsHeaders = getCorsHeaders(req)
 
@@ -100,11 +101,40 @@ serve(async (req: Request) => {
         console.warn(`[JOB] Found ${expiredOrders.length} expired orders. Processing...`)
         let releasedCount = 0
 
-        for (const order of (expiredOrders as ExpiredOrder[])) {
+        // ⛔PARASI ÇEKİLMİŞ OLABİLECEK SİPARİŞ İPTAL EDİLMEZ (karne 2026-11 P2 · OPS-222).
+        //
+        // `iyzico-callback` ödeme BAŞARILI ama siparişle eşleşmediğinde siparişe hiçbir şey yazmaz;
+        // sipariş `pending/pending` kalır ve tek iz `client_errors`'taki `PAYMENT_ORDER_MISMATCH`
+        // alarmıdır. Bu iş yalnız durum + yaşa bakıyordu: müşteri ödemiş, 24 saat sonra sipariş
+        // `cancelled + failed`. Artık o kaydı taşıyan sipariş `pending` kalır ve raporlanır.
+        // Kayıt sorgusu düşerse HİÇBİR sipariş iptal edilmez: "bakamadım" "kayıt yok" değildir.
+        const adaylar = expiredOrders as ExpiredOrder[]
+        let incelemeSeti: Set<string>
+        try {
+            incelemeSeti = await eslesmeyenOdemeSiparisleri(supabaseUrl, supabaseKey, adaylar.map((o) => o.id))
+        } catch (olcumErr) {
+            console.warn('[JOB] needs_review kaydi olculemedi; hicbir siparis iptal edilmedi:', olcumErr instanceof Error ? olcumErr.message : 'hata')
+            return new Response(JSON.stringify({ error: 'review_check_failed', released: 0 }), {
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            })
+        }
+        const incelemeBekleyen = adaylar.filter((o) => incelemeSeti.has(o.id)).map((o) => o.id)
+        if (incelemeBekleyen.length > 0) {
+            await raiseRevenueAlarm(supabaseUrl, supabaseKey, {
+                fn: 'release-expired-reservations',
+                code: 'PAYMENT_NEEDS_REVIEW_SURESI_DOLDU',
+                message: `${incelemeBekleyen.length} siparis rezervasyon suresini doldurdu ama eslesmeyen odeme kaydi var; iptal EDILMEDI, insan mudahalesi gerekiyor.`,
+                extra: { adet: incelemeBekleyen.length, order_ids: incelemeBekleyen },
+            })
+        }
+
+        for (const order of adaylar.filter((o) => !incelemeSeti.has(o.id))) {
 
             try {
-                // a. Siparişi iptal et
-                const { error: updateErr } = await supabase
+                // a. Siparişi iptal et — yalnız HÂLÂ pending/pending ise. Okuma ile yazma arasında
+                // callback siparişi ilerletmiş olabilir; koşulsuz yazım ödenmiş siparişi ezerdi.
+                const { data: guncellenen, error: updateErr } = await supabase
                     .from('venthub_orders')
                     .update({
                         status: 'cancelled',
@@ -112,8 +142,15 @@ serve(async (req: Request) => {
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', order.id)
-                
+                    .eq('status', 'pending')
+                    .eq('payment_status', 'pending')
+                    .select('id')
+
                 if (updateErr) throw updateErr
+                if (!Array.isArray(guncellenen) || guncellenen.length === 0) {
+                    console.warn(`[JOB] Order ${order.id} artik pending degil; atlandi`)
+                    continue
+                }
 
                 // b. Log/Not ekle
                 await supabase.from('order_notes').insert({
@@ -163,6 +200,8 @@ serve(async (req: Request) => {
         return new Response(JSON.stringify({
             success: true,
             released_count: releasedCount,
+            // Boşken de yazılır: "hiç olmadı" ile "hiç bakılmadı" ayırt edilsin.
+            inceleme_bekleyen: incelemeBekleyen,
             message: `Successfully released ${releasedCount} expired orders and restored their stock.`
         }), { 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
