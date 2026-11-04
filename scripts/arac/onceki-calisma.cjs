@@ -223,6 +223,51 @@ async function linearKaynagi(sorgu, baglar, ms) {
   return tamam(kayitlar.length, sirala(bulgular, (b) => b.kimlik), { ipucu: true })
 }
 
+// ───────────────────────── ölçüm defterleri (ARC-121, OPS-120 madde 7) ─────────────────────────
+// Amaç: ölçüm hangi departmanda yapılırsa yapılsın kayıt altında olsun, BAYAT DEĞİLSE tekrar ölçülmesin.
+// Kaynaklar: docs/audits/*.md, hafıza `olcum/*.md`, katalog kaynak dizini `katalog-envanteri.md` (Linear Design yorumları donuk arşiv, taranmaz).
+// Bayatlık eşiği 14 gün (ölçüm defterlerinin tazelik satırlarıyla aynı mertebe); bayat bulgu tekrar ölçümü ENGELLEMEZ, yalnız "BAYAT" damgalanır.
+const OLCUM_TAZE_GUN = 14
+const GUN_MS = 24 * 60 * 60 * 1000
+const TARIH_DESENI = /(\d{4}-\d{2}-\d{2})/
+
+/** Defter tarihi: dosya adındaki tarih, yoksa içeriğin ilk tarihi, yoksa son değişiklik zamanı. */
+function olcumTarihi({ yol, metin, mtimeMs }) {
+  const adTarihi = TARIH_DESENI.exec(path.posix.basename(String(yol).replace(/\\/g, '/')))
+  if (adTarihi) return adTarihi[1]
+  const icTarih = TARIH_DESENI.exec(String(metin || '').slice(0, 2000))
+  if (icTarih) return icTarih[1]
+  return mtimeMs ? new Date(mtimeMs).toISOString().slice(0, 10) : null
+}
+
+async function olcumKaynagi(sorgu, baglar, simdiMs) {
+  if (typeof baglar.olcumDefterleri !== 'function') return atlandi('ölçüm defteri bağı yok')
+  const defterler = await baglar.olcumDefterleri()
+  const bulgular = []
+  for (const d of defterler) {
+    const baslik = String(d.metin || '').split('\n').slice(0, 8).join(' ')
+    const e = eslestir(sorgu, `${d.yol} ${baslik}`)
+    if (!e) continue
+    const tarih = olcumTarihi(d)
+    const yas = tarih ? Math.floor((simdiMs - Date.parse(tarih + 'T00:00:00Z')) / GUN_MS) : null
+    bulgular.push({ tur: 'olcum', yol: d.yol, tarih, yas, taze: yas !== null && yas <= OLCUM_TAZE_GUN, ...e })
+  }
+  return tamam(defterler.length, sirala(bulgular, (b) => b.tarih || ''))
+}
+
+/** "ÖNCEKİ ÖLÇÜM:" ilk satırı: defter + tarih + taze/BAYAT. Bayat değilse tekrar ölçülmez. */
+function olcumSatiri(k) {
+  const onek = 'ÖNCEKİ ÖLÇÜM: '
+  if (k.durum === 'atlandi') return `${onek}ATLANDI (${k.sebep})`
+  if (k.durum === 'olculemedi') return `${onek}ÖLÇÜLEMEDİ (${k.sebep})`
+  if (!k.bulgular.length) return `${onek}YOK (${k.arandi} ölçüm defteri arandı)`
+  const parca = k.bulgular
+    .slice(0, EN_FAZLA_BULGU)
+    .map((b) => `${b.yol} (${b.tarih || 'tarihsiz'}, ${b.taze ? 'taze' : b.yas === null ? 'tarihsiz' : `BAYAT ${b.yas} gün`})`)
+  const tazeVar = k.bulgular.some((b) => b.taze)
+  return `${onek}BULUNDU ${k.bulgular.length} — ${parca.join('; ')}${tazeVar ? ' → taze kayıt varken yeniden ölçme, defteri oku' : ' → hepsi bayat, yeniden ölçüp AYNI deftere tarihli ekle'}`
+}
+
 function sebepMetni(hata) {
   if (!hata) return 'bilinmeyen hata'
   if (hata.killed || hata.signal === 'SIGTERM') return 'süre aşıldı'
@@ -317,6 +362,7 @@ function ayrintiSatiri(ad, k) {
 
 function metinCikti(sonuc) {
   const satirlar = [sonuc.ilk]
+  if (sonuc.olcumIlk) satirlar.push(sonuc.olcumIlk)
   for (const ad of KAYNAKLAR) satirlar.push(ayrintiSatiri(ad, sonuc.kaynaklar[ad]))
   if (sonuc.sonuc === 'bulgu-var') {
     satirlar.push('  ⚠ Bulgu varken sıfırdan üretme: önce yukarıdakileri aç, işin devamı mı tekrarı mı karar ver.')
@@ -354,10 +400,15 @@ async function tara(metin, { baglar, haric = [], derin = false, butceMs = CLI_BU
     const [dosya, git, kanban, linear, sage] = await Promise.all([dosyaVaadi, gitVaadi, kanbanVaadi, linearVaadi, sageVaadi])
     kaynaklar = { dosya, git, kanban, sage, linear }
   }
+  const olcum = sorgu.yeterli
+    ? await kaynakKos(() => olcumKaynagi(sorgu, baglar, t0), tavan(KANBAN_TAVAN_MS))
+    : olculemedi('ifade çok kısa')
   const hesap = sonucuHesapla(sorgu, kaynaklar)
   const sonuc = {
     sonuc: hesap.sonuc,
     ilk: ilkSatir(sorgu, kaynaklar, hesap),
+    olcum,
+    olcumIlk: olcumSatiri(olcum),
     sorgu: { ifade: sorgu.ifade, ids: sorgu.ids, terimler: sorgu.terimler.map((t) => t.kat), haric: sorgu.haric },
     kaynaklar,
     toplam: hesap.toplam,
@@ -425,6 +476,42 @@ function gercekBaglar({ repo = REPO, ortam = process.env } = {}) {
       const j = JSON.parse(cikti)
       if (!j || !Array.isArray(j.kayitlar)) throw new Error('kanban dışa aktarımı beklenen biçimde değil')
       return j.kayitlar
+    },
+    // ARC-121: ölçüm defterleri — depo docs/audits, hafıza olcum/, katalog kaynak dizini. Okunamayan dizin atlanır (boş dönmez, sessiz de kalmaz:
+    // hiçbir kaynak okunamazsa fırlatır → "ÖLÇÜLEMEDİ").
+    olcumDefterleri: async () => {
+      const hafiza = ortam.HAFIZA_DIZINI || path.join(os.homedir(), '.claude', 'projects', 'c--Users-alize-venthub-hvac', 'memory')
+      const dizinler = [path.join(repo, 'docs', 'audits'), path.join(hafiza, 'olcum')]
+      const tekler = []
+      try {
+        tekler.push(path.join(path.dirname(anaKok()), 'venthub-pdf-ingestor', 'kaynak-dizini', 'katalog-envanteri.md'))
+      } catch {
+        /* ana kök çözülemedi: katalog envanteri atlanır */
+      }
+      const dosyalar = []
+      let okunanDizin = 0
+      for (const d of dizinler) {
+        try {
+          for (const ad of fs.readdirSync(d)) if (ad.endsWith('.md')) dosyalar.push(path.join(d, ad))
+          okunanDizin++
+        } catch {
+          /* dizin yok */
+        }
+      }
+      dosyalar.push(...tekler.filter((y) => fs.existsSync(y)))
+      if (!okunanDizin && !dosyalar.length) throw new Error('ölçüm defteri dizinleri okunamadı')
+      return dosyalar.map((tam) => {
+        let metin = ''
+        let mtimeMs = 0
+        try {
+          metin = fs.readFileSync(tam, 'utf8').slice(0, 4000)
+          mtimeMs = fs.statSync(tam).mtimeMs
+        } catch {
+          /* okunamayan dosya boş sayılır */
+        }
+        const goreli = icindeMi(tam, repo) ? path.relative(repo, tam).replace(/\\/g, '/') : path.basename(path.dirname(tam)) + '/' + path.basename(tam)
+        return { yol: goreli, metin, mtimeMs }
+      })
     },
     daemonCanli: () => daemonCanliMi(anaKok()),
     // ⚠sage paketi `require` ile SENKRON yüklenir (soğukta ~3 sn ölçüldü) ve bu sırada olay döngüsü durur: Kanban ve Linear
