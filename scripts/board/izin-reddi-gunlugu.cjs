@@ -107,18 +107,41 @@ function toolUseAdlari(kayit) {
   }
 }
 
+/** Ana transkript dizininin kardeşleri: aynı üst dizinde, adı ana dizin adı + `--` ile başlayanlar (büyük/küçük harf duyarsız). */
+function kardesDizinler() {
+  const ust = path.dirname(PROJE_DIZINI)
+  const onek = path.basename(PROJE_DIZINI).toLowerCase() + '--'
+  try {
+    return fs
+      .readdirSync(ust)
+      .filter((f) => f.toLowerCase().startsWith(onek))
+      .map((f) => path.join(ust, f))
+  } catch {
+    return []
+  }
+}
+
 async function tara(gun) {
   let dosyalar = []
   try {
-    dosyalar = fs.readdirSync(PROJE_DIZINI).filter((f) => f.endsWith('.jsonl'))
+    dosyalar = fs.readdirSync(PROJE_DIZINI).filter((f) => f.endsWith('.jsonl')).map((f) => path.join(PROJE_DIZINI, f))
   } catch (e) {
     return { hata: `transkript dizini okunamadi (${PROJE_DIZINI}): ${e && e.message}`, olaylar: [] }
   }
+  // ARC-173 (4 Kasım): departman pencereleri worktree'de çalışır; transkriptleri kardeş dizinlerde yaşar
+  // (`C--...--claude-worktrees-<ad>`). Yalnız ana dizini taramak "7 günde 0 ret" gibi YANLIŞ EVREN sayısı üretiyordu.
+  for (const k of kardesDizinler()) {
+    try {
+      dosyalar.push(...fs.readdirSync(k).filter((f) => f.endsWith('.jsonl')).map((f) => path.join(k, f)))
+    } catch {
+      /* okunamayan kardeş dizin atlanır */
+    }
+  }
   const olaylar = []
   for (const dosya of dosyalar) {
-    const sid = dosya.slice(0, 8)
+    const sid = path.basename(dosya).slice(0, 8)
     const akis = readline.createInterface({
-      input: fs.createReadStream(path.join(PROJE_DIZINI, dosya)),
+      input: fs.createReadStream(dosya),
       crlfDelay: Infinity,
     })
     /** uuid → {ad, ozet}. Yalnız `tool_use` içeren assistant kayıtları girer. */
