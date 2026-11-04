@@ -199,8 +199,11 @@ Yeni deferred bulgular iş emri kaydı (Kanban kartı) ister; kartı sen açma, 
 
 ## Bitiş durumu
 
-`DONE` (tüm kademe bulguları verified) · `DONE_WITH_DEFERRED` · `BLOCKED` (hedef açılamadı, giriş
-yok, ağaç kirli — sebep ve ne gerektiği yazılır) · `REPORT_ONLY` (`--sadece-rapor`).
+Son satırdaki `DURUM:` kelimesi aşağıdaki ortak blokta tanımlı dörtten biridir. Karşılıklar:
+`BITTI` (tüm kademe bulguları verified; `--sadece-rapor` ile yalnız rapor istendiyse de rapor
+tamamsa BITTI) · `CEKINCELI` (bazı bulgular ertelendi: deferred listesi çekince olarak yazılır) ·
+`ENGELLI` (hedef açılamadı, giriş yok, ağaç kirli: sebep ve ne gerektiği yazılır) ·
+`BAGLAM-EKSIK` (hangi sayfa, hangi dal belirsiz).
 
 ## Kesin kurallar
 
