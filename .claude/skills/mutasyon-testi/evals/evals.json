@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "testlerimiz ödeme kodunu gerçekten koruyor mu, mutasyon testi yapalım",
+    "sağ kalan mutant var mı bak, iade durumu kodunda",
+    "bu PR webhook koduna dokunuyor, testler yeterli mi bağımsız doğrula",
+    "mutation testing koş, fiyat hesaplama modülü için",
+    "testler geçiyor ama kodu koruyorlar mı, bozup deneyelim",
+    "kritik koda dokunan değişikliği doğrulayalım, testleri sağlam mı",
+    "yetki kontrolü testleri gerçekten bir şey yakalıyor mu",
+    "sipariş durumu geçişlerinin testleri zayıf olabilir, mutant yoklaması yap",
+    "MUTASYON TESTİ YAP",
+    "testleri sabote edip hâlâ geçiyor mu bakalım, kaos yoklaması",
+    "kapsam yüzdesi yüksek ama güvenmiyorum, testler kodu tutuyor mu",
+    "do the tests actually protect the payment code? run a mutation check"
+  ],
+  "should_not_trigger": [
+    "yeni bir test yaz, sepet toplamı için",
+    "vitest'i çalıştır ve sonucu söyle",
+    "kod kapsam raporunu çıkar",
+    "bu değişikliği incele, hata var mı",
+    "flaky olan testi düzelt",
+    "test dosyasındaki yazım hatasını düzelt",
+    "ödeme webhook imzasını doğrulayan kodu yaz",
+    "güvenlik taraması yap"
+  ]
+}

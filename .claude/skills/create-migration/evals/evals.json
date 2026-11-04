@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "yeni bir migration dosyası oluşturalım, siparişlere kargo notu kolonu eklenecek",
+    "veritabanına yeni tablo ekleyeceğim, migration nasıl yazılır",
+    "şema degisikligi lazım: urunler tablosuna garanti_suresi kolonu",
+    "migration yaz, iade talepleri için yeni bir durum alanı gelsin",
+    "supabase migrationu ekleyelim, bayi_notlari tablosu",
+    "DB şema değişikliği yapacağız, önce güvenli yolu söyle",
+    "yeni index için migration hazırla",
+    "kolon ekleyen bir migration dosyası aç, adı doğru damgalı olsun",
+    "MİGRATİON YAZ: kategoriler tablosuna sıra numarası",
+    "migration dosyasını nasıl adlandıracagız, damga kaç haneli",
+    "tabloya kısıt ekleyecek migration lazım, prod'a gidecek",
+    "I need a new migration to add a column to the orders table"
+  ],
+  "should_not_trigger": [
+    "RLS politikasını güvenlik açısından gözden geçir",
+    "büyük tabloda kolon tipini veri kaybetmeden nasıl değiştiririz, geri doldurma yöntemini anlat",
+    "siparişleri listeleyen servis fonksiyonunu yaz",
+    "veritabanındaki ürün sayısını sorgula",
+    "migration geçmişini ve son uygulananı göster",
+    "ürün sayfasına teknik özellik tablosu ekle",
+    "testleri çalıştır ve hatayı bul",
+    "bu PR'ı birleştir"
+  ]
+}
