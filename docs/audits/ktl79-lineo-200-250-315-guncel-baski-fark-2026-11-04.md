@@ -10,7 +10,7 @@ KTL-12 (10 Ekim) bu üç ürünü `LINEO_QUITE_KATALOG.pdf` s.28 ile düzeltti v
 
 ## Ebat sütun eşlemesi (görsel doğrulama)
 
-Katalog s.29 çizimi (Version C: Lineo 200/250/315) elle okundu: **A** ön görünüşte toplam genişlik, **B** toplam yükseklik, **C** yan görünüşte eksen boyunca toplam uzunluk, **ØD** bağlantı çapı. Canlıda `size_a_mm / size_b_mm / size_c_mm` bu sırayla A/B/C tutuyor (17143-17146 canlı değerleri katalog A/B/C ile birebir). Sayfa görüntüsü: `C:/Users/alize/VentHub-Gorsel-Arsiv/_liste/ktl12-ebat-2026-11-04/s29.png` (depo dışı).
+Katalog s.29 çizimi (Version C: Lineo 200/250/315) elle okundu: **A** ön görünüşte toplam genişlik, **B** toplam yükseklik, **C** yan görünüşte eksen boyunca toplam uzunluk, **ØD** bağlantı çapı. Canlıda `size_a_mm / size_b_mm / size_c_mm` bu sırayla A/B/C tutuyor (17143-17146 canlı değerleri katalog A/B/C ile birebir). Sayfa görüntüsü: `~/VentHub-Gorsel-Arsiv/_liste/ktl12-ebat-2026-11-04/s29.png` (depo dışı).
 
 ## Fark tablosu (güncel baskı s.28-29 ↔ canlı 4 Kasım, `/tr/products/vortice-lineo-kanal-fanlari`)
 
