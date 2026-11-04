@@ -22,10 +22,23 @@ import {
 
 export type BilgiMerkeziKaynagi = IcBaglantiKaynagi & {
   aileKarti(slug: string, dil: string): Promise<{ slug: string; ad: string } | null>
+  /**
+   * Kategori kartı verisi (URN-151). `ad` = `getCategoryDisplayName` (sözlük → menü etiketi → ad), `aciklama` =
+   * `getCategoryDescription` (o dilin metni; yoksa BOŞ dize, başka dile düşme yok). Pasif/silinmiş kategori `null`.
+   */
+  kategoriKarti(slug: string, dil: string): Promise<{ slug: string; ad: string; aciklama: string } | null>
 }
 
 export interface UrunKarti {
   ad: string
+  href: Route
+}
+
+/** Yazının "İlgili ürün kategorileri" kutusundaki kart (URN-151). Markasızdır: kategori adı + kısa metin. */
+export interface KategoriKarti {
+  ad: string
+  /** Kategorinin o dildeki kısa metni; yoksa boş (görünüm satırı hiç basmaz, Türkçe metin yedeği konmaz). */
+  aciklama: string
   href: Route
 }
 
@@ -46,6 +59,8 @@ export interface YaziSayfasi {
   icindekiler: IcindekilerOgesi[]
   okumaSuresi: number
   urunKartlari: UrunKarti[]
+  /** `yazi.ilgiliKategoriler` kimliklerinden (URN-151); alan yoksa ya da boşsa boş dizi, görünüm bloğu basmaz. */
+  kategoriKartlari: KategoriKarti[]
   ilgiliYazilar: IlgiliYazi[]
 }
 
@@ -71,6 +86,21 @@ async function aileKartiHazirla(kimlik: string, dil: YaziDili, kaynak: BilgiMerk
   return { ad: kart.ad, href }
 }
 
+/**
+ * Kategori kimliği → kart (URN-151). Pasif/silinmiş kategori ya da adı boş kayıt SESSİZ GEÇMEZ: ATAR (derleme durur).
+ * Bağlantı çözümü (`hrefler`) zaten `icBaglantilariCoz`da yapılır; burada yalnız görünen veri toplanır.
+ * Eski (takma adlı) slug bugünkü slug'a çevrilir; kart bugünkü kategoriden beslenir.
+ */
+async function kategoriKartiHazirla(kimlik: string, dil: YaziDili, kaynak: BilgiMerkeziKaynagi, href: Route): Promise<KategoriKarti> {
+  const { tur, anahtar } = kimlikAyristir(kimlik)
+  if (tur !== 'kategori') throw new IcBaglantiHatasi(kimlik, 'kategori kartı yalnız kategori kimliğiyle yazılır (vh:kategori/<slug>)')
+  const guncel = (await kaynak.kategori(anahtar))?.slug ?? (await kaynak.takmaAd('kategori', anahtar.toLowerCase()))
+  const kart = guncel ? await kaynak.kategoriKarti(guncel, dil) : null
+  if (!kart) throw new IcBaglantiHatasi(kimlik, 'kategori kartı için etkin kategori bulunamadı')
+  if (!kart.ad.trim()) throw new IcBaglantiHatasi(kimlik, 'kategori kartı için görünen ad boş')
+  return { ad: kart.ad, aciklama: kart.aciklama.trim(), href }
+}
+
 export async function yaziSayfasiHazirla(
   yazi: RehberYazisi,
   dil: YaziDili,
@@ -80,7 +110,9 @@ export async function yaziSayfasiHazirla(
   const metin = yazi.diller[dil]
   if (!metin) throw new Error(`[bilgi merkezi] "${yazi.kimlik}" yazısı ${dil} dilinde yok`)
   const ayrismis = markdownAyristir(metin.govde)
-  const kimlikler = [...baglantilariTopla(ayrismis).filter((h) => h.startsWith('vh:')), ...yazi.urunler]
+  // Aynı kategori alanda tekrar edebilir; kart tekrarsız çizilir (Set).
+  const kategoriKimlikleri = [...new Set(yazi.ilgiliKategoriler ?? [])]
+  const kimlikler = [...baglantilariTopla(ayrismis).filter((h) => h.startsWith('vh:')), ...yazi.urunler, ...kategoriKimlikleri]
   // Yazı kendine bağlanamaz (URN-140): kendi sayfasına giden bağlantı boş tıklamadır, ters dizine de sayılmaz.
   if (kimlikler.includes(`vh:yazi/${yazi.kimlik}`)) {
     throw new IcBaglantiHatasi(`vh:yazi/${yazi.kimlik}`, 'yazı kendine bağlanamaz (self-link)')
@@ -90,6 +122,11 @@ export async function yaziSayfasiHazirla(
   const urunKartlari: UrunKarti[] = []
   for (const k of yazi.urunler) {
     urunKartlari.push(await aileKartiHazirla(k, dil, kaynak, hrefler.get(k) as Route))
+  }
+
+  const kategoriKartlari: KategoriKarti[] = []
+  for (const k of kategoriKimlikleri) {
+    kategoriKartlari.push(await kategoriKartiHazirla(k, dil, kaynak, hrefler.get(k) as Route))
   }
 
   const ilgiliYazilar = ilgiliYazilariSec(yazi, dil, yazilar).map((y) => {
@@ -106,6 +143,7 @@ export async function yaziSayfasiHazirla(
     icindekiler: icindekiler(ayrismis),
     okumaSuresi: okumaSuresiDakika(metin.govde),
     urunKartlari,
+    kategoriKartlari,
     ilgiliYazilar,
   }
 }
