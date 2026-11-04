@@ -13,11 +13,11 @@ import { describe, expect, it } from 'vitest'
 const require_ = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '..', '..', '..')
 const KANCA = path.join(KOK, '.claude', 'hooks', 'push-kapisi.cjs')
-type Secenek = { cwd: string; mevcutDal?: (c: string) => string | null; kokler?: string[] }
+type Secenek = { cwd: string; mevcutDal?: (c: string) => string | null; gitDeposu?: (p: string) => boolean }
 const motor = require_(KANCA) as { degerlendir: (k: string, o: Secenek) => string | null; parcala: (k: string) => string[][] }
 
 const CWD = path.resolve('/depo/calisma')
-const o = (mevcut: string | null = 'feat-x'): Secenek => ({ cwd: CWD, mevcutDal: () => mevcut, kokler: [CWD, path.resolve('/depo')] })
+const o = (mevcut: string | null = 'feat-x'): Secenek => ({ cwd: CWD, mevcutDal: () => mevcut, gitDeposu: (p) => !p.includes('depo-degil') })
 const ret = (k: string, s: Secenek = o()) => motor.degerlendir(k, s)
 
 describe('INV-PUSH-KAPISI-1 — izin verilen tek biçim', () => {
@@ -30,6 +30,9 @@ describe('INV-PUSH-KAPISI-1 — izin verilen tek biçim', () => {
     'git push origin feat-a:feat-b',
     'git push -n origin feat-x',
     'git -C /depo/calisma push origin feat-x',
+    'git -C C:/Users/alize/venthub-pdf-ingestor push origin kaynak-dizini-x',
+    'git -C /kardes/ingestor push -u origin feat-x',
+    'cd /kardes/ingestor && git push origin feat-x',
     'git status && git push origin feat-x',
     'git push',
     'git -c core.quotepath=off status',
@@ -64,8 +67,10 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     ['git push https://github.com/x/y.git feat-x', 'adlı bir uzak değil'],
     ['git push git@github.com:x/y.git feat-x', 'adlı bir uzak değil'],
     ['git push origin HEAD:feat-*', 'joker'],
-    ['git -C /baska/depo push origin feat-x', 'ağacı dışında'],
-    ['git -C ../../baska push origin feat-x', 'ağacı dışında'],
+    ['git -C /baska/depo-degil push origin feat-x', 'git deposu değil'],
+    ['git -C ../depo-degil push origin feat-x', 'git deposu değil'],
+    ['git -C /kardes/ingestor push origin master', 'korunan'],
+    ['git -C /kardes/ingestor push -f origin feat-x', 'yasak bayrak'],
     ['git status && git push origin master', 'korunan'],
     ['ls; git push -f origin x', 'yasak bayrak'],
     ['bash -c "git push origin master"', 'korunan'],
@@ -107,7 +112,7 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     ['bash -lc "git push origin master"', 'korunan'],
     ['pwsh -Command "git push -f origin x"', 'yasak bayrak'],
     ['cmd /c "git push origin main"', 'korunan'],
-    ['git -C /baska -C . push origin feat-x', 'ağacı dışında'],
+    ['git -C /baska/depo-degil -C . push origin feat-x', 'git deposu değil'],
   ])('reddeder: %s', (k, parca) => {
     const sonuc = ret(k)
     expect(sonuc, k).not.toBeNull()
@@ -119,6 +124,16 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     expect(ret('git push origin HEAD', o('main'))).toContain('main')
     expect(ret('git push origin', o('master'))).toContain('master')
     expect(ret('git push origin @', o('master'))).toContain('master')
+  })
+
+  it('cd X && git push: mevcut dal çalışma klasöründe değil X\'te ölçülür (OPS notu #2252)', () => {
+    const dal = (c: string) => (c.endsWith('ana-master') ? 'master' : 'feat-x')
+    const s = (cwd: string): Secenek => ({ cwd, mevcutDal: dal, gitDeposu: () => true })
+    expect(ret('cd /depo/ana-master && git push', s(CWD))).toContain('master')
+    expect(ret('cd /depo/ana-master && git push origin HEAD', s(CWD))).toContain('master')
+    expect(ret('cd /depo/ozellik && git push', s(path.resolve('/depo/ana-master')))).toBeNull()
+    expect(ret('git push', s(path.resolve('/depo/ana-master')))).toContain('master')
+    expect(ret('cd /depo/ozellik; git -C ../ana-master push origin HEAD', s(CWD))).toContain('master')
   })
 
   it('⛔SABOTAJ: korunan dal listesi boşalsaydı master push geçerdi (kapı gerçekten ayırt ediyor)', () => {

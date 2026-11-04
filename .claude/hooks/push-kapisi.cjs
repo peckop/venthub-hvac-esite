@@ -15,7 +15,8 @@
  *  · --force, -f, --force-with-lease, --force-if-includes, +refspec, --delete, -d, `:dal` (silme), --mirror, --all, --prune;
  *  · uzak ad yerine adres (https://..., git@..., yol): yalnız adlı uzak (origin) geçer;
  *  · refspec yok ya da `HEAD` iken MEVCUT dal master/main ise;
- *  · `git -C <yol>` yolu bu çalışma kopyasının ya da ana deponun ağacı dışındaysa.
+ *  · `git -C <yol>` yolu bir git deposu değilse (kardeş depo dahil HER git deposu serbest; kurallar o deponun dalında uygulanır);
+ *    `cd X && git push` zincirinde mevcut dal X'te ölçülür.
  * Zincirler (`&&`, `;`, `|`, satır sonu), `bash -c "..."` ve `eval` içi de taranır. Çözülemeyen biçim → fail-open (geçer).
  *
  * Güvenlik: salt-okuma (yalnız `git rev-parse` çağırır), fail-open, vana `VENTHUB_PUSH_KAPISI_KAPAT=1`.
@@ -142,7 +143,7 @@ function pushBul(t) {
 }
 
 /**
- * Saf karar. girdi: komut metni. o: { cwd, mevcutDal(cwd)->string|null, kokler: [mutlak yol] }.
+ * Saf karar. girdi: komut metni. o: { cwd, mevcutDal(cwd)->string|null, gitDeposu(yol)->boolean (varsayılan: git rev-parse) }.
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
  */
 function degerlendir(komut, o) {
@@ -154,6 +155,10 @@ function degerlendir(komut, o) {
   if (gitPushVar && parcalar.some((t) => t.some((x, k) => GIT_ORTAM.test(x) || (komutAdi(x) === 'export' && GIT_ORTAM.test('export ' + (t[k + 1] || '')))))) {
     return 'GIT_CONFIG_*/GIT_DIR/GIT_EXEC_PATH/GIT_NAMESPACE/GIT_SSH_COMMAND ortam değişkeni push hedefini/yapılandırmasını değiştirebilir; değişkensiz yaz'
   }
+  // `cd X && git push` biçimi: çalışma klasörü zincir boyunca izlenir; mevcut dal (HEAD/argümansız push denetimi) ve göreli
+  // -C yolları X'e göre çözülür. SINIR: alt kabuk `( cd X ... )` kapsamı ayrılmaz (cd sonraki parçalara sızar, konservatif);
+  // `cd` argümansız ya da `cd -` ise klasör değişmedi sayılır.
+  let cwd = o.cwd
   for (const t of parcalar) {
     // xargs ve env -S: argümanlar statik görülemez → git ve push birlikte geçiyorsa fail-closed
     const tGitPush = t.some(gitGecer) && t.some((x) => x.includes('push'))
@@ -162,17 +167,19 @@ function degerlendir(komut, o) {
     // bash -c "..." / eval "..." / pwsh -Command "..." / cmd /c "..." içini de tara
     const ilk = asilKomut(t)
     const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
+    const oo = { ...o, cwd }
+    if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-')) cwd = path.resolve(cwd, t[ilk + 1])
     if (KABUKLAR.has(ad)) {
       if (t.some((x, k) => k > ilk && /^-(e|ec|enc|encodedcommand)$/i.test(x))) return 'kodlanmış kabuk komutu (-EncodedCommand): içerik denetlenemez; düz yaz'
       const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))
       if (ci >= 0 && t[ci + 1]) {
         const yuk = t.slice(ci + 1).join(' ')
         if (/git/i.test(yuk) && /push/i.test(yuk) && /[$%^`]/.test(yuk)) return 'kabuk komutunda genişletme ($, %, ^) git push ile birlikte: hedef önceden bilinemez; dal adını açık yaz'
-        const ic = degerlendir(yuk, o)
+        const ic = degerlendir(yuk, oo)
         if (ic) return ic
       }
     } else if (ad === 'eval') {
-      const ic = degerlendir(t.slice(ilk + 1).join(' '), o)
+      const ic = degerlendir(t.slice(ilk + 1).join(' '), oo)
       if (ic) return ic
     }
     // Fail-closed: parçadaki HER `git` tokeni aday komut başlangıcıdır (sarmalayıcıların bayrak sözdizimi modellenmez);
@@ -182,7 +189,7 @@ function degerlendir(komut, o) {
       const p = pushBul(t.slice(k))
       if (!p) continue
       if (p.yasak) return p.yasak
-      const neden = pushDegerlendir(p, o)
+      const neden = pushDegerlendir(p, oo)
       if (neden) return neden
     }
   }
@@ -192,13 +199,12 @@ function degerlendir(komut, o) {
 function pushDegerlendir({ c, args }, o) {
   let cwd = o.cwd
   if (c.length > 0) {
-    // art arda -C değerleri git gibi birikir: her biri öncekine göre çözülür, SON yol denetlenir
+    // art arda -C değerleri git gibi birikir: her biri öncekine göre çözülür, SON yol denetlenir.
+    // OPS kararı (4 Kasım, #2252): -C yolu HERHANGİ bir git deposu olabilir (kardeş depo venthub-pdf-ingestor dahil);
+    // kurallar (master/main, force, silme) O deponun dalında uygulanır. Git deposu olmayan yol reddedilir.
     const cozulen = c.reduce((onceki, y) => path.resolve(onceki, y), o.cwd)
-    const icinde = (o.kokler || []).some((k) => {
-      const r = path.relative(k, cozulen)
-      return r === '' || (!r.startsWith('..') && !path.isAbsolute(r))
-    })
-    if (!icinde) return `git -C ${c.join(' -C ')}: yol bu çalışma kopyasının ve ana deponun ağacı dışında; push yalnız kendi ağacından yapılır`
+    const depoMu = o.gitDeposu || ((y) => git(y, 'rev-parse', '--git-dir') !== null)
+    if (!depoMu(cozulen)) return `git -C ${c.join(' -C ')}: yol bir git deposu değil; push yalnız bir git deposundan yapılır`
     cwd = cozulen
   }
   const konumsal = []
@@ -251,16 +257,6 @@ function git(cwd, ...a) {
   return r.status === 0 ? String(r.stdout).trim() : null
 }
 
-/** -C yolunun izinli kökleri: bu çalışma kopyası + ana depo (ortak git dizininin ebeveyni, worktree'leri altında). */
-function kokleriBul(cwd) {
-  const kokler = new Set([path.resolve(cwd)])
-  const top = git(cwd, 'rev-parse', '--show-toplevel')
-  if (top) kokler.add(path.resolve(top))
-  const ortak = git(cwd, 'rev-parse', '--path-format=absolute', '--git-common-dir')
-  if (ortak) kokler.add(path.resolve(ortak, '..'))
-  return [...kokler]
-}
-
 function mevcutDalBul(cwd) {
   return git(cwd, 'rev-parse', '--abbrev-ref', 'HEAD')
 }
@@ -292,7 +288,7 @@ function main() {
       // (yol/.exe/sarmalayıcı/alias öncesi seçenek yakalanır; yapılandırma alias'ı kancanın göremediği bilinen sınırdır).
       if (typeof komut !== 'string' || !/git/i.test(komut)) process.exit(0)
       const cwd = girdi.cwd || process.cwd()
-      const neden = degerlendir(komut, { cwd, mevcutDal: mevcutDalBul, kokler: kokleriBul(cwd) })
+      const neden = degerlendir(komut, { cwd, mevcutDal: mevcutDalBul })
       if (neden) deny(neden)
     } catch (e) {
       process.stderr.write('[push-kapisi] cozulemedi (' + ((e && e.message) || 'bilinmeyen') + '), karisilmadi\n')
