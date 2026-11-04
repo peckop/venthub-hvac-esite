@@ -97,7 +97,7 @@ export const en: typeof tr = {
         // Decision 288 (Recep, OPS-76): matches the TR name 'Radyal (Santrifüj) Fanlar'; address and key are unchanged.
         radial: 'Radial (Centrifugal) Fans',
         roof: 'Roof Fans',
-        'axial-ind': 'Industrial Axial Fans',
+        'axial-ind': 'Axial Fans',
         'air-curtain': 'Air Curtains',
         conditioning: 'Air Conditioning Solutions',
         'rect-duct': 'Rectangular Duct Fans',
