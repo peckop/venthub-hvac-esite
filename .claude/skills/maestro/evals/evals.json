@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "12 admin sayfasını ortak tablo kitine taşıyalım, paralel dalgalarla",
+    "bütün servisleri yeni client fabrikasına geçir, parçalara bölüp paralel yürüt",
+    "tüm formları yeni doğrulama desenine çevir, kalite kapılı dalgalar halinde",
+    "aynı yapısal değişikliği onlarca dosyaya uygulamak istiyorum, maestro ile",
+    "maestro başlat: 20 modülü yeni hata API'sine taşı",
+    "bölünebilir büyük bir göç var, alt ajan dalgaları ve merkezi doğrulama lazım",
+    "bütün sayfaları yeni bileşene geçirelim, hepsi birbirinden bağımsız hedefler",
+    "MAESTRO İLE TAŞI: bütün hook'ları yeni kalıba",
+    "kod tabanında her yeri aynı kalıba dönüştürmek istiyorum, paralel ajanlarla",
+    "denetle sonra düzelt: onlarca dosyada aynı kusur var, dalga dalga düzelt",
+    "migrate all pages to the shared kit in parallel waves",
+    "bu 15 sayfayı ortak kite taşıma işini orkestre et"
+  ],
+  "should_not_trigger": [
+    "tek bir dosyadaki yazım hatasını düzelt",
+    "şu hatayı ayıkla, neden çöküyor",
+    "bu değişikliğin planını çıkar, uygulama",
+    "repo genelinde salt okuma taraması yap, değişiklik yok",
+    "tek sayfanın başlığını değiştir",
+    "yeni migration dosyası oluştur",
+    "testleri çalıştır",
+    "PR'ı incele"
+  ]
+}
