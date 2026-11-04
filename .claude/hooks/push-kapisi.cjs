@@ -35,7 +35,7 @@ const SARMALAYICI = new Set(['command', 'exec', 'nohup', 'time', 'builtin', 'env
 const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash', 'pwsh', 'powershell', 'cmd'])
 const ATAMA = /^[A-Za-z_][A-Za-z0-9_]*=/
 /** UNC (\\sunucu\paylaşım), // ağ yolu ve \\?\ \\.\ aygıt önekleri: kanca bunlara dokunmaz (SMB/dosya sistemi erişimi tetiklenmesin). */
-const AG_YOLU = (y) => /^(?:\\\\|\/\/)/.test(String(y))
+const AG_YOLU = (y) => /^[\\/]{2}/.test(String(y))
 
 /** Komut adı: yol ve .exe atılır, küçük harf (`/usr/bin/GIT.exe` → `git`). */
 const komutAdi = (x) => path.basename(String(x)).replace(/\.exe$/i, '').toLowerCase()
@@ -151,7 +151,7 @@ function pushBul(t) {
  */
 function degerlendir(komut, o) {
   // UNC/ağ/aygıt yolu: ayrıştırıcı ters eğik çizgileri kaçış sayıp yolu bozabileceği için HAM metinde aranır (-C ve cd hedefi).
-  if (/(?:\s-C\s*|\bcd\s+)["']?(?:\\\\|\/\/)/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
+  if (/(?:\s-C\s*|\bcd\s+)(?:["']*)[\\/]{2}/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
   const parcalar = parcala(String(komut || ''))
   // Tırnaklı yük da tek token olur ("git push origin master"): git sözcüğü token içinde de aranır.
   const gitGecer = (x) => komutAdi(x) === 'git' || /(^|[\s/\\])git(\.exe)?(\s|$)/i.test(x)
@@ -172,8 +172,12 @@ function degerlendir(komut, o) {
     // bash -c "..." / eval "..." / pwsh -Command "..." / cmd /c "..." içini de tara
     const ilk = asilKomut(t)
     const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
-    const oo = { ...o, cwd, ekCwd: cwd !== o.cwd ? [o.cwd] : [] }
-    if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-') && !AG_YOLU(t[ilk + 1])) cwd = path.resolve(cwd, t[ilk + 1])
+    // İç içe çağrılarda önceki klasörler SİLİNMEZ, birikir (özgün klasör her zaman ölçülür).
+    const oo = { ...o, cwd, ekCwd: [...new Set([...(o.ekCwd || []), ...(cwd !== o.cwd ? [o.cwd] : [])])] }
+    if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-')) {
+      if (AG_YOLU(t[ilk + 1])) return `cd ${t[ilk + 1]}: UNC/ağ/aygıt yolu denetlenmez; yerel yol yaz`
+      cwd = path.resolve(cwd, t[ilk + 1])
+    }
     if (KABUKLAR.has(ad)) {
       if (t.some((x, k) => k > ilk && /^-(e|ec|enc|encodedcommand)$/i.test(x))) return 'kodlanmış kabuk komutu (-EncodedCommand): içerik denetlenemez; düz yaz'
       const ci = t.findIndex((x, k) => k > ilk && (/^-[a-z]*c[a-z]*$/i.test(x) || /^\/c$/i.test(x) || /^-command$/i.test(x)))

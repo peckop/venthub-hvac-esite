@@ -139,6 +139,9 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
     expect(ret('cd /depo/ozellik && git push', s(path.resolve('/depo/ana-master')))).toContain('master')
     expect(ret('cd /depo/ozellik && git push', s(CWD))).toBeNull()
     expect(ret('false || cd /depo/ana-master; git push origin HEAD', s(CWD))).toContain('master')
+    // iç içe: bash -c içinde cd, özgün klasör (master) yine ölçülür
+    expect(ret('cd /depo/ozellik && bash -c "cd /depo/ozellik2 && git push origin HEAD"', s(path.resolve('/depo/ana-master')))).toContain('master')
+    expect(ret('cd //sunucu/paylasim && git push origin feat-x', s(CWD))).toContain('UNC')
     expect(ret('git push', s(path.resolve('/depo/ana-master')))).toContain('master')
     expect(ret('cd /depo/ozellik; git -C ../ana-master push origin HEAD', s(CWD))).toContain('master')
   })
