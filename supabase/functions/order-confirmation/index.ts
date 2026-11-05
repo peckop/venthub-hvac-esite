@@ -6,6 +6,7 @@ import { sentryCaptureException } from "../_shared/sentry.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 // Şablon motoru + kaçış tek yerde (güvenlik karnesi 2026-11 G1; cetvel email-template-standard.md §2).
 import { guvenliRenk, guvenliUrl, kacir, renderTemplate } from '../_shared/kodlama.ts'
+import { resendIstegi } from './resend_istegi.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -194,18 +195,19 @@ serve(async (req) => {
 
     // send
     async function send() {
-      return await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: emailFrom, to: toList, bcc: bcc.length > 0 ? bcc : undefined, subject, html, text: `${subject}` })
-      })
+      // §B3.1 Katman 1: Idempotency-Key = order-confirmation:<orderId> (resend_istegi.ts).
+      // Aynı sipariş için 24 saat içindeki tekrar çağrı müşteriye ikinci e-posta üretmez.
+      return await fetch('https://api.resend.com/emails', resendIstegi(resendApiKey, order_id as string, {
+        from: emailFrom, to: toList, bcc: bcc.length > 0 ? bcc : undefined, subject, html, text: `${subject}`,
+      }))
     }
 
     // REC-368: gönderici doğrulanmamışsa Resend DENEME göndericisine (onboarding@resend.dev)
     // SESSİZCE DÜŞÜLMEZ. Deneme göndericisi yalnız Resend hesap sahibine teslim eder: sahibin kendi
     // adresiyle yapılan denemede e-posta gider ve her şey çalışıyor GÖRÜNÜR, aynı anda müşteriye
     // hiçbir e-posta gitmez. Hata görünür olmalı: kayıt + hata izleme + 5xx (çağıran
-    // order-paid-webhook deftere `failed` yazar ve pg_net tekrar dener; sipariş geri alınmaz).
+    // order-paid-webhook deftere `failed` yazar; sipariş geri alınmaz). pg_net tekrar DENEMEZ
+    // (tek atım, ateşle-unut): yeniden gönderim yalnız elle ya da tetik yeniden koşunca olur.
     const resp = await send()
     if (!resp.ok) {
       const txt = await resp.text().catch(()=> '')
