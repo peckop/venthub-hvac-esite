@@ -36,8 +36,12 @@ describe('INV-WEBHOOK-2 imzalı gönderim', () => {
     .filter((s) => !s.trim().startsWith('--'))
     .join('\n')
 
-  it('son tanım imzalı migration’dır', () => {
-    expect(dosya).toBe('20261031230000_webhook_imzali_gonderim.sql')
+  it('son tanım imzalı + olay kimlikli migration’dır (ALT-76 PR 3)', () => {
+    expect(dosya).toBe('20261105090000_webhook_olay_tekillestirme.sql')
+  })
+
+  it('gövdeye rastgele event_id koyar (imzalı gövdenin içinde; alıcının kalıcı tekrar koruması)', () => {
+    expect(kod).toMatch(/jsonb_build_object\(\s*'event_id'\s*,\s*gen_random_uuid\(\)/)
   })
 
   it('düz secret başlığını GÖNDERMEZ', () => {

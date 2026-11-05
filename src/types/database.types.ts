@@ -3895,6 +3895,21 @@ export type Database = {
           },
         ]
       }
+      webhook_olaylari: {
+        Row: {
+          alindi: string
+          olay_kimligi: string
+        }
+        Insert: {
+          alindi?: string
+          olay_kimligi: string
+        }
+        Update: {
+          alindi?: string
+          olay_kimligi?: string
+        }
+        Relationships: []
+      }
       wizard_selections: {
         Row: {
           calculated_airflow_m3h: number | null
@@ -4672,6 +4687,10 @@ export type Database = {
           tenant_id: string
           tur: string
         }[]
+      }
+      webhook_olay_tuket: {
+        Args: { p_govde: string; p_imza: string; p_zaman: string }
+        Returns: string
       }
     }
     Enums: {

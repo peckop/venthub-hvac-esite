@@ -16,6 +16,7 @@ import { SATIS_KIPI_TAG } from '@/lib/kip/satisKipi'
 import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import { imzaDogrula, imzaTekrariMi } from '@/lib/webhook/imza'
+import { olayKimligi, olayTuket } from '@/lib/webhook/olayTekil'
 // Yalnız `type` import eden saf yardımcı (React/i18n/client bağımlılığı YOK — ölçüldü),
 // bu yüzden route handler'da güvenle kullanılır.
 import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
@@ -299,7 +300,6 @@ export async function POST(request: NextRequest) {
   try {
     // ALT-76: imza HAM gövde üzerinden doğrulanır; gövde bir kez okunur, JSON olarak sonra çözülür.
     const hamGovde = await request.text()
-    const webhookSecret = request.headers.get('x-webhook-secret')
 
     /**
      * FAIL-CLOSED. Eski hâli `if (expectedSecret && ...)` idi: env TANIMSIZSA koşul hiç
@@ -335,33 +335,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     /**
-     * ALT-76 · HMAC-SHA256 imza + replay koruması (CLAUDE.md kural 11), GEÇİŞ AŞAMASI.
-     * İmza başlığı VARSA karar yalnız imzaya bağlıdır: geçersiz ya da pencere dışı imza,
-     * düz secret doğru olsa bile 401 alır (imzalı istek düz secret ile kurtarılamaz) ve aynı
-     * imzanın pencere içinde tekrarı da 401'dir. İmza YOKSA eski düz secret yolu sürer;
-     * veritabanı tetiği imza üretene kadar (ayrı migration, Recep onayı) bu yol açık kalır.
+     * ALT-76 · HMAC-SHA256 imza + replay koruması (CLAUDE.md kural 11), ZORUNLU.
+     * İmza = hex(HMAC-SHA256(secret, `<x-webhook-timestamp>.<ham gövde>`)), sabit zamanlı
+     * karşılaştırılır; zaman damgası en çok 5 dakika sapabilir. İmzasız istek 401'dir: eski düz
+     * `x-webhook-secret` yolu KAPATILDI (PR 3), çünkü tek gönderen olan handle_supabase_webhook()
+     * 20261031230000'den beri yalnız imzalı gönderiyor ve düz başlığı hiç göndermiyor (canlıda
+     * ölçüldü 2026-11-05). Açık bırakılan düz yol, imzanın bütün kazancını boşa çıkarırdı.
      */
     const simdiMs = Date.now()
-    const imzaSonucu = imzaDogrula({
-      secrets: acceptedSecrets,
-      zamanSn: request.headers.get('x-webhook-timestamp'),
-      imza: request.headers.get('x-webhook-signature'),
-      hamGovde,
-      simdiMs,
-    })
-    if (imzaSonucu === 'gecersiz' || imzaSonucu === 'bayat') {
+    const zamanSn = request.headers.get('x-webhook-timestamp')
+    const imza = request.headers.get('x-webhook-signature')
+    const imzaSonucu = imzaDogrula({ secrets: acceptedSecrets, zamanSn, imza, hamGovde, simdiMs })
+    if (imzaSonucu !== 'gecerli' || !zamanSn || !imza) {
       console.warn(`Unauthorized Supabase webhook attempt blocked (imza: ${imzaSonucu}).`)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (imzaSonucu === 'gecerli') {
-      // Doğrulama imzayı küçük harfe çevirir; tekrar anahtarı da AYNI kanonik biçimden alınır
-      // (aksi hâlde büyük harfli hex ile aynı imza tekrar korumasını atlatırdı).
-      if (imzaTekrariMi((request.headers.get('x-webhook-signature') ?? '').toLowerCase(), simdiMs)) {
-        console.warn('Unauthorized Supabase webhook attempt blocked (imza tekrarı).')
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    } else if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
-      console.warn('Unauthorized Supabase webhook attempt blocked.')
+    // Aynı örnekteki tekrar DB'ye gitmeden kesilir. Doğrulama imzayı küçük harfe çevirir; tekrar
+    // anahtarı da AYNI kanonik biçimden alınır (aksi hâlde büyük harfli hex korumayı atlatırdı).
+    if (imzaTekrariMi(imza.toLowerCase(), simdiMs)) {
+      console.warn('Unauthorized Supabase webhook attempt blocked (imza tekrarı).')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -375,6 +367,25 @@ export async function POST(request: NextRequest) {
     }
     if (payload === null || typeof payload !== 'object') {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+
+    /**
+     * ALT-76 PR 3 · KALICI tekrar koruması. Bellek içi küme sunucusuz örnekler arasında
+     * paylaşılmaz; olay kimliği DB'de (webhook_olaylari) tüketilir. RPC imzayı Vault sırrıyla
+     * yeniden doğrular, bu yüzden anon EXECUTE imzasız kimlik yazmaya yaramaz.
+     * FAIL-CLOSED: RPC'ye ulaşılamazsa 503 — korumasız işlemek yerine bu olay tazelenmez,
+     * sayfa ISR yedeğine (1 saat) kalır.
+     */
+    if (!olayKimligi(payload)) {
+      return NextResponse.json({ error: 'Missing event_id' }, { status: 400 })
+    }
+    const olay = await olayTuket(supabase, { zamanSn, hamGovde, imza })
+    if (olay === 'tekrar' || olay === 'reddedildi') {
+      console.warn(`Unauthorized Supabase webhook attempt blocked (olay: ${olay}).`)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (olay !== 'yeni') {
+      return NextResponse.json({ error: 'Service Unavailable' }, { status: 503 })
     }
 
     console.warn(`[Supabase Webhook] Received ${payload.type} event on table "${payload.table}"`)
