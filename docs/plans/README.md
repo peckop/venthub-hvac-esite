@@ -19,6 +19,7 @@
 | `seo-transition-blueprint.md` | Eski siteden sıralama-koruyan geçiş planı | **BEKLİYOR** (canlıya geçişte devreye girer) |
 | `faz2-admin-backlog.md` | Admin Faz-2 açık işleri | **AÇIK** backlog |
 | `i18n-jsx-literals-cleanup-2026-06-14.md` | i18n literal temizliği makinesi (Workflow+merge3+keycheck) | **KISMEN** — admin bitti; rota süpürmesi + bayi kaldı |
+| `odeme-bildirimi-yeniden-deneme-2026-11.md` | Ödeme onayı bildirimi yeniden deneme tasarımı (karne 2026-11 P7; önerilen: durum tabanlı süpürücü) | **TASLAK** — yalnız tasarım; uygulama dilimleri ayrı kart (OPS-225) |
 
 ## 📘 REFERANS (strateji/sözleşme — iş değil)
 
