@@ -20,7 +20,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
 
 /**
  * ⛔DEPO YOLU SABİT YAZILMAZ — INV-MUTLAK-YOL-1 bunu daha önce CI'da yakaladı: mutlak yol

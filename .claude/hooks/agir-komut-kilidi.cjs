@@ -58,7 +58,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function kilitDizini() {
   if (process.env.VENTHUB_AGIR_KILIT_DIR) return process.env.VENTHUB_AGIR_KILIT_DIR
-  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
   return path.join(pano, 'agir-kilit')
 }
 

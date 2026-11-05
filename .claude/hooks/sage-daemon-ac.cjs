@@ -39,7 +39,7 @@ function calistir(env = process.env, simdi = Date.now(), dep = {}) {
   if (env[VANA] === '1') return ''
   const dbKok = env.VENTHUB_SAGE_DB_KOKU || (dep.anaKok || (() => require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs')).anaKok()))()
   const uyari = (dep.uyari || ((k) => require(path.join(__dirname, 'sage-yazim-sayaci.cjs')).daemonUyarisi(k)))(dbKok)
-  const pano = env.VENTHUB_BOARD_DIR || 'C:/tmp/venthub-board'
+  const pano = env.VENTHUB_BOARD_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
   const damga = path.join(pano, '.sage-daemon-denendi')
   let sonDeneme = NaN
   try {

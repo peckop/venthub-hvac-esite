@@ -54,7 +54,7 @@ const ESIK_PENCERE_TOPLAM = Number(process.env.VENTHUB_BELLEK_PENCERE_TOPLAM || 
 const PENCERE_KOMUT = /claude-code[\\/][^"]*claude\.exe/i
 
 function onbellekYolu() {
-  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
   return process.env.VENTHUB_BELLEK_ONBELLEK || path.join(pano, '.bellek-yoklama.json')
 }
 
