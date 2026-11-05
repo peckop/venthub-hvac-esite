@@ -93,6 +93,31 @@ export async function decryptClaims(cookieValue: string, secret: string): Promis
   }
 }
 
+/** Önbellek çerezinin ömrü (sn). Çerez `maxAge`'i ve şifreli yükteki bitiş damgası aynı değeri kullanır. */
+const CLAIMS_CACHE_TTL_SN = 900
+
+/** Şifreli yükte önbelleğin kendi bitiş damgası (epoch sn). Çağırana dönen claim'lerden sıyrılır. */
+const CACHE_EXP_ALANI = 'vh_cache_exp'
+
+/**
+ * K1 (güvenlik karnesi 2026-11): önbellekteki claim ancak şu dördü birlikte tutarsa kabul edilir:
+ *   - `user_role` dolu,
+ *   - `sub` boş olmayan metin (kimliksiz claim kabul edilmez),
+ *   - JWT `exp`'i sayı ve gelecekte (süresi dolmuş oturumun claim'i önbellekten dönmez),
+ *   - önbelleğin kendi bitiş damgası sayı ve gelecekte (eski biçimli, damgasız çerez de reddedilir).
+ * Biri tutmazsa akış `getClaims`'e düşer; orada rol DB/JWT'den taze okunur.
+ * Eskiden yalnız `user_role` bakılıyordu: aynı çerez değeri süresiz yeniden gönderilebiliyordu.
+ */
+export function onbellekClaimGecerli(claims: Record<string, unknown>, simdiSn: number): boolean {
+  if (!claims.user_role) return false
+  const { sub, exp } = claims
+  const cacheExp = claims[CACHE_EXP_ALANI]
+  if (typeof sub !== 'string' || sub.length === 0) return false
+  if (typeof exp !== 'number' || !Number.isFinite(exp) || exp <= simdiSn) return false
+  if (typeof cacheExp !== 'number' || !Number.isFinite(cacheExp) || cacheExp <= simdiSn) return false
+  return true
+}
+
 /**
  * Scopes claims validation: returns cached claims if valid, otherwise queries Supabase client
  * and updates the cache cookie in the response.
@@ -106,8 +131,10 @@ export async function resolveUserClaims(
   // 1. Attempt Cache Lookup
   const cachedCookie = request.cookies.get('sb-claims-cache')?.value
   if (cachedCookie) {
-    const claims = await decryptClaims(cachedCookie, secret)
-    if (claims && claims.user_role) {
+    const cached = await decryptClaims(cachedCookie, secret)
+    if (cached && onbellekClaimGecerli(cached, Math.floor(Date.now() / 1000))) {
+      const claims = { ...cached }
+      delete claims[CACHE_EXP_ALANI]
       return { claims, error: null, source: 'cache' }
     }
   }
@@ -121,9 +148,12 @@ export async function resolveUserClaims(
     
     const claims = data.claims
     
-    // 3. Encrypt and set cache cookie (expiring in 15 minutes to balance freshness and security)
-    const encrypted = await encryptClaims(claims, secret)
-    setClaimsCacheCookie(response, encrypted, 900)
+    // 3. Encrypt and set cache cookie (expiring in 15 minutes to balance freshness and security).
+    // Bitiş damgası şifreli yükün İÇİNE de yazılır: çerezin `maxAge`'i yalnız tarayıcıya
+    // tavsiyedir, aynı değer elle yeniden gönderilirse sunucu onu yine reddetmeli (K1).
+    const cacheExp = Math.floor(Date.now() / 1000) + CLAIMS_CACHE_TTL_SN
+    const encrypted = await encryptClaims({ ...claims, [CACHE_EXP_ALANI]: cacheExp }, secret)
+    setClaimsCacheCookie(response, encrypted, CLAIMS_CACHE_TTL_SN)
     
     return { claims, error: null, source: 'client' }
   } catch (err) {

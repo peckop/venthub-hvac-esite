@@ -521,9 +521,16 @@ const isVercel = origin.startsWith('https://venthub') // venthub.evil.example de
 ```
 ✅ **DOĞRU**
 ```ts
-const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite[a-z0-9-]*\.vercel\.app$/
-const isVercel = ONIZLEME_KALIBI.test(origin)
+const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite-(?:[a-z0-9]{9}|git-[a-z0-9-]+)-peckops-projects\.vercel\.app$/
+const isVercel = ONIZLEME_KALIBI.test(origin) || origin === 'https://venthub-hvac-esite.vercel.app'
 ```
+
+**Ekip kapsamı (C5, güvenlik karnesi 2026-11, 2026-11-04).** Önizleme kalıbı ekip son ekine
+(`-peckops-projects`) çivilenir; serbest kuyruklu ön ek (`venthub-hvac-esite[a-z0-9-]*`) başka hesabın
+`venthub-hvac-esite-x` projesini kabul ediyordu. Biçim Vercel API'den ölçüldü (son 20 dağıtım, hepsi
+`venthub-hvac-esite-<9 hane>-peckops-projects.vercel.app`). `http://localhost:*` yalnız edge yerel
+çalışırken (`SUPABASE_URL` yerel/kong) ya da edge secret `EDGE_CORS_LOCALHOST=1` ile bilinçli açılınca
+yansıtılır; barındırılan çalışma zamanında reddedilir.
 
 **NEDEN.** `.vercel.app` **paylaşılan** bir son ektir — oraya isteyen herkes deploy edebilir.
 `endsWith('.vercel.app')` yazan bir allowlist "bizim önizlemelerimiz" değil, **"Vercel'e deploy
