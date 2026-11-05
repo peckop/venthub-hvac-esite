@@ -216,6 +216,36 @@ describe('INV-KANCA-CANLI-YAZIM-1 · OPS penceresi geçer, diğerleri reddedilir
     expect(redMi(ops.stdout.trim())).toBe(false)
   })
 
+  it('ARC-251: OPS\'un salt-okuma Kanban komutu (node -e süzgeci, git-bash cwd) geçer, gerçek canlı yazım hâlâ engellenir', () => {
+    const SALT_OKUMA =
+      'cd /c/depo/.claude/worktrees/ops-pencere && node scripts/board/kanban-anlik.cjs --acik --kisa 2>/dev/null | node -e "let s=\'\';process.stdin.on(\'data\',d=>s+=d).on(\'end\',()=>{const j=JSON.parse(s.slice(s.indexOf(\'{\')));for(const x of j.tasks)if(x.task.id===\'debf1210\')console.log(JSON.stringify(x.task).slice(0,300))})"'
+    const gecer = kos({ session_id: digerSid, agent_type: 'arac-pencere', cwd: '/c/depo/.claude/worktrees/ops-pencere', tool_input: { command: SALT_OKUMA } })
+    expect(gecer.kod).toBe(0)
+    expect(gecer.cikti).toBe('')
+    // sabotaj kolu: kapı gerçekten ayırt ediyor, yani aynı pencereden gerçek canlı yazım komutu reddedilir
+    const yazim = kos({ session_id: digerSid, agent_type: 'arac-pencere', tool_input: { command: 'node scripts/db/product-data/a.mjs --apply' } })
+    expect(redMi(yazim.cikti)).toBe(true)
+  })
+
+  it('ARC-251: kapı çökerse sebep stderr\'e yazılır ve çıkış 2 olur (eskiden "No stderr output")', () => {
+    const r = spawnSync('node', [KANCA], {
+      input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: 'echo x' }, cwd: KOK }),
+      encoding: 'utf8',
+      env: { ...process.env, VENTHUB_CANLI_YAZIM_COKUS_SINAMA: '1' },
+    })
+    expect(r.status, 'çöküşte çıkış 2 (engelle) olmalı').toBe(2)
+    expect(r.stderr, 'çöküş sebebi stderr\'de görünmeli').toMatch(/kapi COKTU[\s\S]*sinama: yapay cokus/)
+    expect(r.stdout.trim()).toBe('')
+  })
+
+  it('ARC-251: nesne olmayan geçerli JSON (null, dizi, sayı) kapıyı çökertmez', () => {
+    for (const girdi of ['null', '[]', '42', '"metin"']) {
+      const r = spawnSync('node', [KANCA], { input: girdi, encoding: 'utf8' })
+      expect(r.status, girdi).toBe(0)
+      expect(r.stdout.trim(), girdi).toBe('')
+    }
+  })
+
   it('Bash dışı araç, bayraksız komut ve bozuk girdi: karışmaz', () => {
     expect(kos({ session_id: digerSid, tool_name: 'Read', tool_input: { file_path: 'a' } }).cikti).toBe('')
     expect(kos({ session_id: digerSid, tool_input: { command: 'node scripts/db/product-data/a.mjs' } }).cikti).toBe('')
