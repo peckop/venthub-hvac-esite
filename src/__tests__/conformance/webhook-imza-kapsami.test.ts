@@ -81,17 +81,26 @@ function sahteIstemci() {
         order() { return b },
         single() { d.tek = true; return b },
         eq(k: string, v: unknown) { d.filtreler.push([k, v]); return b },
+        is(k: string, v: unknown) { d.filtreler.push([k, v]); return b },
         update() { d.op = 'update'; return b },
-        insert(g: Record<string, unknown>) {
-          gorulenOlaylar.push(String(g.event_id))
-          return Promise.resolve({ data: null, error: null })
-        },
+        delete() { d.op = 'delete'; return b },
+        // "Önce kaydet" sahiplenmesi: insert ... on conflict (event_id) do nothing returning.
+        upsert(g: Record<string, unknown>) { d.op = 'upsert'; d.filtreler.push(['event_id', g.event_id]); return b },
         then(coz: (v: unknown) => unknown) { return Promise.resolve(calistir()).then(coz) },
       }
       function calistir(): { data: unknown; error: unknown } {
         if (tablo.endsWith('_webhook_events')) {
-          const id = d.filtreler.find(([k]) => k === 'event_id')?.[1]
-          return { data: gorulenOlaylar.includes(String(id)) ? [{ event_id: id }] : [], error: null }
+          const id = String(d.filtreler.find(([k]) => k === 'event_id')?.[1])
+          if (d.op === 'upsert') {
+            if (gorulenOlaylar.includes(id)) return { data: [], error: null }
+            gorulenOlaylar.push(id)
+            return { data: [{ event_id: id }], error: null }
+          }
+          if (d.op === 'delete') {
+            gorulenOlaylar = gorulenOlaylar.filter((x) => x !== id)
+            return { data: null, error: null }
+          }
+          return { data: null, error: null }
         }
         if (d.op === 'update') {
           yazimlar++

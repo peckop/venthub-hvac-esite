@@ -56,7 +56,20 @@ async function sha256Base64(input: string): Promise<string> {
 
 const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
+// Olay sahipliği (ALT-138 "önce kaydet"): işlem başarısız biterse (4xx/5xx; 409 çakışma dahil) sahiplenilen
+// olay satırı bırakılır, böylece kargo firmasının yeniden denemesi "tekrar" sanılıp yutulmaz.
+type Sahiplik = { birak: (() => Promise<void>) | null }
+
 Deno.serve(async (req: Request) => {
+  const sahiplik: Sahiplik = { birak: null }
+  const cevap = await isle(req, sahiplik)
+  if (cevap.status >= 400 && sahiplik.birak) {
+    try { await sahiplik.birak() } catch (e) { console.error('[returns-webhook] olay sahipliği bırakılamadı', e) }
+  }
+  return cevap
+})
+
+async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
   try {
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, { status: 405 })
 
@@ -111,9 +124,24 @@ Deno.serve(async (req: Request) => {
     // Dedup (olay kimliği ZORUNLU, yukarıda doğrulandı). Tenant filtresi KALDIRILDI: filtre istekten gelen
     // değerle kuruluyordu, yani farklı bir `?tenant_id=` göndermek idempotency'yi atlatıyordu. `event_id` kargo
     // firmasının global tekil kimliği; varlığı tek başına "bu olay işlendi" demektir.
+    //
+    // ÖNCE KAYDET (ALT-138): eskiden kontrol-sonra-kaydet idi (select → işle → insert); aynı olayın eşzamanlı iki
+    // teslimi ikisi de "yok" görüp ikisi de işleniyordu. Artık olay işlemden ÖNCE atomik sahiplenilir:
+    // `insert ... on conflict (event_id) do nothing returning` — `event_id` UNIQUE (20250914_returns_webhook_events.sql).
+    // Satır dönmezse olay zaten sahiplenilmiş → 200 no-op. İşlem 4xx/5xx biterse sahiplik bırakılır (Deno.serve).
     {
-      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).limit(1)
-      if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
+      const { data: sahiplenen, error: sahipHata } = await supabase
+        .from('returns_webhook_events')
+        .upsert(
+          { event_id: eventId, body_hash: await sha256Base64(raw), received_at: new Date().toISOString() },
+          { onConflict: 'event_id', ignoreDuplicates: true },
+        )
+        .select('event_id')
+      if (sahipHata) return json({ error: 'Event claim failed' }, { status: 500 })
+      if (!Array.isArray(sahiplenen) || sahiplenen.length === 0) return json({ ok: true, event_id: eventId, duplicate: true })
+      sahiplik.birak = async () => {
+        await supabase.from('returns_webhook_events').delete().eq('event_id', eventId).is('processed_at', null)
+      }
     }
 
     // Resolve return_id if missing using order_id + tracking_number if necessary (best effort)
@@ -172,8 +200,20 @@ Deno.serve(async (req: Request) => {
     // Update returns row
     let updated = false
     if (Object.keys(patch).length > 0) {
-      const { error: updErr } = await supabase.from('venthub_returns').update(patch).eq('id', returnId)
+      // MONOTONLUK (ALT-138, kural 11): yazım OKUNAN duruma bağlıdır. Eskiden koşulsuzdu: okuma ile yazma arasında
+      // admin iadeyi `refunded` yaptıysa kargo olayı onu `received`'a geri çekiyordu (geçiş kapısı eski durumu görmüştü).
+      // 0 satır = satır arada değişti → 409; olay sahipliği bırakılır, yeniden deneme taze durumla kapıdan geçer.
+      const { data: yazilanlar, error: updErr } = await supabase
+        .from('venthub_returns')
+        .update(patch)
+        .eq('id', returnId)
+        .eq('status', String(cur.status))
+        .select('id')
       if (updErr) return json({ error: updErr.message || 'DB update failed' }, { status: 500 })
+      if (!Array.isArray(yazilanlar) || yazilanlar.length === 0) {
+        console.error('[returns-webhook] iade durumu okuma ile yazma arasında değişti', { code: 'STATE_CHANGED', return_id: returnId, read_status: cur.status })
+        return json({ error: 'Conflict: return status changed', code: 'STATE_CHANGED' }, { status: 409 })
+      }
       updated = true
     }
 
@@ -181,8 +221,8 @@ Deno.serve(async (req: Request) => {
     try {
       const bodyHash = await sha256Base64(raw)
       if (eventId) {
-        await supabase.from('returns_webhook_events').insert({
-          event_id: eventId,
+        // Satır en başta sahiplenildi; burada yalnız ayrıntısı doldurulur.
+        await supabase.from('returns_webhook_events').update({
           return_id: returnId,
           order_id: p.order_id || null,
           carrier: p.carrier || null,
@@ -190,10 +230,9 @@ Deno.serve(async (req: Request) => {
           status_raw: p.status || null,
           status_mapped: (patch['status'] as string) || String(cur.status),
           body_hash: bodyHash,
-          received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
           tenant_id: tenantId,
-        })
+        }).eq('event_id', eventId)
       }
     } catch {}
 
@@ -293,4 +332,4 @@ Deno.serve(async (req: Request) => {
     console.error('Returns webhook error:', _e);
     return json({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
   }
-})
+}

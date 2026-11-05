@@ -126,7 +126,7 @@ const kayit = (): Record<string, unknown> => ({ ...satir })
 function sahteIstemci() {
   return {
     from(tablo: string) {
-      const durum: { op: 'select' | 'update'; govde: Record<string, unknown>; filtreler: [string, unknown][]; tek: boolean } = {
+      const durum: { op: 'select' | 'update' | 'delete' | 'upsert'; govde: Record<string, unknown>; filtreler: [string, unknown][]; tek: boolean } = {
         op: 'select', govde: {}, filtreler: [], tek: false,
       }
       const b = {
@@ -134,22 +134,28 @@ function sahteIstemci() {
         limit() { return b },
         single() { durum.tek = true; return b },
         eq(k: string, v: unknown) { durum.filtreler.push([k, v]); return b },
+        is(k: string, v: unknown) { durum.filtreler.push([k, v]); return b },
         update(g: Record<string, unknown>) { durum.op = 'update'; durum.govde = g; return b },
-        insert(g: Record<string, unknown>) {
-          if (tablo === 'shipping_webhook_events') {
-            olaylar.push(String(g.event_id))
-            olayDurumlari.push(String(g.status_mapped))
-          }
-          return Promise.resolve({ data: null, error: null })
-        },
+        delete() { durum.op = 'delete'; return b },
+        // "Önce kaydet" sahiplenmesi: insert ... on conflict (event_id) do nothing returning.
+        upsert(g: Record<string, unknown>) { durum.op = 'upsert'; durum.govde = g; return b },
         then(coz: (v: unknown) => unknown) { return Promise.resolve(calistir()).then(coz) },
       }
       const uyar = (r: Record<string, unknown>) => durum.filtreler.every(([k, v]) => r[k] === v)
       function calistir(): { data: unknown; error: unknown } {
         if (tablo === 'shipping_webhook_events') {
-          // tekrar kontrolü: daha önce işlenmiş event_id var mı
-          const varMi = durum.filtreler.some(([k, v]) => k === 'event_id' && olaylar.includes(String(v)))
-          return { data: varMi ? [{ event_id: durum.filtreler[0][1] }] : [], error: null }
+          if (durum.op === 'upsert') {
+            const id = String(durum.govde.event_id)
+            if (olaylar.includes(id)) return { data: [], error: null } // çakışma: satır dönmez
+            olaylar.push(id)
+            return { data: [{ event_id: id }], error: null }
+          }
+          if (durum.op === 'update') { olayDurumlari.push(String(durum.govde.status_mapped)); return { data: null, error: null } }
+          if (durum.op === 'delete') {
+            const id = String(durum.filtreler.find(([k]) => k === 'event_id')?.[1])
+            olaylar = olaylar.filter((x) => x !== id)
+          }
+          return { data: null, error: null }
         }
         if (tablo !== 'venthub_orders') return { data: [], error: null }
         if (durum.op === 'select') {

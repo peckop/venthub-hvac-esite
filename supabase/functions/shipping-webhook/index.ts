@@ -65,7 +65,20 @@ async function sha256Base64(input: string): Promise<string> {
 
 const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
+// Olay sahipliği (ALT-138 "önce kaydet"): işlem başarısız biterse (4xx/5xx) sahiplenilen olay satırı bırakılır,
+// böylece taşıyıcının yeniden denemesi "tekrar" sanılıp yutulmaz.
+type Sahiplik = { birak: (() => Promise<void>) | null }
+
 Deno.serve(async (req: Request) => {
+  const sahiplik: Sahiplik = { birak: null }
+  const cevap = await isle(req, sahiplik)
+  if (cevap.status >= 400 && sahiplik.birak) {
+    try { await sahiplik.birak() } catch (e) { console.error('[shipping-webhook] olay sahipliği bırakılamadı', e) }
+  }
+  return cevap
+})
+
+async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
   try {
     if (req.method !== 'POST') {
       return jsonResponse({ error: 'Method not allowed' }, { status: 405 })
@@ -155,17 +168,26 @@ Deno.serve(async (req: Request) => {
     // yani saldırgan farklı bir `?tenant_id=` göndererek idempotency'yi ATLAYABİLİYORDU.
     // `event_id` kargo firmasının global tekil kimliği; varlığı tek başına "bu olay işlendi"
     // demektir. Karşılaştırmayı silmek burada sınırı gevşetmez, bypass kolunu kaldırır.
+    //
+    // ÖNCE KAYDET (ALT-138): eskiden kontrol-sonra-kaydet idi (select → işle → insert); aynı olayın eşzamanlı iki
+    // teslimi ikisi de "yok" görüp ikisi de işleniyordu. Artık olay işlemden ÖNCE atomik sahiplenilir:
+    // `insert ... on conflict (event_id) do nothing returning` — `event_id` UNIQUE (20250901_shipping_webhook_events.sql).
+    // Satır dönmezse olay zaten sahiplenilmiş → 200 no-op. İşlem 4xx/5xx biterse sahiplik bırakılır (Deno.serve).
     {
-      try {
-        const { data: existing } = await supabase
-          .from('shipping_webhook_events')
-          .select('event_id')
-          .eq('event_id', eventId)
-          .limit(1)
-        if (Array.isArray(existing) && existing.length > 0) {
-          return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
-        }
-      } catch {}
+      const { data: sahiplenen, error: sahipHata } = await supabase
+        .from('shipping_webhook_events')
+        .upsert(
+          { event_id: eventId, body_hash: await sha256Base64(raw), received_at: new Date().toISOString() },
+          { onConflict: 'event_id', ignoreDuplicates: true },
+        )
+        .select('event_id')
+      if (sahipHata) return jsonResponse({ error: 'Event claim failed' }, { status: 500 })
+      if (!Array.isArray(sahiplenen) || sahiplenen.length === 0) {
+        return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
+      }
+      sahiplik.birak = async () => {
+        await supabase.from('shipping_webhook_events').delete().eq('event_id', eventId).is('processed_at', null)
+      }
     }
 
     let orderId = (p.order_id || '').trim()
@@ -222,17 +244,16 @@ Deno.serve(async (req: Request) => {
       try {
         const bodyHash = await sha256Base64(raw)
         if (eventId) {
-          await supabase.from('shipping_webhook_events').insert({
-            event_id: eventId,
+          // Satır en başta sahiplenildi; burada yalnız ayrıntısı doldurulur.
+          await supabase.from('shipping_webhook_events').update({
             order_id: orderId,
             carrier: p.carrier || null,
             status_raw: p.status || null,
             status_mapped: statusMapped,
             body_hash: bodyHash,
-            received_at: new Date().toISOString(),
             processed_at: new Date().toISOString(),
             tenant_id: tenantId,
-          })
+          }).eq('event_id', eventId)
         }
       } catch {}
     }
@@ -353,17 +374,15 @@ Deno.serve(async (req: Request) => {
     try {
       const bodyHash = await sha256Base64(raw)
       if (eventId) {
-        await supabase.from('shipping_webhook_events').insert({
-          event_id: eventId,
+        await supabase.from('shipping_webhook_events').update({
           order_id: orderId,
           carrier: p.carrier || null,
           status_raw: p.status || null,
           status_mapped: data?.status || undefined,
           body_hash: bodyHash,
-          received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
           tenant_id: tenantId,
-        })
+        }).eq('event_id', eventId)
       }
     } catch {}
 
@@ -389,5 +408,5 @@ Deno.serve(async (req: Request) => {
     console.error('Shipping webhook error:', _e);
     return jsonResponse({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
   }
-})
+}
 
