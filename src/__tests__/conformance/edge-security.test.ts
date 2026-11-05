@@ -448,12 +448,14 @@ const SERVICE_ROLE_CHECK_RE =
 function webhookGaps(code: string): string[] {
   const gaps: string[] = []
 
-  const hasHmacPrimitive = /crypto\s*\.\s*subtle/.test(code) || /\bhmacValid\s*\(/.test(code)
+  // `webhookImzaGecerli` (ALT-138): zaman + olay kimliği + gövdeyi kapsayan paylaşılan HMAC yardımcısı.
+  const hasHmacPrimitive = /crypto\s*\.\s*subtle/.test(code) || /\b(?:hmacValid|webhookImzaGecerli)\s*\(/.test(code)
   const readsSignature = /headers\s*\.\s*get\s*\(\s*['"][^'"]*signature[^'"]*['"]\s*\)/i.test(code)
   if (!hasHmacPrimitive || !readsSignature) gaps.push('HMAC-imza')
 
+  // Atama parantezli de olabilir: `const ts = (req.headers.get('x-timestamp') || ...).trim()`.
   const tsVar = code.match(
-    /(?:const|let)\s+(\w+)\s*=\s*\w+\s*\.\s*headers\s*\.\s*get\s*\(\s*['"][^'"]*(?:timestamp|event-time)[^'"]*['"]/i,
+    /(?:const|let)\s+(\w+)\s*=\s*\(?\s*\w+\s*\.\s*headers\s*\.\s*get\s*\(\s*['"][^'"]*(?:timestamp|event-time)[^'"]*['"]/i,
   )?.[1]
   const rejectsMissing = tsVar
     ? new RegExp(`if\\s*\\(\\s*!\\s*${tsVar}\\b[^)]*\\)[\\s\\S]{0,200}?\\b401\\b`).test(code)
@@ -1122,6 +1124,17 @@ describe('R9 · *webhook* uçları HMAC + ZORUNLU timestamp guard taşımalı', 
       window,
     ].join('\n')
     expect(webhookGaps(failClosed)).toEqual([])
+
+    // ALT-138 biçimi: paylaşılan yardımcı + parantezli, kırpılmış atama da fail-CLOSED sayılır.
+    const alt138 = [
+      `const sig = req.headers.get('x-signature') || ''`,
+      `const tsHeader = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()`,
+      `ok = await webhookImzaGecerli(secret, tsHeader, eventId, raw, sig)`,
+      `if (!tsHeader) { return json({ error: 'Missing timestamp header' }, { status: 401 }) }`,
+      window,
+    ].join('\n')
+    expect(webhookGaps(alt138)).toEqual([])
+    expect(webhookGaps(alt138.replace('if (!tsHeader)', 'if (tsHeader)'))).toContain('zorunlu-timestamp')
 
     // İmzasız uç da yakalanmalı.
     expect(webhookGaps(failClosed.replace(/crypto\.subtle/g, 'noop'))).toContain('HMAC-imza')
