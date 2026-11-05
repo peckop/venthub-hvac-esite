@@ -149,6 +149,26 @@ describe('admin-orders-latest · tenant kapsamı ve sorgu', () => {
     expect(metinUrl.searchParams.get('order_number')).toBe('ilike.*VH-2026*')
   })
 
+  it('⭐DB hatası: 502 + request_id, boş liste DÖNMEZ, DB metni yanıtta yok', async () => {
+    resolveCallerSahte.mockResolvedValue(admin())
+    fetchSahte.mockResolvedValue(
+      new Response('{"message":"relation venthub_orders: permission denied ayse@example.com"}', { status: 500 }),
+    )
+    const hata = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const r = await isleyici(istek())
+    expect(r.status).toBe(502)
+    const g = await govde(r)
+    expect(g.error).toBe('upstream_error')
+    expect(typeof g.request_id).toBe('string')
+    expect(r.headers.get('X-Request-Id')).toBe(g.request_id)
+    expect(g).not.toHaveProperty('rows')
+    expect(JSON.stringify(g)).not.toMatch(/permission|ayse/)
+    const log = hata.mock.calls.map((c) => c.join(' ')).join('\n')
+    expect(log).toContain('permission denied')
+    expect(log).not.toMatch(/ayse@example\.com/)
+    hata.mockRestore()
+  })
+
   it('⭐beklenmeyen hata: 500 sabit kod + request_id, iç hata metni yanıta DÖNMEZ (K6)', async () => {
     resolveCallerSahte.mockResolvedValue(admin())
     fetchSahte.mockRejectedValue(new Error('baglanti koptu: ayse@example.com 05551234567'))

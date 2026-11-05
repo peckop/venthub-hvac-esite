@@ -7,9 +7,11 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
+  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders })
@@ -52,7 +54,8 @@ Deno.serve(async (req: Request) => {
       .maybeSingle()
 
     if (profErr) {
-      return new Response(JSON.stringify({ error: 'profile_error', details: profErr.message }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      console.error('admin-create-coupon profile error:', requestId, metniMaskele(profErr.message, 500))
+      return new Response(JSON.stringify({ error: 'profile_error', request_id: requestId }), { status: 500, headers: { 'Content-Type': 'application/json', 'X-Request-Id': requestId, ...corsHeaders } })
     }
 
     const userRole = profile?.role as string | undefined || 'user'
@@ -128,12 +131,15 @@ Deno.serve(async (req: Request) => {
       .single()
 
     if (insErr) {
-      return new Response(JSON.stringify({ error: 'insert_failed', details: insErr.message }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      // DB metni yanıta dönmez; yalnız SQLSTATE kodu (ör. 23505 = kod zaten var) + request_id (OPS-213).
+      console.error('admin-create-coupon insert error:', requestId, metniMaskele(insErr.message, 500))
+      return new Response(JSON.stringify({ error: 'insert_failed', db_code: insErr.code ?? null, request_id: requestId }), { status: 400, headers: { 'Content-Type': 'application/json', 'X-Request-Id': requestId, ...corsHeaders } })
     }
 
     return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   } catch (_e: unknown) {
-    const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ error: 'internal', details: msg }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+    // K6: iç hata metni yanıta dönmez; ayrıntı maskeli olarak loga, istemci `request_id` ile bulur (OPS-213).
+    console.error('admin-create-coupon error:', requestId, metniMaskele(_e instanceof Error ? _e.message : String(_e), 500))
+    return new Response(JSON.stringify({ error: 'internal', request_id: requestId }), { status: 500, headers: { 'Content-Type': 'application/json', 'X-Request-Id': requestId, ...corsHeaders } })
   }
 })

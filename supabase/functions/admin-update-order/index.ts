@@ -10,6 +10,7 @@ import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.t
 import { SIPARIS_DURUM_IZIN, monotonIhlaliMi } from '../_shared/siparis_gecis.ts'
 import { adminDurumGirdisi, adminDurumKarari } from '../_shared/odeme_inceleme.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 
 /**
  * PostgREST dizisinden ilk profil satırını RUNTIME kontrolüyle daraltır.
@@ -271,14 +272,14 @@ Deno.serve(async (req: Request) => {
       action: 'order_status_update', rowPk: hedefId, before: once, after: { status: newStatus }, comment: gerekce,
     });
   } catch (_e) {
-    console.error('Admin update order error:', _e instanceof Error ? _e.name : 'hata');
+    console.error('Admin update order error:', requestId, metniMaskele(_e instanceof Error ? _e.message : String(_e), 500));
     // Doğrulanmış yöneticinin çağrısı beklenmedik hatayla bitse de iz bırakır (bitir yalnız bir kez yazar).
     if (acilBitir) {
-      return await acilBitir(500, { ok: false, error: 'internal_error' }, {
+      return await acilBitir(500, { ok: false, error: 'internal_error', request_id: requestId }, {
         action: 'order_status_rejected', rowPk: null, before: null, after: { error: 'internal_error' }, comment: null,
       });
     }
-    return new Response(JSON.stringify({ error: 'internal_error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    return new Response(JSON.stringify({ error: 'internal_error', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   }
 });
 

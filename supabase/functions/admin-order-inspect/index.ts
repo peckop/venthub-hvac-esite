@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   const cors = corsHeaders;
+  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
 
@@ -74,8 +75,8 @@ Deno.serve(async (req: Request) => {
     const row = Array.isArray(json) ? json[0] : null
     return new Response(JSON.stringify({ ok: !!row, rpcUrl, row }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
   } catch (_e: unknown) {
-    console.error('Admin order inspect error:', _e);
-    const msg = _e instanceof Error ? _e.message : 'unknown';
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    // K6: iç hata metni yanıta dönmez; ayrıntı maskeli olarak loga, istemci `request_id` ile bulur (OPS-213).
+    console.error('Admin order inspect error:', requestId, metniMaskele(_e instanceof Error ? _e.message : String(_e), 500));
+    return new Response(JSON.stringify({ error: 'internal_error', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type':'application/json', 'X-Request-Id': requestId } })
   }
 })
