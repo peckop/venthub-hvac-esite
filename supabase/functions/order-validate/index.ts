@@ -3,6 +3,7 @@
 // Ödeme öncesi sepet doğrulaması: fiyat ve stok yeniden hesaplanır. Sepet yalnız doğrulanmış
 // kullanıcının ve tenant'ının sepeti olabilir (karne 2026-11 Y1).
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { resolveCaller, type CallerContext } from '../_shared/caller.ts'
 interface CartItem { product_id: string; quantity: number | string; unit_price?: number | string; price_list_id?: string | null }
 interface Product {
@@ -77,7 +78,7 @@ Deno.serve(async (req) => {
     async function getJson<T>(_path: string): Promise<T> {
       const res = await fetch(`${supabaseUrl}${_path}`, { headers });
       const txt = await res.text();
-      if (!res.ok) throw new Error(`fetch ${_path} -> ${res.status}: ${txt}`);
+      if (!res.ok) throw new Error(`fetch ${_path} -> ${res.status}: ${metniMaskele(txt, 500)}`);
       try { return JSON.parse(txt) as T; } catch { return null as unknown as T; }
     }
 

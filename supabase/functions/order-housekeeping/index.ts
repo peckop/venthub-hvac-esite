@@ -3,6 +3,7 @@
 // Ödenmemiş `pending` siparişleri kapatır. Çağıran: `.github/workflows/order-housekeeping-cron.yml`
 // (Bearer service_role). TENANT: tüm kiracıları süpürür — R13 tabanında adıyla (Faz 2 borcu).
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { restSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { ayricalikliMi, resolveCaller, type CallerContext } from '../_shared/caller.ts'
@@ -125,7 +126,7 @@ Deno.serve(async (req) => {
 
       if (!resp.ok) {
         const govde = await resp.text().catch(() => '')
-        throw new Error(`PATCH ${resp.status}: ${govde.slice(0, 200)}`)
+        throw new Error(`PATCH ${resp.status}: ${metniMaskele(govde, 200)}`)
       }
     }
 

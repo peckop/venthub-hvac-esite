@@ -1,6 +1,7 @@
 // Çağıran sınıfı: (a) oturumlu admin tarayıcısı — resolveCaller (getUser) + rol kapısı + tenant filtresi
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { resolveCaller, type CallerContext } from '../_shared/caller.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -115,8 +116,8 @@ Deno.serve(async (req) => {
     const total = Number(contentRange.split('/')[1] || '0') || 0
     return new Response(JSON.stringify({ total, page: pageParam, limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   } catch (_e) {
-    console.error('Admin orders latest error:', _e);
-    const msg = _e instanceof Error ? _e.message : String(_e);
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    // K6: iç hata metni yanıta dönmez; ayrıntı maskeli olarak loga, istemci `request_id` ile bulur (OPS-213).
+    console.error('Admin orders latest error:', requestId, metniMaskele(_e instanceof Error ? _e.message : String(_e), 500));
+    return new Response(JSON.stringify({ error: 'internal_error', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
 })
