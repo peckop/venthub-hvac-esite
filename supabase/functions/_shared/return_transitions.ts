@@ -81,13 +81,14 @@ export type TransitionVerdict =
  * Tanımadığımız bir şeyi geçirmek, kuralı olmayan bir kapıdır.
  */
 export function canCarrierTransition(current: string, next: string): TransitionVerdict {
-  if (current === next) return { allowed: true }
   if (!(RETURN_STATUSES as readonly string[]).includes(current)) {
     return { allowed: false, reason: 'unknown_current' }
   }
   if (!(RETURN_STATUSES as readonly string[]).includes(next)) {
     return { allowed: false, reason: 'unknown_next' }
   }
+  // Aynı statü (bilinen) no-op'tur; bilinmeyen denetiminden SONRA gelir ki ('x','x') geçmesin.
+  if (current === next) return { allowed: true }
   if (isTerminalReturnStatus(current)) return { allowed: false, reason: 'terminal' }
   const allowed = CARRIER_ALLOWED_TRANSITIONS[current as ReturnStatus]
   return allowed.includes(next as ReturnStatus) ? { allowed: true } : { allowed: false, reason: 'not_allowed' }
