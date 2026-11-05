@@ -59,9 +59,10 @@ describe('INV-PANO-DIZINI-1 · pano dizini varsayılanı', () => {
 })
 
 describe('INV-PANO-DIZINI-1 · sabit yol geri gelemez (statik tarama)', () => {
-  it('.claude/hooks ve scripts/board içinde sabit sürücü harfli pano yolu yok', () => {
+  it('hooks, scripts/board, hijyen, belge, arac içinde sabit sürücü harfli pano yolu yok', () => {
     const ihlal: string[] = []
-    for (const dosya of [...betikler('.claude/hooks'), ...betikler('scripts/board')]) {
+    // hooks'un require ettiği hijyen/belge/arac betikleri de dahil (denetçi bulgusu: orada da yazıyorlardı)
+    for (const dosya of ['.claude/hooks', 'scripts/board', 'scripts/hijyen', 'scripts/belge', 'scripts/arac'].flatMap(betikler)) {
       if (dosya.endsWith('pano-dizini.cjs')) continue
       const satirlar = sabitPanoSatirlari(fs.readFileSync(path.join(KOK, dosya), 'utf8'))
       for (const s of satirlar) ihlal.push(`${dosya}: ${s.trim().slice(0, 100)}`)

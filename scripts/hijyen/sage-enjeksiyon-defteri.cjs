@@ -42,7 +42,7 @@ const OKUMA_SATIR_TAVANI = 5000
 
 /** PANO dizini `sage-dosya-dersi.cjs` ile aynı çözümlenir (ortam değişkeni → varsayılan). */
 function panoDizini() {
-  return process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  return process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../board/pano-dizini.cjs').VARSAYILAN
 }
 
 const oturumKisa = (oturum) => String(oturum || 'oturumsuz').slice(0, 24)

@@ -646,7 +646,7 @@ function jsonlOku(yol) {
 }
 
 function panoDizini(ortam = process.env) {
-  return ortam.VENTHUB_BOARD_DIR || ortam.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  return ortam.VENTHUB_BOARD_DIR || ortam.VENTHUB_PANO_DIR || require('../board/pano-dizini.cjs').VARSAYILAN
 }
 
 /**

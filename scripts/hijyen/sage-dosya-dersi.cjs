@@ -82,7 +82,7 @@ const EN_FAZLA_DERS = 8
 const TOPLAM_KARAKTER = 2800
 const BUTCE_MS = 800
 
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../board/pano-dizini.cjs').VARSAYILAN
 
 /** Sage verisi PROJENİN İÇİNDE yaşar (ana ağaç); worktree'de yoktur. */
 function dbYolu(kok) {
