@@ -894,9 +894,11 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, isAkislari)).toEqual([])
   })
 
-  it('GEO-SEO ilk örnek: yedi düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, yayın sonrası dizin isteği, haftalık öz-değerlendirme, haftalık üç motor)', () => {
+  it('GEO-SEO ilk örnek: on düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, otomatik kuyruk, dizin isteği kararı, rehber taslak okuması, rakip kıyası, haftalık öz-değerlendirme, haftalık üç motor)', () => {
     const g = gercek['GEO-SEO']
-    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'haftalik', 'haftalik', 'her-dagitim-gunluk', 'olay', 'olay'])
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'haftalik', 'haftalik', 'her-dagitim-gunluk', 'her-dagitim-gunluk', 'olay', 'olay', 'olay', 'olay'])
+    // HRT-106: dizin-takip kararı görevi (D7) listede; tetik henüz kurulu değil (kuracak: ARAÇ)
+    expect(g.gorevler.find((x) => x.gorev.includes('scripts/seo/dizin-takip.mjs --durum'))).toMatchObject({ bagli: 'hayir', baglayacak: 'ARAC' })
     expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
     expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
   })
