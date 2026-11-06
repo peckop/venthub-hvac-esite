@@ -48,7 +48,7 @@ try {
  * Bu yuzden ikisi de kabul edilir ve board.cjs in okudugu ad ONCELIKLIDIR: tek bir degisken
  * ayarlamak butun katmani birlikte tasir.
  */
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
 
 function stdinOku() {
   try {
@@ -750,7 +750,9 @@ try {
 }
 
 const cokAgac = denetlenecek.length > 1
-const etiket = (y) => (cokAgac ? path.basename(y.agac) + ' :: ' + y.bagil : y.bagil)
+// ARC-59: dosya yolu git çıktısından gelen serbest metindir (boşluk, nokta, kontrol karakteri taşıyabilir) → tek satır, 160 karakter.
+const { metinTemiz } = require(path.join(__dirname, 'dis-metin-temiz.cjs'))
+const etiket = (y) => metinTemiz(cokAgac ? path.basename(y.agac) + ' :: ' + y.bagil : y.bagil, 160)
 
 const bildirilen = new Set(taban.bildirilen)
 const ihlaller = []

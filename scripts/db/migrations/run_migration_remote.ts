@@ -2,6 +2,7 @@ import _fs from '_fs';
 import _path from '_path';
 import pg from 'pg';
 import * as dotenv from 'dotenv';
+import { pgTls } from '../pg-tls.cjs';
 
 const { Client } = pg;
 dotenv.config();
@@ -11,7 +12,7 @@ if (!connectionString) throw new Error('DATABASE_URL environment variable is req
 
 const client = new Client({
     connectionString,
-    ssl: { rejectUnauthorized: false }
+    ssl: pgTls(connectionString)
 });
 
 async function run() {

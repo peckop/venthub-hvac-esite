@@ -215,11 +215,59 @@ function kanitYolu(girdi) {
   }
 }
 
+// ARC-261 (BLG-19): file_matches içeriği ilk 65536 karaktere kırpar (@wrongstack/primitives capSubject); kırpılan kısımdaki desen
+// "bulunamadı" verir. Desen tam dosyada var ama kırpılmış kısımda yoksa kart bugün kabul eder, Done'da patlar.
+const KIRPMA_SINIRI = 65536
+const PATTERN_TAVAN = 256
+// Gruptan sonra + * {n,} gelen ve içinde de niceleyici olan grup: (a+)+, (\w+\w*)+, (a|aa)+ benzeri felaket geri izleme adayı.
+const ICICE_NICELEYICI = /\((?:[^()\\]|\\.)*(?:[+*]|\{\d+,\d*\}|\|)(?:[^()\\]|\\.)*\)(?:[+*]|\{\d+,\d*\})/
+
+/** file_matches deseni kırpılmış içerikte yok ama tam dosyada var → sebep; ölçülemezse (dosya/desen okunamaz) null (fail-open). */
+function kirpmaSorunu(g, yol) {
+  try {
+    const j = JSON.parse(String(g.checkNotes || g.checkDescription || ''))
+    if (!j || typeof j.pattern !== 'string' || !j.pattern) return null
+    // ReDoS (denetçi S1): kapı senkron bekler; sunucu da bu desenleri reddeder (compileUserRegex). Uzun ya da iç içe niceleyicili desene karışma.
+    if (j.pattern.length > PATTERN_TAVAN || ICICE_NICELEYICI.test(j.pattern)) return null
+    const taban = process.env.CLAUDE_PROJECT_DIR || process.cwd()
+    const temiz = String(yol).trim()
+    // Sunucu worktree'yi ANA AĞACA kanonikler (tools/wrongstack-mcp/kanonik-kok.cjs); ana ağaçta dosya yoksa worktree'dekine düş.
+    const ana = taban.replace(/[\\/]\.claude[\\/]worktrees[\\/][^\\/]+$/, '')
+    let tam
+    try {
+      tam = fs.readFileSync(path.resolve(ana, temiz), 'utf8')
+    } catch {
+      tam = fs.readFileSync(path.resolve(taban, temiz), 'utf8')
+    }
+    if (tam.length <= KIRPMA_SINIRI) return null
+    const re = new RegExp(j.pattern, typeof j.flags === 'string' ? j.flags.replace(/[gy]/g, '') : '')
+    if (re.test(tam.slice(0, KIRPMA_SINIRI)) || !re.test(tam)) return null
+    return (
+      'file_matches "' + yol + '" deseni dosyanın ilk ' + KIRPMA_SINIRI + ' karakterinde YOK, sonrasında var: doğrulayıcı içeriği kırpar ve "bulunamadı" verir. ' +
+      'Deseni dosya başında geçen bir metne bağla (örn. başlık satırı) ya da hedef metni dosyanın başına taşı. ' + GECERLI_BICIMLER
+    )
+  } catch {
+    return null
+  }
+}
+
 /** hook girdisi → reddetme sebebi ya da null. `ekler` testte izin listesini sabitler. */
 function incele(hookGirdisi, ekler) {
   if (!hookGirdisi || hookGirdisi.tool_name !== ARAC) return null
   const g = hookGirdisi.tool_input || {}
   if (!EYLEMLER.has(g.action)) return null
+
+  // ARC-255: `command` diye bir alan YOK. Komut `checkNotes`'a, tip `checkType: "command"`a gider; `command` verilirse araç onu
+  // yok sayar ve kriteri sessizce "manual" yapar (6 Kasım ARC-252, 13 Ekim ölçümü). Done'da verify_completion "needs_human" verir.
+  if (typeof g.command === 'string' && g.command.trim() && !(g.checkType === 'command' && String(g.checkNotes || '').trim())) {
+    return (
+      '"command" alanı araçta YOK ve yok sayılır: kriter sessizce "manual" olur, verify_completion needs_human verir. ' +
+      'Doğru çağrı: checkType "command" ve checkNotes "' +
+      g.command.trim().slice(0, 120) +
+      '" (komutun kendisi checkNotes\'a). ' +
+      GECERLI_BICIMLER
+    )
+  }
 
   if (KOMUT_TIPLERI.has(g.checkType)) {
     const komut = String(g.checkNotes || g.checkDescription || '').trim()
@@ -231,7 +279,7 @@ function incele(hookGirdisi, ekler) {
   if (!DOSYA_TIPLERI.has(g.checkType)) return null
   const yol = kanitYolu(g)
   const sorun = yolSorunu(yol)
-  if (!sorun) return null
+  if (!sorun) return g.checkType === 'file_matches' ? kirpmaSorunu(g, yol) : null
   return (
     g.checkType +
     ' kanıtı "' +
@@ -271,5 +319,5 @@ function main() {
   process.exit(0)
 }
 
-module.exports = { incele, yolSorunu, kanitYolu, komutSorunu, izinEkleriniOku, izinKumesi, ENGELLI, SHELL_OPERATOR_RE, ENV_EXPANSION_RE }
+module.exports = { incele, kirpmaSorunu, KIRPMA_SINIRI, yolSorunu, kanitYolu, komutSorunu, izinEkleriniOku, izinKumesi, ENGELLI, SHELL_OPERATOR_RE, ENV_EXPANSION_RE }
 if (require.main === module) main()

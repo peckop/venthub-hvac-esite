@@ -106,6 +106,18 @@ describe('INV-BOARD-10 · izin-reddi gunlugu dogru sinifi sayar', () => {
     expect(r.out).toMatch(/Bash:1/)
   })
 
+  it('⭐ARC-173: worktree penceresinin kardes transkript dizini de taranir (yalniz ana dizin = yanlis evren)', () => {
+    const d = dizin('t-kardes')
+    dosyaYaz(`${d}/aaaaaaaa-1111-2222-3333-444444444444.jsonl`, ciftSatir('u1', 'Bash', 'gh pr merge 1', 'automode-blocked', '07:10:00'))
+    // departman penceresi: ayni ust dizinde, ad = ana dizin adi + "--claude-worktrees-<ad>"
+    dosyaYaz(`${d}--claude-worktrees-arac-pencere/bbbbbbbb-1111-2222-3333-444444444444.jsonl`, ciftSatir('u2', 'Bash', 'node merge.cjs 2244', 'automode-blocked', '07:20:00'))
+    // ilgisiz kardes (onek eslesmez) SAYILMAZ
+    dosyaYaz(`${d}x/cccccccc-1111-2222-3333-444444444444.jsonl`, ciftSatir('u3', 'Bash', 'baska proje', 'automode-blocked', '07:30:00'))
+    const r = kos(d, ['olc', '--gun', GUN])
+    expect(r.kod, r.err).toBe(0)
+    expect(r.out, 'kardes worktree dizinindeki ret gorunmuyor').toMatch(/toplam 2 ret/)
+  })
+
   it('⭐user-rejected ANOMALI SAYILMAZ — insan karari ariza degildir', () => {
     const d = dizin('t-insan')
     dosyaYaz(

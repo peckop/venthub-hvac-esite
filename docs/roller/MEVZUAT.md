@@ -12,6 +12,12 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 - Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır (hangi rol hangisini kullanır: YETENEK atar).
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
+## Amaç
+Amaç ve Nasıl: `docs/roller/MEVZUAT-gorevler.md`.
+
+## Düzenli görevler
+- 4 görev, tetiğe bağlı 1: `docs/roller/MEVZUAT-gorevler.md`.
+
 ## Dosyalar
 docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.
 
@@ -22,7 +28,7 @@ Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirs
 Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).
 
 ## Yetenek ve araç
-Önce NotebookLM (`notebooklm ask`; takip defteri a5f382a4, katalog 8bb600d9); Yayın Ofisi CELEX + SPARQL (EUR-Lex'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini. Skill: notebook-navigator.
+Yayın Ofisi CELEX + SPARQL (EUR-Lex'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini; docs/mevzuat/kayit.json. Skill: ce-uygunluk-dosyasi. NotebookLM emekli (karar 419).
 
 ## Kurallar (1)
 - K1 Plan önce.
@@ -48,7 +54,7 @@ CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Rec
 ## Çalışma düzeni
 - Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).
 - Her iş: Kanban kartı (`<KISA AD>-<sayı>`, is-kayit-duzeni §1) + emirde YÖNTEM + KAYNAK/CETVEL. Linear iş kaydı olarak emekli (karar 324): yeni kayıt açılmaz.
-- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` ile başlar (`Fixes`/`Kayıtsız:` yolları 10-08'de kapandı); kartsız iş yok, önce kart açılır.
+- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` satırı taşır (`Fixes`/`Kayıtsız:` yolları 10-08'de kapandı); kartsız iş yok, önce kart açılır.
 - Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar; dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).
 - Ders ve hata anında `wrongstack-sage remember` (`audience.roles=[<ROL>]`, tags [rol, ders]); gün sonu raporunda "sage'e bugün N ders".
 - Vitrin, föy ya da yazıda OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı) yazmadan önce resmî kaynaktan al; kaynakta birebir yoksa yazılmaz, yapay zekâ özeti kanıt değildir (`rehber-yazisi-standard.md` R2.3).

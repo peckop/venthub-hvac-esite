@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "kod tabanı vizyonumuza ne kadar sadık, prd denetimi yapalım",
+    "neyi silebiliriz, neyi sadeleştirebiliriz, kanıta dayalı rapor çıkar",
+    "karmaşıklık azaltma denetimi başlat",
+    "scaffold mu vizyon mu, hangi kısımlar gereksiz",
+    "projenin vizyona sadakatini ölç, silinebilecekleri sırala",
+    "PRD DENETİMİ YAP",
+    "gereksiz karmaşıklık nerede, vizyondan sapan yerleri bul",
+    "kodun ne kadarı bizim vizyonumuza hizmet ediyor, öncelikli rapor ver",
+    "bu kadar kod gerekli mi, neyi kesebiliriz diye denetle",
+    "vizyona sadakat raporu hazırla, hiçbir şeyi silme sadece raporla",
+    "audit the codebase against our PRD and tell what can be removed",
+    "ölü ağırlık var mı, karmaşıklığı vizyona göre denetle"
+  ],
+  "should_not_trigger": [
+    "kullanılmayan bağımlılıkları bul",
+    "20 eksende kalite denetimi koş",
+    "bu PR'daki hataları bul",
+    "güvenlik açığı tara",
+    "sprint teslim denetimi, 10/10 kontrolü",
+    "yeni PRD yaz, konuşmadan çıkar",
+    "mimari kuralları kontrol et",
+    "bu planı çürüt"
+  ]
+}

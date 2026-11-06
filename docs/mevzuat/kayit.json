@@ -1,5 +1,5 @@
 {
-  "surum": "0.4",
+  "surum": "0.5",
   "uretildi": "2026-09-25",
   "cetvel": "docs/standards/mevzuat-kaydi-standard.md",
   "aile_kaynagi": "venthub-pdf-ingestor/paket/aileler.csv (2026-09-25T07:30Z)",
@@ -52,7 +52,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2019_1781.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc102",
@@ -74,9 +74,10 @@
       "acik_sorular": [
         "Katalogdaki fan ailelerinin büyük çoğunluğunda motor gövdeye entegre ve bağımsız test edilemez durumda görünüyor; bu durumda Md.2(2)(a) istisnası (fan içine gömülü, ayrılamayan motor) devreye girip ürünü kapsam dışı bırakabilir. Hangi aile/SKU'da motor GERÇEKTEN ayrılabilir/bağımsız satılan bir bileşen, hangisinde değil — bu, ürün teknik dosyası/kurulum kılavuzu düzeyinde ayrıca doğrulanmalı; burada resmi kaynaktan çıkarım yapılmamıştır.",
         "avens-hiz-anahtarlari (Hız Anahtarları) ailesinin VSD tanımına (Md.3(2): sürekli frekans VE gerilim ayarı yapan elektronik güç dönüştürücü) girip girmediği ürün teknik özellikleriyle teyit edilmeli; basit kademeli/trafo tipi hız anahtarları VSD sayılmayabilir. BULUNAMADI — ayrı ürün-seviyesi inceleme gerekir.",
-        "Konsolide sürümler (Yayın Ofisi SPARQL, 2026-09-25): 20191025, 20210701, 20230124. 2023/3 yalnız Almanca dil düzeltmesi; içerik değişikliği yalnız 2021/341."
+        "Konsolide sürümler (Yayın Ofisi SPARQL, 2026-09-25): 20191025, 20210701, 20230124. 2023/3 yalnız Almanca dil düzeltmesi; içerik değişikliği yalnız 2021/341.",
+        "6 Kasım 2026 ölçümü: Yayın Ofisi SPARQL 2023/3 değişikliğini (2023-01-03) gösteriyor, `degistirenler` yalnız 2021/341 içeriyor; 2023/3 metni okunmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "A"
     },
     {
@@ -115,7 +116,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2021_341.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc102",
@@ -134,8 +135,10 @@
         }
       ],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
-      "son_kontrol": "2026-09-25",
+      "acik_sorular": [
+        "6 Kasım 2026 ölçümü: düzeltme R(05) 2026-08-03 kayıtta yok; içeriği okunmadı."
+      ],
+      "son_kontrol": "2026-11-06",
       "eksen": "A"
     },
     {
@@ -202,7 +205,8 @@
         "Ham metinde '(AB) 2019/1781 sayılı Komisyon Tüzüğü' için '1/9/2019 tarihli' (1 Eylül 2019), '(AB) 2021/341' için '17/12/2020 tarihli' ibaresi geçiyor; bunlar AB'nin resmi kabul tarihleriyle (sırasıyla 1 Ekim 2019 ve 23 Şubat 2021) UYUŞMUYOR. Bu, Resmî Gazete metnindeki bir yazım/çeviri hatası olabilir ya da Komisyon içi karar tarihine (C-numarası) atıf olabilir — kaynak metinde başka açıklama yok, düzeltme yapılmadan olduğu gibi raporlanmıştır.",
         "Tebliğin bizzat kabul/imza tarihi (Bakanlık tebliğ numarasının verildiği tarih) Resmî Gazete metninde ayrıca yazmıyor; yalnız yayım tarihi (28/4/2021) var.",
         "Tebliğ metni AB tüzük tarihlerini yanlış veriyor: 2019/1781 için 1/9/2019 (doğrusu 1 Ekim 2019), 2021/341 için 17/12/2020 (doğrusu 23 Şubat 2021). Ham metinden doğrulandı 2026-09-25.",
-        "Ek PDF taranmış görüntü (metin katmanı yok); madde doğrulaması görsel okumayla yapılır."
+        "Ek PDF taranmış görüntü (metin katmanı yok); madde doğrulaması görsel okumayla yapılır.",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "A"
@@ -236,7 +240,9 @@
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "A",
       "notlar": "v0.1 bu kalemi \"yalnız tarih ertelemesi\" diye özetlemişti; Md.1 içerik değişikliğidir (2026-09-25 düzeltildi). Sürücü tarihi Md.5 ile değişir, Md.4 değil (Ek-I madde 2 = motor ürün bilgisi)."
@@ -603,7 +609,8 @@
         "Hava perdesi (vortice-hava-perdesi, vortice-h-ad-elektrikli) ve tekil oda ünitelerindeki (vortice-vort-mono) fan motorlarının gerçek elektrik giriş gücünün 125W eşiğinin altında kalıp kalmadığı ürün bazında doğrulanmalı — eşik altındaysa o SKU kapsam dışı kalır",
         "'Duman Egzoz Fanları' (vortice-vort-heatmaster-slimroof-smoke) ailesindeki her SKU'nun gerçekten 300°C/1 saat+ F-sınıfı sertifikaya sahip olup olmadığı teyit edilmeli; sertifikasız/düşük sınıf varyantlar istisna kapsamına girmeyebilir",
         "'Şömine ve Baca Fanları' (vortice-vort-industrial-ventilation-roof) için taşınan gazın çalışma sıcaklığının 100°C'yi aşıp aşmadığı ürün bazında kontrol edilmeli (aşıyorsa Md.1.3(e) istisnası)",
-        "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında"
+        "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında",
+        "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -637,7 +644,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Ek I/II/III içeriği (verim hedefleri) bu kayıtta ayrıca okunmadı; değerlerin 327/2011 Annex I ikinci aşamasıyla aynı olduğu varsayılmaz, okunmalı."
+        "Ek I/II/III içeriği (verim hedefleri) bu kayıtta ayrıca okunmadı; değerlerin 327/2011 Annex I ikinci aşamasıyla aynı olduğu varsayılmaz, okunmalı.",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -729,7 +737,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Teblığın Ek II/III/IV'ünün (ürün bilgi şartları, ölçüm/hesaplama yöntemleri) AB Ek II/III/IV ile birebir mi yoksa TR'ye özgü ufak farklar mı içerdiği bu araştırmada okunmadı ('Ekleri için tıklayınız' linki takip edilmedi) — VentHub ürün sayfası şartları için bir sonraki turda TR Ek II doğrudan okunmalı."
+        "Teblığın Ek II/III/IV'ünün (ürün bilgi şartları, ölçüm/hesaplama yöntemleri) AB Ek II/III/IV ile birebir mi yoksa TR'ye özgü ufak farklar mı içerdiği bu araştırmada okunmadı ('Ekleri için tıklayınız' linki takip edilmedi) — VentHub ürün sayfası şartları için bir sonraki turda TR Ek II doğrudan okunmalı.",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -764,14 +773,15 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_34.json",
-      "resmi_kaynak_sayisi": 2,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "EUR-Lex'e ham erişim WAF tarafından engellendiği için OJ yayım tarihi/sayısı ve resmi 'in force' durum etiketi bu oturumda birincil kaynaktan doğrulanamadı; ikincil resmi kaynak (Komisyon ATEX sayfası) durumun 'yürürlükte' olduğunu teyit ediyor.",
-        "Komisyonun 2014/34/AB'yi kapsayan aktif bir mevzuat revizyonu/değerlendirme (evaluation/REFIT) çalışmasına dair resmi kaynakta kanıt BULUNAMADI. Tek güncelleme, idari rehber belgesinin ('ATEX 2014-34-EU Guidelines') Ocak 2026'da yayımlanan 6. baskısı — bu mevzuat değişikliği değil, yorum rehberi güncellemesi."
+        "Komisyonun 2014/34/AB'yi kapsayan aktif bir mevzuat revizyonu/değerlendirme (evaluation/REFIT) çalışmasına dair resmi kaynakta kanıt BULUNAMADI. Tek güncelleme, idari rehber belgesinin ('ATEX 2014-34-EU Guidelines') Ocak 2026'da yayımlanan 6. baskısı — bu mevzuat değişikliği değil, yorum rehberi güncellemesi.",
+        "6 Kasım 2026 ölçümü: 2024/2749 değişikliği (2024-10-09) ve teklif 2025/503 kayıtta yok, metinleri okunmadı; en son konsolide 02014L0034-20260530."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "C"
     },
     {
@@ -803,7 +813,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Bakanlık adı 2016'dan bu yana değişti (Bilim, Sanayi ve Teknoloji Bakanlığı -> Sanayi ve Teknoloji Bakanlığı); yönetmeliğin güncel resmi yürütücüsü ayrıca teyit edilmedi."
+        "Bakanlık adı 2016'dan bu yana değişti (Bilim, Sanayi ve Teknoloji Bakanlığı -> Sanayi ve Teknoloji Bakanlığı); yönetmeliğin güncel resmi yürütücüsü ayrıca teyit edilmedi.",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
@@ -831,13 +842,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1999_92.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "EUR-Lex erişilemediği için 1999/92/EC'nin resmi yayım/yürürlük tarihleri ve güncel EUR-Lex durum etiketi bu oturumda birincil kaynaktan teyit edilemedi."
+        "EUR-Lex erişilemediği için 1999/92/EC'nin resmi yayım/yürürlük tarihleri ve güncel EUR-Lex durum etiketi bu oturumda birincil kaynaktan teyit edilemedi.",
+        "6 Kasım 2026 ölçümü: 2007/30 değişikliği (2007-06-20) kayıtta yok, metni okunmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "C"
     },
     {
@@ -869,7 +881,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Yönetmeliğin yürürlük maddesi ve varsa sonraki değişiklikleri (madde bazlı) bu oturumda ayrıca taranmadı."
+        "Yönetmeliğin yürürlük maddesi ve varsa sonraki değişiklikleri (madde bazlı) bu oturumda ayrıca taranmadı.",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
@@ -958,7 +971,9 @@
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: yayıncı (iso.org) sayfası HTTP 403 verdi, tazelik ölçülemedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
     },
@@ -986,7 +1001,9 @@
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: yayıncı (iso.org) sayfası HTTP 403 verdi, tazelik ölçülemedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
     },
@@ -1029,7 +1046,9 @@
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026 ölçümü: EVS sayfasında 2017 sürümü 02.05.2024'te geri çekilmiş, NSAI sayfasında EN 14986:2024 24.04.2024'te yayımlanmış görünüyor. Yayıncı (CEN/CENELEC) kapsam sayfası robots.txt \"Disallow: /\" yüzünden çekilemedi; ulusal kuruluş sayfaları yayıncı sayılmadığından durum ve baskı yılı DEĞİŞTİRİLMEDİ. Elle okuma gerekir."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
     },
@@ -1063,7 +1082,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_30.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc51",
@@ -1105,7 +1124,7 @@
       "acik_sorular": [
         "Direktifin yürürlük (entry into force) tarihi EUR-Lex erişilemediği için doğrulanamadı; yalnız 'uygulanabilir olma' (20.4.2016) tarihi EC sayfasından doğrulandı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "D"
     },
     {
@@ -1152,7 +1171,9 @@
         }
       ],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
     },
@@ -1218,7 +1239,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_35.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc51",
@@ -1250,7 +1271,7 @@
       "acik_sorular": [
         "OJ L 96 sayfa numarası (357) EUR-Lex'ten birebir teyit edilemedi; ikincil kaynaklardan (WebSearch özet) alınmıştır, resmi alıntı değildir — ayrı doğrulama gerekir."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "D"
     },
     {
@@ -1297,7 +1318,9 @@
         }
       ],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
     },
@@ -1393,7 +1416,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "C1/C2/C3/C4 kategori tanımları ve 'birinci/ikinci çevre' kavramı IEC webstore kapsam sayfasında yok; standardın kendisi (telifli) olmadan doğrulanamaz — BULUNAMADI olarak işaretlendi."
+        "C1/C2/C3/C4 kategori tanımları ve 'birinci/ikinci çevre' kavramı IEC webstore kapsam sayfasında yok; standardın kendisi (telifli) olmadan doğrulanamaz — BULUNAMADI olarak işaretlendi.",
+        "6 Kasım 2026: IEC mağaza sayfası ed. 4.0 (2022-11-30), geri çekme alanı yok; sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
@@ -1421,11 +1445,11 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2011_65.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "D"
     },
     {
@@ -1454,7 +1478,9 @@
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
     },
@@ -1481,11 +1507,11 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2012_19.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "D"
     },
     {
@@ -1514,7 +1540,9 @@
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
     },
@@ -1555,7 +1583,7 @@
       "durum": "gecis-doneminde",
       "durum_notu": "yururlukte (ESPR (EU) 2024/1781 çerçevesinde havalandırma üniteleri özelinde eski Ecodesign Direktifi hükümleri 31 Aralık 2026'ya kadar geçiş rejimiyle uygulanmaya devam ediyor — bkz. EU-2024/1781 kalemi)",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1253_2014.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "vortice-isi-geri-kazanim",
@@ -1608,9 +1636,10 @@
       ],
       "acik_sorular": [
         "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı.",
-        "Md.1(2)(c) istisnası yalnız \"axial or centrifugal fans only equipped with a housing\" içindir; karışık akışlı ve ek parçalı kanal fanları kapsamda olabilir (2026-09-25, BLOG itirazıyla düzeltildi)."
+        "Md.1(2)(c) istisnası yalnız \"axial or centrifugal fans only equipped with a housing\" içindir; karışık akışlı ve ek parçalı kanal fanları kapsamda olabilir (2026-09-25, BLOG itirazıyla düzeltildi).",
+        "6 Kasım 2026 ölçümü: 2020/1000 değişikliği Yayın Ofisi'nde var, kayıtta yalnız 2016/2282 yazılı; metni okunmadı. Komisyon revizyon sayfası gövdesi hâlâ \"May 2025\" diyor (dateModified 2026-03-09): sapma şüphesi sürüyor."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "E"
     },
     {
@@ -1645,7 +1674,7 @@
       "durum": "yururlukte",
       "durum_notu": "yururlukte (2010/30/EU çerçeve direktifi 2017/1369 ile yürürlükten kaldırılmış olsa da, delege tüzük olarak 1254/2014 ayrıca yürürlükten kaldırılana kadar geçerliliğini korur; EPREL kayıt zorunluluğu 2017/1369 Md.4 ile bu tüzük kapsamındaki ürünlere de geriye dönük uygulanır)",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1254_2014.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "vortice-isi-geri-kazanim",
@@ -1690,9 +1719,10 @@
         "Model, piyasaya arzdan önce AB Enerji Etiketleme Ürün Veritabanı'na (EPREL, dayanak: (EU) 2017/1369 Md.4) tedarikçi tarafından kaydedilmeli."
       ],
       "acik_sorular": [
-        "EPREL kaydı VentHub ürün sayfalarında görünürlük/doğrulama linki olarak sunuluyor mu — bu eksen kapsamında kod/CMS tarafı incelenmedi, yalnız mevzuat şartı doğrulandı."
+        "EPREL kaydı VentHub ürün sayfalarında görünürlük/doğrulama linki olarak sunuluyor mu — bu eksen kapsamında kod/CMS tarafı incelenmedi, yalnız mevzuat şartı doğrulandı.",
+        "6 Kasım 2026 ölçümü: 2017/254 ve 2020/987 değişiklikleri Yayın Ofisi'nde var, `degistirenler` boş; kanıttaki 2017/1369 alıntısı \"As from\" yerine \"From\" yazıyor (alıntı düzeltilmeli)."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "E"
     },
     {
@@ -1768,7 +1798,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Md.2(2)(c) \"yalnız gövdeye sahip aksiyel veya santrifüj fan\" istisnası Vortice CA MD (santrifüj, filtre/HRS yok) için metne göre uygulanabilir; ancak üretici seriyi NRVU-U beyan ediyor. Komisyon SSS'si (bağlayıcı değil) housing = pervaneyi saran ve akışı yönlendiren gövde; box-fan ve roof-fan ventilasyon ünitesidir. Gövde içinde housing dışı akış parçası var mı ve 150/200 MD'nin BEP gücü bilinmiyor (AVenS paketi A4/A6). Satış kararına dayanak yapılmaz (REC-397, 2026-09-25)."
+        "Md.2(2)(c) \"yalnız gövdeye sahip aksiyel veya santrifüj fan\" istisnası Vortice CA MD (santrifüj, filtre/HRS yok) için metne göre uygulanabilir; ancak üretici seriyi NRVU-U beyan ediyor. Komisyon SSS'si (bağlayıcı değil) housing = pervaneyi saran ve akışı yönlendiren gövde; box-fan ve roof-fan ventilasyon ünitesidir. Gövde içinde housing dışı akış parçası var mı ve 150/200 MD'nin BEP gücü bilinmiyor (AVenS paketi A4/A6). Satış kararına dayanak yapılmaz (REC-397, 2026-09-25).",
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
@@ -1843,7 +1874,9 @@
       "urun_sayfasi_sartlari": [
         "EU-1254/2014 ile aynı — VentHub ürün sayfasında etiket + ürün bilgi föyü fiyatın yakınında gösterilmeli (EU Ek VII'nin TR karşılığı hükümleri)."
       ],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
     },
@@ -1875,7 +1908,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Yönetmeliğin kendi RG tarih/sayısı ve tam metni bu araştırmada doğrudan çekilmedi — yalnız dayanak referansından teyit edildi."
+        "Yönetmeliğin kendi RG tarih/sayısı ve tam metni bu araştırmada doğrudan çekilmedi — yalnız dayanak referansından teyit edildi.",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
@@ -1909,7 +1943,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_1781.json",
-      "resmi_kaynak_sayisi": 2,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "vortice-isi-geri-kazanim",
@@ -1930,9 +1964,10 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "31 Aralık 2026 sonrası havalandırma üniteleri için ESPR temelli yeni bir uygulama tedbiri kabul edilmiş mi/edilecek mi — bu eksende ayrıca izlenmedi, DG GROW revizyon çalışmasıyla (bkz. EU-1253/2014 kalemi) ilişkisi teyit edilmedi.",
-        "ESPR ilk çalışma planının tam listesi ve tarihi (resmî Komisyon çalışma planı belgesi) bu araştırmada ayrıca çekilip doğrulanmadı; yalnız ESPR metnindeki recital'den çıkarım yapıldı."
+        "ESPR ilk çalışma planının tam listesi ve tarihi (resmî Komisyon çalışma planı belgesi) bu araştırmada ayrıca çekilip doğrulanmadı; yalnız ESPR metnindeki recital'den çıkarım yapıldı.",
+        "6 Kasım 2026 ölçümü: kanıtın iki alıntısı birebir değil (yürürlükten kaldırma alıntısının sonundaki \"as regards ventilation units\" metinde yok; recital alıntısı \"For the first working plan\" derken kanıt \"In its\" yazıyor). Öneri COM(2026)590 (2026-09-09) takipte."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "E"
     },
     {
@@ -1950,8 +1985,8 @@
         "yururluk": "2023-06-29 civarı (tüzük olarak yayımla yürürlüğe girer)",
         "uygulama_asamalari": [
           {
-            "tarih": "2027-01-20",
-            "ne": "Tüzük zorunlu uygulamaya girer; bu tarihten önce piyasaya arz edilen makine 2006/42/EC'ye tabi kalır. 42 ay geçiş süresi (2023-06-29 + 42 ay)."
+            "tarih": "2027-01-14",
+            "ne": "Tüzük uygulamaya girer (Md 54: \"It shall apply from 14 January 2027\") ve 2006/42/AT aynı gün yürürlükten kalkar (Md 51(2)). Önceki kayıt 2027-01-20 yazıyordu (Komisyon sayfası ifadesi); Yayın Ofisi'nin birincil metni 14 Ocak 2027 der. Türkiye'deki yeni yönetmelik ayrı tarihlidir: 20 Ocak 2027 (bkz. TR-YON-MAKINE-2023/1230). Not: aynı metinde Md 54 başka bazı maddeler için daha erken tarihler verir; ayrıntı birincil metindedir."
           }
         ]
       },
@@ -1960,13 +1995,14 @@
       ],
       "degistirenler": [],
       "karsilik": [
-        "TR-YON-MAKINE-2006/42"
+        "TR-YON-MAKINE-2006/42",
+        "TR-YON-MAKINE-2023/1230"
       ],
       "iliski_notlari": [],
       "durum": "gecis-doneminde",
-      "durum_notu": "yururlukte (uygulaması 2027-01-20'de başlayacak; geçiş döneminde)",
+      "durum_notu": "yururlukte (uygulaması 2027-01-14'te başlayacak; geçiş döneminde)",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2023_1230.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "vortice-h-ad-elektrikli",
@@ -2207,9 +2243,10 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Dijital kullanım kılavuzu/uygunluk beyanı izni (madde bazlı) yalnız EC özet sayfasından doğrulandı ('clarifies conditions under which the instructions for use and the declaration of conformity can be provided in a digital format... mandatory as of 20 January 2027'); EUR-Lex madde numarası (muhtemelen Md. 10) birincil metinden teyit edilemedi.",
-        "Kurumsal yapıya ilişkin diğer fark maddeleri (AI destekli güvenlik fonksiyonları, siber güvenlik) yalnız EC özetinden; birebir tüzük maddesi alıntısı yok."
+        "Kurumsal yapıya ilişkin diğer fark maddeleri (AI destekli güvenlik fonksiyonları, siber güvenlik) yalnız EC özetinden; birebir tüzük maddesi alıntısı yok.",
+        "AB uygulama tarihi 14 Ocak 2027, TR yönetmeliğinin tarihi 20 Ocak 2027: iki kalem ayrı tutulmalı; arada 6 gün fark var. Komisyon sayfasındaki \"20 January 2027\" ifadesi birincil metinle çelişiyor."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
       "eksen": "F"
     },
     {
@@ -2229,16 +2266,21 @@
           {
             "tarih": "2014-09-28",
             "ne": "RG 29133 sayılı değişiklik yönetmeliği yayımlandı (ikincil kaynak: LEXPERA/resmigazete başlığı; birincil metin doğrudan okunmadı)"
+          },
+          {
+            "tarih": "2027-01-20",
+            "ne": "Yeni Makine Emniyeti Yönetmeliği (RG 16.10.2026/33402) Md 51(1)(b) ile bu yönetmeliği yürürlükten kaldırır; 20/1/2027'den önce 2006/42/AT'ye uygun piyasaya arz edilen ürünlerin piyasada bulundurulması Geçici Md 1 uyarınca engellenmez."
           }
         ]
       },
       "yerini_aldigi": [],
       "degistirenler": [],
       "karsilik": [
-        "AB-2023/1230"
+        "AB-2023/1230",
+        "TR-YON-MAKINE-2023/1230"
       ],
       "iliski_notlari": [],
-      "durum": "yururlukte",
+      "durum": "gecis-doneminde",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-MAKINE-2006_42.json",
       "resmi_kaynak_sayisi": 1,
       "etkilenen_aileler": [
@@ -2480,9 +2522,292 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "2023/1230'u uygulayacak YENİ bir TR yönetmeliği (taslak dahil) resmi bir kaynakta BULUNAMADI. Sanayi odaları/danışmanlık siteleri (kso.org.tr, electrotest.com.tr) 'Bakanlık taslak hazırlıyor' diyor ama resmi taslak metni veya RG duyurusu tespit edilemedi — ikincil kaynak, doğrulanmadı."
+        "Yeni TR yönetmeliği RG 16.10.2026/33402'de yayımlandı (bkz. TR-YON-MAKINE-2023/1230); \"BULUNAMADI\" notu 6 Kasım 2026'da çözüldü.",
+        "TR uyumlaştırılmış standart listesi tebliği (TS EN 60204-1, TS EN ISO 12100 yayın yılları) hâlâ birincil kaynakta bulunamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-06",
+      "eksen": "F",
+      "durum_notu": "yururlukte; 20/1/2027'de yeni Makine Emniyeti Yönetmeliği Md 51(1)(b) ile yürürlükten kalkar (çalışan okuması, bağımsız doğrulama bekliyor)"
+    },
+    {
+      "kimlik": "TR-YON-MAKINE-2023/1230",
+      "ad": "Makine Emniyeti Yönetmeliği (2023/1230/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "makine"
+      ],
+      "kapsam": "Sanayi ve Teknoloji Bakanlığı yönetmeliği; AB 2023/1230 Makine Tüzüğü'nün Türkiye'deki karşılığıdır. 3/3/2009 tarihli Makina Emniyeti Yönetmeliği'nin (2006/42/AT) yerini alır. Makine ve ilgili ürünlerin piyasaya arzı için sağlık ve güvenlik şartlarını, uygunluk değerlendirmesini ve beyan biçimini (Ek-5) düzenler. Elektriksel tehlikelerde uygunluk değerlendirmesi ve piyasaya arz yükümlülükleri Belirli Gerilim Sınırları Yönetmeliği'ne değil bu yönetmeliğe tabidir (Ek-3 1.5.1; çalışan okuması).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2026-10-16, RG Sayı 33402",
+        "yururluk": "2026-10-16 (Md 1-3, 7(2)-(3), 8(2)-(3), 21(2), 27-42, 47, Geçici Md 1, Md 52, 53); diğer hükümler 2027-01-20 (Md 52)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2027-01-20",
+            "ne": "Yönetmeliğin kalan hükümleri yürürlüğe girer; 2009 tarihli 27158 sayılı Makina Emniyeti Yönetmeliği Md 51(1)(b) ile kalkar. 20/1/2027'den önce 2006/42/AT'ye uygun piyasaya arz edilen ürünler Geçici Md 1 uyarınca piyasada bulundurulabilir."
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "TR-YON-MAKINE-2006/42"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2023/1230"
+      ],
+      "iliski_notlari": [
+        "Aynı Resmî Gazete sayısı 25155 sayılı tel halat yönetmeliğini de kaldırır (Md 51(1)(a), 73/361/AT); VentHub ürünleriyle doğrudan ilgisi ölçülmedi."
+      ],
+      "durum": "gecis-doneminde",
+      "durum_notu": "yayımlandı; Md 1-3 vb. 16.10.2026'da yürürlükte, kalan hükümler 20/1/2027",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-MAKINE-2023_1230.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-h-ad-elektrikli",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-hucreli-hf-s",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-dikdortgen-kanal-radyal",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vorticent-cms-atex",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-nimax",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-axial",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-hucreli-aspiratorler",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-qbk-sal-kc-evo",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-qe-b-kasa",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "seat-atex-ptc-sensor",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-bvu-ls",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vortice-bravo-s",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-radon-range-circular",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-quadro-evo",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-punto-evo-flexo",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-elektrikli-isiticilar",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-hiz-anahtarlari",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-hava-perdesi",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-e-atex",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "nicotra-gebhardt-rdh",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-sulu-batarya",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-nimus",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-roof",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-radon-range-roof",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-roof",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "nicotra-gebhardt-at",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "nicotra-gebhardt-dd",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "nicotra-gebhardt-adh",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "vortice-vort-nordik-hvls",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "20/1/2027'den itibaren fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir; öncesi için 2006/42/AT karşılığı yönetmelik ve Geçici Md 1 geçerlidir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Madde numaraları (51, 52, Geçici 1), Ek-5 Kısım A'nın 10 alanı ve Ek-3 1.5.1 metni bir çalışanın okumasıdır; bağımsız doğrulayıcı yeniden ölçmedi (Resmî Gazete 6 Kasım 2026 ikinci denemede erişilemedi).",
+        "Ekler taranmış görüntü (54 sayfa, metin katmanı yok); Ek-3 sonu, Ek-4 ve Ek-5 dışındaki ekler taranmadı.",
+        "mevzuat.gov.tr konsolide metni ve robots.txt içeriği ölçülmedi.",
+        "Bu yönetmeliğe bağlı TR uyumlaştırılmış standart listesi tebliği bulunamadı."
+      ],
+      "son_kontrol": "2026-11-06",
       "eksen": "F"
     },
     {
@@ -2521,7 +2846,9 @@
         }
       ],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "6 Kasım 2026: Komisyon CPR sayfası alıntısı birebir, Yayın Ofisi 2024/3110'un 305/2011'i yürürlükten kaldırdığını gösteriyor; kanıt adresi (sha256) kayda geçirilmedi, son_kontrol yenilenmedi."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
     },
@@ -2564,7 +2891,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Ürün ailesi bazında hangi tarihte 305/2011'den 2024/3110'a geçileceği (hangi hEN'in ne zaman yeniden atıflanacağı) EUR-Lex/CEN'den doğrulanamadı — bu ayrıntı 2040'a kadar sürebilecek kademeli bir standart-bazlı süreçtir (EC sayfasında genel ifade var, ürün-özel tarih yok)."
+        "Ürün ailesi bazında hangi tarihte 305/2011'den 2024/3110'a geçileceği (hangi hEN'in ne zaman yeniden atıflanacağı) EUR-Lex/CEN'den doğrulanamadı — bu ayrıntı 2040'a kadar sürebilecek kademeli bir standart-bazlı süreçtir (EC sayfasında genel ifade var, ürün-özel tarih yok).",
+        "6 Kasım 2026: Komisyon CPR sayfası alıntısı birebir; EUR-Lex eli URL HTTP 202 (güvenlik duvarı); sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -2604,7 +2932,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "F400 sınıfı iddiasının VentHub kataloğunda nereden geldiği (üretici teknik föyü mü, iç varsayım mı) bu araştırmanın kapsamı dışında — mevzuat/standart seviyesinde 'bu ürün ailesi F400'dür' diyen resmi bir kaynak YOK, sınıf ataması ürün-bazlı test sertifikasına aittir.",
-        "EN 12101-3'ün CPR (305/2011 veya 2024/3110) altında OJ'de hangi tarihte/hangi tüzükte atıflandığı CEN/EUR-Lex'ten birincil doğrulanamadı; yalnız ikincil kaynak."
+        "EN 12101-3'ün CPR (305/2011 veya 2024/3110) altında OJ'de hangi tarihte/hangi tüzükte atıflandığı CEN/EUR-Lex'ten birincil doğrulanamadı; yalnız ikincil kaynak.",
+        "6 Kasım 2026: CEN/CENELEC robots.txt \"Disallow: /\" ve kanıt portalı HTTP 500; tazelik ölçülemedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -2647,7 +2976,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "2026-02-20 tarihli 33174 sayılı değişikliğin içeriği (ne değişti) doğrulanamadı — yalnız WebSearch başlığından tespit edildi, birincil metin bu oturumda okunmadı (zaman/kapsam kısıtı)."
+        "2026-02-20 tarihli 33174 sayılı değişikliğin içeriği (ne değişti) doğrulanamadı — yalnız WebSearch başlığından tespit edildi, birincil metin bu oturumda okunmadı (zaman/kapsam kısıtı).",
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -2698,7 +3028,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "'Son değişiklik tarihi' sorusu tam güven aralığında yanıtlanamadı: WebSearch 2015 (RG 29411), 2018 (2018/11347 K.) ve 2021 (RG 31665, CB Kararı 4825) değişikliklerinden bahsediyor ama en güncel konsolide metin bu oturumda birincil kaynaktan doğrulanmadı (zaman kısıtı + resmigazete eskiler arşivinde doğru URL bulunamadı). Yalnız 2007 orijinal metin doğrulandı."
+        "'Son değişiklik tarihi' sorusu tam güven aralığında yanıtlanamadı: WebSearch 2015 (RG 29411), 2018 (2018/11347 K.) ve 2021 (RG 31665, CB Kararı 4825) değişikliklerinden bahsediyor ama en güncel konsolide metin bu oturumda birincil kaynaktan doğrulanmadı (zaman kısıtı + resmigazete eskiler arşivinde doğru URL bulunamadı). Yalnız 2007 orijinal metin doğrulandı.",
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -2749,7 +3080,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "SORULAN SPESİFİK VERİ BULUNAMADI: 'Taşınabilir nem alma ve klima cihazları için GWP yasakları/tarihleri' — Ek IV'ün (Annex IV) hangi maddesinin hangi ürün alt kategorisi için hangi GWP eşiğini hangi tarihte yasakladığı, EUR-Lex'e erişilemediği için birincil metinden doğrulanamadı. EC'nin genel sayfaları (climate.ec.europa.eu) yalnız genel çerçeveden bahsediyor, madde/tarih detayı yok. Bu, dokümanın en zayıf noktası — mevzuat metnine erişim sağlanana kadar 'BULUNAMADI' olarak işaretlenmelidir.",
-        "517/2014'ün 2024/573 tarafından resmen 'repealed' edildiği ifadesi yalnız ikincil kaynaklardan (europeansources.info, chemlinked) teyit edildi; EUR-Lex başlığından birebir alıntı alınamadı."
+        "517/2014'ün 2024/573 tarafından resmen 'repealed' edildiği ifadesi yalnız ikincil kaynaklardan (europeansources.info, chemlinked) teyit edildi; EUR-Lex başlığından birebir alıntı alınamadı.",
+        "6 Kasım 2026: Komisyon F-gaz sayfası alıntısı birebir; COM(2025)501 öneri takipte; sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -2795,7 +3127,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "MADDE 9(2) ve MADDE 10(4)'ün tam içeriği (ne düzenledikleri) bu araştırmada okunmadı — yalnız yürürlük maddesindeki referans doğrulandı, kendi metinleri incelenmedi (kapsam dışı, zaman kısıtı)."
+        "MADDE 9(2) ve MADDE 10(4)'ün tam içeriği (ne düzenledikleri) bu araştırmada okunmadı — yalnız yürürlük maddesindeki referans doğrulandı, kendi metinleri incelenmedi (kapsam dışı, zaman kısıtı).",
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -2888,7 +3221,8 @@
       ],
       "acik_sorular": [
         "2018 sonrası değişiklik taraması yalnız arama motoruyla yapıldı.",
-        "Ekler taranmış PDF; Tablo 5.1/5.2 ve Ek-8 8.1/8.2.1 görsel okumayla doğrulandı (ek s.24–26, 30)."
+        "Ekler taranmış PDF; Tablo 5.1/5.2 ve Ek-8 8.1/8.2.1 görsel okumayla doğrulandı (ek s.24–26, 30).",
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "G",
@@ -2942,7 +3276,8 @@
       "urun_sayfasi_sartlari": [],
       "yazi_konusu": [],
       "acik_sorular": [
-        "Güncel hâli (2011 sonrası değişiklikler) doğrulanmadı; yazıda \"2010 tarihli yönetmelik\" diye anılır."
+        "Güncel hâli (2011 sonrası değişiklikler) doğrulanmadı; yazıda \"2010 tarihli yönetmelik\" diye anılır.",
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "G",
@@ -2993,7 +3328,8 @@
       "urun_sayfasi_sartlari": [],
       "yazi_konusu": [],
       "acik_sorular": [
-        "Sonradan uyumlaştırılmış standart yayımlanıp yayımlanmadığı kontrol edilmedi."
+        "Sonradan uyumlaştırılmış standart yayımlanıp yayımlanmadığı kontrol edilmedi.",
+        "6 Kasım 2026: alıntı birebir; sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "G",
@@ -3029,7 +3365,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "VentHub'ın AB dışı pazar ürünlerinde ithalatçı mı dağıtıcı mı olduğu ve birimlerin TR'ye ilk arz tarihi ticari olgudur, bu kayıtta yok (REC-397, karar 130).",
-        "Kanunun sonradan değişip değişmediği (konsolide metin) bu kayıtta okunmadı."
+        "Kanunun sonradan değişip değişmediği (konsolide metin) bu kayıtta okunmadı.",
+        "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
@@ -3159,6 +3496,10 @@
     {
       "eksen": "F",
       "not": "EN 12101-3 sınıflandırması (F200/F300/F400/F600) standardın kendisinde tanımlıdır ama HANGİ VentHub ürününün HANGİ sınıfa girdiği mevzuat/standart seviyesinde değil, ürün bazlı test sertifikasında belirtilir — 'vortice-vort-heatmaster-slimroof-smoke ailesi F400'dür' iddiası bu araştırmayla ne doğrulandı ne çürütüldü; kaynağı (muhtemelen üretici teknik föyü) ayrıca sorgulanmalı."
+    },
+    {
+      "eksen": "F",
+      "not": "6 Kasım 2026 tazeleme (MVZ-4): AB kalemleri Yayın Ofisi veri servisi ve SPARQL ile ham çekildi; kanıt dosyalarına sha256_ilk12 tabanı ilk kez yazıldı (önceki kanıtlarda sha256 yoktu). TR kalemleri için Resmî Gazete ve mevzuat.gov.tr ikinci denemede erişilemedi: 12 TR kaleminin tazeliği ölçülmedi, son_kontrol yenilenmedi. Yenilenen kalemler AB-2019/1781, 2021/341, 2014/34, 1999/92, 2014/30, 2014/35, 2011/65, 2012/19, 1253/2014, 1254/2014, 2024/1781, 2023/1230 ve iki Makine yönetmeliğidir."
     }
   ],
   "erisilemeyenler": [
@@ -3262,5 +3603,5 @@
       "etki": "EN 12101-3'ün CPR altındaki resmi uyumlaştırılmış-standart statüsü ve F200/F300/F400/F600 sınıflarının tam tanımı CEN'in kendi kataloğundan doğrulanamadı; yalnız ikincil sanayi kataloğu siteleri (standards.iteh.ai, genorma.com — resmi değil) kullanıldı."
     }
   ],
-  "guncellendi": "2026-09-25"
+  "guncellendi": "2026-11-06"
 }

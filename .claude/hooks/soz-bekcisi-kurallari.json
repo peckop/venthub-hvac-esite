@@ -1,0 +1,14 @@
+{
+  "aciklama": "Söz bekçisi kural listesi (ARC-58). Her kural: ne yakalanır, sahibin hangi şikâyeti üzerine eklendi, tarih. Yeni şikâyet = yeni satır; kural aynı gün kapı olur. Sahibin sözü tırnakla değil, özetle yazılır (depo herkese açık).",
+  "kurallar": [
+    {
+      "id": "ic-kimlik-8",
+      "ne": "Sekiz haneli iç kimlik (en az bir rakam ve bir harf, 0-9a-f): oturum, kart ya da kayıt kimliği. Departman kodu + numara (OPS-29, ARC-34), karar numarası, tarih damgası ve sürüm numarası serbesttir.",
+      "sikayet": "Sahip, iç sistemin sayı-harf kodlarını ekranda görmek istemiyor; ezberlemesi de gerekmiyor.",
+      "tarih": "2026-10-04",
+      "desen": "(?<![0-9A-Za-z-])[0-9a-f]{8}(?![0-9A-Za-z-])",
+      "rakamVeHarf": true,
+      "duzeltme": "Kimliği yazma; kart için departman kodu + numara (ARC-58), pencere için departman adı ya da kısa iş adı kullan."
+    }
+  ]
+}

@@ -183,7 +183,7 @@ if (require.main === module) {
       } catch {
         /* girdi yok: süzme yapılmaz */
       }
-      const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+      const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
       if (cikti) cikti = require(path.join(__dirname, 'uyari-susturma.cjs')).suz(cikti, sid, pano, Date.now(), 'sage').replace(/\n$/, '')
     } catch {
       /* süzme bozulduysa satır olduğu gibi basılır */

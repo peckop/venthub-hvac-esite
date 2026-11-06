@@ -1,6 +1,6 @@
 ---
 name: codebase-navigation
-description: "Kod tabanında gezinme: tanım, çağıran, etki; bizde codebase_* ve codegraph araçları. Tetik: \"nerede tanımlı\", \"kim çağırıyor\", \"etki analizi\"."
+description: "Tanımadığın kodda yön bulma: giriş noktası, anlama ve metne göre arama, tek sembolün kaynağını okuma (codebase_search, codebase_read_symbol). Çağıran ve etki sorusu codegraph işidir."
 category: research
 metadata:
   kaynak: "WrongStack @wrongstack/core 1.1.0 skills/codebase-navigation/SKILL.md (MIT lisansı, telif WrongStack)"

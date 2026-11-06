@@ -6719,6 +6719,10 @@ CREATE INDEX "idx_coupons_tenant_id" ON "public"."coupons" USING "btree" ("tenan
 
 
 
+CREATE INDEX "idx_data_subject_requests_handled_by" ON "public"."data_subject_requests" USING "btree" ("handled_by");
+
+
+
 CREATE INDEX "idx_dsr_status_due" ON "public"."data_subject_requests" USING "btree" ("status", "due_at");
 
 
@@ -6728,6 +6732,10 @@ CREATE INDEX "idx_dsr_user" ON "public"."data_subject_requests" USING "btree" ("
 
 
 CREATE INDEX "idx_error_groups_assigned_to" ON "public"."error_groups" USING "btree" ("assigned_to");
+
+
+
+CREATE INDEX "idx_goods_receipts_tenant_id" ON "public"."goods_receipts" USING "btree" ("tenant_id");
 
 
 
@@ -6775,6 +6783,10 @@ CREATE INDEX "idx_order_email_events_order_kind" ON "public"."order_email_events
 
 
 
+CREATE INDEX "idx_order_invoices_issued_by" ON "public"."order_invoices" USING "btree" ("issued_by");
+
+
+
 CREATE INDEX "idx_order_notes_order_id" ON "public"."order_notes" USING "btree" ("order_id");
 
 
@@ -6803,7 +6815,15 @@ CREATE INDEX "idx_price_lists_tenant_id" ON "public"."price_lists" USING "btree"
 
 
 
+CREATE INDEX "idx_pricing_rule_price_book_id" ON "public"."pricing_rule" USING "btree" ("price_book_id");
+
+
+
 CREATE INDEX "idx_product_authorities_product_id" ON "public"."product_authorities" USING "btree" ("product_id");
+
+
+
+CREATE INDEX "idx_product_families_subcategory_id" ON "public"."product_families" USING "btree" ("subcategory_id");
 
 
 
@@ -6847,7 +6867,15 @@ CREATE INDEX "idx_project_items_product_id" ON "public"."project_items" USING "b
 
 
 
+CREATE INDEX "idx_purchase_order_items_tenant_id" ON "public"."purchase_order_items" USING "btree" ("tenant_id");
+
+
+
 CREATE INDEX "idx_quote_email_events_quote" ON "public"."quote_email_events" USING "btree" ("quote_id", "created_at" DESC);
+
+
+
+CREATE INDEX "idx_refund_attempts_tenant_id" ON "public"."refund_attempts" USING "btree" ("tenant_id");
 
 
 
@@ -6919,7 +6947,27 @@ CREATE INDEX "idx_venthub_orders_user_id" ON "public"."venthub_orders" USING "bt
 
 
 
+CREATE INDEX "idx_venthub_quote_items_product_id" ON "public"."venthub_quote_items" USING "btree" ("product_id");
+
+
+
 CREATE INDEX "idx_venthub_quote_items_quote" ON "public"."venthub_quote_items" USING "btree" ("quote_id");
+
+
+
+CREATE INDEX "idx_venthub_quote_items_tenant_id" ON "public"."venthub_quote_items" USING "btree" ("tenant_id");
+
+
+
+CREATE INDEX "idx_venthub_quotes_accept_confirmed_by" ON "public"."venthub_quotes" USING "btree" ("accept_confirmed_by");
+
+
+
+CREATE INDEX "idx_venthub_quotes_accept_recorded_by" ON "public"."venthub_quotes" USING "btree" ("accept_recorded_by");
+
+
+
+CREATE INDEX "idx_venthub_quotes_amended_from" ON "public"."venthub_quotes" USING "btree" ("amended_from");
 
 
 
@@ -6931,7 +6979,15 @@ CREATE INDEX "idx_venthub_quotes_root" ON "public"."venthub_quotes" USING "btree
 
 
 
+CREATE INDEX "idx_venthub_quotes_source_project_id" ON "public"."venthub_quotes" USING "btree" ("source_project_id");
+
+
+
 CREATE INDEX "idx_venthub_quotes_status" ON "public"."venthub_quotes" USING "btree" ("status");
+
+
+
+CREATE INDEX "idx_venthub_quotes_superseded_by" ON "public"."venthub_quotes" USING "btree" ("superseded_by");
 
 
 
@@ -8148,15 +8204,33 @@ CREATE POLICY "admins_read_error_groups" ON "public"."error_groups" FOR SELECT T
 ALTER TABLE "public"."brands" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "brands_admin_write" ON "public"."brands" TO "authenticated" USING ((EXISTS ( SELECT 1
+CREATE POLICY "brands_admin_delete" ON "public"."brands" FOR DELETE TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY ((ARRAY['admin'::character varying, 'super_admin'::character varying])::"text"[])))))) WITH CHECK ((EXISTS ( SELECT 1
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
+
+
+
+CREATE POLICY "brands_admin_insert" ON "public"."brands" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY ((ARRAY['admin'::character varying, 'super_admin'::character varying])::"text"[]))))));
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
 
 
 
-CREATE POLICY "brands_tenant_select" ON "public"."brands" FOR SELECT USING (("tenant_id" = ( SELECT "public"."jwt_tenant_id"() AS "jwt_tenant_id")));
+CREATE POLICY "brands_admin_update" ON "public"."brands" FOR UPDATE TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles" "up"
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"])))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles" "up"
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
+
+
+
+CREATE POLICY "brands_select_anon" ON "public"."brands" FOR SELECT TO "anon" USING (("tenant_id" = ( SELECT "public"."jwt_tenant_id"() AS "jwt_tenant_id")));
+
+
+
+CREATE POLICY "brands_select_authenticated" ON "public"."brands" FOR SELECT TO "authenticated" USING ((("tenant_id" = ( SELECT "public"."jwt_tenant_id"() AS "jwt_tenant_id")) OR (EXISTS ( SELECT 1
+   FROM "public"."user_profiles" "up"
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"])))))));
 
 
 
@@ -8300,14 +8374,6 @@ CREATE POLICY "inventory_settings_update_admin" ON "public"."inventory_settings"
 
 
 
-CREATE POLICY "merged_brands_authenticated_select" ON "public"."brands" FOR SELECT TO "authenticated" USING (((EXISTS ( SELECT 1
-   FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT "auth"."uid"() AS "uid") AS "uid") AS "uid") AS "uid") AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))) OR (EXISTS ( SELECT 1
-   FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT "auth"."uid"() AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"])))))));
-
-
-
 CREATE POLICY "merged_category_mapping_rules_service_role_select" ON "public"."category_mapping_rules" FOR SELECT TO "service_role" USING ((true OR true));
 
 
@@ -8321,14 +8387,6 @@ CREATE POLICY "merged_order_email_events_service_role_select" ON "public"."order
 
 
 CREATE POLICY "merged_payment_transactions_service_role_select" ON "public"."payment_transactions" FOR SELECT TO "service_role" USING ((true OR true));
-
-
-
-CREATE POLICY "merged_product_families_authenticated_select" ON "public"."product_families" FOR SELECT TO "authenticated" USING (((EXISTS ( SELECT 1
-   FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT "auth"."uid"() AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid") AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))) OR (EXISTS ( SELECT 1
-   FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT "auth"."uid"() AS "uid") AS "uid") AS "uid") AS "uid") AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"])))))));
 
 
 
@@ -8441,23 +8499,27 @@ CREATE POLICY "orders_update_policy" ON "public"."venthub_orders" FOR UPDATE TO 
 ALTER TABLE "public"."organizations" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "p_dsr_admin_all" ON "public"."data_subject_requests" TO "authenticated" USING ("public"."is_admin_user"()) WITH CHECK ("public"."is_admin_user"());
+CREATE POLICY "p_dsr_admin_delete" ON "public"."data_subject_requests" FOR DELETE TO "authenticated" USING (( SELECT "public"."is_admin_user"() AS "is_admin_user"));
 
 
 
-CREATE POLICY "p_dsr_owner_insert" ON "public"."data_subject_requests" FOR INSERT TO "authenticated" WITH CHECK ((("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("applicant_email" = ( SELECT ("auth"."jwt"() ->> 'email'::"text"))) AND ("status" = 'received'::"text") AND ("due_at" = ("received_at" + '30 days'::interval)) AND ("outcome" IS NULL) AND ("completed_at" IS NULL) AND ("identity_verified_at" IS NULL) AND ("handled_by" IS NULL) AND ("retained_data_note" IS NULL)));
+CREATE POLICY "p_dsr_admin_update" ON "public"."data_subject_requests" FOR UPDATE TO "authenticated" USING (( SELECT "public"."is_admin_user"() AS "is_admin_user")) WITH CHECK (( SELECT "public"."is_admin_user"() AS "is_admin_user"));
 
 
 
-COMMENT ON POLICY "p_dsr_owner_insert" ON "public"."data_subject_requests" IS 'Veri sahibi kendi talebini acar. Kimlik tevsiki: applicant_email = JWT email (Teblig m.5). Surec alanlari (status/due_at/outcome/completed_at/identity_verified_at/handled_by/retained_data_note) with check ile DB default''una PIN''lidir -- kolon-GRANT ile DEGIL, cunku tablo-duzeyi grant kolon grant''ini gecersiz kilar. UPDATE politikasi yok.';
+CREATE POLICY "p_dsr_insert" ON "public"."data_subject_requests" FOR INSERT TO "authenticated" WITH CHECK ((( SELECT "public"."is_admin_user"() AS "is_admin_user") OR (("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("applicant_email" = ( SELECT ("auth"."jwt"() ->> 'email'::"text"))) AND ("status" = 'received'::"text") AND ("due_at" = ("received_at" + '30 days'::interval)) AND ("outcome" IS NULL) AND ("completed_at" IS NULL) AND ("identity_verified_at" IS NULL) AND ("handled_by" IS NULL) AND ("retained_data_note" IS NULL))));
 
 
 
-CREATE POLICY "p_dsr_owner_select" ON "public"."data_subject_requests" FOR SELECT TO "authenticated" USING (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
+COMMENT ON POLICY "p_dsr_insert" ON "public"."data_subject_requests" IS 'Veri sahibi kendi talebini acar. Kimlik tevsiki: applicant_email = JWT email (Teblig m.5). Surec alanlari (status/due_at/outcome/completed_at/identity_verified_at/handled_by/retained_data_note) with check ile DB default''una PIN''lidir -- kolon-GRANT ile DEGIL, cunku tablo-duzeyi grant kolon grant''ini gecersiz kilar. UPDATE politikasi yok.';
 
 
 
-COMMENT ON POLICY "p_dsr_owner_select" ON "public"."data_subject_requests" IS 'Veri sahibi yalnız kendi talebini görür; süreci ve 30 günlük son tarihi izleyebilir.';
+CREATE POLICY "p_dsr_select" ON "public"."data_subject_requests" FOR SELECT TO "authenticated" USING ((( SELECT "public"."is_admin_user"() AS "is_admin_user") OR ("user_id" = ( SELECT "auth"."uid"() AS "uid"))));
+
+
+
+COMMENT ON POLICY "p_dsr_select" ON "public"."data_subject_requests" IS 'Veri sahibi yalnız kendi talebini görür; süreci ve 30 günlük son tarihi izleyebilir. Yönetici (is_admin_user) tümünü görür.';
 
 
 
@@ -8576,15 +8638,33 @@ CREATE POLICY "product_costs_admin_select" ON "public"."product_costs" FOR SELEC
 ALTER TABLE "public"."product_families" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "product_families_admin_write" ON "public"."product_families" TO "authenticated" USING ((EXISTS ( SELECT 1
+CREATE POLICY "product_families_admin_delete" ON "public"."product_families" FOR DELETE TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY ((ARRAY['admin'::character varying, 'super_admin'::character varying])::"text"[])))))) WITH CHECK ((EXISTS ( SELECT 1
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
+
+
+
+CREATE POLICY "product_families_admin_insert" ON "public"."product_families" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY ((ARRAY['admin'::character varying, 'super_admin'::character varying])::"text"[]))))));
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
 
 
 
-CREATE POLICY "product_families_tenant_select" ON "public"."product_families" FOR SELECT USING ((("tenant_id" = ( SELECT "public"."jwt_tenant_id"() AS "jwt_tenant_id")) AND ("deleted_at" IS NULL)));
+CREATE POLICY "product_families_admin_update" ON "public"."product_families" FOR UPDATE TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles" "up"
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"])))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles" "up"
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
+
+
+
+CREATE POLICY "product_families_select_anon" ON "public"."product_families" FOR SELECT TO "anon" USING ((("tenant_id" = ( SELECT "public"."jwt_tenant_id"() AS "jwt_tenant_id")) AND ("deleted_at" IS NULL)));
+
+
+
+CREATE POLICY "product_families_select_authenticated" ON "public"."product_families" FOR SELECT TO "authenticated" USING (((("tenant_id" = ( SELECT "public"."jwt_tenant_id"() AS "jwt_tenant_id")) AND ("deleted_at" IS NULL)) OR (EXISTS ( SELECT 1
+   FROM "public"."user_profiles" "up"
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"])))))));
 
 
 
@@ -8690,19 +8770,15 @@ ALTER TABLE "public"."quote_email_events" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "quote_email_events_admin_read" ON "public"."quote_email_events" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles" "up"
-  WHERE (("up"."id" = "auth"."uid"()) AND (("up"."role")::"text" = ANY ((ARRAY['admin'::character varying, 'super_admin'::character varying])::"text"[]))))));
+  WHERE (("up"."id" = ( SELECT "auth"."uid"() AS "uid")) AND (("up"."role")::"text" = ANY (ARRAY[('admin'::character varying)::"text", ('super_admin'::character varying)::"text"]))))));
 
 
 
-CREATE POLICY "quote_items_insert_admin" ON "public"."venthub_quote_items" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ( SELECT "public"."is_admin_user"() AS "is_admin_user") AND (EXISTS ( SELECT 1
+CREATE POLICY "quote_items_insert" ON "public"."venthub_quote_items" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ((( SELECT "public"."is_admin_user"() AS "is_admin_user") AND (EXISTS ( SELECT 1
    FROM "public"."venthub_quotes" "q"
-  WHERE (("q"."id" = "venthub_quote_items"."quote_id") AND ("q"."tenant_id" = "public"."jwt_tenant_id"()) AND ("q"."status" = 'draft'::"text"))))));
-
-
-
-CREATE POLICY "quote_items_insert_own_requested" ON "public"."venthub_quote_items" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND (EXISTS ( SELECT 1
+  WHERE (("q"."id" = "venthub_quote_items"."quote_id") AND ("q"."tenant_id" = "public"."jwt_tenant_id"()) AND ("q"."status" = 'draft'::"text"))))) OR (EXISTS ( SELECT 1
    FROM "public"."venthub_quotes" "q"
-  WHERE (("q"."id" = "venthub_quote_items"."quote_id") AND ("q"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("q"."status" = 'requested'::"text"))))));
+  WHERE (("q"."id" = "venthub_quote_items"."quote_id") AND ("q"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("q"."status" = 'requested'::"text")))))));
 
 
 
@@ -8723,11 +8799,7 @@ CREATE POLICY "quote_number_counters_deny_all" ON "public"."quote_number_counter
 
 
 
-CREATE POLICY "quotes_insert_admin_draft" ON "public"."venthub_quotes" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ( SELECT "public"."is_admin_user"() AS "is_admin_user") AND ("status" = 'draft'::"text")));
-
-
-
-CREATE POLICY "quotes_insert_own_requested" ON "public"."venthub_quotes" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("status" = 'requested'::"text")));
+CREATE POLICY "quotes_insert" ON "public"."venthub_quotes" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ((( SELECT "public"."is_admin_user"() AS "is_admin_user") AND ("status" = 'draft'::"text")) OR (("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("status" = 'requested'::"text")))));
 
 
 
@@ -8735,11 +8807,7 @@ CREATE POLICY "quotes_select_own_or_admin" ON "public"."venthub_quotes" FOR SELE
 
 
 
-CREATE POLICY "quotes_update_admin" ON "public"."venthub_quotes" FOR UPDATE TO "authenticated" USING ((("tenant_id" = "public"."jwt_tenant_id"()) AND ( SELECT "public"."is_admin_user"() AS "is_admin_user"))) WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ( SELECT "public"."is_admin_user"() AS "is_admin_user")));
-
-
-
-CREATE POLICY "quotes_update_customer_decision" ON "public"."venthub_quotes" FOR UPDATE TO "authenticated" USING ((("tenant_id" = "public"."jwt_tenant_id"()) AND ("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("status" = 'quoted'::"text"))) WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND (("status" = 'rejected'::"text") OR (("status" = 'accepted'::"text") AND ("superseded_by" IS NULL) AND ("valid_until" >= "now"()) AND ("accept_channel" = 'site'::"text") AND ("accept_recorded_by" IS NULL) AND ("accepted_revision_no" = "revision_no")))));
+CREATE POLICY "quotes_update" ON "public"."venthub_quotes" FOR UPDATE TO "authenticated" USING ((("tenant_id" = "public"."jwt_tenant_id"()) AND (( SELECT "public"."is_admin_user"() AS "is_admin_user") OR (("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("status" = 'quoted'::"text"))))) WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND (( SELECT "public"."is_admin_user"() AS "is_admin_user") OR (("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND (("status" = 'rejected'::"text") OR (("status" = 'accepted'::"text") AND ("superseded_by" IS NULL) AND ("valid_until" >= "now"()) AND ("accept_channel" = 'site'::"text") AND ("accept_recorded_by" IS NULL) AND ("accepted_revision_no" = "revision_no")))))));
 
 
 

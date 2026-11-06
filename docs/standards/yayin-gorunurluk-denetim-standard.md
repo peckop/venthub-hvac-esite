@@ -137,6 +137,52 @@ yalnız "yayın günü listesi"ne güvenilmez. Haritada olmayan yeni adres (TR) 
 `bing-webmaster-oku.mjs --taban` (fark kipi, SEO-43), `sayfa-kalite.mjs` (+7). 14. günde gösterim, tık, sıra
 (`gsc-sayfa-oku.mjs`). Kartta tek satır + sayı; ham çıktı depo dışı dosyada.
 
+### Y2.2 Açılışta site haritası farkı: bildirim gelmese de yeni adres kaçmaz (SEO-78, 2026-11-03, OPS UYGUN)
+
+Y2.1 yayın bildirimine bağlıdır (R10 B8 ve B10'da BLOG, GEO-SEO'ya tek satır yazar). 3 Kasım 2026'da yeni rehber (`fan-cesitleri`) bildirim gelmeden canlıya çıktı; GEO-SEO onu site haritasındaki 94 → 95 adres artışından buldu. Bildirim aksasa da iş kaçmasın diye **her açılışta** (yeni pencere, compact dönüşü, gün başı):
+
+1. Canlı `https://venthub.com.tr/sitemap.xml` adresleri alınır ve depo dışı son kayıtla (`~/VentHub-Olcum-Arsiv/geo-seo/harita-son.txt`, sıralı adres listesi) karşılaştırılır (`comm -13 son yeni`: yeni adres; `comm -23`: kalkan adres).
+2. Yeni adres varsa ve açık bir kartı yoksa aynı turda kart açılır (SEO-NN, kaynak olay: "bildirim gelmedi") ve Y2.1 adımları koşulur: Google dizin isteği, IndexNow durumu (`dizin-tetigi` koşusu günlüğünde adres var mı), Bing, Yandex. Kota dolu adım ertesi günün ilk işidir ve karta yazılır.
+3. Bildirim gelmediği BLOG'a ve OPS'a tek satırla yazılır (yazının yayınlayanı bildirmemiştir; sorun sürerse R10 B8/B10 hatırlatılır).
+4. Kalkan adres varsa 308/404 durumu ölçülür (yönlendirme mi, kaldırma mı); kalkan adres sessiz geçilmez.
+5. Karşılaştırmadan sonra son kayıt güncellenir.
+
+`dizin-tetigi` iş akışı (`degisen-adres-bildir.mjs`) aynı farkı IndexNow için zaten koşar; bu madde onun Google/Bing/Yandex ve kart tarafındaki yedeğidir, yerine geçmez.
+
+### Y2.3 Rehber taslak okumasında eklenti ajanı: bağımsız okuma, her bulgu doğrulanır (SEO-80, 2026-11-03, OPS UYGUN)
+
+claude-seo eklentisi karar 417 ile yalnız yerel kapsamda kuruludur; kullanım haritası `docs/audits/seo-claude-seo-kullanim-2026-11-03.md`. Eklenti kendiliğinden devreye girmez, bu madde onu rehber akışına sabit bir adım olarak bağlar. Her rehber taslağı R10 B6a okumasına geldiğinde:
+
+1. Eklentinin kendi `claude-seo:seo-geo` ajanı taslağın yerel dosyasına salınır. Ajan yalnız dosyayı okur: ağ, Python betiği, dosya yazma ve `/seo setup` yoktur. GEO-SEO'nun ve BLOG'un kendi bulguları ajana verilmez (bağımsız okuma). Görev metnine yürürlükteki rehber cetvel kararlarının kısa özeti verilir (R3.3 makale tarzı, markasız gövde ve en çok bir VentHub sorusu; R3 zorunlu bölüm başlıkları; R11 başlık kuralları; ayrı "nedir" sayfası açılmaması gibi SEO-81 hükmü): özet bulgu değil sınırdır, bağımsızlığı bozmaz.
+2. Ajanın her bulgusu bir iddiadır. Taslak satırına ve atıf yapılan kaynağın metnine karşı doğrulanmadan bulgu sayılmaz ve BLOG'a iletilmez. Doğrulanamayan ya da çürüyen bulgu "yanlış pozitif" olarak kalır. Ajanın verdiği puan (ör. 55/100) karar girdisi ya da hedef değildir. **Karar çelişkisi:** ajanın önerisi yürürlükteki rehber cetvel kararıyla (R3, R3.3, R11 ya da OPS'un yazılı hükmü) çelişiyorsa öneri bulgu sayılmaz, kartta "karar çelişkisi" diye ayrı satıra yazılır ve BLOG'a iletilmez; altındaki gözlem doğruysa (ör. bölüm gerçekten tekrar ediyor) gözlem cetvele uygun bir önerinin dayanağı olarak ayrıca yazılır.
+3. Kartta her ajan bulgusu için üç alan tutulur: doğrulandı / yanlış pozitif; GEO-SEO ve BLOG kapılarında da bulundu mu (ortak) ya da yalnız ajan mı buldu (ek); yazının hangi satırı.
+4. İlk 3 rehber taslağında isabet oranı (doğrulanan bulgu / ajanın toplam bulgusu) ve ajan turunun süre ve jeton maliyeti kartta yazılır. Üçüncü yazıdan sonra devam, daraltma ya da bırakma önerisi bu veriyle OPS'a gider. **Karar (3 Kasım 2026, OPS):** üç taslakta ölçüm yapıldı (aşağıdaki tablo), adım kalıcıdır; sonraki yazılarda her turda isabet ve maliyet kartta yazılmaya devam eder, isabet belirgin düşerse ya da maliyet artarsa daraltma önerisi OPS'a gider.
+5. Yazı yayınlandığı halde aramada görünmüyorsa `seo-sxo` (sayfa türü uyumu), site haritası değiştiyse `seo-sitemap` ile bakılır. Eklentinin öteki araçları kullanılmaz; Python ortamı (`/seo setup`, karar 417'de yasak) kararı sonuçla birlikte OPS'a gider.
+
+İlk veri noktası (3 Kasım 2026, BLG-33 taslağı v1k): ajan 6 bulgu verdi; 3'ü GEO-SEO okumasıyla ortak, 2'si doğrulanan ek bulgu (çalışma ilkesi bölümü havanın çark yolunu anlatmıyor; seçim paragrafı yanlış bölümde), 1'i yanlış pozitif (iki kaynağın aynı bilgiyi yazdığı bir yerde atıf çelişkisi sanıldı). Ajan, GEO-SEO okumasının bulduğu iki şeyi kaçırdı: seçim tablosunda aynı cümleyi tekrarlayan satırlar ve iki ürün serisi arasında seçim sorusunun cevapsızlığı (katalog bilgisi gerekir). İsabet 5/6.
+
+| Taslak (3 Kasım 2026) | Ajanın toplam bulgusu + önerisi | Doğrulanan | Karar çelişkisi (bulgu sayılmadı) | Tur süresi | Jeton |
+|---|---|---|---|---|---|
+| Plug fan taslağı v1k | 6 | 5 | 0 | ölçülmedi | ölçülmedi |
+| Radyal-aksiyel taslağı v3 | 14 | 13 | 1 (SSS'ye "nedir" soruları) | 69 sn | ~46 bin |
+| Fan çeşitleri taslağı v11 | 12 | 9 | 3 (H3'leri "nedir" yapmak, zorunlu bölümleri taşımak, kapı başlığını yeniden adlandırmak) | 77 sn | ~46 bin |
+
+Toplam isabet 27/32 (%84). Karar çelişkisi olan beş öneri ajanın rehber cetvelini bilmemesinden çıktı; bu yüzden görev metnine cetvel özeti verilir (madde 1). Ajan hiçbir turda atıf yapılan kaynağın içeriğini açmadı: atıf doğruluğu bu ölçüme dahil değildir, BLOG'un doğrulama turlarındadır.
+
+### Y2.4 Rakip sayfa kıyası: adım listesi (SEO-83, 2026-11-04, OPS emri)
+
+"Şu sayfa aramada önde, bizimkini ona göre iyileştir" istendiğinde GEO-SEO bu sırayı koşar; her seferinde yeniden tarif edilmez. İlk uygulama radyal/aksiyel yazısı (SEO-81), ikincisi kanal tipi fan yazısı (SEO-83). Anlamsal boşluğun içerik sınıfları (çekirdek, ayırt edici, sıradan, fırsat) `write-seo-geo-content` yeteneğinde yazılıdır; bu liste ondan önceki ölçüm ve yazı/kategori ayrımı adımlarıdır, yerini almaz.
+
+1. **Sorgu kümesi.** Kıyasın sorguları yazılı olarak sabitlenir: ana terim, "nedir", çeşitleri, fiyatları, (varsa) "fark". Sorgu seçimi Recep'in ya da OPS'un sözüne değil ölçüme bağlanır; ölçülemeyen sorgu "ölçülmedi" diye yazılır.
+2. **Search Console, son 90 gün.** Bizim yazı ve ilgili kategori sayfası için sayfa süzgeciyle (tam eşitlik) toplam gösterim, tık, sıra ve sorgular; sitede o kelimeyi içeren sorgular hangi sayfaya gidiyor. Sonuç az satırsa "veri yok" yazılır, tahmin yürütülmez.
+3. **Trends çapalı küme** (karar 326, geo-olcum G8): her çağrıda en az 3 değeri olan bir çapa terim bulunur; çapa null ya da 3'ün altındaysa çağrı geçersizdir. Düşük hacimde değerler çağrıdan çağrıya oynar: yön okunur, oran okunmaz.
+4. **SERP, tarayıcıda** (tr, tr, kişiselleştirme kapalı): her sorgu için ilk sayfadaki organik sonuçlar sayfa türüne ayrılır (ürün-kategori, bilgi, pazaryeri); bizim ve rakip sayfanın görünüp görünmediği ayrı satırdır. Rakip adı sorguda geçiyorsa (marka sorgusu) bu, genel sorguda görünmek sayılmaz; kıyasın dayanağı genel sorgulardır.
+5. **Ham HTML.** Rakip sayfa, bizim yazı ve bizim kategori sayfası aynı çıkarıcıyla okunur: title, meta açıklama, H1, H2/H3 listesi, kelime, tablo başlıkları, iç bağlantı sayısı, JSON-LD türleri. Ham sayfa depoya girmez.
+6. **Y2.3 ajanı.** Eklenti ajanı bağımsız okur (ağ yok, dosya yazma yok); görevine cetvel özeti ve "YAZIYA / KATEGORİYE" etiketi istenir. Her bulgu sayfa satırına karşı doğrulanır; cetvelle çelişen öneri "karar çelişkisi" diye ayrılır.
+7. **Hüküm.** Her önerinin sahibi yazılır: ürün, fiyat ve çeşit sorguları kategori sayfasına, "nedir" ve "nasıl çalışır" sorguları yazıya aittir; yazı kategori sorgusunu, kategori yazı sorgusunu yememeli. Çıktı: title, H1, ilk H2, eksik bölümler, tablo, iç bağlantı; metni yazı için BLOG, kategori için URUN yazar, GEO-SEO yalnız ölçer ve hüküm verir. Kabul: 14. günde aynı ölçümler yeniden koşulur.
+
+Kurallar: rakip adı ve rakip sayfa adresi depoya girmez (kart ve depo dışı arşiv); arama ve sorgu verisi depoya yazılmaz (P6); ölçülmeyen "ölçülmedi" yazılır; Recep'in sözü depoya tırnakla yazılmaz.
+
 ## Y3 — Kabul (yayın günü ve sonrası)
 
 - Eski adres: `AYNI` ya da `TEK-308` (dil öneki olmayan eski adreste tek 307 meşru, plan §4); **ZINCIR 0 ·
@@ -188,6 +234,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
   ürün ailesi = ailenin ve aktif varyantlarının en son `updated_at`'i (`getFamilySitemapData`), rehber yazısı
   `guncellemeTarihi`. Güvenilir kaynağı olmayan satırda (sabit sayfalar, markalar, seri adresi) alan **yazılmaz**.
 - Üretim anı (`new Date()`) lastmod olarak YAZILMAZ. Kapı: INV-SITEMAP-LASTMOD-1 (`src/app/__tests__/sitemapLastmod.test.ts`).
+- Canlı kapı `LASTMOD-BUGUN` (SEO-88, 2026-11-06): bugünkü **saatli** damga KIRMIZI (üretim anı izi); bugünkü **gün başı** tarih damgası (`T00:00:00.000Z`, içerik yazarının verdiği tarih) UYARI'dır, yayın günü gerçek yayın böyle görünür ve ertesi gün kendiliğinden düşer. **Toplu eşik (SEO-89):** aynı gün başı damgasını bugün taşıyan adres sayısı `max(10, lastmod'lu adreslerin %20'si)` ya da üstüyse hepsi KIRMIZI (veri kaynaklı toplu bozulma izi; ölçülen yayın günü en çok 3 adres, 2026-11-06). Eşik ilk üç yayın gününde yeniden bakılır.
 - **Niçin (ölçüm, 2026-09-29):** canlı haritada 87 adresin 61'i her gün "bugün" taşıyordu. Google lastmod'u yalnız
   tutarlı biçimde doğruysa kullanır; her şeyi her gün değişmiş ilan eden haritanın tarihlerini yok sayar ve yeni
   sayfanın gerçek tarihi de kaybolur. Aynı gün GSC: 83 dizinli sayfanın 81'ine son uğrama 8–30 gün önce.

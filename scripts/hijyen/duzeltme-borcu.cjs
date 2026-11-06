@@ -29,7 +29,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../board/pano-dizini.cjs').VARSAYILAN
 /** İşaretin geçerlilik süresi: bundan eski işaret borca dönüşmez (kapanmamış eski oturum gürültüsü). */
 const ISARET_OMRU_MS = 6 * 60 * 60 * 1000
 

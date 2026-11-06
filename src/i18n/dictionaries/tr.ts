@@ -114,7 +114,7 @@ export const tr = {
         // Karar 288 (Recep, OPS-76): ad `categories.name`/`menu_label` ile aynı dize; adres (`radyal-fanlar`) ve anahtar değişmez.
         radial: 'Radyal (Santrifüj) Fanlar',
         roof: 'Çatı Tipi Fanlar',
-        'axial-ind': 'Aksiyel Sanayi Fanları',
+        'axial-ind': 'Aksiyel Fanlar',
         'air-curtain': 'Hava Perdeleri',
         conditioning: 'İklimlendirme Çözümleri',
         'rect-duct': 'Dikdörtgen Kanal Tipi Fanlar',
@@ -409,6 +409,8 @@ export const tr = {
       icindekiler: 'İçindekiler',
       urunlerBaslik: 'İlgili ürün aileleri',
       urunDugme: 'Aileyi incele',
+      kategorilerBaslik: 'İlgili ürün kategorileri',
+      kategoriDugme: 'Kategoriyi incele',
       ilgiliBaslik: 'İlgili yazılar',
       teklifBaslik: 'Projeniz için teklif alın',
       teklifAciklama: 'İhtiyacınızı iletişim formundan yazın; uygun ürün için teklif hazırlayalım.',

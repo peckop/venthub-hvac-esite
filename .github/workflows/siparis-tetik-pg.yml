@@ -1,0 +1,105 @@
+name: Gercek Postgres davranis testleri — siparis monoton tetigi + yetki (Y4/Y5-b/K5)
+
+# ---------------------------------------------------------------------------
+# INV-SIPARIS-MONOTON-PG-1 (OPS-221 · guvenlik karnesi 2026-11 P1 kilit c)
+#
+# NICIN VAR: `venthub_orders` monoton tetigi (20261103120000_venthub_orders_monoton_durum.sql)
+# bugune kadar CI'da yalniz METIN olarak olculuyordu; "service_role ile delivered -> confirmed
+# UPDATE hata verir" cumlesini hicbir test bir veritabaninda kosturmuyordu (PGlite depoda yok).
+# Bu is bos bir postgres:16 servisi acar, migration'i OLDUGU GIBI uygular ve gecisleri
+# service_role (BYPASSRLS) rolüyle dener. Test: src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts
+#
+# INV-YETKI-PG-1 (ALT-155 · karne Y4 / Y5-b / K5): ikinci adim ayni servisi kullanir.
+# Karne maddeleri master'da kapaliydi ama kapilarin davranisi CI'da yalniz migration METNINI
+# okuyan testlerle duruyordu. Test, ALT-145 ve ALT-136 migration'larini damga sirasiyla OLDUGU GIBI
+# uygular (admin_list_all_users moderator'e kapali, oturumlu rol degisikligi fail-closed denetim
+# satiri, admin_audit_log actor sahteciligi RLS reddi) ve ayni sondalari migration ONCESI tabanda
+# da kosar (taban acik cikar). Test: src/__tests__/conformance/yetki-davranis-pg.test.ts
+# NICIN AYNI IS AKISI: servis, pnpm/node kurulumu ve eylem sabitlemeleri ayni; ayri dosya bu
+# ~35 satiri ve eylem surumlerini iki yerde guncel tutmak demekti. Testler AYRI adimda kosar
+# (paralel vitest iki testin kuracagi rolleri yaristirir) ve ikinci test kendi gecici
+# veritabanini acar (auth semasi, varsayilan yetkiler gibi sabit adli nesneler birbirine karismaz).
+#
+# ZORUNLU KIP: `VENTHUB_TEST_PG_ZORUNLU=1` — veritabani adresi yoksa test KIRMIZIDIR; normal
+# test paketinde (adres yok) kol gorunur bicimde ATLANIR, atlanmis kol yesil degildir.
+#
+# Sir YOK: servis yalniz bu isin icinde yasar, prod'a baglanmaz. Parola koşucuya ozel ve gecicidir.
+# ---------------------------------------------------------------------------
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/_shared/siparis_gecis.ts'
+      - 'src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts'
+      - 'src/__tests__/conformance/yetki-davranis-pg.test.ts'
+      - '.github/workflows/siparis-tetik-pg.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/_shared/siparis_gecis.ts'
+      - 'src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts'
+      - 'src/__tests__/conformance/yetki-davranis-pg.test.ts'
+      - '.github/workflows/siparis-tetik-pg.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: siparis-tetik-pg-${{ github.ref }}
+  cancel-in-progress: true
+
+# Depo PUBLIC: `permissions:` yazilinca varsayilanlar duser, `contents: read` ZORUNLU (CLAUDE.md Notlar).
+permissions:
+  contents: read
+
+jobs:
+  tetik-pg:
+    name: Davranis testleri (postgres:16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Iki adim da zorunlu kipte kosar; adres tek yerde durur (ikinci test bu adresi yalniz
+    # "gercek veritabani degil" korumasi ve create database icin kullanir, icine yazmaz).
+    env:
+      VENTHUB_TEST_PG_URL: postgres://postgres:postgres@localhost:5432/vh_tetik_test
+      VENTHUB_TEST_PG_ZORUNLU: '1'
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vh_tetik_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      # Lifecycle betikleri KAPALI: kokun `postinstall`i tsc kosturur, bu test kullanmaz.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+
+      - name: Tetik testi (zorunlu kip)
+        run: pnpm exec vitest run src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts
+
+      # Ilk adim kirmizi olsa da ikinci adim kosar: iki kapinin durumu tek koşuda gorunsun.
+      - name: Yetki davranisi testi (zorunlu kip)
+        if: ${{ !cancelled() }}
+        run: pnpm exec vitest run src/__tests__/conformance/yetki-davranis-pg.test.ts

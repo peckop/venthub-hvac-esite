@@ -224,27 +224,58 @@ class WebhookMockDb {
     let dataset = table === 'venthub_orders' ? this.orders : this.events
     // Birden çok .eq() filtresi BİRLEŞİR (PostgREST gibi): kaynak durum koşulu (.eq('status', ...)) id filtresini ezmemeli.
     const filters: Array<[string, unknown]> = []
+    // `.is(col, null)` PostgREST'te IS NULL demektir: alanı hiç yazılmamış (undefined) satır da eşleşir.
+    const nullFilters: string[] = []
+    // `.lt(col, val)` PostgREST'te col < val (webhooks.test.ts ile aynı): ISO metinleri sözlük sırasıyla; NULL alan eşleşmez.
+    const ltFilters: Array<[string, string]> = []
     let limitVal = 0
-    let patchObject: any = null
+    let patchObject: Record<string, unknown> | null = null
+    let deleteMode = false
+    const eslesir = (r: Record<string, unknown>) =>
+      filters.every(([c, v]) => r[c] === v) &&
+      nullFilters.every((c) => r[c] == null) &&
+      ltFilters.every(([c, v]) => typeof r[c] === 'string' && (r[c] as string) < v)
 
     const chain = {
       select: (fields: string = '*') => {
         return chain
       },
-      eq: (col: string, val: any) => {
+      eq: (col: string, val: unknown) => {
         filters.push([col, val])
         return chain
+      },
+      is: (col: string, val: null) => {
+        if (val !== null) throw new Error('WebhookMockDb.is yalnız null destekler')
+        nullFilters.push(col)
+        return chain
+      },
+      lt: (col: string, val: string) => {
+        ltFilters.push([col, val])
+        return chain
+      },
+      delete: () => {
+        deleteMode = true
+        return chain
+      },
+      /** ALT-138 (#2286): webhooks.test.ts'teki eşiyle aynı ignore-duplicates semantiği (çakışan satır yazılmaz, dönmez). */
+      upsert: (row: Record<string, unknown>, opts?: { onConflict?: string; ignoreDuplicates?: boolean }) => {
+        const anahtar = opts?.onConflict ?? 'event_id'
+        const mevcut = dataset.some((r: Record<string, unknown>) => r[anahtar] === row[anahtar])
+        if (mevcut && !opts?.ignoreDuplicates) throw new Error('WebhookMockDb.upsert: ignoreDuplicates olmadan birleştirme modellenmedi')
+        if (!mevcut) dataset.push(row)
+        const donen = mevcut ? [] : [row]
+        return { select: async (_alanlar?: string) => ({ data: donen, error: null }) }
       },
       limit: (l: number) => {
         limitVal = l
         return chain
       },
-      update: (patch: any) => {
+      update: (patch: Record<string, unknown>) => {
         patchObject = patch
         return chain
       },
       single: async () => {
-        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
+        const filtered = dataset.filter(eslesir)
         if (filtered.length === 0) {
           return { data: null, error: { message: 'Not found', code: 'PGRST116' } }
         }
@@ -258,7 +289,12 @@ class WebhookMockDb {
         return { data: row, error: null }
       },
       then: (resolve: any) => {
-        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
+        const filtered = dataset.filter(eslesir)
+        if (deleteMode) {
+          for (const r of filtered) dataset.splice(dataset.indexOf(r), 1)
+          resolve({ data: filtered, error: null })
+          return
+        }
         if (patchObject) {
           filtered.forEach(r => Object.assign(r, patchObject))
         }
@@ -280,7 +316,9 @@ vi.mock('@supabase/supabase-js', () => {
   }
 })
 
-async function computeSignature(secret: string, body: string): Promise<string> {
+// ALT-138: imza `<x-timestamp>.<x-event-id>.<ham gövde>` üzerinden (sabit_zaman.ts::webhookImzaMetni).
+async function computeSignature(secret: string, rawBody: string, ts: string, eventId: string): Promise<string> {
+  const body = `${ts}.${eventId}.${rawBody}`
   const encoder = new TextEncoder()
   const key = await globalThis.crypto.subtle.importKey(
     'raw',
@@ -555,7 +593,8 @@ describe('Comprehensive Workload Scenarios E2E Suite (5 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-COL-100', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-S4')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
@@ -563,7 +602,9 @@ describe('Comprehensive Workload Scenarios E2E Suite (5 Test Cases)', () => {
         // T025-VH: shipping-webhook replay guard'i artik ZORUNLU (cetvel §3.5).
         // Bu testler basari yolunu sinadigi icin taze bir timestamp gondermeleri gerekiyor;
         // eskiden guard 'varsa uygula' (fail-OPEN) oldugu icin basliksiz geciyorlardi.
-        'x-timestamp': String(Date.now()),
+        // ALT-138: zaman + olay kimligi imzanin parcasi; olay kimligi zorunlu.
+        'x-timestamp': ts,
+        'x-event-id': 'EV-S4',
         'Content-Type': 'application/json',
         'x-signature': signature
       },

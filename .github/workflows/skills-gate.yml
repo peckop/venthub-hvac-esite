@@ -83,7 +83,10 @@ jobs:
         if: steps.anahtar.outputs.var == '1' && steps.fark.outputs.degisen != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node scripts/skills-eval-run.mjs
+          # ALT-160: --etiket zorunlu. PR'da pr-<no>; push/dispatch'te PR yok, koşu kimliği verilir.
+          # Değer yalnız sayıdan kurulur ve env üzerinden geçer (run: satırına ifade gömülmez).
+          ETIKET: ${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || format('run-{0}', github.run_id) }}
+        run: node scripts/skills-eval-run.mjs "--etiket=$ETIKET"
 
       - name: rapor dosyasini sakla
         if: always()

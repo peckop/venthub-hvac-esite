@@ -1,6 +1,6 @@
 # Ölçüm defteri: PIM / UnoPIM
 
-Sahibi: OPS · Son doğrulama: 2026-11-02 · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
+Sahibi: OPS · Son doğrulama: 2026-11-04 (KATALOG, aşağıdaki "Ölçüm 2026-11-04" bölümü güncel durumdur; 09-29 ve 11-02 satırları tarihçedir) · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
 Son ölçüm: 2026-09-29 (OPS, Sonnet). Önceki: REC-357 (In Review), karar 36 EVET (09-22), 81/82 EVET.
 
 | Konu | Bulgu |
@@ -21,6 +21,19 @@ Son ölçüm: 2026-09-29 (OPS, Sonnet). Önceki: REC-357 (In Review), karar 36 E
 | Görsel alanı | Tek görsel özniteliği `image` (tip image, zorunlu değil); galeri ya da dosya tipi öznitelik yok. Görseli dolu ürün 0/442. |
 | API | Yönetim paneli `/admin/login` 200; REST kimliksiz 401, mevcut anahtarla `GET products` 200 (total=442), `GET attributes/image` 200. 2 API anahtarı, 2 OAuth istemcisi tanımlı. |
 | Sınır | Ölçüm salt okumadır: UnoPIM'e ürün verisi yazılmadı, canlı Supabase'e dokunulmadı. |
+
+## Ölçüm 2026-11-04 (KATALOG, KTL-80 / KTL-81 / KTL-82; yerel UnoPIM, canlı Supabase'e yazım yok, hiçbir ürün yayında değil)
+| Konu | Bulgu |
+|---|---|
+| Sürüm | v3.1.1 → v3.1.3 (görüntü etiketi `compose.yaml`'da sabit). Yükseltme öncesi veritabanı ve dosya yedeği alındı; ürün sayısı ve 5 örnek ürünün özeti önce/sonra aynı. |
+| Veri | 1165 ürün (hepsi kapalı/taslak), 107 aile (102 + 5 yeni), 201 kategori, 2 etkin dil (tr_TR, en_US). 12 ürün Design'ın yeni modelleri (Penta, Platt, Notus, Phantom, Sanikit), değerleri Design İçerik veri dosyalarından. |
+| Metin | 1153 ürünün tr+en açıklaması ve kısa açıklaması, Design seri kaydından (KTL-80 Faz B); 59 ürün Design'ın eksik-içerik dosyasından; ürün adı (tr) Design model adı. |
+| Marka | `brand` seçim özniteliği, 1165/1165 (Vortice 916, SEAT 82, Casals 53, AVenS 44, Danfoss 35, Nicotra Gebhardt 35). |
+| Kategori | İki kök ağaç: site menüsü (Design katalog-grup v2.4: 11 grup, 21 tür, yaprak 25/25 dolu) ve Marka · Aile · Seri (6 marka, 56 aile, 104 seri). Her ürün iki ağaçta da. Eski sitenin kategori tablosu kaynak DEĞİL (karar 412). |
+| Görsel | Ana görseli olan ürün 1157/1165 (KTL-81: 429; yeni modellerden 10). Eksik 8: eski 6 + Sanikit 2. Galeri ya da alt metin özniteliği yok. |
+| Fiyat / KDV / stok | UnoPIM'de yok, yazılmadı. Kaynak ölçümü: fiyat kaynağı tek (Avensair 2026 liste, EUR, KDV hariç) ve 1165 ürünün 348'ini kapsıyor; KDV eski 442 ürünün hepsinde %20; Supabase `stock_qty` yalnız 0 ya da 50 (yer tutucu). Ayrıntı: venthub-gorsel-arsiv `_liste/ktl82-faz-c-2026-11-04/RAPOR.md`. |
+| Fark kontrolü | `scripts/icerik-hatti/tasarim-unopim-fark.mjs` (KTL-83: depoda, vitest bozma testli; Design anlık görüntüleri ↔ UnoPIM; görüntü 7 günden eskiyse çıkış 2): ad, açıklama, kısa açıklama, teknik değer, marka, kategori; ilk koşuda 1165 üründe fark 0, bozma testinde farkı yakaladı. |
+| Yazım güvencesi | Her toplu yazım: yedek, tam değer klonu (UnoPIM PUT `values.common`'ı tamamen değiştirir), geri okuma, hedef dışı karşılaştırma, ilk farkta durma. |
 
 ## Hüküm (09-29)
 441 ürün, tek kanal → ayrı PIM zorunlu değil; asıl acı veri disiplini. UnoPIM YEREL TEZGÂH olarak devam, yazma kolu açılmaz. 4 hafta koşulu (~10-27): 24 boş ürün + 2 hafta fark 0 + challenger 5 koşulu; sağlanmazsa Supabase tabloları.

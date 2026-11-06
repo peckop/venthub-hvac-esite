@@ -1,5 +1,6 @@
 // Çağıran sınıfı: (b) sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
@@ -221,14 +222,14 @@ serve(async (req) => {
           table_name: 'venthub_orders',
           row_pk: order_id,
           action: 'email_send_failed',
-          after: { kind: 'order_confirmation', reason, provider_status: resp.status, provider_error: txt.slice(0, 500) },
+          after: { kind: 'order_confirmation', reason, provider_status: resp.status, provider_error: metniMaskele(txt, 500) },
           tenant_id: tenantId,
         }),
       }).catch(() => null)
       if (!denetim || !denetim.ok) {
         console.error('[order-confirmation] admin_audit_log yazilamadi', { order_id, reason })
       }
-      return new Response(JSON.stringify({ error: 'send_failed', reason, provider_status: resp.status, body: txt.slice(0, 500) }), { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'send_failed', reason, provider_status: resp.status, body: metniMaskele(txt, 500) }), { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=> ({}))
 

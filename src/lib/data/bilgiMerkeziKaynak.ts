@@ -2,7 +2,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { cache } from 'react'
 
 import { HVAC_BRANDS } from '../../data/brands'
+import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+import { getDictValue } from '../../i18n/getDictValue'
 import type { Database } from '../../types/database.types'
+import { getCategoryDescription, getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 import type { IcBaglantiKaynagi, KategoriKaynagi } from '../bilgiMerkezi/icBaglanti'
 import { supabaseStaticClient } from '../supabase/static'
@@ -24,6 +28,7 @@ import { supabaseStaticClient } from '../supabase/static'
  */
 export function bilgiMerkeziKaynagi(supabase: SupabaseClient<Database>): IcBaglantiKaynagi & {
   aileKarti(slug: string, dil: string): Promise<{ slug: string; ad: string } | null>
+  kategoriKarti(slug: string, dil: string): Promise<{ slug: string; ad: string; aciklama: string } | null>
 } {
   const aileSatiri = async (slug: string) => {
     const { data, error } = await supabase
@@ -148,6 +153,26 @@ export function bilgiMerkeziKaynagi(supabase: SupabaseClient<Database>): IcBagla
       const yerel = i18n && typeof i18n[dil] === 'string' && (i18n[dil] as string).trim() ? (i18n[dil] as string) : null
       return { slug: satir.slug, ad: yerel ?? satir.name }
     },
+
+    async kategoriKarti(slug, dil) {
+      // URN-151: ad `getCategoryDisplayName` (CLAUDE.md kural 7: ham name/slug render yasak), kısa metin
+      // `getCategoryDescription` (o dilin metni; EN'de yoksa boş, Türkçe yedeği YOK). Pasif kategori `null`.
+      const { data, error } = await supabase
+        .from('categories')
+        .select('slug, name, menu_label, translation_key, description, metadata, is_active')
+        .eq('tenant_id', DEFAULT_TENANT_ID)
+        .eq('slug', slug)
+        .limit(1)
+        .maybeSingle()
+      if (error) throw error
+      if (!data?.slug || !data.is_active) return null
+      const sozluk = dil === 'en' ? en : tr
+      return {
+        slug: data.slug,
+        ad: getCategoryDisplayName(data, (anahtar) => getDictValue(sozluk, anahtar)),
+        aciklama: getCategoryDescription(data, dil),
+      }
+    },
   }
 }
 
@@ -161,4 +186,5 @@ export const varsayilanKaynak: ReturnType<typeof bilgiMerkeziKaynagi> = {
   takmaAd: cache(varsayilan.takmaAd),
   marka: varsayilan.marka,
   aileKarti: cache(varsayilan.aileKarti),
+  kategoriKarti: cache(varsayilan.kategoriKarti),
 }

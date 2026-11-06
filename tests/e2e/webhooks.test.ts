@@ -17,16 +17,51 @@ class WebhookMockDb {
     let dataset = table === 'venthub_orders' ? this.orders : this.events
     // Birden çok .eq() filtresi BİRLEŞİR (PostgREST gibi): kaynak durum koşulu (.eq('status', ...)) id filtresini ezmemeli.
     const filters: Array<[string, unknown]> = []
+    // `.is(col, null)` PostgREST'te IS NULL demektir: alanı hiç yazılmamış (undefined) satır da eşleşir.
+    const nullFilters: string[] = []
+    // `.lt(col, val)` PostgREST'te col < val: ISO-8601 metinleri sözlük sırasıyla karşılaştırılır; alanı olmayan (NULL) satır eşleşmez.
+    const ltFilters: Array<[string, string]> = []
     let limitVal = 0
-    let patchObject: any = null
+    let patchObject: Record<string, unknown> | null = null
+    let deleteMode = false
+    const eslesir = (r: Record<string, unknown>) =>
+      filters.every(([c, v]) => r[c] === v) &&
+      nullFilters.every((c) => r[c] == null) &&
+      ltFilters.every(([c, v]) => typeof r[c] === 'string' && (r[c] as string) < v)
 
     const chain = {
       select: (fields: string = '*') => {
         return chain
       },
-      eq: (col: string, val: any) => {
+      eq: (col: string, val: unknown) => {
         filters.push([col, val])
         return chain
+      },
+      is: (col: string, val: null) => {
+        if (val !== null) throw new Error('WebhookMockDb.is yalnız null destekler')
+        nullFilters.push(col)
+        return chain
+      },
+      lt: (col: string, val: string) => {
+        ltFilters.push([col, val])
+        return chain
+      },
+      delete: () => {
+        deleteMode = true
+        return chain
+      },
+      /**
+       * ALT-138 (#2286): olay tekilleştirmesi "önce kaydet" — upsert(..., { onConflict, ignoreDuplicates: true }).select().
+       * PostgREST ignore-duplicates: çakışan satır YAZILMAZ ve DÖNMEZ; yalnız gerçekten eklenen satır döner.
+       * Kol 10 (yinelenen olay) tam bu boş dönüşe dayanır: burada [row] dönerse kol kırmızı olmalı.
+       */
+      upsert: (row: Record<string, unknown>, opts?: { onConflict?: string; ignoreDuplicates?: boolean }) => {
+        const anahtar = opts?.onConflict ?? 'event_id'
+        const mevcut = dataset.some((r: Record<string, unknown>) => r[anahtar] === row[anahtar])
+        if (mevcut && !opts?.ignoreDuplicates) throw new Error('WebhookMockDb.upsert: ignoreDuplicates olmadan birleştirme modellenmedi')
+        if (!mevcut) dataset.push(row)
+        const donen = mevcut ? [] : [row]
+        return { select: async (_alanlar?: string) => ({ data: donen, error: null }) }
       },
       limit: (l: number) => {
         limitVal = l
@@ -37,7 +72,7 @@ class WebhookMockDb {
         return chain
       },
       single: async () => {
-        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
+        const filtered = dataset.filter(eslesir)
         if (filtered.length === 0) {
           return { data: null, error: { message: 'Not found', code: 'PGRST116' } }
         }
@@ -51,7 +86,12 @@ class WebhookMockDb {
         return { data: row, error: null }
       },
       then: (resolve: any) => {
-        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
+        const filtered = dataset.filter(eslesir)
+        if (deleteMode) {
+          for (const r of filtered) dataset.splice(dataset.indexOf(r), 1)
+          resolve({ data: filtered, error: null })
+          return
+        }
         if (patchObject) {
           filtered.forEach(r => Object.assign(r, patchObject))
         }
@@ -73,7 +113,9 @@ vi.mock('@supabase/supabase-js', () => {
   }
 })
 
-async function computeSignature(secret: string, body: string): Promise<string> {
+// ALT-138: imza `<x-timestamp>.<x-event-id>.<ham gövde>` üzerinden (sabit_zaman.ts::webhookImzaMetni).
+async function computeSignature(secret: string, rawBody: string, ts: string, eventId: string): Promise<string> {
+  const body = `${ts}.${eventId}.${rawBody}`
   const encoder = new TextEncoder()
   const key = await globalThis.crypto.subtle.importKey(
     'raw',
@@ -127,7 +169,8 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     }
 
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T1')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
@@ -135,7 +178,9 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
         // T025-VH: shipping-webhook replay guard'i artik ZORUNLU (cetvel §3.5).
         // Bu testler basari yolunu sinadigi icin taze bir timestamp gondermeleri gerekiyor;
         // eskiden guard 'varsa uygula' (fail-OPEN) oldugu icin basliksiz geciyorlardi.
-        'x-timestamp': String(Date.now()),
+        // ALT-138: zaman + olay kimligi imzanin parcasi; olay kimligi zorunlu.
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T1',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -172,17 +217,17 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
   it('3. should enforce stale replay guard and reject signatures older than 5 minutes', async () => {
     const payload = { order_number: 'ORD-901', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
-
     // Set timestamp to 10 minutes ago
     const expiredTimestamp = String(Date.now() - 10 * 60 * 1000)
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, expiredTimestamp, 'EV-T3')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-signature': signature,
-        'x-timestamp': expiredTimestamp
+        'x-timestamp': expiredTimestamp,
+        'x-event-id': 'EV-T3'
       },
       body: rawBody
     })
@@ -242,12 +287,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     // Webhook executes under Tenant A environment context
     const payload = { order_number: 'ORD-COL-999', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T6')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T6',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -300,6 +347,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
       method: 'POST',
       headers: {
         'x-timestamp': String(Date.now()),
+        'x-event-id': 'EV-T7',
         'Content-Type': 'application/json',
         'x-webhook-token': 'legacy-sandbox-token-555' // Legacy fallback
       },
@@ -320,12 +368,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-MONO', status: 'shipped' } // Demotion attempt
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T8')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T8',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -346,12 +396,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
     const payload = { order_number: 'ORD-901', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-T9')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
+        'x-event-id': 'EV-T9',
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -371,18 +423,22 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
       order_number: 'ORD-DUP'
     })
 
+    // ALT-138 R1: tekrar teslim yalnız olay İŞLENMİŞ (processed_at dolu) ise 200 duplicate alır; processed_at boş
+    // satır "süren işlem" demektir ve 409 IN_FLIGHT alır (aşağıdaki 12-16). Bu kol işlenmiş olayı sınar.
     mockDbInstance.events.push({
-      event_id: 'EV-111222'
+      event_id: 'EV-111222',
+      processed_at: new Date().toISOString()
     })
 
     const payload = { order_number: 'ORD-DUP', status: 'shipped' }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-111222')
 
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
-        'x-timestamp': String(Date.now()),
+        'x-timestamp': ts,
         'Content-Type': 'application/json',
         'x-signature': signature,
         'x-id': 'EV-111222' // Already exists
@@ -423,14 +479,15 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     // istek YINE DE gecerli imzali. Yani "imza dogru" tenant'i dogrulamaz — kaynak satir dogrular.
     const payload = { order_number: 'ORD-DERIVE', status: 'shipped', tenant_id: ATTACKER_TENANT }
     const rawBody = JSON.stringify(payload)
-    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, 'EV-DERIVE-1')
 
     const req = new Request(
       `https://localhost/functions/v1/shipping-webhook?tenant_id=${ATTACKER_TENANT}`,
       {
         method: 'POST',
         headers: {
-          'x-timestamp': String(Date.now()),
+          'x-timestamp': ts,
           'Content-Type': 'application/json',
           'x-signature': signature,
           'x-id': 'EV-DERIVE-1'
@@ -448,5 +505,217 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     expect(event).toBeDefined()
     expect(event?.tenant_id).toBe(ORDER_TENANT)
     expect(event?.tenant_id).not.toBe(ATTACKER_TENANT)
+  })
+
+  // ─── ALT-138 R1: "önce kaydet" tekilleştirmesinde SÜREN işlem ile İŞLENMİŞ olay ayrımı ───
+  // Eskiden upsert boş dönünce (olay zaten sahiplenilmiş) her durumda 200 duplicate dönüyordu. İlk teslim henüz
+  // işlenirken gelen ikinci teslim 200 alır, ilk işlem sonra hata verip sahipliği bırakırsa taşıyıcı yeniden
+  // denemediği için olay KAYBOLUYORDU. Kural: processed_at NULL → 409 IN_FLIGHT + Retry-After; dolu → 200 duplicate.
+  // (İki gerçek eşzamanlı teslimin bariyerli sınaması ve sabotaj kolu: kargo-webhook-monoton.test.ts.)
+
+  /** Aynı imzalı teslimi tekrar tekrar gönderebilmek için: gövde bir kez okunabildiğinden her çağrıda yeni Request üretir. */
+  async function teslimHazirla(eventId: string, payload: Record<string, unknown>): Promise<() => Request> {
+    const rawBody = JSON.stringify(payload)
+    const ts = String(Date.now())
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody, ts, eventId)
+    return () => new Request('https://localhost/functions/v1/shipping-webhook', {
+      method: 'POST',
+      headers: {
+        'x-timestamp': ts,
+        'x-event-id': eventId,
+        'Content-Type': 'application/json',
+        'x-signature': signature
+      },
+      body: rawBody
+    })
+  }
+
+  interface OlayKaydi { event_id?: string; processed_at?: string | null }
+  const olayKayitlari = () => mockDbInstance.events as OlayKaydi[]
+
+  it('12. should answer 409 IN_FLIGHT with Retry-After when the same event is still being processed (processed_at NULL), and leave the first delivery\'s claim untouched', async () => {
+    mockDbInstance.orders.push({ id: 'order-inflight', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-INFLIGHT' })
+    // İlk teslim sahipliği aldı ama henüz bitmedi: satır var, processed_at boş.
+    mockDbInstance.events.push({ event_id: 'EV-INFLIGHT', processed_at: null, received_at: new Date().toISOString() })
+
+    const teslim = await teslimHazirla('EV-INFLIGHT', { order_number: 'ORD-INFLIGHT', status: 'shipped' })
+    const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+
+    expect(res.status).toBe(409)
+    const body = await res.json()
+    expect(body.error).toBe('IN_FLIGHT')
+    expect(body.duplicate).toBeUndefined()
+    // Retry-After: pozitif tam sayı ve replay penceresinin (5 dk = 300 sn) altında.
+    const bekleme = Number(res.headers.get('retry-after'))
+    expect(Number.isInteger(bekleme)).toBe(true)
+    expect(bekleme).toBeGreaterThan(0)
+    expect(bekleme).toBeLessThan(300)
+    // İkinci teslim siparişe dokunmaz ve ilk teslimin sahiplik satırını SİLMEZ (409 yolu sahipliği almadı).
+    expect(mockDbInstance.orders[0].status).toBe('confirmed')
+    expect(olayKayitlari()).toHaveLength(1)
+    expect(olayKayitlari()[0].event_id).toBe('EV-INFLIGHT')
+    expect(olayKayitlari()[0].processed_at).toBeNull()
+  })
+
+  it('13. should answer 200 duplicate for the retry once the first delivery has finished (processed_at filled), without a second write', async () => {
+    mockDbInstance.orders.push({ id: 'order-bitti', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-BITTI' })
+    mockDbInstance.events.push({ event_id: 'EV-BITTI', processed_at: null, received_at: new Date().toISOString() })
+
+    const teslim = await teslimHazirla('EV-BITTI', { order_number: 'ORD-BITTI', status: 'shipped' })
+    expect((await simulator.invokeFunction(webhookFunctionPath, teslim())).status).toBe(409)
+
+    // İlk teslim bitti (başarı yolu processed_at'i doldurur).
+    olayKayitlari()[0].processed_at = new Date().toISOString()
+
+    const tekrar = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(tekrar.status).toBe(200)
+    const body = await tekrar.json()
+    expect(body.duplicate).toBe(true)
+    expect(mockDbInstance.orders[0].status).toBe('confirmed') // ikinci teslim yazmadı
+  })
+
+  it('14. should process the retry when the first delivery failed and released its claim after a 409 (event is not lost)', async () => {
+    mockDbInstance.orders.push({ id: 'order-kayip', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-KAYIP', carrier: null, tracking_number: null })
+    mockDbInstance.events.push({ event_id: 'EV-KAYIP', processed_at: null, received_at: new Date().toISOString() })
+
+    const teslim = await teslimHazirla('EV-KAYIP', { order_number: 'ORD-KAYIP', status: 'shipped', carrier: 'dhl', tracking_number: 'DHL-KAYIP' })
+    expect((await simulator.invokeFunction(webhookFunctionPath, teslim())).status).toBe(409)
+
+    // İlk teslim hata verdi: sahiplik satırını bıraktı (Deno.serve sarmalayıcısındaki delete ... is('processed_at', null)).
+    mockDbInstance.events.length = 0
+
+    const tekrar = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(tekrar.status).toBe(200)
+    expect((await tekrar.json()).duplicate).toBeUndefined()
+    expect(mockDbInstance.orders[0].status).toBe('shipped')
+    expect(mockDbInstance.orders[0].tracking_number).toBe('DHL-KAYIP')
+    // Yeniden deneme olayı işledi ve tamamlandı olarak işaretledi.
+    expect(olayKayitlari()).toHaveLength(1)
+    expect(olayKayitlari()[0].processed_at).toBeTruthy()
+  })
+
+  it('15. should fail closed with 5xx (never a silent 200) when the event state cannot be read', async () => {
+    mockDbInstance.orders.push({ id: 'order-okuma', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-OKUMA' })
+    mockDbInstance.events.push({ event_id: 'EV-OKUMA', processed_at: null, received_at: new Date().toISOString() })
+
+    const teslim = await teslimHazirla('EV-OKUMA', { order_number: 'ORD-OKUMA', status: 'shipped' })
+
+    // Yalnız olay tablosuna doğrudan yapılan select('processed_at') okuması hata verir; upsert(...).select() zinciri etkilenmez.
+    const originalFrom = mockDbInstance.from.bind(mockDbInstance)
+    mockDbInstance.from = (table: string) => {
+      const chain = originalFrom(table)
+      if (table === 'shipping_webhook_events') {
+        ;(chain as { select: unknown }).select = () => ({
+          eq: () => ({ limit: async () => ({ data: null, error: { message: 'baglanti koptu' } }) })
+        })
+      }
+      return chain
+    }
+
+    try {
+      const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+      expect(res.status).toBe(500)
+      expect((await res.json()).error).toBe('Event state read failed')
+      expect(mockDbInstance.orders[0].status).toBe('confirmed')
+      // Okuma hatasında da ilk teslimin satırı silinmez.
+      expect(olayKayitlari()).toHaveLength(1)
+    } finally {
+      mockDbInstance.from = originalFrom
+    }
+  })
+
+  it('16. should release its own claim when processing fails, so the same event retried afterwards is processed and marked done', async () => {
+    // Sipariş henüz yok: ilk teslim 404 ile biter ve sahipliği bırakır.
+    const teslim = await teslimHazirla('EV-ILKHATA', { order_number: 'ORD-ILKHATA', status: 'shipped', carrier: 'dhl', tracking_number: 'DHL-ILKHATA' })
+    const ilk = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(ilk.status).toBe(404)
+    expect(olayKayitlari().some((e) => e.event_id === 'EV-ILKHATA')).toBe(false)
+
+    // Sipariş sonradan görünür olur; AYNI olay yeniden denenir.
+    mockDbInstance.orders.push({ id: 'order-ilkhata', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-ILKHATA', carrier: null, tracking_number: null })
+    const yeniden = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(yeniden.status).toBe(200)
+    expect((await yeniden.json()).duplicate).toBeUndefined()
+    expect(mockDbInstance.orders[0].status).toBe('shipped')
+    expect(olayKayitlari()).toHaveLength(1)
+    expect(olayKayitlari()[0].processed_at).toBeTruthy()
+
+    // Tamamlanmış olayın üçüncü teslimi artık 200 duplicate (409 değil) ve yazım yapmaz.
+    const ucuncu = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(ucuncu.status).toBe(200)
+    expect((await ucuncu.json()).duplicate).toBe(true)
+  })
+
+  // ─── ALT-138 R1 ek: TAKILI satırın atomik devralınması (izolat ölürse ya da bırakma başarısız olursa olay kaybolmaz) ───
+  // processed_at NULL satır `received_at` eşiğinden (DEVRALMA_S = 90 sn) ESKİyse yeniden deneme sahipliği compare-and-set ile
+  // devralır; taze satır 409 almaya devam eder. Sabotaj kolu (devralma sökülünce kırmızı): kargo/iade conformance testlerinde.
+
+  const saniyeOnce = (sn: number) => new Date(Date.now() - sn * 1000).toISOString()
+
+  it('17. should take over a stuck claim (processed_at NULL, received_at older than the takeover threshold), process the event and mark it done', async () => {
+    mockDbInstance.orders.push({ id: 'order-takili', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-TAKILI', carrier: null, tracking_number: null })
+    const eskiZaman = saniyeOnce(600)
+    mockDbInstance.events.push({ event_id: 'EV-TAKILI', processed_at: null, received_at: eskiZaman })
+
+    const teslim = await teslimHazirla('EV-TAKILI', { order_number: 'ORD-TAKILI', status: 'shipped', carrier: 'dhl', tracking_number: 'DHL-TAKILI' })
+    const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+
+    expect(res.status).toBe(200)
+    expect((await res.json()).duplicate).toBeUndefined()
+    expect(mockDbInstance.orders[0].status).toBe('shipped')
+    expect(mockDbInstance.orders[0].tracking_number).toBe('DHL-TAKILI')
+    expect(olayKayitlari()).toHaveLength(1)
+    expect(olayKayitlari()[0].processed_at).toBeTruthy()
+    // Devralma received_at'i yeniledi (compare-and-set güncellemesi).
+    expect(String((olayKayitlari()[0] as { received_at?: string }).received_at) > eskiZaman).toBe(true)
+
+    const tekrar = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(tekrar.status).toBe(200)
+    expect((await tekrar.json()).duplicate).toBe(true)
+  })
+
+  it('18. should keep answering 409 IN_FLIGHT for a fresh NULL claim (received_at inside the takeover threshold) and not touch it', async () => {
+    mockDbInstance.orders.push({ id: 'order-taze', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-TAZE' })
+    const tazeZaman = saniyeOnce(60)
+    mockDbInstance.events.push({ event_id: 'EV-TAZE', processed_at: null, received_at: tazeZaman })
+
+    const teslim = await teslimHazirla('EV-TAZE', { order_number: 'ORD-TAZE', status: 'shipped' })
+    const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+
+    expect(res.status).toBe(409)
+    expect((await res.json()).error).toBe('IN_FLIGHT')
+    expect(mockDbInstance.orders[0].status).toBe('confirmed')
+    expect(olayKayitlari()).toHaveLength(1)
+    expect((olayKayitlari()[0] as { received_at?: string }).received_at).toBe(tazeZaman)
+    expect(olayKayitlari()[0].processed_at).toBeNull()
+  })
+
+  it('19. should fail closed with 5xx when the takeover update itself errors (no silent 409/200, claim row kept)', async () => {
+    mockDbInstance.orders.push({ id: 'order-devralma-hata', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-DEVRALMA' })
+    mockDbInstance.events.push({ event_id: 'EV-DEVRALMA', processed_at: null, received_at: saniyeOnce(600) })
+
+    const teslim = await teslimHazirla('EV-DEVRALMA', { order_number: 'ORD-DEVRALMA', status: 'shipped' })
+
+    // Yalnız olay tablosunda update(...).eq().is().lt().select() zinciri (devralma) hata verir; claim upsert'i ve okuma etkilenmez.
+    const originalFrom = mockDbInstance.from.bind(mockDbInstance)
+    mockDbInstance.from = (table: string) => {
+      const chain = originalFrom(table)
+      if (table === 'shipping_webhook_events') {
+        ;(chain as { update: unknown }).update = () => ({
+          eq: () => ({ is: () => ({ lt: () => ({ select: async () => ({ data: null, error: { message: 'baglanti koptu' } }) }) }) })
+        })
+      }
+      return chain
+    }
+
+    try {
+      const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+      expect(res.status).toBe(500)
+      expect((await res.json()).error).toBe('Event takeover failed')
+      expect(mockDbInstance.orders[0].status).toBe('confirmed')
+      expect(olayKayitlari()).toHaveLength(1)
+    } finally {
+      mockDbInstance.from = originalFrom
+    }
   })
 })

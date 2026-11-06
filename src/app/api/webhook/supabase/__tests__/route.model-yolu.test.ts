@@ -1,7 +1,9 @@
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { yayindaListesiAyarla } from '@/config/__tests__/yayindaTestKiti'
+
+import { imzaliIstek } from './imzaliIstek'
 
 /**
  * INV-WEBHOOK-MODEL-YOLU-1 — products webhook dalı, YAYINDAKİ modelin sayfa yolunu (TR + EN) da tazeler (ALT-16,
@@ -41,12 +43,14 @@ vi.mock('@/lib/supabase/static', () => ({
 
 const WEBHOOK_SECRET = 'test-webhook-secret-mock'
 
+// ALT-76 PR 3: kalıcı tekrar koruması burada ölçülmez (webhook-hmac-imza.test.ts); olay hep yeni.
+vi.mock('@/lib/webhook/olayTekil', async (orijinal) => ({
+  ...(await orijinal<Record<string, unknown>>()),
+  olayTuket: async () => 'yeni',
+}))
+
 function istek(payload: unknown): NextRequest {
-  return new NextRequest('http://localhost/api/webhook/supabase', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-webhook-secret': WEBHOOK_SECRET },
-    body: JSON.stringify(payload),
-  })
+  return imzaliIstek(payload, WEBHOOK_SECRET)
 }
 
 async function urunGuncelle(record: Record<string, unknown>, oldRecord: Record<string, unknown> | null = null) {

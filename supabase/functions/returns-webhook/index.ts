@@ -12,17 +12,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { canCarrierTransition } from '../_shared/return_transitions.ts'
-import { hmacImzaGecerli, timingSafeEquals } from '../_shared/sabit_zaman.ts'
+import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), { status: init.status || 200, headers: { 'content-type': 'application/json; charset=utf-8', ...(init.headers||{}) } })
 }
 
-// İmza ve token karşılaştırması SABİT ZAMANLI (karne 2026-11 K4, cetvel §3.5 · E17).
-// Eskiden `given === computed` ve `tok === token` idi.
-function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
-  return hmacImzaGecerli(secret, raw, signatureHeader)
-}
+// İMZA BİÇİMİ (ALT-138): HMAC-SHA256( `<x-timestamp>.<x-event-id>.<ham gövde>` ), base64; `sha256=` öneki kabul.
+// Eskiden imza yalnız gövdeyi kapsıyordu: zaman ve olay kimliği değiştirilerek istek tekrar oynatılabiliyordu.
+// Eski biçim için geçiş bayrağı YOK (cetvel §3.5). Karşılaştırma sabit zamanlı (sabit_zaman.ts, E17).
 
 function mapReturnStatus(input?: string): { status?: string; setReceived?: boolean } {
   const s = (input || '').toLowerCase()
@@ -58,7 +56,35 @@ async function sha256Base64(input: string): Promise<string> {
 
 const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
+// Süren ilk teslim varken gelen ikinci teslime söylenen bekleme (Retry-After, saniye). 30 sn: ilk teslimin normal süresi
+// birkaç saniyedir (iade okuma/yazma + en iyi çabayla bildirim), yani 30 sn sonra ya bitmiştir (200 duplicate) ya da
+// başarısız bitip sahipliği bırakmıştır (yeniden deneme işlenir). SKEW_MS'in (5 dk) çok altında kalmalı: kargo firması
+// aynı zaman damgasıyla yeniden denerse pencere dışında 401 alır ve olay yine kaybolur.
+const IN_FLIGHT_RETRY_AFTER_S = 30
+
+// Takılı sahipliğin devralınma eşiği (sn): `processed_at` NULL ve `received_at` bundan eskiyse ilk teslim ölmüş sayılır
+// (izolat olayKaydet'ten önce öldü ya da sahipliği bırakan delete hata verdi) ve yeniden deneme sahipliği atomik devralır.
+// Aksi halde satır sonsuza dek NULL kalır, her yeniden deneme 409 alır ve 5 dk sonra 401 Stale ile olay kaybolurdu.
+// 90 sn: ilk teslimin en kötü işlem süresinin (iade okuma/yazma + en iyi çabayla bildirim zinciri; normalde saniyeler)
+// üstünde, yoksa canlı bir işlem çalınır; SKEW_MS'in (5 dk) altında, yoksa devralacak yeniden deneme zaman penceresini
+// kaçırır. Retry-After (30 sn) ile tutarlı: 30. ve 60. sn'deki denemeler 409 alır, 90. sn'den sonrakiler devralır.
+// Yine de iki işlem üst üste binerse iade yazımı okunan duruma bağlı (monoton) olduğu için çift yazım zarar vermez.
+const DEVRALMA_S = 90
+
+// Olay sahipliği (ALT-138 "önce kaydet"): işlem başarısız biterse (4xx/5xx; 409 çakışma dahil) sahiplenilen
+// olay satırı bırakılır, böylece kargo firmasının yeniden denemesi "tekrar" sanılıp yutulmaz.
+type Sahiplik = { birak: (() => Promise<void>) | null }
+
 Deno.serve(async (req: Request) => {
+  const sahiplik: Sahiplik = { birak: null }
+  const cevap = await isle(req, sahiplik)
+  if (cevap.status >= 400 && sahiplik.birak) {
+    try { await sahiplik.birak() } catch (e) { console.error('[returns-webhook] olay sahipliği bırakılamadı', e) }
+  }
+  return cevap
+})
+
+async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
   try {
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, { status: 405 })
 
@@ -72,21 +98,27 @@ Deno.serve(async (req: Request) => {
     const token = Deno.env.get('RETURNS_WEBHOOK_TOKEN') || ''
     const sign = req.headers.get('x-signature') || ''
     const tok = req.headers.get('x-webhook-token') || ''
+    // Zaman ve olay kimliği imzanın PARÇASIDIR (ALT-138): imzadan önce okunur, imzalanmış hâliyle kullanılır.
+    const tsHeader = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()
+    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     let ok = false
-    if (secret && sign) ok = await hmacValid(secret, raw, sign)
+    if (secret && sign) ok = await webhookImzaGecerli(secret, tsHeader, eventId, raw, sign)
     if (!ok && token && tok && timingSafeEquals(tok, token)) ok = true
     if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
 
     // Enforce replay guard - mandatory timestamp header
-    const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
     if (!tsHeader) {
       return json({ error: 'Missing timestamp header' }, { status: 401 })
+    }
+    // Olay kimliği ZORUNLU (ALT-138): tekilleştirme ve olay kaydı kimliksiz isteği göremezdi.
+    if (!eventId) {
+      return json({ error: 'Missing event id header' }, { status: 400 })
     }
 
     let t = 0
     // support epoch ms or ISO
-    if (/^\d+$/.test(tsHeader.trim())) {
-      t = parseInt(tsHeader.trim(), 10)
+    if (/^\d+$/.test(tsHeader)) {
+      t = parseInt(tsHeader, 10)
     } else {
       const d = Date.parse(tsHeader)
       t = Number.isFinite(d) ? d : 0
@@ -104,13 +136,60 @@ Deno.serve(async (req: Request) => {
 
     const p = normalizePayload(body) as { return_id?: string; order_id?: string; carrier?: string; tracking_number?: string; status?: string; delivered_at?: string }
 
-    // Optional dedup. Tenant filtresi KALDIRILDI: filtre istekten gelen değerle kuruluyordu,
-    // yani farklı bir `?tenant_id=` göndermek idempotency'yi atlatıyordu. `event_id` kargo
+    // Dedup (olay kimliği ZORUNLU, yukarıda doğrulandı). Tenant filtresi KALDIRILDI: filtre istekten gelen
+    // değerle kuruluyordu, yani farklı bir `?tenant_id=` göndermek idempotency'yi atlatıyordu. `event_id` kargo
     // firmasının global tekil kimliği; varlığı tek başına "bu olay işlendi" demektir.
-    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
-    if (eventId) {
-      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).limit(1)
-      if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
+    //
+    // ÖNCE KAYDET (ALT-138): eskiden kontrol-sonra-kaydet idi (select → işle → insert); aynı olayın eşzamanlı iki
+    // teslimi ikisi de "yok" görüp ikisi de işleniyordu. Artık olay işlemden ÖNCE atomik sahiplenilir:
+    // `insert ... on conflict (event_id) do nothing returning` — `event_id` UNIQUE (20250914_returns_webhook_events.sql).
+    // Satır dönmezse olay zaten sahiplenilmiş; ama "sahiplenilmiş" = "işlenmiş" DEĞİLDİR: ilk teslim hâlâ sürüyor olabilir.
+    // `processed_at` DOLU ise olay tamamlandı → 200 no-op. NULL ise sürüyor (ya da yarım kaldı) → 409 IN_FLIGHT + Retry-After:
+    // 200 dönseydik kargo firması yeniden denemezdi ve ilk işlem sonra hata verip sahipliği bıraktığında olay KAYBOLURDU.
+    // İşlem 4xx/5xx biterse sahiplik bırakılır (Deno.serve); 409 dalı sahipliği ALMADIĞI için ilk teslimin satırına dokunmaz.
+    {
+      const { data: sahiplenen, error: sahipHata } = await supabase
+        .from('returns_webhook_events')
+        .upsert(
+          { event_id: eventId, body_hash: await sha256Base64(raw), received_at: new Date().toISOString() },
+          { onConflict: 'event_id', ignoreDuplicates: true },
+        )
+        .select('event_id')
+      if (sahipHata) return json({ error: 'Event claim failed' }, { status: 500 })
+      if (!Array.isArray(sahiplenen) || sahiplenen.length === 0) {
+        const { data: mevcut, error: okumaHata } = await supabase
+          .from('returns_webhook_events')
+          .select('processed_at')
+          .eq('event_id', eventId)
+          .limit(1)
+        // Fail-closed: durum okunamıyorsa sessiz 200 yok (olay kaybolurdu); 5xx kargo firmasını yeniden denetir.
+        if (okumaHata) return json({ error: 'Event state read failed' }, { status: 500 })
+        const islendi = Array.isArray(mevcut) && mevcut[0]?.processed_at != null
+        if (islendi) return json({ ok: true, event_id: eventId, duplicate: true })
+        // Sürüyor ya da takıldı. ATOMİK DEVRALMA: yalnız processed_at hâlâ NULL VE received_at eşikten eskiyse satırın
+        // received_at'i yenilenir (compare-and-set); eşzamanlı iki yeniden denemeden yalnız biri satır döndürür.
+        const simdi = Date.now()
+        const { data: devralinan, error: devralmaHata } = await supabase
+          .from('returns_webhook_events')
+          .update({ received_at: new Date(simdi).toISOString() })
+          .eq('event_id', eventId)
+          .is('processed_at', null)
+          .lt('received_at', new Date(simdi - DEVRALMA_S * 1000).toISOString())
+          .select('event_id')
+        if (devralmaHata) return json({ error: 'Event takeover failed' }, { status: 500 })
+        // Satır dönmediyse: ilk teslim taze (süren işlem) ya da satır hiç yok (ilk teslim arada sahipliği bıraktı);
+        // her iki durumda 409, yeniden deneme normal akışla sahipliği alır ya da devralır.
+        if (!Array.isArray(devralinan) || devralinan.length === 0) {
+          return json(
+            { error: 'IN_FLIGHT', event_id: eventId, retry_after_s: IN_FLIGHT_RETRY_AFTER_S },
+            { status: 409, headers: { 'Retry-After': String(IN_FLIGHT_RETRY_AFTER_S) } },
+          )
+        }
+        // Devralındı: sahiplik bu teslimde; aşağıda bırakma kancası kurulur ve normal işleme devam edilir.
+      }
+      sahiplik.birak = async () => {
+        await supabase.from('returns_webhook_events').delete().eq('event_id', eventId).is('processed_at', null)
+      }
     }
 
     // Resolve return_id if missing using order_id + tracking_number if necessary (best effort)
@@ -139,6 +218,30 @@ Deno.serve(async (req: Request) => {
       ? `&tenant_id=eq.${encodeURIComponent(tenantId)}`
       : ''
 
+    // `processed_at` DOLU = olay tamamlandı; NULL = sürüyor (tekrar teslim 409 IN_FLIGHT alır). Bu yüzden başarıyla biten
+    // (200) HER yol bunu çağırmalı: geçiş kapısının 200 reddi dahil, yoksa o olayın tekrarı sonsuza dek 409 alırdı.
+    // Yazım hatası işi bozmaz (iade zaten yazıldı) ama görünür olur: satır NULL kalırsa yeniden denemeler 409 alır.
+    async function olayKaydet(statusMapped: string) {
+      try {
+        const bodyHash = await sha256Base64(raw)
+        // Satır en başta sahiplenildi; burada yalnız ayrıntısı doldurulur.
+        const { error } = await supabase.from('returns_webhook_events').update({
+          return_id: returnId,
+          order_id: p.order_id || null,
+          carrier: p.carrier || null,
+          tracking_number: p.tracking_number || null,
+          status_raw: p.status || null,
+          status_mapped: statusMapped,
+          body_hash: bodyHash,
+          processed_at: new Date().toISOString(),
+          tenant_id: tenantId,
+        }).eq('event_id', eventId)
+        if (error) console.error('[returns-webhook] olay kaydı (processed_at) yazılamadı', { code: 'EVENT_RECORD_FAILED', event_id: eventId })
+      } catch (e) {
+        console.error('[returns-webhook] olay kaydı (processed_at) yazılamadı', { code: 'EVENT_RECORD_FAILED', event_id: eventId, hata: e instanceof Error ? e.message : String(e) })
+      }
+    }
+
     const mapped = mapReturnStatus(p.status)
     const patch: Record<string, unknown> = {}
     if (mapped.status) patch['status'] = mapped.status
@@ -155,7 +258,9 @@ Deno.serve(async (req: Request) => {
     const verdict = canCarrierTransition(String(cur.status), nextStatusCandidate)
     if (!verdict.allowed) {
       // 200 dönülür: kargo firmasının kuyruğu tekrar tekrar denemesin. Reddin SEBEBİ
-      // gövdede açıkça yazar — sessiz yutma değil, kayıtlı ret.
+      // gövdede açıkça yazar — sessiz yutma değil, kayıtlı ret. Olay tamamlandı sayılır (processed_at dolar):
+      // aynı olayın tekrarı 200 duplicate alır, 409 IN_FLIGHT'a takılmaz.
+      await olayKaydet('ignored:transition_blocked')
       return json({
         ok: true,
         unchanged: true,
@@ -169,30 +274,25 @@ Deno.serve(async (req: Request) => {
     // Update returns row
     let updated = false
     if (Object.keys(patch).length > 0) {
-      const { error: updErr } = await supabase.from('venthub_returns').update(patch).eq('id', returnId)
+      // MONOTONLUK (ALT-138, kural 11): yazım OKUNAN duruma bağlıdır. Eskiden koşulsuzdu: okuma ile yazma arasında
+      // admin iadeyi `refunded` yaptıysa kargo olayı onu `received`'a geri çekiyordu (geçiş kapısı eski durumu görmüştü).
+      // 0 satır = satır arada değişti → 409; olay sahipliği bırakılır, yeniden deneme taze durumla kapıdan geçer.
+      const { data: yazilanlar, error: updErr } = await supabase
+        .from('venthub_returns')
+        .update(patch)
+        .eq('id', returnId)
+        .eq('status', String(cur.status))
+        .select('id')
       if (updErr) return json({ error: updErr.message || 'DB update failed' }, { status: 500 })
+      if (!Array.isArray(yazilanlar) || yazilanlar.length === 0) {
+        console.error('[returns-webhook] iade durumu okuma ile yazma arasında değişti', { code: 'STATE_CHANGED', return_id: returnId, read_status: cur.status })
+        return json({ error: 'Conflict: return status changed', code: 'STATE_CHANGED' }, { status: 409 })
+      }
       updated = true
     }
 
-    // Audit event
-    try {
-      const bodyHash = await sha256Base64(raw)
-      if (eventId) {
-        await supabase.from('returns_webhook_events').insert({
-          event_id: eventId,
-          return_id: returnId,
-          order_id: p.order_id || null,
-          carrier: p.carrier || null,
-          tracking_number: p.tracking_number || null,
-          status_raw: p.status || null,
-          status_mapped: (patch['status'] as string) || String(cur.status),
-          body_hash: bodyHash,
-          received_at: new Date().toISOString(),
-          processed_at: new Date().toISOString(),
-          tenant_id: tenantId,
-        })
-      }
-    } catch {}
+    // Olay kaydı + processed_at (başarı yolu)
+    await olayKaydet((patch['status'] as string) || String(cur.status))
 
     // Optional email: send only when we progressed to 'received'
     try {
@@ -290,4 +390,4 @@ Deno.serve(async (req: Request) => {
     console.error('Returns webhook error:', _e);
     return json({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
   }
-})
+}

@@ -107,9 +107,22 @@ function satir(rol, sonuclar) {
   const bayat = sonuclar.filter((s) => s.bayat)
   if (!bayat.length) return ''
   const parca = bayat.map((s) => `${s.ad}: ${s.gun} gün (eşik ${s.esik}${s.baslangic ? ', sayaç ilk görülmeden beri' : ''})`)
+  // Brief'i tanımlı ilk bayat görev için başlatıcı komutu (ARC-254): hatırlatma işe dönsün.
+  // Başlat ve damga komutu AYNI göreve işaret eder (denetçi bulgusu: iki görev bayatken farklı göreve gidiyordu).
+  let hedef = bayat[0]
+  let baslat = ''
+  try {
+    const b = bayat.find((s) => require('./gorev-baslat.cjs').BASLATILABILIR.includes(s.ad))
+    if (b) {
+      hedef = b
+      baslat = `başlat: node scripts/hijyen/gorev-baslat.cjs "${b.ad}" --rol ${rol} · bitince `
+    }
+  } catch {
+    /* başlatıcı yüklenemedi: eski satır (fail-open) */
+  }
   return (
-    `⚠GÖREV (${rol}): ${parca.join(' · ')} — yapınca damgala: ` +
-    `node scripts/hijyen/gorev-damga.cjs "${bayat[0].ad}" --rol ${rol}`
+    `⚠GÖREV (${rol}): ${parca.join(' · ')} — ${baslat || 'yapınca '}damgala: ` +
+    `node scripts/hijyen/gorev-damga.cjs "${hedef.ad}" --rol ${rol}`
   )
 }
 

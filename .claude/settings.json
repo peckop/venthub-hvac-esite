@@ -167,6 +167,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\"",
             "statusMessage": "agir-komut-kilidi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/push-kapisi.cjs\"",
+            "statusMessage": "push-kapisi",
+            "timeout": 15
           }
         ]
       },
@@ -235,6 +241,16 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-emir-uyarisi.cjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Agent|SendMessage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/olcum-satiri-uyarisi.cjs\"",
+            "timeout": 10
           }
         ]
       },
@@ -454,6 +470,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pr-birlesti-kart.cjs\"",
             "statusMessage": "pr-birlesti-kart"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ci-uyandirici.cjs\"",
+            "asyncRewake": true,
+            "timeout": 2700
           }
         ]
       },
@@ -528,6 +550,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-beklenti-kapisi.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/soz-bekcisi.cjs\"",
+            "timeout": 15
           },
           {
             "type": "command",

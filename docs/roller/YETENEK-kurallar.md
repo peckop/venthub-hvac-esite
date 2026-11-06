@@ -2,6 +2,14 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/YETENEK.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.** Yeni skill yazma ve mevcut skill'i değiştirme Claude Code'un kendi skill-creator yeteneğiyle yapılır (`anthropic-skills:skill-creator` ya da `skill-creator:skill-creator`): taslak, eval, tetik açıklaması optimizasyonu ve ölçüm onunla koşar. Elle SKILL.md yazmak yasaktır; projedeki yerel `skills-creator` bunun yerine geçmez. Olay: YETENEK skill'leri elle yazmıştı; kural 3 Kasım 2026'da OPS penceresinde konuldu.
+2. **Türkçe tetik duyarlılığı eval ile ölçülür.** Tetik açıklaması Türkçe yazılan kelimelerle de tetiklenir: yazım hatalı, eksiz ya da ekli, büyük-küçük harf ve ı/İ varyantları dahil. skill-creator eval setinde Türkçe tetik cümleleri zorunludur ve ölçülür: tetiklenmesi gereken ve tetiklenmemesi gereken Türkçe örnekler birlikte bulunur. Olay: aynı kural (3 Kasım 2026, OPS penceresi); skill'ler Türkçe yazılan istekle tetiklenmeli.
+3. **Kanıt PR gövdesinde durur.** Skill ekleyen ya da değiştiren PR'ın gövdesinde skill-creator eval raporu (Türkçe tetik isabeti: tetiklenmesi gerekenlerin ve gerekmeyenlerin sonucu) bulunur; raporsuz skill PR'ı eksiktir. Olay: aynı kural (3 Kasım 2026, OPS penceresi).
+4. **Skill PR'ı üç ek dosyaya dokunabilir; tavan artışı Recep kararıdır.** YETENEK skill PR'ında `src/__tests__/conformance/skill-yuku-butcesi.test.ts` (bütçe tavanı), `diff-review-taban.test.ts` ve araç envanterindeki skill satırını (`docs/audits/arac-envanteri-2026-09-07.md`) değiştirebilir. Bütçe tavanını artırmak Recep kararıdır: OPS iletir, ölçülmüş aşım ve sınav sonucu gerekir. Olay: OPS-232 (6 Kasım 2026), sahiplik açığı.
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 
 ## Recep'e mesaj kuralları (ayrıntı; yöneten metin `~/.claude/output-styles/recep.md`)
@@ -9,7 +17,9 @@
 - (OPS hariç) tabloya yalnız KENDİ kartların girer; çok departmanlı genel resmi OPS verir; çok elzemse tablo dışında tek cümle hatırlat.
 - (OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider, Recep'e ANLATILMAZ; Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). OPS Recep'e filo durumunu konsolide tabloyla kendisi verir.
 - (OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde ya da durum sorduğunda son rapordan beri kartında değişen yoksa cevap TEK cümledir; bekleyen kartlar her cevapta yeniden dökülmez, tabloya yalnız durumu değişen ya da Recep'in adıyla sorduğu kart girer. İşi kalmayan departman bunu Recep'e değil OPS'a yazar. Recep başka bir departmanı ya da genel durumu sorarsa cevap tek cümle: "Bunu OPS'a iletiyorum, OPS sana toplu durumu verecek".
-- İşin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok) (OPS hariç).
+- İşin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa "<DEPARTMAN ADI> işini bekliyor" yaz (bekleyen departmanın adı yazılır, "başka departman" denmez; departman değilse neyi beklediği yazılır: CI, Recep onayı, dış kişi) (OPS hariç).
+- (OPS hariç) Recep'e karar sorusu ya da "Recep'te:" satırı yazılmaz: karar gereken konu OPS'a SendMessage ile gider (kart no + tek satır soru + önerim); OPS kokpitte toplar, Recep'e sorar, cevabı departmana iletir. Recep departman penceresine kendisi yazarsa departman cevap verir, karar sorusunu yine OPS üzerinden yürütür. İstisna yok: canlı yazım "yaz" sözü de OPS penceresindedir (OPS-203, HRT-100).
+- (OPS) Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe); altında akan cümlelerle: ne bu, hiç çalıştı mı, işimize yarar mı, aktif etmezsek ne olur, önerim.
 - Durum sütunu yalnız şu yedi kelimeden biri: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen iştir (OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"). Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır.
 - Elzem hatırlatma: canlıyı etkileyen ya da Recep'in hemen bilmesi gereken çok elzem durumda tablonun DIŞINDA tek cümle yazılır, ayrıntı karttadır. Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS'a yaz.
 - 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez).
@@ -37,7 +47,7 @@
 - Süren iş ancak OPS açıkça "X'i bırak" derse bırakılır; OPS bırak derse sebebini yazar, sen de bıraktığın işin durumunu kartına işlersin. Kendi kendine iş değiştirmek bu kurala aykırıdır.
 
 ## Birleştirme ve ölçüm kaydı (HRT-60)
-- Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
+- Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json` kanca kayıtları) değişikliği yazmamış bir denetçi alt ajan tam farkı okur; engelleyici bulgu yoksa ARAÇ birleştirir ve hüküm PR'a yazılır. İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep'e gider. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
 - Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).
 - Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).
 - Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.

@@ -11,8 +11,6 @@
     "project_items.Users can insert items in their projects": 153,
     "project_items.Users can update items in their projects": 153,
     "project_items.Users can delete items from their projects": 153,
-    "product_authorities.Product authorities are manageable by admins.": 144,
-    "brands.merged_brands_authenticated_select": 14,
-    "product_families.merged_product_families_authenticated_select": 14
+    "product_authorities.Product authorities are manageable by admins.": 144
   }
 }

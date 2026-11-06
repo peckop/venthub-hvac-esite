@@ -39,7 +39,7 @@ function kartKapatSatirlari(pr, govde, depo = 'peckop/venthub-hvac-esite') {
     return [`KART KAPAT: ${nolar.join(', ')} — PR #${pr} BIRDEN COK karta bagli; otomatik karar yok, her kartin BITIS maddesini ayri degerlendir.`]
   }
   return [
-    `KART KAPAT: ${nolar[0]} — PR #${pr} birlesti. Kartin BITIS maddesi bu PR ile tamamsa: add_check (command: gh api repos/${depo}/pulls/${pr}/merge) → verify_completion → move_task done.`,
+    `KART KAPAT: ${nolar[0]} — PR #${pr} birlesti. Kartin BITIS maddesi bu PR ile tamamsa: add_check (checkType: command, checkNotes: gh api repos/${depo}/pulls/${pr}/merge; "command" diye alan YOK, yok sayilir ve kriter manual olur) → verify_completion → move_task done.`,
     `          Kartin baska acik PR'i/isi varsa KAPATMA; karta "PR #${pr} birlesti" notu dus.`,
   ]
 }

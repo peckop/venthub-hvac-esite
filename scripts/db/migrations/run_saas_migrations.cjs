@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');
+const { pgTls } = require('../pg-tls.cjs');
 
 // Load environment variables from .env if available
 try {
@@ -15,7 +16,7 @@ if (!connectionString) throw new Error("DATABASE_URL environment variable is req
 
 const client = new Client({
   connectionString,
-  ssl: { rejectUnauthorized: false }
+  ssl: pgTls(connectionString)
 });
 
 const migrationFiles = [

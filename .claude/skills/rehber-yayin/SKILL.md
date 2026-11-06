@@ -26,8 +26,8 @@ metadata:
 | Doğrulama turu, düzeltme, tam yeniden tur | B5–B6 | BLOG (hüküm BLOG'da; 3g MEVZUAT) |
 | Önizleme gitti, onay bekliyor | B7 | BLOG sunar, Recep onaylar |
 | PR açık ya da birleşti, canlıda ölçülmedi | B8–B10 | BLOG; birleşmeyi OPS onaylar |
-| Canlı 200, dizin isteği ya da IndexNow yok | B11–B12 | GEO-SEO |
-| Yayın sonrası ölçüm, kaynak bakımı | B13–B16 | GEO-SEO ölçer, BLOG yorumlar |
+| Canlı 200, dizin isteği ya da IndexNow yok | B11–B12 | GEO-SEO (akış: `dizin-takip` skill'i; IndexNow anahtarı ve komutu Y2) |
+| Yayın sonrası ölçüm, kaynak bakımı | B13–B16 | GEO-SEO ölçer (`seo-olcum` skill'i), BLOG yorumlar |
 
 ## Her basamakta üç şeyi söyle
 

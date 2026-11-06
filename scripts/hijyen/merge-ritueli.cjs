@@ -221,7 +221,9 @@ const ONAY_ASGARI = 20
  */
 function onayGecerli(ham) {
   if (ham === undefined || ham === null) return { gecerli: false, sebep: 'verilmedi', metin: '' }
-  const metin = String(ham).trim()
+  // Tek satıra indirilir: PR yorumuna "> " ile yazılan çok satırlı onayın 2. satırı çıplak kalır ve madde 7'nin bulgu/kapanış
+  // işaretini taşıyabilir (denetçi, ARC-262).
+  const metin = String(ham).replace(/\s*[\r\n\u2028\u2029]+\s*/g, ' ').trim()
   if (!metin) return { gecerli: false, sebep: 'BOS', metin: '' }
   if (metin.length < ONAY_ASGARI) {
     return {
@@ -343,7 +345,9 @@ function degerlendir(girdi) {
         'OTOMATIK uygulama). Serit KENDI indirmez.' +
         (girdi.onay !== undefined && girdi.onay !== null ? '  ⚠--onay REDDEDILDI: ' + onay.sebep : ''))
     }
-  } else if (girdi.onay !== undefined && girdi.onay !== null) {
+  } else if (girdi.onay !== undefined && girdi.onay !== null &&
+    !(Array.isArray(girdi.functionsDegisen) && girdi.functionsDegisen.length)) {
+    // (Edge değişikliği varsa onay madde 6'nın; burada "gereksiz" denmez.)
     // Migration YOKKEN onay: kapiyi acmaz (zaten acik), ama SESSIZ de gecmez — gereksiz onay,
     // "onay aliskanligi" doguracak ilk adimdir ve bir sonraki sefer migration'li PR'da refleks olur.
     ekle(5, 'MIGRATION 0', true, '⚠--onay GEREKSIZ verildi: migration 0, acilacak kapi yok')
@@ -351,7 +355,98 @@ function degerlendir(girdi) {
     ekle(5, 'MIGRATION 0', true)
   }
 
+  // 6 — EDGE FUNCTIONS (ARC-259, OPS 6 Kasım): supabase/functions/** değişikliği EDGE/OPS tam okuma ister.
+  // `undefined` = çağıran ölçmedi (eski fikstürler); `null` = OKUNAMADI (fail-closed); dizi = ölçüldü.
+  if (girdi.functionsDegisen === null) {
+    ekle(6, 'EDGE FUNCTIONS 0', false, 'functions diff\'i OKUNAMADI — olculemedi (fail-closed)')
+  } else if (Array.isArray(girdi.functionsDegisen)) {
+    if (girdi.functionsDegisen.length) {
+      const dosyalar = girdi.functionsDegisen.length + ' dosya: ' +
+        girdi.functionsDegisen.slice(0, 3).join(', ') + (girdi.functionsDegisen.length > 3 ? ' …' : '')
+      if (onay.gecerli) {
+        // ARC-262: Recep onaylı Edge değişikliği de ritüelden geçer (madde 5 ile aynı --onay kuralı, tek ölçüt).
+        ekle(6, 'EDGE FUNCTIONS ' + girdi.functionsDegisen.length + ' — RECEP ONAYI KANITLI', true,
+          onay.metin + ' · ' + dosyalar)
+      } else {
+        ekle(6, 'EDGE FUNCTIONS 0', false,
+          'Edge degisikligi: EDGE/OPS tam okuma · ' + dosyalar +
+          '  (autoMode kurali functions degisikligini reddeder; #2272 bu bosluktan gecmisti)' +
+          (girdi.onay !== undefined && girdi.onay !== null ? '  ⚠--onay REDDEDILDI: ' + onay.sebep : ''))
+      }
+    } else {
+      ekle(6, 'EDGE FUNCTIONS 0', true)
+    }
+  }
+
+  // 7 — AÇIK İNCELEME BULGUSU (ARC-259): kapanmamış "DÜZELTME GEREKİR" / MEDIUM-HIGH bulgusu son commit'ten SONRA.
+  if (girdi.inceleme === null) {
+    ekle(7, 'ACIK INCELEME BULGUSU 0', false, 'PR yorumlari/commit tarihi OKUNAMADI — olculemedi (fail-closed)')
+  } else if (girdi.inceleme !== undefined) {
+    const acik = acikIncelemeBulgusu(girdi.inceleme)
+    ekle(7, 'ACIK INCELEME BULGUSU 0', !acik.acik, acik.acik ? acik.detay : '')
+  }
+
   return { maddeler, kirmizi: maddeler.filter((m) => !m.gecti).length }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ARC-259 — Edge functions ve açık inceleme bulgusu (saf yardımcılar)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** İnceleme yorumundaki bulgu işareti: "DÜZELTME GEREKİR" ya da satır başında MEDIUM/HIGH başlığı. */
+const BULGU_ISARETI = /D[ÜUüu]ZELTME GEREK[İIiı]R/i
+/** Denetçi sözlüğü: ENGELLEYİCİ-VAR yalnız satır başında bulgudur (hüküm yorumu cümle içinde andığında tetiklemesin). */
+const ENGELLEYICI_VAR = /^[\s>*#|\-\d.)[(]*\**\s*ENGELLEY[İIiı]C[İIiı]-VAR/i
+/** Satır başında (liste/numara/köşeli parantez/tablo/kalın süsünden sonra) MEDIUM ya da HIGH; ya da "Bulgu 1 (HIGH)". */
+const SIDDET_BASLIGI = /^[\s>*#|\-\d.)[(]*\**\s*(MEDIUM|HIGH)\b|^[^.\n]{0,30}\((MEDIUM|HIGH)\)/
+/** "yok / bulunmadı / 0" geçen şiddet satırı bulgu değildir ("HIGH: yok", "MEDIUM/HIGH bulgu yok"). */
+const OLUMSUZ = /(?<![\p{L}\d])(yok|bulunmuyor|bulunmad[ıi]|s[ıi]f[ıi]r|0)(?![\p{L}\d])/iu
+/**
+ * Bulguların kapandığını bildiren yorum işareti: SATIR BAŞINDA olmalı. Sebep: ritüelin KIRMIZI mesajı bu ifadeyi
+ * cümle ortasında taşır; çıktı PR'a yapıştırılırsa kendi bulgusunu kapatmasın. "KAPANDI DEĞİL" kapatmaz.
+ */
+const KAPANIS_ISARETI = /^[\s>*#-]*(?:[İIiı]NCELEME KAPAND[İIiı]|B[UuÜüİIiı]LGULAR G[İIiı]DER[İIiı]LD[İIiı])(?!\s*DE[ĞG][İIiı]L)/im
+
+/** Yorum gövdesi bulgu içeriyor mu? NBSP/NFD normalleştirilir; şiddet başlığı satır satır ve olumsuzluk dışlanarak ölçülür. */
+function bulguVarMi(govde) {
+  const metin = String(govde || '').normalize('NFC').replace(/ /g, ' ')
+  if (BULGU_ISARETI.test(metin)) return true
+  return metin.split(/\r?\n/).some((s) => ENGELLEYICI_VAR.test(s) || (SIDDET_BASLIGI.test(s) && !OLUMSUZ.test(s)))
+}
+
+/**
+ * Edge değişikliği: `supabase/functions/` altındaki yollar. SAF.
+ * @param {string[]|null|undefined} dosyalar
+ */
+function edgeDegisiklikleri(dosyalar) {
+  return (dosyalar || []).filter((d) => String(d).replace(/\\/g, '/').startsWith('supabase/functions/'))
+}
+
+/**
+ * Açık inceleme bulgusu mu? SAF.
+ * @param {{yorumlar:Array<{govde:string,tarih:string}>, sonCommit:string}} girdi
+ *   `yorumlar`: PR yorumları + inceleme gövdeleri; `sonCommit`: son commit tarihi (ISO). Satır içi (diff) inceleme
+ *   iş parçacıkları `gh pr view --json` ile gelmez: bu ölçümün bilinen sınırıdır.
+ * Kural: bulgu işaretli yorum son commit'ten SONRAYSA (düzeltme gelmemiş) ve ondan sonra kapanış yorumu yoksa AÇIK.
+ */
+function acikIncelemeBulgusu(girdi) {
+  const son = Date.parse(girdi.sonCommit)
+  if (!Number.isFinite(son)) return { acik: true, detay: 'son commit tarihi OKUNAMADI (fail-closed)' }
+  const yorumlar = (girdi.yorumlar || [])
+    .map((y) => ({ govde: String(y.govde || ''), t: Date.parse(y.tarih) }))
+    .filter((y) => Number.isFinite(y.t))
+  for (const y of yorumlar) {
+    if (y.t <= son || !bulguVarMi(y.govde)) continue
+    const kapandi = yorumlar.some((k) => k.t > y.t && KAPANIS_ISARETI.test(k.govde.normalize('NFC').replace(/ /g, ' ')))
+    if (!kapandi) {
+      return {
+        acik: true,
+        detay: 'son commit\'ten SONRA yazilmis kapanmamis inceleme bulgusu (' + new Date(y.t).toISOString() +
+          '): once duzelt ve it, ya da yeni bir yorumun BIRINCI satirina kapanis ifadesini yaz (docs/roller/ARAC-kurallar.md)',
+      }
+    }
+  }
+  return { acik: false, detay: '' }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -404,7 +499,7 @@ function ozDogrulama(yerelMetin, masterMetin) {
 
 module.exports = {
   ozDogrulama,
-  turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli,
+  turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
 
@@ -432,7 +527,7 @@ if (require.main === module) {
       'KULLANIM\n  node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>] [--merge] [--onay="..."]\n' +
       '  --merge : bes madde YESIL ise merge\'i bu betik yapar (gh pr merge --squash --delete-branch).\n' +
       '            Kapi ve eylem AYNI surecte; pipe/&& zincirine kapi konmaz (cikis kodu yutulur).\n' +
-      '  --onay  : migration\'li PR\'da madde 5\'i acar. Metin RECEP\'IN KENDI SOZU olmali\n' +
+      '  --onay  : migration\'li PR\'da madde 5\'i, supabase/functions degisen PR\'da madde 6\'yi acar (ARC-262). Metin RECEP\'IN KENDI SOZU olmali\n' +
       '            (kim · nerede · ne zaman), asgari ' + ONAY_ASGARI + ' karakter. --merge ile\n' +
       '            birlikte verilirse metin PR\'a YORUM olarak yazilir (kanit PR\'da kalir).\n' +
       '            Diger dort madde kirmizi ise --onay HICBIR SEYI acmaz.\n\n' +
@@ -505,6 +600,25 @@ if (require.main === module) {
       .split('\n').filter(Boolean)
   } catch { migrationlar = null }
 
+  // ARC-259: Edge functions değişikliği + açık inceleme bulgusu. Ölçülemezse null (fail-closed, KIRMIZI).
+  let functionsDegisen = null
+  try {
+    functionsDegisen = edgeDegisiklikleri(
+      git(['diff', '--name-only', 'origin/master...origin/' + dal, '--', 'supabase/functions/']).split('\n').filter(Boolean),
+    )
+  } catch { functionsDegisen = null }
+
+  let inceleme = null
+  try {
+    const j = JSON.parse(gh(['pr', 'view', pr, '--json', 'comments,reviews,commits']))
+    const yorumlar = [
+      ...(j.comments || []).map((c) => ({ govde: c.body, tarih: c.createdAt })),
+      ...(j.reviews || []).map((r) => ({ govde: r.body, tarih: r.submittedAt })),
+    ]
+    const sonCommit = (j.commits || []).map((c) => c.committedDate).filter(Boolean).sort().pop()
+    inceleme = sonCommit ? { yorumlar, sonCommit } : null
+  } catch { inceleme = null }
+
   yaz('  turetme: ' + okunanDosya + ' workflow okundu, zorunlu cekirdek ' + cekirdek.length +
     ' kapi: ' + (cekirdek.join(', ') || '(BOS)'))
   // §21: kabul edilen boşluk SESSİZ olamaz.
@@ -513,7 +627,7 @@ if (require.main === module) {
   for (const s of sinirlar) yaz('  ⚠sinir : ' + s)
 
   const { maddeler, kirmizi } = degerlendir({
-    pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY,
+    pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY, functionsDegisen, inceleme,
   })
   for (const m of maddeler) {
     yaz((m.gecti ? '  YESIL   ' : '  ⛔KIRMIZI ') + m.no + '. ' + m.ad + (m.detay ? '  — ' + m.detay : ''))
@@ -533,7 +647,7 @@ if (require.main === module) {
 
   yaz('')
   yaz(kirmizi === 0
-    ? 'SONUC: YESIL — bes madde saglandi, self-merge serbest.'
+    ? 'SONUC: YESIL — maddeler saglandi (5 + Edge functions + acik inceleme bulgusu), self-merge serbest.'
     : 'SONUC: ⛔KIRMIZI — ' + kirmizi + ' madde saglanmadi. MERGE ETME.')
   if (kirmizi !== 0) {
     // Kirmizi STDERR'e de yazilir: `| tail` ile kirpilan stdout'ta kaybolmasin.
@@ -546,11 +660,17 @@ if (require.main === module) {
     // patlarsa hic yazilmaz — oysa onayin verildigi o zaman da dogrudur. Ayrica bu yorum
     // "merge edildi" DEMEZ, "onay sudur" der; sirasi yuzunden yanlis bir sey iddia etmez.
     // ⚠Yorum YALNIZ --merge ile yazilir: --onay tek basina bir OLCUMDUR, eylem degil.
-    if (onayGecerli(ONAY).gecerli && migrationlar && migrationlar.length) {
+    const edgeSayisi = Array.isArray(functionsDegisen) ? functionsDegisen.length : 0
+    if (onayGecerli(ONAY).gecerli && ((migrationlar && migrationlar.length) || edgeSayisi)) {
       try {
         gh(['pr', 'comment', pr, '--body',
-          'MIGRATION ONAYI (merge-ritueli.cjs --onay) — ' + migrationlar.length +
-          ' migration bu PR ile prod\'a OTOMATIK uygulanacak (kural 13).\n\n> ' + ONAY +
+          (migrationlar && migrationlar.length
+            ? 'MIGRATION ONAYI (merge-ritueli.cjs --onay) — ' + migrationlar.length +
+              ' migration bu PR ile prod\'a OTOMATIK uygulanacak (kural 13).'
+            : '') +
+          (edgeSayisi ? (migrationlar && migrationlar.length ? '\n' : '') +
+            'EDGE ONAYI (merge-ritueli.cjs --onay) — ' + edgeSayisi + ' supabase/functions dosyasi degisiyor.' : '') +
+          '\n\n> ' + onayGecerli(ONAY).metin +
           '\n\nBu satir betik tarafindan, merge\'den ONCE yazildi; kanit PR\'da kalir.'])
         yaz('  bilgi   onay metni PR\'a yorum olarak yazildi')
       } catch (e) {

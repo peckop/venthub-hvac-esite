@@ -30,6 +30,9 @@ import {
  * (tr/en × 2 = 4 satır); fikstürden yalnız bu dört kayıt çıktı (49 → 45), başka fark yok.
  * YENİLEME KAYDI 2: ALT-57 (2026-10-12) `/(.*)` başlık grubuna `Permissions-Policy: camera=(), microphone=(),
  * geolocation=()` ekledi; fikstüre yalnız bu başlık girdisi eklendi (adres değişmedi: yönlendirme ve yeniden yazım aynı).
+ * YENİLEME KAYDI 3: OPS-211 (2026-11-03, PR #2207) CSP rapor ucu ekledi: `/(.*)` grubuna `Reporting-Endpoints:
+ * csp-ucu="/api/csp-rapor"` başlığı eklendi ve `Content-Security-Policy-Report-Only` değerinin sonuna
+ * `; report-uri /api/csp-rapor; report-to csp-ucu` geldi; yönlendirmeler (44) ve yeniden yazımlar aynı, başka fark yok.
  */
 
 const ANAHTAR = 'NEXT_PUBLIC_ADRES_DILI'

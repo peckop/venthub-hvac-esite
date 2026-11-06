@@ -31,6 +31,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     // BLG-22 (31 Ekim 2026): yuvarlak aile REC-397 ile arşivlendi; rehber aynı serinin aktif dikdörtgen ailesine bağlanır.
     ['vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari', 'Vortice VORT Commercial In-Line Dikdörtgen Kanal Fanları'],
     ['vortice-radon-serisi-kanal-fanlari', 'Vortice Radon Serisi Kanal Fanları'],
+    // BLG-39 (4 Kasım 2026): kanal tipi fan rehberi beşinci aile olarak Avens dikdörtgen kanal ailesine bağlanır; ölçüm: 200, canonical kendisi, noindex yok.
+    ['avens-dikdortgen-kanal-tipi-radyal-fanlar', 'AVenS Dikdörtgen Kanal Tipi Radyal Fanlar'],
     // Isı geri kazanım cihazı nedir yazısı (BLG-20, 2026-11): üç aile sayfası canlıda 200 verir (31 Ekim ölçümü).
     ['vortice-vort-hr-isi-geri-kazanim', 'Vortice VORT HR Isı Geri Kazanım'],
     ['vortice-vort-mono', 'Vortice VORT Mono'],
@@ -124,6 +126,11 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     takmaAd: async (tur, slug) => takma[`${tur}:${slug}`] ?? null,
     marka: (slug) => slug === 'vortice',
     aileKarti: async (slug) => (aileler.has(slug) ? { slug, ad: aileler.get(slug) as string } : null),
+    // URN-151: görünen ad slug'dan türetilen sentetik ad; kısa metin yalnız TR'de dolu (canlıda EN çoğu kategoride boş).
+    kategoriKarti: async (slug, dil) =>
+      kategoriler[slug]
+        ? { slug, ad: `${dil === 'en' ? 'Category' : 'Kategori'} ${slug}`, aciklama: dil === 'en' ? '' : `${slug} kategorisinin kısa metni.` }
+        : null,
     ...ek,
   }
 }

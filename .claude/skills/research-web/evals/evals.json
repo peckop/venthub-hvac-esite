@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "fan verimliliği yönetmeliğinin güncel hâli ne, kaynak göster",
+    "bunu web'de araştır: Next.js 15.5 değişiklikleri",
+    "kaynaklı özet çıkar: ErP 2025 gereklilikleri",
+    "iki bulut sağlayıcıyı karşılaştırmalı araştır",
+    "Araştır: İyzico webhook imza yöntemi",
+    "GÜNCEL YÖNETMELİK NE: ısıtma sistemleri",
+    "bu konuda internette ne yazıyor, kaynak göstererek anlat",
+    "arastir: supabase edge function limitleri",
+    "ErP 2025 hakkında araştırma yap",
+    "rakip ürünleri araştır ve kaynaklarıyla özetle",
+    "soruyu parçala, kaynakları sırala, bulguları sentezle",
+    "web araştırması yap: klima santrali sertifikaları"
+  ],
+  "should_not_trigger": [
+    "React 19 için güncel sürüm ne",
+    "bağımlılığı 5'ten 6'ya yükselt ve geçiş planı çıkar",
+    "kod tabanında nerede tanımlı",
+    "katalog PDF'inde bu ürünün debisi ne yazıyor",
+    "yeni blog yazısı yaz",
+    "testi koş",
+    "YouTube'dan montaj videosu bul",
+    "bana uygun bir skill bul"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "VAV damper nedir diye bir tanım sayfası yaz",
+    "Rehber yazısı yaz: hava perdesi seçimi",
+    "blog yazısı hazırla, konu klima santrali bakımı",
+    "iki fan tipini karşılaştırma sayfası yaz",
+    "SEO içerik üret: ısı geri kazanım cihazı",
+    "SSS sayfası yaz, her sayı kaynaklı olsun",
+    "yapay zekâ yanıtlarında alıntılanacak bir rehber yaz",
+    "Karşılaştırma sayfasi yaz: aksiyel ve santrifüj fan",
+    "BLOG YAZISI YAZ: kanal tipi fanlar",
+    "arama motoru ve GEO için tanım sayfası hazırla",
+    "bu konuda 1200 kelimelik rehber içeriği yaz",
+    "ürün kategorisi için SEO içeriği üret"
+  ],
+  "should_not_trigger": [
+    "blog yazısı yayınlandı, dizine ekle",
+    "robots.txt'e GPTBot kuralı ekle",
+    "Supabase tablosuna RLS policy yaz",
+    "git commit at",
+    "ürün sayfasının LCP süresini düşür",
+    "bu metni İngilizceye çevir",
+    "fiyat listesini CSV olarak dışa aktar",
+    "rehber yazısı yayına çıkıyor, sıradaki basamak ne"
+  ]
+}

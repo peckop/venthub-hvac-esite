@@ -97,7 +97,7 @@ export const en: typeof tr = {
         // Decision 288 (Recep, OPS-76): matches the TR name 'Radyal (Santrifüj) Fanlar'; address and key are unchanged.
         radial: 'Radial (Centrifugal) Fans',
         roof: 'Roof Fans',
-        'axial-ind': 'Industrial Axial Fans',
+        'axial-ind': 'Axial Fans',
         'air-curtain': 'Air Curtains',
         conditioning: 'Air Conditioning Solutions',
         'rect-duct': 'Rectangular Duct Fans',
@@ -300,6 +300,8 @@ export const en: typeof tr = {
       icindekiler: 'Contents',
       urunlerBaslik: 'Related product families',
       urunDugme: 'View family',
+      kategorilerBaslik: 'Related product categories',
+      kategoriDugme: 'View category',
       ilgiliBaslik: 'Related articles',
       teklifBaslik: 'Get a quote for your project',
       teklifAciklama: 'Describe your needs in the contact form; we will prepare a quote for the right product.',

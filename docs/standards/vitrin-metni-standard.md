@@ -5,7 +5,7 @@
 > vitrin açıklamasına karıştı ve 11 gün canlıda kaldı (müşteri ekranı + meta description + JSON-LD).
 > Karar 42 o tek kaydı onardı ama **cetvel yazılmadı**; karar 45'te aynı deseni taşıyan 274 blok
 > parçası ölçüldü. Bu dosya o ölçümün kuralıdır.
-> **Sahibi:** URUN şeridi. Yazma betiği kapıları (`scripts/icerik-hatti/**`) ALTYAPI şeridinde.
+> **Sahibi:** URUN şeridi. Yazma betikleri ve yazma kapıları (`scripts/icerik-hatti/**`) KATALOG şeridinde; ALTYAPI'nın payı yalnız CI, bağımlılık ve güvenlik kapılarıdır.
 > **İlgili cetveller:** `catalog-ingestion-standard.md` (kaynak dizini, çıkarım),
 > `rendering-cache-standard.md` (hangi sayfa nasıl üretilir), `product-schema-standard.md`.
 
@@ -69,7 +69,7 @@ biçimleri (2026-09-17/18, 38 aile / 274 parça):
 [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) yalnız **atıf biçimlerini**
 arıyor (`[s.NN]`, `[DB]`, `Kaynak s.NN`); yukarıdaki on biçimin dokuzu oradan sessizce geçer.
 Karar 42 migration'ı bunu kendi yorumunda zaten yazıyordu. Deseni KAPI 5'e genişletmek
-**ALTYAPI şeridinin borcudur** (dosya o şeritte), K8 tablosunda adıyla duruyor.
+**KATALOG şeridinin borcudur** (dosya o şeritte), K8 tablosunda adıyla duruyor.
 
 ⚠**Desen iki turda ölçülerek genişletildi ve ilk teşhis yarım doğruydu.** İlk hâlinde desen kendi
 pozitif kümesinin %10'unu kaçırıyordu: karar 45 planındaki 39 parçanın 4'ünü görmüyordu. Birinci
@@ -227,7 +227,7 @@ birlikte yapılır (REC-206 ayrı liste (i)).
 | Migration guard 3a | veri onarımı migration'ı | çizilen **8** alanda (aile 6 + `products.description_i18n` 2) not deseni = 0 | koşum başına bir kez |
 | Migration guard 3b | veri onarımı migration'ı | `bloklar_tr` + `maddeler_tr`'de desen, **adıyla muaf 6 parça dışında** 0 eşleşme | koşum başına bir kez |
 | Migration guard 3c | veri onarımı migration'ı | dokunulmaması gereken **20** parçanın md5'i birebir (K3'ün ve muafiyetin kanıtı) | koşum başına bir kez |
-| KAPI 5 | [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) | yazma anında **yalnız atıf biçimleri** (`[s.NN]`, `[DB]`, `Kaynak s.NN`) | ⛔K2'nin on biçiminden dokuzu kapı dışı — **ALTYAPI borcu**, karar 42'den devir |
+| KAPI 5 | [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) | yazma anında **yalnız atıf biçimleri** (`[s.NN]`, `[DB]`, `Kaynak s.NN`) | ⛔K2'nin on biçiminden dokuzu kapı dışı — **KATALOG borcu**, karar 42'den devir |
 | INV-DIL-DUSUSU-1 | [dil-dususu-yok.test.ts](src/test/dil-dususu-yok.test.ts) + [dil-dususu.e2e.ts](e2e/dil-dususu.e2e.ts) | K10: kaynakta çapraz dil düşüşü deseni 0; EN ürün ve kategori sayfasında TR gövde metni 0 (gerçek sunucu HTML'i) | yinelenen — her PR |
 | Canlı ölçüm | merge sonrası, elle | anon rolüyle `get_family_detail` + `get_product_families_enriched` çıktısında desen, **muaf 6 parça dışında** 0 | ⛔kod karşılığı YOK (elle prosedür) |
 

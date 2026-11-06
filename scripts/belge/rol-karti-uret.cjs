@@ -108,7 +108,9 @@ const RECEP_MESAJ_KURALLARI = [
   '- (OPS hariç) tabloya yalnız KENDİ kartların girer; çok departmanlı genel resmi OPS verir; çok elzemse tablo dışında tek cümle hatırlat.',
   '- (OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider, Recep\'e ANLATILMAZ; Recep\'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). OPS Recep\'e filo durumunu konsolide tabloyla kendisi verir.',
   '- (OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde ya da durum sorduğunda son rapordan beri kartında değişen yoksa cevap TEK cümledir; bekleyen kartlar her cevapta yeniden dökülmez, tabloya yalnız durumu değişen ya da Recep\'in adıyla sorduğu kart girer. İşi kalmayan departman bunu Recep\'e değil OPS\'a yazar. Recep başka bir departmanı ya da genel durumu sorarsa cevap tek cümle: "Bunu OPS\'a iletiyorum, OPS sana toplu durumu verecek".',
-  '- İşin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok) (OPS hariç).',
+  '- İşin başkasını bekliyorsa Sorumlu yine "ben" kalır, Sırada sütununa "<DEPARTMAN ADI> işini bekliyor" yaz (bekleyen departmanın adı yazılır, "başka departman" denmez; departman değilse neyi beklediği yazılır: CI, Recep onayı, dış kişi) (OPS hariç).',
+  '- (OPS hariç) Recep\'e karar sorusu ya da "Recep\'te:" satırı yazılmaz: karar gereken konu OPS\'a SendMessage ile gider (kart no + tek satır soru + önerim); OPS kokpitte toplar, Recep\'e sorar, cevabı departmana iletir. Recep departman penceresine kendisi yazarsa departman cevap verir, karar sorusunu yine OPS üzerinden yürütür. İstisna yok: canlı yazım "yaz" sözü de OPS penceresindedir (OPS-203, HRT-100).',
+  '- (OPS) Karar sorusu tablodaki Onayında satırıdır (Önerim: evet/hayır + tek cümle gerekçe); altında akan cümlelerle: ne bu, hiç çalıştı mı, işimize yarar mı, aktif etmezsek ne olur, önerim.',
   '- Durum sütunu yalnız şu yedi kelimeden biri: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen iştir (OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"). Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır.',
   '- Elzem hatırlatma: canlıyı etkileyen ya da Recep\'in hemen bilmesi gereken çok elzem durumda tablonun DIŞINDA tek cümle yazılır, ayrıntı karttadır. Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS\'a yaz.',
   '- 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez).',
@@ -184,7 +186,7 @@ const SUREN_IS_KORUMA_KURALI = [
  */
 const BIRLESTIRME_KURALI = [
   '## Birleştirme ve ölçüm kaydı (HRT-60)',
-  '- Kendi PR\'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR\'da (`.claude/hooks`, `scripts/board`, `settings.json`) önce OPS "okundu, uygun" yazar. Migration içeren PR Recep\'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep\'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).',
+  '- Kendi PR\'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR\'da (`.claude/hooks`, `scripts/board`, `settings.json` kanca kayıtları) değişikliği yazmamış bir denetçi alt ajan tam farkı okur; engelleyici bulgu yoksa ARAÇ birleştirir ve hüküm PR\'a yazılır. İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep\'e gider. Migration içeren PR Recep\'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep\'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).',
   '- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).',
   '- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR\'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).',
   '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.',
@@ -223,7 +225,7 @@ const OPS_OKUMA_KURALI_ROLLERI = ['OPS']
 const OPS_OKUMA_KURALI = [
   '## Okuma, kaynak ve defter (HRT-60)',
   '- OPS departman PR\'ını birleştirmez: tam farkı okur, "okundu, uygun" ya da düzeltmeyi yazar, sıra verir; ritüelle yalnız KENDİ PR\'ını birleştirir.',
-  '- Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, departman iyileştirmesi ve kural metninin onay makamı OPS\'tır (Recep 16 Ekim); deny listesi gevşetilmez. İzin kuralı, izin modu, onay veren kanca, .mcp.json ve hesap Recep sözüyle yapılır; kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, Recep\'e gider. Recep\'te ayrıca canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, para harcatan her şey, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur ve "okundu, uygun" yazar.',
+  '- Kanca (kapıyı gevşetmeyen), izin içermeyen ayar, departman iyileştirmesi ve kural metninin onay makamı OPS\'tır (Recep 16 Ekim); deny listesi gevşetilmez. İzin kuralı, izin modu, onay veren kanca, .mcp.json ve hesap Recep sözüyle yapılır; kapıyı, kancayı, izin kuralını ya da Recep kapısı metnini GEVŞETEN öneri OPS onayıyla geçmez, Recep\'e gider. Recep\'te ayrıca canlı veritabanı yazımı ("yaz"), migration\'lı birleştirme, para harcatan her şey, geri alınamaz silme, sır yazımı, geçmişi silen git komutu ve menü yeri, adres, fiyat gibi ürün kararları kalır. Kanca ve ayar PR\'ını (OPS\'unki dahil) bağımsız denetçi alt ajan okur, ARAÇ birleştirir (Recep 4 Kasım); OPS yalnız izin, deny, MCP ya da defaultMode değiştirenleri okur.',
   '- Recep\'e giden her olgu cümlesi (doğru, yanlış, var, yok, kaç) yanında kaynağıyla gider: dosya:satır, canlı adres ya da komut; kaynak yoksa "ölçülmedi" yazılır.',
   '- Kanca, ayar ve MCP PR\'ının tam fark okumasında sabit soru: "bu değişiklik başka bir sürümün ya da ağacın canlı veriye ulaşmasını mümkün kılıyor mu?" (ritüel maddesi ARAÇ\'ta).',
   '- Emir yazmadan önce alıcının rol kartına bakılır (Görev satırı, "Görev değil" satırı); görev dışı emir yazılmaz (HRT-73: kural eskiden ortak dosyadaydı, OPS kuralı olduğu için buraya taşındı).',
@@ -492,7 +494,7 @@ const CALISMA = [
   '## Çalışma düzeni',
   '- Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree\'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).',
   '- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, is-kayit-duzeni §1) + emirde YÖNTEM + KAYNAK/CETVEL. Linear iş kaydı olarak emekli (karar 324): yeni kayıt açılmaz.',
-  '- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` ile başlar (`Fixes`/`Kayıtsız:` yolları 10-08\'de kapandı); kartsız iş yok, önce kart açılır.',
+  '- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` satırı taşır (`Fixes`/`Kayıtsız:` yolları 10-08\'de kapandı); kartsız iş yok, önce kart açılır.',
   '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar; dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).',
   '- Ders ve hata anında `wrongstack-sage remember` (`audience.roles=[<ROL>]`, tags [rol, ders]); gün sonu raporunda "sage\'e bugün N ders".',
   '- Vitrin, föy ya da yazıda OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı) yazmadan önce resmî kaynaktan al; kaynakta birebir yoksa yazılmaz, yapay zekâ özeti kanıt değildir (`rehber-yazisi-standard.md` R2.3).',
@@ -544,7 +546,7 @@ const ROLLER = {
     yetki: 'Belge temizliği ve emeklilik, rol kartı üretimi (üretici ve departman değişikliğinde PR öncesi harita-dogrulayici), tazelik göstergesi ölçümü (kurulum ARAÇ\'ta).',
     yasak: 'CLAUDE.md değişikliği OPS kapısıdır; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmaz.',
     yetenek: 'plan-challenger, diff-review, alt ajan çürütme, docs/README.md haritası.',
-    durum: 'Açık (REC-400, REC-426).',
+    durum: 'Açık.',
   },
   URUN: {
     gorev: 'Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi, yapısal veri (JSON-LD) üreticisi (GEO-SEO ölçer). Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI\'da kalır. İşe başlarken urun-yapisal-veri-standard §2 ve rendering-cache-standard oku.',
@@ -579,8 +581,8 @@ const ROLLER = {
     dosyalar: 'scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.',
     yetki: 'Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.',
     yasak: 'Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.',
-    yetenek: 'Search Console, PageSpeed ölçümü, seo-audit.',
-    durum: 'Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.',
+    yetenek: 'Search Console (arayüz ve URL Inspection API), Bing Webmaster API (GetUrlInfo, SubmitUrlBatch), Yandex Webmaster (arayüz, yeniden tarama), Google Trends (çapa kuralı), claude-seo:seo-geo ajanı (yalnız yerel, Y2.3), scripts/seo/dizin-takip.mjs, PageSpeed, seo-audit.',
+    durum: 'Açık (asli görev).',
   },
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5, R10.5 (ders listesi), R10.6 (yayın öncesi kontrol) ve R11\'i oku.',
@@ -608,7 +610,7 @@ const ROLLER = {
     dosyalar: 'docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.',
     yetki: 'Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirsiz" hükmü verir; BLOG yazısındaki mevzuat cümlelerini kontrol eder (R5.1); kayıt değişince ilgili departmana bildirir; "ilk anlatan" konu önerir, sırayı Recep belirler.',
     yasak: 'Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).',
-    yetenek: 'Önce NotebookLM (`notebooklm ask`; takip defteri a5f382a4, katalog 8bb600d9); Yayın Ofisi CELEX + SPARQL (EUR-Lex\'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini. Skill: notebook-navigator.',
+    yetenek: 'Yayın Ofisi CELEX + SPARQL (EUR-Lex\'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini; docs/mevzuat/kayit.json. Skill: ce-uygunluk-dosyasi. NotebookLM emekli (karar 419).',
     durum: 'Açık (pencere 3 Kasım\'da açıldı, OPS-210).',
   },
   SATIS: {
@@ -648,13 +650,13 @@ const ROLLER = {
     durum: 'Açık (asli görev; iş azlığı kapatma sebebi değildir). İşler OPS\'tan gelir. Son şerit günü notu 2026-08-28; Linear\'da I18N etiketli kayıt yok. Admin (~256) ve legal (~235) literal sayıları Haziran ölçümü, bayat.',
   },
   YETENEK: {
-    gorev: 'Skill\'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill\'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Departmanların kendi işini ölçmesi departmanların işidir.',
-    gorevDegil: 'departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS).',
-    dosyalar: '`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`. Rol kartlarındaki skill listesinin içeriği YETENEK\'ten gelir, kartı HARİTA\'nın üreticisi yazar.',
+    gorev: 'Skill\'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill\'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.',
+    gorevDegil: 'departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS); elle SKILL.md yazmak.',
+    dosyalar: '`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`; skill PR\'ında skill-yuku-butcesi ve diff-review-taban testleri, envanterde skill satırı (tavan: Recep kararı). Rol kartlarındaki skill listesinin içeriği YETENEK\'ten gelir, kartı üretici yazar.',
     yetki: 'Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını önerir; skill kusurlarını (bayat yol/araç adı, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydeder, `.claude/skills/**` düzeltmesini ayrı PR\'la yapar; haftalık kullanım ölçümü (atanmış ama kullanılmayan kırmızı); amaca bağlanamayan skill\'i kapatır (silmez).',
     yasak: '`.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.',
-    yetenek: 'plan-challenger, verify-before-done, skills-creator (kısmen: `.agent` ağacına yazar), find-skills (kısmen: dış kurulum onay ister), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.',
-    durum: 'Açık. Skill atama tablosunun içeriğini bu rol doldurur (iskelet HARİTA\'da, REC-509).',
+    yetenek: 'plan-challenger, verify-before-done, skills-creator (kısmen: `.agent`\'e yazar), find-skills (dış kurulum onaylı), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.',
+    durum: 'Açık. Skill atama tablosunu bu rol doldurur (iskelet HARİTA\'da, REC-509).',
   },
   // HRT-35 (karar 322, OPS-93, 2026-10-09): tek işi takip; kod yazmaz, işi az olsun ki her zaman açık tutulabilsin.
   TAKIP: {
@@ -870,7 +872,6 @@ const TASLAK_ROLLERI = {
   EDGE: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
   I18N: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
   MARKA: 'departman kapalı (iş dondurma); açılışta sahibi Amaç, Ne zaman ve Nasıl alanlarını yazar',
-  MEVZUAT: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
   SATIS: 'pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar',
 }
 

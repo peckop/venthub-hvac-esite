@@ -84,7 +84,9 @@ vi.mock('@supabase/ssr', () => {
 })
 
 // Helper signature function for Webhook HMAC simulation
-async function computeSignature(secret: string, body: string): Promise<string> {
+// ALT-138: imza `<x-timestamp>.<x-event-id>.<ham gövde>` üzerinden (sabit_zaman.ts::webhookImzaMetni).
+async function computeSignature(secret: string, rawBody: string, ts: string, eventId: string): Promise<string> {
+  const body = `${ts}.${eventId}.${rawBody}`
   const encoder = new TextEncoder()
   const key = await globalThis.crypto.subtle.importKey(
     'raw',
@@ -270,17 +272,17 @@ describe('Tier 5 Adversarial & Coverage Hardening E2E Suite', () => {
     it('6. should reject webhook updates exploiting clock skew or far-future signature timestamps', async () => {
       const payload = { order_number: 'ORD-1', status: 'shipped' }
       const rawBody = JSON.stringify(payload)
-      const sig = await computeSignature('hmac-secret-999', rawBody)
-      
       // Set timestamp 1 hour in the future to test future clock-skew guard
       const futureTime = String(Date.now() + 60 * 60 * 1000)
+      const sig = await computeSignature('hmac-secret-999', rawBody, futureTime, 'EV-A6')
 
       const req = new Request('https://localhost/functions/v1/shipping-webhook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-signature': sig,
-          'x-timestamp': futureTime
+          'x-timestamp': futureTime,
+          'x-event-id': 'EV-A6'
         },
         body: rawBody
       })
@@ -296,16 +298,20 @@ describe('Tier 5 Adversarial & Coverage Hardening E2E Suite', () => {
     // "imza geçerli AMA timestamp hiç gönderilmemiş" halini görmüyordu — replay
     // guard'ın "varsa uygula" (fail-OPEN) olduğu ay boyunca ikisi de yeşil kaldı.
     // Bu test tam o boşluğu kapatır: guard artık ZORUNLU (cetvel §3.5).
+    // ALT-138: zaman damgası artık imzanın parçası; HMAC yolunda damgasız istek imza katmanında
+    // düşer (imzasız alanla doğrulama yok). "Missing timestamp header" dalı yalnız legacy token
+    // yolundan erişilir; o dal da ayrıca sınanır.
     it('7. should reject a correctly signed webhook that omits the timestamp header entirely', async () => {
       const payload = { order_number: 'ORD-1', status: 'shipped' }
       const rawBody = JSON.stringify(payload)
-      const sig = await computeSignature('hmac-secret-999', rawBody)
+      const sig = await computeSignature('hmac-secret-999', rawBody, '', 'EV-A7')
 
       const req = new Request('https://localhost/functions/v1/shipping-webhook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-signature': sig
+          'x-signature': sig,
+          'x-event-id': 'EV-A7'
           // x-timestamp / x-event-time BİLEREK yok
         },
         body: rawBody
@@ -313,7 +319,15 @@ describe('Tier 5 Adversarial & Coverage Hardening E2E Suite', () => {
 
       const res = await simulator.invokeFunction(webhookPath, req)
       expect(res.status).toBe(401)
-      const resBody = await res.json()
+
+      const tokenReq = new Request('https://localhost/functions/v1/shipping-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-webhook-token': 'sandbox-111', 'x-event-id': 'EV-A7' },
+        body: rawBody
+      })
+      const tokenRes = await simulator.invokeFunction(webhookPath, tokenReq)
+      expect(tokenRes.status).toBe(401)
+      const resBody = await tokenRes.json()
       expect(resBody.error).toBe('Missing timestamp header')
     })
   })

@@ -180,3 +180,6 @@ graphify-out/
 *.sqlite3-wal
 *.sqlite3-shm
 *.sqlite3-journal
+
+# Bulut (Linux) oturumlarinda sabit Windows yolu "C:/..." goreli sayilip depo icine klasor acardi (ARC-252)
+/C:/

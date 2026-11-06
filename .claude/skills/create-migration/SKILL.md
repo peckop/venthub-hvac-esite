@@ -1,6 +1,6 @@
 ---
 name: create-migration
-description: VentHub'da yeni Supabase migration dosyası oluşturmanın güvenli yolu — adlandırma, kural-13 zinciri, plan-challenger zorunluluğu ve migration-safety kontrol listesiyle. Migration/DB şema değişikliği istendiğinde kullan.
+description: 'Yeni Supabase migration DOSYASINI açar: damgalı ad, kural-13 zinciri, plan-challenger, güvenlik listesi. "migration yaz", "migration dosyası oluştur", "tabloya kolon, index, kısıt ekle", "yeni tablo" denince kullan.'
 ---
 
 # /create-migration — güvenli migration oluşturma
