@@ -82,7 +82,7 @@ describe('fikstür tamlığı — yazıdaki her vh: kimliği sahteKaynak.ts\'te 
   it('SABOTAJ 3: bilinmeyen kategori ve slug ile verilmiş yazı kimliği de bildirilir', async () => {
     const bozuk = {
       ...YAZILAR[0],
-      ilgiliKategoriler: [...(YAZILAR[0].ilgiliKategoriler ?? []), 'vh:kategori/olmayan-kategori-sabotaj'],
+      ilgiliKategoriler: [...(YAZILAR[0].ilgiliKategoriler ?? []), 'vh:kategori/olmayan-kategori-sabotaj' as const],
       urunler: [...(YAZILAR[0].urunler ?? []), 'vh:yazi/olmayan-yazi-sabotaj'],
     }
     const eksik = await eksikFikstur([bozuk], sahteKaynak())
