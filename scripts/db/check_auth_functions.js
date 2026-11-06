@@ -28,7 +28,7 @@ async function run() {
     const env = loadEnv();
     const client = new Client({
         connectionString: env.DATABASE_URL,
-        ssl: pgTls()
+        ssl: pgTls(env.DATABASE_URL)
     });
     await client.connect();
 
