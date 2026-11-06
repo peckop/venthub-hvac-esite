@@ -1112,7 +1112,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-11-03',
     // Güncelleme tarihi 2026-11-04 (BLG-36): gövde türler çerçevesiyle yenilendi; doğrulanmış metin taslak v12 (sha cf6aaf30e82c; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu).
     // ilgiliKategoriler: 11 fan alt kategorisi (URN-151 kategori kartı).
-    guncellemeTarihi: '2026-11-04',
+    // BLG-40 (2026-11-06): H1 (= sayfa başlığı) ve meta açıklaması değişti; önceki H1 bir rakip sayfanın başlığıyla birebir aynıydı (GEO-SEO ölçümü). Gövde, slug ve ürün listesi aynı.
+    guncellemeTarihi: '2026-11-06',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
       'vh:kategori/axial-industrial-fans',
@@ -1130,10 +1131,10 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     diller: {
       tr: {
         slug: 'fan-cesitleri',
-        ozet: "Akış yoluna göre aksiyel, radyal ve karma akışlı fan türleri ile VentHub kataloğundaki kanal tipi, çatı tipi, banyo ve duman egzoz gibi fan kategorileri.",
+        ozet: "Fan çeşitleri akış yoluna göre aksiyel, radyal ve karma akışlı olarak ayrılır. AB tüzüğündeki akış açısı sınırları ve VentHub fan kategorileri bu yazıda.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Fan türlerini akış yoluna ve VentHub kategorilerine göre karşılaştırmak için bu rehberden başlayın; kategori sayfalarına buradan geçin.",
-        govde: `# Havalandırmada kullanılan fan çeşitleri nelerdir?
+        govde: `# Fan türleri ve çeşitleri: aksiyel, radyal, karma akışlı fanlar
 
 Havalandırmada kullanılan fan türleri, havanın fandan geçerken izlediği yola göre başlıca aksiyel, radyal (santrifüj), karma akışlı ve çapraz akışlı olarak ayrılır [1]. ABD Enerji Bakanlığı kılavuzu iki ana tür sayar: aksiyel ve santrifüj [2]; Avrupa Birliği'nin (AB) 2024/1834 sayılı fan tüzüğü karma akışlı ve çapraz akışlı fanı da kategori olarak sayar (madde 2(1)) [1]. Fan türünün seçimi hava özellikleri, debi, basınç ve sistem yerleşimine bağlıdır [2]; bu yazı projeye özel seçimin yerine geçmez. Yazı önce türleri, sonra seçime nereden başlanacağını anlatır; VentHub kataloğundaki fan kategorileri üçüncü bölümde sıralanır.
 
