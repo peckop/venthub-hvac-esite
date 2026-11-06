@@ -427,3 +427,72 @@ describe('INV-RITUEL-3 · öz-doğrulama: --merge yalnız master\'daki betikle (
     expect(kaynak.slice(Math.max(0, i - 400), i)).toContain('if (MERGE)')
   })
 })
+
+describe('INV-RITUEL-4 · Edge functions ve açık inceleme bulgusu (ARC-259, OPS 6 Kasım)', () => {
+  type Inceleme = { yorumlar: Array<{ govde: string; tarih: string }>; sonCommit: string } | null
+  const r4 = ritual as unknown as {
+    degerlendir: (g: Record<string, unknown>) => ReturnType<typeof ritual.degerlendir>
+    edgeDegisiklikleri: (d: unknown) => string[]
+    acikIncelemeBulgusu: (g: NonNullable<Inceleme>) => { acik: boolean; detay: string }
+  }
+  const temel = () => tamGirdi() as unknown as Record<string, unknown>
+  const T = (s: string) => `2026-11-06T${s}:00Z`
+
+  it('edgeDegisiklikleri yalnız supabase/functions/ yollarını süzer (Windows ayracı dahil)', () => {
+    expect(r4.edgeDegisiklikleri(['supabase/functions/_shared/cors.ts', 'supabase/migrations/x.sql', 'src/a.ts', 'supabase\\functions\\y\\index.ts'])).toEqual([
+      'supabase/functions/_shared/cors.ts',
+      'supabase\\functions\\y\\index.ts',
+    ])
+    expect(r4.edgeDegisiklikleri(null)).toEqual([])
+  })
+
+  it('⛔ functions değişikliği KIRMIZI; boş yeşil; ölçülemedi KIRMIZI; çağıran vermediyse madde yok (5 madde korunur)', () => {
+    const kirmizi = r4.degerlendir({ ...temel(), functionsDegisen: ['supabase/functions/_shared/cors.ts'] })
+    const m6 = madde(kirmizi as ReturnType<typeof ritual.degerlendir>, 6)
+    expect(m6.gecti).toBe(false)
+    expect(m6.detay).toContain('Edge degisikligi: EDGE/OPS tam okuma')
+    expect(kirmizi.kirmizi).toBe(1)
+    expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: [] }), 6).gecti).toBe(true)
+    expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: null }), 6).gecti).toBe(false)
+    expect(r4.degerlendir(temel()).maddeler.some((m) => m.no === 6)).toBe(false)
+    expect(r4.degerlendir(temel()).maddeler).toHaveLength(5)
+  })
+
+  it('⛔ "DÜZELTME GEREKİR" son commit\'ten SONRA ve kapanmamışsa KIRMIZI', () => {
+    const g: NonNullable<Inceleme> = { sonCommit: T('10:00'), yorumlar: [{ govde: 'İnceleme: DÜZELTME GEREKİR (cors origin listesi)', tarih: T('10:30') }] }
+    expect(r4.acikIncelemeBulgusu(g).acik).toBe(true)
+    const s = r4.degerlendir({ ...temel(), inceleme: g })
+    expect(madde(s, 7).gecti).toBe(false)
+    expect(s.kirmizi).toBe(1)
+  })
+
+  it('MEDIUM/HIGH başlık satırı da bulgudur; cümle içinde geçen kelime değildir', () => {
+    const bas = (govde: string): NonNullable<Inceleme> => ({ sonCommit: T('10:00'), yorumlar: [{ govde, tarih: T('11:00') }] })
+    expect(r4.acikIncelemeBulgusu(bas('Bulgular:\n- MEDIUM: origin doğrulaması eksik')).acik).toBe(true)
+    expect(r4.acikIncelemeBulgusu(bas('**HIGH** sızıntı riski')).acik).toBe(true)
+    expect(r4.acikIncelemeBulgusu(bas('Açık MEDIUM ya da HIGH bulgu yok, engelleyici da yok')).acik).toBe(false)
+    expect(r4.acikIncelemeBulgusu(bas('ENGELLEYİCİ-YOK, tek nit')).acik).toBe(false)
+  })
+
+  it('düzeltme commit\'i yorumdan SONRA gelmişse ya da kapanış yorumu varsa yeşil', () => {
+    const yorum = { govde: 'DÜZELTME GEREKİR', tarih: T('10:30') }
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('11:00'), yorumlar: [yorum] }).acik).toBe(false) // düzeltme yorumdan sonra
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [yorum, { govde: 'İNCELEME KAPANDI: bulgular giderildi', tarih: T('10:45') }] }).acik).toBe(false)
+    // kapanış bulgudan ÖNCE yazılmışsa bulguyu kapatmaz
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [{ govde: 'İNCELEME KAPANDI', tarih: T('10:10') }, yorum] }).acik).toBe(true)
+  })
+
+  it('fail-closed: inceleme ölçülemedi (null) ya da commit tarihi okunamadı KIRMIZI', () => {
+    expect(madde(r4.degerlendir({ ...temel(), inceleme: null }), 7).gecti).toBe(false)
+    expect(r4.acikIncelemeBulgusu({ sonCommit: 'bozuk', yorumlar: [] }).acik).toBe(true)
+    expect(madde(r4.degerlendir({ ...temel(), inceleme: { sonCommit: T('10:00'), yorumlar: [] } }), 7).gecti).toBe(true)
+  })
+
+  it('CLI iki ölçümü de değerlendirmeye verir (kaynak taraması: kol bağlantısı sessizce düşmesin)', () => {
+    const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+    const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
+    expect(cli).toMatch(/'supabase\/functions\/'/)
+    expect(cli).toMatch(/'comments,reviews,commits'/)
+    expect(cli).toMatch(/onay: ONAY, functionsDegisen, inceleme/)
+  })
+})
