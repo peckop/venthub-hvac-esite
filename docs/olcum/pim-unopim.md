@@ -32,7 +32,7 @@ Son ölçüm: 2026-09-29 (OPS, Sonnet). Önceki: REC-357 (In Review), karar 36 E
 | Kategori | İki kök ağaç: site menüsü (Design katalog-grup v2.4: 11 grup, 21 tür, yaprak 25/25 dolu) ve Marka · Aile · Seri (6 marka, 56 aile, 104 seri). Her ürün iki ağaçta da. Eski sitenin kategori tablosu kaynak DEĞİL (karar 412). |
 | Görsel | Ana görseli olan ürün 1157/1165 (KTL-81: 429; yeni modellerden 10). Eksik 8: eski 6 + Sanikit 2. Galeri ya da alt metin özniteliği yok. |
 | Fiyat / KDV / stok | UnoPIM'de yok, yazılmadı. Kaynak ölçümü: fiyat kaynağı tek (Avensair 2026 liste, EUR, KDV hariç) ve 1165 ürünün 348'ini kapsıyor; KDV eski 442 ürünün hepsinde %20; Supabase `stock_qty` yalnız 0 ya da 50 (yer tutucu). Ayrıntı: venthub-gorsel-arsiv `_liste/ktl82-faz-c-2026-11-04/RAPOR.md`. |
-| Fark kontrolü | `tasarim-unopim-fark.mjs` (Design anlık görüntüleri ↔ UnoPIM): ad, açıklama, kısa açıklama, teknik değer, marka, kategori; ilk koşuda 1165 üründe fark 0, bozma testinde farkı yakaladı. |
+| Fark kontrolü | `scripts/icerik-hatti/tasarim-unopim-fark.mjs` (KTL-83: depoda, vitest bozma testli; Design anlık görüntüleri ↔ UnoPIM; görüntü 7 günden eskiyse çıkış 2): ad, açıklama, kısa açıklama, teknik değer, marka, kategori; ilk koşuda 1165 üründe fark 0, bozma testinde farkı yakaladı. |
 | Yazım güvencesi | Her toplu yazım: yedek, tam değer klonu (UnoPIM PUT `values.common`'ı tamamen değiştirir), geri okuma, hedef dışı karşılaştırma, ilk farkta durma. |
 
 ## Hüküm (09-29)
