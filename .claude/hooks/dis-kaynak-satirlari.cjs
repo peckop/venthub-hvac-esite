@@ -345,7 +345,7 @@ module.exports = { onbellekYolu, claudeGeride, mcpAyristir, skillKaynaklari, sat
 
 if (require.main === module && process.argv.includes('--yaz')) {
   const { execFile } = require('child_process')
-  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
   // Windows'ta kabuk (.cmd/.exe çözümü) argümanları ayırmadan birleştirir: `&`, `?`, boşluk içerenler (gh api yolu) tırnaklanmazsa cmd böler.
   const kabuk = process.platform === 'win32'
   const tirnakla = (a) => (kabuk && /[&?|<>^ ]/.test(a) ? '"' + a + '"' : a)

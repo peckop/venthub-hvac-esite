@@ -639,7 +639,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('## İçerik kuralı')
-      expect(metin, `${ad} kartı: PR gövdesi Kanban satırıyla başlar`).toContain('PR gövdesi `Kanban: <numara>` ile başlar')
+      // HRT-107: CI kapısı (pr-kayit-kapisi.cjs) gövdede Kanban satırını arar, ilk satır şartı yok
+      expect(metin, `${ad} kartı: PR gövdesi Kanban satırı taşır`).toContain('PR gövdesi `Kanban: <numara>` satırı taşır')
     }
     const cetveller: Array<[string, string]> = [
       ['rehber-yazisi-standard.md', '10. **Şirket iddiası ve reklam dili yok**'],
@@ -728,7 +729,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
         expect(m.split(ortak).length - 1, `${etiket}: ortak bölüm tam bir kez`).toBe(1)
         expect(m, etiket).toContain('merge-ritueli.cjs')
         expect(m, etiket).toContain('--onay')
-        expect(m, etiket).toContain('okundu, uygun')
+        expect(m, etiket).toContain('bir denetçi alt ajan tam farkı okur; engelleyici bulgu yoksa ARAÇ birleştirir')
         expect(m, etiket).toContain('--agac=<ağaç> --merge')
         expect(m, etiket).toContain('doğrudan çağrılmaz')
         expect(m, etiket).toContain('karar 98, 224')
@@ -839,13 +840,14 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(ortak).toContain('deny gevşetilmez (§18)')
     expect(ortak).toContain("Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer")
     expect(ortak).toContain('izin modunu değiştirmek Recep kararıdır')
-    expect(ortak).toContain("OPS'un kendi kanca/ayar PR'ını ARAÇ okur")
+    expect(ortak).toContain('değişikliği yazmamış bir denetçi alt ajan tam farkı okuyup engelleyici bulgu bildirmedikten sonra ARAÇ birleştirir')
+    expect(ortak).toContain('İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep')
     // filo-ortak 10.000 bayt tavanında (hazir-ozellik-kurulumu): çapalı hafıza ve bağımsız doğrulama satırları kurallar dosyalarında.
     for (const [ad, m] of Object.entries(kuralMetinleri)) {
       expect(m, `${ad}: çapalı hafıza`).toContain('Çapalı hafıza okunur ve etiketlenir')
       expect(m, `${ad}: bağımsız doğrulama`).toContain('Bağımsız doğrulama: canlı yazım betiği')
     }
-    expect(kuralMetinleri.OPS).toContain('OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur')
+    expect(kuralMetinleri.OPS).toContain('Kanca ve ayar PR\'ını (OPS\'unki dahil) bağımsız denetçi alt ajan okur, ARAÇ birleştirir')
   })
 
   it("HRT-65: kardeş depodaki 'bağlı: evet' tetiği yerelde ölçülür, kardeş depo yoksa sorun sayılmaz (ayırt edici)", () => {
@@ -893,9 +895,11 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, isAkislari)).toEqual([])
   })
 
-  it('GEO-SEO ilk örnek: yedi düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, yayın sonrası dizin isteği, haftalık öz-değerlendirme, haftalık üç motor)', () => {
+  it('GEO-SEO ilk örnek: on düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste, otomatik kuyruk, dizin isteği kararı, rehber taslak okuması, rakip kıyası, haftalık öz-değerlendirme, haftalık üç motor)', () => {
     const g = gercek['GEO-SEO']
-    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'haftalik', 'haftalik', 'her-dagitim-gunluk', 'olay', 'olay'])
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'haftalik', 'haftalik', 'her-dagitim-gunluk', 'her-dagitim-gunluk', 'olay', 'olay', 'olay', 'olay'])
+    // HRT-106: dizin-takip kararı görevi (D7) listede; tetik henüz kurulu değil (kuracak: ARAÇ)
+    expect(g.gorevler.find((x) => x.gorev.includes('scripts/seo/dizin-takip.mjs --durum'))).toMatchObject({ bagli: 'hayir', baglayacak: 'ARAC' })
     expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
     expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
   })

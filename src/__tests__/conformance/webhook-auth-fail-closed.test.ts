@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { imzaliIstek } from '@/app/api/webhook/supabase/__tests__/imzaliIstek'
+
 /**
  * INV-WEBHOOK-1 · Supabase webhook kimlik doğrulaması FAIL-CLOSED olmalı.
  *
@@ -64,12 +66,21 @@ const PAYLOAD = {
   old_record: { id: 'p1', tenant_id: 't1' },
 }
 
+// ALT-76 PR 3: kalıcı tekrar koruması burada ölçülmez (webhook-hmac-imza.test.ts); olay hep yeni.
+vi.mock('@/lib/webhook/olayTekil', async (orijinal) => ({
+  ...(await orijinal<Record<string, unknown>>()),
+  olayTuket: async () => 'yeni',
+}))
+
+/**
+ * ALT-76 PR 3: düz `x-webhook-secret` yolu kapandı; "secret ile istek" artık o secret ile
+ * İMZALANMIŞ istektir. `null` = imza başlıkları hiç yok.
+ */
 function request(secret: string | null): NextRequest {
-  const headers: Record<string, string> = { 'content-type': 'application/json' }
-  if (secret !== null) headers['x-webhook-secret'] = secret
+  if (secret !== null) return imzaliIstek(PAYLOAD, secret)
   return new NextRequest('http://localhost/api/webhook/supabase', {
     method: 'POST',
-    headers,
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify(PAYLOAD),
   })
 }

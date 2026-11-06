@@ -27,7 +27,7 @@ const path = require('path')
 const { execFileSync } = require('child_process')
 const canlilik = require('./canlilik.cjs')
 
-const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || path.join('C:', 'tmp', 'venthub-board')
+const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || require('./pano-dizini.cjs').VARSAYILAN
 /** Claude Code'un pencere başına yazdığı oturum kaydı: `<pid>.json` (sessionId + name). Test için env ile değişir. */
 const OTURUM_KAYIT_DIZINI = process.env.VENTHUB_OTURUM_KAYIT_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
 /** Kira ömrü: bu süre atış almayan talep BAYAT sayılır ve engellemez (ölü oturum kilitlemesin). */

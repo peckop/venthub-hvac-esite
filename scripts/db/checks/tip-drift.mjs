@@ -32,6 +32,7 @@
  *
  * KULLANIM: node scripts/db/checks/tip-drift.mjs [--tip-dosyasi <yol>]
  * ÇIKIŞ: 0 = senkron · 1 = DRIFT (şema farkı) · 2 = ÖLÇEMEDİM (fail-closed)
+ * (0, canlıya henüz uygulanmamış migration'ın yarattığı kalemleri de kapsar — ALT-159, aşağıda.)
  *
  * ⭐`--tip-dosyasi` NİÇİN VAR (REC-121 CI bağlama adımı, 2026-09-08): kapının KIRMIZI
  * tarafını göstermek için commit'li tip dosyasını BOZMAK gerekiyordu — ama o dosya URUN'un
@@ -187,7 +188,71 @@ export function saglikOlc(yuzey) {
   return { varlik, kolon, saglikli: varlik >= EN_AZ_VARLIK && kolon >= EN_AZ_KOLON }
 }
 
-function ana() {
+/**
+ * ⭐BEKLEYEN MIGRATION İSTİSNASI (ALT-159, 2026-11-06) — "TİPLERDE VAR, CANLIDA YOK" kalemlerinin
+ * TEK meşru sebebi: tabloyu/kolonu/fonksiyonu yaratan migration depoda VAR ama canlıya HENÜZ
+ * uygulanmadı. Migration'lı PR'da tam bu olur: kod yeni tabloyu kullanır, tipler PR'da üretilir,
+ * migration ise ancak birleşince `supabase-migrate.yml` ile uygulanır (kural 13). Saha: #2283
+ * (webhook_olaylari) bu kapıda 4 kalemle kırmızıydı ve tipleri çıkarmak tsc'yi kırardı.
+ *
+ * ⛔DAR TUTULDU: istisna YALNIZ (a) canlı defterde (`public._migration_ledger`) KAYDI OLMAYAN migration
+ * dosyalarının (b) metninde YARATILAN nesnelerle BİREBİR eşleşen kalemlere uygulanır. "Canlıda
+ * var, tiplerde yok" yönü hiç etkilenmez. Defter okunamazsa ölçüm durur (çıkış 2), yeşil verilmez.
+ */
+export function migrationNesneleri(metinler) {
+  const nesne = new Set()
+  const ad = (sema, isim) => (sema || 'public') + '.' + isim
+  for (const ham of metinler) {
+    const metin = String(ham)
+      .replace(/\$(\w*)\$[\s\S]*?\$\1\$/g, (m) => (/^\$\w*\$\s*$/.test(m) ? m : ' '))
+      .replace(/--[^\n]*/g, '')
+      .replace(/"/g, '')
+    let m
+    const tablo = /create\s+table\s+(?:if\s+not\s+exists\s+)?(?:(\w+)\.)?(\w+)\s*\(([\s\S]*?)\n\s*\)\s*;/gi
+    while ((m = tablo.exec(metin))) {
+      const t = ad(m[1], m[2])
+      nesne.add('tablo:' + t)
+      for (const satir of m[3].split('\n')) {
+        const k = /^\s*([a-z_]\w*)\s+[a-z]/i.exec(satir)
+        if (k && !/^(constraint|primary|unique|foreign|check|exclude|like)$/i.test(k[1])) nesne.add('kolon:' + t + '.' + k[1])
+      }
+    }
+    const kolon = /alter\s+table\s+(?:only\s+)?(?:if\s+exists\s+)?(?:(\w+)\.)?(\w+)\s+add\s+column\s+(?:if\s+not\s+exists\s+)?(\w+)/gi
+    while ((m = kolon.exec(metin))) nesne.add('kolon:' + ad(m[1], m[2]) + '.' + m[3])
+    const fonk = /create\s+(?:or\s+replace\s+)?function\s+(?:(\w+)\.)?(\w+)\s*\(/gi
+    while ((m = fonk.exec(metin))) nesne.add('fonksiyon:' + ad(m[1], m[2]))
+  }
+  return nesne
+}
+
+/** Fazla kalemleri bekleyen migration'ın açıkladıkları ve açıklanamayanlar diye ayırır. */
+export function fazlaAyir(fazla, nesneler) {
+  return {
+    aciklanan: fazla.filter((k) => nesneler.has(k)),
+    kalan: fazla.filter((k) => !nesneler.has(k)),
+  }
+}
+
+/** Defterde kaydı olmayan migration dosyaları. `kayitli` boşsa (defter okunamadı) null döner. */
+export function bekleyenDosyalar(dosyalar, kayitli) {
+  if (!kayitli || kayitli.size === 0) return null
+  return dosyalar.filter((d) => !kayitli.has(d)).sort()
+}
+
+async function defterOku(proje) {
+  // SALT OKUMA: Management API sorgu ucu, yalnız SELECT. Kimlik kapının zaten kullandığı jeton.
+  const yanit = await fetch('https://api.supabase.com/v1/projects/' + proje + '/database/query', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + JETON, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: 'select name from public._migration_ledger' }),
+  })
+  if (!yanit.ok) throw new Error('defter sorgusu HTTP ' + yanit.status)
+  const satirlar = await yanit.json()
+  if (!Array.isArray(satirlar)) throw new Error('defter yaniti dizi degil')
+  return new Set(satirlar.map((r) => String(r.name)))
+}
+
+async function ana() {
   if (!fs.existsSync(TIP_DOSYASI)) oldur(TIP_DOSYASI + ' yok — depo kokunde mi kosuyorsun?')
   const kimlik = projeKimligi()
   if (kimlik.hata) oldur('proje kimligi cozulemedi — ' + kimlik.hata)
@@ -230,7 +295,28 @@ function ana() {
   if (!sL.saglikli) oldur('CANLI cikti ayristirilamadi (esik ' + EN_AZ_VARLIK + '/' + EN_AZ_KOLON + '). Bicim degismis olabilir; ayristirici GUNCELLENMELI.')
 
   const hamEksik = [...canli].filter((k) => !commitli.has(k)).sort()
-  const fazla = [...commitli].filter((k) => !canli.has(k)).sort()
+  let fazla = [...commitli].filter((k) => !canli.has(k)).sort()
+  let bekleyenNot = ''
+  if (fazla.length) {
+    const migDizin = 'supabase/migrations'
+    const dosyalar = fs.readdirSync(migDizin).filter((d) => d.endsWith('.sql'))
+    let kayitli
+    try {
+      kayitli = await defterOku(PROJE)
+    } catch (e) {
+      oldur('tiplerde fazla kalem var ama canli migration defteri okunamadi: ' + String((e && e.message) || e).slice(0, 160))
+    }
+    const bekleyen = bekleyenDosyalar(dosyalar, kayitli)
+    if (bekleyen === null) oldur('canli migration defteri BOS dondu — bekleyen migration olculemez.')
+    const nesneler = migrationNesneleri(bekleyen.map((d) => fs.readFileSync(path.join(migDizin, d), 'utf8')))
+    const { aciklanan, kalan } = fazlaAyir(fazla, nesneler)
+    if (aciklanan.length) {
+      bekleyenNot = aciklanan.length + ' kalem canliya HENUZ uygulanmamis migration ile aciklandi (' + bekleyen.join(', ') + ')'
+      console.log('[tip-drift] BEKLEYEN MIGRATION — tiplerde var, canlida henuz yok (' + aciklanan.length + '):')
+      for (const k of aciklanan) console.log('    ~ ' + k)
+    }
+    fazla = kalan
+  }
 
   /**
    * ⭐BİLİNEN BORÇ TABANI — niçin var ve niçin KENDİSİ DE ÖLÇÜLÜYOR.
@@ -272,7 +358,8 @@ function ana() {
   if (eksik.length === 0 && fazla.length === 0) {
     console.log(
       '[tip-drift] INV-TIP-DRIFT-1 YESIL — sema yuzeyi SENKRON (bicim/surum farki olcut DEGIL)' +
-      (taban.length ? '; ' + taban.length + ' kalem BILINEN BORC tabanda (bunlar HALA DRIFT, onarimi bekliyor).' : '.'),
+      (taban.length ? '; ' + taban.length + ' kalem BILINEN BORC tabanda (bunlar HALA DRIFT, onarimi bekliyor).' : '.') +
+      (bekleyenNot ? ' ' + bekleyenNot + '; migration uygulaninca kalemler canlida da gorunur.' : ''),
     )
     process.exit(0)
   }
@@ -297,5 +384,5 @@ function ana() {
 // gelir ve düz string karşılaştırması sessizce HİÇ eşleşmez — betik "koşmuş" görünür,
 // hiçbir şey ölçmez.
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
-  ana()
+  ana().catch((e) => oldur('beklenmeyen hata: ' + String((e && e.message) || e).slice(0, 200)))
 }

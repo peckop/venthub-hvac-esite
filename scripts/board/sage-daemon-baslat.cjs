@@ -74,7 +74,7 @@ async function baslat({ kok, ice = (url) => import(url), log = () => {}, zamanAs
 
 async function main() {
   const { kanonikKok } = require('../../tools/wrongstack-mcp/posta-kutusu.cjs')
-  const panoDizini = process.env.VENTHUB_BOARD_DIR || 'C:/tmp/venthub-board'
+  const panoDizini = process.env.VENTHUB_BOARD_DIR || require('./pano-dizini.cjs').VARSAYILAN
   const gunluk = (s) => {
     try {
       fs.mkdirSync(panoDizini, { recursive: true })

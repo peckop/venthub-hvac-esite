@@ -100,16 +100,21 @@ function kartiOku(dbYolu, taskId) {
     process.removeAllListeners('warning')
     const { DatabaseSync } = require('node:sqlite')
     db = new DatabaseSync(dbYolu, { readOnly: true })
-    const satir = db
+    // ARC-255: kart kimliği 8 haneli önekle de verilir (kanban araçları önek kabul eder, uzunluk sınırı koymaz); tam eşleşme
+    // yoksa ÖNEK eşleşmesi (tek kart) kullanılır; birden çok kart eşleşirse araç zaten "Ambiguous" der, kapı karışmaz. Eskiden yalnız tam eşleşme vardı: kısa kimlikle Done'a taşıma kapıyı
+    // "kart-okunamadi" diye sessizce atlıyordu (6 Kasım ölçümü, ARC-252 needs_human iken Done oldu).
+    const satirlar = db
       .prepare(
-        "select json_extract(b.payload,'$.title') as pano, " +
+        "select json_extract(t.value,'$.id') as kid, json_extract(b.payload,'$.title') as pano, " +
           "json_extract(t.value,'$.columnId') as kolon, " +
           "json_extract(t.value,'$.verificationReport.verdict') as verdict, " +
           "json_extract(t.value,'$.labels') as etiketler " +
           'from kanban_boards b, json_each(b.payload, \'$.tasks\') t ' +
-          "where json_extract(t.value,'$.id') = ? limit 1"
+          "where json_extract(t.value,'$.id') = ? " +
+          "or (length(?) >= 1 and substr(json_extract(t.value,'$.id'), 1, length(?)) = ?) limit 3"
       )
-      .get(taskId)
+      .all(taskId, taskId, taskId, taskId)
+    const satir = satirlar.find((s) => s.kid === taskId) || (satirlar.length === 1 ? satirlar[0] : null)
     if (!satir) return null
     let etiketler = []
     try {
@@ -129,6 +134,32 @@ function kartiOku(dbYolu, taskId) {
   }
 }
 
+const GUNLUK_TAVAN = 512 * 1024
+
+/**
+ * ARC-255 (OPS-232): her Done isteğinin kimlik biçimi ve kararı TEK satır olarak depo DIŞINA yazılır; böylece "hangi çağrı hangi
+ * kimlikle, hangi sebeple geçti" ölçülebilir (6 Kasım'da 11 kapısız Done'un kimlik biçimi ayrıştırılamamıştı).
+ * Satır: ISO zaman · kimlik uzunluğu · tam|önek · kimliğin ilk 8 karakteri · sebep · izin|RED. Dosya pano dizininde `done-kapisi.log`,
+ * 512 KB'ı geçince yazılmaz (tavan). Yazılamazsa sessiz (fail-open); Kanban'a yazmaz.
+ */
+function gunluguYaz(taskId, k, ortam = process.env) {
+  try {
+    const dir = ortam.VENTHUB_BOARD_DIR || ortam.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
+    const dosya = path.join(dir, 'done-kapisi.log')
+    fs.mkdirSync(dir, { recursive: true })
+    try {
+      if (fs.statSync(dosya).size > GUNLUK_TAVAN) return
+    } catch {
+      /* dosya henüz yok */
+    }
+    const kimlik = String(taskId)
+    const bicim = kimlik.length >= 36 ? 'tam' : 'önek'
+    fs.appendFileSync(dosya, [new Date().toISOString(), kimlik.length, bicim, kimlik.slice(0, 8).replace(/[\t\r\n]/g, '?'), k.sebep, k.izin ? 'izin' : 'RED'].join('\t') + '\n')
+  } catch {
+    /* günlük yazılamadı: kapı kararını etkilemez */
+  }
+}
+
 function main() {
   if (process.env[VANA] === '1') return
   let ham = ''
@@ -145,6 +176,7 @@ function main() {
   }
   if (!doneIstegiMi(girdi)) return
   const k = karar(kartiOku(veritabaniYolu(), girdi.tool_input.taskId))
+  gunluguYaz(girdi.tool_input.taskId, k)
   if (k.izin) return
   console.log(
     JSON.stringify({
@@ -162,4 +194,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { doneIstegiMi, karar, redMetni, veritabaniYolu, kartiOku, MUAF_ETIKETLER }
+module.exports = { doneIstegiMi, karar, redMetni, veritabaniYolu, kartiOku, gunluguYaz, MUAF_ETIKETLER }

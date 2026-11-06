@@ -41,7 +41,7 @@ async function run() {
     const tryConnect = async (url) => {
         const client = new Client({
             connectionString: url,
-            ssl: pgTls(),
+            ssl: pgTls(url),
             connectionTimeoutMillis: 15000,
         });
 

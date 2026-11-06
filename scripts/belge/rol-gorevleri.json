@@ -46,14 +46,44 @@
           "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
         },
         {
-          "gorev": "Yayın sonrası dizin isteği: canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda IndexNow ve Google kuyruğu (değişen adres bildiricisi); Google günlük sınırı sabit değil ölçülür (bugüne dek 11), sınıra takılan adres sonraki gün ilk iş; GEO-SEO'nundur, onay sorulmaz. Aynı turda Bing Webmaster URL İnceleme'den dizin oluşturma isteği (günlük kota 100) ve Yandex Webmaster Yeniden tarama aracından adres gönderimi (günlük 10 adres); Yandex paneli salt okunur ya da oturum kapalıysa IndexNow ile yetinilir, karta 'Yandex paneli kapalı' yazılır. Bing ölçümü ve gönderimi önce API betikleriyle yapılır: scripts/seo/bing-webmaster-oku.mjs (GetUrlInfo, GetCrawlStats, GetCrawlIssues; anahtar ~/.claude/bing-webmaster-anahtar.txt, docs/olcum/erisim-envanteri.md) ve scripts/seo/bing-url-gonder.mjs (kota 100/gün); panel ikincildir",
+          "gorev": "Yayın sonrası otomatik kuyruk: canlıya çıkan her yeni ya da değişen adres IndexNow ve Google kuyruğuna girer (değişen adres bildiricisi); Google günlük sınırı sabit değil ölçülür, sınıra takılan adres sonraki gün ilk iş; GEO-SEO'nundur, onay sorulmaz. Motor bazında istek kararı aşağıdaki dizin-takip görevindedir",
           "komut": "scripts/seo/degisen-adres-bildir.mjs",
           "siklik": "olay",
           "tetik": "actions",
           "tetikAyrinti": ".github/workflows/dizin-tetigi.yml deployment_status (başarılı üretim dağıtımı) + günlük schedule; iş akışı ALT-91 (#1976), kuyruk komutu --kuyruk-sonraki",
           "bagli": "evet",
-          "cikti": "Adres başına Search Console isteği ve IndexNow sonucu ilgili Kanban kartına; engel varsa (oturum yok, günlük sınır) OPS'a tek satır",
-          "esik": "Canlıda 200 görülen her yeni ya da değişen adres için aynı gün istek; Google sınırına takılan ertesi gün ilk iş"
+          "cikti": "Adres başına IndexNow ve Google kuyruk sonucu ilgili Kanban kartına; engel varsa (oturum yok, günlük sınır) OPS'a tek satır",
+          "esik": "Canlıda 200 görülen her yeni ya da değişen adres için aynı gün kuyruk girişi; Google sınırına takılan ertesi gün ilk iş"
+        },
+        {
+          "gorev": "Yayın sonrası dizin isteği: canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda scripts/seo/dizin-takip.mjs --durum kararı; yalnız YAP/TEKRAR olan adres×motor'a istek (Google elle istek günde ~10, Bing API günde 100, Yandex arayüz günde 10, IndexNow günlük görev); eylemden sonra aynı turda --kaydet; cetvel dizin-sistemleri-standard.md D7",
+          "siklik": "her-dagitim-gunluk",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "BLOG B10 bildirimi ya da site haritası farkı; tetik henüz kurulu değil (kuracak: ARAÇ); mevcut .github/workflows/dizin-tetigi.yml IndexNow ve Google kuyruğunu ayrıca besler",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Adres×motor başına --kaydet satırı ve ilgili Kanban kartına özet; engel varsa (oturum yok, günlük sınır) OPS'a tek satır",
+          "esik": "YAP kalan adres 0"
+        },
+        {
+          "gorev": "Rehber taslak okuması: BLOG taslağı B6a'ya getirince R10 okuması ve Y2.3 ajan turu; bulgu satıra karşı doğrulanır (cetvel yayin-gorunurluk-denetim-standard.md Y2.3)",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "BLOG taslağı B6a'ya getirince bildirim; tetik henüz kurulu değil (kuracak: ARAÇ)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Doğrulanmış bulgu listesi BLOG'a; doğrulanmayan bulgu düşer",
+          "esik": "Her bulgu ilgili satıra karşı doğrulanmış"
+        },
+        {
+          "gorev": "Rakip sayfa kıyası: OPS emri gelince Y2.4 yedi adım (cetvel yayin-gorunurluk-denetim-standard.md Y2.4)",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "OPS emri kartı açılınca; tetik henüz kurulu değil (kuracak: ARAÇ)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Yedi adımın çıktısı kartta; sonuç OPS'a",
+          "esik": "Yedi adımın hepsi tamam"
         },
         {
           "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",

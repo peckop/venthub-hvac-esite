@@ -19,5 +19,5 @@ paths:
 4. Fiyatsız üründe işaretleme (karar 379). Sahte fiyat, `price: 0` ve uydurma yorum/derecelendirme yazılmaz; görünür olmayan değer işaretlenmez.
 5. `FAQPage` JSON-LD konmaz (`src/lib/bilgiMerkezi/jsonld.ts:5`: SSS zengin sonucu 2026-05-07'de kalktı); görünür SSS kalır.
 6. Ölçmeden "dizinde yok", "bozuk" ya da "boş" denmez.
-7. Arama sonucunda eski metin görülürse önce adres ölçülür.
-8. Search Console "Geliştirmeler" ve "Alışveriş" raporları haftalık okunur
+7. Search Console "Geliştirmeler" ve "Alışveriş" raporları haftalık okunur
+8. Dizin isteği disiplini. İstek atmadan önce dizin-takip kararı okunur; YAP/TEKRAR dışındaki adres×motor'a istek atılmaz.

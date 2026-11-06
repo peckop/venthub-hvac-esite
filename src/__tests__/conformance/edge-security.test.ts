@@ -102,8 +102,9 @@ const KNOWN_VIOLATIONS = {
   // `verify_jwt = false` ile açık duran uçlar. İkisi de BORÇ, "kabul edilmiş tasarım" değil:
   //  • iyzico-callback — kimliği yalnız iyzico'nun `token`'ı taşıyor; token yokken orderId
   //    ile DB'den geri-doldurulabiliyor (imza/HMAC doğrulaması YOK).
-  //  • shipping-status — takip numarasıyla sipariş durumu döndürür; tek koruma IP rate-limit.
-  R5: ['iyzico-callback', 'shipping-status'],
+  // shipping-status 2026-11-05'te tabandan çıktı (ALT-138): uç T058-VH'de emekli edildi,
+  // yalnız 410 döner. Borç değil, R5_EMEKLI'de adla duruyor; emeklilik bekçisi aşağıda.
+  R5: ['iyzico-callback'],
 
   // R6 — _shared/tenant_config.ts JWT payload'ını İMZASIZ çözüp `tenant_id` seçiyor.
   // Sahte JWT ile tenant sınırı aşılabilir (data bleeding). ÇÖZÜM: tenant_id'yi
@@ -235,6 +236,24 @@ const R5_EXEMPT: Record<string, string> = {
   // pg_cron `net.http_post` ile auth header'sız çağırır; uç dışarıya veri döndürmez,
   // TCMB kurlarını yazar. Muafiyet ADLA verilir ki yeni uçlara sessizce sızmasın.
   'tcmb-rates-sync': 'pg_cron auth header gönderemez (yalnız yazan, veri döndürmeyen uç)',
+  // T058-VH: emekli uç, her isteğe 410 ENDPOINT_RETIRED döner, hiçbir veriye dokunmaz.
+  // Muafiyet R5_EMEKLI bekçisine bağlıdır: uç yeniden iş yaparsa bekçi kırmızı verir.
+  'shipping-status':'emekli uç: yalnız 410 döner, veri okumaz (T058-VH)',
+}
+
+/**
+ * Emekli olduğu için R5 muafiyeti alan uçlar. Bekçi: kaynak 410 + ENDPOINT_RETIRED dönmeli ve
+ * Supabase istemcisi, sorgu ya da ortam sırrı okumamalı. Uç yeniden canlanırsa test kırmızı olur.
+ */
+const R5_EMEKLI: readonly string[] = ['shipping-status']
+
+/** Emekli uç: 410 + ENDPOINT_RETIRED döner; Supabase istemcisi, sorgu ya da ortam sırrı yok. */
+function emekliUcMu(code: string): boolean {
+  return (
+    /status:\s*410\b/.test(code) &&
+    code.includes('ENDPOINT_RETIRED') &&
+    !/\bcreateClient\b|\.from\s*\(|\.rpc\s*\(|Deno\.env\.get/.test(code)
+  )
 }
 
 /* ------------------------------------------------------------------ *
@@ -807,6 +826,23 @@ describe('R5 · verify_jwt=false olan her fonksiyon gövdesinde kimlik doğrulam
         "verify_jwt = true yap. Gerçekten auth gönderemeyen bir çağıran varsa (pg_cron) " +
         "R5_EXEMPT'e ADLA ve gerekçesiyle ekle.",
     )
+  })
+
+  it('R5 emekli muafiyetleri gerçekten emekli (410, veri yok)', () => {
+    for (const fn of R5_EMEKLI) {
+      expect(R5_EXEMPT[fn], `${fn} R5_EMEKLI'de ama R5_EXEMPT'te yok`).toBeDefined()
+      const src = INDEX_SOURCES.find((s) => s.fn === fn)
+      expect(src, `${fn}/index.ts bulunamadı`).toBeDefined()
+      expect(emekliUcMu(src?.code ?? ''), `${fn} artık emekli değil: R5 muafiyetinden çıkar`).toBe(true)
+    }
+  })
+
+  it('emeklilik bekçisi veri okuyan ucu yakalar (bilerek bozulmuş örnek)', () => {
+    const emekli = INDEX_SOURCES.find((s) => s.fn === 'shipping-status')?.code ?? ''
+    expect(emekliUcMu(emekli)).toBe(true)
+    const canli = `${emekli}\nconst sb = createClient(url, key)\nawait sb.from('orders').select('*')`
+    expect(emekliUcMu(canli)).toBe(false)
+    expect(emekliUcMu(emekli.replace('status: 410', 'status: 200'))).toBe(false)
   })
 
   it('R5 muafiyetleri gerçekten verify_jwt=false uçlar (bayat muafiyet koruması)', () => {

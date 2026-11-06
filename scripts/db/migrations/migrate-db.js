@@ -33,7 +33,7 @@ if (!connectionString) {
 
 const client = new Client({
   connectionString: connectionString,
-  ssl: pgTls() // Required for Supabase in many environments
+  ssl: pgTls(connectionString) // Required for Supabase in many environments
 });
 
 const migrationSQL = `
