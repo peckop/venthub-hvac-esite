@@ -10,6 +10,7 @@ import {
   metniMaskele,
   nesneyiMaskele,
   sirDurumu,
+  tcknGecerliMi,
 } from '../maske'
 
 /**
@@ -130,6 +131,38 @@ describe('maske · kişisel veri (S1, S2, S6)', () => {
     expect(cikti.length).toBeLessThan(40_000)
     const yaprak = nesneyiMaskele(Array(50).fill(Array(50).fill(1))) as number[][]
     expect(yaprak.flat().filter((x) => x === 1)).toHaveLength(200)
+  })
+
+  it('nesneyiMaskele düğüm bütçesi: yaprak harcamayan (null, boş dizi) derin ağaç 1000 düğümde kesilir (OPS-213)', () => {
+    // Paylaşılan başvurularla 50^4 = 6,25 milyon düğüm; bütçesiz dolaşma bu testi dakikalarca koşturur.
+    const l3 = Array(50).fill(null)
+    const l2 = Array(50).fill(l3)
+    const l1 = Array(50).fill(l2)
+    const kok = Array(50).fill(l1)
+    const say = (x: unknown): number => (Array.isArray(x) ? 1 + x.reduce((a: number, e) => a + say(e), 0) : 1)
+    const bas = Date.now()
+    const cikti = nesneyiMaskele(kok)
+    expect(Date.now() - bas).toBeLessThan(500)
+    // Bütçe 1000 ziyaret; her kesilen dizinin sonuna en çok bir `***` eklenir.
+    expect(say(cikti)).toBeLessThanOrEqual(1000 + 4)
+    // Boş nesnelerle aynı saldırı: anahtar döngüsü de bütçede durur.
+    const nesne = Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`k${i}`, l1]))
+    expect(JSON.stringify(nesneyiMaskele(nesne)).length).toBeLessThan(20_000)
+  })
+
+  it('metniMaskele sağlaması tutan TCKN\'yi gizler, tutmayan 11 haneyi bırakır (OPS-213)', () => {
+    expect(tcknGecerliMi('10000000146')).toBe(true)
+    expect(tcknGecerliMi('10000000147')).toBe(false)
+    expect(tcknGecerliMi('01000000146')).toBe(false)
+    expect(tcknGecerliMi('1000000014')).toBe(false)
+    expect(metniMaskele('kimlik 10000000146 reddedildi')).toBe('kimlik *** reddedildi')
+    expect(metniMaskele('identityNumber="10000000146"')).toBe('identityNumber="***"')
+    // Sağlaması tutmayan 11 hane, 12+ hane ve zaman damgası korunur.
+    expect(metniMaskele('sayac 10000000147 t=1730620800000 x=100000001460')).toBe(
+      'sayac 10000000147 t=1730620800000 x=100000001460',
+    )
+    // Telefon deseni (0 ile başlayan 11 hane) TCKN'den önce gelir ve kendi biçiminde maskeler.
+    expect(metniMaskele('05551234567')).toBe('***67')
   })
 
   it('sirDurumu anahtarın hiçbir karakterini döndürmez', () => {

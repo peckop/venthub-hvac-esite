@@ -48,7 +48,7 @@ export interface KargoSiparisi {
 
 export type YazimKarari =
   /** Hiçbir şey yazılmaz (takip alanları dahil). */
-  | { islem: 'yoksay'; neden: 'ORDER_CANCELLED' | 'ORDER_NOT_CONFIRMED' | 'ORDER_NOT_PAID' | 'ORDER_STATUS_UNKNOWN' }
+  | { islem: 'yoksay'; neden: 'ORDER_CANCELLED' | 'ORDER_DELIVERED' | 'ORDER_NOT_CONFIRMED' | 'ORDER_NOT_PAID' | 'ORDER_STATUS_UNKNOWN' }
   /** Yalnız takip alanları (status değişmez). */
   | { islem: 'yalniz_takip' }
   /**
@@ -61,16 +61,20 @@ export type YazimKarari =
  * Okunan sipariş durumu + taşıyıcı hedefi → yazım kararı.
  *
  *  · cancelled: ÇIKIŞSIZ — hiçbir şey yazılmaz.
+ *  · delivered: KİLİTLİ (ALT-138) — takip alanları dahil hiçbir şey yazılmaz. Teslim edilmiş siparişin
+ *    takip bağlantısı müşterinin elindeki kanıttır; gecikmiş ya da sahte bir olayın onu başka bir adrese
+ *    çevirmesi oltalama yoludur. Düzeltme gerekiyorsa admin yapar (admin_audit_log).
  *  · pending: ödenmemiş sipariş için kargo olayı anlamsız — yoksayılır.
  *  · confirmed/processing → shipped: yalnız ÖDENMİŞ siparişte (admin kargolama ile aynı kural).
  *  · delivered hedefi, sipariş henüz shipped değilse İKİ ADIM: önce shipped, sonra delivered. Gerekçe:
  *    taşıyıcı teslim bildirdiyse paket fiilen çıkmıştır; yalnız shipped yazıp bırakmak teslim sinyalini
  *    (tekrar gelmeyebilir) kaybettirir, atlamak ise tetikle çelişir (confirmed→delivered yasak).
- *  · aynı/geri değer (shipped→shipped, delivered→shipped...): status yazılmaz, takip alanları güncellenir.
+ *  · aynı değer (shipped→shipped): status yazılmaz, takip alanları güncellenir.
  */
 export function kargoYazimKarari(siparis: KargoSiparisi, cozum: HedefCozum): YazimKarari {
   const durum = siparis.status ?? ''
   if (durum === 'cancelled') return { islem: 'yoksay', neden: 'ORDER_CANCELLED' }
+  if (durum === 'delivered') return { islem: 'yoksay', neden: 'ORDER_DELIVERED' }
   if (durum === 'pending') return { islem: 'yoksay', neden: 'ORDER_NOT_CONFIRMED' }
   if (!['confirmed', 'processing', 'shipped', 'delivered'].includes(durum)) {
     return { islem: 'yoksay', neden: 'ORDER_STATUS_UNKNOWN' }
@@ -78,7 +82,6 @@ export function kargoYazimKarari(siparis: KargoSiparisi, cozum: HedefCozum): Yaz
   if (cozum.tur !== 'hedef') return { islem: 'yalniz_takip' }
 
   const hedef = cozum.hedef
-  if (durum === 'delivered') return { islem: 'yalniz_takip' }
   if (durum === 'shipped') {
     return hedef === 'delivered'
       ? { islem: 'adimlar', adimlar: [{ kaynak: 'shipped', hedef: 'delivered' }] }
@@ -95,6 +98,59 @@ export function kargoYazimKarari(siparis: KargoSiparisi, cozum: HedefCozum): Yaz
           { kaynak: 'shipped', hedef: 'delivered' },
         ],
       }
+}
+
+/**
+ * Takip bağlantısının izinli olduğu taşıyıcı alan adları (ALT-138). Liste admin panelinin kendi ürettiği
+ * takip adreslerinden alındı (`src/views/admin/OrdersTableBody.tsx`, `AdminLogisticsTableBody.tsx`):
+ * yeni bir taşıyıcı bağlanınca buraya eklenir ve testi genişletilir. Alan adının kendisi ya da alt alan
+ * adı kabul edilir (`www.yurticikargo.com`, `gonderitakip.ptt.gov.tr`); benzer görünen alan adı kabul edilmez.
+ */
+export const TAKIP_ALAN_ADLARI: readonly string[] = [
+  'yurticikargo.com',
+  'araskargo.com.tr',
+  'mngkargo.com.tr',
+  'ptt.gov.tr',
+]
+
+/**
+ * Taşıyıcının gönderdiği takip bağlantısı siparişe yazılabilir mi? Yalnız `https:` şemalı, kimlik bilgisi ve
+ * özel bağlantı noktası taşımayan, izinli bir taşıyıcı alan adına giden adres kabul edilir.
+ *
+ * NİÇİN: bağlantı müşteriye sipariş sayfasında ve e-postada tıklanır biçimde gösterilir. Doğrulanmadan
+ * yazılan değer `javascript:` şeması ya da oltalama sitesi olabilir.
+ */
+export function takipBaglantisiGecerli(ham: string | null | undefined): boolean {
+  return takipBaglantisiNormal(ham) !== null
+}
+
+/** Ters bölü, boşluk ya da denetim karakteri (U+0000–U+0020, U+007F) var mı? */
+function belirsizKarakterVar(metin: string): boolean {
+  for (let i = 0; i < metin.length; i++) {
+    const k = metin.charCodeAt(i)
+    if (k <= 0x20 || k === 0x7f || k === 0x5c) return true
+  }
+  return /\s/.test(metin)
+}
+
+/**
+ * Geçerli takip bağlantısının YAZILACAK biçimi (`URL.href`), geçersizse `null`. Ham metin yazılmaz: ters bölü,
+ * boşluk ve denetim karakteri WHATWG ayrıştırıcısında başka, SMS/e-postadaki bağlantılayıcıda başka okunabilir
+ * (`https://www.yurticikargo.com\@kotu.example/x`); bu yüzden böyle karakter taşıyan girdi baştan reddedilir.
+ */
+export function takipBaglantisiNormal(ham: string | null | undefined): string | null {
+  const metin = (ham ?? '').trim()
+  if (!metin || metin.length > 2048 || belirsizKarakterVar(metin)) return null
+  let url: URL
+  try {
+    url = new URL(metin)
+  } catch {
+    return null
+  }
+  if (url.protocol !== 'https:') return null
+  if (url.username || url.password || url.port) return null
+  const host = url.hostname.toLowerCase().replace(/\.$/, '')
+  return TAKIP_ALAN_ADLARI.some((alan) => host === alan || host.endsWith(`.${alan}`)) ? url.href : null
 }
 
 /** Veritabanı monotonluk tetiği reddetti mi (PostgREST/supabase-js hata nesnesi)? */

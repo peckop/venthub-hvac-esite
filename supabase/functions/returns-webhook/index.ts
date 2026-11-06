@@ -12,17 +12,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { canCarrierTransition } from '../_shared/return_transitions.ts'
-import { hmacImzaGecerli, timingSafeEquals } from '../_shared/sabit_zaman.ts'
+import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), { status: init.status || 200, headers: { 'content-type': 'application/json; charset=utf-8', ...(init.headers||{}) } })
 }
 
-// İmza ve token karşılaştırması SABİT ZAMANLI (karne 2026-11 K4, cetvel §3.5 · E17).
-// Eskiden `given === computed` ve `tok === token` idi.
-function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
-  return hmacImzaGecerli(secret, raw, signatureHeader)
-}
+// İMZA BİÇİMİ (ALT-138): HMAC-SHA256( `<x-timestamp>.<x-event-id>.<ham gövde>` ), base64; `sha256=` öneki kabul.
+// Eskiden imza yalnız gövdeyi kapsıyordu: zaman ve olay kimliği değiştirilerek istek tekrar oynatılabiliyordu.
+// Eski biçim için geçiş bayrağı YOK (cetvel §3.5). Karşılaştırma sabit zamanlı (sabit_zaman.ts, E17).
 
 function mapReturnStatus(input?: string): { status?: string; setReceived?: boolean } {
   const s = (input || '').toLowerCase()
@@ -72,21 +70,27 @@ Deno.serve(async (req: Request) => {
     const token = Deno.env.get('RETURNS_WEBHOOK_TOKEN') || ''
     const sign = req.headers.get('x-signature') || ''
     const tok = req.headers.get('x-webhook-token') || ''
+    // Zaman ve olay kimliği imzanın PARÇASIDIR (ALT-138): imzadan önce okunur, imzalanmış hâliyle kullanılır.
+    const tsHeader = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()
+    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     let ok = false
-    if (secret && sign) ok = await hmacValid(secret, raw, sign)
+    if (secret && sign) ok = await webhookImzaGecerli(secret, tsHeader, eventId, raw, sign)
     if (!ok && token && tok && timingSafeEquals(tok, token)) ok = true
     if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
 
     // Enforce replay guard - mandatory timestamp header
-    const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
     if (!tsHeader) {
       return json({ error: 'Missing timestamp header' }, { status: 401 })
+    }
+    // Olay kimliği ZORUNLU (ALT-138): tekilleştirme ve olay kaydı kimliksiz isteği göremezdi.
+    if (!eventId) {
+      return json({ error: 'Missing event id header' }, { status: 400 })
     }
 
     let t = 0
     // support epoch ms or ISO
-    if (/^\d+$/.test(tsHeader.trim())) {
-      t = parseInt(tsHeader.trim(), 10)
+    if (/^\d+$/.test(tsHeader)) {
+      t = parseInt(tsHeader, 10)
     } else {
       const d = Date.parse(tsHeader)
       t = Number.isFinite(d) ? d : 0
@@ -104,11 +108,10 @@ Deno.serve(async (req: Request) => {
 
     const p = normalizePayload(body) as { return_id?: string; order_id?: string; carrier?: string; tracking_number?: string; status?: string; delivered_at?: string }
 
-    // Optional dedup. Tenant filtresi KALDIRILDI: filtre istekten gelen değerle kuruluyordu,
-    // yani farklı bir `?tenant_id=` göndermek idempotency'yi atlatıyordu. `event_id` kargo
+    // Dedup (olay kimliği ZORUNLU, yukarıda doğrulandı). Tenant filtresi KALDIRILDI: filtre istekten gelen
+    // değerle kuruluyordu, yani farklı bir `?tenant_id=` göndermek idempotency'yi atlatıyordu. `event_id` kargo
     // firmasının global tekil kimliği; varlığı tek başına "bu olay işlendi" demektir.
-    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
-    if (eventId) {
+    {
       const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).limit(1)
       if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
     }

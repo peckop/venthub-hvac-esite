@@ -1,0 +1,85 @@
+name: Siparis monoton tetigi — gercek Postgres
+
+# ---------------------------------------------------------------------------
+# INV-SIPARIS-MONOTON-PG-1 (OPS-221 · guvenlik karnesi 2026-11 P1 kilit c)
+#
+# NICIN VAR: `venthub_orders` monoton tetigi (20261103120000_venthub_orders_monoton_durum.sql)
+# bugune kadar CI'da yalniz METIN olarak olculuyordu; "service_role ile delivered -> confirmed
+# UPDATE hata verir" cumlesini hicbir test bir veritabaninda kosturmuyordu (PGlite depoda yok).
+# Bu is bos bir postgres:16 servisi acar, migration'i OLDUGU GIBI uygular ve gecisleri
+# service_role (BYPASSRLS) rolüyle dener. Test: src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts
+#
+# ZORUNLU KIP: `VENTHUB_TEST_PG_ZORUNLU=1` — veritabani adresi yoksa test KIRMIZIDIR; normal
+# test paketinde (adres yok) kol gorunur bicimde ATLANIR, atlanmis kol yesil degildir.
+#
+# Sir YOK: servis yalniz bu isin icinde yasar, prod'a baglanmaz. Parola koşucuya ozel ve gecicidir.
+# ---------------------------------------------------------------------------
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/_shared/siparis_gecis.ts'
+      - 'src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts'
+      - '.github/workflows/siparis-tetik-pg.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/_shared/siparis_gecis.ts'
+      - 'src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts'
+      - '.github/workflows/siparis-tetik-pg.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: siparis-tetik-pg-${{ github.ref }}
+  cancel-in-progress: true
+
+# Depo PUBLIC: `permissions:` yazilinca varsayilanlar duser, `contents: read` ZORUNLU (CLAUDE.md Notlar).
+permissions:
+  contents: read
+
+jobs:
+  tetik-pg:
+    name: Monoton tetik (postgres:16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vh_tetik_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      # Lifecycle betikleri KAPALI: kokun `postinstall`i tsc kosturur, bu test kullanmaz.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+
+      - name: Tetik testi (zorunlu kip)
+        env:
+          VENTHUB_TEST_PG_URL: postgres://postgres:postgres@localhost:5432/vh_tetik_test
+          VENTHUB_TEST_PG_ZORUNLU: '1'
+        run: pnpm exec vitest run src/__tests__/conformance/siparis-monoton-tetik-pg.test.ts

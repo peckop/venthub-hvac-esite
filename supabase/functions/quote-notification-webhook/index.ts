@@ -26,6 +26,7 @@ import { checkRateLimit } from '../_shared/rate_limit.ts'
 import { DEFAULT_TENANT_ID } from '../_shared/tenant.ts'
 import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
 import { kacir } from '../_shared/kodlama.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { icBildirimOlustur, musteriOnayAnahtari } from './ic_bildirim.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (returns-webhook ile aynı pencere)
@@ -294,9 +295,9 @@ Deno.serve(async (req: Request) => {
       console.error('[quote-notification-webhook] resend basarisiz', {
         quote_id: quote.id,
         status: resp.status,
-        govde: govde.slice(0, 300),
+        govde: metniMaskele(govde, 300),
       })
-      await deftereYaz({ email_to: to, subject, status: 'failed', error: `resend ${resp.status}: ${govde.slice(0, 300)}` })
+      await deftereYaz({ email_to: to, subject, status: 'failed', error: `resend ${resp.status}: ${metniMaskele(govde, 300)}` })
       return json({ error: 'send_failed', status: resp.status }, 502)
     }
     const musteriSonuc = resp.ok ? ((await resp.json().catch(() => null)) as { id?: string } | null) : null
@@ -368,9 +369,9 @@ Deno.serve(async (req: Request) => {
         console.error('[quote-notification-webhook] ic bildirim basarisiz', {
           quote_id: quote.id,
           status: icResp.status,
-          govde: govde.slice(0, 300),
+          govde: metniMaskele(govde, 300),
         })
-        await deftereYaz({ email_to: icAlici, subject: ic.subject, status: 'failed', error: `resend ${icResp.status}: ${govde.slice(0, 300)}` })
+        await deftereYaz({ email_to: icAlici, subject: ic.subject, status: 'failed', error: `resend ${icResp.status}: ${metniMaskele(govde, 300)}` })
         return json({ error: 'internal_notify_failed', status: icResp.status, quote_id: quote.id }, 502)
       }
       const icSonuc = icResp.ok ? ((await icResp.json().catch(() => null)) as { id?: string } | null) : null

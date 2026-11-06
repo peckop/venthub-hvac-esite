@@ -27,6 +27,7 @@ const YENI = fs.readFileSync(path.join(KOK, YOL), 'utf8')
 const SOKUMLER: [RegExp, string][] = [
   [/basariYazilabilirMi\(siparisSatiri\)/g, '({ yaz: true, sebep: null })'],
   [/retYazilabilirMi\(siparisSatiri, [^)]*\)/g, '({ yaz: true, sebep: null })'],
+  [/retSiparisleEslesiyorMu\(result, siparisSatiri\)/g, '({ gecti: true, bicim: null, sebep: null })'],
   [/kosulFiltresi\((BASARI|RET)_ONCESI\)/g, "''"],
   [/debugBirlestir\(siparisSatiri\?\.payment_debug, /g, '((_eski: unknown, y: Record<string, unknown>) => y)(null, '],
 ]
@@ -62,6 +63,8 @@ const DEFTER = { refunded_total: 120, refunds: [{ id: 'r1', amount: 120 }], raw:
 let satir: Satir
 let patchlar: { url: URL; govde: Record<string, unknown>; guncellenen: number }[] = []
 let rpcCagrilari: string[] = []
+/** RPC gövdeleri (ad → gövde): yan etkinin HANGİ siparişe gittiğini ölçmek için. */
+let rpcGovdeleri: { ad: string; govde: Record<string, unknown> }[] = []
 /** Gelir alarmı kodları (`client_errors` POST gövdesindeki `extra.code`). */
 let alarmlar: string[] = []
 /** Müşteri sepetinden kalem silme çağrısı sayısı. */
@@ -124,7 +127,9 @@ async function sahteFetch(girdi: RequestInfo | URL, secenek?: RequestInit): Prom
     }
   }
   if (url.pathname.includes('/rest/v1/rpc/')) {
-    rpcCagrilari.push(url.pathname.split('/').pop() ?? '')
+    const ad = url.pathname.split('/').pop() ?? ''
+    rpcCagrilari.push(ad)
+    rpcGovdeleri.push({ ad, govde: JSON.parse(String(secenek?.body ?? '{}')) as Record<string, unknown> })
     return Response.json({ success: true })
   }
   if (url.pathname.endsWith('/rest/v1/client_errors')) {
@@ -241,6 +246,7 @@ beforeEach(() => {
   satir = yeniSatir()
   patchlar = []
   rpcCagrilari = []
+  rpcGovdeleri = []
   alarmlar = []
   sepetSilme = 0
   patchOncesi = null
@@ -296,8 +302,10 @@ describe('INV-ODEME-CALLBACK-2 · başarı geri saramaz (karne kilit a, kural 11
     expect(c.status).toBe('success')
     expect(patchlar.filter((p) => 'status' in p.govde || 'payment_status' in p.govde)).toHaveLength(0)
     expect(satir.status).toBe('delivered')
-    // Zararsız tekrarda stok RPC'si yine koşar ve stok damgasını BİRLEŞTİREREK ekler: defter korunur.
-    expect(satir.payment_debug).toMatchObject({ refunded_total: 120, refunds: DEFTER.refunds, paymentId: 'yeni-odeme' })
+    // OPS-221: zararsız tekrar hiçbir yan etki koşturmaz ve deftere yazmaz.
+    expect(patchlar).toHaveLength(0)
+    expect(rpcCagrilari).toEqual([])
+    expect(satir.payment_debug).toEqual(kayit)
     expect(alarmlar).toEqual([])
   })
 
@@ -365,15 +373,18 @@ describe('INV-ODEME-CALLBACK-2 · başarı geri saramaz (karne kilit a, kural 11
     expect(alarmlar).toEqual([])
   })
 
-  it('kimliksiz tekrar bildirim: stok düşümü yarım kaldıysa YALNIZ stok onarılır, müşterinin sepeti boşaltılmaz', async () => {
+  it('OPS-221 P5: kimliksiz tekrar bildirim stok RPC\'sini ÇAĞIRMAZ; kısmi düşümün stock_processed:false kanıtı korunur', async () => {
     const kayit = { refunded_total: 0, paymentId: 'yeni-odeme', stock_processed: false }
     satir = yeniSatir({ status: 'confirmed', payment_status: 'paid', payment_debug: kayit, coupon_code: 'YUZDE10', user_id: 'musteri-1' })
     iyziYanit = basarili
     const c = await cagir(yeni, { orderId: SIPARIS })
     expect(c.status).toBe('success')
-    expect(rpcCagrilari).toEqual(['process_order_stock_reduction'])
+    expect(rpcCagrilari).toEqual([])
+    expect(patchlar).toHaveLength(0)
     expect(sepetSilme).toBe(0)
-    expect(satir).toMatchObject({ status: 'confirmed', payment_status: 'paid' })
+    expect(satir.payment_debug).toEqual(kayit)
+    // Damga var (false): ilk çağrı stoğu denedi ve alarmını o zaman kaldırdı; tekrar yeni alarm üretmez.
+    expect(alarmlar).toEqual([])
   })
 
   it('kayıtlı paymentId olmayan eski ödenmiş satır: fail-closed, PAYMENT_UNVERIFIED_LEGACY, defter değişmez', async () => {
@@ -385,12 +396,80 @@ describe('INV-ODEME-CALLBACK-2 · başarı geri saramaz (karne kilit a, kural 11
     expect(satir.payment_debug).toEqual(DEFTER)
   })
 
-  it('tekrar bildirimde stok onarımı deftere yalnız stok alanı yazar; raw ve paymentId değişmez', async () => {
-    const kayit = { refunded_total: 0, paymentId: 'yeni-odeme', raw: { paymentId: 'yeni-odeme', ozgun: true }, stock_processed: false }
+  it('OPS-221: tekrar bildirimde stok hiç denenmemişse (damga yok) sessiz kalmaz: STOCK_NOT_ATTEMPTED, yine de RPC ve PATCH yok', async () => {
+    const kayit = { refunded_total: 0, paymentId: 'yeni-odeme', raw: { paymentId: 'yeni-odeme', ozgun: true } }
     satir = yeniSatir({ status: 'confirmed', payment_status: 'paid', payment_debug: kayit })
     iyziYanit = basarili
-    await cagir(yeni, { orderId: SIPARIS })
-    expect(satir.payment_debug).toMatchObject({ raw: { paymentId: 'yeni-odeme', ozgun: true }, stock_processed: true })
+    const c = await cagir(yeni, { orderId: SIPARIS })
+    expect(c.status).toBe('success')
+    expect(alarmlar).toEqual(['STOCK_NOT_ATTEMPTED'])
+    expect(rpcCagrilari).toEqual([])
+    expect(patchlar).toHaveLength(0)
+    expect(satir.payment_debug).toEqual(kayit)
+  })
+
+  it('OPS-221 P3/P5: istek yalnız conversationId taşısa da geçişin yan etkileri KARARIN SATIRINA gider, bir kez', async () => {
+    satir = yeniSatir({ coupon_code: 'YUZDE10', user_id: 'musteri-1' })
+    iyziYanit = basarili
+    const c = await cagir(yeni, { token: KURBAN_TOKEN, conversationId: satir.conversation_id })
+    expect(c).toMatchObject({ status: 'success', updated: true })
+    const stok = rpcGovdeleri.filter((r) => r.ad === 'process_order_stock_reduction')
+    expect(stok.map((r) => r.govde.p_order_id)).toEqual([SIPARIS])
+    expect(rpcCagrilari.filter((r) => r === 'increment_coupon_usage')).toHaveLength(1)
+    expect(sepetSilme).toBeGreaterThan(0)
+    expect(satir.payment_debug).toMatchObject({ stock_processed: true, refunded_total: 120 })
+  })
+})
+
+describe('OPS-221 · karne P1 kilit testleri (adıyla)', () => {
+  it('P1 (a): satır delivered/paid ya da refunded iken retrieve SUCCESS → durum PATCH\'i yok; olan her PATCH filtresinde status=eq.pending', async () => {
+    for (const over of [
+      { status: 'delivered', payment_status: 'paid' },
+      { status: 'delivered', payment_status: 'refunded' },
+      { status: 'cancelled', payment_status: 'refunded' },
+      { status: 'confirmed', payment_status: 'partial_refunded' },
+    ]) {
+      satir = yeniSatir(over)
+      patchlar = []
+      iyziYanit = basarili
+      await cagir(yeni, { token: KURBAN_TOKEN, orderId: SIPARIS })
+      await cagir(yeni, { orderId: SIPARIS })
+      const durumPatchleri = patchlar.filter((p) => 'status' in p.govde || 'payment_status' in p.govde)
+      for (const p of durumPatchleri) expect(p.url.searchParams.get('status'), JSON.stringify(over)).toBe('eq.pending')
+      expect(yazildi(), JSON.stringify(over)).toBe(false)
+      expect(satir).toMatchObject(over)
+      expect(satir.payment_debug).toEqual(DEFTER)
+    }
+  })
+
+  it('P1 (b): satır paid iken retrieve FAILURE → PATCH yok (saldırganın token\'ı, siparişin kendi token\'ı, token\'sız)', async () => {
+    for (const govde of [
+      { token: SALDIRGAN_TOKEN, orderId: SIPARIS },
+      { token: KURBAN_TOKEN, orderId: SIPARIS },
+      { orderId: SIPARIS },
+    ]) {
+      satir = yeniSatir({ status: 'confirmed', payment_status: 'paid' })
+      patchlar = []
+      iyziYanit = reddedildi
+      await cagir(yeni, govde)
+      expect(patchlar, JSON.stringify(govde)).toHaveLength(0)
+      expect(satir.payment_status).toBe('paid')
+      expect(satir.payment_debug).toEqual(DEFTER)
+    }
+  })
+
+  it('P1 (b) eşleşme kapısı: pending sipariş + kendi token\'ı ama ret yanıtı BAŞKA siparişin basketId\'sini taşıyor → yazılmaz', async () => {
+    iyziYanit = () => ({ ...reddedildi(), basketId: '22222222-2222-4222-8222-222222222222' })
+    await cagir(yeni, { token: KURBAN_TOKEN, orderId: SIPARIS })
+    expect(patchlar).toHaveLength(0)
+    expect(satir.payment_status).toBe('pending')
+  })
+
+  it('P1 (b) eşleşme kapısı: ret yanıtı bu siparişin basketId\'sini taşıyorsa yazılır', async () => {
+    iyziYanit = () => ({ ...reddedildi(), basketId: SIPARIS })
+    const c = await cagir(yeni, { token: KURBAN_TOKEN, orderId: SIPARIS })
+    expect(c.updated).toBe(true)
+    expect(satir.payment_status).toBe('failed')
   })
 })
 
@@ -414,7 +493,7 @@ describe('INV-ODEME-CALLBACK-3 · monotonluk: pending dışındaki HER durum bu 
 })
 
 describe('SABOTAJ · aynı saldırılar kapısı sökülmüş koda karşı GEÇER (test körlüğü kontrolü)', () => {
-  it('kapısız kopya kuruldu (dört söküm de eşleşti)', () => {
+  it('kapısız kopya kuruldu (beş söküm de eşleşti)', () => {
     expect(eskiYuklenemedi).toBe('')
     expect(eski).not.toBeNull()
   })
@@ -425,6 +504,12 @@ describe('SABOTAJ · aynı saldırılar kapısı sökülmüş koda karşı GEÇE
     await cagir(eski as Isleyici, { token: SALDIRGAN_TOKEN, orderId: SIPARIS })
     expect(satir.payment_status).toBe('failed')
     expect(satir.payment_debug).not.toHaveProperty('refunded_total')
+  })
+
+  it('kapısız kodda: başka siparişin basketId\'sini taşıyan ret pending siparişe yazılır', async () => {
+    iyziYanit = () => ({ ...reddedildi(), basketId: '22222222-2222-4222-8222-222222222222' })
+    await cagir(eski as Isleyici, { token: KURBAN_TOKEN, orderId: SIPARIS })
+    expect(satir.payment_status).toBe('failed')
   })
 
   it('kapısız kodda: teslim edilmiş sipariş confirmed\'a geri sarılır', async () => {

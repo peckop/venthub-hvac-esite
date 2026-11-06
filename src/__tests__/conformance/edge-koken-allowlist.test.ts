@@ -152,10 +152,11 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
   })
 
   /**
-   * C5 (güvenlik karnesi 2026-11): localhost yalnız YEREL edge'de ya da bilinçli açma
-   * bayrağıyla yansıtılır. Kol davranışı ölçer: gerçek getCorsHeaders, sahte Deno.env.
+   * ALT-156 (2026-11-05): C5'in localhost kısıtı geri alındı — CI admin-smoke localhost'tan barındırılan
+   * edge'i çağırıyor. localhost:<port> her çalışma zamanında yansıtılır; kalıp dışı köken yine reddedilir.
+   * Kol davranışı ölçer: gerçek getCorsHeaders, sahte Deno.env (env artık karara girmez).
    */
-  describe('C5 — localhost yalniz yerel calisma zamaninda', () => {
+  describe('localhost: barindirilan edge de yansitir (ALT-156), kalip disi red', () => {
     type DenoSahte = { env: { get(k: string): string | undefined } }
     const g = globalThis as { Deno?: DenoSahte }
     const onceki = g.Deno
@@ -169,8 +170,8 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
     }
     const PROD = { SUPABASE_URL: 'https://abcdefghijklmnop.supabase.co' }
 
-    it('prod (barindirilan) edge: localhost YANSITILMAZ, yedek adrese duser', () => {
-      expect(acao('http://localhost:3000', PROD)).toBe('https://venthub-hvac-esite.vercel.app')
+    it('prod (barindirilan) edge: localhost:<port> YANSITILIR (CI admin-smoke yolu)', () => {
+      expect(acao('http://localhost:3000', PROD)).toBe('http://localhost:3000')
     })
     it.each(['http://kong:8000', 'http://127.0.0.1:54321', 'http://localhost:54321'])(
       'yerel edge (SUPABASE_URL=%s): localhost yansitilir',
@@ -178,14 +179,12 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
         expect(acao('http://localhost:3000', { SUPABASE_URL: url })).toBe('http://localhost:3000')
       },
     )
-    it('bilincli acma: EDGE_CORS_LOCALHOST=1 yalniz tam "1"', () => {
-      expect(acao('http://localhost:3000', { ...PROD, EDGE_CORS_LOCALHOST: '1' })).toBe('http://localhost:3000')
-      expect(acao('http://localhost:3000', { ...PROD, EDGE_CORS_LOCALHOST: 'true' })).not.toBe('http://localhost:3000')
-    })
-    it('yerelde bile localhost kalibi disi reddedilir', () => {
-      const yerel = { SUPABASE_URL: 'http://kong:8000' }
-      expect(acao('http://localhost:3000.evil.example', yerel)).not.toBe('http://localhost:3000.evil.example')
-      expect(acao('http://localhost', yerel)).not.toBe('http://localhost')
+    it('localhost kalibi disi reddedilir (prod ve yerel)', () => {
+      for (const env of [PROD, { SUPABASE_URL: 'http://kong:8000' }]) {
+        expect(acao('http://localhost:3000.evil.example', env)).not.toBe('http://localhost:3000.evil.example')
+        expect(acao('http://localhost', env)).not.toBe('http://localhost')
+        expect(acao('https://localhost:3000', env)).not.toBe('https://localhost:3000')
+      }
     })
     it('prod: kanonik, uretim takma adi ve ekip onizlemesi kabul; yabanci onek red', () => {
       expect(acao('https://venthub.com.tr', PROD)).toBe('https://venthub.com.tr')
@@ -194,10 +193,12 @@ describe('INV-KOKEN-ALLOWLIST-1 — Edge CORS allowlist genisligi', () => {
       expect(acao(onizleme, PROD)).toBe(onizleme)
       expect(acao('https://venthub-hvac-esite-x.vercel.app', PROD)).toBe('https://venthub-hvac-esite.vercel.app')
     })
-    it('Deno yoksa (env okunamaz) localhost reddedilir — fail-closed', () => {
+    it('Deno yoksa da karar ayni: localhost yansitilir, yabanci koken yedege duser', () => {
       g.Deno = undefined
-      const req = new Request('https://x/f', { headers: { Origin: 'http://localhost:3000' } })
-      expect(getCorsHeaders(req)['Access-Control-Allow-Origin']).toBe('https://venthub-hvac-esite.vercel.app')
+      const yerel = new Request('https://x/f', { headers: { Origin: 'http://localhost:3000' } })
+      expect(getCorsHeaders(yerel)['Access-Control-Allow-Origin']).toBe('http://localhost:3000')
+      const yabanci = new Request('https://x/f', { headers: { Origin: 'https://evil.example' } })
+      expect(getCorsHeaders(yabanci)['Access-Control-Allow-Origin']).toBe('https://venthub-hvac-esite.vercel.app')
     })
   })
 

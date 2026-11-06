@@ -19,7 +19,7 @@ import {
 } from '../_shared/caller.ts'
 import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
 // Maske + hata ayıklama bayrağı tek yerde (güvenlik karnesi 2026-11 S1).
-import { hataAyiklamaAcik, maskAd, maskEposta, maskTelefon, metniMaskele, sirDurumu } from '../_shared/maske.ts'
+import { hataAyiklamaAcik, maskAd, maskEposta, maskTelefon, metniMaskele, nesneyiMaskele, sirDurumu } from '../_shared/maske.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { denemeSiparisiKaydet, satisKipiKarari } from '../_shared/satis_kipi.ts'
@@ -389,7 +389,7 @@ Deno.serve(async (req: Request) => {
                     fn: 'iyzico-payment',
                     code: 'VALIDATION_UNAVAILABLE',
                     message: `order-validate ${vResp.status} dondu; odeme baslatilamiyor.`,
-                    extra: { upstream_status: vResp.status, detail: detail.slice(0, 300) },
+                    extra: { upstream_status: vResp.status, detail: metniMaskele(detail, 300) },
                 });
                 return validationFail('VALIDATION_UNAVAILABLE', 'Fiyat doğrulaması yapılamadı, ödeme başlatılmadı.', { upstream_status: vResp.status }, 502);
             }
@@ -764,7 +764,8 @@ Deno.serve(async (req: Request) => {
         });
         if (!itemsResp.ok) {
             const errTxt = await itemsResp.text().catch(() => '')
-            console.error('Order items insert failed:', itemsResp.status, errTxt)
+            // PostgREST kısıt ihlali metni satır değeri taşıyabilir (K8).
+            console.error('Order items insert failed:', itemsResp.status, metniMaskele(errTxt, 1000))
             return new Response(JSON.stringify({ error: { code: 'DATABASE_ERROR', message: 'Sipariş kalemleri eklenemedi' } }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
@@ -939,12 +940,14 @@ Deno.serve(async (req: Request) => {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
         } else {
-            console.error('İyzico checkout form creation failed:', iyzicoResult);
+            // Sağlayıcı yanıtı serbest metindir (hata mesajı alıcı verisini yankılayabilir) → maskeli (K8).
+            const iyzicoHata = metniMaskele(String(iyzicoResult?.errorMessage || 'unknown'), 500)
+            console.error('İyzico checkout form creation failed:', requestId, nesneyiMaskele(iyzicoResult));
             try {
                 const { slackNotify } = await import('../_shared/notify.ts')
                 await slackNotify('İyzico checkout form creation failed', [
                     { title: 'Request-Id', value: requestId, short: true },
-                    { title: 'Details', value: String(iyzicoResult?.errorMessage || 'unknown'), short: false },
+                    { title: 'Details', value: iyzicoHata, short: false },
                 ])
             } catch { }
 
@@ -952,7 +955,7 @@ Deno.serve(async (req: Request) => {
                 error: {
                     code: 'IYZICO_FORM_ERROR',
                     message: 'İyzico ödeme formu oluşturulamadı',
-                    details: iyzicoResult.errorMessage || 'Bilinmeyen hata'
+                    details: iyzicoResult.errorMessage ? iyzicoHata : 'Bilinmeyen hata'
                 }
             }), {
                 status: 500,
@@ -963,10 +966,13 @@ Deno.serve(async (req: Request) => {
     } catch (error) {
         // KOŞULSUZ: iç hata metni artık yanıtta değil (S5), tek izi bu log + Slack.
         // İstemci `X-Request-Id` ile bu satırı bulur.
-        console.error('Critical Error:', requestId, error);
+        // Geniş catch: hata nesnesi (mesaj + yığın) alıcı adı, e-posta, telefon ya da TCKN taşıyan bir
+        // değer içerebilir → log ve Slack yalnız maskeli metni görür (OPS-213, cetvel K8).
+        const hataMetni = error instanceof Error ? `${error.name}: ${error.message}\n${error.stack ?? ''}` : String(error)
+        console.error('Critical Error:', requestId, metniMaskele(hataMetni, 2000));
         try {
             const { slackNotify } = await import('../_shared/notify.ts')
-            const errMsg = error instanceof Error ? error.message : String(error)
+            const errMsg = metniMaskele(error instanceof Error ? error.message : String(error), 500)
             await slackNotify('iyzico-payment crashed', [
                 { title: 'Request-Id', value: requestId, short: true },
                 { title: 'Error', value: errMsg, short: false },
