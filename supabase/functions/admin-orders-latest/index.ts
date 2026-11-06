@@ -111,6 +111,13 @@ Deno.serve(async (req) => {
       }
     })
 
+    // DB hatası "sipariş yok" gibi görünmesin: 502 + request_id, ayrıntı maskeli loga (OPS-213).
+    if (!resp.ok) {
+      const hataMetni = await resp.text().catch(() => '')
+      console.error('Admin orders latest db error:', requestId, resp.status, metniMaskele(hataMetni, 500))
+      return new Response(JSON.stringify({ error: 'upstream_error', request_id: requestId }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    }
+
     const rows = await resp.json().catch(() => [])
     const contentRange = resp.headers.get('content-range') || '0-0/0'
     const total = Number(contentRange.split('/')[1] || '0') || 0

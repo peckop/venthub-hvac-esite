@@ -482,10 +482,8 @@ function hataSizanYanitlar(kod: string): number[] {
  * sınıfında değil) ya da başka PR'ın dosyası.
  */
 const HATA_GOVDESI_TABANI = new Set([
-  'admin-create-coupon',
-  'admin-iyzico-reconcile',
-  'admin-order-inspect',
-  'admin-update-order',
+  // OPS-213: admin-create-coupon, admin-iyzico-reconcile, admin-order-inspect, admin-update-order
+  // tabandan çıktı (sabit kod + request_id, ayrıntı maskeli log).
   'admin-update-shipping',
   'apply-coupon',
   'delivery-notification',

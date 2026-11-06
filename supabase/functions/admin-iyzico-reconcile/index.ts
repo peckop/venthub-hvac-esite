@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
   const cors = corsHeaders;
+  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
 
@@ -110,14 +111,16 @@ Deno.serve(async (req) => {
         const st = cbJson?.status || 'pending'
         results.push({ id:o.id, conversation_id:o.conversation_id, status: st, from:'callback' })
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e ?? '')
-        results.push({ id:o.id, conversation_id:o.conversation_id, error: msg })
+        // Sipariş başına hata: sabit kod yanıta, ayrıntı maskeli loga (OPS-213).
+        console.error('admin-iyzico-reconcile callback error:', requestId, o.id, metniMaskele(e instanceof Error ? e.message : String(e ?? ''), 500))
+        results.push({ id:o.id, conversation_id:o.conversation_id, error: 'callback_failed' })
       }
     }
 
     return new Response(JSON.stringify({ ok:true, processed: results.length, results }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e ?? '')
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    // K6: iç hata metni yanıta dönmez; ayrıntı maskeli olarak loga, istemci `request_id` ile bulur (OPS-213).
+    console.error('admin-iyzico-reconcile error:', requestId, metniMaskele(e instanceof Error ? e.message : String(e ?? ''), 500))
+    return new Response(JSON.stringify({ error: 'internal_error', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type':'application/json', 'X-Request-Id': requestId } })
   }
 })
