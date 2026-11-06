@@ -203,7 +203,11 @@ Deno.serve(async (req: Request) => {
 ### 3.5 Webhook kuralı — HMAC + replay guard, **fail-CLOSED**
 
 **KURAL.** Sınıf (c) fonksiyonlarında `verify_jwt=false` olduğu için **tek kimlik kanıtı gövdededir**:
-1. Ham gövde üzerinden **HMAC-SHA256** imza doğrulaması (`x-signature`, sabit-zamanlı karşılaştırma),
+1. **HMAC-SHA256** imza doğrulaması (`x-signature`, sabit-zamanlı karşılaştırma). İmzalanan metin
+   yalnız ham gövde DEĞİLDİR: `<x-timestamp>.<x-event-id>.<ham gövde>` (2026-11-05, #2266, ALT-138).
+   Zaman ve olay kimliği imzaya girer; saldırgan geçerli bir gövdeyi yeni zaman ya da yeni olay
+   kimliğiyle tekrar gönderemez. İki alan nokta içeremez (bölünme tek olsun); biri boşsa imza geçersizdir.
+   Tek uygulama: `supabase/functions/_shared/sabit_zaman.ts::webhookImzaGecerli`; uçta elle HMAC yazılmaz.
 2. **Zorunlu** timestamp header'ı + dar pencere (≤5 dk) replay guard,
 3. Sır **yoksa** veya imza **yoksa** → **401**. Fonksiyon açılmaz.
 
@@ -218,12 +222,16 @@ if (!secret) { console.warn('secret yok, atlanıyor'); /* devam */ }   // fail-O
 ```
 ✅ **DOĞRU** (`returns-webhook` deseni):
 ```ts
-const secret = Deno.env.get('RETURNS_WEBHOOK_SECRET') || ''
-const sign   = req.headers.get('x-signature') || ''
-if (!secret || !sign || !(await hmacValid(secret, raw, sign))) {
-  return json({ error: 'Invalid signature' }, { status: 401 })
-}
-const ts = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
+import { webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
+
+const secret  = Deno.env.get('RETURNS_WEBHOOK_SECRET') || ''
+const sign    = req.headers.get('x-signature') || ''
+const ts      = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()
+const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
+// İmzalanan metin: `${ts}.${eventId}.${raw}`; zaman ya da olay kimliği boşsa false (fail-closed)
+let ok = false
+if (secret && sign) ok = await webhookImzaGecerli(secret, ts, eventId, raw, sign)
+if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
 if (!ts) return json({ error: 'Missing timestamp header' }, { status: 401 })
 if (Math.abs(Date.now() - Date.parse(ts)) > 5 * 60_000) {
   return json({ error: 'Stale or invalid timestamp' }, { status: 401 })
@@ -601,7 +609,7 @@ sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat
 | **E3** | §3.4 CORS tek kaynak | aynı | `getCorsHeaders` **import ediliyor** ama **çağrılmıyor** | **CANLI — R2** |
 | **E4** | §3.4 elle cors objesi yasak | aynı | `Access-Control-Allow-` literali `_shared/cors.ts` **dışında** geçiyor | **CANLI — R3** (baseline: `apply-coupon`) |
 | **E5** | §3.7 per-fonksiyon toml yasak | `supabase/functions/*/supabase.toml` | dosya sayısı > 0 | **CANLI — R4** |
-| **E6** | §3.1 `verify_jwt=false` allow-list | `supabase/config.toml` | `false` olan uçta gövdede kimlik/imza sinyali yok | **CANLI — R5** (baseline: `iyzico-callback`, `shipping-status`; muaf: `tcmb-rates-sync`) |
+| **E6** | §3.1 `verify_jwt=false` allow-list | `supabase/config.toml` | `false` olan uçta gövdede kimlik/imza sinyali yok | **CANLI — R5** (baseline: `iyzico-callback`; muaf: `tcmb-rates-sync`, `shipping-status` — emekli uç, 410 döner, `R5_EMEKLI` bekçisine bağlı, 2026-11-05 ALT-138) |
 | **E7** | §3.7 config kapsamı | `config.toml` ↔ `functions/*/` dizinleri | dizini olup `[functions."x"]` bloğu olmayan fonksiyon | **CANLI — R7** (baseline: 26'nın 13'ünde blok yok; `healthz` 2026-08-19'da çıktı) |
 | **E14** | §3.11 ortam değiştiren sessiz varsayılan yasak | `supabase/functions/**/*.ts` | `Deno.env.get(...)` sonrası `\|\|`/`??` ile **mutlak http(s) adresi** varsayılanı | **CANLI — INV-CONFIG-1** (2026-08-19 kurulduğunda **bilinçli KIRMIZI**: `iyzico-payment:384`, `iyzico-callback:174`) |
 | **E13** | §3.11 ölçemeyen yeşil dönemez | `healthz/index.ts` + `config.toml` | koşulsuz `ok: true`, ya da öz-denetim çağrılmıyor, ya da `healthz` toml'da beyan edilmemiş | **CANLI — INV-CONFIG-1** |

@@ -728,7 +728,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
         expect(m.split(ortak).length - 1, `${etiket}: ortak bölüm tam bir kez`).toBe(1)
         expect(m, etiket).toContain('merge-ritueli.cjs')
         expect(m, etiket).toContain('--onay')
-        expect(m, etiket).toContain('okundu, uygun')
+        expect(m, etiket).toContain('bir denetçi alt ajan tam farkı okur; engelleyici bulgu yoksa ARAÇ birleştirir')
         expect(m, etiket).toContain('--agac=<ağaç> --merge')
         expect(m, etiket).toContain('doğrudan çağrılmaz')
         expect(m, etiket).toContain('karar 98, 224')
@@ -839,13 +839,14 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(ortak).toContain('deny gevşetilmez (§18)')
     expect(ortak).toContain("Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer")
     expect(ortak).toContain('izin modunu değiştirmek Recep kararıdır')
-    expect(ortak).toContain("OPS'un kendi kanca/ayar PR'ını ARAÇ okur")
+    expect(ortak).toContain('değişikliği yazmamış bir denetçi alt ajan tam farkı okuyup engelleyici bulgu bildirmedikten sonra ARAÇ birleştirir')
+    expect(ortak).toContain('İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep')
     // filo-ortak 10.000 bayt tavanında (hazir-ozellik-kurulumu): çapalı hafıza ve bağımsız doğrulama satırları kurallar dosyalarında.
     for (const [ad, m] of Object.entries(kuralMetinleri)) {
       expect(m, `${ad}: çapalı hafıza`).toContain('Çapalı hafıza okunur ve etiketlenir')
       expect(m, `${ad}: bağımsız doğrulama`).toContain('Bağımsız doğrulama: canlı yazım betiği')
     }
-    expect(kuralMetinleri.OPS).toContain('OPS\'un kendi kanca ve ayar PR\'ını ARAÇ okur')
+    expect(kuralMetinleri.OPS).toContain('Kanca ve ayar PR\'ını (OPS\'unki dahil) bağımsız denetçi alt ajan okur, ARAÇ birleştirir')
   })
 
   it("HRT-65: kardeş depodaki 'bağlı: evet' tetiği yerelde ölçülür, kardeş depo yoksa sorun sayılmaz (ayırt edici)", () => {
