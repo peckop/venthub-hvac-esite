@@ -73,8 +73,18 @@ test.describe('INV-AXE-1 — ana sayfa TR 390px axe taraması', () => {
 
     // "Karar verilemedi" (incomplete) color-contrast düğümleri: geçti DEĞİL, görülmeyen alan. Sayı artarsa
     // (yeni gradyan/görsel arka plan üstü metin) kırmızı; azalırsa tabanı düşürme notu çıkar (OPS şartı, 10-05).
-    const belirsiz = sonuc.incomplete.find((v) => v.id === 'color-contrast')?.nodes.length ?? 0
+    const belirsizDugumler = sonuc.incomplete.find((v) => v.id === 'color-contrast')?.nodes ?? []
+    const belirsiz = belirsizDugumler.length
     testInfo.annotations.push({ type: 'color-contrast-incomplete', description: String(belirsiz) })
+    // TEŞHİS (ALT-158, 6 Kasım): sayı tek başına kararsız koşuyu açıklamıyordu (#2289 ilk koşu 27, yeniden koşu
+    // ≤21, aynı kod). Her düğümün hedefi ve axe'ın sebebi basılır; bir sonraki sapma kendini teşhis eder.
+    // Taban DEĞİŞMEDİ — bu satırlar yalnız görünürlük ekler, kapıyı gevşetmez.
+    const teshis = belirsizDugumler.map((d) => {
+      const sebep = [...d.any, ...d.all, ...d.none].map((c) => c.message).find(Boolean) ?? '(sebep yok)'
+      return `${d.target.join(' ')} | ${sebep}`
+    })
+    testInfo.annotations.push({ type: 'color-contrast-incomplete-dugumler', description: teshis.join('\n') })
+    console.warn(`[INV-AXE-1] color-contrast incomplete ${belirsiz} düğüm:\n${teshis.join('\n')}`)
     if (belirsiz < BELIRSIZ_KONTRAST_TABAN) {
       console.warn(
         `NOT: color-contrast incomplete ${belirsiz} < taban ${BELIRSIZ_KONTRAST_TABAN}; ` +
