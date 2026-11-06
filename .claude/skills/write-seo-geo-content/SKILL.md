@@ -309,9 +309,24 @@ Yukarıdaki E-E-A-T listesi yazım içindir; denetimde yalnız şu farklar eklen
 - **Deneyim gösterilir, beyan edilmez.** Yazarın "denedim" demesi kanıt sayılmaz; kanıt gerçek bir iz taşır (kurulum fotoğrafı, saha ölçümü, katalogdan sayfa atfı). İzi olmayan deneyim cümlesi uydurulmaz, eksik olarak raporlanır. Yazar özgeçmişi tek başına yetmez; içeriğin kendisi konuya hâkim görünmelidir.
 - **Dört eksen için "var / zayıf / yok" yaz, sayısal puan uydurma.** Her zayıf ya da yok için kanıtı olan somut bir ek öner (kaynaklı sayı, kaynak dizininden sayfa atfı, sınırlılık notu). Kaynaksız sayı eklemek öneri sayılmaz.
 - **Anlamsal boşluk (rakip sayfalara karşı).** Hedef sorgunun üst sonuçlarındaki sayfaların işlediği varlıkları ve alt konuları, sayfanın işlediğiyle yan yana koy ve her farkı sınıfla: çekirdek (hepsinde var, bizde yok), ayırt edici (bir iki rakipte var), sıradan (herkes yüzeysel geçer), fırsat (rakipler atlamış). Her boşluk için hangi başlığa ve ne derinlikte (paragraf, alt başlık, bölüm) ekleneceği yazılır. Boşluk, doldurma değil bilgi taşıyan bölümdür.
+- **Adım listesi (Y2.4).** "Şu sayfa aramada önde, bizimkini ona göre iyileştir" işinde ölçüm sırası `docs/standards/yayin-gorunurluk-denetim-standard.md` Y2.4'te yazılıdır: sorgu kümesi, Search Console 90 gün, Trends çapalı küme, SERP, ham HTML, Y2.3 ajanı, hüküm. Sırayı her seferinde yeniden tarif etme, orayı koş. Y2.4 bu bölümden ÖNCE gelir (ölçüm ve yazı/kategori ayrımı); bu bölümün sınıfları onun yerine geçmez, onun çıktısını sınıflar.
 - **Sınırlar.** Rakip sayfa okuması elle ve insan onayıyla yapılır; sayfa tarayan komut ya da betik eklenmez. Search Console verisi depoya girmez. Rakip adı ve rakam doğrulanmadan yazılmaz. SSS şeması (FAQPage) önerilmez. Bölüm GEO-SEO departmanının çürütücü ve araştırmacı çalışanlarınca da kullanılır.
 
 Fikir kaynağı: inhouseseo/superseo-skills eeat-audit ve semantic-gap-analysis @9cf22cc065a294bf0077ea6af6b4ea0eb7f89cdc (Apache-2.0; kendi cümlelerimizle yazıldı)
+
+## Ölçülmüş dersler (GEO-SEO ölçer, YETENEK işler)
+
+Neden burada: rakip kıyası dersleri yalnız GEO-SEO'da kalırsa yazıyı yazan onları görmez, aynı varsayımı yeniden dener. "Sıra arttı" iddiası da burada yalnız önce/sonra ölçümüyle yazılır; ölçüm yoksa satıra "ölçülüyor" yazılır, tahmin yazılmaz. Depo herkese açıktır: bu tabloya Search Console ya da gösterim/sıra sayısı, rakip adı ve kişi sözü girmez; sayılar GEO-SEO kartlarındadır, buraya niteliksel sonuç yazılır.
+
+| Değişiklik | Önce | Sonra | 14. gün |
+|---|---|---|---|
+| SEO-81, radyal/aksiyel yazı: başlık ve H1 "Radyal ve aksiyel fan farkı nedir?" oldu, ilk H2'de fark tablosu önerildi | Başlıkta ve H2'lerde "fark" yoktu; "fark" sorgusunda sayfa gösterim almıyordu; rakip sayfaların tamamı başlıkta fark ya da karşılaştırma taşıyordu | Yeni başlık canlıda (4 Kasım), dizin isteği gitti | Ölçülüyor: 18 Kasım. Kabul: aynı SERP'te ilk 10 ve Search Console'da "fark" sorgusunda gösterim |
+| SEO-83, kanal tipi fan: hüküm = yazıya "nedir/nasıl çalışır" (markasız tanım, H1 "Kanal tipi fan nedir, nerede kullanılır?", fiyat başlığı "Teklif için hangi bilgiler gerekir?"), kategoriye çeşit ve teklif bölümü | Genel kanal fanı aramalarında ilk sayfa ürün-kategori ağırlıklı; yazı yalnız "nedir" aramasında ilk sayfada; kategori ilk sayfada yok; rakip sayfa genel aramalarda ilk sayfada değil, yalnız marka adlı aramada çıkıyor | Uygulanmadı (yazı BLOG'da, kategori yeni siteye girdi); uygulanınca doldurulur | Ölçülüyor: uygulama tarihi + 14 gün |
+
+Derslerin kısa hâli (yazıya başlarken oku):
+- "Rakip önde çıkıyor" öncülü ölçülmeden kabul edilmez. SEO-83'te rakip yalnız marka adlı aramada öndeydi; marka adlı sorgu genel sorgu sayılmaz.
+- Fiyat ve çeşit sorguları kategori sayfasının işidir, "nedir" ve "nasıl çalışır" sorguları yazının; yazı kategori sorgusunu, kategori yazı sorgusunu yememeli.
+- "Sıra arttı" yalnız önce/sonra ölçümüyle yazılır; 14. gün gelmeden tabloya sonuç yazılmaz.
 
 ## Quality Standards
 

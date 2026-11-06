@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { odemeSiparisleEslesiyorMu } from '../odeme_eslesme'
+import { odemeSiparisleEslesiyorMu, retSiparisleEslesiyorMu } from '../odeme_eslesme'
 
 /**
  * INV-PAY-ESLESME-1 — VULN-001 kapısının kilidi (REC-355).
@@ -231,6 +231,48 @@ describe('INV-PAY-ESLESME-1 — BİÇİM A (yeni) kolu', () => {
     expect(sebep).not.toContain(String(kurban.conversation_id))
     expect(sebep).not.toContain(String(kurban.total_amount))
     expect(sebep).toMatch(/^[a-z_]+$/)
+  })
+})
+
+describe('OPS-221 — eşleşme kapısı okuduğu payment_status\'u KULLANIR (karne 2026-11 P1)', () => {
+  it('sözlük dışı ödeme durumu: kimlik ve tutar tutsa bile GEÇMEZ (fail-closed)', () => {
+    const { satir, raw } = fiksturVakalari()[0]
+    const k = odemeSiparisleEslesiyorMu(raw, { ...satir, payment_status: 'odendi' })
+    expect(k).toMatchObject({ gecti: false, sebep: 'odeme_durumu_sozluk_disi' })
+  })
+
+  it('NULL ya da eksik ödeme durumu \'pending\' sayılır (kolon DEFAULT\'u, DB tetiğiyle aynı); 13 vaka bozulmaz', () => {
+    const { satir, raw } = fiksturVakalari()[0]
+    expect(odemeSiparisleEslesiyorMu(raw, { ...satir, payment_status: null }).gecti).toBe(true)
+    for (const p of ['pending', 'paid', 'failed', 'refunded', 'partial_refunded']) {
+      expect(odemeSiparisleEslesiyorMu(raw, { ...satir, payment_status: p }).gecti, p).toBe(true)
+    }
+  })
+})
+
+describe('OPS-221 — retSiparisleEslesiyorMu: ret dalı da eşleşme kapısından geçer (karne P1 (b))', () => {
+  it('ret yanıtı BAŞKA siparişin basketId\'sini taşıyorsa geçmez', () => {
+    const v = fiksturVakalari()
+    const k = retSiparisleEslesiyorMu({ paymentStatus: 'FAILURE', basketId: v[1].raw.basketId }, v[0].satir)
+    expect(k).toMatchObject({ gecti: false, sebep: 'kimlik_eslesmedi' })
+  })
+
+  it('ret yanıtı bu siparişin kimliğini taşıyorsa geçer (biçim A ve B)', () => {
+    const { satir, raw } = fiksturVakalari()[0]
+    expect(retSiparisleEslesiyorMu({ basketId: satir.id }, satir)).toMatchObject({ gecti: true, bicim: 'id' })
+    expect(retSiparisleEslesiyorMu({ basketId: raw.basketId }, satir)).toMatchObject({ gecti: true, bicim: 'epoch' })
+  })
+
+  it('basketId yoksa tek başına red sebebi değil (ret biçimi ölçülmedi, token bağı ayrıca şart)', () => {
+    const { satir } = fiksturVakalari()[0]
+    expect(retSiparisleEslesiyorMu({ paymentStatus: 'FAILURE' }, satir)).toMatchObject({ gecti: true, bicim: null })
+  })
+
+  it('satır yok, yanıt yok ya da sözlük dışı ödeme durumu → geçmez', () => {
+    const { satir } = fiksturVakalari()[0]
+    expect(retSiparisleEslesiyorMu({ basketId: satir.id }, null).gecti).toBe(false)
+    expect(retSiparisleEslesiyorMu(null, satir).gecti).toBe(false)
+    expect(retSiparisleEslesiyorMu({ basketId: satir.id }, { ...satir, payment_status: 'odendi' }).gecti).toBe(false)
   })
 })
 

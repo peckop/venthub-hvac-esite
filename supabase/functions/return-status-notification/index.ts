@@ -4,7 +4,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 // Kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
 import { guvenliRenk, guvenliUrl, kacir } from '../_shared/kodlama.ts'
-import { maskEposta } from '../_shared/maske.ts'
+import { maskEposta, metniMaskele } from '../_shared/maske.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -337,7 +337,8 @@ ${companyFooter}
     })
 
     if (!emailResponse.ok) {
-      const errorText = await emailResponse.text()
+      // K8: Resend hata metni alıcı adresini taşıyabilir; hata nesnesine (log + yanıt) maskeli girer.
+      const errorText = metniMaskele(await emailResponse.text().catch(() => ''), 500)
       throw new Error(`Email failed: ${errorText}`)
     }
 
@@ -355,7 +356,8 @@ ${companyFooter}
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Unknown error'
+    // K8: buraya düşen her hata serbest metindir; log ve yanıt maskeli metni görür.
+    const msg = metniMaskele(error instanceof Error ? error.message : 'Unknown error', 500)
     console.error('Notification error:', msg)
     return new Response(JSON.stringify({ error: msg, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }

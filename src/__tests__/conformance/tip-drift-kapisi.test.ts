@@ -13,8 +13,9 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 function repoKoku(): string {
   return execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], {
@@ -137,5 +138,70 @@ describe('INV-TIP-DRIFT-1 · kapı CI’a BAĞLI ve doğru kimlikle koşuyor', (
       'envanter hâlâ "çağıran yok" diyor — bağ kuruldu ama kayıt bayat kaldı',
     ).toBe(false)
     expect(satir, 'envanter satırı çağıranı CI olarak yazmıyor').toMatch(/CI[^|]*db-advisor/)
+  })
+})
+
+/**
+ * ALT-159 (2026-11-06): BEKLEYEN MIGRATION İSTİSNASI. "Tiplerde var, canlıda yok" kalemi yalnız canlı
+ * defterde kaydı OLMAYAN bir migration onu YARATIYORSA kırmızı sayılmaz. Saha: #2283 (webhook_olaylari).
+ * Uçtan uca canlı ölçüm PR gövdesinde (defter okundu, 4 kalem açıklandı; migration dosyası çıkarılınca çıkış 1).
+ */
+type TipDriftModulu = {
+  migrationNesneleri(metinler: string[]): Set<string>
+  fazlaAyir(fazla: string[], nesneler: Set<string>): { aciklanan: string[]; kalan: string[] }
+  bekleyenDosyalar(dosyalar: string[], kayitli: Set<string> | null): string[] | null
+}
+
+describe('INV-TIP-DRIFT-1 · bekleyen migration istisnası dar (ALT-159)', () => {
+  let m: TipDriftModulu
+  beforeAll(async () => {
+    m = (await import(pathToFileURL(path.join(KOK, BETIK)).href)) as TipDriftModulu
+  })
+
+  const MIG = [
+    '-- yorum: create table public.yorumdaki (x int);',
+    'create table if not exists public.webhook_olaylari (',
+    '  olay_kimligi uuid primary key,',
+    '  alindi timestamptz not null default now(),',
+    '  constraint ck check (true)',
+    ');',
+    'alter table public.siparis add column if not exists iz text;',
+    'create or replace function public.webhook_olay_tuket(p text) returns boolean language plpgsql as $$',
+    'begin create table public.govdedeki (x int); return true; end $$;',
+  ].join('\n')
+
+  it('migration metninden tablo, kolon, eklenen kolon ve fonksiyon çıkar; yorum ve gövde sayılmaz', () => {
+    const n = m.migrationNesneleri([MIG])
+    expect([...n].sort()).toEqual([
+      'fonksiyon:public.webhook_olay_tuket',
+      'kolon:public.siparis.iz',
+      'kolon:public.webhook_olaylari.alindi',
+      'kolon:public.webhook_olaylari.olay_kimligi',
+      'tablo:public.webhook_olaylari',
+    ])
+  })
+
+  it('SABOTAJ: bekleyen migration\'ın yaratmadığı fazla kalem KIRMIZI kalır', () => {
+    const n = m.migrationNesneleri([MIG])
+    const r = m.fazlaAyir(['tablo:public.webhook_olaylari', 'kolon:public.baska.uydurma'], n)
+    expect(r.aciklanan).toEqual(['tablo:public.webhook_olaylari'])
+    expect(r.kalan).toEqual(['kolon:public.baska.uydurma'])
+  })
+
+  it('SABOTAJ: defterde KAYITLI (uygulanmış) migration istisna vermez; defter boşsa ölçülemez', () => {
+    const kayitli = new Set(['20261101000000_eski.sql'])
+    expect(m.bekleyenDosyalar(['20261101000000_eski.sql', '20261105090000_yeni.sql'], kayitli)).toEqual([
+      '20261105090000_yeni.sql',
+    ])
+    expect(m.bekleyenDosyalar(['20261105090000_yeni.sql'], new Set())).toBeNull()
+    expect(m.bekleyenDosyalar(['20261105090000_yeni.sql'], null)).toBeNull()
+  })
+
+  it('istisna yalnız fazla kalem varken devreye girer ve defter okunamazsa çıkış 2 (fail-closed)', () => {
+    const k = oku(BETIK)
+    expect(k).toMatch(/if \(fazla\.length\) \{[\s\S]*?defterOku\(PROJE\)/)
+    expect(k).toMatch(/migration defteri okunamadi/)
+    expect(k).toMatch(/select name from public\._migration_ledger/)
+    expect(k, 'defter sorgusu salt okuma olmalı').not.toMatch(/(insert|update|delete)\s+(into|from)?\s*public\._migration_ledger/i)
   })
 })

@@ -1,4 +1,5 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 Deno.serve(async (req: Request) => {
@@ -66,7 +67,7 @@ Deno.serve(async (req: Request) => {
 
     if (!resp.ok) {
       const _text = await resp.text().catch(()=>'' )
-      return new Response(JSON.stringify({ ok:false, httpStatus: resp.status, rpcUrl, body:_text }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
+      return new Response(JSON.stringify({ ok:false, httpStatus: resp.status, rpcUrl, body:metniMaskele(_text, 2000) }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
     const json = await resp.json().catch(()=>[])

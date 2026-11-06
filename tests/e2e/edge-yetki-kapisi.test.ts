@@ -41,7 +41,7 @@ vi.mock('@supabase/supabase-js', () => {
     const filtre: Record<string, unknown> = {}
     const q: Record<string, unknown> = {}
     const kendisi = () => q
-    for (const ad of ['select', 'order', 'limit', 'lt', 'gte', 'lte', 'in', 'update', 'insert', 'neq']) {
+    for (const ad of ['select', 'order', 'limit', 'lt', 'gte', 'lte', 'in', 'is', 'update', 'insert', 'neq']) {
       q[ad] = kendisi
     }
     q.eq = (kolon: string, deger: unknown) => {

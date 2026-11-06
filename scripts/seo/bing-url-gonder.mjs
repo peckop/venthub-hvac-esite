@@ -206,7 +206,7 @@ async function calistir() {
   if (s.kalan.length > 0) console.log(`KALAN ${s.kalan.length} adres (kota yetmedi/ölçülemedi), ertesi gün ilk iş:\n${s.kalan.join('\n')}`)
   if (cikti) {
     mkdirSync(resolve(cikti), { recursive: true })
-    const dosya = join(resolve(cikti), `bing-url-gonder-${alinma.slice(0, 10)}.json`)
+    const dosya = join(resolve(cikti), `bing-url-gonder-${alinma.slice(0, 10)}T${alinma.slice(11, 19).replace(/:/g, '')}.json`)
     writeFileSync(dosya, JSON.stringify({ alinma, site: siteUrl, kuru, ...s }, null, 1))
     console.log(`çıktı: ${dosya}`)
   }

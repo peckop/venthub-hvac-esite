@@ -658,7 +658,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     konu: 'konfor',
     yayinTarihi: '2026-10-25',
     // 2026-11-03 (BLG-30): terim hizası, "karışık akışlı" → "karma akışlı (karışık akışlı)"; metin iddiası değişmedi.
-    guncellemeTarihi: '2026-11-03',
+    // Güncelleme tarihi 2026-11-04 (BLG-39, SEO-83): gövde yenilendi (kesit farkı, kullanım yerleri, seçim bilgileri, kaynaklar); doğrulanmış metin taslak v-son (sha c97467046789; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug, H1 ve ürün listesi değişmedi.
+    guncellemeTarihi: '2026-11-04',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -667,121 +668,106 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     diller: {
       tr: {
         slug: 'kanal-tipi-fan-nedir-nerede-kullanilir',
-        ozet: "Fan akış türlerini ve kanal tipi fanların nerelere takıldığını üretici belgeleriyle öğrenin; katalog özellikleri ile DOE rehberindeki debi ve basınç anlatımı.",
+        ozet: "Kanal tipi fan nedir, nasıl çalışır, nerede kullanılır? Yuvarlak ve dikdörtgen kesit farkı, fan türleri ve seçimde bakılacak bilgiler.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Kanal fanı seçmeden önce türleri ve takılacağı yerleri bu rehberde karşılaştırın.',
         govde: `# Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar
 
-Kanal tipi fan, havalandırma kanalına yerleştirilmiş bir fan türüdür; Avens yuvarlak kanal tipi fanı yuvarlak bir kanala, dikdörtgen kanal tipi fanı dikdörtgen kesitli kanallara entegre fanlar olarak tanımlar [1]. Vortice LINEO serisini yatay ya da dikey kanallı montaj için tasarlanmış karma akışlı (karışık akışlı) fanlar olarak tanımlar [2].
+Kanal tipi fan, havalandırma sistemlerinde kullanılan ve kanala entegre edilen fandır; kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı (U.S. Department of Energy, DOE) ile AMCA International'ın rehberine göre tüp tipi aksiyel fanlar egzoz uygulamalarında sık kullanılır [1]; bir üretici kataloğundaki kanal fanı serileri ise asma tavan ve çatı arasında, mutfak, tuvalet, laboratuvar, bar ve restoran gibi mekânlarda kullanılır [4]. Kanal tipi fanlar farklı akış türleriyle yapılır [1][4]. DOE rehberi kanallı iklimlendirme tesisatına uygun tür olarak tüp tipi aksiyel fanı anlatır [1]. Bir üretici kataloğu ise kanal fanı serilerinden birini karma akışlı (karışık akışlı) olarak tanımlar [4].
 
-Bu yazı, fanların akış türlerini, kanal tipi fanların hangi yerleşimlerde kullanıldığını ve seçerken hangi bilgilere bakılacağını üretici belgelerine ve ABD Enerji Bakanlığı'nın 2003 tarihli, endüstriyel fan sistemlerine yönelik rehberine dayanarak anlatır [2][7].
+## Kanal tipi fan nasıl çalışır?
 
-## Fanlarda akış türleri ve kanal fanları
+DOE rehberine göre tüp tipi aksiyel fanlar egzoz uygulamalarında sık kullanılır, çünkü kanal kayıplarını yenmeye yetecek basıncı oluşturur [1]. Rehber fanları iki ana türe ayırır: santrifüj ve aksiyel [1]. Santrifüj fan, dönen bir çarkla havanın hızını artırır; hava çarkın göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır ve bu enerji, hava çıkışa girmeden önce yavaşlarken statik basınç artışına dönüşür [1]. Aksiyel fan ise havayı fanın ekseni boyunca hareket ettirir; hava, pervane ile uçak kanadındaki gibi kanat yüzeyinde oluşan aerodinamik kaldırma kuvvetiyle basınçlandırılır [1].
 
-DOE rehberi fanları iki ana türe ayırır: aksiyel ve santrifüj [7]. Aksiyel fanlar havayı fanın ekseni boyunca hareket ettirir [7]. Santrifüj fanlar yüksek basıncı yüksek verimle üretebilir [7]. Vortice kataloğu karma akışlı çarkı, helisel fanların avantajı olan yüksek debi ve çarkın ekseni çevresindeki akışı, santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatır [2]. Aynı katalogda CA V0 ve CA MD serilerinin sayfa başlığı santrifüj kanal fanı der, gövde metni ise karma akışlı olduğunu yazar [2]; bu nedenle akış türü yalnız seri adından çıkarılmaz.
+Aksiyel fanın silindirli türü tüp tipi aksiyel fandır: DOE rehberi bunu bir silindirin içine yerleştirilmiş pervane tipi fan olarak tanımlar ve hava akışı özelliklerini iyileştirdiği için pervane tipi fandan daha yüksek basınç ve daha iyi verim sağladığını yazar [1]. Tüp tipi aksiyel fanlar orta basınçlı, yüksek debili uygulamalarda kullanılır [1]. DOE rehberi, çıkışına kılavuz kanatlar eklenmiş tüp tipi aksiyel fanı kılavuz kanatlı (vaneaxial) aksiyel fan olarak tanımlar [1]. Karma akışlı fan DOE rehberinde tanımlanmaz; bir üretici kataloğu karma akışlı çarkı, helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatır (üretici anlatımı) [4].
 
-ABD Enerji Bakanlığı rehberi, tüp tipi aksiyel (tubeaxial) fanları orta basınçlı ve yüksek debili uygulamalar için tanımlar ve kanallı iklimlendirme tesisatlarına uygun bulur [7].
-
-| Tür | Kaynaktaki ifade | Kaynak |
+| Tür | Çalışma ilkesi | Kaynak |
 |---|---|---|
-| Aksiyel | Havayı fanın ekseni boyunca hareket ettirir [7] | [7] |
-| Santrifüj | Yüksek basıncı yüksek verimle üretebilir [7] | [7] |
-| Karma akışlı (karışık akışlı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir [2] | [2] |
-| Tüp tipi aksiyel (aksiyel fanın bir alt türü) | Orta basınç ve yüksek debili uygulamalara uygundur [7] | [7] |
+| Santrifüj | Havayı radyal yönde hızlandırır, kinetik enerjiyi basınca çevirir | [1] |
+| Aksiyel | Havayı fanın ekseni boyunca hareket ettirir | [1] |
+| Tüp tipi aksiyel | Silindir içindeki pervane tipi fandır; orta basınç ve yüksek debili uygulamalara uygundur | [1] |
+| Kılavuz kanatlı aksiyel | Tüp tipi aksiyel fana çıkış kanatları eklenmiş türdür | [1] |
+| Karma akışlı (üretici anlatımı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir | [4] |
+
+## Yuvarlak ve dikdörtgen kesit farkı nedir?
+
+Fark, fanın bağlandığı kanalın kesitindedir. Bir firmanın bilgi sayfası yuvarlak kanal tipi fanı yuvarlak bir kanala entegre fan, dikdörtgen kanal tipi fanı ise dikdörtgen kesitli kanallara entegre fan olarak tanımlar; aynı sayfa dikdörtgen kesitli olanı büyük hava hacimlerini taşımak için tasarlanmış ve sıkışık alanlarda daha iyi yer kullanımı sağlayan fan olarak anlatır [2]. Aynı serinin üretici kataloğunda anlatılan karma akışlı kanal fanı serisi, standart yuvarlak kesitli borulara takılabildiği gibi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3].
+
+Sınırlar: incelenen kaynaklarda yuvarlak ve dikdörtgen kesit arasında sayıya dayalı bir debi, basınç ya da ses karşılaştırması verilmemiştir [2][3].
 
 ## Kanal tipi fan nerede kullanılır?
 
-Vortice, plastik reçine gövdeli CA V0 serisini asma tavana ya da çatı arasına monte edilen bir kanal fanı olarak sunar; kataloğa göre mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygundur [2]. Aynı katalog boyalı sac çelik gövdeli CA MD serisini de asma tavan ve çatı arası kurulumu için tanımlar [2].
+Kaynaklarda egzoz uygulamaları, asma tavan ve çatı arası ile dış mekân kullanım yeri olarak anılır [1][4]. DOE rehberi tüp tipi aksiyel fanların nispeten az yer kapladığını da yazar [1]. Bir üretici kataloğunda plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilen kanal fanı olarak sunulur ve mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygun görülür; boyalı sac çelik gövdeli bir seri de asma tavan ve çatı arası kurulumu için tanımlanır (üretici anlatımı) [4]. Yüksekliği çok düşük bir seri, kısa asma tavanlara monte edilmeye elverişlidir [4].
 
-Kanalın ucuna takılan türler de vardır. Çelik sac duvar tipi fanlar kanalın ucuna monte edilir ve laboratuvar, bar, restoran, çamaşırhane, spor salonu gibi ticari ya da endüstriyel mekânların havalandırma ihtiyacını karşılar [2]. Çatı tipi fanlar da kanal ucuna monte edilir ve çatıdan atış yapan ticari ve endüstriyel mekânlar için tanımlanmıştır [2]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [2].
+Aynı katalog kanal sisteminin ucuna takılan türleri de listeler. Çelik sac duvar tipi fanlar laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânların havalandırma ihtiyacını karşılar; çatı tipi fanlar çatıdan atış yapan ticari ve endüstriyel mekânlar için tanımlanmıştır (üretici anlatımı) [4]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [4].
 
-Yüksekliği düşük fanlar da vardır: CA IN-LINE serisi çok kısa yüksekliği sayesinde kısa asma tavanlara monte edilmeye elverişlidir [2]. VentHub'da dikdörtgen kanal modelleri için [Vortice VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari) sayfasına bakabilirsiniz. İç mekânda duvara monte edilen, havalandırma kanallarının ucuna bağlanan fanlar konutlarda ve fabrika, hastane, spor salonu, restoran gibi endüstriyel ortamlarda kullanılır [2].
-
-Radon gazı tahliyesi için ayrılmış bir seri de kanal tipi fan sunar: Vortice'nin radona özel serisi kanal tipi egzoz fanını 100, 125, 150, 160 ve 200 mm çaplarında, seri montaj imkânıyla verir [5]. Aynı seri çatı tipi emiş ünitesini 150, 160 ve 200 mm çaplarında ve dış mekâna uygun IP45 koruma sınıfıyla sunar [5]. Vortice kataloğuna göre radon ürün grubu kanal içi (CA-RM ES) ve çatı (CA-RM RF ES) olmak üzere 8 modelden oluşur [6]. Radona özel seri fırçasız ve elektronik kontrollü motorlarla ve özel kontrol paneliyle birlikte kullanılabilir [5].
-
-| Yerleşim | Kataloğun anlattığı kullanım | Kaynak |
+| Yerleşim | Anlatılan kullanım | Kaynak |
 |---|---|---|
-| Asma tavan ya da çatı arası, kanal içi | Mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane, dükkân | [2] |
-| Kısa asma tavan | Çok kısa yükseklik sayesinde kısa asma tavanlara uygun | [2] |
-| Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [2] |
-| Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [2] |
-| Radon tahliyesi, kanal içi ve çatı | Radona özel seri | [5] |
-
-## Yuvarlak ve dikdörtgen kesitli kanallara takılan fanlar
-
-Avens yuvarlak kanal tipi fanı yuvarlak kesitli bir kanala entegre fan olarak, dikdörtgen kanal tipi fanı ise dikdörtgen kesitli kanallara entegre fan olarak tanımlar [1]. Vortice LINEO fanlarının standart yuvarlak kesitli borulara ve özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabildiğini belirtir [3].
+| Egzoz uygulamaları | Tüp tipi aksiyel fan: kanal kayıplarını yenecek basınç, az yer | [1] |
+| Asma tavan ya da çatı arası, kanal içi | Mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane, dükkân | [4] |
+| Kısa asma tavan | Çok kısa yükseklik sayesinde kısa asma tavanlara uygun | [4] |
+| Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [4] |
+| Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [4] |
 
 ## Kanal tipi fan seçerken hangi bilgilere bakılır?
 
-Vortice katalogları çap, montaj yönü ve koruma sınıfını seri bazında verir; aşağıdaki ilk tablo bu katalog bilgilerini toplar.
+DOE rehberine göre fan seçimi, hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar; fan, sistemin debi ve basınç gereksinimleri hesaplanarak seçilir [1]. Sistem eğrisi, damper, kanal, filtre ve dirsek gibi her bileşenin kaybı toplanarak hesaplanır; bileşenlerin etkileşiminden doğan performans değişimine sistem etkisi denir [1]. Gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz, ağır durumlarda kararsız çalışabilir, fazla akış enerjisi üretir ve gürültüyü artırır [1].
 
-| Katalogda seri bazında verilen özellik | Ne söylüyor | Kaynak |
+| Seçim girdisi | Kaynak ne söylüyor | Kaynak |
 |---|---|---|
-| Kanal çapı | CA V0 serisinde 7 model nominal 100 ile 315 mm arasındadır [2]; radona özel kanal fanı 100 ile 200 mm arasındadır [5] | [2][5] |
-| Montaj yönü | CA V0 serisi yatay, dikey ya da eğimli monte edilebilir | [2] |
-| Koruma sınıfı | CA V0 serisinde kanala bağlı emiş ve üfleme için IP44 verilir [2]; radona özel çatı ünitesinde dış mekâna uygun IP45 verilir [5] | [2][5] |
+| Debi ve basınç | Seçim, sistemin hava debisi ve basınç gereksiniminin hesabına dayanır | [1] |
+| Sistem kayıpları | Damper, kanal, filtre, dirsek gibi bileşen kayıpları toplanır | [1] |
+| Fan boyutu | Gereğinden büyük fan, verimin en yüksek olduğu noktada çalışmaz | [1] |
+| Kesit ve montaj alanı | Üretici anlatımı: yuvarlak ya da dikdörtgen kanal [3]; firma bilgi yazısı: dikdörtgen kesitte sıkışık alan avantajı [2] | [2][3] |
 
-DOE rehberi fan seçiminde sıcaklık, basınç, hava akımı özellikleri ve sistem yerleşimi gibi girdileri de sayar [7]; aşağıdaki ikinci tablo rehberin debi, basınç ve sistem eğrisi anlatımından üç konuyu toplar.
-
-| DOE rehberinden seçilmiş konu | Ne söylüyor | Kaynak |
-|---|---|---|
-| Debi ve basınç | Fan seçimi, sistemin debi ve basınç gereksinimlerinin hesaplanmasına dayanır [7] | [7] |
-| Kararlı çalışma | Fan eğrisi ile sistem eğrisinin eğimi aynı yöndeyse fan kararsız çalışabilir [7] | [7] |
-| Sistem kaybı | Kanal, dirsek, damper ve filtre gibi bileşenlerin kayıpları toplanır | [7] |
-
-Debi ve basınç fan eğrisiyle birlikte okunur. DOE rehberine göre genel olarak fan eğrileri sıfır debi noktasından aşağı doğru iner: fan üzerindeki karşı basınç azaldıkça debi artar [7]. Sistem eğrisi, damper, kanal, filtre, dirsek gibi bileşenlerin kayıpları toplanarak hesaplanır [7].
-
-Hesaplanan eğri gerçek sistemde yukarı kayabilir. DOE rehberi buna sistem etkisi der: bileşenler arasındaki etkileşim, akış profili düzgün olmadığında kayıpları hesaplananın üzerine çıkarır ve sistem eğrisini yukarı taşır [7]. Rehber, bir fanın girişine ya da çıkışına yakın birden çok dirseğin maliyetli bir sistem etkisi yaratabileceğini söyler [7].
-
-Ses düzeyi seçimde belirleyiciyse [sessiz fan seçimi rehberi](vh:yazi/sessiz-fan-secimi) dB(A) değerlerinin hangi koşulda okunacağını anlatır.
-
-## Kanal tipi fan montaj seçenekleri ve sistem etkisi
-
-DOE rehberi, sistem etkisinin akış profilini mümkün olduğunca düzgün tutacak bir düzenle azaltılabileceğini belirtir; alan kısıtı buna engel olursa sistem etkisinin fan seçimine katılması gerektiğini söyler [7].
-
-Vortice CA V0 serisinin yatay, dikey ya da eğimli monte edilebildiğini belirtir [2]. Vortice, LINEO fanlarının kanalın başına, ortasına ya da sonuna; yatay ya da dikey; duvara, tavana ya da asma tavana monte edilebildiğini belirtir [4]. Aynı katalog paralel bağlantıda debinin, seri bağlantıda basıncın iki katına çıktığını yazar [4]. LINEO kataloğu, gövdenin çapının bağlandığı havalandırma kanalından yalnız biraz büyük olduğunu ve bu nedenle dar alanlara kurulum için uygun olduğunu yazar [3].
-
-## Fiyatı belirleyen etkenler
-
-Bu yazıda fiyat verilmez ve fiyat etkeni sayılmaz; kaynaklarımız ürün özelliklerini anlatır, fiyatı değil. Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. [Kanal tipi fanlar kategorisi](vh:kategori/duct-fans) ürün ailelerini listeler.
+Ses düzeyi seçimde belirleyiciyse [sessiz fan seçimi rehberi](vh:yazi/sessiz-fan-secimi) dB(A) değerlerinin hangi koşulda okunacağını anlatır; farklı fan türlerini karşılaştırmak için [fan çeşitleri rehberine](vh:yazi/fan-cesitleri) bakabilirsiniz.
 
 ## Sık sorulan sorular
 
 ### Kanal tipi fan asma tavanda kullanılabilir mi?
 
-Evet, Vortice kataloğunda CA V0 ve CA MD serileri asma tavana ya da çatı arasına monte edilen kanal fanları olarak tanımlanır [2]. Kısa asma tavanlar için çok kısa yükseklikli CA IN-LINE serisi de vardır [2].
+Üretici kataloğuna göre evet: plastik reçine gövdeli ve boyalı sac çelik gövdeli kanal fanı serileri asma tavana ya da çatı arasına monte edilen fanlar olarak tanımlanır [4].
 
 ### Kanal tipi fan dikdörtgen kanala takılabilir mi?
 
-Evet, Vortice kataloğuna göre LINEO fanları özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabilir [3]. Avens de dikdörtgen kesitli kanallara entegre fanları dikdörtgen kanal tipi fan olarak tanımlar [1].
+Üretici kataloğuna göre evet: karma akışlı kanal fanı serisi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabilir [3].
 
 ### Kanal tipi fan dışarıya ya da çatıya monte edilebilir mi?
 
-Evet, Vortice kataloğunda dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları [2] ve kanal ucuna monte edilen çatı tipi fanlar [2] yer alır. Radona özel serinin çatı ünitesi dış mekâna uygun IP45 koruma sınıfındadır [5].
+Üretici kataloğuna göre dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları vardır; çatı tipi fanlar ise kanal sisteminin ucuna takılan ayrı bir türdür [4].
 
 ### Kanal tipi fan yatay mı dikey mi monte edilir?
 
-Vortice'nin belirttiği serilerde her ikisi de mümkündür. Vortice CA V0 serisinin yatay, dikey ya da eğimli monte edilebildiğini belirtir [2]. LINEO serisi de yatay ya da dikey kanallı montaj için tasarlanmıştır [2].
+Bir üretici kataloğunda karma akışlı kanal fanı serisi yatay ya da dikey kanallı montaj için tasarlanmıştır; başka bir seri yatay, dikey ya da eğimli monte edilebilir [4].
 
 ### Birden fazla kanal tipi fan seri ya da paralel bağlanabilir mi?
 
-Vortice LINEO kataloğunda evet: katalog paralel ve seri bağlantı düzenlerini gösterir; paralelde debinin, seride basıncın iki katına çıktığını yazar [4]. Radona özel serinin kanal içi fanı için de seri montaj imkânı verilir [5].
+Bir üretici kataloğu, karma akışlı kanal fanı serisi için paralel ve seri bağlantı düzenlerini gösterir; paralel bağlantıda debinin, seri bağlantıda basıncın iki katına çıktığını yazar [3].
 
-### Kanal tipi fan seçmek için hangi bilgiler gerekir?
+### Tüp tipi aksiyel fan ile kılavuz kanatlı aksiyel fan arasındaki fark nedir?
 
-Fan seçimi sistemin debi ve basınç gereksinimlerinin hesaplanmasına dayanır [7]. DOE rehberi fan eğrisi ile sistem eğrisinin birlikte okunmasını ve sistem etkisinin hesaba katılmasını anlatır [7]. Vortice katalogları çap ve koruma sınıfını seri bazında verir [2][5].
+Fark çıkış kanatlarıdır: kılavuz kanatlı fanda bu kanatlar hava akış düzenini iyileştirir ve havanın kinetik enerjisini basınca çevirir [1].
+
+### VentHub'da kanal tipi fan için teklif nasıl alınır?
+
+İlgili aile ya da ürün sayfasındaki "Teknik Teklif İste" düğmesi teklif başlatır; teklifte gereken bilgiler yazının son bölümünde sıralanır.
+
+## VentHub'da hangi kanal tipi fan serileri var?
+
+VentHub'un [kanal tipi fanlar kategorisinde](vh:kategori/duct-fans) şu aileler listelenir: [AVenS dikdörtgen kanal tipi radyal fanlar](vh:aile/avens-dikdortgen-kanal-tipi-radyal-fanlar), [LINEO kanal fanları](vh:aile/vortice-lineo-kanal-fanlari), [LINEO Quiet sessiz kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari), [Radon serisi kanal fanları](vh:aile/vortice-radon-serisi-kanal-fanlari) ve [VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari). Çap, model sayısı ve teknik değerler aile ve ürün sayfalarındadır.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklif için şu bilgileri hazırlayın: hava debisi, sıcaklık, basınç, hava akımının özellikleri, sistem yerleşimi, kanalın kesiti ve montaj alanı. Bu liste, DOE rehberinin fan seçimi için saydığı koşullara [1] ve kaynaklarda anılan kesit ve montaj bilgisine [2][3] dayanan yazarın derlemesidir.
 
 ## Kaynaklar
 
-Üretici belgelerinde verilen sayfa numaraları kataloğun basılı sayfa numarasıdır; radona özel seri belgesinde [5] basılı numara olmadığı için PDF sayfa sırası verilmiştir. DOE rehberinde basılı sayfa numarası kullanılmıştır.
+Üretici belgelerinde verilen sayfa numaraları kataloğun basılı sayfa numarasıdır. DOE rehberinde basılı sayfa numarası kullanılmıştır. Kaynak [3] ve [4] aynı üreticinin katalogları, [2] ise bu üreticinin bir serisini anlatan firma yazısıdır; üçü birbirinden bağımsız kaynak sayılmaz.
 
-1. Avens, "LINEO Kanal Tipi Fanlar" bilgi sayfası, https://www.avensair.com/lineo-kanal-tipi-fanlar (erişim 25.10.2026).
-2. Vortice, In-Line Fans Range kataloğu (dosya adı Doc_Pubblicita_In-Line_Fans_Range_191875.pdf), s. 4, 5, 36, 42, 74, 78, 84, 90, 92 (üretici belgesi).
-3. Vortice, Commercial ventilation in-line fans kataloğu (dosya adı Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf), s. 4 (üretici belgesi).
-4. Vortice, Commercial Ventilation in Line kataloğu (dosya adı Commercial_Ventilation_in_Line_1.pdf), s. 7 (üretici belgesi).
-5. Vortice, radona özel seri kataloğu (dosya adı 2022-11-en-ca-rm-es-radon.pdf), s. 23 ve 24 (üretici belgesi).
-6. Vortice, CA RADON kataloğu (dosya adı Doc_Pubblicita_CA_RADON_178112.pdf), s. 8 (üretici belgesi).
-7. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 4, 6, 7, 8, 19, 23. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 25.10.2026)
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 8, 17, 19, 22, 23. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 25.10.2026)
+2. Avens Havalandırma, "LINEO Kanal Tipi Fanlar" bilgi yazısı (firma sitesi blog bölümü), https://www.avensair.com/lineo-kanal-tipi-fanlar (erişim 04.11.2026).
+3. Vortice, Commercial Ventilation in Line kataloğu (dosya adı Commercial_Ventilation_in_Line_1.pdf), s. 5, 7 (üretici belgesi).
+4. Vortice, In-Line Fans Range kataloğu (dosya adı Doc_Pubblicita_In-Line_Fans_Range_191875.pdf), s. 4, 5, 36, 42, 74, 78, 84, 90 (üretici belgesi).
 
 ## Teknik sorumluluk notu
 

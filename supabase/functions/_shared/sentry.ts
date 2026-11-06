@@ -2,7 +2,14 @@
 // Minimal Sentry client for Edge Functions (no external deps)
 // Usage: set SENTRY_DSN (_e.g., https://PUBLIC_KEY@o123456.ingest.sentry.io/987654) and optionally SENTRY_ENV/SENTRY_RELEASE
 
-export type SentryLevel = 'fatal' | 'error' | 'warning' | 'info' | 'debug' | 'log';
+import { metniMaskele } from './maske.ts'
+
+// Olay mesajı serbest metindir (sağlayıcı/DB hata metni alıcı adresi ya da telefon taşıyabilir):
+// Sentry'ye yalnız `metniMaskele`den geçmiş hâli gider. Tek yerde, çağıranın unutma imkânı yok
+// (güvenlik incelemesi 2026-11-03 takibi, OPS-213; cetvel `cikti-kodlama-maske-standard.md` K8).
+const SENTRY_MESAJ_SINIRI = 2000
+
+export type SentryLevel ='fatal' | 'error' | 'warning' | 'info' | 'debug' | 'log';
 
 function parseDsn(dsn: string): { host: string; publicKey: string; projectId: string } | null {
   try {
@@ -51,7 +58,7 @@ export async function sentryCaptureMessage(message: string, level: SentryLevel =
     logger: 'edge',
     timestamp: Date.now() / 1000,
     level,
-    message,
+    message: metniMaskele(message, SENTRY_MESAJ_SINIRI),
     extra,
     environment: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_ENV') || undefined,
     release: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_RELEASE') || undefined,
@@ -63,7 +70,7 @@ export async function sentryCaptureException(_e: unknown, extra?: Record<string,
   const dsn = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_DSN') || ''
   if (!dsn) return
   const isErr = _e instanceof Error
-  const message = isErr ? (_e.message || String(_e)) : String(_e)
+  const message = metniMaskele(isErr ? (_e.message || String(_e)) : String(_e), SENTRY_MESAJ_SINIRI)
   const stack = isErr ? (_e.stack || undefined) : undefined
   const event = {
     platform: 'javascript',

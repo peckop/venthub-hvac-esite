@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bu sorgu için SERP ölç",
+    "sayfamız ilk sayfada mı",
+    "sıra ölç: kanal tipi fan",
+    "rakip sayfa kıyası yap",
+    "arama talebini ölç, Trends'e bak",
+    "Search Console verisinden bu sayfanın durumunu oku",
+    "SERP olc, tr tr kisisellestirme kapali",
+    "ilk sayfada gorunuyor muyuz ölç",
+    "RAKİP SAYFA KIYASI: radyal ve aksiyel fan farkı",
+    "başlığı değiştirdik, sıra arttı mı ölç",
+    "marka adlı sorgu mu genel sorgu mu diye SERP'te bak",
+    "rakip sayfa kıyasının yedi adımını koş"
+  ],
+  "should_not_trigger": [
+    "rehber yazısı yaz",
+    "yeni yazıyı dizine ekle, dizin isteği at",
+    "IndexNow gönder",
+    "sayfa yavaş, LCP'yi düşür",
+    "React 19 için güncel sürüm ne",
+    "kart aç",
+    "bu fonksiyonu kim çağırıyor",
+    "ürün fiyat listesini CSV olarak dışa aktar"
+  ]
+}

@@ -4,6 +4,9 @@
 -- Ne zaman: imzalı gönderimden sonra önbellek tazeleme sessizce durduysa (sunucu günlüğünde
 -- "Unauthorized Supabase webhook attempt blocked (imza: ...)" satırları, net._http_response'ta 401).
 -- Güvenli çünkü sunucu (PR 1) imza başlığı YOKSA eski düz secret yolunu hâlâ kabul eder.
+-- ⚠ALT-76 PR 3'TEN SONRA GEÇERSİZ: düz secret yolu rotadan kaldırıldı ve rota event_id ister.
+-- Bu dosya tek başına koşulursa önbellek tazeleme DURUR. Önce
+-- 20261105090000_webhook_olay_tekillestirme_geri_al.sql ve rota geri alınır.
 -- Fonksiyon gövdesi 20260816160245_webhook_secret_to_vault.sql ile birebir aynıdır.
 
 begin;

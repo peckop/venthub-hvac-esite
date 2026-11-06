@@ -2,6 +2,10 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { z } from 'https://esm.sh/zod@3.23.8'
 import { metniMaskele, nesneyiMaskele } from '../_shared/maske.ts'
+import { govdeyiSinirliOku } from '../_shared/govde_siniri.ts'
+
+/** İstemci hata kaydı gövdesi üst sınırı. Alanlar zaten 4000 karaktere kesilir; 64 KB bol paydır. */
+const GOVDE_SINIRI_BAYT = 64 * 1024
 
 const clientErrorSchema = z.object({
   msg: z.string().default(''),
@@ -59,7 +63,14 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const rawBody = await req.json().catch(() => null) as unknown
+    // Gövde boyutu ayrıştırmadan ÖNCE sınırlı (OPS-213): maskeleme bütçesi ancak JSON ayrıştıktan sonra
+    // devreye girer; sınırsız `req.json()` megabaytlık gövdeyi önce belleğe alıp ayrıştırıyordu.
+    const govde = await govdeyiSinirliOku(req, GOVDE_SINIRI_BAYT)
+    if (!govde.ok) {
+      const buyuk = govde.sebep === 'cok_buyuk'
+      return new Response(buyuk ? 'Payload Too Large' : 'Bad Request', { status: buyuk ? 413 : 400, headers: cors })
+    }
+    const rawBody = (() => { try { return JSON.parse(govde.metin) as unknown } catch { return null } })()
     if (!rawBody || typeof rawBody !== 'object') {
       return new Response('Bad Request', { status: 400, headers: cors })
     }
@@ -164,7 +175,8 @@ Deno.serve(async (req: Request) => {
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {
       // S5: DB hata metni istemciye DÖNMEZ; ayrıntı yalnız logda, istek kimliğiyle.
-      console.error('Log client error insert failed:', requestId, error);
+      // PostgREST hata ayrıntısı satır değerini taşıyabilir (K8).
+      console.error('Log client error insert failed:', requestId, error.code, metniMaskele(error.message, 500));
       return new Response(JSON.stringify({ error: 'insert_failed', request_id: requestId }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
@@ -190,8 +202,8 @@ Deno.serve(async (req: Request) => {
 
     return new Response('ok', { status: 200, headers: cors })
   } catch (_e) {
-    console.error('Log client error outer catch:', requestId, _e);
     const msg = metniMaskele(_e instanceof Error ? _e.message : String(_e), 500);
+    console.error('Log client error outer catch:', requestId, msg);
     try {
       const { slackNotify } = await import('../_shared/notify.ts')
       await slackNotify('log-client-error failed', [

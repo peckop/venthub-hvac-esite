@@ -102,8 +102,9 @@ const KNOWN_VIOLATIONS = {
   // `verify_jwt = false` ile açık duran uçlar. İkisi de BORÇ, "kabul edilmiş tasarım" değil:
   //  • iyzico-callback — kimliği yalnız iyzico'nun `token`'ı taşıyor; token yokken orderId
   //    ile DB'den geri-doldurulabiliyor (imza/HMAC doğrulaması YOK).
-  //  • shipping-status — takip numarasıyla sipariş durumu döndürür; tek koruma IP rate-limit.
-  R5: ['iyzico-callback', 'shipping-status'],
+  // shipping-status 2026-11-05'te tabandan çıktı (ALT-138): uç T058-VH'de emekli edildi,
+  // yalnız 410 döner. Borç değil, R5_EMEKLI'de adla duruyor; emeklilik bekçisi aşağıda.
+  R5: ['iyzico-callback'],
 
   // R6 — _shared/tenant_config.ts JWT payload'ını İMZASIZ çözüp `tenant_id` seçiyor.
   // Sahte JWT ile tenant sınırı aşılabilir (data bleeding). ÇÖZÜM: tenant_id'yi
@@ -235,6 +236,24 @@ const R5_EXEMPT: Record<string, string> = {
   // pg_cron `net.http_post` ile auth header'sız çağırır; uç dışarıya veri döndürmez,
   // TCMB kurlarını yazar. Muafiyet ADLA verilir ki yeni uçlara sessizce sızmasın.
   'tcmb-rates-sync': 'pg_cron auth header gönderemez (yalnız yazan, veri döndürmeyen uç)',
+  // T058-VH: emekli uç, her isteğe 410 ENDPOINT_RETIRED döner, hiçbir veriye dokunmaz.
+  // Muafiyet R5_EMEKLI bekçisine bağlıdır: uç yeniden iş yaparsa bekçi kırmızı verir.
+  'shipping-status':'emekli uç: yalnız 410 döner, veri okumaz (T058-VH)',
+}
+
+/**
+ * Emekli olduğu için R5 muafiyeti alan uçlar. Bekçi: kaynak 410 + ENDPOINT_RETIRED dönmeli ve
+ * Supabase istemcisi, sorgu ya da ortam sırrı okumamalı. Uç yeniden canlanırsa test kırmızı olur.
+ */
+const R5_EMEKLI: readonly string[] = ['shipping-status']
+
+/** Emekli uç: 410 + ENDPOINT_RETIRED döner; Supabase istemcisi, sorgu ya da ortam sırrı yok. */
+function emekliUcMu(code: string): boolean {
+  return (
+    /status:\s*410\b/.test(code) &&
+    code.includes('ENDPOINT_RETIRED') &&
+    !/\bcreateClient\b|\.from\s*\(|\.rpc\s*\(|Deno\.env\.get/.test(code)
+  )
 }
 
 /* ------------------------------------------------------------------ *
@@ -448,12 +467,14 @@ const SERVICE_ROLE_CHECK_RE =
 function webhookGaps(code: string): string[] {
   const gaps: string[] = []
 
-  const hasHmacPrimitive = /crypto\s*\.\s*subtle/.test(code) || /\bhmacValid\s*\(/.test(code)
+  // `webhookImzaGecerli` (ALT-138): zaman + olay kimliği + gövdeyi kapsayan paylaşılan HMAC yardımcısı.
+  const hasHmacPrimitive = /crypto\s*\.\s*subtle/.test(code) || /\b(?:hmacValid|webhookImzaGecerli)\s*\(/.test(code)
   const readsSignature = /headers\s*\.\s*get\s*\(\s*['"][^'"]*signature[^'"]*['"]\s*\)/i.test(code)
   if (!hasHmacPrimitive || !readsSignature) gaps.push('HMAC-imza')
 
+  // Atama parantezli de olabilir: `const ts = (req.headers.get('x-timestamp') || ...).trim()`.
   const tsVar = code.match(
-    /(?:const|let)\s+(\w+)\s*=\s*\w+\s*\.\s*headers\s*\.\s*get\s*\(\s*['"][^'"]*(?:timestamp|event-time)[^'"]*['"]/i,
+    /(?:const|let)\s+(\w+)\s*=\s*\(?\s*\w+\s*\.\s*headers\s*\.\s*get\s*\(\s*['"][^'"]*(?:timestamp|event-time)[^'"]*['"]/i,
   )?.[1]
   const rejectsMissing = tsVar
     ? new RegExp(`if\\s*\\(\\s*!\\s*${tsVar}\\b[^)]*\\)[\\s\\S]{0,200}?\\b401\\b`).test(code)
@@ -807,6 +828,23 @@ describe('R5 · verify_jwt=false olan her fonksiyon gövdesinde kimlik doğrulam
     )
   })
 
+  it('R5 emekli muafiyetleri gerçekten emekli (410, veri yok)', () => {
+    for (const fn of R5_EMEKLI) {
+      expect(R5_EXEMPT[fn], `${fn} R5_EMEKLI'de ama R5_EXEMPT'te yok`).toBeDefined()
+      const src = INDEX_SOURCES.find((s) => s.fn === fn)
+      expect(src, `${fn}/index.ts bulunamadı`).toBeDefined()
+      expect(emekliUcMu(src?.code ?? ''), `${fn} artık emekli değil: R5 muafiyetinden çıkar`).toBe(true)
+    }
+  })
+
+  it('emeklilik bekçisi veri okuyan ucu yakalar (bilerek bozulmuş örnek)', () => {
+    const emekli = INDEX_SOURCES.find((s) => s.fn === 'shipping-status')?.code ?? ''
+    expect(emekliUcMu(emekli)).toBe(true)
+    const canli = `${emekli}\nconst sb = createClient(url, key)\nawait sb.from('orders').select('*')`
+    expect(emekliUcMu(canli)).toBe(false)
+    expect(emekliUcMu(emekli.replace('status: 410', 'status: 200'))).toBe(false)
+  })
+
   it('R5 muafiyetleri gerçekten verify_jwt=false uçlar (bayat muafiyet koruması)', () => {
     const open = parseVerifyJwtFalse(Object.values(CONFIG_TOML)[0])
     const staleExempt = Object.keys(R5_EXEMPT).filter((fn) => !open.includes(fn))
@@ -1122,6 +1160,17 @@ describe('R9 · *webhook* uçları HMAC + ZORUNLU timestamp guard taşımalı', 
       window,
     ].join('\n')
     expect(webhookGaps(failClosed)).toEqual([])
+
+    // ALT-138 biçimi: paylaşılan yardımcı + parantezli, kırpılmış atama da fail-CLOSED sayılır.
+    const alt138 = [
+      `const sig = req.headers.get('x-signature') || ''`,
+      `const tsHeader = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()`,
+      `ok = await webhookImzaGecerli(secret, tsHeader, eventId, raw, sig)`,
+      `if (!tsHeader) { return json({ error: 'Missing timestamp header' }, { status: 401 }) }`,
+      window,
+    ].join('\n')
+    expect(webhookGaps(alt138)).toEqual([])
+    expect(webhookGaps(alt138.replace('if (!tsHeader)', 'if (tsHeader)'))).toContain('zorunlu-timestamp')
 
     // İmzasız uç da yakalanmalı.
     expect(webhookGaps(failClosed.replace(/crypto\.subtle/g, 'noop'))).toContain('HMAC-imza')
@@ -1453,14 +1502,25 @@ describe('R13 · service_role REST adresinde tenant_id=eq. zorunlu (E16)', () =>
 const SIR_ADI_RE =
   /(secret|token|signature|\bsig\b|\bsign\b|computed|expected|api_?key|service_?(?:role)?_?key|supabase_?key|hmac|\bbearer\b|\bgiven\b)/i
 const KARSILASTIRMA_RE = new RegExp(
-  String.raw`(\x60[^\x60]*\x60|'[^']*'|"[^"]*"|[\w$.?!\[\]]+)\s*(===|!==)\s*(\x60[^\x60]*\x60|'[^']*'|"[^"]*"|[\w$.?!\[\]]+)`,
+  // İşleç: katı (`===`, `!==`) VE gevşek (`==`, `!=`) eşitlik — ikisi de ilk farklı baytta döner.
+  // OPS-213 (#2209 LOW): yalnız katı biçim aranıyordu; `if (sig != expected)` görünmüyordu.
+  // Sol işlenen `!` içerdiğinden `a!==b` aynı eşleşmeyi `a!` `==` `b` diye bölebilir; sonuç (isabet) aynıdır.
+  String.raw`(\x60[^\x60]*\x60|'[^']*'|"[^"]*"|[\w$.?!\[\]]+)\s*(===|!==|==|!=)\s*(\x60[^\x60]*\x60|'[^']*'|"[^"]*"|[\w$.?!\[\]]+)`,
   'g',
 )
 const DUZ_LITERAL_RE = /^(null|undefined|true|false|\d[\d.]*|'[^']*'|"[^"]*"|\x60[^$\x60]*\x60)$/
 
 function sabitZamansizKarsilastirmalar(code: string): string[] {
   const out: string[] = []
-  code.split('\n').forEach((satir, i) => {
+  code.split('\n').forEach((hamSatir, i) => {
+    // Çağrı ifadesi tek işlenene indirgenir; içindeki ad korunur (inceleme bulgusu 3, OPS-213):
+    // `req.headers.get('x-signature') !== expected` → `cagri_x_signature_ !== expected`. Eskiden
+    // işlenen sınıfında `(`/`)` olmadığı için çağrılı sol yan hiç eşleşmiyordu.
+    let satir = hamSatir
+    for (let onceki = ''; onceki !== satir; ) {
+      onceki = satir
+      satir = satir.replace(/[\w$.]+\(([^()]*)\)/g, (_c, ic: string) => `cagri_${ic.replace(/[^\w]/g, '_')}`)
+    }
     for (const m of satir.matchAll(KARSILASTIRMA_RE)) {
       const sol = m[1]
       const sag = m[3]
@@ -1485,6 +1545,25 @@ describe('R14 · sır karşılaştırmasında === yasak, sabit zamanlı karşıl
     expect(sabitZamansizKarsilastirmalar('if (typeof token === x) y()')).toHaveLength(0)
     expect(sabitZamansizKarsilastirmalar('if (token.length === n) y()')).toHaveLength(0)
     expect(sabitZamansizKarsilastirmalar('return timingSafeEquals(given, computed)')).toHaveLength(0)
+  })
+
+  it('dedektör gevşek eşitliği de görür: `!=`, `==`, boşluksuz `!==` (sabotaj kolları, OPS-213)', () => {
+    expect(sabitZamansizKarsilastirmalar('if (sig != expected) return 401'), '!=').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('return given == computed'), '==').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('if (token!==expected) deny()'), 'boşluksuz !==').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('if (authHeader != `Bearer ${serviceRoleKey}`) {'), '!= Bearer').toHaveLength(1)
+    // Literal ve tip kontrolü gevşek biçimde de serbest.
+    expect(sabitZamansizKarsilastirmalar('if (token != null) use(token)')).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar("if (kind == 'service_role') x()")).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('if (token!=null) y()')).toHaveLength(0)
+    // `<=`, `>=`, `=>` eşitlik değildir.
+    expect(sabitZamansizKarsilastirmalar('if (token.exp <= now) refresh()')).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('const f = (token) => token')).toHaveLength(0)
+    // Çağrı ifadeli işlenen (inceleme bulgusu 3).
+    expect(sabitZamansizKarsilastirmalar("if (req.headers.get('x-signature') !== expected) deny()"), 'çağrı sol').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar('if (hmac(body) != sig) deny()'), 'hmac çağrısı').toHaveLength(1)
+    expect(sabitZamansizKarsilastirmalar("if (req.headers.get('x-signature') === null) deny()")).toHaveLength(0)
+    expect(sabitZamansizKarsilastirmalar('if (timingSafeEquals(given, computed) === false) deny()')).toHaveLength(0)
   })
 
   it('hiçbir edge kaynağı sırrı === ile karşılaştırmıyor', () => {
