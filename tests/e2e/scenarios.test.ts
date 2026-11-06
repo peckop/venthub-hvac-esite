@@ -224,27 +224,50 @@ class WebhookMockDb {
     let dataset = table === 'venthub_orders' ? this.orders : this.events
     // Birden çok .eq() filtresi BİRLEŞİR (PostgREST gibi): kaynak durum koşulu (.eq('status', ...)) id filtresini ezmemeli.
     const filters: Array<[string, unknown]> = []
+    // `.is(col, null)` PostgREST'te IS NULL demektir: alanı hiç yazılmamış (undefined) satır da eşleşir.
+    const nullFilters: string[] = []
     let limitVal = 0
-    let patchObject: any = null
+    let patchObject: Record<string, unknown> | null = null
+    let deleteMode = false
+    const eslesir = (r: Record<string, unknown>) =>
+      filters.every(([c, v]) => r[c] === v) && nullFilters.every((c) => r[c] == null)
 
     const chain = {
       select: (fields: string = '*') => {
         return chain
       },
-      eq: (col: string, val: any) => {
+      eq: (col: string, val: unknown) => {
         filters.push([col, val])
         return chain
+      },
+      is: (col: string, val: null) => {
+        if (val !== null) throw new Error('WebhookMockDb.is yalnız null destekler')
+        nullFilters.push(col)
+        return chain
+      },
+      delete: () => {
+        deleteMode = true
+        return chain
+      },
+      /** ALT-138 (#2286): webhooks.test.ts'teki eşiyle aynı ignore-duplicates semantiği (çakışan satır yazılmaz, dönmez). */
+      upsert: (row: Record<string, unknown>, opts?: { onConflict?: string; ignoreDuplicates?: boolean }) => {
+        const anahtar = opts?.onConflict ?? 'event_id'
+        const mevcut = dataset.some((r: Record<string, unknown>) => r[anahtar] === row[anahtar])
+        if (mevcut && !opts?.ignoreDuplicates) throw new Error('WebhookMockDb.upsert: ignoreDuplicates olmadan birleştirme modellenmedi')
+        if (!mevcut) dataset.push(row)
+        const donen = mevcut ? [] : [row]
+        return { select: async (_alanlar?: string) => ({ data: donen, error: null }) }
       },
       limit: (l: number) => {
         limitVal = l
         return chain
       },
-      update: (patch: any) => {
+      update: (patch: Record<string, unknown>) => {
         patchObject = patch
         return chain
       },
       single: async () => {
-        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
+        const filtered = dataset.filter(eslesir)
         if (filtered.length === 0) {
           return { data: null, error: { message: 'Not found', code: 'PGRST116' } }
         }
@@ -258,7 +281,12 @@ class WebhookMockDb {
         return { data: row, error: null }
       },
       then: (resolve: any) => {
-        const filtered = dataset.filter(r => filters.every(([c, v]) => r[c] === v))
+        const filtered = dataset.filter(eslesir)
+        if (deleteMode) {
+          for (const r of filtered) dataset.splice(dataset.indexOf(r), 1)
+          resolve({ data: filtered, error: null })
+          return
+        }
         if (patchObject) {
           filtered.forEach(r => Object.assign(r, patchObject))
         }
