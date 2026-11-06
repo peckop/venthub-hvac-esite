@@ -1175,7 +1175,7 @@ Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölç
 - Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans).
 - Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır [4]; modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
 - Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans).
-- Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; modeller: [plug fanlar](vh:kategori/plug-fans).
+- Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; modeller: [plug fanlar](vh:kategori/plug-fans); ayrıntı için [plug fan nedir, nerede kullanılır](vh:yazi/plug-fan-nedir) yazısına bakılabilir.
 - Korozyona ve aside dayanımlı fanlar kategorisi santrifüj fanları kapsar [4]; modeller: [korozyona ve aside dayanımlı fanlar](vh:kategori/corrosion-and-acid-resistant-fans).
 - Şömine ve baca fanları bacanın çekişini mekanik olarak destekleyen fanlardır [4]; modeller: [şömine ve baca fanları](vh:kategori/chimney-fans).
 - Endüstriyel tavan vantilatörleri büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; havayı dışarı atmaz, içerideki havayı karıştırır [4]; modeller: [endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans).
@@ -1228,6 +1228,102 @@ Kategoriler yazının "VentHub'da hangi fan kategorileri ve serileri var?" böl�
 ## Teknik sorumluluk notu
 
 Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Fan seçimi debi, basınç, ortam ve güvenlik gereklerine bağlıdır. Kurulum ve elektrik bağlantısı yetkili personelle yapılmalıdır. Katalog ve kategori bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-33), doğrulanmış metin: taslak v1m (sha aacd0e7bbd24). Makale çerçevesi (OPS-216, cetvel R3.3): markasız gövde, seri adları yalnız "VentHub'da hangi plug fan serileri var?" bölümünde ve Kaynaklar'da (toplam 4 ad; kapı en çok 8).
+    // Kaynaklar: ASHRAE Terminology (plenum fan), IIR kaydı (Coward 1997), ABD Enerji Bakanlığı fan kılavuzu, Casals plug fan kataloğu CV092024 (VentHub kaynak dizini), VentHub kategori ve ürün sayfaları (3 Kasım 2026). Kayıtlı gövde sha 9fe065f9c225. Fiyat yok: kategori sayfası teklife yönlendirir.
+    // Doğrulama: v1c-v1m, her turda tuzaklı + temiz kopya; son tur (9) tuzaklı 5/5, temiz yanlış 0. Recep okudu, yayın kararı Recep'te: birleşme ayrı OPS onayıyla; yayinTarihi birleşme gününe göre güncellenir.
+    kimlik: 'plug-fan-nedir',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-06',
+    guncellemeTarihi: '2026-11-06',
+    urunler: ['vh:aile/casals-enkelfan-ec-plug', 'vh:aile/casals-kentalfan-plug'],
+    ilgiliKategoriler: ['vh:kategori/plug-fans'],
+    diller: {
+      tr: {
+        slug: 'plug-fan-nedir',
+        ozet: "Plug fan nedir? Çark ve tahrik yapısı, kullanım yerleri, seçim girdileri ve VentHub'daki plug fan serileri.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Plug fanın ne olduğunu, VentHub'daki iki seriyi ve seçimde gereken girdileri görmek için bu rehberden başlayın.",
+        govde: `# Plug fan nedir, nasıl çalışır, nerede kullanılır?
+
+Plug fan, ASHRAE Journal'da 1997'de yayımlanan bir makalenin başlığında "unhoused (plug/plenum) fans" ifadesiyle geçen kasasız bir fan türüdür [2]; bir üreticinin kataloğundaki EC ve IEC motorlu plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli çarkı olan merkezkaç fanlardır [4]. ASHRAE sözlüğünde plenum fan girdisi vardır: tek girişli bir çarkla hava dağıtım sistemindeki bir plenum haznesini basınçlandıran fan düzeneği olarak tanımlanır [1]. Bu yazı fanın nasıl çalıştığını, nerelerde kullanıldığını ve seçimde hangi bilgilerin gerektiğini anlatır; VentHub'daki seriler en sonda kısaca sıralanır.
+
+## Plug fan nasıl çalışır?
+
+ABD Enerji Bakanlığı kılavuzunun sözlüğü merkezkaç fanı, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımı olarak tanımlar; kanatları dönüş yönünden geriye doğru açılı fanlar bu kılavuzda merkezkaç fanların bir grubudur [3]. Katalogdaki EC ve IEC motorlu plug fanlarda çark geriye eğik kanatlı ve tek emişlidir [4]. ASHRAE sözlüğü plenum fan girdisinde çarkın tipik olarak kanat profilli ya da geriye eğik tasarımda olduğunu yazar; bu bilgi plenum fan içindir [1].
+
+ABD Enerji Bakanlığı kılavuzu, çarkın motor miline doğrudan bağlandığı düzenin kayışlı tahrike göre daha yüksek verim, daha az yer ve daha az bakım gibi avantajları olduğunu belirtir [3]. Aynı kılavuz doğrudan tahrikli fanların motorun devrinde dönmesi gerektiğini ve bunun kullanılabilecekleri uygulamaları sınırladığını da yazar [3]. Plug fanların hepsi doğrudan tahrikli değildir: aynı katalogda doğrudan tahrikli serilerin yanında kayış tahrikli bir seri de yer alır [4].
+
+ABD Enerji Bakanlığı kılavuzu doğrudan tahrikli fanın hız ayarını kayışlı düzene göre daha az esnek bulur; bu esnekliği eklemenin bir yolu olarak ayarlanabilir hız sürücüsünü gösterir [3]. Frekans dönüştürücünün ne işe yaradığı için [frekans konvertörü rehberine](vh:yazi/frekans-konvertoru), ürünler için [frekans konvertörleri kategorisine](vh:kategori/frequency-converters) bakılabilir.
+
+## Hangi makinelerde kullanılır?
+
+Katalogdaki EC ve IEC motorlu plug fanlar klima cihazlarına, plenumlara, kompresörlere, kurutuculara, kabinlere ve fotovoltaik invertörlere entegre edilmek üzere uygun görülür [4]. Bu kullanımlardan hangisinde hangi serinin tercih edileceği katalogda yazılı değildir [4].
+
+Fan seçimi, ABD Enerji Bakanlığı kılavuzuna göre sistemin çalışma koşullarını bilerek başlar: hava özellikleri, hava debisi, basınç ve sistem yerleşimi [3]. Hava özellikleri nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri kapsar [3].
+
+## Seçimde hangi bilgiler gerekir?
+
+Tablonun ilk üç satırı ABD Enerji Bakanlığı kılavuzunun fan seçimi ve doğrudan tahrikli fanda hız ayarı için verdiği bilgileri, son üç satır VentHub'ın plug fan kategorisinde seçimi belirleyen soruları gösterir.
+
+| Girdi | Neyi belirler | Hangi kaynak sayıyor |
+|---|---|---|
+| Hava özellikleri, hava debisi, basınç ve sistem yerleşimi | Merkezkaç ya da eksenel fan türünden hangisinin gerektiğini birlikte belirler | ABD Enerji Bakanlığı kılavuzu [3] |
+| Tahrik düzeni | Doğrudan tahrikli fan motorun devrinde döner, kayışlı düzene göre hız ayarı daha az esnektir | ABD Enerji Bakanlığı kılavuzu [3] |
+| Hız ayarı ihtiyacı | Doğrudan tahrikte esnekliği ayarlanabilir hız sürücüsü ekler | ABD Enerji Bakanlığı kılavuzu [3] |
+| Motor tipi | EC ya da IEC asenkron motor ailesi | VentHub plug fanlar kategorisi [5] |
+| Besleme tipi | Tek faz ya da üç faz bağlantısı | VentHub plug fanlar kategorisi [5] |
+| Model boyutu | Seri içinde model seçimi | VentHub plug fanlar kategorisi [5] |
+
+## VentHub'da hangi plug fan serileri var?
+
+VentHub'ın [plug fanlar](vh:kategori/plug-fans) kategorisinde iki Casals serisi bulunur: harici rotorlu EC motorlu [ENKELFAN](vh:aile/casals-enkelfan-ec-plug) ve IEC standart asenkron motorlu [KENTALFAN](vh:aile/casals-kentalfan-plug) [5]. İkisi de geriye eğik kanatlı, tek emişli ve doğrudan tahriklidir [4]. Model, besleme ve sıcaklık ayrıntıları ürün sayfalarındadır; ürün sayfalarında "Teknik Teklif İste" düğmesi bulunur [5].
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez. VentHub'ın plug fan kategorisi seçimi hava debisi ve basınç, motor tipi, besleme tipi ve model boyutuna bağlar [5]; bu girdiler yukarıdaki tabloda toplanmıştır.
+
+## Bu yazının sınırları nelerdir?
+
+ASHRAE'nin tanımı plenum fan içindir; sözlükte plug fan adıyla yapılan sorguda girdi bulunamadı (tek yöntem: adres sorgusu) ve plug fan ile plenum fan arasındaki ilişki bu yazıda yalnızca bir makale başlığına dayanır; makalenin metnine erişilemediği için ayrıntıya girilmemiştir [1][2]. Katalogda ses değerinin ölçüm koşulu (mesafe, ortam) yazılı değildir, bu yüzden ses değerleri seriler arasında karşılaştırılmamalıdır [4]. İki motor tipi katalogda birbiriyle karşılaştırılmamıştır; bu yazı da bir üstünlük sonucu çıkarmaz [4].
+
+## Sık sorulan sorular
+
+### Plug fan ile plenum fan aynı şey midir?
+
+ASHRAE sözlüğündeki tanım plenum fan içindir [1]. ASHRAE Journal'daki bir makalenin başlığı iki adı "plug/plenum" diye yan yana kullanır [2]; bu, iki adın yakın bir fan türü için kullanıldığına dair tek kaynaklı bir işarettir, bir tanım değildir.
+
+### Plug fan her zaman doğrudan tahrikli midir?
+
+Hayır. Katalogdaki EC ve IEC motorlu seriler doğrudan tahriklidir, bir seri ise kayış tahriklidir [4].
+
+### Plug fanın koruma sınıfı nedir?
+
+Katalogdaki EC motorlu plug fanın motoru IP54 korumalı ve B sınıfı yalıtımlıdır, IEC asenkron motorlu olanın motoru IP55 korumalı ve F sınıfı yalıtımlıdır [4]. IEC asenkron motorlu seri için talep üzerine 100 °C'ye ve IP66'ya kadar farklı üretim de mümkündür [4].
+
+### Plug fan hangi sıcaklıkta çalışır?
+
+Katalogdaki EC motorlu plug fanın çalışma sıcaklığı modele göre -20 ile 60 °C arasından -30 ile 40 °C arasına kadar değişir, IEC asenkron motorlu olanın sürekli çalışma sıcaklığı en çok 60 °C'dir [4].
+
+### VentHub'da hangi plug fan serileri var, teklif nasıl istenir?
+
+VentHub'ın plug fanlar kategorisinde EC motorlu ve IEC asenkron motorlu iki seri bulunur; ürün sayfalarında "Teknik Teklif İste" düğmesi vardır [5].
+
+## Kaynaklar
+
+1. ASHRAE, ASHRAE Terminology (A Comprehensive Glossary of Terms for the Built Environment), "plenum fan" girdisi; "plug fan" ve "unhoused fan" sorgularında girdi bulunamadı (tek yöntem: adres sorgusu). https://terminology.ashrae.org/?entry=plenum%20fan (erişim 03.11.2026)
+2. C. W. Coward, "Unhoused (plug/plenum) fans: is their performance predictable?", ASHRAE Journal, cilt 39, sayı 10, Ekim 1997. Bibliyografik kayıt: International Institute of Refrigeration, kayıt no 1998-3086, https://iifiir.org/en/fridoc/unhoused-plug-plenum-fans-is-their-performance-predictable-109693 (yalnız kayıt okundu; makale metnine erişilmedi; erişim 03.11.2026)
+3. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 8, 15, 21, 51, 79 ve 80 (basılı s. 4, 11, 17, 47, 75 ve 76). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
+4. Casals, Plug fans — Technical Catalogue / Catálogo técnico (revizyon kodu CV092024), PDF s. 12, 16, 20 ve 21 (basılı s. 10, 14, 18 ve 19); VentHub kaynak dizininde kayıtlıdır (pdf_hash b7c9ad9cab1e).
+5. VentHub, plug fanlar kategori sayfası ile iki ürün ailesi sayfası, canlı sitede 3 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/plug-fanlar, https://venthub.com.tr/tr/products/casals-enkelfan-ec-plug ve https://venthub.com.tr/tr/products/casals-kentalfan-plug
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Fan seçimi debi, basınç, ortam ve güvenlik gereklerine bağlıdır. Kurulum ve elektrik bağlantısı yetkili personelle yapılmalıdır. Katalog ve ürün bilgileri yayın tarihindeki sürüme aittir.
 `,
       },
     },
