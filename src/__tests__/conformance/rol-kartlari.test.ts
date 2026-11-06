@@ -639,7 +639,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('## İçerik kuralı')
-      expect(metin, `${ad} kartı: PR gövdesi Kanban satırıyla başlar`).toContain('PR gövdesi `Kanban: <numara>` ile başlar')
+      // HRT-107: CI kapısı (pr-kayit-kapisi.cjs) gövdede Kanban satırını arar, ilk satır şartı yok
+      expect(metin, `${ad} kartı: PR gövdesi Kanban satırı taşır`).toContain('PR gövdesi `Kanban: <numara>` satırı taşır')
     }
     const cetveller: Array<[string, string]> = [
       ['rehber-yazisi-standard.md', '10. **Şirket iddiası ve reklam dili yok**'],

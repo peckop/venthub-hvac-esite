@@ -14,3 +14,5 @@ paths:
 4. JSON ya da cetvel okuyan her test koşulur, yalnız yazdığın değil.
 5. Üretici `--yaz` CRLF checkout'ta fazladan dosya değiştirir; yalnız gerçek değişenler tutulur.
 6. Ağır test dosyaları paralel değil tek tek koşulur.
+7. Ortak satır PR'ında üç ölçüm PR'dan önce koşulur; tek düzeltme turu planlanır.
+8. HARİTA kartının kanıtı içeriği de ölçer. Birleşme kontrolüne.
