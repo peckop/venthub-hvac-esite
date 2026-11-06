@@ -2,16 +2,16 @@
 /**
  * Ölçüm defteri: "bu sorgu daha önce ölçüldü mü?" sorusunun tek adresi (SEO-87, cetvel: dizin-sistemleri-standard.md D8).
  *
- * NİÇİN: 6 Kasım 2026'da kanal fanı sorguları için daha önce yapılmış kıyasın üzerine yeni plan yazıldı, çünkü
+ * NİÇİN: 6 Kasım 2026'da daha önce yapılmış bir kıyasın üzerine yeni plan yazıldı, çünkü
  * ham ölçümler yüzlerce klasörde dağınıktı ve aratacak tek yer yoktu. Yeni SERP / Search Console / Trends ölçümünden
  * ÖNCE `--sor` koşulur; ölçüldüyse eski kayda gidilir, yeniden ölçüm yalnız eski kayıt eskiyse ya da kapsam yeniyse yapılır.
  *
  * DEFTER: depo DIŞI `olcumler.jsonl` (repo PUBLIC: arama sorgusu ve Search Console verisi depoya girmez, P6). Depo içi yol REDDEDİLİR.
  * Satır: {tarih, sorgu, motor, kart, kaynak, tur?, sira?, sayfaTipi?, adres?, not?}. `sorgu` olduğu gibi yazılır; eşleşme
- * anahtarı Türkçe harfleri sadeleştirir ve noktalamayı atar ("Kanal fanları?" = "kanal fanlari").
+ * anahtarı Türkçe harfleri sadeleştirir ve noktalamayı atar ("Örnek sorgu?" = "ornek sorgu").
  *
  * Kullanım:
- *   node scripts/seo/olcum-defteri.mjs --sor "kanal fanları nelerdir" [--motor google] [--gun 30] [--defter <olcumler.jsonl>]
+ *   node scripts/seo/olcum-defteri.mjs --sor "ornek sorgu" [--motor google] [--gun 30] [--defter <olcumler.jsonl>]
  *   node scripts/seo/olcum-defteri.mjs --kaydet --sorgu "..." --motor google --kart SEO-86 --kaynak seo86/ [--tur serp|gsc|trends] [--sira 4] [--sayfa-tipi bilgi|kategori|karma] [--adres <https>] [--tarih ISO] [--not "..."]
  *   node scripts/seo/olcum-defteri.mjs --toplu <satirlar.json>   (içe aktarım: dizi; aynı tarih+sorgu+motor+kart çiftlenmez)
  * Çıkış: 0 tamam; 2 geçersiz girdi ya da depo içi yol.
@@ -102,7 +102,7 @@ export function sorguOlculduMu({ satirlar, sorgu, motor = null, gun = ESKI_ESIGI
   const motorUygun = (/** @type {{motor: string}} */ s) => motor === null || s.motor === motor
   const tam = satirlar.filter((s) => sorguAnahtari(s.sorgu) === anahtar && motorUygun(s))
   tam.sort((a, b) => tarihAl(b.tarih) - tarihAl(a.tarih))
-  // Benzer: en az iki ortak sözcük ve kısa sorgunun yarısından fazlası ortak ("kanal fanları nelerdir" ~ "kanal fanları kullanım alanları").
+  // Benzer: en az iki ortak sözcük ve kısa sorgunun yarısından fazlası ortak ("ornek konu nelerdir" ~ "ornek konu kullanim alanlari").
   const benzerSatirlar = satirlar.filter((s) => {
     const k = sorguAnahtari(s.sorgu)
     if (k === anahtar || !motorUygun(s) || !sozcukler.length) return false
