@@ -27,7 +27,7 @@ console.warn(`Connecting to ${hostname} (Force IPv4)...`);
 
 const client = new Client({
     connectionString,
-    ssl: pgTls(),
+    ssl: pgTls(connectionString),
     connectionTimeoutMillis: 10000
 });
 

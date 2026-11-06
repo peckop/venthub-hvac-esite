@@ -43,7 +43,7 @@ async function run() {
         console.warn(`🔗 Attempting connection to: ${maskedUrl}`);
         const client = new Client({
             connectionString: url,
-            ssl: pgTls(),
+            ssl: pgTls(url),
             connectionTimeoutMillis: 15000,
         });
 

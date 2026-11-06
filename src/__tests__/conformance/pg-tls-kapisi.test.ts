@@ -80,3 +80,52 @@ describe('INV-TLS-BETIK-1 · betiklerde TLS doğrulaması kapatılmaz (C10)', ()
     expect(b.stdout).toMatch(/^HATA pg-tls: kok sertifika bir PEM degil/)
   })
 })
+
+/**
+ * ALT-164 (OPS-234 m3, 2026-11-06): bağlantı dizgesi TLS'i EZEMEZ. Ölçüldü (pg 8.23.1): node-postgres
+ * dizgedeki parametreleri `ssl` ayarının üzerine yazar; `sslmode=disable` TLS'i kapatır.
+ */
+describe('INV-TLS-BETIK-1 · bağlantı dizgesindeki sslmode pgTls ayarını ezemez (ALT-164)', () => {
+  const yardimci = path.join(SCRIPTS, 'db', 'pg-tls.cjs')
+  const dene = (baglanti: string) => {
+    const kod =
+      "const { pgTls } = require(process.argv[1]); try { const t = pgTls(process.argv[2]); console.log('OK', t.rejectUnauthorized) } catch (e) { console.log('HATA', e.message) }"
+    const temiz: NodeJS.ProcessEnv = { ...process.env }
+    delete temiz.PGSSLROOTCERT
+    return spawnSync(process.execPath, ['-e', kod, yardimci, baglanti], { env: temiz, encoding: 'utf8' }).stdout.trim()
+  }
+
+  it('NEDEN: pg gerçekten ezer (bu kol yeşilken kapı gereklidir)', () => {
+    const kod =
+      "const CP = require('pg/lib/connection-parameters'); const s = { ca: ['x'], rejectUnauthorized: true };" +
+      "const p = (q) => JSON.stringify(new CP({ connectionString: 'postgres://u:p@h:5432/d' + q, ssl: s }).ssl);" +
+      "console.log(p('') + '|' + p('?sslmode=disable') + '|' + p('?sslmode=no-verify'))"
+    const r = spawnSync(process.execPath, ['-e', kod], { cwd: KOK, encoding: 'utf8' })
+    const [yok, kapali, dogrulamasiz] = r.stdout.trim().split('|')
+    expect(yok).toBe('{"ca":["x"],"rejectUnauthorized":true}')
+    expect(kapali, 'sslmode=disable artık ezmiyorsa kapı gözden geçirilir').toBe('false')
+    expect(dogrulamasiz).toBe('{"rejectUnauthorized":false}')
+  })
+
+  it('SABOTAJ: TLS parametresi taşıyan dizge reddedilir (büyük/küçük harf fark etmez)', () => {
+    for (const q of ['?sslmode=disable', '?sslmode=no-verify', '?sslmode=require', '?SSLMODE=disable', '?ssl=0', '?sslrootcert=/x', '?a=1&uselibpqcompat=true&sslmode=require']) {
+      expect(dene('postgres://u:p@h:5432/d' + q), q).toMatch(/^HATA pg-tls: baglanti dizgesinde TLS ayarini ezen parametre var/)
+    }
+    expect(dene('bu bir url degil')).toMatch(/^HATA pg-tls: baglanti dizgesi URL olarak ayristirilamadi/)
+  })
+
+  it('temiz dizge geçer, doğrulama açık', () => {
+    expect(dene('postgres://u:p@h:5432/d')).toBe('OK true')
+    expect(dene('postgresql://u:p@h:6543/d?application_name=x')).toBe('OK true')
+  })
+
+  it('connectionString kullanan her betik pgTls()\'e dizgeyi verir', () => {
+    const ihlaller = gez(SCRIPTS)
+      .filter((f) => {
+        const k = yorumSiyir(fs.readFileSync(f, 'utf8'))
+        return /\bconnectionString\b/.test(k) && /\bpgTls\(\s*\)/.test(k)
+      })
+      .map((f) => path.relative(KOK, f))
+    expect(ihlaller, 'doğrusu: ssl: pgTls(<bağlantı dizgesi>)').toEqual([])
+  })
+})

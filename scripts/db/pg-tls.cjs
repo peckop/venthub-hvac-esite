@@ -17,7 +17,44 @@ const tls = require('node:tls')
 
 const VARSAYILAN_CA = path.join(__dirname, 'checks', 'supabase-root-2021-ca.pem')
 
-function pgTls() {
+/**
+ * ⛔BAĞLANTI DİZGESİ TLS'İ EZEMEZ (ALT-164, OPS-234 m3, 2026-11-06). Ölçüldü (pg 8.23.1,
+ * ConnectionParameters): dizgedeki parametreler `ssl` ayarının ÜZERİNE yazılır:
+ *   sslmode=disable → ssl false (TLS YOK) · sslmode=no-verify → rejectUnauthorized false ·
+ *   sslmode=require/prefer → {} (bizim kök sertifikamız düşer) · ssl=0 → false · sslrootcert=… → dosya okur.
+ * Bu yüzden dizgede TLS'e dokunan parametre varsa bağlantı REDDEDİLİR (fail-closed); TLS yalnız buradan gelir.
+ */
+const TLS_EZEN_PARAMETRELER = ['sslmode', 'ssl', 'sslrootcert', 'sslcert', 'sslkey', 'sslpassword', 'uselibpqcompat']
+
+/** Bağlantı dizgesinde TLS'i ezebilecek sorgu parametrelerini döner (küçük harf). Ayrıştırılamazsa hata. */
+function tlsEzenParametreler(baglanti) {
+  let url
+  try {
+    url = new URL(baglanti)
+  } catch {
+    throw new Error('pg-tls: baglanti dizgesi URL olarak ayristirilamadi (TLS parametreleri denetlenemez)')
+  }
+  const adlar = [...url.searchParams.keys()].map((a) => a.toLowerCase())
+  return [...new Set(adlar.filter((a) => TLS_EZEN_PARAMETRELER.includes(a)))]
+}
+
+/**
+ * @param {string} [baglanti] Client'a `connectionString` olarak verilen dizge. connectionString kullanan
+ *   her çağıran bunu VERMELİ (kapı: pg-tls-kapisi.test.ts); yalnız alan alan yapılandırma (host/user/...) verilmez.
+ */
+function pgTls(baglanti) {
+  if (baglanti !== undefined) {
+    if (typeof baglanti !== 'string' || baglanti === '') {
+      throw new Error('pg-tls: baglanti dizgesi bos ya da metin degil')
+    }
+    const ezen = tlsEzenParametreler(baglanti)
+    if (ezen.length) {
+      throw new Error(
+        `pg-tls: baglanti dizgesinde TLS ayarini ezen parametre var (${ezen.join(', ')}); ` +
+          'dizgeden cikar, TLS yalniz pgTls() ile verilir',
+      )
+    }
+  }
   const verilen = process.env.PGSSLROOTCERT
   const caYol = verilen || VARSAYILAN_CA
   if (!fs.existsSync(caYol)) {
@@ -32,4 +69,4 @@ function pgTls() {
   return { ca: [...tls.rootCertificates, pem], rejectUnauthorized: true }
 }
 
-module.exports = { pgTls, VARSAYILAN_CA }
+module.exports = { pgTls, tlsEzenParametreler, TLS_EZEN_PARAMETRELER, VARSAYILAN_CA }

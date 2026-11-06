@@ -10,7 +10,7 @@ if (!connectionString) throw new Error('DATABASE_URL environment variable is req
 
 const client = new Client({
     connectionString,
-    ssl: pgTls()
+    ssl: pgTls(connectionString)
 });
 
 async function run() {
