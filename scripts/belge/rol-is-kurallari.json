@@ -70,7 +70,9 @@
         "**Yeni cetvel başlığı Sahibi ve Son doğrulama taşır; README satırı, sahiplik kaydı ve araç envanteri satırı aynı PR'da gelir.** Yerelde `belge-tazelik`, `rol-kartlari` ve `arac-envanteri` testleri koşulur. Olay: #1991 (Son doğrulama eksik, CI kırmızı), HRT-59 (#2040, envanter satırı için INV-ARAC-1 uyarısı).",
         "**JSON ya da cetvel okuyan her test koşulur, yalnız yazdığın değil.** Bir veri dosyasını okuyan tüm testler (dış bağımlılık beyanı, sahiplik, görev verisi) PR'dan önce çalışır. Olay: #2018 (`diagram` skill'i dış bağımlılık tablosunda beyansızdı, `ajan-skill-cozulur` CI'da kırmızı).",
         "**Üretici `--yaz` CRLF checkout'ta fazladan dosya değiştirir; yalnız gerçek değişenler tutulur.** `git diff --ignore-space-at-eol --stat` ile ayır, kalanı `git checkout -- <dosya>` ile geri al; yeni üretici kolu eklenince bunu tekrar ölç. Olay: HRT-59 ve HRT-71'de 17 kurallar dosyası sahte değişti.",
-        "**Ağır test dosyaları paralel değil tek tek koşulur.** Bellek darken beş dosya birlikte `sessionstart-pencere-adi`'ni 60 sn sınırında düşürür (tek başına 65/65). Olay: HRT-45 (25 Ekim)."
+        "**Ağır test dosyaları paralel değil tek tek koşulur.** Bellek darken beş dosya birlikte `sessionstart-pencere-adi`'ni 60 sn sınırında düşürür (tek başına 65/65). Olay: HRT-45 (25 Ekim).",
+        "**Ortak satır PR'ında üç ölçüm PR'dan önce koşulur; tek düzeltme turu planlanır.** `tr -d '\\r' < .claude/rules/filo-ortak.md | wc -c` (tavan 10.000), `node scripts/belge/rol-karti-uret.cjs --kontrol` (CRLF checkout'ta CR atılarak karşılaştırılır) ve bağlı testler. Olay: #2227 aynı cümleye üç ardışık commit, #2236 satır sonu düzeltmesi, #2260 filo-ortak 9.988/10.000 B için satır birleştirme.",
+        "**HARİTA kartının kanıtı içeriği de ölçer.** Birleşme kontrolüne (`gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`) ek olarak değişen veriyi bağlayan test (`pnpm exec vitest run src/__tests__/conformance/rol-kartlari.test.ts`) ya da `file_matches` eklenir; yalnız birleşme kanıtı içeriğin doğru olduğunu göstermez. Olay: HRT-99..106 kartlarında tek `command` kanıtı."
       ]
     },
     "KATALOG": {
