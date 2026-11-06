@@ -343,7 +343,9 @@ function degerlendir(girdi) {
         'OTOMATIK uygulama). Serit KENDI indirmez.' +
         (girdi.onay !== undefined && girdi.onay !== null ? '  ⚠--onay REDDEDILDI: ' + onay.sebep : ''))
     }
-  } else if (girdi.onay !== undefined && girdi.onay !== null) {
+  } else if (girdi.onay !== undefined && girdi.onay !== null &&
+    !(Array.isArray(girdi.functionsDegisen) && girdi.functionsDegisen.length)) {
+    // (Edge değişikliği varsa onay madde 6'nın; burada "gereksiz" denmez.)
     // Migration YOKKEN onay: kapiyi acmaz (zaten acik), ama SESSIZ de gecmez — gereksiz onay,
     // "onay aliskanligi" doguracak ilk adimdir ve bir sonraki sefer migration'li PR'da refleks olur.
     ekle(5, 'MIGRATION 0', true, '⚠--onay GEREKSIZ verildi: migration 0, acilacak kapi yok')
@@ -357,10 +359,18 @@ function degerlendir(girdi) {
     ekle(6, 'EDGE FUNCTIONS 0', false, 'functions diff\'i OKUNAMADI — olculemedi (fail-closed)')
   } else if (Array.isArray(girdi.functionsDegisen)) {
     if (girdi.functionsDegisen.length) {
-      ekle(6, 'EDGE FUNCTIONS 0', false,
-        'Edge degisikligi: EDGE/OPS tam okuma · ' + girdi.functionsDegisen.length + ' dosya: ' +
-        girdi.functionsDegisen.slice(0, 3).join(', ') + (girdi.functionsDegisen.length > 3 ? ' …' : '') +
-        '  (autoMode kurali functions degisikligini reddeder; #2272 bu bosluktan gecmisti)')
+      const dosyalar = girdi.functionsDegisen.length + ' dosya: ' +
+        girdi.functionsDegisen.slice(0, 3).join(', ') + (girdi.functionsDegisen.length > 3 ? ' …' : '')
+      if (onay.gecerli) {
+        // ARC-262: Recep onaylı Edge değişikliği de ritüelden geçer (madde 5 ile aynı --onay kuralı, tek ölçüt).
+        ekle(6, 'EDGE FUNCTIONS ' + girdi.functionsDegisen.length + ' — RECEP ONAYI KANITLI', true,
+          onay.metin + ' · ' + dosyalar)
+      } else {
+        ekle(6, 'EDGE FUNCTIONS 0', false,
+          'Edge degisikligi: EDGE/OPS tam okuma · ' + dosyalar +
+          '  (autoMode kurali functions degisikligini reddeder; #2272 bu bosluktan gecmisti)' +
+          (girdi.onay !== undefined && girdi.onay !== null ? '  ⚠--onay REDDEDILDI: ' + onay.sebep : ''))
+      }
     } else {
       ekle(6, 'EDGE FUNCTIONS 0', true)
     }
@@ -515,7 +525,7 @@ if (require.main === module) {
       'KULLANIM\n  node scripts/hijyen/merge-ritueli.cjs <PR> <dal> [--agac=<yol>] [--merge] [--onay="..."]\n' +
       '  --merge : bes madde YESIL ise merge\'i bu betik yapar (gh pr merge --squash --delete-branch).\n' +
       '            Kapi ve eylem AYNI surecte; pipe/&& zincirine kapi konmaz (cikis kodu yutulur).\n' +
-      '  --onay  : migration\'li PR\'da madde 5\'i acar. Metin RECEP\'IN KENDI SOZU olmali\n' +
+      '  --onay  : migration\'li PR\'da madde 5\'i, supabase/functions degisen PR\'da madde 6\'yi acar (ARC-262). Metin RECEP\'IN KENDI SOZU olmali\n' +
       '            (kim · nerede · ne zaman), asgari ' + ONAY_ASGARI + ' karakter. --merge ile\n' +
       '            birlikte verilirse metin PR\'a YORUM olarak yazilir (kanit PR\'da kalir).\n' +
       '            Diger dort madde kirmizi ise --onay HICBIR SEYI acmaz.\n\n' +
@@ -648,11 +658,17 @@ if (require.main === module) {
     // patlarsa hic yazilmaz — oysa onayin verildigi o zaman da dogrudur. Ayrica bu yorum
     // "merge edildi" DEMEZ, "onay sudur" der; sirasi yuzunden yanlis bir sey iddia etmez.
     // ⚠Yorum YALNIZ --merge ile yazilir: --onay tek basina bir OLCUMDUR, eylem degil.
-    if (onayGecerli(ONAY).gecerli && migrationlar && migrationlar.length) {
+    const edgeSayisi = Array.isArray(functionsDegisen) ? functionsDegisen.length : 0
+    if (onayGecerli(ONAY).gecerli && ((migrationlar && migrationlar.length) || edgeSayisi)) {
       try {
         gh(['pr', 'comment', pr, '--body',
-          'MIGRATION ONAYI (merge-ritueli.cjs --onay) — ' + migrationlar.length +
-          ' migration bu PR ile prod\'a OTOMATIK uygulanacak (kural 13).\n\n> ' + ONAY +
+          (migrationlar && migrationlar.length
+            ? 'MIGRATION ONAYI (merge-ritueli.cjs --onay) — ' + migrationlar.length +
+              ' migration bu PR ile prod\'a OTOMATIK uygulanacak (kural 13).'
+            : '') +
+          (edgeSayisi ? (migrationlar && migrationlar.length ? '\n' : '') +
+            'EDGE ONAYI (merge-ritueli.cjs --onay) — ' + edgeSayisi + ' supabase/functions dosyasi degisiyor.' : '') +
+          '\n\n> ' + ONAY +
           '\n\nBu satir betik tarafindan, merge\'den ONCE yazildi; kanit PR\'da kalir.'])
         yaz('  bilgi   onay metni PR\'a yorum olarak yazildi')
       } catch (e) {
