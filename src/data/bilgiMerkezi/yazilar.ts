@@ -1175,7 +1175,7 @@ Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölç
 - Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans).
 - Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır [4]; modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
 - Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans).
-- Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; modeller: [plug fanlar](vh:kategori/plug-fans).
+- Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; modeller: [plug fanlar](vh:kategori/plug-fans); ayrıntı için [plug fan nedir, nerede kullanılır](vh:yazi/plug-fan-nedir) yazısına bakılabilir.
 - Korozyona ve aside dayanımlı fanlar kategorisi santrifüj fanları kapsar [4]; modeller: [korozyona ve aside dayanımlı fanlar](vh:kategori/corrosion-and-acid-resistant-fans).
 - Şömine ve baca fanları bacanın çekişini mekanik olarak destekleyen fanlardır [4]; modeller: [şömine ve baca fanları](vh:kategori/chimney-fans).
 - Endüstriyel tavan vantilatörleri büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; havayı dışarı atmaz, içerideki havayı karıştırır [4]; modeller: [endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans).
@@ -1238,8 +1238,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Doğrulama: v1c-v1m, her turda tuzaklı + temiz kopya; son tur (9) tuzaklı 5/5, temiz yanlış 0. Recep okudu, yayın kararı Recep'te: birleşme ayrı OPS onayıyla; yayinTarihi birleşme gününe göre güncellenir.
     kimlik: 'plug-fan-nedir',
     konu: 'verimlilik',
-    yayinTarihi: '2026-11-03',
-    guncellemeTarihi: '2026-11-03',
+    yayinTarihi: '2026-11-06',
+    guncellemeTarihi: '2026-11-06',
     urunler: ['vh:aile/casals-enkelfan-ec-plug', 'vh:aile/casals-kentalfan-plug'],
     ilgiliKategoriler: ['vh:kategori/plug-fans'],
     diller: {
