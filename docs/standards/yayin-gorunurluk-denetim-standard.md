@@ -141,7 +141,7 @@ yalnız "yayın günü listesi"ne güvenilmez. Haritada olmayan yeni adres (TR) 
 
 Y2.1 yayın bildirimine bağlıdır (R10 B8 ve B10'da BLOG, GEO-SEO'ya tek satır yazar). 3 Kasım 2026'da yeni rehber (`fan-cesitleri`) bildirim gelmeden canlıya çıktı; GEO-SEO onu site haritasındaki 94 → 95 adres artışından buldu. Bildirim aksasa da iş kaçmasın diye **her açılışta** (yeni pencere, compact dönüşü, gün başı):
 
-1. Canlı `https://venthub.com.tr/sitemap.xml` adresleri alınır ve depo dışı son kayıtla (`C:/tmp/vh-arsiv/geo-seo/harita-son.txt`, sıralı adres listesi) karşılaştırılır (`comm -13 son yeni`: yeni adres; `comm -23`: kalkan adres).
+1. Canlı `https://venthub.com.tr/sitemap.xml` adresleri alınır ve depo dışı son kayıtla (`C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/harita-son.txt`, sıralı adres listesi) karşılaştırılır (`comm -13 son yeni`: yeni adres; `comm -23`: kalkan adres).
 2. Yeni adres varsa ve açık bir kartı yoksa aynı turda kart açılır (SEO-NN, kaynak olay: "bildirim gelmedi") ve Y2.1 adımları koşulur: Google dizin isteği, IndexNow durumu (`dizin-tetigi` koşusu günlüğünde adres var mı), Bing, Yandex. Kota dolu adım ertesi günün ilk işidir ve karta yazılır.
 3. Bildirim gelmediği BLOG'a ve OPS'a tek satırla yazılır (yazının yayınlayanı bildirmemiştir; sorun sürerse R10 B8/B10 hatırlatılır).
 4. Kalkan adres varsa 308/404 durumu ölçülür (yönlendirme mi, kaldırma mı); kalkan adres sessiz geçilmez.
