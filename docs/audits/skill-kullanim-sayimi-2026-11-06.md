@@ -12,20 +12,20 @@ Yalnız yapılandırılmış `tool_use` blokları sayıldı. **Skill çağrısı
 
 | Departman | Pencere dökümü | Skill çağrısı | SKILL.md okuması | Çekirdek skill | Çekirdekten tetiklenen | Çekirdekte hiç tetiklenmeyen | Çalışan açılışı |
 |---|---|---|---|---|---|---|---|
-| 3D | yok | 0 | 0 | 6 | 0 | 6 | 0 |
-| ADMIN | yok | 0 | 0 | 11 | 0 | 11 | 0 |
+| 3D | yok | ölçülemedi | ölçülemedi | 6 | ölçülemedi | ölçülemedi | 0 |
+| ADMIN | yok | ölçülemedi | ölçülemedi | 11 | ölçülemedi | ölçülemedi | 0 |
 | ALTYAPI | var | 0 | 6 | 11 | 1 | 10 | 45 |
 | ARAC | var | 0 | 0 | 13 | 0 | 13 | 15 |
 | BLOG | var | 3 | 0 | 7 | 1 | 6 | 86 |
-| EDGE | yok | 0 | 0 | 10 | 0 | 10 | 0 |
+| EDGE | yok | ölçülemedi | ölçülemedi | 10 | ölçülemedi | ölçülemedi | 0 |
 | GEO-SEO | var | 2 | 0 | 10 | 0 | 10 | 0 |
 | HARITA | var | 0 | 0 | 13 | 0 | 13 | 1 |
-| I18N | yok | 0 | 0 | 10 | 0 | 10 | 0 |
+| I18N | yok | ölçülemedi | ölçülemedi | 10 | ölçülemedi | ölçülemedi | 0 |
 | KATALOG | var | 0 | 0 | 10 | 0 | 10 | 0 |
-| MEVZUAT | yok | 0 | 0 | 7 | 0 | 7 | 8 |
+| MEVZUAT | yok | ölçülemedi | ölçülemedi | 7 | ölçülemedi | ölçülemedi | 8 |
 | OPS | var | 2 | 0 | 12 | 0 | 12 | 20 |
-| SATIS | yok | 0 | 0 | 10 | 0 | 10 | 0 |
-| TASARIM | yok | 0 | 0 | 7 | 0 | 7 | 0 |
+| SATIS | yok | ölçülemedi | ölçülemedi | 10 | ölçülemedi | ölçülemedi | 0 |
+| TASARIM | yok | ölçülemedi | ölçülemedi | 7 | ölçülemedi | ölçülemedi | 0 |
 | URUN | var | 0 | 0 | 11 | 0 | 11 | 6 |
 | YETENEK | var | 1 | 14 | 7 | 1 | 6 | 5 |
 
@@ -33,20 +33,20 @@ Yalnız yapılandırılmış `tool_use` blokları sayıldı. **Skill çağrısı
 
 ## Çekirdekte olup 7 günde hiç tetiklenmeyen skill (departman başına)
 
-- **3D**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, git-commit, calisma-kopyasi-sil
-- **ADMIN**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, git-commit, qa, mutasyon-testi, calisma-kopyasi-sil
+- **3D**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
+- **ADMIN**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
 - **ALTYAPI**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, agy-orchestrate, git-commit, calisma-kopyasi-sil
 - **ARAC**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, prompt-engineering, git-flow, refactor-planner, sdd, mnemosyne, maestro, agy-orchestrate, git-commit, mutasyon-testi, calisma-kopyasi-sil
 - **BLOG**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, git-commit, calisma-kopyasi-sil
-- **EDGE**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, git-commit, mutasyon-testi, calisma-kopyasi-sil
+- **EDGE**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
 - **GEO-SEO**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, git-commit, qa, rehber-yayin, calisma-kopyasi-sil, dizin-takip, seo-olcum
 - **HARITA**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, prompt-engineering, git-flow, refactor-planner, sdd, maestro, agy-orchestrate, git-commit, notebooklm-sync, orion-cli, calisma-kopyasi-sil
-- **I18N**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, git-commit, mutasyon-testi, calisma-kopyasi-sil
+- **I18N**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
 - **KATALOG**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, git-commit, mutasyon-testi, calisma-kopyasi-sil
-- **MEVZUAT**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, git-commit, ce-uygunluk-dosyasi, calisma-kopyasi-sil
+- **MEVZUAT**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
 - **OPS**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, prompt-engineering, git-flow, sdd, git-commit, notebooklm-sync, office-hours, to-prd, video-kaynak, calisma-kopyasi-sil
-- **SATIS**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, git-commit, mutasyon-testi, calisma-kopyasi-sil
-- **TASARIM**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, git-commit, qa, calisma-kopyasi-sil
+- **SATIS**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
+- **TASARIM**: ölçülemedi (pencere dökümü yok, çoğunun penceresi açık değil); "kullanmadı" diye okunmaz
 - **URUN**: wrongstack-kanban, wrongstack-mailbox-mcp, multi-agent, git-flow, refactor-planner, sdd, maestro, git-commit, qa, mutasyon-testi, calisma-kopyasi-sil
 - **YETENEK**: wrongstack-mailbox-mcp, multi-agent, prompt-engineering, git-flow, git-commit, calisma-kopyasi-sil
 
