@@ -97,6 +97,9 @@ describe('INV-KANCA-DONE-KANIT-1 · gerçek veritabanıyla uçtan uca', () => {
       { id: 'kirmizi', columnId: 'review', labels: [], verificationReport: { verdict: 'failed' } },
       { id: 'yesil', columnId: 'review', labels: [], verificationReport: { verdict: 'passed' } },
       { id: 'muaf', columnId: 'review', labels: ['kanit-muaf'] },
+      { id: 'f96610b5-501b-4634-b709-cd15a501f6b0', columnId: 'review', labels: [], verificationReport: { verdict: 'needs_human' } },
+      { id: 'abc123aa-0000-4000-8000-000000000001', columnId: 'review', labels: [], verificationReport: { verdict: 'failed' } },
+      { id: 'abc123aa-0000-4000-8000-000000000002', columnId: 'review', labels: [], verificationReport: { verdict: 'passed' } },
     ])
     db.close()
   })
@@ -137,6 +140,25 @@ describe('INV-KANCA-DONE-KANIT-1 · gerçek veritabanıyla uçtan uca', () => {
       expect(r.status).toBe(0)
       expect(r.stdout.trim()).toBe('')
     }
+  })
+
+  it('ARC-255: 8 haneli kısa kimlikle Done isteği de kapıdan geçer (needs_human kart reddedilir)', () => {
+    const r = calistir(istek({ taskId: 'f96610b5', columnId: 'done' }))
+    expect(r.status).toBe(0)
+    const c = JSON.parse(r.stdout)
+    expect(c.hookSpecificOutput.permissionDecision).toBe('deny')
+    expect(c.hookSpecificOutput.permissionDecisionReason).toMatch(/"needs_human"/)
+  })
+
+  it('ARC-255: kısa kimlik belirsizse (iki kart) ya da 6 karakterden kısaysa kapı karışmaz (araç kendi hatasını verir)', () => {
+    expect(calistir(istek({ taskId: 'abc123aa', columnId: 'done' })).stdout.trim()).toBe('') // iki kart eşleşir
+    expect(calistir(istek({ taskId: 'f9661', columnId: 'done' })).stdout.trim()).toBe('') // 5 karakter, önek kabul edilmez
+  })
+
+  it('ARC-255: tam kimlik hâlâ tam eşleşmeyle okunur', () => {
+    const c = JSON.parse(calistir(istek({ taskId: 'abc123aa-0000-4000-8000-000000000001', columnId: 'done' })).stdout)
+    expect(c.hookSpecificOutput.permissionDecisionReason).toMatch(/"failed"/)
+    expect(calistir(istek({ taskId: 'abc123aa-0000-4000-8000-000000000002', columnId: 'done' })).stdout.trim()).toBe('')
   })
 
   it('vana: VENTHUB_DONE_KAPISI_KAPALI=1 kapıyı kapatır', () => {

@@ -221,6 +221,18 @@ function incele(hookGirdisi, ekler) {
   const g = hookGirdisi.tool_input || {}
   if (!EYLEMLER.has(g.action)) return null
 
+  // ARC-255: `command` diye bir alan YOK. Komut `checkNotes`'a, tip `checkType: "command"`a gider; `command` verilirse araç onu
+  // yok sayar ve kriteri sessizce "manual" yapar (6 Kasım ARC-252, 13 Ekim ölçümü). Done'da verify_completion "needs_human" verir.
+  if (typeof g.command === 'string' && g.command.trim() && !(g.checkType === 'command' && String(g.checkNotes || '').trim())) {
+    return (
+      '"command" alanı araçta YOK ve yok sayılır: kriter sessizce "manual" olur, verify_completion needs_human verir. ' +
+      'Doğru çağrı: checkType "command" ve checkNotes "' +
+      g.command.trim().slice(0, 120) +
+      '" (komutun kendisi checkNotes\'a). ' +
+      GECERLI_BICIMLER
+    )
+  }
+
   if (KOMUT_TIPLERI.has(g.checkType)) {
     const komut = String(g.checkNotes || g.checkDescription || '').trim()
     const sorun = komutSorunu(komut, ekler === undefined ? izinEkleriniOku() : ekler)

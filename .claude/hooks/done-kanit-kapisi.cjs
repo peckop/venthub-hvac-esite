@@ -100,16 +100,21 @@ function kartiOku(dbYolu, taskId) {
     process.removeAllListeners('warning')
     const { DatabaseSync } = require('node:sqlite')
     db = new DatabaseSync(dbYolu, { readOnly: true })
-    const satir = db
+    // ARC-255: kart kimliği 8 haneli önekle de verilir (kanban araçları önek kabul eder); tam eşleşme yoksa ÖNEK eşleşmesi
+    // (en az 6 karakter, tek kart) kullanılır. Eskiden yalnız tam eşleşme vardı: kısa kimlikle Done'a taşıma kapıyı
+    // "kart-okunamadi" diye sessizce atlıyordu (6 Kasım ölçümü, ARC-252 needs_human iken Done oldu).
+    const satirlar = db
       .prepare(
-        "select json_extract(b.payload,'$.title') as pano, " +
+        "select json_extract(t.value,'$.id') as kid, json_extract(b.payload,'$.title') as pano, " +
           "json_extract(t.value,'$.columnId') as kolon, " +
           "json_extract(t.value,'$.verificationReport.verdict') as verdict, " +
           "json_extract(t.value,'$.labels') as etiketler " +
           'from kanban_boards b, json_each(b.payload, \'$.tasks\') t ' +
-          "where json_extract(t.value,'$.id') = ? limit 1"
+          "where json_extract(t.value,'$.id') = ? " +
+          "or (length(?) >= 6 and substr(json_extract(t.value,'$.id'), 1, length(?)) = ?) limit 3"
       )
-      .get(taskId)
+      .all(taskId, taskId, taskId, taskId)
+    const satir = satirlar.find((s) => s.kid === taskId) || (satirlar.length === 1 ? satirlar[0] : null)
     if (!satir) return null
     let etiketler = []
     try {
