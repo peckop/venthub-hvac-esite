@@ -48,7 +48,11 @@ const BELIRSIZ_KONTRAST_TABAN = 21
  * (`setTimeout(syncVisibility, 1500)`). Tek tarama bu yüzden yarışıyordu: axe bant açılmadan biterse 21,
  * açıldıktan sonra biterse 27 (fark tam 6 düğüm, hepsi bant; ölçüm: koşu 42180185428 deneme 2, iki liste).
  * Çözüm: bandın görünmesi BEKLENİR, sonra iki ayrı tarama yapılır. Sayfa (bant hariç) tavanı 21 kalır,
- * bandın kendi tavanı 6. Hiçbir tavan gevşemedi; bandın 6 belirsiz düğümü ayrı iştir (yeni bant Design'dan).
+ * bandın kendi tavanı 6.
+ * ⚠BU BİR GEVŞETMEDİR (ALT-163 düzeltmesi): önce bant açıkken sayı 27 olunca kapı KIRMIZIYDI; şimdi bandın
+ * 6 belirsiz düğümü ayrı tavanla YEŞİL geçiyor, yani toplam hoşgörü 21'den 27'ye çıktı. Bant tavanı 6
+ * OPS-233 kararıyla (Recep onayı) KALIR. Kalıcı çözüm eski bandı düzeltmek değil: yeni site çerez bandı
+ * Design'dan erişilebilir kontrastla gelecek (OPS-180 şartı); o gelince BANT_KONTRAST_TABAN düşürülür.
  */
 const BANT = '[role="dialog"][aria-label="Çerez İzni"]'
 const BANT_KONTRAST_TABAN = 6
