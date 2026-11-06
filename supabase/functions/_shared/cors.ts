@@ -82,3 +82,5 @@ export function getCorsHeaders(req: Request) {
     'Access-Control-Max-Age': '86400',
   };
 }
+
+// ARC-259 sinama: atilabilir dal, birlestirilmez
