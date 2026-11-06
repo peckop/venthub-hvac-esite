@@ -8,6 +8,8 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
 import { SIPARIS_DURUM_IZIN, monotonIhlaliMi } from '../_shared/siparis_gecis.ts'
+import { adminDurumGirdisi, adminDurumKarari } from '../_shared/odeme_inceleme.ts'
+import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 
 /**
  * PostgREST dizisinden ilk profil satırını RUNTIME kontrolüyle daraltır.
@@ -25,6 +27,16 @@ function firstProfileRow(value: unknown): { role: string | null; tenant_id: stri
   }
 }
 
+/** Denetim satırı: her yönetici çağrısının TEK izi (P11, kural 11). */
+interface DenetimIzi {
+  action: 'order_status_update' | 'order_status_rejected'
+  rowPk: string | null
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  comment: string | null
+}
+type Bitir = (http: number, govde: Record<string, unknown>, iz: DenetimIzi) => Promise<Response>
+
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   const cors = corsHeaders;
@@ -33,6 +45,9 @@ Deno.serve(async (req: Request) => {
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
   const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin))
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
+
+  /** Yönetici doğrulandıktan sonra tanımlanır; catch dalı da denetim satırını buradan yazar. */
+  let acilBitir: Bitir | null = null
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: cors });
@@ -107,69 +122,163 @@ Deno.serve(async (req: Request) => {
       throw tenantErr
     }
 
-    const body = await req.json().catch(() => ({}));
-    const { id, conversation_id, status, display_code } = body || {};
-    // ALT-131: varsayilan 'paid' KALDIRILDI (status kolonunda 'paid' yok, CHECK reddederdi) ve gecersiz
-    // sozluk degeri veritabanina gitmeden 400 ile doner. Gecis monotonlugunu veritabani tetigi denetler.
-    const newStatus = typeof status === 'string' ? status.trim() : '';
-    if (!Object.prototype.hasOwnProperty.call(SIPARIS_DURUM_IZIN, newStatus)) {
-      return new Response(JSON.stringify({ error: 'invalid_status', allowed: Object.keys(SIPARIS_DURUM_IZIN) }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
-    }
-
-    async function patch(filter: string) {
-      return await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${serviceRoleKey}`,
-          apikey: serviceRoleKey,
-          'Content-Type': 'application/json',
-          Prefer: 'return=representation'
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-    }
-
-    async function listRecent(_limit = 100) {
-      const res = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?tenant_id=eq.${encodeURIComponent(tenantId)}&select=id,conversation_id,created_at&order=created_at.desc&limit=${_limit}`, {
-        headers: {
-          Authorization: `Bearer ${serviceRoleKey}`,
-          apikey: serviceRoleKey
+    // ── KARNE 2026-11 P11 · OPS-222 ───────────────────────────────────────────────
+    // Bu noktadan sonra çağıran DOĞRULANMIŞ bir yöneticidir ve HER sonuç (başarı, 400, 404, 409,
+    // 500) `admin_audit_log`'a TAM BİR satır yazar (CLAUDE.md kural 11). Eskiden dosyada denetim
+    // yazımı hiç yoktu: pending sipariş izsiz `confirmed` olabiliyordu. Tek çıkış `bitir()`;
+    // erken `return new Response` bu bölümde yasak (çift ya da eksik satır sınıfını kapatır).
+    const actorId = user.id
+    let denetimYazildi = false
+    const bitir: Bitir = async (http, govde, iz) => {
+      let denetim: 'yazildi' | 'yazilamadi' = 'yazilamadi'
+      if (!denetimYazildi) {
+        denetimYazildi = true
+        const auditResp = await fetch(`${supabaseUrl}/rest/v1/admin_audit_log`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({
+            actor: actorId,
+            table_name: 'venthub_orders',
+            row_pk: iz.rowPk,
+            action: iz.action,
+            before: iz.before,
+            after: { ...(iz.after ?? {}), http, request_id: requestId },
+            comment: iz.comment,
+            tenant_id: tenantId,
+          }),
+        }).catch(() => null)
+        if (auditResp && auditResp.ok) {
+          denetim = 'yazildi'
+        } else {
+          // İz düşerse sessiz kalınmaz: platform logu + gelir alarmı yüzeyi (Hata Grupları ekranı).
+          console.error('[admin-update-order] admin_audit_log yazilamadi', { request_id: requestId, http: auditResp?.status ?? null })
+          await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+            fn: 'admin-update-order',
+            code: 'ADMIN_AUDIT_YAZILAMADI',
+            message: 'Yonetici siparis durumu cagrisinin denetim satiri yazilamadi.',
+            extra: { request_id: requestId, row_pk: iz.rowPk, action: iz.action, http },
+          })
         }
-      });
-      const txt = await res.text();
-      const data = (()=>{ try{ return JSON.parse(txt) }catch{ return [] } })();
-      return Array.isArray(data) ? data : [];
-    }
-
-    let resp: Response | null = null;
-    if (id) {
-      resp = await patch(`id=eq.${encodeURIComponent(id)}`);
-    } else if (conversation_id) {
-      resp = await patch(`conversation_id=eq.${encodeURIComponent(conversation_id)}`);
-    } else if (display_code) {
-      // display_code: UI'de görünen son 8 hane kodu (id'nin son 8'i)
-      const recent = await listRecent(200);
-      const target = recent.find((o: { id?: string }) => (o?.id || '').toString().toLowerCase().endsWith(String(display_code).toLowerCase()));
-      if (!target) {
-        return new Response(JSON.stringify({ ok:false, error:'not_found_by_display_code', tried: display_code }), { status: 404, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
       }
-      resp = await patch(`id=eq.${encodeURIComponent(target.id)}`);
+      return new Response(JSON.stringify({ ...govde, audit: denetim }), { status: http, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    }
+    acilBitir = bitir
+
+    const body: unknown = await req.json().catch(() => null);
+    const girdi: Record<string, unknown> = (typeof body === 'object' && body !== null && !Array.isArray(body)) ? body as Record<string, unknown> : {};
+    const { id, conversation_id, status, display_code, reason } = girdi;
+    const gerekce = typeof reason === 'string' ? reason.trim().slice(0, 500) : null;
+    const istenen = typeof status === 'string' ? status.trim().slice(0, 40) : null;
+
+    // 1) Durum: yoksa 400, sözlük dışıysa 400 (eskiden varsayılan `'paid'`; ALT-131 + P11).
+    const durumGirdisi = adminDurumGirdisi(status);
+    if (!durumGirdisi.gecerli) {
+      return await bitir(400, { ok: false, error: durumGirdisi.kod, allowed: Object.keys(SIPARIS_DURUM_IZIN) }, {
+        action: 'order_status_rejected', rowPk: null, before: null, after: { requested_status: istenen, error: durumGirdisi.kod }, comment: gerekce,
+      });
+    }
+    const newStatus = durumGirdisi.durum;
+
+    const okumaBasligi = { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey };
+    const kiraci = encodeURIComponent(tenantId);
+
+    // 2) Hedef satır (tenant içinde). Mevcut durum okunmadan karar verilmez.
+    let filtre: string | null = null;
+    if (typeof id === 'string' && id) {
+      filtre = `id=eq.${encodeURIComponent(id)}`;
+    } else if (typeof conversation_id === 'string' && conversation_id) {
+      filtre = `conversation_id=eq.${encodeURIComponent(conversation_id)}`;
+    } else if (typeof display_code === 'string' && display_code) {
+      // display_code: UI'de görünen son 8 hane kodu (id'nin son 8'i)
+      const res = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?tenant_id=eq.${kiraci}&select=id&order=created_at.desc&limit=200`, { headers: okumaBasligi });
+      const recent: unknown = res.ok ? await res.json().catch(() => []) : [];
+      const kod = display_code.toLowerCase();
+      const eslesen = (Array.isArray(recent) ? recent : [])
+        .map((o: unknown) => (typeof o === 'object' && o !== null ? (o as Record<string, unknown>).id : null))
+        .filter((v): v is string => typeof v === 'string' && v.toLowerCase().endsWith(kod));
+      if (eslesen.length === 0) {
+        return await bitir(404, { ok: false, error: 'not_found_by_display_code' }, {
+          action: 'order_status_rejected', rowPk: null, before: null, after: { requested_status: newStatus, error: 'not_found_by_display_code' }, comment: gerekce,
+        });
+      }
+      if (eslesen.length > 1) {
+        return await bitir(409, { ok: false, error: 'AMBIGUOUS_DISPLAY_CODE' }, {
+          action: 'order_status_rejected', rowPk: null, before: null, after: { requested_status: newStatus, error: 'AMBIGUOUS_DISPLAY_CODE' }, comment: gerekce,
+        });
+      }
+      filtre = `id=eq.${encodeURIComponent(eslesen[0])}`;
     } else {
-      return new Response(JSON.stringify({ error: 'missing identifier' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
+      return await bitir(400, { ok: false, error: 'missing_identifier' }, {
+        action: 'order_status_rejected', rowPk: null, before: null, after: { requested_status: newStatus, error: 'missing_identifier' }, comment: gerekce,
+      });
     }
 
-    const ok = resp && resp.ok;
-    const text = resp ? await resp.text() : '';
+    const satirResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filtre}&tenant_id=eq.${kiraci}&select=id,status,payment_status&limit=2`, { headers: okumaBasligi });
+    if (!satirResp.ok) {
+      console.error('[admin-update-order] siparis okunamadi', { request_id: requestId, http: satirResp.status });
+      return await bitir(500, { ok: false, error: 'order_read_failed' }, {
+        action: 'order_status_rejected', rowPk: null, before: null, after: { requested_status: newStatus, error: 'order_read_failed' }, comment: gerekce,
+      });
+    }
+    const satirlar: unknown = await satirResp.json().catch(() => []);
+    const liste = Array.isArray(satirlar) ? satirlar.filter((r): r is Record<string, unknown> => typeof r === 'object' && r !== null) : [];
+    if (liste.length !== 1 || typeof liste[0].id !== 'string' || typeof liste[0].status !== 'string') {
+      const kod = liste.length > 1 ? 'AMBIGUOUS_ORDER' : 'not_found';
+      return await bitir(liste.length > 1 ? 409 : 404, { ok: false, error: kod }, {
+        action: 'order_status_rejected', rowPk: null, before: null, after: { requested_status: newStatus, error: kod }, comment: gerekce,
+      });
+    }
+    const hedefId = liste[0].id as string;
+    const mevcut = liste[0].status as string;
+    const once = { status: mevcut, payment_status: typeof liste[0].payment_status === 'string' ? liste[0].payment_status : null };
 
-    // Monotonluk tetigi reddetti: 500 degil 409 (istemci hatasi), net kod.
-    if (!ok && monotonIhlaliMi(text)) {
-      return new Response(JSON.stringify({ ok: false, error: 'INVALID_TRANSITION', response: text }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    // 3) Monotonluk + gerekçe: geri geçiş 409, pending→confirmed gerekçesiz 409.
+    const karar = adminDurumKarari({ mevcut, yeni: newStatus, gerekce });
+    if (karar.islem === 'reddet') {
+      return await bitir(karar.http, { ok: false, error: karar.kod, from: mevcut, to: newStatus }, {
+        action: 'order_status_rejected', rowPk: hedefId, before: once, after: { requested_status: newStatus, error: karar.kod }, comment: gerekce,
+      });
     }
 
-    return new Response(JSON.stringify({ ok, response: text }), { status: ok ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    // 4) Koşullu yazım: okuma ile yazma arasında durum değiştiyse 0 satır → 409 (ezme yok).
+    const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(hedefId)}&tenant_id=eq.${kiraci}&status=eq.${encodeURIComponent(mevcut)}`, {
+      method: 'PATCH',
+      headers: { ...okumaBasligi, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify({ status: newStatus, updated_at: new Date().toISOString() })
+    });
+    const text = await resp.text().catch(() => '');
+
+    // Monotonluk tetiği (VH409) reddetti: 500 değil 409, net kod. Ham gövde yanıta konmaz.
+    if (!resp.ok && monotonIhlaliMi(text)) {
+      return await bitir(409, { ok: false, error: 'INVALID_TRANSITION', from: mevcut, to: newStatus }, {
+        action: 'order_status_rejected', rowPk: hedefId, before: once, after: { requested_status: newStatus, error: 'INVALID_TRANSITION_DB' }, comment: gerekce,
+      });
+    }
+    if (!resp.ok) {
+      console.error('[admin-update-order] PATCH dustu', { request_id: requestId, http: resp.status });
+      return await bitir(500, { ok: false, error: 'update_failed' }, {
+        action: 'order_status_rejected', rowPk: hedefId, before: once, after: { requested_status: newStatus, error: 'update_failed' }, comment: gerekce,
+      });
+    }
+    const yazilan: unknown = (() => { try { return JSON.parse(text) } catch { return [] } })();
+    if (!Array.isArray(yazilan) || yazilan.length === 0) {
+      return await bitir(409, { ok: false, error: 'CONCURRENT_CHANGE', from: mevcut, to: newStatus }, {
+        action: 'order_status_rejected', rowPk: hedefId, before: once, after: { requested_status: newStatus, error: 'CONCURRENT_CHANGE' }, comment: gerekce,
+      });
+    }
+
+    return await bitir(200, { ok: true, id: hedefId, from: mevcut, to: newStatus }, {
+      action: 'order_status_update', rowPk: hedefId, before: once, after: { status: newStatus }, comment: gerekce,
+    });
   } catch (_e) {
-    console.error('Admin update order error:', _e);
-    return new Response(JSON.stringify({ error: _e instanceof Error ? _e.message : 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    console.error('Admin update order error:', _e instanceof Error ? _e.name : 'hata');
+    // Doğrulanmış yöneticinin çağrısı beklenmedik hatayla bitse de iz bırakır (bitir yalnız bir kez yazar).
+    if (acilBitir) {
+      return await acilBitir(500, { ok: false, error: 'internal_error' }, {
+        action: 'order_status_rejected', rowPk: null, before: null, after: { error: 'internal_error' }, comment: null,
+      });
+    }
+    return new Response(JSON.stringify({ error: 'internal_error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   }
 });
 

@@ -37,12 +37,42 @@ const KANONIK_ORIGINLER = [
  *   venthub-hvac-esite.vercel.app
  *   venthub-hvac-esite-1fk7v482n-peckops-projects.vercel.app
  */
-const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite[a-z0-9-]*\.vercel\.app$/;
+/**
+ * ⭐C5 (güvenlik karnesi 2026-11, 2026-11-04 daraltıldı) — ekip kapsamına ÇİVİLENDİ.
+ *
+ * ÖNCESİ: `^https://venthub-hvac-esite[a-z0-9-]*\.vercel\.app$`. Ön ek serbest kuyruklu olduğu için
+ * Vercel'de `venthub-hvac-esite-x` adlı projeyi BAŞKA bir hesabın açması yetiyordu
+ * (`venthub-hvac-esite-x.vercel.app` kalıba uyuyordu).
+ *
+ * ÖLÇÜLDÜ (Vercel API, `peckops-projects` ekibi, son 20 dağıtım, 2026-11-04): hepsi
+ * `venthub-hvac-esite-<9 küçük harf/rakam>-peckops-projects.vercel.app`. Dal önizleme takma adı
+ * Vercel biçimiyle `venthub-hvac-esite-git-<dal>-peckops-projects.vercel.app`. Üretim takma adı
+ * `venthub-hvac-esite.vercel.app` tam eşleşmeyle ayrıca kabul (aşağıda).
+ *
+ * KALAN RİSK (gizlenmiyor): son ek bir ekip adıdır, alan adı sahipliği değildir; ekip dışından
+ * biri tam olarak `venthub-hvac-esite-<9 hane>-peckops-projects` adlı bir proje açabilirse kalıba
+ * uyar. Çağrılar çerez taşımıyor (kimlik bearer token), yani köken tek başına yetki vermez.
+ */
+const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite-(?:[a-z0-9]{9}|git-[a-z0-9-]+)-peckops-projects\.vercel\.app$/;
+
+/** Üretim dağıtımının Vercel takma adı — tam eşleşme. */
+const VERCEL_URETIM_ORIGIN = 'https://venthub-hvac-esite.vercel.app';
+
+/**
+ * `http://localhost:<port>` her çalışma zamanında yansıtılır (ALT-156, 2026-11-05).
+ *
+ * C5'in (#2272) "localhost yalnız yerel edge'de" kısıtı GERİ ALINDI: CI'daki admin-smoke
+ * (e2e/admin-smoke.e2e.ts) tarayıcıyı localhost'ta açıp barındırılan edge'i çağırıyor; kısıt
+ * isteği CORS'ta düşürdü ve master'ı kırmızıya çevirdi. Kalan risk değişmedi: çağrılar çerez
+ * taşımıyor, kimlik bearer token'dır; köken tek başına yetki vermez. Kalıp tam köken ister
+ * (`http://localhost:3000.evil.example` ve portsuz `http://localhost` reddedilir).
+ */
+const LOCALHOST_KOKEN = /^http:\/\/localhost:\d+$/;
 
 export function getCorsHeaders(req: Request) {
   const origin = req.headers.get('Origin') || '';
-  const isLocal = origin.startsWith('http://localhost:');
-  const isVercel = ONIZLEME_KALIBI.test(origin);
+  const isLocal = LOCALHOST_KOKEN.test(origin);
+  const isVercel = ONIZLEME_KALIBI.test(origin) || origin === VERCEL_URETIM_ORIGIN;
   const isKanonik = KANONIK_ORIGINLER.includes(origin);
   const allowed = isLocal || isVercel || isKanonik;
   return {

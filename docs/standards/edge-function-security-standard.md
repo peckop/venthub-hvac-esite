@@ -521,9 +521,17 @@ const isVercel = origin.startsWith('https://venthub') // venthub.evil.example de
 ```
 ✅ **DOĞRU**
 ```ts
-const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite[a-z0-9-]*\.vercel\.app$/
-const isVercel = ONIZLEME_KALIBI.test(origin)
+const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite-(?:[a-z0-9]{9}|git-[a-z0-9-]+)-peckops-projects\.vercel\.app$/
+const isVercel = ONIZLEME_KALIBI.test(origin) || origin === 'https://venthub-hvac-esite.vercel.app'
 ```
+
+**Ekip kapsamı (C5, güvenlik karnesi 2026-11, 2026-11-04).** Önizleme kalıbı ekip son ekine
+(`-peckops-projects`) çivilenir; serbest kuyruklu ön ek (`venthub-hvac-esite[a-z0-9-]*`) başka hesabın
+`venthub-hvac-esite-x` projesini kabul ediyordu. Biçim Vercel API'den ölçüldü (son 20 dağıtım, hepsi
+`venthub-hvac-esite-<9 hane>-peckops-projects.vercel.app`). `http://localhost:<port>` her çalışma
+zamanında yansıtılır (tam köken kalıbı `^http://localhost:\d+$`). C5'in "localhost yalnız yerel edge'de"
+kısıtı 2026-11-05'te geri alındı (ALT-156): CI admin-smoke localhost'tan barındırılan edge'i çağırıyor ve
+kısıt master'ı kırmızıya çevirdi. Köken tek başına yetki vermez; kimlik bearer token'dır.
 
 **NEDEN.** `.vercel.app` **paylaşılan** bir son ektir — oraya isteyen herkes deploy edebilir.
 `endsWith('.vercel.app')` yazan bir allowlist "bizim önizlemelerimiz" değil, **"Vercel'e deploy
@@ -606,7 +614,7 @@ sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat
 | **E12-D** | §3.9 **sınıf (b) kapısı** | `tenantFromServiceBody` çağıran her dosya | aynı dosyada service_role karşılaştırması yok | **CANLI — R11-D** (baseline BOŞ) |
 | **E15** | §3.12 paylaşılan girdi → prod≠master | `supabase/config.toml`, `functions/_shared/**` dokunan PR | `drift-check.mjs` **master checkout'uyla** sapma > 0 | **CANLI — INV-EDGE-DRIFT-1** (2026-08-23; ölçülen süre 27 fn / 11 sn) |
 | **E16** | §3.9 service_role adresinde tenant filtresi | `supabase/functions/**/*.ts` | tenant kapsamlı tabloya (`venthub_orders`, `venthub_order_items`, `venthub_returns`, `coupons`, `cart_items`, `shopping_carts`, `price_lists`, `product_prices`) giden `/rest/v1/<tablo>?` ifadesinde `tenant_id=eq.` **literali** yok (koşullu `${...Filter}` sayılmaz) | **CANLI — R13** (2026-11-03, OPS-211; kurulduğunda bilinçli KIRMIZI: 11 adres. Kapanan: `order-validate`×4, `iyzico-refund`, `admin-orders-latest`. Taban 5: `_shared/refund_guard`, `iyzico-callback`, `order-housekeeping`, `returns-webhook`×2 — Faz 2 borcu) |
-| **E17** | §3.5 sır karşılaştırması sabit zamanlı | `supabase/functions/**/*.ts` | `===`/`!==` iki yanından biri sır adı (secret/token/signature/key/hmac/computed/expected/given/`Bearer ${..}`) ve öbürü düz literal değil | **CANLI — R14** (2026-11-03, OPS-211; kurulduğunda KIRMIZI: 5 dosya. Kapanan: `shipping-webhook`, `returns-webhook`, `release-expired-reservations`, `order-housekeeping` → `_shared/sabit_zaman.ts`. Taban 1: `_shared/odeme_yazim_kapisi.ts` — ödeme durum makinesi PR'ı çalışıyor) |
+| **E17** | §3.5 sır karşılaştırması sabit zamanlı | `supabase/functions/**/*.ts` | `===`/`!==` ya da gevşek `==`/`!=` (OPS-213, 2026-11-04) iki yanından biri sır adı (secret/token/signature/key/hmac/computed/expected/given/`Bearer ${..}`) ve öbürü düz literal değil | **CANLI — R14** (2026-11-03, OPS-211; gevşek eşitlik eklenince yeni isabet 0; kurulduğunda KIRMIZI: 5 dosya. Kapanan: `shipping-webhook`, `returns-webhook`, `release-expired-reservations`, `order-housekeeping` → `_shared/sabit_zaman.ts`. Taban 1: `_shared/odeme_yazim_kapisi.ts` — ödeme durum makinesi PR'ı çalışıyor) |
 
 > **E12 niçin üçe bölündü (2026-08-15).** Tek kural sıralamaya bakıyordu ve T026'daki
 > gerçek açığı **göremedi**: `_shared/tenant_config.ts` modülü `?tenant_id=` okuyordu,

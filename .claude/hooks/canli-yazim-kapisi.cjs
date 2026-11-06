@@ -223,13 +223,37 @@ function reddet(sebep) {
   )
 }
 
+/**
+ * Beklenmeyen çöküş (ARC-251): settings kaydı onFailure "block" olduğu için komut zaten durur (karar 390, gevşetilmez);
+ * burada yalnız SEBEBİ görünür kılınır. Önceden "No stderr output" ile durduğu için kimse çöküşün nedenini bilemiyordu.
+ * Çıkış 2 = engelle + stderr'i modele göster. Süreç hiç başlayamazsa/zaman aşımına uğrarsa bu satır yazılamaz (bellek baskısı).
+ */
+function cokus(e) {
+  try {
+    process.stderr.write(
+      '[canli-yazim-kapisi] kapi COKTU, komut onFailure=block geregi durduruldu (canli yazim sebebi DEGIL): ' +
+        String((e && e.message) || e).slice(0, 200) +
+        ' — komut salt-okumaysa ayni komutu yeniden dene; tekrar ederse ARAC\'a (ARC-251) bildir.\n',
+    )
+  } catch {
+    /* stderr yazılamıyorsa yapılacak bir şey yok */
+  }
+  process.exit(2)
+}
+
 function main() {
+  process.on('uncaughtException', cokus)
+  // Yalnız test için: çöküş yolunu sınar (kapıyı gevşetmez; bu değişken kapıyı yalnız KAPATIR/engeller, açmaz).
+  if (process.env.VENTHUB_CANLI_YAZIM_COKUS_SINAMA === '1') throw new Error('sinama: yapay cokus')
   let girdi = {}
   try {
     girdi = JSON.parse(fs.readFileSync(0, 'utf8') || '{}')
   } catch {
+    process.stderr.write('[canli-yazim-kapisi] girdi cozulemedi, karisilmadi (fail-open)\n')
     process.exit(0)
   }
+  // `null`, dizi ya da sayı gibi geçerli ama nesne olmayan JSON: tool_input okunurken try dışında patlıyordu.
+  if (!girdi || typeof girdi !== 'object') process.exit(0)
   const komut = (girdi.tool_input || {}).command || ''
   const ps = girdi.tool_name === 'PowerShell'
   if (girdi.tool_name !== 'Bash' && !ps) process.exit(0)

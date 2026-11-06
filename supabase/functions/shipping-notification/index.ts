@@ -5,7 +5,7 @@ import { sentryCaptureException } from "../_shared/sentry.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 // Şablon motoru + kaçış + maske tek yerde (güvenlik karnesi 2026-11 G1/S2).
 import { guvenliRenk, guvenliUrl, kacir, renderTemplate } from '../_shared/kodlama.ts'
-import { maskEposta } from '../_shared/maske.ts'
+import { maskEposta, metniMaskele } from '../_shared/maske.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -368,8 +368,11 @@ ${companyFooter}
     // + 5xx. Çağıran admin-update-shipping kargo kaydını geri almaz, `emailResult.sent=false` döner.
     const resp = await sendEmail(EMAIL_FROM, toList, bcc)
     if (!resp.ok) {
-      const errorText = await resp.text().catch(()=>'')
-      const normalized = errorText.toLowerCase()
+      // K8: sağlayıcı hata metni alıcı adresini taşıyabilir → denetim kaydı, hata nesnesi (log, Sentry,
+      // yanıt) yalnız maskeli metni görür. Sebep sınıflandırması ham metinden yapılır, metin dışarı çıkmaz.
+      const hamHata = await resp.text().catch(()=>'')
+      const errorText = metniMaskele(hamHata, 500)
+      const normalized = hamHata.toLowerCase()
       const reason = (normalized.includes('domain') && normalized.includes('verify')) || normalized.includes('from address')
         ? 'sender_unverified' : 'provider_error'
       try { await sentryCaptureException(new Error(`shipping-notification send failed (${reason}, ${resp.status})`), { fn: 'shipping-notification', tenant_id: tenantId }) } catch { /* izleme düşse bile kayıt aşağıda */ }
@@ -381,13 +384,13 @@ ${companyFooter}
             table_name: 'venthub_orders',
             row_pk: order_id,
             action: 'email_send_failed',
-            after: { kind: 'shipping_notification', reason, provider_status: resp.status, provider_error: errorText.slice(0, 500) },
+            after: { kind: 'shipping_notification', reason, provider_status: resp.status, provider_error: errorText },
             tenant_id: tenantId,
           }),
         }).catch(() => null)
         if (!denetim || !denetim.ok) console.error('[shipping-notification] admin_audit_log yazilamadi', { order_id, reason })
       }
-      throw new Error(`Email send failed (${reason}, ${resp.status}): ${errorText.slice(0, 500)}`)
+      throw new Error(`Email send failed (${reason}, ${resp.status}): ${errorText}`)
     }
 
     const result = await resp.json().catch(()=>({})) as ResendResult
@@ -425,7 +428,8 @@ ${companyFooter}
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error ?? 'Unknown error')
+    // K8: buraya düşen her hata (sağlayıcı, ağ, DB) serbest metindir; log ve yanıt maskeli metni görür.
+    const msg = metniMaskele(error instanceof Error ? error.message : String(error ?? 'Unknown error'), 500)
     console.error('Shipping notification error:', msg)
     try { await sentryCaptureException(error, { fn: 'shipping-notification' }) } catch { /* swallow */ }
     return new Response(JSON.stringify({ error: msg, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

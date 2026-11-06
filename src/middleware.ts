@@ -178,6 +178,16 @@ export async function middleware(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
   if (!supabaseUrl || !anonKey) {
+    // K6 (güvenlik karnesi 2026-11): env yokken admin kapısı hiç koşmuyordu, `/admin` kabuğu
+    // açık kalıyordu. Supabase yoksa yetki doğrulanamaz → FAIL-CLOSED; JWT sırrı eksikken
+    // verilen yanıtın aynısı. Vitrin rotaları eskisi gibi geçer.
+    if (effectiveSegments[0] === 'admin') {
+      console.error('[Middleware] Supabase env tanımlı değil — admin erişimi reddedildi (fail-closed).')
+      const misconfigUrl = request.nextUrl.clone()
+      misconfigUrl.pathname = '/'
+      misconfigUrl.searchParams.set('auth_error', 'server_misconfigured')
+      return redirectResponse(misconfigUrl, 302)
+    }
     return setTenantCookie(response)
   }
 

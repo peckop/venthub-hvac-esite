@@ -1,5 +1,6 @@
 
 import pg from 'pg';
+import { pgTls } from '../pg-tls.cjs';
 const { Client } = pg;
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -11,7 +12,7 @@ if (!databaseUrl) {
 
 const client = new Client({
     connectionString: databaseUrl,
-    ssl: { rejectUnauthorized: false }
+    ssl: pgTls()
 });
 
 async function applyFixes() {

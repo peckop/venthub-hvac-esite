@@ -1,5 +1,6 @@
 
 import pg from 'pg';
+import { pgTls } from '../pg-tls.cjs';
 const { Client } = pg;
 
 // Construct connection string if DATABASE_URL is missing but fragments exist
@@ -32,7 +33,7 @@ if (!connectionString) {
 
 const client = new Client({
   connectionString: connectionString,
-  ssl: { rejectUnauthorized: false } // Required for Supabase in many environments
+  ssl: pgTls() // Required for Supabase in many environments
 });
 
 const migrationSQL = `
