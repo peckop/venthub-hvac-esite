@@ -28,7 +28,7 @@ Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirs
 Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).
 
 ## Yetenek ve araç
-Önce NotebookLM (`notebooklm ask`; takip defteri a5f382a4, katalog 8bb600d9); Yayın Ofisi CELEX + SPARQL (EUR-Lex'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini. Skill: notebook-navigator.
+Yayın Ofisi CELEX + SPARQL (EUR-Lex'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini; docs/mevzuat/kayit.json. Skill: ce-uygunluk-dosyasi. NotebookLM emekli (karar 419).
 
 ## Kurallar (1)
 - K1 Plan önce.
