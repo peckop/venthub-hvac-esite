@@ -38,9 +38,19 @@ async function calistir() {
   const { panoDizini } = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pano-dizini.cjs'))
   const t = modul.tetik(girdi.tool_input && girdi.tool_input.command, cikti(girdi.tool_response))
   if (!t) return 0
-  const pr = t.pr || modul.dalPr(t.dal)
-  if (!pr) return 0
-  const ilk = modul.prOku(pr)
+  let pr = t.pr
+  let ilk
+  if (pr) {
+    ilk = modul.prOku(pr)
+  } else {
+    // İtiş: yerel commit'i çöz (HEAD → dal adı), dalın açık PR'ını bul, GitHub PR başını bu commit'e güncelleyene kadar bekle;
+    // yoksa eski commit'in eski yeşili "CI yeşil" diye yanlış haber olurdu.
+    const yerel = modul.yerelDal(t.dal)
+    if (!yerel) return 0
+    pr = modul.dalPr(yerel.ad)
+    if (!pr) return 0
+    ilk = await modul.itisiBekle({ pr, sha: yerel.sha })
+  }
   if (!ilk || ilk.state !== 'OPEN') return 0
   const sha = ilk.headRefOid || ''
   const dizin = panoDizini()

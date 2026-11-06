@@ -24,6 +24,7 @@ const ARALIK_MS = 30 * 1000
 const TAVAN_MS = 40 * 60 * 1000
 const MESAJ_TAVANI = 500
 const GH_ZAMAN_ASIMI_MS = 15 * 1000
+const TEYIT_MS = 10 * 1000
 const PR_ALANLARI = 'number,state,mergeStateStatus,statusCheckRollup,body,headRefOid,headRefName,title'
 
 const BASARISIZ = new Set(['FAILURE', 'CANCELLED', 'TIMED_OUT', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'ERROR'])
@@ -85,23 +86,42 @@ function mesaj(pv, s) {
   return tam.length > MESAJ_TAVANI ? tam.slice(0, MESAJ_TAVANI - 1) + '…' : tam
 }
 
-const PR_URL = /github\.com\/[^/\s"']+\/[^/\s"']+\/pull\/(\d+)/
-const PUSH = /\bgit\s+push\s+(?:-\S+\s+)*origin\s+([^\s;&|<>]+)/
-const PUSH_YASAK = /--delete|\s-d\s|--force-with-lease=|:\s*$/
+/** Bu depo: gh çağrıları HER ZAMAN `--repo` ile gider (ek çalışma dizinlerindeki başka depoların PR'ı karışmasın). */
+const REPO = 'peckop/venthub-hvac-esite'
+const PR_URL = /github\.com\/([^/\s"']+\/[^/\s"']+)\/pull\/(\d+)/
+const PUSH_KOMUT = /\bgit\s+push\b([^;&|<>\n]*)/
+
+/**
+ * `git push` argümanlarından dal: remote'tan (origin) sonraki ilk bayraksız argüman; `+ref`, `src:dst` (dst alınır) ve
+ * `refs/heads/` öneki çözülür. `--delete`/`-d`, tırnak/kabuk karakteri ya da dal yoksa null. 'HEAD' olduğu gibi döner
+ * (yerel dal adını çağıran çözer). SAF.
+ */
+function pushDali(argumanlar) {
+  const t = String(argumanlar || '').trim().split(/\s+/).filter(Boolean)
+  if (t.includes('--delete') || t.includes('-d')) return null
+  const i = t.indexOf('origin')
+  if (i < 0) return null
+  const aday = t.slice(i + 1).find((x) => !x.startsWith('-'))
+  if (!aday || /["'`$()]/.test(aday)) return null
+  let dal = aday.replace(/^\+/, '')
+  if (dal.includes(':')) dal = dal.split(':').pop()
+  dal = dal.replace(/^refs\/heads\//, '')
+  return dal || null
+}
 
 /**
  * Bash komutundan beklenecek PR: { pr } | { dal } | null. SAF; çıktı metni `gh pr create`in bastığı URL için.
- * `gh pr create` → çıktıdaki PR URL'si. `git push origin <dal>` → dal (PR numarası dalın açık PR'ından çözülür).
+ * `gh pr create` → çıktıdaki PR URL'si (YALNIZ bu depo). `git push origin <dal>` → dal; "Everything up-to-date" yeni itiş değildir.
  */
 function tetik(komut, cikti) {
   const k = String(komut || '')
   if (/\bgh\s+pr\s+create\b/.test(k)) {
     const m = PR_URL.exec(String(cikti || ''))
-    return m ? { pr: Number(m[1]) } : null
+    return m && m[1].toLowerCase() === REPO ? { pr: Number(m[2]) } : null
   }
-  const p = PUSH.exec(k)
-  if (p && !PUSH_YASAK.test(k)) {
-    const dal = p[1].includes(':') ? p[1].split(':').pop() : p[1]
+  const p = PUSH_KOMUT.exec(k)
+  if (p && !/Everything up-to-date/i.test(String(cikti || ''))) {
+    const dal = pushDali(p[1])
     return dal ? { dal } : null
   }
   return null
@@ -114,7 +134,7 @@ function ghCalistir(args) {
 /** Tek PR'ı okur; okunamazsa null (fail-open). `calistir` test için enjekte edilir. */
 function prOku(pr, calistir = ghCalistir) {
   try {
-    return JSON.parse(calistir(['pr', 'view', String(pr), '--json', PR_ALANLARI]))
+    return JSON.parse(calistir(['pr', 'view', String(pr), '--repo', REPO, '--json', PR_ALANLARI]))
   } catch {
     return null
   }
@@ -123,10 +143,35 @@ function prOku(pr, calistir = ghCalistir) {
 /** Dalın AÇIK PR numarası; yoksa/okunamazsa null. */
 function dalPr(dal, calistir = ghCalistir) {
   try {
-    const liste = JSON.parse(calistir(['pr', 'list', '--head', String(dal), '--state', 'open', '--json', 'number', '--limit', '1']))
+    const liste = JSON.parse(calistir(['pr', 'list', '--repo', REPO, '--head', String(dal), '--state', 'open', '--json', 'number', '--limit', '1']))
     return Array.isArray(liste) && liste[0] && Number.isInteger(liste[0].number) ? liste[0].number : null
   } catch {
     return null
+  }
+}
+
+/** Yerel dalın commit'i (itiş yarışı denetimi için); 'HEAD' verilirse geçerli dalın adı da döner. Okunamazsa null. */
+function yerelDal(dal, git = (a) => execFileSync('git', a, { encoding: 'utf8', timeout: GH_ZAMAN_ASIMI_MS, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] })) {
+  try {
+    const ad = dal === 'HEAD' ? git(['rev-parse', '--abbrev-ref', 'HEAD']).trim() : dal
+    if (!ad || ad === 'HEAD') return null
+    return { ad, sha: git(['rev-parse', ad]).trim() }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * İtişten sonra GitHub'ın PR başını güncellemesini bekler (en çok `tavan` ms): PR'ın headRefOid'i itilen commit'e eşit olunca
+ * PR görünümünü döner; eşitlenmezse null. Eski commit'in eski yeşili "CI yeşil" diye yanlış haber olmasın.
+ */
+async function itisiBekle({ pr, sha, oku = prOku, uyu = (ms) => new Promise((r) => setTimeout(r, ms)), aralik = 5000, tavan = 120000, simdi = Date.now }) {
+  const bas = simdi()
+  for (;;) {
+    const pv = oku(pr)
+    if (pv && pv.headRefOid === sha) return pv
+    if (simdi() - bas >= tavan) return null
+    await uyu(aralik)
   }
 }
 
@@ -177,7 +222,7 @@ function kilitBirak(dizin, pr, sha) {
  * 'yenilendi' = bekleme sırasında dal yeni commit aldı (yeni itişin kendi bekleyicisi var; bu sessiz biter).
  * Enjekte edilenler (`oku`, `uyu`, `simdi`) testte bekleme süresini sıfırlar.
  */
-async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTimeout(r, ms)), simdi = Date.now, aralik = ARALIK_MS, tavan = TAVAN_MS, ilkSha }) {
+async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTimeout(r, ms)), simdi = Date.now, aralik = ARALIK_MS, tavan = TAVAN_MS, ilkSha, teyit = TEYIT_MS }) {
   const bas = simdi()
   let sha = ilkSha || ''
   let hata = 0
@@ -191,6 +236,19 @@ async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTime
       if (!sha) sha = pv.headRefOid || ''
       else if (pv.headRefOid && pv.headRefOid !== sha && pv.state === 'OPEN') return { sonuc: 'yenilendi', pv, s: null }
       const s = siniflandir(pv)
+      if (s.durum === 'yesil') {
+        // YEŞİL TEYİDİ: GitHub itişten hemen sonra eski commit'in yeşilini ya da kısmen kayıtlı kapıları döndürebilir.
+        // Tek okuma yetmez: aynı commit'te ikinci okuma da yeşil olmalı.
+        await uyu(teyit)
+        const ikinci = oku(pr)
+        const s2 = ikinci ? siniflandir(ikinci) : null
+        if (!ikinci || s2.durum !== 'yesil' || (ikinci.headRefOid && ikinci.headRefOid !== pv.headRefOid)) {
+          if (simdi() - bas >= tavan) return { sonuc: 'zaman-asimi', pv, s: null }
+          await uyu(aralik)
+          continue
+        }
+        return { sonuc: 'yesil', pv: ikinci, s: s2 }
+      }
       if (s.durum !== 'bekliyor') return { sonuc: s.durum, pv, s }
     }
     if (simdi() - bas >= tavan) return { sonuc: 'zaman-asimi', pv, s: null }
@@ -231,14 +289,24 @@ function birlestiSatiri(pv) {
 
 async function hepsi(yaz = (x) => process.stdout.write(x + '\n'), calistir = ghCalistir, uyu = (ms) => new Promise((r) => setTimeout(r, ms))) {
   let onceki = {}
+  let ilkTur = true
   for (;;) {
     try {
-      const liste = JSON.parse(calistir(['pr', 'list', '--state', 'open', '--limit', '50', '--json', PR_ALANLARI]))
+      const liste = JSON.parse(calistir(['pr', 'list', '--repo', REPO, '--state', 'open', '--limit', '50', '--json', PR_ALANLARI]))
+      // gh geçici boş liste dönerse bütün PR'lar kaybolmuş sayılıp sonraki turda hepsi yeniden basılmasın.
+      if (Array.isArray(liste) && !liste.length && Object.keys(onceki).length) throw new Error('bos liste')
       const { satirlar, yeni, kaybolan } = degisiklikler(liste, onceki)
-      satirlar.forEach(yaz)
+      if (ilkTur) {
+        // İLK TUR SESSİZ BASELINE: mevcut yeşil/kırmızılar "değişiklik" değildir (16 açık PR'da 13 satırlık sel ölçüldü).
+        yaz('ILK-TARAMA acik=' + liste.length + ' yesil=' + satirlar.filter((x) => x.startsWith('CI-YESIL')).length + ' kirmizi=' + satirlar.filter((x) => x.startsWith('CI-KIRMIZI')).length)
+        ilkTur = false
+      } else {
+        satirlar.forEach(yaz)
+      }
       for (const n of kaybolan) {
         const satir = birlestiSatiri(prOku(n, calistir))
         if (satir) yaz(satir)
+        else if (onceki[n]) yeni[n] = onceki[n] // PR okunamadı: sonraki turda yeniden sorulur, birleşme olayı kaybolmasın
       }
       onceki = yeni
     } catch {
@@ -249,8 +317,9 @@ async function hepsi(yaz = (x) => process.stdout.write(x + '\n'), calistir = ghC
 }
 
 module.exports = {
-  kapiDurumu, siniflandir, kanbanNo, mesaj, tetik, prOku, dalPr, kilitYolu, kilitAl, kilitBirak, bekle, degisiklikler, birlestiSatiri, hepsi,
-  ARALIK_MS, TAVAN_MS, MESAJ_TAVANI,
+  kapiDurumu, siniflandir, kanbanNo, mesaj, tetik, pushDali, prOku, dalPr, yerelDal, itisiBekle, kilitYolu, kilitAl, kilitBirak, bekle,
+  degisiklikler, birlestiSatiri, hepsi,
+  REPO, ARALIK_MS, TAVAN_MS, TEYIT_MS, MESAJ_TAVANI,
 }
 
 if (require.main === module) {

@@ -24,6 +24,9 @@ interface Modul {
   kanbanNo: (b: unknown) => string
   mesaj: (pv: Pv, s: Sinif) => string
   tetik: (komut: unknown, cikti?: unknown) => { pr?: number; dal?: string } | null
+  itisiBekle: (o: Record<string, unknown>) => Promise<Pv | null>
+  yerelDal: (dal: string, git?: (a: string[]) => string) => { ad: string; sha: string } | null
+  hepsi: (yaz: (s: string) => void, calistir: (a: string[]) => string, uyu: () => Promise<void>) => Promise<void>
   kilitAl: (dizin: string, pr: number, sha: string, simdi?: number, yasiyor?: (p: number) => boolean) => boolean
   kilitBirak: (dizin: string, pr: number, sha: string) => void
   bekle: (o: Record<string, unknown>) => Promise<{ sonuc: string; pv: Pv | null; s: Sinif | null }>
@@ -90,10 +93,53 @@ describe('INV-CI-UYANDIRICI-1 · tetik ve mesaj', () => {
     expect(m.tetik('git push -u origin arac/arc263-ci-uyandirici')).toEqual({ dal: 'arac/arc263-ci-uyandirici' })
     expect(m.tetik('git push origin HEAD:arac/x')).toEqual({ dal: 'arac/x' })
     expect(m.tetik('git push origin --delete arac/x')).toBeNull()
+    expect(m.tetik('git push -d origin arac/x')).toBeNull()
     expect(m.tetik('git push')).toBeNull()
     expect(m.tetik('git status')).toBeNull()
     expect(m.tetik('gh pr view 5')).toBeNull()
     expect(m.tetik(undefined)).toBeNull()
+  })
+
+  it('denetçi S3: itiş biçimleri (HEAD, refs/heads, +ref, bayrak sırası, kabuk yeniden yönlendirmesi) çözülür; bozuk biçim ve alıntı null', () => {
+    const dal = (k: string) => m.tetik(k)?.dal ?? null
+    expect(dal('git push origin HEAD')).toBe('HEAD')
+    expect(dal('git push origin HEAD:refs/heads/arac/x')).toBe('arac/x')
+    expect(dal('git push origin refs/heads/arac/x')).toBe('arac/x')
+    expect(dal('git push origin +arac/x')).toBe('arac/x')
+    expect(dal('git push origin arac/x -u')).toBe('arac/x')
+    expect(dal('git push -u origin arac/x 2>&1')).toBe('arac/x')
+    expect(dal('git add . && git push origin arac/x')).toBe('arac/x')
+    expect(dal('git push origin --force')).toBeNull()
+    expect(dal('git push origin --tags')).toBeNull()
+    expect(dal('echo "git push origin x"')).toBeNull()
+    expect(dal('git push upstream arac/x')).toBeNull()
+  })
+
+  it('denetçi S1: "Everything up-to-date" yeni itiş değildir (kanca yeşil PR\'da anında uyandırmaz)', () => {
+    expect(m.tetik('git push origin arac/x', 'Everything up-to-date')).toBeNull()
+    expect(m.tetik('git push origin arac/x', 'To github.com:o/r.git\n   a1..b2  arac/x -> arac/x')).toEqual({ dal: 'arac/x' })
+  })
+
+  it('denetçi S2: yabancı depodaki PR URL\'si reddedilir; gh çağrıları --repo ile gider', () => {
+    expect(m.tetik('gh pr create', 'https://github.com/orion/other/pull/2302')).toBeNull()
+    expect(m.tetik('gh pr create', 'https://github.com/PECKOP/venthub-hvac-esite/pull/9')).toEqual({ pr: 9 })
+    const kaynak = readFileSync(path.join(KOK, 'scripts', 'board', 'ci-uyandirici.cjs'), 'utf8')
+    expect(kaynak.match(/'--repo', REPO/g)?.length ?? 0).toBeGreaterThanOrEqual(3)
+  })
+
+  it('itisiBekle: PR başı itilen commit\'e eşitlenene kadar bekler; eşitlenmezse null (eski yeşil yanlış haber olmaz)', async () => {
+    let t = 0
+    const okuyucu = (dizi: Array<Pv | null>) => {
+      let i = 0
+      return () => dizi[Math.min(i++, dizi.length - 1)]
+    }
+    const ortak = { pr: 5, sha: 'yeni', uyu: async () => void (t += 5000), simdi: () => t }
+    const pv = await m.itisiBekle({ ...ortak, oku: okuyucu([pr([], { headRefOid: 'eski' }), pr([], { headRefOid: 'yeni' })]) })
+    expect(pv?.headRefOid).toBe('yeni')
+    t = 0
+    expect(await m.itisiBekle({ ...ortak, oku: okuyucu([pr([], { headRefOid: 'eski' })]), tavan: 20_000 })).toBeNull()
+    expect(m.yerelDal('HEAD', (a: string[]) => (a[1] === '--abbrev-ref' ? 'arac/x\n' : 'abc123\n'))).toEqual({ ad: 'arac/x', sha: 'abc123' })
+    expect(m.yerelDal('HEAD', () => 'HEAD\n')).toBeNull()
   })
 
   it('mesaj: PR no, Kanban no, durum ve OPS yönergesi; kırmızıda kapı adları; tavan aşılmaz', () => {
@@ -128,16 +174,25 @@ describe('INV-CI-UYANDIRICI-1 · bekleyici döngü (sahte okuyucu, sıfır bekle
             t += 30_000
           },
           simdi: () => t,
+          teyit: 0,
           ...ek,
         }),
     }
   }
 
-  it('bekliyor, bekliyor, yeşil → yeşil döner, iki kez uyur', async () => {
-    const k = kos([pr([kosuyor('ci')]), pr([kosuyor('ci')]), pr([gecti('ci')])])
+  it('bekliyor, bekliyor, yeşil, yeşil (teyit) → yeşil döner; iki bekleme + bir teyit uykusu', async () => {
+    const k = kos([pr([kosuyor('ci')]), pr([kosuyor('ci')]), pr([gecti('ci')]), pr([gecti('ci')])])
     const r = await k.calis()
     expect(r.sonuc).toBe('yesil')
-    expect(k.uykular()).toBe(2)
+    expect(k.uykular()).toBe(3)
+  })
+
+  it('⛔ denetçi S1: tek yeşil okuma yetmez; teyitte kapı yeniden koşuyorsa ya da commit değiştiyse yeşil DENMEZ', async () => {
+    const a = await kos([pr([gecti('ci')]), pr([kosuyor('ci')]), pr([gecti('ci')]), pr([gecti('ci')])]).calis()
+    expect(a.sonuc).toBe('yesil')
+    // ilk okuma yeşil, teyit okuması başka commit: sahte yeşil; sonra gerçek yeşil
+    const b = kos([pr([gecti('ci')]), pr([gecti('ci')], { headRefOid: 'bbb222' })])
+    expect((await b.calis()).sonuc).not.toBe('yesil')
   })
 
   it('kırmızı ve birleşti ilk görüldüğü anda döner', async () => {
@@ -183,6 +238,28 @@ describe('INV-CI-UYANDIRICI-1 · OPS kipi (--hepsi çekirdeği)', () => {
     expect(b.kaybolan).toEqual([9, 11])
     const c = m.degisiklikler([pr([gecti('ci')], { headRefOid: 'ccc333' })], b.yeni)
     expect(c.satirlar).toHaveLength(1)
+  })
+
+  it('denetçi nit: ilk tur SESSİZ baseline (tek özet satırı); sonra yalnız değişim; boş liste glitch\'i sel üretmez', async () => {
+    const turlar: string[] = [JSON.stringify([pr([gecti('ci')]), pr([{ name: 'ci', conclusion: 'FAILURE' }], { number: 9, body: 'Kanban: HRT-5' })])]
+    turlar.push(JSON.stringify([])) // gh geçici boş
+    turlar.push(JSON.stringify([pr([gecti('ci')]), pr([{ name: 'ci', conclusion: 'FAILURE' }], { number: 9, body: 'Kanban: HRT-5' })]))
+    turlar.push(JSON.stringify([pr([gecti('ci')], { headRefOid: 'ddd444' })])) // #9 kayboldu (birleşme sorusu), #2322 yeni commit
+    const cikti: string[] = []
+    let tur = 0
+    const calistir = (a: string[]) => {
+      if (a[1] === 'view') return JSON.stringify(pr([], { number: 9, state: 'MERGED', body: 'Kanban: HRT-5' }))
+      return turlar[Math.min(tur, turlar.length - 1)]
+    }
+    await m
+      .hepsi((s) => cikti.push(s), calistir, async () => {
+        tur += 1
+        if (tur > 3) throw new Error('dur')
+      })
+      .catch(() => undefined)
+    expect(cikti[0]).toBe('ILK-TARAMA acik=2 yesil=1 kirmizi=1')
+    expect(cikti.filter((s) => s.startsWith('CI-')).length).toBe(1) // yalnız son turdaki yeni commit yeşili; boş-liste turu satır üretmedi
+    expect(cikti).toContain('BIRLESTI #9 HRT-5')
   })
 
   it('açıktan kaybolan PR: birleşti → BIRLESTI satırı; hâlâ açıksa null', () => {
