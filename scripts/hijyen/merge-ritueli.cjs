@@ -221,7 +221,9 @@ const ONAY_ASGARI = 20
  */
 function onayGecerli(ham) {
   if (ham === undefined || ham === null) return { gecerli: false, sebep: 'verilmedi', metin: '' }
-  const metin = String(ham).trim()
+  // Tek satıra indirilir: PR yorumuna "> " ile yazılan çok satırlı onayın 2. satırı çıplak kalır ve madde 7'nin bulgu/kapanış
+  // işaretini taşıyabilir (denetçi, ARC-262).
+  const metin = String(ham).replace(/\s*[\r\n\u2028\u2029]+\s*/g, ' ').trim()
   if (!metin) return { gecerli: false, sebep: 'BOS', metin: '' }
   if (metin.length < ONAY_ASGARI) {
     return {
@@ -668,7 +670,7 @@ if (require.main === module) {
             : '') +
           (edgeSayisi ? (migrationlar && migrationlar.length ? '\n' : '') +
             'EDGE ONAYI (merge-ritueli.cjs --onay) — ' + edgeSayisi + ' supabase/functions dosyasi degisiyor.' : '') +
-          '\n\n> ' + ONAY +
+          '\n\n> ' + onayGecerli(ONAY).metin +
           '\n\nBu satir betik tarafindan, merge\'den ONCE yazildi; kanit PR\'da kalir.'])
         yaz('  bilgi   onay metni PR\'a yorum olarak yazildi')
       } catch (e) {

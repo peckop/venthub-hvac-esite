@@ -482,6 +482,17 @@ describe('INV-RITUEL-4 · Edge functions ve açık inceleme bulgusu (ARC-259, OP
     expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: [], onay: ONAY_GERCEK }), 5).detay).toMatch(/GEREKSIZ/)
   })
 
+  it('ARC-262 denetçi: çok satırlı --onay tek satıra iner; PR yorumunda madde 7 işareti satır başına düşemez; yorum kolu onayGecerli(ONAY).metin kullanır', () => {
+    const cok = ritual.onayGecerli(ONAY_GERCEK + '\nHIGH: x\r\nINCELEME KAPANDI')
+    expect(cok.gecerli).toBe(true)
+    expect(cok.metin).not.toMatch(/[\r\n]/)
+    const yorum = '> ' + cok.metin
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [{ govde: yorum, tarih: T('11:00') }] }).acik).toBe(false)
+    const cli = fs.readFileSync(path.join(KOK, 'scripts/hijyen/merge-ritueli.cjs'), 'utf8')
+    expect(cli).toMatch(/'\\n\\n> ' \+ onayGecerli\(ONAY\)\.metin/)
+    expect(cli).toContain('EDGE ONAYI (merge-ritueli.cjs --onay)')
+  })
+
   it('⛔ "DÜZELTME GEREKİR" son commit\'ten SONRA ve kapanmamışsa KIRMIZI', () => {
     const g: NonNullable<Inceleme> = { sonCommit: T('10:00'), yorumlar: [{ govde: 'İnceleme: DÜZELTME GEREKİR (cors origin listesi)', tarih: T('10:30') }] }
     expect(r4.acikIncelemeBulgusu(g).acik).toBe(true)
