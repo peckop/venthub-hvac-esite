@@ -82,6 +82,14 @@ describe('OPS-224 · sonlanma durumları adıyla sabit', () => {
     expect(canCarrierTransition('bilinmeyen', 'cancelled')).toEqual({ allowed: false, reason: 'unknown_current' })
   })
 
+  it('bilinmeyen statü kendisine geçişte de reddedilir (aynı-statü kısayolu bilinmeyeni geçirmez)', () => {
+    expect(canCarrierTransition('x', 'x')).toEqual({ allowed: false, reason: 'unknown_current' })
+    expect(canCarrierTransition('__proto__', '__proto__')).toEqual({ allowed: false, reason: 'unknown_current' })
+    for (const s of RETURN_STATUSES) {
+      expect(canCarrierTransition(s, s), `${s} → ${s}`).toEqual({ allowed: true })
+    }
+  })
+
   it.each(['__proto__', 'constructor', 'toString', ''])(
     'kalıtsal ya da boş anahtar `%s` statü değildir, istisna fırlatmaz',
     (anahtar) => {
