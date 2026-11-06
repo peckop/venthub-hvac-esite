@@ -234,6 +234,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
   ürün ailesi = ailenin ve aktif varyantlarının en son `updated_at`'i (`getFamilySitemapData`), rehber yazısı
   `guncellemeTarihi`. Güvenilir kaynağı olmayan satırda (sabit sayfalar, markalar, seri adresi) alan **yazılmaz**.
 - Üretim anı (`new Date()`) lastmod olarak YAZILMAZ. Kapı: INV-SITEMAP-LASTMOD-1 (`src/app/__tests__/sitemapLastmod.test.ts`).
+- Canlı kapı `LASTMOD-BUGUN` (SEO-88, 2026-11-06): bugünkü **saatli** damga KIRMIZI (üretim anı izi); bugünkü **gün başı** tarih damgası (`T00:00:00.000Z`, içerik yazarının verdiği tarih) UYARI'dır, yayın günü gerçek yayın böyle görünür ve ertesi gün kendiliğinden düşer.
 - **Niçin (ölçüm, 2026-09-29):** canlı haritada 87 adresin 61'i her gün "bugün" taşıyordu. Google lastmod'u yalnız
   tutarlı biçimde doğruysa kullanır; her şeyi her gün değişmiş ilan eden haritanın tarihlerini yok sayar ve yeni
   sayfanın gerçek tarihi de kaybolur. Aynı gün GSC: 83 dizinli sayfanın 81'ine son uğrama 8–30 gün önce.

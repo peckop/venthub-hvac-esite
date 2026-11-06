@@ -426,7 +426,11 @@ function lastmodKontrolu(harita, bugun, cikti) {
     zamanlar.push({ s, ms: t.getTime(), gun: t.toISOString().slice(0, 10) })
   }
   for (const z of zamanlar) {
-    if (z.gun === bugun) cikti.push(bulgu('LASTMOD-BUGUN', 'KIRMIZI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}): gerçek değişiklik değil "şimdi" damgası olabilir (REC-454)`))
+    if (z.gun !== bugun) continue
+    // Gün başı damgası (T00:00:00.000Z) içerik yazarının verdiği TARİHtir: yayın günü gerçek yayın böyle görünür (SEO-88).
+    // REC-454'ün hatası `new Date()` ile SAATLİ damga üretmekti; saatli bugün damgası KIRMIZI kalır.
+    if (z.ms % 86_400_000 === 0) cikti.push(bulgu('LASTMOD-BUGUN', 'UYARI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}), gün başı tarih damgası: yayın günü olabilir, ertesi gün de aynıysa gerçek değişiklik tarihi sayılır`))
+    else cikti.push(bulgu('LASTMOD-BUGUN', 'KIRMIZI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}) ve saatli: gerçek değişiklik değil "şimdi" damgası olabilir (REC-454)`))
   }
   const damga = new Map()
   for (const z of zamanlar) { if (!damga.has(z.ms)) damga.set(z.ms, []); damga.get(z.ms).push(z) }
