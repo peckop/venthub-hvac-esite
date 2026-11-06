@@ -1,5 +1,7 @@
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { imzaliIstek } from './imzaliIstek'
 
 /**
  * INV-FANOUT-FAMILY-1 — `brands` ve `price_lists` dalları AİLE TÜRÜNE KÖR olmalıdır.
@@ -75,15 +77,14 @@ vi.mock('@/lib/supabase/static', () => ({
 
 const WEBHOOK_SECRET = 'test-webhook-secret-mock'
 
+// ALT-76 PR 3: kalıcı tekrar koruması burada ölçülmez (webhook-hmac-imza.test.ts); olay hep yeni.
+vi.mock('@/lib/webhook/olayTekil', async (orijinal) => ({
+  ...(await orijinal<Record<string, unknown>>()),
+  olayTuket: async () => 'yeni',
+}))
+
 function buildRequest(payload: unknown): NextRequest {
-  return new NextRequest('http://localhost/api/webhook/supabase', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-webhook-secret': WEBHOOK_SECRET,
-    },
-    body: JSON.stringify(payload),
-  })
+  return imzaliIstek(payload, WEBHOOK_SECRET)
 }
 
 const SERI: FamilyRow = {

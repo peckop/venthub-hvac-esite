@@ -1,5 +1,6 @@
-import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { imzaliIstek } from './imzaliIstek'
 
 /**
  * URN-144 (karar 410) — üç kademeli kategori ağacında tazeleme kümesi.
@@ -66,12 +67,12 @@ vi.mock('@/lib/supabase/static', () => ({
 }))
 
 const SIR = 'test-webhook-secret-mock'
-const istek = (govde: unknown) =>
-  new NextRequest('http://localhost/api/webhook/supabase', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-webhook-secret': SIR },
-    body: JSON.stringify(govde),
-  })
+// ALT-76 PR 3: kalıcı tekrar koruması burada ölçülmez (webhook-hmac-imza.test.ts); olay hep yeni.
+vi.mock('@/lib/webhook/olayTekil', async (orijinal) => ({
+  ...(await orijinal<Record<string, unknown>>()),
+  olayTuket: async () => 'yeni',
+}))
+const istek = (govde: unknown) => imzaliIstek(govde, SIR)
 
 const meta = (tr: string, en: string) => ({ slug: { tr, en } })
 const KOK: Satir = { id: 'k', slug: 'accessories', metadata: meta('aksesuarlar', 'accessories'), parent_id: null }
