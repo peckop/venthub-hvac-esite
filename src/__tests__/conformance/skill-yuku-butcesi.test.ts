@@ -62,7 +62,16 @@ const OTURUMA_GIREN = new Set(['name', 'description', 'argument-hint'])
  * 26,5 KB (27 136 bayt) = bugünkü toplam + ~0,2 KB baş payı.
  * ✅OPS onayı 3 Kasım 2026, YTN-26. Bundan sonraki her yükseltme aynı yoldan gider: ölçüm + OPS kararı, bu bloğa yeni tarihli satır.
  */
-const BUTCE_BAYT = 26.5 * 1024
+/**
+ * ⭐BÜTÇE 26,5 → 27 KB (YTN-42, ölçüm 2026-11-06). dizin-takip ve seo-olcum (GEO-SEO müdür çekirdeği) oturum listesine
+ * +0,7 KB ekledi: önceki toplam ~26,9 KB, yeni toplam 27 585 bayt (72 → 74 skill). Açıklamalar 222 ve 200 bayt (tavan 300).
+ * Başka skill'in tetik cümlesini kısaltarak yer açmak denendi (maestro açıklaması 1157 → 416 bayt, sınav 12/12 ve 8/8 tuttu),
+ * ama bütçe sorunu yaratıyorsa tavan artırılır, tetik cümleleri kısaltılmaz: açıklama o skill'in tek tetik yeridir.
+ * 27 KB (27 648 bayt) = bugünkü toplam + ~0,06 KB baş payı.
+ * ✅Recep kararı OPS üzerinden iletildi, 6 Kasım 2026, YTN-42. Bundan sonraki her yükseltme aynı yoldan gider: ölçülmüş aşım + sınav
+ * sonucu OPS'a gelir, bu bloğa yeni tarihli satır yazılır.
+ */
+const BUTCE_BAYT = 27 * 1024
 
 /** Tek bir açıklamanın tavanı. Yeni skill'ler için geçerli; bugünkü aşanlar aşağıda ADIYLA. */
 const ACIKLAMA_TAVANI = 300

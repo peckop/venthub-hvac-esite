@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "yeni yazı için dizin isteği at",
+    "bu rehberi dizine ekle",
+    "hangi motorda taranmadı, adres adres bak",
+    "yayın sonrası dizin işlerini yürüt",
+    "IndexNow Bing Yandex gönder",
+    "aynı adrese tekrar istek atmayalım, durum tablosuna bak",
+    "Google Search Console'dan dizine eklenmesini iste",
+    "dizin takip durumunu çıkar, YAP olanlara istek at",
+    "Yandex için günlük kotaya göre adres gönder",
+    "DIZINE EKLE: yeni yayınlanan fan rehberi",
+    "dizin istegi kotasini asmadan gonder",
+    "IndexNow ile değişen adresleri bildir"
+  ],
+  "should_not_trigger": [
+    "rehber yazısı yaz",
+    "sıra ölç, ilk sayfada mıyız",
+    "bu sayfanın title etiketini değiştir",
+    "rakip sayfa kıyası yap",
+    "robots.txt'e GPTBot kuralı ekle",
+    "yeni migration dosyası aç",
+    "blog yazısı yayınlandı, yayın akışında sıradaki basamak ne",
+    "kategori sayfasının H1'ini düzelt"
+  ]
+}
