@@ -97,6 +97,12 @@ describe('INV-KANCA-DONE-KANIT-1 · gerçek veritabanıyla uçtan uca', () => {
       { id: 'kirmizi', columnId: 'review', labels: [], verificationReport: { verdict: 'failed' } },
       { id: 'yesil', columnId: 'review', labels: [], verificationReport: { verdict: 'passed' } },
       { id: 'muaf', columnId: 'review', labels: ['kanit-muaf'] },
+      { id: 'f96610b5-501b-4634-b709-cd15a501f6b0', columnId: 'review', labels: [], verificationReport: { verdict: 'needs_human' } },
+      { id: 'abc123aa-0000-4000-8000-000000000001', columnId: 'review', labels: [], verificationReport: { verdict: 'failed' } },
+      { id: 'abc123aa-0000-4000-8000-000000000002', columnId: 'review', labels: [], verificationReport: { verdict: 'passed' } },
+      // tam eşleşme önceliği: 'zz-ayni' hem kendi kimliği hem 'zz-ayni-uzun'un öneki
+      { id: 'zz-ayni', columnId: 'review', labels: [], verificationReport: { verdict: 'failed' } },
+      { id: 'zz-ayni-uzun', columnId: 'review', labels: [], verificationReport: { verdict: 'passed' } },
     ])
     db.close()
   })
@@ -109,7 +115,7 @@ describe('INV-KANCA-DONE-KANIT-1 · gerçek veritabanıyla uçtan uca', () => {
     spawnSync(process.execPath, [KANCA], {
       input: JSON.stringify(girdi),
       encoding: 'utf8',
-      env: { ...process.env, VENTHUB_KANBAN_DB: dbYolu, ...ortam },
+      env: { ...process.env, VENTHUB_KANBAN_DB: dbYolu, VENTHUB_BOARD_DIR: path.join(dizin, 'pano'), ...ortam },
     })
 
   it('kanıtsız kart Done isteğinde DENY çıktısı verir, çıkış kodu 0', () => {
@@ -137,6 +143,64 @@ describe('INV-KANCA-DONE-KANIT-1 · gerçek veritabanıyla uçtan uca', () => {
       expect(r.status).toBe(0)
       expect(r.stdout.trim()).toBe('')
     }
+  })
+
+  it('ARC-255: 8 haneli kısa kimlikle Done isteği de kapıdan geçer (needs_human kart reddedilir)', () => {
+    const r = calistir(istek({ taskId: 'f96610b5', columnId: 'done' }))
+    expect(r.status).toBe(0)
+    const c = JSON.parse(r.stdout)
+    expect(c.hookSpecificOutput.permissionDecision).toBe('deny')
+    expect(c.hookSpecificOutput.permissionDecisionReason).toMatch(/"needs_human"/)
+  })
+
+  it('ARC-255: önek belirsizse (iki kart) kapı karışmaz (araç "Ambiguous" der); 5 karakterlik tek eşleşen önek de yakalanır', () => {
+    expect(calistir(istek({ taskId: 'abc123aa', columnId: 'done' })).stdout.trim()).toBe('') // iki kart eşleşir
+    const c = JSON.parse(calistir(istek({ taskId: 'f9661', columnId: 'done' })).stdout) // araç uzunluk sınırı koymaz
+    expect(c.hookSpecificOutput.permissionDecisionReason).toMatch(/"needs_human"/)
+  })
+
+  it('ARC-255: tam eşleşme önek eşleşmesinden önce gelir (zz-ayni kırmızı, zz-ayni-uzun yeşil)', () => {
+    const c = JSON.parse(calistir(istek({ taskId: 'zz-ayni', columnId: 'done' })).stdout)
+    expect(c.hookSpecificOutput.permissionDecisionReason).toMatch(/"failed"/)
+    expect(calistir(istek({ taskId: 'zz-ayni-uzun', columnId: 'done' })).stdout.trim()).toBe('')
+  })
+
+  it('ARC-255 günlük: her Done isteği pano dizinindeki done-kapisi.log\'a tek satır yazar (kimlik biçimi, sebep, izin/RED)', () => {
+    const log = path.join(dizin, 'pano', 'done-kapisi.log')
+    fs.rmSync(log, { force: true })
+    calistir(istek({ taskId: 'f96610b5', columnId: 'done' })) // önek, needs_human → RED
+    calistir(istek({ taskId: 'abc123aa-0000-4000-8000-000000000002', columnId: 'done' })) // tam, passed → izin
+    calistir(istek({ taskId: 'kanitsiz', columnId: 'review' })) // Done değil → günlüğe girmez
+    const satirlar = fs.readFileSync(log, 'utf8').trim().split('\n').map((s) => s.split('\t'))
+    expect(satirlar).toHaveLength(2)
+    expect(satirlar[0]?.slice(1)).toEqual(['8', 'önek', 'f96610b5', 'verify-needs_human', 'RED'])
+    expect(satirlar[1]?.slice(1)).toEqual(['36', 'tam', 'abc123aa', 'verify-passed', 'izin'])
+  })
+
+  it('ARC-255 günlük: kimlikteki sekme/satır sonu günlüğü bozmaz (sahte sütun ya da satır oluşmaz)', () => {
+    const log = path.join(dizin, 'pano', 'done-kapisi.log')
+    fs.rmSync(log, { force: true })
+    calistir(istek({ taskId: 'a\tb\nFAKE\tx\ty', columnId: 'done' }))
+    const satirlar = fs.readFileSync(log, 'utf8').trim().split('\n')
+    expect(satirlar).toHaveLength(1)
+    expect(satirlar[0]?.split('\t')).toHaveLength(6)
+    expect(satirlar[0]).toContain('a?b?FAKE')
+  })
+
+  it('ARC-255 günlük: yazılamayan dizin kapı kararını bozmaz (fail-open) ve vana günlüğe de yazmaz', () => {
+    fs.writeFileSync(path.join(dizin, '_dosya_var.txt'), 'x') // dizin yerine dosya: mkdir/append başarısız olur
+    const r = calistir(istek({ taskId: 'kanitsiz', columnId: 'done' }), { VENTHUB_BOARD_DIR: path.join(dizin, '_dosya_var.txt', 'alt') })
+    expect(JSON.parse(r.stdout).hookSpecificOutput.permissionDecision).toBe('deny')
+    const log = path.join(dizin, 'pano', 'done-kapisi.log')
+    const once = fs.readFileSync(log, 'utf8')
+    calistir(istek({ taskId: 'kanitsiz', columnId: 'done' }), { VENTHUB_DONE_KAPISI_KAPALI: '1' })
+    expect(fs.readFileSync(log, 'utf8')).toBe(once)
+  })
+
+  it('ARC-255: tam kimlik hâlâ tam eşleşmeyle okunur', () => {
+    const c = JSON.parse(calistir(istek({ taskId: 'abc123aa-0000-4000-8000-000000000001', columnId: 'done' })).stdout)
+    expect(c.hookSpecificOutput.permissionDecisionReason).toMatch(/"failed"/)
+    expect(calistir(istek({ taskId: 'abc123aa-0000-4000-8000-000000000002', columnId: 'done' })).stdout.trim()).toBe('')
   })
 
   it('vana: VENTHUB_DONE_KAPISI_KAPALI=1 kapıyı kapatır', () => {

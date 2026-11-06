@@ -16,7 +16,7 @@ console.warn('🚀 Using Pooler Connection to connect...')
 
 const client = new Client({
     connectionString: DATABASE_URL,
-    ssl: pgTls()
+    ssl: pgTls(DATABASE_URL)
 })
 
 async function run() {

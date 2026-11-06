@@ -12,7 +12,7 @@ if (!databaseUrl) {
 
 const client = new Client({
     connectionString: databaseUrl,
-    ssl: pgTls()
+    ssl: pgTls(databaseUrl)
 });
 
 async function applyFixes() {

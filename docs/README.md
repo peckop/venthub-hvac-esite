@@ -69,6 +69,7 @@
 | **Yapay zekâ cevaplarında** (Claude, Gemini) VentHub geçiyor mu, hangi motorla, hangi soru listesiyle, ne ölçülmez? | `standards/geo-olcum-standard.md` (TASLAK, karar 124) |
 | Hangi arama motoru / yapay zekâ ürünü **hangi dizinden beslenir**, hangi bot gelir, bizden ne ister ("Bing'de olmak ChatGPT'de olmak mı")? Sitemizde bot engeli, IndexNow, llms.txt, ölçümün kör noktaları? | `standards/dizin-sistemleri-standard.md` (TASLAK, SEO-1) → ölçüm `audits/dizin-gorunurluk-olcum-2026-10-02.md` |
 | **Dizin isteği atılacak mı**, hangi motorda ne zaman bekleniyor? | `standards/dizin-sistemleri-standard.md` D7 (betik: dizin-takip.mjs, scripts/seo altında) |
+| **Bu sorgu daha önce ölçüldü mü?** (SERP, Search Console, Trends) | `standards/dizin-sistemleri-standard.md` D8 (betik: olcum-defteri.mjs, scripts/seo altında) |
 | Bir kategorinin **adı hangi kolondan** gelir (menüde, başlıkta, kırıntıda)? | `standards/kategori-adlandirma-standard.md` |
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır (şerit sahipliği, worktree izolasyonu, bir-iş-bir-dal)? | `standards/collaboration-protocol.md` (kurallar) · `standards/multi-session-coordination-standard.md` (şerit panosu: kira, yol rezervasyonu, canlılık) · `standards/fleet-mechanism-standard.md` §0 (filo mesajla çalışır), §35 (pano canlılığının gerçek kaynağı `claude agents --json`), §36 (ölçüm için açılan `claude -p` alt süreci) |
 | Pencereler yeniden açılınca ne yapılır, tekrarlanan tur (loop/cron) ne zaman ve kimin onayıyla kurulur? | `standards/session-loop-ritual.md` |

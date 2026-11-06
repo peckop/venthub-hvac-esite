@@ -16,6 +16,7 @@ Neden var: "rakip önde" ya da "sıramız arttı" gibi cümleler ölçülmeden y
 
 ## Ölçüm sırası
 
+0. **Defter.** Yeni ölçümden önce `node scripts/seo/olcum-defteri.mjs --sor "<sorgu>"` ile aynı ölçüm daha önce yapılmış mı bak, ölçümden sonra `--kaydet` ile yaz (cetvel `dizin-sistemleri-standard.md` D8). Ölçüm arşivi depo dışındadır: kullanıcı klasöründeki `VentHub-Olcum-Arsiv/geo-seo`.
 1. **SERP.** Chrome'da (claude-in-chrome) `hl=tr gl=tr pws=0` ile tek alım. Kişiselleştirme farkı olabilir; kullanıcının kendi ekranındaki sonuç ayrı bir satırdır, ölçüm yerine geçmez.
 2. **Search Console.** `scripts/seo/gsc-sayfa-oku.mjs` ile sayfa verisi. **Arama ve sorgu verisi depoya YAZILMAZ** (P6): kartta ve depo dışı arşivde kalır.
 3. **Arama talebi (Trends).** Sayfa API'sine tarayıcıdan gidilir. Çapa terim en az 3 değerli olmalı; değilse çağrı geçersizdir. Düşük hacimde yön okunur, oran okunmaz (karar 326).

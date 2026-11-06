@@ -39,7 +39,7 @@ async function run() {
 
     const client = new Client({
         connectionString,
-        ssl: pgTls()
+        ssl: pgTls(connectionString)
     });
 
     try {

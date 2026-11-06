@@ -470,6 +470,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pr-birlesti-kart.cjs\"",
             "statusMessage": "pr-birlesti-kart"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ci-uyandirici.cjs\"",
+            "asyncRewake": true,
+            "timeout": 2700
           }
         ]
       },
