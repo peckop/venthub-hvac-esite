@@ -25,6 +25,8 @@
 // düşürmemelidir. Ama sessizce yutulmaz da — başarısız olursa `console.error` ile
 // platform loglarına düşer.
 
+import { metniMaskele } from './maske.ts'
+
 const SOURCE = 'edge:revenue-path'
 
 export type RevenueAlarmInput = {
@@ -79,7 +81,7 @@ export async function raiseRevenueAlarm(
     })
     if (!resp.ok) {
       const detail = await resp.text().catch(() => '')
-      console.error(`[${SOURCE}] alarm yazilamadi (${resp.status}): ${detail.slice(0, 200)}`)
+      console.error(`[${SOURCE}] alarm yazilamadi (${resp.status}): ${metniMaskele(detail, 200)}`)
     }
   } catch (e) {
     console.error(`[${SOURCE}] alarm yazilamadi:`, e)

@@ -18,9 +18,14 @@
  * 2 ölçemedi (model cevabı çözülemedi / ağ) · anahtar yoksa ATLANDI ve 0 (SARI, kırmızı değil).
  *
  * KULLANIM
- *   node scripts/skills-eval-run.mjs            # gerçek koşu (ANTHROPIC_API_KEY gerekir)
- *   node scripts/skills-eval-run.mjs --kuru     # ağa ÇIKMAZ: istem sayısı + maliyet TAHMİNİ
- *   node scripts/skills-eval-run.mjs --agac=.claude/skills
+ *   node scripts/skills-eval-run.mjs --etiket=YTN-41          # gerçek koşu (ANTHROPIC_API_KEY gerekir)
+ *   node scripts/skills-eval-run.mjs --etiket=YTN-41 --kuru   # ağa ÇIKMAZ: istem sayısı + maliyet TAHMİNİ
+ *   node scripts/skills-eval-run.mjs --etiket=YTN-41 --agac=.claude/skills
+ *   pnpm skills:eval -- --etiket=YTN-41
+ *
+ * ⭐--etiket ZORUNLU (ALT-160): rapor docs/audits/skills-eval-<tarih>-<etiket>.json olur; o dosya zaten
+ * varsa betik hiçbir şey koşmadan çıkış 2 verir (eskiden aynı günün raporunu sessizce eziyordu).
+ * CI `--etiket=pr-<PR no>` verir (skills-gate.yml).
  *
  * ⛔Anahtar ortam değişkeninden okunur ve HİÇBİR YERE basılmaz (repo PUBLIC).
  */
@@ -28,7 +33,18 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { CLI_SADE_BAYRAKLAR, cevabiCoz, frontmatterCoz, istemKur, jetonTahmini, maliyetTahmini, ozet, puanla } from './skills-eval/lib.mjs'
+import {
+  CLI_SADE_BAYRAKLAR,
+  cevabiCoz,
+  etiketCoz,
+  frontmatterCoz,
+  istemKur,
+  jetonTahmini,
+  maliyetTahmini,
+  ozet,
+  puanla,
+  raporAdi,
+} from './skills-eval/lib.mjs'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 // Fiyat tablosu burada AÇIK durur ki maliyet satırı "nereden çıktı" sorusuna cevap verebilsin.
@@ -153,6 +169,22 @@ async function modeleSor(anahtar, istem) {
 }
 
 async function main() {
+  // ETİKET + ÜZERİNE YAZMA KAPISI en başta: ağa ve kotaya dokunmadan önce (ALT-160).
+  const e = etiketCoz(bayraklar)
+  if (e.hata) {
+    console.error('[skills-eval] ' + e.hata)
+    process.exit(2)
+  }
+  const damga = new Date().toISOString()
+  const tarih = damga.slice(0, 10)
+  const raporYolu = path.join(depoKoku, 'docs', 'audits', raporAdi(tarih, e.etiket))
+  if (fs.existsSync(raporYolu)) {
+    console.error(
+      `[skills-eval] RAPOR ZATEN VAR, ÜZERİNE YAZILMAZ: docs/audits/${raporAdi(tarih, e.etiket)} — ` +
+        'başka bir etiket ver ya da eski raporu bilerek taşı.',
+    )
+    process.exit(2)
+  }
   const anahtar = process.env.ANTHROPIC_API_KEY || ''
   const agaclar = (agacBayragi ? [agacBayragi.split('=')[1]] : AGACLAR).map(agaciOku)
 
@@ -171,10 +203,9 @@ async function main() {
   const kosacak = ornek > 0 ? isler.slice(0, ornek) : isler
 
   const arkaUc = arkaUcSec()
-  const damga = new Date().toISOString()
-  const tarih = damga.slice(0, 10)
   const cikti = {
     damga,
+    etiket: e.etiket,
     model: MODEL,
     arkaUc,
     kuru,
@@ -191,7 +222,7 @@ async function main() {
 
   if (isler.length === 0) {
     console.error('[skills-eval] SINAVLI SKILL YOK — ölçülecek bir şey bulunamadı.')
-    yaz(cikti, tarih)
+    yazRapor(cikti, raporYolu)
     process.exit(2)
   }
 
@@ -213,7 +244,7 @@ async function main() {
     for (const a of cikti.agaclar) {
       console.log(`  ${a.agac}: skill ${a.skill} · sinavli ${a.sinavli} · sinavsiz ${a.sinavsiz.length}`)
     }
-    yaz(cikti, tarih)
+    yazRapor(cikti, raporYolu)
     // Anahtar yoksa SARI: kirmizi vermez (OPS hukmu 2026-09-12).
     process.exit(0)
   }
@@ -264,16 +295,20 @@ async function main() {
     `[skills-eval] toplam ${o.toplam} · gecti ${o.gecti} · dustu ${o.dustu} · olcemedi ${o.olcemedi} · ` +
       `sure ${cikti.sureSaniye}s · maliyet ${cikti.maliyet.usd === null ? 'olculemedi (CLI)' : '$' + cikti.maliyet.usd}`,
   )
-  yaz(cikti, tarih)
+  yazRapor(cikti, raporYolu)
   process.exit(o.cikis)
 }
 
-function yaz(cikti, tarih) {
-  const dizin = path.join(depoKoku, 'docs', 'audits')
-  fs.mkdirSync(dizin, { recursive: true })
-  const yol = path.join(dizin, `skills-eval-${tarih}.json`)
-  fs.writeFileSync(yol, JSON.stringify(cikti, null, 2) + '\n', 'utf8')
-  console.log(`  rapor: docs/audits/skills-eval-${tarih}.json`)
+function yazRapor(cikti, yol) {
+  fs.mkdirSync(path.dirname(yol), { recursive: true })
+  // 'wx': dosya bu arada (yarış) oluşmuşsa da üzerine YAZMAZ, hata verir.
+  try {
+    fs.writeFileSync(yol, JSON.stringify(cikti, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' })
+  } catch (err) {
+    console.error('[skills-eval] rapor yazılamadı (üzerine yazma reddi ya da G/Ç): ' + (err && err.message))
+    process.exit(2)
+  }
+  console.log('  rapor: ' + path.relative(depoKoku, yol).split(path.sep).join('/'))
 }
 
 main().catch((e) => {

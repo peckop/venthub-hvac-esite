@@ -39,7 +39,7 @@ const path = require('path')
  * yönlendirmenin YARIM uygulanması 2026-08-23'te canlı bir şeride kanarya notu düşürdü.
  * board.cjs'in okuduğu ad ÖNCELİKLİ — tek değişken bütün katmanı birlikte taşısın.
  */
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
 
 /**
  * TAŞIMA/SİLME FİİLLERİ — POSIX ve PowerShell birlikte, çünkü bu makinede ikisi de koşuyor.

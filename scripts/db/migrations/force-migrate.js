@@ -6,6 +6,7 @@ if (dns.setDefaultResultOrder) {
 }
 
 import pg from 'pg';
+import { pgTls } from '../pg-tls.cjs';
 const { Client } = pg;
 
 // Construct connection string explicitly
@@ -26,7 +27,7 @@ console.warn(`Connecting to ${hostname} (Force IPv4)...`);
 
 const client = new Client({
     connectionString,
-    ssl: { rejectUnauthorized: false },
+    ssl: pgTls(connectionString),
     connectionTimeoutMillis: 10000
 });
 

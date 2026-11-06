@@ -35,7 +35,7 @@ const fs = require('fs')
 const path = require('path')
 const { execFileSync } = require('child_process')
 
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../board/pano-dizini.cjs').VARSAYILAN
 const ONBELLEK = path.join(PANO, '.belge-tazelik-onbellek.json')
 
 // CONTEXT.md ve docs/DURUM-TAKIP.md 2026-09-29'da emekli edildi (yerinde yönlendirme sayfası): çekirdek değiller.

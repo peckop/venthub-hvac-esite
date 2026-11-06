@@ -3,13 +3,14 @@ import pg from 'pg';
 import _fs from '_fs';
 import _path from '_path';
 import { fileURLToPath } from 'url';
+import { pgTls } from '../pg-tls.cjs';
 
 const __dirname = _path.dirname(fileURLToPath(import.meta.url));
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) { console.error('DATABASE_URL missing'); process.exit(1); }
 
-const client = new pg.Client({ connectionString: databaseUrl, ssl: { rejectUnauthorized: false } });
+const client = new pg.Client({ connectionString: databaseUrl, ssl: pgTls(databaseUrl) });
 
 async function runMigration() {
     try {

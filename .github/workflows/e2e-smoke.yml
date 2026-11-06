@@ -48,9 +48,10 @@ permissions:
   contents: read
   pull-requests: read
 
+# ALT-161: master PUSH koşuları birbirini iptal etmez (gerekçe ve ölçüm ci.yml concurrency yorumunda).
 concurrency:
-  group: e2e-smoke-${{ github.ref }}
-  cancel-in-progress: true
+  group: e2e-smoke-${{ github.event_name == 'push' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 jobs:
   admin-smoke:

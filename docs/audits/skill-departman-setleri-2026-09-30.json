@@ -1993,7 +1993,21 @@
    "ad": "calisma-kopyasi-sil",
    "departmanlar": "HEPSI",
    "ne": "Çalışma kopyası (worktree, C:/tmp/vh-*) silme akışı: envanter, sahiplik, silme kapısı, ilan, güvenli silme sırası; yalnız kendi departmanının kopyası, kuralı kaynağa işaret eder. Müdür çalıştırır, çalışana ön yüklenmez."
+  },
+  {
+   "ad": "dizin-takip",
+   "departmanlar": [
+    "GEO-SEO"
+   ],
+   "ne": "Yayın sonrası dizin isteğini adres × motor karar tablosuna göre sürer (Google, Bing, Yandex, IndexNow); aynı adrese tekrar istek atmaz. Müdür çalıştırır, çalışana ön yüklenmez."
+  },
+  {
+   "ad": "seo-olcum",
+   "departmanlar": [
+    "GEO-SEO"
+   ],
+   "ne": "Arama görünürlüğü ölçümü: SERP, sıra, arama talebi (Trends), rakip sayfa kıyası (Y2.4); ölçmeden hüküm vermez. Müdür çalıştırır, çalışana ön yüklenmez."
   }
  ],
- "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır; 2026-11-01 (YTN-24): write-seo-geo-content GEO-SEO araştırmacı ve çürütücü setlerinde adıyla çağır (E-E-A-T farkı ve anlamsal boşluk denetimi); 2026-11-03 (YTN-26): ce-uygunluk-dosyasi yeni skill, MEVZUAT müdür çekirdeğinde; 2026-11-03 (YTN-27): calisma-kopyasi-sil yeni skill, müdür çekirdeği (HEPSI)"
+ "guncelleme": "2026-10-03 (YTN-11): WrongStack skill bağlama kararı + mudurCekirdegi; kb alanları diskten yenilendi; 2026-10-13 (BLG-11): rehber-yayin müdür çekirdeğine (BLOG, GEO-SEO); 2026-10-19 (HRT-61): blog-uygulayici, geo-seo-uygulayici ve yetenek-arastirmaci tanımları üretilecek (uret: true; onYukle dolduruldu, adiylaCagir'dan ön yüke taşınanlarla); 2026-10-26 (YTN-21 madde 6): incremental-implementation yeni skill, uygulayıcı setlerinde adıyla çağır; 2026-11-01 (YTN-24): write-seo-geo-content GEO-SEO araştırmacı ve çürütücü setlerinde adıyla çağır (E-E-A-T farkı ve anlamsal boşluk denetimi); 2026-11-03 (YTN-26): ce-uygunluk-dosyasi yeni skill, MEVZUAT müdür çekirdeğinde; 2026-11-03 (YTN-27): calisma-kopyasi-sil yeni skill, müdür çekirdeği (HEPSI); 2026-11-06 (YTN-41): dizin-takip ve seo-olcum yeni skill, GEO-SEO müdür çekirdeğinde"
 }

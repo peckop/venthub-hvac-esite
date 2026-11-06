@@ -115,6 +115,44 @@ buradan yapılmaz.
 | ChatGPT/Perplexity/Claude/Copilot/Gemini'de "VentHub" soruları (arama açık/kapalı) | ölçülmedi | GEO-SEO (`geo-olcum-standard.md`) |
 | Gizli akıtmalı blok (`S:0`) basit okuyucuda görünür mü | ölçülmedi | GEO-SEO |
 
+## D7 — Dizin takip defteri: istek atmadan önce karar, istekten sonra kayıt (v0.2, 2026-11-06, Kanban SEO dizin-takip kartı)
+
+**Niçin.** Dizin işlemleri dağınık kayıtlıydı (Google elle istek defteri 4 Kasım'a kadar tek satır, Bing gönderim çıktıları ayrı klasörlerde, Yandex gönderimleri yalnız durum dosyasında). Sonuçları (ölçüldü, 6 Kasım): 5 Kasım Google elle istek sırası kimse görmediği için kaçtı; aynı adres (fan çeşitleri) Yandex'e 4 Kasım'da iki kez gönderildi (panel geçmişi 10:08 ve 21:32); `bing-url-gonder.mjs` çıktı dosyası gün adıyla yazıldığı için aynı günün ikinci gönderimi birincinin kaydını ezdi; "hangi yazı hangi motorda taranmadı" her seferinde baştan ölçüldü. Aynı işin ikinci kez yapılması Google'da günlük kotadan (~10-11 adres), Yandex'te günlük 10 adresten yer yer.
+
+**Kurallar.**
+
+1. **Tek defter.** Depo dışı `hareketler.jsonl` (varsayılan `~/VentHub-Olcum-Arsiv/geo-seo/dizin-takip/`; depo içi yol REDDEDİLİR, repo PUBLIC). Satır: `{tarih, motor, eylem, adres, sonuc?, kaynak?}`; motor `google|bing|yandex|indexnow`, eylem `istek|gonderim|olcum`. Çıktı dosyaları (ör. Bing gönderim JSON'u) kayıt sayılmaz, defter asıldır.
+2. **İstekten sonra aynı turda kayıt.** Dış eylem (Google "Dizine eklenmesini iste", Bing `--gonder`, Yandex "Sayfaları yeniden tara", IndexNow) bittiği anda `node scripts/seo/dizin-takip.mjs --kaydet <motor> <eylem> <adres,adres>`; kayıtsız eylem yapılmamış sayılır. Eski kayıtlar `--ice-aktar` ile tek seferde taşınır (çiftlemez); Yandex için kaynak panelin "Gönderilen sayfalar" listesidir (elle okunur, `--tarih` ile).
+3. **İstekten önce karar.** `node scripts/seo/dizin-takip.mjs --durum` canlı site haritasından adres ve `lastmod`'u, Google URL Inspection API'den ve Bing GetUrlInfo'dan son tarama tarihini okur, defterle birleştirip her adres×motor için tek karar verir. **Yalnız YAP ya da TEKRAR olan adres×motor'a istek atılır.**
+4. **Karar tablosu.**
+
+| Karar | Koşul | İstek? |
+|---|---|---|
+| TAMAM | son tarama ≥ `lastmod` (IndexNow: bildirim `lastmod` sonrası) | hayır |
+| BEKLE | tarama yok/eski AMA `lastmod` sonrası istek var, eşik dolmadı | hayır |
+| TEKRAR | aynı durum, eşik doldu (Google 7, Bing 5, Yandex 7 gün) | evet |
+| YAP | taranmamış/eski ve `lastmod` sonrası hiç istek yok | evet |
+| ATLA | sayfa noindex (ör. İngilizce kategori sayfaları, EN yayını kapalıyken) | hayır, kota boşa gider |
+| ESKI | tarama bilgisi API'den gelmeyen motor (Yandex, IndexNow) ve `lastmod` adres bazlı kayıt başlangıcından önce (Yandex 1 Kasım, IndexNow 5 Kasım) | hayır, geçmiş bilinmiyor |
+| OLCULEMEDI | durum okunamadı (API hatası, hız sınırı) | hayır, önce yeniden ölç; sessiz sıfır yok |
+
+5. **Eşikler ölçülmüş değil.** 7/5/7 gün başlangıç varsayımıdır; TEKRAR çıkan her adresin sonucu tabloya yazılır ve eşik üç koşu sonra gözden geçirilir. Bing hız sınırı (art arda çok `GetUrlInfo`) ölçüldü: başarısızlar bir kez yavaşça yeniden denenir.
+6. **`lastmod` sınırı.** Bazı `lastmod` değerleri yalnız tarihtir (00:00Z); aynı gün içindeki değişiklik ile tarama sırası karar veremez, tarama günü ≥ `lastmod` günü TAMAM sayılır. İçerik gün içinde sonra değişirse yeni `lastmod` yeni karar doğurur.
+7. **Kanban.** Kalıcı takip kartı SEO panosundaki "Dizin takip düzeni" kartıdır: her `--durum` koşusunun tablosu karta not yazılır; BLOG yayın bildirimi geldiğinde adres tabloya girer, aynı turda istekler atılır ve kayıt düşülür. Dizin isteği GEO-SEO görevidir, Recep'ten ayrıca onay istenmez; kota gerektiren iş sırası bu tabloya göre kurulur.
+
+## D8 — Ölçüm arşivi: yeni ölçümden önce "daha önce ölçüldü mü", ölçümden sonra kayıt (v0.1, 2026-11-06, Kanban SEO-87)
+
+**Niçin.** 6 Kasım 2026'da kanal fanı sorguları için iki gün önce yapılmış kıyasın (SEO-83) üzerine, o kayıt aranmadığı için yeni plan yazıldı. Ham ölçümler depo dışında yüzlerce dosyada dağınıktı, indeks ve yedek yoktu.
+
+1. **Yer.** Arşiv `~/VentHub-Olcum-Arsiv/geo-seo/` (kullanıcı klasörü altında, depo DIŞI; repo PUBLIC, arama ve Search Console verisi depoya girmez, P6). `C:/tmp` altında arşiv tutulmaz: temizlik işleri orayı siler.
+2. **İndeks.** Arşivdeki `INDEKS.md` her klasör ve dosya için bir satır tutar: giriş, kart no, tarih, ne ölçüldü. Yeni klasör açılınca aynı turda indekse satır yazılır; satırsız klasör "ölçülmemiş" sayılır.
+3. **Sorgu defteri.** Arşivdeki `olcumler.jsonl` tek defterdir. Satır: `tarih, sorgu, motor (google|bing|yandex|trends|gsc), kart, kaynak` + isteğe bağlı `tur (serp|gsc|trends|diger), sira, sayfaTipi (bilgi|kategori|karma|diger), adres, not`. Depo içi yol reddedilir.
+4. **Önce sor.** Yeni SERP, Search Console ya da Trends ölçümünden önce `node scripts/seo/olcum-defteri.mjs --sor "<sorgu>" [--motor ..]` koşulur. Çıktı: ÖLÇÜLDÜ (eşik içinde), ESKİ ÖLÇÜM (yeniden ölçüm gerekçeli) ya da ÖLÇÜLMEDİ (benzer kayıtlı sorgular listelenir). Yalnız `gsc`/`trends` kaydı varsa SERP ölçümü yok diye işaretlenir: sıra ve sayfa tipi bilinmez.
+5. **Sonra yaz.** Her ölçümden sonra `--kaydet` (ya da toplu için `--toplu`); aynı gün+sorgu+motor+kart çiftlenmez. Kayıtsız ölçüm yapılmamış sayılır.
+6. **Eşik.** 30 gün başlangıç varsayımıdır (SERP bir haftada değişir, ay sonunda güvenilmez); ölçülmemiştir, üç ESKİ kararından sonra gözden geçirilir.
+7. **Yedek.** Arşiv yolu hafıza yedek kancasının kapsamına ARAÇ ile bağlanır (ayrı rutin kurulmaz); bağlanana kadar arşivin tek kopyası bu makinededir.
+8. **Sınır.** Arşivde ölçüm kaydı vardır, hüküm yoktur: hüküm ilgili Kanban kartındadır; ham dosyaya dayanan sayı kartta "kaynak: <klasör>" ile anılır.
+
 ## Ölçüm geçmişi
 
 | Tarih | Ölçüm | Sonuç |

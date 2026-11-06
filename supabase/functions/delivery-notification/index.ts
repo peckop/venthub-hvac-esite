@@ -1,5 +1,6 @@
 // Çağıran sınıfı: (b) sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 // Şablon motoru + kaçış tek yerde (güvenlik karnesi 2026-11 G1; cetvel email-template-standard.md §2).
@@ -250,8 +251,8 @@ serve(async (req) => {
       const t = await resp.text().catch(()=> '')
       // Başarısızlık artık YUTULMUYOR: defterde `failed` + hata metni kalır. Eskiden gönderim
       // hatası yalnız HTTP cevabında yaşıyordu ve çağıran (shipping-webhook) onu yutuyordu.
-      await damgala(supabaseUrl, serviceKey, denemeId, 'failed', null, t.slice(0, 500))
-      return new Response(JSON.stringify({ error: 'send_failed', body: t }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      await damgala(supabaseUrl, serviceKey, denemeId, 'failed', null, metniMaskele(t, 500))
+      return new Response(JSON.stringify({ error: 'send_failed', body: metniMaskele(t, 500) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=>({}))
 

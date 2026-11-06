@@ -141,7 +141,7 @@ yalnız "yayın günü listesi"ne güvenilmez. Haritada olmayan yeni adres (TR) 
 
 Y2.1 yayın bildirimine bağlıdır (R10 B8 ve B10'da BLOG, GEO-SEO'ya tek satır yazar). 3 Kasım 2026'da yeni rehber (`fan-cesitleri`) bildirim gelmeden canlıya çıktı; GEO-SEO onu site haritasındaki 94 → 95 adres artışından buldu. Bildirim aksasa da iş kaçmasın diye **her açılışta** (yeni pencere, compact dönüşü, gün başı):
 
-1. Canlı `https://venthub.com.tr/sitemap.xml` adresleri alınır ve depo dışı son kayıtla (`C:/tmp/vh-arsiv/geo-seo/harita-son.txt`, sıralı adres listesi) karşılaştırılır (`comm -13 son yeni`: yeni adres; `comm -23`: kalkan adres).
+1. Canlı `https://venthub.com.tr/sitemap.xml` adresleri alınır ve depo dışı son kayıtla (`~/VentHub-Olcum-Arsiv/geo-seo/harita-son.txt`, sıralı adres listesi) karşılaştırılır (`comm -13 son yeni`: yeni adres; `comm -23`: kalkan adres).
 2. Yeni adres varsa ve açık bir kartı yoksa aynı turda kart açılır (SEO-NN, kaynak olay: "bildirim gelmedi") ve Y2.1 adımları koşulur: Google dizin isteği, IndexNow durumu (`dizin-tetigi` koşusu günlüğünde adres var mı), Bing, Yandex. Kota dolu adım ertesi günün ilk işidir ve karta yazılır.
 3. Bildirim gelmediği BLOG'a ve OPS'a tek satırla yazılır (yazının yayınlayanı bildirmemiştir; sorun sürerse R10 B8/B10 hatırlatılır).
 4. Kalkan adres varsa 308/404 durumu ölçülür (yönlendirme mi, kaldırma mı); kalkan adres sessiz geçilmez.
@@ -234,6 +234,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
   ürün ailesi = ailenin ve aktif varyantlarının en son `updated_at`'i (`getFamilySitemapData`), rehber yazısı
   `guncellemeTarihi`. Güvenilir kaynağı olmayan satırda (sabit sayfalar, markalar, seri adresi) alan **yazılmaz**.
 - Üretim anı (`new Date()`) lastmod olarak YAZILMAZ. Kapı: INV-SITEMAP-LASTMOD-1 (`src/app/__tests__/sitemapLastmod.test.ts`).
+- Canlı kapı `LASTMOD-BUGUN` (SEO-88, 2026-11-06): bugünkü **saatli** damga KIRMIZI (üretim anı izi); bugünkü **gün başı** tarih damgası (`T00:00:00.000Z`, içerik yazarının verdiği tarih) UYARI'dır, yayın günü gerçek yayın böyle görünür ve ertesi gün kendiliğinden düşer. **Toplu eşik (SEO-89):** aynı gün başı damgasını bugün taşıyan adres sayısı `max(10, lastmod'lu adreslerin %20'si)` ya da üstüyse hepsi KIRMIZI (veri kaynaklı toplu bozulma izi; ölçülen yayın günü en çok 3 adres, 2026-11-06). Eşik ilk üç yayın gününde yeniden bakılır.
 - **Niçin (ölçüm, 2026-09-29):** canlı haritada 87 adresin 61'i her gün "bugün" taşıyordu. Google lastmod'u yalnız
   tutarlı biçimde doğruysa kullanır; her şeyi her gün değişmiş ilan eden haritanın tarihlerini yok sayar ve yeni
   sayfanın gerçek tarihi de kaybolur. Aynı gün GSC: 83 dizinli sayfanın 81'ine son uğrama 8–30 gün önce.

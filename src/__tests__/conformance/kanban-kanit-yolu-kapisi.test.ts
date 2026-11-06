@@ -61,6 +61,26 @@ describe('INV-KANBAN-KANIT-YOLU-1', () => {
     expect(k.incele(null)).toBeNull()
   })
 
+  it('ARC-255: "command" alanıyla gelen çağrı reddedilir (araç yok sayıp sessizce manual yapıyor)', () => {
+    const komut = 'gh api repos/peckop/venthub-hvac-esite/pulls/2281/merge'
+    expect(reddedilir({ action: 'add_check', checkDescription: 'PR birleşti', command: komut })).toBe(true)
+    expect(reddedilir({ action: 'add_check', checkType: 'manual', checkDescription: 'x', command: komut })).toBe(true)
+    // checkType command ama komut checkNotes'ta yok, yalnız command alanında: yine yok sayılır
+    expect(reddedilir({ action: 'add_check', checkType: 'command', checkDescription: 'x', command: komut })).toBe(true)
+    const m = k.incele(cagri({ action: 'add_check', checkDescription: 'x', command: komut })) ?? ''
+    expect(m).toContain('checkType "command"')
+    expect(m).toContain('checkNotes')
+    expect(m).toContain(komut)
+  })
+
+  it('ARC-255: doğru çağrı (checkType command + checkNotes) ve boş command alanı geçer', () => {
+    const komut = 'gh api repos/peckop/venthub-hvac-esite/pulls/2281/merge'
+    expect(reddedilir({ action: 'add_check', checkType: 'command', checkNotes: komut })).toBe(false)
+    expect(reddedilir({ action: 'add_check', checkType: 'command', checkNotes: komut, command: komut })).toBe(false)
+    expect(reddedilir({ action: 'add_check', checkType: 'manual', checkNotes: 'kanıt notu', command: '' })).toBe(false)
+    expect(reddedilir({ action: 'add_note', command: komut })).toBe(false)
+  })
+
   it('reddetme metni üç çalışan yolu ve sebebi söyler', () => {
     const m = k.incele(cagri({ action: 'add_check', checkType: 'file_exists', checkNotes: 'C:/tmp/x.md' })) ?? ''
     expect(m).toContain('mutlak yol')

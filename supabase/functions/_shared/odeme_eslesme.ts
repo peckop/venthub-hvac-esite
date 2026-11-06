@@ -81,8 +81,18 @@ export type SiparisSatiri = {
   conversation_id?: string | null
   total_amount?: number | string | null
   currency?: string | null
+  /**
+   * OPS-221 (karne 2026-11 P1): bu alan eskiden okunup KULLANILMIYORDU. Artık kapı onu ölçer:
+   * sözlük dışı değer karar verilemez demektir (fail-closed). NULL/eksik 'pending' sayılır — DB'deki
+   * monoton tetik de aynı kuralı uygular (`20261103120000_venthub_orders_monoton_durum.sql`).
+   * ⚠DURUM KARARI (pending mi, geri sarma mı) burada DEĞİL, `odeme_yazim_kapisi.ts`'de: o karar
+   * "aynı ödemenin tekrarı" ile "ikinci tahsilat"ı ayırmak için eşleşmenin SONUCUNA ihtiyaç duyar.
+   */
   payment_status?: string | null
 }
+
+/** `venthub_orders_payment_status_check` sözlüğü (prod'dan ölçüldü, T042-VH). */
+const ODEME_SOZLUGU = ['pending', 'paid', 'failed', 'refunded', 'partial_refunded']
 
 /**
  * İyzico `checkoutForm.retrieve` yanıtından gereken alanlar.
@@ -120,6 +130,22 @@ export type EslesmeKarari = {
 const EPOCH_BASKET = /^VH-(\d{10,})-/
 const EPOCH_CONV = /^CONV-(\d{10,})$/
 
+/** Satırın ödeme durumu sözlükte mi? NULL/eksik 'pending' sayılır (kolon DEFAULT'u ve DB tetiğiyle aynı). */
+function odemeDurumuOkunur(satir: SiparisSatiri): boolean {
+  const p = satir.payment_status
+  if (p === null || p === undefined) return true
+  return typeof p === 'string' && ODEME_SOZLUGU.includes(p)
+}
+
+/** `basketId` bu siparişin kimliğini mi taşıyor? Biçim A (id) ya da biçim B (epoch bağı); değilse null. */
+function kimlikBicimi(basketId: string, satir: SiparisSatiri): 'id' | 'epoch' | null {
+  if (satir.id && basketId === satir.id) return 'id'
+  const b = EPOCH_BASKET.exec(basketId)
+  const c = EPOCH_CONV.exec(String(satir.conversation_id ?? ''))
+  if (b && c && b[1] === c[1]) return 'epoch'
+  return null
+}
+
 function sayi(v: unknown): number | null {
   if (v === null || v === undefined || v === '') return null
   const n = Number(v)
@@ -142,20 +168,13 @@ export function odemeSiparisleEslesiyorMu(
   if (!sonuc) return { gecti: false, bicim: null, sebep: 'odeme_sonucu_yok' }
   if (!satir) return { gecti: false, bicim: null, sebep: 'siparis_satiri_yok' }
 
+  if (!odemeDurumuOkunur(satir)) return { gecti: false, bicim: null, sebep: 'odeme_durumu_sozluk_disi' }
+
   const basketId = typeof sonuc.basketId === 'string' ? sonuc.basketId : null
   if (!basketId) return { gecti: false, bicim: null, sebep: 'basketId_yok' }
 
   // ── KİMLİK ──────────────────────────────────────────────────────────────────
-  let bicim: 'id' | 'epoch' | null = null
-
-  if (satir.id && basketId === satir.id) {
-    bicim = 'id'
-  } else {
-    const b = EPOCH_BASKET.exec(basketId)
-    const c = EPOCH_CONV.exec(String(satir.conversation_id ?? ''))
-    if (b && c && b[1] === c[1]) bicim = 'epoch'
-  }
-
+  const bicim = kimlikBicimi(basketId, satir)
   if (!bicim) return { gecti: false, bicim: null, sebep: 'kimlik_eslesmedi' }
 
   // ── TUTAR ───────────────────────────────────────────────────────────────────
@@ -184,5 +203,29 @@ export function odemeSiparisleEslesiyorMu(
     return { gecti: false, bicim, sebep: 'para_birimi_siparisle_eslesmedi' }
   }
 
+  return { gecti: true, bicim, sebep: null }
+}
+
+/**
+ * BAŞARISIZ ödeme sonucunun bu siparişe ait olup olmadığı (OPS-221, karne 2026-11 P1 (b)).
+ *
+ * Ret dalı eskiden bu kapıdan HİÇ geçmiyordu. Asıl bağ `odeme_yazim_kapisi.ts::retYazilabilirMi`'deki
+ * token şartıdır (token siparişin KENDİ token'ı; `iyzico-payment` yazar). Bu fonksiyon ikinci kattır:
+ * ret yanıtı bir `basketId` taşıyorsa o da bu siparişin kimliği olmalıdır. Başka siparişin kimliğini
+ * taşıyan ret, başka siparişin reddidir.
+ *
+ * ⚠Tutar SORULMAZ ve `basketId` YOKLUĞU tek başına red sebebi DEĞİLDİR: reddedilen kartta İyzico
+ * yanıtının biçimi ölçülmedi (karne §6, "reddedilen kart retrieve yanıtı"). Bilinmeyen biçimde
+ * fail-closed olmak her reddi yazılamaz yapar; sipariş 'pending' kalır ve müşteri "ödeme reddedildi"
+ * yerine sonsuz bekleme görür. Token bağı her durumda ayrıca geçilmek zorundadır.
+ */
+export function retSiparisleEslesiyorMu(sonuc: OdemeSonucu | null, satir: SiparisSatiri | null): EslesmeKarari {
+  if (!sonuc) return { gecti: false, bicim: null, sebep: 'odeme_sonucu_yok' }
+  if (!satir) return { gecti: false, bicim: null, sebep: 'siparis_satiri_yok' }
+  if (!odemeDurumuOkunur(satir)) return { gecti: false, bicim: null, sebep: 'odeme_durumu_sozluk_disi' }
+  const basketId = typeof sonuc.basketId === 'string' && sonuc.basketId.length > 0 ? sonuc.basketId : null
+  if (!basketId) return { gecti: true, bicim: null, sebep: null }
+  const bicim = kimlikBicimi(basketId, satir)
+  if (!bicim) return { gecti: false, bicim: null, sebep: 'kimlik_eslesmedi' }
   return { gecti: true, bicim, sebep: null }
 }
