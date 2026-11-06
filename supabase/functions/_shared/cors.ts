@@ -59,27 +59,19 @@ const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite-(?:[a-z0-9]{9}|git-[a-z0-
 const VERCEL_URETIM_ORIGIN = 'https://venthub-hvac-esite.vercel.app';
 
 /**
- * ⭐C5: `http://localhost:*` yalnız edge YEREL çalışırken yansıtılır (`supabase functions serve`:
- * SUPABASE_URL yerel/kong adresidir). Barındırılan (prod) çalışma zamanında SUPABASE_URL
- * `https://<ref>.supabase.co`'dur ve localhost reddedilir. Yerel Next'i prod edge'e bağlamak
- * gerekirse bilinçli açma: edge secret `EDGE_CORS_LOCALHOST=1` (yalnız tam "1").
+ * `http://localhost:<port>` her çalışma zamanında yansıtılır (ALT-156, 2026-11-05).
+ *
+ * C5'in (#2272) "localhost yalnız yerel edge'de" kısıtı GERİ ALINDI: CI'daki admin-smoke
+ * (e2e/admin-smoke.e2e.ts) tarayıcıyı localhost'ta açıp barındırılan edge'i çağırıyor; kısıt
+ * isteği CORS'ta düşürdü ve master'ı kırmızıya çevirdi. Kalan risk değişmedi: çağrılar çerez
+ * taşımıyor, kimlik bearer token'dır; köken tek başına yetki vermez. Kalıp tam köken ister
+ * (`http://localhost:3000.evil.example` ve portsuz `http://localhost` reddedilir).
  */
-const YEREL_KONAK = /^https?:\/\/(?:localhost|127\.0\.0\.1|kong|host\.docker\.internal)(?::\d+)?(?:\/|$)/i;
 const LOCALHOST_KOKEN = /^http:\/\/localhost:\d+$/;
-
-function envOku(ad: string): string {
-  const deno = (globalThis as { Deno?: { env?: { get(k: string): string | undefined } } }).Deno;
-  return deno?.env?.get(ad) ?? '';
-}
-
-export function localhostKabulMu(supabaseUrl: string, acmaBayragi: string): boolean {
-  return YEREL_KONAK.test(supabaseUrl.trim()) || acmaBayragi.trim() === '1';
-}
 
 export function getCorsHeaders(req: Request) {
   const origin = req.headers.get('Origin') || '';
-  const isLocal = LOCALHOST_KOKEN.test(origin) &&
-    localhostKabulMu(envOku('SUPABASE_URL'), envOku('EDGE_CORS_LOCALHOST'));
+  const isLocal = LOCALHOST_KOKEN.test(origin);
   const isVercel = ONIZLEME_KALIBI.test(origin) || origin === VERCEL_URETIM_ORIGIN;
   const isKanonik = KANONIK_ORIGINLER.includes(origin);
   const allowed = isLocal || isVercel || isKanonik;
