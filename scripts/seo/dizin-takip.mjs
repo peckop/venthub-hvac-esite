@@ -20,12 +20,13 @@
  * Kullanım:
  *   node scripts/seo/dizin-takip.mjs --durum [--gun 14] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
  *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <adres,adres> [--sonuc aramada]
- *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
+ *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
  * Defter ve çıktı depoya GİRMEZ (repo PUBLIC; pazar-olcum P6): depo içi yol REDDEDİLİR.
  */
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { anahtarDosyasiYolu, anahtarOku, depoIcindeMi, oku as bingOku } from './bing-webmaster-oku.mjs'
@@ -35,7 +36,7 @@ export const SITE = 'https://venthub.com.tr'
 export const GSC_MULK = 'sc-domain:venthub.com.tr'
 export const MOTORLAR = ['google', 'bing', 'yandex', 'indexnow']
 export const EYLEMLER = ['istek', 'gonderim', 'olcum']
-export const VARSAYILAN_KLASOR = 'C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo'
+export const VARSAYILAN_KLASOR = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo').replace(/\\/g, '/')
 export const VARSAYILAN_DEFTER = `${VARSAYILAN_KLASOR}/dizin-takip/hareketler.jsonl`
 /** Aynı adrese yeniden istek hakkının doğduğu gün sayısı. Google günlük kotası ~10-11 olduğu için en uzunu. */
 export const TEKRAR_ESIGI_GUN = { google: 7, bing: 5, yandex: 7 }

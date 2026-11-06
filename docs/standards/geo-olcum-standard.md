@@ -186,7 +186,7 @@ Sınırlar ve dürüstlük:
   sıra iddiası yalnız iki farklı çağrıda aynı yönde çıkarsa yazılır.
 - `time` değeri `today 5-y` (haftalık), `today 12-m` (haftalık/günlük), `all` (2004'ten aylık) alabilir; kayıt
   dosyasında pencere ve terim sırası yazılır.
-- Sorgu ve sayfa verisi gibi bu seri de depo dışıdır (P6). Son arşiv: `C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/supermetrics-son-2026-10-14/`.
+- Sorgu ve sayfa verisi gibi bu seri de depo dışıdır (P6). Son arşiv: `~/VentHub-Olcum-Arsiv/geo-seo/supermetrics-son-2026-10-14/`.
 
 ---
 

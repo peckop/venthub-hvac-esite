@@ -121,7 +121,7 @@ buradan yapılmaz.
 
 **Kurallar.**
 
-1. **Tek defter.** Depo dışı `hareketler.jsonl` (varsayılan `C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/dizin-takip/`; depo içi yol REDDEDİLİR, repo PUBLIC). Satır: `{tarih, motor, eylem, adres, sonuc?, kaynak?}`; motor `google|bing|yandex|indexnow`, eylem `istek|gonderim|olcum`. Çıktı dosyaları (ör. Bing gönderim JSON'u) kayıt sayılmaz, defter asıldır.
+1. **Tek defter.** Depo dışı `hareketler.jsonl` (varsayılan `~/VentHub-Olcum-Arsiv/geo-seo/dizin-takip/`; depo içi yol REDDEDİLİR, repo PUBLIC). Satır: `{tarih, motor, eylem, adres, sonuc?, kaynak?}`; motor `google|bing|yandex|indexnow`, eylem `istek|gonderim|olcum`. Çıktı dosyaları (ör. Bing gönderim JSON'u) kayıt sayılmaz, defter asıldır.
 2. **İstekten sonra aynı turda kayıt.** Dış eylem (Google "Dizine eklenmesini iste", Bing `--gonder`, Yandex "Sayfaları yeniden tara", IndexNow) bittiği anda `node scripts/seo/dizin-takip.mjs --kaydet <motor> <eylem> <adres,adres>`; kayıtsız eylem yapılmamış sayılır. Eski kayıtlar `--ice-aktar` ile tek seferde taşınır (çiftlemez); Yandex için kaynak panelin "Gönderilen sayfalar" listesidir (elle okunur, `--tarih` ile).
 3. **İstekten önce karar.** `node scripts/seo/dizin-takip.mjs --durum` canlı site haritasından adres ve `lastmod`'u, Google URL Inspection API'den ve Bing GetUrlInfo'dan son tarama tarihini okur, defterle birleştirip her adres×motor için tek karar verir. **Yalnız YAP ya da TEKRAR olan adres×motor'a istek atılır.**
 4. **Karar tablosu.**
@@ -144,7 +144,7 @@ buradan yapılmaz.
 
 **Niçin.** 6 Kasım 2026'da kanal fanı sorguları için iki gün önce yapılmış kıyasın (SEO-83) üzerine, o kayıt aranmadığı için yeni plan yazıldı. Ham ölçümler depo dışında yüzlerce dosyada dağınıktı, indeks ve yedek yoktu.
 
-1. **Yer.** Arşiv `C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/` (depo DIŞI; repo PUBLIC, arama ve Search Console verisi depoya girmez, P6). `C:/tmp` altında arşiv tutulmaz: temizlik işleri orayı siler.
+1. **Yer.** Arşiv `~/VentHub-Olcum-Arsiv/geo-seo/` (kullanıcı klasörü altında, depo DIŞI; repo PUBLIC, arama ve Search Console verisi depoya girmez, P6). `C:/tmp` altında arşiv tutulmaz: temizlik işleri orayı siler.
 2. **İndeks.** Arşivdeki `INDEKS.md` her klasör ve dosya için bir satır tutar: giriş, kart no, tarih, ne ölçüldü. Yeni klasör açılınca aynı turda indekse satır yazılır; satırsız klasör "ölçülmemiş" sayılır.
 3. **Sorgu defteri.** Arşivdeki `olcumler.jsonl` tek defterdir. Satır: `tarih, sorgu, motor (google|bing|yandex|trends|gsc), kart, kaynak` + isteğe bağlı `tur (serp|gsc|trends|diger), sira, sayfaTipi (bilgi|kategori|karma|diger), adres, not`. Depo içi yol reddedilir.
 4. **Önce sor.** Yeni SERP, Search Console ya da Trends ölçümünden önce `node scripts/seo/olcum-defteri.mjs --sor "<sorgu>" [--motor ..]` koşulur. Çıktı: ÖLÇÜLDÜ (eşik içinde), ESKİ ÖLÇÜM (yeniden ölçüm gerekçeli) ya da ÖLÇÜLMEDİ (benzer kayıtlı sorgular listelenir). Yalnız `gsc`/`trends` kaydı varsa SERP ölçümü yok diye işaretlenir: sıra ve sayfa tipi bilinmez.

@@ -17,11 +17,12 @@
  * Çıkış: 0 tamam; 2 geçersiz girdi ya da depo içi yol.
  */
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { homedir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { depoIcindeMi } from './bing-webmaster-oku.mjs'
 
-export const VARSAYILAN_DEFTER = 'C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/olcumler.jsonl'
+export const VARSAYILAN_DEFTER = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo', 'olcumler.jsonl').replace(/\\/g, '/')
 export const MOTORLAR = ['google', 'bing', 'yandex', 'trends', 'gsc']
 export const TURLER = ['serp', 'gsc', 'trends', 'diger']
 export const SAYFA_TIPLERI = ['bilgi', 'kategori', 'karma', 'diger']

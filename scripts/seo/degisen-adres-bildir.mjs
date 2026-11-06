@@ -32,7 +32,7 @@
  *   - IndexNow anahtarı kamuya açıktır (`src/config/indexnow.ts`); `INDEXNOW_KEY` ortam değişkeni yalnız geçersiz kılar.
  *
  * KULLANIM:
- *   node scripts/seo/degisen-adres-bildir.mjs --taban C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/taban.json --kuyruk C:/Users/alize/VentHub-Olcum-Arsiv/geo-seo/google-kuyruk.jsonl --taban-kur
+ *   node scripts/seo/degisen-adres-bildir.mjs --taban ~/VentHub-Olcum-Arsiv/geo-seo/taban.json --kuyruk ~/VentHub-Olcum-Arsiv/geo-seo/google-kuyruk.jsonl --taban-kur
  *   node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk …            (kuru: farkı gösterir)
  *   node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk … --uygula
  *   node scripts/seo/degisen-adres-bildir.mjs --kuyruk … --kuyruk-sonraki 11
