@@ -69,12 +69,14 @@ function kapiyiSok(metin: string): string {
 
 let yazimlar = 0
 let gorulenOlaylar: string[] = []
+/** processed_at'i DOLU olay kimlikleri: tekrar teslim yalnız bunlar için 200 duplicate alır (R1, ALT-138); sürenler 409 alır. */
+let tamamlananOlaylar = new Set<string>()
 
 /** İki fonksiyonun kullandığı supabase-js zincirinin alt kümesi; kapı sonrası mutlu yolu yürütmeye yeter. */
 function sahteIstemci() {
   return {
     from(tablo: string) {
-      const d: { op: string; filtreler: [string, unknown][]; tek: boolean } = { op: 'select', filtreler: [], tek: false }
+      const d: { op: string; govde: Record<string, unknown>; filtreler: [string, unknown][]; tek: boolean } = { op: 'select', govde: {}, filtreler: [], tek: false }
       const b = {
         select() { return b },
         limit() { return b },
@@ -82,7 +84,7 @@ function sahteIstemci() {
         single() { d.tek = true; return b },
         eq(k: string, v: unknown) { d.filtreler.push([k, v]); return b },
         is(k: string, v: unknown) { d.filtreler.push([k, v]); return b },
-        update() { d.op = 'update'; return b },
+        update(g: Record<string, unknown>) { d.op = 'update'; d.govde = g; return b },
         delete() { d.op = 'delete'; return b },
         // "Önce kaydet" sahiplenmesi: insert ... on conflict (event_id) do nothing returning.
         upsert(g: Record<string, unknown>) { d.op = 'upsert'; d.filtreler.push(['event_id', g.event_id]); return b },
@@ -96,8 +98,21 @@ function sahteIstemci() {
             gorulenOlaylar.push(id)
             return { data: [{ event_id: id }], error: null }
           }
+          if (d.op === 'select') {
+            // Çakışma sonrası durum okuması: select('processed_at').eq('event_id', id).limit(1)
+            return { data: gorulenOlaylar.includes(id) ? [{ processed_at: tamamlananOlaylar.has(id) ? '2026-11-06T00:00:00.000Z' : null }] : [], error: null }
+          }
+          if (d.op === 'update') {
+            if (d.govde.processed_at) tamamlananOlaylar.add(id)
+            return { data: null, error: null }
+          }
           if (d.op === 'delete') {
-            gorulenOlaylar = gorulenOlaylar.filter((x) => x !== id)
+            // Gerçek SQL: `.is('processed_at', null)` süzgeci tamamlanmış satırı SİLMEZ.
+            const yalnizBos = d.filtreler.some(([k, v]) => k === 'processed_at' && v === null)
+            if (!(yalnizBos && tamamlananOlaylar.has(id))) {
+              gorulenOlaylar = gorulenOlaylar.filter((x) => x !== id)
+              tamamlananOlaylar.delete(id)
+            }
             return { data: null, error: null }
           }
           return { data: null, error: null }
@@ -204,6 +219,7 @@ afterAll(() => {
 beforeEach(() => {
   yazimlar = 0
   gorulenOlaylar = []
+  tamamlananOlaylar = new Set<string>()
 })
 
 describe('INV-WEBHOOK-IMZA-1 · saf yardımcı', () => {

@@ -91,6 +91,12 @@ let zorlaHata: { code?: string; message: string } | null = null
 /** verilirse hata yalnız bu koşulu sağlayan yazımlara uygulanır (ör. yalnız ikinci adım). */
 let zorlaHataKosul: ((govde: Record<string, unknown>) => boolean) | null = null
 let olayDurumlari: string[] = []
+/** processed_at'i DOLU olay kimlikleri (olay tamamlandı). `olaylar`da olup burada olmayan = ilk teslim sürüyor. */
+let tamamlananOlaylar = new Set<string>()
+/** verilirse olay tablosundaki durum okuması (`select('processed_at')`) bu hatayla döner. */
+let olayOkumaHatasi: { message: string } | null = null
+/** İlk teslimi sipariş okumasında bekletir: "ilk işlem sürerken ikinci teslim" yarışını belirleyici kılar (zamanlamaya bağlı değil). */
+let okumaBariyeri: { ulasti: () => void; serbest: Promise<void> } | null = null
 
 const IZIN: Record<string, string[]> = {
   pending: ['confirmed', 'cancelled'],
@@ -139,21 +145,44 @@ function sahteIstemci() {
         delete() { durum.op = 'delete'; return b },
         // "Önce kaydet" sahiplenmesi: insert ... on conflict (event_id) do nothing returning.
         upsert(g: Record<string, unknown>) { durum.op = 'upsert'; durum.govde = g; return b },
-        then(coz: (v: unknown) => unknown) { return Promise.resolve(calistir()).then(coz) },
+        then(coz: (v: unknown) => unknown) {
+          // İlk teslim sipariş okumasına ulaşınca bariyerde bekler; bariyer yalnız bir kez (ilk okuma) kullanılır.
+          if (okumaBariyeri && tablo === 'venthub_orders' && durum.op === 'select') {
+            const bariyer = okumaBariyeri
+            okumaBariyeri = null
+            bariyer.ulasti()
+            return bariyer.serbest.then(() => calistir()).then(coz)
+          }
+          return Promise.resolve(calistir()).then(coz)
+        },
       }
       const uyar = (r: Record<string, unknown>) => durum.filtreler.every(([k, v]) => r[k] === v)
       function calistir(): { data: unknown; error: unknown } {
         if (tablo === 'shipping_webhook_events') {
+          const id = String(durum.op === 'upsert' ? durum.govde.event_id : durum.filtreler.find(([k]) => k === 'event_id')?.[1])
           if (durum.op === 'upsert') {
-            const id = String(durum.govde.event_id)
             if (olaylar.includes(id)) return { data: [], error: null } // çakışma: satır dönmez
             olaylar.push(id)
             return { data: [{ event_id: id }], error: null }
           }
-          if (durum.op === 'update') { olayDurumlari.push(String(durum.govde.status_mapped)); return { data: null, error: null } }
+          if (durum.op === 'select') {
+            // Durum okuması: select('processed_at').eq('event_id', id).limit(1) → satır dizisi.
+            if (olayOkumaHatasi) return { data: null, error: olayOkumaHatasi }
+            return { data: olaylar.includes(id) ? [{ processed_at: tamamlananOlaylar.has(id) ? '2026-11-06T00:00:00.000Z' : null }] : [], error: null }
+          }
+          if (durum.op === 'update') {
+            // Olay kaydı: processed_at dolunca olay tamamlandı sayılır.
+            if (durum.govde.processed_at) tamamlananOlaylar.add(id)
+            olayDurumlari.push(String(durum.govde.status_mapped))
+            return { data: null, error: null }
+          }
           if (durum.op === 'delete') {
-            const id = String(durum.filtreler.find(([k]) => k === 'event_id')?.[1])
-            olaylar = olaylar.filter((x) => x !== id)
+            // Gerçek SQL: `.is('processed_at', null)` süzgeci tamamlanmış satırı SİLMEZ.
+            const yalnizBos = durum.filtreler.some(([k, v]) => k === 'processed_at' && v === null)
+            if (!(yalnizBos && tamamlananOlaylar.has(id))) {
+              olaylar = olaylar.filter((x) => x !== id)
+              tamamlananOlaylar.delete(id)
+            }
           }
           return { data: null, error: null }
         }
@@ -232,7 +261,7 @@ async function cagir(
   isleyici: Isleyici,
   govde: Record<string, unknown>,
   basliklar: Record<string, string> = {},
-): Promise<{ http: number; json: Record<string, unknown> }> {
+): Promise<{ http: number; json: Record<string, unknown>; retryAfter: string | null }> {
   const r = await isleyici(
     new Request('https://ornek.supabase.co/functions/v1/shipping-webhook', {
       method: 'POST',
@@ -247,11 +276,33 @@ async function cagir(
       body: JSON.stringify({ order_id: SIPARIS, ...govde }),
     }),
   )
-  return { http: r.status, json: await r.json() }
+  return { http: r.status, json: await r.json(), retryAfter: r.headers.get('retry-after') }
 }
+
+/**
+ * "İlk teslim işlenirken ikinci teslim" yarışını belirleyici kurar (zamanlama şansına bağlı değil): ilk teslim sahipliği
+ * alıp sipariş okumasında BEKLER, ikinci teslim tam bu sırada gelir, sonra ilk teslim serbest bırakılıp bitirilir.
+ */
+async function surenIslemdeIkinciTeslim(isleyici: Isleyici, olay: string, govde: Record<string, unknown> = { status: 'in_transit' }) {
+  let ulasti!: () => void
+  let birak!: () => void
+  const ulastiSozu = new Promise<void>((coz) => { ulasti = coz })
+  okumaBariyeri = { ulasti, serbest: new Promise<void>((coz) => { birak = coz }) }
+  const ilkSozu = cagir(isleyici, govde, { 'x-event-id': olay })
+  await ulastiSozu // ilk teslim sahipliği aldı ve sipariş okumasında bekliyor
+  const ikinci = await cagir(isleyici, govde, { 'x-event-id': olay })
+  const olaylarIken = [...olaylar]
+  const yazimIken = patchlar.length
+  birak()
+  return { ilk: await ilkSozu, ikinci, olaylarIken, yazimIken }
+}
+
+/** Sabotaj: süren işlem dalı sökülür; boş dönen upsert her durumda 200 duplicate'a düşer (R1 öncesi davranış). */
+const SUREN_ISLEM_DALI = /if \(!islendi\) \{/
 
 let olaySayaci = 0
 let yeni: Isleyici
+let surenDalsiz: Isleyici
 let eski: Isleyici | null = null
 let eskiYuklenemedi = ''
 let kilitsiz: Isleyici | null = null
@@ -261,6 +312,8 @@ beforeAll(async () => {
   vi.stubGlobal('fetch', sahteFetch)
   Object.assign(globalThis, { __sahteIstemci: sahteIstemci })
   yeni = await isleyiciYukle(nodeKopyasi('yeni', YENI))
+  if (!SUREN_ISLEM_DALI.test(YENI)) throw new Error('sabotaj deseni eşleşmedi: süren işlem dalı bulunamadı')
+  surenDalsiz = await isleyiciYukle(nodeKopyasi('suren-dalsiz', YENI.replace(SUREN_ISLEM_DALI, 'if (false) {')))
   try {
     eski = await isleyiciYukle(nodeKopyasi('kapisiz', kapiyiSok(YENI)))
   } catch (e) {
@@ -283,6 +336,9 @@ beforeEach(() => {
   patchlar = []
   olaylar = []
   olayDurumlari = []
+  tamamlananOlaylar = new Set<string>()
+  olayOkumaHatasi = null
+  okumaBariyeri = null
   zorlaHataKosul = null
   bildirimler = 0
   patchOncesi = null
@@ -697,5 +753,91 @@ describe('ALT-138 · SABOTAJ kolu (delivered kilidi ve bağlantı denetimi sök�
   it('kilitsiz kopyada: javascript: bağlantısı YAZILIR', async () => {
     await cagir(kilitsiz!, { status: 'in_transit', tracking_url: 'javascript:alert(1)' })
     expect(satir.tracking_url).toBe('javascript:alert(1)')
+  })
+})
+
+/**
+ * R1 (ALT-138, OPS kararı): olay "sahiplenilmiş" ile "işlenmiş" ayrıdır. Upsert boş dönünce (olay zaten var)
+ * `processed_at` NULL ise ilk teslim SÜRÜYOR demektir: ikinci teslim 409 IN_FLIGHT + Retry-After alır, 200 DEĞİL;
+ * aksi halde ilk işlem sonra hata verip sahipliği bırakınca taşıyıcı yeniden denemez ve olay kaybolur.
+ * `processed_at` doluysa 200 duplicate. Durum okunamazsa 5xx (sessiz 200 yok).
+ */
+describe('ALT-138 R1 · süren teslim (IN_FLIGHT) ile işlenmiş olay ayrımı', () => {
+  it('İŞLEM SÜRERKEN ikinci teslim: 409 IN_FLIGHT + Retry-After, ilk teslimin sahipliğine dokunmaz; ilk bitince tekrar 200 duplicate (olay kaybolmaz, çift işlenmez)', async () => {
+    const r = await surenIslemdeIkinciTeslim(yeni, 'evt-suren', { status: 'in_transit', tracking_number: 'TN-S' })
+    expect(r.ikinci.http).toBe(409)
+    expect(r.ikinci.json.error).toBe('IN_FLIGHT')
+    expect(r.ikinci.json.duplicate).toBeUndefined()
+    // Retry-After: pozitif tam sayı ve replay penceresinin (5 dk = 300 sn) altında.
+    const bekleme = Number(r.ikinci.retryAfter)
+    expect(Number.isInteger(bekleme)).toBe(true)
+    expect(bekleme).toBeGreaterThan(0)
+    expect(bekleme).toBeLessThan(300)
+    // 409 yolu sahipliği almadığı için ilk teslimin satırı SİLİNMEDİ ve ikinci teslim siparişe yazmadı.
+    expect(r.olaylarIken).toContain('evt-suren')
+    expect(r.yazimIken).toBe(0)
+    // İlk teslim sonunda işlendi ve olay tamamlandı işaretlendi.
+    expect(r.ilk.http).toBe(200)
+    expect(r.ilk.json.duplicate).toBeUndefined()
+    expect(satir.status).toBe('shipped')
+    expect(satir.tracking_number).toBe('TN-S')
+    expect(tamamlananOlaylar.has('evt-suren')).toBe(true)
+    // Artık tamamlanmış olayın tekrarı 200 duplicate (409 değil) ve yazım yok.
+    const yazimlar = patchlar.length
+    const tekrar = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-S' }, { 'x-event-id': 'evt-suren' })
+    expect(tekrar.http).toBe(200)
+    expect(tekrar.json.duplicate).toBe(true)
+    expect(patchlar).toHaveLength(yazimlar)
+  })
+
+  it('SABOTAJ: süren işlem dalı sökülünce aynı yarışta ikinci teslim 200 duplicate alır (kilit kırmızıyı görüyor)', async () => {
+    const r = await surenIslemdeIkinciTeslim(surenDalsiz, 'evt-suren-sabotaj')
+    expect(r.ikinci.http).toBe(200)
+    expect(r.ikinci.json.duplicate).toBe(true)
+    expect(r.ikinci.retryAfter).toBeNull()
+  })
+
+  it('ilk işlem hata verirse (500) sahiplik bırakılır; aynı olayın yeniden denemesi işlenir ve tamamlandı işaretlenir (olay kaybolmaz)', async () => {
+    zorlaHata = { code: '08006', message: 'connection failure' }
+    const ilk = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-H' }, { 'x-event-id': 'evt-hata' })
+    expect(ilk.http).toBe(500)
+    expect(olaylar).not.toContain('evt-hata')
+    expect(satir.status).toBe('confirmed')
+
+    zorlaHata = null
+    const tekrar = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-H' }, { 'x-event-id': 'evt-hata' })
+    expect(tekrar.http).toBe(200)
+    expect(tekrar.json.duplicate).toBeUndefined()
+    expect(satir.status).toBe('shipped')
+    expect(satir.tracking_number).toBe('TN-H')
+    expect(olaylar).toContain('evt-hata')
+    expect(tamamlananOlaylar.has('evt-hata')).toBe(true)
+  })
+
+  it('yoksayılan (200 ignored) ve etkisiz olaylar da TAMAMLANIR: tekrarları 409 IN_FLIGHT değil 200 duplicate alır', async () => {
+    satir = yeniSatir({ status: 'cancelled' })
+    const yoksayilan = await cagir(yeni, { status: 'in_transit' }, { 'x-event-id': 'evt-yoksay' })
+    expect(yoksayilan.http).toBe(200)
+    expect(yoksayilan.json.ignored).toBe(true)
+    expect(tamamlananOlaylar.has('evt-yoksay')).toBe(true)
+    expect((await cagir(yeni, { status: 'in_transit' }, { 'x-event-id': 'evt-yoksay' })).json.duplicate).toBe(true)
+
+    satir = yeniSatir({ status: 'shipped', tracking_number: 'TN-E' })
+    const etkisiz = await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-E' }, { 'x-event-id': 'evt-etkisiz' })
+    expect(etkisiz.http).toBe(200)
+    expect(etkisiz.json.unchanged).toBe(true)
+    expect(tamamlananOlaylar.has('evt-etkisiz')).toBe(true)
+    expect((await cagir(yeni, { status: 'in_transit', tracking_number: 'TN-E' }, { 'x-event-id': 'evt-etkisiz' })).json.duplicate).toBe(true)
+  })
+
+  it('FAIL-CLOSED: olay durumu okunamazsa 5xx (sessiz 200 yok), ilk teslimin satırına dokunulmaz, sipariş yazılmaz', async () => {
+    olaylar.push('evt-okuma') // ilk teslim sahipliği almış
+    olayOkumaHatasi = { message: 'baglanti koptu' }
+    const r = await cagir(yeni, { status: 'in_transit' }, { 'x-event-id': 'evt-okuma' })
+    expect(r.http).toBe(500)
+    expect(r.json.error).toBe('Event state read failed')
+    expect(r.json.duplicate).toBeUndefined()
+    expect(olaylar).toContain('evt-okuma')
+    expect(patchlar).toHaveLength(0)
   })
 })

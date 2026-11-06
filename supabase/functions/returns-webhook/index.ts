@@ -56,6 +56,12 @@ async function sha256Base64(input: string): Promise<string> {
 
 const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
+// Süren ilk teslim varken gelen ikinci teslime söylenen bekleme (Retry-After, saniye). 30 sn: ilk teslimin normal süresi
+// birkaç saniyedir (iade okuma/yazma + en iyi çabayla bildirim), yani 30 sn sonra ya bitmiştir (200 duplicate) ya da
+// başarısız bitip sahipliği bırakmıştır (yeniden deneme işlenir). SKEW_MS'in (5 dk) çok altında kalmalı: kargo firması
+// aynı zaman damgasıyla yeniden denerse pencere dışında 401 alır ve olay yine kaybolur.
+const IN_FLIGHT_RETRY_AFTER_S = 30
+
 // Olay sahipliği (ALT-138 "önce kaydet"): işlem başarısız biterse (4xx/5xx; 409 çakışma dahil) sahiplenilen
 // olay satırı bırakılır, böylece kargo firmasının yeniden denemesi "tekrar" sanılıp yutulmaz.
 type Sahiplik = { birak: (() => Promise<void>) | null }
@@ -128,7 +134,10 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
     // ÖNCE KAYDET (ALT-138): eskiden kontrol-sonra-kaydet idi (select → işle → insert); aynı olayın eşzamanlı iki
     // teslimi ikisi de "yok" görüp ikisi de işleniyordu. Artık olay işlemden ÖNCE atomik sahiplenilir:
     // `insert ... on conflict (event_id) do nothing returning` — `event_id` UNIQUE (20250914_returns_webhook_events.sql).
-    // Satır dönmezse olay zaten sahiplenilmiş → 200 no-op. İşlem 4xx/5xx biterse sahiplik bırakılır (Deno.serve).
+    // Satır dönmezse olay zaten sahiplenilmiş; ama "sahiplenilmiş" = "işlenmiş" DEĞİLDİR: ilk teslim hâlâ sürüyor olabilir.
+    // `processed_at` DOLU ise olay tamamlandı → 200 no-op. NULL ise sürüyor (ya da yarım kaldı) → 409 IN_FLIGHT + Retry-After:
+    // 200 dönseydik kargo firması yeniden denemezdi ve ilk işlem sonra hata verip sahipliği bıraktığında olay KAYBOLURDU.
+    // İşlem 4xx/5xx biterse sahiplik bırakılır (Deno.serve); 409 dalı sahipliği ALMADIĞI için ilk teslimin satırına dokunmaz.
     {
       const { data: sahiplenen, error: sahipHata } = await supabase
         .from('returns_webhook_events')
@@ -138,7 +147,24 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
         )
         .select('event_id')
       if (sahipHata) return json({ error: 'Event claim failed' }, { status: 500 })
-      if (!Array.isArray(sahiplenen) || sahiplenen.length === 0) return json({ ok: true, event_id: eventId, duplicate: true })
+      if (!Array.isArray(sahiplenen) || sahiplenen.length === 0) {
+        const { data: mevcut, error: okumaHata } = await supabase
+          .from('returns_webhook_events')
+          .select('processed_at')
+          .eq('event_id', eventId)
+          .limit(1)
+        // Fail-closed: durum okunamıyorsa sessiz 200 yok (olay kaybolurdu); 5xx kargo firmasını yeniden denetir.
+        if (okumaHata) return json({ error: 'Event state read failed' }, { status: 500 })
+        const islendi = Array.isArray(mevcut) && mevcut[0]?.processed_at != null
+        // Satır hiç dönmediyse (ilk teslim arada sahipliği bıraktı) da buraya düşer: yeniden deneme sahipliği alır.
+        if (!islendi) {
+          return json(
+            { error: 'IN_FLIGHT', event_id: eventId, retry_after_s: IN_FLIGHT_RETRY_AFTER_S },
+            { status: 409, headers: { 'Retry-After': String(IN_FLIGHT_RETRY_AFTER_S) } },
+          )
+        }
+        return json({ ok: true, event_id: eventId, duplicate: true })
+      }
       sahiplik.birak = async () => {
         await supabase.from('returns_webhook_events').delete().eq('event_id', eventId).is('processed_at', null)
       }
@@ -170,6 +196,30 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
       ? `&tenant_id=eq.${encodeURIComponent(tenantId)}`
       : ''
 
+    // `processed_at` DOLU = olay tamamlandı; NULL = sürüyor (tekrar teslim 409 IN_FLIGHT alır). Bu yüzden başarıyla biten
+    // (200) HER yol bunu çağırmalı: geçiş kapısının 200 reddi dahil, yoksa o olayın tekrarı sonsuza dek 409 alırdı.
+    // Yazım hatası işi bozmaz (iade zaten yazıldı) ama görünür olur: satır NULL kalırsa yeniden denemeler 409 alır.
+    async function olayKaydet(statusMapped: string) {
+      try {
+        const bodyHash = await sha256Base64(raw)
+        // Satır en başta sahiplenildi; burada yalnız ayrıntısı doldurulur.
+        const { error } = await supabase.from('returns_webhook_events').update({
+          return_id: returnId,
+          order_id: p.order_id || null,
+          carrier: p.carrier || null,
+          tracking_number: p.tracking_number || null,
+          status_raw: p.status || null,
+          status_mapped: statusMapped,
+          body_hash: bodyHash,
+          processed_at: new Date().toISOString(),
+          tenant_id: tenantId,
+        }).eq('event_id', eventId)
+        if (error) console.error('[returns-webhook] olay kaydı (processed_at) yazılamadı', { code: 'EVENT_RECORD_FAILED', event_id: eventId })
+      } catch (e) {
+        console.error('[returns-webhook] olay kaydı (processed_at) yazılamadı', { code: 'EVENT_RECORD_FAILED', event_id: eventId, hata: e instanceof Error ? e.message : String(e) })
+      }
+    }
+
     const mapped = mapReturnStatus(p.status)
     const patch: Record<string, unknown> = {}
     if (mapped.status) patch['status'] = mapped.status
@@ -186,7 +236,9 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
     const verdict = canCarrierTransition(String(cur.status), nextStatusCandidate)
     if (!verdict.allowed) {
       // 200 dönülür: kargo firmasının kuyruğu tekrar tekrar denemesin. Reddin SEBEBİ
-      // gövdede açıkça yazar — sessiz yutma değil, kayıtlı ret.
+      // gövdede açıkça yazar — sessiz yutma değil, kayıtlı ret. Olay tamamlandı sayılır (processed_at dolar):
+      // aynı olayın tekrarı 200 duplicate alır, 409 IN_FLIGHT'a takılmaz.
+      await olayKaydet('ignored:transition_blocked')
       return json({
         ok: true,
         unchanged: true,
@@ -217,24 +269,8 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
       updated = true
     }
 
-    // Audit event
-    try {
-      const bodyHash = await sha256Base64(raw)
-      if (eventId) {
-        // Satır en başta sahiplenildi; burada yalnız ayrıntısı doldurulur.
-        await supabase.from('returns_webhook_events').update({
-          return_id: returnId,
-          order_id: p.order_id || null,
-          carrier: p.carrier || null,
-          tracking_number: p.tracking_number || null,
-          status_raw: p.status || null,
-          status_mapped: (patch['status'] as string) || String(cur.status),
-          body_hash: bodyHash,
-          processed_at: new Date().toISOString(),
-          tenant_id: tenantId,
-        }).eq('event_id', eventId)
-      }
-    } catch {}
+    // Olay kaydı + processed_at (başarı yolu)
+    await olayKaydet((patch['status'] as string) || String(cur.status))
 
     // Optional email: send only when we progressed to 'received'
     try {
