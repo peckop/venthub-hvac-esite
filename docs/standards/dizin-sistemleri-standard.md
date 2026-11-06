@@ -142,7 +142,7 @@ buradan yapılmaz.
 
 ## D8 — Ölçüm arşivi: yeni ölçümden önce "daha önce ölçüldü mü", ölçümden sonra kayıt (v0.1, 2026-11-06, Kanban SEO-87)
 
-**Niçin.** 6 Kasım 2026'da kanal fanı sorguları için iki gün önce yapılmış kıyasın (SEO-83) üzerine, o kayıt aranmadığı için yeni plan yazıldı. Ham ölçümler depo dışında yüzlerce dosyada dağınıktı, indeks ve yedek yoktu.
+**Niçin.** 6 Kasım 2026'da iki gün önce yapılmış bir kıyasın (SEO-83) üzerine, o kayıt aranmadığı için yeni plan yazıldı. Ham ölçümler depo dışında yüzlerce dosyada dağınıktı, indeks ve yedek yoktu.
 
 1. **Yer.** Arşiv `~/VentHub-Olcum-Arsiv/geo-seo/` (kullanıcı klasörü altında, depo DIŞI; repo PUBLIC, arama ve Search Console verisi depoya girmez, P6). `C:/tmp` altında arşiv tutulmaz: temizlik işleri orayı siler.
 2. **İndeks.** Arşivdeki `INDEKS.md` her klasör ve dosya için bir satır tutar: giriş, kart no, tarih, ne ölçüldü. Yeni klasör açılınca aynı turda indekse satır yazılır; satırsız klasör "ölçülmemiş" sayılır.

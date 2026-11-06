@@ -17,12 +17,12 @@ import {
 
 const gun = (n: number) => `2026-11-${String(n).padStart(2, '0')}T08:00:00.000Z`
 const NOW = Date.parse(gun(20))
-const satir = (o: Record<string, unknown> = {}) => ({ tarih: gun(6), sorgu: 'kanal tipi fan nedir', motor: 'google', kart: 'SEO-83', kaynak: 'seo83/', ...o })
+const satir = (o: Record<string, unknown> = {}) => ({ tarih: gun(6), sorgu: 'alfa urun nedir', motor: 'google', kart: 'SEO-83', kaynak: 'seo83/', ...o })
 
 describe('sorguAnahtari', () => {
   it('Türkçe harfleri sadeleştirir, noktalamayı atar, boşluğu tekilleştirir', () => {
-    expect(sorguAnahtari('Kanal fanları?')).toBe('kanal fanlari')
-    expect(sorguAnahtari('  KANAL   tipi  fan - nedir ')).toBe('kanal tipi fan nedir')
+    expect(sorguAnahtari('Örnek konu?')).toBe('ornek konu')
+    expect(sorguAnahtari('  ALFA   urun  - nedir ')).toBe('alfa urun nedir')
     expect(sorguAnahtari('Işık ÇÖZÜM Ğ')).toBe('isik cozum g')
   })
   it('boş ya da yalnız noktalama boş anahtar verir', () => {
@@ -60,38 +60,38 @@ describe('defterAyristir', () => {
 describe('sorguOlculduMu', () => {
   const satirlar = [
     satir(),
-    satir({ tarih: gun(2), sorgu: 'kanal tipi fan nedir', motor: 'bing', kart: 'SEO-71' }),
-    satir({ tarih: gun(6), sorgu: 'kanal fanları nelerdir', kart: 'SEO-86', sira: 12 }),
+    satir({ tarih: gun(2), sorgu: 'alfa urun nedir', motor: 'bing', kart: 'SEO-71' }),
+    satir({ tarih: gun(6), sorgu: 'ornek konu nelerdir', kart: 'SEO-1', sira: 12 }),
   ]
   it('yeni kayıt varsa OLCULDU ve en yeni kayıt döner', () => {
-    const r = sorguOlculduMu({ satirlar, sorgu: 'Kanal tipi fan nedir?', simdi: NOW })
+    const r = sorguOlculduMu({ satirlar, sorgu: 'Alfa urun nedir?', simdi: NOW })
     expect(r.durum).toBe('OLCULDU')
     expect(r.son?.motor).toBe('google')
     expect(r.satirlar).toHaveLength(2)
     expect(r.yasGun).toBe(14)
   })
   it('yalnız gsc/trends kaydı varsa SERP ölçümü YOK diye işaretler', () => {
-    const k = [satir({ motor: 'gsc', tur: 'gsc', sorgu: 'hangi kanal fanları' })]
-    const r = sorguOlculduMu({ satirlar: k, sorgu: 'hangi kanal fanları', simdi: NOW })
+    const k = [satir({ motor: 'gsc', tur: 'gsc', sorgu: 'hangi ornek konu' })]
+    const r = sorguOlculduMu({ satirlar: k, sorgu: 'hangi ornek konu', simdi: NOW })
     expect(r.durum).toBe('OLCULDU')
     expect(r.serpVar).toBe(false)
     expect(r.motorlar).toEqual(['gsc'])
-    expect(sorguOlculduMu({ satirlar: [...k, satir({ sorgu: 'hangi kanal fanları', tur: 'serp' })], sorgu: 'hangi kanal fanları', simdi: NOW }).serpVar).toBe(true)
+    expect(sorguOlculduMu({ satirlar: [...k, satir({ sorgu: 'hangi ornek konu', tur: 'serp' })], sorgu: 'hangi ornek konu', simdi: NOW }).serpVar).toBe(true)
   })
   it('eşik sınırı: tam eşik günde hâlâ OLCULDU, bir gün fazlasında ESKI', () => {
     const t = Date.parse(gun(6)) + ESKI_ESIGI_GUN * 86400000
-    expect(sorguOlculduMu({ satirlar, sorgu: 'kanal tipi fan nedir', motor: 'google', simdi: t }).durum).toBe('OLCULDU')
-    expect(sorguOlculduMu({ satirlar, sorgu: 'kanal tipi fan nedir', motor: 'google', simdi: t + 86400000 }).durum).toBe('ESKI')
+    expect(sorguOlculduMu({ satirlar, sorgu: 'alfa urun nedir', motor: 'google', simdi: t }).durum).toBe('OLCULDU')
+    expect(sorguOlculduMu({ satirlar, sorgu: 'alfa urun nedir', motor: 'google', simdi: t + 86400000 }).durum).toBe('ESKI')
   })
   it('motor süzgeci: yalnız o motorun kaydına bakar', () => {
-    expect(sorguOlculduMu({ satirlar, sorgu: 'kanal tipi fan nedir', motor: 'yandex', simdi: NOW }).durum).toBe('OLCULMEDI')
-    expect(sorguOlculduMu({ satirlar, sorgu: 'kanal tipi fan nedir', motor: 'bing', simdi: NOW }).son?.kart).toBe('SEO-71')
+    expect(sorguOlculduMu({ satirlar, sorgu: 'alfa urun nedir', motor: 'yandex', simdi: NOW }).durum).toBe('OLCULMEDI')
+    expect(sorguOlculduMu({ satirlar, sorgu: 'alfa urun nedir', motor: 'bing', simdi: NOW }).son?.kart).toBe('SEO-71')
   })
   it('tam eşleşme yoksa OLCULMEDI ve benzer sorguları önerir', () => {
-    const r = sorguOlculduMu({ satirlar, sorgu: 'kanal fanları kullanım alanları', simdi: NOW })
+    const r = sorguOlculduMu({ satirlar, sorgu: 'ornek konu kullanim alanlari', simdi: NOW })
     expect(r.durum).toBe('OLCULMEDI')
-    expect(r.benzer).toContain('kanal fanları nelerdir')
-    expect(r.benzer).not.toContain('kanal tipi fan nedir')
+    expect(r.benzer).toContain('ornek konu nelerdir')
+    expect(r.benzer).not.toContain('alfa urun nedir')
   })
   it('benzer yoksa boş liste, boş defterde OLCULMEDI', () => {
     expect(sorguOlculduMu({ satirlar: [], sorgu: 'hava perdesi', simdi: NOW })).toMatchObject({ durum: 'OLCULMEDI', benzer: [] })
@@ -101,7 +101,7 @@ describe('sorguOlculduMu', () => {
 describe('yeniOlanlar ve satirYaz', () => {
   it('aynı gün+sorgu+motor+kart ikinci kez yazılmaz', () => {
     const mevcut = [satir()]
-    const adaylar = [satir({ sorgu: 'Kanal tipi fan nedir?' }), satir({ sorgu: 'yeni sorgu' }), satir({ sorgu: 'yeni sorgu' })]
+    const adaylar = [satir({ sorgu: 'Alfa urun nedir?' }), satir({ sorgu: 'yeni sorgu' }), satir({ sorgu: 'yeni sorgu' })]
     const yeni = yeniOlanlar(mevcut, adaylar)
     expect(yeni.map((s) => s.sorgu)).toEqual(['yeni sorgu'])
   })
@@ -123,17 +123,17 @@ describe('CLI güvenliği', () => {
     }
   }
   it('depo içi defter yolu reddedilir (exit 2)', () => {
-    const r = kos(['--sor', 'kanal fanı', '--defter', resolve(__dirname, 'olcumler.jsonl')])
+    const r = kos(['--sor', 'ornek sorgu', '--defter', resolve(__dirname, 'olcumler.jsonl')])
     expect(r.kod).toBe(2)
     expect(r.hata).toContain('git deposunun içinde')
   })
   it('depo dışı geçici defterde kaydet → sor → toplu çiftlemez', () => {
     const d = join(mkdtempSync(join(tmpdir(), 'olcum-defteri-test-')), 'olcumler.jsonl')
-    const k = kos(['--kaydet', '--sorgu', 'Kanal fanları nelerdir?', '--motor', 'google', '--kart', 'SEO-86', '--kaynak', 'seo86/', '--sira', '12', '--defter', d])
+    const k = kos(['--kaydet', '--sorgu', 'Ornek konu nelerdir?', '--motor', 'google', '--kart', 'SEO-1', '--kaynak', 'arsiv/', '--sira', '12', '--defter', d])
     expect(k.kod).toBe(0)
     expect(existsSync(d)).toBe(true)
     expect(readFileSync(d, 'utf8').trim().split('\n')).toHaveLength(1)
-    const s = kos(['--sor', 'kanal fanlari nelerdir', '--defter', d])
+    const s = kos(['--sor', 'ornek konu nelerdir', '--defter', d])
     expect(s.kod).toBe(0)
     expect(s.cikti).toContain('ÖLÇÜLDÜ')
     expect(kos(['--sor', 'tamamen yeni sorgu', '--defter', d]).cikti).toContain('ÖLÇÜLMEDİ')
