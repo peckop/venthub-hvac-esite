@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.
 
 ## Düzenli görevler
-- 7 görev, tetiğe bağlı 7: `docs/roller/GEO-SEO-gorevler.md`.
+- 10 görev, tetiğe bağlı 7: `docs/roller/GEO-SEO-gorevler.md`.
 
 ## Dosyalar
 scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
@@ -28,14 +28,14 @@ Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-sta
 Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.
 
 ## Yetenek ve araç
-Search Console, PageSpeed ölçümü, seo-audit.
+Search Console (arayüz ve URL Inspection API), Bing Webmaster API (GetUrlInfo, SubmitUrlBatch), Yandex Webmaster (arayüz, yeniden tarama), Google Trends (çapa kuralı), claude-seo:seo-geo ajanı (yalnız yerel, Y2.3), scripts/seo/dizin-takip.mjs, PageSpeed, seo-audit.
 
 ## Kurallar (3)
 - K1 Plan önce; K17 Hreflang; K23 llms.txt (geçiş, katı).
 - Gerekçeli özet: `docs/roller/GEO-SEO-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.
+Açık (asli görev).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

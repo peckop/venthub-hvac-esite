@@ -581,8 +581,8 @@ const ROLLER = {
     dosyalar: 'scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.',
     yetki: 'Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.',
     yasak: 'Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.',
-    yetenek: 'Search Console, PageSpeed ölçümü, seo-audit.',
-    durum: 'Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.',
+    yetenek: 'Search Console (arayüz ve URL Inspection API), Bing Webmaster API (GetUrlInfo, SubmitUrlBatch), Yandex Webmaster (arayüz, yeniden tarama), Google Trends (çapa kuralı), claude-seo:seo-geo ajanı (yalnız yerel, Y2.3), scripts/seo/dizin-takip.mjs, PageSpeed, seo-audit.',
+    durum: 'Açık (asli görev).',
   },
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5, R10.5 (ders listesi), R10.6 (yayın öncesi kontrol) ve R11\'i oku.',
