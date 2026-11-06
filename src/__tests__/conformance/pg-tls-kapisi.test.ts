@@ -116,7 +116,7 @@ describe('INV-TLS-BETIK-1 · bağlantı dizgesindeki sslmode pgTls ayarını eze
 
   it('temiz dizge geçer, doğrulama açık', () => {
     expect(dene('postgres://u:p@h:5432/d')).toBe('OK true')
-    expect(dene('postgresql://u:p@h:6543/d?application_name=x')).toBe('OK true')
+    expect(dene('postgresql://u@h:6543/d?application_name=x')).toBe('OK true')
   })
 
   it('connectionString kullanan her betik pgTls()\'e dizgeyi verir', () => {
