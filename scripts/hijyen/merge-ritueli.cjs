@@ -382,9 +382,23 @@ function degerlendir(girdi) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** İnceleme yorumundaki bulgu işareti: "DÜZELTME GEREKİR" ya da satır başında MEDIUM/HIGH başlığı. */
-const BULGU_ISARETI = /D[ÜUüu]ZELTME GEREK[İIiı]R|^[\s>*#-]*\**\s*(MEDIUM|HIGH)\b/m
-/** Bulguların kapandığını bildiren yorum işareti (kapanış, işaretli yorumdan SONRA gelmelidir). */
-const KAPANIS_ISARETI = /[İIiı]NCELEME KAPAND[İIiı]|B[İIiı]LGULAR G[İIiı]DER[İIiı]LD[İIiı]/i
+const BULGU_ISARETI = /D[ÜUüu]ZELTME GEREK[İIiı]R|ENGELLEY[İIiı]C[İIiı]-VAR/i
+/** Satır başında (liste/numara/köşeli parantez/tablo/kalın süsünden sonra) MEDIUM ya da HIGH; ya da "Bulgu 1 (HIGH)". */
+const SIDDET_BASLIGI = /^[\s>*#|\-\d.)[(]*\**\s*(MEDIUM|HIGH)\b|^[^.\n]{0,30}\((MEDIUM|HIGH)\)/
+/** "yok / bulunmadı / 0" geçen şiddet satırı bulgu değildir ("HIGH: yok", "MEDIUM/HIGH bulgu yok"). */
+const OLUMSUZ = /(?<![\p{L}\d])(yok|bulunmuyor|bulunmad[ıi]|s[ıi]f[ıi]r|0)(?![\p{L}\d])/iu
+/**
+ * Bulguların kapandığını bildiren yorum işareti: SATIR BAŞINDA olmalı. Sebep: ritüelin KIRMIZI mesajı bu ifadeyi
+ * cümle ortasında taşır; çıktı PR'a yapıştırılırsa kendi bulgusunu kapatmasın. "KAPANDI DEĞİL" kapatmaz.
+ */
+const KAPANIS_ISARETI = /^[\s>*#-]*(?:[İIiı]NCELEME KAPAND[İIiı]|B[UuÜüİIiı]LGULAR G[İIiı]DER[İIiı]LD[İIiı])(?!\s*DE[ĞG][İIiı]L)/im
+
+/** Yorum gövdesi bulgu içeriyor mu? NBSP/NFD normalleştirilir; şiddet başlığı satır satır ve olumsuzluk dışlanarak ölçülür. */
+function bulguVarMi(govde) {
+  const metin = String(govde || '').normalize('NFC').replace(/ /g, ' ')
+  if (BULGU_ISARETI.test(metin)) return true
+  return metin.split(/\r?\n/).some((s) => SIDDET_BASLIGI.test(s) && !OLUMSUZ.test(s))
+}
 
 /**
  * Edge değişikliği: `supabase/functions/` altındaki yollar. SAF.
@@ -408,13 +422,13 @@ function acikIncelemeBulgusu(girdi) {
     .map((y) => ({ govde: String(y.govde || ''), t: Date.parse(y.tarih) }))
     .filter((y) => Number.isFinite(y.t))
   for (const y of yorumlar) {
-    if (!BULGU_ISARETI.test(y.govde) || y.t <= son) continue
-    const kapandi = yorumlar.some((k) => k.t > y.t && KAPANIS_ISARETI.test(k.govde))
+    if (y.t <= son || !bulguVarMi(y.govde)) continue
+    const kapandi = yorumlar.some((k) => k.t > y.t && KAPANIS_ISARETI.test(k.govde.normalize('NFC').replace(/ /g, ' ')))
     if (!kapandi) {
       return {
         acik: true,
         detay: 'son commit\'ten SONRA yazilmis kapanmamis inceleme bulgusu (' + new Date(y.t).toISOString() +
-          '): once duzelt ve it, ya da bulgulari kapatan "INCELEME KAPANDI" yorumu yaz',
+          '): once duzelt ve it, ya da yeni bir yorumun BIRINCI satirina kapanis ifadesini yaz (docs/roller/ARAC-kurallar.md)',
       }
     }
   }

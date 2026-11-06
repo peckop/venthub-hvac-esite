@@ -474,6 +474,35 @@ describe('INV-RITUEL-4 · Edge functions ve açık inceleme bulgusu (ARC-259, OP
     expect(r4.acikIncelemeBulgusu(bas('ENGELLEYİCİ-YOK, tek nit')).acik).toBe(false)
   })
 
+  it('denetçi sözlüğü (ENGELLEYİCİ-VAR), liste/tablo/köşeli/parantezli şiddet biçimleri ve küçük harf/NBSP bulgudur; olumsuz satır değildir', () => {
+    const bas = (govde: string): NonNullable<Inceleme> => ({ sonCommit: T('10:00'), yorumlar: [{ govde, tarih: T('11:00') }] })
+    const acik = (g: string) => r4.acikIncelemeBulgusu(bas(g)).acik
+    for (const g of ['ENGELLEYİCİ-VAR: kapı gevşiyor', 'Engelleyici-var: x', '1. MEDIUM — origin', '1) HIGH x', '[MEDIUM] x', '| MEDIUM | x |', '**Bulgu 1 (HIGH):** x', 'düzeltme gerekir', 'DÜZELTME GEREKİR', 'DÜZELTME GEREKİR']) {
+      expect(acik(g), g).toBe(true)
+    }
+    for (const g of ['HIGH: yok', 'MEDIUM/HIGH bulgu yok', 'MEDIUM bulunmadı', 'ENGELLEYİCİ-YOK', 'should-fix: 2 nit']) {
+      expect(acik(g), g).toBe(false)
+    }
+  })
+
+  it('kapanış: "bulgular giderildi" ve küçük harf kapatır; "KAPANDI DEĞİL" ve cümle ortası/ritüel çıktısı kapatmaz (kendi kendini kapatma yok)', () => {
+    const bulgu = { govde: 'DÜZELTME GEREKİR', tarih: T('10:30') }
+    const kapat = (govde: string) => r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [bulgu, { govde, tarih: T('10:45') }] }).acik
+    expect(kapat('BULGULAR GİDERİLDİ: hepsi')).toBe(false)
+    expect(kapat('bulgular giderildi')).toBe(false)
+    expect(kapat('inceleme kapandı')).toBe(false)
+    expect(kapat('İNCELEME KAPANDI DEĞİL, bulgu sürüyor')).toBe(true)
+    expect(kapat('KIRMIZI mesaj: bulgulari kapatan "INCELEME KAPANDI" yorumu yaz')).toBe(true)
+    // ritüelin gerçek KIRMIZI metni de (ARC-259) kapatma işareti taşımaz
+    const metin = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+    expect(metin).not.toMatch(/yorumu yaz['"]?,\s*\n?.*INCELEME KAPANDI|bulgulari kapatan "INCELEME KAPANDI"/)
+  })
+
+  it('eşit zaman: yorum anı == son commit anı bulguyu AÇIK saymaz (sınır, y.t <= son)', () => {
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [{ govde: 'DÜZELTME GEREKİR', tarih: T('10:00') }] }).acik).toBe(false)
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [{ govde: 'DÜZELTME GEREKİR', tarih: '2026-11-06T10:00:01Z' }] }).acik).toBe(true)
+  })
+
   it('düzeltme commit\'i yorumdan SONRA gelmişse ya da kapanış yorumu varsa yeşil', () => {
     const yorum = { govde: 'DÜZELTME GEREKİR', tarih: T('10:30') }
     expect(r4.acikIncelemeBulgusu({ sonCommit: T('11:00'), yorumlar: [yorum] }).acik).toBe(false) // düzeltme yorumdan sonra
