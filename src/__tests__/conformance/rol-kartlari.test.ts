@@ -444,7 +444,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) expect(metin, ad).toContain('olgun kütüphane/sistem aranır (karar 181)')
   })
 
-  it('Recep mesaj biçimi her kartta: tek tablo + madde işaretli liste + 3 maddelik compact notu + Onayında yalnız Recep kararı', () => {
+  it('Recep mesaj biçimi her kartta: tek tablo + madde işaretli liste + otomatik compact satırı + Onayında yalnız Recep kararı', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('durum mesajı TEK TABLO')
       expect(metin, ad).toContain('"Recep\'e mesaj kuralları"')
@@ -453,8 +453,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       expect(metin, ad).toContain('| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |')
       expect(metin, ad).toContain('2+ kalem madde işaretli liste olur')
-      expect(metin, ad).toContain('cevabın sonuna 3 maddelik liste')
-      expect(metin, ad).toContain('kopyalanabilir `/compact')
+      expect(metin, ad).toContain('Compact otomatiktir (eşik 600k)')
+      expect(metin, ad).not.toContain('kopyalanabilir `/compact')
       expect(metin, ad).toContain('Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti')
       expect(metin, ad).toContain('"Onayında" yalnız Recep kararı bekleyen iştir')
       expect(metin, ad).toContain('Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır')
@@ -1210,9 +1210,9 @@ describe('INV-ROL-1 — durum dosyası standart "Yarım iş" satırı (HRT-31, O
     }
     expect(uretici.DURUM_SATIRI_KURALI).toContain('`Yarım iş: yok — <kısa>`')
     expect(uretici.DURUM_SATIRI_KURALI).toContain('`Yarım iş: var — <ne>, <ne zaman güvenli>`')
-    // OPS 2026-10-05: compact hazırlığı notu Recep'e KENDİ penceresinde yazılır, OPS'a tek satır.
-    expect(uretici.DURUM_SATIRI_KURALI).toContain("KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider")
-    for (const ad of BEKLENEN_ROLLER) expect(kurallar[ad], ad).toContain('iki aşamalı compact cümlesi KENDİ penceresinde')
+    // OPS 2026-11-06: compact otomatik; pencere Recep'e not ya da /compact satırı yazmaz, OPS'a bir şey göndermez.
+    expect(uretici.DURUM_SATIRI_KURALI).toContain("Recep'e not ya da /compact satırı yazılmaz")
+    for (const ad of BEKLENEN_ROLLER) expect(kurallar[ad], ad).not.toContain('iki aşamalı compact cümlesi KENDİ penceresinde')
     // Blokta geçen iki örnek biçim, <...> yer tutucuları doldurulunca kancada okunur.
     expect(yarimIsOku('Yarım iş: yok — kısa')).toBe('yok')
     expect(yarimIsOku('Yarım iş: var — ne, ne zaman güvenli')).toBe('var')

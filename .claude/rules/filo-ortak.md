@@ -6,18 +6,10 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 ## Compact
 
-- "COMPACT YAKIN" uyarısı görününce, compact yapılana kadar her cevabın sonuna üç parça koy.
-- Birinci parça üç maddelik liste, her madde ayrı satırda tam cümle: durum dosyam güncel mi (dosya adı ve saat), yarım iş var mı, hüküm ("Şimdi compact yapabilirsin" ya da "X bitince söyleyeceğim").
-- İkinci parça, listenin altında tek kod bloğunda kopyalanabilir `/compact` satırı. Kalıp:
-
-```
-/compact Recep'in son sözlerini aynen koru. Şunları koru: <numara (durum)>, ..., yarım işler (<kısa adlar>). Ayrıntı durum dosyamda. Araç çıktılarını ve eski ölçüm ayrıntılarını at.
-```
-
-- Üçüncü parça, en altta, iki aşamalı compact cümlesi: "Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz."
-- Üç parça KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider.
-- `/compact` satırını vermeden önce durum dosyasını güncelle ve sonuna tek satır yaz (yalnız durum dosyasına, Recep'e görünen cevaba değil): `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`.
+- Compact otomatiktir (eşik 600k); Recep'e `/compact` satırı, üç maddelik liste ya da iki aşama cümlesi verilmez. Recep isterse elle `/compact` serbesttir.
+- "COMPACT YAKIN" uyarısı (500k) görününce durum dosyanı hemen güncelle ve sonuna tek satır yaz: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Yarım işi güvenli noktaya getirmeye bak; iş akışını kesme.
 - Compact dönüşünde ilk çağrı durum dosyasını okumaktır; ilk görünür satır "bana ulaşan son girdin: <özet>" olur.
+- Sonra kendi panondaki açık kartları oku, durum dosyasıyla karşılaştır ve sırası belli işe geç; elinde iş yoksa OPS'a tek satır "boştayım" yaz.
 - Konuşmada verilen her kalıcı söz kalıcı yere yazılır; yazılmadıysa verilmemiştir.
 
 ## İş ve kart
@@ -45,7 +37,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 ## Recep ile iletişim
 
-- Recep'e mekanik iş verme: dışa aktarma, kopyala-yapıştır, canlı yazım ya da pencere değiştirme adımı yazma; tek istisna COMPACT YAKIN'daki `/compact` satırı.
+- Recep'e mekanik iş verme: dışa aktarma, kopyala-yapıştır, canlı yazım ya da pencere değiştirme adımı yazma.
 - Onay nerede verilir, dört durum:
   - Canlı yazım betiği: departman hazırlar ve koşmaz; Recep "yaz" sözünü OPS penceresinde söyler, OPS koşar. Komut, değişken adları, geri alma yolu OPS'a gider.
   - Migration'lı PR birleştirme, gerçek para, geri alınamaz silme: Recep'in sözü işi koşan pencerede geçerli (karar 224). Bu soru da OPS'tan sorulur; söz OPS penceresinde verilirse birleştirme/koşum OPS'ta yapılır (142 örneği). Menü yeri, adres, fiyat gibi ürün kararları da Recep'indir.

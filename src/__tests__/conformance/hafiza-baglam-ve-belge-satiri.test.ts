@@ -127,56 +127,21 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     expect(bd.satir(200_000, 250_000)).toMatch(/COMPACT YAKIN/)
   })
 
-  it("COMPACT YAKIN satırı Recep'e HAZIRLIK NOTU talimatı taşır; doluyor/düz satırda YOK (Recep 09-29)", () => {
+  it('COMPACT YAKIN satırı COMPACT OTOMATIK talimatı taşır (durum dosyasını güncelle); Recep e liste, /compact satırı ya da iki aşama cümlesi öğretmez; doluyor/düz satırda YOK (ARC-264)', () => {
     const yakin = bd.satir(500_000, 1_000_000) as string
-    for (const madde of [
-      'COMPACT HAZIRLIK NOTU',
-      'UC MADDELIK LISTE',
-      "'- ' ile baslayan",
-      'Birinci madde: durum dosyam guncel mi',
-      'Ikinci madde: yarim is var mi',
-      'Ucuncu madde: hukum',
-      'Simdi compact yapabilirsin',
-      'her cevapta kisaca tekrarla',
-    ]) {
-      expect(yakin, madde).toContain(madde)
+    for (const parca of ['COMPACT OTOMATIK', 'Durum dosyani SIMDI guncelle', 'Yarim is: yok', 'Yarim is: var', 'isine devam et']) {
+      expect(yakin, parca).toContain(parca)
     }
-    // Recep 09-29 (iki kez): maddeler yan yana tek paragraf ve (a)(b)(c) etiketli YAZILMAZ. Talimat bunu ÖĞRETMEMELİ.
-    expect(yakin, 'talimat etiketli (a)(b)(c) biçimi öğretiyor').not.toMatch(/\(a\)|\(b\)|\(c\)/)
-    expect(yakin, 'talimat yan yana yazmayı yasaklamıyor').toMatch(/yan yana tek paragraf YOK/)
-    // Ops 09-29 (Recep: "compact konusunda genel bilgilendirme lazım"): duyuru YOK, bilgi kancanın kendisinde durur.
-    expect(yakin, 'compact bilgilendirme cümlesi (iki aşamalı) satırda yok').toContain(
-      'Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir.',
-    )
-    expect(yakin).toContain('Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz.')
-    // ARC-69 (OPS 10-09): rol kurallarındaki "listenin altında tek kod bloğunda /compact satırı" şartı kancada da
-    // olmalı; pencere her istemde kancayı görür, kurallar dosyasını görmez (10-09'da OPS /compact satırını vermedi).
-    for (const parca of [
-      'UC PARCA',
-      'TEK KOD BLOGU',
-      "/compact Recep'in son sozlerini aynen koru",
-      'Sunlari koru: <numara (durum)>',
-      'yarim isler (<kisa adlar>)',
-      'Ayrinti durum dosyamda',
-      'Arac ciktilarini ve eski olcum ayrintilarini at',
-    ]) {
-      expect(yakin, 'kod bloğu parçası eksik: ' + parca).toContain(parca)
+    // Eski üç parçalı not (Recep e yazılan liste + kod bloğu + iki aşama cümlesi) geri gelmesin.
+    for (const eski of ['COMPACT HAZIRLIK NOTU', 'UC MADDELIK LISTE', 'TEK KOD BLOGU', 'Compact iki aşamalıdır', 'Sunlari koru:', 'kopyalayip yapistiracagi']) {
+      expect(yakin, 'eski not geri gelmiş: ' + eski).not.toContain(eski)
     }
-    // Sıra: liste → kod bloğundaki /compact satırı → en altta iki aşamalı cümle (filo-ortak.md "Compact" bölümü).
-    const sira = [
-      yakin.indexOf('Ucuncu madde: hukum'),
-      yakin.indexOf("/compact Recep'in son sozlerini aynen koru"),
-      yakin.indexOf('Compact iki aşamalıdır'),
-    ]
-    expect(sira.every((i) => i >= 0), 'bir parça yok: ' + sira.join(',')).toBe(true)
-    expect(sira, 'parçaların sırası bozuk (liste, /compact kod bloğu, iki aşamalı cümle)').toEqual([...sira].sort((a, b) => a - b))
-    // Ops 09-29: "JEV" iç kelimedir, Recep'e giden hiçbir kanca metninde geçmez (kaynak dosya hafızası da anılmaz).
+    expect(yakin, 'talimat Recep e /compact vermeyi yasaklamıyor').toContain('Recep e /compact satiri, liste ya da aciklama YAZMA')
     expect(yakin, 'Recep e giden metinde iç kelime JEV').not.toMatch(/JEV/i)
-    expect(yakin, 'kaynak hafıza dosyası adı metne sızmış').not.toContain('compact-jev')
-    expect(bd.satir(499_999, 1_000_000), 'bilgilendirme yalnız COMPACT YAKIN satırında').not.toContain('iki aşamalıdır')
+    expect(bd.satir(499_999, 1_000_000), 'talimat yalnız COMPACT YAKIN satırında').not.toContain('COMPACT OTOMATIK')
     expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
-    expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT HAZIRLIK NOTU')
+    expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT OTOMATIK')
   })
 
   it('pencere önceliği durum çubuğuyla aynı: ortam > proje ayarı > kullanıcı ayarı > 1M', () => {
