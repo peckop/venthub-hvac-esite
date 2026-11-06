@@ -31,7 +31,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
 /** OPS emri: günde en çok 6 sınav. Aşılırsa kanca susar (gürültü > fayda). */
 const GUNLUK_SINIR = Number(process.env.VENTHUB_SOGUK_SINIR || 6)
 const MODEL = 'sonnet'
