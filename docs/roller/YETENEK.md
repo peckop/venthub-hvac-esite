@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Skill'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Departmanların kendi işini ölçmesi departmanların işidir. Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.
+Skill'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.
 Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS); elle SKILL.md yazmak.
 
 ## Yönetim (karar 201)
@@ -19,7 +19,7 @@ Amaç ve Nasıl: `docs/roller/YETENEK-gorevler.md`.
 - 2 görev, tetiğe bağlı 2: `docs/roller/YETENEK-gorevler.md`.
 
 ## Dosyalar
-`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`. Rol kartlarındaki skill listesinin içeriği YETENEK'ten gelir, kartı HARİTA'nın üreticisi yazar.
+`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`; skill PR'ında skill-yuku-butcesi ve diff-review-taban testleri, envanterde skill satırı (tavan: Recep kararı). Rol kartlarındaki skill listesinin içeriği YETENEK'ten gelir, kartı HARİTA üreticisi yazar.
 
 ## Yetki
 Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını önerir; skill kusurlarını (bayat yol/araç adı, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydeder, `.claude/skills/**` düzeltmesini ayrı PR'la yapar; haftalık kullanım ölçümü (atanmış ama kullanılmayan kırmızı); amaca bağlanamayan skill'i kapatır (silmez).
@@ -28,14 +28,14 @@ Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını öneri
 `.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.
 
 ## Yetenek ve araç
-plan-challenger, verify-before-done, skills-creator (kısmen: `.agent` ağacına yazar), find-skills (kısmen: dış kurulum onay ister), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.
+plan-challenger, verify-before-done, skills-creator (kısmen: `.agent` ağacına yazar), find-skills (dış kurulum onaylı), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.
 
 ## Kurallar (1)
 - K1 Plan önce.
 - Gerekçeli özet: `docs/roller/YETENEK-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık. Skill atama tablosunun içeriğini bu rol doldurur (iskelet HARİTA'da, REC-509).
+Açık. Skill atama tablosunu bu rol doldurur (iskelet HARİTA'da, REC-509).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
