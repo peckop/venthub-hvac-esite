@@ -37,6 +37,21 @@
       "durum_satiri": "Sayfa Last-Modified: 2026-09-16; süreç takvimi: Aralık 2024 - Bahar 2027",
       "alinti": "The European Commission (Directorate-General for Energy), hereafter DG ENER, is carrying out a back-to-back evaluation and impact assessment study for the Review of Commission Regulation (EU) 2019/1781 of October 2019 laying down Ecodesign requirements for electric motors and variable speed drives (VSDs).",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32019R1781",
+      "son_url": "http://publications.europa.eu/resource/celex/32019R1781",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-06",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (curl/Accept application/xhtml+xml, Accept-Language eng)",
+      "durum_satiri": "Yayın Ofisi veri servisi EUR-Lex \"In force\" satırını vermez; durum değişiklik zincirinden (Yayın Ofisi SPARQL) çıkarıldı. Önceki kanıtta sha256 yoktu: bu değer İLK TABANdır, sonraki kontrol aynı yöntemle yeniden hesaplanmalı.",
+      "sha256_ilk12": "e8b3b2d1fbe0",
+      "sha256_normalizasyon": "betik/stil atılmış, etiketler soyulmuş, boşluk tekil, NFC; OJ dosya adı başlığı metinde kalır",
+      "alinti": "",
+      "alinti_dogrulandi": false
     }
   ]
 }

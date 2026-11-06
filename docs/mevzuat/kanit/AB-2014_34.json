@@ -37,6 +37,21 @@
       "durum_satiri": "robots.txt boş/kısıtlama yok ancak site AWS WAF JS-challenge sayfası döndürüyor (HTTP 202, 'window.awsWafCookieDomainList'); curl ile ham metne ulaşılamadı. Aynı engel /eli/dir/2014/34/oj, PDF endpoint, homepage.html ve LSU (legal status) sayfalarında da tekrarlandı.",
       "alinti": "ERİŞİLEMEDİ",
       "alinti_dogrulandi": false
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32014L0034",
+      "son_url": "http://publications.europa.eu/resource/celex/32014L0034",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-06",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (curl/Accept application/xhtml+xml, Accept-Language eng)",
+      "durum_satiri": "Yayın Ofisi veri servisi EUR-Lex \"In force\" satırını vermez; durum değişiklik zincirinden (Yayın Ofisi SPARQL) çıkarıldı. Önceki kanıtta sha256 yoktu: bu değer İLK TABANdır, sonraki kontrol aynı yöntemle yeniden hesaplanmalı.",
+      "sha256_ilk12": "9a418ef90d54",
+      "sha256_normalizasyon": "betik/stil atılmış, etiketler soyulmuş, boşluk tekil, NFC; OJ dosya adı başlığı metinde kalır",
+      "alinti": "",
+      "alinti_dogrulandi": false
     }
   ]
 }

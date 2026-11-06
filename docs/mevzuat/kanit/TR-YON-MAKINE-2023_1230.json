@@ -1,0 +1,35 @@
+{
+  "kimlik": "TR-YON-MAKINE-2023/1230",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2026/10/20261016-12.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2026/10/20261016-12.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-06",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "curl ile ham çekim (bir çalışan, 6 Kasım 2026 yaklaşık 10:25-10:30 UTC); kodlama cp1254. Fihrist: /eskiler/2026/10/20261016.htm",
+      "durum_satiri": "Resmî Gazete 16 Ekim 2026 Cuma, sayı 33402: \"MAKİNE EMNİYETİ YÖNETMELİĞİ (2023/1230/AB)\", Sanayi ve Teknoloji Bakanlığı, 53 madde. Resmî Gazete sayfası durum satırı vermez.",
+      "sha256_ilk12": "5b7aa3ac1195",
+      "sha256_normalizasyon": "etiketsiz gövde sha256 (çalışan hesabı); ham dosya sha256 ilk 12: 652ed355e003",
+      "alinti": "MAKİNE EMNİYETİ YÖNETMELİĞİ (2023/1230/AB)",
+      "alinti_dogrulandi": false,
+      "dogrulama_notu": "Başlık ve sayı çalışan raporundan; müdür ve bağımsız doğrulayıcı henüz yeniden okumadı (Resmî Gazete 6 Kasım 2026 ikinci denemede erişilemedi)."
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2026/10/20261016-12-1.pdf",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2026/10/20261016-12-1.pdf",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-06",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Ekler PDF; metin katmanı yok (pdftotext 0 karakter), sayfalar görüntüden okundu: PDF sayfa n = basılı sayfa n+24",
+      "durum_satiri": "Ek-5 Kısım A: 10 alan; Kısım B: 4 alan (basılı s.66). Ek-3 1.5.1 basılı s.38. İkinci okuma bekliyor.",
+      "alinti": "",
+      "alinti_dogrulandi": false
+    }
+  ]
+}
