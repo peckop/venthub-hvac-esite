@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
@@ -17,7 +18,7 @@ import { describe, expect, it } from 'vitest'
  * kusurun aynısını üretir. Bu yüzden üç sonuç var (GECTI · DUSTU · OLCEMEDI) ve çözülemeyen
  * satır `null` döner.
  *
- * Ağ YOK: puanlama saf modülde (`scripts/skills-eval/lib.mjs`), koşucu ayrı dosyada. Ayrımın
+ * Ağ YOK: puanlama saf modülde (`scripts/skills-eval/lib.mjs`), kosucu ayrı dosyada. Ayrımın
  * sebebi ölçülebilirlik: ağa çıkan kodun eşiği test edilemez.
  *
  * Cetvel: `execution-method-standard.md` §8.1 (test aynı PR'da) ·
@@ -51,6 +52,9 @@ interface Lib {
     girisUsdMilyon: number
     cikisUsdMilyon: number
   }) => number
+  ETIKET_KALIBI: RegExp
+  etiketCoz: (bayraklar: string[]) => { etiket?: string; hata?: string }
+  raporAdi: (tarih: string, etiket: string) => string
 }
 
 const require_ = createRequire(import.meta.url)
@@ -216,7 +220,7 @@ describe('INV-SKILLS-EVAL-2 · frontmatter açıklaması', () => {
 /**
  * EK-1 (2026-09-25): bayraksız `claude -p` TAM oturum açıyordu — kancalar koştu, gerçek
  * `.claude/skills` listesi sınav kataloğuyla yarıştı, 120 sn'de üç skill zaman aşımına düştü.
- * Sade set iki yerde korunur: sabitin içeriği VE koşucunun onu gerçekten spawn'a vermesi
+ * Sade set iki yerde korunur: sabitin içeriği VE kosucunun onu gerçekten spawn'a vermesi
  * (sabit doğru ama bağlanmamışsa ölçüm yine kirli olur).
  */
 describe('skills-eval CLI yolu SADE bağlamda koşar (EK-1)', () => {
@@ -233,11 +237,63 @@ describe('skills-eval CLI yolu SADE bağlamda koşar (EK-1)', () => {
     expect(b, '--bare OAuth u kapatır; yerel koşu API anahtarı ister').not.toContain('--bare')
   })
 
-  it('koşucu sabiti claude spawn argümanlarına yayıyor', () => {
+  it('kosucu sabiti claude spawn argümanlarına yayıyor', () => {
     const kaynak = fs.readFileSync(path.resolve(__dirname, '../../../scripts/skills-eval-run.mjs'), 'utf8')
     expect(kaynak).toMatch(/import\s*\{[^}]*CLI_SADE_BAYRAKLAR[^}]*\}\s*from '\.\/skills-eval\/lib\.mjs'/)
     expect(kaynak).toMatch(/spawnSync\('claude',\s*\['-p',\s*'--model',\s*MODEL,\s*\.\.\.CLI_SADE_BAYRAKLAR(?:,\s*'--max-budget-usd',\s*'0\.50')?\]/)
     // ARC-237: bütçe sınırı çağrıda durmalı (sade bayrak dizisini bozmadan sonuna eklenir)
     expect(kaynak).toContain("'--max-budget-usd', '0.50'")
+  })
+})
+
+/**
+ * ALT-160 (OPS-232, 2026-11-06): rapor adı yalnız tarihti; aynı gün ikinci koşu ilkini SESSİZCE eziyordu
+ * ve kart numarası elle yazıldığı için yanlış çıkıyordu (#2296 "ytn41"). Etiket zorunlu, dosya adında;
+ * var olan rapor üzerine yazılmaz.
+ */
+describe('INV-SKILLS-EVAL-1 · rapor etiketi ve üzerine yazma reddi (ALT-160)', () => {
+  const KOK = path.resolve(__dirname, '../../..')
+  const kosucu = () => fs.readFileSync(path.join(KOK, 'scripts/skills-eval-run.mjs'), 'utf8').replace(/\r\n/g, '\n')
+
+  it('etiket yoksa, iki kez verildiyse ya da biçimi bozuksa hata döner', () => {
+    expect(lib.etiketCoz([]).hata).toMatch(/ZORUNLU/)
+    expect(lib.etiketCoz(['--kuru']).hata).toMatch(/ZORUNLU/)
+    expect(lib.etiketCoz(['--etiket=A', '--etiket=B']).hata).toMatch(/birden çok/)
+    for (const kotu of ['', '../x', 'a/b', 'a b', '-bas', 'a.json', 'x'.repeat(41)]) {
+      expect(lib.etiketCoz(['--etiket=' + kotu]).hata, kotu).toMatch(/geçersiz/)
+    }
+  })
+
+  it('geçerli etiket döner ve rapor adına girer', () => {
+    expect(lib.etiketCoz(['--kuru', '--etiket=YTN-41'])).toEqual({ etiket: 'YTN-41' })
+    expect(lib.etiketCoz(['--etiket=pr-2300'])).toEqual({ etiket: 'pr-2300' })
+    expect(lib.raporAdi('2026-11-06', 'YTN-41')).toBe('skills-eval-2026-11-06-YTN-41.json')
+    // SABOTAJ: aynı gün iki farklı kart aynı dosyaya düşmez
+    expect(lib.raporAdi('2026-11-06', 'YTN-41')).not.toBe(lib.raporAdi('2026-11-06', 'YTN-42'))
+  })
+
+  it('etiketsiz koşu ağa çıkmadan çıkış 2 verir (gerçek süreç)', () => {
+    const r = spawnSync(process.execPath, [path.join(KOK, 'scripts/skills-eval-run.mjs'), '--kuru'], {
+      encoding: 'utf8',
+      env: { ...process.env, ANTHROPIC_API_KEY: '' },
+    })
+    expect(r.status).toBe(2)
+    expect(r.stderr).toMatch(/--etiket=<kart> ZORUNLU/)
+  })
+
+  it('kapı ağdan ve arka uç seçiminden ÖNCE, yazım wx bayrağıyla (üzerine yazmaz)', () => {
+    const k = kosucu()
+    const kapi = k.indexOf('RAPOR ZATEN VAR, ÜZERİNE YAZILMAZ')
+    expect(kapi, 'üzerine yazma kapısı yok').toBeGreaterThan(-1)
+    expect(kapi, 'kapı arka uç seçiminden sonra kalmış').toBeLessThan(k.indexOf('const arkaUc = arkaUcSec()'))
+    expect(k).toMatch(/fs\.existsSync\(raporYolu\)[\s\S]{0,400}process\.exit\(2\)/)
+    expect(k).toContain("flag: 'wx'")
+    expect(k, 'eski tarih-yalnız rapor adı geri gelmiş').not.toMatch(/skills-eval-\$\{tarih\}\.json/)
+  })
+
+  it('CI çağrısı etiket veriyor', () => {
+    const wf = fs.readFileSync(path.join(KOK, '.github/workflows/skills-gate.yml'), 'utf8')
+    expect(wf).toMatch(/node scripts\/skills-eval-run\.mjs "--etiket=\$ETIKET"/)
+    expect(wf).toMatch(/ETIKET: \$\{\{ github\.event\.pull_request\.number && format\('pr-\{0\}'/)
   })
 })
