@@ -28,6 +28,15 @@ const z = require_(path.join(KOK, 'scripts', 'hijyen', 'gorev-tazelik.cjs')) as 
 const GUN = 86400000
 const T0 = Date.parse('2026-11-06T10:00:00Z')
 
+const SABIT_SORULAR = [
+  'Bu hafta hangi hata ikinci kez yapıldı, kalıcı çözümü ne?',
+  'Gelen isteklerden hangisi gecikti ya da unutuldu?',
+  'Hangi kart ya da kayıt bayat?',
+  'Hangi iş geri dönüp düzeltildi?',
+  'Hangi skill, kanca ya da Claude Code özelliği kullanıldı; hangisi kullanılmalıydı da kullanılmadı?',
+  "İşe başlamadan önce Kanban'da aynı iş arandı mı, mükerrer iş var mı?",
+]
+
 /** Brief'teki "N. soru" satırlarını sayar. */
 function soruSatirlari(brief: string): string[] {
   return brief.split('\n').filter((s) => /^[1-6]\. /.test(s))
@@ -35,14 +44,7 @@ function soruSatirlari(brief: string): string[] {
 
 describe('INV-GOREV-BASLAT-1 · sabit altı soru ve brief', () => {
   it('altı soru OPS-232 metniyle birebir', () => {
-    expect(b.SORULAR).toEqual([
-      'Bu hafta hangi hata ikinci kez yapıldı, kalıcı çözümü ne?',
-      'Gelen isteklerden hangisi gecikti ya da unutuldu?',
-      'Hangi kart ya da kayıt bayat?',
-      'Hangi iş geri dönüp düzeltildi?',
-      'Hangi skill, kanca ya da Claude Code özelliği kullanıldı; hangisi kullanılmalıydı da kullanılmadı?',
-      "İşe başlamadan önce Kanban'da aynı iş arandı mı, mükerrer iş var mı?",
-    ])
+    expect(b.SORULAR).toEqual(SABIT_SORULAR)
   })
 
   it('brief altı soruyu, dizin/dal doğrulamasını, salt okuma ve push yasağını taşır', () => {
@@ -57,11 +59,17 @@ describe('INV-GOREV-BASLAT-1 · sabit altı soru ve brief', () => {
     expect(m).toContain('ÖNCEKİ ÖLÇÜM:')
   })
 
-  it('⛔SABOTAJ: bir soru düşerse sayım kırmızı verir (kapı soru sayısını gerçekten ölçüyor)', () => {
-    const m = b.brief({ rol: 'ARAC', ad: 'öz-değerlendirme', simdi: T0, cwd: '/c/depo/arac', dal: 'arac/x' })
-    const bozuk = m.replace(/^3\. .*\n/m, '')
-    expect(soruSatirlari(bozuk)).toHaveLength(5)
-    expect(soruSatirlari(bozuk)).not.toHaveLength(6)
+  it('⛔SABOTAJ: SORULAR\'dan bir soru düşerse GERÇEK kapı (birebir eşitlik) kırmızı verir ve brief 5 soruya iner', () => {
+    const kopya = [...b.SORULAR]
+    try {
+      b.SORULAR.splice(2, 1)
+      expect(() => expect(b.SORULAR).toEqual(SABIT_SORULAR)).toThrow()
+      const m = b.brief({ rol: 'ARAC', ad: 'öz-değerlendirme', simdi: T0, cwd: '/c/depo/arac', dal: 'arac/x' })
+      expect(soruSatirlari(m)).toHaveLength(5)
+    } finally {
+      b.SORULAR.splice(0, b.SORULAR.length, ...kopya)
+    }
+    expect(b.SORULAR).toEqual(SABIT_SORULAR)
   })
 
   it('kart taslağı numarayı uydurmaz, KAYNAK/YÖNTEM/BİTİŞ taşır ve damga komutunu gösterir', () => {
@@ -96,6 +104,18 @@ describe('INV-GOREV-BASLAT-1 · komut satırı ve istem satırı', () => {
     expect(s).toContain('başlat: node scripts/hijyen/gorev-baslat.cjs "öz-değerlendirme" --rol ARAC')
     expect(s).toContain('bitince damgala: node scripts/hijyen/gorev-damga.cjs "öz-değerlendirme" --rol ARAC')
     expect(s.split('\n')).toHaveLength(1)
+  })
+
+  it('iki görev bayatken başlat ve damga komutu AYNI göreve işaret eder (brief\'li görev)', () => {
+    const gorevler = [
+      { ad: 'SEO haftalık', esik: 7 },
+      { ad: 'öz-değerlendirme', esik: 7 },
+    ]
+    const damgalar = { 'SEO haftalık|GEO-SEO': { ts: T0 - 9 * GUN }, 'öz-değerlendirme|GEO-SEO': { ts: T0 - 8 * GUN } }
+    const s = z.satir('GEO-SEO', z.degerlendir({ gorevler, rol: 'GEO-SEO', damgalar, simdi: T0 }))
+    expect(s).toContain('gorev-baslat.cjs "öz-değerlendirme" --rol GEO-SEO')
+    expect(s).toContain('gorev-damga.cjs "öz-değerlendirme" --rol GEO-SEO')
+    expect(s).not.toContain('gorev-damga.cjs "SEO haftalık"')
   })
 
   it('brief\'i tanımsız görevde eski satır (başlatıcı yok) korunur', () => {
