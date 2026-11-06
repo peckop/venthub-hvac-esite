@@ -417,6 +417,10 @@ function faviconKontrolu(sayfalar, varliklar, cikti) {
   }
 }
 
+/** Bugünkü aynı gün başı damgası KIRMIZI eşiği (SEO-89): en az bu kadar adres ya da lastmod'lu adreslerin bu oranı. */
+export const LASTMOD_TOPLU_GUNBASI_MIN = 10
+export const LASTMOD_TOPLU_GUNBASI_ORAN = 0.2
+
 function lastmodKontrolu(harita, bugun, cikti) {
   const zamanlar = []
   for (const s of harita.satirlar) {
@@ -425,11 +429,16 @@ function lastmodKontrolu(harita, bugun, cikti) {
     if (Number.isNaN(t.getTime())) continue
     zamanlar.push({ s, ms: t.getTime(), gun: t.toISOString().slice(0, 10) })
   }
+  // Bugünkü gün başı damgası taşıyan adet: eşik ölçülmüş yayın günü dağılımından türer (SEO-89): canlıda aynı güne en çok 3 adres
+  // (6 Kasım 2026 ölçümü); eşik = max(10, lastmod'lu adreslerin %20'si) ya da üstü KIRMIZI (veri kaynaklı toplu bozulma izi).
+  const bugunGunBasi = zamanlar.filter((z) => z.gun === bugun && z.ms % 86_400_000 === 0).length
+  const toplu = bugunGunBasi >= Math.max(LASTMOD_TOPLU_GUNBASI_MIN, Math.ceil(zamanlar.length * LASTMOD_TOPLU_GUNBASI_ORAN))
   for (const z of zamanlar) {
     if (z.gun !== bugun) continue
     // Gün başı damgası (T00:00:00.000Z) içerik yazarının verdiği TARİHtir: yayın günü gerçek yayın böyle görünür (SEO-88).
     // REC-454'ün hatası `new Date()` ile SAATLİ damga üretmekti; saatli bugün damgası KIRMIZI kalır.
-    if (z.ms % 86_400_000 === 0) cikti.push(bulgu('LASTMOD-BUGUN', 'UYARI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}), gün başı tarih damgası: yayın günü olabilir, ertesi gün de aynıysa gerçek değişiklik tarihi sayılır`))
+    if (z.ms % 86_400_000 === 0 && toplu) cikti.push(bulgu('LASTMOD-BUGUN', 'KIRMIZI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}): ${bugunGunBasi} adres aynı gün başı damgasını taşıyor (eşik ${Math.max(LASTMOD_TOPLU_GUNBASI_MIN, Math.ceil(zamanlar.length * LASTMOD_TOPLU_GUNBASI_ORAN))}): toplu damga, veri kaynaklı bozulma olabilir (SEO-89)`))
+    else if (z.ms % 86_400_000 === 0) cikti.push(bulgu('LASTMOD-BUGUN', 'UYARI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}), gün başı tarih damgası: yayın günü olabilir, ertesi gün de aynıysa gerçek değişiklik tarihi sayılır`))
     else cikti.push(bulgu('LASTMOD-BUGUN', 'KIRMIZI', z.s.loc, `lastmod ${z.s.lastmod} = bugün (${bugun}) ve saatli: gerçek değişiklik değil "şimdi" damgası olabilir (REC-454)`))
   }
   const damga = new Map()
