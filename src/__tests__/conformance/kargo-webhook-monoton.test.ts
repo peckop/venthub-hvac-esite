@@ -97,6 +97,12 @@ let tamamlananOlaylar = new Set<string>()
 let olayOkumaHatasi: { message: string } | null = null
 /** İlk teslimi sipariş okumasında bekletir: "ilk işlem sürerken ikinci teslim" yarışını belirleyici kılar (zamanlamaya bağlı değil). */
 let okumaBariyeri: { ulasti: () => void; serbest: Promise<void> } | null = null
+/** Olay satırlarının `received_at` zamanı (ms). Doğrudan `olaylar.push` ile eklenen satır için kayıt yoksa "şimdi" sayılır. */
+let olayZamanlari = new Map<string, number>()
+/** verilirse devralma güncellemesi bu hatayla döner. */
+let devralmaHatasi: { message: string } | null = null
+/** Başarılı devralma sayısı. */
+let devralmalar = 0
 
 const IZIN: Record<string, string[]> = {
   pending: ['confirmed', 'cancelled'],
@@ -132,8 +138,8 @@ const kayit = (): Record<string, unknown> => ({ ...satir })
 function sahteIstemci() {
   return {
     from(tablo: string) {
-      const durum: { op: 'select' | 'update' | 'delete' | 'upsert'; govde: Record<string, unknown>; filtreler: [string, unknown][]; tek: boolean } = {
-        op: 'select', govde: {}, filtreler: [], tek: false,
+      const durum: { op: 'select' | 'update' | 'delete' | 'upsert'; govde: Record<string, unknown>; filtreler: [string, unknown][]; kucuktur: [string, string][]; tek: boolean } = {
+        op: 'select', govde: {}, filtreler: [], kucuktur: [], tek: false,
       }
       const b = {
         select() { return b },
@@ -141,6 +147,7 @@ function sahteIstemci() {
         single() { durum.tek = true; return b },
         eq(k: string, v: unknown) { durum.filtreler.push([k, v]); return b },
         is(k: string, v: unknown) { durum.filtreler.push([k, v]); return b },
+        lt(k: string, v: string) { durum.kucuktur.push([k, v]); return b },
         update(g: Record<string, unknown>) { durum.op = 'update'; durum.govde = g; return b },
         delete() { durum.op = 'delete'; return b },
         // "Önce kaydet" sahiplenmesi: insert ... on conflict (event_id) do nothing returning.
@@ -163,12 +170,25 @@ function sahteIstemci() {
           if (durum.op === 'upsert') {
             if (olaylar.includes(id)) return { data: [], error: null } // çakışma: satır dönmez
             olaylar.push(id)
+            olayZamanlari.set(id, Date.parse(String(durum.govde.received_at)))
             return { data: [{ event_id: id }], error: null }
           }
           if (durum.op === 'select') {
             // Durum okuması: select('processed_at').eq('event_id', id).limit(1) → satır dizisi.
             if (olayOkumaHatasi) return { data: null, error: olayOkumaHatasi }
             return { data: olaylar.includes(id) ? [{ processed_at: tamamlananOlaylar.has(id) ? '2026-11-06T00:00:00.000Z' : null }] : [], error: null }
+          }
+          if (durum.op === 'update' && durum.kucuktur.length > 0) {
+            // Atomik devralma: update(received_at).eq(event_id).is(processed_at, null).lt(received_at, eşik).select() —
+            // yalnız satır VAR, processed_at NULL ve received_at eşikten ESKİyse güncellenir ve satır döner (compare-and-set).
+            if (devralmaHatasi) return { data: null, error: devralmaHatasi }
+            const esik = Date.parse(String(durum.kucuktur.find(([k]) => k === 'received_at')?.[1]))
+            const zaman = olayZamanlari.get(id) ?? Date.now()
+            const uygun = olaylar.includes(id) && !tamamlananOlaylar.has(id) && zaman < esik
+            if (!uygun) return { data: [], error: null }
+            olayZamanlari.set(id, Date.parse(String(durum.govde.received_at)))
+            devralmalar++
+            return { data: [{ event_id: id }], error: null }
           }
           if (durum.op === 'update') {
             // Olay kaydı: processed_at dolunca olay tamamlandı sayılır.
@@ -298,11 +318,14 @@ async function surenIslemdeIkinciTeslim(isleyici: Isleyici, olay: string, govde:
 }
 
 /** Sabotaj: süren işlem dalı sökülür; boş dönen upsert her durumda 200 duplicate'a düşer (R1 öncesi davranış). */
-const SUREN_ISLEM_DALI = /if \(!islendi\) \{/
+const SUREN_ISLEM_DALI = /const islendi = Array\.isArray\(mevcut\) && mevcut\[0\]\?\.processed_at != null/
+/** Sabotaj: atomik devralma sökülür; takılı (eski) satır hiçbir zaman devralınmaz, yeniden denemeler sonsuza dek 409 alır. */
+const DEVRALMA_DALI = /if \(!Array\.isArray\(devralinan\) \|\| devralinan\.length === 0\) \{/
 
 let olaySayaci = 0
 let yeni: Isleyici
 let surenDalsiz: Isleyici
+let devralmasiz: Isleyici
 let eski: Isleyici | null = null
 let eskiYuklenemedi = ''
 let kilitsiz: Isleyici | null = null
@@ -313,7 +336,9 @@ beforeAll(async () => {
   Object.assign(globalThis, { __sahteIstemci: sahteIstemci })
   yeni = await isleyiciYukle(nodeKopyasi('yeni', YENI))
   if (!SUREN_ISLEM_DALI.test(YENI)) throw new Error('sabotaj deseni eşleşmedi: süren işlem dalı bulunamadı')
-  surenDalsiz = await isleyiciYukle(nodeKopyasi('suren-dalsiz', YENI.replace(SUREN_ISLEM_DALI, 'if (false) {')))
+  surenDalsiz = await isleyiciYukle(nodeKopyasi('suren-dalsiz', YENI.replace(SUREN_ISLEM_DALI, 'const islendi = true')))
+  if (!DEVRALMA_DALI.test(YENI)) throw new Error('sabotaj deseni eşleşmedi: devralma dalı bulunamadı')
+  devralmasiz = await isleyiciYukle(nodeKopyasi('devralmasiz', YENI.replace(DEVRALMA_DALI, 'if (true) {')))
   try {
     eski = await isleyiciYukle(nodeKopyasi('kapisiz', kapiyiSok(YENI)))
   } catch (e) {
@@ -339,6 +364,9 @@ beforeEach(() => {
   tamamlananOlaylar = new Set<string>()
   olayOkumaHatasi = null
   okumaBariyeri = null
+  olayZamanlari = new Map<string, number>()
+  devralmaHatasi = null
+  devralmalar = 0
   zorlaHataKosul = null
   bildirimler = 0
   patchOncesi = null
@@ -838,6 +866,89 @@ describe('ALT-138 R1 · süren teslim (IN_FLIGHT) ile işlenmiş olay ayrımı',
     expect(r.json.error).toBe('Event state read failed')
     expect(r.json.duplicate).toBeUndefined()
     expect(olaylar).toContain('evt-okuma')
+    expect(patchlar).toHaveLength(0)
+  })
+
+  /** İlk teslimin izolatı ölmüş/bırakma başarısız: satır NULL kalmış ve `saniyeOnce` saniye önce alınmış. */
+  const takiliSatir = (olay: string, saniyeOnce: number) => {
+    olaylar.push(olay)
+    olayZamanlari.set(olay, Date.now() - saniyeOnce * 1000)
+  }
+  const GOVDE_TAKILI = { status: 'in_transit', tracking_number: 'TN-T' }
+
+  it('TAKILI SATIR: received_at eşikten eski ve processed_at NULL ise yeniden deneme sahipliği atomik devralır, olayı işler ve tamamlar (olay kaybolmaz)', async () => {
+    takiliSatir('evt-takili', 120)
+    const r = await cagir(yeni, GOVDE_TAKILI, { 'x-event-id': 'evt-takili' })
+    expect(r.http).toBe(200)
+    expect(r.json.duplicate).toBeUndefined()
+    expect(devralmalar).toBe(1)
+    expect(satir.status).toBe('shipped')
+    expect(satir.tracking_number).toBe('TN-T')
+    expect(tamamlananOlaylar.has('evt-takili')).toBe(true)
+    // received_at yenilendi: devralma sonrası satır artık taze.
+    expect(Date.now() - (olayZamanlari.get('evt-takili') ?? 0)).toBeLessThan(10_000)
+    // Tamamlanmış olayın tekrarı 200 duplicate, yazım yok.
+    const yazimlar = patchlar.length
+    const tekrar = await cagir(yeni, GOVDE_TAKILI, { 'x-event-id': 'evt-takili' })
+    expect(tekrar.http).toBe(200)
+    expect(tekrar.json.duplicate).toBe(true)
+    expect(patchlar).toHaveLength(yazimlar)
+  })
+
+  it('TAZE NULL satır (received_at eşik içinde) 409 IN_FLIGHT almaya devam eder; devralınmaz, received_at değişmez, sipariş yazılmaz', async () => {
+    takiliSatir('evt-taze', 60)
+    const onceki = olayZamanlari.get('evt-taze')
+    const r = await cagir(yeni, GOVDE_TAKILI, { 'x-event-id': 'evt-taze' })
+    expect(r.http).toBe(409)
+    expect(r.json.error).toBe('IN_FLIGHT')
+    expect(devralmalar).toBe(0)
+    expect(patchlar).toHaveLength(0)
+    expect(olayZamanlari.get('evt-taze')).toBe(onceki)
+    expect(olaylar).toContain('evt-taze')
+  })
+
+  it('SABOTAJ: devralma sökülünce takılı satır sonsuza dek 409 alır, olay işlenmez (TAKILI SATIR testi kırmızıyı görüyor)', async () => {
+    takiliSatir('evt-takili-sabotaj', 120)
+    const r = await cagir(devralmasiz, GOVDE_TAKILI, { 'x-event-id': 'evt-takili-sabotaj' })
+    expect(r.http).toBe(409)
+    expect(r.json.error).toBe('IN_FLIGHT')
+    expect(patchlar).toHaveLength(0)
+    expect(tamamlananOlaylar.has('evt-takili-sabotaj')).toBe(false)
+  })
+
+  it('iki yeniden deneme takılı satırı aynı anda devralmaya kalkarsa yalnız biri alır; diğeri 409 (taze received_at), çift işlenmez', async () => {
+    takiliSatir('evt-devral-yaris', 120)
+    const r = await surenIslemdeIkinciTeslim(yeni, 'evt-devral-yaris', GOVDE_TAKILI)
+    expect(r.ikinci.http).toBe(409)
+    expect(r.ikinci.json.error).toBe('IN_FLIGHT')
+    expect(r.yazimIken).toBe(0)
+    expect(r.ilk.http).toBe(200)
+    expect(devralmalar).toBe(1)
+    expect(satir.status).toBe('shipped')
+  })
+
+  it('devralınan teslim de sahiplik bırakma kancasını taşır: devralma sonrası işlem hata verirse satır bırakılır, sonraki deneme işler', async () => {
+    takiliSatir('evt-devral-hata', 120)
+    zorlaHata = { code: '08006', message: 'connection failure' }
+    const ilk = await cagir(yeni, GOVDE_TAKILI, { 'x-event-id': 'evt-devral-hata' })
+    expect(ilk.http).toBe(500)
+    expect(devralmalar).toBe(1)
+    expect(olaylar).not.toContain('evt-devral-hata')
+    zorlaHata = null
+    const tekrar = await cagir(yeni, GOVDE_TAKILI, { 'x-event-id': 'evt-devral-hata' })
+    expect(tekrar.http).toBe(200)
+    expect(tekrar.json.duplicate).toBeUndefined()
+    expect(satir.status).toBe('shipped')
+    expect(tamamlananOlaylar.has('evt-devral-hata')).toBe(true)
+  })
+
+  it('FAIL-CLOSED: devralma güncellemesi hata verirse 500 (sessiz 409/200 yok), satır silinmez, sipariş yazılmaz', async () => {
+    takiliSatir('evt-devral-okuma', 120)
+    devralmaHatasi = { message: 'baglanti koptu' }
+    const r = await cagir(yeni, GOVDE_TAKILI, { 'x-event-id': 'evt-devral-okuma' })
+    expect(r.http).toBe(500)
+    expect(r.json.error).toBe('Event takeover failed')
+    expect(olaylar).toContain('evt-devral-okuma')
     expect(patchlar).toHaveLength(0)
   })
 })

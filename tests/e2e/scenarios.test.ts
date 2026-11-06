@@ -226,11 +226,15 @@ class WebhookMockDb {
     const filters: Array<[string, unknown]> = []
     // `.is(col, null)` PostgREST'te IS NULL demektir: alanı hiç yazılmamış (undefined) satır da eşleşir.
     const nullFilters: string[] = []
+    // `.lt(col, val)` PostgREST'te col < val (webhooks.test.ts ile aynı): ISO metinleri sözlük sırasıyla; NULL alan eşleşmez.
+    const ltFilters: Array<[string, string]> = []
     let limitVal = 0
     let patchObject: Record<string, unknown> | null = null
     let deleteMode = false
     const eslesir = (r: Record<string, unknown>) =>
-      filters.every(([c, v]) => r[c] === v) && nullFilters.every((c) => r[c] == null)
+      filters.every(([c, v]) => r[c] === v) &&
+      nullFilters.every((c) => r[c] == null) &&
+      ltFilters.every(([c, v]) => typeof r[c] === 'string' && (r[c] as string) < v)
 
     const chain = {
       select: (fields: string = '*') => {
@@ -243,6 +247,10 @@ class WebhookMockDb {
       is: (col: string, val: null) => {
         if (val !== null) throw new Error('WebhookMockDb.is yalnız null destekler')
         nullFilters.push(col)
+        return chain
+      },
+      lt: (col: string, val: string) => {
+        ltFilters.push([col, val])
         return chain
       },
       delete: () => {

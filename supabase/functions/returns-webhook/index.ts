@@ -62,6 +62,15 @@ const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 // aynı zaman damgasıyla yeniden denerse pencere dışında 401 alır ve olay yine kaybolur.
 const IN_FLIGHT_RETRY_AFTER_S = 30
 
+// Takılı sahipliğin devralınma eşiği (sn): `processed_at` NULL ve `received_at` bundan eskiyse ilk teslim ölmüş sayılır
+// (izolat olayKaydet'ten önce öldü ya da sahipliği bırakan delete hata verdi) ve yeniden deneme sahipliği atomik devralır.
+// Aksi halde satır sonsuza dek NULL kalır, her yeniden deneme 409 alır ve 5 dk sonra 401 Stale ile olay kaybolurdu.
+// 90 sn: ilk teslimin en kötü işlem süresinin (iade okuma/yazma + en iyi çabayla bildirim zinciri; normalde saniyeler)
+// üstünde, yoksa canlı bir işlem çalınır; SKEW_MS'in (5 dk) altında, yoksa devralacak yeniden deneme zaman penceresini
+// kaçırır. Retry-After (30 sn) ile tutarlı: 30. ve 60. sn'deki denemeler 409 alır, 90. sn'den sonrakiler devralır.
+// Yine de iki işlem üst üste binerse iade yazımı okunan duruma bağlı (monoton) olduğu için çift yazım zarar vermez.
+const DEVRALMA_S = 90
+
 // Olay sahipliği (ALT-138 "önce kaydet"): işlem başarısız biterse (4xx/5xx; 409 çakışma dahil) sahiplenilen
 // olay satırı bırakılır, böylece kargo firmasının yeniden denemesi "tekrar" sanılıp yutulmaz.
 type Sahiplik = { birak: (() => Promise<void>) | null }
@@ -156,14 +165,27 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
         // Fail-closed: durum okunamıyorsa sessiz 200 yok (olay kaybolurdu); 5xx kargo firmasını yeniden denetir.
         if (okumaHata) return json({ error: 'Event state read failed' }, { status: 500 })
         const islendi = Array.isArray(mevcut) && mevcut[0]?.processed_at != null
-        // Satır hiç dönmediyse (ilk teslim arada sahipliği bıraktı) da buraya düşer: yeniden deneme sahipliği alır.
-        if (!islendi) {
+        if (islendi) return json({ ok: true, event_id: eventId, duplicate: true })
+        // Sürüyor ya da takıldı. ATOMİK DEVRALMA: yalnız processed_at hâlâ NULL VE received_at eşikten eskiyse satırın
+        // received_at'i yenilenir (compare-and-set); eşzamanlı iki yeniden denemeden yalnız biri satır döndürür.
+        const simdi = Date.now()
+        const { data: devralinan, error: devralmaHata } = await supabase
+          .from('returns_webhook_events')
+          .update({ received_at: new Date(simdi).toISOString() })
+          .eq('event_id', eventId)
+          .is('processed_at', null)
+          .lt('received_at', new Date(simdi - DEVRALMA_S * 1000).toISOString())
+          .select('event_id')
+        if (devralmaHata) return json({ error: 'Event takeover failed' }, { status: 500 })
+        // Satır dönmediyse: ilk teslim taze (süren işlem) ya da satır hiç yok (ilk teslim arada sahipliği bıraktı);
+        // her iki durumda 409, yeniden deneme normal akışla sahipliği alır ya da devralır.
+        if (!Array.isArray(devralinan) || devralinan.length === 0) {
           return json(
             { error: 'IN_FLIGHT', event_id: eventId, retry_after_s: IN_FLIGHT_RETRY_AFTER_S },
             { status: 409, headers: { 'Retry-After': String(IN_FLIGHT_RETRY_AFTER_S) } },
           )
         }
-        return json({ ok: true, event_id: eventId, duplicate: true })
+        // Devralındı: sahiplik bu teslimde; aşağıda bırakma kancası kurulur ve normal işleme devam edilir.
       }
       sahiplik.birak = async () => {
         await supabase.from('returns_webhook_events').delete().eq('event_id', eventId).is('processed_at', null)

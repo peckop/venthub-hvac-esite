@@ -19,11 +19,15 @@ class WebhookMockDb {
     const filters: Array<[string, unknown]> = []
     // `.is(col, null)` PostgREST'te IS NULL demektir: alanı hiç yazılmamış (undefined) satır da eşleşir.
     const nullFilters: string[] = []
+    // `.lt(col, val)` PostgREST'te col < val: ISO-8601 metinleri sözlük sırasıyla karşılaştırılır; alanı olmayan (NULL) satır eşleşmez.
+    const ltFilters: Array<[string, string]> = []
     let limitVal = 0
     let patchObject: Record<string, unknown> | null = null
     let deleteMode = false
     const eslesir = (r: Record<string, unknown>) =>
-      filters.every(([c, v]) => r[c] === v) && nullFilters.every((c) => r[c] == null)
+      filters.every(([c, v]) => r[c] === v) &&
+      nullFilters.every((c) => r[c] == null) &&
+      ltFilters.every(([c, v]) => typeof r[c] === 'string' && (r[c] as string) < v)
 
     const chain = {
       select: (fields: string = '*') => {
@@ -36,6 +40,10 @@ class WebhookMockDb {
       is: (col: string, val: null) => {
         if (val !== null) throw new Error('WebhookMockDb.is yalnız null destekler')
         nullFilters.push(col)
+        return chain
+      },
+      lt: (col: string, val: string) => {
+        ltFilters.push([col, val])
         return chain
       },
       delete: () => {
@@ -528,7 +536,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
   it('12. should answer 409 IN_FLIGHT with Retry-After when the same event is still being processed (processed_at NULL), and leave the first delivery\'s claim untouched', async () => {
     mockDbInstance.orders.push({ id: 'order-inflight', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-INFLIGHT' })
     // İlk teslim sahipliği aldı ama henüz bitmedi: satır var, processed_at boş.
-    mockDbInstance.events.push({ event_id: 'EV-INFLIGHT', processed_at: null })
+    mockDbInstance.events.push({ event_id: 'EV-INFLIGHT', processed_at: null, received_at: new Date().toISOString() })
 
     const teslim = await teslimHazirla('EV-INFLIGHT', { order_number: 'ORD-INFLIGHT', status: 'shipped' })
     const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
@@ -551,7 +559,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
   it('13. should answer 200 duplicate for the retry once the first delivery has finished (processed_at filled), without a second write', async () => {
     mockDbInstance.orders.push({ id: 'order-bitti', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-BITTI' })
-    mockDbInstance.events.push({ event_id: 'EV-BITTI', processed_at: null })
+    mockDbInstance.events.push({ event_id: 'EV-BITTI', processed_at: null, received_at: new Date().toISOString() })
 
     const teslim = await teslimHazirla('EV-BITTI', { order_number: 'ORD-BITTI', status: 'shipped' })
     expect((await simulator.invokeFunction(webhookFunctionPath, teslim())).status).toBe(409)
@@ -568,7 +576,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
   it('14. should process the retry when the first delivery failed and released its claim after a 409 (event is not lost)', async () => {
     mockDbInstance.orders.push({ id: 'order-kayip', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-KAYIP', carrier: null, tracking_number: null })
-    mockDbInstance.events.push({ event_id: 'EV-KAYIP', processed_at: null })
+    mockDbInstance.events.push({ event_id: 'EV-KAYIP', processed_at: null, received_at: new Date().toISOString() })
 
     const teslim = await teslimHazirla('EV-KAYIP', { order_number: 'ORD-KAYIP', status: 'shipped', carrier: 'dhl', tracking_number: 'DHL-KAYIP' })
     expect((await simulator.invokeFunction(webhookFunctionPath, teslim())).status).toBe(409)
@@ -588,7 +596,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
 
   it('15. should fail closed with 5xx (never a silent 200) when the event state cannot be read', async () => {
     mockDbInstance.orders.push({ id: 'order-okuma', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-OKUMA' })
-    mockDbInstance.events.push({ event_id: 'EV-OKUMA', processed_at: null })
+    mockDbInstance.events.push({ event_id: 'EV-OKUMA', processed_at: null, received_at: new Date().toISOString() })
 
     const teslim = await teslimHazirla('EV-OKUMA', { order_number: 'ORD-OKUMA', status: 'shipped' })
 
@@ -636,5 +644,78 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const ucuncu = await simulator.invokeFunction(webhookFunctionPath, teslim())
     expect(ucuncu.status).toBe(200)
     expect((await ucuncu.json()).duplicate).toBe(true)
+  })
+
+  // ─── ALT-138 R1 ek: TAKILI satırın atomik devralınması (izolat ölürse ya da bırakma başarısız olursa olay kaybolmaz) ───
+  // processed_at NULL satır `received_at` eşiğinden (DEVRALMA_S = 90 sn) ESKİyse yeniden deneme sahipliği compare-and-set ile
+  // devralır; taze satır 409 almaya devam eder. Sabotaj kolu (devralma sökülünce kırmızı): kargo/iade conformance testlerinde.
+
+  const saniyeOnce = (sn: number) => new Date(Date.now() - sn * 1000).toISOString()
+
+  it('17. should take over a stuck claim (processed_at NULL, received_at older than the takeover threshold), process the event and mark it done', async () => {
+    mockDbInstance.orders.push({ id: 'order-takili', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-TAKILI', carrier: null, tracking_number: null })
+    const eskiZaman = saniyeOnce(600)
+    mockDbInstance.events.push({ event_id: 'EV-TAKILI', processed_at: null, received_at: eskiZaman })
+
+    const teslim = await teslimHazirla('EV-TAKILI', { order_number: 'ORD-TAKILI', status: 'shipped', carrier: 'dhl', tracking_number: 'DHL-TAKILI' })
+    const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+
+    expect(res.status).toBe(200)
+    expect((await res.json()).duplicate).toBeUndefined()
+    expect(mockDbInstance.orders[0].status).toBe('shipped')
+    expect(mockDbInstance.orders[0].tracking_number).toBe('DHL-TAKILI')
+    expect(olayKayitlari()).toHaveLength(1)
+    expect(olayKayitlari()[0].processed_at).toBeTruthy()
+    // Devralma received_at'i yeniledi (compare-and-set güncellemesi).
+    expect(String((olayKayitlari()[0] as { received_at?: string }).received_at) > eskiZaman).toBe(true)
+
+    const tekrar = await simulator.invokeFunction(webhookFunctionPath, teslim())
+    expect(tekrar.status).toBe(200)
+    expect((await tekrar.json()).duplicate).toBe(true)
+  })
+
+  it('18. should keep answering 409 IN_FLIGHT for a fresh NULL claim (received_at inside the takeover threshold) and not touch it', async () => {
+    mockDbInstance.orders.push({ id: 'order-taze', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-TAZE' })
+    const tazeZaman = saniyeOnce(60)
+    mockDbInstance.events.push({ event_id: 'EV-TAZE', processed_at: null, received_at: tazeZaman })
+
+    const teslim = await teslimHazirla('EV-TAZE', { order_number: 'ORD-TAZE', status: 'shipped' })
+    const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+
+    expect(res.status).toBe(409)
+    expect((await res.json()).error).toBe('IN_FLIGHT')
+    expect(mockDbInstance.orders[0].status).toBe('confirmed')
+    expect(olayKayitlari()).toHaveLength(1)
+    expect((olayKayitlari()[0] as { received_at?: string }).received_at).toBe(tazeZaman)
+    expect(olayKayitlari()[0].processed_at).toBeNull()
+  })
+
+  it('19. should fail closed with 5xx when the takeover update itself errors (no silent 409/200, claim row kept)', async () => {
+    mockDbInstance.orders.push({ id: 'order-devralma-hata', status: 'confirmed', payment_status: 'paid', order_number: 'ORD-DEVRALMA' })
+    mockDbInstance.events.push({ event_id: 'EV-DEVRALMA', processed_at: null, received_at: saniyeOnce(600) })
+
+    const teslim = await teslimHazirla('EV-DEVRALMA', { order_number: 'ORD-DEVRALMA', status: 'shipped' })
+
+    // Yalnız olay tablosunda update(...).eq().is().lt().select() zinciri (devralma) hata verir; claim upsert'i ve okuma etkilenmez.
+    const originalFrom = mockDbInstance.from.bind(mockDbInstance)
+    mockDbInstance.from = (table: string) => {
+      const chain = originalFrom(table)
+      if (table === 'shipping_webhook_events') {
+        ;(chain as { update: unknown }).update = () => ({
+          eq: () => ({ is: () => ({ lt: () => ({ select: async () => ({ data: null, error: { message: 'baglanti koptu' } }) }) }) })
+        })
+      }
+      return chain
+    }
+
+    try {
+      const res = await simulator.invokeFunction(webhookFunctionPath, teslim())
+      expect(res.status).toBe(500)
+      expect((await res.json()).error).toBe('Event takeover failed')
+      expect(mockDbInstance.orders[0].status).toBe('confirmed')
+      expect(olayKayitlari()).toHaveLength(1)
+    } finally {
+      mockDbInstance.from = originalFrom
+    }
   })
 })
