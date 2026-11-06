@@ -382,7 +382,9 @@ function degerlendir(girdi) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** İnceleme yorumundaki bulgu işareti: "DÜZELTME GEREKİR" ya da satır başında MEDIUM/HIGH başlığı. */
-const BULGU_ISARETI = /D[ÜUüu]ZELTME GEREK[İIiı]R|ENGELLEY[İIiı]C[İIiı]-VAR/i
+const BULGU_ISARETI = /D[ÜUüu]ZELTME GEREK[İIiı]R/i
+/** Denetçi sözlüğü: ENGELLEYİCİ-VAR yalnız satır başında bulgudur (hüküm yorumu cümle içinde andığında tetiklemesin). */
+const ENGELLEYICI_VAR = /^[\s>*#|\-\d.)[(]*\**\s*ENGELLEY[İIiı]C[İIiı]-VAR/i
 /** Satır başında (liste/numara/köşeli parantez/tablo/kalın süsünden sonra) MEDIUM ya da HIGH; ya da "Bulgu 1 (HIGH)". */
 const SIDDET_BASLIGI = /^[\s>*#|\-\d.)[(]*\**\s*(MEDIUM|HIGH)\b|^[^.\n]{0,30}\((MEDIUM|HIGH)\)/
 /** "yok / bulunmadı / 0" geçen şiddet satırı bulgu değildir ("HIGH: yok", "MEDIUM/HIGH bulgu yok"). */
@@ -397,7 +399,7 @@ const KAPANIS_ISARETI = /^[\s>*#-]*(?:[İIiı]NCELEME KAPAND[İIiı]|B[UuÜüİI
 function bulguVarMi(govde) {
   const metin = String(govde || '').normalize('NFC').replace(/ /g, ' ')
   if (BULGU_ISARETI.test(metin)) return true
-  return metin.split(/\r?\n/).some((s) => SIDDET_BASLIGI.test(s) && !OLUMSUZ.test(s))
+  return metin.split(/\r?\n/).some((s) => ENGELLEYICI_VAR.test(s) || (SIDDET_BASLIGI.test(s) && !OLUMSUZ.test(s)))
 }
 
 /**

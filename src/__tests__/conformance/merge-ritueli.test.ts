@@ -480,7 +480,7 @@ describe('INV-RITUEL-4 · Edge functions ve açık inceleme bulgusu (ARC-259, OP
     for (const g of ['ENGELLEYİCİ-VAR: kapı gevşiyor', 'Engelleyici-var: x', '1. MEDIUM — origin', '1) HIGH x', '[MEDIUM] x', '| MEDIUM | x |', '**Bulgu 1 (HIGH):** x', 'düzeltme gerekir', 'DÜZELTME GEREKİR', 'DÜZELTME GEREKİR']) {
       expect(acik(g), g).toBe(true)
     }
-    for (const g of ['HIGH: yok', 'MEDIUM/HIGH bulgu yok', 'MEDIUM bulunmadı', 'ENGELLEYİCİ-YOK', 'should-fix: 2 nit']) {
+    for (const g of ['HIGH: yok', 'MEDIUM/HIGH bulgu yok', 'MEDIUM bulunmadı', 'ENGELLEYİCİ-YOK', 'should-fix: 2 nit', 'Denetçi sözlüğü `ENGELLEYİCİ-VAR` tanınmıyordu, giderildi']) {
       expect(acik(g), g).toBe(false)
     }
   })
