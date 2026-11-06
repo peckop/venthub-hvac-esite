@@ -5,7 +5,9 @@
  * Kök sebep: @wrongstack/kanban resolveProjectPath mutlak yolu kök kontrolünden önce reddeder (1.0.26, 1.0.36, 1.0.37).
  */
 import { spawnSync } from 'node:child_process'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -79,6 +81,37 @@ describe('INV-KANBAN-KANIT-YOLU-1', () => {
     expect(reddedilir({ action: 'add_check', checkType: 'command', checkNotes: komut, command: komut })).toBe(false)
     expect(reddedilir({ action: 'add_check', checkType: 'manual', checkNotes: 'kanıt notu', command: '' })).toBe(false)
     expect(reddedilir({ action: 'add_note', command: komut })).toBe(false)
+  })
+
+  it('ARC-261: file_matches deseni 64K kırpmanın ötesindeyse reddedilir, başta/yok/okunamaz ise geçer', () => {
+    const dizin = mkdtempSync(path.join(tmpdir(), 'kirpma-'))
+    const eski = process.env.CLAUDE_PROJECT_DIR
+    process.env.CLAUDE_PROJECT_DIR = dizin
+    try {
+      const SINIR = 65536
+      const dolgu = (n: number) => 'x'.repeat(n)
+      writeFileSync(path.join(dizin, 'buyuk.md'), 'BASLIK-ILK\n' + dolgu(SINIR + 100) + '\nKUYRUK-SON\n')
+      writeFileSync(path.join(dizin, 'sinirda.md'), dolgu(SINIR - 4) + 'SINIR') // "SINIR" 65532'de başlar, 65536'da kesilir
+      writeFileSync(path.join(dizin, 'tam-sinir.md'), dolgu(SINIR - 5) + 'SINIR') // son harf 65536. karakter: içeride
+      writeFileSync(path.join(dizin, 'kucuk.md'), 'KUYRUK-SON')
+      const fm = (file: string, pattern: string) =>
+        reddedilir({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file, pattern }) })
+      expect(fm('buyuk.md', 'KUYRUK-SON')).toBe(true)
+      expect(fm('buyuk.md', 'BASLIK-ILK')).toBe(false)
+      expect(fm('buyuk.md', 'HIC-YOK')).toBe(false)
+      expect(fm('sinirda.md', 'SINIR')).toBe(true)
+      expect(fm('tam-sinir.md', 'SINIR')).toBe(false)
+      expect(fm('kucuk.md', 'KUYRUK-SON')).toBe(false)
+      expect(fm('yok.md', 'x')).toBe(false)
+      expect(fm('buyuk.md', '(bozuk')).toBe(false)
+      const m = k.incele(cagri({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file: 'buyuk.md', pattern: 'KUYRUK-SON' }) })) ?? ''
+      expect(m).toContain('65536')
+      expect(m).toContain('buyuk.md')
+    } finally {
+      if (eski === undefined) delete process.env.CLAUDE_PROJECT_DIR
+      else process.env.CLAUDE_PROJECT_DIR = eski
+      rmSync(dizin, { recursive: true, force: true })
+    }
   })
 
   it('reddetme metni üç çalışan yolu ve sebebi söyler', () => {

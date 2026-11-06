@@ -215,6 +215,29 @@ function kanitYolu(girdi) {
   }
 }
 
+// ARC-261 (BLG-19): file_matches içeriği ilk 65536 karaktere kırpar (@wrongstack/primitives capSubject); kırpılan kısımdaki desen
+// "bulunamadı" verir. Desen tam dosyada var ama kırpılmış kısımda yoksa kart bugün kabul eder, Done'da patlar.
+const KIRPMA_SINIRI = 65536
+
+/** file_matches deseni kırpılmış içerikte yok ama tam dosyada var → sebep; ölçülemezse (dosya/desen okunamaz) null (fail-open). */
+function kirpmaSorunu(g, yol) {
+  try {
+    const j = JSON.parse(String(g.checkNotes || g.checkDescription || ''))
+    if (!j || typeof j.pattern !== 'string' || !j.pattern) return null
+    const taban = process.env.CLAUDE_PROJECT_DIR || process.cwd()
+    const tam = fs.readFileSync(path.resolve(taban, yol), 'utf8')
+    if (tam.length <= KIRPMA_SINIRI) return null
+    const re = new RegExp(j.pattern)
+    if (re.test(tam.slice(0, KIRPMA_SINIRI)) || !re.test(tam)) return null
+    return (
+      'file_matches "' + yol + '" deseni dosyanın ilk ' + KIRPMA_SINIRI + ' karakterinde YOK, sonrasında var: doğrulayıcı içeriği kırpar ve "bulunamadı" verir. ' +
+      'Deseni dosya başında geçen bir metne bağla (örn. başlık satırı) ya da hedef metni dosyanın başına taşı. ' + GECERLI_BICIMLER
+    )
+  } catch {
+    return null
+  }
+}
+
 /** hook girdisi → reddetme sebebi ya da null. `ekler` testte izin listesini sabitler. */
 function incele(hookGirdisi, ekler) {
   if (!hookGirdisi || hookGirdisi.tool_name !== ARAC) return null
@@ -243,7 +266,7 @@ function incele(hookGirdisi, ekler) {
   if (!DOSYA_TIPLERI.has(g.checkType)) return null
   const yol = kanitYolu(g)
   const sorun = yolSorunu(yol)
-  if (!sorun) return null
+  if (!sorun) return g.checkType === 'file_matches' ? kirpmaSorunu(g, yol) : null
   return (
     g.checkType +
     ' kanıtı "' +
@@ -283,5 +306,5 @@ function main() {
   process.exit(0)
 }
 
-module.exports = { incele, yolSorunu, kanitYolu, komutSorunu, izinEkleriniOku, izinKumesi, ENGELLI, SHELL_OPERATOR_RE, ENV_EXPANSION_RE }
+module.exports = { incele, kirpmaSorunu, KIRPMA_SINIRI, yolSorunu, kanitYolu, komutSorunu, izinEkleriniOku, izinKumesi, ENGELLI, SHELL_OPERATOR_RE, ENV_EXPANSION_RE }
 if (require.main === module) main()
