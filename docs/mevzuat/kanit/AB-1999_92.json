@@ -25,6 +25,21 @@
       "durum_satiri": "Türk yönetmeliğinin BİRİNCİ BÖLÜM Dayanak maddesinden birebir alıntı; EU direktifinin varlığını ve kabul tarihini ikincil resmi kaynaktan doğruluyor.",
       "alinti": "16/12/1999 tarihli ve 1999/92/EC sayılı Avrupa Parlamentosu ve Konseyi Direktifine paralel olarak",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/31999L0092",
+      "son_url": "http://publications.europa.eu/resource/celex/31999L0092",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-06",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (curl/Accept text/html, Accept-Language eng)",
+      "durum_satiri": "Yayın Ofisi veri servisi EUR-Lex \"In force\" satırını vermez; durum değişiklik zincirinden (Yayın Ofisi SPARQL) çıkarıldı. Önceki kanıtta sha256 yoktu: bu değer İLK TABANdır, sonraki kontrol aynı yöntemle yeniden hesaplanmalı.",
+      "sha256_ilk12": "6ea2ad51c9d1",
+      "sha256_normalizasyon": "betik/stil atılmış, etiketler soyulmuş, boşluk tekil, NFC; OJ dosya adı başlığı metinde kalır",
+      "alinti": "",
+      "alinti_dogrulandi": false
     }
   ]
 }

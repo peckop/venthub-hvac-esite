@@ -25,6 +25,21 @@
       "durum_satiri": "Recital metni; havalandırma üniteleri ada bağlı olarak bu listede açıkça yok.",
       "alinti": "In its first working plan, the Commission should prioritise iron, steel, aluminium, textiles, in particular garments and footwear, furniture, including mattresses, tyres, detergents, paints, lubricants, chemicals, information and communication technology products and other electronics, and energy-related products for which ecodesign requirements are to be set for the first time or for which existing measures adopted pursu[ant to Directive 2009/125/EC need review]",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32024R1781",
+      "son_url": "http://publications.europa.eu/resource/celex/32024R1781",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-06",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (curl/Accept application/xhtml+xml, Accept-Language eng)",
+      "durum_satiri": "Yayın Ofisi veri servisi EUR-Lex \"In force\" satırını vermez; durum değişiklik zincirinden (Yayın Ofisi SPARQL) çıkarıldı. Önceki kanıtta sha256 yoktu: bu değer İLK TABANdır, sonraki kontrol aynı yöntemle yeniden hesaplanmalı.",
+      "sha256_ilk12": "99fdabeb7367",
+      "sha256_normalizasyon": "betik/stil atılmış, etiketler soyulmuş, boşluk tekil, NFC; OJ dosya adı başlığı metinde kalır",
+      "alinti": "",
+      "alinti_dogrulandi": false
     }
   ]
 }
