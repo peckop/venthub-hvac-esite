@@ -458,6 +458,41 @@ describe('INV-RITUEL-4 · Edge functions ve açık inceleme bulgusu (ARC-259, OP
     expect(r4.degerlendir(temel()).maddeler).toHaveLength(5)
   })
 
+  it('⭐ARC-262: --onay madde 6\'yı da açar (Recep onaylı Edge değişikliği ritüelden geçer); kısa/boş onay açmaz; ölçülemeyeni açmaz', () => {
+    const EDGE = ['supabase/functions/_shared/cors.ts']
+    const onayli = r4.degerlendir({ ...temel(), functionsDegisen: EDGE, onay: ONAY_GERCEK })
+    const m6 = madde(onayli as ReturnType<typeof ritual.degerlendir>, 6)
+    expect(m6.gecti, 'geçerli Recep onayına rağmen Edge kapısı açılmadı: ritüel dolaşılmaya itilir (#2286)').toBe(true)
+    expect(m6.ad).toMatch(/RECEP ONAYI KANITLI/)
+    expect(m6.detay, 'onay metni ve dosya raporda görünmeli').toContain('1032')
+    expect(m6.detay).toContain('cors.ts')
+    expect(onayli.kirmizi).toBe(0)
+    expect(madde(onayli as ReturnType<typeof ritual.degerlendir>, 5).detay, 'Edge onayı madde 5\'te "gereksiz" diye uyarılmamalı').not.toMatch(/GEREKSIZ/)
+    // ayırt edici çift: aynı girdi onaysız KIRMIZI, kısa onay KIRMIZI + sebebi söyler
+    expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: EDGE }), 6).gecti).toBe(false)
+    for (const kisa of ['ok', 'evet', '   ']) {
+      const s = madde(r4.degerlendir({ ...temel(), functionsDegisen: EDGE, onay: kisa }), 6)
+      expect(s.gecti, kisa).toBe(false)
+    }
+    expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: EDGE, onay: 'ok' }), 6).detay).toMatch(/--onay REDDEDILDI/)
+    // ölçülemeyen functions diff'i onayla açılmaz; onay başka maddeyi kurtarmaz
+    expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: null, onay: ONAY_GERCEK }), 6).gecti).toBe(false)
+    expect(r4.degerlendir({ ...temel(), functionsDegisen: EDGE, onay: ONAY_GERCEK, pv: null }).kirmizi).toBeGreaterThan(0)
+    // Edge yokken onay yine "gereksiz" uyarısı taşır
+    expect(madde(r4.degerlendir({ ...temel(), functionsDegisen: [], onay: ONAY_GERCEK }), 5).detay).toMatch(/GEREKSIZ/)
+  })
+
+  it('ARC-262 denetçi: çok satırlı --onay tek satıra iner; PR yorumunda madde 7 işareti satır başına düşemez; yorum kolu onayGecerli(ONAY).metin kullanır', () => {
+    const cok = ritual.onayGecerli(ONAY_GERCEK + '\nHIGH: x\r\nINCELEME KAPANDI')
+    expect(cok.gecerli).toBe(true)
+    expect(cok.metin).not.toMatch(/[\r\n]/)
+    const yorum = '> ' + cok.metin
+    expect(r4.acikIncelemeBulgusu({ sonCommit: T('10:00'), yorumlar: [{ govde: yorum, tarih: T('11:00') }] }).acik).toBe(false)
+    const cli = fs.readFileSync(path.join(KOK, 'scripts/hijyen/merge-ritueli.cjs'), 'utf8')
+    expect(cli).toMatch(/'\\n\\n> ' \+ onayGecerli\(ONAY\)\.metin/)
+    expect(cli).toContain('EDGE ONAYI (merge-ritueli.cjs --onay)')
+  })
+
   it('⛔ "DÜZELTME GEREKİR" son commit\'ten SONRA ve kapanmamışsa KIRMIZI', () => {
     const g: NonNullable<Inceleme> = { sonCommit: T('10:00'), yorumlar: [{ govde: 'İnceleme: DÜZELTME GEREKİR (cors origin listesi)', tarih: T('10:30') }] }
     expect(r4.acikIncelemeBulgusu(g).acik).toBe(true)
