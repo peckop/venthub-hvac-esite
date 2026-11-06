@@ -25,17 +25,27 @@ function getEmailConfig() {
   return { to, supabaseUrl, serviceKey };
 }
 
+/**
+ * Slack mrkdwn kaçışı: yalnız `&`, `<`, `>` (Slack'in belgelediği üç karakter; sıra önemli, önce `&`).
+ * NİÇİN (güvenlik incelemesi 2026-11-03 takibi, OPS-213): Slack `<https://x|metin>` ve `<!channel>`
+ * dizilerini bağlantı ve kanal çağrısı olarak işler. İstemci hata mesajı ya da sağlayıcı hata metni
+ * bu kanala gidiyor; kaçışsız hâlde dışarıdan gelen metin ekipteki herkese `@channel` bildirimi ya da
+ * gerçek görünen oltalama bağlantısı basabiliyordu. E-posta yolu düz metindir, kaçış orada uygulanmaz.
+ */
+export const slackKacir = (s: unknown): string =>
+  String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 async function sendSlack(text: string, fields?: NotifyField[]) {
   const url = getSlackWebhook();
   if (!url) return false;
-  
-  const payload: Record<string, unknown> = { text };
+
+  const payload: Record<string, unknown> = { text: slackKacir(text) };
   if (Array.isArray(fields) && fields.length > 0) {
     payload.attachments = [{
       color: '#e01e5a',
       fields: fields.map((f) => ({
-        title: String(f.title),
-        value: String(f.value),
+        title: slackKacir(f.title),
+        value: slackKacir(f.value),
         short: !!f.short,
       })),
     }];

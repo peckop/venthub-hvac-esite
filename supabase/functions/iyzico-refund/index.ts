@@ -45,6 +45,7 @@
 // Bekçi: INV-PAY-3.
 
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { claimRefund, fullCancelKey, settleRefund } from '../_shared/refund_guard.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
@@ -407,7 +408,7 @@ Deno.serve(async (req) => {
         fn: 'iyzico-refund',
         code: 'REFUND_PAID_BUT_ORDER_NOT_UPDATED',
         message: 'İyzico iadeyi ONAYLADI ama sipariş satırı güncellenemedi — elle mutabakat gerekiyor.',
-        extra: { order_id: orderId, attempt_id: attemptId, amount: targetAmount, detail: detail.slice(0, 300) },
+        extra: { order_id: orderId, attempt_id: attemptId, amount: targetAmount, detail: metniMaskele(detail, 300) },
       });
       return json({
         error: {
