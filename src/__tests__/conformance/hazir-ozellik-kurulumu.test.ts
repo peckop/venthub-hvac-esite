@@ -161,7 +161,7 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
     expect(roller.length).toBeGreaterThan(0)
   })
 
-  it('üretici bloklarıyla eşit: ortak metinler (tablo başlığı, yedi durum kelimesi, /compact kalıbı, Yarım iş satırı, iki aşamalı cümle) kaynaktaki yazımın AYNISI', () => {
+  it('üretici bloklarıyla eşit: ortak metinler (tablo başlığı, yedi durum kelimesi, Yarım iş satırı, otomatik compact talimatı) kaynaktaki yazımın AYNISI', () => {
     // Bu dosya docs/roller/*-kurallar.md bloklarının kısaltılmış kopyasıdır; üretici ya da kanca metni değişirse burası KIRMIZI olur.
     const kaynak = (yolu: string): string => lf(fs.readFileSync(path.join(kok, yolu), 'utf8')).replace(/\\'/g, "'")
     const uretici = kaynak(path.join('scripts', 'belge', 'rol-karti-uret.cjs'))
@@ -170,15 +170,13 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
     const ureticiParcalari = [
       '| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |',
       'Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti',
-      "/compact Recep'in son sözlerini aynen koru. Şunları koru: <numara (durum)>, ..., yarım işler (<kısa adlar>). Ayrıntı durum dosyamda. Araç çıktılarını ve eski ölçüm ayrıntılarını at.",
-      'hüküm "Şimdi compact yapabilirsin" ya da "X bitince söyleyeceğim"',
       'Yarım iş: yok — <kısa>',
       'Yarım iş: var — <ne>, <ne zaman güvenli>',
       '<DEPARTMAN ADI> işini bekliyor',
     ]
     const kancaParcalari = [
-      'Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir.',
-      'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz.',
+      'Yarim is: yok — <kisa>',
+      'Yarim is: var — <ne>, <ne zaman guvenli>',
     ]
     for (const p of ureticiParcalari) {
       expect(uretici.includes(p), `üretici (rol-karti-uret.cjs) bu metni artık taşımıyor: ${p}`).toBe(true)
@@ -186,7 +184,6 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
     }
     for (const p of kancaParcalari) {
       expect(kanca.includes(p), `kanca (baglam-doluluk.cjs) bu metni artık taşımıyor: ${p}`).toBe(true)
-      expect(kural.includes(p), `kural dosyası bu metni taşımıyor: ${p}`).toBe(true)
     }
   })
 

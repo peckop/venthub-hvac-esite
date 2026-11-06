@@ -114,8 +114,8 @@ const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') 
  *
  * Bağlam eşiğe gelince pencere hazırlığı elle kurmak zorunda kalıyordu: "durum dosyam güncel mi", "yarım iş var mı",
  * "/compact satırı nasıl". Üçü de deterministik: kanca durum dosyasının yaşını ve "Yarım iş" satırını zaten okuyor.
- * Bu bölüm hükmü (HAZIR / DEĞİL + nedeni) ve /compact metnini KANCA üretir; pencere yalnız DEĞİL ise durum dosyasını
- * günceller. Hüküm ölçütü kokpitteki `compactHazirlik` ile AYNI: durum dosyası ≤60 dk VE "Yarım iş yok".
+ * Bu bölüm hükmü (HAZIR / DEĞİL + nedeni) KANCA üretir; /compact metni yalnız kokpite gider (ARC-264: Recep'e verilmez,
+ * compact otomatiktir); pencere yalnız DEĞİL ise durum dosyasını günceller. Hüküm ölçütü kokpitteki `compactHazirlik` ile AYNI: durum dosyası ≤60 dk VE "Yarım iş yok".
  * Belirsizlik (satır yok, dosya yok) "HAZIR" demez. Metin dosya içeriğinden gelir ama yalnız kart numarası deseni
  * ve "Yarım iş" satırının ilk 120 karakteri alınır (keyfi dosya metni istem satırına taşınmaz).
  */
@@ -149,7 +149,7 @@ function compactIcerigi(metin) {
 }
 
 /**
- * Pencerenin yapıştıracağı /compact satırı; kalıp .claude/rules/filo-ortak.md "Compact" bölümüyle AYNI.
+ * Kokpit için /compact metni (Recep elle isterse); COMPACT YAKIN satırına artık GİRMEZ (ARC-264: compact otomatik).
  * Kart durumu (Sürüyor, Sırada...) dosyadan güvenle çıkmaz; metne yazılmaz, "ayrıntı durum dosyamda" der.
  */
 function compactMetni(icerik) {
@@ -177,10 +177,8 @@ function hazirlikHukmu(yasMs, yarimIs) {
 /** COMPACT YAKIN satırına eklenen hüküm cümlesi; hazirlik yoksa '' (eski davranış). */
 function hazirlikCumlesi(h) {
   if (!h || typeof h !== 'object' || typeof h.hazir !== 'boolean') return ''
-  if (h.hazir) {
-    return ' HAZIRLIK: HAZIR (' + h.neden + '). Recep icin /compact satiri kancadan hazir: ' + (h.compactMetni || '(uretilemedi)')
-  }
-  return ' HAZIRLIK: DEGIL (' + (h.neden || 'olculemedi') + '). Once durum dosyasini guncelle (sonuna "Yarim is: yok/var" satiri), sonra compact.'
+  if (h.hazir) return ' HAZIRLIK: HAZIR (' + h.neden + '). Durum dosyasi guncel; compact otomatik olur.'
+  return ' HAZIRLIK: DEGIL (' + (h.neden || 'olculemedi') + '). Once durum dosyasini guncelle (sonuna "Yarim is: yok/var" satiri), sonra isine devam et; compact otomatik olur.'
 }
 
 /**
@@ -259,33 +257,16 @@ function donusSatiri(sonuc, bildirilen) {
 }
 
 /**
- * COMPACT HAZIRLIK NOTU talimatı (Recep 09-29: "diğer pencerelerin compact açıklaması yaptığını görmedim,
- * bu önemli"). Kanca ve durum dosyası yazımı pencerelerde ÇALIŞIYOR ama Recep'e görünen tek cümle üretmiyordu;
- * yalnız Ops elle açıklıyordu. Bu satır eşik üstünde HER istemde gelir → not "bir kez" değil, compact
- * yapılana kadar her cevapta tekrarlanır. Biçim: recep.md §2b "Compact hazırlığı" (üç AYRI satır, tablo değil).
- *
- * ⚠BİÇİM (Recep 09-29, iki kez tekrarladı: "şıkları yanyana dizmişsin, alt alta olsun düz cümle gibi"):
- * üç madde TEK PARAGRAFTA yan yana ve `(a) (b) (c)` etiketiyle yazılınca okunmuyordu. Talimat artık
- * her maddenin AYRI SATIRDA, etiketsiz düz cümle olmasını söyler; eski etiketli sürüm geri gelmesin diye
- * kapı (hafiza-baglam-ve-belge-satiri.test.ts) etiketleri yasaklar.
+ * COMPACT OTOMATİK talimatı (ARC-264, OPS 11-06; Recep: her pencerede /compact satırını elle kopyalamaktan ve uzaktayken
+ * yapamamaktan şikâyetçi). Otomatik compact açık (CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=60 → 600k); uyarı 500k'de gelir ve araya
+ * 100k düşer. Bu satır Recep'e liste, /compact satırı ya da iki aşama cümlesi VERMEZ; pencereye tek iş söyler: durum dosyasını
+ * şimdi güncelle ve sonuna "Yarım iş" satırını yaz. Eski üç parçalı not (Recep 09-29, ARC-69) kalktı; geri gelmesin diye
+ * kapı (hafiza-baglam-ve-belge-satiri.test.ts) yasaklar. Metin .claude/rules/filo-ortak.md "Compact" bölümüyle aynı yönde olmalı.
  */
 const HAZIRLIK_NOTU =
-  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA UC PARCA yaz. " +
-  "Birinci parca UC MADDELIK LISTE; her madde '- ' ile baslayan " +
-  'ayri bir satir ve tam cumle, yan yana tek paragraf YOK, harfli ya da numarali etiket YOK. ' +
-  'Birinci madde: durum dosyam guncel mi (dosya adi + saat). ' +
-  'Ikinci madde: yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir). ' +
-  "Ucuncu madde: hukum, 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
-  // ARC-69 (OPS 10-09): rol kurallarında şart olan satır kancada yoktu; pencere her istemde kancayı görüyor,
-  // kurallar dosyasını görmüyor. Metin .claude/rules/filo-ortak.md "Compact" bölümündeki kalıpla AYNI olmalı.
-  "Ikinci parca, listenin altinda, uc ters tirnakla acilan TEK KOD BLOGU icinde Recep'in kopyalayip yapistiracagi su /compact satiri: " +
-  "/compact Recep'in son sozlerini aynen koru. Sunlari koru: <numara (durum)>, ..., yarim isler (<kisa adlar>). " +
-  'Ayrinti durum dosyamda. Arac ciktilarini ve eski olcum ayrintilarini at. ' +
-  'Durumu cumleye KOPYALAMA, ayrinti durum dosyasinda durur; durum dosyan guncel degilse bu satiri vermeden ONCE onu yaz. ' +
-  "Ucuncu parca, en altta, Recep'e su tek cumle: " +
-  '"Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. ' +
-  'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz." ' +
-  'Compact yapilana kadar her cevapta kisaca tekrarla.'
+  ' ⭐COMPACT OTOMATIK: compact kendiliginden olur (esik %60); Recep e /compact satiri, liste ya da aciklama YAZMA. ' +
+  'Durum dosyani SIMDI guncelle ve sonuna "Yarim is: yok — <kisa>" ya da "Yarim is: var — <ne>, <ne zaman guvenli>" satirini yaz, ' +
+  'sonra isine devam et; yarim isi guvenli noktaya getirmeye bak.'
 
 /**
  * Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı.
