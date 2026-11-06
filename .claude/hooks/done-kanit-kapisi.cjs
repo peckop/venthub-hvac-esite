@@ -154,7 +154,7 @@ function gunluguYaz(taskId, k, ortam = process.env) {
     }
     const kimlik = String(taskId)
     const bicim = kimlik.length >= 36 ? 'tam' : 'önek'
-    fs.appendFileSync(dosya, [new Date().toISOString(), kimlik.length, bicim, kimlik.slice(0, 8), k.sebep, k.izin ? 'izin' : 'RED'].join('\t') + '\n')
+    fs.appendFileSync(dosya, [new Date().toISOString(), kimlik.length, bicim, kimlik.slice(0, 8).replace(/[\t\r\n]/g, '?'), k.sebep, k.izin ? 'izin' : 'RED'].join('\t') + '\n')
   } catch {
     /* günlük yazılamadı: kapı kararını etkilemez */
   }

@@ -177,6 +177,16 @@ describe('INV-KANCA-DONE-KANIT-1 · gerçek veritabanıyla uçtan uca', () => {
     expect(satirlar[1]?.slice(1)).toEqual(['36', 'tam', 'abc123aa', 'verify-passed', 'izin'])
   })
 
+  it('ARC-255 günlük: kimlikteki sekme/satır sonu günlüğü bozmaz (sahte sütun ya da satır oluşmaz)', () => {
+    const log = path.join(dizin, 'pano', 'done-kapisi.log')
+    fs.rmSync(log, { force: true })
+    calistir(istek({ taskId: 'a\tb\nFAKE\tx\ty', columnId: 'done' }))
+    const satirlar = fs.readFileSync(log, 'utf8').trim().split('\n')
+    expect(satirlar).toHaveLength(1)
+    expect(satirlar[0]?.split('\t')).toHaveLength(6)
+    expect(satirlar[0]).toContain('a?b?FAKE')
+  })
+
   it('ARC-255 günlük: yazılamayan dizin kapı kararını bozmaz (fail-open) ve vana günlüğe de yazmaz', () => {
     fs.writeFileSync(path.join(dizin, '_dosya_var.txt'), 'x') // dizin yerine dosya: mkdir/append başarısız olur
     const r = calistir(istek({ taskId: 'kanitsiz', columnId: 'done' }), { VENTHUB_BOARD_DIR: path.join(dizin, '_dosya_var.txt', 'alt') })
