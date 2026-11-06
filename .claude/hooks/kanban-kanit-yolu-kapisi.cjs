@@ -218,16 +218,29 @@ function kanitYolu(girdi) {
 // ARC-261 (BLG-19): file_matches içeriği ilk 65536 karaktere kırpar (@wrongstack/primitives capSubject); kırpılan kısımdaki desen
 // "bulunamadı" verir. Desen tam dosyada var ama kırpılmış kısımda yoksa kart bugün kabul eder, Done'da patlar.
 const KIRPMA_SINIRI = 65536
+const PATTERN_TAVAN = 256
+// Gruptan sonra + * {n,} gelen ve içinde de niceleyici olan grup: (a+)+, (\w+\w*)+, (a|aa)+ benzeri felaket geri izleme adayı.
+const ICICE_NICELEYICI = /\((?:[^()\\]|\\.)*(?:[+*]|\{\d+,\d*\}|\|)(?:[^()\\]|\\.)*\)(?:[+*]|\{\d+,\d*\})/
 
 /** file_matches deseni kırpılmış içerikte yok ama tam dosyada var → sebep; ölçülemezse (dosya/desen okunamaz) null (fail-open). */
 function kirpmaSorunu(g, yol) {
   try {
     const j = JSON.parse(String(g.checkNotes || g.checkDescription || ''))
     if (!j || typeof j.pattern !== 'string' || !j.pattern) return null
+    // ReDoS (denetçi S1): kapı senkron bekler; sunucu da bu desenleri reddeder (compileUserRegex). Uzun ya da iç içe niceleyicili desene karışma.
+    if (j.pattern.length > PATTERN_TAVAN || ICICE_NICELEYICI.test(j.pattern)) return null
     const taban = process.env.CLAUDE_PROJECT_DIR || process.cwd()
-    const tam = fs.readFileSync(path.resolve(taban, yol), 'utf8')
+    const temiz = String(yol).trim()
+    // Sunucu worktree'yi ANA AĞACA kanonikler (tools/wrongstack-mcp/kanonik-kok.cjs); ana ağaçta dosya yoksa worktree'dekine düş.
+    const ana = taban.replace(/[\\/]\.claude[\\/]worktrees[\\/][^\\/]+$/, '')
+    let tam
+    try {
+      tam = fs.readFileSync(path.resolve(ana, temiz), 'utf8')
+    } catch {
+      tam = fs.readFileSync(path.resolve(taban, temiz), 'utf8')
+    }
     if (tam.length <= KIRPMA_SINIRI) return null
-    const re = new RegExp(j.pattern)
+    const re = new RegExp(j.pattern, typeof j.flags === 'string' ? j.flags.replace(/[gy]/g, '') : '')
     if (re.test(tam.slice(0, KIRPMA_SINIRI)) || !re.test(tam)) return null
     return (
       'file_matches "' + yol + '" deseni dosyanın ilk ' + KIRPMA_SINIRI + ' karakterinde YOK, sonrasında var: doğrulayıcı içeriği kırpar ve "bulunamadı" verir. ' +

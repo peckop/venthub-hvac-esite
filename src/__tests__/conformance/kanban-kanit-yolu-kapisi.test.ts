@@ -5,7 +5,7 @@
  * Kök sebep: @wrongstack/kanban resolveProjectPath mutlak yolu kök kontrolünden önce reddeder (1.0.26, 1.0.36, 1.0.37).
  */
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -104,6 +104,29 @@ describe('INV-KANBAN-KANIT-YOLU-1', () => {
       expect(fm('kucuk.md', 'KUYRUK-SON')).toBe(false)
       expect(fm('yok.md', 'x')).toBe(false)
       expect(fm('buyuk.md', '(bozuk')).toBe(false)
+      // flags: sunucu bayrakları kullanır (denetçi S3)
+      const fb = (pattern: string, flags: string) =>
+        reddedilir({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file: 'buyuk.md', pattern, flags }) })
+      expect(fb('kuyruk-son', 'i')).toBe(true)
+      expect(fb('kuyruk-son', '')).toBe(false)
+      expect(fb('^KUYRUK-SON$', 'm')).toBe(true)
+      // baştaki boşluklu yol sunucuda trim edilir (nit)
+      expect(fm(' buyuk.md', 'KUYRUK-SON')).toBe(true)
+      // ReDoS (denetçi S1): felaket desen kapıyı kilitlemez, karışılmaz
+      writeFileSync(path.join(dizin, 'redos.md'), 'a'.repeat(30) + '!' + 'b'.repeat(SINIR + 100))
+      const t0 = Date.now()
+      expect(fm('redos.md', '^(a+)+$')).toBe(false)
+      expect(fm('redos.md', '^(a|aa)+$')).toBe(false)
+      expect(fm('buyuk.md', 'KUYRUK-SON' + '.?'.repeat(130))).toBe(false) // 256 karakter tavanı
+      expect(Date.now() - t0).toBeLessThan(2000)
+      // worktree: sunucu ana ağaçta ölçer (denetçi S2); ana ağaçta dosya yoksa worktree'dekine düşer
+      const wt = path.join(dizin, '.claude', 'worktrees', 'w1')
+      mkdirSync(wt, { recursive: true })
+      process.env.CLAUDE_PROJECT_DIR = wt
+      expect(fm('buyuk.md', 'KUYRUK-SON')).toBe(true)
+      writeFileSync(path.join(wt, 'sadece-wt.md'), 'x' + dolgu(SINIR + 10) + 'WT-SON')
+      expect(fm('sadece-wt.md', 'WT-SON')).toBe(true)
+      process.env.CLAUDE_PROJECT_DIR = dizin
       const m = k.incele(cagri({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file: 'buyuk.md', pattern: 'KUYRUK-SON' }) })) ?? ''
       expect(m).toContain('65536')
       expect(m).toContain('buyuk.md')
