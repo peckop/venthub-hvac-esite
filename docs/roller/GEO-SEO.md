@@ -16,7 +16,7 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.
 
 ## Düzenli görevler
-- 7 görev, tetiğe bağlı 7: `docs/roller/GEO-SEO-gorevler.md`.
+- 10 görev, tetiğe bağlı 7: `docs/roller/GEO-SEO-gorevler.md`.
 
 ## Dosyalar
 scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
@@ -28,14 +28,14 @@ Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-sta
 Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.
 
 ## Yetenek ve araç
-Search Console, PageSpeed ölçümü, seo-audit.
+Search Console (arayüz ve URL Inspection API), Bing Webmaster API (GetUrlInfo, SubmitUrlBatch), Yandex Webmaster (arayüz, yeniden tarama), Google Trends (çapa kuralı), claude-seo:seo-geo ajanı (yalnız yerel, Y2.3), scripts/seo/dizin-takip.mjs, PageSpeed, seo-audit.
 
 ## Kurallar (3)
 - K1 Plan önce; K17 Hreflang; K23 llms.txt (geçiş, katı).
 - Gerekçeli özet: `docs/roller/GEO-SEO-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.
+Açık (asli görev).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
@@ -54,7 +54,7 @@ CLAUDE.md OPS kapısıdır, Recep'e OPS götürür; izin, .mcp.json ve hesap Rec
 ## Çalışma düzeni
 - Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).
 - Her iş: Kanban kartı (`<KISA AD>-<sayı>`, is-kayit-duzeni §1) + emirde YÖNTEM + KAYNAK/CETVEL. Linear iş kaydı olarak emekli (karar 324): yeni kayıt açılmaz.
-- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` ile başlar (`Fixes`/`Kayıtsız:` yolları 10-08'de kapandı); kartsız iş yok, önce kart açılır.
+- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` satırı taşır (`Fixes`/`Kayıtsız:` yolları 10-08'de kapandı); kartsız iş yok, önce kart açılır.
 - Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar; dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).
 - Ders ve hata anında `wrongstack-sage remember` (`audience.roles=[<ROL>]`, tags [rol, ders]); gün sonu raporunda "sage'e bugün N ders".
 - Vitrin, föy ya da yazıda OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı) yazmadan önce resmî kaynaktan al; kaynakta birebir yoksa yazılmaz, yapay zekâ özeti kanıt değildir (`rehber-yazisi-standard.md` R2.3).

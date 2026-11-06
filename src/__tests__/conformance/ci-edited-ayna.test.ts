@@ -343,7 +343,13 @@ const HEP_KOSAN = HEP_KOSAN_BEKLENTISI.map((h) => h.ad)
 /** `ci` işinde bulunabilecek job düzeyi anahtarlar: BAŞKASI (özellikle `if`) işin kendisini atlatabilir ya da yetkisini değiştirir. */
 const IS_ANAHTARLARI = ['runs-on', 'timeout-minutes', 'defaults', 'steps']
 const ZAMAN_ASIMI = "timeout-minutes: ${{ github.event.action == 'edited' && 30 || 15 }}"
-const CONCURRENCY = ["group: ci-${{ github.ref }}${{ github.event.action == 'edited' && '-edited' || '' }}", 'cancel-in-progress: true']
+/** ALT-161: master push grubu SHA başına, iptal yalnız push dışı olaylarda (master koşuları birbirini iptal etmez). */
+const CONCURRENCY = [
+  "group: ci-${{ github.event_name == 'push' && github.sha || github.ref }}${{ github.event.action == 'edited' && '-edited' || '' }}",
+  "cancel-in-progress: ${{ github.event_name != 'push' }}",
+]
+const EDITED_SONEKI = "${{ github.event.action == 'edited' && '-edited' || '' }}"
+const PUSH_SHA_GRUBU = "github.event_name == 'push' && github.sha"
 /** EN AZ yetki: bunun dışındaki her izin (okuma dahil) ve her yazma biçimi kırmızıdır. */
 const IZINLER = ['actions: read', 'contents: read', 'pull-requests: read']
 const TURLER = ['edited', 'opened', 'reopened', 'synchronize']
@@ -887,8 +893,11 @@ function concurrencyDenetle(metin: string): string[] {
     .slice(b.bas + 1, b.bit)
     .filter(anlamli)
     .map((s) => degerTemizle(s))
-  if (!govde.includes(CONCURRENCY[0])) ihlal.push('concurrency grubu `edited` için ayrı değil: düzenleme koşan TAM koşuyu iptal eder')
-  if (!govde.includes(CONCURRENCY[1])) ihlal.push('cancel-in-progress: true yok')
+  const grup = govde.find((s) => s.startsWith('group:')) ?? ''
+  if (!grup.includes(EDITED_SONEKI)) ihlal.push('concurrency grubu `edited` için ayrı değil: düzenleme koşan TAM koşuyu iptal eder')
+  if (!grup.includes(PUSH_SHA_GRUBU)) ihlal.push('master push grubu SHA başına değil: birleşme koşuları birbirini iptal eder (ALT-161)')
+  if (!govde.includes(CONCURRENCY[1])) ihlal.push('cancel-in-progress yalnız push dışı olaylarda açık değil (ALT-161)')
+  if (!govde.includes(CONCURRENCY[0])) ihlal.push('concurrency grubu beklenen satırla birebir aynı değil')
   const fazla = govde.filter((s) => !CONCURRENCY.includes(s))
   if (fazla.length) ihlal.push(`concurrency bloğunda beklenmeyen satır: ${fazla.join(' ; ')}`)
   return ihlal
@@ -1417,7 +1426,9 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'pull_request türlerinden `synchronize` düşer (yeni commit CI başlatmaz)', boz: (c) => ustSatiriYaz(c, 'on', 'types:', '    types: [opened, reopened, edited]'), beklenen: ['pull_request türleri'] },
   { ad: 'pull_request türleri satır içi liste değil', boz: (c) => ustSatiriYaz(c, 'on', 'types:', '    types:'), beklenen: ['satır içi liste olarak okunamadı'] },
   { ad: 'concurrency grubundan `edited` soneki düşer', boz: (c) => ustSatiriYaz(c, 'concurrency', 'group:', '  group: ci-${{ github.ref }}'), beklenen: ['`edited` için ayrı değil'] },
-  { ad: 'concurrency `cancel-in-progress: false` olur', boz: (c) => ustSatiriYaz(c, 'concurrency', 'cancel-in-progress:', '  cancel-in-progress: false'), beklenen: ['cancel-in-progress: true yok'] },
+  { ad: 'concurrency `cancel-in-progress: false` olur', boz: (c) => ustSatiriYaz(c, 'concurrency', 'cancel-in-progress:', '  cancel-in-progress: false'), beklenen: ['cancel-in-progress yalnız push dışı'] },
+  { ad: 'ALT-161: master push da iptal edilir (`cancel-in-progress: true`)', boz: (c) => ustSatiriYaz(c, 'concurrency', 'cancel-in-progress:', '  cancel-in-progress: true'), beklenen: ['cancel-in-progress yalnız push dışı'] },
+  { ad: 'ALT-161: master push grubu SHA yerine ref olur (bekleyen koşu yine iptal)', boz: (c) => ustSatiriYaz(c, 'concurrency', 'group:', "  group: ci-${{ github.ref }}${{ github.event.action == 'edited' && '-edited' || '' }}"), beklenen: ['SHA başına değil'] },
   { ad: 'concurrency bloğuna ek satır girer', boz: (c) => ustSatiriYaz(c, 'concurrency', 'cancel-in-progress:', '  cancel-in-progress: true\n  fazladan: 1'), beklenen: ['concurrency bloğunda beklenmeyen satır'] },
 
   // ── yapı: sınıflama atlatılamaz ─────────────────────────────────────────────────────────────────────────────────
@@ -1668,6 +1679,13 @@ describe('INV-CI-EDITED-1 — edited aynası ci iş akışına doğru bağlı', 
     const bozuk = adimAnahtariniYaz(ci, AYNA_ADIM_ADI, 'name', 'name: edited aynası')
     expect(bozuk).not.toBe(ci)
     expect(denetle(bozuk).join('|')).toContain('SINIFSIZ')
+  })
+
+  it('ALT-161: e2e-smoke.yml de master push koşularını iptal etmez (SHA grubu, iptal yalnız push dışı)', () => {
+    const e2e = readFileSync(path.join(KOK, '.github/workflows/e2e-smoke.yml'), 'utf8').replace(/\r\n/g, '\n')
+    expect(e2e).toContain("  group: e2e-smoke-${{ github.event_name == 'push' && github.sha || github.ref }}\n")
+    expect(e2e).toContain("  cancel-in-progress: ${{ github.event_name != 'push' }}\n")
+    expect(e2e, 'eski koşulsuz iptal geri gelmiş').not.toMatch(/^ {2}cancel-in-progress: true$/m)
   })
 
   it('sabotaj 4: concurrency grubundan edited soneki düşerse yakalanır', () => {

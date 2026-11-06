@@ -20,9 +20,13 @@ on:
 # ALT-38: `edited` (PR başlığı/gövdesi düzenleme) AYRI grupta. Kod değişmedi; koşan TAM koşuyu İPTAL ETMEMELİ.
 # Ölçüldü (10-03..10-06): 187 PR koşusunun 50'si aynı commit'in tekrarıydı, 30'u iptal edilen bir koşudan sonra geldi.
 # `push` ve `workflow_dispatch` olaylarında `github.event.action` yoktur (boş): grup eskisiyle AYNI kalır.
+# ALT-161: master PUSH koşuları birbirini İPTAL ETMEZ. Grup SHA başına, cancel-in-progress yalnız PR/dal/dispatch'te.
+# Ölçüldü (30 Ekim–6 Kasım): master push'ta 171 koşunun 116'sı iptal; birleşme sonrası ilk koşu çoğu SHA için
+# hiç sonuç vermedi, master'a özgü kırmızının hangi PR'dan geldiği kayboldu. (Aynı grupta bekleyen tek koşu da
+# yenisi gelince iptal edilir; bu yüzden yalnız cancel-in-progress'i kapatmak yetmez, grup SHA'ya bölünür.)
 concurrency:
-  group: ci-${{ github.ref }}${{ github.event.action == 'edited' && '-edited' || '' }}
-  cancel-in-progress: true
+  group: ci-${{ github.event_name == 'push' && github.sha || github.ref }}${{ github.event.action == 'edited' && '-edited' || '' }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 # Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU (CLAUDE.md Notlar).
 # `actions: read` YALNIZ edited aynasının (scripts/ci/edited-ayna.cjs) önceki koşuları okuması içindir;

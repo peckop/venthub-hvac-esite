@@ -276,7 +276,7 @@ module.exports = {
 }
 
 if (require.main === module && process.argv.includes('--yaz')) {
-  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
+  const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN
   yaz(pano, { simdi: () => Date.now() }).then(
     () => process.exit(0),
     () => process.exit(0),

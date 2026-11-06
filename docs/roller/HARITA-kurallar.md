@@ -9,6 +9,8 @@
 4. **JSON ya da cetvel okuyan her test koşulur, yalnız yazdığın değil.** Bir veri dosyasını okuyan tüm testler (dış bağımlılık beyanı, sahiplik, görev verisi) PR'dan önce çalışır. Olay: #2018 (`diagram` skill'i dış bağımlılık tablosunda beyansızdı, `ajan-skill-cozulur` CI'da kırmızı).
 5. **Üretici `--yaz` CRLF checkout'ta fazladan dosya değiştirir; yalnız gerçek değişenler tutulur.** `git diff --ignore-space-at-eol --stat` ile ayır, kalanı `git checkout -- <dosya>` ile geri al; yeni üretici kolu eklenince bunu tekrar ölç. Olay: HRT-59 ve HRT-71'de 17 kurallar dosyası sahte değişti.
 6. **Ağır test dosyaları paralel değil tek tek koşulur.** Bellek darken beş dosya birlikte `sessionstart-pencere-adi`'ni 60 sn sınırında düşürür (tek başına 65/65). Olay: HRT-45 (25 Ekim).
+7. **Ortak satır PR'ında üç ölçüm PR'dan önce koşulur; tek düzeltme turu planlanır.** `tr -d '\r' < .claude/rules/filo-ortak.md | wc -c` (tavan 10.000), `node scripts/belge/rol-karti-uret.cjs --kontrol` (CRLF checkout'ta CR atılarak karşılaştırılır) ve bağlı testler. Olay: #2227 aynı cümleye üç ardışık commit, #2236 satır sonu düzeltmesi, #2260 filo-ortak 9.988/10.000 B için satır birleştirme.
+8. **HARİTA kartının kanıtı içeriği de ölçer.** Birleşme kontrolüne (`gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`) ek olarak değişen veriyi bağlayan test (`pnpm exec vitest run src/__tests__/conformance/rol-kartlari.test.ts`) ya da `file_matches` eklenir; yalnız birleşme kanıtı içeriğin doğru olduğunu göstermez. Olay: HRT-99..106 kartlarında tek `command` kanıtı.
 
 ## Genel kurallar
 

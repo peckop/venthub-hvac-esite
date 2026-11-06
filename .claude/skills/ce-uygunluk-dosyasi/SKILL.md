@@ -37,7 +37,7 @@ Bir kurum ya da müşteri, firma ürünü için CE belgesi, uygunluk beyanı, te
 1. **Kart.** MEVZUAT panosunda kart aç (KAYNAK/CETVEL, YÖNTEM, ÖNCEKİ ÇALIŞMA). Kartsız başlama.
 2. **Girdi topla.** Yazışma gövdelerini ve ekleri al. Posta aracı gövdeyi verir, ek içeriğini vermez; ek indirmek için OPS'tan izin al, yalnız istenen dosyaları indir ve depo dışı çalışma klasörüne koy (`<is>/girdi/`). Taranmış PDF'te sayfaları görüntüye çevirip oku.
 3. **Girdi özeti yaz** (`00-girdi-ozeti.md`, iç not): yazışma özeti, kurumun talep maddeleri, ürün (ad, marka, model aileleri, etiket verisi), her ekin ne olduğu (belge türü, tarih, kapsam, hangi model, hangi madde), çelişkiler.
-4. **Rejimi belirle ve doğrulat.** Hangi mevzuat uygulanır (Makine, LVD, EMC, RoHS ve benzeri)? Bugün yürürlükte olan hangisi, yaklaşan değişiklik ve geçiş tarihi ("piyasaya arz" kuralı) nedir? Araştırmacı çalışan AB metnini (CELEX servisi) ve TR metnini (Resmî Gazete) bulur; doğrulayıcı çalışan bağımsız yeniden ölçer. Doğrulanamayan "doğrulanamadı" kalır.
+4. **Rejimi belirle ve doğrulat.** Talebin istediği mevzuat hangisidir ve fiilen hangi standartlar uygulanıyor? Bugün yürürlükte olan hangisi, yaklaşan değişiklik ve geçiş tarihi ("piyasaya arz" kuralı) nedir? Kapsam talebin istediğiyle sınırlıdır: beyan Makine yönetmeliğini ve fiilen uygulanan standartları kapsar; elektrik güvenliği Makine Ek I 1.5.1 üzerinden kapsanır, ayrı LVD yazılmaz, EMC beyana yazılmaz (üreticiye bilgi notu olarak yalnız iç listede kalır). Talep edilmeyen rejim eklenmez; genişletme önerisi OPS'a gider. Araştırmacı çalışan AB metnini (CELEX servisi) ve TR metnini (Resmî Gazete) bulur; doğrulayıcı çalışan bağımsız yeniden ölçer. Doğrulanamayan "doğrulanamadı" kalır.
 5. **Üç belgeyi hazırla** (Word):
    - `01-uygunluk-beyani-taslagi`: resmî alan listesi, TR ve EN.
    - `02-risk-degerlendirme-cercevesi`: ürün sınırları, tehlike listesi, risk tahmin tablosu, azaltma sırası, soru listesi (EN ISO 12100 çerçevesi).
@@ -47,6 +47,7 @@ Bir kurum ya da müşteri, firma ürünü için CE belgesi, uygunluk beyanı, te
 
 ## Kontrol listesi (bitmeden)
 
+- [ ] Kapsam talebi aşmıyor: beyanda talep edilmeyen rejim (ayrı LVD, EMC gibi) yok.
 - [ ] Beyan alanları resmî metindeki alan sayısıyla eşleşiyor (kaynak ve tarih yazılı).
 - [ ] Üçüncü kişi belgesinin ne olduğu kendi metninden okundu (gönüllü onay ≠ beyan).
 - [ ] Adres, tarih ve model kapsamı tutarsızlıkları listelendi.

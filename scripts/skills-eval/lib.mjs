@@ -206,3 +206,30 @@ export const CLI_SADE_BAYRAKLAR = [
   '--setting-sources', '',
   '--system-prompt', 'Sen bir yonlendirme siniflandiricisisin. Yalniz istenen bicimde cevap ver.',
 ]
+
+/**
+ * RAPOR ETİKETİ (ALT-160, OPS-232, 2026-11-06). Ölçülen kusur: rapor adı yalnız tarihti
+ * (`skills-eval-<tarih>.json`), aynı gün ikinci koşu ilkini SESSİZCE eziyordu; raporun hangi
+ * karta ait olduğu da elle yazılıyordu ve yanlış çıktı (#2296'da "ytn41"). Artık etiket
+ * ZORUNLU ve dosya adının parçası; dosya zaten varsa koşucu üzerine yazmaz.
+ * Biçim dosya adına güvenli tutulur: harf/rakam ile başlar, harf/rakam/tire, en çok 40 karakter
+ * (`YTN-41`, `pr-2300`). Nokta, eğik çizgi ve boşluk yasak: etiket yol kaçışı açamaz.
+ */
+export const ETIKET_KALIBI = /^[A-Za-z0-9][A-Za-z0-9-]{0,39}$/
+
+/** `--etiket=<kart>` bayrağını çözer. Döner: `{ etiket }` ya da `{ hata }` (hiçbir zaman ikisi birden). */
+export function etiketCoz(bayraklar) {
+  const b = (bayraklar || []).filter((x) => typeof x === 'string' && x.startsWith('--etiket='))
+  if (b.length === 0) return { hata: '--etiket=<kart> ZORUNLU (ör. --etiket=YTN-41; CI: --etiket=pr-<no>)' }
+  if (b.length > 1) return { hata: '--etiket birden çok verildi: ' + b.join(' ') }
+  const etiket = b[0].slice('--etiket='.length)
+  if (!ETIKET_KALIBI.test(etiket)) {
+    return { hata: `--etiket biçimi geçersiz: "${etiket}" (harf/rakam ile başlar, harf/rakam/tire, en çok 40)` }
+  }
+  return { etiket }
+}
+
+/** Rapor dosya adı: tarih + etiket. Aynı gün farklı kartın raporu ayrı dosyaya düşer. */
+export function raporAdi(tarih, etiket) {
+  return `skills-eval-${tarih}-${etiket}.json`
+}

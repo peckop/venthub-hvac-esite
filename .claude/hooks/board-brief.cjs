@@ -222,7 +222,7 @@ try {
   const susturma = require(path.join(__dirname, 'uyari-susturma.cjs'))
   const durumMu = (s) => /^(PANO|YÖNTEM):/.test(s)
   const sureklilik = lines.filter((s) => !durumMu(s))
-  const suzulen = susturma.suz(lines.filter(durumMu).join('\n'), sid, process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board', Date.now(), 'brief')
+  const suzulen = susturma.suz(lines.filter(durumMu).join('\n'), sid, process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || require('../../scripts/board/pano-dizini.cjs').VARSAYILAN, Date.now(), 'brief')
   cikanSatirlar = [...sureklilik, ...suzulen.split('\n').filter(Boolean)]
 } catch { cikanSatirlar = lines /* süzme bozulduysa hepsi basılır */ }
 if (cikanSatirlar.length === 0) process.exit(0)
