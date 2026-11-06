@@ -197,6 +197,13 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
     }
   })
 
+  it('objektiflik satırı sabit: rapor ve kıyas VentHub u kayırmaz, yargı somut şeye dayanır (OPS 2026-11-06)', () => {
+    const kural = lf(fs.readFileSync(yol, 'utf8'))
+    for (const p of ['Her rapor, kıyas ve değerlendirme objektiftir', 'rakip/alternatif daha iyiyse açıkça yaz', 'her yargı görülen somut bir şeye']) {
+      expect(kural.includes(p), `filo-ortak.md objektiflik satırı eksik: ${p}`).toBe(true)
+    }
+  })
+
   it('sızıntı yok: depo PUBLIC; kural dosyası e-posta, yerel yol, anahtar ya da sır deseni taşımaz', () => {
     const kural = fs.readFileSync(yol, 'utf8')
     expect(kural).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.-]+/)
