@@ -12,8 +12,8 @@
 // `isMockEnv` dalıyla testlerde tamamen atlanıyordu — yani kapı test edilmiyordu (cetvel §3.9).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
-import { hmacImzaGecerli, timingSafeEquals } from '../_shared/sabit_zaman.ts'
-import { kargoHedefiCoz, kargoYazimKarari, tetikReddiMi } from '../_shared/kargo_webhook_gecis.ts'
+import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
+import { kargoHedefiCoz, kargoYazimKarari, takipBaglantisiNormal, tetikReddiMi } from '../_shared/kargo_webhook_gecis.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {
@@ -22,13 +22,10 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   })
 }
 
-// İmza ve token karşılaştırması SABİT ZAMANLI (karne 2026-11 K4, cetvel §3.5 · E17).
-// Eskiden `given === computed` ve `token === expected` idi: ilk farklı baytta dönen
-// karşılaştırma beklenen değerin önekini yanıt süresiyle sızdırır.
-// Yalnız BASE64 imza kabul edilir (hex kabul EDİLMEZ); `sha256=` öneki normalize edilir (sabit_zaman.ts).
-function hmacValid(secret: string, raw: string, signatureHeader: string): Promise<boolean> {
-  return hmacImzaGecerli(secret, raw, signatureHeader)
-}
+// İMZA BİÇİMİ (ALT-138): HMAC-SHA256( `<x-timestamp>.<x-event-id>.<ham gövde>` ), base64; `sha256=` öneki kabul.
+// Eskiden imza yalnız gövdeyi kapsıyordu: yakalanmış bir istek taze zaman + yeni olay kimliğiyle sınırsız
+// tekrar oynatılabiliyordu. Eski biçim için geçiş bayrağı YOK (cetvel §3.5: yeni kapıya geçiş modu konmaz;
+// entegre taşıyıcı henüz yok, kıracak canlı çağıran yok). Karşılaştırma sabit zamanlı (sabit_zaman.ts, E17).
 
 function normalizePayload(carrierHint: string, obj: unknown) {
   const rec = (typeof obj === 'object' && obj !== null) ? (obj as Record<string, unknown>) : {};
@@ -83,10 +80,13 @@ Deno.serve(async (req: Request) => {
     // DB'ye dokunuş, en son sipariş satırından türetme (aşağıda `tenantFromRow`).
     const secret = Deno.env.get('SHIPPING_WEBHOOK_SECRET') || ''
     const signature = req.headers.get('x-signature') || req.headers.get('x-carrier-signature') || ''
+    // Zaman ve olay kimliği imzanın PARÇASIDIR (ALT-138): imzadan önce okunur, imzalanmış hâliyle kullanılır.
+    const tsHeader = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()
+    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     let authorized = false
 
     if (secret && signature) {
-      authorized = await hmacValid(secret, raw, signature)
+      authorized = await webhookImzaGecerli(secret, tsHeader, eventId, raw, signature)
     }
 
     // Legacy token fallback (sandbox)
@@ -107,15 +107,18 @@ Deno.serve(async (req: Request) => {
     // Şu an entegre bir kargo sağlayıcısı YOK, yani kıracak canlı çağıran da yok —
     // kapıyı sıkı kurmanın en ucuz anı burası. Sağlayıcı bağlanırken `x-timestamp`
     // (veya `x-event-time`) göndermesi ENTEGRASYON ÖN KOŞULUDUR.
-    const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
     if (!tsHeader) {
       return jsonResponse({ error: 'Missing timestamp header' }, { status: 401 })
+    }
+    // Olay kimliği ZORUNLU (ALT-138): tekilleştirme ve olay kaydı kimliksiz isteği göremezdi.
+    if (!eventId) {
+      return jsonResponse({ error: 'Missing event id header' }, { status: 400 })
     }
     {
       let t = 0
       // support epoch ms or ISO
-      if (/^\d+$/.test(tsHeader.trim())) {
-        t = parseInt(tsHeader.trim(), 10)
+      if (/^\d+$/.test(tsHeader)) {
+        t = parseInt(tsHeader, 10)
       } else {
         const d = Date.parse(tsHeader)
         t = Number.isFinite(d) ? d : 0
@@ -146,14 +149,13 @@ Deno.serve(async (req: Request) => {
       delivered_at?: string
     }
 
-    // Optional dedup by event id
+    // Dedup by event id (ZORUNLU, yukarıda doğrulandı)
     // Dedup, tenant türetmeden ÖNCE gelir çünkü henüz sipariş satırı okunmadı. Eskiden burada
     // `matched.tenant_id === tenantId` karşılaştırması vardı ve `tenantId` İSTEKTEN geliyordu —
     // yani saldırgan farklı bir `?tenant_id=` göndererek idempotency'yi ATLAYABİLİYORDU.
     // `event_id` kargo firmasının global tekil kimliği; varlığı tek başına "bu olay işlendi"
     // demektir. Karşılaştırmayı silmek burada sınırı gevşetmez, bypass kolunu kaldırır.
-    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
-    if (eventId) {
+    {
       try {
         const { data: existing } = await supabase
           .from('shipping_webhook_events')
@@ -199,7 +201,14 @@ Deno.serve(async (req: Request) => {
     const patch: Partial<OrderRow> & Record<string, unknown> = {}
     if (typeof p.carrier === 'string' && p.carrier) patch.carrier = p.carrier
     if (typeof p.tracking_number === 'string' && p.tracking_number) patch.tracking_number = p.tracking_number
-    if (typeof p.tracking_url === 'string' && p.tracking_url) patch.tracking_url = p.tracking_url
+    // Takip bağlantısı müşteriye tıklanır gösterilir (ALT-138): yalnız https + izinli taşıyıcı alan adı yazılır.
+    // Geçersiz bağlantı olayı düşürmez (durum sinyali kaybolmasın); yalnız bağlantı yazılmaz ve günlüğe düşer.
+    if (typeof p.tracking_url === 'string' && p.tracking_url) {
+      // Ham metin değil, ayrıştırılmış biçim yazılır (WHATWG `href`): doğrulanan ile saklanan aynı adres olsun.
+      const takipUrl = takipBaglantisiNormal(p.tracking_url)
+      if (takipUrl) patch.tracking_url = takipUrl
+      else console.warn('[shipping-webhook] takip bağlantısı reddedildi (şema/alan adı)', { code: 'TRACKING_URL_REJECTED', order_id: orderId })
+    }
 
     // ALT-134 — status'a YAZMA kararı saf modülde (`_shared/kargo_webhook_gecis.ts`): taşıyıcı kelimesi yalnız
     // shipped/delivered hedefine çözülür (ham değer, 'paid', 'failed' ASLA status'a gitmez); cancelled çıkışsız;

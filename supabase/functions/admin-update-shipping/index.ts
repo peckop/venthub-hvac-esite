@@ -4,6 +4,7 @@
 // türetilir (`_shared/tenant.ts::tenantFromVerifiedUser`). Eski `resolveTenantId(req, parsed)`
 // tenant'ı istekten alıp profil sorgusuna FİLTRE koyuyordu (cetvel §3.9).
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
@@ -200,7 +201,7 @@ serve(async (req) => {
       if (!updCancel.ok) {
         const txt = await updCancel.text()
         if (monotonIhlaliMi(txt)) return jsonHata(409, 'INVALID_TRANSITION', 'Siparis durumu bu islemi kabul etmiyor')
-        return new Response(JSON.stringify({ error: 'cancel_failed', status: updCancel.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+        return new Response(JSON.stringify({ error: 'cancel_failed', status: updCancel.status, body: metniMaskele(txt, 1000) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
       }
       const iptalSatirlari: unknown = await updCancel.json().catch(() => [])
       if (!Array.isArray(iptalSatirlari) || iptalSatirlari.length === 0) {
@@ -253,7 +254,7 @@ serve(async (req) => {
           error: 'tracking_check_failed',
           message: 'Takip numarası benzersizlik kontrolü yapılamadı; kargo bilgisi YAZILMADI.',
           status: dupResp.status,
-          detail: detail.slice(0, 200),
+          detail: metniMaskele(detail, 200),
         }), { status: 503, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
       }
       const dupRows = await dupResp.json().then((x: unknown) => Array.isArray(x) ? x : []).catch(() => [])
@@ -307,7 +308,7 @@ serve(async (req) => {
     if (!upd.ok) {
       const txt = await upd.text()
       if (monotonIhlaliMi(txt)) return jsonHata(409, 'INVALID_TRANSITION', 'Siparis durumu bu islemi kabul etmiyor')
-      return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: metniMaskele(txt, 1000) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
     }
     const guncellenen: unknown = await upd.json().catch(() => [])
     if (!Array.isArray(guncellenen) || guncellenen.length === 0) {

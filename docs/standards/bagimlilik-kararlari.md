@@ -252,6 +252,17 @@ braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk 
 
 ⭐**2026-10-25 — BEŞİNCİ KAYIT, KAPATILAMADI (ALT-100):** `braces` kaydı kapandı (audit artık vermiyor, bayat kabul silindi). Yerine `GHSA-mrhx-c7xc-m3w5` (`zod` <4.6.6, bellek tüketimi) girdi: düzeltme yalnız ana sürümde (zod 4), bizde `^3.24.1`. Tavan 1 kalır (braces çıktı, zod girdi). Kabul OPS hükmüne bağlıdır. Aynı gün `dompurify` 3.4.16→3.4.17 (iki kayıt: `GHSA-cg2g-xh64-v4q7` kritik, `GHSA-mrv2-3pqr-j5jr` yüksek) ve `undici` 7.29.1→7.30.1 (`GHSA-xjj6-f33q-929c`) kilit dosyasında geçişli paket olarak yükseltilerek kapandı (override yok); `next` iki kaydı #1999 ile kapanır.
 
+⭐**2026-11-05 — ALTINCI DURUM, ÜRETİMDE KAPALI, GELİŞTİRMEDE KAPATILAMADI (OPS-225):** `GHSA-mrhx-c7xc-m3w5`
+üretim ağacında kapandı (doğrudan `zod` artık `^4.6.6`, kilitli 4.6.7; `pnpm audit --prod --audit-level high` =
+"No known vulnerabilities found"); bu yüzden §7 tablosunda satırı yok ve kapı (`--prod`) yeşil. Tam `pnpm audit
+--audit-level high` hâlâ 1 yüksek gösterir: yol `.>eslint-plugin-react-compiler>zod`, kilitli `zod@3.25.76`.
+Eklenti `19.1.0-rc.2` (son sürüm) `zod: ^3.22.4` istiyor; 3.x hattının son kararlısı 3.25.76 ve yamalı sürüm
+yalnız `>=4.6.6`. Aynı ana sürümde yama YOK; override ana sürüm atlaması olur (eklentiye zod 4 dayatmak),
+yapılmadı. Risk: yalnız `pnpm lint` sırasında, girdi bizim kaynak dosyalarımız; sunucu yanıt yolunda ve tarayıcı
+paketinde yok. Kaldırma şartı: `pnpm why zod` çıktısında 3.x tüketicisi kalmadı (eklenti zod 4'e geçti ya da
+`react-compiler/react-compiler` kuralı `eslint-plugin-react-hooks` 7'nin derleyici kurallarına taşınıp eklenti
+kaldırıldı) veya 3.x hattına yama geldi (`pnpm view zod versions`).
+
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
 
