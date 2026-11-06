@@ -5,7 +5,9 @@
  * Kök sebep: @wrongstack/kanban resolveProjectPath mutlak yolu kök kontrolünden önce reddeder (1.0.26, 1.0.36, 1.0.37).
  */
 import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -79,6 +81,60 @@ describe('INV-KANBAN-KANIT-YOLU-1', () => {
     expect(reddedilir({ action: 'add_check', checkType: 'command', checkNotes: komut, command: komut })).toBe(false)
     expect(reddedilir({ action: 'add_check', checkType: 'manual', checkNotes: 'kanıt notu', command: '' })).toBe(false)
     expect(reddedilir({ action: 'add_note', command: komut })).toBe(false)
+  })
+
+  it('ARC-261: file_matches deseni 64K kırpmanın ötesindeyse reddedilir, başta/yok/okunamaz ise geçer', () => {
+    const dizin = mkdtempSync(path.join(tmpdir(), 'kirpma-'))
+    const eski = process.env.CLAUDE_PROJECT_DIR
+    process.env.CLAUDE_PROJECT_DIR = dizin
+    try {
+      const SINIR = 65536
+      const dolgu = (n: number) => 'x'.repeat(n)
+      writeFileSync(path.join(dizin, 'buyuk.md'), 'BASLIK-ILK\n' + dolgu(SINIR + 100) + '\nKUYRUK-SON\n')
+      writeFileSync(path.join(dizin, 'sinirda.md'), dolgu(SINIR - 4) + 'SINIR') // "SINIR" 65532'de başlar, 65536'da kesilir
+      writeFileSync(path.join(dizin, 'tam-sinir.md'), dolgu(SINIR - 5) + 'SINIR') // son harf 65536. karakter: içeride
+      writeFileSync(path.join(dizin, 'kucuk.md'), 'KUYRUK-SON')
+      const fm = (file: string, pattern: string) =>
+        reddedilir({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file, pattern }) })
+      expect(fm('buyuk.md', 'KUYRUK-SON')).toBe(true)
+      expect(fm('buyuk.md', 'BASLIK-ILK')).toBe(false)
+      expect(fm('buyuk.md', 'HIC-YOK')).toBe(false)
+      expect(fm('sinirda.md', 'SINIR')).toBe(true)
+      expect(fm('tam-sinir.md', 'SINIR')).toBe(false)
+      expect(fm('kucuk.md', 'KUYRUK-SON')).toBe(false)
+      expect(fm('yok.md', 'x')).toBe(false)
+      expect(fm('buyuk.md', '(bozuk')).toBe(false)
+      // flags: sunucu bayrakları kullanır (denetçi S3)
+      const fb = (pattern: string, flags: string) =>
+        reddedilir({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file: 'buyuk.md', pattern, flags }) })
+      expect(fb('kuyruk-son', 'i')).toBe(true)
+      expect(fb('kuyruk-son', '')).toBe(false)
+      expect(fb('^KUYRUK-SON$', 'm')).toBe(true)
+      // baştaki boşluklu yol sunucuda trim edilir (nit)
+      expect(fm(' buyuk.md', 'KUYRUK-SON')).toBe(true)
+      // ReDoS (denetçi S1): felaket desen kapıyı kilitlemez, karışılmaz
+      writeFileSync(path.join(dizin, 'redos.md'), 'a'.repeat(30) + '!' + 'b'.repeat(SINIR + 100))
+      const t0 = Date.now()
+      expect(fm('redos.md', '^(a+)+$')).toBe(false)
+      expect(fm('redos.md', '^(a|aa)+$')).toBe(false)
+      expect(fm('buyuk.md', 'KUYRUK-SON' + '.?'.repeat(130))).toBe(false) // 256 karakter tavanı
+      expect(Date.now() - t0).toBeLessThan(2000)
+      // worktree: sunucu ana ağaçta ölçer (denetçi S2); ana ağaçta dosya yoksa worktree'dekine düşer
+      const wt = path.join(dizin, '.claude', 'worktrees', 'w1')
+      mkdirSync(wt, { recursive: true })
+      process.env.CLAUDE_PROJECT_DIR = wt
+      expect(fm('buyuk.md', 'KUYRUK-SON')).toBe(true)
+      writeFileSync(path.join(wt, 'sadece-wt.md'), 'x' + dolgu(SINIR + 10) + 'WT-SON')
+      expect(fm('sadece-wt.md', 'WT-SON')).toBe(true)
+      process.env.CLAUDE_PROJECT_DIR = dizin
+      const m = k.incele(cagri({ action: 'add_check', checkType: 'file_matches', checkNotes: JSON.stringify({ file: 'buyuk.md', pattern: 'KUYRUK-SON' }) })) ?? ''
+      expect(m).toContain('65536')
+      expect(m).toContain('buyuk.md')
+    } finally {
+      if (eski === undefined) delete process.env.CLAUDE_PROJECT_DIR
+      else process.env.CLAUDE_PROJECT_DIR = eski
+      rmSync(dizin, { recursive: true, force: true })
+    }
   })
 
   it('reddetme metni üç çalışan yolu ve sebebi söyler', () => {
