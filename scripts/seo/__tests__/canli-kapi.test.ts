@@ -253,6 +253,14 @@ describe('INV-CANLI-KAPI-1 · lastmod (kural 42/29)', () => {
     v.harita.satirlar.push({ loc: TABAN + '/tr/tz', lastmod: '2026-09-30T01:00:00+03:00', changefreq: null, priority: null }) // UTC 09-29 22:00: bugün değil
     expect(adresler(v, 'LASTMOD-BUGUN')).toEqual([TABAN + '/tr/x0'])
   })
+  it('LASTMOD-BUGUN (SEO-88): bugünkü gün başı tarih damgası UYARI (yayın günü), saatli bugün damgası KIRMIZI kalır', () => {
+    const gunBasi = temiz(); gunBasi.harita.satirlar.push(...satir(1, '2026-09-30T00:00:00.000Z'))
+    const g = kodlar(gunBasi, 'LASTMOD-BUGUN')
+    expect(g).toHaveLength(1)
+    expect(g[0].seviye).toBe('UYARI')
+    const saatli = temiz(); saatli.harita.satirlar.push(...satir(1, '2026-09-30T00:00:00.001Z'))
+    expect(kodlar(saatli, 'LASTMOD-BUGUN')[0].seviye).toBe('KIRMIZI')
+  })
   it('LASTMOD-TOPLU: ≥5 satır aynı ms damgası UYARI; 4 satır, gün başı (T00:00:00.000Z) ve farklı damgalar değil', () => {
     const toplu = temiz(); toplu.harita.satirlar.push(...satir(5, '2026-08-27T18:03:50.647Z'))
     const t = kodlar(toplu, 'LASTMOD-TOPLU')
