@@ -363,6 +363,8 @@ Bunlar departman penceresinin (müdürün) kendi aracıdır; `Skill` aracıyla a
 | calisma-kopyasi-sil (6,2K) | HEPSİ (15 departman) | Çalışma kopyası (worktree, C:/tmp/vh-*) silme akışı (YTN-27, ALTYAPI bilgi paketi): envanter, sahiplik, silme kapısı, ilan, güvenli silme sırası. Kuralı yeniden yazmaz, `agac-silme-kapisi.cjs` ve fleet-mechanism-standard madde 30'a işaret eder; yalnız kendi departmanının kopyası, başkasınınki OPS'a liste. Müdür çalıştırır, çalışana ön yüklenmez. |
 | ce-uygunluk-dosyasi (6,4K) | MEVZUAT | Firma ürünü için CE uygunluk dosyası taslağı (YTN-26, MVZ-2): girdi özeti, rejim doğrulaması, beyan taslağı, risk çerçevesi, eksik belge listesi. MEVZUAT'ın uygulayıcısı yok; iş müdür penceresinde yürür, çalışana ön yüklenmez. `pdf` girdi (araştırmacıda ön yüklü), `docx` çıktı tarafı (depo dışı kullanıcı skill'i). |
 
+| dizin-takip (3,0K) | GEO-SEO | Yayın sonrası dizin isteği (YTN-41, SEO-84): adres × motor karar tablosu, kota ve kayıt disiplini; müdür çalıştırır, çalışana ön yüklenmez. |
+| seo-olcum (2,4K) | GEO-SEO | Arama görünürlüğü ölçümü (YTN-41): SERP, sıra, Trends, rakip kıyası Y2.4; ölçmeden hüküm yok. Müdür çalıştırır, çalışana ön yüklenmez. |
 Hiçbir departmana bağlanmayanlar (eski not): docker-deploy, plugin-author, audit-log (bu depoda skill klasörü yok); alınamayan: auto-review (çalıştıracak ana program yok).
 
 ## 6.3 İlk dalga (YTN-18, OPS onayı 12 Ekim 2026)
