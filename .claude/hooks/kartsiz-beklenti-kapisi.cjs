@@ -80,7 +80,7 @@ const SATIR_KALIBI = /(onay[ıi]na sunuyorum|\bevet de\b)/i
 const OLUMSUZ = /\b(yok|istemiyor|gerekmiyor|beklenmiyor|bekleyen yok|bir şey yok|bir sey yok)\b/i
 // Giriş satırı: iki nokta ile biten ya da yalnız parantezli not ("(iki adım):") bir istek değil, ardından gelenleri bağlar.
 const GIRIS = /(?::\s*$|^\s*\([^)]*\)\s*:?\s*$)/
-// Muaf: compact hazırlığı Recep output style'ında kendi kalıbı olan ritüeldir (üç maddelik not + /compact satırı), kart gerektirmez.
+// Muaf: compact hazırlığı Recep output style'ında kendi kalıbı olan ritüeldir (elle /compact; Recep'in kendi isteği), kart gerektirmez.
 const MUAF = /compact/i
 const ATLATMA = /^\s*Kartsız:\s*(\S.{4,})$/im
 const MADDE = /^\s*(?:[-*•]|\d+[.)]|\*\*\d+[.)]?\*\*)\s+/

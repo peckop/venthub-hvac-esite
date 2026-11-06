@@ -270,8 +270,8 @@ const HAZIRLIK_NOTU =
 
 /**
  * Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı.
- * `hazirlik` (ARC-131 madde 1) verilirse COMPACT YAKIN satırı hükmü ve kancanın kendi ürettiği /compact metnini taşır:
- * pencere metni sıfırdan yazmaz, yalnız "DEĞİL" ise durum dosyasını günceller.
+ * `hazirlik` (ARC-131 madde 1) verilirse COMPACT YAKIN satırı hükmü (HAZIR / DEĞİL + neden) taşır; /compact metni satıra girmez (ARC-86: compact otomatik):
+ * pencere yalnız "DEĞİL" ise durum dosyasını günceller.
  */
 function satir(token, pencere, hazirlik = null) {
   if (token === null || token === undefined) return null
