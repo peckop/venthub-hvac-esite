@@ -62,6 +62,7 @@ describe('liste kartı — güncelleme tarihi', () => {
       ['frekans-konvertoru', '2026-11-01', '1 Kasım 2026'],
       ['fan-cesitleri', '2026-11-04', '4 Kasım 2026'],
       ['radyal-aksiyel-fan-secimi', '2026-11-04', '4 Kasım 2026'],
+      ['kanal-tipi-fan-nedir', '2026-11-04', '4 Kasım 2026'],
     ]
     for (const [kimlik, iso, yazili] of beklenen) {
       const yazi = YAZILAR.find((y) => y.kimlik === kimlik)
