@@ -652,10 +652,10 @@ const ROLLER = {
   YETENEK: {
     gorev: 'Skill\'leri amaca göre departmana ve iş türüne bağlamak, gerçekten kullanılıp kullanılmadığını ölçmek; skill\'in ne işe yaradığını, hangi departmanın hangi işte hangisini kullanacağını ve skill kusurlarını bilen tek yer olmak. Skill yazımı ve değişikliği yalnız skill-creator ile yapılır.',
     gorevDegil: 'departmanın kendi işini ölçmesi (departman); settings.json ve .mcp.json (OPS); elle SKILL.md yazmak.',
-    dosyalar: '`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`; skill PR\'ında skill-yuku-butcesi ve diff-review-taban testleri, envanterde skill satırı (tavan: Recep kararı). Rol kartlarındaki skill listesinin içeriği YETENEK\'ten gelir, kartı HARİTA üreticisi yazar.',
+    dosyalar: '`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`; skill PR\'ında skill-yuku-butcesi ve diff-review-taban testleri, envanterde skill satırı (tavan: Recep kararı). Rol kartlarındaki skill listesinin içeriği YETENEK\'ten gelir, kartı üretici yazar.',
     yetki: 'Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını önerir; skill kusurlarını (bayat yol/araç adı, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydeder, `.claude/skills/**` düzeltmesini ayrı PR\'la yapar; haftalık kullanım ölçümü (atanmış ama kullanılmayan kırmızı); amaca bağlanamayan skill\'i kapatır (silmez).',
     yasak: '`.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.',
-    yetenek: 'plan-challenger, verify-before-done, skills-creator (kısmen: `.agent` ağacına yazar), find-skills (dış kurulum onaylı), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.',
+    yetenek: 'plan-challenger, verify-before-done, skills-creator (kısmen: `.agent`\'e yazar), find-skills (dış kurulum onaylı), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.',
     durum: 'Açık. Skill atama tablosunu bu rol doldurur (iskelet HARİTA\'da, REC-509).',
   },
   // HRT-35 (karar 322, OPS-93, 2026-10-09): tek işi takip; kod yazmaz, işi az olsun ki her zaman açık tutulabilsin.

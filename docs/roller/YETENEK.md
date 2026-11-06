@@ -19,7 +19,7 @@ Amaç ve Nasıl: `docs/roller/YETENEK-gorevler.md`.
 - 2 görev, tetiğe bağlı 2: `docs/roller/YETENEK-gorevler.md`.
 
 ## Dosyalar
-`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`; skill PR'ında skill-yuku-butcesi ve diff-review-taban testleri, envanterde skill satırı (tavan: Recep kararı). Rol kartlarındaki skill listesinin içeriği YETENEK'ten gelir, kartı HARİTA üreticisi yazar.
+`docs/audits/skill-*`, `docs/audits/skills-*`, `.claude/skills/**`; skill PR'ında skill-yuku-butcesi ve diff-review-taban testleri, envanterde skill satırı (tavan: Recep kararı). Rol kartlarındaki skill listesinin içeriği YETENEK'ten gelir, kartı üretici yazar.
 
 ## Yetki
 Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını önerir; skill kusurlarını (bayat yol/araç adı, yanlış çıktı yeri, kural çelişkisi) kaynağıyla kaydeder, `.claude/skills/**` düzeltmesini ayrı PR'la yapar; haftalık kullanım ölçümü (atanmış ama kullanılmayan kırmızı); amaca bağlanamayan skill'i kapatır (silmez).
@@ -28,7 +28,7 @@ Skill atama haritasını ve emirlerdeki YÖNTEM satırı skill adlarını öneri
 `.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.
 
 ## Yetenek ve araç
-plan-challenger, verify-before-done, skills-creator (kısmen: `.agent` ağacına yazar), find-skills (dış kurulum onaylı), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.
+plan-challenger, verify-before-done, skills-creator (kısmen: `.agent`'e yazar), find-skills (dış kurulum onaylı), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.
 
 ## Kurallar (1)
 - K1 Plan önce.
