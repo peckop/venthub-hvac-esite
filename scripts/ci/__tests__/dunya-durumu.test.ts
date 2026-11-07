@@ -3,7 +3,7 @@
 // Saf Node birim testi: DOM ortamı yalnız maliyet. Ağ, gerçek `git` ve gerçek ev dizini YOK; yalnız komut satırı testi geçici
 // dizinde (modülün kopyasıyla) alt süreç koşar ve o süreçte `git` BİLEREK bulunamaz (PATH boş dizin).
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -25,7 +25,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  *   5. YALNIZ KİP: eskisi gibi liste = include, taban sorulmaz,
  *   6. DISLAN KESİŞİM: taban ∩ PR (PR'ın yeni kaydı, silinmiş kayıt, boş taban, sıra), taban okunamazsa HİÇBİR ŞEY dışlanmaz + uyarı,
  *   7. TABAN OKUMA: `git show HEAD^1:<liste>` argümanları TAM eşitlik (kabuk yok), ortam yolu önceliği, her başarısızlık null, şekil denetimi,
- *   8. KOMUT SATIRI: gerçek alt süreç, geçici dizin, `git` yok.
+ *   8. KOMUT SATIRI: gerçek alt süreç, geçici dizin, `git` yok,
+ *   9. YOL SÜZGECİ (ALT-38i): süzgeçli kayıt PR kapısından YALNIZ PR'ın değişen dosyalarından hiçbiri süzgece uymuyorsa çıkar. Süzgeç TABANDAN okunur
+ *      (PR kendi kaydıyla genişletemez), değişen dosyalar ya da tabandaki süzgeç okunamazsa test DIŞLANMAZ, `yalniz` kipinde süzgeç YOK, dizin öneki sınırı
+ *      (`a/b/` → `a/bc` uymaz), `git diff` argümanları ve hata yolları literal sınanır; SABOTAJ kolları süzgeç mantığını kaynakta bozup testin kırmızı verdiğini ölçer.
  * Dış dünya HER ZAMAN sahtedir: `fs.readFileSync` ve `child_process.execFileSync` atamayla sahtelenir, test bitince geri konur (gerçek
  * `git` hiç çalışmaz). Gerçek vitest.config.ts yüklemesi (üç kip + boş taban + okunamayan taban) src/__tests__/conformance/test-kosu-kapsami.test.ts
  * içinde ölçülür.
@@ -40,6 +43,8 @@ interface Kayit {
   neden: string
   kanit: string
   yeniYer: string[]
+  /** ALT-38i: isteğe bağlı yol süzgeci; geçersiz biçimleri de sınamak için bilerek `unknown`. */
+  yolFiltresi?: unknown
 }
 interface Liste {
   surum: number
@@ -50,26 +55,32 @@ interface Ayar {
   exclude: string[]
   include: string[] | null
   uyari?: string
+  suzgeceTakilan?: string[]
 }
 type Env = Record<string, string | undefined>
 type ExecFn = (komut: string, args: string[], secenek: unknown) => unknown
+type DosyaVarMi = (yol: string, dizinMi?: boolean) => boolean
 interface Secenek {
   tabanOku?: () => unknown
-  dosyaVarMi?: (yol: string) => boolean
+  dosyaVarMi?: DosyaVarMi
+  degisenOku?: () => unknown
 }
 interface Modul {
   KOK: string
   LISTE_YOLU: string
   ORTAM_ADI: string
   TABAN_LISTE_ORTAM: string
+  DEGISEN_ORTAM: string
   KIPLER: string[]
   YENI_YERLER: string[]
   TEST_DESENI: RegExp
   DISLANAMAZ: readonly string[]
   ayar: (env?: Env, liste?: unknown, secenek?: Secenek) => Ayar
-  dogrula: (liste: unknown, dosyaVarMi?: (yol: string) => boolean) => string[]
+  dogrula: (liste: unknown, dosyaVarMi?: DosyaVarMi) => string[]
   listeyiOku: (kok?: string) => Liste
   tabanListesiniOku: (env?: Env, kok?: string, execFn?: ExecFn) => Liste | null
+  degisenYollariniOku: (env?: Env, kok?: string, execFn?: ExecFn) => string[] | null
+  filtreEslesirMi: (filtre: readonly string[], yol: string) => boolean
 }
 const D = require_(MODUL_YOLU) as Modul
 /** Sahteleme yüzeyleri: modül bu işlevleri çağrı ANINDA nesneden okur, o yüzden atama yeter (edited-ayna.test.ts ile aynı desen). */
@@ -78,9 +89,13 @@ const cpYuzeyi = require_('node:child_process') as { execFileSync: unknown }
 
 const KIP = 'VENTHUB_DUNYA_DURUMU'
 const TABAN_ENV = 'VENTHUB_DUNYA_TABAN_LISTESI'
+const DEGISEN_ENV = 'VENTHUB_DUNYA_DEGISEN_DOSYALAR'
 const LISTE_YOLU = 'scripts/ci/dunya-durumu-testleri.json'
 const GIT_ARGS = ['show', `HEAD^1:${LISTE_YOLU}`]
 const gitSecenek = (kok: string) => ({ cwd: kok, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1048576, timeout: 10000 })
+/** `git diff` argümanları ve seçenekleri literal: `-z` (NUL ayraç), `--no-renames` (eski ad da görünsün), kabuk YOK, ilk ebeveyne göre. */
+const GIT_DEGISEN_ARGS = ['diff', '--name-only', '-z', '--no-renames', 'HEAD^1', 'HEAD']
+const gitDegisenSecenek = (kok: string) => ({ cwd: kok, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 16 * 1024 * 1024, timeout: 10000 })
 const KOK_SAHTE = '/sahte/kok'
 
 const DISLANAMAZ_BEKLENEN = [
@@ -93,6 +108,8 @@ const DISLANAMAZ_BEKLENEN = [
   'src/__tests__/conformance/ci-degisiklik-sinifi.test.ts',
 ]
 const GERCEK_KAYIT = 'src/__tests__/conformance/taban-tazeligi-dunya.test.ts'
+/** Diskteki gerçek listenin TÜM test yolları (sıra dosyadaki sıra): listeye kayıt eklenince bu testlerin elle güncellenmesi gerekmesin. */
+const DISK_YOLLARI = D.listeyiOku().testler.map((t) => t.test)
 const KORUYUCU_MESAJI = 'bu test dışlama mekanizmasının KENDİ koruyucusu, PR kapısından çıkarılamaz'
 
 const A = 'src/__tests__/a.test.ts'
@@ -133,9 +150,10 @@ const temizlikler: Array<() => void> = []
 
 beforeEach(() => {
   dizin = mkdtempSync(path.join(tmpdir(), 'dunya-durumu-'))
-  ortamYedegi = { [KIP]: process.env[KIP], [TABAN_ENV]: process.env[TABAN_ENV] }
+  ortamYedegi = { [KIP]: process.env[KIP], [TABAN_ENV]: process.env[TABAN_ENV], [DEGISEN_ENV]: process.env[DEGISEN_ENV] }
   delete process.env[KIP]
   delete process.env[TABAN_ENV]
+  delete process.env[DEGISEN_ENV]
 })
 afterEach(() => {
   for (const t of temizlikler.splice(0).reverse()) t()
@@ -196,24 +214,53 @@ function sahteExec(donus: () => unknown) {
 }
 
 describe('sözleşme yüzeyi — dışa açılan adlar ve sabitler literal sınanır', () => {
-  it('dışa açılan ad kümesi TAM: mevcut dokuz ad korunur, yenileri DISLANAMAZ + TABAN_LISTE_ORTAM + tabanListesiniOku', () => {
+  it('dışa açılan ad kümesi TAM: mevcut dokuz ad korunur, yenileri DISLANAMAZ + TABAN_LISTE_ORTAM + tabanListesiniOku + (ALT-38i) DEGISEN_ORTAM + degisenYollariniOku + filtreEslesirMi', () => {
     expect(Object.keys(D).sort()).toEqual(
-      ['DISLANAMAZ', 'KIPLER', 'KOK', 'LISTE_YOLU', 'ORTAM_ADI', 'TABAN_LISTE_ORTAM', 'TEST_DESENI', 'YENI_YERLER', 'ayar', 'dogrula', 'listeyiOku', 'tabanListesiniOku'].sort(),
+      [
+        'DEGISEN_ORTAM',
+        'DISLANAMAZ',
+        'KIPLER',
+        'KOK',
+        'LISTE_YOLU',
+        'ORTAM_ADI',
+        'TABAN_LISTE_ORTAM',
+        'TEST_DESENI',
+        'YENI_YERLER',
+        'ayar',
+        'degisenYollariniOku',
+        'dogrula',
+        'filtreEslesirMi',
+        'listeyiOku',
+        'tabanListesiniOku',
+      ].sort(),
     )
   })
 
   it('sabitler literal: kip değişkeni, taban değişkeni, liste yolu, kipler, depo kökü (sabit kendi kendini doğrulamasın)', () => {
     expect(D.ORTAM_ADI).toBe('VENTHUB_DUNYA_DURUMU')
     expect(D.TABAN_LISTE_ORTAM).toBe('VENTHUB_DUNYA_TABAN_LISTESI')
+    expect(D.DEGISEN_ORTAM).toBe('VENTHUB_DUNYA_DEGISEN_DOSYALAR')
     expect(D.LISTE_YOLU).toBe('scripts/ci/dunya-durumu-testleri.json')
     expect(D.KIPLER).toEqual(['dislan', 'yalniz'])
     // `git show` bu dizinde koşar ve `dosyaVarMi` bu köke göre bakar: kök kayarsa taban sessizce başka yerden okunurdu
     expect(path.resolve(D.KOK)).toBe(KOK)
   })
 
-  it('gerçek liste (diskteki) hata vermez: DISLANAMAZ ve kanonik yol kuralları bugünkü tek kaydı reddetmez', () => {
+  it('gerçek liste (diskteki) hata vermez: DISLANAMAZ, kanonik yol ve yolFiltresi kuralları bugünkü kayıtları reddetmez', () => {
     expect(D.dogrula(D.listeyiOku())).toEqual([])
     expect(D.listeyiOku().testler.map((t) => t.test)).toContain(GERCEK_KAYIT)
+  })
+
+  it('gerçek listedeki her yolFiltresi GERÇEK diskte var ve türü yazımıyla uyumlu (sondaki / dizin, onsuz dosya): yetim süzgeç yok', () => {
+    const suzgecliler = D.listeyiOku().testler.filter((t) => t.yolFiltresi !== undefined)
+    expect(suzgecliler.length, 'gerçek listede süzgeçli kayıt yok: bu kapı hiçbir şey ölçmüyor').toBeGreaterThan(0)
+    for (const t of suzgecliler) {
+      for (const g of t.yolFiltresi as string[]) {
+        const govde = g.endsWith('/') ? g.slice(0, -1) : g
+        expect(existsSync(path.join(KOK, govde)), `${t.test}: süzgeç ${g} diskte yok`).toBe(true)
+        expect(statSync(path.join(KOK, govde)).isDirectory(), `${t.test}: ${g} türü yazımıyla uyuşmuyor`).toBe(g.endsWith('/'))
+      }
+    }
   })
 })
 
@@ -377,7 +424,8 @@ describe('GEÇERSİZ LİSTE — dislan ve yalniz FIRLATIR (vitest başlamaz: fai
     const sonuc = D.ayar({ [KIP]: kip }, undefined, { tabanOku: () => taban(GERCEK_KAYIT) })
     expect(okunanlar).toHaveLength(1)
     expect(sonuc.kip).toBe(kip)
-    expect(kip === 'yalniz' ? sonuc.include : sonuc.exclude).toEqual([GERCEK_KAYIT])
+    // yalniz: diskteki listenin TAMAMI; dislan: yalnız tabandakiler (taban tek kayıt taşıyor, diğer gerçek kayıtlar PR'ın yeni kaydı sayılır)
+    expect(kip === 'yalniz' ? sonuc.include : sonuc.exclude).toEqual(kip === 'yalniz' ? DISK_YOLLARI : [GERCEK_KAYIT])
   })
 
   it.each(kipler)('%s: liste verilmeyip disk okunamazsa FIRLATIR, mesaj okunamadığını söyler (ham fs hatası sızmaz)', (kip) => {
@@ -403,7 +451,7 @@ describe('YALNIZ kip — eskisi gibi: liste = include, taban sorulmaz', () => {
 
   it('seçenek hiç verilmezse boş seçenek sayılır: gerçek dosya-varlık denetimi ve (liste de verilmezse) diskteki gerçek liste', () => {
     expect(D.ayar({ [KIP]: 'yalniz' }, liste(GERCEK_KAYIT))).toStrictEqual({ kip: 'yalniz', exclude: [], include: [GERCEK_KAYIT] })
-    expect(D.ayar({ [KIP]: 'yalniz' })).toStrictEqual({ kip: 'yalniz', exclude: [], include: [GERCEK_KAYIT] })
+    expect(D.ayar({ [KIP]: 'yalniz' })).toStrictEqual({ kip: 'yalniz', exclude: [], include: DISK_YOLLARI })
   })
 
   it('ortam değişkeni (taban yolu) yalniz kipinde okunmaz', () => {
@@ -669,6 +717,595 @@ describe('tabanListesiniOku — kaynak seçimi, argümanlar, her başarısızlı
   })
 })
 
+// ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// YOL SÜZGECİ (ALT-38i, OPS hükmü 2026-10-09). Süzgeçli kayıt PR kapısından YALNIZ PR'ın değişen dosyalarından hiçbiri süzgece uymuyorsa çıkar.
+// Güven sınırı B3'ün devamıdır: süzgeç TABANDAN okunur, okunamayan her şey testi kapıda TUTAR (güvenli taraf).
+// ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+/** Süzgeçli deneme kaydı (`yolFiltresi` bilerek `unknown`: geçersiz biçimler de sınanır). */
+const suzgecli = (test: string, yolFiltresi: unknown): Kayit => ({ ...kayit(test), yolFiltresi })
+type TabanKaydi = [test: string, yolFiltresi?: unknown]
+/** Süzgeçli taban: `[yol]` süzgeçsiz, `[yol, süzgeç]` süzgeçli (süzgeç `null` da olabilir: alan YAZILI ama geçersiz). Taban gerekçe istemez, yalnız şekil. */
+const suzgecliTaban = (...kayitlar: TabanKaydi[]) => ({
+  surum: 1,
+  testler: kayitlar.map(([test, yolFiltresi]) => (yolFiltresi === undefined ? { test } : { test, yolFiltresi })),
+})
+const SUZGEC = ['x/', 'tek.cjs']
+/** A'nın tabandaki süzgeci SUZGEC olan PR çalıştırıcısı: `degisen` değişen dosya okuyucusunun döneceği değerdir (ham, geçersiz de olabilir). */
+const dislanSuzgecli = (
+  degisen: unknown,
+  { pr = liste(A), tabanListe = suzgecliTaban([A, SUZGEC]), env = {} }: { pr?: Liste; tabanListe?: unknown; env?: Env } = {},
+) => {
+  const degisenOku = vi.fn(() => degisen)
+  const sonuc = D.ayar({ [KIP]: 'dislan', ...env }, pr, { tabanOku: () => tabanListe, dosyaVarMi: VAR, degisenOku })
+  return { sonuc, degisenOku }
+}
+/** Süzgece takılan test PR kapısında KALIR (dışlanmaz) ve bildirilir; takılmayan DIŞARI çıkar ve anahtar hiç yazılmaz. */
+const TUTULAN: Ayar = { kip: 'dislan', exclude: [], include: null, suzgeceTakilan: [A] }
+const CIKAN: Ayar = { kip: 'dislan', exclude: [A], include: null }
+
+describe('YOL SÜZGECİ — dogrula: yolFiltresi şekli, glob, kanonik yazım, tekrar, yetim, tür', () => {
+  const ON = `testler[0] (${A}): `
+  const dogrulaSuzgec = (f: unknown, dosyaVarMi: DosyaVarMi = VAR) => D.dogrula({ surum: 1, testler: [suzgecli(A, f)] }, dosyaVarMi)
+
+  it('geçerli süzgeç kabul edilir: dizin öneki, tam dosya yolu, ikisi birlikte; alan HİÇ yazılmamışsa da geçerli', () => {
+    expect(dogrulaSuzgec(['a/b/'])).toEqual([])
+    expect(dogrulaSuzgec(['a/b.cjs'])).toEqual([])
+    expect(dogrulaSuzgec(['a/b/', 'c.json', '.githooks/', '.cc_docs.yaml'])).toEqual([])
+    expect(D.dogrula(liste(A), VAR)).toEqual([])
+  })
+
+  it.each(['src/**', 'src/*.ts', '*', 'a/b/**', 'a/*/b/'])('glob %j YASAK: tam BİR hata, mesaj birebir', (g) => {
+    expect(dogrulaSuzgec([g])).toEqual([`${ON}yolFiltresi "${g}": glob YASAK (dizin öneki "a/b/" ya da tam dosya yolu)`])
+  })
+
+  it.each(['./a/b/', 'a//b/', 'a/./b/', 'a/../b/', 'a\\b/', '/abs/x', '/x/', '../x', '..', '../', 'a/b//', '/', '.', './'])(
+    'kanonik olmayan yazım %j reddedilir (tam BİR hata)',
+    (g) => {
+      const h = dogrulaSuzgec([g])
+      expect(h, g).toHaveLength(1)
+      expect(h[0]).toContain(`${ON}yolFiltresi "${g}": yol kanonik değil`)
+    },
+  )
+
+  it.each<[string, unknown]>([
+    ['boş dizi', []],
+    ['metin', 'a/b/'],
+    ['nesne', {}],
+    ['null', null],
+    ['sayı', 5],
+  ])('dizi olmayan ya da boş süzgeç (%s) tek hata: alan istenmiyorsa HİÇ yazılmaz', (_ad, f) => {
+    expect(dogrulaSuzgec(f)).toEqual([`${ON}yolFiltresi en az bir yol taşıyan dizi olmalı (süzgeç istenmiyorsa alan HİÇ yazılmaz)`])
+  })
+
+  it.each<[string, unknown]>([
+    ['boş metin', ''],
+    ['sayı', 5],
+    ['null', null],
+    ['nesne', {}],
+  ])('metin olmayan öğe (%s) hata verir; yanındaki geçerli öğe etkilenmez', (_ad, o) => {
+    expect(dogrulaSuzgec(['a/', o])).toEqual([`${ON}yolFiltresi öğesi boş olmayan metin olmalı`])
+  })
+
+  it('tekrar edilen öğe hata verir; farklı iki öğe tekrar sayılmaz', () => {
+    expect(dogrulaSuzgec(['a/', 'a/'])).toEqual([`${ON}yolFiltresi "a/": tekrar`])
+    expect(dogrulaSuzgec(['a/', 'b/'])).toEqual([])
+  })
+
+  it('yetim süzgeç: dosyaVarMi(yol, dizinMi) çağrılır (dizin öneki için true, tam yol için false); "yok" olan yol hata verir', () => {
+    const var_ = vi.fn((yol: string) => yol !== 'yok')
+    expect(dogrulaSuzgec(['x/y/', 'z.cjs'], var_)).toEqual([])
+    expect(var_).toHaveBeenCalledWith('x/y', true)
+    expect(var_).toHaveBeenCalledWith('z.cjs', false)
+    expect(var_).toHaveBeenCalledWith(A) // testin kendi varlık denetimi dizinMi taşımaz
+    const mesaj = (g: string) =>
+      `${ON}yolFiltresi "${g}": yol yok ya da türü uyuşmuyor ("a/b/" bir dizin, "a/b" bir dosya olmalı; yetim süzgeç hiç eşleşmez ve test PR kapısından HEP çıkar)`
+    expect(dogrulaSuzgec(['yok'], var_)).toEqual([mesaj('yok')])
+    expect(dogrulaSuzgec(['yok/'], var_)).toEqual([mesaj('yok/')])
+  })
+
+  it('GERÇEK diskte tür denetimi: dizin `/`sız, dosya `/`lı yazılırsa ve olmayan yol hata verir; doğru yazım geçer', () => {
+    const gercek = (f: unknown) => D.dogrula({ surum: 1, testler: [suzgecli(GERCEK_KAYIT, f)] })
+    expect(gercek(['.githooks/', 'package.json'])).toEqual([])
+    expect(gercek(['.githooks'])).toHaveLength(1) // dizin ama `/`sız: tam eşitlik hiçbir dosyayla eşleşmezdi
+    expect(gercek(['.githooks'])[0]).toContain('yol yok ya da türü uyuşmuyor')
+    expect(gercek(['package.json/'])).toHaveLength(1) // dosya ama `/`lı
+    expect(gercek(['olmayan-dizin/'])).toHaveLength(1)
+  })
+
+  it.each(['dislan', 'yalniz'])('%s: PR listesinde geçersiz süzgeç FIRLATIR (vitest başlamaz); taban ve değişen dosyalar hiç sorulmaz', (kip) => {
+    const tabanOku = vi.fn(() => taban(A))
+    const degisenOku = vi.fn(() => ['x'])
+    const pr = { surum: 1, testler: [suzgecli(A, ['src/**'])] }
+    expect(() => D.ayar({ [KIP]: kip }, pr, { tabanOku, degisenOku, dosyaVarMi: VAR })).toThrow(
+      `${LISTE_YOLU} GEÇERSİZ (1 hata): ${ON}yolFiltresi "src/**": glob YASAK (dizin öneki "a/b/" ya da tam dosya yolu)`,
+    )
+    expect(tabanOku).not.toHaveBeenCalled()
+    expect(degisenOku).not.toHaveBeenCalled()
+  })
+})
+
+describe('filtreEslesirMi — dizin öneki sınırı, tam eşitlik, takma yazımlar', () => {
+  it.each<[string, string[], string, boolean]>([
+    ['dizin öneki: altındaki dosya', ['a/b/'], 'a/b/c.ts', true],
+    ['dizin öneki: derin dosya', ['a/b/'], 'a/b/c/d/e.ts', true],
+    ['SINIR: `a/b/` öneki `a/bc` yolunu kapsamaz', ['a/b/'], 'a/bc', false],
+    ['SINIR: `a/b/` öneki `a/bc/x.ts` yolunu kapsamaz', ['a/b/'], 'a/bc/x.ts', false],
+    ['SINIR: `a/b/` öneki `a/b.ts` yolunu kapsamaz', ['a/b/'], 'a/b.ts', false],
+    ['dizinin kendisi (öneksiz) kapsanmaz', ['a/b/'], 'a/b', false],
+    ['tam dosya: eşitlik', ['a/b.ts'], 'a/b.ts', true],
+    ['tam dosya: uzantılı kardeş uymaz', ['a/b.ts'], 'a/b.tsx', false],
+    ['tam dosya: altına inen yol uymaz', ['a/b.ts'], 'a/b.ts/x', false],
+    ['tam dosya: önek değil', ['a/b.ts'], 'a/b.ts.bak', false],
+    ['takma yazım ./x/y', ['x/'], './x/y', true],
+    ['takma yazım x//y', ['x/'], 'x//y', true],
+    ['takma yazım z/../x/y', ['x/'], 'z/../x/y', true],
+    ['takma yazım x/../z üst dizine çıkıp başka yere iner', ['x/'], 'x/../z', false],
+    ['ters eğik çizgi', ['x/'], 'x\\y', true],
+    ['büyük/küçük harf duyarlı', ['x/'], 'X/y', false],
+    ['benzer önek', ['x/'], 'xx/y', false],
+    ['birden çok süzgeç: ikincisi uyar', ['x/', 'y.cjs'], 'y.cjs', true],
+    ['birden çok süzgeç: hiçbiri uymaz', ['x/', 'y.cjs'], 'z/y.cjs', false],
+    ['boş süzgeç hiçbir şeyi kapsamaz', [], 'x/a', false],
+    ['kök dosyası tam eşitlik', ['.mcp.json'], '.mcp.json', true],
+    ['nokta ile başlayan dizin', ['.githooks/'], '.githooks/lib/doc-scope.cjs', true],
+  ])('%s', (_ad, filtre, yol, beklenen) => {
+    expect(D.filtreEslesirMi(filtre, yol)).toBe(beklenen)
+  })
+})
+
+describe('YOL SÜZGECİ — dislan: süzgece uyan PR testi kapıda KALIR, uymayan çıkar', () => {
+  it.each<[string, string[], boolean]>([
+    ['süzgeç dizinindeki dosya', ['x/a.ts'], true],
+    ['süzgeç dizininin derin dosyası', ['x/b/c/d.ts'], true],
+    ['tam dosya süzgeci', ['tek.cjs'], true],
+    ['ilgisiz dosya', ['y/a.ts'], false],
+    ['hiç değişiklik yok', [], false],
+    ['biri uyar, biri uymaz: BİRİ yeter', ['y/a.ts', 'x/z.md'], true],
+    ['çok ilgisiz dosya ve bir uyan', ['a/1', 'b/2', 'c/3', 'tek.cjs'], true],
+    ['dizin adı tek başına (önek `x/` değil)', ['x'], false],
+    ['benzer önek (xx/)', ['xx/a.ts'], false],
+    ['tam yolun uzantılı kardeşi', ['tek.cjs.bak'], false],
+    ['tam yolun altı', ['tek.cjs/ek.ts'], false],
+    ['büyük/küçük harf duyarlı', ['X/a.ts'], false],
+    ['takma yazım ./x/a.ts', ['./x/a.ts'], true],
+    ['takma yazım x//a.ts', ['x//a.ts'], true],
+    ['takma yazım z/../x/a.ts', ['z/../x/a.ts'], true],
+  ])('%s: değişen dosyalar sorulur (TAM bir kez); sonuç tam', (_ad, degisen, tutulur) => {
+    const { sonuc, degisenOku } = dislanSuzgecli(degisen)
+    expect(sonuc).toStrictEqual(tutulur ? TUTULAN : CIKAN)
+    expect('uyari' in sonuc).toBe(false)
+    expect(degisenOku).toHaveBeenCalledTimes(1)
+    expect(degisenOku).toHaveBeenCalledWith()
+  })
+
+  it('süzgeçsiz kayıt eskisi gibi HER PR\'da dışlanır, değişen dosya ne olursa olsun (süzgeç yok → sorulmaz)', () => {
+    for (const degisen of [[], ['x/a.ts'], ['y/a.ts'], null]) {
+      const degisenOku = vi.fn(() => degisen)
+      const sonuc = D.ayar({ [KIP]: 'dislan' }, liste(A, B), { tabanOku: () => taban(A, B), dosyaVarMi: VAR, degisenOku })
+      expect(sonuc).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+      expect(degisenOku).not.toHaveBeenCalled()
+    }
+  })
+
+  it('karışık liste: süzgeçliler uyan dosyayla tutulur, süzgeçsizler dışlanır; sıra PR listesinin sırasıdır; PR\'ın YENİ kaydı hiçbir koşulda dışlanmaz', () => {
+    const pr = liste(C, A, B)
+    const tabanListe = suzgecliTaban([A, ['x/']], [B], [C, ['z/']])
+    const kos = (degisen: string[]) => D.ayar({ [KIP]: 'dislan' }, pr, { tabanOku: () => tabanListe, dosyaVarMi: VAR, degisenOku: () => degisen })
+    expect(kos(['y/q'])).toStrictEqual({ kip: 'dislan', exclude: [C, A, B], include: null })
+    expect(kos(['x/q'])).toStrictEqual({ kip: 'dislan', exclude: [C, B], include: null, suzgeceTakilan: [A] })
+    expect(kos(['x/q', 'z/q'])).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [C, A] })
+    const yeni = D.ayar({ [KIP]: 'dislan' }, liste(A, B), { tabanOku: () => suzgecliTaban([B]), dosyaVarMi: VAR, degisenOku: () => ['y/q'] })
+    expect(yeni).toStrictEqual({ kip: 'dislan', exclude: [B], include: null }) // A tabanda YOK: kendi PR'ında dışlanmaz
+  })
+
+  describe('süzgeç PR kaydından DEĞİL TABAN kaydından okunur (PR kendi dışlamasını genişletemez)', () => {
+    it('PR süzgeci GENİŞLETİRSE etkisizdir: PR\'ın eklediği y/ sayılmaz, test çıkar', () => {
+      const { sonuc } = dislanSuzgecli(['y/a.ts'], { pr: { surum: 1, testler: [suzgecli(A, [...SUZGEC, 'y/'])] } })
+      expect(sonuc).toStrictEqual(CIKAN)
+    })
+
+    it('PR süzgeci DARALTIRSA da tabandaki geçerlidir: x/ hâlâ tutar', () => {
+      const { sonuc } = dislanSuzgecli(['x/a.ts'], { pr: { surum: 1, testler: [suzgecli(A, ['z/'])] } })
+      expect(sonuc).toStrictEqual(TUTULAN)
+    })
+
+    it('PR süzgeci TÜMDEN SİLERSE (alan yok) tabandaki hâlâ tutar: süzgeci silmek kapıdan çıkarmaz', () => {
+      const { sonuc } = dislanSuzgecli(['x/a.ts'], { pr: liste(A) })
+      expect(sonuc).toStrictEqual(TUTULAN)
+    })
+
+    it('tabanda süzgeç YOKSA PR\'ın yazdığı süzgeç de etkisizdir: test her PR\'da çıkar ve değişen dosyalar sorulmaz', () => {
+      const { sonuc, degisenOku } = dislanSuzgecli(['x/a.ts'], { pr: { surum: 1, testler: [suzgecli(A, ['x/'])] }, tabanListe: taban(A) })
+      expect(sonuc).toStrictEqual(CIKAN)
+      expect(degisenOku).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('değişen dosyalar OKUNAMADIYSA süzgeçli test dışlanmaz (güvenli taraf) ve uyarı döner', () => {
+    it.each<[string, unknown]>([
+      ['null', null],
+      ['undefined', undefined],
+      ['metin', 'x/a.ts'],
+      ['nesne', { 0: 'x/a.ts' }],
+      ['sayı', 0],
+    ])('okuyucu %s döner', (_ad, d) => {
+      const { sonuc } = dislanSuzgecli(d)
+      expect(sonuc).toStrictEqual({ ...TUTULAN, uyari: expect.stringContaining('değişen dosyalar okunamadı') })
+    })
+
+    it('okuyucu FIRLATIRSA da aynı sonuç: dışlanmaz + uyarı (ayar fırlatmaz)', () => {
+      const sonuc = D.ayar({ [KIP]: 'dislan' }, liste(A), { tabanOku: () => suzgecliTaban([A, SUZGEC]), dosyaVarMi: VAR, degisenOku: patlayan('degisenOku') })
+      expect(sonuc).toStrictEqual({ ...TUTULAN, uyari: expect.stringContaining('değişen dosyalar okunamadı') })
+    })
+
+    it('süzgeçsiz kayıt okunamayan değişen dosyalardan ETKİLENMEZ: yine dışlanır, yalnız süzgeçli tutulur', () => {
+      const { sonuc, degisenOku } = dislanSuzgecli(null, { pr: liste(A, B), tabanListe: suzgecliTaban([A, SUZGEC], [B]) })
+      expect(sonuc).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A], uyari: expect.stringContaining('değişen dosyalar okunamadı') })
+      expect(degisenOku).toHaveBeenCalledTimes(1)
+    })
+
+    it('uyarı metni TAM ve kaynağı söyler: ortam boşsa git diff + fetch-depth ipucu', () => {
+      expect(dislanSuzgecli(null).sonuc.uyari).toBe(
+        "değişen dosyalar okunamadı (git diff HEAD^1 HEAD; pull_request birleştirme commit'i ve fetch-depth >= 2 gerekir): yol süzgeçli testler DIŞLANMADI, PR kapısında koşar (güvenli taraf)",
+      )
+    })
+
+    it("ortam değişkeni DOLUYSA uyarı onu adıyla ve yolu JSON kaçışlı söyler (git'ten bahsetmez); satır sonu enjekte edemez", () => {
+      expect(dislanSuzgecli(null, { env: { [DEGISEN_ENV]: '/x/d.txt' } }).sonuc.uyari).toBe(
+        'değişen dosyalar okunamadı (VENTHUB_DUNYA_DEGISEN_DOSYALAR="/x/d.txt"): yol süzgeçli testler DIŞLANMADI, PR kapısında koşar (güvenli taraf)',
+      )
+      const kotu = dislanSuzgecli(null, { env: { [DEGISEN_ENV]: 'a\n::error::sahte\nb' } }).sonuc.uyari as string
+      expect(kotu).not.toMatch(/[\r\n]/)
+      expect(kotu).not.toContain('git diff')
+    })
+
+    it('ortam değişkeni BOŞ metinse "dolu değil" sayılır: uyarı git kaynağını söyler', () => {
+      expect(dislanSuzgecli(null, { env: { [DEGISEN_ENV]: '' } }).sonuc.uyari).toContain('git diff HEAD^1 HEAD')
+    })
+  })
+
+  describe('değişen dosyalar YALNIZ gerektiğinde ve TAM BİR kez sorulur', () => {
+    it('iki süzgeçli kayıt: tek çağrı (önbellek), argümansız', () => {
+      const { sonuc, degisenOku } = dislanSuzgecli(['x/a.ts'], { pr: liste(A, B), tabanListe: suzgecliTaban([A, ['x/']], [B, ['y/']]) })
+      expect(sonuc).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A] })
+      expect(degisenOku).toHaveBeenCalledTimes(1)
+    })
+
+    it('süzgeçli kayıt tabanda YOK (PR\'ın yeni kaydı): sorulmaz', () => {
+      const { sonuc, degisenOku } = dislanSuzgecli(['x/a.ts'], { pr: { surum: 1, testler: [suzgecli(A, ['x/'])] }, tabanListe: taban(B) })
+      expect(sonuc).toStrictEqual({ kip: 'dislan', exclude: [], include: null })
+      expect(degisenOku).not.toHaveBeenCalled()
+    })
+
+    it('taban OKUNAMADIYSA önce taban uyarısı gelir: değişen dosyalar sorulmaz, hiçbir şey dışlanmaz, süzgeç anahtarı yok', () => {
+      const degisenOku = vi.fn(() => ['y/a.ts'])
+      const sonuc = D.ayar({ [KIP]: 'dislan' }, { surum: 1, testler: [suzgecli(A, SUZGEC)] }, { tabanOku: () => null, dosyaVarMi: VAR, degisenOku })
+      expect(sonuc).toStrictEqual({ kip: 'dislan', exclude: [], include: null, uyari: expect.stringContaining('taban listesi okunamadı') })
+      expect(degisenOku).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('tabandaki süzgeç GEÇERSİZSE test DIŞLANMAZ (güvenli taraf); uyarı yok, değişen dosyalar sorulmaz', () => {
+    it.each<[string, unknown]>([
+      ['boş dizi', []],
+      ['dizi değil (metin)', 'x/'],
+      ['null', null],
+      ['nesne', {}],
+      ['boş öğe', ['']],
+      ['glob', ['x/*']],
+      ['takma yazım', ['./x/']],
+      ['çift eğik çizgi', ['x//']],
+      ['üst dizin', ['..']],
+      ['tekrar', ['x/', 'x/']],
+      ['sayı öğe', [5]],
+    ])('%s', (_ad, f) => {
+      const { sonuc, degisenOku } = dislanSuzgecli(['y/a.ts'], { tabanListe: suzgecliTaban([A, f]) })
+      expect(sonuc).toStrictEqual(TUTULAN)
+      expect('uyari' in sonuc).toBe(false)
+      expect(degisenOku).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('yalniz ve tam kiplerinde süzgeç YOKTUR', () => {
+    const suzgecliPr: Liste = { surum: 1, testler: [suzgecli(A, SUZGEC), kayit(B)] }
+
+    it('yalniz: listenin TAMAMI koşar; taban ve değişen dosyalar sorulmaz, git çağrılmaz, süzgeç anahtarı yok', () => {
+      const git = gitTakmasi(patlayan('git'))
+      const sonuc = D.ayar({ [KIP]: 'yalniz' }, suzgecliPr, { tabanOku: patlayan('tabanOku'), degisenOku: patlayan('degisenOku'), dosyaVarMi: VAR })
+      expect(sonuc).toStrictEqual({ kip: 'yalniz', exclude: [], include: [A, B] })
+      expect(git.cagrilar).toEqual([])
+    })
+
+    it('tam: liste okunmaz, değişen dosyalar sorulmaz, git çağrılmaz', () => {
+      const git = gitTakmasi(patlayan('git'))
+      expect(D.ayar({}, patlayanListe(), { degisenOku: patlayan('degisenOku'), tabanOku: patlayan('tabanOku') })).toStrictEqual({ kip: 'tam', exclude: [], include: null })
+      expect(git.cagrilar).toEqual([])
+    })
+  })
+
+  describe('varsayılan değişen kaynağı: enjeksiyon yoksa `degisenYollariniOku(env)` (gerçek bağ)', () => {
+    const tabanOku = () => suzgecliTaban([A, SUZGEC], [B])
+    const dis = (env: Env = {}) => D.ayar({ [KIP]: 'dislan', ...env }, liste(A, B), { tabanOku, dosyaVarMi: VAR })
+
+    it('git kolu: `git diff` modül kökünde, kabuksuz ve TAM seçeneklerle BİR kez çağrılır; uyan dosya → tutulur', () => {
+      const git = gitTakmasi(() => 'x/a.ts\0')
+      expect(dis()).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A] })
+      expect(git.cagrilar).toStrictEqual([['git', GIT_DEGISEN_ARGS, gitDegisenSecenek(D.KOK)]])
+    })
+
+    it('git kolu: uymayan dosya → süzgeçli çıkar', () => {
+      gitTakmasi(() => 'y/b.ts\0')
+      expect(dis()).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+    })
+
+    it('git kolu iki süzgeçli kayıtta da TEK çağrı yapar', () => {
+      const git = gitTakmasi(() => 'x/a.ts\0')
+      const sonuc = D.ayar({ [KIP]: 'dislan' }, liste(A, B), { tabanOku: () => suzgecliTaban([A, ['x/']], [B, ['y/']]), dosyaVarMi: VAR })
+      expect(sonuc).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A] })
+      expect(git.cagrilar).toHaveLength(1)
+    })
+
+    it('git fırlatır ya da okunamaz çıktı verirse: süzgeçli test DIŞLANMAZ + uyarı (FIRLATMAZ)', () => {
+      const okunamaz: Array<[string, () => unknown]> = [
+        ['git fırlatır', patlayan('git')],
+        ["NUL'suz dolu çıktı", () => 'x/a.ts'],
+        ['kesilmiş çıktı', () => 'x/a.ts\0eksik'],
+        ['üst dizine çıkan yol', () => '../x\0'],
+        ['undefined', () => undefined],
+      ]
+      for (const [ad, donus] of okunamaz) {
+        const git = gitTakmasi(donus)
+        expect(dis(), ad).toStrictEqual({
+          kip: 'dislan',
+          exclude: [B],
+          include: null,
+          suzgeceTakilan: [A],
+          uyari: expect.stringContaining('git diff HEAD^1 HEAD'),
+        })
+        git.geriKoy()
+      }
+    })
+
+    it('git BOŞ çıktı verirse (PR\'ın değişen dosyası yok) okunabilmiştir: süzgeçli test çıkar, uyarı yok', () => {
+      gitTakmasi(() => '')
+      expect(dis()).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+    })
+
+    it('ortam değişkeni DOLUYSA değişen dosyalar o dosyadır; git ÇAĞRILMAZ', () => {
+      const git = gitTakmasi(patlayan('git'))
+      const dosya = dosyaYaz('degisen.txt', 'x/a.ts\0')
+      expect(dis({ [DEGISEN_ENV]: dosya })).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A] })
+      expect(git.cagrilar).toEqual([])
+    })
+
+    it("ortam değişkeni dolu ama dosya yok: git'e DÜŞÜLMEZ, süzgeçli test dışlanmaz, uyarı değişkeni söyler", () => {
+      const git = gitTakmasi(() => 'y/b.ts\0') // git çağrılsaydı süzgeçli çıkardı
+      const yok = path.join(dizin, 'yok.txt')
+      expect(dis({ [DEGISEN_ENV]: yok })).toStrictEqual({
+        kip: 'dislan',
+        exclude: [B],
+        include: null,
+        suzgeceTakilan: [A],
+        uyari: expect.stringContaining(`${DEGISEN_ENV}=${JSON.stringify(yok)}`),
+      })
+      expect(git.cagrilar).toEqual([])
+    })
+
+    it("ayar kendisine verilen ortamı değişen dosya okumaya İLETİR (process.env'i değil)", () => {
+      process.env[DEGISEN_ENV] = dosyaYaz('baska-degisen.txt', 'x/a.ts\0')
+      const git = gitTakmasi(() => 'y/b.ts\0')
+      expect(dis()).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+      expect(git.cagrilar).toHaveLength(1)
+    })
+  })
+})
+
+describe('degisenYollariniOku — kaynak seçimi, ayrıştırma, her başarısızlık null', () => {
+  it('git kolu: komut `git`, argümanlar literal, seçenekler TAM eşitlik (kabuk YOK, cwd = verilen kök, ilk ebeveyne göre, -z ve --no-renames)', () => {
+    const { exec, cagrilar } = sahteExec(() => 'a.ts\0b/c.ts\0')
+    expect(D.degisenYollariniOku({}, KOK_SAHTE, exec)).toEqual(['a.ts', 'b/c.ts'])
+    expect(cagrilar).toStrictEqual([['git', GIT_DEGISEN_ARGS, gitDegisenSecenek(KOK_SAHTE)]])
+  })
+
+  it('kök verilmezse modülün kökü (KOK); execFn verilmezse child_process.execFileSync; env verilmezse process.env', () => {
+    const { exec, cagrilar } = sahteExec(() => 'a.ts\0')
+    expect(D.degisenYollariniOku({}, undefined, exec)).toEqual(['a.ts'])
+    expect(cagrilar[0][2]).toStrictEqual(gitDegisenSecenek(D.KOK))
+    const git = gitTakmasi(() => 'b.ts\0')
+    expect(D.degisenYollariniOku({})).toEqual(['b.ts'])
+    expect(git.cagrilar).toHaveLength(1)
+    process.env[DEGISEN_ENV] = dosyaYaz('d.txt', 'c.ts\0')
+    const git2 = gitTakmasi(patlayan('git'))
+    expect(D.degisenYollariniOku(undefined, KOK_SAHTE, patlayan('git'))).toEqual(['c.ts'])
+    expect(git2.cagrilar).toEqual([])
+  })
+
+  it.each<[string, string, string[] | null]>([
+    ['tek yol', 'a.ts\0', ['a.ts']],
+    ['iki yol', 'a.ts\0b/c.ts\0', ['a.ts', 'b/c.ts']],
+    ['boş çıktı = değişiklik yok', '', []],
+    ['yeni satır içeren ad NUL kipinde BÖLÜNMEZ', 'a\nb.ts\0', ['a\nb.ts']],
+    ['boşluk içeren ad', 'a b/c d.ts\0', ['a b/c d.ts']],
+    ['takma yazım özüne iner', './a//b.ts\0', ['a/b.ts']],
+    ['ters eğik çizgi eğik çizgiye döner', 'a\\b.ts\0', ['a/b.ts']],
+    ['`..` ile BAŞLAYAN ama üst dizin olmayan ad geçerli', '..gizli/x\0', ['..gizli/x']],
+    ['KESİLMİŞ çıktı (son NUL yok)', 'a.ts\0b/c', null],
+    ["NUL'suz dolu çıktı (-z düşmüş ya da kesilmiş)", 'a.ts', null],
+    ["NUL'suz satır ayraçlı dolu çıktı git kolunda KABUL EDİLMEZ", 'a.ts\nb.ts\n', null],
+    ['boş öğe (çift NUL)', 'a.ts\0\0', null],
+    ['yalnız NUL', '\0', null],
+    ['üst dizine çıkış (..)', 'a.ts\0../x\0', null],
+    ['normalleşince üst dizine çıkış', 'a/../../x\0', null],
+    ['yalnız ..', '..\0', null],
+    ['köke indirgenen yol (a/..)', 'a/..\0', null],
+    ['nokta', '.\0', null],
+    ['mutlak yol', '/etc/x\0', null],
+    ['sürücü harfli yol', 'C:/x\0', null],
+    ['sürücü harfli ters eğik çizgili yol', 'C:\\x\0', null],
+  ])('git kolu: %s', (_ad, cikti, beklenen) => {
+    expect(D.degisenYollariniOku({}, KOK_SAHTE, () => cikti)).toEqual(beklenen)
+  })
+
+  it('çok sayıda yol (5000) kesintisiz ayrıştırılır ve sırası korunur', () => {
+    const yollar = Array.from({ length: 5000 }, (_x, i) => `d${i % 7}/f${i}.ts`)
+    expect(D.degisenYollariniOku({}, KOK_SAHTE, () => `${yollar.join('\0')}\0`)).toEqual(yollar)
+  })
+
+  it.each<[string, string, string[] | null]>([
+    ['NUL ayraçlı', 'a.ts\0b/c.ts\0', ['a.ts', 'b/c.ts']],
+    ['LF ayraçlı', 'a.ts\nb/c.ts\n', ['a.ts', 'b/c.ts']],
+    ['CRLF ayraçlı', 'a.ts\r\nb/c.ts\r\n', ['a.ts', 'b/c.ts']],
+    ['son satır sonu yok', 'a.ts\nb/c.ts', ['a.ts', 'b/c.ts']],
+    ['boş satırlar atlanır', 'a.ts\n\n\nb.ts\n', ['a.ts', 'b.ts']],
+    ['tek yol', 'a.ts', ['a.ts']],
+    ['boş dosya = değişiklik yok', '', []],
+    ['yalnız satır sonu = değişiklik yok', '\n', []],
+    ['NUL kipinde kesilmiş', 'a.ts\0b', null],
+    ['LF kipinde üst dizin', 'a.ts\n../x\n', null],
+    ['LF kipinde mutlak yol', '/x\n', null],
+    ['LF kipinde takma yazım özüne iner', './a/./b.ts\n', ['a/b.ts']],
+  ])('ortam dosyası: %s', (_ad, icerik, beklenen) => {
+    const { exec, cagrilar } = sahteExec(patlayan('git'))
+    expect(D.degisenYollariniOku({ [DEGISEN_ENV]: dosyaYaz('degisen.txt', icerik) }, KOK_SAHTE, exec)).toEqual(beklenen)
+    expect(cagrilar).toEqual([])
+  })
+
+  it('ortam dolu ama dosya YOK ya da bir DİZİN: null ve git ÇAĞRILMAZ (okunamayan istenen kaynağın yerini başka kaynak almaz)', () => {
+    const { exec, cagrilar } = sahteExec(() => 'a.ts\0')
+    expect(D.degisenYollariniOku({ [DEGISEN_ENV]: path.join(dizin, 'yok.txt') }, KOK_SAHTE, exec)).toBeNull()
+    expect(D.degisenYollariniOku({ [DEGISEN_ENV]: dizin }, KOK_SAHTE, exec)).toBeNull()
+    expect(cagrilar).toEqual([])
+  })
+
+  it('ortam yolu BOŞ metinse git kolu kullanılır', () => {
+    const { exec, cagrilar } = sahteExec(() => 'a.ts\0')
+    expect(D.degisenYollariniOku({ [DEGISEN_ENV]: '' }, KOK_SAHTE, exec)).toEqual(['a.ts'])
+    expect(cagrilar).toHaveLength(1)
+  })
+
+  it.each<[string, ExecFn]>([
+    [
+      'git yok (ENOENT)',
+      () => {
+        throw Object.assign(new Error('spawn git ENOENT'), { code: 'ENOENT' })
+      },
+    ],
+    [
+      'HEAD^1 yok, sığ klon (çıkış 128)',
+      () => {
+        throw Object.assign(new Error('Command failed: git diff'), { status: 128 })
+      },
+    ],
+    [
+      'zaman aşımı',
+      () => {
+        throw Object.assign(new Error('spawnSync git ETIMEDOUT'), { code: 'ETIMEDOUT' })
+      },
+    ],
+    [
+      'çıktı tampon sınırını aştı (ENOBUFS)',
+      () => {
+        throw Object.assign(new Error('spawnSync git ENOBUFS'), { code: 'ENOBUFS' })
+      },
+    ],
+    [
+      'Error olmayan değer fırlatılır',
+      () => {
+        throw 'metin hata'
+      },
+    ],
+    ['undefined döner', () => undefined],
+  ])('git kolu: %s → FIRLATMAZ, null döner', (_ad, exec) => {
+    expect(() => D.degisenYollariniOku({}, KOK_SAHTE, exec)).not.toThrow()
+    expect(D.degisenYollariniOku({}, KOK_SAHTE, exec)).toBeNull()
+  })
+})
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// SABOTAJ (ALT-38i): süzgeç mantığı KAYNAKTA bozulur ve yukarıdaki sözleşmenin kırmızı verdiği ölçülür. Her kol bir mutasyondur: modülün kaynağı
+// `eski` → `yeni` değişimiyle geçici bir depoya yazılır ve YÜKLENİR; senaryo gerçek modülde beklenen sonucu verir, bozuk modülde VERMEZ. `eski` kaynakta
+// TAM BİR kez bulunmak zorundadır: kaynak yeniden yazılır da hedef kaybolursa kol sessizce yeşil kalmaz, KIRMIZI olur ve güncellenmeyi ister.
+// ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+describe('SABOTAJ — süzgeç mantığı bozulunca sözleşme KIRMIZI verir', () => {
+  interface Senaryo {
+    calistir: (m: Modul) => unknown
+    beklenen: unknown
+  }
+  const dis = (m: Modul, pr: Liste, tabanListe: unknown, degisen: unknown) =>
+    m.ayar({ [KIP]: 'dislan' }, pr, { tabanOku: () => tabanListe, dosyaVarMi: VAR, degisenOku: () => degisen })
+
+  const SENARYO: Record<string, Senaryo> = {
+    'süzgeç TABANDAN okunur (PR genişletemez)': {
+      calistir: (m) => dis(m, { surum: 1, testler: [suzgecli(A, ['y/'])] }, suzgecliTaban([A, ['x/']]), ['y/a.ts']),
+      beklenen: CIKAN,
+    },
+    'okunamayan değişen dosyalar testi TUTAR': {
+      calistir: (m) => dis(m, liste(A), suzgecliTaban([A, ['x/']]), null),
+      beklenen: { ...TUTULAN, uyari: expect.stringContaining('değişen dosyalar okunamadı') },
+    },
+    'dizin öneki sınırı (a/b/ → a/bc uymaz)': {
+      calistir: (m) => dis(m, liste(A), suzgecliTaban([A, ['a/b/']]), ['a/bc/x.ts']),
+      beklenen: CIKAN,
+    },
+    'tabandaki geçersiz süzgeç testi TUTAR': {
+      calistir: (m) => dis(m, liste(A), suzgecliTaban([A, []]), ['y/a.ts']),
+      beklenen: TUTULAN,
+    },
+    'BİRİ uyarsa yeter': {
+      calistir: (m) => dis(m, liste(A), suzgecliTaban([A, ['x/']]), ['y/b.ts', 'x/a.ts']),
+      beklenen: TUTULAN,
+    },
+    'süzgeç yolunun TÜRÜ denetlenir (dizin `/`sız yazılamaz)': {
+      calistir: (m) => m.dogrula({ surum: 1, testler: [suzgecli(A, ['d'])] }, (yol, dizinMi) => dizinMi === undefined || (dizinMi ? yol === 'd' : yol === 'f')),
+      beklenen: [expect.stringContaining('türü uyuşmuyor')],
+    },
+  }
+
+  /** Gerçek modülün kaynağını `eski` → `yeni` ile bozar, geçici bir depoya yazıp yükler. `eski` kaynakta tam bir kez bulunmalı. */
+  function bozukModul(eski: string, yeni: string, ad: string): Modul {
+    const kaynak = readFileSync(MODUL_YOLU, 'utf8').replace(/\r\n/g, '\n')
+    expect(kaynak.split(eski).length - 1, `sabotaj hedefi kaynakta TAM BİR kez bulunmalı (kaynak yeniden yazıldıysa kol güncellenmeli): ${eski}`).toBe(1)
+    const yol = path.join(dizin, 'bozuk', ad, 'scripts/ci/dunya-durumu.cjs')
+    mkdirSync(path.dirname(yol), { recursive: true })
+    writeFileSync(yol, kaynak.replace(eski, () => yeni))
+    return require_(yol) as Modul
+  }
+  const gozle = (m: Modul, s: Senaryo): unknown => {
+    try {
+      return s.calistir(m)
+    } catch (e) {
+      return { firladi: e instanceof Error ? e.message : String(e) }
+    }
+  }
+
+  it.each(Object.keys(SENARYO))('senaryo GERÇEK modülde yeşil: %s', (ad) => {
+    expect(gozle(D, SENARYO[ad])).toEqual(SENARYO[ad].beklenen)
+  })
+
+  it.each<[string, string, string, string]>([
+    ['PR kaydından oku (tabandan değil)', 'const k = tabanKaydi.get(y);', 'const k = tabanKaydi.get(y) && pr.testler.find((t) => t.test === y);', 'süzgeç TABANDAN okunur (PR genişletemez)'],
+    [
+      'değişen dosyalar okunamazsa DIŞLA (fail-open)',
+      'takilan.push(y);\n        degisenUyari = degisenUyarisi(env);',
+      'dislanan.push(y);\n        degisenUyari = degisenUyarisi(env);',
+      'okunamayan değişen dosyalar testi TUTAR',
+    ],
+    ['önek sınırını kaldır (a/b/ → a/bc uyar)', 'o.startsWith(g)', 'o.startsWith(g.slice(0, -1))', 'dizin öneki sınırı (a/b/ → a/bc uymaz)'],
+    [
+      'tabandaki geçersiz süzgeci yok say (dışla)',
+      'takilan.push(y); // tabandaki süzgeç geçersiz: koşar',
+      'dislanan.push(y); // tabandaki süzgeç geçersiz: koşar',
+      'tabandaki geçersiz süzgeç testi TUTAR',
+    ],
+    ['HEPSİ uymalı (biri yetmez)', 'd.some((yol) => filtreEslesirMi(k.yolFiltresi, yol))', 'd.every((yol) => filtreEslesirMi(k.yolFiltresi, yol))', 'BİRİ uyarsa yeter'],
+    ['tür denetimini kaldır', "dosyaVarMi(govde, g.endsWith('/'))", 'dosyaVarMi(govde)', 'süzgeç yolunun TÜRÜ denetlenir (dizin `/`sız yazılamaz)'],
+  ])('KIRMIZI: %s', (ad, eski, yeni, senaryoAdi) => {
+    const bozuk = bozukModul(eski, yeni, ad.replace(/[^a-z0-9]+/gi, '-'))
+    expect(gozle(bozuk, SENARYO[senaryoAdi]), `sabotaj "${ad}" senaryo "${senaryoAdi}" tarafından YAKALANMADI`).not.toEqual(SENARYO[senaryoAdi].beklenen)
+  })
+})
+
 describe('komut satırı — `node scripts/ci/dunya-durumu.cjs` (gerçek alt süreç, geçici dizin, git YOK)', () => {
   let kok = ''
   let bosPath = ''
@@ -782,5 +1419,88 @@ describe('komut satırı — `node scripts/ci/dunya-durumu.cjs` (gerçek alt sü
     expect(r.status).toBe(1)
     expect(r.stderr).toMatch(/^\[dunya-durumu\] .*dunya-durumu-testleri\.json/)
     expect(r.stdout).toBe('')
+  })
+
+  describe('yol süzgeci (ALT-38i): değişen dosyalar ortam dosyasıyla verilir, git YOK', () => {
+    /** A süzgeçli (x/), B süzgeçsiz; x/a.txt diskte (süzgeç yolu GERÇEKTEN var: yetim süzgeç liste hatasıdır). */
+    const suzgecliAgac = () => agacKur({ surum: 1, testler: [suzgecli(A, ['x/']), kayit(B)] }, [A, B, 'x/a.txt'])
+    const tabanSuzgecli = () => dosyaYaz('taban.json', JSON.stringify(suzgecliTaban([A, ['x/']], [B])))
+    const degisenDosyasi = (icerik: string) => dosyaYaz('degisen.txt', icerik)
+
+    it('süzgece UYAN değişen dosya: süzgeçli test kapıda KALIR (JSON: exclude yalnız süzgeçsiz, suzgeceTakilan dolu), uyarı yok, çıkış 0', () => {
+      suzgecliAgac()
+      const r = kos(['--kip', 'dislan', '--json'], { [TABAN_ENV]: tabanSuzgecli(), [DEGISEN_ENV]: degisenDosyasi('x/a.txt\0') })
+      expect(r.status, r.stderr).toBe(0)
+      expect(JSON.parse(r.stdout)).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A] })
+      expect(r.stderr).toBe('')
+    })
+
+    it('süzgece UYMAYAN değişen dosya: süzgeçli test DIŞARI çıkar (süzgeç anahtarı hiç yazılmaz), uyarı yok, çıkış 0', () => {
+      suzgecliAgac()
+      const r = kos(['--kip', 'dislan', '--json'], { [TABAN_ENV]: tabanSuzgecli(), [DEGISEN_ENV]: degisenDosyasi('y/b.txt\0') })
+      expect(r.status, r.stderr).toBe(0)
+      expect(JSON.parse(r.stdout)).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+      expect(r.stderr).toBe('')
+    })
+
+    it.each<[string, string, string]>([
+      ['uyan', 'x/a.txt\0', 'kip=dislan dışarıda=1 yalnız=- suzgece-takilan=1\n'],
+      ['uymayan', 'y/b.txt\0', 'kip=dislan dışarıda=2 yalnız=-\n'],
+      ['satır ayraçlı (LF)', 'x/a.txt\n', 'kip=dislan dışarıda=1 yalnız=- suzgece-takilan=1\n'],
+      ['satır ayraçlı (CRLF)', 'y/b.txt\r\n', 'kip=dislan dışarıda=2 yalnız=-\n'],
+      ['boş dosya (değişiklik yok)', '', 'kip=dislan dışarıda=2 yalnız=-\n'],
+    ])('düz özet satırı, değişen dosyalar %s', (_ad, icerik, beklenen) => {
+      suzgecliAgac()
+      const r = kos(['--kip', 'dislan'], { [TABAN_ENV]: tabanSuzgecli(), [DEGISEN_ENV]: degisenDosyasi(icerik) })
+      expect(r.status, r.stderr).toBe(0)
+      expect(r.stdout).toBe(beklenen)
+    })
+
+    it('değişen dosya listesi OKUNAMIYOR (ortam dolu, dosya yok): süzgeçli test dışlanmaz, uyarı HEM stderr\'de HEM JSON\'da, çıkış 0', () => {
+      suzgecliAgac()
+      const yok = path.join(dizin, 'yok-degisen.txt')
+      const r = kos(['--kip', 'dislan', '--json'], { [TABAN_ENV]: tabanSuzgecli(), [DEGISEN_ENV]: yok })
+      expect(r.status, r.stderr).toBe(0)
+      const json = JSON.parse(r.stdout) as Ayar
+      expect(json).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A], uyari: expect.stringContaining(`${DEGISEN_ENV}=${JSON.stringify(yok)}`) })
+      expect(r.stderr).toBe(`[dunya-durumu] ${json.uyari}\n`)
+    })
+
+    it('ortam değişkeni YOK ve git YOK (PATH boş): süzgeçli test dışlanmaz, uyarı git diff kaynağını söyler, çıkış 0', () => {
+      suzgecliAgac()
+      const r = kos(['--kip', 'dislan', '--json'], { [TABAN_ENV]: tabanSuzgecli() })
+      expect(r.status, r.stderr).toBe(0)
+      const json = JSON.parse(r.stdout) as Ayar
+      expect(json).toStrictEqual({ kip: 'dislan', exclude: [B], include: null, suzgeceTakilan: [A], uyari: expect.stringContaining('git diff HEAD^1 HEAD') })
+      expect(r.stderr).toBe(`[dunya-durumu] ${json.uyari}\n`)
+    })
+
+    it('yalniz ve tam kiplerinde süzgeç YOK: değişen dosya ortamı verilse de listenin tamamı / hiçbiri dışlanmaz', () => {
+      suzgecliAgac()
+      const degisen = degisenDosyasi('y/b.txt\0')
+      expect(JSON.parse(kos(['--kip', 'yalniz', '--json'], { [DEGISEN_ENV]: degisen }).stdout)).toStrictEqual({ kip: 'yalniz', exclude: [], include: [A, B] })
+      expect(JSON.parse(kos(['--kip', 'tam', '--json'], { [DEGISEN_ENV]: degisen }).stdout)).toStrictEqual({ kip: 'tam', exclude: [], include: null })
+    })
+
+    it('listede GLOB süzgeç: her kipte çıkış 1, stderr hatayı söyler, stdout boş', () => {
+      agacKur({ surum: 1, testler: [suzgecli(A, ['x/*'])] }, [A, 'x/a.txt'])
+      for (const kip of ['tam', 'dislan', 'yalniz']) {
+        const r = kos(['--kip', kip, '--json'], { [TABAN_ENV]: tabanDosyasi(A) })
+        expect(r.status, kip).toBe(1)
+        expect(r.stderr, kip).toBe(`[dunya-durumu] liste GEÇERSİZ:\n  - testler[0] (${A}): yolFiltresi "x/*": glob YASAK (dizin öneki "a/b/" ya da tam dosya yolu)\n`)
+        expect(r.stdout, kip).toBe('')
+      }
+    })
+
+    it('listede YETİM süzgeç (diskte olmayan dizin) ve TÜRÜ yanlış süzgeç (dizin `/`sız): çıkış 1', () => {
+      agacKur({ surum: 1, testler: [suzgecli(A, ['olmayan/'])] }, [A])
+      const yetim = kos(['--kip', 'dislan'], { [TABAN_ENV]: tabanDosyasi(A) })
+      expect(yetim.status).toBe(1)
+      expect(yetim.stderr).toContain('yolFiltresi "olmayan/": yol yok ya da türü uyuşmuyor')
+      agacKur({ surum: 1, testler: [suzgecli(A, ['x'])] }, [A, 'x/a.txt'])
+      const tur = kos(['--kip', 'dislan'], { [TABAN_ENV]: tabanDosyasi(A) })
+      expect(tur.status).toBe(1)
+      expect(tur.stderr).toContain('yolFiltresi "x": yol yok ya da türü uyuşmuyor')
+    })
   })
 })

@@ -1,6 +1,6 @@
-# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.3
+# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.4
 
-**Sürüm 1.3 · 2026-10-13 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-13 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
+**Sürüm 1.4 · 2026-11-08 · Sahibi: ALTYAPI · Son doğrulama: 2026-11-08 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §3 yol süzgeci ve çıkarılan testler listesi: ALT-38i (OPS hükmü 2026-10-09); §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -42,7 +42,7 @@ yer yazılıdır, yeni yerde gerçekten koştuğunu bir kapı doğrular, kırmı
 
 | Yer | Ne zaman | Hangi testler | Kırmızıda ne olur |
 |---|---|---|---|
-| PR kapısı (`pull_request` olayı: paralel `test-shard` işleri, §4.2; `ci` işinin Test adımı yalnız `edited` koşusunda) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`), her dosya TAM BİR shard'da; seçici daraltırsa (§4.3) yalnız seçilenler, şüphede hepsi | kırmızı shard `ci`yi kırmızı yapar (son adım bekler), birleştirme durur |
+| PR kapısı (`pull_request` olayı: paralel `test-shard` işleri, §4.2; `ci` işinin Test adımı yalnız `edited` koşusunda) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`; yol süzgeçli kayıt, PR'ın değişen dosyalarından biri süzgece uyuyorsa kapıda KALIR, §3), her dosya TAM BİR shard'da; seçici daraltırsa (§4.3) yalnız seçilenler, şüphede hepsi | kırmızı shard `ci`yi kırmızı yapar (son adım bekler), birleştirme durur |
 | master push (`ci` işi, aynı Test adımı) | master'a her birleşmede | TAM paket, liste dahil (kip boş) | master kırmızı; ⚠ aynı `concurrency` grubunda koşu iptal edilebilir (07-06..10-06: 1119 master koşusunun 419'u iptal), tek başına güvence DEĞİLDİR |
 | Zamanlı (`dunya-durumu.yml`) | 6 saatte bir (`23 */6 * * *`) ve elle | YALNIZ dünya durumu listesi (kip `yalniz`) | iş akışı kırmızı; PR'ı bloklamaz, kanca satırı `DUNYA:` her mesajda gösterir |
 | Yerel `pnpm test` | elle | TAM paket (kip boş) | geliştiricinin terminalinde |
@@ -59,6 +59,7 @@ tabanın son dökülme tarihi, dış sistem, bu makinenin durumu.
 **PR kapısından çıkarma kuralı** (`scripts/ci/dunya-durumu-testleri.json`, her kayıt):
 
 - Tek tek dosya yolu yazılır; glob YASAK (kapsam sessizce genişlemesin).
+- `yolFiltresi` (isteğe bağlı, ALT-38i): testin girdilerine dokunan PR'da test PR kapısında KALIR; kurallar aşağıda ("Yol süzgeci").
 - `neden`: testin neden dünya durumu olduğu. `kanit`: CI geçmişinden (aynı test ≥3 farklı dalda 12 saat içinde kırmızı = dünya olayı
   kümesi) ya da koddan gösterilmiş bağ. İkisi de en az 20 karakter, boş geçilmez.
 - `yeniYer`: `zamanli` ZORUNLU (master push tek başına güvence değildir), ayrıca `master-push`.
@@ -80,6 +81,51 @@ dosya) HİÇBİR test dışlanmaz: tam paket koşar, uyarı yazılır. Yerel kul
 ile elle verebilir (doluyken okunamıyorsa git'e DÜŞÜLMEZ). Liste `dislan` ve `yalniz` kiplerinde her yüklemede doğrulanır, geçersizse
 yapılandırma FIRLATIR. Dışlama mekanizmasının kendi koruyucu testleri (`INV-CI-EDITED-1/2`, `INV-TEST-KOSU-1`, `INV-DUNYA-SATIRI-1`, `INV-CI-SINIF-1/2/3`
 dosyaları ve sınıflayıcının karar tablosu `degisiklik-sinifi.test.ts`, `DISLANAMAZ` sabiti) listeye GİREMEZ.
+
+**Yol süzgeci (`yolFiltresi`, ALT-38i, OPS hükmü 2026-10-09).** Bir kayıt, testin girdisi olan yolları taşıyabilir. Süzgeçli test PR kapısından YALNIZ PR'ın
+değişen dosyalarından HİÇBİRİ süzgece uymuyorsa çıkar; biri uyarsa kapıda KALIR: testin girdisine dokunan PR o testin korumasını kaybetmez. Süzgeçsiz kayıt eskisi gibi
+her PR'da çıkar. Kurallar (`scripts/ci/dunya-durumu.cjs`):
+
+- Girdi: dizin öneki (`a/b/`, sondaki `/` ZORUNLU) ya da tam dosya yolu (`a/b.cjs`). Glob YASAK; yol köke göreli ve kanonik (`./`, `//`, `..`, `\` yok); tekrar yok; boş dizi yok
+  (süzgeç istenmiyorsa alan HİÇ yazılmaz).
+- Yetim ve yanlış türlü süzgeç listeyi GEÇERSİZ yapar: yol diskte VAR olmalı ve türü yazımıyla uyuşmalı (`/`lı dizin, `/`sız dosya). Silinen, taşınan ya da `/`sız yazılmış bir dizin
+  sessizce hiçbir yolla eşleşmez ve test PR kapısından HEP çıkardı. Geçersiz listede `dislan` ve `yalniz` kiplerinde yapılandırma FIRLATIR (vitest başlamaz).
+- Önek sınırı: `a/b/` öneki `a/bc` yolunu kapsamaz. Karşılaştırma büyük/küçük harf duyarlıdır; değişen yollar önce kanonik özüne indirilir (`./x`, `a//x`).
+- Süzgeç PR'ın kaydından DEĞİL TABAN kaydından (`HEAD^1`, yukarıdaki B3 kuralı) okunur: PR kendi kaydındaki süzgeci genişleterek, daraltarak ya da silerek kendi dışlamasını değiştiremez.
+  Tabanda süzgeç yoksa PR'ın yazdığı süzgeç de etkisizdir (test her PR'da çıkar).
+- Değişen dosyalar `git diff --name-only -z --no-renames HEAD^1 HEAD` ile okunur (`pull_request` birleştirme commit'i ve en az 2 commit derinliği gerekir; `ci` ve `test-shard` işleri
+  `fetch-depth: 0` ile çıkış yapar). Yerel kullanım ve testler `VENTHUB_DUNYA_DEGISEN_DOSYALAR=<dosya yolu>` (NUL ya da satır ayraçlı) ile elle verebilir; doluyken okunamıyorsa git'e DÜŞÜLMEZ.
+- GÜVENLİ TARAF: değişen dosyalar okunamazsa (git yok, `HEAD^1` yok, kesilmiş çıktı, `..` ya da mutlak yol, okunamayan dosya) ya da tabandaki süzgeç geçersizse süzgeçli test DIŞLANMAZ,
+  PR kapısında koşar; değişen dosyalar okunamadıysa `[dunya-durumu]` uyarısı stderr'e yazılır. Eksik süzgeç girdisi koruma kaybıdır, fazlası yalnız süre kaybıdır: kuşkuda geniş yaz.
+- `yalniz` kipinde (zamanlı koşu) süzgeç YOKTUR: listenin tamamı koşar.
+- Süzgece uyduğu için PR kapısında kalan testler sonuçta `suzgeceTakilan` alanında görünür (`node scripts/ci/dunya-durumu.cjs --kip dislan --json`).
+- Süzgeç girdileri ÖLÇÜLÜR, tahmin edilmez: testin okuduğu ya da çalıştırdığı izlenen dosyalar (kaynaklar: test haritası `scripts/ci/test-haritasi.json` `okunan` alanı ve testin gerçek koşusunun
+  dosya erişim kaydı). Kapı: `src/__tests__/conformance/test-kosu-kapsami.test.ts` (gerçek `vitest.config.ts` yüklemesi, süzgeç uyan ve okunamayan kollar) ve
+  `scripts/ci/__tests__/dunya-durumu.test.ts` (şekil, tür, önek sınırı, tabandan okuma, güvenli taraf, `git diff` argümanları ve kaynakta bozulunca kırmızı veren sabotaj kolları).
+
+**PR kapısından çıkarılan testler (2026-11-08).** Liste `scripts/ci/dunya-durumu-testleri.json`dur; her kaydın nedeni, kanıtı ve yeni yeri orada yazılıdır, karnede (§7) `dunyaDurumu` alanıyla görünür.
+Süre `scripts/ci/test-sureleri.json` yerel ölçümüdür (filo yükü altında; mutlak saniye değil).
+
+| Test | Kimlik | Süzgeç: bu yollardan biri değişirse test PR kapısında KALIR | Yeni yer | Kanıt (CI geçmişi 2026-07-06..10-07) | Süre |
+|---|---|---|---|---|---|
+| `src/__tests__/conformance/taban-tazeligi-dunya.test.ts` | `INV-TABAN-TAZE-1` (tazelik kolu) | yok: her PR'da çıkar | master push + zamanlı | 55 kırmızı koşu, 39 dal; 52'si dünya olayı kümesinde (ALT-38, §1) | 0,3 sn altı |
+| `src/__tests__/conformance/githooks-doc-scope.test.ts` | `INV-HOOKS-2` | `.githooks/`, `.cc_docs.yaml`, testin kendisi | master push + zamanlı | 6 kırmızı koşu, 6 dal (1'i master push), tek küme 2026-08-27 | 18,3 sn |
+| `src/__tests__/conformance/sessionstart-tavan.test.ts` | `INV-SESSIONSTART-TAVAN-1` | `docs/roller/`, `scripts/belge/`, `scripts/board/`, `scripts/hijyen/`, `.claude/hooks/`, `.claude/settings.json`, `.githooks/lib/companion-defter.cjs`, `.mcp.json`, `CLAUDE.md`, testin kendisi | master push + zamanlı | 4 kırmızı koşu, 4 dal, master push 0, tek küme 2026-09-29 | 130,4 sn |
+
+Son iki satır OPS hükmüdür (ALT-38i, 2026-10-09): `githooks-doc-scope` zamanlı kola alınır; `sessionstart-tavan` TAM çıkmaz, PR kapısında yalnız rol kartını ya da açılış çıktısını değiştiren
+yollar değişince koşar, diğer PR'larda zamanlı kolda koşar. Zamanlı kolun kırmızısı sessiz kalmaz: kanca satırı `DUNYA:` her mesajda gösterir (aşağıda "Görünen yüz").
+
+**Süzgeç girdi ölçümü (2026-11-08).**
+
+- `githooks-doc-scope`: test geçici depoya `.githooks/post-commit`, `.githooks/post-merge`, `.githooks/lib/doc-scope.cjs` ve `.cc_docs.yaml` dosyalarını kopyalar ve `sh` ile koşturur; başka izlenen dosya okumaz.
+  Süzgeçte `.githooks/` dizin olarak yazılıdır (üst küme: `pre-commit`, `pre-push`, `lib/companion-defter.cjs` değişince de koşar; bilinçli geniş).
+- `sessionstart-tavan`: SessionStart kancası (`.claude/settings.json` kaydı: `session-board.cjs`; aynı olayın öbür kayıtları `sage-daemon-ac`, `hafiza-yedek`, `sabit-dersler` bu testte koşmaz) dört açılış türünde
+  (`startup`, `resume`, `clear`, `compact`), `OPS`/`ARAC`/`HARITA`/`ALTYAPI` rol kollarında ve pencere başlığı kolunda, testin hermetik düzeneğiyle gerçekten koşturuldu; `fs` erişimi ve `require`
+  çözümlemesi alt süreçler dahil kaydedildi. Okunan izlenen dosya 29: `.claude/hooks/` (5), `.claude/settings.json`, `.githooks/lib/companion-defter.cjs`, `.mcp.json`, `scripts/belge/` (3: `rol-karti-uret.cjs` ve iki JSON),
+  `scripts/board/` (14), `scripts/hijyen/` (4). Süzgeç bu dizinlerin üst kümesidir. Kalan iki giriş ölçümün dışındadır, nedeniyle yazılı: `docs/roller/` testin KENDİ varlık denetimidir
+  (`docs/roller/{ARAC,OPS,HARITA}.md` diskte olmalı; kart özeti kancanın okuduğu `scripts/belge/*.json` verisinden gelir, `docs/roller` dosyalarından değil), `CLAUDE.md` ise test haritasında okunan olarak yazılıdır
+  (CI'da hiçbir kod okumaz; yerel makinede alt süreç `claude` komutu okur). `tools/wrongstack-mcp/` süzgeçte yoktur: posta sayacı UUID olmayan oturum kimliğiyle erken döner ve o dosyalara test yolunda hiç ulaşmaz.
+  Test haritasının `.snap` girdileri (`src/__tests__/conformance/__snapshots__/...`) depoda YOKTUR ve iki test de görüntü karşılaştırması yapmaz; süzgece alınmadı (alınsa `dogrula` "yol yok" derdi).
 
 **Görünen yüz.** Zamanlı koşunun kırmızısı ya da sessizce ölmesi `DUNYA:` kanca satırında görünür (`.claude/hooks/dunya-durumu-satiri.cjs`,
 `defter-tazelik-satiri.cjs` çağırır): yolundayken susar, kırmızıda ve ölçüm bayatlayınca konuşur. Sorgu yalnız `master` dalının koşularına
@@ -255,7 +301,7 @@ koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir.
 | `INV-CI-SINIF-1` | `ci-degisiklik-sinifi.test.ts` | sınıf kararının iki iş akışına bağı: dar küme sınıflayıcıdan türer ve `tam` içermez; YALNIZ `Build (blocking)` ve Next.js önbelleği sınıfı okur (Test ve öteki kapılar okumaz); `admin-smoke` iş düzeyinde `if`/`needs` taşımaz; her ağır e2e adımı tam koşulu taşır; iki sınıf adımı birebir aynı ve tabandan çıkarılır |
 | `INV-CI-SINIF-2` | `ci-degisiklik-sinifi.test.ts` | "siteye dokunmayan" tanımının ölçümü: derleme girdisinin src/ ve public/ dışına giden her kenarı `tam`; dosya okuyan derleme girdisi yalnız bilinen iki dosya; package.json CI hattı betikleri ve e2e işinin betikleri `tam` |
 | `INV-CI-SINIF-3` | `ci-degisiklik-sinifi.test.ts` | sınıf adımının GERÇEK gövdesi gerçek git ve bash ile koşar: belge farkı `belge`, kod farkı `tam`; sınıflayıcı çökerse adım kırmızı olmaz `sinif=tam` yazar (yedek silinirse kırmızı: kontrol testi); taban kopyası yoksa `tam`. bash yoksa atlanır, CI'da (ubuntu) her zaman koşar |
-| `INV-TEST-KOSU-1` | `test-kosu-kapsami.test.ts`, `dunya-durumu.test.ts` | her test dosyası bir yerde koşar; listedeki her kaydın dosyası var, gerekçesi ve kanıtı dolu, yeni yeri `zamanli` içeriyor; `dislan` kümesi PR listesi ∩ taban listesi; koruyucu testler listeye giremez; `ci` işinin Test adımı `dislan` kipini yalnız `pull_request`te verir; zamanlı iş akışı `yalniz` kipinde ve `schedule` ile koşar |
+| `INV-TEST-KOSU-1` | `test-kosu-kapsami.test.ts`, `dunya-durumu.test.ts` | her test dosyası bir yerde koşar; listedeki her kaydın dosyası var, gerekçesi ve kanıtı dolu, yeni yeri `zamanli` içeriyor; `dislan` kümesi PR listesi ∩ taban listesi; yol süzgeci tabandan okunur, süzgeç yolları diskte var ve türü uyuşuyor, okunamayan değişen dosya testi dışlamaz, `yalniz` kipinde süzgeç yok (§3); koruyucu testler listeye giremez; `ci` işinin Test adımı `dislan` kipini yalnız `pull_request`te verir; zamanlı iş akışı `yalniz` kipinde ve `schedule` ile koşar |
 | `INV-CI-EDITED-1` | `ci-edited-ayna.test.ts` | aynanın `ci.yml`'ye bağlantısı: ağır adımlar atlama koşulu taşır, hep koşan adımlar (kayıt kapısı, taban izi) taşımaz, iz adımı adı ve sırası, ayna adımı kayıt kapısından sonra ve karar betiğini TABAN kopyasından koşturur, `edited` ayrı grupta, izinler en az, tam geçmiş |
 | `INV-CI-EDITED-2` | `edited-ayna.test.ts` | aynanın karar mantığı ve GitHub çağrısının biçimi: atla yalnız aynı head ve AYNI taban izli tam koşu `success` iken; taban değişti, mekanizmaya dokunuldu, merge-ref biçimi bozuk ya da iz yoksa TAM; çağrı bütçesi |
 | `INV-DUNYA-SATIRI-1` | `dunya-durumu-satiri.test.ts` | kanca satırı: yalnız `master` sorgusu, eşikler, ölçüm hatasında ve 404'te bilinen kırmızının korunması, çözülemeyen damganın susmaması, dış metnin satıra girmemesi, kancaya bağlantı |
@@ -496,7 +542,8 @@ listesine girene kadar öneri `OLCULMEDI` olur (sessizce `KORU` olmaz).
 1. **Taşıma ve bölme** (`TASI-ADAYI-DUNYA-DURUMU`): §3 geçerlidir. Bütün kırmızıları PR'dan bağımsız (dünya olayı) olan test `scripts/ci/dunya-durumu-testleri.json`a
    taşınır; neden, kanıt ve yeni yer yazılır, kanıt `q2_ci` sayılarıdır. Kırmızılarının bir kısmı PR'ın KENDİ hatası olan test (`izole` kırmızılar sonraki koşuda
    `duzeldi`) tümden taşınmaz: dünya durumu kolu ayrı dosyaya çıkar, PR kolu PR'da kalır (örnek: `taban-tazeligi` ve `taban-tazeligi-dunya`). Aksi hâlde PR'ın gerçek
-   hatasını yakalayan kol da kaçar.
+   hatasını yakalayan kol da kaçar. Kolu ayırmak mümkün değilse ve testin girdisi PR'da değişebiliyorsa kayıt `yolFiltresi` taşır (§3): girdisine dokunan PR'da test kapıda kalır,
+   dokunmayanda çıkar (örnek: `sessionstart-tavan`, `githooks-doc-scope`). Taşıma PR'ı karnenin `dunyaDurumu` ve `oneri` alanlarını aynı PR'da listeyle eşler (§7.5: listedeki HER test karnede görünür).
 2. **Güçlendirme** (`KISMI-KORUMA`): test kalır. Yakalanmayan her bozma için bir kontrol eklenir ve o bozma yeniden uygulanıp testin kırmızı verdiği gösterilir.
    Sıra: para, yetki ve veritabanı kapıları önce.
 3. **Birleştirme** (`COKLU-KORUMA-ADAYI`): iki testin bütün kontrolleri tek dosyada toplanır, hiçbiri düşmez. Kazanç dosya sayısıdır, süre değil (bugünkü üç adayın
@@ -560,7 +607,7 @@ Eski tarihli karne silinmez. **Bilinen sınır:** ham bozma çıktıları (`gNN.
 | Ölçülen 347'nin hükmü | 345 `KIRMIZI` · 1 `YESIL` · 1 `TABAN_KIRMIZI` |
 | Denenen / kaçan bozma | 709 / 306 (ana tur 558 / 213; ek yoklama 151 / 93, 107 testte) |
 | En az bir bozması kaçan test (`kismi`) | 221 |
-| Öneri dağılımı | `OLCULMEDI` 306 · `KISMI-KORUMA` 218 · `KORU` 117 · `TASI-ADAYI-DUNYA-DURUMU` 7 · `COKLU-KORUMA-ADAYI` 3 · `SAHTE-YESIL-ADAYI` 1 · `ORTAM-INCELE` 1 · `TASINDI` 1 |
+| Öneri dağılımı | `OLCULMEDI` 306 · `KISMI-KORUMA` 218 · `KORU` 117 · `TASI-ADAYI-DUNYA-DURUMU` 5 · `COKLU-KORUMA-ADAYI` 3 · `SAHTE-YESIL-ADAYI` 1 · `ORTAM-INCELE` 1 · `TASINDI` 3 |
 | 8. soru | 2 `beyan` · 292 `statik` (kesin değil) · 360 `yok` (hangi dosya değişince koşacağı belirlenemedi) |
 | Silinecek test | 0: §7.4 madde 4 sağlanmadı, üç adayın her birinde yalnız 1 bozma denendi |
 | CI penceresi | `ci.yml` koşuları, 2026-07-06..2026-10-07 |
@@ -576,7 +623,8 @@ Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz):
 2. **İki ölçüm yeniden yapılacak:** `belge-kart-plan-kapisi.test.ts` (bozma yapılmadan kırmızı: ölçüm makinesinde satır sonu CRLF; `ORTAM-INCELE`) ve
    `instruction-surface-ppr.test.ts` (iki bozma yakalanmadı ama test yalnız kayıtlı dosyalara bakıyor, bozmalar kayıtlı değildi; `SAHTE-YESIL-ADAYI`).
 3. **Uygulama kayıtları** (bu PR'ın dışında, ayrı Kanban kartları): ALT-38i, PR kapısından çıkacak 2 test (`sessionstart-tavan`, `githooks-doc-scope`; üç ayda 10
-   kırmızı, ikisi de toplu olay) ve bölünecek 4 test (`comment-scrubber-scheme-safety`, `companion-parity-coverage`, `standard-section-integrity`,
+   kırmızı, ikisi de toplu olay; **2026-11-08'de yol süzgeçli olarak çıkarıldı, §3**; karnenin yalnız `dunyaDurumu`, `oneri`, `q8_tetik.yer` ve `ozet.oneriler` alanları listeyle eşlendi,
+   ölçüm yenilenmedi, yukarıdaki dağılım bunu yansıtır) ve bölünecek 4 test (`comment-scrubber-scheme-safety`, `companion-parity-coverage`, `standard-section-integrity`,
    `uretilmis-artefakt-tazeligi`); ALT-38j, birleşecek 3 test (`bash-write-audit-uretilmis-sinifi`, `e1-kimlik-kontrolu`, `storage-yazma-nobetcisi`, eşleriyle);
    ALT-38k, güçlendirme dalgası 1 ve ölçülmeyen testlerin ölçümü.
 4. **`--onceki` bayrağı** (ALT-38l): üretici önceki karnenin `q3_sabotaj` sonuçlarını, kaynağı değişmemiş testler için devralır; bunsuz yenileme eski ölçümleri

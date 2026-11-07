@@ -4,7 +4,7 @@ import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * INV-TEST-KOSU-1 · HER TEST DOSYASI EN AZ BİR YERDE KOŞAR; PR kapısından çıkan her test yeni yerinde GERÇEKTEN koşar (ALT-38).
@@ -45,9 +45,31 @@ const LISTE_MUTLAK = path.join(KOK, 'scripts/ci/dunya-durumu-testleri.json')
 /** Taban listesi ortam değişkeni: modülden okunmaz, BİLEREK sabit (modülde ad değişirse bu kapı kırmızı olsun). */
 const TABAN_ORTAM = 'VENTHUB_DUNYA_TABAN_LISTESI'
 const TABAN_GERCEK = { [TABAN_ORTAM]: LISTE_MUTLAK }
+/**
+ * Değişen dosyalar ortam değişkeni (ALT-38i): yol süzgeçli kayıtlar PR'ın `git diff HEAD^1 HEAD` çıktısına bağlıdır. Bu kapının ölçtüğü şey "mekanizma bağlı mı"dır,
+ * "bu PR hangi dosyalara dokundu" değildir; sonuç git geçmişine (ve PR'ın dosyalarına) bağlı olmasın diye değişen dosyalar HER SEFERİNDE açıkça verilir.
+ * Varsayılan: hiçbir süzgece uymayan tek dosya (`dislan` = listedeki HER test dışarıda). Ad BİLEREK sabit (modülden okunmaz).
+ */
+const DEGISEN_ORTAM = 'VENTHUB_DUNYA_DEGISEN_DOSYALAR'
+let degisenDizini = ''
+let degisenIlgisiz = ''
+/** Değişen dosyalar listesi dosyası (NUL ayraçlı, `git diff -z` biçimi). */
+function degisenDosyasiYaz(ad: string, yollar: string[]): string {
+  const yol = path.join(degisenDizini, ad)
+  writeFileSync(yol, yollar.map((y) => `${y}\0`).join(''))
+  return yol
+}
+beforeAll(() => {
+  degisenDizini = mkdtempSync(path.join(tmpdir(), 'kosu-kapsami-degisen-'))
+  degisenIlgisiz = degisenDosyasiYaz('ilgisiz.txt', ['docs/ilgisiz-bir-belge.md'])
+})
+afterAll(() => {
+  if (degisenDizini) rmSync(degisenDizini, { recursive: true, force: true })
+})
+const degisenGercek = () => ({ [DEGISEN_ORTAM]: degisenIlgisiz })
 const D = require_(path.join(KOK, 'scripts/ci/dunya-durumu.cjs')) as {
-  ayar: (env: Record<string, string | undefined>, liste: Liste) => { kip: string; exclude: string[]; include: string[] | null; uyari?: string }
-  dogrula: (liste: Liste, dosyaVarMi?: (yol: string) => boolean) => string[]
+  ayar: (env: Record<string, string | undefined>, liste: Liste) => { kip: string; exclude: string[]; include: string[] | null; uyari?: string; suzgeceTakilan?: string[] }
+  dogrula: (liste: Liste, dosyaVarMi?: (yol: string, dizinMi?: boolean) => boolean) => string[]
   listeyiOku: () => Liste
   TEST_DESENI: RegExp
 }
@@ -56,6 +78,7 @@ interface Kayit {
   neden: string
   kanit: string
   yeniYer: string[]
+  yolFiltresi?: string[]
 }
 interface Liste {
   surum: number
@@ -420,14 +443,15 @@ const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g')
  * `taban`: `dislan` kipinin taban listesi DOSYA YOLU (varsayılan: çalışma ağacındaki gerçek liste); `null` ise değişken hiç verilmez
  * (üst sürecin değeri de silinir). Taban açıkça verilmezse sonuç `git show HEAD^1`in içeriğine bağlı olurdu.
  */
-function ortamKur(kip: Kip, taban: string | null = LISTE_MUTLAK): NodeJS.ProcessEnv {
+function ortamKur(kip: Kip, taban: string | null = LISTE_MUTLAK, degisen: string | null = degisenIlgisiz): NodeJS.ProcessEnv {
   // `process.env` yayılımı ProcessEnv tipini korur (Next'in zorunlu kıldığı NODE_ENV dahil: boş nesne bu tipe uymaz); sızmaması gerekenler sonra silinir.
   const e: NodeJS.ProcessEnv = { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' }
   for (const k of Object.keys(e)) {
-    if (k.startsWith('VITEST') || k === 'VENTHUB_DUNYA_DURUMU' || k === TABAN_ORTAM || k === SHARD_ORTAM) delete e[k]
+    if (k.startsWith('VITEST') || k === 'VENTHUB_DUNYA_DURUMU' || k === TABAN_ORTAM || k === DEGISEN_ORTAM || k === SHARD_ORTAM) delete e[k]
   }
   if (kip) e.VENTHUB_DUNYA_DURUMU = kip
   if (taban) e[TABAN_ORTAM] = taban
+  if (degisen) e[DEGISEN_ORTAM] = degisen
   return e
 }
 
@@ -437,15 +461,15 @@ interface VitestListesi {
   stderr: string
 }
 
-function vitestListesi(kip: Kip, taban: string | null = LISTE_MUTLAK, deneme = 1): Promise<VitestListesi> {
+function vitestListesi(kip: Kip, taban: string | null = LISTE_MUTLAK, deneme = 1, degisen: string | null = degisenIlgisiz): Promise<VitestListesi> {
   return new Promise((cozum, red) => {
     execFile(
       process.execPath,
       [VITEST_GIRISI, 'list', '--filesOnly'],
-      { cwd: KOK, env: ortamKur(kip, taban), encoding: 'utf8', timeout: ALT_SUREC_ZAMAN_ASIMI_MS, maxBuffer: 64 * 1024 * 1024, windowsHide: true },
+      { cwd: KOK, env: ortamKur(kip, taban, degisen), encoding: 'utf8', timeout: ALT_SUREC_ZAMAN_ASIMI_MS, maxBuffer: 64 * 1024 * 1024, windowsHide: true },
       (hata, stdout, stderr) => {
         // Geçici alt süreç hatası (yük altında başlatma, disk) bir kez yeniden denenir; kalıcı hata (bozuk config) ikinci denemede de düşer ve bildirilir.
-        if (hata && deneme < 2) return cozum(vitestListesi(kip, taban, deneme + 1))
+        if (hata && deneme < 2) return cozum(vitestListesi(kip, taban, deneme + 1, degisen))
         if (hata) return red(new Error(`vitest list (kip "${kip || 'boş'}") ${deneme} denemede de başarısız: ${hata.message}\n${String(stderr).slice(-1500)}`))
         // Boş küme HATA DEĞİLDİR: `yalniz` kipinde dışlama listeyi de yutarsa küme boş gelir ve bunu ilgili teste söyletmek gerekir.
         const dosyalar = String(stdout)
@@ -538,7 +562,7 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     expect(D.ayar({}, liste)).toEqual({ kip: 'tam', exclude: [], include: null })
     expect(D.ayar({ VENTHUB_DUNYA_DURUMU: '' }, liste)).toEqual({ kip: 'tam', exclude: [], include: null })
     // `dislan` = PR listesi ∩ taban: taban açıkça çalışma ağacındaki listenin kendisi (git geçmişinden bağımsız); kesişimin kendisi birim testte.
-    expect(D.ayar({ VENTHUB_DUNYA_DURUMU: 'dislan', ...TABAN_GERCEK }, liste)).toEqual({ kip: 'dislan', exclude: yollar, include: null })
+    expect(D.ayar({ VENTHUB_DUNYA_DURUMU: 'dislan', ...TABAN_GERCEK, ...degisenGercek() }, liste)).toEqual({ kip: 'dislan', exclude: yollar, include: null })
     expect(D.ayar({ VENTHUB_DUNYA_DURUMU: 'yalniz' }, liste)).toEqual({ kip: 'yalniz', exclude: [], include: yollar })
   })
 
@@ -549,7 +573,7 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
 
   it('KAPSAM: dislan ∪ yalniz = tam — hiçbir test dosyası iki kipte birden düşmez', () => {
     const tum = testDosyalari().filter((d) => !VITEST_DISI.some((v) => v.desen.test(d)))
-    const dislan = D.ayar({ VENTHUB_DUNYA_DURUMU: 'dislan', ...TABAN_GERCEK }, liste)
+    const dislan = D.ayar({ VENTHUB_DUNYA_DURUMU: 'dislan', ...TABAN_GERCEK, ...degisenGercek() }, liste)
     const yalniz = D.ayar({ VENTHUB_DUNYA_DURUMU: 'yalniz' }, liste)
     const prdeKosan = tum.filter((d) => !dislan.exclude.includes(d))
     const zamanlidaKosan = tum.filter((d) => (yalniz.include as string[]).includes(d))
@@ -615,6 +639,45 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     expect(yalniz).toEqual(sirali(yollar))
   }, 90_000)
 
+  // ── YOL SÜZGECİ (ALT-38i): süzgeçli kayıt PR'ın değişen dosyaları süzgece uyuyorsa PR kapısında KALIR; GERÇEK config yolunda da çalışmalı ──────────────
+  // Değişen dosyalar alt sürece dosya yoluyla verilir (git geçmişi yok). Bu iki test, `vitest.config.ts` → `ayar(process.env)` zincirinde değişen dosyaların
+  // ortamdan geçtiğini ve süzgeçli kaydın GERÇEKTEN kapıda kaldığını (ve uymayanın çıktığını) ölçer; birim kollar (scripts/ci/__tests__/dunya-durumu.test.ts) eşleşme kuralını sınar.
+  /** Süzgeç öğesi bu yola uyar mı: BAĞIMSIZ küçük yeniden yazım (modülün `filtreEslesirMi`sini kullanmak testi totolojik yapardı). */
+  const uyar = (filtre: string[], yol: string) => filtre.some((g) => (g.endsWith('/') ? yol.startsWith(g) : yol === g))
+  const suzgecliKayitlar = () => liste.testler.filter((t) => Array.isArray(t.yolFiltresi))
+
+  it('GERÇEK config dislan + süzgece UYAN değişen dosya: süzgeci uyan test(ler) PR kapısında KALIR, uymayanlar ve süzgeçsizler dışarıda; uyarı yok', async () => {
+    const degisen = '.githooks/post-commit' // githooks-doc-scope'un ölçülmüş girdisi
+    const dosya = degisenDosyasiYaz('uyan.txt', [degisen])
+    const [bos, dislan] = await Promise.all([kume(''), vitestListesi('dislan', LISTE_MUTLAK, 1, dosya)])
+    expect(dislan.dosyalar.length, 'vitest list çıktısı ayrıştırılamadı ya da boş (biçim değişmiş olabilir)').toBeGreaterThan(0)
+    const tutulan = suzgecliKayitlar()
+      .filter((t) => uyar(t.yolFiltresi as string[], degisen))
+      .map((t) => t.test)
+    expect(tutulan, 'ölçülmüş girdi hiçbir süzgece uymuyor: kol hiçbir şey ölçmüyor (süzgeç listeden düşmüş olabilir)').toContain(
+      'src/__tests__/conformance/githooks-doc-scope.test.ts',
+    )
+    const beklenenDisarida = yollar.filter((y) => !tutulan.includes(y))
+    expect(beklenenDisarida.length, 'bu girdide hiçbir test dışarıda kalmıyor: kol dışlamayı ölçmüyor').toBeGreaterThan(0)
+    expect(dislan.dosyalar).toEqual(sirali(bos.filter((d) => !beklenenDisarida.includes(d))))
+    for (const t of tutulan) expect(dislan.dosyalar, `${t} süzgece uydu ama PR kapısında KOŞMUYOR`).toContain(t)
+    expect(dislan.stderr, 'okunabilen değişen dosyalar uyarı üretmemeli').not.toContain('[dunya-durumu]')
+  }, 90_000)
+
+  it("GERÇEK config dislan + OKUNAMAYAN değişen dosya listesi: süzgeçli testler dışlanmaz (güvenli taraf), süzgeçsizler yine dışarıda, stderr'e TEK uyarı yazılır", async () => {
+    const yokDegisen = path.join(degisenDizini, 'yok.txt')
+    const [bos, dislan] = await Promise.all([kume(''), vitestListesi('dislan', LISTE_MUTLAK, 1, yokDegisen)])
+    expect(dislan.dosyalar.length, 'vitest list çıktısı ayrıştırılamadı ya da boş (biçim değişmiş olabilir)').toBeGreaterThan(0)
+    const suzgecli = suzgecliKayitlar().map((t) => t.test)
+    expect(suzgecli.length, 'gerçek listede süzgeçli kayıt yok: kol hiçbir şey ölçmüyor').toBeGreaterThan(0)
+    const beklenenDisarida = yollar.filter((y) => !suzgecli.includes(y))
+    expect(dislan.dosyalar).toEqual(sirali(bos.filter((d) => !beklenenDisarida.includes(d))))
+    const uyarilar = dislan.stderr.split(/\r?\n/).filter((s) => s.startsWith('[dunya-durumu] '))
+    expect(uyarilar, `stderr: ${dislan.stderr}`).toHaveLength(1)
+    expect(uyarilar[0]).toContain('değişen dosyalar okunamadı')
+    expect(uyarilar[0]).toContain(DEGISEN_ORTAM)
+  }, 90_000)
+
   // ── TABAN (ALT-38a B3): `dislan` PR listesi ∩ TABAN'ı dışlar; kesişim GERÇEK config yolunda da çalışmalı ─────────────────────────────
   // Taban listesi alt sürece dosya yoluyla verilir (git geçmişi yok). Bu iki test B3'ün kendisinin regresyonudur: dışlama yalnız PR listesine
   // bakıyor olsaydı (eski davranış) ikisi de kırmızı olurdu, çünkü listedeki test taban BOŞ ya da OKUNAMAZ iken de dışarıda kalırdı.
@@ -655,7 +718,7 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     for (const kip of ['tam', 'dislan', 'yalniz']) {
       const r = cli(kip)
       expect(r.status, `--kip ${kip}: ${r.stderr}`).toBe(0)
-      expect(JSON.parse(r.stdout), `--kip ${kip}`).toEqual(D.ayar({ VENTHUB_DUNYA_DURUMU: kip, ...TABAN_GERCEK }, liste))
+      expect(JSON.parse(r.stdout), `--kip ${kip}`).toEqual(D.ayar({ VENTHUB_DUNYA_DURUMU: kip, ...TABAN_GERCEK, ...degisenGercek() }, liste))
       expect(r.stderr, `--kip ${kip}: taban verildi, uyarı olmamalı`).toBe('')
     }
     const gecersiz = cli('hepsi')
