@@ -75,6 +75,26 @@ describe('INV-SON-KONUSMA-1 · tur ayrıştırma', () => {
     expect(t.map((x) => [x.recep, x.cevap])).toEqual([['araya yazdım', 'cevabım']])
   })
 
+  it('ARC-270: liste biçimli prompt ([{type:text}]) da tur olur; liste biçimli posta/bildirim tur dışı; metinsiz liste atlanır', () => {
+    const liste = (m: string, text: string, ts?: string) => ({
+      type: 'attachment',
+      timestamp: ts,
+      attachment: { type: 'queued_command', commandMode: m, prompt: [{ type: 'text', text }] },
+    })
+    const t = dk.turlar([
+      liste('prompt', 'araya liste yazdım', 't1'),
+      cevap('cevabım', 'a1'),
+      liste('prompt', '<cross-session-message from="x">posta</cross-session-message>'),
+      cevap('pencereye cevap', 'a2'),
+      liste('prompt', 'Another Claude session sent a message: x'),
+      cevap('ona da', 'a3'),
+      liste('task-notification', 'bildirim'),
+      { type: 'attachment', attachment: { type: 'queued_command', commandMode: 'prompt', prompt: [{ type: 'image', source: {} }] } },
+      cevap('resim cevabı', 'a4'),
+    ])
+    expect(t.map((x) => [x.recep, x.cevap])).toEqual([['araya liste yazdım', 'cevabım']])
+  })
+
   it('compact sonrası kopya satırlar (aynı saat+metin, aynı mesaj kimliği) tur çoğaltmaz, cevabı ezmez', () => {
     const t = dk.turlar([recep('soru', 't1'), cevap('cevap', 'a1'), recep('soru', 't1'), cevap('cevap', 'a1')])
     expect(t).toEqual([{ recep: 'soru', zaman: 't1', cevap: 'cevap' }])

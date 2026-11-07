@@ -150,7 +150,8 @@ function turlar(satirlar) {
     }
     if (o.type === 'attachment' && o.attachment && o.attachment.type === 'queued_command') {
       const a = o.attachment
-      const p = typeof a.prompt === 'string' ? a.prompt : ''
+      // ARC-270: iş sürerken yazılan mesaj liste biçiminde ([{type:'text',text}]) de gelir (ölçüldü: 25 örnek); string-only okuma onu atlıyordu.
+      const p = typeof a.prompt === 'string' ? a.prompt : metinOf(a.prompt) || ''
       if (a.commandMode !== 'prompt' || /cross-session-message|agent-message|task-notification/.test(p)) {
         cari = null
         continue
