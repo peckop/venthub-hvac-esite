@@ -177,9 +177,13 @@ function pencereTanimi(dept, rol, calisanlar) {
     `model: ${PENCERE_MODEL[dept] || PENCERE_MODEL_VARSAYILAN}`,
     // Ajan hafızası KULLANICI kapsamında (depo PUBLIC; project/local hafızayı depoya yazar). Araç kısıtı yok: müdür yazar.
     'memory: user',
-    '---',
-    '',
   ]
+  // Pilot (YTN-47, OPS onaylı): ön yüklenecek skill'ler rol verisinden gelir (ROLLER[dept].pencereSkills).
+  if ((rol.pencereSkills || []).length) {
+    f.push('skills:')
+    for (const s of rol.pencereSkills) f.push(`  - ${s}`)
+  }
+  f.push('---', '')
   const govde = [
     `Sen VentHub'ın ${dept} departmanının müdür penceresisin. Departmanın görevi: ${cumle(rol.gorev)} Dosya alanın: ${cumle(rol.dosyalar)}`,
     `Yetkin, yasakların ve kuralların docs/roller/${dept}.md ile docs/roller/${dept}-kurallar.md dosyalarındadır; işe başlamadan önce onları oku.`,
@@ -188,6 +192,7 @@ function pencereTanimi(dept, rol, calisanlar) {
       ? `Müdür penceresisin: konu başına çalışan açarsın (${calisanlar.join(', ')}); çalışan sonucu yalnız sana döner (docs/standards/execution-method-standard.md §10.3).`
       : `Müdür penceresisin: bu departmanın tanımlı çalışanı yok (skill setleri tablosunda satırı yok); işi kendin yürütürsün.`,
   ]
+  if (rol.pencereTetik) govde.push(rol.pencereTetik)
   return f.concat(govde).join('\n') + '\n'
 }
 

@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest'
 type Uretici = {
   GOREV_DEGIL_BASLIK: string
   DERS_TEKRAR_KURALI: string
+  OZ_DEGERLENDIRME_KURALI: string
   SUREN_IS_KORUMA_KURALI: string
   SEO_EK_KURALI: string
   SEO_EK_KURALI_ROLLERI: string[]
@@ -1433,6 +1434,36 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.DERS_TEKRAR_KURALI, '') }
     expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
     expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Aynı ders ikinci kez/)
+  })
+
+  it('HRT-114 (OPS-232): haftalık öz-değerlendirme sabit altı soruya bağlıdır; blok her rolün kurallar dosyasında, düşerse sorunlar() yakalar', () => {
+    const kurallar = uretici.uretKurallar()
+    const sorular = ['İkinci kez yapılan hata', 'Geciken ya da unutulan istek', 'Bayat kart ya da kayıt', 'Geri dönüp düzeltilen iş', 'skill, kanca ve Claude Code özelliği', 'mükerrer iş araması']
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain(uretici.OZ_DEGERLENDIRME_KURALI)
+      // Görev metni artık kart/kural kontrolünü değil sabit altı soruyu gösterir (her rolde, görev verisi olanlarda).
+      const gorev = (uretici.GOREVLER[ad]?.gorevler as Array<{ gorev: string }> | undefined)?.find((g) => g.gorev.startsWith('Haftalık öz-değerlendirme (OPS-168 O9)'))
+      if (gorev) expect(gorev.gorev, ad).toContain('sabit altı soruya karşı okur')
+    }
+    for (const s of sorular) expect(uretici.OZ_DEGERLENDIRME_KURALI, s).toContain(s)
+    const ad = roller[0]
+    const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.OZ_DEGERLENDIRME_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Haftalık öz-değerlendirme/)
+  })
+
+  it('HRT-114 (OPS-232): ortak ölçüm maddeleri (defter satırı, test:ilgili kırmızı dosya listesi, güncel master bayt ölçümü) kurallar dosyalarında ve filo-ortak işaretçilerinde durur', () => {
+    const kurallar = uretici.uretKurallar()
+    const ortak = fs.readFileSync(path.join(KOK, '.claude', 'rules', 'filo-ortak.md'), 'utf8').replace(/\r\n/g, '\n')
+    for (const ad of roller) {
+      expect(kurallar[ad], ad).toContain('"defter: ölçüldü/ölçülmedi" bilgisini de taşır')
+      expect(kurallar[ad], ad).toContain('"bu işin alanı mı: evet/hayır" yazılır')
+      expect(kurallar[ad], ad).toContain('güncel master\'ın üstünde bayt ölçümü yapılır')
+    }
+    expect(ortak).toContain('"defter: ölçüldü/ölçülmedi"')
+    expect(ortak).toContain('"bu işin alanı mı: evet/hayır"')
+    expect(ortak).toContain('birleşmeden önce güncel master üstünde bayt ölçülür')
+    expect(ortak).toContain('sabit altı soruya karşı okur')
   })
 })
 

@@ -19,7 +19,7 @@ Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandı�
 - 7 görev, tetiğe bağlı 6: `docs/roller/ALTYAPI-gorevler.md`.
 
 ## Dosyalar
-package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md.
+package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md, scripts/skills-eval-run.mjs ve scripts/skills-eval/** (ALT-160; skill içeriği YETENEK'te), scripts/hafiza/** (REC-363 ölçüm betikleri; ARAÇ ikincil: claude -p bütçe sınırı).
 
 ## Yetki
 CI ve bağımlılık değişikliği, dependabot PR'ları, güvenlik taraması; kendi cetveli için gözden geçirme.
