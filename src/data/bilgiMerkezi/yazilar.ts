@@ -437,7 +437,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-01 (BLG-29): "Sessiz fan nedir?" ara başlığı ve çalışma tanımı cümlesi (üretici beyanına dayalı, tek üreticiye genellenmez), meta açıklamada "sessiz fan", kardeş yazılara
     // üç iç bağlantı. H1 ve title değişmedi (Recep kararı). Önceki değer: 2026-10-31 (BLG-25).
     // 2026-11-03 (BLG-30): terim hizası, "karışık akışlı" → "karma akışlı (karışık akışlı)" (ürün sayfalarının diliyle aynı); metin iddiası değişmedi.
-    guncellemeTarihi: '2026-11-03',
+    // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "sessiz kanal fanları" ve "sessiz çalışan kanal fanları" ifadeleri girişe ve SSS'ye eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
+    guncellemeTarihi: '2026-11-07',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
@@ -452,6 +453,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
 Sessiz fan seçimi, katalogdaki ses değerinin hangi koşulda verildiğini okumakla başlar: ses basıncı düzeyi ölçüm noktasındaki sesi, ses gücü düzeyi ses kaynağının yaydığı sesi anlatır [1]. Vortice'nin Lineo Quiet kanal fanında ses değeri ayar noktasına göre çok değişir: Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].
 
 Bu yüzden "kaç dB?" sorusu tek başına cevaplanmaz; hangi yol (emiş, üfleme, gövde), hangi ayar noktası ve hangi mesafe sorularıyla birlikte cevaplanır. Aşağıda bu üç koşul, yatak odası ve ofis gibi mekânların resmî değerleri ve Lineo Quiet'in katalog değerleri birlikte okunuyor.
+
+Sessiz kanal fanları, yani sessiz çalışan kanal fanları, bu rehberde üreticisi yaydığı sesi azaltmak için tasarladığını belirten kanal fanları anlamında kullanılır; hangi değerin sessiz sayılacağı mekâna göre değişir ve katalogdaki ses değeri koşuluyla birlikte okunur [1][2].
 
 ## Sessiz fan nedir? Bir üretici örneği
 
@@ -620,6 +623,10 @@ Cevap sistemin ses hesabına bağlıdır. Yönetmelik kanal tasarımında kanal 
 
 ABD Enerji Bakanlığı kılavuzuna göre aksiyel fanlar aynı kapasitedeki hat içi santrifüj fanlardan biraz daha gürültü çıkarma eğilimindedir; bu gürültüde yüksek frekanslar baskın olma eğilimindedir ve yüksek frekanslar daha kolay azaltılır [4]. Kılavuz endüstriyel ve ticari fan uygulamalarını ele alır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4]. İki fan türünün farkı, fan eğrisi ve çalışma noktası [radyal fan mı aksiyel fan mı rehberinde](vh:yazi/radyal-aksiyel-fan-secimi) anlatılır.
 
+### Sessiz kanal fanları (sessiz çalışan kanal fanları) nasıl seçilir?
+
+Seçim, ses değerinin koşulunu (yol, ayar noktası ve mesafe) okumakla başlar [2]; katalogdaki 3 m serbest alan değeri oda içi hedefle doğrudan karşılaştırılmaz, hedef mekânın oda içi değeridir [1][2]. Adımlar yazının "Sessiz kanal fanı seçerken kontrol listesi" bölümünde sıralanır.
+
 ### Vortice Lineo Quiet kaç dB(A) ses çıkarır?
 
 Lineo Quiet modellerinde katalogdaki en düşük gövde değeri 9,9 dB(A) · 4 V · gövde, 3 m (Lineo 100 Quiet ES), en yüksek gövde değeri 48,3 dB(A) · 10 V · gövde, 3 m'dir (Lineo 315 Quiet ES) [2]. Katalog Lineo Quiet modellerinin ses değerlerini ayar noktası ya da hız bazında ayrı verir [2].
@@ -660,6 +667,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // 2026-11-03 (BLG-30): terim hizası, "karışık akışlı" → "karma akışlı (karışık akışlı)"; metin iddiası değişmedi.
     // Güncelleme tarihi 2026-11-04 (BLG-39, SEO-83): gövde yenilendi (kesit farkı, kullanım yerleri, seçim bilgileri, kaynaklar); doğrulanmış metin taslak v-son (sha c97467046789; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug, H1 ve ürün listesi değişmedi.
     // Güncelleme tarihi 2026-11-07 (BLG-41, SEO-86): giriş markasız "kanal fanları" tanımıyla başlar, tür sayımı ve "Kullanım alanları" başlığı eklendi; meta açıklama "kanal fanları nelerdir" ve "kullanım alanları" ifadelerini taşır. H1, başlık, adres ve ürün listesi aynı. Doğrulanmış metin taslak (sha e5bb7cdac23f; üç tur, tuzaklı ve temiz kopya). Not: BLG-39 içeriği 6 Kasım'da çıkmış, tarih 4 Kasım'da kalmıştı; bu tarih ikisini de kapsar.
+    // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "Kanal fanı çeşitleri nelerdir?" bölümü eklendi (mevcut tür tablosu bu başlığın altında); var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
     guncellemeTarihi: '2026-11-07',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
@@ -681,6 +689,10 @@ Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve k
 DOE rehberine göre tüp tipi aksiyel fanlar egzoz uygulamalarında sık kullanılır, çünkü kanal kayıplarını yenmeye yetecek basıncı oluşturur [1]. Rehber fanları iki ana türe ayırır: santrifüj ve aksiyel [1]. Santrifüj fan, dönen bir çarkla havanın hızını artırır; hava çarkın göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır ve bu enerji, hava çıkışa girmeden önce yavaşlarken statik basınç artışına dönüşür [1]. Aksiyel fan ise havayı fanın ekseni boyunca hareket ettirir; hava, pervane ile uçak kanadındaki gibi kanat yüzeyinde oluşan aerodinamik kaldırma kuvvetiyle basınçlandırılır [1].
 
 Aksiyel fanın silindirli türü tüp tipi aksiyel fandır: DOE rehberi bunu bir silindirin içine yerleştirilmiş pervane tipi fan olarak tanımlar ve hava akışı özelliklerini iyileştirdiği için pervane tipi fandan daha yüksek basınç ve daha iyi verim sağladığını yazar [1]. Tüp tipi aksiyel fanlar orta basınçlı, yüksek debili uygulamalarda kullanılır [1]. DOE rehberi, çıkışına kılavuz kanatlar eklenmiş tüp tipi aksiyel fanı kılavuz kanatlı (vaneaxial) aksiyel fan olarak tanımlar [1]. Karma akışlı fan DOE rehberinde tanımlanmaz; bir üretici kataloğu karma akışlı çarkı, helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatır (üretici anlatımı) [4].
+
+## Kanal fanı çeşitleri nelerdir?
+
+Kanal fanı çeşitleri iki ölçüte göre anlatılır: kesite göre yuvarlak ve dikdörtgen [2]; fan türü olarak santrifüj ve aksiyel (tüp tipi, kılavuz kanatlı) [1] ve üretici anlatımıyla karma akışlı [4]. Tür tablosu çalışma ilkesini özetler; kesit farkı bir sonraki bölümdedir.
 
 | Tür | Çalışma ilkesi | Kaynak |
 |---|---|---|
@@ -1114,7 +1126,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-04 (BLG-36): gövde türler çerçevesiyle yenilendi; doğrulanmış metin taslak v12 (sha cf6aaf30e82c; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu).
     // ilgiliKategoriler: 11 fan alt kategorisi (URN-151 kategori kartı).
     // BLG-40 (2026-11-06): H1 (= sayfa başlığı) ve meta açıklaması değişti; önceki H1 bir rakip sayfanın başlığıyla birebir aynıydı (GEO-SEO ölçümü). Gövde, slug ve ürün listesi aynı.
-    guncellemeTarihi: '2026-11-06',
+    // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan için H3 başlıklı yeni bölüm eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
+    guncellemeTarihi: '2026-11-07',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
       'vh:kategori/axial-industrial-fans',
@@ -1180,6 +1193,24 @@ Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölç
 - Korozyona ve aside dayanımlı fanlar kategorisi santrifüj fanları kapsar [4]; modeller: [korozyona ve aside dayanımlı fanlar](vh:kategori/corrosion-and-acid-resistant-fans).
 - Şömine ve baca fanları bacanın çekişini mekanik olarak destekleyen fanlardır [4]; modeller: [şömine ve baca fanları](vh:kategori/chimney-fans).
 - Endüstriyel tavan vantilatörleri büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; havayı dışarı atmaz, içerideki havayı karıştırır [4]; modeller: [endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans).
+
+## Kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan nedir?
+
+### Kanal tipi fanlar
+
+Kanal tipi fanlar havayı kanal hattının içinde taşır ve kanala seri bağlanır [3][4]. Kanal tipi, bir kategoridir: VentHub'ın kanal tipi fan kategorisinde karma akışlı iki aile ile dikdörtgen kanal tipi radyal fanlar ailesi bulunur [3][4]. Ayrıntı için [kanal tipi fan nedir rehberine](vh:yazi/kanal-tipi-fan-nedir) bakın.
+
+### Hücreli aspiratörler
+
+Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]. Bir fan hem bir akış yoluna hem bir kategoriye girebilir; örneğin hücreli aspiratör, kayış kasnaklı bir radyal fandır [4].
+
+### Çapraz akışlı fanlar
+
+AB tüzüğü çapraz akışlı fanı, gaz yolu çarkın eksenine esasen dik olan ve çarka çevresinden girip çevresinden çıkan fan olarak tanımlar (madde 2(25)) [1]. İncelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur [4].
+
+### Plug fanlar
+
+Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; radyal (santrifüj) fanlar kategorisinin sayfası hücreli ve gövdeli yapılarla birlikte plug yapıyı da tanıtır [4]. Ayrıntı için [plug fan nedir, nerede kullanılır](vh:yazi/plug-fan-nedir) yazısına bakılabilir.
 
 ## Teklif için hangi bilgiler gerekir?
 

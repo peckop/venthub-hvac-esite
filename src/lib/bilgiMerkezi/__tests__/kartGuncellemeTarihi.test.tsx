@@ -60,9 +60,10 @@ describe('liste kartı — güncelleme tarihi', () => {
     const kartlar = listeKartlari('tr', YAZILAR)
     const beklenen: Array<[string, string, string]> = [
       ['frekans-konvertoru', '2026-11-01', '1 Kasım 2026'],
-      ['fan-cesitleri', '2026-11-06', '6 Kasım 2026'],
+      ['fan-cesitleri', '2026-11-07', '7 Kasım 2026'],
       ['radyal-aksiyel-fan-secimi', '2026-11-04', '4 Kasım 2026'],
       ['kanal-tipi-fan-nedir', '2026-11-07', '7 Kasım 2026'],
+      ['sessiz-fan-secimi', '2026-11-07', '7 Kasım 2026'],
     ]
     for (const [kimlik, iso, yazili] of beklenen) {
       const yazi = YAZILAR.find((y) => y.kimlik === kimlik)
