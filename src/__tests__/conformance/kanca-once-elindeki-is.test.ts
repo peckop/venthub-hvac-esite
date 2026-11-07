@@ -302,5 +302,56 @@ describe('VADESİ GELEN · kendi panosu (ARC-268, OPS 7 Kasım)', () => {
     const govde = kaynak.slice(kaynak.indexOf('function vadeEkle()'), kaynak.indexOf('const yaz = () =>'))
     expect(govde).not.toMatch(/!==\s*'OPS'\)\s*return/)
     expect(govde).toMatch(/vadeMetni\(bugun,\s*undefined,\s*rol\)/)
+    // ARC-269: rol kararı kaynak regex'inde değil, saf vadeRolu'da ölçülür; kanca onu çağırmalı.
+    expect(govde).toMatch(/vadeRolu\(rolSeridi\)/)
+  })
+})
+
+describe('VADESİ GELEN · gerçek ONEK ve rol kararı (ARC-269, ARC-268 denetçi bulguları)', () => {
+  const BUGUN = '2026-11-07'
+  const alani = gerek(path.join(KOK, '.claude', 'hooks', 'kart-alani-kapisi.cjs')) as {
+    ONEK: Record<string, string>
+    HARITA: string
+    haritayiOku: (metin: string) => Record<string, unknown>
+  }
+  const mm = m as unknown as { vadeRolu: (r: unknown) => string | null }
+  const k = (title: string, extra: Record<string, unknown> = {}) => ({ id: title, title, sutun: 'To Do', dueDate: BUGUN, ...extra })
+
+  it('haritadaki HER departman gerçek ONEK tablosunda bir önekle karşılanır (3D, I18N, MARKA dahil)', () => {
+    const karsilanan = new Set(Object.values(alani.ONEK))
+    const harita = fs.readFileSync(alani.HARITA, 'utf8')
+    // Haritada "(planlı, kapalı)" işaretli departmanın panosu/öneki yoktur; açılırken standartta önek verilir, o zamana kadar muaf.
+    const kapali = (d: string) => new RegExp(`^\\|\\s*${d.replace('MUHENDISLIK', 'M[ÜU]HEND[İI]SL[İI]K')}\\s*\\(planlı, kapalı\\)`, 'm').test(harita)
+    const eksik = Object.keys(alani.haritayiOku(harita)).filter((d) => !karsilanan.has(d) && !kapali(d))
+    expect(eksik, `önek tablosunda olmayan departman: ${eksik.join(', ')}`).toEqual([])
+  })
+
+  it('3D ve I18N pencereleri kendi vadeli kartını görür (başlık öneki ya da atanan), başkasınınkini görmez', () => {
+    const kartlar = [k('3D-3 model bütçesi'), k('I18-5 sözlük dalgası'), k('DIL-2 çeviri'), k('MRK-1 logo'), k('ARC-1 başka', { assignee: 'ARAÇ' })]
+    for (const [rol, no] of [['3D', '3D-3'], ['I18N', 'I18-5'], ['I18N', 'DIL-2'], ['MARKA', 'MRK-1']] as const) {
+      const metin = m.vadeMetni(BUGUN, kartlar, rol, alani.ONEK)
+      expect(metin, rol).toContain(no)
+      expect(metin, rol).not.toContain('ARC-1')
+    }
+    expect(m.vadeMetni(BUGUN, [k('X-9 sahipsiz', { assignee: '3D' })], '3D', alani.ONEK)).toContain('X-9')
+  })
+
+  it('⛔SABOTAJ: eksik önek tablosu (eski hâl) 3D/I18N kartını sessizce kaçırır — gerçek tablo bunu kapatır', () => {
+    const eski = { ARC: 'ARAC', ALT: 'ALTYAPI', HRT: 'HARITA' }
+    expect(m.vadeMetni(BUGUN, [k('I18-5 sözlük')], 'I18N', eski)).toBe('')
+    expect(m.vadeMetni(BUGUN, [k('I18-5 sözlük')], 'I18N', alani.ONEK)).toContain('I18-5')
+  })
+
+  it('vadeRolu: rolsüz → null (sessiz), OPS (her harf boyutu) → "" (bütün panolar), departman → olduğu gibi', () => {
+    for (const bos of [undefined, null, '', '   ']) expect(mm.vadeRolu(bos)).toBeNull()
+    for (const ops of ['OPS', 'ops', ' Ops ']) expect(mm.vadeRolu(ops)).toBe('')
+    expect(mm.vadeRolu('ARAC')).toBe('ARAC')
+    expect(mm.vadeRolu(' 3D ')).toBe('3D')
+  })
+
+  it('⛔SABOTAJ: karar tersine çevrilirse (OPS rolü geçirilir / departman boşaltılır) ayrım bozulur', () => {
+    const kartlar = [k('ARC-1 a'), k('ALT-2 b')]
+    expect(m.vadeMetni(BUGUN, kartlar, mm.vadeRolu('ARAC') as string, alani.ONEK)).not.toContain('ALT-2')
+    expect(m.vadeMetni(BUGUN, kartlar, mm.vadeRolu('OPS') as string, alani.ONEK)).toContain('ALT-2')
   })
 })
