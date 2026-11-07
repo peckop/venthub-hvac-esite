@@ -17,3 +17,4 @@ Recep 2026-09-29: "bu ölçümleri tekrar tekrar yapmamak adına önceki ve şim
 | wrongstack-ozellik-envanteri.md | WrongStack'in hangi özelliği var, bizde durumu ne, almak mı yazmak mı (hatırlatma dahil); sahip ARAÇ |
 | kanban-dogrulayici-komutlari.md | Kanban kanıt komutu (verify_completion) hangi komutları geçirir, 1.0.26 ile karşılaştırma, komut dışı kanıt yolları, kartı kapatma yolu; sahip ARAÇ |
 | postcompact-baglam-olcumu.md | PostCompact kancasının çıktısı compact sonrası bağlama giriyor mu (belgeden: hayır; doğru yol SessionStart compact), kırpma sorunu ve ENOENT kökü; sahip ARAÇ |
+| uygulayici-izolasyon-olcumu.md | Uygulayıcı ajanlara isolation: worktree uygun mu (koşullu: master tabanlı, node_modules gerektirmeyen iş) ve ekip (agent teams) bayrağı Desktop'ta adlandırılmış alt ajanı teammate yapıyor mu (hayır, yalnız terminalde); sahip ARAÇ |
