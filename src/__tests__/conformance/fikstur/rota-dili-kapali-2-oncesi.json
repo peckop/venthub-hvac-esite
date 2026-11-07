@@ -337,6 +337,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/asit-fani-nedir-korozyona-dayanikli-fan-secimi",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -566,6 +570,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/plug-fan-nedir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/asit-fani-nedir-korozyona-dayanikli-fan-secimi",
         "alternates": null
       },
       {
