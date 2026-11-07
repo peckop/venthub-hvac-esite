@@ -22,7 +22,7 @@ Filonun araçları (kanca, pano, ayar, ritüel) bozulmadan ve ölçülerek çal�
 .claude/hooks/**, scripts/board/**, scripts/hijyen/**, scripts/arac/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.
 
 ## Yetki
-Kanca tasarımı, kurulumu, testi ve settings.json kanca kaydı ARAÇ'ındır (kanca ve ayar PR'ını denetçi alt ajan okuduktan sonra ARAÇ birleştirir; HARİTA yalnız kural ve belge metnini yazar); araç denemeleri; araç envanterine satır ekleme.
+Kanca tasarımı, kurulumu, testi ve settings.json kanca kaydı ARAÇ'ındır (kanca ve ayar PR'ını denetçi alt ajan okuduktan sonra ARAÇ birleştirir ve hükmü PR'a yazar; HARİTA yalnız kural ve belge metnini yazar); araç denemeleri; araç envanterine satır ekleme.
 
 ## Yasak ve sınır
 İzin, deny, MCP (.mcp.json) ve defaultMode kararı OPS kapısıdır (Recep'e OPS götürür); ALTYAPI'nın CI dosyalarına dokunmaz.

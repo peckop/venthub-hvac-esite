@@ -546,7 +546,7 @@ const ROLLER = {
     gorev: 'Kanca, WrongStack, claude-mem ve şerit aracı altyapısı; araç envanteri ve araç-atıl-kalmaz kuralı.',
     gorevDegil: 'CI iş akışı ve bağımlılık (ALTYAPI); belge ve rol kartı (HARİTA); site kodu (URUN).',
     dosyalar: '.claude/hooks/**, scripts/board/**, scripts/hijyen/**, scripts/arac/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.',
-    yetki: 'Kanca tasarımı, kurulumu, testi ve settings.json kanca kaydı ARAÇ\'ındır (kanca ve ayar PR\'ını denetçi alt ajan okuduktan sonra ARAÇ birleştirir; HARİTA yalnız kural ve belge metnini yazar); araç denemeleri; araç envanterine satır ekleme.',
+    yetki: 'Kanca tasarımı, kurulumu, testi ve settings.json kanca kaydı ARAÇ\'ındır (kanca ve ayar PR\'ını denetçi alt ajan okuduktan sonra ARAÇ birleştirir ve hükmü PR\'a yazar; HARİTA yalnız kural ve belge metnini yazar); araç denemeleri; araç envanterine satır ekleme.',
     yasak: 'İzin, deny, MCP (.mcp.json) ve defaultMode kararı OPS kapısıdır (Recep\'e OPS götürür); ALTYAPI\'nın CI dosyalarına dokunmaz.',
     yetenek: 'wrongstack-kanban, wrongstack-mailbox-mcp, ast-grep, CodeGraph.',
     durum: 'Açık.',
@@ -554,7 +554,7 @@ const ROLLER = {
   ALTYAPI: {
     gorev: 'CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi; rota dili satırı ve yönlendirme (arama sonuç sayfasının kendisi URUN\'dur).',
     gorevDegil: 'arama sonuç sayfasının kendisi (URUN); kanca ve WrongStack aracı (ARAC); belge düzeni (HARİTA).',
-    dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md, scripts/skills-eval-run.mjs ve scripts/skills-eval/** (ALT-160; skill içeriği YETENEK\'te).',
+    dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md, scripts/skills-eval-run.mjs ve scripts/skills-eval/** (ALT-160; skill içeriği YETENEK\'te), scripts/hafiza/** (REC-363 ölçüm betikleri; ARAÇ ikincil: claude -p bütçe sınırı).',
     pencereTetik: "Skill'leri Skill aracıyla adıyla çağır: worktree sil, C:/tmp temizliği, kopyaları kaldır → calisma-kopyasi-sil (ön yüklü); ödeme, sipariş, fiyat, yetki ya da webhook koduna dokunan PR'ı bağımsız doğrularken → mutasyon-testi; onlarca dosyayı ortak desene taşırken → maestro.",
     pencereSkills: ['calisma-kopyasi-sil'],
     yetki: 'CI ve bağımlılık değişikliği, dependabot PR\'ları, güvenlik taraması; kendi cetveli için gözden geçirme.',
