@@ -164,10 +164,10 @@ const mesajGonder = (mesaj: string) => ({
 })
 
 let sayac = 0
-function calistir(kayitlar: object[], ek: { durdurAktif?: boolean; kanban?: 'iyi' | 'bozuk' | 'detaysiz'; govde?: string } = {}) {
+function calistir(kayitlar: object[], ek: { durdurAktif?: boolean; kanban?: 'iyi' | 'bozuk' | 'detaysiz'; govde?: string; oturum?: string } = {}) {
   const tp = path.join(dizin, 'tr-' + ++sayac + '.jsonl')
   fs.writeFileSync(tp, kayitlar.map(k => JSON.stringify(k)).join('\n') + '\n')
-  const oturum = 'test-oturum-' + process.pid + '-' + sayac
+  const oturum = ek.oturum ?? 'test-oturum-' + process.pid + '-' + sayac
   const r = spawnSync(process.execPath, [KANCA], {
     input: ek.govde ?? JSON.stringify({ transcript_path: tp, session_id: oturum, stop_hook_active: ek.durdurAktif === true }),
     encoding: 'utf8',
@@ -177,6 +177,7 @@ function calistir(kayitlar: object[], ek: { durdurAktif?: boolean; kanban?: 'iyi
       KARTSIZ_KAPI_KANBAN:
         ek.kanban === 'bozuk' ? path.join(dizin, 'yok-boyle-betik.cjs') : ek.kanban === 'detaysiz' ? sahteKanbanDetaysiz : sahteKanban,
       KARTSIZ_KAPI_DURUM_DIZINI: durumDizini,
+      KARTSIZ_KAPI_BEKLEYEN_DIZINI: dizin,
     },
   })
   return { kod: r.status, stderr: r.stderr, oturum, tp }
@@ -274,7 +275,7 @@ describe('INV-KARTSIZ-KAPI-7: Kanban okunamazsa geçer ama durum dosyası uyarı
 })
 
 describe('INV-KARTSIZ-KAPI-8: başka pencereye giden mesaj (SendMessage) aynı kuraldan geçer', () => {
-  it('kartsız istek içeren SendMessage → exit 2; aynı mesaj ikinci Stop\'ta bir daha bloklamaz', () => {
+  it('kartsız istek içeren SendMessage → exit 2; ek satır gelmeden ikinci Stop da kırmızı kalır (ARC-265), mesaj yeniden yazdırılmaz', () => {
     const kayitlar = [insan('x'), mesajGonder('Recep için:\n**Senden istenen**\n- Ekrana bak\n'), asistan('Gönderdim.')]
     const tp = path.join(dizin, 'sm-' + ++sayac + '.jsonl')
     fs.writeFileSync(tp, kayitlar.map(k => JSON.stringify(k)).join('\n') + '\n')
@@ -284,12 +285,14 @@ describe('INV-KARTSIZ-KAPI-8: başka pencereye giden mesaj (SendMessage) aynı k
         input: JSON.stringify({ transcript_path: tp, session_id: oturum }),
         encoding: 'utf8',
         timeout: 20000,
-        env: { ...process.env, KARTSIZ_KAPI_KANBAN: sahteKanban, KARTSIZ_KAPI_DURUM_DIZINI: durumDizini },
+        env: { ...process.env, KARTSIZ_KAPI_KANBAN: sahteKanban, KARTSIZ_KAPI_DURUM_DIZINI: durumDizini, KARTSIZ_KAPI_BEKLEYEN_DIZINI: dizin },
       })
     const ilk = kos()
     expect(ilk.status).toBe(2)
     expect(ilk.stderr).toContain('başka pencereye giden mesaj')
-    expect(kos().status).toBe(0)
+    const ikinci = kos()
+    expect(ikinci.status).toBe(2)
+    expect(ikinci.stderr).toContain('ek satır yok')
     fs.rmSync(path.join(os.tmpdir(), 'kartsiz-kapi-gorulen-' + oturum.replace(/[^A-Za-z0-9-]/g, '').slice(0, 40) + '.json'), { force: true })
   })
 
@@ -586,5 +589,85 @@ describe('INV-KARTSIZ-KAPI-11 (ARC-95): süreç — gerçek Kanban betiği çağ
     const durum = JSON.parse(fs.readFileSync(path.join(durumDizini, 'kartsiz-kapi.json'), 'utf8')) as { seviye: string; ozet: string }
     expect(durum.seviye).toBe('uyari')
     expect(durum.ozet).toContain('ölçemedi')
+  })
+})
+
+// ARC-265 (7 Kasım): kırmızıda cevabı YENİDEN YAZDIRMA — yalnız tek kısa ek satır ("(kart X)" / "Kartsız: sebep") istenir.
+describe('INV-KARTSIZ-KAPI-12 (ARC-265): kırmızıda ek satır akışı', () => {
+  const kirmizi = [insan('x'), asistan('Tamam.\n\n**Senden beklenenler**\n\n- Design penceresine bak\n')]
+  const sonraki = (oturum: string, metin: string) => calistir([insan('x'), asistan(metin)], { oturum })
+  const yeniOturum = () => 'ek-oturum-' + process.pid + '-' + ++sayac
+  /** Kırmızı turu çalıştırır ve bekleyen kaydı oluşan yeni oturum kimliğini döner. */
+  const kirmiziOturum = () => {
+    const o = yeniOturum()
+    expect(calistir(kirmizi, { oturum: o }).kod).toBe(2)
+    return o
+  }
+
+  it('(a) kırmızı mesaj tam yeniden yazım İSTEMEZ; yalnız tek kısa ek satır ister', () => {
+    const r = calistir(kirmizi, { oturum: yeniOturum() })
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('YENİDEN YAZMA')
+    expect(r.stderr).toContain('TEK KISA SATIR')
+  })
+
+  it('(b) ek satır geçerli kart taşıyorsa kapanır (exit 0, durum iyi, bekleyen silinir)', () => {
+    const o = kirmiziOturum()
+    expect(sonraki(o, '(kart OPS-61)').kod).toBe(0)
+    const d = JSON.parse(fs.readFileSync(path.join(durumDizini, 'kartsiz-kapi.json'), 'utf8')) as { seviye: string }
+    expect(d.seviye).toBe('iyi')
+    expect(fs.readdirSync(dizin).some((a) => a.startsWith('kartsiz-kapi-bekleyen-' + o))).toBe(false)
+    expect(sonraki(o, 'Tamam.').kod).toBe(0) // kapandıktan sonra sıradan kısa cevap bloklanmaz
+  })
+
+  it('(b) "Kartsız: <sebep>" ek satırı kapatır ve sebep kayda düşer', () => {
+    const o = kirmiziOturum()
+    expect(sonraki(o, 'Kartsız: ARC-265 testi, kalıcı iş değil').kod).toBe(0)
+    expect(fs.readFileSync(path.join(durumDizini, 'kartsiz-atlatma.log'), 'utf8')).toContain('ARC-265 testi')
+  })
+
+  it('(c) ek satır yoksa kırmızı KALIR', () => {
+    const r = sonraki(kirmiziOturum(), 'Tamam, yaptım.')
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('ek satır yok')
+  })
+
+  it("(c) geçersiz kart kırmızı bırakır: kapalı kart ve Recep'e bağlı olmayan kart", () => {
+    expect(sonraki(kirmiziOturum(), '(kart OPS-70)').kod).toBe(2)
+    expect(sonraki(kirmiziOturum(), '(kart OPS-71)').kod).toBe(2)
+  })
+
+  it('(c) kapı gevşemez: RECEP YETKİSİ satırı olmayan kart ek satırla da geçmez (OPS-72)', () => {
+    const r = sonraki(kirmiziOturum(), '(kart OPS-72)')
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('RECEP YETKİSİ')
+  })
+
+  it('serbest metindeki "yok" sözü kart doğrulamasını atlatamaz', () => {
+    expect(sonraki(kirmiziOturum(), 'OPS-70 için bir şey yok').kod).toBe(2)
+  })
+
+  it('sınırlı tur: ek satır 3 denemede doğrulanamazsa tur geçer ama sessiz değil (döngü koruması)', () => {
+    const o = kirmiziOturum()
+    expect(sonraki(o, 'olmadı 1').kod).toBe(2)
+    expect(sonraki(o, 'olmadı 2').kod).toBe(2)
+    const son = sonraki(o, 'olmadı 3')
+    expect(son.kod).toBe(0)
+    expect(son.stderr).toContain('denemede dogrulanamadi')
+  })
+
+  it('uzun yeni mesaj ek satır sayılmaz: bekleyen silinir, normal denetimden geçer', () => {
+    const o = kirmiziOturum()
+    expect(sonraki(o, 'Bitti, ayrıntı: ' + 'x'.repeat(600)).kod).toBe(0)
+    expect(sonraki(o, 'Tamam.').kod).toBe(0)
+  })
+
+  it('ekSatirKarar birimi: uzun / atlatma / kartsız / geçerli / geçersiz', () => {
+    const k = kanca as unknown as { ekSatirKarar: (m: string, d: typeof hepsiGecerli) => { durum: string } }
+    expect(k.ekSatirKarar('x'.repeat(501), hepsiGecerli).durum).toBe('uzun')
+    expect(k.ekSatirKarar('Kartsız: kalıcı iş değil', hepsiGecerli).durum).toBe('atlatildi')
+    expect(k.ekSatirKarar('olmadı', hepsiGecerli).durum).toBe('blok')
+    expect(k.ekSatirKarar('(kart OPS-61)', hepsiGecerli).durum).toBe('temiz')
+    expect(k.ekSatirKarar('(kart OPS-61)', hicbiriGecerli).durum).toBe('blok')
   })
 })

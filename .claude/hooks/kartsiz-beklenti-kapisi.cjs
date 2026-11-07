@@ -405,13 +405,65 @@ function turuOku(kayitlar) {
   return { sonMetin, mesajlar }
 }
 
+// ── ARC-265 (7 Kasım): kırmızıda cevabı YENİDEN YAZDIRMA ──
+// Olay (KTL-82 mesajı, OPS ölçümü): kapı "mesajı yeniden yaz" deyince pencere aynı cevabı ikinci kez yazıyor, Recep aynı metni iki kez görüyordu.
+// Çözüm: kırmızıda bekleyen durum kaydedilir; pencere yalnız TEK KISA SATIR yazar ("(kart X)" ya da "Kartsız: <sebep>"), kanca satırı
+// Kanban'dan doğrular. Kapı GEVŞEMEZ: satır yoksa/geçersizse kırmızı kalır (en çok EK_SATIR_DENEME tur; sonra fail-open ama sessiz değil).
+const EK_SATIR_AZAMI = 500 // bundan uzun cevap "ek satır" değil, yeni mesajdır: normal denetimden geçer
+const EK_SATIR_DENEME = 3
+const BEKLEYEN_OMUR_MS = 60 * 60 * 1000
+
+/** Ek satırı değerlendirir. Dönüş: { durum: 'uzun' | 'atlatildi' | 'temiz' | 'blok' | 'olculemedi', sorunlar, atlatmaSebebi? }. */
+function ekSatirKarar(metin, kartlariDogrula) {
+  const t = String(metin || '').trim()
+  if (t.length > EK_SATIR_AZAMI) return { durum: 'uzun', sorunlar: [] }
+  const atlat = ATLATMA.exec(t)
+  if (atlat) return { durum: 'atlatildi', sorunlar: [], atlatmaSebebi: atlat[1].trim() }
+  const kartlar = kartBaslari(t)
+  if (kartlar.length === 0) return { durum: 'blok', sorunlar: ['ek satır yok: "(kart OPS-61)" ya da "Kartsız: <sebep>" yazılmadı'] }
+  // Yalnız kart belirteçleri doğrulanır (satırdaki serbest metin "yok" gibi sözlerle denetimi atlatamasın).
+  // Parantezsiz: "(kart X)" tek başına GIRIS kalıbına takılıp maddesiz sayılır ve doğrulamayı atlardı.
+  const k = degerlendir('Senden istenen: kart ' + kartlar.join(' '), kartlariDogrula)
+  return { durum: k.durum, sorunlar: k.sorunlar, olculemedi: k.olculemedi }
+}
+
+function bekleyenDizini() {
+  return process.env.KARTSIZ_KAPI_BEKLEYEN_DIZINI || os.tmpdir()
+}
+function bekleyenYolu(oturum) {
+  return path.join(bekleyenDizini(), 'kartsiz-kapi-bekleyen-' + String(oturum).replace(/[^A-Za-z0-9-]/g, '').slice(0, 40) + '.json')
+}
+function bekleyenOku(oturum, simdi = Date.now()) {
+  try {
+    const b = JSON.parse(fs.readFileSync(bekleyenYolu(oturum), 'utf8'))
+    if (!b || typeof b.zaman !== 'number' || simdi - b.zaman > BEKLEYEN_OMUR_MS) return null
+    return { zaman: b.zaman, deneme: Number(b.deneme) || 1 }
+  } catch {
+    return null
+  }
+}
+function bekleyenYaz(oturum, deneme, simdi = Date.now()) {
+  try {
+    fs.writeFileSync(bekleyenYolu(oturum), JSON.stringify({ zaman: simdi, deneme }))
+  } catch {
+    /* yazılamadı: kapı yine çalışır */
+  }
+}
+function bekleyenSil(oturum) {
+  try {
+    fs.unlinkSync(bekleyenYolu(oturum))
+  } catch {
+    /* yok */
+  }
+}
+
 function engelMetni(sorunlar, kaynak) {
   return (
     "[kartsiz-beklenti-kapisi] KIRMIZI: Recep'ten istenen şey KARTSIZ (" + kaynak + '). ' +
     sorunlar.join(' · ') + '. ' +
-    "Şimdi: Kanban'da (kendi panonda) kartı aç (atanan Sen ya da etiket recep-bekliyor; karardıysa karar-bekliyor), " +
-    'numarasını ilgili maddenin sonuna yaz ("(kart OPS-61)") ve mesajı yeniden yaz. ' +
-    'Gerçekten kart gerekmiyorsa mesaja tek satır ekle: "Kartsız: <sebep>" (sebep kayda düşer).' +
+    "Şimdi: Kanban'da (kendi panonda) kartı aç (atanan Sen ya da etiket recep-bekliyor; karardıysa karar-bekliyor). " +
+    'Mesajı YENİDEN YAZMA (Recep aynı cevabı iki kez görmesin): yalnız TEK KISA SATIR yaz — "(kart OPS-61)" gibi kart numarası ' +
+    '(kanca Kanban\'dan doğrular) ya da gerçekten kart gerekmiyorsa "Kartsız: <sebep>" (sebep kayda düşer).' +
     (sorunlar.some((s) => s.includes('RECEP YETKİSİ'))
       ? ' RECEP YETKİSİ sorunu: yetkisi verilmiş işi Recep\'e soru olarak getirme, işi yap; kartı gerçekten Recep\'e bağlıysa açıklamaya ' +
         '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ).'
@@ -468,8 +520,43 @@ function main() {
     const tur = turuOku(kayitlar)
     if (!tur) process.exit(0)
 
+    // ARC-265: önceki tur kırmızı verdiyse bu turun cevabı ek satır olarak değerlendirilir (yeniden yazım istenmez).
+    const bekleyen = bekleyenOku(oturum)
+    if (bekleyen) {
+      const ek = ekSatirKarar(tur.sonMetin, kanbandanDogrula)
+      if (ek.durum === 'uzun') {
+        bekleyenSil(oturum) // yeni, uzun mesaj: aşağıdaki normal denetimden geçer
+      } else if (ek.durum === 'atlatildi') {
+        atlatmaKaydet(ek.atlatmaSebebi, oturum)
+        bekleyenSil(oturum)
+        durumYaz('iyi', 'kapı çalışıyor')
+        process.exit(0)
+      } else if (ek.durum === 'temiz') {
+        bekleyenSil(oturum)
+        durumYaz('iyi', 'kapı çalışıyor')
+        process.exit(0)
+      } else if (ek.durum === 'olculemedi') {
+        bekleyenSil(oturum)
+        durumYaz('uyari', 'kapı ölçemedi: ' + ek.olculemedi)
+        process.stderr.write('[kartsiz-beklenti-kapisi] ek satir olculemedi, tur gecti: ' + ek.olculemedi + '\n')
+        process.exit(0)
+      } else {
+        // blok: ek satır yok ya da geçersiz → kırmızı kalır (sınırlı sayıda tur; sonra fail-open ama sessiz değil).
+        if (bekleyen.deneme >= EK_SATIR_DENEME) {
+          bekleyenSil(oturum)
+          durumYaz('uyari', 'kartsız istek ek satırla kapanmadı (' + EK_SATIR_DENEME + ' deneme)')
+          process.stderr.write('[kartsiz-beklenti-kapisi] ek satir ' + EK_SATIR_DENEME + ' denemede dogrulanamadi, tur gecti (sessiz degil)\n')
+          process.exit(0)
+        }
+        bekleyenYaz(oturum, bekleyen.deneme + 1)
+        durumYaz('uyari', 'ek satır geçersiz, kırmızı kaldı')
+        process.stderr.write(engelMetni(ek.sorunlar, 'ek satır') + '\n')
+        process.exit(2)
+      }
+    }
+
     const gorulen = gorulenOku(oturum)
-    const adaylar = [{ metin: tur.sonMetin, kaynak: 'son mesaj', kod: null }]
+    const adaylar =[{ metin: tur.sonMetin, kaynak: 'son mesaj', kod: null }]
     for (const m of tur.mesajlar) adaylar.push({ metin: m, kaynak: 'başka pencereye giden mesaj', kod: ozetKodu(m) })
 
     const sorunlar = []
@@ -493,11 +580,12 @@ function main() {
 
     if (sorunlar.length > 0) {
       durumYaz('uyari', 'son tur kartsız istek yüzünden bloklandı')
-      // Döngü koruması: kapı zaten bir kez bloklamışsa bu tur geçer.
+      // Döngü koruması: kapı zaten bir kez bloklamışsa bu tur geçer. (Ek satır turları yukarıda kendi sayacıyla sınırlıdır.)
       if (input.stop_hook_active) {
         process.stderr.write('[kartsiz-beklenti-kapisi] stop_hook_active: ikinci kez bloklanmadi\n')
         process.exit(0)
       }
+      bekleyenYaz(oturum, 1) // ARC-265: sonraki tur ek satır beklenir
       process.stderr.write(engelMetni(sorunlar, kaynak) + '\n')
       process.exit(2)
     }
@@ -511,6 +599,6 @@ function main() {
   })
 }
 
-module.exports = { maddeleriCikar, degerlendir, kartBaslari, kanbandanDogrula, turuOku, yetkiDegerlendir, ONEKLER }
+module.exports = { maddeleriCikar, degerlendir, kartBaslari, kanbandanDogrula, turuOku, yetkiDegerlendir, ekSatirKarar, EK_SATIR_AZAMI, EK_SATIR_DENEME, ONEKLER }
 
 if (require.main === module) main()
