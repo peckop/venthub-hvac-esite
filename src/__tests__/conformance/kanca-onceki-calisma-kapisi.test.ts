@@ -37,7 +37,7 @@ interface Modul {
   }) => Bulunan
   oncekiSatiri: (a: string) => string
   metinler: (b: Bulunan, aciklama?: string) => string[]
-  sonCommitler: (k: string, o: string, c: () => { status: number; stdout: string }) => Array<{ id: string; konu: string }>
+  sonCommitler: (k: string, o: string, c: (k: string, a: string[]) => { status: number; stdout: string }) => Array<{ id: string; konu: string }>
   departmanBelgeleri: (
     k: string,
     d: Array<{ onek: string; tam: boolean }>,
@@ -131,6 +131,17 @@ describe('kaynak okuyucular (sahte çalıştırıcı)', () => {
   it('git çıktısı ayrıştırılır; hata durumunda boş', () => {
     expect(m.sonCommitler(KOK, 'YTN', () => ({ status: 0, stdout: 'abc1234\tYTN-1 başlık\n' }))).toEqual([{ id: 'abc1234', konu: 'YTN-1 başlık' }])
     expect(m.sonCommitler(KOK, 'YTN', () => ({ status: 128, stdout: '' }))).toEqual([])
+  })
+  it('ARC-271: git --grep deseni "INV-3D-7" gibi anmaları 3D önekiyle eşlemez, gerçek 3D-7 kartını eşler', () => {
+    let desen = ''
+    m.sonCommitler(KOK, '3D', (_k: string, arg: string[]) => {
+      desen = String(arg.find((a) => a.startsWith('--grep=')) || '').slice('--grep='.length)
+      return { status: 0, stdout: '' }
+    })
+    const re = new RegExp(desen, 'i')
+    expect(re.test('INV-3D-7 kapısı eklendi')).toBe(false)
+    expect(re.test('3D (3D-7): model')).toBe(true)
+    expect(re.test('Kanban: 3D-12')).toBe(true)
   })
   it('belgeler yalnız harita desenlerinin docs/audits önekiyle eşleşir', () => {
     const ls = () => ({ status: 0, stdout: 'docs/audits/skill-a.md\ndocs/audits/geo-b.md\n' })

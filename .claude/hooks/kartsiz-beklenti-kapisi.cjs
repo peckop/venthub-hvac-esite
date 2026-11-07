@@ -29,7 +29,7 @@ const { kuyrukSatirlari } = require('./transkript-kuyrugu.cjs')
 
 // Kanban kart ön ekleri (ölçüldü 2026-10-04: panolardaki başlık ön ekleri). Yeni departman ön eki → buraya.
 // TSR/DIL/MRK/MVZ/STS 10-05: docs/standards/is-kayit-duzeni-standard.md §1 tablosu; eksikken bu departmanların kartı «bilinen kart değil» diye bloklanırdı.
-const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS']
+const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS', 'TKP', 'I18', '3D']
 const KART_NO = new RegExp('\\b(?:' + ONEKLER.join('|') + ')-\\d{1,5}\\b', 'g')
 const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi
 

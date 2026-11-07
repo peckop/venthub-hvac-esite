@@ -304,6 +304,10 @@ describe('VADESİ GELEN · kendi panosu (ARC-268, OPS 7 Kasım)', () => {
     expect(govde).toMatch(/vadeMetni\(bugun,\s*undefined,\s*rol\)/)
     // ARC-269: rol kararı kaynak regex'inde değil, saf vadeRolu'da ölçülür; kanca onu çağırmalı.
     expect(govde).toMatch(/vadeRolu\(rolSeridi\)/)
+    // ARC-271: rolsüz pencere (vadeRolu null) vadeMetni'ne HİÇ ulaşmadan döner; satır silinirse tüm panolar rolsüz pencereye akar.
+    expect(govde.indexOf('rol === null')).toBeGreaterThan(-1)
+    expect(govde.indexOf('rol === null')).toBeLessThan(govde.indexOf('vadeMetni('))
+    expect(govde).toMatch(/if \(rol === null\) return/)
   })
 })
 
