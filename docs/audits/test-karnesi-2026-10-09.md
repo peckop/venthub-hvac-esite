@@ -50,9 +50,9 @@
 | KORU | 117 |
 | COKLU-KORUMA-ADAYI | 3 |
 | ORTAM-INCELE | 1 |
-| TASI-ADAYI-DUNYA-DURUMU | 7 |
+| TASI-ADAYI-DUNYA-DURUMU | 5 |
+| TASINDI | 3 |
 | SAHTE-YESIL-ADAYI | 1 |
-| TASINDI | 1 |
 
 ### CI koşuları (ci.yml, pencere içi)
 
@@ -64,10 +64,12 @@
 
 Test adımı süresi medyanı: 190 sn (örnek 374 başarılı koşu).
 
-## PR kapısından çıkan (dünya durumu) testler ve yeni yerleri (1)
+## PR kapısından çıkan (dünya durumu) testler ve yeni yerleri (3)
 
 | Test | Yeni yer | Neden | Kanıt |
 |---|---|---|---|
+| `src/__tests__/conformance/githooks-doc-scope.test.ts` | master-push + zamanli | Git kancalarının companion kapsam süzgecini (doc-scope.cjs) geçici dizinde gerçek git init + commit ve sh ile koşturur; sonucu git geçmişine, saate ve makinenin kabuğuna bağlıdır, PR'ın dosyalarına değil. Yazarın düzeltemeyeceği bir kırmızı suçsuz PR'ı bekletir. Testin kendi girdilerine dokunan PR'da test PR kapısında TUTAR: girdiler testin geçici depoya kopyaladığı dosyalardır (.githooks/post-commit, .githooks/post-merge, .githooks/lib/doc-scope.cjs, .cc_docs.yaml; süzgeçte .githooks/ dizini olarak yazılı) ve testin kendisi. | ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, PR #1790; CI geçmişi 2026-07-06..10-07): 6 kırmızı koşu, 6 farklı dal (1'i master push); 6'sı da dünya olayı kümesinde (tek küme, 2026-08-27), bugün kırmızı yok. Ortam bağı: geçici dizinde git init + commit, sh, 15 sn'ye kadar bekleme döngüsü. Süre 18,3 sn (scripts/ci/test-sureleri.json). OPS hükmü 2026-10-09 (ALT-38i): zamanlı kola alınır. |
+| `src/__tests__/conformance/sessionstart-tavan.test.ts` | master-push + zamanli | SessionStart kancasını (session-board.cjs) hermetik dizinde yaklaşık 30 kez gerçek süreç olarak koşturup çıktı boyutunu (tavan 9.000 karakter) ölçer; ev dizinine ve makinenin durumuna kısmen bağlıdır ve 130 sn ile paketin en ağır testidir. Tavanı gerçekten koruyan yer çıktıyı şekillendiren girdilerdir (rol kartları, rol kartı üreticisi, pano ve hijyen betikleri, kancanın kendisi): bunlara dokunan PR'da test PR kapısında TUTAR, dokunmayanda zamanlı kola bırakır. Süzgeç girdileri 2026-11-08'de kancanın dört açılışta, OPS/ARAC/HARITA/ALTYAPI rol kollarında ve pencere başlığı kolunda gerçek koşusuyla ölçüldü (alt süreçler dahil): okunan izlenen dosyalar yalnız bu dizinlerde; docs/roller/ testin kendi varlık denetimidir, CLAUDE.md ise test-haritasında (scripts/ci/test-haritasi.json) okunan olarak yazılıdır. | ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, PR #1790; CI geçmişi 2026-07-06..10-07): 4 kırmızı koşu, 4 farklı dal, master push 0; 4'ü de dünya olayı kümesinde (tek küme, 2026-09-29), bugün kırmızı yok. Ortam bağı: ev dizini; yerel süre 130,4 sn (scripts/ci/test-sureleri.json), ağır yük altında taban koşusu 179 sn. OPS hükmü 2026-10-09 (ALT-38i): TAM çıkmaz, yalnız rol kartını ya da açılış çıktısını değiştiren yollar değişince PR kapısında koşar. |
 | `src/__tests__/conformance/taban-tazeligi-dunya.test.ts` | master-push + zamanli | Şema tabanının en yeni migration'dan geri kalıp kalmadığını ölçer. Cevap pull request'in koduna değil master'ın o anki durumuna ve tabanın son dökülme tarihine bağlıdır; taban prod'dan elle dökülür (sema-tabani-uret.yml), yani suçsuz bir PR'ın yazarı düzeltemez. Dosya, kapının KENDİ koduna ait kollardan ayrıldı: onlar (evren, kısmi taban, damga biçimi, README) taban-tazeligi.test.ts'te PR kapısında KALDI. | CI geçmişi 2026-07-06..10-06 (ALT-38 ölçümü; karne belgesi ALT-38b PR'ı ile depoya girer): bu kapı 55 kırmızı koşuda, 39 farklı dalda kırmızı verdi; 52'si dünya olayı kümesinde (altı küme: aynı test ≥3 dalda 12 saat içinde), 11'i master push. OPS ölçümü 2026-10-06: son 10 kırmızının 5'i (#1692 migrate sonrası suçsuz PR'lar). |
 
 ## ÇELİŞKİLER (aynı test için farklı sabotaj hükmü; çözülmedi, sessizce seçilmedi) (0)
@@ -508,7 +510,7 @@ Ayrıntı (sekiz soru, her dosya için) `test-karnesi-*.json` içindedir. Bu tab
 | `src/__tests__/conformance/form-submission-standard.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 9 | statik (5) | KISMI-KORUMA |
 | `src/__tests__/conformance/foy-vitrin-parite.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 9 | ölçülmedi | KORU |
 | `src/__tests__/conformance/gh-api-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | ölçülmedi | KISMI-KORUMA |
-| `src/__tests__/conformance/githooks-doc-scope.test.ts` | conformance | 6 | KIRMIZI (1/1) | bagli | 18283 | statik (6) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/githooks-doc-scope.test.ts` | conformance | 6 | KIRMIZI (1/1) | bagli | 18283 | statik (6) | TASINDI |
 | `src/__tests__/conformance/githooks-integrity.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 6 | statik (1) | KORU |
 | `src/__tests__/conformance/golge-kurucu.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | statik (2) | KISMI-KORUMA |
 | `src/__tests__/conformance/gorsel-yedegi.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (4) | OLCULMEDI |
@@ -669,7 +671,7 @@ Ayrıntı (sekiz soru, her dosya için) `test-karnesi-*.json` içindedir. Bu tab
 | `src/__tests__/conformance/seo-h1-tekilligi.test.tsx` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 368 | statik (4) | KISMI-KORUMA |
 | `src/__tests__/conformance/seo-yonlendirme-hedefi.test.ts` | conformance | 0 | KIRMIZI (1/2) | bagimsiz | 4 | statik (2) | KISMI-KORUMA |
 | `src/__tests__/conformance/sessionstart-pencere-adi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 71005 | statik (2) | KORU |
-| `src/__tests__/conformance/sessionstart-tavan.test.ts` | conformance | 4 | KIRMIZI (1/1) | bagli | 130403 | statik (3) | TASI-ADAYI-DUNYA-DURUMU |
+| `src/__tests__/conformance/sessionstart-tavan.test.ts` | conformance | 4 | KIRMIZI (1/1) | bagli | 130403 | statik (3) | TASINDI |
 | `src/__tests__/conformance/shipping-alarm-ops.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 12 | ölçülmedi | KISMI-KORUMA |
 | `src/__tests__/conformance/silent-fan-series-binding.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 13 | statik (1) | KORU |
 | `src/__tests__/conformance/silme-baglanti-kapisi.test.ts` | conformance | 2 | KIRMIZI (1/1) | supheli | 541 | ölçülmedi | KISMI-KORUMA |

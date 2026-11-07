@@ -1,6 +1,6 @@
 {
   "surum": 1,
-  "aciklama": "PR kapısından (ci işinin Test adımı, pull_request olayı) ÇIKARILAN dünya durumu testleri. Kod: scripts/ci/dunya-durumu.cjs; cetvel: docs/standards/test-karnesi-standard.md §3. Bu testler SİLİNMEZ: master push (ci işi, tam paket) ve zamanlı iş akışında (dunya-durumu.yml) koşar; kırmızıyı her mesajdaki kanca satırı gösterir. Yeni kayıt neden + kanıt + yeni yer taşımak ZORUNDA (INV-TEST-KOSU-1). PR kapısında bir test YALNIZ base dalındaki (master) listede de yazılıysa dışarıda kalır (kesişim): bu PR'ın listeye eklediği kayıt kendi PR'ında DIŞLANMAZ, birleşince sonraki PR'larda etkili olur (ALT-38a B3). Dışlama mekanizmasının kendi koruyucu testleri (DISLANAMAZ, scripts/ci/dunya-durumu.cjs) listeye giremez.",
+  "aciklama": "PR kapısından (ci işinin Test adımı, pull_request olayı) ÇIKARILAN dünya durumu testleri. Kod: scripts/ci/dunya-durumu.cjs; cetvel: docs/standards/test-karnesi-standard.md §3. Bu testler SİLİNMEZ: master push (ci işi, tam paket) ve zamanlı iş akışında (dunya-durumu.yml) koşar; kırmızıyı her mesajdaki kanca satırı gösterir. Yeni kayıt neden + kanıt + yeni yer taşımak ZORUNDA (INV-TEST-KOSU-1). PR kapısında bir test YALNIZ base dalındaki (master) listede de yazılıysa dışarıda kalır (kesişim): bu PR'ın listeye eklediği kayıt kendi PR'ında DIŞLANMAZ, birleşince sonraki PR'larda etkili olur (ALT-38a B3). Dışlama mekanizmasının kendi koruyucu testleri (DISLANAMAZ, scripts/ci/dunya-durumu.cjs) listeye giremez. Bir kayıt isteğe bağlı `yolFiltresi` taşıyabilir (dizin öneki 'a/b/' ya da tam dosya yolu; glob YASAK): süzgeçli test PR kapısından YALNIZ PR'ın değişen dosyalarından hiçbiri süzgece uymuyorsa çıkar; süzgeç PR'ın kaydından değil TABAN kaydından okunur (ALT-38i).",
   "testler": [
     {
       "test": "src/__tests__/conformance/taban-tazeligi-dunya.test.ts",
@@ -10,6 +10,41 @@
       "neden": "Şema tabanının en yeni migration'dan geri kalıp kalmadığını ölçer. Cevap pull request'in koduna değil master'ın o anki durumuna ve tabanın son dökülme tarihine bağlıdır; taban prod'dan elle dökülür (sema-tabani-uret.yml), yani suçsuz bir PR'ın yazarı düzeltemez. Dosya, kapının KENDİ koduna ait kollardan ayrıldı: onlar (evren, kısmi taban, damga biçimi, README) taban-tazeligi.test.ts'te PR kapısında KALDI.",
       "kanit": "CI geçmişi 2026-07-06..10-06 (ALT-38 ölçümü; karne belgesi ALT-38b PR'ı ile depoya girer): bu kapı 55 kırmızı koşuda, 39 farklı dalda kırmızı verdi; 52'si dünya olayı kümesinde (altı küme: aynı test ≥3 dalda 12 saat içinde), 11'i master push. OPS ölçümü 2026-10-06: son 10 kırmızının 5'i (#1692 migrate sonrası suçsuz PR'lar).",
       "gorunenYuz": "kanca satırı TABAN (.claude/hooks/defter-tazelik-satiri.cjs): her mesajda taban yaşı ve sonrasındaki migration sayısı görünür; kanca satırı DUNYA (.claude/hooks/dunya-durumu-satiri.cjs): zamanlı koşunun son sonucu ve yaşı görünür"
+    },
+    {
+      "test": "src/__tests__/conformance/githooks-doc-scope.test.ts",
+      "kimlik": "INV-HOOKS-2",
+      "eskiYer": "pull_request (test-shard işleri, her PR'da)",
+      "yeniYer": ["master-push", "zamanli"],
+      "yolFiltresi": [
+        ".githooks/",
+        ".cc_docs.yaml",
+        "src/__tests__/conformance/githooks-doc-scope.test.ts"
+      ],
+      "neden": "Git kancalarının companion kapsam süzgecini (doc-scope.cjs) geçici dizinde gerçek git init + commit ve sh ile koşturur; sonucu git geçmişine, saate ve makinenin kabuğuna bağlıdır, PR'ın dosyalarına değil. Yazarın düzeltemeyeceği bir kırmızı suçsuz PR'ı bekletir. Testin kendi girdilerine dokunan PR'da test PR kapısında TUTAR: girdiler testin geçici depoya kopyaladığı dosyalardır (.githooks/post-commit, .githooks/post-merge, .githooks/lib/doc-scope.cjs, .cc_docs.yaml; süzgeçte .githooks/ dizini olarak yazılı) ve testin kendisi.",
+      "kanit": "ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, PR #1790; CI geçmişi 2026-07-06..10-07): 6 kırmızı koşu, 6 farklı dal (1'i master push); 6'sı da dünya olayı kümesinde (tek küme, 2026-08-27), bugün kırmızı yok. Ortam bağı: geçici dizinde git init + commit, sh, 15 sn'ye kadar bekleme döngüsü. Süre 18,3 sn (scripts/ci/test-sureleri.json). OPS hükmü 2026-10-09 (ALT-38i): zamanlı kola alınır.",
+      "gorunenYuz": "kanca satırı DUNYA (.claude/hooks/dunya-durumu-satiri.cjs): zamanlı koşu kırmızıysa her mesajda görünür"
+    },
+    {
+      "test": "src/__tests__/conformance/sessionstart-tavan.test.ts",
+      "kimlik": "INV-SESSIONSTART-TAVAN-1",
+      "eskiYer": "pull_request (test-shard işleri, her PR'da)",
+      "yeniYer": ["master-push", "zamanli"],
+      "yolFiltresi": [
+        "docs/roller/",
+        "scripts/belge/",
+        "scripts/board/",
+        "scripts/hijyen/",
+        ".claude/hooks/",
+        ".claude/settings.json",
+        ".githooks/lib/companion-defter.cjs",
+        ".mcp.json",
+        "CLAUDE.md",
+        "src/__tests__/conformance/sessionstart-tavan.test.ts"
+      ],
+      "neden": "SessionStart kancasını (session-board.cjs) hermetik dizinde yaklaşık 30 kez gerçek süreç olarak koşturup çıktı boyutunu (tavan 9.000 karakter) ölçer; ev dizinine ve makinenin durumuna kısmen bağlıdır ve 130 sn ile paketin en ağır testidir. Tavanı gerçekten koruyan yer çıktıyı şekillendiren girdilerdir (rol kartları, rol kartı üreticisi, pano ve hijyen betikleri, kancanın kendisi): bunlara dokunan PR'da test PR kapısında TUTAR, dokunmayanda zamanlı kola bırakır. Süzgeç girdileri 2026-11-08'de kancanın dört açılışta, OPS/ARAC/HARITA/ALTYAPI rol kollarında ve pencere başlığı kolunda gerçek koşusuyla ölçüldü (alt süreçler dahil): okunan izlenen dosyalar yalnız bu dizinlerde; docs/roller/ testin kendi varlık denetimidir, CLAUDE.md ise test-haritasında (scripts/ci/test-haritasi.json) okunan olarak yazılıdır.",
+      "kanit": "ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, PR #1790; CI geçmişi 2026-07-06..10-07): 4 kırmızı koşu, 4 farklı dal, master push 0; 4'ü de dünya olayı kümesinde (tek küme, 2026-09-29), bugün kırmızı yok. Ortam bağı: ev dizini; yerel süre 130,4 sn (scripts/ci/test-sureleri.json), ağır yük altında taban koşusu 179 sn. OPS hükmü 2026-10-09 (ALT-38i): TAM çıkmaz, yalnız rol kartını ya da açılış çıktısını değiştiren yollar değişince PR kapısında koşar.",
+      "gorunenYuz": "kanca satırı DUNYA (.claude/hooks/dunya-durumu-satiri.cjs): zamanlı koşu kırmızıysa her mesajda görünür"
     }
   ]
 }

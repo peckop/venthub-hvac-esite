@@ -10,8 +10,12 @@ name: Dunya durumu
 #   1. master push: `ci` işinin Test adımı TAM paketi koşar. UYARI: master push koşuları aynı
 #      concurrency grubunda iptal edilebilir (ölçüldü 07-06..10-06: 1119 master koşusunun 419'u iptal),
 #      yani tek başına güvence DEĞİLDİR.
-#   2. BU İŞ AKIŞI: zamanlı (6 saatte bir) + elle; YALNIZ listedeki testleri koşar (kip `yalniz`).
-#      Asıl güvence budur: bir master koşusu iptal edilse de en geç 6 saat sonra görülür.
+#   2. BU İŞ AKIŞI: zamanlı (cron'u 6 saatte bir) + elle; YALNIZ listedeki testleri koşar (kip `yalniz`).
+#      Asıl güvence budur: bir master koşusu iptal edilse de bir sonraki zamanlı koşuda görülür. "En geç 6 saat" DEĞİL:
+#      GitHub zamanlanmış koşuları geciktirir ve atlar. Ölçüldü (gh run list, 100 zamanlı koşu, 2026-10-07..2026-11-07):
+#      ardışık koşu aralığı medyan 7,2 saat, p90 10,8 saat, en uzun 15,3 saat; 99 aralığın 76'sı 6 saati aştı.
+#      Kanca satırı (`DUNYA:`) son zamanlı koşu kırmızıysa konuşur ve son tamamlanan koşu 18 saatten eskiyse "koşu YOK" der
+#      (.claude/hooks/dunya-durumu-satiri.cjs); ölçülen en uzun aralık (15,3 saat) bu eşiğin altındadır.
 #
 # KIRMIZIDA KİME HABER GİDER: bu iş akışı kırmızı bitince OPS'un her mesajında gördüğü kanca satırı
 # `DUNYA:` (.claude/hooks/defter-tazelik-satiri.cjs) "SON ZAMANLI KOŞU KIRMIZI" yazar; bu satır PR'ı
@@ -23,7 +27,7 @@ name: Dunya durumu
 
 on:
   schedule:
-    # 6 saatte bir, tam saat DEĞİL (GitHub tam saatlerde zamanlanmış işleri geciktiriyor).
+    # Nominal 6 saatte bir (gerçek ritim üstte ölçülü: medyan 7,2 saat), tam saat DEĞİL (GitHub tam saatlerde zamanlanmış işleri geciktiriyor).
     - cron: '23 */6 * * *'
   workflow_dispatch:
 
