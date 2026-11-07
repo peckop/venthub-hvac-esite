@@ -306,7 +306,7 @@ describe('INV-KARTSIZ-KAPI-8: başka pencereye giden mesaj (SendMessage) aynı k
   })
 
   it('ARC-271: kart-alani-kapisi ONEK tablosundaki her önek bu listede de var (iki liste ayrışmaz)', () => {
-    const alani = require(path.resolve(__dirname, '../../../.claude/hooks/kart-alani-kapisi.cjs')) as { ONEK: Record<string, string> }
+    const alani = require_(path.resolve(__dirname, '../../../.claude/hooks/kart-alani-kapisi.cjs')) as { ONEK: Record<string, string> }
     const eksik = Object.keys(alani.ONEK).filter((o) => !kanca.ONEKLER.includes(o))
     expect(eksik, `kartsiz-beklenti ONEKLER'de yok: ${eksik.join(', ')}`).toEqual([])
   })
