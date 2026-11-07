@@ -185,12 +185,17 @@ function vadeKartlariCalistir(bugun) {
 /**
  * VADESİ GELEN (ARC-236, OPS 1 Kasım): dueDate ≤ bugün olan ve Done olmayan kartlar, en YENİ vade önce (bugün → geriye; bayat kartlar bugünü gömmesin, OPS 1 Kasım), en çok 10.
  * Kanban 1.3.0'da vade yalnız veridir, hatırlatma yoktur; zamanlayıcı da yok (karar 53) — OPS açılışında görünür.
+ * ARC-268 (OPS 7 Kasım, Recep: "her departman açılışta kendi panosuna bakıyor mu?"): `rol` verilirse (OPS dışı bir departman) yalnız O
+ * departmanın kartları (`kartDepartmani`: atanan ya da başlık öneki) listelenir; `rol` boş ya da OPS ise bütün panolar.
  * Okunamazsa ya da vadeli kart yoksa '' (fail-open). `kartlar` testte verilir; `bugun` yerel gün "YYYY-MM-DD".
  */
-function vadeMetni(bugun, kartlar = acikKartlar(() => vadeKartlariCalistir(bugun))) {
+function vadeMetni(bugun, kartlar = acikKartlar(() => vadeKartlariCalistir(bugun)), rol = '', onek = onekTablosu()) {
   if (!kartlar || !/^\d{4}-\d{2}-\d{2}$/.test(String(bugun))) return ''
   const gunu = (k) => (typeof k.dueDate === 'string' ? k.dueDate.slice(0, 10) : '')
+  const hedef = ad(rol)
+  const kendiPano = hedef !== '' && hedef !== 'OPS'
   const vadeli = kartlar
+    .filter((k) => !kendiPano || kartDepartmani(k, onek) === hedef)
     .filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(gunu(k)) && gunu(k) <= bugun && k.sutun !== 'Done')
     .sort((a, b) => gunu(b).localeCompare(gunu(a)) || kartNo(a.title).localeCompare(kartNo(b.title)))
   if (vadeli.length === 0) return ''
