@@ -527,6 +527,8 @@ function main() {
     // ARC-265: önceki tur kırmızı verdiyse bu turun cevabı ek satır olarak değerlendirilir (yeniden yazım istenmez).
     // Denetçi bulgusu 2: bekleyen kayıt YALNIZ kırmızıyı doğuran insan mesajının devam turunda geçerlidir; yeni insan mesajı gelince düşer
     // (ilgisiz kısa cevap gereksiz bloklanmasın).
+    let ekTuru = false // bu tur kırmızıdan sonraki devam turu mu (gerçek devam turunda stop_hook_active=true gelir; denetçi turu 2)
+    let oncekiDeneme = 0
     let bekleyen = bekleyenOku(oturum)
     if (bekleyen && bekleyen.insan !== tur.insan) {
       bekleyenSil(oturum)
@@ -552,6 +554,8 @@ function main() {
       // ek satırla birlikte yazılmış yeni kartsız istek ya da SendMessage geçmesin).
       bekleyenSil(oturum)
       if (ek.durum === 'atlatildi') atlatmaKaydet(ek.atlatmaSebebi, oturum)
+      ekTuru = true
+      oncekiDeneme = bekleyen.deneme
     }
 
     const gorulen = gorulenOku(oturum)
@@ -580,12 +584,19 @@ function main() {
     if (sorunlar.length > 0) {
       durumYaz('uyari', 'son tur kartsız istek yüzünden bloklandı')
       // Döngü koruması: kapı zaten bir kez bloklamışsa bu tur geçer. (Ek satır turları yukarıda kendi sayacıyla sınırlıdır.)
-      if (input.stop_hook_active) {
+      // Ek turu (denetçi turu 2): kırmızıdan sonraki devam turunda stop_hook_active=true gelir; koruma burada kendi sayacıyla (EK_SATIR_DENEME) işler,
+      // yoksa ek satırla birlikte yazılan yeni kartsız istek bayrak yüzünden geçerdi.
+      if (ekTuru && oncekiDeneme >= EK_SATIR_DENEME) {
+        atlatmaKaydet('EK-SATIR-DOGRULANAMADI: ek turda yeni kartsiz istek ' + EK_SATIR_DENEME + ' denemede kapanmadi, tur gecti', oturum)
+        process.stderr.write('[kartsiz-beklenti-kapisi] ek tur ' + EK_SATIR_DENEME + ' denemede kapanmadi, tur gecti (log: kartsiz-atlatma.log)\n')
+        process.exit(0)
+      }
+      if (!ekTuru && input.stop_hook_active) {
         process.stderr.write('[kartsiz-beklenti-kapisi] stop_hook_active: ikinci kez bloklanmadi\n')
         process.exit(0)
       }
       // ARC-265: devam turunda ek satır beklenir. Yazılamazsa kırmızı yine verilir ama ek satır akışı çalışmaz: görünür kıl (bulgu 4).
-      if (!bekleyenYaz(oturum, 1, tur.insan)) {
+      if (!bekleyenYaz(oturum, ekTuru ? oncekiDeneme + 1 : 1, tur.insan)) {
         durumYaz('uyari', 'ek satır kaydı yazılamadı (tmp): kırmızı yeniden-yaz moduna düştü')
         process.stderr.write('[kartsiz-beklenti-kapisi] bekleyen kayit yazilamadi (' + bekleyenDizini() + '), ek satir akisi calismaz\n')
       }

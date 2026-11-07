@@ -683,6 +683,31 @@ describe('INV-KARTSIZ-KAPI-12 (ARC-265): kırmızıda ek satır akışı', () =>
     expect(r.stderr).toContain('başka pencereye giden mesaj')
   })
 
+  // Denetçi turu 2: gerçek devam turunda Claude Code stop_hook_active=true gönderir; önceki testler bayrağı vermediği için bunu görmüyordu.
+  it('turu 2 · C: GERÇEK devam turunda (stop_hook_active=true) ek satırla gelen yeni kartsız istek yine bloklanır', () => {
+    const o = kirmiziOturum()
+    const r = calistir([insan('x'), asistan('Senden beklenen:\n- Y bak\nOPS-61 de açıktır')], { oturum: o, durdurAktif: true })
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('kartsız madde')
+  })
+
+  it('turu 2 · D: stop_hook_active=true iken ek turdaki kartsız SendMessage "(kart OPS-61)" ile saklanamaz', () => {
+    const o = kirmiziOturum()
+    const r = calistir([insan('x'), mesajGonder('**Senden istenen**\n- Z yap\n'), asistan('(kart OPS-61)')], { oturum: o, durdurAktif: true })
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('başka pencereye giden mesaj')
+  })
+
+  it('turu 2: ek turda yeni kartsız istek sınırsız döngü yaratmaz (EK_SATIR_DENEME sonra geçer, kalıcı log)', () => {
+    const o = kirmiziOturum()
+    const kotu = 'Senden beklenen:\n- Y bak\nOPS-61 de açıktır'
+    const gec: number[] = []
+    for (let i = 0; i < 5; i++) gec.push(calistir([insan('x'), asistan(kotu)], { oturum: o, durdurAktif: true }).kod ?? -1)
+    expect(gec.slice(0, 2)).toEqual([2, 2])
+    expect(gec).toContain(0)
+    expect(fs.readFileSync(path.join(durumDizini, 'kartsiz-atlatma.log'), 'utf8')).toContain('ek turda yeni kartsiz istek')
+  })
+
   it('bulgu 3: 3 denemede doğrulanamayan tur KALICI log satırı bırakır (durum dosyası ezilse de iz kalır)', () => {
     const o = kirmiziOturum()
     sonraki(o, 'olmadı 1')
