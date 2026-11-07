@@ -191,9 +191,11 @@ function dokumUret(kayitYolu, simdi = new Date(), kaynak = 'PreCompact') {
   const t = turlar(kayitSatirlari(kayitYolu))
   const son = t.slice(-RECEP_SAYI)
   const cevapBaslangic = son.length - CEVAP_SAYI
+  // Döküm biçiminin ayraçları metin içinde satır başında geçerse etiketler karışır (ARC-266 denetçi bulgusu 3): ters bölü ile etkisizleştirilir.
+  const kacis = (m) => String(m).replace(/^(### Recep \(|#### Cevap)/gm, '\\$1')
   const parcalar = son.map((tur, i) => {
-    let p = `### Recep (${tur.zaman || 'saat yok'})\n${tur.recep}\n`
-    if (i >= cevapBaslangic && tur.cevap) p += `\n#### Cevap\n${tur.cevap}\n`
+    let p = `### Recep (${tur.zaman || 'saat yok'})\n${kacis(tur.recep)}\n`
+    if (i >= cevapBaslangic && tur.cevap) p += `\n#### Cevap\n${kacis(tur.cevap)}\n`
     return p
   })
   let govde = parcalar.join('\n')
@@ -275,7 +277,9 @@ function enjeksiyonKisa(
       const baslik = `### Ajan cevabı (${c.zaman})\n`
       const yer = Math.min(CEVAP_ENJ_TEK, pay - baslik.length - 40)
       if (yer < 120) break
-      const m = c.metin.length > yer ? c.metin.slice(0, yer) + ' […cevap kırpıldı, tamamı dosyada]' : c.metin
+      // Sözler çoğunlukla cevabın SONUNDA durur (denetçi bulgusu 3): baş + son korunur, orta kısım dosyada kalır.
+      const bas = Math.floor(yer * 0.4)
+      const m = c.metin.length > yer ? c.metin.slice(0, bas) + ' […cevap kırpıldı, orta kısım dosyada] ' + c.metin.slice(-(yer - bas)) : c.metin
       const parca = baslik + m + '\n'
       secilen.unshift(parca)
       pay -= parca.length + 1

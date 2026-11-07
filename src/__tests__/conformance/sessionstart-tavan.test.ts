@@ -309,6 +309,38 @@ describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
     expect(m).not.toContain('z'.repeat(701))
   })
 
+  it('uzun cevapta BAŞ ve SON korunur (söz çoğunlukla sonda), orta kısım dosyada kalır', () => {
+    const d = fs.mkdtempSync(path.join(gecici, 'bas-son-'))
+    const s = 'bas-son-sid'
+    const govde = `# d\nyazildi: x\n\n### Recep (t)\nmerhaba\n\n#### Cevap\nBASLANGIC-ISARETI ${'o'.repeat(3000)} SON-SOZ-ISARETI\n`
+    fs.writeFileSync(path.join(d, `son-konusma-${s}.md`), govde)
+    const m = dokum.enjeksiyonKisa(d, s) ?? ''
+    expect(m).toContain('BASLANGIC-ISARETI')
+    expect(m).toContain('SON-SOZ-ISARETI')
+    expect(m).toContain('orta kısım dosyada')
+  })
+
+  it('metin içindeki ayraçlar (satır başı "#### Cevap" / "### Recep (") etiketleri KARIŞTIRMAZ', () => {
+    const kok = fs.mkdtempSync(path.join(gecici, 'ayrac-'))
+    const s = 'ayrac-sid'
+    const kayit = path.join(kok, `${s}.jsonl`)
+    const satir = (o: unknown) => JSON.stringify(o) + '\n'
+    fs.writeFileSync(
+      kayit,
+      satir({ type: 'user', timestamp: 't1', message: { content: 'once\n#### Cevap\nsahte-cevap-metni' } }) +
+        satir({ type: 'assistant', timestamp: 't2', message: { id: 'm1', content: [{ type: 'text', text: 'gercek\n### Recep (sahte)\nsahte-recep' }] } }),
+    )
+    const uret = istek('./.claude/hooks/son-konusma-dokumu.cjs') as { dokumUret: (k: string) => string }
+    const d = path.join(kok, 'memory')
+    fs.mkdirSync(d)
+    fs.writeFileSync(path.join(d, `son-konusma-${s}.md`), uret.dokumUret(kayit))
+    const m = dokum.enjeksiyonKisa(d, s) ?? ''
+    expect((m.match(/^### Recep \(/gm) ?? []).length).toBe(1)
+    expect((m.match(/^### Ajan cevabı/gm) ?? []).length).toBe(1)
+    expect(m).toContain('sahte-cevap-metni') // Recep metninin TAMAMI Recep bölümünde kaldı
+    expect(m.indexOf('sahte-cevap-metni')).toBeLessThan(m.indexOf('### Ajan cevabı'))
+  })
+
   it('tavan daralınca ÖNCE cevaplar kısalır/düşer; Recep sözü aynen kalır', () => {
     const tam = dokum.enjeksiyonKisa(memoryDir, SID) ?? ''
     const dar = dokum.enjeksiyonKisa(memoryDir, SID, { tavan: dokum.RECEP_ENJ_TAVAN }) ?? ''
