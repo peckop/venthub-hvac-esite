@@ -2,7 +2,7 @@
 //
 // supabase/functions/returns-webhook/index.ts
 // Receives carrier webhook for return shipments. On delivered, marks venthub_returns.status='received'.
-// Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RETURNS_WEBHOOK_SECRET (HMAC) or RETURNS_WEBHOOK_TOKEN
+// Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RETURNS_WEBHOOK_SECRET (HMAC; token yolu ALT-166 ile kaldırıldı)
 //
 // TENANT (T026-VH Adım 5): kargo firması tenant UUID'lerimizi bilmez; `return_id`/`order_id`
 // bilir. Tenant istekten OKUNMAZ — imza doğrulandıktan sonra `venthub_returns` satırından
@@ -12,7 +12,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { canCarrierTransition } from '../_shared/return_transitions.ts'
-import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
+import { webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), { status: init.status || 200, headers: { 'content-type': 'application/json; charset=utf-8', ...(init.headers||{}) } })
@@ -94,16 +94,16 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
 
     // TENANT BURADA ÇÖZÜLMEZ. Sıra kutsal: önce imza/token, sonra replay guard, sonra
     // DB'ye dokunuş, en son iade satırından türetme (aşağıda `tenantFromRow`).
+    // Yalnız HMAC (ALT-166): eski x-webhook-token yolu zaman ve olay kimliğini imzalamıyordu; token sızarsa
+    // sınırsız sahte iade durumu yazılabilirdi. Canlıda RETURNS_WEBHOOK_TOKEN tanımlı değildi ve son 30 günde
+    // token yoluyla başarılı çağrı yoktu (ölçüldü 2026-11-07).
     const secret = Deno.env.get('RETURNS_WEBHOOK_SECRET') || ''
-    const token = Deno.env.get('RETURNS_WEBHOOK_TOKEN') || ''
     const sign = req.headers.get('x-signature') || ''
-    const tok = req.headers.get('x-webhook-token') || ''
     // Zaman ve olay kimliği imzanın PARÇASIDIR (ALT-138): imzadan önce okunur, imzalanmış hâliyle kullanılır.
     const tsHeader = (req.headers.get('x-timestamp') || req.headers.get('x-event-time') || '').trim()
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     let ok = false
     if (secret && sign) ok = await webhookImzaGecerli(secret, tsHeader, eventId, raw, sign)
-    if (!ok && token && tok && timingSafeEquals(tok, token)) ok = true
     if (!ok) return json({ error: 'Unauthorized' }, { status: 401 })
 
     // Enforce replay guard - mandatory timestamp header
@@ -283,7 +283,11 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
         .eq('id', returnId)
         .eq('status', String(cur.status))
         .select('id')
-      if (updErr) return json({ error: updErr.message || 'DB update failed' }, { status: 500 })
+      if (updErr) {
+        // Ham DB mesajı gövdeye dönmez (ALT-167); ayrıntı yalnız günlüğe.
+        console.error('[returns-webhook] iade güncellenemedi', { code: 'UPDATE_FAILED', return_id: returnId, hata: updErr.message })
+        return json({ error: 'DB update failed', code: 'UPDATE_FAILED' }, { status: 500 })
+      }
       if (!Array.isArray(yazilanlar) || yazilanlar.length === 0) {
         console.error('[returns-webhook] iade durumu okuma ile yazma arasında değişti', { code: 'STATE_CHANGED', return_id: returnId, read_status: cur.status })
         return json({ error: 'Conflict: return status changed', code: 'STATE_CHANGED' }, { status: 409 })
@@ -387,7 +391,8 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
 
     return json({ ok: true, return_id: returnId, status: (patch['status'] || cur.status) })
   } catch (_e) {
-    console.error('Returns webhook error:', _e);
-    return json({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
+    // İstisna nesnesinin tamamı değil yalnız mesajı (istek bağlamı/başlık günlüğe düşmesin; #2348 inceleme LOW-3).
+    console.error('[returns-webhook] beklenmeyen hata', { code: 'INTERNAL', hata: _e instanceof Error ? _e.message : String(_e) })
+    return json({ error: 'Unexpected error', code: 'INTERNAL' }, { status: 500 })
   }
 }

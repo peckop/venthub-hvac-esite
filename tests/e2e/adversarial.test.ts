@@ -299,8 +299,9 @@ describe('Tier 5 Adversarial & Coverage Hardening E2E Suite', () => {
     // guard'ın "varsa uygula" (fail-OPEN) olduğu ay boyunca ikisi de yeşil kaldı.
     // Bu test tam o boşluğu kapatır: guard artık ZORUNLU (cetvel §3.5).
     // ALT-138: zaman damgası artık imzanın parçası; HMAC yolunda damgasız istek imza katmanında
-    // düşer (imzasız alanla doğrulama yok). "Missing timestamp header" dalı yalnız legacy token
-    // yolundan erişilir; o dal da ayrıca sınanır.
+    // düşer (imzasız alanla doğrulama yok). ALT-166: legacy token yolu KALDIRILDI; "Missing timestamp
+    // header" dalına artık kimlik doğrulamadan geçen bir istek ulaşamaz, token ile damgasız istek de 401
+    // 'Unauthorized' alır (env'de SHIPPING_WEBHOOK_TOKEN tanımlıyken).
     it('7. should reject a correctly signed webhook that omits the timestamp header entirely', async () => {
       const payload = { order_number: 'ORD-1', status: 'shipped' }
       const rawBody = JSON.stringify(payload)
@@ -328,7 +329,7 @@ describe('Tier 5 Adversarial & Coverage Hardening E2E Suite', () => {
       const tokenRes = await simulator.invokeFunction(webhookPath, tokenReq)
       expect(tokenRes.status).toBe(401)
       const resBody = await tokenRes.json()
-      expect(resBody.error).toBe('Missing timestamp header')
+      expect(resBody.error).toBe('Unauthorized')
     })
   })
 

@@ -251,11 +251,22 @@ Mevcut 5 ve 6 numaralı testler bu hâli **göremiyordu** (5'te imza hiç yok, 6
 bayat), fail-open ay boyunca yeşil kaldı. Kilit bilerek-bozularak kanıtlandı: guard geri alınınca
 test 7 FAIL etti.
 
-**Adlandırılmış istisna — `SHIPPING_WEBHOOK_TOKEN` (legacy).** `shipping-webhook`, HMAC'e ek olarak
-statik bir `x-webhook-token` yolunu da kabul ediyor. Bu yol da **fail-closed**'dır (env tanımlı
-değilse hiç açılmaz) ve artık zorunlu replay guard'ın arkasındadır. Yine de HMAC'ten zayıftır:
-sır dönmez, gövdeye bağlı değildir. **Gerçek sağlayıcı bağlanınca kaldırılacaktır**; o güne kadar
-sandbox/test yolu olarak adıyla kayıtlıdır (`tests/e2e/adversarial.test.ts` bu yolu sınıyor).
+**Adlandırılmış istisna — `SHIPPING_WEBHOOK_TOKEN` (legacy): KALDIRILDI (ALT-166, 2026-11-07).**
+`shipping-webhook` (`SHIPPING_WEBHOOK_TOKEN`) ve `returns-webhook` (`RETURNS_WEBHOOK_TOKEN`), HMAC'e ek
+olarak statik bir `x-webhook-token` yolu kabul ediyordu. İstisna kaldırıldı: **iki uç da yalnız HMAC ile
+kimlik doğrular** (`webhookImzaGecerli`: zaman + olay kimliği + ham gövde birlikte imzalı, §3.5).
+Token yolu HMAC'ten zayıftı: sır dönmez, zamanı ve olay kimliğini imzalamaz; token sızarsa saldırgan taze
+zaman ve yeni olay kimliğiyle sınırsız sahte durum yazabilirdi.
+
+**Gerekçe (ölçüm, ALT-166, 2026-11-07).** Canlıda `RETURNS_WEBHOOK_TOKEN` tanımlı değildi;
+`SHIPPING_WEBHOOK_TOKEN` tanımlıydı ama son 30 günde iki fonksiyona gelen 3 çağrının üçü de 401 aldı.
+Token yoluyla başarılı çağrı yoktu, yani kaldırmak kıracak bir canlı çağıran yok.
+
+**Sonuç.** Canlıdaki `SHIPPING_WEBHOOK_TOKEN` sırrı artık hiçbir kod tarafından okunmuyor; silinmesi ayrı
+bir canlı işlemdir (OPS), kod değişikliğinin parçası değildir. Kilitler: `webhook-imza-kapsami.test.ts`
+("TOKEN YOLU KALDIRILDI" kolu: ortamda token TANIMLI olsa bile yalnız `x-webhook-token` + taze zaman +
+olay kimliği gönderen istek 401 alır ve DB'ye yazılmaz; ayrıca iki kaynakta `*_WEBHOOK_TOKEN` okuması
+bulunmadığını statik doğrular) ve `tests/e2e/webhooks.test.ts` test 7 (doğru token bile 401).
 
 ### 3.6 `service_role` kuralı
 

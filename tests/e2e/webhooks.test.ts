@@ -139,6 +139,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
         SUPABASE_URL: 'https://tnofewwkwlyjsqgwjjga.supabase.co',
         SUPABASE_SERVICE_ROLE_KEY: 'service-key',
         SHIPPING_WEBHOOK_SECRET: 'webhook-hmac-secret-12345',
+        // Token BİLEREK tanımlı (ALT-166): token yolu kaldırıldı; test 7 tanımlı token'ın da kapıyı açmadığını sınar.
         SHIPPING_WEBHOOK_TOKEN: 'legacy-sandbox-token-555'
       }
     })
@@ -331,7 +332,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     }
   })
 
-  it('7. should fall back to legacy sandbox token when HMAC signature header is absent', async () => {
+  it('7. should NOT accept the removed legacy token path (ALT-166), even with the env token defined', async () => {
     mockDbInstance.orders.push({
       id: 'order-sandbox',
       status: 'confirmed',
@@ -349,14 +350,14 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
         'x-timestamp': String(Date.now()),
         'x-event-id': 'EV-T7',
         'Content-Type': 'application/json',
-        'x-webhook-token': 'legacy-sandbox-token-555' // Legacy fallback
+        'x-webhook-token': 'legacy-sandbox-token-555' // Kaldırılan yol: doğru token bile 401
       },
       body: rawBody
     })
 
     const res = await simulator.invokeFunction(webhookFunctionPath, req)
-    expect(res.status).toBe(200)
-    expect(mockDbInstance.orders[0].status).toBe('shipped')
+    expect(res.status).toBe(401)
+    expect(mockDbInstance.orders[0].status).toBe('confirmed')
   })
 
   it('8. should enforce monotonic status updates, blocking status demotion attempts', async () => {

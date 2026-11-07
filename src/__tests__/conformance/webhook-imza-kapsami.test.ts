@@ -24,6 +24,10 @@ import {
  * DAVRANIŞLA ölçülür: iki fonksiyon gerçek hâliyle yüklenir (`Deno.serve` işleyicisi yakalanır, supabase-js
  * sahte istemciyle değişir). SABOTAJ: aynı saldırılar imzayı yalnız gövdeye bağlayan ve olay kimliğini zorunlu
  * tutmayan kopyaya karşı da koşar ve orada GEÇTİKLERİ ölçülür (kalıp: kargo-webhook-monoton.test.ts).
+ *
+ * TOKEN YOLU YOK (ALT-166, 2026-11-07): eski `x-webhook-token` yolu zaman ve olay kimliğini imzalamıyordu; iki uç
+ * da yalnız HMAC ile kimlik doğrular. `ORTAM` `*_WEBHOOK_TOKEN`ı bilerek TANIMLI tutar: kapı, ortamda token olması
+ * yüzünden değil, kodda token yolu bulunmadığı için kapalıdır (aşağıdaki "TOKEN YOLU KALDIRILDI" kolu).
  */
 
 const KOK = path.resolve(__dirname, '../../..')
@@ -54,7 +58,7 @@ const UCLAR: Uc[] = [
 
 /** İmza kapsamını söken dönüşümler: imza yalnız gövde, olay kimliği isteğe bağlı. Her biri eşleşmek ZORUNDA. */
 const SOKUMLER: [RegExp, string][] = [
-  [/import \{ timingSafeEquals, webhookImzaGecerli \}/, 'import { timingSafeEquals, hmacImzaGecerli }'],
+  [/import \{ webhookImzaGecerli \}/, 'import { hmacImzaGecerli }'],
   [/webhookImzaGecerli\(secret, tsHeader, eventId, raw, (\w+)\)/, 'hmacImzaGecerli(secret, raw, $1)'],
   [/if \(!eventId\) \{/, 'if (false) {'],
 ]
@@ -262,6 +266,15 @@ describe('INV-WEBHOOK-IMZA-1 · saf yardımcı', () => {
     }
   })
 
+  it('iki fonksiyon da ortamdan *_WEBHOOK_TOKEN okumuyor (token yolu kodda yok, ALT-166)', () => {
+    for (const uc of UCLAR) {
+      const kaynak = fs.readFileSync(path.join(KOK, `supabase/functions/${uc.ad}/index.ts`), 'utf8')
+      expect(kaynak, uc.ad).not.toMatch(/Deno\.env\.get\(\s*['"][A-Z_]*WEBHOOK_TOKEN['"]\s*\)/)
+      expect(kaynak, uc.ad).not.toMatch(/headers\.get\(\s*['"]x-webhook-token['"]\s*\)/)
+      expect(kaynak, uc.ad).not.toMatch(/timingSafeEquals/)
+    }
+  })
+
   it('hmacImzaGecerli genel yardımcı olarak duruyor (başka çağıranlar için davranışı değişmedi)', async () => {
     expect(await hmacImzaGecerli(SIR, 'g', imzala('g'))).toBe(true)
   })
@@ -313,10 +326,35 @@ describe.each(UCLAR)('INV-WEBHOOK-IMZA-1 · $ad: imza zaman + olay + gövdeyi ka
     expect(r.http).toBe(401)
   })
 
-  it('olay kimliği yoksa token yolu da 400 (zorunlu), DB yazılmaz', async () => {
+  it('TOKEN YOLU KALDIRILDI (ALT-166): ortamda *_WEBHOOK_TOKEN TANIMLI olsa bile yalnız x-webhook-token + taze zaman + olay kimliği 401, DB yazılmaz', async () => {
+    // ön koşul: token ortamda gerçekten tanımlı; 401'in sebebi "token yok" olamaz
+    expect(ORTAM[uc.tokenAdi]).toBe(TOKEN)
+    const r = await cagir(yeni.get(uc.ad)!, uc, {
+      'x-webhook-token': TOKEN,
+      'x-timestamp': String(Date.now()),
+      'x-event-id': 'evt-token-yolu',
+    })
+    expect(r.http).toBe(401)
+    expect(r.json.error).toBe('Unauthorized')
+    expect(yazimlar).toBe(0)
+    // kapı olay sahiplenmesinden ÖNCE kapanır: olay tablosuna satır düşmez
+    expect(gorulenOlaylar).toEqual([])
+  })
+
+  it('token + imza kipi karışık: geçerli token yanlış imzayı kurtarmaz (401, DB yazılmaz)', async () => {
+    const r = await cagir(yeni.get(uc.ad)!, uc, {
+      'x-webhook-token': TOKEN,
+      'x-timestamp': String(Date.now()),
+      'x-event-id': 'evt-token-yanlis-imza',
+      'x-signature': 'gecersiz',
+    })
+    expect(r.http).toBe(401)
+    expect(yazimlar).toBe(0)
+  })
+
+  it('olay kimliği yoksa token da imza da kabul edilmez (401), DB yazılmaz', async () => {
     const r = await cagir(yeni.get(uc.ad)!, uc, { 'x-webhook-token': TOKEN, 'x-timestamp': String(Date.now()) })
-    expect(r.http).toBe(400)
-    expect(r.json.error).toBe('Missing event id header')
+    expect(r.http).toBe(401)
     expect(yazimlar).toBe(0)
   })
 
@@ -357,8 +395,9 @@ describe.each(UCLAR)('INV-WEBHOOK-IMZA-1 · $ad SABOTAJ kolu (imza yalnız gövd
     expect(r.http, 'kapı sökülünce saldırı geçmeli; geçmiyorsa test kapıyı ölçmüyor').toBe(200)
   })
 
-  it('kapısız kopyada: olay kimliksiz istek tekilleştirmesiz GEÇER', async () => {
-    const r = await cagir(kapisiz.get(uc.ad)!, uc, { 'x-webhook-token': TOKEN, 'x-timestamp': String(Date.now()) })
-    expect(r.http).toBe(200)
+  it('kapısız kopyada: olay kimliksiz (yalnız gövde imzalı) istek tekilleştirmesiz GEÇER', async () => {
+    const ham = JSON.stringify(uc.govde)
+    const r = await cagir(kapisiz.get(uc.ad)!, uc, { 'x-timestamp': String(Date.now()), 'x-signature': imzala(ham) })
+    expect(r.http, 'kapı sökülünce saldırı geçmeli; geçmiyorsa test kapıyı ölçmüyor').toBe(200)
   })
 })

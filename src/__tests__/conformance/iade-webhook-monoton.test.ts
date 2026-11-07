@@ -334,6 +334,9 @@ describe('INV-IADE-WEBHOOK-MONOTON-1 · önce kaydet tekilleştirmesi', () => {
     iadeYazimHatasi = { message: 'baglanti koptu' }
     const ilk = await cagir(yeni, 'evt-hata')
     expect(ilk.http).toBe(500)
+    // ALT-167 davranış kolu: ham DB mesajı gövdeye sızmaz, sabit kod döner.
+    expect(JSON.stringify(ilk.json)).not.toContain('baglanti koptu')
+    expect(ilk.json.code).toBe('UPDATE_FAILED')
     expect(olaylar).not.toContain('evt-hata')
     expect(iadeYazimlari).toBe(0)
 
