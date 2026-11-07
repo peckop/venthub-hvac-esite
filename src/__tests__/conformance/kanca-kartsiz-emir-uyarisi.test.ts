@@ -83,4 +83,11 @@ describe('INV-KANCA-KARTSIZ-EMIR-1 · gerçek süreç', () => {
       expect(kos(s)).toMatchObject({ status: 0, stdout: '' })
     }
   })
+
+  it('ARC-271: kart-alani-kapisi ONEK tablosundaki her önek kart numarası olarak tanınır (3D, DIL, MRK dahil)', () => {
+    const { KART_NO } = gerek(KANCA) as { KART_NO: RegExp }
+    const { ONEK } = gerek(path.join(KOK, '.claude', 'hooks', 'kart-alani-kapisi.cjs')) as { ONEK: Record<string, string> }
+    const tanimayan = Object.keys(ONEK).filter((o) => !KART_NO.test(o + '-12'))
+    expect(tanimayan, 'kartsiz-emir-uyarisi KART_NO tanımıyor: ' + tanimayan.join(', ')).toEqual([])
+  })
 })

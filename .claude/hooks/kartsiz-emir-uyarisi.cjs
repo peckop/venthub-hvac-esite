@@ -25,7 +25,7 @@
 const fs = require('fs')
 
 // docs/standards/is-kayit-duzeni-standard.md'deki departman önekleri + Linear'dan taşınan REC.
-const KART_NO = /\b(?:URN|ALT|SEO|KTL|BLG|HRT|TSR|ARC|OPS|STS|EDG|ADM|MVZ|TKP|YTN|REC|I18)-\d{1,5}\b/
+const KART_NO = /\b(?:URN|ALT|SEO|KTL|BLG|HRT|TSR|ARC|OPS|STS|EDG|ADM|MVZ|TKP|YTN|REC|I18|DIL|MRK|3D)-\d{1,5}\b/
 // Başında gönderen adı: "OPS → ARAÇ:", "OPS emri", "OPS ek", "OPS:"
 const OPS_BASI = /^\s*OPS\b/
 // Onay / hüküm / bilgi işaretleri: bunlar emir değildir. (küçük harf, tr)

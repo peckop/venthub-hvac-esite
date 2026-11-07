@@ -130,7 +130,7 @@ function metinler(adaylar, aciklama) {
 
 function sonCommitler(kok, onek, calistir = git) {
   const r = calistir(kok, [
-    'log', 'origin/master', `--since=${SON_GUN}.days`, '-i', '-E', `--grep=(^|[^A-Za-z0-9])${onek}-[0-9]+`,
+    'log', 'origin/master', `--since=${SON_GUN}.days`, '-i', '-E', `--grep=(^|[^A-Za-z0-9-])${onek}-[0-9]+`,
     '--format=%h\t%s', '-n', '400',
   ])
   if (!r || r.status !== 0) return []

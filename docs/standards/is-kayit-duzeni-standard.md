@@ -61,6 +61,7 @@ korur. **Kısa ad tablosu yalnız bu belgededir; diğer belgeler bu tabloya atı
 | SATIS | `STS` | `STS-1` |
 | TASARIM | `TSR` | `TSR-1` |
 | TAKIP (karar 322) | `TKP` | `TKP-1` |
+| 3D (OPS onayı 7 Kasım, ARC-271) | `3D` | `3D-1` |
 
 OPS ve SEO zaten üç harf olduğu için aynı kalır; I18N harf-rakam karışık olduğu için `DIL` alır (biçim: 2-4 büyük harf).
 Tabloda olmayan departman ilk kartını açmadan önce

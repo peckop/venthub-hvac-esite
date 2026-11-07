@@ -302,7 +302,13 @@ describe('INV-KARTSIZ-KAPI-8: başka pencereye giden mesaj (SendMessage) aynı k
   })
 
   it('bilinen kart ön ekleri listesi sabit: yeni departman eklenince bilinçli güncellenir', () => {
-    expect(kanca.ONEKLER).toEqual(['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS'])
+    expect(kanca.ONEKLER).toEqual(['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS', 'TKP', 'I18', '3D'])
+  })
+
+  it('ARC-271: kart-alani-kapisi ONEK tablosundaki her önek bu listede de var (iki liste ayrışmaz)', () => {
+    const alani = require_(path.resolve(__dirname, '../../../.claude/hooks/kart-alani-kapisi.cjs')) as { ONEK: Record<string, string> }
+    const eksik = Object.keys(alani.ONEK).filter((o) => !kanca.ONEKLER.includes(o))
+    expect(eksik, `kartsiz-beklenti ONEKLER'de yok: ${eksik.join(', ')}`).toEqual([])
   })
 })
 
