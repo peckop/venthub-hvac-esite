@@ -593,7 +593,8 @@ describe('INV-KARTSIZ-KAPI-11 (ARC-95): süreç — gerçek Kanban betiği çağ
 })
 
 // ARC-265 (7 Kasım): kırmızıda cevabı YENİDEN YAZDIRMA — yalnız tek kısa ek satır ("(kart X)" / "Kartsız: sebep") istenir.
-describe('INV-KARTSIZ-KAPI-12 (ARC-265): kırmızıda ek satır akışı', () => {
+// Her kol birkaç gerçek süreç başlatır (kanca + sahte Kanban); tam pakette ölçülen yükte tek kol 49 sn sürdü → bu blokta süre ayrıdır (genel sınır yükseltilmedi).
+describe('INV-KARTSIZ-KAPI-12 (ARC-265): kırmızıda ek satır akışı', { timeout: 120_000 }, () => {
   const kirmizi = [insan('x'), asistan('Tamam.\n\n**Senden beklenenler**\n\n- Design penceresine bak\n')]
   const sonraki = (oturum: string, metin: string) => calistir([insan('x'), asistan(metin)], { oturum })
   const yeniOturum = () => 'ek-oturum-' + process.pid + '-' + ++sayac
