@@ -25,6 +25,7 @@ const tazelik = require_(path.join(KOK, 'scripts', 'hijyen', 'ana-agac-tazelik.c
   ileriSar: (agac: string) => { durum: string; geride?: number; sebep?: string }
   ayarYolunaDeger: (dosyalar: string[]) => boolean
   acilisSatiri: (agac: string) => string
+  anaAgacSatiri: (s: { durum: string; geride?: number; sebep?: string }, ayar: boolean) => string
 }
 
 const GECICI: string[] = []
@@ -164,12 +165,46 @@ describe('INV-ANA-AGAC-TAZE-1 ana ağaç tazeliği', { timeout: GIT_SURE }, () =
     expect(tazelik.ayarYolunaDeger(['src/app/page.tsx', 'docs/CLAUDE.md', 'supabase/migrations/x.sql'])).toBe(false)
   })
 
+  it('ARC-272 · ritüel ANA AGAC satırı: ilerlendi düz, ayar yoluna değerse ipucu; engelli/ölçülemedi ⚠ ile UYARIR ve zorlamaz', () => {
+    const satir = tazelik.anaAgacSatiri
+    expect(satir({ durum: 'ilerlendi', geride: 1 }, false)).toBe('ANA AGAC: ilerlendi (geride 1)')
+    expect(satir({ durum: 'ilerlendi', geride: 2 }, true)).toContain('yeni kancalar sonraki turda')
+    expect(satir({ durum: 'guncel', geride: 0 }, true)).toBe('ANA AGAC: guncel (geride 0)')
+    for (const d of ['engelli', 'olcemedi']) {
+      const s = satir({ durum: d, geride: 1, sebep: 'agac temiz degil (1 izlenen dosya: x)' }, false)
+      expect(s, d).toMatch(/^⚠ANA AGAC: /)
+      expect(s, d).toContain('ILERLETILEMEDI')
+      expect(s, d).toContain('agac temiz degil')
+    }
+  })
+
+  it('⛔SABOTAJ: çakışan kirli ana ağaçta ileriSar DURUR (zorlamaz), satır ⚠ ile uyarır, ağaç ve yerel değişiklik korunur', () => {
+    const { ana } = kurulum(1)
+    fs.writeFileSync(path.join(ana, 'a.txt'), 'kirli\n')
+    const s = tazelik.ileriSar(ana)
+    expect(s.durum).toBe('engelli')
+    expect(tazelik.anaAgacSatiri(s, false)).toMatch(/^⚠ANA AGAC: engelli/)
+    expect(tazelik.olc(ana).geride).toBe(1) // ilerletilmedi
+    expect(fs.readFileSync(path.join(ana, 'a.txt'), 'utf8')).toBe('kirli\n')
+  })
+
   it('düzenek gerçekten bağlı: açılış kancası ve merge ritüeli modülü çağırır', () => {
     const kanca = fs.readFileSync(path.join(KOK, '.claude', 'hooks', 'session-board.cjs'), 'utf8')
     expect(kanca).toMatch(/ana-agac-tazelik\.cjs'\)\)\s*\.acilisSatiri\(/)
     const ritual = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
-    expect(ritual).toMatch(/tazelik\.ayarYolunaDeger\(dosyalar\)/)
-    expect(ritual).toMatch(/tazelik\.ileriSar\(tazelik\.anaAgacYolu\(AGAC\)\)/)
+    // ARC-272: ff HER birleştirmeden sonra (ayar yoluna değmeyen belge PR'ından sonra da); ayar yolu yalnız ipucu metnini değiştirir.
+    expect(ritual).not.toMatch(/if\s*\(\s*tazelik\.ayarYolunaDeger\(/)
+    expect(ritual).toMatch(/tazelik\.anaAgacSatiri\(tazelik\.ileriSar\(tazelik\.anaAgacYolu\(AGAC\)\),\s*ayar\)/)
+    // Sarmalayıcı koşul da yasak: ileriSar'dan önceki blokta ayara bağlı `if` olmaz (yalnız fetchTamam ayrımı serbest).
+    const blok = ritual.slice(ritual.indexOf('ARC-272 (OPS'), ritual.indexOf('tazelik.ileriSar('))
+    expect(blok.length).toBeGreaterThan(50)
+    expect(blok).not.toMatch(/if\s*\(\s*!?\s*ayar\b/)
+    expect(blok).not.toMatch(/ayar\s*(&&|\?)/)
+    // fetch hatası "güncel" görünmez, ölçülemedi yazılır.
+    expect(ritual).toMatch(/fetchTamam\s*\n?\s*\?[\s\S]*?OLCEMEDI — fetch basarisiz/)
+    // fetch ileriSar'dan ÖNCE gelir (bayat uzak ucu ölçmek "güncel" dedirtir, ARC-120/133'te iki kez yaşandı).
+    expect(ritual.indexOf("git(['fetch', 'origin', 'master', '-q'])")).toBeGreaterThan(-1)
+    expect(ritual.indexOf("git(['fetch', 'origin', 'master', '-q'])")).toBeLessThan(ritual.indexOf('tazelik.ileriSar('))
     // stash/reset/checkout ileri sarma yolunda YASAK (kirli ağaç birinin yarım işidir).
     const modul = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'), 'utf8')
     expect(modul).not.toMatch(/\[\s*'(stash|reset|checkout)'/)

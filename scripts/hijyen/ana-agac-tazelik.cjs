@@ -217,6 +217,18 @@ function ayarYolunaDeger(dosyalar) {
   return dosyalar.some((d) => AYAR_YOLLARI.some((r) => r.test(d)))
 }
 
+/**
+ * Merge ritüelinin birleştirme sonrası ANA AGAC satırı (ARC-272). `ayar`: PR ayar yoluna değdi mi (yalnız ilerlendi ipucunu değiştirir).
+ * Engelli (kirli ağaç, ff olmuyor) ve ölçülemedi durumları ⚠ ile UYARIR; ağaca dokunmaz, zorlamaz.
+ */
+function anaAgacSatiri(s, ayar) {
+  const ipucu = ayar ? ' — yeni kancalar sonraki turda, .mcp.json pencere yeniden acilinca etkin' : ''
+  const govde = s.durum + (s.geride != null ? ' (geride ' + s.geride + ')' : '') + (s.sebep ? ' — ' + s.sebep : '')
+  const uyari = s.durum === 'engelli' || s.durum === 'olcemedi' ? '⚠' : ''
+  return uyari + 'ANA AGAC: ' + govde + (s.durum === 'ilerlendi' ? ipucu : '') +
+    (uyari ? ' — ana agac ILERLETILEMEDI: dosya kanitli kartlar bayat agactan okunur, sahibine sor ya da temizleyip ana-agac-tazelik --ileri-sar' : '')
+}
+
 /** Oturum açılışı için tek satır; güncelse boş dize (sessizlik kuralı). */
 function acilisSatiri(herhangiAgac) {
   let o
@@ -236,7 +248,7 @@ function acilisSatiri(herhangiAgac) {
   )
 }
 
-module.exports = { AYAR_YOLLARI, anaAgacYolu, olc, engel, ileriSar, pencereIleriSar, pencereSatiri, ayarYolunaDeger, acilisSatiri }
+module.exports = { AYAR_YOLLARI, anaAgacYolu, olc, engel, ileriSar, pencereIleriSar, pencereSatiri, ayarYolunaDeger, anaAgacSatiri, acilisSatiri }
 
 if (require.main === module) {
   const argv = process.argv.slice(2)

@@ -551,7 +551,7 @@ if (require.main === module) {
   const AGAC = agacBayragi ? agacBayragi.slice('--agac='.length) : process.cwd()
 
   /** git DAİMA `-C` ile: beyan hatırlanır, `-C` hatırlanmaz (§28). */
-  const git = (args) => execFileSync('git', ['-C', AGAC, ...args], { encoding: 'utf8' }).trim()
+  const git = (args) => execFileSync('git', ['-C', AGAC, ...args], { encoding: 'utf8', timeout: 120000 }).trim()
   const gh = (args) => execFileSync('gh', args, { encoding: 'utf8', cwd: AGAC })
   const yaz = (s) => process.stdout.write(s + '\n')
 
@@ -721,16 +721,19 @@ if (require.main === module) {
     // ama sonuç her koşulda GÖRÜNÜR yazılır. Yalnız ff-only; stash/reset/checkout yok.
     try {
       const tazelik = require(path.join(__dirname, 'ana-agac-tazelik.cjs'))
-      const dosyalar = JSON.parse(gh(['pr', 'view', pr, '--json', 'files'])).files.map((f) => f.path)
-      if (tazelik.ayarYolunaDeger(dosyalar)) {
-        try { git(['fetch', 'origin', 'master', '-q']) } catch { /* ölçüm bayatsa ileriSar 'guncel' der; aşağıda yazılır */ }
-        const s = tazelik.ileriSar(tazelik.anaAgacYolu(AGAC))
-        yaz('ANA AGAC: ' + s.durum + (s.geride != null ? ' (geride ' + s.geride + ')' : '') +
-          (s.sebep ? ' — ' + s.sebep : '') +
-          (s.durum === 'ilerlendi' ? ' — yeni kancalar sonraki turda, .mcp.json pencere yeniden acilinca etkin' : ''))
-      }
+      // ARC-272 (OPS 7 Kasım): ff HER birleştirmeden sonra yapılır, yalnız ayar yoluna değen PR'dan sonra değil. Eskiden
+      // belge PR'ında ana ağaç geride kalıyor, ana ağaçtan okunan file_exists kanıtı kartı sahte kırmızıya düşürüyordu (ARC-120).
+      // Kirli ağaçta/ff olmazsa ileriSar durur; satır ⚠ ile uyarır, zorlamaz.
+      let ayar = false
+      try { ayar = tazelik.ayarYolunaDeger(JSON.parse(gh(['pr', 'view', pr, '--json', 'files'])).files.map((f) => f.path)) } catch { /* ipucu yalnız mesajdır */ }
+      let fetchTamam = true
+      try { git(['fetch', 'origin', 'master', '-q']) } catch { fetchTamam = false }
+      // fetch patlarsa bayat origin/master "güncel" dedirtir (ARC-120 deseni): ileri sarma denenmez, ölçülemedi yazılır.
+      yaz(fetchTamam
+        ? tazelik.anaAgacSatiri(tazelik.ileriSar(tazelik.anaAgacYolu(AGAC)), ayar)
+        : '⚠ANA AGAC: OLCEMEDI — fetch basarisiz, ana agac ileri sarilmadi; elle: git fetch + ana-agac-tazelik --ileri-sar (merge etkilenmedi)')
     } catch (e) {
-      yaz('ANA AGAC: OLCEMEDI — ' + String((e && e.message) || e).slice(0, 160) + ' (merge etkilenmedi)')
+      yaz('⚠ANA AGAC: OLCEMEDI — ' + String((e && e.message) || e).slice(0, 160) + ' (merge etkilenmedi)')
     }
   }
   process.exit(0)
