@@ -505,6 +505,22 @@ describe('INV-TASIMA-1 · sırlar: parola betikten GEÇMEZ', () => {
     expect(parolaKanaliVar("env: { GPG_PASS: x }")).toBe(true)
   })
 
+  it('PROVA DERSİ (2026-11-07): boş hafıza klasörü sayılmaz (prova sahte KAYIP 44 → 18 verdi)', () => {
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'tasima-hafiza-'))
+    try {
+      const p = path.join(kok, 'ev', '.claude', 'projects')
+      fs.mkdirSync(path.join(p, 'bos-proje', 'memory'), { recursive: true })
+      fs.mkdirSync(path.join(p, 'dolu-proje', 'memory'), { recursive: true })
+      fs.writeFileSync(path.join(p, 'dolu-proje', 'memory', 'a.md'), '# a')
+      const D2 = require_(path.join(TASIMA, 'dogrula.cjs')) as { olc(o: { ev: string; anaDepo: string }): { sayimlar: { hafizaKlasorSayisi: number; hafizaMd: number } } }
+      const s = D2.olc({ ev: path.join(kok, 'ev'), anaDepo: path.join(kok, 'depo') }).sayimlar
+      expect(s.hafizaKlasorSayisi).toBe(1)
+      expect(s.hafizaMd).toBe(1)
+    } finally {
+      fs.rmSync(kok, { recursive: true, force: true })
+    }
+  })
+
   it('PROVA DERSİ (2026-11-07): klon uzun yol açar ve hatanın SONUNU raporlar; iç içe kök reddedilir', () => {
     const g = fs.readFileSync(path.join(TASIMA, 'git.cjs'), 'utf8')
     expect(g).toMatch(/'-c', 'core\.longpaths=true', 'clone', '--quiet'/)
