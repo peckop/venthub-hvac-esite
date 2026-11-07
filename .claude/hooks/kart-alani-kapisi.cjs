@@ -52,6 +52,11 @@ const ONEK = {
   YTN: 'YETENEK',
   TKP: 'TAKIP',
   OPS: 'OPS',
+  // ARC-269: haritada olup tabloda eksik üç departman. Panoda I18N kartları "I18-n" (pano açıklaması), standart DIL der: ikisi de çözülür.
+  I18: 'I18N',
+  DIL: 'I18N',
+  MRK: 'MARKA',
+  '3D': '3D',
 }
 
 const HARF = 'a-zçğıöşüâîû'

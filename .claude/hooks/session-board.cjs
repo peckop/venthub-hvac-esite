@@ -788,11 +788,12 @@ function onceBunlarEkle() {
  */
 function vadeEkle() {
   try {
-    if (!rolSeridi || String(rolSeridi).trim() === '') return
-    const rol = String(rolSeridi).trim().toUpperCase() === 'OPS' ? '' : rolSeridi
+    const once = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs'))
+    const rol = once.vadeRolu(rolSeridi) // null: rolsüz pencere sessiz; '': OPS, bütün panolar (ARC-269: karar davranış testinde)
+    if (rol === null) return
     const t = new Date()
     const bugun = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
-    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).vadeMetni(bugun, undefined, rol)
+    const metin = once.vadeMetni(bugun, undefined, rol)
     if (!metin) return
     bolumler.splice(2, 0, {
       ad: 'vade',

@@ -206,7 +206,18 @@ function vadeMetni(bugun, kartlar = acikKartlar(() => vadeKartlariCalistir(bugun
   return satirlar.join('\n') + '\n'
 }
 
+/**
+ * VADESİ GELEN rol kararı (ARC-269, ARC-268 denetçi bulgusu: karar yalnız kaynak regex'iyle test ediliyordu).
+ * Dönüş: null = sessiz (rolsüz pencere); '' = bütün panolar (OPS); aksi hâlde departman rolü olduğu gibi.
+ */
+function vadeRolu(rolSeridi) {
+  const r = String(rolSeridi == null ? '' : rolSeridi).trim()
+  if (r === '') return null
+  return r.toUpperCase() === 'OPS' ? '' : r
+}
+
 module.exports = {
+  vadeRolu,
   vadeMetni,
   acilisMetni,
   baslatmaUyarisi,
