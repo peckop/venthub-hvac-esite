@@ -20,7 +20,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Emir rol kartındaki Görev satırının dışındaysa ya da "Görev değil" satırına giriyorsa işe başlama; OPS'a "görev dışı: <hangi satır>" diye tek satır dön.
 - Yöntemi değiştirirsen işbaşı notuna `YÖNTEM: X yerine Y, çünkü ...` yaz; yazılmamış sapma hatadır.
 - Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim ...`); ana dizinde ölçüm koşma, kendi worktree'nde çalış.
-- Planı karta yaz; `ÖNCEKİ ÇALIŞMA:` satırını beş yeri (Kanban, git geçmişi, docs/plans ve docs/audits, sage, Linear arşivi) arayarak doldur; ifadesiz "yok" yazma.
+- Planı karta yaz; `ÖNCEKİ ÇALIŞMA:` satırını beş yeri (Kanban, git geçmişi, docs/plans ve docs/audits, sage, Linear arşivi) arayarak doldur; ifadesiz "yok" yazma. Ölçüm kartında satır "defter: ölçüldü/ölçülmedi" da taşır.
 - Kartı kanıt komutuyla aç (`add_check`: `command` ya da `file_matches`). Done'a taşımadan önce `verify_completion` koştur; rapor `passed` değilse taşıma. PR için kanıt `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`, kod için `pnpm exec vitest run <göreli test yolu>`, depo dışı iş için elle kontrol + kanıt notudur.
 - PR gövdesinde `Kanban: <ÖN EK>-<sayı>` satırı bulunur (taşınan kartta `Kanban: REC-nn`). `Fixes REC-nn` ya da Linear numarası yazma.
 - Migration içeren PR'ı yalnız Recep onayıyla birleştir (master'a birleşince prod'a otomatik uygulanır).
@@ -33,7 +33,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Recep'in onayladığı işi bekletmek için ölçülmüş engel gerekir; karta "ölçüldü mü?" yazılır.
 - Önce Claude Code'un yerleşik karşılığını ara; genel inceleme ve sadeleştirmede önce yerleşik `/code-review` ve `/simplify`, ödeme, auth, RLS ya da webhook koduna dokunan farkta ayrıca `security-reviewer` ajanı. Mevcut code-review, diff-review, security-scanner, refactor-planner yetenekleri silinmez.
 - Dış araç kararı dört kapılıdır (ihtiyaç, örtüşme, deneme, benimseme); her kapıda dur ya da devam (arac-envanteri-standard.md).
-- İyileştirme hakkı: kendi alanındaki iyileştirmeyi OPS'a tek mesajla öner (ne, kazanç, bedel); onay gelmeden uygulanmaz. Cuma çürütücü haftayı kart ve kurallara karşı okur, en çok 3 öneri OPS'a gider. Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer.
+- İyileştirme hakkı: kendi alanındaki iyileştirmeyi OPS'a tek mesajla öner (ne, kazanç, bedel); onay gelmeden uygulanmaz. Cuma çürütücü haftayı sabit altı soruya karşı okur (kurallar dosyası, "Haftalık öz-değerlendirme"), en çok 3 öneri OPS'a gider. Gevşeten öneri Recep'e gider, sıkılaştıran OPS onayıyla geçer.
 
 ## Recep ile iletişim
 
@@ -62,7 +62,8 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 - Yerelde yalnız `pnpm test:ilgili` koş; seçici TAM derse hiçbir test koşmaz, CI koşar. Değişen test dosyalarını `pnpm vitest <dosya> --run` ile ekle. Tam paket, type-check ve build yerelde koşturulmaz.
 - PR açınca `mcp__ccd_pr__bind_pr` ile PR'ı asıl PR olarak bağla; CI'ı yoklama (`gh pr watch`, döngü, `sleep` yok): `ci-uyandirici.cjs` kancası CI bitince uyandırır; uyanmazsa `gh pr view` ile TEK SEFERLİK oku, ya da OPS dürter.
-- İlgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz.
+- İlgisiz kırmızı testte en çok 10 dakika uğraş, OPS'a yaz. PR gövdesinde `test:ilgili`'nin kırmızı dosyalarını "bu işin alanı mı: evet/hayır" ile listele.
+- Ortak satır PR'ı (bu dosya, rol kartı, açılış özeti) birleşmeden önce güncel master üstünde bayt ölçülür.
 - Durum satırında BELLEK uyarısı varsa (boş bellek 2 GB altı, tek süreç 3 GB üstü) tam vitest, tsc, `next build`, `pnpm install`, Docker gibi ağır komut başlatma; OPS'a yaz.
 
 ## Bilgi sırası ve açılış

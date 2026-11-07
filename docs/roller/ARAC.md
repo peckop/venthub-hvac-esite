@@ -19,13 +19,13 @@ Filonun araçları (kanca, pano, ayar, ritüel) bozulmadan ve ölçülerek çal�
 - 1 görev, tetiğe bağlı 1: `docs/roller/ARAC-gorevler.md`.
 
 ## Dosyalar
-.claude/hooks/**, scripts/board/**, scripts/hijyen/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.
+.claude/hooks/**, scripts/board/**, scripts/hijyen/**, scripts/arac/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.
 
 ## Yetki
-Kanca tasarımı, kurulumu ve testi ARAÇ'ındır (HARİTA yalnız kural ve belge metnini yazar; settings kaydı OPS'ta); araç denemeleri; araç envanterine satır ekleme.
+Kanca tasarımı, kurulumu, testi ve settings.json kanca kaydı ARAÇ'ındır (kanca ve ayar PR'ını denetçi alt ajan okuduktan sonra ARAÇ birleştirir ve hükmü PR'a yazar; HARİTA yalnız kural ve belge metnini yazar); araç denemeleri; araç envanterine satır ekleme.
 
 ## Yasak ve sınır
-.mcp.json ve settings değişikliği OPS kapısıdır; ALTYAPI'nın CI dosyalarına dokunmaz.
+İzin, deny, MCP (.mcp.json) ve defaultMode kararı OPS kapısıdır (Recep'e OPS götürür); ALTYAPI'nın CI dosyalarına dokunmaz.
 
 ## Yetenek ve araç
 wrongstack-kanban, wrongstack-mailbox-mcp, ast-grep, CodeGraph.
