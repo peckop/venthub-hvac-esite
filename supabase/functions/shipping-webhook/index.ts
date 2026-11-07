@@ -440,7 +440,8 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
 
     return jsonResponse({ ok: true, order_id: data?.id, status: data?.status })
   } catch (_e) {
-    console.error('Shipping webhook error:', _e);
+    // İstisna nesnesinin tamamı değil yalnız mesajı (istek bağlamı/başlık günlüğe düşmesin; #2348 inceleme LOW-3).
+    console.error('[shipping-webhook] beklenmeyen hata', { code: 'INTERNAL', hata: _e instanceof Error ? _e.message : String(_e) })
     return jsonResponse({ error: 'Unexpected error', code: 'INTERNAL' }, { status: 500 })
   }
 }

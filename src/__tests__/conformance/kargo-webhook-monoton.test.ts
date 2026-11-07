@@ -724,6 +724,9 @@ describe('INV-KARGO-WEBHOOK-1 · yarış ve tetik: fail-closed yazım, fail-safe
     zorlaHata = { code: '08006', message: 'connection failure' }
     const r = await cagir(yeni, { status: 'in_transit' })
     expect(r.http).toBe(500)
+    // ALT-167 davranış kolu: ham DB mesajı gövdeye sızmaz, sabit kod döner.
+    expect(JSON.stringify(r.json)).not.toContain('connection failure')
+    expect(r.json.code).toBe('UPDATE_FAILED')
   })
 })
 

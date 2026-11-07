@@ -391,7 +391,8 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
 
     return json({ ok: true, return_id: returnId, status: (patch['status'] || cur.status) })
   } catch (_e) {
-    console.error('Returns webhook error:', _e);
+    // İstisna nesnesinin tamamı değil yalnız mesajı (istek bağlamı/başlık günlüğe düşmesin; #2348 inceleme LOW-3).
+    console.error('[returns-webhook] beklenmeyen hata', { code: 'INTERNAL', hata: _e instanceof Error ? _e.message : String(_e) })
     return json({ error: 'Unexpected error', code: 'INTERNAL' }, { status: 500 })
   }
 }
