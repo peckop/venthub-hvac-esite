@@ -55,7 +55,7 @@ Genel kurallardan sona alınan: İşe uymayan genel kurallar silinmez, sona alı
 - Haftalık öz-değerlendirme görevi sabit altı soruyla yapılır. Çürütücü haftanın kartlarını ve PR'larını bu sorulara karşı okur, müdür en çok 3 iyileştirmeyi OPS'a tek mesajla yazar. Her soruya bakılan kaynak (Kanban, git geçmişi, sage) ve sonuç yazılır; ifadesiz "yok" cevap sayılmaz.
   1. İkinci kez yapılan hata var mı ve kalıcı çözümü ne (kural, kanca, test ya da sage dersi)?
   2. Geciken ya da unutulan istek var mı (emir, verilen söz, kart)?
-  3. Bayat kart ya da kayıt var mı (Kanban, durum dosyası, cetvel, sahiplik tablosu)?
+  3. Bayat kart ya da kayıt var mı (Kanban, durum dosyası, cetvel, sahiplik tablosu, yazı türleri haritasındaki kendi satırın ve son doğrulama tarihi)?
   4. Geri dönüp düzeltilen iş var mı ve ilk seferde neden tutmadı?
   5. Kullanılan ya da kullanılması gerekirken kullanılmayan skill, kanca ve Claude Code özelliği var mı?
   6. İşe başlamadan Kanban'da mükerrer iş araması yapıldı mı (kartın ÖNCEKİ ÇALIŞMA satırı dolu mu)?
