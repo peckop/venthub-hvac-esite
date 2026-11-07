@@ -6,8 +6,8 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 ## Compact
 
-- Compact otomatiktir (eşik 600k); Recep'e `/compact` satırı, üç maddelik liste ya da iki aşama cümlesi verilmez. Recep isterse elle `/compact` serbesttir.
-- "COMPACT YAKIN" uyarısı (500k) görününce durum dosyanı hemen güncelle ve sonuna tek satır yaz: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Yarım işi güvenli noktaya getirmeye bak; iş akışını kesme.
+- Compact otomatiktir (eşik 500k); Recep'e `/compact` satırı, üç maddelik liste ya da iki aşama cümlesi verilmez. Recep isterse elle `/compact` serbesttir.
+- "COMPACT YAKIN" uyarısı (470k) görününce durum dosyanı hemen güncelle ve sonuna tek satır yaz: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Yarım işi güvenli noktaya getirmeye bak; iş akışını kesme.
 - Compact dönüşünde ilk çağrı durum dosyasını okumaktır; ilk görünür satır "bana ulaşan son girdin: <özet>" olur.
 - Sonra kendi panondaki açık kartları oku, durum dosyasıyla karşılaştır ve sırası belli işe geç; elinde iş yoksa OPS'a tek satır "boştayım" yaz.
 - Konuşmada verilen her kalıcı söz kalıcı yere yazılır; yazılmadıysa verilmemiştir.

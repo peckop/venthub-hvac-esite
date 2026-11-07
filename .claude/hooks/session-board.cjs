@@ -721,6 +721,14 @@ try {
 // ANA AĞAÇ TAZELİĞİ (REC-345, karar 44 — ölçüldü 2026-09-17): kancalar/CLAUDE.md/.mcp.json ana
 // ağaçtan yüklenir; ana ağaç 50 commit gerideyken dört merge'lü düzenek hiçbir pencerede etkin
 // değildi ve hiçbir kapı görmedi. Güncelse satır basılmaz (sessizlik kuralı). Ağ beklemez.
+// PENCERE ÇALIŞMA KOPYASI (ARC-264): pencerenin kendi kopyası master'ın gerisindeyse ff-only ilerler (startup/resume/compact).
+// Önce ilerlet, sonra ana ağaç satırı. Fail-open; vana VENTHUB_PENCERE_FF=0.
+try {
+  const tz = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'))
+  bolum('pencere-kopyasi', 1, tz.pencereSatiri(tz.pencereIleriSar(input.cwd || process.cwd())))
+} catch (e) {
+  bolum('pencere-kopyasi', 1, '⚠pencere kopyasi tazelik adimi calismadi (' + ((e && (e.code || e.message)) || 'bilinmeyen') + ').\n')
+}
 try {
   bolum('tazelik', 1, require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'))
     .acilisSatiri(input.cwd || process.cwd()))

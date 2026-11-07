@@ -129,7 +129,7 @@ describe('INV-COMPACT-HAZIRLIK-2 · hüküm: yalnız taze dosya VE "yarım iş y
     expect(bd.hazirlikHukmu(null, 'yok').hazir).toBe(false)
   })
 
-  it('COMPACT YAKIN satırı hükmü taşır, /compact metnini Recep e VERMEZ (ARC-264); hazırlık verilmezse eski satır aynen kalır', () => {
+  it('COMPACT YAKIN satırı hükmü taşır, /compact metnini Recep e VERMEZ (ARC-86); hazırlık verilmezse eski satır aynen kalır', () => {
     const eski = bd.satir(520_000, 1_000_000)
     const hazir = bd.satir(520_000, 1_000_000, { hazir: true, neden: 'durum dosyasi 3 dk once guncellendi, yarim is yok', compactMetni: '/compact X' })
     const degil = bd.satir(520_000, 1_000_000, { hazir: false, neden: 'yarim is var' })
