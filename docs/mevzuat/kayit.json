@@ -75,7 +75,8 @@
         "Katalogdaki fan ailelerinin büyük çoğunluğunda motor gövdeye entegre ve bağımsız test edilemez durumda görünüyor; bu durumda Md.2(2)(a) istisnası (fan içine gömülü, ayrılamayan motor) devreye girip ürünü kapsam dışı bırakabilir. Hangi aile/SKU'da motor GERÇEKTEN ayrılabilir/bağımsız satılan bir bileşen, hangisinde değil — bu, ürün teknik dosyası/kurulum kılavuzu düzeyinde ayrıca doğrulanmalı; burada resmi kaynaktan çıkarım yapılmamıştır.",
         "avens-hiz-anahtarlari (Hız Anahtarları) ailesinin VSD tanımına (Md.3(2): sürekli frekans VE gerilim ayarı yapan elektronik güç dönüştürücü) girip girmediği ürün teknik özellikleriyle teyit edilmeli; basit kademeli/trafo tipi hız anahtarları VSD sayılmayabilir. BULUNAMADI — ayrı ürün-seviyesi inceleme gerekir.",
         "Konsolide sürümler (Yayın Ofisi SPARQL, 2026-09-25): 20191025, 20210701, 20230124. 2023/3 yalnız Almanca dil düzeltmesi; içerik değişikliği yalnız 2021/341.",
-        "6 Kasım 2026 ölçümü: Yayın Ofisi SPARQL 2023/3 değişikliğini (2023-01-03) gösteriyor, `degistirenler` yalnız 2021/341 içeriyor; 2023/3 metni okunmadı."
+        "6 Kasım 2026 ölçümü: Yayın Ofisi SPARQL 2023/3 değişikliğini (2023-01-03) gösteriyor, `degistirenler` yalnız 2021/341 içeriyor; 2023/3 metni okunmadı.",
+        "7 Kasım 2026 (MVZ-5): 2023/3 metni okundu: yalnızca Almanca dil sürümündeki hataları düzeltiyor, içerik değiştirmiyor; esaslı değiştiren sayılmaz, düzeltme olarak not edilebilir."
       ],
       "son_kontrol": "2026-11-06",
       "eksen": "A"
@@ -610,7 +611,8 @@
         "'Duman Egzoz Fanları' (vortice-vort-heatmaster-slimroof-smoke) ailesindeki her SKU'nun gerçekten 300°C/1 saat+ F-sınıfı sertifikaya sahip olup olmadığı teyit edilmeli; sertifikasız/düşük sınıf varyantlar istisna kapsamına girmeyebilir",
         "'Şömine ve Baca Fanları' (vortice-vort-industrial-ventilation-roof) için taşınan gazın çalışma sıcaklığının 100°C'yi aşıp aşmadığı ürün bazında kontrol edilmeli (aşıyorsa Md.1.3(e) istisnası)",
         "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında",
-        "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi."
+        "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi.",
+        "7 Kasım 2026 (MVZ-5): düzeltme R(05) 2026-10-29 ayrı kaynak olarak okunamadı; düzeltme içeriği hâlâ okunmadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -779,7 +781,8 @@
       "acik_sorular": [
         "EUR-Lex'e ham erişim WAF tarafından engellendiği için OJ yayım tarihi/sayısı ve resmi 'in force' durum etiketi bu oturumda birincil kaynaktan doğrulanamadı; ikincil resmi kaynak (Komisyon ATEX sayfası) durumun 'yürürlükte' olduğunu teyit ediyor.",
         "Komisyonun 2014/34/AB'yi kapsayan aktif bir mevzuat revizyonu/değerlendirme (evaluation/REFIT) çalışmasına dair resmi kaynakta kanıt BULUNAMADI. Tek güncelleme, idari rehber belgesinin ('ATEX 2014-34-EU Guidelines') Ocak 2026'da yayımlanan 6. baskısı — bu mevzuat değişikliği değil, yorum rehberi güncellemesi.",
-        "6 Kasım 2026 ölçümü: 2024/2749 değişikliği (2024-10-09) ve teklif 2025/503 kayıtta yok, metinleri okunmadı; en son konsolide 02014L0034-20260530."
+        "6 Kasım 2026 ölçümü: 2024/2749 değişikliği (2024-10-09) ve teklif 2025/503 kayıtta yok, metinleri okunmadı; en son konsolide 02014L0034-20260530.",
+        "7 Kasım 2026 (MVZ-5): \"2024/2749\" tüzük değil Direktif (AB) 2024/2749; 2014/34/AB dahil on direktifi acil durum prosedürleri bakımından değiştiriyor (CELEX 32024L2749, başlık ve girişi okundu). `degistirenler` alanına eklenmesi gerekir; ürün etkisi okunmadı."
       ],
       "son_kontrol": "2026-11-06",
       "eksen": "C"
@@ -847,7 +850,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "EUR-Lex erişilemediği için 1999/92/EC'nin resmi yayım/yürürlük tarihleri ve güncel EUR-Lex durum etiketi bu oturumda birincil kaynaktan teyit edilemedi.",
-        "6 Kasım 2026 ölçümü: 2007/30 değişikliği (2007-06-20) kayıtta yok, metni okunmadı."
+        "6 Kasım 2026 ölçümü: 2007/30 değişikliği (2007-06-20) kayıtta yok, metni okunmadı.",
+        "7 Kasım 2026 (MVZ-5): 2007/30 işçi sağlığı raporlama direktiflerinin toplu değişikliği; 1999/92 için Md 13(3) raporlama maddesine atıf var (metin okundu), ürün hükümlerine dokunduğuna dair bulgu yok."
       ],
       "son_kontrol": "2026-11-06",
       "eksen": "C"
@@ -1637,7 +1641,8 @@
       "acik_sorular": [
         "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı.",
         "Md.1(2)(c) istisnası yalnız \"axial or centrifugal fans only equipped with a housing\" içindir; karışık akışlı ve ek parçalı kanal fanları kapsamda olabilir (2026-09-25, BLOG itirazıyla düzeltildi).",
-        "6 Kasım 2026 ölçümü: 2020/1000 değişikliği Yayın Ofisi'nde var, kayıtta yalnız 2016/2282 yazılı; metni okunmadı. Komisyon revizyon sayfası gövdesi hâlâ \"May 2025\" diyor (dateModified 2026-03-09): sapma şüphesi sürüyor."
+        "6 Kasım 2026 ölçümü: 2020/1000 değişikliği Yayın Ofisi'nde var, kayıtta yalnız 2016/2282 yazılı; metni okunmadı. Komisyon revizyon sayfası gövdesi hâlâ \"May 2025\" diyor (dateModified 2026-03-09): sapma şüphesi sürüyor.",
+        "7 Kasım 2026 (MVZ-5): 2020/1000 yalnızca bazı dil sürümlerinde Md 1(2)(g) hatasını düzeltiyor (metin okundu); esaslı değişiklik değil."
       ],
       "son_kontrol": "2026-11-06",
       "eksen": "E"
@@ -1720,7 +1725,8 @@
       ],
       "acik_sorular": [
         "EPREL kaydı VentHub ürün sayfalarında görünürlük/doğrulama linki olarak sunuluyor mu — bu eksen kapsamında kod/CMS tarafı incelenmedi, yalnız mevzuat şartı doğrulandı.",
-        "6 Kasım 2026 ölçümü: 2017/254 ve 2020/987 değişiklikleri Yayın Ofisi'nde var, `degistirenler` boş; kanıttaki 2017/1369 alıntısı \"As from\" yerine \"From\" yazıyor (alıntı düzeltilmeli)."
+        "6 Kasım 2026 ölçümü: 2017/254 ve 2020/987 değişiklikleri Yayın Ofisi'nde var, `degistirenler` boş; kanıttaki 2017/1369 alıntısı \"As from\" yerine \"From\" yazıyor (alıntı düzeltilmeli).",
+        "7 Kasım 2026 (MVZ-5): 2020/987 yalnızca bazı dil sürümlerinde Md 1(2)(e) hatasını düzeltiyor; 2017/254 ise tolerans kullanımı bakımından 1254/2014'ü değiştiriyor (metin okundu), `degistirenler`e 2017/254 eklenmeli."
       ],
       "son_kontrol": "2026-11-06",
       "eksen": "E"
@@ -2837,7 +2843,7 @@
       "durum": "gecis-doneminde",
       "durum_notu": "yururlukte (2039'da tamamen yürürlükten kalkacak, geçiş sürecinde)",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-305_2011.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [
         {
           "slug": "vortice-vort-heatmaster-slimroof-smoke",
@@ -2847,9 +2853,10 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: Komisyon CPR sayfası alıntısı birebir, Yayın Ofisi 2024/3110'un 305/2011'i yürürlükten kaldırdığını gösteriyor; kanıt adresi (sha256) kayda geçirilmedi, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Komisyon CPR sayfası alıntısı birebir, Yayın Ofisi 2024/3110'un 305/2011'i yürürlükten kaldırdığını gösteriyor; kanıt adresi (sha256) kayda geçirilmedi, son_kontrol yenilenmedi.",
+        "7 Kasım 2026 (MVZ-5): Yayın Ofisi ham metni çekildi, sha256 tabanı kanıta yazıldı, son_kontrol yenilendi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-07",
       "eksen": "F"
     },
     {
@@ -2881,7 +2888,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_3110.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "vortice-vort-heatmaster-slimroof-smoke",
@@ -2892,9 +2899,10 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Ürün ailesi bazında hangi tarihte 305/2011'den 2024/3110'a geçileceği (hangi hEN'in ne zaman yeniden atıflanacağı) EUR-Lex/CEN'den doğrulanamadı — bu ayrıntı 2040'a kadar sürebilecek kademeli bir standart-bazlı süreçtir (EC sayfasında genel ifade var, ürün-özel tarih yok).",
-        "6 Kasım 2026: Komisyon CPR sayfası alıntısı birebir; EUR-Lex eli URL HTTP 202 (güvenlik duvarı); sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Komisyon CPR sayfası alıntısı birebir; EUR-Lex eli URL HTTP 202 (güvenlik duvarı); sha256 kayda geçirilmedi, son_kontrol yenilenmedi.",
+        "7 Kasım 2026 (MVZ-5): Yayın Ofisi ham metni çekildi, sha256 tabanı kanıta yazıldı, son_kontrol yenilendi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-07",
       "eksen": "F"
     },
     {
@@ -3064,7 +3072,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_573.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "vortice-deumido-range",
@@ -3081,9 +3089,10 @@
       "acik_sorular": [
         "SORULAN SPESİFİK VERİ BULUNAMADI: 'Taşınabilir nem alma ve klima cihazları için GWP yasakları/tarihleri' — Ek IV'ün (Annex IV) hangi maddesinin hangi ürün alt kategorisi için hangi GWP eşiğini hangi tarihte yasakladığı, EUR-Lex'e erişilemediği için birincil metinden doğrulanamadı. EC'nin genel sayfaları (climate.ec.europa.eu) yalnız genel çerçeveden bahsediyor, madde/tarih detayı yok. Bu, dokümanın en zayıf noktası — mevzuat metnine erişim sağlanana kadar 'BULUNAMADI' olarak işaretlenmelidir.",
         "517/2014'ün 2024/573 tarafından resmen 'repealed' edildiği ifadesi yalnız ikincil kaynaklardan (europeansources.info, chemlinked) teyit edildi; EUR-Lex başlığından birebir alıntı alınamadı.",
-        "6 Kasım 2026: Komisyon F-gaz sayfası alıntısı birebir; COM(2025)501 öneri takipte; sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Komisyon F-gaz sayfası alıntısı birebir; COM(2025)501 öneri takipte; sha256 kayda geçirilmedi, son_kontrol yenilenmedi.",
+        "7 Kasım 2026 (MVZ-5): Yayın Ofisi ham metni çekildi, sha256 tabanı kanıta yazıldı, son_kontrol yenilendi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-07",
       "eksen": "F"
     },
     {
