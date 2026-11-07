@@ -195,6 +195,13 @@ describe('INV-ANA-AGAC-TAZE-1 ana ağaç tazeliği', { timeout: GIT_SURE }, () =
     // ARC-272: ff HER birleştirmeden sonra (ayar yoluna değmeyen belge PR'ından sonra da); ayar yolu yalnız ipucu metnini değiştirir.
     expect(ritual).not.toMatch(/if\s*\(\s*tazelik\.ayarYolunaDeger\(/)
     expect(ritual).toMatch(/tazelik\.anaAgacSatiri\(tazelik\.ileriSar\(tazelik\.anaAgacYolu\(AGAC\)\),\s*ayar\)/)
+    // Sarmalayıcı koşul da yasak: ileriSar'dan önceki blokta ayara bağlı `if` olmaz (yalnız fetchTamam ayrımı serbest).
+    const blok = ritual.slice(ritual.indexOf('ARC-272 (OPS'), ritual.indexOf('tazelik.ileriSar('))
+    expect(blok.length).toBeGreaterThan(50)
+    expect(blok).not.toMatch(/if\s*\(\s*!?\s*ayar\b/)
+    expect(blok).not.toMatch(/ayar\s*(&&|\?)/)
+    // fetch hatası "güncel" görünmez, ölçülemedi yazılır.
+    expect(ritual).toMatch(/fetchTamam\s*\n?\s*\?[\s\S]*?OLCEMEDI — fetch basarisiz/)
     // fetch ileriSar'dan ÖNCE gelir (bayat uzak ucu ölçmek "güncel" dedirtir, ARC-120/133'te iki kez yaşandı).
     expect(ritual.indexOf("git(['fetch', 'origin', 'master', '-q'])")).toBeGreaterThan(-1)
     expect(ritual.indexOf("git(['fetch', 'origin', 'master', '-q'])")).toBeLessThan(ritual.indexOf('tazelik.ileriSar('))

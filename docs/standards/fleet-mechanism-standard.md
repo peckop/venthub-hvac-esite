@@ -1551,8 +1551,9 @@ satırları `settings.json`'da commit'siz duruyordu; `pull` kirli dosyaya dokunm
 2. **Oturum açılışı tazeliği ölçer** (`session-board.cjs` → `ana-agac-tazelik.cjs acilisSatiri`):
    geride ise `⚠ANA AGAC N COMMIT GERIDE` satırı ve ileri sarılabilir mi, değilse neden. Güncelse
    sessiz. **Ağ beklemez** — `refs/remotes/origin/*` bütün worktree'lerde ortaktır.
-3. **Merge ritüeli, ayar yoluna değen merge'ten sonra ana ağacı ileri sarar** (`.claude/`,
-   `.mcp.json`, `CLAUDE.md`, `tools/`, `.githooks/`). Yalnız üç şart birlikteyse: `master` dalı ·
+3. **Merge ritüeli, HER merge'ten sonra (ARC-272) önce `fetch`, sonra ana ağacı ileri sarar**; ayar yoluna
+   değen PR (`.claude/`, `.mcp.json`, `CLAUDE.md`, `tools/`, `.githooks/`) yalnız "yeni kancalar sonraki turda"
+   ipucunu belirler. Fetch patlarsa ileri sarma denenmez, `⚠ANA AGAC: OLCEMEDI` yazılır. Yalnız üç şart birlikteyse: `master` dalı ·
    izlenen dosyada değişiklik yok · ana ağaçta fazladan commit yok. Yalnız `merge --ff-only`;
    **stash/reset/checkout YOK** (kirli ağaç birinin yarım işidir). Sonuç her koşulda yazılır;
    merge zaten yapıldığı için çıkış kodunu değiştirmez.
