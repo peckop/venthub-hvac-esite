@@ -120,11 +120,14 @@ describe('INV-SESSIONSTART-TAVAN-1 · çıktı ≤ 9.000 karakter (şişirilmiş
   }
 
   it(
-    "compact: Recep'in SON mesajı aynen görünür, cevaplar girmez, durum bloğu kırpılınca yol yazılır",
+    "compact: Recep'in SON mesajı aynen görünür, ajanın yalnız SON 2 cevabı KIRPILMIŞ girer (ARC-266), durum bloğu kırpılınca yol yazılır",
     () => {
       const { ek } = calistir('compact')
       expect(ek).toContain(SON_MESAJ_BASI)
-      expect(ek).not.toContain(CEVAP_ANAHTARI)
+      expect(ek).toContain(`${CEVAP_ANAHTARI}-29`)
+      expect(ek).toContain(`${CEVAP_ANAHTARI}-28`)
+      expect(ek).not.toContain(`${CEVAP_ANAHTARI}-27`)
+      expect(ek).not.toContain('z'.repeat(701))
       expect(ek).toContain('KIRPILDI')
       expect(ek).toContain('arac-serit-durumu-state.md')
       expect(ek).toContain(`son-konusma-${SID}.md`)
@@ -268,18 +271,56 @@ describe('ROL KARTI satırı · kimliğin hemen altında, fail-open', () => {
 describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
   const istek = createRequire(path.join(KOK, 'package.json'))
   const dokum = istek('./.claude/hooks/son-konusma-dokumu.cjs') as {
-    enjeksiyonKisa: (dir: string, sid: string, o?: { sonN?: number; mesajTavan?: number; tavan?: number }) => string | null
+    enjeksiyonKisa: (
+      dir: string,
+      sid: string,
+      o?: { sonN?: number; mesajTavan?: number; tavan?: number; cevapN?: number },
+    ) => string | null
+    CEVAP_ENJ_N: number
+    CEVAP_ENJ_TEK: number
+    CEVAP_ENJ_TOPLAM: number
+    RECEP_ENJ_TAVAN: number
   }
 
   it('döküm yoksa null', () => {
     expect(dokum.enjeksiyonKisa(memoryDir, 'yok-boyle-bir-sid')).toBeNull()
   })
 
-  it('toplam tavanı aşmaz, en yeni mesaj kalır, cevap girmez', () => {
-    const m = dokum.enjeksiyonKisa(memoryDir, SID, { sonN: 30, mesajTavan: 600, tavan: 2500 }) ?? ''
+  it('ARC-266 sabitleri: 2 cevap, tek ≤700, toplam ≤1400, Recep bütçesi 3600 (sessizce yükseltilemez)', () => {
+    expect([dokum.CEVAP_ENJ_N, dokum.CEVAP_ENJ_TEK, dokum.CEVAP_ENJ_TOPLAM, dokum.RECEP_ENJ_TAVAN]).toEqual([2, 700, 1400, 3600])
+  })
+
+  it('cevapN:0 ise cevap girmez; toplam tavanı aşmaz, en yeni mesaj kalır', () => {
+    const m = dokum.enjeksiyonKisa(memoryDir, SID, { sonN: 30, mesajTavan: 600, tavan: 2500, cevapN: 0 }) ?? ''
     expect(m.length).toBeLessThanOrEqual(2500 + 200)
     expect(m).toContain(SON_MESAJ_BASI)
     expect(m).not.toContain(CEVAP_ANAHTARI)
+  })
+
+  it('varsayılan: Recep mesajları ÖNCE, sonra son 2 cevap (en yeni sonda), tek ≤700 ve cevap bölümü ≤1400', () => {
+    const m = dokum.enjeksiyonKisa(memoryDir, SID) ?? ''
+    expect(m.indexOf(SON_MESAJ_BASI)).toBeGreaterThan(-1)
+    expect(m.indexOf('### Ajan cevabı')).toBeGreaterThan(m.indexOf(SON_MESAJ_BASI))
+    expect((m.match(/### Ajan cevabı/g) ?? []).length).toBe(2)
+    expect(m.indexOf(`${CEVAP_ANAHTARI}-28`)).toBeLessThan(m.indexOf(`${CEVAP_ANAHTARI}-29`))
+    expect(m).toContain('cevap kırpıldı')
+    const bolum = m.slice(m.indexOf('### Ajan cevabı'))
+    expect(bolum.length).toBeLessThanOrEqual(dokum.CEVAP_ENJ_TOPLAM + 100)
+    expect(m).not.toContain('z'.repeat(701))
+  })
+
+  it('tavan daralınca ÖNCE cevaplar kısalır/düşer; Recep sözü aynen kalır', () => {
+    const tam = dokum.enjeksiyonKisa(memoryDir, SID) ?? ''
+    const dar = dokum.enjeksiyonKisa(memoryDir, SID, { tavan: dokum.RECEP_ENJ_TAVAN }) ?? ''
+    expect(dar.length).toBeLessThan(tam.length)
+    expect((dar.match(/### Ajan cevabı/g) ?? []).length).toBeLessThanOrEqual(1)
+    expect(dar.length).toBeLessThanOrEqual(dokum.RECEP_ENJ_TAVAN + 100)
+    expect(dar).toContain(SON_MESAJ_BASI)
+    expect(dar).toContain('y'.repeat(1400))
+    const orta = dokum.enjeksiyonKisa(memoryDir, SID, { tavan: dokum.RECEP_ENJ_TAVAN + 500 }) ?? ''
+    expect((orta.match(/### Ajan cevabı/g) ?? []).length).toBe(1)
+    expect(orta).toContain(`${CEVAP_ANAHTARI}-29`)
+    expect(orta).toContain('y'.repeat(1400))
   })
 
   it("tek mesaj mesajTavan'dan uzunsa kırpıldığı yazılır", () => {

@@ -225,12 +225,23 @@ function enjeksiyon(memoryDir, sid, sinir = ENJEKTE_UST_SINIR) {
  * bu sınırı aşıyordu. Burada: yalnız Recep'in SON mesajları (sonN), her biri mesajTavan'a kadar AYNEN,
  * toplam tavan'ı aşmaz; cevaplar ve eski mesajlar dosyada kalır, yolu satırda yazılır.
  */
-function enjeksiyonKisa(memoryDir, sid, { sonN = 8, mesajTavan = 1500, tavan = 3600 } = {}) {
+// ARC-266 (7 Kasım, Recep: "sözü ben yapıştırmayayım, sistem yapıştırsın"): dönüşte Recep mesajlarının ardından
+// ajanın KENDİ son cevapları da kırpılmış gelir (verdiği sözler). Sayılar sabittir; testte sabitlenmiştir.
+const CEVAP_ENJ_N = 2 // en çok kaç cevap
+const CEVAP_ENJ_TEK = 700 // cevap başına üst sınır
+const CEVAP_ENJ_TOPLAM = 1400 // cevap bölümü toplam üst sınırı
+const RECEP_ENJ_TAVAN = 3600 // Recep bölümü bütçesi; cevaplar bunun ÜSTÜNDEKİ paydan alır, Recep sözü cevap için kısalmaz
+function enjeksiyonKisa(
+  memoryDir,
+  sid,
+  { sonN = 8, mesajTavan = 1500, tavan = RECEP_ENJ_TAVAN + CEVAP_ENJ_TOPLAM, cevapN = CEVAP_ENJ_N } = {},
+) {
   const y = dosyaYolu(memoryDir, sid)
   if (!sid || !fs.existsSync(y)) return null
   const s = fs.readFileSync(y, 'utf8')
   const bas = s.split('\n').slice(0, 2).join('\n')
   const govde = s.split('\n').slice(2).join('\n')
+  const cevaplar = []
   const mesajlar = govde
     .split(/^### Recep \(/m)
     .slice(1)
@@ -239,17 +250,39 @@ function enjeksiyonKisa(memoryDir, sid, { sonN = 8, mesajTavan = 1500, tavan = 3
       const zaman = ust > -1 ? p.slice(0, ust) : 'saat yok'
       let metin = ust > -1 ? p.slice(ust + 2) : p
       const cevap = metin.indexOf('\n#### Cevap')
-      if (cevap > -1) metin = metin.slice(0, cevap)
+      if (cevap > -1) {
+        const c = metin.slice(cevap + '\n#### Cevap'.length).trim()
+        if (c) cevaplar.push({ zaman, metin: c })
+        metin = metin.slice(0, cevap)
+      }
       metin = metin.trim()
       if (metin.length > mesajTavan) metin = metin.slice(0, mesajTavan) + ' […mesaj kırpıldı, tamamı dosyada]'
       return `### Recep (${zaman})\n${metin}\n`
     })
     .slice(-sonN)
-  const not = `(yalnız Recep'in son ${mesajlar.length} mesajı; cevaplar ve eski kısım dosyada — tamamı: ${path.basename(y)})\n`
+  const cevapVar = cevapN > 0 && cevaplar.length > 0
+  const not = `(Recep'in son ${mesajlar.length} mesajı aynen${cevapVar ? '; ardından ajanın kendi son cevapları KIRPILMIŞ' : '; cevaplar dosyada'}, eski kısım dosyada — tamamı: ${path.basename(y)})\n`
   let kabul = mesajlar
   const topla = (l) => bas.length + not.length + l.reduce((n, m) => n + m.length + 1, 0)
-  while (kabul.length > 1 && topla(kabul) > tavan) kabul = kabul.slice(1)
-  return bas + '\n' + not + kabul.join('\n')
+  const recepTavan = Math.min(RECEP_ENJ_TAVAN, tavan)
+  while (kabul.length > 1 && topla(kabul) > recepTavan) kabul = kabul.slice(1)
+  let cevapBolumu = ''
+  if (cevapVar) {
+    // Recep sözü önce; cevaplar yalnız artan paydan alır, en yeni cevap önce, toplam sabit tavanlı.
+    let pay = Math.min(CEVAP_ENJ_TOPLAM, tavan - topla(kabul))
+    const secilen = []
+    for (const c of cevaplar.slice(-cevapN).reverse()) {
+      const baslik = `### Ajan cevabı (${c.zaman})\n`
+      const yer = Math.min(CEVAP_ENJ_TEK, pay - baslik.length - 40)
+      if (yer < 120) break
+      const m = c.metin.length > yer ? c.metin.slice(0, yer) + ' […cevap kırpıldı, tamamı dosyada]' : c.metin
+      const parca = baslik + m + '\n'
+      secilen.unshift(parca)
+      pay -= parca.length + 1
+    }
+    cevapBolumu = secilen.length ? '\n' + secilen.join('\n') : ''
+  }
+  return bas + '\n' + not + kabul.join('\n') + cevapBolumu
 }
 
 /** Stop turunda dökümü yenilemek gerekir mi: dosya yok ya da kayıttan eski. */
@@ -318,5 +351,5 @@ function main() {
   }
 }
 
-module.exports = { sirSuz, turlar, dokumUret, enjeksiyon, enjeksiyonKisa, dosyaYolu, dokumGerekli, eskiDokumleriSil, RECEP_SAYI, CEVAP_SAYI, ENJEKTE_UST_SINIR }
+module.exports = { sirSuz, turlar, dokumUret, enjeksiyon, enjeksiyonKisa, dosyaYolu, dokumGerekli, eskiDokumleriSil, RECEP_SAYI, CEVAP_SAYI, ENJEKTE_UST_SINIR, CEVAP_ENJ_N, CEVAP_ENJ_TEK, CEVAP_ENJ_TOPLAM, RECEP_ENJ_TAVAN }
 if (require.main === module) main()
