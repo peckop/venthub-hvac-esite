@@ -85,8 +85,8 @@ interface Cekirdek {
   sha256Dosya(y: string): string
   icindekilerBicimHatalari(ic: unknown): string[]
   parcalariDogrula(ic: Icindekiler, kok: string, o?: { sha?: boolean }): string[]
-  gpgSifrelemeArgumanlari(c: string): string[]
-  gpgCozmeArgumanlari(g: string): string[]
+  gpgSifrelemeArgumanlari(): string[]
+  gpgCozmeArgumanlari(): string[]
   openpgpSimetrikOzet(b: Buffer): { sifreli: boolean; aes256: boolean }
   argumanlariAyir(
     a: string[],
@@ -467,16 +467,27 @@ describe('INV-TASIMA-1 · sırlar: parola betikten GEÇMEZ', () => {
     return fs.readdirSync(TASIMA).filter((f) => f.endsWith('.cjs')).map((ad) => ({ ad, kaynak: fs.readFileSync(path.join(TASIMA, ad), 'utf8') }))
   }
 
-  it('şifreleme komutu simetrik AES256, çıktıyı dosyaya yazar; toplu kip ve parola bayrağı YOK', () => {
-    const a = C.gpgSifrelemeArgumanlari('cikis.gpg')
+  it('şifreleme komutu simetrik AES256, çıktıyı stdout\'a verir; toplu kip ve parola bayrağı YOK', () => {
+    const a = C.gpgSifrelemeArgumanlari()
     expect(a).toContain('--symmetric')
     expect(a[a.indexOf('--cipher-algo') + 1]).toBe('AES256')
-    expect(a[a.indexOf('--output') + 1]).toBe('cikis.gpg')
-    for (const x of [...a, ...C.gpgCozmeArgumanlari('g.gpg')]) {
+    expect(a[a.indexOf('--output') + 1]).toBe('-')
+    for (const x of [...a, ...C.gpgCozmeArgumanlari()]) {
       expect(parolaKanaliVar(x), x).toBe(false)
       expect(x).not.toBe('--batch') // toplu kip pinentry'yi kapatır; parolayı Recep'in penceresi sorsun
     }
-    expect(C.gpgCozmeArgumanlari('g.gpg')).toContain('--decrypt')
+    expect(C.gpgCozmeArgumanlari()).toContain('--decrypt')
+  })
+
+  it('gpg\'ye DOSYA YOLU argüman olarak gitmez (MSYS kesme işaretini siler: Drive\'ım → Driveım, 2026-11-07)', () => {
+    const k = fs.readFileSync(path.join(TASIMA, 'cekirdek.cjs'), 'utf8')
+    const govde = (ad: string) => k.slice(k.indexOf(`function ${ad}(`), k.indexOf('\n}\n', k.indexOf(`function ${ad}(`)))
+    expect(govde('gpgSifrele')).toMatch(/gpgSifrelemeArgumanlari\(\)/)
+    expect(govde('gpgCoz')).toMatch(/gpgCozmeArgumanlari\(\)/)
+    expect(govde('gpgCoz')).toMatch(/input: fs\.readFileSync\(girdiYol\)/)
+    for (const x of [...C.gpgSifrelemeArgumanlari(), ...C.gpgCozmeArgumanlari()]) {
+      expect(x.includes('/') || x.includes('\\') || x.includes("'"), x).toBe(false)
+    }
   })
 
   it('KAYNAK TARAMASI: scripts/tasima/*.cjs parola kanalı açmaz, gpg\'ye toplu kip vermez, parolayı ortamdan okumaz', () => {
@@ -492,6 +503,17 @@ describe('INV-TASIMA-1 · sırlar: parola betikten GEÇMEZ', () => {
     expect(parolaKanaliVar("spawnSync('gpg', ['--passphrase', sifre])")).toBe(true)
     expect(parolaKanaliVar("spawnSync('gpg', ['--pinentry-mode', 'loopback'])")).toBe(true)
     expect(parolaKanaliVar("env: { GPG_PASS: x }")).toBe(true)
+  })
+
+  it('PROVA DERSİ (2026-11-07): klon uzun yol açar ve hatanın SONUNU raporlar; iç içe kök reddedilir', () => {
+    const g = fs.readFileSync(path.join(TASIMA, 'git.cjs'), 'utf8')
+    expect(g).toMatch(/'-c', 'core\.longpaths=true', 'clone', '--quiet'/)
+    expect(g).toMatch(/c\.hata\.slice\(-300\)/)
+    const K = require_(path.join(TASIMA, 'kur.cjs')) as { iceIceKokler(e: string[], y: string[]): string[] }
+    expect(K.iceIceKokler(['C:\\tmp'], ['C:\\tmp\\tasima-prova\\tmp'])).toHaveLength(1)
+    expect(K.iceIceKokler(['C:\\TMP\\'], ['c:/tmp/x'])).toHaveLength(1)
+    expect(K.iceIceKokler(['C:\\tmp'], ['C:\\tmp2\\x', 'D:\\tmp\\x', 'C:\\tasima-prova'])).toHaveLength(0)
+    expect(K.iceIceKokler(['C:\\Users\\alize'], ['C:\\Users\\recep'])).toHaveLength(0)
   })
 
   it('düz sır tar\'ı diske yazılmaz: paketle.cjs sırları bellekte kurar (sirlar için dosyaYazici çağrısı yok)', () => {

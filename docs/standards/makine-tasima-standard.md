@@ -5,7 +5,7 @@
 > **Zorlayan kapı:** `INV-TASIMA-1` → `src/__tests__/conformance/makine-tasima.test.ts` (yol dönüşümü, tar bütünlüğü, sha256 sabotajı, git bundle gidiş dönüşü, parola kanalı yok, hedef git deposunda olamaz).
 > **Sahibi:** ALTYAPI · **Kayıt:** Kanban: ALT-165 · **İlk yazım:** 2026-11-06
 > **Son ölçüm:** 2026-11-06
-> **Son doğrulama:** 2026-11-06 — kuru koşum bu makinede ölçüldü; paketleme ve kurulum sahte iki makinede uçtan uca sınandı. GERÇEK paketleme (sahibin gpg parolası gerekir) ve gerçek yeni makinede kurulum henüz KOŞULMADI: taşıma provası bekliyor (§9).
+> **Son doğrulama:** 2026-11-07 — GERÇEK paketleme provası yapıldı (sahibin parolasıyla, Drive'a 2,5 GB) ve paket bu makinede yalıtılmış bir köke kuruldu; sırlar parolayla açıldı. Gerçek yeni makinede kurulum henüz KOŞULMADI (§9).
 
 ## 0. Kaynak ve cetvel
 
@@ -286,7 +286,7 @@ Silmeden önce sahibe yazılacaklar: paket doğrulandı mı (§5.12), sırlar ye
 
 ## 9. Bilinen riskler ve ölçülemeyenler
 
-- **Taşıma provası YAPILMADI.** Gerçek paketleme (sahibin gpg parolası) ve gerçek yeni makinede kurulum koşulmadı. Sınanan: kuru koşum (bu makine), sahte iki makinede paketle→kur (yol dönüşümü, proje klasörü yeniden adlandırma, sha256 sabotajı, çakışma, SQLite WAL, git dalı/commit/stash), gpg paket tanıma örneği. Ölçülmedi: gerçek gpg parola penceresi akışı (iki kez sorma, iptal), gerçek 2,4 GB'lık yazım süresi, Drive eşitleme süresi.
+- **Taşıma provası (2026-11-07, bu makine, yalıtılmış kök).** Gerçek paketleme sahibin parolasıyla koştu: 7 parça, 18.933 dosya, sırlar AES256 doğrulandı, yaklaşık 3 dakika. Paketten kur: 7 parça sha256 tuttu, sırlar parolayla açıldı (33 dosya), git depoları bundle ve stash'leriyle kuruldu (venthub-hvac 83/83 stash). Provada çıkan ve düzeltilen üç kusur: (1) gpg (MSYS) argümandaki kesme işaretini siliyordu, `Drive'ım` yolu `Driveım` oldu; artık gpg'ye yol verilmez, stdin ve stdout kullanılır. (2) ingestor klonu 260 karakter sınırına takıldı (221 karakterlik yol + 44 karakterlik kök); klon artık `core.longpaths=true` ile alınıyor ve hata metninin sonu raporlanıyor. (3) Prova kökü `C:\tmp` altına kurulunca yol yazımı doğrulaması çevrilmiş yolu da eski yol saydı; `kur` artık eski bir kökün içine düşen yeni kökü baştan reddediyor. **Prova kökü eski köklerin DIŞINDA olmalı** (ör. `C:\tasima-prova`). Ölçülmedi: gerçek yeni makinede kurulum, Drive eşitleme süresi.
 - **DPAPI sırları** (§2.2): yeni makinede açılmayabilir.
 - **51 GB > 50 GB** kaygısı seçmeli paketle kalktı (2,4 GB tahmin); `--transkriptler` (15 GB) Drive'a sığmaz.
 - **`~/.claude/projects` yol türevi:** kur yeniden adlandırır; `/resume` listesi transkript almadıkça boş başlar.

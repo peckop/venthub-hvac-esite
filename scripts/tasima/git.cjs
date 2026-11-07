@@ -136,8 +136,12 @@ function depoyuKur(g) {
     const kaynak = g.uzak || g.bundle
     if (!kaynak) return { ok: false, notlar, hata: 'ne uzak adres ne bundle var' }
     fs.mkdirSync(path.dirname(g.hedef), { recursive: true })
-    const c = git(['clone', kaynak, g.hedef], path.dirname(g.hedef))
-    if (!c.ok) return { ok: false, notlar, hata: `klon başarısız (${g.uzak ? 'uzak' : 'bundle'}): ${c.hata.slice(0, 300)}` }
+    // core.longpaths: Windows 260 karakter sınırı. ingestor'da 221 karakterlik yol var; kök 44 karakter olunca
+    // checkout "Filename too long" ile düştü (ölçüldü 2026-11-07, ilk gerçek prova). --quiet: ilerleme satırları
+    // stderr'i doldurup asıl hatayı gizliyordu; hata metninin SONU raporlanır.
+    const c = git(['-c', 'core.longpaths=true', 'clone', '--quiet', kaynak, g.hedef], path.dirname(g.hedef))
+    if (!c.ok) return { ok: false, notlar, hata: `klon başarısız (${g.uzak ? 'uzak' : 'bundle'}): ${c.hata.slice(-300)}` }
+    git(['config', 'core.longpaths', 'true'], g.hedef)
     notlar.push(`klon: ${g.uzak ? 'uzak adresten' : 'bundle\'dan'}`)
 
     if (g.bundle) {
