@@ -175,3 +175,157 @@ describe('INV-ANA-AGAC-TAZE-1 ana ağaç tazeliği', { timeout: GIT_SURE }, () =
     expect(modul).not.toMatch(/\[\s*'(stash|reset|checkout)'/)
   })
 })
+
+/**
+ * INV-PENCERE-KOPYASI-FF-1 · pencerenin KENDİ çalışma kopyası SessionStart'ta güncellenir (ARC-264, OPS kararı 7 Kasım).
+ *
+ * ⭐NİÇİN: kancalar/kurallar pencerenin çalışma kopyasından koşar; kopyalar master'ın 2-121 commit gerisindeydi ve
+ * #2324'teki yeni COMPACT YAKIN metni pencerelere hiç ulaşmadı. Sıra: (a) temiz + ff edilebilir → ff-only; (b) temiz,
+ * dalın PR'ı birleşmiş (ya da commit'leri master'da) → eski dala dokunmadan origin/master'dan yeni dal; (c) aksi hâlde
+ * (kirli, ayrık HEAD, birleşmemiş kendi commit) dokunma + uyarı. Merge fallback YOK (açık PR farkını değiştirir).
+ * Durum üretilir: bare origin + ana ağaç + geride bırakılmış worktree. Makinenin gerçek deposuna dokunulmaz.
+ */
+type PencereSonuc = { durum: string; geride?: number; sebep?: string; dal?: string; yeniDal?: string }
+const pencereIleriSar = (tazelik as unknown as {
+  pencereIleriSar: (cwd: string, uzak?: string, env?: Record<string, string>, pr?: (dal: string) => boolean | null, simdi?: Date) => PencereSonuc
+}).pencereIleriSar
+const pencereSatiri = (tazelik as unknown as { pencereSatiri: (s: PencereSonuc | null) => string }).pencereSatiri
+const SIMDI = new Date(2026, 10, 7, 12, 0, 0)
+const PR_BIRLESMIS = (): boolean | null => true
+const PR_ACIK = (): boolean | null => false
+const PR_YOK = (): boolean | null => null
+
+/** wt: 'serit' dalı, kurulum sonrası N commit geriye alınmış (HEAD~N); origin/master N commit önde. */
+function gerideKopya(n: number): { wt: string; ana: string } {
+  const k = kurulum(n)
+  g(k.wt, 'reset', '-q', '--hard', `HEAD~${n}`)
+  return { wt: k.wt, ana: k.ana }
+}
+
+/** Pencerenin dalına origin'de olmayan bir yerel commit ekler (PR'ı birleşmiş/birleşmemiş dal benzetimi). */
+function yerelCommit(wt: string, dosya = 'yerel.txt'): string {
+  fs.writeFileSync(path.join(wt, dosya), 'x\n')
+  g(wt, 'add', dosya)
+  g(wt, 'commit', '-q', '-m', 'yerel')
+  return g(wt, 'rev-parse', 'HEAD')
+}
+
+describe('INV-PENCERE-KOPYASI-FF-1 pencere çalışma kopyası güncelleme', { timeout: GIT_SURE }, () => {
+  it('(a) geride temiz pencere kopyası ileri sarılır; dosya yeni içeriğe geçer; ikinci çağrı güncel ve sessiz', () => {
+    const { wt } = gerideKopya(3)
+    expect(tazelik.olc(wt).geride).toBe(3)
+    expect(pencereIleriSar(wt)).toMatchObject({ durum: 'ilerlendi', geride: 3, dal: 'serit' })
+    expect(tazelik.olc(wt)).toMatchObject({ geride: 0, ileride: 0 })
+    expect(fs.readFileSync(path.join(wt, 'a.txt'), 'utf8').trim()).toBe('3')
+    const s = pencereIleriSar(wt)
+    expect(s).toMatchObject({ durum: 'guncel', geride: 0 })
+    expect(pencereSatiri(s), 'güncelken satır basılmaz').toBe('')
+  })
+
+  it('alt dizinden çağrılsa da pencerenin kök dizinini bulur', () => {
+    const { wt } = gerideKopya(1)
+    fs.mkdirSync(path.join(wt, 'alt'), { recursive: true })
+    expect(pencereIleriSar(path.join(wt, 'alt')).durum).toBe('ilerlendi')
+  })
+
+  it('(c) KİRLİ izlenen dosya: dokunulmaz (ilgisiz dosya da olsa), yerel değişiklik korunur, sebep yazılır', () => {
+    const { wt } = gerideKopya(1)
+    fs.writeFileSync(path.join(wt, 'z.txt'), 'pencerenin-yarim-isi\n')
+    const once = g(wt, 'rev-parse', 'HEAD')
+    const s = pencereIleriSar(wt, 'origin/master', {}, PR_BIRLESMIS, SIMDI)
+    expect(s.durum).toBe('engelli')
+    expect(s.sebep).toMatch(/agac temiz degil \(1 izlenen dosya: .*z\.txt/)
+    expect(g(wt, 'rev-parse', 'HEAD')).toBe(once)
+    expect(fs.readFileSync(path.join(wt, 'z.txt'), 'utf8')).toBe('pencerenin-yarim-isi\n')
+    expect(pencereSatiri(s)).toMatch(/^⚠PENCERE KOPYASI 1 commit GERIDE ve guncellenemedi/)
+  })
+
+  it('(b) kendi commit\'i var ama PR\'ı BİRLEŞMİŞ: eski dala dokunulmaz, origin/master\'dan yeni dal açılır', () => {
+    const { wt } = gerideKopya(2)
+    const eskiUc = yerelCommit(wt)
+    const s = pencereIleriSar(wt, 'origin/master', {}, PR_BIRLESMIS, SIMDI)
+    expect(s).toMatchObject({ durum: 'yeni-dal', geride: 2, dal: 'serit', yeniDal: 'pencere/pencere-2026-11-07' })
+    expect(g(wt, 'rev-parse', '--abbrev-ref', 'HEAD')).toBe('pencere/pencere-2026-11-07')
+    expect(g(wt, 'rev-parse', 'HEAD')).toBe(g(wt, 'rev-parse', 'origin/master'))
+    expect(g(wt, 'rev-parse', 'serit'), 'eski dal olduğu gibi duruyor').toBe(eskiUc)
+    expect(pencereSatiri(s)).toContain("'pencere/pencere-2026-11-07' acildi (2 commit geride idi)")
+  })
+
+  it('(b) aynı adlı dal zaten varsa yeni dal -2 son ekiyle açılır (var olan dal ezilmez)', () => {
+    const { wt } = gerideKopya(1)
+    yerelCommit(wt)
+    g(wt, 'branch', 'pencere/pencere-2026-11-07', 'HEAD')
+    const eskiUc = g(wt, 'rev-parse', 'pencere/pencere-2026-11-07')
+    expect(pencereIleriSar(wt, 'origin/master', {}, PR_BIRLESMIS, SIMDI).yeniDal).toBe('pencere/pencere-2026-11-07-2')
+    expect(g(wt, 'rev-parse', 'pencere/pencere-2026-11-07')).toBe(eskiUc)
+  })
+
+  it('(b) dal adındaki rol öneki yeni dala taşınır', () => {
+    const { wt } = gerideKopya(1)
+    g(wt, 'branch', '-m', 'serit', 'katalog/ktl83-x')
+    yerelCommit(wt)
+    expect(pencereIleriSar(wt, 'origin/master', {}, PR_BIRLESMIS, SIMDI).yeniDal).toBe('katalog/pencere-2026-11-07')
+  })
+
+  it('(b) PR\'ı birleşmemiş (açık) kendi commit\'i: DOKUNULMAZ, HEAD aynı, sebep PR i birlesmemis', () => {
+    const { wt } = gerideKopya(2)
+    const once = yerelCommit(wt)
+    const s = pencereIleriSar(wt, 'origin/master', {}, PR_ACIK, SIMDI)
+    expect(s.durum).toBe('engelli')
+    expect(s.sebep).toMatch(/master'da olmayan 1 commit var ve PR i birlesmemis/)
+    expect(g(wt, 'rev-parse', 'HEAD')).toBe(once)
+    expect(g(wt, 'rev-parse', '--abbrev-ref', 'HEAD')).toBe('serit')
+  })
+
+  it('gh cevapsız (null) ve commit\'ler master\'da değil: dokunulmaz, sebep PR durumu olculemedi', () => {
+    const { wt } = gerideKopya(1)
+    yerelCommit(wt)
+    const s = pencereIleriSar(wt, 'origin/master', {}, PR_YOK, SIMDI)
+    expect(s.durum).toBe('engelli')
+    expect(s.sebep).toMatch(/PR durumu olculemedi/)
+  })
+
+  it('gh cevapsız ama git cherry BOŞ (commit master\'da aynı yamayla var): yeni dal açılır', () => {
+    const { wt } = gerideKopya(1)
+    // aynı yama master'a başka commit olarak girdi (squash/cherry-pick benzetimi): geçici dalda yapıp master'a it
+    g(wt, 'checkout', '-q', '-b', 'gecici', 'origin/master')
+    fs.writeFileSync(path.join(wt, 'yerel.txt'), 'x\n')
+    g(wt, 'add', 'yerel.txt')
+    g(wt, 'commit', '-q', '-m', 'ayni-yama-master-da')
+    g(wt, 'push', '-q', 'origin', 'gecici:master')
+    g(wt, 'checkout', '-q', 'serit')
+    yerelCommit(wt)
+    const s = pencereIleriSar(wt, 'origin/master', {}, PR_YOK, SIMDI)
+    expect(s.durum).toBe('yeni-dal')
+  })
+
+  it('(c) ayrık HEAD: dokunulmaz', () => {
+    const { wt } = gerideKopya(1)
+    g(wt, 'checkout', '-q', '--detach')
+    const once = g(wt, 'rev-parse', 'HEAD')
+    expect(pencereIleriSar(wt, 'origin/master', {}, PR_BIRLESMIS, SIMDI)).toMatchObject({ durum: 'engelli', sebep: 'ayrik HEAD (dal yok)' })
+    expect(g(wt, 'rev-parse', 'HEAD')).toBe(once)
+  })
+
+  it('vana VENTHUB_PENCERE_FF=0: hiçbir şey yapılmaz, kopya geride kalır', () => {
+    const { wt } = gerideKopya(2)
+    expect(pencereIleriSar(wt, 'origin/master', { VENTHUB_PENCERE_FF: '0' })).toEqual({ durum: 'kapali' })
+    expect(tazelik.olc(wt).geride).toBe(2)
+  })
+
+  it('depo olmayan dizin: fırlatmaz, olcemedi döner (fail-open)', () => {
+    const bos = fs.mkdtempSync(path.join(os.tmpdir(), 'pencere-ff-bos-'))
+    GECICI.push(bos)
+    expect(pencereIleriSar(bos).durum).toBe('olcemedi')
+  })
+
+  it('SessionStart kancası (session-board.cjs) adımı gerçekten çağırır ve vanayı bilir; modül yıkıcı git komutu içermez', () => {
+    const kaynak = fs.readFileSync(path.join(KOK, '.claude', 'hooks', 'session-board.cjs'), 'utf8')
+    expect(kaynak).toMatch(/pencereIleriSar\(input\.cwd \|\| process\.cwd\(\)\)/)
+    expect(kaynak).toMatch(/pencereSatiri\(/)
+    const modul = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'), 'utf8')
+    expect(modul).toContain("env.VENTHUB_PENCERE_FF === '0'")
+    expect(modul, 'reset/stash/checkout/force/rebase/push yok; merge yalnız --ff-only').not.toMatch(/'reset'|'stash'|'checkout'|'--force'|'rebase'|'push'/)
+    expect(modul.match(/'merge'/g)?.length, 'merge yalnız ff-only çağrılarında').toBe(modul.match(/'merge', '--ff-only'/g)?.length)
+  })
+})

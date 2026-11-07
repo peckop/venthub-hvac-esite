@@ -453,7 +453,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       expect(metin, ad).toContain('| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |')
       expect(metin, ad).toContain('2+ kalem madde işaretli liste olur')
-      expect(metin, ad).toContain('Compact otomatiktir (eşik 600k)')
+      expect(metin, ad).toContain('Compact otomatiktir (eşik 500k)')
       expect(metin, ad).not.toContain('kopyalanabilir `/compact')
       expect(metin, ad).toContain('Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti')
       expect(metin, ad).toContain('"Onayında" yalnız Recep kararı bekleyen iştir')

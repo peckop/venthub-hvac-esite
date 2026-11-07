@@ -23,7 +23,7 @@
 - Durum sütunu yalnız şu yedi kelimeden biri: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen iştir (OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"). Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır.
 - Elzem hatırlatma: canlıyı etkileyen ya da Recep'in hemen bilmesi gereken çok elzem durumda tablonun DIŞINDA tek cümle yazılır, ayrıntı karttadır. Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS'a yaz.
 - 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez).
-- Compact otomatiktir (eşik 600k): Recep'e /compact satırı, liste ya da iki aşama cümlesi verilmez (Recep isterse elle serbest). "COMPACT YAKIN" uyarısında (500k) durum dosyası hemen güncellenir, sonuna `Yarım iş` satırı yazılır.
+- Compact otomatiktir (eşik 500k): Recep'e /compact satırı, liste ya da iki aşama cümlesi verilmez (Recep isterse elle serbest). "COMPACT YAKIN" uyarısında (470k) durum dosyası hemen güncellenir, sonuna `Yarım iş` satırı yazılır.
 
 ## Kart planı (karar 241/243)
 - Plan karta yazılır (docs/standards/kart-plani-standard.md): konuyu bilmeyenin uygulayabileceği açıklıkta; işi planı yazan değil yeni açılan ekip üyesi yapar; müşteriye görünen, veritabanı ya da site yapısı planı Recep'e tek sayfa özetle OPS'tan gider; planın iskeletinin eksiksizliğini `node scripts/belge/kart-plan-kapisi.cjs --kart <NO>` ölçer.

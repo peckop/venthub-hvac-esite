@@ -114,7 +114,7 @@ const RECEP_MESAJ_KURALLARI = [
   '- Durum sütunu yalnız şu yedi kelimeden biri: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe; "Onayında" yalnız Recep kararı bekleyen iştir (OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"). Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır.',
   '- Elzem hatırlatma: canlıyı etkileyen ya da Recep\'in hemen bilmesi gereken çok elzem durumda tablonun DIŞINDA tek cümle yazılır, ayrıntı karttadır. Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS\'a yaz.',
   '- 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez).',
-  '- Compact otomatiktir (eşik 600k): Recep\'e /compact satırı, liste ya da iki aşama cümlesi verilmez (Recep isterse elle serbest). "COMPACT YAKIN" uyarısında (500k) durum dosyası hemen güncellenir, sonuna `Yarım iş` satırı yazılır.',
+  '- Compact otomatiktir (eşik 500k): Recep\'e /compact satırı, liste ya da iki aşama cümlesi verilmez (Recep isterse elle serbest). "COMPACT YAKIN" uyarısında (470k) durum dosyası hemen güncellenir, sonuna `Yarım iş` satırı yazılır.',
 ].join('\n')
 
 /**

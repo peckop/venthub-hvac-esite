@@ -17,7 +17,7 @@
  *
  * ── EŞİKLER ──
  *
- * Ops/Recep: 300k "doluyor", 500k "compact yakın". Compact penceresi `autoCompactWindow` ile
+ * Ops/Recep: 300k "doluyor", 470k "compact yakın". Compact penceresi `autoCompactWindow` ile
  * küçültülmüşse (karar 140'ta 250k idi) mutlak eşik hiç yanmaz; bu yüzden eşik
  * min(mutlak, pencerenin %60 / %80'i). Pencere önceliği durum çubuğuyla aynı: ortam değişkeni >
  * proje/kullanıcı ayarı > model penceresi (varsayılan 1M).
@@ -47,7 +47,7 @@ const path = require('path')
 const OKUMA_BAYT = 512 * 1024
 const MODEL_PENCERESI = 1_000_000
 const DOLUYOR = 300_000
-const YAKIN = 500_000
+const YAKIN = 470_000
 
 /** Durum çubuğundaki `compactPenceresi` ile aynı öncelik. */
 function compactPenceresi(kok = process.cwd(), ev = os.homedir(), env = process.env) {
@@ -114,7 +114,7 @@ const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') 
  *
  * Bağlam eşiğe gelince pencere hazırlığı elle kurmak zorunda kalıyordu: "durum dosyam güncel mi", "yarım iş var mı",
  * "/compact satırı nasıl". Üçü de deterministik: kanca durum dosyasının yaşını ve "Yarım iş" satırını zaten okuyor.
- * Bu bölüm hükmü (HAZIR / DEĞİL + nedeni) KANCA üretir; /compact metni yalnız kokpite gider (ARC-264: Recep'e verilmez,
+ * Bu bölüm hükmü (HAZIR / DEĞİL + nedeni) KANCA üretir; /compact metni yalnız kokpite gider (ARC-86: Recep'e verilmez,
  * compact otomatiktir); pencere yalnız DEĞİL ise durum dosyasını günceller. Hüküm ölçütü kokpitteki `compactHazirlik` ile AYNI: durum dosyası ≤60 dk VE "Yarım iş yok".
  * Belirsizlik (satır yok, dosya yok) "HAZIR" demez. Metin dosya içeriğinden gelir ama yalnız kart numarası deseni
  * ve "Yarım iş" satırının ilk 120 karakteri alınır (keyfi dosya metni istem satırına taşınmaz).
@@ -149,7 +149,7 @@ function compactIcerigi(metin) {
 }
 
 /**
- * Kokpit için /compact metni (Recep elle isterse); COMPACT YAKIN satırına artık GİRMEZ (ARC-264: compact otomatik).
+ * Kokpit için /compact metni (Recep elle isterse); COMPACT YAKIN satırına artık GİRMEZ (ARC-86: compact otomatik).
  * Kart durumu (Sürüyor, Sırada...) dosyadan güvenle çıkmaz; metne yazılmaz, "ayrıntı durum dosyamda" der.
  */
 function compactMetni(icerik) {
@@ -257,14 +257,14 @@ function donusSatiri(sonuc, bildirilen) {
 }
 
 /**
- * COMPACT OTOMATİK talimatı (ARC-264, OPS 11-06; Recep: her pencerede /compact satırını elle kopyalamaktan ve uzaktayken
- * yapamamaktan şikâyetçi). Otomatik compact açık (CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=60 → 600k); uyarı 500k'de gelir ve araya
+ * COMPACT OTOMATİK talimatı (ARC-86, OPS 11-06; Recep: her pencerede /compact satırını elle kopyalamaktan ve uzaktayken
+ * yapamamaktan şikâyetçi). Otomatik compact açık (CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=50 → 500k); uyarı 470k'de gelir ve araya
  * 100k düşer. Bu satır Recep'e liste, /compact satırı ya da iki aşama cümlesi VERMEZ; pencereye tek iş söyler: durum dosyasını
  * şimdi güncelle ve sonuna "Yarım iş" satırını yaz. Eski üç parçalı not (Recep 09-29, ARC-69) kalktı; geri gelmesin diye
  * kapı (hafiza-baglam-ve-belge-satiri.test.ts) yasaklar. Metin .claude/rules/filo-ortak.md "Compact" bölümüyle aynı yönde olmalı.
  */
 const HAZIRLIK_NOTU =
-  ' ⭐COMPACT OTOMATIK: compact kendiliginden olur (esik %60); Recep e /compact satiri, liste ya da aciklama YAZMA. ' +
+  ' ⭐COMPACT OTOMATIK: compact kendiliginden olur (esik %50); Recep e /compact satiri, liste ya da aciklama YAZMA. ' +
   'Durum dosyani SIMDI guncelle ve sonuna "Yarim is: yok — <kisa>" ya da "Yarim is: var — <ne>, <ne zaman guvenli>" satirini yaz, ' +
   'sonra isine devam et; yarim isi guvenli noktaya getirmeye bak.'
 

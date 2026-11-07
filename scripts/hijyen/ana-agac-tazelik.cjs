@@ -111,6 +111,107 @@ function ileriSar(agac, uzak = 'origin/master') {
   return { durum: 'ilerlendi', geride: o.geride }
 }
 
+/**
+ * PENCERE ÇALIŞMA KOPYASI (ARC-264, OPS 7 Kasım): kancalar ve kurallar pencerenin KENDİ çalışma kopyasından koşar;
+ * kopyalar master'ın 2-121 commit gerisindeydi ve #2324'teki yeni COMPACT YAKIN metni pencerelere hiç ulaşmadı.
+ * `ileriSar` yalnız ana ağaç (master dalı) içindir; bu işlev pencerenin kopyasını şu sırayla günceller (OPS kararı):
+ *   (a) ağaç temiz ve dal ff edilebiliyorsa (origin'de olmayan commit yok) → `merge --ff-only origin/master`;
+ *   (b) ağaç temiz, dalın kendi commit'leri var ama dalın PR'ı BİRLEŞMİŞ (gh: --state merged dolu) ya da `git cherry`
+ *       boş (commit'lerin hepsi master'da) → eski dala DOKUNULMAZ, origin/master'dan yeni dal: `switch -c <rol>/pencere-<tarih>`;
+ *   (c) aksi hâlde (kirli izlenen dosya, ayrık HEAD, birleşmemiş kendi commit) → DOKUNULMAZ, tek satır uyarı.
+ * Merge fallback YOK: açık PR dalına master birleştirmek PR farkını değiştirir. Stash/reset/checkout YOK. Ağ yok
+ * (origin/master bütün worktree'lerde ortak ref); gh cevapsızsa yalnız `git cherry`e bakılır. Vana: VENTHUB_PENCERE_FF=0.
+ * `prBirlesmis` testte yerine konur: (dal) → true | false | null (ölçülemedi).
+ * @returns {{durum:'guncel'|'ilerlendi'|'yeni-dal'|'engelli'|'olcemedi'|'kapali', geride?:number, sebep?:string, dal?:string, yeniDal?:string}}
+ */
+const PR_DEPO = 'peckop/venthub-hvac-esite'
+function prBirlesmisGh(dal) {
+  try {
+    const cikti = execFileSync('gh', ['pr', 'list', '--repo', PR_DEPO, '--head', dal, '--state', 'merged', '--json', 'number', '--jq', 'length'], {
+      encoding: 'utf8', timeout: 15000, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
+    }).trim()
+    const n = Number(cikti)
+    return Number.isFinite(n) ? n > 0 : null
+  } catch {
+    return null
+  }
+}
+
+/** origin/master'da karşılığı olmayan ('+') commit sayısı; ölçülemezse null. */
+function cherryFarki(agac, uzak) {
+  try {
+    return git(agac, ['cherry', uzak, 'HEAD']).split('\n').filter((s) => s.startsWith('+')).length
+  } catch {
+    return null
+  }
+}
+
+function yeniDalAdi(agac, dal, simdi) {
+  const rol = /^[a-z0-9-]+\//.test(dal) ? dal.split('/')[0] : 'pencere'
+  const gun = simdi.getFullYear() + '-' + String(simdi.getMonth() + 1).padStart(2, '0') + '-' + String(simdi.getDate()).padStart(2, '0')
+  const taban = rol + '/pencere-' + gun
+  for (let i = 1; i <= 9; i++) {
+    const ad = i === 1 ? taban : taban + '-' + i
+    try {
+      git(agac, ['rev-parse', '--verify', '--quiet', 'refs/heads/' + ad])
+    } catch {
+      return ad
+    }
+  }
+  return null
+}
+
+function pencereIleriSar(cwd, uzak = 'origin/master', env = process.env, prBirlesmis = prBirlesmisGh, simdi = new Date()) {
+  if (env.VENTHUB_PENCERE_FF === '0') return { durum: 'kapali' }
+  let o
+  try {
+    o = olc(git(cwd, ['rev-parse', '--show-toplevel']), uzak)
+  } catch (e) {
+    return { durum: 'olcemedi', sebep: String((e && e.message) || e).slice(0, 160) }
+  }
+  const baz = { geride: o.geride, dal: o.dal }
+  if (o.geride === 0) return { durum: 'guncel', ...baz }
+  if (o.dal === 'HEAD') return { durum: 'engelli', ...baz, sebep: 'ayrik HEAD (dal yok)' }
+  if (o.kirli.length) {
+    return { durum: 'engelli', ...baz, sebep: 'agac temiz degil (' + o.kirli.length + ' izlenen dosya: ' + o.kirli.slice(0, 3).join(', ') + ')' }
+  }
+  if (o.ileride === 0) {
+    try {
+      git(o.agac, ['merge', '--ff-only', uzak], 60000)
+    } catch (e) {
+      return { durum: 'engelli', ...baz, sebep: 'ff-only reddetti: ' + String((e && e.message) || e).slice(0, 120) }
+    }
+    return { durum: 'ilerlendi', ...baz }
+  }
+  // (b) kendi commit'leri var: yalnız dalın işi bitmişse (PR birleşmiş ya da commit'ler master'da) yeni dal
+  const cherry = cherryFarki(o.agac, uzak)
+  const pr = cherry === 0 ? true : prBirlesmis(o.dal)
+  if (!(pr === true || cherry === 0)) {
+    return { durum: 'engelli', ...baz, sebep: "'" + o.dal + "' dalinda master'da olmayan " + o.ileride + ' commit var' + (pr === null ? ' (PR durumu olculemedi)' : ' ve PR i birlesmemis') }
+  }
+  const yeni = yeniDalAdi(o.agac, o.dal, simdi)
+  if (!yeni) return { durum: 'engelli', ...baz, sebep: 'yeni dal adi uretilemedi' }
+  try {
+    git(o.agac, ['switch', '-c', yeni, uzak], 60000)
+  } catch (e) {
+    return { durum: 'engelli', ...baz, sebep: 'yeni dal acilamadi: ' + String((e && e.message) || e).slice(0, 120) }
+  }
+  return { durum: 'yeni-dal', ...baz, yeniDal: yeni }
+}
+
+/** Oturum açılışı için tek satır (pencere kopyası); güncel ya da kapalıysa boş dize. */
+function pencereSatiri(s) {
+  if (!s || s.durum === 'guncel' || s.durum === 'kapali') return ''
+  if (s.durum === 'ilerlendi') {
+    return 'PENCERE KOPYASI ' + s.geride + ' commit ileri sarildi (' + s.dal + '): kancalar/kurallar guncel; settings.json degistiyse pencereyi yeniden ac.\n'
+  }
+  if (s.durum === 'yeni-dal') {
+    return "PENCERE KOPYASI: '" + s.dal + "' dalinin isi bitmis (PR birlesmis); eski dala dokunulmadi, origin/master'dan yeni dal '" + s.yeniDal + "' acildi (" + s.geride + ' commit geride idi): kancalar/kurallar guncel.\n'
+  }
+  if (s.durum === 'olcemedi') return '⚠PENCERE KOPYASI tazeligi OLCULEMEDI (' + s.sebep + ') — kancalar bayat olabilir.\n'
+  return '⚠PENCERE KOPYASI ' + s.geride + ' commit GERIDE ve guncellenemedi: ' + s.sebep + '. Sahibine sor; kanca/kural metni bayat kalir.\n'
+}
+
 /** PR dosya listesi ana ağacın yüklediği bir yola değiyor mu? */
 function ayarYolunaDeger(dosyalar) {
   return dosyalar.some((d) => AYAR_YOLLARI.some((r) => r.test(d)))
@@ -135,7 +236,7 @@ function acilisSatiri(herhangiAgac) {
   )
 }
 
-module.exports = { AYAR_YOLLARI, anaAgacYolu, olc, engel, ileriSar, ayarYolunaDeger, acilisSatiri }
+module.exports = { AYAR_YOLLARI, anaAgacYolu, olc, engel, ileriSar, pencereIleriSar, pencereSatiri, ayarYolunaDeger, acilisSatiri }
 
 if (require.main === module) {
   const argv = process.argv.slice(2)

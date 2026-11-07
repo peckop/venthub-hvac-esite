@@ -112,11 +112,11 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     expect(bd.satir(0, 1_000_000)).toBe('BAGLAM: 0k/1M')
   })
 
-  it('eşik çiftleri (1M pencere): 299k düz / 300k doluyor · 499k doluyor / 500k COMPACT YAKIN', () => {
+  it('eşik çiftleri (1M pencere): 299k düz / 300k doluyor · 469k doluyor / 470k COMPACT YAKIN', () => {
     expect(bd.satir(299_999, 1_000_000)).toBe('BAGLAM: 300k/1M')
     expect(bd.satir(300_000, 1_000_000)).toMatch(/^⚠BAGLAM: 300k\/1M — doluyor/)
-    expect(bd.satir(499_999, 1_000_000)).toMatch(/doluyor/)
-    expect(bd.satir(500_000, 1_000_000)).toMatch(/^⛔BAGLAM: 500k\/1M — COMPACT YAKIN/)
+    expect(bd.satir(469_999, 1_000_000)).toMatch(/doluyor/)
+    expect(bd.satir(470_000, 1_000_000)).toMatch(/^⛔BAGLAM: 470k\/1M — COMPACT YAKIN/)
     expect(bd.satir(null, 1_000_000)).toBeNull()
   })
 
@@ -127,8 +127,8 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     expect(bd.satir(200_000, 250_000)).toMatch(/COMPACT YAKIN/)
   })
 
-  it('COMPACT YAKIN satırı COMPACT OTOMATIK talimatı taşır (durum dosyasını güncelle); Recep e liste, /compact satırı ya da iki aşama cümlesi öğretmez; doluyor/düz satırda YOK (ARC-264)', () => {
-    const yakin = bd.satir(500_000, 1_000_000) as string
+  it('COMPACT YAKIN satırı COMPACT OTOMATIK talimatı taşır (durum dosyasını güncelle); Recep e liste, /compact satırı ya da iki aşama cümlesi öğretmez; doluyor/düz satırda YOK (ARC-86)', () => {
+    const yakin = bd.satir(470_000, 1_000_000) as string
     for (const parca of ['COMPACT OTOMATIK', 'Durum dosyani SIMDI guncelle', 'Yarim is: yok', 'Yarim is: var', 'isine devam et']) {
       expect(yakin, parca).toContain(parca)
     }
@@ -138,8 +138,8 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     }
     expect(yakin, 'talimat Recep e /compact vermeyi yasaklamıyor').toContain('Recep e /compact satiri, liste ya da aciklama YAZMA')
     expect(yakin, 'Recep e giden metinde iç kelime JEV').not.toMatch(/JEV/i)
-    expect(bd.satir(499_999, 1_000_000), 'talimat yalnız COMPACT YAKIN satırında').not.toContain('COMPACT OTOMATIK')
-    expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
+    expect(bd.satir(469_999, 1_000_000), 'talimat yalnız COMPACT YAKIN satırında').not.toContain('COMPACT OTOMATIK')
+    expect(bd.satir(469_999, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT OTOMATIK')
   })

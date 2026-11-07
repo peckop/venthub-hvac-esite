@@ -189,7 +189,7 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
 
   it('Compact bölümü: otomatik compact + dönüşte pano okuma sabit; eski üç parçalı not geri gelmez (ARC-86)', () => {
     const kural = lf(fs.readFileSync(yol, 'utf8'))
-    for (const p of ['Compact otomatiktir (eşik 600k)', 'durum dosyanı hemen güncelle', 'boştayım', 'panondaki açık kartları oku']) {
+    for (const p of ['Compact otomatiktir (eşik 500k)', 'durum dosyanı hemen güncelle', 'boştayım', 'panondaki açık kartları oku']) {
       expect(kural.includes(p), `filo-ortak.md Compact bölümünde yok: ${p}`).toBe(true)
     }
     for (const p of ['kopyalanabilir `/compact`', 'Üçüncü parça', 'Compact iki aşamalıdır']) {

@@ -37,7 +37,7 @@ const path = require('path')
 const BAYAT_ESIK_DK = 60
 
 // ── ÖZET YÖNERGESİ (ARC-69, karar 321, 2026-10-10) ──
-// Otomatik compact (600k) uyarısız gelir; özet durum dosyasını taşımazsa pencere dönüşte "neredeydim"i kaybeder.
+// Otomatik compact (500k) uyarısız gelir; özet durum dosyasını taşımazsa pencere dönüşte "neredeydim"i kaybeder.
 // PreCompact'ın stdout'u özet talimatı olarak işlenir (10-08 deneme: kancanın yazdığı cümle özete AYNEN geçti).
 // Bu yüzden kapı, durum dosyasının SON bloğunu "özete aynen taşı" yönergesiyle stdout'a da yazar.
 // YÖNERGE_BAYAT_DK uyarı eşiği DEĞİL (o 60'tır, yukarıda ölçülü): burada bayatlık özetin başına konan bir not,
