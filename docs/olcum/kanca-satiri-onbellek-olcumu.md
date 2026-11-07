@@ -8,7 +8,7 @@ Her kullanıcı mesajında UserPromptSubmit kancaları bağlama satır ekler (BA
 
 ## 2. Yöntem ve kapsam
 
-- Kaynak: `C:\Users\alize\.claude\projects` altında son 7 günün 5-300 MB arası üst düzey oturum kayıtları: **14 dosya**, 30.787 assistant çağrısı (`message.id` ile tekilleştirildi), 30.692 ardışık çift.
+- Kaynak: kullanıcı ayar dizinindeki `~/.claude/projects` altında son 7 günün 5-300 MB arası üst düzey oturum kayıtları: **14 dosya**, 30.787 assistant çağrısı (`message.id` ile tekilleştirildi), 30.692 ardışık çift.
 - Ölçü: ardışık iki çağrıda `r = cache_read(B) / (cache_read(A) + cache_creation(A))`. `r ≈ 1` önek korunmuş, düşük `r` önbellek kaçırmış demektir.
 - Sınıflama: boşluk süresi (5 dk altı, 5 dk-1 saat, 1 saat üstü), compact sonrası, model değişimi, kullanıcı istemi ilk çağrısı ve kancanın o turda varlığı.
 - Sınır: `usage` alanları sunucu önbelleğini **dolaylı** gösterir; bu belge korelasyon verir, nedensellik iddia etmez.
