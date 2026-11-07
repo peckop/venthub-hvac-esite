@@ -205,7 +205,8 @@ try {
 let TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
 const MUTLAK_TAVAN = 9900
 const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
-const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
+// Recep'in son 8 mesajı (≤3.600) + ajanın son 2 cevabı kırpılmış (≤1.400, ARC-266); toplam aşılırsa ÖNCE cevaplar kısalır (Recep sözü 3.600'e kadar kısalmaz)
+const DOKUM_TAVAN = 5000
 const bolumler = []
 /**
  * oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır.
