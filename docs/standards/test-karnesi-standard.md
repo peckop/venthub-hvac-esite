@@ -1,6 +1,6 @@
 # Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.4
 
-**Sürüm 1.4 · 2026-11-08 · Sahibi: ALTYAPI · Son doğrulama: 2026-11-08 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §3 yol süzgeci ve çıkarılan testler listesi: ALT-38i (OPS hükmü 2026-10-09); §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
+**Sürüm 1.4 · 2026-11-08 · Sahibi: ALTYAPI · Son doğrulama: 2026-11-08 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §3 yol süzgeci ve çıkarılan testler listesi: ALT-38i (OPS hükmü 2026-10-09); §3 süzgeç sabitleme, zamanlı kolun ölçülen ritmi, ödünleşimler ve görünürlük: ALT-38i bağımsız denetim bulguları Ö1, Ö3, Ö4, D1, D3, D4, D5 (2026-11-08); §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -44,7 +44,7 @@ yer yazılıdır, yeni yerde gerçekten koştuğunu bir kapı doğrular, kırmı
 |---|---|---|---|
 | PR kapısı (`pull_request` olayı: paralel `test-shard` işleri, §4.2; `ci` işinin Test adımı yalnız `edited` koşusunda) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`; yol süzgeçli kayıt, PR'ın değişen dosyalarından biri süzgece uyuyorsa kapıda KALIR, §3), her dosya TAM BİR shard'da; seçici daraltırsa (§4.3) yalnız seçilenler, şüphede hepsi | kırmızı shard `ci`yi kırmızı yapar (son adım bekler), birleştirme durur |
 | master push (`ci` işi, aynı Test adımı) | master'a her birleşmede | TAM paket, liste dahil (kip boş) | master kırmızı; ⚠ aynı `concurrency` grubunda koşu iptal edilebilir (07-06..10-06: 1119 master koşusunun 419'u iptal), tek başına güvence DEĞİLDİR |
-| Zamanlı (`dunya-durumu.yml`) | 6 saatte bir (`23 */6 * * *`) ve elle | YALNIZ dünya durumu listesi (kip `yalniz`) | iş akışı kırmızı; PR'ı bloklamaz, kanca satırı `DUNYA:` her mesajda gösterir |
+| Zamanlı (`dunya-durumu.yml`) | cron `23 */6 * * *` (NOMİNAL 6 saatte bir; ölçülen gerçek ritim daha seyrek: medyan 7,2 saat, en uzun 15,3 saat, §3 "Zamanlı kolun ölçülen ritmi") ve elle | YALNIZ dünya durumu listesi (kip `yalniz`) | iş akışı kırmızı; PR'ı bloklamaz, kanca satırı `DUNYA:` her mesajda gösterir |
 | Yerel `pnpm test` | elle | TAM paket (kip boş) | geliştiricinin terminalinde |
 
 Üç kip `VENTHUB_DUNYA_DURUMU` ortam değişkeniyle seçilir (`scripts/ci/dunya-durumu.cjs`, `vitest.config.ts` okur). Geçersiz değer
@@ -90,18 +90,55 @@ her PR'da çıkar. Kurallar (`scripts/ci/dunya-durumu.cjs`):
   (süzgeç istenmiyorsa alan HİÇ yazılmaz).
 - Yetim ve yanlış türlü süzgeç listeyi GEÇERSİZ yapar: yol diskte VAR olmalı ve türü yazımıyla uyuşmalı (`/`lı dizin, `/`sız dosya). Silinen, taşınan ya da `/`sız yazılmış bir dizin
   sessizce hiçbir yolla eşleşmez ve test PR kapısından HEP çıkardı. Geçersiz listede `dislan` ve `yalniz` kiplerinde yapılandırma FIRLATIR (vitest başlamaz).
+- Kayıt şekli KAPALIDIR (ALT-38i bağımsız denetim Ö1b): izinli alanlar `test`, `kimlik`, `eskiYer`, `yeniYer`, `yolFiltresi`, `neden`, `kanit`, `gorunenYuz` (`KAYIT_ALANLARI`); bunların dışındaki alan `dogrula`da
+  HATA verir. Niçin: `yolFiltre` gibi bir yazım hatası alanı sessizce düşürürdü, kayıt süzgeçsiz sayılırdı, test her PR'da çıkardı ve kimse kırmızı görmezdi. Süzgecin VARLIĞI ve en az bugünkü girdileri kapsaması ayrıca
+  adıyla sabittir (aşağıdaki "Süzgecin sabitlenmesi").
 - Önek sınırı: `a/b/` öneki `a/bc` yolunu kapsamaz. Karşılaştırma büyük/küçük harf duyarlıdır; değişen yollar önce kanonik özüne indirilir (`./x`, `a//x`).
 - Süzgeç PR'ın kaydından DEĞİL TABAN kaydından (`HEAD^1`, yukarıdaki B3 kuralı) okunur: PR kendi kaydındaki süzgeci genişleterek, daraltarak ya da silerek kendi dışlamasını değiştiremez.
   Tabanda süzgeç yoksa PR'ın yazdığı süzgeç de etkisizdir (test her PR'da çıkar).
 - Değişen dosyalar `git diff --name-only -z --no-renames HEAD^1 HEAD` ile okunur (`pull_request` birleştirme commit'i ve en az 2 commit derinliği gerekir; `ci` ve `test-shard` işleri
   `fetch-depth: 0` ile çıkış yapar). Yerel kullanım ve testler `VENTHUB_DUNYA_DEGISEN_DOSYALAR=<dosya yolu>` (NUL ya da satır ayraçlı) ile elle verebilir; doluyken okunamıyorsa git'e DÜŞÜLMEZ.
-- GÜVENLİ TARAF: değişen dosyalar okunamazsa (git yok, `HEAD^1` yok, kesilmiş çıktı, `..` ya da mutlak yol, okunamayan dosya) ya da tabandaki süzgeç geçersizse süzgeçli test DIŞLANMAZ,
+- GÜVENLİ TARAF: değişen dosyalar okunamazsa (git yok, `HEAD^1` yok, kesilmiş çıktı, `..` ya da mutlak yol, okunamayan dosya, git'ten BOŞ çıktı) ya da tabandaki süzgeç geçersizse süzgeçli test DIŞLANMAZ,
   PR kapısında koşar; değişen dosyalar okunamadıysa `[dunya-durumu]` uyarısı stderr'e yazılır. Eksik süzgeç girdisi koruma kaybıdır, fazlası yalnız süre kaybıdır: kuşkuda geniş yaz.
+- Boş değişen dosya listesi (bağımsız denetim D1): git'ten BOŞ çıktı gelirse "ölçülemedi" sayılır (null, fail-closed), çünkü stderr yutulduğundan başarısız ya da yarım kalmış bir `git diff` de boş çıktı
+  bırakır ve "PR hiçbir dosyaya dokunmadı" ile ayırt edilemez. `VENTHUB_DUNYA_DEGISEN_DOSYALAR` ile verilen BOŞ dosya ise "değişiklik yok"tur (girdi elle ve bilerek verilir; süzgeçli test çıkar, uyarı yok).
+  Bedel: farkı gerçekten boş bir birleştirme commit'inde süzgeçli testler bir kez gereksiz koşar ve uyarı yazılır; yanlış dışlamanın bedeli ise sessiz koruma kaybıdır.
 - `yalniz` kipinde (zamanlı koşu) süzgeç YOKTUR: listenin tamamı koşar.
-- Süzgece uyduğu için PR kapısında kalan testler sonuçta `suzgeceTakilan` alanında görünür (`node scripts/ci/dunya-durumu.cjs --kip dislan --json`).
+- `suzgeceTakilan` (bağımsız denetim D3): `dislan` sonucunda, TABANDA süzgeç taşıyıp PR kapısında KALAN kayıtların listesi (`node scripts/ci/dunya-durumu.cjs --kip dislan --json`); boşsa anahtar hiç yazılmaz.
+  Ad "süzgece uyan" demek DEĞİL "süzgeç yüzünden dışlanmayan" demektir ve ÜÇ durumda dolar, üçü de güvenli taraftır: **(1)** süzgeç PR'ın değişen dosyalarından birine uydu (korumanın kaybolmaması gereken olağan durum;
+  `uyari` yok), **(2)** tabandaki süzgeç geçersiz (dizi değil, boş, glob, kanonik olmayan yol): doğrulanamayan süzgeçle dışlama yapılmaz (`uyari` yok), **(3)** değişen dosyalar okunamadı (`uyari` DOLU).
+  Yani `suzgeceTakilan` dolu ve `uyari` boşsa neden (1) ya da (2)'dir; `uyari` doluysa en az bir kayıt (3) ile tutulmuştur.
+- Günlük satırı (bağımsız denetim Ö4): `dislan` kipinde yapılandırma yüklenirken stderr'e TEK satır yazılır: `[dunya-durumu] dışlanan=N tutulan=M değişen=K`. N PR kapısından çıkan test sayısı, M süzgeç yüzünden kalan
+  test sayısı (`suzgeceTakilan`), K PR'ın değişen dosya sayısı (okunamadıysa `?`). Niçin: dışlama sessiz bir karardır; beklenmeyen bir `değişen=0` ya da hep aynı `dışlanan` sayısı günlükte görünmezse kimsenin
+  gözüne çarpmaz. `tam` ve `yalniz` kiplerinde satır yazılmaz. Kapı: `test-kosu-kapsami.test.ts` (gerçek `vitest.config.ts` yüklemesinde satır TAM eşitlikle sınanır) ve `dunya-durumu.test.ts` (`ozetSatiri`).
 - Süzgeç girdileri ÖLÇÜLÜR, tahmin edilmez: testin okuduğu ya da çalıştırdığı izlenen dosyalar (kaynaklar: test haritası `scripts/ci/test-haritasi.json` `okunan` alanı ve testin gerçek koşusunun
-  dosya erişim kaydı). Kapı: `src/__tests__/conformance/test-kosu-kapsami.test.ts` (gerçek `vitest.config.ts` yüklemesi, süzgeç uyan ve okunamayan kollar) ve
-  `scripts/ci/__tests__/dunya-durumu.test.ts` (şekil, tür, önek sınırı, tabandan okuma, güvenli taraf, `git diff` argümanları ve kaynakta bozulunca kırmızı veren sabotaj kolları).
+  dosya erişim kaydı). Kapı: `src/__tests__/conformance/test-kosu-kapsami.test.ts` (gerçek `vitest.config.ts` yüklemesi, süzgeç uyan ve okunamayan kollar, süzgecin sabitlenmesi ve graf tamlığı) ve
+  `scripts/ci/__tests__/dunya-durumu.test.ts` (şekil, kapalı kayıt şekli, tür, önek sınırı, tabandan okuma, güvenli taraf, `git diff` argümanları, özet satırı ve kaynakta bozulunca kırmızı veren sabotaj kolları).
+
+**Süzgecin sabitlenmesi (bağımsız denetim Ö1b).** Mekanizma doğru çalışsa bile süzgecin kendisi listeden sessizce düşebilir ya da daralabilir; bunu `test-kosu-kapsami.test.ts` mekanik olarak tutar:
+
+- `githooks-doc-scope.test.ts` ve `sessionstart-tavan.test.ts` kayıtları ADIYLA `yolFiltresi` taşımak zorundadır (alan silinirse, boş diziye düşerse, kayıt listeden çıkarsa kırmızı).
+- `githooks-doc-scope` süzgeci en az `.githooks/` ve `.cc_docs.yaml`; `sessionstart-tavan` süzgeci en az `.claude/hooks/`, `scripts/board/`, `scripts/belge/`, `scripts/hijyen/`, `docs/roller/` ve `.claude/settings.json`
+  girdilerini kapsamak zorundadır. Daha geniş süzgeç serbesttir, DARALMA kırmızıdır; süzgeçten bir girdi çıkarılacaksa bu sabitleme ve yukarıdaki ölçüm birlikte güncellenir.
+- Kanıt: `test-kosu-kapsami.test.ts` içindeki SABOTAJ kolları süzgeci bir KOPYA kökte bozar (girdi silme, alan silme, boş dizi, `yolFiltre` yazım hatası, kaydı silme) ve kırmızıyı ölçer; gerçek dosyalara hiç dokunmaz. Tek seferlik kanıt (2026-11-08):
+  gerçek-ağaç testleri aynı kodla bozuk bir kopya köke yöneltildi; süzgeçten `"scripts/board/"` satırı silinince, `sessionstart-tavan` ya da `githooks-doc-scope` kaydından `yolFiltresi` alanı tümden silinince ve alan adı `yolFiltre`
+  yazılınca KIRMIZI verdi, bozulmamış kopyada ve gerçek ağaçta YEŞİL.
+
+**Graf tamlığı (bağımsız denetim Ö1a).** `sessionstart-tavan` kancasının dosya girdileri `.claude/hooks/session-board.cjs`ten başlayan bir grafla büyür; grafa süzgeç DIŞINDA yeni bir dosya girerse o dosyaya dokunan PR testi kapıda bulamaz.
+`test-kosu-kapsami.test.ts` bu grafı statik tarar (literal `require('...')`, `import('...')`, statik `import/export ... from`, tüm argümanları dize olan `path.join(__dirname, ...)`/`path.resolve(__dirname, ...)`; yorumlar sayılmaz;
+yalnız `.cjs/.mjs/.js` dosyalarının içine inilir) ve süzgeç dışında kalan HER repo-içi dosyayı kırmızı yapar. Bugün graf 27 dosyadır (ölçüm 2026-11-08), hepsi süzgeç içindedir. Sınır, saklanmaz: tarama bir YOKLAMADIR, kanıt değildir;
+değişkenli yollar (`path.join(KOK, ...)`, şablon dizeleri) ona görünmez. Onların tam ölçümü çalışma zamanı izlemesidir (yukarıdaki "Süzgeç girdi ölçümü"); statik tarama yalnız sonradan eklenen literal bağlantıları yakalar. Kanıt: grafa süzgeç dışı bir dosyaya
+`require` eklenmiş kopyada test KIRMIZI verdi, bozulmamışta YEŞİL.
+
+**Zamanlı kolun ölçülen ritmi (bağımsız denetim Ö3).** `dunya-durumu.yml` cron'u `23 */6 * * *`dır ve NOMİNAL aralık 6 saattir; GERÇEK ritim değildir. GitHub zamanlanmış koşuları geciktirir ve atlar. Ölçüm (2026-11-08, `gh run list --workflow dunya-durumu.yml --limit 100`,
+100 zamanlı koşu, 2026-10-07T13:38Z..2026-11-07T22:03Z): ardışık koşu aralığı medyan 7,2 saat, p90 10,8 saat, en uzun 15,3 saat, en kısa 4,2 saat; 99 aralığın 76'sı 6 saati aştı (son 60 koşuda medyan 7,3, p90 11,2, en uzun 15,3 saat).
+Bu yüzden "bir master koşusu iptal olsa da en geç 6 saatte görünür" cümlesi YANLIŞTIR ve cetvelden ile `dunya-durumu.yml` başlığından kaldırıldı. Doğru güvence: kırmızı bir sonraki zamanlı koşuda görünür; ölçülen en uzun bekleme 15,3 saattir.
+`DUNYA:` kanca satırının 18 saatlik "koşu YOK" eşiği bu aralığın üstündedir (sahte alarm üretmez). Aynı ölçümde 100 zamanlı koşunun 14'ü `failure` bitti; bu cetvelin konusu değildir, kırmızının görünürlüğü `DUNYA:` satırının işidir.
+
+**Seçici ile süzgeç: ödünleşim (bağımsız denetim D4).** Dünya durumu dışlaması seçiciden ÖNCE uygulanır: `test-shard` işleri ve seçici test evrenini `VENTHUB_DUNYA_DURUMU=dislan` ile kurar (`ci.yml`). Bu yüzden seçici `TAM`
+dediğinde bile (küresel girdi değişti: `package.json`, `pnpm-lock.yaml`, `vitest*`, `scripts/ci/`, `.github/` ...) süzgeçli testler, süzgeç PR'ın dosyalarına uymuyorsa ÇIKMAYA devam eder: `TAM`, "dünya durumu listesi dışındaki her şey" demektir, "her şey" değil.
+Bedel: küresel bir girdi (örneğin Node sürümü ya da vitest ayarı) bu testlerin sonucunu değiştirse bile PR kapısı bunu görmez; master push (TAM paket) ve zamanlı koşu görür. Süzgece küresel girdi eklemek (`package.json` ...) `sessionstart-tavan`ı
+(130 sn) küresel girdiye dokunan her PR'a geri getirirdi; BİLİNÇLİ olarak eklenmedi.
 
 **PR kapısından çıkarılan testler (2026-11-08).** Liste `scripts/ci/dunya-durumu-testleri.json`dur; her kaydın nedeni, kanıtı ve yeni yeri orada yazılıdır, karnede (§7) `dunyaDurumu` alanıyla görünür.
 Süre `scripts/ci/test-sureleri.json` yerel ölçümüdür (filo yükü altında; mutlak saniye değil).
@@ -126,6 +163,10 @@ yollar değişince koşar, diğer PR'larda zamanlı kolda koşar. Zamanlı kolun
   (`docs/roller/{ARAC,OPS,HARITA}.md` diskte olmalı; kart özeti kancanın okuduğu `scripts/belge/*.json` verisinden gelir, `docs/roller` dosyalarından değil), `CLAUDE.md` ise test haritasında okunan olarak yazılıdır
   (CI'da hiçbir kod okumaz; yerel makinede alt süreç `claude` komutu okur). `tools/wrongstack-mcp/` süzgeçte yoktur: posta sayacı UUID olmayan oturum kimliğiyle erken döner ve o dosyalara test yolunda hiç ulaşmaz.
   Test haritasının `.snap` girdileri (`src/__tests__/conformance/__snapshots__/...`) depoda YOKTUR ve iki test de görüntü karşılaştırması yapmaz; süzgece alınmadı (alınsa `dogrula` "yol yok" derdi).
+- Testin ULAŞMADIĞI yollar (bağımsız denetim D5; ölçümde okunmadı, süzgeçte YOK, değişirlerse PR `sessionstart-tavan`ı kapıda bulmaz): **(a)** `.claude/agents/<ajan>.md` `model:` satırı: `scripts/board/pencere-kimligi.cjs` pencere modeli uyarısı için cwd'den yukarı
+  bu dosyayı okuyabilir, ancak testin hermetik düzeneği bu okumayı tetiklemedi (yol değişkenle kurulur, statik tarama da görmez). **(b)** `tools/wrongstack-mcp/posta-kutusu.cjs`: `scripts/hijyen/posta-kutusu-sayac.cjs` kanonik kökü ondan alır
+  (`path.join(kok, 'tools', 'wrongstack-mcp', 'posta-kutusu.cjs')`, yine değişkenli yol); yalnız UUID oturum kimliğinde çalışır, test UUID olmayan kimlik verir. İki yolun içeriği testin sonucunu değiştirebilecek bir dala girilmediği için
+  süzgece alınmadı; bu bir ölçüm sınırıdır, kanıt değil: test bu dallara girecek biçimde genişletilirse süzgeç ve bu satır birlikte güncellenir.
 
 **Görünen yüz.** Zamanlı koşunun kırmızısı ya da sessizce ölmesi `DUNYA:` kanca satırında görünür (`.claude/hooks/dunya-durumu-satiri.cjs`,
 `defter-tazelik-satiri.cjs` çağırır): yolundayken susar, kırmızıda ve ölçüm bayatlayınca konuşur. Sorgu yalnız `master` dalının koşularına
@@ -301,7 +342,7 @@ koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir.
 | `INV-CI-SINIF-1` | `ci-degisiklik-sinifi.test.ts` | sınıf kararının iki iş akışına bağı: dar küme sınıflayıcıdan türer ve `tam` içermez; YALNIZ `Build (blocking)` ve Next.js önbelleği sınıfı okur (Test ve öteki kapılar okumaz); `admin-smoke` iş düzeyinde `if`/`needs` taşımaz; her ağır e2e adımı tam koşulu taşır; iki sınıf adımı birebir aynı ve tabandan çıkarılır |
 | `INV-CI-SINIF-2` | `ci-degisiklik-sinifi.test.ts` | "siteye dokunmayan" tanımının ölçümü: derleme girdisinin src/ ve public/ dışına giden her kenarı `tam`; dosya okuyan derleme girdisi yalnız bilinen iki dosya; package.json CI hattı betikleri ve e2e işinin betikleri `tam` |
 | `INV-CI-SINIF-3` | `ci-degisiklik-sinifi.test.ts` | sınıf adımının GERÇEK gövdesi gerçek git ve bash ile koşar: belge farkı `belge`, kod farkı `tam`; sınıflayıcı çökerse adım kırmızı olmaz `sinif=tam` yazar (yedek silinirse kırmızı: kontrol testi); taban kopyası yoksa `tam`. bash yoksa atlanır, CI'da (ubuntu) her zaman koşar |
-| `INV-TEST-KOSU-1` | `test-kosu-kapsami.test.ts`, `dunya-durumu.test.ts` | her test dosyası bir yerde koşar; listedeki her kaydın dosyası var, gerekçesi ve kanıtı dolu, yeni yeri `zamanli` içeriyor; `dislan` kümesi PR listesi ∩ taban listesi; yol süzgeci tabandan okunur, süzgeç yolları diskte var ve türü uyuşuyor, okunamayan değişen dosya testi dışlamaz, `yalniz` kipinde süzgeç yok (§3); koruyucu testler listeye giremez; `ci` işinin Test adımı `dislan` kipini yalnız `pull_request`te verir; zamanlı iş akışı `yalniz` kipinde ve `schedule` ile koşar |
+| `INV-TEST-KOSU-1` | `test-kosu-kapsami.test.ts`, `dunya-durumu.test.ts` | her test dosyası bir yerde koşar; listedeki her kaydın dosyası var, gerekçesi ve kanıtı dolu, yeni yeri `zamanli` içeriyor; `dislan` kümesi PR listesi ∩ taban listesi; yol süzgeci tabandan okunur, süzgeç yolları diskte var ve türü uyuşuyor, okunamayan (ve git'ten boş gelen) değişen dosya testi dışlamaz, `yalniz` kipinde süzgeç yok, kayıt şekli kapalı (bilinmeyen alan hata); iki süzgeçli kayıt ADIYLA süzgeç taşır ve bugünkü girdi dizinlerini kapsar, `session-board.cjs` grafı süzgeç içinde kalır, `dislan` yüklemesi tek `dışlanan/tutulan/değişen` özet satırı yazar (§3); koruyucu testler listeye giremez; `ci` işinin Test adımı `dislan` kipini yalnız `pull_request`te verir; zamanlı iş akışı `yalniz` kipinde ve `schedule` ile koşar |
 | `INV-CI-EDITED-1` | `ci-edited-ayna.test.ts` | aynanın `ci.yml`'ye bağlantısı: ağır adımlar atlama koşulu taşır, hep koşan adımlar (kayıt kapısı, taban izi) taşımaz, iz adımı adı ve sırası, ayna adımı kayıt kapısından sonra ve karar betiğini TABAN kopyasından koşturur, `edited` ayrı grupta, izinler en az, tam geçmiş |
 | `INV-CI-EDITED-2` | `edited-ayna.test.ts` | aynanın karar mantığı ve GitHub çağrısının biçimi: atla yalnız aynı head ve AYNI taban izli tam koşu `success` iken; taban değişti, mekanizmaya dokunuldu, merge-ref biçimi bozuk ya da iz yoksa TAM; çağrı bütçesi |
 | `INV-DUNYA-SATIRI-1` | `dunya-durumu-satiri.test.ts` | kanca satırı: yalnız `master` sorgusu, eşikler, ölçüm hatasında ve 404'te bilinen kırmızının korunması, çözülemeyen damganın susmaması, dış metnin satıra girmemesi, kancaya bağlantı |

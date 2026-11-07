@@ -11,12 +11,26 @@ import { defineConfig } from "vitest/config"
 // `VENTHUB_DUNYA_DURUMU` boşsa TAM paket (yerel `pnpm test`, master push); `dislan` ise listedekiler dışarıda
 // (yalnız pull_request olayında `ci` işi); `yalniz` ise yalnız onlar (zamanlı dunya-durumu.yml).
 // Geçersiz değer FIRLATIR — sessizce "tam"a düşen bir yazım hatası kapıyı gizlice kaldırırdı.
-const dunyaDurumu = (createRequire(import.meta.url)("./scripts/ci/dunya-durumu.cjs") as {
-  ayar: (env: NodeJS.ProcessEnv) => { exclude: string[]; include: string[] | null; uyari?: string }
-}).ayar(process.env)
+interface DunyaSonucu {
+  kip: string
+  exclude: string[]
+  include: string[] | null
+  uyari?: string
+  suzgeceTakilan?: string[]
+}
+// Yükleme BİLEREK parantezli ve takma adsız: `createRequire` değişkene bağlanırsa `INV-TEST-SEC-1` blok 7 (koşum kapanımı) çağrıyı izleyemez ve kırmızı verir.
+const dunyaModulu = (createRequire(import.meta.url)("./scripts/ci/dunya-durumu.cjs") as {
+  ayar: (env: NodeJS.ProcessEnv) => DunyaSonucu
+  ozetSatiri: (env: NodeJS.ProcessEnv, sonuc: DunyaSonucu) => string | null
+})
+const dunyaDurumu = dunyaModulu.ayar(process.env)
 // `dislan` yalnız TABANDA (base dalı) da yazılı kayıtları dışlar; taban okunamazsa hiçbir şey dışlanmaz (TAM paket koşar) ve neden burada
 // SESSİZ kalmaz: yazılmazsa "dışlama çalışıyor" sanılır ama her PR'da tam paket koşardı (ALT-38a B3).
 if (dunyaDurumu.uyari) process.stderr.write(`[dunya-durumu] ${dunyaDurumu.uyari}\n`)
+// ALT-38i (Ö4): `dislan`da tek özet satırı — dışlanan / süzgeçle kapıda kalan / değişen dosya sayısı. Dışlama sessiz bir karardır; günlükte sayılar görünmezse beklenmeyen bir
+// `değişen=0` ya da hep aynı `dışlanan` kimsenin gözüne çarpmaz. `tam` ve `yalniz` kiplerinde satır yazılmaz.
+const dunyaOzeti = dunyaModulu.ozetSatiri(process.env, dunyaDurumu)
+if (dunyaOzeti) process.stderr.write(`[dunya-durumu] ${dunyaOzeti}\n`)
 
 // ALT-38c-2: `VENTHUB_TEST_SHARD_DOSYALARI` (JSON liste dosyası) doluysa YALNIZ o listedeki test dosyaları koşar (ci.yml `test-shard` işleri; liste
 // scripts/ci/test-shard.cjs ile üretilir, parçaların birleşimi TÜM paketin listesidir: INV-CI-SHARD-2). Boşsa (yerel `pnpm test`, master push, edited,

@@ -33,6 +33,10 @@
  *   2. Değişen dosyalar okunamazsa (git yok, `HEAD^1` yok, dosya bozuk) süzgeçli test DIŞLANMAZ ve `uyari` döner (güvenli taraf: koşar).
  *   3. Tabandaki süzgeç geçersizse (dizi değil, boş, glob, kanonik olmayan yol) o test DIŞLANMAZ.
  *   Süzgeçsiz kayıt eskisi gibi her PR'da dışlanır. `yalniz` kipinde süzgeç YOKTUR: zamanlı koşu listenin tamamını koşar.
+ *   Kayıt şekli KAPALIDIR (`KAYIT_ALANLARI`): bilinmeyen alan `dogrula`da hata verir. NİÇİN: `yolFiltre` gibi bir yazım hatası alanı sessizce düşürürdü ve kayıt
+ *   süzgeçsiz sayılırdı (test her PR'da çıkar, koruma daralır, kimse kırmızı görmez). Süzgecin VARLIĞI (ve kapsamı) ayrıca test-kosu-kapsami.test.ts'te adıyla sabittir.
+ *   Değişen dosya listesi git'ten BOŞ gelirse okunamamış sayılır (null; ortam dosyasında boş dosya "değişiklik yok"tur): boş git çıktısı "değişiklik yok" ile "ölçülemedi"yi
+ *   ayırt ettirmez, ayırt edilemeyen durumda güvenli taraf süzgeçli testi PR kapısında tutmaktır (kararın gerekçesi `degisenYollariniOku` yorumunda).
  *
  * Kullanım (kütüphane): const { ayar } = require('./scripts/ci/dunya-durumu.cjs');
  * Kullanım (komut):     node scripts/ci/dunya-durumu.cjs [--kip dislan|yalniz|tam] [--json]
@@ -56,6 +60,12 @@ const DEGISEN_ORTAM = 'VENTHUB_DUNYA_DEGISEN_DOSYALAR';
 const DEGISEN_GIT_ARGUMANLARI = Object.freeze(['diff', '--name-only', '-z', '--no-renames', 'HEAD^1', 'HEAD']);
 const KIPLER = ['dislan', 'yalniz'];
 const YENI_YERLER = ['master-push', 'zamanli'];
+/**
+ * Liste kaydının İZİNLİ alanları (kapalı küme). `test`, `neden`, `kanit`, `yeniYer`, `yolFiltresi` kapıyı sürer; `kimlik` (kapı adı), `eskiYer` (testin eski yeri) ve
+ * `gorunenYuz` (kırmızı nerede görünür) insan okuruna ve karne üretecine yazılmış kayıt alanlarıdır, karar vermez. Bunların dışındaki ad bir yazım hatasıdır (`yolFiltre`)
+ * ve alanı sessizce düşürürdü: `dogrula` reddeder.
+ */
+const KAYIT_ALANLARI = Object.freeze(['test', 'kimlik', 'eskiYer', 'yeniYer', 'yolFiltresi', 'neden', 'kanit', 'gorunenYuz']);
 const TEST_DESENI = /\.(test|spec)\.(ts|tsx|js|cjs|mjs)$/;
 /**
  * Dışlama mekanizmasının KENDİ koruyucuları: bunlar PR kapısından ÇIKARILAMAZ (`dogrula` listede görürse hata verir).
@@ -156,6 +166,11 @@ function dogrula(liste, dosyaVarMi = varsayilanDosyaVarMi) {
       hatalar.push(`${ad}: test yolu bir test dosyası olmalı`);
       return;
     }
+    for (const alan of Object.keys(t)) {
+      if (!KAYIT_ALANLARI.includes(alan)) {
+        hatalar.push(`${ad}: bilinmeyen alan "${alan}" (izinli: ${KAYIT_ALANLARI.join(', ')}); yazım hatası alanı sessizce düşürür, süzgeç ya da gerekçe hiç okunmaz`);
+      }
+    }
     if (t.test.includes('*')) hatalar.push(`${ad}: glob YASAK (liste tek tek dosya yolu taşır, kapsam sessizce genişlemesin)`);
     if (!kanonikYolMu(t.test)) {
       hatalar.push(`${ad}: yol kanonik değil (köke göreli, "./" "//" "/./" ".." ve "\\" içermeyen yazım şart: vitest bu yazımları aynı dosyaya eşler, takma yazım DISLANAMAZ ve taban kesişimini atlatırdı)`);
@@ -223,6 +238,13 @@ function tabanListesiniOku(env = process.env, kok = KOK, execFn = childProcess.e
  *   (b) değilse `git diff --name-only -z --no-renames HEAD^1 HEAD` (birleştirme commit'inin ilk ebeveynine göre; kabuk YOK).
  * Her yol kanonik özüne indirilir. HER başarısızlık (git yok, `HEAD^1` yok, kesilmiş çıktı, okunamayan dosya, `..`/mutlak yol) FIRLATMAZ: null döner
  * ve çağıran süzgeçli testi DIŞLAMAZ. (a) doluyken okunamıyorsa (b)'ye DÜŞÜLMEZ.
+ *
+ * BOŞ ÇIKTI İKİ KAYNAKTA AYNI ŞEY DEĞİLDİR (ALT-38i, bağımsız denetim bulgusu D1):
+ *   (a) ortam dosyasını elle ya da bir test BİLEREK yazar: boş dosya "değişiklik yok"tur ([] döner), süzgeçli test çıkar.
+ *   (b) git çıktısı ÇIKARSANIR: `stdio`nun stderr'i yutulduğundan, başarısız ya da yarım kalmış bir `git diff` de boş çıktı bırakabilir; "PR hiçbir dosyaya dokunmadı" ile
+ *       "ölçülemedi" birbirinden ayrılamaz. Ayrılamayan durumda FAIL-CLOSED: null döner, süzgeçli test DIŞLANMAZ ve uyarı görünür.
+ *   Bedel: farkı gerçekten boş bir birleştirme commit'inde (PR base'e göre hiçbir şey eklemiyor) süzgeçli testler bir kez gereksiz koşar ve uyarı yazılır (en çok birkaç
+ *   dakika, PR'ı bloklamaz: test yeşildir). Karşı kefe: yanlış dışlamanın bedeli SESSİZ koruma kaybıdır ve kimse görmez.
  */
 function degisenYollariniOku(env = process.env, kok = KOK, execFn = childProcess.execFileSync) {
   try {
@@ -239,8 +261,10 @@ function degisenYollariniOku(env = process.env, kok = KOK, execFn = childProcess
           }),
     );
     let ham;
-    if (metin === '') ham = [];
-    else if (metin.includes('\0')) {
+    if (metin === '') {
+      if (!yol) return null; // git kolu: boş çıktı = ölçülemedi (yukarıdaki karar); ortam dosyası kolu: boş dosya = değişiklik yok
+      ham = [];
+    } else if (metin.includes('\0')) {
       if (!metin.endsWith('\0')) return null; // kesilmiş çıktı
       ham = metin.slice(0, -1).split('\0');
     } else if (yol) ham = metin.split('\n').map((s) => s.replace(/\r$/, '')).filter((s) => s !== '');
@@ -282,7 +306,13 @@ function tabanUyarisi(env) {
  *   secenek  test için enjeksiyon: `tabanOku` (parametresiz; ayrıştırılmış taban listesi ya da null döner), `dosyaVarMi` (dogrula'ya geçer),
  *            `degisenOku` (parametresiz; kanonik değişen yollar dizisi ya da null; yalnız süzgeçli kayıt varsa ve TAM BİR kez çağrılır).
  * Dönüş: { kip, exclude, include } (+ `uyari`: `dislan`da taban okunamadıysa (exclude boştur) ya da süzgeçli kayıt için değişen dosyalar okunamadıysa;
- *   + `suzgeceTakilan`: yalnız `dislan`da, süzgeci PR'ın dosyalarına uyduğu için PR kapısında KALAN taban kayıtları; boşsa anahtar hiç yazılmaz).
+ *   + `suzgeceTakilan`: yalnız `dislan`da, TABANDA süzgeç taşıyıp PR kapısında KALAN kayıtlar; boşsa anahtar hiç yazılmaz). Ad "süzgece uyan" demek DEĞİL, "süzgeç yüzünden
+ *   dışlanmayan" demektir; üç ayrı durumda dolar (hepsi güvenli taraftır, sebebi sonuçtan okunur):
+ *     1. süzgeç PR'ın değişen dosyalarından birine UYDU (testin girdisine dokunan PR korumasını kaybetmez; `uyari` yok),
+ *     2. tabandaki süzgeç GEÇERSİZ (dizi değil, boş, glob, kanonik olmayan yol): doğrulanamayan süzgeçle dışlama yapılmaz (`uyari` yok),
+ *     3. değişen dosyalar OKUNAMADI (git yok, `HEAD^1` yok, boş ya da kesik git çıktısı, okunamayan ortam dosyası): `uyari` DOLU gelir.
+ *   Yani `suzgeceTakilan` dolu ve `uyari` boşsa neden 1 ya da 2'dir (ikisini birbirinden ayıran tek şey tabandaki süzgecin kendisidir); `uyari` doluysa en az bir kayıt
+ *   neden 3 ile tutulmuştur (diğerleri 1 ya da 2 olabilir).
  */
 function ayar(env = process.env, liste, secenek = {}) {
   const kip = env[ORTAM_ADI] || '';
@@ -346,6 +376,28 @@ function ayar(env = process.env, liste, secenek = {}) {
   return sonuc;
 }
 
+/**
+ * `dislan` kipinde CI günlüğüne yazılan TEK özet satırının gövdesi (çağıran `[dunya-durumu] ` önekini koyar): `dışlanan=N tutulan=M değişen=K`.
+ *   N  PR kapısından ÇIKAN test sayısı (`exclude`),
+ *   M  süzgeç yüzünden kapıda KALAN test sayısı (`suzgeceTakilan`; yukarıdaki üç durum),
+ *   K  PR'ın değişen dosya sayısı; okunamadıysa "?" (karar bu listeye bakar, okunamıyorsa görünür olsun).
+ * NİÇİN: dışlama SESSİZ bir karardır. Günlükte "kaç test çıktı, kaçı süzgeçle kaldı, karar kaç dosyaya baktı" yazmazsa beklenmeyen bir `değişen=0` ya da hep aynı
+ * `dışlanan` sayısı kimsenin gözüne çarpmaz (ALT-38i, bağımsız denetim bulgusu Ö4). Yalnız `dislan`da üretilir; `tam` ve `yalniz` için null döner.
+ * K ayrı bir okumadır (`ayar` değişen dosyaları yalnız süzgeçli kayıt varsa sorar; satır her `dislan` koşusunda dolu olsun). `degisenOku` test için enjekte edilir.
+ */
+function ozetSatiri(env, sonuc, degisenOku = () => degisenYollariniOku(env)) {
+  if (!sonuc || sonuc.kip !== 'dislan') return null;
+  let degisen = '?';
+  try {
+    const d = degisenOku();
+    if (Array.isArray(d)) degisen = String(d.length);
+  } catch {
+    // okunamadı: "?" kalır (özet satırı hiçbir koşulda yapılandırma yüklemesini düşürmez)
+  }
+  const tutulan = Array.isArray(sonuc.suzgeceTakilan) ? sonuc.suzgeceTakilan.length : 0;
+  return `dışlanan=${sonuc.exclude.length} tutulan=${tutulan} değişen=${degisen}`;
+}
+
 module.exports = {
   KOK,
   LISTE_YOLU,
@@ -354,6 +406,7 @@ module.exports = {
   DEGISEN_ORTAM,
   KIPLER,
   YENI_YERLER,
+  KAYIT_ALANLARI,
   TEST_DESENI,
   DISLANAMAZ,
   ayar,
@@ -362,6 +415,7 @@ module.exports = {
   tabanListesiniOku,
   degisenYollariniOku,
   filtreEslesirMi,
+  ozetSatiri,
 };
 
 /** Komut satırı. Çıkış kodunu DÖNER; `process.exit` yerine `process.exitCode` kullanılır ki stderr yazımı yarıda kesilmesin. */

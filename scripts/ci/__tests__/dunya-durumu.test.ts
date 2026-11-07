@@ -29,6 +29,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  *   9. YOL SÜZGECİ (ALT-38i): süzgeçli kayıt PR kapısından YALNIZ PR'ın değişen dosyalarından hiçbiri süzgece uymuyorsa çıkar. Süzgeç TABANDAN okunur
  *      (PR kendi kaydıyla genişletemez), değişen dosyalar ya da tabandaki süzgeç okunamazsa test DIŞLANMAZ, `yalniz` kipinde süzgeç YOK, dizin öneki sınırı
  *      (`a/b/` → `a/bc` uymaz), `git diff` argümanları ve hata yolları literal sınanır; SABOTAJ kolları süzgeç mantığını kaynakta bozup testin kırmızı verdiğini ölçer.
+ *  10. KAPALI KAYIT ŞEKLİ (bağımsız denetim Ö1b): `KAYIT_ALANLARI` literal sabittir, bilinmeyen alan (`yolFiltre` gibi yazım hatası) `dogrula`da hata verir;
+ *      git'ten BOŞ gelen değişen dosya listesi okunamamış sayılır (D1, fail-closed) ama ortam dosyasında boş dosya "değişiklik yok"tur;
+ *      `ozetSatiri` (Ö4) yalnız `dislan`da `dışlanan=N tutulan=M değişen=K` üretir.
  * Dış dünya HER ZAMAN sahtedir: `fs.readFileSync` ve `child_process.execFileSync` atamayla sahtelenir, test bitince geri konur (gerçek
  * `git` hiç çalışmaz). Gerçek vitest.config.ts yüklemesi (üç kip + boş taban + okunamayan taban) src/__tests__/conformance/test-kosu-kapsami.test.ts
  * içinde ölçülür.
@@ -73,6 +76,7 @@ interface Modul {
   DEGISEN_ORTAM: string
   KIPLER: string[]
   YENI_YERLER: string[]
+  KAYIT_ALANLARI: readonly string[]
   TEST_DESENI: RegExp
   DISLANAMAZ: readonly string[]
   ayar: (env?: Env, liste?: unknown, secenek?: Secenek) => Ayar
@@ -81,6 +85,7 @@ interface Modul {
   tabanListesiniOku: (env?: Env, kok?: string, execFn?: ExecFn) => Liste | null
   degisenYollariniOku: (env?: Env, kok?: string, execFn?: ExecFn) => string[] | null
   filtreEslesirMi: (filtre: readonly string[], yol: string) => boolean
+  ozetSatiri: (env: Env, sonuc: unknown, degisenOku?: () => unknown) => string | null
 }
 const D = require_(MODUL_YOLU) as Modul
 /** Sahteleme yüzeyleri: modül bu işlevleri çağrı ANINDA nesneden okur, o yüzden atama yeter (edited-ayna.test.ts ile aynı desen). */
@@ -214,11 +219,12 @@ function sahteExec(donus: () => unknown) {
 }
 
 describe('sözleşme yüzeyi — dışa açılan adlar ve sabitler literal sınanır', () => {
-  it('dışa açılan ad kümesi TAM: mevcut dokuz ad korunur, yenileri DISLANAMAZ + TABAN_LISTE_ORTAM + tabanListesiniOku + (ALT-38i) DEGISEN_ORTAM + degisenYollariniOku + filtreEslesirMi', () => {
+  it('dışa açılan ad kümesi TAM: mevcut dokuz ad korunur, yenileri DISLANAMAZ + TABAN_LISTE_ORTAM + tabanListesiniOku + (ALT-38i) DEGISEN_ORTAM + degisenYollariniOku + filtreEslesirMi + KAYIT_ALANLARI + ozetSatiri', () => {
     expect(Object.keys(D).sort()).toEqual(
       [
         'DEGISEN_ORTAM',
         'DISLANAMAZ',
+        'KAYIT_ALANLARI',
         'KIPLER',
         'KOK',
         'LISTE_YOLU',
@@ -231,6 +237,7 @@ describe('sözleşme yüzeyi — dışa açılan adlar ve sabitler literal sına
         'dogrula',
         'filtreEslesirMi',
         'listeyiOku',
+        'ozetSatiri',
         'tabanListesiniOku',
       ].sort(),
     )
@@ -244,6 +251,12 @@ describe('sözleşme yüzeyi — dışa açılan adlar ve sabitler literal sına
     expect(D.KIPLER).toEqual(['dislan', 'yalniz'])
     // `git show` bu dizinde koşar ve `dosyaVarMi` bu köke göre bakar: kök kayarsa taban sessizce başka yerden okunurdu
     expect(path.resolve(D.KOK)).toBe(KOK)
+  })
+
+  it('KAYIT_ALANLARI literal ve dondurulmuş: kapıyı süren beş alan + insan/karne alanları (kimlik, eskiYer, gorunenYuz); GERÇEK listedeki her alan bu kümede', () => {
+    expect([...D.KAYIT_ALANLARI]).toEqual(['test', 'kimlik', 'eskiYer', 'yeniYer', 'yolFiltresi', 'neden', 'kanit', 'gorunenYuz'])
+    expect(Object.isFrozen(D.KAYIT_ALANLARI)).toBe(true)
+    for (const t of D.listeyiOku().testler) for (const alan of Object.keys(t)) expect(D.KAYIT_ALANLARI, `${t.test}: ${alan}`).toContain(alan)
   })
 
   it('gerçek liste (diskteki) hata vermez: DISLANAMAZ, kanonik yol ve yolFiltresi kuralları bugünkü kayıtları reddetmez', () => {
@@ -825,6 +838,55 @@ describe('YOL SÜZGECİ — dogrula: yolFiltresi şekli, glob, kanonik yazım, t
   })
 })
 
+describe('KAPALI KAYIT ŞEKLİ — bilinmeyen alan (yazım hatası) dogrula\'da hata verir (bağımsız denetim Ö1b)', () => {
+  const ON = `testler[0] (${A}): `
+  const IZINLI = 'test, kimlik, eskiYer, yeniYer, yolFiltresi, neden, kanit, gorunenYuz'
+  const mesaj = (alan: string) => `${ON}bilinmeyen alan "${alan}" (izinli: ${IZINLI}); yazım hatası alanı sessizce düşürür, süzgeç ya da gerekçe hiç okunmaz`
+  const dogrulaKayit = (k: object) => D.dogrula({ surum: 1, testler: [k] }, VAR)
+
+  it.each(['yolFiltre', 'yolfiltresi', 'yolFiltresi ', 'yol_filtresi', 'filtre', 'Test', 'yeniyer', 'yeniYerr', 'kanıt', 'neden2', 'ekstra'])(
+    'bilinmeyen alan %j reddedilir: tam BİR hata, mesaj birebir',
+    (alan) => {
+      expect(dogrulaKayit({ ...kayit(A), [alan]: ['x/'] })).toEqual([mesaj(alan)])
+    },
+  )
+
+  it('yolFiltresi yerine yolFiltre yazılırsa kayıt "süzgeçsiz" görünürdü: şimdi hata verir (alan sessizce düşmez)', () => {
+    const yazimHatali = { ...kayit(A), yolFiltre: ['x/'] }
+    expect('yolFiltresi' in yazimHatali).toBe(false)
+    expect(dogrulaKayit(yazimHatali)).toEqual([mesaj('yolFiltre')])
+  })
+
+  it('izinli her alan kabul edilir: kimlik, eskiYer ve gorunenYuz karar vermez ama yazılabilir', () => {
+    const tam = { ...kayit(A), kimlik: 'INV-X-1', eskiYer: 'pull_request', gorunenYuz: 'kanca satırı', yolFiltresi: ['x/'] }
+    expect(dogrulaKayit(tam)).toEqual([])
+    expect(Object.keys(tam).sort()).toEqual([...D.KAYIT_ALANLARI].sort())
+  })
+
+  it('iki bilinmeyen alan iki hata verir (sıra: kayıttaki alan sırası); başka kuraldan gelen hatalarla birlikte raporlanır', () => {
+    const k = { ...kayit(A), yolFiltre: ['x/'], ekstra: 1 }
+    expect(dogrulaKayit(k)).toEqual([mesaj('yolFiltre'), mesaj('ekstra')])
+    expect(dogrulaKayit({ ...k, neden: 'kısa' })).toEqual([mesaj('yolFiltre'), mesaj('ekstra'), `${ON}neden en az 20 karakterlik gerekçe taşımalı`])
+  })
+
+  it('test yolu bozuk kayıtta alan denetimine inilmez (kayıt zaten tek hatayla reddedilir)', () => {
+    expect(D.dogrula({ surum: 1, testler: [{ test: 'a.txt', yolFiltre: ['x/'] }] }, VAR)).toEqual(['testler[0] (a.txt): test yolu bir test dosyası olmalı'])
+  })
+
+  it.each(['dislan', 'yalniz'])('%s: PR listesinde bilinmeyen alan FIRLATIR (vitest başlamaz); taban ve değişen dosyalar hiç sorulmaz', (kip) => {
+    const tabanOku = vi.fn(() => taban(A))
+    const degisenOku = vi.fn(() => ['x'])
+    const pr = { surum: 1, testler: [{ ...kayit(A), yolFiltre: ['x/'] }] }
+    expect(() => D.ayar({ [KIP]: kip }, pr, { tabanOku, degisenOku, dosyaVarMi: VAR })).toThrow(`${LISTE_YOLU} GEÇERSİZ (1 hata): ${mesaj('yolFiltre')}`)
+    expect(tabanOku).not.toHaveBeenCalled()
+    expect(degisenOku).not.toHaveBeenCalled()
+  })
+
+  it('tam kip: liste HİÇ okunmaz, bilinmeyen alan orada da fırlatmaz (kapı hiçbir şeyi dışlamaz)', () => {
+    expect(D.ayar({}, { surum: 1, testler: [{ ...kayit(A), yolFiltre: ['x/'] }] })).toStrictEqual({ kip: 'tam', exclude: [], include: null })
+  })
+})
+
 describe('filtreEslesirMi — dizin öneki sınırı, tam eşitlik, takma yazımlar', () => {
   it.each<[string, string[], string, boolean]>([
     ['dizin öneki: altındaki dosya', ['a/b/'], 'a/b/c.ts', true],
@@ -1067,9 +1129,22 @@ describe('YOL SÜZGECİ — dislan: süzgece uyan PR testi kapıda KALIR, uymaya
       }
     })
 
-    it('git BOŞ çıktı verirse (PR\'ın değişen dosyası yok) okunabilmiştir: süzgeçli test çıkar, uyarı yok', () => {
-      gitTakmasi(() => '')
-      expect(dis()).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+    it('git BOŞ çıktı verirse (D1, fail-closed) OKUNAMAMIŞ sayılır: "değişiklik yok" ile "ölçülemedi" ayırt edilemez, süzgeçli test DIŞLANMAZ + uyarı', () => {
+      const git = gitTakmasi(() => '')
+      expect(dis()).toStrictEqual({
+        kip: 'dislan',
+        exclude: [B],
+        include: null,
+        suzgeceTakilan: [A],
+        uyari: expect.stringContaining('git diff HEAD^1 HEAD'),
+      })
+      expect(git.cagrilar).toHaveLength(1)
+    })
+
+    it('ortam dosyası BOŞ ise (D1\'in karşı kolu) "değişiklik yok"tur: elle verilen girdi bilerek boştur, süzgeçli test çıkar, uyarı yok', () => {
+      const git = gitTakmasi(patlayan('git'))
+      expect(dis({ [DEGISEN_ENV]: dosyaYaz('bos-degisen.txt', '') })).toStrictEqual({ kip: 'dislan', exclude: [A, B], include: null })
+      expect(git.cagrilar).toEqual([])
     })
 
     it('ortam değişkeni DOLUYSA değişen dosyalar o dosyadır; git ÇAĞRILMAZ', () => {
@@ -1124,7 +1199,7 @@ describe('degisenYollariniOku — kaynak seçimi, ayrıştırma, her başarısı
   it.each<[string, string, string[] | null]>([
     ['tek yol', 'a.ts\0', ['a.ts']],
     ['iki yol', 'a.ts\0b/c.ts\0', ['a.ts', 'b/c.ts']],
-    ['boş çıktı = değişiklik yok', '', []],
+    ['BOŞ çıktı = ölçülemedi (D1, fail-closed: "değişiklik yok" ile ayırt edilemez)', '', null],
     ['yeni satır içeren ad NUL kipinde BÖLÜNMEZ', 'a\nb.ts\0', ['a\nb.ts']],
     ['boşluk içeren ad', 'a b/c d.ts\0', ['a b/c d.ts']],
     ['takma yazım özüne iner', './a//b.ts\0', ['a/b.ts']],
@@ -1222,6 +1297,71 @@ describe('degisenYollariniOku — kaynak seçimi, ayrıştırma, her başarısı
   })
 })
 
+describe('ozetSatiri — `dislan` günlük satırı: dışlanan / tutulan / değişen (bağımsız denetim Ö4)', () => {
+  const sonuc = (exclude: string[], suzgeceTakilan?: string[]): Ayar => ({ kip: 'dislan', exclude, include: null, ...(suzgeceTakilan ? { suzgeceTakilan } : {}) })
+
+  it.each<[string, Ayar, unknown, string]>([
+    ['üç dışlanan, tutulan yok, 17 değişen', sonuc([A, B, C]), Array.from({ length: 17 }, (_x, i) => `d/${i}.ts`), 'dışlanan=3 tutulan=0 değişen=17'],
+    ['bir dışlanan, iki tutulan, beş değişen', sonuc([B], [A, C]), ['a', 'b', 'c', 'd', 'e'], 'dışlanan=1 tutulan=2 değişen=5'],
+    ['hiçbir şey dışlanmadı (taban okunamadı), değişen sayısı yine görünür', sonuc([]), ['a'], 'dışlanan=0 tutulan=0 değişen=1'],
+    ['değişen dosya yok ([]): 0 yazılır, "?" değil', sonuc([A, B]), [], 'dışlanan=2 tutulan=0 değişen=0'],
+    ['okuyucu null döndü', sonuc([A], [B]), null, 'dışlanan=1 tutulan=1 değişen=?'],
+    ['okuyucu undefined döndü', sonuc([A]), undefined, 'dışlanan=1 tutulan=0 değişen=?'],
+    ['okuyucu dizi olmayan değer döndü', sonuc([A]), 'x/a.ts', 'dışlanan=1 tutulan=0 değişen=?'],
+  ])('%s', (_ad, s, degisen, beklenen) => {
+    const degisenOku = vi.fn(() => degisen)
+    expect(D.ozetSatiri({}, s, degisenOku)).toBe(beklenen)
+    expect(degisenOku).toHaveBeenCalledTimes(1)
+  })
+
+  it('okuyucu FIRLATIRSA satır yine üretilir ("?"): özet satırı yapılandırma yüklemesini düşürmez', () => {
+    expect(D.ozetSatiri({}, sonuc([A, B], [C]), patlayan('degisenOku'))).toBe('dışlanan=2 tutulan=1 değişen=?')
+  })
+
+  it.each([
+    ['tam', { kip: 'tam', exclude: [], include: null }],
+    ['yalniz', { kip: 'yalniz', exclude: [], include: [A, B] }],
+    ['sonuç null', null],
+    ['sonuç undefined', undefined],
+  ])('%s: satır YOK (null) ve değişen dosyalar sorulmaz', (_ad, s) => {
+    const degisenOku = vi.fn(() => ['x'])
+    expect(D.ozetSatiri({}, s, degisenOku)).toBeNull()
+    expect(degisenOku).not.toHaveBeenCalled()
+  })
+
+  it('satır tek satırdır ve satır sonu içermez (günlükte iş akışı komutu enjekte edilemez)', () => {
+    const s = D.ozetSatiri({}, sonuc([A], [B]), () => ['a\n::error::sahte'])
+    expect(s).toBe('dışlanan=1 tutulan=1 değişen=1')
+    expect(s).not.toMatch(/[\r\n]/)
+  })
+
+  it('varsayılan okuyucu: ortam dosyası doluysa o dosya sayılır (git ÇAĞRILMAZ); satırın sayısı ayar() ile aynı kaynaktan gelir', () => {
+    const git = gitTakmasi(patlayan('git'))
+    const dosya = dosyaYaz('ozet-degisen.txt', 'x/a.ts\0y/b.ts\0z/c.ts\0')
+    expect(D.ozetSatiri({ [DEGISEN_ENV]: dosya }, sonuc([A]))).toBe('dışlanan=1 tutulan=0 değişen=3')
+    expect(git.cagrilar).toEqual([])
+  })
+
+  it('varsayılan okuyucu: ortam boşsa `git diff HEAD^1 HEAD` TAM BİR kez, literal argümanlarla çağrılır', () => {
+    const git = gitTakmasi(() => 'a.ts\0b.ts\0')
+    expect(D.ozetSatiri({}, sonuc([A]))).toBe('dışlanan=1 tutulan=0 değişen=2')
+    expect(git.cagrilar).toStrictEqual([['git', GIT_DEGISEN_ARGS, gitDegisenSecenek(D.KOK)]])
+  })
+
+  it('varsayılan okuyucu: okunamayan kaynak (dosya yok, boş git çıktısı, git fırlatır) "?" yazar ve FIRLATMAZ', () => {
+    gitTakmasi(patlayan('git'))
+    expect(D.ozetSatiri({ [DEGISEN_ENV]: path.join(dizin, 'yok.txt') }, sonuc([A]))).toBe('dışlanan=1 tutulan=0 değişen=?')
+    expect(D.ozetSatiri({}, sonuc([A]))).toBe('dışlanan=1 tutulan=0 değişen=?')
+    gitTakmasi(() => '')
+    expect(D.ozetSatiri({}, sonuc([A]))).toBe('dışlanan=1 tutulan=0 değişen=?')
+  })
+
+  it('ayar() sonucunun GERÇEK biçimiyle çalışır: süzgeçle kalan test M\'ye, dışlananlar N\'ye yansır', () => {
+    const a = D.ayar({ [KIP]: 'dislan' }, liste(A, B), { tabanOku: () => suzgecliTaban([A, ['x/']], [B]), dosyaVarMi: VAR, degisenOku: () => ['x/a.ts', 'q'] })
+    expect(D.ozetSatiri({}, a, () => ['x/a.ts', 'q'])).toBe('dışlanan=1 tutulan=1 değişen=2')
+  })
+})
+
 // ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // SABOTAJ (ALT-38i): süzgeç mantığı KAYNAKTA bozulur ve yukarıdaki sözleşmenin kırmızı verdiği ölçülür. Her kol bir mutasyondur: modülün kaynağı
 // `eski` → `yeni` değişimiyle geçici bir depoya yazılır ve YÜKLENİR; senaryo gerçek modülde beklenen sonucu verir, bozuk modülde VERMEZ. `eski` kaynakta
@@ -1259,6 +1399,14 @@ describe('SABOTAJ — süzgeç mantığı bozulunca sözleşme KIRMIZI verir', (
     'süzgeç yolunun TÜRÜ denetlenir (dizin `/`sız yazılamaz)': {
       calistir: (m) => m.dogrula({ surum: 1, testler: [suzgecli(A, ['d'])] }, (yol, dizinMi) => dizinMi === undefined || (dizinMi ? yol === 'd' : yol === 'f')),
       beklenen: [expect.stringContaining('türü uyuşmuyor')],
+    },
+    'bilinmeyen alan (yazım hatası) reddedilir': {
+      calistir: (m) => m.dogrula({ surum: 1, testler: [{ ...kayit(A), yolFiltre: ['x/'] }] }, VAR),
+      beklenen: [expect.stringContaining('bilinmeyen alan "yolFiltre"')],
+    },
+    'git BOŞ çıktı okunamamış sayılır (fail-closed)': {
+      calistir: (m) => m.degisenYollariniOku({}, KOK_SAHTE, () => ''),
+      beklenen: null,
     },
   }
 
@@ -1300,6 +1448,8 @@ describe('SABOTAJ — süzgeç mantığı bozulunca sözleşme KIRMIZI verir', (
     ],
     ['HEPSİ uymalı (biri yetmez)', 'd.some((yol) => filtreEslesirMi(k.yolFiltresi, yol))', 'd.every((yol) => filtreEslesirMi(k.yolFiltresi, yol))', 'BİRİ uyarsa yeter'],
     ['tür denetimini kaldır', "dosyaVarMi(govde, g.endsWith('/'))", 'dosyaVarMi(govde)', 'süzgeç yolunun TÜRÜ denetlenir (dizin `/`sız yazılamaz)'],
+    ['bilinmeyen alanı kabul et (kayıt şekli açık)', 'if (!KAYIT_ALANLARI.includes(alan)) {', 'if (false) {', 'bilinmeyen alan (yazım hatası) reddedilir'],
+    ['git boş çıktısını "değişiklik yok" say (fail-open)', 'if (!yol) return null; // git kolu: boş çıktı', '// git kolu: boş çıktı', 'git BOŞ çıktı okunamamış sayılır (fail-closed)'],
   ])('KIRMIZI: %s', (ad, eski, yeni, senaryoAdi) => {
     const bozuk = bozukModul(eski, yeni, ad.replace(/[^a-z0-9]+/gi, '-'))
     expect(gozle(bozuk, SENARYO[senaryoAdi]), `sabotaj "${ad}" senaryo "${senaryoAdi}" tarafından YAKALANMADI`).not.toEqual(SENARYO[senaryoAdi].beklenen)

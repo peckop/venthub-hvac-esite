@@ -1,10 +1,10 @@
 import { execFile, execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * INV-TEST-KOSU-1 · HER TEST DOSYASI EN AZ BİR YERDE KOŞAR; PR kapısından çıkan her test yeni yerinde GERÇEKTEN koşar (ALT-38).
@@ -21,13 +21,20 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  *      girer: `dislan` hiçbir şeyi dışlamaz, `yalniz` herkesi koşturur, bir test hiçbir yerde koşmaz. `ayar()`'ı doğrudan çağırmak bu bağı
  *      ÖLÇMEZ; çare: config GERÇEKTEN yüklenir (`vitest list --filesOnly`, üç kip) ve çıkan dosya kümesi tam eşitlikle sınanır,
  *   6. dunya-durumu.yml'de test kırmızısı yutulur (`|| true`, continue-on-error), kabuk (pipefail) düşer ya da cron seyrekleşir:
- *      "en geç 6 saatte görünür" güvencesi kopar. Çare: adım ve iş başlığı satır düzeyinde TAM EŞİTLİK; cron ayrıştırılıp en geniş aralık ölçülür,
+ *      zamanlı koşunun NOMİNAL 6 saatlik ritmi kopar (GERÇEK aralık GitHub gecikmesiyle bunun üstündedir: 100 koşuda medyan 7,2 sa, en uzun 15,3 sa; cetvel §3).
+ *      Çare: adım ve iş başlığı satır düzeyinde TAM EŞİTLİK; cron ayrıştırılıp en geniş aralık ölçülür,
  *   7. ci.yml Test adımı master push'ta atlanır (`if:` koşulu), `push:` tetikleyicisi daralır ya da kabuk (pipefail) düşer. Çare: aynı tam eşitlik,
  *   8. `ayar('tam')` geçersiz sayılır (açık `tam` kipi: yerel kullanım, komut satırı),
  *   9. package.json `scripts.test` dosya/dizin/proje süzgeci kazanır: üç koşu yerinin ortak girişi sessizce daralır,
  *  10. `dislan` kipi TABAN listesini (base dalının listesi) kesişime sokmaz ya da taban okunamayınca sessiz kalır (ALT-38a B3): bir PR kendi
  *      listesiyle kapıdan çıkabilir ya da taban hiç okunamadığı hâlde "dışlama çalışıyor" sanılır. Çare: gerçek config boş ve okunamayan tabanla
  *      yüklenir; boş tabanda HİÇBİR test dışlanmaz, okunamayan tabanda tam küme koşar ve stderr'e TEK uyarı yazılır.
+ *  11. (ALT-38i, bağımsız denetim Ö1b) yol süzgeci SABİT değildir: iki süzgeçli kayıttan birinin `yolFiltresi` alanı (ya da yazım hatasıyla `yolFiltre`) düşer ya da süzgeç
+ *      daralırsa test sessizce her PR'da çıkar, girdisine dokunan PR korumasını kaybeder. Çare: iki kayıt ADIYLA süzgeç taşımak zorunda, `sessionstart-tavan` süzgeci
+ *      bugünkü girdi dizinlerinden daha dar olamaz ve dünya durumu dışlaması gerçek config yolunda ayrıca `dışlanan=N tutulan=M değişen=K` özet satırını stderr'e yazar (Ö4).
+ *  12. (ALT-38i, Ö1a) tamlık sürüklenmesi: `.claude/hooks/session-board.cjs`ten başlayan literal `require`/`path.join(__dirname, ...)` grafına YENİ bir dosya girer ama süzgece
+ *      eklenmezse, o dosyaya dokunan PR `sessionstart-tavan`ı kapıda bulamaz. Çare: graf statik taranır, süzgeç dışında kalan HER repo-içi dosya kırmızıdır. Tarama bir yoklamadır,
+ *      kanıt değil: literal olmayan yollar (`path.join(KOK, ...)`, şablon dizeleri) ona görünmez; onların tam ölçümü çalışma zamanı izlemesiyle yapılır (cetvel §3 "Süzgeç girdi ölçümü").
  * "Dışarıda" olan her test dosyası aşağıdaki VITEST_DISI tablosunda gerekçesiyle ve KOŞTUĞU YERLE yazılıdır.
  *
  * Ölçüm yüzeyi: `git ls-files` + `node:fs` + satır taraması + alt süreçte `vitest list --filesOnly` (ağ yok, test KOŞMAZ, dosyaları
@@ -70,7 +77,8 @@ const degisenGercek = () => ({ [DEGISEN_ORTAM]: degisenIlgisiz })
 const D = require_(path.join(KOK, 'scripts/ci/dunya-durumu.cjs')) as {
   ayar: (env: Record<string, string | undefined>, liste: Liste) => { kip: string; exclude: string[]; include: string[] | null; uyari?: string; suzgeceTakilan?: string[] }
   dogrula: (liste: Liste, dosyaVarMi?: (yol: string, dizinMi?: boolean) => boolean) => string[]
-  listeyiOku: () => Liste
+  listeyiOku: (kok?: string) => Liste
+  filtreEslesirMi: (filtre: readonly string[], yol: string) => boolean
   TEST_DESENI: RegExp
 }
 interface Kayit {
@@ -376,7 +384,7 @@ function cronHatalari(dunyaYml: string): string[] {
     } else {
       const aralik = cronEnGenisAralikDk(cronlar)
       if (!(aralik <= ZAMANLI_EN_FAZLA_ARALIK_DK)) {
-        ihlal.push(`dunya-durumu.yml cron en geniş aralığı ${aralik} dk (${cronlar.join(' | ')}): en çok ${ZAMANLI_EN_FAZLA_ARALIK_DK} dk (6 saat) olmalı, yoksa "bir master koşusu iptal olsa da en geç 6 saatte görünür" güvencesi kopar`)
+        ihlal.push(`dunya-durumu.yml cron en geniş aralığı ${aralik} dk (${cronlar.join(' | ')}): en çok ${ZAMANLI_EN_FAZLA_ARALIK_DK} dk (6 saat) olmalı, yoksa zamanlı koşunun nominal ritmi kopar (gerçek aralık GitHub gecikmesiyle bunun da üstündedir; ölçüm: test-karnesi-standard.md §3)`)
       }
     }
     return ihlal
@@ -484,6 +492,15 @@ function vitestListesi(kip: Kip, taban: string | null = LISTE_MUTLAK, deneme = 1
 }
 
 const vitestDosyalari = (kip: Kip): Promise<string[]> => vitestListesi(kip).then((r) => r.dosyalar)
+
+/**
+ * `vitest.config.ts`in stderr'indeki `[dunya-durumu] ...` satırları iki türdür: UYARI (taban/değişen dosyalar okunamadı) ve `dislan`da yazılan tek ÖZET satırı
+ * `dışlanan=N tutulan=M değişen=K` (ALT-38i Ö4). Uyarı sayan testler özeti SAYMAZ, özeti arayan testler uyarıyı: iki tür birbirini maskelemesin diye ayrı süzülür.
+ */
+const OZET_DESENI = /^\[dunya-durumu\] dışlanan=\d+ tutulan=\d+ değişen=(?:\d+|\?)$/
+const dunyaSatirlari = (stderr: string): string[] => stderr.split(/\r?\n/).filter((s) => s.startsWith('[dunya-durumu] '))
+const uyariSatirlari = (stderr: string): string[] => dunyaSatirlari(stderr).filter((s) => !OZET_DESENI.test(s))
+const ozetSatirlari = (stderr: string): string[] => dunyaSatirlari(stderr).filter((s) => OZET_DESENI.test(s))
 
 /** TAM (boş) kip: izlenen hiçbir test dosyası düşmemeli, tablodaki dışlamalar GERÇEKTEN dışarıda, listedeki her yol listelenmeli. */
 function bosKipIhlalleri(bos: readonly string[], tum: readonly string[], yollar: readonly string[]): string[] {
@@ -661,7 +678,10 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     expect(beklenenDisarida.length, 'bu girdide hiçbir test dışarıda kalmıyor: kol dışlamayı ölçmüyor').toBeGreaterThan(0)
     expect(dislan.dosyalar).toEqual(sirali(bos.filter((d) => !beklenenDisarida.includes(d))))
     for (const t of tutulan) expect(dislan.dosyalar, `${t} süzgece uydu ama PR kapısında KOŞMUYOR`).toContain(t)
-    expect(dislan.stderr, 'okunabilen değişen dosyalar uyarı üretmemeli').not.toContain('[dunya-durumu]')
+    expect(uyariSatirlari(dislan.stderr), 'okunabilen değişen dosyalar uyarı üretmemeli').toEqual([])
+    expect(ozetSatirlari(dislan.stderr), `özet satırı TEK ve sayılar kümeyle tutarlı olmalı; stderr: ${dislan.stderr}`).toEqual([
+      `[dunya-durumu] dışlanan=${beklenenDisarida.length} tutulan=${tutulan.length} değişen=1`,
+    ])
   }, 90_000)
 
   it("GERÇEK config dislan + OKUNAMAYAN değişen dosya listesi: süzgeçli testler dışlanmaz (güvenli taraf), süzgeçsizler yine dışarıda, stderr'e TEK uyarı yazılır", async () => {
@@ -672,10 +692,20 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     expect(suzgecli.length, 'gerçek listede süzgeçli kayıt yok: kol hiçbir şey ölçmüyor').toBeGreaterThan(0)
     const beklenenDisarida = yollar.filter((y) => !suzgecli.includes(y))
     expect(dislan.dosyalar).toEqual(sirali(bos.filter((d) => !beklenenDisarida.includes(d))))
-    const uyarilar = dislan.stderr.split(/\r?\n/).filter((s) => s.startsWith('[dunya-durumu] '))
+    const uyarilar = uyariSatirlari(dislan.stderr)
     expect(uyarilar, `stderr: ${dislan.stderr}`).toHaveLength(1)
     expect(uyarilar[0]).toContain('değişen dosyalar okunamadı')
     expect(uyarilar[0]).toContain(DEGISEN_ORTAM)
+    // Özet satırı okunamayan değişen dosyayı "?" ile söyler ve süzgeçli testlerin hepsi "tutulan"dır (güvenli taraf).
+    expect(ozetSatirlari(dislan.stderr), `stderr: ${dislan.stderr}`).toEqual([`[dunya-durumu] dışlanan=${beklenenDisarida.length} tutulan=${suzgecli.length} değişen=?`])
+  }, 90_000)
+
+  it('GERÇEK config tam ve yalniz kiplerinde özet satırı YAZILMAZ (yalnız `dislan` dışlama kararı verir)', async () => {
+    const [tam, yalniz] = await Promise.all([vitestListesi(''), vitestListesi('yalniz')])
+    for (const [kip, r] of [['tam', tam], ['yalniz', yalniz]] as const) {
+      expect(r.dosyalar.length, `${kip}: vitest list çıktısı ayrıştırılamadı ya da boş`).toBeGreaterThan(0)
+      expect(dunyaSatirlari(r.stderr), `${kip}: stderr: ${r.stderr}`).toEqual([])
+    }
   }, 90_000)
 
   // ── TABAN (ALT-38a B3): `dislan` PR listesi ∩ TABAN'ı dışlar; kesişim GERÇEK config yolunda da çalışmalı ─────────────────────────────
@@ -689,7 +719,8 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
       const [bos, dislan] = await Promise.all([kume(''), vitestListesi('dislan', bosTaban)])
       expect(dislan.dosyalar.length, 'vitest list çıktısı ayrıştırılamadı ya da boş (biçim değişmiş olabilir)').toBeGreaterThan(0)
       expect(dislan.dosyalar).toEqual(bos)
-      expect(dislan.stderr, 'geçerli (boş) taban uyarı üretmemeli').not.toContain('[dunya-durumu]')
+      expect(uyariSatirlari(dislan.stderr), 'geçerli (boş) taban uyarı üretmemeli').toEqual([])
+      expect(ozetSatirlari(dislan.stderr), `stderr: ${dislan.stderr}`).toEqual(['[dunya-durumu] dışlanan=0 tutulan=0 değişen=1'])
     } finally {
       rmSync(dizin, { recursive: true, force: true })
     }
@@ -702,10 +733,11 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
       const [bos, dislan] = await Promise.all([kume(''), vitestListesi('dislan', yokTaban)])
       expect(dislan.dosyalar.length, 'vitest list çıktısı ayrıştırılamadı ya da boş (biçim değişmiş olabilir)').toBeGreaterThan(0)
       expect(dislan.dosyalar).toEqual(bos)
-      const uyarilar = dislan.stderr.split(/\r?\n/).filter((s) => s.startsWith('[dunya-durumu] '))
+      const uyarilar = uyariSatirlari(dislan.stderr)
       expect(uyarilar, `stderr: ${dislan.stderr}`).toHaveLength(1)
       expect(uyarilar[0]).toContain('taban listesi okunamadı')
       expect(uyarilar[0]).toContain(TABAN_ORTAM)
+      expect(ozetSatirlari(dislan.stderr), `stderr: ${dislan.stderr}`).toEqual(['[dunya-durumu] dışlanan=0 tutulan=0 değişen=1'])
     } finally {
       rmSync(dizin, { recursive: true, force: true })
     }
@@ -925,5 +957,327 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     expect(denetle(ci, dunyaYml, { surum: 1, testler: [] }, var_).join('|')).toContain('liste BOŞ')
     const ikili: Liste = { ...liste, testler: [liste.testler[0], liste.testler[0]] }
     expect(D.dogrula(ikili, () => true).join('|')).toContain('tekrar')
+  })
+})
+
+// ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// YOL SÜZGECİ SABİTLEME (ALT-38i, bağımsız denetim Ö1b + Ö1a)
+//
+// Süzgeç mekanizması (scripts/ci/dunya-durumu.cjs) doğru çalışsa bile, süzgecin KENDİSİ listeden sessizce düşebilir ya da daralabilir:
+//   · `yolFiltresi` alanı silinir ya da `yolFiltre` diye yazılır → kayıt süzgeçsiz sayılır, test HER PR'da çıkar (koruma daralır, kırmızı yok),
+//   · süzgeçten bir girdi dizini (`scripts/board/`) kalkar → o dizine dokunan PR `sessionstart-tavan`ı kapıda bulamaz,
+//   · `session-board.cjs` grafına süzgeç dışında yeni bir dosya girer → aynı sessiz daralma (tamlık sürüklenmesi).
+// Bu blok üçünü de mekanik olarak sabitler. Ölçüm işlevleri bir KÖK alır: gerçek ağaçta çağrılır (yeşil olmalı), sabotaj kolları ise gerçek dosyaya DOKUNMADAN
+// bir KOPYA kökte aynı işlevleri çağırır (bozuk girdide kırmızı verdiğini göstermek için).
+// ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+/** Gerçek-ağaç denetimlerinin kökü (tek satır: kanıt koşusunda bozuk bir kopyaya çevrilebilsin diye ayrı sabit). */
+const SABITLEME_KOKU = KOK
+const LISTE_GOR = 'scripts/ci/dunya-durumu-testleri.json'
+/** Süzgeçli olmak ZORUNDA olan iki kayıt (ADIYLA): alan silinirse ya da liste bu kayıtları yitirirse kırmızı. */
+const GITHOOKS_KAYDI = 'src/__tests__/conformance/githooks-doc-scope.test.ts'
+const SESSIONSTART_KAYDI = 'src/__tests__/conformance/sessionstart-tavan.test.ts'
+const SUZGECLI_ZORUNLU: readonly string[] = [GITHOOKS_KAYDI, SESSIONSTART_KAYDI]
+/**
+ * Her zorunlu kaydın süzgeci EN AZ bu girdileri kapsamak zorunda (daha geniş süzgeç serbest, DARALMA kırmızı).
+ * Kaynak: çalışma zamanı izlemesiyle ölçülmüş girdiler (docs/standards/test-karnesi-standard.md §3 "Süzgeç girdi ölçümü").
+ */
+const SUZGEC_ASGARI: Readonly<Record<string, readonly string[]>> = {
+  [GITHOOKS_KAYDI]: ['.githooks/', '.cc_docs.yaml'],
+  [SESSIONSTART_KAYDI]: ['.claude/hooks/', 'scripts/board/', 'scripts/belge/', 'scripts/hijyen/', 'docs/roller/', '.claude/settings.json'],
+}
+
+/** Sabitleme ihlalleri (boş = sağlam): zorunlu kayıt var mı, `yolFiltresi` dolu dizi mi, asgari girdilerin HER BİRİ süzgeç tarafından kapsanıyor mu. */
+function suzgecSabitlemeIhlalleri(l: Liste): string[] {
+  const ihlal: string[] = []
+  for (const ad of SUZGECLI_ZORUNLU) {
+    const k = l.testler.find((t) => t.test === ad)
+    if (!k) {
+      ihlal.push(`${ad}: listede kayıt YOK (PR kapısından çıkış kaldırıldıysa bu sabitleme ve cetvel §3 birlikte güncellenir)`)
+      continue
+    }
+    if (!Array.isArray(k.yolFiltresi) || k.yolFiltresi.length === 0) {
+      ihlal.push(`${ad}: yolFiltresi YOK ya da boş (alan silinirse ya da yazım hatasıyla adı değişirse test HER PR'da PR kapısından çıkar, girdisine dokunan PR korumasını kaybeder)`)
+      continue
+    }
+    for (const girdi of SUZGEC_ASGARI[ad]) {
+      if (!D.filtreEslesirMi(k.yolFiltresi, girdi)) ihlal.push(`${ad}: yolFiltresi "${girdi}" girdisini KAPSAMIYOR (süzgeç daraldı: bu girdiye dokunan PR testi PR kapısında bulamaz)`)
+    }
+  }
+  return ihlal
+}
+
+// ── Ö1a: `session-board.cjs` require grafı ─────────────────────────────────────────────────────────────────────────
+const GRAF_GIRISI = '.claude/hooks/session-board.cjs'
+/** Bloklu yorumlar atılır; satır başı `//` satırları atılır. Satır sonu yorumlarına DOKUNULMAZ (dizeler içindeki `//` URL'leri bozulmasın). */
+const yorumsuzKod = (kaynak: string): string =>
+  kaynak
+    .replace(/\r\n/g, '\n')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n')
+    .filter((s) => !/^\s*\/\//.test(s))
+    .join('\n')
+/** `require('x')` / `import('x')` (şablon dizesi değil, enterpolasyonsuz). */
+const REQUIRE_DESENI = /\b(?:require|import)\s*\(\s*(['"`])([^'"`\n$]+)\1\s*\)/g
+/** Statik ESM: `import x from 'y'`, `export { x } from 'y'`. */
+const ESM_DESENI = /^[ \t]*(?:import|export)\b[^'"`\n;]*?\bfrom\s*(['"])([^'"\n]+)\1/gm
+/** `path.join(__dirname, 'a', 'b')` ve `path.resolve(__dirname, ...)`: TÜM argümanlar dize olduğunda. Karışık argüman (değişken içeren) görünmez. */
+const DIRNAME_DESENI = /\bpath\.(?:join|resolve)\(\s*__dirname((?:\s*,\s*(['"`])[^'"`\n$]*\2)+)\s*\)/g
+const DIRNAME_ARGUMANI = /(['"`])([^'"`\n$]*)\1/g
+
+/** Bir dosyanın kodundan çıkan aday mutlak yollar (henüz çözümlenmemiş: uzantı/dizin/varlık sonra bakılır). */
+function grafAdaylari(kod: string, dir: string): string[] {
+  const adaylar: string[] = []
+  for (const m of kod.matchAll(REQUIRE_DESENI)) if (m[2].startsWith('.')) adaylar.push(path.resolve(dir, m[2]))
+  for (const m of kod.matchAll(ESM_DESENI)) if (m[2].startsWith('.')) adaylar.push(path.resolve(dir, m[2]))
+  for (const m of kod.matchAll(DIRNAME_DESENI)) adaylar.push(path.resolve(dir, ...[...m[1].matchAll(DIRNAME_ARGUMANI)].map((x) => x[2])))
+  return adaylar
+}
+
+/** Aday yolu çözer: önce olduğu gibi, sonra yaygın uzantılarla, sonra `index.*`; yalnız KÖK içindeki, `node_modules` dışındaki gerçek DOSYALAR sayılır (dizinler sayılmaz). */
+function grafCozumle(kok: string, aday: string): string | null {
+  const dosyaMi = (p: string): boolean => {
+    try {
+      return statSync(p).isFile()
+    } catch {
+      return false
+    }
+  }
+  const bulunan =
+    ['', '.cjs', '.js', '.mjs', '.json'].map((uz) => `${aday}${uz}`).find(dosyaMi) ?? ['index.cjs', 'index.js', 'index.mjs'].map((i) => path.join(aday, i)).find(dosyaMi)
+  if (!bulunan) return null
+  const goreli = path.relative(kok, bulunan).replace(/\\/g, '/')
+  return goreli.startsWith('..') || path.isAbsolute(goreli) || goreli.startsWith('node_modules/') ? null : goreli
+}
+
+/** Girişten başlayan graftaki TÜM repo-içi dosyalar (giriş dahil, sıralı). Yalnız `.cjs/.mjs/.js` dosyalarının içine inilir; `.json` vb. yapraktır. Giriş yoksa boş döner. */
+function grafDosyalari(kok: string, giris: string): string[] {
+  const gorulen = new Set<string>()
+  const sira = [giris]
+  for (let g = sira.shift(); g !== undefined; g = sira.shift()) {
+    if (gorulen.has(g)) continue
+    const mutlak = path.join(kok, g)
+    if (!existsSync(mutlak)) continue
+    gorulen.add(g)
+    if (!/\.(?:cjs|mjs|js)$/.test(g)) continue
+    for (const aday of grafAdaylari(yorumsuzKod(readFileSync(mutlak, 'utf8')), path.dirname(mutlak))) {
+      const c = grafCozumle(kok, aday)
+      if (c !== null && !gorulen.has(c)) sira.push(c)
+    }
+  }
+  return [...gorulen].sort()
+}
+
+/** Grafı tarar ve `sessionstart-tavan` kaydının (verilen kökteki listenin) süzgecinin DIŞINDA kalan dosyaları döner. Kayıt ya da süzgeç yoksa HER dosya "dışarıda"dır. */
+function suzgecDisiGraf(kok: string): { graf: string[]; disarida: string[] } {
+  const k = D.listeyiOku(kok).testler.find((t) => t.test === SESSIONSTART_KAYDI)
+  const suzgec = k !== undefined && Array.isArray(k.yolFiltresi) ? k.yolFiltresi : []
+  const graf = grafDosyalari(kok, GRAF_GIRISI)
+  return { graf, disarida: graf.filter((f) => !D.filtreEslesirMi(suzgec, f)) }
+}
+
+describe('YOL SÜZGECİ SABİTLEME — süzgeç listeden düşmez/daralmaz (Ö1b), graf süzgeçten taşmaz (Ö1a)', () => {
+  const kopyalar: string[] = []
+  afterEach(() => {
+    for (const k of kopyalar.splice(0)) rmSync(k, { recursive: true, force: true })
+  })
+
+  /** Gerçek ağacın grafını (ve listeyi) yeni bir kök dizine KOPYALAR; sabotaj kopyada yapılır, gerçek dosyaya hiç dokunulmaz. */
+  function agacKopyala(): string {
+    const kopya = mkdtempSync(path.join(tmpdir(), 'suzgec-sabitleme-'))
+    kopyalar.push(kopya)
+    for (const g of [...grafDosyalari(SABITLEME_KOKU, GRAF_GIRISI), LISTE_GOR]) {
+      const hedef = path.join(kopya, g)
+      mkdirSync(path.dirname(hedef), { recursive: true })
+      copyFileSync(path.join(SABITLEME_KOKU, g), hedef)
+    }
+    return kopya
+  }
+  const dosyaYaz = (kok: string, goreli: string, icerik: string): void => {
+    mkdirSync(path.dirname(path.join(kok, goreli)), { recursive: true })
+    writeFileSync(path.join(kok, goreli), icerik)
+  }
+  const dosyaEkle = (kok: string, goreli: string, satir: string): void => dosyaYaz(kok, goreli, `${readFileSync(path.join(kok, goreli), 'utf8')}\n${satir}\n`)
+  const gercekListe = (): Liste => JSON.parse(JSON.stringify(D.listeyiOku(SABITLEME_KOKU))) as Liste
+  const kayitOf = (l: Liste, ad: string): Kayit => {
+    const k = l.testler.find((t) => t.test === ad)
+    if (!k) throw new Error(`sabotaj hedefi listede yok: ${ad}`)
+    return k
+  }
+  /** Kopya kökteki listeyi `degistir` ile bozar ve dosyaya yazar (JSON üzerinden: sabotaj dosya yolunda da etkili olur). */
+  function listeKopyasiniBoz(kok: string, degistir: (l: Liste) => void): void {
+    const l = D.listeyiOku(kok)
+    degistir(l)
+    writeFileSync(path.join(kok, LISTE_GOR), `${JSON.stringify(l, null, 2)}\n`)
+  }
+
+  // ── GERÇEK AĞAÇ: yeşil olmalı ──────────────────────────────────────────────────────────────────────────────────────
+  it('iki süzgeçli kayıt ADIYLA yolFiltresi taşır ve asgari girdileri kapsar (githooks-doc-scope + sessionstart-tavan)', () => {
+    expect(suzgecSabitlemeIhlalleri(D.listeyiOku(SABITLEME_KOKU))).toEqual([])
+  })
+
+  it('asgari girdi tablosu kendi içinde tutarlı: her zorunlu kayıt tabloda, her tablo girdisi geçerli bir süzgeç öğesi (dogrula kabul eder)', () => {
+    expect([...SUZGECLI_ZORUNLU].sort()).toEqual(Object.keys(SUZGEC_ASGARI).sort())
+    for (const [ad, girdiler] of Object.entries(SUZGEC_ASGARI)) {
+      expect(girdiler.length, ad).toBeGreaterThan(0)
+      expect(D.dogrula({ surum: 1, testler: [{ ...D.listeyiOku(SABITLEME_KOKU).testler[0], test: ad, yolFiltresi: [...girdiler] }] }), ad).toEqual([])
+    }
+  })
+
+  it('gerçek liste kapalı şekle uyar: bilinmeyen alan yok (yolFiltre gibi bir yazım hatası burada kırmızı olurdu)', () => {
+    expect(D.dogrula(D.listeyiOku(SABITLEME_KOKU))).toEqual([])
+  })
+
+  it("TAMLIK: session-board.cjs'ten başlayan literal require ve path.join(__dirname) grafındaki HER repo-içi dosya sessionstart-tavan süzgecine uyar", () => {
+    const { graf, disarida } = suzgecDisiGraf(SABITLEME_KOKU)
+    // Tarayıcı sessizce hiçbir şey bulmaz hâle gelirse "boş graf = ihlal yok" yeşili sahte olurdu: giriş ve tanınmış üyeler bulunmak zorunda.
+    expect(graf, 'giriş dosyası grafta yok (giriş taşındı/silindi: bu sabitleme güncellenmeli)').toContain(GRAF_GIRISI)
+    expect(graf.filter((f) => f.startsWith('scripts/board/')).length, 'scripts/board/ altından hiçbir modül bulunamadı: tarayıcı bozuk').toBeGreaterThanOrEqual(3)
+    expect(graf.length, `graf yalnız ${graf.length} dosya: tarayıcı bozuk ya da graf çöktü`).toBeGreaterThanOrEqual(10)
+    expect(
+      disarida,
+      `sessionstart-tavan süzgecinin DIŞINDA kalan graf dosyaları (süzgece eklenmeli ya da require kaldırılmalı; aksi hâlde bu dosyalara dokunan PR testi PR kapısında bulamaz): ${disarida.join(', ')}`,
+    ).toEqual([])
+  })
+
+  // ── SABOTAJ: kopyada bozulunca KIRMIZI ─────────────────────────────────────────────────────────────────────────────
+  describe('SABOTAJ (kopya kök): süzgeç girdisi/alan düşünce sabitleme KIRMIZI verir', () => {
+    const girdiler = SUZGECLI_ZORUNLU.flatMap((ad) => SUZGEC_ASGARI[ad].map((g): [string, string] => [ad, g]))
+
+    it('kontrol: kopya BOZULMADAN yeşil (sabotaj kolları yanlış sebeple kırmızı vermesin)', () => {
+      const kopya = agacKopyala()
+      expect(suzgecSabitlemeIhlalleri(D.listeyiOku(kopya))).toEqual([])
+      expect(suzgecDisiGraf(kopya).disarida).toEqual([])
+    })
+
+    it.each(girdiler)('%s: süzgeçten "%s" SİLİNİNCE kırmızı (dosya yoluyla: listeyi kopyada bozup yeniden okur)', (ad, girdi) => {
+      const kopya = agacKopyala()
+      listeKopyasiniBoz(kopya, (l) => {
+        const k = kayitOf(l, ad)
+        k.yolFiltresi = (k.yolFiltresi ?? []).filter((g) => g !== girdi)
+      })
+      expect(suzgecSabitlemeIhlalleri(D.listeyiOku(kopya))).toEqual([
+        `${ad}: yolFiltresi "${girdi}" girdisini KAPSAMIYOR (süzgeç daraldı: bu girdiye dokunan PR testi PR kapısında bulamaz)`,
+      ])
+    })
+
+    it.each(SUZGECLI_ZORUNLU)('%s: yolFiltresi alanı TÜMDEN silinince kırmızı', (ad) => {
+      const kopya = agacKopyala()
+      listeKopyasiniBoz(kopya, (l) => {
+        delete kayitOf(l, ad).yolFiltresi
+      })
+      const ihlal = suzgecSabitlemeIhlalleri(D.listeyiOku(kopya))
+      expect(ihlal).toHaveLength(1)
+      expect(ihlal[0]).toContain(`${ad}: yolFiltresi YOK ya da boş`)
+    })
+
+    it.each(SUZGECLI_ZORUNLU)('%s: yolFiltresi BOŞ diziye düşünce kırmızı', (ad) => {
+      const kopya = agacKopyala()
+      listeKopyasiniBoz(kopya, (l) => {
+        kayitOf(l, ad).yolFiltresi = []
+      })
+      expect(suzgecSabitlemeIhlalleri(D.listeyiOku(kopya)).join('|')).toContain(`${ad}: yolFiltresi YOK ya da boş`)
+    })
+
+    it.each(SUZGECLI_ZORUNLU)('%s: alan adı yazım hatasıyla "yolFiltre" olunca İKİ kapı da kırmızı: sabitleme (alan yok) ve dogrula (bilinmeyen alan)', (ad) => {
+      const l = gercekListe()
+      const k = kayitOf(l, ad)
+      Reflect.set(k, 'yolFiltre', k.yolFiltresi)
+      delete k.yolFiltresi
+      expect(suzgecSabitlemeIhlalleri(l).join('|')).toContain(`${ad}: yolFiltresi YOK ya da boş`)
+      expect(D.dogrula(l).join('|')).toContain('bilinmeyen alan "yolFiltre"')
+    })
+
+    it.each(SUZGECLI_ZORUNLU)('%s: kayıt listeden TÜMDEN silinince kırmızı', (ad) => {
+      const l = gercekListe()
+      l.testler = l.testler.filter((t) => t.test !== ad)
+      expect(suzgecSabitlemeIhlalleri(l)).toEqual([expect.stringContaining(`${ad}: listede kayıt YOK`)])
+    })
+
+    it('süzgeç daralınca graf taşar: scripts/board/ silinince graftaki tüm scripts/board/ dosyaları "dışarıda" çıkar (tamlık kolu aynı sebeple kırmızı)', () => {
+      const kopya = agacKopyala()
+      listeKopyasiniBoz(kopya, (l) => {
+        const k = kayitOf(l, SESSIONSTART_KAYDI)
+        k.yolFiltresi = (k.yolFiltresi ?? []).filter((g) => g !== 'scripts/board/')
+      })
+      const { graf, disarida } = suzgecDisiGraf(kopya)
+      expect(disarida.length).toBeGreaterThan(0)
+      expect(disarida).toEqual(graf.filter((f) => f.startsWith('scripts/board/')))
+    })
+  })
+
+  describe('SABOTAJ (kopya kök): grafa süzgeç DIŞINDA bir dosya girince tamlık kolu KIRMIZI verir', () => {
+    it("literal require: grafın girişine `require('../../scripts/ci/sahte-girdi.cjs')` eklenince o dosya dışarıda çıkar", () => {
+      const kopya = agacKopyala()
+      dosyaYaz(kopya, 'scripts/ci/sahte-girdi.cjs', 'module.exports = 1\n')
+      dosyaEkle(kopya, GRAF_GIRISI, "require('../../scripts/ci/sahte-girdi.cjs')")
+      expect(suzgecDisiGraf(kopya).disarida).toEqual(['scripts/ci/sahte-girdi.cjs'])
+    })
+
+    it('path.join(__dirname, ...) biçimi: DERİN bir graf düğümüne (scripts/board altında) eklenen veri dosyası da yakalanır (geçişli)', () => {
+      const kopya = agacKopyala()
+      const derin = grafDosyalari(kopya, GRAF_GIRISI).find((f) => f.startsWith('scripts/board/') && f.endsWith('.cjs'))
+      if (derin === undefined) throw new Error('kopya grafında scripts/board/ altında modül yok: kol hiçbir şey ölçmüyor')
+      dosyaYaz(kopya, 'docs/plans/sahte-veri.json', '{}\n')
+      dosyaEkle(kopya, derin, "const sahte = require(path.join(__dirname, '..', '..', 'docs', 'plans', 'sahte-veri.json'))")
+      expect(suzgecDisiGraf(kopya).disarida).toEqual(['docs/plans/sahte-veri.json'])
+    })
+
+    it('geçişlilik: süzgeç İÇİNDE yeni bir modül süzgeç DIŞINDAKİ bir dosyayı require ederse dışarıdaki dosya yakalanır, içerideki yakalanmaz', () => {
+      const kopya = agacKopyala()
+      dosyaYaz(kopya, 'scripts/ci/disarida.cjs', 'module.exports = 2\n')
+      dosyaYaz(kopya, 'scripts/board/yeni-yardimci.cjs', "module.exports = require('../ci/disarida.cjs')\n")
+      dosyaEkle(kopya, GRAF_GIRISI, "require('../../scripts/board/yeni-yardimci.cjs')")
+      expect(suzgecDisiGraf(kopya).disarida).toEqual(['scripts/ci/disarida.cjs'])
+    })
+
+    it('ESM biçimi: `import x from "../ci/esm-girdi.mjs"` ve `export * from` aynı şekilde yakalanır', () => {
+      const kopya = agacKopyala()
+      dosyaYaz(kopya, 'scripts/ci/esm-girdi.mjs', 'export const x = 1\n')
+      dosyaYaz(kopya, 'scripts/ci/esm-diger.mjs', 'export const y = 1\n')
+      dosyaYaz(kopya, 'scripts/board/esm-kopru.mjs', "import { x } from '../ci/esm-girdi.mjs'\nexport * from '../ci/esm-diger.mjs'\nexport { x }\n")
+      dosyaEkle(kopya, GRAF_GIRISI, "import('../../scripts/board/esm-kopru.mjs')")
+      expect(suzgecDisiGraf(kopya).disarida).toEqual(['scripts/ci/esm-diger.mjs', 'scripts/ci/esm-girdi.mjs'])
+    })
+
+    it('süzgeç İÇİNE eklenen yeni modül ihlal DEĞİLDİR (süzgeç dizinleri serbestçe büyür)', () => {
+      const kopya = agacKopyala()
+      dosyaYaz(kopya, 'scripts/hijyen/yeni-olcum.cjs', 'module.exports = 3\n')
+      dosyaEkle(kopya, GRAF_GIRISI, "require('../../scripts/hijyen/yeni-olcum.cjs')")
+      const { graf, disarida } = suzgecDisiGraf(kopya)
+      expect(graf).toContain('scripts/hijyen/yeni-olcum.cjs')
+      expect(disarida).toEqual([])
+    })
+
+    it('YORUM graf kenarı DEĞİLDİR: satır yorumu ve blok yorumdaki require sayılmaz', () => {
+      const kopya = agacKopyala()
+      dosyaYaz(kopya, 'scripts/ci/yorumda.cjs', 'module.exports = 4\n')
+      dosyaEkle(kopya, GRAF_GIRISI, "// require('../../scripts/ci/yorumda.cjs')\n/* require('../../scripts/ci/yorumda.cjs')\n   path.join(__dirname, '..', '..', 'scripts', 'ci', 'yorumda.cjs') */")
+      const { graf, disarida } = suzgecDisiGraf(kopya)
+      expect(graf).not.toContain('scripts/ci/yorumda.cjs')
+      expect(disarida).toEqual([])
+    })
+
+    it('olmayan hedef ya da paket (node:fs, bağımlılık) graf kenarı DEĞİLDİR; VAR OLAN ama kök dışındaki dosya da sayılmaz', () => {
+      const kopya = agacKopyala()
+      const kokDisi = path.resolve(kopya, '..', `suzgec-kok-disi-${path.basename(kopya)}.cjs`)
+      try {
+        writeFileSync(kokDisi, 'module.exports = 6\n')
+        dosyaEkle(kopya, GRAF_GIRISI, `require('node:fs')\nrequire('./yok-boyle-bir-dosya.cjs')\nrequire('../../../${path.basename(kokDisi)}')`)
+        expect(existsSync(kokDisi), 'kök dışındaki hedef dosya yazılamadı: kol hiçbir şey ölçmüyor').toBe(true)
+        const { graf, disarida } = suzgecDisiGraf(kopya)
+        expect(graf.some((f) => f.includes('suzgec-kok-disi'))).toBe(false)
+        expect(disarida).toEqual([])
+      } finally {
+        rmSync(kokDisi, { force: true })
+      }
+    })
+
+    it('değişken içeren path.join(__dirname, x) GÖRÜNMEZ (belgelenmiş sınır): tarayıcı yalnız literal biçimlere bakar', () => {
+      const kopya = agacKopyala()
+      dosyaYaz(kopya, 'scripts/ci/gorunmez.cjs', 'module.exports = 5\n')
+      dosyaEkle(kopya, GRAF_GIRISI, "const ad = 'gorunmez.cjs'\nrequire(path.join(__dirname, '..', '..', 'scripts', 'ci', ad))")
+      expect(suzgecDisiGraf(kopya).disarida, 'literal olmayan yollar için çalışma zamanı izleme gerekir (cetvel §3)').toEqual([])
+    })
   })
 })
