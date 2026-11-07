@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { createHmac } from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -13,6 +14,7 @@ import {
   takipBaglantisiNormal,
   tetikReddiMi,
 } from '../../../supabase/functions/_shared/kargo_webhook_gecis'
+import { webhookImzaMetni } from '../../../supabase/functions/_shared/sabit_zaman'
 
 /**
  * INV-KARGO-WEBHOOK-1 · kargo webhook'u siparişi yalnız İLERİ taşır, iptali ve sözlük dışını yazmaz (ALT-134,
@@ -78,7 +80,8 @@ type Satir = {
 }
 
 const SIPARIS = '22222222-2222-4222-8222-222222222222'
-const TOKEN = 'webhook-test-token'
+const SIR = 'webhook-test-sirri'
+const imzala = (metin: string, sir = SIR) => createHmac('sha256', sir).update(metin).digest('base64')
 
 let satir: Satir
 let patchlar: { govde: Record<string, unknown>; filtreler: [string, unknown][]; guncellenen: number }[] = []
@@ -268,7 +271,7 @@ async function isleyiciYukle(dosya: string): Promise<Isleyici> {
         ({
           SUPABASE_URL: 'https://ornek.supabase.co',
           SUPABASE_SERVICE_ROLE_KEY: 'test-anahtari',
-          SHIPPING_WEBHOOK_TOKEN: TOKEN,
+          SHIPPING_WEBHOOK_SECRET: SIR,
         })[k],
     },
   })
@@ -282,18 +285,25 @@ async function cagir(
   govde: Record<string, unknown>,
   basliklar: Record<string, string> = {},
 ): Promise<{ http: number; json: Record<string, unknown>; retryAfter: string | null }> {
+  // Kimlik doğrulama yalnız HMAC (ALT-166): zaman + olay kimliği + gövde birlikte imzalanır. İmza, testin ezdiği
+  // zaman/olay değerleriyle hesaplanır; yani ezilen başlık da "doğru imzalı" gelir ve kapıyı ölçen şey kendi
+  // kuralıdır (bayat zaman, tekrar eden olay), imza uyuşmazlığı değil. Test isterse `x-signature`ı da ezebilir.
+  const ham = JSON.stringify({ order_id: SIPARIS, ...govde })
+  const otoOlay = `evt-oto-${++olaySayaci}`
+  const ts = basliklar['x-timestamp'] ?? String(Date.now())
+  const olay = basliklar['x-event-id'] ?? otoOlay
   const r = await isleyici(
     new Request('https://ornek.supabase.co/functions/v1/shipping-webhook', {
       method: 'POST',
       // x-event-id ZORUNLU (ALT-138): her çağrıya tekil bir kimlik; test isterse kendi kimliğiyle ezer.
       headers: {
         'content-type': 'application/json',
-        'x-webhook-token': TOKEN,
-        'x-timestamp': String(Date.now()),
-        'x-event-id': `evt-oto-${++olaySayaci}`,
+        'x-timestamp': ts,
+        'x-event-id': olay,
+        'x-signature': imzala(webhookImzaMetni(ts, olay, ham)),
         ...basliklar,
       },
-      body: JSON.stringify({ order_id: SIPARIS, ...govde }),
+      body: ham,
     }),
   )
   return { http: r.status, json: await r.json(), retryAfter: r.headers.get('retry-after') }
@@ -718,8 +728,14 @@ describe('INV-KARGO-WEBHOOK-1 · yarış ve tetik: fail-closed yazım, fail-safe
 })
 
 describe('INV-KARGO-WEBHOOK-1 · imza ve replay kapısı bozulmadı (kural 11)', () => {
-  it('geçersiz token → 401, DB\'ye dokunulmaz', async () => {
-    const r = await cagir(yeni, { status: 'in_transit' }, { 'x-webhook-token': 'yanlis' })
+  it('geçersiz imza → 401, DB\'ye dokunulmaz', async () => {
+    const r = await cagir(yeni, { status: 'in_transit' }, { 'x-signature': 'yanlis' })
+    expect(r.http).toBe(401)
+    expect(patchlar).toHaveLength(0)
+  })
+
+  it('imzasız istek → 401, DB\'ye dokunulmaz (token yolu yok, ALT-166)', async () => {
+    const r = await cagir(yeni, { status: 'in_transit' }, { 'x-signature': '' })
     expect(r.http).toBe(401)
     expect(patchlar).toHaveLength(0)
   })

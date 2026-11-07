@@ -3,7 +3,7 @@
 // Supabase Edge Function: shipping-webhook
 // Receives carrier sandbox/live webhook and updates order shipping fields securely
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
-// Optional (recommended): SHIPPING_WEBHOOK_SECRET (HMAC-SHA256) or SHIPPING_WEBHOOK_TOKEN (legacy)
+// Optional (recommended): SHIPPING_WEBHOOK_SECRET (HMAC-SHA256; token yolu ALT-166 ile kaldırıldı)
 //
 // TENANT (T026-VH Adım 5): kargo firması bizim tenant UUID'lerimizi BİLMEZ — `order_id` /
 // `order_number` bilir. Bu yüzden tenant istekten OKUNMAZ, imzalı isteğin işaret ettiği
@@ -12,7 +12,7 @@
 // `isMockEnv` dalıyla testlerde tamamen atlanıyordu — yani kapı test edilmiyordu (cetvel §3.9).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
-import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
+import { webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
 import { kargoHedefiCoz, kargoYazimKarari, takipBaglantisiNormal, tetikReddiMi } from '../_shared/kargo_webhook_gecis.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
@@ -117,12 +117,9 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
       authorized = await webhookImzaGecerli(secret, tsHeader, eventId, raw, signature)
     }
 
-    // Legacy token fallback (sandbox)
-    if (!authorized) {
-      const token = req.headers.get('x-webhook-token') || ''
-      const expected = Deno.env.get('SHIPPING_WEBHOOK_TOKEN') || ''
-      if (expected && token && timingSafeEquals(token, expected)) authorized = true
-    }
+    // Yalnız HMAC (ALT-166): eski x-webhook-token yolu kaldırıldı. Zaman ve olay kimliğini imzalamıyordu;
+    // token sızarsa taze zaman + yeni olay kimliğiyle sınırsız sahte kargo durumu yazılabilirdi. Ölçüm
+    // (2026-11-07): canlıda SHIPPING_WEBHOOK_TOKEN tanımlı ama son 30 günde 2 çağrı var, ikisi de 401.
 
     if (!authorized) {
       return jsonResponse({ error: 'Unauthorized' }, { status: 401 })
@@ -383,8 +380,9 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
             if (yazilan.length === 0) return await yoksay('MONOTON_REJECTED', okunan.status)
             break
           }
-          const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
-          return jsonResponse({ error: msg }, { status: 500 })
+          // Ham DB mesajı gövdeye dönmez (ALT-167); ayrıntı yalnız günlüğe.
+          console.error('[shipping-webhook] sipariş güncellenemedi', { code: 'UPDATE_FAILED', order_id: orderId, hata: (error as { message?: unknown })?.message })
+          return jsonResponse({ error: 'Update failed', code: 'UPDATE_FAILED' }, { status: 500 })
         }
         const ilk = Array.isArray(satirlar) ? satirlar[0] : null
         if (!ilk) {
@@ -443,7 +441,7 @@ async function isle(req: Request, sahiplik: Sahiplik): Promise<Response> {
     return jsonResponse({ ok: true, order_id: data?.id, status: data?.status })
   } catch (_e) {
     console.error('Shipping webhook error:', _e);
-    return jsonResponse({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
+    return jsonResponse({ error: 'Unexpected error', code: 'INTERNAL' }, { status: 500 })
   }
 }
 

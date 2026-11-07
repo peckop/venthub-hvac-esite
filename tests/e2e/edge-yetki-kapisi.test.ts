@@ -204,13 +204,13 @@ describe('K4 · zamanlanmış uçlar service_role anahtarını sabit zamanlı do
     expect(cagrilar.some((u) => u.includes('/rest/v1/venthub_orders'))).toBe(true)
   })
 
-  it('shipping-webhook: aynı uzunlukta yanlış legacy token 401', async () => {
+  it('shipping-webhook: env\'de tanımlı legacy token DOĞRU gönderilse bile 401 (token yolu kaldırıldı, ALT-166)', async () => {
     simulator.setEnv('SHIPPING_WEBHOOK_TOKEN', 'legacy-token-555')
     fetchKur(() => undefined)
     const res = await simulator.invokeFunction(
       fnYolu('shipping-webhook'),
       istek('shipping-webhook', null, {
-        headers: { 'x-webhook-token': 'legacy-token-556', 'x-timestamp': String(Date.now()) },
+        headers: { 'x-webhook-token': 'legacy-token-555', 'x-timestamp': String(Date.now()), 'x-event-id': 'EV-YK-1' },
         body: JSON.stringify({ order_number: 'ORD-1', status: 'shipped' }),
       }),
     )

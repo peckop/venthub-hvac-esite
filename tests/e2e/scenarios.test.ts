@@ -355,8 +355,7 @@ describe('Comprehensive Workload Scenarios E2E Suite (5 Test Cases)', () => {
       env: {
         SUPABASE_URL: 'https://tnofewwkwlyjsqgwjjga.supabase.co',
         SUPABASE_SERVICE_ROLE_KEY: 'service-key',
-        SHIPPING_WEBHOOK_SECRET: 'webhook-hmac-secret-12345',
-        SHIPPING_WEBHOOK_TOKEN: 'legacy-sandbox-token-555'
+        SHIPPING_WEBHOOK_SECRET: 'webhook-hmac-secret-12345'
       }
     })
 
