@@ -552,8 +552,13 @@ function parcalariDogrula(ic, kok, { sha = true, parcalar = null } = {}) {
 // hiçbir yolu yoktur: ne argüman, ne ortam değişkeni, ne dosya. Bu yüzden gpg çağrılarında toplu kip
 // ve parola-kanalı bayrakları KULLANILMAZ (test bu kaynakları tarar).
 
-/** Şifreleme: girdi gpg'nin stdin'inden gelir, çıktı `cikis` dosyasına yazılır. */
-function gpgSifrelemeArgumanlari(cikis) {
+/**
+ * Şifreleme: girdi gpg'nin stdin'inden gelir, şifreli çıktı stdout'tan döner; dosyayı Node yazar.
+ * ⛔Dosya yolu gpg'ye ARGÜMAN olarak verilmez: Git for Windows gpg'si (MSYS) argümandaki kesme işaretini
+ * tırnak sayıp siler; "G:\Drive'ım\..." yolu "Driveım" olur ve şifreleme "No such file" ile düşer
+ * (ölçüldü 2026-11-07, ilk gerçek prova). Çözmede de şifreli baytlar stdin'den verilir.
+ */
+function gpgSifrelemeArgumanlari() {
   return [
     '--symmetric',
     '--cipher-algo', 'AES256',
@@ -561,12 +566,12 @@ function gpgSifrelemeArgumanlari(cikis) {
     '--s2k-digest-algo', 'SHA512',
     '--s2k-count', '65011712',
     '--no-symkey-cache',
-    '--output', cikis,
+    '--output', '-',
   ]
 }
 
-function gpgCozmeArgumanlari(girdi) {
-  return ['--decrypt', '--no-symkey-cache', girdi]
+function gpgCozmeArgumanlari() {
+  return ['--decrypt', '--no-symkey-cache']
 }
 
 function gpgBul(verilen = null) {
@@ -580,27 +585,28 @@ function gpgBul(verilen = null) {
   return null
 }
 
-/** Arşiv baytlarını gpg ile şifreler. Çıktı geçici adla yazılır, başarıda asıl adına döner. */
+/** Arşiv baytlarını gpg ile şifreler. Şifreli çıktı geçici adla yazılır, başarıda asıl adına döner. */
 function gpgSifrele(girdiBuffer, cikisYol, gpgYol) {
   const gecici = `${cikisYol}.tmp`
   fs.rmSync(gecici, { force: true })
-  const r = spawnSync(gpgYol, gpgSifrelemeArgumanlari(gecici), {
+  const r = spawnSync(gpgYol, gpgSifrelemeArgumanlari(), {
     input: girdiBuffer,
-    stdio: ['pipe', 'inherit', 'inherit'],
+    stdio: ['pipe', 'pipe', 'inherit'],
     maxBuffer: 1 << 28,
     windowsHide: false,
   })
-  if (r.error || r.status !== 0 || !fs.existsSync(gecici) || fs.statSync(gecici).size === 0) {
-    fs.rmSync(gecici, { force: true })
+  if (r.error || r.status !== 0 || !r.stdout || r.stdout.length === 0) {
     throw new Error(`gpg şifreleme başarısız (çıkış ${r.status}${r.error ? `, ${r.error.message}` : ''}); parola girilmediyse ya da iptal edildiyse bu beklenen sonuçtur`)
   }
+  fs.writeFileSync(gecici, r.stdout)
   fs.renameSync(gecici, cikisYol)
 }
 
-/** Şifreli dosyayı çözer, düz baytları döndürür (diske yazmaz). */
+/** Şifreli dosyayı çözer, düz baytları döndürür (diske yazmaz). Şifreli baytlar gpg'ye stdin'den gider. */
 function gpgCoz(girdiYol, gpgYol) {
-  const r = spawnSync(gpgYol, gpgCozmeArgumanlari(girdiYol), {
-    stdio: ['inherit', 'pipe', 'inherit'],
+  const r = spawnSync(gpgYol, gpgCozmeArgumanlari(), {
+    input: fs.readFileSync(girdiYol),
+    stdio: ['pipe', 'pipe', 'inherit'],
     maxBuffer: 1 << 28,
     windowsHide: false,
   })

@@ -139,9 +139,13 @@ function olc(opt = {}) {
   try {
     for (const d of fs.readdirSync(projeler, { withFileTypes: true })) {
       const m = path.join(projeler, d.name, 'memory')
-      if (d.isDirectory() && fs.existsSync(m)) {
+      // Yalnız içinde md olan klasör sayılır: boş memory klasörleri pakete girmez (tar boş dizin taşımaz)
+      // ve c--/C-- yazımlı iki klasör yeni makinede birleşebilir; boşları saymak sahte KAYIP verdi
+      // (ölçüldü 2026-11-07 prova: eski 44, yeni 18; farkın 26'sı boş, md sayısı iki tarafta 1509).
+      const n = d.isDirectory() && fs.existsSync(m) ? mdSay(m) : 0
+      if (n > 0) {
         klasor += 1
-        md += mdSay(m)
+        md += n
       }
     }
   } catch {

@@ -353,6 +353,13 @@ function main(argv) {
     }
     const yeni = yeniKokler(ic, a)
     const esleme = eslemeler(ic, yeni, a.coklu['yol-esle'])
+    const ic_ice = iceIceKokler(degisenEskiKokler(ic, yeni), Object.values(yeni))
+    if (ic_ice.length) {
+      process.stderr.write(`kur: yeni kök, değişen eski bir kökün İÇİNDE: ${ic_ice.join('; ')}\n` +
+        '  Yol yazımı doğrulaması çevrilmiş yolu da "eski yol" sayar ve kurulum KIRMIZI biter (ölçüldü 2026-11-07,\n' +
+        '  prova C:\\tmp altına kuruldu). Provayı eski köklerin DIŞINDA bir klasöre kurun (ör. başka sürücü ya da C:\\tasima-prova).\n')
+      return 1
+    }
     const sec = a.deger.parcalar ? new Set(a.deger.parcalar.split(',').map((s) => s.trim()).filter(Boolean)) : null
     if (!a.bayrak.gercek) {
       planYazdir(ic, pkg, yeni, esleme, sec, a)
@@ -363,6 +370,18 @@ function main(argv) {
     process.stderr.write(`kur: HATA — ${e.message}\n`)
     return 1
   }
+}
+
+/** Değişen bir eski kökün altına düşen yeni kökler ("eski => yeni" listesi). Büyük-küçük harf duyarsız (Windows). */
+function iceIceKokler(eskiKokler, yeniKoklerListesi) {
+  const n = (p) => String(p).replace(/[\\/]+/g, '\\').replace(/\\$/, '').toLowerCase()
+  const sonuc = []
+  for (const e of eskiKokler) {
+    for (const y of yeniKoklerListesi) {
+      if (y && n(y).startsWith(`${n(e)}\\`)) sonuc.push(`${e} => ${y}`)
+    }
+  }
+  return sonuc
 }
 
 function gercekKos(ic, pkg, yeni, esleme, sec, a) {
@@ -460,4 +479,4 @@ function gercekKos(ic, pkg, yeni, esleme, sec, a) {
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2))
 
-module.exports = { main, paketKlasoru, eslemeler, hedefBul, degisenEskiKokler }
+module.exports = { main, paketKlasoru, eslemeler, hedefBul, degisenEskiKokler, iceIceKokler }
