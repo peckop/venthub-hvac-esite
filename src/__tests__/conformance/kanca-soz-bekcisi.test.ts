@@ -142,6 +142,14 @@ describe('INV-SOZ-BEKCISI-2 — UserPromptSubmit hatırlatması (cevaptan ÖNCE,
     expect(hat.hatirlatma([])).toBe('')
   })
 
+  it('kesme kod noktası başınadır: emoji çifti bölünüp bozuk karakter (U+FFFD) üretmez', () => {
+    for (let n = 230; n < 245; n++) {
+      const s = hat.hatirlatma([{ duzeltme: 'a'.repeat(n) + '😀😀😀' }])
+      expect(s.includes('�'), `n=${n}`).toBe(false)
+      expect(Buffer.byteLength(s, 'utf8')).toBeLessThanOrEqual(300)
+    }
+  })
+
   it('settings.json: hatırlatma UserPromptSubmit\'e, ölçer Stop\'a bağlı (ikisi de kayıtlı)', () => {
     const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8')) as {
       hooks: Record<string, { hooks: { command: string }[] }[]>

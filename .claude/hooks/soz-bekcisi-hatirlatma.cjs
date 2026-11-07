@@ -15,13 +15,15 @@ const path = require('node:path')
 const TAVAN_BAYT = 300
 const KURAL_DOSYASI = path.join(__dirname, 'soz-bekcisi-kurallari.json')
 
-/** Kurallardan tek satır; bayt tavanını aşarsa son kelimede keser. Kural yoksa ''. */
+/** Kurallardan tek satır; bayt tavanını aşarsa sondan karakter karakter keser. Kural yoksa ''. */
 function hatirlatma(kurallar, tavan = TAVAN_BAYT) {
   const parcalar = (kurallar || []).map((k) => String(k.duzeltme || '').trim()).filter(Boolean)
   if (parcalar.length === 0) return ''
   let satir = 'SÖZ KURALI (sahibin şikâyeti, cevapta görünmesin): ' + parcalar.join(' · ')
-  while (Buffer.byteLength(satir, 'utf8') > tavan) satir = satir.slice(0, -1)
-  return satir
+  // Kod noktası başına keser (UTF-16 slice emoji çiftini bölüp bozuk karakter üretirdi, denetçi bulgusu).
+  const noktalar = Array.from(satir)
+  while (noktalar.length > 0 && Buffer.byteLength(noktalar.join(''), 'utf8') > tavan) noktalar.pop()
+  return noktalar.join('')
 }
 
 function calistir() {
