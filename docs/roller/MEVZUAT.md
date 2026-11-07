@@ -19,7 +19,7 @@ Amaç ve Nasıl: `docs/roller/MEVZUAT-gorevler.md`.
 - 4 görev, tetiğe bağlı 1: `docs/roller/MEVZUAT-gorevler.md`.
 
 ## Dosyalar
-docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.
+docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.5, 47 kalem), docs/mevzuat/kanit/** (47 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.
 
 ## Yetki
 Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirsiz" hükmü verir; BLOG yazısındaki mevzuat cümlelerini kontrol eder (R5.1); kayıt değişince ilgili departmana bildirir; "ilk anlatan" konu önerir, sırayı Recep belirler.
