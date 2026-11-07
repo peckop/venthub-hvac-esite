@@ -299,6 +299,25 @@ describe('INV-PENCERE-KOPYASI-FF-1 pencere çalışma kopyası güncelleme', { t
     expect(s.durum).toBe('yeni-dal')
   })
 
+  it('(b) izlenmeyen dosya master\'daki bir dosyayla çakışırsa switch reddeder: engelli, dosya ve eski dal korunur', () => {
+    const { wt } = gerideKopya(1)
+    const eskiUc = yerelCommit(wt)
+    // origin/master'da a.txt değişti; çakışma için master'a yeni bir dosya ekle, pencerede aynı adla İZLENMEYEN dosya olsun
+    g(wt, 'checkout', '-q', '-b', 'gecici', 'origin/master')
+    fs.writeFileSync(path.join(wt, 'yeni-master.txt'), 'm\n')
+    g(wt, 'add', 'yeni-master.txt')
+    g(wt, 'commit', '-q', '-m', 'master-yeni-dosya')
+    g(wt, 'push', '-q', 'origin', 'gecici:master')
+    g(wt, 'checkout', '-q', 'serit')
+    fs.writeFileSync(path.join(wt, 'yeni-master.txt'), 'pencerenin-izlenmeyen-dosyasi\n')
+    const s = pencereIleriSar(wt, 'origin/master', {}, PR_BIRLESMIS, SIMDI)
+    expect(s.durum).toBe('engelli')
+    expect(s.sebep).toMatch(/yeni dal acilamadi/)
+    expect(fs.readFileSync(path.join(wt, 'yeni-master.txt'), 'utf8')).toBe('pencerenin-izlenmeyen-dosyasi\n')
+    expect(g(wt, 'rev-parse', 'serit')).toBe(eskiUc)
+    expect(g(wt, 'rev-parse', '--abbrev-ref', 'HEAD')).toBe('serit')
+  })
+
   it('(c) ayrık HEAD: dokunulmaz', () => {
     const { wt } = gerideKopya(1)
     g(wt, 'checkout', '-q', '--detach')
