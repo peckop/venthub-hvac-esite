@@ -122,7 +122,16 @@ const enkazMesaji = (enkaz: string[]): string =>
   'oldu (belgenin 1. satiri 1968 bayta cikti) ve UC KOL DA 17/17 YESIL kaldi.\n' +
   'Enkaz: ' + enkaz.join(' · ')
 
-describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
+/**
+ * ⭐KOL SÜRESİ GENEL SINIRDAN AYRILDI (ARC-267, 7 Kasım ölçüldü): bu dosyanın kolları üreticiyi GERÇEK süreç olarak koşturur
+ * (depo taraması). "YAZMA KIPI KORUR" kolu tek başına 3,0 sn; bellek %88-90'da ve tam pakette 31,0 sn sürüp genel 30 sn sınırında
+ * düştü (HARİTA HRT-19 kapanışı Kanban doğrulayıcıda buna takıldı). Düşen kol `finally`ye varamadığı için canlı `scripts/` altında
+ * `zz-*-gecici.*` artıkları da kalıyordu (ana ağaçta görüldü).
+ * ⛔GENEL SINIR YÜKSELTİLMEDİ (gerçek askıyı gizler); süre yalnız süreç koşturan bu iki bloğa verilir. Emsal: ana-agac-tazelik.test.ts GIT_SURE.
+ */
+const SUREC_SURE = 120_000
+
+describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', { timeout: SUREC_SURE }, () => {
   it('betik ve envanter belgesi VAR (kapi KOR kosmasin)', () => {
     expect(fs.existsSync(BETIK), 'kapi betigi yok — kapi hicbir sey olcmuyor ama yesil yanardi').toBe(true)
     expect(fs.existsSync(path.join(KOK, GERCEK_ENVANTER)), 'envanter belgesi yok').toBe(true)
@@ -520,7 +529,7 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
  * ⛔Reddeden kollar gercek belgeye YAZMAZ (reddedilmezse bile bayt karsilastirmasi yakalar); "ARAC yazar" kolu
  * saf fonksiyonla sinanir (surec kolu canli belgeye yazma riski tasirdi).
  */
-describe('INV-ARAC-4: --yaz varsayilan hedefe yalniz ARAC agacinda yazar', () => {
+describe('INV-ARAC-4: --yaz varsayilan hedefe yalniz ARAC agacinda yazar', { timeout: SUREC_SURE }, () => {
   const yazma = (rol: string, args: string[] = ['--yaz']): Cikti => kostur(args, { VENTHUB_PENCERE_AGENT: rol })
   const gercekBayt = (): string => fs.readFileSync(path.join(KOK, GERCEK_ENVANTER), 'utf8')
 
