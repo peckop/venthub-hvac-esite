@@ -80,30 +80,82 @@ describe('INV-SOZ-BEKCISI-1 — 8 haneli iç kimlik', () => {
   })
 })
 
-describe('INV-SOZ-BEKCISI-1 — Stop kancası uçtan uca', () => {
-  it('iç kimlik varsa exit 2 ve düzeltme önerir', () => {
+describe('INV-SOZ-BEKCISI-1 — Stop ölçeri uçtan uca (geri çevirmez, sayar)', () => {
+  it('iç kimlik varsa tur GERİ ÇEVRİLMEZ (exit 0) ve ihlal kayda sayılır; kimliğin kendisi kayda yazılmaz', () => {
     const r = koş('Oturum 06903c7d hazır.')
-    expect(r.kod).toBe(2)
-    expect(r.hata).toContain('06903c7d')
-    expect(r.hata).toContain('Sözbekçisi:')
+    expect(r.kod).toBe(0)
+    expect(r.hata).not.toContain('KIRMIZI')
+    const kayit = fs.readFileSync(path.join(r.dizin, 'soz-bekcisi-ihlal.log'), 'utf8')
+    expect(kayit).toContain('ic-kimlik-8x1')
+    expect(kayit).not.toContain('06903c7d')
   })
 
-  it('departman kodu yazılınca geçer', () => {
-    expect(koş('ARC-58 hazır, karar 419.').kod).toBe(0)
+  it('⛔SABOTAJ: stop_hook_active ya da herhangi bir girdide exit 2 asla dönmez', () => {
+    for (const ek of [{}, { stop_hook_active: true }]) expect(koş('Oturum 06903c7d hazır.', ek).kod).toBe(0)
   })
 
-  it('"Sözbekçisi: sebep" satırı atlatır ve kayda düşer', () => {
+  it('departman kodu yazılınca geçer ve kayıt düşmez', () => {
+    const r = koş('ARC-58 hazır, karar 419.')
+    expect(r.kod).toBe(0)
+    expect(fs.existsSync(path.join(r.dizin, 'soz-bekcisi-ihlal.log'))).toBe(false)
+  })
+
+  it('"Sözbekçisi: sebep" satırı atlatma kaydına düşer, ihlal sayılmaz', () => {
     const r = koş('Kimlik 06903c7d.\nSözbekçisi: sahibin kendi sorduğu kimlik')
     expect(r.kod).toBe(0)
     expect(fs.readFileSync(path.join(r.dizin, 'soz-bekcisi-atlatma.log'), 'utf8')).toContain('sahibin kendi sorduğu kimlik')
-  })
-
-  it('stop_hook_active ise ikinci kez bloklamaz', () => {
-    expect(koş('Oturum 06903c7d hazır.', { stop_hook_active: true }).kod).toBe(0)
+    expect(fs.existsSync(path.join(r.dizin, 'soz-bekcisi-ihlal.log'))).toBe(false)
   })
 
   it('bozuk girdi fail-open', () => {
     const r = spawnSync(process.execPath, [KANCA], { input: 'bozuk', encoding: 'utf8' })
     expect(r.status).toBe(0)
+  })
+})
+
+describe('INV-SOZ-BEKCISI-2 — UserPromptSubmit hatırlatması (cevaptan ÖNCE, tek satır, ≤300 bayt)', () => {
+  const HATIRLATMA = path.join(KOK, '.claude', 'hooks', 'soz-bekcisi-hatirlatma.cjs')
+  const hat = require_(HATIRLATMA) as { hatirlatma: (k: { duzeltme: string }[], tavan?: number) => string; TAVAN_BAYT: number }
+  const kosHat = (env: Record<string, string> = {}) =>
+    spawnSync(process.execPath, [HATIRLATMA], { input: '{}', encoding: 'utf8', env: { ...process.env, ...env } })
+
+  it('gerçek süreç: kuralın düzeltme cümlesini tek satır basar, 300 baytı aşmaz, exit 0', () => {
+    const r = kosHat({ VENTHUB_SOZ_BEKCISI_KAPAT: '' })
+    expect(r.status).toBe(0)
+    const satirlar = r.stdout.trimEnd().split('\n')
+    expect(satirlar).toHaveLength(1)
+    expect(Buffer.byteLength(satirlar[0], 'utf8')).toBeLessThanOrEqual(300)
+    expect(satirlar[0]).toContain(motor.kurallariOku()[0].duzeltme)
+  })
+
+  it('sabit metin: iki koşum bayt bayt aynı (önbelleği oynatmaz)', () => {
+    expect(kosHat().stdout).toBe(kosHat().stdout)
+  })
+
+  it('vana kapatınca sessiz', () => {
+    expect(kosHat({ VENTHUB_SOZ_BEKCISI_KAPAT: '1' }).stdout).toBe('')
+  })
+
+  it('⛔SABOTAJ: çok kural bayt tavanını aşamaz; kural yoksa satır yok', () => {
+    const cok = Array.from({ length: 20 }, (_, i) => ({ duzeltme: 'uzun düzeltme cümlesi numara ' + i + ' ğüşiöç' }))
+    expect(Buffer.byteLength(hat.hatirlatma(cok), 'utf8')).toBeLessThanOrEqual(300)
+    expect(hat.hatirlatma([])).toBe('')
+  })
+
+  it('kesme kod noktası başınadır: emoji çifti bölünüp bozuk karakter (U+FFFD) üretmez', () => {
+    for (let n = 230; n < 245; n++) {
+      const s = hat.hatirlatma([{ duzeltme: 'a'.repeat(n) + '😀😀😀' }])
+      expect(s.includes('�'), `n=${n}`).toBe(false)
+      expect(Buffer.byteLength(s, 'utf8')).toBeLessThanOrEqual(300)
+    }
+  })
+
+  it('settings.json: hatırlatma UserPromptSubmit\'e, ölçer Stop\'a bağlı (ikisi de kayıtlı)', () => {
+    const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8')) as {
+      hooks: Record<string, { hooks: { command: string }[] }[]>
+    }
+    const komutlar = (olay: string) => ayar.hooks[olay].flatMap((g) => g.hooks.map((h) => h.command))
+    expect(komutlar('UserPromptSubmit').some((c) => c.includes('soz-bekcisi-hatirlatma.cjs'))).toBe(true)
+    expect(komutlar('Stop').some((c) => c.includes('soz-bekcisi.cjs'))).toBe(true)
   })
 })

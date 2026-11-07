@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// soz-bekcisi — Stop kapısı (ARC-58, Recep onayı 2026-10-04): sahibin "görmek istemiyorum" dediği şey cevapta
-// geçiyorsa tur geri çevrilir; pencere cümleyi düzeltip yeniden yazar. Kural listesi: soz-bekcisi-kurallari.json
-// (hafıza satırı tek başına kapı değildir; yeni şikâyet = listeye satır, aynı gün kapı olur).
+// soz-bekcisi — Stop ÖLÇERİ (ARC-58, Recep onayı 2026-10-04; yeniden tasarım OPS 2026-11-07): sahibin "görmek istemiyorum"
+// dediği şey cevapta geçiyorsa tur GERİ ÇEVRİLMEZ (exit hep 0), ihlal ~/.claude/mod-durum/soz-bekcisi-ihlal.log'a sayılır.
+// Önleme cevaptan ÖNCE gelir: soz-bekcisi-hatirlatma.cjs (UserPromptSubmit). Kural listesi: soz-bekcisi-kurallari.json
+// (hafıza satırı tek başına kapı değildir; yeni şikâyet = listeye satır, hatırlatma ve ölçüm aynı gün başlar).
 //
 // KAPSAM: yalnız turun SON asistan metni (sahibin ekranda gördüğü). Başka pencereye giden SendMessage metni taranmaz;
 // iç yazışmada kimlik meşru olabilir. Kod blokları (```) ve adresler (http...) taranmaz.
@@ -59,6 +60,18 @@ function atlatmaKaydet(sebep, oturum) {
   }
 }
 
+/** İhlal sayısı: kural kimliği + oturum, bulunan ifade YAZILMAZ (iç kimlik kayda sızmasın). Yazılamazsa sessiz geçer. */
+function ihlalKaydet(bulgular, oturum) {
+  try {
+    const dizin = durumDizini()
+    fs.mkdirSync(dizin, { recursive: true })
+    const satir = bulgular.map((b) => b.kural.id + 'x' + b.bulunan.length).join(',')
+    fs.appendFileSync(path.join(dizin, 'soz-bekcisi-ihlal.log'), new Date().toISOString() + ' ' + oturum + ' ' + satir + '\n')
+  } catch {
+    process.stderr.write('[soz-bekcisi] ihlal kaydi yazilamadi\n')
+  }
+}
+
 function engelMetni(bulgular) {
   return (
     '[soz-bekcisi] KIRMIZI: sahibin görmek istemediği şey cevapta geçiyor. ' +
@@ -107,15 +120,13 @@ function main() {
       atlatmaKaydet(at[1], input.session_id || 'x')
       process.exit(0)
     }
-    if (input.stop_hook_active) {
-      process.stderr.write('[soz-bekcisi] stop_hook_active: ikinci kez bloklanmadi\n')
-      process.exit(0)
-    }
-    process.stderr.write(engelMetni(bulgular) + '\n')
-    process.exit(2)
+    // Geri çevirmez (OPS 7 Kasım): Stop'ta exit 2 cevap ekrana düştükten sonra yeniden yazdırır, sahip aynı mesajı iki kez görür.
+    // Önleme UserPromptSubmit hatırlatmasındadır (soz-bekcisi-hatirlatma.cjs); burası yalnız ölçer.
+    ihlalKaydet(bulgular, input.session_id || 'x')
+    process.exit(0)
   })
 }
 
-module.exports = { kurallariOku, tara, taranacakMetin, engelMetni, ATLATMA }
+module.exports = { kurallariOku, tara, taranacakMetin, engelMetni, ihlalKaydet, ATLATMA }
 
 if (require.main === module) main()
