@@ -42,6 +42,15 @@
 ## Aynı ders ikinci kez (HRT-70)
 - Bir ders ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir: aynı ders sage'de ya da bir kartta yazılıydı ve aynı sebepten ikinci kez kırmızı CI, kısmi iş ya da geri alınan işlem çıktıysa, çiğneyen departman kontrol önerisini (kanca ya da araç içi kapı) OPS'a tek mesajla yazar: hangi ders, hangi iki vaka, önerilen kontrol. OPS ARAÇ'a kart verir; kapının tasarımı ARAÇ'ındır. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
 
+## Haftalık öz-değerlendirme (HRT-114)
+- Haftalık öz-değerlendirme görevi sabit altı soruyla yapılır. Çürütücü haftanın kartlarını ve PR'larını bu sorulara karşı okur, müdür en çok 3 iyileştirmeyi OPS'a tek mesajla yazar. Her soruya bakılan kaynak (Kanban, git geçmişi, sage) ve sonuç yazılır; ifadesiz "yok" cevap sayılmaz.
+  1. İkinci kez yapılan hata var mı ve kalıcı çözümü ne (kural, kanca, test ya da sage dersi)?
+  2. Geciken ya da unutulan istek var mı (emir, verilen söz, kart)?
+  3. Bayat kart ya da kayıt var mı (Kanban, durum dosyası, cetvel, sahiplik tablosu)?
+  4. Geri dönüp düzeltilen iş var mı ve ilk seferde neden tutmadı?
+  5. Kullanılan ya da kullanılması gerekirken kullanılmayan skill, kanca ve Claude Code özelliği var mı?
+  6. İşe başlamadan Kanban'da mükerrer iş araması yapıldı mı (kartın ÖNCEKİ ÇALIŞMA satırı dolu mu)?
+
 ## Süren iş koruması (HRT-73)
 - Departmanın elinde süren iş varken gelen yeni emir o işi bölmez: emri kartına alırsın, sıraya koyarsın ve OPS'a "elimde X var, bitince başlarım" diye dönersin.
 - Süren iş ancak OPS açıkça "X'i bırak" derse bırakılır; OPS bırak derse sebebini yazar, sen de bıraktığın işin durumunu kartına işlersin. Kendi kendine iş değiştirmek bu kurala aykırıdır.
@@ -50,7 +59,9 @@
 - Kendi PR'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR'da (`.claude/hooks`, `scripts/board`, `settings.json` kanca kayıtları) değişikliği yazmamış bir denetçi alt ajan tam farkı okur; engelleyici bulgu yoksa ARAÇ birleştirir ve hüküm PR'a yazılır. İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep'e gider. Migration içeren PR Recep'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).
 - Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).
 - Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).
-- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.
+- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır. Yeni bir ölçüm kartında ÖNCEKİ ÇALIŞMA satırı "defter: ölçüldü/ölçülmedi" bilgisini de taşır; bilgi ölçüm defterinin sorgu çıktısından alınır (SEO ölçümünde `olcum-defteri.mjs --sor`). Olay: aynı ölçüm SEO-81, SEO-83 ve SEO-86'da üç kez tekrarlandı. Kapı tarafı gerekirse ARAÇ'a kart olarak açılır.
+- PR gövdesinde `pnpm test:ilgili`'nin kırmızı verdiği dosyalar listelenir; her dosyanın yanına "bu işin alanı mı: evet/hayır" yazılır. Olay: SEO-87'de kırmızı bir test "ilgisiz" sayılıp geçildi ve CI'da düştü.
+- Ortak satır (filo-ortak.md, rol kartı, açılış özeti) değiştiren PR birleşmeden önce güncel master'ın üstünde bayt ölçümü yapılır; kendi dalındaki ölçüm yetmez. Olay: art arda birleşen iki PR kendi tabanında yeşildi, birlikte kart tavanını aştı ve master'da test kırmızıya döndü (HRT-109).
 - Günlük işte Recep'e soru sorulmaz; `docs/standards/filo-tuzugu.md` Madde 2.1'de sayılan Recep kalemleri (`docs/roller/OPS.md` "Recep kapıları" ve ek kalemler: edge fonksiyonlu PR, dış yazışma, ürün kararları, departman açma/kapama) ve izin genişletme dışındaki her onay OPS'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS'a yazılır; Recep'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).
 
 ## Durum dosyası: standart "Yarım iş" satırı (HRT-31)

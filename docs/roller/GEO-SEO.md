@@ -19,7 +19,7 @@ Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini
 - 10 görev, tetiğe bağlı 7: `docs/roller/GEO-SEO-gorevler.md`.
 
 ## Dosyalar
-scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
+scripts/seo/**, public/llms.txt, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
 
 ## Yetki
 Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.

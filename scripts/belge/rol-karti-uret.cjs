@@ -189,8 +189,26 @@ const BIRLESTIRME_KURALI = [
   '- Kendi PR\'ını (migrationsız, edge fonksiyonsuz) kontroller yeşilken `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<ağaç> --merge` ile sen birleştirirsin; `gh pr merge` doğrudan çağrılmaz. Kanca ve ayar etkili PR\'da (`.claude/hooks`, `scripts/board`, `settings.json` kanca kayıtları) değişikliği yazmamış bir denetçi alt ajan tam farkı okur; engelleyici bulgu yoksa ARAÇ birleştirir ve hüküm PR\'a yazılır. İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep\'e gider. Migration içeren PR Recep\'in sözüyle `--onay` ile birleşir; edge fonksiyonlu PR da Recep\'in sözünü bekler (`--onay` yalnız migration içindir); söz işi koşan pencerede geçerlidir (karar 98, 224).',
   '- Çapalı hafıza okunur ve etiketlenir: dosyaya dokunmadan önce kancanın gösterdiği dersi oku; dersi uyguladıysan kart notuna yaz; ders yazarken departman etiketi (`audience.roles`) ve dosya çapası zorunludur (OPS-168 O10).',
   '- Bağımsız doğrulama: canlı yazım betiği, iş akışı ya da kapı, rol kartı üreticisi ve canlıya etkili PR\'da doğrulayıcı çalışan varsayılandır. Salt-okuma doğrulayıcı ve çürütücü bellek uyarısında da serbesttir; vitest, tsc, build ve `pnpm install` koşmaz (OPS-168 O5).',
-  '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır.',
+  '- Her ölçüm sonucu tarih ve tazelik süresiyle tek yere yazılır (sage `remember` + `validity` ve `anchor`, ya da ilgili ölçüm defteri): ölçülen şey, tarih, kaynak, ne zaman bayatlar. Bayatlamamış ölçüm tekrarlanmaz; işe başlamadan önce o kayıt aranır. Yeni bir ölçüm kartında ÖNCEKİ ÇALIŞMA satırı "defter: ölçüldü/ölçülmedi" bilgisini de taşır; bilgi ölçüm defterinin sorgu çıktısından alınır (SEO ölçümünde `olcum-defteri.mjs --sor`). Olay: aynı ölçüm SEO-81, SEO-83 ve SEO-86\'da üç kez tekrarlandı. Kapı tarafı gerekirse ARAÇ\'a kart olarak açılır.',
+  '- PR gövdesinde `pnpm test:ilgili`\'nin kırmızı verdiği dosyalar listelenir; her dosyanın yanına "bu işin alanı mı: evet/hayır" yazılır. Olay: SEO-87\'de kırmızı bir test "ilgisiz" sayılıp geçildi ve CI\'da düştü.',
+  '- Ortak satır (filo-ortak.md, rol kartı, açılış özeti) değiştiren PR birleşmeden önce güncel master\'ın üstünde bayt ölçümü yapılır; kendi dalındaki ölçüm yetmez. Olay: art arda birleşen iki PR kendi tabanında yeşildi, birlikte kart tavanını aştı ve master\'da test kırmızıya döndü (HRT-109).',
   '- Günlük işte Recep\'e soru sorulmaz; `docs/standards/filo-tuzugu.md` Madde 2.1\'de sayılan Recep kalemleri (`docs/roller/OPS.md` "Recep kapıları" ve ek kalemler: edge fonksiyonlu PR, dış yazışma, ürün kararları, departman açma/kapama) ve izin genişletme dışındaki her onay OPS\'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS\'a yazılır; Recep\'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).',
+].join('\n')
+
+/**
+ * HAFTALIK ÖZ-DEĞERLENDİRME (HRT-114, OPS-232, OPS emri 6 Kasım): görev kural kontrolü değil, departmanın kendi işinin sahibi olarak
+ * gelişmesidir (6 Kasım turunda dört departman eksiğini ancak sorulunca buldu). Sabit altı soru; görev metni (rol-gorevleri.json) buraya
+ * işaret eder. Kart baytı payı olmadığı için kurallar dosyasında durur; her rolün dosyasına AYNEN girer.
+ */
+const OZ_DEGERLENDIRME_KURALI = [
+  '## Haftalık öz-değerlendirme (HRT-114)',
+  '- Haftalık öz-değerlendirme görevi sabit altı soruyla yapılır. Çürütücü haftanın kartlarını ve PR\'larını bu sorulara karşı okur, müdür en çok 3 iyileştirmeyi OPS\'a tek mesajla yazar. Her soruya bakılan kaynak (Kanban, git geçmişi, sage) ve sonuç yazılır; ifadesiz "yok" cevap sayılmaz.',
+  '  1. İkinci kez yapılan hata var mı ve kalıcı çözümü ne (kural, kanca, test ya da sage dersi)?',
+  '  2. Geciken ya da unutulan istek var mı (emir, verilen söz, kart)?',
+  '  3. Bayat kart ya da kayıt var mı (Kanban, durum dosyası, cetvel, sahiplik tablosu)?',
+  '  4. Geri dönüp düzeltilen iş var mı ve ilk seferde neden tutmadı?',
+  '  5. Kullanılan ya da kullanılması gerekirken kullanılmayan skill, kanca ve Claude Code özelliği var mı?',
+  '  6. İşe başlamadan Kanban\'da mükerrer iş araması yapıldı mı (kartın ÖNCEKİ ÇALIŞMA satırı dolu mu)?',
 ].join('\n')
 
 /**
@@ -422,6 +440,8 @@ function kuralDosyasi(ad) {
     '',
     DERS_TEKRAR_KURALI,
     '',
+    OZ_DEGERLENDIRME_KURALI,
+    '',
     SUREN_IS_KORUMA_KURALI,
     '',
     BIRLESTIRME_KURALI,
@@ -525,16 +545,16 @@ const ROLLER = {
   ARAC: {
     gorev: 'Kanca, WrongStack, claude-mem ve şerit aracı altyapısı; araç envanteri ve araç-atıl-kalmaz kuralı.',
     gorevDegil: 'CI iş akışı ve bağımlılık (ALTYAPI); belge ve rol kartı (HARİTA); site kodu (URUN).',
-    dosyalar: '.claude/hooks/**, scripts/board/**, scripts/hijyen/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.',
-    yetki: 'Kanca tasarımı, kurulumu ve testi ARAÇ\'ındır (HARİTA yalnız kural ve belge metnini yazar; settings kaydı OPS\'ta); araç denemeleri; araç envanterine satır ekleme.',
-    yasak: '.mcp.json ve settings değişikliği OPS kapısıdır; ALTYAPI\'nın CI dosyalarına dokunmaz.',
+    dosyalar: '.claude/hooks/**, scripts/board/**, scripts/hijyen/**, scripts/arac/** ve testleri (arac-envanteri*, kanca-*, kanban-tutarlilik, ops-oturumu*), tools/**, docs/audits/arac-envanteri-*.',
+    yetki: 'Kanca tasarımı, kurulumu, testi ve settings.json kanca kaydı ARAÇ\'ındır (kanca ve ayar PR\'ını denetçi alt ajan okuduktan sonra ARAÇ birleştirir; HARİTA yalnız kural ve belge metnini yazar); araç denemeleri; araç envanterine satır ekleme.',
+    yasak: 'İzin, deny, MCP (.mcp.json) ve defaultMode kararı OPS kapısıdır (Recep\'e OPS götürür); ALTYAPI\'nın CI dosyalarına dokunmaz.',
     yetenek: 'wrongstack-kanban, wrongstack-mailbox-mcp, ast-grep, CodeGraph.',
     durum: 'Açık.',
   },
   ALTYAPI: {
     gorev: 'CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi; rota dili satırı ve yönlendirme (arama sonuç sayfasının kendisi URUN\'dur).',
     gorevDegil: 'arama sonuç sayfasının kendisi (URUN); kanca ve WrongStack aracı (ARAC); belge düzeni (HARİTA).',
-    dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md.',
+    dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, scripts/ci/**, .github/dependabot.yml, docs/standards/fleet-mechanism-standard.md, scripts/skills-eval-run.mjs ve scripts/skills-eval/** (ALT-160; skill içeriği YETENEK\'te).',
     pencereTetik: "Skill'leri Skill aracıyla adıyla çağır: worktree sil, C:/tmp temizliği, kopyaları kaldır → calisma-kopyasi-sil (ön yüklü); ödeme, sipariş, fiyat, yetki ya da webhook koduna dokunan PR'ı bağımsız doğrularken → mutasyon-testi; onlarca dosyayı ortak desene taşırken → maestro.",
     pencereSkills: ['calisma-kopyasi-sil'],
     yetki: 'CI ve bağımlılık değişikliği, dependabot PR\'ları, güvenlik taraması; kendi cetveli için gözden geçirme.',
@@ -581,7 +601,7 @@ const ROLLER = {
   'GEO-SEO': {
     gorev: 'Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük denetimi ve pazar ölçümü.',
     gorevDegil: 'içerik yazımı (BLOG); sayfa ve robots kodu (URUN, ALTYAPI); canlı içeriğe yazmak.',
-    dosyalar: 'scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.',
+    dosyalar: 'scripts/seo/**, public/llms.txt, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.',
     yetki: 'Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.',
     yasak: 'Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.',
     yetenek: 'Search Console (arayüz ve URL Inspection API), Bing Webmaster API (GetUrlInfo, SubmitUrlBatch), Yandex Webmaster (arayüz, yeniden tarama), Google Trends (çapa kuralı), claude-seo:seo-geo ajanı (yalnız yerel, Y2.3), scripts/seo/dizin-takip.mjs, PageSpeed, seo-audit.',
@@ -1030,6 +1050,7 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (SEO_EK_KURALI_ROLLERI.includes(ad) && !metin.includes(SEO_EK_KURALI)) s.push(`${ad}: kurallar dosyasında "VentHub SEO ek kuralları" bloğu eksik/değişmiş (HRT-75)`)
     if (!SEO_EK_KURALI_ROLLERI.includes(ad) && metin.includes('## VentHub SEO ek kuralları')) s.push(`${ad}: "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasına girer (HRT-75)`)
     if (!metin.includes(DERS_TEKRAR_KURALI)) s.push(`${ad}: kurallar dosyasında "Aynı ders ikinci kez" bloğu eksik/değişmiş (HRT-70)`)
+    if (!metin.includes(OZ_DEGERLENDIRME_KURALI)) s.push(`${ad}: kurallar dosyasında "Haftalık öz-değerlendirme" sabit altı soru bloğu eksik/değişmiş (HRT-114)`)
   }
   return s
 }
@@ -1371,6 +1392,7 @@ module.exports = {
   TARAYICI_KURALI,
   TESHIS_KURALI,
   DERS_TEKRAR_KURALI,
+  OZ_DEGERLENDIRME_KURALI,
   SUREN_IS_KORUMA_KURALI,
   SEO_EK_KURALI,
   SEO_EK_KURALI_ROLLERI,

@@ -86,7 +86,7 @@
           "esik": "Yedi adımın hepsi tamam"
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -140,7 +140,7 @@
           "esik": "GEÇTİ: plan iskeleti eksiksiz (docs/standards/kart-plani-standard.md)"
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -176,7 +176,7 @@
           "taslak": true
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -250,7 +250,7 @@
           "taslak": true
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -314,7 +314,7 @@
           "taslak": true
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -376,7 +376,7 @@
           "esik": "Yazılan alanların tamamı sayfada beklenen değerde; sapma 0"
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -391,7 +391,7 @@
       "nasil": "execution-method-standard.md, is-kayit-duzeni-standard.md, filo-tuzugu.md",
       "gorevler": [
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -415,7 +415,7 @@
       "nasil": "fleet-mechanism-standard.md, arac-envanteri-standard.md, hafiza-kancalari-standard.md",
       "gorevler": [
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -430,7 +430,7 @@
       "nasil": "rendering-cache-standard.md, adres-semasi-standard.md, kategori-adlandirma-standard.md",
       "gorevler": [
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -445,7 +445,7 @@
       "nasil": "rehber-yazisi-standard.md",
       "gorevler": [
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -460,7 +460,7 @@
       "nasil": "cetvel yok — yazımı kapsamda (skill atama tablosu iskeleti HARİTA'da, REC-509; komşu cetvel tasarim-yetenek-standard.md ARAÇ'ın)",
       "gorevler": [
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -484,7 +484,7 @@
       "nasil": "3d-webgl-standard.md",
       "gorevler": [
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
@@ -532,7 +532,7 @@
           "taslak": true
         },
         {
-          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını rol kartına, kurallara ve Dosyalar satırına karşı okur; müdür en çok 3 iyileştirme önerir",
+          "gorev": "Haftalık öz-değerlendirme (OPS-168 O9): çürütücü haftanın kartlarını ve PR'larını sabit altı soruya karşı okur (kurallar dosyası, \"Haftalık öz-değerlendirme\"); müdür en çok 3 iyileştirme önerir",
           "siklik": "haftalik",
           "tetik": "istem-tazelik",
           "tetikAyrinti": ".claude/hooks/gorev-tazelik-satiri.cjs istem satırında \"öz-değerlendirme: N gün\" (7 gün eşik); damga scripts/hijyen/gorev-damga.cjs (ARC-216 A kolu)",
