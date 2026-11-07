@@ -402,7 +402,9 @@ function turuOku(kayitlar) {
       if (b.type === 'tool_use' && b.name === 'SendMessage' && b.input && typeof b.input.message === 'string') mesajlar.push(b.input.message)
     }
   }
-  return { sonMetin, mesajlar }
+  const si = kayitlar[sonInsan]
+  const insan = ozetKodu((si.uuid || '') + '|' + (si.timestamp || '') + '|' + JSON.stringify(si.message && si.message.content))
+  return { sonMetin, mesajlar, insan }
 }
 
 // ── ARC-265 (7 Kasım): kırmızıda cevabı YENİDEN YAZDIRMA ──
@@ -437,16 +439,18 @@ function bekleyenOku(oturum, simdi = Date.now()) {
   try {
     const b = JSON.parse(fs.readFileSync(bekleyenYolu(oturum), 'utf8'))
     if (!b || typeof b.zaman !== 'number' || simdi - b.zaman > BEKLEYEN_OMUR_MS) return null
-    return { zaman: b.zaman, deneme: Number(b.deneme) || 1 }
+    return { zaman: b.zaman, deneme: Number(b.deneme) || 1, insan: String(b.insan || '') }
   } catch {
     return null
   }
 }
-function bekleyenYaz(oturum, deneme, simdi = Date.now()) {
+/** Dönüş: yazıldı mı. `insan` = kırmızıyı doğuran insan mesajının kimliği (yeni insan mesajında kayıt düşer). */
+function bekleyenYaz(oturum, deneme, insan, simdi = Date.now()) {
   try {
-    fs.writeFileSync(bekleyenYolu(oturum), JSON.stringify({ zaman: simdi, deneme }))
+    fs.writeFileSync(bekleyenYolu(oturum), JSON.stringify({ zaman: simdi, deneme, insan }))
+    return true
   } catch {
-    /* yazılamadı: kapı yine çalışır */
+    return false
   }
 }
 function bekleyenSil(oturum) {
@@ -521,42 +525,37 @@ function main() {
     if (!tur) process.exit(0)
 
     // ARC-265: önceki tur kırmızı verdiyse bu turun cevabı ek satır olarak değerlendirilir (yeniden yazım istenmez).
-    const bekleyen = bekleyenOku(oturum)
+    // Denetçi bulgusu 2: bekleyen kayıt YALNIZ kırmızıyı doğuran insan mesajının devam turunda geçerlidir; yeni insan mesajı gelince düşer
+    // (ilgisiz kısa cevap gereksiz bloklanmasın).
+    let bekleyen = bekleyenOku(oturum)
+    if (bekleyen && bekleyen.insan !== tur.insan) {
+      bekleyenSil(oturum)
+      bekleyen = null
+    }
     if (bekleyen) {
       const ek = ekSatirKarar(tur.sonMetin, kanbandanDogrula)
-      if (ek.durum === 'uzun') {
-        bekleyenSil(oturum) // yeni, uzun mesaj: aşağıdaki normal denetimden geçer
-      } else if (ek.durum === 'atlatildi') {
-        atlatmaKaydet(ek.atlatmaSebebi, oturum)
-        bekleyenSil(oturum)
-        durumYaz('iyi', 'kapı çalışıyor')
-        process.exit(0)
-      } else if (ek.durum === 'temiz') {
-        bekleyenSil(oturum)
-        durumYaz('iyi', 'kapı çalışıyor')
-        process.exit(0)
-      } else if (ek.durum === 'olculemedi') {
-        bekleyenSil(oturum)
-        durumYaz('uyari', 'kapı ölçemedi: ' + ek.olculemedi)
-        process.stderr.write('[kartsiz-beklenti-kapisi] ek satir olculemedi, tur gecti: ' + ek.olculemedi + '\n')
-        process.exit(0)
-      } else {
-        // blok: ek satır yok ya da geçersiz → kırmızı kalır (sınırlı sayıda tur; sonra fail-open ama sessiz değil).
+      if (ek.durum === 'blok') {
+        // ek satır yok ya da geçersiz → kırmızı kalır (sınırlı sayıda tur; sonra fail-open, kalıcı log satırıyla).
         if (bekleyen.deneme >= EK_SATIR_DENEME) {
           bekleyenSil(oturum)
+          atlatmaKaydet('EK-SATIR-DOGRULANAMADI: ' + EK_SATIR_DENEME + ' denemede kart/Kartsız satiri gelmedi, tur gecti', oturum)
           durumYaz('uyari', 'kartsız istek ek satırla kapanmadı (' + EK_SATIR_DENEME + ' deneme)')
-          process.stderr.write('[kartsiz-beklenti-kapisi] ek satir ' + EK_SATIR_DENEME + ' denemede dogrulanamadi, tur gecti (sessiz degil)\n')
+          process.stderr.write('[kartsiz-beklenti-kapisi] ek satir ' + EK_SATIR_DENEME + ' denemede dogrulanamadi, tur gecti (log: kartsiz-atlatma.log)\n')
           process.exit(0)
         }
-        bekleyenYaz(oturum, bekleyen.deneme + 1)
+        bekleyenYaz(oturum, bekleyen.deneme + 1, tur.insan)
         durumYaz('uyari', 'ek satır geçersiz, kırmızı kaldı')
         process.stderr.write(engelMetni(ek.sorunlar, 'ek satır') + '\n')
         process.exit(2)
       }
+      // uzun / atlatildi / temiz / olculemedi: bekleyen kapanır; AMA tur aşağıdaki NORMAL denetimden de geçer (denetçi bulgusu 1b/1c:
+      // ek satırla birlikte yazılmış yeni kartsız istek ya da SendMessage geçmesin).
+      bekleyenSil(oturum)
+      if (ek.durum === 'atlatildi') atlatmaKaydet(ek.atlatmaSebebi, oturum)
     }
 
     const gorulen = gorulenOku(oturum)
-    const adaylar =[{ metin: tur.sonMetin, kaynak: 'son mesaj', kod: null }]
+    const adaylar = [{ metin: tur.sonMetin, kaynak: 'son mesaj', kod: null }]
     for (const m of tur.mesajlar) adaylar.push({ metin: m, kaynak: 'başka pencereye giden mesaj', kod: ozetKodu(m) })
 
     const sorunlar = []
@@ -585,7 +584,11 @@ function main() {
         process.stderr.write('[kartsiz-beklenti-kapisi] stop_hook_active: ikinci kez bloklanmadi\n')
         process.exit(0)
       }
-      bekleyenYaz(oturum, 1) // ARC-265: sonraki tur ek satır beklenir
+      // ARC-265: devam turunda ek satır beklenir. Yazılamazsa kırmızı yine verilir ama ek satır akışı çalışmaz: görünür kıl (bulgu 4).
+      if (!bekleyenYaz(oturum, 1, tur.insan)) {
+        durumYaz('uyari', 'ek satır kaydı yazılamadı (tmp): kırmızı yeniden-yaz moduna düştü')
+        process.stderr.write('[kartsiz-beklenti-kapisi] bekleyen kayit yazilamadi (' + bekleyenDizini() + '), ek satir akisi calismaz\n')
+      }
       process.stderr.write(engelMetni(sorunlar, kaynak) + '\n')
       process.exit(2)
     }
