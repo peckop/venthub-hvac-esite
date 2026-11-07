@@ -43,6 +43,10 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     // Plug fan nedir yazısı (BLG-33, 2026-11): iki aile sayfası canlıda 200 verir (3 Kasım ölçümü; kategori sayfasından).
     ['casals-enkelfan-ec-plug', 'Casals ENKELFAN EC Plug Fan'],
     ['casals-kentalfan-plug', 'Casals KENTALFAN Plug Fan'],
+    // Asit fanı nedir yazısı (BLG-45, 2026-11): üç aile sayfası canlıda 200 verir (kategori sayfasından, 7 Kasım ölçümü).
+    ['seat-serisi', 'SEAT Storm Jet Asit Dayanımlı Fanlar'],
+    ['jet-serisi', 'JET Serisi'],
+    ['storm-serisi', 'STORM Serisi'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {

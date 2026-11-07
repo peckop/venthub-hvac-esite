@@ -1360,6 +1360,145 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-45), doğrulanmış metin: taslak v12 (sha a97bd48354c6). Makale çerçevesi (cetvel R3.3): markasız gövde, seri adları yalnız "VentHub'da hangi korozyona dayanıklı fan serileri var?" bölümünde ve Kaynaklar'da.
+    // Doğrulama: dört tur tam okuma, her turda tuzaklı + temiz kopya (tuzaklar 6/6, 7/7, 7/7, 7/7); GEO-SEO taslak okuması uygun; mevzuat satırları MEVZUAT paketinden (07.11.2026). Recep onayı 08.11.2026 (OPS). Fiyat, sıcaklık sınırı ve debi/basınç aralığı yok: kaynakta tek ve tarihli değer yok.
+    kimlik: 'asit-fani-nedir-korozyona-dayanikli-fan-secimi',
+    konu: 'guvenlik',
+    yayinTarihi: '2026-11-08',
+    guncellemeTarihi: '2026-11-08',
+    urunler: ['vh:aile/seat-serisi', 'vh:aile/jet-serisi', 'vh:aile/storm-serisi'],
+    ilgiliKategoriler: ['vh:kategori/corrosion-and-acid-resistant-fans'],
+    diller: {
+      tr: {
+        slug: 'asit-fani-nedir-korozyona-dayanikli-fan-secimi',
+        ozet: "Asit fanı, yani korozyona dayanıklı fan nedir? Hangi ortamlarda gündeme gelir, PP asit fanı dahil hangi malzemeler anılır, motor nerede olmalı, ATEX ile ilişkisi.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Asit fanının ne olduğunu, hangi ortamlarda gündeme geldiğini ve malzeme, motor yeri ile ATEX açısından neye bakılacağını görmek için bu rehberden başlayın.",
+        govde: `# Asit fanı nedir? Korozyona ve kimyasala dayanıklı fan nasıl seçilir
+
+Asit fanı, havadaki aşındırıcı gaz, buhar ya da damlacıkların parçalarını bozmayacağı malzemelerle yapılan fandır. Bu yazı asit fanının hangi ortamlarda gündeme geldiğini, kaynaklarda hangi malzemelerin anıldığını, motorun yerini ve patlayıcı ortam (ATEX) ile ilişkisini anlatır; kaynaklar yazının sonunda listelenir.
+
+## Asit fanı nedir?
+
+Bu yazıda asit fanı, korozyona dayanıklı fan ve kimyasal dayanımlı fan aynı anlamda kullanılır. Polipropilenden (PP) yapılan asit fanına bu yazıda PP asit fanı denir. ABD'deki Texas State Üniversitesi'nin çeker ocak egzozu için yazdığı standart, egzoz kanalının, fanın ve yıkayıcının malzemesinin çeker ocakta kullanılan maddelerle uyumlu seçilmesini ister [2].
+
+## Asit fanı ve korozyona dayanıklı fan hangi ortamlarda gündeme gelir?
+
+VentHub'da bu ortamlar için [korozyona ve aside dayanımlı fanlar kategorisi](vh:kategori/corrosion-and-acid-resistant-fans) bulunur.
+
+### Laboratuvar çeker ocağı
+
+Laboratuvar çeker ocağı bu ortamlardan biridir. Texas State Üniversitesi'nin çeker ocak standardı egzoz fanı için korozyon düzeyine göre malzeme ayırır: çok korozif koşullarda cam elyaf, PVC ya da eşdeğeri fanlar kullanılmalı; düşük ve orta korozif koşullarda kaplamalı çelik, cam elyaf ya da PVC fanlar kullanılabilir [2]. Bu, tek bir üniversitenin kendi standardıdır.
+
+### Kapalı yüzme havuzu
+
+Kapalı yüzme havuzu bir diğer örnektir. Euro Inox'un havuz ortamında paslanmaz çelik rehberi kapalı havuz atmosferini yapı ortamında bulunabilecek en aşındırıcı ortamlardan biri olarak niteler ve en kötü korozyon koşullarının havuz suyuyla temas noktasında değil, havuzun üzerindeki havada, örneğin asma tavanların arkasında oluştuğunu yazar [6]. ABD Hastalık Kontrol ve Önleme Merkezleri (CDC) havuz havasındaki yüksek kloramin ve diğer uçucu bileşik düzeylerinin metal yapıları ve ekipmanı da bozabileceğini belirtir [7]; su arıtmada kullanılan kimyasalların aşındırıcı doğası nedeniyle, yanma ekipmanı bulunan ekipman odalarında tüm ekipmanda, özellikle yanma ekipmanında, korozyon beklenmesi gerektiğini de yazar [8]. Alıntılanan sayfalar fanı anmaz, yapı parçalarından ve ekipman odası ekipmanından söz eder; havuz ortamında fanın da gündeme gelebileceği yazarın çıkarımıdır.
+
+### Atık su arıtma
+
+Atık su arıtma tesisleri de kanal sisteminden geçen en aşındırıcı gazlardan bazılarını üretir; bir üreticinin cam elyaf takviyeli plastik (FRP) fan kataloğu bunlar arasında hidrojen sülfür, metan, amonyak ve klor sayar [5].
+
+## Korozyona dayanıklı fanlarda hangi malzemeler kullanılır?
+
+Kaynaklarda anılan malzemeler aşağıdaki tabloda toplanmıştır. Tablo malzemeleri iyiden kötüye sıralamaz; kaynaklar malzeme uyumunu tahliye edilen maddelere bağlar [2].
+
+| Malzeme | Kaynakta ne yazıyor | Kaynak |
+|---|---|---|
+| Polipropilen (PP) | Asitlere ve alkalilere karşı çok iyi direnç gösterir. Aromatik, alifatik ve klorlu çözücülerde ve derişik nitrik asit gibi güçlü asitlerde zayıf kalır. Bir kimyasal direnç kılavuzu pH değeri değişen sistemler için kullanılacak en uygun malzemelerden biri olduğunu yazar | [3][4] |
+| PVC | Çeker ocak egzozunda, çok korozif koşullarda cam elyafla birlikte, düşük ve orta korozif koşullarda da anılır | [2] |
+| Cam elyaf (FRP) | Çeker ocak egzozunda çok korozif koşullar için anılır; bir FRP fan kataloğu hava akımına açık çelik parça bulunmadığını yazar | [2][5] |
+| Kaplamalı çelik | Çeker ocak egzozunda düşük ve orta korozif koşullar için anılır; kimyasal etkiye karşı kanal için de kaplamalı yumuşak çelik gerekebilir | [1][2] |
+
+Tablodaki polipropilen satırı bir malzeme föyüne ve bir kimyasal direnç kılavuzuna dayanır, fan föyüne değil [3][4]. Malzemelerin sıcaklık sınırı ayrıca belgelenir; bu yazıda sıcaklık sınırı verilmez, ilgili modelin ürün föyündeki değere bakılır.
+
+## Korozyona dayanıklı fanın motoru nerede olmalı?
+
+Çeker ocak standardı, fan motorunun kolay erişim için ve motorun kirlenmesini önlemek amacıyla egzoz kanalının dışına monte edilmesini önerir [2]. İngiltere Sağlık ve Güvenlik Kurumu'nun (HSE) yerel egzoz havalandırması kılavuzu ise kanal içindeki aksiyel fanı anlatırken, kirleticinin yanıcı ya da korozif olmadığı durumda motorun da kanalın içinde olduğunu yazar [1]. İki kaynak birlikte okunduğunda, kirletici korozifse motoru hava akımının dışında tutma yönünde bir ilke ortaya çıkar [1][2]; bu, yazarın çıkarımıdır.
+
+## Korozyona dayanıklı fan ile ATEX aynı şey midir?
+
+Üretici belgeleri patlayıcı ortama uygun sürümü ATEX adıyla anar ve 94/9/CE direktifine atıf yapar [13][14]; bu direktif 20 Nisan 2016'dan itibaren 2014/34/AB sayılı direktifle yürürlükten kaldırılmıştır [9]. 2014/34/AB direktifi muhtemel patlayıcı ortamda kullanılması amaçlanan teçhizatı ve koruyucu sistemleri kapsar; muhtemel patlayıcı ortamı yerel ve işletme koşulları nedeniyle patlayıcı hale gelebilecek ortam olarak tanımlar [9]. Türkiye'de muhtemel patlayıcı ortamda kullanılan teçhizata ilişkin yönetmelik 30 Haziran 2016 tarihli ve 29758 sayılı Resmî Gazete'de yayımlanmış ve yayımı tarihinde yürürlüğe girmiştir [10].
+
+Korozyona dayanım fanın malzemesinin aşındırıcı maddelerle uyumuyla, patlayıcı ortama uygunluk ise teçhizatın patlayıcı ortamda kullanılmasıyla ilgilidir [2][9]; biri diğerinin yerine geçmez; bu, yazarın çıkarımıdır. Bir ortam ikisini birden taşıyabilir: bir FRP fan kataloğu atık suda en yaygın gaz olan hidrojen sülfürün yüksek derecede patlayıcı olduğunu yazar ve bu yüzden patlamaya dayanıklı motor kullanılmasını, fan gövdesinin iç yüzeyinin de statik elektriğe karşı topraklanmasını önerir [5].
+
+2014/34/AB direktifinin Ek I bölümü, gaz, buhar, sis ya da hava/toz karışımı kaynaklı patlayıcı ortamın olası olmadığı ya da olsa bile seyrek ve kısa süreli olduğu yerler için tasarlanan teçhizatı kategori 3 olarak tanımlar [9]. Çalışanların korunmasına ilişkin 1999/92/AT sayılı direktif, normal çalışmada gaz, buhar veya sis halinde patlayıcı ortamın oluşmasının beklenmediği ve oluşsa da yalnızca kısa süre kalacağı yeri Bölge 2 olarak tanımlar; Bölge 2 ya da Bölge 22 için de, uygun olmaları koşuluyla, kategori 1, 2 veya 3 ekipmanı kabul eder [11]. Türkiye'de Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik (30 Nisan 2013 tarihli, 28633 sayılı Resmî Gazete) de Bölge 2 veya Bölge 22 için kategori 1, 2 veya 3 ekipmanı sayar [12].
+
+## Asit fanı seçerken hangi adımlar izlenir?
+
+Seçim, kaynaklardaki ilkelerden derlenen şu sırayla yapılabilir; sıra yazarın derlemesidir.
+
+1. Tahliye edilecek maddeleri listeleyin; malzeme, bu maddelerle uyumuna göre seçilir [2].
+2. Her malzemeyi madde bazında kimyasal direnç kılavuzlarında ya da föylerde doğrulayın [3][4].
+3. Hava yoluna giren parçaların, yani kanalın, fanın ve varsa yıkayıcının malzemesini birlikte değerlendirin [1][2].
+4. Motorun hava akımı içinde mi dışında mı olacağını belirleyin [1][2].
+5. Ortamda patlayıcı atmosfer ihtimali varsa bunu korozyondan ayrı değerlendirin [9][11].
+6. Teklif için gereken bilgileri toplayın (aşağıda).
+
+Fan türlerinin genel sınıflaması için [fan çeşitleri rehberi](vh:yazi/fan-cesitleri), santrifüj ve aksiyel fanların ayrımı için [radyal ve aksiyel fan seçimi rehberi](vh:yazi/radyal-aksiyel-fan-secimi) okunabilir.
+
+## Sık sorulan sorular
+
+### PP (polipropilen) asit fanı her kimyasala dayanır mı?
+
+Hayır. Bir polipropilen malzeme föyü, polipropilenin asitlere ve alkalilere karşı çok iyi, aromatik, alifatik ve klorlu çözücülere karşı zayıf dirençli olduğunu yazar [3]. Bir kimyasal direnç kılavuzu da polipropilenin derişik nitrik asit gibi güçlü asitlerde, klorlu hidrokarbonlarda, aromatik bileşiklerde ve yüksek derişimli serbest klorda uygun olmadığını belirtir [4]. Fanın kendi dayanımı ise modelin ürün föyündeki bilgiyle belirlenir.
+
+### PP asit fanı santrifüj fan mıdır?
+
+Üretici belgelerine göre SEAT, JET ve STORM serilerinin çarkı ileri eğimli santrifüj tipte, enjeksiyonla kalıplanmış PPH'den yapılır; JET serisi ayrıca çatı kaidesine monte, dikey boşaltmalı hat içi santrifüj fan olarak tanımlanır [13][14]. Santrifüj ve aksiyel fan ayrımı için [radyal ve aksiyel fan seçimi rehberi](vh:yazi/radyal-aksiyel-fan-secimi) okunabilir.
+
+### Paslanmaz çelik korozif ortamda her zaman güvenli midir?
+
+Hayır. Euro Inox rehberi, havuz atmosferinde 1.4301 (304) kalite paslanmaz çelik askı çubuklarındaki gerilimli korozyon çatlamasının 1985'te İsviçre'nin Uster kentindeki bir kapalı havuzun beton tavanının çökmesine yol açtığını anlatır [6]. Rehber, asma tavan bağlantı elemanları için yüksek alaşımlı paslanmaz çelikleri "şart" sayar [6]. Bu bulgu yapısal parçalar içindir; fanlar için ayrı bir değerlendirme gerekir; bu, yazarın çıkarımıdır.
+
+### Kanalın ve yıkayıcının malzemesi de önemli mi?
+
+Evet. Çeker ocak standardı egzoz kanalı, fan ve yıkayıcı malzemelerinin çeker ocakta kullanılan maddelerle uyumuna göre seçilmesini ister; kanal için termoplastik malzemelerin kullanılmamasını da şart koşar [2]. HSE kılavuzu da kimyasal etkiye karşı kanal için kaplamalı yumuşak çelik gerekebileceğini, korozif olmayan düşük sıcaklıklı uygulamalarda ise alüminyum ya da plastiğin (PVC, polipropilen) uygun olabileceğini yazar [1].
+
+### FRP fanda hava akımına açık çelik parça tamamen yok mu?
+
+Bir FRP fan kataloğu hava akımına açık çelik parça bulunmadığını yazar; aynı katalog hava akımıyla temas eden bağlantı elemanlarının paslanmaz çelikten olduğunu ve yangın geciktirici polyesterle kapsüllendiğini belirtir [5].
+
+### VentHub'da asit fanı fiyatı için teklif nasıl alınır?
+
+Ürün sayfalarındaki "Teknik Teklif İste" düğmesiyle teklif istenir; gereken bilgiler "Teklif için hangi bilgiler gerekir?" bölümünde sıralanır.
+
+## VentHub'da hangi korozyona dayanıklı fan serileri var?
+
+VentHub'un [korozyona ve aside dayanımlı fanlar kategorisinde](vh:kategori/corrosion-and-acid-resistant-fans) üç aile listelenir: [SEAT serisi](vh:aile/seat-serisi), [JET serisi](vh:aile/jet-serisi) ve [STORM serisi](vh:aile/storm-serisi). Üretici belgelerine göre SEAT serisinin gövdesi UV işlemli polipropilenden (PPH), çarkı enjeksiyonla kalıplanmış PPH'den yapılır [13]; JET ve STORM serilerinin gövdesi de polipropilendir, yalnız STORM 10'un gövdesi polietilendir [14]. Üç serinin belgesinde de motorun hava akımının dışında olduğu yazılıdır [13][14].
+
+Üretici, ürünlerini tanıttığı bölümde uygulama alanları olarak laboratuvarları, kimya sanayiini, su arıtma tesislerini, hastaneleri, elektrokaplamayı ve üniversiteleri sayar [13]. JET serisi laboratuvar egzozu ve kimya sanayii gibi çok aşındırıcı uygulamalar için tanımlanır [14]. STORM serisi güvenlik kabinleri (STORM 10), yıkayıcılar, duman yakalama kolları ve filtre muhafazaları (STORM 12, 14, 16) için anılır [14]. Üç serinin belgelerinde de ATEX paragrafı yer alır; paragraf "SEAT Series Fans" için Zone II, kategori 3 G seçeneğinden söz eder [13][14]. Çap, model sayısı ve teknik değerler aile ve ürün sayfalarındadır.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklif için şu bilgileri hazırlayın: tahliye edilecek maddeler ve ortam, hava debisi ve basınç, tek faz ya da üç faz tercihi, motorun hava akımına göre konumu, patlayıcı ortam (ATEX) ihtimali ve montaj alanı. Bu liste, kaynaklardaki malzeme uyumu [2], motor yeri [1][2], fan boyutlandırması [2] ve patlayıcı ortam [9] ilkelerinden yola çıkan yazarın derlemesidir; tek faz ya da üç faz tercihi ve montaj alanı ilke kaynaklarına bağlanmamıştır.
+
+## Kaynaklar
+
+Sayfa numaraları PDF sayfa sırasıdır. Kaynak [1], [2], [5], [7] ve [8] ABD ve İngiltere kaynaklarıdır, [6] Avrupa merkezli bir paslanmaz çelik birliğinin rehberidir; hepsi ilke örneği olarak kullanılmıştır; Türkiye için geçerli hükümler ilgili Türk resmî metinlerinde aranmalıdır. Kaynak [5], [13] ve [14] üreticilerin kendi belgeleridir ve ürünlerini anlatır; tarafsız kaynak sayılmaz. Kaynak [6] paslanmaz çeliğin havuz ortamında kullanımına ilişkin bir rehberdir. Kaynak [3] ve [4] fan için değil, bir malzeme föyü ve bir kimyasal direnç kılavuzu olarak hazırlanmıştır.
+
+1. UK Health and Safety Executive (HSE), HSG258 Controlling airborne contaminants at work: A guide to local exhaust ventilation (LEV), 3. baskı, 2017, s. 52 (¶172), s. 56 (¶190). https://www.hse.gov.uk/pubns/priced/hsg258.pdf (erişim 07.11.2026)
+2. Texas State University, EHSRM Fume Hood Standard, "Exhaust System (General)", "Exhaust Ducts" ve "Exhaust Fan" bölümleri. https://gato-docs.its.txst.edu/risk-management/ehsrm-labsfty/EHSRM-Fume-Hood-Standard (erişim 07.11.2026)
+3. White Knight (WK) Fluid Handling, Polypropylene (PP) malzeme föyü (27.02.2025), "General Properties". https://wkfluidhandling.com/wp-content/media/materials/pp-polypropylene.pdf (erişim 07.11.2026)
+4. Chemline, Chemical Resistance Guide (CRG.11.03.2023), polipropilen bölümü. https://www.jmesales.com/content/docs/Chemline/Chemline.Chemical-Resistance-Guide.11.03.2023-1.pdf (erişim 07.11.2026)
+5. Greenheck, BCSW-FRP Centrifugal Fans kataloğu (Nisan 2019), "Wastewater Treatment" ve "Corrosion Resistance" bölümleri, "Construction Features". https://content.greenheck.com/public/DAMProd/Original/10002/BCSWFRP_catalog.pdf (erişim 07.11.2026)
+6. Euro Inox, Safe use of stainless steel in swimming pool environments, 2013, s. 5, 6, 7. https://www.edelstahl-rostfrei.de/fileadmin/user_upload/ISER/downloads/Safe_use_swimmingpools_EN.pdf (erişim 07.11.2026)
+7. CDC, Model Aquatic Health Code 2018 ekleri, Preventing In-line Production of Toxic Chlorine Gas Events, s. 3. https://www.cdc.gov/model-aquatic-health-code/media/pdfs/Mini-MAHC-ANNEX-Chlorine-Gassing-508.pdf (erişim 07.11.2026)
+8. CDC, Model Aquatic Health Code 2018 ekleri, Preventing Pool Chemical Injuries, s. 4. https://www.cdc.gov/model-aquatic-health-code/media/pdfs/Mini-MAHC-Annex-Preventing-Pool-Chemical-Injuries-508.pdf (erişim 07.11.2026)
+9. Avrupa Parlamentosu ve Konseyi, Direktif 2014/34/AB (26 Şubat 2014, özgün metin), md. 1, md. 2(5), md. 43, Ek I. https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0034 (erişim 07.11.2026)
+10. Resmî Gazete, 30 Haziran 2016, sayı 29758, muhtemel patlayıcı ortamda kullanılan teçhizata ilişkin yönetmelik, md. 43(1). https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm (erişim 25.09.2026; MEVZUAT kontrolü 07.11.2026)
+11. Avrupa Parlamentosu ve Konseyi, Direktif 1999/92/AT, Ek I md. 2 ve Ek II Bölüm B. http://publications.europa.eu/resource/celex/31999L0092 (erişim 06.11.2026)
+12. Resmî Gazete, 30 Nisan 2013, sayı 28633, Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik (MEVZUAT kontrolü, 07.11.2026).
+13. SEAT, SEAT Series kataloğu (dosya adı SEAT-CATALOGUE.pdf), s. 5, 6 ve SEAT.pdf, s. 1 (üretici belgesi).
+14. SEAT, JET (JET.pdf, s. 1) ve STORM (Storm_series.pdf, s. 1) belgeleri (üretici belgesi).
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Katalog değerleri model ve çalışma noktasına göre değişebilir; kendi sisteminizde farklı çıkabilir. Kurulum yetkili personel tarafından yapılmalıdır.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
