@@ -780,13 +780,17 @@ function onceBunlarEkle() {
   }
 }
 
-/** VADESİ GELEN (ARC-236): yalnız OPS penceresi açılışında; Kanban okunamazsa sessiz (fail-open). */
+/**
+ * VADESİ GELEN (ARC-236, ARC-268): OPS'ta bütün panolar, departman penceresinde YALNIZ kendi panosu (kart departmanı: atanan ya da
+ * başlık öneki). Rolü olmayan pencerede sessiz; Kanban okunamazsa sessiz (fail-open).
+ */
 function vadeEkle() {
   try {
-    if (!rolSeridi || String(rolSeridi).trim().toUpperCase() !== 'OPS') return
+    if (!rolSeridi || String(rolSeridi).trim() === '') return
+    const rol = String(rolSeridi).trim().toUpperCase() === 'OPS' ? '' : rolSeridi
     const t = new Date()
     const bugun = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
-    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).vadeMetni(bugun)
+    const metin = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'once-elindeki-is.cjs')).vadeMetni(bugun, undefined, rol)
     if (!metin) return
     bolumler.splice(2, 0, {
       ad: 'vade',

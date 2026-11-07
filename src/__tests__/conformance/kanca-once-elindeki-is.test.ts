@@ -7,6 +7,7 @@
  * (etiketi yok sayan / kendini sayan) bir kopyaya karşı KIRMIZI verir; yani kural gerçekten ölçülüyor.
  */
 import { spawnSync } from 'node:child_process'
+import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 
@@ -28,7 +29,7 @@ interface Kart {
   dueDate?: string | null
 }
 interface Modul {
-  vadeMetni: (bugun: string, kartlar: Kart[] | null) => string
+  vadeMetni: (bugun: string, kartlar?: Kart[] | null, rol?: string, onek?: Record<string, string>) => string
   acilisMetni: (rol: string, kartlar: Kart[] | null, onek?: Record<string, string>) => string
   baslatmaUyarisi: (hedef: string, kartlar: Kart[] | null, onek?: Record<string, string>) => string
   grupla: (k: Kart[], rol: string, onek?: Record<string, string>) => { surenler: Kart[]; bekleyenler: Kart[]; incelemede: Kart[]; sirada: Kart[] }
@@ -241,5 +242,65 @@ describe('VADESİ GELEN (ARC-236, OPS açılışı)', () => {
     const gevsek = vadeli.filter((k) => k.dueDate).map((k) => k.title)
     expect(gevsek.join()).toContain('ARC-900') // gevşek kopya yarını da sayardı
     expect(m.vadeMetni(BUGUN, vadeli)).not.toContain('ARC-900')
+  })
+})
+
+describe('VADESİ GELEN · kendi panosu (ARC-268, OPS 7 Kasım)', () => {
+  const BUGUN = '2026-11-07'
+  const kartlar = [
+    kart('ARC-31', 'Backlog', { title: 'araç vadeli', dueDate: '2026-10-06' }),
+    kart('ARC-32', 'To Do', { title: 'araç bugün', dueDate: '2026-11-07' }),
+    kart('ARC-33', 'Backlog', { title: 'araç gelecek', dueDate: '2026-11-20' }),
+    kart('ARC-34', 'Done', { title: 'araç bitmiş', dueDate: '2026-10-01' }),
+    kart('ALT-76', 'To Do', { title: 'altyapı vadeli', dueDate: '2026-10-23' }),
+    kart('HRT-9', 'In Progress', { title: 'harita vadeli', dueDate: '2026-11-07' }),
+    kart('REC-77', 'Backlog', { title: 'taşınan araç kartı', dueDate: '2026-10-10', assignee: 'Araç' }),
+    kart('REC-78', 'Backlog', { title: 'departmansız', dueDate: '2026-10-10' }),
+  ]
+  const no = (metin: string) => metin.split('\n').filter(Boolean).map((s) => s.split(' · ')[0].replace('VADESİ GELEN: ', ''))
+
+  it('(a) departman rolünde YALNIZ kendi panosunun vadesi gelen kartı görünür (başlık öneki ya da atanan)', () => {
+    const metin = m.vadeMetni(BUGUN, kartlar, 'ARAC', ONEK)
+    expect(no(metin)).toEqual(['ARC-32', 'REC-77', 'ARC-31'])
+    for (const baska of ['ALT-76', 'HRT-9', 'REC-78']) expect(metin).not.toContain(baska)
+    expect(no(m.vadeMetni(BUGUN, kartlar, 'altyapi', ONEK))).toEqual(['ALT-76'])
+  })
+
+  it('(b) OPS ve rolsüz çağrıda bütün panolar görünür', () => {
+    const hepsi = ['ARC-32', 'HRT-9', 'ALT-76', 'REC-77', 'REC-78', 'ARC-31'] // vade tarihi azalan, eşitte kart no
+    expect(no(m.vadeMetni(BUGUN, kartlar, 'OPS', ONEK))).toEqual(hepsi)
+    expect(no(m.vadeMetni(BUGUN, kartlar, '', ONEK))).toEqual(hepsi)
+    expect(no(m.vadeMetni(BUGUN, kartlar, undefined, ONEK))).toEqual(hepsi)
+  })
+
+  it('(c) gelecek vade ve Done görünmez; kendi panosunda vade yoksa boş', () => {
+    const metin = m.vadeMetni(BUGUN, kartlar, 'ARAC', ONEK)
+    expect(metin).not.toContain('ARC-33')
+    expect(metin).not.toContain('ARC-34')
+    expect(m.vadeMetni(BUGUN, kartlar, 'TASARIM', ONEK)).toBe('')
+  })
+
+  it('(d) çok kartta kendi panosunda da çıktı tavanlı (10 satır + "+N" notu)', () => {
+    const cok = Array.from({ length: 14 }, (_, i) => kart(`ARC-${200 + i}`, 'Backlog', { dueDate: '2026-10-01' }))
+    const satirlar = m.vadeMetni(BUGUN, cok, 'ARAC', ONEK).split('\n').filter(Boolean)
+    expect(satirlar).toHaveLength(11)
+    expect(satirlar[10]).toContain('+4 vadesi gelen kart daha')
+  })
+
+  it('(e) Kanban okunamazsa (null) kendi panosunda da sessiz boş (fail-open)', () => {
+    expect(m.vadeMetni(BUGUN, null, 'ARAC', ONEK)).toBe('')
+  })
+
+  it('SABOTAJ: süzgeç kalkarsa (rol yok sayılırsa) (a) KIRMIZI verir — ayrım gerçekten ölçülüyor', () => {
+    const rolsuz = m.vadeMetni(BUGUN, kartlar, '', ONEK)
+    expect(rolsuz).toContain('ALT-76') // gevşek kopya başka panoyu da gösterirdi
+    expect(m.vadeMetni(BUGUN, kartlar, 'ARAC', ONEK)).not.toContain('ALT-76')
+  })
+
+  it('açılış kancası bağlı: vadeEkle rol sınırı kaldırıldı, rol departman olarak geçirilir (OPS boş)', () => {
+    const kaynak = fs.readFileSync(path.join(KOK, '.claude', 'hooks', 'session-board.cjs'), 'utf8')
+    const govde = kaynak.slice(kaynak.indexOf('function vadeEkle()'), kaynak.indexOf('const yaz = () =>'))
+    expect(govde).not.toMatch(/!==\s*'OPS'\)\s*return/)
+    expect(govde).toMatch(/vadeMetni\(bugun,\s*undefined,\s*rol\)/)
   })
 })
