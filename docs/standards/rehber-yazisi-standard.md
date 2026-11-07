@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.17 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.18 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -95,6 +95,10 @@ metinlerinde marka adlarının yoğunlaşması, kuralın yazılı olup kapısın
 **v0.17 (2026-11-03, BLG-37, OPS bulgusu):** `MARKA_SERI_ADLARI` listesine sitedeki markalar ve seri adları eklendi (Vortice, Gebhardt,
 Danfoss, Avens, LINEO, VORT, VLT; "Radon" gaz adı olduğu için alınmadı). Neden: fan-cesitleri ve radyal-aksiyel yazılarının gövdesi
 Vortice ve LINEO taşıyor, liste yokken kapı onları görmezdi. Test eklendi (56/56).
+
+**v0.18 (2026-11-07, BLG-44, OPS kararı):** R5.5'e **"Var olan ifade silinmez, yalnız eklenir"** maddesi: yayındaki yazının revizyonunda
+başlık, H2/H3, meta açıklama ve SSS'te var olan ifade silinmez; revizyondan önce fark betikle çıkarılır, silinen satır PR gövdesine ve
+GEO-SEO'ya yazılır. Kapı yazılmadı (ARAÇ işi); fark betiği BLOG çalışma klasöründe (depo dışı).
 
 ---
 
@@ -550,6 +554,19 @@ farkın yalnız başlık satırları olduğu betikle gösterilir; (b) `rehber-de
 aynıdır; (c) iki bağımsız tur (başlıkların okunması + tam okuma). İçerik cümlesi değişiyorsa bu madde uygulanmaz, tam
 revizyon (R5.1) gerekir. Dayanak: BLG-13. **Yayın ya da revizyon PR'ında** yazı kaydındaki güncelleme tarihi aynı PR'da
 değişir; birleşmeden sonra canlı site haritası `lastmod` değeri ölçülür (BLG-13'te eski kalmıştı, ayrı PR gerekti).
+
+**Var olan ifade silinmez, yalnız eklenir (v0.18, BLG-44, OPS kararı 2026-11-07, GEO-SEO SEO-89 ölçümüne dayanır).** Yayındaki
+yazının revizyonunda başlıkta (H1), H2 ve H3 başlıklarında, meta açıklamada (`ozet`) ve SSS soru ile cevaplarında var olan ifade
+silinmez ve yeniden yazılmaz; yalnız yeni başlık, bölüm ya da soru eklenir. **Niçin:** bu alanlardaki ifadeler sayfanın arama
+motorunda eşleştiği sorgularla bağlantılıdır; ölçülmeden silinen ifade bu bağı koparabilir, bir revizyonun ölçülebilir etkisi de
+ancak eski metin yerinde kaldığında okunur. **Uygulama:** (a) revizyondan önce eski ve yeni gövde arasındaki fark betikle çıkarılır:
+silinen ya da değişen satır sayısı, eksik başlık sayısı ve eklenen satırlar listelenir; yalnız-ekleme revizyonunda silinen satır 0
+olmalıdır. (b) Silinmesi ya da değişmesi gereken bir ifade varsa (yanlış olgu, kaynak düzeltmesi) bu madde onu engellemez, ama o
+satır ayrıca gerekçesiyle revizyonun PR gövdesine ve GEO-SEO'ya yazılır (satır sayısı fark kanıtındaki sayıyla aynı olmalı).
+(c) Eklenen cümleler başka bölümde zaten doğrulanmış iddiaların yeniden dizilişiyse tur, eklenen satırların eski metindeki
+karşılığıyla eşdeğerliği ve başlıkların içeriği karşılamasıdır (tuzaklı + temiz kopya); yeni olgu içeriyorsa tam R5.1 uygulanır.
+(d) Yeni başlık Y2 (R11.3) kuralına uyar: tek başına okunduğunda neyi anlattığı anlaşılır. Dayanak: BLG-44 (fan-cesitleri,
+kanal-tipi-fan-nedir, sessiz-fan-secimi; üç yazıda silinen satır 0).
 
 ### R5.6 Önizleme
 
