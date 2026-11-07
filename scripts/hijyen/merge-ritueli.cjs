@@ -721,14 +721,13 @@ if (require.main === module) {
     // ama sonuç her koşulda GÖRÜNÜR yazılır. Yalnız ff-only; stash/reset/checkout yok.
     try {
       const tazelik = require(path.join(__dirname, 'ana-agac-tazelik.cjs'))
-      const dosyalar = JSON.parse(gh(['pr', 'view', pr, '--json', 'files'])).files.map((f) => f.path)
-      if (tazelik.ayarYolunaDeger(dosyalar)) {
-        try { git(['fetch', 'origin', 'master', '-q']) } catch { /* ölçüm bayatsa ileriSar 'guncel' der; aşağıda yazılır */ }
-        const s = tazelik.ileriSar(tazelik.anaAgacYolu(AGAC))
-        yaz('ANA AGAC: ' + s.durum + (s.geride != null ? ' (geride ' + s.geride + ')' : '') +
-          (s.sebep ? ' — ' + s.sebep : '') +
-          (s.durum === 'ilerlendi' ? ' — yeni kancalar sonraki turda, .mcp.json pencere yeniden acilinca etkin' : ''))
-      }
+      // ARC-272 (OPS 7 Kasım): ff HER birleştirmeden sonra yapılır, yalnız ayar yoluna değen PR'dan sonra değil. Eskiden
+      // belge PR'ında ana ağaç geride kalıyor, ana ağaçtan okunan file_exists kanıtı kartı sahte kırmızıya düşürüyordu (ARC-120).
+      // Kirli ağaçta/ff olmazsa ileriSar durur; satır ⚠ ile uyarır, zorlamaz.
+      let ayar = false
+      try { ayar = tazelik.ayarYolunaDeger(JSON.parse(gh(['pr', 'view', pr, '--json', 'files'])).files.map((f) => f.path)) } catch { /* ipucu yalnız mesajdır */ }
+      try { git(['fetch', 'origin', 'master', '-q']) } catch { /* ölçüm bayatsa ileriSar 'guncel' der; aşağıda yazılır */ }
+      yaz(tazelik.anaAgacSatiri(tazelik.ileriSar(tazelik.anaAgacYolu(AGAC)), ayar))
     } catch (e) {
       yaz('ANA AGAC: OLCEMEDI — ' + String((e && e.message) || e).slice(0, 160) + ' (merge etkilenmedi)')
     }
