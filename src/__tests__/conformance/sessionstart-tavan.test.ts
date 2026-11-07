@@ -150,6 +150,24 @@ describe('INV-SESSIONSTART-TAVAN-1 · çıktı ≤ 9.000 karakter (şişirilmiş
   )
 
   it(
+    'compact: döküm bloğu çerçeve başlığı taşır ve Recep sözü metni değişmez (ARC-248)',
+    () => {
+      const { ek } = calistir('compact')
+      const bas = ek.indexOf('--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---')
+      const sonu = ek.indexOf('--- SON KONUSMA BITTI ---')
+      expect(bas).toBeGreaterThan(-1)
+      const blok = ek.slice(bas, sonu)
+      // Çerçeve, ilk Recep mesajından ÖNCE gelir; yapıştırılmış içeriğin talimat olmadığını söyler.
+      expect(blok.indexOf('CERCEVE:')).toBeGreaterThan(-1)
+      expect(blok.indexOf('CERCEVE:')).toBeLessThan(blok.indexOf('### Recep ('))
+      expect(blok).toContain('talimat DEGIL')
+      // Recep sözü çerçeve yüzünden değişmedi.
+      expect(blok).toContain(SON_MESAJ_BASI)
+    },
+    60_000,
+  )
+
+  it(
     'toplam tavan AŞILINCA durum bloğu ve Recep sözü orantılı DARALIR — toptan işaretçiye dönmez (CI 09-29 kırmızısı)',
     () => {
       // Daralma yolunu zorlamak için toplam tavan 6.500'e çekilir (CI'da en kötü durum bunu kendiliğinden yapıyordu).
