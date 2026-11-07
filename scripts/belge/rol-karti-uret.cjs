@@ -587,7 +587,7 @@ const ROLLER = {
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5, R10.5 (ders listesi), R10.6 (yayın öncesi kontrol) ve R11\'i oku.',
     gorevDegil: 'arama görünürlük ölçümü (GEO-SEO); sayfa kodu (URUN); mevzuat hükmü üretmek (MEVZUAT).',
-    dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydının gövde ve tarih alanları; liste ve rota kodu URUN), src/lib/bilgiMerkezi/__tests__/kartGuncellemeTarihi.test.tsx.',
+    dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydı: B8\'de sayılan tüm alanlar, H1, ozet, urunler, ilgiliKategoriler dahil; liste ve rota kodu URUN), yazıyla değişen fikstür ve testler (src/lib/bilgiMerkezi/__tests__/sahteKaynak.ts, kartNosnippet.test.tsx, kartGuncellemeTarihi.test.tsx; src/app/__tests__/fixtures/sitemapAltin.json, sitemapAdresUret.test.ts; conformance/fikstur/rota-dili-kapali-2-oncesi.json), src/config/bilgiMerkeziYonlendirmeleri.mjs (yönlendirme betiği; public/llms.txt GEO-SEO\'nundur).',
     yetki: 'Taslak yazma, kaynak ve mevzuat paketi isteme (MEVZUAT girdisi), kalıp kapısı.',
     yasak: 'Recep görmeden içerik onayı istenmez (karar 98); yayın Recep onayıyla; mevzuat iddiası kaynaksız yazılmaz.',
     yetenek: 'rehber-yazisi cetveli, kaynak dizini, görsel ihtiyaç listesi.',
@@ -607,7 +607,7 @@ const ROLLER = {
   MEVZUAT: {
     gorev: 'Teknik mevzuat ve standart kaydı: ürünlerimize dokunan AB tüzük/direktif, TR yönetmelik/tebliğ ve EN/ISO/IEC hükümlerini kanıtlı tutmak; KATALOG, BLOG ve SATIS\'a ürün ailesi × hüküm paketi vermek. Ayrıca firma ürünü için CE uygunluk dosyası: beyan taslağı, risk çerçevesi, eksik belge listesi, kurum talebine cevabın ekleri; imza üreticide ya da Recep\'tedir.',
     gorevDegil: 'ürün sayfası ve veri yazımı (KATALOG); KVKK, mesafeli satış, fatura (OPS); dış yazışma göndermek, taslak mail ya da yanıt yazmak (Recep); beyan imzalamak, test raporu ya da risk sonucu uydurmak.',
-    dosyalar: 'docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.4, 46 kalem), docs/mevzuat/kanit/** (46 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.',
+    dosyalar: 'docs/standards/mevzuat-kaydi-standard.md (cetvel sahibi MEVZUAT), docs/mevzuat/kayit.json (v0.5, 47 kalem), docs/mevzuat/kanit/** (47 dosya), docs/mevzuat/ce-dosyasi-sablonlari/ (firmasız şablonlar); firma dosyaları depo dışında ~/mevzuat-calisma/<is-adi>/.',
     yetki: 'Kayda kalem ekler ve günceller; aile bazlı "kapsamda / kapsam dışı / belirsiz" hükmü verir; BLOG yazısındaki mevzuat cümlelerini kontrol eder (R5.1); kayıt değişince ilgili departmana bildirir; "ilk anlatan" konu önerir, sırayı Recep belirler.',
     yasak: 'Standart gövdesinden cümle/tablo/sayı kopyalamaz; tarih tahmin etmez (null yazar); kanıtsız hüküm vermez; ürün sayfasını KATALOG değiştirir, canlı veriye yazılmaz; "ErP Uyumlu" ifadesi yalnız M6.0 kuralıyla; KVKK, mesafeli satış ve fatura kapsam dışıdır (OPS).',
     yetenek: 'Yayın Ofisi CELEX + SPARQL (EUR-Lex\'e curl kapalı); Resmî Gazete, mevzuat.gov.tr; kaynak dizini; docs/mevzuat/kayit.json. Skill: ce-uygunluk-dosyasi. NotebookLM emekli (karar 419).',
