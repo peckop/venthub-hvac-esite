@@ -21,3 +21,4 @@ paths:
 6. Ölçmeden "dizinde yok", "bozuk" ya da "boş" denmez.
 7. Search Console "Geliştirmeler" ve "Alışveriş" raporları haftalık okunur
 8. Dizin isteği disiplini. İstek atmadan önce dizin-takip kararı okunur; YAP/TEKRAR dışındaki adres×motor'a istek atılmaz.
+9. Dizin isteği listenin en önündedir (Recep, 8 Kasım).

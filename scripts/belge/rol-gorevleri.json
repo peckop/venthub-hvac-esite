@@ -56,14 +56,14 @@
           "esik": "Canlıda 200 görülen her yeni ya da değişen adres için aynı gün kuyruk girişi; Google sınırına takılan ertesi gün ilk iş"
         },
         {
-          "gorev": "Yayın sonrası dizin isteği: canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda scripts/seo/dizin-takip.mjs --durum kararı; yalnız YAP/TEKRAR olan adres×motor'a istek (Google elle istek günde ~10, Bing API günde 100, Yandex arayüz günde 10, IndexNow günlük görev); eylemden sonra aynı turda --kaydet; cetvel dizin-sistemleri-standard.md D7",
+          "gorev": "Yayın sonrası dizin isteği (listenin EN ÖNÜ, takip ölçümlerinden önce; sıra: kotadan artan adresler, sonra yeni yayınlanan yazı, en son kontrol): canlıya çıkan her yeni ya da değişen adres doğrulanınca aynı turda scripts/seo/dizin-takip.mjs --durum kararı; yalnız YAP/TEKRAR olan adres×motor'a istek (Google elle istek günde ~10, Bing API günde 100, Yandex arayüz günde 10, IndexNow günlük görev); eylemden sonra aynı turda --kaydet; cetvel dizin-sistemleri-standard.md D7",
           "siklik": "her-dagitim-gunluk",
           "tetik": "kart-kapisi",
           "tetikAyrinti": "BLOG B10 bildirimi ya da site haritası farkı; tetik henüz kurulu değil (kuracak: ARAÇ); mevcut .github/workflows/dizin-tetigi.yml IndexNow ve Google kuyruğunu ayrıca besler",
           "bagli": "hayir",
           "baglayacak": "ARAC",
           "cikti": "Adres×motor başına --kaydet satırı ve ilgili Kanban kartına özet; engel varsa (oturum yok, günlük sınır) OPS'a tek satır",
-          "esik": "YAP kalan adres 0"
+          "esik": "YAP kalan adres 0; kota yüzünden kalan adres ertesi gün kota açılışında ilk iş"
         },
         {
           "gorev": "Rehber taslak okuması: BLOG taslağı B6a'ya getirince R10 okuması ve Y2.3 ajan turu; bulgu satıra karşı doğrulanır (cetvel yayin-gorunurluk-denetim-standard.md Y2.3)",
