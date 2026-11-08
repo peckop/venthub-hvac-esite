@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.18 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.19 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -100,6 +100,8 @@ Vortice ve LINEO taşıyor, liste yokken kapı onları görmezdi. Test eklendi (
 başlık, H2/H3, meta açıklama ve SSS'te var olan ifade silinmez; revizyondan önce fark betikle çıkarılır, silinen satır PR gövdesine ve
 GEO-SEO'ya yazılır. Kapı yazılmadı (ARAÇ işi); fark betiği BLOG çalışma klasöründe (depo dışı).
 
+**v0.19 (2026-11-08, BLG-48, OPS-245, Recep onayı):** ERF blog incelemesinden (BLG-32, BLG-47, BLG-48; Geo-SEO SEO-94 SERP ölçümü) üç kural: **R1.3 farklı arama niyeti istisnası (K1)**, **R1.4 "sektör/uygulama rehberi" içerik türü (K2)**, **R11.3 Y9 yalnız-ekleme sorgu ifadesi (K6)**. Kanıt: ERF 21 sektör sorgusunun 9'unda ilk 10'da (Bing), VentHub 0/21; bizde sektör yazısı yok. Ölçülmeyen ve kural olmayan: uzunluk, H2 sayısı, FAQPage işareti (K4/K5 önerisi yok); görsel şartı (K3) yeni sitede Design görsel yolu geldikten sonra ayrı karar.
+
 ---
 
 ## R0 — Kapsam
@@ -175,6 +177,12 @@ Aynı sorguya iki yazı yarışmaz. Yeni konu açılmadan önce Search Console'd
 küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişletilmesi** (R5.5 revizyonu)
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 
+**Farklı arama niyeti istisnası (v0.19, K1).** Aynı ürün türü için **sektör ya da uygulama sorgusu** ("mutfak egzoz fanı", "boyahane havalandırma fanı"; "X için fan") mevcut rehberle aynı sorgu değil, farklı niyettir ve ayrı yazı açılabilir. Üç şart BİRLİKTE aranır, biri eksikse yazı açılmaz:
+1. **Talep ölçümü:** Geo-SEO sorgunun SERP türünü ve talebini ölçer (`seo-olcum`; önce `olcum-defteri.mjs --sor`, cetvel D8); sayı ve ölçüm tarihi karta yazılır. Ölçülmeden "farklı niyet" hükmü verilmez. Ölçü `yayin-gorunurluk-denetim-standard.md` Y2.5'tir: sorgu sınıfı (ürün türü, bilgi, sektör/uygulama), sitede karşılık, talep ve sıra; üç satırı R10 B6a okumasında GEO-SEO yazar, açılsın mı ve hangi sırayla kararı BLOG'un cetveline ve OPS'a aittir. Talep tek bir rakibin varlığıyla gerekçelendirilmez (Y2.5 kuralı).
+2. **Kaynak paketi:** sektörün mevzuat ya da standart karşılığı R2.6'nın üç şartıyla (MEVZUAT paketi ya da BLOG'un ham metinden doğrulaması); kaynağı olmayan sektör yazısı açılmaz.
+3. **Ürün karşılığı:** sitede o sektöre uygun satılan aile ya da kategori vardır (R1.2 c > 0); yazı oraya iç bağlantı verir. Karşılığı olmayan sektör yazısı sıranın sonuna bile girmez.
+Mevcut rehberle çakışan sorguda (aynı sorgu iki sayfaya uyuyorsa) hedef sayfayı Geo-SEO SERP türüne bakıp belirler; bu istisna o kuralı değiştirmez.
+
 ### R1.4 Konu sırası ve içerik türleri (karar 121, Recep 2026-09-24/25)
 
 **Konu sırası** (kayıt: REC-369 yorumu 2026-09-24):
@@ -199,6 +207,7 @@ Sırayı **yalnız Recep** değiştirir. Hacim ve mevsim verisi (pazar ölçüm 
 | "Doğrusu ve yanlışı" dizisi (yaygın yanlış + kaynaklı doğrusu) | EVET | yanlış da doğru da kaynağa bağlanır; kaynaksız "yaygın yanlış" yazılmaz |
 | Mevzuatı ilk anlatan yazı | EVET | konu listesi MEVZUAT şeridinden gelir; resmî metin R2.1/2'dir, BLOG kendi indirdiği ham metinle doğrular |
 | Hesaplayıcıyla birleşen yazı | EVET | R2.5: hesap örneğinin sonucu hesaplayıcıyla aynıdır, bağlantı `vh:hesaplayici/…` |
+| Sektör/uygulama rehberi (v0.19, K2) | ŞARTLI | R1.3 istisnasının üç şartı (talep ölçümü, R2.6 kaynak paketi, ürün karşılığı); kalıp R3'tür, ek: sektörün **kendi** yükümlülüğü (mevzuat, standart) kaynaklı anlatılır, "çözüm", "en iyi", "her ortama uygun" gibi vaat dili yasaktır (R11 Y1; ERF'in başlıklarında "çözüm/sistemleri" yaygın, bizde kullanılmaz); her sektör bir yazıdır, "sektörler" torba yazısı yazılmaz |
 | Saha deneyimi yazıları, Türkçe iklimlendirme terimleri sözlüğü | SONRA | sözlük Bilgi Merkezi alt kırılımı; bilgi mimarisi kararı TASARIM'dan sonra |
 | Tedarikçi yazıları | ŞİMDİLİK YOK | |
 | ESP yazısı | MÜMKÜN | üçüncü bir firmanın iç bilgisi ve o firma için yazılmış metin kullanılmaz; farklı açı (ayrıntı Kararlar belgesinde, PUBLIC depoya girmez) |
@@ -927,6 +936,7 @@ resmî satırlara yaslanır ama onları aşar, bu yüzden aşağıdaki uyarı ko
 | Y6 | H2 sayısı ve kelime sayısı hedef değildir (R3'ün mevcut cümlesi); bölüm sayısı yan soruların sayısından gelir | 7 | RESMÎ |
 | Y7 | Başlığın metni değişirse içindekinin çapası da değişir; dışarıdan o çapaya bağlantı varsa eski çapa kırılır (R10 B9 ölçümünde çapa bağlantısı sorulur) | R6 | İLKE |
 | Y8 | Gövde ve SSS cevapları daraltılabilir (accordion, sekme) yapılmaz; bölüm içeriği sayfa yüklenirken görünür kalır ve sayfa yüklenirken kaydırma konumu JS ile değiştirilmez, adresteki hash silinmez. Şablon kararıdır (URUN); değişirse bu satır yeniden ölçülür | 13 | RESMÎ (öneri, garanti değil) |
+| Y9 | **(v0.19, K6)** Yayındaki yazıda H1, H2, H3 ya da SSS'ye, aranan sorgunun eşanlamlı ifadesi **yalnız ekleme** ile eklenebilir (R5.5 "var olan ifade silinmez" korunur); karar GEO-SEO'nun SERP okumasıyla verilir, BLOG yazar; gövdeye iddia ekleniyorsa R5.5 tam okuma, yalnız başlıksa R5.5 başlık-yalnız revizyon akışı | 3, 5, 8 (+ R5.5) | İLKE |
 
 ### R11.4 Denetim kolu (`baslikDenetle`, UYARI)
 
