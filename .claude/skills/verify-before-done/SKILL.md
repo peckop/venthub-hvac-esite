@@ -14,7 +14,7 @@ metadata:
 
 | Kaynak metin | Bizde |
 |---|---|
-| "project's own checks" | `pnpm type-check`, `pnpm lint`, `pnpm test -- --run`, ilgili `src/__tests__/conformance/*`; PR'da `gh pr checks` |
+| "project's own checks" | Yerelde yalnız `pnpm test:ilgili` (seçici `scripts/ci/test-sec.cjs`; "TAM" derse yerelde hiçbir test koşmaz, CI koşar) ve değişen test dosyası için `pnpm exec vitest run <yol>`; tam paket, `pnpm type-check` ve build yerelde koşulmaz. PR'da `gh pr checks`; ilgili `src/__tests__/conformance/*` |
 | verification.run / execution.shell | Bash aracı |
 | Kanban "verified" | `kanban_manage` doğrulayıcısı (kural 7) |
 | `codebase-targeted-test`, `codebase-impact-analysis` araçları | Yok. Etkilenen test: değişen dosyanın yanındaki / `src/__tests__/conformance/` altındaki ilgili test; çağıranlar: `graphify affected "sembol()"` (parantez şart) ya da `codegraph_explore` |
