@@ -13,6 +13,23 @@
       "durum_satiri": "yürürlükte; 30/12/2006 tarihli 26392 sayılı 'Belirli Gerilim Sınırları Dahilinde Kullanılmak Üzere Tasarlanmış Elektrikli Teçhizat ile İlgili Yönetmelik (2006/95/AT)' yürürlükten kaldırılmıştır.",
       "alinti": "MADDE 2 – (1) Bu Yönetmelik, Ek-II'de listelenen ekipman ve durumlar dışında, alternatif akım için 50 V - 1000 V, doğru akım için 75 V - 1500 V arasındaki gerilimlerde kullanılmak üzere tasarlanan elektrikli ekipmanları kapsar.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 65539,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "d5e0fdb02e59",
+      "sha256_metin_ilk12": "95412802fdb3",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "alternatif akım için 50 V - 1000 V",
+      "alinti_dogrulandi": true
     }
   ]
 }

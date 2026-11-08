@@ -39,6 +39,23 @@
       "alinti": "8.2.1) Fanlar – Fancoiller 1) Fanların ve fancoiller için EK-5'te verilen değerlerin sağlanması bakımından gerekli önlemler alınır. ... 3) Gürültü emisyonu azaltılmış sessiz fan tipi seçimine, hava akımı, fan hızı, statik basınç ayarları ile gürültünün azaltılmasına ve fanın hava türbülansını azaltacak biçimde yönlendirilmesine dikkat edilir.",
       "alinti_dogrulandi": true,
       "not": "Taranmış PDF; basılı sayfa \"Binaların Gürültü–30\" = PDF s.18 görsel okumayla. Alt ajan transkripsiyonu 1. fıkrada hatalıydı (\"boyutları belirlenecektir\"), düzeltildi."
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 89421,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "b7a5abbeccb5",
+      "sha256_metin_ilk12": "322e3de70dc5",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "Yeni yapılacak binalarda en az C akustik performans sınıfı sağlanır",
+      "alinti_dogrulandi": true
     }
   ]
 }

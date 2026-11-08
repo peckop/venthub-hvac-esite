@@ -25,6 +25,23 @@
       "durum_satiri": "Aynı PDF, aynı yöntemle doğrulandı.",
       "alinti": "MADDE 24- (1) 29/6/2022 tarihli ve 31881 sayılı Resmî Gazete'de yayımlanan Florlu Sera Gazlarına İlişkin Yönetmelik yürürlükten kaldırılmıştır. ... MADDE 25- (1) Bu Yönetmeliğin; a) 9 uncu maddesinin ikinci fıkrası ile 10 uncu maddesinin dördüncü fıkrası 1/1/2025 tarihinde, b) Diğer hükümleri yayımı tarihinde, yürürlüğe girer.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2024/10/20241015-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2024/10/20241015-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 99873,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "dc7b01fbf007",
+      "sha256_metin_ilk12": "60b42a049af6",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "31881 sayılı Resmî Gazete’de yayımlanan Florlu Sera Gazlarına İlişkin Yönetmelik yürürlükten kaldırılmıştır.",
+      "alinti_dogrulandi": true
     }
   ]
 }

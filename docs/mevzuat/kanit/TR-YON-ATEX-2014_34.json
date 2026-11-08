@@ -25,6 +25,23 @@
       "durum_satiri": "Aynı belge; direktif dayanağı ve eski yönetmeliğin (94/9/AT karşılığı) kaldırıldığı teyit ediliyor.",
       "alinti": "26/2/2014 tarihli ve 2014/34/AB ... (94/9/AT), yürürlükten kaldırılmıştır.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 112934,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "dd37f11729e0",
+      "sha256_metin_ilk12": "37c84f022ef8",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "Bu Yönetmelik yayımı tarihinde yürürlüğe girer.",
+      "alinti_dogrulandi": true
     }
   ]
 }

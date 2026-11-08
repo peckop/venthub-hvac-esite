@@ -13,6 +13,23 @@
       "durum_satiri": "yururlukte; öncekini (2008 tarihli yönetmelik) yürürlükten kaldırdığı ayrıca doğrulanmadı (kapsam dışı bırakıldı).",
       "alinti": "ELEKTRİKLİ VE ELEKTRONİK EŞYALARDA BAZI ZARARLI MADDELERİN KULLANIMININ KISITLANMASINA İLİŞKİN YÖNETMELİK — Sayı : 32055 — 26 Aralık 2022 PAZARTESİ",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2022/12/20221226-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2022/12/20221226-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 69137,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "cef5663466d9",
+      "sha256_metin_ilk12": "293450fa9a0b",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "ELEKTRİKLİ VE ELEKTRONİK EŞYALARDA BAZI ZARARLI MADDELERİN KULLANIMININ KISITLANMASINA İLİŞKİN YÖNETMELİK",
+      "alinti_dogrulandi": true
     }
   ]
 }
