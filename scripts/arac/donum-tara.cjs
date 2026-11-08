@@ -8,7 +8,7 @@
  * Çıktı: depo dışı iki dosya (~/.claude/mod-durum/donum-tara.json önbellek, donum-tara-son.json son satır) + tek satır.
  *
  * SALT-OKUMA (dökümlere dokunmaz), ARTIMLI (dosya başına kaldığı bayttan devam; tam tarama dakikalar sürdü), SÜRE TAVANLI,
- * FAIL-OPEN. 300 MB üstü döküm atlanır ve satırda söylenir. Vana: VENTHUB_DONUM_TARA_KAPAT=1.
+ * FAIL-OPEN. 300 MB üstü döküm geçmişiyle okunmaz (ilk koşuda canlıysa son 64 MB, ölüyse dosya sonundan artımlı); satır eksik günleri söyler. Vana: VENTHUB_DONUM_TARA_KAPAT=1.
  * Günlük koruma: aynı gün ikinci koşu taramaz, son satırı döner (açılış kancası günün ilk açılışında tetikler).
  * Kullanım: node scripts/arac/donum-tara.cjs [--yaz] [--zorla]   (argümansız: son satırı yazar, taramaz)
  */
@@ -17,6 +17,7 @@ const os = require('node:os')
 const path = require('node:path')
 
 const BUYUK_SINIR = 300 * 1024 * 1024
+const SON_BAYT = 64 * 1024 * 1024 // büyük canlı dökümde ilk koşuda geriye okunan miktar
 const TAVAN_MS = 20 * 1000
 const PARCA = 8 * 1024 * 1024
 const KOK_TAVANI = 5000
@@ -128,19 +129,18 @@ function dosyaTara(yol, ofset, dept, durum, bitisi, parca = PARCA) {
 }
 
 /**
- * Tüm projeleri artımlı tarar. Döner: { durum, atlanan: [yol], eksik: bool }.
+ * Tüm projeleri artımlı tarar. Döner: { durum, eksik: bool }.
  * `simdi` ve `tavanMs` test için enjekte edilir; tavan dolarsa kalan dosyalar sonraki koşuya kalır (eksik=true).
  */
-function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanMs = TAVAN_MS, buyukSinir = BUYUK_SINIR, parca } = {}) {
+function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanMs = TAVAN_MS, buyukSinir = BUYUK_SINIR, sonBayt = SON_BAYT, parca } = {}) {
   const baslangic = simdi()
   const bitisi = () => simdi() - baslangic >= tavanMs
-  const atlanan = []
   let eksik = false
   let dizinler = []
   try {
     dizinler = fs.readdirSync(proje, { withFileTypes: true }).filter((e) => e.isDirectory())
   } catch {
-    return { durum, atlanan, eksik: true }
+    return { durum, eksik: true }
   }
   for (const d of dizinler) {
     const dept = departman(d.name)
@@ -158,22 +158,25 @@ function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanM
       }
       try {
         const boyut = fs.statSync(yol).size
-        if (boyut > buyukSinir) {
-          atlanan.push(yol)
-          continue
+        if (boyut > buyukSinir && !durum.dosyalar[yol]) {
+          // BÜYÜK DÖKÜM, İLK KARŞILAŞMA (ARC-285): geçmişi okunmaz. Canlıysa (son 3 günde yazılmış) son SON_BAYT; ölüyse dosya sonu
+          // (yeni bayt gelirse artımlı sayılır). Başlangıç günü kayıtlıdır; satır o günden önceki sayının eksik olduğunu söyler.
+          const canli = fs.statSync(yol).mtimeMs > simdi() - 3 * 86400000
+          durum.dosyalar[yol] = { boyut, ofset: canli ? Math.max(0, boyut - sonBayt) : boyut, buyuk: true, baslangic: yerelGun(new Date(simdi()).toISOString()) }
         }
         const onceki = durum.dosyalar[yol] || { boyut: 0, ofset: 0 }
-        const ofset = boyut < onceki.ofset ? 0 : onceki.ofset // dosya küçüldüyse baştan
+        // dosya küçüldüyse baştan; büyük dökümde baştan değil dosya sonundan (300 MB geçmişi yeniden okunmaz, çift sayım olmaz)
+        const ofset = boyut < onceki.ofset ? (onceki.buyuk ? boyut : 0) : onceki.ofset
         if (ofset >= boyut) continue
         const yeni = dosyaTara(yol, ofset, dept, durum, bitisi, parca)
-        durum.dosyalar[yol] = { boyut, ofset: yeni }
+        durum.dosyalar[yol] = { ...durum.dosyalar[yol], boyut, ofset: yeni }
         if (yeni < boyut && bitisi()) eksik = true // kuyruktaki yarım satır (açık oturum) eksiklik sayılmaz
       } catch {
         // okunamayan dosya: sonraki koşuda yeniden denenir
       }
     }
   }
-  return { durum, atlanan, eksik }
+  return { durum, eksik }
 }
 
 const gunEkle = (gun, n) => {
@@ -182,24 +185,31 @@ const gunEkle = (gun, n) => {
   return yerelGun(d.toISOString())
 }
 
-/** '9 döküm >300MB atlandı (ana 6, arac 1)': hangi departmanın sayısı eksik kalıyor. SAF. */
-function atlananNotu(atlanan) {
+/**
+ * Büyük (>300MB) dökümler geçmişleriyle okunmaz (ARC-285): ilk koşuda canlıysa son 64MB, ölüyse dosya sonundan başlanır.
+ * Sayım başlangıcı `gun`dan SONRAYSA o günün sayısı bu dökümler için eksik olabilir; satır bunu departman adıyla söyler. SAF.
+ */
+function buyukNotu(durum, gun) {
+  const kismi = Object.entries(durum.dosyalar).filter(([, v]) => v && v.buyuk && v.baslangic > gun)
+  if (!kismi.length) return ''
   const say = {}
-  for (const y of atlanan) {
+  for (const [y] of kismi) {
     const d = departman(path.basename(path.dirname(String(y))))
     say[d] = (say[d] || 0) + 1
   }
   const ozet = Object.entries(say).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([d, n]) => `${d} ${n}`).join(', ')
-  return `${atlanan.length} döküm >300MB atlandı (${ozet})`
+  const ilk = kismi.map(([, v]) => v.baslangic).sort()[0]
+  return `${kismi.length} büyük döküm (${ozet}) ${ilk}'den itibaren sayılıyor, geçmişi okunmaz: önceki günler eksik olabilir`
 }
 
 /** Tek satır. `bugun`'den önceki en son veri günü ile ondan önceki veri günü karşılaştırılır; boşluk yazılır. SAF. */
-function satirUret(durum, bugun, { atlanan = [], eksik = false } = {}) {
+function satirUret(durum, bugun, { eksik = false } = {}) {
   const gunler = Object.keys(durum.gunler).filter((g) => g < bugun).sort()
   const son = gunler[gunler.length - 1]
   if (!son) {
     const n = []
-    if (atlanan.length) n.push(atlananNotu(atlanan))
+    const bn0 = buyukNotu(durum, '')
+    if (bn0) n.push(bn0)
     if (eksik) n.push('tarama tamamlanmadı (süre tavanı), sayılar eksik olabilir')
     return 'DÖNÜM: önceki güne ait veri yok' + (n.length ? ' [' + n.join('; ') + ']' : '')
   }
@@ -213,7 +223,8 @@ function satirUret(durum, bugun, { atlanan = [], eksik = false } = {}) {
   const notlar = []
   if (son !== gunEkle(bugun, -1)) notlar.push(`dün verisi yok, son veri ${son}`)
   if (onceki && onceki !== gunEkle(son, -1)) notlar.push(`önceki karşılaştırma ${onceki} (${Math.round((new Date(son) - new Date(onceki)) / 86400000) - 1} gün boşluk)`)
-  if (atlanan.length) notlar.push(atlananNotu(atlanan))
+  const bn = buyukNotu(durum, son)
+  if (bn) notlar.push(bn)
   if (eksik) notlar.push('tarama tamamlanmadı (süre tavanı), sayılar eksik olabilir')
   const metin = `DÖNÜM ${son}: ${parcalar.length ? parcalar.join('; ') : 'yeniden betik ve elle komut yok'}${notlar.length ? ' [' + notlar.join('; ') + ']' : ''}`
   return metin.length > 600 ? metin.slice(0, 599) + '…' : metin
