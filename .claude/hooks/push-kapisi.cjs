@@ -121,7 +121,8 @@ function ansiCTirnak(komut, i) {
     if (k in TEK) {
       s += TEK[k]
       j += 2
-    } else if (k === 'c' && j + 2 < komut.length && komut[j + 2] !== "'") {
+    } else if (k === 'c' && j + 2 < komut.length && komut[j + 2] !== "'" && komut[j + 2] !== '\\') {
+      // `\c'` ve `\c\`: bash lexer'ı `\X` çiftini atlayıp kapanışı bulur; X'i yutmayız, `\c` literal kalır, sonraki çift normal çözülür (tırnak durumu kaymaz).
       // \cX = denetim karakteri (X & 0x1f, \c? = 0x7f); `\c@` NUL'dur ve bash orada keser (denetçi 2. bulgu).
       s += komut[j + 2] === '?' ? '\x7f' : String.fromCharCode(komut.charCodeAt(j + 2) & 0x1f)
       j += 3
