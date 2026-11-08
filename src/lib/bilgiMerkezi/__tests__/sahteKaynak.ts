@@ -47,6 +47,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['seat-serisi', 'SEAT Storm Jet Asit Dayanımlı Fanlar'],
     ['jet-serisi', 'JET Serisi'],
     ['storm-serisi', 'STORM Serisi'],
+    // Çatı tipi fan nedir yazısı (BLG-49, 2026-11): Slimroof aile sayfası canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
+    ['vortice-slimroof-cati-fanlari', 'Vortice Slimroof Çatı Fanları'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {

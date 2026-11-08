@@ -1186,7 +1186,7 @@ Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölç
 - Aksiyel fanlar kategorisi duvara monte edilen, düşük ve orta basınçlı aksiyel fanları kapsar [4]; modeller: [aksiyel fanlar](vh:kategori/axial-industrial-fans).
 - Radyal (santrifüj) fanlar kategorisinin sayfası hücreli, plug ve gövdeli olmak üzere üç yapıyı tanıtır [4]; modeller: [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans).
 - Kanal tipi fanlar havayı kanal hattının içinde taşır ve kanala seri bağlanır; kategoride karma akışlı iki LINEO ailesi (LINEO ve LINEO Quiet) de bulunur [3][4]; modeller: [kanal tipi fanlar](vh:kategori/duct-fans). Ayrıntı için [kanal tipi fan nedir rehberine](vh:yazi/kanal-tipi-fan-nedir), ses değeri için [sessiz fan rehberine](vh:yazi/sessiz-fan-secimi) bakın.
-- Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans).
+- Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans). Seçimde nelere bakıldığı için [çatı tipi fan rehberi](vh:yazi/cati-tipi-fan-nedir) okunabilir.
 - Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans).
 - Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır [4]; modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
 - Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans).
@@ -1496,6 +1496,106 @@ Sayfa numaraları PDF sayfa sırasıdır. Kaynak [1], [2], [5], [7] ve [8] ABD v
 ## Teknik sorumluluk notu
 
 Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Katalog değerleri model ve çalışma noktasına göre değişebilir; kendi sisteminizde farklı çıkabilir. Kurulum yetkili personel tarafından yapılmalıdır.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-49), doğrulanmış metin: taslak v4 (sha f643f2b4d662). Makale çerçevesi (cetvel R3.3): markasız gövde, marka ve seri adları yalnız "VentHub'da hangi çatı tipi fan serileri var?" bölümünde ve Kaynaklar'da.
+    // Doğrulama: dört tur tam okuma, her turda tuzaklı + temiz kopya (tuzaklar 5/5, 5/5, 5/5, 4/4); son tur temiz kopyada yanlış 0. Recep onayı 08.11.2026 (OPS). Mevzuat cümlesi yok (MEVZUAT paketi gerekmedi), fiyat yok: ürün sayfaları teklife yönlendirir.
+    // Çatı fanına özgü bağımsız seçim kaynağı bulunamadı; seçim cümleleri üretici beyanı olarak etiketlidir, HSE ve CIBSE atış ilkesi olarak okunur (mesafe rakamı yok).
+    kimlik: 'cati-tipi-fan-nedir',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-08',
+    guncellemeTarihi: '2026-11-08',
+    urunler: ['vh:aile/vortice-slimroof-cati-fanlari'],
+    ilgiliKategoriler: ['vh:kategori/roof-fans'],
+    diller: {
+      tr: {
+        slug: 'cati-tipi-fan-nedir-nasil-secilir',
+        ozet: "Çatı tipi fan nedir? Çatıdan egzoz atarken hangi ilke belirleyicidir, çatıda hangi fan türleri kullanılır, seçimde hangi bilgiler gerekir ve VentHub'da hangi çatı tipi fan serileri var.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Çatı tipi fanın ne anlama geldiğini, egzoz atışında nelere dikkat edildiğini ve seçimde gereken bilgileri görmek için bu rehberden başlayın.",
+        govde: `# Çatı tipi fan nedir, nasıl seçilir?
+
+Bu yazıda çatı tipi fan, çatıya monte edilip havayı binanın dışına atan fan anlamında kullanılır; üretici sayfalarında terim egzoz çatı fanları için bu anlamda geçer, bazı üreticiler besleme çatı fanlarını da aynı adla sunar [4][6][8]. Bu yazı iki soru üzerinde durur: atılan hava binaya geri girecek mi [2] ve fan hangi koşulda çalışacak [1].
+
+Kısaca:
+
+- Atış yeri: kirletici ihmal edilebilir derişime inmedikçe egzoz havası binaya ya da başka binalara geri girmemeli; atış noktası binanın en yüksek noktasının belirgin biçimde üstünde olmalı [2].
+- Fan türü: çatıda eksenel, merkezkaç ve karışık akışlı fanlar kullanılır; "çatı tipi" adı yerleşimi anlatır, tek bir fan türünü değil [1][4][6][8].
+- Seçim girdileri: hava özellikleri, debi, basınç ve sistem yerleşimi; fazla büyük fan enerji ve bakım maliyetini artırır [1].
+- Üretici beyanı: başlık, bakım erişimi ve motor seçenekleri üreticilere göre değişir; bu bilgiler üretici anlatımıdır [4][5][6].
+
+## Çatıdan egzoz atarken hangi ilke belirleyicidir?
+
+İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) yerel egzoz havalandırması rehberi, çekilen havanın temizlenmiş olsun olmasın, kirletici ihmal edilebilir derişime inmedikçe binaya ya da başka binalara geri girmemesi gerektiğini yazar [2]. Aynı rehber hedefi, havanın bina çevresindeki dolaşım girdaplarının ötesine atılması olarak koyar ve atış noktasının binanın en yüksek noktasının belirgin biçimde üstünde olmasını ister [2]. CIBSE'nin genel havalandırma rehberi de, yerel egzozlu sistemleri anlattığı yerde, egzoz havasının kapı, pencere ve diğer hava girişlerinden uzak tutulmasını söyler [3].
+
+Bir üreticinin çatı fanı sayfası aynı amacı yukarı atışlı bir düzenle anlatır: karışık akışlı fan, egzoz havasının yeniden emilimini önlemek için kirleticileri binadan uzağa atar [6]. İlk iki kaynak çatı fanına özgü değildir: HSE rehberi işyerinde kirletici tahliyesi, CIBSE rehberi genel havalandırma için yazılmıştır [2][3]. Bu yüzden ilke olarak okunmalıdır; mesafe ya da yükseklik rakamı olarak değil.
+
+## Çatıda hangi fan türleri kullanılır?
+
+ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: eksenel fanlar havayı fanın ekseni boyunca hareket ettirir, merkezkaç fanlar havayı radyal yönde hızlandırır; iki türün basınç, debi ve verimde örtüşen yetenekleri vardır ama genellikle birbirinin yerine kullanılamazlar [1]. Bir üreticinin fan türleri sayfası ise bir sınıflamayı havanın fan içindeki yörüngesine göre yapar ve santrifüj ile eksenelin yanına karışık akışlı (helikosantrifüj) türü ekler [4]. Çatıda üç türün de örneği görülür:
+
+| Tür | Çatıdaki örnek | Kaynak |
+|---|---|---|
+| Eksenel (pervane tipi) | Pervane tipi fanlar yüksek debiyi düşük basınçta verir ve çatı havalandırmasında sık kullanılır | ABD Enerji Bakanlığı kılavuzu [1] |
+| Merkezkaç (santrifüj) | Bir üreticinin çatıya monte, dikey atışlı, hat içi santrifüj fan serisi, laboratuvar egzozu ve kimya endüstrisi gibi çok korozif uygulamalar için anlatılır | Üretici beyanı [8] |
+| Karışık akışlı | Bir üretici, egzozun yeniden emilimini önlemek için çatıda yukarı atışlı kayışlı karışık akışlı fan sunar | Üretici beyanı [6] |
+
+## Üreticiler çatı fanlarını nasıl anlatıyor?
+
+Aşağıdakiler üreticilerin kendi sayfalarındaki beyanlardır [4][5][7]. Bir üretici çatı fanı aralığının konut, ticari (tersiyer) ve endüstriyel uygulamaları kapsadığını yazar [4]. Aynı üreticinin bir serisi hava sıkılığı yüksek ve bakımı kolay, plastik ya da alüminyum başlıklıdır; eğilebilir sistemi tam sökmeden bakıma izin verir [4]. Bir başka seri yüksek verimli EC motorlu, bir diğeri kimya, petrokimya, laboratuvar ya da çeker ocak gibi ortamlarda korozyona dayanacak biçimde tasarlanmıştır [4].
+
+İkinci bir üretici (ilk üreticinin sayfa altbilgisi, ikinci üreticinin adını taşıyan bir grup listesi verir [4][5]), başlığın yuvarlak tasarımının yağmur girişi riskini azalttığını, koruyucu başlığın motor ve pervane bakımı için kolayca çıkarıldığını ve EC motorun entegre elektronik kontrolle motoru optimum yükte çalıştırdığını bildirir [5]. Üçüncü bir üretici, dikey atışla egzoz havası çekmek için tasarladığı çatı fanı serisinin mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalarda tercih edilebileceğini ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygun olduğunu yazar [7].
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez; bu iki ürün ailesinin sayfalarında fiyat gösterilmez, teklif istenir [9]. Fan seçiminin girdileri kılavuzda şöyle sayılır. ABD Enerji Bakanlığı kılavuzuna göre fan seçimi sistemin çalışma koşullarının bilinmesiyle başlar: hava özellikleri (nem, sıcaklık, yoğunluk, kirlilik düzeyi), hava debisi, basınç ve sistem yerleşimi; bu koşullar eksenel ya da merkezkaç fandan hangisinin gerektiğini belirler [1]. Aynı kılavuz belirsizlikleri fazla büyük fanla karşılamayı sorun sayar: yüksek enerji maliyeti, yüksek bakım ve azalan sistem güvenilirliği [1]. VentHub'ın çatı tipi fanlar kategorisi seçimi belirleyen soruları çatı tipi ve eğimi, gereken debi ve tahliye edilen havanın niteliği olarak sıralar [9].
+
+Tahrikte kılavuz bir denge anlatır: eksenel fanlarda doğrudan tahrik motoru fanın arkasında, düşük sıcaklıkta ve temiz havada, hava akımıyla soğutabilir ama motora erişimi bir ölçüde kısıtlar, kayışlı tahrik ise fan hızı seçiminde esneklik verir ve motoru hava akımının dışında tutar [1]. Bir üretici çatı fanlarında doğrudan tahrikin bakım erişiminin zor olduğu yerde, kayışlı tahrikin devir ayarıyla sistem dengelemesi gereken yerde kullanıldığını yazar [6].
+
+## VentHub'da hangi çatı tipi fan serileri var?
+
+VentHub'ın [çatı tipi fanlar](vh:kategori/roof-fans) kategorisinde iki ürün ailesi bulunur: on modelli [Vortice Slimroof çatı fanları](vh:aile/vortice-slimroof-cati-fanlari) ve üç modelli Vortice Radon serisi [9]. Slimroof sayfasının başlığında 460–18.600 m³/h aralığı, ilk modelin açıklamasında radyal atış ve EC motor yazılıdır [9]. Radon serisi, kategori sayfasında radon tahliyesi için ayrı bir aile olarak anılır ve bu yazının kapsamı dışındadır [9]. Yukarıda ikinci üretici olarak anılan Vortice, bu kategorideki ürünlerin markasıdır [5][9]. Model ayrıntıları ürün sayfalarındadır; ürün sayfalarında "Teknik Teklif İste" düğmesi bulunur [9].
+
+## Sık sorulan sorular
+
+### Çatı tipi fan hangi fan türüdür?
+
+Çatıda birden çok fan türü kullanılır [1][6][8]. Çatıda pervane tipi eksenel fanlar sık kullanılır [1]; üreticiler çatıya monte santrifüj ve karışık akışlı fanlar da sunar [6][8].
+
+### Çatı fanında egzoz havası nereye atılmalı?
+
+HSE rehberi atış noktasının binanın en yüksek noktasının belirgin biçimde üstünde olmasını, CIBSE ise egzozun kapı, pencere ve hava girişlerinden uzak tutulmasını ister [2][3]. Bu genel ilkelerdir; mesafe rakamı proje hesabına aittir.
+
+### Fan boyutunu büyük seçmek güvenli midir?
+
+Kaynak bunu önermez [1]. ABD Enerji Bakanlığı kılavuzu, tasarımcıların belirsizlikleri fazla büyük fan seçerek karşılamasının yüksek enerji maliyeti, yüksek bakım ve azalan sistem güvenilirliği gibi sorunlar doğurduğunu yazar [1].
+
+### Çatı tipi fanda bakım nasıl yapılır?
+
+Bu üreticiye göre değişir. Bir üretici eğilebilir sistemle tam sökmeden bakımı [4], bir diğeri kolay çıkarılan koruyucu başlığı [5] anlatır; kılavuz ise doğrudan tahrikli eksenel fanda motora erişimin bir ölçüde kısıtlı olduğunu yazar [1].
+
+### VentHub'da hangi çatı tipi fanlar var, teklif nasıl istenir?
+
+Kategoride Slimroof ve Radon olmak üzere iki ürün ailesi vardır; ürün sayfalarında "Teknik Teklif İste" düğmesi bulunur [9].
+
+## Kaynaklar
+
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 13, 15, 21, 23 ve 26 (basılı s. 9, 11, 17, 19 ve 22). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 08.11.2026)
+2. Health and Safety Executive (HSE), HSG258 Controlling airborne contaminants at work: A guide to local exhaust ventilation (LEV), 3. baskı, 2017, paragraf 220 ve 221 (PDF s. 62–63). https://books.hse.gov.uk/gempdf/hsg258.pdf (erişim 08.11.2026)
+3. CIBSE, CIBSE Top Tips 1: Ventilation in Buildings, 2015. https://www.cibse.org/knowledge-research/knowledge-resources/engineering-guidance/cibse-top-tips/cibse-top-tips-1-ventilation-in-buildings-2015/ (erişim 08.11.2026)
+4. Casals Ventilación, "Roof fans solutions by Casals" belge kitaplığı sayfası, "Types of fans" sayfası ve çatı fanları broşürü (2 sayfa; yalnız sayfa 2'deki bakım cümlesi). https://www.casals.com/en/documentation/document-library/roof-fans/ , https://www.casals.com/en/ventilation-tools/types-of-fans/ , https://www.casals.com/assets/uploads/cat_pdf/43579-roof-fans-flyer-casals.pdf (erişim 08.11.2026)
+5. Vortice, SLIMROOF 355 T ES ürün sayfası. https://fanselectionpro.vortice.com/en/60/fans/33116-slimroof-355-t-es (erişim 08.11.2026)
+6. Greenheck, Roof Fans. https://www.greenheck.com/products/fans/roof (erişim 08.11.2026)
+7. Systemair, DVN Roof Fans. https://www.systemair.com/en/products/fans/roof-fans/dvn (erişim 08.11.2026)
+8. SEAT Fans, JET Series (Fantech Pty Ltd broşürü, sayfa 4). https://www.fantech.com.au/images/Brochures/SEAT.pdf (erişim 08.11.2026)
+9. VentHub, çatı tipi fanlar kategori sayfası, Slimroof ve Radon ürün ailesi sayfaları, canlı sitede 8 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/cati-tipi-fanlar , https://venthub.com.tr/tr/products/vortice-slimroof-cati-fanlari , https://venthub.com.tr/tr/products/vortice-radon-serisi-cati-fanlari
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Atış yeri ve mesafeleri projeye özel hesapla belirlenir; üretici beyanları üreticinin kendi sayfalarındaki bilgilerdir. Ürün bilgileri yayın tarihindeki sürüme aittir.
 `,
       },
     },
