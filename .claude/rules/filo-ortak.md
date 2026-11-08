@@ -27,7 +27,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Kanca ve ayar etkili PR'ı (.claude/hooks, scripts/board, settings.json kanca kayıtları), değişikliği yazmamış bir denetçi alt ajan tam farkı okuyup engelleyici bulgu bildirmedikten sonra ARAÇ birleştirir; hüküm PR'a yazılır. İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep'e gider.
 - Süren işin varken gelen emri karta al, sıraya koy, OPS'a "elimde X var, bitince başlarım" dön; OPS "X'i bırak" demedikçe geçme.
 - Salt-okuma alt ajanı (araştırmacı, çürütücü, doğrulayıcı) `name` vermeden aç; uygulayıcıyı `name` ile aç.
-- Bölmeden önce üç soru: bağımsız mı, mekanikse betik, ayrı yargı mı; 4 varsayılan, BELLEK'te 2 (§10.4a).
+- Bölmeden önce üç soru (§10.4a); 4 varsayılan, BELLEK'te 2.
 - Alt ajanın görev metnine "açık PR dalına push yok" yaz.
 - Toplu MCP yazımı (sync_task_graph, add_check, transition_task ve benzeri) alt ajana verilmez; yazmayı çağıran pencere yapar.
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`).
@@ -50,7 +50,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Durum sütununa yalnız şu yedi kelimeden birini yaz: Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti. "Bitti" yalnız ölçülmüş işe, "Onayında" yalnız Recep kararı bekleyen işe yazılır; OPS onayı verilmiş, kontrol bekleyen iş "Sürüyor"dur.
 - (OPS hariç) Tabloya yalnız kendi kartlarını koy; filo geneli tabloyu OPS verir. Tablonun üstüne kalın satır "**<DEPARTMAN> — kendi kartlarım**" yaz, ilk sütun başlığı "<ÖN EK> No" olur. Sorumlu hep "ben", Sırada'ya "<DEPARTMAN ADI> işini bekliyor" yaz; departman değilse neyi beklediğini yaz (CI, Recep onayı, dış kişi); "başka departman" deme. Başka pencereden gelen mesaja cevabı o pencereye `SendMessage` ile yaz; Recep'e tek cümle.
 - (OPS hariç) Kartında değişen yoksa tablo yazma; Recep "devam et" derse cevap tek cümledir. "Devam edeyim mi" diye sorma, sırası belli işe geç.
-- Her rapor, kıyas ve değerlendirme objektiftir: VentHub'ı ya da kendi işini kayırma; rakip/alternatif daha iyiyse açıkça yaz; her yargı görülen somut bir şeye dayanır.
+- Her rapor, kıyas ve değerlendirme objektiftir: VentHub'ı ya da kendi işini kayırma; rakip/alternatif daha iyiyse açıkça yaz, zayıf yanı yumuşatmadan söyle; her yargı görülen somut bir şeye (sayfa, öğe, sayı, ölçüm) dayanır.
 - Recep'e akan cümleyle, kısa paragraflarla yaz; madde gerekirse tam cümleler ayrı satırda; `(a)` etiketi, telgraf kısaltması yok.
 - Erteleme dili kullanma; "yarın" yerine tarih ya da gün yaz. (OPS) Recep kararı bekleyen işi "Recep'te: <soru>" yaz, tarih verme.
 - "Yapıldı mı" sorusuna önce hafıza, Kanban, git geçmişi; ölçmediysen "bilmiyorum, bakıyorum" de. Niyeti anlamadıysan ölçmeden önce tek netleştirme sorusu sor; veride ya da kodda olanı sorma, araştır.

@@ -514,7 +514,7 @@ yazılmaz: aynı gün dört ajan 1230 satırın %4'ünü bitirirken betik 417 sa
 
 1. **Parçalar bağımsız mı?** Aynı dosyaya yazmıyor ve birbirinin sonucunu beklemiyorsa evet. Hayırsa **tek ajan**.
 2. **İş mekanik ve hacimli mi** (satır, sayfa, dosya taraması)? Öyleyse **önce betik**. Satır başına ajan okuması
-   ilk partide **%20'nin altında** hüküm (verilen satırların doğru çıkan payı) veriyorsa bırakılır, betiğe geçilir;
+   ilk partide hükme bağlanabilen satırın payı **%20'nin altındaysa** (ör. 399 satırdan 35) bırakılır, betiğe geçilir;
    alt ajan yalnız betiğin çıktısını doğrular.
 3. **Her parça ayrı yargı istiyor mu?** Ancak o zaman parça sayısı kadar alt ajan açılır.
 
