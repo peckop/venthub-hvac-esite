@@ -14,6 +14,10 @@ metadata:
 
 Neden var: dizin isteği kotalıdır (Google günde yaklaşık 10, Yandex 10, Bing 100). Aynı adrese ikinci kez istek atmak kotayı yakar ve hiçbir şey kazandırmaz. Bu yüzden her istek bir defterde izlenir ve yalnız karar tablosu "YAP" ya da "TEKRAR" derse atılır.
 
+## Öncelik (Recep, 8 Kasım)
+
+Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerinden önce gelir. Sıra: (1) kota yüzünden atılamamış adresler (Google kotası dolduysa ertesi gün kota açılışında ilk iş), (2) yeni yayınlanmış yazılar (BLOG "canlı" mesajı gelince aynı turda), (3) kontrol ve takip ölçümleri. Recep'e onay sorulmaz.
+
 ## Akış
 
 1. **Durum.** `GSC_SA_ANAHTAR` ortam değişkeni servis hesabı anahtar dosyasını gösterir (yolu ve içeriği depoya yazma). Sonra:
