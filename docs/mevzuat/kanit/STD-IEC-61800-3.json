@@ -13,6 +13,40 @@
       "durum_satiri": "Publication date 2022-11-30, Edition 4.0, Stability date 2027, 'Under development' etiketi yok (standart aktif).",
       "alinti": "IEC 61800-3:2022 specifies electromagnetic compatibility (EMC) requirements for adjustable speed power drive systems (PDSs) and machine tools (MTs). [...] This fourth edition cancels and replaces the third edition published in 2017.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://webstore.iec.ch/en/publication/65056",
+      "son_url": "https://webstore.iec.ch/en/publication/65056",
+      "http": 200,
+      "robots": "izinli (robots.txt HTTP 200, 0 bayt)",
+      "erisim_tarihi": "2026-11-09",
+      "yayinci": "webstore.iec.ch",
+      "resmi": true,
+      "yontem": "IEC web mağazası katalog sayfası, Node fetch, User-Agent VentHub-mevzuat/1.0; webstore.iec.ch/robots.txt HTTP 200 ve 0 bayt (kısıt yok); kapsam cümlesi; ölçüm 9 Kasım 2026",
+      "durum_satiri": "Yayıncı katalog sayfası: Publication date 2022-11-30, Edition 4.0; 'Under development' etiketi yok. Tam metin ücretli, okunmadı.",
+      "bayt": 468703,
+      "sha256_ilk12": "cda46717856c",
+      "sha256_metin_ilk12": "41f3637b482f",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "IEC 61800-3:2022 specifies electromagnetic compatibility (EMC) requirements for adjustable speed power drive systems (PDSs) and machine tools (MTs).",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://webstore.iec.ch/en/publication/65056",
+      "son_url": "https://webstore.iec.ch/en/publication/65056",
+      "http": 200,
+      "robots": "izinli (robots.txt HTTP 200, 0 bayt)",
+      "erisim_tarihi": "2026-11-09",
+      "yayinci": "webstore.iec.ch",
+      "resmi": true,
+      "yontem": "aynı çekim; yerini aldığı baskı; ölçüm 9 Kasım 2026",
+      "durum_satiri": "Yayıncı katalog sayfası.",
+      "bayt": 468703,
+      "sha256_ilk12": "cda46717856c",
+      "sha256_metin_ilk12": "41f3637b482f",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "This fourth edition cancels and replaces the third edition published in 2017.",
+      "alinti_dogrulandi": true
     }
   ]
 }

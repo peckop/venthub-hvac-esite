@@ -1288,13 +1288,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-ISO-80079-36.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: yayıncı (iso.org) sayfası HTTP 403 verdi, tazelik ölçülemedi."
+        "6 Kasım 2026: yayıncı (iso.org) sayfası HTTP 403 verdi, tazelik ölçülemedi.",
+        "9 Kasım 2026: yayıncı (ISO) sayfası değil, Komisyon özet listesi kullanıldı; tazelik bu liste üzerinden ölçüldü, standardın ISO/CEN yayım tarihi hâlâ doğrulanmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-09",
       "eksen": "C"
     },
     {
@@ -1318,13 +1319,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-ISO-80079-37.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: yayıncı (iso.org) sayfası HTTP 403 verdi, tazelik ölçülemedi."
+        "6 Kasım 2026: yayıncı (iso.org) sayfası HTTP 403 verdi, tazelik ölçülemedi.",
+        "9 Kasım 2026: yayıncı (ISO) sayfası değil, Komisyon özet listesi kullanıldı; tazelik bu liste üzerinden ölçüldü, standardın ISO/CEN yayım tarihi hâlâ doğrulanmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-09",
       "eksen": "C"
     },
     {
@@ -1363,13 +1365,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-14986.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026 ölçümü: EVS sayfasında 2017 sürümü 02.05.2024'te geri çekilmiş, NSAI sayfasında EN 14986:2024 24.04.2024'te yayımlanmış görünüyor. Yayıncı (CEN/CENELEC) kapsam sayfası robots.txt \"Disallow: /\" yüzünden çekilemedi; ulusal kuruluş sayfaları yayıncı sayılmadığından durum ve baskı yılı DEĞİŞTİRİLMEDİ. Elle okuma gerekir."
+        "6 Kasım 2026 ölçümü: EVS sayfasında 2017 sürümü 02.05.2024'te geri çekilmiş, NSAI sayfasında EN 14986:2024 24.04.2024'te yayımlanmış görünüyor. Yayıncı (CEN/CENELEC) kapsam sayfası robots.txt \"Disallow: /\" yüzünden çekilemedi; ulusal kuruluş sayfaları yayıncı sayılmadığından durum ve baskı yılı DEĞİŞTİRİLMEDİ. Elle okuma gerekir.",
+        "9 Kasım 2026: Komisyon listesi (4 Eylül 2026 üretimli) EN 14986:2017'yi hâlâ yürürlükte uyumlaştırılmış gösteriyor, 2024 baskısına atıf yok; ulusal kuruluş sayfalarındaki \"2017 geri çekildi / 2024 yayımlandı\" bilgisi (EVS, NSAI) ikincil kaynaktır ve kayda uygulanmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-09",
       "eksen": "C"
     },
     {
@@ -1712,7 +1715,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/STD-IEC-61800-3.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc51",
@@ -1743,9 +1746,10 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "C1/C2/C3/C4 kategori tanımları ve 'birinci/ikinci çevre' kavramı IEC webstore kapsam sayfasında yok; standardın kendisi (telifli) olmadan doğrulanamaz — BULUNAMADI olarak işaretlendi.",
-        "6 Kasım 2026: IEC mağaza sayfası ed. 4.0 (2022-11-30), geri çekme alanı yok; sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
+        "6 Kasım 2026: IEC mağaza sayfası ed. 4.0 (2022-11-30), geri çekme alanı yok; sha256 kayda geçirilmedi, son_kontrol yenilenmedi.",
+        "9 Kasım 2026: sayfa yeniden çekildi, sha kayıtlı; Edition 4.0, Publication date 2022-11-30, Stability date 2027 sayfa metninde birebir görüldü. Tam metin ücretli, EMC kategorisi (C1-C4) tanımları okunmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-09",
       "eksen": "D"
     },
     {
@@ -3267,7 +3271,8 @@
       "acik_sorular": [
         "F400 sınıfı iddiasının VentHub kataloğunda nereden geldiği (üretici teknik föyü mü, iç varsayım mı) bu araştırmanın kapsamı dışında — mevzuat/standart seviyesinde 'bu ürün ailesi F400'dür' diyen resmi bir kaynak YOK, sınıf ataması ürün-bazlı test sertifikasına aittir.",
         "EN 12101-3'ün CPR (305/2011 veya 2024/3110) altında OJ'de hangi tarihte/hangi tüzükte atıflandığı CEN/EUR-Lex'ten birincil doğrulanamadı; yalnız ikincil kaynak.",
-        "6 Kasım 2026: CEN/CENELEC robots.txt \"Disallow: /\" ve kanıt portalı HTTP 500; tazelik ölçülemedi."
+        "6 Kasım 2026: CEN/CENELEC robots.txt \"Disallow: /\" ve kanıt portalı HTTP 500; tazelik ölçülemedi.",
+        "9 Kasım 2026: kaynak erişilemedi. CEN/CENELEC robots.txt Disallow: / ve proje sayfaları HTTP 500 (ölçüldü); TSE ve Komisyon CPR uyumlaştırılmış standart listesi bu turda okunmadı. son_kontrol yenilenmedi; durum ve baskı yılı değiştirilmedi."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
@@ -3704,12 +3709,13 @@
       "yazi_konusu": [],
       "acik_sorular": [
         "Sonradan uyumlaştırılmış standart yayımlanıp yayımlanmadığı kontrol edilmedi.",
-        "6 Kasım 2026: alıntı birebir; sha256 kayda geçirilmedi, son_kontrol yenilenmedi."
+        "6 Kasım 2026: alıntı birebir; sha256 kayda geçirilmedi, son_kontrol yenilenmedi.",
+        "9 Kasım 2026: ham çekim yapıldı, alıntı birebir (sha kayıtlı). Bildirimin yerini alan uyumlaştırılmış standart yayımı hâlâ doğrulanmadı: açık web aramasında kanıt bulunamadı, Komisyon uyumlaştırılmış standartlar sayfası/EUR-Lex listesi okunmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-09",
       "eksen": "G",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-BILDIRIM-2016_C416_06.json",
-      "resmi_kaynak_sayisi": 1
+      "resmi_kaynak_sayisi": 2
     },
     {
       "kimlik": "TR-KANUN-7223",
@@ -4133,5 +4139,5 @@
       "etki": "EN 12101-3'ün CPR altındaki resmi uyumlaştırılmış-standart statüsü ve F200/F300/F400/F600 sınıflarının tam tanımı CEN'in kendi kataloğundan doğrulanamadı; yalnız ikincil sanayi kataloğu siteleri (standards.iteh.ai, genorma.com — resmi değil) kullanıldı."
     }
   ],
-  "guncellendi": "2026-11-08"
+  "guncellendi": "2026-11-09"
 }
