@@ -530,6 +530,15 @@ yazılmaz: aynı gün dört ajan 1230 satırın %4'ünü bitirirken betik 417 sa
   değil. İkincil kaynaktaki jeton katı sayısı burada kullanılmaz.
 - Kapı eylemi yine müdürdedir (§10.4); çalışan sayısının artması denetimi gevşetmez.
 
+**Dört katman (OPS-257, Recep onayı 8 Kasım; HRT-123).** Tekrarlayan işi hangi katmanın taşıyacağı karışmasın diye sıra şudur:
+
+| Katman | Ne taşır | Kural |
+|---|---|---|
+| 1. Depo betiği | Tekrarlanan **mekanik** adım | Testli ve araç envanterinde olur. Aynı betik **ikinci kez** yazılıyorsa depoya girer (tek seferlik ölçüm betiği serbesttir). |
+| 2. Skill | Departmanın **mevcut** skill'leri | İlgili depo betiğini çağırır; her şey tek skill'e sığdırılmaz. Yeni skill yalnız mevcutlarda eksik varsa, `skill-creator` ile açılır. |
+| 3. Kural ve kanca | Davranış | "Betik yazmadan önce tara" kuralı (HRT-121, kurallar dosyalarında). **Kapılar betiğe gömülmez:** kapı kanca ya da test olarak ayrı durur, betik kapıyı koşturmaz ya da atlamaz. |
+| 4. Ölçüm | Katmanların tutup tutmadığı | **Günlüktür** (ARAÇ'ın `donum-tara` ölçümü; betiği ve sahibi ARAÇ'tır, bu cetvel yalnız sıklığı koyar). Sayım regex tabanlıdır, yön göstergesidir, hüküm değildir. |
+
 ### 10.5 Claude Code sınırları (kayıt: ihtiyaçta bilinsin)
 
 **Doğrulama durumu (2026-09-30):** ARAÇ üç belge sayfasını (`code.claude.com/docs/en/sub-agents.md`, `workflows.md`,
