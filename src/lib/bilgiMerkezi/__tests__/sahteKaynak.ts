@@ -47,6 +47,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['seat-serisi', 'SEAT Storm Jet Asit Dayanımlı Fanlar'],
     ['jet-serisi', 'JET Serisi'],
     ['storm-serisi', 'STORM Serisi'],
+    // Patlayıcı ortamda fan seçimi (ATEX) yazısı (BLG-51, 2026-11): Vorticent CMS ATEX aile sayfası canlıda 200 verir (8 Kasım ölçümü; ürün sayfası).
+    ['vortice-vorticent-cms-atex-santrifuj-fanlar', 'Vortice Vorticent CMS ATEX Santrifüj Fanlar'],
     // Çatı tipi fan nedir yazısı (BLG-49, 2026-11): Slimroof aile sayfası canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
     ['vortice-slimroof-cati-fanlari', 'Vortice Slimroof Çatı Fanları'],
   ])
