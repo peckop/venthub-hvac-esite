@@ -298,6 +298,13 @@ Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerek
 - Mesajda `Kartsız: <sebep>` atlatması önceki gibi çalışır ve bu denetimi de atlar; sebep `kartsiz-atlatma.log`'a düşer.
 - Gerekçe satırı yalnız VARLIĞINI ve sınıfını doğrular; sınıfın doğru seçilip seçilmediğine (ör. canlı yazım olmayan işe
   "canlı yazım" yazmak) kapı bakamaz: o OPS'un kart incelemesidir.
+
+**Bayatlık denetimi (ARC-274, 8 Kasım):** OPS, Recep'e onay listesini ÇIKARMADAN önce `node scripts/board/bayat-karar-denetimi.cjs`
+koşar. Betik `karar-bekliyor` etiketli açık kartlarda üç şeye bakar: kart metnindeki `#NNNN` PR'ların hepsi MERGED/CLOSED mu
+("BAYAT olabilir"; bir kısmı ise "KISMEN"), bağımlılıkların hepsi tamamlanmış mı, metinde anılan kartların hepsi Done mu.
+Yalnız UYARIR, engellemez; `gh` ya da pano okunamazsa "ölçülemedi" satırı basar. Uyarılı kart Recep'e sorulmadan önce OPS tarafından
+elle kontrol edilir ve gerçekten bittiyse kapatılır. Neden: 8 Kasım'da üç bayat kart (OPS-235, OPS-193, OPS-165) onay listesine girdi.
+Testi: `src/__tests__/conformance/bayat-karar-denetimi.test.ts` (INV-BAYAT-KARAR-1).
 - Atananı `Sen`/`Recep` olup etiketsiz kart da Recep'e bağlı sayılır (birinci denetimde de geçerli).
 
 ---
