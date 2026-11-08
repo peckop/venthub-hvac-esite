@@ -2883,7 +2883,7 @@
       "durum": "gecis-doneminde",
       "durum_notu": "yayımlandı; Md 1-3 vb. 16.10.2026'da yürürlükte, kalan hükümler 20/1/2027",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-MAKINE-2023_1230.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "vortice-h-ad-elektrikli",
@@ -3126,9 +3126,10 @@
         "Madde numaraları (51, 52, Geçici 1), Ek-5 Kısım A'nın 10 alanı ve Ek-3 1.5.1 metni bir çalışanın okumasıdır; bağımsız doğrulayıcı yeniden ölçmedi (Resmî Gazete 6 Kasım 2026 ikinci denemede erişilemedi).",
         "Ekler taranmış görüntü (54 sayfa, metin katmanı yok); Ek-3 sonu, Ek-4 ve Ek-5 dışındaki ekler taranmadı.",
         "mevzuat.gov.tr konsolide metni ve robots.txt içeriği ölçülmedi.",
-        "Bu yönetmeliğe bağlı TR uyumlaştırılmış standart listesi tebliği bulunamadı."
+        "Bu yönetmeliğe bağlı TR uyumlaştırılmış standart listesi tebliği bulunamadı.",
+        "8 Kasım 2026 bağımsız okuma: Resmî Gazete sayfa metninde yayım tarihi/sayı (16.10.2026, 33402), Md 51(1)(a)(b), Md 51(2), Geçici Md 1(1), Md 52(1)(a)(b) ve Md 53 birebir doğrulandı; kayıttaki tarih ve madde numaraları tutuyor. Ek-3 1.5.1 ve Ek-5 Kısım A hâlâ yalnız çalışan okuması (ekler görsel PDF)."
       ],
-      "son_kontrol": "2026-11-06",
+      "son_kontrol": "2026-11-08",
       "eksen": "F"
     },
     {
