@@ -202,7 +202,7 @@ describe('INV-PUSH-KAPISI-1 — ters eğik çizgi + satır sonu (ARC-278)', () =
     'git push \\\n  origin \\\n  master',
     'git push origin master \\\n',
     'gi\\\nt push origin master',
-    'git \\\r\npush origin master',
+    'git push origin feat-x \\\r\ngit push origin master',
     'git push origin "mas\\\nter"',
     'git push --for\\\nce origin feat-x',
     'git push origin feat-x:ma\\\nster',
@@ -222,6 +222,8 @@ describe('INV-PUSH-KAPISI-1 — ters eğik çizgi + satır sonu (ARC-278)', () =
   it('ayrıştırıcı: satır devamı jetonu birleştirir', () => {
     expect(motor.parcala('git \\\npush origin mas\\\nter')).toEqual([['git', 'push', 'origin', 'master']])
     expect(motor.parcala('echo "a\\\nb"')).toEqual([['echo', 'ab']])
+    // CRLF devam değildir (bash CR'yi kaçırır, LF komutu bitirir): jetonlar birleşmez
+    expect(motor.parcala('git \\\r\npush origin master')).not.toEqual([['git', 'push', 'origin', 'master']])
   })
 })
 

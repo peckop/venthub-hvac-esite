@@ -94,11 +94,10 @@ function heredocGovdesiniAyikla(komut) {
   return satirlar[0]
 }
 
-/** `\` + satır sonu (LF ya da CRLF) satır devamı mı? Evetse silinecek karakter sayısını (2 ya da 3), değilse 0 döner. */
+/** `\` + LF satır devamı mı? Evetse silinecek karakter sayısını (2), değilse 0 döner. `\` + CR + LF devam DEĞİLDİR (bash CR'yi kaçırır, LF komutu bitirir): birleştirmek bash'ten sapmak olur. */
 function satirDevami(komut, i) {
   if (komut[i] !== '\\') return 0
   if (komut[i + 1] === '\n') return 2
-  if (komut[i + 1] === '\r' && komut[i + 2] === '\n') return 3
   return 0
 }
 
