@@ -1,5 +1,4 @@
-import { createRequire } from 'node:module'
-import { resolve } from 'node:path'
+import { kapsamla, prDegisenleri } from './_ortak/pr-kapsami'
 
 /**
  * INV-SCRUB-1 · ORTAK YARDIMCI (ALT-38i parça 2: kapı PR kolu ve DÜNYA kolu olarak ikiye bölündü).
@@ -142,6 +141,8 @@ export const KONTROL_KODU: readonly string[] = [
   'src/__tests__/conformance/comment-scrubber-scheme-safety.test.ts',
   'src/__tests__/conformance/comment-scrubber-scheme-safety-dunya.test.ts',
   'src/__tests__/conformance/comment-scrubber-scheme-safety.yardimci.ts',
+  'src/__tests__/conformance/_ortak/pr-kapsami.ts',
+  'scripts/ci/dunya-durumu.cjs',
 ]
 
 /** Dedektör denemeleri için tek satırlık regex kaynağı kurar: `x.replace(/<on><yorum işareti><son>/g, '')`. */
@@ -158,34 +159,8 @@ const goreli =(globYolu: string): string => globYolu.replace(/^\//, '')
  * Okuyucunun kendisi yüklenemese ya da fırlatsa da bu işlev FIRLATMAZ, `null` döner (yani çağıran TAM taramaya düşer).
  * ⚠Yerelde commit sonrası `HEAD^1..HEAD` yalnız SON commit'tir; çok commitli yerel dalda PR'ın tamamı için liste elle verilir.
  */
-export function prDegisenleri(): string[] | null {
-  try {
-    const modul = createRequire(import.meta.url)(
-      resolve(__dirname, '../../../scripts/ci/dunya-durumu.cjs'),
-    ) as { degisenYollariniOku: () => string[] | null }
-    const d = modul.degisenYollariniOku()
-    return Array.isArray(d) ? d : null
-  } catch {
-    return null
-  }
-}
-
-/**
- * `tumu` kümesini PR'ın değişen dosyalarına göre daraltır.
- * @param tumu     tam küme (taranabilecek her hedef)
- * @param anahtar  bir hedefin değişen listedeki yol karşılığı (kanonik, POSIX, köke göreli)
- * @param degisen  testler için enjeksiyon; verilmezse `prDegisenleri()` okunur. Açık `null` = "okunamadı" (varsayılan DEVREYE GİRMEZ).
- * @returns `degisen` okunamadıysa `{ liste: tumu (aynen), tam: true }`; okunduysa `{ liste: tumu ∩ değişen (tumu sırasında), tam: false }`
- */
-export function kapsamla<T>(
-  tumu: T[],
-  anahtar: (x: T) => string,
-  degisen: string[] | null = prDegisenleri(),
-): { liste: T[]; tam: boolean } {
-  if (!Array.isArray(degisen)) return { liste: tumu, tam: true }
-  const kume = new Set(degisen)
-  return { liste: tumu.filter((x) => kume.has(anahtar(x))), tam: false }
-}
+// Okuyucu ve daraltma TEK yerde durur: `./_ortak/pr-kapsami.ts` (ALT-38i #2367). Bu dosya yalnız yeniden dışa aktarır.
+export { kapsamla, prDegisenleri }
 
 /** Kontrol kodu değişmişse daraltma kalkar: `null` (= tam tarama) döner; aksi hâlde liste aynen. */
 function kontrolKoduDegistiyseTam(degisen: string[] | null): string[] | null {
