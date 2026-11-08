@@ -340,6 +340,17 @@
             "statusMessage": "dönüm"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/dizin-acilis.cjs\"",
+            "timeout": 15,
+            "statusMessage": "dizin"
+          }
+        ]
       }
     ],
     "SessionEnd": [
