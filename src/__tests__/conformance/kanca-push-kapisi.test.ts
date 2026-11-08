@@ -260,6 +260,13 @@ describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () =
     // kabuk takma adı üzerinden (denetçi: orta)
     "git config alias.foo '!git config core.hooksPath /tmp/bos'",
     "git config --global alias.hp '!sh -c x'",
+    'git config alias.cfg config',
+    "git config --global alias.hp 'config core.hooksPath /tmp/bos'",
+    'git config `echo core.hooksPath` /tmp/bos',
+    // değer alan seçeneğin değeri mod bayrağı değildir (güvenlik incelemesi)
+    'git config --comment --list core.hooksPath /tmp/bos',
+    'git config --file --get core.hooksPath /tmp/bos',
+    'git config --type --unset core.hooksPath /tmp/bos',
     // anahtar konumunda kabuk genişletmesi
     'K=core.hooksPath; git config $K /tmp/bos',
     'git config "$K" /tmp/bos',
@@ -280,7 +287,8 @@ describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () =
     expect(ret('git config --get-all core.hooksPath')).toBeNull()
     expect(ret('git config --show-origin --get core.hooksPath')).toBeNull()
     expect(ret('git config user.name "$NAME"')).toBeNull()
-    expect(ret('git config alias.co checkout')).toBeNull()
+    expect(ret('git config --get alias.co')).toBeNull()
+    expect(ret('git config --unset alias.co')).toBeNull()
     expect(ret('git config --get $K')).toBeNull()
     expect(ret('bash -c "git config core.hooksPath /x"')).not.toBeNull()
   })
