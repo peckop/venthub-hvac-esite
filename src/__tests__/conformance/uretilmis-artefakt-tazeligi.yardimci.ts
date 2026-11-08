@@ -2,6 +2,8 @@ import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 
+import { kapsamla, prDegisenleri } from './_ortak/pr-kapsami'
+
 /**
  * ÜRETİLMİŞ ARTEFAKT TAZELİĞİ · ortak yardımcı (ALT-38i parça 2). Test DEĞİLDİR (vitest yalnız `*.test.ts` toplar).
  *
@@ -222,40 +224,10 @@ export function manifestOku(): ArtefaktManifesti | null {
 // PR KAPSAMI
 // ---------------------------------------------------------------------------------------------------------------------------
 
-/**
- * PR'ın değişen dosyaları: kanonik, POSIX, köke göreli yollar; okunamadıysa `null`.
- * Tek okuyucu `scripts/ci/dunya-durumu.cjs` `degisenYollariniOku`dur. Okuyucunun kendisi yüklenemese ya da fırlatsa da bu işlev
- * FIRLATMAZ, `null` döner (çağıran TAM denetime düşer).
- * ⚠Yerelde commit sonrası `HEAD^1..HEAD` yalnız SON commit'tir; çok commitli yerel dalda PR'ın tamamı için liste elle verilir.
- */
-export function prDegisenleri(): string[] | null {
-  try {
-    const modul = createRequire(import.meta.url)(`${repoKoku()}/scripts/ci/dunya-durumu.cjs`) as {
-      degisenYollariniOku: () => string[] | null
-    }
-    const d = modul.degisenYollariniOku()
-    return Array.isArray(d) ? d : null
-  } catch {
-    return null
-  }
-}
-
-/**
- * `tumu` kümesini PR'ın değişen dosyalarına göre daraltır.
- * @param tumu     tam küme
- * @param anahtar  bir öğenin değişen listedeki yol karşılığı (kanonik, POSIX, köke göreli)
- * @param degisen  testler için enjeksiyon; verilmezse `prDegisenleri()` okunur. Açık `null` = "okunamadı" (varsayılan DEVREYE GİRMEZ).
- * @returns `degisen` okunamadıysa `{ liste: tumu (aynen), tam: true }`; okunduysa `{ liste: tumu ∩ değişen (tumu sırasında), tam: false }`
- */
-export function kapsamla<T>(
-  tumu: T[],
-  anahtar: (x: T) => string,
-  degisen: string[] | null = prDegisenleri(),
-): { liste: T[]; tam: boolean } {
-  if (!Array.isArray(degisen)) return { liste: tumu, tam: true }
-  const kume = new Set(degisen)
-  return { liste: tumu.filter((x) => kume.has(anahtar(x))), tam: false }
-}
+// PR'ın değişen dosyaları ve kümeyi onlara göre daraltma TEK yerde durur: `./_ortak/pr-kapsami.ts` (ALT-38i #2367).
+// Fail-closed: değişen liste okunamazsa `prDegisenleri()` null döner ve `kapsamla` tumu AYNEN + `tam: true` verir.
+// Bu dosya yalnız yeniden dışa aktarır; testlerin içe aktarımı değişmez.
+export { kapsamla, prDegisenleri }
 
 /**
  * Kontrolün KENDİ girdileri: biri değişirse PR kolu TAM denetler. Bunlar kuralı ya da kuralın baktığı dondurma anahtarını
@@ -266,6 +238,8 @@ export const KENDI_GIRDILERI: readonly string[] = [
   'src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts',
   'src/__tests__/conformance/uretilmis-artefakt-tazeligi-dunya.test.ts',
   'src/__tests__/conformance/uretilmis-artefakt-tazeligi.yardimci.ts',
+  'src/__tests__/conformance/_ortak/pr-kapsami.ts',
+  'scripts/ci/dunya-durumu.cjs',
   'scripts/hijyen/artefakt-bayatlik-sayim.cjs',
   'scripts/hijyen/tasiyici-anahtari.cjs',
   '.companion-tasiyici.json',
