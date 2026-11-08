@@ -64,6 +64,34 @@ const GIT_ORTAM = /^(?:export\s+)?GIT_(?:CONFIG_PARAMETERS|CONFIG_COUNT|CONFIG_K
 /** `-c anahtar=değer` için tek serbest küme: görünüm ve kimlik adı. core.pager yalnız `cat` (başka pager komut çalıştırır). */
 const ZARARSIZ_ANAHTAR = /^(?:core\.quotepath=|color\.[a-z.]+=|advice\.[a-z.]+=|core\.pager=cat$|user\.(?:name|email)=|log\.[a-z.]+=|diff\.renames=)/i
 
+/**
+ * ARC-277 (MVZ-10 yanlış pozitifi): `cat > dosya <<'E' ... arr.push(...) ... E` gövdesindeki sözcükler komut sanılıyordu.
+ * TIRNAKLI sınırlayıcılı (<<'E', <<"E": genişleme yok) heredoc gövdesi, alıcı salt veri okuyorsa ve aynı satırda yorumlayıcıya
+ * giden bir şey yoksa komut metninden çıkarılır. Tırnaksız sınırlayıcıda $(...) çalışır, bu yüzden gövde TARANMAYA devam eder.
+ * Kapanış sınırlayıcısı yoksa gövde komutun sonuna kadar sayılır (bash gibi); yine de ayıklanır.
+ */
+function heredocGovdesiniAyikla(komut) {
+  // Fail-closed (güvenlik incelemesi, 2 tur): ayrıştırıcı farkı doğmasın diye YALNIZ tek, basit, tam anlaşılır biçim ayıklanır:
+  // komutun TAMAMI `cat|tee [> dosya] <<'E'` satırı + gövde + kapanış satırı; başka satır, komut, tırnak, boru, zincir, kaçış, genişleme yok.
+  // Başka her biçimde (yürütme, zincir, ikinci heredoc, kapanışsız gövde ...) gövde taranmaya devam eder.
+  // Ters eğik çizgi sınıfta YOK: `cat \<<'E'` bash'te `\<` kaçışıdır (heredoc değil), dosya adı sayılmamalı. Windows yolu / ile yazılır.
+  const hedef = String.raw`(?:>>?\s*[A-Za-z0-9_./~:-]+)`
+  const op = String.raw`<<(-?)(['"])([A-Za-z_][A-Za-z0-9_]*)\2`
+  const bicim1 = new RegExp(String.raw`^[ \t]*(?:cat|tee)(?:[ \t]+(?:${hedef}|[A-Za-z0-9_./~:-]+))?[ \t]*${op}[ \t]*$`)
+  const bicim2 = new RegExp(String.raw`^[ \t]*cat[ \t]*${op}[ \t]*${hedef}[ \t]*$`)
+  const satirlar = String(komut).replace(/\r/g, '').split('\n')
+  while (satirlar.length && satirlar[satirlar.length - 1].trim() === '') satirlar.pop()
+  const m = bicim1.exec(satirlar[0]) || bicim2.exec(satirlar[0])
+  if (!m) return String(komut)
+  const [, tire, , sinirlayici] = m
+  const kapanis = satirlar.length - 1
+  const son = tire ? satirlar[kapanis].replace(/^\t+/, '') : satirlar[kapanis]
+  // Kapanış sınırlayıcısı son satır olmalı ve gövdede BAŞKA kapanış satırı olmamalı (erken kapanıştan sonra gelen satır komuttur).
+  if (kapanis < 1 || son !== sinirlayici) return String(komut)
+  for (let k = 1; k < kapanis; k++) if ((tire ? satirlar[k].replace(/^\t+/, '') : satirlar[k]) === sinirlayici) return String(komut)
+  return satirlar[0]
+}
+
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut, yorumAtla = true) {
   const parcalar = []
@@ -157,6 +185,8 @@ function pushBul(t, genisletme = false) {
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
  */
 function degerlendir(komut, o) {
+  // İç içe yük (eval / bash -c) ayıklanmaz: dış kabuk yükteki $(...) ve ters tırnağı heredoc'tan ÖNCE genişletir (güvenlik incelemesi, 3. tur).
+  if (!o.heredocYok) komut = heredocGovdesiniAyikla(komut || '')
   // UNC/ağ/aygıt yolu: ayrıştırıcı ters eğik çizgileri kaçış sayıp yolu bozabileceği için HAM metinde aranır (-C ve cd hedefi).
   if (/(?:\s-C\s*|\bcd\s+)(?:["']*)[\\/]{2}/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
   const parcalar = parcala(String(komut || ''), !o.yorumYok)
@@ -185,7 +215,7 @@ function degerlendir(komut, o) {
     const ilk = asilKomut(t)
     const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
     // İç içe çağrılarda önceki klasörler SİLİNMEZ, birikir (özgün klasör her zaman ölçülür).
-    const oo = { ...o, cwd, ekCwd: [...new Set([...(o.ekCwd || []), ...(cwd !== o.cwd ? [o.cwd] : [])])] }
+    const oo = { ...o, heredocYok: true, cwd, ekCwd: [...new Set([...(o.ekCwd || []), ...(cwd !== o.cwd ? [o.cwd] : [])])] }
     if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-')) {
       if (AG_YOLU(t[ilk + 1])) return `cd ${t[ilk + 1]}: UNC/ağ/aygıt yolu denetlenmez; yerel yol yaz`
       cwd = path.resolve(cwd, t[ilk + 1])
@@ -347,6 +377,6 @@ function main() {
   })
 }
 
-module.exports = { degerlendir, parcala, pushBul }
+module.exports = { degerlendir, parcala, pushBul, heredocGovdesiniAyikla }
 
 if (require.main === module) main()

@@ -14,7 +14,9 @@ const require_ = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '..', '..', '..')
 const KANCA = path.join(KOK, '.claude', 'hooks', 'push-kapisi.cjs')
 type Secenek = { cwd: string; mevcutDal?: (c: string) => string | null; gitDeposu?: (p: string) => boolean }
-const motor = require_(KANCA) as { degerlendir: (k: string, o: Secenek) => string | null; parcala: (k: string) => string[][] }
+const motor = require_(KANCA) as { degerlendir: (k: string, o: Secenek) => string | null; parcala: (k: string) => string[][]
+  heredocGovdesiniAyikla: (k: string) => string
+}
 
 const CWD = path.resolve('/depo/calisma')
 const o = (mevcut: string | null = 'feat-x'): Secenek => ({ cwd: CWD, mevcutDal: () => mevcut, gitDeposu: (p) => !p.includes('depo-degil') })
@@ -190,6 +192,87 @@ describe('INV-PUSH-KAPISI-1 — reddedilenler', () => {
 describe('INV-PUSH-KAPISI-1 — ayrıştırıcı', () => {
   it('tırnak içindeki operatör bölmez', () => {
     expect(motor.parcala('echo "a && git push origin master"')).toEqual([['echo', 'a && git push origin master']])
+  })
+})
+
+describe('INV-PUSH-KAPISI-1 — heredoc gövdesi (ARC-277, MVZ-10 yanlış pozitifi)', () => {
+  const veriGovdesi = (govde: string, onek = "cat > betik.cjs <<'E'") => `${onek}\n${govde}\nE`
+
+  it.each([
+    "arr.push(1)\nconst G = $(echo)\nfoo $x push",
+    'const a = []; a.push(x); $kabuk push',
+    '$g push origin master',
+    'git push origin master',
+  ])('tırnaklı sınırlayıcı + cat alıcısı: gövde veri sayılır, yanlış pozitif yok (%s)', (govde) => {
+    expect(ret(veriGovdesi(govde))).toBeNull()
+    expect(ret(veriGovdesi(govde, "tee betik.cjs <<'E'"))).toBeNull()
+    expect(ret(veriGovdesi(govde, 'cat > betik.cjs <<"E"'))).toBeNull()
+  })
+
+  it('gövdeden sonraki GERÇEK komut yine denetlenir', () => {
+    expect(ret(veriGovdesi('arr.push(1)') + '\ngit push origin master')).toContain('korunan dal')
+    expect(ret("cat > a <<'E' && git push origin master\nx\nE")).toContain('korunan dal')
+  })
+
+  it('⛔SABOTAJ: gövdenin KOŞULABİLECEĞİ durumlarda gövde taranmaya devam eder', () => {
+    // yorumlayıcı alıcılar
+    expect(ret("bash <<'E'\ngit push origin master\nE")).not.toBeNull()
+    expect(ret("sh <<'E'\ngit push origin master\nE")).not.toBeNull()
+    expect(ret("cat <<'E' | bash\ngit push origin master\nE")).not.toBeNull()
+    // bilinen sınır: node/python gövdesinde TIRNAKLI dizge içindeki `git push` bu kancada görülmez (komut metni dışı); katman pre-push (ARC-277 PR2)
+    // tırnaksız sınırlayıcı: $(...) çalışır
+    expect(ret('cat > a <<E\n$(git push origin master)\nE')).not.toBeNull()
+  })
+
+  it('⛔SABOTAJ (güvenlik incelemesi): gövde dosyaya yazılıp aynı komutta koşulursa gövde taranır', () => {
+    for (const kos of ['bash betik.sh', 'sh ./betik.sh', './betik.sh', '. ./betik.sh', 'source betik.sh', 'node betik.cjs', 'exec bash betik.sh', 'cat betik.sh | bash'])
+      expect(ret(`cat > betik.sh <<'E'\ngit push origin master\nE\n${kos}`)).not.toBeNull()
+    // dosya yolu ./ ile yazılsa da (hedef) yürütme sayılmaz
+    expect(ret("cat > ./betik.cjs <<'E'\narr.push(1)\n$x push\nE")).toBeNull()
+  })
+
+  it('⛔SABOTAJ (3. güvenlik turu): iç içe yükte (eval, bash -c) ayıklama yok; dış kabuk $(...) genişletir', () => {
+    expect(ret('eval "cat > a <<\'E\'\n$(git push origin master)\nE"')).not.toBeNull()
+    expect(ret('bash -c "cat > a <<\'E\'\n$(git push origin master)\nE"')).not.toBeNull()
+    expect(ret('sh -c "cat > a <<\'E\'\n`git push origin master`\nE"')).not.toBeNull()
+  })
+
+  it('ayıklayıcı: <<- sekmeli kapanışı tanır; kapanışsız gövde ve erken kapanıştan sonraki satır FAIL-CLOSED (taranır)', () => {
+    expect(ret("cat > a <<-'E'\n\tx.push(1)\n\tE")).toBeNull()
+    expect(ret("cat > a <<'E'\narr.push(1)\n$x push")).not.toBeNull()
+    // gövde içinde erken kapanış satırı: sonrası KOMUTTUR
+    expect(ret("cat > a <<'E'\nx\nE\ngit push origin master\nE")).not.toBeNull()
+  })
+
+  it('⛔SABOTAJ (2. güvenlik turu): ayrıştırıcı farkı biçimleri ayıklanmaz, gövde taranır', () => {
+    const gov = '\n$g push origin master\nE'
+    for (const op of [
+      "echo 'x\ncat > a <<'E'", // açık tırnak sonrası satır
+      "cat > a <<'E' \\", // satır devamı
+      "cat > a <<'E' | bash", // boru
+      "cat > a <<'E' ; bash a", // zincir
+      "cat > a <<'E' && bash a",
+      "cat > a <<'E' <<'F'", // ikinci heredoc
+      "echo ' <<'E'", // tırnak içi operatör
+      "# cat > a <<'E'", // yorum
+      "cat $(x) <<'E'", // genişleme
+      "cat `x` <<'E'",
+      "cat a b <<'E'", // çoklu argüman
+      "cat \\<<'E'", // bash'te \< kaçış, heredoc değil (denetçi bulgusu)
+      "cat <<<'E'", // here-string
+      "cat f # <<'E'",
+      "cat \"<<'E'\"",
+      "cat > Makefile <<'E'\n\tgit push origin master\nE\nmake #",
+      "cat <<'E' | $SHELL",
+      "cat <<'E' | ash",
+      "cat <<'E' | while read l; do $l; done",
+      "dd of=f <<'E'",
+      "cat() { $SHELL; }; cat <<'E'",
+      "sort --compress-program=/tmp/x <<'E'",
+    ])
+      expect(motor.heredocGovdesiniAyikla(op + gov)).toBe(op + gov) // ayıklanmaz → gövde eski davranışla taranır
+    // Açık tırnak/satır devamı biçimleri ayıklama öncesi de geçiyordu (ARC-250 notu: ayrıştırıcının bilinen sınırı); regresyon değil.
+    for (const op of ["cat > a <<'E' | bash", "cat > a <<'E' ; bash a", "cat > a <<'E' && bash a", "cat $(x) <<'E'"]) expect(ret(op + gov)).not.toBeNull()
   })
 })
 
