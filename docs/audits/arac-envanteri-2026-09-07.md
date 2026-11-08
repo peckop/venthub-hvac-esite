@@ -703,6 +703,9 @@ madde 1 gereği araç sayılmaz.
 | `scripts/mevzuat/__tests__/mevzuat-araclari.test.ts` | MVZ-10 / OPS-256 · scripts/mevzuat/ham-cekim.cjs ve kanit-ekle.cjs. | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/mevzuat/ham-cekim.cjs` | MEVZUAT HAM ÇEKİM — bir resmî adresi ham bayt olarak çeker; ham ve etiketsiz metnin sha256'sını | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/mevzuat/kanit-ekle.cjs` | MEVZUAT KANIT EKLE — ham-cekim.cjs çıktısını (kaynak girdisi) kalemin kanıt dosyasına ekler ve | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/rehber/__tests__/tur.test.ts` | INV-REHBER-TUR-1 · doğrulama turu betikleri (rehber-yazisi-standard.md R5.1.2, OPS-255): sessiz kısmi yama yok, tuzak/yama/fark/kayıt/aynı-sayı/kapsam sözcüğü; ağa çıkmaz | BLOG | vitest (`pnpm test`) | 2026-11-08 (17/17) | kendisi test | AKTIF |
+| `scripts/rehber/tur/tur-lib.mjs` | REHBER DOĞRULAMA TURU BETİKLERİ — saf yardımcılar (R5.1.2, OPS-255): iddia iskeleti, yama, değişen cümleler, aynı-sayı, tuzaklı kopya, tur kaydı; yargı vermez | BLOG | vitest (`pnpm test`) | 2026-11-08 (17/17) | scripts/rehber/__tests__/tur.test.ts | AKTIF |
+| `scripts/rehber/tur/tur.mjs` | REHBER DOĞRULAMA TURU — komut satırı (R5.1.2, OPS-255): iskelet, yama, fark, kapi, tuzak, kayit; ağa çıkmaz | BLOG | elle: `node scripts/rehber/tur/tur.mjs <komut>` (CI'da koşmaz; mantık testle korunur) | 2026-11-08 (BLG-54/55 taslaklarında kapi kırmızı 0) | scripts/rehber/__tests__/tur.test.ts | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
