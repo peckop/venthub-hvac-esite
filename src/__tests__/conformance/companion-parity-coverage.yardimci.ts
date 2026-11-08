@@ -363,7 +363,12 @@ export interface PrKisitliSonuc {
  */
 export function prKisitliSayim(g: Girdiler & { degisen: string[] | null; bugun: Date }): PrKisitliSonuc {
   const kaynaklar = g.izlenen.filter(f => sayac.kapsamdaMi(f, g.kapsam))
-  const { liste, tam } = kapsamla(kaynaklar, y => y, g.degisen)
+  const { liste: degisenKaynak, tam } = kapsamla(kaynaklar, y => y, g.degisen)
+  // Kaynağın companion'ı (modülün kuralı: uzantısız kaynak adı + `.md`) PR'da değiştiyse ya da SİLİNDİYSE kaynak da PR'ın
+  // konusudur: eski cetvelin C5 "çaresi" companion'ı silmekti ve silinen companion'ı sayım ancak kaynaktan görür (denetçi Ö1, #2370).
+  const degisenKume = new Set(g.degisen ?? [])
+  const companionDegisti = (k: string): boolean => degisenKume.has(`${k.replace(/\.[^./]+$/, '')}.md`)
+  const liste = tam ? degisenKaynak : kaynaklar.filter(k => degisenKume.has(k) || companionDegisti(k))
   const secili = new Set(liste)
   const izlenen = tam ? g.izlenen : g.izlenen.filter(f => f.endsWith('.md') || secili.has(f))
   const sayim = sayac.sayimCekirdegi({

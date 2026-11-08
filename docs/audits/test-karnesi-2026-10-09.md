@@ -8,22 +8,22 @@
 
 | Konu | Sayı |
 |---|---|
-| test dosyası (git ls-files) | 656 |
+| test dosyası (git ls-files) | 657 |
 | · betik | 46 |
-| · conformance | 363 |
+| · conformance | 364 |
 | · birim | 222 |
 | · edge | 7 |
 | · e2e | 17 |
 | · smoke | 1 |
 | sabotajla ÖLÇÜLEN dosya | 347 |
-| sabotajla ÖLÇÜLMEYEN dosya | 309 |
+| sabotajla ÖLÇÜLMEYEN dosya | 310 |
 | sabotajda ÇELİŞKİ (aynı test için farklı hüküm, çözülmedi) | 0 |
 | KISMİ koruma (kırmızı veriyor ama ölçülen bir bozulmaya yeşil kalıyor) | 221 |
 | 8. soru: TETİK beyanı yazılı dosya (kesin) | 4 |
-| 8. soru: yalnız statik okumadan (kesin DEĞİL) | 292 |
+| 8. soru: yalnız statik okumadan (kesin DEĞİL) | 293 |
 | 8. soru: ÖLÇÜLMEDİ (beyan yok, okunan yol yok) | 360 |
 | CI penceresinde kırmızı veren dosya | 70 |
-| CI penceresinde HİÇ kırmızı vermeyen dosya | 586 |
+| CI penceresinde HİÇ kırmızı vermeyen dosya | 587 |
 
 ### Sabotaj hükümleri (ölçülen dosyalarda)
 
@@ -38,7 +38,7 @@
 | Hüküm | Dosya |
 |---|---|
 | supheli | 175 |
-| bagimsiz | 472 |
+| bagimsiz | 473 |
 | bagli | 9 |
 
 ### Öneri adayları (KARAR DEĞİL)
@@ -51,7 +51,7 @@
 | COKLU-KORUMA-ADAYI | 3 |
 | ORTAM-INCELE | 1 |
 | TASI-ADAYI-DUNYA-DURUMU | 5 |
-| TASINDI | 5 |
+| TASINDI | 6 |
 | SAHTE-YESIL-ADAYI | 1 |
 
 ### CI koşuları (ci.yml, pencere içi)
@@ -64,7 +64,7 @@
 
 Test adımı süresi medyanı: 190 sn (örnek 374 başarılı koşu).
 
-## PR kapısından çıkan (dünya durumu) testler ve yeni yerleri (5)
+## PR kapısından çıkan (dünya durumu) testler ve yeni yerleri (6)
 
 | Test | Yeni yer | Neden | Kanıt |
 |---|---|---|---|
@@ -73,6 +73,7 @@ Test adımı süresi medyanı: 190 sn (örnek 374 başarılı koşu).
 | `src/__tests__/conformance/sessionstart-tavan.test.ts` | master-push + zamanli | SessionStart kancasını (session-board.cjs) hermetik dizinde yaklaşık 30 kez gerçek süreç olarak koşturup çıktı boyutunu (tavan 9.000 karakter) ölçer; ev dizinine ve makinenin durumuna kısmen bağlıdır ve 130 sn ile paketin en ağır testidir. Tavanı gerçekten koruyan yer çıktıyı şekillendiren girdilerdir (rol kartları, rol kartı üreticisi, pano ve hijyen betikleri, kancanın kendisi): bunlara dokunan PR'da test PR kapısında TUTAR, dokunmayanda zamanlı kola bırakır. Süzgeç girdileri 2026-11-08'de kancanın dört açılışta, OPS/ARAC/HARITA/ALTYAPI rol kollarında ve pencere başlığı kolunda gerçek koşusuyla ölçüldü (alt süreçler dahil): okunan izlenen dosyalar yalnız bu dizinlerde; docs/roller/ testin kendi varlık denetimidir, CLAUDE.md ise test-haritasında (scripts/ci/test-haritasi.json) okunan olarak yazılıdır. | ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, PR #1790; CI geçmişi 2026-07-06..10-07): 4 kırmızı koşu, 4 farklı dal, master push 0; 4'ü de dünya olayı kümesinde (tek küme, 2026-09-29), bugün kırmızı yok. Ortam bağı: ev dizini; yerel süre 130,4 sn (scripts/ci/test-sureleri.json), ağır yük altında taban koşusu 179 sn. OPS hükmü 2026-10-09 (ALT-38i): TAM çıkmaz, yalnız rol kartını ya da açılış çıktısını değiştiren yollar değişince PR kapısında koşar. |
 | `src/__tests__/conformance/standard-section-integrity-dunya.test.ts` | master-push + zamanli | docs/standards/*.md cetvellerinin TAM KLASÖR taramasını yapar (mükerrer bölüm numarası, sahipsiz alt bölüm, aynı kod kimliğinin iki başlıkta anlatılması). Üç kural da dosya başınadır: bir cetvelin ihlali yalnız o cetvelin içeriğinden doğar. Tam klasör sonucu PR'ın koduna değil, dokunmadığı bir cetvelin (başka dalın ya da kapı gevşekken girmiş eski bir kusurun) durumuna bağlıdır; suçsuz PR'ın yazarı bunu düzeltemez. Dosya, kapının KENDİ koduna ait kollardan ayrıldı: fikstür ve ayıklayıcı testleri ile aynı üç kuralın PR'ın DEĞİŞTİRDİĞİ cetvellerdeki taraması (fail-closed: değişen liste okunamazsa ya da kontrolün kendi kodu değişirse tam klasör) standard-section-integrity.test.ts'te PR kapısında KALDI. İki kol ortak yardımcıyı kullanır (standard-section-integrity.yardimci.ts): kopya yok. | ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, CI geçmişi 2026-07-06..10-07): standard-section-integrity.test.ts 13 kırmızı koşuda, 12 farklı dalda kırmızı verdi (1'i master push); 11'i tek dünya olayı kümesinde (aynı test ≥3 dalda 12 saat içinde), 2'si izole ve sonraki koşuda düzeldi (PR'ın kendi hatası). Ortam bağı yok: yalnız docs/standards okur (karne q4: bagli, yalnız CI kümesi nedeniyle). Süre 123 ms (karne q5). OPS hükmü 2026-10-09 (ALT-38i parça 2): kapı bölünür, tam klasör kolu zamanlı kola alınır, PR kolu PR'ın değiştirdiği cetvellerle sınırlanır. |
 | `src/__tests__/conformance/taban-tazeligi-dunya.test.ts` | master-push + zamanli | Şema tabanının en yeni migration'dan geri kalıp kalmadığını ölçer. Cevap pull request'in koduna değil master'ın o anki durumuna ve tabanın son dökülme tarihine bağlıdır; taban prod'dan elle dökülür (sema-tabani-uret.yml), yani suçsuz bir PR'ın yazarı düzeltemez. Dosya, kapının KENDİ koduna ait kollardan ayrıldı: onlar (evren, kısmi taban, damga biçimi, README) taban-tazeligi.test.ts'te PR kapısında KALDI. | CI geçmişi 2026-07-06..10-06 (ALT-38 ölçümü; karne belgesi ALT-38b PR'ı ile depoya girer): bu kapı 55 kırmızı koşuda, 39 farklı dalda kırmızı verdi; 52'si dünya olayı kümesinde (altı küme: aynı test ≥3 dalda 12 saat içinde), 11'i master push. OPS ölçümü 2026-10-06: son 10 kırmızının 5'i (#1692 migrate sonrası suçsuz PR'lar). |
+| `src/__tests__/conformance/uretilmis-artefakt-tazeligi-dunya.test.ts` | master-push + zamanli | Üretilmiş artefaktların (docs/*_master.md) depoda izlenmesini, manifestteki içerik özetiyle eşleşmesini ve kaynakları derlemeden sonra değişen artefakt sayısını TÜM veriyle, her zaman denetler. Kırmızısı çoğunlukla PR'ın dosyalarından değil, master'daki kaynak ve manifest durumunun PR'dan bağımsız kaymasından gelir: bir kaynağı değiştiren her master birleşmesinden sonra açık PR'ların hepsi kendi dosyasına dokunmadan kırmızıya dönebilir (taşıyıcı KAPALI iken parity yalnız sayar, AÇIK iken bloklar). Dosya, kapının PR'a ait kollarından ayrıldı: uretilmis-artefakt-tazeligi.test.ts PR kapısında KALDI ve aynı kuralları yalnız PR'ın dokunduğu girdiler için (ilan yaml'ı, manifest, artefaktın kendisi, kaynağı değişen artefakt) koşar; değişen liste okunamazsa ya da kontrolün kendi kodu değişirse tam veriyle koşar. Yol süzgeci gerekmez: PR kolu girdiye zaten diff'ten bakar. | ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, CI geçmişi 2026-07-06..10-07): 36 kırmızı koşu, 29 farklı dal (1'i master push); 32'si dünya olayı kümesinde (3 küme, 2026-08-26..09-03), PR'a ait 4 (hepsi sonraki koşuda düzeldi), bugün kırmızı yok. Ortam bağı: git HEAD ağacı ve blob'ları, taşıyıcı anahtarı (.companion-tasiyici.json, bugün KAPALI). Süre 0,8 sn (scripts/ci/test-sureleri.json). Uygulama kaydı: ALT-38i (cetvel §7.7 madde 3, bölünecek 4 testten biri). |
 
 ## ÇELİŞKİLER (aynı test için farklı sabotaj hükmü; çözülmedi, sessizce seçilmedi) (0)
 
@@ -722,6 +723,7 @@ Ayrıntı (sekiz soru, her dosya için) `test-karnesi-*.json` içindedir. Bu tab
 | `src/__tests__/conformance/tip-drift-kapisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 94 | statik (2) | KORU |
 | `src/__tests__/conformance/uc-boyut-musteri-yuzeyi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 9 | statik (1) | KISMI-KORUMA |
 | `src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts` | conformance | 0 | KIRMIZI (1/1) | supheli | 1461 | statik (9) | KISMI-KORUMA |
+| `src/__tests__/conformance/uretilmis-artefakt-tazeligi-dunya.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | statik (3) | TASINDI |
 | `src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts` | conformance | 36 | KIRMIZI (1/1) | bagli | 754 | statik (4) | TASI-ADAYI-DUNYA-DURUMU |
 | `src/__tests__/conformance/url-takma-adlari-listele.test.ts` | conformance | 0 | ölçülmedi | bagimsiz | ölçülmedi | ölçülmedi | OLCULMEDI |
 | `src/__tests__/conformance/urun-secici-girisi.test.ts` | conformance | 0 | KIRMIZI (1/1) | bagimsiz | 63 | statik (1) | KISMI-KORUMA |

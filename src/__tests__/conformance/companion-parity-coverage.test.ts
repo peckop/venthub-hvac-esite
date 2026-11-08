@@ -342,6 +342,35 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     ).toBeGreaterThan(400)
   })
 
+  it('⭐PR-KISITLI KOL: yalnız companion\'ı SİLEN PR, eski kaynakta C4 üretir (denetçi Ö1, #2370); ilgisiz PR üretmez', () => {
+    const kapsam = {
+      koklerRecursive: ['src'],
+      skipDirs: new Set<string>(),
+      skipBasenames: new Set<string>(),
+    }
+    const bugun = new Date('2026-09-03T00:00:00Z')
+    // PR `src/a/Silinen.md`'yi sildi: HEAD'de (birleşme sonrası) yok, ama değişen listede görünür (`--no-renames`).
+    const izlenen = ['src/a/Silinen.tsx', 'src/a/Eski.tsx', 'src/a/Eski.md']
+    const tarihler = new Map<string, string>([
+      ['src/a/Silinen.tsx', '2026-08-20'], // eşiği aşmış (14 gün)
+      ['src/a/Eski.tsx', '2026-08-20'],
+      ['src/a/Eski.md', '2026-08-20'],
+    ])
+    const girdi = { izlenen, tarihler, kapsam, bugun }
+
+    const silen = prKisitliSayim({ ...girdi, degisen: ['src/a/Silinen.md'] })
+    expect(silen.tam).toBe(false)
+    expect(
+      silen.sayim.eksik.map(e => e.yol),
+      'companion\'ı silen PR, kaynağı değişmediği için kapsam dışı kaldı: eski cetvelin C5 "çaresi" PR kapısından geçerdi',
+    ).toEqual(['src/a/Silinen.tsx'])
+    expect(silen.prKaynak).toBe(1)
+
+    const ilgisiz = prKisitliSayim({ ...girdi, degisen: ['README.md'] })
+    expect(ilgisiz.sayim.eksik, 'ilgisiz PR eksik üretmemeli').toEqual([])
+    expect(ilgisiz.prKaynak).toBe(0)
+  })
+
   it('⭐PR-KISITLI KOL AYIRT EDER: yalnız PR\'ın dokunduğu eski kaynak sayılır; liste okunamazsa TAM sayıma düşer', () => {
     // Fikstür ŞART: gerçek depoda PR'ın değiştirdiği kaynak her zaman TAZEDİR (son commit'i PR'ın kendisi), yani
     // PR-kısıtlı kol bugün yapısal olarak sessizdir. "Sıfır" hem "PR borç bırakmadı"nın hem "daraltma ölü"nün
@@ -405,9 +434,17 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     expect(bos.tam, 'boş liste "okundu, dokunulmadı"dır; tam sayıma düşmemeli').toBe(false)
     expect(bos.sayim.eksik.length + bos.sayim.bayat.length).toBe(0)
 
-    // (5) Yalnız companion'a dokunan PR (kaynağa değil) borç ÜRETMEZ: kaynak PR'ın değil.
-    const sadeceMd = prKisitliSayim({ ...girdi, degisen: ['src/a/BaskaBayat.md'] })
-    expect(sadeceMd.sayim.bayat).toEqual([])
+    // (5) Companion'a dokunan PR (kaynağa değil) çifti KAPSAMINA alır (denetçi Ö1, #2370: silme ya da bırakma da PR'ın işidir):
+    //     companion'ı tazelemiyorsa (tarihi eski kalıyorsa) çift bayat görünür; tazeliyorsa (gerçek veride güncellenen
+    //     companion'ın tarihi yenidir) borç ÜRETMEZ.
+    const mdyeDokunduTazelemedi = prKisitliSayim({ ...girdi, degisen: ['src/a/BaskaBayat.md'] })
+    expect(mdyeDokunduTazelemedi.sayim.bayat).toEqual(['src/a/BaskaBayat.md'])
+    const mdTazelendi = prKisitliSayim({
+      ...girdi,
+      tarihler: new Map([...tarihler, ['src/a/BaskaBayat.md', '2026-08-25']]),
+      degisen: ['src/a/BaskaBayat.md'],
+    })
+    expect(mdTazelendi.sayim.bayat, 'companion tazelendi: borç kalmamalı').toEqual([])
 
     // (6) Silinen kaynak (izlenmiyor) listede olsa da sayılmaz; kapsamdaki HER kaynağa dokunan PR tam sayımla AYNI sonucu verir.
     const hepsi = prKisitliSayim({
