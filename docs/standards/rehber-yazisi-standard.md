@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.19 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.20 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -101,6 +101,8 @@ başlık, H2/H3, meta açıklama ve SSS'te var olan ifade silinmez; revizyondan 
 GEO-SEO'ya yazılır. Kapı yazılmadı (ARAÇ işi); fark betiği BLOG çalışma klasöründe (depo dışı).
 
 **v0.19 (2026-11-08, BLG-48, OPS-245, Recep onayı):** ERF blog incelemesinden (BLG-32, BLG-47, BLG-48; Geo-SEO SEO-94 SERP ölçümü) üç kural: **R1.3 farklı arama niyeti istisnası (K1)**, **R1.4 "sektör/uygulama rehberi" içerik türü (K2)**, **R11.3 Y9 yalnız-ekleme sorgu ifadesi (K6)**. Kanıt: ERF 21 sektör sorgusunun 9'unda ilk 10'da (Bing), VentHub 0/21; bizde sektör yazısı yok. Ölçülmeyen ve kural olmayan: uzunluk, H2 sayısı, FAQPage işareti (K4/K5 önerisi yok); görsel şartı (K3) yeni sitede Design görsel yolu geldikten sonra ayrı karar.
+
+**v0.20 (2026-11-08, BLG-52, OPS-245 ve OPS-247, Recep iki kez evet):** R3'e **zorunlu kısa katman**: her rehberde H1'in altında, ilk `## ` başlığından önce 40–70 kelimelik doğrudan cevap + `Kısaca:` satırı + 3–4 maddelik liste; cevap + maddeler 80–120 kelime. Uygulama BLG-49 ve BLG-50'de yapılmıştı, kuralı cetvel taşımıyordu (master'da "Kısaca" 0 eşleşme; OPS ölçümü). **Kapı yazıldı:** `kalipDenetle` artık `kisaKatmanDenetle` çağırır (`KISA-KATMAN-YOK`, `-CEVAP`, `-MADDE`, `-ETIKET`, `-TOPLAM`, KIRMIZI); sabotaj kolu `rehber-denetim.test.ts`, gerçek yayın listesine bağlı kol `kisa-katman-yayinda.test.ts` (INV-REHBER-KISA-KATMAN-1). 8 Kasım ölçümü: yayındaki 11 yazıdan dördü kırmızıydı (radyal/aksiyel ve sessiz fanda katman yok; çatı tipi 129, ATEX 127 kelime) ve aynı PR'da düzeltildi (yalnız ekleme ya da yalnız silme; yeni sayı, iddia, marka, fiyat yok). **Sayfa düzeni** (adım şeridi, büyüyen görsel, tablodan ürüne geçiş, bölüm sonu düğme) bu cetvelin konusu değildir: yeni sitede Design şablonu sağlar (OPS-247).
 
 ---
 
@@ -324,7 +326,7 @@ EUR-Lex bot doğrulaması isterse ham metin Cellar adresinden (`publications.eur
 Kalıp rakip ölçümünden (n = 1) çıkarıldı; bu yüzden **sayı hedefi değil ölçüttür**: konunun yan
 soruları (R1'deki arama önerileri + SSS) cevaplandı mı. Kelime sayısı ve H2 sayısı hedef değildir.
 
-**Zorunlu bölümler (kapı: `scripts/rehber/rehber-denetim.mjs` → `kalipDenetle`, R8.1):** tek H1 · en az
+**Zorunlu bölümler (kapı: `scripts/rehber/rehber-denetim.mjs` → `kalipDenetle`, R8.1):** tek H1 · **H1 altında kısa katman (v0.20, aşağıdaki tablo)** · en az
 bir tablo · başlığı birebir `## Fiyatı belirleyen etkenler`, `## Sık sorulan sorular` (5–8 `###` soru),
 `## Kaynaklar`, `## Teknik sorumluluk notu`. Başlık metni sabittir çünkü kapı başlığı birebir arar;
 "Fiyatı neler belirler?" gibi bir varyant kırmızı verir. Gövdenin geri kalanı konuya göre serbesttir.
@@ -336,7 +338,8 @@ değildir. Fark ancak emsal yazıyla elle kıyasla bulundu (OPS).
 |---|---|
 | H1 | Aranan soru ya da konu adı |
 | Alt başlıklar (H2, H3) | Tek başına okunduğunda anlamlı; konu terimi doğal yerinde; aynı ifade her H2'de tekrarlanmaz. **R11** (resmî dayanak ve İLKE sınıfı; kapı UYARI verir, kırmızı değil). Zorunlu bölüm başlıkları sabittir, bu satırdan muaftır |
-| Doğrudan cevap | İlk 2–3 cümle sorunun cevabı; giriş cümlesi yok |
+| Doğrudan cevap | İlk 2–3 cümle sorunun cevabı; giriş cümlesi yok. Biçimi aşağıdaki **Kısa katman** satırındadır |
+| **Kısa katman (v0.20, BLG-52; kapı `kisaKatmanDenetle`, KIRMIZI)** | H1'in altında, ilk `## ` başlığından önce, bu sırayla: **(1)** 40–70 kelimelik doğrudan cevap (2–3 cümle); **(2)** tek başına bir satır `Kısaca:`; **(3)** 3–4 madde, her biri `- Etiket: cümle` biçiminde (etiket maddenin bağlandığı H2'yi adlandırır). Cevap + maddeler toplamı **80–120 kelime**. Kelime = harf/rakam öbeği; `[n]` atıf işaretleri ve `Kısaca:` satırı sayılmaz. Kurallar: **(a)** yeni iddia, sayı, marka, fiyat yok; her cümle gövdede karşılığı olan bilgidir ve atıfı gövdeden aynen taşır; **(b)** gövde kısaltılmaz (yayındaki yazıya katman eklenirken var olan giriş paragrafı yerinde kalır; R5.5 yalnız-ekleme); **(c)** cevap ile gövdedeki giriş cümlesi harfi harfine aynı olmaz (eşanlamlıyla yeniden yazılır); **(d)** koşullu ya da etiketli gövde bilgisi katmana koşuluyla/etiketiyle alınır (BLG-50 çürütücü turu: koşul ve etiket düşen 10 kalem). Kapı yalnız sayıyı, biçimi ve yerini ölçer; maddenin ilgili H2'ye bağlı olduğu ve cümlenin gövdede karşılığı olduğu **ölçülmez** (anlam), bağımsız çürütücü turunda her madde için gövde karşılığına bakılır (R5.1). Sayfa düzeni (adım şeridi, büyüyen görsel, tablodan ürüne geçiş, bölüm sonu düğme) bu cetvelde değildir: **yeni sitede Design şablonu sağlar** (OPS-247) |
 | Gövde | Konuya uyan bölümler: nedir / nasıl çalışır · türleri · uygulamalar · seçim ve boyutlandırma · hesap örneği (R2.5 + hesaplayıcı bağlantısı) · alternatiflerle kıyas · montaj · bakım · güvenlik ve mevzuat · fiyatı belirleyen etkenler · izlenecek yol. Her yan soru bir bölüme bağlanır |
 | Tablo | En az bir (kıyas ya da boyutlandırma); hücreler de iddiadır (R5.1) |
 | Fiyat | **Rakam yok.** "Fiyatı belirleyen etkenler" bölümü etkenleri anlatır; fiyat yalnız ürün sayfasında görünür (`rendering-cache-standard.md` §2). **Hub kalıbı (v0.12, BLG-31):** çeşitleri ve kategorileri sıralayan hub yazısında kaynaklar fiyat etkenlerini anlatmıyorsa başlık birebir kalır, altı bunu açıkça söyler ("fiyatı belirleyen etkenleri kaynakla sayamaz"), teklifte hangi seçim girdilerinin istendiği kaynak atfıyla yazılır, uydurma etken yazılmaz |
@@ -670,7 +673,7 @@ koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil veri
 | Kapı | Ne ölçer | Hangi PR'da doğar | Sahip |
 |---|---|---|---|
 | Atıf betiği (R5.1 3b) | numarasız iddia cümlesi 0; metin ↔ liste birebir | BLOG doğrulama betikleri PR'ı | BLOG |
-| Kalıp (R3 zorunlu bölümler) | tek H1; en az bir tablo; `## Fiyatı belirleyen etkenler`, `## Sık sorulan sorular` (5–8 soru), `## Kaynaklar`, `## Teknik sorumluluk notu` var; not sabit cümleyle başlar. **Var** (v0.4, `kalipDenetle`); sabotaj kolu: 09-24 vakasının birebir benzeri iki kırmızı verir, onaya sunulmuş ilk metin (sha f29ab1c35e26) gerçek çalıştırmada aynı iki kırmızıyı verdi | BLOG kalıp kapısı PR'ı | BLOG |
+| Kalıp (R3 zorunlu bölümler) | tek H1; en az bir tablo; `## Fiyatı belirleyen etkenler`, `## Sık sorulan sorular` (5–8 soru), `## Kaynaklar`, `## Teknik sorumluluk notu` var; not sabit cümleyle başlar; **H1 altında kısa katman** (cevap 40–70, `Kısaca:` + 3–4 madde, toplam 80–120 kelime; v0.20, `kisaKatmanDenetle`). **Var** (v0.4, `kalipDenetle`; kısa katman kolu v0.20, BLG-52); sabotaj kolu: 09-24 vakasının birebir benzeri iki kırmızı verir, onaya sunulmuş ilk metin (sha f29ab1c35e26) gerçek çalıştırmada aynı iki kırmızıyı verdi | BLOG kalıp kapısı PR'ı | BLOG |
 | İç bağlantı — metin (R3) | metinde düz site adresi 0 (mutlak, göreli, çıplak); kimlik biçimi `vh:<tür>/<anahtar>`. **Var** (v0.4, `icBaglantiDenetle`, `denetle` içinde; INV-REHBER-IC-BAGLANTI-1) | BLOG kalıp kapısı PR'ı | BLOG |
 | İç bağlantı — canlı (R3) | yayındaki her rehber yazısının gövdesindeki site içi bağlantı **doğrudan 200**; 3xx ve 404 KIRMIZI (yönlendirme izlenmez); yayında yazı yoksa `EVREN-BOS` (çıkış 3), temiz değil. **Betik var** (`scripts/rehber/ic-baglanti-denetle.mjs`, ağlı); ölçüldü 2026-09-24: site haritasında yazı 0 → EVREN-BOS; önizlemenin 5 bağlantısı 200; sabotaj: kök adres 308 → KIRMIZI. **Zamanlı koşu ve adres yayınından (REC-300) sonra koşturma ALTYAPI'da** | BLOG kalıp kapısı PR'ı (betik) · ALTYAPI (bağlama) | BLOG + ALTYAPI |
 | Başlık yapısı (R11) | zorunlu bölümler hariç H2'lerin yarısından azı konu terimi taşıyorsa `BASLIK-KONU-ORANI`, %60'ından fazlası konu terimlerinin tamamını taşıyorsa `BASLIK-TEKRAR`; **UYARI, kırmızı değil** (eşikler bizimdir, resmî eşik yok: R11.2). **Var** (v0.9, `baslikDenetle`, `denetle` çıktısında `uyari` dizisi); sabotaj kolu her sınıfı bilerek bozulmuş örnekte yakalar | BLOG başlık kuralı PR'ı (BLG-12) | BLOG |

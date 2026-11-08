@@ -20,13 +20,21 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, bolumMetni, SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari, markaDenetle } from '../rehber-denetim.mjs'
+import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, kisaKatmanAyir, bolumMetni,SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari, markaDenetle } from '../rehber-denetim.mjs'
 
 const TEMIZ = `---
 baslik: Örnek cihaz nedir, nasıl seçilir?
 meta_aciklama: Örnek cihazın ne işe yaradığı ve seçimde bakılacak ölçütler.
 ---
 # Örnek cihaz nedir?
+
+Örnek cihaz, havayı bir kanaldan diğerine taşıyan temel bir ekipmandır. Seçimde taşınacak hava miktarı, kanal yolundaki direnç ve montaj yeri birlikte değerlendirilir. Bu yazı önce cihazın görevini anlatır, sonra seçim ölçütlerini sıralar, en sonda sık sorulan sorulara ve kaynaklara yer verir.
+
+Kısaca:
+
+- Görev: cihaz havayı bir yerden başka bir yere taşır ve kanal içinde sürekli bir akış sağlar.
+- Seçim: hava miktarı, kanal yolundaki direnç ve montaj yeri birlikte değerlendirilir, tek bir ölçüte bakılarak karar verilmez.
+- Bakım: üretici kılavuzundaki aralıklarla yapılır, yapılan her işlem tarihiyle birlikte kayıt altına alınır.
 
 Örnek cihaz, havayı bir kanaldan diğerine taşır [1]. Çıkış hızı genellikle 7–9 m/s aralığındadır [1].
 
@@ -324,6 +332,48 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
   })
   it('Windows satır sonu (CRLF) bölümleri bozmaz', () => {
     expect(kalipDenetle(TEMIZ.replace(/\n/g, '\r\n'))).toEqual([])
+  })
+  describe('R3 kısa katman (v0.20, BLG-52): künye altı cevap + Kısaca, kapı KIRMIZI', () => {
+    const MADDELER = TEMIZ.match(/Kısaca:\n\n([\s\S]*?)\n\nÖrnek cihaz, havayı/)![1]
+    const katmanSinifi = (md: string) => kalipDenetle(md).map((k: { sinif: string }) => k.sinif).filter((s: string) => s.startsWith('KISA-KATMAN'))
+    it('temiz örnek kısa katmandan geçer; katman metni ayrıştırılır', () => {
+      expect(katmanSinifi(TEMIZ)).toEqual([])
+      const k = kisaKatmanAyir(TEMIZ)!
+      expect(k.maddeler).toHaveLength(3)
+      expect(k.cevap).toMatch(/^Örnek cihaz, havayı bir kanaldan/)
+    })
+    it('Kısaca satırı ve madde listesi yoksa KISA-KATMAN-YOK (yayındaki radyal/aksiyel ve sessiz fan vakası: katman ya satır içi ya hiç yok)', () => {
+      expect(katmanSinifi(TEMIZ.replace('Kısaca:\n\n' + MADDELER + '\n\n', ''))).toEqual(['KISA-KATMAN-YOK'])
+      expect(katmanSinifi(TEMIZ.replace('Kısaca:\n\n', 'Kısaca: kısa bir cümle.\n\n').replace(MADDELER, ''))).toEqual(['KISA-KATMAN-YOK'])
+    })
+    it('Kısaca ilk H2 den sonraya düşerse katman yok sayılır', () => {
+      const sonra = TEMIZ.replace('Kısaca:\n\n' + MADDELER + '\n\n', '').replace('## Fiyatı belirleyen etkenler\n', '## Fiyatı belirleyen etkenler\n\nKısaca:\n\n' + MADDELER + '\n')
+      expect(katmanSinifi(sonra)).toEqual(['KISA-KATMAN-YOK'])
+    })
+    it('doğrudan cevap 40–70 kelime dışında KISA-KATMAN-CEVAP', () => {
+      const cevap = kisaKatmanAyir(TEMIZ)!.cevap
+      expect(katmanSinifi(TEMIZ.replace(cevap, 'Örnek cihaz havayı taşır [1].'))).toContain('KISA-KATMAN-CEVAP')
+      expect(katmanSinifi(TEMIZ.replace(cevap, cevap + ' ' + cevap))).toContain('KISA-KATMAN-CEVAP')
+    })
+    it('madde sayısı 3–4 dışında KISA-KATMAN-MADDE (2 ve 5)', () => {
+      const [a, b, c] = MADDELER.split('\n')
+      expect(katmanSinifi(TEMIZ.replace(MADDELER, [a, b].join('\n')))).toContain('KISA-KATMAN-MADDE')
+      expect(katmanSinifi(TEMIZ.replace(MADDELER, [a, b, c, a, b].join('\n')))).toContain('KISA-KATMAN-MADDE')
+      expect(katmanSinifi(TEMIZ.replace(MADDELER, [a, b, c, a].join('\n')))).not.toContain('KISA-KATMAN-MADDE')
+    })
+    it('madde "- Etiket: cümle" biçiminde değilse KISA-KATMAN-ETIKET', () => {
+      expect(katmanSinifi(TEMIZ.replace('- Görev: cihaz', '- cihaz'))).toContain('KISA-KATMAN-ETIKET')
+    })
+    it('cevap + maddeler 80–120 dışında KISA-KATMAN-TOPLAM; atıf işaretleri ve Kısaca satırı sayılmaz', () => {
+      const uzun = MADDELER.replace('kayıt altına alınır.', 'kayıt altına alınır ve her ziyarette bir sonraki ziyaretin tarihi de deftere yazılır, böylece cihazın geçmişi eksiksiz izlenir ve süreler birbirine karışmaz; ayrıca arıza ve onarım bilgileri aynı deftere eklenir ve vardiya devrinde bir sonraki ekibe okunarak aktarılır.')
+      expect(katmanSinifi(TEMIZ.replace(MADDELER, uzun))).toEqual(['KISA-KATMAN-TOPLAM'])
+      const atifli = MADDELER.replace(/\.$/gm, ' [1][2][3][4][5][6][7][8][9][10].')
+      expect(katmanSinifi(TEMIZ.replace(MADDELER, atifli))).toEqual([])
+    })
+    it('H1 ile ilk H2 arasında yer alan eski giriş paragrafı korunur (gövde kısaltılmaz): katmandan sonra gelen metin kırmızı üretmez', () => {
+      expect(katmanSinifi(TEMIZ)).toEqual([])
+      expect(TEMIZ).toMatch(/Kısaca:[\s\S]*Örnek cihaz, havayı bir kanaldan diğerine taşır \[1\]/)
+    })
   })
 })
 

@@ -268,7 +268,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // (INV-BILGI-MERKEZI-KART-1).
     // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Fan ses gücü seviyesi nasıl okunur?").
     // Güncelleme tarihi 2026-11-04 (BLG-38, SEO-81): H1 "Radyal ve aksiyel fan farkı nedir?", fark tablosu, nedir ve kullanım alanları bölümleri; doğrulanmış metin taslak v4 (sha 1e7f013da8f7; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug değişmedi.
-    guncellemeTarihi: '2026-11-04',
+    guncellemeTarihi: '2026-11-08',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
       'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
@@ -283,6 +283,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140; meta açıklamasından AYRI alan, SEO-30): rehberin cümlelerini tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Uygulamanıza hangi fan tipinin uyduğunu bu rehberde bulun.',
         govde: `# Radyal ve aksiyel fan farkı nedir?
+
+İki fan havayı farklı yönde hareket ettirir: aksiyel fanda hava fan ekseni boyunca ilerler, radyal (santrifüj) fanda ise hava radyal yönde hızlandırılır ve kinetik enerji basınca dönüşür [1]. Temiz, düşük basınçlı ve yüksek debili hava akımlarında çoğunlukla aksiyel fan; yüksek basınç gerektiren ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımlarında çoğunlukla radyal fan öne çıkar [1].
+
+Kısaca:
+
+- Farklar: hava yönü, basınç ve debi, verim, ses, kirli hava ve boyut karşılaştırması tabloda yer alır [1].
+- Seçim: debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
+- Fan eğrisi: kayışlı bir radyal fan kataloğunda eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2].
 
 Aksiyel fan havayı pervane gibi fan ekseni doğrultusunda iter; radyal (santrifüj) fan ise havayı radyal yönde hızlandırıp kinetik enerjiyi basınca çevirir [1]. Pervane tipi aksiyel fanlar düşük basınçta yüksek debi üretir [1]; radyal düz kanatlı fanlar ise yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1]. Kısaca: temiz hava, düşük basınç ve yüksek debi çoğunlukla aksiyel fanı; yüksek basınç ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımı çoğunlukla radyal fanı öne çıkarır [1].
 
@@ -458,6 +466,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ya da konu listesini tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Ses değerini hangi koşulda okuyacağınızı bu rehberde bulun.',
         govde: `# Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü
+
+Sessiz kanal fanı seçerken önce katalogdaki ses değerinin hangi koşulda verildiğine bakılır [1][2]. Ses basıncı düzeyi belirli bir noktadaki sesi, ses gücü düzeyi kaynağın yaydığı sesi gösterir [1]. Vortice Lineo Quiet kataloğunda aynı modelin sesi ayar noktasına ve yola (emiş, üfleme, gövde) göre değişir; bu yüzden bir dB(A) değeri yol, ayar noktası ve mesafeyle birlikte okunur [2].
+
+Kısaca:
+
+- Sessiz fan: bu rehberde üreticisi yaydığı sesi azaltmak için tasarladığını belirten fan anlamındadır; hangi değerin sessiz sayılacağı mekâna göre değişir [1][2].
+- Fark: ses basıncı belirli bir noktadaki ses düzeyini, ses gücü kaynağın yaydığı sesi anlatır [1].
+- Koşul: Vortice kataloğu ses basıncını 3 m mesafede, serbest alanda hesaplanmış olarak verir [2].
 
 Sessiz kanal fanı seçimi, katalogdaki ses değerinin hangi koşulda verildiğini okumakla başlar: ses basıncı düzeyi ölçüm noktasındaki sesi, ses gücü düzeyi ses kaynağının yaydığı sesi anlatır [1]. Vortice'nin Lineo Quiet kanal fanında ses değeri ayar noktasına göre çok değişir: Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].
 
@@ -1580,10 +1596,10 @@ Bu yazıda çatı tipi fan, çatıya monte edilip havayı binanın dışına ata
 
 Kısaca:
 
-- Atış yeri: kirletici ihmal edilebilir derişime inmedikçe egzoz havası binaya ya da başka binalara geri girmemeli; atış noktası binanın en yüksek noktasının belirgin biçimde üstünde olmalı [2].
+- Atış yeri: HSE rehberine göre kirletici ihmal edilebilir derişime inmedikçe egzoz havası binaya ya da başka binalara geri girmemeli; atış noktası binanın en yüksek noktasının belirgin biçimde üstünde olmalı [2].
 - Fan türü: çatıda eksenel, merkezkaç ve karışık akışlı fanlar kullanılır; "çatı tipi" adı yerleşimi anlatır, tek bir fan türünü değil [1][4][6][8].
-- Seçim girdileri: hava özellikleri, debi, basınç ve sistem yerleşimi; fazla büyük fan enerji ve bakım maliyetini artırır [1].
-- Üretici beyanı: başlık, bakım erişimi ve motor seçenekleri üreticilere göre değişir; bu bilgiler üretici anlatımıdır [4][5][6].
+- Seçim girdileri: hava özellikleri, debi, basınç ve sistem yerleşimi [1].
+- Üretici beyanı: başlık, bakım erişimi ve motor seçenekleri üreticilere göre değişir [4][5][6].
 
 ## Çatıdan egzoz atarken hangi ilke belirleyicidir?
 
@@ -1680,10 +1696,9 @@ ATEX, patlayıcı ortamlara ilişkin iki AB direktifine verilen addır: biri bu 
 
 Kısaca:
 
-- İki direktif: ekipmanı 2014/34/AB, çalışanları 99/92/AT düzenler [3].
 - Bölge: alanı işveren bölgelere ayırır [3]; bölge 2'de patlayıcı ortamın normal işletmede oluşması beklenmez, oluşursa kısa süre kalır [2].
 - Kategori: kategori 3 ekipman, patlayıcı ortamın olası olmadığı ya da yalnız seyrek ve kısa süreli olduğu yerler içindir [1].
-- Eşleşme: 99/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
+- Eşleşme: 99/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, ekipman ortamın türüne uygunsa, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
 
 ## ATEX hangi iki direktife verilen addır?
 

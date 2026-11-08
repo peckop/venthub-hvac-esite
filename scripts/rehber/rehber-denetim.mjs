@@ -160,7 +160,59 @@ export function bolumMetni(md, baslik) {
   return satirlar.slice(i + 1, son === -1 ? undefined : son).join('\n')
 }
 
-/** R3 kalıp denetimi: zorunlu bölüm, tek H1, en az bir tablo, SSS sayısı, sorumluluk notunun sabit ilk cümlesi. */
+/**
+ * R3 kısa katman (v0.20, BLG-52, OPS-245 ve OPS-247 kararı, Recep 8 Kasım 2026 iki kez evet): her rehberde H1'in altında,
+ * ilk `## ` başlığından önce: 40–70 kelimelik doğrudan cevap + `Kısaca:` satırı + 3–4 maddelik liste; cevap + maddeler toplamı
+ * 80–120 kelime. Kelime = harf/rakam öbeği, `[n]` atıf işaretleri sayılmaz, `Kısaca:` satırı sayılmaz.
+ * Her madde `- Etiket: cümle` biçimindedir; etiket maddenin bağlandığı H2'yi adlandırır. Maddenin H2'ye bağlı olduğu ve cümlenin
+ * gövdede karşılığı olduğu kapıda ÖLÇÜLMEZ (anlam); bağımsız çürütücü turunda bakılır (R5.1).
+ */
+export const KISA_KATMAN = { cevap: [40, 70], madde: [3, 4], toplam: [80, 120] }
+const kelimeSay = (t) => (t.replace(/\[\d+\]/g, '').match(/[\p{L}\p{N}]+/gu) || []).length
+
+/** H1'in altından ilk H2'ye kadar olan kısa katmanı ayrıştırır: { cevap, maddeler } ya da `Kısaca:` yoksa null. */
+export function kisaKatmanAyir(md) {
+  const satirlar = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '').split('\n')
+  const h1 = satirlar.findIndex((s) => /^#\s/.test(s))
+  if (h1 === -1) return null
+  const h2 = satirlar.findIndex((s, i) => i > h1 && /^##\s/.test(s))
+  const ust = satirlar.slice(h1 + 1, h2 === -1 ? undefined : h2)
+  const k = ust.findIndex((s) => /^Kısaca:\s*$/.test(s.trim()))
+  if (k === -1) return null
+  let i = k + 1
+  while (i < ust.length && ust[i].trim() === '') i++
+  const maddeler = []
+  while (i < ust.length && /^- /.test(ust[i])) maddeler.push(ust[i++])
+  return { cevap: ust.slice(0, k).join('\n').trim(), maddeler }
+}
+
+/** Kısa katman kırmızıları (kalipDenetle çağırır). */
+export function kisaKatmanDenetle(md) {
+  const kirmizi = []
+  const ekle = (sinif, ayrinti) => kirmizi.push({ sinif, ayrinti })
+  const katman = kisaKatmanAyir(md)
+  if (katman === null) {
+    ekle('KISA-KATMAN-YOK', 'H1 ile ilk `## ` başlığı arasında `Kısaca:` satırı ve altında madde listesi yok (R3 kısa katman)')
+    return kirmizi
+  }
+  const kc = kelimeSay(katman.cevap)
+  if (kc < KISA_KATMAN.cevap[0] || kc > KISA_KATMAN.cevap[1]) {
+    ekle('KISA-KATMAN-CEVAP', `doğrudan cevap ${kc} kelime (${KISA_KATMAN.cevap[0]}–${KISA_KATMAN.cevap[1]} olmalı)`)
+  }
+  const n = katman.maddeler.length
+  if (n < KISA_KATMAN.madde[0] || n > KISA_KATMAN.madde[1]) {
+    ekle('KISA-KATMAN-MADDE', `${n} madde (${KISA_KATMAN.madde[0]}–${KISA_KATMAN.madde[1]} olmalı)`)
+  }
+  const etiketsiz = katman.maddeler.filter((m) => !/^- [^:\n]{2,40}: \S/.test(m))
+  if (etiketsiz.length > 0) ekle('KISA-KATMAN-ETIKET', `${etiketsiz.length} madde \`- Etiket: cümle\` biçiminde değil`)
+  const toplam = kc + kelimeSay(katman.maddeler.join('\n'))
+  if (toplam < KISA_KATMAN.toplam[0] || toplam > KISA_KATMAN.toplam[1]) {
+    ekle('KISA-KATMAN-TOPLAM', `cevap + maddeler ${toplam} kelime (${KISA_KATMAN.toplam[0]}–${KISA_KATMAN.toplam[1]} olmalı)`)
+  }
+  return kirmizi
+}
+
+/** R3 kalıp denetimi: zorunlu bölüm, tek H1, en az bir tablo, SSS sayısı, sorumluluk notunun sabit ilk cümlesi, kısa katman. */
 export function kalipDenetle(md) {
   const kirmizi = []
   const ekle = (sinif, ayrinti) => kirmizi.push({ sinif, ayrinti })
@@ -181,6 +233,7 @@ export function kalipDenetle(md) {
   if (not !== null && !not.replace(/\s+/g, ' ').trim().startsWith(SORUMLULUK_ILK_CUMLE)) {
     ekle('SORUMLULUK-NOTU-METNI', `ilk cümle sabit metin olmalı: "${SORUMLULUK_ILK_CUMLE}"`)
   }
+  for (const k of kisaKatmanDenetle(md)) kirmizi.push(k)
   return kirmizi
 }
 
