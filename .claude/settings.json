@@ -329,6 +329,17 @@
             "statusMessage": "sabit dersler"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/donum-tara-acilis.cjs\"",
+            "timeout": 15,
+            "statusMessage": "dönüm"
+          }
+        ]
       }
     ],
     "SessionEnd": [
