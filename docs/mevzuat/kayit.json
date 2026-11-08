@@ -296,7 +296,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "robots.txt curl ile çekilemedi (eur-lex.europa.eu ana domain AWS WAF JS-challenge döndürüyor, x-amzn-waf-action: challenge, HTTP 202 boş gövde) — gerçek tarayıcı oturumu (Kernel) ile erişildi; robots.txt sonradan tarayıcıdan okundu: /legal-content/*/TXT/DOC/ ve /TXT/SIG/ (indirme formatları) disallow, kullanılan /legal-content/EN/ALL/ ve /EN/TXT/?uri= yolları disallow DEĞİL.",
-        "Alıntılar curl+grep yerine gerçek tarayıcı DOM metninde JS indexOf ile doğrulandı (WAF engeli nedeniyle curl kullanılamadı); metod sapması olarak not edildi."
+        "Alıntılar curl+grep yerine gerçek tarayıcı DOM metninde JS indexOf ile doğrulandı (WAF engeli nedeniyle curl kullanılamadı); metod sapması olarak not edildi.",
+        "8 Kasım 2026: 2027-07-24 ve 2037-07-24 tarihleri (AB) 2025/2481 Md 1(4) ham metninden doğrulandı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -340,7 +341,9 @@
       "yerini_aldigi": [
         "AB-327/2011"
       ],
-      "degistirenler": [],
+      "degistirenler": [
+        "AB-2025/2481"
+      ],
       "karsilik": [
         "TR-SGM-2026/2"
       ],
@@ -615,9 +618,299 @@
         "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında",
         "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi.",
         "7 Kasım 2026 (MVZ-5): düzeltme R(05) 2026-10-29 ayrı kaynak olarak okunamadı; düzeltme içeriği hâlâ okunmadı.",
-        "8 Kasım 2026: TR SGM-2026/2 metni \"(AB) 2025/2481 sayılı Komisyon Tüzüğü\" ile yapılan değişikliği esas aldığını yazıyor; 2025/2481 kayıtta yok, Yayın Ofisi'nden okunmalı."
+        "8 Kasım 2026: TR SGM-2026/2 metni \"(AB) 2025/2481 sayılı Komisyon Tüzüğü\" ile yapılan değişikliği esas aldığını yazıyor; 2025/2481 kayıtta yok, Yayın Ofisi'nden okunmalı.",
+        "8 Kasım 2026: (AB) 2025/2481 ham çekildi ve kayda alındı (AB-2025/2481); Md 9(1) ve Md 10 değişikliği, 2027 ve 2037 tarihleri tüzük metninden doğrulandı. Ek IV ayrıntısı okunmadı."
       ],
       "son_kontrol": "2026-09-25",
+      "eksen": "B"
+    },
+    {
+      "kimlik": "AB-2025/2481",
+      "ad": "Commission Regulation (EU) 2025/2481 of 2 December 2025 amending Regulation (EU) 2024/1834 as regards definitions, transitional provisions, verification tolerances, test results corrections and other provisions that relate to fan speed",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "2024/1834 fan tüzüğünü değiştirir: Md 2'de \"en iyi verim noktası\" tanımı yenilenir ve \"inherent speed\" (doğal devir) tanımı eklenir; Md 6 silinir (dolanma yasağı 2024/1781 Md 40 ile karşılanıyor); Md 8'in yedinci girintisi silinir; Md 9(1) yeniden yazılır: 327/2011 24 Temmuz 2026'da kalkar, Ek I-III diğer ürünlere entegre fanlarda 24 Temmuz 2027'ye, yedek parça fanlarda 24 Temmuz 2037'ye kadar uygulanır; Md 10 yeniden yazılır. Ek I, II, III ve IV değişir (ek tanımlar: uç hızı ve çark çapı; Ek II yedek parça muafiyeti ve devir bilgisi; Ek III test sonucu düzeltmesi). Ek IV (doğrulama toleransı) ayrıntısı bu kayıtta ayrıca okunmadı.",
+      "tarihler": {
+        "kabul": "2025-12-02",
+        "yayim": "2025-12-08 (OJ L serisi, 2025/2481)",
+        "yururluk": "Yayımını izleyen 20. gün (Md 2)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2024-07-24",
+            "ne": "Değiştirilen Md 10: Md 9(2) bu tarihten itibaren uygulanır"
+          },
+          {
+            "tarih": "2026-07-24",
+            "ne": "Değiştirilen Md 10: 2024/1834 bu tarihten itibaren uygulanır; Md 9(1): 327/2011 yürürlükten kalkar"
+          },
+          {
+            "tarih": "2027-07-24",
+            "ne": "Md 9(1): 327/2011 Ek I-III diğer ürünlere entegre fanlar için burada sona erer"
+          },
+          {
+            "tarih": "2037-07-24",
+            "ne": "Md 9(1) ve Ek II: 327/2011 Ek I-III yedek parça fanlar için burada sona erer"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-SGM-2026/2"
+      ],
+      "iliski_notlari": [
+        "AB-2024/1834 değiştirilmiştir (2024/1834 Md 9(1) ve Md 10 bu tüzükle yeniden yazıldı).",
+        "TR SGM-2026/2 bu değişikliği esas aldığını yazıyor; Ek II/III/IV'ün TR metniyle birebirliği okunmadı."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2025_2481.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanal tipi (in-line) fan, 125W-500kW motorlu, hiçbir istisnaya girmiyor"
+        },
+        {
+          "slug": "avens-hucreli-hf-s",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal endüstriyel fan, standart FMEG kapsamında"
+        },
+        {
+          "slug": "avens-dikdortgen-kanal-radyal",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanal tipi radyal fan, standart kapsam"
+        },
+        {
+          "slug": "avens-nimax",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanallı ısı geri kazanım ünitesi; Md.1(1) 'diğer ürünlere entegre edilen fanlar dahil' hükmü gereği içindeki fan bileşeni kapsamda"
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-axial",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Aksiyel endüstriyel fan, standart kapsam"
+        },
+        {
+          "slug": "avens-hucreli-aspiratorler",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Endüstriyel hücreli aspiratör (ev tipi davlumbaz değil), standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-qbk-sal-kc-evo",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; EC plug-fan, santrifüj tip, standart kapsam"
+        },
+        {
+          "slug": "avens-qe-b-kasa",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Banyo/tuvalet egzoz fanı; ev tipi kurutma makinesi/davlumbaz istisnasına girmiyor, standart kapsam"
+        },
+        {
+          "slug": "vortice-vortice-bravo-s",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanal tipi fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-radon-range-circular",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Radon tahliye amaçlı kanal fanı; istisna listesinde radon fanı için özel muafiyet yok, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-quadro-evo",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-punto-evo-flexo",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanal tipi fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanal tipi fan, standart kapsam"
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Plug-fan, santrifüj tip, standart kapsam"
+        },
+        {
+          "slug": "vortice-hava-perdesi",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Hava perdesi; motor gücü 125W-500kW aralığındaysa fan bileşeni kapsamda (aralık dışı düşük güçlü modeller için Ek soru: açık_sorular)"
+        },
+        {
+          "slug": "vortice-h-ad-elektrikli",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Elektrikli hava perdesi; içindeki fan motoru 125W-500kW aralığındaysa kapsamda"
+        },
+        {
+          "slug": "nicotra-gebhardt-rdh",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "nicotra-gebhardt-at",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "nicotra-gebhardt-dd",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "nicotra-gebhardt-adh",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "avens-nimus",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-roof",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Standart çatı tipi fan (duman/F-sınıfı versiyonu değil), standart kapsam"
+        },
+        {
+          "slug": "vortice-radon-range-roof",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Çatı tipi radon tahliye fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-roof",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Şömine/baca fanı; çalışma gazı sıcaklığı 100°C'yi aşmıyorsa standart kapsamda (aşıyorsa Md.1.3(e) istisnası devreye girebilir, açık soru)"
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Tekil oda ısı geri kazanım ünitesi; içindeki fan bileşeni Md.1(1) gereği kapsamda"
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "2024/1834'ü değiştiren tüzük; Kanallı ısı geri kazanım ünitesi; entegre fan bileşeni kapsamda"
+        },
+        {
+          "slug": "vortice-vorticent-cms-atex",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; ATEX (Direktif 2014/34/AB) — Md.1.3(a) muhtemel patlayıcı ortam istisnası, teblig Md.2.3(a) ile birebir"
+        },
+        {
+          "slug": "vortice-vort-e-atex",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; ATEX aksiyel fan — Md.1.3(a) istisnası"
+        },
+        {
+          "slug": "seat-atex-ptc-sensor",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; ATEX'e özgü yedek parça/sensör — hem ATEX istisnası hem de fan değil, sensör/yedek parça"
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Duman tahliye fanı; Md.1.3(b) 'acil durum, 300°C ve üzeri sıcaklıkta 1 saat+ kısa süreli çalışma' tanımına uyan F300/F400 sertifikalı modeller için istisna geçerli — sertifikaya göre değişebileceğinden açık_sorular'da da işaretlendi"
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Askeri tesis (yeraltı sığınağı) ve sivil savunma tesisi (bomba sığınağı) havalandırması — Md.1.3(ç)/EN Md.1.3(d) ile birebir örtüşüyor"
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; 'Asit Dayanımlı Fanlar' kategorisi — zehirli/aşındırıcı/yanıcı gaz taşıma amaçlı tasarlanıp pazarlanan fanlar için Md.1.3(g)/EN Md.1.3(h) istisnası (dikkat: ad 'jet-serisi' olsa da EU'nun tanımladığı 'jet fan' kategorisiyle karıştırılmamalı — bu ürün ailesi asit/korozif gaz hattı fanı, thrust/jet fanı değil)"
+        },
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Asit dayanımlı fan — aynı korozif gaz istisnası (Md.1.3(g)/(h))"
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Asit dayanımlı fan — aynı korozif gaz istisnası (Md.1.3(g)/(h))"
+        },
+        {
+          "slug": "vortice-vort-nordik-hvls",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Endüstriyel tavan vantilatörü (HVLS) — Ek I madde 31 tanımına göre 'air-circulating fan' (kanala bağlı olmayan, bir mekanda havayı serbestçe döndüren fan) niteliğinde; Md.1.3(p) istisnası"
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Frekans konvertörü — fan değil, ayrı bir ekodizayn tüzüğü (2019/1781, motor/VSD) kapsamında"
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Frekans konvertörü — fan değil, ayrı tüzük kapsamında"
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Frekans konvertörü — fan değil, ayrı tüzük kapsamında"
+        },
+        {
+          "slug": "avens-elektrikli-isiticilar",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Elektrikli kanal ısıtıcısı — fan değil, bu tüzüğün konusu dışında"
+        },
+        {
+          "slug": "avens-hiz-anahtarlari",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Hız anahtarı/kontrolörü — fan değil, aksesuar; VSD kullanımı yalnız fan verim hesabında bilgi şartı (Ek II 2(c)) olarak geçiyor"
+        },
+        {
+          "slug": "avens-sulu-batarya",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Sulu batarya (su serpantini) kanal seksiyonu — fan değil, ısıtma/soğutma bataryası"
+        },
+        {
+          "slug": "avens-bvu-ls",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Yedek parça/sensör kategorisi — kendisi bir fan değil (içerikte gerçek yedek fan varsa Md.9(1) geçiş hükmü ayrıca değerlendirilmeli, açık soru)"
+        },
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsam-disi",
+          "neden": "2024/1834'ü değiştiren tüzük; Nem alma cihazı; ürün kendisi 'fan' olarak pazarlanmıyor, cihazın bütünü ayrı bir ürün kategorisi (bkz. açık_sorular — içindeki fan bileşeni teorik olarak Md.1(1) kapsamına girebilir)"
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Ek IV (doğrulama toleransı) değişikliğinin ayrıntısı bu kayıtta okunmadı; ürün bilgi şartı formülleri için ek okuması gerekir.",
+        "EUR-Lex \"In force\" etiketi doğrudan okunamadı (WAF); durum yürürlük maddesinden çıkarıldı."
+      ],
+      "son_kontrol": "2026-11-08",
       "eksen": "B"
     },
     {

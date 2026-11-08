@@ -1,0 +1,23 @@
+{
+  "kimlik": "AB-2025/2481",
+  "eksen": "B",
+  "kaynaklar": [
+    {
+      "url": "http://publications.europa.eu/resource/celex/32025R2481",
+      "son_url": "http://publications.europa.eu/resource/cellar/17716332-d404-11f0-8da2-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (curl/Accept application/xhtml+xml, Accept-Language eng); 303 ile cellar DOC_1'e yönlenir",
+      "durum_satiri": "Yayın Ofisi veri servisi EUR-Lex \"In force\" satırını vermez; durum yürürlük maddesinden ve 2024/1834 değişiklik zincirinden çıkarıldı. sha256 bu kalem için İLK TABANdır.",
+      "bayt": 49003,
+      "sha256_ilk12": "28a3f11bf40e",
+      "sha256_metin_ilk12": "810db567e5f4",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "Regulation (EU) No 327/2011 is repealed with effect from 24 July 2026. However, Annexes I, II and III to that Regulation shall continue to apply until 24 July 2027 to fans integrated into other products, and until 24 July 2037 to spare part fans",
+      "alinti_dogrulandi": true
+    }
+  ]
+}
