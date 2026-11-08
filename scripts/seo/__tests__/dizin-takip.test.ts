@@ -14,7 +14,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os'
 import {
   KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
-  satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar,
+  satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
 const S = 'https://venthub.com.tr'
@@ -235,5 +235,36 @@ describe('günlük defter yedeği', () => {
       expect(readFileSync(yedek, 'utf8')).toBe('satir1\nsatir2\n')
       expect(existsSync(join(d, 'yedek', 'hareketler-2026-11-09.jsonl'))).toBe(false)
     } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+})
+
+describe('karar: yalnız-tarih lastmod (SEO-98, 8 Kasım yanlış-YAP)', () => {
+  it('yalnizTarihMi: tarih ve tam gece yarısı UTC yalnız-tarihtir, saatli değer değil', () => {
+    expect(yalnizTarihMi('2026-11-08')).toBe(true)
+    expect(yalnizTarihMi('2026-11-08T00:00:00.000Z')).toBe(true)
+    expect(yalnizTarihMi('2026-11-08T00:00:00Z')).toBe(true)
+    expect(yalnizTarihMi('2026-11-08T00:00:00+00:00')).toBe(true)
+    expect(yalnizTarihMi('2026-11-08T08:00:00.000Z')).toBe(false)
+    expect(yalnizTarihMi('2026-11-08T00:00:01Z')).toBe(false)
+    expect(yalnizTarihMi(null)).toBe(false)
+  })
+
+  it('istek önceki gün 22:49Z, lastmod gün başı 00:00Z (TR saatiyle aynı gün): Google YAP DEĞİL, BEKLE', () => {
+    const k = karar({ motor: 'google', lastmod: '2026-11-08T00:00:00.000Z', sonTarama: null, sonHareket: ms('2026-11-07T22:49:00Z'), simdi: ms('2026-11-08T12:00:00Z') })
+    expect(k.durum).toBe('BEKLE')
+  })
+
+  it('istek TR gün başından önce (önceki gün 20:59Z): hâlâ YAP (içerik o gün değişmiş olabilir)', () => {
+    const k = karar({ motor: 'google', lastmod: '2026-11-08', sonTarama: null, sonHareket: ms('2026-11-07T20:59:00Z'), simdi: ms('2026-11-08T12:00:00Z') })
+    expect(k.durum).toBe('YAP')
+  })
+
+  it('saatli lastmod için tolerans YOK: 22:49Z isteği ertesi gün 08:00Z lastmod\'undan önce → YAP', () => {
+    const k = karar({ motor: 'google', lastmod: '2026-11-08T08:00:00.000Z', sonTarama: null, sonHareket: ms('2026-11-07T22:49:00Z'), simdi: ms('2026-11-08T12:00:00Z') })
+    expect(k.durum).toBe('YAP')
+  })
+
+  it('IndexNow: aynı tolerans geçerli (gün başı lastmod, önceki gün 22:49Z bildirim → TAMAM)', () => {
+    expect(karar({ motor: 'indexnow', lastmod: '2026-11-08T00:00:00.000Z', sonHareket: ms('2026-11-07T22:49:00Z'), simdi: ms('2026-11-08T12:00:00Z') }).durum).toBe('TAMAM')
   })
 })
