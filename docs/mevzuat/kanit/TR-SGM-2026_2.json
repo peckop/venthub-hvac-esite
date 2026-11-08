@@ -37,6 +37,23 @@
       "durum_satiri": "n/a (madde metni)",
       "alinti": "GEÇİCİ MADDE 1- (1) ... Ek I, Ek II ve Ek III'ü ... diğer ürünlere entegre fanlar açısından 24/7/2028 tarihine kadar ve yedek parça fanlar açısından 24/7/2037 tarihine kadar uygulanmaya devam eder.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.mevzuat.gov.tr/anasayfa/MevzuatFihristDetayIframe?MevzuatTur=9&MevzuatNo=45014&MevzuatTertip=5",
+      "son_url": "https://www.mevzuat.gov.tr/anasayfa/MevzuatFihristDetayIframe?MevzuatTur=9&MevzuatNo=45014&MevzuatTertip=5",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.mevzuat.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 76512,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "ee98c3470173",
+      "sha256_metin_ilk12": "8a00b17d4b56",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "Diğer hükümleri 24/7/2027 tarihinde",
+      "alinti_dogrulandi": true
     }
   ]
 }

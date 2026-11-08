@@ -37,6 +37,23 @@
       "durum_satiri": "Yürürlükten kaldırılan tebliğ maddesi — TR karşılığı EU 640/2009'un yerini alan tebliğ",
       "alinti": "MADDE 12 – (1) 7/2/2012 tarihli ve 28197 sayılı Resmî Gazete'de yayımlanan Elektrik Motorları ile İlgili Çevreye Duyarlı Tasarım Gereklerine Dair Tebliğ (SGM: 2012/2) yürürlükten kaldırılmıştır.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 47006,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "80e3a4a396f3",
+      "sha256_metin_ilk12": "cf1deba1ffaf",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "Bu Tebliğin 9 uncu maddesinin birinci fıkrası yayımı tarihinde, diğer maddeleri ise 1/7/2021 tarihinde yürürlüğe girer.",
+      "alinti_dogrulandi": true
     }
   ]
 }

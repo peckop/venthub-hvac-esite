@@ -183,7 +183,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_16.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc102",
@@ -210,7 +210,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): RG sayfasında Md 12 ve Md 13 alıntıları birebir; 2021/23 değişikliği RG 29.06.2021/31526 sayfasında okundu. mevzuat.gov.tr değişiklik listesine bakılamadı (MevzuatNo bilinmiyor)."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "A"
     },
     {
@@ -239,14 +239,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_23.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): RG sayfasında Md 2 alıntısı birebir; ayrıca Md 1, 3-6 ilgili tarihleri \"1/7/2021\" → \"15/8/2021\" yapıyor, Md 7 yayımı tarihinde yürürlük. Sonraki değişiklik izi bulunamadı; mevzuat.gov.tr bakılamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "A",
       "notlar": "v0.1 bu kalemi \"yalnız tarih ertelemesi\" diye özetlemişti; Md.1 içerik değişikliğidir (2026-09-25 düzeltildi). Sürücü tarihi Md.5 ile değişir, Md.4 değil (Ek-I madde 2 = motor ürün bilgisi)."
     },
@@ -614,7 +614,8 @@
         "'Şömine ve Baca Fanları' (vortice-vort-industrial-ventilation-roof) için taşınan gazın çalışma sıcaklığının 100°C'yi aşıp aşmadığı ürün bazında kontrol edilmeli (aşıyorsa Md.1.3(e) istisnası)",
         "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında",
         "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi.",
-        "7 Kasım 2026 (MVZ-5): düzeltme R(05) 2026-10-29 ayrı kaynak olarak okunamadı; düzeltme içeriği hâlâ okunmadı."
+        "7 Kasım 2026 (MVZ-5): düzeltme R(05) 2026-10-29 ayrı kaynak olarak okunamadı; düzeltme içeriği hâlâ okunmadı.",
+        "8 Kasım 2026: TR SGM-2026/2 metni \"(AB) 2025/2481 sayılı Komisyon Tüzüğü\" ile yapılan değişikliği esas aldığını yazıyor; 2025/2481 kayıtta yok, Yayın Ofisi'nden okunmalı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -649,7 +650,7 @@
       ],
       "durum": "gecis-doneminde",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SVGM-2019_15.json",
-      "resmi_kaynak_sayisi": 2,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
@@ -657,7 +658,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 10 alıntısı birebir. SGM-2026/2 (mevzuat.gov.tr MevzuatNo=45014) Md 11 bu tebliği yürürlükten kaldırıyor; Md 12(1)(b) gereği kaldırma 24/7/2027'de yürürlüğe giriyor; Geçici Md 1(1) Ek I-III'ün entegre fanlar için 24/7/2028, yedek parça fanlar için 24/7/2037'ye kadar uygulanmaya devam ettiğini yazıyor. Durum `gecis-doneminde` yapıldı (kaynak: SGM-2026/2 kanıtındaki mevcut alıntılar)."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "B"
     },
     {
@@ -702,7 +703,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2026_2.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "vortice-lineo",
@@ -749,9 +750,10 @@
       "acik_sorular": [
         "Teblığın Ek II/III/IV'ünün (ürün bilgi şartları, ölçüm/hesaplama yöntemleri) AB Ek II/III/IV ile birebir mi yoksa TR'ye özgü ufak farklar mı içerdiği bu araştırmada okunmadı ('Ekleri için tıklayınız' linki takip edilmedi) — VentHub ürün sayfası şartları için bir sonraki turda TR Ek II doğrudan okunmalı.",
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
-        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 12 ve Geçici Md 1 alıntıları birebir (mevzuat.gov.tr MevzuatNo=45014). Sayfada RG tarih/sayı satırı yok: \"RG 07.02.2026 sayı 33161\" bu okumada doğrulanmadı. Değişiklik izi bulunamadı. Ekler (.doc) okunmadı."
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 12 ve Geçici Md 1 alıntıları birebir (mevzuat.gov.tr MevzuatNo=45014). Sayfada RG tarih/sayı satırı yok: \"RG 07.02.2026 sayı 33161\" bu okumada doğrulanmadı. Değişiklik izi bulunamadı. Ekler (.doc) okunmadı.",
+        "8 Kasım 2026 ham çekim: mevzuat.gov.tr /mevzuat?MevzuatNo=45014&MevzuatTur=9 sayfası \"Resmî Gazete Tarihi: 07.02.2026 Resmî Gazete Sayısı: 33161\" yazıyor (künye doğrulandı). Tebliğ ayrıca (AB) 2025/2481 değişikliğini esas aldığını yazıyor; AB-2024/1834 kalemine 2025/2481 değiştireni bakılmalı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "B"
     },
     {
@@ -817,19 +819,21 @@
         "AB-2014/34"
       ],
       "iliski_notlari": [
-        "TR-94/9-AT-yonetmelik (eski, ad/RG detayı bu oturumda ayrıca doğrulanmadı)"
+        "TR-94/9-AT-yonetmelik (eski, ad/RG detayı bu oturumda ayrıca doğrulanmadı)",
+        "Değiştiren: RG 27.06.2020 sayı 31168, \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\" (Sanayi ve Teknoloji Bakanlığı; https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm, ham çekim 8 Kasım 2026, sha256_ilk12 3d7d64d4f7a3). Ayrı kalem açılınca `degistirenler`e taşınmalı."
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2014_34.json",
-      "resmi_kaynak_sayisi": 2,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Bakanlık adı 2016'dan bu yana değişti (Bilim, Sanayi ve Teknoloji Bakanlığı -> Sanayi ve Teknoloji Bakanlığı); yönetmeliğin güncel resmi yürütücüsü ayrıca teyit edilmedi.",
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
-        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): KAYITTA OLMAYAN DEĞİŞİKLİK: RG 27.06.2020 sayı 31168 (Sanayi ve Teknoloji Bakanlığı), \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\": Md 2(2)(c)-(ç), Md 3 (dayanak), Md 4(1)(b)-(d), Md 15(1)(a)(1), Md 44 (yürütücü \"Sanayi ve Teknoloji Bakanı\"), Ek-2 1.0.5 işaretleme ve terim değişiklikleri; yayımı tarihinde yürürlük. Ham çekimle doğrulanınca `degistirenler`e yazılmalı. Aynı okumada Md 2, Md 4(1)(l)(r)(s)(ğ), Md 41, 42 (94/9/AT yönetmeliği RG 30/12/2006 sayı 26392 dördüncü mükerrer, yürürlükten kaldırıldı), Md 43, 44 metinleri okundu (MVZ-6, BLG-51)."
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): KAYITTA OLMAYAN DEĞİŞİKLİK: RG 27.06.2020 sayı 31168 (Sanayi ve Teknoloji Bakanlığı), \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\": Md 2(2)(c)-(ç), Md 3 (dayanak), Md 4(1)(b)-(d), Md 15(1)(a)(1), Md 44 (yürütücü \"Sanayi ve Teknoloji Bakanı\"), Ek-2 1.0.5 işaretleme ve terim değişiklikleri; yayımı tarihinde yürürlük. Ham çekimle doğrulanınca `degistirenler`e yazılmalı. Aynı okumada Md 2, Md 4(1)(l)(r)(s)(ğ), Md 41, 42 (94/9/AT yönetmeliği RG 30/12/2006 sayı 26392 dördüncü mükerrer, yürürlükten kaldırıldı), Md 43, 44 metinleri okundu (MVZ-6, BLG-51).",
+        "8 Kasım 2026: RG 31168 değişikliği ham çekimle doğrulandı (başlık birebir); değiştirilen maddeler: 2(2)(c)-(ç), 3, 4(1)(b)-(d), 15(1)(a)(1), 44, Ek-2 1.0.5. Yürütücü artık \"Sanayi ve Teknoloji Bakanı\"."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "C"
     },
     {
@@ -891,7 +895,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-1999_92.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
@@ -899,7 +903,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Başlık/RG künyesi doğrulandı; Ek-1 md 2 Bölge 2/22 tanımları ve Ek-3 bölge-kategori satırı birebir okundu (MVZ-6). mevzuat.gov.tr MevzuatNo=18335 sayfasında değişiklik bilgisi görünmüyor; bir web aramasında geçen \"2023, RG 32345\" değişikliği doğrulanmadı. Ek-2 2.4-2.5 hâlâ 94/9/AT yönetmeliğine atıf yapıyor."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "C"
     },
     {
@@ -1167,7 +1171,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-EMC-2014_30.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc51",
@@ -1190,7 +1194,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 1 alıntısı birebir; Md 45: 24/10/2007 tarihli 26680 sayılı EMC Yönetmeliği (2004/108/AT) yürürlükten kaldırılmış. Sayfa 2016 asıl metni; mevzuat.gov.tr değişiklik listesine bakılamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "D"
     },
     {
@@ -1315,7 +1319,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-LVD-2014_35.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [
         {
           "slug": "danfoss-fc51",
@@ -1338,7 +1342,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 2 alıntısı birebir; Md 25: 30/12/2006 tarihli 26392 sayılı 2006/95/AT yönetmeliği yürürlükten kaldırılmış. mevzuat.gov.tr değişiklik listesine bakılamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "D"
     },
     {
@@ -1492,14 +1496,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ROHS-2011_65.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Başlık ve künye bileşenleri sayfada var. Md 21: 5(4) ve 13, 15 ile Ek-5 CE hükümleri 1/1/2024, diğer hükümler 1/2/2023. Sayfada önceki RoHS yönetmeliğini kaldıran madde yok. mevzuat.gov.tr bakılamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "D"
     },
     {
@@ -1555,14 +1559,14 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-WEEE-2012_19.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Başlık/künye birebir; Md 30 önceki \"Atık Elektrikli ve Elektronik Eşyaların Kontrolü Yönetmeliği\"ni kaldırıyor, Md 31: 1/2/2023 yürürlük. mevzuat.gov.tr bakılamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "D"
     },
     {
@@ -1779,7 +1783,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_18.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 5,
       "etkilenen_aileler": [
         {
           "slug": "vortice-isi-geri-kazanim",
@@ -1822,7 +1826,7 @@
         "Md.2(2)(c) \"yalnız gövdeye sahip aksiyel veya santrifüj fan\" istisnası Vortice CA MD (santrifüj, filtre/HRS yok) için metne göre uygulanabilir; ancak üretici seriyi NRVU-U beyan ediyor. Komisyon SSS'si (bağlayıcı değil) housing = pervaneyi saran ve akışı yönlendiren gövde; box-fan ve roof-fan ventilasyon ünitesidir. Gövde içinde housing dışı akış parçası var mı ve 150/200 MD'nin BEP gücü bilinmiyor (AVenS paketi A4/A6). Satış kararına dayanak yapılmaz (REC-397, 2026-09-25).",
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "E"
     },
     {
@@ -1854,7 +1858,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_19.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [
         {
           "slug": "vortice-isi-geri-kazanim",
@@ -1898,7 +1902,7 @@
       "acik_sorular": [
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "E"
     },
     {
@@ -1925,7 +1929,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ERP-2009_125.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
@@ -1933,7 +1937,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Dayanak alıntısı (RG 25.05.2021/31491 Havalandırma Üniteleri tebliği Md 3) birebir; yönetmeliğin kendi RG künyesi resmî kaynakta yine bulunamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "E"
     },
     {
@@ -2990,7 +2994,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-YAPI-305_2011.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [
         {
           "slug": "vortice-vort-heatmaster-slimroof-smoke",
@@ -3003,7 +3007,7 @@
         "2026-02-20 tarihli 33174 sayılı değişikliğin içeriği (ne değişti) doğrulanamadı — yalnız WebSearch başlığından tespit edildi, birincil metin bu oturumda okunmadı (zaman/kapsam kısıtı).",
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "F"
     },
     {
@@ -3032,7 +3036,7 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-YANGIN-2007.json",
-      "resmi_kaynak_sayisi": 2,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "avens-siginak-havalandirma-uniteleri",
@@ -3055,7 +3059,7 @@
         "'Son değişiklik tarihi' sorusu tam güven aralığında yanıtlanamadı: WebSearch 2015 (RG 29411), 2018 (2018/11347 K.) ve 2021 (RG 31665, CB Kararı 4825) değişikliklerinden bahsediyor ama en güncel konsolide metin bu oturumda birincil kaynaktan doğrulanmadı (zaman kısıtı + resmigazete eskiler arşivinde doğru URL bulunamadı). Yalnız 2007 orijinal metin doğrulandı.",
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "F"
     },
     {
@@ -3142,7 +3146,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-FGAZ-2024.json",
-      "resmi_kaynak_sayisi": 2,
+      "resmi_kaynak_sayisi": 3,
       "etkilenen_aileler": [
         {
           "slug": "vortice-deumido-range",
@@ -3156,7 +3160,7 @@
         "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
         "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): RG 15.10.2024/32693 sayfası (eskiler/2024/10/20241015-2.htm) okundu: Md 4(1), Md 24(1) birebir; Md 25: 9(2) ve 10(4) 1/1/2025, diğer hükümler yayım tarihinde. iklim.gov.tr PDF metni okuyucuda çıkarılamadı. mevzuat.gov.tr bakılamadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "F"
     },
     {
@@ -3250,10 +3254,10 @@
         "Ekler taranmış PDF; Tablo 5.1/5.2 ve Ek-8 8.1/8.2.1 görsel okumayla doğrulandı (ek s.24–26, 30).",
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "G",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-GURULTU-BINA-2017.json",
-      "resmi_kaynak_sayisi": 4
+      "resmi_kaynak_sayisi": 5
     },
     {
       "kimlik": "TR-YON-CEVRE-GURULTU-2010",
@@ -3305,10 +3309,10 @@
         "Güncel hâli (2011 sonrası değişiklikler) doğrulanmadı; yazıda \"2010 tarihli yönetmelik\" diye anılır.",
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "G",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-CEVRE-GURULTU-2010.json",
-      "resmi_kaynak_sayisi": 1
+      "resmi_kaynak_sayisi": 2
     },
     {
       "kimlik": "AB-BILDIRIM-2016/C416/06",
@@ -3386,7 +3390,7 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-KANUN-7223.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
@@ -3394,7 +3398,7 @@
         "Kanunun sonradan değişip değişmediği (konsolide metin) bu kayıtta okunmadı.",
         "6 Kasım 2026: Resmî Gazete sayfası ham çekildi, kanıt alıntıları birebir bulundu; TR tarafında son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "E"
     }
   ],
@@ -3629,5 +3633,5 @@
       "etki": "EN 12101-3'ün CPR altındaki resmi uyumlaştırılmış-standart statüsü ve F200/F300/F400/F600 sınıflarının tam tanımı CEN'in kendi kataloğundan doğrulanamadı; yalnız ikincil sanayi kataloğu siteleri (standards.iteh.ai, genorma.com — resmi değil) kullanıldı."
     }
   ],
-  "guncellendi": "2026-11-06"
+  "guncellendi": "2026-11-08"
 }

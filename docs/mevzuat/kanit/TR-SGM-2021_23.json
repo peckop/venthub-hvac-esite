@@ -13,6 +13,23 @@
       "durum_satiri": "TEBLİĞ, Sanayi ve Teknoloji Bakanlığından — MADDE 7: Bu Tebliğ yayımı tarihinde yürürlüğe girer",
       "alinti": "MADDE 2 – Aynı Tebliğin 13 üncü maddesinin birinci fıkrasında yer alan \"1/7/2021\" ibaresi \"15/8/2021\" olarak değiştirilmiştir.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/06/20210629-12.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/06/20210629-12.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 22688,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "e6031d25cca6",
+      "sha256_metin_ilk12": "c99910a363e5",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 (mevzuat.gov.tr için utf-8) çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "“1/7/2021” ibaresi “15/8/2021” olarak değiştirilmiştir.",
+      "alinti_dogrulandi": true
     }
   ]
 }

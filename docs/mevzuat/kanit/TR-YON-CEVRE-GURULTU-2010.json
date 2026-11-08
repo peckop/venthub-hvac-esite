@@ -11,6 +11,23 @@
       "alinti": "a) Mevcut yapılarda; tesisat dairelerinde veya yapı içinde veya dışında herhangi bir yerde bulunan soğutma fanı, iklimlendirme sistemleri, hava kanalları, ... hassas kullanımlara iletilen gürültü seviyesi Leq gürültü göstergesi cinsinden arka plan gürültü seviyesini 5 dBA'dan fazla aşamaz.",
       "alinti_dogrulandi": true,
       "not": "Alt ajan HTML metinden grep ile doğruladı."
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2010/06/20100604-5.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2010/06/20100604-5.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 170054,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "972fc7c4ee2e",
+      "sha256_metin_ilk12": "e7f76d5ccb08",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "tesisat dairelerinde veya yapı içinde veya dışında herhangi bir yerde bulunan soğutma fan",
+      "alinti_dogrulandi": true
     }
   ]
 }

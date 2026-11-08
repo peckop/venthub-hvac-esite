@@ -49,6 +49,23 @@
       "durum_satiri": "Komisyon SSS yorumu; sayfa hukuken bağlayıcı olmadığını kendisi yazıyor. Md.2(2)(c)/1253 Md.1(2)(c) yorumu için.",
       "alinti": "This implies that such products are considered ‘fans’ and shall be treated according to Regulation (EU)327/2011. ... “housing” ... a casing around the impeller that guides the gas stream toward, through and from the impeller. ... Products that would normally be called ‘box-fans’ or ‘roof-fans’ are considered ventilation units.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 36284,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "c42a8c8af1e0",
+      "sha256_metin_ilk12": "8beffdece180",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "HAVALANDIRMA ÜNİTELERİNİN ÇEVREYE DUYARLI TASARIM GEREKLİLİKLERİNE DAİR TEBLİĞ",
+      "alinti_dogrulandi": true
     }
   ]
 }

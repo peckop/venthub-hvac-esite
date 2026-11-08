@@ -25,6 +25,23 @@
       "durum_satiri": "Aynı RG sayfası; MADDE 87 fıkra 8 ikincil kaynaktaki (2015 değişikliğe atıf yapan hukuk sitesi) madde numarasıyla birebir örtüşüyor.",
       "alinti": "MADDE 87- (1) Yangın hâlinde, mevcut iklimlendirme ve havalandırma tesisatı duman kontrol sistemi olarak da kullanılabilir. ... (8) Havalandırma ve duman tahliye kanallarının yangın kompartımanı duvarlarını delmemesi gerekir.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2007/12/20071219-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2007/12/20071219-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Yerleşik tarayıcı bölmesinde aynı köken fetch(yol, no-store) -> arrayBuffer -> crypto.subtle SHA-256 (bu makinenin curl HTTPS bağlantısı zaman aşımına düşüyor; ölçüm 8 Kasım 2026)",
+      "bayt": 686728,
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır, sonraki kontrol aynı yöntemle kıyaslanmalı.",
+      "sha256_ilk12": "d77ada88cb65",
+      "sha256_metin_ilk12": "27dcdfe2304c",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "mevcut iklimlendirme ve havalandırma tesisatı duman kontrol sistemi olarak da",
+      "alinti_dogrulandi": true
     }
   ]
 }
