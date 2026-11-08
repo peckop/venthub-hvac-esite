@@ -80,7 +80,7 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // `dateModified` buradan. Önceki değerler: 2026-10-10 (URN-90), 2026-10-08 (#1755, "Fiyatı belirleyen etkenler"
     // giriş cümlesi), 2026-10-06 (#1733).
     // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Frekans konvertörü motorda ses yapar mı?").
-    guncellemeTarihi: '2026-11-01',
+    guncellemeTarihi: '2026-11-08',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
@@ -89,6 +89,14 @@ export const YAZILAR: readonly RehberYazisi[] = [
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ya da konu listesini tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Konvertör seçimine nereden başlayacağınızı bu rehberde bulun.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
+
+Frekans konvertörü, motorun hızını motora verdiği gerilimi ve frekansı değiştirerek ayarlayan elektronik kontrol cihazıdır [1]. Pompa ve fanda hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır; üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Cihaz seçimi besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiğine bakılarak yapılır [1][2].
+
+Kısaca:
+
+- Çalışma: cihaz doğrultucu, DC ara devre, invertör ve kontrol birimi olmak üzere dört ana bölümden oluşur [1].
+- Enerji: santrifüj fan ve pompada küçük bir hız düşüşü güçte büyük bir düşüş getirir [2].
+- Tork: pompa ve fanlar değişken tork uygulamasıdır; bu uygulamada düşük hızda motor için ek soğutma ya da akım düşürme gerekmez [1].
 
 Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
 
@@ -669,7 +677,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-04 (BLG-39, SEO-83): gövde yenilendi (kesit farkı, kullanım yerleri, seçim bilgileri, kaynaklar); doğrulanmış metin taslak v-son (sha c97467046789; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug, H1 ve ürün listesi değişmedi.
     // Güncelleme tarihi 2026-11-07 (BLG-41, SEO-86): giriş markasız "kanal fanları" tanımıyla başlar, tür sayımı ve "Kullanım alanları" başlığı eklendi; meta açıklama "kanal fanları nelerdir" ve "kullanım alanları" ifadelerini taşır. H1, başlık, adres ve ürün listesi aynı. Doğrulanmış metin taslak (sha e5bb7cdac23f; üç tur, tuzaklı ve temiz kopya). Not: BLG-39 içeriği 6 Kasım'da çıkmış, tarih 4 Kasım'da kalmıştı; bu tarih ikisini de kapsar.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "Kanal fanı çeşitleri nelerdir?" bölümü eklendi (mevcut tür tablosu bu başlığın altında); var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
-    guncellemeTarihi: '2026-11-07',
+    guncellemeTarihi: '2026-11-08',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -682,6 +690,15 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Kanal fanı seçmeden önce türleri ve takılacağı yerleri bu rehberde karşılaştırın.',
         govde: `# Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar
+
+Kanal tipi fanlar kanala entegre edilerek havalandırma sistemlerinde çalışır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı rehberi fanları santrifüj ve aksiyel diye ikiye ayırır, kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı uygun tür olarak anlatır [1].
+
+Kısaca:
+
+- Çalışma: tüp tipi aksiyel fan, kanal kayıplarını yenecek basıncı oluşturduğu için egzoz uygulamalarında sık kullanılır [1].
+- Kesit: fark fanın bağlandığı kanalın kesitindedir; bir firmanın bilgi sayfasına göre dikdörtgen olanı sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
+- Seçim: fan seçimi hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi bilinerek başlar [1].
+- Kullanım: bir üretici kataloğuna göre plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilir [4].
 
 Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve kanala entegre edilen fanlardır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. Hangi kanal fanlarının bulunduğu iki ölçüte göre anlatılır: kesite göre yuvarlak ve dikdörtgen [2]; fan türü olarak santrifüj ve aksiyel (tüp tipi, kılavuz kanatlı) [1] ve üretici anlatımıyla karma akışlı [4]. ABD Enerji Bakanlığı (U.S. Department of Energy, DOE) ile AMCA International'ın rehberi fanları santrifüj ve aksiyel olarak ikiye ayırır ve kanallı iklimlendirme tesisatına uygun tür olarak tüp tipi aksiyel fanı anlatır [1]; bir üretici kataloğu ise kanal fanı serilerinden birini karma akışlı (karışık akışlı) olarak tanımlar [4]. Kullanım alanları kaynaklarda egzoz uygulamaları [1], asma tavan ve çatı arası ile mutfak, tuvalet, laboratuvar, bar ve restoran gibi mekânlar [4] olarak geçer.
 
@@ -799,7 +816,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     konu: 'verimlilik',
     yayinTarihi: '2026-10-31',
     // 1 Kasım 2026 (BLG-27): ısı geri kazanım yazısında kurulum türü adı "kanal tipi" terimine çevrildi (başlık, bağlantı metni, tablo, SSS); iddia kümesi aynı. Gövde sha yukarıdaki değerden farklıdır.
-    guncellemeTarihi: '2026-11-01',
+    guncellemeTarihi: '2026-11-08',
     urunler: [
       'vh:aile/vortice-vort-hr-isi-geri-kazanim',
       'vh:aile/vortice-vort-mono',
@@ -812,6 +829,15 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz; yeni iddia, sayı ya da marka yok.
         kartOzeti: 'Isı geri kazanım cihazı seçmeden önce türleri ve seçim ölçütlerini bu rehberde karşılaştırın.',
         govde: `# Isı geri kazanım cihazı nedir, nasıl seçilir?
+
+Isı geri kazanım cihazı, egzoz havasıyla dışarı atılacak ısıyı içeri alınan taze havaya aktaran havalandırma cihazıdır [1][2]. Isı geri kazanımlı havalandırıcıda (HRV) hava-hava ısı eşanjörü iki yalıtılmış hava akımı arasında ısı aktarır [2]. Nemi de aktaran türe enerji geri kazanımlı havalandırıcı (ERV) denir [4][1].
+
+Kısaca:
+
+- Eşanjör: plakalı ve döner çarklı gibi türler vardır; nem geri kazanımı entalpi plakalı ve döner çarklı türlerde mümkündür [3].
+- Verim: bir sertifika ölçütü (Passive House Institute, 2009) etkin kuru ısı geri kazanımını belirli koşullarda yüzde 75'ten yüksek ister [6].
+- Filtre: Eurovent kılavuzunun genel önerisi filtrenin en az yılda bir değiştirilmesi, eşanjörün iki yılda bir temizlenmesidir; geçerli aralık cihazın üretici kılavuzundan okunur [3].
+- Kurulum türü: kanal tipi merkezi ünite kanalla bağlanır; oda tipi ünite ayrı mahallere yerleştirilir [8][9].
 
 Isı geri kazanım cihazı, binadan atılan egzoz havasının ısısını içeri alınan taze havaya aktaran havalandırma cihazıdır [1][2].
 
@@ -988,7 +1014,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'hava-perdesi',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-01',
-    guncellemeTarihi: '2026-11-01',
+    guncellemeTarihi: '2026-11-08',
     urunler: ['vh:aile/vortice-ad-isiticisiz-hava-perdeleri', 'vh:aile/vortice-h-ad-elektrikli-isiticili-hava-perdeleri'],
     diller: {
       tr: {
@@ -997,6 +1023,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: 'Hava perdesi seçmeden önce kaynaklı model bilgisini ve enerji etkisinin sınırlarını bu rehberde okuyun.',
         govde: `# Hava perdesi nedir, nasıl seçilir?
+
+Hava perdesi, kapı ya da geçiş açıklığının üstüne monte edilir ve açıklık boyunca aşağı doğru hava akımı üfler; kapı açıkken dış havanın içeri girişini sınırlamaya çalışır [1][3]. Katalog ısıtıcısız ve elektrikli ısıtıcılı olmak üzere iki seri sunar [1]; AMCA'nın bir bilgisayar modelleme çalışması enerji performansının kapı kullanım sıklığına ve bina girişinin yönüne bağlı olduğunu söyler [2].
+
+Kısaca:
+
+- Çalışma: perde, yazın soğutulmuş ve kışın ısıtılmış havanın kaçmasını önlemeyi amaçlar [1]; dış havanın içeri girişini sınırlamaya çalışır [3].
+- Enerji: AMCA modelleme çalışmasına göre bina girişinin yönü, bina basıncı ve kapı kullanım sıklığı perdenin enerji performansını etkiler [2].
+- Montaj: bir üretici kataloğuna göre en düşük montaj yüksekliği 2,3 m, önerilen en yüksek montaj yüksekliği 4 m'dir [1]; başka üreticilerde sınır farklı olabilir [4].
 
 Hava perdesi, kapı ya da geçiş açıklığının üstüne monte edilen ve açıklık boyunca aşağı doğru hava akımı üfleyen cihazdır; bu akım kapı açıkken dış havanın içeri girişini sınırlamaya çalışır [1][3].
 
@@ -1128,7 +1162,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // ilgiliKategoriler: 11 fan alt kategorisi (URN-151 kategori kartı).
     // BLG-40 (2026-11-06): H1 (= sayfa başlığı) ve meta açıklaması değişti; önceki H1 bir rakip sayfanın başlığıyla birebir aynıydı (GEO-SEO ölçümü). Gövde, slug ve ürün listesi aynı.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan için H3 başlıklı yeni bölüm eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
-    guncellemeTarihi: '2026-11-07',
+    guncellemeTarihi: '2026-11-08',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
       'vh:kategori/axial-industrial-fans',
@@ -1150,6 +1184,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Fan türlerini akış yoluna ve VentHub kategorilerine göre karşılaştırmak için bu rehberden başlayın; kategori sayfalarına buradan geçin.",
         govde: `# Fan türleri ve çeşitleri: aksiyel, radyal, karma akışlı fanlar
+
+ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: aksiyel ve santrifüj [2]. Hangi türün seçileceği hava özelliklerine, debiye, basınca ve sistem yerleşimine bağlıdır [2]. Yazı önce türleri, sonra seçime nereden başlanacağını anlatır; katalog kategorileri de sıralanır. Seçimde fanın uygulamadaki işi, yani gereken debi ve basınç, belirleyici girdi olarak anılır [2].
+
+Kısaca:
+
+- Aksiyel: fan, havayı dönme ekseni boyunca bir pervane gibi hareket ettirir; hafif ve kompakt olma eğilimindedir [2].
+- Radyal: fan, havayı radyal yönde hızlandırır; sağlam, sessiz ve güvenilirdir [2].
+- Karma akışlı: bir üretici beyanına göre çark, helisel fanın yüksek debisini santrifüj fanın yüksek basıncıyla birleştirir [3].
 
 Havalandırmada kullanılan fan türleri, havanın fandan geçerken izlediği yola göre başlıca aksiyel, radyal (santrifüj), karma akışlı ve çapraz akışlı olarak ayrılır [1]. ABD Enerji Bakanlığı kılavuzu iki ana tür sayar: aksiyel ve santrifüj [2]; Avrupa Birliği'nin (AB) 2024/1834 sayılı fan tüzüğü karma akışlı ve çapraz akışlı fanı da kategori olarak sayar (madde 2(1)) [1]. Fan türünün seçimi hava özellikleri, debi, basınç ve sistem yerleşimine bağlıdır [2]; bu yazı projeye özel seçimin yerine geçmez. Yazı önce türleri, sonra seçime nereden başlanacağını anlatır; VentHub kataloğundaki fan kategorileri üçüncü bölümde sıralanır.
 
@@ -1272,7 +1314,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'plug-fan-nedir',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-06',
-    guncellemeTarihi: '2026-11-06',
+    guncellemeTarihi: '2026-11-08',
     urunler: ['vh:aile/casals-enkelfan-ec-plug', 'vh:aile/casals-kentalfan-plug'],
     ilgiliKategoriler: ['vh:kategori/plug-fans'],
     diller: {
@@ -1282,6 +1324,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Plug fanın ne olduğunu, VentHub'daki iki seriyi ve seçimde gereken girdileri görmek için bu rehberden başlayın.",
         govde: `# Plug fan nedir, nasıl çalışır, nerede kullanılır?
+
+Bir üreticinin kataloğunda EC ve IEC motorlu plug fanlar geriye eğik kanatlı, tek emişli, doğrudan tahrikli çarkı olan merkezkaç fanlardır [4]. Katalog bu fanları klima cihazı, plenum, kompresör, kurutucu, kabin ve fotovoltaik invertöre entegre edilmek üzere uygun görür [4]. Yazı çalışmayı, kullanım yerlerini ve seçim girdilerini sırayla anlatır.
+
+Kısaca:
+
+- Tahrik: ABD Enerji Bakanlığı kılavuzu doğrudan tahriki kayışlıya göre daha verimli, daha az yer kaplayan ve daha az bakım isteyen bir düzen olarak anar; doğrudan tahrikli fanın motorun devrinde dönmesi gerektiğini ve kullanım alanını sınırladığını da yazar [3].
+- Seçim: ABD Enerji Bakanlığı kılavuzuna göre fan seçimi hava özellikleri, hava debisi, basınç ve sistem yerleşimini bilerek başlar [3].
+- Seriler: VentHub'ın plug fan kategorisinde iki seri bulunur; biri harici rotorlu EC motorlu, biri IEC standart asenkron motorlu [5].
 
 Plug fan, ASHRAE Journal'da 1997'de yayımlanan bir makalenin başlığında "unhoused (plug/plenum) fans" ifadesiyle geçen kasasız bir fan türüdür [2]; bir üreticinin kataloğundaki EC ve IEC motorlu plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli çarkı olan merkezkaç fanlardır [4]. ASHRAE sözlüğünde plenum fan girdisi vardır: tek girişli bir çarkla hava dağıtım sistemindeki bir plenum haznesini basınçlandıran fan düzeneği olarak tanımlanır [1]. Bu yazı fanın nasıl çalıştığını, nerelerde kullanıldığını ve seçimde hangi bilgilerin gerektiğini anlatır; VentHub'daki seriler en sonda kısaca sıralanır.
 
@@ -1377,6 +1427,14 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Asit fanının ne olduğunu, hangi ortamlarda gündeme geldiğini ve malzeme, motor yeri ile ATEX açısından neye bakılacağını görmek için bu rehberden başlayın.",
         govde: `# Asit fanı nedir? Korozyona ve kimyasala dayanıklı fan nasıl seçilir
+
+Asit fanı, havadaki aşındırıcı gaz, buhar ya da damlacıklara dayanacak malzemelerle yapılan fandır. Laboratuvar çeker ocağı, kapalı yüzme havuzu ve atık su arıtma kaynaklarda aşındırıcı ortam örnekleri olarak geçer [2][5][6]. Malzeme seçimi, kaynaklara göre tahliye edilen maddelerle uyuma bağlıdır; anılan malzemeler arasında polipropilen, PVC, cam elyaf ve kaplamalı çelik vardır [2][3][4].
+
+Kısaca:
+
+- Ortam: Texas State Üniversitesi'nin çeker ocak standardı çok korozif koşullarda cam elyaf, PVC ya da eşdeğeri fan önerir; bu tek bir üniversitenin kendi standardıdır [2].
+- Motor: aynı standart, motorun kolay erişim için ve kirlenmesini önlemek amacıyla egzoz kanalının dışına monte edilmesini önerir [2].
+- Seçim: yazarın derlemesine göre tahliye edilen maddeler listelenir, malzeme her madde için föylerden ve kılavuzlardan doğrulanır [2][3][4].
 
 Asit fanı, havadaki aşındırıcı gaz, buhar ya da damlacıkların parçalarını bozmayacağı malzemelerle yapılan fandır. Bu yazı asit fanının hangi ortamlarda gündeme geldiğini, kaynaklarda hangi malzemelerin anıldığını, motorun yerini ve patlayıcı ortam (ATEX) ile ilişkisini anlatır; kaynaklar yazının sonunda listelenir.
 
