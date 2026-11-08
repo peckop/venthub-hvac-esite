@@ -25,6 +25,7 @@ Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerind
    Her adres × motor için bir durum döner: **TAMAM / BEKLE / TEKRAR / YAP / ATLA / ESKI / OLCULEMEDI**. İstek yalnız **YAP** ve **TEKRAR** satırlarına atılır; diğerlerine atılmaz. OLCULEMEDI "taranmadı" demek değildir, ölçemedim demektir.
 2. **Motor adımı** (yalnız YAP/TEKRAR olanlar):
    - **Google:** Chrome (claude-in-chrome) ile Search Console. Üstteki "URL'yi denetle" kutusuna TAM `https://` adresi yaz, Enter; sonuç gelince "Dizine eklenmesini iste". 1-3 dakika bekle. Başarı mesajı "Dizine eklenmesi istendi"; "Kota Aşıldı" görünürse dur, yarına bırak.
+   - Açılış satırı: `node scripts/seo/dizin-acilis.mjs --sadece-satir` son anlık görüntüden YAP/TEKRAR sayılarını verir; bugün ölçüm yoksa `--durum` arka planda başlar. İstek yine tablodan okunarak atılır.
    - Google tıklaması için çalışan parçacık: `node scripts/seo/tarayici-parcaciklari.mjs gsc` (window.__iste(adres, ilk)); sonra `--kaydet`. Robot doğrulaması çıkarsa dur.
    - **Bing:** `node scripts/seo/bing-url-gonder.mjs --gonder <adresler>` (günde 100).
    - **Yandex:** webmaster.yandex.com, bu site için indexing/reindex sayfasındaki metin kutusuna adresler satır satır (günde 10).
