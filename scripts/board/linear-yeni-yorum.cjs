@@ -62,29 +62,89 @@ const ZAMAN_ASIMI_MS = 3000
  * damgaya (10-25) düşüyordu: aynı komut cwd'ye göre 0 ya da 9 yorum veriyordu. `--path-format=absolute`
  * ana ağaçta dönen göreli ".git"i de mutlak yapar (aksi halde damga cwd'ye göre farklı dosyaya giderdi).
  */
-function damgaYolu() {
+/**
+ * ⭐ARC-273 (8 Kasım, Recep "sürekli hatalı bildirim"): git yanıt vermezse (2 sn zaman aşımı, bellek baskısı) eski kod
+ * %TEMP% yedeğine düşüyordu ve oradaki BAYAT damgayı (10-25) gerçek sanıyordu: damga 11-06'dayken zil "en eski 10-25"
+ * dedi. Çözüm: ortak .git dizini ÖNCE git'siz, dosya sisteminden bulunur (worktree'de `.git` bir dosyadır,
+ * `gitdir: <ana>/.git/worktrees/<ad>` der); git yalnız ikinci yol; %TEMP% yedeği son çare ve damgası GÜVENİLMEZ sayılır.
+ */
+function ortakGitDizini(baslangic = __dirname, fsm = fs) {
+  let dizin = path.resolve(baslangic)
+  for (let i = 0; i < 12; i++) {
+    const aday = path.join(dizin, '.git')
+    try {
+      const st = fsm.statSync(aday)
+      if (st.isDirectory()) return aday
+      if (st.isFile()) {
+        const m = /^gitdir:\s*(.+)$/m.exec(fsm.readFileSync(aday, 'utf8'))
+        if (m) {
+          const gd = path.resolve(dizin, m[1].trim())
+          // <ana>/.git/worktrees/<ad> -> <ana>/.git ; commondir dosyası varsa o kazanır.
+          try {
+            const c = fsm.readFileSync(path.join(gd, 'commondir'), 'utf8').trim()
+            if (c) return path.resolve(gd, c)
+          } catch {
+            /* commondir yok: yol biçimine bak */
+          }
+          if (path.basename(path.dirname(gd)) === 'worktrees') return path.dirname(path.dirname(gd))
+          return gd
+        }
+      }
+    } catch {
+      /* bu seviyede .git yok */
+    }
+    const ust = path.dirname(dizin)
+    if (ust === dizin) break
+    dizin = ust
+  }
+  return null
+}
+
+/** `{ yol, yedek }`: yedek=true ise %TEMP% son çaresidir ve içindeki damga güvenilmez. */
+function damgaKonumu() {
+  const fsYolu = ortakGitDizini()
+  if (fsYolu) return { yol: path.join(fsYolu, 'venthub-linear-son-okuma.json'), yedek: false }
   try {
     const ortak = execFileSync('git', ['-C', __dirname, 'rev-parse', '--path-format=absolute', '--git-common-dir'], {
       encoding: 'utf8',
       timeout: 2000,
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
-    if (ortak) return path.join(path.resolve(ortak), 'venthub-linear-son-okuma.json')
+    if (ortak) return { yol: path.join(path.resolve(ortak), 'venthub-linear-son-okuma.json'), yedek: false }
   } catch {
     /* git yok ya da depo değil: aşağıdaki yedeğe düş */
   }
-  return path.join(os.tmpdir(), 'venthub-linear-son-okuma.json')
+  return { yol: path.join(os.tmpdir(), 'venthub-linear-son-okuma.json'), yedek: true }
 }
 
-/** Son okuma damgasını okur. Dosya yoksa: 24 saat öncesi (ilk kurulumda tsunami olmasın). */
+function damgaYolu() {
+  return damgaKonumu().yol
+}
+
+const YEDEK_PENCERE_MS = 24 * 60 * 60 * 1000
+
+/**
+ * Damga dosyasının içeriğinden eşiği çıkarır (saf; testte sahte dosya verilir).
+ * Dosya yoksa/bozuksa 24 saat öncesi (ilk kurulumda tsunami olmasın). `yedek` (%TEMP%) konumunda damga GÜVENİLMEZ:
+ * bayat olabilir (ARC-273: 10-25 damgası 11-06'da okunduğu hâlde gerçek sanıldı), eşik en fazla 24 saat geriye gider.
+ */
+function esikHesapla(ham, yedek, simdiMs = Date.now()) {
+  const varsayilan = new Date(simdiMs - YEDEK_PENCERE_MS).toISOString()
+  if (!ham || typeof ham.damga !== 'string' || Number.isNaN(Date.parse(ham.damga))) return varsayilan
+  if (yedek) return Date.parse(ham.damga) > simdiMs - YEDEK_PENCERE_MS ? ham.damga : varsayilan
+  return ham.damga
+}
+
+/** Son okuma damgasını okur. */
 function sonOkuma() {
+  const { yol, yedek } = damgaKonumu()
+  let ham = null
   try {
-    const ham = JSON.parse(fs.readFileSync(damgaYolu(), 'utf8'))
-    if (ham && typeof ham.damga === 'string') return ham.damga
+    ham = JSON.parse(fs.readFileSync(yol, 'utf8'))
   } catch {
-    /* yok ya da bozuk: yedeğe düş */
+    /* yok ya da bozuk: varsayılan pencere */
   }
-  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  return esikHesapla(ham, yedek)
 }
 
 /**
@@ -593,6 +653,9 @@ module.exports = {
   satir,
   cek,
   damgaYolu,
+  damgaKonumu,
+  ortakGitDizini,
+  esikHesapla,
   PROJELER,
   ZAMAN_ASIMI_MS,
   SORGU,
@@ -606,7 +669,11 @@ module.exports = {
 
 if (require.main === module) {
   const tani = process.argv.includes('--tani')
-  if (process.argv.includes('--durum')) {
+  const bilinmeyen = process.argv.slice(2).filter((a) => !['--tani', '--durum'].includes(a))
+  if (bilinmeyen.length > 0) {
+    // ARC-273: yardım/bilinmeyen bayrak sayaç sorgusu KOŞMAZ (sessiz yan etki olmasın).
+    console.log('kullanim: node scripts/board/linear-yeni-yorum.cjs [--durum | --tani]   (bayraksiz: kanca satiri)')
+  } else if (process.argv.includes('--durum')) {
     // Tek satır JSON; çıkış kodu HER ZAMAN 0 (ölçülemedi de bir sonuçtur, çağıran kendi hatasıyla karıştırmasın).
     durum().then((d) => console.log(JSON.stringify(d)))
   } else if (!tani) {
