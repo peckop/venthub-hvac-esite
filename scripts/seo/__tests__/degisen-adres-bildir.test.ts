@@ -281,3 +281,83 @@ describe('INV-DEGISEN-ADRES-1 · uçtan uca', () => {
     expect(kuyruksuz.status).toBe(2)
   })
 })
+
+describe('INV-DEGISEN-ADRES-1 · --adres zorla liste (SEO-97)', () => {
+  async function zorla(fetchFn: typeof fetch, y: ReturnType<typeof dizin>, adresler: string[], kip: 'kuru' | 'uygula' = 'uygula', k4Gevsek?: boolean) {
+    const satirlar: string[] = []
+    const s = await calistir({ fetchFn, site: SITE, ...y, kip, k3bAcik: false, k4Gevsek, anahtar: ANAHTAR, zaman: '2026-11-09T09:00:00Z', cikti: (m: string) => satirlar.push(m), adresler })
+    return { ...s, satirlar: satirlar.join('\n') }
+  }
+
+  it('(z1) özet değişmemiş adres de gider: metin farkı aranmaz, tek POST, kuyruğa girer', async () => {
+    const y = dizin()
+    await kos(sahteSite(sayfalar()).fetchFn, y, 'taban-kur')
+    const a = sahteSite(sayfalar()) // başlık/h1 aynı: normal koşu fark görmez
+    expect((await kos(a.fetchFn, y, 'kuru')).satirlar).toContain('yeni 0 · metin 0 · lastmod 0')
+    const b = sahteSite(sayfalar())
+    const s = await zorla(b.fetchFn, y, [BILGI])
+    expect(s.cikis).toBe(0)
+    expect(b.postlar).toHaveLength(1)
+    expect(b.postlar[0].govde.urlList).toEqual([BILGI])
+    expect(jsonlOku(readFileSync(y.kuyrukYolu, 'utf8')).map((x: { adres: string }) => x.adres)).toEqual([BILGI])
+  })
+
+  it('(z2) kapılar gevşemez: haritada olmayan, 404 veren, kanoniği başka olan ve yabancı alan adı gitmez', async () => {
+    const y = dizin()
+    const sp = { ...sayfalar(), [KATEGORI]: { baslik: 'K', kanonik: `${SITE}/tr/baska` }, [URUN]: { baslik: 'U', durum: 404 } }
+    const a = sahteSite(sp)
+    const s = await zorla(a.fetchFn, y, [`${SITE}/tr/yok`, URUN, KATEGORI, 'https://baska.example/x'])
+    expect(s.cikis).toBe(1)
+    expect(a.postlar).toHaveLength(0)
+    expect(s.satirlar).toContain('site haritasında yok')
+    expect(s.satirlar).toContain('kanonik')
+    expect(s.satirlar).toContain('dışında')
+  })
+
+  it('(z3) karışık liste: geçenler gider, geçmeyenler REDDEDİLDİ yazılır; kuru koşumda POST ve dosya yazımı yok', async () => {
+    const y = dizin()
+    const kuru = sahteSite(sayfalar())
+    const k = await zorla(kuru.fetchFn, y, [BILGI, `${SITE}/tr/yok`], 'kuru')
+    expect(k.cikis).toBe(0)
+    expect(kuru.postlar).toHaveLength(0)
+    expect(existsSync(y.kuyrukYolu)).toBe(false)
+    const a = sahteSite(sayfalar())
+    const s = await zorla(a.fetchFn, y, [BILGI, `${SITE}/tr/yok`])
+    expect(s.cikis).toBe(0)
+    expect(a.postlar[0].govde.urlList).toEqual([BILGI])
+    expect(s.satirlar).toContain('kabul 1 · reddedilen 1')
+  })
+
+  it('(z4) taban varsa yalnız gönderilen adresin kaydı güncellenir; K4 kapalıyken ürün gitmez (kapı korunur)', async () => {
+    const y = dizin()
+    await kos(sahteSite(sayfalar()).fetchFn, y, 'taban-kur')
+    const once = JSON.parse(readFileSync(y.tabanYolu, 'utf8')).adresler
+    const degisen = { ...sayfalar(), [BILGI]: { baslik: 'Rehber v2' }, [URUN]: { baslik: 'Ürün v2' } }
+    const a = sahteSite(degisen)
+    const s = await zorla(a.fetchFn, y, [BILGI, URUN], 'uygula', false)
+    expect(s.cikis).toBe(0)
+    expect(a.postlar[0].govde.urlList).toEqual([BILGI])
+    const sonra = JSON.parse(readFileSync(y.tabanYolu, 'utf8')).adresler
+    expect(sonra[BILGI].hash).not.toBe(once[BILGI].hash)
+    expect(sonra[URUN]).toEqual(once[URUN])
+    expect(sonra[KATEGORI]).toEqual(once[KATEGORI])
+  })
+
+  it('(z5) IndexNow reddederse exit 1 ve taban ilerlemez; boş liste exit 2', async () => {
+    const y = dizin()
+    await kos(sahteSite(sayfalar()).fetchFn, y, 'taban-kur')
+    const once = readFileSync(y.tabanYolu, 'utf8')
+    const a = sahteSite({ ...sayfalar(), [BILGI]: { baslik: 'Rehber v2' } }, {}, 500)
+    expect((await zorla(a.fetchFn, y, [BILGI])).cikis).toBe(1)
+    expect(readFileSync(y.tabanYolu, 'utf8')).toBe(once)
+    expect((await zorla(sahteSite(sayfalar()).fetchFn, y, [' ', ''])).cikis).toBe(2)
+  })
+
+  it('(z6) CLI: --adres tırnaksız bayrak exit 2', async () => {
+    const { spawnSync } = await import('node:child_process')
+    const betik = resolve(__dirname, '..', 'degisen-adres-bildir.mjs')
+    const r = spawnSync(process.execPath, [betik, '--kuyruk', join(tmpdir(), 'k.jsonl'), '--adres'], { encoding: 'utf8' })
+    expect(r.status).toBe(2)
+    expect(r.stderr).toMatch(/--adres/)
+  })
+})

@@ -27,7 +27,7 @@ Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerind
    - **Google:** Chrome (claude-in-chrome) ile Search Console. Üstteki "URL'yi denetle" kutusuna TAM `https://` adresi yaz, Enter; sonuç gelince "Dizine eklenmesini iste". 1-3 dakika bekle. Başarı mesajı "Dizine eklenmesi istendi"; "Kota Aşıldı" görünürse dur, yarına bırak.
    - **Bing:** `node scripts/seo/bing-url-gonder.mjs --gonder <adresler>` (günde 100).
    - **Yandex:** webmaster.yandex.com, bu site için indexing/reindex sayfasındaki metin kutusuna adresler satır satır (günde 10).
-   - **IndexNow:** `node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk … --uygula`.
+   - **IndexNow:** `node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk … --uygula`. Başlık/açıklama/H1 aynı kalıp gövdesi değişen yazı fark görünmez; o zaman listeyi zorla: `… --kuyruk … --adres <tam https adresler, virgülle> --uygula` (kapılar aynı: haritada, 200, kanonik kendisi).
 3. **Kayıt, aynı turda.** Eylemden hemen sonra:
    `node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <https-adres,adres>`
    `--sonuc` ve `--tarih` isteğe bağlıdır; Yandex'te panel geçmişinden gelen eski kayıt için `--tarih` verilir. Eski kayıtları toplu almak için `--ice-aktar` vardır. Kayıt atlanırsa bir sonraki `--durum` aynı adrese yine YAP der ve kota boşa gider.
