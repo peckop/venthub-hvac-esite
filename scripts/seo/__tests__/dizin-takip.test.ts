@@ -9,10 +9,12 @@
  */
 import { describe, it, expect } from 'vitest'
 import { execFileSync } from 'node:child_process'
-import { resolve } from 'node:path'
+import { resolve, join } from 'node:path'
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import {
   KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
-  satirYaz, sonHareket, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar,
+  satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar,
 } from '../dizin-takip.mjs'
 
 const S = 'https://venthub.com.tr'
@@ -215,5 +217,23 @@ describe('CLI güvenliği', () => {
     const tmp = process.env.TEMP || process.env.TMPDIR || '/tmp'
     expect(kos(['--kaydet', 'bilinmeyen', 'istek', `${S}/tr/x`, '--hareket', `${tmp}/dizin-takip-test-${process.pid}.jsonl`]).kod).toBe(2)
     expect(kos(['--kaydet', 'google', 'istek', 'https://baska.com/x', '--hareket', `${tmp}/dizin-takip-test-${process.pid}.jsonl`]).kod).toBe(2)
+  })
+})
+
+describe('günlük defter yedeği', () => {
+  it('yedekAl defteri yedek/hareketler-<gün>.jsonl olarak aynen kopyalar, aynı gün üzerine yazar', () => {
+    const d = mkdtempSync(join(tmpdir(), 'dizin-yedek-'))
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      writeFileSync(defter, 'satir1\n')
+      const gun = new Date('2026-11-08T10:00:00Z')
+      expect(yedekAl(defter, gun)).toBe(1)
+      const yedek = join(d, 'yedek', 'hareketler-2026-11-08.jsonl')
+      expect(readFileSync(yedek, 'utf8')).toBe('satir1\n')
+      writeFileSync(defter, 'satir1\nsatir2\n')
+      yedekAl(defter, gun)
+      expect(readFileSync(yedek, 'utf8')).toBe('satir1\nsatir2\n')
+      expect(existsSync(join(d, 'yedek', 'hareketler-2026-11-09.jsonl'))).toBe(false)
+    } finally { rmSync(d, { recursive: true, force: true }) }
   })
 })

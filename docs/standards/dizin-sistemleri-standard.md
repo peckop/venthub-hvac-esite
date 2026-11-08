@@ -139,6 +139,7 @@ buradan yapılmaz.
 5. **Eşikler ölçülmüş değil.** 7/5/7 gün başlangıç varsayımıdır; TEKRAR çıkan her adresin sonucu tabloya yazılır ve eşik üç koşu sonra gözden geçirilir. Bing hız sınırı (art arda çok `GetUrlInfo`) ölçüldü: başarısızlar bir kez yavaşça yeniden denenir.
 6. **`lastmod` sınırı.** Bazı `lastmod` değerleri yalnız tarihtir (00:00Z); aynı gün içindeki değişiklik ile tarama sırası karar veremez, tarama günü ≥ `lastmod` günü TAMAM sayılır. İçerik gün içinde sonra değişirse yeni `lastmod` yeni karar doğurur.
 7. **Kanban.** Kalıcı takip kartı SEO panosundaki "Dizin takip düzeni" kartıdır: her `--durum` koşusunun tablosu karta not yazılır; BLOG yayın bildirimi geldiğinde adres tabloya girer, aynı turda istekler atılır ve kayıt düşülür. Dizin isteği GEO-SEO görevidir, Recep'ten ayrıca onay istenmez; kota gerektiren iş sırası bu tabloya göre kurulur.
+8. **Yedek ve sonuç geçmişi (2026-11-08).** `--kaydet` ve `--ice-aktar` her yazımdan sonra defteri `dizin-takip/yedek/hareketler-<gün>.jsonl` olarak kopyalar (aynı gün üzerine yazar); `DIZIN_TAKIP_YEDEK2` verilirse ikinci kopya depo dışı o klasöre de gider. `--durum` çıktısı `--cikti` verilmese de defter klasörüne `dizin-takip-<gün>.json` yazar: işlem geçmişi ile sonuç geçmişi (hangi gün TAMAM oldu) birlikte kalır. Kayıt 2026-11-04'ten başlar; öncesi için yalnız elle istek defterinden taşınan satırlar vardır. Yedekler hâlâ aynı makinededir; başka diske kopya ARAÇ'la bağlanır.
 
 ## D8 — Ölçüm arşivi: yeni ölçümden önce "daha önce ölçüldü mü", ölçümden sonra kayıt (v0.1, 2026-11-06, Kanban SEO-87)
 
