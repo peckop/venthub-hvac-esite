@@ -1,6 +1,6 @@
 # Rehber yazısı mevzuat bağı: şema önerisi ve yayındaki yazıların eşlemesi (BLG-57, OPS-253)
 
-Durum: **ÖNERİ.** Karar sahipleri: yazı şeması BLOG + Design (makale JSON'u), kayıt alanı MEVZUAT, kapı ARAÇ. Eski siteye kod yok (karar 412); bu belge yeni site şemasına girecek alanı tarif eder.
+Durum: **ÖNERİ, MEVZUAT ve ARAÇ görüşü işlendi (8 Kasım 2026, ikinci sürüm); DESIGN cevabı (soru 5) açık.** Karar sahipleri: yazı şeması BLOG + Design (makale JSON'u), kayıt alanı MEVZUAT, kapı ARAÇ. Eski siteye kod yok (karar 412); bu belge yeni site şemasına girecek alanı tarif eder.
 Cetvel: `rehber-yazisi-standard.md` R2.6 ve R5.1 3g (mevzuat cümlesini MEVZUAT kontrol eder), `mevzuat-kaydi-standard.md` M2 (kalem kimliği) ve M6.1 madde 4 (kayıt değişince yazıya "güncelle" bildirimi).
 Girdi: MVZ-9 tutarlılık ölçümü (8 Kasım 2026, `docs/mevzuat/kayit.json` v0.5, 47 kalem) ve BLG-53 Design makale JSON'u. Ölçüm tarihi: 8 Kasım 2026, `kayit.json` v0.5 **49 kalem** (MVZ-9'dan sonra 2025/2481 ve TR-YON-GURULTU-BINA-2018-DEG kalemleri eklenmiş; bu belgedeki bütün kimlikler `kayit.json`'a karşı betikle doğrulandı, 22 kimlik, eksik 0).
 
@@ -43,10 +43,16 @@ Alanlar:
 
 | Kapı | Ne ölçer | Renk | Sahip |
 |---|---|---|---|
-| M-A | `mevzuat[].kayit` her biri `kayit.json`'da var mı; `kaynak` numaraları yazının kaynak listesinde var mı | KIRMIZI | ARAÇ (CI) |
+| M-A | `mevzuat[].kayit` her biri `kayit.json`'da var mı; `kaynak` numaraları yazının kaynak listesinde var mı. Kimlik DEĞİŞMEZ sayılır: kalem `kaldirildi` olsa da kimlik kalır (`yerine_gelen` yönlendirir), yazıdaki bağ kırılmaz. `madde` serbest metindir, doğrulanmaz | KIRMIZI (bilinen eksik: bkz. altta) | ARAÇ (CI) |
 | M-B | Gövdede mevzuat deseni taşıyan cümle (`rehber-denetim.mjs` MEVZUAT deseni: yönetmelik, tebliğ, kanun, zorunlu…) olup yazıda hiç `mevzuat` bağı yoksa | KIRMIZI | BLOG (`rehber-denetim.mjs`) |
-| M-C | Kalem `durum`, `tarihler`, `degistirenler` ya da `son_kontrol` alanında değişirse, o kalemi anan her yazıyı "mevzuat gözden geçirmesi gerekli" diye işaretler; işaret kalkmadan yazı yeniden yayımlanmaz | UYARI → pano | ARAÇ + MEVZUAT |
-| M-D | `kayit.json` kalemine `atif_yapan_yazilar` alanı yazı bağından **üretilir** (elle yazılmaz) | üretim | ARAÇ |
+| M-C | Kalem `durum`, `tarihler`, `yerini_aldigi` ya da `degistirenler` alanında değişirse, o kalemi anan her yazıyı "mevzuat gözden geçirmesi gerekli" diye işaretler; işaret kalkmadan yazı yeniden yayımlanmaz. **`son_kontrol` tek başına işaret üretmez** (35 günlük tazelemede kalemlerin çoğunun tarihi değişir, işaret anlamını yitirir). Yüzey: PR kapısı (master'a göre `kayit.json` farkı) + M-D çıktısından yazı listesi, PR yorumu ve BLOG Kanban kartı; kokpit kullanılmaz, zamanlayıcı yok | UYARI → Kanban kartı | ARAÇ + MEVZUAT |
+| M-D | Yazı bağından türetilen `atif_yapan_yazilar` **`kayit.json`'a yazılmaz** (dosya MEVZUAT'ın elle yazdığı, CRLF'li kayıt; her yazı düzeltmesi kayıt farkı üretmesin). Üretilmiş ayrı dosyada tutulur (örn. `docs/mevzuat/atif-dizini.json`, elle düzenlenmez), testte "güncel mi" kontrolü yazı bağı değişince CI'ı kırar; üretim komutu tek satır | üretim + test | ARAÇ |
+
+**M-A ilk gün kırmızı vermesin.** BLG-55 yazısının iki yönetmeliği için kayıt kalemi açılana kadar (MVZ-12) kapı ya bilinen-eksik listesiyle (her satır kart numaralı, ratchet) ya da o yazı için uyarı olarak açılır. Karar ARAÇ'ın; kalemler açılınca liste boşalır.
+
+**M-C ikinci yol (sonra).** Yazı bağına `kayit_sha`/kalem damgası ekleyip yayında eski damga olanı işaretlemek daha sağlamdır ama şema alanı ister; önce PR kapısı yolu, damga ikinci adım.
+
+**Araç taraması (8 Kasım):** M-A, M-C, M-D'yi karşılayan mevcut betik ya da kapı yok; `mevzuat-kaydi-standard` M5'te önerilen kayıt tutarlılığı betiği yazılmamış (`scripts/mevzuat` altında yalnız `kanit-ekle` ve `ham-cekim` var). Kapı yazımı ayrı kart (ARAÇ).
 
 M-B, bağ olmayan yazıyı yakalar ama bağın doğru olduğunu söylemez: doğruluğu MEVZUAT gözden geçirmesi (R5.1 3g) ve BLG-56 gibi periyodik MVZ-9 ölçümü yargılar.
 
@@ -68,7 +74,7 @@ Kaynak: MVZ-9 satır tablosu (11 yazı) + BLG-54/55 (yeni). `tur` önerisi ve MV
 | cati-tipi-fan-nedir-nasil-secilir | yok | mevzuat cümlesi yok |
 | patlayici-ortamda-fan-secimi-atex-bolge-kategori | AB-2014/34 · md 1, 2, 43; Ek I; Ek II 1.0.5, 2.3.1.1 · atıf; AB-94/9 · atıf; AB-1999/92 · atıf; TR-YON-ATEX-2014/34 · Md 4(1)(s)(ğ), Md 41, Md 43(1) · atıf; TR-YON-ATEX-1999/92 · Ek-1, Ek-3 · tanim | atıflar uyuşuyor; bakanlık adı ve "sonraki değişiklikler okunmamıştır" cümlesi bayat (BLG-56); `99/92/AT` ve `1999/92/AT` yazımı tek biçime |
 | hucreli-aspirator-nedir-secerken-nelere-bakilir (BLG-54) | yok | mevzuat cümlesi yok (MEVZUAT hükmü gerekmedi) |
-| banyo-ve-tuvalet-fani-nasil-secilir (BLG-55) | Planlı Alanlar İmar Yönetmeliği (RG 30113) · md 2, 32/9, 39/6 · atıf; Binalarda Enerji Performansı Yönetmeliği (RG 27075) · md 17/1, 17/10 · atıf | **İki yönetmelik için `kayit.json`'da kalem yok**; bu satırlar `kayit` doldurulamaz. MEVZUAT iki kalemi açmadan M-A geçemez (soru 2) |
+| banyo-ve-tuvalet-fani-nasil-secilir (BLG-55) | Planlı Alanlar İmar Yönetmeliği (RG 30113) · md 2, 32/9, 39/6 · atıf; Binalarda Enerji Performansı Yönetmeliği (RG 27075) · md 17/1, 17/10 · atıf | **İki yönetmelik için `kayit.json`'da kalem yok**; MEVZUAT kalemleri açacak (MVZ-12): imar `TR-YON-IMAR-PLANLI-2017`, BEP `TR-YON-BEP-2008`. Kalemler `kayit.json`'da görününceye kadar bu satırlar doldurulmaz |
 
 Mevzuat cümlesi taşıyan dokuz yazının bağları bugün `kayit.json`'la doldurulabilir; tek istisna BLG-55'in iki yönetmeliğidir (kalem açılması gerekir). İlk toplu doldurmayı Design makale JSON'u dosyalarına (BLG-53, `blog-calisma\design-makale\`) betikle yapmak mümkündür; yazı gövdesi değişmediği için yeni tur gerekmez (yalnız yeni alan eklenir, iddia eklenmez).
 
@@ -79,13 +85,20 @@ Mevzuat cümlesi taşıyan dokuz yazının bağları bugün `kayit.json`'la dold
 3. ARAÇ: M-A, M-C, M-D kapılarını yazar (CI'da `kayit.json` ↔ Design JSON okuması).
 4. HARİTA: yazı ↔ ürün ailesi bağı (`urunler`) ile aynı yapıyı kullanıyorsa `mevzuat` alanını yanına koyar (ortak yükleyici).
 
-## 6. Açık sorular
+## 6. Sorular ve cevaplar (8 Kasım)
 
-1. **MEVZUAT:** bağ bölüm düzeyinde mi (öneri), cümle düzeyinde mi? Cümle düzeyi her daraltmada kayar; bölüm düzeyi R5.1 3g okumasını bölüm başına yapar.
-2. **MEVZUAT:** Planlı Alanlar İmar Yönetmeliği ve Binalarda Enerji Performansı Yönetmeliği için kalem açılacak mı, kimlikleri ne olacak (öneri `TR-YON-IMAR-PLANLI-ALANLAR`, `TR-YON-BEP`; M2 biçimi MEVZUAT'ın)?
-3. **BLOG kararı (ısı geri kazanım):** 1253/2014 ve 1254/2014 yazıda yok; yazıya mevzuat cümlesi eklemek yeni iddiadır (paket + tur gerekir). Öneri: ayrı kartla, ısı geri kazanım yazısının bir sonraki R5.5 revizyonunda.
-4. **ARAÇ:** M-C pano işareti hangi yüzeyde görünür (kokpit, Kanban kartı, ya da Design yönetim ekranı)? Bildirim kanalı M6.1 madde 4 ile aynı olabilir.
-5. **DESIGN:** `mevzuat` alanı makale JSON'una ve sayfa şablonuna girerse okuyucuya görünür mü (örn. "Bu yazıdaki mevzuat cümleleri şu kayıtlara dayanır")? Öneri: görünmez, yalnız yönetim verisi.
+1. **Bölüm mü cümle mi (MEVZUAT): bölüm.** Kayıt cümle tutmaz, cümle düzeyi kimlik karşılıksız. `madde` serbest metin kalır, kapı doğrulamaz; madde düzeyi gerekirse sonra kayıtta `maddeler` açılır, şimdi değil.
+2. **İmar ve BEP kalemleri (MEVZUAT): açılacak, MVZ-12.** Kimlikler yıl ekiyle: `TR-YON-IMAR-PLANLI-2017` (RG 30113) ve `TR-YON-BEP-2008` (RG 27075); kimlik bir kez verilir. Ham metin MVZ-11'de okundu (imar md 2, 32/9, 39/6; BEP md 17/1, 17/10 doğrulandı). Önceki öneri adlar (`...-ALANLAR`, `TR-YON-BEP`) geçersiz.
+3. **Isı geri kazanım kapsam boşluğu (BLOG): ayrı kart, R5.5 revizyonunda.** Yazıya 1253/2014 ve 1254/2014 cümlesi eklemek yeni iddiadır; MEVZUAT paketi verir (kayıt tarafı hazır, `etkilenen_aileler` kapsamda yazılı), tur yapılır. Bu belgede yazı değişmez.
+4. **M-C yüzeyi (ARAÇ): Kanban BLOG kartı.** Kokpit Recep'in karar yüzeyidir, oraya konmaz; otomatik kart açma kart kapısıdır, zamanlayıcı yok.
+5. **Design'da görünürlük (DESIGN): açık.** Öneri değişmedi: okuyucuya görünmez, yalnız yönetim verisi. Design cevabı gelince işlenir.
+
+## 6b. Kalan işler (her biri ayrı kart)
+
+- MEVZUAT: MVZ-12 (iki kalem, kanıtıyla).
+- ARAÇ: M-A, M-C (PR kapısı yolu), M-D (üretilmiş ayrı dosya) kapı yazımı.
+- BLOG: Design makale JSON'larına `mevzuat` alanını doldurma (13 dosya) ve M-B (`rehber-denetim.mjs`); kalemler açılınca BLG-55 satırı.
+- BLOG: ısı geri kazanım R5.5 revizyonu (soru 3), MEVZUAT paketi sonrası.
 
 ## 7. Sınırlar
 
