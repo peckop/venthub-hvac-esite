@@ -27,6 +27,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Kanca ve ayar etkili PR'ı (.claude/hooks, scripts/board, settings.json kanca kayıtları), değişikliği yazmamış bir denetçi alt ajan tam farkı okuyup engelleyici bulgu bildirmedikten sonra ARAÇ birleştirir; hüküm PR'a yazılır. İzin, deny, MCP ya da defaultMode değiştiren PR OPS üzerinden Recep'e gider.
 - Süren işin varken gelen emri karta al, sıraya koy, OPS'a "elimde X var, bitince başlarım" dön; OPS "X'i bırak" demedikçe geçme.
 - Salt-okuma alt ajanı (araştırmacı, çürütücü, doğrulayıcı) `name` vermeden aç; uygulayıcıyı `name` ile aç.
+- Bölmeden önce üç soru (§10.4a); 4 varsayılan, BELLEK'te 2.
 - Alt ajanın görev metnine "açık PR dalına push yok" yaz.
 - Toplu MCP yazımı (sync_task_graph, add_check, transition_task ve benzeri) alt ajana verilmez; yazmayı çağıran pencere yapar.
 - Müdür kalıcı ders ve hata anında `wrongstack-sage remember` ile kaydeder (`audience.roles=[<ROL>]`).
