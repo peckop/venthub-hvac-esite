@@ -63,7 +63,7 @@ describe('liste kartı — güncelleme tarihi', () => {
       ['fan-cesitleri', '2026-11-07', '7 Kasım 2026'],
       ['radyal-aksiyel-fan-secimi', '2026-11-04', '4 Kasım 2026'],
       ['kanal-tipi-fan-nedir', '2026-11-07', '7 Kasım 2026'],
-      ['sessiz-fan-secimi', '2026-11-07', '7 Kasım 2026'],
+      ['sessiz-fan-secimi', '2026-11-08', '8 Kasım 2026'],
     ]
     for (const [kimlik, iso, yazili] of beklenen) {
       const yazi = YAZILAR.find((y) => y.kimlik === kimlik)
