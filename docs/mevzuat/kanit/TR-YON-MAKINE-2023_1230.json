@@ -30,6 +30,23 @@
       "durum_satiri": "Ek-5 Kısım A: 10 alan; Kısım B: 4 alan (basılı s.66). Ek-3 1.5.1 basılı s.38. İkinci okuma bekliyor.",
       "alinti": "",
       "alinti_dogrulandi": false
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2026/10/20261016-12.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2026/10/20261016-12.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Bağımsız ham çekim: Node fetch, User-Agent VentHub-mevzuat/1.0; ölçüm 8 Kasım 2026 (6 Kasım çalışan okumasından bağımsız)",
+      "durum_satiri": "Resmî metin sayfası (16 Ekim 2026 CUMA, Sayı 33402). Sayfa metni Md 51(1)(a)(b), Geçici Md 1, Md 52, Md 53 dahil okundu. Ekler (Ek-3, Ek-5) görsel PDF, bu çekimde okunmadı. sha256 bu yöntem için İLK TABANdır.",
+      "bayt": 181474,
+      "sha256_ilk12": "652ed355e003",
+      "sha256_metin_ilk12": "cb5bc6323476",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "b) 3/3/2009 tarihli ve 27158 sayılı Resmî Gazete’de yayımlanan Makina Emniyeti Yönetmeliği (2006/42/AT).",
+      "alinti_dogrulandi": true
     }
   ]
 }
