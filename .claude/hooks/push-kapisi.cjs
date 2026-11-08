@@ -94,6 +94,13 @@ function heredocGovdesiniAyikla(komut) {
   return satirlar[0]
 }
 
+/** `\` + LF satır devamı mı? Evetse silinecek karakter sayısını (2), değilse 0 döner. `\` + CR + LF devam DEĞİLDİR (bash CR'yi kaçırır, LF komutu bitirir): birleştirmek bash'ten sapmak olur. */
+function satirDevami(komut, i) {
+  if (komut[i] !== '\\') return 0
+  if (komut[i + 1] === '\n') return 2
+  return 0
+}
+
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut, yorumAtla = true) {
   const parcalar = []
@@ -116,6 +123,8 @@ function parcala(komut, yorumAtla = true) {
     if (tirnak) {
       if (c === tirnak) tirnak = null
       // Çift tırnak içinde ters eğik çizgi yalnız $ ` " \ önünde kaçıştır (bash gibi); "D:\depolar\..." yolu bozulmaz.
+      // ARC-278: ters eğik çizgi + satır sonu çift tırnak içinde de satır devamıdır (ikisi birlikte silinir).
+      else if (c === '\\' && tirnak === '"' && satirDevami(komut, i)) i += satirDevami(komut, i) - 1
       else if (c === '\\' && tirnak === '"' && i + 1 < komut.length && '$`"\\'.includes(komut[i + 1])) jeton += komut[++i]
       else jeton += c
       continue
@@ -123,6 +132,9 @@ function parcala(komut, yorumAtla = true) {
     if (c === "'" || c === '"') {
       tirnak = c
       jetonVar = true
+    } else if (c === '\\' && satirDevami(komut, i)) {
+      // ARC-278 (denetçi bulgusu): `git \⏎push origin master` ve `mas\⏎ter` bash'te satır devamıdır; eskiden `\n` jetona giriyor, push tanınmıyordu.
+      i += satirDevami(komut, i) - 1
     } else if (c === '\\' && i + 1 < komut.length) {
       jeton += komut[++i]
       jetonVar = true
@@ -204,11 +216,13 @@ function degerlendir(komut, o) {
   // `cd` argümansız ya da `cd -` ise klasör değişmedi sayılır.
   let cwd = o.cwd
   // Tek tırnak dışında komut yerine koyma var mı ($(…) ya da ters tırnak): alt komut/komut adı gizlenebilir.
-  const genisletme = /\$\(|`/.test(String(komut || '').replace(/'[^']*'/g, ''))
+  // Ham metin regex'leri satır devamı silinmiş metinde koşar (`$\<LF>(echo push)`, `pu\<LF>sh`: bash birleştirir; ARC-278 denetçi bulgusu). Tek tırnak içi literal kalır.
+  const devamsiz = String(komut || '').replace(/'[^']*'|\\\n/g, (m) => (m === '\\\n' ? '' : m))
+  const genisletme = /\$\(|`/.test(devamsiz.replace(/'[^']*'/g, ''))
   for (const t of parcalar) {
     // Komut adı genişletmeyle belirleniyorsa (`$(echo git) push ...`, `$G push ...`) ve komutta push geçiyorsa fail-closed.
     const ilkAd = asilKomut(t)
-    if (ilkAd >= 0 && /[$`]/.test(t[ilkAd]) && /\bpush\b/.test(String(komut || ''))) return 'komut adı genişletmeyle belirleniyor ($…) ve komutta push geçiyor: git push gizlenebilir; komutu açık yaz'
+    if (ilkAd >= 0 && /[$`]/.test(t[ilkAd]) && /\bpush\b/.test(devamsiz)) return 'komut adı genişletmeyle belirleniyor ($…) ve komutta push geçiyor: git push gizlenebilir; komutu açık yaz'
     // xargs ve env -S: argümanlar statik görülemez → git ve push birlikte geçiyorsa fail-closed
     const tGitPush = t.some(gitGecer) && t.some((x) => x.includes('push'))
     if (tGitPush && t.some((x) => komutAdi(x) === 'xargs')) return 'xargs ile git push: argümanlar önceden bilinemez; push\'u doğrudan yaz'
