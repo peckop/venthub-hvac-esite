@@ -121,6 +121,10 @@ function ansiCTirnak(komut, i) {
     if (k in TEK) {
       s += TEK[k]
       j += 2
+    } else if (k === 'c' && j + 2 < komut.length && komut[j + 2] !== "'") {
+      // \cX = denetim karakteri (X & 0x1f, \c? = 0x7f); `\c@` NUL'dur ve bash orada keser (denetçi 2. bulgu).
+      s += komut[j + 2] === '?' ? '\x7f' : String.fromCharCode(komut.charCodeAt(j + 2) & 0x1f)
+      j += 3
     } else if ((m = (k === "x" && /^[0-9a-fA-F]{1,2}/.exec(sonra)) || (k === "u" && /^[0-9a-fA-F]{1,4}/.exec(sonra)) || (k === "U" && /^[0-9a-fA-F]{1,8}/.exec(sonra)))) {
       s += String.fromCodePoint(Math.min(parseInt(m[0], 16), 0x10ffff))
       j += 2 + m[0].length
