@@ -245,7 +245,7 @@ async function olcumKaynagi(sorgu, baglar, simdiMs) {
   const defterler = await baglar.olcumDefterleri()
   const bulgular = []
   for (const d of defterler) {
-    const baslik = String(d.metin || '').split('\n').slice(0, 8).join(' ')
+    const baslik = `${String(d.metin || '').split('\n').slice(0, 8).join(' ')} ${String(d.basliklar || '')}`
     const e = eslestir(sorgu, `${d.yol} ${baslik}`)
     if (!e) continue
     const tarih = olcumTarihi(d)
@@ -481,7 +481,8 @@ function gercekBaglar({ repo = REPO, ortam = process.env } = {}) {
     // hiçbir kaynak okunamazsa fırlatır → "ÖLÇÜLEMEDİ").
     olcumDefterleri: async () => {
       const hafiza = ortam.HAFIZA_DIZINI || path.join(os.homedir(), '.claude', 'projects', 'c--Users-alize-venthub-hvac', 'memory')
-      const dizinler = [path.join(repo, 'docs', 'audits'), path.join(hafiza, 'olcum')]
+      // ARC-275 (8 Kasım, KTL-84 olayı): depodaki docs/olcum defterleri de taranır; eskiden yalnız docs/audits ve hafıza olcum/ vardı.
+      const dizinler = [path.join(repo, 'docs', 'audits'), path.join(repo, 'docs', 'olcum'), path.join(hafiza, 'olcum')]
       const tekler = []
       try {
         tekler.push(path.join(path.dirname(anaKok()), 'venthub-pdf-ingestor', 'kaynak-dizini', 'katalog-envanteri.md'))
@@ -502,15 +503,25 @@ function gercekBaglar({ repo = REPO, ortam = process.env } = {}) {
       if (!okunanDizin && !dosyalar.length) throw new Error('ölçüm defteri dizinleri okunamadı')
       return dosyalar.map((tam) => {
         let metin = ''
+        let basliklar = ''
         let mtimeMs = 0
         try {
-          metin = fs.readFileSync(tam, 'utf8').slice(0, 4000)
+          const tamMetin = fs.readFileSync(tam, 'utf8')
+          metin = tamMetin.slice(0, 4000)
+          // ARC-275: bölüm başlıkları ("## Ölçüm 2026-11-04 ...") dosyanın ilk satırlarında değil ortada durur; eşleşmeye girsin.
+          basliklar = tamMetin
+            .split(/\r?\n/)
+            .filter((l) => /^#{1,4}\s/.test(l))
+            .slice(0, 80)
+            .join(' ')
+          // docs/olcum defterleri küçük ve derlenmiş (konu tablosu satırları bulguyu taşır: "Eksik 8", "1157/1165"); başlık yetmez, GÖVDESİ de eşleşir.
+          if (icindeMi(tam, path.join(repo, 'docs', 'olcum'))) basliklar += ' ' + tamMetin.slice(0, 60000)
           mtimeMs = fs.statSync(tam).mtimeMs
         } catch {
           /* okunamayan dosya boş sayılır */
         }
         const goreli = icindeMi(tam, repo) ? path.relative(repo, tam).replace(/\\/g, '/') : path.basename(path.dirname(tam)) + '/' + path.basename(tam)
-        return { yol: goreli, metin, mtimeMs }
+        return { yol: goreli, metin, basliklar, mtimeMs }
       })
     },
     daemonCanli: () => daemonCanliMi(anaKok()),
