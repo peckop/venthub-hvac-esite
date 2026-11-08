@@ -11,6 +11,23 @@
       "alinti": "CEN EN ISO 9614-2 or EN ISO 3744 or EN ISO 3746 or EN ISO 3743-1 or EN ISO 3741 or ISO 13347 or EN ISO 9614-1 or EN ISO 3745 or EN ISO 3743-2",
       "alinti_dogrulandi": true,
       "not": "Alt ajan ham metinden grep ile doğruladı."
+    },
+    {
+      "url": "http://publications.europa.eu/resource/oj/JOC_2016_416_R_0006",
+      "son_url": "http://publications.europa.eu/resource/cellar/35ac48f6-a7d3-11e6-aab7-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-09",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi (OJ C 416, 11.11.2016), Node fetch, Accept application/xhtml+xml, Accept-Language eng; yeniden doğrulama 9 Kasım 2026",
+      "durum_satiri": "Resmî Gazete C serisi bildirimi; sha256 bu belge için İLK TABANdır.",
+      "bayt": 75095,
+      "sha256_ilk12": "49b33ecd064b",
+      "sha256_metin_ilk12": "3719faceb3b3",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "CEN EN ISO 9614-2 or EN ISO 3744 or EN ISO 3746 or EN ISO 3743-1 or EN ISO 3741 or ISO 13347 or EN ISO 9614-1 or EN ISO 3745 or EN ISO 3743-2",
+      "alinti_dogrulandi": true
     }
   ]
 }

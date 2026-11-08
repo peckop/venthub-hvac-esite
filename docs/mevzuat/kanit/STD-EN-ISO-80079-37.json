@@ -13,6 +13,23 @@
       "durum_satiri": "Aynı resmi Komisyon listesi; withdrawal tarihi yok, hâlâ yürürlükte uyumlaştırılmış standart.",
       "alinti": "2014/34/EU - CEN EN ISO 80079-37:2016 ... Explosive atmospheres - Part 37: Non-electrical equipment for explosive atmospheres - Non-electrical type of protection constructional safety ''c'', control of ignition sources ''b'', liquid immersion ''k'' (ISO 80079-37:2016) ... 12.08.2016 OJ C 293",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://single-market-economy.ec.europa.eu/document/download/49c372bc-1a5c-44aa-a1b2-22a14bb24e80_en?filename=Summary%20List_ATEX%2017.9.2025.pdf",
+      "son_url": "https://single-market-economy.ec.europa.eu/document/download/49c372bc-1a5c-44aa-a1b2-22a14bb24e80_en?filename=Summary%20List_ATEX%2017.9.2025.pdf",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-09",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "yontem": "Node fetch (ham-cekim.cjs, User-Agent VentHub-mevzuat/1.0), PDF pdftotext -layout ile metne çevrildi; Komisyon ATEX sayfasında \"Summary list as pdf file\" bağlantısı hâlâ bu dosya",
+      "durum_satiri": "Komisyon özet listesi (PDF, \"Generated 4 September 2026\"); EN ISO 80079-37:2016 listede; yürürlük 12.08.2016, OJ C 293; geri çekilme tarihi yok. Liste hukuki etki doğurmaz, referanslar Resmî Gazete kararlarıyla (2022/1668 ve değişiklikleri) yayımlanır.",
+      "bayt": 125948,
+      "sha256_ilk12": "762fa95b6983",
+      "sha256_metin_ilk12": "6ac4718c0113",
+      "sha256_normalizasyon": "ham: PDF baytı; metin: pdftotext -layout çıktısı, boşluk tekil, NFC, trim",
+      "alinti": "EN ISO 80079-37:2016 ... 12.08.2016 OJ C 293 ... (ISO 80079-37:2016)",
+      "alinti_dogrulandi": true
     }
   ]
 }
