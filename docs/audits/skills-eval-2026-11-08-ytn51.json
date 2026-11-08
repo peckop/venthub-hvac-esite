@@ -1,0 +1,143 @@
+{
+  "damga": "2026-11-08T19:44:50.528Z",
+  "etiket": "ytn51",
+  "model": "claude-haiku-4-5-20251001",
+  "arkaUc": "cli",
+  "kuru": false,
+  "ornek": null,
+  "agaclar": [
+    {
+      "agac": "../../../../AppData/Local/Temp/claude/8850c58ef9401835/6ce115ff-e92b-4103-b78b-4d390c17f05a/scratchpad/dar-agac",
+      "skill": 75,
+      "sinavli": 2,
+      "sinavsiz": [
+        "agy-orchestrate",
+        "api-design",
+        "bug-hunter",
+        "calisma-kopyasi-sil",
+        "ce-uygunluk-dosyasi",
+        "chimera",
+        "code-review",
+        "codebase-navigation",
+        "codegraph",
+        "create-migration",
+        "data-governance",
+        "database-migrations",
+        "debugging",
+        "diff-review",
+        "dizin-takip",
+        "fallow",
+        "find-skills",
+        "geo-fundamentals",
+        "git-commit",
+        "git-flow",
+        "graphify",
+        "i18n-conventions",
+        "incremental-implementation",
+        "investigate",
+        "llm-council",
+        "maestro",
+        "mnemosyne",
+        "multi-agent",
+        "mutasyon-testi",
+        "node-modern",
+        "notebook-navigator",
+        "notebooklm-sync",
+        "observability",
+        "office-hours",
+        "orion-cli",
+        "payments-webhooks",
+        "plan-challenger",
+        "prd-complexity-audit",
+        "prompt-engineering",
+        "qa",
+        "react-modern",
+        "refactor-planner",
+        "research-web",
+        "sdd",
+        "security-scanner",
+        "seo-olcum",
+        "skills-creator",
+        "supabase",
+        "supabase-security",
+        "task-observer",
+        "tech-stack",
+        "testing",
+        "threejs-webgl-performance",
+        "to-issues",
+        "to-prd",
+        "typescript-strict",
+        "typography",
+        "ui-ux-pro-max",
+        "venthub-20-eksen-denetimi",
+        "venthub-architecture",
+        "venthub-auditor",
+        "venthub-enterprise-audit",
+        "venthub-global-rontgen",
+        "venthub-tasarim-dili",
+        "vercel-composition-patterns",
+        "vercel-react-best-practices",
+        "verify-before-done",
+        "video-kaynak",
+        "web-design-guidelines",
+        "web-performance",
+        "web-platform-baseline",
+        "wrongstack-kanban",
+        "wrongstack-mailbox-mcp"
+      ]
+    }
+  ],
+  "istek": 2,
+  "sonuclar": [
+    {
+      "ad": "rehber-yayin",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": "../../../../AppData/Local/Temp/claude/8850c58ef9401835/6ce115ff-e92b-4103-b78b-4d390c17f05a/scratchpad/dar-agac"
+    },
+    {
+      "ad": "write-seo-geo-content",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": "../../../../AppData/Local/Temp/claude/8850c58ef9401835/6ce115ff-e92b-4103-b78b-4d390c17f05a/scratchpad/dar-agac"
+    }
+  ],
+  "ozet": {
+    "toplam": 2,
+    "gecti": 2,
+    "dustu": 0,
+    "olcemedi": 0,
+    "cikis": 0
+  },
+  "sureSaniye": 70,
+  "maliyet": {
+    "girisJetonu": null,
+    "cikisJetonu": null,
+    "usd": null,
+    "not": "CLI arka ucu jeton kullanimini bildirmez -> OLCULEMEDI (abonelikten gider)"
+  }
+}
