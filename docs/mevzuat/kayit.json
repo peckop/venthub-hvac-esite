@@ -3485,7 +3485,7 @@
       ],
       "karsilik": [],
       "iliski_notlari": [
-        "Değişiklik RG 31.05.2018/30437 (Md.5, Ek-3); Md.13/Ek-5/Ek-8 değişmedi (ajan ölçümü, değişiklik metni MEVZUAT tarafından ayrıca okunmadı)."
+        "Değişiklik: RG 31.05.2018/30437 (kayıt TR-YON-GURULTU-BINA-2018-DEG, ham metin 8 Kasım 2026 okundu): Md 5(5)(6), Md 11(3), Ek-3 Tablo 3.2/3.4/3.5, Ek-4, Geçici Md 1. Md 13, Ek-5 ve Ek-8 değişmedi (değişiklik metni birebir okundu)."
       ],
       "durum": "yururlukte",
       "etkilenen_aileler": [
@@ -3553,6 +3553,45 @@
       "eksen": "G",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-GURULTU-BINA-2017.json",
       "resmi_kaynak_sayisi": 5
+    },
+    {
+      "kimlik": "TR-YON-GURULTU-BINA-2018-DEG",
+      "ad": "Binaların Gürültüye Karşı Korunması Hakkında Yönetmelikte Değişiklik Yapılmasına Dair Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "ses",
+        "yapi-urunleri"
+      ],
+      "kapsam": "Binaların Gürültüye Karşı Korunması Hakkında Yönetmeliği (RG 31.05.2017/30082) değiştirir: Md 5 beşinci ve altıncı fıkra (mimari akustik raporu ve akustik proje zorunluluğu kapsamı, akustik performans belgesi); Md 11 üçüncü fıkra ile Ek-3 Tablo 3.2 ve 3.4 dipnot 3'te \"10 dB\" değeri \"14 dB\"; Ek-3 Tablo 3.5 ve Ek-4 yenilenir (ekler görsel, okunmadı); Geçici Md 1 eklenir (bir yıl süreyle akustik proje yerine mimari akustik rapor). Md 13, Ek-5 ve Ek-8 bu değişiklikte yer almaz.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2018-05-31 (RG Sayı 30437)",
+        "yururluk": "2018-05-31 (Md 6: yayımı tarihinde)",
+        "asamalar": [
+          {
+            "tarih": "2018-05-31",
+            "ne": "Yürürlüğe girer; Geçici Md 1 bu tarihten itibaren bir yıl süreyle geçerli (süre sonu metinden türetildi, ayrıca doğrulanmadı)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "TR-YON-GURULTU-BINA-2017'yi değiştirir. Servis ekipmanı gürültüsü hükümleri (Md 13, Ek-5 Tablo 5.1/5.2, Ek-8) bu değişiklikte yok; ürün ailelerine doğrudan etkisi görülmedi."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-GURULTU-BINA-2018-DEG.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Ekler (Tablo 3.5, Ek-4) görsel; okunmadı.",
+        "2018 sonrası başka değişiklik olup olmadığı mevzuat.gov.tr değişiklik listesinden ayrıca taranmadı."
+      ],
+      "son_kontrol": "2026-11-08",
+      "eksen": "G"
     },
     {
       "kimlik": "TR-YON-CEVRE-GURULTU-2010",
