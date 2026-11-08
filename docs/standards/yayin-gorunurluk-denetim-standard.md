@@ -189,6 +189,16 @@ Toplam isabet 27/32 (%84). Karar çelişkisi olan beş öneri ajanın rehber cet
 
 Kurallar: rakip adı ve rakip sayfa adresi depoya girmez (kart ve depo dışı arşiv); arama ve sorgu verisi depoya yazılmaz (P6); ölçülmeyen "ölçülmedi" yazılır; Recep'in sözü depoya tırnakla yazılmaz.
 
+### Y2.5 Yayın öncesi sektör sayfası kontrolü (SEO-94, 2026-11-08, OPS-245 kararı)
+
+SEO-94 ölçümünde bir rakip, sektör ya da uygulama adı taşıyan doğal sorguların 21'inin 9'unda Bing ilk 10'daydı (5'inde 1.), VentHub 0/21 ve sitede sektör sayfası yoktu; genel ürün-türü sorgularında ise aynı rakip 18'in 3'ünde ilk 10'daydı. Sektör sorgusu ürün türü sorgusundan ayrı bir niyettir. Bu yüzden her rehber ya da sayfa taslağı R10 B6a okumasına geldiğinde GEO-SEO şu üç satırı karta yazar:
+
+1. **Sorgu sınıfı.** Taslağın hedef sorgusu ürün türü mü ("radyal fan"), bilgi mi ("nedir") yoksa sektör/uygulama mı ("boyahane havalandırma fanı")? Ölçmeden sınıf yazılmaz; ölçülemeyen "ölçülmedi".
+2. **Sitede karşılık.** Sektör/uygulama sorgusu için sitemapte ve site içinde sektör sayfası var mı, hangi adres? Yoksa "sektör sayfası yok" yazılır; bu bir yayın engeli değildir, açık bir konu boşluğu kaydıdır. Sayfanın ürün/kategori karşılığı (hangi kategori, hangi marka) ve sektör kaynak paketinin (mevzuat, standart) var olup olmadığı yanına yazılır.
+3. **Talep ve sıra.** Sektör sorgusunun talebi (Google arama önerisi sayısı, Search Console gösterimi; Trends yoksa "ölçülmedi") ve ilk 10'daki sayfa türleri Y2.4 madde 4a-e kurallarıyla ölçülür. Yeni sektör sayfası kararı (açılsın mı, hangi sırayla) BLOG'un rehber cetveline ve OPS'a aittir; GEO-SEO yalnız ölçer ve sıralar.
+
+Kural: sektör sayfası talebi tek bir rakibin varlığıyla gerekçelendirilmez; gerekçe ürün karşılığı, kaynak paketi ve ölçülen talebin birlikte var olmasıdır.
+
 ## Y3 — Kabul (yayın günü ve sonrası)
 
 - Eski adres: `AYNI` ya da `TEK-308` (dil öneki olmayan eski adreste tek 307 meşru, plan §4); **ZINCIR 0 ·
