@@ -287,9 +287,10 @@
       ],
       "iliski_notlari": [
         "EU-2013/666 (kısmi)",
-        "EU-2016/2282 (kısmi)"
+        "EU-2016/2282 (kısmi)",
+        "8 Kasım 2026: durum kaldirildi → gecis-doneminde. Genel hükümler 24 Temmuz 2026'da yürürlükten kalktı, ancak Ek I-III diğer ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır (2025/2481 Md 1(4) ham metninden doğrulandı); \"kaldirildi\" bu tarihleri örtüyordu ve M5'te kontrolsüz bırakıyordu. Yerine gelen: AB-2024/1834."
       ],
-      "durum": "kaldirildi",
+      "durum": "gecis-doneminde",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-327_2011.json",
       "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
@@ -300,7 +301,8 @@
         "8 Kasım 2026: 2027-07-24 ve 2037-07-24 tarihleri (AB) 2025/2481 Md 1(4) ham metninden doğrulandı."
       ],
       "son_kontrol": "2026-11-08",
-      "eksen": "B"
+      "eksen": "B",
+      "yerine_gelen": "AB-2024/1834"
     },
     {
       "kimlik": "AB-2024/1834",
