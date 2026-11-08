@@ -230,6 +230,57 @@ describe('INV-PUSH-KAPISI-1 — ters eğik çizgi + satır sonu (ARC-278)', () =
   })
 })
 
+describe('INV-PUSH-KAPISI-1 — ANSI-C tırnağı ve değişkenle gizlenen alt komut (ARC-283)', () => {
+  it.each([
+    "echo $'\\'' ; git push origin master",
+    "echo $'a\\'b' && git push origin master",
+    "git push origin $'master'",
+    "git push origin $'mas\\x74er'",
+    "git push origin $'\\155aster'",
+    "git $'push' origin master",
+    "git $'\\x70ush' origin master",
+    "git push origin feat-x:$'ma\\u0073ter'",
+    // NUL: bash $'..' içinde NUL'dan sonrasını keser, hedef master kalır
+    "git push origin $'master\\x00junk'",
+    "git push origin $'master\\0junk'",
+    "git push origin $'master\\000zz'",
+    "git push origin $'master\\u0000x'",
+    "git push origin $'master\\U00000000x'",
+    "git push origin $'master\\c@junk'",
+    "git push origin $'master\\c@'",
+    // \c + \ ya da ': bash lexer'ı çifti atlar, tırnak durumu kaymamalı
+    "echo $'\\c\\'' ; git push origin master",
+    "echo $'\\c\\\\' ; git push origin master",  ])('ANSI-C tırnağı tırnak durumunu kaydırmaz, içerik çözülür; reddedilir (%j)', (k) => {
+    expect(ret(k)).not.toBeNull()
+  })
+
+  it.each([
+    'git ${x} push origin master',
+    'git $X push origin master',
+    'x=push; git ${x} origin master; git $x push',
+    'git "$x" push origin feat-x',
+    'git $"push" origin master',
+    'git -C . ${x} push origin feat-x',
+  ])('git alt komutu değişkenle gizlenmişse ve push görünüyorsa reddedilir (%j)', (k) => {
+    expect(ret(k)).not.toBeNull()
+  })
+
+  it('MEŞRU kullanımlar geçer: ANSI-C tırnaklı metin, değişken push olmayan git komutunda', () => {
+    expect(ret("echo $'a\\tb' && git push origin feat-x")).toBeNull()
+    expect(ret("git commit -m $'satir1\\nsatir2'")).toBeNull()
+    expect(ret("git push origin $'feat-x'")).toBeNull()
+    expect(ret('git log $REF --oneline')).toBeNull()
+    expect(ret('git status && echo ${x}')).toBeNull()
+  })
+
+  it('ayrıştırıcı: ANSI-C içeriği tek jeton olur ve kaçışlar çözülür; kapanışsız tırnak komutu yutmaz-çökmez', () => {
+    expect(motor.parcala("echo $'\\'' ; git push origin feat-x")).toEqual([['echo', "'"], ['git', 'push', 'origin', 'feat-x']])
+    expect(motor.parcala("echo $'a\\x41\\101\\u0042\\n'")).toEqual([['echo', 'aAAB\n']])
+    expect(() => motor.parcala("echo $'acik \\")).not.toThrow()
+    expect(() => motor.parcala("git push origin $'\\U7fffffff'")).not.toThrow()
+  })
+})
+
 describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () => {
   it.each([
     'git config core.hooksPath /tmp/bos',
