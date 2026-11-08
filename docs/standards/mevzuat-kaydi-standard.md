@@ -95,7 +95,10 @@ yeniden tanımlamaz, uygular:
 3. **Ham kanıt (R2.3):** `curl` ile ham çekim; kayıtta ilk ve son adres, HTTP durumu, yönlendirme
    zinciri, sayfanın durum satırı (EUR-Lex'te *"In force"* / *"No longer in force"*), etiketi soyulmuş
    metnin sha256'sı, birebir alıntı, erişim tarihi. Özetleyici araç (WebFetch) keşif içindir,
-   kanıt değildir.
+   kanıt değildir. ⚠TR kaynakları (resmigazete.gov.tr, mevzuat.gov.tr) `curl/*` kullanıcı
+   etmenini TLS sonrası sessizce düşürür (0 bayt, zaman aşımı); `curl -A "VentHub-mevzuat/1.0"`
+   ya da Node `fetch` ile 200 gelir (ölçüldü 2026-11-08, ALT-174). Kullanıcı etmeni kanıta
+   `yontem` alanında yazılır; tarayıcı bölmesi artık zorunlu değil, yedek yoldur.
 4. **robots.txt ve kullanım şartı önce okunur.** Otomatik okuma yasaksa o kaynak elle okunur ve
    kanıt dosyasına `robots: yasak — elle okundu` yazılır. (Niçin: 2026-09-24'te Google Trends'e
    bu kontrol yapılmadan otomatik erişildi.)
