@@ -37,6 +37,23 @@
       "durum_satiri": "Konsolide metin (02024R1834-20251228), ▼M1 = 32025R2481 ile değişen bölüm işareti",
       "alinti": "▼M1 1.   Regulation (EU) No 327/2011 is repealed with effect from 24 July 2026. However, Annexes I, II and III to that Regulation shall continue to apply until 24 July 2027 to fans integrated into other products, and until 24 July 2037 to spare part fans ... ▼M1 Article 10 ... It shall apply from 24 July 2026. However, Article 9(2) shall apply from 24 July 2024.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32024R1834R%2805%29",
+      "son_url": "http://publications.europa.eu/resource/cellar/b3481cb5-d339-11f1-9458-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (curl/Accept application/xhtml+xml, Accept-Language eng); CELEX 32024R1834R(05) adresi parantezleri %28 %29 kodlanınca çalışır",
+      "durum_satiri": "Düzeltme (corrigendum) metni, OJ L 2026/90925, 29.10.2026. sha256 bu belge için İLK TABANdır.",
+      "bayt": 3442,
+      "sha256_ilk12": "7b69933b66a7",
+      "sha256_metin_ilk12": "5b7d8dd722c7",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "On page 23, in Annex III, point 6.1, last paragraph",
+      "alinti_dogrulandi": true
     }
   ]
 }

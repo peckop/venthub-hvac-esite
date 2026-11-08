@@ -350,11 +350,12 @@
       "iliski_notlari": [
         "EU-2013/666 (Md.8, zımni kısmi ilga)",
         "EU-2016/2282 (Md.10, zımni kısmi ilga)",
-        "EU-2025/2481 (2025-12-02 kabul, 2025-12-28 yürürlük; Md.6 silindi, Md.9(1) ve Md.10 değiştirildi, Ek I/II/III/IV değişti)"
+        "EU-2025/2481 (2025-12-02 kabul, 2025-12-28 yürürlük; Md.6 silindi, Md.9(1) ve Md.10 değiştirildi, Ek I/II/III/IV değişti)",
+        "Düzeltme R(05) (OJ L 2026/90925, 29.10.2026): Ek III nokta 6.1 son paragrafta yazım düzeltmesi, \"were\" → \"where\" ve varsayılan hava yoğunluğu \"1 200 kg/m3\" → \"1,2 kg/m3\". Bağlayıcı sayısal içerik değişimi: yoğunluk değeri ondalık yazımla düzeltildi."
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_1834.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "vortice-lineo",
@@ -616,12 +617,12 @@
         "'Duman Egzoz Fanları' (vortice-vort-heatmaster-slimroof-smoke) ailesindeki her SKU'nun gerçekten 300°C/1 saat+ F-sınıfı sertifikaya sahip olup olmadığı teyit edilmeli; sertifikasız/düşük sınıf varyantlar istisna kapsamına girmeyebilir",
         "'Şömine ve Baca Fanları' (vortice-vort-industrial-ventilation-roof) için taşınan gazın çalışma sıcaklığının 100°C'yi aşıp aşmadığı ürün bazında kontrol edilmeli (aşıyorsa Md.1.3(e) istisnası)",
         "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında",
-        "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi.",
-        "7 Kasım 2026 (MVZ-5): düzeltme R(05) 2026-10-29 ayrı kaynak olarak okunamadı; düzeltme içeriği hâlâ okunmadı.",
+        "6 Kasım 2026 ölçümü: pencere içinde düzeltme R(05) 2026-10-29 var, içeriği okunmadı; bu yüzden son_kontrol yenilenmedi. → 8 Kasım 2026: R(05) okundu ve iliski_notlari'na işlendi (Ek III 6.1 yoğunluk yazımı).",
+        "7 Kasım 2026 (MVZ-5): düzeltme R(05) 2026-10-29 ayrı kaynak olarak okunamadı; düzeltme içeriği hâlâ okunmadı. → 8 Kasım 2026: R(05) okundu ve iliski_notlari'na işlendi (Ek III 6.1 yoğunluk yazımı).",
         "8 Kasım 2026: TR SGM-2026/2 metni \"(AB) 2025/2481 sayılı Komisyon Tüzüğü\" ile yapılan değişikliği esas aldığını yazıyor; 2025/2481 kayıtta yok, Yayın Ofisi'nden okunmalı.",
         "8 Kasım 2026: (AB) 2025/2481 ham çekildi ve kayda alındı (AB-2025/2481); Md 9(1) ve Md 10 değişikliği, 2027 ve 2037 tarihleri tüzük metninden doğrulandı. Ek IV ayrıntısı okunmadı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "B"
     },
     {
