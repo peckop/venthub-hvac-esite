@@ -71,10 +71,13 @@ function kanbanNo(body) {
 function mesaj(pv, s) {
   const no = pv && pv.number ? '#' + pv.number : '#?'
   const kanban = kanbanNo(pv && pv.body)
-  const ek = kanban ? ' (Kanban: ' + kanban + ')' : ''
+  const sha8 = pv && pv.headRefOid ? String(pv.headRefOid).slice(0, 8) : '?'
+  const ek = (kanban ? ' (Kanban: ' + kanban + ')' : '') + ' sha ' + sha8
   let metin
-  if (s.durum === 'yesil') {
-    metin = `PR ${no}${ek} CI YEŞİL, mergeState=${s.mergeState || '?'}. Sırada: bağımsız denetçi hükmü varsa ritüelle birleştir, yoksa denetçiyi aç. OPS'a tek satır SendMessage yaz.`
+  if (s.durum === 'eski') {
+    metin = `PR ${no}${ek} CI SONUCU ESKİ COMMIT'E AİT: rollup yeşil ama bu sha'nın kendi check-runs'ı bitmedi ya da yok. Birleştirme; gh api repos/${REPO}/commits/${sha8}/check-runs ile baş sha'yı kendin doğrula. OPS'a tek satır SendMessage yaz.`
+  } else if (s.durum === 'yesil') {
+    metin = `PR ${no}${ek} CI YEŞİL (baş sha check-runs ile doğrulandı), mergeState=${s.mergeState || '?'}. Sırada: bağımsız denetçi hükmü varsa ritüelle birleştir, yoksa denetçiyi aç. OPS'a tek satır SendMessage yaz.`
   } else if (s.durum === 'kirmizi') {
     metin = `PR ${no}${ek} CI KIRMIZI: ${s.basarisiz.slice(0, 4).join(', ')}${s.basarisiz.length > 4 ? ' …' : ''}. gh run view --log-failed ile sebebi oku, düzelt (ilgisiz kırmızıda en çok 10 dk, sonra OPS'a yaz). OPS'a tek satır SendMessage yaz.`
   } else if (s.durum === 'birlesti') {
@@ -129,6 +132,30 @@ function tetik(komut, cikti) {
 
 function ghCalistir(args) {
   return execFileSync('gh', args, { encoding: 'utf8', timeout: GH_ZAMAN_ASIMI_MS, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] })
+}
+
+/**
+ * Bir commit'in kapılarını REST ile (check-runs, o sha'ya bağlı) sınıflar. SAF karar kısmı: { durum: 'yesil'|'kirmizi'|'bekliyor', basarisiz }.
+ * Kapı yok ya da tamamlanmamış kapı varsa 'bekliyor' (boş yeşil değildir). Rollup başka commit'in sonucunu taşıyabilir; bu sha'ya bağlıdır.
+ */
+function restSiniflandir(veri) {
+  const kosular = veri && Array.isArray(veri.check_runs) ? veri.check_runs : null
+  if (!kosular) return null
+  const basarisiz = kosular.filter((k) => kapiDurumu({ conclusion: k.conclusion }) === 'basarisiz').map(kapiAdi)
+  if (basarisiz.length) return { durum: 'kirmizi', basarisiz }
+  const bekleyen = kosular.filter((k) => k.status !== 'completed' || kapiDurumu({ conclusion: k.conclusion }) === 'bekliyor').length
+  if (!kosular.length || bekleyen) return { durum: 'bekliyor', basarisiz: [] }
+  return { durum: 'yesil', basarisiz: [] }
+}
+
+/** Baş sha'nın REST sonucu; okunamazsa null (fail-open: rollup'a güvenilir). `calistir` test için enjekte edilir. */
+function shaDogrula(sha, calistir = ghCalistir) {
+  if (!/^[0-9a-f]{7,40}$/i.test(String(sha || ''))) return null
+  try {
+    return restSiniflandir(JSON.parse(calistir(['api', `repos/${REPO}/commits/${sha}/check-runs?per_page=100`])))
+  } catch {
+    return null
+  }
 }
 
 /** Tek PR'ı okur; okunamazsa null (fail-open). `calistir` test için enjekte edilir. */
@@ -222,7 +249,7 @@ function kilitBirak(dizin, pr, sha) {
  * 'yenilendi' = bekleme sırasında dal yeni commit aldı (yeni itişin kendi bekleyicisi var; bu sessiz biter).
  * Enjekte edilenler (`oku`, `uyu`, `simdi`) testte bekleme süresini sıfırlar.
  */
-async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTimeout(r, ms)), simdi = Date.now, aralik = ARALIK_MS, tavan = TAVAN_MS, ilkSha, teyit = TEYIT_MS }) {
+async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTimeout(r, ms)), simdi = Date.now, aralik = ARALIK_MS, tavan = TAVAN_MS, ilkSha, teyit = TEYIT_MS, dogrula = shaDogrula }) {
   const bas = simdi()
   let sha = ilkSha || ''
   let hata = 0
@@ -244,6 +271,14 @@ async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTime
         const s2 = ikinci ? siniflandir(ikinci) : null
         if (!ikinci || s2.durum !== 'yesil' || (ikinci.headRefOid && ikinci.headRefOid !== pv.headRefOid)) {
           if (simdi() - bas >= tavan) return { sonuc: 'zaman-asimi', pv, s: null }
+          await uyu(aralik)
+          continue
+        }
+        // SHA TEYİDİ (ARC-279): rollup yeşil olsa da baş commit'in KENDİ check-runs'ı yeşil olmalı. Bekliyor/yok → sonuç eski commit'e ait olabilir.
+        const rest = ikinci.headRefOid ? dogrula(ikinci.headRefOid) : null
+        if (rest && rest.durum === 'kirmizi') return { sonuc: 'kirmizi', pv: ikinci, s: { ...s2, durum: 'kirmizi', basarisiz: rest.basarisiz } }
+        if (rest && rest.durum === 'bekliyor') {
+          if (simdi() - bas >= tavan) return { sonuc: 'eski', pv: ikinci, s: { ...s2, durum: 'eski' } }
           await uyu(aralik)
           continue
         }
@@ -317,7 +352,7 @@ async function hepsi(yaz = (x) => process.stdout.write(x + '\n'), calistir = ghC
 }
 
 module.exports = {
-  kapiDurumu, siniflandir, kanbanNo, mesaj, tetik, pushDali, prOku, dalPr, yerelDal, itisiBekle, kilitYolu, kilitAl, kilitBirak, bekle,
+  kapiDurumu, siniflandir, restSiniflandir, shaDogrula, kanbanNo, mesaj, tetik, pushDali, prOku, dalPr, yerelDal, itisiBekle, kilitYolu, kilitAl, kilitBirak, bekle,
   degisiklikler, birlestiSatiri, hepsi,
   REPO, ARALIK_MS, TAVAN_MS, TEYIT_MS, MESAJ_TAVANI,
 }
