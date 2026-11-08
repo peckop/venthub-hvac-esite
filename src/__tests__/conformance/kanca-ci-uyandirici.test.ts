@@ -175,6 +175,7 @@ describe('INV-CI-UYANDIRICI-1 · bekleyici döngü (sahte okuyucu, sıfır bekle
           },
           simdi: () => t,
           teyit: 0,
+          dogrula: () => null,
           ...ek,
         }),
     }
@@ -208,6 +209,52 @@ describe('INV-CI-UYANDIRICI-1 · bekleyici döngü (sahte okuyucu, sıfır bekle
   it('tavan dolunca zaman-asimi; okunamayan PR beş denemeden sonra okunamadi', async () => {
     expect((await kos([pr([kosuyor('ci')])], { tavan: 90_000 }).calis()).sonuc).toBe('zaman-asimi')
     expect((await kos([null]).calis()).sonuc).toBe('okunamadi')
+  })
+
+  it('⛔ ARC-279: rollup yeşil ama baş sha\'nın check-runs\'ı bekliyorsa yeşil DENMEZ; REST yeşile dönünce yeşil', async () => {
+    const veriler = [{ durum: 'bekliyor', basarisiz: [] }, { durum: 'bekliyor', basarisiz: [] }, { durum: 'yesil', basarisiz: [] }]
+    let n = 0
+    const sorulan: string[] = []
+    const r = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })], {
+      dogrula: (sha: string) => {
+        sorulan.push(sha)
+        return veriler[Math.min(n++, veriler.length - 1)]
+      },
+    }).calis()
+    expect(r.sonuc).toBe('yesil')
+    expect(sorulan).toEqual(['abcdef1234', 'abcdef1234', 'abcdef1234'])
+  })
+
+  it('⛔ ARC-279: REST sürekli bekliyorsa tavanda "eski" döner ve mesaj ESKİ COMMIT der; REST kırmızıysa kırmızı', async () => {
+    const eski = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })], { tavan: 90_000, dogrula: () => ({ durum: 'bekliyor', basarisiz: [] }) }).calis()
+    expect(eski.sonuc).toBe('eski')
+    const metin = m.mesaj(eski.pv as Pv, eski.s as Sinif)
+    expect(metin).toContain("ESKİ COMMIT'E AİT")
+    expect(metin).toContain('abcdef12')
+    const kirmizi = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })], { dogrula: () => ({ durum: 'kirmizi', basarisiz: ['test'] }) }).calis()
+    expect(kirmizi.sonuc).toBe('kirmizi')
+    expect(kirmizi.s?.basarisiz).toEqual(['test'])
+  })
+
+  it('REST okunamazsa (null) rollup\'a güvenilir (fail-open); yeşil mesajı baş sha\'yı taşır', async () => {
+    const r = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })]).calis()
+    expect(r.sonuc).toBe('yesil')
+    expect(m.mesaj(r.pv as Pv, r.s as Sinif)).toContain('sha abcdef12')
+    // yanlış beyan yok: doğrulama yapılmadıysa mesaj "doğrulandı" demez
+    expect(m.mesaj(r.pv as Pv, r.s as Sinif)).toContain('DOĞRULANAMADI')
+    expect(m.mesaj(r.pv as Pv, r.s as Sinif)).not.toContain('check-runs ile doğrulandı')
+    const d = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })], { dogrula: () => ({ durum: 'yesil', basarisiz: [] }) }).calis()
+    expect(m.mesaj(d.pv as Pv, d.s as Sinif)).toContain('check-runs ile doğrulandı')
+  })
+
+  it('restSiniflandir: boş ve tamamlanmamış kapı yeşil değildir; sha biçimi geçersizse shaDogrula çağırmaz', () => {
+    const rs = (m as unknown as { restSiniflandir: (v: unknown) => { durum: string } | null; shaDogrula: (s: string, c: () => string) => unknown })
+    expect(rs.restSiniflandir({ check_runs: [] })?.durum).toBe('bekliyor')
+    expect(rs.restSiniflandir({ check_runs: [{ name: 'a', status: 'completed', conclusion: 'success' }, { name: 'b', status: 'in_progress', conclusion: null }] })?.durum).toBe('bekliyor')
+    expect(rs.restSiniflandir({ check_runs: [{ name: 'a', status: 'completed', conclusion: 'success' }] })?.durum).toBe('yesil')
+    expect(rs.restSiniflandir({ check_runs: [{ name: 'a', status: 'completed', conclusion: 'failure' }] })?.durum).toBe('kirmizi')
+    expect(rs.restSiniflandir({})).toBeNull()
+    expect(rs.shaDogrula('../x', () => { throw new Error('çağrılmamalı') })).toBeNull()
   })
 })
 

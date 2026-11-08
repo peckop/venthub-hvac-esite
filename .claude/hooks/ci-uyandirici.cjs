@@ -57,7 +57,7 @@ async function calistir() {
   if (!modul.kilitAl(dizin, pr, sha)) return 0
   try {
     const sonuc = await modul.bekle({ pr, ilkSha: sha })
-    if (!['yesil', 'kirmizi', 'birlesti', 'kapandi'].includes(sonuc.sonuc)) return 0
+    if (!['yesil', 'kirmizi', 'birlesti', 'kapandi', 'eski'].includes(sonuc.sonuc)) return 0
     try {
       fs.writeSync(2, modul.mesaj(sonuc.pv, sonuc.s) + '\n')
     } catch {
