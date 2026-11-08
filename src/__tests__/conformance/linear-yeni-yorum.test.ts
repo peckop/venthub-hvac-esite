@@ -604,3 +604,67 @@ describe('INV-LINEAR-YORUM-10 (ARC-241): damga yolu çalışma dizininden bağı
     expect(satir).toContain('en eski 10-25 18:37Z')
   })
 })
+
+describe('INV-LINEAR-YORUM-11 (ARC-273): damga git olmadan bulunur, bayat %TEMP% damgası güvenilmez, --help damga yazmaz', () => {
+  const fs = require_('node:fs') as typeof import('node:fs')
+  const os = require_('node:os') as typeof import('node:os')
+  const path = require_('node:path') as typeof import('node:path')
+  const mm = m as unknown as {
+    ortakGitDizini: (baslangic?: string) => string | null
+    esikHesapla: (ham: unknown, yedek: boolean, simdiMs?: number) => string
+  }
+  const SIMDI = Date.parse('2026-11-08T06:55:00.000Z')
+
+  it('OLAY (8 Kasım): yedek konumdaki 10-25 damgası eşik olmaz, en çok 24 saat geriye gidilir', () => {
+    expect(mm.esikHesapla({ damga: '2026-10-25T15:45:33.551Z' }, true, SIMDI)).toBe('2026-11-07T06:55:00.000Z')
+    // asıl konumdaki damga (11-06) olduğu gibi kalır; yedekte bile 24 saatten yeni damga korunur
+    expect(mm.esikHesapla({ damga: '2026-11-06T15:17:57.777Z' }, false, SIMDI)).toBe('2026-11-06T15:17:57.777Z')
+    expect(mm.esikHesapla({ damga: '2026-11-08T02:00:00.000Z' }, true, SIMDI)).toBe('2026-11-08T02:00:00.000Z')
+  })
+
+  it('damga yok ya da bozuksa 24 saat öncesi', () => {
+    expect(mm.esikHesapla(null, false, SIMDI)).toBe('2026-11-07T06:55:00.000Z')
+    expect(mm.esikHesapla({ damga: 'saçma' }, false, SIMDI)).toBe('2026-11-07T06:55:00.000Z')
+  })
+
+  it('ortakGitDizini git çalıştırmadan, worktree .git dosyasından ana .git dizinini bulur', () => {
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'arc273-'))
+    try {
+      const ana = path.join(kok, 'ana')
+      fs.mkdirSync(path.join(ana, '.git', 'worktrees', 'wt'), { recursive: true })
+      fs.mkdirSync(path.join(ana, 'scripts', 'board'), { recursive: true })
+      const wt = path.join(kok, 'wt', 'scripts', 'board')
+      fs.mkdirSync(wt, { recursive: true })
+      fs.writeFileSync(path.join(kok, 'wt', '.git'), `gitdir: ${path.join(ana, '.git', 'worktrees', 'wt')}\n`)
+      expect(mm.ortakGitDizini(path.join(ana, 'scripts', 'board'))).toBe(path.join(ana, '.git'))
+      expect(mm.ortakGitDizini(wt)).toBe(path.join(ana, '.git'))
+    } finally {
+      fs.rmSync(kok, { recursive: true, force: true })
+    }
+  })
+
+  it('linear-okundu: --help ve bilinmeyen bayrak damgayı YAZMAZ, bayraksız çağrı yazar', () => {
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'arc273-okundu-'))
+    try {
+      const klasor = path.join(kok, 'scripts', 'board')
+      fs.mkdirSync(klasor, { recursive: true })
+      fs.mkdirSync(path.join(kok, '.git'))
+      for (const ad of ['linear-okundu.cjs', 'linear-yeni-yorum.cjs']) {
+        fs.copyFileSync(path.resolve(BETIK, '..', ad), path.join(klasor, ad))
+      }
+      const damga = path.join(kok, '.git', 'venthub-linear-son-okuma.json')
+      const kos = (...arg: string[]) => spawnSync(process.execPath, [path.join(klasor, 'linear-okundu.cjs'), ...arg], { encoding: 'utf8' })
+      for (const arg of ['--help', '-h', '--bilinmeyen']) {
+        const r = kos(arg)
+        expect(fs.existsSync(damga), `${arg} damga yazdı`).toBe(false)
+        expect(r.stdout).toContain('kullanim')
+      }
+      expect(kos('--bilinmeyen').status).toBe(2)
+      expect(kos('--help').status).toBe(0)
+      expect(kos().status).toBe(0)
+      expect(fs.existsSync(damga)).toBe(true)
+    } finally {
+      fs.rmSync(kok, { recursive: true, force: true })
+    }
+  })
+})
