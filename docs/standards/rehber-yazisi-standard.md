@@ -183,6 +183,8 @@ Aynı sorguya iki yazı yarışmaz. Yeni konu açılmadan önce Search Console'd
 küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişletilmesi** (R5.5 revizyonu)
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 
+**Önceki çalışma taraması betiktir (BLG-58).** Yayındaki yazıların konu, adres, ürün, kategori ve mevzuat kalemi tablosunu elle çıkarma; `node scripts/rehber/yazi-envanteri.mjs` üretir (dizin durumu depo dışı dosyadan gelir, yoksa "ÖLÇÜLMEDİ" yazar). Karta "önceki çalışma" satırı yazılırken bu tablo kullanılır.
+
 **Farklı arama niyeti istisnası (v0.19, K1).** Aynı ürün türü için **sektör ya da uygulama sorgusu** ("mutfak egzoz fanı", "boyahane havalandırma fanı"; "X için fan") mevcut rehberle aynı sorgu değil, farklı niyettir ve ayrı yazı açılabilir. Üç şart BİRLİKTE aranır, biri eksikse yazı açılmaz:
 1. **Talep ölçümü:** Geo-SEO sorgunun SERP türünü ve talebini ölçer (`seo-olcum`; önce `olcum-defteri.mjs --sor`, cetvel D8); sayı ve ölçüm tarihi karta yazılır. Ölçülmeden "farklı niyet" hükmü verilmez. Ölçü `yayin-gorunurluk-denetim-standard.md` Y2.5'tir: sorgu sınıfı (ürün türü, bilgi, sektör/uygulama), sitede karşılık, talep ve sıra; üç satırı R10 B6a okumasında GEO-SEO yazar, açılsın mı ve hangi sırayla kararı BLOG'un cetveline ve OPS'a aittir. Talep tek bir rakibin varlığıyla gerekçelendirilmez (Y2.5 kuralı).
 2. **Kaynak paketi:** sektörün mevzuat ya da standart karşılığı R2.6'nın üç şartıyla (MEVZUAT paketi ya da BLOG'un ham metinden doğrulaması); kaynağı olmayan sektör yazısı açılmaz.
