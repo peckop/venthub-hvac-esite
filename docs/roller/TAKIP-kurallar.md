@@ -31,6 +31,10 @@
 ## Teşhis komutları (HRT-69)
 - Kurulum ya da ayar şüphesinde `claude doctor` ve `/status`; bağlam ya da kota sorusunda `/context` ve `/usage`; kritik PR'da `/ultrareview` yalnız OPS kararıyla (3 ücretsiz koşu, kod buluta gider). Yerleşik özellik envanteri: docs/audits/claude-code-yerlesik-ozellikler-2026-10-19.md.
 
+## Betik yazmadan önce tara (HRT-121)
+- Betik yazmadan önce depo `scripts/` ve `docs/standards/arac-envanteri-standard.md` taranır. Aynı işi yapan araç varsa o kullanılır; eksiği varsa araca bayrak eklenir (sahibi ARAÇ ya da aracın sahibi departman, PR ile); aynı işin kopyası yazılmaz.
+- Tek seferlik ölçüm betiği serbesttir. Aynı betiği ikinci kez yazıyorsan üçüncüyü yazmadan önce OPS'a "ortak araç adayı" diye tek satır öner (ne, kaç kez, kazanç).
+
 ## Aynı ders ikinci kez (HRT-70)
 - Bir ders ikinci kez çiğnenirse açıklamada kalmaz, otomatik kontrole çevrilir: aynı ders sage'de ya da bir kartta yazılıydı ve aynı sebepten ikinci kez kırmızı CI, kısmi iş ya da geri alınan işlem çıktıysa, çiğneyen departman kontrol önerisini (kanca ya da araç içi kapı) OPS'a tek mesajla yazar: hangi ders, hangi iki vaka, önerilen kontrol. OPS ARAÇ'a kart verir; kapının tasarımı ARAÇ'ındır. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
 

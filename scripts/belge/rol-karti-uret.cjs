@@ -159,6 +159,18 @@ const TESHIS_KURALI = [
 ].join('\n')
 
 /**
+ * BETİK YAZMADAN ÖNCE TARA (HRT-121, OPS-256 birleşik karar, 8 Kasım; sıkılaştıran, OPS onaylı): filo-ortak.md bayt tavanında (10.000)
+ * olduğu için kurallar dosyasında durur; her rolün dosyasına AYNEN girer. Gerekçe ölçümü (OPS-256): Katalog'da unopim.cjs varken 30 + 10
+ * yeniden yazım; Araç'ta yesil-pr.cjs 14/114; HARİTA'da üretici --yaz + CRLF ayıklama komutu yüzlerce kez elle (HRT-119, kart notu);
+ * depo scripts/ altında anılmayan 41 betik.
+ */
+const ARAC_TARAMA_KURALI = [
+  '## Betik yazmadan önce tara (HRT-121)',
+  '- Betik yazmadan önce depo `scripts/` ve `docs/standards/arac-envanteri-standard.md` taranır. Aynı işi yapan araç varsa o kullanılır; eksiği varsa araca bayrak eklenir (sahibi ARAÇ ya da aracın sahibi departman, PR ile); aynı işin kopyası yazılmaz.',
+  '- Tek seferlik ölçüm betiği serbesttir. Aynı betiği ikinci kez yazıyorsan üçüncüyü yazmadan önce OPS\'a "ortak araç adayı" diye tek satır öner (ne, kaç kez, kazanç).',
+].join('\n')
+
+/**
  * AYNI DERS İKİNCİ KEZ (HRT-70, OPS emri 19 Ekim): HRT-68 ölçümü dersin yazılsa bile açıklama olarak kaldığını gösterdi.
  * Kapının tasarımı ARAÇ'ındır; burada yalnız kural metni durur. Vakalar: docs/audits/ders-tekrar-vakalari-2026-10-19.md.
  * filo-ortak.md bayt tavanında olduğu için kurallar dosyasında durur; her rolün dosyasına AYNEN girer.
@@ -437,6 +449,8 @@ function kuralDosyasi(ad) {
     TARAYICI_KURALI,
     '',
     TESHIS_KURALI,
+    '',
+    ARAC_TARAMA_KURALI,
     '',
     DERS_TEKRAR_KURALI,
     '',
@@ -1047,6 +1061,7 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
     if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
+    if (!metin.includes(ARAC_TARAMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Betik yazmadan önce tara" bloğu eksik/değişmiş (HRT-121)`)
     if (!metin.includes(SUREN_IS_KORUMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Süren iş koruması" bloğu eksik/değişmiş (HRT-73)`)
     if (SEO_EK_KURALI_ROLLERI.includes(ad) && !metin.includes(SEO_EK_KURALI)) s.push(`${ad}: kurallar dosyasında "VentHub SEO ek kuralları" bloğu eksik/değişmiş (HRT-75)`)
     if (!SEO_EK_KURALI_ROLLERI.includes(ad) && metin.includes('## VentHub SEO ek kuralları')) s.push(`${ad}: "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasına girer (HRT-75)`)
@@ -1392,6 +1407,7 @@ module.exports = {
   DURUM_SATIRI_KURALI,
   TARAYICI_KURALI,
   TESHIS_KURALI,
+  ARAC_TARAMA_KURALI,
   DERS_TEKRAR_KURALI,
   OZ_DEGERLENDIRME_KURALI,
   SUREN_IS_KORUMA_KURALI,
