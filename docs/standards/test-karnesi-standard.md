@@ -1,6 +1,6 @@
-# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.4
+# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.5
 
-**Sürüm 1.4 · 2026-11-08 · Sahibi: ALTYAPI · Son doğrulama: 2026-11-08 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §3 yol süzgeci ve çıkarılan testler listesi: ALT-38i (OPS hükmü 2026-10-09); §3 süzgeç sabitleme, zamanlı kolun ölçülen ritmi, ödünleşimler ve görünürlük: ALT-38i bağımsız denetim bulguları Ö1, Ö3, Ö4, D1, D3, D4, D5 (2026-11-08); §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
+**Sürüm 1.5 · 2026-11-08 · Sahibi: ALTYAPI · Son doğrulama: 2026-11-08 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §3 yol süzgeci ve çıkarılan testler listesi: ALT-38i (OPS hükmü 2026-10-09); §3 PR kolu ve dünya koluna bölünen dört test: ALT-38i parça 2 (#2367, #2369, #2372, #2370; 2026-11-08); §3 süzgeç sabitleme, zamanlı kolun ölçülen ritmi, ödünleşimler ve görünürlük: ALT-38i bağımsız denetim bulguları Ö1, Ö3, Ö4, D1, D3, D4, D5 (2026-11-08); §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b; §8: ALT-38 kapanış raporu, karar 351**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -71,8 +71,9 @@ tabanın son dökülme tarihi, dış sistem, bu makinenin durumu.
   245 test tanımı, yaklaşık 280 vaka; hepsi yeşildi) gerçek NotebookLM'e ya da defter durumunun yaşına bakıp assert eden test yoktur;
   bayat defter (yerel kayıtta 10 gün) yeşil kaldı çünkü hiçbiri dünyayı ölçmüyordu. O boşluk
   bu cetvelin konusu değil, ayrı bir iştir (canlı oturum yoklaması).
-- Aday olup bu sürümde TAŞINMAYANLAR: kırmızısı kısmen takvime bağlı kollar (`companion-parity-coverage`, `karar-kayit-bagi`). Dosya
-  düzeyinde taşıma PR farkını koruyan kolları da götürür; bölme önerisi karne ile gelir.
+- Aday olup bu sürümde TAŞINMAYANLAR: kırmızısı kısmen takvime bağlı kol `karar-kayit-bagi`. Dosya
+  düzeyinde taşıma PR farkını koruyan kolları da götürür; bölme önerisi karne ile gelir. (`companion-parity-coverage` 2026-11-08'de
+  PR kolu ve dünya kolu olarak bölündü, §3 tablosu ve §7.7 madde 3.)
 
 **PR'ın kendi listesi tek başına yetmez (güvenlik incelemesi B3).** `dislan` kipinde dışarıda kalan küme = PR'ın listesi ∩ master'daki
 liste (`git show HEAD^1:scripts/ci/dunya-durumu-testleri.json`): bir PR listeye kendi kırmızı testini ekleyip kendi `ci`'sını yeşile
@@ -669,8 +670,10 @@ Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz):
    `instruction-surface-ppr.test.ts` (iki bozma yakalanmadı ama test yalnız kayıtlı dosyalara bakıyor, bozmalar kayıtlı değildi; `SAHTE-YESIL-ADAYI`).
 3. **Uygulama kayıtları** (bu PR'ın dışında, ayrı Kanban kartları): ALT-38i, PR kapısından çıkacak 2 test (`sessionstart-tavan`, `githooks-doc-scope`; üç ayda 10
    kırmızı, ikisi de toplu olay; **2026-11-08'de yol süzgeçli olarak çıkarıldı, §3**; karnenin yalnız `dunyaDurumu`, `oneri`, `q8_tetik.yer` ve `ozet.oneriler` alanları listeyle eşlendi,
-   ölçüm yenilenmedi, yukarıdaki dağılım bunu yansıtır) ve bölünecek 4 test (`comment-scrubber-scheme-safety`, `companion-parity-coverage`, `standard-section-integrity`,
-   `uretilmis-artefakt-tazeligi`); ALT-38j, birleşecek 3 test (`bash-write-audit-uretilmis-sinifi`, `e1-kimlik-kontrolu`, `storage-yazma-nobetcisi`, eşleriyle);
+   ölçüm yenilenmedi, yukarıdaki dağılım bunu yansıtır) ve bölünen 4 test (`comment-scrubber-scheme-safety`, `companion-parity-coverage`, `standard-section-integrity`,
+   `uretilmis-artefakt-tazeligi`; **2026-11-08'de PR kolu ve dünya kolu olarak bölündü, §3 tablosu**: her biri `…-dunya.test.ts` dünya kolu + PR kapısında KALAN PR kolu,
+   PR kolu yalnız PR'ın değiştirdiği girdilerle sınırlı, değişen liste okunamazsa ya da kontrolün kendi kodu değişirse TAM, kanaryalar tam veriden; ortak okuyucu
+   `src/__tests__/conformance/_ortak/pr-kapsami.ts`; bölünen dosyaların karne kayıtları üreticiyle eklendi, PR kolu kayıtlarının `oneri` alanı bir sonraki karne yenilemesinde güncellenir); ALT-38j, birleşecek 3 test (`bash-write-audit-uretilmis-sinifi`, `e1-kimlik-kontrolu`, `storage-yazma-nobetcisi`, eşleriyle);
    ALT-38k, güçlendirme dalgası 1 ve ölçülmeyen testlerin ölçümü.
 4. **`--onceki` bayrağı** (ALT-38l): üretici önceki karnenin `q3_sabotaj` sonuçlarını, kaynağı değişmemiş testler için devralır; bunsuz yenileme eski ölçümleri
    kaybeder (§7.6).
