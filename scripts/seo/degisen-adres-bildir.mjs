@@ -19,6 +19,10 @@
  *   --uygula                IndexNow + kuyruk + taban güncelle (aşağıdaki kurallarla).
  *   --kuyruk-sonraki [N]    Google kuyruğundan sıradaki N adresi basar (varsayılan 11 = günlük sınır, SEO-54 ölçümü).
  *   --kuyruk-tamam a,b      Verilen adresleri kuyruktan çıkarır (Search Console'da dizin isteği alınanlar).
+ *   --adres a,b             ZORLA LİSTE (SEO-97): verilen TAM https adreslerini metin farkına bakmadan IndexNow'a bildirir
+ *                           (özet aynı kalıp gövde değişen yazı için). Kapılar aynı: adres haritada, 200, kanonik kendisi
+ *                           olmalı; K4 planı geçerli. --uygula yoksa kuru koşar. --taban verilirse yalnız gönderilen adresin
+ *                           kaydı güncellenir; --kuyruk verilirse adresler Google kuyruğuna da girer.
  *
  * KURALLAR:
  *   - Taban ve kuyruk DEPO DIŞINDA durur (P6: arama/sayfa verisi depoya yazılmaz); depo içi yol exit 2.
@@ -327,14 +331,65 @@ function dur(kod, mesaj) {
   process.exit(kod)
 }
 
+/**
+ * `--adres a,b` kipi: verilen listeyi, metin farkına bakmadan, IndexNow'a bildirir (BLG-14 türü kaçırma için: içerik
+ * değişti ama başlık/açıklama/H1 özeti aynı kaldı). KAPILAR GEVŞEMEZ: her adres haritada olmalı, 200 vermeli ve kanoniği
+ * kendisi olmalı (aksi hâlde hiçbir kipte gitmez); IndexNow planı yine K4 kapısından (`indexNowPlani`) geçer.
+ * Taban yoksa dokunulmaz; varsa yalnız kabul edilen adresin kaydı güncellenir, diğer kayıtlar olduğu gibi kalır.
+ */
+async function zorlaListe({ fetchFn, siteUrl, host, kayitlar, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek, anahtar, zaman, cikti, adresler }) {
+  if (kip === 'taban-kur') return { cikis: 2, mesaj: '--adres ile --taban-kur birlikte kullanılamaz' }
+  const istenen = [...new Set(adresler.map((a) => a.trim()).filter(Boolean))]
+  if (istenen.length === 0) return { cikis: 2, mesaj: '--adres a,b biçiminde en az bir tam https adresi ister' }
+  const haritada = new Map(kayitlar.map((k) => [k.adres, k]))
+  const simdi = {}
+  const reddedilen = []
+  for (const adres of istenen) {
+    let yabanci = false
+    try { yabanci = new URL(adres).host !== host } catch { yabanci = true }
+    if (yabanci) { reddedilen.push(`${adres} (${host} dışında ya da geçersiz adres)`); continue }
+    if (!haritada.has(adres)) { reddedilen.push(`${adres} (site haritasında yok)`); continue }
+    const s = await adresOku(fetchFn, adres)
+    if (s.durum !== 'tamam') { reddedilen.push(`${adres} (${s.neden ?? s.durum})`); continue }
+    simdi[adres] = { hash: ozetHash(s.ozet), lastmod: haritada.get(adres).lastmod }
+  }
+  for (const r of reddedilen) cikti(`  REDDEDİLDİ (bildirilmez): ${r}`)
+  const degisimler = Object.keys(simdi).map((adres) => ({ adres, tur: 'metin' }))
+  cikti(`zorla liste: istenen ${istenen.length} · kabul ${degisimler.length} · reddedilen ${reddedilen.length}`)
+  if (degisimler.length === 0) return { cikis: 1, mesaj: 'verilen adreslerin hiçbiri kapıdan geçmedi, hiçbir şey gönderilmedi' }
+  const plan = indexNowPlani(degisimler, { k3bAcik, k4Gevsek })
+  cikti(`IndexNow planı: gidecek ${plan.gidecek.length} · K4 bekleyen ${plan.bekleyen.length}`)
+  if (kip !== 'uygula') {
+    cikti('KURU KOŞUM — hiçbir şey gönderilmedi, yazılmadı.')
+    return { cikis: 0 }
+  }
+  let indexnow = { durum: 'bos' }
+  try {
+    indexnow = await indexNowGonder(fetchFn, { host, anahtar, siteUrl, adresler: plan.gidecek })
+  } catch (e) {
+    indexnow = { durum: 'hata', mesaj: e.message }
+  }
+  cikti(`IndexNow: ${indexnow.durum}${indexnow.http ? ` HTTP ${indexnow.http}` : ''}${indexnow.mesaj ? ` ${indexnow.mesaj}` : ''}`)
+  if (typeof kuyrukYolu === 'string') atomikYaz(kuyrukYolu, jsonlMetni(kuyrukBirlestir(kuyrukOku(kuyrukYolu), degisimler, zaman)))
+  const kabul = indexnow.durum === 'gonderildi' || indexnow.durum === 'bos'
+  const taban = typeof tabanYolu === 'string' ? tabanOku(tabanYolu) : null
+  if (kabul && taban !== null) {
+    const gidenler = Object.fromEntries(plan.gidecek.filter((a) => a in simdi).map((a) => [a, simdi[a]]))
+    tabanYaz(tabanYolu, { ...taban, ...gidenler }, zaman)
+  }
+  return { cikis: kabul ? 0 : 1 }
+}
+
 /** Dışa açık çalıştırıcı: testler `fetchFn` ve zaman enjekte eder; CLI gerçek `fetch` verir. */
-export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek = K4_GEVSEK, anahtar, zaman = new Date().toISOString(), cikti = console.log }) {
+export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek = K4_GEVSEK, anahtar, zaman = new Date().toISOString(), cikti = console.log, adresler: zorlaAdresler = /** @type {string[] | null} */ (null) }) {
   const siteUrl = site.replace(/\/+$/, '')
   const host = new URL(siteUrl).host
   const harita = await fetchFn(`${siteUrl}/sitemap.xml`, { headers: { 'user-agent': 'venthub-degisen-adres' } })
   if (!harita.ok) return { cikis: 1, mesaj: `site haritası okunamadı: HTTP ${harita.status}` }
   let kayitlar
   try { kayitlar = sitemapOku(await harita.text()) } catch (e) { return { cikis: 1, mesaj: e.message } }
+
+  if (zorlaAdresler !== null) return zorlaListe({ fetchFn, siteUrl, host, kayitlar, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek, anahtar, zaman, cikti, adresler: zorlaAdresler })
 
   const taban = tabanOku(tabanYolu)
   if (taban === null && kip === 'uygula') return { cikis: 2, mesaj: 'taban yok: önce --taban-kur ile ilk tabanı kur (ilk koşuda "bütün harita yeni" bildirilmez)' }
@@ -419,13 +474,15 @@ async function cli() {
     process.exit(0)
   }
 
-  if (typeof tabanYolu !== 'string') dur(2, 'HATA: --taban <dosya> gerekli.')
+  const adresArg = arg('--adres')
+  if (adresArg !== undefined && typeof adresArg !== 'string') dur(2, 'HATA: --adres a,b biçiminde TAM https adresleri ister (Git Bash\'te /tr/... değil tam adres ver).')
+  if (typeof tabanYolu !== 'string' && adresArg === undefined) dur(2, 'HATA: --taban <dosya> gerekli.')
   const kip = process.argv.includes('--taban-kur') ? 'taban-kur' : process.argv.includes('--uygula') ? 'uygula' : 'kuru'
   if (process.argv.includes('--taban-kur') && process.argv.includes('--uygula')) dur(2, 'HATA: --taban-kur ile --uygula birlikte kullanılamaz.')
   let k3bAcik
   try { k3bAcik = k3bOku(readFileSync(resolve(DEPO_KOKU, 'src/config/features.ts'), 'utf8')) } catch (e) { dur(1, `DURDU: bayrak okunamadı (${e.message}); belirsizlikte K4 kapalı varsayılmaz, koşu durur.`) }
   const anahtar = kip === 'uygula' ? anahtarOku() : ''
-  const s = await calistir({ site, tabanYolu, kuyrukYolu, kip, k3bAcik, anahtar })
+  const s = await calistir({ site, tabanYolu, kuyrukYolu, kip, k3bAcik, anahtar, adresler: adresArg === undefined ? null : adresArg.split(',') })
   if (s.mesaj) console.error(`${s.cikis === 2 ? 'HATA' : 'DURDU'}: ${s.mesaj}`)
   process.exit(s.cikis)
 }
