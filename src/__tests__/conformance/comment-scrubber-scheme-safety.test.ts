@@ -1,4 +1,21 @@
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
+
+import {
+  guvensizSatirlar,
+  KANARYA_ESIGI,
+  kapsamla,
+  KONTROL_KODU,
+  ornekSatir,
+  prDegisenleri,
+  r1YeniIhlaller,
+  r2BayatTaban,
+  TERS,
+  YORUM_ISARETI,
+} from './comment-scrubber-scheme-safety.yardimci'
 
 /**
  * INV-SCRUB-1 — ölçüm ve otomasyon araçlarının yorum sıyırıcıları şema-güvenli olmalı.
@@ -32,6 +49,35 @@ import { describe, expect, it } from 'vitest'
  * "beni listeden çıkar" diye kırmızı yanar. Liste ne sessizce genişleyebilir ne bayatlayabilir.
  */
 
+/**
+ * ⭐BU DOSYA PR KOLUDUR (ALT-38i parça 2, 2026-11-08). Kapı ikiye bölündü:
+ *
+ *   · BU DOSYA (PR kapısında KALIR): dedektör kanaryası, dedektörün kendini doğrulaması ve R1/R2'nin DEĞİŞEN dosyalarla
+ *     sınırlı hâli. PR'ın değiştirdiği bir dosyaya şema-güvensiz sıyırıcı eklenirse (ya da tabandaki bir dosya düzelip
+ *     listeden çıkarılmazsa) burası KIRMIZI yanar.
+ *   · `comment-scrubber-scheme-safety-dunya.test.ts` (PR kapısından ÇIKAR; master push + zamanlı koşu,
+ *     `scripts/ci/dunya-durumu-testleri.json`): R1/R2'nin TAM ağaç hâli ve kendi kanaryası.
+ *
+ * NİÇİN: karne ölçümü (`docs/audits/test-karnesi-2026-10-09.json`, CI geçmişi 2026-07-06..10-07): bu dosya 11 kırmızı koşuda,
+ * 6 farklı dalda kırmızı verdi; 7'si tek dünya olayı kümesinde (aynı test ≥3 dalda 12 saat içinde kırmızı: PR'ların kendi
+ * kodundan bağımsız ortak neden), 4'ü izole (3'ü sonraki koşuda düzeldi; cetvel §7.4 bunları PR'ın KENDİ hatası olarak okur).
+ * Kolu ayırmak ikisini de korur: PR'ın değiştirdiği dosyadaki ihlal burada yakalanır, suçsuz PR'ı bekleten tam ağaç taraması
+ * zamanlı kolda kalır. Dosya tümden taşınsaydı PR'ın gerçek hatasını yakalayan kol da kaçardı (cetvel:
+ * `docs/standards/test-karnesi-standard.md` §3 ve §7.4).
+ *
+ * KAPSAM KARARI (yardımcı dosyada, iki kolun paylaştığı tek kod): değişen liste okunamazsa ya da kontrolün KENDİ kodu
+ * (dedektör, TABAN, iki kol) değişmişse TAM ağaç taranır (fail-closed); boş küme yalnız "liste okundu, kaynağa dokunulmadı"
+ * iken geçerlidir. Kanarya (taranan dosya sayısı) her zaman tam ağaçtan sayılır.
+ *
+ * ⚠YEREL KULLANIM: değişen liste `git diff HEAD^1 HEAD` ile (PR'ın birleştirme commit'i) okunur; yerelde dalın SON commit'i
+ * demektir. Çok commitli bir dalın tamamı için liste elle verilir: `VENTHUB_DUNYA_DEGISEN_DOSYALAR=<dosya yolu>`.
+ *
+ * KAYNAKLAR (aşağıdaki `import.meta.glob` bloğu) dünya kolundaki blokla BAYT BAYT aynı kalmak ZORUNDADIR; ikisi ayrı dosya
+ * olduğu için kopyadır (glob'un yardımcı dosyaya taşınamama nedeni yardımcının başlığında). Ayrışırlarsa son testteki kayma
+ * testi KIRMIZI verir.
+ */
+
+// KAYNAK-BLOK-BASLA
 declare global {
   interface ImportMeta {
     glob(
@@ -100,124 +146,21 @@ const KAYNAKLAR: Record<string, string> = {
     eager: true,
   }),
 }
+// KAYNAK-BLOK-BITIS
 
-/** Bu dosyanın kendisi — örnek desenleri METİN olarak taşıdığı için ölçüm dışı. */
-const KENDIM = '/src/__tests__/conformance/comment-scrubber-scheme-safety.test.ts'
+const kapsamMetni = (tam: boolean, taranan: number): string =>
+  tam
+    ? `TAM ağaç (${taranan} dosya): değişen liste okunamadı ya da kontrolün kendi kodu değişti`
+    : `PR'ın DEĞİŞEN dosyaları (${taranan} dosya); tam ağaç dünya kolunda (comment-scrubber-scheme-safety-dunya.test.ts)`
 
-/** Tek ters eğik çizgi. Kaçış cehenneminden kaçmak için adlandırıldı. */
-const TERS = '\\'
-
-/** Bir regex KAYNAĞINDA yorum işareti bu dört karakterle yazılır. */
-const YORUM_ISARETI = TERS + '/' + TERS + '/'
-
-/**
- * Kaçış karakterlerini atar.
- *
- * Regex KAYNAĞINI regex'le aramak kaçış cehennemidir ve körlük tam orada doğar. Bunun yerine
- * incelenen pencereden ters eğik çizgiler atılır ve düz metin karşılaştırılır: dört karakterlik
- * yorum işareti sadeleşir, aranan kalıplar okunur hâle gelir.
- */
-function kacissiz(s: string): string {
-  return s.split(TERS).join('')
-}
-
-/** Yorum işaretinden SONRA satır sonuna kadar yiyen biçimler. */
-function satirSonunaKadarYiyor(sonrasi: string): boolean {
-  const s = kacissiz(sonrasi)
-  return s.startsWith('[^n]') || s.startsWith('[^rn]') || s.startsWith('.*')
-}
-
-/**
- * Yorum işaretinden ÖNCE gelen üç güvenli biçimden biri var mı?
- *
- * BİLİNEN SINIR: pencere 30 karakter. Aynı pencerede ilgisiz bir sebeple `[^:` geçen bir
- * regex yanlışlıkla güvenli sayılabilir (yanlış-NEGATİF). Ters yönü — güvenliyi güvensiz
- * saymak — daha zararlı olurdu; bu yüzden şüphede güvenli tarafa düşülüyor.
- */
-function semaKorumasiVar(oncesi: string): boolean {
-  const s = kacissiz(oncesi)
-  if (s.endsWith('(?<!:)')) return true // 1. ön-bakış (kanonik)
-  if (s.includes('[^:')) return true // 2. iki nokta içeren negatif sınıf
-  if (s.endsWith('^s*')) return true // 3. satır-başı çapası (`^\s*` sadeleşmiş hâli)
-  return false
-}
-
-/**
- * KULLANIM mı, yoksa desenden SÖZ ETME mi?
- *
- * Bu ayrım kapının kullanılabilir olmasının şartı — ve ilk koşuda CANLI yakalandı:
- * `csp-origin-coverage` bekçisi, kendi docstring'inde tam olarak bu anti-deseni ANLATIYOR
- * ("`/\/\/.*$/` bu repoda hiçbir şey sıyırmaz"). İlk sürüm o cümleyi ihlal saydı; yani kuralı
- * ÖĞRETEN metin kuralı çiğniyor göründü. Aynı aile bu depoda daha önce de yaşandı
- * (INV-MIGRATION-LEDGER-1 kendi yasak-uyarısına takılmıştı).
- *
- * Ayrım: satır-içi backtick'e alınmış desen bir ANIŞTIR (düzyazı); çıplak yazılmış desen
- * KULLANIMDIR (çalışan kod). Ölçümden önce satır-içi kod parçaları sıyrılır. Kapı zayıflamaz:
- * tehlikeli olan biçim — çalışan regex literali — hâlâ yakalanır.
- */
-function anisSiyir(satir: string): string {
-  return satir.replace(/`[^`]*`/g, ' ')
-}
-
-/**
- * Bir dosyadaki şema-güvensiz sıyırıcıların satır numaraları.
- *
- * Ölçüm SATIR SATIR yapılır: bir regex literali hiçbir zaman satır aşmaz, ve böylece hem
- * anış-sıyırma satıra uygulanabilir hem de bildirilen satır numarası birebir doğru olur.
- */
-function guvensizSatirlar(kaynak: string): number[] {
-  const bulunan: number[] = []
-  kaynak.split('\n').forEach((hamSatir, indeks) => {
-    const satir = anisSiyir(hamSatir)
-    let i = satir.indexOf(YORUM_ISARETI)
-    while (i !== -1) {
-      const sonrasi = satir.slice(i + YORUM_ISARETI.length, i + YORUM_ISARETI.length + 12)
-      const oncesi = satir.slice(Math.max(0, i - 30), i)
-      if (satirSonunaKadarYiyor(sonrasi) && !semaKorumasiVar(oncesi)) {
-        bulunan.push(indeks + 1)
-        return
-      }
-      i = satir.indexOf(YORUM_ISARETI, i + 1)
-    }
-  })
-  return bulunan
-}
-
-function ihlalHaritasi(): Map<string, number[]> {
-  const harita = new Map<string, number[]>()
-  for (const [yol, kaynak] of Object.entries(KAYNAKLAR)) {
-    if (yol === KENDIM) continue
-    const satirlar = guvensizSatirlar(kaynak)
-    if (satirlar.length > 0) harita.set(yol.replace(/^\//, ''), satirlar)
-  }
-  return harita
-}
-
-/**
- * TABAN (ratchet) — 2026-08-18'de ÖLÇÜLDÜ. Her satır bir borç, sahibi yorumda.
- *
- * Bu dosyalara BİLEREK dokunulmadı: başka şeritlerin mülkü ve tek bir PR'da üç şeridi birden
- * kırmızıya sokmak kapının kendisinden çok zarar verirdi. Sahibi sırası geldiğinde tek satırla
- * düzeltir ve kendini bu listeden ÇIKARIR — R2 bunu zorlar.
- */
-const TABAN: readonly string[] = [
-  'src/__tests__/conformance/admin-fx-lock-visibility.test.ts', // ADMIN-CUSTOMER
-  'src/__tests__/conformance/admin-returns-concurrency.test.ts', // ADMIN-CUSTOMER
-  'src/__tests__/conformance/canonical-url-ssot.test.ts', // LEGAL-SEO — en riskli: doğası gereği URL avlıyor
-  'src/__tests__/conformance/legal-en-leftover.test.ts', // LEGAL-SEO
-  'src/__tests__/conformance/pricing-fx-rate-single-resolver.test.ts', // PRICING
-  'src/__tests__/conformance/purchasing-machine-and-evidence.test.ts', // PRICING
-]
-
-describe('INV-SCRUB-1 · ölçüm ve otomasyon araçlarının yorum sıyırıcıları şema-güvenli', () => {
+describe('INV-SCRUB-1 · ölçüm ve otomasyon araçlarının yorum sıyırıcıları şema-güvenli (PR kolu)', () => {
   it('dedektör çalışıyor: taranan dosya sayısı makul (test + betik + edge)', () => {
-    // Boş/az tarama "temiz" demek değil, "dedektör kör" demektir.
-    expect(Object.keys(KAYNAKLAR).length).toBeGreaterThan(220)
+    // Boş/az tarama "temiz" demek değil, "dedektör kör" demektir. Kanarya R1/R2 daralsa da HER ZAMAN tam ağaçtan sayılır.
+    expect(Object.keys(KAYNAKLAR).length).toBeGreaterThan(KANARYA_ESIGI)
   })
 
   it('dedektör kendini doğrular: güvensizi yakalar, üç güvenli biçimi ve ilgisizi yakalamaz', () => {
-    const ornek = (on: string, son: string) =>
-      'x.replace(/' + on + YORUM_ISARETI + son + "/g, '')"
+    const ornek = ornekSatir
 
     // GÜVENSİZ — üç yazım da yakalanmalı.
     expect(guvensizSatirlar(ornek('', '[^' + TERS + 'n]*'))).toHaveLength(1)
@@ -243,13 +186,11 @@ describe('INV-SCRUB-1 · ölçüm ve otomasyon araçlarının yorum sıyırıcı
     expect(guvensizSatirlar('bos\nbos\n' + ornek('', '[^' + TERS + 'n]*'))).toEqual([3])
   })
 
-  it('R1 · tabanda olmayan yeni bir şema-güvensiz sıyırıcı YOK', () => {
-    const yeni = [...ihlalHaritasi().entries()]
-      .filter(([yol]) => !TABAN.includes(yol))
-      .map(([yol, satirlar]) => yol + ':' + satirlar.join(','))
+  it('R1 · PR kolu: değişen dosyalarda tabanda olmayan yeni bir şema-güvensiz sıyırıcı YOK', () => {
+    const { yeni, tam, taranan } = r1YeniIhlaller(KAYNAKLAR, prDegisenleri())
 
     expect(
-      yeni.sort(),
+      yeni,
       [
         'Şema-güvensiz satır-yorumu sıyırıcısı: URL taşıyan satırda şemayı yorum sanar,',
         'satırın geri kalanını siler ve bekçiyi SESSİZCE kör bırakır (hep yeşil kalır).',
@@ -258,14 +199,15 @@ describe('INV-SCRUB-1 · ölçüm ve otomasyon araçlarının yorum sıyırıcı
         'Sonra sıyırıcının şemayı yemediğini KANITLAYAN bir alt-sınır testi ekle — yalnız',
         'sıyırmayı değil, o satırdan hedefin GERÇEKTEN toplandığını da ölç.',
         '',
+        `Kapsam: ${kapsamMetni(tam, taranan)}`,
+        '',
         ...yeni,
       ].join('\n'),
     ).toEqual([])
   })
 
-  it('R2 · stale-guard: taban BAYATLAMAZ — düzeltilen dosya listeden çıkarılır', () => {
-    const halaIhlalli = new Set(ihlalHaritasi().keys())
-    const bayat = TABAN.filter((yol) => !halaIhlalli.has(yol))
+  it('R2 · PR kolu stale-guard: değişen TABAN dosyaları hâlâ ihlalli — düzeltilen dosya listeden çıkarılır', () => {
+    const { bayat, tam, denetlenen } = r2BayatTaban(KAYNAKLAR, prDegisenleri())
 
     expect(
       bayat,
@@ -274,8 +216,183 @@ describe('INV-SCRUB-1 · ölçüm ve otomasyon araçlarının yorum sıyırıcı
         'Ratchet ancak kısaldığında ratchet olur: bayat taban, düzeltilmiş bir kusuru hâlâ',
         'borç gibi gösterir ve bir sonraki okuyanı yanlış yere bakmaya iter.',
         '',
+        `Kapsam: ${kapsamMetni(tam, denetlenen)} (denetlenen TABAN dosyası)`,
+        '',
         ...bayat,
       ].join('\n'),
     ).toEqual([])
+  })
+})
+
+/**
+ * PR KOLUNUN KAPSAM KARARI — SENTETİK KAYNAK KÜMESİYLE (dosya sistemine ve git'e bağlı değil).
+ *
+ * Bu bloğun varlık sebebi: bölme, PR kolundan tam ağaç kontrolünü ÇIKARDI; geriye kalan güvence "değişen dosya listesi
+ * doğru okunuyor ve belirsizlikte tam ağaca düşülüyor" cümlesidir. O cümle burada kollarıyla sabitlenir. Bir kol bozulursa
+ * (daralma yanlış yönde çalışır, `null` boş kümeye çevrilir, kontrol kodu değişince tam tarama kalkar) ilgili `it` kırmızı verir.
+ */
+describe('INV-SCRUB-1 · PR kolunun kapsam kararı (sentetik kümeyle)', () => {
+  const KOTU = ornekSatir('', '[^' + TERS + 'n]*') // şema-güvensiz sıyırıcı
+  const TEMIZ = 'export const a = 1'
+  const KUME: Record<string, string> = {
+    '/scripts/kotu.cjs': KOTU,
+    '/scripts/temiz.cjs': TEMIZ,
+    '/src/lib/__tests__/duzelmis.test.ts': TEMIZ,
+  }
+
+  it('R1: ihlalli dosya DEĞİŞEN listedeyse PR kolu görür', () => {
+    expect(r1YeniIhlaller(KUME, ['scripts/kotu.cjs'], [])).toEqual({
+      yeni: ['scripts/kotu.cjs:1'],
+      tam: false,
+      taranan: 1,
+    })
+  })
+
+  it('R1: ihlalli dosya değişmediyse PR kolu görmez, tam ağaç (dünya kolu) görür', () => {
+    expect(r1YeniIhlaller(KUME, ['scripts/temiz.cjs'], [])).toEqual({ yeni: [], tam: false, taranan: 1 })
+    expect(r1YeniIhlaller(KUME, null, [])).toEqual({ yeni: ['scripts/kotu.cjs:1'], tam: true, taranan: 3 })
+  })
+
+  it('R1: değişen liste OKUNAMADIYSA (null) boş küme DEĞİL, tam ağaç taranır (fail-closed)', () => {
+    const r = r1YeniIhlaller(KUME, null, [])
+    expect(r.tam).toBe(true)
+    expect(r.taranan).toBe(Object.keys(KUME).length)
+    expect(r.yeni).toEqual(['scripts/kotu.cjs:1'])
+  })
+
+  it('R1: liste OKUNDU ve kaynağa dokunulmadı (boş liste) ise boş küme taranır', () => {
+    expect(r1YeniIhlaller(KUME, [], [])).toEqual({ yeni: [], tam: false, taranan: 0 })
+  })
+
+  it('R1: silinen dosya (değişen listede, kümede yok) taranacak kaynak sayılmaz', () => {
+    expect(r1YeniIhlaller(KUME, ['scripts/silinmis.cjs'], [])).toEqual({ yeni: [], tam: false, taranan: 0 })
+  })
+
+  it('R1: kontrolün KENDİ kodu değiştiyse (dedektör, TABAN, iki kol) daralma kalkar, tam ağaç taranır', () => {
+    for (const kod of KONTROL_KODU) {
+      expect(r1YeniIhlaller(KUME, [kod], []), kod).toEqual({
+        yeni: ['scripts/kotu.cjs:1'],
+        tam: true,
+        taranan: 3,
+      })
+    }
+  })
+
+  it('R1: tabandaki ihlalli dosya yeni sayılmaz', () => {
+    expect(r1YeniIhlaller(KUME, ['scripts/kotu.cjs'], ['scripts/kotu.cjs']).yeni).toEqual([])
+  })
+
+  describe('R2', () => {
+    const TABAN_DENEME = ['scripts/kotu.cjs', 'src/lib/__tests__/duzelmis.test.ts', 'scripts/silinmis.cjs']
+
+    it('değişen TABAN dosyası düzelmişse (artık ihlalli değil) bayat sayılır', () => {
+      expect(r2BayatTaban(KUME, ['src/lib/__tests__/duzelmis.test.ts'], TABAN_DENEME)).toEqual({
+        bayat: ['src/lib/__tests__/duzelmis.test.ts'],
+        tam: false,
+        denetlenen: 1,
+      })
+    })
+
+    it('değişen TABAN dosyası hâlâ ihlalliyse bayat DEĞİL', () => {
+      expect(r2BayatTaban(KUME, ['scripts/kotu.cjs'], TABAN_DENEME)).toEqual({ bayat: [], tam: false, denetlenen: 1 })
+    })
+
+    it('TABAN dosyası silinmişse (değişen listede, kümede yok) bayattır: listeden çıkarılmalı', () => {
+      expect(r2BayatTaban(KUME, ['scripts/silinmis.cjs'], TABAN_DENEME).bayat).toEqual(['scripts/silinmis.cjs'])
+    })
+
+    it('TABAN dosyasına dokunulmadıysa PR kolu denetlemez (bayatlık dünya kolunda görünür)', () => {
+      expect(r2BayatTaban(KUME, ['scripts/temiz.cjs'], TABAN_DENEME)).toEqual({ bayat: [], tam: false, denetlenen: 0 })
+    })
+
+    it('değişen liste okunamadıysa (null) TÜM TABAN denetlenir (fail-closed)', () => {
+      expect(r2BayatTaban(KUME, null, TABAN_DENEME)).toEqual({
+        bayat: ['src/lib/__tests__/duzelmis.test.ts', 'scripts/silinmis.cjs'],
+        tam: true,
+        denetlenen: 3,
+      })
+    })
+
+    it('kontrolün KENDİ kodu değiştiyse tüm TABAN denetlenir', () => {
+      for (const kod of KONTROL_KODU) {
+        const r = r2BayatTaban(KUME, [kod], TABAN_DENEME)
+        expect(r.tam, kod).toBe(true)
+        expect(r.denetlenen, kod).toBe(3)
+      }
+    })
+  })
+
+  it('kapsamla: okunamadı (null) tam küme aynen döner; okundu ise kesişim, tumu sırasında', () => {
+    const tumu = ['b', 'a', 'c']
+    expect(kapsamla(tumu, (x) => x, null)).toEqual({ liste: tumu, tam: true })
+    expect(kapsamla(tumu, (x) => x, null).liste).toBe(tumu)
+    expect(kapsamla(tumu, (x) => x, ['c', 'b', 'z'])).toEqual({ liste: ['b', 'c'], tam: false })
+    expect(kapsamla(tumu, (x) => x, [])).toEqual({ liste: [], tam: false })
+  })
+
+  it('prDegisenleri: ortam dosyasındaki liste okunur; okunamayan ortam dosyası null döner, git denenmez', () => {
+    const onceki = process.env.VENTHUB_DUNYA_DEGISEN_DOSYALAR
+    const dizin = mkdtempSync(join(tmpdir(), 'cs-degisen-'))
+    try {
+      const dosya = join(dizin, 'degisen.txt')
+      writeFileSync(dosya, 'scripts/a.cjs\nsrc/b.test.ts\n')
+      process.env.VENTHUB_DUNYA_DEGISEN_DOSYALAR = dosya
+      expect(prDegisenleri()).toEqual(['scripts/a.cjs', 'src/b.test.ts'])
+
+      writeFileSync(dosya, '') // boş ortam dosyası = "değişiklik yok" (git'in boş çıktısı ise "ölçülemedi")
+      expect(prDegisenleri()).toEqual([])
+
+      process.env.VENTHUB_DUNYA_DEGISEN_DOSYALAR = join(dizin, 'yok.txt') // okunamıyor → git'e DÜŞÜLMEZ
+      expect(prDegisenleri()).toBeNull()
+    } finally {
+      if (onceki === undefined) delete process.env.VENTHUB_DUNYA_DEGISEN_DOSYALAR
+      else process.env.VENTHUB_DUNYA_DEGISEN_DOSYALAR = onceki
+      rmSync(dizin, { recursive: true, force: true })
+    }
+  })
+})
+
+/**
+ * KAYMA TESTİ — `import.meta.glob` bloğu iki kolda BAYT BAYT aynı mı?
+ *
+ * Dünya kolu bu dosyanın bloğunu kopyalar; kopya ayrışırsa iki kol FARKLI dosya kümelerini tararsa kapı hangi kümeyi
+ * tarıyorsa onu sessizce daraltabilir (ör. dünya kolu `scripts/**` desenini kaybeder, PR kolu yeşil kalır).
+ * İşaretler birleştirilerek yazıldı: bu kodun kaynağı işaretin kendisini TAŞIMAZ, yalnız gerçek blok taşır.
+ */
+const BLOK_BASI = '// KAYNAK-BLOK-' + 'BASLA'
+const BLOK_SONU = '// KAYNAK-BLOK-' + 'BITIS'
+
+function kaynakBlogu(metin: string): string | null {
+  const duz = metin.replace(/\r\n/g, '\n')
+  if (duz.split(BLOK_BASI).length !== 2 || duz.split(BLOK_SONU).length !== 2) return null
+  const bas = duz.indexOf(BLOK_BASI)
+  const son = duz.indexOf(BLOK_SONU)
+  return son > bas ? duz.slice(bas, son + BLOK_SONU.length) : null
+}
+
+describe('INV-SCRUB-1 · KAYNAKLAR glob bloğu PR kolu ve dünya kolunda aynı (kayma testi)', () => {
+  const PR_KOLU = resolve(__dirname, 'comment-scrubber-scheme-safety.test.ts')
+  const DUNYA_KOLU = resolve(__dirname, 'comment-scrubber-scheme-safety-dunya.test.ts')
+
+  it('iki dosyada da tam BİR blok var ve içerikleri aynı', () => {
+    const pr = kaynakBlogu(readFileSync(PR_KOLU, 'utf8'))
+    const dunya = kaynakBlogu(readFileSync(DUNYA_KOLU, 'utf8'))
+    expect(pr, 'PR kolunda işaretli blok yok ya da birden çok').not.toBeNull()
+    expect(dunya, 'dünya kolunda işaretli blok yok ya da birden çok').not.toBeNull()
+    // Boş/kısa blok eşitliği anlamsızlaştırır (iki boş metin eşittir): glob çağrısının KENDİSİ blokta olmalı.
+    expect(pr).toContain('import.meta.glob(')
+    expect(pr).toContain('const KAYNAKLAR')
+    expect(dunya).toBe(pr)
+  })
+
+  it('kayma testinin kendi mantığı: işaretsiz ya da çift işaretli kaynak null döner, farklı blok farklı çıkar', () => {
+    expect(kaynakBlogu('işaretsiz')).toBeNull()
+    expect(kaynakBlogu([BLOK_BASI, 'a', BLOK_BASI, 'b', BLOK_SONU].join('\n'))).toBeNull()
+    expect(kaynakBlogu([BLOK_BASI, 'a', BLOK_SONU].join('\n'))).not.toBe(
+      kaynakBlogu([BLOK_BASI, 'b', BLOK_SONU].join('\n')),
+    )
+    expect(kaynakBlogu(['x', BLOK_BASI, 'a', BLOK_SONU, 'y'].join('\n'))).toBe(
+      kaynakBlogu([BLOK_BASI, 'a', BLOK_SONU].join('\n')),
+    )
   })
 })
