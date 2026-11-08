@@ -15,6 +15,8 @@ const BETIK = path.resolve(__dirname, '..', '..', '..', 'scripts', 'board', 'bay
 type Kart = { title: string; description?: string; bagimliliklar?: Array<{ status: string | null }> }
 type Sonuc = { neden: string[]; guc: 'bayat' | 'kismen' | null; olculemedi: string[] }
 const m = gerek(BETIK) as {
+  atifsizMetin: (metin: string) => string
+  ghPrDurumu: (n: number, calistir?: unknown) => string | null
   prNumaralari: (metin: string) => number[]
   kartNumaralari: (metin: string, haric?: string | null) => string[]
   degerlendir: (kart: Kart, prDurum: Record<number, string | null>, kartDurum: Record<string, string>) => Sonuc
@@ -75,8 +77,46 @@ describe('INV-BAYAT-KARAR-1: degerlendir (olay biçimleri)', () => {
     expect(m.degerlendir({ title: 'OPS-244', description: 'SHA-256 ve ALT-165' }, {}, durum).guc).toBe('kismen')
   })
 
+  it('ARC-274 denetçi bulgusu: ÖNCEKİ ÇALIŞMA / KAYNAK / KİM İSTEDİ / YÖNTEM atıfları kanıt sayılmaz (satır içi etiketler dahil)', () => {
+    const aciklama =
+      'KİM İSTEDİ: OPS. YÖNTEM: elle. KAYNAK/CETVEL: yok. ÖNCEKİ ÇALIŞMA: #2327 ve #2330 birleşti, ALT-165 Done. NE: yeni iş bekliyor.'
+    expect(m.atifsizMetin(aciklama)).not.toContain('#2327')
+    expect(m.atifsizMetin(aciklama)).not.toContain('ALT-165')
+    expect(m.atifsizMetin(aciklama)).toContain('NE: yeni iş bekliyor')
+    const s = m.degerlendir({ title: 'OPS-242 · temizlik', description: aciklama }, { 2327: 'MERGED', 2330: 'MERGED' }, { 'ALT-165': 'done' })
+    expect(s.guc).toBeNull()
+    // etiket dışı gövdedeki anma hâlâ sayılır
+    const g = m.degerlendir({ title: 'OPS-243', description: 'ÖNCEKİ ÇALIŞMA: yok. NE: #2327 ve #2330 kapat' }, { 2327: 'MERGED', 2330: 'CLOSED' }, {})
+    expect(g.guc).toBe('bayat')
+  })
+
+  it('ARC-274 denetçi bulgusu: tek kapalı PR, RECEP YETKİSİ ya da "sıradaki" işareti "bayat"ı "kısmen"e düşürür', () => {
+    const iki = { 2327: 'MERGED', 2330: 'MERGED' }
+    expect(m.degerlendir({ title: 'OPS-1', description: '#2327' }, { 2327: 'MERGED' }, {}).guc).toBe('kismen')
+    expect(m.degerlendir({ title: 'ALT-76', description: '#2327 #2330 RECEP YETKİSİ: migration birleştirme' }, iki, {}).guc).toBe('kismen')
+    expect(m.degerlendir({ title: 'REC-394 · sıradaki C14', description: '#2327 #2330' }, iki, {}).guc).toBe('kismen')
+    expect(m.degerlendir({ title: 'OPS-2', description: '#2327 #2330' }, iki, {}).guc).toBe('bayat')
+  })
+
+  it('ghPrDurumu: closed+merged -> MERGED, closed -> CLOSED, open -> OPEN, hata -> null (enjekte gh)', () => {
+    const gh = (cikti: string | Error) => (() => {
+      if (cikti instanceof Error) throw cikti
+      return cikti
+    }) as unknown
+    const f = m.ghPrDurumu as (n: number, c: unknown) => string | null
+    expect(f(2327, gh('closed true\n'))).toBe('MERGED')
+    expect(f(2327, gh('closed false'))).toBe('CLOSED')
+    expect(f(2327, gh('open false'))).toBe('OPEN')
+    expect(f(2327, gh(new Error('HTTP 404')))).toBeNull()
+    expect(f(2327, gh('garip çıktı'))).toBeNull()
+  })
+
+  it('PR\'da ön ek: url#1234 ve a#1234 PR sayılmaz', () => {
+    expect(m.prNumaralari('bkz https://x/y#1234 ve a#5678')).toEqual([])
+  })
+
   it('satır biçimi: bayat/kısmen öneki ve neden', () => {
-    const s = m.degerlendir({ title: 'OPS-235 · x', description: '#2327' }, { 2327: 'MERGED' }, {})
+    const s = m.degerlendir({ title: 'OPS-235 · x', description: '#2327 #2330' }, { 2327: 'MERGED', 2330: 'CLOSED' }, {})
     expect(m.satirYaz('OPS-235', 'OPS-235 · x', s)).toMatch(/^BAYAT olabilir: OPS-235 — anılan PR/)
     expect(m.satirYaz('OPS-1', 'OPS-1', { neden: ['x'], guc: 'kismen', olculemedi: [] })).toMatch(/^KISMEN bayat olabilir: OPS-1/)
   })
@@ -105,6 +145,28 @@ describe('INV-BAYAT-KARAR-1: tara (sahte pano ve gh)', () => {
       prOku: () => null,
     })
     expect(s.uyari).toBe(1)
+  })
+
+  it('ARC-274 denetçi bulgusu: aynı numara iki kartta farklı sütundaysa o numara "Done" sayılmaz (sıraya bağlı hüküm yok)', () => {
+    const s = m.tara({
+      oku: oku([kart('OPS-242', 'ALT-165 işi')], [kart('ALT-165', '', { sutun: 'Done' }), kart('ALT-165', '', { sutun: 'To Do' })]),
+      prOku: () => null,
+    })
+    expect(s.uyari).toBe(0)
+  })
+
+  it('PR_AZAMI: sınırı aşan PR sayısında yalnız sınır kadar gh çağrılır ve ölçülemedi satırı çıkar', () => {
+    const cok = Array.from({ length: 33 }, (_, i) => `#${3000 + i}`).join(' ')
+    const sorulan: number[] = []
+    const s = m.tara({
+      oku: oku([kart('OPS-77', cok)]),
+      prOku: (n) => {
+        sorulan.push(n)
+        return 'OPEN'
+      },
+    })
+    expect(sorulan).toHaveLength(30)
+    expect(s.satirlar.join('\n')).toMatch(/3 PR sınır nedeniyle bakılmadı/)
   })
 
   it('pano okunamazsa SESSİZ "bayat yok" demez, ölçülemedi satırı basar', () => {

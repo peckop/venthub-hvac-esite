@@ -51,8 +51,29 @@ function kartNoBasliktan(baslik) {
  * Bir kartın bayatlık nedenleri. Saf (ağ yok): `prDurum` {numara: 'MERGED'|'CLOSED'|'OPEN'|null}, `kartDurum` {KARTNO: sutun}.
  * Dönüş: {neden: string[], guc: 'bayat'|'kismen'|null, olculemedi: string[]}.
  */
+/**
+ * Geçmişe atıf bölümleri bayatlık kanıtı DEĞİLDİR: "ÖNCEKİ ÇALIŞMA / KAYNAK / KİM İSTEDİ / YÖNTEM" tasarım gereği biten işleri anar
+ * (8 Kasım denetçi ölçümü: ALT-76 ve OPS-242 bu yüzden yanlış uyarıldı). Kart açıklamaları çoğu kez tek paragraftır ve etiketler satır içindedir;
+ * bu yüzden satır değil ETİKET bölünür. Saf.
+ */
+const ETIKETLER = ['KİM İSTEDİ', 'YÖNTEM', 'KAYNAK/CETVEL', 'ÖNCEKİ ÇALIŞMA', 'KAYNAK', 'AÇAN', 'NE', 'BİTİŞ', 'OLAY', 'KAPSAM', 'RECEP YETKİSİ', 'SIRA', 'BAĞIMLILIK']
+const ATIF_ETIKETLERI = new Set(['KİM İSTEDİ', 'YÖNTEM', 'KAYNAK/CETVEL', 'ÖNCEKİ ÇALIŞMA', 'KAYNAK', 'AÇAN'])
+const ETIKET_DESENI = new RegExp(`(?=(?:^|[\\s.;])(?:${ETIKETLER.map((e) => e.replace('/', '\\/')).join('|')})\\s*:)`, 'u')
+
+function atifsizMetin(metin) {
+  return String(metin || '')
+    .split(ETIKET_DESENI)
+    .filter((parca) => {
+      const m = /^[\s.;]*([^:]{1,20}):/u.exec(parca)
+      return !(m && ATIF_ETIKETLERI.has(m[1].trim()))
+    })
+    .join(' ')
+}
+
 function degerlendir(kart, prDurum, kartDurum) {
-  const metin = `${kart.title || ''}\n${kart.description || ''}`
+  const metin = `${kart.title || ''}\n${atifsizMetin(kart.description)}`
+  // Tek kapalı PR zayıf kanıt (ilk adım olabilir): "bayat" için en az iki kapalı PR gerekir. Recep'ten yetki bekleyen / "sıradaki" işli kart: PR geçmişte kapalı olsa bile kararın kendisi bekliyor olabilir (ALT-76: PR 2 migration kararı).
+  const bekleyenIs = /RECEP YETKİSİ\s*:|sıradaki|bekleyen iş/iu.test(`${kart.title || ''}\n${kart.description || ''}`)
   const kendi = kartNoBasliktan(kart.title)
   const nedenler = []
   const olculemedi = []
@@ -68,12 +89,17 @@ function degerlendir(kart, prDurum, kartDurum) {
       else if (d === 'OPEN') acik.push(n)
       else olculemedi.push(`#${n}`)
     }
-    if (kapali.length > 0 && acik.length === 0 && olculemedi.length === 0) {
+    if (kapali.length > 1 && acik.length === 0 && olculemedi.length === 0 && !bekleyenIs) {
       guc = 'bayat'
       nedenler.push(`anılan PR'ların hepsi kapalı: ${kapali.join(', ')}`)
     } else if (kapali.length > 0) {
       guc = guc || 'kismen'
-      nedenler.push(`anılan PR'lardan bir kısmı kapalı: ${kapali.join(', ')}${acik.length ? ` (açık: ${acik.map((n) => '#' + n).join(', ')})` : ''}`)
+      const hepsiKapali = acik.length === 0 && olculemedi.length === 0
+      nedenler.push(
+        hepsiKapali
+          ? `anılan PR kapalı ama kesin hüküm yok (tek PR ya da kartta "sıradaki/bekleyen iş/RECEP YETKİSİ" var): ${kapali.join(', ')}`
+          : `anılan PR'lardan bir kısmı kapalı: ${kapali.join(', ')}${acik.length ? ` (açık: ${acik.map((n) => '#' + n).join(', ')})` : ''}`,
+      )
     }
   }
 
@@ -139,11 +165,16 @@ function tara({ etiket = 'karar-bekliyor', oku = anlikOku, prOku = ghPrDurumu } 
   const kartDurum = {}
   for (const t of hepsi) {
     const no = kartNoBasliktan(t.task.title)
-    if (no) kartDurum[no] = t.task.sutun ? String(t.task.sutun).toLowerCase().replace(/\s+/g, '') : ''
+    if (!no) continue
+    const sutun = t.task.sutun ? String(t.task.sutun).toLowerCase().replace(/\s+/g, '') : ''
+    // Aynı numara birden çok kartta varsa (ölçüldü: 10 numarada sütunlar karışık) hüküm sıraya bağlı olmasın: BELİRSİZ, kural dışı.
+    if (no in kartDurum && kartDurum[no] !== sutun) kartDurum[no] = null
+    else if (!(no in kartDurum)) kartDurum[no] = sutun
   }
+  for (const no of Object.keys(kartDurum)) if (kartDurum[no] === null) delete kartDurum[no]
   // sütun adı "Done" → 'done'
   const prler = new Set()
-  for (const t of adaylar) for (const n of prNumaralari(`${t.task.title}\n${t.task.description || ''}`)) prler.add(n)
+  for (const t of adaylar) for (const n of prNumaralari(`${t.task.title}\n${atifsizMetin(t.task.description)}`)) prler.add(n)
   const prDurum = {}
   const sirali = [...prler].sort((a, b) => b - a).slice(0, PR_AZAMI)
   for (const n of sirali) prDurum[n] = prOku(n)
@@ -159,7 +190,7 @@ function tara({ etiket = 'karar-bekliyor', oku = anlikOku, prOku = ghPrDurumu } 
   return { satirlar, taranan: adaylar.length, uyari: satirlar.filter((l) => l.startsWith('BAYAT') || l.startsWith('KISMEN')).length, olculemedi: olculemeyenPr.size > 0 }
 }
 
-module.exports = { prNumaralari, kartNumaralari, degerlendir, satirYaz, ghPrDurumu, tara, kartNoBasliktan }
+module.exports = { atifsizMetin, PR_AZAMI, prNumaralari, kartNumaralari, degerlendir, satirYaz, ghPrDurumu, tara, kartNoBasliktan }
 
 if (require.main === module) {
   const argv = process.argv.slice(2)
