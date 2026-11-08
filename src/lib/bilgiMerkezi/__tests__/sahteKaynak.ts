@@ -49,6 +49,9 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['storm-serisi', 'STORM Serisi'],
     // Patlayıcı ortamda fan seçimi (ATEX) yazısı (BLG-51, 2026-11): Vorticent CMS ATEX aile sayfası canlıda 200 verir (8 Kasım ölçümü; ürün sayfası).
     ['vortice-vorticent-cms-atex-santrifuj-fanlar', 'Vortice Vorticent CMS ATEX Santrifüj Fanlar'],
+    // BLG-54 (2026-11): aile sayfaları canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
+    ['avens-hucreli-aspiratorler-hf-fw', 'AVenS Hücreli Aspiratörler HF-FW'],
+    ['avens-hucreli-aspiratorler-hf-s', 'AVenS Hücreli Aspiratörler HF-S'],
     // Çatı tipi fan nedir yazısı (BLG-49, 2026-11): Slimroof aile sayfası canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
     ['vortice-slimroof-cati-fanlari', 'Vortice Slimroof Çatı Fanları'],
   ])
