@@ -10,7 +10,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS } from '../dizin-acilis.mjs'
+import { trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS } from '../dizin-acilis.mjs'
 
 const BETIK = resolve(__dirname, '..', 'dizin-acilis.mjs')
 const gecici: string[] = []
@@ -44,6 +44,16 @@ describe('saf parçalar', () => {
     yaz(k, '2026-11-07', []); yaz(k, '2026-11-08', [satir('YAP', 'TAMAM', 'TAMAM')])
     writeFileSync(join(k, 'dizin-takip-2026-11-09.json'), '{bozuk')
     expect(enSonAnlik(k)?.gun).toBe('2026-11-08')
+  })
+})
+
+describe('Türkiye günü', () => {
+  it('UTC gece yarısından önceki an TR ertesi günü yazar; anlık görüntü günü alinma saatinden gelir', () => {
+    expect(trGun(Date.parse('2026-11-08T21:30:00Z'))).toBe('2026-11-09')
+    expect(trGun(Date.parse('2026-11-08T20:59:00Z'))).toBe('2026-11-08')
+    const k = dizin()
+    writeFileSync(join(k, 'dizin-takip-2026-11-08.json'), JSON.stringify({ alinma: '2026-11-08T22:10:00Z', tablo: [] }))
+    expect(enSonAnlik(k)?.gun).toBe('2026-11-09')
   })
 })
 

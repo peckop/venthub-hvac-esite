@@ -25,6 +25,8 @@ const BU_DIZIN = dirname(fileURLToPath(import.meta.url))
 // `detached: true` yalnız merkezî başlatıcıda yazılır (INV-KOPUK-1, REC-415): kopuk çocuk konsol penceresi açmasın.
 const { kopukBaslat } = createRequire(import.meta.url)('../board/kopuk-baslat.cjs')
 export const KILIT_OMRU_MS = 30 * 60 * 1000
+/** Türkiye günü (UTC+3, yaz saati yok): gece yarısından sonra UTC bir önceki günü yazmasın. */
+export const trGun = (ms) => new Date(ms + 3 * 3600 * 1000).toISOString().slice(0, 10)
 const ISTEK_KARARLARI = new Set(['YAP', 'TEKRAR'])
 const MOTORLAR = [['google', 'Google'], ['bing', 'Bing'], ['indexnow', 'IndexNow']]
 
@@ -40,7 +42,11 @@ export function enSonAnlik(klasor) {
   for (const ad of adaylar) {
     try {
       const j = JSON.parse(readFileSync(join(klasor, ad), 'utf8'))
-      if (j && Array.isArray(j.tablo)) return { gun: ad.slice(12, 22), alinma: j.alinma || null, tablo: j.tablo }
+      if (j && Array.isArray(j.tablo)) {
+        const alinma = j.alinma || null
+        const t = alinma ? Date.parse(alinma) : NaN
+        return { gun: Number.isFinite(t) ? trGun(t) : ad.slice(12, 22), alinma, tablo: j.tablo }
+      }
     } catch { /* bozuk dosya: bir öncekine bak */ }
   }
   return null
@@ -83,7 +89,7 @@ function arkaPlanBaslat(klasor, env) {
 export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = process.env, baslat = true, baslatici = arkaPlanBaslat } = {}) {
   if (env.VENTHUB_DIZIN_ACILIS_KAPAT === '1') return ''
   try {
-    const bugun = new Date(simdi).toISOString().slice(0, 10)
+    const bugun = trGun(simdi)
     const anlik = enSonAnlik(klasor)
     const taze = anlik && anlik.gun >= bugun
     let baslatildi = false
