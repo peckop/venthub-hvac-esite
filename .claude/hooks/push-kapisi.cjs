@@ -194,6 +194,47 @@ function pushBul(t, genisletme = false) {
   return { c: yollar, args: t.slice(i + 1) }
 }
 
+const HOOKSPATH_OKUMA = new Set(['--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--unset', '--unset-all'])
+
+/**
+ * `git config core.hooksPath <değer>` (ARC-281, OPS onaylı): pre-push katmanını (push-hedef-kapisi) atlatır; `-c core.hooksPath=` zaten
+ * pushBul'da reddedilir. `git` tokeninden sonraki parça verilir. Okuma (--get/--list) ve silme (--unset: varsayılan kancalara döner)
+ * serbest; anahtar büyük-küçük harf duyarsız. Yalnız git config alt komutu (global seçenekler -C/-c atlanır). Dönüş: neden ya da null.
+ * SINIR: `.git/config` dosyasını elle yazmak, `git -c` dışı ortam yolları ve Bash dışı yazım bu kapıdan görünmez (git pre-push ve GitHub master koruması arkada).
+ */
+function hooksPathYazimi(sonrasi, ham = '') {
+  // Fail-closed: git'in değer alan global seçenekleri (--super-prefix, --git-dir ...) konumu kaydırır; `config` tokeni parçanın HERHANGİ bir yerinde
+  // ise ve ondan sonra core.hooksPath + değer varsa reddedilir (fazladan eşleşme yalnız `git ... config core.hooksPath <değer>` biçimine düşer).
+  const i = sonrasi.indexOf('config')
+  if (i < 0) return null
+  const arg = sonrasi.slice(i + 1)
+  const MESAJ = 'git config core.hooksPath <değer> (ya da include.path / --edit ile aynı etki): pre-push kapısını (push hedef/kapalı dal/döküm) atlatır; ayarı değiştirme (kurulum scripts/setup-hooks.mjs shim modeliyle, okuma ve --unset serbest)'
+  // Mod bayrağı (okuma/silme) YALNIZ anahtardan ÖNCE geçerlidir: git sondaki bayrağı yok sayıp yazar (`git config core.hooksPath /x --list` yazar; denetçi ölçtü).
+  // --show-origin/--show-scope mod değil görünüm bayrağıdır: muafiyet vermez.
+  // Değer alan seçeneklerin DEĞERİ mod bayrağı sayılmaz (`--comment --list`, `-f --get`): git onu değer olarak tüketir, mod yine yazmadır.
+  const DEGERLI = new Set(['--comment', '-f', '--file', '--blob', '--type', '--default', '--fixed-value'])
+  const modIdx = arg.findIndex((a, k) => HOOKSPATH_OKUMA.has(a) && !DEGERLI.has(arg[k - 1]))
+  const modOnce = (idx) => modIdx >= 0 && modIdx < idx
+  // --edit dosyayı düzenleyiciyle açar: hangi anahtarın yazılacağı görülemez → reddedilir (okuma bayrağı yoksa).
+  if (modIdx < 0 && arg.some((a) => a === '--edit' || a === '-e')) return MESAJ
+  // Anahtar konumunda kabuk genişletmesi (`git config $K /x`, `core.$(echo hooksPath)`): anahtar önceden bilinemez, ardından değer varsa fail-closed.
+  const konumsal = arg.map((a, ix) => [a, ix]).filter(([a]) => !/^-/.test(a))
+  // `$(`/ters tırnak ayrıştırıcıda parçayı böler: anahtar tokeni `$` ile BİTİYORSA değer sonraki parçada kalmıştır → o da kapsanır.
+  if (konumsal.length >= 1 && /[$`]/.test(konumsal[0][0]) && (konumsal.length >= 2 || /[$`]$/.test(konumsal[0][0])) && !modOnce(konumsal[0][1])) return MESAJ
+  // Ters tırnaklı komut yerine koyma (``git config `echo core.hooksPath` /x``): ayrıştırıcı parçayı ters tırnakta böler, anahtar görünmez →
+  // `config`ten sonra aynı komut içinde ters tırnak varsa ve önde mod bayrağı yoksa fail-closed.
+  if (modIdx < 0 && /\bconfig\b[^;&|\n]*`/.test(String(ham))) return MESAJ
+  // Takma ad yazımı (`alias.x '!git config core.hooksPath /x'` kabuk alias'ı kapı içine bakamaz; `alias.cfg config` ise `git cfg core.hooksPath /x`
+  // ile aynı etkiyi verir, kapı `cfg`yi `config` bilmez): herhangi alias.* yazımı reddedilir; okuma/silme serbest.
+  const ai = arg.findIndex((a) => /^alias\./i.test(a))
+  if (ai >= 0 && !modOnce(ai) && (/=/.test(arg[ai]) || arg.slice(ai + 1).some((a) => !/^-/.test(a)))) return MESAJ
+  // Anahtar: herhangi bir bölümde `hookspath` (core.hooksPath, ya da include'lu dosyadan gelen bölüm) ve `include.path` / `includeIf.*.path` (başka dosyadan hooksPath getirir).
+  const ki = arg.findIndex((a) => /(^|\.)hookspath(=|$)/i.test(a) || /^include(if\..*)?\.path(=|$)/i.test(a))
+  if (ki < 0) return null
+  if ((/=/.test(arg[ki]) || arg.slice(ki + 1).some((a) => !/^-/.test(a))) && !modOnce(ki)) return MESAJ
+  return null
+}
+
 /**
  * Saf karar. girdi: komut metni. o: { cwd, mevcutDal(cwd)->string|null, gitDeposu(yol)->boolean (varsayılan: git rev-parse) }.
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
@@ -265,6 +306,8 @@ function degerlendir(komut, o) {
     // hiçbiri master/main'e, force ile ya da dışarıya push yapmamalı.
     for (let k = 0; k < t.length; k++) {
       if (komutAdi(t[k]) !== 'git') continue
+      const hp = hooksPathYazimi(t.slice(k + 1), String(komut))
+      if (hp) return hp
       const p = pushBul(t.slice(k), genisletme)
       if (!p) continue
       if (p.yasak) return p.yasak

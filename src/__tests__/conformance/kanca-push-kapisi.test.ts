@@ -230,6 +230,70 @@ describe('INV-PUSH-KAPISI-1 — ters eğik çizgi + satır sonu (ARC-278)', () =
   })
 })
 
+describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () => {
+  it.each([
+    'git config core.hooksPath /tmp/bos',
+    'git config --local core.hookspath /tmp/bos',
+    'git config --global core.HOOKSPATH /tmp/bos',
+    'git -C . config core.hooksPath /tmp/bos',
+    'cd /depo && git config core.hooksPath .',
+    'git config --add core.hooksPath /tmp/bos',
+    'git config --file .git/config core.hooksPath /tmp/bos',
+    'git -c core.hooksPath=/tmp/bos status',
+    'git -c core.hookspath=/tmp/bos commit -m a',
+    'echo ok && git config core.hooksPath /x',
+    'git --super-prefix x/ config core.hooksPath /tmp/bos',
+    'git --git-dir=.git config core.hooksPath /tmp/bos',
+    'git --no-pager config core.hooksPath /tmp/bos',
+    'git config include.path ../baska.cfg',
+    'git config --local includeIf.gitdir:/x/.path /tmp/baska.cfg',
+    'git config --edit',
+    'git config -e --global',
+    'git config extra.hookspath /tmp/bos',
+    // denetçi (ARC-281 PR #2410): sondaki mod bayrağı muafiyet VERMEZ, git yine yazar
+    'git config core.hooksPath /tmp/bos --list',
+    'git config core.hooksPath /tmp/bos --unset',
+    'git config core.hooksPath /tmp/bos --get',
+    'git config --global core.hooksPath /tmp/bos -l',
+    'git config --show-scope core.hooksPath /tmp/bos',
+    'git config --show-origin core.hooksPath /tmp/bos',
+    // kabuk takma adı üzerinden (denetçi: orta)
+    "git config alias.foo '!git config core.hooksPath /tmp/bos'",
+    "git config --global alias.hp '!sh -c x'",
+    'git config alias.cfg config',
+    "git config --global alias.hp 'config core.hooksPath /tmp/bos'",
+    'git config `echo core.hooksPath` /tmp/bos',
+    // değer alan seçeneğin değeri mod bayrağı değildir (güvenlik incelemesi)
+    'git config --comment --list core.hooksPath /tmp/bos',
+    'git config --file --get core.hooksPath /tmp/bos',
+    'git config --type --unset core.hooksPath /tmp/bos',
+    // anahtar konumunda kabuk genişletmesi
+    'K=core.hooksPath; git config $K /tmp/bos',
+    'git config "$K" /tmp/bos',
+    'git config $(echo core.hooksPath) /tmp/bos',
+    'git config core.$(echo hooksPath) /tmp/bos',
+  ])('hooksPath yazımı reddedilir (%j)', (k) => {
+    expect(ret(k)).not.toBeNull()
+  })
+
+  it('okuma, silme ve başka anahtarlar serbest; bash -c içindeki yazım yine reddedilir', () => {
+    expect(ret('git config --get core.hooksPath')).toBeNull()
+    expect(ret('git config core.hooksPath')).toBeNull()
+    expect(ret('git config --unset core.hooksPath')).toBeNull()
+    expect(ret('git config --list')).toBeNull()
+    expect(ret('git config user.name Ada')).toBeNull()
+    expect(ret('git config --global core.autocrlf true')).toBeNull()
+    expect(ret('git config --unset core.hooksPath')).toBeNull()
+    expect(ret('git config --get-all core.hooksPath')).toBeNull()
+    expect(ret('git config --show-origin --get core.hooksPath')).toBeNull()
+    expect(ret('git config user.name "$NAME"')).toBeNull()
+    expect(ret('git config --get alias.co')).toBeNull()
+    expect(ret('git config --unset alias.co')).toBeNull()
+    expect(ret('git config --get $K')).toBeNull()
+    expect(ret('bash -c "git config core.hooksPath /x"')).not.toBeNull()
+  })
+})
+
 describe('INV-PUSH-KAPISI-1 — --no-verify reddi (ARC-277)', () => {
   it.each([
     'git push --no-verify origin feat-x',
