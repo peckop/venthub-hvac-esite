@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -359,5 +362,81 @@ describe('INV-DOC-4b · Kapı A ikinci ayak — kaynak derlemeden sonra DEĞİŞ
       KAYNAK_HARITASI_KANARYA_MESAJI,
     )
     expect(k.ihlaller, k.mesaj).toEqual([])
+  })
+})
+
+/**
+ * KURAL İŞLEVLERİ İHLAL VEREBİLİR Mİ (denetçi önemli bulgusu, #2369)
+ *
+ * İki kol da aynı yedi `kural*` işlevini gerçek, TEMİZ veriyle çağırır. Bir işlev bozulup hep `[]` dönse iki kol da aynı anda
+ * sessizce yeşil kalırdı. Burada her işleve bir İHLALLİ girdi verilir: boş dönmemeli ve ihlalin adını taşımalı.
+ */
+describe('INV-DOC · kural işlevleri ihlali yakalar (fikstür)', () => {
+  const kayit = (yol: string, ozet: string, ek: Partial<ManifestKaydi> = {}): ManifestKaydi => ({
+    ad: 'x',
+    yol,
+    kaynak_kumesi: ['a'],
+    kaynak_commit: 'c',
+    icerik_sha256: ozet,
+    kaynak: { ozet: 'o', dosya_sayisi: 1, dosyalar: { 'docs/README.md': 'h' }, izlenmeyen: [] },
+    ...ek,
+  })
+  const manifestOlustur = (...kayitlar: ManifestKaydi[]): ArtefaktManifesti => ({
+    surum: 1,
+    kaynak_commit: 'c',
+    calisma_agaci: 'temiz',
+    artefaktlar: kayitlar,
+  })
+
+  it('kuralIlanIzlenen: ilan edilen ama izlenmeyen artefakt ihlaldir', () => {
+    expect(kuralIlanIzlenen(['docs/yok.md'], new Set(['docs/var.md'])).ihlaller).toEqual(['docs/yok.md'])
+    expect(kuralIlanIzlenen(['docs/var.md'], new Set(['docs/var.md'])).ihlaller).toEqual([])
+  })
+
+  it('kuralManifestVar: manifest yoksa (null) ihlaldir', () => {
+    expect(kuralManifestVar(null).ihlaller).toEqual([ARTEFAKT_MANIFESTI])
+    expect(kuralManifestVar(manifestOlustur(kayit('docs/a.md', 'x'))).ihlaller).toEqual([])
+  })
+
+  it('kuralManifestIzlenen: manifestte olup izlenmeyen artefakt ihlaldir', () => {
+    const m = manifestOlustur(kayit('docs/yok.md', 'x'), kayit('docs/var.md', 'x'))
+    expect(kuralManifestIzlenen(m, new Set(['docs/var.md'])).ihlaller).toEqual(['docs/yok.md'])
+  })
+
+  it('kuralIcerikOzeti: manifestteki özet depodakiyle uyuşmuyorsa ihlaldir; izlenmeyen artefakt bu kuralın konusu değildir', () => {
+    const yanlis = kayit('docs/README.md', '0'.repeat(64))
+    const k = kuralIcerikOzeti([yanlis], new Set(['docs/README.md']))
+    expect(k.ihlaller.length, 'yanlış özet yakalanmadı').toBe(1)
+    expect(k.ihlaller[0]).toContain('docs/README.md')
+    expect(kuralIcerikOzeti([yanlis], new Set()).ihlaller, 'izlenmeyen ayrı kuralın işi').toEqual([])
+  })
+
+  it('kuralKayitEksiksiz: özetsiz, yolsuz ya da kaynak kümesiz kayıt ihlaldir', () => {
+    const m = manifestOlustur(
+      kayit('docs/a.md', ''),
+      kayit('', 'x'),
+      kayit('docs/b.md', 'x', { kaynak_kumesi: [] }),
+      kayit('docs/tam.md', 'x'),
+    )
+    expect(kuralKayitEksiksiz(m).ihlaller).toEqual(['docs/a.md', '(yolsuz kayıt)', 'docs/b.md'])
+  })
+
+  it('kuralIlanManifestAyni: yaml ilan eder ama manifest kaydetmemişse ihlaldir', () => {
+    const m = manifestOlustur(kayit('docs/a.md', 'x'))
+    expect(kuralIlanManifestAyni(['docs/a.md', 'docs/b.md'], m).ihlaller).toEqual(['docs/b.md'])
+    expect(kuralIlanManifestAyni(['docs/a.md'], m).ihlaller).toEqual([])
+  })
+
+  it('kuralIzlenmeyenKaynak: derleme anında izlenmeyen kaynak taşıyan manifest ihlaldir', () => {
+    const kirli = kayit('docs/a.md', 'x', {
+      kaynak: { ozet: 'o', dosya_sayisi: 1, dosyalar: { 'docs/README.md': 'h' }, izlenmeyen: ['docs/yeni.md'] },
+    })
+    expect(kuralIzlenmeyenKaynak(manifestOlustur(kirli)).ihlaller.length).toBe(1)
+    expect(kuralIzlenmeyenKaynak(manifestOlustur(kayit('docs/a.md', 'x'))).ihlaller).toEqual([])
+  })
+
+  it('KENDI_GIRDILERI: listedeki her yol depoda var (yazım hatası sessizce hiç tetiklenmezdi)', () => {
+    const yok = KENDI_GIRDILERI.filter((y) => !existsSync(resolve(process.cwd(), y)))
+    expect(yok, 'KENDI_GIRDILERI var olmayan yol içeriyor').toEqual([])
   })
 })
