@@ -1246,7 +1246,7 @@ Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölç
 - Radyal (santrifüj) fanlar kategorisinin sayfası hücreli, plug ve gövdeli olmak üzere üç yapıyı tanıtır [4]; modeller: [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans).
 - Kanal tipi fanlar havayı kanal hattının içinde taşır ve kanala seri bağlanır; kategoride karma akışlı iki LINEO ailesi (LINEO ve LINEO Quiet) de bulunur [3][4]; modeller: [kanal tipi fanlar](vh:kategori/duct-fans). Ayrıntı için [kanal tipi fan nedir rehberine](vh:yazi/kanal-tipi-fan-nedir), ses değeri için [sessiz fan rehberine](vh:yazi/sessiz-fan-secimi) bakın.
 - Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans). Seçimde nelere bakıldığı için [çatı tipi fan rehberi](vh:yazi/cati-tipi-fan-nedir) okunabilir.
-- Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans).
+- Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans). Seçimde nelere bakıldığı için [banyo ve tuvalet fanı rehberi](vh:yazi/banyo-tuvalet-fani-secimi) okunabilir.
 - Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır [4]; modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
 - Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans). Seçimde nelere bakıldığı için [hücreli aspiratör rehberi](vh:yazi/hucreli-aspirator-nedir) okunabilir.
 - Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; modeller: [plug fanlar](vh:kategori/plug-fans); ayrıntı için [plug fan nedir, nerede kullanılır](vh:yazi/plug-fan-nedir) yazısına bakılabilir.
@@ -1905,6 +1905,138 @@ Kategoride iki aile bulunur: sık kanatlı HF-FW ve seyrek kanatlı HF-S; teklif
 ## Teknik sorumluluk notu
 
 Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Hücreli ailelerin teknik özellikleri üretici teknik föyünden doğrulanmalıdır. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-55), doğrulanmış metin: taslak v15 (sha 4329bcb6430f). Makale çerçevesi (cetvel R3.3): markasız gövde, marka ve seri adları yalnız "VentHub'da hangi banyo ve tuvalet fanı serileri var?" bölümünde ve Kaynaklar'da.
+    // Doğrulama: on tam tur (v1-v13), her turda tuzaklı + temiz kopya; son tam turda engelleyici 0, tuzaklı 10/10. MEVZUAT hükmü (MVZ-8): mevzuat cümleleri doğru; 'debi değeri verilmez' yalnız banyo ve tuvalet fanı için ve eklerin okunmadığı kaydıyla. Recep yayın onayı 08.11.2026 (OPS). Fiyat yok.
+    kimlik: 'banyo-tuvalet-fani-secimi',
+    konu: 'konfor',
+    yayinTarihi: '2026-11-08',
+    guncellemeTarihi: '2026-11-08',
+    urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
+    ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
+    diller: {
+      tr: {
+        slug: 'banyo-ve-tuvalet-fani-nasil-secilir',
+        ozet: "Banyo ve tuvalet fanı imar yönetmeliğine göre zorunlu mu? Debi, ses ve kumanda ölçütleri nelerdir; teklif için hangi bilgiler gerekir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Banyo ve tuvalet fanı seçerken mevzuatın, debinin, sesin ve kumandanın nasıl ele alındığını görmek için bu rehberden başlayın.",
+        govde: `# Banyo ve tuvalet fanı nasıl seçilir?
+
+Banyo ve tuvalet fanı, nemi ve kirleticileri oluştuğu yerde odadan atan yerel egzoz fanıdır; ABD Enerji Bakanlığı banyo egzoz fanlarını bu türden sayar [5]. Türkiye'de incelenen iki yönetmeliğin gövde metninde bu fanlar için debi değeri yoktur [1][2]. Yurt dışı ölçütler sıralanır.
+
+Kısaca:
+
+- Mevzuat: baca ya da mekanik havalandırma istenir, gövdede debi yoktur; bağımsız bölümün ıslak hacminde mekanik havalandırma yapılmazsa pencere net 0,30 × 0,30 m'den küçük olamaz [1].
+- Debi: HVI 100 ft²'ye kadar banyoda 1 CFM/ft² önerir [4]; İngiltere konutlarında aralıklı egzozda banyo en az 15, tuvalet 6 l/s [3].
+- Ses: ENERGY STAR 10-89 CFM banyo/yardımcı fanlarında en az 2,8 CFM/W, azami 2,0 sone ister [6].
+- Kumanda: broşürde nem eşiği, hareket algılama fanı açar, zamanlayıcı kapatır [10].
+
+## Banyo ve tuvalet fanı ne işe yarar?
+
+ABD Enerji Bakanlığı spot havalandırmayı, yerel egzoz fanlarıyla kirleticileri ve nemi kaynağında hızla uzaklaştırma olarak tanımlar [5]. Dünya Sağlık Örgütü'nün nem ve küf rehberi de olumsuz sağlık etkilerinden kaçınmanın en önemli yolu olarak iç yüzeylerde ve bina yapılarında kalıcı nemin ve mikrobiyal üremenin önlenmesini ya da en aza indirilmesini sayar ve havalandırmanın kirleticileri kaynağında (yerel egzoz) uzaklaştırması gerektiğini yazar [7]. Kanal tipi fanların genel anlatımı için [kanal tipi fan nedir, nerede kullanılır](vh:yazi/kanal-tipi-fan-nedir) yazısına, fan türlerinin genel ayrımı için [fan çeşitleri](vh:yazi/fan-cesitleri) yazısına bakılabilir.
+
+## Banyo ve tuvaletin havalandırılması imar yönetmeliğine göre zorunlu mu?
+
+Planlı Alanlar İmar Yönetmeliği uygulama imar planı bulunan alanları kapsar (madde 2) [1]. Bu yönetmeliğe göre binalarda banyo, tuvalet ve benzeri kullanım alanlarının havalandırma bacası ile ya da mekanik havalandırma ile havalandırılması zorunludur (madde 32/9) [1]. Aynı yönetmelik, bağımsız bölümün tuvalet, banyo ve benzeri ıslak hacimlerinde mekanik havalandırma yapılmadığında yapılacak havalandırma penceresinin net 0,30 × 0,30 metreden küçük olamayacağını yazar (madde 39/6) [1]. İki maddenin birlikte nasıl uygulandığı bu yazıda yorumlanmaz; metin mekanik fanı tek yol olarak yazmaz, baca ya da mekanik havalandırma seçeneklerini birlikte sayar [1].
+
+## Banyo fanı debisi için hangi ölçütler kullanılıyor?
+
+Türkiye'de incelenen yönetmeliklerin gövde metninde banyo ve tuvalet fanı için debi değeri verilmez [1][2]; bu yazı karşılaştırma için iki yurt dışı ölçüt kullanır [3][4]. Home Ventilating Institute (HVI), 100 fit kareye kadar olan banyoda fanın fit kare başına 1 CFM hava sağlamasını önerir [4]. İngiltere'de (England) Approved Document F'in 1. cildi, aralıklı egzoz sistemleri için en düşük egzoz hızını banyo için 15 l/s, tuvalet için 6 l/s olarak Tablo 1.1'de verir [3]. Tuvalet için pencereyle havalandırma yönergesi alternatif olarak kullanılabilir; belge ayrıca daha az hava sızdırmaz konutlarda aralıklı egzoz fanlarının tüm ıslak hacimlere konmasını önerir (madde 1.47, rehber niteliğinde; kapsamı Tablo 1.6'da daha az hava sızdırmaz konut olarak verilir) [3].
+
+İki ölçüt farklı birimde ve farklı mantıktadır: biri alan başına öneridir, öbürü en düşük egzoz hızıdır; bu yüzden yan yana okunamaz. Bu ölçütlerin projede esas alınması bir tasarım kararıdır; bu yazı onları Türkiye'de uygulanır diye sunmaz.
+
+| Ölçüt | Değer | Geçerli olduğu yer | Kaynak |
+|---|---|---|---|
+| HVI banyo havalandırması önerisi | 100 ft²'ye kadar olan banyoda ft² başına 1 CFM [4] | Yer belirtilmemiş; ABD birimleriyle yazılmış sektör önerisi [4] | [4] |
+| Approved Document F, Tablo 1.1 (banyo, aralıklı egzoz) | En az 15 l/s [3] | İngiltere (England) | [3] |
+| Planlı Alanlar İmar Yönetmeliği, madde 32 ve 39 [1] | Gövde metninde debi değeri verilmez [1] | Türkiye (imar planlı alanlar) [1] | [1] |
+
+## Banyo fanının sesi ve verimi hangi değerlerle anlatılır?
+
+ABD'deki ENERGY STAR programının güncel ölçütleri, 10 ile 89 CFM arasındaki banyo ve yardımcı oda fanları için en az 2,8 CFM/W verim ve en çok 2,0 sone ses düzeyi ister; sone değeri belirli bir referans statik basınçtaki ölçüme bağlıdır [6]. ABD Enerji Bakanlığı, gürültülü havalandırma fanlarının verimli ve sessiz ENERGY STAR modelleriyle değiştirilmesini önerir [5]. Bir üreticinin broşürü ses basıncını 3 m uzaklıkta dB(A) olarak verir: azami 90 m³/h debili bir modelde 26,9, azami 175 m³/h debili bir modelde 32,3 dB(A) [8]. Sone ile dB(A) farklı büyüklüklerdir; ses gücü ile ses basıncının farkı için [sessiz kanal fanı nasıl seçilir](vh:yazi/sessiz-fan-secimi) yazısına bakılabilir.
+
+## Banyo fanı hangi kumanda türleriyle çalışır?
+
+HVI, fanın banyo kullanıldıktan sonra 20 dakika açık bırakılmasını önerir [4]. Bir üreticinin konut havalandırma broşürü, Punto serisi için örneğin iki çalışma biçimi anlatır: nem kumandalı modelde iç ortam bağıl nemi önceden ayarlanan değeri aştığında ürün otomatik açılır ve nem ayarlanan sınırın altına düştüğünde bir zamanlayıcı ürünü kapatır; hareket sensörlü modelde kişi odadan çıktıktan sonra ünite zamanlayıcı ayarına göre 3 ile 20 dakika çalışmaya devam eder [10]. VentHub'daki Punto Evo Flexo ailesinin (Quadro Evo ailesi için bu cümle geçerli değildir) dört modelinin hiçbirinde nem kumandası yoktur, ikisinde zamanlayıcı vardır ve hareket algılama model verisinde yer almaz [11].
+
+## Geri akış panjuru ve koruma derecesi için üretici broşürleri ne yazar?
+
+ABD Enerji Bakanlığı mutfak ve banyo tahliyelerinin doğrudan dışarıya gitmesini ve çatı arasına verilmemesi gerektiğini yazar [5]. Bir üreticinin duvar tipi eksenel fan broşürü, ürünün dışarıya doğrudan ya da kısa kanallarla hava tahliyesi için tasarlandığını yazar [8]. Aynı üreticinin Punto Evo Flexo broşüründe fan kapalıyken istenmeyen hava girişini, Quadro Evo broşüründe kötü koku ve soğuk hava yayılmasını önleyen bir geri akış panjuru anlatılır [8][9].
+
+Aynı üreticinin Quadro Evo broşürü, çarkın nominal debilerde yüksek basınç düzeyleri sağladığını yazar [9]. Aynı serinin başka bir broşürü, odadan tahliye ağzına kadar izin verilen basınç kaybını çok katlı bir ortak ana kolon için verilen referans kurulumda (başlıca koşullar: 2,75 m oda yüksekliği, dirseksiz düz kanal, son üniteden çatı üstündeki çıkışa kanal en çok 1,5 m, tüm üniteler aynı anda çalışırken) 60 Pa olarak verir; bu değer o kurulumun koşullarına bağlıdır [9].
+
+Quadro Evo broşürü, ürünün IP45 koruma derecesiyle banyonun 1. bölgesinde güvenli montaja uygun olduğunu yazar [9]. Bu bir üretici beyanıdır; bölge tanımı ve ölçüleri bu yazıda verilmez. Elektrik bağlantısı ve montaj, güncel elektrik tesisat kurallarına ve üreticinin kılavuzuna göre yetkili personel tarafından yapılır.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez; ilgili ürün sayfalarında fiyat gösterilmez, teklif istenir [11]. Teklifte hazır bulundurulacak seçim girdileri şunlardır:
+
+- Odanın alanı: HVI 100 fit kareye kadar banyolarda alan başına, daha büyük banyolarda sıhhi tesisat elemanlarının sayısına ve türüne göre öneri verir [4].
+- Montaj şekli: duvar, tavan ya da kanal bağlantısı kategori sayfasında anılır [11].
+- Kanal uzunluğu ve çıkış: izin verilen basınç kaybı üretici ve kurulum referansına bağlıdır; üretici değeri yalnız kendi referans kurulumu için verilmiştir [9].
+- Kumanda tercihi: nem, zamanlayıcı ve hareket algılama [10].
+- Ses beklentisi: sone ya da dB(A) ve ölçüm uzaklığı [6][8].
+- Yerel gereksinim: baca, mekanik havalandırma ve pencere seçenekleri yönetmelikte yazılıdır [1].
+
+## Bu yazının sınırları
+
+- İncelenen iki yönetmeliğin gövde metninde banyo ve tuvalet fanı için sayısal debi ya da hava değişim değeri verilmez; ekleri okunmamıştır [1][2].
+- Binalarda Enerji Performansı Yönetmeliği, havalandırma ve iklimlendirme sistemlerinin tasarımında TS 3419 ve ilgili Avrupa standartlarına uyulmasını ister (madde 17/1); TS 3419'un içeriği, Binaların Yangından Korunması Hakkında Yönetmelik ve belediyelerin kendi imar yönetmelikleri bu yazıda okunmamıştır, bu yüzden başka bir belgede debi değerinin bulunmadığı söylenemez [2].
+- Madde numaraları yayın tarihindeki güncel metne aittir ve değişiklikle kayabilir.
+- HVI ve ENERGY STAR ABD kaynaklıdır, İngiltere belgesi yalnız İngiltere içindir; bu ölçütler Türkiye'de bağlayıcı değildir [3][4][6]. Projeye özel değeri tasarımcı ve üretici kılavuzu belirler.
+- Fiyatı belirleyen etkenler bu yazının kaynaklarında yer almaz.
+
+## VentHub'da hangi banyo ve tuvalet fanı serileri var?
+
+VentHub'ın [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans) kategorisinde dört aile bulunur [11]. [Punto Evo Flexo banyo fanları](vh:aile/vortice-punto-evo-flexo-banyo-fanlari) duvar ve tavan montajına uygun banyo-tuvalet aspiratörü olarak anlatılır [11]. [VORT Quadro Evo](vh:aile/vortice-vort-quadro-evo) duvar ya da tavan montajına uygun, bilyalı motorlu bir santrifüj kanal tipi fan olarak anlatılır [11]. [AVenS QE-B Kasa Serisi](vh:aile/avens-qe-b-kasa-serisi) gömme ya da duvar/tavan montajı için kullanılan temel fan kasası ve valf grubu olarak tanımlanır [11]. Dördüncü aile olan Bravo S ise fan değil, hava kalitesi sensörü olarak anlatılır [11].
+
+## Sık sorulan sorular
+
+### Banyo fanı kullanımdan sonra ne kadar açık kalmalı?
+
+HVI, fanın banyo kullanıldıktan sonra 20 dakika açık bırakılmasını önerir [4]. Bir üreticinin hareket sensörlü modelinde ünite, kişi odadan çıktıktan sonra zamanlayıcı ayarına göre 3 ile 20 dakika çalışmaya devam eder [10].
+
+### Banyo tahliyesi çatı arasına verilebilir mi?
+
+ABD Enerji Bakanlığı mutfak ve banyo tahliyelerinin doğrudan dışarıya gitmesini ve çatı arasına verilmemesi gerektiğini yazar [5].
+
+### Geri akış panjuru ne işe yarar?
+
+Bir üreticinin Punto Evo Flexo broşüründe geri akış panjuru istenmeyen hava girişini, Quadro Evo broşüründe kötü koku ve soğuk hava yayılmasını önleyen parça olarak anlatılır [8][9].
+
+### Spot havalandırma nedir?
+
+ABD Enerji Bakanlığı spot havalandırmayı, yerel egzoz fanlarıyla kirleticileri ve nemi kaynağında hızla uzaklaştırma olarak tanımlar [5].
+
+### Yönetmelik banyo ve tuvalet için fan mı pencere mi ister?
+
+Yönetmelik mekanik fanı tek yol olarak yazmaz; Planlı Alanlar İmar Yönetmeliği banyo ve tuvaletin baca ya da mekanik havalandırmayla havalandırılmasını ister; bağımsız bölümün ıslak hacminde mekanik havalandırma yapılmadığında yapılacak pencere için net 0,30 × 0,30 metre alt sınırı vardır [1]. İki maddenin birlikte nasıl uygulandığı bu yazıda yorumlanmaz; madde 39/6 mekanik havalandırma yapılmadığı takdirde yapılacak pencereden söz eder [1].
+
+### VentHub'da hangi banyo ve tuvalet fanları var?
+
+Kategoride iki fan ailesi, bir fan kasası serisi ve fan olmayan bir hava kalitesi sensörü ailesi (Bravo S) bulunur; teklif ürün sayfalarından istenir [11].
+
+## Kaynaklar
+
+1. Planlı Alanlar İmar Yönetmeliği, Resmî Gazete 03.07.2017, sayı 30113, madde 2, 32 ve 39; mevzuat.gov.tr, MevzuatNo=23722, güncel konsolide metin (erişim 08.11.2026).
+2. Binalarda Enerji Performansı Yönetmeliği, Resmî Gazete 05.12.2008, sayı 27075, madde 17; mevzuat.gov.tr, MevzuatNo=13594, güncel konsolide metin (erişim 08.11.2026).
+3. UK Government, Approved Document F: Ventilation, Volume 1: Dwellings, 2026 baskısı (24 Mart 2027'de, yüksek riskli bina işinde 24 Eylül 2027'de yürürlüğe girer) ve 2021 baskısı (15 Haziran 2022'de yürürlüğe girmiştir), Tablo 1.1 ve madde 1.47, England için. https://assets.publishing.service.gov.uk/media/6a9a918a01bbff0bf8f97e1b/Approved_Document_F__Volume_1_Dwellings.pdf , https://assets.publishing.service.gov.uk/media/61deba42d3bf7f054fcc243d/ADF1.pdf (erişim 08.11.2026)
+4. Home Ventilating Institute (HVI), Bathroom Ventilation. https://www.hvi.org/resources/publications/bathroom-ventilation/ (erişim 08.11.2026)
+5. U.S. Department of Energy, Energy Saver, Home Ventilation (ES-HomeVentilation, adres sürümü 2021-08), sayfa 1 ve 2. https://www.energy.gov/sites/default/files/2021-08/ES-HomeVentilation_081021.pdf (erişim 08.11.2026)
+6. ENERGY STAR, Ventilation Fans Key Product Criteria. https://www.energystar.gov/products/ventilation_fans/key_product_criteria (erişim 08.11.2026)
+7. World Health Organization, WHO Guidelines for Indoor Air Quality: Dampness and Mould, 2009, PDF s. 6 ve basılı s. 51. https://iris.who.int/server/api/core/bitstreams/9261a374-7d3b-4825-a61e-0c09dea2af87/content (erişim 08.11.2026)
+8. Vortice, Punto Evo Flexo konut havalandırma broşürü (Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2), sayfa 3, 4 ve 5; VentHub kaynak dizini (erişim 08.11.2026).
+9. Aynı üretici, Quadro Evo konut havalandırma broşürleri (vort_quadro_evo_4 sayfa 3 ve 4; vort_quadro_evo_179649 sayfa 4 ve 13); VentHub kaynak dizini (erişim 08.11.2026).
+10. Aynı üretici, Residential Ventilation broşürü (ResidentialVentilation, Punto serisi), sayfa 6; VentHub kaynak dizini (erişim 08.11.2026).
+11. VentHub, banyo ve tuvalet fanları kategori sayfası, Punto Evo Flexo, Quadro Evo ve QE-B kasa serisi ürün sayfaları ile Bravo S ürün sayfası, canlı sitede 8 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/banyo-tuvalet-fanlari , https://venthub.com.tr/tr/products/vortice-punto-evo-flexo-banyo-fanlari , https://venthub.com.tr/tr/products/vortice-vort-quadro-evo , https://venthub.com.tr/tr/products/avens-qe-b-kasa-serisi , https://venthub.com.tr/tr/products/vortice-bravo-s
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Yasal bilgi yayın tarihindeki metne aittir; yurt dışı kaynaklı ölçütler yalnız bilgi amaçlıdır. Elektrik bağlantısı ve montaj yetkili personelle yapılır; üretici beyanları üreticinin kendi belgelerindeki bilgilerdir. Ürün bilgileri yayın tarihindeki sürüme aittir.
 `,
       },
     },
