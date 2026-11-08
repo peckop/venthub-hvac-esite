@@ -56,5 +56,13 @@ if [ -f "$DOKUM" ]; then
 fi
 
 BETIK="$ROOT/scripts/hijyen/kapali-dal-push.cjs"
-[ -f "$BETIK" ] || exit 0
-printf '%s\n' "$GIRDI" | "$NODE" "$BETIK"
+if [ -f "$BETIK" ]; then
+  printf '%s\n' "$GIRDI" | "$NODE" "$BETIK" || exit $?
+fi
+
+# (3) Push hedef kapisi (ARC-277, scripts/hijyen/push-hedef-kapisi.cjs): hedef master/main, silme ve hizli ileri OLMAYAN guncelleme
+#     REDDEDILIR; push'u hangi surec (node betigi dahil) yaparsa yapsin calisir. Bilincli gecis (silme/hizli-ileri-degil):
+#     VH_PUSH_HEDEF_IZIN=1 git push ...  (master/main icin gecis YOK). `--no-verify` bu kancayi da atlar (DURUST SINIR).
+HEDEF="$ROOT/scripts/hijyen/push-hedef-kapisi.cjs"
+[ -f "$HEDEF" ] || exit 0
+printf '%s\n' "$GIRDI" | "$NODE" "$HEDEF" "$@"
