@@ -101,6 +101,40 @@ function satirDevami(komut, i) {
   return 0
 }
 
+/**
+ * ARC-283: `$'...'` ANSI-C tırnağı (bash). İçinde `\'` kaçıştır, tırnağı kapatmaz; eskiden `$'\''` tırnak durumunu kaydırıp
+ * sonraki `; git push origin master` kısmını yutuyordu. i = `$` konumu; { s: çözülmüş metin, son: son tırnağın konumu } döner.
+ * Kapanış yoksa (bash da hata verir) son = komut uzunluğu. Yaygın kaçışlar (\xHH, \NNN, \uHHHH, \n ...) çözülür; tanınmayan olduğu gibi kalır.
+ */
+function ansiCTirnak(komut, i) {
+  let s = ''
+  let j = i + 2
+  const TEK = { n: '\n', t: '\t', r: '\r', a: '\x07', b: '\b', e: '\x1b', E: '\x1b', f: '\f', v: '\v', '\\': '\\', "'": "'", '"': '"', '?': '?' }
+  while (j < komut.length && komut[j] !== "'") {
+    if (komut[j] !== "\\" || j + 1 >= komut.length) {
+      s += komut[j++]
+      continue
+    }
+    const k = komut[j + 1]
+    const sonra = komut.slice(j + 2)
+    let m
+    if (k in TEK) {
+      s += TEK[k]
+      j += 2
+    } else if ((m = (k === "x" && /^[0-9a-fA-F]{1,2}/.exec(sonra)) || (k === "u" && /^[0-9a-fA-F]{1,4}/.exec(sonra)) || (k === "U" && /^[0-9a-fA-F]{1,8}/.exec(sonra)))) {
+      s += String.fromCodePoint(Math.min(parseInt(m[0], 16), 0x10ffff))
+      j += 2 + m[0].length
+    } else if ((m = /^[0-7]{1,3}/.exec(komut.slice(j + 1)))) {
+      s += String.fromCharCode(parseInt(m[0], 8) & 255)
+      j += 1 + m[0].length
+    } else {
+      s += "\\" + k
+      j += 2
+    }
+  }
+  return { s, son: j }
+}
+
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut, yorumAtla = true) {
   const parcalar = []
@@ -129,7 +163,13 @@ function parcala(komut, yorumAtla = true) {
       else jeton += c
       continue
     }
-    if (c === "'" || c === '"') {
+    if (c === '$' && komut[i + 1] === "'") {
+      // ARC-283: ANSI-C tırnağı; içerik çözülüp jetona eklenir, tırnak durumu kaymaz.
+      const a = ansiCTirnak(komut, i)
+      jeton += a.s
+      jetonVar = true
+      i = a.son
+    } else if (c === "'" || c === '"') {
       tirnak = c
       jetonVar = true
     } else if (c === '\\' && satirDevami(komut, i)) {
@@ -189,7 +229,9 @@ function pushBul(t, genisletme = false) {
     else break
   }
   // Alt komut yerine koyma ile gizlenmiş olabilir (`git $(echo push) origin master`): ayrıştırıcı `$(`'de parçayı böler, alt komut düşer.
-  if (genisletme && (t[i] === undefined || /[$`]/.test(t[i]))) return { yasak: 'git alt komutu genişletmeyle belirleniyor ($(…), `…`): push gizlenebilir; alt komutu açık yaz' }
+  // ARC-283: `git ${x} push ...`, `git $X push ...`: alt komut değişkenle gizlenmiş; push başka bir tokende görünüyorsa komut satırı genişletmesiz de fail-closed.
+  const degiskenAlt = t[i] !== undefined && t[i].includes('$') && t.slice(i).some((x) => x.includes('push'))
+  if ((genisletme && (t[i] === undefined || /[$`]/.test(t[i]))) || degiskenAlt) return { yasak: 'git alt komutu genişletmeyle belirleniyor ($(…), `…`): push gizlenebilir; alt komutu açık yaz' }
   if (t[i] !== 'push') return null
   return { c: yollar, args: t.slice(i + 1) }
 }
