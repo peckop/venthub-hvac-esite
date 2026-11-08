@@ -140,6 +140,17 @@ describe('INV-ROL-1 — rol kartı üreticisi ayırt edici', () => {
     expect(uretici.sorunlar(bozuk).some((s) => s.includes('bayt'))).toBe(true)
   })
 
+  it('HRT-120: kontrol fiilî tavanı (6255) yakalar, 6656 sert sınırın altındaki kartı da', () => {
+    const fiili = Math.floor(uretici.KART_BAYT_SINIRI * 0.94) - 1
+    const doldur = (ad: 'URUN') => {
+      const fark = fiili + 1 - Buffer.byteLength(temiz[ad], 'utf8')
+      return { ...temiz, [ad]: temiz[ad] + 'x'.repeat(Math.max(fark, 1)) }
+    }
+    const bozuk = doldur('URUN')
+    expect(Buffer.byteLength(bozuk.URUN, 'utf8')).toBeLessThan(uretici.KART_BAYT_SINIRI)
+    expect(uretici.sorunlar(bozuk).some((s) => s.startsWith('URUN:') && s.includes('bayt'))).toBe(true)
+  })
+
   it('başlığı eksik kartı yakalar', () => {
     const bozuk = { ...temiz, ADMIN: temiz.ADMIN.replace('## Yetki', '## Baska') }
     expect(uretici.sorunlar(bozuk).some((s) => s.includes('başlık eksik'))).toBe(true)

@@ -1000,7 +1000,8 @@ function sorunlar(kartlar) {
   const s = []
   for (const [ad, metin] of Object.entries(kartlar)) {
     const bayt = Buffer.byteLength(metin, 'utf8')
-    if (bayt > KART_BAYT_SINIRI) s.push(`${ad}: ${bayt} bayt > ${KART_BAYT_SINIRI}`)
+    // Fiilî tavan testlerle aynı (HRT-120): 6656 sert sınır kalır (KART_BAYT_SINIRI), ama kontrol testin kabul ettiği değeri kabul eder.
+    if (bayt > KART_AMAC_TAVANI) s.push(`${ad}: ${bayt} bayt > ${KART_AMAC_TAVANI} (fiilî tavan; sert sınır ${KART_BAYT_SINIRI})`)
     for (const blok of [RECEP_KAPILARI, ILETISIM_ISTISNA[ad] || ILETISIM, YONETIM_ISTISNA[ad] || YONETIM, CALISMA]) {
       if (!metin.includes(blok)) s.push(`${ad}: ortak blok eksik/değişmiş: ${blok.split('\n')[0]}`)
     }
