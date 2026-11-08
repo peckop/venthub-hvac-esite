@@ -230,6 +230,33 @@ describe('INV-PUSH-KAPISI-1 — ters eğik çizgi + satır sonu (ARC-278)', () =
   })
 })
 
+describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () => {
+  it.each([
+    'git config core.hooksPath /tmp/bos',
+    'git config --local core.hookspath /tmp/bos',
+    'git config --global core.HOOKSPATH /tmp/bos',
+    'git -C . config core.hooksPath /tmp/bos',
+    'cd /depo && git config core.hooksPath .',
+    'git config --add core.hooksPath /tmp/bos',
+    'git config --file .git/config core.hooksPath /tmp/bos',
+    'git -c core.hooksPath=/tmp/bos status',
+    'git -c core.hookspath=/tmp/bos commit -m a',
+    'echo ok && git config core.hooksPath /x',
+  ])('hooksPath yazımı reddedilir (%j)', (k) => {
+    expect(ret(k)).not.toBeNull()
+  })
+
+  it('okuma, silme ve başka anahtarlar serbest; bash -c içindeki yazım yine reddedilir', () => {
+    expect(ret('git config --get core.hooksPath')).toBeNull()
+    expect(ret('git config core.hooksPath')).toBeNull()
+    expect(ret('git config --unset core.hooksPath')).toBeNull()
+    expect(ret('git config --list')).toBeNull()
+    expect(ret('git config user.name Ada')).toBeNull()
+    expect(ret('git config --global core.autocrlf true')).toBeNull()
+    expect(ret('bash -c "git config core.hooksPath /x"')).not.toBeNull()
+  })
+})
+
 describe('INV-PUSH-KAPISI-1 — --no-verify reddi (ARC-277)', () => {
   it.each([
     'git push --no-verify origin feat-x',

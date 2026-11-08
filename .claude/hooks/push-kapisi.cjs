@@ -194,6 +194,28 @@ function pushBul(t, genisletme = false) {
   return { c: yollar, args: t.slice(i + 1) }
 }
 
+const HOOKSPATH_OKUMA = new Set(['--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--unset', '--unset-all', '--show-origin', '--show-scope'])
+
+/**
+ * `git config core.hooksPath <değer>` (ARC-281, OPS onaylı): pre-push katmanını (push-hedef-kapisi) atlatır; `-c core.hooksPath=` zaten
+ * pushBul'da reddedilir. `git` tokeninden sonraki parça verilir. Okuma (--get/--list) ve silme (--unset: varsayılan kancalara döner)
+ * serbest; anahtar büyük-küçük harf duyarsız. Yalnız git config alt komutu (global seçenekler -C/-c atlanır). Dönüş: neden ya da null.
+ * SINIR: `.git/config` dosyasını elle yazmak, `git -c` dışı ortam yolları ve Bash dışı yazım bu kapıdan görünmez (git pre-push ve GitHub master koruması arkada).
+ */
+function hooksPathYazimi(sonrasi) {
+  let i = 0
+  while (i < sonrasi.length && /^-/.test(sonrasi[i])) i += sonrasi[i] === '-C' || sonrasi[i] === '-c' ? 2 : 1
+  if (sonrasi[i] !== 'config') return null
+  const arg = sonrasi.slice(i + 1)
+  if (arg.some((a) => HOOKSPATH_OKUMA.has(a))) return null
+  const ki = arg.findIndex((a) => /^core\.hookspath(=|$)/i.test(a))
+  if (ki < 0) return null
+  if (/=/.test(arg[ki]) || arg.slice(ki + 1).some((a) => !/^-/.test(a))) {
+    return 'git config core.hooksPath <değer>: pre-push kapısını (push hedef/kapalı dal/döküm) atlatır; ayarı değiştirme (kurulum scripts/setup-hooks.mjs shim modeliyle, okuma ve --unset serbest)'
+  }
+  return null
+}
+
 /**
  * Saf karar. girdi: komut metni. o: { cwd, mevcutDal(cwd)->string|null, gitDeposu(yol)->boolean (varsayılan: git rev-parse) }.
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
@@ -265,6 +287,8 @@ function degerlendir(komut, o) {
     // hiçbiri master/main'e, force ile ya da dışarıya push yapmamalı.
     for (let k = 0; k < t.length; k++) {
       if (komutAdi(t[k]) !== 'git') continue
+      const hp = hooksPathYazimi(t.slice(k + 1))
+      if (hp) return hp
       const p = pushBul(t.slice(k), genisletme)
       if (!p) continue
       if (p.yasak) return p.yasak
