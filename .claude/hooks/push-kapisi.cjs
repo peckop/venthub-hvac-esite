@@ -216,11 +216,13 @@ function degerlendir(komut, o) {
   // `cd` argümansız ya da `cd -` ise klasör değişmedi sayılır.
   let cwd = o.cwd
   // Tek tırnak dışında komut yerine koyma var mı ($(…) ya da ters tırnak): alt komut/komut adı gizlenebilir.
-  const genisletme = /\$\(|`/.test(String(komut || '').replace(/'[^']*'/g, ''))
+  // Ham metin regex'leri satır devamı silinmiş metinde koşar (`$\<LF>(echo push)`, `pu\<LF>sh`: bash birleştirir; ARC-278 denetçi bulgusu). Tek tırnak içi literal kalır.
+  const devamsiz = String(komut || '').replace(/'[^']*'|\\\n/g, (m) => (m === '\\\n' ? '' : m))
+  const genisletme = /\$\(|`/.test(devamsiz.replace(/'[^']*'/g, ''))
   for (const t of parcalar) {
     // Komut adı genişletmeyle belirleniyorsa (`$(echo git) push ...`, `$G push ...`) ve komutta push geçiyorsa fail-closed.
     const ilkAd = asilKomut(t)
-    if (ilkAd >= 0 && /[$`]/.test(t[ilkAd]) && /\bpush\b/.test(String(komut || ''))) return 'komut adı genişletmeyle belirleniyor ($…) ve komutta push geçiyor: git push gizlenebilir; komutu açık yaz'
+    if (ilkAd >= 0 && /[$`]/.test(t[ilkAd]) && /\bpush\b/.test(devamsiz)) return 'komut adı genişletmeyle belirleniyor ($…) ve komutta push geçiyor: git push gizlenebilir; komutu açık yaz'
     // xargs ve env -S: argümanlar statik görülemez → git ve push birlikte geçiyorsa fail-closed
     const tGitPush = t.some(gitGecer) && t.some((x) => x.includes('push'))
     if (tGitPush && t.some((x) => komutAdi(x) === 'xargs')) return 'xargs ile git push: argümanlar önceden bilinemez; push\'u doğrudan yaz'
