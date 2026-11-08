@@ -22,6 +22,7 @@ type Uretici = {
   GOREV_DEGIL_BASLIK: string
   DERS_TEKRAR_KURALI: string
   OZ_DEGERLENDIRME_KURALI: string
+  ARAC_TARAMA_KURALI: string
   SUREN_IS_KORUMA_KURALI: string
   SEO_EK_KURALI: string
   SEO_EK_KURALI_ROLLERI: string[]
@@ -1461,6 +1462,18 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.OZ_DEGERLENDIRME_KURALI, '') }
     expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
     expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Haftalık öz-değerlendirme/)
+  })
+
+  it('HRT-121 (OPS-256): "betik yazmadan önce scripts/ ve araç envanteri taranır, kopya yazılmaz" bloğu her rolün kurallar dosyasında; düşerse sorunlar() yakalar', () => {
+    const kurallar = uretici.uretKurallar()
+    for (const ad of roller) expect(kurallar[ad], ad).toContain(uretici.ARAC_TARAMA_KURALI)
+    for (const parca of ['`scripts/`', 'arac-envanteri-standard.md', 'bayrak eklenir', 'kopyası yazılmaz']) {
+      expect(uretici.ARAC_TARAMA_KURALI, parca).toContain(parca)
+    }
+    const ad = roller[0]
+    const bozuk = { ...kurallar, [ad]: kurallar[ad].replace(uretici.ARAC_TARAMA_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(bozuk).join('\n')).toMatch(/Betik yazmadan önce tara/)
   })
 
   it('HRT-114 (OPS-232): ortak ölçüm maddeleri (defter satırı, test:ilgili kırmızı dosya listesi, güncel master bayt ölçümü) kurallar dosyalarında ve filo-ortak işaretçilerinde durur', () => {
