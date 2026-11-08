@@ -64,6 +64,50 @@ const GIT_ORTAM = /^(?:export\s+)?GIT_(?:CONFIG_PARAMETERS|CONFIG_COUNT|CONFIG_K
 /** `-c anahtar=değer` için tek serbest küme: görünüm ve kimlik adı. core.pager yalnız `cat` (başka pager komut çalıştırır). */
 const ZARARSIZ_ANAHTAR = /^(?:core\.quotepath=|color\.[a-z.]+=|advice\.[a-z.]+=|core\.pager=cat$|user\.(?:name|email)=|log\.[a-z.]+=|diff\.renames=)/i
 
+/** Gövdesini yalnız VERİ olarak okuyan komutlar (çalıştırmaz). Başka her alıcı (bash, node, eval, xargs ...) gövdeyi koşabilir → gövde taranır. */
+const VERI_ALICI = new Set(['cat', 'tee', 'wc', 'head', 'tail', 'sort', 'uniq', 'tr', 'cut', 'grep', 'rg', 'base64', 'sha256sum', 'md5sum', 'shasum', 'dd'])
+/** Heredoc operatöründen sonra satırda bu sözcüklerden biri varsa gövde (boru ya da zincirle) bir yorumlayıcıya gidebilir. */
+const YORUMLAYICI = /\b(?:bash|sh|zsh|dash|ksh|fish|busybox|eval|source|xargs|node|nodejs|python3?|perl|ruby|php|pwsh|powershell|cmd|deno|bun|env|git|gh)\b/i
+
+/** Dosya yürütme biçimleri: `./f`, `../f`, `. f` (kaynak alma), `exec`. */
+const YURUTME_YOLU = /(?:^|[;&|(])\s*(?:\.{1,2}\/|\.\s|exec\b)/m
+/**
+ * ARC-277 (MVZ-10 yanlış pozitifi): `cat > dosya <<'E' ... arr.push(...) ... E` gövdesindeki sözcükler komut sanılıyordu.
+ * TIRNAKLI sınırlayıcılı (<<'E', <<"E": genişleme yok) heredoc gövdesi, alıcı salt veri okuyorsa ve aynı satırda yorumlayıcıya
+ * giden bir şey yoksa komut metninden çıkarılır. Tırnaksız sınırlayıcıda $(...) çalışır, bu yüzden gövde TARANMAYA devam eder.
+ * Kapanış sınırlayıcısı yoksa gövde komutun sonuna kadar sayılır (bash gibi); yine de ayıklanır.
+ */
+function heredocGovdesiniAyikla(komut) {
+  const satirlar = String(komut).split('\n')
+  const cikti = []
+  for (let i = 0; i < satirlar.length; i++) {
+    const satir = satirlar[i]
+    cikti.push(satir)
+    const bekleyen = []
+    let tumVeri = true
+    for (const m of satir.matchAll(/<<(-?)\s*(['"])([A-Za-z_][A-Za-z0-9_]*)\2/g)) {
+      bekleyen.push({ tire: m[1] === '-', sinirlayici: m[3] })
+      const once = satir.slice(0, m.index).split(/[;&|(]/).pop().trim().split(/\s+/).filter((x) => x && !ATAMA.test(x))
+      const sonra = satir.slice(m.index + m[0].length)
+      if (!(once.length > 0 && VERI_ALICI.has(komutAdi(once[0]))) || YORUMLAYICI.test(sonra)) tumVeri = false
+    }
+    if (bekleyen.length === 0) continue
+    for (const b of bekleyen) {
+      const baslangic = i + 1
+      let j = baslangic
+      while (j < satirlar.length && (b.tire ? satirlar[j].replace(/^\t+/, '') : satirlar[j]) !== b.sinirlayici) j++
+      // Veri alıcıysa gövdeyi atla (kapanış satırı dahil); değilse olduğu gibi bırak.
+      if (tumVeri) i = Math.min(j, satirlar.length - 1)
+      else break
+    }
+  }
+  const sade = cikti.join('\n')
+  // Güvenlik incelemesi (ARC-277): gövde bir DOSYAYA yazılıp aynı komutta sonra koşulabilir (`cat > f <<'E' ... E` + `bash f`, `./f`, `. f`, node f).
+  // Gövde ayıklandıysa kalan komut metninde yürütme/yorumlayıcı belirtisi VARSA ayıklama geri alınır (fail-closed, gövde taranır).
+  if (sade.length !== String(komut).length && (YORUMLAYICI.test(sade) || YURUTME_YOLU.test(sade))) return String(komut)
+  return sade
+}
+
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut, yorumAtla = true) {
   const parcalar = []
@@ -157,6 +201,7 @@ function pushBul(t, genisletme = false) {
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
  */
 function degerlendir(komut, o) {
+  komut = heredocGovdesiniAyikla(komut || '')
   // UNC/ağ/aygıt yolu: ayrıştırıcı ters eğik çizgileri kaçış sayıp yolu bozabileceği için HAM metinde aranır (-C ve cd hedefi).
   if (/(?:\s-C\s*|\bcd\s+)(?:["']*)[\\/]{2}/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
   const parcalar = parcala(String(komut || ''), !o.yorumYok)
@@ -347,6 +392,6 @@ function main() {
   })
 }
 
-module.exports = { degerlendir, parcala, pushBul }
+module.exports = { degerlendir, parcala, pushBul, heredocGovdesiniAyikla }
 
 if (require.main === module) main()

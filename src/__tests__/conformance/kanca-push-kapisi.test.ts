@@ -193,6 +193,48 @@ describe('INV-PUSH-KAPISI-1 — ayrıştırıcı', () => {
   })
 })
 
+describe('INV-PUSH-KAPISI-1 — heredoc gövdesi (ARC-277, MVZ-10 yanlış pozitifi)', () => {
+  const veriGovdesi = (govde: string, onek = "cat > betik.cjs <<'E'") => `${onek}\n${govde}\nE`
+
+  it.each([
+    "arr.push(1)\nconst G = $(echo)\nfoo $x push",
+    'const a = []; a.push(x); $kabuk push',
+    '$g push origin master',
+    'git push origin master',
+  ])('tırnaklı sınırlayıcı + cat alıcısı: gövde veri sayılır, yanlış pozitif yok (%s)', (govde) => {
+    expect(ret(veriGovdesi(govde))).toBeNull()
+    expect(ret(veriGovdesi(govde, "tee betik.cjs <<'E'"))).toBeNull()
+    expect(ret(veriGovdesi(govde, 'cat > betik.cjs <<"E"'))).toBeNull()
+  })
+
+  it('gövdeden sonraki GERÇEK komut yine denetlenir', () => {
+    expect(ret(veriGovdesi('arr.push(1)') + '\ngit push origin master')).toContain('korunan dal')
+    expect(ret("cat > a <<'E' && git push origin master\nx\nE")).toContain('korunan dal')
+  })
+
+  it('⛔SABOTAJ: gövdenin KOŞULABİLECEĞİ durumlarda gövde taranmaya devam eder', () => {
+    // yorumlayıcı alıcılar
+    expect(ret("bash <<'E'\ngit push origin master\nE")).not.toBeNull()
+    expect(ret("sh <<'E'\ngit push origin master\nE")).not.toBeNull()
+    expect(ret("cat <<'E' | bash\ngit push origin master\nE")).not.toBeNull()
+    // bilinen sınır: node/python gövdesinde TIRNAKLI dizge içindeki `git push` bu kancada görülmez (komut metni dışı); katman pre-push (ARC-277 PR2)
+    // tırnaksız sınırlayıcı: $(...) çalışır
+    expect(ret('cat > a <<E\n$(git push origin master)\nE')).not.toBeNull()
+  })
+
+  it('⛔SABOTAJ (güvenlik incelemesi): gövde dosyaya yazılıp aynı komutta koşulursa gövde taranır', () => {
+    for (const kos of ['bash betik.sh', 'sh ./betik.sh', './betik.sh', '. ./betik.sh', 'source betik.sh', 'node betik.cjs', 'exec bash betik.sh', 'cat betik.sh | bash'])
+      expect(ret(`cat > betik.sh <<'E'\ngit push origin master\nE\n${kos}`)).not.toBeNull()
+    // dosya yolu ./ ile yazılsa da (hedef) yürütme sayılmaz
+    expect(ret("cat > ./betik.cjs <<'E'\narr.push(1)\n$x push\nE")).toBeNull()
+  })
+
+  it('ayıklayıcı: kapanış sınırlayıcısı olmayan gövde de atlanır, <<- sekmeli kapanışı tanır', () => {
+    expect(ret("cat > a <<'E'\narr.push(1)\n$x push")).toBeNull()
+    expect(ret("cat > a <<-'E'\n\tx.push(1)\n\tE")).toBeNull()
+  })
+})
+
 describe('INV-PUSH-KAPISI-1 — kanca süreci', () => {
   const kos = (komut: string, ek: Record<string, string> = {}) =>
     spawnSync(process.execPath, [KANCA], {
