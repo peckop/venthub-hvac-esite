@@ -767,7 +767,7 @@
       "kapsam": "Muhtemel patlayıcı ortamlarda (gaz/buhar/sis/toz) kullanılması amaçlanan ekipman ve koruyucu sistemleri kapsar; temel sağlık ve güvenlik gerekliliklerini ve uygunluk değerlendirme prosedürlerini tanımlar. Ekipman Grup I (madenler) ve Grup II (diğer tüm uygulamalar) olarak ayrılır; Grup II kategori 1, 2, 3 (gerekli koruma seviyesine göre) ve G (gaz) / D (toz) ortam ayrımı yapılır. Yeni Yaklaşım (New Legislative Framework) çerçevesine göre revize edilmiştir.",
       "tarihler": {
         "kabul": "26/2/2014 (Avrupa Parlamentosu ve Konseyi Direktifi olarak; TR yönetmeliğinin dayanak maddesinde bu tarihle anılıyor)",
-        "yayim": "BULUNAMADI (bu oturumda EUR-Lex ham metnine erişilemedi; OJ referansı doğrulanmadı)",
+        "yayim": "2014-03-29 (OJ L 96, s. 309 ilk sayfa; ham metin başlığı \"L 96/309\", 29.3.2014)",
         "yururluk": "20 Nisan 2016 itibarıyla uygulanır (\"applicable from 20 April 2016\")",
         "uygulama_asamalari": [
           {
@@ -786,16 +786,17 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_34.json",
-      "resmi_kaynak_sayisi": 4,
+      "resmi_kaynak_sayisi": 5,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "EUR-Lex'e ham erişim WAF tarafından engellendiği için OJ yayım tarihi/sayısı ve resmi 'in force' durum etiketi bu oturumda birincil kaynaktan doğrulanamadı; ikincil resmi kaynak (Komisyon ATEX sayfası) durumun 'yürürlükte' olduğunu teyit ediyor.",
         "Komisyonun 2014/34/AB'yi kapsayan aktif bir mevzuat revizyonu/değerlendirme (evaluation/REFIT) çalışmasına dair resmi kaynakta kanıt BULUNAMADI. Tek güncelleme, idari rehber belgesinin ('ATEX 2014-34-EU Guidelines') Ocak 2026'da yayımlanan 6. baskısı — bu mevzuat değişikliği değil, yorum rehberi güncellemesi.",
         "6 Kasım 2026 ölçümü: 2024/2749 değişikliği (2024-10-09) ve teklif 2025/503 kayıtta yok, metinleri okunmadı; en son konsolide 02014L0034-20260530.",
-        "7 Kasım 2026 (MVZ-5): \"2024/2749\" tüzük değil Direktif (AB) 2024/2749; 2014/34/AB dahil on direktifi acil durum prosedürleri bakımından değiştiriyor (CELEX 32024L2749, başlık ve girişi okundu). `degistirenler` alanına eklenmesi gerekir; ürün etkisi okunmadı."
+        "7 Kasım 2026 (MVZ-5): \"2024/2749\" tüzük değil Direktif (AB) 2024/2749; 2014/34/AB dahil on direktifi acil durum prosedürleri bakımından değiştiriyor (CELEX 32024L2749, başlık ve girişi okundu). `degistirenler` alanına eklenmesi gerekir; ürün etkisi okunmadı.",
+        "8 Kasım 2026: Yayın Ofisi ham metni yeniden çekildi, etiketsiz metin sha256 öncekiyle aynı (9a418ef90d54): metinde değişiklik yok. OJ yayım künyesi ham metin başlığından alındı (L 96/309, 29.3.2014); EUR-Lex \"In force\" etiketi hâlâ doğrudan okunamıyor (WAF)."
       ],
-      "son_kontrol": "2026-11-06",
+      "son_kontrol": "2026-11-08",
       "eksen": "C"
     },
     {
@@ -859,15 +860,16 @@
       "iliski_notlari": [],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1999_92.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "EUR-Lex erişilemediği için 1999/92/EC'nin resmi yayım/yürürlük tarihleri ve güncel EUR-Lex durum etiketi bu oturumda birincil kaynaktan teyit edilemedi.",
         "6 Kasım 2026 ölçümü: 2007/30 değişikliği (2007-06-20) kayıtta yok, metni okunmadı.",
-        "7 Kasım 2026 (MVZ-5): 2007/30 işçi sağlığı raporlama direktiflerinin toplu değişikliği; 1999/92 için Md 13(3) raporlama maddesine atıf var (metin okundu), ürün hükümlerine dokunduğuna dair bulgu yok."
+        "7 Kasım 2026 (MVZ-5): 2007/30 işçi sağlığı raporlama direktiflerinin toplu değişikliği; 1999/92 için Md 13(3) raporlama maddesine atıf var (metin okundu), ürün hükümlerine dokunduğuna dair bulgu yok.",
+        "8 Kasım 2026: Yayın Ofisi ham metni (text/html) yeniden çekildi, etiketsiz metin sha256 öncekiyle aynı (6ea2ad51c9d1): metinde değişiklik yok. xhtml biçimi bu CELEX için 404 verir, text/html çalışır."
       ],
-      "son_kontrol": "2026-11-06",
+      "son_kontrol": "2026-11-08",
       "eksen": "C"
     },
     {
