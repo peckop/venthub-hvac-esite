@@ -2,6 +2,8 @@ import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 
+import { kapsamla, prDegisenleri } from './_ortak/pr-kapsami'
+
 /**
  * INV-DOC-2 · ORTAK YARDIMCI (ALT-38i parça 2). Test DEĞİLDİR (vitest yalnız `*.test.ts` toplar).
  *
@@ -335,42 +337,9 @@ export function c5MdDisi(b: Bulgular): string[] {
 // PR-KISITLI SAYIM
 // ---------------------------------------------------------------------------------------------------------------------
 
-/**
- * PR'ın değişen dosyaları: kanonik, POSIX, köke göreli yollar; okunamadıysa `null`.
- * Tek okuyucu `scripts/ci/dunya-durumu.cjs` `degisenYollariniOku`dur (CI'da `git diff --name-only -z --no-renames HEAD^1 HEAD`;
- * yerel kullanım ve testler `VENTHUB_DUNYA_DEGISEN_DOSYALAR=<dosya yolu>` ile elle verir; doluyken okunamıyorsa git'e DÜŞÜLMEZ).
- * Okuyucunun kendisi yüklenemese ya da fırlatsa da bu işlev FIRLATMAZ, `null` döner (yani çağıran TAM sayıma düşer).
- * ⚠Yerelde commit sonrası `HEAD^1..HEAD` yalnız SON commit'tir; çok commitli yerel dalda PR'ın tamamı için liste elle verilir.
- */
-export function prDegisenleri(): string[] | null {
-  try {
-    const modul = require_(resolve(process.cwd(), 'scripts/ci/dunya-durumu.cjs')) as {
-      degisenYollariniOku: () => string[] | null
-    }
-    const d = modul.degisenYollariniOku()
-    return Array.isArray(d) ? d : null
-  } catch {
-    return null
-  }
-}
-
-/**
- * `tumu` kümesini PR'ın değişen dosyalarına göre daraltır.
- * @param tumu     tam küme (taranabilecek her hedef)
- * @param anahtarFn  bir hedefin değişen listedeki yol karşılığı (kanonik, POSIX, köke göreli; ör. `(y) => y`)
- * @param degisen  verilmezse `prDegisenleri()` okunur. Açık `null` = "okunamadı" (varsayılan DEVREYE GİRMEZ).
- * @returns `degisen` okunamadıysa `{ liste: tumu (aynen), tam: true }`; okunduysa `{ liste: tumu ∩ değişen (tumu sırasında), tam: false }`.
- *   FAIL-CLOSED: "ölçemedim" asla boş kümeye çevrilmez; boş küme yalnız "liste okundu ve hiçbir hedefe dokunulmadı" iken olur.
- */
-export function kapsamla<T>(
-  tumu: T[],
-  anahtarFn: (x: T) => string,
-  degisen: string[] | null = prDegisenleri(),
-): { liste: T[]; tam: boolean } {
-  if (!Array.isArray(degisen)) return { liste: tumu, tam: true }
-  const kume = new Set(degisen)
-  return { liste: tumu.filter(x => kume.has(anahtarFn(x))), tam: false }
-}
+// PR'ın değişen dosyaları ve kümeyi onlara göre daraltma TEK yerde durur: `./_ortak/pr-kapsami.ts` (ALT-38i #2367).
+// Fail-closed: değişen liste okunamazsa `prDegisenleri()` null döner ve `kapsamla` tumu AYNEN + `tam: true` verir.
+export { kapsamla, prDegisenleri }
 
 export interface PrKisitliSonuc {
   /** Modülün sayım çekirdeğinin çıktısı (PR'ın kaynaklarıyla sınırlı; `tam` ise tüm depo). */
