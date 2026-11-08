@@ -28,7 +28,7 @@ const KATEGORILER = [
   ['ritüel-hazırlık', /switch -C [^\s]*gecici-merge/],
   ['durum-ekle', />>\s*\S*durum/],
   ['sabotaj-elle', /\b(?:cp\b[^\n]*(?:yedek|\.bak|sabotaj)|sed -i\b)/],
-  ['döküm-tarama', /\.jsonl\b/],
+  ['döküm-tarama', /\.claude[\\/]projects|\bprojects\/\S*\.jsonl\b/],
 ]
 
 const evSayfa = () => process.env.VENTHUB_DONUM_DIZINI || path.join(os.homedir(), '.claude', 'mod-durum')
@@ -90,6 +90,7 @@ function satirSay(satir, dept, durum) {
       const s = sayac(durum, gun, dept)
       s.betik += 1
       const kume = (durum.kokler[dept] ||= [])
+      if (k.length < 3) continue // jenerik ad (1.py, x.js): yeniden sayılmaz, kümeye girmez
       if (kume.includes(k)) s.yeniden += 1
       else if (kume.length < KOK_TAVANI) kume.push(k)
     } else if (c.name === 'Bash' && typeof c.input.command === 'string') {
@@ -99,25 +100,25 @@ function satirSay(satir, dept, durum) {
 }
 
 /** Bir dosyayı kaldığı bayttan okur; son tam satıra kadar ilerler. Döner: ilerleyen bayt. */
-function dosyaTara(yol, ofset, dept, durum, bitisi) {
+function dosyaTara(yol, ofset, dept, durum, bitisi, parca = PARCA) {
   const fd = fs.openSync(yol, 'r')
   try {
     const boyut = fs.fstatSync(fd).size
     let pos = ofset
-    const tampon = Buffer.alloc(PARCA)
+    const tampon = Buffer.alloc(parca)
     while (pos < boyut) {
       if (bitisi()) break
-      const n = fs.readSync(fd, tampon, 0, Math.min(PARCA, boyut - pos), pos)
+      const n = fs.readSync(fd, tampon, 0, Math.min(parca, boyut - pos), pos)
       if (n <= 0) break
-      const parca = tampon.subarray(0, n)
-      const son = parca.lastIndexOf(10) // \n
+      const kisim = tampon.subarray(0, n)
+      const son = kisim.lastIndexOf(10) // \n
       if (son < 0) {
         // shortcut: PARCA'dan uzun tek satır (≈8MB) atlanır; parçanın sonu dosya sonuysa yazılmakta olan satır sonraki koşuya kalır
         if (pos + n >= boyut) break
         pos += n
         continue
       }
-      for (const s of parca.toString('utf8', 0, son).split('\n')) satirSay(s, dept, durum)
+      for (const s of kisim.toString('utf8', 0, son).split('\n')) satirSay(s, dept, durum)
       pos += son + 1 // yalnız tam satırlar tüketilir; kalan kuyruk sonraki turda ya da sonraki koşuda okunur
     }
     return pos
@@ -130,7 +131,7 @@ function dosyaTara(yol, ofset, dept, durum, bitisi) {
  * Tüm projeleri artımlı tarar. Döner: { durum, atlanan: [yol], eksik: bool }.
  * `simdi` ve `tavanMs` test için enjekte edilir; tavan dolarsa kalan dosyalar sonraki koşuya kalır (eksik=true).
  */
-function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanMs = TAVAN_MS, buyukSinir = BUYUK_SINIR } = {}) {
+function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanMs = TAVAN_MS, buyukSinir = BUYUK_SINIR, parca } = {}) {
   const baslangic = simdi()
   const bitisi = () => simdi() - baslangic >= tavanMs
   const atlanan = []
@@ -164,7 +165,7 @@ function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanM
         const onceki = durum.dosyalar[yol] || { boyut: 0, ofset: 0 }
         const ofset = boyut < onceki.ofset ? 0 : onceki.ofset // dosya küçüldüyse baştan
         if (ofset >= boyut) continue
-        const yeni = dosyaTara(yol, ofset, dept, durum, bitisi)
+        const yeni = dosyaTara(yol, ofset, dept, durum, bitisi, parca)
         durum.dosyalar[yol] = { boyut, ofset: yeni }
         if (yeni < boyut && bitisi()) eksik = true // kuyruktaki yarım satır (açık oturum) eksiklik sayılmaz
       } catch {
@@ -181,13 +182,24 @@ const gunEkle = (gun, n) => {
   return yerelGun(d.toISOString())
 }
 
+/** '9 döküm >300MB atlandı (ana 6, arac 1)': hangi departmanın sayısı eksik kalıyor. SAF. */
+function atlananNotu(atlanan) {
+  const say = {}
+  for (const y of atlanan) {
+    const d = departman(path.basename(path.dirname(String(y))))
+    say[d] = (say[d] || 0) + 1
+  }
+  const ozet = Object.entries(say).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([d, n]) => `${d} ${n}`).join(', ')
+  return `${atlanan.length} döküm >300MB atlandı (${ozet})`
+}
+
 /** Tek satır. `bugun`'den önceki en son veri günü ile ondan önceki veri günü karşılaştırılır; boşluk yazılır. SAF. */
 function satirUret(durum, bugun, { atlanan = [], eksik = false } = {}) {
   const gunler = Object.keys(durum.gunler).filter((g) => g < bugun).sort()
   const son = gunler[gunler.length - 1]
   if (!son) {
     const n = []
-    if (atlanan.length) n.push(`${atlanan.length} döküm >300MB atlandı`)
+    if (atlanan.length) n.push(atlananNotu(atlanan))
     if (eksik) n.push('tarama tamamlanmadı (süre tavanı), sayılar eksik olabilir')
     return 'DÖNÜM: önceki güne ait veri yok' + (n.length ? ' [' + n.join('; ') + ']' : '')
   }
@@ -201,7 +213,7 @@ function satirUret(durum, bugun, { atlanan = [], eksik = false } = {}) {
   const notlar = []
   if (son !== gunEkle(bugun, -1)) notlar.push(`dün verisi yok, son veri ${son}`)
   if (onceki && onceki !== gunEkle(son, -1)) notlar.push(`önceki karşılaştırma ${onceki} (${Math.round((new Date(son) - new Date(onceki)) / 86400000) - 1} gün boşluk)`)
-  if (atlanan.length) notlar.push(`${atlanan.length} döküm >300MB atlandı`)
+  if (atlanan.length) notlar.push(atlananNotu(atlanan))
   if (eksik) notlar.push('tarama tamamlanmadı (süre tavanı), sayılar eksik olabilir')
   const metin = `DÖNÜM ${son}: ${parcalar.length ? parcalar.join('; ') : 'yeniden betik ve elle komut yok'}${notlar.length ? ' [' + notlar.join('; ') + ']' : ''}`
   return metin.length > 600 ? metin.slice(0, 599) + '…' : metin
@@ -218,7 +230,9 @@ function oku(yol) {
 function yaz(yol, veri) {
   try {
     fs.mkdirSync(path.dirname(yol), { recursive: true })
-    fs.writeFileSync(yol, JSON.stringify(veri))
+    const gecici = `${yol}.${process.pid}.tmp`
+    fs.writeFileSync(gecici, JSON.stringify(veri))
+    fs.renameSync(gecici, yol)
   } catch {
     // yazılamadı: sonraki koşu yeniden dener
   }

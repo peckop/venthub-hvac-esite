@@ -21,7 +21,7 @@ interface Modul {
   departman: (d: string) => string
   kok: (ad: string) => string
   satirSay: (satir: string, dept: string, durum: Durum) => void
-  tara: (o: Record<string, unknown>) => { durum: Durum; atlanan: string[]; eksik: boolean }
+  tara: (o: Record<string, unknown> & { parca?: number }) => { durum: Durum; atlanan: string[]; eksik: boolean }
   satirUret: (durum: Durum, bugun: string, o?: { atlanan?: string[]; eksik?: boolean }) => string
   gunluk: (o: Record<string, unknown>) => string
   bos: () => Durum
@@ -98,12 +98,53 @@ describe('INV-DONUM-TARA-1 · tarama (artımlı, atlama, tavan, boşluk)', () =>
     expect(durum.gunler['2026-11-06'].arac.elle).toBe(1)
   })
 
+  it('⛔ yarım tool_use satırı sonraki koşuya kalır (kaybolmaz, çifte sayılmaz); çok parçalı okumada toplam doğru; tavan dosya İÇİNDE işler', () => {
+    const { proje, dosya } = kur()
+    const satirlar = Array.from({ length: 200 }, (_, i) => bash('2026-11-06', `cp a${i} a${i}.yedek`))
+    const tam = satirlar.join('\n') + '\n'
+    const yarim = bash('2026-11-06', 'cp son son.yedek')
+    // son satırın yarısı yazılmış (açık oturum): henüz sayılmaz
+    writeFileSync(dosya, tam + yarim.slice(0, 40))
+    const durum = m.bos()
+    m.tara({ kok: proje, durum, parca: 512 })
+    expect(durum.gunler['2026-11-06'].arac.elle).toBe(200)
+    appendFileSync(dosya, yarim.slice(40) + '\n')
+    m.tara({ kok: proje, durum, parca: 512 })
+    expect(durum.gunler['2026-11-06'].arac.elle).toBe(201)
+    m.tara({ kok: proje, durum, parca: 512 })
+    expect(durum.gunler['2026-11-06'].arac.elle).toBe(201)
+    // tavan dosya içinde: ilk okumadan sonra dolar, kalan sonraki koşuya kalır; toplam yine tam
+    const d2 = m.bos()
+    let t = 0
+    const r1 = m.tara({ kok: proje, durum: d2, parca: 512, tavanMs: 15, simdi: () => (t += 10) })
+    expect(r1.eksik).toBe(true)
+    expect(d2.gunler['2026-11-06']?.arac?.elle ?? 0).toBeLessThan(201)
+    m.tara({ kok: proje, durum: d2, parca: 512 })
+    expect(d2.gunler['2026-11-06'].arac.elle).toBe(201)
+  })
+
+  it('jenerik kısa kök (1.py, x.js) yeniden sayılmaz; döküm-tarama yalnız projects/*.jsonl; atlanan dökümde departman adı yazılır', () => {
+    const d = m.bos()
+    const g = '2026-11-07'
+    m.satirSay(yaz(g, 'a', 'C:/tmp/1.py'), 'arac', d)
+    m.satirSay(yaz(g, 'b', 'C:/tmp/2.py'), 'arac', d)
+    m.satirSay(yaz(g, 'c', 'C:/tmp/x.js'), 'arac', d)
+    expect(d.gunler[g].arac).toEqual({ betik: 3, yeniden: 0, elle: 0 })
+    m.satirSay(bash(g, 'cat kaynak-dizini/sayfalar.jsonl | head'), 'arac', d)
+    expect(d.gunler[g].arac.elle).toBe(0)
+    m.satirSay(bash(g, 'ls ~/.claude/projects/x/s.jsonl'), 'arac', d)
+    expect(d.gunler[g].arac.elle).toBe(1)
+    const atlanan = ['/p/C--Users-alize-venthub-hvac/a.jsonl', '/p/C--Users-alize-venthub-hvac/b.jsonl', '/p/C--Users-alize-venthub-hvac--claude-worktrees-arac-pencere/c.jsonl']
+    d.gunler['2026-11-07'] = { arac: { betik: 1, yeniden: 1, elle: 0 } }
+    expect(m.satirUret(d, '2026-11-08', { atlanan })).toContain('3 döküm >300MB atlandı (ana 2, arac 1)')
+  })
+
   it('⛔ büyük döküm atlanır ve satırda söylenir; süre tavanı dolunca eksik işaretlenir', () => {
     const { proje, dosya } = kur()
     writeFileSync(dosya, yaz('2026-11-06', 'a', 'C:/tmp/x.cjs') + '\n')
     const atla = m.tara({ kok: proje, durum: m.bos(), buyukSinir: 10 })
     expect(atla.atlanan).toHaveLength(1)
-    expect(m.satirUret(atla.durum, '2026-11-08', atla)).toContain('1 döküm >300MB atlandı')
+    expect(m.satirUret(atla.durum, '2026-11-08', atla)).toContain('1 döküm >300MB atlandı (arac 1)')
     let t = 0
     const tavan = m.tara({ kok: proje, durum: m.bos(), tavanMs: 5, simdi: () => (t += 10) })
     expect(tavan.eksik).toBe(true)
