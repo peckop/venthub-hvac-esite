@@ -94,6 +94,14 @@ function heredocGovdesiniAyikla(komut) {
   return satirlar[0]
 }
 
+/** `\` + satır sonu (LF ya da CRLF) satır devamı mı? Evetse silinecek karakter sayısını (2 ya da 3), değilse 0 döner. */
+function satirDevami(komut, i) {
+  if (komut[i] !== '\\') return 0
+  if (komut[i + 1] === '\n') return 2
+  if (komut[i + 1] === '\r' && komut[i + 2] === '\n') return 3
+  return 0
+}
+
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
 function parcala(komut, yorumAtla = true) {
   const parcalar = []
@@ -116,6 +124,8 @@ function parcala(komut, yorumAtla = true) {
     if (tirnak) {
       if (c === tirnak) tirnak = null
       // Çift tırnak içinde ters eğik çizgi yalnız $ ` " \ önünde kaçıştır (bash gibi); "D:\depolar\..." yolu bozulmaz.
+      // ARC-278: ters eğik çizgi + satır sonu çift tırnak içinde de satır devamıdır (ikisi birlikte silinir).
+      else if (c === '\\' && tirnak === '"' && satirDevami(komut, i)) i += satirDevami(komut, i) - 1
       else if (c === '\\' && tirnak === '"' && i + 1 < komut.length && '$`"\\'.includes(komut[i + 1])) jeton += komut[++i]
       else jeton += c
       continue
@@ -123,6 +133,9 @@ function parcala(komut, yorumAtla = true) {
     if (c === "'" || c === '"') {
       tirnak = c
       jetonVar = true
+    } else if (c === '\\' && satirDevami(komut, i)) {
+      // ARC-278 (denetçi bulgusu): `git \⏎push origin master` ve `mas\⏎ter` bash'te satır devamıdır; eskiden `\n` jetona giriyor, push tanınmıyordu.
+      i += satirDevami(komut, i) - 1
     } else if (c === '\\' && i + 1 < komut.length) {
       jeton += komut[++i]
       jetonVar = true

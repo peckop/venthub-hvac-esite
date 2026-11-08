@@ -195,6 +195,36 @@ describe('INV-PUSH-KAPISI-1 — ayrıştırıcı', () => {
   })
 })
 
+describe('INV-PUSH-KAPISI-1 — ters eğik çizgi + satır sonu (ARC-278)', () => {
+  it.each([
+    'git \\\npush origin master',
+    'git push origin mas\\\nter',
+    'git push \\\n  origin \\\n  master',
+    'git push origin master \\\n',
+    'gi\\\nt push origin master',
+    'git \\\r\npush origin master',
+    'git push origin "mas\\\nter"',
+    'git push --for\\\nce origin feat-x',
+    'git push origin feat-x:ma\\\nster',
+    'cd /depo/calisma && git \\\npush origin HEAD:refs/heads/mas\\\nter',
+  ])('bash satır devamını siler; kapı push ve hedefi doğru görür, reddeder (%j)', (k) => {
+    expect(ret(k)).not.toBeNull()
+  })
+
+  it('satır devamıyla yazılmış MEŞRU push geçer; tek tırnak içi ters eğik çizgi + satır sonu devam sayılmaz', () => {
+    expect(ret('git \\\npush origin feat-x')).toBeNull()
+    expect(ret('git push \\\n  -u \\\n  origin feat-x')).toBeNull()
+    expect(ret('git push origin feat-x \\\n')).toBeNull()
+    // tek tırnak: bash'te literal; ayrıştırıcı jetonu böl-ma-z, push hedefi feat-x
+    expect(motor.parcala("echo 'a\\\nb' && git push origin feat-x")).toEqual([["echo", "a\\\nb"], ['git', 'push', 'origin', 'feat-x']])
+  })
+
+  it('ayrıştırıcı: satır devamı jetonu birleştirir', () => {
+    expect(motor.parcala('git \\\npush origin mas\\\nter')).toEqual([['git', 'push', 'origin', 'master']])
+    expect(motor.parcala('echo "a\\\nb"')).toEqual([['echo', 'ab']])
+  })
+})
+
 describe('INV-PUSH-KAPISI-1 — --no-verify reddi (ARC-277)', () => {
   it.each([
     'git push --no-verify origin feat-x',
