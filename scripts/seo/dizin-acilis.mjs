@@ -18,10 +18,12 @@
 import { readdirSync, readFileSync, writeFileSync, statSync, mkdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, dirname, resolve } from 'node:path'
-import { spawn } from 'node:child_process'
+import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 
 const BU_DIZIN = dirname(fileURLToPath(import.meta.url))
+// `detached: true` yalnız merkezî başlatıcıda yazılır (INV-KOPUK-1, REC-415): kopuk çocuk konsol penceresi açmasın.
+const { kopukBaslat } = createRequire(import.meta.url)('../board/kopuk-baslat.cjs')
 export const KILIT_OMRU_MS = 30 * 60 * 1000
 const ISTEK_KARARLARI = new Set(['YAP', 'TEKRAR'])
 const MOTORLAR = [['google', 'Google'], ['bing', 'Bing'], ['indexnow', 'IndexNow']]
@@ -70,11 +72,8 @@ function arkaPlanBaslat(klasor, env) {
   mkdirSync(klasor, { recursive: true })
   writeFileSync(join(klasor, '.durum-kilit'), String(Date.now()))
   const anahtar = env.GSC_SA_ANAHTAR || join(homedir(), '.claude', 'gsc-anahtar.json')
-  const cocuk = spawn(process.execPath, [join(BU_DIZIN, 'dizin-takip.mjs'), '--durum', '--cikti', klasor], {
-    detached: true, stdio: 'ignore', windowsHide: true, env: { ...env, GSC_SA_ANAHTAR: anahtar },
-  })
+  const cocuk = kopukBaslat(join(BU_DIZIN, 'dizin-takip.mjs'), ['--durum', '--cikti', klasor], { env: { ...env, GSC_SA_ANAHTAR: anahtar } })
   cocuk.on('error', () => {})
-  cocuk.unref()
 }
 
 /**
