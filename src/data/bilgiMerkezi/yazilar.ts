@@ -94,7 +94,7 @@ Frekans konvertörü, motorun hızını motora verdiği gerilimi ve frekansı de
 
 Kısaca:
 
-- Çalışma: cihaz doğrultucu, DC ara devre, invertör ve kontrol birimi olmak üzere dört ana bölümden oluşur [1].
+- Çalışma: cihaz temel biçiminde doğrultucu, DC ara devre, invertör ve kontrol birimi olmak üzere dört ana bölüme ayrılabilir [1].
 - Enerji: santrifüj fan ve pompada küçük bir hız düşüşü güçte büyük bir düşüş getirir [2].
 - Tork: pompa ve fanlar değişken tork uygulamasıdır; bu uygulamada düşük hızda motor için ek soğutma ya da akım düşürme gerekmez [1].
 
@@ -106,13 +106,14 @@ Frekans konvertörü, motor hızını değiştirebilen ya da yükteki değişime
 
 ## Frekans konvertörü nasıl çalışır?
 
-Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
+Bir frekans konvertörü temel biçiminde dört ana bölüme ayrılabilir: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
 
 | Bölüm | Görevi |
 |---|---|
 | Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir [1] |
 | DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler [1] |
 | İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
+| Kontrol birimi | Yazılım, donanımı çalıştırarak AC motoru kontrol eden ve düzenleyen değişken gerilimi üretir [1] |
 
 İnvertör, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
 
@@ -212,7 +213,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasınd
 
 ### Frekans konvertörü ile invertör aynı şey mi?
 
-Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
+Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. Bu en yaygın biçim, gerilim kaynaklı ve darbe genişlik modülasyonlu (PWM) frekans konvertörüdür; kaynak ona çoğu zaman yanlışlıkla invertör dendiğini de belirtir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
 
 ### Frekans konvertörü ne kadar enerji tasarrufu sağlar?
 
@@ -224,7 +225,7 @@ Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yükse
 
 ### Yangın modunda frekans konvertörü fanı durdurur mu?
 
-FC 101'in yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3].
+FC 101'in yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3]. Bu cevap yalnız Danfoss FC 101 için kaynaklıdır; başka sürücülerin yangın modu davranışı o sürücünün kılavuzundan okunmalıdır.
 
 ### Türkiye'de frekans konvertörleri için verimlilik şartı var mı?
 
@@ -388,7 +389,7 @@ Fan çıkışına yakın konumlandırılmış bir dirsek, iletilen debiyi %30'a 
 2. Havanın nem ve parçacık içeriğini belirleyin; bunlar fan tipi seçiminde önemli etkenlerdir [1].
 3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
 4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
-5. Fan girişinde ve çıkışında sistem etkisi yaratacak dirsekleri azaltın [1].
+5. Fan girişindeki dirseği fana çok yakın yerleştirmeyin: girişten önce kanal çapının en az üç katı düz kanal bırakın, bu mümkün değilse giriş kutusu ya da akış düzeltici kullanın; çıkışta dirsek ve benzeri bağlantı parçalarını fandan yeterince uzağa yerleştirin [1].
 6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [4]; patlayıcı ortam söz konusuysa, tüzüğün kapsam dışı koşulu fanın yalnız o ortamda çalışmak üzere belirtilmiş ve bu amaçla özel olarak tasarlanıp pazarlanmış olması olduğundan, bunu gösteren belgeyi üreticiden isteyin [5].
 
 ## Sık sorulan sorular
@@ -425,7 +426,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "T
 
 Üretici belgelerinde verilen sayfa numaraları PDF dosyasındaki sayfa sırasıdır; basılı sayfa numarasından farklı olabilir.
 
-1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 5, 6–9, 11, 16–25, 32–34, 80 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 11.10.2026)
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 5, 6–9, 11, 16–25, 32–34, 39–41, 80 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 11.10.2026)
 2. Nicotra Gebhardt, Centrifugal Fans AT, belt driven, Issue 2.5 EN, 2013, s. 70, 99 (üretici belgesi).
 3. Vortice, Industrial Ventilation kataloğu, s. 4, 58, 64 (üretici belgesi).
 4. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
