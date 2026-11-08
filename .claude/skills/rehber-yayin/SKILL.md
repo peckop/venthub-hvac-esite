@@ -36,6 +36,18 @@ metadata:
    var gibi anılmaz, yerine elle yapılan kontrol söylenir.
 3. **Kaydı** nerede: yazının Kanban kartına not (adres, komut, çıktı); sorgu listeleri ve ham raporlar depo dışı.
 
+## Kapı = komut (cetvel R10 ile aynı; çelişirse cetvel kazanır)
+
+| Basamak | Kapı | Komut |
+|---|---|---|
+| B2, B16 | alıntı kaynakta ham doğrulanır | `node scripts/rehber/alinti-dogrula.mjs <kaynaklar.json> [--cikti <dosya.json>]` |
+| B3 | kalıp, atıf, iddia deseni (kırmızı 0) | `scripts/rehber/rehber-denetim.mjs` modüldür, komut satırı girişi yoktur; sınaması `pnpm vitest run scripts/rehber/__tests__/rehber-denetim.test.ts` |
+| B4, B10 | iç bağlantılar doğrudan 200 | `node scripts/rehber/ic-baglanti-denetle.mjs [--sayfa <adres>]` |
+| B10 | bot karnesi yazı adresinde temiz | `node scripts/seo/bot-karnesi.mjs` |
+| B9 | birleştirme ritüeli | `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` |
+
+Çıktı kart notuna girer. Betiği olmayan kapı için elle kontrol söylenir, betik varmış gibi anılmaz.
+
 ## Sahada düşülen yanlışlar (ölçüldü; tekrar etme)
 
 1. **"IndexNow anahtarı yok" sanıldı.** Anahtarın durumu ve komutu `yayin-gorunurluk-denetim-standard.md` Y2'dedir (tek kaynak); varsayımla atlanmaz, Bing/IndexNow adımı GEO-SEO'ya yazılır (B12).

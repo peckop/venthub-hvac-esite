@@ -26,6 +26,7 @@ metadata:
 3. HVAC teknik sayısı (debi, basınç, kanal ölçüsü, eğri değeri) katalog PDF'inin KAYNAK DİZİNİNDEN ya da standart metninden gelir (CLAUDE.md "Bilgi Kaynağı İş Akışı"); tahminle yazılmaz.
 4. "En az 2.500 kelime" ve "5-8 dış kaynak" asgari hedeflerdir; kısa teknik rehberde kalite boyuttan önce gelir, kısa yazıyı gerekçesiyle yaz.
 5. Yayın akışı ve onay kapıları BLOG rol kartındadır; bu skill yalnız taslağın biçimidir, yayın yetkisi vermez.
+6. **Rehber yazısı ise** taslak teslim edilmeden önce kapıları elle okuyarak değil betikle koştur: komutlar `rehber-yayin` skill'indeki "Kapı = komut" tablosundadır (B2 alıntı, B3 kalıp ve atıf, B4 iç bağlantı). Betik kırmızı verirse taslak teslim edilmez.
 
 ---
 
