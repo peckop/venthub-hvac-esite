@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -276,6 +276,30 @@ describe('INV-SCRUB-1 · PR kolunun kapsam kararı (sentetik kümeyle)', () => {
         taranan: 3,
       })
     }
+  })
+
+  it('KONTROL_KODU gerçek dosyaları gösterir (yazım hatası ya da silinen girdi "kontrol değişince tam tara" kuralını sessizce kapatırdı)', () => {
+    const yok = KONTROL_KODU.filter((y) => !existsSync(resolve(process.cwd(), y)))
+    expect(yok, 'KONTROL_KODU diskte olmayan yol taşıyor').toEqual([])
+    expect(KONTROL_KODU, 'iki kol, yardımcı, kapsam yardımcısı ve değişen-liste okuyucusu listede olmalı').toEqual(
+      expect.arrayContaining([
+        'src/__tests__/conformance/comment-scrubber-scheme-safety.test.ts',
+        'src/__tests__/conformance/comment-scrubber-scheme-safety-dunya.test.ts',
+        'src/__tests__/conformance/comment-scrubber-scheme-safety.yardimci.ts',
+        'src/__tests__/conformance/_ortak/pr-kapsami.ts',
+        'scripts/ci/dunya-durumu.cjs',
+      ]),
+    )
+  })
+
+  it('gerçek KAYNAKLAR anahtarı değişen-liste biçimiyle eşleşir (vite anahtar biçimi değişirse PR kolu sessizce boş küme taramasın)', () => {
+    // Kontrol kodu OLMAYAN, gerçekten var olan bir betik seçilir (kontrol kodu olsaydı daralma kalkar, tam ağaç taranırdı).
+    const hedef = 'scripts/assert-node-major.mjs'
+    expect(existsSync(resolve(process.cwd(), hedef)), `${hedef} depoda yok; başka bir betik seçin`).toBe(true)
+    expect(KONTROL_KODU).not.toContain(hedef)
+    const k = r1YeniIhlaller(KAYNAKLAR, [hedef])
+    expect(k.tam, 'tek dosyalık liste okundu, tam olmamalı').toBe(false)
+    expect(k.taranan, `${hedef} gerçek KAYNAKLAR anahtarlarıyla eşleşmedi`).toBe(1)
   })
 
   it('R1: tabandaki ihlalli dosya yeni sayılmaz', () => {
