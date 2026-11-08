@@ -98,6 +98,30 @@ describe('INV-ONCEKI-OLCUM-1 — tarih ve gerçek bağ', () => {
     expect(yollar).toContain('docs/audits/x-2026-11-02.md')
     expect(yollar.some((y) => y.endsWith('olcum/y.md'))).toBe(true)
 
+    // ARC-275 (KTL-84 olayı): depodaki docs/olcum defterleri de taranır; bölüm başlığı sorguyla eşleşirse aday olur
+    fs.mkdirSync(path.join(kok, 'repo', 'docs', 'olcum'), { recursive: true })
+    fs.writeFileSync(
+      path.join(kok, 'repo', 'docs', 'olcum', 'pim-unopim.md'),
+      '# PIM ölçümleri\n\n' + 'giriş '.repeat(900) + '\n## Ölçüm 2026-11-04 (KATALOG): UnoPIM eksiksiz ürün kaydı alan-alan eksiklik\n\nsayılar',
+    )
+    const ob = m.gercekBaglar({ repo: path.join(kok, 'repo'), ortam: { HAFIZA_DIZINI: path.join(kok, 'hafiza') } })
+    const olcumListe = await ob.olcumDefterleri()
+    expect(olcumListe.map((d) => d.yol)).toContain('docs/olcum/pim-unopim.md')
+    const k = await m.olcumKaynagi(m.sorguKur('UnoPIM eksiksiz ürün kaydı: alan-alan eksiklik ölçümü'), ob, SIMDI)
+    expect(m.olcumSatiri(k)).toContain('docs/olcum/pim-unopim.md')
+    // gövde eşleşmesi: terimler başlıkta değil, yalnız gövdede geçer (docs/olcum gövde taraması silinirse kırmızı)
+    fs.writeFileSync(
+      path.join(kok, 'repo', 'docs', 'olcum', 'govde-ornegi.md'),
+      '# Başka başlık\n\n## Genel\n\n' + 'dolgu '.repeat(900) + '\n\nZirkonyum nanokaplama rezonans histerezis ölçümü tablosu burada.',
+    )
+    const gb = m.gercekBaglar({ repo: path.join(kok, 'repo'), ortam: { HAFIZA_DIZINI: path.join(kok, 'hafiza') } })
+    const gk = await m.olcumKaynagi(m.sorguKur('zirkonyum nanokaplama rezonans histerezis ölçümü'), gb, SIMDI)
+    expect(m.olcumSatiri(gk)).toContain('docs/olcum/govde-ornegi.md')
+    // ⛔SABOTAJ: docs/olcum dizini taranmasaydı aday gelmezdi (bağ dizinleri kaynaktan okur)
+    const eski = m.gercekBaglar({ repo: path.join(kok, 'repo'), ortam: { HAFIZA_DIZINI: path.join(kok, 'hafiza') } })
+    fs.rmSync(path.join(kok, 'repo', 'docs', 'olcum'), { recursive: true, force: true })
+    expect((await eski.olcumDefterleri()).map((d) => d.yol)).not.toContain('docs/olcum/pim-unopim.md')
+
     const bos = m.gercekBaglar({ repo: path.join(kok, 'yok'), ortam: { HAFIZA_DIZINI: path.join(kok, 'yok-hafiza') } })
     const ucuncu = await bos.olcumDefterleri().catch((e: Error) => e.message)
     // ingestor yolu makineye bağlıdır: varsa liste, yoksa hata; ikisi de sessiz boş dönmez
