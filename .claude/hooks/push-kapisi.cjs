@@ -194,7 +194,7 @@ function pushBul(t, genisletme = false) {
   return { c: yollar, args: t.slice(i + 1) }
 }
 
-const HOOKSPATH_OKUMA = new Set(['--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--unset', '--unset-all', '--show-origin', '--show-scope'])
+const HOOKSPATH_OKUMA = new Set(['--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--unset', '--unset-all'])
 
 /**
  * `git config core.hooksPath <değer>` (ARC-281, OPS onaylı): pre-push katmanını (push-hedef-kapisi) atlatır; `-c core.hooksPath=` zaten
@@ -209,13 +209,23 @@ function hooksPathYazimi(sonrasi) {
   if (i < 0) return null
   const arg = sonrasi.slice(i + 1)
   const MESAJ = 'git config core.hooksPath <değer> (ya da include.path / --edit ile aynı etki): pre-push kapısını (push hedef/kapalı dal/döküm) atlatır; ayarı değiştirme (kurulum scripts/setup-hooks.mjs shim modeliyle, okuma ve --unset serbest)'
+  // Mod bayrağı (okuma/silme) YALNIZ anahtardan ÖNCE geçerlidir: git sondaki bayrağı yok sayıp yazar (`git config core.hooksPath /x --list` yazar; denetçi ölçtü).
+  // --show-origin/--show-scope mod değil görünüm bayrağıdır: muafiyet vermez.
+  const modIdx = arg.findIndex((a) => HOOKSPATH_OKUMA.has(a))
+  const modOnce = (idx) => modIdx >= 0 && modIdx < idx
   // --edit dosyayı düzenleyiciyle açar: hangi anahtarın yazılacağı görülemez → reddedilir (okuma bayrağı yoksa).
-  if (!arg.some((a) => HOOKSPATH_OKUMA.has(a)) && arg.some((a) => a === '--edit' || a === '-e')) return MESAJ
-  if (arg.some((a) => HOOKSPATH_OKUMA.has(a))) return null
+  if (modIdx < 0 && arg.some((a) => a === '--edit' || a === '-e')) return MESAJ
+  // Anahtar konumunda kabuk genişletmesi (`git config $K /x`, `core.$(echo hooksPath)`): anahtar önceden bilinemez, ardından değer varsa fail-closed.
+  const konumsal = arg.map((a, ix) => [a, ix]).filter(([a]) => !/^-/.test(a))
+  // `$(`/ters tırnak ayrıştırıcıda parçayı böler: anahtar tokeni `$` ile BİTİYORSA değer sonraki parçada kalmıştır → o da kapsanır.
+  if (konumsal.length >= 1 && /[$`]/.test(konumsal[0][0]) && (konumsal.length >= 2 || /[$`]$/.test(konumsal[0][0])) && !modOnce(konumsal[0][1])) return MESAJ
+  // Kabuk takma adı (`git config alias.x '!git config core.hooksPath /x'`): tek token içinde, kapı içine bakamaz → `!` ile başlayan alias değeri yazımı reddedilir.
+  const ai = arg.findIndex((a) => /^alias\./i.test(a))
+  if (ai >= 0 && !modOnce(ai) && arg.slice(ai + 1).some((a) => /^!/.test(a))) return MESAJ
   // Anahtar: herhangi bir bölümde `hookspath` (core.hooksPath, ya da include'lu dosyadan gelen bölüm) ve `include.path` / `includeIf.*.path` (başka dosyadan hooksPath getirir).
   const ki = arg.findIndex((a) => /(^|\.)hookspath(=|$)/i.test(a) || /^include(if\..*)?\.path(=|$)/i.test(a))
   if (ki < 0) return null
-  if (/=/.test(arg[ki]) || arg.slice(ki + 1).some((a) => !/^-/.test(a))) return MESAJ
+  if ((/=/.test(arg[ki]) || arg.slice(ki + 1).some((a) => !/^-/.test(a))) && !modOnce(ki)) return MESAJ
   return null
 }
 

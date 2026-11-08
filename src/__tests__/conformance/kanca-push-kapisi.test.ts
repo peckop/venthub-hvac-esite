@@ -250,6 +250,21 @@ describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () =
     'git config --edit',
     'git config -e --global',
     'git config extra.hookspath /tmp/bos',
+    // denetçi (ARC-281 PR #2410): sondaki mod bayrağı muafiyet VERMEZ, git yine yazar
+    'git config core.hooksPath /tmp/bos --list',
+    'git config core.hooksPath /tmp/bos --unset',
+    'git config core.hooksPath /tmp/bos --get',
+    'git config --global core.hooksPath /tmp/bos -l',
+    'git config --show-scope core.hooksPath /tmp/bos',
+    'git config --show-origin core.hooksPath /tmp/bos',
+    // kabuk takma adı üzerinden (denetçi: orta)
+    "git config alias.foo '!git config core.hooksPath /tmp/bos'",
+    "git config --global alias.hp '!sh -c x'",
+    // anahtar konumunda kabuk genişletmesi
+    'K=core.hooksPath; git config $K /tmp/bos',
+    'git config "$K" /tmp/bos',
+    'git config $(echo core.hooksPath) /tmp/bos',
+    'git config core.$(echo hooksPath) /tmp/bos',
   ])('hooksPath yazımı reddedilir (%j)', (k) => {
     expect(ret(k)).not.toBeNull()
   })
@@ -261,6 +276,12 @@ describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () =
     expect(ret('git config --list')).toBeNull()
     expect(ret('git config user.name Ada')).toBeNull()
     expect(ret('git config --global core.autocrlf true')).toBeNull()
+    expect(ret('git config --unset core.hooksPath')).toBeNull()
+    expect(ret('git config --get-all core.hooksPath')).toBeNull()
+    expect(ret('git config --show-origin --get core.hooksPath')).toBeNull()
+    expect(ret('git config user.name "$NAME"')).toBeNull()
+    expect(ret('git config alias.co checkout')).toBeNull()
+    expect(ret('git config --get $K')).toBeNull()
     expect(ret('bash -c "git config core.hooksPath /x"')).not.toBeNull()
   })
 })
