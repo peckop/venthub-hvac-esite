@@ -3,7 +3,7 @@
  * Çekirdek: scripts/arac/donum-tara.cjs · açılış kancası: .claude/hooks/donum-tara-acilis.cjs (SessionStart).
  */
 import { spawnSync } from 'node:child_process'
-import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { appendFileSync, mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -21,8 +21,8 @@ interface Modul {
   departman: (d: string) => string
   kok: (ad: string) => string
   satirSay: (satir: string, dept: string, durum: Durum) => void
-  tara: (o: Record<string, unknown> & { parca?: number }) => { durum: Durum; atlanan: string[]; eksik: boolean }
-  satirUret: (durum: Durum, bugun: string, o?: { atlanan?: string[]; eksik?: boolean }) => string
+  tara: (o: Record<string, unknown> & { parca?: number }) => { durum: Durum; eksik: boolean }
+  satirUret: (durum: Durum, bugun: string, o?: { eksik?: boolean }) => string
   gunluk: (o: Record<string, unknown>) => string
   bos: () => Durum
 }
@@ -123,7 +123,7 @@ describe('INV-DONUM-TARA-1 · tarama (artımlı, atlama, tavan, boşluk)', () =>
     expect(d2.gunler['2026-11-06'].arac.elle).toBe(201)
   })
 
-  it('jenerik kısa kök (1.py, x.js) yeniden sayılmaz; döküm-tarama yalnız projects/*.jsonl; atlanan dökümde departman adı yazılır', () => {
+  it('jenerik kısa kök (1.py, x.js) yeniden sayılmaz; döküm-tarama yalnız projects/*.jsonl; büyük dökümde departman adı ve başlangıç günü yazılır', () => {
     const d = m.bos()
     const g = '2026-11-07'
     m.satirSay(yaz(g, 'a', 'C:/tmp/1.py'), 'arac', d)
@@ -134,17 +134,42 @@ describe('INV-DONUM-TARA-1 · tarama (artımlı, atlama, tavan, boşluk)', () =>
     expect(d.gunler[g].arac.elle).toBe(0)
     m.satirSay(bash(g, 'ls ~/.claude/projects/x/s.jsonl'), 'arac', d)
     expect(d.gunler[g].arac.elle).toBe(1)
-    const atlanan = ['/p/C--Users-alize-venthub-hvac/a.jsonl', '/p/C--Users-alize-venthub-hvac/b.jsonl', '/p/C--Users-alize-venthub-hvac--claude-worktrees-arac-pencere/c.jsonl']
+    const bd = (ad: string) => ({ boyut: 1, ofset: 1, buyuk: true, baslangic: '2026-11-09', ad })
+    d.dosyalar['/p/C--Users-alize-venthub-hvac/a.jsonl'] = bd('a')
+    d.dosyalar['/p/C--Users-alize-venthub-hvac/b.jsonl'] = bd('b')
+    d.dosyalar['/p/C--Users-alize-venthub-hvac--claude-worktrees-arac-pencere/c.jsonl'] = bd('c')
     d.gunler['2026-11-07'] = { arac: { betik: 1, yeniden: 1, elle: 0 } }
-    expect(m.satirUret(d, '2026-11-08', { atlanan })).toContain('3 döküm >300MB atlandı (ana 2, arac 1)')
+    // son veri günü (11-07) sayım başlangıcından (11-09) önce: o günün sayısı eksik olabilir
+    expect(m.satirUret(d, '2026-11-08')).toContain("3 büyük döküm (ana 2, arac 1) 2026-11-09'den itibaren sayılıyor")
+    // son veri günü başlangıçtan sonraysa not yoktur
+    d.gunler['2026-11-09'] = { arac: { betik: 1, yeniden: 1, elle: 0 } }
+    expect(m.satirUret(d, '2026-11-10')).not.toContain('büyük döküm')
   })
 
-  it('⛔ büyük döküm atlanır ve satırda söylenir; süre tavanı dolunca eksik işaretlenir', () => {
+  it('⛔ büyük döküm geçmişi okunmaz, yeni bayt artımlı sayılır; canlıysa son SON_BAYT okunur; süre tavanı dolunca eksik işaretlenir', () => {
     const { proje, dosya } = kur()
+    const simdi = () => Date.parse('2026-11-09T12:00:00')
+    const eski = new Date('2026-10-01T10:00:00')
+    // ölü büyük döküm: ilk koşuda dosya sonuna konur, geçmiş sayılmaz
     writeFileSync(dosya, yaz('2026-11-06', 'a', 'C:/tmp/x.cjs') + '\n')
-    const atla = m.tara({ kok: proje, durum: m.bos(), buyukSinir: 10 })
-    expect(atla.atlanan).toHaveLength(1)
-    expect(m.satirUret(atla.durum, '2026-11-08', atla)).toContain('1 döküm >300MB atlandı (arac 1)')
+    utimesSync(dosya, eski, eski)
+    const durum = m.bos()
+    const ilk = m.tara({ kok: proje, durum, buyukSinir: 10, simdi })
+    expect(ilk.durum.gunler['2026-11-06']).toBeUndefined()
+    // yeni bayt gelince yalnız o sayılır
+    appendFileSync(dosya, yaz('2026-11-09', 'b', 'C:/tmp/y.cjs') + '\n')
+    const ikinci = m.tara({ kok: proje, durum, buyukSinir: 10, simdi })
+    expect(ikinci.durum.gunler['2026-11-09'].arac.betik).toBe(1)
+    expect(ikinci.durum.gunler['2026-11-06']).toBeUndefined()
+    // satır: başlangıçtan önceki günler eksik olabilir (departman adıyla)
+    ikinci.durum.gunler['2026-11-08'] = { arac: { betik: 1, yeniden: 1, elle: 0 } }
+    delete ikinci.durum.gunler['2026-11-09']
+    expect(m.satirUret(ikinci.durum, '2026-11-09', ikinci)).toContain("1 büyük döküm (arac 1) 2026-11-09'den itibaren")
+    // canlı büyük döküm (son 3 günde yazılmış): küçük dosyada son SON_BAYT tüm dosyayı kapsar, geçmiş sayılır
+    const canli = new Date('2026-11-08T10:00:00')
+    utimesSync(dosya, canli, canli)
+    const c = m.tara({ kok: proje, durum: m.bos(), buyukSinir: 10, simdi })
+    expect(c.durum.gunler['2026-11-06'].arac.betik).toBe(1)
     let t = 0
     const tavan = m.tara({ kok: proje, durum: m.bos(), tavanMs: 5, simdi: () => (t += 10) })
     expect(tavan.eksik).toBe(true)
