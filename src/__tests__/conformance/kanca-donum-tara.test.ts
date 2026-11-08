@@ -176,6 +176,29 @@ describe('INV-DONUM-TARA-1 · tarama (artımlı, atlama, tavan, boşluk)', () =>
     expect(m.satirUret(tavan.durum, '2026-11-08', tavan)).toContain('tamamlanmadı')
   })
 
+  it('büyük döküm: sonBayt kesmesi yalnız kuyruğu sayar; küçülen büyük döküm baştan okunmaz; veri yokken de satır notu söyler', () => {
+    const { proje, dosya } = kur()
+    const simdi = () => Date.parse('2026-11-09T12:00:00')
+    const a = yaz('2026-11-05', 'a', 'C:/tmp/x.cjs')
+    const b = yaz('2026-11-08', 'b', 'C:/tmp/x.cjs')
+    writeFileSync(dosya, a + '\n' + b + '\n')
+    const canli = new Date('2026-11-08T10:00:00')
+    utimesSync(dosya, canli, canli)
+    const durum = m.bos()
+    const r = m.tara({ kok: proje, durum, buyukSinir: 10, sonBayt: Buffer.byteLength(b) + 1, simdi })
+    expect(r.durum.gunler['2026-11-05']).toBeUndefined() // kesme noktasından önceki satır sayılmaz
+    expect(r.durum.gunler['2026-11-08'].arac.betik).toBe(1)
+    // dosya ofsetten küçük olacak şekilde kısalır: büyük dökümde baştan değil sondan devam (çift sayım yok)
+    writeFileSync(dosya, yaz('2026-11-06', 'z', 'q.js') + '\n')
+    utimesSync(dosya, canli, canli)
+    const k = m.tara({ kok: proje, durum, buyukSinir: 10, simdi })
+    expect(k.durum.gunler['2026-11-06']).toBeUndefined()
+    // hiç veri günü yokken de büyük döküm notu görünür
+    const bos = m.bos()
+    bos.dosyalar['/p/C--Users-alize-venthub-hvac/a.jsonl'] = { boyut: 1, ofset: 1, buyuk: true, baslangic: '2026-11-09' }
+    expect(m.satirUret(bos, '2026-11-10')).toContain('1 büyük döküm (ana 1)')
+  })
+
   it('satır: önceki güne göre sayılar; boşluk ve veri yok açıkça yazılır', () => {
     const d = m.bos()
     d.gunler['2026-11-05'] = { arac: { betik: 5, yeniden: 5, elle: 9 } }

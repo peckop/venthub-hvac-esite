@@ -132,7 +132,7 @@ function dosyaTara(yol, ofset, dept, durum, bitisi, parca = PARCA) {
  * Tüm projeleri artımlı tarar. Döner: { durum, eksik: bool }.
  * `simdi` ve `tavanMs` test için enjekte edilir; tavan dolarsa kalan dosyalar sonraki koşuya kalır (eksik=true).
  */
-function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanMs = TAVAN_MS, buyukSinir = BUYUK_SINIR, parca } = {}) {
+function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanMs = TAVAN_MS, buyukSinir = BUYUK_SINIR, sonBayt = SON_BAYT, parca } = {}) {
   const baslangic = simdi()
   const bitisi = () => simdi() - baslangic >= tavanMs
   let eksik = false
@@ -162,10 +162,11 @@ function tara({ kok: proje = projeKok(), durum = bos(), simdi = Date.now, tavanM
           // BÜYÜK DÖKÜM, İLK KARŞILAŞMA (ARC-285): geçmişi okunmaz. Canlıysa (son 3 günde yazılmış) son SON_BAYT; ölüyse dosya sonu
           // (yeni bayt gelirse artımlı sayılır). Başlangıç günü kayıtlıdır; satır o günden önceki sayının eksik olduğunu söyler.
           const canli = fs.statSync(yol).mtimeMs > simdi() - 3 * 86400000
-          durum.dosyalar[yol] = { boyut, ofset: canli ? Math.max(0, boyut - SON_BAYT) : boyut, buyuk: true, baslangic: yerelGun(new Date(simdi()).toISOString()) }
+          durum.dosyalar[yol] = { boyut, ofset: canli ? Math.max(0, boyut - sonBayt) : boyut, buyuk: true, baslangic: yerelGun(new Date(simdi()).toISOString()) }
         }
         const onceki = durum.dosyalar[yol] || { boyut: 0, ofset: 0 }
-        const ofset = boyut < onceki.ofset ? 0 : onceki.ofset // dosya küçüldüyse baştan
+        // dosya küçüldüyse baştan; büyük dökümde baştan değil dosya sonundan (300 MB geçmişi yeniden okunmaz, çift sayım olmaz)
+        const ofset = boyut < onceki.ofset ? (onceki.buyuk ? boyut : 0) : onceki.ofset
         if (ofset >= boyut) continue
         const yeni = dosyaTara(yol, ofset, dept, durum, bitisi, parca)
         durum.dosyalar[yol] = { ...durum.dosyalar[yol], boyut, ofset: yeni }
@@ -207,6 +208,8 @@ function satirUret(durum, bugun, { eksik = false } = {}) {
   const son = gunler[gunler.length - 1]
   if (!son) {
     const n = []
+    const bn0 = buyukNotu(durum, '')
+    if (bn0) n.push(bn0)
     if (eksik) n.push('tarama tamamlanmadı (süre tavanı), sayılar eksik olabilir')
     return 'DÖNÜM: önceki güne ait veri yok' + (n.length ? ' [' + n.join('; ') + ']' : '')
   }
