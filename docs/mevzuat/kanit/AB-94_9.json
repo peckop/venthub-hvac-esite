@@ -37,6 +37,23 @@
       "durum_satiri": "TR tarafında da 94/9/AT (94/9/EC'nin TR karşılığı) yönetmeliğinin kaldırıldığı ayrıca teyit ediliyor.",
       "alinti": "Yürürlükten kaldırılan Yönetmelik (94/9/AT), yürürlükten kaldırılmıştır.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/31994L0009",
+      "son_url": "http://publications.europa.eu/resource/cellar/195f86f2-ba6b-47e0-9b59-f652bce28f1b.0008.01/DOC_1",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (Node fetch, Accept text/html, Accept-Language eng); xhtml biçimi bu CELEX için 404 verir; yeniden doğrulama 8 Kasım 2026",
+      "durum_satiri": "Özgün metin; 2014/34/AB ile 20 Nisan 2016'dan itibaren yürürlükten kalktı (AB-2014/34 kalemi). sha256 bu belge için İLK TABANdır.",
+      "bayt": 100818,
+      "sha256_ilk12": "4e858ec4807a",
+      "sha256_metin_ilk12": "dc9d72ba94e5",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "DIRECTIVE 94/9/EC OF THE EUROPEAN PARLIAMENT AND THE COUNCIL of 23 March 1994 on the approximation of the laws of the Member States concerning equipment and protective systems intended for use in potentially explosive atmospheres",
+      "alinti_dogrulandi": true
     }
   ]
 }

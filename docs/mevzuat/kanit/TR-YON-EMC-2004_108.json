@@ -13,6 +13,23 @@
       "durum_satiri": "kaldirildi (2016-10-02 itibarıyla, halef yönetmeliğin Madde 45'i ile)",
       "alinti": "MADDE 45 – (1) 24/10/2007 tarihli ve 26680 sayılı Resmî Gazete'de yayımlanan Elektromanyetik Uyumluluk Yönetmeliği (2004/108/AT) yürürlükten kaldırılmıştır.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Node fetch, User-Agent VentHub-mevzuat/1.0; ölçüm 2026-11-08",
+      "durum_satiri": "Resmî metin sayfası (yeniden doğrulama); sha256 bu kalem için İLK TABANdır.",
+      "bayt": 103100,
+      "sha256_ilk12": "d80d3691fa1e",
+      "sha256_metin_ilk12": "ddc2a1e5d00d",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "MADDE 45 – (1) 24/10/2007 tarihli ve 26680 sayılı Resmî Gazete’de yayımlanan Elektromanyetik Uyumluluk Yönetmeliği (2004/108/AT) yürürlükten kaldırılmıştır.",
+      "alinti_dogrulandi": true
     }
   ]
 }

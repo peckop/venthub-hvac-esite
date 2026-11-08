@@ -13,6 +13,23 @@
       "durum_satiri": "In force: This act has been changed. Current consolidated version: 24/07/2026",
       "alinti": "In force: This act has been changed. Current consolidated version: 24/07/2026 ... Date of end of validity: 23/07/2026; Partial end of validity See 32024R1834 Art. 9.1 ... Date of end of validity: 23/07/2037; Repealed by 32024R1834",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32011R0327",
+      "son_url": "http://publications.europa.eu/resource/cellar/c765ffb6-5f03-4a3f-ac61-08fc3f3874b7.0020.03/DOC_1",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "yontem": "AB Yayın Ofisi veri servisi, ham çekim (Node fetch, Accept application/xhtml+xml, Accept-Language eng); yeniden doğrulama 8 Kasım 2026",
+      "durum_satiri": "Özgün metin; yürürlükten kalkma zinciri AB-2024/1834 ve AB-2025/2481 kanıtlarındadır. sha256 bu belge için İLK TABANdır.",
+      "bayt": 196992,
+      "sha256_ilk12": "24d41098ea22",
+      "sha256_metin_ilk12": "acb65356305d",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "COMMISSION REGULATION (EU) No 327/2011 of 30 March 2011 implementing Directive 2009/125/EC of the European Parliament and of the Council with regard to ecodesign requirements for fans driven by motors with an electric input power between 125 W and 500 kW",
+      "alinti_dogrulandi": true
     }
   ]
 }
