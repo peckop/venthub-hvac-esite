@@ -291,7 +291,7 @@
       ],
       "durum": "kaldirildi",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-327_2011.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
@@ -299,7 +299,7 @@
         "Alıntılar curl+grep yerine gerçek tarayıcı DOM metninde JS indexOf ile doğrulandı (WAF engeli nedeniyle curl kullanılamadı); metod sapması olarak not edildi.",
         "8 Kasım 2026: 2027-07-24 ve 2037-07-24 tarihleri (AB) 2025/2481 Md 1(4) ham metninden doğrulandı."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "B"
     },
     {
@@ -1230,7 +1230,7 @@
       ],
       "durum": "kaldirildi",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-94_9.json",
-      "resmi_kaynak_sayisi": 3,
+      "resmi_kaynak_sayisi": 4,
       "etkilenen_aileler": [
         {
           "slug": "seat-serisi",
@@ -1259,7 +1259,7 @@
         "Kapsam dışı ek bulgu: nicotra-gebhardt-adh, nicotra-gebhardt-rdh, nicotra-gebhardt-at aileleri (aileler.txt'de mevcut ama görev talimatındaki ATEX listesinde yok) kendi kaynak PDF'lerinde (479-series-adh.pdf, 481-series-rdh.pdf, 480-series-at.pdf) 'EC Directive 94/9/EG (ATEX 95)' ifadesini içeriyor — opsiyonel ATEX koruma notu olarak.",
         "Ek bulgu: danfoss-fc102 ailesinin kaynak PDF'inde (MG16Z102-Guia-Design-FC102-355-800K-E-Ing.pdf) genel bir güvenlik uyarısı içinde 'EU Directive 94/9/EC (ATEX 95)' ifadesi geçiyor; bu ürünün kendi sertifikasyonu değil, genel bir kurulum uyarısı metni gibi görünüyor — düşük öncelik."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "C"
     },
     {
@@ -1513,16 +1513,18 @@
       "karsilik": [
         "AB-2004/108"
       ],
-      "iliski_notlari": [],
+      "iliski_notlari": [
+        "8 Kasım 2026: önceki kanıt alıntısı kesme işaretini ASCII (') yazmıştı; sayfada birebir ’ (U+2019) var, alıntı birebir biçimiyle yenilendi."
+      ],
       "durum": "kaldirildi",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-EMC-2004_108.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Bu eski yönetmeliğin kendi RG metni (26680 sayılı) doğrudan açılıp doğrulanmadı; yalnız halefin atıf metninden teyit edildi."
       ],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "D"
     },
     {
@@ -1661,14 +1663,16 @@
       "karsilik": [
         "AB-2006/95"
       ],
-      "iliski_notlari": [],
+      "iliski_notlari": [
+        "8 Kasım 2026: önceki kanıt alıntısı kesme işaretini ASCII (') yazmıştı; sayfada birebir ’ (U+2019) var, alıntı birebir biçimiyle yenilendi."
+      ],
       "durum": "kaldirildi",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-LVD-2006_95.json",
-      "resmi_kaynak_sayisi": 1,
+      "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [],
-      "son_kontrol": "2026-09-25",
+      "son_kontrol": "2026-11-08",
       "eksen": "D"
     },
     {

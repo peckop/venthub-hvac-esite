@@ -13,6 +13,23 @@
       "durum_satiri": "kaldirildi (2016-10-02 itibarıyla)",
       "alinti": "GEÇİCİ MADDE 1 – (1) Bakanlık, 30/12/2006 tarihli ve 26392 sayılı Resmî Gazete'de yayımlanan Belirli Gerilim Sınırları Dahilinde Kullanılmak Üzere Tasarlanmış Elektrikli Teçhizat ile İlgili Yönetmelik (2006/95/AT)'e uygun olan ve bu Yönetmeliğin yürürlük tarihinden önce piyasaya arz edilen elektrikli ekipmanların piyasada bulundurulmasını engellemez.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Node fetch, User-Agent VentHub-mevzuat/1.0; ölçüm 2026-11-08",
+      "durum_satiri": "Resmî metin sayfası (yeniden doğrulama); sha256 bu kalem için İLK TABANdır.",
+      "bayt": 65539,
+      "sha256_ilk12": "d5e0fdb02e59",
+      "sha256_metin_ilk12": "95412802fdb3",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "GEÇİCİ MADDE 1 – (1) Bakanlık, 30/12/2006 tarihli ve 26392 sayılı Resmî Gazete’de yayımlanan Belirli Gerilim Sınırları Dahilinde Kullanılmak Üzere Tasarlanmış Elektrikli Teçhizat ile İlgili Yönetmelik (2006/95/AT)’e uygun olan",
+      "alinti_dogrulandi": true
     }
   ]
 }

@@ -99,6 +99,11 @@ yeniden tanımlamaz, uygular:
    etmenini TLS sonrası sessizce düşürür (0 bayt, zaman aşımı); `curl -A "VentHub-mevzuat/1.0"`
    ya da Node `fetch` ile 200 gelir (ölçüldü 2026-11-08, ALT-174). Kullanıcı etmeni kanıta
    `yontem` alanında yazılır; tarayıcı bölmesi artık zorunlu değil, yedek yoldur.
+   **Araç (OPS-256, 2026-11-08):** ham çekim, sha256, birebir alıntı doğrulaması ve kullanıcı
+   etmeni `scripts/mevzuat/ham-cekim.cjs` ile tek yerde yapılır; kanıt dosyasına ve kayıt
+   kalemine yazma `scripts/mevzuat/kanit-ekle.cjs` ile (CRLF korunur, alıntısı doğrulanmayan
+   kaynak eklenmez). Yeniden doğrulama için `--toplu` kullanılır; her iş için ayrı yama betiği
+   yazılmaz.
 4. **robots.txt ve kullanım şartı önce okunur.** Otomatik okuma yasaksa o kaynak elle okunur ve
    kanıt dosyasına `robots: yasak — elle okundu` yazılır. (Niçin: 2026-09-24'te Google Trends'e
    bu kontrol yapılmadan otomatik erişildi.)

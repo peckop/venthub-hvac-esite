@@ -693,6 +693,9 @@ madde 1 gereği araç sayılmaz.
 | `scripts/tasima/git.cjs` | MAKİNE TAŞIMA — GİT YARDIMCILARI (ALT-165). Cetvel: docs/standards/makine-tasima-standard.md. | OPS | docs/standards/makine-tasima-standard.md, scripts/tasima/kur.cjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/tasima/kur.cjs` | MAKİNE TAŞIMA — KUR (YENİ makinede koşar). ALT-165. Cetvel: docs/standards/makine-tasima-standard.md. | OPS | docs/standards/makine-tasima-standard.md, scripts/tasima/paketle.cjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/makine-tasima.test.ts | YENI |
 | `scripts/tasima/paketle.cjs` | MAKİNE TAŞIMA — PAKETLE (ESKİ makinede koşar). ALT-165. Cetvel: docs/standards/makine-tasima-standard.md. | OPS | docs/standards/makine-tasima-standard.md, src/__tests__/conformance/makine-tasima.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/makine-tasima.test.ts | YENI |
+| `scripts/mevzuat/__tests__/mevzuat-araclari.test.ts` | MVZ-10 / OPS-256 · scripts/mevzuat/ham-cekim.cjs ve kanit-ekle.cjs. | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/mevzuat/ham-cekim.cjs` | MEVZUAT HAM ÇEKİM — bir resmî adresi ham bayt olarak çeker; ham ve etiketsiz metnin sha256'sını | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/mevzuat/kanit-ekle.cjs` | MEVZUAT KANIT EKLE — ham-cekim.cjs çıktısını (kaynak girdisi) kalemin kanıt dosyasına ekler ve | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
