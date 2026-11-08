@@ -287,9 +287,10 @@
       ],
       "iliski_notlari": [
         "EU-2013/666 (kısmi)",
-        "EU-2016/2282 (kısmi)"
+        "EU-2016/2282 (kısmi)",
+        "8 Kasım 2026: durum kaldirildi → gecis-doneminde. Genel hükümler 24 Temmuz 2026'da yürürlükten kalktı, ancak Ek I-III diğer ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır (2025/2481 Md 1(4) ham metninden doğrulandı); \"kaldirildi\" bu tarihleri örtüyordu ve M5'te kontrolsüz bırakıyordu. Yerine gelen: AB-2024/1834."
       ],
-      "durum": "kaldirildi",
+      "durum": "gecis-doneminde",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-327_2011.json",
       "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
@@ -300,7 +301,8 @@
         "8 Kasım 2026: 2027-07-24 ve 2037-07-24 tarihleri (AB) 2025/2481 Md 1(4) ham metninden doğrulandı."
       ],
       "son_kontrol": "2026-11-08",
-      "eksen": "B"
+      "eksen": "B",
+      "yerine_gelen": "AB-2024/1834"
     },
     {
       "kimlik": "AB-2024/1834",
@@ -1109,13 +1111,16 @@
         "uygulama_asamalari": []
       },
       "yerini_aldigi": [],
-      "degistirenler": [],
+      "degistirenler": [
+        "TR-YON-ATEX-2020-DEG"
+      ],
       "karsilik": [
         "AB-2014/34"
       ],
       "iliski_notlari": [
         "TR-94/9-AT-yonetmelik (eski, ad/RG detayı bu oturumda ayrıca doğrulanmadı)",
-        "Değiştiren: RG 27.06.2020 sayı 31168, \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\" (Sanayi ve Teknoloji Bakanlığı; https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm, ham çekim 8 Kasım 2026, sha256_ilk12 3d7d64d4f7a3). Ayrı kalem açılınca `degistirenler`e taşınmalı."
+        "Değiştiren: RG 27.06.2020 sayı 31168, \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\" (Sanayi ve Teknoloji Bakanlığı; https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm, ham çekim 8 Kasım 2026, sha256_ilk12 3d7d64d4f7a3). Ayrı kalem açılınca `degistirenler`e taşınmalı.",
+        "8 Kasım 2026: RG 27/6/2020, 31168 değişikliği artık ayrı kalem (TR-YON-ATEX-2020-DEG); degistirenler’e işlendi. Atıf yapılan Md 4(1)(s)(ğ), 41, 43 bu değişiklikten etkilenmedi (ham metin okundu)."
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2014_34.json",
@@ -3740,6 +3745,161 @@
       ],
       "son_kontrol": "2026-11-08",
       "eksen": "E"
+    },
+    {
+      "kimlik": "TR-YON-IMAR-PLANLI-2017",
+      "ad": "Planlı Alanlar İmar Yönetmeliği",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "yapi-urunleri"
+      ],
+      "kapsam": "Uygulama imar planı bulunan alanlarda yapı ve yapılaşmaya ilişkin usul ve esasları belirler. Havalandırmaya dokunan hükümler: Md 32(9) banyo, tuvalet ve benzeri alanların havalandırma bacası ya da mekanik havalandırma ile havalandırılması zorunludur; Md 39(6) mekanik havalandırma yoksa ıslak hacimde en az 0,30 m x 0,30 m havalandırma penceresi aranır. Bu hükümlerde debi ya da hava değişim sayısı verilmez.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2017-07-03",
+        "yururluk": "2017-10-01",
+        "asamalar": [
+          {
+            "tarih": "2017-07-03",
+            "ne": "Md 71: geçici 3 üncü madde yayımı tarihinde yürürlüğe girdi"
+          },
+          {
+            "tarih": "2017-10-01",
+            "ne": "Md 71: diğer maddeler yürürlüğe girdi; Md 70 ile 2/11/1985 tarihli Planlı Alanlar Tip İmar Yönetmeliği yürürlükten kalktı"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [
+        "RG 30/9/2017-30196",
+        "RG 6/2/2018-30324",
+        "RG 28/7/2018-30492",
+        "RG 27/10/2018-30578",
+        "RG 1/3/2019-30701",
+        "RG 25/7/2019-30842",
+        "RG 27/12/2019-30991",
+        "RG 11/3/2020-31065",
+        "RG 23/1/2021-31373",
+        "RG 11/7/2021-31538",
+        "RG 18/8/2022-31927",
+        "RG 31/12/2022-32060",
+        "RG 12/5/2023-32188",
+        "RG 12/8/2023-32277",
+        "RG 28/1/2025-32796",
+        "RG 11/3/2025-32838",
+        "RG 13/8/2025-32985",
+        "RG 14/1/2026-33137",
+        "RG 1/7/2026-33297"
+      ],
+      "karsilik": [],
+      "iliski_notlari": [
+        "Resmî Gazete 3 Temmuz 2017, sayı 30113. Yürütücü bakanlık adı kayıtta tutulmaz (yetki alanı TR).",
+        "8 Kasım 2026: degistirenler listesi mevzuat.gov.tr birleştirilmiş metnindeki \"Değişik/Mülga\" işaretlerinden derlendi (19 ayrı Resmî Gazete); işaretsiz kaldırma ya da başlık düzeyi değişiklik listede olmayabilir.",
+        "Bina/yapılaşma yönetmeliğidir, ürün yönetmeliği değil: ürün sayfasına ya da CE dosyasına şart yüklemez; banyo/tuvalet fanı rehber yazısındaki atıfların dayanağıdır (BLG-55)."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-IMAR-PLANLI-2017.json",
+      "resmi_kaynak_sayisi": 5,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Ürün ailesi × hüküm eşlemesi KATALOG ile yapılmadı (banyo/tuvalet fanı hangi ailelerde); etkilenen_aileler bu yüzden boş.",
+        "konu ekseni geçici: \"yapi-urunleri\" en yakın eksen, yönetmelik ürün değil bina şartı koyuyor; eksen listesine \"bina-havalandirma\" eklenip eklenmeyeceği MEVZUAT kararı (M0)."
+      ],
+      "son_kontrol": "2026-11-08",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-BEP-2008",
+      "ad": "Binalarda Enerji Performansı Yönetmeliği",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "yapi-urunleri"
+      ],
+      "kapsam": "Mevcut ve yeni binalarda enerji kullanımının etkin olması için tasarım, tesisat ve enerji kimlik belgesi esaslarını belirler. Havalandırmaya dokunan hükümler: Md 17(1) havalandırma ve iklimlendirme sistemi tasarımında TS 3419 ve ilgili Avrupa Standartlarına uyulur; Md 17(10) yeni binalarda 500 m3/h ve üzeri sistemlerde ısı geri kazanım tasarımı yapılır, koşullar sağlanırsa kurulumu zorunludur. Banyo ve tuvalet gibi küçük çekişler için ayrı bir debi hükmü yoktur.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2008-12-05",
+        "yururluk": "2009-12-05",
+        "asamalar": [
+          {
+            "tarih": "2009-12-05",
+            "ne": "Md 29: yayımından bir yıl sonra yürürlük (tarih Md 29'dan hesaplandı)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [
+        "RG 1/4/2010-27539",
+        "RG 30/6/2010-27627",
+        "RG 28/4/2017-30051",
+        "RG 19/2/2022-31755",
+        "RG 24/6/2025-32936",
+        "RG 16/5/2026-33255"
+      ],
+      "karsilik": [],
+      "iliski_notlari": [
+        "Resmî Gazete 5 Aralık 2008, sayı 27075. Md 28 ile Binalarda Isı Yalıtım Yönetmeliği (RG 9/10/2008, 27019) yürürlükten kaldırıldı.",
+        "8 Kasım 2026: degistirenler listesi mevzuat.gov.tr birleştirilmiş metnindeki \"Değişik/Mülga\" işaretlerinden derlendi (6 ayrı Resmî Gazete); işaretsiz kaldırma ya da başlık düzeyi değişiklik listede olmayabilir.",
+        "Bina yönetmeliğidir, ürün yönetmeliği değil; rehber yazılarında (BLG-55, ısı geri kazanım) atıf dayanağıdır."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-BEP-2008.json",
+      "resmi_kaynak_sayisi": 4,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "belirsiz",
+          "neden": "Md 17(10) yeni binalarda 500 m3/h ve üzeri sistemlerde ısı geri kazanımı (en az %50 verim, ekonomik avantaj koşuluyla) zorunlu kılar; hangi ürünün hangi projede bu eşiğe girdiği proje bazlıdır, ürün için sabit yargı verilemez."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "belirsiz",
+          "neden": "Md 17(10) yeni binalarda 500 m3/h ve üzeri sistemlerde ısı geri kazanımı (en az %50 verim, ekonomik avantaj koşuluyla) zorunlu kılar; hangi ürünün hangi projede bu eşiğe girdiği proje bazlıdır, ürün için sabit yargı verilemez."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Banyo/tuvalet fanı ailelerinin eşlemesi KATALOG ile yapılmadı; kayıtta yalnız ısı geri kazanım aileleri (belirsiz) yazılı.",
+        "konu ekseni geçici: bkz. TR-YON-IMAR-PLANLI-2017 (bina-havalandirma ekseni kararı)."
+      ],
+      "son_kontrol": "2026-11-08",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-ATEX-2020-DEG",
+      "ad": "Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB)’te Değişiklik Yapılmasına Dair Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "TR-YON-ATEX-2014/34’ü değiştirir: Md 2(2)(c)-(ç) kapsam dışı bentleri, Md 3 dayanak, Md 4(1)(b) ve (d) tanımları (Bakanlık, CE işareti), Md 15(1)(a)(1)’den “(Üretim)” ibaresinin çıkarılması, Md 44 yürütücü, Ek-2 1.0.5 işaretleme maddesi. Ayrıca metindeki “üretici” ibareleri “imalatçı”, “Ekonomi Bakanlığı” “Ticaret Bakanlığı” olur. Md 4(1)(s)(ğ), Md 41, Md 42 ve Md 43 bu değişiklikte yer almaz.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2020-06-27 (RG Sayı 31168)",
+        "yururluk": "2020-06-27 (Md 8: yayımı tarihinde)",
+        "asamalar": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "TR-YON-ATEX-2014/34’ü değiştirir (RG 30/6/2016, 29758). Ürün ailelerine etkisi ana kalem üzerinden okunur; etkilenen_aileler bu kalemde boş.",
+        "8 Kasım 2026: Resmî Gazete sayfası ham çekildi, değişiklik metni birebir okundu; “üretici→imalatçı” çevirisi Türkçe metinde terim değişikliğidir, madde numarası taşımaz."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2020-DEG.json",
+      "resmi_kaynak_sayisi": 4,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "2020 sonrası başka değişiklik olup olmadığı mevzuat.gov.tr değişiklik listesinden ayrıca taranmadı."
+      ],
+      "son_kontrol": "2026-11-08",
+      "eksen": "C"
     }
   ],
   "notlar": [
