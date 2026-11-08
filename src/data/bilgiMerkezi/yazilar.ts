@@ -1658,6 +1658,124 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-51), doğrulanmış metin: taslak v6 (sha 1315ed9bdbb3), iç bağ işaretli v7 (sha d3db53fa6879; metin v6 ile aynı). Makale çerçevesi (cetvel R3.3): markasız gövde, marka ve seri adları yalnız "VentHub'da hangi serilerin sayfasında ATEX bölgesi yazılı?" bölümünde ve Kaynaklar'da.
+    // Doğrulama: altı tur tam okuma, her turda tuzaklı + temiz kopya (tuzaklar 6/6, 5/5, 6/6, 6/6, 7/7, 7/7); son tur temiz kopyada yanlış 0, kapsam aşımı 0. Recep yayın onayı 08.11.2026 (OPS). AB metinleri EUR-Lex ham metninden; TR yönetmelik adları ve madde numaraları MEVZUAT (MVZ-6, 8 Kasım) paketinden: resmigazete.gov.tr yayım tarihli ilk metinler, TR Ek-1 (kategori 3) okunmadı.
+    // Fiyat yok. Vorticent CMS ATEX Zone 1 bilgisi ve JET "Kategori 3 G" ifadesi yalnız VentHub sayfalarındadır (etiketli). SEAT/STORM için bölge iddiası yok.
+    kimlik: 'patlayici-ortamda-fan-secimi-atex',
+    konu: 'guvenlik',
+    yayinTarihi: '2026-11-08',
+    guncellemeTarihi: '2026-11-08',
+    urunler: ['vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar', 'vh:aile/jet-serisi'],
+    ilgiliKategoriler: ['vh:kategori/centrifugal-fans', 'vh:kategori/corrosion-and-acid-resistant-fans'],
+    diller: {
+      tr: {
+        slug: 'patlayici-ortamda-fan-secimi-atex-bolge-kategori',
+        ozet: "ATEX nedir, bölge ve ekipman kategorisi ne anlama gelir, bölge 2'de hangi kategori kullanılır, Türkiye'de karşılığı olan yönetmelikler hangileridir ve VentHub'da hangi serilerin sayfasında ATEX bölgesi yazılı.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Patlayıcı ortamda fan seçerken bölgenin ve ekipman kategorisinin ne demek olduğunu görmek için bu rehberden başlayın.",
+        govde: `# Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?
+
+ATEX, patlayıcı ortamlara ilişkin iki AB direktifine verilen addır: biri bu ortamlarda kullanılacak ekipmanı, öteki işyerinde çalışanların korunmasını düzenler [3]. Bu yazı fan seçimine iki soruyla yaklaşır: işyerindeki alan hangi bölgeye sınıflandırılmış [2][3] ve o bölgede hangi ekipman kategorisi kullanılabilir [2]. Yazı gaz ortamında bölge 2 ile kategori 3 üzerinde durur [1][2].
+
+Kısaca:
+
+- İki direktif: ekipmanı 2014/34/AB, çalışanları 99/92/AT düzenler [3].
+- Bölge: alanı işveren bölgelere ayırır [3]; bölge 2'de patlayıcı ortamın normal işletmede oluşması beklenmez, oluşursa kısa süre kalır [2].
+- Kategori: kategori 3 ekipman, patlayıcı ortamın olası olmadığı ya da yalnız seyrek ve kısa süreli olduğu yerler içindir [1].
+- Eşleşme: 99/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
+
+## ATEX hangi iki direktife verilen addır?
+
+Health and Safety Executive'in (HSE) sayfası ATEX'i, patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen ad olarak anlatır [3]. Bunlardan 2014/34/AB, üye devletlerin patlayıcı ortamlarda kullanılacak ekipman ve koruyucu sistemlere ilişkin yasalarının yakınlaştırılmasını; 99/92/AT ise patlayıcı ortam riski altındaki çalışanların sağlık ve güvenliğinin korunması için asgari gereklilikleri kapsar [3]. 2014/34/AB'nin 1. maddesinin (1)(a) bendi de ana kapsamı aynı sözlerle çizer: patlayıcı ortamlarda kullanılması amaçlanan ekipman ve koruyucu sistemler [1].
+
+Direktif "ekipmanı" makineler, aygıtlar, sabit ya da taşınabilir cihazlar, kontrol bileşenleri ve araçları ile algılama ya da önleme sistemleri olarak sayar; bunlar enerji üretimi, aktarımı, depolanması, ölçümü, kontrolü ve dönüşümü ve/veya malzeme işleme amaçlı olmalı ve kendi olası tutuşturma kaynaklarıyla patlama yaratabilmelidir [1]. Direktif metninde "fan" sözcüğü geçmez [1]; bu yazı bir fanın kapsamda olup olmadığına hüküm vermez. Direktife göre "potentially explosive atmosphere" (potansiyel olarak patlayıcı ortam), yerel ve işletme koşulları nedeniyle patlayıcı hâle gelebilen ortamdır (2. madde, 5. bent) [1].
+
+2014/34/AB, 94/9/AT sayılı direktifi 20 Nisan 2016'dan itibaren yürürlükten kaldırmıştır (43. madde) [1].
+
+## Bölge nedir, kim belirler?
+
+HSE'ye göre işverenler, tehlikeli patlayıcı ortamın oluşabileceği alanları bölgelere sınıflandırmak zorundadır; bir bölgenin sınıfı, büyüklüğü ve yeri patlayıcı ortamın oluşma olasılığına ve oluşursa ne kadar kalacağına bağlıdır [3].
+
+99/92/AT'nin I. Eki bölge 2'yi şöyle tanımlar: gaz, buhar ya da sis hâlindeki yanıcı maddelerin havayla karışımından oluşan patlayıcı ortamın normal işletmede oluşması beklenmeyen, oluşsa bile yalnız kısa süre kalacak olan yer [2].
+
+## Kategori ve "G" işareti ne anlatır?
+
+2014/34/AB'nin I. Eki, kategori 3 ekipmanı, üreticinin belirlediği işletme parametrelerine uygun çalışabilecek ve normal düzeyde koruma sağlayacak biçimde tasarlanmış ekipman olarak tanımlar [1]. Aynı ek, bu kategorinin gaz, buhar, sis ya da hava/toz karışımlarından oluşan patlayıcı ortamın olası olmadığı ya da oluşsa bile yalnız seyrek ve kısa süreli olduğu alanlar için amaçlandığını yazar [1]. II. Ek, kategori 3 gaz ekipmanı için normal işletmede ortaya çıkabilecek öngörülebilir tutuşturma kaynaklarının önlenmesini ister [1].
+
+Ekipman işaretindeki "G" harfi, II. ekipman grubunda gaz, buhar ya da sisin neden olduğu patlayıcı ortamları anlatır [1].
+
+## Bölge ile kategori nasıl eşleşir?
+
+99/92/AT'nin II. Ekinin B bölümü, ekipman ve koruyucu sistemlerin seçim ölçütlerini verir ve hangi bölgede hangi kategorinin kullanılacağını sayar; liste, risk değerlendirmesine dayalı patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla geçerlidir [2]. Bu bölüm kategorileri 94/9/AT'ye atıfla verir [2]; o direktif 2014/34/AB ile yürürlükten kalkmıştır [1]. Yazı iki direktifin kategori anlatımlarını yan yana okur; bu bağı kuran yazının kendi okumasıdır.
+
+| Bölge | Kullanılacak ekipman kategorisi |
+|---|---|
+| Bölge 1 (ya da toz için bölge 21) | Kategori 1 veya 2 |
+| Bölge 2 (ya da toz için bölge 22) | Kategori 1, 2 veya 3 |
+
+Tabloda kategori 3, yalnız bölge 2 ya da bölge 22 için sayılır [2]. Bölge 1'de kategori 3 ekipman bu listede yer almaz [2].
+
+## Türkiye'de karşılığı olan yönetmelikler hangileridir?
+
+Ekipmana ilişkin 2014/34/AB, Türkiye'de Bilim, Sanayi ve Teknoloji Bakanlığı'nın 30 Haziran 2016 tarihli ve 29758 sayılı Resmî Gazete'de yayımlanan "Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB)" başlıklı yönetmeliğe karşılık gelir; yönetmelik, Avrupa Birliği mevzuatına uyum çerçevesinde hazırlanmıştır (41. madde) ve yayımı tarihinde yürürlüğe girmiştir (43. madde) [7]. Teçhizat kategorilerinin sınıflandırması bu yönetmeliğin Ek-1'indedir (4. madde, birinci fıkra, (s) ve (ğ) bentleri) [7]; bu yazı kategori 3 tanımını AB metninden aktarır, Türkçe Ek-1 metnini okumamıştır.
+
+Çalışanların korunmasına ilişkin yönetmelik, 30 Nisan 2013 tarihli ve 28633 sayılı Resmî Gazete'de yayımlanan "Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik"tir [8]. Bu yönetmeliğin Ek-1'inde bölge 2, gaz, buhar ve sis halindeki yanıcı maddelerin hava ile karışarak normal çalışma koşullarında patlayıcı ortam oluşturma ihtimali olmayan yerler ya da böyle bir ihtimal olsa bile patlayıcı ortamın çok kısa bir süre için kalıcı olduğu yerler olarak tanımlanır; Ek-3, patlamadan korunma dokümanında aksi belirtilmedikçe, bölge 2 veya bölge 22 için kategori 1, 2 veya 3 ekipmanı, bölge 1 veya bölge 21 için kategori 1 veya 2 ekipmanı sayar [8].
+
+İki yönetmelik için de Resmî Gazete'de yayımlanan ilk metne bakılmıştır [7][8]; sonraki değişiklikler okunmamıştır.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez. Teklif için gereken bilgiler için bu yazının önerdiği sıra şöyledir. Önce işveren alanı sınıflandırır ve bölgeyi belirler [3]. Sonra, patlamadan korunma belgesi aksini belirtmedikçe, bölgeye uygun ekipman kategorisi seçilir [2]. Gaz, buhar ve sis için ekipman işaretinde "G" harfine bakılabilir [1]. VentHub'ın Vorticent CMS ATEX sayfasında bölge ve işaret bilgisi model bazında verilir ve bölge modele göre değişir [4]; JET sayfasında ATEX versiyonları aile açıklamasında anılır [5]; üretici sayfası Zone 2 versiyonun yalnız üç faz motorla sunulduğunu yazar [6].
+
+## VentHub'da hangi serilerin sayfasında ATEX bölgesi yazılı?
+
+Bu yazı VentHub'daki bütün ATEX işaretli ürünleri değil, sayfasında bölge bilgisi yazılı olan iki seriyi anar. VentHub ürün sayfasına göre [Vorticent CMS ATEX serisinde](vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar) 12/5 T4 ve 14/5 T4 modelleri Zone 1'e; 16/6 T2, 22/9 T4, 25/10 T4, 28/11 T4, 31/12 T4, 35/14 T4, 40/16 T4 ve 45/18 T4 modelleri Zone 2'ye uygun işaretlidir [4]. [JET serisinde](vh:aile/jet-serisi) JET 20, JET 25 ve JET 30 modellerinin ATEX Bölge 2, Kategori 3 G'ye uygun, patlamaya dayanıklı motorlu versiyonları bulunur [5]; üretici sayfası Zone 2 versiyonun yalnız üç faz motorla sunulduğunu yazar [6]. Güncel model ve işaret bilgisi ürün sayfalarındadır.
+
+## Sık sorulan sorular
+
+### ATEX nedir?
+
+Patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen addır: biri ekipmana, biri çalışanların korunmasına ilişkindir [3].
+
+### Bölge 2'de hangi ekipman kategorisi kullanılır?
+
+99/92/AT II. Ek B bölümüne göre, patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla, bölge 2 (ve toz için bölge 22) için kategori 1, 2 ya da 3 ekipman sayılır [2].
+
+### Kategori 3 ne demektir?
+
+2014/34/AB I. Ek'e göre normal düzeyde koruma sağlayan, patlayıcı ortamın olası olmadığı ya da yalnız seyrek ve kısa süreli oluştuğu alanlar için amaçlanan ekipman kategorisidir [1].
+
+### Alanın hangi bölgede olduğuna kim karar verir?
+
+HSE'ye göre alanı işveren sınıflandırır [3].
+
+### Bölge 1'de kategori 3 ekipman kullanılabilir mi?
+
+99/92/AT II. Ek B bölümü, patlamadan korunma belgesi aksini belirtmedikçe, bölge 1 ve 21 için yalnız kategori 1 ya da 2 ekipmanı sayar; kategori 3 yalnız bölge 2 ve 22 satırındadır [2].
+
+### Ekipman işaretindeki "G" harfi ne anlama gelir?
+
+2014/34/AB'ye göre II. ekipman grubunda gaz, buhar ya da sisin neden olduğu patlayıcı ortamları gösterir [1].
+
+## Kaynaklar
+
+1. Avrupa Parlamentosu ve Konseyi, 2014/34/AB sayılı Direktif (26 Şubat 2014), madde 1, 2, 43; Ek I (2. Ekipman grubu II, c); Ek II (1.0.5, 2.3.1.1), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0034 (erişim 08.11.2026)
+2. Avrupa Parlamentosu ve Konseyi, 1999/92/AT sayılı Direktif (16 Aralık 1999), Ek I (Bölge 2) ve Ek II B, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:31999L0092 (erişim 08.11.2026)
+3. Health and Safety Executive (HSE), "ATEX and explosive atmospheres" sayfası (güncelleme 26.01.2026). https://www.hse.gov.uk/fireandexplosion/atex.htm (erişim 08.11.2026)
+4. VentHub, Vortice Vorticent CMS ATEX santrifüj fanlar ürün sayfası, canlı sitede 8 Kasım 2026'da ölçüldü. https://venthub.com.tr/tr/products/vortice-vorticent-cms-atex-santrifuj-fanlar
+5. VentHub, JET serisi ürün ailesi sayfası, canlı sitede 8 Kasım 2026'da ölçüldü. https://venthub.com.tr/tr/products/jet-serisi
+6. SEAT Ventilation, JET 20 ürün sayfası (jet-25 ve jet-30 sayfalarında aynı ifade). https://seat-ventilation.com/products/jet-20 (erişim 08.11.2026)
+7. Bilim, Sanayi ve Teknoloji Bakanlığı, Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB), Resmî Gazete, 30.06.2016, sayı 29758, madde 4, 41, 43. https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm (erişim 08.11.2026)
+8. Çalışma ve Sosyal Güvenlik Bakanlığı, Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik, Resmî Gazete, 30.04.2013, sayı 28633, Ek-1 ve Ek-3. https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm (erişim 08.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Alan sınıflandırması işverenin sorumluluğundadır. Üretici beyanları üreticinin kendi sayfalarındaki bilgilerdir. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */

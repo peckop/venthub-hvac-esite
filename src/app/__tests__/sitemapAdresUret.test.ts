@@ -101,15 +101,16 @@ describe('INV-SITEMAP-ADRES-1 — site haritası adresUret katmanından', () => 
     // BLG-33 (2026-11): sekizinci rehber yazısı (plug-fan-nedir) → +1 satır (kapalı 28 → 29, açık 48 → 49).
     // BLG-45 (2026-11): dokuzuncu rehber yazısı (asit-fani-nedir-korozyona-dayanikli-fan-secimi) → +1 satır (kapalı 29 → 30, açık 49 → 50).
     // BLG-49 (2026-11): onuncu rehber yazısı (cati-tipi-fan-nedir-nasil-secilir) → +1 satır (kapalı 30 → 31, açık 50 → 51).
-    it('EN_YAYIN kapalı: 31 satır, altın veriyle birebir', async () => {
+    // BLG-51 (2026-11): on birinci rehber yazısı (patlayici-ortamda-fan-secimi-atex-bolge-kategori) → +1 satır (kapalı 31 → 32, açık 51 → 52).
+    it('EN_YAYIN kapalı: 32 satır, altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(false, false)
-      expect(satirlar).toHaveLength(31)
+      expect(satirlar).toHaveLength(32)
       expect(altinaCevir(satirlar, base)).toEqual(ALTIN.enKapali)
     })
 
-    it('EN_YAYIN açık: 51 satır (iki dil, alternates ile), altın veriyle birebir', async () => {
+    it('EN_YAYIN açık: 52 satır (iki dil, alternates ile), altın veriyle birebir', async () => {
       const { satirlar, base } = await harita(true, false)
-      expect(satirlar).toHaveLength(51)
+      expect(satirlar).toHaveLength(52)
       expect(altinaCevir(satirlar, base)).toEqual(ALTIN.enAcik)
     })
   })
