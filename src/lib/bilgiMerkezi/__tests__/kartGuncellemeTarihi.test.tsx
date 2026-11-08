@@ -56,14 +56,14 @@ describe('liste kartı — güncelleme tarihi', () => {
     expect(container.textContent).toContain(`Updated ${tarihYaz('2026-10-10', 'en')}`)
   })
 
-  it('yayındaki içerik: rehber yazılarının güncelleme tarihi ve kartın bastığı tarih (radyal-aksiyel, frekans, fan çeşitleri, kanal tipi ve sessiz fan 2026-11-08: BLG-50 ve BLG-52 kısa katman)', () => {
+  it('yayındaki içerik: rehber yazılarının güncelleme tarihi ve kartın bastığı tarih (frekans ve kanal tipi 2026-11-08: BLG-50 ve BLG-52 kısa katman; radyal-aksiyel, fan çeşitleri ve sessiz fan 2026-11-09: BLG-63 AB-327/2011 geçiş dönemi cümleleri)', () => {
     const kartlar = listeKartlari('tr', YAZILAR)
     const beklenen: Array<[string, string, string]> = [
       ['frekans-konvertoru', '2026-11-08', '8 Kasım 2026'],
-      ['fan-cesitleri', '2026-11-08', '8 Kasım 2026'],
-      ['radyal-aksiyel-fan-secimi', '2026-11-08', '8 Kasım 2026'],
+      ['fan-cesitleri', '2026-11-09', '9 Kasım 2026'],
+      ['radyal-aksiyel-fan-secimi', '2026-11-09', '9 Kasım 2026'],
       ['kanal-tipi-fan-nedir', '2026-11-08', '8 Kasım 2026'],
-      ['sessiz-fan-secimi', '2026-11-08', '8 Kasım 2026'],
+      ['sessiz-fan-secimi', '2026-11-09', '9 Kasım 2026'],
     ]
     for (const [kimlik, iso, yazili] of beklenen) {
       const yazi = YAZILAR.find((y) => y.kimlik === kimlik)

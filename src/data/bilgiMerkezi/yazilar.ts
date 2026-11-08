@@ -269,7 +269,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // (INV-BILGI-MERKEZI-KART-1).
     // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Fan ses gücü seviyesi nasıl okunur?").
     // Güncelleme tarihi 2026-11-04 (BLG-38, SEO-81): H1 "Radyal ve aksiyel fan farkı nedir?", fark tablosu, nedir ve kullanım alanları bölümleri; doğrulanmış metin taslak v4 (sha 1e7f013da8f7; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug değişmedi.
-    guncellemeTarihi: '2026-11-08',
+    // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; SSS cevabı "Yürürlükten kalktı" yerine "Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır" ve 327/2011'in genel hükümlerini kaldıran tüzük ifadesi. Yalnız bu iki cümle değişti; tarihler ve kaynaklar aynı. Önceki değer: 2026-11-08.
+    guncellemeTarihi: '2026-11-09',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
       'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
@@ -412,7 +413,7 @@ Büyük seçilen fan en yüksek verim noktasından uzakta çalışabilir; çalı
 
 ### Fanlar için 327/2011 sayılı AB tüzüğü hâlâ geçerli mi?
 
-Yürürlükten kalktı. (EU) 2024/1834 sayılı tüzük, 327/2011'i 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [5]; eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [7]. Türkiye'de tebliğin diğer hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [6]. Türkiye'de eski tebliğin ekleri ise entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
+Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır. (EU) 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [5]; eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [7]. Türkiye'de tebliğin diğer hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [6]. Türkiye'de eski tebliğin ekleri ise entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
 ## VentHub'da hangi radyal ve aksiyel fan serileri var?
 
@@ -456,7 +457,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // 2026-11-03 (BLG-30): terim hizası, "karışık akışlı" → "karma akışlı (karışık akışlı)" (ürün sayfalarının diliyle aynı); metin iddiası değişmedi.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "sessiz kanal fanları" ve "sessiz çalışan kanal fanları" ifadeleri girişe ve SSS'ye eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
     // Güncelleme tarihi 2026-11-08 (BLG-26): H2 "kaç dB(A) yeterli?" sorgusuna göre (eski ifade korunur), Yönetmelik md.6(3), dB(A) tanımı md.4(a), terim hizası; doğrulanmış metin taslak v5 (sha256 5aff5e903c0f; beş tur, tuzaklı turlarda 7/7; Geo-SEO B6a okuması). Önceki değer: 2026-11-07 (BLG-44). ozet, kartOzeti, slug, urunler değişmedi.
-    guncellemeTarihi: '2026-11-08',
+    // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; "bu Tüzük yürürlükten kalkmış" yerine "bu Tüzük'ün genel hükümleri yürürlükten kalkmış". Tek cümle; tarihler ve kaynaklar aynı. Önceki değer: 2026-11-08.
+    guncellemeTarihi: '2026-11-09',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
@@ -504,7 +506,7 @@ Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelik ser
 
 Türkiye'de Yönetmelik, binalarda kullanılacak mekanik ve elektrik ekipmanın ses emisyon değerleri için üreticinin beyan ettiği spektral düzeyler ile A ağırlıklı ses gücü düzeyinin kullanılmasını, ses gücü düzeyinin ölçüldüğü standartla birlikte beyan edilmesini ister [1]. Avrupa Birliği'nde ses gücü beyanı ürün türüne bağlıdır. (AB) 1253/2014 sayılı Komisyon Tüzüğü, havalandırma ünitelerinin ürün bilgisinde konut havalandırma ünitelerinde A ağırlıklı ses gücü düzeyinin (LWA), iç mekânda kullanılması belirtilen konut dışı ünitelerde ise gövde ses gücü düzeyinin tam sayıya yuvarlanarak verilmesini ister [5]. Aynı Tüzük, (AB) 327/2011 tanımındaki, yalnızca bir gövde ile donatılmış eksenel ya da santrifüj fanları kapsamının dışında tutar [5].
 
-Fanlara ilişkin (AB) 327/2011 sayılı Tüzük'ün metninde ses düzeyi gerekliliği yer almaz; bu Tüzük 24 Temmuz 2026'dan itibaren yürürlükten kalkmış, yerine (AB) 2024/1834 sayılı Tüzük geçmiştir; eski Tüzük'ün Ek I, II ve III'ü entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6][7][9]. Yeni Tüzük'te gürültüyle ilgili tanımlı özellik, 10 kW ve üzeri elektrik giriş gücündeki eksenel fanlar için "düşük gürültülü fan"dır; Türkiye'de bu Tüzük'ün karşılığı 7 Şubat 2026 tarihli ve 33161 sayılı Resmî Gazete'de yayımlanan SGM-2026/2 sayılı Tebliğ'dir; Tebliğ'in yayımı tarihinde yürürlüğe giren maddeleri dışındaki hükümleri 24 Temmuz 2027'de yürürlüğe girer; Türkiye'de önceki Tebliğ'in (SVGM: 2019/15) Ek I, II ve III'ü diğer ürünlere entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder, yani entegre fanlarda Türkiye tarihi AB tarihinden (24 Temmuz 2027) farklıdır [7][8].
+Fanlara ilişkin (AB) 327/2011 sayılı Tüzük'ün metninde ses düzeyi gerekliliği yer almaz; bu Tüzük'ün genel hükümleri 24 Temmuz 2026'dan itibaren yürürlükten kalkmış, yerine (AB) 2024/1834 sayılı Tüzük geçmiştir; eski Tüzük'ün Ek I, II ve III'ü entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6][7][9]. Yeni Tüzük'te gürültüyle ilgili tanımlı özellik, 10 kW ve üzeri elektrik giriş gücündeki eksenel fanlar için "düşük gürültülü fan"dır; Türkiye'de bu Tüzük'ün karşılığı 7 Şubat 2026 tarihli ve 33161 sayılı Resmî Gazete'de yayımlanan SGM-2026/2 sayılı Tebliğ'dir; Tebliğ'in yayımı tarihinde yürürlüğe giren maddeleri dışındaki hükümleri 24 Temmuz 2027'de yürürlüğe girer; Türkiye'de önceki Tebliğ'in (SVGM: 2019/15) Ek I, II ve III'ü diğer ürünlere entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder, yani entegre fanlarda Türkiye tarihi AB tarihinden (24 Temmuz 2027) farklıdır [7][8].
 
 ## Vortice kataloğunda ses değeri hangi koşulda verilir?
 
@@ -1179,7 +1181,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // ilgiliKategoriler: 11 fan alt kategorisi (URN-151 kategori kartı).
     // BLG-40 (2026-11-06): H1 (= sayfa başlığı) ve meta açıklaması değişti; önceki H1 bir rakip sayfanın başlığıyla birebir aynıydı (GEO-SEO ölçümü). Gövde, slug ve ürün listesi aynı.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan için H3 başlıklı yeni bölüm eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
-    guncellemeTarihi: '2026-11-08',
+    // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; "327/2011'i yürürlükten kaldırmıştır" yerine "327/2011'in genel hükümlerini yürürlükten kaldırmıştır" ve Kaynaklar 5'te "genel hükümleri yürürlükten kalkmıştır". Madde 2 tanım cümlelerindeki "yürürlükten kalkan 327/2011" ifadesi aynen kaldı. Önceki değer: 2026-11-08.
+    guncellemeTarihi: '2026-11-09',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
       'vh:kategori/axial-industrial-fans',
@@ -1280,7 +1283,7 @@ Bu yazı fiyat vermez ve fiyatı belirleyen etkenleri kaynakla sayamaz. Fan tür
 
 Karma akışlı fanı diğer türlerle karşılaştıran bağımsız bir kaynak bu yazıda kullanılmamıştır; karma akışlı fanın avantajına ilişkin cümle bir üretici beyanıdır [3]. İncelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur, bu yüzden bu türün ürünleri yazıda ele alınmaz [4]. Tüzük jet fanı da ayrı bir kategori sayar (madde 2(1)) [1]; VentHub'daki otopark jet fanları kategorisi 3 Kasım 2026'da ürün listelemiyordu [4]. Jet fan bu yazıda tanımlanmaz.
 
-Tablodaki gaz yolu sütunu okur için bir açıklamadır; tanım niteliğini yalnız akış açısı sütunu taşır [1]. Gaz yolu sütunu yürürlükten kalkan 327/2011 madde 2'nin anlatımına dayanır ve kullanılan metin legislation.gov.uk sitesindeki Birleşik Krallık sürümüdür [5]. 2024/1834 sayılı tüzük, 327/2011'i 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır (madde 9(1)) [1][6]; eski tüzüğün Ek I, II ve III'ü, (AB) 2025/2481 ile değiştirilen aynı fıkraya göre, başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanları için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
+Tablodaki gaz yolu sütunu okur için bir açıklamadır; tanım niteliğini yalnız akış açısı sütunu taşır [1]. Gaz yolu sütunu yürürlükten kalkan 327/2011 madde 2'nin anlatımına dayanır ve kullanılan metin legislation.gov.uk sitesindeki Birleşik Krallık sürümüdür [5]. 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır (madde 9(1)) [1][6]; eski tüzüğün Ek I, II ve III'ü, (AB) 2025/2481 ile değiştirilen aynı fıkraya göre, başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanları için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
 ## Sık sorulan sorular
 
@@ -1314,7 +1317,7 @@ Kategoriler yazının "VentHub'da hangi fan kategorileri ve serileri var?" böl�
 2. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 7 ve 21. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
 3. Vortice S.p.A., LINEO In-line mixed flow fans kataloğu, Cod. 5.170.084.547, Mayıs 2026 (son sayfada ayrıca 5.170.084.504, Şubat 2026 kodu da yazılıdır), s. 1, 4 ve 5 (bu çalışmada herkese açık bir adres doğrulanmadı; VentHub kaynak dizininde kayıtlıdır).
 4. VentHub, fan alt kategorilerinin sayfaları (aksiyel, radyal, kanal tipi, çatı tipi, banyo ve tuvalet, duman egzoz, hücreli, plug, korozyona ve aside dayanımlı, şömine ve baca, endüstriyel tavan vantilatörleri, otopark jet fanları), canlı sitede 3 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/kanal-tipi-fanlar ve diğerleri aynı yol altında.
-5. Avrupa Komisyonu, 327/2011 sayılı (AB) Tüzüğü, 2. madde (tanımlar: aksiyel fan, santrifüj fan, karma akışlı fan, çapraz akışlı fan, santrifüj radyal kanatlı fan); yürürlükten kalkmıştır, yalnız gaz yolu anlatımı için kullanıldı; Birleşik Krallık mevzuat sitesinde yayımlanan, Birleşik Krallık için değiştirilmiş sürüm, AB Resmî Gazete metniyle karşılaştırılmadı: https://www.legislation.gov.uk/eur/2011/327/article/2 (erişim 03.11.2026)
+5. Avrupa Komisyonu, 327/2011 sayılı (AB) Tüzüğü, 2. madde (tanımlar: aksiyel fan, santrifüj fan, karma akışlı fan, çapraz akışlı fan, santrifüj radyal kanatlı fan); genel hükümleri yürürlükten kalkmıştır, yalnız gaz yolu anlatımı için kullanıldı; Birleşik Krallık mevzuat sitesinde yayımlanan, Birleşik Krallık için değiştirilmiş sürüm, AB Resmî Gazete metniyle karşılaştırılmadı: https://www.legislation.gov.uk/eur/2011/327/article/2 (erişim 03.11.2026)
 6. Avrupa Komisyonu, (AB) 2025/2481 sayılı Komisyon Tüzüğü (2024/1834'ü değiştiren tüzük), madde 1(4), Resmî Gazete (OJ L, 8.12.2025); metin EUR-Lex'ten alınan iki yerel kopyadan (HTML ve metin dışa aktarımı) okundu ve madde 9(1) bakımından Resmî Gazete metninin bir PDF kopyasıyla karşılaştırıldı, üçünde de aynıdır; EUR-Lex'in canlı sayfası 3 Kasım 2026'da bot doğrulaması verdiği için yeniden doğrulanamadı: http://data.europa.eu/eli/reg/2025/2481/oj
 
 ## Teknik sorumluluk notu
