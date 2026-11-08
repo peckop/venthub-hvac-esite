@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.20 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.21 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -103,6 +103,8 @@ GEO-SEO'ya yazılır. Kapı yazılmadı (ARAÇ işi); fark betiği BLOG çalış
 **v0.19 (2026-11-08, BLG-48, OPS-245, Recep onayı):** ERF blog incelemesinden (BLG-32, BLG-47, BLG-48; Geo-SEO SEO-94 SERP ölçümü) üç kural: **R1.3 farklı arama niyeti istisnası (K1)**, **R1.4 "sektör/uygulama rehberi" içerik türü (K2)**, **R11.3 Y9 yalnız-ekleme sorgu ifadesi (K6)**. Kanıt: ERF 21 sektör sorgusunun 9'unda ilk 10'da (Bing), VentHub 0/21; bizde sektör yazısı yok. Ölçülmeyen ve kural olmayan: uzunluk, H2 sayısı, FAQPage işareti (K4/K5 önerisi yok); görsel şartı (K3) yeni sitede Design görsel yolu geldikten sonra ayrı karar.
 
 **v0.20 (2026-11-08, BLG-52, OPS-245 ve OPS-247, Recep iki kez evet):** R3'e **zorunlu kısa katman**: her rehberde H1'in altında, ilk `## ` başlığından önce 40–70 kelimelik doğrudan cevap + `Kısaca:` satırı + 3–4 maddelik liste; cevap + maddeler 80–120 kelime. Uygulama BLG-49 ve BLG-50'de yapılmıştı, kuralı cetvel taşımıyordu (master'da "Kısaca" 0 eşleşme; OPS ölçümü). **Kapı yazıldı:** `kalipDenetle` artık `kisaKatmanDenetle` çağırır (`KISA-KATMAN-YOK`, `-CEVAP`, `-MADDE`, `-ETIKET`, `-TOPLAM`, KIRMIZI); sabotaj kolu `rehber-denetim.test.ts`, gerçek yayın listesine bağlı kol `kisa-katman-yayinda.test.ts` (INV-REHBER-KISA-KATMAN-1). 8 Kasım ölçümü: yayındaki 11 yazıdan dördü kırmızıydı (radyal/aksiyel ve sessiz fanda katman yok; çatı tipi 129, ATEX 127 kelime) ve aynı PR'da düzeltildi (yalnız ekleme ya da yalnız silme; yeni sayı, iddia, marka, fiyat yok). **Sayfa düzeni** (adım şeridi, büyüyen görsel, tablodan ürüne geçiş, bölüm sonu düğme) bu cetvelin konusu değildir: yeni sitede Design şablonu sağlar (OPS-247).
+
+**v0.21 (2026-11-08, OPS-255, Recep onayı ve OPS onayı):** **R5.1.2 doğrulama durma koşulu ve tur düzeni.** Tetik ölçüm (BLG-54 v1→v11 ve BLG-55 v1→v14, 20 tam tur): temiz kolda engelleyici bulgunun sıfır çıktığı ilk turdan (iki yazıda da tur 5) sonra iki yazıda toplam on tur daha koştu; sebep R5.1 adım 5'in ("tüm metin") durma koşulunun olmaması ve çürütücü okumasının tura girdikten sonra yapılmasıydı (yapı iki yazıda −431 ve −265 kelime yeniden kuruldu). Doğrulananlarda yedi engelleyici: altısı yazımdan (kapsam ve çoğulluk sözcükleri: "yalnız", "iki üretici", "eski"), biri kaynak paketi eksikliğinden; doğrulayıcı titizliğinden gelen sıfır; tuzaklı kollar 17/17 yakaladı. Kural getirir: dört durma kuralı + beş önlem (R5.1.2). Kapı kolu (kapsam sözcüğü, aynı-sayı denetimi) ve betik takımı (`scripts/rehber/tur/`) sonraki PR'dadır; bu sürüm yalnız cetvel metnidir, kırmızı kapı eklemez.
 
 ---
 
@@ -495,7 +497,7 @@ yazının sitedeki görünüşüne yakın önizleme eklenir (R5.4).
 | 3f. Örnekleme | BLOG | DOĞRULANDI satırlarından en az 3'ü BLOG tarafından ham kaynaktan yeniden açılır. **Örneklenen satırlardan biri yanlışsa tur geçersizdir** |
 | 3g. Mevzuat kontrolü | MEVZUAT şeridi (R2.6) | `tur: mevzuat` satırlarının her biri yürürlükteki metne karşı: yürürlük, değişiklik, AB/TR takvimi. MEVZUAT "yanlış" ya da "bayat" derse tur geçersizdir |
 | 4. Düzeltme | BLOG | DESTEKSİZ / ÇELİŞİYOR / BAYAT satırlar düzeltilir ya da silinir; tuzaklar çıkarılır |
-| 5. İkinci tur | aynı doğrulayıcı | **Tüm metin** 3a'dan yeniden geçer (yalnız değişen satırlar değil: düzeltmede eklenen yeni iddia tabloya girmemiş olabilir) |
+| 5. İkinci tur | aynı doğrulayıcı | **Tüm metin** 3a'dan yeniden geçer (yalnız değişen satırlar değil: düzeltmede eklenen yeni iddia tabloya girmemiş olabilir). ⚠v0.21: durma koşulu ve istisna R5.1.2'dedir (engelleyici 0 = biter; yeni iddia eklemeyen daraltmada yalnız değişen cümleler; en çok 3 tur) |
 
 ### R5.1.1 Tur düzeni (BLG-15, yedi turdan ölçülen; kural değil KAYIT DİSİPLİNİ)
 
@@ -508,6 +510,25 @@ yazının sitedeki görünüşüne yakın önizleme eklenir (R5.4).
 4. **Atıf kümesi ↔ kaynak alanı betikle ölçülür.** İddia tablosunda `kaynak` alanı cümledeki atıf kümesinden üretilir ve
    aralarındaki fark betikle gösterilir; elle okuma yetmez (BLG-15 tur 4: doğrulayıcı iki satır buldu, betik toplam yedi
    satırda eksik gösterdi).
+
+### R5.1.2 Doğrulama durma koşulu ve tur düzeni (OPS-255, v0.21; kural)
+
+**Dört durma kuralı (Recep onaylı):**
+
+1. **Engelleyici sıfır = doğrulama biter.** Engelleyici bulgu: yanlış değer, kaynaksız iddia ya da kapsam aşımı (kaynakta olmayan niteleme, çoğulluk, "yalnız/hiç/tüm" gibi genelleme). Temiz kolda engelleyici bulgusu 0 çıkan ve tuzaklı kolun N/N yakaladığı (R5.3) tur, doğrulamanın son turudur.
+2. **Küçük bulgular tek seferde uygulanır.** Küçük öneriler son turdan sonra tek partide işlenir. Yeni iddia, yeni sayı, yeni marka ya da yeni nitelik **eklemeyen** (yalnız daraltan, kaynağa yaklaştıran, yazım ve üslup düzelten) değişiklikte tüm metin yeniden turlanmaz: yalnız **değişen cümleler** kontrol edilir (BLOG ham kaynaktan yeniden açar, kapı koşar, kart notunda cümle listesi ve önceki/sonraki sha yazılır). R5.1 adım 5 ("tüm metin") yalnız yeni iddia ya da yeni sayı eklenen değişiklikte geçerlidir.
+3. **Tur başlayınca yapı donar.** Doğrulama turu açıldıktan sonra H1, H2/H3 başlıkları, bölüm sırası, SSS soruları ve kısa katman yapısı değişmez. Yapı değişikliği gerekiyorsa tur iptal edilir, değişiklik yapılır, tur baştan sayılır. Yapıyı donduran adım: bağımsız **çürütücü okuması tur 1'den ÖNCE** (aşağıda madde 1).
+4. **En çok 3 tur.** Dördüncü tur gerekiyorsa BLOG durur ve OPS'a "kök sebep notu" ile yazar (R10.3 tur sayacı; her bulgunun hangi önlemle önlenebileceği). Yeni tur OPS onayıyla açılır.
+
+**Beş önlem (BLG-54/55 ölçümünden; hızlandırır, bu kuralların girdisidir):**
+
+1. **Çürütücü ön okuması.** Taslak v1 yazılınca, doğrulama turu açılmadan önce bağımsız çürütücü yapıyı okur: H1 vaadi, H2 vaatleri, SSS'nin gövdeyi tekrarlamaması, olumsuz iddiaların tek "Sınırlar" kutusunda toplanması (R3.3 madde 6). Kanıt: iki yazıda yapı turlar içinde yeniden kuruldu (−431, −265 kelime) ve önceki turları geçersiz kıldı.
+2. **Kapsam ve çoğulluk sözcükleri iddia tablosundadır.** "Yalnız, hiç, iki, tüm, hep, eski, aynı, ilk, tek" gibi sözcük taşıyan her cümle iddia tablosunda kaynak sayfası ve birebir alıntıyla eşlenir; kaynak listesi "aynı üretici" derken gövdede çoğul "üreticiler" yazılmaz. Kanıt: doğrulananlarda altı yazım engelleyicisinin altısı bu sözcüklerden. Kapı kolu aday (K6) olarak not edilir, kırmızı değil; ARAÇ'a ayrı kartla verilir.
+3. **Aynı sayı her yerde aynı.** Kısa katman, gövde, tablo ve SSS'de geçen her sayı ve birim birbiriyle betikle karşılaştırılır; tuzaklı kopyalardaki yanlışların yarısı metnin kendi içinde çelişki üretiyordu. Betik `scripts/rehber/tur/` takımında (kapı adımı) yazılır; yazılana kadar elle karşılaştırma tur notuna işlenir.
+4. **Doğrulayıcı önerisi kanıtsız uygulanmaz.** Bir doğrulayıcı niteleme ya da ekleme önerirse (ör. "bu seri eski seridir"), öneri ham kaynak sayfasından alıntıyla gelmedikçe uygulanmaz; doğrulayıcıya "kanıtı göster" denir. Kanıt: BLG-55 tur 6 önerisi "eski Punto serisi" tur 7'de desteksiz çıktı.
+5. **Tur sonucu dosyaya yazılır.** Her tur sonunda `turN-bulgular.md`: okunan taslak sürümü ve sha, temiz kolda engelleyici/küçük bulgu sayısı, tuzaklı kolda konan/yakalanan, her engelleyicinin sınıfı (yazımdan / doğrulayıcı titizliği / yapı değişikliği / kaynak paketi), tetik. Kanıt: 20 turun 14'ünde bulgu sayısı bu yüzden ölçülemedi ("veri yok").
+
+**Bitirme sunumu.** Son turda engelleyici 0 ise sunum OPS'a gelir; sunum son turdan sonra değişen cümlelerin listesini (önceki ve sonraki sha ile) ve ölçülemeyen yüzeyleri (başlık/meta/JSON-LD, önizleme) açıkça yazar. "Tüm metin yeniden doğrulandı" denmez; "son tam tur sha X, sonrası yalnız daraltma ve kontrol edilen cümleler" denir.
 
 ### R5.2 Model ve bağımsızlık
 
@@ -759,7 +780,7 @@ flowchart TD
 | **B3** Taslak + iddia tablosu | R3 kalıbı; her iddia → kaynak no + birebir alıntı + tür; mevzuat yalnız paketten (R2.6 adım 2) | BLOG | `rehber-denetim.mjs` kırmızı 0 (kalıp, atıf, iç bağlantı-metin, vaat, olumsuz iddia, mevzuat). Adaylar: K0, K0b, K1, K3, K4, K5 (R10.2) | kırmızı 0 olmadan B5'e gidilmez | depo dışı taslak + iddia tablosu + betik çıktısı |
 | **B4** Yayın yolu ölçümü | Bağlanan aile ve kategori kimlikleri güncel slug'a çözülür (son yeniden adlandırma migration'ının eski-yeni çiftleri); site içi bağlantı hedefleri canlıda 200; yayını bloke eden açık karar yok | BLOG | R5.7 kimlik şartı; `ic-baglanti-denetle.mjs` (hedefler); açık karar yok | derleme durur; onay sorulmaz (R5.7 sınırı) | karta not: komut + çıktı |
 | **B5** Doğrulama turu | 3a kapsam çıkarımı (tabloyu görmeden), 3b atıf betiği, 3c alıntı betiği, 3d sınıflama, 3e sabotaj kolu (tuzak yalnız kopyada), 3f örnekleme, 3g MEVZUAT kontrolü | BLOG (doğrulayıcı alt ajanlar bağımsız; hüküm BLOG'da); 3g MEVZUAT | R5.3: eşlenmeyen 0 · DESTEKSİZ 0 · ÇELİŞİYOR 0 · BAYAT 0 · açılamayan 0 · sabotaj N/N (N ≥ 3) | B6 | karta tur notu: tur no, kırmızı sayısı, tuzak sayısı ve yakalanan |
-| **B6** Düzeltme + tam yeniden tur | R5.1 adım 4–5: düzelt, tuzakları çıkar, **tüm metin** yeniden 3a'dan geçer | BLOG | R5.1 adım 5 ("tüm metin"); tur sayacı (R10.3) | tur sayısı 3'ü aşarsa kök sebep notu: her bulgunun hangi aday kapıyla yakalanacağı (R10.2) | karta tur notu |
+| **B6** Düzeltme + tam yeniden tur | R5.1 adım 4–5: düzelt, tuzakları çıkar, **tüm metin** yeniden 3a'dan geçer | BLOG | R5.1 adım 5 ("tüm metin"); tur sayacı (R10.3) | tur sayısı 3'ü aşarsa BLOG durur, OPS'a kök sebep notu yazar: her bulgunun hangi aday kapıyla yakalanacağı (R10.2, R5.1.2 madde 4) | karta tur notu (`turN-bulgular.md`, R5.1.2 önlem 5) |
 | **B6a** GEO-SEO taslak okuması | B5 temiz çıkınca taslak (sha256 ilk 12 hane) Recep'e gitmeden GEO-SEO'ya verilir. GEO-SEO okur ve yazılı görüş döner: B1a'daki arama talebi ve ad listesi karşılanıyor mu, başlık, giriş ve H2'ler arama dilini taşıyor mu, aynı sorguda sitedeki başka yazıyla çakışma (R1.3) var mı. Görüş "uygun" ya da düzeltme listesidir; düzeltme metni değiştirirse B6 (tam yeniden tur) geçerlidir | GEO-SEO okur; BLOG işler | **Kapı yok (aday).** GEO-SEO yazılı görüşü kartta, taslak sha256'sıyla; B7'ye giden metnin sha256'sı görüştekiyle aynı | Görüş gelmeden B7'ye geçilmez; GEO-SEO bir gün içinde dönmezse BLOG OPS'a tek satır yazar | karta tek satır (görüş + sha256). Ayrıntı metni GEO-SEO'nun (B1a ile aynı Y numarası) |
 | **B7** Önizleme + onay | R5.4 iki parça: önizleme (sha256 ilk 12 hane) + düz cümle özet; tek soru "yayınlayalım mı?" | BLOG sunar, Recep onaylar (kendi sözü, bu pencerede) | sha256 doğrulananla aynı; yayına giremeyecek metnin onayı sorulmaz (R5.7) | metin değişirse durum taslak, B5 | durum dosyası + karta onay kaydı (kim, ne zaman, sha256) |
 | **B8** Yazı kaydı + PR | Yazı `src/data/bilgiMerkezi/yazilar.ts` kaydına girer (kimlik, konu, `yayinTarihi`, `guncellemeTarihi`, ürün bağları; dil başına slug, özet, `kartOzeti`, gövde); ters bağlantı (R3.2); PR gövdesinde `Kanban:` satırı **ve R10.6 yayın öncesi kontrol tablosu (sekiz madde, her madde kanıtlı; kanıtsız madde AÇIK, yayın çıkmaz)**; **PR açılınca BLOG yazı adresini, PR numarasını ve ana terimi GEO-SEO'ya tek satır SendMessage ile yazar** (yayın öncesi taban B9'dan önce GEO-SEO'da alınır) | BLOG; şablon ya da rota değişirse URUN | PR kapıları (`ci`, `admin-smoke`…); `pnpm test:ilgili`; INV-REHBER-* testleri; migration varsa Recep onayı | kırmızı kapı BLOG yüzeyindeyse düzeltilir; değilse 10 dakika sınırı sonra OPS'a yazılır | PR + karta not |
