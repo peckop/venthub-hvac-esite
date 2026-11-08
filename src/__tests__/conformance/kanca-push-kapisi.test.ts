@@ -242,6 +242,9 @@ describe('INV-PUSH-KAPISI-1 — git config core.hooksPath reddi (ARC-281)', () =
     'git -c core.hooksPath=/tmp/bos status',
     'git -c core.hookspath=/tmp/bos commit -m a',
     'echo ok && git config core.hooksPath /x',
+    'git --super-prefix x/ config core.hooksPath /tmp/bos',
+    'git --git-dir=.git config core.hooksPath /tmp/bos',
+    'git --no-pager config core.hooksPath /tmp/bos',
   ])('hooksPath yazımı reddedilir (%j)', (k) => {
     expect(ret(k)).not.toBeNull()
   })

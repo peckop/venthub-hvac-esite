@@ -203,9 +203,10 @@ const HOOKSPATH_OKUMA = new Set(['--get', '--get-all', '--get-regexp', '--get-ur
  * SINIR: `.git/config` dosyasını elle yazmak, `git -c` dışı ortam yolları ve Bash dışı yazım bu kapıdan görünmez (git pre-push ve GitHub master koruması arkada).
  */
 function hooksPathYazimi(sonrasi) {
-  let i = 0
-  while (i < sonrasi.length && /^-/.test(sonrasi[i])) i += sonrasi[i] === '-C' || sonrasi[i] === '-c' ? 2 : 1
-  if (sonrasi[i] !== 'config') return null
+  // Fail-closed: git'in değer alan global seçenekleri (--super-prefix, --git-dir ...) konumu kaydırır; `config` tokeni parçanın HERHANGİ bir yerinde
+  // ise ve ondan sonra core.hooksPath + değer varsa reddedilir (fazladan eşleşme yalnız `git ... config core.hooksPath <değer>` biçimine düşer).
+  const i = sonrasi.indexOf('config')
+  if (i < 0) return null
   const arg = sonrasi.slice(i + 1)
   if (arg.some((a) => HOOKSPATH_OKUMA.has(a))) return null
   const ki = arg.findIndex((a) => /^core\.hookspath(=|$)/i.test(a))
