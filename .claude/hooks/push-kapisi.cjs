@@ -208,12 +208,14 @@ function hooksPathYazimi(sonrasi) {
   const i = sonrasi.indexOf('config')
   if (i < 0) return null
   const arg = sonrasi.slice(i + 1)
+  const MESAJ = 'git config core.hooksPath <değer> (ya da include.path / --edit ile aynı etki): pre-push kapısını (push hedef/kapalı dal/döküm) atlatır; ayarı değiştirme (kurulum scripts/setup-hooks.mjs shim modeliyle, okuma ve --unset serbest)'
+  // --edit dosyayı düzenleyiciyle açar: hangi anahtarın yazılacağı görülemez → reddedilir (okuma bayrağı yoksa).
+  if (!arg.some((a) => HOOKSPATH_OKUMA.has(a)) && arg.some((a) => a === '--edit' || a === '-e')) return MESAJ
   if (arg.some((a) => HOOKSPATH_OKUMA.has(a))) return null
-  const ki = arg.findIndex((a) => /^core\.hookspath(=|$)/i.test(a))
+  // Anahtar: herhangi bir bölümde `hookspath` (core.hooksPath, ya da include'lu dosyadan gelen bölüm) ve `include.path` / `includeIf.*.path` (başka dosyadan hooksPath getirir).
+  const ki = arg.findIndex((a) => /(^|\.)hookspath(=|$)/i.test(a) || /^include(if\..*)?\.path(=|$)/i.test(a))
   if (ki < 0) return null
-  if (/=/.test(arg[ki]) || arg.slice(ki + 1).some((a) => !/^-/.test(a))) {
-    return 'git config core.hooksPath <değer>: pre-push kapısını (push hedef/kapalı dal/döküm) atlatır; ayarı değiştirme (kurulum scripts/setup-hooks.mjs shim modeliyle, okuma ve --unset serbest)'
-  }
+  if (/=/.test(arg[ki]) || arg.slice(ki + 1).some((a) => !/^-/.test(a))) return MESAJ
   return null
 }
 
