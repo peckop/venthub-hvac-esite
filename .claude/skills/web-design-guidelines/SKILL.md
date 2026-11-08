@@ -27,6 +27,8 @@ exclusions: []
 
 Review files for compliance with Web Interface Guidelines.
 
+VentHub: yerleşim taşması (reflow) kod okuyarak değil ölçülür: `node scripts/a11y/reflow-scan.mjs <baseUrl> [rota,rota,...]`; bulgu rapora çıktıyla girer.
+
 ### 💎 Strict Token Sistemi (Tailwind Arbitrary Class Yasağı)
 VentHub UI tasarımı sıkı bir token sistemine bağlıdır. Tasarım değerlerinin bütünlüğü için aşağıdaki kısıtlamalar **ZORUNLUDUR**:
 * **Tailwind Arbitrary Class Yasağı:** Tailwind CSS içerisinde `w-[92vw]`, `bg-[#ff0000]`, `h-[42px]` gibi serbest/keyfi (arbitrary) köşeli parantezli değerlerin doğrudan yazılması kesinlikle **YASAKTIR**.

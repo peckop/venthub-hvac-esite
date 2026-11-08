@@ -23,6 +23,7 @@ metadata:
 1. Bölüm 3'teki "RAG ağırlıkları (~%40, ~%20 …)" yüzdeleri **kaynaksızdır**; içeriğe, rapora ya da Recep'e sayı olarak taşınmaz.
 2. GEO ölçümünün cetveli `docs/standards/geo-olcum-standard.md`dır; bu skill yalnız içerik ve teknik kontrol listesidir, ölçüm yerine geçmez.
 3. Skill salt okur (`allowed-tools: Read, Glob, Grep`); betiği çalıştırmak ayrı adımdır ve yalnız yerel dosya okur.
+4. Canlı GEO ölçümünün komutu `node scripts/seo/geo-olcum.mjs kos <gemini|claude> --liste <soru-listesi.json>` ve `ozet`'tir; bu skill onu koşturmaz, ölçüm GEO-SEO'nundur (madde 2'deki cetvelle).
 
 ---
 
