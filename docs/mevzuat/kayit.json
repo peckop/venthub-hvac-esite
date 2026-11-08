@@ -207,7 +207,8 @@
         "Tebliğin bizzat kabul/imza tarihi (Bakanlık tebliğ numarasının verildiği tarih) Resmî Gazete metninde ayrıca yazmıyor; yalnız yayım tarihi (28/4/2021) var.",
         "Tebliğ metni AB tüzük tarihlerini yanlış veriyor: 2019/1781 için 1/9/2019 (doğrusu 1 Ekim 2019), 2021/341 için 17/12/2020 (doğrusu 23 Şubat 2021). Ham metinden doğrulandı 2026-09-25.",
         "Ek PDF taranmış görüntü (metin katmanı yok); madde doğrulaması görsel okumayla yapılır.",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): RG sayfasında Md 12 ve Md 13 alıntıları birebir; 2021/23 değişikliği RG 29.06.2021/31526 sayfasında okundu. mevzuat.gov.tr değişiklik listesine bakılamadı (MevzuatNo bilinmiyor)."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "A"
@@ -242,7 +243,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): RG sayfasında Md 2 alıntısı birebir; ayrıca Md 1, 3-6 ilgili tarihleri \"1/7/2021\" → \"15/8/2021\" yapıyor, Md 7 yayımı tarihinde yürürlük. Sonraki değişiklik izi bulunamadı; mevzuat.gov.tr bakılamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "A",
@@ -630,7 +632,12 @@
         "kabul": "",
         "yayim": "2019-12-20 (RG Sayı 30984)",
         "yururluk": "2020-12-20 (Md.10: yayımı tarihinden bir yıl sonra)",
-        "uygulama_asamalari": []
+        "uygulama_asamalari": [
+          {
+            "tarih": "2027-07-24",
+            "ne": "SGM-2026/2 Md 11 ile yürürlükten kalkar (Md 12(1)(b)); Ek I-III entegre fanlar için 2028-07-24, yedek parça fanlar için 2037-07-24'e kadar uygulanır (Geçici Md 1(1))."
+          }
+        ]
       },
       "yerini_aldigi": [],
       "degistirenler": [],
@@ -640,14 +647,15 @@
       "iliski_notlari": [
         "TR-SGM-2026-2 (Madde 11 ile ilga; ilga hükmü 24/7/2027'de yürürlüğe girecek)"
       ],
-      "durum": "yururlukte",
+      "durum": "gecis-doneminde",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SVGM-2019_15.json",
       "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Ek I/II/III içeriği (verim hedefleri) bu kayıtta ayrıca okunmadı; değerlerin 327/2011 Annex I ikinci aşamasıyla aynı olduğu varsayılmaz, okunmalı.",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 10 alıntısı birebir. SGM-2026/2 (mevzuat.gov.tr MevzuatNo=45014) Md 11 bu tebliği yürürlükten kaldırıyor; Md 12(1)(b) gereği kaldırma 24/7/2027'de yürürlüğe giriyor; Geçici Md 1(1) Ek I-III'ün entegre fanlar için 24/7/2028, yedek parça fanlar için 24/7/2037'ye kadar uygulanmaya devam ettiğini yazıyor. Durum `gecis-doneminde` yapıldı (kaynak: SGM-2026/2 kanıtındaki mevcut alıntılar)."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -740,7 +748,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Teblığın Ek II/III/IV'ünün (ürün bilgi şartları, ölçüm/hesaplama yöntemleri) AB Ek II/III/IV ile birebir mi yoksa TR'ye özgü ufak farklar mı içerdiği bu araştırmada okunmadı ('Ekleri için tıklayınız' linki takip edilmedi) — VentHub ürün sayfası şartları için bir sonraki turda TR Ek II doğrudan okunmalı.",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 12 ve Geçici Md 1 alıntıları birebir (mevzuat.gov.tr MevzuatNo=45014). Sayfada RG tarih/sayı satırı yok: \"RG 07.02.2026 sayı 33161\" bu okumada doğrulanmadı. Değişiklik izi bulunamadı. Ekler (.doc) okunmadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -817,7 +826,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Bakanlık adı 2016'dan bu yana değişti (Bilim, Sanayi ve Teknoloji Bakanlığı -> Sanayi ve Teknoloji Bakanlığı); yönetmeliğin güncel resmi yürütücüsü ayrıca teyit edilmedi.",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): KAYITTA OLMAYAN DEĞİŞİKLİK: RG 27.06.2020 sayı 31168 (Sanayi ve Teknoloji Bakanlığı), \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\": Md 2(2)(c)-(ç), Md 3 (dayanak), Md 4(1)(b)-(d), Md 15(1)(a)(1), Md 44 (yürütücü \"Sanayi ve Teknoloji Bakanı\"), Ek-2 1.0.5 işaretleme ve terim değişiklikleri; yayımı tarihinde yürürlük. Ham çekimle doğrulanınca `degistirenler`e yazılmalı. Aynı okumada Md 2, Md 4(1)(l)(r)(s)(ğ), Md 41, 42 (94/9/AT yönetmeliği RG 30/12/2006 sayı 26392 dördüncü mükerrer, yürürlükten kaldırıldı), Md 43, 44 metinleri okundu (MVZ-6, BLG-51)."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
@@ -886,7 +896,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Yönetmeliğin yürürlük maddesi ve varsa sonraki değişiklikleri (madde bazlı) bu oturumda ayrıca taranmadı.",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Başlık/RG künyesi doğrulandı; Ek-1 md 2 Bölge 2/22 tanımları ve Ek-3 bölge-kategori satırı birebir okundu (MVZ-6). mevzuat.gov.tr MevzuatNo=18335 sayfasında değişiklik bilgisi görünmüyor; bir web aramasında geçen \"2023, RG 32345\" değişikliği doğrulanmadı. Ek-2 2.4-2.5 hâlâ 94/9/AT yönetmeliğine atıf yapıyor."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "C"
@@ -1176,7 +1187,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 1 alıntısı birebir; Md 45: 24/10/2007 tarihli 26680 sayılı EMC Yönetmeliği (2004/108/AT) yürürlükten kaldırılmış. Sayfa 2016 asıl metni; mevzuat.gov.tr değişiklik listesine bakılamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
@@ -1323,7 +1335,8 @@
       ],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Md 2 alıntısı birebir; Md 25: 30/12/2006 tarihli 26392 sayılı 2006/95/AT yönetmeliği yürürlükten kaldırılmış. mevzuat.gov.tr değişiklik listesine bakılamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
@@ -1483,7 +1496,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Başlık ve künye bileşenleri sayfada var. Md 21: 5(4) ve 13, 15 ile Ek-5 CE hükümleri 1/1/2024, diğer hükümler 1/2/2023. Sayfada önceki RoHS yönetmeliğini kaldıran madde yok. mevzuat.gov.tr bakılamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
@@ -1545,7 +1559,8 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Başlık/künye birebir; Md 30 önceki \"Atık Elektrikli ve Elektronik Eşyaların Kontrolü Yönetmeliği\"ni kaldırıyor, Md 31: 1/2/2023 yürürlük. mevzuat.gov.tr bakılamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "D"
@@ -1915,7 +1930,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Yönetmeliğin kendi RG tarih/sayısı ve tam metni bu araştırmada doğrudan çekilmedi — yalnız dayanak referansından teyit edildi.",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): Dayanak alıntısı (RG 25.05.2021/31491 Havalandırma Üniteleri tebliği Md 3) birebir; yönetmeliğin kendi RG künyesi resmî kaynakta yine bulunamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
@@ -3137,7 +3153,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "MADDE 9(2) ve MADDE 10(4)'ün tam içeriği (ne düzenledikleri) bu araştırmada okunmadı — yalnız yürürlük maddesindeki referans doğrulandı, kendi metinleri incelenmedi (kapsam dışı, zaman kısıtı).",
-        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi."
+        "6 Kasım 2026: Resmî Gazete ve mevzuat.gov.tr ağ düzeyinde yanıt vermedi (zaman aşımı); ham çekim ve son altı hafta değişiklik taraması yapılamadı, son_kontrol yenilenmedi.",
+        "8 Kasım 2026 keşif okuması (okuyucu aracı/WebFetch; M3.3 gereği kanıt değil, sha256 yok, bu makineden Resmî Gazete ve mevzuat.gov.tr HTTPS zaman aşımı veriyor): RG 15.10.2024/32693 sayfası (eskiler/2024/10/20241015-2.htm) okundu: Md 4(1), Md 24(1) birebir; Md 25: 9(2) ve 10(4) 1/1/2025, diğer hükümler yayım tarihinde. iklim.gov.tr PDF metni okuyucuda çıkarılamadı. mevzuat.gov.tr bakılamadı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
