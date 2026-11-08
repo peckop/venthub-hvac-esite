@@ -287,9 +287,10 @@
       ],
       "iliski_notlari": [
         "EU-2013/666 (kısmi)",
-        "EU-2016/2282 (kısmi)"
+        "EU-2016/2282 (kısmi)",
+        "8 Kasım 2026: durum kaldirildi → gecis-doneminde. Genel hükümler 24 Temmuz 2026'da yürürlükten kalktı, ancak Ek I-III diğer ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır (2025/2481 Md 1(4) ham metninden doğrulandı); \"kaldirildi\" bu tarihleri örtüyordu ve M5'te kontrolsüz bırakıyordu. Yerine gelen: AB-2024/1834."
       ],
-      "durum": "kaldirildi",
+      "durum": "gecis-doneminde",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-327_2011.json",
       "resmi_kaynak_sayisi": 2,
       "etkilenen_aileler": [],
@@ -300,7 +301,8 @@
         "8 Kasım 2026: 2027-07-24 ve 2037-07-24 tarihleri (AB) 2025/2481 Md 1(4) ham metninden doğrulandı."
       ],
       "son_kontrol": "2026-11-08",
-      "eksen": "B"
+      "eksen": "B",
+      "yerine_gelen": "AB-2024/1834"
     },
     {
       "kimlik": "AB-2024/1834",
@@ -1109,13 +1111,16 @@
         "uygulama_asamalari": []
       },
       "yerini_aldigi": [],
-      "degistirenler": [],
+      "degistirenler": [
+        "TR-YON-ATEX-2020-DEG"
+      ],
       "karsilik": [
         "AB-2014/34"
       ],
       "iliski_notlari": [
         "TR-94/9-AT-yonetmelik (eski, ad/RG detayı bu oturumda ayrıca doğrulanmadı)",
-        "Değiştiren: RG 27.06.2020 sayı 31168, \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\" (Sanayi ve Teknoloji Bakanlığı; https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm, ham çekim 8 Kasım 2026, sha256_ilk12 3d7d64d4f7a3). Ayrı kalem açılınca `degistirenler`e taşınmalı."
+        "Değiştiren: RG 27.06.2020 sayı 31168, \"...(2014/34/AB)'TE DEĞİŞİKLİK YAPILMASINA DAİR YÖNETMELİK\" (Sanayi ve Teknoloji Bakanlığı; https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm, ham çekim 8 Kasım 2026, sha256_ilk12 3d7d64d4f7a3). Ayrı kalem açılınca `degistirenler`e taşınmalı.",
+        "8 Kasım 2026: RG 27/6/2020, 31168 değişikliği artık ayrı kalem (TR-YON-ATEX-2020-DEG); degistirenler’e işlendi. Atıf yapılan Md 4(1)(s)(ğ), 41, 43 bu değişiklikten etkilenmedi (ham metin okundu)."
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2014_34.json",
@@ -3862,6 +3867,39 @@
       ],
       "son_kontrol": "2026-11-08",
       "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-ATEX-2020-DEG",
+      "ad": "Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB)’te Değişiklik Yapılmasına Dair Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "TR-YON-ATEX-2014/34’ü değiştirir: Md 2(2)(c)-(ç) kapsam dışı bentleri, Md 3 dayanak, Md 4(1)(b) ve (d) tanımları (Bakanlık, CE işareti), Md 15(1)(a)(1)’den “(Üretim)” ibaresinin çıkarılması, Md 44 yürütücü, Ek-2 1.0.5 işaretleme maddesi. Ayrıca metindeki “üretici” ibareleri “imalatçı”, “Ekonomi Bakanlığı” “Ticaret Bakanlığı” olur. Md 4(1)(s)(ğ), Md 41, Md 42 ve Md 43 bu değişiklikte yer almaz.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2020-06-27 (RG Sayı 31168)",
+        "yururluk": "2020-06-27 (Md 8: yayımı tarihinde)",
+        "asamalar": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "TR-YON-ATEX-2014/34’ü değiştirir (RG 30/6/2016, 29758). Ürün ailelerine etkisi ana kalem üzerinden okunur; etkilenen_aileler bu kalemde boş.",
+        "8 Kasım 2026: Resmî Gazete sayfası ham çekildi, değişiklik metni birebir okundu; “üretici→imalatçı” çevirisi Türkçe metinde terim değişikliğidir, madde numarası taşımaz."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2020-DEG.json",
+      "resmi_kaynak_sayisi": 4,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "2020 sonrası başka değişiklik olup olmadığı mevzuat.gov.tr değişiklik listesinden ayrıca taranmadı."
+      ],
+      "son_kontrol": "2026-11-08",
+      "eksen": "C"
     }
   ],
   "notlar": [
