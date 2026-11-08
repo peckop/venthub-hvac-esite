@@ -77,7 +77,7 @@ function mesaj(pv, s) {
   if (s.durum === 'eski') {
     metin = `PR ${no}${ek} CI SONUCU ESKİ COMMIT'E AİT: rollup yeşil ama bu sha'nın kendi check-runs'ı bitmedi ya da yok. Birleştirme; gh api repos/${REPO}/commits/${sha8}/check-runs ile baş sha'yı kendin doğrula. OPS'a tek satır SendMessage yaz.`
   } else if (s.durum === 'yesil') {
-    metin = `PR ${no}${ek} CI YEŞİL (baş sha check-runs ile doğrulandı), mergeState=${s.mergeState || '?'}. Sırada: bağımsız denetçi hükmü varsa ritüelle birleştir, yoksa denetçiyi aç. OPS'a tek satır SendMessage yaz.`
+    metin = `PR ${no}${ek} CI YEŞİL (${s.restDogrulandi ? 'baş sha check-runs ile doğrulandı' : "baş sha REST ile DOĞRULANAMADI, rollup'a güvenildi"}), mergeState=${s.mergeState || '?'}. Sırada: bağımsız denetçi hükmü varsa ritüelle birleştir, yoksa denetçiyi aç. OPS'a tek satır SendMessage yaz.`
   } else if (s.durum === 'kirmizi') {
     metin = `PR ${no}${ek} CI KIRMIZI: ${s.basarisiz.slice(0, 4).join(', ')}${s.basarisiz.length > 4 ? ' …' : ''}. gh run view --log-failed ile sebebi oku, düzelt (ilgisiz kırmızıda en çok 10 dk, sonra OPS'a yaz). OPS'a tek satır SendMessage yaz.`
   } else if (s.durum === 'birlesti') {
@@ -148,7 +148,7 @@ function restSiniflandir(veri) {
   return { durum: 'yesil', basarisiz: [] }
 }
 
-/** Baş sha'nın REST sonucu; okunamazsa null (fail-open: rollup'a güvenilir). `calistir` test için enjekte edilir. */
+/** SINIR: ilk 100 check-run okunur (shortcut: >100 kapıda sonrası görülmez; rollup yeşil olmadan REST'e inilmediği için sonraki bekleyen kapıyı rollup yakalar). Baş sha'nın REST sonucu; okunamazsa null (fail-open: rollup'a güvenilir). `calistir` test için enjekte edilir. */
 function shaDogrula(sha, calistir = ghCalistir) {
   if (!/^[0-9a-f]{7,40}$/i.test(String(sha || ''))) return null
   try {
@@ -282,7 +282,7 @@ async function bekle({ pr, oku = prOku, uyu = (ms) => new Promise((r) => setTime
           await uyu(aralik)
           continue
         }
-        return { sonuc: 'yesil', pv: ikinci, s: s2 }
+        return { sonuc: 'yesil', pv: ikinci, s: { ...s2, restDogrulandi: !!rest } }
       }
       if (s.durum !== 'bekliyor') return { sonuc: s.durum, pv, s }
     }

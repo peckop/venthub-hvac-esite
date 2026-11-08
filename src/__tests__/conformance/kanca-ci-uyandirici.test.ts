@@ -240,6 +240,11 @@ describe('INV-CI-UYANDIRICI-1 · bekleyici döngü (sahte okuyucu, sıfır bekle
     const r = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })]).calis()
     expect(r.sonuc).toBe('yesil')
     expect(m.mesaj(r.pv as Pv, r.s as Sinif)).toContain('sha abcdef12')
+    // yanlış beyan yok: doğrulama yapılmadıysa mesaj "doğrulandı" demez
+    expect(m.mesaj(r.pv as Pv, r.s as Sinif)).toContain('DOĞRULANAMADI')
+    expect(m.mesaj(r.pv as Pv, r.s as Sinif)).not.toContain('check-runs ile doğrulandı')
+    const d = await kos([pr([gecti('ci')], { headRefOid: 'abcdef1234' })], { dogrula: () => ({ durum: 'yesil', basarisiz: [] }) }).calis()
+    expect(m.mesaj(d.pv as Pv, d.s as Sinif)).toContain('check-runs ile doğrulandı')
   })
 
   it('restSiniflandir: boş ve tamamlanmamış kapı yeşil değildir; sha biçimi geçersizse shaDogrula çağırmaz', () => {
