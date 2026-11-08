@@ -1,0 +1,23 @@
+{
+  "kimlik": "TR-YON-GURULTU-BINA-2018-DEG",
+  "eksen": "G",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2018/05/20180531-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2018/05/20180531-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-08",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Node fetch, User-Agent VentHub-mevzuat/1.0 (curl/* kullanıcı etmeni bu sitede düşürülür); ölçüm 8 Kasım 2026",
+      "durum_satiri": "Resmî metin sayfası; sha256 bu kalem için İLK TABANdır. Ek (Tablo 3.5, Ek-4) görsel ek, okunmadı.",
+      "bayt": 19770,
+      "sha256_ilk12": "eb75807d30bd",
+      "sha256_metin_ilk12": "4a84c9cf4da2",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: windows-1254 çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "MADDE 6 – Bu Yönetmelik yayımı tarihinde yürürlüğe girer.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}
