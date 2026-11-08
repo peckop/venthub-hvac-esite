@@ -185,7 +185,8 @@ function pushBul(t, genisletme = false) {
  * Dönüş: null (geçer) ya da neden metni (reddedilir).
  */
 function degerlendir(komut, o) {
-  komut = heredocGovdesiniAyikla(komut || '')
+  // İç içe yük (eval / bash -c) ayıklanmaz: dış kabuk yükteki $(...) ve ters tırnağı heredoc'tan ÖNCE genişletir (güvenlik incelemesi, 3. tur).
+  if (!o.heredocYok) komut = heredocGovdesiniAyikla(komut || '')
   // UNC/ağ/aygıt yolu: ayrıştırıcı ters eğik çizgileri kaçış sayıp yolu bozabileceği için HAM metinde aranır (-C ve cd hedefi).
   if (/(?:\s-C\s*|\bcd\s+)(?:["']*)[\\/]{2}/.test(String(komut || ''))) return 'UNC/ağ/aygıt yolu (\\\\sunucu, //sunucu, \\\\?\\) denetlenmez; yerel yol yaz'
   const parcalar = parcala(String(komut || ''), !o.yorumYok)
@@ -214,7 +215,7 @@ function degerlendir(komut, o) {
     const ilk = asilKomut(t)
     const ad = ilk >= 0 ? komutAdi(t[ilk]) : ''
     // İç içe çağrılarda önceki klasörler SİLİNMEZ, birikir (özgün klasör her zaman ölçülür).
-    const oo = { ...o, cwd, ekCwd: [...new Set([...(o.ekCwd || []), ...(cwd !== o.cwd ? [o.cwd] : [])])] }
+    const oo = { ...o, heredocYok: true, cwd, ekCwd: [...new Set([...(o.ekCwd || []), ...(cwd !== o.cwd ? [o.cwd] : [])])] }
     if (ad === 'cd' && t[ilk + 1] && !t[ilk + 1].startsWith('-')) {
       if (AG_YOLU(t[ilk + 1])) return `cd ${t[ilk + 1]}: UNC/ağ/aygıt yolu denetlenmez; yerel yol yaz`
       cwd = path.resolve(cwd, t[ilk + 1])

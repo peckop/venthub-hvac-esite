@@ -231,6 +231,12 @@ describe('INV-PUSH-KAPISI-1 — heredoc gövdesi (ARC-277, MVZ-10 yanlış pozit
     expect(ret("cat > ./betik.cjs <<'E'\narr.push(1)\n$x push\nE")).toBeNull()
   })
 
+  it('⛔SABOTAJ (3. güvenlik turu): iç içe yükte (eval, bash -c) ayıklama yok; dış kabuk $(...) genişletir', () => {
+    expect(ret('eval "cat > a <<\'E\'\n$(git push origin master)\nE"')).not.toBeNull()
+    expect(ret('bash -c "cat > a <<\'E\'\n$(git push origin master)\nE"')).not.toBeNull()
+    expect(ret('sh -c "cat > a <<\'E\'\n`git push origin master`\nE"')).not.toBeNull()
+  })
+
   it('ayıklayıcı: <<- sekmeli kapanışı tanır; kapanışsız gövde ve erken kapanıştan sonraki satır FAIL-CLOSED (taranır)', () => {
     expect(ret("cat > a <<-'E'\n\tx.push(1)\n\tE")).toBeNull()
     expect(ret("cat > a <<'E'\narr.push(1)\n$x push")).not.toBeNull()
