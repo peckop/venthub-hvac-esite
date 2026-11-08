@@ -12,6 +12,23 @@
       "gorunenYuz": "kanca satırı TABAN (.claude/hooks/defter-tazelik-satiri.cjs): her mesajda taban yaşı ve sonrasındaki migration sayısı görünür; kanca satırı DUNYA (.claude/hooks/dunya-durumu-satiri.cjs): zamanlı koşunun son sonucu ve yaşı görünür"
     },
     {
+      "test": "src/__tests__/conformance/companion-parity-coverage-dunya.test.ts",
+      "kimlik": "INV-DOC-2",
+      "eskiYer": "pull_request (test-shard işleri, her PR'da), companion-parity-coverage.test.ts içinde TAM sayım ve takvim kolları olarak",
+      "yeniYer": ["master-push", "zamanli"],
+      "yolFiltresi": [
+        ".cc_docs.yaml",
+        ".companion-tasiyici.json",
+        "scripts/hijyen/companion-sayim.cjs",
+        "scripts/hijyen/tasiyici-anahtari.cjs",
+        "src/__tests__/conformance/companion-parity-coverage-dunya.test.ts",
+        "src/__tests__/conformance/companion-parity-coverage.yardimci.ts"
+      ],
+      "neden": "Companion kapsam paritesinin TAM sayımını ve takvime bağlı kollarını ölçer: C4 (companion'ı olmayan eski kaynak) ve C5 (kaynağından eski companion) tüm depoda, tarihsel borcun görünürlüğü, 'yaş eşiği iş görüyor' (son 7 günde taze bulgu > 0) ve taşıyıcı anahtarı. Cevap PR'ın koduna değil saate ve dokunulmamış kaynakların 7 günü doldurmasına bağlıdır; taşıyıcı AÇIK iken hiçbir commit olmadan bütün açık PR'ları kırmızıya çevirebilir (09-03 ve 09-05'te yaşandı) ve suçsuz PR'ın yazarı bunu düzeltemez. Dosya, kapının KENDİ koduna ait kollardan ayrıldı: ÖNKOŞUL, sayaç tutarlılığı, SAYIM AYIRT EDER, TEK KAYNAK, pano satırı, ratchet, vacuous kapsam ve PR-kısıtlı C4/C5 blok (yalnız PR'ın değiştirdiği kaynaklar sayılır, taşıyıcı AÇIK iken bloklar, değişen liste okunamazsa TAM sayım) companion-parity-coverage.test.ts'te PR kapısında KALDI. İki kol ortak yardımcıyı kullanır (companion-parity-coverage.yardimci.ts): kopya yok. Taşıyıcıyı açıp kapatan, okuyan, sayaç modülünü ya da kapsamı (.cc_docs.yaml) değiştiren PR'da ve testin kendisine dokunan PR'da bu dosya PR kapısında TUTULUR (yolFiltresi).",
+      "kanit": "ALT-38 karne ölçümü (docs/audits/test-karnesi-2026-10-09.json, CI geçmişi 2026-07-06..10-07): companion-parity-coverage.test.ts 13 kırmızı koşuda, 10 farklı dalda kırmızı verdi (1'i master push); 7'si dünya olayı kümesinde (iki küme: aynı test ≥3 dalda 12 saat içinde), 6'sı izole (PR'ın kendi hatası; 4'ü sonraki koşuda düzeldi). Ortam bağı: tam git geçmişi ve sabitlenmemiş saat (karne q4: bagli). Süre 2,8 sn (scripts/ci/test-sureleri.json). OPS hükmü 2026-10-09 (ALT-38i parça 2): kapı bölünür, TAM ve takvim kolları zamanlı kola alınır, PR kolu PR'ın değiştirdiği kaynaklarla sınırlanır.",
+      "gorunenYuz": "kanca satırı DUNYA (.claude/hooks/dunya-durumu-satiri.cjs): zamanlı koşu kırmızıysa her mesajda görünür; borç listeleri ve taşıyıcı durumu koşu günlüğünde adlarıyla basılır"
+    },
+    {
       "test": "src/__tests__/conformance/githooks-doc-scope.test.ts",
       "kimlik": "INV-HOOKS-2",
       "eskiYer": "pull_request (test-shard işleri, her PR'da)",
