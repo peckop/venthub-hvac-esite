@@ -195,6 +195,23 @@ describe('INV-PUSH-KAPISI-1 — ayrıştırıcı', () => {
   })
 })
 
+describe('INV-PUSH-KAPISI-1 — --no-verify reddi (ARC-277)', () => {
+  it.each([
+    'git push --no-verify origin feat-x',
+    'git push origin feat-x --no-verify',
+    'git push -u --no-verify origin feat-x',
+    'git -C /depo/calisma push --no-verify origin feat-x',
+    'cd /depo/calisma && git push --no-verify origin feat-x',
+  ])('pre-push katmanını atlayan bayrak reddedilir (%s)', (k) => {
+    expect(ret(k)).toContain('--no-verify')
+  })
+
+  it('--no-verify olmadan aynı push geçer (sabotaj kolu: bayrak listesi boşalırsa üstteki kırmızı)', () => {
+    expect(ret('git push -u origin feat-x')).toBeNull()
+    expect(ret('git push --verify origin feat-x')).toBeNull()
+  })
+})
+
 describe('INV-PUSH-KAPISI-1 — heredoc gövdesi (ARC-277, MVZ-10 yanlış pozitifi)', () => {
   const veriGovdesi = (govde: string, onek = "cat > betik.cjs <<'E'") => `${onek}\n${govde}\nE`
 

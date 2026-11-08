@@ -9,7 +9,7 @@
  * desenler kaçırır). GitHub master koruması (PR zorunlu, force push kapalı) esas güvencedir; bu kanca ikinci katmandır
  * ve yanlışı komut koşmadan, sebebiyle söyler. deny satırları üçüncü katman olarak kalır.
  *
- * İZİN (tek biçim): `git push [-u|--set-upstream] [-n] [--no-verify] <uzak-ad> [<dal> | HEAD | <kaynak>:<hedef-dal>]...`
+ * İZİN (tek biçim): `git push [-u|--set-upstream] [-n] <uzak-ad> [<dal> | HEAD | <kaynak>:<hedef-dal>]...`
  * REDDEDİLEN:
  *  · hedef dal master/main (düz ad, `refs/heads/` önekli, `kaynak:master`, `HEAD:main`);
  *  · --force, -f, --force-with-lease, --force-if-includes, +refspec, --delete, -d, `:dal` (silme), --mirror, --all, --prune;
@@ -29,8 +29,10 @@ const { spawnSync } = require('node:child_process')
 const KORUNAN = new Set(['master', 'main'])
 const YASAK_BAYRAK = new Set([
   '--force', '-f', '--force-with-lease', '--force-if-includes', '--delete', '-d', '--mirror', '--all', '--prune', '--tags-delete',
+  // ARC-277: --no-verify git pre-push katmanını (push-hedef-kapisi, depo-dökümü, kapalı-dal) atlar; 15 Ekim sonrası agent komutlarında meşru kullanım 0 ölçüldü.
+  '--no-verify',
 ])
-const IZINLI_BAYRAK = new Set(['-u', '--set-upstream', '-n', '--dry-run', '--no-verify', '--verify', '-q', '--quiet', '-v', '--verbose', '--tags', '--no-tags', '--follow-tags', '--progress', '--porcelain'])
+const IZINLI_BAYRAK = new Set(['-u', '--set-upstream', '-n', '--dry-run', '--verify', '-q', '--quiet', '-v', '--verbose', '--tags', '--no-tags', '--follow-tags', '--progress', '--porcelain'])
 const SARMALAYICI = new Set(['command', 'exec', 'nohup', 'time', 'builtin', 'env', 'sudo', 'nice', 'ionice', 'xargs', 'setsid', 'stdbuf', 'timeout'])
 const KABUKLAR = new Set(['bash', 'sh', 'zsh', 'dash', 'ksh', 'fish', 'busybox', 'pwsh', 'powershell', 'cmd'])
 /** `#` yalnız bu kabuklarda (ve üst düzeyde) yorumdur; pwsh/cmd yüklerinde yorum atlama kapalı (gizlenen komut kalmasın). */
