@@ -52,6 +52,14 @@ export function tarihAl(deger) {
   return t
 }
 
+const TR_SAAT_FARKI_MS = 3 * 3600 * 1000
+
+/** lastmod yalnız tarih mi (saat bilgisi yok ya da tam gece yarısı 00:00:00 UTC)? Gün içi sıra bilinmez. */
+export function yalnizTarihMi(deger) {
+  const s = String(deger ?? '').trim()
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) || /^\d{4}-\d{2}-\d{2}T00:00:00(\.0+)?(Z|\+00:00)$/.test(s)
+}
+
 /** Defter satırı geçerli mi: bilinen motor ve eylem, siteye ait adres, geçerli tarih. */
 export function hareketGecerliMi(h) {
   return !!h && MOTORLAR.includes(h.motor) && EYLEMLER.includes(h.eylem)
@@ -109,17 +117,20 @@ export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: har
   if (olculemedi) return { durum: 'OLCULEMEDI', neden: `durum okunamadı${hataMetni ? `: ${hataMetni}` : ''}; istek atmadan önce yeniden ölç` }
   if (noindex) return { durum: 'ATLA', neden: 'sayfa noindex; istek kotayı boşa harcar' }
   const degisim = tarihAl(lastmod)
+  // Yalnız-tarih lastmod gün başına (00:00Z) düşer; o günün TR saatiyle ilk 3 saati önceki günün 21:00Z-24:00Z'sine denk gelir.
+  // Bu aralıkta atılmış istek lastmod gününün değişikliğinden önce sayılmaz (SEO-98: 7 Kasım 22:49Z isteği 8 Kasım lastmod'una YAP dedirtiyordu).
+  const hareketDegisim = degisim !== null && yalnizTarihMi(lastmod) ? degisim - TR_SAAT_FARKI_MS : degisim
   const tarama = typeof sonTarama === 'number' ? sonTarama : tarihAl(sonTarama)
   const baslangic = tarihAl(KAYIT_BASLANGICI[motor])
   const kayitOncesi = baslangic !== null && degisim !== null && degisim < baslangic
   if (motor === 'indexnow') {
     if (degisim === null) return { durum: 'TAMAM', neden: 'lastmod yok; günlük görev bildirir' }
-    if (hareket !== null && hareket >= degisim) return { durum: 'TAMAM', neden: 'bildirim lastmod sonrası' }
+    if (hareket !== null && hareket >= hareketDegisim) return { durum: 'TAMAM', neden: 'bildirim lastmod sonrası' }
     if (kayitOncesi) return { durum: 'ESKI', neden: 'lastmod adres bazlı kayıt başlangıcından önce; günlük görev kapsar' }
     return { durum: 'YAP', neden: 'lastmod sonrası IndexNow bildirimi yok' }
   }
   if (tarama !== null && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
-  if (hareket !== null && (degisim === null || hareket >= degisim)) {
+  if (hareket !== null && (degisim === null || hareket >= hareketDegisim)) {
     const gun = (simdi - hareket) / GUN_MS
     const esik = TEKRAR_ESIGI_GUN[motor] ?? 7
     return gun >= esik
