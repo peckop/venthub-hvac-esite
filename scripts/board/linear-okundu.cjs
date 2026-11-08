@@ -50,6 +50,18 @@ function onbellegiDusur() {
 const bayraklar = process.argv.slice(2)
 const mevcut = oku()
 
+// ARC-273 (8 Kasım): bilinmeyen bayrak (örn. --help) damgayı YAZMAZ. Eskiden her şey "okundu" sayılıyordu ve
+// --help okunmamış yorumları sessizce gizledi. Damga yalnız bayraksız çağrıda yazılır.
+const BILINEN = ['--goster', '--geri']
+const yardim = bayraklar.some((b) => ['--help', '-h', '--yardim'].includes(b))
+const bilinmeyen = bayraklar.filter((b) => !BILINEN.includes(b))
+if (yardim || bilinmeyen.length > 0) {
+  console.log('kullanim: node scripts/board/linear-okundu.cjs [--goster | --geri]')
+  console.log('  (bayraksiz: damgayi simdiye ceker = yorumlari OKUDUM; baska bayrak damga YAZMAZ)')
+  if (!yardim) console.log(`bilinmeyen bayrak: ${bilinmeyen.join(' ')} — hicbir sey yazilmadi`)
+  process.exit(yardim ? 0 : 2)
+}
+
 if (bayraklar.includes('--goster')) {
   console.log(`[linear-okundu] dosya : ${damgaYolu()}`)
   console.log(`[linear-okundu] damga : ${mevcut?.damga || '(yok — sayaç son 24 saati sayar)'}`)

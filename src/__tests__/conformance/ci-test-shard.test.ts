@@ -37,6 +37,10 @@ const require_ = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '../../..')
 const CI_YOLU = path.join(KOK, '.github/workflows/ci.yml')
 const LISTE_MUTLAK = path.join(KOK, 'scripts/ci/dunya-durumu-testleri.json')
+/** Dışlama kararının tek kaynağı (vitest.config.ts de bunu çağırır): `exclude` = shard'larda koşmayan, `suzgeceTakilan` = süzgeç yüzünden koşan. */
+const DUNYA = require_(path.join(KOK, 'scripts/ci/dunya-durumu.cjs')) as {
+  ayar: (env: NodeJS.ProcessEnv) => { kip: string; exclude: string[]; include: string[] | null; suzgeceTakilan?: string[]; uyari?: string }
+}
 const execFileAsync = promisify(execFile)
 
 interface SureTablosu {
@@ -936,18 +940,52 @@ describe('INV-CI-SHARD-2 — shard bölmesi KAPSAMI kanıtlar (birleşim = vites
     expect(gruplar.filter((g) => g.includes(yeni))).toHaveLength(1)
   })
 
-  it("shard'lar ∪ dünya durumu listesi = TAM paket (kip boş): PR kapısından çıkan her test listede yazılı, hiçbiri sessizce düşmedi", async () => {
-    const tam = await vitestDosyalari(ortamKur(''))
+  /**
+   * shard'lar ∪ DIŞLANAN dünya durumu testleri = TAM paket (ALT-172). Dünya listesindeki her test iki kümeden TAM BİRİNDEDİR:
+   *   dışlanan (exclude: shard'larda koşmaz, master push ve zamanlı kolda koşar) ya da süzgece takılan (suzgeceTakilan: PR'ın değişen
+   *   dosyası testin yolFiltresi'ne uyduğu için PR kapısında, yani shard'larda KOŞAR). Takılan test shard'da ve dünya listesinde aynı anda
+   *   bulunur; bu çakışma DEĞİLDİR (ALT-38i #2349 sonrası her `scripts/board/` PR'ında bu test 888/889 ile yanlış kırmızı veriyordu).
+   *   Dışlama kararı vitest.config.ts ile AYNI ortamdan, `dunya-durumu.cjs ayar()` ile okunur (tek kaynak).
+   */
+  function birlesimTamPaket(shardListesi: readonly string[], ortam: NodeJS.ProcessEnv, tam: readonly string[]): { disari: string[]; tutulan: string[] } {
     const dunya = (JSON.parse(readFileSync(LISTE_MUTLAK, 'utf8')) as { testler: Array<{ test: string }> }).testler.map((t) => t.test)
     expect(dunya.length).toBeGreaterThan(0)
-    const { gruplar } = SHARD.dagit(liste, sure, n)
+    const a = DUNYA.ayar(ortam)
+    const disari = sirali(a.exclude)
+    const tutulan = sirali(a.suzgeceTakilan ?? [])
+    // dünya listesi = dışlanan ⊔ takılan (ikisi ayrık, birleşimi listenin tamamı)
+    expect(disari.filter((d) => tutulan.includes(d)), 'bir test hem dışlanan hem takılan').toEqual([])
+    expect(sirali([...disari, ...tutulan]), 'dünya listesindeki bir test ne dışlandı ne takıldı').toEqual(sirali(dunya))
+    const { gruplar } = SHARD.dagit([...shardListesi], sure, n)
     const shardlar = new Set(gruplar.flat())
-    const hepsi = sirali([...shardlar, ...dunya])
-    expect(new Set(hepsi).size, "bir dosya hem shard'da hem dünya durumu listesinde").toBe(hepsi.length)
+    // dışlanan test shard'larda KOŞMAZ; takılan test shard'larda KOŞAR
+    for (const d of disari) expect(shardlar.has(d), `dışlanan ${d} shard'da`).toBe(false)
+    for (const d of tutulan) expect(shardlar.has(d), `süzgece takılan ${d} shard'da DEĞİL (PR kapısında koşmuyor)`).toBe(true)
+    const hepsi = sirali([...shardlar, ...disari])
+    expect(new Set(hepsi).size, "bir dosya hem shard'da hem dışlanan listede").toBe(hepsi.length)
     expect(hepsi).toEqual(tam)
-    // dünya durumu testleri shard'larda KOŞMAZ (dislan); master push ve zamanlı koşuda koşar
-    for (const d of dunya) expect(shardlar.has(d), d).toBe(false)
+    return { disari, tutulan }
+  }
+
+  it("shard'lar ∪ dışlanan dünya durumu testleri = TAM paket (kip boş; değişen dosyalar git'ten): PR kapısından çıkan her test listede yazılı, hiçbiri sessizce düşmedi", async () => {
+    const tam = await vitestDosyalari(ortamKur(''))
+    birlesimTamPaket(liste, ortamKur('dislan'), tam)
   }, 120_000)
+
+  it("ALT-172 regresyonu: değişen dosya süzgece UYARSA (scripts/board/) süzgeçli test shard'da koşar ve çakışma sayılmaz; UYMAZSA (docs/) dışlanır", async () => {
+    const tam = await vitestDosyalari(ortamKur(''))
+    const uyan = path.join(gecici, 'degisen-uyan.txt')
+    const uymayan = path.join(gecici, 'degisen-uymayan.txt')
+    writeFileSync(uyan, 'scripts/board/herhangi.cjs\n')
+    writeFileSync(uymayan, 'docs/plans/herhangi.md\n')
+    const oUyan = ortamKur('dislan', { VENTHUB_DUNYA_DEGISEN_DOSYALAR: uyan })
+    const oUymayan = ortamKur('dislan', { VENTHUB_DUNYA_DEGISEN_DOSYALAR: uymayan })
+    const r1 = birlesimTamPaket(SHARD.vitestListesi(KOK, oUyan), oUyan, tam)
+    expect(r1.tutulan).toContain('src/__tests__/conformance/sessionstart-tavan.test.ts')
+    const r2 = birlesimTamPaket(SHARD.vitestListesi(KOK, oUymayan), oUymayan, tam)
+    expect(r2.tutulan).toEqual([])
+    expect(r2.disari).toContain('src/__tests__/conformance/sessionstart-tavan.test.ts')
+  }, 240_000)
 
   it("include entegrasyonu: VENTHUB_TEST_SHARD_DOSYALARI ile GERÇEK `vitest list` her shard için TAM o shard'ın dosyalarını döner; birleşim = liste", async () => {
     const { gruplar } = SHARD.dagit(liste, sure, n)
