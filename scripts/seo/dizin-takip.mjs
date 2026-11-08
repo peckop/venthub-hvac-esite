@@ -267,6 +267,23 @@ async function bingOlc(adresler) {
   return ilk
 }
 
+/**
+ * Defterin günlük yedeği: `<defter klasörü>/yedek/hareketler-YYYY-MM-DD.jsonl` (aynı gün üzerine yazılır).
+ * DIZIN_TAKIP_YEDEK2 verilirse (depo dışı, başka disk/klasör) ikinci kopya oraya da gider.
+ * Yedek hatası kaydı bozmaz ama sessiz de kalmaz: stderr'e yazılır.
+ */
+export function yedekAl(defter, simdi = new Date()) {
+  const ad = `hareketler-${simdi.toISOString().slice(0, 10)}.jsonl`
+  const hedefler = [join(dirname(defter), 'yedek'), process.env.DIZIN_TAKIP_YEDEK2].filter(Boolean)
+  for (const klasor of hedefler) {
+    try {
+      mkdirSync(resolve(klasor), { recursive: true })
+      writeFileSync(join(resolve(klasor), ad), readFileSync(defter))
+    } catch (e) { console.error(`UYARI: yedek yazılamadı (${klasor}): ${e.message}`) }
+  }
+  return hedefler.length
+}
+
 async function calistir() {
   const arg = process.argv.slice(2)
   const deger = (b) => { const i = arg.indexOf(b); return i >= 0 ? arg[i + 1] : undefined }
@@ -286,6 +303,7 @@ async function calistir() {
     mkdirSync(dirname(defter), { recursive: true })
     appendFileSync(defter, `${hareketler.map(satirYaz).join('\n')}\n`)
     console.log(`kaydedildi: ${hareketler.length} hareket → ${defter}`)
+    yedekAl(defter)
     return
   }
 
@@ -308,12 +326,14 @@ async function calistir() {
     mkdirSync(dirname(defter), { recursive: true })
     if (yeni.length) appendFileSync(defter, `${yeni.map(satirYaz).join('\n')}\n`)
     console.log(`içe aktarım: aday ${aday.length} · yeni ${yeni.length} · zaten vardı ${aday.length - yeni.length} → ${defter}`)
+    if (yeni.length) yedekAl(defter)
     return
   }
 
   // --durum (varsayılan)
-  const cikti = deger('--cikti')
-  if (cikti) yolKontrol(cikti, '--cikti')
+  // --cikti verilmezse durum anlık görüntüsü defterin klasörüne yazılır: sonuç geçmişi (hangi gün dizine girdi) kaybolmaz.
+  const cikti = deger('--cikti') || dirname(defter)
+  yolKontrol(cikti, '--cikti')
   const gun = Number(deger('--gun') || 14)
   if (!Number.isFinite(gun) || gun < 1) { console.error('HATA: --gun pozitif sayı olmalı'); process.exit(2) }
   const { hareketler, atlanan } = defterOku(defter)
