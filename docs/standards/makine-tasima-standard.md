@@ -4,7 +4,7 @@
 > **Betikler:** `scripts/tasima/paketle.cjs` (eski makine) · `scripts/tasima/kur.cjs` (yeni makine) · `scripts/tasima/dogrula.cjs` (iki makine). Ortak kod `cekirdek.cjs`, `envanter.cjs`, `git.cjs`.
 > **Zorlayan kapı:** `INV-TASIMA-1` → `src/__tests__/conformance/makine-tasima.test.ts` (yol dönüşümü, tar bütünlüğü, sha256 sabotajı, git bundle gidiş dönüşü, parola kanalı yok, hedef git deposunda olamaz).
 > **Sahibi:** ALTYAPI · **Kayıt:** Kanban: ALT-165 · **İlk yazım:** 2026-11-06
-> **Son ölçüm:** 2026-11-06
+> **Son ölçüm:** 2026-11-06 (Claude Design zip yedekleri §2.4 ve §3: 2026-11-08)
 > **Son doğrulama:** 2026-11-07 — GERÇEK paketleme provası yapıldı (sahibin parolasıyla, Drive'a 2,5 GB) ve paket bu makinede yalıtılmış bir köke kuruldu; sırlar parolayla açıldı. Gerçek yeni makinede kurulum henüz KOŞULMADI (§9).
 
 ## 0. Kaynak ve cetvel
@@ -104,6 +104,7 @@ Envanterin makine okunur kaynağı `scripts/tasima/envanter.cjs`; tablo onun öz
 | `skills/gstack` | 1,2 GB | yeniden klonlanır/kurulur |
 | node_modules, `.next`, `__pycache__` | | her pakette hariç |
 | worktree kayıtları (`.git/worktrees`, `.claude/worktrees/*`) | | ana depo klonlanınca YOK; gereken worktree'ler `git worktree add` ile yeniden açılır (dallar bundle'da) |
+| Claude Design proje zip yedekleri (OPS-228 taşıması, son tarih 14 Aralık 2026) | 8 Kasım 2026 ölçümü, `~/Downloads`: `VentHub Design System.zip` 82,7 MB (8 Kasım); `Venthub New.zip` ve `Venthub New (1..15).zip` 16 dosya, 1.267,9 MB (25 Ekim–7 Kasım; en büyükleri (14) 225,0 MB ve (15) 229,8 MB) | Asıl kopya taşımadan sonra claude.ai Artifacts'te durur; zip ikinci kopyadır. **Tek kalıcı yer: `<Drive>\VentHub-Tasima\design\`** (Drive eşitlemesi makineden bağımsız tutar, pakete girmez, yeni makinede Drive ile gelir). Yeni taşıma zip'i inince Downloads'tan bu klasöre taşınır. `Venthub New (n)` dosyaları aynı projenin art arda dışa aktarımlarıdır; hangisinin kalacağı (yalnız en yenisi mi, hepsi mi) sahibin kararıdır, karar verilmeden hiçbiri silinmez. `venthub-hvac-platform*.zip` ve `venthub-hvac.zip` (4 dosya, 80,8 MB, Ağustos 2025) Design yedeği değildir, bu satırın dışındadır |
 
 ### 2.5 Yol kırılması (ölçüldü)
 
@@ -119,6 +120,7 @@ Burada yeniden yazılmadı; referans:
 | Kanban + sage + posta kutuları | `scripts/hijyen/sage-yedek.cjs` → `<Drive>\VentHub-Tasima\yedek\`. `VACUUM INTO` + kaynakla sayım. Saklama: sage ve posta son 14 sürüm; kanban en yeni 24 + son 30 günün her günü için en yeni kopya (`DEPOLAR` sabiti) |
 | UnoPim | `scripts/pim/unopim-yedek.cjs al` → `yedek.key` ile şifreli `.vhenc` → `<Drive>\VentHub-Tasima\pim\`, son 3 sürüm |
 | Günlük | `<Drive>\VentHub-Tasima\yedek\gorev-gunlugu.txt` (her adımın çıkış kodu) |
+| Claude Design zip'leri | betik YOK: her proje taşımasında indirilen zip elle `<Drive>\VentHub-Tasima\design\` altına taşınır (§2.4 satırı). Asıl kopya claude.ai Artifacts'tedir |
 | Düz UnoPim klasörü | `~/VentHub-PIM-Yedek` (yerelde kalır; `drive-yedek.cmd` son 6'yı tutar, dosyadaki yorum 3 diyor: ikisi ayrışıyor, niyet ölçülmedi) |
 
 **Geri yükleme komutları** (yedek dizini `VENTHUB_SAGE_YEDEK_DIZINI=<Drive>\VentHub-Tasima\yedek`):
