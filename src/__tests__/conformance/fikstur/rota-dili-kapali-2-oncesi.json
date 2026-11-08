@@ -353,6 +353,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/banyo-ve-tuvalet-fani-nasil-secilir",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -598,6 +602,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/hucreli-aspirator-nedir-secerken-nelere-bakilir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/banyo-ve-tuvalet-fani-nasil-secilir",
         "alternates": null
       },
       {

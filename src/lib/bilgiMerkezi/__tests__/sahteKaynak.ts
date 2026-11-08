@@ -49,6 +49,10 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['storm-serisi', 'STORM Serisi'],
     // Patlayıcı ortamda fan seçimi (ATEX) yazısı (BLG-51, 2026-11): Vorticent CMS ATEX aile sayfası canlıda 200 verir (8 Kasım ölçümü; ürün sayfası).
     ['vortice-vorticent-cms-atex-santrifuj-fanlar', 'Vortice Vorticent CMS ATEX Santrifüj Fanlar'],
+    // BLG-55 (2026-11): aile sayfaları canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
+    ['vortice-punto-evo-flexo-banyo-fanlari', 'Vortice Punto Evo Flexo Banyo Fanları'],
+    ['vortice-vort-quadro-evo', 'Vortice VORT Quadro Evo'],
+    ['avens-qe-b-kasa-serisi', 'AVenS QE-B Kasa Serisi'],
     // BLG-54 (2026-11): aile sayfaları canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
     ['avens-hucreli-aspiratorler-hf-fw', 'AVenS Hücreli Aspiratörler HF-FW'],
     ['avens-hucreli-aspiratorler-hf-s', 'AVenS Hücreli Aspiratörler HF-S'],
