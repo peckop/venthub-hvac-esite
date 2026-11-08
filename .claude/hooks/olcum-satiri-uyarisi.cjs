@@ -53,7 +53,7 @@ function adayCalistir(metin) {
   const r = require('node:child_process').spawnSync(
     process.execPath,
     [require('node:path').join(__dirname, '..', '..', 'scripts', 'arac', 'onceki-calisma.cjs'), metin.slice(0, 2000), '--kanca'],
-    { encoding: 'utf8', timeout: ADAY_ZAMAN_ASIMI_MS, windowsHide: true },
+    { encoding: 'utf8', timeout: Number(process.env.VENTHUB_ADAY_ZAMAN_ASIMI_MS) || ADAY_ZAMAN_ASIMI_MS, windowsHide: true },
   )
   return r.status === 0 ? r.stdout : ''
 }
