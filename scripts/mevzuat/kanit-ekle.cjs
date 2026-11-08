@@ -51,7 +51,8 @@ function ekleTekil(dizi, metin) {
 }
 
 function kaynakAyniMi(a, b) {
-  return a.url === b.url && a.sha256_ilk12 === b.sha256_ilk12 && a.erisim_tarihi === b.erisim_tarihi
+  // Aynı sayfadan farklı alıntı ayrı kanıttır (aynı adres + sha + tarih + aynı alıntı = aynı kaynak)
+  return a.url === b.url && a.sha256_ilk12 === b.sha256_ilk12 && a.erisim_tarihi === b.erisim_tarihi && a.alinti === b.alinti
 }
 
 /**
@@ -75,8 +76,10 @@ function uygula(girdi, secenek = {}) {
     if (!kalem) throw new Error(`kalem yok: ${is.kimlik}`)
     const kaynak = is.kaynakDosya ? JSON.parse(fs.readFileSync(path.resolve(kok, is.kaynakDosya), 'utf8')) : is.kaynak
     const kanitYolu = path.join(kok, kalem.kaynaklar_kanit)
-    let kanit
-    if (fs.existsSync(kanitYolu)) kanit = oku(kanitYolu)
+    // Aynı kalem için birden çok iş (aynı sayfadan farklı alıntılar) aynı kanıt nesnesine yazar
+    let kanit = kanitYazilacak.find(([y]) => y === kanitYolu)?.[1]
+    if (kanit) { /* aynı kanıt dosyası bu koşumda zaten açık */ }
+    else if (fs.existsSync(kanitYolu)) kanit = oku(kanitYolu)
     else if (is.kanitOlustur) kanit = { j: { kimlik: kalem.kimlik, eksen: kalem.eksen, kaynaklar: [] }, crlf: K.crlf, nl: true }
     else throw new Error(`kanıt dosyası yok (kanitOlustur: true ver): ${kalem.kaynaklar_kanit}`)
     if (kaynak) {
@@ -93,7 +96,7 @@ function uygula(girdi, secenek = {}) {
     for (const s of is.acik_sorular || []) ekleTekil(kalem.acik_sorular, s)
     if (is.tarihler) kalem.tarihler = { ...kalem.tarihler, ...is.tarihler }
     if (is.durum) kalem.durum = is.durum
-    kanitYazilacak.push([kanitYolu, kanit])
+    if (!kanitYazilacak.some(([y]) => y === kanitYolu)) kanitYazilacak.push([kanitYolu, kanit])
   }
   K.j.guncellendi = bugun
   if (!kuru) {

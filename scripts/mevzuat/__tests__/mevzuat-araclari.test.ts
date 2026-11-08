@@ -257,6 +257,25 @@ describe('kanit-ekle.cjs', () => {
     }
   })
 
+  it('aynı kalem için aynı sayfadan farklı alıntılar ve yeni kanıt dosyası: hepsi tek dosyada birikir', () => {
+    kur()
+    try {
+      ekle.uygula({
+        bugun: '2026-11-08',
+        isler: [
+          { kimlik: 'TR-Y-2', kaynak: kaynak({ alinti: 'ilk' }), kanitOlustur: true },
+          { kimlik: 'TR-Y-2', kaynak: kaynak({ alinti: 'ikinci' }) },
+          { kimlik: 'TR-Y-2', kaynak: kaynak({ alinti: 'ikinci' }) },
+        ],
+      }, { kok })
+      const y = JSON.parse(readFileSync(path.join(kok, 'docs/mevzuat/kanit/TR-Y_2.json'), 'utf8')) as { kaynaklar: { alinti: string }[] }
+      expect(y.kaynaklar.map((s) => s.alinti)).toEqual(['ilk', 'ikinci'])
+      expect(okuKayit().kalemler[1].resmi_kaynak_sayisi).toBe(2)
+    } finally {
+      rmSync(kok, { recursive: true, force: true })
+    }
+  })
+
   it('kuru koşumda hiçbir dosya değişmez', () => {
     kur()
     try {
