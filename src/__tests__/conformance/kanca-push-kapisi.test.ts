@@ -240,6 +240,12 @@ describe('INV-PUSH-KAPISI-1 — ANSI-C tırnağı ve değişkenle gizlenen alt k
     "git $'push' origin master",
     "git $'\\x70ush' origin master",
     "git push origin feat-x:$'ma\\u0073ter'",
+    // NUL: bash $'..' içinde NUL'dan sonrasını keser, hedef master kalır
+    "git push origin $'master\\x00junk'",
+    "git push origin $'master\\0junk'",
+    "git push origin $'master\\000zz'",
+    "git push origin $'master\\u0000x'",
+    "git push origin $'master\\U00000000x'",
   ])('ANSI-C tırnağı tırnak durumunu kaydırmaz, içerik çözülür; reddedilir (%j)', (k) => {
     expect(ret(k)).not.toBeNull()
   })

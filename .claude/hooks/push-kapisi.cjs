@@ -132,7 +132,9 @@ function ansiCTirnak(komut, i) {
       j += 2
     }
   }
-  return { s, son: j }
+  // bash NUL'dan sonrasını keser (`$'master\x00junk'` → master); jeton `master\0junk` kalırsa korunan dal eşleşmez (denetçi bulgusu).
+  const nul = s.indexOf('\0')
+  return { s: nul >= 0 ? s.slice(0, nul) : s, son: j }
 }
 
 /** Tırnakları koruyarak komutu operatörlerden (&&, ||, ;, |, &, satır sonu) bölüp parçaları token dizilerine çevirir. */
