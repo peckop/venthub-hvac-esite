@@ -23,16 +23,20 @@ const require_ = createRequire(import.meta.url)
  * Okuyucunun kendisi yüklenemese ya da fırlatsa da bu işlev FIRLATMAZ, `null` döner (yani çağıran TAM taramaya düşer).
  * ⚠Yerelde commit sonrası `HEAD^1..HEAD` yalnız SON commit'tir; çok commitli yerel dalda PR'ın tamamı için liste elle verilir.
  */
-export function prDegisenleri(): string[] | null {
+export function prDegisenleri(oku: () => unknown = gercekOkuyucu): string[] | null {
   try {
-    const modul = require_(resolve(__dirname, '../../../../scripts/ci/dunya-durumu.cjs')) as {
-      degisenYollariniOku: () => string[] | null
-    }
-    const d = modul.degisenYollariniOku()
-    return Array.isArray(d) ? d : null
+    const d = oku()
+    return Array.isArray(d) ? (d as string[]) : null
   } catch {
     return null
   }
+}
+
+function gercekOkuyucu(): string[] | null {
+  const modul = require_(resolve(__dirname, '../../../../scripts/ci/dunya-durumu.cjs')) as {
+    degisenYollariniOku: () => string[] | null
+  }
+  return modul.degisenYollariniOku()
 }
 
 /**

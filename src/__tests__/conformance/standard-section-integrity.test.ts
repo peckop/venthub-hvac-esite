@@ -332,6 +332,21 @@ describe('INV-CETVEL-YAPI · PR kapsamı: değişen cetveller, fail-closed', () 
     expect(varsayilan.tam ? varsayilan.liste : tumu).toBe(tumu)
   })
 
+  it('_ortak/pr-kapsami prDegisenleri: okuyucu fırlatır ya da dizi olmayan döner → null (boş küme DEĞİL); okunan dizi aynen', () => {
+    // Denetçi Ö1 (#2367): `catch { return [] }` ya da `Array.isArray` kaldırılsa PR kolu üç kuralı sıfır cetvelde tarar ve yeşil kalırdı.
+    expect(
+      prDegisenleri(() => {
+        throw new Error('okuyucu yüklenemedi')
+      }),
+      'okuyucu fırlatınca null değil; boş küme kapıyı kör eder',
+    ).toBeNull()
+    expect(prDegisenleri(() => undefined), 'dizi olmayan (undefined)').toBeNull()
+    expect(prDegisenleri(() => null), 'okuyucu null (okunamadı)').toBeNull()
+    expect(prDegisenleri(() => 'docs/a.md'), 'dizi olmayan (string)').toBeNull()
+    expect(prDegisenleri(() => ['docs/a.md'])).toEqual(['docs/a.md'])
+    expect(prDegisenleri(() => []), 'okundu ve hiçbir dosya değişmedi').toEqual([])
+  })
+
   it('UÇTAN UCA (geçici cetvel kökü): ihlal yalnız DEĞİŞEN cetvelde görülür; liste okunamazsa ya da kontrol değişirse TAM klasör yakalar', () => {
     const depo = mkdtempSync(join(tmpdir(), 'cetvel-yapi-'))
     try {

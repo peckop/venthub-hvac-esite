@@ -150,7 +150,7 @@ Süre `scripts/ci/test-sureleri.json` yerel ölçümüdür (filo yükü altında
 | `src/__tests__/conformance/sessionstart-tavan.test.ts` | `INV-SESSIONSTART-TAVAN-1` | `docs/roller/`, `scripts/belge/`, `scripts/board/`, `scripts/hijyen/`, `.claude/hooks/`, `.claude/settings.json`, `.githooks/lib/companion-defter.cjs`, `.mcp.json`, `CLAUDE.md`, testin kendisi | master push + zamanlı | 4 kırmızı koşu, 4 dal, master push 0, tek küme 2026-09-29 | 130,4 sn |
 | `src/__tests__/conformance/standard-section-integrity-dunya.test.ts` | `INV-CETVEL-YAPI` (tam klasör kolu) | yok: her PR'da çıkar. PR kolu `standard-section-integrity.test.ts` PR kapısında KALIR ve aynı üç kuralı yalnız PR'ın değiştirdiği cetvellerde tarar (fail-closed: değişen liste okunamazsa ya da kontrolün kendi kodu değişirse TAM klasör; kanaryalar tam klasörden) | master push + zamanlı | 13 kırmızı koşu, 12 dal, 11'i dünya olayı kümesinde, 2'si izole (PR'ın kendi hatası) | 0,2 sn altı |
 
-Son iki satır OPS hükmüdür (ALT-38i, 2026-10-09): `githooks-doc-scope` zamanlı kola alınır; `sessionstart-tavan` TAM çıkmaz, PR kapısında yalnız rol kartını ya da açılış çıktısını değiştiren
+`githooks-doc-scope` ve `sessionstart-tavan` satırları OPS hükmüdür (ALT-38i, 2026-10-09): `githooks-doc-scope` zamanlı kola alınır; `sessionstart-tavan` TAM çıkmaz, PR kapısında yalnız rol kartını ya da açılış çıktısını değiştiren
 yollar değişince koşar, diğer PR'larda zamanlı kolda koşar. Zamanlı kolun kırmızısı sessiz kalmaz: kanca satırı `DUNYA:` her mesajda gösterir (aşağıda "Görünen yüz").
 
 **Süzgeç girdi ölçümü (2026-11-08).**
