@@ -15,6 +15,9 @@
  *
  * DÜRÜST SINIR: `git push --no-verify` pre-push'u atlar. `.claude/hooks/push-kapisi.cjs` agent komutlarında `--no-verify`'i reddeder
  * (15 Ekim sonrası meşru kullanım ölçüldü: 0); komut metnine girmeyen yol (betik içinden `--no-verify`) bu kapıyla da kapanmaz.
+ * Diğer bilinen sınırlar (denetçi ölçümü): `git push --mirror` ile UZAK-YALNIZ ref silmesi pre-push'a hiç görünmez (`--prune` görünür);
+ * var olan etiketin `--force` ile taşınması geçer (hızlı-ileri yalnız refs/heads/ için sorulur); `git config core.hooksPath <boş dizin>` ya da
+ * `VH_NODE_YOLU=x` gibi ortam/ayar oyunları kapıyı atlar; kanca dala bağlıdır (ARC-277 öncesi daldan itişte koşmaz).
  * GitHub master koruması esas güvence, bu kapı ikinci katmandır.
  *
  * Girdi: git'in pre-push stdin'i — satır başına "<yerel ref> <yerel sha> <uzak ref> <uzak sha>"; argümanlar: <uzak ad> <uzak adres>.

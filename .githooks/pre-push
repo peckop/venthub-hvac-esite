@@ -1,5 +1,5 @@
 #!/bin/sh
-# Push bekcileri — iki ayri kapi, ikisi de pre-push'ta, sirayla.
+# Push bekcileri — uc ayri kapi (ucuncusu ARC-277 push-hedef-kapisi, dosyanin sonunda), hepsi pre-push'ta, sirayla.
 #
 # (1) DEPO DOKUM KAPISI (ALT-39, INV-DEPO-DOKUM-1, scripts/security/depo-dokum-kapisi.cjs --pre-push):
 #     itilecek TUM nesneleri (sonradan silinen dosyalar DAHIL) tarar.
@@ -22,7 +22,7 @@
 #     Mantik ve testler: scripts/hijyen/kapali-dal-push.cjs. gh/ag yoksa UYARIR ve gecirir (fail-open).
 #     Bilincli yeniden kullanim: VH_KAPALI_DAL_IZIN=1 git push ...
 #
-# git pre-push stdin'i BIR KEZ okunur ve iki kapiya da verilir.
+# git pre-push stdin'i BIR KEZ okunur ve uc kapiya da verilir.
 #
 # VH_NODE_YOLU: node'un yerini degistirmek icin (varsayilan `node`); testler "node yok" kolunu bununla kosar.
 
