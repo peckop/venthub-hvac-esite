@@ -40,12 +40,13 @@ const NO_RE = /^([A-Z]{2,5}-\d+)\s*[:·\-–—]?\s*/
 function kisaBaslik(tam, sinir = 80) {
   const t = String(tam || '').replace(NO_RE, '').replace(/\s+/g, ' ').replace(/\|/g, '/').trim()
   const kesim = t.search(/\s[—–-]\s|\.\s|\s\(|:\s/)
-  let k = kesim >= 4 ? t.slice(0, kesim) : t
+  let k = kesim >= 12 ? t.slice(0, kesim) : t
   if (k.length > sinir) {
     const son = k.lastIndexOf(' ', sinir)
     k = k.slice(0, son > 20 ? son : sinir).replace(/[\s,;:(]+$/, '') + '…'
   }
-  return k || t.slice(0, sinir)
+  // Önekten başka bir şey yoksa kart no korunur (başlık tamamen kaybolmasın).
+  return k || t.slice(0, sinir) || String(tam || '').trim()
 }
 
 function yaniKartlar(ham) {

@@ -106,7 +106,9 @@ describe('INV-DEFTER-KANBAN-1 · kısa başlık (OPS: sayfada kart no değil iş
   it('önek atılır, ilk öbek alınır', () => {
     expect(K.kisaBaslik('ARC-291: DEFTER = KANBAN\'DAN ÜRETİLİR — defter:<ad> etiketi, uzun ayrıntı')).toBe("DEFTER = KANBAN'DAN ÜRETİLİR")
     expect(K.kisaBaslik('URN-160: Adres tablosu hazır. İkinci cümle burada')).toBe('Adres tablosu hazır')
-    expect(K.kisaBaslik('OPS-258 Kısa iş (ayrıntı)')).toBe('Kısa iş')
+    expect(K.kisaBaslik('OPS-258 Kısa iş (ayrıntı)')).toBe('Kısa iş (ayrıntı)') // kısa kök kesilmez
+    expect(K.kisaBaslik('OPS-259: Yeni site geçişi (ayrıntı)')).toBe('Yeni site geçişi')
+    expect(K.kisaBaslik('URN-160')).toBe('URN-160') // başlık yoksa kart no korunur
   })
   it('80 karakteri sözcük sınırında "…" ile aşmaz; | karakteri kaçar; boş başlık çökertmez', () => {
     const uzun = 'sözcük '.repeat(30)
