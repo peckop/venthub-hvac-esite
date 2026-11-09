@@ -52,6 +52,16 @@ try {
         cikis = 2
       }
     }
+  } else if (sid && mod !== 'kapali') {
+    // ARC-289: işaret yok ama BORÇ var — borç yazıldıktan sonra yazılan ders (roles dolu) borcu kapatır; yoksa borç sonsuza kadar basılırdı.
+    const eski = borc.oku(borc.borcYolu(sid))
+    if (eski && Number.isFinite(eski.ts)) {
+      try {
+        if (borc.dersYazildiMi(kuyrukSatirlari(girdi.transcript_path), eski.ts)) borc.sil(borc.borcYolu(sid))
+      } catch {
+        process.stderr.write('[duzeltme-dersi] ölçülemedi (konuşma kaydı okunamadı); borç korunuyor\n')
+      }
+    }
   }
 } catch {
   /* fail-open: beklenmeyen hata turu bloklamaz (ölçülemeyen okuma yukarıda stderr'e yazılır) */

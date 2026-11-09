@@ -26,6 +26,7 @@ const KALIP = req(path.join(KOK, 'scripts/hijyen/duzeltme-kalibi.cjs')) as {
 const BORC = req(path.join(KOK, 'scripts/hijyen/duzeltme-borcu.cjs')) as {
   dersYazanCagri: (j: unknown) => boolean
   dersYazildiMi: (s: string[], ms: number) => boolean
+  yaz: (yol: string, nesne: object) => void
 }
 const ISARETLE = path.join(KOK, '.claude/hooks/duzeltme-isaretle.cjs')
 const KAPI = path.join(KOK, '.claude/hooks/duzeltme-dersi-kapisi.cjs')
@@ -169,6 +170,76 @@ describe('INV-KANCA-DUZELTME-1 · kanca akışı', () => {
     expect(r.stderr).toContain('ölçülemedi')
     expect(fs.existsSync(path.join(pano, 'duzeltme-isaret-oturum-5.json'))).toBe(true)
     fs.rmSync(pano, { recursive: true, force: true })
+  })
+
+  describe('ARC-289 · işaret yokken borç kapanışı', () => {
+    const borcKur = (pano: string, sid: string, ts: number) => {
+      BORC.yaz(path.join(pano, `duzeltme-borc-${sid}.json`), { ts, kaliplar: ['tekrar-sayisi'] })
+      return path.join(pano, `duzeltme-borc-${sid}.json`)
+    }
+    const t0 = Date.parse('2026-11-06T12:00:00Z')
+
+    it('borç dosyası var, işaret yok, borç ts SONRASI roles dolu ders var → borç silinir, sonraki istem sessiz', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-8', t0)
+      const tp = kayit([remember(['OPS'], '2026-11-09T10:00:00Z')])
+      const r = kos(KAPI, { session_id: 'oturum-8', transcript_path: tp }, pano)
+      expect(r.status).toBe(0)
+      expect(fs.existsSync(yol)).toBe(false)
+      expect(kos(ISARETLE, { session_id: 'oturum-8', prompt: 'devam et' }, pano).stdout).toBe('')
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
+
+    // sabotaj kolları: kapı bozulursa (hiç taramazsa / ts'yi yok sayarsa / roles'ü saymazsa) bunlar kırmızı olur
+    it('sabotaj: borç ts ÖNCESİ ders borcu silmez', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-9', t0)
+      const tp = kayit([remember(['OPS'], '2026-11-05T10:00:00Z')])
+      expect(kos(KAPI, { session_id: 'oturum-9', transcript_path: tp }, pano).status).toBe(0)
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
+
+    it('sabotaj: roles boş ders borcu silmez', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-10', t0)
+      const tp = kayit([remember([], '2026-11-09T10:00:00Z')])
+      kos(KAPI, { session_id: 'oturum-10', transcript_path: tp }, pano)
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
+
+    it('sabotaj: kayıt okunamazsa borç KORUNUR ve stderr "ölçülemedi"', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-11', t0)
+      const r = kos(KAPI, { session_id: 'oturum-11', transcript_path: path.join(pano, 'yok.jsonl') }, pano)
+      expect(r.status).toBe(0)
+      expect(r.stderr).toContain('ölçülemedi')
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
+
+    it('blok kipinde işaretsiz borç + ders yok: bloklamaz (exit 0), borç kalır; ts sayı değilse de kalır', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-13', t0)
+      const tp = kayit([{ type: 'assistant', timestamp: '2026-11-09T10:00:00Z', message: { content: [] } }])
+      expect(kos(KAPI, { session_id: 'oturum-13', transcript_path: tp }, pano, { VENTHUB_DUZELTME_KAPISI: 'blok' }).status).toBe(0)
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.writeFileSync(yol, JSON.stringify({ ts: 'x', kaliplar: [] }))
+      const tp2 = kayit([remember(['OPS'], '2026-11-09T10:00:00Z')])
+      expect(kos(KAPI, { session_id: 'oturum-13', transcript_path: tp2 }, pano).status).toBe(0)
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
+
+    it('sabotaj: vana kapali iken borca dokunulmaz', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-12', t0)
+      const tp = kayit([remember(['OPS'], '2026-11-09T10:00:00Z')])
+      kos(KAPI, { session_id: 'oturum-12', transcript_path: tp }, pano, { VENTHUB_DUZELTME_KAPISI: 'kapali' })
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
   })
 
   it('vana: VENTHUB_DUZELTME_KAPISI=kapali iken işaret yazılmaz, satır çıkmaz', () => {
