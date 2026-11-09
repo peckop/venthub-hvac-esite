@@ -33,6 +33,21 @@ const BOLUMLER = {
 const TAVAN = 30
 const NO_RE = /^([A-Z]{2,5}-\d+)\s*[:·\-–—]?\s*/
 
+/**
+ * Kart başlığının KISA hâli (OPS, 9 Kasım): önek (kart no) atılır, ilk cümle/öbek (" — ", " - ", ". ", " (" ya da ":" öncesi)
+ * alınır, ~80 karakterde sözcük sınırında "…" ile kesilir. Boş kalırsa tam başlık.
+ */
+function kisaBaslik(tam, sinir = 80) {
+  const t = String(tam || '').replace(NO_RE, '').replace(/\s+/g, ' ').replace(/\|/g, '/').trim()
+  const kesim = t.search(/\s[—–-]\s|\.\s|\s\(|:\s/)
+  let k = kesim >= 4 ? t.slice(0, kesim) : t
+  if (k.length > sinir) {
+    const son = k.lastIndexOf(' ', sinir)
+    k = k.slice(0, son > 20 ? son : sinir).replace(/[\s,;:(]+$/, '') + '…'
+  }
+  return k || t.slice(0, sinir)
+}
+
 function yaniKartlar(ham) {
   return (ham || []).map((e) => {
     const t = e.task || {}
@@ -40,7 +55,7 @@ function yaniKartlar(ham) {
     const pano = String((e.board && e.board.title) || '').replace(/^VentHub\s+/i, '')
     return {
       no: m ? m[1] : String(t.id || '').slice(0, 8),
-      baslik: String(t.title || '').replace(NO_RE, '').replace(/\s+/g, ' ').replace(/\|/g, '/').slice(0, 140),
+      baslik: kisaBaslik(t.title),
       durum: String(t.sutun || t.status || ''),
       bitti: t.columnId === 'done' || t.status === 'completed',
       sahip: t.assignee || pano || '',
@@ -217,7 +232,7 @@ function main(argv) {
   }
 }
 
-module.exports = { yaniKartlar, kartlariOku, tablo, blok, metniYaz, blokSatirlari, kontrol, damgaYasi, TAVAN, BOLUMLER }
+module.exports = { kisaBaslik, yaniKartlar, kartlariOku, tablo, blok, metniYaz, blokSatirlari, kontrol, damgaYasi, TAVAN, BOLUMLER }
 
 if (require.main === module) {
   try {

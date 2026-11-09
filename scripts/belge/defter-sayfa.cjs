@@ -67,16 +67,30 @@ function ayikla(metin) {
   const ne = bolumTablosu(metin, 1)
   const sirada = bolumTablosu(metin, 3)
   const sutun = (t, ad) => (t ? t.baslik.findIndex((b) => b.toLowerCase().startsWith(ad)) : -1)
+  // Türkçe küçük harf (İ → i); "İş" sütunu varsa metin oradadır (Kanban'dan üretilen bloklarda ilk sütun kart no / tarihtir).
+  const sutunTr = (t, ad) => (t ? t.baslik.findIndex((b) => b.toLocaleLowerCase('tr').startsWith(ad)) : -1)
   const oncelikIdx = sutun(sirada, 'öncelik')
+  const durumIdx = oncelikIdx >= 0 ? -1 : sutun(sirada, 'durum')
   const kartIdx = sutun(sirada, 'kart')
+  const siradaIs = sutunTr(sirada, 'iş')
+  const neIs = sutunTr(ne, 'iş')
+  // Kart no öneki yalnız Kanban'dan üretilmiş blokta (ilk sütun Kapanış); elle tabloda Kart sütunu sonuçtur.
+  const neKart = ne && ne.baslik[0] && ne.baslik[0].toLowerCase().startsWith('kapanış') ? sutun(ne, 'kart') : -1
+  const ilk = ne && ne.satirlar[0]
   return {
     sonDogrulama: dogrulama ? dogrulama[1] : null,
-    sonIs: ne && ne.satirlar[0] ? { tarih: ne.satirlar[0][0] || '', is: ne.satirlar[0][1] || '' } : null,
+    sonIs: ilk
+      ? {
+          tarih: ilk[0] || '',
+          // Üretilmiş blokta "İş" sütunu + kart no: "URN-160: Başlık"; elle tabloda eski davranış (2. sütun).
+          is: neIs >= 0 ? `${neKart >= 0 && ilk[neKart] ? ilk[neKart] + ': ' : ''}${ilk[neIs] || ''}` : ilk[1] || '',
+        }
+      : null,
     siradaToplam: sirada ? sirada.satirlar.length : 0,
     sirada: sirada
       ? sirada.satirlar.slice(0, SIRADA_EN_COK).map((r) => ({
-          madde: r[0] || '',
-          oncelik: oncelikIdx >= 0 ? r[oncelikIdx] || '' : '',
+          madde: siradaIs >= 0 ? r[siradaIs] || '' : r[0] || '',
+          oncelik: oncelikIdx >= 0 ? r[oncelikIdx] || '' : durumIdx >= 0 ? r[durumIdx] || '' : '',
           kart: kartIdx >= 0 ? r[kartIdx] || '' : '',
         }))
       : [],
@@ -118,7 +132,8 @@ function kaynakDegismedi(metin, bugun, tazelikGun) {
   const m = /<!-- DEFTER-OLCUM:envanter BASLA[^\n]*?Üretildi: (\d{4}-\d{2}-\d{2})[^\n]*-->\r?\n([\s\S]*?)\r?\n<!-- DEFTER-OLCUM:envanter BITIS -->/.exec(metin)
   if (!m) return false
   const uretimYasi = gunFarki(m[1], bugun)
-  if (uretimYasi === null || uretimYasi > tazelikGun) return false
+  // Gelecek tarihli "Üretildi" (elle yazım) kabul edilmez.
+  if (uretimYasi === null || uretimYasi > tazelikGun || Date.parse(`${m[1]}T00:00:00Z`) > Date.parse(`${bugun}T00:00:00Z`)) return false
   const satirlar = m[2].split(/\r?\n/).filter((s) => /^\|/.test(s) && !/^\|\s*Ölçüm\s*\|/.test(s) && !/^\|\s*-/.test(s))
   if (satirlar.length === 0 || satirlar.some((s) => /bekliyor|ölçülemedi/.test(s))) return false
   return satirlar.some((s) => /kaynak değişmedi/.test(s))

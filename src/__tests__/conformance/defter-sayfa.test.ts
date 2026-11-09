@@ -79,6 +79,23 @@ describe('defter-sayfa: ayıklama', () => {
     expect(v.siradaToplam).toBe(4)
   })
 
+  it('Kanban\'dan üretilmiş bloklarda kart no değil İŞ başlığı görünür (OPS kusuru)', () => {
+    const uretilmis = [
+      'Son doğrulama: 2026-11-09',
+      '## 1 Ne yaptık',
+      '| Kapanış | Kart | İş | Sahip |',
+      '|---|---|---|---|',
+      '| 2026-11-09 | URN-160 | Adres tablosu hazır | URUN |',
+      '## 3 Sırada',
+      '| Kart | İş | Durum | Sahip |',
+      '|---|---|---|---|',
+      '| ALT-177 | Önizleme adresi | In Progress | ALTYAPI |',
+    ].join('\n')
+    const v = ds.ayikla(uretilmis)
+    expect(v.sonIs).toEqual({ tarih: '2026-11-09', is: 'URN-160: Adres tablosu hazır' })
+    expect(v.sirada[0]).toEqual({ madde: 'Önizleme adresi', oncelik: 'In Progress', kart: 'ALT-177' })
+  })
+
   it('bozuk/boş metinde fırlatmaz: alanlar null/boş', () => {
     const v = ds.ayikla('rastgele metin')
     expect(v).toEqual({ sonDogrulama: null, sonIs: null, siradaToplam: 0, sirada: [] })

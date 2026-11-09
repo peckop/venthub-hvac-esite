@@ -229,24 +229,44 @@ function metniYaz(metin, yeni) {
   return c.replace(/\n/g, eol)
 }
 
+/** Durum dosyası yoksa {} (ilk koşu); VAR ama çözümlenemiyorsa { __bozuk: true } (sahte "ölçüldü" üretilmez: denetçi U1). */
 function durumOku(yol = durumYolu()) {
+  let ham
   try {
-    return JSON.parse(fs.readFileSync(yol, 'utf8'))
+    ham = fs.readFileSync(yol, 'utf8')
+  } catch (e) {
+    return e && e.code === 'ENOENT' ? {} : { __bozuk: true }
+  }
+  try {
+    const d = JSON.parse(ham)
+    return d && typeof d === 'object' && !Array.isArray(d) ? d : { __bozuk: true }
   } catch {
-    return {}
+    return { __bozuk: true }
   }
 }
 
+/** Atomik yazım (geçici dosya + rename): yarım yazılmış durum dosyası kalmaz. */
 function durumYaz(d, yol = durumYolu()) {
   try {
     fs.mkdirSync(path.dirname(yol), { recursive: true })
-    fs.writeFileSync(yol, JSON.stringify(d, null, 2))
+    const gecici = `${yol}.${process.pid}.tmp`
+    fs.writeFileSync(gecici, JSON.stringify(d, null, 2))
+    fs.renameSync(gecici, yol)
   } catch {
-    // Durum yazılamadı: sonraki koşu yeniden ölçer (zararsız).
+    // Durum yazılamadı: sonraki koşu iz kaydı bulamaz, ilk koşu gibi davranır (zararsız).
   }
 }
 
 function olc(kaynaklar = KAYNAKLAR, onceki = durumOku()) {
+  if (onceki.__bozuk) {
+    // Bozuk durum: iz kıyası yapılamaz → izli kaynaklar "ölçülemedi"; izsizler (dizin) olağan okunur. Dosya silinince ilk koşu taban kurar.
+    const satirlar = kaynaklar.map((k) => {
+      const s = k.sonuc()
+      if (!k.iz) return { ad: k.ad, ozet: s ? s.ozet : 'ölçülemedi (sonuç okunamadı)', tarih: s ? s.tarih : '', durum: s ? 'olculdu' : 'olculemedi' }
+      return { ad: k.ad, ozet: s ? s.ozet : 'ölçülemedi (sonuç okunamadı)', tarih: s ? s.tarih : '', durum: 'olculemedi' }
+    })
+    return { satirlar, yeni: null }
+  }
   const yeni = { ...onceki }
   const satirlar = kaynaklar.map((k) => {
     const r = degerlendir(k, onceki[k.ad])
@@ -282,13 +302,14 @@ function main(argv) {
     return 0
   }
   fs.writeFileSync(yol, yz)
-  durumYaz(yeni)
+  if (yeni) durumYaz(yeni)
+  else process.stdout.write('⚠DEFTER-ENVANTER: durum dosyası bozuk (çözümlenemedi); izli satırlar "ölçülemedi". Dosyayı sil, sonraki koşu taban kurar: ' + durumYolu() + '\n')
   const sorunlu = satirlar.filter((x) => x.durum === 'degisti-bekliyor' || x.durum === 'olculemedi').length
   process.stdout.write(`DEFTER-ENVANTER: ${satirlar.length} ölçüm satırı yazıldı${sorunlu ? `, ${sorunlu} tanesi dikkat ister` : ''}\n`)
   return 0
 }
 
-module.exports = { degerlendir, blok, metniYaz, olc, designIzi, farkSonucu, pimSonucu, adresSonucu, KAYNAKLAR, ETIKET }
+module.exports = { durumOku, durumYaz, degerlendir, blok, metniYaz, olc, designIzi, farkSonucu, pimSonucu, adresSonucu, KAYNAKLAR, ETIKET }
 if (require.main === module) {
   try {
     process.exitCode = main(process.argv.slice(2))

@@ -1,5 +1,7 @@
 // @vitest-environment node
+import fs from 'node:fs'
 import { createRequire } from 'node:module'
+import os from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -14,7 +16,9 @@ const E = req(path.join(KOK, 'scripts/hijyen/defter-envanter.cjs')) as {
   degerlendir: (k: unknown, onceki: unknown, simdi?: string) => { durum: string; ozet: string; tarih: string; yeniKayit: unknown }
   blok: (s: { ad: string; ozet: string; tarih: string; durum: string }[], t: string) => string
   metniYaz: (m: string, y: string) => string | null
-  olc: (k: unknown[], onceki: Record<string, unknown>) => { satirlar: { durum: string }[]; yeni: Record<string, unknown> }
+  olc: (k: unknown[], onceki: Record<string, unknown>) => { satirlar: { durum: string }[]; yeni: Record<string, unknown> | null }
+  durumOku: (yol: string) => Record<string, unknown>
+  durumYaz: (d: unknown, yol: string) => void
 }
 
 const SONUC = { ozet: '1165 üründe fark 0', tarih: '2026-11-05T10:00:00.000Z' }
@@ -88,9 +92,37 @@ describe('INV-DEFTER-ENVANTER-1 · yazma', () => {
   it('"2 Envanter" başlığı yoksa yazmaz (null)', () => {
     expect(E.metniYaz('# boş\n', y)).toBeNull()
   })
+  it('sabotaj (U1): bozuk durum dosyası sahte "ölçüldü" üretmez; yok olan dosya ilk koşudur', () => {
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'de-durum-'))
+    try {
+      const yol = path.join(dizin, 'durum.json')
+      expect(E.durumOku(yol)).toEqual({})
+      fs.writeFileSync(yol, '{yarım')
+      const bozuk = E.durumOku(yol)
+      expect(bozuk.__bozuk).toBe(true)
+      const r = E.olc([kaynak('aaa'), { ad: 'dizin', iz: null, sonuc: () => SONUC }], bozuk)
+      expect(r.satirlar.map((s) => s.durum)).toEqual(['olculemedi', 'olculdu'])
+      expect(r.yeni).toBeNull()
+      fs.writeFileSync(yol, '[1,2]')
+      expect(E.durumOku(yol).__bozuk).toBe(true)
+    } finally {
+      fs.rmSync(dizin, { recursive: true, force: true })
+    }
+  })
+  it('durum yazımı atomik: geçici dosya kalmaz, geri okunur', () => {
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'de-durum-'))
+    try {
+      const yol = path.join(dizin, 'alt', 'durum.json')
+      E.durumYaz({ k: { iz: 'aaa' } }, yol)
+      expect(E.durumOku(yol)).toEqual({ k: { iz: 'aaa' } })
+      expect(fs.readdirSync(path.dirname(yol))).toEqual(['durum.json'])
+    } finally {
+      fs.rmSync(dizin, { recursive: true, force: true })
+    }
+  })
   it('olc: ölçülemeyen kaynak durumu bozmaz', () => {
     const r = E.olc([kaynak(null)], { k: { iz: 'aaa', izZamani: '2026-11-05T00:00:00.000Z' } })
     expect(r.satirlar[0].durum).toBe('olculemedi')
-    expect(r.yeni.k).toEqual({ iz: 'aaa', izZamani: '2026-11-05T00:00:00.000Z' })
+    expect(r.yeni?.k).toEqual({ iz: 'aaa', izZamani: '2026-11-05T00:00:00.000Z' })
   })
 })

@@ -101,6 +101,24 @@ describe('INV-DEFTER-KANBAN-1 · yazma ve kontrol', () => {
   })
 })
 
+describe('INV-DEFTER-KANBAN-1 · kısa başlık (OPS: sayfada kart no değil iş görünsün)', () => {
+  const K = req(path.join(KOK, 'scripts/hijyen/defter-kartlari.cjs')) as { kisaBaslik: (t: string, n?: number) => string }
+  it('önek atılır, ilk öbek alınır', () => {
+    expect(K.kisaBaslik('ARC-291: DEFTER = KANBAN\'DAN ÜRETİLİR — defter:<ad> etiketi, uzun ayrıntı')).toBe("DEFTER = KANBAN'DAN ÜRETİLİR")
+    expect(K.kisaBaslik('URN-160: Adres tablosu hazır. İkinci cümle burada')).toBe('Adres tablosu hazır')
+    expect(K.kisaBaslik('OPS-258 Kısa iş (ayrıntı)')).toBe('Kısa iş')
+  })
+  it('80 karakteri sözcük sınırında "…" ile aşmaz; | karakteri kaçar; boş başlık çökertmez', () => {
+    const uzun = 'sözcük '.repeat(30)
+    const k = K.kisaBaslik(`URN-1: ${uzun}`)
+    expect(k.length).toBeLessThanOrEqual(81)
+    expect(k.endsWith('…')).toBe(true)
+    expect(K.kisaBaslik('URN-2: a | b')).not.toContain('|')
+    expect(K.kisaBaslik('')).toBe('')
+    expect(K.kisaBaslik(undefined as unknown as string)).toBe('')
+  })
+})
+
 describe('INV-DEFTER-KANBAN-1 · gerçek defterler', () => {
   it('üretilmiş blok bulunan her defterde blok çifti tam ve damga var', () => {
     const dizin = path.join(KOK, 'docs', 'defter')
