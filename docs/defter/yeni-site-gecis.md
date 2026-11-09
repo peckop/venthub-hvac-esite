@@ -47,8 +47,8 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 | Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |
 |---|---|---|---|
 | Design ↔ UnoPIM fark | 1165 üründe fark 0; teknik değer: 4130 kontrol, 0 fark | 2026-11-09 | kaynak değişmedi — son ölçüm 2026-11-09 |
-| UnoPIM görsel / fiyat-KDV | görsel 1157/1165 (11-04) · liste fiyatı 343/1165 yazıldı, kaynakta 348 (11-05); KDV %20 tümünde | 2026-11-09 | kaynak değişmedi — son ölçüm 2026-11-09 |
-| Adres eşleştirme kapsama | taslak 2402 satır; slug kapsamı kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi 0/6 | 2026-11-04 | ölçüldü |
+| UnoPIM görsel / fiyat-KDV | görsel 1157/1165 (11-04) · liste fiyatı 343/1165 yazıldı, kaynakta 348 (11-05) · KDV %20: 1165/1165 (11-05) | 2026-11-05 | kaynak değişmedi — son ölçüm 2026-11-05 |
+| Adres eşleştirme kapsama | taslak 2402 satır; slug kapsamı kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi 0/6 | 2026-11-04 | kaynak değişmedi — son ölçüm 2026-11-04 |
 | Dizin | TUTARLI: defter 2026-11-09 anlık görüntüsüyle birebir (101 adres) | 2026-11-09 | ölçüldü |
 <!-- DEFTER-OLCUM:envanter BITIS -->
 

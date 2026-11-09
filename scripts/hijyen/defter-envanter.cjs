@@ -109,15 +109,29 @@ function farkSonucu(kok = gorselKok()) {
 function pimSonucu(kok = KOK) {
   const m = oku(path.join(kok, 'docs', 'olcum', 'pim-unopim.md'))
   if (!m) return null
-  const gorsel = /Ana görseli olan ürün (\d+)\/(\d+)/.exec(m)
-  const fiyat = /EUR liste fiyatı[^:\n]*:\s*(\d+) ürün/.exec(m)
-  const csv = /CSV'de tekil (\d+) SKU/.exec(m)
-  const dogrulama = /Son doğrulama:\s*(\d{4}-\d{2}-\d{2})/.exec(m)
+  // Sayılar bölümlerin KENDİ ölçüm tarihiyle okunur ("## Ölçüm YYYY-MM-DD"); "Son doğrulama" günü ölçüm tarihi değildir
+  // (belge yalnız kayıttan doğrulanmış olabilir). Hiçbiri literal değil: metin değişirse eşleşme düşer, uydurma yok.
+  const bolumler = m.split(/^## /m).map((b) => ({ gun: (/^Ölçüm (\d{4}-\d{2}-\d{2})/.exec(b) || [])[1], b })).filter((x) => x.gun)
+  const bul = (re) => {
+    for (const { gun, b } of bolumler) {
+      const e = re.exec(b)
+      if (e) return { e, gun }
+    }
+    return null
+  }
+  const gorsel = bul(/Ana görseli olan ürün (\d+)\/(\d+)/)
+  const fiyat = bul(/EUR liste fiyatı[^:\n]*:\s*(\d+) ürün/)
+  const csv = bul(/CSV'de tekil (\d+) SKU/)
+  const kdv = bul(/vat_rate_percent` %(\d+),? (\d+)\/(\d+)/)
   if (!gorsel || !fiyat) return null
-  const toplam = gorsel[2]
+  const toplam = gorsel.e[2]
+  const kisa = (g) => g.slice(5)
+  const gunler = [gorsel.gun, fiyat.gun, kdv && kdv.gun].filter(Boolean).sort()
   return {
-    ozet: `görsel ${gorsel[1]}/${toplam} (11-04) · liste fiyatı ${fiyat[1]}/${toplam} yazıldı${csv ? `, kaynakta ${csv[1]}` : ''} (11-05); KDV %20 tümünde`,
-    tarih: dogrulama ? dogrulama[1] : '',
+    ozet:
+      `görsel ${gorsel.e[1]}/${toplam} (${kisa(gorsel.gun)}) · liste fiyatı ${fiyat.e[1]}/${toplam} yazıldı${csv ? `, kaynakta ${csv.e[1]}` : ''} (${kisa(fiyat.gun)})` +
+      (kdv ? ` · KDV %${kdv.e[1]}: ${kdv.e[2]}/${kdv.e[3]} (${kisa(kdv.gun)})` : ''),
+    tarih: gunler[gunler.length - 1],
   }
 }
 
@@ -137,7 +151,9 @@ function dizinSonucu(kok = KOK) {
   try {
     const r = spawnSync(process.execPath, [path.join(kok, 'scripts', 'seo', 'dizin-defter-kontrol.mjs')], { encoding: 'utf8', timeout: 30000, windowsHide: true, cwd: kok })
     const s = String(r.stdout || '').split('\n').find((x) => x.trim())
-    return r.status === 0 && s ? { ozet: s.trim().slice(0, 160), tarih: new Date().toISOString().slice(0, 10) } : null
+    // Çıkış 1 = sapma bulundu (ölçüm başarılı, sonuç "sapma"); başka çıkış ya da çıktı yok = ölçülemedi.
+    if (!s || (r.status !== 0 && r.status !== 1)) return null
+    return { ozet: (r.status === 1 ? 'SAPMA: ' : '') + s.trim().slice(0, 150), tarih: new Date().toISOString().slice(0, 10) }
   } catch {
     return null
   }
@@ -165,14 +181,16 @@ function degerlendir(kaynak, onceki, simdi = new Date().toISOString()) {
   if (iz === null) return { durum: 'olculemedi', ...gosterilen, yeniKayit: onceki }
   if (!onceki || !onceki.iz) return { durum: s ? 'olculdu' : 'olculemedi', ...gosterilen, yeniKayit: s ? { iz, izZamani: simdi } : onceki }
   if (onceki.iz === iz) return { durum: s ? 'degismedi' : 'olculemedi', ...gosterilen, yeniKayit: onceki }
-  // İz değişti: yalnız iz değişiminden SONRA üretilmiş sonuç yeni ölçüm sayılır.
-  // Tam ISO tarih (fark raporu) kesin karşılaştırılır; yalnız gün olan (belge) için izden SONRAKİ gün gerekir
-  // (aynı günkü belge tarihi, ölçümün izden sonra yapıldığını kanıtlamaz: sahte tazelik olmasın).
+  // İz değişti: yalnız DEĞİŞİMİN İLK GÖRÜLDÜĞÜ andan SONRA üretilmiş sonuç yeni ölçüm sayılır (denetçi E2: önceki ölçüm anı
+  // değil, değişim anı referanstır). Değişim anı ilk görüldüğünde kaydedilir ve aynı iz sürdükçe sabit kalır.
+  // Tam ISO tarih (fark raporu) kesin karşılaştırılır; yalnız gün olan (belge) için o günden SONRAKİ gün gerekir
+  // (aynı günkü belge tarihi, ölçümün değişimden sonra yapıldığını kanıtlamaz: sahte tazelik olmasın).
+  const degisim = onceki.gorulenIz === iz && onceki.degisimZamani ? onceki.degisimZamani : simdi
   const t = s && s.tarih ? String(s.tarih) : ''
-  const yeni = t.length > 10 ? Date.parse(t) > Date.parse(onceki.izZamani) : t !== '' && t > String(onceki.izZamani).slice(0, 10)
+  const yeni = t.length > 10 ? Date.parse(t) > Date.parse(degisim) : t !== '' && t > String(degisim).slice(0, 10)
   return yeni
     ? { durum: 'olculdu', ...gosterilen, yeniKayit: { iz, izZamani: simdi } }
-    : { durum: 'degisti-bekliyor', ...gosterilen, yeniKayit: onceki }
+    : { durum: 'degisti-bekliyor', ...gosterilen, yeniKayit: { ...onceki, gorulenIz: iz, degisimZamani: degisim } }
 }
 
 const ETIKET = {

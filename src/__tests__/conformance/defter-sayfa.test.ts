@@ -108,9 +108,9 @@ describe('defter-sayfa: kart halleri (kör sayfa değil)', () => {
   })
 
   describe('kaynakIzi (ARC-291): kaynak değişmediyse süre dolsa da bayat değil, AYRI hal', () => {
-    const blok = (satir: string) =>
-      `<!-- DEFTER-OLCUM:envanter BASLA — x -->\n| Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |\n|---|---|---|---|\n${satir}\n<!-- DEFTER-OLCUM:envanter BITIS -->`
-    const metin = (satir: string) => DEFTER.replace('| 1 | 2 |', `| 1 | 2 |\n\n${blok(satir)}`)
+    const blok = (satir: string, uretildi: string) =>
+      `<!-- DEFTER-OLCUM:envanter BASLA — x · Üretildi: ${uretildi} -->\n| Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |\n|---|---|---|---|\n${satir}\n<!-- DEFTER-OLCUM:envanter BITIS -->`
+    const metin = (satir: string, uretildi = '2026-11-30') => DEFTER.replace('| 1 | 2 |', `| 1 | 2 |\n\n${blok(satir, uretildi)}`)
     const TEMIZ = '| Fark | 1165 üründe fark 0 | 2026-11-05 | kaynak değişmedi — son ölçüm 2026-11-05 |'
     const izli = kayit({ olcum: 'node x', kaynakIzi: 'node x --iz' })
 
@@ -124,6 +124,19 @@ describe('defter-sayfa: kart halleri (kör sayfa değil)', () => {
       for (const s of ['| Fark | x | 2026-11-05 | ⚠ kaynak DEĞİŞTİ, ölçüm bekliyor |', '| Adres | x | 2026-11-04 | ⚠ ölçülemedi (iz üretilemedi) |']) {
         expect(ds.sayfaUret(man(izli), okuyucu(metin(s)), '2026-12-01').kartlar[0].hal, s).toBe('bayat')
       }
+    })
+    it('sabotaj (E1): ESKİ blok (betik koşmamış) "kaynak değişmedi" yazsa da BAYAT', () => {
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ, '2026-01-01')), '2026-12-01').kartlar[0].hal).toBe('bayat')
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ, '2026-11-16')), '2026-12-01').kartlar[0].hal).toBe('bayat') // 14 gün + 1
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ, '2026-11-16').replace(/\n/g, '\r\n')), '2026-12-01').kartlar[0].hal).toBe('bayat')
+    })
+    it('sabotaj (E1): yalnız "ölçüldü" satırları kaynak değişmedi anlamına gelmez', () => {
+      const s = '| Dizin | TUTARLI | 2026-12-01 | ölçüldü |'
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(s, '2026-12-01')), '2026-12-01').kartlar[0].hal).toBe('bayat')
+    })
+    it('"ölçüldü" satırı "kaynak değişmedi" satırıyla birlikte olabilir (dizin gibi izsiz kaynak)', () => {
+      const s = `${TEMIZ}\n| Dizin | TUTARLI | 2026-12-01 | ölçüldü |`
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(s, '2026-12-01')), '2026-12-01').kartlar[0].hal).toBe('kaynak-degismedi')
     })
     it('sabotaj: manifestte kaynakIzi yoksa ya da blok yoksa BAYAT; eşik içinde TAZE kalır', () => {
       expect(ds.sayfaUret(man(kayit()), okuyucu(metin(TEMIZ)), '2026-12-01').kartlar[0].hal).toBe('bayat')

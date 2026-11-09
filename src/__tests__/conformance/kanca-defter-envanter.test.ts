@@ -41,20 +41,26 @@ describe('INV-DEFTER-ENVANTER-1 · değerlendirme', () => {
     expect(r.yeniKayit).toBe(onceki)
     expect(E.blok([{ ad: 'k', ...r }], '2026-11-09')).toContain('ölçülemedi')
   })
-  it('sabotaj: iz değişti ama izden sonra yeni sonuç yok → ölçüm bekliyor, kayıt ilerlemez', () => {
-    const onceki = { iz: 'aaa', izZamani: '2026-11-06T09:00:00.000Z' }
-    const r = E.degerlendir(kaynak('bbb'), onceki, SIMDI)
+  it('sabotaj (E2): DEĞİŞİMDEN ÖNCE üretilmiş sonuç yeni ölçüm sayılmaz; değişim anı ilk görülünce kaydedilir', () => {
+    const onceki = { iz: 'aaa', izZamani: '2026-11-05T09:00:00.000Z' }
+    const r = E.degerlendir(kaynak('bbb', { ozet: 'eski', tarih: '2026-11-07T10:00:00.000Z' }), onceki, SIMDI)
     expect(r.durum).toBe('degisti-bekliyor')
-    expect(r.yeniKayit).toBe(onceki)
+    expect(r.yeniKayit).toEqual({ ...onceki, gorulenIz: 'bbb', degisimZamani: SIMDI })
   })
-  it('iz değişti ve izden sonra yeni sonuç var → ölçüldü, kayıt ilerler', () => {
-    const onceki = { iz: 'aaa', izZamani: '2026-11-04T09:00:00.000Z' }
+  it('değişim anı aynı iz sürdükçe SABİT kalır (her koşuda ileri kaymaz)', () => {
+    const onceki = { iz: 'aaa', izZamani: '2026-11-01T09:00:00.000Z', gorulenIz: 'bbb', degisimZamani: '2026-11-06T09:00:00.000Z' }
+    const r = E.degerlendir(kaynak('bbb', { ozet: 'eski', tarih: '2026-11-05T10:00:00.000Z' }), onceki, SIMDI)
+    expect(r.durum).toBe('degisti-bekliyor')
+    expect((r.yeniKayit as { degisimZamani: string }).degisimZamani).toBe('2026-11-06T09:00:00.000Z')
+  })
+  it('değişimden SONRA üretilmiş sonuç var → ölçüldü, kayıt ilerler ve değişim izi temizlenir', () => {
+    const onceki = { iz: 'aaa', izZamani: '2026-11-01T09:00:00.000Z', gorulenIz: 'bbb', degisimZamani: '2026-11-06T09:00:00.000Z' }
     const r = E.degerlendir(kaynak('bbb', { ozet: 'fark 3', tarih: '2026-11-08T10:00:00.000Z' }), onceki, SIMDI)
     expect(r.durum).toBe('olculdu')
     expect(r.yeniKayit).toEqual({ iz: 'bbb', izZamani: SIMDI })
   })
-  it('sabotaj: izle AYNI güne ait belge tarihi (yalnız gün) yeni ölçüm sayılmaz', () => {
-    const onceki = { iz: 'aaa', izZamani: '2026-11-09T08:00:00.000Z' }
+  it('sabotaj: değişimle AYNI güne ait belge tarihi (yalnız gün) yeni ölçüm sayılmaz', () => {
+    const onceki = { iz: 'aaa', izZamani: '2026-11-01T09:00:00.000Z', gorulenIz: 'bbb', degisimZamani: '2026-11-09T08:00:00.000Z' }
     expect(E.degerlendir(kaynak('bbb', { ozet: 'x', tarih: '2026-11-09' }), onceki, SIMDI).durum).toBe('degisti-bekliyor')
     expect(E.degerlendir(kaynak('bbb', { ozet: 'x', tarih: '2026-11-10' }), onceki, SIMDI).durum).toBe('olculdu')
   })

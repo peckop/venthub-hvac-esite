@@ -103,19 +103,25 @@ function kartVerisi(kayit, oku, bugun) {
   if (!v.sonDogrulama) return { ...temel, ...v, hal: 'olculemedi', sebep: '"Son doğrulama" satırı yok ya da biçimsiz' }
   const yas = gunFarki(v.sonDogrulama, bugun)
   if (yas === null) return { ...temel, ...v, hal: 'olculemedi', sebep: '"Son doğrulama" tarihi geçersiz' }
-  if (yas > kayit.tazelikGun && kayit.kaynakIzi && kaynakDegismedi(metin)) return { ...temel, ...v, yas, hal: 'kaynak-degismedi' }
+  if (yas > kayit.tazelikGun && kayit.kaynakIzi && kaynakDegismedi(metin, bugun, kayit.tazelikGun)) return { ...temel, ...v, yas, hal: 'kaynak-degismedi' }
   return { ...temel, ...v, yas, hal: yas > kayit.tazelikGun ? 'bayat' : 'taze' }
 }
 
 /**
- * ARC-291: `kaynakIzi` olan defterde, ölçüm bloğundaki HİÇBİR satır "bekliyor" ya da "ölçülemedi" değilse süre dolsa da bayat sayılmaz
- * (tazelik kaynağa bağlı). Ayrı hal olarak gösterilir, taze ile karışmaz; `Son doğrulama` günü yine görünür (sahte tazelik yasağı).
+ * ARC-291: `kaynakIzi` olan defterde, süre dolsa da bayat sayılmaz YALNIZ şu üç koşul birlikte sağlanırsa (tazelik kaynağa bağlı):
+ *  (1) ölçüm bloğu `tazelikGun` içinde üretilmiş (betik hiç koşmadıysa "değişmedi" iddiası eskidir: denetçi E1),
+ *  (2) hiçbir satır "bekliyor" ya da "ölçülemedi" değil,
+ *  (3) en az bir satır açıkça "kaynak değişmedi" (yalnız "ölçüldü" satırları kaynak değişmedi anlamına gelmez).
+ * Ayrı hal olarak gösterilir, taze ile karışmaz; `Son doğrulama` günü yine görünür (sahte tazelik yasağı).
  */
-function kaynakDegismedi(metin) {
-  const m = /<!-- DEFTER-OLCUM:envanter BASLA[^\n]*-->\r?\n([\s\S]*?)\r?\n<!-- DEFTER-OLCUM:envanter BITIS -->/.exec(metin)
+function kaynakDegismedi(metin, bugun, tazelikGun) {
+  const m = /<!-- DEFTER-OLCUM:envanter BASLA[^\n]*?Üretildi: (\d{4}-\d{2}-\d{2})[^\n]*-->\r?\n([\s\S]*?)\r?\n<!-- DEFTER-OLCUM:envanter BITIS -->/.exec(metin)
   if (!m) return false
-  const satirlar = m[1].split(/\r?\n/).filter((s) => /^\|/.test(s) && !/^\|\s*(Ölçüm|---)/.test(s))
-  return satirlar.length > 0 && satirlar.every((s) => !/bekliyor|ölçülemedi/.test(s))
+  const uretimYasi = gunFarki(m[1], bugun)
+  if (uretimYasi === null || uretimYasi > tazelikGun) return false
+  const satirlar = m[2].split(/\r?\n/).filter((s) => /^\|/.test(s) && !/^\|\s*Ölçüm\s*\|/.test(s) && !/^\|\s*-/.test(s))
+  if (satirlar.length === 0 || satirlar.some((s) => /bekliyor|ölçülemedi/.test(s))) return false
+  return satirlar.some((s) => /kaynak değişmedi/.test(s))
 }
 
 function kac(s) {
