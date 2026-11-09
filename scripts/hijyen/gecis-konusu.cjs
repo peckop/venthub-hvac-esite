@@ -21,17 +21,22 @@ const DEFTER = 'docs/defter/yeni-site-gecis.md'
 const PLAN = 'docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md'
 
 /** `(?<!\p{L})` = kelime başı (JS \b Türkçe harfi kelime saymaz). */
+// Denetçi (ARC-290): "canlıya çıktı mı", "canlıya geçmeden migration", "veri geçiş planı" günlük deploy/migration cümleleridir → YOK.
+// Her kalıp kelime başında başlar; "geçiş" yalnız site/canlı bağlamıyla.
 const GECIS_RE = new RegExp(
-  [
-    'yeni\\s+site',
-    'canl[ıi]ya\\s+(ge[çc]i[şs]|ge[çc]|[çc][ıi]k)',
-    'canl[ıi]\\s+ge[çc]i[şs]',
-    'site\\s+ge[çc]i[şs]i?',
-    'siteye\\s+ge[çc]i[şs]',
-    'ge[çc]i[şs]\\s+(plan[ıi]|konusu|s[üu]reci|tek\\s+resim)',
-    'eski\\s*(?:→|->|-|\\s)\\s*yeni\\s+adres',
-    'adres\\s+e[şs]le[şs]tirme',
-  ].join('|'),
+  '(?<!\\p{L})(?:' +
+    [
+      'yeni\\s+site',
+      'canl[ıi]ya\\s+ge[çc]i[şs]',
+      'canl[ıi]ya\\s+[çc][ıi]k[ıi][şs]',
+      '(?:canl[ıi]|site)\\s+ge[çc]i[şs]',
+      'siteye\\s+ge[çc]i[şs]',
+      '(?:site|canl[ıi])\\s+ge[çc]i[şs]\\p{L}*\\s+(?:plan|konu|s[üu]re[çc])',
+      'ge[çc]i[şs]\\s+tek\\s+resim',
+      'eski\\s*(?:→|->|-|\\s)\\s*yeni\\s+adres',
+      'adres\\s+e[şs]le[şs]tirme',
+    ].join('|') +
+    ')',
   'iu',
 )
 

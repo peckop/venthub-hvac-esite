@@ -34,7 +34,8 @@ describe('INV-KANCA-GECIS-KONUSU-1 · kalıp', () => {
     for (const m of [
       'yeni site için adres şeması nasıl olacak',
       'Canlıya geçiş planı',
-      'canlıya geçelim mi',
+      'canlıya çıkış planı',
+      'site geçiş planı nerede',
       'eski → yeni adres tablosu',
       'siteye geçişte dizin isteği',
     ]) {
@@ -42,7 +43,17 @@ describe('INV-KANCA-GECIS-KONUSU-1 · kalıp', () => {
     }
   })
   it('gündelik "geçiş" cümlelerini YAKALAMAZ; string olmayan girdi çökertmez', () => {
-    for (const m of ['veri geçişi bitti', 'auth geçişi için migration yaz', 'sayfa geçiş animasyonu', 'testler geçti']) {
+    for (const m of [
+      'veri geçişi bitti',
+      'auth geçişi için migration yaz',
+      'sayfa geçiş animasyonu',
+      'testler geçti',
+      'canlıya çıktı mı',
+      'canlıya geçmeden migration kontrol et',
+      'canlıya çıkmadan önce test et',
+      'veri geçiş planı',
+      'auth geçiş süreci',
+    ]) {
       expect(YARDIMCI.gecisMi(m), m).toBe(false)
     }
     expect(YARDIMCI.gecisMi(42)).toBe(false)

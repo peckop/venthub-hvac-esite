@@ -70,9 +70,13 @@ function main() {
       const parca = [uyari(metin), adaylar(metin)].filter(Boolean)
       // ARC-290: OPS aynı geçiş konusunda alt ajan açıyorsa deftere yönlendir (uyarı, blok değil).
       if (g.tool_name === 'Agent') {
-        const gecis = require('node:path').join(__dirname, '..', '..', 'scripts', 'hijyen', 'gecis-konusu.cjs')
-        const s = require(gecis).uyari(`${girdi.description || ''}\n${girdi.prompt || ''}`, g)
-        if (s) parca.unshift(s)
+        try {
+          const gecis = require('node:path').join(__dirname, '..', '..', 'scripts', 'hijyen', 'gecis-konusu.cjs')
+          const s = require(gecis).uyari(`${girdi.description || ''}\n${girdi.prompt || ''}`, g)
+          if (s) parca.unshift(s)
+        } catch {
+          // yönlendirme yardımcısı bozulsa ÖLÇÜM SATIRI / ADAYLAR uyarıları yine basılır
+        }
       }
       if (parca.length) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: parca.join('\n') } }) + '\n')
     } catch {
