@@ -18,6 +18,9 @@ Sitedeki ürün sayıları (ses, ağırlık, devir, fiyat) üreticinin güncel k
 ## Düzenli görevler
 - 6 görev, tetiğe bağlı 6: `docs/roller/KATALOG-gorevler.md`.
 
+## Sürekli defterler
+- katalog-unopim-icerik
+
 ## Dosyalar
 scripts/icerik-hatti/**, scripts/db/product-data/**, catalog-ingestion / csv-import-export / pricing / product-schema standartları; kardeş depo venthub-pdf-ingestor.
 
