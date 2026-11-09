@@ -2448,6 +2448,99 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-67), doğrulanmış metin: taslak v3 (sha 8ec89aeae1e5). Kısa sektör sayfası (cetvel R3.3): markasız gövde, aile adı yalnız girişte, tabloda, "VentHub'da mutfak egzoz fanı için hangi örnek aile sayfası ne yazar?" bölümünde ve Kaynaklar'da.
+    // Doğrulama: tur 1 (v1, tuzaklı 12/12, temiz kopyada engelleyici 0, 4 düzeltme), tur 2 (v2, tuzaklı 14/14, temiz kopyada engelleyici 0, 2 düzeltme) ve v3'te yalnız değişen cümleler müdür okumasıyla; OPS-255 tavanı (3 tur) aşılmadı. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok. Ürün iddiası seçili modelin ürün açıklaması kadar; yazı "restoran" sözcüğünün ürün sayfasında geçmediğini açıkça söyler.
+    kimlik: 'mutfak-restoran-egzoz-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-09',
+    guncellemeTarihi: '2026-11-09',
+    urunler: ['vh:aile/vortice-vort-qbk-sal-kc-evo'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'mutfak-restoran-egzoz-fani-nasil-secilir',
+        ozet: "Mutfak ve restoran egzoz fanı seçerken HSE'nin catering sayfası ve VentHub'ın mutfak davlumbaz egzoz aspiratörü sayfası ne yazar; hangi bilgiler gerekir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Mutfak egzozunda kaynakların neyi yazdığını ve neyin bu yazıdan çıkarılamayacağını görmek için bu rehberden başlayın.",
+        govde: `# Mutfak ve restoran egzoz fanı nasıl seçilir?
+
+HSE'nin catering sıkça sorulan sorular sayfası, mutfakta duman, buhar ve ısının atılmasının genellikle pişirme cihazlarının üstündeki bir kanopi davlumbazla mekanik egzoz yoluyla sağlandığını söyler [1]. Bu yazı mutfak için debi, fan türü ya da model önermez; HSE sayfasında ve VentHub'ın Vortice VORT QBK SAL KC Evo aile sayfasında yazılanları aktarır [1][2].
+
+Kısaca:
+
+- Kaynak: HSE cevabı, pişirmenin duman, buhar ve büyük miktarda ısı üretebileceğini, bunların güvenli bir dış noktaya atılması gerektiğini söyler [1].
+- Yöntem: Cevap, bunun genellikle kanopi davlumbazla mekanik egzozla sağlandığını belirtir [1].
+- Ürün: VentHub aile sayfasında seçili modelin açıklaması, mutfak davlumbaz egzoz sistemleri için tasarlanmış hücreli bir mutfak aspiratörünü anlatır [2].
+
+## Kaynaklar mutfak egzozu için neler yazar?
+
+| Kaynak | Konu | Ne yazıyor |
+|---|---|---|
+| HSE, catering sıkça sorulan sorular | Mutfak havalandırması | Duman, buhar ve ısı güvenli bir dış noktaya atılır; bu genellikle pişirme cihazlarının üstündeki kanopi davlumbazla mekanik egzozla sağlanır [1] |
+| HSE, catering sıkça sorulan sorular | Gaz cihazları için hava girişi | Cevap, gaz cihazları için yeterli tamamlama havası (makeup air) sağlamanın özellikle önemli olduğunu söyler [1] |
+| VentHub, Vortice VORT QBK SAL KC Evo | Seçili modelin ürün açıklaması | Mutfak davlumbaz egzoz sistemleri için özel tasarlanmış hücreli mutfak aspiratörü [2] |
+
+## HSE mutfak havalandırması için ne yazar?
+
+HSE'nin catering sayfasındaki "Ventilation and temperature" bölümü, mutfakta havalandırma gerekip gerekmediğini sorar. Cevap, pişirmenin duman, buhar ve büyük miktarda ısı üretebileceğini, havalandırmanın bunları güvenli bir dış noktaya attığını ve bunun genellikle pişirme cihazlarının üstündeki kanopi davlumbazla mekanik egzozla sağlandığını söyler [1]. Cevap ayrıca gaz cihazları için yeterli tamamlama havası (makeup air) sağlamanın özellikle önemli olduğunu belirtir; hava yetersizliğinin ve hatalı baca düzeninin eksik yanmaya ve karbon monoksit birikimine yol açabileceğini de ekler [1]. Cevabın metninde yağ sözcüğü geçmez [1].
+
+## VentHub'da mutfak egzoz fanı için hangi örnek aile sayfası ne yazar?
+
+[Vortice VORT QBK SAL KC Evo](vh:aile/vortice-vort-qbk-sal-kc-evo) aile sayfasında seçili modelin ürün açıklaması, ürünü "Mutfak davlumbaz egzoz sistemleri için özel tasarlanmış" diye anlatır ve hücreli mutfak aspiratörü olarak tanımlar [2]. Sayfa 21 model listeler; yol ağacında Fanlar ve Radyal (Santrifüj) Fanlar kategorileri görünür [2]. Sayfanın görünür metni yağ, is ve restoran sözcüklerini içermez [2]. Fiyat gösterilmez, teklif istenir [2].
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı bir girdi listesi vermez; aşağıdaki yazılar seçim girdilerine ve fan türlerine yönlendirir. VentHub teklif formunun hangi alanları istediği bu yazıda ölçülmemiştir:
+
+- Debi, basınç ve sistem yerleşimi: [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+- Hücreli aspiratörün ne olduğu: [hücreli aspiratör nedir](vh:yazi/hucreli-aspirator-nedir) yazısına bakılabilir.
+
+## Mutfak egzoz fanı yazısının sınırları nelerdir?
+
+- Kaynak HSE sayfasıdır [1]; bu yazı Türkiye'deki yükümlülükleri belirlemez.
+- HSE cevabından seçilen cümleler aktarılmıştır; cevabın yönlendirdiği mutfak havalandırması bilgi notu (CAIS10) bu yazıda incelenmemiştir.
+- Ürün sayfasının görünür metni yağ ve restoran sözcüklerini içermez [2]; ürünün bir restoran mutfağında kullanılıp kullanılamayacağı sayfanın görünür metninden çıkarılamaz. Sayfanın meta açıklaması, ailenin yağ ve is yüklü havanın işlenmesine uygun olduğunu söyler [2]; bu yazı o ifadeyi ürün özelliği olarak aktarmaz.
+- VentHub'ın diğer aile sayfaları bu yazıda taranmamıştır.
+
+## Mutfak egzozu için hangi yazılara bakılabilir?
+
+Fan türlerinin genel tanıtımı için [fan çeşitleri](vh:yazi/fan-cesitleri), çatı tipi fanlar için [çatı tipi fan nedir](vh:yazi/cati-tipi-fan-nedir) yazısına bakılabilir.
+
+## Sık sorulan sorular
+
+### HSE mutfakta havalandırma için ne yazıyor?
+
+Cevap, pişirmenin duman, buhar ve büyük miktarda ısı üretebileceğini söyler; havalandırmanın bunları güvenli bir dış noktaya attığını ve bunun genellikle pişirme cihazlarının üstündeki kanopi davlumbazla mekanik egzozla sağlandığını belirtir [1].
+
+### Restoran mutfağı için hangi fan kullanılır?
+
+Bu yazı bir fan türü ya da model önermez. VentHub aile sayfasında seçili modelin açıklaması, mutfak davlumbaz egzoz sistemleri için tasarlanmış hücreli bir mutfak aspiratörünü anlatır; sayfanın görünür metni restoran sözcüğünü içermez [2].
+
+### Mutfak egzozu için kaç fan gerekir?
+
+Bu yazı debi ya da fan adedi vermez; seçim girdileri için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+### Hücreli mutfak aspiratörü nedir?
+
+Bu yazı hücreli aspiratörü tanıtmaz; [hücreli aspiratör nedir](vh:yazi/hucreli-aspirator-nedir) yazısına bakılabilir.
+
+### Mutfak egzoz fanının fiyatı nedir?
+
+Bu yazıda incelenen aile sayfasında fiyat gösterilmez, teklif istenir [2].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Frequently asked questions (Catering and hospitality), "Ventilation and temperature". https://www.hse.gov.uk/catering/faqs.htm (erişim 09.11.2026)
+2. VentHub, Vortice VORT QBK SAL KC Evo aile sayfası, canlı sitede 9 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/products/vortice-vort-qbk-sal-kc-evo
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */

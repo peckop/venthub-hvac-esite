@@ -53,6 +53,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['vortice-vort-e-atex-fanlar', 'Vortice VORT-E ATEX Fanlar'],
     // BLG-65 (2026-11): depo yazısı: Nordik HVLS Hyperblade aile sayfası canlıda 200 verir (9 Kasım ölçümü; ürün sayfası).
     ['vortice-nordik-hvls-hyperblade', 'Vortice Nordik HVLS Hyperblade'],
+    // BLG-67 (2026-11): mutfak yazısı: VORT QBK SAL KC Evo aile sayfası canlıda 200 verir (9 Kasım ölçümü; ürün sayfası).
+    ['vortice-vort-qbk-sal-kc-evo', 'Vortice VORT QBK SAL KC Evo'],
     // BLG-55 (2026-11): aile sayfaları canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
     ['vortice-punto-evo-flexo-banyo-fanlari', 'Vortice Punto Evo Flexo Banyo Fanları'],
     ['vortice-vort-quadro-evo', 'Vortice VORT Quadro Evo'],
