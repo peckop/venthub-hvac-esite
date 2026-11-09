@@ -71,6 +71,6 @@ var, aynı dosya iki kayıtta yok, `aktif` kaydın `olcum`'u dolu, şema alanlar
 | Defter | Sahip | Durum |
 |---|---|---|
 | urun-adres | URUN | Planlı: pilot, canlı adres şemasıyla başlar (URN-157 geçiş tablosu "Sırada"da) |
-| geo-seo-dizin | GEO-SEO | Planlı: pilot, mevcut dizin-takip parçalarını çatıda toplar |
+| geo-seo-dizin | GEO-SEO | Pilot (SEO-101): depo-güvenli özet, `olcum` = `node scripts/seo/dizin-defter-kontrol.mjs` (arşivdeki son anlık görüntüyle sayı karşılaştırır; ham veri depoya girmez) |
 
 Yeni defter eklemek: önce manifest kaydı (`durum: planli`), sonra dosya, sonra `pilot`/`aktif`.
