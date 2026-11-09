@@ -2161,6 +2161,105 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-64), doğrulanmış metin: taslak v3 (sha 9de18fae60bc). Kısa sektör sayfası (cetvel R3.3): markasız gövde, aile adları yalnız "VentHub'da atölye fanı için hangi örnek aile sayfaları endüstriyel kullanım yazar?" bölümünde, tabloda ve Kaynaklar'da.
+    // Doğrulama: tur 1 (v1, tuzaklı 10/10, 1 engelleyici + düzeltmeler), tur 2 (v2, tuzaklı 10/10, engelleyici 0) ve v3'te yalnız değişen üç cümle müdür okumasıyla; OPS-255 tavanı (3 tur) aşılmadı. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok. Ürün iddiası yalnız iki aile sayfasında birebir yazan açıklama cümleleri.
+    kimlik: 'atolye-havalandirma-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-09',
+    guncellemeTarihi: '2026-11-09',
+    urunler: ['vh:aile/vortice-aksiyel-endustriyel-fanlar', 'vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'atolye-havalandirma-fani-nasil-secilir',
+        ozet: "Atölye havalandırma fanı seçerken HSE'nin işyeri havalandırması sayfası ve VentHub aile sayfaları ne yazar; hangi bilgiler gerekir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Atölye fanında kaynakların neyi yazdığını ve neyin bu yazıdan çıkarılamayacağını görmek için bu rehberden başlayın.",
+        govde: `# Atölye havalandırma fanı nasıl seçilir?
+
+HSE'nin işyeri havalandırması sayfası, mekanik havalandırmanın fanla odalara hava verdiğini ve odalardan hava aldığını yazar; kaynak dumanı ve prosesin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılmasını ise kapsamadığını belirtir [1]. Bu yazı atölye için debi ya da fan türü önermez; HSE sayfasının bu cümlelerini ve VentHub aile sayfalarının endüstriyel hacimler için yazdıklarını aktarır [1][2].
+
+Kısaca:
+
+- Mekanik havalandırma: HSE, fanların odalara hava vermek ve odalardan hava almak için kullanıldığını yazar [1].
+- Kapsam: HSE sayfası, kaynak dumanı ve prosesin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılmasını kapsamadığını belirtir [1].
+- Ürün: bu yazıda incelenen VentHub aksiyel ve radyal fan aile sayfaları ticari ve endüstriyel kullanım cümleleri taşır; atölye sözcüğü bu sayfalarda geçmez [2].
+
+## Kaynaklar atölye havalandırması için neler yazar?
+
+| Kaynak | Konu | Ne yazıyor |
+|---|---|---|
+| HSE, işyeri havalandırması | Mekanik havalandırma | Mekanik havalandırma odalara hava vermek ve odalardan hava almak için fan kullanır [1] |
+| HSE, işyeri havalandırması | Kapsam | Sayfa, kaynak dumanı ve prosesin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılmasını kapsamaz; bu konu için COSHH ve yerel egzoz havalandırması rehberlerine yönlendirir [1] |
+| VentHub, Vortice aksiyel endüstriyel fanlar | Aile açıklaması | Ticari ve endüstriyel hacimlerin havalandırması için tasarlanmış, duvar tipi endüstriyel aksiyel fan ailesi [2] |
+| VentHub, Nicotra Gebhardt RDH radyal fanlar | Aile açıklaması | Ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için tasarlanmış radyal fan [2] |
+
+## HSE sayfası atölye havalandırması için ne yazar?
+
+HSE'nin işyeri havalandırması sayfası, mekanik havalandırmanın odalara hava vermek ve odalardan hava almak için fan kullandığını yazar [1]. Aynı sayfa, kaynak dumanı ve prosesin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılmasını kapsamadığını söyler ve bu konu için COSHH ile yerel egzoz havalandırması rehberlerine yönlendirir [1]. Atölyede boya işlemi varsa [boyahane havalandırma fanı](vh:yazi/boyahane-havalandirma-fani-secimi) yazısına bakılabilir.
+
+## Atölye fanı için hangi yazılara bakılabilir?
+
+Fan türlerinin genel tanıtımı için [fan çeşitleri](vh:yazi/fan-cesitleri), radyal ve aksiyel fan karşılaştırması için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi), çatıya oturan fanlar için [çatı tipi fan](vh:yazi/cati-tipi-fan-nedir), gürültü için [sessiz fan seçimi](vh:yazi/sessiz-fan-secimi) yazılarına bakılabilir.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez; incelenen aile sayfalarında fiyat gösterilmez, teklif istenir [2]. Aşağıdaki girdiler fan seçiminin genel girdileridir; VentHub teklif formunun hangi alanları istediği bu yazıda ölçülmemiştir:
+
+- Atölyede kaynak dumanı ya da toz gibi zararlı madde üreten bir işlem olup olmadığı: HSE bu maddelerin uzaklaştırılmasını işyeri havalandırması sayfasının kapsamı dışında bırakır [1].
+- Debi, basınç ve sistem yerleşimi: seçim girdileri için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+- Taşınacak havanın özellikleri: [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısı hava özelliklerini seçimin girdileri arasında sayar.
+
+## Atölye fanı yazısının sınırları nelerdir?
+
+- Kaynak HSE sayfasıdır [1]; bu yazı Türkiye'deki yükümlülükleri belirlemez.
+- HSE sayfası zararlı maddelerin uzaklaştırılmasını kapsamadığını yazar [1]; bu yazı yerel egzoz sistemi tasarlamaz.
+- Aile sayfalarının açıklama metinleri alıntılanmıştır [2]; ayrı model sayfaları bu yazıda taranmamıştır.
+- Bu yazıda incelenen aile sayfalarında atölye sözcüğü geçmez [2].
+
+## VentHub'da atölye fanı için hangi örnek aile sayfaları endüstriyel kullanım yazar?
+
+[Vortice aksiyel endüstriyel fanlar](vh:aile/vortice-aksiyel-endustriyel-fanlar) aile sayfasının açıklama alanı, ailenin "ticari ve endüstriyel hacimlerin havalandırması için tasarlanmış, farklı çaplarda, monofaze ve trifaze sürümleri bulunan duvar tipi endüstriyel aksiyel fan ailesi" olduğunu yazar [2]. [Nicotra Gebhardt RDH radyal fanlar](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) aile sayfası, "ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için özel olarak dizayn edilmiştir" der [2]. Bu sayfalar atölyeyi anmaz; bir atölyede kullanılıp kullanılamayacakları sayfalardan çıkarılamaz.
+
+## Sık sorulan sorular
+
+### HSE'nin işyeri havalandırması sayfası kaynak dumanını kapsıyor mu?
+
+Hayır. Sayfa, kaynak dumanı ve prosesin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılmasını kapsamadığını yazar ve bu konu için COSHH ile yerel egzoz havalandırması rehberlerine yönlendirir [1].
+
+### Mekanik havalandırma nedir?
+
+HSE'ye göre mekanik havalandırma, odalara hava vermek ve odalardan hava almak için fan kullanır [1].
+
+### Atölye için kaç fan gerekir?
+
+Bu yazı debi ya da fan adedi vermez; seçim girdileri için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+### Atölyede boya işlemi varsa ne yapılır?
+
+Boya işlemi için kaynakların yazdıkları [boyahane havalandırma fanı](vh:yazi/boyahane-havalandirma-fani-secimi) yazısında ayrıca toplanmıştır.
+
+### Atölye fanının fiyatı nedir?
+
+Bu yazıda incelenen aile sayfalarında fiyat gösterilmez, teklif istenir [2].
+
+### VentHub'da atölye için hangi fan var?
+
+Bu yazıda incelenen aksiyel ve radyal aile sayfaları atölye için bir seri belirtmez; endüstriyel hacimler ve sistemler için kullanım cümleleri yazar [2].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Ventilation in the workplace, Overview. https://www.hse.gov.uk/ventilation/index.htm (erişim 09.11.2026)
+2. VentHub, Vortice aksiyel endüstriyel fanlar (açıklama alanı) ve Nicotra Gebhardt RDH radyal fanlar aile sayfaları, canlı sitede 9 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/products/vortice-aksiyel-endustriyel-fanlar , https://venthub.com.tr/tr/products/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */

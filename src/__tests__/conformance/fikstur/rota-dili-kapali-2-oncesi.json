@@ -361,6 +361,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/atolye-havalandirma-fani-nasil-secilir",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -614,6 +618,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/boyahane-havalandirma-fani-nasil-secilir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/atolye-havalandirma-fani-nasil-secilir",
         "alternates": null
       },
       {
