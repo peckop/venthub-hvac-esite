@@ -81,6 +81,16 @@ function calistir() {
   }
   if (girdi.tool_name !== ARAC_ADI) return
   const satirlar = hesapla(girdi.tool_input)
+  // ARC-290: OPS geçiş/yeni site konusunda kart açıyorsa deftere yönlendir (uyarı, blok değil; yalnız add_task).
+  try {
+    const ti = girdi.tool_input || {}
+    if (ti.action === 'add_task') {
+      const s = require(path.join(KOK, 'scripts', 'hijyen', 'gecis-konusu.cjs')).uyari(`${ti.title || ''}\n${ti.description || ''}`, girdi)
+      if (s) satirlar.unshift(s)
+    }
+  } catch {
+    // yönlendirme yardımcısı okunamadı: kart yine açılır
+  }
   if (!satirlar.length) return
   try {
     fs.writeSync(
