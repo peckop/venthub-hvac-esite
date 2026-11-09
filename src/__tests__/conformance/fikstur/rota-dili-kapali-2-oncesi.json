@@ -373,6 +373,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/mutfak-egzoz-fani-nasil-secilir",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/category/fanlar",
         "alternates": null
       },
@@ -638,6 +642,10 @@
       },
       {
         "url": "http://localhost:3000/tr/bilgi-merkezi/demir-celik-tesisi-isi-kontrolu-havalandirma-kaynaklari",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/mutfak-egzoz-fani-nasil-secilir",
         "alternates": null
       },
       {
