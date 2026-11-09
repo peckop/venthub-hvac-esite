@@ -12,6 +12,8 @@
 
 ## 0. Kapsam: bu cetvel neyi yönetir, neyi yönetmez
 
+> **Yeni site notu (9 Kasım 2026, URN-159 sonrası, ALT-179):** yeni sitenin adres şeması (2 Kasım tek önek kararı: TR `/tr/urunler`, `/tr/uygulama-alanlari`, `/tr/rehber`; EN `/en/products`, `/en/applications`, `/en/guides`) **bu cetvelde ve `rotaDili.veri.json` tablosunda YOKTUR**: tek kaynak `adres-semasi-standard.md` (v0.3). Bu cetvel ve §4 tablosu **eski sitenin** 11 statik sayfasını yönetir; yeni site sıfırdan kurulacağı için eski site koduna yeni önek işlenmez (karar 412). Yeni sitede statik sayfa adresleri yazılırken bu cetvelin kuralları (R1…R8, kapılar) ölçülüp yeniden benimsenir ya da `adres-semasi-standard.md` içine alınır; o karar ayrı bir iştir. Bugün için: eski siteyi etkileyen bir değişiklik yok.
+
 | Yönetir (Aşama 1) | Yönetmez |
 |---|---|
 | Veriden bağımsız **statik sayfalar**, yalnız **bugün sayfası (`page.tsx`) olan klasörler** (§4: Design listesinden 27 sayfanın 8'i; kalanı neden girmediğiyle §4'te) | Kategori / dal / aile / marka / model adresleri: **K3B hattı** (`adres-semasi-standard.md`, `adresUret`) |
