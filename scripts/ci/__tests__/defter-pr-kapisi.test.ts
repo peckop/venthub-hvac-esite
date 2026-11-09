@@ -98,8 +98,20 @@ const GEO: Kayit = { ...URUN, ad: 'geo-seo-dizin', dosya: 'docs/defter/geo-seo-d
 const MANIFEST = { defterler: [URUN, GEO] }
 const UYGUN_SEBEP = 'Defter-gerekmez: yalnız biçim düzeltmesi, adres kuralı değişmedi'
 
-function defter(tarih: string | null): string {
-  return tarih ? `# Adres defteri\n\n**Son doğrulama:** ${tarih}\n\nİçerik.\n` : '# Adres defteri\n\nİçerik.\n'
+function defter(tarih: string | null, govde = 'İçerik.'): string {
+  return tarih ? `# Adres defteri
+
+**Son doğrulama:** ${tarih}
+
+${govde}
+` : `# Adres defteri
+
+${govde}
+`
+}
+/** Aynı defterin gövdesi değişmiş yeni sürümü (gerçek bir güncelleme). */
+function yeni(tarih: string | null): string {
+  return defter(tarih, 'Güncellenmiş içerik.')
 }
 
 function karar(g: Partial<Girdi>): Sonuc {
@@ -122,10 +134,14 @@ function denetle(m: Kapi): string[] {
   dene('geçerli istisna muaf eder', () => g({ degisenYollar: ['next.config.mjs'], govde: UYGUN_SEBEP }).durum === 'yesil')
   dene('kısa istisna ihlal', () => g({ degisenYollar: ['next.config.mjs'], govde: 'Defter-gerekmez: kısa' }).ihlaller.some((i) => i.tur === 'istisna-kisa'))
   dene('defter değişti ve tarih ilerledi -> yeşil', () =>
-    g({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-01'), sonraki: defter('2026-11-09') } } }).durum === 'yesil')
+    g({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-01'), sonraki: yeni('2026-11-09') } } }).durum === 'yesil')
   dene('tarih ilerlemedi -> ihlal', () =>
     g({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-09'), sonraki: defter('2026-11-09') } } }).ihlaller.some((i) => i.tur === 'son-dogrulama-ilerlemedi'))
   dene('bot muaf', () => g({ degisenYollar: ['next.config.mjs'], yazar: 'dependabot[bot]' }).durum === 'atlandi')
+  dene('yalnız tarih değişti (gövde aynı) -> sahte tazelik ihlali', () =>
+    g({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-01'), sonraki: defter('2026-11-09') } } }).ihlaller.some((i) => i.tur === 'son-dogrulama-sahte'))
+  dene('defter dosyası başka defterin izlenen yolu değildir', () =>
+    g({ manifest: { defterler: [{ ...URUN, izlenen: ['docs/**'] }, { ...GEO, izlenen: ['docs/defter/**'] }] }, degisenYollar: [GEO.dosya], defterMetinleri: { [GEO.dosya]: { onceki: defter('2026-11-01'), sonraki: yeni('2026-11-09') } } }).ihlaller.length === 0)
   dene('değişen dosya okunamadı -> ölçülemedi', () => g({ degisenYollar: null }).durum === 'olculemedi')
   dene('UYARI kipi kırmaz', () => m.cikisKodu(g({ degisenYollar: ['next.config.mjs'], kip: 'uyari' })) === 0)
   dene('UYARI kipinde ölçülemedi de kırmaz', () => m.cikisKodu(g({ degisenYollar: null, kip: 'uyari' })) === 0)
@@ -147,6 +163,9 @@ describe('INV-DEFTER-PR-KAPISI-1 · glob, istisna, tarih (saf)', () => {
     expect(kapi.globEsle('docs/seo/**', 'docs/seo/a/b/c.md')).toBe(true)
     expect(kapi.globEsle('docs/seo/', 'docs/seo/a.md')).toBe(true)
     expect(kapi.globEsle('docs/seo/**', 'docs/seo')).toBe(false)
+    expect(kapi.globEsle('src/**/x.ts', 'src/x.ts')).toBe(true) // `**/` sıfır dizin
+    expect(kapi.globEsle('src/**/x.ts', 'src/a/b/x.ts')).toBe(true)
+    expect(kapi.globEsle('src/**/x.ts', 'src/abx.ts')).toBe(false) // `**/` dizin sınırı korur
     expect(kapi.globEsle('a?.ts', 'ab.ts')).toBe(true)
     expect(kapi.globEsle('a.b', 'aXb')).toBe(false) // nokta düz metin, her karakter DEĞİL
     expect(kapi.globEsle('docs\\seo\\x.md', 'docs/seo/x.md')).toBe(true) // ters eğik çizgi normalleşir
@@ -251,7 +270,7 @@ describe('INV-DEFTER-PR-KAPISI-1 · karar', () => {
   it('YAKALAR: iki defter, yalnız biri güncel', () => {
     const s = karar({
       degisenYollar: ['next.config.mjs', URUN.dosya, 'scripts/seo/dizin-takip.mjs'],
-      defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-01'), sonraki: defter('2026-11-09') } },
+      defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-01'), sonraki: yeni('2026-11-09') } },
     })
     expect(s.ihlaller.map((i) => i.defter)).toEqual(['geo-seo-dizin'])
     expect(s.kapsam).toMatchObject({ kesisen: 2, uyumlu: 1, ihlalli: 1 })
@@ -259,7 +278,7 @@ describe('INV-DEFTER-PR-KAPISI-1 · karar', () => {
 
   it('GEÇİRİR: ilgisiz PR, güncel defter, geçerli istisna, bot, emekli kayıt, manifest yok', () => {
     expect(karar({ degisenYollar: ['src/app/x.tsx'] })).toMatchObject({ durum: 'yesil', neden: 'ilgisiz-pr' })
-    expect(karar({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: null, sonraki: defter('2026-11-09') } } }).durum).toBe('yesil')
+    expect(karar({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: null, sonraki: yeni('2026-11-09') } } }).durum).toBe('yesil')
     const istisnali = karar({ degisenYollar: ['next.config.mjs'], govde: UYGUN_SEBEP })
     expect(istisnali).toMatchObject({ durum: 'yesil', kapsam: { muaf: 1 }, istisna: { kullanildi: true } })
     expect(karar({ degisenYollar: ['next.config.mjs'], yazar: 'dependabot[bot]' })).toMatchObject({ durum: 'atlandi', neden: 'bot' })
@@ -276,17 +295,53 @@ describe('INV-DEFTER-PR-KAPISI-1 · karar', () => {
   it('tarih kuralı: yok, ilerlemedi, PR gününden geri, gelecek; yeni dosyada önceki tarih aranmaz', () => {
     const tur = (onceki: string | null, sonraki: string | null, ek: Partial<Girdi> = {}): string[] =>
       karar({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki, sonraki } }, ...ek }).ihlaller.map((i) => i.tur)
-    expect(tur(defter('2026-11-01'), defter(null))).toEqual(['son-dogrulama-yok'])
+    expect(tur(defter('2026-11-01'), yeni(null))).toEqual(['son-dogrulama-yok'])
     expect(tur(defter('2026-11-09'), defter('2026-11-09'))).toEqual(['son-dogrulama-ilerlemedi'])
     expect(tur(defter('2026-11-09'), defter('2026-11-05'))).toEqual(['son-dogrulama-ilerlemedi'])
-    expect(tur(defter('2026-10-01'), defter('2026-11-05'))).toEqual(['son-dogrulama-geri'])
-    expect(tur(defter('2026-11-01'), defter('2026-11-12'))).toEqual(['son-dogrulama-gelecek'])
-    expect(tur(null, defter('2026-11-09'))).toEqual([])
-    expect(tur(defter('2026-11-01'), defter('2026-11-09'))).toEqual([])
+    expect(tur(defter('2026-10-01'), yeni('2026-11-05'))).toEqual(['son-dogrulama-geri'])
+    expect(tur(defter('2026-11-01'), yeni('2026-11-12'))).toEqual(['son-dogrulama-gelecek'])
+    expect(tur(null, yeni('2026-11-09'))).toEqual([])
+    expect(tur(defter('2026-11-01'), yeni('2026-11-09'))).toEqual([])
+  })
+
+  it('SAHTE TAZELİK: yalnız tarih satırı değişir, gövde aynıysa ihlal (plan §6.3); gövde değişince geçer', () => {
+    const t = (sonraki: string) =>
+      karar({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-01'), sonraki } } }).ihlaller.map((i) => i.tur)
+    expect(t(defter('2026-11-09'))).toEqual(['son-dogrulama-sahte'])
+    expect(t(defter('2026-11-09').replace(/\n/g, '\r\n'))).toEqual(['son-dogrulama-sahte']) // CRLF aynı sayılır
+    expect(t(yeni('2026-11-09'))).toEqual([])
+  })
+
+  it('SAAT DİLİMİ: Türkiye gece yarısı (UTC bir gün geride) ve bir gün önce açılan PR yanlış alarm vermez; iki gün sapma verir', () => {
+    const t = (tarih: string, ek: Partial<Girdi> = {}) =>
+      karar({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-10-01'), sonraki: yeni(tarih) } }, ...ek }).ihlaller.map((i) => i.tur)
+    expect(t('2026-11-10')).toEqual([]) // bugün 11-09 UTC, yazar 11-10 yazdı
+    expect(t('2026-11-11')).toEqual(['son-dogrulama-gelecek'])
+    expect(t('2026-11-08')).toEqual([]) // PR 11-09'da açıldı, defter bir gün önce doğrulandı
+    expect(t('2026-11-07')).toEqual(['son-dogrulama-geri'])
+  })
+
+  it('defter dosyası başka defterin izlenen globuna girse de zincir alarmı vermez (D2)', () => {
+    const m = { defterler: [{ ...URUN, izlenen: ['docs/**'] }, { ...GEO, izlenen: ['docs/defter/**'] }] }
+    const s = karar({ manifest: m, degisenYollar: [GEO.dosya], defterMetinleri: { [GEO.dosya]: { onceki: defter('2026-11-01'), sonraki: yeni('2026-11-09') } } })
+    expect(s.ihlaller).toEqual([])
+  })
+
+  it('bot: her [bot] hesabı muaf (github-actions[bot] dahil)', () => {
+    expect(karar({ degisenYollar: ['next.config.mjs'], yazar: 'github-actions[bot]' }).durum).toBe('atlandi')
+    expect(karar({ degisenYollar: ['next.config.mjs'], yazar: 'baska-uygulama[bot]' }).durum).toBe('atlandi')
+    expect(karar({ degisenYollar: ['next.config.mjs'], yazar: 'bot-gibi-insan' }).durum).toBe('uyari')
+  })
+
+  it('annotation başlığında , ve : kaçar (özellik ayırıcı)', () => {
+    const s = karar({ manifest: { defterler: [{ ...URUN, ad: 'x,y:z', dosya: 'docs/defter/x.md', izlenen: ['/mutlak'] }] }, degisenYollar: ['a'] })
+    const baslik = kapi.satirlar(s).find((x) => x.startsWith('::warning '))!
+    const ozellik = baslik.slice(0, baslik.indexOf('::', 3))
+    expect(ozellik).not.toMatch(/title=.*[,:].*$/)
   })
 
   it('tarih ihlali de geçerli istisnayla muaf olur (defter gerekmediyse tarih de gerekmez)', () => {
-    const s = karar({ degisenYollar: ['next.config.mjs', URUN.dosya], govde: UYGUN_SEBEP, defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-09'), sonraki: defter('2026-11-09') } } })
+    const s = karar({ degisenYollar: ['next.config.mjs', URUN.dosya], govde: UYGUN_SEBEP, defterMetinleri: { [URUN.dosya]: { onceki: defter('2026-11-09'), sonraki: yeni('2026-11-09') } } })
     expect(s.durum).toBe('yesil')
   })
 
@@ -346,7 +401,7 @@ describe('INV-DEFTER-PR-KAPISI-1 · main (ortam girişi)', () => {
       okuManifest: () => MANIFEST,
       degisenYollar: () => ['next.config.mjs'],
       depoDosyalari: () => ['next.config.mjs'],
-      okuSonraki: () => defter('2026-11-09'),
+      okuSonraki: () => yeni('2026-11-09'),
       okuOnceki: () => defter('2026-11-01'),
       yaz: (m) => cikti.push(m),
       ozetYaz: (_y, m) => ozet.push(m),
@@ -422,7 +477,8 @@ describe('INV-DEFTER-PR-KAPISI-1 · ci.yml bağlantısı', () => {
 
   it('yalnız pull_request olayında koşar ve BLOKLAMAZ (continue-on-error), kip uyari', () => {
     expect(yorumsuz).toContain("if: github.event_name == 'pull_request'")
-    expect(yorumsuz).toContain('continue-on-error: true')
+    // `continue-on-error` YOK: INV-CI-EDITED-1 sınıflı adımda yasaklar; uyarı kipinde çıkış hep 0 olduğu için gerekmez.
+    expect(yorumsuz).not.toContain('continue-on-error')
     expect(yorumsuz).toMatch(/DEFTER_KAPISI_KIP:\s*uyari\s*$/m)
   })
 
@@ -447,7 +503,9 @@ describe('INV-DEFTER-PR-KAPISI-1 · SABOTAJ (her hatalı kopya en az bir kontrol
     { ad: 'defter değişmedi yakalanmaz', eski: 'if (!dokunuldu) {', yeni: 'if (false) {' },
     { ad: 'istisna her şeyi muaf eder', eski: 'if (istisna.gecerli) { kapsam.muaf++; istisnaKullanildi = true; continue; }\n      kapsam.ihlalli++;\n      ihlaller.push({ defter: k.ad, tur: \'defter-degismedi\'', yeni: 'if (true) { kapsam.muaf++; istisnaKullanildi = true; continue; }\n      kapsam.ihlalli++;\n      ihlaller.push({ defter: k.ad, tur: \'defter-degismedi\'' },
     { ad: 'tarih ilerlemedi geçer (<= yerine <)', eski: 'yeni <= eski', yeni: 'yeni < eski' },
-    { ad: 'bot muaf değil', eski: "BOT_YAZARLAR.has(String(girdi.yazar || '').toLowerCase())", yeni: 'false' },
+    { ad: 'bot muaf değil', eski: 'BOT_YAZARLAR.has(yazarKucuk) || BOT_KALIBI.test(yazarKucuk)', yeni: 'false' },
+    { ad: 'sahte tazelik (yalnız tarih) geçer', eski: "gövdeSansTarih(m.onceki) === gövdeSansTarih(m.sonraki)", yeni: 'false' },
+    { ad: 'defter dosyası başka defterin izlenen yolu sayılır', eski: '!defterDosyalari.has(y) &&', yeni: '' },
     { ad: 'UYARI kipi de kırar', eski: "if (s.kip !== 'kirmizi') return 0;", yeni: '' },
     { ad: 'ölçülemedi yeşil sayılır', eski: "return sonuc('olculemedi', 'degisen-dosya-okunamadi', { istisna });", yeni: "return sonuc('yesil', 'x');" },
     { ad: 'istisna sebebi uzunluğa bakmaz', eski: 'const ISTISNA_MIN_SEBEP = 20;', yeni: 'const ISTISNA_MIN_SEBEP = 1;' },

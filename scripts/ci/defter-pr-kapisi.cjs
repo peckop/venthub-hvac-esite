@@ -39,7 +39,8 @@ const ATLANAN_DURUMLAR = ['planli', 'emekli'];
 const ISTISNA_ANAHTARI = 'Defter-gerekmez';
 const ISTISNA_MIN_SEBEP = 20;
 const GENIS_GLOB_ESIGI = 100;
-const BOT_YAZARLAR = new Set(['dependabot[bot]', 'renovate[bot]']);
+const BOT_YAZARLAR = new Set(['dependabot[bot]', 'renovate[bot]', 'github-actions[bot]']);
+const BOT_KALIBI = /\[bot\]$/i;
 const GUN_KALIBI = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Kod çitleri ve HTML yorumlarındaki satırlar sayılmaz (şablon örneği kapıyı geçirmesin). */
@@ -79,9 +80,11 @@ function globRegex(glob) {
     const c = g[i];
     if (c === '*') {
       if (g[i + 1] === '*') {
-        r += '.*';
         i++;
-        if (g[i + 1] === '/') i++;
+        if (g[i + 1] === '/') {
+          r += '(?:.*/)?'; // `a/**/b`: sıfır ya da daha çok dizin (`a/b` ve `a/x/y/b`), `a/xb` DEĞİL
+          i++;
+        } else r += '.*';
       } else r += '[^/]*';
     } else if (c === '?') r += '[^/]';
     else r += c.replace(/[.+^${}()|[\]\\]/g, '\\$&');
@@ -152,6 +155,25 @@ function sonDogrulamaOku(metin) {
   return e ? e[1] : null;
 }
 
+/** Saat dilimi farkı (yazar Türkiye saatiyle gece yarısı, CI UTC) yanlış alarm üretmesin: tarih kuralları ±1 gün toleranslı. */
+const GUN_TOLERANSI = 1;
+
+function gunKaydir(gun, n) {
+  const d = new Date(`${gun}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Defter gövdesi, `Son doğrulama` satırları çıkarılmış hâliyle (yalnız tarih basarak sahte tazelik ayrımı için). */
+function gövdeSansTarih(metin) {
+  return String(metin || '')
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .filter((s) => !/^[ \t>*_-]*Son do[ğg]rulama[ \t*_]*:/i.test(s))
+    .join('\n')
+    .trim();
+}
+
 /**
  * Karar. Saf: dosya sistemi, git ve ağ YOK.
  * girdi: { manifest, degisenYollar, govde, yazar, prAcilisGunu, bugun, defterMetinleri, depoDosyalari, kip }
@@ -162,7 +184,8 @@ function degerlendir(girdi) {
   const bos = { kontrolEdilen: 0, kesisen: 0, uyumlu: 0, ihlalli: 0, muaf: 0 };
   const sonuc = (durum, neden, ekstra) => ({ kip, durum, neden, ihlaller: [], istisna: { var: false, gecerli: false, sebepUzunlugu: 0 }, kapsam: { ...bos }, ...ekstra });
 
-  if (BOT_YAZARLAR.has(String(girdi.yazar || '').toLowerCase())) return sonuc('atlandi', 'bot');
+  const yazarKucuk = String(girdi.yazar || '').toLowerCase();
+  if (BOT_YAZARLAR.has(yazarKucuk) || BOT_KALIBI.test(yazarKucuk)) return sonuc('atlandi', 'bot');
   if (girdi.manifest === null || girdi.manifest === undefined) return sonuc('atlandi', 'manifest-yok');
   const istisna = istisnaBul(girdi.govde);
   const ayik = manifestiAyikla(girdi.manifest, girdi.depoDosyalari);
@@ -177,11 +200,13 @@ function degerlendir(girdi) {
 
   for (const s of ayik.sorunlu) ihlaller.push({ defter: s.ad, tur: 'manifest-gecersiz', mesaj: s.sorunlar.join('; ') });
 
+  const defterDosyalari = new Set(ayik.gecerli.map((k) => yolNormallestir(k.dosya)));
   let istisnaKullanildi = false;
   for (const k of ayik.gecerli) {
     if (ATLANAN_DURUMLAR.includes(k.durum)) continue;
     const dosya = yolNormallestir(k.dosya);
-    const kesisen = degisen.filter((y) => y !== dosya && k.izlenen.some((g) => globEsle(g, y)));
+    // Defter dosyası (hiçbiri) bir başkasının izlenen yolu sayılmaz: defter, defterin izlenen yolu değildir (zincir alarmı olmasın).
+    const kesisen = degisen.filter((y) => !defterDosyalari.has(y) && k.izlenen.some((g) => globEsle(g, y)));
     if (kesisen.length === 0) continue;
     kapsam.kesisen++;
     const dokunuldu = degisenKume.has(dosya);
@@ -198,8 +223,9 @@ function degerlendir(girdi) {
     let sorun = null;
     if (yeni === null) sorun = ['son-dogrulama-yok', `${dosya} içinde "Son doğrulama: YYYY-MM-DD" satırı yok`];
     else if (eski !== null && yeni <= eski) sorun = ['son-dogrulama-ilerlemedi', `Son doğrulama ilerlemedi (${eski} → ${yeni})`];
-    else if (GUN_KALIBI.test(String(girdi.prAcilisGunu || '')) && yeni < girdi.prAcilisGunu) sorun = ['son-dogrulama-geri', `Son doğrulama (${yeni}) PR'ın açıldığı günden (${girdi.prAcilisGunu}) geri`];
-    else if (GUN_KALIBI.test(String(girdi.bugun || '')) && yeni > girdi.bugun) sorun = ['son-dogrulama-gelecek', `Son doğrulama (${yeni}) gelecekte (bugün ${girdi.bugun})`];
+    else if (eski !== null && m.onceki !== null && gövdeSansTarih(m.onceki) === gövdeSansTarih(m.sonraki)) sorun = ['son-dogrulama-sahte', `${dosya} içinde yalnız "Son doğrulama" tarihi değişti, gövde aynı: tarih tek başına tazelik üretmez (plan §6.3)`];
+    else if (GUN_KALIBI.test(String(girdi.prAcilisGunu || '')) && yeni < gunKaydir(girdi.prAcilisGunu, -GUN_TOLERANSI)) sorun = ['son-dogrulama-geri', `Son doğrulama (${yeni}) PR'ın açıldığı günden (${girdi.prAcilisGunu}) ${GUN_TOLERANSI} günden fazla geri`];
+    else if (GUN_KALIBI.test(String(girdi.bugun || '')) && yeni > gunKaydir(girdi.bugun, GUN_TOLERANSI)) sorun = ['son-dogrulama-gelecek', `Son doğrulama (${yeni}) gelecekte (bugün ${girdi.bugun}, tolerans ${GUN_TOLERANSI} gün)`];
     if (sorun) {
       if (istisna.gecerli) { kapsam.muaf++; istisnaKullanildi = true; continue; }
       kapsam.ihlalli++;
@@ -225,6 +251,11 @@ function aciklamaKacis(s) {
   return String(s).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A').replace(/::/g, ':​:');
 }
 
+/** `title=` özelliği için ek kaçış: `,` ve `:` özellik ayırıcıdır. */
+function ozellikKacis(s) {
+  return aciklamaKacis(s).replace(/:/g, '%3A').replace(/,/g, '%2C');
+}
+
 function satirlar(s) {
   const cikti = [];
   const seviye = s.kip === 'kirmizi' ? 'error' : 'warning';
@@ -232,7 +263,7 @@ function satirlar(s) {
     cikti.push(`::${seviye} title=Defter kapısı ölçülemedi::${aciklamaKacis(s.neden)}`);
   }
   for (const i of s.ihlaller) {
-    cikti.push(`::${seviye} title=Defter kapısı (${s.kip === 'kirmizi' ? 'KIRMIZI' : 'UYARI'}) ${aciklamaKacis(i.defter)}::${aciklamaKacis(`${i.tur}: ${i.mesaj}`)}`);
+    cikti.push(`::${seviye} title=Defter kapısı (${s.kip === 'kirmizi' ? 'KIRMIZI' : 'UYARI'}) ${ozellikKacis(i.defter)}::${aciklamaKacis(`${i.tur}: ${i.mesaj}`)}`);
   }
   // Yanlış alarm sayımı: sabit anahtarlı tek satır (iki haftalık ölçüm bu satırı sayar). Sebep METNİ yazılmaz.
   cikti.push(`DEFTER_KAPISI ${JSON.stringify({ kip: s.kip, durum: s.durum, neden: s.neden, kapsam: s.kapsam, ihlal: s.ihlaller.map((i) => i.tur), istisna: { var: s.istisna.var, gecerli: s.istisna.gecerli, kullanildi: Boolean(s.istisna.kullanildi) } })}`);
