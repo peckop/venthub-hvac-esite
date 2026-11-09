@@ -18,7 +18,7 @@
  *   node scripts/hijyen/defter-kartlari.cjs --hepsi --kontrol
  *
  * CI Kanban'ı OKUYAMAZ (sqlite yerel, git dışı); bu yüzden uyuşmazlık uyarısı günlük "Sabah özeti" adımında ve elle koşar.
- * CI yalnız blokların biçimini ve `Üretildi:` damgasının tazeliğini ölçer (kanca-defter-kartlari.test.ts).
+ * CI yalnız blokların biçimini ve `Üretildi:` damgasının varlığını ölçer (yaş eşiği yok; yaş `damgaYasi` ile okunur) (kanca-defter-kartlari.test.ts).
  */
 
 const fs = require('node:fs')
@@ -73,10 +73,22 @@ function etiketOku(ad) {
 }
 
 /** Bölüm gövdesi (başlık satırı hariç, ham tablo metni). */
-function tablo(kip, kartlar) {
+/** Bölüme girecek kartlar, TABLO ve KONTROL için tek sıralama (tavan kesimi aynı kartları seçsin). */
+function secim(kip, kartlar) {
   const bitenler = kartlar.filter((k) => k.bitti).sort((a, b) => (b.kapanis || '').localeCompare(a.kapanis || '') || b.no.localeCompare(a.no, 'en', { numeric: true }))
   const acik = kartlar.filter((k) => !k.bitti).sort((a, b) => a.no.localeCompare(b.no, 'en', { numeric: true }))
-  const liste = kip === 'ne-yaptik' ? bitenler : acik
+  return kip === 'ne-yaptik' ? bitenler : acik
+}
+
+/** Aynı numara iki kartta geçerse ikincisi "NO#2" anahtarı alır (ayrışma gizlenmesin). */
+function anahtarla(harita, no) {
+  let a = no
+  for (let i = 2; a in harita; i += 1) a = `${no}#${i}`
+  return a
+}
+
+function tablo(kip, kartlar) {
+  const liste = secim(kip, kartlar)
   const gosterilen = liste.slice(0, TAVAN)
   const bas = kip === 'ne-yaptik' ? ['| Kapanış | Kart | İş | Sahip |', '|---|---|---|---|'] : ['| Kart | İş | Durum | Sahip |', '|---|---|---|---|']
   const satirlar = gosterilen.map((k) => (kip === 'ne-yaptik' ? `| ${k.kapanis || '?'} | ${k.no} | ${k.baslik} | ${k.sahip} |` : `| ${k.no} | ${k.baslik} | ${k.durum} | ${k.sahip} |`))
@@ -120,7 +132,7 @@ function blokSatirlari(metin, kip) {
   for (const s of m[1].split('\n')) {
     const h = s.replace(/^\||\|$/g, '').split('|').map((x) => x.trim())
     const no = kip === 'ne-yaptik' ? h[1] : h[0]
-    if (no && /^[A-Z]{2,5}-\d+$|^[0-9a-f]{8}$/.test(no)) harita[no] = kip === 'ne-yaptik' ? h[0] : h[2]
+    if (no && /^[A-Z]{2,5}-\d+$|^[0-9a-f]{8}$/.test(no)) harita[anahtarla(harita, no)] = kip === 'ne-yaptik' ? h[0] : h[2]
   }
   return harita
 }
@@ -134,8 +146,7 @@ function kontrol(metin, kartlar) {
     if (!eldeki) continue
     bulunan += 1
     const taze = {}
-    const liste = kartlar.filter((k) => (kip === 'ne-yaptik' ? k.bitti : !k.bitti))
-    for (const k of liste.slice(0, TAVAN)) taze[k.no] = kip === 'ne-yaptik' ? k.kapanis || '?' : k.durum
+    for (const k of secim(kip, kartlar).slice(0, TAVAN)) taze[anahtarla(taze, k.no)] = kip === 'ne-yaptik' ? k.kapanis || '?' : k.durum
     for (const no of Object.keys(taze)) {
       if (!(no in eldeki)) ayrik.push(`${BOLUMLER[kip].ad}: ${no} Kanban'da var, defterde yok`)
       else if (eldeki[no] !== taze[no]) ayrik.push(`${BOLUMLER[kip].ad}: ${no} defterde "${eldeki[no]}", Kanban'da "${taze[no]}"`)
@@ -188,6 +199,10 @@ function main(argv) {
     } else if (argv.includes('--yaz')) {
       if (!yol || !fs.existsSync(yol)) {
         process.stdout.write(`⚠DEFTER-KANBAN ${ad}: defter dosyası yok; yazılmadı\n`)
+        continue
+      }
+      if (!oku.kartlar.length) {
+        process.stdout.write(`⚠DEFTER-KANBAN ${ad}: etiketli kart 0 (etiket yazımı?); mevcut blok korunsun diye yazılmadı\n`)
         continue
       }
       const yeni = metniYaz(fs.readFileSync(yol, 'utf8'), ad, oku.kartlar, bugun)

@@ -83,6 +83,17 @@ describe('INV-DEFTER-KANBAN-1 · yazma ve kontrol', () => {
   it('blok yoksa "blok-yok" (uyumlu sayılmaz)', () => {
     expect(D.kontrol(DEFTER, kartlar).durum).toBe('blok-yok')
   })
+  it('kontrol: 30 karttan fazlada da taze üretim uyumlu (tablo ile aynı sıralama)', () => {
+    const cok = D.yaniKartlar(Array.from({ length: 40 }, (_, i) => ham(`URN-${300 - i * 3}`, 'x', i % 2 ? { sutun: 'In Progress', status: 'in_progress' } : {})))
+    const yeni = D.metniYaz(DEFTER, 'urun-adres', cok, '2026-11-09') as string
+    expect(D.kontrol(yeni, cok)).toMatchObject({ durum: 'uyumlu', ayrik: [] })
+  })
+  it('sabotaj: aynı numaralı iki kartın biri değişince ayrışma gizlenmez', () => {
+    const ikiz = (d: string) => D.yaniKartlar([ham('URN-50', 'a'), ham('URN-50', 'b', { sutun: d, status: 'pending' })])
+    const yeni = D.metniYaz(DEFTER, 'urun-adres', ikiz('To Do'), '2026-11-09') as string
+    expect(D.kontrol(yeni, ikiz('To Do')).durum).toBe('uyumlu')
+    expect(D.kontrol(yeni, ikiz('In Progress')).durum).toBe('ayrisik')
+  })
   it('damga yaşı ölçülür; damga yoksa null', () => {
     const yeni = D.metniYaz(DEFTER, 'urun-adres', kartlar, '2026-11-01') as string
     expect(D.damgaYasi(yeni, new Date('2026-11-09T12:00:00Z'))).toBe(8)

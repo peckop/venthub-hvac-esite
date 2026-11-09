@@ -100,7 +100,13 @@ describe('INV-DEFTER-KANBAN-1 · etiketsiz kart uyarısı (ARC-291)', () => {
     expect(kos(KART, kart('ARC-300: kanca testi', [])).cikti).not.toContain('DEFTER ETİKETİ YOK')
     expect(kos(KART, kart('URN-300: dizin isteği', [], 'add_note')).cikti).not.toContain('DEFTER ETİKETİ YOK')
     expect(kos(KART, kart('URN-300: dizin isteği', []), { VENTHUB_GECIS_KONUSU_KAPAT: '1' }).cikti).not.toContain('DEFTER ETİKETİ YOK')
-    expect(kos(KART, kart('URN-300: adres', ['defter:YOK_BÜYÜK'])).cikti).toContain('DEFTER ETİKETİ YOK')
+    expect(kos(KART, kart('URN-300: adres eşleştirme', ['defter:YOK_BÜYÜK'])).cikti).toContain('DEFTER ETİKETİ YOK')
+  })
+  it('büyük harfli etiket kabul edilir; alakasız "adres/dizin" başlıkları susar', () => {
+    expect(kos(KART, kart('URN-300: adres eşleştirme', ['defter:Urun-adres'])).cikti).not.toContain('DEFTER ETİKETİ YOK')
+    for (const t of ['Sipariş teslimat adresi', 'e-posta adresi doğrula', 'Vitrin dizin yapısı (klasör dizini)', 'Adres defteri alanı', 'dizinde ara']) {
+      expect(kos(KART, kart(`URN-301: ${t}`, [])).cikti, t).not.toContain('DEFTER ETİKETİ YOK')
+    }
   })
 })
 
