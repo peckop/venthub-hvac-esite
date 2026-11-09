@@ -198,6 +198,14 @@ describe('INV-YEDEK-UYARI-1 · yedek-uyari.txt açılış satırı (ARC-292)', (
     expect(baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya(), VENTHUB_YEDEK_UYARI_KAPAT: '1' }))).not.toContain('YEDEK UYARI')
     expect(baglam(kos('UserPromptSubmit', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() }))).not.toContain('YEDEK UYARI')
   })
+  it('sabotaj: kontrol karakterleri (ESC, U+2028) bağlama girmez', () => {
+    fs.writeFileSync(dosya(), 'yedek \u001b[31mdüştü\u2028son\u0000\n')
+    const satirlar = baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() })).split('\n')
+    const son = satirlar[satirlar.length - 1]
+    expect(son).toBe('⚠YEDEK UYARI: yedek  [31mdüştü son')
+     
+    expect(/[\u0000-\u001f\u2028]/.test(son)).toBe(false)
+  })
   it('uzun içerik 200 karaktere kırpılır', () => {
     fs.writeFileSync(dosya(), 'x'.repeat(500) + '\n')
     const satirlar = baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() })).split('\n')

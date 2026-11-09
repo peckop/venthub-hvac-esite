@@ -214,7 +214,9 @@ function yedekUyariSatiri(olay) {
     if (olay !== 'SessionStart' || process.env.VENTHUB_YEDEK_UYARI_KAPAT === '1') return null
     const yol = process.env.VENTHUB_YEDEK_UYARI_DOSYA || path.join(os.homedir(), '.claude', 'zamanli', 'yedek-uyari.txt')
     const ilk = String(fs.readFileSync(yol, 'utf8')).split(/\r?\n/).find((s) => s.trim())
-    return ilk ? '⚠YEDEK UYARI: ' + ilk.trim().slice(0, 200) : null
+    // Kontrol karakterleri (ESC, NUL, U+2028 vb.) bağlama girmesin.
+    const temiz = ilk ? ilk.replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, ' ').trim() : ''
+    return temiz ? '⚠YEDEK UYARI: ' + temiz.slice(0, 200) : null
   } catch {
     return null
   }
