@@ -11,6 +11,7 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
 | 2026-11-09 | `adres-semasi-standard.md` v0.3: yeni sitenin tek önek şeması §1A (urunler, uygulama-alanlari, rehber; A12–A15), eski şema §1 "eski site" diye işaretlendi, §3 geçiş eski-adres gruplarını söyler; rota dili ve dil tespiti bölümlerine dokunulmadı | Cetvel ile karar ayrışıklığı kapandı | URN-159 |
+| 2026-11-09 | Rota dili sorusu kapandı: ALTYAPI cetveli yeni sitenin tek kaynağını adres-semasi v0.3 olarak yazdı, rota dili tablosu eski siteyi yönetir | Madde Sırada'dan düştü | URN-159, ALT-179 |
 | 2026-11-09 | Bu defter pilot olarak yazıldı; repoda ölçülebilen katmanlar sayıldı | Aşağıdaki envanter | URN-158 |
 | 2026-11-09 | 308 sahiplik bölüşümü görüşü SEO-76'ya yazıldı: URUN eşleştirme tablosunu ve yönlendirmeyi yazar, ALTYAPI rota dilini ve arama yönlendirmesini tutar, GEO-SEO ölçer | Kabul edildi, tablo işi URN-157'ye açıldı (geçişe bağlı, beklemede) | SEO-76, URN-157 |
 | 2026-11-06 | `vitrin-metni-standard.md` içinde yazma betikleri ve kapıları KATALOG şeridine yazıldı (8., 72., 230. satırlar) | #2319 birleşti | URN-156 |
@@ -68,14 +69,14 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 
 `docs/standards/adres-semasi-standard.md` v0.3 (9 Kasım, URN-159) iki şemayı ayrı tutar: §1 eski site (K3-b/B-1, bayraklar kapalı), §1A yeni site tek önek
 (`/tr/urunler`, `/tr/uygulama-alanlari`, `/tr/rehber`; EN `products`, `applications`, `guides`). Kaynak Design Venthub New `assets/veri/adres.json`, 9 Kasım okuma (depo dışı).
-Rota dili cetveline (`rota-dili-standard`, ALTYAPI) ve tablosuna bu turda bakılmadı ve dokunulmadı; yeni öneklerle uyumu ALTYAPI'ya sorulacak (bkz. 3).
+Rota dili cetveli (`rota-dili-standard.md`, ALTYAPI) §0 ile yeni sitenin tek kaynağının bu cetvel (v0.3) olduğunu, rota dili tablosunun eski siteyi yönettiğini yazıyor
+(ALT-179, #2450, 1d335bd04): tablo yeni önekleri taşımıyor, kod değişmedi, karar 412. URUN o dosyaya dokunmadı.
 
 ## 3 Sırada ve yapılabilecekler
 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
 | Canlı şemadan (`/tr/products`, `/category`, `/brands`, `/bilgi-merkezi`) yeni tek önekli hedefe eşleştirme tablosu | 308 yönlendirmenin kaynağı; mevcut taslağın "eski" sütunu canlıdan değil Design ara şemasından | yüksek | URN-157 (geçişe bağlı) |
-| `rota-dili-standard` (ALTYAPI) yeni önekleri (`urunler`, `uygulama-alanlari`, `rehber`, EN karşılıkları) taşıyor mu (ölçülmedi) | Rota dili ALTYAPI'nındır; URUN yalnız OPS'a sorar | orta | OPS'a soruldu (URN-159) |
 | Rehber eşlemesi: canlı 13 yazı, Design 5 yazı, birebir slug 0 | Hangi yazı yeni adrese, hangisi neye gidecek kararı yok; BLOG ile birlikte | orta | URN-157'ye bağlı |
 | Marka 7, ana sayfa, iletişim, hakkımızda, ürün seçici, sepet/hesap/ödeme için eşleme önerisi | Eşleme kararı yok; URUN öneri yazar | orta | URN-157'ye bağlı |
 | 6 çakışan hedef için önerili liste (örnek: sığınak kategorisi ve uygulama alanı) | Recep kararı gerekir; liste URUN'dan | orta | URN-157'ye bağlı |
