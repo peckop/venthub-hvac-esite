@@ -2260,6 +2260,99 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-65), doğrulanmış metin: taslak v3 (sha c6d636bad58b). Kısa sektör sayfası (cetvel R3.3): markasız gövde, aile adı yalnız "VentHub'da depo fanı için hangi örnek sayfa ne yazar?" bölümünde, tabloda ve Kaynaklar'da.
+    // Doğrulama: tur 1 (v1, tuzaklı 9/10, engelleyici 0 temiz kopyada), tur 2 (v2, tuzaklı 10/10, temiz kopyada engelleyici 0) ve v3'te yalnız değişen iki cümle müdür okumasıyla; OPS-255 tavanı (3 tur) aşılmadı. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok. Ürün iddiası kategori sayfasındaki tipik uygulama cümlesi ve aile sayfasında seçili modelin ürün açıklaması kadar.
+    kimlik: 'depo-havalandirma-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-09',
+    guncellemeTarihi: '2026-11-09',
+    urunler: ['vh:aile/vortice-nordik-hvls-hyperblade'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'depo-havalandirma-fani-nasil-secilir',
+        ozet: "Depo havalandırma fanı seçerken HSE'nin ısı stresi sayfası ve VentHub tavan vantilatörü sayfaları ne yazar; hangi bilgiler gerekir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Depo fanında kaynakların neyi yazdığını ve neyin bu yazıdan çıkarılamayacağını görmek için bu rehberden başlayın.",
+        govde: `# Depo havalandırma fanı nasıl seçilir?
+
+HSE'nin ısı stresi sayfası, sıcaklığı kontrol etmek için verdiği örnekler arasında fan ya da klima kullanmayı sayar [1]. Bu yazı depo için debi ya da fan türü önermez; HSE sayfasının bu cümlesini ve VentHub'ın tavan vantilatörü kategorisi ile Nordik HVLS Hyperblade aile sayfasında yazılanları aktarır [1][2].
+
+Kısaca:
+
+- Sıcaklık kontrolü: HSE ısı stresi sayfası, sıcaklığı kontrol etmek için fan ya da klima kullanmayı örnekler arasında sayar [1].
+- Kategori: VentHub tavan vantilatörleri kategori sayfası, depoyu bu vantilatörlerin tipik uygulamaları arasında anar [2].
+- Ürün: Nordik HVLS Hyperblade aile sayfasında seçili modelin ürün açıklaması, geniş endüstriyel alanların havalandırılması ve homojen sıcaklık dağılımı için tasarlanmış bir tavan pervanesini anlatır; aile sayfasının görünür metni depoyu anmaz [2].
+
+## Kaynaklar depo havalandırması için neler yazar?
+
+| Kaynak | Konu | Ne yazıyor |
+|---|---|---|
+| HSE, ısı stresi | Sıcaklık kontrolü | Sıcaklığı kontrol etmek için verilen örnekler arasında fan ya da klima kullanımı sayılır [1] |
+| VentHub, tavan vantilatörleri kategorisi | Tipik uygulama | Depo, spor salonu, fabrika ve showroom tipik uygulamadır [2] |
+| VentHub, Nordik HVLS Hyperblade | Seçili modelin ürün açıklaması | Geniş endüstriyel alanların havalandırılması ve homojen sıcaklık dağılımı için tasarlanmış tavan pervanesi [2] |
+
+## HSE ısı stresi sayfası depo için ne yazar?
+
+HSE'nin ısı stresi sayfası, sıcaklığı kontrol etmek için verdiği örnekler arasında fan ya da klima kullanmayı sayar [1]. Sayfa depoyu anmaz; rehberin esas olarak yıl boyunca ısı stresinin sorun olduğu iş yerleri için, örneğin fırınlar ve dökümhaneler için yazıldığını söyler [1].
+
+## Depo için hangi yazılara bakılabilir?
+
+Fan türlerinin genel tanıtımı için [fan çeşitleri](vh:yazi/fan-cesitleri), radyal ve aksiyel fan karşılaştırması için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi), kapı ve geçiş açıklıklarındaki hava kaybı konusunda [hava perdesi](vh:yazi/hava-perdesi) yazısına bakılabilir.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez; incelenen aile sayfasında fiyat gösterilmez, teklif istenir [2]. Bu yazı bir girdi listesi vermez; aşağıdaki maddeler kaynaklara ve yazılara yönlendirir. VentHub teklif formunun hangi alanları istediği bu yazıda ölçülmemiştir:
+
+- Kullanım yeri: kategori sayfası depo, spor salonu, fabrika ve showroom gibi büyük hacimli yerleri tipik uygulama olarak anar [2].
+- Debi, basınç ve sistem yerleşimi: seçim girdileri için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+## Depo fanı yazısının sınırları nelerdir?
+
+- Kaynak HSE sayfasıdır [1]; bu yazı Türkiye'deki yükümlülükleri belirlemez.
+- HSE sayfası depoyu anmaz [1]; bu yazı depo için sıcaklık ya da hava değişimi hedefi vermez.
+- Depo sözcüğü, bu yazıda incelenen kategori sayfasında görünür metinde yer alır; aile sayfasının görünür metninde geçmez [2].
+- Ayrı model sayfaları ve VentHub'ın diğer aile sayfaları bu yazıda taranmamıştır.
+
+## VentHub'da depo fanı için hangi örnek sayfa ne yazar?
+
+[Tavan vantilatörleri](vh:kategori/industrial-ceiling-fans) kategori sayfası, "Depo, spor salonu, fabrika ve showroom tipik uygulamadır" der [2]. [Vortice Nordik HVLS Hyperblade](vh:aile/vortice-nordik-hvls-hyperblade) aile sayfasında seçili modelin ürün açıklaması, bir tavan pervanesini "geniş endüstriyel alanların havalandırılması ve homojen sıcaklık dağılımı için tasarlanmış" diye anlatır [2]. Aile sayfasının görünür metni depoyu anmaz; ürünün bir depoda kullanılıp kullanılamayacağı sayfadan çıkarılamaz.
+
+## Sık sorulan sorular
+
+### HSE ısı stresi sayfası depoyu anıyor mu?
+
+Hayır. Sayfa depoyu anmaz; sıcaklığı kontrol etmek için verdiği örnekler arasında fan ya da klima kullanmayı sayar [1].
+
+### Depo için hangi tavan vantilatörü kullanılır?
+
+Bu yazı bir model önermez. VentHub kategori sayfası depoyu tavan vantilatörlerinin tipik uygulamaları arasında anar; incelenen aile sayfasının görünür metni depoyu anmaz [2].
+
+### Depo için kaç fan gerekir?
+
+Bu yazı debi ya da fan adedi vermez; seçim girdileri için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+### Kapı ve geçiş açıklıklarında hava kaybı nasıl azaltılır?
+
+Bu yazı bu konuyu ele almaz; [hava perdesi](vh:yazi/hava-perdesi) yazısına bakılabilir.
+
+### Depo fanının fiyatı nedir?
+
+Bu yazıda incelenen aile sayfasında fiyat gösterilmez, teklif istenir [2].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Temperature in the workplace: Heat stress, How can I reduce the risks? https://www.hse.gov.uk/temperature/employer/heat-stress.htm (erişim 09.11.2026)
+2. VentHub, Tavan vantilatörleri kategori sayfası ve Vortice Nordik HVLS Hyperblade aile sayfası, canlı sitede 9 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/tavan-vantilatorleri , https://venthub.com.tr/tr/products/vortice-nordik-hvls-hyperblade
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
