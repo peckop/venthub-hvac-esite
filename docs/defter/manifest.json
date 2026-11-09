@@ -27,13 +27,14 @@
       "izlenen": [
         "scripts/seo/dizin-takip.mjs",
         "scripts/seo/dizin-acilis.mjs",
+        "scripts/seo/dizin-defter-kontrol.mjs",
         "docs/standards/dizin-sistemleri-standard.md"
       ],
-      "tazelikGun": 14,
+      "tazelikGun": 7,
       "tetik": ["kart-kapanisi", "sure", "dis-kaynak"],
-      "olcum": null,
+      "olcum": "node scripts/seo/dizin-defter-kontrol.mjs",
       "disKaynak": "gsc",
-      "durum": "planli"
+      "durum": "pilot"
     }
   ]
 }
