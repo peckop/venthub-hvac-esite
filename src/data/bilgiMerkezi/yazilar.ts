@@ -837,7 +837,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     konu: 'verimlilik',
     yayinTarihi: '2026-10-31',
     // 1 Kasım 2026 (BLG-27): ısı geri kazanım yazısında kurulum türü adı "kanal tipi" terimine çevrildi (başlık, bağlantı metni, tablo, SSS); iddia kümesi aynı. Gövde sha yukarıdaki değerden farklıdır.
-    guncellemeTarihi: '2026-11-08',
+    // 9 Kasım 2026 (BLG-62): Resmî Gazete'deki ekotasarım ve enerji etiketi tebliğleri (SGM-2021/18, 2021/19) yeni bölüm, SSS ve Kaynaklar 12-13 olarak eklendi (R5.5 yalnız ekleme).
+    guncellemeTarihi: '2026-11-09',
     urunler: [
       'vh:aile/vortice-vort-hr-isi-geri-kazanim',
       'vh:aile/vortice-vort-mono',
@@ -862,7 +863,7 @@ Kısaca:
 
 Isı geri kazanım cihazı, binadan atılan egzoz havasının ısısını içeri alınan taze havaya aktaran havalandırma cihazıdır [1][2].
 
-Bu yazı cihazın nasıl çalıştığını, eşanjör türlerini, verimin nasıl okunacağını ve seçerken hangi değerlere bakılacağını Eurovent, ABD Enerji Bakanlığı, Kanada Doğal Kaynaklar Bakanlığı, REHVA ve Passive House Institute kaynaklarına ve üretici belgelerine dayanarak anlatır. VentHub kataloğundaki 16 ısı geri kazanım modelinden 13'ü Vortice tablosunda, AVenS'in üç modeli ise tablonun altındaki paragrafta yer alır.
+Bu yazı cihazın nasıl çalıştığını, eşanjör türlerini, verimin nasıl okunacağını ve seçerken hangi değerlere bakılacağını Eurovent, ABD Enerji Bakanlığı, Kanada Doğal Kaynaklar Bakanlığı, REHVA ve Passive House Institute kaynaklarına ve üretici belgelerine dayanarak anlatır. Türkiye'deki ekotasarım ve enerji etiketi şartları ise Resmî Gazete'de yayımlanan iki tebliğe dayanır [12][13]. VentHub kataloğundaki 16 ısı geri kazanım modelinden 13'ü Vortice tablosunda, AVenS'in üç modeli ise tablonun altındaki paragrafta yer alır.
 
 ## Isı geri kazanım cihazı nedir?
 
@@ -974,6 +975,14 @@ Aşağıdaki tablodaki en yüksek debi, en yüksek basınç ve güç değerleri 
 
 [AVenS ısı geri kazanım cihazları](vh:aile/avens-isi-geri-kazanim-cihazlari) ailesinde AVenS 750, AVenS 1000 ve AVenS 2000 olmak üzere üç model vardır. Üretici ürün sayfası ise 750-5000 m³/h aralığında daha fazla model listeler; aynı sayfa G4 sınıfı temizlenebilir kaset filtreleri ve plug fanlı seçenekleri sayar [10], teknik belgeler eşanjörü alüminyum plakalı olarak tanımlar [11]. Modellerin taze hava debileri üretici teknik belgelerinde 750, 1000 ve 2000 m³/h olarak yazılıdır [11].
 
+## Isı geri kazanım cihazları için ekotasarım ve enerji etiketi şartı var mı?
+
+Türkiye'de havalandırma ünitelerinin çevreye duyarlı tasarım gereklilikleri, 25 Mayıs 2021 tarihli ve 31491 sayılı Resmî Gazete'de yayımlanan Havalandırma Ünitelerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM: 2021/18) ile belirlenmiştir; tebliğin adı 1253/2014/AB sayılı AB tüzüğüne atıf yapar [12]. Konut tipi havalandırma ünitelerinin enerji etiketlemesi, aynı tarihli ve sayılı Konut Tipi Havalandırma Ünitelerinin Enerji Etiketlemesine Dair Tebliğ (SGM: 2021/19) kapsamındadır; bu tebliğin adı 1254/2014/AB sayılı tüzüğe atıf yapar [13].
+
+Ekotasarım tebliği havalandırma ünitelerini kapsar ve konut tipi havalandırma ünitesini, azami debisi 250 m³/h'ten fazla olmayan ya da 250 ile 1000 m³/h arasında azami debiye sahip olup kullanım amacının konut tipi havalandırma uygulamaları olduğu imalatçı tarafından özellikle belirtilen ünite olarak tanımlar [12]. Tebliğ, donma koruması ya da buz çözme amaçlı ısı transferi dışında, ısı geri kazanımı için ısı eşanjörü ile birlikte ısı pompası içeren ya da ısı geri kazanım sistemine ilave olarak ısı transferine veya ısı atılmasına izin veren üniteleri kapsam dışı bırakır; etiket tebliği aynı istisnayı koyar [12][13]. Konut tipi üniteler için ekotasarım tebliğinin Ek-II'sinin 1. maddesindeki gereklilikler [12] ve tedarikçilerin her üniteye bilgileri içeren baskılı bir etiket iliştirmesi [13] 1 Ekim 2021'den itibaren uygulanır; iki tebliğ de yayımı tarihinde yürürlüğe girmiştir [12][13].
+
+Azami debi ve imalatçının kullanım amacı beyanı, ünitenin konut tipi mi konut dışı mı sayılacağını belirler; ekotasarım tebliği ikisini de kapsar, enerji etiketi tebliği ise yalnız konut tipi üniteleri kapsar [12][13]. Tebliğin ikinci maddesi ayrıca istisnalar sayar [12]. Katalogdaki aileler için kapsam, ürün sayfasındaki model verileri ve imalatçı beyanıyla ayrıca değerlendirilir.
+
 ## Fiyatı belirleyen etkenler
 
 Bu yazıda fiyat verilmez. Kaynaklarda maliyete şu iki yerde değinilir: ABD Enerji Bakanlığı raporu altıgen karşı akışlı çekirdeklerin daha yüksek maliyetle geldiğini [5], Aldrich rehberi düşük güç tüketimli sistemlerin çoğu zaman daha pahalı olduğunu belirtir [4]. Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. [Isı geri kazanım kategorisi](vh:kategori/heat-recovery-vmc) ürün ailelerini listeler.
@@ -1000,6 +1009,10 @@ Eurovent kılavuzunun genel önerisi filtrenin en az yılda bir değiştirilmesi
 
 ABD Enerji Bakanlığı rehberi birçok ERV ve HRV cihazının hatırı sayılır ses ürettiğini söyler [4]. Ses basıncı ve ses gücü ayrı ölçülerdir; üreticinin hangisini hangi uzaklıkta verdiğine bakılır [3].
 
+### Türkiye'de ısı geri kazanım cihazları için ekotasarım ya da enerji etiketi şartı var mı?
+
+Türkiye'de havalandırma ünitelerini kapsayan bir çevreye duyarlı tasarım tebliği (SGM: 2021/18) ve konut tipi havalandırma üniteleri için bir enerji etiketleme tebliği (SGM: 2021/19) vardır [12][13]. Ekotasarım tebliği konut tipi ve konut dışı üniteleri, enerji etiketi tebliği yalnız konut tipi üniteleri kapsar [12][13]. Donma koruması ya da buz çözme dışında ısı geri kazanımı için ısı eşanjörü ile birlikte ısı pompası içeren ya da ısı geri kazanım sistemine ilave olarak ısı transferine veya ısı atılmasına izin veren üniteler iki tebliğin de kapsamı dışındadır; bu, tebliğlerdeki istisnalardan yalnızca biridir [12][13]. Cihazınızın kapsamda olup olmadığını imalatçıdan sorun.
+
 ### Isı geri kazanım cihazının fiyatı nedir?
 
 Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin.
@@ -1019,6 +1032,8 @@ Eurovent kılavuzunda ve ABD Enerji Bakanlığı belgelerinde verilen sayfa numa
 9. Vortice, "VORT MONO RANGE" kataloğu (dosya adı vortice-vort-mono-wifi-189860.pdf, Ocak 2025), s. 4, 14, 17 (üretici belgesi).
 10. AVenS (Avensair), "Alüminyum eşanjörlü ısı geri kazanım cihazları AVenS 1000" ürün sayfası, https://www.avensair.com/aluminyum-esanjorlu-isi-geri-kazanim-cihazlari-avens-1000 (erişim 31.10.2026).
 11. AVenS (Avensair), "Cihaz teknik bilgileri": AVENS 750 IGK (23.09.2024), AVENS 1000 IGK (13.11.2017, revizyon 15.11.2017; ürün sayfasında aynı metne sahip, 11.03.2026'da yüklenmiş ikinci bir dosya da bağlıdır), AVENS 2000 IGK (30.01.2024), her biri 4 sayfa, s. 1/4 ve 4/4, https://www.avensair.com/uploads/ (üretici belgesi, erişim 31.10.2026).
+12. T.C. Resmî Gazete, 25.05.2021, Sayı 31491, Havalandırma Ünitelerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (1253/2014/AB) (SGM: 2021/18). https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm (erişim 09.11.2026)
+13. T.C. Resmî Gazete, 25.05.2021, Sayı 31491, Konut Tipi Havalandırma Ünitelerinin Enerji Etiketlemesine Dair Tebliğ (1254/2014/AB) (SGM: 2021/19). https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-6.htm (erişim 09.11.2026)
 
 ## Teknik sorumluluk notu
 
@@ -1030,7 +1045,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
   {
     // BLOG (BLG-28), doğrulanmış metin: taslak v5 sha d4c707a340ad (v1-v5 beş turda doğrulandı, hedef üçtü, karşılanmadı; her turda tuzaklı kopya 5/5 yakalandı).
     // v5 → v6 farkı on küçük kapsam/terim düzeltmesidir (OPS kararıyla tam tur yok; fark ayrı bir doğrulayıcıya okutuldu). Taslak v6 sha 03af6be30421; kayıtlı gövde sha 2da9d06327b6.
-    // Mevzuat iddiası yok (R2.6 gerekmez; Türkiye kapsamı için hüküm aktarılmaz). Fiyat yok: ürün sayfaları teklife yönlendirir.
+    // Mevzuat iddiası: yalnız ekotasarım (SGM-2021/18) ve enerji etiketi (SGM-2021/19) tebliği kapsamı, MVZ-14 paketi + ham RG ile doğrulandı (BLG-62 tur 1-3); başka ülke/AB hükmü aktarılmaz. Fiyat yok: ürün sayfaları teklife yönlendirir.
     // Yayın: karar 121/c (profesyonel yazı AYNI adreste döner); birleşme ayrı OPS ve Recep onayıyla. yayinTarihi birleşme gününe göre güncellenir.
     kimlik: 'hava-perdesi',
     konu: 'verimlilik',
