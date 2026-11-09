@@ -133,6 +133,7 @@ function denetle(m: Kapi): string[] {
   dene('KIRMIZI kipte ölçülemedi kırar', () => m.cikisKodu(g({ degisenYollar: null, kip: 'kirmizi' })) === 1)
   dene('manifest yok -> atlandı', () => g({ manifest: null, degisenYollar: ['next.config.mjs'] }).durum === 'atlandi')
   dene('emekli kayıt kapı dışı', () => g({ manifest: { defterler: [{ ...URUN, durum: 'emekli' }] }, degisenYollar: ['next.config.mjs'] }).durum === 'yesil')
+  dene('planli kayıt kapı dışı', () => g({ manifest: { defterler: [{ ...URUN, durum: 'planli' }] }, degisenYollar: ['next.config.mjs'] }).durum === 'yesil')
   dene('ilgisiz PR yeşil', () => g({ degisenYollar: ['src/app/page.tsx'] }).durum === 'yesil')
   return hata
 }
@@ -209,6 +210,29 @@ describe('INV-DEFTER-PR-KAPISI-1 · manifest şeması (plan §4.1)', () => {
   it('manifest kök yapısı bozuksa bozuk işaretlenir', () => {
     expect(kapi.manifestiAyikla({ defterler: 'x' }).bozuk).toBe(true)
     expect(kapi.manifestiAyikla(null).bozuk).toBe(true)
+  })
+})
+
+describe('INV-DEFTER-PR-KAPISI-1 · gerçek manifest (PR #2440, sema:1)', () => {
+  const gercek = {
+    sema: 1,
+    _not: 'x',
+    defterler: [
+      { ...URUN, ozet: 'Canlı adres şeması', durum: 'planli' },
+      { ...GEO, ozet: 'Dizin takibi', disKaynak: 'gsc', durum: 'planli' },
+    ],
+  }
+
+  it('ek alanlar (sema, ozet, _not) şemayı bozmaz; planli kayıtlar geçerli ama kapı dışıdır', () => {
+    const a = kapi.manifestiAyikla(gercek)
+    expect(a.sorunlu).toEqual([])
+    expect(a.gecerli).toHaveLength(2)
+    expect(karar({ manifest: gercek, degisenYollar: ['next.config.mjs'] })).toMatchObject({ durum: 'yesil', kapsam: { kontrolEdilen: 0 } })
+  })
+
+  it('aynı manifest pilot olunca kapı devreye girer', () => {
+    const pilot = { ...gercek, defterler: gercek.defterler.map((k) => ({ ...k, durum: 'pilot' })) }
+    expect(karar({ manifest: pilot, degisenYollar: ['next.config.mjs'] }).durum).toBe('uyari')
   })
 })
 
@@ -427,7 +451,7 @@ describe('INV-DEFTER-PR-KAPISI-1 · SABOTAJ (her hatalı kopya en az bir kontrol
     { ad: 'UYARI kipi de kırar', eski: "if (s.kip !== 'kirmizi') return 0;", yeni: '' },
     { ad: 'ölçülemedi yeşil sayılır', eski: "return sonuc('olculemedi', 'degisen-dosya-okunamadi', { istisna });", yeni: "return sonuc('yesil', 'x');" },
     { ad: 'istisna sebebi uzunluğa bakmaz', eski: 'const ISTISNA_MIN_SEBEP = 20;', yeni: 'const ISTISNA_MIN_SEBEP = 1;' },
-    { ad: 'emekli kayıt kapıya girer', eski: "if (k.durum === 'emekli') continue;", yeni: '' },
+    { ad: 'emekli/planlı kayıt kapıya girer', eski: 'if (ATLANAN_DURUMLAR.includes(k.durum)) continue;', yeni: '' },
     { ad: 'manifest yokken kırar', eski: "return sonuc('atlandi', 'manifest-yok');", yeni: "return sonuc('olculemedi', 'manifest-yok');" },
   ]
 

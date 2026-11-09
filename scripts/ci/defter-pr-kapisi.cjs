@@ -33,7 +33,9 @@ const KOK = path.resolve(__dirname, '../..');
 const MANIFEST_YOLU = 'docs/defter/manifest.json';
 const KIPLER = ['uyari', 'kirmizi'];
 const VARSAYILAN_KIP = 'uyari';
-const DURUMLAR = ['pilot', 'aktif', 'kontrolsuz', 'emekli'];
+const DURUMLAR = ['planli', 'pilot', 'aktif', 'kontrolsuz', 'emekli'];
+/** Kapı dışı durumlar: henüz kurulmamış (planli) ve kapatılmış (emekli) defter izlenmez (manifest sema:1, PR #2440). */
+const ATLANAN_DURUMLAR = ['planli', 'emekli'];
 const ISTISNA_ANAHTARI = 'Defter-gerekmez';
 const ISTISNA_MIN_SEBEP = 20;
 const GENIS_GLOB_ESIGI = 100;
@@ -171,13 +173,13 @@ function degerlendir(girdi) {
   const degisenKume = new Set(degisen);
   const metinler = girdi.defterMetinleri || {};
   const ihlaller = [];
-  const kapsam = { ...bos, kontrolEdilen: ayik.gecerli.filter((k) => k.durum !== 'emekli').length };
+  const kapsam = { ...bos, kontrolEdilen: ayik.gecerli.filter((k) => !ATLANAN_DURUMLAR.includes(k.durum)).length };
 
   for (const s of ayik.sorunlu) ihlaller.push({ defter: s.ad, tur: 'manifest-gecersiz', mesaj: s.sorunlar.join('; ') });
 
   let istisnaKullanildi = false;
   for (const k of ayik.gecerli) {
-    if (k.durum === 'emekli') continue;
+    if (ATLANAN_DURUMLAR.includes(k.durum)) continue;
     const dosya = yolNormallestir(k.dosya);
     const kesisen = degisen.filter((y) => y !== dosya && k.izlenen.some((g) => globEsle(g, y)));
     if (kesisen.length === 0) continue;
