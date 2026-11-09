@@ -80,7 +80,8 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // `dateModified` buradan. Önceki değerler: 2026-10-10 (URN-90), 2026-10-08 (#1755, "Fiyatı belirleyen etkenler"
     // giriş cümlesi), 2026-10-06 (#1733).
     // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Frekans konvertörü motorda ses yapar mı?").
-    guncellemeTarihi: '2026-11-08',
+    // Güncelleme tarihi 2026-11-09 (BLG-56, R5.5 yalnız-ekleme revizyonu): elektromanyetik uyumluluk kategorilerinin kaynağı (Danfoss FC 102 kılavuzu) açıkça atfedildi.
+    guncellemeTarihi: '2026-11-09',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
@@ -177,7 +178,7 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 
 - Motor kablosundaki hızlı gerilim değişimi (dU/dt), kablonun fazları ile ekranı ve ekran ile toprak arasında kaçak akımlar oluşturur; bu da sürücünün elektromanyetik yayılımını değiştirir [1].
 - Şebeke, motor ve kontrol kabloları birbirinden ayrı döşenmelidir; aksi hâlde istenmeyen davranış ya da düşük performans görülebilir [1].
-- Sürücüler için elektromanyetik uyumluluk kategorileri (C1–C4) EN/IEC 61800-3 standardında tanımlanır: C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Standardın güncel baskısı ayarlanabilir hızlı sürücü sistemlerinin EMC gerekliliklerini tanımlar [11].
+- Sürücüler için elektromanyetik uyumluluk kategorileri (C1–C4) EN/IEC 61800-3 standardında tanımlanır: C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Bu sınıflandırma Danfoss FC 102 tasarım kılavuzundan aktarılmıştır [1]; standardın kendi metni bu yazıda okunmamıştır ve C4 kategorisinin tanımı aktarılmamıştır. Standardın güncel baskısı ayarlanabilir hızlı sürücü sistemlerinin EMC gerekliliklerini tanımlar [11].
 - Motor yatak akımlarını önlemek için tahrik ucu olmayan tarafta yalıtımlı rulman kullanılması ve sürücü, motor ile tahrik edilen makinenin doğru topraklanması önerilir [1].
 - Elektrik çarpmasına karşı kaçak akım koruma cihazı kullanılacaksa besleme tarafında yalnız Tip B cihaz kullanılmalıdır, çünkü sürücü toprak iletkeninde DC akım oluşturabilir [1].
 - Sürücü patlayıcı ortama kurulmamalıdır; gerekiyorsa bu alanın dışındaki bir panoya yerleştirilir [1].
@@ -197,7 +198,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasınd
 - **Güç ve giriş gerilimi.** Aynı aile içinde modeli güç ve gerilim sınıfı belirler; örneğin FC 101 0,25 kW ile 90 kW arasında, üç fazlı 200–240 V, 380–480 V ve 525–600 V girişle üretilir [2].
 - **Koruma sınıfı ve kitler.** FC 101 IP20 ya da IP54 gövdeyle sunulur; IP21 isteğe bağlı bir kitle sağlanır [3].
 - **Montaj yerinin koşulları.** Yüksek ortam sıcaklığı, yüksek rakım, yüksek anahtarlama frekansı ya da uzun motor kablosu akım düşürme gerektirebilir; bu durumlarda bir güç boyutu büyük cihaz seçilmesi önerilir [1].
-- **Elektromanyetik uyumluluk kategorisi.** EN/IEC 61800-3'e göre C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Teklifteki cihazın, kurulacağı ortamın kategorisine uyduğuna bakın.
+- **Elektromanyetik uyumluluk kategorisi.** EN/IEC 61800-3'e göre C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir (Danfoss FC 102 tasarım kılavuzuna göre) [1]. Teklifteki cihazın, kurulacağı ortamın kategorisine uyduğuna bakın.
 - **Kurulum kalemleri.** Toplam maliyete cihazın yanında kurulum da girer: motor kablosunun türü ve uzunluğu (FC 51'de ekranlı kabloda azami 15 m, ekransız kabloda azami 50 m [4]), kaçak akım koruması kullanılacaksa besleme tarafındaki Tip B cihaz [1] ve şebeke, motor ve kontrol kablolarının ayrı döşenmesi [1].
 
 ## Frekans konvertörü seçiminde izlenecek yol
@@ -270,6 +271,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-01 (BLG-29): sessiz fan rehberine iç bağlantı eklendi ("Fan ses gücü seviyesi nasıl okunur?").
     // Güncelleme tarihi 2026-11-04 (BLG-38, SEO-81): H1 "Radyal ve aksiyel fan farkı nedir?", fark tablosu, nedir ve kullanım alanları bölümleri; doğrulanmış metin taslak v4 (sha 1e7f013da8f7; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug değişmedi.
     // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; SSS cevabı "Yürürlükten kalktı" yerine "Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır" ve 327/2011'in genel hükümlerini kaldıran tüzük ifadesi. Yalnız bu iki cümle değişti; tarihler ve kaynaklar aynı. Önceki değer: 2026-11-08.
+    // Güncelleme tarihi 2026-11-09 (BLG-56, R5.5 yalnız-ekleme): duman tahliyesi fanlarının EN 12101-3 belgelendirme cümlesine kaynak atfı (üretici broşürü) eklendi.
     guncellemeTarihi: '2026-11-09',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
@@ -368,7 +370,7 @@ Radyal fanlar:
 
 Tipten bağımsız not:
 
-- Duman tahliyesi: yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir [4].
+- Duman tahliyesi: yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir (Vortice jet fan broşürü, üretici belgesi, s. 10) [4].
 
 ## Fan eğrisi nasıl okunur?
 
