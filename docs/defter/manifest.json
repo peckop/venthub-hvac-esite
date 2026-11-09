@@ -37,6 +37,22 @@
       "olcum": "node scripts/seo/dizin-defter-kontrol.mjs",
       "disKaynak": "gsc",
       "durum": "pilot"
+    },
+    {
+      "ad": "yeni-site-gecis",
+      "dosya": "docs/defter/yeni-site-gecis.md",
+      "sahip": "OPS",
+      "ozet": "Yeni site geçişi tek süreç olarak: kararlar, Design eksikleri, adres, UnoPIM, önizleme, dizin ve sıradaki işler",
+      "izlenen": [
+        "docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md",
+        "docs/plans/yeni-site-katalog-sema-taslak-2026-11-01.md",
+        "docs/standards/adres-semasi-standard.md"
+      ],
+      "tazelikGun": 7,
+      "tetik": ["kart-kapanisi", "sure"],
+      "olcum": null,
+      "disKaynak": null,
+      "durum": "pilot"
     }
   ]
 }
