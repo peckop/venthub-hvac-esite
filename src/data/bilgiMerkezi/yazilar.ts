@@ -2353,6 +2353,101 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-66), doğrulanmış metin: taslak v3 (sha 0300d2f75b3c). Ürün iddiasız genel sektör sayfası (cetvel R3.3): markasız gövde, ürün bağı yok (urunler boş); kaynaklar OSHA ısı genel bakış, OSHA mühendislik kontrolleri, HSE ısı stresi. Demir çelik adı yalnız OSHA tablosunda geçer; havalandırma ve fan örnekleri demir çeliği anmayan genel sayfalardandır ve yazı bunu açıkça söyler.
+    // Doğrulama: tur 1 (v1, tuzaklı 12/12 + 1 gerçek düzeltme, temiz kopyada engelleyici 0), tur 2 (v2, tuzaklı 14/14, temiz kopyada engelleyici 0, 2 aktarım düzeltmesi) ve v3'te yalnız değişen iki cümle müdür okumasıyla; OPS-255 tavanı (3 tur) aşılmadı. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok, ürün yok.
+    kimlik: 'demir-celik-isi-kontrolu-havalandirma',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-09',
+    guncellemeTarihi: '2026-11-09',
+    urunler: [],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'demir-celik-tesisi-isi-kontrolu-havalandirma-kaynaklari',
+        ozet: "Demir çelik tesisinde ısı kontrolü ve havalandırma için OSHA ve HSE sayfaları ne yazar, hangi örnekler sektöre özel değildir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Demir çelik tesislerinde ısı kontrolü kaynaklarının neyi söylediğini ve neyi söylemediğini görmek için bu rehberden başlayın.",
+        govde: `# Demir çelik tesisinde ısı kontrolü ve havalandırma kaynakları ne yazar?
+
+OSHA'nın ısı sayfası, kapalı alanda tehlikeli ısı maruziyetinin görülebildiği işler arasında demir çelik tesislerini ve dökümhaneleri sayar [1]. Havalandırma ve fan örnekleri demir çeliği anmayan genel ısı kontrolü sayfalarında geçer; havalandırma OSHA'da, fan OSHA ve HSE'de [2][3]. Bu yazı debi, fan türü ya da model önermez; OSHA ve HSE sayfalarında yazanları aktarır.
+
+Kısaca:
+
+- Sektör: OSHA ısı sayfasının kapalı alan sütununda demir çelik tesisleri ve dökümhaneler satırı bulunur [1].
+- Havalandırma: OSHA mühendislik kontrolleri sayfası genel havalandırmayı artırmayı, soğutma fanlarını ve yüksek ısı ya da nem üretilen noktalarda yerel egzoz havalandırmasını sayar; sayfa demir çeliği anmaz [2].
+- Dökümhane: HSE ısı stresi sayfası dökümhaneleri ve izabe işlemlerini örnek verir, sıcaklığı kontrol etmek için fan ya da klima kullanmayı sayar; sayfa demir çeliği anmaz [3].
+
+## Kaynaklar demir çelik tesisi için neler yazar?
+
+| Kaynak | Demir çelik tesisi adı geçiyor mu? | Ne yazıyor |
+|---|---|---|
+| OSHA, ısı genel bakış [1] | Evet, tabloda "Iron and steel mills and foundries" | Kapalı alanda tehlikeli ısı maruziyeti görülebilen işler listesi |
+| OSHA, mühendislik kontrolleri [2] | Hayır, incelenen sayfa metninde demir ya da çelik geçmez | Mühendislik kontrolü listesinden havalandırma ve fan kalemleri: genel havalandırmayı artırma, soğutma fanları, yerel egzoz havalandırması, püskürtmeli fanlar; liste ayrıca klima, yansıtıcı kalkan, sıcak yüzey yalıtımı gibi kalemleri de sayar |
+| HSE, ısı stresi [3] | Hayır, incelenen sayfa metninde demir ya da çelik geçmez; dökümhaneler ve izabe işlemleri geçer | Sıcaklığı kontrol etmek için süreci değiştirmek, fan ya da klima kullanmak, ışınımlı ısıya karşı fiziksel engeller |
+
+## OSHA ısı sayfası kapalı alan işleri için ne yazar?
+
+OSHA'nın ısı genel bakış sayfası, tehlikeli ısı maruziyetinin kapalı ya da açık alanda görülebileceğini söyler. Sayfadaki tablonun kapalı alan sütununda "Iron and steel mills and foundries" yazar [1]. OSHA ısı genel bakış sayfasının incelenen metninde havalandırma ya da fan sözcüğü geçmez [1]; tablo bir risk listesidir.
+
+## OSHA mühendislik kontrolleri sayfası havalandırma için ne yazar?
+
+OSHA'nın mühendislik kontrolleri sayfası, ısıya maruziyeti azaltabilecek mühendislik kontrolleri arasında genel havalandırmayı artırmayı, soğutma fanlarını, yüksek ısı ya da nem üretilen noktalarda yerel egzoz havalandırmasını ve püskürtmeli fanları listeler [2]. Sayfa, bazı çalışma yerlerinin mühendislik kontrolleriyle serinletilemeyeceğini, bu durumda çalışma uygulamalarının değiştirilmesi gerektiğini de söyler [2]. Sayfa demir çeliği ya da dökümhaneyi anmaz; örnekleri çamaşırhane, vinç ve inşaat ekipmanı kabini gibi yerlerden verir [2].
+
+## HSE ısı stresi sayfası dökümhaneler için ne yazar?
+
+HSE'nin ısı stresi sayfası, süreçten ya da kısıtlı alanlardan kaynaklanan sıcak ortamlar için örnek olarak dökümhaneleri ve izabe işlemlerini verir [3]. Sıcaklığı mühendislik çözümleriyle kontrol etmek için örnekler arasında süreçleri değiştirmek, fan ya da klima kullanmak ve ışınımlı ısıya maruziyeti azaltmak için fiziksel engeller kullanmak sayılır [3]. Sayfada demir ve çelik sözcükleri geçmez.
+
+## Fan seçimi için hangi yazılara bakılabilir?
+
+Fan türlerinin genel tanıtımı için [fan çeşitleri](vh:yazi/fan-cesitleri), radyal ve aksiyel fan karşılaştırması için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+## Teklif için hangi bilgiler gerekir?
+
+Teklif öncesi seçim girdileri (debi, basınç, sistem yerleşimi) için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+## Bu yazının sınırları nelerdir?
+
+- Kaynaklar OSHA ve HSE sayfalarıdır [1][2][3]; bu yazı Türkiye'deki yükümlülükleri belirlemez.
+- OSHA mühendislik kontrolleri sayfası ve HSE ısı stresi sayfası demir çeliği anmaz [2][3]; bu yazı onların örneklerini demir çelik tesisine özel bir öneri olarak sunmaz.
+- OSHA ısı genel bakış sayfasındaki satır bir risk listesidir [1]; bu yazı onu havalandırma önerisi olarak sunmaz.
+- Bu yazı ürün anmaz; sıcaklık hedefi, hava değişimi ya da debi vermez.
+
+## Sık sorulan sorular
+
+### OSHA demir çelik tesislerini ısı riski olarak anıyor mu?
+
+Evet. OSHA ısı genel bakış sayfasının kapalı alan sütununda "Iron and steel mills and foundries" yazar [1].
+
+### Demir çelik tesisi için OSHA hangi havalandırmayı öneriyor?
+
+OSHA'nın mühendislik kontrolleri sayfası demir çelik tesisini anmaz; genel bir ısı kontrolü listesinde genel havalandırmayı artırmayı, soğutma fanlarını ve yerel egzoz havalandırmasını sayar [2].
+
+### HSE dökümhaneler için ne yazıyor?
+
+HSE ısı stresi sayfası dökümhaneleri ve izabe işlemlerini ısı stresinin görülebildiği iş yerleri arasında sayar; sıcaklığı kontrol etmek için fan ya da klima kullanmayı örnekler arasında anar [3].
+
+### Demir çelik tesisi için kaç fan gerekir?
+
+Bu yazı debi ya da fan adedi vermez; seçim girdileri için [radyal ve aksiyel fan farkı](vh:yazi/radyal-aksiyel-fan-secimi) yazısına bakılabilir.
+
+### Bu yazı bir ürün ya da fiyat öneriyor mu?
+
+Bu yazı OSHA ve HSE sayfalarında yazanları aktarır [1][2][3]; ürün ve fiyat bilgisi için VentHub kategori sayfalarına bakılabilir.
+
+## Kaynaklar
+
+1. U.S. Occupational Safety and Health Administration (OSHA), Heat - Overview: Working in Outdoor and Indoor Heat Environments, tablo "Hazardous heat exposure for Indoors or Outdoors". https://www.osha.gov/heat-exposure (erişim 09.11.2026)
+2. OSHA, Heat - Engineering Controls, Work Practices, and Personal Protective Equipment. https://www.osha.gov/heat-exposure/controls (erişim 09.11.2026)
+3. UK Health and Safety Executive (HSE), Temperature in the workplace: Heat stress. https://www.hse.gov.uk/temperature/employer/heat-stress.htm (erişim 09.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */

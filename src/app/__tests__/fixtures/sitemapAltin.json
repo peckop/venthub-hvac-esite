@@ -105,6 +105,10 @@
    "priority": 0.6
   },
   {
+   "url": "{BASE}/tr/bilgi-merkezi/demir-celik-tesisi-isi-kontrolu-havalandirma-kaynaklari",
+   "priority": 0.6
+  },
+  {
    "url": "{BASE}/tr/category/fanlar",
    "priority": 0.7
   },
@@ -396,6 +400,10 @@
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi/depo-havalandirma-fani-nasil-secilir",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi/demir-celik-tesisi-isi-kontrolu-havalandirma-kaynaklari",
    "priority": 0.6
   },
   {
