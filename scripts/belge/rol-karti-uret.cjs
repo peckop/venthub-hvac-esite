@@ -979,6 +979,19 @@ function kart(ad, r, amacKartta = amacKarttaMi(ad), defterler = DEFTER_MANIFESTI
   return kartGovdesi(ad, r, amacKartta, '')
 }
 
+/**
+ * Defter satırı bayt payı yüzünden kartta DÜŞEN roller (OPS kararı 9 Kasım: kartlara pay açılmaz, düşme sessiz olmaz).
+ * Her rol için gerçek akış: önce Amaç kartta mı (satırla ölçülür), sonra satır kartta kaldı mı.
+ */
+function defterDusenRoller(manifest = DEFTER_MANIFESTI) {
+  return Object.keys(ROLLER).filter((ad) => {
+    const bolum = defterBolumu(ad, manifest)
+    if (!bolum) return false
+    const amacKartta = Buffer.byteLength(kart(ad, ROLLER[ad], true, manifest), 'utf8') <= KART_AMAC_TAVANI
+    return !kart(ad, ROLLER[ad], amacKartta, manifest).includes(bolum)
+  })
+}
+
 function kartGovdesi(ad, r, amacKartta, defterBolumMetni) {
   return [
     `# ROL KARTI: ${ad}`,
@@ -1459,6 +1472,7 @@ module.exports = {
   TASLAK_ROLLERI,
   KART_AMAC_TAVANI,
   defterBolumu,
+  defterDusenRoller,
   kart,
   amacKarttaMi,
   gorevVerisiOku,

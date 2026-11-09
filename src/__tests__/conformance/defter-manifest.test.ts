@@ -38,6 +38,7 @@ const uretici = req(path.join(KOK, 'scripts', 'belge', 'rol-karti-uret.cjs')) as
   KART_AMAC_TAVANI: number
   defterBolumu: (ad: string, m?: unknown) => string
   uret: () => Record<string, string>
+  defterDusenRoller: (m?: unknown) => string[]
   kart: (ad: string, r: unknown, amacKartta: boolean, defterler: unknown) => string
 }
 
@@ -64,7 +65,7 @@ describe('defter manifest yapı kapısı', () => {
       ['aynı dosya iki kayıtta', (m) => (m.defterler.push({ ...m.defterler[0], ad: 'baska-ad' }), m), /aynı dosya/],
       ['ad büyük harf', (m) => ((m.defterler[0].ad = 'Urun_Adres'), m), /ad küçük harf/],
       ['sahip geçersiz', (m) => ((m.defterler[0].sahip = 'YOKROL'), m), /sahip/],
-      ['dosyasız pilot', (m) => ((m.defterler[0].durum = 'pilot'), m), /dosya yok/],
+      ['dosyasız pilot', (m) => ((m.defterler[0].dosya = 'docs/defter/olmayan-defter-xyz.md'), (m.defterler[0].durum = 'pilot'), m), /dosya yok/],
       ['dosya docs dışında', (m) => ((m.defterler[0].dosya = 'src/x.md'), m), /docs\//],
       ['ozet boş', (m) => ((m.defterler[0].ozet = ''), m), /ozet/],
       ['izlenen boş', (m) => ((m.defterler[0].izlenen = []), m), /izlenen boş/],
@@ -139,6 +140,20 @@ describe('rol kartı "Sürekli defterler" bölümü', () => {
       if (bayt > uretici.KART_AMAC_TAVANI) asanlar.push(`${rol}:${bayt}`)
     }
     expect(asanlar, `tavan (${uretici.KART_AMAC_TAVANI}) aşıldı`).toEqual([])
+  })
+
+  it('GÖRÜNÜR DÜŞME (OPS kararı 9 Kasım: kartlara pay açılmaz): defter satırı hangi rolün kartında düşer? Liste açık yazılı, değişirse test bilerek değiştirilir', () => {
+    // Bugünkü kart baytlarıyla tek defterli (12 karakter ad) her rol için ölçülmüş küme: EDGE (pay 12 B) ve YETENEK (pay 17 B).
+    const KARTA_SIGMAYAN = ['EDGE', 'YETENEK']
+    const hepsi = (ad: string): Manifest => ({
+      sema: 1,
+      defterler: roller.map((r) => m({ ad, sahip: r }).defterler[0]),
+    })
+    expect(uretici.defterDusenRoller(hepsi('abcdefghijkl'))).toEqual(KARTA_SIGMAYAN)
+    // Gerçek manifestte düşen rol, yukarıdaki bilinen kümenin dışına çıkarsa: sessiz kayıp, karar gerekir.
+    const gercekDusen = uretici.defterDusenRoller(gercek())
+    expect(gercekDusen.filter((r) => !KARTA_SIGMAYAN.includes(r)), 'bilinmeyen rolde defter satırı kartta düştü').toEqual([])
+    if (gercekDusen.length) console.warn(`[defter] kartta satırı düşen rol (manifest + açılış satırı kaynak): ${gercekDusen.join(', ')}`)
   })
 
   it('pilot roller (URUN, GEO-SEO) tek defterle satırı kartta taşır; yer olmayan rolde (EDGE) satır düşer ama kart tavanın altında kalır', () => {

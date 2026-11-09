@@ -18,6 +18,9 @@ Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini
 ## Düzenli görevler
 - 10 görev, tetiğe bağlı 7: `docs/roller/GEO-SEO-gorevler.md`.
 
+## Sürekli defterler
+- geo-seo-dizin
+
 ## Dosyalar
 scripts/seo/**, public/llms.txt, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum,dizin-sistemleri}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
 
