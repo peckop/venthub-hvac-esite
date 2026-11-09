@@ -38,7 +38,7 @@ const GECIS_RE = new RegExp(
       // Veri aktarımı (ARC-291 eki, Recep): UnoPIM tek başına yeter; öteki kalıplar "aktar" ile birlikte (gündelik "görsel", "resim" tek başına YOK).
       'unopim',
       'veri\\s+aktar\\p{L}*',
-      '(?:teknik\\s+(?:[öo]zellik|de[ğg]er)\\p{L}*|g[öo]rsel\\p{L}*|resim\\p{L}*|[üu]r[üu]n\\s+veri\\p{L}*|fiyat\\s*(?:/|ve)?\\s*kdv)\\s+aktar\\p{L}*',
+      '(?:teknik\\s+(?:[öo]zellik|de[ğg]er)\\p{L}*|g[öo]rsel\\p{L}*|resim\\p{L}*|[üu]r[üu]n\\s+veri\\p{L}*|fiyat(?:\\s*/\\s*|\\s+ve\\s+|\\s+)kdv)\\s+aktar\\p{L}*',
     ].join('|') +
     ')',
   'iu',

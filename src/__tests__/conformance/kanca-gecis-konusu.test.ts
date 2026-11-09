@@ -46,6 +46,8 @@ describe('INV-KANCA-GECIS-KONUSU-1 · kalıp', () => {
       'ürün verisi aktarımı',
       'fiyat/KDV aktarımı',
       'fiyat ve kdv aktarımı',
+      'fiyat kdv aktarımı',
+      'resimleri aktar',
     ]) {
       expect(YARDIMCI.gecisMi(m), m).toBe(true)
     }
