@@ -53,6 +53,24 @@
       "olcum": null,
       "disKaynak": null,
       "durum": "pilot"
+    },
+    {
+      "ad": "katalog-unopim-icerik",
+      "dosya": "docs/defter/katalog-unopim-icerik.md",
+      "sahip": "KATALOG",
+      "ozet": "UnoPIM ürün içeriği: alan × doluluk (1165 ürün), Design↔UnoPIM fark sonucu ve doldurulması gerekenler",
+      "izlenen": [
+        "scripts/icerik-hatti/unopim-icerik-olc.mjs",
+        "scripts/icerik-hatti/unopim-icerik-kurallar.mjs",
+        "scripts/icerik-hatti/tasarim-unopim-fark.mjs",
+        "docs/olcum/pim-unopim.md",
+        "docs/standards/catalog-ingestion-standard.md"
+      ],
+      "tazelikGun": 7,
+      "tetik": ["kart-kapanisi", "dis-kaynak"],
+      "olcum": "node scripts/icerik-hatti/unopim-icerik-olc.mjs --kontrol",
+      "disKaynak": "unopim",
+      "durum": "pilot"
     }
   ]
 }
