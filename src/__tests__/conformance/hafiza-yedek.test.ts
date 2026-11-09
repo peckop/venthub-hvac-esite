@@ -160,3 +160,55 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     expect(bozuk.status).toBe(0)
   })
 })
+
+describe('INV-YEDEK-UYARI-1 · yedek-uyari.txt açılış satırı (ARC-292)', () => {
+  const kos = (olay: string, env: Record<string, string>, hafiza = dir) =>
+    spawnSync('node', [KANCA], {
+      input: JSON.stringify({ hook_event_name: olay }),
+      encoding: 'utf8',
+      windowsHide: true,
+      env: { ...process.env, HAFIZA_DIZINI: hafiza, ...env },
+    })
+  const baglam = (c: { stdout: string }) =>
+    c.stdout ? (JSON.parse(c.stdout) as { hookSpecificOutput: { additionalContext: string } }).hookSpecificOutput.additionalContext : ''
+  const dosya = () => path.join(dir, 'yedek-uyari.txt')
+
+  it('dosya varsa SessionStart satırına tek satır eklenir (yalnız ilk dolu satır)', () => {
+    fs.writeFileSync(dosya(), '\nUnoPIM yedeği atlandı: sürücü yok\nikinci satır\n')
+    const c = baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() }))
+    expect(c).toContain('⚠YEDEK UYARI: UnoPIM yedeği atlandı: sürücü yok')
+    expect(c).not.toContain('ikinci satır')
+    expect(c).toContain('HAFIZA YEDEK')
+  })
+  it('hafıza dizini yokken de uyarı basar', () => {
+    fs.writeFileSync(dosya(), 'yedek düştü\n')
+    const c = baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() }, path.join(dir, 'yok')))
+    expect(c).toBe('⚠YEDEK UYARI: yedek düştü')
+  })
+  it('sabotaj: dosya yok / boş / okunamaz (dizin) → uyarı satırı yok, çıkış 0', () => {
+    for (const yol of [path.join(dir, 'yok.txt'), dosya(), dir]) {
+      if (yol === dosya()) fs.writeFileSync(yol, ' \n\n')
+      const r = kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: yol })
+      expect(r.status).toBe(0)
+      expect(baglam(r)).not.toContain('YEDEK UYARI')
+    }
+  })
+  it('sabotaj: vana ve SessionStart dışı olaylar susar', () => {
+    fs.writeFileSync(dosya(), 'yedek düştü\n')
+    expect(baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya(), VENTHUB_YEDEK_UYARI_KAPAT: '1' }))).not.toContain('YEDEK UYARI')
+    expect(baglam(kos('UserPromptSubmit', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() }))).not.toContain('YEDEK UYARI')
+  })
+  it('sabotaj: kontrol karakterleri (ESC, U+2028) bağlama girmez', () => {
+    fs.writeFileSync(dosya(), 'yedek \u001b[31mdüştü\u2028son\u0000\n')
+    const satirlar = baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() })).split('\n')
+    const son = satirlar[satirlar.length - 1]
+    expect(son).toBe('⚠YEDEK UYARI: yedek  [31mdüştü son')
+     
+    expect(/[\u0000-\u001f\u2028]/.test(son)).toBe(false)
+  })
+  it('uzun içerik 200 karaktere kırpılır', () => {
+    fs.writeFileSync(dosya(), 'x'.repeat(500) + '\n')
+    const satirlar = baglam(kos('SessionStart', { VENTHUB_YEDEK_UYARI_DOSYA: dosya() })).split('\n')
+    expect(satirlar[satirlar.length - 1]).toBe('⚠YEDEK UYARI: ' + 'x'.repeat(200))
+  })
+})

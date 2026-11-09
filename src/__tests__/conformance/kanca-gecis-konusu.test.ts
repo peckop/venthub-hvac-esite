@@ -83,6 +83,33 @@ describe('INV-KANCA-GECIS-KONUSU-1 · istem', () => {
   })
 })
 
+describe('INV-DEFTER-KANBAN-1 · etiketsiz kart uyarısı (ARC-291)', () => {
+  const kart = (title: string, labels?: string[], action = 'add_task') => ({
+    tool_name: 'mcp__wrongstack-kanban__kanban_manage',
+    tool_input: { action, title, labels },
+  })
+  it('geçiş/adres/dizin başlıklı kart etiketsiz açılırsa HER rolde uyarır', () => {
+    for (const rol of ['ops-pencere', 'urun-pencere', 'arac-pencere']) {
+      const r = kos(KART, kart('URN-300: 308 yönlendirme tablosu', ['kanca']), { VENTHUB_PENCERE_AGENT: rol })
+      expect(r.status).toBe(0)
+      expect(r.cikti, rol).toContain('DEFTER ETİKETİ YOK')
+    }
+  })
+  it('sabotaj: defter:<ad> etiketi varsa, başka konuysa, add_task değilse, vana kapalıysa susar', () => {
+    expect(kos(KART, kart('URN-300: 308 yönlendirme tablosu', ['defter:urun-adres'])).cikti).not.toContain('DEFTER ETİKETİ YOK')
+    expect(kos(KART, kart('ARC-300: kanca testi', [])).cikti).not.toContain('DEFTER ETİKETİ YOK')
+    expect(kos(KART, kart('URN-300: dizin isteği', [], 'add_note')).cikti).not.toContain('DEFTER ETİKETİ YOK')
+    expect(kos(KART, kart('URN-300: dizin isteği', []), { VENTHUB_GECIS_KONUSU_KAPAT: '1' }).cikti).not.toContain('DEFTER ETİKETİ YOK')
+    expect(kos(KART, kart('URN-300: adres eşleştirme', ['defter:YOK_BÜYÜK'])).cikti).toContain('DEFTER ETİKETİ YOK')
+  })
+  it('büyük harfli etiket kabul edilir; alakasız "adres/dizin" başlıkları susar', () => {
+    expect(kos(KART, kart('URN-300: adres eşleştirme', ['defter:Urun-adres'])).cikti).not.toContain('DEFTER ETİKETİ YOK')
+    for (const t of ['Sipariş teslimat adresi', 'e-posta adresi doğrula', 'Vitrin dizin yapısı (klasör dizini)', 'Adres defteri alanı', 'dizinde ara']) {
+      expect(kos(KART, kart(`URN-301: ${t}`, [])).cikti, t).not.toContain('DEFTER ETİKETİ YOK')
+    }
+  })
+})
+
 describe('INV-KANCA-GECIS-KONUSU-1 · Agent ve kart açma', () => {
   it('OPS Agent açarken geçiş konusu → PreToolUse uyarısı (blok değil)', () => {
     const r = kos(AGENT, { tool_name: 'Agent', tool_input: { description: 'yeni site araştırması', prompt: 'canlıya geçiş için adres şemasını araştır' } })

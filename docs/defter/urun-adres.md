@@ -8,6 +8,16 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 
 ## 1 Ne yaptık
 
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:urun-adres etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs urun-adres --yaz · Üretildi: 2026-11-09 -->
+| Kapanış | Kart | İş | Sahip |
+|---|---|---|---|
+| 2026-11-09 | URN-160 | Geçiş hazırlığı: marka/ana sayfa/sabit sayfa eski→yeni eşleme önerisi + 6 çakışan hedef için öneri listesi (defter Sırada'sına karar satırla | URUN |
+| 2026-11-09 | URN-159 | adres-semasi-standard.md 2 Kasım tek önek kararına göre güncelle (/urunler, /uygulama-alanlari, /rehber; EN products/applications/guides) | URUN |
+| 2026-11-09 | URN-158 | OPS-258 pilot defteri "urun-adres": canlı adres şeması, yönlendirme katmanları, SEO-76 son ölçümü, Sırada (URN-157 + eksik kalemler) | URUN |
+| 2026-11-06 | URN-156 | vitrin-metni-standard.md: ürün metni yazma betiklerinin sahibi KATALOG (8. ve 230. satır ALTYAPI gösteriyor, bayat) | URUN |
+| 2026-10-10 | SEO-35 | adres şeması karar belgesi (A bugünkü / B düz kategori / C kimlikli kısa) + Google öğrenmeden önce ucuz kararlar (OPS emri 10-10, vade 16:00 | SEO |
+<!-- DEFTER-KANBAN:ne-yaptik BITIS -->
+
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
 | 2026-11-09 | `adres-semasi-standard.md` v0.3: yeni sitenin tek önek şeması §1A (urunler, uygulama-alanlari, rehber; A12–A15), eski şema §1 "eski site" diye işaretlendi, §3 geçiş eski-adres gruplarını söyler; rota dili ve dil tespiti bölümlerine dokunulmadı | Cetvel ile karar ayrışıklığı kapandı | URN-159 |
@@ -74,6 +84,16 @@ Rota dili cetveli (`rota-dili-standard.md`, ALTYAPI) §0 ile yeni sitenin tek ka
 (ALT-179, #2450, 1d335bd04): tablo yeni önekleri taşımıyor, kod değişmedi, karar 412. URUN o dosyaya dokunmadı.
 
 ## 3 Sırada ve yapılabilecekler
+
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:urun-adres etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs urun-adres --yaz · Üretildi: 2026-11-09 -->
+| Kart | İş | Durum | Sahip |
+|---|---|---|---|
+| ALT-177 | Yeni site geçişi: rota dili (dil öneki, A9 307/308, A10 dil tespiti), arama sayfası yönlendirmesi ve yönlendirme haritası CI kapıları (geçiş | Backlog | ALTYAPI |
+| SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm: 308 listesini canlı adreslere karşı sına, Search Console /urunler/ ve /rehber/ süzgeçleri (Recep | Backlog | GEO-SEO |
+| URN-85 | 3-C adres şeması açılış PR'ı: ADRES_SEMASI_K3B = true + eski→yeni harita + next.config'ten 19 satır silme (+ #1738 tek gövde bayrağı) | Backlog | URUN |
+| URN-86 | Aile EN slug'ı (35 aile) ve diğer EN adres farkları: dil başına slug, hedef Design CSV, 18 Ekim EN açılışından önce | Backlog | URUN |
+| URN-157 | Yeni siteye geçişte eski→yeni adres eşleştirme tablosu + 308 yönlendirme (kaynak: canlı site haritası → Design envanteri; adres-semasi-stand | Backlog | URUN |
+<!-- DEFTER-KANBAN:sirada BITIS -->
 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
