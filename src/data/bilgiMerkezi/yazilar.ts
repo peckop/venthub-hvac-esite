@@ -1687,7 +1687,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'patlayici-ortamda-fan-secimi-atex',
     konu: 'guvenlik',
     yayinTarihi: '2026-11-08',
-    guncellemeTarihi: '2026-11-08',
+    // 9 Kasım 2026 (BLG-56 öneri 1-3, R5.5): RG 27.06.2020/31168 değişiklik yönetmeliği okundu (Bakanlık adı, bakan, değişmeyen maddeler, Kaynak 9), '99/92/AT' yazımı '1999/92/AT' birliğine getirildi, 28633 ve 29758 için tarama sınırı yazıldı.
+    guncellemeTarihi: '2026-11-09',
     urunler: ['vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar', 'vh:aile/jet-serisi'],
     ilgiliKategoriler: ['vh:kategori/centrifugal-fans', 'vh:kategori/corrosion-and-acid-resistant-fans'],
     diller: {
@@ -1704,11 +1705,11 @@ Kısaca:
 
 - Bölge: alanı işveren bölgelere ayırır [3]; bölge 2'de patlayıcı ortamın normal işletmede oluşması beklenmez, oluşursa kısa süre kalır [2].
 - Kategori: kategori 3 ekipman, patlayıcı ortamın olası olmadığı ya da yalnız seyrek ve kısa süreli olduğu yerler içindir [1].
-- Eşleşme: 99/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, ekipman ortamın türüne uygunsa, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
+- Eşleşme: 1999/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, ekipman ortamın türüne uygunsa, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
 
 ## ATEX hangi iki direktife verilen addır?
 
-Health and Safety Executive'in (HSE) sayfası ATEX'i, patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen ad olarak anlatır [3]. Bunlardan 2014/34/AB, üye devletlerin patlayıcı ortamlarda kullanılacak ekipman ve koruyucu sistemlere ilişkin yasalarının yakınlaştırılmasını; 99/92/AT ise patlayıcı ortam riski altındaki çalışanların sağlık ve güvenliğinin korunması için asgari gereklilikleri kapsar [3]. 2014/34/AB'nin 1. maddesinin (1)(a) bendi de ana kapsamı aynı sözlerle çizer: patlayıcı ortamlarda kullanılması amaçlanan ekipman ve koruyucu sistemler [1].
+Health and Safety Executive'in (HSE) sayfası ATEX'i, patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen ad olarak anlatır [3]. Bunlardan 2014/34/AB, üye devletlerin patlayıcı ortamlarda kullanılacak ekipman ve koruyucu sistemlere ilişkin yasalarının yakınlaştırılmasını; 1999/92/AT ise patlayıcı ortam riski altındaki çalışanların sağlık ve güvenliğinin korunması için asgari gereklilikleri kapsar [3]. 2014/34/AB'nin 1. maddesinin (1)(a) bendi de ana kapsamı aynı sözlerle çizer: patlayıcı ortamlarda kullanılması amaçlanan ekipman ve koruyucu sistemler [1].
 
 Direktif "ekipmanı" makineler, aygıtlar, sabit ya da taşınabilir cihazlar, kontrol bileşenleri ve araçları ile algılama ya da önleme sistemleri olarak sayar; bunlar enerji üretimi, aktarımı, depolanması, ölçümü, kontrolü ve dönüşümü ve/veya malzeme işleme amaçlı olmalı ve kendi olası tutuşturma kaynaklarıyla patlama yaratabilmelidir [1]. Direktif metninde "fan" sözcüğü geçmez [1]; bu yazı bir fanın kapsamda olup olmadığına hüküm vermez. Direktife göre "potentially explosive atmosphere" (potansiyel olarak patlayıcı ortam), yerel ve işletme koşulları nedeniyle patlayıcı hâle gelebilen ortamdır (2. madde, 5. bent) [1].
 
@@ -1718,7 +1719,7 @@ Direktif "ekipmanı" makineler, aygıtlar, sabit ya da taşınabilir cihazlar, k
 
 HSE'ye göre işverenler, tehlikeli patlayıcı ortamın oluşabileceği alanları bölgelere sınıflandırmak zorundadır; bir bölgenin sınıfı, büyüklüğü ve yeri patlayıcı ortamın oluşma olasılığına ve oluşursa ne kadar kalacağına bağlıdır [3].
 
-99/92/AT'nin I. Eki bölge 2'yi şöyle tanımlar: gaz, buhar ya da sis hâlindeki yanıcı maddelerin havayla karışımından oluşan patlayıcı ortamın normal işletmede oluşması beklenmeyen, oluşsa bile yalnız kısa süre kalacak olan yer [2].
+1999/92/AT'nin I. Eki bölge 2'yi şöyle tanımlar: gaz, buhar ya da sis hâlindeki yanıcı maddelerin havayla karışımından oluşan patlayıcı ortamın normal işletmede oluşması beklenmeyen, oluşsa bile yalnız kısa süre kalacak olan yer [2].
 
 ## Kategori ve "G" işareti ne anlatır?
 
@@ -1728,7 +1729,7 @@ Ekipman işaretindeki "G" harfi, II. ekipman grubunda gaz, buhar ya da sisin ned
 
 ## Bölge ile kategori nasıl eşleşir?
 
-99/92/AT'nin II. Ekinin B bölümü, ekipman ve koruyucu sistemlerin seçim ölçütlerini verir ve hangi bölgede hangi kategorinin kullanılacağını sayar; liste, risk değerlendirmesine dayalı patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla geçerlidir [2]. Bu bölüm kategorileri 94/9/AT'ye atıfla verir [2]; o direktif 2014/34/AB ile yürürlükten kalkmıştır [1]. Yazı iki direktifin kategori anlatımlarını yan yana okur; bu bağı kuran yazının kendi okumasıdır.
+1999/92/AT'nin II. Ekinin B bölümü, ekipman ve koruyucu sistemlerin seçim ölçütlerini verir ve hangi bölgede hangi kategorinin kullanılacağını sayar; liste, risk değerlendirmesine dayalı patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla geçerlidir [2]. Bu bölüm kategorileri 94/9/AT'ye atıfla verir [2]; o direktif 2014/34/AB ile yürürlükten kalkmıştır [1]. Yazı iki direktifin kategori anlatımlarını yan yana okur; bu bağı kuran yazının kendi okumasıdır.
 
 | Bölge | Kullanılacak ekipman kategorisi |
 |---|---|
@@ -1743,7 +1744,7 @@ Ekipmana ilişkin 2014/34/AB, Türkiye'de Bilim, Sanayi ve Teknoloji Bakanlığ�
 
 Çalışanların korunmasına ilişkin yönetmelik, 30 Nisan 2013 tarihli ve 28633 sayılı Resmî Gazete'de yayımlanan "Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik"tir [8]. Bu yönetmeliğin Ek-1'inde bölge 2, gaz, buhar ve sis halindeki yanıcı maddelerin hava ile karışarak normal çalışma koşullarında patlayıcı ortam oluşturma ihtimali olmayan yerler ya da böyle bir ihtimal olsa bile patlayıcı ortamın çok kısa bir süre için kalıcı olduğu yerler olarak tanımlanır; Ek-3, patlamadan korunma dokümanında aksi belirtilmedikçe, bölge 2 veya bölge 22 için kategori 1, 2 veya 3 ekipmanı, bölge 1 veya bölge 21 için kategori 1 veya 2 ekipmanı sayar [8].
 
-İki yönetmelik için de Resmî Gazete'de yayımlanan ilk metne bakılmıştır [7][8]; sonraki değişiklikler okunmamıştır.
+29758 sayılı yönetmelik için Resmî Gazete'de yayımlanan ilk metne ve 27 Haziran 2020 tarihli ve 31168 sayılı Resmî Gazete'de yayımlanan değişiklik yönetmeliğine bakılmıştır [7][9]. Değişiklik yönetmeliği Bakanlık tanımını Sanayi ve Teknoloji Bakanlığı olarak yazar ve yürütme maddesinde Sanayi ve Teknoloji Bakanını anar [9]; bu yazının atıf yaptığı 4. maddenin birinci fıkrasındaki (s) ve (ğ) bentleri ile 41. ve 43. maddeler değiştirilen maddeler arasında yer almaz [9]. 29758 sayılı yönetmelik için bu iki metin dışında değişiklik taraması yapılmamıştır [7][9]. 28633 sayılı yönetmelik için Resmî Gazete'de yayımlanan ilk metne bakılmıştır [8]; bu yönetmeliğin sonraki değişikliklerinin taraması yapılmamıştır.
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -1761,7 +1762,7 @@ Patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen addır: biri ekipm
 
 ### Bölge 2'de hangi ekipman kategorisi kullanılır?
 
-99/92/AT II. Ek B bölümüne göre, patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla, bölge 2 (ve toz için bölge 22) için kategori 1, 2 ya da 3 ekipman sayılır [2].
+1999/92/AT II. Ek B bölümüne göre, patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla, bölge 2 (ve toz için bölge 22) için kategori 1, 2 ya da 3 ekipman sayılır [2].
 
 ### Kategori 3 ne demektir?
 
@@ -1773,7 +1774,7 @@ HSE'ye göre alanı işveren sınıflandırır [3].
 
 ### Bölge 1'de kategori 3 ekipman kullanılabilir mi?
 
-99/92/AT II. Ek B bölümü, patlamadan korunma belgesi aksini belirtmedikçe, bölge 1 ve 21 için yalnız kategori 1 ya da 2 ekipmanı sayar; kategori 3 yalnız bölge 2 ve 22 satırındadır [2].
+1999/92/AT II. Ek B bölümü, patlamadan korunma belgesi aksini belirtmedikçe, bölge 1 ve 21 için yalnız kategori 1 ya da 2 ekipmanı sayar; kategori 3 yalnız bölge 2 ve 22 satırındadır [2].
 
 ### Ekipman işaretindeki "G" harfi ne anlama gelir?
 
@@ -1789,6 +1790,7 @@ HSE'ye göre alanı işveren sınıflandırır [3].
 6. SEAT Ventilation, JET 20 ürün sayfası (jet-25 ve jet-30 sayfalarında aynı ifade). https://seat-ventilation.com/products/jet-20 (erişim 08.11.2026)
 7. Bilim, Sanayi ve Teknoloji Bakanlığı, Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB), Resmî Gazete, 30.06.2016, sayı 29758, madde 4, 41, 43. https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm (erişim 08.11.2026)
 8. Çalışma ve Sosyal Güvenlik Bakanlığı, Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik, Resmî Gazete, 30.04.2013, sayı 28633, Ek-1 ve Ek-3. https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm (erişim 08.11.2026)
+9. Sanayi ve Teknoloji Bakanlığı, Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB)'te Değişiklik Yapılmasına Dair Yönetmelik, Resmî Gazete, 27.06.2020, sayı 31168. https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm (erişim 09.11.2026)
 
 ## Teknik sorumluluk notu
 
