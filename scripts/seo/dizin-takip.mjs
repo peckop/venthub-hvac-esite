@@ -268,17 +268,23 @@ async function googleOlc(adresler) {
   return sonuc
 }
 
+/** Bing GetUrlInfo adresler arası bekleme (ms): ilk geçiş, sonra iki yavaşlayan yeniden deneme (SEO-102). */
+export const BING_ARALIK_MS = [1000, 2000, 3500]
+
 async function bingOlc(adresler) {
   const k = anahtarOku(anahtarDosyasiYolu())
   if (k.hata) return Object.fromEntries(adresler.map((a) => [a, { hata: k.hata }]))
   const cevir = (s) => Object.fromEntries((s.urlBilgi ?? []).map((u) => [u.adres, u.durum === 'TAMAM' ? { sonTarama: u.sonTarama } : { hata: u.neden ?? u.durum }]))
-  const ilk = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: adresler, gun: 30 }))
-  const basarisiz = adresler.filter((a) => !ilk[a] || ilk[a].hata)
-  if (!basarisiz.length) return ilk
-  // Hız sınırı ihtimaline karşı yalnız başarısızlar yavaşça bir kez daha denenir (sessiz geçmez: yine başarısızsa OLCULEMEDI kalır).
-  await new Promise((r) => setTimeout(r, 2000))
-  const ikinci = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: basarisiz, gun: 30, bekleMs: 1200 }))
-  for (const a of basarisiz) ilk[a] = ikinci[a] ?? { hata: 'Bing yanıtı yok' }
+  // SEO-102: tam site haritası (101 adres) varsayılan 200 ms aralıkla 61 adreste ThrottleHost verdi; ilk geçiş yavaş okur.
+  const ilk = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: adresler, gun: 30, bekleMs: BING_ARALIK_MS[0] }))
+  // Hız sınırına karşı yalnız başarısızlar, her turda daha yavaş, en çok iki kez daha denenir (sessiz geçmez: yine başarısızsa OLCULEMEDI kalır).
+  for (const aralik of BING_ARALIK_MS.slice(1)) {
+    const basarisiz = adresler.filter((a) => !ilk[a] || ilk[a].hata)
+    if (!basarisiz.length) break
+    await new Promise((r) => setTimeout(r, 3000))
+    const sonraki = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: basarisiz, gun: 30, bekleMs: aralik }))
+    for (const a of basarisiz) ilk[a] = sonraki[a] ?? { hata: 'Bing yanıtı yok' }
+  }
   return ilk
 }
 

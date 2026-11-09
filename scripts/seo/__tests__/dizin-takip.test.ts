@@ -13,7 +13,7 @@ import { resolve, join } from 'node:path'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
-  KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
+  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
   satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
@@ -153,6 +153,14 @@ describe('içe aktarım', () => {
     const ilk = yeniOlanlar([], aday)
     expect(ilk).toHaveLength(aday.length)
     expect(yeniOlanlar(ilk, aday)).toHaveLength(0)
+  })
+})
+
+describe('Bing hız sınırı (SEO-102)', () => {
+  it('ilk geçiş en az 1 sn aralıklı, yeniden denemeler her turda daha yavaş', () => {
+    expect(BING_ARALIK_MS[0]).toBeGreaterThanOrEqual(1000)
+    expect(BING_ARALIK_MS.length).toBeGreaterThanOrEqual(2)
+    for (let i = 1; i < BING_ARALIK_MS.length; i++) expect(BING_ARALIK_MS[i]).toBeGreaterThan(BING_ARALIK_MS[i - 1])
   })
 })
 

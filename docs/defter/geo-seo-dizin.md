@@ -8,6 +8,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 
 | Tarih | İş | Neden | Sonuç | Kart |
 |---|---|---|---|---|
+| 2026-11-09 | Bing durum ölçümü tam kapsamda yavaş okur; OLCULEMEDI 61 → 7 | Tam kapsam Bing hız sınırına takılıyordu | `BING_ARALIK_MS` [1000, 2000, 3500] | SEO-102 |
 | 2026-11-09 | Defter ve tutarlılık kontrolü | Alanın bugünkü hâli tek yerde, depo-güvenli | Bu dosya + `dizin-defter-kontrol.mjs` | SEO-101 |
 | 2026-11-09 | Takip kapsamı tüm site haritası; Google "dizinde" olmadan TAMAM vermez | Tablo 101 adresin 40'ını izliyordu; taranmış ama dizinde olmayan sayfa TAMAM görünüyordu | 101 adresin 87'si Google dizininde, 14'ü değil; 7 ürün sayfası hiç istek almamıştı | SEO-100 |
 | 2026-11-09 | Eski tarihli lastmod ve açılış satırı gününün Türkiye günü olması | Gece yarısından sonra UTC bir önceki günü yazıyordu | Açılış satırı TR günü | SEO-99 |
@@ -24,7 +25,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 {
   "anlikGoruntu": "dizin-takip-2026-11-09.json",
   "gun": "2026-11-09",
-  "sha256": "25fddb81ed79c1369703e42f90375cb3668553497d3541a5a44ea9744b18aa78",
+  "sha256": "ee9171f51abca8234f6bc6b7706bab63fce83502963a885884fb7216b8e3aa4f",
   "adresSayisi": 101,
   "kapsam": {
     "about": 1,
@@ -47,13 +48,13 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
       "OLCULEMEDI": 0
     },
     "bing": {
-      "TAMAM": 27,
-      "BEKLE": 11,
+      "TAMAM": 68,
+      "BEKLE": 18,
       "TEKRAR": 0,
-      "YAP": 2,
+      "YAP": 8,
       "ATLA": 0,
       "ESKI": 0,
-      "OLCULEMEDI": 61
+      "OLCULEMEDI": 7
     },
     "indexnow": {
       "TAMAM": 33,
@@ -75,7 +76,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
     }
   },
   "olculemeyen": {
-    "bing: ThrottleHost": 61
+    "bing: ThrottleHost": 7
   }
 }
 ```
@@ -85,7 +86,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 |---|---|---|---|
 | İzlenen adres kümeleri | Site haritasının tamamı: 101 adres (14 bilgi merkezi, 29 kategori, 47 ürün, 7 marka, 4 sabit sayfa) | 2026-11-09 | `node scripts/seo/dizin-takip.mjs --durum`; yukarıdaki özet |
 | Google dizin durumu (canlı) | 87 adres dizinde, 14'ü değil: 11 Google'ın bilmediği (4 bilgi merkezi yazısı, 7 ürün sayfası), 2 keşfedildi-dizinde değil, 1 tarandı-dizinde değil | 2026-11-09 | `node scripts/seo/gsc-url-denetim.mjs --cikti <depo dışı>` (URL Inspection `verdict`) |
-| Bing ölçümü | Kapsam 101'e çıkınca 61 adresin durumu `ThrottleHost` ile okunamadı; kararlar OLCULEMEDI (sessiz sıfır değil) | 2026-11-09 | `scripts/seo/dizin-takip.mjs` `bingOlc`; özetteki `olculemeyen` |
+| Bing ölçümü | Kapsam 101'e çıkınca 61 adresin durumu `ThrottleHost` ile okunamadı; SEO-102 ile (adresler arası 1 sn, iki yavaş yeniden deneme) 7'ye indi, kalan 7 OLCULEMEDI (sessiz sıfır değil) | 2026-11-09 | `scripts/seo/dizin-takip.mjs` `bingOlc`, `BING_ARALIK_MS`; özetteki `olculemeyen` |
 | Yandex | API yok; IndexNow ortak uç noktası Yandex'e iletir, elle istek bırakıldı; tarama bilgisi yalnız elle okunan ölçümle | 2026-11-08 | `dizin-sistemleri-standard.md` D7 madde 11 |
 | IndexNow | Günlük görev + değişen adres bildirici; anahtar kamuya açık | 2026-11-09 | `scripts/seo/degisen-adres-bildir.mjs`, `.github/workflows/dizin-tetigi.yml` |
 | Günlük kotalar | Google elle istek ~11/gün (9 Kasım ölçüldü: 11. istekte kota doldu), Bing 100/gün, Yandex elle istek kullanılmıyor | 2026-11-09 | `docs/standards/yayin-gorunurluk-denetim-standard.md` Y2.1; `bing-url-gonder.mjs --kota` |
@@ -98,7 +99,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
 | Google dizin isteği: 14 dizinde olmayan adres (4 bilgi merkezi yazısı, 7 ürün sayfası, 2 keşfedildi, 1 tarandı) + BLG-56'nın 2 güncellenmiş yazısı; günde ~11 istek, 10 ve 11 Kasım | Google'ın elle kotası dolduğu için bugün atılamadı; önce kota artığı, sonra yeni yazı (D7 madde 9) | yüksek | SEO-90 |
-| Bing ölçümünü parçalara böl (ThrottleHost) | Tüm site haritasında 61 adres okunamadı; sessiz sıfır yasağı gereği OLCULEMEDI kaldı, karar verilemiyor | yüksek | SEO-102 |
+| Bing ölçümünde kalan 7 adres (ThrottleHost) | SEO-102 düzeltmesiyle 61'den 7'ye indi; kalanlar hız sınırında, bir sonraki ölçümde yeniden denenir. Yine yüksek kalırsa aralık artırılır | düşük | SEO-102 |
 | Hava perdesi ve ısı geri kazanım sıra etkisi | Sayfalar dizinde ama aramada üst sırada çıkmadığı gözlemi; dizin değil sıra sorunu olabilir | orta | SEO-91 |
 | 308 yönlendirme geçişinin arama motoru ölçümü | Geçiş öncesi eski adres + dizin durumu, geçiş günü tek sıçrama, sonra 14 gün dizin takibi; kural adres-semasi-standard A9/A6 | orta, geçiş tarihi gelince | SEO-76 |
 | "Taranmış, dizinde değil" sayfalar için kalite/iç bağlantı bakışı | İstek bu durumu değiştirmeyebilir; sonsuz istek atılmaz (D7 madde 12) | orta | — |
