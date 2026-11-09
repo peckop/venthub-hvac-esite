@@ -164,7 +164,7 @@ En çok boş hücresi olan 15 aile (66 ailede en az bir boşluk var; tam liste `
 
 | Liste | Sayı | Yer |
 |---|---|---|
-| Ürün/aile × teknik alan boşlukları (SKU listeli) | 271 aile×alan (115 kısmi + 156 ailede tamamen boş), 2841 boş hücre | `C:/Users/alize/VentHub-Gorsel-Arsiv/_liste/unopim-icerik-olcum/doldurulacak.csv` (sha256 `ea272f1acc5e86cc0a99cc9c1d06319adc68f11e96f4a49d6d27eedbb801cdbe`) |
+| Ürün/aile × teknik alan boşlukları (SKU listeli) | 271 aile×alan (115 kısmi + 156 ailede tamamen boş), 2841 boş hücre | `~/VentHub-Gorsel-Arsiv/_liste/unopim-icerik-olcum/doldurulacak.csv` (sha256 `ea272f1acc5e86cc0a99cc9c1d06319adc68f11e96f4a49d6d27eedbb801cdbe`) |
 | Liste fiyatı kaynağı olmayan ürün | 822 | `_liste/ktl82-faz-c-2026-11-04/fiyat-kaynagi-olmayan-urunler.csv` (arşiv deposu); ticari statü ürün kararı |
 | Design'da olup UnoPIM'de olmayan kayıt | 0 (çözüldü) | 6 Kasım'da 41 kayıt (`DAN-80141` + `EDF-*` 40) vardı; 7 Kasım'da Design'da öneksiz kayıtlar çıkarıldı, adres dizini toplamı 1165 = UnoPIM 1165 (`surec/ops-cevap-2026-11-07-galeri-ve-cift-kod.md`). 41'lik liste yalnız tarihçe: `_liste/ktl82-faz-c-2026-11-04/design-fazla-41-sku-ad.csv` |
 | Design'da kaynağı olmayan fotoğrafsız ürün | 18 (Design 11-07) → UnoPIM'de görselsiz 5 | 13'ü sonradan üretici/Supabase görseliyle UnoPIM'de görselli (VRT-12103, -10914, -10925, -10926, -10927, -11291, -11293, -11177, -11903, -12108, -25095, -25096, SEA-61102010); kalan 5: VRT-HP-1400, VRT-HP-1400-D, AVE-13050, AVE-13051, SEA-810105 |
