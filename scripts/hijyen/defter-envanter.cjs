@@ -73,8 +73,8 @@ function unopimIzi() {
   }
 }
 
-/** Eşleştirme taslağı (2 Kasım, 2402 satır, SEO-76; depo dışı). URUN bildirdi, 9 Kasım. */
-const ADRES_VARSAYILAN = 'C:/tmp/vh-arsiv/geo-seo/seo76/yonlendirme-2026-11-02-tam.csv'
+/** Eşleştirme taslağı (2 Kasım, 2402 satır, SEO-76; depo dışı, kalıcı kopya). URUN bildirdi, 9 Kasım (C:\tmp yolu kullanılmaz). */
+const ADRES_VARSAYILAN = path.join(os.homedir(), 'VentHub-Gorsel-Arsiv', '_liste', 'seo76', 'yonlendirme-2026-11-02-tam.csv')
 
 /** Adres eşleştirme taslağı dosya izi (depo dışı; VENTHUB_ADRES_ESLESTIRME ile değişir); dosya yoksa null (ölçülemedi). */
 function adresIzi() {
