@@ -19,6 +19,7 @@
 
 const fs = require('node:fs')
 const path = require('node:path')
+const defterManifesti = require('./defter-manifest.cjs')
 
 // 4096 idi; 31 kuralın rol kartlarına dağıtımı (REC-503) ile 6656'ya çıktı: en yüklü kart (URUN, ölçüm: 6151 bayt)
 // kendi 17 kuralını taşır. Aşılırsa kural özetleri kısaltılır; sınır BİR DAHA GEVŞETİLMEZ (OPS şartı).
@@ -800,6 +801,14 @@ function gorevBolumu(ad, veri = GOREVLER) {
   ].join('\n')
 }
 
+/** Departman defterleri (HRT-126, OPS-258): manifest bir kez okunur; okunamazsa kart satırı üretilmez, yapı testi KIRMIZI verir. */
+const DEFTER_MANIFESTI = defterManifesti.oku()
+
+/** Kartta "Sürekli defterler" bölümü (yalnız o rolün görünen durumdaki defteri varsa; yoksa boş dize). */
+function defterBolumu(ad, manifest = DEFTER_MANIFESTI) {
+  return defterManifesti.kartBolumu(ad, manifest)
+}
+
 function hucre(s) {
   return String(s).replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim()
 }
@@ -955,7 +964,35 @@ function altiAlanSorunlari(kartlar, veri, roller, varMi, taslak = TASLAK_ROLLERI
   return s
 }
 
-function kart(ad, r, amacKartta = amacKarttaMi(ad)) {
+/**
+ * Rol kartı. "Sürekli defterler" satırı (HRT-126) bayt payına göre yer alır: Amaç metni geri çekilebiliyorsa (verisi olan rol,
+ * `amacKartta` true) önce o karar verilir (`amacKarttaMi` kartı satırla ölçer); geri çekilecek bir şey kalmadıysa ve kart yine
+ * fiilî tavanı (KART_AMAC_TAVANI) aşıyorsa satır kartta DÜŞER. Düşen satır sessiz kayıp değildir: manifest, açılış satırı
+ * (ARAÇ) ve PR kapısı (ALTYAPI) asıl kaynaktır; kart yalnız bir işarettir (tüzük Madde 3).
+ */
+function kart(ad, r, amacKartta = amacKarttaMi(ad), defterler = DEFTER_MANIFESTI) {
+  const bolum = defterBolumu(ad, defterler)
+  const tam = kartGovdesi(ad, r, amacKartta, bolum)
+  if (!bolum) return tam
+  const geriCekilebilir = Boolean(GOREVLER[ad]) && amacKartta === true
+  if (geriCekilebilir || Buffer.byteLength(tam, 'utf8') <= KART_AMAC_TAVANI) return tam
+  return kartGovdesi(ad, r, amacKartta, '')
+}
+
+/**
+ * Defter satırı bayt payı yüzünden kartta DÜŞEN roller (OPS kararı 9 Kasım: kartlara pay açılmaz, düşme sessiz olmaz).
+ * Her rol için gerçek akış: önce Amaç kartta mı (satırla ölçülür), sonra satır kartta kaldı mı.
+ */
+function defterDusenRoller(manifest = DEFTER_MANIFESTI) {
+  return Object.keys(ROLLER).filter((ad) => {
+    const bolum = defterBolumu(ad, manifest)
+    if (!bolum) return false
+    const amacKartta = Buffer.byteLength(kart(ad, ROLLER[ad], true, manifest), 'utf8') <= KART_AMAC_TAVANI
+    return !kart(ad, ROLLER[ad], amacKartta, manifest).includes(bolum)
+  })
+}
+
+function kartGovdesi(ad, r, amacKartta, defterBolumMetni) {
   return [
     `# ROL KARTI: ${ad}`,
     '',
@@ -968,6 +1005,7 @@ function kart(ad, r, amacKartta = amacKarttaMi(ad)) {
     YONETIM_ISTISNA[ad] || YONETIM,
     '',
     ...(GOREVLER[ad] ? [amacBolumu(ad, GOREVLER, amacKartta), '', gorevBolumu(ad), ''] : []),
+    ...(defterBolumMetni ? [defterBolumMetni, ''] : []),
     '## Dosyalar',
     r.dosyalar,
     '',
@@ -1433,6 +1471,9 @@ module.exports = {
   nasilGecerliMi,
   TASLAK_ROLLERI,
   KART_AMAC_TAVANI,
+  defterBolumu,
+  defterDusenRoller,
+  kart,
   amacKarttaMi,
   gorevVerisiOku,
   isAkisiMetinleri,
