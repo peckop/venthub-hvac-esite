@@ -37,7 +37,7 @@ interface Sonuc {
   ilk: string
   toplam: number
   sure_ms: number
-  kaynaklar: Record<'dosya' | 'git' | 'kanban' | 'sage' | 'linear', Kaynak>
+  kaynaklar: Record<'dosya' | 'git' | 'kanban' | 'defter' | 'sage' | 'linear', Kaynak>
 }
 interface Commit {
   hash: string
@@ -60,6 +60,7 @@ interface Baglar {
   portAc: () => Promise<{ searchSage: (q: string, o: object) => Promise<{ id: string; text: string }[]> } | null>
   linearAnahtar: string
   linearGetir: (terim: string, ms: number) => Promise<{ identifier: string; title: string; durum: string }[]>
+  defterler?: () => Promise<{ durum: string; sebep?: string; defterler?: { ad: string; dosya: string; sahip: string; metin: string }[] }>
 }
 interface Kayit {
   ts: string
@@ -258,7 +259,7 @@ describe('INV-ONCEKI-CALISMA-8: sayaç satırı biçimi ve depo dışı yazım',
     const k = mod.taramaKaydi(await ornek(), { sid: 'sid-1', kart: 'ARC-30', anahtar: 'rec300 model adres listesi' })
     expect(Object.keys(k).sort()).toEqual(['anahtar', 'bulunan', 'kart', 'kaynaklar', 'sid', 'sonuc', 'sure_ms', 'ts'])
     expect(k.sonuc).toBe('bulgu-var')
-    expect(Object.keys(k.kaynaklar)).toEqual(['dosya', 'git', 'kanban', 'sage', 'linear'])
+    expect(Object.keys(k.kaynaklar)).toEqual(['dosya', 'git', 'kanban', 'defter', 'sage', 'linear'])
     expect(k.kaynaklar.dosya).toBe(1)
     expect(k.bulunan).toEqual([CSV])
     expect(Number.isNaN(Date.parse(k.ts))).toBe(false)

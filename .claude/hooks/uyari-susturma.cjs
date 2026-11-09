@@ -40,7 +40,8 @@ function anahtarVeImza(satir) {
   const govde = satir.slice(isaret.length)
   const anahtar = govde.split(':')[0].trim().slice(0, 40)
   let imza = govde
-  if (SAYI_YOK.has(anahtar)) imza = imza.replace(/\d+/g, '#')
+  // ARC-288: "⚠DEFTER (ROL): ad 21 gün …" gün sayacı/commit sayısı her gün değişir; durum = hangi defter bayat (ad), sayı değil.
+  if (SAYI_YOK.has(anahtar) || /^DEFTER\b/.test(anahtar)) imza = imza.replace(/\d+/g, '#')
   else imza = imza.replace(/\d+(?:[.,]\d+)?\s*(?:gun|dk|saat|MB|GB|k\/\d+M)\b/gi, '#').replace(/\b\d{1,2}:\d{2}Z?\b/g, '#')
   return { anahtar, imza: isaret + imza }
 }
