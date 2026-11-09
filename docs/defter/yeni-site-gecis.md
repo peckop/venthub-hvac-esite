@@ -12,7 +12,7 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 | Parça | Ne | Alt defter ya da kart |
 |---|---|---|
-| Design | Claude Design'daki "Venthub New" projesi yeni sitenin kaynağı; eksikleri Design'a OPS listesinden yaptırılır | 2. bölüm B; kart OPS-180 |
+| Design | Claude Design'daki "Venthub New" projesi yeni sitenin kaynağı; eksiklerini Recep yaptırır, eksik listesini OPS verir; OPS Design'a kendiliğinden şart ya da kural yazmaz | 2. bölüm B; kart OPS-180 |
 | Adres | Tek önek şeması, eski adreslerin yeni adreslere 308 yönlendirmesi | `docs/defter/urun-adres.md`; URN-157, ALT-177, SEO-76 |
 | UnoPIM / ürün verisi | Ürün verisinin tek kaynağı; Design ile sayı farkı ve görselsiz ürünler | KTL-82 (Katalog); 2. bölüm A |
 | Arka uç | Veritabanı, sipariş, teklif, ödeme, sunucu fonksiyonları canlıdan olduğu gibi alınır | OPS-180 (kapsam: yeni site mevcut arka uca bağlanır) |
