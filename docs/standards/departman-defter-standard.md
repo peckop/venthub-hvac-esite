@@ -50,6 +50,12 @@ yol ya da komut; yolu olmayan satır iddiadır, envantere girmez) · **3 Sırada
 varsa kart no) · **4 Kararlar** (tarih + karar no + tek cümle; söz tırnaklanmaz). Bölüm başına öneri tavanı 40 satır;
 eskiler `docs/archive/` altına tarihçe olarak taşınır.
 
+**İş bölümlerinin kaynağı (ARC-291, HRT-129).** Defterin iş bölümleri, yani **1 Ne yaptık** ve **3 Sırada**, elle yazılmaz;
+`defter:<ad>` etiketli Kanban kartlarından betikle üretilir (üretici ARAÇ'ındır, `<ad>` manifestteki `ad`dir). Elle yazılan
+yalnız kapsam (başlıktaki alan tanımı) ve **4 Kararlar** bölümüdür; **2 Envanter** ölçümle gelir (D2.4). Defterin işini
+taşıyan kart etiketsiz açılmaz: etiketsiz kart bölüme girmez, iş defterde görünmez. Kural üretici betik yayına girene kadar
+geçişlidir: eski elle yazılmış satırlar yerinde kalır, yeni satır etiketli karttan gelir.
+
 ## D4 — Tazelik
 
 `Son doğrulama` varsayılan eşik **14 gün**; manifestte defter başına değişir (sıra ölçümü gibi çabuk eskiyen alanda daha

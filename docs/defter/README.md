@@ -23,6 +23,9 @@ buradaki departman başına alan haritasıdır. Kurallar cetvelde; bu sayfa dosy
 | 3. Sırada ve yapılabilecekler | Her madde: gerekçe + öncelik (yüksek/orta/düşük) + varsa kart no. |
 | 4. Kararlar | Tarih + karar no + tek cümle. Sahip Recep ya da OPS ise yazılır; söz tırnaklanmaz (depo açık). |
 
+1. ve 3. bölüm elle yazılmaz: `defter:<ad>` etiketli Kanban kartlarından betikle üretilir (cetvel D3, ARC-291); elle yazılan yalnız kapsam ve 4. bölümdür.
+Defterin kartı etiketsiz açılmaz.
+
 Başlığın altında `Sahibi:` ve `Son doğrulama:` satırı. Arama verisi, maliyet ve tedarik verisi, sır deftere girmez; ölçümün
 durduğu yere işaret edilir (cetvel D5).
 
