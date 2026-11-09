@@ -60,7 +60,7 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 | Canlı katalog | 442 model (aile sayfasında `?sku=` ile), 47 aile, 35 kategori (28 aktif), 7 marka | OPS geçiş envanteri (depo dışı) |
 | Yeni site (Design) | kategori 32, aile 17, seri 104, model 1206, mekân 9, bina 5, marka 7, rehber 5, sabit 20 | OPS geçiş envanteri (depo dışı); Design 14 Aralık'ta kapanıyor |
 | UnoPIM adres alanı | 1165 üründe `adres_tr` ve `adres_en` dolu | `docs/olcum/pim-unopim.md` |
-| Eşleştirme taslağı (2 Kasım) | 2402 satır; canlı 94 adresin 93'ü listede yok; slug düzeyinde kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi yazısı 0/6; 6 hedef çakışması | SEO-76 kartı (4 Kasım ölçümü, GEO-SEO) |
+| Eşleştirme taslağı (2 Kasım) | 2402 satır; canlı 94 adresin 93'ü listede yok; slug düzeyinde kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi yazısı 0/6; 6 hedef çakışması; kalıcı kopya depo dışı `C:/Users/alize/VentHub-Gorsel-Arsiv/_liste/seo76/yonlendirme-2026-11-02-tam.csv` (sha256 `1876e560…ff61f3`, `C:/tmp` kopyasıyla aynı, 9 Kasım ölçüldü) | SEO-76 kartı (4 Kasım ölçümü, GEO-SEO) |
 | Model adres listesi (eski şema) | 442 model | `docs/plans/rec300-model-adres-listesi-2026-09-23.csv` |
 
 ### 2.4 Kurallar ve kapılar
