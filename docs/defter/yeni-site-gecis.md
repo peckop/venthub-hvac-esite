@@ -21,6 +21,13 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 ## 1 Ne yaptık
 
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+| Kapanış | Kart | İş | Sahip |
+|---|---|---|---|
+| 2026-11-09 | URN-159 | adres-semasi-standard.md 2 Kasım tek önek kararına göre güncelle (/urunler, /uygulama-alanlari, /rehber; EN products/applications/guides) | URUN |
+| 2026-11-08 | KTL-82 | UnoPIM Faz C: kategori ağacı + marka + galeri/alt metin; fiyat-KDV-stok kaynak önerisi (KTL-80 devamı) | KATALOG |
+<!-- DEFTER-KANBAN:ne-yaptik BITIS -->
+
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
 | 2026-11-09 | Yeni sitenin tek önek adres şeması cetvele işlendi (`/urunler`, `/uygulama-alanlari`, `/rehber`) | `adres-semasi-standard.md` v0.3, #2449; adres ayrıntısı `urun-adres.md` | URN-159 |
@@ -66,6 +73,18 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 | C12 | Stok, Satınalma, Servis, Üretim ve Muhasebe şimdilik yalnız iskelet: 46 sayfa planlı, içleri boş | Açık |
 
 ## 3 Sırada ve yapılabilecekler
+
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+| Kart | İş | Durum | Sahip |
+|---|---|---|---|
+| ALT-177 | Yeni site geçişi: rota dili (dil öneki, A9 307/308, A10 dil tespiti), arama sayfası yönlendirmesi ve yönlendirme haritası CI kapıları (geçiş | Backlog | ALTYAPI |
+| OPS-180 | Yeni vitrin geçişi: Design (Menü S5, İçerik 1.061 model, Adres Şeması v3) + site + geçmiş işler tek resim ve geçiş planı | To Do | OPS |
+| OPS-219 | Design İçerik'e KTL-80 eksik içerik notu: NIC AT 8 özet, 51 ürün seri kaydı, SEA-61102010 adı | To Do | OPS |
+| OPS-220 | Design Venthub New'e yeni site kanal tipi fan kategori girdisi (SEO-83: kesit ayrımı, çeşit tablosu, teklif metni, aile dengesi) | To Do | OPS |
+| OPS-228 | Claude Design 14 Aralık'ta kapanıyor: projelerin Claude'a taşınması (yedek + ölçüm + taşıma planı) | Backlog | OPS |
+| SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm: 308 listesini canlı adreslere karşı sına, Search Console /urunler/ ve /rehber/ süzgeçleri (Recep | Backlog | GEO-SEO |
+| URN-157 | Yeni siteye geçişte eski→yeni adres eşleştirme tablosu + 308 yönlendirme (kaynak: canlı site haritası → Design envanteri; adres-semasi-stand | Backlog | URUN |
+<!-- DEFTER-KANBAN:sirada BITIS -->
 
 Sıra yol haritasındandır; üç iş aynı anda yürür, sonra ortak kontrol, en son canlıya aktarım. Ana kart OPS-180.
 

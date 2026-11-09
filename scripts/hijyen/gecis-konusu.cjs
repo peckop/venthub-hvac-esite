@@ -79,4 +79,19 @@ function uyari(metin, girdi, kok = KOK) {
   return satir(kok)
 }
 
-module.exports = { gecisMi, opsMu, satir, uyari, GECIS_RE, DEFTER }
+/** ARC-291: başlığında geçiş/yeni site/adres/308/dizin geçen kart `defter:<ad>` etiketi olmadan açılırsa açana uyarı (her rol, blok değil). */
+const ETIKETSIZ_RE = /(?<!\p{L})(?:yeni\s+site|site\s+ge[çc]i[şs]|canl[ıi]ya\s+ge[çc]i[şs]|adres|308|dizin|y[öo]nlendir)/iu
+
+function etiketsizUyari(girdi) {
+  if (process.env.VENTHUB_GECIS_KONUSU_KAPAT === '1') return null
+  const ti = girdi || {}
+  if (ti.action !== 'add_task' || !ETIKETSIZ_RE.test(String(ti.title || ''))) return null
+  const etiketler = Array.isArray(ti.labels) ? ti.labels : []
+  if (etiketler.some((e) => typeof e === 'string' && /^defter:[a-z0-9-]+$/.test(e))) return null
+  return (
+    'DEFTER ETİKETİ YOK: başlık geçiş/adres/dizin konusunda ama kartta defter:<ad> etiketi yok. ' +
+    'labels\'a defter:yeni-site-gecis, defter:urun-adres ya da defter:geo-seo-dizin ekle ki defter bu kartı Kanban\'dan üretsin (engel yok).'
+  )
+}
+
+module.exports = { gecisMi, opsMu, satir, uyari, etiketsizUyari, GECIS_RE, ETIKETSIZ_RE, DEFTER }
