@@ -21,6 +21,8 @@
 | `i18n-jsx-literals-cleanup-2026-06-14.md` | i18n literal temizliği makinesi (Workflow+merge3+keycheck) | **KISMEN** — admin bitti; rota süpürmesi + bayi kaldı |
 | `odeme-bildirimi-yeniden-deneme-2026-11.md` | Ödeme onayı bildirimi yeniden deneme tasarımı (karne 2026-11 P7; önerilen: durum tabanlı süpürücü) | **TASLAK** — yalnız tasarım; uygulama dilimleri ayrı kart (OPS-225) |
 
+| `departman-defter-duzeni-2026-11-09.md` | Departman yaşayan defter düzeni: ayrım, beş parça, manifest, dört bağlama noktası, pilot ve aday listesi (OPS-258) | **TASLAK** — yalnız tasarım; uygulama kartları onaydan sonra (HRT-124) |
+
 ## 📘 REFERANS (strateji/sözleşme — iş değil)
 
 | Dosya | Ne |

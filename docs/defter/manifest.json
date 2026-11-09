@@ -1,0 +1,39 @@
+{
+  "sema": 1,
+  "_not": "Departman defterlerinin tek listesi (cetvel: docs/standards/departman-defter-standard.md D6; şema: docs/defter/README.md). Açılış satırı, önceki-çalışma taraması, PR kapısı, rol kartı satırı ve Recep sayfası bu dosyayı okur; ikinci liste tutulmaz.",
+  "defterler": [
+    {
+      "ad": "urun-adres",
+      "dosya": "docs/defter/urun-adres.md",
+      "sahip": "URUN",
+      "ozet": "Canlı adres şeması, yönlendirmeler ve kanonik adres kuralları",
+      "izlenen": [
+        "next.config.mjs",
+        "src/config/markaYonlendirmeleri.mjs",
+        "docs/standards/adres-semasi-standard.md",
+        "docs/standards/canonical-url-standard.md"
+      ],
+      "tazelikGun": 14,
+      "tetik": ["kart-kapanisi", "sure"],
+      "olcum": null,
+      "disKaynak": null,
+      "durum": "planli"
+    },
+    {
+      "ad": "geo-seo-dizin",
+      "dosya": "docs/defter/geo-seo-dizin.md",
+      "sahip": "GEO-SEO",
+      "ozet": "Dizin takibi: hangi adresler hangi motorda, son anlık görüntü özeti, bekleyen dizin işleri",
+      "izlenen": [
+        "scripts/seo/dizin-takip.mjs",
+        "scripts/seo/dizin-acilis.mjs",
+        "docs/standards/dizin-sistemleri-standard.md"
+      ],
+      "tazelikGun": 14,
+      "tetik": ["kart-kapanisi", "sure", "dis-kaynak"],
+      "olcum": null,
+      "disKaynak": "gsc",
+      "durum": "planli"
+    }
+  ]
+}
