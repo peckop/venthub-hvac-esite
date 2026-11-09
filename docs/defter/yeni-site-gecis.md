@@ -2,6 +2,8 @@
 
 Sahibi: OPS · Son doğrulama: 2026-11-09 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: OPS-180 (ana kart), OPS-258, HRT-128
 
+**Son tarih: Design projesi 14 Aralık 2026'da kapanıyor.** Design'daki içerik, adres verisi, görseller ve makaleler o tarihten önce kalıcı depoya alınır (kart OPS-228).
+
 "Canlıya geçiş" dendiğinde konuşulan tek süreç budur. Adres, Design, ürün verisi ve dizin bu sürecin parçalarıdır; ayrı araştırma ya da ayrı iş
 olarak açılmaz, ilgili parçanın alt defterine ve kartına yazılır. Karar verilmiş konu yeniden soru olarak getirilmez; yeni karar gelince
 bu defter güncellenir. Depo herkese açıktır: söz tırnaklanmaz, karar ve kaynak yazılır; maliyet ve sır yoktur.
@@ -50,11 +52,11 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 | A1 | Sepet ve satış kipi sayfaları: sepet, ödeme adımları (adres, kargo, ödeme), ödeme sonucu (başarılı/başarısız), hesapta sipariş ayrıntısı. Satış kipi düğmesi var, sayfaların çizimi yok. Ödeme sağlayıcısı (iyzico) canlıdaki mevcut kodla bağlanır; Design yalnız ekranları çizer | Açık | Design notları |
 | A2 | Ürün galerisi ve görsel açıklamaları: Design'da 718 ürün klasörü, her birinde tek fotoğraf; ek fotoğraf ve alt metin yok. UnoPIM'de iki alan açıldı, boş | Açık | KTL-82 |
 | A3 | Görseli olmayan 8 ürün: VRT-HP-1400, VRT-HP-1400-D, SEA-810105, SEA-61102010, AVE-13050, AVE-13051, VRT-25095, VRT-25096 | Açık | KTL-82 |
-| A4 | Ürün sayısı farkı: Design'da 1206 model, UnoPIM'de 1165 ürün; aradaki 41 ürünün listesini Katalog çıkarır | Liste bekleniyor | KTL-82 |
-| A5 | Bekleyen üç içerik cevabı: Notus 11177 ve 11903 adları katalog tablolarında yer değiştirmiş görünüyor; AVE-80141 için önek kararı (AVE mi DAN mı); Sanikit'in 2 modelinde debi, basınç, güç değerleri yok | Açık | Katalog raporları |
+| A4 | Ürün sayısı farkı: Design'da 1206 model, UnoPIM'de 1165 ürün idi; fark 41 modeldi (6 Kasım, KTL-83: Design'da fazla DAN-80141 ve EDF-* 40 model). Çift kod Design'da çözüldü: önekli kod kaldı, `adres.json` model sayısı 1206'dan 1165'e indi, öneksiz EDF-* `cevir` ile VRT-EDF-*'e çözülür (Design `surec/ops-cevap-2026-11-07-galeri-ve-cift-kod.md`) | Kapandı 7 Kasım: Design 1165 = UnoPIM 1165 | KTL-82 |
+| A5 | Bekleyen üç içerik cevabı: Notus 11177 ve 11903 adları katalog tablolarında yer değiştirmiş görünüyor; AVE-80141 için önek kararı (kapandı 7 Kasım: önekli kod AVE-80141 kalır, DAN-80141 `adres-model-dan.json`'dan çıkarıldı; A4); Sanikit'in 2 modelinde debi, basınç, güç değerleri yok | Açık | Katalog raporları |
 | A5a | İçerik projesinde kalanlar: NIC AT ailesinin 8 ürününün özeti boş, 51 ürünün seri kaydı yok, SEA-61102010 adı boş | Açık | OPS-219 |
 | A5b | Kanal tipi fan kategori sayfası önerisi: yuvarlak ve dikdörtgen kesit ayrımı, çeşit tablosu, teklif metni, aileler arası denge | Öneri | OPS-220 |
-| A5c | Aynı ürün iki SKU anahtarıyla: Design'daki 40 EDF modeli hem önekli (VRT-EDF-xxx) hem öneksiz (EDF-xxx) kayıtlı, UnoPIM önekli olanı kullanıyor; DAN-80141 de aynı (Design hem AVE-80141 hem DAN-80141). Design'a sorulacak: hangisi kanonik. A5 önek sorusuyla aynı karar. UnoPIM'deki 1165 ürünün hepsinin Design'da adresi var | Açık | KTL-82 |
+| A5c | Aynı ürün iki SKU anahtarıyla: Design'daki 40 EDF modeli hem önekli (VRT-EDF-xxx) hem öneksiz (EDF-xxx) kayıtlı, UnoPIM önekli olanı kullanıyor; DAN-80141 de aynı (Design hem AVE-80141 hem DAN-80141). Kanonik olan önekli kod; Design 7 Kasım'da çözdü (A4). UnoPIM'deki 1165 ürünün hepsinin Design'da adresi var | Kapandı 7 Kasım | KTL-82 |
 | A6 | Teklif kipi metinleri: fiyatı olmayan ürünlerde "Teklif iste"; kapsam liste fiyatı olmayan 822 ürün | Karar verildi (4. bölüm 4) | Design |
 
 ### B. Design'ın kendi açık listesi (devir öncesi)
@@ -94,7 +96,10 @@ Sıra yol haritasındandır; üç iş aynı anda yürür, sonra ortak kontrol, e
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
 | Design eksiklerini Design ile yaptırmak (2. bölüm A, B, C) | Esas Design'dır; Design ile OPS konuşmaz, eksik listesini OPS verir, Design ile Recep konuşur | yüksek | OPS-180 |
-| Design'ın adres dosyalarından UnoPIM'e adres yazmak; 41 ürünlük farkı ve görselsiz 8 ürünü listelemek | UnoPIM eksiksiz olmadan hiçbir ürün yayına girmez | yüksek | KTL-82 |
+| Design'ın adres dosyalarından UnoPIM'e adres yazmak; görselsiz 8 ürünü listelemek | UnoPIM eksiksiz olmadan hiçbir ürün yayına girmez (41 ürünlük sayı farkı 7 Kasım'da kapandı, A4) | yüksek | KTL-82 |
+| Fotoğrafsız 18 ürün: Design'da kaynağı yok, görsel üretici kataloğundan ya da Supabase'den gelmeli | Design cevabında çıkan ek bulgu (7 Kasım); UnoPIM eksiksiz olmadan ürün yayına girmez | yüksek | KTL-82 |
+| Design içeriğini, adres verisini, görselleri ve makaleleri kalıcı depoya almak | Design projesi 14 Aralık'ta kapanıyor; öncesinde alınmazsa kaynak kaybolur | yüksek | OPS-228 |
+| Veri aktarımı engeli: UnoPIM'den canlıya yazma kolu açılmaz | Yazma kolu plan-challenger tarafından 5 koşulla BLOK (`docs/olcum/pim-unopim.md`); koşullar kapanmadan aktarım başlamaz | yüksek | REC-357 §6 (ALTYAPI panosu) |
 | Önizlemeyi güncel tutmak; Design ile UnoPIM arasındaki farkı ölçmek | Kontrol önizlemede yapılır | yüksek | OPS-180 |
 | Ortak önizleme kontrolü: sayfa sayfa, masaüstü ve mobil, Türkçe ve İngilizce; bulgular Design'a (tasarım) ya da Katalog'a (ürün verisi) | İki taraf "tamam" diyene kadar tekrarlanır; canlıya aktarım ondan sonra konuşulur | yüksek | OPS-180 |
 | Canlı adresten yeni tek önekli adrese eşleştirme tablosu ve 308 yönlendirmesi | Eski adreslerin yeni adreslere gitmesi geçişin şartı | yüksek | URN-157 (beklemede, geçişe bağlı) |
