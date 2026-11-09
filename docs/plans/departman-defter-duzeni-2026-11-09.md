@@ -164,12 +164,14 @@ Arama sorgusu, tıklama ve sıra verisi deftere girmez (GEO-SEO kuralı P6); def
 Mevcut kalıp: `gorev-tazelik-satiri.cjs` (pencerenin rolünü agent anahtarından çözer, eşiği aşan görev varsa tek satır basar, aşmadıysa sessiz) ve `uyari-susturma.cjs` (satır yalnız durum değişince basılır, ARC-220). Defter satırı aynı kalıpla yazılır:
 
 ```
-⚠DEFTER (URUN): urun-adres 21 gün doğrulanmadı (eşik 14); izlenen yolda 3 commit defterden yeni
+⚠DEFTER (KATALOG): 2 defter bayat: pim-unopim.md 41 gün (eşik 30), erisim-envanteri.md 12 gün (eşik 7)
 ```
 
-Kurallar: pencerenin rolünün defterlerinden **en kötüsü** tek satırda; hepsi tazeyse sessiz; kaynak okunamazsa "ölçülemedi (sebep)" (sessizlik "taze" demek değildir); çıkış her zaman 0; yerel git, ağ yok; vana ortam değişkeniyle kapatılır. Satır **departman başına bir tane**, tavan ~150 bayt.
+Kurallar (ARAÇ görüşüyle uzlaştırılmış hâli, §8): **yeni kanca yazılmaz**; satır `gorev-tazelik-satiri` kalıbıyla üretilir ve ARC-220 susturma sarmalayıcısından geçer (aynı satır oturumda yalnız durum değişince basılır). Rol başına en çok **tek satır**, yalnız **bayat** defter varsa; hepsi tazeyse sessiz. Kaynak okunamazsa "ölçülemedi (sebep)". Çıkış her zaman 0, ağ ve Kanban çağrısı yok, vana ortam değişkeniyle kapatılır. Bayt: bayatken ~150–250 B (tavan 400 karakter, fazlası "+N defter daha"), taze iken 0.
 
-Kimin işi: kanca dosyası ve test **ARAÇ'ın** alanıdır (`.claude/hooks/**`); mantık `scripts/belge/` altında HARİTA ya da `scripts/hijyen/` altında ARAÇ olabilir. Bölüm 6.1'in **uygulama kararı** (kanca nereye, hangi bütçe) ARAÇ görüşüne bırakılır (§8). Bedel sınırı OPS-258'de yazılı: açılışta departman başına tek satır; bu not o sınırı değiştirmez.
+Tazelik kaynağı, ARAÇ'ın sırasıyla: (1) defterin kendi `Son doğrulama:` satırı, (2) dosya adındaki tarih, (3) git'te son **içerik** commit'i. `mtime` kullanılmaz (biçim değişikliği bayat defteri taze gösterir). Bu notun ilk taslağındaki "izlenen yolda N commit defterden yeni" bilgisi açılış satırından **çıkarıldı**: o karşılaştırma PR kapısının işidir (§6.3), kanca yalnız tarih okur.
+
+Kimin işi: kanca bölümü ve testi **ARAÇ'ındır**; manifest ve defter biçimi HARİTA'nın. Bedel sınırı OPS-258'de yazılı: açılışta departman başına tek satır; bu not o sınırı değiştirmez. Etki ölçümü ARC-220'ye bağlanır: ⚠DEFTER sonrası defter dosyası düzenlendi ya da `Son doğrulama` ilerledi mi (kanca zorladığını ölçer, varsaymaz).
 
 ### 6.2 `onceki-calisma.cjs` defterleri de tarar
 
@@ -183,13 +185,16 @@ Kimin işi: kanca dosyası ve test **ARAÇ'ın** alanıdır (`.claude/hooks/**`)
 
 Yeni arama motoru yazılmaz; mevcut tarama bir kaynak kazanır (betiğin kendi kuralı).
 
+**ARAÇ görüşü ile uzlaşma (§8):** bugün betik defterleri manifestten değil, dizin taramasından buluyor (`docs/audits`, `docs/olcum`, hafıza `olcum/`, katalog envanteri) ve tazelik eşiği tek ve sabit 14 gün. ARAÇ'ın önerisi, ki ben de benimsiyorum: **manifest ortak kaynak olur**, dizin taraması yedek kalır (manifestte olmayan eski ölçüm defterleri kaybolmasın). Kazanç: dizin sınırı kalkar, eşik defter başına gelir, açılış satırı ile "ÖNCEKİ ÖLÇÜM" kapısı aynı veriden beslenir, sahibi olmayan defter görünür olur. Yukarıdaki "altıncı kaynak" ifadesi bu yüzden "manifest, mevcut dizin taramasının önüne geçen kaynak" diye okunmalı; çıktı biçimi değişmez.
+
 ### 6.3 PR kapısı
 
 Kural: PR'ın değiştirdiği dosyalar bir defterin `izlenen` yollarıyla kesişiyor ve defter dosyası değişmemişse kırmızı. Kalıp `scripts/board/pr-kayit-kapisi.cjs` (saf mantık, CI yalnız girdiyi okur). Ayrıntılı yanlış-alarm değerlendirmesi ALTYAPI görüşünde (§7); özet kararlar:
 
 - İzlenen yol **dar ve glob**, geniş (`docs/**`, `src/components/**`) olmaz; manifest kontrolü yüz dosyadan geniş glob'u reddeder.
 - İstisna: PR gövdesinde `Defter-gerekmez: <sebep>` (en az 20 karakter), `Kayıtsız:` kalıbı gibi sayılır ve haftalık özette görünür.
-- Bot PR'ları muaf; boş dokunuşa karşı defterin `Son doğrulama` tarihi PR gününden geri olamaz ve ilerlemiş olmalıdır.
+- Bot PR'ları muaf. İki yönlü sahte tazelik koruması: (1) izlenen yol değiştiyse defterin `Son doğrulama` tarihi ilerlemiş **ve** gövdesi değişmiş olmalı (boş dokunuşla geçilmesin); (2) `Son doğrulama` tek başına ilerleyip gövde aynıysa kırmızı (yalnız tarih basarak tazelik üretilmesin; ARAÇ görüşünün bloklayan CI testi). Kanca bunu göremez, diff görür.
+- Manifest yapı testi (aynı CI işi): her defterin dosyası var, sahibi geçerli bir rol, eşiği var, `Son doğrulama` satırı biçimli.
 - İlk iki hafta **UYARI** kipi, yanlış alarm oranı sayılır, düşükse kırmızıya çevrilir.
 
 Defter olmayan departman (manifestte yok) bu kapıdan etkilenmez; kapı yalnız manifestteki kayıtları görür. Bu yüzden yayılım adım adım güvenlidir.
@@ -210,7 +215,20 @@ Bu notun ALTYAPI görüşünden **farkı** yoktur; §6.3 ve §6.4 onu aynen alı
 
 ## 8. ARAÇ görüşü (kanca bölümü)
 
-**Bekleniyor** (OPS aracılığıyla istenecek). ARAÇ'tan beklenen kararlar: (1) §6.1 açılış satırı: kanca dosyası, bütçe (kanca bütçesi 300 ms; `belge-tazelik` önbelleği emsal), `uyari-susturma` ile uyum, tavan bayt; (2) §6.2 önceki-çalışma taramasına defter kaynağı: çekirdeğe mi eklensin, süre etkisi; (3) kanca ve ayar değişikliği olduğundan bağımsız denetçi okuması (rol kuralı). Görüş gelince bu bölüm ARAÇ'ın kendi metniyle doldurulur; ben yazmam.
+Kaynak: ARAÇ'ın görüşü, `docs/audits/departman-defter-kanca-gorusu-2026-11-09.md` (ARC-287, PR #2438, 9 Kasım). ARAÇ bu notu görmeden, mevcut kancaları okuyarak yazmış; ben görüşü okudum, aşağıdaki özet onun hükümleridir (kendi yorumum değil), farklar ayrıca işaretli.
+
+- **(a) Açılış satırı: evet, yeni kanca olarak değil.** `gorev-tazelik-satiri` kalıbı + ARC-220 susturması; rol başına tek satır, yalnız bayat defter varsa; bedel ~150–250 B (ölçülen tur başına medyan 1.169 B tabanına göre en kötü +%13–20, yalnız bayatken); tazelik kaynağı `Son doğrulama` > dosya adı tarihi > son içerik commit'i, `mtime` değil. Ölçülen veride kanca satırı ile önbellek kırılması ilişkisi yok (916 çağrıda 1); ilk haftada tur başına kanca baytı 2.000'i geçerse `kanca-satiri-onbellek-olcumu.md` yeniden ölçme tetikleyicisi devreye girer. Token karşılığı ölçülmedi.
+- **(b) `onceki-calisma.cjs` manifesti okur: evet.** Dizin taraması yedek kalır; çıktı biçimi değişmez; test: manifest defteri sorguyla eşleşince "ÖNCEKİ ÖLÇÜM:" satırında çıkar, bayatsa BAYAT damgası defter eşiğine göre.
+- **(c) ARC-220 ilişkisi:** satır susturma sarmalayıcısına girer; etki ölçümü ⚠DEFTER sonrası defter damgasının ilerleyip ilerlemediğine bağlanır (manifest yolu ARC-220 eşleme tablosuna beslenir).
+- **(d) Kanca YAPMAZ:** defter içeriğini bağlama basmak; taze defteri saymak ya da departmanda birden çok satır; bloklamak (çıkış hep 0; 15 Ağustos pre-commit dersi); içerik doğruluğunu LLM ya da kelime örtüşmesiyle yargılamak (ARC-249'da %87 sahte "kayıp"); `mtime` ile tazelik; zamanlayıcı/cron (karar 53); açılışta ağ ya da Kanban çağrısı; başkasının defterini kancayla damgalamak (damga yalnız sahibin açık komutu, `gorev-damga.cjs` kalıbı).
+- **Zorlama sırası:** CI bloklar (§6.3), kanca hatırlatır, Kanban kartı iş açar; bayat defter kendiliğinden kart açmaz (gürültü), kart sahibinin kararıdır.
+
+**ARAÇ ile bu not arasındaki farklar** (OPS'un istediği):
+1. İlk taslağım açılış satırına "izlenen yolda N commit defterden yeni" ekliyordu; ARAÇ'ın "kanca yalnız tarih okur" ilkesini kabul ettim, çıkardım (§6.1).
+2. Önceki-çalışma taramasında ilk taslağım manifesti "altıncı kaynak" yapıyordu; ARAÇ'ın "manifest ortak kaynak, dizin taraması yedek" modelini kabul ettim (§6.2). Açık kalan tek fark: defter kaynağının "YOK" hükmünün çekirdeğine girmesi (§12, madde 3); ARAÇ bunu yazmadı.
+3. Bayt: ilk taslağım ~150 B tavan koymuştu, ARAÇ 150–250 B ölçtü; 250 B hedefi, 400 karakter tavanı geçerli.
+4. Manifest yeri: ARAÇ `rol-gorevleri.json` kalıbını anıyor, ben `docs/defter/manifest.json` öneriyorum. Kalıp aynı (tek liste, ikinci liste yok); dosya yeri uygulama kartında kesinleşir.
+Başka çelişki yok.
 
 ## 9. Aday defter listesi (rol kartından, tahmin değil)
 
@@ -275,3 +293,7 @@ Bu not kart açmaz. Onaydan sonra önerim şu sıradır (her biri ayrı kart, ay
 3. §6.2: defter kaynağı önceki-çalışma çekirdeğine girsin mi (ARAÇ görüşüyle birlikte)?
 4. §6.4: depo dışı kaynakta önce açılış tetikli kalıp, zamanlayıcı yalnız yedek olarak mı?
 5. Dalga sırası (§9) ve OPS/MÜHENDİSLİK'in kapsam dışı olması.
+
+**Recep'te** (dalga 3 ve §6.4 için; pilotları ve dalga 1–2'yi engellemez):
+- Search Console ve UnoPIM için salt-okuma API sırrı: yeni repo sırrıdır, ALTYAPI eklemez, karar Recep'indir.
+- Günlük zamanlı ölçüm iş akışı: karar 53 gereği önce Recep; OPS sorar. Design CI'da koşmaz, ajan oturumunda ölçülür.
