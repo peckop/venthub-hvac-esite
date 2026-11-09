@@ -18,7 +18,7 @@
  *   Yandex: tarama bilgisi API'de yok; "olcum aramada" hareketi son tarama sayılır.
  *
  * Kullanım:
- *   node scripts/seo/dizin-takip.mjs --durum [--gun 14] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
+ *   node scripts/seo/dizin-takip.mjs --durum [--gun N: yalnız son N günün adresleri; verilmezse TÜM site haritası] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
  *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <adres,adres> [--sonuc aramada]
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
@@ -110,10 +110,10 @@ export function yandexSonTarama(hareketler, adres) {
 
 /**
  * Tek karar. Saf işlev: ağ ve dosya yok.
- * @param {{ motor: string, lastmod?: string|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string }} p
+ * @param {{ motor: string, lastmod?: string|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string }} p
  * @returns {{ durum: 'TAMAM'|'BEKLE'|'TEKRAR'|'YAP'|'ATLA'|'ESKI'|'OLCULEMEDI', neden: string }}
  */
-export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '' }) {
+export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '' }) {
   if (olculemedi) return { durum: 'OLCULEMEDI', neden: `durum okunamadı${hataMetni ? `: ${hataMetni}` : ''}; istek atmadan önce yeniden ölç` }
   if (noindex) return { durum: 'ATLA', neden: 'sayfa noindex; istek kotayı boşa harcar' }
   const degisim = tarihAl(lastmod)
@@ -129,7 +129,8 @@ export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: har
     if (kayitOncesi) return { durum: 'ESKI', neden: 'lastmod adres bazlı kayıt başlangıcından önce; günlük görev kapsar' }
     return { durum: 'YAP', neden: 'lastmod sonrası IndexNow bildirimi yok' }
   }
-  if (tarama !== null && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
+  // SEO-100: Google'da taranmış ama dizinde değilse (verdict) tarama tarihi TAMAM saymaz.
+  if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
   if (hareket !== null && (degisim === null || hareket >= hareketDegisim)) {
     const gun = (simdi - hareket) / GUN_MS
     const esik = TEKRAR_ESIGI_GUN[motor] ?? 7
@@ -138,6 +139,7 @@ export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: har
       : { durum: 'BEKLE', neden: `istek ${Math.floor(gun)} gün önce, tarama bekleniyor (eşik ${esik})` }
   }
   if (motor === 'yandex' && kayitOncesi) return { durum: 'ESKI', neden: 'lastmod Yandex kaydı başlamadan önce; geçmiş bilinmiyor, istek atılmaz' }
+  if (dizinde === false) return { durum: 'YAP', neden: `Google dizinde değil${kapsam ? ` (${kapsam})` : ''} ve lastmod sonrası istek yok` }
   return { durum: 'YAP', neden: tarama === null ? 'hiç taranmamış ve lastmod sonrası istek yok' : 'tarama lastmod\'dan eski ve lastmod sonrası istek yok' }
 }
 
@@ -153,9 +155,11 @@ export function haritaCoz(xml) {
  * Takip kapsamı: lastmod son `gun` günde olan ya da defterde son `gun` günde hareketi olan adresler (+ elle verilenler).
  * @param {{ harita: Array<{ adres: string, lastmod: string|null }>, hareketler: Array<{ tarih: string, adres: string }>, gun?: number, simdi?: number, ek?: string[] }} p
  */
-export function kapsamSec({ harita, hareketler, gun = 14, simdi = Date.now(), ek = [] }) {
+export function kapsamSec({ harita, hareketler, gun = Infinity, simdi = Date.now(), ek = [] }) {
   const sinir = simdi - gun * GUN_MS
   const adresler = new Set(ek)
+  // SEO-100: varsayılan kapsam TÜM site haritası; `gun` sonlu verilirse eski dar kapsam (son N gün).
+  if (!Number.isFinite(gun)) for (const h of harita) adresler.add(h.adres)
   for (const h of harita) { const t = tarihAl(h.lastmod); if (t !== null && t >= sinir) adresler.add(h.adres) }
   for (const h of hareketler) { const t = tarihAl(h.tarih); if (t !== null && t >= sinir) adresler.add(h.adres) }
   const lm = new Map(harita.map((h) => [h.adres, h.lastmod]))
@@ -170,7 +174,7 @@ export function tabloUret({ kapsam, hareketler, olcum, simdi = Date.now() }) {
       const o = olcum?.[motor]?.[adres] ?? {}
       const hareket = sonHareket(hareketler, motor, adres)
       const sonTarama = motor === 'yandex' ? yandexSonTarama(hareketler, adres) : o.sonTarama ?? null
-      const k = karar({ motor, lastmod, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '' })
+      const k = karar({ motor, lastmod, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '' })
       satir[motor] = { ...k, sonTarama: typeof sonTarama === 'number' ? new Date(sonTarama).toISOString() : sonTarama, sonHareket: hareket === null ? null : new Date(hareket).toISOString() }
     }
     return satir
@@ -256,7 +260,7 @@ async function googleOlc(adresler) {
           body: JSON.stringify({ inspectionUrl: a, siteUrl: GSC_MULK }),
         })
         const s = satirCikar(a, await r.json())
-        sonuc[a] = s.hata ? { hata: s.hata } : { sonTarama: s.sonTarama, noindex: /noindex/i.test(s.kapsam ?? '') || s.dizin === 'BLOCKED_BY_META_TAG', kapsam: s.kapsam }
+        sonuc[a] = s.hata ? { hata: s.hata } : { sonTarama: s.sonTarama, noindex: /noindex/i.test(s.kapsam ?? '') || s.dizin === 'BLOCKED_BY_META_TAG', kapsam: s.kapsam, dizinde: s.karar ? s.karar === 'PASS' : null }
       } catch (e) { sonuc[a] = { hata: String(e.message).slice(0, 120) } }
     }
   }
@@ -345,8 +349,8 @@ async function calistir() {
   // --cikti verilmezse durum anlık görüntüsü defterin klasörüne yazılır: sonuç geçmişi (hangi gün dizine girdi) kaybolmaz.
   const cikti = deger('--cikti') || dirname(defter)
   yolKontrol(cikti, '--cikti')
-  const gun = Number(deger('--gun') || 14)
-  if (!Number.isFinite(gun) || gun < 1) { console.error('HATA: --gun pozitif sayı olmalı'); process.exit(2) }
+  const gun = deger('--gun') ? Number(deger('--gun')) : Infinity
+  if (deger('--gun') && (!Number.isFinite(gun) || gun < 1)) { console.error('HATA: --gun pozitif sayı olmalı'); process.exit(2) }
   const { hareketler, atlanan } = defterOku(defter)
   let xml
   try { xml = await (await fetch(`${SITE}/sitemap.xml`)).text() } catch (e) { console.error(`HATA: site haritası okunamadı: ${e.message}`); process.exit(1) }

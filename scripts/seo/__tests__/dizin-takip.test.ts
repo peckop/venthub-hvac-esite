@@ -167,6 +167,18 @@ describe('harita ve kapsam', () => {
     const k = kapsamSec({ harita, hareketler, gun: 14, simdi: NOW })
     expect(k.map((x) => x.adres)).toEqual([A, B].sort())
   })
+  it('SEO-100: gun verilmezse kapsam TÜM site haritasıdır (eski, hareketsiz, lastmod yok dahil)', () => {
+    const k = kapsamSec({ harita: haritaCoz(xml), hareketler: [], simdi: NOW })
+    expect(k.map((x) => x.adres).sort()).toEqual([A, B, `${S}/tr/eski`].sort())
+  })
+  it('SEO-100: Google taranmış ama dizinde değilse TAMAM değil, YAP; dizinde ise TAMAM', () => {
+    const girdi = { motor: 'google', lastmod: gun(5), sonTarama: gun(6), simdi: NOW }
+    const yok = karar({ ...girdi, dizinde: false, kapsam: 'Crawled - currently not indexed' })
+    expect(yok.durum).toBe('YAP')
+    expect(yok.neden).toContain('dizinde değil')
+    expect(karar({ ...girdi, dizinde: true }).durum).toBe('TAMAM')
+    expect(karar({ ...girdi, dizinde: null }).durum).toBe('TAMAM')
+  })
   it('--adres ile elle verilen adres kapsama girer', () => {
     const k = kapsamSec({ harita: haritaCoz(xml), hareketler: [], gun: 1, simdi: NOW, ek: [`${S}/tr/eski`] })
     expect(k.some((x) => x.adres === `${S}/tr/eski`)).toBe(true)
