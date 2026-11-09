@@ -151,7 +151,8 @@ function manifestiAyikla(manifest, depoDosyalari) {
 /** `Son doğrulama: 2026-11-09` (kalın işaretli ya da değil). Bulunamazsa null. */
 function sonDogrulamaOku(metin) {
   if (typeof metin !== 'string') return null;
-  const e = /^[ \t>*_-]*Son do[ğg]rulama[ \t*_]*:[ \t*_]*(\d{4}-\d{2}-\d{2})/im.exec(metin.replace(/\r\n?/g, '\n'));
+  // Satır başında (`**Son doğrulama:** 2026-11-09`) YA DA başlık satırında `·` / `|` ayracından sonra (`Sahibi: X · Son doğrulama: 2026-11-09 · ...`, gerçek defter biçimi).
+  const e = /(?:^|[·|])[ \t>*_-]*Son do[ğg]rulama[ \t*_]*:[ \t*_]*(\d{4}-\d{2}-\d{2})/im.exec(metin.replace(/\r\n?/g, '\n'));
   return e ? e[1] : null;
 }
 
@@ -168,9 +169,7 @@ function gunKaydir(gun, n) {
 function gövdeSansTarih(metin) {
   return String(metin || '')
     .replace(/\r\n?/g, '\n')
-    .split('\n')
-    .filter((s) => !/^[ \t>*_-]*Son do[ğg]rulama[ \t*_]*:/i.test(s))
-    .join('\n')
+    .replace(/(^|[·|])([ \t>*_-]*)Son do[ğg]rulama[ \t*_]*:[ \t*_]*\d{4}-\d{2}-\d{2}/gim, '$1$2')
     .trim();
 }
 

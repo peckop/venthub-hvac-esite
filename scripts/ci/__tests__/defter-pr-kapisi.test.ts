@@ -187,6 +187,9 @@ describe('INV-DEFTER-PR-KAPISI-1 · glob, istisna, tarih (saf)', () => {
     expect(kapi.sonDogrulamaOku('**Son doğrulama:** 2026-11-09')).toBe('2026-11-09')
     expect(kapi.sonDogrulamaOku('Son doğrulama: 2026-11-09')).toBe('2026-11-09')
     expect(kapi.sonDogrulamaOku('- Son dogrulama: 2026-11-09')).toBe('2026-11-09')
+    // Gerçek defter biçimi (docs/defter/geo-seo-dizin.md): başlık satırında `·` ayracından sonra
+    expect(kapi.sonDogrulamaOku('Sahibi: GEO-SEO · Son doğrulama: 2026-11-09 · Cetvel: `x`')).toBe('2026-11-09')
+    expect(kapi.sonDogrulamaOku('Satır ortası Son doğrulama: 2026-11-09 ayraçsız')).toBeNull()
     expect(kapi.sonDogrulamaOku('Son doğrulama: dün')).toBeNull()
     expect(kapi.sonDogrulamaOku('içerik')).toBeNull()
     expect(kapi.sonDogrulamaOku(null)).toBeNull()
@@ -310,6 +313,12 @@ describe('INV-DEFTER-PR-KAPISI-1 · karar', () => {
     expect(t(defter('2026-11-09'))).toEqual(['son-dogrulama-sahte'])
     expect(t(defter('2026-11-09').replace(/\n/g, '\r\n'))).toEqual(['son-dogrulama-sahte']) // CRLF aynı sayılır
     expect(t(yeni('2026-11-09'))).toEqual([])
+    // gerçek başlık biçimi: tarih `·` ayraçlı satırda; yalnız tarih değişince yine sahte, gövde değişince geçer
+    const gercek = (tarih: string, govde: string) => `# Defter\n\nSahibi: GEO-SEO · Son doğrulama: ${tarih} · Cetvel: x\n\n${govde}\n`
+    const ts = (onceki: string, sonraki: string) =>
+      karar({ degisenYollar: ['next.config.mjs', URUN.dosya], defterMetinleri: { [URUN.dosya]: { onceki, sonraki } } }).ihlaller.map((i) => i.tur)
+    expect(ts(gercek('2026-11-01', 'a'), gercek('2026-11-09', 'a'))).toEqual(['son-dogrulama-sahte'])
+    expect(ts(gercek('2026-11-01', 'a'), gercek('2026-11-09', 'b'))).toEqual([])
   })
 
   it('SAAT DİLİMİ: Türkiye gece yarısı (UTC bir gün geride) ve bir gün önce açılan PR yanlış alarm vermez; iki gün sapma verir', () => {
