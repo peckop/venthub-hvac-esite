@@ -18,7 +18,7 @@
  *
  * İLK SATIR üç sonuçtan biridir ve BİRBİRİNE KARIŞMAZ:
  *   ÖNCEKİ ÇALIŞMA: BULUNDU n — <en iyi 2-3 bulgu>
- *   ÖNCEKİ ÇALIŞMA: YOK (k/5 yer arandı, ifade: ...)        ← yalnız ÇEKİRDEK üç kaynak (dosya, git, kanban) tamam ölçüldüyse
+ *   ÖNCEKİ ÇALIŞMA: YOK (k/N yer arandı, ifade: ...)        ← yalnız ÇEKİRDEK üç kaynak (dosya, git, kanban) tamam ölçüldüyse
  *   ÖNCEKİ ÇALIŞMA: ÖLÇÜLEMEDİ (kaynak: sebep; ...)           ← çekirdekten biri ölçülemedi VE bulgu yok, ya da ifade çok kısa
  * Kaynak hatası FIRLATMAZ: "ölçülemedi (sebep)" döner. Sessizlik "yok" demek değildir.
  *
@@ -57,7 +57,7 @@ const DERIN_TAVAN_MS = 3000
 const SAGE_COCUK_TAVAN_MS = 8000
 /** Çekirdek kaynaklar: bunlardan biri ölçülemediyse "YOK" denemez. sage ve linear ipucudur. */
 const CEKIRDEK = ['dosya', 'git', 'kanban']
-const KAYNAKLAR = ['dosya', 'git', 'kanban', 'sage', 'linear']
+const KAYNAKLAR = ['dosya', 'git', 'kanban', 'defter', 'sage', 'linear']
 const EN_FAZLA_BULGU = 3
 const TAMPON_BAYT = 64 * 1024 * 1024
 const DEFTER_ADI = 'ara-onceki-calisma.jsonl'
@@ -192,6 +192,30 @@ async function kanbanKaynagi(sorgu, baglar, ms) {
   return tamam(kayitlar.length, sirala(bulgular, (b) => b.kimlik))
 }
 
+/**
+ * ARC-288 (OPS-258 §6.2): departman defterleri (docs/defter/manifest.json). Yerel ve ucuz → çekirdeğe yakın:
+ * manifest BOZUK ya da bir defter dosyası okunamıyorsa 'olculemedi' ve sonuç "YOK" olamaz (bkz. sonucuHesapla).
+ * Manifest YOK = düzen henüz kurulmamış: 'atlandi' (YOK'u engellemez). Bulgu: eşleşen en iyi satırın bölümü, defter başına bir.
+ */
+async function defterKaynagi(sorgu, baglar) {
+  if (typeof baglar.defterler !== 'function') return atlandi('defter bağı yok')
+  const m = await baglar.defterler()
+  if (m.durum === 'yok') return atlandi('defter manifesti yok')
+  if (m.durum === 'bozuk') return olculemedi(`manifest bozuk: ${m.sebep}`)
+  if (m.durum === 'olculemedi') return olculemedi(m.sebep)
+  const { aranacakSatirlar } = require('../hijyen/defter-tazelik.cjs')
+  const bulgular = []
+  for (const d of m.defterler) {
+    let en = null
+    for (const { bolum, satir } of aranacakSatirlar(d.metin)) {
+      const e = eslestir(sorgu, `${d.ad} ${satir}`)
+      if (e && (!en || e.skor > en.skor)) en = { bolum, ...e }
+    }
+    if (en) bulgular.push({ tur: 'defter', ad: d.ad, yol: d.dosya, ...en })
+  }
+  return tamam(m.defterler.length, sirala(bulgular, (b) => b.ad))
+}
+
 async function sageKaynagi(sorgu, baglar, ms) {
   if (!baglar.daemonCanli()) return olculemedi('sage daemon kapalı')
   const port = await baglar.portAc()
@@ -299,6 +323,8 @@ function bulguEtiketi(b) {
       return `silinmiş dosya ${b.yol} (commit ${b.hash})`
     case 'kart':
       return `kart ${b.kimlik} [${b.durum}]`
+    case 'defter':
+      return `defter ${b.ad} §${b.bolum}`
     case 'sage':
       return `sage ${b.id}`
     case 'linear':
@@ -326,7 +352,8 @@ function sonucuHesapla(sorgu, kaynaklar) {
     return { sonuc: 'olculemedi', toplam, arananlar, sebepler: ['ifade: aranacak ayırt edici kimlik ya da terim yok (en az bir kimlik ya da iki terim)'] }
   }
   if (toplam > 0) return { sonuc: 'bulgu-var', toplam, arananlar, sebepler }
-  const cekirdekEksik = CEKIRDEK.filter((ad) => kaynaklar[ad].durum !== 'tamam')
+  // Defter çekirdek DEĞİL ama ÖLÇÜLEMEDİ ise (manifest bozuk / defter dosyası okunamadı) "YOK" denmez; manifest yoksa (atlandı) denir.
+  const cekirdekEksik = [...CEKIRDEK.filter((ad) => kaynaklar[ad].durum !== 'tamam'), ...(kaynaklar.defter.durum === 'olculemedi' ? ['defter'] : [])]
   if (cekirdekEksik.length) return { sonuc: 'olculemedi', toplam, arananlar, sebepler: sebepler.length ? sebepler : cekirdekEksik.map((ad) => `${ad}: ${kaynaklar[ad].sebep || 'atlandı'}`) }
   return { sonuc: 'bulgu-yok', toplam, arananlar, sebepler }
 }
@@ -351,6 +378,7 @@ function ayrintiSatiri(ad, k) {
   const ozet = k.bulgular.slice(0, EN_FAZLA_BULGU).map((b) => {
     if (b.tur === 'commit') return `${b.hash} ${b.tarih} "${b.konu.slice(0, 90)}"`
     if (b.tur === 'kart') return `${b.kimlik} [${b.durum}] ${b.serit || ''} "${String(b.baslik).slice(0, 80)}"`
+    if (b.tur === 'defter') return `${b.ad} §"${String(b.bolum).slice(0, 70)}"`
     if (b.tur === 'sage') return `${b.id} "${b.metin.slice(0, 80)}"`
     if (b.tur === 'linear') return `${b.kimlik} "${String(b.baslik).slice(0, 80)}"`
     return b.yol
@@ -372,7 +400,7 @@ function metinCikti(sonuc) {
 }
 
 /**
- * Beş kaynağı paralel tarar. Kaynaklar `baglar` ile ENJEKTE edilir (test sahte verir; CLI `gercekBaglar`).
+ * Altı kaynağı (dosya, git, kanban, defter, sage, linear) paralel tarar. Kaynaklar `baglar` ile ENJEKTE edilir (test sahte verir; CLI `gercekBaglar`).
  * @param {string} metin emir metni
  * @param {object} secenek
  * @param {object} secenek.baglar
@@ -396,9 +424,10 @@ async function tara(metin, { baglar, haric = [], derin = false, butceMs = CLI_BU
     const gitVaadi = kaynakKos(() => gitKaynagi(sorgu, baglar, tavan(butceMs), derin), tavan(butceMs))
     const kanbanVaadi = kaynakKos(() => kanbanKaynagi(sorgu, baglar, tavan(KANBAN_TAVAN_MS)), tavan(KANBAN_TAVAN_MS))
     const linearVaadi = kaynakKos(() => linearKaynagi(sorgu, baglar, tavan(LINEAR_TAVAN_MS)), tavan(LINEAR_TAVAN_MS))
+    const defterVaadi = kaynakKos(() => defterKaynagi(sorgu, baglar), tavan(KANBAN_TAVAN_MS))
     const sageVaadi = kaynakKos(() => sageKaynagi(sorgu, baglar, tavan(butceMs)), tavan(butceMs))
-    const [dosya, git, kanban, linear, sage] = await Promise.all([dosyaVaadi, gitVaadi, kanbanVaadi, linearVaadi, sageVaadi])
-    kaynaklar = { dosya, git, kanban, sage, linear }
+    const [dosya, git, kanban, defter, linear, sage] = await Promise.all([dosyaVaadi, gitVaadi, kanbanVaadi, defterVaadi, linearVaadi, sageVaadi])
+    kaynaklar = { dosya, git, kanban, defter, sage, linear }
   }
   const olcum = sorgu.yeterli
     ? await kaynakKos(() => olcumKaynagi(sorgu, baglar, t0), tavan(KANBAN_TAVAN_MS))
@@ -549,6 +578,8 @@ function gercekBaglar({ repo = REPO, ortam = process.env } = {}) {
         }
       }
     },
+    // ARC-288: departman defterleri (manifest docs/defter/manifest.json); yerel, ağ yok.
+    defterler: async () => require('../hijyen/defter-tazelik.cjs').defterIcerikleri(repo),
     linearAnahtar: ortam.LINEAR_API_KEY || '',
     linearGetir: async (terim, ms) => {
       const cevap = await fetch('https://api.linear.app/graphql', {

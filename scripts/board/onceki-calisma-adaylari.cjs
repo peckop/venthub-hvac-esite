@@ -17,6 +17,7 @@
  */
 
 const path = require('node:path')
+const { aranacakSatirlar } = require('../hijyen/defter-tazelik.cjs')
 const { spawnSync } = require('node:child_process')
 
 const SON_GUN = 30
@@ -59,12 +60,12 @@ function sirala(liste) {
 
 /**
  * Saf çekirdek.
- * @param {{ baslik: string, commitler?: Array<{ id: string, konu: string }>, dosyalar?: string[], doneKartlar?: Array<{ no: string, baslik: string }> }} girdi
+ * @param {{ baslik: string, commitler?: Array<{ id: string, konu: string }>, dosyalar?: string[], doneKartlar?: Array<{ no: string, baslik: string }>, defterler?: Array<{ ad: string, metin: string }> }} girdi
  * @returns {{ commit: Array<{ id: string, ad: string, puan: number }>, belge: Array<...>, kart: Array<...>, hepsi: Array<{ tur: string, id: string, ad: string }> }}
  */
 function adaylariBul(girdi) {
   const anahtar = anahtarSozcukler(girdi.baslik)
-  const sonuc = { commit: [], belge: [], kart: [], hepsi: [] }
+  const sonuc = { commit: [], belge: [], kart: [], defter: [], hepsi: [] }
   if (anahtar.length === 0) return sonuc
   const puanla = (metin) => {
     const o = ortakSozcukler(metin, anahtar)
@@ -82,13 +83,24 @@ function adaylariBul(girdi) {
     const p = puanla(k.baslik)
     if (p) sonuc.kart.push({ id: k.no, ad: k.baslik, puan: p })
   }
+  // ARC-288 (OPS-258 §6.2): manifestteki departman defterleri; başlık ve Sırada/Envanter satırları, defter başına en iyi eşleşme.
+  for (const d of girdi.defterler || []) {
+    let en = null
+    for (const { bolum, satir } of aranacakSatirlar(d.metin)) {
+      const p = puanla(`${d.ad.replace(/[-_.]/g, ' ')} ${satir}`)
+      if (p && (!en || p > en.puan)) en = { puan: p, bolum }
+    }
+    if (en) sonuc.defter.push({ id: d.ad, ad: `${d.ad} §${en.bolum}`, puan: en.puan })
+  }
   sonuc.commit = sirala(sonuc.commit).slice(0, KAYNAK_TAVANI)
   sonuc.belge = sirala(sonuc.belge).slice(0, KAYNAK_TAVANI)
   sonuc.kart = sirala(sonuc.kart).slice(0, KAYNAK_TAVANI)
+  sonuc.defter = sirala(sonuc.defter).slice(0, KAYNAK_TAVANI)
   sonuc.hepsi = [
     ...sonuc.commit.map((x) => ({ tur: 'commit', id: x.id, ad: x.ad })),
     ...sonuc.belge.map((x) => ({ tur: 'belge', id: x.id, ad: x.ad })),
     ...sonuc.kart.map((x) => ({ tur: 'kart', id: x.id, ad: x.ad })),
+    ...sonuc.defter.map((x) => ({ tur: 'defter', id: x.id, ad: x.ad })),
   ].slice(0, TOPLAM_TAVANI)
   return sonuc
 }

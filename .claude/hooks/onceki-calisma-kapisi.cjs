@@ -60,7 +60,15 @@ function hesapla(girdi, kaynaklar = {}) {
   const doneKartlar = (kartlar || [])
     .filter((k) => k.sutun === 'Done' && once.kartDepartmani(k, alani.ONEK) === dept)
     .map((k) => ({ no: once.kartNo(k.title) || k.id, baslik: k.title }))
-  const bulunan = adaylar.adaylariBul({ baslik: girdi.title, commitler: commitListe, dosyalar, doneKartlar })
+  // ARC-288: manifestteki departman defterleri (yoksa/bozuksa boş: aday üretilmez, "yok" iddiası da yapılmaz).
+  let defterler = []
+  try {
+    const d = (kaynaklar.defterler || (() => require(path.join(KOK, 'scripts', 'hijyen', 'defter-tazelik.cjs')).defterIcerikleri(KOK)))()
+    if (d && d.durum === 'tamam') defterler = d.defterler
+  } catch {
+    // defter okunamadı: fail-open
+  }
+  const bulunan = adaylar.adaylariBul({ baslik: girdi.title, commitler: commitListe, dosyalar, doneKartlar, defterler })
   return adaylar.metinler(bulunan, girdi.description)
 }
 
