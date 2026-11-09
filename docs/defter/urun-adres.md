@@ -1,0 +1,96 @@
+# URUN defteri: canlı adres şeması ve yönlendirmeler
+
+Sahibi: URUN · Son doğrulama: 2026-11-09 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: OPS-258, URN-158
+
+Alan: eski Next 15 sitedeki (canlı `venthub.com.tr`) adres şeması, yönlendirme katmanları ve kanonik adres kuralları; yeni siteye geçişte
+308 yönlendirmeyi yazan taraf URUN'dur (A6/A9). Depo herkese açıktır: burada yalnız sayı ve yol vardır, arama verisi ve ticari veri yoktur.
+Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmıştır ve bu turda yeniden ölçülmemiştir.
+
+## 1 Ne yaptık
+
+| Tarih | İş | Sonuç | Kart |
+|---|---|---|---|
+| 2026-11-09 | Bu defter pilot olarak yazıldı; repoda ölçülebilen katmanlar sayıldı | Aşağıdaki envanter | URN-158 |
+| 2026-11-09 | 308 sahiplik bölüşümü görüşü SEO-76'ya yazıldı: URUN eşleştirme tablosunu ve yönlendirmeyi yazar, ALTYAPI rota dilini ve arama yönlendirmesini tutar, GEO-SEO ölçer | Kabul edildi, tablo işi URN-157'ye açıldı (geçişe bağlı, beklemede) | SEO-76, URN-157 |
+| 2026-11-06 | `vitrin-metni-standard.md` içinde yazma betikleri ve kapıları KATALOG şeridine yazıldı (8., 72., 230. satırlar) | #2319 birleşti | URN-156 |
+| 2026-10-15 | Model adresleri (`/tr/urun/<slug>-p-<sku>`) ve yeni kategori adresleri içerikle birlikte açılacak diye yayın bekletildi; bayraklar kapalı kaldı | PR #1811 kapalı, dal duruyor | URN-85, URN-86 |
+| 2026-10-11 | Adres şeması cetveli v0.2 (B-1) yazıldı: TR `/tr/urunler`, `/tr/kategori/…`, `/tr/urun/…`; EN `/en/products`, `/en/category/…`, `/en/products/<aile>` | `adres-semasi-standard.md` | SEO-35 |
+
+## 2 Envanter
+
+Ölçüm tarihi 2026-11-09, dayanak sütunundaki yol. "Eski site" kodu `venthub-hvac` deposundadır.
+
+### 2.1 Yönlendirme katmanları (eski sitede)
+
+| Katman | Bugünkü hâli | Dayanak |
+|---|---|---|
+| `next.config.mjs` | 24 `source:` girişi: 21 yönlendirme (1 sessiz fan şablonu, 1 `/destek/hesaplayicilar`, 13 eski TR kategori adı, 6 tekil ürün adresi), 3 başlık bloğu (genel noindex sınırı ve hesap/sepet/ödeme yüzeyleri); `redirects()` ve `rewrites()` ayrı | `next.config.mjs` |
+| Marka yönlendirmeleri | `KALDIRILAN_MARKALAR` 1 kayıt (`frekans-konvertoru`, hedef kategori), `k3bOku`, `markaHedefi`, `markaYonlendirmeleri(k3b)` | `src/config/markaYonlendirmeleri.mjs` (106 satır) |
+| Bilgi merkezi yönlendirmeleri | 2 dilde bölüm adı, `ESKI_KONULAR` 4, `YAYINDAN_KALKAN` 2, EN kapalıyken liste hedefi, `bilgiMerkeziYonlendirmeleri(enYayin)` | `src/config/bilgiMerkeziYonlendirmeleri.mjs` |
+| Eski adres tohumu | kategoriler 17, aileler 6, ürünler 6 | `src/data/eski-adres-tohum.json` |
+| Adres kodu | envanter, eşleştirici, harita üretimi (A7 %90 fail-closed), rota dili tablosu, tazeleme yolları, yayındaki model yolları | `src/lib/adres/` |
+| Veritabanı takma adları (`url_takma_adlari`) | 59 satır (ölçülmedi; OPS envanterinden devralındı, 2026-11-09) | `docs/audits/adres-matrisi-canli-2026-10-04-oncesi.json` (245 satırlık eski matris) |
+
+### 2.2 Bayraklar
+
+| Bayrak | Değer | Anlamı | Dayanak |
+|---|---|---|---|
+| `EN_YAYIN` | `false` | EN yüzey kapalı; EN adresler noindex ve hreflang dışı | `src/config/features.ts` |
+| `ADRES_SEMASI_K3B` | `false` | Yeni model ve kategori adresleri yayında değil; açılışta aynı PR eski-adres haritasını ve `next.config` satırlarını da siler | `src/config/features.ts` |
+
+### 2.3 Canlı adres evreni (devralınan, ölçülmedi)
+
+| Kalem | Sayı | Dayanak |
+|---|---|---|
+| Canlı site haritası | 101 adres (9 Kasım, SEO-100; dağılımı yazılmadı) | OPS geçiş envanteri (depo dışı) |
+| 2 Kasım listesi | 94 adres: ürün 47, kategori 29, marka 7, bilgi merkezi 7, sabit 4 | OPS geçiş envanteri (depo dışı) |
+| Canlı katalog | 442 model (aile sayfasında `?sku=` ile), 47 aile, 35 kategori (28 aktif), 7 marka | OPS geçiş envanteri (depo dışı) |
+| Yeni site (Design) | kategori 32, aile 17, seri 104, model 1206, mekân 9, bina 5, marka 7, rehber 5, sabit 20 | OPS geçiş envanteri (depo dışı); Design 14 Aralık'ta kapanıyor |
+| UnoPIM adres alanı | 1165 üründe `adres_tr` ve `adres_en` dolu | `docs/olcum/pim-unopim.md` |
+| Eşleştirme taslağı (2 Kasım) | 2402 satır; canlı 94 adresin 93'ü listede yok; slug düzeyinde kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi yazısı 0/6; 6 hedef çakışması | SEO-76 kartı (4 Kasım ölçümü, GEO-SEO) |
+| Model adres listesi (eski şema) | 442 model | `docs/plans/rec300-model-adres-listesi-2026-09-23.csv` |
+
+### 2.4 Kurallar ve kapılar
+
+| Kural veya kapı | Ne söyler | Dayanak |
+|---|---|---|
+| A6 | Sağlayıcıya özgü yönlendirme yok (barındırma Cloudflare'e taşınabilir) | `docs/standards/adres-semasi-standard.md` |
+| A9 | Dil önekli eski adres tek sıçramada 308, öneksiz 307 | `docs/standards/adres-semasi-standard.md` |
+| A4 | Rezerve kelimeler | `docs/standards/adres-semasi-standard.md` |
+| Kanonik adres | Tek kaynak `src/config/siteUrl.ts`; bekçi INV-CANONICAL-1 | `docs/standards/canonical-url-standard.md` |
+| INV-ADRES-TEK-KANONIK-1, INV-ADRES-HARITA-1 | Tek kanonik adres, harita tutarlılığı | `src/lib/adres/__tests__/envanter.test.ts` |
+| INV-ADRES-YAYIN-DENETIM-1 | Yayın öncesi adres denetimi | `scripts/seo/__tests__/adres-yayin-denetim.test.ts`, `scripts/seo/adres-yayin-denetim.mjs` |
+| INV-DIL-TESPITI-1 | Dil tespiti | `src/test/dil-tespiti.test.ts` |
+| Harita üretimi | Zamanlı üretim | `.github/workflows/harita-uret.yml`, `scripts/adres/` |
+
+### 2.5 Cetvel boşluğu
+
+`docs/standards/adres-semasi-standard.md` (v0.2, 11 Ekim) 2 Kasım tek önek kararını taşımıyor: `/urunler`, `/uygulama-alanlari`, `/rehber`, `/destek`
+için dosyada karşılık yok (ölçüldü: `uygulama-alanlari` ve `/rehber` geçmiyor; `/tr/urunler` yalnız "Tüm ürünler" satırı). Cetvel hâlâ `/tr/kategori` ve `/tr/urun` diyor.
+
+## 3 Sırada ve yapılabilecekler
+
+| Madde | Gerekçe | Öncelik | Kart |
+|---|---|---|---|
+| Canlı şemadan (`/tr/products`, `/category`, `/brands`, `/bilgi-merkezi`) yeni tek önekli hedefe eşleştirme tablosu | 308 yönlendirmenin kaynağı; mevcut taslağın "eski" sütunu canlıdan değil Design ara şemasından | yüksek | URN-157 (geçişe bağlı) |
+| `adres-semasi-standard.md` cetvelini 2 Kasım tek önek kararıyla güncelle | Cetvel ile karar ayrışık; tablo bu cetvele dayanacak | yüksek | açılacak |
+| Rehber eşlemesi: canlı 13 yazı, Design 5 yazı, birebir slug 0 | Hangi yazı yeni adrese, hangisi neye gidecek kararı yok; BLOG ile birlikte | orta | URN-157'ye bağlı |
+| Marka 7, ana sayfa, iletişim, hakkımızda, ürün seçici, sepet/hesap/ödeme için eşleme önerisi | Eşleme kararı yok; URUN öneri yazar | orta | URN-157'ye bağlı |
+| 6 çakışan hedef için önerili liste (örnek: sığınak kategorisi ve uygulama alanı) | Recep kararı gerekir; liste URUN'dan | orta | URN-157'ye bağlı |
+| EN eski adres evreni sayısı ve EN açılış kararı | Sayı yok; EN açılış Recep kararı | orta | URN-86 |
+| `?sku=` ile gelen eski model adresleri için sorgu duyarlı yönlendirme | A6: sağlayıcı özelliği yok; ALTYAPI yazar, URUN kuralı söyler | orta | ALT-177 |
+| Dondurulmuş eski adres evreni (101 + EN + GSC'de dizinli `?sku=` adresleri + zincir düzleştirme) | GEO-SEO ölçer, URUN tabloya alır | orta | SEO-76 (beklemede) |
+| Defter ölçüm komutu (`olcum`) yaz: next.config kural sayısı, bayraklar, tohum sayıları defterle tutarlı mı | Defter `kontrolsuz` kalmasın; şimdilik `pilot` | düşük | açılacak |
+
+Başka sahipte kalanlar (bilgi için): CI kapıları (eski→yeni 200 tek sıçrama, boyut bütçesi, zincir ve çakışma) ALTYAPI (ALT-177); `src/lib/adres` kodunun yeni kuruluma taşınıp taşınmayacağı OPS kararı (OPS-180);
+Design adres verisinin kalıcı depoya alınması OPS-228 ve KATALOG.
+
+## 4 Kararlar
+
+| Tarih | Karar | Not |
+|---|---|---|
+| 2026-11-09 | 308 sahipliği: URUN tablo ve yönlendirme, ALTYAPI rota dili ve arama yönlendirmesi, GEO-SEO ölçüm | SEO-76 görüşü, OPS bölüşümü |
+| 2026-11-02 | Yeni sitede tek önek: `/urunler`, `/uygulama-alanlari`, `/rehber`, `/destek` | Cetvele henüz işlenmedi (2.5) |
+| karar 412 | Rafta ve eski site kartları başlatılmaz; eski sitenin yönlendirmesine yeni iş eklenmez | Yeni adres işi yeni site hattında |
+| 2026-10-15 | 3-C ve B-1 yayını bekletildi; yeni adresler içerikle birlikte açılacak | Bayraklar kapalı |
+| karar 59 | Barındırma Cloudflare'e taşınabilir; yönlendirme sağlayıcıya özgü yazılmaz | A6 gerekçesi |
