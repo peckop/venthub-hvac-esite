@@ -91,6 +91,13 @@ function calistir() {
   } catch {
     // yönlendirme yardımcısı okunamadı: kart yine açılır
   }
+  // ARC-291: geçiş/adres/dizin başlıklı kart etiketsiz açılıyorsa uyar (her rol).
+  try {
+    const e = require(path.join(KOK, 'scripts', 'hijyen', 'gecis-konusu.cjs')).etiketsizUyari(girdi.tool_input)
+    if (e) satirlar.push(e)
+  } catch {
+    // fail-open
+  }
   if (!satirlar.length) return
   try {
     fs.writeSync(

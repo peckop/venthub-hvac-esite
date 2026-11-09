@@ -6,6 +6,19 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 
 ## 1. Ne yaptık
 
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-09 -->
+| Kapanış | Kart | İş | Sahip |
+|---|---|---|---|
+| 2026-11-09 | SEO-102 | Bing durum ölçümü tam kapsamda ThrottleHost veriyor: bingOlc parçalara bölünsün | SEO |
+| 2026-11-09 | SEO-101 | OPS-258 pilot defteri geo-seo-dizin: depo içi özet defter + tutarlılık kontrolü + manifest pilot | SEO |
+| 2026-11-09 | SEO-100 | Dizin takibi: tüm site haritası kapsamı + Google dizin durumu (coverageState) + sayfa başına kronolojik geçmiş | SEO |
+| 2026-11-08 | SEO-99 | dizin-acilis satır tarihi Türkiye gününe çevrilsin (UTC gece yarısı sapması) | GEO-SEO |
+| 2026-11-08 | SEO-98 | Dizin sürecini otomatiğe bağla: lastmod yanlış-YAP düzeltmesi, Yandex API ölçümü, Bing/defter/zamanlama kararı (Recep 8 Kasım) | GEO-SEO |
+| 2026-11-08 | SEO-84 | Dizin takip düzeni: hangi adrese hangi motorda ne zaman istek atıldı, ne bekleniyor, ne yapılacak; aynı iş tekrarlanmasın (Recep 6 Kasım) | GEO-SEO |
+| 2026-11-08 | ARC-282 | dizin-takip defterinin ikinci disk kopyası (SEO-98) | ARAÇ |
+| 2026-11-07 | SEO-87 | Ölçüm arşivi takip düzeni: INDEKS.md, olcumler.jsonl, "bu sorgu daha önce ölçüldü mü" komutu, arşiv C:/tmp dışına (OPS onayı 6 Kasım) | GEO-SEO |
+<!-- DEFTER-KANBAN:ne-yaptik BITIS -->
+
 | Tarih | İş | Neden | Sonuç | Kart |
 |---|---|---|---|---|
 | 2026-11-09 | Bing durum ölçümü tam kapsamda yavaş okur; OLCULEMEDI 61 → 7 | Tam kapsam Bing hız sınırına takılıyordu | `BING_ARALIK_MS` [1000, 2000, 3500] | SEO-102 |
@@ -95,6 +108,14 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 | Ölçüm arşivi | Konu başına "daha önce ölçüldü mü" kaydı | 2026-11-06 | `scripts/seo/olcum-defteri.mjs`, D8 |
 
 ## 3. Sırada ve yapılabilecekler
+
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-09 -->
+| Kart | İş | Durum | Sahip |
+|---|---|---|---|
+| SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm: 308 listesini canlı adreslere karşı sına, Search Console /urunler/ ve /rehber/ süzgeçleri (Recep | Backlog | GEO-SEO |
+| SEO-90 | Dizin isteği kuyruğu: Yandex kanal tipi yazısı yeniden tarama; Google YAP adresleri (/bilgi-merkezi, plug-fan-nedir, /category/radyal-fanlar | Backlog | GEO-SEO |
+| SEO-91 | 10 Kasım ölçümü: ısı geri kazanım ve hava perdesi yazıları, 7 Kasım'da atılan Google isteği işe yaradı mı (deney sonucu, tecrübe kaydı) | Backlog | GEO-SEO |
+<!-- DEFTER-KANBAN:sirada BITIS -->
 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
