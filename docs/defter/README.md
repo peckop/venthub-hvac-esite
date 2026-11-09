@@ -70,7 +70,7 @@ var, aynı dosya iki kayıtta yok, `aktif` kaydın `olcum`'u dolu, şema alanlar
 
 | Defter | Sahip | Durum |
 |---|---|---|
-| urun-adres | URUN | Planlı: pilot, canlı adres şemasıyla başlar (URN-157 geçiş tablosu "Sırada"da) |
+| urun-adres | URUN | Pilot (URN-158): canlı adres şeması, yönlendirme katmanları, bayraklar; `olcum` henüz yok (kontrolsüz pilot), URN-157 geçiş tablosu "Sırada"da |
 | geo-seo-dizin | GEO-SEO | Pilot (SEO-101): depo-güvenli özet, `olcum` = `node scripts/seo/dizin-defter-kontrol.mjs` (arşivdeki son anlık görüntüyle sayı karşılaştırır; ham veri depoya girmez) |
 
 Yeni defter eklemek: önce manifest kaydı (`durum: planli`), sonra dosya, sonra `pilot`/`aktif`.

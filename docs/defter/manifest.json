@@ -10,6 +10,8 @@
       "izlenen": [
         "next.config.mjs",
         "src/config/markaYonlendirmeleri.mjs",
+        "src/config/bilgiMerkeziYonlendirmeleri.mjs",
+        "src/data/eski-adres-tohum.json",
         "docs/standards/adres-semasi-standard.md",
         "docs/standards/canonical-url-standard.md"
       ],
@@ -17,7 +19,7 @@
       "tetik": ["kart-kapanisi", "sure"],
       "olcum": null,
       "disKaynak": null,
-      "durum": "planli"
+      "durum": "pilot"
     },
     {
       "ad": "geo-seo-dizin",
