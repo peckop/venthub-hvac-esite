@@ -38,6 +38,14 @@ describe('INV-KANCA-GECIS-KONUSU-1 · kalıp', () => {
       'site geçiş planı nerede',
       'eski → yeni adres tablosu',
       'siteye geçişte dizin isteği',
+      'UnoPIM durumu ne',
+      'veri aktarımı nerede kaldı',
+      'teknik özellik aktarımı',
+      'teknik değerleri aktarım planı',
+      'görsel aktarımı bitti mi',
+      'ürün verisi aktarımı',
+      'fiyat/KDV aktarımı',
+      'fiyat ve kdv aktarımı',
     ]) {
       expect(YARDIMCI.gecisMi(m), m).toBe(true)
     }
@@ -53,6 +61,11 @@ describe('INV-KANCA-GECIS-KONUSU-1 · kalıp', () => {
       'canlıya çıkmadan önce test et',
       'veri geçiş planı',
       'auth geçiş süreci',
+      'görsel hiyerarşiyi düzelt',
+      'resim boyutu büyük',
+      'teknik özellik tablosunun rengi',
+      'ürün verisi listesi',
+      'fiyat hesaplayıcı KDV satırı',
     ]) {
       expect(YARDIMCI.gecisMi(m), m).toBe(false)
     }

@@ -35,6 +35,10 @@ const GECIS_RE = new RegExp(
       'ge[çc]i[şs]\\s+tek\\s+resim',
       'eski\\s*(?:→|->|-|\\s)\\s*yeni\\s+adres',
       'adres\\s+e[şs]le[şs]tirme',
+      // Veri aktarımı (ARC-291 eki, Recep): UnoPIM tek başına yeter; öteki kalıplar "aktar" ile birlikte (gündelik "görsel", "resim" tek başına YOK).
+      'unopim',
+      'veri\\s+aktar\\p{L}*',
+      '(?:teknik\\s+(?:[öo]zellik|de[ğg]er)\\p{L}*|g[öo]rsel\\p{L}*|resim\\p{L}*|[üu]r[üu]n\\s+veri\\p{L}*|fiyat\\s*(?:/|ve)?\\s*kdv)\\s+aktar\\p{L}*',
     ].join('|') +
     ')',
   'iu',
@@ -64,7 +68,7 @@ function satir(kok = KOK) {
   }
   return (
     `GEÇİŞ KONUSU: Geçiş tek süreçtir — önce ${defter} oku; yeni araştırma/kart açma, deftere bak; ` +
-    'adres → urun-adres, dizin → geo-seo-dizin defteri (ana kart OPS-180).'
+    'adres → urun-adres, dizin → geo-seo-dizin, veri aktarımı (UnoPIM) → yeni-site-gecis §2 (ana kart OPS-180).'
   )
 }
 
