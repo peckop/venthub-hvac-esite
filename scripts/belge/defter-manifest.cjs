@@ -89,6 +89,11 @@ function sorunlar(manifest, { roller, varMi }) {
       s.push(`${k}: tetik ${TETIKLER.join('/')} değerlerinden en az iki tekil değer olmalı`)
     }
     if (!(d.olcum === null || (typeof d.olcum === 'string' && d.olcum.trim()))) s.push(`${k}: olcum null ya da komut metni olmalı`)
+    // ARC-291: kaynakIzi (isteğe bağlı) = ucuz parmak izi komutu; olcum olmadan anlamsız.
+    if ('kaynakIzi' in d) {
+      if (!(typeof d.kaynakIzi === 'string' && d.kaynakIzi.trim())) s.push(`${k}: kaynakIzi yoksa alan hiç olmamalı, varsa boş olmayan komut metni olmalı`)
+      else if (!(typeof d.olcum === 'string' && d.olcum.trim())) s.push(`${k}: kaynakIzi varsa olcum de dolu olmalı (izi olmayan ölçüm yok, ölçümsüz iz anlamsız)`)
+    }
     if (!(d.disKaynak === null || DIS_KAYNAKLAR.includes(d.disKaynak))) s.push(`${k}: disKaynak null ya da ${DIS_KAYNAKLAR.join('/')} olmalı`)
     if (!DURUMLAR.includes(d.durum)) s.push(`${k}: durum ${DURUMLAR.join('/')} olmalı`)
     if (d.durum === 'aktif' && !(typeof d.olcum === 'string' && d.olcum.trim())) s.push(`${k}: aktif defterin olcum komutu dolu olmalı`)

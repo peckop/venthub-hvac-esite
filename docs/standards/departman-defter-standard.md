@@ -65,6 +65,11 @@ tarih, (3) git'te son içerik commit'i. `mtime` kullanılmaz (biçim değişikli
 **Sahte tazelik yasağı:** `Son doğrulama` tek başına ilerleyip gövde değişmediyse kırmızı; izlenen yol değiştiğinde de defter
 gövdesi değişmeden tarih ilerletmek geçerli sayılmaz.
 
+**Kaynak izi (ARC-291):** manifestte `kaynakIzi` olan defterde ölçüm takvime göre değil kaynağa göre yenilenir: iz
+değişmediyse defter "kaynak değişmedi, son ölçüm X" gösterir ve `sure` tetiği bunu bayat saymaz; ama `Son doğrulama` günü yine
+görünür kalır, sahte tazelik yasağı geçerlidir (iz aynı diye tarih tek başına ilerletilmez). İz üretilemediyse "ölçülemedi"dir,
+asla "değişmedi" değil; iz değişip yeni ölçüm yoksa "ölçüm bekliyor"dur.
+
 ## D5 — Güvenlik: depo herkese açıktır
 
 Deftere ham arama verisi (sorgu, tıklama, sıra), maliyet ve tedarik verisi, sır, kişisel veri girmez. Depo dışı kaynaklı

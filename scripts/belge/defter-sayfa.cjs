@@ -94,6 +94,7 @@ function gunFarki(dogrulama, bugun) {
 /** Bir manifest kaydının sayfa kartı verisi. `oku(dosya)`: metin ya da null (okunamadı). */
 function kartVerisi(kayit, oku, bugun) {
   const temel = { ad: kayit.ad, sahip: kayit.sahip, ozet: kayit.ozet, durum: kayit.durum, tazelikGun: kayit.tazelikGun, dosya: kayit.dosya }
+  // kaynakIzi yalnız hal kararında kullanılır.
   const metin = oku(kayit.dosya)
   // `planli` kayıt dosyasız kalır; dosyası varsa (manifest durumu geride) gerçek veri gösterilir, "planlı" diye gizlenmez.
   if (kayit.durum === 'planli' && metin === null) return { ...temel, hal: 'planli' }
@@ -102,14 +103,26 @@ function kartVerisi(kayit, oku, bugun) {
   if (!v.sonDogrulama) return { ...temel, ...v, hal: 'olculemedi', sebep: '"Son doğrulama" satırı yok ya da biçimsiz' }
   const yas = gunFarki(v.sonDogrulama, bugun)
   if (yas === null) return { ...temel, ...v, hal: 'olculemedi', sebep: '"Son doğrulama" tarihi geçersiz' }
+  if (yas > kayit.tazelikGun && kayit.kaynakIzi && kaynakDegismedi(metin)) return { ...temel, ...v, yas, hal: 'kaynak-degismedi' }
   return { ...temel, ...v, yas, hal: yas > kayit.tazelikGun ? 'bayat' : 'taze' }
+}
+
+/**
+ * ARC-291: `kaynakIzi` olan defterde, ölçüm bloğundaki HİÇBİR satır "bekliyor" ya da "ölçülemedi" değilse süre dolsa da bayat sayılmaz
+ * (tazelik kaynağa bağlı). Ayrı hal olarak gösterilir, taze ile karışmaz; `Son doğrulama` günü yine görünür (sahte tazelik yasağı).
+ */
+function kaynakDegismedi(metin) {
+  const m = /<!-- DEFTER-OLCUM:envanter BASLA[^\n]*-->\r?\n([\s\S]*?)\r?\n<!-- DEFTER-OLCUM:envanter BITIS -->/.exec(metin)
+  if (!m) return false
+  const satirlar = m[1].split(/\r?\n/).filter((s) => /^\|/.test(s) && !/^\|\s*(Ölçüm|---)/.test(s))
+  return satirlar.length > 0 && satirlar.every((s) => !/bekliyor|ölçülemedi/.test(s))
 }
 
 function kac(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 }
 
-const HAL_ETIKETI = { taze: 'taze', bayat: 'BAYAT', olculemedi: 'ölçülemedi', planli: 'planlı' }
+const HAL_ETIKETI = { taze: 'taze', bayat: 'BAYAT', olculemedi: 'ölçülemedi', planli: 'planlı', 'kaynak-degismedi': 'kaynak değişmedi' }
 
 function kartHtml(k) {
   const durumSatiri =
@@ -135,9 +148,9 @@ const CSS = `:root{--zemin:#f7f7f5;--yuzey:#fff;--yazi:#1c1c1a;--soluk:#6b6b66;-
 main{max-width:960px;margin:0 auto}h1{font-size:1.4rem;margin:0 0 4px}.alt{color:var(--soluk);margin:0 0 20px}
 .izgara{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .kart{background:var(--yuzey);border:1px solid var(--cizgi);border-left:6px solid var(--taze);border-radius:8px;padding:14px 16px}
-.kart.bayat,.kart.olculemedi{border-left-color:var(--bayat);border-color:var(--bayat)}.kart.planli{border-left-color:var(--gri)}
+.kart.bayat,.kart.olculemedi{border-left-color:var(--bayat);border-color:var(--bayat)}.kart.planli,.kart.kaynak-degismedi{border-left-color:var(--gri)}
 .kart header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.kart h2{font-size:1.1rem;margin:0}
-.hal{font-size:.8rem;font-weight:700;color:var(--taze)}.kart.bayat .hal,.kart.olculemedi .hal{color:var(--bayat)}.kart.planli .hal{color:var(--gri)}
+.hal{font-size:.8rem;font-weight:700;color:var(--taze)}.kart.bayat .hal,.kart.olculemedi .hal{color:var(--bayat)}.kart.planli .hal,.kart.kaynak-degismedi .hal{color:var(--gri)}
 .kart p{margin:6px 0}.sahip,.dosya,.baslik{color:var(--soluk);font-size:.85rem}.baslik{margin-top:10px}.kart ol{margin:4px 0 0;padding-left:20px}
 .rozet,.kart-no,.kart .kart{font-size:.75rem;border:1px solid var(--cizgi);border-radius:4px;padding:0 4px;color:var(--soluk)}`
 
@@ -147,7 +160,7 @@ function sayfaUret(manifest, oku, bugun) {
   const kartlar = kayitlar.map((d) => kartVerisi(d, oku, bugun))
   const bayat = kartlar.filter((k) => k.hal === 'bayat' || k.hal === 'olculemedi').length
   const ozet = kartlar.length
-    ? `${kartlar.length} defter · ${kartlar.filter((k) => k.hal === 'taze').length} taze · ${bayat} bayat ya da ölçülemedi · ${kartlar.filter((k) => k.hal === 'planli').length} planlı`
+    ? `${kartlar.length} defter · ${kartlar.filter((k) => k.hal === 'taze').length} taze · ${kartlar.filter((k) => k.hal === 'kaynak-degismedi').length} kaynak değişmedi · ${bayat} bayat ya da ölçülemedi · ${kartlar.filter((k) => k.hal === 'planli').length} planlı`
     : 'Manifest okunamadı ya da defter yok.'
   const html = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Departman Defterleri</title><style>${CSS}</style></head><body><main><h1>Departman defterleri</h1><p class="alt">${kac(bugun)} · ${kac(ozet)}</p><div class="izgara">${kartlar.map(kartHtml).join('')}</div></main></body></html>`
   return { html, kartlar }

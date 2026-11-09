@@ -107,6 +107,31 @@ describe('defter-sayfa: kart halleri (kör sayfa değil)', () => {
     expect(r.kartlar[0].hal).toBe('bayat')
   })
 
+  describe('kaynakIzi (ARC-291): kaynak değişmediyse süre dolsa da bayat değil, AYRI hal', () => {
+    const blok = (satir: string) =>
+      `<!-- DEFTER-OLCUM:envanter BASLA — x -->\n| Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |\n|---|---|---|---|\n${satir}\n<!-- DEFTER-OLCUM:envanter BITIS -->`
+    const metin = (satir: string) => DEFTER.replace('| 1 | 2 |', `| 1 | 2 |\n\n${blok(satir)}`)
+    const TEMIZ = '| Fark | 1165 üründe fark 0 | 2026-11-05 | kaynak değişmedi — son ölçüm 2026-11-05 |'
+    const izli = kayit({ olcum: 'node x', kaynakIzi: 'node x --iz' })
+
+    it('eşik aşıldı + tüm satırlar temiz → kaynak-degismedi (taze değil, bayat değil); Son doğrulama günü görünür', () => {
+      const r = ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ)), '2026-12-01')
+      expect(r.kartlar[0].hal).toBe('kaynak-degismedi')
+      expect(r.html).toContain('class="kart kaynak-degismedi"')
+      expect(r.html).toContain('Son doğrulama 2026-11-01')
+    })
+    it('sabotaj: bekleyen ya da ölçülemeyen satır varsa yine BAYAT', () => {
+      for (const s of ['| Fark | x | 2026-11-05 | ⚠ kaynak DEĞİŞTİ, ölçüm bekliyor |', '| Adres | x | 2026-11-04 | ⚠ ölçülemedi (iz üretilemedi) |']) {
+        expect(ds.sayfaUret(man(izli), okuyucu(metin(s)), '2026-12-01').kartlar[0].hal, s).toBe('bayat')
+      }
+    })
+    it('sabotaj: manifestte kaynakIzi yoksa ya da blok yoksa BAYAT; eşik içinde TAZE kalır', () => {
+      expect(ds.sayfaUret(man(kayit()), okuyucu(metin(TEMIZ)), '2026-12-01').kartlar[0].hal).toBe('bayat')
+      expect(ds.sayfaUret(man(izli), okuyucu(DEFTER), '2026-12-01').kartlar[0].hal).toBe('bayat')
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ)), '2026-11-09').kartlar[0].hal).toBe('taze')
+    })
+  })
+
   it('Son doğrulama satırı yoksa ya da dosya okunamıyorsa "ölçülemedi" ve kırmızı (taze DEĞİL)', () => {
     const satirsiz = ds.sayfaUret(man(kayit()), okuyucu('# defter\n\n## 1 Ne yaptık\n'), '2026-11-09')
     expect(satirsiz.kartlar[0].hal).toBe('olculemedi')
