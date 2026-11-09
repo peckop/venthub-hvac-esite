@@ -95,7 +95,6 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 | OPS-219 | Design İçerik'e KTL-80 eksik içerik notu: NIC AT 8 özet, 51 ürün seri kaydı, SEA-61102010 adı | To Do | OPS |
 | OPS-220 | Design Venthub New'e yeni site kanal tipi fan kategori girdisi (SEO-83: kesit ayrımı, çeşit tablosu, teklif metni, aile dengesi) | To Do | OPS |
 | OPS-228 | Claude Design 14 Aralık'ta kapanıyor: projelerin Claude'a taşınması (yedek + ölçüm + taşıma planı) | Backlog | OPS |
-| OPS-260 | Design'da 41 model iki ayrı kodla duruyor (DAN-80141=AVE-80141, EDF-*=VRT-EDF-*); UnoPIM'de tek — Design'da tekilleştirilsin mi (Recep) | Backlog | OPS |
 | SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm: 308 listesini canlı adreslere karşı sına, Search Console /urunler/ ve /rehber/ süzgeçleri (Recep | Backlog | GEO-SEO |
 | URN-157 | Yeni siteye geçişte eski→yeni adres eşleştirme tablosu + 308 yönlendirme (kaynak: canlı site haritası → Design envanteri; adres-semasi-stand | Backlog | URUN |
 <!-- DEFTER-KANBAN:sirada BITIS -->
