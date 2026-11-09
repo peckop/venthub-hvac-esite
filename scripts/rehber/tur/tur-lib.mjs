@@ -208,3 +208,81 @@ export function turKaydiMetni(g) {
   if (g.not) satirlar.push('', '## Not', g.not)
   return `${satirlar.join('\n')}\n`
 }
+
+/**
+ * (f) YAZI GÖVDESİ ÇIKAR / GÖM (BLG-69): 9 Kasım ölçümünde 12 tek seferlik betiğin ikisi buydu (gövdeyi yazilar.ts'ten çıkarma,
+ * doğrulanan sürümü yazilar.ts'e gömme + guncellemeTarihi/yorum). Kayıt `kimlik: '<kimlik>'` ile başlar, sonraki `kimlik:` ile biter.
+ * EOL korunur (CRLF dosya CRLF kalır). Gömme SESSİZ DEĞİLDİR: önceki gövde kayıttakiyle (sondaki satır sonu hariç) bire bir
+ * aynı değilse, çapa tekil değilse, yeni gövde şablon sabiti için güvensizse (ters tırnak, ${) FIRLATIR.
+ */
+const sonSatirsiz = (s) => s.replace(/\n+$/, '')
+
+function kayitAraligi(src, kimlik) {
+  const idx = [...src.matchAll(/kimlik: '([^']+)'/g)]
+  const i = idx.findIndex((m) => m[1] === kimlik)
+  if (i < 0) throw new Error(`kimlik bulunamadı: ${kimlik}`)
+  if (idx.filter((m) => m[1] === kimlik).length > 1) throw new Error(`kimlik birden çok kez geçiyor: ${kimlik}`)
+  return { bas: idx[i].index, son: i + 1 < idx.length ? idx[i + 1].index : src.length }
+}
+
+function govdeSinirlari(blok) {
+  const a = blok.indexOf('govde: `')
+  if (a < 0) throw new Error('govde alanı bulunamadı')
+  const bas = a + 'govde: `'.length
+  const son = blok.indexOf('`,\n', bas)
+  if (son < 0) throw new Error('govde kapanışı bulunamadı')
+  return { bas, son }
+}
+
+export function govdeCikar(kaynak, kimlik) {
+  const src = kaynak.replace(/\r\n/g, '\n')
+  const { bas, son } = kayitAraligi(src, kimlik)
+  const blok = src.slice(bas, son)
+  const g = govdeSinirlari(blok)
+  return blok.slice(g.bas, g.son)
+}
+
+export function govdeGom(kaynak, kimlik, onceki, yeni, secenek = {}) {
+  const crlf = kaynak.includes('\r\n')
+  const src = kaynak.replace(/\r\n/g, '\n')
+  const o = sonSatirsiz(onceki.replace(/\r\n/g, '\n'))
+  const y = sonSatirsiz(yeni.replace(/\r\n/g, '\n'))
+  if (/`|\$\{/.test(y)) throw new Error('yeni gövdede ters tırnak ya da ${ var; şablon sabitinde güvenli değil')
+  const { bas, son } = kayitAraligi(src, kimlik)
+  let blok = src.slice(bas, son)
+  const g = govdeSinirlari(blok)
+  const mevcut = blok.slice(g.bas, g.son)
+  if (sonSatirsiz(mevcut) !== o) throw new Error(`önceki gövde kayıttakiyle aynı değil (kayıt sha ${sha12(sonSatirsiz(mevcut))}, verilen ${sha12(o)})`)
+  const sonEk = mevcut.slice(sonSatirsiz(mevcut).length)
+  blok = blok.slice(0, g.bas) + y + sonEk + blok.slice(g.son)
+  if (secenek.tarih) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(secenek.tarih)) throw new Error('tarih YYYY-AA-GG olmalı')
+    const re = /(\n(\s*))guncellemeTarihi: '[^']*',/
+    if (!re.test(blok)) throw new Error('guncellemeTarihi alanı bulunamadı')
+    const yorumSatiri = secenek.yorum ? `// ${secenek.yorum.replace(/\s+/g, ' ')}` : ''
+    blok = blok.replace(re, (_m, nl) => `${yorumSatiri ? `${nl}${yorumSatiri}` : ''}${nl}guncellemeTarihi: '${secenek.tarih}',`)
+  }
+  const cikti = src.slice(0, bas) + blok + src.slice(son)
+  return crlf ? cikti.replace(/\n/g, '\r\n') : cikti
+}
+
+/**
+ * (g) İDDİA TABLOSU YAMASI (BLG-69): satırları `ara` (metin başlangıcı, tek eşleşme zorunlu; adet verilirse o kadar) ile bulur,
+ * `set` alanlarını yazar (metin, kaynak, tur, alinti); `ekle` yeni satır ekler. Bulunmayan/çok eşleşen `ara` FIRLATIR.
+ */
+export function iddiaYamaUygula(dosya, yamalar) {
+  const iddialar = (dosya.iddialar || []).map((x) => ({ ...x }))
+  for (const [i, y] of yamalar.entries()) {
+    if (y.ekle) {
+      if (typeof y.ekle.metin !== 'string' || !y.ekle.metin) throw new Error(`yama #${i + 1}: ekle.metin gerekli`)
+      iddialar.push({ kaynak: [], tur: 'genel', alinti: '', ...y.ekle })
+      continue
+    }
+    if (typeof y.ara !== 'string' || !y.ara || !y.set) throw new Error(`yama #${i + 1}: ara ve set gerekli (ya da ekle)`)
+    const eslesen = iddialar.filter((x) => x.metin.startsWith(y.ara))
+    const adet = y.adet ?? 1
+    if (eslesen.length !== adet) throw new Error(`yama #${i + 1}: "${y.ara.slice(0, 60)}" ${eslesen.length} satıra uydu (beklenen ${adet})`)
+    for (const x of eslesen) Object.assign(x, y.set)
+  }
+  return { ...dosya, iddialar }
+}

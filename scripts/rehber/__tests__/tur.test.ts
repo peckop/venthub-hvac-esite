@@ -15,7 +15,10 @@ import { describe, expect, it } from 'vitest'
 import { calistir } from '../tur/tur.mjs'
 import {
   degisenCumleler,
+  govdeCikar,
+  govdeGom,
   iddiaIskeleti,
+  iddiaYamaUygula,
   KAPSAM_SOZCUKLERI,
   normalize,
   sayiTutarliligi,
@@ -237,5 +240,87 @@ describe('INV-REHBER-TUR-1 · komut satırı', () => {
   it('bilinmeyen komut ve eksik argüman hata verir', () => {
     expect(() => calistir(['yok'])).toThrow(/komut:/)
     expect(() => calistir(['yama', 'a'])).toThrow(/kullanım/)
+  })
+})
+
+describe('BLG-69 · gövde çıkar/göm ve iddia yaması (tek seferlik betik yerine)', () => {
+  const TS = [
+    'export const YAZILAR = [',
+    '  {',
+    "    kimlik: 'ilk-yazi',",
+    "    guncellemeTarihi: '2026-11-01',",
+    '    diller: { tr: {',
+    '        govde: `# Birinci\n\nBirinci metin [1].\n`,',
+    '    } },',
+    '  },',
+    '  {',
+    "    kimlik: 'ikinci-yazi',",
+    "    yayinTarihi: '2026-10-01',",
+    "    guncellemeTarihi: '2026-11-02',",
+    '    diller: { tr: {',
+    '        govde: `# Ikinci\n\nIkinci metin [1].\n`,',
+    '    } },',
+    '  },',
+    ']',
+    '',
+  ].join('\n')
+
+  it('govdeCikar kaydın gövdesini verir; bilinmeyen kimlik FIRLATIR', () => {
+    expect(govdeCikar(TS, 'ikinci-yazi')).toBe('# Ikinci\n\nIkinci metin [1].\n')
+    expect(() => govdeCikar(TS, 'yok')).toThrow(/bulunamadı/)
+  })
+
+  it('govdeGom yalnız hedef kaydı değiştirir, tarih ve yorum ekler, EOL korur', () => {
+    const sonra = govdeGom(TS, 'ikinci-yazi', '# Ikinci\n\nIkinci metin [1].', '# Ikinci\n\nYeni metin [1].', {
+      tarih: '2026-11-09',
+      yorum: '9 Kasım: düzeltme',
+    })
+    expect(govdeCikar(sonra, 'ikinci-yazi')).toBe('# Ikinci\n\nYeni metin [1].\n')
+    expect(govdeCikar(sonra, 'ilk-yazi')).toBe(govdeCikar(TS, 'ilk-yazi'))
+    expect(sonra).toMatch(/\/\/ 9 Kasım: düzeltme\n\s*guncellemeTarihi: '2026-11-09',/)
+    expect(sonra).toMatch(/guncellemeTarihi: '2026-11-01'/)
+    const crlf = govdeGom(TS.replace(/\n/g, '\r\n'), 'ilk-yazi', '# Birinci\n\nBirinci metin [1].', '# Birinci\n\nYeni [1].')
+    expect(crlf.includes('\r\n')).toBe(true)
+    expect(crlf.replace(/\r\n/g, '\n').includes('Yeni [1].')).toBe(true)
+  })
+
+  it('govdeGom sessiz değildir: önceki gövde uymazsa, ters tırnak varsa, tarih bozuksa FIRLATIR', () => {
+    expect(() => govdeGom(TS, 'ilk-yazi', 'başka bir metin', 'yeni')).toThrow(/aynı değil/)
+    expect(() => govdeGom(TS, 'ilk-yazi', '# Birinci\n\nBirinci metin [1].', 'a `kod` b')).toThrow(/ters tırnak/)
+    expect(() => govdeGom(TS, 'ilk-yazi', '# Birinci\n\nBirinci metin [1].', 'yeni', { tarih: '9 Kasım' })).toThrow(/YYYY/)
+  })
+
+  it('iddiaYamaUygula: set tek eşleşmeyi günceller, çok/sıfır eşleşme ve eksik alan FIRLATIR, ekle satır ekler', () => {
+    const dosya = { iddialar: [{ metin: 'Birinci cümle [1].', kaynak: [1], tur: 'genel', alinti: '' }, { metin: 'Birinci başka cümle [2].', kaynak: [2], tur: 'genel', alinti: '' }] }
+    const sonra = iddiaYamaUygula(dosya, [{ ara: 'Birinci cümle', set: { tur: 'mevzuat', alinti: 'RG 1' } }, { ekle: { metin: 'Yeni cümle [3].', kaynak: [3] } }])
+    expect(sonra.iddialar[0]).toMatchObject({ tur: 'mevzuat', alinti: 'RG 1' })
+    expect(sonra.iddialar).toHaveLength(3)
+    expect(sonra.iddialar[2]).toMatchObject({ metin: 'Yeni cümle [3].', tur: 'genel', alinti: '' })
+    expect(dosya.iddialar[0].tur).toBe('genel')
+    expect(() => iddiaYamaUygula(dosya, [{ ara: 'Yok', set: { tur: 'x' } }])).toThrow(/0 satıra/)
+    expect(() => iddiaYamaUygula(dosya, [{ ara: 'Birinci', set: { tur: 'x' } }])).toThrow(/2 satıra/)
+    expect(() => iddiaYamaUygula(dosya, [{ ara: 'Birinci' }])).toThrow(/gerekli/)
+  })
+
+  it('CLI: cikar → gom → iddia-yama uçtan uca, yazılar dosyası yalnız hedef kayıtta değişir', () => {
+    const k = mkdtempSync(join(tmpdir(), 'tur-blg69-'))
+    const ts = join(k, 'yazilar.ts')
+    writeFileSync(ts, TS, 'utf8')
+    const onceki = join(k, 'onceki.md')
+    expect(calistir(['cikar', 'ilk-yazi', onceki, `--kaynak=${ts}`])).toBe(0)
+    const yeni = join(k, 'yeni.md')
+    writeFileSync(yeni, readFileSync(onceki, 'utf8').replace('Birinci metin', 'Düzeltilmiş metin'), 'utf8')
+    expect(calistir(['gom', 'ilk-yazi', onceki, yeni, '--tarih=2026-11-09', `--kaynak=${ts}`])).toBe(0)
+    const sonra = readFileSync(ts, 'utf8')
+    expect(sonra).toMatch(/Düzeltilmiş metin/)
+    expect(sonra).toMatch(/guncellemeTarihi: '2026-11-09'/)
+    expect(sonra).toMatch(/Ikinci metin \[1\]/)
+    const tablo = join(k, 'iddialar.json')
+    writeFileSync(tablo, JSON.stringify({ iddialar: [{ metin: 'A [1].', kaynak: [1], tur: 'genel', alinti: '' }] }), 'utf8')
+    const yama = join(k, 'yama.json')
+    writeFileSync(yama, JSON.stringify([{ ara: 'A [1]', set: { alinti: 'kaynak metni' } }]), 'utf8')
+    expect(calistir(['iddia-yama', tablo, yama])).toBe(0)
+    expect(JSON.parse(readFileSync(tablo, 'utf8')).iddialar[0].alinti).toBe('kaynak metni')
+    expect(() => calistir(['gom', 'ilk-yazi', onceki, yeni, `--kaynak=${ts}`])).toThrow(/aynı değil/)
   })
 })
