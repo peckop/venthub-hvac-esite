@@ -9,6 +9,9 @@
  *   node scripts/rehber/tur/tur.mjs kapi    <taslak.md> [iddialar.json]        # denetle() + aynı-sayı + kapsam sözcüğü açıkları
  *   node scripts/rehber/tur/tur.mjs tuzak   <taslak.md> <tuzak.json> <klasor> <ad>   # <klasor>/<ad>-temiz.md ve <ad>-tuzakli.md
  *   node scripts/rehber/tur/tur.mjs kayit   <tur.json> <cikti.md>              # turN-bulgular.md üretir
+ *   node scripts/rehber/tur/tur.mjs cikar   <kimlik> <cikti.md> [--kaynak=<yazilar.ts>]      # kayıttaki gövdeyi dosyaya çıkarır (BLG-69)
+ *   node scripts/rehber/tur/tur.mjs gom     <kimlik> <onceki.md> <yeni.md> [--tarih=YYYY-AA-GG] [--yorum="..."] [--kaynak=<yazilar.ts>]   # yazilar.ts'e gömer (önceki gövde bire bir aynı değilse FIRLATIR)
+ *   node scripts/rehber/tur/tur.mjs iddia-yama <iddialar.json> <yama.json>     # [{ara,set,adet?}|{ekle}] satır günceller/ekler (BLG-69)
  *
  * ⚠Bu takım YARGI vermez: doğrulayıcı/çürütücü okuması ve engelleyici hükmü elle kalır (tur-lib.mjs başlığı).
  */
@@ -17,12 +20,26 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { denetle } from '../rehber-denetim.mjs'
-import { degisenCumleler, iddiaIskeleti, sayiTutarliligi, sha12, tuzakliKopya, turKaydiMetni, yamaUygula } from './tur-lib.mjs'
+import {
+  degisenCumleler,
+  govdeCikar,
+  govdeGom,
+  iddiaIskeleti,
+  iddiaYamaUygula,
+  sayiTutarliligi,
+  sha12,
+  tuzakliKopya,
+  turKaydiMetni,
+  yamaUygula,
+} from './tur-lib.mjs'
 
 const oku = (yol) => readFileSync(yol, 'utf8')
 const okuJson = (yol) => JSON.parse(oku(yol))
 const yaz = (yol, metin) => writeFileSync(yol, metin, 'utf8')
 const log = (...a) => console.log(...a)
+const YAZILAR_TS = 'src/data/bilgiMerkezi/yazilar.ts'
+const secenekler = (a) => Object.fromEntries(a.filter((x) => x.startsWith('--')).map((x) => { const i = x.indexOf('='); return i < 0 ? [x.slice(2), true] : [x.slice(2, i), x.slice(i + 1)] }))
+const konumlar = (a) => a.filter((x) => !x.startsWith('--'))
 
 export function calistir(argv) {
   const [komut, ...a] = argv
@@ -91,8 +108,35 @@ export function calistir(argv) {
       log(`kayit: ${cikti}`)
       return 0
     }
+    case 'cikar': {
+      const [kimlik, cikti] = konumlar(a)
+      if (!kimlik || !cikti) throw new Error('kullanım: cikar <kimlik> <cikti.md> [--kaynak=<yazilar.ts>]')
+      const g = govdeCikar(oku(secenekler(a).kaynak || YAZILAR_TS), kimlik)
+      yaz(cikti, g)
+      log(`cikar: ${kimlik} · sha ${sha12(g)} (${cikti})`)
+      return 0
+    }
+    case 'gom': {
+      const [kimlik, onceki, yeni] = konumlar(a)
+      if (!kimlik || !onceki || !yeni) throw new Error('kullanım: gom <kimlik> <onceki.md> <yeni.md> [--tarih=YYYY-AA-GG] [--yorum="..."] [--kaynak=<yazilar.ts>]')
+      const o = secenekler(a)
+      const hedef = o.kaynak || YAZILAR_TS
+      const sonra = govdeGom(oku(hedef), kimlik, oku(onceki), oku(yeni), { tarih: o.tarih, yorum: typeof o.yorum === 'string' ? o.yorum : undefined })
+      yaz(hedef, sonra)
+      log(`gom: ${kimlik} → ${hedef} · yeni gövde sha ${sha12(oku(yeni))}${o.tarih ? ` · guncellemeTarihi ${o.tarih}` : ''}`)
+      return 0
+    }
+    case 'iddia-yama': {
+      const [tabloYolu, yamaYolu] = konumlar(a)
+      if (!tabloYolu || !yamaYolu) throw new Error('kullanım: iddia-yama <iddialar.json> <yama.json>')
+      const dosya = okuJson(tabloYolu)
+      const sonra = iddiaYamaUygula(dosya, okuJson(yamaYolu))
+      yaz(tabloYolu, `${JSON.stringify(sonra, null, 1)}\n`)
+      log(`iddia-yama: ${(dosya.iddialar || []).length} → ${sonra.iddialar.length} satır`)
+      return 0
+    }
     default:
-      throw new Error('komut: iskelet | yama | fark | kapi | tuzak | kayit (başlıktaki kullanıma bak)')
+      throw new Error('komut: iskelet | yama | fark | kapi | tuzak | kayit | cikar | gom | iddia-yama (başlıktaki kullanıma bak)')
   }
 }
 
