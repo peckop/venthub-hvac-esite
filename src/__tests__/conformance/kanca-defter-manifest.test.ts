@@ -9,6 +9,7 @@
  * kayarsa, bozuk manifest sessiz kalırsa, defter ÖLÇÜLEMEDİ iken "YOK" denirse, susturma sayıyı imzaya katarsa bu dosya kırmızı olur.
  */
 import { spawnSync } from 'node:child_process'
+import { copyFileSync, mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
@@ -40,7 +41,7 @@ interface Modul {
   rolSatiri: (
     rol: string,
     kok: string,
-    k?: { manifest?: Manifest; simdi?: number; oku?: (y: string) => string; gitTarihi?: () => string | null; izlenenSay?: () => number | null },
+    k?: { manifest?: Manifest; simdi?: number; oku?: (y: string) => string; gitTarihi?: () => string | null },
   ) => string
   aranacakSatirlar: (m: string) => { bolum: string; satir: string }[]
   defterIcerikleri: (kok: string, o?: { oku?: (y: string) => string }) => { durum: string; sebep?: string; defterler: { ad: string; metin: string }[] }
@@ -84,6 +85,19 @@ describe('INV-KANCA-DEFTER-TAZELIK-1a: manifest okuma (HARİTA §4.1 şeması)',
     const m = z.manifestOku(KOK, { oku: fs({ 'docs/defter/manifest.json': ham }) })
     expect(m.durum).toBe('bozuk')
     expect(m.sebep).toBeTruthy()
+  })
+  it('HARİTA şeması (PR #2440): sema:1 + ozet + durum planli kabul edilir', () => {
+    const ham = JSON.stringify({
+      sema: 1,
+      defterler: [{ ad: 'urun-adres', dosya: 'docs/defter/urun-adres.md', sahip: 'URUN', ozet: 'x', izlenen: ['next.config.mjs'], tazelikGun: 14, tetik: ['sure'], olcum: null, disKaynak: null, durum: 'planli' }],
+    })
+    const m = z.manifestOku(KOK, { oku: fs({ 'docs/defter/manifest.json': ham }) })
+    expect(m.durum).toBe('tamam')
+  })
+  it('bilinmeyen şema sürümü (sema:2) → bozuk: tahmin edilmez', () => {
+    const m = z.manifestOku(KOK, { oku: fs({ 'docs/defter/manifest.json': JSON.stringify({ sema: 2, defterler: [] }) }) })
+    expect(m.durum).toBe('bozuk')
+    expect(m.sebep).toContain('şema')
   })
   it('ENOENT dışı okuma hatası → bozuk (yok sayılmaz)', () => {
     const m = z.manifestOku(KOK, {
@@ -135,9 +149,24 @@ describe('INV-KANCA-DEFTER-TAZELIK-1b: tazelik kaynağı sırası ve eşik', () 
     expect(t(`Son doğrulama: ${on(40)}`, d.dosya, { tazelikGun: 90 }).bayat).toBe(false)
     expect(t(`Son doğrulama: ${on(40)}`, d.dosya, { tazelikGun: 30 }).bayat).toBe(true)
   })
-  it('mtime kullanılmaz: oku/gitTarihi dışında bir zaman kaynağı sonucu değiştirmez', () => {
-    // Aynı içerik, aynı sahte git tarihi → aynı sonuç; dosya sistemi zamanı hiç sorulmaz (sahte oku yalnız metin döner).
-    expect(t('gövde', d.dosya, {}, '2026-11-01')).toEqual(t('gövde', d.dosya, {}, '2026-11-01'))
+  it('mtime kullanılmaz (GERÇEK dosya sistemi): taze mtime bayat "Son doğrulama"yı kurtarmaz, tarihsiz dosyayı taze göstermez', () => {
+    const kok = mkdtempSync(path.join(os.tmpdir(), 'defter-mtime-'))
+    try {
+      mkdirSync(path.join(kok, 'docs', 'defter'), { recursive: true })
+      const eskiTarih = new Date(SIMDI - 40 * GUN).toISOString().slice(0, 10)
+      writeFileSync(path.join(kok, 'docs', 'defter', 'bayat.md'), `# b\nSon doğrulama: ${eskiTarih}\n`)
+      writeFileSync(path.join(kok, 'docs', 'defter', 'tarihsiz.md'), '# t\n')
+      const simdi = new Date(SIMDI)
+      utimesSync(path.join(kok, 'docs', 'defter', 'bayat.md'), simdi, simdi)
+      utimesSync(path.join(kok, 'docs', 'defter', 'tarihsiz.md'), simdi, simdi)
+      const bayat = z.tazelik({ ad: 'bayat', dosya: 'docs/defter/bayat.md', sahip: 'URUN' }, { kok, simdi: SIMDI, gitTarihi: () => null })
+      expect(bayat.bayat).toBe(true)
+      expect(bayat.gun).toBe(40)
+      const tarihsiz = z.tazelik({ ad: 'tarihsiz', dosya: 'docs/defter/tarihsiz.md', sahip: 'URUN' }, { kok, simdi: SIMDI, gitTarihi: () => null })
+      expect(tarihsiz.olculemedi).toBe('tarih bulunamadı')
+    } finally {
+      rmSync(kok, { recursive: true, force: true })
+    }
   })
 })
 
@@ -157,26 +186,40 @@ describe('INV-KANCA-DEFTER-TAZELIK-1c: ⚠DEFTER satırı', () => {
     expect(z.rolSatiri('URUN', KOK, { manifest: { durum: 'bozuk', sebep: 'JSON ayrıştırılamadı', defterler: [] } })).toMatch(/^⚠DEFTER \(URUN\): ölçülemedi \(manifest bozuk/)
   })
   it('bayat defter → tek satır, tavan altında, beklenen biçim', () => {
-    const s = z.rolSatiri('URUN', KOK, { manifest: mf([d('urun-adres')]), simdi: SIMDI, oku: oku(dosya('urun-adres', eski)), izlenenSay: () => null })
+    const s = z.rolSatiri('URUN', KOK, { manifest: mf([d('urun-adres')]), simdi: SIMDI, oku: oku(dosya('urun-adres', eski)) })
     expect(s).toBe('⚠DEFTER (URUN): urun-adres 39 gün doğrulanmadı (eşik 14)')
     expect(s.includes('\n')).toBe(false)
     expect(bayt(s)).toBeLessThanOrEqual(160)
   })
-  it('izlenen yolda defterden yeni commit sayısı satıra girer; sayılamazsa girmez', () => {
+  it('satır yalnız TARİH okur: izlenen yol commit sayısı satıra girmez (PR kapısının işi)', () => {
     const k = { manifest: mf([d('urun-adres', 'URUN', { izlenen: ['next.config.mjs'] })]), simdi: SIMDI, oku: oku(dosya('urun-adres', eski)) }
-    expect(z.rolSatiri('URUN', KOK, { ...k, izlenenSay: () => 3 })).toContain('izlenen yolda 3 commit defterden yeni')
-    expect(z.rolSatiri('URUN', KOK, { ...k, izlenenSay: () => null })).not.toContain('izlenen')
-    expect(z.rolSatiri('URUN', KOK, { ...k, izlenenSay: () => 0 })).not.toContain('izlenen')
+    expect(z.rolSatiri('URUN', KOK, k)).toBe('⚠DEFTER (URUN): urun-adres 39 gün doğrulanmadı (eşik 14)')
+  })
+  it('git çağrısı tavanı: tarihsiz 10 defterde en çok 3 git çağrısı (gecikme tavanı); kalanlar "tarih bulunamadı"', () => {
+    let cagri = 0
+    const ds = Array.from({ length: 10 }, (_, i) => d('d' + i))
+    const hepsi = Object.fromEntries(ds.map((x) => [x.dosya, '# gövde\n']))
+    const s = z.rolSatiri('URUN', KOK, {
+      manifest: mf(ds),
+      simdi: SIMDI,
+      oku: fs(hepsi),
+      gitTarihi: () => {
+        cagri++
+        return '2026-11-08'
+      },
+    })
+    expect(cagri).toBe(3)
+    expect(s).toContain('ölçülemedi (tarih bulunamadı)')
   })
   it('birden çok sorun: ölçülemedi önce, sonra eşiği en çok aşan; "+N defter" eki', () => {
-    const k = { manifest: mf([d('a'), d('b'), d('c')]), simdi: SIMDI, izlenenSay: () => null }
+    const k = { manifest: mf([d('a'), d('b'), d('c')]), simdi: SIMDI }
     const a = z.rolSatiri('URUN', KOK, { ...k, oku: oku(dosya('a', '2026-10-20'), dosya('b', '2026-09-01'), dosya('c', taze)) })
     expect(a).toBe('⚠DEFTER (URUN): b 69 gün doğrulanmadı (eşik 14) (+1 defter)')
     const o = z.rolSatiri('URUN', KOK, { ...k, oku: oku(dosya('a', '2026-10-20'), dosya('c', taze)) })
     expect(o).toBe('⚠DEFTER (URUN): b ölçülemedi (dosya okunamadı) (+1 defter)')
   })
   it('yalnız rolün kendi defterleri; sahip ARAÇ = ARAC, emekli atlanır', () => {
-    const k = { manifest: mf([d('a', 'GEO-SEO'), d('b', 'ARAÇ'), d('c', 'ARAC', { durum: 'emekli' })]), simdi: SIMDI, izlenenSay: () => null }
+    const k = { manifest: mf([d('a', 'GEO-SEO'), d('b', 'ARAÇ'), d('c', 'ARAC', { durum: 'emekli' })]), simdi: SIMDI }
     const hepsi = oku(dosya('a', eski), dosya('b', eski), dosya('c', eski))
     expect(z.rolSatiri('URUN', KOK, { ...k, oku: hepsi })).toBe('')
     expect(z.rolSatiri('ARAC', KOK, { ...k, oku: hepsi })).toContain('b 39 gün')
@@ -184,12 +227,23 @@ describe('INV-KANCA-DEFTER-TAZELIK-1c: ⚠DEFTER satırı', () => {
     expect(z.rolSatiri('GEO-SEO', KOK, { ...k, oku: hepsi })).toContain('a 39 gün')
     expect(z.rolKatla('ARAÇ')).toBe('ARAC')
   })
+  it('planli defter (dosyası henüz yok) ölçülemedi satırı ÜRETMEZ; pilot olunca izlenir', () => {
+    const k = { simdi: SIMDI, oku: oku() }
+    expect(z.rolSatiri('URUN', KOK, { ...k, manifest: mf([d('urun-adres', 'URUN', { durum: 'planli' })]) })).toBe('')
+    expect(z.rolSatiri('URUN', KOK, { ...k, manifest: mf([d('urun-adres', 'URUN', { durum: 'pilot' })]) })).toContain('ölçülemedi (dosya okunamadı)')
+  })
   it('çok uzun ad: 160 bayt tavanı, geçerli UTF-8 (yarım karakter yok)', () => {
     const ad = 'çok-uzun-defter-adı-'.repeat(8)
-    const s = z.rolSatiri('URUN', KOK, { manifest: mf([d(ad)]), simdi: SIMDI, oku: oku(dosya(ad, eski)), izlenenSay: () => 5 })
+    const s = z.rolSatiri('URUN', KOK, { manifest: mf([d(ad)]), simdi: SIMDI, oku: oku(dosya(ad, eski)) })
     expect(bayt(s)).toBeLessThanOrEqual(160)
     expect(Buffer.from(s, 'utf8').toString('utf8')).toBe(s)
     expect(s.startsWith('⚠DEFTER (URUN): ')).toBe(true)
+  })
+  it('emoji (astral) adlı defter: kırpma yetim vekil çifti bırakmaz', () => {
+    const ad = '🙂'.repeat(60)
+    const s = z.rolSatiri('URUN', KOK, { manifest: mf([d(ad)]), simdi: SIMDI, oku: oku(dosya(ad, eski)) })
+    expect(bayt(s)).toBeLessThanOrEqual(160)
+    expect(/[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/.test(s)).toBe(false)
   })
   it('okuma fırlatsa bile fırlatmaz (fail-open): sessiz', () => {
     const k = {
@@ -232,6 +286,44 @@ describe('INV-KANCA-DEFTER-TAZELIK-1d: susturma (ARC-220) ve kanca', () => {
     expect(r.status).toBe(0)
     expect(r.stdout).not.toContain('⚠DEFTER')
   })
+  it('kanca GERÇEK süreçte (kopya ağaç, gerçek manifest): bir kez basar, aynı oturumda susar, vana kapatır, kimliksiz oturumda hep basar, sahibi olmayan pencerede sessiz; GÖREV hatası DEFTER satırını düşürmez', () => {
+    const agac = mkdtempSync(path.join(os.tmpdir(), 'defter-agac-'))
+    try {
+      for (const g of [
+        '.claude/hooks/gorev-tazelik-satiri.cjs',
+        '.claude/hooks/uyari-susturma.cjs',
+        'scripts/hijyen/gorev-tazelik.cjs',
+        'scripts/hijyen/defter-tazelik.cjs',
+        'scripts/board/pencere-kimligi.cjs',
+        'scripts/board/pano-dizini.cjs',
+      ]) {
+        mkdirSync(path.dirname(path.join(agac, g)), { recursive: true })
+        copyFileSync(path.join(KOK, g), path.join(agac, g))
+      }
+      mkdirSync(path.join(agac, 'docs', 'defter'), { recursive: true })
+      const eskiTarih = new Date(Date.now() - 40 * GUN).toISOString().slice(0, 10)
+      writeFileSync(path.join(agac, 'docs', 'defter', 'manifest.json'), JSON.stringify({ sema: 1, defterler: [{ ad: 'urun-adres', dosya: 'docs/defter/urun-adres.md', sahip: 'URUN', durum: 'pilot' }] }))
+      writeFileSync(path.join(agac, 'docs', 'defter', 'urun-adres.md'), `# U\nSon doğrulama: ${eskiTarih}\n`)
+      const pano = path.join(agac, 'pano')
+      const kosu = (env: Record<string, string>, sid: string) =>
+        spawnSync(process.execPath, [path.join(agac, '.claude', 'hooks', 'gorev-tazelik-satiri.cjs')], {
+          input: JSON.stringify({ cwd: agac, session_id: sid }),
+          encoding: 'utf8',
+          env: { ...process.env, VENTHUB_PENCERE_AGENT: 'urun-pencere', VENTHUB_BOARD_DIR: pano, ...env },
+        })
+      const sid = 'b1b2b3b4-1111-2222-3333-444455556666'
+      const bir = kosu({}, sid)
+      expect(bir.status).toBe(0)
+      expect(bir.stdout).toContain('⚠DEFTER (URUN): urun-adres 40 gün doğrulanmadı (eşik 14)')
+      expect(kosu({}, sid).stdout).not.toContain('⚠DEFTER')
+      expect(kosu({ VENTHUB_DEFTER_SATIRI_KAPAT: '1' }, 'c1c2c3c4-1111-2222-3333-444455556666').stdout).not.toContain('⚠DEFTER')
+      expect(kosu({}, '').stdout).toContain('⚠DEFTER (URUN)')
+      expect(kosu({}, '').stdout).toContain('⚠DEFTER (URUN)')
+      expect(kosu({ VENTHUB_PENCERE_AGENT: 'blog-pencere' }, '').stdout).not.toContain('⚠DEFTER')
+    } finally {
+      rmSync(agac, { recursive: true, force: true })
+    }
+  })
   it('kanca: bozuk girdi ve bilinmeyen pencerede çökmez (fail-open), çıkış 0', () => {
     expect(kos({}, '{bozuk').status).toBe(0)
     expect(kos({}, JSON.stringify({ cwd: os.tmpdir() })).status).toBe(0)
@@ -249,6 +341,8 @@ describe('INV-KANCA-DEFTER-TAZELIK-1e: aranacak satırlar ve defter içerikleri'
   it('defterIcerikleri: yok / bozuk / okunamayan defter → ölçülemedi / tamam', () => {
     expect(z.defterIcerikleri(KOK, { oku: fs({}) }).durum).toBe('yok')
     expect(z.defterIcerikleri(KOK, { oku: fs({ 'docs/defter/manifest.json': '{x' }) }).durum).toBe('bozuk')
+    const planli = manifestJson([{ ad: 'urun-adres', dosya: 'docs/defter/urun-adres.md', sahip: 'URUN', durum: 'planli' }])
+    expect(z.defterIcerikleri(KOK, { oku: fs({ 'docs/defter/manifest.json': planli }) })).toMatchObject({ durum: 'tamam', defterler: [] })
     const eksik = z.defterIcerikleri(KOK, { oku: fs({ 'docs/defter/manifest.json': mfHam }) })
     expect(eksik.durum).toBe('olculemedi')
     expect(eksik.sebep).toContain('urun-adres')

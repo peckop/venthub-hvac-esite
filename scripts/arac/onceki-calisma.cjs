@@ -18,7 +18,7 @@
  *
  * İLK SATIR üç sonuçtan biridir ve BİRBİRİNE KARIŞMAZ:
  *   ÖNCEKİ ÇALIŞMA: BULUNDU n — <en iyi 2-3 bulgu>
- *   ÖNCEKİ ÇALIŞMA: YOK (k/5 yer arandı, ifade: ...)        ← yalnız ÇEKİRDEK üç kaynak (dosya, git, kanban) tamam ölçüldüyse
+ *   ÖNCEKİ ÇALIŞMA: YOK (k/N yer arandı, ifade: ...)        ← yalnız ÇEKİRDEK üç kaynak (dosya, git, kanban) tamam ölçüldüyse
  *   ÖNCEKİ ÇALIŞMA: ÖLÇÜLEMEDİ (kaynak: sebep; ...)           ← çekirdekten biri ölçülemedi VE bulgu yok, ya da ifade çok kısa
  * Kaynak hatası FIRLATMAZ: "ölçülemedi (sebep)" döner. Sessizlik "yok" demek değildir.
  *
@@ -400,7 +400,7 @@ function metinCikti(sonuc) {
 }
 
 /**
- * Beş kaynağı paralel tarar. Kaynaklar `baglar` ile ENJEKTE edilir (test sahte verir; CLI `gercekBaglar`).
+ * Altı kaynağı (dosya, git, kanban, defter, sage, linear) paralel tarar. Kaynaklar `baglar` ile ENJEKTE edilir (test sahte verir; CLI `gercekBaglar`).
  * @param {string} metin emir metni
  * @param {object} secenek
  * @param {object} secenek.baglar
