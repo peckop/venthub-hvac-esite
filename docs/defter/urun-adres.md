@@ -11,6 +11,7 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
 | 2026-11-09 | `adres-semasi-standard.md` v0.3: yeni sitenin tek önek şeması §1A (urunler, uygulama-alanlari, rehber; A12–A15), eski şema §1 "eski site" diye işaretlendi, §3 geçiş eski-adres gruplarını söyler; rota dili ve dil tespiti bölümlerine dokunulmadı | Cetvel ile karar ayrışıklığı kapandı | URN-159 |
+| 2026-11-09 | Marka, ana sayfa, sabit sayfa eşleme önerisi (A1–A7) ve 6 çakışan hedef için öneri (Ç1–Ç6) yazıldı; karar OPS üzerinden Recep'te | 3.1 | URN-160 |
 | 2026-11-09 | Rota dili sorusu kapandı: ALTYAPI cetveli yeni sitenin tek kaynağını adres-semasi v0.3 olarak yazdı, rota dili tablosu eski siteyi yönetir | Madde Sırada'dan düştü | URN-159, ALT-179 |
 | 2026-11-09 | Bu defter pilot olarak yazıldı; repoda ölçülebilen katmanlar sayıldı | Aşağıdaki envanter | URN-158 |
 | 2026-11-09 | 308 sahiplik bölüşümü görüşü SEO-76'ya yazıldı: URUN eşleştirme tablosunu ve yönlendirmeyi yazar, ALTYAPI rota dilini ve arama yönlendirmesini tutar, GEO-SEO ölçer | Kabul edildi, tablo işi URN-157'ye açıldı (geçişe bağlı, beklemede) | SEO-76, URN-157 |
@@ -78,8 +79,8 @@ Rota dili cetveli (`rota-dili-standard.md`, ALTYAPI) §0 ile yeni sitenin tek ka
 |---|---|---|---|
 | Canlı şemadan (`/tr/products`, `/category`, `/brands`, `/bilgi-merkezi`) yeni tek önekli hedefe eşleştirme tablosu | 308 yönlendirmenin kaynağı; mevcut taslağın "eski" sütunu canlıdan değil Design ara şemasından | yüksek | URN-157 (geçişe bağlı) |
 | Rehber eşlemesi: canlı 13 yazı, Design 5 yazı, birebir slug 0 | Hangi yazı yeni adrese, hangisi neye gidecek kararı yok; BLOG ile birlikte | orta | URN-157'ye bağlı |
-| Marka 7, ana sayfa, iletişim, hakkımızda, ürün seçici, sepet/hesap/ödeme için eşleme önerisi | Eşleme kararı yok; URUN öneri yazar | orta | URN-157'ye bağlı |
-| 6 çakışan hedef için önerili liste (örnek: sığınak kategorisi ve uygulama alanı) | Recep kararı gerekir; liste URUN'dan | orta | URN-157'ye bağlı |
+| Marka 7, ana sayfa, iletişim, hakkımızda, ürün seçici, sepet/hesap/ödeme eşleme önerisi (A1–A7) | Öneri yazıldı (3.1); karar Recep'te, OPS sorar | orta | URN-160 |
+| 6 çakışan hedef için önerili liste (Ç1–Ç6) | Liste ve öneriler yazıldı (3.1); karar Recep'te, OPS sorar | orta | URN-160 |
 | EN eski adres evreni sayısı ve EN açılış kararı | Sayı yok; EN açılış Recep kararı | orta | URN-86 |
 | `?sku=` ile gelen eski model adresleri için sorgu duyarlı yönlendirme | A6: sağlayıcı özelliği yok; ALTYAPI yazar, URUN kuralı söyler | orta | ALT-177 |
 | Dondurulmuş eski adres evreni (101 + EN + GSC'de dizinli `?sku=` adresleri + zincir düzleştirme) | GEO-SEO ölçer, URUN tabloya alır | orta | SEO-76 (beklemede) |
@@ -87,6 +88,39 @@ Rota dili cetveli (`rota-dili-standard.md`, ALTYAPI) §0 ile yeni sitenin tek ka
 
 Başka sahipte kalanlar (bilgi için): CI kapıları (eski→yeni 200 tek sıçrama, boyut bütçesi, zincir ve çakışma) ALTYAPI (ALT-177); `src/lib/adres` kodunun yeni kuruluma taşınıp taşınmayacağı OPS kararı (OPS-180);
 Design adres verisinin kalıcı depoya alınması OPS-228 ve KATALOG.
+
+### 3.1 Karar satırları (URN-160, 9 Kasım; Recep kararı, OPS sorar)
+
+Yeni siteden gelen kural Design'ındır (Design Venthub New `adres.json`, 9 Kasım okuma); öneriler Design'a şart koymaz, siteyi Design'a uydurur.
+Eski adresler için kaynaklar: canlı 94 adres listesi (2 Kasım), eşlemesiz canlı adres listesi (SEO-76, 4 Kasım) ve eşleştirme taslağı (2402 satır). "Önerim: evet" = önerilen eşlemeyi kabul et.
+Ham dosyalar depoda değil, yalnız sonuçlar buradadır.
+
+**A. Marka, ana sayfa ve sabit sayfalar (canlı → yeni)**
+
+| No | Eski (canlı) | Önerilen yeni | Önerim | Not |
+|---|---|---|---|---|
+| A1 | `/tr/products` | `/tr/urunler` | evet | EN `/en/products` yolu aynı kalır, yönlendirme gerekmez |
+| A2 | `/tr/brands` | `/tr/markalar` | evet | EN `/en/brands` aynı kalır |
+| A3 | `/tr/brands/<marka>`: vortice, avens, casals, seat, danfoss, nicotra-gebhardt (+ flexiva: kodda açık, 2 Kasım haritasında yok) | `/tr/markalar/<marka>` (7 marka adı Design'daki ile birebir) | evet | EN yol aynı kalır (ölçülmedi: `/en/brands/<marka>` biçimi). `frekans-konvertoru` zaten kategoriye yönleniyor (`markaYonlendirmeleri.mjs`) |
+| A4 | `/tr/contact`, `/tr/about` | `/tr/iletisim`, `/tr/hakkimizda` | evet | EN `/en/contact`, `/en/about` aynı kalır |
+| A5 | `/tr` (ana sayfa) | `/tr` (değişmez) | evet | Design `adres.json`'da ana sayfa kaydı yok; kök adres değişmez varsayıldı, Design kaydederse ona uyulur |
+| A6 | `/tr/urun-secici` | `/tr/urunler` (308) | **karar gerek** | Design'da ürün seçici adresi yok (ölçüldü). En yakın içerik ürün listesi; Design ürün seçiciyi eklerse hedef o olur |
+| A7 | `/tr/account`; `/tr/cart`, `/tr/checkout`, `/tr/payment-success` | `/tr/hesap`; sepet için `/tr/teklif-listesi`; checkout ve ödeme sonucu: karşılık yok | **karar gerek** | Dört yüzey de bugün noindex; sepet satış kipinde açılır, şimdilik yok. Önerim: hesap → `/tr/hesap`, sepet → `/tr/teklif-listesi`, checkout/ödeme sonucu → 410 (dizinde olmayan, karşılığı olmayan sayfa) |
+
+**B. Çakışan 6 hedef (2 Kasım taslağı: aynı yeni adrese giden birden çok eski adres)**
+
+Not: taslağın "eski" sütunu canlıdan değil Design ara şemasından geldi (`/tr/kategori/...`). Canlı adresler (`/tr/category/...`) URN-157 tablosuna girerken çakışma listesi yeniden çıkar.
+
+| No | Yeni hedef | Eski adresler (taslak) | Önerim | Gerekçe |
+|---|---|---|---|---|
+| Ç1 | `/tr/urunler` | `kategori/fanlar`, `kategori/hava-sartlandirma` | **hayır** | İki eski kök kategori genel ürün listesine düşmesin; her biri içerik karşılığı olan yeni gruba gitsin (yeni grup düzeyi 7 kategori var) |
+| Ç2 | `/en/products` | `category/fans`, `category/air-treatment` | **hayır** | Ç1'in EN karşılığı, aynı gerekçe |
+| Ç3 | `/tr/urunler/kontrol-ve-aksesuarlar` | `kategori/elektrik-aksesuarlari`, `kontrol-ve-suruculer`, `aksesuarlar` | evet | Yeni grubun adı üç eski kategorinin kapsamına uyuyor (alt türlerin dağılımı ölçülmedi); frekans konvertörü ve hız anahtarı gibi türler ürün satırlarıyla kendi sayfasına gitmeli |
+| Ç4 | `/en/products/controls-and-accessories` | `category/controls-drives`, `category/accessories` | evet | Ç3'ün EN karşılığı |
+| Ç5 | `/tr/urunler/siginak-havalandirma` | `kategori/siginak-havalandirma`, `uygulama-alani/siginak` | evet | Design bu kararı zaten yazmış: sığınak mekânı ayrı sayfa açmıyor, ürün grubuna bağlanıyor; mekân adresi yalnız eski yönlendirme için duruyor |
+| Ç6 | `/tr/urunler/sensorler-ve-koruma` | `kategori/sensorler-ve-koruma`, `kategori/yedek-parcalar-ve-sensorler` | evet | İki eski kategori yeni tek türde birleşiyor (Design kimliği `spare-parts-sensors`) |
+
+OPS'a gidecek karar satırları: A6, A7, Ç1+Ç2 (ikisi tek karar). Öteki satırlar onay niteliğinde.
 
 ## 4 Kararlar
 
