@@ -73,9 +73,12 @@ function unopimIzi() {
   }
 }
 
-/** Adres eşleştirme taslağı dosya izi (depo dışı; VENTHUB_ADRES_ESLESTIRME ile verilir); yoksa null. */
+/** Eşleştirme taslağı (2 Kasım, 2402 satır, SEO-76; depo dışı). URUN bildirdi, 9 Kasım. */
+const ADRES_VARSAYILAN = 'C:/tmp/vh-arsiv/geo-seo/seo76/yonlendirme-2026-11-02-tam.csv'
+
+/** Adres eşleştirme taslağı dosya izi (depo dışı; VENTHUB_ADRES_ESLESTIRME ile değişir); dosya yoksa null (ölçülemedi). */
 function adresIzi() {
-  const y = process.env.VENTHUB_ADRES_ESLESTIRME
+  const y = process.env.VENTHUB_ADRES_ESLESTIRME || ADRES_VARSAYILAN
   if (!y) return null
   try {
     return sha(fs.readFileSync(y))
