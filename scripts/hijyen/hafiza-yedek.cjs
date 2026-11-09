@@ -169,7 +169,7 @@ function isaretYasiSn(dir, simdiSn) {
  * Kanca girişi: stdin JSON'u ({ hook_event_name }) → { cikti } (null: sessiz). PreCompact'ta yedeği ELDE alır
  * (compact'tan önce bitmeli); öteki olaylarda arka planda başlatır ve işareti günceller.
  */
-function kancaKos(girdi, { dir = hafizaDizini(), simdiSn = Math.floor(Date.now() / 1000) } = {}) {
+function kancaKosIc(girdi, { dir = hafizaDizini(), simdiSn = Math.floor(Date.now() / 1000) } = {}) {
   const olay = girdi && girdi.hook_event_name
   if (!fs.existsSync(path.join(dir, '.git'))) return { cikti: null }
   if (olay === 'PreCompact') {
@@ -192,6 +192,34 @@ function kancaKos(girdi, { dir = hafizaDizini(), simdiSn = Math.floor(Date.now()
   }
   if (!k.satir) return { cikti: null }
   return { cikti: { hookSpecificOutput: { hookEventName: olay, additionalContext: k.satir } } }
+}
+
+function kancaKos(girdi, secenek) {
+  const r = kancaKosIc(girdi, secenek)
+  const olay = girdi && girdi.hook_event_name
+  const uyari = yedekUyariSatiri(olay)
+  if (!uyari) return r
+  const hs = (r.cikti && r.cikti.hookSpecificOutput) || { hookEventName: olay, additionalContext: '' }
+  hs.additionalContext = hs.additionalContext ? hs.additionalContext + '\n' + uyari : uyari
+  return { cikti: { hookSpecificOutput: hs } }
+}
+
+/**
+ * ARC-292: drive-yedek.cmd (UnoPIM yedeği) atlanır/düşerse ~/.claude/zamanli/yedek-uyari.txt yazar, başarıda siler.
+ * Dosya varsa SessionStart'ta tek satır "⚠YEDEK UYARI: <ilk satır>"; yok/okunamaz/boş → null (fail-open).
+ * Vana: VENTHUB_YEDEK_UYARI_KAPAT=1. Test için VENTHUB_YEDEK_UYARI_DOSYA yolu geçersiz kılar.
+ */
+function yedekUyariSatiri(olay) {
+  try {
+    if (olay !== 'SessionStart' || process.env.VENTHUB_YEDEK_UYARI_KAPAT === '1') return null
+    const yol = process.env.VENTHUB_YEDEK_UYARI_DOSYA || path.join(os.homedir(), '.claude', 'zamanli', 'yedek-uyari.txt')
+    const ilk = String(fs.readFileSync(yol, 'utf8')).split(/\r?\n/).find((s) => s.trim())
+    // Kontrol karakterleri (ESC, NUL, U+2028 vb.) bağlama girmesin.
+    const temiz = ilk ? ilk.replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, ' ').trim() : ''
+    return temiz ? '⚠YEDEK UYARI: ' + temiz.slice(0, 200) : null
+  } catch {
+    return null
+  }
 }
 
 function main() {
@@ -234,5 +262,6 @@ module.exports = {
   yedekle,
   karar,
   kancaKos,
+  yedekUyariSatiri,
 }
 if (require.main === module) main()
