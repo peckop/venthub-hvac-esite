@@ -219,6 +219,19 @@ describe('INV-KANCA-DUZELTME-1 · kanca akışı', () => {
       fs.rmSync(pano, { recursive: true, force: true })
     })
 
+    it('blok kipinde işaretsiz borç + ders yok: bloklamaz (exit 0), borç kalır; ts sayı değilse de kalır', () => {
+      const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
+      const yol = borcKur(pano, 'oturum-13', t0)
+      const tp = kayit([{ type: 'assistant', timestamp: '2026-11-09T10:00:00Z', message: { content: [] } }])
+      expect(kos(KAPI, { session_id: 'oturum-13', transcript_path: tp }, pano, { VENTHUB_DUZELTME_KAPISI: 'blok' }).status).toBe(0)
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.writeFileSync(yol, JSON.stringify({ ts: 'x', kaliplar: [] }))
+      const tp2 = kayit([remember(['OPS'], '2026-11-09T10:00:00Z')])
+      expect(kos(KAPI, { session_id: 'oturum-13', transcript_path: tp2 }, pano).status).toBe(0)
+      expect(fs.existsSync(yol)).toBe(true)
+      fs.rmSync(pano, { recursive: true, force: true })
+    })
+
     it('sabotaj: vana kapali iken borca dokunulmaz', () => {
       const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-duzeltme-pano-'))
       const yol = borcKur(pano, 'oturum-12', t0)
