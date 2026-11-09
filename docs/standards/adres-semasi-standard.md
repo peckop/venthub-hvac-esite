@@ -1,7 +1,11 @@
 # Adres Şeması Standardı (K3-b)
 
-> **Durum:** v0.2 (B-1) · 2026-10-11 · Şerit: URUN · **Uygulama öncesi cetvel** — şemanın kendisi REC-300 yayınıyla
+> **Durum:** v0.3 (tek önek) · 2026-11-09 · Şerit: URUN · **Uygulama öncesi cetvel** — şemanın kendisi REC-300 yayınıyla
 > canlıya çıkar; bugün canlıda olan kısımlar "CANLI", yayını bekleyenler "HEDEF" diye işaretlidir.
+> **v0.3 (URN-159):** yeni sitenin şeması §1A'dır (2 Kasım tek önek kararı: `/tr/urunler`, `/tr/uygulama-alanlari`,
+> `/tr/rehber`; EN `products`, `applications`, `guides`; kaynak Design `adres.json` "kural" bloğu, DESIGN-MENU
+> 2026-11-02). §1 eski sitenin (Next 15, K3-b/B-1) şemasıdır: bayraklar (`ADRES_SEMASI_K3B`, `EN_YAYIN`) kapalıdır,
+> yeni siteye geçişte bu adresler **eski adres** olur (§3). A5–A11 iki şema için de geçerlidir.
 > **v0.2:** alt kategori (dal) adresi TEK seviyedir (SEO-35 B-1, karar belgesi sürüm 5, 2026-10-10); v0.1'deki iki
 > seviyeli dal adresi kalktı.
 > **Plan:** `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` (v5) · **Kararlar:** SEO ve Yayın K3-b, Katalog
@@ -16,7 +20,9 @@ bağımsız çürütmeden geçti ve her tur, yazılı bir kural olmadığı içi
 config yönlendirmesinin sorgu dizesini taşıyıp döngü yapması, bugün bile 4 sıçramalı bir eski adres zinciri, Türkçe
 tarayıcının İngilizce sayfaya gönderilmesi. CLAUDE.md 1. kural: cetvel yoksa iş cetveli yazmayı da kapsar.
 
-## 1. Şema (HEDEF)
+## 1. Şema — eski site (K3-b, B-1) (HEDEF; bayrakla kapalı)
+
+Eski sitenin hedef şemasıdır; yeni sitede kullanılmaz, geçişte kaynak (eski adres) tarafına geçer. Yeni site: §1A.
 
 | Nesne | TR | EN |
 |---|---|---|
@@ -52,6 +58,61 @@ adres `radyal-fanlar` değişmedi).
 **A4 — Rezerve kelimeler:** Design v3 §4 listesi + `api`, `admin`, `_next`. Hiçbir kategori/aile/marka slug'ı
 bunlarla kesişmez (HEDEF kapı INV-ADRES-CAKISMA-1).
 
+## 1A. Şema — yeni site, tek önek (HEDEF; 2 Kasım kararı)
+
+İki kök vardır: **Ürünler** (`/tr/urunler` ↔ `/en/products`) ve **Uygulama alanları** (`/tr/uygulama-alanlari` ↔
+`/en/applications`). Ürünle ilgili her sayfa `urunler/` altında, düz (tek segment) adres alır; slug aranan ifadedir.
+Kaynak: Design `adres.json` "kural" bloğu (yerel kopya 6 Kasım; sayım: kategori 32, aile sayfası 17, seri 104, model 1206,
+mekân 9, bina 5, marka 7, rehber 5, sabit 20).
+
+| Nesne | TR | EN |
+|---|---|---|
+| Ürünler (kök) | `/tr/urunler` | `/en/products` |
+| Kategori (grup, tür, grup-tür) | `/tr/urunler/<slug>` | `/en/products/<slug>` |
+| Aile sayfası (2+ seri) | `/tr/urunler/<marka>-<aile>-serisi` | `/en/products/<marka>-<aile>-range` |
+| Seri | `/tr/urunler/<marka>-<seri>` (temel seri dahil hiçbir seri ek almaz; tek serili ürün de); sitede ayrı seri sayfası olan her EC serisi ayrı adres (`<seri>-es`) | aynı slug, `/en/products/…` |
+| Model | `/tr/urunler/<slug>-p-<sku>` | `/en/products/<slug>-p-<sku>` |
+| Uygulama alanları (kök) | `/tr/uygulama-alanlari` | `/en/applications` |
+| Mekân | `/tr/uygulama-alanlari/<mekan>-havalandirmasi` | `/en/applications/<mekan>-ventilation` |
+| Bina | `/tr/uygulama-alanlari/<bina>-havalandirmasi` | `/en/applications/<bina-en>-ventilation` (örnek: `residential-ventilation`) |
+| Rehber (liste) | `/tr/rehber` | `/en/guides` |
+| Rehber yazısı | `/tr/rehber/<slug>` | `/en/guides/<slug>` (EN slug kararı bekleyen yazıda EN sayfa çizilmez) |
+| Marka (liste) | `/tr/markalar` | `/en/brands` |
+| Marka | `/tr/markalar/<marka>` | `/en/brands/<marka>` |
+
+**A12 — Çakışma yalnız aynı önek içinde denetlenir:** `urunler/` içinde kategori ↔ seri ↔ aile (model `-p-` ile
+ayrıktır); `uygulama-alanlari/` içinde mekân ↔ bina. Benzersizlik anahtarı `(dil, yol)`'dur. Denetim `adres.json`
+üretiminde otomatik koşar; kapı adı ALTYAPI'dadır (INV-ADRES-CAKISMA-1 yeni önek için yeniden yazılır).
+
+**A13 — Seri adresi yalnız katalog kimliğiyle kurulur** (`/tr/urunler/<seri-id>`; DB ya da katalog-grup kimliği).
+İçerik kısa kimliği (punto, lineo gibi) adreste kullanılmaz.
+
+**A14 — Marka sayfası ürün adresi üretmez.** Marka sayfası serileri kart ve bağlantı olarak gösterir; ürün adresi tektir
+(`urunler/` altı). "Marka + tür" adresi yoktur. Marka içi süzgeç `#` parçasındadır: "Tüm <marka> ürünleri" →
+`/tr/urunler#marka=<marka>` (`?marka=` kullanılmaz, ayrı canonical yoktur).
+
+**A15 — Sabit sayfalar** (20 kayıt: `belgeler`, `hesapla`, `destek`, `iletisim`, `hakkimizda`, `teklif-listesi`,
+`teklif-iste`, `karsilastir`, `hesap`, `arama`, `site-haritasi` ve 9 yasal sayfa) `/tr/<ad>` ↔ `/en/<ad-en>` düz adres
+alır; yasal sayfalar `/tr/yasal/<ad>` ↔ `/en/legal/<ad-en>` altındadır. `teklif-listesi`, `teklif-iste`, `karsilastir`,
+`hesap` ve `arama` noindex'tir. 404 ve hata sayfası adres almaz; sepet satış kipinde açılır, şimdilik yoktur.
+Eski adı bilinen sabitler yönlenir: `/tr/bilgi-merkezi` → `/tr/rehber`, `/tr/nasil-teklif-alinir` → `/tr/destek`,
+`/tr/sss` → `/tr/destek#sss` (EN: `/en/knowledge-hub` → `/en/guides`, `/en/how-to-get-a-quote` → `/en/support`,
+`/en/faq` → `/en/support#faq`).
+
+**A4 (yeni site) — Rezerve kelimeler:** `adres.json` "rezerve" listesi (40 kelime: `urunler`, `products`,
+`uygulama-alanlari`, `applications`, `rehber`, `guides`, `markalar`, `brands`, `destek`, `support`, `iletisim`, `contact`,
+`hakkimizda`, `about`, `sepet`, `cart`, `hesap`, `account`, `arama`, `search`, `yasal`, `legal` ve çevirileri; tam liste
+`adres.json`). Hiçbir kategori, aile, seri, mekân, bina ya da rehber slug'ı bunlarla kesişmez. `api`, `admin`, `_next`
+teknik rezervi eski kuraldan sürer (A4, §1; `adres.json` listesinde yoktur). `bilgi-merkezi` ↔ `knowledge-hub`,
+`nasil-teklif-alinir`, `sss` ↔ `faq` rezervde kalır ve A15'teki gibi yönlenir.
+
+**Site haritası bölümleri:** `sitemap-kategori.xml`, `sitemap-aile.xml`, `sitemap-seri.xml`, `sitemap-model.xml`,
+`sitemap-uygulama.xml`.
+
+**A1–A3 yeni şemada:** A1 (model çözümü, son `-p-`) ve A2 (SKU küçük harf, uymayan metin → 308) aynen geçerlidir; A3'ün
+"slug ≤ 70" ve "teknik değer yalnız `technical_specs`'ten" kuralları da geçerlidir. Kategori slug'ının "zenginleşmez"
+kuralı ise yeni şemada Design kararıyla yeniden yazıldı (slug = aranan ifade, DESIGN-MENU 2026-11-02); ayrıntı `adres.json`'dadır.
+
 ## 2. Tek kanonik (CANLI ilke, REC-205)
 
 **A5 — Bir sayfa hiçbir an iki adresten 200 dönmez.** 2026-09-07'de Google iki seviyeli dal adresimizi "kopya"
@@ -61,6 +122,12 @@ sayıp eledi; sebep iki adresin aynı anda 200 dönmesiydi. B-1 kararıyla dalı
 hiçbir girdide 200 dönmez.
 
 ## 3. Eski adresler — üç katman (HEDEF)
+
+Yeni siteye geçişte **eski adres** iki gruptur: (a) bugün canlı olan eski site adresleri (`/tr/products/<aile>`,
+`/tr/category/<ad>`, `/tr/brands/…`, `/tr/bilgi-merkezi/…`, `?sku=` ile aile sayfaları); (b) §1'deki hedef şemanın
+adresleri (yayına çıkmadıysa gerekmez). Hedef her zaman §1A'dır; tek sıçrama (A9). Eşleştirme tablosu URN-157'dedir
+(geçişe bağlı); tablo bu cetvele değil `adres.json` üretimine dayanır. Üç katman eski sitede nasıl çalışıyorsa orada kalır;
+yeni kurulumda hangisinin taşınacağı OPS-180 kararıdır.
 
 | Katman | Ne çözer | Kural |
 |---|---|---|
