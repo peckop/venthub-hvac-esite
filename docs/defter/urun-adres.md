@@ -67,7 +67,7 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 ### 2.5 Cetvel durumu
 
 `docs/standards/adres-semasi-standard.md` v0.3 (9 Kasım, URN-159) iki şemayı ayrı tutar: §1 eski site (K3-b/B-1, bayraklar kapalı), §1A yeni site tek önek
-(`/tr/urunler`, `/tr/uygulama-alanlari`, `/tr/rehber`; EN `products`, `applications`, `guides`). Kaynak Design `adres.json` "kural" bloğu (yerel kopya 6 Kasım; depo dışı).
+(`/tr/urunler`, `/tr/uygulama-alanlari`, `/tr/rehber`; EN `products`, `applications`, `guides`). Kaynak Design Venthub New `assets/veri/adres.json`, 9 Kasım okuma (depo dışı).
 Rota dili cetveline (`rota-dili-standard`, ALTYAPI) ve tablosuna bu turda bakılmadı ve dokunulmadı; yeni öneklerle uyumu ALTYAPI'ya sorulacak (bkz. 3).
 
 ## 3 Sırada ve yapılabilecekler

@@ -62,7 +62,8 @@ bunlarla kesişmez (HEDEF kapı INV-ADRES-CAKISMA-1).
 
 İki kök vardır: **Ürünler** (`/tr/urunler` ↔ `/en/products`) ve **Uygulama alanları** (`/tr/uygulama-alanlari` ↔
 `/en/applications`). Ürünle ilgili her sayfa `urunler/` altında, düz (tek segment) adres alır; slug aranan ifadedir.
-Kaynak: Design `adres.json` "kural" bloğu (yerel kopya 6 Kasım; sayım: kategori 32, aile sayfası 17, seri 104, model 1206,
+Kaynak: Design Venthub New `assets/veri/adres.json`, 9 Kasım okuma (kural bloğu ve damga; kural Design'ındır, bu cetvel ona uyar;
+sayım 6 Kasım kopyasından: kategori 32, aile sayfası 17, seri 104, model 1206,
 mekân 9, bina 5, marka 7, rehber 5, sabit 20).
 
 | Nesne | TR | EN |
@@ -91,17 +92,18 @@ ayrıktır); `uygulama-alanlari/` içinde mekân ↔ bina. Benzersizlik anahtar�
 (`urunler/` altı). "Marka + tür" adresi yoktur. Marka içi süzgeç `#` parçasındadır: "Tüm <marka> ürünleri" →
 `/tr/urunler#marka=<marka>` (`?marka=` kullanılmaz, ayrı canonical yoktur).
 
-**A15 — Sabit sayfalar** (20 kayıt: `belgeler`, `hesapla`, `destek`, `iletisim`, `hakkimizda`, `teklif-listesi`,
-`teklif-iste`, `karsilastir`, `hesap`, `arama`, `site-haritasi` ve 9 yasal sayfa) `/tr/<ad>` ↔ `/en/<ad-en>` düz adres
+**A15 — Sabit sayfalar** (`belgeler`, `hesapla`, `destek`, `iletisim`, `hakkimizda`, `teklif-listesi`,
+`teklif-iste`, `karsilastir`, `hesap`, `arama`, `site-haritasi`, 9 yasal sayfa; 6 Kasım kopyada 20 kayıt) `/tr/<ad>` ↔ `/en/<ad-en>` düz adres
 alır; yasal sayfalar `/tr/yasal/<ad>` ↔ `/en/legal/<ad-en>` altındadır. `teklif-listesi`, `teklif-iste`, `karsilastir`,
-`hesap` ve `arama` noindex'tir. 404 ve hata sayfası adres almaz; sepet satış kipinde açılır, şimdilik yoktur.
+`hesap` ve `arama` noindex'tir. Teklif onay sayfası (7 Kasım) `/tr/teklif/{no}` ↔ `/en/quote/{no}`'dur: noindex, site
+haritasında yok; `teklif` ve `quote` bu yüzden rezervdedir. 404 ve hata sayfası adres almaz; sepet satış kipinde açılır, şimdilik yoktur.
 Eski adı bilinen sabitler yönlenir: `/tr/bilgi-merkezi` → `/tr/rehber`, `/tr/nasil-teklif-alinir` → `/tr/destek`,
 `/tr/sss` → `/tr/destek#sss` (EN: `/en/knowledge-hub` → `/en/guides`, `/en/how-to-get-a-quote` → `/en/support`,
 `/en/faq` → `/en/support#faq`).
 
-**A4 (yeni site) — Rezerve kelimeler:** `adres.json` "rezerve" listesi (40 kelime: `urunler`, `products`,
+**A4 (yeni site) — Rezerve kelimeler:** `adres.json` "rezerve" listesi (9 Kasım okumada 42 kelime: `urunler`, `products`,
 `uygulama-alanlari`, `applications`, `rehber`, `guides`, `markalar`, `brands`, `destek`, `support`, `iletisim`, `contact`,
-`hakkimizda`, `about`, `sepet`, `cart`, `hesap`, `account`, `arama`, `search`, `yasal`, `legal` ve çevirileri; tam liste
+`hakkimizda`, `about`, `teklif`, `quote`, `sepet`, `cart`, `hesap`, `account`, `arama`, `search`, `yasal`, `legal` ve çevirileri; tam liste
 `adres.json`). Hiçbir kategori, aile, seri, mekân, bina ya da rehber slug'ı bunlarla kesişmez. `api`, `admin`, `_next`
 teknik rezervi eski kuraldan sürer (A4, §1; `adres.json` listesinde yoktur). `bilgi-merkezi` ↔ `knowledge-hub`,
 `nasil-teklif-alinir`, `sss` ↔ `faq` rezervde kalır ve A15'teki gibi yönlenir.
