@@ -3898,13 +3898,13 @@
       ],
       "durum": "yururlukte",
       "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2020-DEG.json",
-      "resmi_kaynak_sayisi": 4,
+      "resmi_kaynak_sayisi": 6,
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "2020 sonrası başka değişiklik olup olmadığı mevzuat.gov.tr değişiklik listesinden ayrıca taranmadı."
       ],
-      "son_kontrol": "2026-11-08",
+      "son_kontrol": "2026-11-09",
       "eksen": "C"
     }
   ],

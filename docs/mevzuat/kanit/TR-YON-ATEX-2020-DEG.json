@@ -69,6 +69,40 @@
       "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
       "alinti": "MADDE 7 – Aynı Yönetmelikte yer alan “üretici” ibareleri “imalatçı” olarak",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-09",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "Resmî Gazete eskiler sayfası, Node fetch, User-Agent VentHub-mevzuat/1.0; Md 4 (Md 15(1)(a)(1)); ölçüm 9 Kasım 2026",
+      "durum_satiri": "Resmî metin sayfası.",
+      "bayt": 28157,
+      "sha256_ilk12": "3d7d64d4f7a3",
+      "sha256_metin_ilk12": "04aca8341f0a",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "MADDE 4 – Aynı Yönetmeliğin 15 inci maddesinin birinci fıkrasının (a) bendinin (1) numaralı alt bendinde yer alan “(Üretim)” ibaresi yürürlükten kaldırılmıştır.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm",
+      "http": 200,
+      "robots": "ölçülmedi",
+      "erisim_tarihi": "2026-11-09",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "yontem": "aynı çekim; Md 3 (Md 4(1)(b) tanımı, bakanlık adı); ölçüm 9 Kasım 2026",
+      "durum_satiri": "Resmî metin sayfası.",
+      "bayt": 28157,
+      "sha256_ilk12": "3d7d64d4f7a3",
+      "sha256_metin_ilk12": "04aca8341f0a",
+      "sha256_normalizasyon": "ham: sunucunun döndürdüğü bayt; metin: çözülüp betik/stil atılmış, etiketler soyulmuş, &nbsp; boşluk, boşluk tekil, NFC",
+      "alinti": "b) Bakanlık: Sanayi ve Teknoloji Bakanlığını,",
+      "alinti_dogrulandi": true
     }
   ]
 }
