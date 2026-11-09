@@ -1174,6 +1174,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
   {
     // BLOG (BLG-31), doğrulanmış metin: taslak v7 (sha 728066b03deb) beş turda doğrulandı (v1-v7; hedef üçtü, karşılanmadı; her turda tuzaklı kopya 5/5 yakalandı).
     // v7 → v8 farkı iki cümledir ve ikisi de iddiayı daraltır (2037 geçiş tarihi çıkarıldı: 2025/2481 değişikliği doğrulanmadı ve kardeş rehber farklı tarih verir; giriş cümlesinde Vortice kapsamı karma akışlı üretici anlatımıyla sınırlandı). Taslak v8 sha 2917711c943b; kayıtlı gövde sha 141c5116ed7a.
+    // Güncel durum (9 Kasım 2026, BLG-56 öneri 4): yukarıdaki "2037 çıkarıldı, 2025/2481 doğrulanmadı" notu v8 anına aittir ve bayatladı; (AB) 2025/2481 madde 1(4) sonradan ham metinden okundu (Kaynak 6) ve 2037 yedek parça tarihi gövdeye döndü (BLG-63). Gövde bu yorum için değişmedi.
     // Mevzuat: tür tanımları (AB) 2024/1834 madde 2(17)-(20), (25), madde 9(1), Ek III nokta 4 (OPS, EUR-Lex ham metni, 3 Kasım 2026); yürürlükten kalkan 327/2011 yalnız gaz yolu anlatımı için [5]. Fiyat yok: ürün sayfaları teklife yönlendirir.
     // Yayın: karar 121/c (profesyonel yazı AYNI adreste döner); birleşme ayrı OPS onayıyla. yayinTarihi birleşme gününe göre güncellenir.
     kimlik: 'fan-cesitleri',
