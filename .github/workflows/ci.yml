@@ -169,6 +169,23 @@ jobs:
           PR_YAZAR: ${{ github.event.pull_request.user.login }}
         run: node scripts/board/pr-kayit-kapisi.cjs
 
+      # OPS-258 (ALT-178) — DEFTER PR KAPISI, UYARI KİPİ. Plan: docs/plans/departman-defter-duzeni-2026-11-09.md §6.3.
+      # Manifestteki (docs/defter/manifest.json) bir defterin `izlenen` yolu değişti ama defter dosyası değişmediyse (ya da
+      # `Son doğrulama` tarihi ilerlemediyse) ANNOTATION uyarısı verir; BLOKLAMAZ: kip `uyari` iken çıkış kodu hep 0 ve
+      # `continue-on-error` kapıdaki beklenmeyen bir çökmenin zorunlu `ci` işini kırmasını da engeller. Manifest yoksa etkisizdir.
+      # Mantık ve test: scripts/ci/defter-pr-kapisi.cjs (saf modül, yeni sır yok, LLM yok). KIRMIZI kip (DEFTER_KAPISI_KIP: kirmizi)
+      # iki haftalık yanlış alarm ölçümünden sonra OPS onayıyla açılır; o gün `continue-on-error` da kalkar.
+      # PR gövdesi ve yazar ORTAM DEĞİŞKENİ olarak geçer, `run:` satırına gömülmez (enjeksiyon). Yalnız pull_request olayında koşar.
+      - name: Defter PR kapısı (OPS-258, UYARI kipi)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          PR_GOVDE: ${{ github.event.pull_request.body }}
+          PR_YAZAR: ${{ github.event.pull_request.user.login }}
+          PR_ACILIS: ${{ github.event.pull_request.created_at }}
+          DEFTER_KAPISI_KIP: uyari
+        run: node scripts/ci/defter-pr-kapisi.cjs
+
       # ALT-38 — `edited` AYNASI (cetvel: docs/standards/test-karnesi-standard.md §4; mantık ve test: scripts/ci/edited-ayna.cjs).
       # Yalnız PR düzenlemesinde koşar. Aynı head SHA için bu koşudan ÖNCE başlamış bir TAM koşu `success` ile bitmişse ve
       # o koşunun `taban izi` bu koşunun tabanıyla (HEAD^1) BİREBİR aynıysa ağır adımlar ATLANIR (kod ve taban aynı: gerçek
