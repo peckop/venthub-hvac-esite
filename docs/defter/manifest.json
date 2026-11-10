@@ -70,6 +70,7 @@
       "tazelikGun": 7,
       "tetik": ["kart-kapanisi", "dis-kaynak"],
       "olcum": "node scripts/icerik-hatti/unopim-icerik-olc.mjs --kontrol",
+      "kaynakIzi": "node scripts/icerik-hatti/unopim-icerik-olc.mjs --iz",
       "disKaynak": "unopim",
       "durum": "pilot"
     }
