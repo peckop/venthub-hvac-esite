@@ -10,7 +10,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS } from '../dizin-acilis.mjs'
+import { kuyrukSatiri, trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS } from '../dizin-acilis.mjs'
 
 const BETIK = resolve(__dirname, '..', 'dizin-acilis.mjs')
 const gecici: string[] = []
@@ -95,6 +95,25 @@ describe('çekirdek', () => {
     expect(calistir({ klasor: k, simdi: SIMDI, env: { VENTHUB_DIZIN_ACILIS_KAPAT: '1' }, baslatici: () => { n++ } })).toBe('')
     calistir({ klasor: k, simdi: SIMDI, env: {}, baslat: false, baslatici: () => { n++ } })
     expect(n).toBe(0)
+  })
+})
+
+describe('kuyruk satırı (SEO-103)', () => {
+  it('bekleyen sayıyı verir, bayat günü işaretler, boşken "boş" der, anlık görüntü yokken ölçülemedi der', () => {
+    const k = dizin(); yaz(k, '2026-11-09', [satir('YAP', 'TAMAM', 'TAMAM'), satir('TEKRAR', 'TAMAM', 'TAMAM'), satir('TAMAM', 'YAP', 'TAMAM')])
+    expect(kuyrukSatiri({ klasor: k, simdi: Date.parse('2026-11-09T07:00:00Z') })).toBe('Google dizin kuyruğunda 2 adres bekliyor, ölçüm 09.11')
+    expect(kuyrukSatiri({ klasor: k, simdi: Date.parse('2026-11-10T07:00:00Z') })).toContain('BAYAT')
+    const bos = dizin(); yaz(bos, '2026-11-09', [satir('TAMAM', 'YAP', 'TAMAM')])
+    expect(kuyrukSatiri({ klasor: bos, simdi: Date.parse('2026-11-09T07:00:00Z') })).toContain('kuyruğu boş')
+    expect(kuyrukSatiri({ klasor: dizin() })).toContain('ölçülemedi')
+  })
+  it('CLI --kuyruk tek satır basar, çıkış 0, ham adres basmaz', () => {
+    const k = dizin(); yaz(k, '2026-11-09', [satir('YAP', 'TAMAM', 'TAMAM')])
+    const r = spawnSync(process.execPath, [BETIK, '--kuyruk'], { encoding: 'utf8', env: { ...process.env, VENTHUB_DIZIN_ARSIV: k } })
+    expect(r.status).toBe(0)
+    expect(r.stdout.trim().split('\n')).toHaveLength(1)
+    expect(r.stdout).toContain('Google dizin kuyruğunda 1 adres bekliyor')
+    expect(r.stdout).not.toContain('https://')
   })
 })
 
