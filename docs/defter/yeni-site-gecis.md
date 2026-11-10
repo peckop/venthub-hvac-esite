@@ -23,9 +23,10 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 ## 1 Ne yaptık
 
-<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-10 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
+| 2026-11-10 | KTL-86 | UnoPIM ürün içeriği yaşayan defteri | KATALOG |
 | 2026-11-09 | URN-159 | adres-semasi-standard.md 2 Kasım tek önek kararına göre güncelle | URUN |
 | 2026-11-09 | KTL-85 | docs/olcum/pim-unopim.md defterini 4 Kasım sonrası işlerle güncelle | KATALOG |
 | 2026-11-08 | KTL-82 | UnoPIM Faz C | KATALOG |
@@ -43,13 +44,13 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 ## 2 Envanter
 
-<!-- DEFTER-OLCUM:envanter BASLA — kaynak izi değişince ölçülür, değişmediyse bayat sayılmaz; node scripts/hijyen/defter-envanter.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-OLCUM:envanter BASLA — kaynak izi değişince ölçülür, değişmediyse bayat sayılmaz; node scripts/hijyen/defter-envanter.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-10 -->
 | Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |
 |---|---|---|---|
-| Design ↔ UnoPIM fark | 1165 üründe fark 0; teknik değer: 4130 kontrol, 0 fark | 2026-11-09 | kaynak değişmedi — son ölçüm 2026-11-09 |
+| Design ↔ UnoPIM fark | 1165 üründe fark 0; teknik değer: 4130 kontrol, 0 fark | 2026-11-10 | kaynak değişmedi — son ölçüm 2026-11-10 |
 | UnoPIM görsel / fiyat-KDV | görsel 1157/1165 (11-04) · liste fiyatı 343/1165 yazıldı, kaynakta 348 (11-05) · KDV %20: 1165/1165 (11-05) | 2026-11-05 | kaynak değişmedi — son ölçüm 2026-11-05 |
 | Adres eşleştirme kapsama | taslak 2402 satır; slug kapsamı kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi 0/6 | 2026-11-04 | kaynak değişmedi — son ölçüm 2026-11-04 |
-| Dizin | TUTARLI: defter 2026-11-09 anlık görüntüsüyle birebir (101 adres) | 2026-11-09 | ölçüldü |
+| Dizin | SAPMA (anlikGoruntu, gun, sha256, kararlar, olculemeyen): arşivde daha yeni anlık görüntü var (defter 2026-11-09, arşiv 2026-11-10); defterin ÖZET blo | 2026-11-10 | ölçüldü |
 <!-- DEFTER-OLCUM:envanter BITIS -->
 
 Ölçüm tarihi 2026-11-09 (içerik 6 Kasım listesinden devralındı; sayı yanında kaynak kartı yazılıdır, bu turda yeniden ölçülmemiştir).
@@ -86,11 +87,10 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 ## 3 Sırada ve yapılabilecekler
 
-<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-10 -->
 | Kart | İş | Durum | Sahip |
 |---|---|---|---|
 | ALT-177 | Yeni site geçişi | Backlog | ALTYAPI |
-| KTL-86 | UnoPIM ürün içeriği yaşayan defteri | To Do | KATALOG |
 | OPS-180 | Yeni vitrin geçişi | To Do | OPS |
 | OPS-219 | Design İçerik'e KTL-80 eksik içerik notu | To Do | OPS |
 | OPS-220 | Design Venthub New'e yeni site kanal tipi fan kategori girdisi | To Do | OPS |

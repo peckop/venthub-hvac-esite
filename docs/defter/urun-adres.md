@@ -8,7 +8,7 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 
 ## 1 Ne yaptık
 
-<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:urun-adres etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs urun-adres --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:urun-adres etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs urun-adres --yaz · Üretildi: 2026-11-10 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
 | 2026-11-09 | URN-160 | Geçiş hazırlığı | URUN |
@@ -85,7 +85,7 @@ Rota dili cetveli (`rota-dili-standard.md`, ALTYAPI) §0 ile yeni sitenin tek ka
 
 ## 3 Sırada ve yapılabilecekler
 
-<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:urun-adres etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs urun-adres --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:urun-adres etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs urun-adres --yaz · Üretildi: 2026-11-10 -->
 | Kart | İş | Durum | Sahip |
 |---|---|---|---|
 | ALT-177 | Yeni site geçişi | Backlog | ALTYAPI |

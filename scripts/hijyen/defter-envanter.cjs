@@ -150,10 +150,11 @@ function adresSonucu(kok = KOK) {
 function dizinSonucu(kok = KOK) {
   try {
     const r = spawnSync(process.execPath, [path.join(kok, 'scripts', 'seo', 'dizin-defter-kontrol.mjs')], { encoding: 'utf8', timeout: 30000, windowsHide: true, cwd: kok })
-    const s = String(r.stdout || '').split('\n').find((x) => x.trim())
+    // Tutarlıysa stdout, sapmada stderr yazar (dizin-defter-kontrol.mjs).
+    const s = `${r.stdout || ''}\n${r.stderr || ''}`.split('\n').find((x) => x.trim())
     // Çıkış 1 = sapma bulundu (ölçüm başarılı, sonuç "sapma"); başka çıkış ya da çıktı yok = ölçülemedi.
     if (!s || (r.status !== 0 && r.status !== 1)) return null
-    return { ozet: (r.status === 1 ? 'SAPMA: ' : '') + s.trim().slice(0, 150), tarih: new Date().toISOString().slice(0, 10) }
+    return { ozet: (r.status === 1 && !/^SAPMA/.test(s.trim()) ? 'SAPMA: ' : '') + s.trim().slice(0, 150), tarih: new Date().toISOString().slice(0, 10) }
   } catch {
     return null
   }

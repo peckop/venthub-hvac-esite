@@ -6,7 +6,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 
 ## 1. Ne yaptık
 
-<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-10 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
 | 2026-11-09 | SEO-102 | Bing durum ölçümü tam kapsamda ThrottleHost veriyor | SEO |
@@ -109,7 +109,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 
 ## 3. Sırada ve yapılabilecekler
 
-<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-10 -->
 | Kart | İş | Durum | Sahip |
 |---|---|---|---|
 | SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm | Backlog | GEO-SEO |
