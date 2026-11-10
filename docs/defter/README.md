@@ -77,5 +77,6 @@ var, aynı dosya iki kayıtta yok, `aktif` kaydın `olcum`'u dolu, şema alanlar
 | urun-adres | URUN | Pilot (URN-158): canlı adres şeması, yönlendirme katmanları, bayraklar; `olcum` henüz yok (kontrolsüz pilot), URN-157 geçiş tablosu "Sırada"da |
 | geo-seo-dizin | GEO-SEO | Pilot (SEO-101): depo-güvenli özet, `olcum` = `node scripts/seo/dizin-defter-kontrol.mjs` (arşivdeki son anlık görüntüyle sayı karşılaştırır; ham veri depoya girmez) |
 | yeni-site-gecis | OPS | Pilot (HRT-128): yeni site geçişi tek süreç (kararlar, Design eksikleri, adres/UnoPIM/önizleme/dizin bağları, sıradaki işler); `olcum` = `node scripts/hijyen/defter-envanter.cjs yeni-site-gecis` ("2 Envanter" bloğu), `kaynakIzi` = aynı betik `--iz` (ARC-291) |
+| katalog-unopim-icerik | KATALOG | Pilot (KTL-86): UnoPIM ürün içeriği alan × doluluk, Design↔UnoPIM fark, doldurulması gerekenler; `olcum` = `node scripts/icerik-hatti/unopim-icerik-olc.mjs --kontrol` (canlı yerel UnoPIM, salt okuma; Docker kapalıysa çıkış 2) |
 
 Yeni defter eklemek: önce manifest kaydı (`durum: planli`), sonra dosya, sonra `pilot`/`aktif`.
