@@ -10,7 +10,7 @@
  *
  * Kullanım: node scripts/seo/tarayici-parcaciklari.mjs <gsc|bing|google>   → parçacık metni stdout'a.
  * Sınırlar: robot doğrulaması (captcha) atlatılmaz, yalnız bildirilir; çıktıya sorgu dizesi (query string) konmaz
- * (javascript_tool "[BLOCKED: Cookie/query string data]" verir); Yandex elle formu bırakıldı (IndexNow karşılar,
+ * (javascript_tool "[BLOCKED: Cookie/query string data]" verir); Yandex elle formu 10 Kasım SEO-105 ile geri geldi (günde 10, form elle;
  * dizin-sistemleri-standard D7 madde 11). Her istekten sonra `dizin-takip.mjs --kaydet` çalıştırılır.
  */
 import { pathToFileURL } from 'node:url'
