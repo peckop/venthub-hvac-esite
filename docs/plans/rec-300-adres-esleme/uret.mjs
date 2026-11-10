@@ -125,13 +125,17 @@ function katYeni(canliEn, l) {
 }
 
 // ── Aile eşlemesi: canlı aile -> Design seri (modellerinin Design serisine oyu) ─────────────────────
+const SERI_ZORLA = Object.fromEntries(['VRT-65155', 'VRT-65156', 'VRT-65157', 'VRT-65158'].map((s) => [s, 'vortice-h-ad-elektrikli']))
 const aileOy = new Map()
 for (const [aile, skular] of Object.entries(AILE_SKU)) {
   const oy = {}
   for (const s of skular) {
     const m = A.model[s]
     if (!m) throw new Error(`Design'da model yok: ${s}`)
-    oy[m.aile] = (oy[m.aile] ?? 0) + 1
+    // Design İçerik cevabı (10 Kasım): H AD modelleri `vortice-h-ad-elektrikli` serisine bağlı; adres.json aktarımda bunları
+    // `vortice-hava-perdesi` altında gösteriyor (seri-veri-dizin `sku` listesi doğru kaynak). AD modelleri hava-perdesi'nde kalır.
+    const seri = SERI_ZORLA[s] ?? m.aile
+    oy[seri] = (oy[seri] ?? 0) + 1
   }
   aileOy.set(aile, oy)
 }

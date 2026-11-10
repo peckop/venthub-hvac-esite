@@ -37,7 +37,9 @@ Her satır hem TR hem EN için üretilir (EN canlıda 200 verir, `EN_YAYIN` kapa
 - `[gecici]` ile başlayan `not` satırları: hedef Design'da henüz karşılık bulmamış, en yakın sayfa yazıldı. Karşılığı gelince hedef güncellenir. Şu an: 8 rehber yazısı (BLOG), ürün seçici (Design seçici adres vermedi), 4 hesaplayıcı aracı adresi (Design tek `hesapla` sayfası).
 - `eslesmeyen.txt`: sepet, ödeme, ödeme sonucu ve giriş/kayıt adresleri. Sepet, ödeme adımları ve ödeme sonucunu Design çizer (6 Kasım yol haritası, karar 4-5); adresleri gelince eklenir. Dördü de bugün noindex.
 
-## Çoktan-bire birleşmeler (9 hedef, kasıtlı)
+**Hava perdesi (10 Kasım, Design İçerik cevabı):** H AD modelleri (VRT-65155..65158) `vortice-h-ad-elektrikli` serisine, AD modelleri (VRT-65195..65198) `vortice-hava-perdesi` serisine bağlı; iki seri aynı veri dosyasını paylaşır. `adres.json` aktarımı H AD modellerini hava-perdesi altında gösterdiği için (aktarım tarafı) üretici bu dört SKU'yu seri-veri-dizin `sku` listesine göre `vortice-h-ad-elektrikli`ye zorlar (`SERI_ZORLA`). Design adres.json düzelince zorlama kaldırılabilir.
+
+## Çoktan-bire birleşmeler (8 hedef, kasıtlı)
 
 Farklı eski adres aynı yeni adrese gider. Teknik sorun değildir; anlam kararı bu tabloda yol haritasına göre verildi:
 
@@ -46,7 +48,6 @@ Farklı eski adres aynı yeni adrese gider. Teknik sorun değildir; anlam karar�
 | `/tr/urunler` | fanlar, hava-şartlandırma (kök kategoriler), hedefsiz eski kategori adları, ürün seçici | Design'da bu iki kök kategorinin tek karşılığı yok (konut ve ticari fanlar, ısıtıcılar ve nem alma ayrı gruplarda); ürünler kökü. Risk: arama motoru bunu alakasız hedef sayabilir. Alternatif gerekirse tek grup seçilir |
 | `/tr/urunler/kontrol-ve-aksesuarlar` | aksesuarlar, elektrik aksesuarları (+ kontrol-sistemleri, kontrol-ve-suruculer takma adları) | Design iki kategoriyi tek grupta birleştirdi |
 | `/tr/urunler/kanal-tipi-fanlar` | kanal tipi fanlar + iki pasif kategori (kanal içi, dikdörtgen kanal) | Pasif kategoriler dizinde değil |
-| `/tr/urunler/vortice-hava-perdesi` | isıtıcısız ve elektrikli ısıtıcılı hava perdesi aileleri | Design iki aileyi tek seride birleştirdi |
 | `/tr/urunler/aksiyel-fanlar` | aksiyel kategori + endüstriyel aksiyel aile | Aile Design'da üç seriye bölündü, tek seri hedefi yok, tür sayfasına |
 | `/tr/urunler/frekans-konvertorleri` | frekans konvertörleri kategorisi + `brands/frekans-konvertoru` | Bugün de bu yönlendirme var |
 | `/tr/rehber` | bilgi merkezi listesi + 8 geçici yazı + eski destek konuları | Geçici, yazılar Design'a girince ayrılır |
