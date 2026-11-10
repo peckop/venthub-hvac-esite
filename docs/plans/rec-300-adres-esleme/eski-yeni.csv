@@ -41,9 +41,8 @@ eski;yeni;kod;tur;kaynak;not
 /en/products/vortice-radon-serisi-kanal-fanlari;/en/products/vortice-radon-range-circular;308;aile;canli-db;
 /en/products/vortice-slimroof-cati-fanlari;/en/products/vortice-slimroof-es;308;aile;canli-db;
 /en/products/vortice-tiracamino-somine-ve-baca-fanlari;/en/products/vortice-vort-industrial-ventilation-roof;308;aile;canli-db;
-/en/products/vortice-vort-commercial-in-line-circular;;410;takma-ad;takma-ad;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok; Eski aile adı (url_takma_adlari / tohum)"
 /en/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari;/en/products/vortice-vort-commercial-in-line-rectangular;308;aile;canli-db;
-/en/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;;410;aile;canli-db;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok"
+/en/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;/en/products/vortice-vort-commercial-in-line-circular;308;aile;canli-db;"Canlıda aktif modeli yok (bugün 404); Design serisi vortice-vort-commercial-in-line-circular kimlikle bağlandı"
 /en/products/vortice-vort-e-atex;/en/products/vortice-e-atex;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
 /en/products/vortice-vort-e-atex-fanlar;/en/products/vortice-e-atex;308;aile;canli-db;
 /en/products/vortice-vort-heatmaster-slimroof-roof;/en/products/vortice-slimroof-es;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
@@ -126,10 +125,10 @@ eski;yeni;kod;tur;kaynak;not
 /tr/products/vortice-radon-serisi-kanal-fanlari;/tr/urunler/vortice-radon-range-circular;308;aile;site-haritasi;
 /tr/products/vortice-slimroof-cati-fanlari;/tr/urunler/vortice-slimroof-es;308;aile;site-haritasi;
 /tr/products/vortice-tiracamino-somine-ve-baca-fanlari;/tr/urunler/vortice-vort-industrial-ventilation-roof;308;aile;site-haritasi;
-/tr/products/vortice-vort-commercial-in-line-circular;;410;takma-ad;takma-ad;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok; Eski aile adı (url_takma_adlari / tohum)"
+/tr/products/vortice-vort-commercial-in-line-circular;/tr/urunler/vortice-vort-commercial-in-line-circular;308;takma-ad;takma-ad;"Canlıda aktif modeli yok (bugün 404); Design serisi vortice-vort-commercial-in-line-circular kimlikle bağlandı; Eski aile adı (url_takma_adlari / tohum)"
 /tr/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari;/tr/urunler/vortice-vort-commercial-in-line-rectangular;308;aile;site-haritasi;
 /tr/products/vortice-vort-commercial-in-line-rectangular;/tr/urunler/vortice-vort-commercial-in-line-rectangular;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
-/tr/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;;410;aile;canli-db;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok"
+/tr/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;/tr/urunler/vortice-vort-commercial-in-line-circular;308;aile;canli-db;"Canlıda aktif modeli yok (bugün 404); Design serisi vortice-vort-commercial-in-line-circular kimlikle bağlandı"
 /tr/products/vortice-vort-e-atex;/tr/urunler/vortice-e-atex;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
 /tr/products/vortice-vort-e-atex-fanlar;/tr/urunler/vortice-e-atex;308;aile;site-haritasi;
 /tr/products/vortice-vort-heatmaster-slimroof-roof;/tr/urunler/vortice-slimroof-es;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)

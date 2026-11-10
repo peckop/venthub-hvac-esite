@@ -31,6 +31,7 @@
 /en/products/vortice-punto-evo-flexo
 /en/products/vortice-radon-range-circular
 /en/products/vortice-radon-range-roof
+/en/products/vortice-vort-commercial-in-line-circular
 /en/products/vortice-vort-commercial-in-line-rectangular
 /en/products/vortice-vort-industrial-ventilation-roof
 /en/products/vortice-vort-mono
