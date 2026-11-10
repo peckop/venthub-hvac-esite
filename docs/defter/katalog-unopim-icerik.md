@@ -183,8 +183,8 @@ Design-İÇERİK `veri/seri-veri-dizin-2026-11-02.json` her modele UnoPIM koduyl
 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
-| 115 kısmi aile×alanı kaynak dizini ve Design ile karşılaştır: değer kaynakta varsa Design'a düzeltme/ekleme listesi, yoksa "kaynakta yok" işareti | Kısmi boşluk, aynı ailenin diğer ürünlerinde dolu olduğu için en olası eksik | Yüksek | KTL-86 sonrası kart açılacak |
-| 156 ailede tamamen boş alanı sınıfla: ailede uygulanmaz mı (tanım fazlası) yoksa kaynakta var mı | Tanım fazlası alan, boş görünüp yanlış eksik sayısı üretir | Orta | — |
+| 115 kısmi aile×alanın kaynakla karşılaştırılması ve değer eksiğinin giderilmesi: SAHİBİ Design-İÇERİK (veri işleme ve eksiklik analizi Design'da; Recep Design'da teknik özellik kontrolünü yürütüyor). KATALOG yalnız Design değişince fark betiğini ve bu ölçümü yeniden koşar, sonucu bu deftere yazar | Kısmi boşluk, aynı ailenin diğer ürünlerinde dolu olduğu için en olası eksik; ama düzeltme UnoPIM'e doğrudan yazılmaz, Design verisinden gelir | Yüksek | Design-İÇERİK (KATALOG başlatmaz) |
+| 156 ailede tamamen boş alanın sınıflanması (ailede uygulanmaz mı, tanım fazlası mı, kaynakta var mı): SAHİBİ Design-İÇERİK; KATALOG yalnız ölçümü yeniden koşar | Tanım fazlası alan, boş görünüp yanlış eksik sayısı üretir | Orta | Design-İÇERİK (KATALOG başlatmaz) |
 | Design teknik değerleri değişince anlık görüntüleri tazele, fark betiğini ve bu ölçümü yeniden koş, defteri güncelle | Recep Design'da teknik özellikleri yeniden kontrol ettiriyor (9 Kasım) | Yüksek | — |
 | Ölçümü kaynak değişikliği tetiğine bağla (UnoPIM damgası ya da Design anlık görüntü sha değişince açılışta ölç); Docker yerel olduğu için zamanlayıcı ayrı karardır | `olcum` komutu Docker kapalıyken 2 (ölçülemedi) verir; kör günlük koşu istenmiyor | Orta | ALTYAPI / OPS |
 
@@ -196,4 +196,5 @@ Design-İÇERİK `veri/seri-veri-dizin-2026-11-02.json` her modele UnoPIM koduyl
 | 2026-11-05 | KDV varsayılanı %20 UnoPIM'e yazıldı; satış fiyatı ve stok UnoPIM'e yazılmaz | KTL-82 kart notu; `pim-unopim.md` |
 | 2026-11-09 | UnoPIM ürün içeriği yaşayan defterle izlenir; sahip KATALOG | OPS-258 çerçevesi, KTL-86 |
 | 2026-11-09 | Ölçüm kör günlük koşmaz; tetik kaynak değişikliği (UnoPIM damgası, Design anlık görüntü sha); kaynak değişmediyse son sonuç geçerli | OPS iletti (Recep düzeltmesi), KTL-86 |
+| 2026-11-10 | Eksiklik analizi ve değer düzeltmesi Design-İÇERİK'indir; KATALOG katalog/föy hazırlar, ölçümü ve fark betiğini Design değişince koşar | OPS iletti, 14 Ekim kuralı, KTL-88 |
 | 2026-11-09 | Design tarafı sayısı güncel Design dosyasından alınır (adres dizini toplamı), eski anlık görüntüden değil | OPS iletti, KTL-86 |
