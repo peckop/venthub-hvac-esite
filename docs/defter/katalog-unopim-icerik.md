@@ -1,6 +1,6 @@
 # KATALOG defteri: UnoPIM ürün içeriği (neler dolu, neler doldurulmalı)
 
-Sahibi: KATALOG · Son doğrulama: 2026-11-09 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: KTL-86 (OPS emri), KTL-82, KTL-83, KTL-85
+Sahibi: KATALOG · Son doğrulama: 2026-11-10 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: KTL-86 (OPS emri), KTL-82, KTL-83, KTL-85
 
 **Tazelik kuralı:** ölçüm her sabah kör koşmaz. Tetik KAYNAK değişikliğidir: UnoPIM'in son ürün güncelleme damgası ya da Design anlık görüntü dosyalarının sha256'sı değişince ölçüm yeniden koşulur ve bu sayfa güncellenir. Kaynak değişmediyse son sonuç geçerlidir (`--kontrol` "kaynak değişmedi" der) ve sayfa yalnız yaşı yüzünden bayat sayılmaz. Manifest tetiği: `kart-kapanisi` + `dis-kaynak`.
 
@@ -15,6 +15,7 @@ Eski ölçüm ve işlem tarihçesi: `docs/olcum/pim-unopim.md` ("Ölçüm 2026-1
 
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
+| 2026-11-10 | Design-İÇERİK `sku` alanı (katalog kodu → UnoPIM kodu) fark betiğine ve kaynak damgasına bağlandı; İÇERİK 1162 ↔ UnoPIM 1165: fark 3 SKU (`SEA-51201003`, `SEA-61102010`, `VRT-253100106XN`) | 2.3b; `tasarim-unopim-fark.mjs` `icerikSku` | KTL-87 |
 | 2026-11-09 | Design tarafı güncel dosyalardan okundu: adres dizini toplamı 1165 = UnoPIM 1165; 41 çift kod 7 Kasım'da Design'da çözülmüş (öneksiz kayıtlar çıkarıldı, `EDF-*` → `VRT-EDF-*` çevirisi); Design'ın 18 fotoğrafsız ürününden 13'ü UnoPIM'de görselli | `surec/ops-cevap-2026-11-07-galeri-ve-cift-kod.md`, `assets/veri/adres-model-dizin.json` (Venthub New) | KTL-86 |
 | 2026-11-09 | Bu defter ve ölçüm betiği kuruldu; ilk canlı ölçüm (yerel UnoPIM, salt okuma) | 1165 ürün, 106 aile; teknik alanlarda 115 kısmi + 156 ailede tamamen boş alan, 2841 boş hücre | KTL-86 |
 | 2026-11-09 | Ölçüm defteri `docs/olcum/pim-unopim.md` 5-8 Kasım işleriyle güncellendi | PR #2460 | KTL-85 |
@@ -36,7 +37,7 @@ Tüm satırların dayanağı: `node scripts/icerik-hatti/unopim-icerik-olc.mjs -
  "kaynak": {
   "unopimSonGuncelleme": "2026-11-07 19:59:31",
   "unopimUrunSayisi": 1165,
-  "tasarimGoruntuSha": "42c834b1b6ee4dc6b19a13a84399fa4e7d41e97c7c148e3ede1c9a7f274a1e40"
+  "tasarimGoruntuSha": "fb788565cc3e325a068b03c1954cf0177d091b7e7f289332f3ef1b50d453be13"
  },
  "urun": 1165,
  "aile": 106,
@@ -159,6 +160,14 @@ En çok boş hücresi olan 15 aile (66 ailede en az bir boşluk var; tam liste `
 | Tarih | Komut | Sonuç | Not |
 |---|---|---|---|
 | 2026-11-09 | `node scripts/icerik-hatti/tasarim-unopim-fark.mjs` | 1165 üründe fark 0: ad 1153 kontrol, açıklama 2330, kısa açıklama 2330, teknik 4130, marka 1165, kategori 1165 | Design anlık görüntüleri 1,9 ile 6,9 gün eski (11-09; en eskisi `ops-foto-urun-listesi-2026-11-02.csv`, eşik 7 gün aşılınca fark betiği çıkış 2 verir; yaş her koşuda betik çıkışından okunur). Teknik karşılaştırmada 454 ürünün Design karşılığı yok (kaynak UnoPIM'in kendisi) ve 12 ürün için ad kaynağı yok: "fark 0" bu ürünler için güvence değildir. Recep 9 Kasım'da Design'da teknik özellikleri yeniden kontrol ettiriyor; Design değişince anlık görüntüler `DesignSync` ile tazelenir ve betik yeniden koşar. |
+
+### 2.3b Design-İÇERİK ↔ UnoPIM model eşlemesi (`sku` alanı)
+
+Design-İÇERİK `veri/seri-veri-dizin-2026-11-02.json` her modele UnoPIM koduyla `sku` verir (katalog kodu → UnoPIM kodu); eşleme bu alanla yapılır, veri dosyasındaki `D` anahtarıyla değil (öneksiz `EDF-450` ile önekli `VRT-EDF-450` ikisi ayrı model gibi okunup çift üretiyordu).
+
+| Tarih | Komut | Sonuç | Not |
+|---|---|---|---|
+| 2026-11-10 | `node scripts/icerik-hatti/tasarim-unopim-fark.mjs --eski-kabul` (`icerikSku` bölümü) | İÇERİK 104 seri, 1163 model, 1162 tekil `sku`; `VRT-11313` iki seride (Ariett ve Punto Evo Flexo, bilinen çift). UnoPIM'de olup İÇERİK dizininde olmayan 3 ürün: `SEA-51201003`, `SEA-61102010`, `VRT-253100106XN`. İÇERİK'te olup UnoPIM'de olmayan sku: 0 | İÇERİK 9 Kasım cevabı 3 model farkı için "Lineo T ve 160 modelleri" adayını önermişti; ölçüm farkın bu üç SKU olduğunu gösterdi (tahmin yok, `sku` listeleri karşılaştırıldı). Dayanak: `_liste/ktl87-icerik-2026-11-10/seri-veri-dizin-2026-11-02.json` (arşiv deposu, sha256 `f3c1c63f84ed54ce53fe72fd5d4cfb1e6e5ad4f9e77b46621f82ba549100fb46`; bu dosya kaynak damgasına dahildir). 41 çift kod temizliği İÇERİK'in işi |
 
 ### 2.4 Doldurulması gereken (özet; ayrıntı depo dışında)
 

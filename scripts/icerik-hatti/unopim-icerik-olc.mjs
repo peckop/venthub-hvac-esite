@@ -51,6 +51,7 @@ const GORUNTU_KOKU = process.env.KATALOG_GORUNTU_KOKU || join(homedir(), 'VentHu
 const GORUNTULER = [
   'ktl80-faz-b-2026-11-04/seri-metin-ozet.json', 'ktl80-faz-b-2026-11-04/ad-tr.csv', 'ktl80-faz-b-2026-11-04/eksik60.json',
   'ktl82-faz-c-2026-11-04/kuru-harita.json', 'ktl82-faz-c-2026-11-04/aileler.json', 'ops-foto-urun-listesi-2026-11-02.csv',
+  'ktl87-icerik-2026-11-10/seri-veri-dizin-2026-11-02.json', // Design-İÇERİK `sku` dizini (KTL-87)
 ].map((d) => join(GORUNTU_KOKU, d))
 const tasarimGoruntuSha = GORUNTULER.every(existsSync) ? sha(GORUNTULER.map((d) => sha(readFileSync(d))).join('\n')) : null
 const kaynak = { unopimSonGuncelleme: unopimSon, unopimUrunSayisi: Number(unopimSay), tasarimGoruntuSha }
