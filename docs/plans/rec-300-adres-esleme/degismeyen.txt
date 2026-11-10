@@ -24,6 +24,7 @@
 /en/products/seat-serisi
 /en/products/storm-serisi
 /en/products/vortice-deumido-range
+/en/products/vortice-h-ad-elektrikli
 /en/products/vortice-hava-perdesi
 /en/products/vortice-isi-geri-kazanim
 /en/products/vortice-lineo

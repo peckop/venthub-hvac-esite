@@ -24,8 +24,7 @@ eski;yeni;kod;tur;kaynak;not
 /en/products/vortice-aksiyel-endustriyel-fanlar;/en/products/axial-fans;308;aile;canli-db;"Aile Design'da 3 seriye bölündü (vortice-vorticel-e, vortice-vorticel-a-e, vortice-vorticel-mp); tek seri hedefi yok, tür sayfasına gider"
 /en/products/vortice-bravo-s;/en/products/vortice-vortice-bravo-s;308;aile;canli-db;
 /en/products/vortice-deumido-nem-alma-cihazlari;/en/products/vortice-deumido-range;308;aile;canli-db;
-/en/products/vortice-h-ad-elektrikli;/en/products/vortice-hava-perdesi;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
-/en/products/vortice-h-ad-elektrikli-isiticili-hava-perdeleri;/en/products/vortice-hava-perdesi;308;aile;canli-db;
+/en/products/vortice-h-ad-elektrikli-isiticili-hava-perdeleri;/en/products/vortice-h-ad-elektrikli;308;aile;canli-db;
 /en/products/vortice-heatmaster-duman-egzoz-fanlari;/en/products/vortice-heatmaster-f400;308;aile;canli-db;
 /en/products/vortice-lineo-100-quiet;/en/products/vortice-lineo-quiet;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
 /en/products/vortice-lineo-125-quiet;/en/products/vortice-lineo-quiet;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
@@ -101,8 +100,8 @@ eski;yeni;kod;tur;kaynak;not
 /tr/products/vortice-bravo-s;/tr/urunler/vortice-vortice-bravo-s;308;aile;site-haritasi;
 /tr/products/vortice-deumido-nem-alma-cihazlari;/tr/urunler/vortice-deumido-range;308;aile;site-haritasi;
 /tr/products/vortice-deumido-range;/tr/urunler/vortice-deumido-range;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
-/tr/products/vortice-h-ad-elektrikli;/tr/urunler/vortice-hava-perdesi;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
-/tr/products/vortice-h-ad-elektrikli-isiticili-hava-perdeleri;/tr/urunler/vortice-hava-perdesi;308;aile;site-haritasi;
+/tr/products/vortice-h-ad-elektrikli;/tr/urunler/vortice-h-ad-elektrikli;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
+/tr/products/vortice-h-ad-elektrikli-isiticili-hava-perdeleri;/tr/urunler/vortice-h-ad-elektrikli;308;aile;site-haritasi;
 /tr/products/vortice-hava-perdesi;/tr/urunler/vortice-hava-perdesi;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
 /tr/products/vortice-heatmaster-duman-egzoz-fanlari;/tr/urunler/vortice-heatmaster-f400;308;aile;site-haritasi;
 /tr/products/vortice-isi-geri-kazanim;/tr/urunler/vortice-isi-geri-kazanim;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
