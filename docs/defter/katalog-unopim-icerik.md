@@ -13,6 +13,14 @@ Eski ölçüm ve işlem tarihçesi: `docs/olcum/pim-unopim.md` ("Ölçüm 2026-1
 
 ## 1 Ne yaptık
 
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:katalog-unopim-icerik etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs katalog-unopim-icerik --yaz · Üretildi: 2026-11-10 -->
+| Kapanış | Kart | İş | Sahip |
+|---|---|---|---|
+| 2026-11-10 | KTL-88 | katalog-unopim-icerik defteri | KATALOG |
+| 2026-11-10 | KTL-87 | UnoPIM içerik defteri ve Design↔UnoPIM fark betiği | KATALOG |
+| 2026-11-10 | KTL-86 | UnoPIM ürün içeriği yaşayan defteri | KATALOG |
+<!-- DEFTER-KANBAN:ne-yaptik BITIS -->
+
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
 | 2026-11-10 | Design-İÇERİK `sku` alanı (katalog kodu → UnoPIM kodu) fark betiğine ve kaynak damgasına bağlandı; İÇERİK 1162 ↔ UnoPIM 1165: fark 3 SKU (`SEA-51201003`, `SEA-61102010`, `VRT-253100106XN`) | 2.3b; `tasarim-unopim-fark.mjs` `icerikSku` | KTL-87 |
@@ -180,6 +188,12 @@ Design-İÇERİK `veri/seri-veri-dizin-2026-11-02.json` her modele UnoPIM koduyl
 | Ölçülmedi | Boşluğun "kaynakta değer var, yazılmamış" mı "kaynakta zaten yok" mu olduğu 271 aile×alan için ayrıştırılmadı | Ayrıştırma kaynak dizini + Design kontrolüyle yapılır (3. bölüm) |
 
 ## 3 Sırada ve yapılabilecekler
+
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:katalog-unopim-icerik etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs katalog-unopim-icerik --yaz · Üretildi: 2026-11-10 -->
+| Kart | İş | Durum | Sahip |
+|---|---|---|---|
+| KTL-89 | katalog-unopim-icerik defteri | To Do | KATALOG |
+<!-- DEFTER-KANBAN:sirada BITIS -->
 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|

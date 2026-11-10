@@ -6,6 +6,7 @@
  * KULLANIM
  *   node scripts/icerik-hatti/unopim-icerik-olc.mjs                 ölç, özeti yaz (stdout), ayrıntıyı --cikti klasörüne yaz
  *   node scripts/icerik-hatti/unopim-icerik-olc.mjs --kontrol       ölç ve defterdeki özet bloğuyla kıyasla (manifest `olcum`)
+ *   node scripts/icerik-hatti/unopim-icerik-olc.mjs --iz            ucuz kaynak parmak izi, tek satır (manifest `kaynakIzi`)
  *   node scripts/icerik-hatti/unopim-icerik-olc.mjs --md            defter tabloları için markdown üret (stdout)
  *   --defter <yol>  (varsayılan docs/defter/katalog-unopim-icerik.md) · --cikti <klasör> (varsayılan ~/VentHub-Gorsel-Arsiv/_liste/unopim-icerik-olcum)
  * ÇIKIŞ (defter standardı D2.4): 0 tutarlı/ölçüldü · 1 defter ile canlı arasında sapma · 2 ölçülemedi (Docker kapalı, blok yok).
@@ -31,6 +32,33 @@ function psql(sorgu) {
     { encoding: 'utf8', maxBuffer: 1 << 29 }).split('\n').filter(Boolean)
 }
 
+const sha = (t) => createHash('sha256').update(t).digest('hex')
+/**
+ * Kaynak damgası (tetik = kaynak değişikliği, ölçüm kör koşmaz): UnoPIM son ürün güncellemesi + ürün sayısı,
+ * Design anlık görüntü dosyalarının (fark betiğinin okuduğu dosyalar + İÇERİK `sku` dizini, KTL-87) birleşik sha256'sı.
+ * Ucuzdur (tek SQL + dosya özeti); ölçülemezse çıkış 2.
+ */
+function kaynakDamgasi() {
+  let son, say
+  try { [son, say] = psql('select max(updated_at)::text, count(*) from products')[0].split('	') } catch (e) { olculemedi(`kaynak damgası okunamadı (Docker açık mı?): ${String(e.message).slice(0, 120)}`) }
+  const kok = process.env.KATALOG_GORUNTU_KOKU || join(homedir(), 'VentHub-Gorsel-Arsiv', '_liste')
+  const dosyalar = [
+    'ktl80-faz-b-2026-11-04/seri-metin-ozet.json', 'ktl80-faz-b-2026-11-04/ad-tr.csv', 'ktl80-faz-b-2026-11-04/eksik60.json',
+    'ktl82-faz-c-2026-11-04/kuru-harita.json', 'ktl82-faz-c-2026-11-04/aileler.json', 'ops-foto-urun-listesi-2026-11-02.csv',
+    'ktl87-icerik-2026-11-10/seri-veri-dizin-2026-11-02.json',
+  ].map((d) => join(kok, d))
+  const tasarimGoruntuSha = dosyalar.every(existsSync) ? sha(dosyalar.map((d) => sha(readFileSync(d))).join('\n'))
+    : null
+  return { unopimSonGuncelleme: son, unopimUrunSayisi: Number(say), tasarimGoruntuSha }
+}
+
+// --iz: manifest `kaynakIzi` (ARC-291). Ucuz parmak izi, stdout TEK satır; ölçümü koşturmaz. Çıkış 0 iz üretildi, 2 ölçülemedi.
+if (bayrak('--iz')) {
+  const k = kaynakDamgasi()
+  console.log(`unopim=${k.unopimSonGuncelleme}|${k.unopimUrunSayisi};tasarim=${k.tasarimGoruntuSha ? k.tasarimGoruntuSha.slice(0, 16) : 'yok'}`)
+  process.exit(0)
+}
+
 let urunler, aileAlanlari
 try {
   urunler = psql('select p.sku, a.code, p.status::text, p.values::text from products p join attribute_families a on a.id=p.attribute_family_id order by p.sku')
@@ -42,19 +70,7 @@ try {
 } catch (e) { olculemedi(`UnoPIM veritabanına erişilemedi (Docker açık mı?): ${String(e.message).slice(0, 160)}`) }
 if (!urunler.length) olculemedi('UnoPIM\'de ürün okunamadı (0 satır)')
 
-const sha = (t) => createHash('sha256').update(t).digest('hex')
-// Kaynak damgası (tetik = kaynak değişikliği, ölçüm kör koşmaz): UnoPIM son ürün güncellemesi + ürün sayısı,
-// Design anlık görüntü dosyalarının (fark betiğinin okuduğu altı dosya) birleşik sha256'sı.
-let unopimSon, unopimSay
-try { [unopimSon, unopimSay] = psql('select max(updated_at)::text, count(*) from products')[0].split('\t') } catch (e) { olculemedi(`kaynak damgası okunamadı: ${String(e.message).slice(0, 120)}`) }
-const GORUNTU_KOKU = process.env.KATALOG_GORUNTU_KOKU || join(homedir(), 'VentHub-Gorsel-Arsiv', '_liste')
-const GORUNTULER = [
-  'ktl80-faz-b-2026-11-04/seri-metin-ozet.json', 'ktl80-faz-b-2026-11-04/ad-tr.csv', 'ktl80-faz-b-2026-11-04/eksik60.json',
-  'ktl82-faz-c-2026-11-04/kuru-harita.json', 'ktl82-faz-c-2026-11-04/aileler.json', 'ops-foto-urun-listesi-2026-11-02.csv',
-  'ktl87-icerik-2026-11-10/seri-veri-dizin-2026-11-02.json', // Design-İÇERİK `sku` dizini (KTL-87)
-].map((d) => join(GORUNTU_KOKU, d))
-const tasarimGoruntuSha = GORUNTULER.every(existsSync) ? sha(GORUNTULER.map((d) => sha(readFileSync(d))).join('\n')) : null
-const kaynak = { unopimSonGuncelleme: unopimSon, unopimUrunSayisi: Number(unopimSay), tasarimGoruntuSha }
+const kaynak = kaynakDamgasi()
 
 const sonuc = doluluk(urunler, aileAlanlari)
 const blok = ozetBlogu(sonuc, kaynak)
