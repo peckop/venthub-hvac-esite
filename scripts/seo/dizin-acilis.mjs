@@ -103,7 +103,29 @@ export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = pr
   }
 }
 
+/**
+ * Sabah özeti için TEK satır (SEO-103, OPS): Google dizin isteği kuyruğunda bekleyen adres sayısı. Kaynak: arşivdeki en son
+ * anlık görüntü (Google'ın kendi ölçümü: YAP + TEKRAR). Kuyruk boşalana kadar sayı görünür, 0 olunca "boş" der.
+ * Anlık görüntü yoksa "ölçülemedi" (asla "boş" değil); bugünden eskiyse BAYAT notu düşer. Ham adres basılmaz. SALT-OKUMA.
+ */
+export function kuyrukSatiri({ klasor = arsivKlasoru(), simdi = Date.now() } = {}) {
+  try {
+    const anlik = enSonAnlik(klasor)
+    if (!anlik) return 'Google dizin kuyruğu ölçülemedi: arşivde anlık görüntü yok'
+    const n = sayilar(anlik.tablo).google
+    const gun = anlik.gun.slice(5).split('-').reverse().join('.')
+    const bayat = anlik.gun < trGun(simdi) ? `, BAYAT: ${gun} ölçümü` : `, ölçüm ${gun}`
+    return n > 0 ? `Google dizin kuyruğunda ${n} adres bekliyor${bayat}` : `Google dizin kuyruğu boş${bayat}`
+  } catch {
+    return 'Google dizin kuyruğu ölçülemedi'
+  }
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  if (process.argv.includes('--kuyruk')) {
+    console.log(kuyrukSatiri())
+    process.exit(0)
+  }
   try {
     const satir = calistir({ baslat: !process.argv.includes('--sadece-satir') })
     if (satir) console.log(satir)
