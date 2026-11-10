@@ -7,8 +7,8 @@
 > departman alanını yaşayan defterle işletir; üç ay sonra yeni söz gelince departman önce deftere bakar; model
 > inisiyatifine bırakılmaz, kanca, CI ve zamanlı ölçüm zorlar.
 > **Sahibi:** HARİTA (biçim ve manifest); her defterin içeriğinin sahibi o departmandır.
-> **Son doğrulama:** 2026-11-09.
-> **Kayıt:** OPS-258, HRT-124 (tasarım notu `docs/plans/departman-defter-duzeni-2026-11-09.md`), HRT-125.
+> **Son doğrulama:** 2026-11-10 (HARİTA; ARC-291 betikleri `scripts/hijyen/defter-kartlari.cjs` ve `defter-envanter.cjs` master'da okundu, D3, D4 ve D8 onlara karşı yazıldı).
+> **Kayıt:** OPS-258, HRT-124 (tasarım notu `docs/plans/departman-defter-duzeni-2026-11-09.md`), HRT-125, HRT-129, HRT-131.
 > **İlgili:** `belge-yonetimi-standard.md` (başlık bloğu, tazelik), `docs/olcum/README.md` (ölçüm defterleri),
 > `fleet-mechanism-standard.md` (kanca, CI), `is-kayit-duzeni-standard.md` (Kanban).
 
@@ -53,8 +53,8 @@ eskiler `docs/archive/` altına tarihçe olarak taşınır.
 **İş bölümlerinin kaynağı (ARC-291, HRT-129).** Defterin iş bölümleri, yani **1 Ne yaptık** ve **3 Sırada**, elle yazılmaz;
 `defter:<ad>` etiketli Kanban kartlarından betikle üretilir (üretici ARAÇ'ındır, `<ad>` manifestteki `ad`dir). Elle yazılan
 yalnız kapsam (başlıktaki alan tanımı) ve **4 Kararlar** bölümüdür; **2 Envanter** ölçümle gelir (D2.4). Defterin işini
-taşıyan kart etiketsiz açılmaz: etiketsiz kart bölüme girmez, iş defterde görünmez. Kural üretici betik yayına girene kadar
-geçişlidir: eski elle yazılmış satırlar yerinde kalır, yeni satır etiketli karttan gelir.
+taşıyan kart etiketsiz açılmaz: etiketsiz kart bölüme girmez, iş defterde görünmez. Üretici yayındadır (D8); eski elle
+yazılmış satırlar yerinde kalır, sahibi taşır ya da siler, yeni satır etiketli karttan gelir.
 
 ## D4 — Tazelik
 
@@ -90,6 +90,32 @@ Tek liste: `docs/defter/manifest.json`. Açılış satırı, önceki-çalışma 
 | PR kapısı | İzlenen yol değişti, defter değişmedi → kırmızı; `Defter-gerekmez: <sebep>` istisnası; bot muaf; ilk iki hafta uyarı kipi; manifest yapı testi | ALTYAPI |
 | Depo dışı ölçüm | Önce açılış tetikli kalıp (GEO-SEO emsali); zamanlayıcı ve API sırrı Recep kararı (karar 53) | ALTYAPI / OPS |
 | Manifest yapı testi, rol kartı satırı, Recep sayfası | Şema, sahip, dosya var, izlenen yol var | HARİTA |
+| Kartlardan üretim (D8) | `defter-kartlari.cjs`: 1 ve 3. bölüm blokları; `--kontrol` Kanban'la ayrışmayı söyler; CI yalnız blok biçimini ve `Üretildi:` damgasını ölçer | ARAÇ |
+| Envanter ölçümü (D8) | `defter-envanter.cjs`: kaynak izine bakar, iz değişince ölçüm sonucunu 2. bölüm bloğuna yazar | ARAÇ |
+| Günlük Sabah özeti (D8) | Her gün `--kontrol` ve envanteri salt okuma kipinde koşar, ayrışmayı defterin sahibine gösterir | OPS (görev), ARAÇ (betik) |
 
 Kanca bloklamaz, defter içeriğinin doğruluğunu yargılamaz, başkasının defterini damgalamaz; bunlar ARAÇ görüşünde
 (`docs/audits/departman-defter-kanca-gorusu-2026-11-09.md`) gerekçeleriyle yazılıdır.
+
+## D8 — İşleyiş: kim ne zaman ne koşar (ARC-291, HRT-131)
+
+Tek cümle: **ölçen ve gösteren otomatiktir, yazan sahibidir.** Betikler (`scripts/hijyen/`, ARAÇ'ın) defteri kendiliğinden
+değiştirmez; ayrışmayı gösterir, güncellemeyi defterin sahibi yapar.
+
+| Bölüm | Üreten | Okuma kipi (otomatik, salt okuma) | Yazma (sahibin işi) |
+|---|---|---|---|
+| 1 Ne yaptık, 3 Sırada | `node scripts/hijyen/defter-kartlari.cjs <ad>` (`defter:<ad>` etiketli kartlar) | `--kontrol` (`--hepsi --kontrol` tüm defterler); çıkış hep 0, ölçülemedi ayrı satır, tablo uydurulmaz | `--yaz`: işaretli bloğu günceller |
+| 2 Envanter | `node scripts/hijyen/defter-envanter.cjs <ad>` (manifest `kaynakIzi` ve D4) | `--kontrol`, `--iz` | `--yaz`: 2. bölüm bloğunu günceller |
+| Kapsam, 4 Kararlar | Elle, sahibi | — | Sahibi |
+
+1. **Günlük kontrol.** Sabah özeti görevi her gün `defter-kartlari.cjs --hepsi --kontrol` ve envanteri okuma kipinde koşar;
+   sapmayı (blok bayat, kart eklenmiş, iz değişmiş, ölçülemedi) defterin sahibine gösterir. Hiçbir otomatik koşu defter
+   dosyasını yazmaz ve PR açmaz.
+2. **Güncelleme sahibin işidir.** Sahibi `--yaz` ile bloğu üretir, kapsam ve kararlar bölümünü elle günceller, küçük bir
+   PR açar (gövdede `Kanban:` satırı). İzlenen yolu değiştiren PR defteri de değiştirir (D2.3); `Defter-gerekmez` istisnası
+   geçerlidir.
+3. **CI'nın sınırı.** Kanban yereldir, CI onu okuyamaz: CI yalnız blok biçimini ve `Üretildi:` damgasının varlığını ölçer.
+   Kartla defter arasındaki uyuşmazlığı günlük kontrol ve elle koşu görür; CI'nın yeşili "defter güncel" demek değildir.
+4. **Kapsam.** `defter-envanter.cjs` bugün yalnız `yeni-site-gecis` defterinin 2. bölümünü bilir; başka defter kaynak izli
+   envanter isterse betiğe okuyucu eklenir (ARAÇ'a kart), cetvel değişmez. Ölçümü olmayan defterin 2. bölümü elle yazılır
+   ve D3'ün "yolu olmayan satır iddiadır" kuralına uyar.
