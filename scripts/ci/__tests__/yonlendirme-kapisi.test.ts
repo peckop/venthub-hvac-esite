@@ -133,7 +133,7 @@ describe('INV-YONLENDIRME-TABLO-1 · yakalananlar', () => {
     expect(olc('')).toContain('BOS-TABLO')
     expect(olc(kapi.BASLIK + '\n')).toEqual(['BOS-TABLO'])
   })
-  it('ESKI-CANLI (A5): eski adres yaşayan listede ise 308 de 410 da kırmızı; ?sku= satırı ve bilinen iki istisna hariç', () => {
+  it('ESKI-CANLI (A5): eski adres yaşayan listede ise 308 de 410 da kırmızı; ?sku= satırı hariç; istisna kümesi boş', () => {
     const liste = new Set(['/tr/x', '/tr/y', '/tr/z', '/tr/z2', '/tr/a'])
     const csv = [kapi.BASLIK, '/tr/x;/tr/y;308;aile;canli-db;', '/tr/z;;410;aile;canli-db;'].join('\n')
     expect(olc(csv, { hedefler: liste })).toEqual(['ESKI-CANLI', 'ESKI-CANLI'])
@@ -141,7 +141,8 @@ describe('INV-YONLENDIRME-TABLO-1 · yakalananlar', () => {
     const sku = [kapi.BASLIK, '/tr/a?sku=1;/tr/y;308;model;canli-db;'].join('\n')
     expect(olc(sku, { hedefler: liste })).toEqual([]) // sorgulu eski adres sayfa değildir
     const bilinen = [kapi.BASLIK, '/en/products/vortice-h-ad-elektrikli;/en/products/vortice-hava-perdesi;308;takma-ad;takma-ad;'].join('\n')
-    expect(olc(bilinen, { hedefler: new Set(['/en/products/vortice-h-ad-elektrikli', '/en/products/vortice-hava-perdesi']) })).toEqual([])
+    // İstisna kümesi BOŞ (URN-157 çelişkileri #2478/#2479 ile düzeldi): eski iki adres artık kırmızı verir, susturulamaz.
+    expect(olc(bilinen, { hedefler: new Set(['/en/products/vortice-h-ad-elektrikli', '/en/products/vortice-hava-perdesi']) })).toEqual(['ESKI-CANLI'])
   })
   it('HEDEF-YOK: yaşayan adres listesi verilince listede olmayan hedef; liste verilmezse ölçülmez', () => {
     const yasayan = new Set(['/tr/urunler/fanlar', '/en/products/fans', '/tr/urunler/vortice-lineo', '/tr/urunler/vortice-lineo-lnq-100'])
