@@ -20,6 +20,7 @@ interface Defter {
   tazelikGun: number
   tetik: string[]
   olcum: string | null
+  kaynakIzi?: string
   disKaynak: string | null
   durum: string
 }
@@ -77,6 +78,8 @@ describe('defter manifest yapı kapısı', () => {
       ['tetik bilinmeyen', (m) => ((m.defterler[0].tetik = ['sure', 'rastgele']), m), /tetik/],
       ['durum bilinmeyen', (m) => ((m.defterler[0].durum = 'belki'), m), /durum/],
       ['aktif ama olcum null', (m) => ((m.defterler[0].durum = 'aktif'), (m.defterler[0].olcum = null), m), /olcum/],
+      ['kaynakIzi boş string', (m) => ((m.defterler[0].olcum = 'node x'), (m.defterler[0].kaynakIzi = ' '), m), /kaynakIzi/],
+      ['kaynakIzi var ama olcum null', (m) => ((m.defterler[0].olcum = null), (m.defterler[0].kaynakIzi = 'node x --iz'), m), /kaynakIzi varsa olcum/],
       ['disKaynak var tetik dis-kaynak yok', (m) => ((m.defterler[0].disKaynak = 'gsc'), (m.defterler[0].tetik = ['kart-kapanisi', 'sure']), m), /dis-kaynak/],
       ['disKaynak bilinmeyen', (m) => ((m.defterler[0].disKaynak = 'bilinmeyen'), m), /disKaynak/],
     ]

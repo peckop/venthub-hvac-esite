@@ -50,7 +50,8 @@
       ],
       "tazelikGun": 7,
       "tetik": ["kart-kapanisi", "sure"],
-      "olcum": null,
+      "olcum": "node scripts/hijyen/defter-envanter.cjs yeni-site-gecis",
+      "kaynakIzi": "node scripts/hijyen/defter-envanter.cjs yeni-site-gecis --iz",
       "disKaynak": null,
       "durum": "pilot"
     },

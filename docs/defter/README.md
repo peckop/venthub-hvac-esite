@@ -63,6 +63,7 @@ Tek liste; açılış satırı, önceki-çalışma taraması, PR kapısı, rol k
 | `tazelikGun` | `Son doğrulama` eşiği (varsayılan 14). |
 | `tetik` | `kart-kapanisi`, `sure`, `dis-kaynak` değerlerinden en az ikisi (cetvel D2.3). |
 | `olcum` | Tutarlılık kontrol komutu (cetvel D2.4) ya da `null` (kontrolsüz). |
+| `kaynakIzi` | İsteğe bağlı (ARC-291). Ölçümden önce koşan UCUZ parmak izi komutu: stdout tek satır, çıkış 0 = iz üretildi, 2 = ölçülemedi. İz önceki koşuyla aynıysa `olcum` koşmaz, defter "kaynak değişmedi, son ölçüm X" der. **Ölçülemedi asla "değişmedi" sayılmaz** (cetvel D2.4 ile aynı ilke). `olcum` dolu değilse `kaynakIzi` olamaz. |
 | `disKaynak` | Depo dışı kaynak adı (`gsc`, `unopim`, `design`) ya da `null`. Ham veri depoya girmez. |
 | `durum` | `planli` (dosya henüz yok) · `pilot` · `aktif` (`olcum` dolu) · `kontrolsuz` · `emekli`. |
 
@@ -75,7 +76,7 @@ var, aynı dosya iki kayıtta yok, `aktif` kaydın `olcum`'u dolu, şema alanlar
 |---|---|---|
 | urun-adres | URUN | Pilot (URN-158): canlı adres şeması, yönlendirme katmanları, bayraklar; `olcum` henüz yok (kontrolsüz pilot), URN-157 geçiş tablosu "Sırada"da |
 | geo-seo-dizin | GEO-SEO | Pilot (SEO-101): depo-güvenli özet, `olcum` = `node scripts/seo/dizin-defter-kontrol.mjs` (arşivdeki son anlık görüntüyle sayı karşılaştırır; ham veri depoya girmez) |
-| yeni-site-gecis | OPS | Pilot (HRT-128): yeni site geçişi tek süreç (kararlar, Design eksikleri, adres/UnoPIM/önizleme/dizin bağları, sıradaki işler); `olcum` henüz yok (kontrolsüz pilot) |
+| yeni-site-gecis | OPS | Pilot (HRT-128): yeni site geçişi tek süreç (kararlar, Design eksikleri, adres/UnoPIM/önizleme/dizin bağları, sıradaki işler); `olcum` = `node scripts/hijyen/defter-envanter.cjs yeni-site-gecis` ("2 Envanter" bloğu), `kaynakIzi` = aynı betik `--iz` (ARC-291) |
 | katalog-unopim-icerik | KATALOG | Pilot (KTL-86): UnoPIM ürün içeriği alan × doluluk, Design↔UnoPIM fark, doldurulması gerekenler; `olcum` = `node scripts/icerik-hatti/unopim-icerik-olc.mjs --kontrol` (canlı yerel UnoPIM, salt okuma; Docker kapalıysa çıkış 2) |
 
 Yeni defter eklemek: önce manifest kaydı (`durum: planli`), sonra dosya, sonra `pilot`/`aktif`.

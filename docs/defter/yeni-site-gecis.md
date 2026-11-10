@@ -23,12 +23,13 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 ## 1 Ne yaptık
 
-<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-10 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
-| 2026-11-09 | URN-159 | adres-semasi-standard.md 2 Kasım tek önek kararına göre güncelle (/urunler, /uygulama-alanlari, /rehber; EN products/applications/guides) | URUN |
-| 2026-11-09 | KTL-85 | docs/olcum/pim-unopim.md defterini 4 Kasım sonrası işlerle güncelle (fiyat/KDV, galeri/alt metin, Design fazla 41) | KATALOG |
-| 2026-11-08 | KTL-82 | UnoPIM Faz C: kategori ağacı + marka + galeri/alt metin; fiyat-KDV-stok kaynak önerisi (KTL-80 devamı) | KATALOG |
+| 2026-11-10 | KTL-86 | UnoPIM ürün içeriği yaşayan defteri | KATALOG |
+| 2026-11-09 | URN-159 | adres-semasi-standard.md 2 Kasım tek önek kararına göre güncelle | URUN |
+| 2026-11-09 | KTL-85 | docs/olcum/pim-unopim.md defterini 4 Kasım sonrası işlerle güncelle | KATALOG |
+| 2026-11-08 | KTL-82 | UnoPIM Faz C | KATALOG |
 <!-- DEFTER-KANBAN:ne-yaptik BITIS -->
 
 | Tarih | İş | Sonuç | Kart |
@@ -42,6 +43,15 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 | 2026-11-01 | Yeni site geçiş planı ve katalog şeması taslağı yazıldı | `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md` | OPS-180 |
 
 ## 2 Envanter
+
+<!-- DEFTER-OLCUM:envanter BASLA — kaynak izi değişince ölçülür, değişmediyse bayat sayılmaz; node scripts/hijyen/defter-envanter.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-10 -->
+| Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |
+|---|---|---|---|
+| Design ↔ UnoPIM fark | 1165 üründe fark 0; teknik değer: 4130 kontrol, 0 fark | 2026-11-10 | kaynak değişmedi — son ölçüm 2026-11-10 |
+| UnoPIM görsel / fiyat-KDV | görsel 1157/1165 (11-04) · liste fiyatı 343/1165 yazıldı, kaynakta 348 (11-05) · KDV %20: 1165/1165 (11-05) | 2026-11-05 | kaynak değişmedi — son ölçüm 2026-11-05 |
+| Adres eşleştirme kapsama | taslak 2402 satır; slug kapsamı kategori 28/29, ürün 6/47, marka 0/7, bilgi merkezi 0/6 | 2026-11-04 | kaynak değişmedi — son ölçüm 2026-11-04 |
+| Dizin | SAPMA (anlikGoruntu, gun, sha256, kararlar, olculemeyen): arşivde daha yeni anlık görüntü var (defter 2026-11-09, arşiv 2026-11-10); defterin ÖZET blo | 2026-11-10 | ölçüldü |
+<!-- DEFTER-OLCUM:envanter BITIS -->
 
 Ölçüm tarihi 2026-11-09 (içerik 6 Kasım listesinden devralındı; sayı yanında kaynak kartı yazılıdır, bu turda yeniden ölçülmemiştir).
 
@@ -77,18 +87,16 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 ## 3 Sırada ve yapılabilecekler
 
-<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-09 -->
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:yeni-site-gecis etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs yeni-site-gecis --yaz · Üretildi: 2026-11-10 -->
 | Kart | İş | Durum | Sahip |
 |---|---|---|---|
-| ALT-177 | Yeni site geçişi: rota dili (dil öneki, A9 307/308, A10 dil tespiti), arama sayfası yönlendirmesi ve yönlendirme haritası CI kapıları (geçiş | Backlog | ALTYAPI |
-| KTL-86 | UnoPIM ürün içeriği yaşayan defteri (docs/defter/katalog-unopim-icerik.md) + ölçüm betiği + manifest satırı | To Do | KATALOG |
-| OPS-180 | Yeni vitrin geçişi: Design (Menü S5, İçerik 1.061 model, Adres Şeması v3) + site + geçmiş işler tek resim ve geçiş planı | To Do | OPS |
-| OPS-219 | Design İçerik'e KTL-80 eksik içerik notu: NIC AT 8 özet, 51 ürün seri kaydı, SEA-61102010 adı | To Do | OPS |
-| OPS-220 | Design Venthub New'e yeni site kanal tipi fan kategori girdisi (SEO-83: kesit ayrımı, çeşit tablosu, teklif metni, aile dengesi) | To Do | OPS |
-| OPS-228 | Claude Design 14 Aralık'ta kapanıyor: projelerin Claude'a taşınması (yedek + ölçüm + taşıma planı) | Backlog | OPS |
-| OPS-260 | Design'da 41 model iki ayrı kodla duruyor (DAN-80141=AVE-80141, EDF-*=VRT-EDF-*); UnoPIM'de tek — Design'da tekilleştirilsin mi (Recep) | Backlog | OPS |
-| SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm: 308 listesini canlı adreslere karşı sına, Search Console /urunler/ ve /rehber/ süzgeçleri (Recep | Backlog | GEO-SEO |
-| URN-157 | Yeni siteye geçişte eski→yeni adres eşleştirme tablosu + 308 yönlendirme (kaynak: canlı site haritası → Design envanteri; adres-semasi-stand | Backlog | URUN |
+| ALT-177 | Yeni site geçişi | Backlog | ALTYAPI |
+| OPS-180 | Yeni vitrin geçişi | To Do | OPS |
+| OPS-219 | Design İçerik'e KTL-80 eksik içerik notu | To Do | OPS |
+| OPS-220 | Design Venthub New'e yeni site kanal tipi fan kategori girdisi | To Do | OPS |
+| OPS-228 | Claude Design 14 Aralık'ta kapanıyor | Backlog | OPS |
+| SEO-76 | Tek önekli adres şeması yayın öncesi ölçüm | Backlog | GEO-SEO |
+| URN-157 | Yeni siteye geçişte eski→yeni adres eşleştirme tablosu + 308 yönlendirme | Backlog | URUN |
 <!-- DEFTER-KANBAN:sirada BITIS -->
 
 Sıra yol haritasındandır; üç iş aynı anda yürür, sonra ortak kontrol, en son canlıya aktarım. Ana kart OPS-180.

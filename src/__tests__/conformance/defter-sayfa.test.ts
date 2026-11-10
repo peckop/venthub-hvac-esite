@@ -79,6 +79,23 @@ describe('defter-sayfa: ayıklama', () => {
     expect(v.siradaToplam).toBe(4)
   })
 
+  it('Kanban\'dan üretilmiş bloklarda kart no değil İŞ başlığı görünür (OPS kusuru)', () => {
+    const uretilmis = [
+      'Son doğrulama: 2026-11-09',
+      '## 1 Ne yaptık',
+      '| Kapanış | Kart | İş | Sahip |',
+      '|---|---|---|---|',
+      '| 2026-11-09 | URN-160 | Adres tablosu hazır | URUN |',
+      '## 3 Sırada',
+      '| Kart | İş | Durum | Sahip |',
+      '|---|---|---|---|',
+      '| ALT-177 | Önizleme adresi | In Progress | ALTYAPI |',
+    ].join('\n')
+    const v = ds.ayikla(uretilmis)
+    expect(v.sonIs).toEqual({ tarih: '2026-11-09', is: 'URN-160: Adres tablosu hazır' })
+    expect(v.sirada[0]).toEqual({ madde: 'Önizleme adresi', oncelik: 'In Progress', kart: 'ALT-177' })
+  })
+
   it('bozuk/boş metinde fırlatmaz: alanlar null/boş', () => {
     const v = ds.ayikla('rastgele metin')
     expect(v).toEqual({ sonDogrulama: null, sonIs: null, siradaToplam: 0, sirada: [] })
@@ -105,6 +122,44 @@ describe('defter-sayfa: kart halleri (kör sayfa değil)', () => {
   it('tazelikGun defter başına: aynı yaş, kısa eşikte bayat', () => {
     const r = ds.sayfaUret(man(kayit({ tazelikGun: 7 })), okuyucu(DEFTER), '2026-11-09')
     expect(r.kartlar[0].hal).toBe('bayat')
+  })
+
+  describe('kaynakIzi (ARC-291): kaynak değişmediyse süre dolsa da bayat değil, AYRI hal', () => {
+    const blok = (satir: string, uretildi: string) =>
+      `<!-- DEFTER-OLCUM:envanter BASLA — x · Üretildi: ${uretildi} -->\n| Ölçüm | Son sonuç | Ölçüm tarihi | Kaynak izi |\n|---|---|---|---|\n${satir}\n<!-- DEFTER-OLCUM:envanter BITIS -->`
+    const metin = (satir: string, uretildi = '2026-11-30') => DEFTER.replace('| 1 | 2 |', `| 1 | 2 |\n\n${blok(satir, uretildi)}`)
+    const TEMIZ = '| Fark | 1165 üründe fark 0 | 2026-11-05 | kaynak değişmedi — son ölçüm 2026-11-05 |'
+    const izli = kayit({ olcum: 'node x', kaynakIzi: 'node x --iz' })
+
+    it('eşik aşıldı + tüm satırlar temiz → kaynak-degismedi (taze değil, bayat değil); Son doğrulama günü görünür', () => {
+      const r = ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ)), '2026-12-01')
+      expect(r.kartlar[0].hal).toBe('kaynak-degismedi')
+      expect(r.html).toContain('class="kart kaynak-degismedi"')
+      expect(r.html).toContain('Son doğrulama 2026-11-01')
+    })
+    it('sabotaj: bekleyen ya da ölçülemeyen satır varsa yine BAYAT', () => {
+      for (const s of ['| Fark | x | 2026-11-05 | ⚠ kaynak DEĞİŞTİ, ölçüm bekliyor |', '| Adres | x | 2026-11-04 | ⚠ ölçülemedi (iz üretilemedi) |']) {
+        expect(ds.sayfaUret(man(izli), okuyucu(metin(s)), '2026-12-01').kartlar[0].hal, s).toBe('bayat')
+      }
+    })
+    it('sabotaj (E1): ESKİ blok (betik koşmamış) "kaynak değişmedi" yazsa da BAYAT', () => {
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ, '2026-01-01')), '2026-12-01').kartlar[0].hal).toBe('bayat')
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ, '2026-11-16')), '2026-12-01').kartlar[0].hal).toBe('bayat') // 14 gün + 1
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ, '2026-11-16').replace(/\n/g, '\r\n')), '2026-12-01').kartlar[0].hal).toBe('bayat')
+    })
+    it('sabotaj (E1): yalnız "ölçüldü" satırları kaynak değişmedi anlamına gelmez', () => {
+      const s = '| Dizin | TUTARLI | 2026-12-01 | ölçüldü |'
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(s, '2026-12-01')), '2026-12-01').kartlar[0].hal).toBe('bayat')
+    })
+    it('"ölçüldü" satırı "kaynak değişmedi" satırıyla birlikte olabilir (dizin gibi izsiz kaynak)', () => {
+      const s = `${TEMIZ}\n| Dizin | TUTARLI | 2026-12-01 | ölçüldü |`
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(s, '2026-12-01')), '2026-12-01').kartlar[0].hal).toBe('kaynak-degismedi')
+    })
+    it('sabotaj: manifestte kaynakIzi yoksa ya da blok yoksa BAYAT; eşik içinde TAZE kalır', () => {
+      expect(ds.sayfaUret(man(kayit()), okuyucu(metin(TEMIZ)), '2026-12-01').kartlar[0].hal).toBe('bayat')
+      expect(ds.sayfaUret(man(izli), okuyucu(DEFTER), '2026-12-01').kartlar[0].hal).toBe('bayat')
+      expect(ds.sayfaUret(man(izli), okuyucu(metin(TEMIZ)), '2026-11-09').kartlar[0].hal).toBe('taze')
+    })
   })
 
   it('Son doğrulama satırı yoksa ya da dosya okunamıyorsa "ölçülemedi" ve kırmızı (taze DEĞİL)', () => {
