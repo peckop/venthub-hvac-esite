@@ -46,15 +46,11 @@ const VARSAYILAN_YOL = 'docs/plans/rec-300-adres-esleme/eski-yeni.csv'
 const VARSAYILAN_HEDEFLER = 'docs/plans/rec-300-adres-esleme/yeni-site-adresleri.txt'
 
 /**
- * BİLİNEN ÇELİŞKİLER (ESKİ-CANLI): URN-157 tablosunda eski adresi yeni sitenin yaşayan listesinde de bulunan iki satır
- * (ortak EN `/en/products/` öneki; denetçi ölçümü 10 Kasım). URUN/Design "liste mi bayat, tablo mu yanlış" cevabını verene dek
- * kapıyı kırmızıya çevirmesin diye BURADA, adıyla, tek tek durur. Cevap gelince satır tablodan ya da listeden düzeltilir ve
- * bu küme boşaltılır; yeni bir çelişki bu kümeye EKLENEREK susturulamaz (kümeyi değiştirmek bu dosyada görünür bir diff'tir).
+ * BİLİNEN ÇELİŞKİLER (ESKİ-CANLI): BOŞ (10 Kasım). URN-157 tablosundaki iki çelişki (ortak EN `/en/products/` öneki) URUN
+ * tarafından düzeltildi (#2478, #2479) ve geçici istisna kaldırıldı. Küme bir kaçış kapağı olarak durur ama yeni bir çelişki bu
+ * kümeye EKLENEREK susturulmamalı: ekleme bu dosyada görünür bir diff'tir ve bağımsız denetçi okumadan birleşmez.
  */
-const BILINEN_ESKI_CANLI = new Set([
-  '/en/products/vortice-h-ad-elektrikli',
-  '/en/products/vortice-vort-commercial-in-line-circular',
-])
+const BILINEN_ESKI_CANLI = new Set([])
 
 function csvAyristir(metin) {
   const satirlar = []
