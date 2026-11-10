@@ -55,7 +55,7 @@ Farklı eski adres aynı yeni adrese gider. Teknik sorun değildir; anlam karar�
 
 ## Sınırlar (bu turda kapsam dışı ya da bekleyen)
 
-- **GEO-SEO dondurulmuş dizin listesi (SEO-76):** istendi, gelince `--ek` ile eklenir; listedeki her adres bir kalıba oturmazsa `eslesmeyen.txt`'ye nedeniyle düşer.
+- **GEO-SEO dondurulmuş dizin listesi (SEO-76, 10 Kasım):** eklendi (`--ek`). 208 satır, 200 benzersiz yol (sha256 `561084da…aaca4c`, depo dışı; tık ve gösterim depoya girmedi, yalnız adres sütunu kullanıldı). 198 yol tabloda eşleşti (11 yeni satır, `kaynak=dizin-listesi`: dal adresleri ve takma slug'lı kategori adresleri; ötekiler zaten vardı), 2 dilsiz adres (`/` ve `/category/jet-fans`) `eslesmeyen.txt`'de: rota dili kuralı ALTYAPI'nın, önce dilli adrese gider. `?brand=` ve `?dept=` parametreli iki adres taban yola indirildi. Listede `?sku=` adresi yok (Search Console'da ve site haritasında olmadığı ölçüldü).
 - **Dilsiz adresler** (`/category/...`, `/products/...`): önce rota dili kuralıyla (ALTYAPI) dilli adrese gider; tablo dilli adresleri kapsar.
 - **Güncel ürün adı adresleri** (`/products/<urun-slug>` 431 adet, takma ad olmayanlar): kodda tanınıyor ama sitemap'te ve takma adlarda yok; dizin listesinde çıkarsa eklenir (DB'den slug listesi alınabilir).
 - **Eski SKU biçimi** (`?sku=10911` gibi, Design `cevir` tablosu 1060 giriş, 327'sinin hedefi canlıda aktif): bu adreslerin eski sitede yayında olduğuna dair kanıt yok; GEO-SEO listesinde çıkarsa `eski-sku` olarak girer.

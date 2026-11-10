@@ -1,3 +1,5 @@
+/	dizin-listesi	dilsiz adres (rota dili kuralı ALTYAPI'da; önce dilli adrese gider)
+/category/jet-fans	dizin-listesi	dilsiz adres (rota dili kuralı ALTYAPI'da; önce dilli adrese gider)
 /en/auth/login	canli-rota	[bekliyor] Giriş ve kayıt Design'da ayrı adres olarak çizilmedi; noindex yüzey
 /en/auth/register	canli-rota	[bekliyor] Giriş ve kayıt Design'da ayrı adres olarak çizilmedi; noindex yüzey
 /en/cart	canli-rota	[bekliyor] Sepet ve ödeme ekranlarını Design çizer (6 Kasım yol haritası, karar 4-5); adres verilince doldurulur. Bugün noindex

@@ -20,7 +20,7 @@ Sayı yanında "ölçülmedi" yazıyorsa o sayı başka kayıttan devralınmış
 
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
-| 2026-11-10 | Eski→yeni adres eşleştirme TABLOSU canlı şemadan üretildi: `docs/plans/rec-300-adres-esleme/eski-yeni.csv` (1250 satır: site haritası 101/101, kategori 36/36, aile 47/47, model 431/431, marka 8/8, rehber 13/13). 9 hedefte kasıtlı çoktan-bire birleşme, geçici hedefler README'de. Yönlendirme yazılmadı | Dizin listesi (GEO-SEO) eklenince tamamlanır; ALTYAPI kapısı (ALT-177) bu dosyayı denetler | URN-157 |
+| 2026-11-10 | Eski→yeni adres eşleştirme TABLOSU canlı şemadan üretildi: `docs/plans/rec-300-adres-esleme/eski-yeni.csv` (1261 satır: site haritası 101/101, kategori 36/36, aile 47/47, model 431/431, marka 8/8, rehber 13/13, GEO-SEO dizin listesi 198/200 yol; kalan 2 dilsiz adres ALTYAPI rota dilinde). 9 hedefte kasıtlı çoktan-bire birleşme, geçici hedefler README'de. Yönlendirme yazılmadı | ALTYAPI kapısı (ALT-177) bu dosyayı denetler; sepet/ödeme/giriş adresleri Design'dan gelince doldurulur | URN-157 |
 | 2026-11-09 | `adres-semasi-standard.md` v0.3: yeni sitenin tek önek şeması §1A (urunler, uygulama-alanlari, rehber; A12–A15), eski şema §1 "eski site" diye işaretlendi, §3 geçiş eski-adres gruplarını söyler; rota dili ve dil tespiti bölümlerine dokunulmadı | Cetvel ile karar ayrışıklığı kapandı | URN-159 |
 | 2026-11-09 | Marka, ana sayfa, sabit sayfa eşleme önerisi (A1–A7) ve 6 çakışan hedef için öneri (Ç1–Ç6) yazıldı; OPS düzeltmesiyle A6, A7 ve Ç1+Ç2 6 Kasım yol haritasına göre URN-157'ye bırakıldı, Recep'e soru yok | 3.1 | URN-160 |
 | 2026-11-09 | Rota dili sorusu kapandı: ALTYAPI cetveli yeni sitenin tek kaynağını adres-semasi v0.3 olarak yazdı, rota dili tablosu eski siteyi yönetir | Madde Sırada'dan düştü | URN-159, ALT-179 |
@@ -98,7 +98,7 @@ Rota dili cetveli (`rota-dili-standard.md`, ALTYAPI) §0 ile yeni sitenin tek ka
 
 | Madde | Gerekçe | Öncelik | Kart |
 |---|---|---|---|
-| Eşleştirme tablosunun tamamlanması: GEO-SEO dondurulmuş dizin listesi (SEO-76) tabloya eklenecek, sepet/ödeme/giriş adresleri Design'dan gelince doldurulacak | Tablo canlı şemadan üretildi (`docs/plans/rec-300-adres-esleme/`); dizin listesi gelmeden "dizindeki her adres" kapsamı doğrulanmış sayılmaz. Yönlendirme yazılmaz, tablo tamamlanmadan canlıya kural girmez (Recep kararı, 10 Kasım) | yüksek | URN-157 |
+| Eşleştirme tablosu: sepet/ödeme/giriş adresleri Design'dan gelince doldurulacak, rehber ve ürün seçici geçici hedefleri kendi adreslerine güncellenecek | Tablo canlı şemadan ve GEO-SEO dizin listesinden üretildi (`docs/plans/rec-300-adres-esleme/`). Yönlendirme yazılmaz, tablo tamamlanmadan canlıya kural girmez (Recep kararı, 10 Kasım). Design adres.json değişince üretici yeniden koşulur | yüksek | URN-157 |
 | Rehber eşlemesi: canlı 13 yazı, Design 5 yazı; 5 yazı birebir slug, 8 yazı Design'da yok | 8 yazı geçici olarak `/tr/rehber` listesine gidiyor; yazılar Design'a girince kendi adreslerine güncellenir | orta | URN-157, BLOG |
 | Marka 7, ana sayfa, iletişim, hakkımızda, ürün seçici, sepet/hesap/ödeme eşleme önerisi (A1–A7) | Öneri yazıldı (3.1); A6 ve A7 Design adresleri verince URN-157'de çözülür, Recep'e soru yok | orta | URN-160 |
 | 6 çakışan hedef için önerili liste (Ç1–Ç6) | Liste yazıldı (3.1); Ç1+Ç2 kök kategori sorusu URN-157 sırasında çözülür, Recep'e soru yok | orta | URN-160 |
