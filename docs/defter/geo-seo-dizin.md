@@ -1,6 +1,6 @@
 # GEO-SEO dizin defteri — hangi sayfa hangi arama motorunda, ne yaptık, sırada ne var
 
-Sahibi: GEO-SEO · Son doğrulama: 2026-11-09 · Cetvel: `docs/standards/departman-defter-standard.md` · Alan cetveli: `docs/standards/dizin-sistemleri-standard.md` (D7, D8) · Kayıt: OPS-258, SEO-101
+Sahibi: GEO-SEO · Son doğrulama: 2026-11-10 · Cetvel: `docs/standards/departman-defter-standard.md` · Alan cetveli: `docs/standards/dizin-sistemleri-standard.md` (D7, D8) · Kayıt: OPS-258, SEO-101
 
 Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor tablosu, arama sorgusu, tıklama ve sıra verisi burada durmaz (P6, cetvel D5); onlar depo dışı arşivde kalır (`~/VentHub-Olcum-Arsiv/geo-seo/dizin-takip/`: `hareketler.jsonl` işlem defteri, `dizin-takip-<gün>.json` günlük anlık görüntü, `yedek/` günlük kopya). Tutarlılık: `node scripts/seo/dizin-defter-kontrol.mjs` (0 tutarlı, 1 sapma, 2 ölçülemedi); özeti yenilemek için `--ozet`.
 
@@ -9,6 +9,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 <!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:geo-seo-dizin etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs geo-seo-dizin --yaz · Üretildi: 2026-11-10 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
+| 2026-11-10 | SEO-103 | Sabah özeti girdisi | SEO |
 | 2026-11-09 | SEO-102 | Bing durum ölçümü tam kapsamda ThrottleHost veriyor | SEO |
 | 2026-11-09 | SEO-101 | OPS-258 pilot defteri geo-seo-dizin | SEO |
 | 2026-11-09 | SEO-100 | Dizin takibi | SEO |
@@ -36,9 +37,9 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 <!-- OZET:BASLA -->
 ```json
 {
-  "anlikGoruntu": "dizin-takip-2026-11-09.json",
-  "gun": "2026-11-09",
-  "sha256": "ee9171f51abca8234f6bc6b7706bab63fce83502963a885884fb7216b8e3aa4f",
+  "anlikGoruntu": "dizin-takip-2026-11-10.json",
+  "gun": "2026-11-10",
+  "sha256": "3686cf164e333ed51e35dab09549e78669adafe97758e48bf32d743e49482e9c",
   "adresSayisi": 101,
   "kapsam": {
     "about": 1,
@@ -52,22 +53,22 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
   },
   "kararlar": {
     "google": {
-      "TAMAM": 72,
+      "TAMAM": 73,
       "BEKLE": 12,
       "TEKRAR": 0,
-      "YAP": 17,
+      "YAP": 16,
       "ATLA": 0,
       "ESKI": 0,
       "OLCULEMEDI": 0
     },
     "bing": {
-      "TAMAM": 68,
-      "BEKLE": 18,
+      "TAMAM": 69,
+      "BEKLE": 17,
       "TEKRAR": 0,
-      "YAP": 8,
+      "YAP": 7,
       "ATLA": 0,
       "ESKI": 0,
-      "OLCULEMEDI": 7
+      "OLCULEMEDI": 8
     },
     "indexnow": {
       "TAMAM": 33,
@@ -89,7 +90,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
     }
   },
   "olculemeyen": {
-    "bing: ThrottleHost": 7
+    "bing: ThrottleHost": 8
   }
 }
 ```
