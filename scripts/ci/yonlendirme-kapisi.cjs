@@ -37,27 +37,66 @@ const DIL_ONEKI = /^\/(tr|en)(\/|$)/
 /** Tablo için gzip bütçesi. A7 sınırı 1 MiB'dır (tüm middleware); tabloya yarısı ayrılır. */
 const TABLO_BUTCESI_BAYT = 512 * 1024
 /** Tablonun varsayılan yeri; URUN commit'li yolu bildirince güncellenir. Yoksa CLI/test no-op'tur. */
-const VARSAYILAN_YOL = 'docs/yonlendirme/yeni-site-yonlendirme.csv'
+const VARSAYILAN_YOL = 'docs/plans/rec-300-adres-esleme/eski-yeni.csv'
+/** Yeni sitenin yaşayan adres listesi (URUN, Design adres.json kaynaklı); varsa hedef statik denetlenir. */
+const VARSAYILAN_HEDEFLER = 'docs/plans/rec-300-adres-esleme/yeni-site-adresleri.txt'
 
 function csvAyristir(metin) {
   const satirlar = []
   const hatalar = []
   const temiz = String(metin).replace(/^﻿/, '')
-  const ham = temiz.split(/\r?\n/)
-  if (ham.length && ham[ham.length - 1] === '') ham.pop()
-  ham.forEach((s, i) => {
+  // RFC 4180 benzeri, ayraç ";": "çift tırnaklı" alan ayraç ve satır sonu taşıyabilir, "" = tek tırnak.
+  const kayitlar = []
+  let alan = ''
+  let alanlar = []
+  let tirnakta = false
+  let baslangic = 1
+  let satirNo = 1
+  const kayitBitir = () => {
+    alanlar.push(alan)
+    kayitlar.push({ satir: baslangic, alanlar })
+    alan = ''
+    alanlar = []
+  }
+  for (let i = 0; i < temiz.length; i++) {
+    const c = temiz[i]
+    if (tirnakta) {
+      if (c === '"') {
+        if (temiz[i + 1] === '"') {
+          alan += '"'
+          i++
+        } else tirnakta = false
+      } else {
+        if (c === '\n') satirNo++
+        alan += c
+      }
+    } else if (c === '"' && alan === '') tirnakta = true
+    else if (c === ';') {
+      alanlar.push(alan)
+      alan = ''
+    } else if (c === '\n' || c === '\r') {
+      if (c === '\r' && temiz[i + 1] === '\n') i++
+      kayitBitir()
+      satirNo++
+      baslangic = satirNo
+    } else alan += c
+  }
+  if (tirnakta) hatalar.push({ kural: 'SATIR', satir: baslangic, mesaj: 'kapanmamış çift tırnak (ölçülemedi)' })
+  if (alan !== '' || alanlar.length) kayitBitir()
+
+  kayitlar.forEach((k, i) => {
     if (i === 0) {
-      if (s.trim() !== BASLIK) hatalar.push({ kural: 'BASLIK', satir: 1, mesaj: `başlık "${s.trim()}" beklenen "${BASLIK}" değil` })
+      const b = k.alanlar.join(';').trim()
+      if (b !== BASLIK) hatalar.push({ kural: 'BASLIK', satir: 1, mesaj: `başlık "${b}" beklenen "${BASLIK}" değil` })
       return
     }
-    if (s.trim() === '') return
-    const alan = s.split(';')
-    if (alan.length !== 6) {
-      hatalar.push({ kural: 'SATIR', satir: i + 1, mesaj: `${alan.length} sütun (6 olmalı)` })
+    if (k.alanlar.length === 1 && k.alanlar[0].trim() === '') return
+    if (k.alanlar.length !== 6) {
+      hatalar.push({ kural: 'SATIR', satir: k.satir, mesaj: `${k.alanlar.length} sütun (6 olmalı)` })
       return
     }
-    const [eski, yeni, kod, tur, kaynak, not] = alan.map((a) => a.trim())
-    satirlar.push({ satir: i + 1, eski, yeni, kod, tur, kaynak, not })
+    const [eski, yeni, kod, tur, kaynak, not] = k.alanlar.map((a) => a.trim())
+    satirlar.push({ satir: k.satir, eski, yeni, kod, tur, kaynak, not })
   })
   return { satirlar, hatalar }
 }
@@ -180,6 +219,16 @@ function saglayiciOzguDenetle(kok) {
   return ihlaller
 }
 
+/** Yaşayan adres listesi: satır satır yol; boş satır ve `#` yorumu atlanır; küçük harf. */
+function hedefOku(metin) {
+  return new Set(
+    String(metin)
+      .split(/\r?\n/)
+      .map((x) => x.trim().toLowerCase())
+      .filter((x) => x && !x.startsWith('#')),
+  )
+}
+
 function rapor(sonuc) {
   const satirlar = sonuc.ihlaller.map((i) => `  ✗ ${i.kural}${i.satir ? ` (satır ${i.satir})` : ''}: ${i.mesaj}`)
   const ozet = `yonlendirme-kapisi: ${sonuc.satirSayisi} satır, gzip ${sonuc.bayt}/${sonuc.butceBayt} bayt, hedef200 ${sonuc.hedefOlculdu ? 'ölçüldü' : 'ÖLÇÜLMEDİ (yaşayan adres listesi verilmedi)'}, ${sonuc.ihlaller.length} ihlal`
@@ -201,16 +250,9 @@ function main(argv, kokVarsayilan) {
     return sag.length ? 1 : 0
   }
   const { satirlar, hatalar } = csvAyristir(fs.readFileSync(tabloYolu, 'utf8'))
-  const hedefDosya = al('--hedefler')
-  const hedefler = hedefDosya
-    ? new Set(
-        fs
-          .readFileSync(hedefDosya, 'utf8')
-          .split(/\r?\n/)
-          .map((x) => x.trim().toLowerCase())
-          .filter(Boolean),
-      )
-    : null
+  const varsayilanHedef = path.join(kok, VARSAYILAN_HEDEFLER)
+  const hedefDosya = al('--hedefler') || (fs.existsSync(varsayilanHedef) ? varsayilanHedef : null)
+  const hedefler = hedefDosya ? hedefOku(fs.readFileSync(hedefDosya, 'utf8')) : null
   const sonuc = denetle(satirlar, { hedefler })
   sonuc.ihlaller.unshift(...hatalar)
   sonuc.ihlaller.push(...sag)
@@ -225,6 +267,8 @@ module.exports = {
   KAYNAKLAR,
   TABLO_BUTCESI_BAYT,
   VARSAYILAN_YOL,
+  VARSAYILAN_HEDEFLER,
+  hedefOku,
   csvAyristir,
   denetle,
   saglayiciOzguDenetle,

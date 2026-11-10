@@ -21,6 +21,8 @@ const req = createRequire(import.meta.url)
 const kapi = req('../yonlendirme-kapisi.cjs') as {
   BASLIK: string
   VARSAYILAN_YOL: string
+  VARSAYILAN_HEDEFLER: string
+  hedefOku: (m: string) => Set<string>
   TABLO_BUTCESI_BAYT: number
   csvAyristir: (m: string) => { satirlar: Satir[]; hatalar: Ihlal[] }
   denetle: (s: Satir[], o?: { hedefler?: Set<string> | null; butceBayt?: number }) => { ihlaller: Ihlal[]; bayt: number }
@@ -58,6 +60,16 @@ describe('INV-YONLENDIRME-TABLO-1 · temiz tablo', () => {
   it('geçerli fikstür sıfır ihlal verir (CRLF ve BOM tolere edilir)', () => {
     expect(olc(TEMIZ)).toEqual([])
     expect(olc('\uFEFF' + TEMIZ.replace(/\n/g, '\r\n') + '\r\n')).toEqual([])
+  })
+  it('çift tırnaklı not alanı ";", "" ve satır sonu taşıyabilir; kapanmamış tırnak ölçülemedi sayılır', () => {
+    const csv = [kapi.BASLIK, '/tr/a;/tr/b;308;aile;canli-db;"not; ayraçlı ""tırnaklı""\nikinci satır"', '/tr/c;/tr/d;308;aile;canli-db;'].join('\n')
+    const { satirlar, hatalar } = kapi.csvAyristir(csv)
+    expect(hatalar).toEqual([])
+    expect(satirlar).toHaveLength(2)
+    expect(satirlar[0].not).toBe('not; ayraçlı "tırnaklı"\nikinci satır')
+    expect(satirlar[1].satir).toBe(4) // tırnak içi satır sonu satır numarasını kaydırır
+    expect(olc(csv)).toEqual([])
+    expect(olc(kapi.BASLIK + '\n/tr/a;/tr/b;308;aile;canli-db;"açık kaldı')).toContain('SATIR')
   })
   it('birden çok eski adres tek hedefe gidebilir (kategori birleşmesi ihlal değil)', () => {
     const csv = [kapi.BASLIK, '/tr/category/a;/tr/urunler/x;308;kategori;canli-db;', '/tr/category/b;/tr/urunler/x;308;kategori;canli-db;'].join('\n')
@@ -250,7 +262,14 @@ describe('INV-YONLENDIRME-TABLO-1 · gerçek tablo (URN-157)', () => {
       return // tablo henüz commit'li değil: geçişe bağlı, URN-157
     }
     const { satirlar, hatalar } = kapi.csvAyristir(metin)
-    const s = kapi.denetle(satirlar)
+    let hedefler: Set<string> | null = null
+    try {
+      hedefler = kapi.hedefOku(readFileSync(path.join(KOK, kapi.VARSAYILAN_HEDEFLER), 'utf8'))
+    } catch {
+      hedefler = null // yaşayan adres listesi yoksa hedef-200 statik denetimi atlanır
+    }
+    const s = kapi.denetle(satirlar, { hedefler })
+    expect(satirlar.length).toBeGreaterThan(0)
     expect([...hatalar, ...s.ihlaller]).toEqual([])
   })
 })
