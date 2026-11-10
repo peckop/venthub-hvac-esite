@@ -16,6 +16,8 @@ Eski ölçüm ve işlem tarihçesi: `docs/olcum/pim-unopim.md` ("Ölçüm 2026-1
 <!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:katalog-unopim-icerik etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs katalog-unopim-icerik --yaz · Üretildi: 2026-11-10 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
+| 2026-11-10 | KTL-91 | OPS emri (yeni site geçiş defteri A3): görselsiz 5 ürüne resmî kaynaktan görsel… | KATALOG |
+| 2026-11-10 | KTL-89 | katalog-unopim-icerik defteri | KATALOG |
 | 2026-11-10 | KTL-88 | katalog-unopim-icerik defteri | KATALOG |
 | 2026-11-10 | KTL-87 | UnoPIM içerik defteri ve Design↔UnoPIM fark betiği | KATALOG |
 | 2026-11-10 | KTL-86 | UnoPIM ürün içeriği yaşayan defteri | KATALOG |
@@ -107,7 +109,7 @@ olcum-ozet:bitti -->
 | `list_price_source_page` | 343 | 1165 | 822 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 | `vat_rate_percent` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 
-Ayrıntı notları: `image` 5 ürün boş (VRT-HP-1400, VRT-HP-1400-D, AVE-13050, AVE-13051, SEA-810105; üretici görseli bekleniyor, bkz. `pim-unopim.md`).
+Ayrıntı notları: `image` 5 ürün boş (VRT-HP-1400, VRT-HP-1400-D, AVE-13050, AVE-13051, SEA-810105; üretici görseli bekleniyor, bkz. `pim-unopim.md`). KTL-91 (10 Kasım): HP-1400 ve HP-1400-D için seri-tahmin görsel kaynaklı hazırlandı (22 kardeş ürünle aynı seri fotoğrafı, sha256 listede); AVE-13050, AVE-13051 ve SEA-810105 için resmî kaynakta görsel bulunamadı, nedenleri listede. Liste ve görseller depo dışında (`~/VentHub-Gorsel-Arsiv/_liste/ktl91-a3-2026-11-10/`); UnoPIM'e yazım Design-İÇERİK'te.
 `gallery` ve `gallery_alt_*` yalnız galerisi olan 255 üründe (Design verisi galeri taşıyan ürünler); galerisiz ürünün galeri alanı boş olması eksik
 sayılmaz, kaç ürünün galerisi olması gerektiği Design kararıdır. `list_price_*` yalnız Avensair 2026 liste fiyat kaynağı olan 343 üründe; kalan 822
 ürünün fiyat modeli ürün kararıdır (`fiyat-kaynagi-olmayan-urunler.csv`, arşiv deposu `_liste/ktl82-faz-c-2026-11-04/`).
@@ -192,7 +194,7 @@ Design-İÇERİK `veri/seri-veri-dizin-2026-11-02.json` her modele UnoPIM koduyl
 <!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:katalog-unopim-icerik etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs katalog-unopim-icerik --yaz · Üretildi: 2026-11-10 -->
 | Kart | İş | Durum | Sahip |
 |---|---|---|---|
-| KTL-89 | katalog-unopim-icerik defteri | To Do | KATALOG |
+| (etiketli açık kart yok) | | | |
 <!-- DEFTER-KANBAN:sirada BITIS -->
 
 | Madde | Gerekçe | Öncelik | Kart |
