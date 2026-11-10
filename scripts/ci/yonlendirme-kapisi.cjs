@@ -9,13 +9,15 @@
  *   BASLIK       başlık tam `eski;yeni;kod;tur;kaynak;not` (sağlayıcıya özgü alan yok: A6)
  *   SATIR        sütun sayısı 6; kod 308|410; tur/kaynak izinli listede
  *   ESKI-BICIM   eski: /tr|/en önekli, `#` yok, sondaki `/` yok; sorgu varsa YALNIZ `?sku=<dolu>` ve tur=model
- *   YENI-BICIM   308'de yeni dolu: /tr|/en önekli, sorgu/`#` yok (A7), sondaki `/` yok, eski ile AYNI dil; 410'da yeni boş
+ *   YENI-BICIM   308'de yeni dolu: /tr|/en önekli, sorgu yok (A7; `#parça` serbest, sunucuya gitmez), sondaki `/` yok, eski ile AYNI dil; 410'da yeni boş
  *   KENDINE      eski = yeni (değişmeyen adres tabloda olmaz; kendine yönlendirme döngüdür)
  *   CAKISMA      aynı eski iki satırda (farklı hedef = çakışma, aynı hedef = kopya)
  *   ZINCIR       bir satırın yeni adresi başka bir satırın eski adresi: 2 sıçrama (A9: tek sıçrama)
  *   OLU-HEDEF    yeni adres, 410 verilen bir eski adres
  *   HEDEF-YOK    (yalnız `hedefler` verilirse) yeni adres yeni sitenin yaşayan adres listesinde değil
- *   BUTCE        gzip(kompakt JSON) > bütçe (varsayılan 512 KiB: A7 sınırı 1 MiB, middleware'in kalanına pay bırakılır)
+ *   ESKI-CANLI   (yalnız `hedefler` verilirse) eski adres yaşayan listede: hem yönlendirilip hem 200 dönemez (A5); iki bilinen satır adıyla istisna
+ *   BOS-TABLO    hiç veri satırı yok / dosya boş / tablo yok (A7: boş haritayla yayın yok; fail-closed)
+ *   BUTCE       gzip(kompakt JSON) > bütçe (varsayılan 512 KiB: A7 sınırı 1 MiB, middleware'in kalanına pay bırakılır)
  *   SAGLAYICI    kural dosyaları sağlayıcıya özgü yönlendirme içermez (A6): vercel.json redirects/routes,
  *                public/_redirects içinde 3xx satırı
  *
@@ -33,6 +35,8 @@ const TURLER = ['kategori', 'aile', 'model', 'marka', 'rehber', 'sabit', 'takma-
 const KAYNAKLAR = ['site-haritasi', 'canli-db', 'takma-ad', 'dizin-listesi']
 /** `?sku=` taşıyabilen satır türleri (URUN şeması: model satırları ve eski-sku). */
 const SKU_TURLERI = ['model', 'eski-sku']
+/** Tablo dosyası yokken CLI çıkışı: 1 (fail-closed). */
+const TABLO_YOK_CIKIS = 1
 const DIL_ONEKI = /^\/(tr|en)(\/|$)/
 /** Tablo için gzip bütçesi. A7 sınırı 1 MiB'dır (tüm middleware); tabloya yarısı ayrılır. */
 const TABLO_BUTCESI_BAYT = 512 * 1024
@@ -40,6 +44,17 @@ const TABLO_BUTCESI_BAYT = 512 * 1024
 const VARSAYILAN_YOL = 'docs/plans/rec-300-adres-esleme/eski-yeni.csv'
 /** Yeni sitenin yaşayan adres listesi (URUN, Design adres.json kaynaklı); varsa hedef statik denetlenir. */
 const VARSAYILAN_HEDEFLER = 'docs/plans/rec-300-adres-esleme/yeni-site-adresleri.txt'
+
+/**
+ * BİLİNEN ÇELİŞKİLER (ESKİ-CANLI): URN-157 tablosunda eski adresi yeni sitenin yaşayan listesinde de bulunan iki satır
+ * (ortak EN `/en/products/` öneki; denetçi ölçümü 10 Kasım). URUN/Design "liste mi bayat, tablo mu yanlış" cevabını verene dek
+ * kapıyı kırmızıya çevirmesin diye BURADA, adıyla, tek tek durur. Cevap gelince satır tablodan ya da listeden düzeltilir ve
+ * bu küme boşaltılır; yeni bir çelişki bu kümeye EKLENEREK susturulamaz (kümeyi değiştirmek bu dosyada görünür bir diff'tir).
+ */
+const BILINEN_ESKI_CANLI = new Set([
+  '/en/products/vortice-h-ad-elektrikli',
+  '/en/products/vortice-vort-commercial-in-line-circular',
+])
 
 function csvAyristir(metin) {
   const satirlar = []
@@ -81,6 +96,7 @@ function csvAyristir(metin) {
       baslangic = satirNo
     } else alan += c
   }
+  if (temiz.trim() === '') hatalar.push({ kural: 'BASLIK', satir: 1, mesaj: 'dosya boş (başlık satırı yok)' })
   if (tirnakta) hatalar.push({ kural: 'SATIR', satir: baslangic, mesaj: 'kapanmamış çift tırnak (ölçülemedi)' })
   if (alan !== '' || alanlar.length) kayitBitir()
 
@@ -182,6 +198,19 @@ function denetle(satirlar, secenek = {}) {
     if (hedefler && !hedefler.has(y)) ihlal('HEDEF-YOK', s, `${s.yeni} yeni sitenin yaşayan adresleri arasında değil`)
   }
 
+  if (satirlar.length === 0) ihlal('BOS-TABLO', null, 'tabloda hiç satır yok (A7: boş haritayla yayın yok)')
+
+  // A5: bir adres hem yönlendirilip hem 200 dönemez. Yaşayan listede olan eski adres (308 de 410 da) yaşayan sayfayı öldürür.
+  if (hedefler) {
+    for (const s of satirlar) {
+      if (s.eski.includes('?')) continue
+      const k = anahtar(s.eski)
+      if (hedefler.has(k) && !BILINEN_ESKI_CANLI.has(k)) {
+        ihlal('ESKI-CANLI', s, `${s.eski} yeni sitenin yaşayan adresi, ama tabloda ${s.kod} alıyor (A5: bir adres hem yönlendirilip hem 200 dönemez)`)
+      }
+    }
+  }
+
   const bayt = gzipBayt(satirlar)
   if (bayt > butce) ihlal('BUTCE', null, `tablo gzip ${bayt} bayt > bütçe ${butce} bayt`)
 
@@ -210,9 +239,10 @@ function saglayiciOzguDenetle(kok) {
       .forEach((satir, i) => {
         const t = satir.trim()
         if (!t || t.startsWith('#')) return
-        const durum = t.split(/\s+/)[2]
-        if (durum && /^30[1278]!?$/.test(durum)) {
-          ihlaller.push({ kural: 'SAGLAYICI', satir: i + 1, mesaj: `public/_redirects ${durum} satırı içeriyor (A6)` })
+        // Durum alanı yoksa Cloudflare Pages/Netlify varsayılanı 302'dir; yalnız 200 (yeniden yazma) ve 404 serbest.
+        const durum = (t.split(/\s+/)[2] || '302').replace('!', '')
+        if (durum !== '200' && durum !== '404') {
+          ihlaller.push({ kural: 'SAGLAYICI', satir: i + 1, mesaj: `public/_redirects ${durum} (yönlendirme) satırı içeriyor (A6)` })
         }
       })
   }
@@ -245,9 +275,10 @@ function main(argv, kokVarsayilan) {
   const tabloYolu = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--'))) || path.join(kok, VARSAYILAN_YOL)
   const sag = saglayiciOzguDenetle(kok)
   if (!fs.existsSync(tabloYolu)) {
-    console.log(`yonlendirme-kapisi: tablo yok (${tabloYolu}) — tablo kapısı atlandı; sağlayıcı denetimi ${sag.length} ihlal`)
+    // Tablo depoda commit'li (URN-157, #2475): yokluğu fail-open DEĞİL, ihlaldir (A7: boş haritayla yayın yok).
+    console.log(`yonlendirme-kapisi: ✗ TABLO-YOK: ${tabloYolu} bulunamadı (silinmiş ya da taşınmış); sağlayıcı denetimi ${sag.length} ihlal`)
     sag.forEach((i) => console.log(`  ✗ ${i.kural}: ${i.mesaj}`))
-    return sag.length ? 1 : 0
+    return TABLO_YOK_CIKIS
   }
   const { satirlar, hatalar } = csvAyristir(fs.readFileSync(tabloYolu, 'utf8'))
   const varsayilanHedef = path.join(kok, VARSAYILAN_HEDEFLER)

@@ -128,6 +128,21 @@ describe('INV-YONLENDIRME-TABLO-1 · yakalananlar', () => {
     expect(olc(ekle('/tr/q4;/tr/urunler;308;aile;baska;'))).toContain('SATIR')
     expect(olc(TEMIZ.replace(kapi.BASLIK, 'eski;yeni;kod;tur;kaynak;not;vercel'))).toContain('BASLIK')
   })
+  it('BOS-TABLO: boş dosya, yalnız başlık ve hiç veri satırı yok', () => {
+    expect(olc('')).toContain('BASLIK')
+    expect(olc('')).toContain('BOS-TABLO')
+    expect(olc(kapi.BASLIK + '\n')).toEqual(['BOS-TABLO'])
+  })
+  it('ESKI-CANLI (A5): eski adres yaşayan listede ise 308 de 410 da kırmızı; ?sku= satırı ve bilinen iki istisna hariç', () => {
+    const liste = new Set(['/tr/x', '/tr/y', '/tr/z', '/tr/z2', '/tr/a'])
+    const csv = [kapi.BASLIK, '/tr/x;/tr/y;308;aile;canli-db;', '/tr/z;;410;aile;canli-db;'].join('\n')
+    expect(olc(csv, { hedefler: liste })).toEqual(['ESKI-CANLI', 'ESKI-CANLI'])
+    expect(olc(csv)).toEqual([]) // liste verilmezse ölçülmez
+    const sku = [kapi.BASLIK, '/tr/a?sku=1;/tr/y;308;model;canli-db;'].join('\n')
+    expect(olc(sku, { hedefler: liste })).toEqual([]) // sorgulu eski adres sayfa değildir
+    const bilinen = [kapi.BASLIK, '/en/products/vortice-h-ad-elektrikli;/en/products/vortice-hava-perdesi;308;takma-ad;takma-ad;'].join('\n')
+    expect(olc(bilinen, { hedefler: new Set(['/en/products/vortice-h-ad-elektrikli', '/en/products/vortice-hava-perdesi']) })).toEqual([])
+  })
   it('HEDEF-YOK: yaşayan adres listesi verilince listede olmayan hedef; liste verilmezse ölçülmez', () => {
     const yasayan = new Set(['/tr/urunler/fanlar', '/en/products/fans', '/tr/urunler/vortice-lineo', '/tr/urunler/vortice-lineo-lnq-100'])
     expect(olc(TEMIZ, { hedefler: yasayan })).toEqual(['HEDEF-YOK']) // /tr/hakkimizda yok
@@ -163,6 +178,10 @@ describe('INV-YONLENDIRME-TABLO-1 · A6 sağlayıcıya özgü kural yok', () => 
     expect(kapi.saglayiciOzguDenetle(d).map((i) => i.kural)).toEqual(['SAGLAYICI'])
     writeFileSync(path.join(d, 'public/_redirects'), '/a /b 308!\n')
     expect(kapi.saglayiciOzguDenetle(d)).toHaveLength(1)
+    writeFileSync(path.join(d, 'public/_redirects'), '/a /b\n') // durum yok = 302 varsayılanı
+    expect(kapi.saglayiciOzguDenetle(d)).toHaveLength(1)
+    writeFileSync(path.join(d, 'public/_redirects'), '/a /b 303\n')
+    expect(kapi.saglayiciOzguDenetle(d)).toHaveLength(1)
     writeFileSync(path.join(d, 'public/_redirects'), '')
     writeFileSync(path.join(d, 'vercel.json'), JSON.stringify({ redirects: [{ source: '/a', destination: '/b' }] }))
     expect(kapi.saglayiciOzguDenetle(d)).toHaveLength(1)
@@ -176,9 +195,14 @@ describe('INV-YONLENDIRME-TABLO-1 · A6 sağlayıcıya özgü kural yok', () => 
 })
 
 describe('INV-YONLENDIRME-TABLO-1 · CLI', () => {
-  it('tablo yoksa tablo kapısı atlanır (0), tablo temizse 0, kirliyse 1', () => {
+  it('tablo yoksa KIRMIZI (fail-closed), tablo temizse 0, kirliyse 1; boş ve yalnız-başlık tablo kırmızı', () => {
     const d = tmp()
-    expect(kapi.main(['node', 'k', '--kok', d], d)).toBe(0)
+    expect(kapi.main(['node', 'k', '--kok', d], d)).toBe(1)
+    const bos = path.join(d, 'bos.csv')
+    writeFileSync(bos, '')
+    expect(kapi.main(['node', 'k', bos, '--kok', d], d)).toBe(1)
+    writeFileSync(bos, kapi.BASLIK + '\n')
+    expect(kapi.main(['node', 'k', bos, '--kok', d], d)).toBe(1)
     const temiz = path.join(d, 't.csv')
     writeFileSync(temiz, TEMIZ)
     expect(kapi.main(['node', 'k', temiz, '--kok', d], d)).toBe(0)
@@ -224,6 +248,12 @@ describe('INV-YONLENDIRME-TABLO-1 · SABOTAJ (kaynağa tek tek hata sokulur; her
     const { satirlar } = m.csvAyristir(TEMIZ)
     if (!m.denetle(satirlar, { butceBayt: 5 }).ihlaller.some((i) => i.kural === 'BUTCE')) ciktilar.push('butce-kacti')
     if (!m.denetle(satirlar, { hedefler: new Set() }).ihlaller.some((i) => i.kural === 'HEDEF-YOK')) ciktilar.push('hedef-kacti')
+    if (!m.denetle([]).ihlaller.some((i) => i.kural === 'BOS-TABLO')) ciktilar.push('bos-tablo-kacti')
+    if (!m.csvAyristir('').hatalar.some((i) => i.kural === 'BASLIK')) ciktilar.push('bos-dosya-kacti')
+    const canli = m.csvAyristir([m.BASLIK, '/tr/x;/tr/y;308;aile;canli-db;'].join('\n')).satirlar
+    if (!m.denetle(canli, { hedefler: new Set(['/tr/x', '/tr/y']) }).ihlaller.some((i) => i.kural === 'ESKI-CANLI')) ciktilar.push('eski-canli-kacti')
+    const t = tmp()
+    if (m.main(['node', 'k', '--kok', t], t) !== 1) ciktilar.push('tablo-yok-gecti')
     return ciktilar
   }
 
@@ -240,6 +270,10 @@ describe('INV-YONLENDIRME-TABLO-1 · SABOTAJ (kaynağa tek tek hata sokulur; her
     ['kod 301 serbest', "const KODLAR = ['308', '410']", "const KODLAR = ['308', '410', '301']"],
     ['bütçe kapalı', 'if (bayt > butce)', 'if (false)'],
     ['hedef kontrolü kapalı', 'if (hedefler && !hedefler.has(y))', 'if (false)'],
+    ['boş tablo geçer', 'if (satirlar.length === 0)', 'if (false)'],
+    ['boş dosya geçer', "if (temiz.trim() === '')", 'if (false)'],
+    ['eski-canli kapalı', 'if (hedefler.has(k) && !BILINEN_ESKI_CANLI.has(k))', 'if (false)'],
+    ['tablo yok geçer', 'const TABLO_YOK_CIKIS = 1', 'const TABLO_YOK_CIKIS = 0'],
   ]
 
   it('sağlam kaynak sabotaj sürücüsünden temiz çıkar (sürücü kendisi doğru çalışıyor)', () => {
@@ -253,23 +287,17 @@ describe('INV-YONLENDIRME-TABLO-1 · SABOTAJ (kaynağa tek tek hata sokulur; her
 })
 
 describe('INV-YONLENDIRME-TABLO-1 · gerçek tablo (URN-157)', () => {
-  it('tablo VARSAYILAN_YOL\'da varsa sıfır ihlal; yoksa atlanır (kapı yalnız fikstürle sınanmıştır)', () => {
-    const yol = path.join(KOK, kapi.VARSAYILAN_YOL)
-    let metin: string
-    try {
-      metin = readFileSync(yol, 'utf8')
-    } catch {
-      return // tablo henüz commit'li değil: geçişe bağlı, URN-157
-    }
+  // Tablo ve yaşayan adres listesi depoda commit'li (#2475, #2476): YOKLUĞU atlanmaz, hata verir (fail-closed, A7).
+  it('tablo ve yaşayan adres listesi VARSAYILAN yollarda durur ve sıfır ihlal verir', () => {
+    const metin = readFileSync(path.join(KOK, kapi.VARSAYILAN_YOL), 'utf8')
+    const hedefler = kapi.hedefOku(readFileSync(path.join(KOK, kapi.VARSAYILAN_HEDEFLER), 'utf8'))
     const { satirlar, hatalar } = kapi.csvAyristir(metin)
-    let hedefler: Set<string> | null = null
-    try {
-      hedefler = kapi.hedefOku(readFileSync(path.join(KOK, kapi.VARSAYILAN_HEDEFLER), 'utf8'))
-    } catch {
-      hedefler = null // yaşayan adres listesi yoksa hedef-200 statik denetimi atlanır
-    }
     const s = kapi.denetle(satirlar, { hedefler })
-    expect(satirlar.length).toBeGreaterThan(0)
+    expect(satirlar.length).toBeGreaterThan(1000)
+    expect(hedefler.size).toBeGreaterThan(1000)
     expect([...hatalar, ...s.ihlaller]).toEqual([])
+  })
+  it('CLI depo kökünde çıkış 0 verir (yol ve hedef listesi kendiliğinden bulunur)', () => {
+    expect(kapi.main(['node', 'k', '--kok', KOK], KOK)).toBe(0)
   })
 })
