@@ -144,7 +144,11 @@ function aileYeni(canliAile, l) {
     return { yeni: d[l], kod: 308, not: '' }
   }
   if (anahtarlar.length === 0) {
-    return { yeni: '', kod: 410, not: 'Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design\'da karşılığı yok' }
+    // Aktif modeli olmayan canlı aile: modelle eşleşemez, Design serisi kimlikle bağlanır (10 Kasım, ALTYAPI bulgusu: 410 yanlıştı)
+    const SERI = { 'vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari': 'vortice-vort-commercial-in-line-circular' }
+    const d = SERI[canliAile] ? A.aile[SERI[canliAile]] : null
+    if (d) return { yeni: d[l], kod: 308, not: 'Canlıda aktif modeli yok (bugün 404); Design serisi ' + SERI[canliAile] + ' kimlikle bağlandı' }
+    return { yeni: '', kod: 410, not: 'Aktif modeli 0; Design\'da karşılığı yok' }
   }
   // Birden çok Design serisine bölünen aile: tek hedef yok -> tür sayfası
   const k = canliAile === 'vortice-aksiyel-endustriyel-fanlar' ? 'axial-industrial-fans' : null
@@ -243,8 +247,11 @@ function coz(ham) {
   // Kategori
   if ((s = rest.match(/^\/category\/([^/]+)(?:\/([^/]+))?$/))) {
     const slug = s[2] ?? s[1]
-    if (!katIndeks[l].has(slug)) return { hata: `kategori slug tanınmadı: ${slug}` }
-    const canli = katIndeks[l].get(slug)
+    // Eski eşleyici iki dilin slug'ını da kabul ediyordu: yoksa öteki dilin slug'ına bak
+    const diger = l === 'tr' ? 'en' : 'tr'
+    const kaynakDil = katIndeks[l].has(slug) ? l : katIndeks[diger].has(slug) ? diger : null
+    if (!kaynakDil) return { hata: `kategori slug tanınmadı: ${slug}` }
+    const canli = katIndeks[kaynakDil].get(slug)
     return { tur: s[2] ? 'kategori-dal' : 'kategori', ent: `kat:${canli}`, ...katYeni(canli, l) }
   }
   // Ürün: aile / model / eski ürün adı
@@ -274,7 +281,9 @@ function coz(ham) {
 // ── Satır üretimi ───────────────────────────────────────────────────────────────────────────────────
 const satirlar = new Map() // eski -> satır
 const hatalar = []
-function ekle(eski, kaynak) {
+function ekle(eskiHam, kaynak) {
+  // `?sku=` dışındaki sorgu parametreleri (?brand=, ?dept=) adresi değiştirmez: taban yola indirilir (kapı: `?` yalnız model ve eski-sku)
+  const eski = eskiHam.includes('?') && !new URL(eskiHam, 'https://x').searchParams.has('sku') ? eskiHam.split('?')[0] : eskiHam
   const r = coz(eski)
   if (r.hata) {
     hatalar.push({ eski, kaynak, neden: r.hata })

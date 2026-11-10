@@ -41,9 +41,8 @@ eski;yeni;kod;tur;kaynak;not
 /en/products/vortice-radon-serisi-kanal-fanlari;/en/products/vortice-radon-range-circular;308;aile;canli-db;
 /en/products/vortice-slimroof-cati-fanlari;/en/products/vortice-slimroof-es;308;aile;canli-db;
 /en/products/vortice-tiracamino-somine-ve-baca-fanlari;/en/products/vortice-vort-industrial-ventilation-roof;308;aile;canli-db;
-/en/products/vortice-vort-commercial-in-line-circular;;410;takma-ad;takma-ad;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok; Eski aile adı (url_takma_adlari / tohum)"
 /en/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari;/en/products/vortice-vort-commercial-in-line-rectangular;308;aile;canli-db;
-/en/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;;410;aile;canli-db;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok"
+/en/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;/en/products/vortice-vort-commercial-in-line-circular;308;aile;canli-db;"Canlıda aktif modeli yok (bugün 404); Design serisi vortice-vort-commercial-in-line-circular kimlikle bağlandı"
 /en/products/vortice-vort-e-atex;/en/products/vortice-e-atex;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
 /en/products/vortice-vort-e-atex-fanlar;/en/products/vortice-e-atex;308;aile;canli-db;
 /en/products/vortice-vort-heatmaster-slimroof-roof;/en/products/vortice-slimroof-es;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
@@ -126,10 +125,10 @@ eski;yeni;kod;tur;kaynak;not
 /tr/products/vortice-radon-serisi-kanal-fanlari;/tr/urunler/vortice-radon-range-circular;308;aile;site-haritasi;
 /tr/products/vortice-slimroof-cati-fanlari;/tr/urunler/vortice-slimroof-es;308;aile;site-haritasi;
 /tr/products/vortice-tiracamino-somine-ve-baca-fanlari;/tr/urunler/vortice-vort-industrial-ventilation-roof;308;aile;site-haritasi;
-/tr/products/vortice-vort-commercial-in-line-circular;;410;takma-ad;takma-ad;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok; Eski aile adı (url_takma_adlari / tohum)"
+/tr/products/vortice-vort-commercial-in-line-circular;/tr/urunler/vortice-vort-commercial-in-line-circular;308;takma-ad;takma-ad;"Canlıda aktif modeli yok (bugün 404); Design serisi vortice-vort-commercial-in-line-circular kimlikle bağlandı; Eski aile adı (url_takma_adlari / tohum)"
 /tr/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari;/tr/urunler/vortice-vort-commercial-in-line-rectangular;308;aile;site-haritasi;
 /tr/products/vortice-vort-commercial-in-line-rectangular;/tr/urunler/vortice-vort-commercial-in-line-rectangular;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
-/tr/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;;410;aile;canli-db;"Aktif modeli 0; bugün canlıda 404 (ölü yönlendirme); Design'da karşılığı yok"
+/tr/products/vortice-vort-commercial-in-line-yuvarlak-kanal-fanlari;/tr/urunler/vortice-vort-commercial-in-line-circular;308;aile;canli-db;"Canlıda aktif modeli yok (bugün 404); Design serisi vortice-vort-commercial-in-line-circular kimlikle bağlandı"
 /tr/products/vortice-vort-e-atex;/tr/urunler/vortice-e-atex;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
 /tr/products/vortice-vort-e-atex-fanlar;/tr/urunler/vortice-e-atex;308;aile;site-haritasi;
 /tr/products/vortice-vort-heatmaster-slimroof-roof;/tr/urunler/vortice-slimroof-es;308;takma-ad;takma-ad;Eski aile adı (url_takma_adlari / tohum)
@@ -248,6 +247,7 @@ eski;yeni;kod;tur;kaynak;not
 /en/category/control-systems/frequency-converters;/en/products/frequency-converters;308;kategori;canli-db;
 /en/category/control-systems/spare-parts-sensors;/en/products/sensors-and-protection;308;kategori;canli-db;
 /en/category/control-systems/speed-controllers;/en/products/speed-controllers;308;kategori;canli-db;
+/en/category/fans/acid-resistant-fans;/en/products/corrosion-and-acid-resistant-fans;308;kategori;dizin-listesi;
 /en/category/fans/axial-industrial-fans;/en/products/axial-fans;308;kategori;canli-db;
 /en/category/fans/bathroom-toilet-fans;/en/products/bathroom-fans;308;kategori;canli-db;
 /en/category/fans/cabinet-fans;/en/products/cabinet-fans;308;kategori;canli-db;
@@ -271,9 +271,13 @@ eski;yeni;kod;tur;kaynak;not
 /tr/category/elektrik-aksesuarlari/hiz-anahtarlari;/tr/urunler/hiz-anahtarlari;308;kategori;canli-db;
 /tr/category/elektrik-aksesuarlari/sensorler-ve-koruma;/tr/urunler/sensorler-ve-koruma;308;kategori;canli-db;
 /tr/category/fanlar/aksiyel-fanlar;/tr/urunler/aksiyel-fanlar;308;kategori;canli-db;
+/tr/category/fanlar/aksiyel-sanayi-fanlari;/tr/urunler/aksiyel-fanlar;308;kategori;dizin-listesi;
+/tr/category/fanlar/asit-dayanikli-fanlar;/tr/urunler/korozyona-ve-aside-dayanikli-fanlar;308;kategori;dizin-listesi;
 /tr/category/fanlar/banyo-tuvalet-fanlari;/tr/urunler/banyo-ve-tuvalet-fanlari;308;kategori;canli-db;
+/tr/category/fanlar/banyo-ve-tuvalet-fanlari;/tr/urunler/banyo-ve-tuvalet-fanlari;308;kategori;dizin-listesi;
 /tr/category/fanlar/cati-tipi-fanlar;/tr/urunler/cati-tipi-fanlar;308;kategori;canli-db;
 /tr/category/fanlar/duman-egzoz-fanlari;/tr/urunler/duman-egzoz-fanlari;308;kategori;canli-db;
+/tr/category/fanlar/endustriyel-tavan-vantilatorleri;/tr/urunler/endustriyel-tavan-vantilatorleri;308;kategori;dizin-listesi;
 /tr/category/fanlar/ex-proof-atex-fanlar;/tr/urunler/atex-fanlari;308;kategori;canli-db;"Pasif kategori (dizinde değil); Design ATEX fanları türü"
 /tr/category/fanlar/hucreli-aspiratorler;/tr/urunler/hucreli-aspiratorler;308;kategori;canli-db;
 /tr/category/fanlar/kanal-tipi-fanlar;/tr/urunler/kanal-tipi-fanlar;308;kategori;canli-db;
@@ -282,15 +286,21 @@ eski;yeni;kod;tur;kaynak;not
 /tr/category/fanlar/otopark-jet-fanlari;;410;kategori;canli-db;"Pasif kategori, Design'da karşılığı yok; aktif ürünü 0"
 /tr/category/fanlar/plug-fanlar;/tr/urunler/plug-fanlar;308;kategori;canli-db;
 /tr/category/fanlar/radyal-fanlar;/tr/urunler/radyal-fanlar;308;kategori;canli-db;
+/tr/category/fanlar/siginak-havalandirma;/tr/urunler/siginak-havalandirma;308;kategori;dizin-listesi;Sığınak: Design mekân yerine ürün grubuna bağlıyor (Recep 11-02)
 /tr/category/fanlar/somine-ve-baca-fanlari;/tr/urunler/somine-ve-baca-fanlari;308;kategori;canli-db;
 /tr/category/fanlar/tavan-vantilatorleri;/tr/urunler/endustriyel-tavan-vantilatorleri;308;kategori;canli-db;
+/tr/category/fans/parking-jet-fan;;410;kategori;dizin-listesi;"Pasif kategori, Design'da karşılığı yok; aktif ürünü 0"
 /tr/category/hava-perdeleri/elektrikli-isiticili-hava-perdeleri;/tr/urunler/elektrikli-isiticili-hava-perdeleri;308;kategori;canli-db;
 /tr/category/hava-perdeleri/isiticisiz-hava-perdeleri;/tr/urunler/isiticisiz-hava-perdeleri;308;kategori;canli-db;
 /tr/category/hava-sartlandirma/elektrikli-kanal-isiticilari;/tr/urunler/elektrikli-kanal-isiticilari;308;kategori;canli-db;
 /tr/category/hava-sartlandirma/nem-alma-cihazlari;/tr/urunler/nem-alma-cihazlari;308;kategori;canli-db;
 /tr/category/hava-sartlandirma/sulu-bataryalar;/tr/urunler/sulu-kanal-isiticilari;308;kategori;canli-db;
+/tr/category/iklimlendirme-ve-hava-sartlandirma/elektrikli-kanal-isiticilari;/tr/urunler/elektrikli-kanal-isiticilari;308;kategori;dizin-listesi;
+/tr/category/iklimlendirme-ve-hava-sartlandirma/nem-alma-cihazlari;/tr/urunler/nem-alma-cihazlari;308;kategori;dizin-listesi;
 /tr/category/isi-geri-kazanim/kanalli-merkezi-uniteler;/tr/urunler/kanalli-isi-geri-kazanim-cihazlari;308;kategori;canli-db;
 /tr/category/isi-geri-kazanim/tek-oda-uniteleri;/tr/urunler/oda-tipi-isi-geri-kazanim-cihazlari;308;kategori;canli-db;
+/tr/category/kontrol-sistemleri/frekans-konvertorleri;/tr/urunler/frekans-konvertorleri;308;kategori;dizin-listesi;
+/tr/category/kontrol-sistemleri/hiz-anahtarlari;/tr/urunler/hiz-anahtarlari;308;kategori;dizin-listesi;
 /tr/category/konut-tipi-havalandirma/kanal-ici-hayalet-fanlar;/tr/urunler/kanal-tipi-fanlar;308;kategori;canli-db;"Pasif kategori (dizinde değil); en yakın tür kanal tipi fanlar"
 /tr/category/ticari-havalandirma/dikdortgen-kanal-fanlari;/tr/urunler/kanal-tipi-fanlar;308;kategori;canli-db;"Pasif kategori (dizinde değil); en yakın tür kanal tipi fanlar"
 /tr/products;/tr/urunler;308;sabit;site-haritasi;
