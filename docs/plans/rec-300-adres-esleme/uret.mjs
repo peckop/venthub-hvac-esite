@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- komut satırı üreticisi, çıktısı sayım ve rapordur */
 // URN-157: eski site -> yeni site (Design) adres eşleştirme TABLOSU üreticisi. YALNIZ tablo üretir;
 // yönlendirme yazmaz, canlıya hiçbir kural girmez (Recep kararı, 10 Kasım: tablo tamamlanmadan yönlendirme yok).
 //
