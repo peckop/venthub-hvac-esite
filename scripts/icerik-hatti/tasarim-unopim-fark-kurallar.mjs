@@ -150,3 +150,27 @@ export function farkHesapla(g) {
 export function eskiGoruntuler(dosyalar, esikGun) {
   return dosyalar.filter((d) => !(d.yasGun <= esikGun)).map((d) => `${d.ad} (${Number.isFinite(d.yasGun) ? Math.floor(d.yasGun) + ' gün' : 'yaş bilinmiyor'})`)
 }
+
+/**
+ * Design-İÇERİK `seri-veri-dizin` ↔ UnoPIM SKU eşlemesi (KTL-87). İÇERİK her modele UnoPIM koduyla `sku` verir
+ * (`seriler[<seri>].sku = { <katalog kodu>: <UnoPIM kodu> }`); eşleme bu alanla yapılır, `modeller`/`D` anahtarıyla değil.
+ * Saf: ağ yok, dosya yok. Anahtarı `_` ile başlayan üst düzey alanlar (`_damga`) seri değildir.
+ * @returns {{seri:number, model:number, tekil:number, cift:Array<{sku:string, seriler:string[]}>, unopimdeYok:string[], icerikteYok:string[]}}
+ */
+export function icerikSkuFarki(dizin, unopimSkular) {
+  const bySku = new Map()
+  let seri = 0
+  let model = 0
+  for (const [ad, v] of Object.entries(dizin || {})) {
+    if (ad.startsWith('_') || !v || typeof v !== 'object') continue
+    seri++
+    for (const sku of Object.values(v.sku || {})) { model++; bySku.set(sku, [...(bySku.get(sku) || []), ad]) }
+  }
+  const u = new Set(unopimSkular)
+  return {
+    seri, model, tekil: bySku.size,
+    cift: [...bySku].filter(([, a]) => a.length > 1).map(([sku, seriler]) => ({ sku, seriler })),
+    unopimdeYok: [...bySku.keys()].filter((s) => !u.has(s)).sort(),
+    icerikteYok: [...u].filter((s) => !bySku.has(s)).sort(),
+  }
+}
