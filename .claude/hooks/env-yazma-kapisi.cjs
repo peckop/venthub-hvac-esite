@@ -28,13 +28,18 @@ const { execFileSync } = require('child_process')
 const ENV = /(^|[/\\])\.env(\.[^/\\\s]+)?$/
 const envMi = (y) => ENV.test(String(y)) && !/\.example$/.test(String(y))
 
-function anaDepo(cwd) {
+// ARC-296: takılan git (yük altında, kilitli indeks) kapıyı 30 sn zaman aşımına, onFailure=block ile de komutun
+// reddine götürüyordu. git 5 sn'de kesilir; kesilince null döner ve "her hedef ana depo sayılır" (güvenli yön: sorar).
+const GIT_ZAMAN_ASIMI_MS = 5000
+
+function anaDepo(cwd, calistir = execFileSync) {
   try {
-    const ortak = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+    const ortak = calistir('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
       cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
       windowsHide: true,
+      timeout: GIT_ZAMAN_ASIMI_MS,
     }).trim()
     return path.dirname(ortak)
   } catch {
@@ -97,5 +102,5 @@ function main() {
   process.exit(0)
 }
 
-module.exports = { incele, anaDepo, envMi }
+module.exports = { incele, anaDepo, envMi, GIT_ZAMAN_ASIMI_MS }
 if (require.main === module) main()
