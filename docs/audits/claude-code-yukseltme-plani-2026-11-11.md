@@ -39,7 +39,7 @@ Stable'ın tek avantajı daha az davranış değişikliği; karşılığında g�
 ## 4. Yükseltme adımları (öneri, uygulanmadı)
 
 1. Sage yedeği al.
-2. Tüm pencereleri kapat; zamanı Recep ve OPS belirler.
+2. Kapsam (OPS düzeltmesi, 11 Kasım): bütün pencereler Claude masaüstü uygulamasını kullanır; uygulamaya gömülü Claude Code 2.1.321'dir ve kendi kendine güncellenir. Yükseltme yalnız terminal CLI'yı (2.1.296; skill sınavı gibi arka plan araçları kullanır) kapsar. Pencere kapatma şartı ve Recep'e zaman sorusu yoktur.
 3. Ayrı worktree'de dene: `claude --version`, tek sohbet, UserPromptSubmit sırası, exit 2 kancaları (`bash-write-guard`, `protect-config`), bir MCP çağrısı, grep/sed içeren Bash çağrıları.
 4. Yükselt: `npm i -g @anthropic-ai/claude-code@2.1.322` (kurulum yöntemi ölçülmedi; yerel kurulumsa komut farklı olur).
 5. Doğrula: sürüm, `node --check` ile kanca dosyaları, smoke testi `CLAUDE_CODE_ENTRYPOINT=sdk-cli`, `--no-session-persistence` ve scratchpad cwd ile.
@@ -48,7 +48,7 @@ Stable'ın tek avantajı daha az davranış değişikliği; karşılığında g�
 ## 5. İzin ayarı önerileri (yalnız öneri; izin ayarı Recep kararıdır, uygulama yok)
 
 - `denyInsteadOfPrompting`: genel olarak ÖNERİLMEZ. Ana terminal pencerelerinde ask istemi red olur; `env-yazma`, `gh-api` kapıları ve push ask'ları Recep'in onay yolunu kaybeder. Alt ajan için ayrı ayarlanabilir olup olmadığı belgede yok.
-- `blockWritesOutsideWorkingDirectories`: Write/Edit/NotebookEdit için dış dizinleri her izin modunda reddeder. `C:\tmp` ve `~/.claude` `additionalDirectories` içinde. ÇAKIŞMA: oturum scratchpad dizini ve yan oturum not klasörü kalıcı listede yok; `CLAUDE_CODE_PLUGIN_DIRS` (`C:/Users/alize/mods`) da yok. Etkinleştirmeden önce bu yollar eklenmeli ya da yazma kapsamı ayrıca doğrulanmalı. `additionalDirectories`'in "çalışma dizini" sayılıp sayılmadığı sürüm notunda tanımlı değil.
+- `blockWritesOutsideWorkingDirectories`: Write/Edit/NotebookEdit için dış dizinleri her izin modunda reddeder. `C:\tmp` ve `~/.claude` `additionalDirectories` içinde. ÇAKIŞMA: oturum scratchpad dizini ve yan oturum not klasörü kalıcı listede yok; `CLAUDE_CODE_PLUGIN_DIRS` (`~/mods`) da yok. Etkinleştirmeden önce bu yollar eklenmeli ya da yazma kapsamı ayrıca doğrulanmalı. `additionalDirectories`'in "çalışma dizini" sayılıp sayılmadığı sürüm notunda tanımlı değil.
 - Geniş deny / dar ask çakışması (master/main push): karar OPS'ta.
 
 ## 6. Opus 4.8 hızlı modu 30 Kasım'da kalkıyor (ARC-295)
