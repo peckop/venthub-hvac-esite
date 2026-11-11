@@ -11,7 +11,7 @@
  * Karar (adres × motor): lastmod = sitemap lastmod (değişiklik tarihi).
  *   TAMAM  son tarama ≥ lastmod (lastmod yoksa: taranmış).
  *   BEKLE  son tarama lastmod'dan eski/yok AMA lastmod'dan sonra istek/gönderim var, eşik dolmadı (Google 7, Bing 5, Yandex 7 gün).
- *   TEKRAR aynı durum, eşik doldu: istek işe yaramadı, yeniden istek hakkı doğar.
+ *   TEKRAR aynı durum, eşik doldu: istek işe yaramadı, yeniden istek hakkı doğar (Google'da adres hiç taranmamışsa eşik 3 gün, SEO-108).
  *   YAP    taranmamış/eski ve lastmod'dan sonra hiç istek yok.
  *   ATLA   sayfa noindex (istek kotayı boşa harcar).
  *   IndexNow: tarama bilgisi yoktur; bildirim lastmod'dan sonraysa TAMAM, değilse YAP.
@@ -40,6 +40,8 @@ export const VARSAYILAN_KLASOR = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo
 export const VARSAYILAN_DEFTER = `${VARSAYILAN_KLASOR}/dizin-takip/hareketler.jsonl`
 /** Aynı adrese yeniden istek hakkının doğduğu gün sayısı. Google günlük kotası ~10-11 olduğu için en uzunu. */
 export const TEKRAR_ESIGI_GUN = { google: 7, bing: 5, yandex: 7 }
+/** Google adresi hiç taramamışken (URL Inspection: bilinmiyor) yeniden istek hakkının doğduğu gün (SEO-108: 8 Kasım isteği 3 gün sonra hâlâ bilinmiyordu). */
+export const TEKRAR_ESIGI_HIC_TARANMAMIS_GUN = { google: 3 }
 /** Tarama bilgisi API'den gelmeyen motorlarda adres bazlı kayıt başlangıcı: bundan eski lastmod'un geçmişi bilinmez → ESKI (istek atılmaz). */
 export const KAYIT_BASLANGICI = { indexnow: '2026-11-05T00:00:00Z', yandex: '2026-11-01T00:00:00Z' }
 const GUN_MS = 24 * 3600 * 1000
@@ -133,7 +135,8 @@ export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: har
   if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
   if (hareket !== null && (degisim === null || hareket >= hareketDegisim)) {
     const gun = (simdi - hareket) / GUN_MS
-    const esik = TEKRAR_ESIGI_GUN[motor] ?? 7
+    // SEO-108: Google adresi HİÇ taramamışsa (URL bilinmiyor) 3 gün sonra istek tutmamış sayılır; taranmış-eski adreste 7 gün kalır.
+    const esik = tarama === null && motor === 'google' ? TEKRAR_ESIGI_HIC_TARANMAMIS_GUN.google : (TEKRAR_ESIGI_GUN[motor] ?? 7)
     return gun >= esik
       ? { durum: 'TEKRAR', neden: `istek ${Math.floor(gun)} gün önce, tarama yok (eşik ${esik})` }
       : { durum: 'BEKLE', neden: `istek ${Math.floor(gun)} gün önce, tarama bekleniyor (eşik ${esik})` }

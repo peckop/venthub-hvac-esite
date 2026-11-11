@@ -46,6 +46,12 @@ describe('karar: Google ve Bing', () => {
     expect(TEKRAR_ESIGI_GUN.google).toBe(7)
     expect(k.durum).toBe('TEKRAR')
   })
+  it('SEO-108: Google adresi hiç taramamış, istek 3 gün önce → TEKRAR; 2 gün önce → BEKLE; taranmış-eski adreste eşik 7 kalır', () => {
+    const lm = '2026-11-01T10:00:00Z'
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-11T22:00:00Z') }).durum).toBe('TEKRAR')
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-10T21:00:00Z') }).durum).toBe('BEKLE')
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: '2026-10-20T00:00:00Z', sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-11T22:00:00Z') }).durum).toBe('BEKLE')
+  })
   it('Bing eşiği 5 gün: 6 gün önceki gönderim TEKRAR, 4 gün önceki BEKLE', () => {
     expect(karar({ motor: 'bing', lastmod: gun(1), sonTarama: null, sonHareket: ms(gun(4)), simdi: NOW }).durum).toBe('TEKRAR')
     expect(karar({ motor: 'bing', lastmod: gun(1), sonTarama: null, sonHareket: ms(gun(6)), simdi: NOW }).durum).toBe('BEKLE')
