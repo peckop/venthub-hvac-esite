@@ -41,7 +41,7 @@ metadata:
 | Basamak | Kapı | Komut |
 |---|---|---|
 | B2, B16 | alıntı kaynakta ham doğrulanır | `node scripts/rehber/alinti-dogrula.mjs <kaynaklar.json> [--cikti <dosya.json>]` |
-| B3 | kalıp, atıf, iddia deseni (kırmızı 0) | Blog betik takımı birleşince: `node scripts/rehber/tur/rehber-tur.mjs kapi`. Şimdilik `rehber-denetim.mjs` modüldür, komut satırı girişi yoktur: BLOG `denetle`, `kisaKatmanDenetle`, `kalipDenetle`, `markaDenetle`, `baslikDenetle` fonksiyonlarını yazı başına küçük bir depo dışı sarmalayıcıyla çağırır (taslak + iddia tablosu JSON); modülün sınaması `pnpm vitest run scripts/rehber/__tests__/rehber-denetim.test.ts` |
+| B3 | kalıp, atıf, iddia deseni (kırmızı 0) | `node scripts/rehber/tur/tur.mjs kapi <taslak.md> [iddialar.json]` (denetle, aynı-sayı ve kapsam sözcüğü açıkları; çıkış 0 temiz, 1 kırmızı). Aynı betiğin öteki alt komutları B5-B6 turunda: `iskelet`, `yama`, `fark`, `tuzak`, `kayit` |
 | B4, B10 | iç bağlantılar doğrudan 200 | `node scripts/rehber/ic-baglanti-denetle.mjs [--sayfa <adres>]` |
 | B10 | bot karnesi yazı adresinde temiz | `node scripts/seo/bot-karnesi.mjs` |
 | B9 | birleştirme ritüeli | `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` |
