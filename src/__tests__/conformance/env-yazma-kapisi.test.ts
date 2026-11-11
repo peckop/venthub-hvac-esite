@@ -14,6 +14,8 @@ const gerek = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '../../..')
 interface Kapi {
   incele: (komut: string, cwd: string, ana: string | null) => string | null
+  anaDepo: (cwd: string, calistir?: (k: string, a: string[], s: { timeout?: number }) => string) => string | null
+  GIT_ZAMAN_ASIMI_MS: number
 }
 const k = gerek(path.join(KOK, '.claude', 'hooks', 'env-yazma-kapisi.cjs')) as Kapi
 const ANA = 'C:/depo/ana'
@@ -41,6 +43,20 @@ describe('INV-ENV-YAZMA-1', () => {
 
   it('ana depo çözülemezse her hedef ana depo sayılır (güvenli yön)', () => {
     expect(sor(`rm ${WT}/.env`, WT, null)).toBe(true)
+  })
+
+  it('ARC-296 sabotaj: git takılırsa 5 sn zaman aşımı konur ve sonuç null (kapı 30 sn kancayı bloklamaz)', () => {
+    let secenek: { timeout?: number } = {}
+    const takilan = (_k: string, _a: string[], s: { timeout?: number }) => {
+      secenek = s
+      throw Object.assign(new Error('spawnSync git ETIMEDOUT'), { code: 'ETIMEDOUT' })
+    }
+    expect(k.anaDepo(WT, takilan)).toBeNull()
+    expect(secenek.timeout).toBe(k.GIT_ZAMAN_ASIMI_MS)
+    expect(k.GIT_ZAMAN_ASIMI_MS).toBeGreaterThan(0)
+    expect(k.GIT_ZAMAN_ASIMI_MS).toBeLessThan(30_000) // kanca süresinin (30 sn) altında
+    // çözülemeyen ana depo → güvenli yön: sorar (üstteki test), takılma bunu değiştirmez
+    expect(sor(`rm ${WT}/.env`, WT, k.anaDepo(WT, takilan))).toBe(true)
   })
 
   it('settings.json Bash kancaları arasında kayıtlı', () => {
