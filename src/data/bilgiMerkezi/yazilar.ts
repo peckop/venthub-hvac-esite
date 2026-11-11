@@ -698,7 +698,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-04 (BLG-39, SEO-83): gövde yenilendi (kesit farkı, kullanım yerleri, seçim bilgileri, kaynaklar); doğrulanmış metin taslak v-son (sha c97467046789; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug, H1 ve ürün listesi değişmedi.
     // Güncelleme tarihi 2026-11-07 (BLG-41, SEO-86): giriş markasız "kanal fanları" tanımıyla başlar, tür sayımı ve "Kullanım alanları" başlığı eklendi; meta açıklama "kanal fanları nelerdir" ve "kullanım alanları" ifadelerini taşır. H1, başlık, adres ve ürün listesi aynı. Doğrulanmış metin taslak (sha e5bb7cdac23f; üç tur, tuzaklı ve temiz kopya). Not: BLG-39 içeriği 6 Kasım'da çıkmış, tarih 4 Kasım'da kalmıştı; bu tarih ikisini de kapsar.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "Kanal fanı çeşitleri nelerdir?" bölümü eklendi (mevcut tür tablosu bu başlığın altında); var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
-    guncellemeTarihi: '2026-11-08',
+    // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
+    guncellemeTarihi: '2026-11-11',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -760,6 +761,8 @@ Aynı katalog kanal sisteminin ucuna takılan türleri de listeler. Çelik sac d
 | Kısa asma tavan | Çok kısa yükseklik sayesinde kısa asma tavanlara uygun | [4] |
 | Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [4] |
 | Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [4] |
+
+Kanal tipi ısı geri kazanım cihazları bu yazıda ele alınmaz; bunun için [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
 
 ## Kanal tipi fan seçerken hangi bilgilere bakılır?
 
@@ -1185,7 +1188,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-40 (2026-11-06): H1 (= sayfa başlığı) ve meta açıklaması değişti; önceki H1 bir rakip sayfanın başlığıyla birebir aynıydı (GEO-SEO ölçümü). Gövde, slug ve ürün listesi aynı.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan için H3 başlıklı yeni bölüm eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
     // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; "327/2011'i yürürlükten kaldırmıştır" yerine "327/2011'in genel hükümlerini yürürlükten kaldırmıştır" ve Kaynaklar 5'te "genel hükümleri yürürlükten kalkmıştır". Madde 2 tanım cümlelerindeki "yürürlükten kalkan 327/2011" ifadesi aynen kaldı. Önceki değer: 2026-11-08.
-    guncellemeTarihi: '2026-11-09',
+    // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
+    guncellemeTarihi: '2026-11-11',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
       'vh:kategori/axial-industrial-fans',
@@ -1284,7 +1288,7 @@ Bu yazı fiyat vermez ve fiyatı belirleyen etkenleri kaynakla sayamaz. Fan tür
 
 ## Bu yazının sınırları nelerdir?
 
-Karma akışlı fanı diğer türlerle karşılaştıran bağımsız bir kaynak bu yazıda kullanılmamıştır; karma akışlı fanın avantajına ilişkin cümle bir üretici beyanıdır [3]. İncelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur, bu yüzden bu türün ürünleri yazıda ele alınmaz [4]. Tüzük jet fanı da ayrı bir kategori sayar (madde 2(1)) [1]; VentHub'daki otopark jet fanları kategorisi 3 Kasım 2026'da ürün listelemiyordu [4]. Jet fan bu yazıda tanımlanmaz.
+Karma akışlı fanı diğer türlerle karşılaştıran bağımsız bir kaynak bu yazıda kullanılmamıştır; karma akışlı fanın avantajına ilişkin cümle bir üretici beyanıdır [3]. İncelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur, bu yüzden bu türün ürünleri yazıda ele alınmaz [4]. Tüzük jet fanı da ayrı bir kategori sayar (madde 2(1)) [1]; VentHub'daki otopark jet fanları kategorisi 3 Kasım 2026'da ürün listelemiyordu [4]. Jet fan bu yazıda tanımlanmaz. Hava perdesi ve ısı geri kazanım cihazı da bu yazıda ele alınmaz; bunlar için [hava perdesi rehberine](vh:yazi/hava-perdesi) ve [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
 
 Tablodaki gaz yolu sütunu okur için bir açıklamadır; tanım niteliğini yalnız akış açısı sütunu taşır [1]. Gaz yolu sütunu yürürlükten kalkan 327/2011 madde 2'nin anlatımına dayanır ve kullanılan metin legislation.gov.uk sitesindeki Birleşik Krallık sürümüdür [5]. 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır (madde 9(1)) [1][6]; eski tüzüğün Ek I, II ve III'ü, (AB) 2025/2481 ile değiştirilen aynı fıkraya göre, başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanları için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
@@ -1923,7 +1927,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'banyo-tuvalet-fani-secimi',
     konu: 'konfor',
     yayinTarihi: '2026-11-08',
-    guncellemeTarihi: '2026-11-08',
+    // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
+    guncellemeTarihi: '2026-11-11',
     urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
     diller: {
@@ -1997,6 +2002,7 @@ Bu yazı fiyat vermez; ilgili ürün sayfalarında fiyat gösterilmez, teklif is
 - Madde numaraları yayın tarihindeki güncel metne aittir ve değişiklikle kayabilir.
 - HVI ve ENERGY STAR ABD kaynaklıdır, İngiltere belgesi yalnız İngiltere içindir; bu ölçütler Türkiye'de bağlayıcı değildir [3][4][6]. Projeye özel değeri tasarımcı ve üretici kılavuzu belirler.
 - Fiyatı belirleyen etkenler bu yazının kaynaklarında yer almaz.
+- Isı geri kazanımlı havalandırma bu yazıda ele alınmaz; bunun için [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
 
 ## VentHub'da hangi banyo ve tuvalet fanı serileri var?
 
