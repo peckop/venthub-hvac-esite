@@ -62,7 +62,7 @@ describe('liste kartı — güncelleme tarihi', () => {
       ['frekans-konvertoru', '2026-11-09', '9 Kasım 2026'],
       ['fan-cesitleri', '2026-11-11', '11 Kasım 2026'],
       ['radyal-aksiyel-fan-secimi', '2026-11-09', '9 Kasım 2026'],
-      ['kanal-tipi-fan-nedir', '2026-11-11', '11 Kasım 2026'],
+      ['kanal-tipi-fan-nedir', '2026-11-12', '12 Kasım 2026'],
       ['sessiz-fan-secimi', '2026-11-09', '9 Kasım 2026'],
     ]
     for (const [kimlik, iso, yazili] of beklenen) {
