@@ -13,7 +13,7 @@ import { resolve, join } from 'node:path'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
-  KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
+  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
   satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
@@ -45,6 +45,12 @@ describe('karar: Google ve Bing', () => {
     const k = karar({ motor: 'google', lastmod: gun(1), sonTarama: null, sonHareket: ms(gun(2)), simdi: NOW + 0 })
     expect(TEKRAR_ESIGI_GUN.google).toBe(7)
     expect(k.durum).toBe('TEKRAR')
+  })
+  it('SEO-108: Google adresi hiç taramamış, istek 3 gün önce → TEKRAR; 2 gün önce → BEKLE; taranmış-eski adreste eşik 7 kalır', () => {
+    const lm = '2026-11-01T10:00:00Z'
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-11T22:00:00Z') }).durum).toBe('TEKRAR')
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-10T21:00:00Z') }).durum).toBe('BEKLE')
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: '2026-10-20T00:00:00Z', sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-11T22:00:00Z') }).durum).toBe('BEKLE')
   })
   it('Bing eşiği 5 gün: 6 gün önceki gönderim TEKRAR, 4 gün önceki BEKLE', () => {
     expect(karar({ motor: 'bing', lastmod: gun(1), sonTarama: null, sonHareket: ms(gun(4)), simdi: NOW }).durum).toBe('TEKRAR')
@@ -156,6 +162,14 @@ describe('içe aktarım', () => {
   })
 })
 
+describe('Bing hız sınırı (SEO-102)', () => {
+  it('ilk geçiş en az 1 sn aralıklı, yeniden denemeler her turda daha yavaş', () => {
+    expect(BING_ARALIK_MS[0]).toBeGreaterThanOrEqual(1000)
+    expect(BING_ARALIK_MS.length).toBeGreaterThanOrEqual(2)
+    for (let i = 1; i < BING_ARALIK_MS.length; i++) expect(BING_ARALIK_MS[i]).toBeGreaterThan(BING_ARALIK_MS[i - 1])
+  })
+})
+
 describe('harita ve kapsam', () => {
   const xml = `<urlset><url><loc>${A}</loc><lastmod>${gun(9)}</lastmod></url><url><loc>${B}</loc></url><url><loc>${S}/tr/eski</loc><lastmod>2026-09-01T00:00:00.000Z</lastmod></url></urlset>`
   it('lastmod olmayan adres null döner', () => {
@@ -166,6 +180,18 @@ describe('harita ve kapsam', () => {
     const hareketler = [{ tarih: gun(8), motor: 'bing', eylem: 'gonderim', adres: B }]
     const k = kapsamSec({ harita, hareketler, gun: 14, simdi: NOW })
     expect(k.map((x) => x.adres)).toEqual([A, B].sort())
+  })
+  it('SEO-100: gun verilmezse kapsam TÜM site haritasıdır (eski, hareketsiz, lastmod yok dahil)', () => {
+    const k = kapsamSec({ harita: haritaCoz(xml), hareketler: [], simdi: NOW })
+    expect(k.map((x) => x.adres).sort()).toEqual([A, B, `${S}/tr/eski`].sort())
+  })
+  it('SEO-100: Google taranmış ama dizinde değilse TAMAM değil, YAP; dizinde ise TAMAM', () => {
+    const girdi = { motor: 'google', lastmod: gun(5), sonTarama: gun(6), simdi: NOW }
+    const yok = karar({ ...girdi, dizinde: false, kapsam: 'Crawled - currently not indexed' })
+    expect(yok.durum).toBe('YAP')
+    expect(yok.neden).toContain('dizinde değil')
+    expect(karar({ ...girdi, dizinde: true }).durum).toBe('TAMAM')
+    expect(karar({ ...girdi, dizinde: null }).durum).toBe('TAMAM')
   })
   it('--adres ile elle verilen adres kapsama girer', () => {
     const k = kapsamSec({ harita: haritaCoz(xml), hareketler: [], gun: 1, simdi: NOW, ek: [`${S}/tr/eski`] })

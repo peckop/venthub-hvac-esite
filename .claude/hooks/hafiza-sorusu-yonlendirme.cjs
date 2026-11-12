@@ -179,6 +179,14 @@ if (defter.kayip.length > 0) {
   )
 }
 
+// ARC-290: OPS penceresinde geçiş/yeni site konusu → tek bağlam satırı (scripts/hijyen/gecis-konusu.cjs; fail-open).
+try {
+  const g = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'gecis-konusu.cjs')).uyari(istem, girdi)
+  if (g) defterSatirlari.unshift(g)
+} catch {
+  // yönlendirme yardımcısı okunamadı: sessiz geç
+}
+
 if (eslesen.length === 0 && defterSatirlari.length === 0) process.exit(0)
 
 const kodMu = eslesen.length > 0 && eslesen.every((k) => k.sinif === 'KOD')

@@ -25,7 +25,11 @@ Saatlik yoğunluk 8 Kasım 06:00–21:00 UTC arasında 33 olay, saatte ortalama 
 
 **4. Compact sonrası ilk model çağrısı (39 ölçümün hepsinde).** İlk çağrının toplam girdisi medyan 164k (en az 149k, en çok 198k). Bunun `postTokens`'ı medyan ~45k (özet + korunan bölüm); aradaki ~115k, her çağrıda yeniden gönderilen sabit taban: sistem istemi, araç şemaları, MCP talimatları, CLAUDE.md ve kural dosyaları, SessionStart kancası çıktısı. Ops penceresi en yüksek (175–198k; MCP/araç listesi en geniş pencere). `yeni-yazılan` önbellek 93–156k, `okunan` 0–65k: compact sonrası önbellek büyük ölçüde yeniden yazılıyor. Taban kalemlerinin tek tek kırılımı bu ölçümde YOK (ayrı bir sistem istemi dökümü gerekir); yalnız toplam doğrulandı.
 
-**5. Recep ara mesajı kaybı: ölçülmedi.** Bitiş ölçüsünün ikinci yarısı ("compact sonrası dökümde ara mesaj kaybı 0, 3 pencerede") bu turda koşulmadı. Gerekçe: `compact_boundary` çevresindeki kullanıcı mesajlarını boundary öncesi/sonrası karşılaştıran bir betik yazılmadı. Kart bu madde için açık kalır.
+**5. Ara mesaj kaybı (34 compact, 8 Kasım sonrası, her pencere).** Yöntem: her özet mesajından önceki 120 dakikadaki kullanıcı tarafı mesajları (Recep'in yazdıkları ve pencereler arası `cross-session-message` iletileri) toplandı; her mesajın kart/PR numarası ve dosya yolu gibi kimlikleri özet metninde aranıyor. Kelime örtüşmesi kullanılmadı (özet kısaltıyor, alıntılamıyor; ilk denemede %87 sahte "kayıp" verdi).
+- Toplam 227 mesaj, 208'i kimlik taşıyor. 190'ının en az bir kimliği özette var. 18'inde yok; 4'ü yalnız `CLAUDE.md` adı taşıyan sistem metni (sahte), 14'ü gerçek aday: altyapı 1, araç 2 (SEO-98 ve #2408; ARC-280), blog 8, katalog 2 (KTL-82, KTL-76), OPS 1 (`linear-okundu.cjs`, otomatik uyarı).
+- Bu 14, "özette yok" demektir, "kayıp" demek değil: özet açık işleri yazar, o sırada kapanmış kart/PR'ı yazmayabilir. Tek tek kapanış/devam kanıtı aranmadı; sonuç üst sınırdır.
+- Recep'in kendi yazdığı mesaj: pencerelerde yalnız OPS'ta 1 tane (8 Kasım 06:47, "ERF analizini tekrar yapacak mıyız" sorusu). Özet bunu taşımıyor, ama (a) OPS compact'tan 1 saat önce cevaplamış ve ölçüm defterine yazmış, (b) açılış kancası Recep'in son mesajlarını compact sonrası dökümde AYNEN geri veriyor (dökümde `### Recep (…)` blokları görüldü). Yani Recep ara mesajı kaybı bu örnekte 0.
+- Sınır: yalnız 1 doğrudan Recep mesajı vardı; "kayıp 0" bu tek örnekle ve kancanın varlığıyla desteklenir, istatistiksel güven vermez. Pencereler arası mesajlarda kancanın aynen geri verme güvencesi yok; 14 adayın gerçek kayıp olup olmadığı açık.
 
 ## Hüküm ve öneri
 
@@ -35,4 +39,4 @@ Saatlik yoğunluk 8 Kasım 06:00–21:00 UTC arasında 33 olay, saatte ortalama 
 
 ## Ölçülmeyenler
 
-Ara mesaj kaybı (madde 5); taban kalemlerinin kırılımı (madde 4); 1 Kasım 15:09 geçişinin nedeni (madde 3); 25 Ekim öncesi dökümler; compact/saat için ayar değişikliği öncesi–sonrası karşılaştırması (eşik değişmedi). Salt-okuma ölçümdür; yerel dökümler tek makineye aittir.
+Pencereler arası 14 aday mesajın gerçek kayıp olup olmadığı (madde 5); taban kalemlerinin kırılımı (madde 4); 1 Kasım 15:09 geçişinin nedeni (madde 3); 25 Ekim öncesi dökümler; compact/saat için ayar değişikliği öncesi–sonrası karşılaştırması (eşik değişmedi). Salt-okuma ölçümdür; yerel dökümler tek makineye aittir.

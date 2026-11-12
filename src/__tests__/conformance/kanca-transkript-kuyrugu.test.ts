@@ -92,6 +92,28 @@ describe('INV-KANCA-KUYRUK-1: yardımcı kuyruğu okur, satır bütünlüğünü
 const DEV_BOY = bufferSabitleri.MAX_STRING_LENGTH + 8 * 1024 * 1024
 let devYol = ''
 
+/**
+ * ARC-85: Linux'ta truncate seyrek dosya üretir; Windows NTFS'te 540 MiB'ı diske YAZAR (ölçüldü: bayraksız 540,0 MB,
+ * `fsutil sparse setflag` ile 0,1 MB) ve yerelde her koşu ~530 MB yazıp silerdi. Bayrak dosya BOŞKEN konur, sonra truncate.
+ * Bayrak konamazsa (fsutil yok / dosya sistemi desteklemiyor) dev vakalar ATLANIR: sessiz 530 MB yazmaktansa görünür atlama.
+ */
+function seyrekBayrakKoy(yol: string): boolean {
+  if (process.platform !== 'win32') return true
+  const r = spawnSync('fsutil', ['sparse', 'setflag', yol], { encoding: 'utf8', windowsHide: true })
+  return r.status === 0
+}
+const SEYREK_OLABILIR = (() => {
+  if (process.platform !== 'win32') return true
+  const gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-seyrek-'))
+  try {
+    const yol = path.join(gecici, 'sonda')
+    fs.closeSync(fs.openSync(yol, 'w'))
+    return seyrekBayrakKoy(yol)
+  } finally {
+    fs.rmSync(gecici, { recursive: true, force: true })
+  }
+})()
+
 /** Seyrek önek korunur; kuyruk her vakada yeniden yazılır (8 MB'lık dev dosya her vaka için kurulmaz). */
 function devKayitYaz(kayitlar: object[]) {
   fs.truncateSync(devYol, DEV_BOY)
@@ -106,10 +128,11 @@ const asistanArac = () => ({
 })
 const UZUN = 'Is bitti: olcum yapildi, kapilar yesil ve sonucu buraya yaziyorum ki cevap gorunur olsun.'
 
-describe('INV-KANCA-KUYRUK-2: dizge sınırını aşan kayıtta iki kanca ÇÖKMEZ, doğru kararı verir', () => {
+describe.skipIf(!SEYREK_OLABILIR)('INV-KANCA-KUYRUK-2: dizge sınırını aşan kayıtta iki kanca ÇÖKMEZ, doğru kararı verir', () => {
   beforeAll(() => {
     devYol = path.join(dizin, 'dev-oturum.jsonl')
     fs.closeSync(fs.openSync(devYol, 'w'))
+    seyrekBayrakKoy(devYol)
     fs.truncateSync(devYol, DEV_BOY)
   }, 120_000)
 

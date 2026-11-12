@@ -20,7 +20,7 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 
 import { dugum } from './tasarim-agac-veri.mjs'
-import { ALANLAR, bozmaUygula, eskiGoruntuler, farkHesapla } from './tasarim-unopim-fark-kurallar.mjs'
+import { ALANLAR, bozmaUygula, eskiGoruntuler, farkHesapla, icerikSkuFarki } from './tasarim-unopim-fark-kurallar.mjs'
 
 const arg = (ad, varsayilan) => { const i = process.argv.indexOf(ad); return i >= 0 ? process.argv[i + 1] : varsayilan }
 const KOK = arg('--goruntu', process.env.KATALOG_GORUNTU_KOKU || join(homedir(), 'VentHub-Gorsel-Arsiv', '_liste'))
@@ -79,6 +79,9 @@ let girdi = {
   adTr: new Map(csvOku(join(B, 'ad-tr.csv'), ',').map((r) => [r.sku, r.ad_tr])),
   degerCsv: new Map(csvOku(join(KOK, 'ops-foto-urun-listesi-2026-11-02.csv'), ';').filter((r) => /^yeni/.test(r.durum)).map((r) => [r.sku, r])),
 }
+// Design-İÇERİK `sku` alanı (KTL-87): modeller UnoPIM koduyla eşlenir. Anlık görüntü yoksa atlanır (bilgi amaçlı, çıkışı değiştirmez).
+const ICERIK = arg('--icerik-dizin', join(KOK, 'ktl87-icerik-2026-11-10', 'seri-veri-dizin-2026-11-02.json'))
+const icerikSku = existsSync(ICERIK) ? icerikSkuFarki(json(ICERIK), urunler.map((u) => u.sku)) : null
 const temiz = farkHesapla(girdi)
 if (BOZMA) girdi = bozmaUygula(girdi)
 const sonuc = BOZMA ? farkHesapla(girdi) : temiz
@@ -90,9 +93,10 @@ const cikti = {
   atlanan: { tasarimdaMetinYok: sonuc.atlanan.tasarimdaMetinYok.length, adKaynagiYok: sonuc.atlanan.adKaynagiYok, teknikKaynagiDBde: sonuc.atlanan.teknikKaynagiDBde },
   fark: Object.fromEntries(Object.entries(sonuc.fark).map(([k, v]) => [k, v.slice(0, 50)])),
   tasarimdaMetinYokSku: sonuc.atlanan.tasarimdaMetinYok,
+  icerikSku,
 }
 writeFileSync(join(CIKTI, `${BOZMA ? 'bozma-test-' : 'fark-'}${tarih}.json`), JSON.stringify(cikti, null, 1))
-console.log(JSON.stringify({ urun: urunler.length, ozet: sonuc.ozet, atlanan: cikti.atlanan }))
+console.log(JSON.stringify({ urun: urunler.length, ozet: sonuc.ozet, atlanan: cikti.atlanan, icerikSku: icerikSku && { seri: icerikSku.seri, model: icerikSku.model, tekil: icerikSku.tekil, cift: icerikSku.cift.length, unopimdeYok: icerikSku.unopimdeYok, icerikteYok: icerikSku.icerikteYok } }))
 if (BOZMA) {
   // bozma testi: temiz koşuya göre HER alanda yeni fark çıkmalı (teknik, yalnız değer CSV'si olan modelde bozulabilir)
   const kor = ALANLAR.filter((k) => sonuc.fark[k].length <= temiz.fark[k].length)

@@ -11,14 +11,14 @@
  * Karar (adres × motor): lastmod = sitemap lastmod (değişiklik tarihi).
  *   TAMAM  son tarama ≥ lastmod (lastmod yoksa: taranmış).
  *   BEKLE  son tarama lastmod'dan eski/yok AMA lastmod'dan sonra istek/gönderim var, eşik dolmadı (Google 7, Bing 5, Yandex 7 gün).
- *   TEKRAR aynı durum, eşik doldu: istek işe yaramadı, yeniden istek hakkı doğar.
+ *   TEKRAR aynı durum, eşik doldu: istek işe yaramadı, yeniden istek hakkı doğar (Google'da adres hiç taranmamışsa eşik 3 gün, SEO-108).
  *   YAP    taranmamış/eski ve lastmod'dan sonra hiç istek yok.
  *   ATLA   sayfa noindex (istek kotayı boşa harcar).
  *   IndexNow: tarama bilgisi yoktur; bildirim lastmod'dan sonraysa TAMAM, değilse YAP.
  *   Yandex: tarama bilgisi API'de yok; "olcum aramada" hareketi son tarama sayılır.
  *
  * Kullanım:
- *   node scripts/seo/dizin-takip.mjs --durum [--gun 14] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
+ *   node scripts/seo/dizin-takip.mjs --durum [--gun N: yalnız son N günün adresleri; verilmezse TÜM site haritası] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
  *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <adres,adres> [--sonuc aramada]
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
@@ -40,6 +40,8 @@ export const VARSAYILAN_KLASOR = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo
 export const VARSAYILAN_DEFTER = `${VARSAYILAN_KLASOR}/dizin-takip/hareketler.jsonl`
 /** Aynı adrese yeniden istek hakkının doğduğu gün sayısı. Google günlük kotası ~10-11 olduğu için en uzunu. */
 export const TEKRAR_ESIGI_GUN = { google: 7, bing: 5, yandex: 7 }
+/** Google adresi hiç taramamışken (URL Inspection: bilinmiyor) yeniden istek hakkının doğduğu gün (SEO-108: 8 Kasım isteği 3 gün sonra hâlâ bilinmiyordu). */
+export const TEKRAR_ESIGI_HIC_TARANMAMIS_GUN = { google: 3 }
 /** Tarama bilgisi API'den gelmeyen motorlarda adres bazlı kayıt başlangıcı: bundan eski lastmod'un geçmişi bilinmez → ESKI (istek atılmaz). */
 export const KAYIT_BASLANGICI = { indexnow: '2026-11-05T00:00:00Z', yandex: '2026-11-01T00:00:00Z' }
 const GUN_MS = 24 * 3600 * 1000
@@ -110,10 +112,10 @@ export function yandexSonTarama(hareketler, adres) {
 
 /**
  * Tek karar. Saf işlev: ağ ve dosya yok.
- * @param {{ motor: string, lastmod?: string|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string }} p
+ * @param {{ motor: string, lastmod?: string|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string }} p
  * @returns {{ durum: 'TAMAM'|'BEKLE'|'TEKRAR'|'YAP'|'ATLA'|'ESKI'|'OLCULEMEDI', neden: string }}
  */
-export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '' }) {
+export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '' }) {
   if (olculemedi) return { durum: 'OLCULEMEDI', neden: `durum okunamadı${hataMetni ? `: ${hataMetni}` : ''}; istek atmadan önce yeniden ölç` }
   if (noindex) return { durum: 'ATLA', neden: 'sayfa noindex; istek kotayı boşa harcar' }
   const degisim = tarihAl(lastmod)
@@ -129,15 +131,18 @@ export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: har
     if (kayitOncesi) return { durum: 'ESKI', neden: 'lastmod adres bazlı kayıt başlangıcından önce; günlük görev kapsar' }
     return { durum: 'YAP', neden: 'lastmod sonrası IndexNow bildirimi yok' }
   }
-  if (tarama !== null && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
+  // SEO-100: Google'da taranmış ama dizinde değilse (verdict) tarama tarihi TAMAM saymaz.
+  if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
   if (hareket !== null && (degisim === null || hareket >= hareketDegisim)) {
     const gun = (simdi - hareket) / GUN_MS
-    const esik = TEKRAR_ESIGI_GUN[motor] ?? 7
+    // SEO-108: Google adresi HİÇ taramamışsa (URL bilinmiyor) 3 gün sonra istek tutmamış sayılır; taranmış-eski adreste 7 gün kalır.
+    const esik = tarama === null && motor === 'google' ? TEKRAR_ESIGI_HIC_TARANMAMIS_GUN.google : (TEKRAR_ESIGI_GUN[motor] ?? 7)
     return gun >= esik
       ? { durum: 'TEKRAR', neden: `istek ${Math.floor(gun)} gün önce, tarama yok (eşik ${esik})` }
       : { durum: 'BEKLE', neden: `istek ${Math.floor(gun)} gün önce, tarama bekleniyor (eşik ${esik})` }
   }
   if (motor === 'yandex' && kayitOncesi) return { durum: 'ESKI', neden: 'lastmod Yandex kaydı başlamadan önce; geçmiş bilinmiyor, istek atılmaz' }
+  if (dizinde === false) return { durum: 'YAP', neden: `Google dizinde değil${kapsam ? ` (${kapsam})` : ''} ve lastmod sonrası istek yok` }
   return { durum: 'YAP', neden: tarama === null ? 'hiç taranmamış ve lastmod sonrası istek yok' : 'tarama lastmod\'dan eski ve lastmod sonrası istek yok' }
 }
 
@@ -153,9 +158,11 @@ export function haritaCoz(xml) {
  * Takip kapsamı: lastmod son `gun` günde olan ya da defterde son `gun` günde hareketi olan adresler (+ elle verilenler).
  * @param {{ harita: Array<{ adres: string, lastmod: string|null }>, hareketler: Array<{ tarih: string, adres: string }>, gun?: number, simdi?: number, ek?: string[] }} p
  */
-export function kapsamSec({ harita, hareketler, gun = 14, simdi = Date.now(), ek = [] }) {
+export function kapsamSec({ harita, hareketler, gun = Infinity, simdi = Date.now(), ek = [] }) {
   const sinir = simdi - gun * GUN_MS
   const adresler = new Set(ek)
+  // SEO-100: varsayılan kapsam TÜM site haritası; `gun` sonlu verilirse eski dar kapsam (son N gün).
+  if (!Number.isFinite(gun)) for (const h of harita) adresler.add(h.adres)
   for (const h of harita) { const t = tarihAl(h.lastmod); if (t !== null && t >= sinir) adresler.add(h.adres) }
   for (const h of hareketler) { const t = tarihAl(h.tarih); if (t !== null && t >= sinir) adresler.add(h.adres) }
   const lm = new Map(harita.map((h) => [h.adres, h.lastmod]))
@@ -170,7 +177,7 @@ export function tabloUret({ kapsam, hareketler, olcum, simdi = Date.now() }) {
       const o = olcum?.[motor]?.[adres] ?? {}
       const hareket = sonHareket(hareketler, motor, adres)
       const sonTarama = motor === 'yandex' ? yandexSonTarama(hareketler, adres) : o.sonTarama ?? null
-      const k = karar({ motor, lastmod, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '' })
+      const k = karar({ motor, lastmod, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '' })
       satir[motor] = { ...k, sonTarama: typeof sonTarama === 'number' ? new Date(sonTarama).toISOString() : sonTarama, sonHareket: hareket === null ? null : new Date(hareket).toISOString() }
     }
     return satir
@@ -256,7 +263,7 @@ async function googleOlc(adresler) {
           body: JSON.stringify({ inspectionUrl: a, siteUrl: GSC_MULK }),
         })
         const s = satirCikar(a, await r.json())
-        sonuc[a] = s.hata ? { hata: s.hata } : { sonTarama: s.sonTarama, noindex: /noindex/i.test(s.kapsam ?? '') || s.dizin === 'BLOCKED_BY_META_TAG', kapsam: s.kapsam }
+        sonuc[a] = s.hata ? { hata: s.hata } : { sonTarama: s.sonTarama, noindex: /noindex/i.test(s.kapsam ?? '') || s.dizin === 'BLOCKED_BY_META_TAG', kapsam: s.kapsam, dizinde: s.karar ? s.karar === 'PASS' : null }
       } catch (e) { sonuc[a] = { hata: String(e.message).slice(0, 120) } }
     }
   }
@@ -264,17 +271,23 @@ async function googleOlc(adresler) {
   return sonuc
 }
 
+/** Bing GetUrlInfo adresler arası bekleme (ms): ilk geçiş, sonra iki yavaşlayan yeniden deneme (SEO-102). */
+export const BING_ARALIK_MS = [1000, 2000, 3500]
+
 async function bingOlc(adresler) {
   const k = anahtarOku(anahtarDosyasiYolu())
   if (k.hata) return Object.fromEntries(adresler.map((a) => [a, { hata: k.hata }]))
   const cevir = (s) => Object.fromEntries((s.urlBilgi ?? []).map((u) => [u.adres, u.durum === 'TAMAM' ? { sonTarama: u.sonTarama } : { hata: u.neden ?? u.durum }]))
-  const ilk = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: adresler, gun: 30 }))
-  const basarisiz = adresler.filter((a) => !ilk[a] || ilk[a].hata)
-  if (!basarisiz.length) return ilk
-  // Hız sınırı ihtimaline karşı yalnız başarısızlar yavaşça bir kez daha denenir (sessiz geçmez: yine başarısızsa OLCULEMEDI kalır).
-  await new Promise((r) => setTimeout(r, 2000))
-  const ikinci = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: basarisiz, gun: 30, bekleMs: 1200 }))
-  for (const a of basarisiz) ilk[a] = ikinci[a] ?? { hata: 'Bing yanıtı yok' }
+  // SEO-102: tam site haritası (101 adres) varsayılan 200 ms aralıkla 61 adreste ThrottleHost verdi; ilk geçiş yavaş okur.
+  const ilk = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: adresler, gun: 30, bekleMs: BING_ARALIK_MS[0] }))
+  // Hız sınırına karşı yalnız başarısızlar, her turda daha yavaş, en çok iki kez daha denenir (sessiz geçmez: yine başarısızsa OLCULEMEDI kalır).
+  for (const aralik of BING_ARALIK_MS.slice(1)) {
+    const basarisiz = adresler.filter((a) => !ilk[a] || ilk[a].hata)
+    if (!basarisiz.length) break
+    await new Promise((r) => setTimeout(r, 3000))
+    const sonraki = cevir(await bingOku({ anahtar: k.anahtar, siteUrl: `${SITE}/`, urlBilgi: basarisiz, gun: 30, bekleMs: aralik }))
+    for (const a of basarisiz) ilk[a] = sonraki[a] ?? { hata: 'Bing yanıtı yok' }
+  }
   return ilk
 }
 
@@ -345,8 +358,8 @@ async function calistir() {
   // --cikti verilmezse durum anlık görüntüsü defterin klasörüne yazılır: sonuç geçmişi (hangi gün dizine girdi) kaybolmaz.
   const cikti = deger('--cikti') || dirname(defter)
   yolKontrol(cikti, '--cikti')
-  const gun = Number(deger('--gun') || 14)
-  if (!Number.isFinite(gun) || gun < 1) { console.error('HATA: --gun pozitif sayı olmalı'); process.exit(2) }
+  const gun = deger('--gun') ? Number(deger('--gun')) : Infinity
+  if (deger('--gun') && (!Number.isFinite(gun) || gun < 1)) { console.error('HATA: --gun pozitif sayı olmalı'); process.exit(2) }
   const { hareketler, atlanan } = defterOku(defter)
   let xml
   try { xml = await (await fetch(`${SITE}/sitemap.xml`)).text() } catch (e) { console.error(`HATA: site haritası okunamadı: ${e.message}`); process.exit(1) }

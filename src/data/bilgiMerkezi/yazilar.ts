@@ -698,7 +698,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-04 (BLG-39, SEO-83): gövde yenilendi (kesit farkı, kullanım yerleri, seçim bilgileri, kaynaklar); doğrulanmış metin taslak v-son (sha c97467046789; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug, H1 ve ürün listesi değişmedi.
     // Güncelleme tarihi 2026-11-07 (BLG-41, SEO-86): giriş markasız "kanal fanları" tanımıyla başlar, tür sayımı ve "Kullanım alanları" başlığı eklendi; meta açıklama "kanal fanları nelerdir" ve "kullanım alanları" ifadelerini taşır. H1, başlık, adres ve ürün listesi aynı. Doğrulanmış metin taslak (sha e5bb7cdac23f; üç tur, tuzaklı ve temiz kopya). Not: BLG-39 içeriği 6 Kasım'da çıkmış, tarih 4 Kasım'da kalmıştı; bu tarih ikisini de kapsar.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "Kanal fanı çeşitleri nelerdir?" bölümü eklendi (mevcut tür tablosu bu başlığın altında); var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
-    guncellemeTarihi: '2026-11-08',
+    // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
+    guncellemeTarihi: '2026-11-11',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -760,6 +761,8 @@ Aynı katalog kanal sisteminin ucuna takılan türleri de listeler. Çelik sac d
 | Kısa asma tavan | Çok kısa yükseklik sayesinde kısa asma tavanlara uygun | [4] |
 | Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [4] |
 | Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [4] |
+
+Kanal tipi ısı geri kazanım cihazları bu yazıda ele alınmaz; bunun için [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
 
 ## Kanal tipi fan seçerken hangi bilgilere bakılır?
 
@@ -1189,6 +1192,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
   {
     // BLOG (BLG-31), doğrulanmış metin: taslak v7 (sha 728066b03deb) beş turda doğrulandı (v1-v7; hedef üçtü, karşılanmadı; her turda tuzaklı kopya 5/5 yakalandı).
     // v7 → v8 farkı iki cümledir ve ikisi de iddiayı daraltır (2037 geçiş tarihi çıkarıldı: 2025/2481 değişikliği doğrulanmadı ve kardeş rehber farklı tarih verir; giriş cümlesinde Vortice kapsamı karma akışlı üretici anlatımıyla sınırlandı). Taslak v8 sha 2917711c943b; kayıtlı gövde sha 141c5116ed7a.
+    // Güncel durum (9 Kasım 2026, BLG-56 öneri 4): yukarıdaki "2037 çıkarıldı, 2025/2481 doğrulanmadı" notu v8 anına aittir ve bayatladı; (AB) 2025/2481 madde 1(4) sonradan ham metinden okundu (Kaynak 6) ve 2037 yedek parça tarihi gövdeye döndü (BLG-63). Gövde bu yorum için değişmedi.
     // Mevzuat: tür tanımları (AB) 2024/1834 madde 2(17)-(20), (25), madde 9(1), Ek III nokta 4 (OPS, EUR-Lex ham metni, 3 Kasım 2026); yürürlükten kalkan 327/2011 yalnız gaz yolu anlatımı için [5]. Fiyat yok: ürün sayfaları teklife yönlendirir.
     // Yayın: karar 121/c (profesyonel yazı AYNI adreste döner); birleşme ayrı OPS onayıyla. yayinTarihi birleşme gününe göre güncellenir.
     kimlik: 'fan-cesitleri',
@@ -1199,7 +1203,10 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-40 (2026-11-06): H1 (= sayfa başlığı) ve meta açıklaması değişti; önceki H1 bir rakip sayfanın başlığıyla birebir aynıydı (GEO-SEO ölçümü). Gövde, slug ve ürün listesi aynı.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan için H3 başlıklı yeni bölüm eklendi; var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
     // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; "327/2011'i yürürlükten kaldırmıştır" yerine "327/2011'in genel hükümlerini yürürlükten kaldırmıştır" ve Kaynaklar 5'te "genel hükümleri yürürlükten kalkmıştır". Madde 2 tanım cümlelerindeki "yürürlükten kalkan 327/2011" ifadesi aynen kaldı. Önceki değer: 2026-11-08.
-    guncellemeTarihi: '2026-11-09',
+    // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
+    // 11 Kasım (BLG-71): H1 'Fan çeşitleri nelerdir?', giriş tanım cümlesi (AB 2024/1834 madde 2(1)), 'Endüstriyel fan çeşitleri dahil' H2 eki, aksiyel maddeye aile adı, Kaynak 2 künye sayfası, meta açıklama eki; doğrulanmış metin taslak v4 (sha acaea8cf51d1; tur 1-2 tuzaklı 5/5 ve 6/6 + temiz, tur 3 temiz BITTI)
+    // 11 Kasım (BLG-71, Mevzuat düzeltmesi): giriş tanım cümlesi madde 2(1) fan tanımına göre yeniden yazıldı (sha a42b7ff8042b)
+    guncellemeTarihi: '2026-11-11',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
       'vh:kategori/axial-industrial-fans',
@@ -1217,12 +1224,12 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     diller: {
       tr: {
         slug: 'fan-cesitleri',
-        ozet: "Fan çeşitleri akış yoluna göre aksiyel, radyal ve karma akışlı olarak ayrılır. AB tüzüğündeki akış açısı sınırları ve VentHub fan kategorileri bu yazıda.",
+        ozet: "Fan çeşitleri akış yoluna göre aksiyel, radyal ve karma akışlı olarak ayrılır. AB tüzüğündeki akış açısı sınırları ve VentHub fan kategorileri bu yazıda. Endüstriyel fan çeşitleri de VentHub kategorileri içinde listelenir.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Fan türlerini akış yoluna ve VentHub kategorilerine göre karşılaştırmak için bu rehberden başlayın; kategori sayfalarına buradan geçin.",
-        govde: `# Fan türleri ve çeşitleri: aksiyel, radyal, karma akışlı fanlar
+        govde: `# Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar
 
-ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: aksiyel ve santrifüj [2]. Hangi türün seçileceği hava özelliklerine, debiye, basınca ve sistem yerleşimine bağlıdır [2]. Yazı önce türleri, sonra seçime nereden başlanacağını anlatır; katalog kategorileri de sıralanır. Seçimde fanın uygulamadaki işi, yani gereken debi ve basınç, belirleyici girdi olarak anılır [2].
+Fan çeşitleri: AB 2024/1834 madde 2(1)'e göre fan aksiyel, santrifüj, çapraz akışlı, karma akışlı ya da jet olabilir [1]. ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: aksiyel ve santrifüj [2]. Hangi türün seçileceği hava özelliklerine, debiye, basınca ve sistem yerleşimine bağlıdır [2]. Yazı önce türleri, sonra seçime nereden başlanacağını anlatır; katalog kategorileri de sıralanır. Seçimde fanın uygulamadaki işi, yani gereken debi ve basınç, belirleyici girdi olarak anılır [2].
 
 Kısaca:
 
@@ -1258,11 +1265,11 @@ Karma akışlı fan, çarktan geçen gaz yolu santrifüj ve aksiyel tiplerin gaz
 
 ABD Enerji Bakanlığı kılavuzu fan seçimine hava özellikleri, debi, basınç ve sistem yerleşimini bilerek başlanmasını söyler [2]. Kategori sayfaları kendi seçim sorularını verir; örneğin kanal tipi fanda seçimi kanal çapı veya kesiti, gereken debi, gürültü hassasiyeti ve hattın radon gibi özel bir tahliye görevi olup olmadığı belirler [4].
 
-## VentHub'da hangi fan kategorileri ve serileri var?
+## VentHub'da hangi fan kategorileri ve serileri var? Endüstriyel fan çeşitleri dahil
 
 Aşağıdaki kategoriler VentHub kataloğunun düzenidir ve her biri aynı ölçüte göre ayrılmamıştır: bazıları kullanım yerini (çatı, banyo, duman egzoz, şömine), bazıları yapıyı ya da malzemeyi (hücreli, plug, korozyona dayanımlı), biri işlevi (tavan vantilatörü) anlatır. Bu ayrım kaynaklı bir sınıflama değil, kataloğun düzeninin tarifidir. Bir fan hem bir akış yoluna hem bir kategoriye girebilir; örneğin hücreli aspiratör, kayış kasnaklı bir radyal fandır [4].
 
-- Aksiyel fanlar kategorisi duvara monte edilen, düşük ve orta basınçlı aksiyel fanları kapsar [4]; modeller: [aksiyel fanlar](vh:kategori/axial-industrial-fans).
+- Aksiyel fanlar kategorisi duvara monte edilen, düşük ve orta basınçlı aksiyel fanları kapsar [4]; kategori sayfasındaki ailelerden biri Vortice Aksiyel Endüstriyel Fanlar'dır [4]; modeller: [aksiyel fanlar](vh:kategori/axial-industrial-fans).
 - Radyal (santrifüj) fanlar kategorisinin sayfası hücreli, plug ve gövdeli olmak üzere üç yapıyı tanıtır [4]; modeller: [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans).
 - Kanal tipi fanlar havayı kanal hattının içinde taşır ve kanala seri bağlanır; kategoride karma akışlı iki LINEO ailesi (LINEO ve LINEO Quiet) de bulunur [3][4]; modeller: [kanal tipi fanlar](vh:kategori/duct-fans). Ayrıntı için [kanal tipi fan nedir rehberine](vh:yazi/kanal-tipi-fan-nedir), ses değeri için [sessiz fan rehberine](vh:yazi/sessiz-fan-secimi) bakın.
 - Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans). Seçimde nelere bakıldığı için [çatı tipi fan rehberi](vh:yazi/cati-tipi-fan-nedir) okunabilir.
@@ -1298,7 +1305,7 @@ Bu yazı fiyat vermez ve fiyatı belirleyen etkenleri kaynakla sayamaz. Fan tür
 
 ## Bu yazının sınırları nelerdir?
 
-Karma akışlı fanı diğer türlerle karşılaştıran bağımsız bir kaynak bu yazıda kullanılmamıştır; karma akışlı fanın avantajına ilişkin cümle bir üretici beyanıdır [3]. İncelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur, bu yüzden bu türün ürünleri yazıda ele alınmaz [4]. Tüzük jet fanı da ayrı bir kategori sayar (madde 2(1)) [1]; VentHub'daki otopark jet fanları kategorisi 3 Kasım 2026'da ürün listelemiyordu [4]. Jet fan bu yazıda tanımlanmaz.
+Karma akışlı fanı diğer türlerle karşılaştıran bağımsız bir kaynak bu yazıda kullanılmamıştır; karma akışlı fanın avantajına ilişkin cümle bir üretici beyanıdır [3]. İncelenen VentHub fan alt kategorileri arasında çapraz akışlı fan için ayrı bir kategori yoktur, bu yüzden bu türün ürünleri yazıda ele alınmaz [4]. Tüzük jet fanı da ayrı bir kategori sayar (madde 2(1)) [1]; VentHub'daki otopark jet fanları kategorisi 3 Kasım 2026'da ürün listelemiyordu [4]. Jet fan bu yazıda tanımlanmaz. Hava perdesi ve ısı geri kazanım cihazı da bu yazıda ele alınmaz; bunlar için [hava perdesi rehberine](vh:yazi/hava-perdesi) ve [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
 
 Tablodaki gaz yolu sütunu okur için bir açıklamadır; tanım niteliğini yalnız akış açısı sütunu taşır [1]. Gaz yolu sütunu yürürlükten kalkan 327/2011 madde 2'nin anlatımına dayanır ve kullanılan metin legislation.gov.uk sitesindeki Birleşik Krallık sürümüdür [5]. 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır (madde 9(1)) [1][6]; eski tüzüğün Ek I, II ve III'ü, (AB) 2025/2481 ile değiştirilen aynı fıkraya göre, başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanları için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
@@ -1331,7 +1338,7 @@ Kategoriler yazının "VentHub'da hangi fan kategorileri ve serileri var?" böl�
 ## Kaynaklar
 
 1. Avrupa Komisyonu, (AB) 2024/1834 sayılı Komisyon Tüzüğü, madde 2(1), 2(17)-(20), 2(25), 2(26) ve Ek III nokta 4, EUR-Lex (CELEX:32024R1834), ilk yayımlanan metin; (AB) 2025/2481 bu bentleri değiştirmez, madde 9(1) için 6 numaralı kaynağa bakınız: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 03.11.2026)
-2. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 7 ve 21. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
+2. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, PDF s. 7, 21 ve 23. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 03.11.2026)
 3. Vortice S.p.A., LINEO In-line mixed flow fans kataloğu, Cod. 5.170.084.547, Mayıs 2026 (son sayfada ayrıca 5.170.084.504, Şubat 2026 kodu da yazılıdır), s. 1, 4 ve 5 (bu çalışmada herkese açık bir adres doğrulanmadı; VentHub kaynak dizininde kayıtlıdır).
 4. VentHub, fan alt kategorilerinin sayfaları (aksiyel, radyal, kanal tipi, çatı tipi, banyo ve tuvalet, duman egzoz, hücreli, plug, korozyona ve aside dayanımlı, şömine ve baca, endüstriyel tavan vantilatörleri, otopark jet fanları), canlı sitede 3 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/category/kanal-tipi-fanlar ve diğerleri aynı yol altında.
 5. Avrupa Komisyonu, 327/2011 sayılı (AB) Tüzüğü, 2. madde (tanımlar: aksiyel fan, santrifüj fan, karma akışlı fan, çapraz akışlı fan, santrifüj radyal kanatlı fan); genel hükümleri yürürlükten kalkmıştır, yalnız gaz yolu anlatımı için kullanıldı; Birleşik Krallık mevzuat sitesinde yayımlanan, Birleşik Krallık için değiştirilmiş sürüm, AB Resmî Gazete metniyle karşılaştırılmadı: https://www.legislation.gov.uk/eur/2011/327/article/2 (erişim 03.11.2026)
@@ -1702,7 +1709,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'patlayici-ortamda-fan-secimi-atex',
     konu: 'guvenlik',
     yayinTarihi: '2026-11-08',
-    guncellemeTarihi: '2026-11-08',
+    // 9 Kasım 2026 (BLG-56 öneri 1-3, R5.5): RG 27.06.2020/31168 değişiklik yönetmeliği okundu (Bakanlık adı, bakan, değişmeyen maddeler, Kaynak 9), '99/92/AT' yazımı '1999/92/AT' birliğine getirildi, 28633 ve 29758 için tarama sınırı yazıldı.
+    guncellemeTarihi: '2026-11-09',
     urunler: ['vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar', 'vh:aile/jet-serisi'],
     ilgiliKategoriler: ['vh:kategori/centrifugal-fans', 'vh:kategori/corrosion-and-acid-resistant-fans'],
     diller: {
@@ -1719,11 +1727,11 @@ Kısaca:
 
 - Bölge: alanı işveren bölgelere ayırır [3]; bölge 2'de patlayıcı ortamın normal işletmede oluşması beklenmez, oluşursa kısa süre kalır [2].
 - Kategori: kategori 3 ekipman, patlayıcı ortamın olası olmadığı ya da yalnız seyrek ve kısa süreli olduğu yerler içindir [1].
-- Eşleşme: 99/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, ekipman ortamın türüne uygunsa, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
+- Eşleşme: 1999/92/AT Ek II B'ye göre, patlamadan korunma belgesi aksini belirtmedikçe, ekipman ortamın türüne uygunsa, bölge 2 için kategori 1, 2 ya da 3, bölge 1 için 1 ya da 2 ekipman sayılır [2].
 
 ## ATEX hangi iki direktife verilen addır?
 
-Health and Safety Executive'in (HSE) sayfası ATEX'i, patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen ad olarak anlatır [3]. Bunlardan 2014/34/AB, üye devletlerin patlayıcı ortamlarda kullanılacak ekipman ve koruyucu sistemlere ilişkin yasalarının yakınlaştırılmasını; 99/92/AT ise patlayıcı ortam riski altındaki çalışanların sağlık ve güvenliğinin korunması için asgari gereklilikleri kapsar [3]. 2014/34/AB'nin 1. maddesinin (1)(a) bendi de ana kapsamı aynı sözlerle çizer: patlayıcı ortamlarda kullanılması amaçlanan ekipman ve koruyucu sistemler [1].
+Health and Safety Executive'in (HSE) sayfası ATEX'i, patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen ad olarak anlatır [3]. Bunlardan 2014/34/AB, üye devletlerin patlayıcı ortamlarda kullanılacak ekipman ve koruyucu sistemlere ilişkin yasalarının yakınlaştırılmasını; 1999/92/AT ise patlayıcı ortam riski altındaki çalışanların sağlık ve güvenliğinin korunması için asgari gereklilikleri kapsar [3]. 2014/34/AB'nin 1. maddesinin (1)(a) bendi de ana kapsamı aynı sözlerle çizer: patlayıcı ortamlarda kullanılması amaçlanan ekipman ve koruyucu sistemler [1].
 
 Direktif "ekipmanı" makineler, aygıtlar, sabit ya da taşınabilir cihazlar, kontrol bileşenleri ve araçları ile algılama ya da önleme sistemleri olarak sayar; bunlar enerji üretimi, aktarımı, depolanması, ölçümü, kontrolü ve dönüşümü ve/veya malzeme işleme amaçlı olmalı ve kendi olası tutuşturma kaynaklarıyla patlama yaratabilmelidir [1]. Direktif metninde "fan" sözcüğü geçmez [1]; bu yazı bir fanın kapsamda olup olmadığına hüküm vermez. Direktife göre "potentially explosive atmosphere" (potansiyel olarak patlayıcı ortam), yerel ve işletme koşulları nedeniyle patlayıcı hâle gelebilen ortamdır (2. madde, 5. bent) [1].
 
@@ -1733,7 +1741,7 @@ Direktif "ekipmanı" makineler, aygıtlar, sabit ya da taşınabilir cihazlar, k
 
 HSE'ye göre işverenler, tehlikeli patlayıcı ortamın oluşabileceği alanları bölgelere sınıflandırmak zorundadır; bir bölgenin sınıfı, büyüklüğü ve yeri patlayıcı ortamın oluşma olasılığına ve oluşursa ne kadar kalacağına bağlıdır [3].
 
-99/92/AT'nin I. Eki bölge 2'yi şöyle tanımlar: gaz, buhar ya da sis hâlindeki yanıcı maddelerin havayla karışımından oluşan patlayıcı ortamın normal işletmede oluşması beklenmeyen, oluşsa bile yalnız kısa süre kalacak olan yer [2].
+1999/92/AT'nin I. Eki bölge 2'yi şöyle tanımlar: gaz, buhar ya da sis hâlindeki yanıcı maddelerin havayla karışımından oluşan patlayıcı ortamın normal işletmede oluşması beklenmeyen, oluşsa bile yalnız kısa süre kalacak olan yer [2].
 
 ## Kategori ve "G" işareti ne anlatır?
 
@@ -1743,7 +1751,7 @@ Ekipman işaretindeki "G" harfi, II. ekipman grubunda gaz, buhar ya da sisin ned
 
 ## Bölge ile kategori nasıl eşleşir?
 
-99/92/AT'nin II. Ekinin B bölümü, ekipman ve koruyucu sistemlerin seçim ölçütlerini verir ve hangi bölgede hangi kategorinin kullanılacağını sayar; liste, risk değerlendirmesine dayalı patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla geçerlidir [2]. Bu bölüm kategorileri 94/9/AT'ye atıfla verir [2]; o direktif 2014/34/AB ile yürürlükten kalkmıştır [1]. Yazı iki direktifin kategori anlatımlarını yan yana okur; bu bağı kuran yazının kendi okumasıdır.
+1999/92/AT'nin II. Ekinin B bölümü, ekipman ve koruyucu sistemlerin seçim ölçütlerini verir ve hangi bölgede hangi kategorinin kullanılacağını sayar; liste, risk değerlendirmesine dayalı patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla geçerlidir [2]. Bu bölüm kategorileri 94/9/AT'ye atıfla verir [2]; o direktif 2014/34/AB ile yürürlükten kalkmıştır [1]. Yazı iki direktifin kategori anlatımlarını yan yana okur; bu bağı kuran yazının kendi okumasıdır.
 
 | Bölge | Kullanılacak ekipman kategorisi |
 |---|---|
@@ -1758,7 +1766,7 @@ Ekipmana ilişkin 2014/34/AB, Türkiye'de Bilim, Sanayi ve Teknoloji Bakanlığ�
 
 Çalışanların korunmasına ilişkin yönetmelik, 30 Nisan 2013 tarihli ve 28633 sayılı Resmî Gazete'de yayımlanan "Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik"tir [8]. Bu yönetmeliğin Ek-1'inde bölge 2, gaz, buhar ve sis halindeki yanıcı maddelerin hava ile karışarak normal çalışma koşullarında patlayıcı ortam oluşturma ihtimali olmayan yerler ya da böyle bir ihtimal olsa bile patlayıcı ortamın çok kısa bir süre için kalıcı olduğu yerler olarak tanımlanır; Ek-3, patlamadan korunma dokümanında aksi belirtilmedikçe, bölge 2 veya bölge 22 için kategori 1, 2 veya 3 ekipmanı, bölge 1 veya bölge 21 için kategori 1 veya 2 ekipmanı sayar [8].
 
-İki yönetmelik için de Resmî Gazete'de yayımlanan ilk metne bakılmıştır [7][8]; sonraki değişiklikler okunmamıştır.
+29758 sayılı yönetmelik için Resmî Gazete'de yayımlanan ilk metne ve 27 Haziran 2020 tarihli ve 31168 sayılı Resmî Gazete'de yayımlanan değişiklik yönetmeliğine bakılmıştır [7][9]. Değişiklik yönetmeliği Bakanlık tanımını Sanayi ve Teknoloji Bakanlığı olarak yazar ve yürütme maddesinde Sanayi ve Teknoloji Bakanını anar [9]; bu yazının atıf yaptığı 4. maddenin birinci fıkrasındaki (s) ve (ğ) bentleri ile 41. ve 43. maddeler değiştirilen maddeler arasında yer almaz [9]. 29758 sayılı yönetmelik için bu iki metin dışında değişiklik taraması yapılmamıştır [7][9]. 28633 sayılı yönetmelik için Resmî Gazete'de yayımlanan ilk metne bakılmıştır [8]; bu yönetmeliğin sonraki değişikliklerinin taraması yapılmamıştır.
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -1776,7 +1784,7 @@ Patlayıcı ortamlara ilişkin iki Avrupa direktifine verilen addır: biri ekipm
 
 ### Bölge 2'de hangi ekipman kategorisi kullanılır?
 
-99/92/AT II. Ek B bölümüne göre, patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla, bölge 2 (ve toz için bölge 22) için kategori 1, 2 ya da 3 ekipman sayılır [2].
+1999/92/AT II. Ek B bölümüne göre, patlamadan korunma belgesi aksini belirtmedikçe ve ekipman gazlara, buharlara, sislere ve/veya tozlara uygun olmak koşuluyla, bölge 2 (ve toz için bölge 22) için kategori 1, 2 ya da 3 ekipman sayılır [2].
 
 ### Kategori 3 ne demektir?
 
@@ -1788,7 +1796,7 @@ HSE'ye göre alanı işveren sınıflandırır [3].
 
 ### Bölge 1'de kategori 3 ekipman kullanılabilir mi?
 
-99/92/AT II. Ek B bölümü, patlamadan korunma belgesi aksini belirtmedikçe, bölge 1 ve 21 için yalnız kategori 1 ya da 2 ekipmanı sayar; kategori 3 yalnız bölge 2 ve 22 satırındadır [2].
+1999/92/AT II. Ek B bölümü, patlamadan korunma belgesi aksini belirtmedikçe, bölge 1 ve 21 için yalnız kategori 1 ya da 2 ekipmanı sayar; kategori 3 yalnız bölge 2 ve 22 satırındadır [2].
 
 ### Ekipman işaretindeki "G" harfi ne anlama gelir?
 
@@ -1804,6 +1812,7 @@ HSE'ye göre alanı işveren sınıflandırır [3].
 6. SEAT Ventilation, JET 20 ürün sayfası (jet-25 ve jet-30 sayfalarında aynı ifade). https://seat-ventilation.com/products/jet-20 (erişim 08.11.2026)
 7. Bilim, Sanayi ve Teknoloji Bakanlığı, Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB), Resmî Gazete, 30.06.2016, sayı 29758, madde 4, 41, 43. https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm (erişim 08.11.2026)
 8. Çalışma ve Sosyal Güvenlik Bakanlığı, Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik, Resmî Gazete, 30.04.2013, sayı 28633, Ek-1 ve Ek-3. https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm (erişim 08.11.2026)
+9. Sanayi ve Teknoloji Bakanlığı, Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB)'te Değişiklik Yapılmasına Dair Yönetmelik, Resmî Gazete, 27.06.2020, sayı 31168. https://www.resmigazete.gov.tr/eskiler/2020/06/20200627-2.htm (erişim 09.11.2026)
 
 ## Teknik sorumluluk notu
 
@@ -1935,7 +1944,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'banyo-tuvalet-fani-secimi',
     konu: 'konfor',
     yayinTarihi: '2026-11-08',
-    guncellemeTarihi: '2026-11-08',
+    // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
+    guncellemeTarihi: '2026-11-11',
     urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
     diller: {
@@ -2009,6 +2019,7 @@ Bu yazı fiyat vermez; ilgili ürün sayfalarında fiyat gösterilmez, teklif is
 - Madde numaraları yayın tarihindeki güncel metne aittir ve değişiklikle kayabilir.
 - HVI ve ENERGY STAR ABD kaynaklıdır, İngiltere belgesi yalnız İngiltere içindir; bu ölçütler Türkiye'de bağlayıcı değildir [3][4][6]. Projeye özel değeri tasarımcı ve üretici kılavuzu belirler.
 - Fiyatı belirleyen etkenler bu yazının kaynaklarında yer almaz.
+- Isı geri kazanımlı havalandırma bu yazıda ele alınmaz; bunun için [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
 
 ## VentHub'da hangi banyo ve tuvalet fanı serileri var?
 

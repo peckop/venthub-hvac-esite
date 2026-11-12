@@ -17,6 +17,9 @@ Filo tek yönle ilerler: sıra, öncelik ve verilen sözler yazılı tutulur; Re
 ## Düzenli görevler
 - 2 görev, tetiğe bağlı 2: `docs/roller/OPS-gorevler.md`.
 
+## Sürekli defterler
+- yeni-site-gecis
+
 ## Dosyalar
 Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.
 

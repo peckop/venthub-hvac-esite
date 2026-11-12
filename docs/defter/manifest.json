@@ -1,0 +1,78 @@
+{
+  "sema": 1,
+  "_not": "Departman defterlerinin tek listesi (cetvel: docs/standards/departman-defter-standard.md D6; şema: docs/defter/README.md). Açılış satırı, önceki-çalışma taraması, PR kapısı, rol kartı satırı ve Recep sayfası bu dosyayı okur; ikinci liste tutulmaz.",
+  "defterler": [
+    {
+      "ad": "urun-adres",
+      "dosya": "docs/defter/urun-adres.md",
+      "sahip": "URUN",
+      "ozet": "Canlı adres şeması, yönlendirmeler ve kanonik adres kuralları",
+      "izlenen": [
+        "next.config.mjs",
+        "src/config/markaYonlendirmeleri.mjs",
+        "src/config/bilgiMerkeziYonlendirmeleri.mjs",
+        "src/data/eski-adres-tohum.json",
+        "docs/standards/adres-semasi-standard.md",
+        "docs/standards/canonical-url-standard.md"
+      ],
+      "tazelikGun": 14,
+      "tetik": ["kart-kapanisi", "sure"],
+      "olcum": null,
+      "disKaynak": null,
+      "durum": "pilot"
+    },
+    {
+      "ad": "geo-seo-dizin",
+      "dosya": "docs/defter/geo-seo-dizin.md",
+      "sahip": "GEO-SEO",
+      "ozet": "Dizin takibi: hangi adresler hangi motorda, son anlık görüntü özeti, bekleyen dizin işleri",
+      "izlenen": [
+        "scripts/seo/dizin-takip.mjs",
+        "scripts/seo/dizin-acilis.mjs",
+        "scripts/seo/dizin-defter-kontrol.mjs",
+        "docs/standards/dizin-sistemleri-standard.md"
+      ],
+      "tazelikGun": 7,
+      "tetik": ["kart-kapanisi", "sure", "dis-kaynak"],
+      "olcum": "node scripts/seo/dizin-defter-kontrol.mjs",
+      "disKaynak": "gsc",
+      "durum": "pilot"
+    },
+    {
+      "ad": "yeni-site-gecis",
+      "dosya": "docs/defter/yeni-site-gecis.md",
+      "sahip": "OPS",
+      "ozet": "Yeni site geçişi tek süreç olarak: kararlar, Design eksikleri, adres, UnoPIM, önizleme, dizin ve sıradaki işler",
+      "izlenen": [
+        "docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md",
+        "docs/plans/yeni-site-katalog-sema-taslak-2026-11-01.md",
+        "docs/standards/adres-semasi-standard.md"
+      ],
+      "tazelikGun": 7,
+      "tetik": ["kart-kapanisi", "sure"],
+      "olcum": "node scripts/hijyen/defter-envanter.cjs yeni-site-gecis",
+      "kaynakIzi": "node scripts/hijyen/defter-envanter.cjs yeni-site-gecis --iz",
+      "disKaynak": null,
+      "durum": "pilot"
+    },
+    {
+      "ad": "katalog-unopim-icerik",
+      "dosya": "docs/defter/katalog-unopim-icerik.md",
+      "sahip": "KATALOG",
+      "ozet": "UnoPIM ürün içeriği: alan × doluluk (1165 ürün), Design↔UnoPIM fark sonucu ve doldurulması gerekenler",
+      "izlenen": [
+        "scripts/icerik-hatti/unopim-icerik-olc.mjs",
+        "scripts/icerik-hatti/unopim-icerik-kurallar.mjs",
+        "scripts/icerik-hatti/tasarim-unopim-fark.mjs",
+        "docs/olcum/pim-unopim.md",
+        "docs/standards/catalog-ingestion-standard.md"
+      ],
+      "tazelikGun": 7,
+      "tetik": ["kart-kapanisi", "dis-kaynak"],
+      "olcum": "node scripts/icerik-hatti/unopim-icerik-olc.mjs --kontrol",
+      "kaynakIzi": "node scripts/icerik-hatti/unopim-icerik-olc.mjs --iz",
+      "disKaynak": "unopim",
+      "durum": "pilot"
+    }
+  ]
+}

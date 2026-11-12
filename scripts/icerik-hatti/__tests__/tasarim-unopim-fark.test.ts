@@ -7,7 +7,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { ALANLAR, bozmaUygula, eskiGoruntuler, farkHesapla, kod, seriMetni } from '../tasarim-unopim-fark-kurallar.mjs'
+import { ALANLAR, bozmaUygula, eskiGoruntuler, farkHesapla, icerikSkuFarki, kod, seriMetni } from '../tasarim-unopim-fark-kurallar.mjs'
 
 const BETIK = join(__dirname, '..', 'tasarim-unopim-fark.mjs')
 
@@ -100,5 +100,30 @@ describe('CLI önkoşulu', () => {
     }
     expect(kodu).toBe(2)
     expect(cikti).toContain('anlık görüntü yok')
+  })
+})
+
+describe('icerikSkuFarki (İÇERİK sku alanıyla eşleme, KTL-87)', () => {
+  const dizin = {
+    _damga: 'üst bilgi, seri değil',
+    a: { modeller: ['EDF-450', '11313'], sku: { 'EDF-450': 'VRT-EDF-450', '11313': 'VRT-11313' } },
+    b: { modeller: ['11313'], sku: { '11313': 'VRT-11313' } },
+  }
+  it('seri, model ve tekil sayar; _damga seri değildir', () => {
+    const s = icerikSkuFarki(dizin, ['VRT-EDF-450', 'VRT-11313'])
+    expect(s).toMatchObject({ seri: 2, model: 3, tekil: 2 })
+  })
+  it('aynı sku iki seride çift olarak raporlanır', () => {
+    expect(icerikSkuFarki(dizin, ['VRT-EDF-450', 'VRT-11313']).cift).toEqual([{ sku: 'VRT-11313', seriler: ['a', 'b'] }])
+  })
+  it('BOZMA: UnoPIM dışında kalan ve İÇERİK dışında kalan sku yakalanır, öneksiz kod eşleşmez', () => {
+    const s = icerikSkuFarki(dizin, ['VRT-11313', 'SEA-1'])
+    expect(s.unopimdeYok).toEqual(['VRT-EDF-450'])
+    expect(s.icerikteYok).toEqual(['SEA-1'])
+    // öneksiz katalog koduyla (D anahtarı) eşleme yapılsaydı EDF-450 UnoPIM'de var sayılırdı: sku alanı bunu yapmaz
+    expect(icerikSkuFarki(dizin, ['EDF-450', 'VRT-11313']).unopimdeYok).toContain('VRT-EDF-450')
+  })
+  it('boş girdi hata vermez', () => {
+    expect(icerikSkuFarki(undefined, [])).toMatchObject({ seri: 0, model: 0, tekil: 0 })
   })
 })

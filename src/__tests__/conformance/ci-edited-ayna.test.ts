@@ -298,6 +298,19 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     },
     anahtarlar: ['name', 'if', 'env', 'run'],
   },
+  // OPS-258 (ALT-178): defter PR kapısı, UYARI kipi. Çıkış kodu uyarı kipinde hep 0; koşulsuz çalışır (ayna koşulu taşırsa düzenleme koşusunda atlanır), `continue-on-error` yok.
+  {
+    ad: 'Defter PR kapısı (OPS-258, UYARI kipi)',
+    kosul: PR_KOSULU,
+    run: 'run: node scripts/ci/defter-pr-kapisi.cjs',
+    env: {
+      PR_GOVDE: '${{ github.event.pull_request.body }}',
+      PR_YAZAR: '${{ github.event.pull_request.user.login }}',
+      PR_ACILIS: '${{ github.event.pull_request.created_at }}',
+      DEFTER_KAPISI_KIP: 'uyari',
+    },
+    anahtarlar: ['name', 'if', 'env', 'run'],
+  },
   {
     ad: AYNA_ADIM_ADI,
     kosul: AYNA_KOSULU,
