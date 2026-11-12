@@ -279,7 +279,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-04 (BLG-38, SEO-81): H1 "Radyal ve aksiyel fan farkı nedir?", fark tablosu, nedir ve kullanım alanları bölümleri; doğrulanmış metin taslak v4 (sha 1e7f013da8f7; tuzaklı + temiz kopya iki turda, tuzaklar 5/5 ve 5/5; fark turu). Slug değişmedi.
     // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; SSS cevabı "Yürürlükten kalktı" yerine "Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır" ve 327/2011'in genel hükümlerini kaldıran tüzük ifadesi. Yalnız bu iki cümle değişti; tarihler ve kaynaklar aynı. Önceki değer: 2026-11-08.
     // Güncelleme tarihi 2026-11-09 (BLG-56, R5.5 yalnız-ekleme): duman tahliyesi fanlarının EN 12101-3 belgelendirme cümlesine kaynak atfı (üretici broşürü) eklendi.
-    guncellemeTarihi: '2026-11-09',
+    guncellemeTarihi: '2026-11-12',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
       'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
@@ -379,11 +379,19 @@ Tipten bağımsız not:
 
 - Duman tahliyesi: yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir (Vortice jet fan broşürü, üretici belgesi, s. 10) [4].
 
+## Fan debisi nedir ve kılavuzda hangi birimle verilir?
+
+Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1]. Kılavuz basıncı inç su sütunu (in. wg) ile verir [1]; üretici katalogları ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
+
 ## Fan eğrisi nasıl okunur?
 
-Kayışlı bir radyal fan kataloğunda eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
+Fan eğrisi, fanın ürettiği basıncın ve gereken gücün fanın geçirebildiği hava debisi aralığı boyunca çizildiği grafiktir [1]. Kayışlı bir radyal fan kataloğunda eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
 
-Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1]. Radyal düz kanatlı fanlarda tutunma kaybı sorunları diğer fanlara göre daha az görülür [1]. Çalışma koşulları geniş ölçüde değişen sistemlerde aksiyel fan özellikle uygun değildir, çünkü şiddetli bir tutunma kaybı bölgesi vardır [1]; tutunma kaybı öne eğik ve geriye eğik santrifüj fanlarda da şiddetli olabilir [1].
+Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Sistem eğrisi, sistemin bileşenlerindeki kayıpların toplanmasıyla hesaplanır [1]. Kılavuza göre fan, sistem eğrisinin fan eğrisini en yüksek verim noktasının yakınında olmayan bir noktada kesmesi nedeniyle verimsiz çalışabilir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1]. Radyal düz kanatlı fanlarda tutunma kaybı sorunları diğer fanlara göre daha az görülür [1]. Çalışma koşulları geniş ölçüde değişen sistemlerde aksiyel fan özellikle uygun değildir, çünkü şiddetli bir tutunma kaybı bölgesi vardır [1]; tutunma kaybı öne eğik ve geriye eğik santrifüj fanlarda da şiddetli olabilir [1].
+
+## Toplam basınç artışı ile statik basınç artışı nasıl ilişkilidir?
+
+Kayışlı bir santrifüj fan kataloğunda eğriler fanın toplam basınç artışını gösterir [2]. Çıkıştaki dinamik basınç, fan çıkışındaki flanşlı kesit alanına göre alınır [2]. Fan çıkışına kanal takılıysa statik basınç artışı, toplam basınç artışından çıkıştaki dinamik basıncın çıkarılmasıyla bulunur; kanal yoksa (serbest çıkış) dinamik basınç, serbest çıkış için verilen bir düzeltme katsayısıyla çarpılarak çıkarılır [2]. Bu, söz konusu üreticinin ilgili fan serisi için verdiği hesap yöntemidir; başka bir üreticinin kataloğunda gösterim ve katsayılar farklı olabilir.
 
 ## Fanı en yüksek verim noktasına yakın seçin
 
@@ -436,8 +444,8 @@ Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "T
 
 Üretici belgelerinde verilen sayfa numaraları PDF dosyasındaki sayfa sırasıdır; basılı sayfa numarasından farklı olabilir.
 
-1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 5, 6–9, 11, 16–25, 32–34, 39–41, 80 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 11.10.2026)
-2. Nicotra Gebhardt, Centrifugal Fans AT, belt driven, Issue 2.5 EN, 2013, s. 70, 99 (üretici belgesi).
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 5, 6–9, 11, 16–25, 31, 32–34, 39–41, 75, 76, 80 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 11.10.2026)
+2. Nicotra Gebhardt, Centrifugal Fans AT, belt driven, Issue 2.5 EN, 2013, s. 99, 104 (üretici belgesi).
 3. Vortice, Industrial Ventilation kataloğu, s. 4, 58, 64 (üretici belgesi).
 4. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
 5. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, md. 1(3), 9, 10, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
