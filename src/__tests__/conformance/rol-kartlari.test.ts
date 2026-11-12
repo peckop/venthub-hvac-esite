@@ -1306,6 +1306,14 @@ describe('INV-ROL-1 — 5N1K kapısı, taslak muafiyeti ve filo tüzüğü (HRT-
     expect(uretici.gorevEksikRoller().sort()).toEqual([...taslak].sort())
   })
 
+  it('HRT-27: taslak rolün kurallar dosyası "departman açılınca yazılır" notunu taşır; görev verisi olan rolde not yoktur (kart baytına dokunmaz)', () => {
+    const kurallar = uretici.uretKurallar()
+    const taslak = Object.keys(uretici.TASLAK_ROLLERI)
+    expect(taslak.length).toBeGreaterThan(0)
+    for (const ad of taslak) expect(kurallar[ad], `${ad} kurallar dosyasında not yok`).toContain('departman açılınca yazılır (HRT-27')
+    for (const ad of Object.keys(uretici.GOREVLER)) expect(kurallar[ad], `${ad} dolu rolde not olmamalı`).not.toContain('departman açılınca yazılır (HRT-27')
+  })
+
   it('AYIRT EDİCİLİK: eksik Neden, Ne zaman, Nasıl, Ne, Nerede ve bozuk taslak kaydı yakalanır', () => {
     expect(sorun((v) => (v.OPS.amac = ''))).toMatch(/OPS: Neden \(Amaç\) eksik/)
     expect(sorun((v) => (v.OPS.gorevler = []))).toMatch(/OPS: Ne zaman \(düzenli görev\) eksik/)

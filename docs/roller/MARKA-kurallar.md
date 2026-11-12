@@ -2,6 +2,8 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/MARKA.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+> Düzenli görevler ve Amaç: departman açılınca yazılır (HRT-27, `TASLAK_ROLLERI`): departman kapalı (iş dondurma); açılışta sahibi Amaç, Ne zaman ve Nasıl alanlarını yazar.
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K10 Design token: Arbitrary Tailwind değeri yasak; değerler `tokens.js`'ten, renk HEX değil CSS custom property (HSL).
 - K12 focus-visible: Etkileşimli elemanlarda `focus:` değil `focus-visible:`.
