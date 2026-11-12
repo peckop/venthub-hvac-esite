@@ -13,7 +13,7 @@ import { resolve, join } from 'node:path'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
-  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
+  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
   satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
@@ -292,5 +292,40 @@ describe('karar: yalnız-tarih lastmod (SEO-98, 8 Kasım yanlış-YAP)', () => {
 
   it('IndexNow: aynı tolerans geçerli (gün başı lastmod, önceki gün 22:49Z bildirim → TAMAM)', () => {
     expect(karar({ motor: 'indexnow', lastmod: '2026-11-08T00:00:00.000Z', sonHareket: ms('2026-11-07T22:49:00Z'), simdi: ms('2026-11-08T12:00:00Z') }).durum).toBe('TAMAM')
+  })
+})
+
+describe('görünme alanı (SEO-109: canlı arama sonucu, sıra değil)', () => {
+  const g = (n: number, sonuc: string) => ({ tarih: gun(n), motor: 'google', eylem: 'gorunme', adres: A, sonuc })
+
+  it('geçerli sonuç kabul edilir, bilinmeyen sonuç ve google dışı motor reddedilir', () => {
+    expect(hareketGecerliMi(g(5, 'gorundu'))).toBe(true)
+    expect(hareketGecerliMi(g(5, 'gorunmuyor'))).toBe(true)
+    expect(hareketGecerliMi(g(5, 'sira-3'))).toBe(false)
+    expect(hareketGecerliMi({ ...g(5, 'gorundu'), motor: 'bing' })).toBe(false)
+    expect(hareketGecerliMi({ ...g(5, 'gorundu'), sonuc: undefined })).toBe(false)
+  })
+  it('görünme ölçümü istek sayılmaz: sonHareket null kalır, TEKRAR/BEKLE kararını bozmaz', () => {
+    expect(sonHareket([g(5, 'gorunmuyor')], 'google', A)).toBeNull()
+  })
+  it('ilk görünme günü ve lastmod’dan gün farkı; sonra kaybolursa son sonuç gorunmuyor kalır', () => {
+    const o = gorunmeOzeti([g(4, 'gorunmuyor'), g(7, 'gorundu'), g(9, 'gorunmuyor')], A, gun(1))
+    expect(o.ilkGorundu).toBe(gun(7))
+    expect(o.gunFarki).toBe(6)
+    expect(o.sonSonuc).toBe('gorunmuyor')
+  })
+  it('hiç ölçüm yoksa boş özet; yalnız gorunmuyor varsa ilkGorundu null', () => {
+    expect(gorunmeOzeti([], A, gun(1))).toEqual({ ilkGorundu: null, son: null, sonSonuc: null, gunFarki: null })
+    expect(gorunmeOzeti([g(4, 'gorunmuyor')], A, gun(1)).ilkGorundu).toBeNull()
+  })
+  it('--durum markdown’ı Görünme sütununu yazar: GÖRÜNMÜYOR, GÖRÜNDÜ, ölçülmedi', () => {
+    const kapsam = [{ adres: A, lastmod: gun(1) }, { adres: B, lastmod: gun(1) }]
+    const t = tabloUret({ kapsam, hareketler: [g(4, 'gorunmuyor')], olcum: {}, simdi: NOW })
+    const md = markdownYaz(t, NOW)
+    expect(md).toContain('| Görünme |')
+    expect(md).toMatch(/ornek \| .*GÖRÜNMÜYOR \(11-04\)/)
+    expect(md).toMatch(/category\/ornek \| .*ölçülmedi/)
+    const t2 = tabloUret({ kapsam, hareketler: [g(4, 'gorundu')], olcum: {}, simdi: NOW })
+    expect(markdownYaz(t2, NOW)).toMatch(/GÖRÜNDÜ ilk 11-04 \(\+3g\)/)
   })
 })

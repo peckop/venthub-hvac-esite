@@ -19,7 +19,7 @@
  *
  * Kullanım:
  *   node scripts/seo/dizin-takip.mjs --durum [--gun N: yalnız son N günün adresleri; verilmezse TÜM site haritası] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
- *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <adres,adres> [--sonuc aramada]
+ *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme> <adres,adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
  * Defter ve çıktı depoya GİRMEZ (repo PUBLIC; pazar-olcum P6): depo içi yol REDDEDİLİR.
@@ -35,7 +35,9 @@ import { satirCikar } from './gsc-url-denetim.mjs'
 export const SITE = 'https://venthub.com.tr'
 export const GSC_MULK = 'sc-domain:venthub.com.tr'
 export const MOTORLAR = ['google', 'bing', 'yandex', 'indexnow']
-export const EYLEMLER = ['istek', 'gonderim', 'olcum']
+export const EYLEMLER = ['istek', 'gonderim', 'olcum', 'gorunme']
+/** SEO-109: 'gorunme' eylemi canlı arama sonucudur (istek DEĞİL); sonuc: gorundu | gorunmuyor | olculemedi. Sıra aranmaz, yalnız yazının kendi adresi sonuçlarda var mı. */
+export const GORUNME_SONUCLARI = ['gorundu', 'gorunmuyor', 'olculemedi']
 export const VARSAYILAN_KLASOR = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo').replace(/\\/g, '/')
 export const VARSAYILAN_DEFTER = `${VARSAYILAN_KLASOR}/dizin-takip/hareketler.jsonl`
 /** Aynı adrese yeniden istek hakkının doğduğu gün sayısı. Google günlük kotası ~10-11 olduğu için en uzunu. */
@@ -65,6 +67,7 @@ export function yalnizTarihMi(deger) {
 /** Defter satırı geçerli mi: bilinen motor ve eylem, siteye ait adres, geçerli tarih. */
 export function hareketGecerliMi(h) {
   return !!h && MOTORLAR.includes(h.motor) && EYLEMLER.includes(h.eylem)
+    && (h.eylem !== 'gorunme' || (h.motor === 'google' && GORUNME_SONUCLARI.includes(h.sonuc)))
     && typeof h.adres === 'string' && h.adres.startsWith(`${SITE}/`) && tarihAl(h.tarih) !== null
 }
 
@@ -92,11 +95,36 @@ export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOSt
 export function sonHareket(hareketler, motor, adres) {
   let en = null
   for (const h of hareketler) {
-    if (h.motor !== motor || h.adres !== adres || h.eylem === 'olcum') continue
+    if (h.motor !== motor || h.adres !== adres || h.eylem === 'olcum' || h.eylem === 'gorunme') continue
     const t = tarihAl(h.tarih)
     if (t !== null && (en === null || t > en)) en = t
   }
   return en
+}
+
+/**
+ * SEO-109: bir adresin Google canlı arama görünme özeti (yalnız 'gorunme' hareketleri).
+ * ilkGorundu: ilk 'gorundu' ölçümü; son: en yeni ölçüm (olculemedi dahil); lastmod verilirse ilk görünmeye kadar gün farkı.
+ * @returns {{ ilkGorundu: string|null, son: string|null, sonSonuc: string|null, gunFarki: number|null }}
+ */
+export function gorunmeOzeti(hareketler, adres, lastmod = null) {
+  let ilk = null
+  let son = null
+  let sonSonuc = null
+  for (const h of hareketler) {
+    if (h.motor !== 'google' || h.eylem !== 'gorunme' || h.adres !== adres || !GORUNME_SONUCLARI.includes(h.sonuc)) continue
+    const t = tarihAl(h.tarih)
+    if (t === null) continue
+    if (h.sonuc === 'gorundu' && (ilk === null || t < ilk)) ilk = t
+    if (son === null || t > son) { son = t; sonSonuc = h.sonuc }
+  }
+  const lm = tarihAl(lastmod)
+  return {
+    ilkGorundu: ilk === null ? null : new Date(ilk).toISOString(),
+    son: son === null ? null : new Date(son).toISOString(),
+    sonSonuc,
+    gunFarki: ilk !== null && lm !== null ? Math.floor((ilk - lm) / GUN_MS) : null,
+  }
 }
 
 /** Yandex için: "aramada" sonuçlu son ölçüm zamanı (API yok; elle okunan "Aramadaki sayfalar" listesi). */
@@ -180,6 +208,7 @@ export function tabloUret({ kapsam, hareketler, olcum, simdi = Date.now() }) {
       const k = karar({ motor, lastmod, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '' })
       satir[motor] = { ...k, sonTarama: typeof sonTarama === 'number' ? new Date(sonTarama).toISOString() : sonTarama, sonHareket: hareket === null ? null : new Date(hareket).toISOString() }
     }
+    satir.gorunme = gorunmeOzeti(hareketler, adres, lastmod)
     return satir
   })
 }
@@ -193,8 +222,14 @@ export function markdownYaz(tablo, simdi = Date.now()) {
     const t = m.durum === 'TAMAM' ? ` (${gunYaz(m.sonTarama ?? m.sonHareket)})` : m.durum === 'BEKLE' || m.durum === 'TEKRAR' ? ` (${gunYaz(m.sonHareket)})` : ''
     return `${m.durum}${t}`
   }
-  const satirlar = [`DİZİN TAKİP ${new Date(simdi).toISOString().slice(0, 16)}Z`, '| Adres | lastmod | Google | Bing | Yandex | IndexNow |', '|---|---|---|---|---|---|']
-  for (const s of tablo) satirlar.push(`| ${kisa(s.adres)} | ${gunYaz(s.lastmod)} | ${hucre(s.google)} | ${hucre(s.bing)} | ${hucre(s.yandex)} | ${hucre(s.indexnow)} |`)
+  // SEO-109: görünme = canlı arama sonucu (sıra değil, çıkıp çıkmama). "ilk" = ilk görünme günü + lastmod'dan gün farkı.
+  const gorunmeHucre = (g) => {
+    if (!g || !g.son) return 'ölçülmedi'
+    const ilk = g.ilkGorundu ? `ilk ${gunYaz(g.ilkGorundu)}${g.gunFarki !== null ? ` (+${g.gunFarki}g)` : ''}` : ''
+    return g.sonSonuc === 'gorundu' ? `GÖRÜNDÜ ${ilk}`.trim() : `${g.sonSonuc === 'gorunmuyor' ? 'GÖRÜNMÜYOR' : 'ölçülemedi'} (${gunYaz(g.son)})${ilk ? ` ${ilk}` : ''}`
+  }
+  const satirlar = [`DİZİN TAKİP ${new Date(simdi).toISOString().slice(0, 16)}Z`, '| Adres | lastmod | Google | Bing | Yandex | IndexNow | Görünme |', '|---|---|---|---|---|---|---|']
+  for (const s of tablo) satirlar.push(`| ${kisa(s.adres)} | ${gunYaz(s.lastmod)} | ${hucre(s.google)} | ${hucre(s.bing)} | ${hucre(s.yandex)} | ${hucre(s.indexnow)} | ${gorunmeHucre(s.gorunme)} |`)
   const yapilacak = []
   for (const motor of MOTORLAR) {
     const l = tablo.filter((s) => s[motor].durum === 'YAP' || s[motor].durum === 'TEKRAR').map((s) => kisa(s.adres))
