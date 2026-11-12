@@ -137,6 +137,35 @@ yalnız "yayın günü listesi"ne güvenilmez. Haritada olmayan yeni adres (TR) 
 `bing-webmaster-oku.mjs --taban` (fark kipi, SEO-43), `sayfa-kalite.mjs` (+7). 14. günde gösterim, tık, sıra
 (`gsc-sayfa-oku.mjs`). Kartta tek satır + sayı; ham çıktı depo dışı dosyada.
 
+**Görünme kuralı: yayından 3 gün sonra yazı aramada yoksa sorun vardır (SEO-109, 2026-11-12).** Sıra bu kuralın konusu
+değildir: yazı birinci sayfada birinci de olsa, beşinci sayfada onuncu da olsa "göründü" sayılır. Sorulan tek soru
+"yazının kendi adresi Google sonuçlarında var mı"dır. Gerekçe: 1–8 Kasım'da hava perdesi yazısının 3. ve 7. gün
+okumaları yalnız dizin durumu ve Search Console'a baktı; "dizinde, gösterim 0, veri gecikmeli" yazılıp beklendi ve yazı
+12 Kasım'da, 11. günde, Recep fark edince "aramada yok" bulundu. Search Console 2–3 gün gecikmelidir, bu yüzden 3. gün
+okumasının kanıtı Search Console değil **canlı arama**dır.
+
+1. **3. gün (B13), canlı arama, her yazı için.** Chrome'da `hl=tr gl=tr pws=0` ile iki ölçüm: (a) `site:<yazı adresi>`;
+   (b) yazının tam başlığı, tırnaksız (ilk 50 sonuçta yazının kendi adresi aranır; liste sayfası, kategori ya da başka
+   sayfa çıkması "yazı göründü" demek değildir). Sonuç iki ölçümle de kartta tek satır olur: "göründü / görünmüyor /
+   ölçülemedi". Search Console satırı (dizin durumu, son tarama, gösterim) ek bilgidir, hükmü belirlemez.
+2. **3. günde "görünmüyor" = KIRMIZI, aynı gün (GEO-SEO).** (i) URL denetimi: dizin durumu, son tarama, Google'ın seçtiği
+   kanonik; dizinde değilse Y2.1 zinciri yeniden (Google isteği, onayı okunur, ertesi gün ilk iş); (ii) sayfa kusuru
+   kontrolü: canlı HTML (kanonik, robots, title/H1), site haritasında ve `lastmod`'da var mı, yazıya bağlanan iç sayfa
+   sayısı; (iii) aynı başlık metnini ya da açıklamayı taşıyan sayfa var mı (liste sayfası, kategori kartı); (iv) bulgu
+   ve öneri aynı gün OPS'a gider (kart, sayılar), OPS Blog'a ya da Ürün'e ileterek sahibini belirler. GEO-SEO Blog'a kart
+   açmaz, metne dokunmaz.
+3. **7. gün, hâlâ "görünmüyor".** Sahibi (Blog: başlık, içerik, iç bağlantı; Ürün: liste/kategori kartı, sayfa kodu)
+   3. günkü bulguya göre düzeltmeyi yapmış olmalıdır; yapılmadıysa OPS aynı gün sahibini sorar. Düzeltme sonrası Y2.1
+   zinciri yeniden koşar, canlı arama tekrar edilir ve sonuç karta yazılır. Hâlâ görünmüyorsa 14. güne "hüküm" olarak
+   taşınır ve Y2.4 rakip kıyası ek olarak koşulur.
+4. **14. gün (B15).** Görünme kuralı yeniden ölçülür; gösterim, tık, sıra bu günün ek bilgisidir. 14. günde görünmüyorsa
+   yazı "görünmüyor listesi"ne girer ve sahibine öneri OPS üzerinden gider.
+5. **Kayıt.** 3., 7., 14. gün sonuçları ve "aramada ilk göründüğü gün" yeni bir tabloya değil, mevcut dizin defterine
+   (`dizin-takip` / `olcum-defteri`) adres başına alan olarak yazılır; görünüm `dizin-takip --durum` çıktısıdır.
+   "Yayın gününden ilk görünme gününe fark" bu alanlardan okunur.
+6. **Tetik hatırlamaya bağlı değildir.** Her yayında yayın günü 3., 7., 14. gün tarihleri OPS'a yazılır ve OPS tetik
+   listesine konur; "kendim bakarım" yazılmaz.
+
 ### Y2.2 Açılışta site haritası farkı: bildirim gelmese de yeni adres kaçmaz (SEO-78, 2026-11-03, OPS UYGUN)
 
 Y2.1 yayın bildirimine bağlıdır (R10 B8 ve B10'da BLOG, GEO-SEO'ya tek satır yazar). 3 Kasım 2026'da yeni rehber (`fan-cesitleri`) bildirim gelmeden canlıya çıktı; GEO-SEO onu site haritasındaki 94 → 95 adres artışından buldu. Bildirim aksasa da iş kaçmasın diye **her açılışta** (yeni pencere, compact dönüşü, gün başı):
