@@ -52,7 +52,8 @@ describe('INV-REHBER-GOVDE-IZI-1 · gerçek yazilar.ts', () => {
   })
 
   it('iz dosyası serileştirmeyle bire bir üretilir (satır başına bir yazı, sıralı): elle bozulursa kırmızı', () => {
-    expect(readFileSync(join(KOK, 'src/lib/bilgiMerkezi/__tests__/govde-izleri.json'), 'utf8')).toBe(izleriSerilestir(izler))
+    const metin = readFileSync(join(KOK, 'src/lib/bilgiMerkezi/__tests__/govde-izleri.json'), 'utf8').replace(/\r\n/g, '\n')
+    expect(metin).toBe(izleriSerilestir(izler))
   })
 })
 
