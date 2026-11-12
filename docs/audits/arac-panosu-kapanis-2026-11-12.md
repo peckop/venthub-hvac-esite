@@ -1,6 +1,6 @@
 # ARAÇ panosu kapanış ölçümü (ARC-84, 2026-11-12)
 
-Kart: ARC-84 (pano kapanışı, vade 14 Kasım, Recep onaylı). Kaynak/cetvel: `docs/standards/is-kayit-duzeni-standard.md` (Done yalnız kanıtla). Önceki tablo: ARC-84 kartının 4 Kasım notu (65 kart). Bu belge Backlog'un 51 kartını `origin/master` 6837737d0'a ve mods deposuna (`C:/Users/alize/mods`, uzak yok) karşı yeniden ölçer. Yöntem: salt okuma araştırmacı (kart no ile `git log --grep`, kanıt dosyasının `git grep` ile varlığı; "yok" hükmü en az iki yöntemle). Kapatma kararı ve Kanban yazımı müdürdür.
+Kart: ARC-84 (pano kapanışı, vade 14 Kasım, Recep onaylı). Kaynak/cetvel: `docs/standards/is-kayit-duzeni-standard.md` (Done yalnız kanıtla). Önceki tablo: ARC-84 kartının 4 Kasım notu (65 kart). Bu belge Backlog'un 51 kartını `origin/master` 6837737d0'a ve mods deposuna (`~/mods`, uzak yok) karşı yeniden ölçer. Yöntem: salt okuma araştırmacı (kart no ile `git log --grep`, kanıt dosyasının `git grep` ile varlığı; "yok" hükmü en az iki yöntemle). Kapatma kararı ve Kanban yazımı müdürdür.
 
 Sayım: 51 kart · TESLİM 6 · AÇIK-GEÇERLİ 44 · ÖLÇÜLEMEDİ 1 · BAYAT 0. Panoda önce: Backlog 51, To Do 11, Done 237 (12 Kasım sabahı); sonra bu belgenin altındaki "Uygulanan" bölümü.
 
