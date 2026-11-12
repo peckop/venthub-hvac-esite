@@ -23,6 +23,6 @@ Bu dosya işaretçidir. Tam metin ve kanıt: `docs/standards/rehber-yazisi-stand
 - Üretici/DOE belgesi künyesi sayfada yazılı numaradan ölçülür (basılı numara ile PDF indeksi farklı).
 - Tuzaklı kopya yanında temiz kopya zorunludur.
 
-## R10.6 sekiz madde (B8 PR gövdesinde tablo)
+## R10.6 dokuz madde (B8 PR gövdesinde tablo)
 
-1. Kart meta kopyası yok, yazıyı gösterecek sayfalar listeli. 2. Her sayı katalog ve canlı sayfayla aynı. 3. Fiyat ya da fiyat ima eden cümle yok. 4. R10.5 beş madde (axe, fikstür, ölçüm dosyası konumu). 5. R11 başlık kuralı (`baslikDenetle`). 6. Site haritası, canonical, hreflang, noindex yok. 7. İç bağlantılar çözülüyor, 404 sıfır. 8. Marka, sertifika, performans iddiası resmî kaynakta birebir var.
+1. Kart meta kopyası yok, yazıyı gösterecek sayfalar listeli. 2. Her sayı katalog ve canlı sayfayla aynı. 3. Fiyat ya da fiyat ima eden cümle yok. 4. R10.5 beş madde (axe, fikstür, ölçüm dosyası konumu). 5. R11 başlık kuralı (`baslikDenetle`). 6. Site haritası, canonical, hreflang, noindex yok. 7. İç bağlantılar çözülüyor, 404 sıfır. 8. Marka, sertifika, performans iddiası resmî kaynakta birebir var. 9. H1/gövde/özet değiştiyse `guncellemeTarihi` aynı PR'da güncellendi ve `node scripts/rehber/govde-izi.mjs --yaz` ile iz kaydı yenilendi (`INV-REHBER-GOVDE-IZI-1` kırmızı verir).
