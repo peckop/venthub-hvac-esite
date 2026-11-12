@@ -841,7 +841,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-10-31',
     // 1 Kasım 2026 (BLG-27): ısı geri kazanım yazısında kurulum türü adı "kanal tipi" terimine çevrildi (başlık, bağlantı metni, tablo, SSS); iddia kümesi aynı. Gövde sha yukarıdaki değerden farklıdır.
     // 9 Kasım 2026 (BLG-62): Resmî Gazete'deki ekotasarım ve enerji etiketi tebliğleri (SGM-2021/18, 2021/19) yeni bölüm, SSS ve Kaynaklar 12-13 olarak eklendi (R5.5 yalnız ekleme).
-    guncellemeTarihi: '2026-11-09',
+    // 12 Kasım 2026 (BLG-62): yayın tarihi; bölüm 9 Kasım'da hazırlandı, canlıya 12 Kasım'da çıktı, lastmod yayın gününü izler.
+    guncellemeTarihi: '2026-11-12',
     urunler: [
       'vh:aile/vortice-vort-hr-isi-geri-kazanim',
       'vh:aile/vortice-vort-mono',
