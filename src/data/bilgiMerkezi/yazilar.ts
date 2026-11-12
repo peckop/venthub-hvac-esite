@@ -699,7 +699,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-07 (BLG-41, SEO-86): giriş markasız "kanal fanları" tanımıyla başlar, tür sayımı ve "Kullanım alanları" başlığı eklendi; meta açıklama "kanal fanları nelerdir" ve "kullanım alanları" ifadelerini taşır. H1, başlık, adres ve ürün listesi aynı. Doğrulanmış metin taslak (sha e5bb7cdac23f; üç tur, tuzaklı ve temiz kopya). Not: BLG-39 içeriği 6 Kasım'da çıkmış, tarih 4 Kasım'da kalmıştı; bu tarih ikisini de kapsar.
     // Güncelleme tarihi 2026-11-07 (BLG-44, SEO-89): yalnız ekleme revizyonu, "Kanal fanı çeşitleri nelerdir?" bölümü eklendi (mevcut tür tablosu bu başlığın altında); var olan başlık, madde, SSS ve meta açıklama aynen kaldı (fark kanıtı: silinen satır 0, R5.5 v0.18). Yeni iddia yok.
     // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
-    guncellemeTarihi: '2026-11-11',
+    // 12 Kasım (BLG-75): "Hava perdesi de bu yazıda ele alınmaz" kapsam cümlesi ve hava perdesi rehberine bağlantı eklendi; yalnız ekleme, iddia yok
+    guncellemeTarihi: '2026-11-12',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -762,7 +763,7 @@ Aynı katalog kanal sisteminin ucuna takılan türleri de listeler. Çelik sac d
 | Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [4] |
 | Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [4] |
 
-Kanal tipi ısı geri kazanım cihazları bu yazıda ele alınmaz; bunun için [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın.
+Kanal tipi ısı geri kazanım cihazları bu yazıda ele alınmaz; bunun için [ısı geri kazanım cihazı rehberine](vh:yazi/isi-geri-kazanim-cihazi-nedir) bakın. Hava perdesi de bu yazıda ele alınmaz; bunun için [hava perdesi rehberine](vh:yazi/hava-perdesi) bakın.
 
 ## Kanal tipi fan seçerken hangi bilgilere bakılır?
 
