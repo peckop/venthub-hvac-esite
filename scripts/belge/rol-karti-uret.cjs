@@ -438,6 +438,8 @@ function kuralDosyasi(ad) {
     '',
     `> Üretilmiştir (\`scripts/belge/rol-karti-uret.cjs\`); elle düzenleme. Rol kartı: \`docs/roller/${dosyaAdi(ad)}\`. K = tam listedeki madde no; gerekçeli tam metin: \`docs/standards/gelistirme-kurallari-tam-liste.md\`.`,
     '',
+    // HRT-27 (OPS 12 Kasım): görev verisi olmayan taslak rolün durumu görünür olsun; kartın bayt payını yemesin diye burada.
+    ...(TASLAK_ROLLERI[ad] ? [`> Düzenli görevler ve Amaç: departman açılınca yazılır (HRT-27, \`TASLAK_ROLLERI\`): ${TASLAK_ROLLERI[ad]}.`, ''] : []),
     ...isKurallariBolumu(ad),
     ...rolKurallari(ad).map(([no, , kisa, ozet]) => `- K${no} ${kisa}: ${ozet}`),
     '',

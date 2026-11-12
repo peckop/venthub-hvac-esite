@@ -2,6 +2,8 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/ADMIN.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+> Düzenli görevler ve Amaç: departman açılınca yazılır (HRT-27, `TASLAK_ROLLERI`): pencere kapalı; sahibi ilk açılışta Amaç, Ne zaman ve Nasıl alanlarını yazar.
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K2 Tip güvenliği: `any` yasak, strict TypeScript.
 - K3 RLS-first: Her tablo RLS politikasıyla korunur.
