@@ -1062,7 +1062,9 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'hava-perdesi',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-01',
-    guncellemeTarihi: '2026-11-08',
+    // 12 Kasım (BLG-75, URN-161): "ilgili yazılar" bloğu konuya göre açık kimlik listesiyle seçilir (önceki liste ortak "verimlilik" konusundan ilk üç yazıydı: çatı tipi, hücreli, plug fan); yazı gövdesi, başlık ve iddia değişmedi.
+    guncellemeTarihi: '2026-11-12',
+    ilgili: ['isi-geri-kazanim-cihazi-nedir', 'fan-cesitleri', 'kanal-tipi-fan-nedir'],
     urunler: ['vh:aile/vortice-ad-isiticisiz-hava-perdeleri', 'vh:aile/vortice-h-ad-elektrikli-isiticili-hava-perdeleri'],
     diller: {
       tr: {
