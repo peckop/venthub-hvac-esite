@@ -63,6 +63,13 @@ export interface RehberYazisi {
    * dokunmadan kategori sayfasından rehbere yol açar.
    */
   ilgiliKategoriler?: readonly `vh:kategori/${string}`[]
+  /**
+   * Yazı altı "ilgili yazılar" için elle seçilmiş yazı KİMLİKLERİ (URN-161; yazı kaydının `kimlik` alanı, `vh:` öneki YOK).
+   * Doluysa `ilgiliYazilariSec` önce bu listeyi kullanır (sıra korunur, en çok üç); yok ya da boşsa konu/ortak aile
+   * kuralı aynen çalışır. Listede olmayan, kendisi olan ya da o dilde yazılmamış kimlik sessizce atlanır.
+   * Neden: aynı konuda çok yazı olunca "ilk üç" konu dışı yazı seçiyordu (hava perdesi → çatı fanı, aspiratör, plug fan).
+   */
+  ilgili?: readonly string[]
   /** Yalnız yazılmış diller. Olmayan dilde sayfa YOKTUR (başka dile düşme yasak, K10). */
   diller: Partial<Record<YaziDili, YaziMetni>>
 }

@@ -64,17 +64,25 @@ export interface YaziSayfasi {
   ilgiliYazilar: IlgiliYazi[]
 }
 
-/** İlgili yazılar: aynı konu ya da ortak ürün ailesi; en çok üç (R3, tasarım K37-a / U2). */
+/**
+ * İlgili yazılar: en çok üç (R3, tasarım K37-a / U2).
+ * `yazi.ilgili` doluysa ÖNCE o liste (elle seçim, sıra korunur; kendisi, tekrar eden, bilinmeyen ve o dilde yazılmamış
+ * kimlik sessizce atlanır — URN-161). Yoksa ya da hiçbir kimlik çözülmezse eski kural: aynı konu ya da ortak ürün ailesi.
+ */
 export function ilgiliYazilariSec(
   yazi: RehberYazisi,
   dil: YaziDili,
   yazilar: readonly RehberYazisi[] = YAZILAR,
 ): RehberYazisi[] {
+  const dildekiler = dildekiYazilar(dil, yazilar).filter((y) => y.kimlik !== yazi.kimlik)
+  if (yazi.ilgili && yazi.ilgili.length > 0) {
+    const secilen = [...new Set(yazi.ilgili)]
+      .map((kimlik) => dildekiler.find((y) => y.kimlik === kimlik))
+      .filter((y): y is RehberYazisi => y !== undefined)
+    if (secilen.length > 0) return secilen.slice(0, 3)
+  }
   const urunler = new Set(yazi.urunler)
-  return dildekiYazilar(dil, yazilar)
-    .filter((y) => y.kimlik !== yazi.kimlik)
-    .filter((y) => y.konu === yazi.konu || y.urunler.some((u) => urunler.has(u)))
-    .slice(0, 3)
+  return dildekiler.filter((y) => y.konu === yazi.konu || y.urunler.some((u) => urunler.has(u))).slice(0, 3)
 }
 
 async function aileKartiHazirla(kimlik: string, dil: YaziDili, kaynak: BilgiMerkeziKaynagi, href: Route): Promise<UrunKarti> {
