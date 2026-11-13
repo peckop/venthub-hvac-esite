@@ -411,6 +411,7 @@ function metinCikti(sonuc) {
   if (sonuc.sonuc === 'bulgu-var') {
     satirlar.push('  ⚠ Bulgu varken sıfırdan üretme: önce yukarıdakileri aç, işin devamı mı tekrarı mı karar ver.')
   }
+  if (!process.env.VENTHUB_DESIGN_SUREC_DIZINI) satirlar.push('  Design surec/: betikten taranmaz (yerel kopya yok); konu Design ile ilgiliyse ana oturumda DesignSync ile surec/ klasörüne elle bak')
   satirlar.push(`  süre: ${sonuc.sure_ms} ms`)
   return satirlar.join('\n')
 }
@@ -561,6 +562,9 @@ function gercekBaglar({ repo = REPO, ortam = process.env } = {}) {
       const hafiza = ortam.HAFIZA_DIZINI || path.join(os.homedir(), '.claude', 'projects', 'c--Users-alize-venthub-hvac', 'memory')
       // ARC-275 (8 Kasım, KTL-84 olayı): depodaki docs/olcum defterleri de taranır; eskiden yalnız docs/audits ve hafıza olcum/ vardı.
       const dizinler = [path.join(repo, 'docs', 'audits'), path.join(repo, 'docs', 'olcum'), path.join(hafiza, 'olcum')]
+      // ARC-300 (e): Design projesinin surec/ klasörü (ops-istek/ops-cevap dosyaları) yalnız DesignSync ile okunur, betikten erişilmez.
+      // Yerel bir kopya varsa (VENTHUB_DESIGN_SUREC_DIZINI) taranır; yoksa metinCikti elle bakma ipucunu basar (sessiz atlama yok).
+      if (ortam.VENTHUB_DESIGN_SUREC_DIZINI) dizinler.push(ortam.VENTHUB_DESIGN_SUREC_DIZINI)
       const tekler = []
       try {
         tekler.push(path.join(path.dirname(anaKok()), 'venthub-pdf-ingestor', 'kaynak-dizini', 'katalog-envanteri.md'))

@@ -27,7 +27,7 @@ Son 7 gün (259 kart): tam kural 0, eksik 178, satır yok 77, yer tutucu 4, çı
 
 Pano bazında tam kuralı geçen yalnız bir MEVZUAT kartı. En çok eksik: ARAÇ 125, ALTYAPI 82, OPS 76, HARİTA 71, BLOG 58.
 
-**Sonuç:** tam kural gerçek pratikten çok uzak. Onu engel yapmak her `add_task`ı tıkardı. Bu yüzden kırmızı (reddeden) kural yalnız iki açık kusura bağlandı: yer tutucu ve ifadesiz çıplak "yok" (30 günde 21 kart). Eksik satır ve satır yokluğu SESSİZ kalıyor; sıkılaştırmanın bir sonraki adımı ayrı karar (OPS) ve önce uyum oranını yükseltmeyi gerektirir.
+**Sonuç:** tam kural gerçek pratikten çok uzak. Onu engel yapmak her `add_task`ı tıkardı. Bu yüzden kırmızı (reddeden) kural yalnız iki açık kusura bağlandı: yer tutucu ve ifadesiz çıplak "yok". **Sayı tanımı:** yukarıdaki 14 + 7 = 21, kapının `oncekiCalismaSorunlari` tanımıyla sayıldı; kancanın kendi `oncekiKirmizi` regex'i daha geniştir ("aranacak" alt dizgisi "taranacak"ı, "doldurulacak", "işe başlarken", "todo" da yakalar). Bağımsız denetçi aynı veritabanında kancayı koşturdu (14 Ekim sonrası 761 kart): **27 ret (20 yer tutucu, 7 ifadesiz yok)**; kancanın gerçek kapsamı 27'dir. 13 Kasım ek: yalnız "aranmadı" yazan satır da ifadesiz sayılır ve "İFADE:" yazımı (noktalı büyük harf) kapıyla aynı ASCII katlamayla ifade sayılır. Eksik satır ve satır yokluğu SESSİZ kalıyor; sıkılaştırmanın bir sonraki adımı ayrı karar (OPS) ve önce uyum oranını yükseltmeyi gerektirir.
 
 ## (b) Uygulanan
 
@@ -38,6 +38,7 @@ Pano bazında tam kuralı geçen yalnız bir MEVZUAT kartı. En çok eksik: ARA�
 
 - `scripts/arac/onceki-calisma.cjs`: tek terimli sorgu artık ÖLÇÜLEMEDİ vermiyor, terim 8 karakter ya da uzunsa ("değerlendirme") aranıyor ve "YOK" satırı `tek terim: zayıf kanıt` damgasını taşıyor; "model"/"adres" gibi kısa tek sözcük hâlâ ÖLÇÜLEMEDİ.
 - Kardeş depo `venthub-pdf-ingestor` (dosya yolları ve commit konuları) `dosya` ve `git` kaynaklarına katıldı; yol `VENTHUB_INGESTOR_DIZINI` ya da ana kökün yanındaki kardeş dizin. Bulunamazsa ya da okunamazsa "YOK" satırında `ingestor deposu taranamadı: <sebep>` yazılır (sessiz atlama yok).
+- Design projesinin `surec/` klasörü (ops-istek/ops-cevap dosyaları) altıncı arama yeridir ama yalnız DesignSync aracıyla okunur, betikten erişilmez: yerel kopya yolu `VENTHUB_DESIGN_SUREC_DIZINI` verilirse ölçüm defterleriyle birlikte taranır, verilmezse çıktı "betikten taranmaz, ana oturumda DesignSync ile elle bak" satırını basar (sessiz atlama yok). Ölçülemedi: Design tarafında kopyalanabilir yerel bir dizin var mı.
 - Test: `src/__tests__/conformance/onceki-calisma.test.ts` INV-ONCEKI-CALISMA-14.
 
 ## Yeniden ölçme tetikleyicisi
