@@ -293,12 +293,12 @@
           "taslak": true
         },
         {
-          "gorev": "Design'ın yeni yorumunu ve cevabını oku ve kayda geçir (öneri diye işaretle, karar sayma; OPS'a bildir)",
-          "komut": "scripts/board/linear-okundu.cjs",
+          "gorev": "Design'ın yeni yorumunu ve cevabını Design sayfasından (Artifact) ArtifactComments aracıyla oku ve kayda geçir (öneri diye işaretle, karar sayma; OPS'a bildir)",
           "siklik": "olay",
           "tetik": "istem-tazelik",
-          "tetikAyrinti": "scripts/board/linear-yeni-yorum.cjs istem satırındaki \"LINEAR: N yeni yorum\" satırını üretir ve metni okundu komutunu verir (kanca .claude/hooks/board-brief.cjs, .claude/settings.json'da bağlı); sayaç dört Design projesinin (MENU, KATALOG, MARKA, BELGE) ve ALTYAPI'nın proje yorumlarını sayar, aynı şeridin kendi yorumlarını saymaz",
-          "bagli": "evet",
+          "tetikAyrinti": "Design kanal kuralı OPS-228'e bağlıdır (Linear yorum kanalı iş kaydı olarak emekli, karar 324; Design yorumu artık Artifact sayfasında). Okuma TASARIM penceresinde ArtifactComments ile yapılır; yeni yorum için istem satırı yok (scripts/board/linear-yeni-yorum.cjs Linear sayacıdır, bu kanalı saymaz; Artifact sayacı kurulacak, kanca altyapısı ARAÇ)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
           "cikti": "Kanban kartı notu ve OPS'a mesaj; karar OPS'tan",
           "esik": "TASLAK: okunmamış Design yorumu 0; süre eşiğini OPS belirler",
           "taslak": true
