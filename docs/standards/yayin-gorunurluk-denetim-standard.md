@@ -164,7 +164,10 @@ okumasının kanıtı Search Console değil **canlı arama**dır.
    (`dizin-takip` / `olcum-defteri`) adres başına alan olarak yazılır; görünüm `dizin-takip --durum` çıktısıdır.
    "Yayın gününden ilk görünme gününe fark" bu alanlardan okunur.
 6. **Tetik hatırlamaya bağlı değildir.** Her yayında yayın günü 3., 7., 14. gün tarihleri OPS'a yazılır ve OPS tetik
-   listesine konur; "kendim bakarım" yazılmaz.
+   listesine konur; "kendim bakarım" yazılmaz. Pencere açılışındaki dizin satırı (`scripts/seo/dizin-acilis.mjs`,
+   SEO-114) ayrıca "GÖRÜNME VADESİ: N yazı canlı aramayla ölçülmedi" parçasını taşır: yayın tarihi yazı kaydından
+   (`src/data/bilgiMerkezi/yazilar.ts`), ölçüm kaydı `hareketler.jsonl`'den okunur; yalnız `gorunme` eylemi sayılır
+   (URN denetimi, Search Console gösterimi ve dizin isteği saymaz), yayından 21 gün sonra yazı izlenmez.
 
 ### Y2.2 Açılışta site haritası farkı: bildirim gelmese de yeni adres kaçmaz (SEO-78, 2026-11-03, OPS UYGUN)
 

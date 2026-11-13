@@ -10,7 +10,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { kuyrukSatiri, trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS } from '../dizin-acilis.mjs'
+import { kuyrukSatiri, trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS, yayinTarihleri, gorunmeVadesi, hareketOku, vadeOku } from '../dizin-acilis.mjs'
 
 const BETIK = resolve(__dirname, '..', 'dizin-acilis.mjs')
 const gecici: string[] = []
@@ -126,5 +126,62 @@ describe('CLI', () => {
     const v = spawnSync(process.execPath, [BETIK], { encoding: 'utf8', env: { ...process.env, VENTHUB_DIZIN_ARSIV: k, VENTHUB_DIZIN_ACILIS_KAPAT: '1' } })
     expect(v.status).toBe(0)
     expect(v.stdout).toBe('')
+  })
+})
+
+describe('görünme vadesi (SEO-114, SEO-113 önerisi B)', () => {
+  const yazilar = [
+    { slug: 'a-yazi', yayin: '2026-11-01' },
+    { slug: 'b-yazi', yayin: '2026-11-08' },
+    { slug: 'eski-yazi', yayin: '2026-09-25' },
+    { slug: 'yeni-yazi', yayin: '2026-11-12' },
+  ]
+  const gor = (adres: string, tarih: string, eylem = 'gorunme', motor = 'google') => ({ tarih, motor, eylem, adres: `https://venthub.com.tr/tr/bilgi-merkezi/${adres}`, sonuc: 'gorunmuyor' })
+
+  it('yayinTarihleri: her yayinTarihi için sonraki ilk slug yazının kendisidir', () => {
+    const metin = `{ kimlik: 'x', yayinTarihi: '2026-10-11', ilgili: ['vh:yazi/baska'], diller: { tr: { slug: 'radyal-yazi' } } },\n{ yayinTarihi: '2026-11-01', diller: { tr: { slug: 'hava-yazi' } } }`
+    expect(yayinTarihleri(metin)).toEqual([{ slug: 'radyal-yazi', yayin: '2026-10-11' }, { slug: 'hava-yazi', yayin: '2026-11-01' }])
+  })
+
+  it('vadesi gelen ve gorunme kaydı olmayan yazı sayılır; kırılım en son vadeye göre', () => {
+    const v = gorunmeVadesi({ yazilar, hareketler: [], bugun: '2026-11-12' })
+    // a-yazi 11-01: 14. gün 11-15 gelmedi, 7. gün (11-08) geçti → 7. gün; b-yazi 11-08: 3. gün (11-11) → 3. gün; eski-yazi 21 günü aştı; yeni-yazi 0. gün
+    expect(v.toplam).toBe(2)
+    expect(v.kirilim).toEqual({ 3: 1, 7: 1, 14: 0 })
+    expect(v.adlar.sort()).toEqual(['a-yazi', 'b-yazi'])
+  })
+
+  it('vade gününden sonraki gorunme kaydı yazıyı düşürür; önceki kayıt düşürmez', () => {
+    const onceki = gor('a-yazi', '2026-11-05T08:00:00Z') // 7. gün eşiği 11-08'den ÖNCE
+    const sonraki = gor('b-yazi', '2026-11-12T08:00:00Z')
+    const v = gorunmeVadesi({ yazilar, hareketler: [onceki, sonraki], bugun: '2026-11-12' })
+    expect(v.adlar).toEqual(['a-yazi'])
+  })
+
+  it('yalnız Google gorunme eylemi sayılır: istek, olcum, Bing ya da başka adres saymaz', () => {
+    const sayilmaz = [gor('a-yazi', '2026-11-12T08:00:00Z', 'istek'), gor('a-yazi', '2026-11-12T08:00:00Z', 'olcum'), gor('a-yazi', '2026-11-12T08:00:00Z', 'gorunme', 'bing'), gor('baska', '2026-11-12T08:00:00Z')]
+    expect(gorunmeVadesi({ yazilar, hareketler: sayilmaz, bugun: '2026-11-12' }).adlar.sort()).toEqual(['a-yazi', 'b-yazi'])
+  })
+
+  it('satır: vade parçası eklenir; vade yoksa ya da null ise satır eskisi gibi kalır', () => {
+    const anlik = { gun: '2026-11-12', alinma: null, tablo: [satir('YAP', 'TAMAM', 'TAMAM')] }
+    const eski = satirUret(anlik, '2026-11-12')
+    expect(satirUret(anlik, '2026-11-12', null)).toBe(eski)
+    expect(satirUret(anlik, '2026-11-12', { toplam: 0, kirilim: { 3: 0, 7: 0, 14: 0 }, adlar: [] })).toBe(`${eski} | görünme vadesi: yok`)
+    expect(satirUret(anlik, '2026-11-12', { toplam: 2, kirilim: { 3: 1, 7: 1, 14: 0 }, adlar: ['a', 'b'] })).toBe(`${eski} | GÖRÜNME VADESİ: 2 yazı canlı aramayla ölçülmedi (3. gün 1, 7. gün 1)`)
+  })
+
+  it('hareketOku bozuk satırı atlar, dosya yoksa []; vadeOku kaynak yoksa null (fail-open)', () => {
+    const d = dizin()
+    expect(hareketOku(d)).toEqual([])
+    writeFileSync(join(d, 'hareketler.jsonl'), `{"motor":"google"}\nBOZUK\n{"eylem":"gorunme"}\n`)
+    expect(hareketOku(d)).toHaveLength(2)
+    expect(vadeOku({ klasor: d, bugun: '2026-11-12', yazilarYolu: join(d, 'yok.ts') })).toBeNull()
+  })
+
+  it('gerçek yazı kaydı okunur ve en az bir yayın tarihi çıkar (kayıt biçimi bozulursa kırmızı)', () => {
+    const v = vadeOku({ klasor: dizin(), bugun: '2026-11-12' })
+    expect(v).not.toBeNull()
+    expect(v?.kirilim).toBeDefined()
   })
 })
