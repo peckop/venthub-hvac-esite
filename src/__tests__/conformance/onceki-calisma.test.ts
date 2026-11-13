@@ -79,6 +79,7 @@ interface Kayit {
 interface Modul {
   kimlikleriCikar: (metin: string) => string[]
   tara: (metin: string, o: { baglar: Baglar; haric?: string[]; derin?: boolean; butceMs?: number }) => Promise<Sonuc>
+  metinCikti: (s: Sonuc) => string
   taramaKaydi: (s: Sonuc, o: { sid: string; kart?: string; anahtar: string }) => Kayit
   defteriYaz: (k: object, o: { yol: string; ortam: Record<string, string>; kokler?: string[] }) => { yazildi: boolean; sebep?: string }
   govdeAnahtari: (yol: string) => string
@@ -206,6 +207,20 @@ describe('INV-ONCEKI-CALISMA-14 (ARC-300 c): tek uzun terim ölçülür, kısa t
     expect(s.ilk).toContain('tek terim: zayıf kanıt')
     const b = await mod.tara('değerlendirme', { baglar: baglar({ dosyalar: async () => ['docs/olcum/oz-degerlendirme-2026-11-13.md'] }) })
     expect(b.sonuc).toBe('bulgu-var')
+  })
+
+  it('ARC-300 (e): Design surec/ betikten taranmaz; yerel kopya yoksa çıktı bunu açıkça söyler, kopya varsa söylemez', async () => {
+    const onceki = process.env.VENTHUB_DESIGN_SUREC_DIZINI
+    try {
+      delete process.env.VENTHUB_DESIGN_SUREC_DIZINI
+      const s = await mod.tara('değerlendirme', { baglar: yok() })
+      expect(mod.metinCikti(s)).toContain('Design surec/: betikten taranmaz')
+      process.env.VENTHUB_DESIGN_SUREC_DIZINI = 'C:/yok-boyle-bir-dizin'
+      expect(mod.metinCikti(s)).not.toContain('Design surec/: betikten taranmaz')
+    } finally {
+      if (onceki === undefined) delete process.env.VENTHUB_DESIGN_SUREC_DIZINI
+      else process.env.VENTHUB_DESIGN_SUREC_DIZINI = onceki
+    }
   })
 
   it('kısa/yaygın tek sözcük ("model") hâlâ ÖLÇÜLEMEDİ', async () => {

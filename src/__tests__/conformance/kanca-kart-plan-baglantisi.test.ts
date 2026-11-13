@@ -42,7 +42,10 @@ const YER_TUTUCULU = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞ
 const IFADESIZ_YOK = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: arandı, yok'
 const BULGULU_IFADESIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: Kanban ARC-25 okundu; git log ve docs/plans içinde başka kayıt yok.'
 const IFADELI_YOK = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: ifade: kart plan kapısı; sonuç: yok'
-const SATIRSIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle'
+const SADECE_ARANMADI = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: Kanban ve git geçmişi aranmadı'
+const BUYUK_IFADE = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: Kanban arandı, kayıt yok.\nİFADE: kart plan kapısı'
+const ARANMADI_IFADELI = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: Linear arşivi aranmadı; ifade: kart plan kapısı; sonuç: ARC-25'
+const SATIRSIZ ='KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle'
 const OLCUM_SATIRI = 'ÖLÇÜM: yayin-oncesi — taban ölçüldü, on izleme koşusu temiz'
 const YENI = '2026-10-27T10:00:00.000Z'
 
@@ -141,6 +144,11 @@ function senaryolar(kancaYolu: string): string[] {
   dogru(deny(ifadesiz) && /ifadesiz/.test(sebep(ifadesiz)), 'add_task: ifadesiz çıplak "yok" reddedilmeli')
   dogru(sessiz(calistir(kancaYolu, acilis(BULGULU_IFADESIZ))), 'add_task: kart/dosya bulgusu olan satır reddedilmemeli (yalnız çıplak yok kırmızı)')
   dogru(sessiz(calistir(kancaYolu, acilis(IFADELI_YOK))), 'add_task: "ifade:" yazılı yok reddedilmemeli')
+  // ARC-300 (d): yalnız "aranmadı" yazan satır reddedilir; "İFADE:" (büyük harf, noktalı İ) ifade sayılır ve değeri kesmez
+  const aranmadi = calistir(kancaYolu, acilis(SADECE_ARANMADI))
+  dogru(deny(aranmadi) && /ifadesiz/.test(sebep(aranmadi)), 'add_task: yalnız "aranmadı" yazan satır reddedilmeli')
+  dogru(sessiz(calistir(kancaYolu, acilis(ARANMADI_IFADELI))), 'add_task: "ifade:" ve bulgusu olan "aranmadı" satırı reddedilmemeli')
+  dogru(sessiz(calistir(kancaYolu, acilis(BUYUK_IFADE))), 'add_task: "İFADE:" (noktalı büyük harf) ifade sayılmalı ve değeri kesmemeli')
   dogru(sessiz(calistir(kancaYolu, acilis(SATIRSIZ))), 'add_task: ÖNCEKİ ÇALIŞMA satırı hiç yoksa sessiz (gürültü sınırı)')
   const reviewYerTutucu = calistir(kancaYolu, reviewTasi('yertutucu'))
   dogru(reviewYerTutucu.status === 0 && !/permissionDecision/.test(reviewYerTutucu.stdout) && /ÖNCEKİ ÇALIŞMA UYARI/.test(baglam(reviewYerTutucu)), 'Review geçişinde yer tutucu yalnız UYARI olmalı, teslimi tıkamaz')
@@ -180,9 +188,12 @@ describe('INV-KANCA-KART-PLAN-BAGI-1 · SABOTAJ: kancaya konan her tek hata en a
     ['ÖLÇÜM uyarısı hiç üretilmez', "return [`KART ÖLÇÜM UYARI (ARC-230;", "return []; [`KART ÖLÇÜM UYARI (ARC-230;"],
     ['okunamayan kart sessiz geçmez', 'if (!k) return', 'if (!k) { fs.writeSync(1, "kart yok\\n"); return }'],
     ['ARC-300: yer tutucu kontrolü kalkar', 'deger.length < 120 && YER_TUTUCU.test(deger)', 'false'],
-    ['ARC-300: ifadesiz çıplak yok kontrolü kalkar', 'deger.length < 140 && YOK_KELIMESI.test(deger)', 'false'],
+    ['ARC-300: ifadesiz çıplak yok kontrolü kalkar', 'deger.length < 140 && (YOK_KELIMESI', 'false && (YOK_KELIMESI'],
     ['ARC-300: bulgusu olan satır da kırmızı olur (gürültü)', '!BULGU.test(deger) && ', ''],
-    ['ARC-300: "ifade:" yazılmış satır da kırmızı olur', '&& !/ifade(si)?[ \\t]*:/i.test(deger)', ''],
+    ['ARC-300: "ifade:" yazılmış satır da kırmızı olur', '&& !/ifade(si)?[ \\t]*:/.test(katli)', ''],
+    ['ARC-300: "ifade:" katlaması kalkar ("İFADE:" görülmez)', '!/ifade(si)?[ \\t]*:/.test(katli)', '!/ifade(si)?[ \\t]*:/i.test(deger)'],
+    ['ARC-300: "İFADE:" satırı değeri keser', '(?![İIiı][Ff][Aa][Dd][Ee])', ''],
+    ['ARC-300 (d): yalnız "aranmadı" satırı kırmızı sayılmaz', ' || ARANMADI.test(katli)', ''],
     ['ARC-300: add_task kırmızıda reddetmez', "permissionDecision: 'deny', permissionDecisionReason", "permissionDecisionX: 'deny', permissionDecisionReasonX"],
     ['ARC-300: Review geçişi de reddeder (teslim tıkanır)', 'kirmizi && acilisMi', 'kirmizi'],
     ['ARC-300: Review geçişinde kırmızı uyarılmaz', '...(kirmizi ? [', '...(false ? ['],

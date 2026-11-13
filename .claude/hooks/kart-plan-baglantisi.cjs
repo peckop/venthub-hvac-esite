@@ -81,19 +81,29 @@ function olcumSatirlari(kart, ad, kapi) {
  *   - ifadesiz çıplak yok: değerde "yok" var, ama kart/commit/dosya bulgusu da "ifade:" arama ifadesi de yok, değer kısa (<140).
  * Satır HİÇ yoksa ya da başka eksikse SESSİZ kalır (ARC-220 gürültü sınırı). SAF; sebep dizgesi ya da null döner.
  */
-const ONCEKI_ETIKET = /(^|\n)[ \t#>*_-]*[Öö][Nn][Cc][Ee][Kk][iİıI][ \t]+[Çç][Aa][Ll][iİıI][Şş][Mm][Aa][ \t]*:[ \t]*([\s\S]*?)(?=\n[ \t#>*_-]*[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ0-9 /_.()-]{2,40}[ \t]*:|\n\s*PLAN\b|$)/
+const ONCEKI_ETIKET = /(^|\n)[ \t#>*_-]*[Öö][Nn][Cc][Ee][Kk][iİıI][ \t]+[Çç][Aa][Ll][iİıI][Şş][Mm][Aa][ \t]*:[ \t]*([\s\S]*?)(?=\n[ \t#>*_-]*(?![İIiı][Ff][Aa][Dd][Ee])[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ0-9 /_.()-]{2,40}[ \t]*:|\n\s*PLAN\b|$)/
 const YER_TUTUCU = /aranacak|doldurulacak|\btbd\b|\btodo\b|işe başlarken/i
 const YOK_KELIMESI = /(^|[^\p{L}])yok(tur)?([^\p{L}]|$)/iu
+// ARC-300 (d): "aranmadı" tek başına arama kanıtı değildir (ifadesiz "yok" gibi). Katlı metinde aranır.
+const ARANMADI = /aranmad[ıi]|aramad[ıi]m?/i
 const BULGU = /\b[a-z]{2,5}-\d+\b|\b(docs|scripts|src|supabase)\/[\w./-]+|\b[0-9a-f]{7,40}\b/i
+/** JS /i "İFADE:" yazımını "ifade" ile eşleştirmez; kapı (kart-plan-kapisi.cjs asciiKatla) ile aynı katlama. */
+function katla(metin) {
+  return String(metin)
+    .replace(/İ/g, 'i')
+    .toLocaleLowerCase('tr')
+    .replace(/[çğıöşü]/g, (c) => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u' })[c])
+}
 function oncekiKirmizi(aciklama) {
   if (typeof aciklama !== 'string') return null
   const m = ONCEKI_ETIKET.exec(aciklama)
   if (!m) return null
   const deger = m[2].trim()
+  const katli = katla(deger)
   if (deger.length < 120 && YER_TUTUCU.test(deger)) {
     return `ÖNCEKİ ÇALIŞMA satırı yer tutucu ("${deger.slice(0, 40)}"): arama yapılmadan kart açılamaz. Önce beş yeri ara (Kanban search_tasks, git log, docs/plans ve docs/audits, sage, Linear arşivi), satıra yer adlarını, "ifade: <aranan sözcükler>" ve bulguyu ya da "yok"u yaz.`
   }
-  if (deger.length < 140 && YOK_KELIMESI.test(deger) && !BULGU.test(deger) && !/ifade(si)?[ \t]*:/i.test(deger)) {
+  if (deger.length < 140 && (YOK_KELIMESI.test(deger) || ARANMADI.test(katli)) && !BULGU.test(deger) && !/ifade(si)?[ \t]*:/.test(katli)) {
     return `ÖNCEKİ ÇALIŞMA satırı ifadesiz "yok" ("${deger.slice(0, 40)}"): hangi sözcüklerle arandığı yazılmayan "yok" kanıt değildir. Satıra "ifade: <aranan sözcükler>" ekle ve aranan yerleri say (örnek: "Kanban search_tasks, git log, docs/plans, docs/audits, sage, Linear arandı; ifade: kart plan kapısı; sonuç: ARC-25").`
   }
   return null
