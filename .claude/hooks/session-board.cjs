@@ -301,6 +301,20 @@ function kisaPano(ozet) {
     .join('\n')
 }
 
+/**
+ * ARC-302 (OPS 13 Kasım): gün adı ve saat TAHMİN EDİLMESİN diye açılışta ve compact dönüşünde hazır basılır
+ * (scripts/arac/zaman.cjs, Europe/Istanbul). FAIL-OPEN: betik yok/hata → satır boş, oturum bloklanmaz. Vana: VENTHUB_ZAMAN_SATIRI_KAPAT=1.
+ */
+function zamanSatiri() {
+  if (process.env.VENTHUB_ZAMAN_SATIRI_KAPAT === '1') return ''
+  try {
+    const zaman = require(path.join(__dirname, '..', '..', 'scripts', 'arac', 'zaman.cjs'))
+    return `Şimdi: ${zaman.zamanSatiri(new Date())}\n`
+  } catch {
+    return ''
+  }
+}
+
 bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${source}\n`)
 
 /**
@@ -738,6 +752,8 @@ try {
 } catch (e) {
   bolum('tazelik', 1, `⚠ana agac tazelik modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — tazelik OLCULMEDI.\n`)
 }
+// ARC-302: gün adı ve saat hazır (açılış + compact dönüşü); satır boşsa bölüm eklenmez.
+bolum('zaman', 1, zamanSatiri())
 
 // SAGE DOSYA DERSİ İŞARETLERİ (Recep 2026-09-18: "gün içinde defalarca compact oluyor").
 // Dersler dosya başına BİR KEZ gösterilir; compact bağlamı kırpınca o "bir kez" kaybolur ve
