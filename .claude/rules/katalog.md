@@ -12,7 +12,7 @@ paths:
 2. Alan değişmeden önce okuyanlar taranır. Bir `technical_specs` anahtarının değeri değişmeden, kaldırılmadan ya da başka alana taşınmadan önce `src/` ve başka departmanların veri dosyalarında.
 3. Aynı sayı metinde de olabilir. Bir sayısal özellik düzeltilince aynı sayının `description_i18n`.
 4. Sütun ya da koşul belirsizse tahminle yazılmaz. Kaynak aynı ölçüt için birden çok sütun veriyorsa.
-5. Canlı yazım betiği kalıbı. Kuru koşum varsayılan; bayatlık kapısı.
+5. Canlı yazım betiği ve ingestor ağacı kalıbı. İngestor ana ağacında değişiklikten önce worktree + PR; tek dosyalık küçük işte yedek + ff-only istisnası, sapma YÖNTEM notuna yazılır.
 6. Önceki çalışma araması içerik anahtarıyla yapılır.
 7. Kanıt mekaniği. Ölçüm dosyaları proje kökü dışında tutulursa doğrulayıcı okuyamaz: karta manuel kanıt.
 8. Düzeltme planında editör notu taşınmaz.

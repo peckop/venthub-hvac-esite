@@ -19,7 +19,7 @@ Kaynaklı rehber yazılarıyla güven ve arama trafiği kazandırır: yazıdaki 
 - 1 görev, tetiğe bağlı 1: `docs/roller/BLOG-gorevler.md`.
 
 ## Dosyalar
-docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydı: B8'de sayılan tüm alanlar, H1, ozet, urunler, ilgiliKategoriler dahil; liste ve rota kodu URUN), yazıyla değişen fikstür ve testler (src/lib/bilgiMerkezi/__tests__/sahteKaynak.ts, kartNosnippet.test.tsx, kartGuncellemeTarihi.test.tsx; src/app/__tests__/fixtures/sitemapAltin.json, sitemapAdresUret.test.ts; conformance/fikstur/rota-dili-kapali-2-oncesi.json), src/config/bilgiMerkeziYonlendirmeleri.mjs (yönlendirme betiği; public/llms.txt GEO-SEO'nundur).
+docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydı: B8'de sayılan tüm alanlar, H1, ozet, urunler, ilgiliKategoriler dahil; liste ve rota kodu URUN), yazıyla değişen fikstür ve testler (src/lib/bilgiMerkezi/__tests__/sahteKaynak.ts, kartNosnippet.test.tsx, kartGuncellemeTarihi.test.tsx; src/app/__tests__/fixtures/sitemapAltin.json, sitemapAdresUret.test.ts; conformance/fikstur/rota-dili-kapali-2-oncesi.json), src/config/bilgiMerkeziYonlendirmeleri.mjs (yönlendirme betiği), public/llms.txt (yalnız rehber yazısı sayısı satırı; dosyanın sahibi GEO-SEO).
 
 ## Yetki
 Taslak yazma, kaynak ve mevzuat paketi isteme (MEVZUAT girdisi), kalıp kapısı.

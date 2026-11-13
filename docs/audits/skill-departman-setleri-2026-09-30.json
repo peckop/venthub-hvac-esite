@@ -1814,6 +1814,65 @@
    "toplamKB": 19.4,
    "adiylaCagir": [],
    "bekleyen": []
+  },
+  {
+   "dept": "TAKIP",
+   "tur": "arastirmaci",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "research-web",
+     "kb": 7.3,
+     "kaynak": "yetenek"
+    },
+    {
+     "ad": "security-scanner",
+     "kb": 9.9,
+     "kaynak": "yetenek"
+    }
+   ],
+   "toplamKB": 17.2,
+   "adiylaCagir": [],
+   "bekleyen": []
+  },
+  {
+   "dept": "TAKIP",
+   "tur": "curutucu",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "plan-challenger",
+     "kb": 17.3,
+     "kaynak": "departman"
+    }
+   ],
+   "toplamKB": 17.3,
+   "adiylaCagir": [],
+   "bekleyen": []
+  },
+  {
+   "dept": "TAKIP",
+   "tur": "dogrulayici",
+   "uret": true,
+   "onYukle": [
+    {
+     "ad": "verify-before-done",
+     "kb": 12.5,
+     "kaynak": "departman"
+    }
+   ],
+   "toplamKB": 12.5,
+   "adiylaCagir": [],
+   "bekleyen": []
+  },
+  {
+   "dept": "TAKIP",
+   "tur": "uygulayici",
+   "uret": false,
+   "onYukle": [],
+   "toplamKB": 0,
+   "adiylaCagir": [],
+   "bekleyen": []
   }
  ],
  "mudurCekirdegi": [

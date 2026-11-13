@@ -74,6 +74,9 @@
 - Ortak satır (filo-ortak.md, rol kartı, açılış özeti) değiştiren PR birleşmeden önce güncel master'ın üstünde bayt ölçümü yapılır; kendi dalındaki ölçüm yetmez. Olay: art arda birleşen iki PR kendi tabanında yeşildi, birlikte kart tavanını aştı ve master'da test kırmızıya döndü (HRT-109).
 - Günlük işte Recep'e soru sorulmaz; `docs/standards/filo-tuzugu.md` Madde 2.1'de sayılan Recep kalemleri (`docs/roller/OPS.md` "Recep kapıları" ve ek kalemler: edge fonksiyonlu PR, dış yazışma, ürün kararları, departman açma/kapama) ve izin genişletme dışındaki her onay OPS'a gelir. Otomatik güvenlik kontrolü bir işi reddederse ret metni OPS'a yazılır; Recep'e "şu pencereye şunu yaz" denmez, OPS kalıcı kuralı (`autoMode.allow`) önerir (OPS-169, Recep 16 Ekim).
 
+## Rehber yazısı birleştirme istisnası (BLG-77)
+- Rehber yazısı PR'ını BLOG hazırlar; birleştirmeyi Recep'in yayın sözüyle OPS yapar (BLOG penceresinde birleştirme denenmez). Yukarıdaki "kendi PR'ını sen birleştirirsin" satırı rehber yazısı dışındaki PR'lar içindir (rehber cetveli R10 B9).
+
 ## Durum dosyası: standart "Yarım iş" satırı (HRT-31)
 - Durum dosyasının adı `lane-day`, `state` ya da `durum` içerir (örnek: `<rol>-lane-day-<tarih>.md`, Geo-SEO'da `geoseo-lane-state.md`); kanca dosyayı bu ad kalıbıyla ve frontmatter `metadata.originSessionId` (TAM oturum kimliği) ile bulur. Rolün sürekli dosyası sürdürülür, ortak adla ikinci dosya açılmaz (HRT-61).
 - Durum dosyasının SONUNA (DEVİR bloğunun içine) her güncellemede ve compact öncesinde tam bu iki biçimden biri yazılır: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Kokpit compact hazırlığı bunu okur; ifade yoksa "ölçülemedi" görünür.

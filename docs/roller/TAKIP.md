@@ -35,7 +35,7 @@ wrongstack-kanban, research-web, security-scanner, bagimlilik-guvenlik-yukseltme
 - Gerekçeli özet: `docs/roller/TAKIP-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık (karar 322, OPS-93). "VentHub TAKİP" panosu ve takip-arastirmaci çalışan tanımı henüz yok (ALT-45).
+Açık (karar 322, OPS-93). "VentHub TAKİP" panosu var (TKP-1, TKP-2); çalışan tanımları takip-arastirmaci, takip-curutucu ve takip-dogrulayici üreticiden gelir (HRT-134).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

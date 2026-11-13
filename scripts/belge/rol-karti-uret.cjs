@@ -295,6 +295,17 @@ const DURUM_SATIRI_KURALI = [
  * Depo herkese açık: kuralın gerekçesi (şirketin durumu) buraya YAZILMAZ; kart notlarında durur.
  */
 const ICERIK_KURALI_ROLLERI = ['BLOG', 'I18N', 'TASARIM', 'URUN', 'SATIS']
+
+/**
+ * BLOG BİRLEŞTİRME İSTİSNASI (BLG-77, OPS 13 Kasım): ortak "Birleştirme ve ölçüm kaydı" satırı "kendi PR'ını sen birleştirirsin" der;
+ * rehber cetveli R10 B9 ise rehber yazısı PR'ında birleştirmeyi OPS'a verir (Recep'in yayın sözüyle). İki metin BLOG'da çelişiyordu.
+ * Yalnız BLOG'un kurallar dosyasına girer; BLOG'un diğer PR'ları (kural, betik, veri) ortak satırdaki yoldan gider.
+ */
+const BLOG_BIRLESTIRME_ISTISNASI_ROLLERI = ['BLOG']
+const BLOG_BIRLESTIRME_ISTISNASI = [
+  '## Rehber yazısı birleştirme istisnası (BLG-77)',
+  '- Rehber yazısı PR\'ını BLOG hazırlar; birleştirmeyi Recep\'in yayın sözüyle OPS yapar (BLOG penceresinde birleştirme denenmez). Yukarıdaki "kendi PR\'ını sen birleştirirsin" satırı rehber yazısı dışındaki PR\'lar içindir (rehber cetveli R10 B9).',
+].join('\n')
 const ICERIK_KURALI = [
   '## İçerik kuralı (HRT-46)',
   '- Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub\'dır. Cetveller: `docs/standards/rehber-yazisi-standard.md` R4 madde 10, `docs/standards/i18n-localization-standard.md` §4.',
@@ -463,6 +474,7 @@ function kuralDosyasi(ad) {
     '',
     BIRLESTIRME_KURALI,
     '',
+    ...(BLOG_BIRLESTIRME_ISTISNASI_ROLLERI.includes(ad) ? [BLOG_BIRLESTIRME_ISTISNASI, ''] : []),
     DURUM_SATIRI_KURALI,
     '',
     ...(OPS_OKUMA_KURALI_ROLLERI.includes(ad) ? [OPS_OKUMA_KURALI, ''] : []),
@@ -582,7 +594,7 @@ const ROLLER = {
   HARITA: {
     gorev: 'Belge ve hafıza düzeni: CLAUDE.md, AGENTS.md, docs/README.md haritası, belge yönetimi cetveli; rol kartı ve ajan tanımı üreticileri, departman açma ve kapatma kaydı; kanca için yalnız kural ve belge metni (tasarım ARAC).',
     gorevDegil: 'uygulama kodu ve CI (ALTYAPI, ARAC); sahibi başkasının cetvelini değiştirmek; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmak.',
-    dosyalar: 'CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**.',
+    dosyalar: 'CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**, docs/defter/**, docs/standards/departman-defter-standard.md, docs/plans/** (belge ve harita planları).',
     yetki: 'Belge temizliği ve emeklilik, rol kartı üretimi (üretici ve departman değişikliğinde PR öncesi harita-dogrulayici), tazelik göstergesi ölçümü (kurulum ARAÇ\'ta).',
     yasak: 'CLAUDE.md değişikliği OPS kapısıdır; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmaz.',
     yetenek: 'plan-challenger, diff-review, alt ajan çürütme, docs/README.md haritası.',
@@ -627,7 +639,7 @@ const ROLLER = {
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi. İşe başlarken rehber-yazisi-standard R10.1 şemasını, R2.6, R5, R10.5 (ders listesi), R10.6 (yayın öncesi kontrol) ve R11\'i oku.',
     gorevDegil: 'arama görünürlük ölçümü (GEO-SEO); sayfa kodu (URUN); mevzuat hükmü üretmek (MEVZUAT).',
-    dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydı: B8\'de sayılan tüm alanlar, H1, ozet, urunler, ilgiliKategoriler dahil; liste ve rota kodu URUN), yazıyla değişen fikstür ve testler (src/lib/bilgiMerkezi/__tests__/sahteKaynak.ts, kartNosnippet.test.tsx, kartGuncellemeTarihi.test.tsx; src/app/__tests__/fixtures/sitemapAltin.json, sitemapAdresUret.test.ts; conformance/fikstur/rota-dili-kapali-2-oncesi.json), src/config/bilgiMerkeziYonlendirmeleri.mjs (yönlendirme betiği; public/llms.txt GEO-SEO\'nundur).',
+    dosyalar: 'docs/standards/rehber-yazisi-standard.md, scripts/rehber/**, rehber yazı taslakları (REC-369), src/data/bilgiMerkezi/yazilar.ts (yalnız yazı kaydı: B8\'de sayılan tüm alanlar, H1, ozet, urunler, ilgiliKategoriler dahil; liste ve rota kodu URUN), yazıyla değişen fikstür ve testler (src/lib/bilgiMerkezi/__tests__/sahteKaynak.ts, kartNosnippet.test.tsx, kartGuncellemeTarihi.test.tsx; src/app/__tests__/fixtures/sitemapAltin.json, sitemapAdresUret.test.ts; conformance/fikstur/rota-dili-kapali-2-oncesi.json), src/config/bilgiMerkeziYonlendirmeleri.mjs (yönlendirme betiği), public/llms.txt (yalnız rehber yazısı sayısı satırı; dosyanın sahibi GEO-SEO).',
     // Pilot (YTN-47, OPS onaylı): pencere tanımına tetik metni ve ön yükleme; yalnız ajan tanımına girer, kart baytını etkilemez.
     pencereTetik: "Skill'leri Skill aracıyla adıyla çağır: yazı yayınlanıyor, dizine ekle, yayın sonrası zincir → rehber-yayin (ön yüklü); kart aç, Done, iş durumu → wrongstack-kanban; commit at, PR aç → git-commit.",
     pencereSkills: ['rehber-yayin'],
@@ -709,7 +721,7 @@ const ROLLER = {
     yetki: 'Salt-okuma ölçüm ve rapor; güncelleme PR sayısını raporlama; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ\'a kart.',
     yasak: 'Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.',
     yetenek: 'wrongstack-kanban, research-web, security-scanner, bagimlilik-guvenlik-yukseltme cetveli.',
-    durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu ve takip-arastirmaci çalışan tanımı henüz yok (ALT-45).',
+    durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu var (TKP-1, TKP-2); çalışan tanımları takip-arastirmaci, takip-curutucu ve takip-dogrulayici üreticiden gelir (HRT-134).',
   },
   // HRT-62 (karar 372, OPS-150, 2026-10-15): Claude Design'da üretilen 3D ürün modelleri ve R3F parça fabrikası URUN'dan ayrıldı.
   '3D': {
@@ -1102,6 +1114,8 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
     if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
     if (!metin.includes(ARAC_TARAMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Betik yazmadan önce tara" bloğu eksik/değişmiş (HRT-121)`)
+    if (BLOG_BIRLESTIRME_ISTISNASI_ROLLERI.includes(ad) && !metin.includes(BLOG_BIRLESTIRME_ISTISNASI)) s.push(`${ad}: kurallar dosyasında "Rehber yazısı birleştirme istisnası" bloğu eksik/değişmiş (BLG-77)`)
+    if (!BLOG_BIRLESTIRME_ISTISNASI_ROLLERI.includes(ad) && metin.includes('## Rehber yazısı birleştirme istisnası')) s.push(`${ad}: "Rehber yazısı birleştirme istisnası" yalnız BLOG kurallar dosyasına girir (BLG-77)`)
     if (!metin.includes(SUREN_IS_KORUMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Süren iş koruması" bloğu eksik/değişmiş (HRT-73)`)
     if (SEO_EK_KURALI_ROLLERI.includes(ad) && !metin.includes(SEO_EK_KURALI)) s.push(`${ad}: kurallar dosyasında "VentHub SEO ek kuralları" bloğu eksik/değişmiş (HRT-75)`)
     if (!SEO_EK_KURALI_ROLLERI.includes(ad) && metin.includes('## VentHub SEO ek kuralları')) s.push(`${ad}: "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasına girer (HRT-75)`)

@@ -19,7 +19,7 @@ Belge ve hafıza düzenini güncel, bulunabilir ve tutarlı tutar; bayat belge, 
 - 4 görev, tetiğe bağlı 4: `docs/roller/HARITA-gorevler.md`.
 
 ## Dosyalar
-CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**.
+CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**, docs/defter/**, docs/standards/departman-defter-standard.md, docs/plans/** (belge ve harita planları).
 
 ## Yetki
 Belge temizliği ve emeklilik, rol kartı üretimi (üretici ve departman değişikliğinde PR öncesi harita-dogrulayici), tazelik göstergesi ölçümü (kurulum ARAÇ'ta).
