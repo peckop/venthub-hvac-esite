@@ -19,10 +19,10 @@ Amaç ve Nasıl: `docs/roller/TASARIM-gorevler.md`.
 - 6 görev, tetiğe bağlı 5: `docs/roller/TASARIM-gorevler.md`.
 
 ## Dosyalar
-`src/design-system/**`, `src/components/ds/**`, `src/index.css` (:root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı).
+`src/design-system/**`, `src/components/ds/**`, `src/index.css` (:root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN'da.
 
 ## Yetki
-Faz 2a (görünmez token köprüsü), Faz 2b (görünüm dönüşü, bayrak arkasında) ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.
+Faz 2a (token köprüsü), Faz 2b ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.
 
 ## Yasak ve sınır
 Adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz.
