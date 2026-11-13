@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "Design Venthub New'deki panel şablonunu Chrome'da kullanıcı gözüyle gezip ölçer misin, Teklifler ekranından başla",
+    "paneli gez ve teklif ekranının 900 piksel genişlikte nasıl göründüğünü raporla",
+    "panel olcumu yapalim, Design'daki ERP tasarimini gercek Chrome'da yuru",
+    "TASARIM düzeltmeyi yaptı, Design düzeltmesini yeniden ölçebilir misin, aynı maddeleri tekrar yürüt",
+    "teklifi gönderip kabul edip siparişe çevirelim, irsaliye ve faturaya kadar DENEME kayıtlarıyla belge zincirini yürüt",
+    "ERP panelini kullanıcı gözüyle gez, bağlı belgeler bölümünde ham [xx.yy] anahtar kalmış mı bak",
+    "kiracı panelinin sunum modunu açıp genişliği 1604, 1100 ve 900 yaparak her birinde ölçüm al",
+    "paneli gezsek, Teklifler listesindeki Kaydet düğmesi ve Başka pencerede de açık uyarısı ne yapıyor, ölçüp rapor yaz",
+    "chrome deneme istek dosyasındaki maddeleri sırayla yürütüp geçti kaldı denenemedi diye raporla",
+    "Panel tasarımını gezip tahsilat adımına kadar ilerler misin, kayıt adlarını DENEME ile başlat",
+    "panel olcumunu tekrarlar misin, onceki turda kalan maddeler duzelmis mi diye bak",
+    "tasarım doğrulaması için kiracı panelini Chrome ile dolaş, ekran görüntülerini kaydedip rapor yaz"
+  ],
+  "should_not_trigger": [
+    "canlı vitrin sitesini tarayıcıda gezip kırık link ve konsol hatası var mı bak, bulduklarını da düzelt",
+    "ürün sayfasındaki bu kareyi tasarım diline göre kabul edilir mi diye değerlendir",
+    "panel bileşeninin Tailwind sınıflarını tokens.js değerlerine çevir, kodu yaz",
+    "yerel geliştirme sunucusundaki checkout sayfasını Playwright ile test et",
+    "sitenin erişilebilirlik denetimini yap, WCAG 2.2 kurallarına göre bulguları listele",
+    "Design projesine yeni bir panel şablonu dosyası yaz ve DesignSync ile gönder",
+    "panelin Supabase tablolarına tenant filtresi ekleyen RLS politikası yaz",
+    "bu PR'daki admin panel değişikliğinin farkını incele, merge'e hazır mı"
+  ]
+}

@@ -245,7 +245,7 @@ Bu bölümdeki skill'lerde dikkat:
 | Araştırmacı | venthub-tasarim-dili (11,4K) | 0,0K | browse (29,9K, y), web-platform-baseline (10,5K, y) | — |
 | Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (11,0K, y) | 11,0K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
 | Çürütücü | plan-challenger (14,6K), web-design-guidelines (4K) | 18,6K | — | — |
-| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | — | — |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (6,7K) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -257,6 +257,7 @@ Bu bölümdeki skill'lerde dikkat:
 - **verify-before-done** — kusur: D8: kapsam listesi depoda olmayan testing/debugging/git-flow skill'lerine gönderiyor (zararsız) · UYARI: "Skills in scope" testing/debugging/git-flow adları bu depoda yok.
 - **accessibility** — not: SKILL.md düzeltme akışı tarif ediyor; Doğrulayıcı yalnız ölçer, düzeltmez (§10.3)
 - **webapp-testing** — UYARI: örnekler npm run dev; VentHub pnpm kullanır.
+- **panel-gezinme** — YTN-55 (13 Kasım 2026): Design Venthub New kiracı panelini yalnız claude-in-chrome ile gezer; Doğrulayıcı panel turunda adıyla çağırır, tuzak listesini TASARIM besler.
 
 ### URUN
 
