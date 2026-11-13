@@ -295,6 +295,17 @@ const DURUM_SATIRI_KURALI = [
  * Depo herkese açık: kuralın gerekçesi (şirketin durumu) buraya YAZILMAZ; kart notlarında durur.
  */
 const ICERIK_KURALI_ROLLERI = ['BLOG', 'I18N', 'TASARIM', 'URUN', 'SATIS']
+
+/**
+ * BLOG BİRLEŞTİRME İSTİSNASI (BLG-77, OPS 13 Kasım): ortak "Birleştirme ve ölçüm kaydı" satırı "kendi PR'ını sen birleştirirsin" der;
+ * rehber cetveli R10 B9 ise rehber yazısı PR'ında birleştirmeyi OPS'a verir (Recep'in yayın sözüyle). İki metin BLOG'da çelişiyordu.
+ * Yalnız BLOG'un kurallar dosyasına girer; BLOG'un diğer PR'ları (kural, betik, veri) ortak satırdaki yoldan gider.
+ */
+const BLOG_BIRLESTIRME_ISTISNASI_ROLLERI = ['BLOG']
+const BLOG_BIRLESTIRME_ISTISNASI = [
+  '## Rehber yazısı birleştirme istisnası (BLG-77)',
+  '- Rehber yazısı PR\'ını BLOG hazırlar; birleştirmeyi Recep\'in yayın sözüyle OPS yapar (BLOG penceresinde birleştirme denenmez). Yukarıdaki "kendi PR\'ını sen birleştirirsin" satırı rehber yazısı dışındaki PR\'lar içindir (rehber cetveli R10 B9).',
+].join('\n')
 const ICERIK_KURALI = [
   '## İçerik kuralı (HRT-46)',
   '- Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub\'dır. Cetveller: `docs/standards/rehber-yazisi-standard.md` R4 madde 10, `docs/standards/i18n-localization-standard.md` §4.',
@@ -463,6 +474,7 @@ function kuralDosyasi(ad) {
     '',
     BIRLESTIRME_KURALI,
     '',
+    ...(BLOG_BIRLESTIRME_ISTISNASI_ROLLERI.includes(ad) ? [BLOG_BIRLESTIRME_ISTISNASI, ''] : []),
     DURUM_SATIRI_KURALI,
     '',
     ...(OPS_OKUMA_KURALI_ROLLERI.includes(ad) ? [OPS_OKUMA_KURALI, ''] : []),
@@ -1102,6 +1114,8 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     if (!metin.includes(TARAYICI_KURALI)) s.push(`${ad}: kurallar dosyasında Tarayıcı bloğu eksik/değişmiş (HRT-61)`)
     if (!metin.includes(TESHIS_KURALI)) s.push(`${ad}: kurallar dosyasında Teşhis komutları bloğu eksik/değişmiş (HRT-69)`)
     if (!metin.includes(ARAC_TARAMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Betik yazmadan önce tara" bloğu eksik/değişmiş (HRT-121)`)
+    if (BLOG_BIRLESTIRME_ISTISNASI_ROLLERI.includes(ad) && !metin.includes(BLOG_BIRLESTIRME_ISTISNASI)) s.push(`${ad}: kurallar dosyasında "Rehber yazısı birleştirme istisnası" bloğu eksik/değişmiş (BLG-77)`)
+    if (!BLOG_BIRLESTIRME_ISTISNASI_ROLLERI.includes(ad) && metin.includes('## Rehber yazısı birleştirme istisnası')) s.push(`${ad}: "Rehber yazısı birleştirme istisnası" yalnız BLOG kurallar dosyasına girir (BLG-77)`)
     if (!metin.includes(SUREN_IS_KORUMA_KURALI)) s.push(`${ad}: kurallar dosyasında "Süren iş koruması" bloğu eksik/değişmiş (HRT-73)`)
     if (SEO_EK_KURALI_ROLLERI.includes(ad) && !metin.includes(SEO_EK_KURALI)) s.push(`${ad}: kurallar dosyasında "VentHub SEO ek kuralları" bloğu eksik/değişmiş (HRT-75)`)
     if (!SEO_EK_KURALI_ROLLERI.includes(ad) && metin.includes('## VentHub SEO ek kuralları')) s.push(`${ad}: "VentHub SEO ek kuralları" yalnız GEO-SEO ve BLOG kurallar dosyasına girer (HRT-75)`)
