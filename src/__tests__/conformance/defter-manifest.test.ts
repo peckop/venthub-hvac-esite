@@ -146,8 +146,9 @@ describe('rol kartı "Sürekli defterler" bölümü', () => {
   })
 
   it('GÖRÜNÜR DÜŞME (OPS kararı 9 Kasım: kartlara pay açılmaz): defter satırı hangi rolün kartında düşer? Liste açık yazılı, değişirse test bilerek değiştirilir', () => {
-    // Bugünkü kart baytlarıyla tek defterli (12 karakter ad) her rol için ölçülmüş küme: EDGE (pay 12 B) ve YETENEK (pay 17 B).
-    const KARTA_SIGMAYAN = ['EDGE', 'YETENEK']
+    // Bugünkü kart baytlarıyla tek defterli (12 karakter ad) her rol için ölçülmüş küme: EDGE (pay 12 B), YETENEK (pay 17 B) ve
+    // TASARIM (HRT-136, 13 Kasım: Görev genişlemesi sonrası kart 6.247 B, pay 8 B; gerçek manifestte TASARIM'ın defteri yok).
+    const KARTA_SIGMAYAN = ['TASARIM', 'EDGE', 'YETENEK']
     const hepsi = (ad: string): Manifest => ({
       sema: 1,
       defterler: roller.map((r) => m({ ad, sahip: r }).defterler[0]),
