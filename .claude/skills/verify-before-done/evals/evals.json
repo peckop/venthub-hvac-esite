@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "tamam bitti sayılır mı, test ettin mi?",
+    "düzeltmeyi yaptım, merge hazır mı kontrol eder misin",
+    "PR'ı açmadan önce çalışıyor demek için elimizde ne kanıt var, doğrula",
+    "son özeti yazmadan önce yaptığımız değişikliğin gerçekten düzeldiğini projenin kendi kontrolleriyle göster",
+    "bu hata düzeldi dedin ama ben görmedim, kanıtla",
+    "iş bitti raporu yazacaksın, önce neyin doğrulandığını neyin doğrulanmadığını ayır",
+    "bitirdim diyorsun, pnpm kontrolleri geçti mi emin misin",
+    "merge etmeden önce son kez her şeyin çalıştığından emin ol, test ettin mi?",
+    "değişiklik bitti, çalışıyor demeden önce doğrulama adımlarını koştur",
+    "şu görevi kapatmadan önce gerçekten düzelmiş mi bak, bitti mi",
+    "teslim öncesi kontrol: neyi test ettin, neyi etmedin, hepsini yaz",
+    "merge hazır mı, kanıtla ve yalnız doğruladığını söyle"
+  ],
+  "should_not_trigger": [
+    "yeni bir React bileşeni yaz, kullanıcı profil kartı olsun",
+    "bu fonksiyonun nasıl çalıştığını açıkla, kodu okuyup anlat",
+    "git commit mesajı yaz, conventional commits biçiminde",
+    "dependabot PR'larını listele ve hangisi major güncelleme göster",
+    "vitest'te yeni bir test dosyası oluştur, ürün sepeti için",
+    "migration dosyası aç, siparişlere kolon eklesin",
+    "sayfa neden yavaş, LCP'yi ölç ve iyileştir",
+    "bu PR'ın kodunu incele, güvenlik açığı var mı"
+  ]
+}

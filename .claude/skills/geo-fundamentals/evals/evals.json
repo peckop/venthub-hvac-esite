@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "GEO için sitemizi gözden geçir, yapay zekâ yanıtlarında alıntılanmak için neyi düzeltmeliyiz",
+    "yapay zekâ alıntı alabilmesi için rehber sayfasında teknik kontrol listesi çıkar",
+    "robots.txt GPTBot'u engelliyor mu, kontrol listesine göre bak",
+    "llms.txt dosyası bizde olmalı mı, GEO açısından değerlendir",
+    "ChatGPT ve Perplexity'nin bizi kaynak göstermesi için içerik yapısını nasıl kurmalıyız",
+    "GEO denetimi yap: tarayıcı erişimi, şema ve içerik yapısı",
+    "ClaudeBot ve GPTBot sitemize girebiliyor mu, erişim kontrolü yap",
+    "yapay zekâ motorları sayfamızdan alıntı yapsın diye ilk paragrafı nasıl yazmalıyız",
+    "üretken motor optimizasyonu için hava perdesi sayfasını kontrol et",
+    "GEO kontrol listesine göre ürün rehberini puanla, salt okuma yeter",
+    "llms.txt ve robots.txt'te yapay zekâ tarayıcıları için ne olması gerekir",
+    "AI cevaplarında markamızın geçmesi için sayfa tarafında neler eksik, GEO bakışıyla söyle"
+  ],
+  "should_not_trigger": [
+    "Google Search Console'dan geçen haftanın tıklama verisini çek",
+    "blog yazısı yaz, hava perdesi nasıl seçilir",
+    "sitemap.xml'e yeni adresleri ekle ve IndexNow gönder",
+    "SERP'te kaçıncı sıradayız ölç",
+    "sayfa başlık etiketini ve meta açıklamayı Türkçe karakterlerle düzelt",
+    "robots.txt dosyasındaki yönlendirme kuralını kaldır, deploy et",
+    "JSON-LD şemasını Product tipi için üret",
+    "Core Web Vitals değerlerini iyileştir, LCP yüksek"
+  ]
+}
