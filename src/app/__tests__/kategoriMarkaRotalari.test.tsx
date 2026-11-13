@@ -10,7 +10,7 @@
 import type { ReactElement } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fiksturdenSlugIle } from '../../lib/data/__tests__/fixtures/kategoriAgaci'
+import { fiksturdenIdIle, fiksturdenSlugIle } from '../../lib/data/__tests__/fixtures/kategoriAgaci'
 
 const cagri = vi.hoisted(() => ({
   kategori: vi.fn(),
@@ -111,6 +111,7 @@ async function sonuc(calis: () => Promise<unknown>, beklenenBilesen: unknown): P
 beforeEach(() => {
   vi.clearAllMocks()
   cagri.kategoriGetir.mockImplementation(async (s: string) => fiksturdenSlugIle(s))
+  cagri.ustGetir.mockImplementation(async (id: string) => fiksturdenIdIle(id))
   cagri.eskiHedef.mockResolvedValue(null)
 })
 
@@ -161,8 +162,10 @@ describe('eski kategori rotası — kararlar bugünküyle aynı', () => {
     // OPS-51: Sığınak 7. KÖK oldu — tek seviyeli adres ESKİSİYLE AYNI ve çizilir (adres değişmez, takma ad gerekmez)
     ['tr', 'siginak-havalandirma', 'CIZ:shelter-ventilation'],
     ['en', 'shelter-ventilation', 'CIZ:shelter-ventilation'],
-    // pasif kategori bugün 200 (O4) — bayrak kapalıyken DEĞİŞMEZ
-    ['tr', 'ticari-havalandirma', 'CIZ:commercial-ventilation'],
+    // URN-154: pasif kategori boş sayfa çizmez — aktif üst varsa üstün adresine, yoksa tüm ürünlere TEK 308 (eski şema adresi)
+    ['tr', 'ticari-havalandirma', 'REDIRECT:/tr/products'],
+    ['tr', 'otopark-jet-fanlari', 'REDIRECT:/tr/category/fanlar'],
+    ['en', 'jet-fans', 'REDIRECT:/en/category/fans'],
     ['tr', 'boyle-bir-kategori-yok', 'NOT_FOUND'],
   ])('/%s/category/%s → %s', async (lang, categorySlug, beklenen) => {
     await expect(sonuc(() => KategoriEski(p({ lang, categorySlug })), cagri.kategori)).resolves.toBe(beklenen)

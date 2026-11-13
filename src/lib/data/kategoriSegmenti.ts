@@ -102,6 +102,24 @@ export async function kategoriSegmentleriniCoz<K extends KategoriSatiri>(
 }
 
 /**
+ * BAYRAK KAPALIYKEN (bugünkü canlı adres şeması) pasif kategorinin yönleneceği ESKİ ŞEMA adresi; aktif kategoride null.
+ * URN-154: pasif kategori (`is_active === false`) ürünsüz ve noindex olduğu hâlde 200 ile BOŞ sayfa çiziyordu
+ * ("Bu kriterlere uygun ürün bulunamadı"; canlı ölçüm 13 Kasım: /tr/category/otopark-jet-fanlari). Hüküm bayrak
+ * AÇIK yolundakiyle aynıdır (O4, `kategoriSegmentleriniCoz`): ilk AKTİF ata varsa onun adresi, yoksa tüm ürünler.
+ * Yalnız adres şeması bugünküdür (`/<dil>/category/<slug>`, `/<dil>/products`); yeni şema bayrakla gelir.
+ */
+export async function pasifKategoriBugunkuHedef<K extends KategoriSatiri>(
+  kategori: K,
+  dil: AdresDili,
+  bag: KategoriCozucuBagimliliklari<K>,
+): Promise<{ tur: 'ata'; slug: string } | { tur: 'urunler' } | null> {
+  if (kategori.is_active !== false) return null
+  const ust = await ilkAktifAtaGetir(kategori.parent_id, bag.ustGetir)
+  if (ust) return { tur: 'ata', slug: getLocalizedCategorySlug(ust, dil) }
+  return { tur: 'urunler' }
+}
+
+/**
  * Rota tarafı: çözer ve SONUCU UYGULAR. `istenen` = bu isteğin adresi (`adresUret` ile aynı
  * biçimde kurulmuş, TEK segmentli); kanonik adresle birebir aynı değilse 308. `istenen` null ise
  * (eski TR rotaları) her zaman 308 — o adresler hiçbir durumda 200 dönmez.
