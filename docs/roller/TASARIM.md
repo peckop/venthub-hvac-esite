@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Tasarımın sahibi: Claude Design (Design Venthub New) ile site ve kiracı paneli (ERP) arasındaki köprü. Design kararlarını kayda geçirir; tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır; site, ürün sayfaları ve kiracı panelinin deneyimini (yerleşim, kabuk, gezinme, etkileşim, süreç akışı, iş aşaması görünürlüğü, görsel tutarlılık) tarayıcıda kullanıcı gözüyle sınar, raporu Design'a geri bildirim olarak hazırlar, düzeltince yeniden sınar.
+Tasarımın sahibi: Claude Design ile site ve kiracı paneli (ERP) arasındaki köprü. Design kararlarını kayda geçirir; tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır; site, ürün sayfaları ve kiracı panelinin deneyimini (yerleşim, kabuk, gezinme, etkileşim, süreç akışı, iş aşaması görünürlüğü, görsel tutarlılık) tarayıcıda kullanıcı gözüyle sınar, raporu Design'a geri bildirim olarak hazırlar, düzeltince yeniden sınar.
 Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): sayfa, rota, adres, veri, SEO ve kabuk KODU (URUN); yönetici paneli KODU (ADMIN); marka kimliği (MARKA). Bu alanlarda kod yazmaz, tasarım ve deneyim değerlendirmesi yapar.
 
 ## Yönetim (karar 201)
@@ -19,7 +19,7 @@ Amaç ve Nasıl: `docs/roller/TASARIM-gorevler.md`.
 - 6 görev, tetiğe bağlı 5: `docs/roller/TASARIM-gorevler.md`.
 
 ## Dosyalar
-`src/design-system/**`, `src/components/ds/**`, `src/index.css` (:root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN'da.
+`src/design-system/**`, `src/components/ds/**`, `src/index.css`, `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN'da.
 
 ## Yetki
 Faz 2a (token köprüsü), Faz 2b ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.
@@ -35,7 +35,7 @@ venthub-tasarim-dili, design-dna (yalnız Faz 1-2), Playwright, plan-challenger,
 - Gerekçeli özet: `docs/roller/TASARIM-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık (asli görev); K36 karar 271 ile kararlı.
+Açık; K36 karar 271 ile kararlı.
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

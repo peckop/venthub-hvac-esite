@@ -666,13 +666,13 @@ const ROLLER = {
     durum: 'Açık (asli görev). Kuyruk: Edge deploy, istemci yayım çağrısını kaldırma, REC-295, canlı doğrulama.',
   },
   TASARIM: {
-    gorev: 'Tasarımın sahibi: Claude Design (Design Venthub New) ile site ve kiracı paneli (ERP) arasındaki köprü. Design kararlarını kayda geçirir; tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır; site, ürün sayfaları ve kiracı panelinin deneyimini (yerleşim, kabuk, gezinme, etkileşim, süreç akışı, iş aşaması görünürlüğü, görsel tutarlılık) tarayıcıda kullanıcı gözüyle sınar, raporu Design\'a geri bildirim olarak hazırlar, düzeltince yeniden sınar.',
+    gorev: 'Tasarımın sahibi: Claude Design ile site ve kiracı paneli (ERP) arasındaki köprü. Design kararlarını kayda geçirir; tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır; site, ürün sayfaları ve kiracı panelinin deneyimini (yerleşim, kabuk, gezinme, etkileşim, süreç akışı, iş aşaması görünürlüğü, görsel tutarlılık) tarayıcıda kullanıcı gözüyle sınar, raporu Design\'a geri bildirim olarak hazırlar, düzeltince yeniden sınar.',
     gorevDegil: 'sayfa, rota, adres, veri, SEO ve kabuk KODU (URUN); yönetici paneli KODU (ADMIN); marka kimliği (MARKA). Bu alanlarda kod yazmaz, tasarım ve deneyim değerlendirmesi yapar.',
-    dosyalar: '`src/design-system/**`, `src/components/ds/**`, `src/index.css` (:root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN\'da.',
+    dosyalar: '`src/design-system/**`, `src/components/ds/**`, `src/index.css`, `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN\'da.',
     yetki: 'Faz 2a (token köprüsü), Faz 2b ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.',
     yasak: 'Adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz.',
     yetenek: 'venthub-tasarim-dili, design-dna (yalnız Faz 1-2), Playwright, plan-challenger, typography, accessibility; claude-in-chrome ve DesignSync (OPS ve TASARIM penceresi; izin değil).',
-    durum: 'Açık (asli görev); K36 karar 271 ile kararlı.',
+    durum: 'Açık; K36 karar 271 ile kararlı.',
   },
   EDGE: {
     gorev: 'Supabase Edge Function katmanı (`supabase/functions/**`, 29 fonksiyon + `_shared/`): güvenlik duruşu, deploy hattı, repo↔prod sapma denetimi; her fonksiyon çağıran sınıfına (a/b/c/d) yazılı bağlanır.',
