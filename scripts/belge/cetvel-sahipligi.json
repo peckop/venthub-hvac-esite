@@ -209,7 +209,7 @@
     "docs/standards/mevzuat-kaydi-standard.md": {
       "sahip": "MEVZUAT",
       "dogrulanacak": false,
-      "dayanak": "OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); cetvel v0.1 taslak, Recep onay kaydı bulunamadı"
+      "dayanak": "OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); Recep cetveli 13 Kasım 2026'da onayladı (OPS-274), v1.0 yürürlük PR'ı MEVZUAT #2506 (MVZ-16)"
     },
     "docs/standards/migration-safety-standard.md": {
       "sahip": "ALTYAPI",
