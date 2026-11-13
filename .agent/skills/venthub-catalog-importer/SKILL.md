@@ -59,7 +59,7 @@ yalnız yönlendirme kalacak. Yönlendirme bayatlamaz.
 depoda (venthub-hvac) katalog **tüketilir**, üretilmez: CSV → DB yüklemesi Kademe 2'dir ve
 `scripts/icerik-hatti/` altındaki betiklerle, Recep kapısından geçerek yapılır.
 
-**Not:** `scripts/visual_ingest_page.py` (ingestor) TERK EDİLMİŞTİR — MIMO servisine bağlıdır ve
+**Not:** `<venthub-pdf-ingestor>/scripts/visual_ingest_page.py` (ingestor) TERK EDİLMİŞTİR — MIMO servisine bağlıdır ve
 o anahtar ölüdür (401, 2026-09-07). Kanonik yol yukarıdaki skill'dir.
 
 <!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
