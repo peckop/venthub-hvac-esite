@@ -3,8 +3,8 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Claude Design ile site arasındaki köprü: Design kararlarını kayda geçirir, tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır, yapılan ekranı Design karesiyle yan yana ölçer.
-Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): sayfa, rota, adres, veri, SEO ve kabuk dosyaları (URUN); marka kimliği (MARKA).
+Tasarımın sahibi: Claude Design ile site ve kiracı paneli (ERP) arasındaki köprü. Design kararlarını kayda geçirir; tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır; site, ürün sayfaları ve kiracı panelinin deneyimini (yerleşim, kabuk, gezinme, etkileşim, süreç akışı, iş aşaması görünürlüğü, görsel tutarlılık) tarayıcıda kullanıcı gözüyle sınar, raporu Design'a geri bildirim olarak hazırlar, düzeltince yeniden sınar.
+Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "görev dışı: <satır>" yaz): sayfa, rota, adres, veri, SEO ve kabuk KODU (URUN); yönetici paneli KODU (ADMIN); marka kimliği (MARKA). Bu alanlarda kod yazmaz, tasarım ve deneyim değerlendirmesi yapar.
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -16,26 +16,26 @@ Görev değil (emir buraya ya da Görev dışına düşerse başlama, OPS'a "gö
 Amaç ve Nasıl: `docs/roller/TASARIM-gorevler.md`.
 
 ## Düzenli görevler
-- 6 görev, tetiğe bağlı 6: `docs/roller/TASARIM-gorevler.md`.
+- 6 görev, tetiğe bağlı 5: `docs/roller/TASARIM-gorevler.md`.
 
 ## Dosyalar
-`src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7), `docs/plans/tasarim-kod-plani-v2*` (dosya kümesi plan önerisidir, karar değil). Cetvel: marka token eşlemesi (OPS onaylı devir 09-30, önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN'da kalır.
+`src/design-system/**`, `src/components/ds/**`, `src/index.css`, `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN'da.
 
 ## Yetki
-Faz 2a (görünmez token köprüsü), Faz 2b (görünüm dönüşü, bayrak arkasında) ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.
+Faz 2a (token köprüsü), Faz 2b ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.
 
 ## Yasak ve sınır
-Adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz; para harcatan tasarım aracı Recep kapısıdır.
+Adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz.
 
 ## Yetenek ve araç
-venthub-tasarim-dili (kare kabul ölçümü), design-dna (yalnız Faz 1-2), Playwright, plan-challenger, typography, accessibility; DesignSync yalnız ana oturumda.
+venthub-tasarim-dili, design-dna (yalnız Faz 1-2), Playwright, plan-challenger, typography, accessibility; claude-in-chrome ve DesignSync (OPS ve TASARIM penceresi; izin değil).
 
 ## Kurallar (5)
 - K1 Plan önce; K2 Tip güvenliği; K10 Design token; K12 focus-visible; K13 Typography prose.
 - Gerekçeli özet: `docs/roller/TASARIM-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık (asli görev); K36 karar 271 ile kararlı (10-03).
+Açık; K36 karar 271 ile kararlı.
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

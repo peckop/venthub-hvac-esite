@@ -2,6 +2,11 @@
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Rol kartı: `docs/roller/TASARIM.md`. K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`.
 
+## Departmana özgü iş kuralları (OPS-168)
+1. **Kart açarken numara boş mu doğrulanır.** Yeni kart numarası verilmeden önce `search_tasks` ile o numara aranır; aynı numara iki kartta çıkarsa ikincisi yeniden numaralanır ve ilk kartın notuna yazılır. Olay: TSR-16 numarası iki kartta çıktı (TASARIM önerisi, OPS onayı 13 Kasım).
+
+## Genel kurallar
+
 - K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
 - K2 Tip güvenliği: `any` yasak, strict TypeScript.
 - K10 Design token: Arbitrary Tailwind değeri yasak; değerler `tokens.js`'ten, renk HEX değil CSS custom property (HSL).

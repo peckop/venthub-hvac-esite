@@ -768,7 +768,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     const diskMetni = (ad: string): string =>
       fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
     const veri = uretici.isKurallariOku(KOK)
-    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'HARITA', 'KATALOG', 'MEVZUAT', 'URUN', 'YETENEK'])
+    expect(Object.keys(veri).sort(), 'ilk paketin altı departmanı').toEqual(['ALTYAPI', 'ARAC', 'BLOG', 'GEO-SEO', 'HARITA', 'KATALOG', 'MEVZUAT', 'TASARIM', 'URUN', 'YETENEK'])
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       for (const [m, etiket] of [[metin, `${ad} (üretilen)`], [diskMetni(ad), `${ad} (disk)`]] as Array<[string, string]>) {
         if (veri[ad]) {
@@ -799,7 +799,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
 
   it('HRT-71: yol kapsamlı işaretçi kural dosyaları üreticiyle diskte bire bir, paths taşır, 2 KB altında, sahipsiz dosya yok', () => {
     const uretilen = uretici.uretYolKurallari()
-    expect(Object.keys(uretilen).sort(), 'yollar alanı olan sekiz rol').toEqual(['altyapi.md', 'arac.md', 'geo-seo.md', 'harita.md', 'katalog.md', 'mevzuat.md', 'urun.md', 'yetenek.md'])
+    expect(Object.keys(uretilen).sort(), 'yollar alanı olan dokuz rol').toEqual(['altyapi.md', 'arac.md', 'geo-seo.md', 'harita.md', 'katalog.md', 'mevzuat.md', 'tasarim.md', 'urun.md', 'yetenek.md'])
     const dizin = path.join(KOK, '.claude', 'rules')
     for (const [dosya, metin] of Object.entries(uretilen)) {
       const disk = fs.readFileSync(path.join(dizin, dosya), 'utf8').replace(/\r\n/g, '\n')
@@ -1249,7 +1249,8 @@ describe('INV-ROL-1 — durum dosyası standart "Yarım iş" satırı (HRT-31, O
   it('TASARIM kartı: Faz 2b/K36 karar 271 kapsamında bayrak arkasında; eski "Recep onayı olmadan başlamaz" ve "yalnız yazı tipi" kalktı', () => {
     const t = kartlar.TASARIM
     expect(t).toContain('Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma)')
-    expect(t).toContain('`data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7')
+    // HRT-136: bayt payı için "plan v2.2 §7" atfı ve "özniteliği/sınıf seçimi" sözcükleri kısaldı; layout.tsx kapsamı (yazı tipi + data-gorunum + body sınıfı) korunur.
+    expect(t).toContain('`src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı)')
     expect(t).toContain('K36 karar 271 ile kararlı')
     for (const eski of ['Faz 2b Recep onayı olmadan başlamaz', 'layout.tsx` (yalnız yazı tipi)', 'K36 kabuk kararı yazılmamış', 'Recep "olur"undan sonra']) {
       expect(t, eski).not.toContain(eski)
