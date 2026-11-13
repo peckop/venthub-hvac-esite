@@ -130,7 +130,8 @@ export default async function Page({ params }: Params) {
   // URN-154: pasif kategori ürünsüz boş sayfa çizmez; aktif üste ya da tüm ürünlere 308 (bayrak açık yoluyla aynı hüküm).
   {
     const pasifHedef = await pasifKategoriBugunkuHedef(category, lang === 'en' ? 'en' : 'tr', kategoriBagimliliklari)
-    if (pasifHedef) permanentRedirect(pasifHedef)
+    if (pasifHedef?.tur === 'ata') permanentRedirect(`/${lang}/category/${pasifHedef.slug}`)
+    if (pasifHedef?.tur === 'urunler') permanentRedirect(`/${lang}/products`)
   }
 
   return <KategoriSayfasi lang={lang} category={category} categorySlug={categorySlug} />

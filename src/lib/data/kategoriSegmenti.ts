@@ -112,11 +112,11 @@ export async function pasifKategoriBugunkuHedef<K extends KategoriSatiri>(
   kategori: K,
   dil: AdresDili,
   bag: KategoriCozucuBagimliliklari<K>,
-): Promise<string | null> {
+): Promise<{ tur: 'ata'; slug: string } | { tur: 'urunler' } | null> {
   if (kategori.is_active !== false) return null
   const ust = await ilkAktifAtaGetir(kategori.parent_id, bag.ustGetir)
-  if (ust) return `/${dil}/category/${getLocalizedCategorySlug(ust, dil)}`
-  return `/${dil}/products`
+  if (ust) return { tur: 'ata', slug: getLocalizedCategorySlug(ust, dil) }
+  return { tur: 'urunler' }
 }
 
 /**
