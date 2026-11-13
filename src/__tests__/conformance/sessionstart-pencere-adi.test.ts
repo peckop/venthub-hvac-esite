@@ -371,6 +371,29 @@ describe('INV-SESSIONSTART-AD-5 · mevcut additionalContext KORUNUR (regresyon)'
   })
 })
 
+describe('INV-SESSIONSTART-ZAMAN-1 (ARC-302) · açılış ve compact dönüşü gün adı ve saati hazır basar', () => {
+  const SATIR = /^Şimdi: (Pazartesi|Salı|Çarşamba|Perşembe|Cuma|Cumartesi|Pazar) \d{1,2} [A-ZÇĞİÖŞÜa-zçğıöşü]+ \d{4} \d{2}:\d{2} TSİ \(ISO hafta \d{1,2}\)$/m
+
+  for (const source of ['startup', 'resume', 'compact']) {
+    it(`${source}: "Şimdi: <gün adı> ..." satırı var, kimlik ve rol kartı satırları yerinde kalır`, () => {
+      const pano = yeniPano()
+      talepYaz(pano, 'ARAC')
+      const s = calistir(source, pano)
+      expect(s.ek).toMatch(SATIR)
+      expect(s.ek.split('\n')[0]).toBe(`Oturum kimliğin: ${SID}`)
+      expect(s.ek.split('\n')[2]).toContain('ROL KARTI: ARAC')
+    })
+  }
+
+  it('vana VENTHUB_ZAMAN_SATIRI_KAPAT=1: satır basılmaz, açılış bozulmaz', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    const s = calistir('startup', pano, { VENTHUB_ZAMAN_SATIRI_KAPAT: '1' })
+    expect(s.ek).not.toContain('Şimdi:')
+    expect(s.ek).toContain('ROL KARTI: ARAC')
+  })
+})
+
 describe('INV-SESSIONSTART-AD-8 · session_title: FARKLI dolu ad EZİLMEZ; boş ya da tablodaki adla AYNI ise kanonik ad YAZILIR', () => {
   // Belge (SessionStart girdisi): `session_title` = başlık zaten ayarlıysa (--name, /rename) dolu gelir. Ölçüm (Ops): restart/
   // resume'da harness dökümdeki /rename adını geri yüklemiyor, pid kaydına türetilmiş ad yazıyor → aynı değeri yazmak zararsız.
