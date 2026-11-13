@@ -55,6 +55,7 @@ function senaryolar(mod: ReturnType<typeof yukle>): string[] {
   dogru(k('.claude/skills/x/SKILL.md', 'bash scripts/yerel.sh').length === 0, 'skill klasörüne göreli atıf sağlam sayılmalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bkz scripts/hijyen/a.cjs?, scripts/hijyen/a.cjs#L3 ve _scripts/hijyen/a.cjs_ …scripts/hijyen/a.cjs!').length === 0, 'çapa ve ? ! _ uç noktalaması jetondan atılmalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bkz **scripts/yok.py**').length === 1, 'kalın yazılmış kopuk atıf kaçmamalı')
+  dogru(k('.claude/skills/x/SKILL.md', 'bkz scripts/test_* ve scripts/foo* ve scripts/yok_* ve **scripts/*.py**').length === 0, 'sonu joker olan atıf (test_*, foo*) somut ad sanılmamalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bkz <ingestor>/scripts/yok.py ve ~/scripts/yok.py').length === 0, 'doğrulanamayan (yer tutucu/ev yolu) atıf atlanmalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bkz ../scripts/hijyen/a.cjs').length === 1, '../ ile başlayan atıf kökten çözülüp sağlam sayılmamalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bkz scripts/hijyen/a.cjs.').length === 0, 'cümle sonu noktası jetondan atılmalı')
@@ -104,7 +105,9 @@ describe('INV-SKILL-ATIF-1 · SABOTAJ: kapıya konan her hata en az bir senaryoy
     ['skills/ üst klasörüne göreli aday yok', ', path.posix.join(ustSkills, yol)]', ']'],
     ['../ kökten de çözülür (yanlış sağlam)', "yol.startsWith('../') ? [yerel]", "yol.startsWith('../') ? [yerel, yol.slice(3)]"],
     ['doğrulanamaz jeton atlanmaz', '|| DOGRULANAMAZ.test(yol)) continue', ') continue'],
-    ['vurgu/çapa kırpılmaz', "return j.replace(/#.*$/, '').replace(/^[^A-Za-z0-9._~/-]+/, '').replace(/^[*_]+|[*_]+$/g, '').replace(/[.:?!…,]+$/, '')", "return j.replace(/[.:]+$/, '')"],
+    ['vurgu çiftsiz kırpılır (sondaki joker * düşer)', "return (vurgu ? vurgu[2] : ham)", "return (vurgu ? vurgu[2] : ham.replace(/[*_]+$/, ''))"],
+    ['vurgu hiç ayrıştırılmaz', "const vurgu = /^([*_]+)(.+)\\1$/.exec(ham)", "const vurgu = null"],
+    ['bağlantı çapası kesilmez', "j.replace(/#.*$/, '')", "j"],
     ['kısa ad eşleşmesi: scripts/ öncesi yol atılır', "if (!yol.includes('scripts/') || ATLA.test(yol) || DOGRULANAMAZ.test(yol)) continue", "if (!yol.includes('scripts/') || ATLA.test(yol) || DOGRULANAMAZ.test(yol)) continue\n      sonuc.push({ no: i + 1, yol: yol.slice(yol.indexOf('scripts/')) })\n      continue"],
     ['joker/şablon atlama kalkar', '|| ATLA.test(yol) ||', '||'],
     ['klasör öneki sayılmaz', "|| [...izlenen].some((f) => f.startsWith(duz + '/'))", ''],

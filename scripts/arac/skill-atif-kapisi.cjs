@@ -22,8 +22,12 @@ const JETON = /[^\s`'"()<>|,;[\]]*scripts\/[^\s`'"()<>|,;[\]]*/g
 const ATLA = /[*{}$]|\.\.\./
 
 function temizle(j) {
-  // bağlantı çapası (#L3) kesilir; markdown vurgusu (**, _) ve cümle noktalaması uçlardan atılır
-  return j.replace(/#.*$/, '').replace(/^[^A-Za-z0-9._~/-]+/, '').replace(/^[*_]+|[*_]+$/g, '').replace(/[.:?!…,]+$/, '').replace(/^\.\//, '')
+  // bağlantı çapası (#L3) kesilir; cümle noktalaması atılır; markdown vurgusu yalnız İKİ UÇTA AYNI işaretse atılır
+  // (`**x**`, `_x_`); sondaki tek `*` (`scripts/foo*`, `scripts/test_*`) joker olarak KALIR ve ATLA'ya takılır.
+  // shortcut: jetonda `:` olan atıf (`scripts/x.py:12`) doğrulanamaz sayılıp atlanır; kopuk dosyaya `:satır` yazılırsa kaçar.
+  const ham = j.replace(/#.*$/, '').replace(/^[^A-Za-z0-9._~/*-]+/, '').replace(/[.:?!…,]+$/, '')
+  const vurgu = /^([*_]+)(.+)\1$/.exec(ham)
+  return (vurgu ? vurgu[2] : ham).replace(/^\.\//, '')
 }
 
 /** Doğrulanamayan jetonlar: mutlak/ev yolu, şema, başı boş (`<ad>/scripts/..` yer tutucu artığı). */
