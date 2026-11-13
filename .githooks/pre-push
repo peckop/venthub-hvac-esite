@@ -60,6 +60,14 @@ if [ -f "$BETIK" ]; then
   printf '%s\n' "$GIRDI" | "$NODE" "$BETIK" || exit $?
 fi
 
+# (2b) MD kimlik yolu kapisi (ARC-303, scripts/hijyen/md-kimlik-yolu-kapisi.cjs): itilecek farkta EKLENEN .md satirinda kimlik yolu
+#     varsa REDDEDER (CI'daki INV-MUTLAK-YOL-1 prose mandalinin yerel aynasi). Fark okunamazsa uyarir ve gecirir (fail-open).
+#     Bilincli gecis: VH_MD_KIMLIK_IZIN=1 git push ...  (`--no-verify` bu kancayi da atlar: DURUST SINIR).
+MDKIMLIK="$ROOT/scripts/hijyen/md-kimlik-yolu-kapisi.cjs"
+if [ -f "$MDKIMLIK" ]; then
+  printf '%s\n' "$GIRDI" | "$NODE" "$MDKIMLIK" || exit $?
+fi
+
 # (3) Push hedef kapisi (ARC-277, scripts/hijyen/push-hedef-kapisi.cjs): hedef master/main, silme ve hizli ileri OLMAYAN guncelleme
 #     REDDEDILIR; push'u hangi surec (node betigi dahil) yaparsa yapsin calisir. Bilincli gecis (silme/hizli-ileri-degil):
 #     VH_PUSH_HEDEF_IZIN=1 git push ...  (master/main icin gecis YOK). `--no-verify` bu kancayi da atlar (DURUST SINIR).
