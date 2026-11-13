@@ -1,12 +1,13 @@
-# Mevzuat Kaydı Standardı (Cetvel) — v0.1 TASLAK
+# Mevzuat Kaydı Standardı (Cetvel) — v1.0
 
 > **Sahibi:** MEVZUAT şeridi. **Doğuran olay:** 2026-09-25, Recep'in sözü: *"mevzuatlar adında bir şerit
 > gerekebilir; tüm konuları tarar, standartlar vs olur, tüm konulara ve ürünlere destek olur."*
 > Aynı hafta BLOG şeridi, fan tüzüğü 327/2011'in yerini 2024/1834'e bıraktığını bir yazı hazırlarken
 > tesadüfen buldu (REC-369). Katalogdaki hiçbir sayfa bunu bilmiyordu; bilginin tek bir yeri yoktu.
 >
-> **Durum:** TASLAK — OPS üzerinden Recep onayına gider. Onaysız hiçbir şerit bu dosyayı kural diye
-> uygulamaz.
+> **Durum:** YÜRÜRLÜKTE (v1.0). **Yürürlük:** Recep onayı, 13 Kasım 2026 (OPS-274). Onay öncesinde
+> (v0.1 taslak dönemi) bu dosya kural diye uygulanmazdı; bu sürümden itibaren tüm şeritler için
+> bağlayıcıdır. Değişiklik MEVZUAT şeridinin işidir; kuralı gevşeten değişiklik yeniden onay ister.
 
 ---
 
@@ -220,6 +221,8 @@ Dayanak: uygunluk model bazında beyan edilir (1253/2014 ve 1254/2014 bilgi şar
 
 ## Ölçüm geçmişi
 
+- 2026-11-13 — v1.0: taslak ibaresi kalktı, yürürlük satırı eklendi (Recep onayı 13 Kasım, OPS-274).
+  İçerik kuralları değişmedi; kayıt o gün 52 kalem.
 - 2026-09-25 — v0.1 taslak. Tohum: altı eksende (motor, fan, ATEX, EMC/alçak gerilim, havalandırma
   üniteleri/enerji etiketi, makine/duman/F-gaz) **42 kalem** (`docs/mevzuat/kayit.json`, kanıtlar
   `docs/mevzuat/kanit/`). Aile slug'larının 47/47'si KATALOG paketiyle eşleşti. Resmî ve doğrulanmış
