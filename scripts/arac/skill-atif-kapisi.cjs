@@ -22,8 +22,12 @@ const JETON = /[^\s`'"()<>|,;[\]]*scripts\/[^\s`'"()<>|,;[\]]*/g
 const ATLA = /[*{}$]|\.\.\./
 
 function temizle(j) {
-  return j.replace(/[.:]+$/, '').replace(/^\.\//, '')
+  // bağlantı çapası (#L3) kesilir; markdown vurgusu (**, _) ve cümle noktalaması uçlardan atılır
+  return j.replace(/#.*$/, '').replace(/^[^A-Za-z0-9._~/-]+/, '').replace(/^[*_]+|[*_]+$/g, '').replace(/[.:?!…,]+$/, '').replace(/^\.\//, '')
 }
+
+/** Doğrulanamayan jetonlar: mutlak/ev yolu, şema, başı boş (`<ad>/scripts/..` yer tutucu artığı). */
+const DOGRULANAMAZ = /^[/~]|:/
 
 /** SKILL.md metninden [{no, yol}] atıfları. Jeton `scripts/` içermeyen önekleri de taşır (tam yol karşılaştırması için). */
 function atiflar(metin) {
@@ -31,7 +35,7 @@ function atiflar(metin) {
   String(metin).split('\n').forEach((satir, i) => {
     for (const eslesme of satir.matchAll(JETON)) {
       const yol = temizle(eslesme[0])
-      if (!yol.includes('scripts/') || ATLA.test(yol)) continue
+      if (!yol.includes('scripts/') || ATLA.test(yol) || DOGRULANAMAZ.test(yol)) continue
       sonuc.push({ no: i + 1, yol })
     }
   })
@@ -40,7 +44,10 @@ function atiflar(metin) {
 
 /** Atıf sağlam mı: tam yol (kökten ya da skill klasörüne göreli) dosya ya da klasör olarak izlenen dosyalarda var. */
 function var_mi(yol, skillKlasoru, izlenen) {
-  const adaylar = [yol, path.posix.join(skillKlasoru, yol), path.posix.join(path.posix.dirname(path.posix.dirname(skillKlasoru)), yol)]
+  const ustSkills = path.posix.dirname(path.posix.dirname(skillKlasoru))
+  const yerel = path.posix.join(skillKlasoru, yol)
+  // `../` ile başlayan yalnız skill klasörüne göreli çözülür; kökten ya da skills/ üstünden çözmek yanlış sağlam sayar
+  const adaylar = yol.startsWith('../') ? [yerel] : [yol, yerel, path.posix.join(ustSkills, yol)]
   return adaylar.some((a) => {
     const duz = a.replace(/\/+$/, '')
     return izlenen.has(duz) || [...izlenen].some((f) => f.startsWith(duz + '/'))

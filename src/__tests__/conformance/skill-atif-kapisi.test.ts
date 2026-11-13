@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
@@ -53,6 +53,10 @@ function senaryolar(mod: ReturnType<typeof yukle>): string[] {
   dogru(k('.claude/skills/x/SKILL.md', 'klasör: scripts/hijyen/ ve scripts/hijyen').length === 0, 'klasör atfı (içinde izlenen dosya) sağlam sayılmalı')
   dogru(k('.agent/skills/ui/SKILL.md', 'python3 skills/ui/scripts/search.py').length === 0, 'skills/ üst klasörüne göreli atıf sağlam sayılmalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bash scripts/yerel.sh').length === 0, 'skill klasörüne göreli atıf sağlam sayılmalı')
+  dogru(k('.claude/skills/x/SKILL.md', 'bkz scripts/hijyen/a.cjs?, scripts/hijyen/a.cjs#L3 ve _scripts/hijyen/a.cjs_ …scripts/hijyen/a.cjs!').length === 0, 'çapa ve ? ! _ uç noktalaması jetondan atılmalı')
+  dogru(k('.claude/skills/x/SKILL.md', 'bkz **scripts/yok.py**').length === 1, 'kalın yazılmış kopuk atıf kaçmamalı')
+  dogru(k('.claude/skills/x/SKILL.md', 'bkz <ingestor>/scripts/yok.py ve ~/scripts/yok.py').length === 0, 'doğrulanamayan (yer tutucu/ev yolu) atıf atlanmalı')
+  dogru(k('.claude/skills/x/SKILL.md', 'bkz ../scripts/hijyen/a.cjs').length === 1, '../ ile başlayan atıf kökten çözülüp sağlam sayılmamalı')
   dogru(k('.claude/skills/x/SKILL.md', 'bkz scripts/hijyen/a.cjs.').length === 0, 'cümle sonu noktası jetondan atılmalı')
   const calisan = mod.calistir(KOK, () => {
     throw new Error('yok')
@@ -72,19 +76,21 @@ describe('INV-SKILL-ATIF-1 · gerçek kapı', () => {
     const gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-atif-'))
     try {
       const git = (...a: string[]) => execFileSync('git', a, { cwd: gecici, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+      const kos = () => spawnSync(process.execPath, [KAPI], { cwd: gecici, encoding: 'utf8' })
       git('init', '-q')
       fs.mkdirSync(path.join(gecici, '.claude/skills/a'), { recursive: true })
       fs.mkdirSync(path.join(gecici, 'scripts'), { recursive: true })
       fs.writeFileSync(path.join(gecici, 'scripts/var.cjs'), '')
-      fs.writeFileSync(path.join(gecici, '.claude/skills/a/SKILL.md'), 'bkz scripts/var.cjs\nve scripts/yok.cjs\n')
+      fs.writeFileSync(path.join(gecici, '.claude/skills/a/SKILL.md'), 'bkz scripts/var.cjs\n')
       git('add', '-A')
-      const r = execFileSync(process.execPath, [KAPI], { cwd: gecici, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).toString()
-      expect(r).toBe('')
-    } catch (e) {
-      const err = e as { status?: number; stderr?: string }
-      expect(err.status).toBe(1)
-      expect(err.stderr).toMatch(/\.claude\/skills\/a\/SKILL\.md:2 kopuk: scripts\/yok\.cjs/)
-      expect(err.stderr).not.toMatch(/scripts\/var\.cjs/)
+      const temiz = kos()
+      expect(temiz.status, temiz.stderr).toBe(0)
+      expect(temiz.stderr).toBe('')
+      fs.writeFileSync(path.join(gecici, '.claude/skills/a/SKILL.md'), 'bkz scripts/var.cjs\nve scripts/yok.cjs\n')
+      const kopuk = kos()
+      expect(kopuk.status).toBe(1)
+      expect(kopuk.stderr).toMatch(/\.claude\/skills\/a\/SKILL\.md:2 kopuk: scripts\/yok\.cjs/)
+      expect(kopuk.stderr).not.toMatch(/scripts\/var\.cjs/)
     } finally {
       fs.rmSync(gecici, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })
     }
@@ -93,13 +99,15 @@ describe('INV-SKILL-ATIF-1 · gerçek kapı', () => {
 
 describe('INV-SKILL-ATIF-1 · SABOTAJ: kapıya konan her hata en az bir senaryoyu kırar', () => {
   const SABOTAJLAR: Array<[string, string, string]> = [
-    ['kök yolu aday değil', 'const adaylar = [yol, ', 'const adaylar = ['],
-    ['skill klasörüne göreli aday yok', 'path.posix.join(skillKlasoru, yol), ', ''],
-    ['skills/ üst klasörüne göreli aday yok', ', path.posix.join(path.posix.dirname(path.posix.dirname(skillKlasoru)), yol)]', ']'],
-    ['kısa ad eşleşmesi: scripts/ öncesi yol atılır', "if (!yol.includes('scripts/') || ATLA.test(yol)) continue", "if (!yol.includes('scripts/') || ATLA.test(yol)) continue\n      sonuc.push({ no: i + 1, yol: yol.slice(yol.indexOf('scripts/')) })\n      continue"],
-    ['joker/şablon atlama kalkar', "|| ATLA.test(yol)) continue", ') continue'],
+    ['kök yolu aday değil', ': [yol, yerel, ', ': [yerel, '],
+    ['skill klasörüne göreli aday yok', ': [yol, yerel, path', ': [yol, path'],
+    ['skills/ üst klasörüne göreli aday yok', ', path.posix.join(ustSkills, yol)]', ']'],
+    ['../ kökten de çözülür (yanlış sağlam)', "yol.startsWith('../') ? [yerel]", "yol.startsWith('../') ? [yerel, yol.slice(3)]"],
+    ['doğrulanamaz jeton atlanmaz', '|| DOGRULANAMAZ.test(yol)) continue', ') continue'],
+    ['vurgu/çapa kırpılmaz', "return j.replace(/#.*$/, '').replace(/^[^A-Za-z0-9._~/-]+/, '').replace(/^[*_]+|[*_]+$/g, '').replace(/[.:?!…,]+$/, '')", "return j.replace(/[.:]+$/, '')"],
+    ['kısa ad eşleşmesi: scripts/ öncesi yol atılır', "if (!yol.includes('scripts/') || ATLA.test(yol) || DOGRULANAMAZ.test(yol)) continue", "if (!yol.includes('scripts/') || ATLA.test(yol) || DOGRULANAMAZ.test(yol)) continue\n      sonuc.push({ no: i + 1, yol: yol.slice(yol.indexOf('scripts/')) })\n      continue"],
+    ['joker/şablon atlama kalkar', '|| ATLA.test(yol) ||', '||'],
     ['klasör öneki sayılmaz', "|| [...izlenen].some((f) => f.startsWith(duz + '/'))", ''],
-    ['sondaki nokta kırpılmaz', "return j.replace(/[.:]+$/, '')", 'return j'],
     ['kopuk atıf bildirilmez', '.filter((a) => !var_mi(a.yol, klasor, izlenen))', '.filter(() => false)'],
     ['satır numarası kayar', 'sonuc.push({ no: i + 1, yol })', 'sonuc.push({ no: i, yol })'],
     ['git okunamazsa kapı çöker', "return { kod: 0, mesaj: `[skill-atif] UYARI:", "throw new Error(`[skill-atif] UYARI:"],
