@@ -1,7 +1,7 @@
 # Mevzuat Kaydı Standardı (Cetvel) — v1.0
 
-> **Sahibi:** MEVZUAT şeridi. **Doğuran olay:** 2026-09-25, Recep'in sözü: *"mevzuatlar adında bir şerit
-> gerekebilir; tüm konuları tarar, standartlar vs olur, tüm konulara ve ürünlere destek olur."*
+> **Sahibi:** MEVZUAT şeridi. **Doğuran olay:** 2026-09-25, sahibin kararıyla ürünlerimize dokunan
+> tüm mevzuat ve standartları tarayıp tüm şeritlere destek verecek ayrı bir MEVZUAT şeridi kuruldu.
 > Aynı hafta BLOG şeridi, fan tüzüğü 327/2011'in yerini 2024/1834'e bıraktığını bir yazı hazırlarken
 > tesadüfen buldu (REC-369). Katalogdaki hiçbir sayfa bunu bilmiyordu; bilginin tek bir yeri yoktu.
 >
