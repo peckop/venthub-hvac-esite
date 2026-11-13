@@ -71,7 +71,14 @@ const OTURUMA_GIREN = new Set(['name', 'description', 'argument-hint'])
  * ✅Recep kararı OPS üzerinden iletildi, 6 Kasım 2026, YTN-42. Bundan sonraki her yükseltme aynı yoldan gider: ölçülmüş aşım + sınav
  * sonucu OPS'a gelir, bu bloğa yeni tarihli satır yazılır.
  */
-const BUTCE_BAYT = 27 * 1024
+/**
+ * ⭐BÜTÇE 27 → 27,5 KB (YTN-55, ölçüm 2026-11-13). panel-gezinme (TASARIM doğrulayıcı) oturum listesine ekledi:
+ * 27 648 → 27 912 bayt (264 bayt aşım, 74 → 75 skill). Açıklama 270 karakter (tavan 300); kısaltmak Türkçe tetik
+ * sınavını zayıflatır, YTN-42 yolu: ölçülmüş aşımda tavan artar, işi bozan daraltma yapılmaz.
+ * 27,5 KB (28 160 bayt) = bugünkü toplam + ~0,24 KB baş payı. Tetik sınavı 11/12 ve 8/8.
+ * ✅OPS onayı 13 Kasım 2026, YTN-55.
+ */
+const BUTCE_BAYT = 27.5 * 1024
 
 /** Tek bir açıklamanın tavanı. Yeni skill'ler için geçerli; bugünkü aşanlar aşağıda ADIYLA. */
 const ACIKLAMA_TAVANI = 300
