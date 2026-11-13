@@ -52,6 +52,7 @@
         "scripts/belge/",
         "scripts/board/",
         "scripts/hijyen/",
+        "scripts/arac/zaman.cjs",
         ".claude/hooks/",
         ".claude/settings.json",
         ".githooks/lib/companion-defter.cjs",
