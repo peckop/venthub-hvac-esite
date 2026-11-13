@@ -50,7 +50,7 @@ Rol başına: 3D 1 · ADMIN 9 · ALTYAPI 17 · ARAC 4 · EDGE 2 · GEO-SEO 1 · 
 | pricing-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | product-image-standard.md | KATALOG | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
 | product-schema-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
-| mevzuat-kaydi-standard.md | MEVZUAT | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); Recep cetveli 13 Kasım 2026'da onayladı (OPS-274), v1.0 yürürlük PR'ı MEVZUAT #2506 (MVZ-16) |
+| mevzuat-kaydi-standard.md | MEVZUAT | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); Recep cetveli 13 Kasım 2026'da onayladı; v1.0 yürürlükte (OPS-274, MEVZUAT #2506, MVZ-16) |
 | execution-method-standard.md | OPS | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | filo-tuzugu.md | OPS | teyitli | OPS-169 (Recep isteği 2026-10-16): tüzüğün metin ve hüküm sahibi OPS, HARİTA belge düzenini tutar |
 | hukum-kaynak-standard.md | OPS | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
