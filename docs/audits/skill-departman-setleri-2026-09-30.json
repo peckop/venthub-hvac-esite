@@ -1472,7 +1472,12 @@
     }
    ],
    "toplamKB": 30.9,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "panel-gezinme",
+     "kb": 6.7
+    }
+   ],
    "bekleyen": []
   },
   {
