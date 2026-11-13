@@ -3,7 +3,9 @@
  *
  * Kanca: .claude/hooks/kart-plan-baglantisi.cjs. OPS kararı (27 Ekim): bugünkü kapı olduğu gibi bağlanır, ama YALNIZ kartta PLAN başlığı
  * VARKEN iskeleti ölçer; başlık yoksa SESSİZ kalır (son 8 günde açılan 55 kartın 0'ında PLAN başlığı vardı: her kartı uyarmak ARC-220'nin
- * kaldırdığı gürültüdür). Kanca hiçbir zaman reddetmez.
+ * kaldırdığı gürültüdür). Kanca iskelet uyarılarında reddetmez. ARC-300 (OPS 13 Kasım): REDDEDEN TEK DURUM `add_task`ta ÖNCEKİ ÇALIŞMA
+ * satırının yer tutucu ("ARANACAK") ya da ifadesiz çıplak "yok" olmasıdır (30 günde 758 kartın 21'i); satır hiç yoksa ya da başka eksikse
+ * sessiz kalır, çünkü yalnız 1 kart tam kuralı geçiyor (ölçüm docs/olcum/kart-onceki-calisma-2026-11-13.md).
  *
  * Sabotaj: kancanın kaynağına tek tek hata sokulur (temp klasörde kopya); her hatalı kopya en az bir senaryoyu kırmızıya çevirir.
  */
@@ -35,7 +37,12 @@ const TAM_PLAN = [
   'ÖNCEKİ ÇALIŞMA: Kanban search_tasks, git log, docs/plans, docs/audits, sage ve Linear arandı; ifade: kart plan kapısı; sonuç: yok.',
 ].join('\n')
 const EKSIK_PLAN = 'PLAN\nAmaç: çok kısa'
-const PLANSIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: arandı, yok'
+const PLANSIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: Kanban search_tasks, git log, docs/plans, docs/audits, sage ve Linear arandı; ifade: kart plan kapısı; sonuç: ARC-25.'
+const YER_TUTUCULU = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: ARANACAK'
+const IFADESIZ_YOK = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: arandı, yok'
+const BULGULU_IFADESIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: Kanban ARC-25 okundu; git log ve docs/plans içinde başka kayıt yok.'
+const IFADELI_YOK = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle\nÖNCEKİ ÇALIŞMA: ifade: kart plan kapısı; sonuç: yok'
+const SATIRSIZ = 'KAYNAK/CETVEL: cetvel yok\nYÖNTEM: elle'
 const OLCUM_SATIRI = 'ÖLÇÜM: yayin-oncesi — taban ölçüldü, on izleme koşusu temiz'
 const YENI = '2026-10-27T10:00:00.000Z'
 
@@ -62,6 +69,7 @@ beforeAll(() => {
         kart('plansiz', 'ARC-903 · plansız', PLANSIZ),
         kart('olcumsuz', 'ARC-905 · yayın', PLANSIZ, ['olcum-yayin-oncesi']),
         kart('olcumlu', 'ARC-906 · yayın', `${PLANSIZ}\n${OLCUM_SATIRI}`, ['olcum-yayin-oncesi']),
+        kart('yertutucu', 'ARC-909 · yer tutucu', YER_TUTUCULU),
       ],
     }),
     1,
@@ -124,6 +132,20 @@ function senaryolar(kancaYolu: string): string[] {
   dogru(/ÖLÇÜM UYARI/.test(baglam(acOlcumsuz)), 'add_task: etiketli kartta ÖLÇÜM satırı yoksa açılışta uyarmalı')
   dogru(sessiz(calistir(kancaYolu, arac({ action: 'add_task', title: 'ARC-908 · yayın', description: `${PLANSIZ}\n${OLCUM_SATIRI}`, labels: ['olcum-yayin-oncesi'] }))), 'add_task: ÖLÇÜM satırı tam kart sessiz olmalı')
 
+  // ARC-300: ÖNCEKİ ÇALIŞMA yer tutucu / ifadesiz çıplak yok = KIRMIZI (add_task reddeder); başka durumlar sessiz
+  const deny = (c: Cikti) => c.status === 0 && c.stdout !== '' && JSON.parse(c.stdout).hookSpecificOutput.permissionDecision === 'deny'
+  const sebep = (c: Cikti): string => (c.stdout ? (JSON.parse(c.stdout).hookSpecificOutput.permissionDecisionReason as string) : '')
+  const yerTutucu = calistir(kancaYolu, acilis(YER_TUTUCULU))
+  dogru(deny(yerTutucu) && /yer tutucu/.test(sebep(yerTutucu)) && /ARC-904/.test(sebep(yerTutucu)), 'add_task: ARANACAK yer tutucusu reddedilmeli (kart numarası ve sebep mesajda)')
+  const ifadesiz = calistir(kancaYolu, acilis(IFADESIZ_YOK))
+  dogru(deny(ifadesiz) && /ifadesiz/.test(sebep(ifadesiz)), 'add_task: ifadesiz çıplak "yok" reddedilmeli')
+  dogru(sessiz(calistir(kancaYolu, acilis(BULGULU_IFADESIZ))), 'add_task: kart/dosya bulgusu olan satır reddedilmemeli (yalnız çıplak yok kırmızı)')
+  dogru(sessiz(calistir(kancaYolu, acilis(IFADELI_YOK))), 'add_task: "ifade:" yazılı yok reddedilmemeli')
+  dogru(sessiz(calistir(kancaYolu, acilis(SATIRSIZ))), 'add_task: ÖNCEKİ ÇALIŞMA satırı hiç yoksa sessiz (gürültü sınırı)')
+  const reviewYerTutucu = calistir(kancaYolu, reviewTasi('yertutucu'))
+  dogru(reviewYerTutucu.status === 0 && !/permissionDecision/.test(reviewYerTutucu.stdout) && /ÖNCEKİ ÇALIŞMA UYARI/.test(baglam(reviewYerTutucu)), 'Review geçişinde yer tutucu yalnız UYARI olmalı, teslimi tıkamaz')
+  dogru(sessiz(calistir(kancaYolu, acilis(YER_TUTUCULU), { VENTHUB_KART_PLAN_BAGI_KAPALI: '1' })), 'vana yer tutucu reddini de kapatmalı')
+
   dogru(sessiz(calistir(kancaYolu, reviewTasi('eksik'), { VENTHUB_KART_PLAN_BAGI_KAPALI: '1' })), 'vana kapatmalı')
   dogru(sessiz(calistir(kancaYolu, reviewTasi('eksik'), { VENTHUB_KANBAN_DB: path.join(dizin, 'yok.sqlite') })), 'fail-open: veritabanı yoksa sessiz')
   dogru(sessiz(calistir(kancaYolu, reviewTasi('yok-boyle-kart'))), 'fail-open: bilinmeyen kart sessiz')
@@ -157,6 +179,13 @@ describe('INV-KANCA-KART-PLAN-BAGI-1 · SABOTAJ: kancaya konan her tek hata en a
     ['add_task etiketleri yok sayılır', "etiketler = Array.isArray(t.labels) ? t.labels.map(String) : []", 'etiketler = []'],
     ['ÖLÇÜM uyarısı hiç üretilmez', "return [`KART ÖLÇÜM UYARI (ARC-230;", "return []; [`KART ÖLÇÜM UYARI (ARC-230;"],
     ['okunamayan kart sessiz geçmez', 'if (!k) return', 'if (!k) { fs.writeSync(1, "kart yok\\n"); return }'],
+    ['ARC-300: yer tutucu kontrolü kalkar', 'deger.length < 120 && YER_TUTUCU.test(deger)', 'false'],
+    ['ARC-300: ifadesiz çıplak yok kontrolü kalkar', 'deger.length < 140 && YOK_KELIMESI.test(deger)', 'false'],
+    ['ARC-300: bulgusu olan satır da kırmızı olur (gürültü)', '!BULGU.test(deger) && ', ''],
+    ['ARC-300: "ifade:" yazılmış satır da kırmızı olur', '&& !/ifade(si)?[ \\t]*:/i.test(deger)', ''],
+    ['ARC-300: add_task kırmızıda reddetmez', "permissionDecision: 'deny', permissionDecisionReason", "permissionDecisionX: 'deny', permissionDecisionReasonX"],
+    ['ARC-300: Review geçişi de reddeder (teslim tıkanır)', 'kirmizi && acilisMi', 'kirmizi'],
+    ['ARC-300: Review geçişinde kırmızı uyarılmaz', '...(kirmizi ? [', '...(false ? ['],
   ]
 
   it.each(SABOTAJLAR)('%s', (ad, eski, yeni) => {
