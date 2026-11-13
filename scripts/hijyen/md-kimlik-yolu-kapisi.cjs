@@ -15,6 +15,12 @@
  *   çıkış 1 = ihlal (dosya:satır listesi stderr'de), çıkış 0 = temiz ya da ölçülemedi.
  * FAIL-OPEN: git yok/diff okunamadı → uyarı basar, GEÇİRİR (kesin kapı CI'daki mutlak-yol testidir).
  * Bilinçli geçiş: VH_MD_KIMLIK_IZIN=1 git push ...  (uyarı yine basılır).
+ *
+ * BİLİNEN SINIRLAR (denetçi ölçtü, CI mandalı yakalar): (1) kapı mandaldan SIKIDIR: mandal sayı ARTIŞINA bakar, kapı her
+ * EKLENEN satıra; tabandaki bir kimlik satırını düzenlemek (yazım düzeltmesi) `+` satırı üretir ve reddedilir → vana ya da
+ * yolu göreli yaz. (2) Taşınan (rename) .md'ye eklenen satır taranmaz (`--diff-filter=AM`: rename'i taramak taşınan dosyanın
+ * mevcut satırlarını "eklenen" sayardı, yanlış pozitif). (3) Kapının KENDİSİ çökerse push durur (çıkış ≠ 0,1); "fail-open"
+ * yalnız fark okuma hatası içindir.
  */
 const { execFileSync } = require('node:child_process')
 
@@ -28,17 +34,23 @@ function eklenenSatirlar(diff) {
   const sonuc = []
   let dosya = ''
   let no = 0
+  let baslikta = false // `+++ ` yalnız dosya başlığında (diff --git .. @@ arası) başlıktır; hunk içinde "++x" eklenen satırdır
   for (const satir of String(diff).split('\n')) {
-    if (satir.startsWith('+++ ')) {
+    if (satir.startsWith('diff --git ')) {
+      baslikta = true
+      continue
+    }
+    if (baslikta && satir.startsWith('+++ ')) {
       dosya = satir.startsWith('+++ b/') ? satir.slice(6).trim() : ''
       continue
     }
     const kafa = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(satir)
     if (kafa) {
+      baslikta = false
       no = Number(kafa[1])
       continue
     }
-    if (satir.startsWith('+') && !satir.startsWith('+++')) {
+    if (!baslikta && satir.startsWith('+')) {
       if (dosya.endsWith('.md')) sonuc.push({ dosya, no, metin: satir.slice(1) })
       no += 1
     }
@@ -70,7 +82,7 @@ function calistir(stdin, ortam = process.env) {
     const [, yerelSha, , uzakSha] = satir.trim().split(/\s+/)
     if (!yerelSha || SIFIR.test(yerelSha)) continue // silme push'u
     try {
-      const diff = git(['diff', '--unified=0', '--no-color', '--diff-filter=AM', taban(yerelSha, uzakSha || '0'), yerelSha])
+      const diff = git(['-c', 'core.quotepath=off', 'diff', '--unified=0', '--no-color', '--diff-filter=AM', taban(yerelSha, uzakSha || '0'), yerelSha])
       bulunan.push(...ihlaller(eklenenSatirlar(diff)))
     } catch (hata) {
       olculemedi = (hata && (hata.code || hata.message)) || 'bilinmeyen'

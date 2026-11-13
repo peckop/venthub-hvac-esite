@@ -61,6 +61,8 @@ beforeAll(() => {
   commitle('.archive/arsiv.md', `arsiv: ${KIMLIK}\n`, 'arsiv')
   commitle('docs/companion.md', `---\nsource_path: ${KIMLIK}\n---\n`, 'companion')
   commitle('src/kod.ts', `// ${KIMLIK}\n`, 'kod')
+  commitle('docs/ö-türkçe.md', `# türkçe ad\nyol: ${KIMLIK}\n`, 'unicode dosya adı (git quotepath tırnaklar)')
+  commitle('docs/artilar.md', `# artılar\n++ ${KIMLIK}\n`, 'içeriği "++" ile başlayan satır diff\'te "+++" görünür')
   karmaSha = git('rev-parse', 'HEAD')
 })
 
@@ -93,6 +95,8 @@ function senaryolar(betik: string): string[] {
   const yeniDal = calistir(betik, itme(karmaSha)) // uzak sha sıfır: origin/master ile ortak atadan
   dogru(yeniDal.kod === 1 && /docs\/yeni\.md:2:/.test(yeniDal.err), 'yeni dal (uzak sha sıfır) origin/master tabanıyla taranmalı')
   dogru(!/arsiv\.md|companion\.md|kod\.ts/.test(yeniDal.err), '.archive/, companion source_path: ve .md olmayan dosya kapsam dışı olmalı')
+  dogru(/docs\/ö-türkçe\.md:2:/.test(yeniDal.err), 'Unicode dosya adı (core.quotepath=off) taranmalı')
+  dogru(/docs\/artilar\.md:2:/.test(yeniDal.err), 'içeriği "++" ile başlayan eklenen satır dosya başlığı sanılmamalı')
   const silme = calistir(betik, itme(SIFIR, tabanSha))
   dogru(silme.kod === 0 && silme.err === '', "silme push'u (yerel sha sıfır) taranmadan, uyarısız geçmeli")
   const vana = calistir(betik, itme(ihlalSha, tabanSha), { VH_MD_KIMLIK_IZIN: '1' })
@@ -116,10 +120,23 @@ describe('INV-MD-KIMLIK-1 · gerçek kapı', () => {
   })
 
   it('eklenenSatirlar: yeni dosya, satır numaraları ve silinen satırlar', () => {
-    const diff = ['--- a/x.md', '+++ b/x.md', '@@ -3,1 +3,2 @@', '-eski', '+yeni bir', '+yeni iki', '--- a/y.txt', '+++ b/y.txt', '@@ -1,0 +1,1 @@', '+metin'].join('\n')
+    const diff = [
+      'diff --git a/x.md b/x.md',
+      '--- a/x.md',
+      '+++ b/x.md',
+      '@@ -3,1 +3,2 @@',
+      '-eski',
+      '+yeni bir',
+      '+++ içeriği artıyla başlayan satır',
+      'diff --git a/y.txt b/y.txt',
+      '--- a/y.txt',
+      '+++ b/y.txt',
+      '@@ -1,0 +1,1 @@',
+      '+metin',
+    ].join('\n')
     expect(mod.eklenenSatirlar(diff)).toEqual([
       { dosya: 'x.md', no: 3, metin: 'yeni bir' },
-      { dosya: 'x.md', no: 4, metin: 'yeni iki' },
+      { dosya: 'x.md', no: 4, metin: '++ içeriği artıyla başlayan satır' },
     ])
   })
 })
@@ -133,6 +150,8 @@ describe('INV-MD-KIMLIK-1 · SABOTAJ: kapıya konan her hata en az bir senaryoyu
     ['yalnız .md değil her dosya taranır', "if (dosya.endsWith('.md')) sonuc.push", 'if (dosya) sonuc.push'],
     ['vana yok sayılır', "ortam.VH_MD_KIMLIK_IZIN === '1'", 'false'],
     ['silme push\'u taranır', 'if (!yerelSha || SIFIR.test(yerelSha)) continue', 'if (!yerelSha) continue'],
+    ['quotepath açık: Unicode ad tırnaklanır, dosya kaçar', "'-c', 'core.quotepath=off', ", ''],
+    ['"+++" her yerde başlık sayılır: "++" ile başlayan satır kaçar', 'if (baslikta && satir.startsWith(\'+++ \')) {', "if (satir.startsWith('+++ ')) {"],
     ['ihlal çıkış 1 yerine 0 verir', 'kod: 1,', 'kod: 0,'],
     ['okunamayan fark sessizce geçer (uyarı yok)', 'if (olculemedi && bulunan.length === 0) {', 'if (false) {'],
   ]
