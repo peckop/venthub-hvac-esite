@@ -434,7 +434,7 @@ function olcumEksikleri(kart, veri) {
   return eksikler
 }
 
-module.exports = { olcumEksikleri, degerlendir, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
+module.exports = { olcumEksikleri, degerlendir, oncekiCalismaSorunlari, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
 
 if (require.main === module) {
   process.exitCode = main(process.argv.slice(2))

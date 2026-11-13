@@ -61,6 +61,7 @@ interface Baglar {
   linearAnahtar: string
   linearGetir: (terim: string, ms: number) => Promise<{ identifier: string; title: string; durum: string }[]>
   defterler?: () => Promise<{ durum: string; sebep?: string; defterler?: { ad: string; dosya: string; sahip: string; metin: string }[] }>
+  ingestorDurumu?: () => { var: boolean; sebep: string | null }
 }
 interface Kayit {
   ts: string
@@ -82,7 +83,7 @@ interface Modul {
   defteriYaz: (k: object, o: { yol: string; ortam: Record<string, string>; kokler?: string[] }) => { yazildi: boolean; sebep?: string }
   govdeAnahtari: (yol: string) => string
   tekrarUretimOlc: (o: { sid: string; defter: string; pano: string }) => null | { kayit: Kayit }
-  gercekBaglar: () => Baglar
+  gercekBaglar: (o?: { repo?: string; ortam?: Record<string, string> }) => Baglar
   calistir: (argv: string[], o: { baglar: Baglar & { kapat?: () => void }; ortam: Record<string, string> }) => Promise<{ kod: number; cikti: string }>
 }
 
@@ -192,6 +193,54 @@ describe('INV-ONCEKI-CALISMA-4: yaygın sözcük tek başına bulgu sayılmaz', 
     })
     const yollar = s.kaynaklar.dosya.bulgular.map((b) => b.yol)
     expect(yollar).toEqual(['docs/model-adres-listesi.csv'])
+  })
+})
+
+describe('INV-ONCEKI-CALISMA-14 (ARC-300 c): tek uzun terim ölçülür, kısa tek sözcük ölçülmez; ingestor taranır', () => {
+  const yok = () => baglar({ dosyalar: async () => ['src/app/page.tsx'] })
+
+  it('tek uzun terim ("değerlendirme") ÖLÇÜLEMEDİ değil, "tek terim" damgalı YOK/BULUNDU verir', async () => {
+    const s = await mod.tara('değerlendirme', { baglar: yok() })
+    expect(s.sonuc).toBe('bulgu-yok')
+    expect(s.ilk).toContain('ifade:')
+    expect(s.ilk).toContain('tek terim: zayıf kanıt')
+    const b = await mod.tara('değerlendirme', { baglar: baglar({ dosyalar: async () => ['docs/olcum/oz-degerlendirme-2026-11-13.md'] }) })
+    expect(b.sonuc).toBe('bulgu-var')
+  })
+
+  it('kısa/yaygın tek sözcük ("model") hâlâ ÖLÇÜLEMEDİ', async () => {
+    const s = await mod.tara('model', { baglar: yok() })
+    expect(s.sonuc).toBe('olculemedi')
+  })
+
+  it('ingestor taranamadıysa "YOK" satırında sebebiyle görünür; sessiz atlanmaz', async () => {
+    const s = await mod.tara('rec300 model adres listesi', { baglar: baglar({ dosyalar: async () => ['src/app/page.tsx'], ingestorDurumu: () => ({ var: false, sebep: 'kardeş depo bulunamadı' }) }) })
+    expect(s.sonuc).toBe('bulgu-yok')
+    expect(s.ilk).toContain('ingestor deposu taranamadı: kardeş depo bulunamadı')
+    const tam = await mod.tara('rec300 model adres listesi', { baglar: baglar({ dosyalar: async () => ['src/app/page.tsx'], ingestorDurumu: () => ({ var: true, sebep: null }) }) })
+    expect(tam.ilk).not.toContain('ingestor deposu')
+  })
+
+  it('gerçek bağ: kardeş depo dosyaları önekle görünür; olmayan dizin sebebini söyler', async () => {
+    const ing = gecici()
+    const git = (...a: string[]) => spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: ing, encoding: 'utf8' })
+    git('init', '-q')
+    fs.mkdirSync(path.join(ing, 'kaynak-dizini'))
+    fs.writeFileSync(path.join(ing, 'kaynak-dizini', 'nicotra-katalog.md'), 'x')
+    git('add', '.')
+    git('commit', '-q', '-m', 'nicotra katalog eklendi')
+    const var_ = mod.gercekBaglar({ ortam: { VENTHUB_INGESTOR_DIZINI: ing } })
+    const dosyalar = await var_.dosyalar(8000)
+    const log = await var_.gitLog(8000)
+    expect(dosyalar).toContain('venthub-pdf-ingestor/kaynak-dizini/nicotra-katalog.md')
+    expect(log.some((c) => c.konu === '[venthub-pdf-ingestor] nicotra katalog eklendi')).toBe(true)
+    expect(var_.ingestorDurumu?.().var).toBe(true)
+
+    const yokDizin = mod.gercekBaglar({ ortam: { VENTHUB_INGESTOR_DIZINI: path.join(ing, 'yok-boyle-dizin') } })
+    const ana = await yokDizin.dosyalar(8000)
+    expect(ana.some((y) => y.startsWith('venthub-pdf-ingestor/'))).toBe(false)
+    expect(yokDizin.ingestorDurumu?.().var).toBe(false)
+    expect(yokDizin.ingestorDurumu?.().sebep).toContain('bulunamadı')
   })
 })
 

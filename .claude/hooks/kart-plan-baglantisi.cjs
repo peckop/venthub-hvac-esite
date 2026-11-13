@@ -15,7 +15,9 @@
  *
  * NE YAPAR: (1) `add_task` açıklamasında, (2) bir kartı Review'a taşıyan `move_task`/`transition_task`/`update_task`ta kartın
  * kayıtlı açıklamasında PLAN başlığı varsa `degerlendir` çalıştırır; iskelet eksikse eksikleri additionalContext olarak UYARIR.
- * NE YAPMAZ: reddetmez (çıkış hep 0), Kanban'a yazmaz, ağa gitmez. Veritabanı/kart okunamazsa ya da modül yüklenemezse sessiz (fail-open).
+ * NE YAPMAZ: Kanban'a yazmaz, ağa gitmez; çıkış hep 0. Veritabanı/kart okunamazsa ya da modül yüklenemezse sessiz (fail-open).
+ * REDDEDER YALNIZ (ARC-300, OPS 13 Kasım): `add_task`ta ÖNCEKİ ÇALIŞMA satırı yer tutucu ("ARANACAK") ya da ifadesiz çıplak "yok" ise
+ * (permissionDecision deny, vana kapatır); Review geçişinde aynı kusur yalnız uyarı. Başka her durumda reddetmez.
  *
  * VANA: `VENTHUB_KART_PLAN_BAGI_KAPALI=1` kapatır. `VENTHUB_KANBAN_DB` veritabanı yolunu ezer (test).
  * KURULUM: `.claude/settings.json` PreToolUse kaydı (ayarı OPS tam fark okuyarak birleştirir).
@@ -69,6 +71,32 @@ function olcumSatirlari(kart, ad, kapi) {
   }
   if (!Array.isArray(eksik) || eksik.length === 0) return []
   return [`KART ÖLÇÜM UYARI (ARC-230; ${ad}): kart sınıfı için zorunlu ölçüm satırı eksik (kural verisi scripts/belge/kart-sinif-olcum.json):`, ...eksik.slice(0, AZAMI_SATIR).map((e) => `  - ${e}`)]
+}
+
+/**
+ * ÖNCEKİ ÇALIŞMA satırının İKİ açık kusuru (ARC-300; OPS 13 Kasım): yer tutucu ("ARANACAK") ve ifadesiz çıplak "yok".
+ * ÖLÇÜLDÜ 13 Kasım: son 30 günde açılan 758 kartın yalnız 1'i kapının tam kuralını (beş yer + "ifade:" + sonuç) geçiyor, 559'u eksik,
+ * 184'ünde satır yok; tam kuralı engel yapmak her karta tıkardı. Bu yüzden KIRMIZI yalnız şu ikisidir (30 günde 21 kart):
+ *   - yer tutucu: değer kısa (<120) ve ARANACAK / DOLDURULACAK / TBD / TODO / "işe başlarken" içerir (arama yapılmamış, sonra yapılacak);
+ *   - ifadesiz çıplak yok: değerde "yok" var, ama kart/commit/dosya bulgusu da "ifade:" arama ifadesi de yok, değer kısa (<140).
+ * Satır HİÇ yoksa ya da başka eksikse SESSİZ kalır (ARC-220 gürültü sınırı). SAF; sebep dizgesi ya da null döner.
+ */
+const ONCEKI_ETIKET = /(^|\n)[ \t#>*_-]*[Öö][Nn][Cc][Ee][Kk][iİıI][ \t]+[Çç][Aa][Ll][iİıI][Şş][Mm][Aa][ \t]*:[ \t]*([\s\S]*?)(?=\n[ \t#>*_-]*[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ0-9 /_.()-]{2,40}[ \t]*:|\n\s*PLAN\b|$)/
+const YER_TUTUCU = /aranacak|doldurulacak|\btbd\b|\btodo\b|işe başlarken/i
+const YOK_KELIMESI = /(^|[^\p{L}])yok(tur)?([^\p{L}]|$)/iu
+const BULGU = /\b[a-z]{2,5}-\d+\b|\b(docs|scripts|src|supabase)\/[\w./-]+|\b[0-9a-f]{7,40}\b/i
+function oncekiKirmizi(aciklama) {
+  if (typeof aciklama !== 'string') return null
+  const m = ONCEKI_ETIKET.exec(aciklama)
+  if (!m) return null
+  const deger = m[2].trim()
+  if (deger.length < 120 && YER_TUTUCU.test(deger)) {
+    return `ÖNCEKİ ÇALIŞMA satırı yer tutucu ("${deger.slice(0, 40)}"): arama yapılmadan kart açılamaz. Önce beş yeri ara (Kanban search_tasks, git log, docs/plans ve docs/audits, sage, Linear arşivi), satıra yer adlarını, "ifade: <aranan sözcükler>" ve bulguyu ya da "yok"u yaz.`
+  }
+  if (deger.length < 140 && YOK_KELIMESI.test(deger) && !BULGU.test(deger) && !/ifade(si)?[ \t]*:/i.test(deger)) {
+    return `ÖNCEKİ ÇALIŞMA satırı ifadesiz "yok" ("${deger.slice(0, 40)}"): hangi sözcüklerle arandığı yazılmayan "yok" kanıt değildir. Satıra "ifade: <aranan sözcükler>" ekle ve aranan yerleri say (örnek: "Kanban search_tasks, git log, docs/plans, docs/audits, sage, Linear arandı; ifade: kart plan kapısı; sonuç: ARC-25").`
+  }
+  return null
 }
 
 /** Veritabanı yolu: ortam ezmesi, yoksa kanonik (ana ağaç) kök (done-kanit-kapisi.cjs ile aynı çözümleme). */
@@ -133,7 +161,9 @@ function main() {
   let olusturuldu
   let baslik = ''
   let etiketler = []
+  let acilisMi = false
   if (t.action === 'add_task') {
+    acilisMi = true
     aciklama = t.description
     baslik = String(t.title || '')
     etiketler = Array.isArray(t.labels) ? t.labels.map(String) : []
@@ -150,7 +180,20 @@ function main() {
     return
   }
   const kapi = require(path.join(__dirname, '..', '..', 'scripts', 'belge', 'kart-plan-kapisi.cjs'))
-  const satir = [...satirlar(aciklama, ad, kapi, olusturuldu), ...olcumSatirlari({ baslik, aciklama: String(aciklama || ''), etiketler }, ad, kapi)]
+  // ARC-300: yer tutucu / ifadesiz çıplak yok. Açılışta (add_task) KIRMIZI = reddeder; Review geçişinde yalnız uyarır (kart zaten açık, teslimi tıkamayız).
+  const kirmizi = oncekiKirmizi(aciklama)
+  if (kirmizi && acilisMi) {
+    fs.writeSync(
+      1,
+      JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: `KART AÇILMADI (ARC-300; ${ad}): ${kirmizi} Vana: ${VANA}=1.` } }) + '\n',
+    )
+    return
+  }
+  const satir = [
+    ...(kirmizi ? [`KART ÖNCEKİ ÇALIŞMA UYARI (ARC-300; ${ad}): ${kirmizi}`] : []),
+    ...satirlar(aciklama, ad, kapi, olusturuldu),
+    ...olcumSatirlari({ baslik, aciklama: String(aciklama || ''), etiketler }, ad, kapi),
+  ]
   if (satir.length === 0) return
   fs.writeSync(1, JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: satir.join('\n') } }) + '\n')
 }
@@ -164,4 +207,4 @@ if (require.main === module) {
   process.exit(0)
 }
 
-module.exports = { reviewIstegiMi, satirlar, olcumSatirlari, etiketCoz, kartiOku, kisaAd, veritabaniYolu }
+module.exports = { reviewIstegiMi, oncekiKirmizi, satirlar, olcumSatirlari, etiketCoz, kartiOku, kisaAd, veritabaniYolu }

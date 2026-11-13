@@ -59,6 +59,11 @@ const SAGE_COCUK_TAVAN_MS = 8000
 const CEKIRDEK = ['dosya', 'git', 'kanban']
 const KAYNAKLAR = ['dosya', 'git', 'kanban', 'defter', 'sage', 'linear']
 const EN_FAZLA_BULGU = 3
+/** Tek terimli sorguda terimin en az bu kadar karakter olması gerekir (ARC-300 c); "model"/"adres" (5) yeterli sayılmaz. */
+const TEK_TERIM_MIN = 8
+/** Kardeş depo (venthub-pdf-ingestor) yolları arama sonucunda bu önekle görünür (ARC-300 c). */
+const INGESTOR_ADI = 'venthub-pdf-ingestor'
+const INGESTOR_ONEK = `${INGESTOR_ADI}/`
 const TAMPON_BAYT = 64 * 1024 * 1024
 const DEFTER_ADI = 'ara-onceki-calisma.jsonl'
 
@@ -117,7 +122,10 @@ function sorguKur(metin, haric = []) {
     terimler,
     esik: Math.min(3, terimler.length),
     // Ayırt edici dayanak yoksa "yok" demek yalan olur: tek sıradan sözcük her yerde çıkar ya da hiçbir yerde.
-    yeterli: ids.length > 0 || terimler.length >= 2,
+    // ARC-300 (c): TEK terim de yeterlidir, yeter ki uzun ve özel olsun ("değerlendirme"); kısa ve yaygın tek sözcük ("model", "adres")
+    // yeterli SAYILMAZ. Tek terimle verilen "YOK" ilk satırda "tek terim" damgası taşır (zayıf kanıt, gizlenmez).
+    yeterli: ids.length > 0 || terimler.length >= 2 || (terimler.length === 1 && terimler[0].kat.length >= TEK_TERIM_MIN),
+    tekTerim: ids.length === 0 && terimler.length === 1,
     haric: [...haricKimlik],
   }
 }
@@ -157,7 +165,13 @@ async function dosyaKaynagi(sorgu, baglar, ms) {
     const e = eslestir(sorgu, yol)
     if (e) bulgular.push({ tur: 'dosya', yol, ...e })
   }
-  return tamam(dosyalar.length, sirala(bulgular, (b) => b.yol))
+  return tamam(dosyalar.length, sirala(bulgular, (b) => b.yol), ingestorEki(baglar))
+}
+
+/** ARC-300 (c): kardeş depo (ingestor) taranamadıysa bu sonuçta GÖRÜNÜR (`ingestorAtlandi`); sessizce atlanmaz. */
+function ingestorEki(baglar) {
+  const d = typeof baglar.ingestorDurumu === 'function' ? baglar.ingestorDurumu() : null
+  return d && !d.var ? { ingestorAtlandi: d.sebep || 'bilinmeyen sebep' } : {}
 }
 
 async function gitKaynagi(sorgu, baglar, ms, derin) {
@@ -349,7 +363,7 @@ function sonucuHesapla(sorgu, kaynaklar) {
   const sebepler = KAYNAKLAR.filter((ad) => kaynaklar[ad].durum === 'olculemedi').map((ad) => `${ad}: ${kaynaklar[ad].sebep}`)
   const arananlar = KAYNAKLAR.filter((ad) => kaynaklar[ad].durum === 'tamam').length
   if (!sorgu.yeterli) {
-    return { sonuc: 'olculemedi', toplam, arananlar, sebepler: ['ifade: aranacak ayırt edici kimlik ya da terim yok (en az bir kimlik ya da iki terim)'] }
+    return { sonuc: 'olculemedi', toplam, arananlar, sebepler: ['ifade: aranacak ayırt edici kimlik ya da terim yok (en az bir kimlik, iki terim ya da ' + TEK_TERIM_MIN + ' karakterden uzun tek terim)'] }
   }
   if (toplam > 0) return { sonuc: 'bulgu-var', toplam, arananlar, sebepler }
   // Defter çekirdek DEĞİL ama ÖLÇÜLEMEDİ ise (manifest bozuk / defter dosyası okunamadı) "YOK" denmez; manifest yoksa (atlandı) denir.
@@ -366,7 +380,9 @@ function ilkSatir(sorgu, kaynaklar, hesap) {
   if (hesap.sonuc === 'bulgu-yok') {
     const eksik = KAYNAKLAR.filter((ad) => kaynaklar[ad].durum !== 'tamam').map((ad) => `${ad}: ${kaynaklar[ad].sebep}`)
     const ek = eksik.length ? `; bakılamayan ipucu kaynakları: ${eksik.join(', ')}` : ''
-    return `${onek}YOK (${hesap.arananlar}/${KAYNAKLAR.length} yer arandı, ifade: ${sorgu.ifade}${ek})`
+    const ingestor = kaynaklar.dosya.ingestorAtlandi ? `; ingestor deposu taranamadı: ${kaynaklar.dosya.ingestorAtlandi}` : ''
+    const tek = sorgu.tekTerim ? '; tek terim: zayıf kanıt, ikinci bir sözcükle yeniden ara' : ''
+    return `${onek}YOK (${hesap.arananlar}/${KAYNAKLAR.length} yer arandı, ifade: ${sorgu.ifade}${ek}${ingestor}${tek})`
   }
   return `${onek}ÖLÇÜLEMEDİ (${hesap.sebepler.join('; ')})`
 }
@@ -474,17 +490,50 @@ async function pythonKos(betik, ms) {
 function gercekBaglar({ repo = REPO, ortam = process.env } = {}) {
   const anaKok = () => require('../hijyen/ana-kok.cjs').anaKok()
   const cocuklar = []
+  // ARC-300 (c): kardeş depo (venthub-pdf-ingestor) da taranır. Yol: VENTHUB_INGESTOR_DIZINI, yoksa ana kökün yanındaki kardeş dizin.
+  // Bulunamaz ya da okunamazsa ana depo sonucu yine döner; sebep `ingestorDurumu()` ile ilk satıra çıkar (sessiz atlama yok).
+  let ingestorSebep = null
+  const ingestorKoku = () => {
+    try {
+      const aday = ortam.VENTHUB_INGESTOR_DIZINI || path.join(path.dirname(anaKok()), INGESTOR_ADI)
+      return fs.existsSync(path.join(aday, '.git')) ? aday : null
+    } catch {
+      return null
+    }
+  }
+  const ingestorOku = async (args, ms) => {
+    const kok = ingestorKoku()
+    if (!kok) {
+      ingestorSebep = ingestorSebep || 'kardeş depo bulunamadı (VENTHUB_INGESTOR_DIZINI ya da ana kökün yanında)'
+      return null
+    }
+    try {
+      return await gitCiktisi(ms, args, kok)
+    } catch (hata) {
+      ingestorSebep = ingestorSebep || sebepMetni(hata)
+      return null
+    }
+  }
   return {
-    dosyalar: async (ms) => (await gitCiktisi(ms, ['ls-files', '-z'], repo)).split('\0').filter(Boolean),
+    ingestorDurumu: () => ({ var: ingestorSebep === null, sebep: ingestorSebep }),
+    dosyalar: async (ms) => {
+      const ana = (await gitCiktisi(ms, ['ls-files', '-z'], repo)).split('\0').filter(Boolean)
+      const ing = await ingestorOku(['ls-files', '-z'], ms)
+      return ing === null ? ana : [...ana, ...ing.split('\0').filter(Boolean).map((y) => INGESTOR_ONEK + y)]
+    },
     gitLog: async (ms) => {
-      const cikti = await gitCiktisi(ms, ['log', '--all', '--format=%h%x09%ad%x09%s', '--date=short'], repo)
-      return cikti
-        .split('\n')
-        .filter(Boolean)
-        .map((s) => {
-          const [hash, tarih, ...konu] = s.split('\t')
-          return { hash, tarih, konu: konu.join('\t') }
-        })
+      const sat = (cikti, onek) =>
+        cikti
+          .split('\n')
+          .filter(Boolean)
+          .map((s) => {
+            const [hash, tarih, ...konu] = s.split('\t')
+            return { hash, tarih, konu: onek + konu.join('\t') }
+          })
+      const bicim = ['log', '--all', '--format=%h%x09%ad%x09%s', '--date=short']
+      const ana = sat(await gitCiktisi(ms, bicim, repo), '')
+      const ing = await ingestorOku(bicim, ms)
+      return ing === null ? ana : [...ana, ...sat(ing, `[${INGESTOR_ADI}] `)]
     },
     silinmisYollar: async (ms) => {
       const cikti = await gitCiktisi(ms, ['log', '--all', '--diff-filter=D', '--name-only', '--format=%x01%h%x09%ad', '--date=short'], repo)
