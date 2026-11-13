@@ -1515,7 +1515,8 @@ describe('INV-ROL-1 — departman açma tek liste (HRT-61, O7)', () => {
    * setler JSON'una satır eklenmedi, `.claude/agents` altında yalnız takip-pencere var. Satırlar eklenince bu kayıt silinmek ZORUNDA
    * (aşağıdaki test eski istisnayı kırmızı yapar); takip: OPS'a açık soru, çalışan seti YETENEK ölçümüdür.
    */
-  const SET_SATIRI_YOK: Record<string, string> = { TAKIP: 'HRT-35: çalışan seti ölçülmedi (YETENEK)' }
+  // TAKIP kaydı HRT-134'te silindi (üç çalışan satırı skill-departman-setleri JSON'una girdi, takip-* tanımları üreticiden geldi).
+  const SET_SATIRI_YOK: Record<string, string> = {}
 
   /** Bir departmanın açma listesindeki eksik yerleri (boş = tam). Kaynaklar parametre: ayırt edicilik testi bozulmuş kopya verir. */
   function eksikYerler(

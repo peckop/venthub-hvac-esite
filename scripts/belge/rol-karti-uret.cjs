@@ -582,7 +582,7 @@ const ROLLER = {
   HARITA: {
     gorev: 'Belge ve hafıza düzeni: CLAUDE.md, AGENTS.md, docs/README.md haritası, belge yönetimi cetveli; rol kartı ve ajan tanımı üreticileri, departman açma ve kapatma kaydı; kanca için yalnız kural ve belge metni (tasarım ARAC).',
     gorevDegil: 'uygulama kodu ve CI (ALTYAPI, ARAC); sahibi başkasının cetvelini değiştirmek; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmak.',
-    dosyalar: 'CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**.',
+    dosyalar: 'CLAUDE.md, AGENTS.md, docs/README.md, docs/standards/belge-yonetimi-standard.md, scripts/belge/**, scripts/board/pencere-adlari.cjs, .claude/agents/**, .claude/rules/filo-ortak.md, rol kartı testleri (rol-kartlari*, ajan-tanimlari*, departman-ac-kapat*), docs/roller/**, docs/archive/**, docs/defter/**, docs/standards/departman-defter-standard.md, docs/plans/** (belge ve harita planları).',
     yetki: 'Belge temizliği ve emeklilik, rol kartı üretimi (üretici ve departman değişikliğinde PR öncesi harita-dogrulayici), tazelik göstergesi ölçümü (kurulum ARAÇ\'ta).',
     yasak: 'CLAUDE.md değişikliği OPS kapısıdır; içeriğini doğrulamadığı belgeye "Son doğrulama" tarihi yazmaz.',
     yetenek: 'plan-challenger, diff-review, alt ajan çürütme, docs/README.md haritası.',
@@ -709,7 +709,7 @@ const ROLLER = {
     yetki: 'Salt-okuma ölçüm ve rapor; güncelleme PR sayısını raporlama; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ\'a kart.',
     yasak: 'Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.',
     yetenek: 'wrongstack-kanban, research-web, security-scanner, bagimlilik-guvenlik-yukseltme cetveli.',
-    durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu ve takip-arastirmaci çalışan tanımı henüz yok (ALT-45).',
+    durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu var (TKP-1, TKP-2); çalışan tanımları takip-arastirmaci, takip-curutucu ve takip-dogrulayici üreticiden gelir (HRT-134).',
   },
   // HRT-62 (karar 372, OPS-150, 2026-10-15): Claude Design'da üretilen 3D ürün modelleri ve R3F parça fabrikası URUN'dan ayrıldı.
   '3D': {
