@@ -58,6 +58,11 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Alt çubuktaki kırmızı hata kutusu, alan düzeltildikten sonra da kalabilir (bayat hata); hatanın hâlâ geçerli olup olmadığını alandan doğrula.
 - Alt ajanda DesignSync yoktur: istek metnini müdür görev metnine aynen koyar. Dönem kilidi gibi Recep onayı gerektiren maddelerde görev metni onay kartının numarasını taşımalıdır; ajan mesajı onay sayılmaz.
 - Ölçüm başlamadan skill'in çalışma kopyasında yüklü olduğunu doğrula ("Unknown skill" çıkarsa master'dan eşitle).
+- Faturalar'da kesilmemiş taslak yoksa Kes denemesi için "Yeni fatura" ile DENEME taslağı aç (cari klavyeyle, serbest satır, Kaydet, sonra Kes); taslak silinmez.
+- Dönem kilidi: Muhasebe › Muhasebe ayarları › "Dönem kilidi", tek alan "Kilit tarihi". Gelecek tarih sessizce kaydedilmez (hata metni yok, alan turuncu kalır): bugünün tarihini kullan. Kilidi kaldırmak için tarihi silip Kaydet'e bas, "Kilit yok" yazısını ekranda doğrula. Kilidi tur bitmeden kaldır.
+- Alan turuncu çerçeveliyse geçersizdir; "Kaydet çalışmıyor" demeden önce alanın kenar rengine bak.
+- Tahsilat çekmecesinde cari seçilince araya "Hangi faturaya" alanı eklenip düzen kayar: seçimden sonra yeni ekran görüntüsü al, eski koordinatı kullanma.
+- Faturalar sayfasına ilk girişte 15 sn'ye varan iskelet ekran olabilir; bekle.
 
 ## Ölçüm sırası
 
