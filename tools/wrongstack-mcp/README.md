@@ -106,7 +106,7 @@ kapanışını derler, `~/.claude/venthub-wrongstack-170/` altına tarball yapar
 (bağlam kaydığı için yeniden üretildi: yedi değişiklik, `git apply --check`, uygulama ve `--reverse --check` temiz).
 **Önce/sonra (izole scratch kök, sunucu işaretçisi kopyalanmadı → canlı daemon'a bağlanılmadı):** araç sayıları aynı (sage 15, codebase-index 18,
 kanban 3, mailbox 3); sage `remember` ≈16-17 ms ve `memory_search` 2-4 ms iki sürümde de; kanban `list_boards` ≈100 ms; `codebase_read_symbol`
-671 → 242 ms. **Şema göçü YOK:** `sage.db` (47 nesne) ve kanban sqlite (15 nesne) 1.7.0 sonrası canlıyla özdeş, `user_version` 0.
+671 → 242 ms (tek koşum; canlı kurulumdan sonra aynı sunucu 297 ms verdi: fark gürültü içinde, hız kazancı sayılmaz). **Şema göçü YOK:** `sage.db` (47 nesne) ve kanban sqlite (15 nesne) 1.7.0 sonrası canlıyla özdeş, `user_version` 0.
 **Açılmayan parçalar (sebep ölçüldü, yerel kaldı):** `Sage.service` ve `indexing.service` (WrongMemory/WrongIndex servisleri) yapılandırması ve
 yönetimi `wstack` CLI'sine (`@wrongstack/cli`) aittir; dört MCP paketinde servis ikilisi ya da yönetim komutu yoktur, bizde `wstack` kurulu değil. Sunucular
 yerel modda çalışmaya devam eder (varsayılan). `architecture_decisions` aracı çekirdekte ("brain" grubu) vardır ama dört MCP sunucusunun araç listesinde
@@ -153,7 +153,7 @@ tabanlandı (kopyada `git apply` ve `node --check` temiz). Sage yaması iç `sag
 **Yükseltme günü sırası (kesinti = TÜM pencereler):** yukarıdaki "Sürüm yükseltme" bölümü aynen geçerlidir.
 1. Posta ve sage yedeği: `node scripts/hijyen/sage-yedek.cjs` (ilk satırda `HAZIR`).
 2. Bütün Claude pencereleri kapanır (Recep, yalnız bunu söyler; OPS koordine eder).
-3. YALNIZ ARAÇ penceresi açılır: `node tools/wrongstack-mcp/kurulum.cjs` (kendi sunucularını ve daemon'ları durdurur,
+3. YALNIZ ARAÇ penceresi açılır: `node tools/wrongstack-mcp/kurulum.cjs` **önce ARAÇ çalışma kopyasında, sonra ana ağaçta da** (sürüm kapısı ana ağaçtaki KURULU sürümü baz alır; ana ağaç eski kalırsa 1.7.0 sunucuları "ana ağaç 1.3.0" diye reddedilir, 14 Kasım'da böyle oldu). Uygulama yeniden açılınca OPS oturumunu kendiliğinden devam ettirir: betik "başka pencere açık" derse mesajdaki `oturum <8 hane>` hangi pencere olduğunu söyler (kendi sunucularını ve daemon'ları durdurur,
    `npm ci --ignore-scripts`, iki yama, doğrulama). Tahmini süre: kurulum ~1-2 dakika, yamalar saniyeler; toplam kesinti ~10 dakika.
 4. Son satır `HAZIR` → `node tools/wrongstack-mcp/saglik.cjs` (eski sürümlü daemon yok) ve ana ağaçta `--sunucu` doğrulaması.
 5. Öteki pencereler açılır; açılışta WRONGSTACK satırı "1.1.4" demeli.

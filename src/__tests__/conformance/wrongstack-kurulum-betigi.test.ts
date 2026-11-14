@@ -21,6 +21,7 @@ interface Surec {
 }
 interface Kurulum {
   siniflandir: (s: Surec[], kendiClaude: number | null, kendiPid?: number) => { kendi: Surec[]; yabanci: Surec[]; daemon: Surec[] }
+  pencereOturumu: (s: Surec[], pid: number) => string
   kendiClaudeBul: (s: Surec[], baslangic?: number) => number | null
   surumFarki: (deps: Record<string, string>, kurulu: (ad: string) => string | null) => string[]
   temizle: (metin: string) => string
@@ -55,6 +56,16 @@ describe('INV-WRONGSTACK-KURULUM-1 · kurulum betiği', () => {
     expect(r.kendi.map((s) => s.pid).sort()).toEqual([13, 14])
     expect(r.yabanci.map((s) => s.pid)).toEqual([21])
     expect(r.daemon.map((s) => s.pid)).toEqual([30])
+  })
+
+  it('yabancı pencerenin oturumu komut satırındaki --resume değerinden okunur; yoksa boş (hata mesajı pencereyi adıyla söyler)', () => {
+    const s: Surec[] = [
+      { pid: 5, ppid: 1, ad: 'claude.exe', komut: 'claude.exe --output-format stream-json --resume=69c8cf17-b9d3-4ebf-8cab-a41161241d67 --model x' },
+      { pid: 6, ppid: 1, ad: 'claude.exe', komut: 'claude.exe --output-format stream-json' },
+    ]
+    expect(k.pencereOturumu(s, 5)).toBe('69c8cf17')
+    expect(k.pencereOturumu(s, 6)).toBe('')
+    expect(k.pencereOturumu(s, 99)).toBe('')
   })
 
   it('terminalden koşuda (kendi claude yok) bütün pencere sunucuları YABANCI sayılır', () => {
