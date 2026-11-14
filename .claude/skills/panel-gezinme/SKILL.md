@@ -52,17 +52,28 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Teklifteki Sorumlu sonraki belgelere taşınmaz; irsaliye ve faturaya elle yaz.
 - Sunum modu adresi: `https://claude.ai/design/p/<proje>?file=templates%2Fpanel-teklifler%2FPanelTeklifler.dc.html&present=1` (proje kimliğini görev metni verir).
 - Ctrl K paleti açıkken `zoom` ya da art arda ekran görüntüsü paleti kapatabilir; sonra yazılan metin sayfaya düşer. Bir arama için tek ekran görüntüsü yeter.
-- "Kes" yalnız temiz (kaydedilmiş) formda görünür; Kes hatasını denemek için numarası boş kayıtlı bir taslak gerekir ve bu o taslağı değiştirir: önceki değerini yaz, bitince geri yaz. "+ Yeni" menüsünde alış faturası yoktur.
+- "Kes" yalnız temiz (kaydedilmiş) formda görünür; Kes hatasını denemek için numarası boş kayıtlı bir taslak gerekir ve bu o taslağı değiştirir: önceki değerini yaz, bitince geri yaz. Belge sayfasında "+ Yeni" menüsünde "Alış faturası ekle" artık vardır.
 - Yeni teklifte Kaydet çubuğu için önce bir alan yaz (Sorumlu). Escape'siz çıkış yolu "Değişiklikleri geri al"dır.
 - Satış alt menüsü açıkken sağ üstteki "Teklif ekle" düğmesi aşağı kayar (kapalıyken y≈86, açıkken y≈103): tıklamadan önce yeni ekran görüntüsü al.
 - Alt çubuktaki kırmızı hata kutusu, alan düzeltildikten sonra da kalabilir (bayat hata); hatanın hâlâ geçerli olup olmadığını alandan doğrula.
 - Alt ajanda DesignSync yoktur: istek metnini müdür görev metnine aynen koyar. Dönem kilidi gibi Recep onayı gerektiren maddelerde görev metni onay kartının numarasını taşımalıdır; ajan mesajı onay sayılmaz.
 - Ölçüm başlamadan skill'in çalışma kopyasında yüklü olduğunu doğrula ("Unknown skill" çıkarsa master'dan eşitle).
 - Faturalar'da kesilmemiş taslak yoksa Kes denemesi için "Yeni fatura" ile DENEME taslağı aç (cari klavyeyle, serbest satır, Kaydet, sonra Kes); taslak silinmez.
-- Dönem kilidi: Muhasebe › Muhasebe ayarları › "Dönem kilidi", tek alan "Kilit tarihi". Gelecek tarih sessizce kaydedilmez (hata metni yok, alan turuncu kalır): bugünün tarihini kullan. Kilidi kaldırmak için tarihi silip Kaydet'e bas, "Kilit yok" yazısını ekranda doğrula. Kilidi tur bitmeden kaldır.
+- Dönem kilidi: Muhasebe › Muhasebe ayarları › "Dönem kilidi", tek alan "Kilit tarihi". Gelecek tarih artık kırmızı yazıyla reddedilir (dar sütunda kırık); tarih yazınca Tab yetmez, Kaydet şart. Bugünün tarihini kullan. Kilidi kaldırmak için tarihi silip Kaydet'e bas, "Kilit yok" yazısını ekranda doğrula. Kilidi tur bitmeden kaldır.
 - Alan turuncu çerçeveliyse geçersizdir; "Kaydet çalışmıyor" demeden önce alanın kenar rengine bak.
 - Tahsilat çekmecesinde cari seçilince araya "Hangi faturaya" alanı eklenip düzen kayar: seçimden sonra yeni ekran görüntüsü al, eski koordinatı kullanma.
-- Faturalar sayfasına ilk girişte 15 sn'ye varan iskelet ekran olabilir; bekle.
+- Faturalar sayfasına ilk girişte 15 sn'ye varan iskelet ekran olabilir; bekle. İlk yükleme 30-40 sn sürebilir.
+- Görüntü alanı yüksekliği sekme sayısına göre oynar (734/718/662): alt çubuk düğmelerinin y'si kayar; her tıklamadan önce yeni ekran görüntüsü al.
+- Satış simgesine ilk basış yalnız alt menüyü açar; sayfa için alt menü satırına bas. Liste sayfasında "Yeni fatura/Teklif ekle" ilk basışta sayfayı değiştirmeyebilir, üst sekmeye bas. Düğme adı "Teklif ekle"dir.
+- Menü ve ⋯ kapatma: boş alana bas (Escape yasak). ⋯ açıkken ikinci ⋯ önceki menünün öğesine basar; önce menüyü kapat. "+ Yeni" menüsü açık değilken harf yazmak kısayol tetikler ("v" = Görev planla): tuşlamadan önce menünün açıldığını kareyle doğrula.
+- "Çıkış yap" paneli bırakıp mağaza giriş sayfasına atar: yalnız tur sonunda bas. "Yardım" da panelden çıkıp vitrine gider.
+- Rol değiştirince sayfa "PanelMasa.renderVals(): Cannot access 'kr'…" ile boş kalır: yenile (rol kalır). Rol listesi yerel select; Muhasebe rolü yoktur.
+- Önizle × ile kapanınca tıklama arkadaki satıra geçer.
+- Çekmece "Neden" listesi klavyeyle seçilince boş görünür (seçim yine de geçer). Boş adlı serbest satır kayıtta sessizce silinir.
+- Virman düğmesi ≥2 kasa/banka hesabı ister: hesapsız turda iki DENEME hesabı aç.
+- Metraj çekmecesi "Satırlar › Excel'den satır al": boş girişte düğme pasif; hata görmek için başlığı olan, adet sütunu eksik CSV yaz. Kullanıcılar ve roller sol şeritte değil, sol alt hesap menüsündedir. Menü adları: Müşteri talepleri, Hizmet ve diğer kalemler (Kayıtlar altında).
+- Ödenmiş zincirde teklif/sipariş/irsaliye satırında "Sıradaki: Fatura" bayat kalabilir: bulguyu "mükerrer fatura riski" diye yaz.
+- Hover yazıları (title) ve CSV indirmesi araçla görülemez; "denenemedi: araç sınırı" yaz, tahmin etme. Tık sayısı: katı sayımda ekran = ayrı sayfa/çekmece.
 
 ## Ölçüm sırası
 
