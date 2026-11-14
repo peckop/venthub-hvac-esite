@@ -40,7 +40,7 @@ Design Venthub New içindeki panel şablonlarını (Teklifler ve belge zinciri) 
 
 ## Tuzaklar
 
-Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi başına tuzak eklemez, gördüğünü raporunda "şaşırılan yerler" altına yazar. TASARIM yeni tuzağı YETENEK'e iletir, YETENEK bu bölümü skill-creator ile günceller.
+Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi başına tuzak eklemez, gördüğünü raporunda "şaşırılan yerler" altına yazar. TASARIM tuzağı bu bölüme kendi PR'ıyla ekler (OPS kararı, 13 Kasım); YETENEK yalnız tetik ya da açıklama değişirse devreye girer.
 
 - İlk yükleme ve genişlik değişimi sonrası 2-10 sn siyah ya da iskelet ekran gelir; bekle, sonra ölç.
 - Tıklama ekrana 2-3 sn gecikmeyle yansır; ilk ekran görüntüsü eski durumu gösterebilir.
@@ -50,6 +50,14 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Kırmızı hata satırı sayfayla kayar; alt koyu çubuktaki mesaj kayıtlı kalır.
 - Sayfa yenilenince aynı kayıt değil Teklifler listesi açılır.
 - Teklifteki Sorumlu sonraki belgelere taşınmaz; irsaliye ve faturaya elle yaz.
+- Sunum modu adresi: `https://claude.ai/design/p/<proje>?file=templates%2Fpanel-teklifler%2FPanelTeklifler.dc.html&present=1` (proje kimliğini görev metni verir).
+- Ctrl K paleti açıkken `zoom` ya da art arda ekran görüntüsü paleti kapatabilir; sonra yazılan metin sayfaya düşer. Bir arama için tek ekran görüntüsü yeter.
+- "Kes" yalnız temiz (kaydedilmiş) formda görünür; Kes hatasını denemek için numarası boş kayıtlı bir taslak gerekir ve bu o taslağı değiştirir: önceki değerini yaz, bitince geri yaz. "+ Yeni" menüsünde alış faturası yoktur.
+- Yeni teklifte Kaydet çubuğu için önce bir alan yaz (Sorumlu). Escape'siz çıkış yolu "Değişiklikleri geri al"dır.
+- Satış alt menüsü açıkken sağ üstteki "Teklif ekle" düğmesi aşağı kayar (kapalıyken y≈86, açıkken y≈103): tıklamadan önce yeni ekran görüntüsü al.
+- Alt çubuktaki kırmızı hata kutusu, alan düzeltildikten sonra da kalabilir (bayat hata); hatanın hâlâ geçerli olup olmadığını alandan doğrula.
+- Alt ajanda DesignSync yoktur: istek metnini müdür görev metnine aynen koyar. Dönem kilidi gibi Recep onayı gerektiren maddelerde görev metni onay kartının numarasını taşımalıdır; ajan mesajı onay sayılmaz.
+- Ölçüm başlamadan skill'in çalışma kopyasında yüklü olduğunu doğrula ("Unknown skill" çıkarsa master'dan eşitle).
 
 ## Ölçüm sırası
 
