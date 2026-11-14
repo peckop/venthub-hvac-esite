@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 /**
- * MOD DEPOSU YEDEĞİ (ARC-134, karar 363 madde 7). C:/Users/alize/mods (kendi git deposu) özel uzak depoya
+ * MOD DEPOSU YEDEĞİ (ARC-134, karar 363 madde 7). ~/mods (kendi git deposu) özel uzak depoya
  * (peckop/venthub-mods, dal `yedek`) yedeklenir. Yalnız kaynak: sır kalıbı görülürse commit atılmaz.
  *
  *   node scripts/arac/mod-yedek.cjs            → commit (değişiklik varsa) + itme + durum dosyası
