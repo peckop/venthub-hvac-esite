@@ -42,7 +42,9 @@ export const KIRINTI_ANA_SAYFA_ANAHTARI = 'category.breadcrumbHome'
  * Bilgi merkezi eskiden kendi sözlük anahtarını ("Ana sayfa", küçük s) okuyordu; kategori ve ürün "Ana Sayfa" yazıyordu.
  */
 export function kirintiAnaSayfaAdi(t: (anahtar: string) => string): string {
-  return t(KIRINTI_ANA_SAYFA_ANAHTARI)
+  // Anahtar LITERAL yazılır (i18n-dead-key kapısı `t(degisken)`'i yasaklar: anahtar kaynakta aranabilir kalsın).
+  // `KIRINTI_ANA_SAYFA_ANAHTARI` ile eşitliği kirintiAnaSayfaAdi.test.ts ölçer.
+  return t('category.breadcrumbHome')
 }
 
 interface KirintiAd {
