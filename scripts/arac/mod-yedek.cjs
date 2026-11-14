@@ -62,7 +62,7 @@ function yedekle({ dir = modsDizini(), push = true, simdi = new Date() } = {}) {
       git(dir, ['commit', '-q', '-m', 'mod yedek ' + simdi.toISOString().slice(0, 16) + 'Z'])
     }
     if (!push) return { durum: 'yerel', push: false }
-    git(dir, ['push', '-q', 'origin', 'HEAD:refs/heads/' + UZAK_DAL], 40000)
+    git(dir, ['push', '-q', 'origin', 'master:' + UZAK_DAL], 40000)
     return { durum: 'commit', push: true }
   } catch (e) {
     return { durum: 'hata', mesaj: String(e.message || e).split('\n')[0].slice(0, 160) }
