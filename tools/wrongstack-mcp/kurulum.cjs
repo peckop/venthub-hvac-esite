@@ -112,6 +112,13 @@ function surecleriOku() {
   }))
 }
 
+/** Pencere sürecinin komut satırındaki `--resume=<oturum>` değeri (uygulama açılışta eski oturumu kendiliğinden devam ettirir); yoksa ''. */
+function pencereOturumu(surecler, pid) {
+  const s = surecler.find((x) => x.pid === pid)
+  const m = s && /--resume[= ]([0-9a-f-]{8,})/i.exec(s.komut || '')
+  return m ? m[1].slice(0, 8) : ''
+}
+
 function yamalar(dizin = YAMALAR) {
   return fs.readdirSync(dizin).filter((d) => d.endsWith('.patch'))
 }
@@ -239,8 +246,9 @@ function kur() {
   const { kendi, yabanci, daemon } = siniflandir(surecler, kendiClaudeBul(surecler))
   if (yabanci.length) {
     const pencereler = [...new Set(yabanci.map((s) => s.ppid))]
+    const adlar = pencereler.map((p) => p + (pencereOturumu(surecler, p) ? ' (oturum ' + pencereOturumu(surecler, p) + ')' : ''))
     throw new Error(
-      pencereler.length + ' baska pencere acik (' + yabanci.length + ' MCP sureci, ebeveyn ' + pencereler.join(',') + ') — once o pencereleri kapat',
+      pencereler.length + ' baska pencere acik (' + yabanci.length + ' MCP sureci, ebeveyn ' + adlar.join(', ') + ') — once o pencereleri kapat',
     )
   }
   for (const s of [...kendi, ...daemon]) {
@@ -268,7 +276,7 @@ function kur() {
   }
 }
 
-module.exports = { siniflandir, kendiClaudeBul, surumFarki, surecleriOku, temizle, yamaHedefi, yamaSurumFarki, gitApply, yamaYolu, yamaUygulu }
+module.exports = { pencereOturumu, siniflandir, kendiClaudeBul, surumFarki, surecleriOku, temizle, yamaHedefi, yamaSurumFarki, gitApply, yamaYolu, yamaUygulu }
 
 if (require.main === module) {
   try {
