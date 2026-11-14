@@ -25,6 +25,14 @@ const { spawn } = require('node:child_process')
 const SURE_DK = 20
 
 /**
+ * Dil grupları (ARC-310): 1.7.0 tek `codebase_index` çağrısına 240 sn'lik sunucu bekçisi koyuyor (ölçüldü 14 Kasım:
+ * 20 günlük farkla `{}` çağrısı "exceeded its 240000ms watchdog timeout" verdi, dizin değişmedi). Bekçi araç
+ * şemasından ayarlanamıyor; bu yüzden artımlı yenileme dil gruplarına bölünür (her grup kendi 240 sn'sini alır).
+ * Md en ağır grup (sembollerin %55'i); tek başına bırakıldı.
+ */
+const DIL_GRUPLARI = [['ts', 'tsx', 'js', 'jsx'], ['md'], ['json', 'yaml', 'toml'], ['sql', 'py', 'css', 'shell']]
+
+/**
  * @typedef {{ totalSymbols?: number, totalFiles?: number, sizeBytes?: number, lastIndexed?: number, byLang?: Record<string, number> }} Istatistik
  * @typedef {{ filesIndexed?: number, errors?: unknown[] }} IndeksSonucu
  */
@@ -111,7 +119,13 @@ function yenile({ cli, kok, sureMs = SURE_DK * 60_000, calistir }) {
       await iste('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'kod-dizini-yenile', version: '1' } })
       p.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }) + '\n')
       const onceki = await cagir('codebase_stats', {})
-      const indeks = await cagir('codebase_index', {}) // artımlı; `force` YOK
+      // artımlı; `force` YOK; dil grupları ayrı çağrı (bekçi sınırı için DIL_GRUPLARI notuna bak)
+      const indeks = { filesIndexed: 0, errors: [] }
+      for (const langs of DIL_GRUPLARI) {
+        const g = (await cagir('codebase_index', { langs })) || {}
+        indeks.filesIndexed += g.filesIndexed || 0
+        if (Array.isArray(g.errors)) indeks.errors = indeks.errors.concat(g.errors)
+      }
       const sonraki = await cagir('codebase_stats', {})
       bitir(null, { onceki, sonraki, indeks, sureMs: Date.now() - t0 })
     })().catch((e) => bitir(e))
@@ -151,4 +165,4 @@ if (require.main === module) {
   main(process.argv.slice(2)).then((k) => process.exit(k))
 }
 
-module.exports = { yenile, ozet, govde, main }
+module.exports = { yenile, ozet, govde, main, DIL_GRUPLARI }

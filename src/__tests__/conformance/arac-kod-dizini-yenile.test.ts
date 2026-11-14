@@ -28,6 +28,7 @@ const M = req(BETIK) as {
   }>
   ozet: (s: unknown) => string
   govde: (r: unknown) => unknown
+  DIL_GRUPLARI: string[][]
 }
 
 /** Sahte MCP: `mod` ortam değişkeniyle davranışı seçilir. */
@@ -74,8 +75,15 @@ describe('INV-ARAC-KOD-DIZINI-1 · yenileme akışı (sahte MCP)', () => {
     fs.rmSync(s.dizin, { recursive: true, force: true })
     expect(r.onceki?.totalSymbols).toBe(100)
     expect(r.sonraki?.totalSymbols).toBe(900)
-    expect(r.indeks).toEqual({ filesIndexed: 7, errors: [] })
+    expect(r.indeks).toEqual({ filesIndexed: 7 * M.DIL_GRUPLARI.length, errors: [] })
     expect(r.sureMs).toBeGreaterThanOrEqual(0)
+  })
+
+  it('dil grupları: kodun asıl dillerini kapsar, tekrar yok, birden çok çağrı (240 sn bekçisi, ARC-310)', () => {
+    const hepsi = M.DIL_GRUPLARI.flat()
+    for (const d of ['ts', 'tsx', 'js', 'md', 'json', 'yaml', 'sql', 'py', 'css']) expect(hepsi).toContain(d)
+    expect(new Set(hepsi).size).toBe(hepsi.length)
+    expect(M.DIL_GRUPLARI.length).toBeGreaterThan(1)
   })
 
   it('SABOTAJ: araç hatası (isError) reddedilir — sessiz yeşil yok', async () => {
