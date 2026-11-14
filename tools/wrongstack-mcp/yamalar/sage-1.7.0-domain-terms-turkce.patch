@@ -10,8 +10,8 @@
    const claimed = [];
    const claim = (match, term) => {
 @@ -641,7 +641,7 @@
-     const key = normalizeTerm(term);
-     return claimed.some((c) => c.key === key && start < c.end && end > c.start);
+     const key2 = normalizeTerm(term);
+     return claimed.some((c) => c.key === key2 && start < c.end && end > c.start);
    };
 -  for (const match of cleaned.matchAll(/`([A-Za-z][A-Za-z0-9_-]{2,80})`/g)) {
 +  for (const match of cleaned.matchAll(/`(\p{L}[\p{L}\p{N}_-]{2,80})`/gu)) {

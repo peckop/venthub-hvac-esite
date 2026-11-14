@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.3.0`, `@wrongstack/codebase-index-mcp@1.3.0`, `@wrongstack/kanban-mcp@1.3.0`, `@wrongstack/mailbox-mcp@1.3.0` (ARC-199, 1 Kasım: 1.1.4'ten; **npm'de YOK**, GitHub v1.3.0 etiketinden kendi makinemizde derlendi: "1.1.4 → 1.3.0 geçişi" bölümü; önceki: ARC-151, 16 Ekim: 1.1.4'e 1.1.2'den; ölçüm, kesinti ve geri dönüş "1.1.2 → 1.1.4 geçişi" bölümünde; önceki: ARC-127, 14 Ekim: 1.1.0'dan; dört sarmalayıcı 1.1.2, içerideki `core`/`sage`/`kanban`/`tools` paketleri 1.1.0 PİNLİ kaldı, yani çalışma kodu yalnız sarmalayıcıda değişti; core skill'leri 1.1.0 ile 1.1.2 arasında BİREBİR aynı, ölçüldü; önceki: ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.7.0`, `@wrongstack/codebase-index-mcp@1.7.0`, `@wrongstack/kanban-mcp@1.7.0`, `@wrongstack/mailbox-mcp@1.7.0` (ARC-307, 14 Kasım: 1.3.0'dan, aynı yol; **npm'de YOK**; "1.3.0 → 1.7.0 geçişi" bölümü; önceki: ARC-199, 1 Kasım: 1.1.4'ten; **npm'de YOK**, GitHub v1.3.0 etiketinden kendi makinemizde derlendi: "1.1.4 → 1.3.0 geçişi" bölümü; önceki: ARC-151, 16 Ekim: 1.1.4'e 1.1.2'den; ölçüm, kesinti ve geri dönüş "1.1.2 → 1.1.4 geçişi" bölümünde; önceki: ARC-127, 14 Ekim: 1.1.0'dan; dört sarmalayıcı 1.1.2, içerideki `core`/`sage`/`kanban`/`tools` paketleri 1.1.0 PİNLİ kaldı, yani çalışma kodu yalnız sarmalayıcıda değişti; core skill'leri 1.1.0 ile 1.1.2 arasında BİREBİR aynı, ölçüldü; önceki: ARC-94, 1.0.26'dan yükseltme PR'ı birleşip `kurulum.cjs` koştuğunda geçerli olur; ölçüm `docs/audits/wrongstack-1-1-0-gecis-olcumu-2026-10-12.md`; 09-27 1.0.19'dan 1.0.26'ya yükseltilmişti), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
 | **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
@@ -94,6 +94,24 @@ sürümü kur. **Sınır:** kapı yalnız sarmalayıcıdan açılan sunucuları 
 **Paket hiçbir yerde kurulu değilse (REC-466, 12 Ekim 2026):** kapı ayrıca "PAKET KURULU DEGIL" der ve çıkış 1 verir; stderr
 `node tools/wrongstack-mcp/kurulum.cjs --denetle` (eksiği söyler) ve ardından ana ağaçta `kurulum.cjs` yolunu gösterir.
 Eskiden sunucu "Cannot find module" ile ölür, istemci yalnız "Connection closed" görürdü.
+
+### 1.3.0 → 1.7.0 geçişi (ARC-307, 14 Kasım 2026): aynı yol, ölçülen, kesinti ve geri dönüş
+
+**Karar:** Recep 14 Kasım 19:17 "1.7 ile başlatalım" (OPS penceresi; MCP değişikliği onayı). **Yol ARC-199 ile aynı:** 1.7.0 npm'de yok
+(yalnız GitHub, 14 Kasım); `node tools/wrongstack-mcp/uret-1.7.0.cjs` v1.7.0'ı `C:/tmp/ws-src-1.7.0`'a klonlar, dört sunucuyu ve iç bağımlılık
+kapanışını derler, `~/.claude/venthub-wrongstack-170/` altına tarball yapar; depoda `wrongstack-170.sha256` ve `package-lock.json` durur.
+**Fark:** kapanış 15 değil **16 paket** (yeni `@wrongstack/wrongmemory-client`, `sage`in bağımlılığı); `uret-1.3.0.cjs` ve `wrongstack-130.sha256` silindi
+(geri dönüş `git revert` ile geri getirir; 1.3.0 tarball'ları `~/.claude/venthub-wrongstack-130/` altında diskte durur).
+**Yamalar:** `kanban-mcp-1.7.0-ozet-donus.patch` (içerik 1.3.0'dakiyle aynı, 1.7.0'a olduğu gibi oturdu) ve `sage-1.7.0-domain-terms-turkce.patch`
+(bağlam kaydığı için yeniden üretildi: yedi değişiklik, `git apply --check`, uygulama ve `--reverse --check` temiz).
+**Önce/sonra (izole scratch kök, sunucu işaretçisi kopyalanmadı → canlı daemon'a bağlanılmadı):** araç sayıları aynı (sage 15, codebase-index 18,
+kanban 3, mailbox 3); sage `remember` ≈16-17 ms ve `memory_search` 2-4 ms iki sürümde de; kanban `list_boards` ≈100 ms; `codebase_read_symbol`
+671 → 242 ms. **Şema göçü YOK:** `sage.db` (47 nesne) ve kanban sqlite (15 nesne) 1.7.0 sonrası canlıyla özdeş, `user_version` 0.
+**Açılmayan parçalar (sebep ölçüldü, yerel kaldı):** `Sage.service` ve `indexing.service` (WrongMemory/WrongIndex servisleri) yapılandırması ve
+yönetimi `wstack` CLI'sine (`@wrongstack/cli`) aittir; dört MCP paketinde servis ikilisi ya da yönetim komutu yoktur, bizde `wstack` kurulu değil. Sunucular
+yerel modda çalışmaya devam eder (varsayılan). `architecture_decisions` aracı çekirdekte ("brain" grubu) vardır ama dört MCP sunucusunun araç listesinde
+yoktur (ölçüldü); Kanban kararları asıl kayıt olarak kalır, besleme önerisi bu yüzden MCP üzerinden uygulanamaz.
+**Geri dönüş:** PR'ı `git revert`; tüm pencereler kapalıyken `node tools/wrongstack-mcp/kurulum.cjs` (1.3.0 tarball'ları diskte), gerekirse `sage-yedek.cjs --geri`.
 
 ### 1.1.4 → 1.3.0 geçişi (ARC-199, 1 Kasım 2026): kaynaktan derleme, ölçülen, kesinti ve geri dönüş
 
