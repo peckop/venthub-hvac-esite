@@ -122,7 +122,8 @@ function yenile({ cli, kok, sureMs = SURE_DK * 60_000, calistir }) {
       // artımlı; `force` YOK; dil grupları ayrı çağrı (bekçi sınırı için DIL_GRUPLARI notuna bak)
       const indeks = { filesIndexed: 0, errors: [] }
       for (const langs of DIL_GRUPLARI) {
-        const g = (await cagir('codebase_index', { langs })) || {}
+        const g = await cagir('codebase_index', { langs })
+        if (!g) throw new Error(`codebase_index (${langs.join(',')}): sonuç okunamadı (JSON değil); yaş sıfırlanmaz`)
         indeks.filesIndexed += g.filesIndexed || 0
         if (Array.isArray(g.errors)) indeks.errors = indeks.errors.concat(g.errors)
       }
@@ -154,10 +155,27 @@ async function main(argv) {
       const gurultu = ['md', 'json', 'yaml'].reduce((a, k) => a + (l[k] || 0), 0)
       process.stdout.write(`GÜRÜLTÜ: md+json+yaml sembol payı ${((gurultu / toplam) * 100).toFixed(0)}% (${gurultu}/${toplam})\n`)
     }
-    return Array.isArray(i.errors) && i.errors.length ? 1 : 0
+    const kod = Array.isArray(i.errors) && i.errors.length ? 1 : 0
+    kayit(argv, kod === 0)
+    return kod
   } catch (e) {
     process.stderr.write(`HATA: ${e.message}\n`)
+    kayit(argv, false)
     return 1
+  }
+}
+
+/**
+ * Sonucu açılış kancasının okuduğu ortak durum dizinine yazar (ARC-311). Başarıda yaş sıfırlanır (elle koşu da sayılır);
+ * kilit ve başarısızlık kaydı yalnız `--arka-plan` (kancanın başlattığı koşu) için tutulur. Yazılamazsa sessiz.
+ */
+function kayit(argv, basari) {
+  try {
+    const t = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'kod-dizini-tazelik.cjs'))
+    const arkaPlan = argv.includes('--arka-plan')
+    t.bitir({ dizin: t.durumDizini(), basari, kilidiBirak: arkaPlan })
+  } catch {
+    /* kayıt yazılamadı: yenileme sonucu değişmez */
   }
 }
 

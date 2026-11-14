@@ -51,6 +51,7 @@ process.stdin.on('data', (d) => {
       if (ad === 'codebase_stats') { sayac++; return yanit({ content: [{ type: 'text', text: JSON.stringify({ totalSymbols: sayac === 1 ? 100 : 900, totalFiles: 10, sizeBytes: 1048576, lastIndexed: 1789642878314, byLang: { ts: 100, md: 800 } }) }] }) }
       if (ad === 'codebase_index') {
         if (mod === 'arac-hatasi') return yanit({ isError: true, content: [{ type: 'text', text: 'ENOSPC' }] })
+        if (mod === 'json-degil') return yanit({ content: [{ type: 'text', text: 'dizin kilitli, sonra tekrar deneyin' }] })
         return yanit({ content: [{ type: 'text', text: JSON.stringify({ filesIndexed: 7, errors: [] }) }] })
       }
     }
@@ -89,6 +90,12 @@ describe('INV-ARAC-KOD-DIZINI-1 · yenileme akışı (sahte MCP)', () => {
   it('SABOTAJ: araç hatası (isError) reddedilir — sessiz yeşil yok', async () => {
     const s = sahteCalistir('arac-hatasi')
     await expect(M.yenile({ cli: 'x', kok: s.dizin, calistir: s.calistir })).rejects.toThrow(/codebase_index.*ENOSPC/)
+    fs.rmSync(s.dizin, { recursive: true, force: true })
+  })
+
+  it('SABOTAJ: JSON olmayan index gövdesi başarı sayılmaz (yaş yanlışlıkla sıfırlanmasın)', async () => {
+    const s = sahteCalistir('json-degil')
+    await expect(M.yenile({ cli: 'x', kok: s.dizin, calistir: s.calistir })).rejects.toThrow(/sonuç okunamadı/)
     fs.rmSync(s.dizin, { recursive: true, force: true })
   })
 
