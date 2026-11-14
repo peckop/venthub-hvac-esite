@@ -16,6 +16,8 @@ export interface BreadcrumbItem {
 
 interface BreadcrumbProps {
     items: BreadcrumbItem[]
+    /** Bulunulan sayfanın kanonik yolu (dilsiz, `Routes.*`): JSON-LD son halkasının adresi. Verilmezse son öğenin `href`'i. */
+    sayfaYolu?: string
     /** Arka plan stili: 'white' (varsayılan), 'transparent', 'dark' */
     variant?: 'white' | 'transparent' | 'dark'
     className?: string
@@ -35,6 +37,7 @@ interface BreadcrumbProps {
  */
 const Breadcrumb: React.FC<BreadcrumbProps> = ({
     items,
+    sayfaYolu,
     variant = 'white',
     className = ''
 }) => {
@@ -68,29 +71,41 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
     const styles = textClasses[variant]
     
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": items.map((item, index) => ({
-            "@type": "ListItem",
-            "position": index + 1,
-            "name": item.label,
-            // REC-100: `SITE_URL` bu `'use client'` bileşeninde tarayıcı paketine
-            // `http://localhost:3000` olarak giriyordu — yani BreadcrumbList yapısal
-            // verisi hydrate sonrası localhost adresleri bildiriyordu.
-            "item": item.href ? `${canonicalOrigin()}${localizedHref(item.href, lang)}` : undefined
-        }))
-    };
+    // URN-164 (K1): konum yolu JSON-LD'si — ana sayfa halkası YOK (görünür liste aşağıda kalır), her halkanın
+    // adresi dolu, SON halka sayfanın kanonik adresi (`sayfaYolu`; verilmezse son öğenin kendi `href`'i).
+    // Adres bilinmiyorsa ya da 2 halkaya ulaşılamıyorsa (kök kategori) BreadcrumbList BASILMAZ.
+    // REC-100: adres `SITE_URL` değil `canonicalOrigin()` (tarayıcı paketinde localhost sızıntısı olmasın).
+    const sonYol = sayfaYolu ?? items[items.length - 1]?.href
+    // Sözleşme: ilk öğe HER ZAMAN ana sayfadır (altı çağıranın hepsi; marka sayfası `Routes.home()` ile dil önekli verir).
+    const halkalar = items.slice(1).map((item, index, dizi) => ({
+        item,
+        yol: index === dizi.length - 1 ? sonYol : item.href,
+    }))
+    const jsonLd =
+        sonYol && halkalar.length >= 2 && halkalar.every((h) => !!h.yol)
+            ? {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": halkalar.map((h, index) => ({
+                    "@type": "ListItem",
+                    "position": index + 1,
+                    "name": h.item.label,
+                    "item": `${canonicalOrigin()}${localizedHref(h.yol as string, lang)}`
+                }))
+            }
+            : null;
 
     return (
         <nav
             aria-label="Breadcrumb"
             className={`${bgClasses[variant]} ${className}`}
         >
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
-            />
+            {jsonLd && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
+                />
+            )}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <ol className="flex items-center flex-wrap gap-y-1 text-sm">
                     {items.map((item, index) => {

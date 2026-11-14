@@ -147,22 +147,50 @@ Bu cetvele bir alan eklemek isteyen değişiklik şunları getirmek zorundadır:
 
 ---
 
-## 4a. Konum yolu (`BreadcrumbList`) ilk basamak adı — TEK yazım (URN-164)
+## 4a. Konum yolu (`BreadcrumbList`) — TEK kalıp, her sayfa türünde (URN-164, karar K1, 14 Kasım 2026)
 
-Konum yolunun ilk basamağı (JSON-LD `BreadcrumbList` ve görünür kırıntı) **her sayfa türünde** aynı yazılır:
-TR **"Ana Sayfa"**, EN **"Home"**. Kaynak tek sözlük anahtarı `category.breadcrumbHome`, tek okuyucu
-`kirintiAnaSayfaAdi(t)` (`src/lib/seo/kirinti.ts`). Sayfa türü kendi ana sayfa anahtarını AÇMAZ, düz metin yazmaz.
+**Kural (tüm sayfa türlerinde aynı):**
 
-* Niçin: 14 Kasım 2026 ölçümü (SEO-112): kategori ve ürün sayfaları "Ana Sayfa", bilgi merkezi liste ve yazı
-  sayfaları "Ana sayfa" (küçük s) yazıyordu; Google sonucunda yol satırı iki biçimde göründü.
-* Kapsam: aile/model/kategori/seri/marka (`category.breadcrumbHome`), bilgi merkezi liste + yazı (JSON-LD ve görünür).
-* Kapı: `INV-KIRINTI-ANA-SAYFA-1` (`src/lib/seo/__tests__/kirintiAnaSayfaAdi.test.ts`): yardımcı iki dilde doğru
-  değeri verir; bilgi merkezi sözlüğünde ana sayfa anahtarı yoktur; ana sayfa basamağını kuran her dosya yardımcıyı
-  çağırır; görünür kırıntıda `href: '/'` basamağı yalnız tek anahtardan yazılır. Sabotajla (bir çağrıyı eski anahtara
-  çevirmek) kırmızı olduğu kanıtlandı.
-* Bilinen sınır: bilgi merkezi yazı sayfasında son basamak (yazı başlığı) `item` taşımaz; bu bilerek böyledir
-  (son basamak bulunulan sayfadır, `buildBreadcrumbJsonLd` sözleşmesi). Arama sırasına etki beklenmez; yalnız
-  yol satırındaki yazım değişir.
+1. **JSON-LD'de ANA SAYFA halkası yoktur.** Görünür `<nav>` kırıntısında "Ana Sayfa" (TR) / "Home" (EN) kalır; yapısal veride yazılmaz.
+2. **Her halkanın `item` adresi doludur ve SON halkanın `item`'ı sayfanın kanonik adresidir** (canonical ile aynı kaynak).
+   Adressiz halka yoktur.
+3. **Zincir gerçek adres yapısıyla birebir** (kökten sayfaya; yeni kademe uydurulmaz).
+4. **JSON-LD'de 2 halkaya ulaşılamıyorsa BreadcrumbList BASILMAZ** (kök kategori, Bilgi Merkezi liste sayfası). Görünür kırıntı kalır.
+5. Görünür kırıntıdaki ana sayfa adı tek yazım: TR "Ana Sayfa", EN "Home"; tek sözlük anahtarı `category.breadcrumbHome`, tek okuyucu
+   `kirintiAnaSayfaAdi(t)` (`src/lib/seo/kirinti.ts`).
+
+**Üretici:** tek yardımcı `konumYoluJsonLd({ lang, baseUrl, steps, sayfaAdresi })` (`src/lib/seo/jsonld.ts`); aile/model
+(`aileSayfasi.tsx`) ve Bilgi Merkezi yazı/liste (`bilgiMerkeziRotasi.tsx`) onu çağırır, kategori/alt kategori/seri/marka görünümleri
+`Breadcrumb.tsx` içinde aynı kuralı uygular (`sayfaYolu` = sayfanın kanonik yolu). `buildBreadcrumbJsonLd` yalnız eski sözleşme testleri için
+durur; sayfa üretimi onu çağırmaz.
+
+**Kaynak — kurumsal ölçüm (14 Kasım 2026, Google TR sonuç satırları + sayfa kaynağı):**
+
+| Site | Sayfa kaynağında | Google satırı |
+|---|---|---|
+| erfgroup | JSON-LD tam zincir, ilk halka item = sitenin kökü | "erfgroup.com › Blog" (kök halkası gizli, son halka yok) |
+| orfan | RDFa Anasayfa(/) › Bloglar › Genel › başlık (son adressiz) | "orfan.com.tr › Bloglar › Genel" |
+| haviksan, vitlofan | BreadcrumbList YOK | ham adres yolu "blog › slug" |
+| fanturk | JSON-LD [Ana sayfa(kök) › başlık(adressiz)] | ham adres yolu |
+| Systemair TR | yapısal kırıntı YOK | "tr-tr › fanlar › kanal-fanlari" (ham yol) |
+| Vensis (Vortice dağıtıcısı) | yalnız Article JSON-LD | ham adres yolu |
+| S&P TR | kırıntı YOK | ham adres yolu |
+| Ziehl-Abegg TR | WebPage.breadcrumb tam 4 halka adresli (Home item /tr) | yine ham yol |
+| VentHub (kural öncesi) | JSON-LD Ana sayfa(/tr) › Bilgi Merkezi › başlık (son adressiz) | "venthub.com.tr › Ana sayfa › Bilgi Merkezi" |
+
+Okuma: Google son halkayı (bulunulan sayfa) satırda göstermiyor; ilk halkanın adresi sitenin KÖKÜ ise ana sayfa halkasını gizliyor.
+Bizde ilk halka `/tr` (kök 308 ile `/tr`'ye gider) olduğundan "Ana sayfa" satıra çıkıyordu. **Google kırıntıyı ipucu sayar: satırı
+kendi seçer, görünmesi garanti değildir**; bu kural yalnız sayfanın verdiği veriyi doğru ve tek biçimli yapar.
+
+**Kapılar:**
+* `INV-KONUM-YOLU-1` (`src/lib/seo/__tests__/konumYolu.test.tsx`): yardımcı (ana sayfa düşer, son halka adresi, <2 → null, sözleşme
+  ihlali ATAR, sabotaj kolu), `Breadcrumb` (kök / alt / üç kademe / marka / adressiz), Bilgi Merkezi'nin TÜM TR yazıları + liste.
+  Aile/model: `src/app/__tests__/aileSayfasiUcKademe.test.tsx` (JSON-LD adları ana sayfasız, son halka kanonik adres).
+* `INV-KIRINTI-ANA-SAYFA-1` (`kirintiAnaSayfaAdi.test.ts`): görünür kırıntıdaki ana sayfa adı tek yazım.
+* Canlı ölçüm: `node scripts/seo/konum-yolu-olc.mjs --ek <tam adresler> --kirintisiz <tam adresler>` (kusurda çıkış 1; bayraklar
+  ADRESSIZ, ANA-SAYFA-HALKASI, SON-HALKA-ADRES-FARKLI, KIRINTI-YOK, KIRINTI-BEKLENMEZDI).
+* Arama satırı ölçümü (GEO-SEO): birleşmeden +7 ve +28 gün sonra aynı sorgularda satır biçimi okunur; sonuç bu kuralı değiştirmez,
+  yalnız beklentiyi günceller.
 
 ---
 

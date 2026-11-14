@@ -212,7 +212,7 @@ describe('aileSayfasi.tsx: tek kaynak bağlaması (kaynak denetimi)', () => {
 
   it('zincir tek yerde kurulur; JSON-LD o diziyi alır ve görünüm aynı diziyi prop olarak alır', () => {
     expect(kaynak.match(/aileKirintiAdimlari\(/g)).toHaveLength(1)
-    expect(kaynak).toMatch(/buildBreadcrumbJsonLd\(\{[^}]*steps: kirinti/)
+    expect(kaynak).toMatch(/konumYoluJsonLd\(\{[^}]*steps: kirinti/)
     expect(kaynak).toMatch(/kirinti=\{kirinti\}/)
   })
 

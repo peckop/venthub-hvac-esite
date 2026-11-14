@@ -92,7 +92,7 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <Breadcrumb items={breadcrumbItems} className="mb-10" />
+              <Breadcrumb items={breadcrumbItems} sayfaYolu={Routes.product(series.slug)} className="mb-10" />
               <div className="flex items-center gap-3 mb-6 text-primary-navy font-medium text-sm tracking-widest uppercase bg-primary-navy/5 w-fit px-4 py-2 rounded-hvac-sm border border-primary-navy/10">
                 <Info size={16} />
                 <span>{series.brand_name ?? t('category.landing.expertiseArea')}</span>

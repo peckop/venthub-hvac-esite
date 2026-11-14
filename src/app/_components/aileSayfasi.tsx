@@ -26,9 +26,9 @@ import { aileBasligiDebili, aileDebiAraligi, aileTitleDebili } from '@/lib/seo/a
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
-  buildBreadcrumbJsonLd,
   buildProductGroupJsonLd,
   buildSeriesLandingJsonLd,
+  konumYoluJsonLd,
 } from '@/lib/seo/jsonld'
 import { aileKirintiAdimlari, type KirintiAdimi, kirintiAnaSayfaAdi } from '@/lib/seo/kirinti'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
@@ -411,7 +411,15 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null, ilgiliAileler 
         })
       : []
   const breadcrumbJsonLd =
-    kirinti.length >= 2 ? buildBreadcrumbJsonLd({ lang, baseUrl: SITE_URL, steps: kirinti }) : null
+    family && kirinti.length >= 2
+      ? konumYoluJsonLd({
+          lang,
+          baseUrl: SITE_URL,
+          steps: kirinti,
+          // Son halka = sayfanın canonical adresi (aynı kaynak: aileSayfasiAdresleri, model rotasında modelin adresi).
+          sayfaAdresi: aileSayfasiAdresleri(family.slug, sunucuSku)[lang === 'en' ? 'en' : 'tr'],
+        })
+      : null
 
   if (breadcrumbJsonLd) assertNoUuid(breadcrumbJsonLd)
 

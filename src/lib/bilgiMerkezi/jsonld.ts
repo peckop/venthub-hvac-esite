@@ -3,7 +3,7 @@
  *
  * NİÇİN `Article`: Google Article türünü yalnız Article / NewsArticle / BlogPosting üzerinden kabul
  * ediyor; `TechArticle` o listede yok. `FAQPage` KONMAZ: SSS zengin sonucu 2026-05-07'de kalktı.
- * BreadcrumbList bu dosyada DEĞİL — tek kaynak `buildBreadcrumbJsonLd` (src/lib/seo/jsonld.ts).
+ * BreadcrumbList bu dosyada DEĞİL — tek kaynak `konumYoluJsonLd` (src/lib/seo/jsonld.ts; URN-164 K1).
  *
  * Yazar ve yayıncı Kurum'dur (VentHub); yapay zekâ notu yok (karar 106).
  */

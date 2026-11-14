@@ -148,7 +148,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         <div className="animate-fadeIn">
-                            <Breadcrumb items={breadcrumbItems} className="mb-10" />
+                            <Breadcrumb items={breadcrumbItems} sayfaYolu={Routes.category(getLocalizedCategorySlug(category, lang))} className="mb-10" />
                             <div className="flex items-center gap-3 mb-6 text-primary-navy font-bold text-sm tracking-widest uppercase bg-primary-navy/5 w-fit px-4 py-2 rounded-full border border-primary-navy/10">
                                 <Info size={16} />
                                 <span>{t('category.landing.expertiseArea')}</span>

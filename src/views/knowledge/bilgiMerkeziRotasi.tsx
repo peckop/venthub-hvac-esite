@@ -11,7 +11,7 @@ import { jsonLdMetni, makaleJsonLd } from '../../lib/bilgiMerkezi/jsonld'
 import { markdownAyristir } from '../../lib/bilgiMerkezi/markdown'
 import { yaziSayfasiHazirla } from '../../lib/bilgiMerkezi/sayfa'
 import { varsayilanKaynak } from '../../lib/data/bilgiMerkeziKaynak'
-import { buildBreadcrumbJsonLd } from '../../lib/seo/jsonld'
+import { konumYoluJsonLd } from '../../lib/seo/jsonld'
 import { kirintiAnaSayfaAdi } from '../../lib/seo/kirinti'
 import { sayfaUstVerisi } from '../../lib/seo/sayfaUstVerisi'
 import { bilgiMerkeziDilAcik, bilgiMerkeziYaziHref } from '../../utils/bilgiMerkezi'
@@ -89,17 +89,19 @@ export async function ListeRotasi({ params, bolumDili }: { params: Params; bolum
   const { lang } = await params
   if (!bolumAcik(lang, bolumDili)) notFound()
   const t = ceviri(bolumDili)
-  const kirinti = buildBreadcrumbJsonLd({
+  // URN-164 K1: liste sayfasında ana sayfa halkası JSON-LD'ye girmez → tek halka kalır → BreadcrumbList BASILMAZ.
+  const kirinti = konumYoluJsonLd({
     lang: bolumDili,
     baseUrl: SITE_URL,
     steps: [
       { name: kirintiAnaSayfaAdi(t), path: '/' },
       { name: t('bilgiMerkezi.ad'), path: null },
     ],
+    sayfaAdresi: `${SITE_URL}${bilgiMerkeziRotalari.liste(bolumDili)}`,
   })
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdMetni(kirinti) }} />
+      {kirinti && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdMetni(kirinti) }} />}
       <BilgiMerkeziListe dil={bolumDili} />
     </>
   )
@@ -160,7 +162,7 @@ export async function YaziRotasi({ params, bolumDili }: { params: Params; bolumD
     yayinTarihi: yazi.yayinTarihi,
     guncellemeTarihi: yazi.guncellemeTarihi,
   })
-  const kirinti = buildBreadcrumbJsonLd({
+  const kirinti = konumYoluJsonLd({
     lang: bolumDili,
     baseUrl: SITE_URL,
     steps: [
@@ -168,12 +170,14 @@ export async function YaziRotasi({ params, bolumDili }: { params: Params; bolumD
       { name: t('bilgiMerkezi.ad'), path: bilgiMerkeziRotalari.liste(bolumDili) },
       { name: sayfa.ayrismis.h1, path: null },
     ],
+    // Son halka = yazının kanonik adresi (makale JSON-LD'sindeki `yol` ile aynı kaynak).
+    sayfaAdresi: `${SITE_URL}${bilgiMerkeziYaziHref(sayfa.metin.slug, bolumDili)}`,
   })
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdMetni(makale) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdMetni(kirinti) }} />
+      {kirinti && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdMetni(kirinti) }} />}
       <RehberYazisiSayfasi sayfa={sayfa} />
     </>
   )

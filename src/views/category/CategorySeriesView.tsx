@@ -65,7 +65,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                         animate={{ opacity: 1, y: 0 }}
                         className="flex justify-center mb-12"
                     >
-                        <Breadcrumb items={breadcrumbItems} />
+                        <Breadcrumb items={breadcrumbItems} sayfaYolu={Routes.category(getLocalizedCategorySlug(category, lang))} />
                     </motion.div>
 
                     <motion.div
