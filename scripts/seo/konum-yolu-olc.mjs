@@ -42,6 +42,8 @@ function halkalar(html) {
         continue
       }
       if (x['@graph']) kuyruk.push(...x['@graph'])
+      // WebPage.breadcrumb içine gömülü BreadcrumbList (ziehl-abegg gibi siteler)
+      if (x.breadcrumb && typeof x.breadcrumb === 'object') kuyruk.push(x.breadcrumb)
       const tur = x['@type']
       if (tur === 'BreadcrumbList' || (Array.isArray(tur) && tur.includes('BreadcrumbList'))) {
         bulunan.push(
@@ -57,7 +59,9 @@ function halkalar(html) {
   return bulunan
 }
 
-const harita = await metin(`${TABAN}/sitemap.xml`)
+// `--sadece-ek`: site haritası okunmaz, yalnız --ek adresleri ölçülür (başka sitelerin sayfalarını karşılaştırmak için).
+const SADECE_EK = arg.includes('--sadece-ek')
+const harita = SADECE_EK ? { govde: '' } : await metin(`${TABAN}/sitemap.xml`)
 const yazilar = [...harita.govde.matchAll(/<loc>([^<]*\/tr\/bilgi-merkezi\/[^<]+)<\/loc>/g)].map((m) => m[1])
 const sayfalar = [...yazilar, ...EK.map((e) => (e.startsWith('http') ? e : `${TABAN}${e}`))]
 if (sayfalar.length === 0) {
@@ -71,7 +75,10 @@ for (const url of sayfalar) {
   const listeler = halkalar(govde)
   const bayrak = []
   if (durum !== 200) bayrak.push(`HTTP-${durum}`)
-  if (listeler.length === 0) bayrak.push('KIRINTI-YOK')
+  // JSON-LD yoksa RDFa/mikroveri BreadcrumbList var mı (başka siteler bu biçimi kullanır); halkaları dökmez, yalnız bildirir.
+  const mikro = /typeof=["']BreadcrumbList["']|itemtype=["']https?:\/\/schema\.org\/BreadcrumbList["']/i.test(govde)
+  if (listeler.length === 0 && mikro) bayrak.push('YALNIZ-MIKROVERI')
+  else if (listeler.length === 0) bayrak.push('KIRINTI-YOK')
   if (listeler.length > 1) bayrak.push('BIRDEN-COK-LISTE')
   const liste = listeler[0] ?? []
   if (liste.some((h) => !h.item)) bayrak.push('ADRESSIZ')
