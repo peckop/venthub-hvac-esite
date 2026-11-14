@@ -162,6 +162,47 @@ describe('Breadcrumb bileşeni (kategori, alt kategori, seri, marka görünümle
     kuralaUyar(liste(h) ?? [], `${BASE}/tr/brands/vortice`)
   })
 
+  it('EN: Home halkası düşer, her halka /en adresli, son halka EN kanonik adresi (kategori, alt kategori, ürün ailesi, marka)', () => {
+    durum.dil = 'en'
+    try {
+      const alt = liste(
+        render(
+          [{ label: 'Home', href: '/' }, { label: 'Fans', href: '/category/fans' }, { label: 'Duct Fans', href: '' }],
+          '/category/duct-fans',
+        ),
+      )
+      kuralaUyar(alt ?? [], `${BASE}/en/category/duct-fans`)
+      expect(alt?.map((x) => x.name)).toEqual(['Fans', 'Duct Fans'])
+
+      expect(liste(render([{ label: 'Home', href: '/' }, { label: 'Fans' }], '/category/fans'))).toBeNull()
+
+      const urun = liste(
+        render(
+          [{ label: 'Home', href: '/' }, { label: 'Shelter Ventilation Systems', href: '/category/shelter' }, { label: 'AVenS', href: '' }],
+          '/products/avens',
+        ),
+      )
+      kuralaUyar(urun ?? [], `${BASE}/en/products/avens`)
+
+      const marka = liste(render([{ label: 'Home', href: '/en' }, { label: 'Brands', href: '/brands' }, { label: 'Vortice' }], '/brands/vortice'))
+      kuralaUyar(marka ?? [], `${BASE}/en/brands/vortice`)
+    } finally {
+      durum.dil = 'tr'
+    }
+  })
+
+  it('EN yardımcı: konumYoluJsonLd Home halkasını düşürür, son halka EN adresi', () => {
+    const j = konumYoluJsonLd({
+      lang: 'en',
+      baseUrl: BASE,
+      steps: [{ name: 'Home', path: '/' }, { name: 'Knowledge Hub', path: '/en/knowledge-hub' }, { name: 'Guide', path: null }],
+      sayfaAdresi: `${BASE}/en/knowledge-hub/guide`,
+    })
+    const l = j?.itemListElement as Halka[]
+    kuralaUyar(l, `${BASE}/en/knowledge-hub/guide`)
+    expect(l.map((h) => h.item)).toEqual([`${BASE}/en/knowledge-hub`, `${BASE}/en/knowledge-hub/guide`])
+  })
+
   it('son öğenin kendi adresi varsa (showcase) prop gerekmez; adres hiç yoksa JSON-LD basılmaz (adressiz halka yok)', () => {
     const adresli = render([{ label: 'Ana Sayfa', href: '/' }, { label: 'Fanlar', href: '/category/fanlar' }, { label: 'Alt', href: '/category/alt' }])
     kuralaUyar(liste(adresli) ?? [], `${BASE}/tr/category/alt`)
