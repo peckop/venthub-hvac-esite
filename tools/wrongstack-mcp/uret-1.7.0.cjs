@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 'use strict'
 /**
- * WRONGSTACK 1.3.0 — KAYNAKTAN PAKET ÜRETİMİ (ARC-199, Recep 1 Kasım "1.3.0'ı eski yöntemle kur").
+ * WRONGSTACK 1.7.0 — KAYNAKTAN PAKET ÜRETİMİ (ARC-307, Recep 14 Kasım "1.7 ile başlatalım"; yöntem ARC-199 ile aynı).
  *
  * ── NİÇİN VAR ──
- * 1.3.0 npm'de YOK (npm `latest` 1.1.11; 1.3.0 yalnız GitHub'da, 29 Ekim 2026, yalnız tek dosyalık program
+ * 1.7.0 npm'de YOK (npm `latest` 1.1.11; 1.7.0 yalnız GitHub'da, 14 Kasım 2026, yalnız tek dosyalık program
  * olarak yayınlı). Bizim dört sunucumuz (sage-mcp, kanban-mcp, mailbox-mcp, codebase-index-mcp) npm paketi
- * olarak çalışır. Bu betik GitHub'daki v1.3.0 etiketinden o dört paketi ve iç bağımlılıklarını (15 paket) kendi
+ * olarak çalışır. Bu betik GitHub'daki v1.7.0 etiketinden o dört paketi ve iç bağımlılıklarını (16 paket) kendi
  * makinemizde derler, `npm pack` ile tarball yapar. `kurulum.cjs` sonra bu tarball'lardan `npm ci` koşar.
- * Tarball'lar (≈9 MB) DEPOYA GİRMEZ (OPS onayı 1 Kasım): `~/.claude/venthub-wrongstack-130/` altında durur;
- * depoda yalnız bu tarif, `wrongstack-130.sha256` ve `package-lock.json` bulunur.
+ * Tarball'lar (≈9 MB) DEPOYA GİRMEZ (OPS onayı 1 Kasım): `~/.claude/venthub-wrongstack-170/` altında durur;
+ * depoda yalnız bu tarif, `wrongstack-170.sha256` ve `package-lock.json` bulunur.
  *
  * ── AYARLAR (aynı komutla yeniden üretilebilsin diye AÇIKÇA yazılı) ──
- *  - Kaynak: `git clone --depth 1 --branch v1.3.0 https://github.com/wrongstack/wrongstack.git C:/tmp/ws-src-1.3.0`
+ *  - Kaynak: `git clone --depth 1 --branch v1.7.0 https://github.com/wrongstack/wrongstack.git C:/tmp/ws-src-1.7.0`
  *    (etiket ek açıklamalı; çıkan commit c52219246ef19591b1527ad1e06928c6b1aa1ce2).
  *  - Proje `packageManager: bun@1.4.3` der; pnpm bunu reddeder ("This project is configured to use bun").
  *    Bu yüzden her pnpm çağrısı `--config.package-manager-strict=false` ile koşar. Derleme betikleri Bun ister
@@ -20,14 +20,14 @@
  *  - Bağımlılık kurulumu `--ignore-scripts` (kurulum betikleri koşmaz). Projenin kilit dosyası `bun.lock`'tur,
  *    pnpm onu kullanmaz: dış (npm kaydı) bağımlılık sürümleri kurulum günündeki çözüme göre gelir. Bu yüzden
  *    TARBALL'LAR kayıt belgesidir; yeniden üretim aynı bayt sonucu vermeyebilir (ölçülmedi) → yeniden üretince
- *    `--kilit` ile kilit yenilenir ve `wrongstack-130.sha256` güncellenir.
- *  - `npm pack` öncesi `workspace:*` bağımlılık metinleri `1.3.0`a çevrilir (npm pack çevirmez; çevrilmezse
+ *    `--kilit` ile kilit yenilenir ve `wrongstack-170.sha256` güncellenir.
+ *  - `npm pack` öncesi `workspace:*` bağımlılık metinleri `1.7.0`a çevrilir (npm pack çevirmez; çevrilmezse
  *    tarball kurulamaz).
  *
  * ── KULLANIM ──
- *   node tools/wrongstack-mcp/uret-1.3.0.cjs           → klonla, kur, derle, paketle (≈3 dk), sağlama toplamı yaz
- *   node tools/wrongstack-mcp/uret-1.3.0.cjs --kilit   → paket kümesinden package.json bağımlılıkları + kilit üret
- *   node tools/wrongstack-mcp/uret-1.3.0.cjs --denetle → tarball'ların sağlama toplamı depodaki listeyle aynı mı
+ *   node tools/wrongstack-mcp/uret-1.7.0.cjs           → klonla, kur, derle, paketle (≈3 dk), sağlama toplamı yaz
+ *   node tools/wrongstack-mcp/uret-1.7.0.cjs --kilit   → paket kümesinden package.json bağımlılıkları + kilit üret
+ *   node tools/wrongstack-mcp/uret-1.7.0.cjs --denetle → tarball'ların sağlama toplamı depodaki listeyle aynı mı
  * Çıktının son satırı `HAZIR` ya da `HATA: <neden>`.
  */
 const fs = require('node:fs')
@@ -37,16 +37,16 @@ const crypto = require('node:crypto')
 const { execFileSync } = require('node:child_process')
 
 const ARAC = __dirname
-const SURUM = '1.3.0'
-const ETIKET = 'v1.3.0'
+const SURUM = '1.7.0'
+const ETIKET = 'v1.7.0'
 const DEPO = 'https://github.com/wrongstack/wrongstack.git'
-const KAYNAK = 'C:/tmp/ws-src-1.3.0'
-const PAKET_DIZINI = path.join(os.homedir(), '.claude', 'venthub-wrongstack-130').replace(/\\/g, '/')
-const SAGLAMA = path.join(ARAC, 'wrongstack-130.sha256')
+const KAYNAK = 'C:/tmp/ws-src-1.7.0'
+const PAKET_DIZINI = path.join(os.homedir(), '.claude', 'venthub-wrongstack-170').replace(/\\/g, '/')
+const SAGLAMA = path.join(ARAC, 'wrongstack-170.sha256')
 /** Dört sunucumuz. */
 const SUNUCULAR = ['sage-mcp', 'kanban-mcp', 'mailbox-mcp', 'codebase-index-mcp']
-/** Sunucuların iç bağımlılık kapanışı (15 paket; 1 Kasım ölçüldü, `kapanis()` aynısını yeniden hesaplar). */
-const PAKETLER = ['agent-catalog', 'codebase-index-mcp', 'contracts', 'coordination', 'core', 'hq', 'kanban', 'kanban-mcp', 'mailbox-mcp', 'mcp', 'persistence', 'primitives', 'sage', 'sage-mcp', 'tools']
+/** Sunucuların iç bağımlılık kapanışı (16 paket; 1 Kasım ölçüldü, `kapanis()` aynısını yeniden hesaplar). */
+const PAKETLER = ['agent-catalog', 'codebase-index-mcp', 'contracts', 'coordination', 'core', 'hq', 'kanban', 'kanban-mcp', 'mailbox-mcp', 'mcp', 'persistence', 'primitives', 'sage', 'sage-mcp', 'tools', 'wrongmemory-client']
 const PNPM = ['--config.package-manager-strict=false']
 
 function calistir(komut, args, ek = {}) {
@@ -137,13 +137,13 @@ function denetle() {
 }
 
 /**
- * package.json bağımlılıkları (sabit "1.3.0") + package-lock.json. Önce geçici klasörde `file:` bağımlılıkla
- * kurulur (kayıt 1.3.0'ı bilmez), sonra package.json sabit sürüme, kilitteki `resolved` ise tarball'ın mutlak
+ * package.json bağımlılıkları (sabit "1.7.0") + package-lock.json. Önce geçici klasörde `file:` bağımlılıkla
+ * kurulur (kayıt 1.7.0'ı bilmez), sonra package.json sabit sürüme, kilitteki `resolved` ise tarball'ın mutlak
  * `file:` adresine yazılır: `npm ci` kilitteki adresten çeker; `INV-WRONGSTACK-MCP-1` (sabit sürüm + kilit
  * sürümü) aynen geçerli kalır.
  */
 function kilitUret() {
-  const gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'wrongstack-130-kilit-'))
+  const gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'wrongstack-170-kilit-'))
   const dosya = (d) => 'file:' + PAKET_DIZINI + '/' + tarballAdi(d)
   const overrides = Object.fromEntries(PAKETLER.map((d) => ['@wrongstack/' + d, dosya(d)]))
   const dependencies = Object.fromEntries(SUNUCULAR.map((s) => ['@wrongstack/' + s, overrides['@wrongstack/' + s]]))
