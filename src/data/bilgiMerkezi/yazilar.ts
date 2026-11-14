@@ -2091,6 +2091,123 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-60), doğrulanmış metin: taslak v12 (sha 290c0d88be64). Kısa sektör sayfası (cetvel R3.3): markasız gövde, aile adları yalnız "VentHub'da hangi örnek aile sayfalarında ATEX bölge ya da işaret metni yazılı?" bölümünde ve Kaynaklar'da.
+    // Doğrulama: dört tam tur (v3, v7, v9, v10; her turda tuzaklı + temiz kopya, tuzaklı 10/10) ve v11'de yalnız değişen cümleler; OPS-255 tavanı (3 tur) aşıldı, son turda engelleyici cümleler düzeltilmeyip metinden çıkarıldı (OPS emri). Mevzuat paketi yok: Türkiye mevzuatı iddiası yok, yalnız AB 1999/92/AT bilgi cümlesi. Fiyat yok.
+    kimlik: 'boyahane-havalandirma-fani-secimi',
+    konu: 'guvenlik',
+    yayinTarihi: '2026-11-09',
+    guncellemeTarihi: '2026-11-09',
+    urunler: ['vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar', 'vh:aile/jet-serisi', 'vh:aile/vortice-vort-e-atex-fanlar'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'boyahane-havalandirma-fani-nasil-secilir',
+        ozet: "Boyahane havalandırma fanı seçerken kaynaklar hava miktarı, fan malzemesi, ateşleme kaynakları ve ATEX için ne yazar; hangi bilgiler gerekir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Boyahane fanında kaynakların neyi yazdığını ve neyin bu yazıdan çıkarılamayacağını görmek için bu rehberden başlayın.",
+        govde: `# Boyahane havalandırma fanı nasıl seçilir?
+
+Boya püskürtme kabini, HSE rehberinde operatörü ve işlemi tamamen çevreleyen kapalı kabin örnekleri arasında sayılır [1]. Kaynaklar, yanıcı buhar ve sis bulunabilen yerlerde hava miktarını, fan malzemesini, ateşleme kaynaklarını ve bölgeye göre donanım kategorisini ayrı ayrı anar [2][3][4][5]. Bu yazı bölge sınıfı belirlemez; kaynakların ve VentHub aile sayfalarının yazdıklarını aktarır [1][6].
+
+Kısaca:
+
+- Hava miktarı: ABD OSHA kuralı, atılan toplam havanın çözücü buharını alt patlama sınırının yüzde 25'ine seyreltecek büyüklükte olmasını ister [2].
+- Fan: yanıcı ortamlarda fanlar çoğunlukla demir dışı alaşımdan yapılır ve topraklanmalıdır [3].
+- Donanım: ABD kuralı püskürtme alanında bulunan ve yanıcı kalıntı birikintisine maruz olmayan elektrik donanımını patlamaya dayanıklı tipte ister [5]; AB direktifi, patlamadan korunma belgesi aksini belirtmedikçe, bölgeye göre donanım kategorisi ister [4].
+- Bölge: HSE rehberi bölgelemeyi kapsamadığını yazar; bu yazı boyahanenin bölgesini belirlemez [1].
+
+## Kaynaklar boyahane havalandırması için neler yazar?
+
+| Kaynak | Konu | Ne yazıyor |
+|---|---|---|
+| HSE rehberi (İngiltere) | Kirletici özelliği | Toz, duman ve sis gibi proses kirleticileri aşındırıcı, yapışkan ya da yoğuşabilir olabilir, bazıları yanıcı olabilir; bu özellikler yerel havalandırmanın tasarımını belirler [1] |
+| OSHA 1910.94 (ABD) | Hava miktarı | Atılan toplam hava, çözücü buharını püskürtülen çözücünün alt patlama sınırının yüzde 25'ine seyreltecek büyüklükte olmalıdır [2] |
+| OSHA 1910.94 (ABD) | Yapı | Kabin ve ona bağlı besleme ve egzoz kanalının yapımında yanıcı malzeme kullanılmaz [2] |
+| OSHA 1910.107 (ABD) | Elektrik donanımı | Püskürtme alanında bulunan ve yanıcı kalıntı birikintisine maruz olmayan elektrik tesisatı ve donanımı patlamaya dayanıklı tipte olmalıdır [5] |
+| OSHA 1910.107 (ABD) | Fan dönen elemanı | Fanın dönen elemanı demir dışı ya da kıvılcım çıkarmayan malzemeden olmalı veya gövde böyle bir malzemeden olmalı ya da onunla kaplanmalıdır [5] |
+| OSHA 1910.107 (ABD) | Motor ve kayış | Egzoz fanlarını çalıştıran elektrik motorları kabinin ya da kanalların içine konmaz; kayış, kayış ve kasnak tamamen kapatılmadıkça kabine ya da kanala girmez [5] |
+| DOE/AMCA rehberi | Fan malzemesi | Yanıcı ortamlarda fanlar çoğunlukla demir dışı alaşımdan yapılır ve dönen parçalar dahil topraklanmalıdır [3] |
+| 1999/92/AT Direktifi | Donanım kategorisi | Patlamadan korunma belgesi aksini belirtmiyorsa bölgeye göre donanım kategorisi seçilir; Bölge 2'de 1, 2 ya da 3 kategorisi [4] |
+
+## HSE rehberi kirleticilerin özellikleri hakkında ne yazar?
+
+HSE rehberi, toz, duman ve sis gibi proses kirleticilerinin aşındırıcı, yapışkan ya da yoğuşabilir olabildiğini, bazılarının da yanıcı olabildiğini ve bu özelliklerin yerel havalandırmanın tasarımını belirlediğini yazar [1]. Rehber ayrıca seyrelmenin engellendiği durumlarda, örneğin buhar-hava karışımı kapalı bir alana aktığında, karışımın çökeceğini ve zehirli bir risk, malzemeye göre de yanıcı bir risk doğurabileceğini belirtir; çoğu işyerinde ise hava hareketi ve cereyanın doymuş buhar-hava karışımını hızla seyrelttiğini de yazar [1]. Rehber bölgeleme ve patlama tahliyesi gibi yanıcılık konularını kapsamadığını, bu tehlikeler varsa tasarımın bunları hesaba katması gerektiğini ve DSEAR'ın geçerli olduğunu da yazar [1].
+
+## Boyahane egzoz havası ne kadar olmalı?
+
+ABD İş Sağlığı ve Güvenliği İdaresi (OSHA), püskürtme kabinlerine ilişkin kuralında, (c)(6)(i) bendinin gerekliliklerine ek olarak kabinden atılan toplam hava hacminin çözücü buharını püskürtülen çözücünün alt patlama sınırının yüzde 25'ine seyreltecek büyüklükte olmasını ister [2]. Metindeki hesap örneği, bir galon çözücünün buharını alt patlama sınırının yüzde 25'ine seyreltmek için gereken hava hacmini çözücünün alt patlama sınırından ve galon başına buhar hacminden hesaplar [2]. Dakikadaki hava debisi için bu hacim, dakikada buharlaşan çözücü galon sayısıyla çarpılır [2]. Kuralın (c)(6)(i) bendi, yeterli bir hava ikame sistemi bulunmayan kabinlerde kabin açıklıklarından içeri giren havanın hızı için Tablo G-10'da asgari değerler verir [2]. Bunlar ABD kuralıdır ve bu yazı bir debi değeri vermez. Fan seçiminin genel girdileri için [fan çeşitleri](vh:yazi/fan-cesitleri) yazısına bakılabilir.
+
+## Boyahane fanı ve motoru için hangi yapı özellikleri anılır?
+
+ABD Enerji Bakanlığı ve AMCA International'ın 2003 tarihli ortak rehberi, yanıcı ortamlarda fanların metalin metale temasından doğan kıvılcım riskini azaltmak için çoğunlukla demir dışı alaşımlardan yapıldığını, bazı uygulamalarda fanın belirli parçalarının kıvılcıma dayanıklı malzemeden üretilebildiğini ve statik deşarj kıvılcımını azaltmak için dönen parçalar dahil fanın topraklanması gerektiğini yazar [3]. Fan malzemesi ve motoru için OSHA'nın 1910.107 numaralı kuralında şu hükümler vardır: fanın dönen elemanı demir dışı ya da kıvılcım çıkarmayan malzemeden olmalı veya gövde böyle bir malzemeden olmalı ya da onunla kaplanmalıdır; egzoz fanlarını çalıştıran elektrik motorları kabinin ya da kanalların içine konmaz; kayış ise kayış ve kasnak tamamen kapatılmadıkça kabine ya da kanala girmez [5]. OSHA 1910.94 kuralı püskürtme kabininde ışıkların, motorların, elektrik donanımının ve diğer ateşleme kaynaklarının 1910.107 numaralı kuralın ilgili hükümlerine uymasını ister [2]. O kural, püskürtme alanını yanıcı buhar ya da sisin ya da yanıcı kalıntı, toz ve birikintilerin tehlikeli miktarda bulunduğu alan olarak tanımlar ve bu alanda bulunan ve yanıcı kalıntı birikintisine maruz olmayan elektrik tesisatı ile donanımının Sınıf I, grup D yerler için onaylı, patlamaya dayanıklı tipte olmasını ister [5]. HSE rehberi eksenel fanları anlatırken, kirletici yanıcı ya da korozif değilse motorun da kanal içinde olduğunu yazar [1]. HSE'nin bu anlatımı genel yerel havalandırma içindir; OSHA'nın motor hükmü ise püskürtme kabini egzoz fanları içindir [1][5].
+
+## Boyahane için bölge ve ATEX nasıl anlaşılır?
+
+Avrupa Birliği'nin 1999/92/AT sayılı Direktifi Bölge 2'yi, gaz, buhar ya da sis halindeki yanıcı maddelerin havayla patlayıcı bir karışım oluşturmasının normal çalışmada beklenmediği, oluşursa yalnız kısa süre kalacağı yer olarak tanımlar [4]. Direktifin Ek II B bölümü, patlayıcı atmosfer oluşabilecek yerlerde donanım ve koruyucu sistemlerin, patlamadan korunma belgesi aksini belirtmiyorsa, kategorilere göre seçilmesini ister: Bölge 1'de kategori 1 ya da 2, Bölge 2'de kategori 1, 2 ya da 3 donanım [4]. Bu tanım ve seçim ölçütü bir boyahanenin hangi bölgede olduğunu söylemez [4]. Direktifin bu bölümü kategorileri 94/9/AT'ye atıfla verir [4]; bölge, kategori ve işaret kavramlarının güncel ayrıntısı için [patlayıcı ortamda fan seçimi](vh:yazi/patlayici-ortamda-fan-secimi-atex) yazısına bakılabilir.
+
+## Teklif için hangi bilgiler gerekir?
+
+Bu yazı fiyat vermez; ilgili aile sayfalarında fiyat gösterilmez, teklif istenir [6]. Aşağıdaki girdiler kaynaklardan türetilmiştir; VentHub teklif formunun hangi alanları istediği bu yazıda ölçülmemiştir:
+
+- Püskürtülen çözücü, alt patlama sınırı, galon başına buhar hacmi ve dakikada buharlaşan çözücü miktarı: OSHA kuralındaki hava miktarı hesabı bunlara bağlıdır [2].
+- Sistem koşulları: hava özellikleri, debi, basınç ve sistem yerleşimi [3].
+- Bölge bilgisi: incelenen ürün sayfalarında ATEX bölgesi ya da işareti yazılıdır [6]; HSE rehberi bölgeleme konusunu kapsamadığını yazar [1].
+
+## Bu yazının sınırları
+
+- HSE rehberi bölgeleme konusunu kapsamadığını yazar [1]; bu yazı boyahane için bölge sınıfı belirlemez.
+- Kaynaklar ABD, İngiltere ve Avrupa Birliği metinleridir [1][2][3][4][5]; bu yazı Türkiye'deki yükümlülükleri belirlemez.
+- OSHA metninin GPO 2024 baskısı kullanılmıştır; güncel sürüm ayrıca kontrol edilmelidir [2][5].
+- Püskürtme kabinleri için bir Avrupa standardı bu yazıda anılmaz.
+- DOE/AMCA rehberi 2003 tarihlidir; cümlesi boyahaneye özgü değil, genel yanıcı ortam ilkesidir [3].
+- Boyahane fanında sıcaklık sınıfı ya da bölge hükmü bu yazıdan çıkarılamaz.
+
+## VentHub'da hangi örnek aile sayfalarında ATEX bölge ya da işaret metni yazılı?
+
+[Vorticent CMS ATEX](vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar) aile sayfasının açıklama metni 12/5 T4 ve 14/5 T4 (0,09 kW) modellerinin Zone 1'e, 16/6 T2, 22/9 T4, 25/10 T4, 28/11 T4, 31/12 T4, 35/14 T4, 40/16 T4 ve 45/18 T4 modellerinin Zone 2'ye uygun olduğunu, ailenin −20 °C ile 40 °C ortam sıcaklığı aralığında, toz içermeyen temiz hava taşımaya uygun olduğunu yazar [6]. [JET](vh:aile/jet-serisi) aile sayfası JET 20, JET 25 ve JET 30 modellerinin ATEX Bölge 2, Kategori 3 G'ye uygun, patlamaya dayanıklı motorlu versiyonlarının bulunduğunu ve ailenin kimyasallara ve aşındırıcı gazlara karşı dayanıklı olduğunu, polipropilen gövde ve çarka sahip olduğunu yazar [6]. [VORT-E ATEX](vh:aile/vortice-vort-e-atex-fanlar) aile sayfasında seçili model 40320'ın açıklaması, fanı ATEX II 2G/D h T3/125°C X Gb/Db işaretli, patlayıcı toz ve gaz içeren ortamların havalandırılması için tasarlanmış ex-proof aksiyel sanayi fanı olarak anlatır [6]. Bu üç aile sayfasının hiçbiri boyahane ya da çözücü kullanımını anmaz [6]. Bu yüzden bir boyahanede kullanılıp kullanılamayacakları sayfalardan çıkarılamaz.
+
+## Sık sorulan sorular
+
+### HSE rehberi boya püskürtme kabinini nasıl sınıflandırır?
+
+HSE rehberi boya püskürtme kabinini, operatörü ve işlemi tamamen çevreleyen kapalı kabin örnekleri arasında sayar; bu yapılar için booth, room ve cabin sözcüklerinin kullanıldığını yazar [1].
+
+### Boyahane fanı ATEX olmak zorunda mı?
+
+Bu yazı boyahanenin bölgesini belirlemez. 1999/92/AT Direktifi, patlayıcı atmosfer oluşabilecek yerlerde donanımın, patlamadan korunma belgesi aksini belirtmiyorsa, kategorilere göre seçilmesini ister [4]; OSHA kuralı da püskürtme alanında bulunan ve yanıcı kalıntı birikintisine maruz olmayan elektrik donanımının patlamaya dayanıklı tipte olmasını ister [5]. Fanın dönen elemanı için ABD kuralında ayrı bir hüküm vardır [5].
+
+### Boyahane egzozunda hava miktarı nasıl belirlenir?
+
+OSHA kuralı, püskürtülen çözücünün alt patlama sınırına dayalı bir seyreltme ölçüsü kullanır [2]. Türkiye'deki karşılığı bu yazıda doğrulanmamıştır.
+
+### Boyahane kanalı hangi malzemeden yapılmamalı?
+
+OSHA kuralı, püskürtme kabini ve ona bağlı besleme ve egzoz kanalının yapımında yanıcı malzeme kullanılmamasını ister [2].
+
+### Yanıcı ortamda fan neden demir dışı alaşımdan yapılır?
+
+DOE/AMCA rehberine göre metalin metale temasından doğan kıvılcım riskini azaltmak için [3].
+
+### VentHub'da boyahane için hangi fan var?
+
+Sayfalar boyahane için bir seri belirtmez; bu yazıda incelenen Vorticent CMS ATEX, JET ve VORT-E ATEX aile sayfaları boyahaneyi anmaz [6].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), HSG258 Controlling airborne contaminants at work: A guide to local exhaust ventilation (LEV), 3. baskı, 2017, ¶44, ¶47, ¶48, ¶49, ¶110, ¶190. https://books.hse.gov.uk/gempdf/hsg258.pdf (erişim 08.11.2026)
+2. U.S. Occupational Safety and Health Administration, 29 CFR 1910.94(c) Spray finishing operations, (c)(3)(i)(a)(b), (c)(6)(i), (c)(6)(ii); GPO CFR 2024 baskısı. https://www.govinfo.gov/content/pkg/CFR-2024-title29-vol5/xml/CFR-2024-title29-vol5-sec1910-94.xml (erişim 08.11.2026)
+3. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, Nisan 2003, PDF s. 8, 9 ve 21 (basılı sayfa = PDF sayfası − 4). https://www.energy.gov/sites/prod/files/2014/05/f16/fan_sourcebook.pdf (erişim 08.11.2026)
+4. Avrupa Parlamentosu ve Konseyi, 1999/92/AT sayılı Direktif (16 Aralık 1999), Ek I (Bölge 2 tanımı) ve Ek II B (donanım seçimi ölçütleri), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:31999L0092 (erişim 09.11.2026)
+5. U.S. Occupational Safety and Health Administration, 29 CFR 1910.107 Spray finishing using flammable and combustible materials, (a)(2) spraying area tanımı, (c)(6) elektrik tesisatı hükmü ve (d)(4), (d)(5), (d)(6) fan dönen elemanı, elektrik motoru ve kayış hükümleri; GPO CFR 2024 baskısı. https://www.govinfo.gov/content/pkg/CFR-2024-title29-vol5/xml/CFR-2024-title29-vol5-sec1910-107.xml (erişim 09.11.2026)
+6. VentHub, Vorticent CMS ATEX, JET ve VORT-E ATEX aile sayfaları, canlı sitede 8 ve 9 Kasım 2026'da ölçüldü: https://venthub.com.tr/tr/products/vortice-vorticent-cms-atex-santrifuj-fanlar , https://venthub.com.tr/tr/products/jet-serisi , https://venthub.com.tr/tr/products/vortice-vort-e-atex-fanlar
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Patlayıcı ortamda kullanılacak ekipmanın uygunluğu üreticinin teknik belgeleri ve yetkili uzman değerlendirmesiyle doğrulanmalıdır. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
