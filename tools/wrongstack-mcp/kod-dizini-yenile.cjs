@@ -154,10 +154,27 @@ async function main(argv) {
       const gurultu = ['md', 'json', 'yaml'].reduce((a, k) => a + (l[k] || 0), 0)
       process.stdout.write(`GÜRÜLTÜ: md+json+yaml sembol payı ${((gurultu / toplam) * 100).toFixed(0)}% (${gurultu}/${toplam})\n`)
     }
-    return Array.isArray(i.errors) && i.errors.length ? 1 : 0
+    const kod = Array.isArray(i.errors) && i.errors.length ? 1 : 0
+    kayit(argv, kod === 0)
+    return kod
   } catch (e) {
     process.stderr.write(`HATA: ${e.message}\n`)
+    kayit(argv, false)
     return 1
+  }
+}
+
+/**
+ * Sonucu açılış kancasının okuduğu ortak durum dizinine yazar (ARC-311). Başarıda yaş sıfırlanır (elle koşu da sayılır);
+ * kilit ve başarısızlık kaydı yalnız `--arka-plan` (kancanın başlattığı koşu) için tutulur. Yazılamazsa sessiz.
+ */
+function kayit(argv, basari) {
+  try {
+    const t = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'kod-dizini-tazelik.cjs'))
+    const arkaPlan = argv.includes('--arka-plan')
+    t.bitir({ dizin: t.durumDizini(), basari, kilidiBirak: arkaPlan })
+  } catch {
+    /* kayıt yazılamadı: yenileme sonucu değişmez */
   }
 }
 
