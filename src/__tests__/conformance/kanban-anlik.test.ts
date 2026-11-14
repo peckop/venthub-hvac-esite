@@ -157,6 +157,13 @@ describe('INV-KANBAN-ANLIK-2 · --detay tek kartın tam içeriği', () => {
     expect(t.tahminSaat).toBe(3)
   })
 
+  it('--not-sayisi N son N notu verir; geçersiz değer (x, 0, -1, 2.5) varsayılan 5\'e düşer', () => {
+    for (const v of ['0', '-1', '2.5']) expect(kos('--id', 'OPS-31', '--detay', '--not-sayisi', v).tasks[0].task.notlar).toHaveLength(5)
+    expect(kos('--id', 'OPS-31', '--detay', '--not-sayisi', '7').tasks[0].task.notlar).toHaveLength(7)
+    expect(kos('--id', 'OPS-31', '--detay', '--not-sayisi', '2').tasks[0].task.notlar?.map(n => n.icerik)).toEqual(['not 5', 'not 6'])
+    expect(kos('--id', 'OPS-31', '--detay', '--not-sayisi', 'x').tasks[0].task.notlar).toHaveLength(5)
+  })
+
   it('bağımlılığı olmayan kartta liste boş gelir, çökmez', () => {
     const r = kos('--id', 'ARC-33', '--detay')
     expect(r.ok).toBe(true)

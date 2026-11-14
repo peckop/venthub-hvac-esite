@@ -54,7 +54,7 @@ function hata(sebep) {
 
 // --label <x> (tekrarlanabilir), --limit N, --db <yol>
 function argumanlar(argv) {
-  const a = { etiketler: [], kimlikler: [], pano: null, acik: false, detay: false, kisa: false, vadeBas: null, vadeSon: null, limit: Infinity, db: null }
+  const a = { etiketler: [], kimlikler: [], pano: null, acik: false, detay: false, kisa: false, vadeBas: null, vadeSon: null, limit: Infinity, db: null, notSayisi: DETAY_NOT_SAYISI }
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i]
     if (k === '--label') a.etiketler.push(String(argv[++i] ?? '').trim().toLowerCase())
@@ -65,7 +65,10 @@ function argumanlar(argv) {
     else if (k === '--vade-bas') a.vadeBas = String(argv[++i] ?? '').slice(0, 10)
     else if (k === '--vade-son') a.vadeSon = String(argv[++i] ?? '').slice(0, 10)
     else if (k === '--detay') a.detay = true
-    else if (k === '--limit') {
+    else if (k === '--not-sayisi') {
+      const n = Number(argv[++i])
+      if (Number.isInteger(n) && n > 0) a.notSayisi = Math.min(n, 100)
+    } else if (k === '--limit') {
       const n = Number(argv[++i])
       if (Number.isInteger(n) && n > 0) a.limit = n
     } else if (k === '--db') a.db = argv[++i] ?? null
@@ -122,7 +125,7 @@ function kabulOzeti(t) {
 }
 
 // Tek kartın TAM içeriği (--detay). panoKartlari: bağımlılık başlıklarını çözmek için aynı panonun kartları.
-function detayEkle(k, t, panoKartlari) {
+function detayEkle(k, t, panoKartlari, notSayisi = DETAY_NOT_SAYISI) {
   k.description = kisaMetin(t.description, DETAY_ACIKLAMA_SINIRI)
   k.kabulOlcutleri = (Array.isArray(t.successCriteria) ? t.successCriteria : []).map(c => ({
     id: c.id,
@@ -135,7 +138,7 @@ function detayEkle(k, t, panoKartlari) {
     return { id, title: d ? d.title : null, status: d ? d.status : null }
   })
   const notlar = Array.isArray(t.notes) ? t.notes : []
-  k.notlar = notlar.slice(-DETAY_NOT_SAYISI).map(n => ({
+  k.notlar = notlar.slice(-notSayisi).map(n => ({
     yazan: n.author ?? null,
     icerik: kisaMetin(n.content, DETAY_NOT_SINIRI),
     saat: n.createdAt ?? null,
@@ -155,7 +158,7 @@ function vadeUyar(t, bas, son) {
   return (bas === null || v >= bas) && (son === null || v <= son)
 }
 
-function kartKisalt(t, sutunAdi, detay, panoKartlari, kisa) {
+function kartKisalt(t, sutunAdi, detay, panoKartlari, kisa, notSayisi) {
   const k = {
     id: t.id,
     title: kisa ? kisaMetin(t.title, 120) : t.title,
@@ -175,7 +178,7 @@ function kartKisalt(t, sutunAdi, detay, panoKartlari, kisa) {
     k.updatedAt = t.updatedAt
   }
   if (t.completedAt) k.completedAt = t.completedAt
-  if (detay) return detayEkle(k, t, panoKartlari)
+  if (detay) return detayEkle(k, t, panoKartlari, notSayisi)
   if (!kisa && typeof t.description === 'string' && t.description !== '') k.description = t.description.slice(0, ACIKLAMA_SINIRI)
   return k
 }
@@ -212,7 +215,7 @@ function oku(a) {
       if (!vadeUyar(t, a.vadeBas, a.vadeSon)) continue
       const sutun = sutunlar.get(t.columnId) ?? t.columnId ?? null
       if (a.acik && t.columnId === 'done') continue
-      tasks.push({ board: { id: pano.id, title: pano.title }, task: kartKisalt(t, sutun, a.detay, pano.tasks, a.kisa) })
+      tasks.push({ board: { id: pano.id, title: pano.title }, task: kartKisalt(t, sutun, a.detay, pano.tasks, a.kisa, a.notSayisi) })
     }
   }
   return { tasks: tasks.slice(0, a.limit), sayac }
