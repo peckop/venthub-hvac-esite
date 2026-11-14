@@ -15,6 +15,7 @@
  */
 
 const { spawn } = require('node:child_process')
+const fs = require('node:fs')
 const path = require('node:path')
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -23,10 +24,15 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 function okunmamis(sid, { kok, zamanAsimiMs = 5000 } = {}) {
   return new Promise((coz) => {
     if (typeof sid !== 'string' || !UUID.test(sid)) return coz({ durum: 'olculemedi', sebep: 'oturum kimligi gecersiz' })
-    const cli = path.join(kok, 'tools', 'wrongstack-mcp', 'node_modules', '@wrongstack', 'mailbox-mcp', 'dist', 'cli.js')
     // Kök, pencerelerin kutusuyla AYNI olmalı: sürücü harfi küçük (bkz. posta-kutusu.cjs kanonikKok —
     // büyük `C:` ayrı bir kutu açar, sayaç boş kutuyu sayıp "0" derdi).
     const { kanonikKok } = require(path.join(kok, 'tools', 'wrongstack-mcp', 'posta-kutusu.cjs'))
+    const cliYolu = (k) => path.join(k, 'tools', 'wrongstack-mcp', 'node_modules', '@wrongstack', 'mailbox-mcp', 'dist', 'cli.js')
+    // ARC-308 (14 Kasım, ÖLÇÜLDÜ): worktree'de tools/wrongstack-mcp/node_modules YOK (kurulum ana ağaçta); eski kod orada
+    // var olmayan cli.js'i başlatıp "sunucu cevapsiz kapandi" diyordu (çıkış 1, MODULE_NOT_FOUND) — her pencere açılışında.
+    // Önce bu kök, yoksa ana ağaç (kanonik kök); ikisi de yoksa nedeni dürüstçe söyle.
+    const cli = [cliYolu(kok), cliYolu(kanonikKok(kok))].find((y) => fs.existsSync(y))
+    if (!cli) return coz({ durum: 'olculemedi', sebep: 'mailbox-mcp kurulu degil (bu kok ve ana agac)' })
     let p
     try {
       p = spawn(process.execPath, [cli, '--project-root', kanonikKok(kok), '--actor', sid, '--stdio'], {
