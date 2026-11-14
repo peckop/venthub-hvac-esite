@@ -1,10 +1,10 @@
 {
   "should_trigger": [
     "tamam bitti sayılır mı, test ettin mi?",
-    "düzeltmeyi yaptım, merge hazır mı kontrol eder misin",
+    "düzeltmeyi yaptım, bitti demeden önce hangi kontrolleri koştuğumuzu ve sonuçlarını yaz",
     "PR'ı açmadan önce çalışıyor demek için elimizde ne kanıt var, doğrula",
     "son özeti yazmadan önce yaptığımız değişikliğin gerçekten düzeldiğini projenin kendi kontrolleriyle göster",
-    "bu hata düzeldi dedin ama ben görmedim, kanıtla",
+    "bu hata düzeldi dedin, hangi kontrolle doğruladığını ve neyi doğrulamadığını göster",
     "iş bitti raporu yazacaksın, önce neyin doğrulandığını neyin doğrulanmadığını ayır",
     "bitirdim diyorsun, pnpm kontrolleri geçti mi emin misin",
     "merge etmeden önce son kez her şeyin çalıştığından emin ol, test ettin mi?",
