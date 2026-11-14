@@ -147,6 +147,25 @@ Bu cetvele bir alan eklemek isteyen değişiklik şunları getirmek zorundadır:
 
 ---
 
+## 4a. Konum yolu (`BreadcrumbList`) ilk basamak adı — TEK yazım (URN-164)
+
+Konum yolunun ilk basamağı (JSON-LD `BreadcrumbList` ve görünür kırıntı) **her sayfa türünde** aynı yazılır:
+TR **"Ana Sayfa"**, EN **"Home"**. Kaynak tek sözlük anahtarı `category.breadcrumbHome`, tek okuyucu
+`kirintiAnaSayfaAdi(t)` (`src/lib/seo/kirinti.ts`). Sayfa türü kendi ana sayfa anahtarını AÇMAZ, düz metin yazmaz.
+
+* Niçin: 14 Kasım 2026 ölçümü (SEO-112): kategori ve ürün sayfaları "Ana Sayfa", bilgi merkezi liste ve yazı
+  sayfaları "Ana sayfa" (küçük s) yazıyordu; Google sonucunda yol satırı iki biçimde göründü.
+* Kapsam: aile/model/kategori/seri/marka (`category.breadcrumbHome`), bilgi merkezi liste + yazı (JSON-LD ve görünür).
+* Kapı: `INV-KIRINTI-ANA-SAYFA-1` (`src/lib/seo/__tests__/kirintiAnaSayfaAdi.test.ts`): yardımcı iki dilde doğru
+  değeri verir; bilgi merkezi sözlüğünde ana sayfa anahtarı yoktur; ana sayfa basamağını kuran her dosya yardımcıyı
+  çağırır; görünür kırıntıda `href: '/'` basamağı yalnız tek anahtardan yazılır. Sabotajla (bir çağrıyı eski anahtara
+  çevirmek) kırmızı olduğu kanıtlandı.
+* Bilinen sınır: bilgi merkezi yazı sayfasında son basamak (yazı başlığı) `item` taşımaz; bu bilerek böyledir
+  (son basamak bulunulan sayfadır, `buildBreadcrumbJsonLd` sözleşmesi). Arama sırasına etki beklenmez; yalnız
+  yol satırındaki yazım değişir.
+
+---
+
 ## 5. Bilinen sınırlar
 
 * Bu cetvelin kapıları **builder'ın sözleşmesini** ölçer, canlı sayfayı değil. Fonksiyonun

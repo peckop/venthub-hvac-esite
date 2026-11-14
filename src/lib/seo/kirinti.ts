@@ -34,6 +34,17 @@ export const dilOnekliMi = (yol: string): boolean => /^\/(tr|en)(\/|$)/.test(yol
  */
 export const kirintiHref = (path: string, lang: string): string => localizedHref(path, lang)
 
+/** Sözlük anahtarı: konum yolunun ilk basamağı (TR "Ana Sayfa", EN "Home"). TEK yazım; sayfa türü kendi anahtarını açmaz. */
+export const KIRINTI_ANA_SAYFA_ANAHTARI = 'category.breadcrumbHome'
+
+/**
+ * Konum yolunun (JSON-LD BreadcrumbList ve görünür kırıntı) ilk basamak adı — TÜM sayfa türleri için tek yer (URN-164).
+ * Bilgi merkezi eskiden kendi sözlük anahtarını ("Ana sayfa", küçük s) okuyordu; kategori ve ürün "Ana Sayfa" yazıyordu.
+ */
+export function kirintiAnaSayfaAdi(t: (anahtar: string) => string): string {
+  return t(KIRINTI_ANA_SAYFA_ANAHTARI)
+}
+
 interface KirintiAd {
   ad: string
   slug: string

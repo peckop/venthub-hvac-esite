@@ -6,6 +6,7 @@ import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 import type { YaziSayfasi } from '../../lib/bilgiMerkezi/sayfa'
+import { kirintiAnaSayfaAdi } from '../../lib/seo/kirinti'
 import { bilgiMerkeziListeHref } from '../../utils/bilgiMerkezi'
 import { localizedHref, Routes } from '../../utils/routes'
 import RehberGovdesi from './RehberGovdesi'
@@ -64,7 +65,7 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
           <ol className="flex flex-wrap items-center gap-2">
             <li>
               <Link href={localizedHref(Routes.home(), dil)} className={`hover:text-brand-cyan-ink ${odakSinifi}`}>
-                {t('bilgiMerkezi.anaSayfa')}
+                {kirintiAnaSayfaAdi(t)}
               </Link>
             </li>
             <li aria-hidden="true">{'/'}</li>

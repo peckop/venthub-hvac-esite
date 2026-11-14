@@ -30,7 +30,7 @@ import {
   buildProductGroupJsonLd,
   buildSeriesLandingJsonLd,
 } from '@/lib/seo/jsonld'
-import { aileKirintiAdimlari, type KirintiAdimi } from '@/lib/seo/kirinti'
+import { aileKirintiAdimlari, type KirintiAdimi, kirintiAnaSayfaAdi } from '@/lib/seo/kirinti'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient } from '@/lib/supabase/static'
 import type { FamilyListItem } from '@/types/ui-models'
@@ -402,7 +402,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null, ilgiliAileler 
     family && gorunenAileAdi.trim()
       ? aileKirintiAdimlari({
           dil: adresDili(lang),
-          anasayfaAdi: t('category.breadcrumbHome'),
+          anasayfaAdi: kirintiAnaSayfaAdi(t),
           zincir: zincirAdimlari,
           aile: { ad: gorunenAileAdi, slug: family.slug },
           model: seciliModel

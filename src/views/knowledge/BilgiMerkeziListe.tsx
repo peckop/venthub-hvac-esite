@@ -6,6 +6,7 @@ import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 import { markdownAyristir } from '../../lib/bilgiMerkezi/markdown'
+import { kirintiAnaSayfaAdi } from '../../lib/seo/kirinti'
 import { bilgiMerkeziYaziHref } from '../../utils/bilgiMerkezi'
 import { localizedHref, Routes } from '../../utils/routes'
 import BilgiMerkeziArama, { type ListeKarti } from './BilgiMerkeziArama'
@@ -52,7 +53,7 @@ export default function BilgiMerkeziListe({ dil, yazilar = YAZILAR }: { dil: Yaz
                 href={localizedHref(Routes.home(), dil)}
                 className="hover:text-brand-cyan-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan-ink"
               >
-                {t('bilgiMerkezi.anaSayfa')}
+                {kirintiAnaSayfaAdi(t)}
               </Link>
             </li>
             <li aria-hidden="true">{'/'}</li>

@@ -12,6 +12,7 @@ import { markdownAyristir } from '../../lib/bilgiMerkezi/markdown'
 import { yaziSayfasiHazirla } from '../../lib/bilgiMerkezi/sayfa'
 import { varsayilanKaynak } from '../../lib/data/bilgiMerkeziKaynak'
 import { buildBreadcrumbJsonLd } from '../../lib/seo/jsonld'
+import { kirintiAnaSayfaAdi } from '../../lib/seo/kirinti'
 import { sayfaUstVerisi } from '../../lib/seo/sayfaUstVerisi'
 import { bilgiMerkeziDilAcik, bilgiMerkeziYaziHref } from '../../utils/bilgiMerkezi'
 import { bilgiMerkeziRotalari } from '../../utils/bilgiMerkeziRotalari'
@@ -92,7 +93,7 @@ export async function ListeRotasi({ params, bolumDili }: { params: Params; bolum
     lang: bolumDili,
     baseUrl: SITE_URL,
     steps: [
-      { name: t('bilgiMerkezi.anaSayfa'), path: '/' },
+      { name: kirintiAnaSayfaAdi(t), path: '/' },
       { name: t('bilgiMerkezi.ad'), path: null },
     ],
   })
@@ -163,7 +164,7 @@ export async function YaziRotasi({ params, bolumDili }: { params: Params; bolumD
     lang: bolumDili,
     baseUrl: SITE_URL,
     steps: [
-      { name: t('bilgiMerkezi.anaSayfa'), path: '/' },
+      { name: kirintiAnaSayfaAdi(t), path: '/' },
       { name: t('bilgiMerkezi.ad'), path: bilgiMerkeziRotalari.liste(bolumDili) },
       { name: sayfa.ayrismis.h1, path: null },
     ],

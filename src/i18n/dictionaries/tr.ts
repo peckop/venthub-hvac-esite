@@ -386,7 +386,6 @@ export const tr = {
   // burada yalnız şablonun sabit metinleri durur (rehber-yazisi-standard.md R3).
   bilgiMerkezi: {
     ad: 'Bilgi Merkezi',
-    anaSayfa: 'Ana sayfa',
     liste: {
       seoBaslik: 'Bilgi Merkezi — Havalandırma Rehber Yazıları | VentHub',
       seoAciklama: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
