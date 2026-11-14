@@ -70,6 +70,17 @@ describe('INV-ARAC-MOD-YEDEK-1', () => {
     fs.rmSync(s.kok, { recursive: true, force: true })
   })
 
+  it('yedek dalı zaten checkout ise de itilir (branch -f hatası yok)', () => {
+    const s = kur(true)
+    git(s.dir, 'add', '-A')
+    git(s.dir, 'commit', '-q', '-m', 'ilk')
+    git(s.dir, 'checkout', '-q', '-b', M.UZAK_DAL)
+    fs.writeFileSync(path.join(s.dir, 'b.txt'), 'iki')
+    expect(M.yedekle({ dir: s.dir })).toEqual({ durum: 'commit', push: true })
+    expect(git(s.uzak, 'log', '-1', '--format=%s', M.UZAK_DAL)).toMatch(/^mod yedek /)
+    fs.rmSync(s.kok, { recursive: true, force: true })
+  })
+
   it('depo olmayan dizin yok-depo', () => {
     const d = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-mod-yedek-yok-'))
     expect(M.yedekle({ dir: d }).durum).toBe('yok-depo')

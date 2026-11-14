@@ -63,7 +63,8 @@ function yedekle({ dir = modsDizini(), push = true, simdi = new Date() } = {}) {
     }
     if (!push) return { durum: 'yerel', push: false }
     // Deny satırı push + master eşleşmesini keser (OPS 14 Kasım): yerel yedek dalı HEAD'e eşitlenir, o dal itilir; push satırında master ya da iki nokta yok.
-    git(dir, ['branch', '-f', UZAK_DAL, 'HEAD'])
+    // Yedek dalı zaten checkout'taysa branch -f hata verir; o durumda dal HEAD'dir, eşitlemeye gerek yok.
+    if (git(dir, ['branch', '--show-current']).trim() !== UZAK_DAL) git(dir, ['branch', '-f', UZAK_DAL, 'HEAD'])
     git(dir, ['push', '-q', 'origin', UZAK_DAL], 40000)
     return { durum: 'commit', push: true }
   } catch (e) {
