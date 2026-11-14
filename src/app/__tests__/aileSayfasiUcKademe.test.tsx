@@ -114,7 +114,12 @@ async function sayfa() {
   const nav = html.match(/<nav aria-label="[^"]*">[\s\S]*?<\/nav>/)?.[0] ?? ''
   const baglantilar = [...nav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map((m) => [m[1], m[2].replace(/<[^>]+>/g, '').trim()])
   const jsonlar = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]))
-  const liste = jsonlar.find((j) => j['@type'] === 'BreadcrumbList') as { itemListElement: { name: string }[] } | undefined
+  const liste = jsonlar.find((j) => j['@type'] === 'BreadcrumbList') as
+    | { itemListElement: { name: string; item?: string }[] }
+    | undefined
+  // URN-164 (K1): JSON-LD'de ana sayfa halkası YOK, her halkanın adresi dolu, son halka sayfanın kanonik adresi.
+  expect(liste?.itemListElement.every((e) => !!e.item)).toBe(true)
+  expect(liste?.itemListElement.at(-1)?.item).toMatch(/\/tr\/(products|urun)\/ptc$/)
   return { baglantilar, jsonAdlari: liste?.itemListElement.map((e) => e.name) ?? [] }
 }
 
@@ -132,8 +137,8 @@ describe('AileSayfasi kırıntısı — zincir parent_id\'den', () => {
       '/tr/kategori/elektrik-aksesuarlari',
       '/tr/kategori/frekans-konvertorleri',
     ])
-    // JSON-LD aynı diziden (son basamak aile adı bağlantısızdır, JSON-LD'de bulunur).
-    expect(jsonAdlari).toEqual(['Ana Sayfa', 'Aksesuarlar', 'Elektrik Aksesuarları', 'Frekans Konvertörleri', 'PTC'])
+    // JSON-LD aynı diziden, ana sayfa halkası hariç (son basamak aile adı görünürde bağlantısızdır, JSON-LD'de adresli).
+    expect(jsonAdlari).toEqual(['Aksesuarlar', 'Elektrik Aksesuarları', 'Frekans Konvertörleri', 'PTC'])
     expect(durum.okunan).toEqual(['k'])
   })
 
@@ -141,25 +146,25 @@ describe('AileSayfasi kırıntısı — zincir parent_id\'den', () => {
     kur(FANS, KANAL, [FANS, KANAL])
     const { baglantilar, jsonAdlari } = await sayfa()
     expect(baglantilar.map((b) => b[1])).toEqual(['Ana Sayfa', 'Fanlar', 'Kanal Tipi Fanlar'])
-    expect(jsonAdlari).toEqual(['Ana Sayfa', 'Fanlar', 'Kanal Tipi Fanlar', 'PTC'])
+    expect(jsonAdlari).toEqual(['Fanlar', 'Kanal Tipi Fanlar', 'PTC'])
     expect(durum.okunan).toEqual([])
   })
 
   it('yalnız yaprak sütunda ve alt boş değil: orta ve kök ata zincirinden', async () => {
     kur(null, YAPRAK, [KOK, ORTA, YAPRAK])
     const { jsonAdlari } = await sayfa()
-    expect(jsonAdlari).toEqual(['Ana Sayfa', 'Aksesuarlar', 'Elektrik Aksesuarları', 'Frekans Konvertörleri', 'PTC'])
+    expect(jsonAdlari).toEqual(['Aksesuarlar', 'Elektrik Aksesuarları', 'Frekans Konvertörleri', 'PTC'])
   })
 
   it('alt kategori boş (aile ana kategoriye bağlı): yalnız ana', async () => {
     kur(FANS, null, [FANS])
     const { jsonAdlari } = await sayfa()
-    expect(jsonAdlari).toEqual(['Ana Sayfa', 'Fanlar', 'PTC'])
+    expect(jsonAdlari).toEqual(['Fanlar', 'PTC'])
   })
 
   it('pasif ORTA ara halka kırıntıya BASILMAZ (sayfası aktif atasına yönlenir)', async () => {
     kur(null, YAPRAK, [KOK, { ...ORTA, aktif: false }, YAPRAK])
     const { jsonAdlari } = await sayfa()
-    expect(jsonAdlari).toEqual(['Ana Sayfa', 'Aksesuarlar', 'Frekans Konvertörleri', 'PTC'])
+    expect(jsonAdlari).toEqual(['Aksesuarlar', 'Frekans Konvertörleri', 'PTC'])
   })
 })

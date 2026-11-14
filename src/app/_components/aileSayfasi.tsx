@@ -26,11 +26,11 @@ import { aileBasligiDebili, aileDebiAraligi, aileTitleDebili } from '@/lib/seo/a
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
-  buildBreadcrumbJsonLd,
   buildProductGroupJsonLd,
   buildSeriesLandingJsonLd,
+  konumYoluJsonLd,
 } from '@/lib/seo/jsonld'
-import { aileKirintiAdimlari, type KirintiAdimi } from '@/lib/seo/kirinti'
+import { aileKirintiAdimlari, type KirintiAdimi, kirintiAnaSayfaAdi } from '@/lib/seo/kirinti'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient } from '@/lib/supabase/static'
 import type { FamilyListItem } from '@/types/ui-models'
@@ -402,7 +402,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null, ilgiliAileler 
     family && gorunenAileAdi.trim()
       ? aileKirintiAdimlari({
           dil: adresDili(lang),
-          anasayfaAdi: t('category.breadcrumbHome'),
+          anasayfaAdi: kirintiAnaSayfaAdi(t),
           zincir: zincirAdimlari,
           aile: { ad: gorunenAileAdi, slug: family.slug },
           model: seciliModel
@@ -411,7 +411,15 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null, ilgiliAileler 
         })
       : []
   const breadcrumbJsonLd =
-    kirinti.length >= 2 ? buildBreadcrumbJsonLd({ lang, baseUrl: SITE_URL, steps: kirinti }) : null
+    family && kirinti.length >= 2
+      ? konumYoluJsonLd({
+          lang,
+          baseUrl: SITE_URL,
+          steps: kirinti,
+          // Son halka = sayfanın canonical adresi (aynı kaynak: aileSayfasiAdresleri, model rotasında modelin adresi).
+          sayfaAdresi: aileSayfasiAdresleri(family.slug, sunucuSku)[lang === 'en' ? 'en' : 'tr'],
+        })
+      : null
 
   if (breadcrumbJsonLd) assertNoUuid(breadcrumbJsonLd)
 

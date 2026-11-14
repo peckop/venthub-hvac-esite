@@ -153,7 +153,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
           canlıda ÜÇ canonical'a yol açıyordu ve sonuncusu `http://localhost:3000` idi. */}
 
       {/* STANDARD BREADCRUMB */}
-      <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-6" />
+      <Breadcrumb items={breadcrumbItems} sayfaYolu={Routes.brand(slug)} variant="transparent" className="pt-6" />
 
       {/* Brand Hero: Ultra Premium Cinema Look */}
       <section className="relative h-60vh lg:h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">

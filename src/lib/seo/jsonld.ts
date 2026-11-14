@@ -547,6 +547,48 @@ export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Reco
   }
 }
 
+export interface KonumYoluJsonLdParams {
+  lang: string
+  baseUrl: string
+  /** Görünür kırıntı zinciri (ilk basamak ana sayfa `path: '/'`, son basamak bulunulan sayfa `path: null`). */
+  steps: BreadcrumbStep[]
+  /** Bulunulan sayfanın KANONİK mutlak adresi (canonical ile aynı kaynaktan): son halkanın `item`'ı. */
+  sayfaAdresi: string
+}
+
+/**
+ * URN-164 (K1, karar 2026-11-14): arama sonucundaki konum yolu (BreadcrumbList) — TÜM sayfa türlerinde tek kural.
+ *  1. JSON-LD'de ANA SAYFA HALKASI YOK (görünür `<nav>`'da kalır): Google satırda zaten sitenin kökünü gizliyor,
+ *     bizde ilk halkanın adresi `/tr` (kökten 308) olduğu için "Ana sayfa" satıra çıkıyordu.
+ *  2. Kalan her halkanın `item`'ı dolu; SON halka sayfanın kanonik adresi (adressiz son halka yok).
+ *  3. Halka sayısı 2'nin altına düşerse (kök kategori, Bilgi Merkezi liste) BreadcrumbList BASILMAZ → `null`.
+ *  4. Zincir gerçek adres yapısıyla birebir; yeni kademe uydurulmaz.
+ * Google kırıntıyı ipucu sayar: satırı kendi seçer, görünmesi garanti değil. Cetvel: urun-yapisal-veri-standard §4a.
+ */
+export function konumYoluJsonLd(params: KonumYoluJsonLdParams): Record<string, unknown> | null {
+  const { lang, baseUrl, steps, sayfaAdresi } = params
+  if (!sayfaAdresi) throw new Error('konumYoluJsonLd: sayfaAdresi bos olamaz')
+  const son = steps[steps.length - 1]
+  if (!son || son.path !== null) {
+    throw new Error('konumYoluJsonLd: son basamak bulunulan sayfadir, path null olmali')
+  }
+  if (steps.some((s) => !s.name.trim())) throw new Error('konumYoluJsonLd: basamak adi bos olamaz')
+
+  const halkalar = steps[0]?.path === '/' ? steps.slice(1) : steps
+  if (halkalar.length < 2) return null
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: halkalar.map((step, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: step.name,
+      item: step.path === null ? sayfaAdresi : kirintiAdresi(baseUrl, lang, step.path),
+    })),
+  }
+}
+
 const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 
 /**

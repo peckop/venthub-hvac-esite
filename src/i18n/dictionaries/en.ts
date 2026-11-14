@@ -277,7 +277,6 @@ export const en: typeof tr = {
   // KNOWLEDGE HUB (decision 92, 2026-09-24) — template texts only; article bodies live elsewhere.
   bilgiMerkezi: {
     ad: 'Knowledge Hub',
-    anaSayfa: 'Home',
     liste: {
       seoBaslik: 'Knowledge Hub — Ventilation Guides | VentHub',
       seoAciklama: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',

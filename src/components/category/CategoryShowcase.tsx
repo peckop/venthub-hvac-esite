@@ -58,7 +58,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     return (
         <div className="min-h-screen bg-white">
             {/* Breadcrumb Navigation */}
-            <Breadcrumb items={breadcrumbItems} variant="white" />
+            <Breadcrumb items={breadcrumbItems} sayfaYolu={Routes.category(getLocalizedCategorySlug(category, lang))} variant="white" />
 
             {/* Hero Section */}
             <div className="relative h-hvac-hero w-full overflow-hidden bg-primary-navy">

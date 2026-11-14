@@ -239,10 +239,13 @@ describe('(b) sayfa gövdesi: H1 ve ilk paragraf', () => {
   })
 
   it('breadcrumb son basamağı ve model adları DEĞİŞMEZ: aile adı (H1 geçersiz kılması kırıntıya sızmaz)', async () => {
-    const h = await html('tr', LINEO_QUIET_AILE_SLUG)
+    // URN-164 (K1): kategorisiz aile = tek halka → BreadcrumbList basılmaz; kırıntıyı ölçmek için kategorili fikstür.
+    durum.detail = detayKur(LINEO_QUIET_AILE_SLUG, KODLAR, null, true)
+    const h = renderToStaticMarkup(await AileSayfasi({ lang: 'tr', slug: LINEO_QUIET_AILE_SLUG, sunucuSku: null }))
     const bc = jsonLdler(h).find((j) => j['@type'] === 'BreadcrumbList')
-    const maddeler = (bc?.itemListElement ?? []) as Array<{ name: string }>
+    const maddeler = (bc?.itemListElement ?? []) as Array<{ name: string; item?: string }>
     expect(maddeler.at(-1)?.name).toBe(DB_BASLIK)
+    expect(maddeler.at(-1)?.item).toMatch(/^https?:\/\/[^/]+\/tr\/products\/.+/)
   })
 })
 

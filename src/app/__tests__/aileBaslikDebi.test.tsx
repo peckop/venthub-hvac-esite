@@ -166,7 +166,11 @@ describe('URN-149 aile başlığı debi aralığı', () => {
   })
 
   it('(g) BreadcrumbList son öğe adı ve tüm itemListElement adları debisiz', async () => {
-    const s = await sayfa('tr', detayKur(AD, DEBILI))
+    // URN-164 (K1): ana sayfa halkası JSON-LD'de yok → kategorisiz aile tek halka bırakır, BreadcrumbList basılmaz.
+    // Bu test kırıntı adlarını ölçtüğü için fikstüre kategori verilir (kategori + aile = 2 halka).
+    const d = detayKur(AD, DEBILI)
+    const kategorili = { ...d, family: { ...d.family, category: { id: 'c1', name: 'Fans', slug: 'fans', metadata: { hide_price: false } } } }
+    const s = await sayfa('tr', kategorili)
     const kirinti = s.jsonLd.find((j) => j['@type'] === 'BreadcrumbList')
     expect(kirinti).toBeDefined()
     const ogeler = (kirinti?.itemListElement ?? []) as Array<{ name?: string }>
