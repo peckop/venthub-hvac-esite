@@ -29,10 +29,13 @@ function durumDizini(env = process.env) {
   return env.VENTHUB_KOD_DIZINI_DURUM_DIZINI || path.join(os.homedir(), '.claude', 'kod-dizini-durum')
 }
 
-function tarihOku(yol) {
+const SAAT_SAPMASI_MS = 60_000
+
+/** Kayıt tarihi; geleceğe 1 dk'dan fazla taşıyorsa (saat ileri alınıp geri çekildi) GEÇERSİZ sayılır: günlerce susturmasın. */
+function tarihOku(yol, simdi) {
   try {
     const t = JSON.parse(fs.readFileSync(yol, 'utf8')).tarih
-    return typeof t === 'number' && Number.isFinite(t) ? t : null
+    return typeof t === 'number' && Number.isFinite(t) && t <= simdi + SAAT_SAPMASI_MS ? t : null
   } catch {
     return null
   }
@@ -43,7 +46,8 @@ function kilitTaze(dizin, simdi) {
   const yol = path.join(dizin, 'kilit')
   try {
     const damga = Number(fs.readFileSync(yol, 'utf8'))
-    return simdi - (Number.isFinite(damga) && damga > 0 ? damga : fs.statSync(yol).mtimeMs) < KILIT_OMRU_MS
+    const t = Number.isFinite(damga) && damga > 0 ? damga : fs.statSync(yol).mtimeMs
+    return t <= simdi + SAAT_SAPMASI_MS && simdi - t < KILIT_OMRU_MS // gelecekteki damga = bozuk saat = taze sayılmaz
   } catch {
     return false
   }
@@ -51,33 +55,60 @@ function kilitTaze(dizin, simdi) {
 
 /** Saf karar: 'sessiz' | 'surer' | 'hata-bekle' | 'baslat' (+ yaş gün; kayıt yoksa null). */
 function karar({ dizin, simdi = Date.now() }) {
-  const son = tarihOku(path.join(dizin, 'son.json'))
+  const son = tarihOku(path.join(dizin, 'son.json'), simdi)
   const yasGun = son == null ? null : Math.max(0, (simdi - son) / GUN_MS)
   if (yasGun != null && yasGun < ESIK_GUN) return { eylem: 'sessiz', yasGun }
   if (kilitTaze(dizin, simdi)) return { eylem: 'surer', yasGun }
-  const hata = tarihOku(path.join(dizin, 'hata.json'))
+  const hata = tarihOku(path.join(dizin, 'hata.json'), simdi)
   if (hata != null && simdi - hata < HATA_BEKLEME_MS) return { eylem: 'hata-bekle', yasGun }
   return { eylem: 'baslat', yasGun }
 }
 
-/** Kilidi ATOMİK al (`wx`); süresi dolmuş kilit düşürülür. Alındıysa true. */
+/** `wx` ile yeni dosya yaz: yalnız dosya YOKSA başarır (atomik). */
+function yeniYaz(yol, simdi) {
+  try {
+    fs.writeFileSync(yol, String(simdi), { flag: 'wx' })
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Kilidi ATOMİK al. Süresi dolmuş kilidi devralma da tek elde olmalı (denetçi bulgusu, 14 Kasım: "bayat sil + yeniden
+ * yaz" iki pencerede birbirinin taze kilidini siliyordu, 6/15 turda 2-3 başlatma): devralma `kilit.devral` (`wx`) ile
+ * seri hâle getirilir; devralan kilidi TAZE mi diye yeniden bakar, sonra siler ve yazar. Alındıysa true.
+ */
 function kilitAl(dizin, simdi = Date.now()) {
   fs.mkdirSync(dizin, { recursive: true })
   const yol = path.join(dizin, 'kilit')
-  for (let i = 0; i < 2; i++) {
+  if (yeniYaz(yol, simdi)) return true
+  if (kilitTaze(dizin, simdi)) return false
+  const devral = yol + '.devral'
+  if (!yeniYaz(devral, simdi)) {
+    // devralan çöktüyse (60 sn'den eski) devral kilidi bir sonraki pencere için temizlenir
     try {
-      fs.writeFileSync(yol, String(simdi), { flag: 'wx' })
-      return true
-    } catch (e) {
-      if (!e || e.code !== 'EEXIST' || kilitTaze(dizin, simdi)) return false
-      try {
-        fs.unlinkSync(yol)
-      } catch {
-        return false
-      }
+      if (Date.now() - fs.statSync(devral).mtimeMs > 60_000) fs.unlinkSync(devral)
+    } catch {
+      /* başkası temizledi */
+    }
+    return false
+  }
+  try {
+    if (kilitTaze(dizin, simdi)) return false // devralma beklerken başkası taze kilit yazdı
+    try {
+      fs.unlinkSync(yol)
+    } catch {
+      /* zaten yok */
+    }
+    return yeniYaz(yol, simdi)
+  } finally {
+    try {
+      fs.unlinkSync(devral)
+    } catch {
+      /* yok */
     }
   }
-  return false
 }
 
 function kilitBirak(dizin) {

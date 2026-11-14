@@ -122,7 +122,8 @@ function yenile({ cli, kok, sureMs = SURE_DK * 60_000, calistir }) {
       // artımlı; `force` YOK; dil grupları ayrı çağrı (bekçi sınırı için DIL_GRUPLARI notuna bak)
       const indeks = { filesIndexed: 0, errors: [] }
       for (const langs of DIL_GRUPLARI) {
-        const g = (await cagir('codebase_index', { langs })) || {}
+        const g = await cagir('codebase_index', { langs })
+        if (!g) throw new Error(`codebase_index (${langs.join(',')}): sonuç okunamadı (JSON değil); yaş sıfırlanmaz`)
         indeks.filesIndexed += g.filesIndexed || 0
         if (Array.isArray(g.errors)) indeks.errors = indeks.errors.concat(g.errors)
       }

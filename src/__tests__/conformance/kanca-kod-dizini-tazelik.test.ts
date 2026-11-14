@@ -137,7 +137,7 @@ describe('INV-KOD-DIZINI-TAZELIK-1 · karar', () => {
 })
 
 describe('INV-KOD-DIZINI-TAZELIK-1 · eşzamanlı pencereler ve sabotaj', () => {
-  it('10 pencere aynı anda açılırsa başlatıcı TAM BİR kez çalışır (atomik kilit)', () => {
+  it('10 pencere ARDIŞIK açılırsa başlatıcı TAM BİR kez çalışır (karar() taze kilidi görür; atomiklik aşağıdaki testlerde)', () => {
     son(SIMDI - 9 * GUN)
     let n = 0
     for (let i = 0; i < 10; i++) M.kancaKos({ dizin, simdi: SIMDI, baslatici: () => n++, bosBellekMB: 8000 })
@@ -157,6 +157,41 @@ describe('INV-KOD-DIZINI-TAZELIK-1 · eşzamanlı pencereler ve sabotaj', () => 
     const S = req(kopya) as Modul
     expect(S.kilitAl(dizin, SIMDI)).toBe(true)
     expect(S.kilitAl(dizin, SIMDI + 1000)).toBe(true)
+  })
+
+  it('GERÇEK YARIŞ: bayat kilide 8 süreç aynı anda saldırır, 5 turda her turda TAM BİR kazanan (denetçi bulgusu: eskiden 6/15 turda 2-3)', async () => {
+    const { spawn } = req('node:child_process') as typeof import('node:child_process')
+    const betik = `const m=require(${JSON.stringify(KAYNAK)});const t=Number(process.argv[1]);const d=process.argv[2];` +
+      `const bekle=Number(process.argv[3])-Date.now();const x=Date.now()+Math.max(0,bekle);while(Date.now()<x){};` +
+      `process.stdout.write(m.kilitAl(d,t)?'1':'0')`
+    for (let tur = 0; tur < 5; tur++) {
+      const d = path.join(dizin, `tur${tur}`)
+      fs.mkdirSync(d, { recursive: true })
+      const simdi = Date.now()
+      fs.writeFileSync(path.join(d, 'kilit'), String(simdi - M.KILIT_OMRU_MS - 60_000)) // yarım kalmış, süresi dolmuş
+      const baslangic = Date.now() + 1500 // hepsi aynı ana kadar meşgul bekler
+      const sonuclar = await Promise.all(
+        Array.from({ length: 8 }, () =>
+          new Promise<string>((res) => {
+            const p = spawn(process.execPath, ['-e', betik, String(simdi), d, String(baslangic)], { stdio: ['ignore', 'pipe', 'ignore'] })
+            let o = ''
+            p.stdout.on('data', (c) => (o += c))
+            p.on('close', () => res(o))
+          }),
+        ),
+      )
+      expect(sonuclar.filter((s) => s === '1').length, `tur ${tur}: ${sonuclar.join('')}`).toBe(1)
+    }
+  }, 60_000)
+
+  it('geleceğe taşan kayıtlar (saat ileri alınıp geri çekildi) geçersiz sayılır: günlerce susturmaz, kilit tutmaz', () => {
+    const ileri = SIMDI + 30 * GUN
+    fs.writeFileSync(path.join(dizin, 'son.json'), JSON.stringify({ tarih: ileri }))
+    expect(M.karar({ dizin, simdi: SIMDI }).eylem).toBe('baslat') // son.json geçersiz → kayıt yok → bayat
+    fs.writeFileSync(path.join(dizin, 'hata.json'), JSON.stringify({ tarih: ileri }))
+    expect(M.karar({ dizin, simdi: SIMDI }).eylem).toBe('baslat') // hata kaydı da geçersiz → bekleme yok
+    fs.writeFileSync(path.join(dizin, 'kilit'), String(ileri))
+    expect(M.kilitAl(dizin, SIMDI)).toBe(true) // gelecekteki damga taze sayılmaz, devralınır
   })
 
   it('kaynak sözleşmesi: kanca kopuk-baslat kullanır, detached/zamanlayıcı yok, çıkış her koşulda 0', () => {
