@@ -6,7 +6,7 @@
  * ── NİÇİN VAR ──
  * 1.7.0 npm'de YOK (npm `latest` 1.1.11; 1.7.0 yalnız GitHub'da, 14 Kasım 2026, yalnız tek dosyalık program
  * olarak yayınlı). Bizim dört sunucumuz (sage-mcp, kanban-mcp, mailbox-mcp, codebase-index-mcp) npm paketi
- * olarak çalışır. Bu betik GitHub'daki v1.7.0 etiketinden o dört paketi ve iç bağımlılıklarını (15 paket) kendi
+ * olarak çalışır. Bu betik GitHub'daki v1.7.0 etiketinden o dört paketi ve iç bağımlılıklarını (16 paket) kendi
  * makinemizde derler, `npm pack` ile tarball yapar. `kurulum.cjs` sonra bu tarball'lardan `npm ci` koşar.
  * Tarball'lar (≈9 MB) DEPOYA GİRMEZ (OPS onayı 1 Kasım): `~/.claude/venthub-wrongstack-170/` altında durur;
  * depoda yalnız bu tarif, `wrongstack-170.sha256` ve `package-lock.json` bulunur.
@@ -45,7 +45,7 @@ const PAKET_DIZINI = path.join(os.homedir(), '.claude', 'venthub-wrongstack-170'
 const SAGLAMA = path.join(ARAC, 'wrongstack-170.sha256')
 /** Dört sunucumuz. */
 const SUNUCULAR = ['sage-mcp', 'kanban-mcp', 'mailbox-mcp', 'codebase-index-mcp']
-/** Sunucuların iç bağımlılık kapanışı (15 paket; 1 Kasım ölçüldü, `kapanis()` aynısını yeniden hesaplar). */
+/** Sunucuların iç bağımlılık kapanışı (16 paket; 1 Kasım ölçüldü, `kapanis()` aynısını yeniden hesaplar). */
 const PAKETLER = ['agent-catalog', 'codebase-index-mcp', 'contracts', 'coordination', 'core', 'hq', 'kanban', 'kanban-mcp', 'mailbox-mcp', 'mcp', 'persistence', 'primitives', 'sage', 'sage-mcp', 'tools', 'wrongmemory-client']
 const PNPM = ['--config.package-manager-strict=false']
 
