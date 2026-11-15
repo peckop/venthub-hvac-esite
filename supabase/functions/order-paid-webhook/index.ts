@@ -31,6 +31,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { sentryCaptureMessage } from '../_shared/sentry.ts'
 import { metniMaskele } from '../_shared/maske.ts'
+import { timingSafeEquals, webhookImzaGecerli } from '../_shared/sabit_zaman.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (kardeş webhook'larla aynı pencere)
 const KIND = 'order_paid'
@@ -65,33 +66,6 @@ function json(body: unknown, status = 200): Response {
   })
 }
 
-/** Sabit zamanlı karşılaştırma — sır baytları zamanlamayla sızmasın (§3.5 disiplini). */
-function timingSafeEquals(a: string, b: string): boolean {
-  if (a.length !== b.length) return false
-  let diff = 0
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
-  return diff === 0
-}
-
-async function hmacValid(secret: string, raw: string, signature: string): Promise<boolean> {
-  try {
-    const key = await crypto.subtle.importKey(
-      'raw',
-      new TextEncoder().encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign'],
-    )
-    const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw))
-    const hex = Array.from(new Uint8Array(sig))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
-    return timingSafeEquals(hex, signature.replace(/^sha256=/i, '').toLowerCase())
-  } catch {
-    return false
-  }
-}
-
 interface OrderPaidPayload {
   order_id?: string
   tenant_id?: string | null
@@ -110,14 +84,18 @@ Deno.serve(async (req: Request) => {
 
     const sign = req.headers.get('x-signature') || ''
     const token = req.headers.get('x-webhook-secret') || ''
+    // İmzalı yol (ALT-138 sözleşmesi, returns-webhook ile aynı): imza `<x-timestamp>.<x-event-id>.<ham gövde>`
+    // üzerindedir; zaman ya da olay kimliği eksikse imzalı yol reddedilir (webhookImzaGecerli fail-closed).
+    const tsHeader = req.headers.get('x-timestamp') || ''
+    const eventId = (req.headers.get('x-event-id') || '').trim()
     let authorized = false
-    if (sign) authorized = await hmacValid(secret, raw, sign)
+    if (sign) authorized = await webhookImzaGecerli(secret, tsHeader.trim(), eventId, raw, sign)
+    // ISTISNA-OPS293-D1 (15 Kasim 2026): duz secret yolu; kapanis D2 migration paketiyle (3 gonderen SQL imzali yollayinca). Silinmeden once SQL gondericiler imzalanmali.
     if (!authorized && token) authorized = timingSafeEquals(token, secret)
     if (!authorized) return json({ error: 'unauthorized' }, 401)
 
     // Timestamp ZORUNLU. "Başlık varsa kontrol et" fail-OPEN'dır: göndermeyen çağıran için
     // guard hiç çalışmaz (§3.5 — yeni kapıya geçiş modu konmaz).
-    const tsHeader = req.headers.get('x-timestamp') || ''
     if (!tsHeader) return json({ error: 'missing_timestamp' }, 401)
     const t = /^\d+$/.test(tsHeader.trim()) ? parseInt(tsHeader.trim(), 10) : Date.parse(tsHeader)
     if (!t || Math.abs(Date.now() - t) > SKEW_MS) return json({ error: 'stale_timestamp' }, 401)
