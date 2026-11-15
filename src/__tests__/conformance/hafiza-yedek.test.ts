@@ -23,11 +23,13 @@ interface Modul {
   sirKalibiVar: (fark: string) => boolean
   yedekYasiSn: (dir: string, simdiSn: number) => number | null
   bekleyenVar: (dir: string) => boolean
-  yedekle: (a: { dir: string; sebep?: string; simdi?: Date }) => { durum: string; push?: boolean }
-  karar: (a: { olay: string; yasSn: number | null; bekleyen: boolean; sonDenemeYasSn: number | null }) => {
+  yedekle: (a: { dir: string; sebep?: string; simdi?: Date }) => { durum: string; push?: boolean; disarida?: string[]; neden?: string }
+  karar: (a: { olay: string; yasSn: number | null; bekleyen: boolean; sonDenemeYasSn: number | null; sonBasarisiz?: string | null }) => {
     yedekle: boolean
     satir: string | null
   }
+  sonKayit: (dir: string) => { durum: string; push?: boolean; disarida?: string[] } | null
+  basarisizNeden: (k: { durum: string; push?: boolean; disarida?: string[]; neden?: string } | null) => string | null
   kancaKos: (girdi: { hook_event_name: string }, o: { dir: string; simdiSn: number }) => { cikti: unknown }
 }
 const m = gerek(MODUL) as Modul
@@ -88,6 +90,53 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     expect(commitSayisi(dir)).toBe(once)
     expect(git(dir, 'diff', '--cached', '--name-only')).toBe('')
     expect(fs.readFileSync(path.join(dir, '.hafiza-commit-uyari.log'), 'utf8')).toContain('SIR KALIBI')
+  })
+
+  it('ARC-319: sır kalıbı yalnız KENDİ dosyasını dışarıda bırakır, temiz dosya yine commit olur (6 gün sessiz düşme)', () => {
+    const once = commitSayisi(dir)
+    fs.writeFileSync(path.join(dir, 'sizinti.md'), 'anahtar ' + 'sk-ant-' + 'a'.repeat(70) + '\n')
+    fs.writeFileSync(path.join(dir, 'temiz.md'), 'sıradan ders\n')
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('commit')
+    expect(r.disarida).toEqual(['sizinti.md'])
+    expect(commitSayisi(dir)).toBe(once + 1)
+    expect(git(dir, 'show', '--name-only', '--format=', 'HEAD')).toBe('temiz.md')
+    expect(git(dir, 'diff', '--cached', '--name-only')).toBe('')
+    expect(fs.readFileSync(path.join(dir, '.hafiza-commit-uyari.log'), 'utf8')).toContain('sizinti.md')
+    // Sır içeren dosya hiçbir commit'e sızmadı.
+    expect(git(dir, 'log', '--all', '--format=', '--name-only')).not.toContain('sizinti.md')
+  })
+
+  it('ARC-319: son deneme kaydı yazılır; başarısız neden okunur, başarıda null', () => {
+    fs.writeFileSync(path.join(dir, 'sizinti.md'), 'anahtar ' + 'sk-ant-' + 'a'.repeat(70) + '\n')
+    m.yedekle({ dir, sebep: 'test' })
+    const k = m.sonKayit(dir)
+    expect(k?.durum).toBe('sir-kalibi')
+    expect(m.basarisizNeden(k)).toContain('hiçbir şey yedeklenemedi (sizinti.md')
+    expect(m.basarisizNeden({ durum: 'commit', push: false })).toContain('push düştü')
+    expect(m.basarisizNeden({ durum: 'hata', neden: 'x' })).toContain('yedek hata verdi: x')
+    expect(m.basarisizNeden({ durum: 'commit', push: true })).toBeNull()
+    expect(m.basarisizNeden({ durum: 'degisiklik-yok' })).toBeNull()
+    expect(m.basarisizNeden(null)).toBeNull()
+    expect(m.sonKayit(path.join(dir, 'yok'))).toBeNull()
+    // Kayıt md değil: commit'e girmez, bekleyen saymaz.
+    fs.rmSync(path.join(dir, 'sizinti.md'))
+    expect(m.bekleyenVar(dir)).toBe(false)
+  })
+
+  it('ARC-319: kanca satırı "başlatıldı" yalnız başlatıldıysa der; başarısız son deneme neden ile görünür', () => {
+    const k = (o: Partial<Parameters<Modul['karar']>[0]>) =>
+      m.karar({ olay: 'UserPromptSubmit', yasSn: 5000, bekleyen: true, sonDenemeYasSn: null, ...o })
+    expect(k({}).satir).toContain('başlatıldı')
+    // Deneme aralığı dolmadı: yedek başlatılmadı, satır "başlatıldı" DEMEZ.
+    expect(k({ sonDenemeYasSn: 60 }).satir).not.toContain('başlatıldı')
+    const b = k({ sonDenemeYasSn: 60, sonBasarisiz: 'hiçbir şey yedeklenemedi (a.md sır kalıbı nedeniyle dışarıda)' })
+    expect(b.satir).toContain('⛔SON YEDEK BAŞARISIZ: hiçbir şey yedeklenemedi (a.md')
+    expect(b.satir).not.toContain('başlatıldı')
+    // Bekleyen yoksa eski başarısızlık satırı kirletmez.
+    expect(k({ bekleyen: false, sonBasarisiz: 'x' }).satir).toBeNull()
+    const s = m.karar({ olay: 'SessionStart', yasSn: 9000, bekleyen: true, sonDenemeYasSn: 60, sonBasarisiz: 'y' })
+    expect(s.satir).toContain('⛔SON YEDEK BAŞARISIZ: y')
   })
 
   it('yaş ve bekleyen: son commit yaşı sn olarak ölçülür, izlenmeyen md bekleyen sayılır', () => {

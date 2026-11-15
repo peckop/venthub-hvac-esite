@@ -38,6 +38,7 @@ const ESIK_SN = 3600
 const DENEME_ARALIGI_SN = 600
 const ISARET = '.hafiza-yedek-deneme'
 const UYARI_LOGU = '.hafiza-commit-uyari.log'
+const SON_KAYIT = '.hafiza-yedek-son'
 const PATHSPEC = ['*.md', 'MEMORY.md.oncesi-*']
 
 // Tam değer kalıpları (kırpılmış "..." parçaları eşleşmez). Eski betikle AYNI liste; gevşetilmez.
@@ -99,16 +100,22 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date() } =
         // Bu kalıba uyan dosya yok: öteki kalıp yine eklenir.
       }
     }
-    if (git(dir, ['diff', '--cached', '--name-only']).trim() === '') return { durum: 'degisiklik-yok' }
-    if (sirKalibiVar(git(dir, ['diff', '--cached', '-U0']))) {
+    const dosyalar = git(dir, ['diff', '--cached', '--name-only', '-z']).split('\0').filter(Boolean)
+    if (dosyalar.length === 0) return sonuc(dir, simdi, sebep, { durum: 'degisiklik-yok' })
+    // ARC-319: sır kalıbı yalnız KENDİ dosyasını dışarıda bırakır, kalan yedek alınır. (Eskiden tek eşleşme TÜM yedeği
+    // durduruyordu: 9-15 Kasım arası 6 gün commit atılmadı; bir nottaki sahte bağlantı örneği kalıbı tetikledi.)
+    const disarida = []
+    for (const d of dosyalar) {
+      if (!sirKalibiVar(git(dir, ['diff', '--cached', '-U0', '--', d]))) continue
+      disarida.push(d)
+      git(dir, ['reset', '-q', '--', d])
       try {
-        fs.appendFileSync(path.join(dir, UYARI_LOGU), simdi.toISOString() + ' SIR KALIBI: commit atilmadi, elle bak (' + sebep + ')\n')
+        fs.appendFileSync(path.join(dir, UYARI_LOGU), simdi.toISOString() + ' SIR KALIBI: ' + d + ' yedege ALINMADI, elle bak (' + sebep + ')\n')
       } catch {
-        // Günlük yazılamazsa da commit atılmaz; asıl koruma indeksi temizlemektir.
+        // Günlük yazılamazsa da dosya dışarıda kalır; asıl koruma indeksten çıkarmaktır.
       }
-      git(dir, ['reset', '-q'])
-      return { durum: 'sir-kalibi' }
     }
+    if (git(dir, ['diff', '--cached', '--name-only']).trim() === '') return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida })
     const iso = simdi.toISOString().slice(0, 16) + 'Z'
     git(dir, ['commit', '-q', '-m', 'hafiza: ' + sebep + ' ' + iso])
     let push = false
@@ -116,19 +123,49 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date() } =
       git(dir, ['push', '-q', 'origin', 'master'], 25000)
       push = true
     } catch {
-      // Ağ yok / uzak yok: yerel commit yeterli, yaş uyarısı zaten görünür.
+      // Ağ yok / uzak yok: yerel commit yeterli; push durumu son-durum kaydına yazılır, kanca satırı söyler.
     }
-    return { durum: 'commit', push }
-  } catch {
-    return { durum: 'hata' }
+    return sonuc(dir, simdi, sebep, { durum: 'commit', push, disarida })
+  } catch (e) {
+    return sonuc(dir, simdi, sebep, { durum: 'hata', neden: String((e && e.message) || e).split('\n')[0].slice(0, 160) })
   }
+}
+
+/** Son yedek denemesinin sonucunu .hafiza-yedek-son dosyasına yazar (md değil: commit'e girmez); kanca satırı bunu okur. */
+function sonuc(dir, simdi, sebep, r) {
+  try {
+    fs.writeFileSync(path.join(dir, SON_KAYIT), JSON.stringify({ sn: Math.floor(simdi.getTime() / 1000), sebep, ...r }))
+  } catch {
+    // Kayıt yazılamazsa kanca eski kaydı okur; yedeğin kendisi etkilenmez.
+  }
+  return r
+}
+
+/** Son deneme kaydı; yok/bozuk → null. */
+function sonKayit(dir) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(dir, SON_KAYIT), 'utf8'))
+  } catch {
+    return null
+  }
+}
+
+/** Kayıt BAŞARISIZ bir son denemeyi gösteriyorsa kısa neden, yoksa null. */
+function basarisizNeden(k) {
+  if (!k) return null
+  const dosya = Array.isArray(k.disarida) && k.disarida.length ? ' (' + k.disarida.slice(0, 3).join(', ') + ' sır kalıbı nedeniyle dışarıda)' : ''
+  if (k.durum === 'sir-kalibi') return 'hiçbir şey yedeklenemedi' + dosya
+  if (k.durum === 'hata') return 'yedek hata verdi: ' + (k.neden || 'bilinmiyor')
+  if (k.durum === 'commit' && k.push === false) return 'commit atıldı ama push düştü' + dosya
+  if (k.durum === 'commit' && dosya) return 'kısmen yedeklendi' + dosya
+  return null
 }
 
 /**
  * Saf karar. girdi: { olay, yasSn, bekleyen, sonDenemeYasSn }.
  * Dönüş: { yedekle: boolean, satir: string | null }.
  */
-function karar({ olay, yasSn, bekleyen, sonDenemeYasSn }) {
+function karar({ olay, yasSn, bekleyen, sonDenemeYasSn, sonBasarisiz }) {
   if (olay === 'PreCompact') return { yedekle: true, satir: null }
   if (olay !== 'SessionStart' && olay !== 'UserPromptSubmit') return { yedekle: false, satir: null }
   if (yasSn === null || yasSn === undefined) return { yedekle: false, satir: null }
@@ -136,13 +173,16 @@ function karar({ olay, yasSn, bekleyen, sonDenemeYasSn }) {
   const eski = yasSn > ESIK_SN
   const denemeAraligiGecti = sonDenemeYasSn === null || sonDenemeYasSn === undefined || sonDenemeYasSn >= DENEME_ARALIGI_SN
   const yedekle = bekleyen && eski && denemeAraligiGecti
+  // "Başlatıldı" yalnız gerçekten başlatıldıysa; son deneme başarısızsa neden açıkça yazılır (6 gün sessiz düşme dersi).
+  const basarisiz = bekleyen && sonBasarisiz ? ' · ⛔SON YEDEK BAŞARISIZ: ' + sonBasarisiz : ''
+  const arka = yedekle ? ' (arka planda yedek başlatıldı)' : ''
   if (olay === 'SessionStart') {
-    const durum = !bekleyen ? 'bekleyen değişiklik yok' : eski ? 'bekleyen değişiklik VAR ⚠ (arka planda yedek başlatıldı)' : 'bekleyen değişiklik var'
-    return { yedekle, satir: 'HAFIZA YEDEK: son commit ' + dk + ' dk önce · ' + durum }
+    const durum = !bekleyen ? 'bekleyen değişiklik yok' : eski ? 'bekleyen değişiklik VAR ⚠' + arka : 'bekleyen değişiklik var'
+    return { yedekle, satir: 'HAFIZA YEDEK: son commit ' + dk + ' dk önce · ' + durum + basarisiz }
   }
   // UserPromptSubmit: yalnız uyarılacak durumda konuşur.
   if (bekleyen && eski) {
-    return { yedekle, satir: '⚠HAFIZA YEDEK: son commit ' + dk + ' dk önce, bekleyen değişiklik var (arka planda yedek başlatıldı)' }
+    return { yedekle, satir: '⚠HAFIZA YEDEK: son commit ' + dk + ' dk önce, bekleyen değişiklik var' + arka + basarisiz }
   }
   return { yedekle: false, satir: null }
 }
@@ -181,6 +221,7 @@ function kancaKosIc(girdi, { dir = hafizaDizini(), simdiSn = Math.floor(Date.now
     yasSn: yedekYasiSn(dir, simdiSn),
     bekleyen: bekleyenVar(dir),
     sonDenemeYasSn: isaretYasiSn(dir, simdiSn),
+    sonBasarisiz: basarisizNeden(sonKayit(dir)),
   })
   if (k.yedekle) {
     try {
@@ -261,6 +302,8 @@ module.exports = {
   bekleyenVar,
   yedekle,
   karar,
+  sonKayit,
+  basarisizNeden,
   kancaKos,
   yedekUyariSatiri,
 }

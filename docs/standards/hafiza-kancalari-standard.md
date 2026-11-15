@@ -437,7 +437,10 @@ hafıza yazıları yedeksiz kalırdı.
 3. **Yaş = son commit'in yaşı.** Bekleyen değişiklik yokken uyarı ve yedek YOKTUR (yedeklenecek bir şey yok);
    SessionStart yaş satırını her durumda söyler, UserPromptSubmit yalnız `bekleyen + eski` iken konuşur.
 4. **Sır taraması gevşetilmez.** Staged farkta tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…,
-   postgres URL'si) varsa commit ATILMAZ, `.hafiza-commit-uyari.log`'a yazılır, indeks `git reset -q` ile temizlenir.
+   postgres URL'si) taşıyan DOSYA yedeğe alınmaz: indeksten çıkarılır ve `.hafiza-commit-uyari.log`'a adıyla yazılır;
+   kalan dosyalar commit olur (ARC-319: eskiden tek eşleşme TÜM yedeği durduruyordu, 9-15 Kasım arası 6 gün commit
+   atılmadı). Her denemenin sonucu `.hafiza-yedek-son` dosyasına yazılır; kanca satırı "başlatıldı"yı yalnız
+   gerçekten başlattığında söyler ve son deneme başarısızsa nedenini (dışarıda kalan dosya, push düşmesi, hata) yazar.
 5. **`git add` kalıpları AYRI verilir.** Eşleşmeyen kalıpta git hiçbir şey eklemeden düşer: eski betik
    `MEMORY.md.oncesi-*` dosyası yokken sessizce hiçbir şey yedeklemiyordu (ARC-92 testinin ilk koşusunda ölçüldü;
    bugün 6 dosya var, bu yüzden canlıda tetiklenmiyordu).
