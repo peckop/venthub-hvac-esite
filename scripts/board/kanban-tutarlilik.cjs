@@ -33,7 +33,13 @@ const KURAL = Object.freeze({
   numarasiz: 'Başlığında departman kodu olmayan kart',
   haftasiz: 'Hafta etiketi olmadığı için ekranda görünmeyen biten kart',
   kararAcik: "Karar verilmiş ama Backlog'da duran kart",
+  // ARC-102 kapı 2: üçü de YALNIZ RAPOR (plan() onarmaz; karar insanda).
+  kanitsizDone: 'Son 14 günde Done olmuş ama kanıt (kabul ölçütü) kaydı olmayan kart',
+  kararErtelendi: 'Hem «karar-bekliyor» hem «ertelendi» etiketli kart',
+  ertelendiVadesiz: '«ertelendi» etiketli ama vadesi (dueDate) olmayan kart',
 })
+
+const KANITSIZ_GUN = 14
 
 function etiketler(t) {
   return (Array.isArray(t.labels) ? t.labels : []).map((l) => String(typeof l === 'string' ? l : (l && l.name) || '').toLowerCase())
@@ -44,7 +50,7 @@ function bitmisMi(t) {
 }
 
 /** Kartın ihlal ettiği kurallar (kokpit `tutarsizlariBul` ile aynı tanım). Arşivli/başlıksız kart sayılmaz. */
-function ihlaller(t) {
+function ihlaller(t, simdi = new Date()) {
   if (!t || typeof t.title !== 'string' || t.status === 'archived') return []
   const e = etiketler(t)
   const bitmis = bitmisMi(t)
@@ -55,6 +61,12 @@ function ihlaller(t) {
   // ARC-141 (15 Ekim): yalnız SÜTUNA bakar. Eskiden `|| status === 'pending'` de sayılıyordu; To Do kartları da pending
   // olduğundan onarımdan sonra bile 9 kart tutarsız görünüyordu (To Do'daki karar-verildi kart zaten sıradadır).
   if (!bitmis && e.includes('karar-verildi') && t.columnId === 'backlog') o.push('kararAcik')
+  // ARC-102 kapı 2 (12 Ekim: kopya kart update_task columnId=done ile Done'a girdi, sunucu engellemedi). Eski tarih sayılmaz (geçmiş).
+  const bitis = typeof t.completedAt === 'string' ? Date.parse(t.completedAt) : NaN
+  const kabulYok = !(Array.isArray(t.successCriteria) ? t.successCriteria : []).length
+  if (bitmis && kabulYok && !e.includes('kanit-muaf') && Number.isFinite(bitis) && simdi.getTime() - bitis <= KANITSIZ_GUN * 86_400_000) o.push('kanitsizDone')
+  if (!bitmis && e.includes('karar-bekliyor') && e.includes('ertelendi')) o.push('kararErtelendi')
+  if (!bitmis && e.includes('ertelendi') && !t.dueDate) o.push('ertelendiVadesiz')
   return o
 }
 
@@ -84,7 +96,7 @@ function haftaEtiketi(t, simdi = new Date()) {
  * karar-verildi kart zaten sıradadır, ihlal sayılmaz; onarımdan sonra aynı tarama 0 kararAcik bulur.
  */
 function plan(t, simdi = new Date()) {
-  const ih = ihlaller(t)
+  const ih = ihlaller(t, simdi)
   const p = { etiketEkle: null, todoyaTasi: false, yalnizRapor: [] }
   for (const k of ih) {
     if (k === 'haftasiz') p.etiketEkle = haftaEtiketi(t, simdi)
@@ -104,7 +116,7 @@ async function calistir({ kartlar, yaz, simdi = new Date(), kartKimligi } = {}) 
   for (const t of kartlar || []) {
     if (kartKimligi && t.id !== kartKimligi) continue
     sonuc.taranan++
-    const ih = ihlaller(t)
+    const ih = ihlaller(t, simdi)
     if (ih.length === 0) continue
     sonuc.tutarsiz++
     for (const k of ih) sonuc.kurallar[k] = (sonuc.kurallar[k] || 0) + 1

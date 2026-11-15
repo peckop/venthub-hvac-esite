@@ -284,6 +284,19 @@ try {
 }
 
 /**
+ * ── SAAT (ARC-102 kapı 1) — HER MESAJDA ──
+ * 11 ve 12 Ekim'de pencereler damgayı tahminle ~2 saat ileri yazdı; açılıştaki "Şimdi:" satırı uzun oturumda bayatlar.
+ * Gerçek İstanbul saati (scripts/arac/zaman.cjs, ARC-302). FAIL-OPEN, vana: VENTHUB_SAAT_SATIRI_KAPAT=1.
+ */
+try {
+  if (process.env.VENTHUB_SAAT_SATIRI_KAPAT !== '1') {
+    process.stdout.write('SAAT: ' + require(path.join(__dirname, '..', '..', 'scripts', 'arac', 'zaman.cjs')).zamanSatiri(new Date()) + '\n')
+  }
+} catch {
+  // satır yok: kanca bozulmaz
+}
+
+/**
  * ── KAYIT (ARC-82) — HER MESAJDA ──
  * Pencerenin konuşma dosyasının boyutu: "KAYIT: 612 MB"; 1 GB ⚠, 1,5 GB ⛔ yeni oturuma devret.
  * Yalnız statSync (dosya açılmaz). Gerekçe ve eşikler: baglam-doluluk.cjs "KAYIT BOYUTU".
