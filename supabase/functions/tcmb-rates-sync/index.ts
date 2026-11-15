@@ -67,7 +67,7 @@ serve(async (req: Request) => {
       headers: { 'Content-Type': 'application/json' }
     })
   }
-  const supabase = createClient(supabaseUrl, serviceKey)
+  const supabase = istemciOlustur(supabaseUrl, serviceKey)
 
   // 1) Eşzamanlı kapı (await YOK): sürmekte olan istek ya da yakın başarılı istek varsa hemen dön.
   const ilkKarar = cooldownKarari({ simdiMs: Date.now(), sonBasariMs, surenIstek, bugununBultenTam: null })
@@ -101,7 +101,11 @@ serve(async (req: Request) => {
   }
 })
 
-async function esitle(supabase: ReturnType<typeof createClient>): Promise<Response> {
+// İstemci tipi çağrı noktasındaki çıkarımla AYNI olsun (createClient'ın genel ReturnType'ı uyuşmaz: Deno check TS2345).
+const istemciOlustur = (url: string, key: string) => createClient(url, key)
+type Istemci = ReturnType<typeof istemciOlustur>
+
+async function esitle(supabase: Istemci): Promise<Response> {
   let xml = ''
   try {
     // Zaman aşımı: asılı kalan TCMB bağlantısı süren-istek bayrağını isolate sınırına kadar tutmasın (cron kaçmasın).

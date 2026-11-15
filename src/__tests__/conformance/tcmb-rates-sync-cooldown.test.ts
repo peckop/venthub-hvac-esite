@@ -106,7 +106,7 @@ function ucSorunlari(ham: string): string[] {
   const fetchKonum = kod.indexOf('await fetch(TCMB_URL')
   const esitleKonum = kod.indexOf('async function esitle')
   const bayrak = kod.indexOf('surenIstek = true')
-  const ilkAwait = kod.indexOf('await ', kod.indexOf('const supabase = createClient'))
+  const ilkAwait = kod.indexOf('await ', kod.indexOf('const supabase = istemciOlustur'))
   if (fetchKonum < 0 || serve < 0 || esitleKonum < 0) return ['uc yapisi bulunamadi']
   if (esitleKonum > fetchKonum) s.push('TCMB fetch esitle disinda')
   // her cooldown dönüşü fetch'ten ÖNCE ve iki tane (eşzamanlı kapı + DB kapısı)
