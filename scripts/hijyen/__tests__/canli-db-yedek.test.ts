@@ -87,6 +87,7 @@ function kos(komut: string[], ek: Record<string, string> = {}, oz: { hedef?: str
     PG_RESTORE_YOLU: sahte,
     PSQL_YOLU: sahte,
     SUPABASE_DB_URL: URL_SIR,
+    CANLI_YEDEK_KIMLIK: 'url',
     FAKE_SIZINTI: URL_SIR,
     FAKE_LOG: log,
     ...ek,
@@ -366,5 +367,55 @@ describe('INV-CANLI-YEDEK-1 saklama (14 gün, en az 3, doğrulanmış koruma)', 
     expect(vhencler(hedef).sort()).toEqual(['yedek-eski.vhenc', ad(10), ad(11), ad(14)].sort())
     expect(fs.existsSync(path.join(hedef, 'notlar.txt'))).toBe(true)
     expect(fs.existsSync(path.join(hedef, ad(1).replace('.vhenc', '.manifest.json')))).toBe(false)
+  })
+})
+
+describe('INV-CANLI-YEDEK-1 geçici giriş rolü yolu (Yönetim API, parola sıfırlanmaz)', () => {
+  const GECICI = 'GeciciRolParola77xyz'
+  const REF = 'abcdefghijklmnopqrst'
+  const kimlikBetigi = (icerik: string): string => {
+    const yol = path.join(taban, `kimlik-${Math.random().toString(36).slice(2)}.cjs`)
+    fs.writeFileSync(yol, icerik)
+    return yol
+  }
+  const gecici = (betik: string, ek: Record<string, string> = {}) => ({
+    CANLI_YEDEK_KIMLIK: 'gecici-rol',
+    CANLI_YEDEK_KIMLIK_BETIGI: betik,
+    CANLI_YEDEK_PROJE_REF: REF,
+    CANLI_YEDEK_HOST: 'aws-0-eu-central-1.pooler.supabase.com',
+    ...ek,
+  })
+
+  it('geçici rolün parolası PGPASSWORD ile pg_dump\'a gider, çıktıda ve argv\'de geçmez', () => {
+    const betik = kimlikBetigi(`process.stdout.write(JSON.stringify({ role: 'cli_login_supabase_read_only_user', password: '${GECICI}', ttl_seconds: 300 }))`)
+    const hedef = path.join(taban, 'hedef-gecici-rol')
+    const r = kos(['al'], gecici(betik), { hedef })
+    expect(r.durum).toBe(0)
+    expect(r.cikti + r.hata).not.toContain(GECICI)
+    const kayitlar = fs
+      .readFileSync(r.log, 'utf8')
+      .trim()
+      .split('\n')
+      .map((s) => JSON.parse(s) as { argv: string[]; pgpass: string | null; pghost: string | null })
+    const dokum = kayitlar.find((k) => k.argv.some((x) => x.startsWith('--file=')))
+    expect(dokum?.pgpass).toBe(GECICI)
+    expect(dokum?.pghost).toBe('aws-0-eu-central-1.pooler.supabase.com')
+    for (const k of kayitlar) expect(k.argv.join(' ')).not.toContain(GECICI)
+    expect(vhencler(hedef)).toHaveLength(1)
+  })
+
+  it('kimlik betiği ölçülemedi (çıkış 3) derse yedek YAZILMAZ ve çıkış 3 olur', () => {
+    const betik = kimlikBetigi("console.error('SUPABASE_ACCESS_TOKEN tanımlı değil: ölçülemedi'); process.exit(3)")
+    const hedef = path.join(taban, 'hedef-gecici-rol-yok')
+    const r = kos(['al'], gecici(betik), { hedef })
+    expect(r.durum).toBe(3)
+    expect(vhencler(hedef)).toHaveLength(0)
+  })
+
+  it('sunucu ya da proje ref yoksa tahmin edilmez: ölçülemedi', () => {
+    const hedef = path.join(taban, 'hedef-gecici-rol-ref')
+    const r = kos(['al'], { CANLI_YEDEK_KIMLIK: 'gecici-rol', SUPABASE_DB_URL: '' }, { hedef })
+    expect(r.durum).toBe(3)
+    expect(vhencler(hedef)).toHaveLength(0)
   })
 })

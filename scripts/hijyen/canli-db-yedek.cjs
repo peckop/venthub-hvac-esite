@@ -46,9 +46,9 @@ const VARSAYILAN_HEDEF = "G:/Drive'ım/VentHub-Tasima/yedek/canli-db"
 const AD_DESENI = /^yedek-(\d{8}T\d{6}Z)\.vhenc$/
 // Supabase'in yönettiği ya da geri yüklenemeyen şemalar: AÇIKÇA dışlanır (izin listesi değil, dışlama listesi — plan §5 bulgu 4).
 // vault: sırlar proje anahtarıyla şifreli, başka projeye geri yüklenemez (yeniden girilecek sır adları cetvelde). cron: işler migration'lardan kurulur.
-const DISLANAN_SEMALAR = ['extensions', 'graphql', 'graphql_public', 'pgbouncer', 'pgsodium', 'pgsodium_masks', 'realtime', '_realtime', 'supabase_functions', 'vault', 'net', 'cron']
+const DISLANAN_SEMALAR = ['extensions', 'graphql', 'graphql_public', 'pgbouncer', 'pgsodium', 'pgsodium_masks', 'realtime', '_realtime', 'supabase_functions', 'vault', 'net', 'cron', 'pgroonga']
 // Oturum/belirteç tabloları: yapı gelir, VERİ gelmez (plan §5 bulgu 10: gereksiz ve hassas).
-const DISLANAN_VERI = ['auth.sessions', 'auth.refresh_tokens', 'auth.flow_state', 'auth.one_time_tokens', 'auth.mfa_challenges', 'auth.saml_relay_states']
+const DISLANAN_VERI = ['auth.sessions', 'auth.refresh_tokens', 'auth.flow_state', 'auth.one_time_tokens', 'auth.mfa_challenges', 'auth.saml_relay_states', 'auth.mfa_amr_claims']
 const SEMA_SORGUSU = "select nspname from pg_namespace where nspname !~ '^pg_' and nspname <> 'information_schema' order by 1"
 const AZAMI_BAYT = 1.5 * 1024 * 1024 * 1024
 
@@ -126,6 +126,55 @@ function bagKapsami(ham) {
   }
   if (parola) env.PGPASSWORD = parola
   return { env, gizli: [...gizli].sort((a, b) => b.length - a.length) }
+}
+// Bağlantı kaynağı: varsayılan geçici salt-okunur giriş rolü (Yönetim API'si; `supabase db dump`un yolu, parola
+// SIFIRLANMAZ/girilmez); CANLI_YEDEK_KIMLIK=url ise SUPABASE_DB_URL (parolası elle verilen eski yol).
+// Geçici rol yolunda sunucu/port/veritabanı SUPABASE_DB_URL'den (yalnız bu üç parça, kullanıcı ve parola ALINMAZ)
+// ya da CANLI_YEDEK_HOST / CANLI_YEDEK_PORT / CANLI_YEDEK_VERITABANI'ndan gelir.
+function baglantiKur() {
+  if ((process.env.CANLI_YEDEK_KIMLIK || 'gecici-rol') === 'url') {
+    const ham = process.env.SUPABASE_DB_URL
+    if (!ham) throw new YedekHatasi('SUPABASE_DB_URL tanımlı değil')
+    return bagKapsami(ham)
+  }
+  let host = process.env.CANLI_YEDEK_HOST || ''
+  let port = process.env.CANLI_YEDEK_PORT || ''
+  let veritabani = process.env.CANLI_YEDEK_VERITABANI || ''
+  let ref = process.env.CANLI_YEDEK_PROJE_REF || ''
+  const ham = process.env.SUPABASE_DB_URL
+  if (ham && (!host || !ref)) {
+    try {
+      const u = new URL(ham)
+      host = host || u.hostname
+      port = port || u.port
+      veritabani = veritabani || decodeURIComponent(u.pathname.replace(/^\//, ''))
+      const sonek = decodeURIComponent(u.username).split('.')[1] // havuz kullanıcısı: postgres.<proje-ref>
+      if (!ref && sonek) ref = sonek
+    } catch {
+      /* ayrıştırılamadıysa açık ortam değişkenlerine bakılır */
+    }
+  }
+  if (!host || !ref) throw new YedekHatasi('geçici rol yolu için sunucu ve proje ref gerekir (CANLI_YEDEK_HOST, CANLI_YEDEK_PROJE_REF ya da SUPABASE_DB_URL’den türetilir): ölçülemedi', 3)
+  const kimlikBetigi = process.env.CANLI_YEDEK_KIMLIK_BETIGI || path.join(__dirname, 'canli-db-yedek-kimlik.cjs')
+  const r = spawnSync(process.execPath, [kimlikBetigi], { encoding: 'utf8', env: { ...process.env, CANLI_YEDEK_PROJE_REF: ref }, timeout: 60000 })
+  if (r.error || r.status !== 0) throw new YedekHatasi(`geçici giriş rolü alınamadı (çıkış ${r.status ?? 'yok'}): ${String(r.stderr || (r.error && r.error.message) || '').slice(0, 200)}`, r.status === 3 ? 3 : 1)
+  let kim
+  try {
+    kim = JSON.parse(r.stdout)
+  } catch {
+    throw new YedekHatasi('geçici giriş rolü çıktısı çözümlenemedi (içerik gösterilmez)')
+  }
+  const kullanici = /pooler\.supabase\.com$/.test(host) ? `${kim.role}.${ref}` : kim.role
+  const env = {
+    PGHOST: host,
+    PGPORT: port || '5432',
+    PGUSER: kullanici,
+    PGDATABASE: veritabani || 'postgres',
+    PGSSLMODE: 'require',
+    PGCONNECT_TIMEOUT: '30',
+    PGPASSWORD: kim.password,
+  }
+  return { env, gizli: [kim.password, host].filter(Boolean).sort((a, b) => b.length - a.length) }
 }
 function suz(metin, gizli) {
   let s = String(metin == null ? '' : metin)
@@ -319,10 +368,10 @@ function al() {
   const hedef = hedefDizini()
   if (hedefDepoIcindeMi(hedef)) throw new YedekHatasi('CANLI_YEDEK_DIZIN bir git deposunun içinde — yedek kişisel veri taşır, reddedildi')
   const anahtar = anahtarOku(hedef) // anahtar sorunu varsa yedek BAŞLAMADAN dur
-  const ham = process.env.SUPABASE_DB_URL
-  if (!ham) throw new YedekHatasi('SUPABASE_DB_URL tanımlı değil')
-  const { env: pgEnv, gizli } = bagKapsami(ham)
+  const { env: pgEnv, gizli } = baglantiKur()
   const ek = (process.env.CANLI_YEDEK_PG_EK_BAYRAK || '').split(/\s+/).filter(Boolean)
+  // geçici `cli_login_postgres` rolü yalnız net/public görür; auth, storage, vault için `SET ROLE postgres` (pg_dump --role) şart.
+  if ((process.env.CANLI_YEDEK_KIMLIK || 'gecici-rol') !== 'url' && process.env.CANLI_YEDEK_ROL !== 'salt-okunur') ek.push('--role=postgres')
   for (const b of ek) if (!b.startsWith('--') || b.includes('@')) throw new YedekHatasi('CANLI_YEDEK_PG_EK_BAYRAK yalnız `--` bayrakları içerebilir ve bağlantı bilgisi taşıyamaz')
   fs.mkdirSync(hedef, { recursive: true })
   const baslangic = Date.now()
