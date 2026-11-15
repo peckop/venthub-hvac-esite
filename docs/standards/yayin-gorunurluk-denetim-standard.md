@@ -251,7 +251,7 @@ Kural: sektör sayfası talebi tek bir rakibin varlığıyla gerekçelendirilmez
   hariç, ham HTML) gelmesi gerekir. Aile ve model sayfasında: (a) görünür kırıntıda ana kategori (+ alt kategori; model
   sayfasında aile) gerçek `<a href>`, aile sayfasında **≥2** (Ana Sayfa + ana kategori), son basamak bağlantısız ve
   `aria-current="page"`; **kırıntıda marka basamağı YOKTUR** (URN-126, canlıda ölçüldü 2026-10-13: `/tr/products/seat-serisi`
-  BreadcrumbList = Ana Sayfa › Fanlar › Korozyona ve Aside Dayanımlı Fanlar › aile adı); markaya bağlantı kırıntının değil sayfadaki
+  görünür kırıntı = Ana Sayfa › Fanlar › Korozyona ve Aside Dayanımlı Fanlar › aile adı; **JSON-LD BreadcrumbList'te Ana Sayfa halkası yoktur**, kural `urun-yapisal-veri-standard.md` §4a, URN-164, 14 Kasım 2026); markaya bağlantı kırıntının değil sayfadaki
   **üretici bloğunun** işidir (H1 üstünde, "ÜRETİCİ VERİSİ" etiketinin yanında, `/tr/brands/<marka>` ya da yeni şemada
   `/tr/markalar/<marka>`) ve **≥1** olmalıdır; `bot-karnesi` aile sayfasında bunu sayar, 0 ise `MARKA-BAGLANTISI-YOK` kırmızıdır
   (SEO-40); (b) "Modeller"
