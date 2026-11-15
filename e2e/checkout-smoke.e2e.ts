@@ -1,5 +1,7 @@
 import { expect,test } from '@playwright/test'
 
+import { oturumuKapat } from './yardimci/oturum-kapat'
+
 /**
  * Checkout funnel smoke — satınalma hunisi donma/loop bekçisi (ÖDEME ÖNCESİ DURUR).
  *
@@ -40,6 +42,11 @@ const PASSWORD = process.env.E2E_ADMIN_PASSWORD
 test.describe('checkout funnel smoke (pre-payment)', () => {
   // Secret/credential yoksa atla (CI'ı kırma) — admin smoke ile aynı kimlik.
   test.skip(!EMAIL || !PASSWORD, 'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD gerekli (CI var+secret).')
+
+  // ALT-189: her test kendi girişini bitirir (yalnız yerel oturum; bkz. yardimci/oturum-kapat.ts).
+  test.afterEach(async ({ page }) => {
+    await oturumuKapat(page)
+  })
 
   test('login → sepete ekle → checkout hunisi boot olur, donmaz ve ozet adimina ulasir', async ({ page }) => {
     // 1) Gerçek login (admin smoke ile birebir aynı çapalar)
