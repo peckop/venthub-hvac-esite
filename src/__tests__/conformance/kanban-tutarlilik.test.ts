@@ -105,6 +105,36 @@ describe('INV-KANBAN-TUTARLILIK-2 · tespit kokpit kuralıyla aynı dört tanım
   })
 })
 
+describe('INV-KANBAN-TUTARLILIK-5 · ARC-102 kapı 2: üç yeni kural, yalnız rapor', () => {
+  const simdi = new Date('2026-11-15T12:00:00Z')
+  const ik = (t: Partial<Kart> & { successCriteria?: unknown[]; dueDate?: string | null }) => (betik.ihlaller as (t: unknown, s: Date) => string[])(kart(t), simdi)
+
+  it('kanıtsız Done: son 14 günde, kabul ölçütü yok, kanit-muaf yok → ihlal; kanıt/muaf/eski tarih → temiz', () => {
+    const yeni = '2026-11-10T09:00:00Z'
+    expect(ik({ labels: ['hafta-46'], completedAt: yeni })).toEqual(['kanitsizDone'])
+    // SABOTAJ kolları: her koşul tek başına kuralı söndürür.
+    expect(ik({ labels: ['hafta-46'], completedAt: yeni, successCriteria: [{ id: 'c1' }] })).toEqual([])
+    expect(ik({ labels: ['hafta-46', 'kanit-muaf'], completedAt: yeni })).toEqual([])
+    expect(ik({ labels: ['hafta-46'], completedAt: '2026-10-20T09:00:00Z' })).toEqual([])
+    expect(ik({ labels: ['hafta-46'], completedAt: 'bozuk' })).toEqual([])
+  })
+
+  it('karar-bekliyor + ertelendi birlikte; ertelendi kartta vade yok → ihlal; biten kart sayılmaz', () => {
+    const bekleyen = { columnId: 'backlog', status: 'pending', labels: ['karar-bekliyor', 'ertelendi'], dueDate: '2026-12-01' }
+    expect(ik(bekleyen)).toEqual(['kararErtelendi'])
+    expect(ik({ ...bekleyen, labels: ['ertelendi'], dueDate: null })).toEqual(['ertelendiVadesiz'])
+    expect(ik({ ...bekleyen, labels: ['ertelendi'] })).toEqual([])
+    expect(ik({ ...bekleyen, columnId: 'done', status: 'completed', labels: ['ertelendi', 'hafta-46'], dueDate: null, completedAt: '2026-10-01T00:00:00Z' })).toEqual([])
+  })
+
+  it('yeni üç kural ONARILMAZ: plan yalnız rapor yazar, etiket ya da taşıma üretmez', () => {
+    const p = betik.plan(kart({ labels: ['hafta-46'], completedAt: new Date().toISOString() }), new Date())
+    expect(p.yalnizRapor).toEqual(['kanitsizDone'])
+    expect(p.etiketEkle).toBeNull()
+    expect(p.todoyaTasi).toBe(false)
+  })
+})
+
 describe('INV-KANBAN-TUTARLILIK-3 · onarım planı SINIRI aşmaz', () => {
   it('haftasız biten kart: yalnız hafta etiketi eklenir, mevcut etiketler KORUNUR', async () => {
     const yazilan: { id: string; etiketler?: string[]; tasindi?: string }[] = []
