@@ -1,54 +1,124 @@
 /**
  * INV-TCMB-COOLDOWN-1 (OPS-293 D5) — `tcmb-rates-sync` kimliksizdir (verify_jwt=false); yetkisiz çağrı sahte kur
- * YAZDIRAMAZ ama her çağrı TCMB'ye giderdi (kaynak tüketimi). Sertleştirme: son TCMB satırı 30 dk'dan yeniyse ya da
- * isolate yakın zamanda TCMB'ye gittiyse TCMB'ye HİÇ gitmeden `carried:true` döner.
+ * YAZDIRAMAZ ama her çağrı TCMB'ye giderdi (kaynak tüketimi). Sertleştirme: bugünün bülteni yazılmışsa, bu
+ * isolate 30 dk içinde başarılı TCMB isteği yaptıysa ya da istek sürüyorsa TCMB'ye HİÇ gitmeden `carried:true`.
  *
- * Statik ölçüm (Deno ucu vitest'te koşmaz): (1) sabit 30 dk, (2) cooldown dönüşü TCMB `fetch`'inden ÖNCE,
- * (3) DB kolu `fetched_at`'e bakar, (4) okuma hatası fail-open. Sabotaj: cooldown kontrolü `fetch`'ten sonraya
- * taşınırsa ya da sabit değişirse kırmızı (aşağıdaki saf karar fonksiyonu bunu kanıtlar).
+ * İki katman: (1) karar `cooldown.ts` (saf, importsuz) DAVRANIŞSAL ölçülür; (2) uç dosyası metin olarak: kapı
+ * TCMB `fetch`'inden ÖNCE, süren-istek bayrağı ilk `await`'ten ÖNCE kurulur, damga yalnız `damgaAtilsinMi` ile.
+ * security-reviewer (15 Kasım) bulguları F1-F5 buraya bağlıdır.
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import {
+  COOLDOWN_MS,
+  cooldownKarari,
+  damgaAtilsinMi,
+  haftaSonuMu,
+  istanbulBugun,
+} from '../../../supabase/functions/tcmb-rates-sync/cooldown'
+
 const KOD = readFileSync(join(process.cwd(), 'supabase', 'functions', 'tcmb-rates-sync', 'index.ts'), 'utf8')
 
-/** Saf karar: kaynak metninde cooldown dönüşü TCMB istek satırından önce mi ve sabit 30 dk mı. */
-function cooldownSorunlari(kod: string): string[] {
-  const sorun: string[] = []
-  if (!/const COOLDOWN_MS = 30 \* 60 \* 1000\b/.test(kod)) sorun.push('COOLDOWN_MS 30 dk degil')
-  const fetchKonum = kod.indexOf('await fetch(TCMB_URL')
-  const donusKonum = kod.search(/return cooldownYanit\(\)/)
-  if (fetchKonum < 0) sorun.push('TCMB fetch satiri bulunamadi')
-  if (donusKonum < 0) sorun.push('cooldown donusu yok')
-  if (fetchKonum >= 0 && donusKonum >= 0 && donusKonum > fetchKonum) sorun.push('cooldown donusu TCMB fetch ten SONRA')
-  if (!/\.select\('fetched_at'\)[\s\S]{0,120}\.eq\('source', 'tcmb'\)/.test(kod)) sorun.push('DB kolu fetched_at/source=tcmb okumuyor')
-  if (!/reason: 'cooldown'/.test(kod)) sorun.push("yanit nedeni 'cooldown' degil")
-  if (!/cooldown okunamadi/.test(kod)) sorun.push('okuma hatasi loglanmiyor (fail-open kaniti)')
-  return sorun
-}
+// 2026-11-16 Pazartesi 12:45 UTC = 15:45 İstanbul; 2026-11-14 Cumartesi.
+const PAZARTESI = Date.UTC(2026, 10, 16, 12, 45)
+const CUMARTESI = Date.UTC(2026, 10, 14, 12, 45)
+const girdi = (o: Partial<Parameters<typeof cooldownKarari>[0]> = {}) => ({
+  simdiMs: PAZARTESI,
+  sonBasariMs: 0,
+  surenIstek: false,
+  bugununBulteniVar: false as boolean | null,
+  ...o,
+})
 
-describe('INV-TCMB-COOLDOWN-1 · tcmb-rates-sync cooldown', () => {
-  it('⭐karne kilidi: cooldown, TCMB isteğinden ÖNCE ve 30 dk', () => {
-    expect(cooldownSorunlari(KOD)).toEqual([])
+describe('INV-TCMB-COOLDOWN-1 · karar (davranışsal)', () => {
+  it('sabit 30 dk', () => {
+    expect(COOLDOWN_MS).toBe(30 * 60 * 1000)
   })
 
-  it('dedektör sabotajı: cooldown fetch’ten sonraya taşınırsa, sabit değişirse ya da DB kolu kalkarsa KIRMIZI', () => {
-    const fetchSatiri = "const res = await fetch(TCMB_URL, { headers: { Accept: 'application/xml' } })"
-    // (a) donus fetch'ten sonra
-    const sonraya = KOD.replaceAll('return cooldownYanit()', '/* kaldirildi */').replace(fetchSatiri, `${fetchSatiri}\nreturn cooldownYanit()`)
-    expect(cooldownSorunlari(sonraya).join('|')).toContain('SONRA')
-    // (b) sabit
-    expect(cooldownSorunlari(KOD.replace('30 * 60 * 1000', '1000')).join('|')).toContain('30 dk degil')
-    // (c) DB kolu
-    expect(cooldownSorunlari(KOD.replace(".select('fetched_at')", ".select('id')")).join('|')).toContain('fetched_at')
-    // (d) cooldown tamamen yok
-    expect(cooldownSorunlari(KOD.replaceAll('return cooldownYanit()', '')).join('|')).toContain('cooldown donusu yok')
+  it('hiçbir koşul yoksa devam (cron çalışır)', () => {
+    expect(cooldownKarari(girdi())).toBe('devam')
   })
 
-  it('yanıt gövdesinde iç hata metni yok (S4 ile uyumlu): cooldown yanıtı sabit koddur', () => {
+  it('bellek penceresi sınırı: 29:59 cooldown, 30:00 devam, hiç başarı yoksa (0) devam', () => {
+    expect(cooldownKarari(girdi({ sonBasariMs: PAZARTESI - (COOLDOWN_MS - 1000) }))).toBe('cooldown')
+    expect(cooldownKarari(girdi({ sonBasariMs: PAZARTESI - COOLDOWN_MS }))).toBe('devam')
+    expect(cooldownKarari(girdi({ sonBasariMs: 0 }))).toBe('devam')
+  })
+
+  it('süren istek varsa cooldown (eşzamanlı çağrılar tek uçuş)', () => {
+    expect(cooldownKarari(girdi({ surenIstek: true }))).toBe('cooldown')
+  })
+
+  it('bugünün bülteni DB’de varsa cooldown; yoksa ya da OKUNAMADIYSA (null) fail-open devam', () => {
+    expect(cooldownKarari(girdi({ bugununBulteniVar: true }))).toBe('cooldown')
+    expect(cooldownKarari(girdi({ bugununBulteniVar: false }))).toBe('devam')
+    expect(cooldownKarari(girdi({ bugununBulteniVar: null }))).toBe('devam')
+  })
+
+  it('İstanbul günü: UTC 21:30 ertesi güne geçer, hafta sonu İstanbul takvimiyle ölçülür', () => {
+    expect(istanbulBugun(Date.UTC(2026, 10, 16, 20, 59))).toBe('2026-11-16')
+    expect(istanbulBugun(Date.UTC(2026, 10, 16, 21, 0))).toBe('2026-11-17')
+    expect(haftaSonuMu(CUMARTESI)).toBe(true)
+    expect(haftaSonuMu(PAZARTESI)).toBe(false)
+  })
+
+  it('F3/F4: dünkü bülten (bugün yayınlanmadı) bellek damgası KURMAZ → 12:45 cron’u bastırılamaz; hafta sonu kurar', () => {
+    expect(damgaAtilsinMi('2026-11-16', PAZARTESI)).toBe(true)
+    expect(damgaAtilsinMi('2026-11-13', PAZARTESI)).toBe(false)
+    expect(damgaAtilsinMi('2026-11-13', CUMARTESI)).toBe(true)
+  })
+})
+
+describe('INV-TCMB-COOLDOWN-1 · uç dosyası (sıra ve eşzamanlılık)', () => {
+  const fetchKonum = KOD.indexOf('await fetch(TCMB_URL')
+  const ilkAwait = KOD.indexOf('await supabase', KOD.indexOf('serve(async'))
+  const ATAMA = /\)\s+sonBasariMs = |^\s*sonBasariMs = /gm // bildirim (`let sonBasariMs = 0`) sayılmaz
+  const bayrakKur = KOD.indexOf('surenIstek = true')
+
+  it('⭐karne kilidi: TCMB fetch’i yalnız `esitle` içinde ve her cooldown dönüşü ondan ÖNCE', () => {
+    expect(fetchKonum).toBeGreaterThan(0)
+    expect(KOD.indexOf('async function esitle')).toBeLessThan(fetchKonum)
+    const donusler = [...KOD.matchAll(/return cooldownYanit\(\)/g)].map((m) => m.index ?? -1)
+    expect(donusler.length, 'iki cooldown dönüşü beklenir (eşzamanlı kapı + DB kapısı)').toBe(2)
+    for (const d of donusler) expect(d, 'cooldown dönüşü fetch ten sonra').toBeLessThan(fetchKonum)
+  })
+
+  it('F1: süren-istek bayrağı serve içindeki İLK await’ten ÖNCE kurulur; finally ile bırakılır', () => {
+    expect(bayrakKur).toBeGreaterThan(0)
+    expect(bayrakKur).toBeLessThan(ilkAwait)
+    expect(KOD).toMatch(/finally \{\s*surenIstek = false\s*\}/)
+  })
+
+  it('F2: DB kapısı BUGÜNÜN (İstanbul) bülteni, `fetched_at` değil; okuma hatası fail-open', () => {
+    expect(KOD).toMatch(/\.eq\('effective_date', istanbulBugun\(Date\.now\(\)\)\)/)
+    expect(KOD).not.toMatch(/fetched_at/)
+    expect(KOD).toMatch(/bugunHatasi \? null :/)
+  })
+
+  it('F3/F4: bellek damgası yalnız `damgaAtilsinMi` ile, ayrıştırma BAŞARISINDAN sonra; fetch öncesi atama yok', () => {
+    const atamalar = [...KOD.matchAll(ATAMA)].map((m) => m.index ?? -1)
+    expect(atamalar.length).toBe(1)
+    expect(atamalar[0]).toBeGreaterThan(fetchKonum)
+    expect(KOD).toMatch(/if \(damgaAtilsinMi\(bulletin\.effectiveDate, Date\.now\(\)\)\) sonBasariMs = Date\.now\(\)/)
+    expect(KOD.indexOf('const bulletin = parseBulletin')).toBeLessThan(atamalar[0])
+  })
+
+  it('yanıt gövdesinde iç hata metni yok: cooldown yanıtı sabit koddur', () => {
     expect(KOD).toMatch(/reason: 'cooldown'/)
     expect(KOD).not.toMatch(/reason: 'cooldown'[^}]*\.message/)
+  })
+
+  it('dedektör sabotajı: bayrak await’ten sonraya, damga fetch’ten öncesine ya da fetched_at kapısı geri gelirse KIRMIZI', () => {
+    const bayrakSonra = KOD.replace('surenIstek = true', '/* kaldirildi */').replace(
+      'return await esitle(supabase)',
+      'surenIstek = true\n    return await esitle(supabase)',
+    )
+    expect(bayrakSonra.indexOf('surenIstek = true')).toBeGreaterThan(bayrakSonra.indexOf('await supabase', bayrakSonra.indexOf('serve(async')))
+    const damgaOnce = KOD.replace('async function esitle(supabase: ReturnType<typeof createClient>): Promise<Response> {', 'async function esitle(supabase: ReturnType<typeof createClient>): Promise<Response> {\n  sonBasariMs = Date.now()')
+    expect([...damgaOnce.matchAll(ATAMA)].length).toBe(2)
+    expect(KOD.replace(".eq('effective_date', istanbulBugun(Date.now()))", ".select('fetched_at')")).toMatch(/fetched_at/)
   })
 })

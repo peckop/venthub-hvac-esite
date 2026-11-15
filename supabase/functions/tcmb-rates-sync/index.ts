@@ -7,6 +7,7 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { cooldownKarari, damgaAtilsinMi, istanbulBugun } from './cooldown.ts'
 
 const TCMB_URL = 'https://www.tcmb.gov.tr/kurlar/today.xml'
 const QUOTE_CURRENCIES = ['EUR', 'USD']
@@ -40,11 +41,17 @@ function parseBulletin(xml: string): ParsedBulletin | null {
 }
 
 // D5 (OPS-293): uç `verify_jwt=false` ve kimliksiz; yetkisiz çağrı sahte kur YAZDIRAMAZ ama her çağrı
-// TCMB'ye gider (kaynak tüketimi, kota). Sertleştirme: son TCMB satırı COOLDOWN_MS'ten yeniyse ya da bu
-// isolate yakın zamanda TCMB'ye gittiyse TCMB'ye HİÇ gitmeden `carried:true` döner. Kimlik denetimi
-// (JWT + Actions) bu işin DIŞINDA: ayrı karar, pg_cron çağıranını değiştirir.
-const COOLDOWN_MS = 30 * 60 * 1000
-let sonTcmbIstegiMs = 0 // isolate ömrü boyunca; soğuk başlangıçta 0 → DB satırı belirleyici
+// TCMB'ye gider (kaynak tüketimi, kota). Sertleştirme (karar: ./cooldown.ts, saf ve testli): bugünün (İstanbul)
+// bülteni DB'de varsa, bu isolate son 30 dk içinde başarılı bir TCMB isteği yaptıysa ya da bir istek sürüyorsa
+// TCMB'ye HİÇ gitmeden `carried:true` döner. Kimlik denetimi (JWT + Actions) bu işin DIŞINDA: ayrı karar.
+let sonBasariMs = 0 // isolate ömrü boyunca; yalnız BAŞARILI ve bugüne ait bültenle (ya da hafta sonu) kurulur
+let surenIstek = false // eşzamanlı çağrılar tek uçuşa iner (await'ten ÖNCE, eşzamanlı kurulur)
+
+const cooldownYanit = () =>
+  new Response(JSON.stringify({ ok: true, carried: true, reason: 'cooldown' }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  })
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -61,29 +68,33 @@ serve(async (req: Request) => {
   }
   const supabase = createClient(supabaseUrl, serviceKey)
 
-  // Cooldown: TCMB'ye gitmeden ÖNCE. Okuma hatası fail-open (eski davranış), yalnız loga yazılır.
-  const cooldownYanit = () =>
-    new Response(JSON.stringify({ ok: true, carried: true, reason: 'cooldown' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    })
-  if (Date.now() - sonTcmbIstegiMs < COOLDOWN_MS) return cooldownYanit()
-  const { data: sonSatir, error: sonSatirHatasi } = await supabase
-    .from('currency_rates')
-    .select('fetched_at')
-    .eq('source', 'tcmb')
-    .order('fetched_at', { ascending: false })
-    .limit(1)
-  if (sonSatirHatasi) {
-    console.error('[tcmb-rates-sync] cooldown okunamadi:', sonSatirHatasi)
-  } else {
-    const sonMs = sonSatir?.[0]?.fetched_at ? Date.parse(sonSatir[0].fetched_at as string) : NaN
-    if (Number.isFinite(sonMs) && Date.now() - sonMs < COOLDOWN_MS) return cooldownYanit()
+  // 1) Eşzamanlı kapı (await YOK): sürmekte olan istek ya da yakın başarılı istek varsa hemen dön.
+  if (cooldownKarari({ simdiMs: Date.now(), sonBasariMs, surenIstek, bugununBulteniVar: null }) === 'cooldown') {
+    return cooldownYanit()
   }
+  surenIstek = true
+  try {
+    // 2) Bugünün bülteni zaten yazıldıysa TCMB'ye gitme. Okuma hatası fail-open (eski davranış), yalnız loga yazılır.
+    const { data: bugunSatiri, error: bugunHatasi } = await supabase
+      .from('currency_rates')
+      .select('id')
+      .eq('source', 'tcmb')
+      .eq('effective_date', istanbulBugun(Date.now()))
+      .limit(1)
+    if (bugunHatasi) console.error('[tcmb-rates-sync] cooldown okunamadi:', bugunHatasi)
+    const bugununBulteniVar = bugunHatasi ? null : (bugunSatiri?.length ?? 0) > 0
+    if (cooldownKarari({ simdiMs: Date.now(), sonBasariMs, surenIstek: false, bugununBulteniVar }) === 'cooldown') {
+      return cooldownYanit()
+    }
+    return await esitle(supabase)
+  } finally {
+    surenIstek = false
+  }
+})
 
+async function esitle(supabase: ReturnType<typeof createClient>): Promise<Response> {
   let xml = ''
   try {
-    sonTcmbIstegiMs = Date.now()
     const res = await fetch(TCMB_URL, { headers: { Accept: 'application/xml' } })
     if (!res.ok) {
       // TCMB erişilemez → hata değil taşıma: mevcut son satır geçerli kalır (çözücü latest okur)
@@ -107,6 +118,8 @@ serve(async (req: Request) => {
       headers: { 'Content-Type': 'application/json' }
     })
   }
+  // Bellek damgası yalnız BAŞARILI ve bugüne ait bültenle (ya da hafta sonu): dünkü bülten 12:45 cron'unu bastırmasın.
+  if (damgaAtilsinMi(bulletin.effectiveDate, Date.now())) sonBasariMs = Date.now()
 
   const { data: tenants, error: tenantsError } = await supabase.from('tenants').select('id')
   // S4 (güvenlik karnesi 2026-11): uç `verify_jwt=false`; DB'nin iç hata metni yanıta DÖNMEZ,
@@ -167,4 +180,4 @@ serve(async (req: Request) => {
     JSON.stringify({ ok, bulletinDate: bulletin.effectiveDate, rates: bulletin.rates, inserted, skipped, errors }),
     { status: ok ? 200 : 500, headers: { 'Content-Type': 'application/json' } }
   )
-})
+}
