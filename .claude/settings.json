@@ -561,6 +561,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kanban-tutarlilik-onarimi.cjs\"",
             "statusMessage": "kanban-tutarlilik-onarimi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kart-numara-bildirimi.cjs\"",
+            "timeout": 10
           }
         ]
       },
