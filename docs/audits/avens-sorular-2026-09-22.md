@@ -124,5 +124,18 @@ Vortice'in 2026 kataloglarını elimizdeki önceki baskılarla ve ürün verimiz
 
 Bu üç cevap gelene kadar sitede ilgili değerler yalnız katalogda birebir yazanlarla sınırlı tutulur; tahmin yazılmaz.
 
+## 9. Vortice: üretici sitesinde güncel karşılığı bulunmayan belgeler (15 Kasım 2026)
+
+Vortice'in resmî katalog sayfalarında (vortice.com ve vortice.it) güncel karşılığını bulamadığımız dört nokta var. Yalnız üreticinin cevaplayabileceği sorular:
+
+| # | Konu | Gözlem | Soru |
+|---|---|---|---|
+| 1 | JET-A F400 ve JET-R F400 jet fanlar (27 ürün) | Elimizdeki tek jet fan föyü Ekim 2018 baskısı (JET-A, JET-R, MPC); yangın sınıfı olarak yalnız F300-120 yazıyor. Üreticide bu föyün aynısı arşiv yolunda duruyor. Şubat 2019 tarihli 150574 belgesi yalnız MPC-HP ve MPC-ED kitapçığı. | F400 (400 °C/2 saat) sınıflı JET-A ve JET-R modellerinin güncel teknik föyü hangisi? Debi, güç, akım, ses ve ağırlık değerlerini hangi belgeden almalıyız? Ekim 2018 föyündeki iki debi değeri (kod 45653 için 10.650, 45655 için 10.000 m³/h) güncel mi? |
+| 2 | Endüstriyel havalandırma genel kataloğu | Elimizdeki "industrial_Ventilation" belgesi 168 sayfa, Mayıs 2020 baskısı; üreticide aynı dosya arşiv yolunda duruyor, güncel bir genel katalog bulamadık. | Bu belgenin yerine geçen güncel genel katalog var mı? Yoksa hangi ürün ailesi için hangi belge geçerli? |
+| 3 | Radon bilgi broşürü | 42 sayfa, Kasım 2022 baskısı; üreticinin katalog listesinde yok. Teknik değerler ayrı Radon kataloğunda (Haziran 2026) bulunuyor. | Bu broşür hâlâ geçerli ve kullanılabilir mi, yoksa kaldırılmış mı? |
+| 4 | VORTICENT CMS ATEX model fişleri (10 adet) | Üretici sitesinde dinamik sayfa olarak duruyor; baskı kodu ve tarih taşıyan bir belge yok. | Her model fişinin baskı kodlu, indirilebilir teknik föyü var mı? |
+
+Bu cevaplar gelene kadar bu dört konuda sitede yalnız elimizdeki belgede birebir yazan değerler kullanılır; tahmin yazılmaz.
+
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.
