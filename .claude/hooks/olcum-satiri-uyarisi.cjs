@@ -17,7 +17,10 @@
 
 const OLCUM = /ölç|olcum|olcu(?:p|m)/i
 const EMIR = /(?:^|\n)\s*(?:YÖNTEM|YONTEM|KAYNAK\/CETVEL|KAYNAK|GÖREV|GOREV)\s*:|görev metni|salt-?okuma tarama/i
-const VAR = /ÖNCEK[İIiı]\s+ÖLÇÜM\s*:|ONCEK[İIiı]\s+OLCUM\s*:/i
+// ARC-328: ölçüm kartının "defter: ölçüldü/ölçülmedi" satırı da ölçüm kaydına bakıldığını söyler (ÖNCEKİ ÇALIŞMA satırında taşınır).
+const VAR = /ÖNCEK[İIiı]\s+ÖLÇÜM\s*:|ONCEK[İIiı]\s+OLCUM\s*:|defter\s*:\s*(?:ölçüldü|olculdu|ölçülmedi|olculmedi)/i
+// ARC-328: "ÖNCEKİ ÇALIŞMA:" satırı geçmiş ölçüme gönderme yapar ("ölçüldü" vb.); ölçüm İSTEYEN metin sayılmaz.
+const GECMIS_SATIR = /^[ \t]*ÖNCEK[İIiı]\s+ÇALIŞMA\s*:.*$/gim
 const ALT_SINIR = 160
 const ADAY_TAVAN = 1200
 const ADAY_ZAMAN_ASIMI_MS = 2000
@@ -26,7 +29,7 @@ const ADAY_ZAMAN_ASIMI_MS = 2000
 function uyari(metin) {
   const t = String(metin || '')
   if (t.length < ALT_SINIR) return null
-  if (!OLCUM.test(t) || !EMIR.test(t) || VAR.test(t)) return null
+  if (!OLCUM.test(t.replace(GECMIS_SATIR, '')) || !EMIR.test(t) || VAR.test(t)) return null
   return (
     'ÖLÇÜM SATIRI YOK: bu metin bir ölçüm istiyor ama "ÖNCEKİ ÖLÇÜM:" satırı taşımıyor. Önce ölçüm defterlerine bak ' +
     '(node scripts/arac/onceki-calisma.cjs "<konu>"); taze kayıt varsa yeniden ölçme, bayatsa tarihli ekle. Satırı metne yaz (engel yok).'
@@ -67,7 +70,16 @@ function main() {
       const g = JSON.parse(raw)
       const girdi = g.tool_input || {}
       const metin = g.tool_name === 'Agent' ? girdi.prompt : g.tool_name === 'SendMessage' ? girdi.message : null
-      const parca = [uyari(metin), adaylar(metin)].filter(Boolean)
+      // ARC-328: aynı metin için ÖLÇÜM SATIRI uyarısı oturumda bir kez (yeniden denemede yinelenmez); süzme bozulursa basılır.
+      let u = uyari(metin)
+      if (u) {
+        try {
+          if (!require('./bir-kez.cjs').basilsin('olcum-satiri-uyarisi', g.session_id, u + '\n' + String(metin).slice(0, 600))) u = null
+        } catch {
+          /* süzme bozuldu: uyarı basılır */
+        }
+      }
+      const parca = [u, adaylar(metin)].filter(Boolean)
       // ARC-290: OPS aynı geçiş konusunda alt ajan açıyorsa deftere yönlendir (uyarı, blok değil).
       if (g.tool_name === 'Agent') {
         try {
