@@ -162,7 +162,9 @@ describe('INV-TCMB-COOLDOWN-1 · uç dosyası (sıra, eşzamanlılık, yazım so
       expect(ucSorunlari(KOD.replace(eski, yeni)), `sabotaj yesil kaldi: ${ad}`).not.toEqual([])
     }
     // fetch öncesine fazladan damga ataması (ATAMA kalıbı `{ sonBasariMs = ...}` biçimini de yakalar)
-    const oncesi = KOD.replace('async function esitle(supabase: ReturnType<typeof createClient>): Promise<Response> {', 'async function esitle(supabase: ReturnType<typeof createClient>): Promise<Response> {\n  { sonBasariMs = Date.now() }')
+    const imza = 'async function esitle(supabase: Istemci): Promise<Response> {'
+    expect(KOD, 'sabotaj hedefi bulunamadi: esitle imzasi').toContain(imza)
+    const oncesi = KOD.replace(imza, `${imza}\n  { sonBasariMs = Date.now() }`)
     expect(ucSorunlari(oncesi), 'fetch oncesi damga yesil kaldi').not.toEqual([])
     // bayrak ile kapı arasına await giren yeni kod (B5b)
     const arayaAwait = KOD.replace('  surenIstek = true\n', '  await Promise.resolve()\n  surenIstek = true\n')
