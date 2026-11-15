@@ -9,6 +9,7 @@
 const path = require('node:path')
 
 try {
+  try { require('./kanca-sayac.cjs').say('kod-dizini-tazelik', 'kosu') } catch { /* sayaç kancayı bozmaz */ }
   const satir = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'kod-dizini-tazelik.cjs')).kancaKos()
   if (satir) process.stdout.write(satir + '\n')
 } catch {

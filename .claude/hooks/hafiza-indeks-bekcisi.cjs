@@ -231,6 +231,7 @@ function main() {
     process.exit(0)
   }
   modeleIlet.oturum(girdi.session_id) // aynı uyarı bu oturumda modele bir kez gider
+  try { require('./kanca-sayac.cjs').say('hafiza-indeks-bekcisi', 'kosu', girdi.session_id) } catch { /* sayaç kancayı bozmaz */ }
   const ti = girdi.tool_input || {}
   const filePath = ti.file_path || ''
   const tur = indeksTuru(filePath)
@@ -276,6 +277,7 @@ function main() {
           'KUCULTEN yazim her zaman gecer. Sonra yeni satirini ekleyip yeniden yaz. Yazim KAYBOLMADI, ' +
           'yalniz ertelendi.',
       )
+      try { require('./kanca-sayac.cjs').say('hafiza-indeks-bekcisi', 'deny', girdi.session_id) } catch { /* sayaç kancayı bozmaz */ }
       process.exit(2)
     }
   }

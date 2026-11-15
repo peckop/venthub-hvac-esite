@@ -314,6 +314,7 @@ function eskiDokumleriSil(memoryDir, sid, simdi = Date.now()) {
 }
 
 function main() {
+  try { require('./kanca-sayac.cjs').say('son-konusma-dokumu', 'kosu') } catch { /* sayaç kancayı bozmaz */ }
   let girdi = {}
   try {
     girdi = JSON.parse(fs.readFileSync(0, 'utf8') || '{}')

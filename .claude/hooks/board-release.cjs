@@ -37,4 +37,5 @@ try {
   const mine = board.liveClaims().find(c => c.sid === sid)
   if (mine) board.append(sid, { type: 'release', reason: input.reason || 'session-end' })
 } catch { /* fail-open: bırakılamadıysa TTL devreye girer */ }
+try { require('./kanca-sayac.cjs').say('board-release', 'birak', sid) } catch { /* sayaç kancayı bozmaz */ }
 process.exit(0)

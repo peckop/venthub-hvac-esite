@@ -78,10 +78,12 @@ function calistir() {
     `PENCERE KİLİDİ: Recep "başka pencere açma" dedi${koyulma ? ` (${koyulma} kondu)` : ''}. İzinli departmanlar: ${sonuc.izinliler.join(', ')}. ` +
     `"${alici}" gönderilmedi (${sonuc.sebep}). Kartı yaz; göndermek gerekiyorsa Recep'e cevabında sor. Departman sana yazdıysa ` +
     'ona 30 dakika boyunca cevap verebilirsin. Kilidi yalnız Recep\'in sözüyle node scripts/board/pencere-kilidi.cjs --kaldir ile kaldır.'
+  try { require('./kanca-sayac.cjs').say('pencere-kilidi-kapisi', 'deny') } catch { /* sayaç kancayı bozmaz */ }
   yaz({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: neden } })
 }
 
 if (require.main === module) {
+  try { require('./kanca-sayac.cjs').say('pencere-kilidi-kapisi', 'kosu') } catch { /* sayaç kancayı bozmaz */ }
   try {
     calistir()
   } catch {

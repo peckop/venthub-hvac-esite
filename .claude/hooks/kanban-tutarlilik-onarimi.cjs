@@ -84,6 +84,7 @@ function main() {
 }
 
 if (require.main === module) {
+  try { require('./kanca-sayac.cjs').say('kanban-tutarlilik-onarimi', 'kosu') } catch { /* sayaç kancayı bozmaz */ }
   try {
     main()
   } catch {
