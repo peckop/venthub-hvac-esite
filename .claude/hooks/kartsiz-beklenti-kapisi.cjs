@@ -60,7 +60,8 @@ const YETKI_KALIPLARI = [
   /^(?:hesap|ayar)(?:\s*\/\s*(?:hesap|ayar))*\s+dosyasi\b/,
   // ARC-142: "dış kişiye Recep adına yazışma", "tedarikçiye/dış kişiye Recep adına yazışma", "üreticiye Recep adına belge isteği".
   // "Recep adına" ZORUNLU: yalnız "tedarikçi hakkında soru" gibi ifadeler liste dışı kalır (kullanıcı adına mesaj göndermek açık izin ister).
-  /^(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*(?:\s*\/\s*(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*)*\s+recep\s+adina\s+(?:yazisma|mesaj|e-?posta|belge\s+istegi)/,]
+  /^(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*(?:\s*\/\s*(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*)*\s+recep\s+adina\s+(?:yazisma|mesaj|e-?posta|belge\s+istegi)/,
+]
 
 /** Kartın açıklamasından: { durum: 'yok' | 'liste-disi' | 'tamam', gerekce }. Birden çok satırda biri geçerliyse 'tamam'. */
 function yetkiDegerlendir(aciklama) {
@@ -470,7 +471,7 @@ function engelMetni(sorunlar, kaynak) {
     (sorunlar.some((s) => s.includes('RECEP YETKİSİ'))
       ? ' RECEP YETKİSİ sorunu: yetkisi verilmiş işi Recep\'e soru olarak getirme, işi yap; kartı gerçekten Recep\'e bağlıysa açıklamaya ' +
         '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ). ' +
-        "Departman penceresiysen karar sorusunu Recep'e yazma, OPS'a SendMessage ile ver (kart no, soru, önerim); karar OPS'un ise kartı Recep'e bağlama (Sen/recep-bekliyor etiketini koyma)."
+        "Departman penceresiysen karar sorusunu Recep'e yazma, OPS'a SendMessage ile ver (kart no, soru, önerim); karar OPS'un ise kartı Recep'e bağlama (atanan Sen/Recep ya da recep-bekliyor/karar-bekliyor etiketini koyma)."
       : '')
   )
 }
