@@ -25,4 +25,5 @@ if (!/\.(ts|tsx|js|jsx|cjs|mjs)$/i.test(filePath)) process.exit(0);
 
 const acc = path.join(os.tmpdir(), `venthub-edited-${sessionId}.txt`);
 try { fs.appendFileSync(acc, filePath + '\n'); } catch { /* sessizce geç */ }
+try { require('./kanca-sayac.cjs').say('accumulate-edits', 'kosu', sessionId) } catch { /* sayaç kancayı bozmaz */ }
 process.exit(0);

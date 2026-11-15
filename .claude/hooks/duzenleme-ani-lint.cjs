@@ -48,5 +48,6 @@ if (require.main === module) {
   } catch {
     // fail-open
   }
+  try { require('./kanca-sayac.cjs').say('duzenleme-ani-lint', kod === 2 ? 'deny' : 'kosu') } catch { /* sayaç kancayı bozmaz */ }
   process.exit(kod)
 }

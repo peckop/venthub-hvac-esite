@@ -530,6 +530,7 @@ function main() {
 const girdi = girdiOku()
 const sid = girdi.session_id || girdi.sessionId || process.env.CLAUDE_SESSION_ID || ''
 const tetik = girdi.trigger || 'manual'
+try { require('./kanca-sayac.cjs').say('precompact-durum-kapisi', 'kosu', sid) } catch { /* sayaç kancayı bozmaz */ }
 
 if (process.env.VENTHUB_PRECOMPACT_KAPALI === '1') {
   process.stdout.write('[precompact] kapi ATLANDI (VENTHUB_PRECOMPACT_KAPALI=1).\n')
@@ -589,6 +590,7 @@ if (dosyalar.length === 0) {
       'Icinde DORT SABIT ALAN olsun: son girdi / acik kuyruk / verilen sozler / bekleyen kararlar.\n' +
       'Yazdiktan sonra /compact tekrar. Zorunluysa: VENTHUB_PRECOMPACT_KAPALI=1\n',
   )
+  try { require('./kanca-sayac.cjs').say('precompact-durum-kapisi', 'deny', sid) } catch { /* sayaç kancayı bozmaz */ }
   process.exit(2)
 }
 

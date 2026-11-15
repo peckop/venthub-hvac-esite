@@ -112,6 +112,7 @@ function disBaglantilar(kok) {
 }
 
 function karar(sebep) {
+  try { require('./kanca-sayac.cjs').say('silme-baglanti-kapisi', 'deny') } catch { /* sayaç kancayı bozmaz */ }
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: sebep } }))
   process.exit(0)
 }
@@ -123,6 +124,7 @@ function main() {
   let girdi
   try { girdi = JSON.parse(raw) } catch { process.stderr.write('[silme-baglanti-kapisi] stdin bozuk JSON, karisilmadi\n'); return }
   const komut = girdi.tool_input && girdi.tool_input.command
+  try { require('./kanca-sayac.cjs').say('silme-baglanti-kapisi', 'kosu', girdi.session_id) } catch { /* sayaç kancayı bozmaz */ }
   if (!komut) return
   for (const h of silmeHedefleri(komut)) {
     const kok = yolCoz(h.yol, girdi.cwd)

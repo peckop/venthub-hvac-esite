@@ -167,6 +167,7 @@ async function main() {
     girdi = { tool_name: 'execute_sql', tool_input: { query: '' } }
   }
   const k = karar(girdi)
+  try { require('./kanca-sayac.cjs').say('sql-yazma-kapisi', k ? k.karar : 'kosu', girdi.session_id) } catch { /* sayaç kancayı bozmaz */ }
   if (!k) process.exit(0)
   process.stdout.write(
     JSON.stringify({

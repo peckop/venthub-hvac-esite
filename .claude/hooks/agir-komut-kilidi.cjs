@@ -513,6 +513,7 @@ function calistir() {
   if (!ad) return
   const arkaPlan = Boolean(girdi.tool_input && girdi.tool_input.run_in_background)
   const r = kilitAl({ sid, komut, ad, lane: process.env.CC_LANE || '', simdi, arkaPlan, agent })
+  try { require('./kanca-sayac.cjs').say('agir-komut-kilidi', r.ok ? 'allow' : 'deny', sid) } catch { /* sayaç kancayı bozmaz */ }
   if (r.ok) {
     // ⭐Yalnız ARKA PLAN alımı sarılır (belirteç yalnız onda üretilir); karar (`permissionDecision`)
     // DÖNMEZ: izin akışı değişmez. `updatedInput` girdi nesnesinin TAMAMINI değiştirir: diğer alanlar korunur.
