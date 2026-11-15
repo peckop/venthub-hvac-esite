@@ -30,6 +30,7 @@
 // kimlik doğrular, idempotansı korur, gönderimi mevcut uca devreder, sonucu deftere yazar.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { sentryCaptureMessage } from '../_shared/sentry.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (kardeş webhook'larla aynı pencere)
 const KIND = 'order_paid'
@@ -249,7 +250,9 @@ Deno.serve(async (req: Request) => {
         await defterHatasiniBildir('failed', order.id, { message: e instanceof Error ? e.message : String(e) })
       }
       // 500: pg_net tekrar dener. Damga ATILMADIĞI için tekrar denemesi GÜVENLİ.
-      return json({ error: 'send_failed', detail: gonderimHatasi.slice(0, 500) }, 500)
+      // Ayrıntı yanıta DEĞİL deftere (error kolonu, yukarıda) ve maskeli loga gider (OPS-293 D4).
+      console.error(`[order-paid-webhook] gonderim basarisiz siparis=${order.id}: ${metniMaskele(gonderimHatasi, 500)}`)
+      return json({ error: 'send_failed' }, 500)
     }
 
     // ── Damga — YALNIZ gönderim başarılı olduktan sonra, ve YALNIZ hâlâ boşsa ──────
@@ -301,7 +304,8 @@ Deno.serve(async (req: Request) => {
       stamped: (stamped?.length ?? 0) > 0,
     }, 200)
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    return json({ error: 'unexpected', message: msg }, 500)
+    // İç hata metni yanıta konmaz (OPS-293 D4); ayrıntı maskeli logda.
+    console.error(`[order-paid-webhook] beklenmeyen hata: ${metniMaskele(e instanceof Error ? e.message : String(e))}`)
+    return json({ error: 'unexpected' }, 500)
   }
 })

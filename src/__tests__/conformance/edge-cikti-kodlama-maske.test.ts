@@ -473,6 +473,23 @@ function hataSizanYanitlar(kod: string): number[] {
       kirli.some((v) => v.konum < konum && new RegExp(`\\b${v.ad}\\b`).test(g))
     ) out.push(kod.slice(0, konum).split('\n').length)
   }
+  // `json({ … })` yardımcısıyla kurulan yanıtlar (OPS-293 D4): yukarıdaki kalıp `new Response(JSON.stringify(`
+  // görmediği için order-paid-webhook'un `detail: gonderimHatasi…` ve `message: msg` kolları ölçülmüyordu.
+  // `message`/`detail` anahtarının değeri SABİT dizge değilse iç metin yanıta sızıyordur.
+  for (const m of kod.matchAll(/\b(?:json|jsonResponse)\(\s*\{/g)) {
+    const konum = m.index ?? 0
+    const metin = parantezIci(kod, kod.indexOf('(', konum))
+    const sizan = [...metin.matchAll(/\b(?:message|detail)\s*:\s*('[^']*'|"[^"]*"|`[^`$]*`|[^,}\n]+)/g)].some(
+      (a) => !/^(?:'[^']*'|"[^"]*"|`[^`$]*`)$/.test(a[1].trim()),
+    )
+    const g = kodKismi(metin).replace(/\b\w+\s*:/g, ' ')
+    if (
+      sizan ||
+      /\.message\b/.test(g) ||
+      /String\(\s*(_?e|err|error|_err|_error)\s*\)/.test(g) ||
+      kirli.some((v) => v.konum < konum && new RegExp(`\\b${v.ad}\\b`).test(g))
+    ) out.push(kod.slice(0, konum).split('\n').length)
+  }
   return out
 }
 
@@ -484,10 +501,13 @@ function hataSizanYanitlar(kod: string): number[] {
 const HATA_GOVDESI_TABANI = new Set([
   // OPS-213: admin-create-coupon, admin-iyzico-reconcile, admin-order-inspect, admin-update-order
   // tabandan çıktı (sabit kod + request_id, ayrıntı maskeli log).
+  // OPS-293 D4: iyzico-callback (`error: 'callback_error'`) ve order-paid-webhook tabandan çıktı.
+  // OPS-293 D4: `json({…})` kolu iki ucu İLK KEZ görünür kıldı (bu işin dışında, ayrı karta): küçülür, büyümez.
+  'iyzico-refund',
+  'returns-webhook',
   'admin-update-shipping',
   'apply-coupon',
   'delivery-notification',
-  'iyzico-callback', // S4'ün kalan kolu: P1 durum makinesi PR'ında (bu iş dokunmadı)
   'notification-service',
   'order-confirmation',
   'order-housekeeping',
@@ -501,8 +521,19 @@ const config = readFileSync(join(KOK, 'supabase', 'config.toml'), 'utf8')
 const JWTSIZ = [...config.matchAll(/\[functions\."?([\w-]+)"?\]\s*\n\s*verify_jwt\s*=\s*false/g)].map((m) => m[1])
 
 describe('INV-CIKTI-KODLAMA-1 · S4/S5 iç hata metni yanıt gövdesinde', () => {
-  it('⭐karne kilidi: tcmb-rates-sync, iyzico-payment, log-client-error yanıtında `.message` yok', () => {
-    for (const islev of ['tcmb-rates-sync', 'iyzico-payment', 'log-client-error']) {
+  it('dedektör sabotajı (OPS-293 D4): `json({ message|detail: <ifade> })` ve sabit metin ayrımı', () => {
+    const sizar = (g: string) => hataSizanYanitlar(`const msg = e.message\nreturn json({ ${g} }, 500)`)
+    expect(sizar("error: 'unexpected', message: msg"), 'message: degisken yakalanmadi').toHaveLength(1)
+    expect(sizar("error: 'send_failed', detail: gonderimHatasi.slice(0, 500)"), 'detail: ifade yakalanmadi').toHaveLength(1)
+    expect(sizar('error: `x ${e}`, message: `ayrinti ${hata}`'), 'sablon yakalanmadi').toHaveLength(1)
+    expect(sizar("error: 'unexpected', message: 'Sabit metin'"), 'sabit metin yanlis pozitif').toEqual([])
+    expect(sizar("error: 'x', message: 'Hata, tekrar deneyin'"), 'virgullu sabit metin yanlis pozitif').toEqual([])
+    expect(hataSizanYanitlar('const msg = e.message\nreturn jsonResponse({ detail: msg }, 500)'), 'jsonResponse yakalanmadi').toHaveLength(1)
+    expect(sizar("error: 'send_failed'"), 'sabit kod yanlis pozitif').toEqual([])
+  })
+
+  it('⭐karne kilidi: tcmb-rates-sync, iyzico-payment, log-client-error, iyzico-callback, order-paid-webhook yanıtında iç hata metni yok', () => {
+    for (const islev of ['tcmb-rates-sync', 'iyzico-payment', 'log-client-error', 'iyzico-callback', 'order-paid-webhook']) {
       expect(hataSizanYanitlar(islevKodu(islev)), `${islev}: yanit govdesinde ic hata metni`).toEqual([])
     }
     // tcmb: yanıttaki `errors` dizisine DB hata metni eklenmez.

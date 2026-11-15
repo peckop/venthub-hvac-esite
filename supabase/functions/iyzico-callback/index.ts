@@ -13,6 +13,7 @@ import Iyzipay from "npm:iyzipay";
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '../_shared/origins.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
+import { metniMaskele } from '../_shared/maske.ts'
 import { odemeSiparisleEslesiyorMu, retSiparisleEslesiyorMu, type SiparisSatiri } from '../_shared/odeme_eslesme.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import {
@@ -746,13 +747,13 @@ Deno.serve(async (req) => {
     const infoHtml = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
     return new Response(infoHtml, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
   } catch (error: unknown) {
-    console.error("iyzico-callback error:", error);
+    console.error("iyzico-callback error:", metniMaskele(error instanceof Error ? (error.stack ?? error.message) : String(error), 2000));
     // Hata olsa bile JSON bekleyen isteklere 'pending' JSON dön, aksi halde frontend'_e 'pending' ile yönlendir
     const accept = (req.headers.get('accept') || '').toLowerCase()
     const wantsJson = accept.includes('application/json') || !!req.headers.get('x-client-info')
     if (wantsJson) {
-      const msg = error instanceof Error ? error.message : String(error);
-      return new Response(JSON.stringify({ status: 'pending', error: msg }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      // İç hata metni yanıta konmaz (OPS-293 D4); ayrıntı yukarıdaki console.error'da. status ve HTTP 200 DEĞİŞMEZ.
+      return new Response(JSON.stringify({ status: 'pending', error: 'callback_error' }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     try {
       const url = new URL(req.url);
