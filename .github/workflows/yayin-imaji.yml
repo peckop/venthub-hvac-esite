@@ -74,3 +74,23 @@ jobs:
             NEXT_PUBLIC_SHOP_WHATSAPP=${{ vars.IMAJ_SHOP_WHATSAPP }}
             NEXT_PUBLIC_SENTRY_DSN=${{ vars.IMAJ_SENTRY_DSN }}
             NEXT_PUBLIC_APP_VERSION=${{ steps.ad.outputs.kisa }}
+
+      # OTOMATİK YAYIN (OPS-286): imaj GHCR'a gittikten sonra Coolify'a "yeni imajı çek ve dağıt" denir.
+      # Yalnız master'a itmede ve elle tetiklemede çalışır (PR'da imaj itilmez, dağıtım olmaz). Sır yalnız bu adıma girer.
+      # Coolify API'si panelin https adresindedir (:8000 dışarıya kapalı). Dağıtım hata verirse iş akışı kırmızı olur.
+      - name: Coolify'a dağıt
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
+          COOLIFY_UYGULAMA_UUID: ${{ vars.COOLIFY_UYGULAMA_UUID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${COOLIFY_API_TOKEN}" ] || [ -z "${COOLIFY_UYGULAMA_UUID}" ]; then
+            echo "COOLIFY_API_TOKEN sırrı ya da COOLIFY_UYGULAMA_UUID değişkeni tanımsız; dağıtım atlandı" >&2
+            exit 1
+          fi
+          kod=$(curl -sS -o /tmp/coolify-yanit.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
+            "https://coolify.venthub.com.tr/api/v1/deploy?uuid=${COOLIFY_UYGULAMA_UUID}&force=true")
+          echo "Coolify yanıt kodu: ${kod}"
+          [ "${kod}" = "200" ]
