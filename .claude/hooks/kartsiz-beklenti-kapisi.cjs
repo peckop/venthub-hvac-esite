@@ -470,7 +470,8 @@ function engelMetni(sorunlar, kaynak) {
     '(kanca Kanban\'dan doğrular) ya da gerçekten kart gerekmiyorsa "Kartsız: <sebep>" (sebep kayda düşer).' +
     (sorunlar.some((s) => s.includes('RECEP YETKİSİ'))
       ? ' RECEP YETKİSİ sorunu: yetkisi verilmiş işi Recep\'e soru olarak getirme, işi yap; kartı gerçekten Recep\'e bağlıysa açıklamaya ' +
-        '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ).'
+        '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ). ' +
+        "Departman penceresiysen karar sorusunu Recep'e yazma, OPS'a SendMessage ile ver (kart no, soru, önerim); karar OPS'un ise kartı Recep'e bağlama (atanan Sen/Recep ya da recep-bekliyor/karar-bekliyor etiketini koyma)."
       : '')
   )
 }
