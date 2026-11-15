@@ -102,12 +102,6 @@ function calistir() {
   if (girdi.tool_name !== 'SendMessage') return
   const mesaj = girdi.tool_input && girdi.tool_input.message
   if (siniflandir(mesaj) !== 'emir') return
-  // ARC-328: aynı mesaj (yeniden deneme) oturumda ikinci kez uyarılmaz; farklı mesaj yeniden uyarılır. Süzme bozulursa uyarı basılır.
-  try {
-    if (!require('./bir-kez.cjs').basilsin('kartsiz-emir-uyarisi', girdi.session_id, UYARI + '\n' + String(mesaj).trim().slice(0, 600))) return
-  } catch {
-    /* süzme bozuldu: uyarı basılır */
-  }
   try {
     fs.writeSync(1, JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: UYARI } }) + '\n')
   } catch {
