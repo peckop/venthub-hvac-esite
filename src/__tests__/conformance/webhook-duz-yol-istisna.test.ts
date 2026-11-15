@@ -27,7 +27,20 @@ const FONKSIYONLAR = path.join(KOK, 'supabase/functions')
 /** Düz yolu tanıyan, adlandırılmış istisna kümesi. Yalnız küçülür; D2 sonrası boşalır. */
 const ISTISNA_KUMESI = ['order-paid-webhook', 'quote-notification-webhook']
 const ISTISNA_YORUMU = /\/\/ ISTISNA-OPS293-D1 \(15 Kasim 2026\):/
-const DUZ_YOL_OKUMA = /headers\s*\.\s*get\s*\(\s*['"]x-webhook-secret['"]\s*\)/
+// Başlık ADI aranır, çağrı biçimi değil (reviewer: `get('X-Webhook-Secret')`, ters tırnak ve sabit değişken geçmesin).
+const DUZ_YOL_OKUMA = /x-webhook-secret/i
+
+/** `supabase/functions` altındaki TÜM .ts dosyaları (test dizinleri hariç), göreli yol. `_shared` yardımcıları dahil. */
+function tumKaynaklar(dizin = FONKSIYONLAR, ust = ''): string[] {
+  const out: string[] = []
+  for (const d of fs.readdirSync(dizin, { withFileTypes: true })) {
+    if (d.name === 'node_modules' || d.name === '__tests__') continue
+    const goreli = ust ? `${ust}/${d.name}` : d.name
+    if (d.isDirectory()) out.push(...tumKaynaklar(path.join(dizin, d.name), goreli))
+    else if (d.name.endsWith('.ts') && !d.name.endsWith('.test.ts')) out.push(goreli)
+  }
+  return out.sort()
+}
 
 function uclariKesfet(): string[] {
   return fs
@@ -93,6 +106,21 @@ describe('INV-WEBHOOK-DUZ-YOL-1 · düz secret yolu kapalı istisna kümesi', ()
 
   it('x-webhook-secret başlığını okuyan uç kümesi TAM OLARAK istisna kümesi (yeni uç eklenemez, küme yalnız küçülür)', () => {
     expect(duzYoluOlanlar(uclar)).toEqual([...ISTISNA_KUMESI].sort())
+  })
+
+  it('⭐x-webhook-secret adını (büyük/küçük harf, ters tırnak, sabit, _shared yardımcısı dahil) taşıyan TÜM dosyalar istisna uçlarının index.ts’i', () => {
+    const tum = tumKaynaklar()
+    expect(tum.length, 'keşif boş').toBeGreaterThan(50)
+    const taşıyan = tum.filter((g) => DUZ_YOL_OKUMA.test(yorumsuz(fs.readFileSync(path.join(FONKSIYONLAR, g), 'utf8'))))
+    expect(taşıyan).toEqual(ISTISNA_KUMESI.map((u) => `${u}/index.ts`).sort())
+  })
+
+  it('sabotaj: aynı kural `_shared` yardımcısında, büyük harfli ya da sabit değişkenli başlık adında KIRMIZI', () => {
+    const kural = (kod: string) => DUZ_YOL_OKUMA.test(yorumsuz(kod))
+    expect(kural("const t = req.headers.get('X-Webhook-Secret')")).toBe(true)
+    expect(kural('const t = req.headers.get(`x-webhook-secret`)')).toBe(true)
+    expect(kural("const H = 'x-webhook-secret'; req.headers.get(H)")).toBe(true)
+    expect(kural("// x-webhook-secret yalnız yorumda\nconst a = 1")).toBe(false)
   })
 
   it('istisna kümesindeki uçlar: işaret, ortak sabit zaman, yerel kopya yok, timingSafeEquals karşılaştırması', () => {
