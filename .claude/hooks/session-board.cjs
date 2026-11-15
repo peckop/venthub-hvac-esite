@@ -493,6 +493,15 @@ if (source === 'resume') {
 // Kural bugune kadar YAZIYDI ("donuste ILK IS durum dosyasini oku") ve tamamen ajan disiplinine
 // dayaniyordu. Burasi onu MEKANIZMAYA cevirir: dosyanin son blogunu ajanin onune KOYAR, cunku
 // "oku" demek ile okutmak ayni sey degil.
+// ARC-326: bağlam kırpıldı (compact) ya da boşaldı (clear); "oturumda bir kez" gösterilen sabit satırlar (söz kuralı, görev, kart alanı...)
+// yeniden görünsün. clear aynı session_id'yi koruyabilir: sage nesil sıfırlaması da compact || clear koşulunda.
+if (source === 'compact' || source === 'clear') {
+  try {
+    require('./bir-kez.cjs').sifirla(sid)
+  } catch {
+    /* sıfırlanamadıysa süre dolunca yenilenir */
+  }
+}
 if (source === 'compact') {
   bolum('compact-kol', 1,
     '⭐COMPACT DONUSU — baglamin kirpildi. ILK GORUNUR SATIRIN "bana ulasan son girdin: <ozet>" ' +

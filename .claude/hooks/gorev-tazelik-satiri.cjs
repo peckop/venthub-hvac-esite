@@ -29,7 +29,14 @@ function calistir() {
   if (!rol) return
   try {
     const satir = require(path.join(KOK, 'scripts', 'hijyen', 'gorev-tazelik.cjs')).rolSatiri(rol, KOK)
-    if (satir) fs.writeSync(1, satir + '\n')
+    // ARC-326: aynı GÖREV satırı saatte bir (gün sayısı değişince rakamsız özet aynı kalır, eşik/görev adı değişince yeni durumdur).
+    let bas = true
+    try {
+      bas = !satir || require('./bir-kez.cjs').basilsin('gorev-tazelik-satiri', String(girdi.session_id || ''), satir, { rakamsiz: true, yenilemeMs: 3600000 })
+    } catch {
+      bas = true
+    }
+    if (satir && bas) fs.writeSync(1, satir + '\n')
   } catch {
     // GÖREV satırı bozulsa DEFTER satırı yine çalışır (ve tersi)
   }

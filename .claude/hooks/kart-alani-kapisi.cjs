@@ -280,10 +280,24 @@ function calistir() {
   }
   const satirlar = incele(girdi.tool_input, harita, kartOku)
   if (!satirlar.length) return
+  // ARC-326: yalnız sabit "KART ALANI (DEPT): Görev..." başlık satırı oturumda bir kez; kart başına değişen UYARI ve KART SATIRLARI
+  // (eksik KAYNAK/YÖNTEM/ÖNCEKİ ÇALIŞMA, görev dışı, alan) HER kartta basılır (denetçi bulgusu: ikinci kartın uyarısı yutuluyordu).
+  const baslikMi = (s) => /^KART ALANI \(/.test(s)
+  const cikis = satirlar.filter((s) => !baslikMi(s))
+  for (const s of satirlar.filter(baslikMi).reverse()) {
+    let bas = true
+    try {
+      bas = require('./bir-kez.cjs').basilsin('kart-alani-kapisi', girdi.session_id, s)
+    } catch {
+      bas = true
+    }
+    if (bas) cikis.unshift(s)
+  }
+  if (!cikis.length) return
   try {
     fs.writeSync(
       1,
-      JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: satirlar.join('\n') } }) + '\n',
+      JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: cikis.join('\n') } }) + '\n',
     )
   } catch {
     // stdout kapalı: bilgi verilemedi, kart yine açılır

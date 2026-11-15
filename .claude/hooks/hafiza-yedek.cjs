@@ -20,7 +20,19 @@ try {
 try {
   const modul = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'hafiza-yedek.cjs'))
   const r = modul.kancaKos(girdi)
-  if (r.cikti) process.stdout.write(JSON.stringify(r.cikti))
+  if (r.cikti) {
+    // ARC-326: yalnız BİLGİ satırı (⚠HAFIZA YEDEK: son commit N dk önce) 30 dk'da bir; dakika değişimi tek başına yeni durum değil. ⛔ başarısızlık satırı her mesajda görünür.
+    let bas = true
+    try {
+      const ek = r.cikti.hookSpecificOutput && r.cikti.hookSpecificOutput.additionalContext
+      if (girdi.hook_event_name === 'UserPromptSubmit' && typeof ek === 'string' && !/⛔/.test(ek)) {
+        bas = require('./bir-kez.cjs').basilsin('hafiza-yedek', String(girdi.session_id || ''), ek, { rakamsiz: true, yenilemeMs: 1800000 })
+      }
+    } catch {
+      bas = true
+    }
+    if (bas) process.stdout.write(JSON.stringify(r.cikti))
+  }
 } catch {
   // fail-open ve SESSİZ
 }
