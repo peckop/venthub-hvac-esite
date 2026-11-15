@@ -35,7 +35,7 @@ Design Venthub New içindeki panel şablonlarını (Teklifler ve belge zinciri) 
 - Kayıt silme yok. Açtığın her kaydın adı ya da Sorumlu alanı `DENEME-<tur>` ile başlar.
 - Kaydedilmemiş değişiklikle çıkma yok: önce Kaydet ya da "Kaydetmeden çık" penceresi.
 - Dönem kilidi koyma: Recep onayı gerekir.
-- Cari seçici yerel bir select'tir: fareyle değil, klavyeyle (ok tuşları + Enter).
+- Cari, tedarikçi ve rol alanları yazılabilir kutudur (datalist): tam etiketi yaz ("Unvan · C-xxxx", "DENEME-10m Rol") ve Tab'a bas; ok tuşu, End, Home, Return ve kısmi metin seçmez.
 - Dosya yazma ve push yok; yalnız ölçüm.
 
 ## Tuzaklar
@@ -67,13 +67,23 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Satış simgesine ilk basış yalnız alt menüyü açar; sayfa için alt menü satırına bas. Liste sayfasında "Yeni fatura/Teklif ekle" ilk basışta sayfayı değiştirmeyebilir, üst sekmeye bas. Düğme adı "Teklif ekle"dir.
 - Menü ve ⋯ kapatma: boş alana bas (Escape yasak). ⋯ açıkken ikinci ⋯ önceki menünün öğesine basar; önce menüyü kapat. "+ Yeni" menüsü açık değilken harf yazmak kısayol tetikler ("v" = Görev planla): tuşlamadan önce menünün açıldığını kareyle doğrula.
 - "Çıkış yap" paneli bırakıp mağaza giriş sayfasına atar: yalnız tur sonunda bas. "Yardım" da panelden çıkıp vitrine gider.
-- Rol değiştirince sayfa "PanelMasa.renderVals(): Cannot access 'kr'…" ile boş kalır: yenile (rol kalır). Rol listesi yerel select; Muhasebe rolü yoktur.
+- Rol değiştirince sayfa "PanelMasa.renderVals(): Cannot access 'kr'…" ile boş kalır: yenile (rol kalır). Rol alanı yazılabilir kutudur (tam ad + Tab); ekran seçimi 8 sn geriden gösterir: hesap menüsünü yeniden açıp değeri doğrula. Muhasebe rolü yoktur.
 - Önizle × ile kapanınca tıklama arkadaki satıra geçer.
 - Çekmece "Neden" listesi klavyeyle seçilince boş görünür (seçim yine de geçer). Boş adlı serbest satır kayıtta sessizce silinir.
 - Virman düğmesi ≥2 kasa/banka hesabı ister: hesapsız turda iki DENEME hesabı aç.
 - Metraj çekmecesi "Satırlar › Excel'den satır al": boş girişte düğme pasif; hata görmek için başlığı olan, adet sütunu eksik CSV yaz. Kullanıcılar ve roller sol şeritte değil, sol alt hesap menüsündedir. Menü adları: Müşteri talepleri, Hizmet ve diğer kalemler (Kayıtlar altında).
 - Ödenmiş zincirde teklif/sipariş/irsaliye satırında "Sıradaki: Fatura" bayat kalabilir: bulguyu "mükerrer fatura riski" diye yaz.
 - Hover yazıları (title) ve CSV indirmesi araçla görülemez; "denenemedi: araç sınırı" yaz, tahmin etme. Tık sayısı: katı sayımda ekran = ayrı sayfa/çekmece.
+- Rol testinde okuma-only rol için "Şu rolden başla"da İzleyici'yi seç (tüm kutular boş); Yönetici ve Satış tam yetkili gelir. Menü ve düğme süzmesini ölç, düğmeye basma.
+- Stok sayfalarında Depo süzgeci boş kutu görünür: kutuya tıkla, etiketin ilk harflerini yaz, Enter (ok tuşu etkisiz). Tek depo varken transfer için önce Depolar › Depo ekle (DENEME). Sayım kapanınca stok geri alınamaz: yalnız DENEME ürününde sayım yap.
+- Fiyatlar'da satır işaretlenince çıkan "Süzgece uyan N satırın hepsini seç" düğmesine basma (toplu fiyat riski). Teklif ayarında değişiklik sonrası Tab yetmez, alt çubuktan Kaydet.
+- Dönem kilidi kaydetmede hata vermez; kilitli tarihli taslak kaydedilir, denetim sağ paneldeki "Göndermeden önce" satırında ve Kes'te olur (kırmızı hata yalnız Kes ile çıkar, kalıcı belge riski: basma). Kilit görevinde onay kartı numarası görev metninde yazılı olmazsa çalışan durur.
+- Ctrl K'den sonra 1-2 sn bekle, hemen yazılan metin palete düşmez. Listede ↑↓ satır seçmez, odağı "Yeni sipariş" düğmesine taşır ve Enter boş sipariş açar: kayıt aç, tuşla gezme. Panelin kısayol listesi: ?, Ctrl K, Ctrl S, Shift+tık, ↑↓, Enter, Boşluk, Esc; G/N/V yoktur.
+- "Diğer" sekme menüsü kaydırılamaz (sığmayan sekmeye erişilmez). Sekme çubuğu toplamı 40'ta kalabilir.
+- Sütun panelinde işaretlenen sütun "Dar pencere: … gizlendi." ile sessizce gizlenebilir (tablo altı gri satır): kanıt bu satırdır. "Varsayılana dön" uzun panellerde ekran dışında kalır.
+- Tarih alanına yazarken ilk karakterden sonra odak kaybolabilir: alana yeniden tıkla. Kayıtta sessizce proje (P-xxxx) açılır; açılan kaydı raporla.
+- Çalışan sonucu her parça için müdüre döner: kanıtsız satır yok (sayfa başlığı, ham yazı, süre, kare yolu), rapor başında "denenemedi" sayısı sebebiyle, işler ~8 maddelik parçalara bölünür.
+- Tur sonunda (Recep kararı 15 Kasım): rapor DesignSync ile yüklenir; Design'a gidecek mesajı TASARIM Design Venthub New sohbet penceresine claude-in-chrome ile kendisi yapıştırıp gönderir. Önce sohbetin son mesajlarına bak; aynı tur mesajı zaten gönderilmişse ikinci kez gönderme. Sohbet açılamazsa OPS'a tek satır yaz.
 
 ## Ölçüm sırası
 
