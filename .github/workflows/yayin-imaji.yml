@@ -16,13 +16,9 @@ on:
       - .dockerignore
       - .github/workflows/yayin-imaji.yml
       - next.config.mjs
+  # master'a HER birleşme yeni imaj üretir (kaynak kodu değişince imaj da değişmeli; yol süzgeci yalnız PR'da kalır).
   push:
     branches: [master]
-    paths:
-      - Dockerfile
-      - .dockerignore
-      - .github/workflows/yayin-imaji.yml
-      - next.config.mjs
   workflow_dispatch:
 
 concurrency:
