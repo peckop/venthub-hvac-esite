@@ -216,7 +216,16 @@ const nextConfig = {
         //    (`/destek/hesaplayicilar` → `/urun-secici`, bilgi merkezi EN-kapalı kuralları) yeni adrese gider, zincir olmaz.
         //    Kapalıyken `rotaDiliHedefleriniYenile` girdiyi AYNEN (aynı referans) döndürür.
         //  · Rota dili kuralları (eski klasör adresi → yeni adres) zaten yeni adrese gider, yenilemeye girmez. Hepsi tek hop.
-        return [...rotaDiliHedefleriniYenile(mevcutKurallar, ADRES_DILI), ...rotaDiliYonlendirmeleri(ADRES_DILI)];
+        // ALT-190: `www` → apex KALICI (308), tek hop. Vercel bunu alan adı ayarıyla yapıyordu; kendi sunucumuzda (Coolify/Traefik)
+        // yerleşik yönlendirme 307/302 verir ve Traefik etiketiyle 308'e çevirmek yönlendirici etiketlerini siler (15 Kasım 2026 olayı).
+        // Kural en başta: www'den gelen her istek başka kurala girmeden apex'in AYNI yoluna gider (sorgu dizesi korunur).
+        const wwwYonlendirmesi = {
+            source: '/:path*',
+            has: [{ type: 'host', value: 'www.venthub.com.tr' }],
+            destination: 'https://venthub.com.tr/:path*',
+            permanent: true,
+        };
+        return [wwwYonlendirmesi, ...rotaDiliHedefleriniYenile(mevcutKurallar, ADRES_DILI), ...rotaDiliYonlendirmeleri(ADRES_DILI)];
     },
     async rewrites() {
         // Yeni adres → mevcut klasör (sayfa dosyası aranmadan önce). Anahtar kapalıyken boş.

@@ -16,7 +16,7 @@ const TR_CHROME = 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
 const EN = 'en-US,en;q=0.9'
 const EN_HOP = 6
 
-type Kural = { source: string; destination: string }
+type Kural = { source: string; destination: string; has?: unknown[] }
 
 afterEach(() => {
   if (ilkDeger === undefined) delete process.env[ANAHTAR]
@@ -38,6 +38,8 @@ function kaynakDeseni(kaynak: string): RegExp {
 /** İlk eşleşen config yönlendirmesini uygular (Next sırası); eşleşme yoksa null. */
 function configUygula(kurallar: Kural[], yol: string, arama: string): string | null {
   for (const k of kurallar) {
+    // Koşullu (`has`: alan adı) kurallar bu benzetimde YOK: istek `venthub.com.tr` alan adıyla gelir ve ALT-190 `www` kuralı eşleşmez.
+    if (k.has) continue
     const m = kaynakDeseni(k.source).exec(yol)
     if (!m) continue
     const [hedefYol, hedefSorgu = ''] = k.destination.split('?')
