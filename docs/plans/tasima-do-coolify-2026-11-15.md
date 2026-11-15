@@ -39,3 +39,13 @@ Standalone çıktı ISR ve `unstable_cache` verisini diske yazar (`.next/server`
 ## Geri dönüş
 
 DNS kaydı Vercel IP'lerine (216.198.79.65 / 64.29.17.65) geri çevrilir; Vercel projesi duruyor olsa da kota yenilenince ya da hesap açılınca çalışır. Vercel hesabı duraklatıldıysa bu yol kapalıdır: bu yüzden DNS çevirmeden önce denemenin yeşil olması şarttır.
+
+## Ölçülen dersler (15 Kasım 2026 taşıma günü; koşu kitabı kuralları)
+
+1. **Sertifika:** DNS çevrildikten SONRA `coolify-proxy` yeniden başlatılmalı. İlk Let's Encrypt denemesi DNS yayılmadan yapılırsa 403 ile düşer ve Traefik varsayılan sertifikayı verir. 14:52-14:57 TSİ arası apex https kesikti (5 dk); `docker restart coolify-proxy` ile geçerli sertifika (YR2) alındı.
+2. **`custom_labels` YAPMA:** Coolify'a özel Traefik etiketi verildiğinde Coolify kendi ürettiği yönlendirici etiketlerinin TAMAMINI bırakır; kapsayıcı yönlendirmesiz kalır ve site 503 verir (15:03-15:12 TSİ, ~9 dk). Yönlendirme ince ayarı uygulama katmanında (next.config) yapılır. Geri alma: coolify-db'de `applications.custom_labels = null` (API boş değer reddeder, base64 ister) ve zorla yeniden dağıt.
+3. **Canlı sunucuda değişiklikten önce** (Coolify ayarı, proxy, yeniden dağıtım): OPS'a tek satır "ne değişiyor, nasıl geri alınır"; önce deneme adresinde (sslip) denenir; kesintide ilk iş geri alma.
+4. **Webhook adresi sert yazılıydı:** `handle_supabase_webhook()` olayları `venthub-hvac-esite.vercel.app`'e yolluyordu (taşımadan sonra sayfalar 24 saat bayat kalırdı); #2537 ile `https://venthub.com.tr/api/webhook/supabase` yapıldı. Başka sert yazılı hedef için migration'larda `vercel.app` aranır.
+5. **Coolify otomatik yayınlamaz:** GHCR'a imaj itilince Coolify çekmez. Deploy elle: `POST /api/v1/deploy?uuid=<uuid>` (API belirteci `~/.secrets/coolify-api.txt`). Tetik, panel https'e alınınca (alt alan adı) iş akışına eklenir.
+6. **İlk yönetici hesabı:** kurulumda `ROOT_USER_*` ortam değişkenleri işlemedi (kullanıcı oluşmadı, kayıt sayfası açık kaldı); hesap artisan ile oluşturuldu, kayıt kapatıldı, kullanıcı Root Team'e elle eklendi.
+7. **Vercel hâlâ master'da derliyor** (Git bağlantısı açık); geri dönüş yolu bu yüzden güncel kalır.
