@@ -280,6 +280,12 @@ function calistir() {
   }
   const satirlar = incele(girdi.tool_input, harita, kartOku)
   if (!satirlar.length) return
+  // ARC-326: aynı KART ALANI / uyarı satırı oturumda bir kez; ÖNCEKİ ÇALIŞMA adayları karta göre değiştiği için yeniden görünür.
+  try {
+    if (!require('./bir-kez.cjs').basilsin('kart-alani-kapisi', girdi.session_id, satirlar.join('\n'), { rakamsiz: true })) return
+  } catch {
+    /* süzme bozulduysa satırlar basılır */
+  }
   try {
     fs.writeSync(
       1,

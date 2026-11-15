@@ -494,6 +494,12 @@ if (source === 'resume') {
 // dayaniyordu. Burasi onu MEKANIZMAYA cevirir: dosyanin son blogunu ajanin onune KOYAR, cunku
 // "oku" demek ile okutmak ayni sey degil.
 if (source === 'compact') {
+  // ARC-326: bağlam kırpıldı; "oturumda bir kez" gösterilen sabit satırlar (söz kuralı, görev, kart alanı...) yeniden görünsün.
+  try {
+    require('./bir-kez.cjs').sifirla(sid)
+  } catch {
+    /* sıfırlanamadıysa süre dolunca yenilenir */
+  }
   bolum('compact-kol', 1,
     '⭐COMPACT DONUSU — baglamin kirpildi. ILK GORUNUR SATIRIN "bana ulasan son girdin: <ozet>" ' +
     'olacak (gecis aninda yazilan mesaj YUTULABILIR; teslimati garanti edemeyiz ama kaybi 1 turda ' +

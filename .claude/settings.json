@@ -207,7 +207,7 @@
           {
             "type": "command",
             "command": "graphify hook-guard search",
-            "timeout": 10
+            "timeout": 20
           }
         ]
       },

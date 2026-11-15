@@ -27,7 +27,17 @@ try {
       borc.yaz(borc.isaretYolu(girdi.session_id), { ts: Date.now(), kaliplar: sonuc.kaliplar })
     }
     const satirlar = borc.satirlar(girdi.session_id)
-    if (satirlar.length) process.stdout.write(satirlar.join('\n') + '\n')
+    if (satirlar.length) {
+      const metin = satirlar.join('\n') + '\n'
+      // ARC-326: aynı borç metni saatte bir; borç sayısı ya da içerik değişince hemen yeniden yazılır (rakamsız DEĞİL).
+      let bas = true
+      try {
+        bas = require('./bir-kez.cjs').basilsin('duzeltme-isaretle', String(girdi.session_id), metin, { yenilemeMs: 3600000 })
+      } catch {
+        bas = true
+      }
+      if (bas) process.stdout.write(metin)
+    }
   }
 } catch {
   /* fail-open ve SESSİZ: kanca turu asla bloklamaz */

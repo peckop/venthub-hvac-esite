@@ -42,6 +42,13 @@ try {
   const metin = satir({ kok, dbKok, dosya: tamYol, oturum: girdi.session_id })
   if (!metin) process.exit(0)
 
+  // ARC-326: aynı dosya + aynı ders metni oturumda bir kez (metin değişirse ya da başka dosyaysa yeniden görünür).
+  try {
+    if (!require('./bir-kez.cjs').basilsin('sage-dosya-dersi', girdi.session_id, tamYol + '\n' + metin)) process.exit(0)
+  } catch {
+    /* süzme bozulduysa ders basılır */
+  }
+
   process.stdout.write(
     JSON.stringify({
       hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: metin },

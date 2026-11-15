@@ -30,7 +30,21 @@ function calistir() {
   if (process.env.VENTHUB_SOZ_BEKCISI_KAPAT === '1') return
   const j = JSON.parse(fs.readFileSync(KURAL_DOSYASI, 'utf8'))
   const s = hatirlatma(j.kurallar)
-  if (s) fs.writeSync(1, s + '\n')
+  if (!s) return
+  // ARC-326: sabit satır oturumda bir kez (compact dönüşünde session-board sıfırlar); sid yoksa ya da süzme bozulursa basılır.
+  let sid = ''
+  try {
+    sid = String((JSON.parse(fs.readFileSync(0, 'utf8') || '{}') || {}).session_id || '')
+  } catch {
+    sid = ''
+  }
+  let bas = true
+  try {
+    bas = require('./bir-kez.cjs').basilsin('soz-bekcisi-hatirlatma', sid, s)
+  } catch {
+    bas = true
+  }
+  if (bas) fs.writeSync(1, s + '\n')
 }
 
 module.exports = { hatirlatma, TAVAN_BAYT }
