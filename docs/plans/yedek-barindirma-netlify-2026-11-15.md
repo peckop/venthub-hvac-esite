@@ -13,7 +13,24 @@
 | Render Free | — | "üretimde kullanmayın" | evet |
 | VPS | — | ücretli | evet (para harcanmaz) |
 
-**Açık noktalar (hesap açılınca ilk ölçülecek):** (a) Netlify ücretsiz katmanda ticari kullanım maddesi, (b) middleware'in 308/307 yönlendirme sırası (Netlify "headers and redirects are evaluated after middleware" diyor; `src/middleware.ts` kendi yönlendirmesini yapıyor, `next.config.mjs` `redirects()` ile sıra farkı olabilir), (c) `VERCEL_*` ortam değişkenlerine bağlı kod yolları, (d) 15 GB/ay bant sınırı (300 kredi ÷ 20 kredi/GB) bu sitenin 9,27 GB Fast Origin Transfer'ına yakın.
+**Açık noktalar (hesap açılınca ilk ölçülecek):** (a) Netlify ücretsiz katmanda ticari kullanım maddesi, (b) middleware'in 308/307 yönlendirme sırası (Netlify "headers and redirects are evaluated after middleware" diyor; `src/middleware.ts` kendi yönlendirmesini yapıyor, `next.config.mjs` `redirects()` ile sıra farkı olabilir), (c) `VERCEL_*` ortam değişkenlerine bağlı kod yolları, (d) 15 GB/ay bant sınırı (300 kredi ÷ 20 kredi/GB) bu sitenin 9,27 GB Fast Origin Transfer'ına yakın, (e) kredi dayanıklılığı: aşağıdaki hesap.
+
+### Kredi hesabı (ALT-187, 15 Kasım; OPS'un verdiği tarife: 300 kredi KESİN sınır, aktarım 20 kredi/GB, 10 bin istek 2 kredi, her yayın 15 kredi)
+
+**Girdi (ölçülen, Vercel paneli, OPS 15 Kasım):** son 30 günde CDN isteği 429 bin; son 7 günde 138 bin (≈19,7 bin/gün); Fast Origin Transfer 3,44 GB/7 gün (bu origin→CDN aktarımıdır, ziyaretçiye giden değil). Ana sayfa HTML'i sıkıştırılmış 21.955 bayt (curl, ölçüldü). Ziyaretçiye giden toplam aktarım (JS/CSS/görsel dahil) ölçülemedi: istek başına ortalama 20 KB (yalnız HTML) ile 100 KB (varlıklar dahil, varsayım) arasında iki senaryo.
+
+| Kalem | Hesap | Kredi/gün |
+|---|---|---|
+| İstek | 19,7 bin ÷ 10 bin × 2 | ≈ 3,9 |
+| Aktarım, 20 KB/istek | 19,7 bin × 20 KB ≈ 0,39 GB × 20 | ≈ 7,9 |
+| Aktarım, 100 KB/istek | 19,7 bin × 100 KB ≈ 1,97 GB × 20 | ≈ 39 |
+| **Toplam trafik** | | **≈ 12 (iyimser) – 43 (kötümser)** |
+
+Yayın maliyeti (tek seferlik): staging 3 deneme + üretim 1 = 4 × 15 = **60 kredi**. Kalan 240 kredi: iyimser senaryoda ≈ 20 gün, kötümser ≈ 5,6 gün. Yalnız gece (≈ 12 saat) kullanım bunun yaklaşık yarısı kadar yakar. Bot trafiği bu sayıya dahildir (insan olayı 797/30 gün); Cloudflare önbelleği (ayrı madde) isteği ve aktarımı Netlify'a hiç düşürmeyebilir.
+
+**Ölçülemeyenler:** Netlify'ın sunucusuz işlev ve ISR yeniden üretim kredisi (tarifede OPS vermedi, belge doğrulanmadı); her `git push` yayını tetikliyorsa dal başına yayın; Netlify'da bir kredi bitince sitenin duraklaması; gerçek ortalama varlık boyutu.
+
+**Otomatik yayın kapalı olmalı (kural):** Netlify yalnız gece için acil yedek. Site kurulurken sürekli yayın (Continuous deployment) kapalı tutulur ya da yayın kilitlenir ("Stop auto publishing"), yayınlar elle başlatılır; aksi hâlde her master birleşmesi 15 kredi yakar (14 Kasım'da tek günde 10 üretim dağıtımı = 150 kredi). Arayüzdeki tam ad hesap açılınca doğrulanır (belgeden doğrulanmadı). Gün sonu: yedek ihtiyacı bitince DNS Vercel'e döner ve Netlify sitesi duraklatılır/silinmez (silme OPS'a sorulur).
 
 ## 2. Hesap gerektirmeyen hazırlık (bu PR'da yok, bu belgede)
 
