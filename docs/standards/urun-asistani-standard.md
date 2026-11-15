@@ -72,7 +72,11 @@
 - **A6.1** Geliştirme (kapılar, RPC, servis, arayüz) sürebilir; **asistan canlıya ancak şu üçü tamamlanınca açılır:**
   (1) KVKK kararı: standart sözleşme imzalanıp 5 iş günü içinde Kurum'a bildirildi YA DA danışmanın gösterdiği başka yol
   uygulandı (karar Recep'in); (2) A5.4 aydınlatma metni yayında; (3) A2.5, A3.6 ve A4.2 kapıları yeşil.
-- **A6.2** Canlıya açma özellik bayrağıyladır ve acil kapatma anahtarı vardır; bayrak varsayılan KAPALI.
+- **A6.2** "Kendi modelimizi kurarsak aktarım olmaz" varsayımı YANLIŞTIR. Site DigitalOcean Frankfurt'ta barınıyor (OPS bilgisi,
+  15 Kasım); Supabase projesi `eu-central-1` (Frankfurt) bölgesinde (proje listesinden ölçüldü, 15 Kasım). Kullanıcı verisi
+  bugün zaten Türkiye dışında işleniyor; aynı yere kurulacak kendi modelimiz de yurt dışında olur. Model sağlayıcısını
+  değiştirmek aktarımın alıcısını değiştirir, aktarımı ortadan kaldırmaz. Hukuki değerlendirme MEVZUAT'ındır (MVZ-17).
+- **A6.3** Canlıya açma özellik bayrağıyladır ve acil kapatma anahtarı vardır; bayrak varsayılan KAPALI.
 
 ## A7. Kabul kapısı
 
