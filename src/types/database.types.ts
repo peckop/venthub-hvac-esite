@@ -4380,6 +4380,7 @@ export type Database = {
           product_id: string
         }[]
       }
+      arama_govde_kokleri: { Args: { p_t: string }; Returns: string[] }
       arama_indeksi_tazele: { Args: { p_ids?: string[] }; Returns: number }
       arama_kelimeler: { Args: { p_q: string }; Returns: string[] }
       arama_kesin_ifade: { Args: { p_q: string }; Returns: string }
@@ -4387,6 +4388,7 @@ export type Database = {
       arama_marka_es: { Args: { p_k: string }; Returns: string }
       arama_marka_kelimeleri: { Args: never; Returns: string[] }
       arama_normalize: { Args: { p_t: string }; Returns: string }
+      arama_sozluk_ifade: { Args: { p_q: string }; Returns: string }
       bump_rate_limit: {
         Args: { p_key: string; p_limit: number; p_window_seconds: number }
         Returns: {
