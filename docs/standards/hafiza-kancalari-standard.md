@@ -438,9 +438,9 @@ hafıza yazıları yedeksiz kalırdı.
    SessionStart yaş satırını her durumda söyler, UserPromptSubmit yalnız `bekleyen + eski` iken konuşur.
 4. **Sır taraması gevşetilmez.** Tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…, postgres URL'si) taşıyan
    DOSYA indekse HİÇ GİRMEZ: adaylar `git status -z` ile okunur, her biri `git add`ten ÖNCE taranır (yeni dosya: tüm içerik;
-   izlenen: HEAD'e göre yalnız eklenen satırlar; NUL baytları silinir, UTF-16 ve ikili de taranır; ad glob sayılmaz),
-   sırlı dosya `.hafiza-commit-uyari.log`'a adıyla yazılır; commit'ten hemen önce indeks farkı bir kez daha taranır;
-   koşular `.hafiza-yedek-kilit` (mkdir, 120 sn bayat) ile sıralanır (PR #2550 denetçi bulgusu: eşzamanlı iki koşuda
+   izlenen: HEAD'e göre ilk `@@` satırından sonraki TÜM eklenen satırlar, `++` önekliler dahil; NUL baytları silinir, UTF-16 ve ikili de taranır; ad glob sayılmaz),
+   sırlı dosya `.hafiza-commit-uyari.log`'a adıyla yazılır; commit'ten hemen önce indeks farkı bir kez daha, commit'ten SONRA ama push'tan önce HEAD farkı bir kez daha taranır (kilitsiz eski kapanış betiği araya girerse commit geri alınır, uzağa gitmez);
+   koşular `.hafiza-yedek-kilit` (mkdir, 120 sn bayat) ile sıralanır (kilidi yalnız alan koşu bırakır; PreCompact 15 sn'ye kadar bekler; PR #2550 denetçi bulgusu: eşzamanlı iki koşuda
    sırlı dosya commit'e girebiliyordu). Kalan dosyalar commit olur (ARC-319: eskiden tek eşleşme TÜM yedeği durduruyordu,
    9-15 Kasım arası 6 gün commit atılmadı). Her denemenin sonucu `.hafiza-yedek-son` dosyasına yazılır; kanca satırı
    "başlatıldı"yı yalnız gerçekten başlattığında söyler ve son deneme başarısızsa nedenini (dışarıda kalan dosya, push

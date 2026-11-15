@@ -60,6 +60,7 @@ function git(dir, args, zamanAsimiMs = 15000) {
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
     timeout: zamanAsimiMs,
+    maxBuffer: 512 * 1024 * 1024,
   })
 }
 
@@ -106,7 +107,10 @@ function nulSil(s) {
 /** Eklenen satırlar mı taranacak (fark) yoksa tüm metin mi. Silinen (-) satır yeni içerik taşımaz (denetçi N2). */
 function sirliMetin(metin, farkMi) {
   const t = nulSil(metin)
-  return sirKalibiVar(farkMi ? t.split('\n').filter((s) => s.startsWith('+') && !s.startsWith('+++')).join('\n') : t)
+  if (!farkMi) return sirKalibiVar(t)
+  const satirlar = t.split('\n')
+  const ilk = satirlar.findIndex((x) => x.startsWith('@@'))
+  return ilk >= 0 && sirKalibiVar(satirlar.slice(ilk).filter((x) => x.startsWith('+')).join('\n'))
 }
 
 /** Değişen/yeni md adaylarını `-z` ile oku (alıntısız, Türkçe ve boşluklu ad güvenli; denetçi B2). */
@@ -140,17 +144,22 @@ const KILIT = '.hafiza-yedek-kilit'
 const KILIT_BAYAT_MS = 120000
 
 /** Atomik tek-koşu kilidi (mkdir). Bayat (>120 sn) kilit düşürülür. Kurulamazsa (EEXIST dışı) fail-open: devam. */
-function kilitAl(dir) {
+function kilitAl(dir, jeton) {
   const yol = path.join(dir, KILIT)
   for (let i = 0; i < 2; i++) {
     try {
       fs.mkdirSync(yol)
+      try {
+        fs.writeFileSync(path.join(yol, 'sahip'), jeton)
+      } catch {
+        // Jeton yazılamazsa bırakma yine dizini siler.
+      }
       return true
     } catch (e) {
       if (!e || e.code !== 'EEXIST') return true
       try {
         if (Date.now() - fs.statSync(yol).mtimeMs <= KILIT_BAYAT_MS) return false
-        fs.rmdirSync(yol)
+        fs.rmSync(yol, { recursive: true, force: true }) // bayat kilit düşürülür
       } catch {
         return false
       }
@@ -159,11 +168,28 @@ function kilitAl(dir) {
   return false
 }
 
-function kilitBirak(dir) {
+/** Kilit alınana kadar en çok bekleMs bekler (PreCompact: compact öncesi son notlar yedeksiz kalmasın). */
+function kilitBekle(dir, jeton, bekleMs) {
+  const son = Date.now() + bekleMs
+  while (!kilitAl(dir, jeton)) {
+    if (Date.now() >= son) return false
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 250)
+  }
+  return true
+}
+
+/** Yalnız KENDİ jetonuyla alınmış kilidi bırakır: bayat düşüp başkasına geçen kilit silinmez (denetçi N-B). */
+function kilitBirak(dir, jeton) {
+  const yol = path.join(dir, KILIT)
   try {
-    fs.rmdirSync(path.join(dir, KILIT))
+    if (fs.readFileSync(path.join(yol, 'sahip'), 'utf8') !== jeton) return
   } catch {
-    // Zaten yok ya da bayat düştü.
+    // Jeton okunamadı: eski biçim ya da yazılamamış; dizin boşsa aşağıda silinir.
+  }
+  try {
+    fs.rmSync(yol, { recursive: true, force: true })
+  } catch {
+    // Zaten yok.
   }
 }
 
@@ -179,18 +205,19 @@ function uzagaGonder(dir) {
 /**
  * Yedek al. Dönüş: { durum: 'yok-depo' | 'mesgul' | 'degisiklik-yok' | 'push-tekrar' | 'sir-kalibi' | 'commit' | 'hata', push?: boolean, disarida?: string[] }
  */
-function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), taramaSonrasi = null } = {}) {
+function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), taramaSonrasi = null, commitOncesi = null, bekleMs = 0 } = {}) {
   let kilitli = false
+  const jeton = process.pid + '-' + Math.random().toString(36).slice(2)
   try {
     if (!fs.existsSync(path.join(dir, '.git'))) return { durum: 'yok-depo' }
-    if (!kilitAl(dir)) return { durum: 'mesgul' } // başka koşu sürüyor: kaydı ezme, sessiz çık
+    if (!kilitBekle(dir, jeton, bekleMs)) return { durum: 'mesgul' } // başka koşu sürüyor: kaydı ezme, sessiz çık
     kilitli = true
     // Önceki (çöken) koşudan kalan indeks temizlenir; aday seçimi baştan yapılır.
     git(dir, ['reset', '-q'])
     const hepsi = adaylar(dir)
     if (hepsi.length === 0) {
       const onceki = sonKayit(dir)
-      if (onceki && onceki.durum === 'commit' && onceki.push === false) return sonuc(dir, simdi, sebep, { durum: 'push-tekrar', push: uzagaGonder(dir) })
+      if (onceki && (onceki.durum === 'commit' || onceki.durum === 'push-tekrar') && onceki.push === false) return sonuc(dir, simdi, sebep, { durum: 'push-tekrar', push: uzagaGonder(dir) })
       return sonuc(dir, simdi, sebep, { durum: 'degisiklik-yok' })
     }
     // ARC-319: sır kalıbı yalnız KENDİ dosyasını dışarıda bırakır, kalan yedek alınır. (Eskiden tek eşleşme TÜM yedeği
@@ -216,15 +243,41 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), ta
       }
     }
     if (taramaSonrasi) taramaSonrasi() // test dikişi: tarama ile git add arasındaki yarış penceresini taklit eder
-    for (let i = 0; i < temizler.length; i += 50) git(dir, ['--literal-pathspecs', 'add', '--', ...temizler.slice(i, i + 50)])
+    for (let i = 0; i < temizler.length; i += 50) {
+      const grup = temizler.slice(i, i + 50)
+      try {
+        git(dir, ['--literal-pathspecs', 'add', '--', ...grup])
+      } catch {
+        // Tarama ile add arasında biri silinmiş olabilir: tek tek dene, kaybolanı atla (denetçi N-G).
+        for (const t of grup) {
+          try {
+            git(dir, ['--literal-pathspecs', 'add', '--', t])
+          } catch {
+            // Kayıp dosya bir sonraki koşuda zaten aday olmaz.
+          }
+        }
+      }
+    }
     // Commit'ten hemen önce tüm indeks farkı BİR KEZ daha taranır (derinlemesine koruma).
     if (git(dir, ['diff', '--cached', '--name-only']).trim() === '') return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida })
     if (sirliMetin(git(dir, ['diff', '--cached', '-U0', '--text']), true)) {
       git(dir, ['reset', '-q'])
       return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida: disarida.concat('(indeks son taramada)') })
     }
+    if (commitOncesi) commitOncesi() // test dikişi: son tarama ile commit arasındaki kilitsiz dış yazar penceresi
     const iso = simdi.toISOString().slice(0, 16) + 'Z'
     git(dir, ['commit', '-q', '-m', 'hafiza: ' + sebep + ' ' + iso])
+    // Commit sonrası, PUSH'tan önce son kapı: kilitsiz bir dış yazar (eski kapanış betiği) indekse sırlı dosya soktuysa
+    // commit geri alınır ve hiçbir şey uzağa gitmez (denetçi N-A).
+    if (sirliMetin(git(dir, ['show', '-U0', '--text', '--format=', 'HEAD']), true)) {
+      try {
+        git(dir, ['reset', '-q', '--soft', 'HEAD~1'])
+      } catch {
+        git(dir, ['update-ref', '-d', 'HEAD']) // ilk commit idi
+      }
+      git(dir, ['reset', '-q'])
+      return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida: disarida.concat('(commit sonrası taramada)') })
+    }
     return sonuc(dir, simdi, sebep, { durum: 'commit', push: uzagaGonder(dir), disarida })
   } catch (e) {
     try {
@@ -236,9 +289,9 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), ta
     const ham = String((e && e.stderr) || (e && e.message) || e)
       .split('\n')
       .find((s) => s.trim())
-    return sonuc(dir, simdi, sebep, { durum: 'hata', neden: temiz(String(ham || 'bilinmiyor').split(dir).join('<depo>')).slice(0, 160) })
+    return sonuc(dir, simdi, sebep, { durum: 'hata', neden: temiz(String(ham || 'bilinmiyor').split(dir).join('<depo>').split(dir.replace(/\\/g, '/')).join('<depo>')).slice(0, 160) })
   } finally {
-    if (kilitli) kilitBirak(dir)
+    if (kilitli) kilitBirak(dir, jeton)
   }
 }
 
@@ -328,7 +381,7 @@ function kancaKosIc(girdi, { dir = hafizaDizini(), simdiSn = Math.floor(Date.now
   const olay = girdi && girdi.hook_event_name
   if (!fs.existsSync(path.join(dir, '.git'))) return { cikti: null }
   if (olay === 'PreCompact') {
-    yedekle({ dir, sebep: 'precompact', simdi: new Date(simdiSn * 1000) })
+    yedekle({ dir, sebep: 'precompact', simdi: new Date(simdiSn * 1000), bekleMs: 15000 })
     return { cikti: null }
   }
   const k = karar({

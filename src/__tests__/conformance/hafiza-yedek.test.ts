@@ -23,7 +23,7 @@ interface Modul {
   sirKalibiVar: (fark: string) => boolean
   yedekYasiSn: (dir: string, simdiSn: number) => number | null
   bekleyenVar: (dir: string) => boolean
-  yedekle: (a: { dir: string; sebep?: string; simdi?: Date; taramaSonrasi?: () => void }) => { durum: string; push?: boolean; disarida?: string[]; neden?: string }
+  yedekle: (a: { dir: string; sebep?: string; simdi?: Date; taramaSonrasi?: () => void; commitOncesi?: () => void; bekleMs?: number }) => { durum: string; push?: boolean; disarida?: string[]; neden?: string }
   karar: (a: { olay: string; yasSn: number | null; bekleyen: boolean; sonDenemeYasSn: number | null; sonBasarisiz?: string | null }) => {
     yedekle: boolean
     satir: string | null
@@ -219,6 +219,82 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     expect(r.durum).toBe('sir-kalibi')
     expect(commitSayisi(dir)).toBe(once)
     expect(git(dir, 'diff', '--cached', '--name-only')).toBe('')
+  })
+
+  it('ARC-319 denetçi E1: izlenen dosyaya eklenen "++" ya da "+++" ile başlayan sırlı satır da yakalanır (başlık sanılıp atlanmaz)', () => {
+    fs.writeFileSync(path.join(dir, 'not.md'), 'ilk\n')
+    git(dir, 'add', '--', 'not.md')
+    git(dir, 'commit', '-q', '-m', 'not')
+    for (const onek of ['++', '++ ', '+++ b/x ', '+']) {
+      fs.writeFileSync(path.join(dir, 'not.md'), 'ilk\n' + onek + SIR)
+      const once = commitSayisi(dir)
+      const r = m.yedekle({ dir, sebep: 'test' })
+      expect(r.durum, 'önek ' + JSON.stringify(onek)).toBe('sir-kalibi')
+      expect(r.disarida).toEqual(['not.md'])
+      expect(commitSayisi(dir)).toBe(once)
+    }
+  })
+
+  it('ARC-319 denetçi M11: izlenen a[1].md temiz değişince glob a1.md’ye taşmaz (diff de literal pathspec)', () => {
+    fs.writeFileSync(path.join(dir, 'a[1].md'), 'bir\n')
+    fs.writeFileSync(path.join(dir, 'a1.md'), 'iki\n')
+    git(dir, 'add', '--', 'a[1].md', 'a1.md')
+    git(dir, 'commit', '-q', '-m', 'iki dosya')
+    fs.writeFileSync(path.join(dir, 'a[1].md'), 'bir\ntemiz ek\n')
+    fs.writeFileSync(path.join(dir, 'a1.md'), 'iki\n' + SIR)
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.disarida).toEqual(['a1.md'])
+    expect(sonCommitDosyalari()).toEqual(['a[1].md'])
+  })
+
+  it('ARC-319 denetçi N-A: kilitsiz dış yazar son tarama ile commit arasında sırlı dosyayı indekse sokarsa commit geri alınır, uzağa gitmez', () => {
+    const uzak = fs.mkdtempSync(path.join(os.tmpdir(), 'hafiza-uzak-'))
+    try {
+      execFileSync('git', ['init', '-q', '--bare', uzak], { windowsHide: true })
+      git(dir, 'remote', 'add', 'origin', uzak)
+      fs.writeFileSync(path.join(dir, 'gizli.md'), SIR)
+      fs.writeFileSync(path.join(dir, 'temiz.md'), 'ders\n')
+      const once = commitSayisi(dir)
+      const ilk = git(dir, 'rev-parse', 'HEAD')
+      const r = m.yedekle({ dir, sebep: 'test', commitOncesi: () => git(dir, 'add', '--', 'gizli.md') })
+      expect(r.durum).toBe('sir-kalibi')
+      expect(r.disarida).toContain('(commit sonrası taramada)')
+      expect(commitSayisi(dir)).toBe(once)
+      expect(git(dir, 'rev-parse', 'HEAD')).toBe(ilk)
+      expect(git(dir, 'diff', '--cached', '--name-only')).toBe('')
+      // Uzakta hiçbir şey yok: push yapılmadı.
+      expect(() => execFileSync('git', ['-C', uzak, 'rev-parse', 'master'], { stdio: 'pipe', windowsHide: true })).toThrow()
+    } finally {
+      fs.rmSync(uzak, { recursive: true, force: true })
+    }
+  })
+
+  it('ARC-319 denetçi N-B: kilidi bayat düşüp başkasına geçmişse bitirenin finally’si başkasının kilidini silmez; N-H: bekleMs kilit boşalmazsa mesgul döner', () => {
+    fs.writeFileSync(path.join(dir, 'ders.md'), 'bir\n')
+    const kilit = path.join(dir, '.hafiza-yedek-kilit')
+    const r = m.yedekle({ dir, sebep: 'test', commitOncesi: () => fs.writeFileSync(path.join(kilit, 'sahip'), 'baska-surec') })
+    expect(r.durum).toBe('commit')
+    expect(fs.existsSync(kilit)).toBe(true)
+    expect(fs.readFileSync(path.join(kilit, 'sahip'), 'utf8')).toBe('baska-surec')
+    const t0 = Date.now()
+    expect(m.yedekle({ dir, sebep: 'test', bekleMs: 400 }).durum).toBe('mesgul')
+    expect(Date.now() - t0).toBeGreaterThanOrEqual(350)
+    fs.rmSync(kilit, { recursive: true, force: true })
+  })
+
+  it('ARC-319 denetçi N-C ve N-E: push iki koşuda da düşse üçüncü koşu yine dener; hata nedeninde / ve \\ yolu maskelenir', () => {
+    fs.writeFileSync(path.join(dir, 'ders.md'), 'bir\n')
+    expect(m.yedekle({ dir, sebep: 'test' }).push).toBe(false)
+    expect(m.yedekle({ dir, sebep: 'test' })).toMatchObject({ durum: 'push-tekrar', push: false })
+    expect(m.yedekle({ dir, sebep: 'test' })).toMatchObject({ durum: 'push-tekrar', push: false })
+    // index.lock varken git yolu ileri eğik çizgiyle yazar; neden mutlak yol taşımamalı.
+    fs.writeFileSync(path.join(dir, '.git', 'index.lock'), '')
+    fs.writeFileSync(path.join(dir, 'yeni.md'), 'n\n')
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('hata')
+    expect(r.neden).not.toContain(dir)
+    expect(r.neden).not.toContain(dir.replace(/\\/g, '/'))
+    fs.rmSync(path.join(dir, '.git', 'index.lock'))
   })
 
   it('ARC-319 denetçi N7: push düşünce kayıt yazılır, uzak sonradan eklenince "değişiklik yok" koşusu push’u yeniden dener', () => {
