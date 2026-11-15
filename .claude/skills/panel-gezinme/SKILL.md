@@ -83,7 +83,7 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Sütun panelinde işaretlenen sütun "Dar pencere: … gizlendi." ile sessizce gizlenebilir (tablo altı gri satır): kanıt bu satırdır. "Varsayılana dön" uzun panellerde ekran dışında kalır.
 - Tarih alanına yazarken ilk karakterden sonra odak kaybolabilir: alana yeniden tıkla. Kayıtta sessizce proje (P-xxxx) açılır; açılan kaydı raporla.
 - Çalışan sonucu her parça için müdüre döner: kanıtsız satır yok (sayfa başlığı, ham yazı, süre, kare yolu), rapor başında "denenemedi" sayısı sebebiyle, işler ~8 maddelik parçalara bölünür.
-- Tur sonunda (Recep kararı 15 Kasım): rapor DesignSync ile yüklenir; Design'a gidecek mesajı TASARIM Design Venthub New sohbet penceresine claude-in-chrome ile kendisi yapıştırıp gönderir. Önce sohbetin son mesajlarına bak; aynı tur mesajı zaten gönderilmişse ikinci kez gönderme. Sohbet açılamazsa OPS'a tek satır yaz.
+- Tur sonunda (Recep kararı 15 Kasım): rapor DesignSync ile yüklenir; Design'a gidecek mesajı TASARIM Design Venthub New sohbet penceresine claude-in-chrome ile kendisi yapıştırıp gönderir. Önce sohbetin son mesajlarına bak; aynı tur mesajı zaten gönderilmişse ikinci kez gönderme. Sohbet açılamazsa OPS'a tek satır yaz. Design başka sekmede çalışırken sohbette Resume ya da başka düğmeye basma (Recep'in çalışan sekmesini bozabilir); işin sonunda kendi sekmeni kapat.
 
 ## Ölçüm sırası
 
