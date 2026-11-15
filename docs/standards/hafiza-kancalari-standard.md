@@ -102,7 +102,7 @@ bir durum değil, bir boşluktur.
 | `hafiza-kullanim-sayaci.cjs` | kanca | defterdeki enjeksiyonları `recordInjection`, transcript atıflarını `recordUse` ile sage'e yazar | Stop (async) | ARAÇ | aynı kapı |
 | `sage-hijyen-oturum-sonu.cjs` | kanca | taze doğrulanmış yedek varken `port.hygiene` koşar | SessionEnd | ARAÇ | aynı kapı |
 | `scripts/hijyen/hafiza-enjeksiyonu.cjs` · `sage-enjeksiyon-defteri.cjs` | modül | konu/sayaç/hijyen mantığı (port enjekte) · oturum+nesil anahtarlı enjeksiyon defteri | üç kanca + `sage-dosya-dersi` | ARAÇ | aynı kapı |
-| `hafiza-yedek.cjs` | kanca | hafıza deposunu PreCompact'ta ELDE, eşik (3600 sn) aşılınca ve bekleyen md varken arka planda yedekler; açılışta yaş satırı (§9) | PreCompact · SessionStart · UserPromptSubmit | ARAÇ | `…/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol) |
+| `hafiza-yedek.cjs` | kanca | hafıza deposunu PreCompact'ta ELDE, eşik (3600 sn) aşılınca ve bekleyen md varken arka planda yedekler; açılışta yaş satırı (§9) | PreCompact · SessionStart · UserPromptSubmit | ARAÇ | `…/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 12+ kol) |
 | `scripts/hijyen/hafiza-yedek.cjs` | modül | yedek mantığı: ayrı `git add`, sır taraması, yaş ölçümü, saf karar; CLI `--yedekle --sebep <ad>` ve `--yas` (eski `~/.claude/hafiza-commit.sh`'ın yerine) | kanca + oturum kapanışı | ARAÇ | aynı kapı |
 
 ⚠**AYARA KAYIT RECEP KAPISI:** bu tabloda listelenen bir kanca `.claude/settings.json`'a
@@ -436,11 +436,15 @@ hafıza yazıları yedeksiz kalırdı.
    (`.hafiza-yedek-deneme` işaretinin mtime'ı; `*.md` olmadığı için commit'e girmez).
 3. **Yaş = son commit'in yaşı.** Bekleyen değişiklik yokken uyarı ve yedek YOKTUR (yedeklenecek bir şey yok);
    SessionStart yaş satırını her durumda söyler, UserPromptSubmit yalnız `bekleyen + eski` iken konuşur.
-4. **Sır taraması gevşetilmez.** Staged farkta tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…,
-   postgres URL'si) taşıyan DOSYA yedeğe alınmaz: indeksten çıkarılır ve `.hafiza-commit-uyari.log`'a adıyla yazılır;
-   kalan dosyalar commit olur (ARC-319: eskiden tek eşleşme TÜM yedeği durduruyordu, 9-15 Kasım arası 6 gün commit
-   atılmadı). Her denemenin sonucu `.hafiza-yedek-son` dosyasına yazılır; kanca satırı "başlatıldı"yı yalnız
-   gerçekten başlattığında söyler ve son deneme başarısızsa nedenini (dışarıda kalan dosya, push düşmesi, hata) yazar.
+4. **Sır taraması gevşetilmez.** Tam anahtar kalıbı (sk-ant, ghp_, gho_, lin_api_, sbp_, eyJ…, postgres URL'si) taşıyan
+   DOSYA indekse HİÇ GİRMEZ: adaylar `git status -z` ile okunur, her biri `git add`ten ÖNCE taranır (yeni dosya: tüm içerik;
+   izlenen: HEAD'e göre yalnız eklenen satırlar; NUL baytları silinir, UTF-16 ve ikili de taranır; ad glob sayılmaz),
+   sırlı dosya `.hafiza-commit-uyari.log`'a adıyla yazılır; commit'ten hemen önce indeks farkı bir kez daha taranır;
+   koşular `.hafiza-yedek-kilit` (mkdir, 120 sn bayat) ile sıralanır (PR #2550 denetçi bulgusu: eşzamanlı iki koşuda
+   sırlı dosya commit'e girebiliyordu). Kalan dosyalar commit olur (ARC-319: eskiden tek eşleşme TÜM yedeği durduruyordu,
+   9-15 Kasım arası 6 gün commit atılmadı). Her denemenin sonucu `.hafiza-yedek-son` dosyasına yazılır; kanca satırı
+   "başlatıldı"yı yalnız gerçekten başlattığında söyler ve son deneme başarısızsa nedenini (dışarıda kalan dosya, push
+   düşmesi, hata) yazar; düşen push sonraki "değişiklik yok" koşusunda yeniden denenir.
 5. **`git add` kalıpları AYRI verilir.** Eşleşmeyen kalıpta git hiçbir şey eklemeden düşer: eski betik
    `MEMORY.md.oncesi-*` dosyası yokken sessizce hiçbir şey yedeklemiyordu (ARC-92 testinin ilk koşusunda ölçüldü;
    bugün 6 dosya var, bu yüzden canlıda tetiklenmiyordu).
@@ -448,8 +452,8 @@ hafıza yazıları yedeksiz kalırdı.
    ve kullanıcı düzeyi `settings.json:294` (eski betiğin yerine `node scripts/hijyen/hafiza-yedek.cjs --yedekle
    --sebep kapanis`). Kayıtlı olana kadar kanca ölüdür; kural bu cetveldedir.
 
-**Kanıt:** `src/__tests__/conformance/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 9 kol, geçici git deposunda);
-bozma 8/8 yakalandı. **Ölçüt:** bekleyen değişiklik varken yaş ≤ 3600 sn
+**Kanıt:** `src/__tests__/conformance/hafiza-yedek.test.ts` (INV-HAFIZA-YEDEK-1, 12 kol + ARC-319 kolları, geçici git deposunda);
+ARC-319 bozmaları (NUL silme, literal pathspec, başlangıç reset, kilit, commit öncesi tarama) 5/5 yakalandı. **Ölçüt:** bekleyen değişiklik varken yaş ≤ 3600 sn
 (`node scripts/hijyen/hafiza-yedek.cjs --yas` ya da `git -C <hafıza dizini> log -1 --format=%ct`).
 
 ---

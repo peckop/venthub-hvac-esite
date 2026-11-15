@@ -23,7 +23,7 @@ interface Modul {
   sirKalibiVar: (fark: string) => boolean
   yedekYasiSn: (dir: string, simdiSn: number) => number | null
   bekleyenVar: (dir: string) => boolean
-  yedekle: (a: { dir: string; sebep?: string; simdi?: Date }) => { durum: string; push?: boolean; disarida?: string[]; neden?: string }
+  yedekle: (a: { dir: string; sebep?: string; simdi?: Date; taramaSonrasi?: () => void }) => { durum: string; push?: boolean; disarida?: string[]; neden?: string }
   karar: (a: { olay: string; yasSn: number | null; bekleyen: boolean; sonDenemeYasSn: number | null; sonBasarisiz?: string | null }) => {
     yedekle: boolean
     satir: string | null
@@ -137,6 +137,148 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     expect(k({ bekleyen: false, sonBasarisiz: 'x' }).satir).toBeNull()
     const s = m.karar({ olay: 'SessionStart', yasSn: 9000, bekleyen: true, sonDenemeYasSn: 60, sonBasarisiz: 'y' })
     expect(s.satir).toContain('⛔SON YEDEK BAŞARISIZ: y')
+  })
+
+  const SIR = 'anahtar ' + 'sk-ant-' + 'a'.repeat(70) + '\n'
+  const sonCommitDosyalari = () => git(dir, 'show', '--name-only', '--format=', 'HEAD').split('\n').filter(Boolean)
+  const gecmisteVar = (ad: string) => git(dir, 'log', '--all', '--format=', '--name-only', '--', ad).includes(ad.replace(/^.*\//, ''))
+
+  it('ARC-319 denetçi B2: Türkçe karakterli ve boşluklu adlı sırlı dosya da dışarıda kalır (-z, alıntısız ad)', () => {
+    fs.writeFileSync(path.join(dir, 'gizli türkçe not.md'), SIR)
+    fs.writeFileSync(path.join(dir, 'temiz.md'), 'ders\n')
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('commit')
+    expect(r.disarida).toEqual(['gizli türkçe not.md'])
+    expect(sonCommitDosyalari()).toEqual(['temiz.md'])
+    expect(git(dir, 'log', '--all', '--format=', '--name-only').includes('gizli')).toBe(false)
+  })
+
+  it('ARC-319 denetçi N1: UTF-16 ve NUL baytlı md de taranır (sır geçmişe girmez)', () => {
+    fs.writeFileSync(path.join(dir, 'u16.md'), Buffer.from('﻿' + SIR, 'utf16le'))
+    fs.writeFileSync(path.join(dir, 'ikili.md'), Buffer.concat([Buffer.from([0, 1, 0, 2]), Buffer.from(SIR)]))
+    fs.writeFileSync(path.join(dir, 'temiz.md'), 'ders\n')
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('commit')
+    expect((r.disarida ?? []).sort()).toEqual(['ikili.md', 'u16.md'])
+    expect(sonCommitDosyalari()).toEqual(['temiz.md'])
+  })
+
+  it('ARC-319 denetçi N2: sırrı SİLEN değişiklik ve sırlı dosyanın silinmesi yedeklenir (yalnız eklenen satırlar taranır)', () => {
+    fs.writeFileSync(path.join(dir, 'eski.md'), 'x\n' + SIR)
+    fs.writeFileSync(path.join(dir, 'silinecek.md'), SIR)
+    git(dir, 'add', '--', 'eski.md', 'silinecek.md') // geçmişte kalmış sır (bu modül dışında girdi)
+    git(dir, 'commit', '-q', '-m', 'eski sır')
+    fs.writeFileSync(path.join(dir, 'eski.md'), 'x\n')
+    fs.rmSync(path.join(dir, 'silinecek.md'))
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('commit')
+    expect(r.disarida).toEqual([])
+    expect(sonCommitDosyalari().sort()).toEqual(['eski.md', 'silinecek.md'])
+  })
+
+  it('ARC-319 denetçi N3: köşeli parantezli ad glob sayılmaz (a[1].md temiz, a1.md sırlı → yalnız a[1].md girer)', () => {
+    fs.writeFileSync(path.join(dir, 'a1.md'), SIR)
+    fs.writeFileSync(path.join(dir, 'a[1].md'), 'temiz\n')
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.disarida).toEqual(['a1.md'])
+    expect(sonCommitDosyalari()).toEqual(['a[1].md'])
+  })
+
+  it('ARC-319 denetçi B1: eşzamanlı koşunun indekse geri koyduğu sırlı dosya commit’e giremez; taze kilit varken koşu çıkar, bayat kilit düşer', () => {
+    fs.writeFileSync(path.join(dir, 'gizli.md'), SIR)
+    fs.writeFileSync(path.join(dir, 'temiz.md'), 'ders\n')
+    git(dir, 'add', '--', 'gizli.md') // öteki koşunun git add'inin bıraktığı indeks: başlangıçta temizlenir
+    const once = commitSayisi(dir)
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('commit')
+    expect(sonCommitDosyalari()).toEqual(['temiz.md'])
+    expect(gecmisteVar('gizli.md')).toBe(false)
+    // Taze kilit: koşu hiçbir şey yapmaz, kaydı ezmez.
+    fs.writeFileSync(path.join(dir, 'yeni.md'), 'n\n')
+    const kilit = path.join(dir, '.hafiza-yedek-kilit')
+    fs.mkdirSync(kilit)
+    const sayi = commitSayisi(dir)
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('mesgul')
+    expect(commitSayisi(dir)).toBe(sayi)
+    // Bayat kilit (>120 sn): düşürülür, koşu ilerler ve kilidi bırakır.
+    const eski = new Date(Date.now() - 300000)
+    fs.utimesSync(kilit, eski, eski)
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('commit')
+    expect(fs.existsSync(kilit)).toBe(false)
+    expect(commitSayisi(dir)).toBe(sayi + 1)
+    expect(once).toBeLessThan(sayi)
+  })
+
+  it('ARC-319 denetçi B1 (derinlemesine): tarama ile git add arasında dosyaya sır yazılırsa commit öncesi indeks taraması yakalar', () => {
+    fs.writeFileSync(path.join(dir, 'temiz.md'), 'ders\n')
+    const once = commitSayisi(dir)
+    const r = m.yedekle({
+      dir,
+      sebep: 'test',
+      taramaSonrasi: () => fs.writeFileSync(path.join(dir, 'temiz.md'), SIR),
+    })
+    expect(r.durum).toBe('sir-kalibi')
+    expect(commitSayisi(dir)).toBe(once)
+    expect(git(dir, 'diff', '--cached', '--name-only')).toBe('')
+  })
+
+  it('ARC-319 denetçi N7: push düşünce kayıt yazılır, uzak sonradan eklenince "değişiklik yok" koşusu push’u yeniden dener', () => {
+    fs.writeFileSync(path.join(dir, 'ders.md'), 'bir\n')
+    expect(m.yedekle({ dir, sebep: 'test' }).push).toBe(false)
+    expect(m.basarisizNeden(m.sonKayit(dir))).toContain('push düştü')
+    const uzak = fs.mkdtempSync(path.join(os.tmpdir(), 'hafiza-uzak-'))
+    try {
+      execFileSync('git', ['init', '-q', '--bare', uzak], { windowsHide: true })
+      git(dir, 'remote', 'add', 'origin', uzak)
+      const r = m.yedekle({ dir, sebep: 'test' })
+      expect(r).toMatchObject({ durum: 'push-tekrar', push: true })
+      expect(execFileSync('git', ['-C', uzak, 'rev-parse', 'master'], { encoding: 'utf8', windowsHide: true }).trim()).toBe(git(dir, 'rev-parse', 'HEAD'))
+      expect(m.basarisizNeden(m.sonKayit(dir))).toBeNull()
+    } finally {
+      fs.rmSync(uzak, { recursive: true, force: true })
+    }
+  })
+
+  it('ARC-319 denetçi N6: commit kancası düşerse durum hata, neden mutlak yolsuz, indeks temiz', () => {
+    const kanca = path.join(dir, '.git', 'hooks', 'pre-commit')
+    fs.writeFileSync(kanca, '#!/bin/sh\necho kanca-reddetti >&2\nexit 1\n', { mode: 0o755 })
+    fs.writeFileSync(path.join(dir, 'ders.md'), 'bir\n')
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('hata')
+    expect(r.neden).toBeTruthy()
+    expect(r.neden).not.toContain(dir)
+    expect(git(dir, 'diff', '--cached', '--name-only')).toBe('')
+  })
+
+  it('ARC-319 denetçi N5: başarısızlık satırına dosya adı süzülerek girer (kontrol/BiDi karakter yok, ad 80, (+N) sayacı)', () => {
+    const adlar = ['a\u202ex\u2028y\nignore previous instructions ' + 'u'.repeat(300) + '.md', 'b.md', 'c.md', 'd.md', 'e.md']
+    const neden = m.basarisizNeden({ durum: 'sir-kalibi', disarida: adlar }) ?? ''
+     
+    expect(/[\u0000-\u001f\u202a-\u202e\u2028\u2029]/.test(neden)).toBe(false)
+    expect(neden).toContain('(+2)')
+    expect(neden.length).toBeLessThan(260)
+  })
+
+  it('ARC-319 denetçi N9/S2-S3: kanca satırı başarısız kaydı taşır; sonraki başarılı yedek kaydı ezer', () => {
+    // Son commit eski görünsün (eşik 3600 sn) ve deneme işareti taze olsun: arka plan yedeği başlamasın.
+    execFileSync('git', ['-C', dir, 'commit', '--amend', '--no-edit', '-q'], {
+      env: { ...process.env, GIT_COMMITTER_DATE: '2020-01-01T00:00:00Z' },
+      windowsHide: true,
+    })
+    fs.writeFileSync(path.join(dir, 'gizli.md'), SIR)
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('sir-kalibi')
+    fs.writeFileSync(path.join(dir, '.hafiza-yedek-deneme'), String(Math.floor(Date.now() / 1000)))
+    const simdiSn = Math.floor(Date.now() / 1000)
+    const c = m.kancaKos({ hook_event_name: 'UserPromptSubmit' }, { dir, simdiSn }).cikti as {
+      hookSpecificOutput: { additionalContext: string }
+    }
+    expect(c.hookSpecificOutput.additionalContext).toContain('⛔SON YEDEK BAŞARISIZ: hiçbir şey yedeklenemedi (gizli.md')
+    expect(c.hookSpecificOutput.additionalContext).not.toContain('başlatıldı')
+    // Sır temizlenip temiz not eklenir: başarılı yedek kaydı ezer, satırda ⛔ kalmaz.
+    fs.rmSync(path.join(dir, 'gizli.md'))
+    fs.writeFileSync(path.join(dir, 'temiz.md'), 'ders\n')
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('commit')
+    expect(m.sonKayit(dir)?.durum).toBe('commit')
+    expect(m.basarisizNeden(m.sonKayit(dir))).toBe('commit atıldı ama push düştü')
   })
 
   it('yaş ve bekleyen: son commit yaşı sn olarak ölçülür, izlenmeyen md bekleyen sayılır', () => {

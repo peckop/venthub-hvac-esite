@@ -15,9 +15,14 @@
  *
  * ── DAVRANIŞ (eski betikle AYNI, gevşetilmedi) ──
  *
- * `git add -- '*.md' 'MEMORY.md.oncesi-*'`; değişiklik yoksa sessiz çık; STAGED farkta tam anahtar kalıbı varsa
- * commit ATMAZ, `.hafiza-commit-uyari.log`'a yazar ve `git reset -q` ile indeksi temizler; yoksa commit +
- * best-effort `git push origin master` (push düşerse sessiz).
+ * Adaylar `git status --porcelain -z` ile okunur (md ve MEMORY.md.oncesi-*); değişiklik yoksa sessiz çık. Her aday
+ * indekse GİRMEDEN taranır (yeni dosya: tüm içerik; izlenen: HEAD'e göre YALNIZ eklenen satırlar; NUL baytları
+ * silinir, UTF-16 ve ikili dosya da taranır). Tam anahtar kalıbı taşıyan DOSYA stage'lenmez ve
+ * `.hafiza-commit-uyari.log`'a adıyla yazılır (ARC-319: eskiden tek eşleşme TÜM yedeği durduruyordu); kalanlar
+ * stage'lenir, commit'ten hemen önce indeks farkı bir kez daha taranır, sonra commit + best-effort push.
+ * Koşular atomik kilitle (`.hafiza-yedek-kilit`, mkdir, 120 sn bayat) sıralanır. Her denemenin sonucu
+ * `.hafiza-yedek-son` dosyasına yazılır; kanca satırı gerçek sonucu söyler. Push düşmüşse sonraki "değişiklik yok"
+ * koşusunda yeniden denenir.
  *
  * ── YAŞ ÖLÇÜSÜ ──
  *
@@ -84,50 +89,156 @@ function bekleyenVar(dir) {
   }
 }
 
-/**
- * Yedek al. Dönüş: { durum: 'yok-depo' | 'degisiklik-yok' | 'sir-kalibi' | 'commit' | 'hata', push?: boolean }
- */
-function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date() } = {}) {
+// Kontrol ve BiDi karakterleri; kaçışlar kaynakta yazılı (ham karakter yok): 0000-001f 007f-009f 2028 2029 202a-202e 2066-2069
+const KONTROL = /[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g
+/** Konsol/BiDi kontrol karakterlerini bağlama sokmamak için boşluğa çevirir. */
+function temiz(s) {
+  return String(s)
+    .replace(KONTROL, ' ')
+    .trim()
+}
+
+/** UTF-16 (PowerShell `>` çıktısı) ve ikili dosyalar için NUL baytlarını siler: kalıp yine eşleşir (denetçi N1). */
+function nulSil(s) {
+  return String(s).replace(/\0/g, '')
+}
+
+/** Eklenen satırlar mı taranacak (fark) yoksa tüm metin mi. Silinen (-) satır yeni içerik taşımaz (denetçi N2). */
+function sirliMetin(metin, farkMi) {
+  const t = nulSil(metin)
+  return sirKalibiVar(farkMi ? t.split('\n').filter((s) => s.startsWith('+') && !s.startsWith('+++')).join('\n') : t)
+}
+
+/** Değişen/yeni md adaylarını `-z` ile oku (alıntısız, Türkçe ve boşluklu ad güvenli; denetçi B2). */
+function adaylar(dir) {
+  const t = git(dir, ['status', '--porcelain', '-z', '-uall', '--', ...PATHSPEC]).split('\0')
+  const liste = []
+  for (let i = 0; i < t.length; i++) {
+    const s = t[i]
+    if (s.length < 4) continue
+    const x = s[0]
+    const y = s[1]
+    if (x === 'R' || x === 'C') i++ // yeniden adlandırmada eski ad ayrı jeton
+    liste.push({ p: s.slice(3), yeni: x === '?', silindi: x === 'D' || y === 'D' })
+  }
+  return liste
+}
+
+/** Dosya indekse GİRMEDEN taranır: sırlı dosya hiç stage'lenmez, eşzamanlı koşu onu geri koyamaz (denetçi B1). */
+function dosyaSirli(dir, a) {
+  if (a.silindi) return false
+  const oku = () => fs.readFileSync(path.join(dir, a.p), 'latin1')
+  if (a.yeni) return sirliMetin(oku(), false)
   try {
-    if (!fs.existsSync(path.join(dir, '.git'))) return { durum: 'yok-depo' }
-    // Kalıplar AYRI eklenir: git add, eşleşmeyen bir kalıpta ("did not match any files") HİÇBİR şey eklemeden
-    // düşer. Eski betik iki kalıbı tek komutta veriyordu ve MEMORY.md.oncesi-* dosyası yokken sessizce
-    // hiçbir şey yedeklemiyordu (ARC-92'de test bunu yakaladı).
-    for (const kalip of PATHSPEC) {
+    return sirliMetin(git(dir, ['--literal-pathspecs', 'diff', '-U0', '--text', 'HEAD', '--', a.p]), true)
+  } catch {
+    return sirliMetin(oku(), false) // HEAD yok (ilk commit): tüm içerik taranır
+  }
+}
+
+const KILIT = '.hafiza-yedek-kilit'
+const KILIT_BAYAT_MS = 120000
+
+/** Atomik tek-koşu kilidi (mkdir). Bayat (>120 sn) kilit düşürülür. Kurulamazsa (EEXIST dışı) fail-open: devam. */
+function kilitAl(dir) {
+  const yol = path.join(dir, KILIT)
+  for (let i = 0; i < 2; i++) {
+    try {
+      fs.mkdirSync(yol)
+      return true
+    } catch (e) {
+      if (!e || e.code !== 'EEXIST') return true
       try {
-        git(dir, ['add', '--', kalip])
+        if (Date.now() - fs.statSync(yol).mtimeMs <= KILIT_BAYAT_MS) return false
+        fs.rmdirSync(yol)
       } catch {
-        // Bu kalıba uyan dosya yok: öteki kalıp yine eklenir.
+        return false
       }
     }
-    const dosyalar = git(dir, ['diff', '--cached', '--name-only', '-z']).split('\0').filter(Boolean)
-    if (dosyalar.length === 0) return sonuc(dir, simdi, sebep, { durum: 'degisiklik-yok' })
+  }
+  return false
+}
+
+function kilitBirak(dir) {
+  try {
+    fs.rmdirSync(path.join(dir, KILIT))
+  } catch {
+    // Zaten yok ya da bayat düştü.
+  }
+}
+
+function uzagaGonder(dir) {
+  try {
+    git(dir, ['push', '-q', 'origin', 'master'], 25000)
+    return true
+  } catch {
+    return false // Ağ yok / uzak yok: yerel commit yeterli; durum son-durum kaydına yazılır, kanca satırı söyler.
+  }
+}
+
+/**
+ * Yedek al. Dönüş: { durum: 'yok-depo' | 'mesgul' | 'degisiklik-yok' | 'push-tekrar' | 'sir-kalibi' | 'commit' | 'hata', push?: boolean, disarida?: string[] }
+ */
+function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), taramaSonrasi = null } = {}) {
+  let kilitli = false
+  try {
+    if (!fs.existsSync(path.join(dir, '.git'))) return { durum: 'yok-depo' }
+    if (!kilitAl(dir)) return { durum: 'mesgul' } // başka koşu sürüyor: kaydı ezme, sessiz çık
+    kilitli = true
+    // Önceki (çöken) koşudan kalan indeks temizlenir; aday seçimi baştan yapılır.
+    git(dir, ['reset', '-q'])
+    const hepsi = adaylar(dir)
+    if (hepsi.length === 0) {
+      const onceki = sonKayit(dir)
+      if (onceki && onceki.durum === 'commit' && onceki.push === false) return sonuc(dir, simdi, sebep, { durum: 'push-tekrar', push: uzagaGonder(dir) })
+      return sonuc(dir, simdi, sebep, { durum: 'degisiklik-yok' })
+    }
     // ARC-319: sır kalıbı yalnız KENDİ dosyasını dışarıda bırakır, kalan yedek alınır. (Eskiden tek eşleşme TÜM yedeği
     // durduruyordu: 9-15 Kasım arası 6 gün commit atılmadı; bir nottaki sahte bağlantı örneği kalıbı tetikledi.)
     const disarida = []
-    for (const d of dosyalar) {
-      if (!sirKalibiVar(git(dir, ['diff', '--cached', '-U0', '--', d]))) continue
-      disarida.push(d)
-      git(dir, ['reset', '-q', '--', d])
+    const temizler = []
+    for (const a of hepsi) {
+      let sirli = false
       try {
-        fs.appendFileSync(path.join(dir, UYARI_LOGU), simdi.toISOString() + ' SIR KALIBI: ' + d + ' yedege ALINMADI, elle bak (' + sebep + ')\n')
+        sirli = dosyaSirli(dir, a)
       } catch {
-        // Günlük yazılamazsa da dosya dışarıda kalır; asıl koruma indeksten çıkarmaktır.
+        sirli = true // okunamayan dosya yedeğe alınmaz (güvenli taraf)
+      }
+      if (!sirli) {
+        temizler.push(a.p)
+        continue
+      }
+      disarida.push(a.p)
+      try {
+        fs.appendFileSync(path.join(dir, UYARI_LOGU), simdi.toISOString() + ' SIR KALIBI: ' + temiz(a.p).slice(0, 120) + ' yedege ALINMADI, elle bak (' + sebep + ')\n')
+      } catch {
+        // Günlük yazılamazsa da dosya hiç stage'lenmez; asıl koruma budur.
       }
     }
+    if (taramaSonrasi) taramaSonrasi() // test dikişi: tarama ile git add arasındaki yarış penceresini taklit eder
+    for (let i = 0; i < temizler.length; i += 50) git(dir, ['--literal-pathspecs', 'add', '--', ...temizler.slice(i, i + 50)])
+    // Commit'ten hemen önce tüm indeks farkı BİR KEZ daha taranır (derinlemesine koruma).
     if (git(dir, ['diff', '--cached', '--name-only']).trim() === '') return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida })
+    if (sirliMetin(git(dir, ['diff', '--cached', '-U0', '--text']), true)) {
+      git(dir, ['reset', '-q'])
+      return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida: disarida.concat('(indeks son taramada)') })
+    }
     const iso = simdi.toISOString().slice(0, 16) + 'Z'
     git(dir, ['commit', '-q', '-m', 'hafiza: ' + sebep + ' ' + iso])
-    let push = false
-    try {
-      git(dir, ['push', '-q', 'origin', 'master'], 25000)
-      push = true
-    } catch {
-      // Ağ yok / uzak yok: yerel commit yeterli; push durumu son-durum kaydına yazılır, kanca satırı söyler.
-    }
-    return sonuc(dir, simdi, sebep, { durum: 'commit', push, disarida })
+    return sonuc(dir, simdi, sebep, { durum: 'commit', push: uzagaGonder(dir), disarida })
   } catch (e) {
-    return sonuc(dir, simdi, sebep, { durum: 'hata', neden: String((e && e.message) || e).split('\n')[0].slice(0, 160) })
+    try {
+      git(dir, ['reset', '-q'])
+    } catch {
+      // Sessiz.
+    }
+    // İlk anlamlı satır: git hatasında asıl neden stderr'dedir; mutlak yol bağlama girmesin (denetçi N6).
+    const ham = String((e && e.stderr) || (e && e.message) || e)
+      .split('\n')
+      .find((s) => s.trim())
+    return sonuc(dir, simdi, sebep, { durum: 'hata', neden: temiz(String(ham || 'bilinmiyor').split(dir).join('<depo>')).slice(0, 160) })
+  } finally {
+    if (kilitli) kilitBirak(dir)
   }
 }
 
@@ -153,16 +264,20 @@ function sonKayit(dir) {
 /** Kayıt BAŞARISIZ bir son denemeyi gösteriyorsa kısa neden, yoksa null. */
 function basarisizNeden(k) {
   if (!k) return null
-  const dosya = Array.isArray(k.disarida) && k.disarida.length ? ' (' + k.disarida.slice(0, 3).join(', ') + ' sır kalıbı nedeniyle dışarıda)' : ''
+  // Dosya adları bağlama girer: kontrol/BiDi karakter süzülür, ad başına 80 karakter, üç addan fazlası "(+N)" (denetçi N5).
+  const adlar = Array.isArray(k.disarida) ? k.disarida : []
+  const dosya = adlar.length
+    ? ' (' + adlar.slice(0, 3).map((a) => temiz(a).slice(0, 80)).join(', ') + (adlar.length > 3 ? ' (+' + (adlar.length - 3) + ')' : '') + ' sır kalıbı nedeniyle dışarıda)'
+    : ''
   if (k.durum === 'sir-kalibi') return 'hiçbir şey yedeklenemedi' + dosya
-  if (k.durum === 'hata') return 'yedek hata verdi: ' + (k.neden || 'bilinmiyor')
-  if (k.durum === 'commit' && k.push === false) return 'commit atıldı ama push düştü' + dosya
+  if (k.durum === 'hata') return 'yedek hata verdi: ' + temiz(k.neden || 'bilinmiyor').slice(0, 160)
+  if ((k.durum === 'commit' || k.durum === 'push-tekrar') && k.push === false) return 'commit atıldı ama push düştü' + dosya
   if (k.durum === 'commit' && dosya) return 'kısmen yedeklendi' + dosya
   return null
 }
 
 /**
- * Saf karar. girdi: { olay, yasSn, bekleyen, sonDenemeYasSn }.
+ * Saf karar. girdi: { olay, yasSn, bekleyen, sonDenemeYasSn, sonBasarisiz }.
  * Dönüş: { yedekle: boolean, satir: string | null }.
  */
 function karar({ olay, yasSn, bekleyen, sonDenemeYasSn, sonBasarisiz }) {
