@@ -83,7 +83,10 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Sütun panelinde işaretlenen sütun "Dar pencere: … gizlendi." ile sessizce gizlenebilir (tablo altı gri satır): kanıt bu satırdır. "Varsayılana dön" uzun panellerde ekran dışında kalır.
 - Tarih alanına yazarken ilk karakterden sonra odak kaybolabilir: alana yeniden tıkla. Kayıtta sessizce proje (P-xxxx) açılır; açılan kaydı raporla.
 - Çalışan sonucu her parça için müdüre döner: kanıtsız satır yok (sayfa başlığı, ham yazı, süre, kare yolu), rapor başında "denenemedi" sayısı sebebiyle, işler ~8 maddelik parçalara bölünür.
-- Tur sonunda (Recep kararı 15 Kasım): rapor DesignSync ile yüklenir; Design'a gidecek mesajı TASARIM Design Venthub New sohbet penceresine claude-in-chrome ile kendisi yapıştırıp gönderir. Önce sohbetin son mesajlarına bak; aynı tur mesajı zaten gönderilmişse ikinci kez gönderme. Sohbet açılamazsa OPS'a tek satır yaz. Design başka sekmede çalışırken sohbette Resume ya da başka düğmeye basma (Recep'in çalışan sekmesini bozabilir); işin sonunda kendi sekmeni kapat.
+- Tur sonunda yükleme ikili kural (Recep, OPS 15 Kasım): DesignSync finalize_plan Recep'ten onay ister. Recep başındayken: tur başına TEK finalize_plan, `surec/**` gibi geniş desenle, rapor + tablo + kareler tek seferde, turun en sonunda; onaydan önce OPS'a tek satır "onay penceresi açılacak" yaz. Gece ya da Recep yokken koşan turda: rapor metni Design Venthub New sohbetine claude-in-chrome ile yapıştırılır, kareler file_upload ile eklenir. Mesajı TASARIM kendisi gönderir. Önce sohbetin son mesajlarına bak; aynı tur mesajı zaten gönderilmişse ikinci kez gönderme. Sohbet açılamazsa OPS'a tek satır yaz. Design başka sekmede çalışırken sohbette Resume ya da başka düğmeye basma (Recep'in çalışan sekmesini bozabilir); işin sonunda kendi sekmeni kapat.
+- Çalışan görev metnine "kapsam dışı düğmeye basma (Onayla, Sil, Gönder, Hepsini seç)" satırı yazılır (tur 11'de çalışan Onayla'ya basıp bir siparişi onayladı). Kare kimliği (ss_) dosya adı değildir: görsel gerekiyorsa çalışandan zaman damgalı dosya adı iste.
+- Datalist etiketleri: Cihaz parkından seç "Cihaz adı · IR-no" (ör. "Vortice Lineo 100 Quiet ES · IR-2026-0009") + Tab; kısmi yazı alanı temizler. Cariler liste aramasında çok karakterli yazıda ilk harften sonra odak kaybolabilir: kutuya yeniden tıkla.
+- Design sayfası ağırdır: sohbete uzun metin yazarken Chrome sekmesi donabilir (CDP zaman aşımı); metni kısa tut, donarsa sekmeyi kapatıp yeniden aç.
 
 ## Ölçüm sırası
 
@@ -94,7 +97,7 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 
 ## Rapor
 
-Başlık, yöntem, özet (kaç geçti / kaldı / denenemedi), madde listesi, çalışanlar, denenemeyenler, şaşırılan yerler, açılan kayıtlar, bıraktığın durum. Rapor `surec/chrome-deneme-rapor-<n>-<tarih>.md`, görseller `surec/chrome-deneme-gorseller-<n>-<tarih>/`. Design'a yazma yalnız DesignSync ve Recep sözüyle, yeni dosya olarak; mevcut dosyaların üstüne yazılmaz.
+Başlık, yöntem, özet (kaç geçti / kaldı / denenemedi), madde listesi, çalışanlar, denenemeyenler, şaşırılan yerler, açılan kayıtlar, bıraktığın durum. Rapor `surec/chrome-deneme-rapor-<n>-<tarih>.md`, görseller `surec/chrome-deneme-gorseller-<n>-<tarih>/`. Design'a yazma: Recep başındayken tur başına tek DesignSync yüklemesi, gece ya da Recep yokken sohbete yapıştırma + file_upload (ikili kural, yukarıdaki Tuzaklar); mevcut dosyaların üstüne yazılmaz.
 
 <!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
 ## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt
