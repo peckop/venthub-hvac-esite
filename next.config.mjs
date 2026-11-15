@@ -40,6 +40,9 @@ const nextConfig = {
     // Güvenlik karnesi 2026-11 C4 (OPS-211): `X-Powered-By: Next.js` başlığı çerçeveyi her yanıtta ilan
     // ediyordu. Bekçi: INV-CSP-RAPOR-1 (src/app/api/csp-rapor/__tests__/basliklar.test.ts).
     poweredByHeader: false,
+    // ALT-190 (OPS-280): kendi sunucusunda (Docker + Coolify) çalışacak imaj için bağımsız çıktı. YALNIZ Dockerfile
+    // `VENTHUB_CIKTI=standalone` verir; Vercel derlemesinde anahtar yoktur, yapılandırma değişmez (geri dönüş yolu).
+    ...(process.env.VENTHUB_CIKTI === 'standalone' ? { output: 'standalone' } : {}),
     // ALT-38f: anahtar kapalıyken BOŞ nesne (anahtar eklenmez); açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds`.
     ...e2eHizliDerlemeAyari(E2E_TIP_LINT_ATLA),
     images: {

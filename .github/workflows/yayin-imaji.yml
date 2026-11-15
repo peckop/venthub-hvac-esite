@@ -1,0 +1,80 @@
+# YAYIN İMAJI — kendi sunucusu (DigitalOcean + Coolify) için Docker imajını derler ve GHCR'a iter (ALT-190, OPS-280).
+#
+# ⚠ NİÇİN BURADA: sunucu 2 GB, `next build` 8 GB ister. Derleme GitHub Actions'ta olur; Coolify hazır imajı çeker.
+# ⚠ SIR YOK: imaja yalnız halka açık NEXT_PUBLIC_* değerleri girer (depo değişkenleri, zaten istemci paketine gömülüdür).
+#   Sunucu sırları imaja GİRMEZ; Coolify çalışma anında verir. GHCR'a yalnız GITHUB_TOKEN ile yazılır.
+# ⚠ OTOMATİK YAYIN YOK: bu iş akışı imaj üretir, siteyi DEĞİŞTİRMEZ. Coolify'ın çekmesi ayrı, elle bir adımdır.
+#
+# Tetik: PR'da yalnız DERLER (itmez, derlemenin sağlam olduğunu kanıtlar); `workflow_dispatch` ve master'a itme
+# imajı `:sha-<kısa>` ve `:latest` olarak GHCR'a iter.
+name: Yayın İmajı (GHCR)
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/yayin-imaji.yml
+      - next.config.mjs
+  push:
+    branches: [master]
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/yayin-imaji.yml
+      - next.config.mjs
+  workflow_dispatch:
+
+concurrency:
+  group: yayin-imaji-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  imaj:
+    name: İmaj derle
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: GHCR girişi
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: İmaj adı (küçük harf)
+        id: ad
+        run: |
+          echo "imaj=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "kisa=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
+
+      - name: Derle ve (PR değilse) it
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ steps.ad.outputs.imaj }}:sha-${{ steps.ad.outputs.kisa }}
+            ${{ steps.ad.outputs.imaj }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=https://venthub.com.tr
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.IMAJ_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ vars.IMAJ_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_SHOP_WHATSAPP=${{ vars.IMAJ_SHOP_WHATSAPP }}
+            NEXT_PUBLIC_SENTRY_DSN=${{ vars.IMAJ_SENTRY_DSN }}
+            NEXT_PUBLIC_APP_VERSION=${{ steps.ad.outputs.kisa }}
