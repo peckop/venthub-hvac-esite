@@ -133,13 +133,18 @@ Betik: `scripts/belge/kart-plan-kapisi.cjs`. Kimliği INV-KART-PLAN-1, testi
 - PLAN başlığı ile "PLAN: gerekmez — ..." satırı birlikte varsa PLAN değerlendirilir, istisna yok sayılır.
 - Kartı bulma: önce başlığın BAŞINDAki numara (`HRT-14 · ...`); bulunamazsa başlığın ilk 60 karakterinde
   numara aranır ("URUN REC-411: ..."). Her aşamada tek eşleşme gerekir; birden fazlası "belirsiz" sayılır
-  ve çıkış 2 verir.
+  ve çıkış 2 verir. Aynı numara birden çok panoda geçiyorsa (taşınan REC-nn kartları, ALT-4/ARC-5/HRT-10
+  çakışmaları) `--pano <ad|id>` ile daraltılır (HRT-18): pano kimliği birebir ya da pano adında ASCII
+  katlamalı alt dizge (`--kart REC-345 --pano ALTYAPI`). Olmayan pano sessizce yok sayılmaz, çıkış 2 verir
+  ve mevcut pano adlarını söyler; seçilen panoda da birden çok eşleşme varsa yine "belirsiz"dir.
 - Linear numarası: PR başlığında ve gövdesinde kapanmaması gereken Linear numarası (REC-nn) geçmez, yalnız
   `Kanban: <no>` satırı yazılır (Linear'a bağlı PR birleşince kayıt kendiliğinden Done olur, REC-508 böyle
   kapandı). `--pr-govde-dosyasi` gövdede REC-nn görürse stderr'e UYARI basar; bu kol YALNIZ uyarıdır, çıkış
   kodunu değiştirmez (karar 187 ile geçiş döneminde kasıtlı `Fixes REC-nn` meşrudur). `Kanban: REC-411`
   satırının kendisindeki REC-nn geçerli bir kart numarasıdır (taşınan Linear kaydı) ve uyarı vermez; yalnız
-  diğer satırlardaki REC-nn uyarır.
+  diğer satırlardaki REC-nn uyarır. Başlık kolu (HRT-18): `--pr-baslik "<metin>"` verilirse başlıktaki REC-nn
+  için aynı UYARI basılır; yine yalnız uyarıdır, çıkış kodunu değiştirmez ve tek başına girdi sayılmaz
+  (`--kart` ya da `--pr-govde-dosyasi` ile birlikte koşar).
 - Çıkış kodu: 0 geçti ya da plan-gerekmez; 1 eksik var (her eksik ayrı satırda); 2 Kanban veri dosyası
   okunamadı ya da kart bulunamadı/belirsiz (sessizlik geçti sayılmaz). Betik hiçbir şey yazmaz.
 
