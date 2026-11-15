@@ -163,7 +163,8 @@ describe('1. TABLO ↔ DİSK — her satırın sayfası var, yeni adres başka s
 describe('2. GERÇEK next.config (anahtar 1) — tek hop, rewrite, zincir yok', () => {
   it('redirects: zincir/döngü YOK (tüm kurallar, mevcut + rota dili)', async () => {
     const { redirects } = await yapilandirma('1')
-    const bulgu = zincirVarMi(redirects)
+    // ALT-190: alan adı koşullu (`has`) `www` kuralı başka bir ALAN ADINA gider (aynı sitenin yolu zincire girmez); yol zinciri ölçümünden ayrılır.
+    const bulgu = zincirVarMi(redirects.filter((k) => !('has' in k)))
     expect(bulgu, bulgu ? `${bulgu.kaynak.source} → ${bulgu.kaynak.destination} sonra ${bulgu.hedef.source}` : '').toBeNull()
   }, 60_000)
 

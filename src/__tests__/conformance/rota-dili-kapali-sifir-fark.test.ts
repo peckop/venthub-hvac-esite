@@ -56,8 +56,12 @@ async function yukle(anahtar: string | undefined) {
   const { default: yapilandirma } = await import('../../../next.config.mjs')
   const rewrites = await yapilandirma.rewrites?.()
   const rewriteListesi = Array.isArray(rewrites) ? { beforeFiles: [], afterFiles: rewrites, fallback: [] } : rewrites
+  // ALT-190: `www` alan adı kuralı rota diliyle ilgisiz bir ALAN ADI yönlendirmesidir (yol kümesini değiştirmez); fikstürden
+  // sonra eklendi. Bu kapı ADRES (yol) farkını ölçer, bu yüzden alan adı koşullu kural ayrılır; varlığı aşağıda ayrıca kilitlenir.
+  const tumKurallar: Array<Kural & { has?: unknown[] }> = (await yapilandirma.redirects?.()) ?? []
   return {
-    redirects: (await yapilandirma.redirects?.()) ?? [],
+    wwwKurallari: tumKurallar.filter((k) => k.has),
+    redirects: tumKurallar.filter((k) => !k.has),
     headers: (await yapilandirma.headers?.()) ?? [],
     // Sentry 11 `tunnelRoute` için `beforeFiles` altına `/monitoring` yeniden yazımları ekler (ALT-46); rota dili
     // ile ilgisizdir. Bu kapı rota dili kurallarını ölçer, bu yüzden tünel kuralları ayrılır.
@@ -68,6 +72,20 @@ async function yukle(anahtar: string | undefined) {
 }
 
 describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres farkı', () => {
+  it('ALT-190: alan adı koşullu TEK kural var: www → apex KALICI (308), yol ve sorgu korunur, anahtardan bağımsız', async () => {
+    for (const anahtar of [undefined, '1']) {
+      const { wwwKurallari } = await yukle(anahtar)
+      expect(wwwKurallari).toEqual([
+        {
+          source: '/:path*',
+          has: [{ type: 'host', value: 'www.venthub.com.tr' }],
+          destination: 'https://venthub.com.tr/:path*',
+          permanent: true,
+        },
+      ])
+    }
+  })
+
   it('ÖN KOŞUL — fikstür dolu evren (boş evrende yeşil kapı ölçüm değildir)', () => {
     expect(FIKSTUR.redirects).toHaveLength(44)
     expect(FIKSTUR.headers).toHaveLength(3)
