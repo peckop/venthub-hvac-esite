@@ -36,8 +36,13 @@ describe('INV-WEBHOOK-2 imzalı gönderim', () => {
     .filter((s) => !s.trim().startsWith('--'))
     .join('\n')
 
-  it('son tanım imzalı + olay kimlikli migration’dır (ALT-76 PR 3)', () => {
-    expect(dosya).toBe('20261105090000_webhook_olay_tekillestirme.sql')
+  it('son tanım, hedefi kendi sunucumuza çeviren migration’dır (ALT-190; imza + event_id ALT-76 PR 3 ile aynı)', () => {
+    expect(dosya).toBe('20261115150000_webhook_hedefi_kendi_sunucu.sql')
+  })
+
+  it('webhook hedefi kanonik alan adıdır, Vercel alt adresi DEĞİL (ALT-190: yoksa olaylar yeni sunucuya ulaşmaz)', () => {
+    expect(kod).toMatch(/webhook_url\s+text\s*:=\s*'https:\/\/venthub\.com\.tr\/api\/webhook\/supabase'/)
+    expect(kod).not.toMatch(/vercel\.app/i)
   })
 
   it('gövdeye rastgele event_id koyar (imzalı gövdenin içinde; alıcının kalıcı tekrar koruması)', () => {
