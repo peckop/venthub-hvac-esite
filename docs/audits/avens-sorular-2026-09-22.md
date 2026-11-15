@@ -112,5 +112,17 @@ Bu yüzden eşleştirme bizim çıkarımımız; ölçüleri AVenS değeri olarak
 Bu üç cevap gelene kadar sitede bu yedi ürün için genişlik, yükseklik, motor tipi ve besleme yazılmaz ("kaynak yok, yazılmaz").
 2024, 2025 ve 2019 fiyat listeleri açılmadı (indirme yapılmadı); aynı alanları taşıma ihtimali düşük.
 
+## 8. Vortice ürünleri: katalog baskıları arasında teyit gereken üç nokta (15 Kasım 2026)
+
+Vortice'in 2026 kataloglarını elimizdeki önceki baskılarla ve ürün verimizle karşılaştırdık. Katalogdan çıkmayan üç noktada sizin ya da Vortice'in teyidi gerekiyor.
+
+| # | Ürün | Gözlem | Soru |
+|---|---|---|---|
+| 1 | Heatmaster F400 çatı fanı (kod 15260-15270, 15301-15310) | Önceki baskıda (Kasım 2024) 21 model "80 °C". Torrette 2026 kataloğunda (Şubat/Temmuz 2026) aynı 21 kod "120 °C" etiketli; 80 °C'lik sürüm 15312-15332 koduyla ayrı satırlarda. Debi, ağırlık ve ebat aynı. | Aynı kodlu ürünler fiziksel olarak mı değişti, yoksa yalnız sınıflandırma mı? Eski stoktaki 80 °C'lik ürün hangi kodla sevk ediliyor? 400 T4 (15263) için doğru azami debi 5.340 mi, 7.870 m³/h mi (katalog ikisini de farklı satırlarda veriyor)? |
+| 2 | Vorticel A-E 550 M/T ES ve 630 M/T ES (kod 41228-41231) | Temmuz 2026 baskısında var; Ekim 2026 baskısında (belge 195104/195101) yok. Baskının giriş metni hâlâ 630 mm çapa ve 14.500 m³/h'e kadar diyor, tablolar 500 mm'de bitiyor. | Bu dört model üretimden kalktı mı, yeni mevzuat (EU 2024/1834) nedeniyle mi çıkarıldı, yoksa kataloğa sonra mı eklenecek? |
+| 3 | Radon CA-RM 160 ES (kod 16280) | Haziran 2026 kataloğunda (belge 193591, s.11) ses 66,4 dB(A) (10 V, 3 m); benzer güç ve debideki 150 ES için 47,4. 2022 baskısında da aynı. | 66,4 değeri doğru mu, baskı hatası mı? Doğru değer nedir? |
+
+Bu üç cevap gelene kadar sitede ilgili değerler yalnız katalogda birebir yazanlarla sınırlı tutulur; tahmin yazılmaz.
+
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.
