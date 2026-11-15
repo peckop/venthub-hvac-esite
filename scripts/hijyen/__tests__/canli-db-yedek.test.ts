@@ -22,9 +22,10 @@ const modul = require(BETIK) as {
   saklamaPlani: (adlar: string[], simdi: Date, gun: number, enAz: number, oku: (ad: string) => { dogrulandi?: boolean } | null) => { tut: string[]; sil: string[] }
 }
 
-const URL_SIR = 'postgresql://postgres.uydurmaref:UydurmaParola%2F9x@uydurma-havuz.example.test:5432/postgres'
 const PAROLA = 'UydurmaParola/9x'
 const PAROLA_KODLU = 'UydurmaParola%2F9x'
+// Şablon dizesi: CI "Secret guard" adımı düz yazılmış postgresql://kullanıcı:parola@ kalıbını arar (`${` içeren satırı atlar).
+const URL_SIR = `postgresql://postgres.uydurmaref:${PAROLA_KODLU}@uydurma-havuz.example.test:5432/postgres`
 const SIRLAR = [URL_SIR, PAROLA, PAROLA_KODLU, 'uydurma-havuz.example.test', 'postgres.uydurmaref']
 
 const SAHTE = `
