@@ -1,6 +1,6 @@
 # KATALOG defteri: UnoPIM ürün içeriği (neler dolu, neler doldurulmalı)
 
-Sahibi: KATALOG · Son doğrulama: 2026-11-10 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: KTL-86 (OPS emri), KTL-82, KTL-83, KTL-85
+Sahibi: KATALOG · Son doğrulama: 2026-11-15 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: KTL-86 (OPS emri), KTL-82, KTL-83, KTL-85
 
 **Tazelik kuralı:** ölçüm her sabah kör koşmaz. Tetik KAYNAK değişikliğidir: UnoPIM'in son ürün güncelleme damgası ya da Design anlık görüntü dosyalarının sha256'sı değişince ölçüm yeniden koşulur ve bu sayfa güncellenir. Kaynak değişmediyse son sonuç geçerlidir (`--kontrol` "kaynak değişmedi" der) ve sayfa yalnız yaşı yüzünden bayat sayılmaz. Manifest tetiği: `kart-kapanisi` + `dis-kaynak`.
 
@@ -25,6 +25,8 @@ Eski ölçüm ve işlem tarihçesi: `docs/olcum/pim-unopim.md` ("Ölçüm 2026-1
 
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
+| 2026-11-16 | Marka örneklemi, Vortice dışı: UnoPIM ↔ üretici kataloğu. Nicotra 12 ürün/46 alan sapma 0 (debi ölçülemedi, 2 ürün eşleşmedi); Danfoss FC 101 ve FC 102 tam tarama (33 ürün) sapma 0, FC 51 faz/kasa boş; AVenS 14 ürün: 3 üründe 6 alan sapması (KENTALFAN 315 T2 devir ve 400 V akımı, 630 T6 debi ve akım, IGK 2000 ölçüleri belgeler arası çelişki); SEAT/STORM/JET 14 ürün: 3 ağırlık sapması, 4 ağırlık kaynak çelişkisi, 1 eşleşmeyen kod, ad alanında devir/gerilim etiketi | Liste: `~/VentHub-Gorsel-Arsiv/_liste/ktl95-marka-ornekleme-2026-11-16/marka-sapma.csv`; UnoPIM veritabanı konteyneri yalnız salt okuma için açıldı ve kapatıldı | KTL-95 (OPS-306) |
+| 2026-11-15 | Fark betiği ve doluluk ölçümü yeniden koşuldu (UnoPIM damgası 15 Kasım 17:02): fark 0 (Design görüntüleri 2-7 Kasım, tazelenmedi); görsel 1162/1165, galeri 257 | §2.3 son satır | KTL-95 (OPS-306) |
 | 2026-11-10 | Design-İÇERİK `sku` alanı (katalog kodu → UnoPIM kodu) fark betiğine ve kaynak damgasına bağlandı; İÇERİK 1162 ↔ UnoPIM 1165: fark 3 SKU (`SEA-51201003`, `SEA-61102010`, `VRT-253100106XN`) | 2.3b; `tasarim-unopim-fark.mjs` `icerikSku` | KTL-87 |
 | 2026-11-09 | Design tarafı güncel dosyalardan okundu: adres dizini toplamı 1165 = UnoPIM 1165; 41 çift kod 7 Kasım'da Design'da çözülmüş (öneksiz kayıtlar çıkarıldı, `EDF-*` → `VRT-EDF-*` çevirisi); Design'ın 18 fotoğrafsız ürününden 13'ü UnoPIM'de görselli | `surec/ops-cevap-2026-11-07-galeri-ve-cift-kod.md`, `assets/veri/adres-model-dizin.json` (Venthub New) | KTL-86 |
 | 2026-11-09 | Bu defter ve ölçüm betiği kuruldu; ilk canlı ölçüm (yerel UnoPIM, salt okuma) | 1165 ürün, 106 aile; teknik alanlarda 115 kısmi + 156 ailede tamamen boş alan, 2841 boş hücre | KTL-86 |
@@ -45,7 +47,7 @@ Tüm satırların dayanağı: `node scripts/icerik-hatti/unopim-icerik-olc.mjs -
 {
  "sema": 1,
  "kaynak": {
-  "unopimSonGuncelleme": "2026-11-07 19:59:31",
+  "unopimSonGuncelleme": "2026-11-15 17:02:39",
   "unopimUrunSayisi": 1165,
   "tasarimGoruntuSha": "fb788565cc3e325a068b03c1954cf0177d091b7e7f289332f3ef1b50d453be13"
  },
@@ -61,12 +63,12 @@ Tüm satırların dayanağı: `node scripts/icerik-hatti/unopim-icerik-olc.mjs -
   "description@en_US": "1165/1165",
   "short_description@tr_TR": "1165/1165",
   "short_description@en_US": "1165/1165",
-  "image": "1160/1165",
-  "gallery": "255/1165",
-  "image_alt_tr": "1160/1165",
-  "image_alt_en": "1160/1165",
-  "gallery_alt_tr": "255/1165",
-  "gallery_alt_en": "255/1165",
+  "image": "1162/1165",
+  "gallery": "257/1165",
+  "image_alt_tr": "1162/1165",
+  "image_alt_en": "1162/1165",
+  "gallery_alt_tr": "257/1165",
+  "gallery_alt_en": "257/1165",
   "adres_tr": "1165/1165",
   "adres_en": "1165/1165",
   "url_key": "1165/1165",
@@ -93,12 +95,12 @@ olcum-ozet:bitti -->
 | `description@en_US` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 | `short_description@tr_TR` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 | `short_description@en_US` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
-| `image` | 1160 | 1165 | 5 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
-| `gallery` | 255 | 1165 | 910 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
-| `image_alt_tr` | 1160 | 1165 | 5 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
-| `image_alt_en` | 1160 | 1165 | 5 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
-| `gallery_alt_tr` | 255 | 1165 | 910 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
-| `gallery_alt_en` | 255 | 1165 | 910 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
+| `image` | 1162 | 1165 | 3 | `unopim-icerik-olc.mjs --md`, 2026-11-15 |
+| `gallery` | 257 | 1165 | 908 | `unopim-icerik-olc.mjs --md`, 2026-11-15 |
+| `image_alt_tr` | 1162 | 1165 | 3 | `unopim-icerik-olc.mjs --md`, 2026-11-15 |
+| `image_alt_en` | 1162 | 1165 | 3 | `unopim-icerik-olc.mjs --md`, 2026-11-15 |
+| `gallery_alt_tr` | 257 | 1165 | 908 | `unopim-icerik-olc.mjs --md`, 2026-11-15 |
+| `gallery_alt_en` | 257 | 1165 | 908 | `unopim-icerik-olc.mjs --md`, 2026-11-15 |
 | `adres_tr` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 | `adres_en` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 | `url_key` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
@@ -109,7 +111,7 @@ olcum-ozet:bitti -->
 | `list_price_source_page` | 343 | 1165 | 822 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 | `vat_rate_percent` | 1165 | 1165 | 0 | `unopim-icerik-olc.mjs --md`, 2026-11-09 |
 
-Ayrıntı notları: `image` 5 ürün boş (VRT-HP-1400, VRT-HP-1400-D, AVE-13050, AVE-13051, SEA-810105; üretici görseli bekleniyor, bkz. `pim-unopim.md`). KTL-91 (10 Kasım): HP-1400 ve HP-1400-D için seri-tahmin görsel kaynaklı hazırlandı (22 kardeş ürünle aynı seri fotoğrafı, sha256 listede); AVE-13050, AVE-13051 ve SEA-810105 için resmî kaynakta görsel bulunamadı, nedenleri listede. Liste ve görseller depo dışında (`~/VentHub-Gorsel-Arsiv/_liste/ktl91-a3-2026-11-10/`); UnoPIM'e yazım Design-İÇERİK'te.
+Ayrıntı notları: `image` 3 ürün boş (AVE-13050, AVE-13051, SEA-810105; 15 Kasım ölçümü, UnoPIM veritabanı sorgusu; 9 Kasım'da boş olan VRT-HP-1400 ve VRT-HP-1400-D 15 Kasım 17:02'ye kadar görsel almış). Önceki not: 5 ürün boştu (üretici görseli bekleniyor, bkz. `pim-unopim.md`). KTL-91 (10 Kasım): HP-1400 ve HP-1400-D için seri-tahmin görsel kaynaklı hazırlandı (22 kardeş ürünle aynı seri fotoğrafı, sha256 listede); AVE-13050, AVE-13051 ve SEA-810105 için resmî kaynakta görsel bulunamadı, nedenleri listede. Liste ve görseller depo dışında (`~/VentHub-Gorsel-Arsiv/_liste/ktl91-a3-2026-11-10/`); UnoPIM'e yazım Design-İÇERİK'te.
 `gallery` ve `gallery_alt_*` yalnız galerisi olan 255 üründe (Design verisi galeri taşıyan ürünler); galerisiz ürünün galeri alanı boş olması eksik
 sayılmaz, kaç ürünün galerisi olması gerektiği Design kararıdır. `list_price_*` yalnız Avensair 2026 liste fiyat kaynağı olan 343 üründe; kalan 822
 ürünün fiyat modeli ürün kararıdır (`fiyat-kaynagi-olmayan-urunler.csv`, arşiv deposu `_liste/ktl82-faz-c-2026-11-04/`).
@@ -170,6 +172,7 @@ En çok boş hücresi olan 15 aile (66 ailede en az bir boşluk var; tam liste `
 | Tarih | Komut | Sonuç | Not |
 |---|---|---|---|
 | 2026-11-09 | `node scripts/icerik-hatti/tasarim-unopim-fark.mjs` | 1165 üründe fark 0: ad 1153 kontrol, açıklama 2330, kısa açıklama 2330, teknik 4130, marka 1165, kategori 1165 | Design anlık görüntüleri 1,9 ile 6,9 gün eski (11-09; en eskisi `ops-foto-urun-listesi-2026-11-02.csv`, eşik 7 gün aşılınca fark betiği çıkış 2 verir; yaş her koşuda betik çıkışından okunur). Teknik karşılaştırmada 454 ürünün Design karşılığı yok (kaynak UnoPIM'in kendisi) ve 12 ürün için ad kaynağı yok: "fark 0" bu ürünler için güvence değildir. Recep 9 Kasım'da Design'da teknik özellikleri yeniden kontrol ettiriyor; Design değişince anlık görüntüler `DesignSync` ile tazelenir ve betik yeniden koşar. |
+| 2026-11-15 | `node scripts/icerik-hatti/tasarim-unopim-fark.mjs --eski-kabul` (UnoPIM damgası 2026-11-15 17:02:39; KTL-95 / OPS-306) | 1165 üründe fark 0: ad 1153 kontrol, açıklama 2330, kısa açıklama 2330, teknik 4130, marka 1165, kategori 1165; `icerikSku` bölümü aynı (İÇERİK'te olup UnoPIM'de olmayan 0; UnoPIM'de olup İÇERİK dizininde olmayan 3: `SEA-51201003`, `SEA-61102010`, `VRT-253100106XN`) | Design anlık görüntüleri DesignSync ile TAZELENMEDİ (en eski 2026-11-02, en yeni 2026-11-07; 7 günlük eşik aşıldığı için `--eski-kabul` kullanıldı): "fark 0" yalnız "UnoPIM'in 15 Kasım değerleri, Design'ın 2-7 Kasım görüntüleriyle aynı" demektir, Design 7 Kasım'dan sonra değiştiyse bu ölçüm onu görmez. Ölçüm (`unopim-icerik-olc.mjs`): UnoPIM damgası 7 Kasım 19:59 → 15 Kasım 17:02; teknik alanlar değişmedi (2841 boş hücre, 115 kısmi, 156 ailede tamamen boş); görsel 1160 → 1162 (VRT-HP-1400 ve -D), galeri 255 → 257 |
 
 ### 2.3b Design-İÇERİK ↔ UnoPIM model eşlemesi (`sku` alanı)
 
