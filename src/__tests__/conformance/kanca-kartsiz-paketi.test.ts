@@ -44,7 +44,7 @@ describe('INV-KANCA-KARTSIZ-PAKET-1 · sekizinci yetki sınıfı', () => {
   })
 
   it('kapıyı gevşetmez: "OPS yetkisi" tek başına, "izin verilmemiş" ve rastgele metin liste dışı kalır', () => {
-    for (const g of ['OPS yetkisi', 'bence OPS yetkisi gibi', 'ops izin verdi', 'izin verilmiş yetki']) {
+    for (const g of ['OPS yetkisi', 'bence OPS yetkisi gibi', 'ops izin verdi', 'izin verilmiş yetki', 'izin verilmemiş OPS yetkisi']) {
       expect(beklenti.yetkiDegerlendir('RECEP YETKİSİ: ' + g).durum, g).toBe('liste-disi')
     }
   })
@@ -105,5 +105,12 @@ describe('INV-KANCA-KARTSIZ-PAKET-1 · bağlantı denetimi', () => {
     expect(oku('kartsiz-beklenti-kapisi.cjs')).toContain('izin\\s+verilmis\\s+ops\\s+yetkisi')
     expect(oku('olcum-satiri-uyarisi.cjs')).toContain("basilsin('olcum-satiri-uyarisi'")
     expect(oku('kartsiz-emir-uyarisi.cjs')).toContain("basilsin('kartsiz-emir-uyarisi'")
+    expect(oku('kartsiz-beklenti-kapisi.cjs')).toContain("OPS'a SendMessage ile ver")
+  })
+
+  it('cetvel sekiz sınıfı yazar (kod ile cetvel ayrışmaz)', () => {
+    const cetvel = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'is-kayit-duzeni-standard.md'), 'utf8')
+    expect(cetvel).toContain('YALNIZ şu sekiz sınıftan')
+    expect(cetvel).toContain('| izin verilmiş OPS yetkisi |')
   })
 })

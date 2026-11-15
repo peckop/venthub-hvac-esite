@@ -271,8 +271,8 @@ açıklamasında satır başında şu satır bulunur:
 RECEP YETKİSİ: <gerekçe>
 ```
 
-Gerekçe YALNIZ şu yedi sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
-yazımı fark etmez; yedincisi ARC-142 ile 15 Ekim'de eklendi):
+Gerekçe YALNIZ şu sekiz sınıftan biridir (devamında " — ayrıntı" serbesttir; büyük/küçük harf ve Türkçe karakter
+yazımı fark etmez; yedincisi ARC-142 ile 15 Ekim'de, sekizincisi ARC-328 ile 15 Kasım'da eklendi):
 
 | Gerekçe | Ne zaman |
 |---|---|
@@ -283,6 +283,7 @@ yazımı fark etmez; yedincisi ARC-142 ile 15 Ekim'de eklendi):
 | yeni görünüm/iddia/yapı kararı | Vitrinde/metinde yeni görünüm, yeni iddia ya da yapı kararı (üç biçim de geçerli) |
 | hesap/ayar dosyası | Hesap, kimlik ya da izin/ayar dosyası değişikliği |
 | dış kişiye Recep adına yazışma | Tedarikçi, üretici, kurum ya da başka bir dış kişiye Recep adına mesaj, e-posta ya da belge isteği göndermek (kullanıcı adına mesaj göndermek açık izin ister). Gerekçede "Recep adına" geçer; örnek: `tedarikçiye Recep adına yazışma — AVenS belge isteği` |
+| izin verilmiş OPS yetkisi | İş Recep kararı değil, OPS'un zaten verdiği yetkiyle yürüyen iştir (ARC-247 EK c, OPS-292 onayı). Kalıp tam yazılır ("OPS yetkisi" tek başına geçmez); karar sorusu Recep'e değil OPS'a SendMessage ile gider |
 
 Bunların dışındaki iş Recep'e SORULMAZ, yapılır. Satır yoksa ya da gerekçe liste dışıysa kapı kırmızı verir
 ("bu işin yetkisi zaten verilmiş, yap").
