@@ -7,6 +7,7 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { bultenTamMi, cooldownKarari, damgaAtilsinMi, istanbulBugun, type CooldownNedeni } from './cooldown.ts'
 
 const TCMB_URL = 'https://www.tcmb.gov.tr/kurlar/today.xml'
 const QUOTE_CURRENCIES = ['EUR', 'USD']
@@ -39,6 +40,20 @@ function parseBulletin(xml: string): ParsedBulletin | null {
   return { effectiveDate: `${year}-${month}-${day}`, rates }
 }
 
+// D5 (OPS-293): uç `verify_jwt=false` ve kimliksiz; yetkisiz çağrı sahte kur YAZDIRAMAZ ama her çağrı
+// TCMB'ye gider (kaynak tüketimi, kota). Sertleştirme (karar: ./cooldown.ts, saf ve testli): bugünün (İstanbul)
+// bülteni DB'de varsa, bu isolate son 30 dk içinde başarılı bir TCMB isteği yaptıysa ya da bir istek sürüyorsa
+// TCMB'ye HİÇ gitmeden `carried:true` döner. Kimlik denetimi (JWT + Actions) bu işin DIŞINDA: ayrı karar.
+let sonBasariMs = 0 // isolate ömrü boyunca; yalnız yazım TAM başarılıysa (bkz. damgaAtilsinMi) kurulur
+let surenIstek = false // eşzamanlı çağrılar tek uçuşa iner (await'ten ÖNCE, eşzamanlı kurulur)
+
+// `neden` hangi kapının tetiklendiğini ayırt eder (cron sessizce kaçarsa net._http_response'ta görünür).
+const cooldownYanit = (neden: CooldownNedeni) =>
+  new Response(JSON.stringify({ ok: true, carried: true, reason: neden }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  })
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { status: 200 })
@@ -52,11 +67,49 @@ serve(async (req: Request) => {
       headers: { 'Content-Type': 'application/json' }
     })
   }
-  const supabase = createClient(supabaseUrl, serviceKey)
+  const supabase = istemciOlustur(supabaseUrl, serviceKey)
 
+  // 1) Eşzamanlı kapı (await YOK): sürmekte olan istek ya da yakın başarılı istek varsa hemen dön.
+  const ilkKarar = cooldownKarari({ simdiMs: Date.now(), sonBasariMs, surenIstek, bugununBultenTam: null })
+  if (ilkKarar !== 'devam') return cooldownYanit(ilkKarar)
+  surenIstek = true
+  try {
+    // 2) Bugünün bülteni HER kiracı × HER kur için yazıldıysa TCMB'ye gitme ("herhangi bir satır" yetmez: eksik
+    //    yazımı onarmak kilitlenirdi). Okuma hatası fail-open (eski davranış), yalnız loga yazılır.
+    const [{ data: kiracilar, error: kiracilarHatasi }, { data: bugunSatirlari, error: bugunHatasi }] = await Promise.all([
+      supabase.from('tenants').select('id'),
+      supabase
+        .from('currency_rates')
+        .select('tenant_id, quote_ccy')
+        .eq('source', 'tcmb')
+        .eq('effective_date', istanbulBugun(Date.now()))
+    ])
+    if (kiracilarHatasi || bugunHatasi) console.error('[tcmb-rates-sync] cooldown okunamadi:', kiracilarHatasi ?? bugunHatasi)
+    const bugununBultenTam =
+      kiracilarHatasi || bugunHatasi || !kiracilar || !bugunSatirlari
+        ? null
+        : bultenTamMi(
+            (kiracilar as { id: string }[]).map((k) => k.id),
+            QUOTE_CURRENCIES,
+            bugunSatirlari as { tenant_id: string; quote_ccy: string }[]
+          )
+    const dbKarari = cooldownKarari({ simdiMs: Date.now(), sonBasariMs, surenIstek: false, bugununBultenTam })
+    if (dbKarari !== 'devam') return cooldownYanit(dbKarari)
+    return await esitle(supabase)
+  } finally {
+    surenIstek = false
+  }
+})
+
+// İstemci tipi çağrı noktasındaki çıkarımla AYNI olsun (createClient'ın genel ReturnType'ı uyuşmaz: Deno check TS2345).
+const istemciOlustur = (url: string, key: string) => createClient(url, key)
+type Istemci = ReturnType<typeof istemciOlustur>
+
+async function esitle(supabase: Istemci): Promise<Response> {
   let xml = ''
   try {
-    const res = await fetch(TCMB_URL, { headers: { Accept: 'application/xml' } })
+    // Zaman aşımı: asılı kalan TCMB bağlantısı süren-istek bayrağını isolate sınırına kadar tutmasın (cron kaçmasın).
+    const res = await fetch(TCMB_URL, { headers: { Accept: 'application/xml' }, signal: AbortSignal.timeout(10_000) })
     if (!res.ok) {
       // TCMB erişilemez → hata değil taşıma: mevcut son satır geçerli kalır (çözücü latest okur)
       return new Response(JSON.stringify({ ok: true, carried: true, reason: `tcmb-http-${res.status}` }), {
@@ -135,8 +188,10 @@ serve(async (req: Request) => {
   }
 
   const ok = errors.length === 0
+  // Bellek damgası yalnız yazım TAM başarılıysa ve cron anını gölgelemiyorsa (bkz. damgaAtilsinMi).
+  if (ok && damgaAtilsinMi(bulletin.effectiveDate, Date.now())) sonBasariMs = Date.now()
   return new Response(
     JSON.stringify({ ok, bulletinDate: bulletin.effectiveDate, rates: bulletin.rates, inserted, skipped, errors }),
     { status: ok ? 200 : 500, headers: { 'Content-Type': 'application/json' } }
   )
-})
+}
