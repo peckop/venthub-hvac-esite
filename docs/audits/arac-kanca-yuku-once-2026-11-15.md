@@ -19,7 +19,7 @@ C:/tmp/venthub-board/{olay-kaydi.jsonl, talimat-yuklendi.log, done-kapisi.log, h
 - Kayıtlı kanca: 77 (proje 76, kullanıcı 1; beklenen ~75, fark +2). Eklenti kancaları (ponytail, security-guidance) bu sayıya dahil değil.
 - Durdurma/deny toplamı 7 günde 425: bash-write-guard 136, kartsiz-beklenti-kapisi 107, push-kapisi 85, kanban-kanit-yolu-kapisi 30, done-kanit-kapisi 24, son-soz-gate 22, izin-istegi-kapisi 10, protect-config 8, kart-onek-tekrari 6, lane-guard 5, agir-komut-kilidi 2, pencere-acilis-denetimi 2; ayrıca zaman aşımı-engeli 17.
 - En çok tetiklenen: bash-write-audit 9578, soz-bekcisi-hatirlatma 3253, hafiza-yedek (UserPromptSubmit) 3162, Stop grubu 8 kanca x 2940, olay-kaydi SubagentStop 1770.
-- En çok yineleyen (bağlama giren aynı metin): bash-write-audit 9093 (%94'ü aynı "SID TEKIL DEGIL" satırı), soz-bekcisi-hatirlatma 3221, duzeltme-isaretle 627, hafiza-yedek 516 tam / 3130 rakamsız, gorev-tazelik-satiri 505, graphify-search 408.
+- En çok yineleyen (bağlama giren aynı metin; ⚠bash-write-audit sayısı YANLIŞ SINIFLANDIRILDI, bkz. "Düzeltme" bölümü: 9093 satırın tamamı çıkış 0 stderr kaydıdır, modele gitmez): bash-write-audit 9093 (%94'ü aynı "SID TEKIL DEGIL" satırı), soz-bekcisi-hatirlatma 3221, duzeltme-isaretle 627, hafiza-yedek 516 tam / 3130 rakamsız, gorev-tazelik-satiri 505, graphify-search 408.
 - Ölçülemeyen 16 kanca: hafiza-indeks-bekcisi, silme-baglanti-kapisi, sql-yazma-kapisi (matcher "supabase" adı arıyor; dökümdeki araç mcp__<uuid>__execute_sql olarak çağrılıyor, 80 çağrının 0'ı uydu), graphify-read, pencere-kilidi-kapisi, kod-dizini-tazelik, board-release, accumulate-edits, duzenleme-ani-lint, agir-komut-kilidi --birak (iki kayıt), kanban-tutarlilik-onarimi, precompact-durum-kapisi, son-konusma-dokumu (PreCompact), TaskCompleted. Ortak çözüm önerisi: her kancanın sonunda tek biçimli sayaç satırı (zaman, sid, kanca, karar). Bu bir kanca değişikliğidir; ARAÇ PR'ı ve denetçi okuması gerekir, settings.json kısmı OPS kapısıdır.
 - hafiza-commit.sh (SessionEnd, kullanıcı ayarı): 537 sır-kalıbı reddi / 5 commit; hafiza-yedek PreCompact: 117 red / 4 commit. Kök sebep ARC-319'da (tek dosyadaki yanlış pozitif tüm yedeği durduruyordu); eski betik hâlâ kilitsiz çalışıyor.
 
@@ -76,7 +76,7 @@ C:/tmp/venthub-board/{olay-kaydi.jsonl, talimat-yuklendi.log, done-kapisi.log, h
 | 47 hafiza-yedek | UserPromptSubmit / * | >=3162  | 0 (bilgi/yan etki) | 516 tam / 3130 rakamsız | D | zaman aşımı(hook_cancelled) 2 |
 | 48 accumulate-edits | PostToolUse / Edit|Write|MultiEdit | ölçülemedi (olay üst sınırı 2811) | yok/ölçülemedi | çıktısız | — |  |
 | 49 duzenleme-ani-lint | PostToolUse / Edit|Write|MultiEdit | ölçülemedi (olay üst sınırı 2811) | yok/ölçülemedi | çıktısız | — |  |
-| 50 bash-write-audit | PostToolUse / Bash | >=9578 ; olay üst sınırı 12370 | uyarı 9578 (hepsi stderr; 9040 "SID TEKIL DEGIL") | 9093 tam / 9257 rakamsız | D |  |
+| 50 bash-write-audit | PostToolUse / Bash | >=9578 ; olay üst sınırı 12370 | uyarı 9578 (hepsi stderr; 9040 "SID TEKIL DEGIL") | 9093 tam / 9257 rakamsız (⚠hepsi çıkış 0 stderr kaydı: modele GİTMEZ; bkz. Düzeltme) | D |  |
 | 51 merge-sonrasi-ileri-sar | PostToolUse / Bash | >=55 ; olay üst sınırı 12370 | 0 (bilgi/yan etki) | 48 tam / 50 rakamsız | D |  |
 | 52 pr-birlesti-kart | PostToolUse / Bash | >=55 ; olay üst sınırı 12370 | uyarı 55 | 0 tam / 30 rakamsız | D |  |
 | 53 ci-uyandirici | PostToolUse / Bash | >=167 ; olay üst sınırı 12370 | uyandırma 167 (blok değil) | çıktısız | D |  |
@@ -110,7 +110,7 @@ C:/tmp/venthub-board/{olay-kaydi.jsonl, talimat-yuklendi.log, done-kapisi.log, h
 
 Sınıflar: **KALIR** (son 7 günde gerçek durdurma yapmış ya da veri/sır/para/canlı koruyan kapı), **SEYRELT** (bilgi notu olup aynı metni her mesajda yineleyen; saatte bir ya da durum değişince yazsın), **DÜZELT** (yanlış alarm veren ya da işi uzatan). İzin, deny, onay veren kanca ve MCP kayıtları dokunulmaz (tablodaki "DOKUNULMAZ" işareti). Kapı kaldırılması önerilmiyor; yalnız gürültü ve tekrar.
 
-Yinelenen bağlam satırı yükü (tabloda "yineleme"): SEYRELT adaylarında 7 günde yaklaşık 15 bin aynı satır (bash-write-audit 9093, soz-bekcisi-hatirlatma 3221, duzeltme-isaretle 627, hafiza-yedek 516, gorev-tazelik-satiri 505, graphify-search 408, kart-alani-kapisi 226, sage-dosya-dersi 122, olcum-satiri-uyarisi 117, patinaj-bekcisi 100, defter-tazelik-satiri 36 tam).
+Yinelenen bağlam satırı yükü (tabloda "yineleme"): SEYRELT adaylarında 7 günde yaklaşık 15 bin aynı satır (bash-write-audit 9093 [YANLIŞ: bkz. Düzeltme; gerçek bağlam yükü 3 günde ~39 satır], soz-bekcisi-hatirlatma 3221, duzeltme-isaretle 627, hafiza-yedek 516, gorev-tazelik-satiri 505, graphify-search 408, kart-alani-kapisi 226, sage-dosya-dersi 122, olcum-satiri-uyarisi 117, patinaj-bekcisi 100, defter-tazelik-satiri 36 tam).
 
 ### SEYRELT
 
@@ -148,7 +148,7 @@ Yinelenen bağlam satırı yükü (tabloda "yineleme"): SEYRELT adaylarında 7 g
 ### Uygulama sırası önerisi (onay gelirse)
 
 1. Ortak sayaç satırı (ölçümü kesinleştirir; hiçbir davranış değiştirmez).
-2. bash-write-audit stderr tekrarı ve add_task numara kancası (en büyük tekil kazanç ve en çok söylenen sıkıntı).
+2. ~~bash-write-audit stderr tekrarı~~ (ARC-324 ölçümüyle DÜŞTÜ: kazanç yok, bkz. Düzeltme) ve add_task numara kancası (en çok söylenen sıkıntı).
 3. SEYRELT grubu tek PR (ortak "aynı oturumda bir kez" yardımcısı).
 4. olcum-satiri-uyarisi ve kartsiz-beklenti yetki sınıfı (ARC-247 ile).
 5. Onaydan 7 gün sonra aynı ölçüm "SONRA" olarak koşulur; gerçek durdurma sayısı düşmüşse ilgili değişiklik geri alınır.
@@ -182,3 +182,16 @@ Tarih: 15 Kasım; 21 kart, hepsinin vadesi 14 Kasım. "Hizmet": yeni siteye doğ
 | ARC-260 | WrongStack görsel iş akışı ölçümü | Recep isteği (Kanban görseli); acil değil | rafa |
 
 Sayım: sürsün 14, rafa 6 (REC-536, REC-464, ARC-19, ARC-28, ARC-57, ARC-260), kapat 1 (ARC-4). Toplam 21.
+
+## Düzeltme (2026-11-15, ARC-324): bash-write-audit "yinelemesi" bağlama girmiyor
+
+ÖNCE tablosu bash-write-audit için 9093 yinelemeyi "bağlama giren aynı metin" saydı ve DÜZELT önerisine "stderr tekrarı" yazdı. Uygulamadan önce kayıt türleri ölçüldü (son 3 gün, tüm oturum dökümleri, "SID TEKIL DEGIL" geçen kayıtlar):
+
+| Kayıt türü | Sayı | Modele gider mi |
+|---|---|---|
+| hook_success PostToolUse, çıkış 0, stderr dolu | 29834 | HAYIR (Claude Code çıkış 0 stderr'i göstermez; modele-ilet.cjs başlığı aynısını yazıyor) |
+| hook_additional_context PostToolUse / UserPromptSubmit | 39 | EVET (modele-ilet oturum başına tekilleştirilmiş kopya) |
+| hook_blocking_error PostToolUse | 4 | EVET |
+
+Sonuç: "SID TEKIL DEGIL" satırının gerçek bağlam yükü 3 günde yaklaşık 39 satırdır, 9 bin değil; modele-ilet.cjs aynı satırı oturumda bir kez iletiyor (aynı sid + aynı sayı: ikinci çağrıda boş; sayı değişirse bir kez daha) ve elle denendi. Bu satırı seyreltmek bağlam kazancı getirmez, DÜZELT satırı bu yüzden uygulanmadı (ARC-324 kapandı, kod değişmedi).
+Yanlış sınıflandırmanın kaynağı: dökümdeki hook_success kayıtları stderr alanını taşır; "stderr var" ile "bağlama girdi" aynı sayıldı. Aynı ölçüt diğer SEYRELT adaylarında şöyle doğrulandı: soz-bekcisi-hatirlatma (3398 UserPromptSubmit stdout kaydı), gorev-tazelik-satiri (UserPromptSubmit stdout) ve graphify-search (PreToolUse additional_context, 5699) GERÇEKTEN stdout'tan bağlama giren kayıtlardır; onlar için SEYRELT önerisi geçerlidir. "SONRA" ölçümü bu ölçütü kullanır: bağlam yükü = stdout (UserPromptSubmit/SessionStart) + hook_additional_context kayıtları; çıkış 0 stderr yük sayılmaz.
