@@ -3158,6 +3158,41 @@ export const en: typeof tr = {
     top: 'Top',
     bottom: 'Bottom'
   },
+  // Product assistant (URN-171): the single text source of the template printer and error paths (`src/lib/asistan/`).
+  // The dictionary carries no judgement words ("suitable", "best"); gate: asistan-cekirdek.test.ts, INV-ASISTAN-2.
+  asistan: {
+    alan: {
+      maxDeliveryM3h: 'Maximum airflow, free blowing (0 Pa)',
+      nominalDeliveryM3h: 'Nominal airflow',
+      diameterMm: 'Diameter',
+      maxStaticPressurePa: 'Max. static pressure',
+      noiseLevelDbA: 'Sound level',
+      noiseLpa3mDb: 'Sound pressure',
+      ipRating: 'IP rating',
+      atexZone: 'ATEX zone'
+    },
+    sablon: {
+      veriYok: 'no data for this product',
+      sesKosulsuz: 'not comparable (no measurement condition)',
+      sesFarkliUretici: 'Sound values from different manufacturers are not compared in the same ranking.',
+      karsilastirmaBasligi: 'Comparison',
+      siraAzalan: 'Sorted by value, highest to lowest.',
+      siraArtan: 'Sorted by value, lowest to highest.',
+      fazlaSonuc: 'Too many products match, so the first {{adet}} are shown. You can narrow the results by stating your criteria more precisely (airflow, diameter or IP rating, for example).'
+    },
+    hata: {
+      suzgecBos: 'No products match these criteria. Try relaxing them or write to us through the quote form.',
+      modelCiktisi: 'I could not understand your request. Please try again with criteria written as numbers with units.',
+      saglayici: 'The assistant cannot answer right now. You can use the search box.',
+      sayac: 'The assistant is unavailable right now. You can use the search box.',
+      istekSiniri: 'Too many requests in a short time. Please wait a moment and try again.'
+    },
+    yonlendirme: {
+      hesap: 'Calculation and sizing are outside the scope of this assistant. You can reach us through the quote form for that.',
+      konuDisi: 'This assistant only answers questions about the technical data of the products in the catalog.',
+      kotuNiyet: 'I cannot help with that request. You can ask questions about the technical data of the catalog products.'
+    }
+  },
   error: {
     chunkTitle: 'Page Update Required',
     chunkDesc: 'The application appears to have been updated. Please refresh the page and try again.',

@@ -44,8 +44,12 @@ import { VARIANT_DETAIL_COLUMNS } from './product.columns'
  * Debi tek istisnadır ve YÖNÜ güvenlidir: `nominal` her zaman `max`'tan küçüktür, yani
  * yedek olarak okunması fanı olduğundan GÜÇLÜ değil ZAYIF gösterir. Zaten yalnız P-Q
  * eğrisi yokken kaba yedek olarak kullanılır.
+ *
+ * DIŞA AKTARILIR (URN-171): ürün asistanının izin listesi (`src/lib/asistan/izinListesi.ts`) debi, ses
+ * ve çap anahtarlarını BURADAN okur; eksen eşlemesinin ikinci bir kopyası yazılmaz. Anahtar eklemek ya da
+ * çıkarmak asistanı da etkiler (kapı: `src/__tests__/conformance/asistan-cekirdek.test.ts`).
  */
-const SPEC_ANAHTARLARI = {
+export const SPEC_ANAHTARLARI = {
   /** Yedek yön güvenli: nominal ≤ max, yani fanı abartmaz. */
   debiM3h: ['max_delivery_m3h', 'nominal_delivery_m3h'],
   /** TEK eksen — `noise_lpa_3m_db` BİLEREK dışarıda (farklı ölçüm mesafesi). */

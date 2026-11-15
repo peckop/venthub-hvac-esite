@@ -3368,6 +3368,41 @@ export const tr = {
     top: 'Üst',
     bottom: 'Alt'
   },
+  // Ürün asistanı (URN-171): şablon basıcının ve hata yollarının TEK metin kaynağı (`src/lib/asistan/`).
+  // Sözlükte "uygun" ya da "en iyi" gibi yargı sözcüğü bulunmaz (kapı: asistan-cekirdek.test.ts, INV-ASISTAN-2).
+  asistan: {
+    alan: {
+      maxDeliveryM3h: 'Serbest üfleme (0 Pa) en yüksek debi',
+      nominalDeliveryM3h: 'Nominal debi',
+      diameterMm: 'Çap',
+      maxStaticPressurePa: 'Maks. statik basınç',
+      noiseLevelDbA: 'Ses düzeyi',
+      noiseLpa3mDb: 'Ses basıncı',
+      ipRating: 'IP sınıfı',
+      atexZone: 'ATEX bölgesi'
+    },
+    sablon: {
+      veriYok: 'bu üründe veri yok',
+      sesKosulsuz: 'karşılaştırılamaz (ölçüm koşulu yok)',
+      sesFarkliUretici: 'Farklı üreticilerin ses değerleri aynı sıralamada karşılaştırılmaz.',
+      karsilastirmaBasligi: 'Karşılaştırma',
+      siraAzalan: 'Değerlere göre yüksekten düşüğe sıralıdır.',
+      siraArtan: 'Değerlere göre düşükten yükseğe sıralıdır.',
+      fazlaSonuc: 'Eşleşen ürün sayısı fazla olduğu için ilk {{adet}} ürün gösteriliyor. Ölçütlerinizi (debi, çap, IP sınıfı gibi) netleştirerek sonuçları daraltabilirsiniz.'
+    },
+    hata: {
+      suzgecBos: 'Bu ölçütlerle eşleşen ürün bulunamadı. Ölçütleri gevşetmeyi deneyin ya da teklif formundan bize yazın.',
+      modelCiktisi: 'İsteğinizi anlayamadım. Ölçütleri sayı ve birimle yazarak yeniden deneyin.',
+      saglayici: 'Asistan şu anda yanıt veremiyor. Arama kutusunu kullanabilirsiniz.',
+      sayac: 'Asistan şu anda kullanılamıyor. Arama kutusunu kullanabilirsiniz.',
+      istekSiniri: 'Kısa sürede çok fazla istek gönderildi. Lütfen biraz bekleyip yeniden deneyin.'
+    },
+    yonlendirme: {
+      hesap: 'Hesaplama ve boyutlandırma bu asistanın kapsamı dışındadır. Bunun için teklif formundan bize ulaşabilirsiniz.',
+      konuDisi: 'Bu asistan yalnız katalogdaki ürünlerin teknik verileriyle ilgili sorulara bakar.',
+      kotuNiyet: 'Bu isteğe yardımcı olamam. Katalogdaki ürünlerin teknik verileriyle ilgili soru sorabilirsiniz.'
+    }
+  },
   error: {
     chunkTitle: 'Sayfa Güncellemesi Gerekli',
     chunkDesc: 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.',
