@@ -172,3 +172,30 @@ describe('INV-AJAN-SKILL-COZULUR-1 — çözüm işlevi ayırt edici (geçici sa
     expect(beyansiz).toContain('supabase-postgres-best-practices')
   })
 })
+
+/**
+ * INV-AJAN-SKILL-COZULUR-2 (REC-509 artığı) — pencere tanımının gövdesindeki "→ <skill>" adları da çözülür.
+ * Üstteki kapılar yalnız `skills:` önyüklemesini ve set JSON'unu ölçer; "Skill aracıyla adıyla çağır: ... → ad" satırındaki
+ * (rol kartı metni) ad elle yazıldığı için olmayan bir adı sessizce taşıyabilirdi.
+ */
+const pencereAdlari = (metin: string): string[] => {
+  const satir = metin.split(/\r?\n/).find((s) => s.startsWith("Skill'leri Skill aracıyla adıyla çağır:"))
+  return satir ? [...satir.matchAll(/→\s*([a-z][a-z0-9-]*)/g)].map((m) => m[1]!) : []
+}
+
+describe('INV-AJAN-SKILL-COZULUR-2 — pencere gövdesindeki skill adları', () => {
+  const dizin = path.join(kok, '.claude', 'agents')
+  const dosyalar = fs.readdirSync(dizin).filter((f) => f.endsWith('-pencere.md'))
+
+  it('her "→ ad" projede ya da DIS_BAGIMLILIK tablosunda var', () => {
+    const eksik = dosyalar.flatMap((f) => pencereAdlari(fs.readFileSync(path.join(dizin, f), 'utf8')).filter((ad) => !projedeVar(ad, kok) && !(ad in DIS_BAGIMLILIK)).map((ad) => `${f}: ${ad}`))
+    expect(eksik, `olmayan skill adı: ${eksik.join('; ')}`).toEqual([])
+  })
+
+  it('bilerek bozulmuş ad yakalanır, geçerli ad geçer', () => {
+    const bozuk = "Skill'leri Skill aracıyla adıyla çağır: iş → olmayan-skill-xyz; başka → wrongstack-kanban."
+    expect(pencereAdlari(bozuk)).toEqual(['olmayan-skill-xyz', 'wrongstack-kanban'])
+    expect(projedeVar('olmayan-skill-xyz', kok)).toBe(false)
+    expect(projedeVar('wrongstack-kanban', kok)).toBe(true)
+  })
+})

@@ -35,7 +35,7 @@ plan-challenger, verify-before-done, skills-creator (kısmen: `.agent`'e yazar),
 - Gerekçeli özet: `docs/roller/YETENEK-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Açık. Skill atama tablosunu bu rol doldurur (iskelet HARİTA'da, REC-509).
+Açık. Skill atama tablosunu bu rol doldurur (kapılar: INV-SKILL-BAGLI-1).
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
