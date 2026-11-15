@@ -155,7 +155,8 @@ function kacis(metin: string): string {
 /** Yorum satırlarını ve satır sonu yorumunu atar: gerekçe metni "bağ" gibi görünmesin. */
 function kodSatirlari(metin: string, tur: 'js' | 'yaml'): string[] {
   const yorumBasi = tur === 'js' ? /^\s*(?:\/\/|\/\*|\*)/ : /^\s*#/
-  const sonYorum = tur === 'js' ? /\s\/\/.*$/ : /\s#.*$/
+  // Şema-güvenli (INV-SCRUB-1): `(?<!:)` ön-bakışı `https://` içindeki çift çizgiyi yorum saymaz.
+  const sonYorum = tur === 'js' ? /\s(?<!:)\/\/.*$/ : /\s#.*$/
   return metin
     .split(/\r?\n/)
     .filter((satir) => !yorumBasi.test(satir))
@@ -315,6 +316,14 @@ describe('INV-CI-KAPI-BAGLI-1 · evren sağlığı (boş evren yeşil ölçüm d
   })
   it('kendini taramaz: bu dosya hiçbir kapının vitest kanıtı olarak sayılmaz', () => {
     for (const k of gercek.kapilar) expect(k.vitestler).not.toContain(KENDI_YOLU)
+  })
+})
+
+describe('INV-CI-KAPI-BAGLI-1 · yorum sıyırıcı şema-güvenli (INV-SCRUB-1 alt sınırı)', () => {
+  it('URL taşıyan satırda hedef GERÇEKTEN toplanır; satır sonu yorumu atılır', () => {
+    const satir = "const hedef = 'https://ornek.dev/yol' // gerekce"
+    expect(kodSatirlari(satir, 'js')).toEqual(["const hedef = 'https://ornek.dev/yol'"])
+    expect(kodSatirlari(satir, 'js')[0]).toContain('https://ornek.dev/yol')
   })
 })
 
