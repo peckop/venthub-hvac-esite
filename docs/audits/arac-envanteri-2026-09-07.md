@@ -1168,6 +1168,19 @@ gerektirmez).
 - **`tmp-lf-fix.yml`** — bkz. §3.5 son not: GitHub Actions tarafında `active` görünen ama repoda
   hiç var olmamış hayalet kayıt; 29'luk dosya sayımına dahil değildir, OPS'un GitHub ayarlarından
   temizlemesi gerekir.
+- **`src/__tests__/conformance/ci-kapisi-baglilik.test.ts` — `INV-CI-KAPI-BAGLI-1`** (ALT-181, 15 Kasım 2026) — durum
+  **KAL**, sahip ALTYAPI. `scripts/ci/*-kapisi.cjs` kapılarının her biri üç bağla bağlı mı ölçer: (a) `scripts/ci/__tests__/`
+  altında kapıyı adıyla anan test, (b) o testin `scripts/ci/test-haritasi.json` satırı, (c) kapının bir iş akışında `node`
+  komutuyla ya da bir vitest testinde çağrılması. Keşif dosya sisteminden (sabit liste yok); eksik bağ ilan edilmemişse
+  KIRMIZI, ilan edilip onarılmışsa da KIRMIZI (iki yönlü mandal, `BILINEN_EKSIK`; bugün 2 satır: `defter-pr-kapisi` ve
+  `yonlendirme-kapisi` testlerinin harita satırı, ALT-184 haritayı tazeleyince silinir). Tetik: PR (`ci` vitest).
+  **Neden §3.2'de satır değil:** o bölümün evreni `scripts/**`; bu dosya `src/` altında ve oraya satır yazılırsa
+  `INV-ARAC-1` `KAYIP 1` ile kırmızı verir (2026-11-15'te envanterin geçici kopyasında ölçüldü), bu yüzden özel satır.
+  **Kanıt:** 23 sınama; sabotaj kolları: bağsız sahte kapı üç bağda da eksik, yorum satırı ve ad çakışması bağ sayılmıyor,
+  geçici depo ağacında uçtan uca, boş evren kırmızı; gerçek ağaçta `scripts/ci/` altına bağsız bir kapı dosyası eklenince
+  üç bağ da kırmızı, ilan yanlış bağa çevrilince iki yön de kırmızı (her sabotaj geri alındı, sha256 doğrulandı).
+  **Sınır (başlıkta da yazılı):** kapının kendi birim testi (c)'nin vitest kolunu da doldurur; iş akışı komutu koparsa bu test
+  kırmızı vermez (ölçüldü), o değişmezi kapıların kendi testleri ölçer.
 
 ---
 
