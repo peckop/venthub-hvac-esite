@@ -17,7 +17,7 @@
 |---|---|---|---|
 | Alan adı DNS'i | **Cloudflare** (brodie/ines.ns.cloudflare.com) | `nslookup -type=NS venthub.com.tr 1.1.1.1` | Kalır — taşıma sebebi yok |
 | Site (Next.js) | Vercel Hobby, proje `venthub-hvac-esite` | apex A 64.29.17.65 / 216.198.79.65, www CNAME cname.vercel-dns.com | **karar 59: _________** |
-| Veritabanı / Auth / Storage / Edge Functions | Supabase `free`, eu-central-1 | 2026-09-16 ölçümü | Kalır; **yedek yok** — ayrı karar kalemi |
+| Veritabanı / Auth / Storage / Edge Functions | Supabase `free`, eu-central-1 | 2026-09-16 ölçümü | Kalır; platform yedeği **yok** (Free), ama **gece tam yedek var** (ALT-188, 15 Kasım 2026): `scripts/hijyen/canli-db-yedek.cjs al`, `drive-yedek.cmd` içinde, AES-256-GCM şifreli `.vhenc`, Drive'da `yedek/canli-db`, 14 gün; geri yükleme kanıtlı (`docs/plans/rec409-canli-yedek-plani-2026-10-01.md` §8). Anahtar tek kopya, makine dışı kopya Recep kararı |
 | Gelen e-posta | Cloudflare Email Routing (MX route1-3.mx.cloudflare.net) | `nslookup -type=MX` | Kalır |
 | Giden e-posta | Resend — **alan adı doğrulanmamış** | `resend._domainkey` yok, `_dmarc` yok | REC-368 |
 | Ziyaretçi analitiği | `@vercel/analytics` bileşeni var, **projede Web Analytics açık değil** | Vercel API `count_pageviews` → 404 "Web Analytics not found" | Veri toplamıyor → sökülür (§B4) |
