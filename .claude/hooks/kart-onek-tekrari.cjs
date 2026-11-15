@@ -27,10 +27,13 @@ const ARAC_ADI = 'mcp__wrongstack-kanban__kanban_manage'
 const VANA = 'VENTHUB_ONEK_TEKRARI_KAPAT'
 const ANLIK = path.resolve(__dirname, '..', '..', 'scripts', 'board', 'kanban-anlik.cjs')
 
-/** "ALT-75 · ..." → "ALT-75" (büyük harf); numara yoksa null. */
+/**
+ * "ALT-75 · ..." → "ALT-75" (büyük harf); numara yoksa null. Alt kart ekleri ayrı anahtardır (denetçi bulgusu, canlı panoda
+ * ALT-38g, ARC-267a, REC-400 H1, OPS-193 EK yaygın): "ALT-38g" → "ALT-38G", "REC-400 H1" → "REC-400 H1".
+ */
 function onek(baslik) {
-  const m = /^\s*([A-Za-z0-9]{2,6}-\d{1,5})(?!\d)/.exec(String(baslik || ''))
-  return m ? m[1].toUpperCase() : null
+  const m = /^\s*([A-Za-z0-9]{2,6}-\d{1,5}[A-Za-z]?)(?![A-Za-z0-9])(?:\s+(EK\d*|H\d+)(?![A-Za-z0-9]))?/i.exec(String(baslik || ''))
+  return m ? (m[1] + (m[2] ? ' ' + m[2] : '')).toUpperCase() : null
 }
 
 /**

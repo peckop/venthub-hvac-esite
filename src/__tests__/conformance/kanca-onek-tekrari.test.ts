@@ -19,6 +19,15 @@ describe('INV-KANCA-ONEK-1 · tekrarlı kart numarası', () => {
     expect(onek('alt-75: ad')).toBe('ALT-75')
     expect(onek('Numarasız başlık')).toBeNull()
     expect(onek('ALT-7 · ad')).toBe('ALT-7')
+    expect(onek('ALT-38g · alt kart')).toBe('ALT-38G')
+    expect(onek('REC-400 H2 · ad')).toBe('REC-400 H2')
+    expect(onek('OPS-193 EK2 · ek')).toBe('OPS-193 EK2')
+  })
+
+  it('denetçi bulgusu: alt kartlar (harf eki, EK, H<n>) kendi anahtarıyla ayrılır, meşru alt kart reddedilmez; birebir aynı alt kart reddedilir', () => {
+    const k = [{ title: 'ALT-38g · a' }, { title: 'ARC-267a · b' }, { title: 'OPS-193 EK · c' }, { title: 'REC-400 H1 · d' }, { title: 'ALT-38 · ana' }]
+    for (const t of ['ALT-38m · yeni', 'ARC-267b · alt', 'OPS-193 EK2 · ek', 'REC-400 H2 · yeni']) expect(karar({ action: 'add_task', title: t }, k)).toBeNull()
+    for (const t of ['ALT-38g · kopya', 'ARC-267a · kopya', 'OPS-193 EK · kopya', 'REC-400 H1 · kopya', 'ALT-38 · kopya']) expect(karar({ action: 'add_task', title: t }, k)).not.toBeNull()
   })
 
   it('aynı önek → ret; SABOTAJ kolları: farklı önek, numarasız başlık, başka eylem, kart listesi boş → izin', () => {
