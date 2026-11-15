@@ -13,7 +13,7 @@
  * Kaynak: scripts/board/kanban-anlik.cjs --kisa (salt-okunur SQLite, TÜM panolar; ön ek numarası panolar arası ortaktır).
  * SINIR: arşivli kartlar okunmaz (kanban-anlik kuralı); arşivlenmiş daha büyük numara varsa araç onu görmez. Aynı sınır
  * kart-onek-tekrari kapısında da vardır; çakışma kapısı yine ikinci kartı reddeder.
- * Alt kart ekleri ("ALT-38g", "REC-400 H1") numara sayılmaz: yalnız saf "ÖN-sayı" başlıkları (ek harfsiz) sayılır.
+ * Bitişik harf eki ("ALT-38g", "ARC-267a") numara sayılmaz; boşluklu ek ("REC-400 H1") taban numara (REC-400) olarak sayılır. Arşivde daha büyük numara olan ön ekte (ölçüm 15 Kasım: yalnız I18) araç yanlış sıradaki önerir.
  */
 
 const { spawnSync } = require('node:child_process')

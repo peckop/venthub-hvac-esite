@@ -52,6 +52,8 @@ describe('INV-KANCA-KART-NUMARA-1 · numara çözümü ve sıradaki', () => {
     expect(no.siradaki(BASLIKLAR, 'OPS')).toMatchObject({ enBuyuk: 300, siradaki: 'OPS-301' })
     expect(no.siradaki(BASLIKLAR, 'ALT')).toMatchObject({ enBuyuk: 0, siradaki: 'ALT-1', kartSayisi: 0 })
     expect(no.siradaki([], 'arc')).toMatchObject({ siradaki: 'ARC-1' })
+    // boşluklu ek taban numara sayılır (denetçi bulgusu: yorum kodla çelişiyordu)
+    expect(no.siradaki(['REC-400 H1 · ek'], 'REC')).toMatchObject({ enBuyuk: 400, siradaki: 'REC-401' })
   })
 
   it('siradaki: büyük sayı küçük sayıdan sonra gelse de en büyük seçilir (sıra bağımsız)', () => {
