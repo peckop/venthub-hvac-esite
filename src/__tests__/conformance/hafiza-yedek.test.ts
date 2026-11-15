@@ -57,6 +57,11 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     const uzun = (onek: string, n: number, set = 'a') => onek + set.repeat(n)
     expect(m.sirKalibiVar(uzun('sk-ant-', 70))).toBe(true)
     expect(m.sirKalibiVar(uzun('ghp_', 36))).toBe(true)
+    // ARC-319 denetçi B2: gho_ ve eyJ kolları da sınanır (kalıbı bozan fark edilsin). JWT parçalardan kurulur.
+    expect(m.sirKalibiVar(uzun('gho_', 36))).toBe(true)
+    expect(m.sirKalibiVar(uzun('gho_', 10))).toBe(false)
+    expect(m.sirKalibiVar('eyJ' + 'a'.repeat(80) + '.' + 'b'.repeat(20))).toBe(true)
+    expect(m.sirKalibiVar('eyJ' + 'a'.repeat(20) + '.' + 'b'.repeat(20))).toBe(false)
     expect(m.sirKalibiVar(uzun('lin_api_', 40))).toBe(true)
     expect(m.sirKalibiVar(uzun('sbp_', 40, 'f'))).toBe(true)
     // Bağlantı dizesi parçalardan kurulur: CI'daki sabit-bağlantı-dizesi taraması (ci.yml Secret guard) sahte örneği de yakalar.
@@ -295,6 +300,53 @@ describe('INV-HAFIZA-YEDEK-1', () => {
     expect(r.neden).not.toContain(dir)
     expect(r.neden).not.toContain(dir.replace(/\\/g, '/'))
     fs.rmSync(path.join(dir, '.git', 'index.lock'))
+  })
+
+  it('ARC-319 denetçi B1 (renk): color.ui=always ve harici diff ayarı altında da izlenen dosyadaki sır yakalanır', () => {
+    fs.writeFileSync(path.join(dir, 'n.md'), 'ilk\n')
+    git(dir, 'add', '--', 'n.md')
+    git(dir, 'commit', '-q', '-m', 'n')
+    git(dir, 'config', 'color.ui', 'always')
+    git(dir, 'config', 'color.diff', 'always')
+    fs.writeFileSync(path.join(dir, 'n.md'), 'ilk\n' + SIR)
+    const once = commitSayisi(dir)
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.durum).toBe('sir-kalibi')
+    expect(r.disarida).toEqual(['n.md'])
+    expect(commitSayisi(dir)).toBe(once)
+  })
+
+  it('ARC-319 denetçi N2: yeni alt dizindeki not da yedeklenir (-uall); okunamayan aday yedeğe alınmaz', () => {
+    fs.mkdirSync(path.join(dir, 'olcum'))
+    fs.writeFileSync(path.join(dir, 'olcum', 'yeni.md'), 'ölçüm\n')
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('commit')
+    expect(sonCommitDosyalari()).toEqual(['olcum/yeni.md'])
+    // Okunamayan aday: boşa işaret eden sembolik bağ (Windows'ta ayrıcalık yoksa bu kol atlanır, kod yolu aynı).
+    try {
+      fs.symlinkSync(path.join(dir, 'yok-hedef'), path.join(dir, 'kirik.md'))
+    } catch {
+      return
+    }
+    const r = m.yedekle({ dir, sebep: 'test' })
+    expect(r.disarida).toEqual(['kirik.md'])
+  })
+
+  it('ARC-319 denetçi N3: yalnız sırlı dosya kaldığında da önceki commit uzağa gönderilir (gönderilmemiş commit gerçek durumdan ölçülür)', () => {
+    fs.writeFileSync(path.join(dir, 'ders.md'), 'bir\n')
+    expect(m.yedekle({ dir, sebep: 'test' }).push).toBe(false)
+    fs.writeFileSync(path.join(dir, 'gizli.md'), SIR)
+    expect(m.yedekle({ dir, sebep: 'test' }).durum).toBe('sir-kalibi') // uzak yok: ikisi de düşer
+    const uzak = fs.mkdtempSync(path.join(os.tmpdir(), 'hafiza-uzak-'))
+    try {
+      execFileSync('git', ['init', '-q', '--bare', uzak], { windowsHide: true })
+      git(dir, 'remote', 'add', 'origin', uzak)
+      const r = m.yedekle({ dir, sebep: 'test' })
+      expect(r.durum).toBe('sir-kalibi')
+      expect(r.push).toBe(true)
+      expect(execFileSync('git', ['-C', uzak, 'rev-parse', 'master'], { encoding: 'utf8', windowsHide: true }).trim()).toBe(git(dir, 'rev-parse', 'HEAD'))
+    } finally {
+      fs.rmSync(uzak, { recursive: true, force: true })
+    }
   })
 
   it('ARC-319 denetçi N7: push düşünce kayıt yazılır, uzak sonradan eklenince "değişiklik yok" koşusu push’u yeniden dener', () => {

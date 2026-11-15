@@ -134,11 +134,14 @@ function dosyaSirli(dir, a) {
   const oku = () => fs.readFileSync(path.join(dir, a.p), 'latin1')
   if (a.yeni) return sirliMetin(oku(), false)
   try {
-    return sirliMetin(git(dir, ['--literal-pathspecs', 'diff', '-U0', '--text', 'HEAD', '--', a.p]), true)
+    return sirliMetin(git(dir, ['--literal-pathspecs', 'diff', ...DUZ_FARK, '-U0', '--text', 'HEAD', '--', a.p]), true)
   } catch {
     return sirliMetin(oku(), false) // HEAD yok (ilk commit): tüm içerik taranır
   }
 }
+
+// Kullanıcının git ayarı (color.ui=always, diff.external, textconv) taramayı kör etmesin: düz fark istenir.
+const DUZ_FARK = ['--no-color', '--no-ext-diff', '--no-textconv']
 
 const KILIT = '.hafiza-yedek-kilit'
 const KILIT_BAYAT_MS = 120000
@@ -156,6 +159,7 @@ function kilitAl(dir, jeton) {
       }
       return true
     } catch (e) {
+      if (e && (e.code === 'EPERM' || e.code === 'EACCES')) return false
       if (!e || e.code !== 'EEXIST') return true
       try {
         if (Date.now() - fs.statSync(yol).mtimeMs <= KILIT_BAYAT_MS) return false
@@ -193,6 +197,16 @@ function kilitBirak(dir, jeton) {
   }
 }
 
+/** Uzağa gönderilmemiş commit var mı: rev-list ölçer; ölçülemezse (uzak yok) son kayıttaki push:false'a bakar. */
+function gonderilmemis(dir) {
+  try {
+    return Number.parseInt(git(dir, ['rev-list', '--count', 'origin/master..HEAD']).trim(), 10) > 0
+  } catch {
+    const k = sonKayit(dir)
+    return Boolean(k && k.push === false)
+  }
+}
+
 function uzagaGonder(dir) {
   try {
     git(dir, ['push', '-q', 'origin', 'master'], 25000)
@@ -216,8 +230,7 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), ta
     git(dir, ['reset', '-q'])
     const hepsi = adaylar(dir)
     if (hepsi.length === 0) {
-      const onceki = sonKayit(dir)
-      if (onceki && (onceki.durum === 'commit' || onceki.durum === 'push-tekrar') && onceki.push === false) return sonuc(dir, simdi, sebep, { durum: 'push-tekrar', push: uzagaGonder(dir) })
+      if (gonderilmemis(dir)) return sonuc(dir, simdi, sebep, { durum: 'push-tekrar', push: uzagaGonder(dir) })
       return sonuc(dir, simdi, sebep, { durum: 'degisiklik-yok' })
     }
     // ARC-319: sır kalıbı yalnız KENDİ dosyasını dışarıda bırakır, kalan yedek alınır. (Eskiden tek eşleşme TÜM yedeği
@@ -237,6 +250,7 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), ta
       }
       disarida.push(a.p)
       try {
+        if (fs.existsSync(path.join(dir, UYARI_LOGU)) && fs.statSync(path.join(dir, UYARI_LOGU)).size > 262144) throw new Error('log dolu') // sınır: 256 KB
         fs.appendFileSync(path.join(dir, UYARI_LOGU), simdi.toISOString() + ' SIR KALIBI: ' + temiz(a.p).slice(0, 120) + ' yedege ALINMADI, elle bak (' + sebep + ')\n')
       } catch {
         // Günlük yazılamazsa da dosya hiç stage'lenmez; asıl koruma budur.
@@ -252,15 +266,19 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), ta
         for (const t of grup) {
           try {
             git(dir, ['--literal-pathspecs', 'add', '--', t])
-          } catch {
-            // Kayıp dosya bir sonraki koşuda zaten aday olmaz.
+          } catch (e2) {
+            // Yalnız kaybolan dosya sessizce atlanır; index.lock gibi gerçek hata 'hata' olarak görünür.
+            if (!/did not match|pathspec/i.test(String((e2 && e2.stderr) || (e2 && e2.message) || e2))) throw e2
           }
         }
       }
     }
     // Commit'ten hemen önce tüm indeks farkı BİR KEZ daha taranır (derinlemesine koruma).
-    if (git(dir, ['diff', '--cached', '--name-only']).trim() === '') return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida })
-    if (sirliMetin(git(dir, ['diff', '--cached', '-U0', '--text']), true)) {
+    if (git(dir, ['diff', '--cached', '--name-only']).trim() === '') {
+      // Yalnız sırlı dosya kaldı; önceki commit'ler uzağa gitmemişse onlar yine de gönderilir.
+      return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida, ...(gonderilmemis(dir) ? { push: uzagaGonder(dir) } : {}) })
+    }
+    if (sirliMetin(git(dir, ['diff', ...DUZ_FARK, '--cached', '-U0', '--text']), true)) {
       git(dir, ['reset', '-q'])
       return sonuc(dir, simdi, sebep, { durum: 'sir-kalibi', disarida: disarida.concat('(indeks son taramada)') })
     }
@@ -269,7 +287,7 @@ function yedekle({ dir = hafizaDizini(), sebep = 'yedek', simdi = new Date(), ta
     git(dir, ['commit', '-q', '-m', 'hafiza: ' + sebep + ' ' + iso])
     // Commit sonrası, PUSH'tan önce son kapı: kilitsiz bir dış yazar (eski kapanış betiği) indekse sırlı dosya soktuysa
     // commit geri alınır ve hiçbir şey uzağa gitmez (denetçi N-A).
-    if (sirliMetin(git(dir, ['show', '-U0', '--text', '--format=', 'HEAD']), true)) {
+    if (sirliMetin(git(dir, ['show', ...DUZ_FARK, '-U0', '--text', '--format=', 'HEAD']), true)) {
       try {
         git(dir, ['reset', '-q', '--soft', 'HEAD~1'])
       } catch {
