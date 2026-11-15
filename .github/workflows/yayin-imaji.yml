@@ -79,7 +79,7 @@ jobs:
       # Yalnız master'a itmede ve elle tetiklemede çalışır (PR'da imaj itilmez, dağıtım olmaz). Sır yalnız bu adıma girer.
       # Coolify API'si panelin https adresindedir (:8000 dışarıya kapalı). Dağıtım hata verirse iş akışı kırmızı olur.
       - name: Coolify'a dağıt
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
         env:
           COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
           COOLIFY_UYGULAMA_UUID: ${{ vars.COOLIFY_UYGULAMA_UUID }}
