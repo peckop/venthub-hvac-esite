@@ -105,6 +105,10 @@ describe('INV-SQL-YAZMA-1 · karar ve bağlantı', () => {
     expect(r.test('mcp__claude_ai_Supabase__execute_sql')).toBe(true)
     expect(r.test('mcp__plugin_supabase_supabase__execute_sql')).toBe(true)
     expect(r.test('mcp__claude_ai_Supabase__apply_migration')).toBe(true)
+    // ARC-322: bağlayıcı uuid adıyla gelince "supabase" geçmiyor; son 7 günde 838 çağrının 398'i eski eşleyiciden kaçıyordu
+    expect(r.test('mcp__0abcd180-de1e-4301-96ff-700522be0275__execute_sql')).toBe(true)
+    expect(r.test('mcp__0abcd180-de1e-4301-96ff-700522be0275__apply_migration')).toBe(true)
     expect(r.test('mcp__claude_ai_Supabase__list_tables')).toBe(false)
+    expect(r.test('mcp__0abcd180-de1e-4301-96ff-700522be0275__list_tables')).toBe(false)
   })
 })
