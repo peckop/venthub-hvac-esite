@@ -13,7 +13,7 @@ import { UrunlerSayfasi, urunlerUstVerisiK3b } from '../../_components/urunlerSa
  * Gövde `urunlerSayfasi.tsx`'ten — bugünkü `/[lang]/products` ile AYNI çekirdek.
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 
 export async function generateStaticParams() {
   // Önceden üretim (plan madde 13): bayrak açıkken TR tek sayfa; kapalıyken hiç (sayfa 404).

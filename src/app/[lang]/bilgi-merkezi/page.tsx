@@ -11,7 +11,7 @@ import { ListeRotasi, listeUstVerisi } from '../../../views/knowledge/bilgiMerke
  * okunmaz (rendering-cache-standard §1.1). Arama istemcide süzer, adrese yazılmaz.
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   return listeUstVerisi(params, 'tr')

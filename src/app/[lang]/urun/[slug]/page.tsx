@@ -20,7 +20,7 @@ import { AileSayfasi, aileSayfasiUstVerisi } from '../../../_components/aileSayf
  * birlikte (Faz 3e) bağlanır; o güne kadar aileler de talep üzerine üretilir.
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 export const dynamicParams = true
 
 export async function generateStaticParams() {

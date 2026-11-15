@@ -9,7 +9,7 @@ import { yaziParametreleri, YaziRotasi, yaziUstVerisi } from '../../../../views/
  * dile düşme yasak). Rota sınıfı ve kurallar TR karşılığıyla aynı (`bilgi-merkezi/[yazi]`).
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 
 export function generateStaticParams({ params }: { params: { lang: string } }) {
   return yaziParametreleri(params.lang, 'en')

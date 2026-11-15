@@ -14,7 +14,7 @@ import { yaziParametreleri, YaziRotasi, yaziUstVerisi } from '../../../../views/
  * DURDURUR (src/lib/bilgiMerkezi/icBaglanti.ts).
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 
 export function generateStaticParams({ params }: { params: { lang: string } }) {
   return yaziParametreleri(params.lang, 'tr')

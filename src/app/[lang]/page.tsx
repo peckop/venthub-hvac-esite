@@ -55,13 +55,13 @@ import HomePage from '../../views/HomePage'
 export const dynamic = 'force-static'
 
 /**
- * ISR YEDEĞİ (1 saat) — birincil tazeleme yolu webhook'tur (`rendering-cache-standard.md` §3);
+ * ISR YEDEĞİ (24 saat; ALT-187) — birincil tazeleme yolu webhook'tur (`rendering-cache-standard.md` §3);
  * bu yalnız EMNİYET AĞIDIR. Yedek olmadan kaçan tek bir webhook sayfayı SONSUZA DEK eski
  * bırakır ve bunu hiçbir şey söylemez — 2026-08-15'te fiyatlar yazıldı, vitrin değişmedi.
  * (`force-static` bunu İPTAL ETMEZ: kategori ve ürünler rotaları aynı ikiliyi taşıyor ve
  * ikisinin de canlıda tazelendiği ölçüldü.)
  */
-export const revalidate = 3600
+export const revalidate = 86400
 
 export async function generateStaticParams() {
   return [
@@ -143,14 +143,14 @@ import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantCons
 // çizilmesin her yeniden üretimde okunuyordu. Etiketler ana sayfa verisiyle AYNI kalır: ürün satırı
 // değişince webhook bu girdiyi de tazeler (rendering-cache-standard.md §3).
 // `kolonKumesi` korunur: vitrin kolon kümesi değişince artırılır, yoksa Vercel veri önbelleği
-// dağıtımlar arası paylaşıldığı için eski kayıt ≤1 saat sunulur (REC-140 dersi).
+// dağıtımlar arası paylaşıldığı için eski kayıt ≤24 saat sunulur (REC-140 dersi).
 const getCachedVitrinUrunleri = (lang: string, tenantId: string) => unstable_cache(
   async () => {
     const prodData = await getProducts(supabaseStaticClient, 12)
     return { prodData, kolonKumesi: 'vitrin-v2-rec140' }
   },
   ['home-vitrin-urunleri', lang, tenantId],
-  { tags: [HOME_DATA_TAG, homeDataTag(tenantId)], revalidate: 3600 }
+  { tags: [HOME_DATA_TAG, homeDataTag(tenantId)], revalidate: 86400 }
 )()
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
@@ -171,9 +171,10 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
     return { catData, productCounts }
   },
   ['home-page-data', lang, tenantId],
-  // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
-  // ana sayfa en fazla 1 saat bayat kalabilir. Sinyalli tazeleme (revalidateTag) aynen çalışır.
-  { tags: [HOME_DATA_TAG, homeDataTag(tenantId)], revalidate: 3600 }
+  // revalidate: 86400 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
+  // ana sayfa en fazla 24 saat bayat kalabilir (ALT-187: Vercel Hobby Active CPU kotası). Sinyalli
+  // tazeleme (revalidateTag) aynen çalışır ve birincil yol olarak kalır.
+  { tags: [HOME_DATA_TAG, homeDataTag(tenantId)], revalidate: 86400 }
 )()
 
 export default async function RootPage({ params }: Props) {

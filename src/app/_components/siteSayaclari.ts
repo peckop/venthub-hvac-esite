@@ -9,8 +9,8 @@ import { supabaseStaticClient } from '@/lib/supabase/static'
  *
  * TAZELEME: sayılar `products` (status/family_id/deleted_at), `product_families` ve `brands` satırlarından türer;
  * webhook bu üç tabloda zaten KEŞİF etiketini (`PRODUCTS_DISCOVERY_TAG` + kiracı etiketi) tazeler, yani yeni
- * tetik/handler dalı gerekmez (rendering-cache-standard §3). `revalidate: 3600` emniyet kemeri: sinyal kaçarsa
- * sayı en fazla 1 saat bayat kalır. Anahtar `lang` ve `tenantId` içerir (kural 12).
+ * tetik/handler dalı gerekmez (rendering-cache-standard §3). `revalidate: 86400` emniyet kemeri: sinyal kaçarsa
+ * sayı en fazla 24 saat bayat kalır (ALT-187). Anahtar `lang` ve `tenantId` içerir (kural 12).
  *
  * Hata önbelleğe YAZILMAZ (sarmal fırlatır) ve çağıran `null` alır: sayfa sayaç kartlarını çizmez, uydurma ya da
  * eski sayı basmaz.
@@ -18,7 +18,7 @@ import { supabaseStaticClient } from '@/lib/supabase/static'
 const getCachedSiteSayaclari = (lang: string, tenantId: string) => unstable_cache(
   async () => getSiteSayaclari(supabaseStaticClient),
   ['site-sayaclari', lang, tenantId],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 export async function siteSayaclariOku(lang: string, tenantId: string): Promise<SiteSayaclari | null> {

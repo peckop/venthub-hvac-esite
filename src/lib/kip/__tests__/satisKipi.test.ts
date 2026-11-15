@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  *
  * KORUDUĞU KUSUR: eskiden `dbdenOku` hatada `KAPALI` DÖNERDİ ve `unstable_cache` `revalidate`sız kurulmuştu → geçici bir
  * ağ hatası (ya da migration öncesi 404) KAPALI'yı SÜRESİZ saklardı; webhook düşerse "açık" da süresiz kalırdı.
- * Şimdi: hatada fırlatılır (önbelleğe girmez), çağıran o çağrıda KAPALI'ya düşer, `revalidate: 300`.
+ * Şimdi: hatada fırlatılır (önbelleğe girmez), çağıran o çağrıda KAPALI'ya düşer, `revalidate: 86400` (ALT-187: 300 → 86400; webhook birincil, süre emniyet kemeri).
  *
  * NE ÖLÇMEZ: gerçek Next önbelleğinin fırlatılan çağrıyı saklamadığı (Next davranışı; burada `unstable_cache` sahte,
  * yalnız KENDİ koduzun fırlattığı ve süre verdiği ölçülür).
@@ -42,13 +42,13 @@ async function yukle() {
 const yanit = (govde: unknown, ok = true, status = 200) => ({ ok, status, json: async () => govde }) as Response
 
 describe('INV-SATIS-KIPI-7: hata önbelleğe yazılmaz, süre sınırlı', () => {
-  it('önbellek revalidate: 300 ve global + kiracı etiketleriyle kurulur', async () => {
+  it('önbellek revalidate: 86400 ve global + kiracı etiketleriyle kurulur', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => yanit({ acik: false, damga: null })))
     const { satisKipiOku, SATIS_KIPI_TAG, SATIS_KIPI_ONBELLEK_SN } = await yukle()
     await satisKipiOku('t1')
-    expect(SATIS_KIPI_ONBELLEK_SN).toBe(300)
+    expect(SATIS_KIPI_ONBELLEK_SN).toBe(86400)
     expect(kayitlar).toHaveLength(1)
-    expect(kayitlar[0].secenek.revalidate, 'revalidate yok: "açık" süresiz bayat kalabilir').toBe(300)
+    expect(kayitlar[0].secenek.revalidate, 'revalidate yok: "açık" süresiz bayat kalabilir').toBe(86400)
     expect(kayitlar[0].secenek.tags).toEqual([SATIS_KIPI_TAG, `${SATIS_KIPI_TAG}-t1`])
     expect(kayitlar[0].anahtar).toEqual(['satis-kipi', 't1'])
   })

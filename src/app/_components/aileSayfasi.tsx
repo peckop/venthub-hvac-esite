@@ -225,7 +225,7 @@ export const ILGILI_AILE_GOSTERILEN = 4
 export const getCachedKategoriAileleri = (lang: string, tenantId: string, kategoriId: string) => unstable_cache(
   async () => (await getFamiliesEnriched(supabaseStaticClient, { categoryIds: [kategoriId], limit: ILGILI_AILE_ADAY_AZAMI })).items,
   ['pdp-related-families', lang, tenantId, kategoriId],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /** Kategorinin vitrin ailelerini okur; okuyamazsa FIRLATIR. Testte enjekte edilir (`AileSayfasi` → `ilgiliAileler`). */

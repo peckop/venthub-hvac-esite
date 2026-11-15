@@ -11,7 +11,7 @@ import { ListeRotasi, listeUstVerisi } from '../../../views/knowledge/bilgiMerke
  * `/tr/knowledge-hub` YOKTUR.
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   return listeUstVerisi(params, 'en')

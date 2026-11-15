@@ -91,7 +91,7 @@ const getCachedKategoriSayimlari = (lang: string, tenantId: string) => unstable_
     return data ?? []
   },
   ['category-counts', lang, tenantId],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /**
@@ -107,7 +107,7 @@ const getCachedKategoriAgaci = (lang: string, tenantId: string) => unstable_cach
     return (data ?? []) as { id: string; parent_id: string | null; is_active: boolean | null }[]
   },
   ['category-tree', lang, tenantId],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /**
@@ -131,8 +131,8 @@ const getCachedFamilies = (
     offset: (page - 1) * PAGE_SIZE
   }),
   ['category-families', lang, tenantId, categoryId, String(page), [...categoryIds].sort().join(',')],
-  // revalidate: 3600 = emniyet kemeri (webhook sinyali kaçarsa en fazla 1 saat bayat).
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  // revalidate: 86400 = emniyet kemeri (webhook sinyali kaçarsa en fazla 24 saat bayat; ALT-187).
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /**
@@ -177,7 +177,7 @@ async function vorticeKatalogSayilari(lang: string, tenantId: string): Promise<K
 const getCachedSessizFanKodlari = (lang: string, tenantId: string, familySlug: string) => unstable_cache(
   async () => getSessizFanCanliKodlari(supabase, familySlug),
   ['sessiz-fan-kodlari', lang, tenantId, familySlug],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /**

@@ -28,7 +28,7 @@ import { KategoriSayfasi, kategoriSayfasiUstVerisiK3b } from '../../../../_compo
  * eski slug / takma ad / iç içe adres gibi adresler talep üzerine (`dynamicParams`) ve yalnız yönlendirir.
  */
 export const dynamic = 'force-static'
-export const revalidate = 3600
+export const revalidate = 86400
 export const dynamicParams = true
 
 export async function generateStaticParams() {
