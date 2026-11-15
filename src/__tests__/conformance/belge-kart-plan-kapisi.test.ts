@@ -16,7 +16,8 @@ import { describe, expect, it } from 'vitest'
 type Sonuc = { gecti: boolean; tur: 'plan' | 'plan-yok' | 'plan-gerekmez'; eksikler: string[]; uyarilar?: string[] }
 type Modul = {
   degerlendir: (aciklama: string, secenek?: { onceki?: 'zorunlu' | 'uyari' }) => Sonuc
-  kartiOku: (no: string, yol: string) => string
+  kartiOku: (no: string, yol: string, panoSecimi?: string) => string
+  prBasligindakiLinear: (baslik?: string) => string[]
   oncekiKipi: (olusturuldu: string | undefined) => 'zorunlu' | 'uyari'
   prGovdeIlkSatiri: (govde: string) => { tamam: boolean; ilk: string }
   ONCEKI_CALISMA_YURURLUK: string
@@ -536,5 +537,73 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
     const basta = calistir('\n\nKanban: HRT-46\nÖzet metni.\n', 'govde-ilk-bosluklu.md')
     expect(basta.status).toBe(0)
     expect(basta.stdout).not.toMatch(/EKSİK/)
+  })
+
+  // HRT-18: aynı numara birden çok panoda (REC-nn, ALT-4/ARC-5/HRT-10 çakışmaları) çıkış 2 veriyordu; `--pano` daraltır.
+  it('--pano: belirsiz numarayı pano adıyla (ASCII katlamalı alt dizge) ya da pano kimliğiyle daraltır', () => {
+    const yol = sahteDosya('a14.sqlite', [
+      { title: 'VentHub ALTYAPI', tasks: [{ title: 'REC-345 · altyapı kartı', description: 'ALTYAPI' }] },
+      { title: 'VentHub ÜRÜN', tasks: [{ title: 'REC-345 · ürün kartı', description: 'URUN' }] },
+    ])
+    expect(() => K.kartiOku('REC-345', yol)).toThrow(/belirsiz.*--pano <ad\|id> ile daralt/)
+    expect(K.kartiOku('REC-345', yol, 'ALTYAPI')).toBe('ALTYAPI')
+    expect(K.kartiOku('REC-345', yol, 'urun')).toBe('URUN')
+    expect(K.kartiOku('REC-345', yol, 'b1')).toBe('URUN')
+  })
+
+  it('--pano: olmayan pano sessizce yok sayılmaz (istisna, mevcut panoları söyler); panoda kart yoksa "bulunamadı" ve pano adı mesajda', () => {
+    const yol = sahteDosya('a15.sqlite', [
+      { title: 'VentHub ALTYAPI', tasks: [{ title: 'REC-345 · bir', description: 'd' }] },
+      { title: 'VentHub ÜRÜN', tasks: [{ title: 'URN-1 · iki', description: 'd' }] },
+    ])
+    expect(() => K.kartiOku('REC-345', yol, 'YOKPANO')).toThrow(/pano bulunamadı: YOKPANO \(mevcut: VentHub ALTYAPI; VentHub ÜRÜN\)/)
+    expect(() => K.kartiOku('REC-345', yol, 'ÜRÜN')).toThrow(/kart bulunamadı: REC-345.*pano: ÜRÜN/)
+  })
+
+  it('--pano: seçilen panonun içinde de belirsizse yine belirsiz (daraltma tek karta inmeli)', () => {
+    const yol = sahteDosya('a16.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-9 · x', description: 'd' }, { title: 'HRT-9 · y', description: 'd' }] }])
+    expect(() => K.kartiOku('HRT-9', yol, 'TEST')).toThrow(/belirsiz.*aşama 1/)
+  })
+
+  it('CLI --kart REC-345 --pano ALTYAPI: çıkış 2 değil (0); --pano olmadan 2; --pano değersiz ya da iki kez verilirse 2', () => {
+    const yol = sahteDosya('a17.sqlite', [
+      { title: 'VentHub ALTYAPI', tasks: [{ title: 'REC-345 · altyapı', description: TAM_PLAN }] },
+      { title: 'VentHub ÜRÜN', tasks: [{ title: 'REC-345 · ürün', description: 'plansız' }] },
+    ])
+    const calistir = (...a: string[]) => spawnSync(process.execPath, [KAPI_YOLU, ...a], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
+    expect(calistir('--kart', 'REC-345').status).toBe(2)
+    const dar = calistir('--kart', 'REC-345', '--pano', 'ALTYAPI')
+    expect(dar.status).toBe(0)
+    expect(dar.stdout).toMatch(/GEÇTİ REC-345/)
+    expect(calistir('--kart', 'REC-345', '--pano', 'ÜRÜN').status).toBe(1)
+    expect(calistir('--kart', 'REC-345', '--pano').status).toBe(2)
+    expect(calistir('--kart', 'REC-345', '--pano', 'ALTYAPI', '--pano', 'ÜRÜN').status).toBe(2)
+  })
+
+  it('prBasligindakiLinear: başlıktaki REC-nn numaralarını tekilleştirerek verir; başka ön ek ve boş başlık boş döner', () => {
+    expect(K.prBasligindakiLinear('ALTYAPI (REC-345, REC-12): iş, bkz REC-345')).toEqual(['REC-345', 'REC-12'])
+    expect(K.prBasligindakiLinear('HARITA (HRT-18): kapı')).toEqual([])
+    expect(K.prBasligindakiLinear('')).toEqual([])
+    expect(K.prBasligindakiLinear(undefined)).toEqual([])
+  })
+
+  it('--pr-baslik: başlıkta REC-nn varsa stderr UYARI basar, çıkış kodu değişmez; REC-nn yoksa uyarı yok', () => {
+    const yol = sahteDosya('a18.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-18 · deneme', description: TAM_PLAN }] }])
+    const govde = path.join(gecici, 'govde-baslik.md')
+    fs.writeFileSync(govde, 'Kanban: HRT-18\nÖzet.\n')
+    const calistir = (baslik: string) =>
+      spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde, '--pr-baslik', baslik], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
+    const uyarili = calistir('ALTYAPI (REC-345): bir iş')
+    expect(uyarili.status).toBe(0)
+    expect(uyarili.stderr).toMatch(/UYARI: PR başlığında Linear numarası REC-345 var/)
+    const temiz = calistir('HARITA (HRT-18): kapıya pano seçeneği')
+    expect(temiz.status).toBe(0)
+    expect(temiz.stderr).not.toMatch(/PR başlığında/)
+  })
+
+  it('--pr-baslik tek başına girdi sayılmaz (kullanım hatası, çıkış 2): başlık kolu bir kart ya da gövdeyle birlikte koşar', () => {
+    const r = spawnSync(process.execPath, [KAPI_YOLU, '--pr-baslik', 'ALTYAPI (REC-345): iş'], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: path.join(gecici, 'yok.sqlite') } })
+    expect(r.status).toBe(2)
+    expect(r.stderr).toMatch(/Kullanım:/)
   })
 })

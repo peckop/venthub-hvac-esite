@@ -1,4 +1,4 @@
-# Kart Planı Standardı (v1.2 — 2026-10-26)
+# Kart Planı Standardı (v1.3 — 2026-11-15)
 
 > **Ne yönetir:** Kanban kartının içindeki PLAN bölümünün nasıl yazıldığı, kimin uyguladığı ve eksiksiz
 > olduğunun nasıl ölçüldüğü. İş emri kartının KAYNAK/CETVEL bloğu (CLAUDE.md kural 1) ayrı kalır; bu cetvel
@@ -8,8 +8,8 @@
 > müşteriye görünen, veritabanı ya da site yapısı planları Recep'e tek sayfa özetle gider. Karar 244:
 > kontrolü yazılamayan kural girmez; bu yüzden kural bir betikle ölçülür.
 > **Sahibi:** HARİTA. Kartı Kanban'a taşıma düzeni (`is-kayit-duzeni-standard.md`) OPS'undur, buna dokunulmaz.
-> **Son doğrulama:** 2026-10-03.
-> **Kayıt:** HRT-14 (OPS-13); v1.1 HRT-26 (OPS-30, ÖNCEKİ ÇALIŞMA satırı); v1.2 HRT-75 (dilimleme, boyut, açık planı koruma). **İlgili:** `execution-method-standard.md` §10 (çalışan tanımları).
+> **Son doğrulama:** 2026-11-15.
+> **Kayıt:** HRT-14 (OPS-13); v1.1 HRT-26 (OPS-30, ÖNCEKİ ÇALIŞMA satırı); v1.2 HRT-75 (dilimleme, boyut, açık planı koruma); v1.3 HRT-18 (kapıda `--pano` ve PR başlığı kolu) ve HRT-20 (karar 251 ile uyum). **İlgili:** `execution-method-standard.md` §10 (çalışan tanımları).
 
 ## Kural
 
@@ -17,7 +17,11 @@
 2. Plan, konuyu hiç bilmeyen birinin yalnız o kartı okuyarak uygulayabileceği açıklıkta yazılır: dosya yolu,
    komut, beklenen çıktı ve durma noktası kartta geçer; "bildiğin gibi" ya da "uygun olanı" denmez.
 3. İşi planı yazan müdür yapmaz; yeni açılan bir ekip üyesi (alt ajan) yapar. Üye plandaki bir belirsizlikte
-   tahminle devam etmez, Sor-noktaları'na göre durur ve müdüre yazar.
+   tahminle devam etmez, Sor-noktaları'na göre durur ve müdüre yazar. Üyenin nasıl açılacağını karar 251
+   belirler (`execution-method-standard.md` §10.3): yazan uygulayıcı `name` ile ekip üyesi olarak, planı
+   denetleyen salt-okuma roller (araştırmacı, çürütücü, doğrulayıcı) `name` verilmeden açılır. Karar 251
+   plan zorunluluğunu daraltmamıştır (HRT-20, 2026-11-15 okuması); plan yazmanın iş kadar uzun olacağı
+   küçük iş için yol "Sınır: plansız iş" bölümündeki `PLAN: gerekmez` satırıdır.
 4. Plan, kartı okuyan kişinin dışında bir şeye dayanmaz; başka kartın sohbetine ya da bir oturum hafızasına
    atıf yapılırsa atıf edilen bilgi karta da yazılır.
 
@@ -133,13 +137,18 @@ Betik: `scripts/belge/kart-plan-kapisi.cjs`. Kimliği INV-KART-PLAN-1, testi
 - PLAN başlığı ile "PLAN: gerekmez — ..." satırı birlikte varsa PLAN değerlendirilir, istisna yok sayılır.
 - Kartı bulma: önce başlığın BAŞINDAki numara (`HRT-14 · ...`); bulunamazsa başlığın ilk 60 karakterinde
   numara aranır ("URUN REC-411: ..."). Her aşamada tek eşleşme gerekir; birden fazlası "belirsiz" sayılır
-  ve çıkış 2 verir.
+  ve çıkış 2 verir. Aynı numara birden çok panoda geçiyorsa (taşınan REC-nn kartları, ALT-4/ARC-5/HRT-10
+  çakışmaları) `--pano <ad|id>` ile daraltılır (HRT-18): pano kimliği birebir ya da pano adında ASCII
+  katlamalı alt dizge (`--kart REC-345 --pano ALTYAPI`). Olmayan pano sessizce yok sayılmaz, çıkış 2 verir
+  ve mevcut pano adlarını söyler; seçilen panoda da birden çok eşleşme varsa yine "belirsiz"dir.
 - Linear numarası: PR başlığında ve gövdesinde kapanmaması gereken Linear numarası (REC-nn) geçmez, yalnız
   `Kanban: <no>` satırı yazılır (Linear'a bağlı PR birleşince kayıt kendiliğinden Done olur, REC-508 böyle
   kapandı). `--pr-govde-dosyasi` gövdede REC-nn görürse stderr'e UYARI basar; bu kol YALNIZ uyarıdır, çıkış
   kodunu değiştirmez (karar 187 ile geçiş döneminde kasıtlı `Fixes REC-nn` meşrudur). `Kanban: REC-411`
   satırının kendisindeki REC-nn geçerli bir kart numarasıdır (taşınan Linear kaydı) ve uyarı vermez; yalnız
-  diğer satırlardaki REC-nn uyarır.
+  diğer satırlardaki REC-nn uyarır. Başlık kolu (HRT-18): `--pr-baslik "<metin>"` verilirse başlıktaki REC-nn
+  için aynı UYARI basılır; yine yalnız uyarıdır, çıkış kodunu değiştirmez ve tek başına girdi sayılmaz
+  (`--kart` ya da `--pr-govde-dosyasi` ile birlikte koşar).
 - Çıkış kodu: 0 geçti ya da plan-gerekmez; 1 eksik var (her eksik ayrı satırda); 2 Kanban veri dosyası
   okunamadı ya da kart bulunamadı/belirsiz (sessizlik geçti sayılmaz). Betik hiçbir şey yazmaz.
 

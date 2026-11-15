@@ -10,6 +10,7 @@
  *
  * KULLANIM (yerelde; CI'da KOŞMAZ: Kanban verisi git dışıdır, depo public):
  *   node scripts/belge/kart-plan-kapisi.cjs --kart HRT-14
+ *   node scripts/belge/kart-plan-kapisi.cjs --kart REC-345 --pano ALTYAPI     (aynı numara birden çok panodaysa daraltır, HRT-18)
  *   node scripts/belge/kart-plan-kapisi.cjs --dosya <aciklama.txt>
  *   node scripts/belge/kart-plan-kapisi.cjs --pr-govde-dosyasi <govde.md>     (gövdedeki "Kanban: <NO>" satırlarını okur;
  *                                                                              gövdenin İLK boş olmayan satırı bu satırdır, HRT-46)
@@ -271,20 +272,32 @@ function sqliteYukle() {
  * `\bNO\b` ("URUN REC-411: …"). Her aşamada tek eşleşme gerekir; birden fazlası "belirsiz" (istisna).
  * Okunamazsa, bulunamazsa ya da belirsizse istisna fırlatır (mesaj aşamayı söyler).
  */
-function kartBul(no, yol) {
+function kartBul(no, yol, panoSecimi) {
   if (!fs.existsSync(yol)) throw new Error(`Kanban veri dosyası yok: ${yol}`)
   const { DatabaseSync } = sqliteYukle()
   const db = new DatabaseSync(yol, { readOnly: true })
   let satirlar
   try {
-    satirlar = db.prepare('SELECT payload FROM kanban_boards').all()
+    satirlar = db.prepare('SELECT id, payload FROM kanban_boards').all()
   } finally {
     db.close()
   }
-  const kartlar = []
-  for (const { payload } of satirlar) {
+  let kartlar = []
+  const panoAdlari = []
+  for (const { id, payload } of satirlar) {
     const pano = JSON.parse(payload)
-    for (const kart of pano.tasks || []) kartlar.push({ pano: pano.title, baslik: String(kart.title || ''), aciklama: kart.description || '', etiketler: Array.isArray(kart.labels) ? kart.labels : [], olusturuldu: typeof kart.createdAt === 'string' ? kart.createdAt : undefined })
+    panoAdlari.push(String(pano.title || ''))
+    for (const kart of pano.tasks || []) kartlar.push({ pano: pano.title, panoId: String(id ?? pano.id ?? ''), baslik: String(kart.title || ''), aciklama: kart.description || '', etiketler: Array.isArray(kart.labels) ? kart.labels : [], olusturuldu: typeof kart.createdAt === 'string' ? kart.createdAt : undefined })
+  }
+  // HRT-18: `--pano <ad|id>` aynı numarayı taşıyan kartları panoyla daraltır (REC-nn ve ALT-4/ARC-5/HRT-10 çakışmaları).
+  // Eşleşme: pano kimliği birebir ya da pano adında ASCII katlamalı alt dizge ("ALTYAPI" → "VentHub ALTYAPI").
+  // Hiçbir panoyla eşleşmeyen seçim sessizce yok sayılmaz: istisna (çıkış 2), mevcut pano adlarını söyler.
+  if (panoSecimi) {
+    const aranan = asciiKatla(panoSecimi).trim()
+    const secilen = kartlar.filter((k) => k.panoId === panoSecimi || asciiKatla(k.pano).includes(aranan))
+    const panoVar = satirlar.some(({ id }) => String(id) === panoSecimi) || panoAdlari.some((ad) => asciiKatla(ad).includes(aranan))
+    if (!panoVar) throw new Error(`pano bulunamadı: ${panoSecimi} (mevcut: ${panoAdlari.join('; ')})`)
+    kartlar = secilen
   }
   const asamalar = [
     { ad: 'aşama 1: başlığın başı', kalip: new RegExp(`^${kacis(no)}(?![A-Za-z0-9-])`), kart: (k) => k.baslik },
@@ -293,14 +306,19 @@ function kartBul(no, yol) {
   for (const asama of asamalar) {
     const bulunan = kartlar.filter((k) => asama.kalip.test(asama.kart(k)))
     if (bulunan.length === 1) return bulunan[0]
-    if (bulunan.length > 1) throw new Error(`kart numarası belirsiz: ${no} ${bulunan.length} kartta geçiyor (${asama.ad}; ${bulunan.map((b) => b.pano).join('; ')})`)
+    if (bulunan.length > 1) throw new Error(`kart numarası belirsiz: ${no} ${bulunan.length} kartta geçiyor (${asama.ad}; ${bulunan.map((b) => b.pano).join('; ')})${panoSecimi ? '' : '; --pano <ad|id> ile daralt'}`)
   }
-  throw new Error(`kart bulunamadı: ${no} (başlığın başında ya da ilk 60 karakterinde aranmıştı)`)
+  throw new Error(`kart bulunamadı: ${no} (başlığın başında ya da ilk 60 karakterinde aranmıştı${panoSecimi ? `; pano: ${panoSecimi}` : ''})`)
 }
 
-/** Kartın açıklaması (bulunamazsa/belirsizse/okunamazsa istisna; ayrıntı için `kartBul`). */
-function kartiOku(no, yol) {
-  return kartBul(no, yol).aciklama
+/** Kartın açıklaması (bulunamazsa/belirsizse/okunamazsa istisna; ayrıntı için `kartBul`). `panoSecimi` isteğe bağlı (HRT-18). */
+function kartiOku(no, yol, panoSecimi) {
+  return kartBul(no, yol, panoSecimi).aciklama
+}
+
+/** PR BAŞLIĞINDAKİ Linear numaraları (HRT-18): başlıkta `REC-nn` GitHub'da Linear kaydını bağlar/kapatır; gövde kolunun ikizi. */
+function prBasligindakiLinear(baslik) {
+  return [...new Set(String(baslik || '').match(/\bREC-\d+\b/g) || [])]
 }
 
 /** Kartın Kanban `labels` alanındaki sınıf etiketleri (küçük harf); karar 244 adım 2: kart açılırken tek sınıf yazılır. */
@@ -320,13 +338,21 @@ function oncekiKipi(olusturuldu) {
 }
 
 function argumanlar(argv) {
-  const s = { kart: [], dosya: [], prGovde: [] }
+  const s = { kart: [], dosya: [], prGovde: [], pano: undefined, prBaslik: [] }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--kart') s.kart.push(argv[++i])
     else if (a === '--dosya') s.dosya.push(argv[++i])
     else if (a === '--pr-govde-dosyasi') s.prGovde.push(argv[++i])
-    else throw new Error(`bilinmeyen argüman: ${a}`)
+    else if (a === '--pano') {
+      if (s.pano !== undefined) throw new Error('--pano yalnız bir kez verilir')
+      s.pano = argv[++i]
+      if (!s.pano) throw new Error('--pano bir değer ister (pano adı ya da kimliği)')
+    } else if (a === '--pr-baslik') {
+      const deger = argv[++i]
+      if (deger === undefined) throw new Error('--pr-baslik bir değer ister (PR başlığı metni)')
+      s.prBaslik.push(deger)
+    } else throw new Error(`bilinmeyen argüman: ${a}`)
   }
   return s
 }
@@ -339,10 +365,15 @@ function main(argv) {
     console.error(`HATA: ${e.message}`)
     return 2
   }
-  const { kart, dosya, prGovde } = girdiler
+  const { kart, dosya, prGovde, pano, prBaslik } = girdiler
   if (kart.some((k) => !k) || dosya.some((d) => !d) || prGovde.some((d) => !d) || kart.length + dosya.length + prGovde.length === 0) {
-    console.error('Kullanım: kart-plan-kapisi.cjs --kart <NO> | --dosya <yol> | --pr-govde-dosyasi <yol>')
+    console.error('Kullanım: kart-plan-kapisi.cjs --kart <NO> [--pano <ad|id>] | --dosya <yol> | --pr-govde-dosyasi <yol> [--pr-baslik <metin>]')
     return 2
+  }
+  // Yalnız uyarı (çıkış kodu değişmez; gövde kolunun ikizi, HRT-18).
+  for (const baslik of prBaslik) {
+    const linear = prBasligindakiLinear(baslik)
+    if (linear.length > 0) console.error(`UYARI: PR başlığında Linear numarası ${linear.join(', ')} var; kapanmaması gerekiyorsa sil, numara yalnız gövdede Kanban: <no> olarak yazılır`)
   }
 
   const isler = [] // {ad, aciklama, etiketler?} (etiketler yalnız --kart ile okunan kartta)
@@ -381,7 +412,7 @@ function main(argv) {
     if (kartNolari.length > 0) {
       const yol = panoDosyasi()
       for (const no of [...new Set(kartNolari)]) {
-        const k = kartBul(no, yol)
+        const k = kartBul(no, yol, pano)
         isler.push({ ad: no, aciklama: k.aciklama, etiketler: kart.includes(no) ? k.etiketler : undefined, olusturuldu: k.olusturuldu })
       }
     }
@@ -434,7 +465,7 @@ function olcumEksikleri(kart, veri) {
   return eksikler
 }
 
-module.exports = { olcumEksikleri, degerlendir, oncekiCalismaSorunlari, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
+module.exports = { olcumEksikleri, degerlendir, oncekiCalismaSorunlari, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, prBasligindakiLinear, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
 
 if (require.main === module) {
   process.exitCode = main(process.argv.slice(2))
