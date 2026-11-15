@@ -200,6 +200,7 @@ Doğrulama satırı (uygula sonrası): `fiyat görünür ürün (veri): 348 / 37
 | 8 | Hesap alanı satış hâli (siparişlerim/takip) | URUN | K1a S4 |
 | 9 | **Bu betik**: kuru koşum → Recep onayı → `--uygula` → K3 doğrulama | ALTYAPI | §6–§7 |
 | 10 | Hosting kullanım şartı — **Recep kararı 2026-08-16 kayıtlı** (user-side-open-items madde 5); bu cetvel yeniden **açmaz** | — | — |
+| 11 | **Satış kipi önbelleği: ödeme/sepet adımı TAZE okur, vitrin ondan ayrılır** (ALT-187, OPS 15 Kasım 2026). `SATIS_KIPI_ONBELLEK_SN` 300 → 86400 yapıldı (Vercel Hobby Active CPU kotası; 300 sn ana sayfa ömrünü 5 dk'ya indiriyordu). Webhook birincil tazeleme olarak kalır ama webhook düşerse `checkout` ve `payment-success` sayfalarının okuduğu kip **24 saate kadar bayat** kalabilir. **Satış açılmadan önce:** (a) `checkout`/`payment-success`/sepet adımı kipi önbelleksiz ya da kısa süreli (≤300 sn) bir okumayla alır; (b) vitrin sayfaları (ana sayfa, kategori, ürün) bu okumadan AYRILIR, yalnız uzun süreli önbellekli okumayı kullanır, böylece ana sayfanın ISR ömrü yeniden kısalmaz (en kısa iç önbellek süresi sayfa ömrünü belirler: `rendering-cache-standard.md` §3 satış kipi satırı); (c) sunucu tarafı yedek kapı (K3 `iyzico-payment` `403 SALES_CLOSED`) zaten DB'den okur, bu madde yalnız arayüzün bayat kalmamasını sağlar. **Şimdi kod yazılmadı**; açılış hazırlığında URUN (sayfalar) + ALTYAPI (sabit ve test) yapar | URUN + ALTYAPI | ALT-187 |
 
 **Bu liste BELGEDİR, kapı BETİKTİR (2026-09-29, OPS emri, karar 190 sonrası):** yukarıdaki kalemlerden otomatik ölçülebilenler
 §8.1'deki önkoşul tablosunda `satis-kipine-gec.mjs` içinde koşar; listeyi hatırlamak kimseye kalmaz. Otomatik ölçülemeyen
@@ -365,6 +366,8 @@ INV-SATIS-KIPI-4/4b/5 gerçek koşumla sınar. Kapıya üç kol eklendi; sabotaj
 dağıtımı önler.
 
 ## 14. Değişiklik kaydı (ek)
+
+- **v1.2 (2026-11-15, ALTYAPI, ALT-187):** §8 listesine madde 11 eklendi: satış kipi önbelleği 86400 sn olduğu için ödeme/sepet adımının kipi taze okuması ve vitrinin bu okumadan ayrılması satış açılışından önce zorunlu kalem. Kod değişmedi.
 
 - **v1.1 (2026-09-07, ALTYAPI, REC-168 / PR-B):** §13 eklendi — `lang` istisnası gerekçesiyle,
   kesin-sayı-önce ve iki tuzağı, kapı dosyası + ölçüt keskinleştirmesi kuralı, ölçülen sınırların
