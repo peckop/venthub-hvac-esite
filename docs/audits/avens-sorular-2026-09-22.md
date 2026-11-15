@@ -55,7 +55,7 @@ değerini** gönderebilir misiniz?
 Aşağıdaki ürünlerin teknik föyünü web'de bulamadık. **Föylerini gönderebilir misiniz?**
 (Debi, basınç, güç, akım, devir, ses, ağırlık, ölçüler.)
 
-- **Dikdörtgen kanal radyal fanlar (7):** AVENS 40x20 · 50x25 · 60x30 · 60x35 · 70x40 · 80x50 · 100x50
+- **Dikdörtgen kanal radyal fanlar (7):** AVENS 40x20 · 50x25 · 60x30 · 60x35 · 70x40 · 80x50 · 100x50 (güncel durum ve üç soru: bölüm 7)
 - **Sulu bataryalar (6):** 11 · 14 · 20 · 28 · 36 · 40 kW kanal tipi (90/70°C)
 - **VORTICENT CMS ATEX 14/5 T2 0,25kW (1):** avensair.com ürün sayfasında bu modelin föyü yok.
 - **BVU-LS 1000 · BVU-LS 2000/3000 (2):** elimizdeki hiçbir belgede bu ürünler geçmiyor.
@@ -86,6 +86,31 @@ hangi ürünün kastedildiğini göstermiyor. **Her ürünün doğru sipariş ko
 | 43151 · 43153 · 43154 · 43155 · 43156 · 43157 · 43158 · 43159 · 43161 | s.36 VORT QBK SAL KC EVO serisi | s.40 TORRETTE TR-A ATEX serisi |
 | 12828 | POT hız anahtarı — s.22, s.26, s.33, s.62'de dört geçiş | geçişlerin en az ikisi farklı fiyatlı |
 | 11903 | s.12 VORT NOTUS | s.52 DD 9/9 420W 1F 4P 3V - 6M0669 |
+
+## 7. Dikdörtgen kanal radyal fanlar: ölçü, motor tipi, besleme ve föydeki REC serisi (15 Kasım 2026)
+
+Konu: AVE-1200, 1250, 1316, 1317, 1355, 1360, 1410 (AVENS 40x20, 50x25, 60x30, 60x35, 70x40, 80x50, 100x50).
+Bölüm 4'teki föy talebi bu modeller için hâlâ açık; aşağıdakiler o talebin gerekçesi ve somut soruları.
+
+**Elimizdeki belgede ne var, ne yok.** 2026 fiyat listesinin 27. sayfasında yedi model için yalnız kod, model adı,
+debi (1100 · 1800 · 2520 · 4100 · 6000 · 7000 · 9500 m³/h), hız anahtarı ya da frekans konvertörü ve fiyat yazıyor.
+Kanal bağlantı ölçüsü (genişlik × yükseklik), birim, motor tipi ve besleme bu sayfada yok. avensair.com'da bu yedi
+ürünün sayfası yok.
+
+**Sitenizde yüklü föy.** avensair.com'da "dikdortgen-kesitli-kanal-tipi" adıyla yüklü tek sayfalık föy KAYI markalı
+"Prizmatik Kanal Fanı" tablosu (REC 40-20 A/B · 50-25 · 60-30 · 60-35 · 70-40 · 80-50 · 100-50; A ve B ölçüleri 400×200 mm
+ile 1000×500 mm arasında). Föyde AVenS adı geçmiyor. Model adları bizim yedi modelle aynı kalıpta, ama debiler yedi modelin
+altısında fiyat listesinden farklı (örnek: 60x35 için liste 4100, föy 3400 m³/h; 40x20 için liste 1100, föy 950 ve 1150).
+Bu yüzden eşleştirme bizim çıkarımımız; ölçüleri AVenS değeri olarak yazmıyoruz.
+
+| # | Soru |
+|---|---|
+| 1 | Yedi model (AVENS 40x20 … 100x50), föydeki REC 40-20 … REC 100-50 serisiyle aynı ürünler mi? Farklıysa her modelin kendi teknik föyü nedir? |
+| 2 | Her modelin kanal bağlantı ölçüsü (genişlik × yükseklik) ve gövde boyu milimetre olarak nedir? Model adındaki "40x20" gibi sayılar santimetre mi? |
+| 3 | Her modelin motor tipi ve beslemesi nedir (tek faz 230 V mu, üç faz 400 V mu)? 80x50 ve 100x50 için fiyat listesi hız anahtarı yerine frekans konvertörü veriyor; bu iki modelin beslemesi hangisi? |
+
+Bu üç cevap gelene kadar sitede bu yedi ürün için genişlik, yükseklik, motor tipi ve besleme yazılmaz ("kaynak yok, yazılmaz").
+2024, 2025 ve 2019 fiyat listeleri açılmadı (indirme yapılmadı); aynı alanları taşıma ihtimali düşük.
 
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.
