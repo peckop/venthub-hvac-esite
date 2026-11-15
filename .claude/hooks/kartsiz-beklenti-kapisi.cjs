@@ -36,14 +36,14 @@ const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 // ── ARC-95 (10-12): İKİNCİ DENETİM — Recep'e bağlanan kartın açıklaması "RECEP YETKİSİ: <gerekçe>" satırı taşır ──
 // Olay: yetkisi zaten verilmiş iş tekrar tekrar Recep'e soru olarak geldi; kural yazılıydı ama kapı yoktu (karar 317 ailesi).
 // Kural: mesajda istek olarak anılan ve Recep'e bağlı (Sen/Recep ya da recep-bekliyor/karar-bekliyor) her açık kart, açıklamasında bir
-// satır "RECEP YETKİSİ: <gerekçe>" taşır; gerekçe YALNIZ aşağıdaki yedi sınıftan biridir (yedincisi ARC-142, 15 Ekim: dış kişiye
+// satır "RECEP YETKİSİ: <gerekçe>" taşır; gerekçe YALNIZ aşağıdaki sekiz sınıftan biridir (sekizincisi ARC-328: izin verilmiş OPS yetkisi; yedincisi ARC-142, 15 Ekim: dış kişiye
 // Recep adına yazışma; OPS-155 AVenS belge isteği altı sınıfta karşılık bulamadan kırmızı aldı). Satır yoksa ya da gerekçe liste dışıysa KIRMIZI.
 // Cetvel: docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ. Kanban betiği ikinci kez (--detay) çağrılır; okunamazsa fail-open ama sessiz değil.
 // Satır başı çapası biçim işaretlerini tanır (OPS 10-12 okuması): düz, "**RECEP YETKİSİ:** x", "- RECEP YETKİSİ: x", "> RECEP YETKİSİ: x".
 // Başında madde/alıntı işareti (> - * +), kalın/altı çizili (** __) ve iki noktanın iki yanında kalın kapanışı serbesttir.
 const YETKI_SATIRI = /^[ \t]*(?:[>\-*+][ \t]*)*(?:\*\*|__)?[ \t]*RECEP[ \t]+YETK[İIiı]S[İIiı][ \t]*(?:\*\*|__)?[ \t]*:[ \t]*(?:\*\*|__)?[ \t]*(\S.*)$/gim
 const YETKI_GEREKCELERI =
-  'canlı yazım · migration birleştirme · gerçek para · geri alınamaz silme · yeni görünüm/iddia/yapı kararı · hesap/ayar dosyası · dış kişiye Recep adına yazışma'
+  'canlı yazım · migration birleştirme · gerçek para · geri alınamaz silme · yeni görünüm/iddia/yapı kararı · hesap/ayar dosyası · dış kişiye Recep adına yazışma · izin verilmiş OPS yetkisi'
 // Karşılaştırma ASCII'ye indirgenmiş metinle yapılır (ı/İ/ş/ğ/ü/ö/ç yazımı ayrımı bozmasın); gerekçenin devamı (" — ayrıntı") serbesttir.
 const asciiKucuk = (s) =>
   String(s).toLocaleLowerCase('tr').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
@@ -61,6 +61,9 @@ const YETKI_KALIPLARI = [
   // ARC-142: "dış kişiye Recep adına yazışma", "tedarikçiye/dış kişiye Recep adına yazışma", "üreticiye Recep adına belge isteği".
   // "Recep adına" ZORUNLU: yalnız "tedarikçi hakkında soru" gibi ifadeler liste dışı kalır (kullanıcı adına mesaj göndermek açık izin ister).
   /^(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*(?:\s*\/\s*(?:dis\s+kisi|tedarikci|uretici|kurum|firma)[a-z]*)*\s+recep\s+adina\s+(?:yazisma|mesaj|e-?posta|belge\s+istegi)/,
+  // ARC-328 (ARC-247 EK c, OPS-292 onayı): sekizinci sınıf. İş Recep'e değil OPS'a bağlıdır; Recep kararı gerekmez, soru OPS'a gider.
+  // "OPS yetkisi" tek başına yetmez: "izin verilmiş" ZORUNLU (yetkinin verilmiş olduğu kartta yazılı olmalı).
+  /^izin\s+verilmis\s+ops\s+yetkisi\b/,
 ]
 
 /** Kartın açıklamasından: { durum: 'yok' | 'liste-disi' | 'tamam', gerekce }. Birden çok satırda biri geçerliyse 'tamam'. */
@@ -470,7 +473,8 @@ function engelMetni(sorunlar, kaynak) {
     '(kanca Kanban\'dan doğrular) ya da gerçekten kart gerekmiyorsa "Kartsız: <sebep>" (sebep kayda düşer).' +
     (sorunlar.some((s) => s.includes('RECEP YETKİSİ'))
       ? ' RECEP YETKİSİ sorunu: yetkisi verilmiş işi Recep\'e soru olarak getirme, işi yap; kartı gerçekten Recep\'e bağlıysa açıklamaya ' +
-        '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ).'
+        '"RECEP YETKİSİ: <gerekçe>" satırını ekle (docs/standards/is-kayit-duzeni-standard.md §RECEP YETKİSİ). ' +
+        "Departman penceresiysen karar sorusunu Recep'e yazma, OPS'a SendMessage ile ver (kart no, soru, önerim); yetki OPS'ta ise gerekçe \"izin verilmiş OPS yetkisi\"."
       : '')
   )
 }
