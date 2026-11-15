@@ -118,6 +118,10 @@ The critical path finds:
 
 Update the spec first when a decision or scope changes, then implement. The spec lives in the repo (`docs/plans/`) next to the code, and the PR body links the section it implements (`Kanban: <ön ek>-<sayı>`).
 
+**Sürüm ve kapsam dışı.** Spec başlığı hangi sürümü anlattığını söyler (`# Spec: <ad> — V1`); bu sürüme girmeyen fikirler spec'teki **Out of Scope (Deferred)** bölümüne tek satır (ne, neden ertelendi) olarak yazılır: kaybolmaz, ama uygulama sırasında spec'te olmayan iş kapsam dışıdır. "İyi fikir, mevcut spec'e katayım" demek V1'in kayma yoludur.
+
+**Yayınlanmış spec'e değişiklik: delta spec.** Teslim edilmiş bir spec'i elle düzenleme; yalnız neyin değiştiğini anlatan küçük bir `Spec Delta` yaz (Objective, Current Behavior, New Behavior, Success Criteria olarak neyin DEĞİŞMEMESİ gerektiği dahil, yalnız sınır farkları; `Status: proposed`). Aynı kapılı akıştan geçer: insan okur, plan, görevler, uygulama. Değişiklik teslim olunca sonuç ana spec'e işlenir ve delta `Status: implemented` olur; ana spec her zaman var olanın kaynağıdır.
+
 Kaynak: addyosmani/agent-skills spec-driven-development @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
 ## Boundaries
