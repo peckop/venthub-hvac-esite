@@ -122,11 +122,11 @@ function calistir() {
   } catch {
     // yazılamadı: sayım bir sonraki çağrıda kaybolur, uyarı yine de verilebilir
   }
-  // ARC-326: aynı patinaj uyarısı oturumda bir kez (rakamlar özetten çıkar; farklı araç ya da farklı uyarı yeniden görünür).
+  // ARC-326: aynı patinaj uyarısı oturumda bir kez (rakamlı özet: 4., 8., 12. çağrı uyarıları ayrı durumdur, tırmanma sinyali kaybolmaz).
   let bas = Boolean(uyari)
   if (uyari) {
     try {
-      bas = require('./bir-kez.cjs').basilsin('patinaj-bekcisi', sid, uyari, { rakamsiz: true })
+      bas = require('./bir-kez.cjs').basilsin('patinaj-bekcisi', sid, uyari)
     } catch {
       bas = true
     }

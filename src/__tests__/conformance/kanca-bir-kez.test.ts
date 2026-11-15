@@ -2,7 +2,8 @@
  * INV-KANCA-BIR-KEZ-1 — sabit bilgi/hatırlatma satırı aynı oturumda bir kez basılır (ARC-326, OPS-292 SEYRELT).
  *
  * Yardımcı: .claude/hooks/bir-kez.cjs · bağlı kancalar: soz-bekcisi-hatirlatma, gorev-tazelik-satiri, hafiza-yedek,
- * kart-alani-kapisi, sage-dosya-dersi, patinaj-bekcisi, duzeltme-isaretle; session-board compact dönüşünde sıfırlar.
+ * kart-alani-kapisi (yalnız başlık satırı), sage-dosya-dersi, patinaj-bekcisi; session-board compact ve clear dönüşünde sıfırlar.
+ * duzeltme-isaretle BİLEREK kapsam dışı (denetçi B1: ⚠DERS-BORCU "yazılana kadar bu satır kalır" sözleşmesini bozardı).
  * Engelleyen kapı kararları ve ⛔/⚠ başarısızlık satırları süzülmez; süzme bozulursa satır BASILIR (fail-open).
  */
 import { spawnSync } from 'node:child_process'
@@ -145,7 +146,6 @@ const BAGLI = [
   'kart-alani-kapisi',
   'sage-dosya-dersi',
   'patinaj-bekcisi',
-  'duzeltme-isaretle',
 ]
 
 describe('INV-KANCA-BIR-KEZ-1 · bağlantı', () => {
@@ -157,16 +157,21 @@ describe('INV-KANCA-BIR-KEZ-1 · bağlantı', () => {
     expect(kaynak.slice(Math.max(0, i - 400), i)).toContain('try {')
   })
 
-  it('hafiza-yedek: ⛔/⚠ başarısızlık satırı süzülmez (kaynakta koşul var)', () => {
+  it('hafiza-yedek: yalnız ⛔ başarısızlık satırı muaf, ⚠HAFIZA YEDEK bilgi satırı süzülür (kaynakta koşul var)', () => {
     const kaynak = fs.readFileSync(path.join(HOOKS, 'hafiza-yedek.cjs'), 'utf8')
-    expect(kaynak).toMatch(/!\/⛔\|⚠\/\.test\(ek\)/)
+    expect(kaynak).toContain('!/⛔/.test(ek)')
+    expect(kaynak).not.toContain('⛔|⚠')
   })
 
-  it('session-board compact kolu bütün kayıtları sıfırlar', () => {
+  it('duzeltme-isaretle bir-kez kullanmaz (⚠DERS-BORCU "yazılana kadar bu satır kalır" sözleşmesi)', () => {
+    expect(fs.readFileSync(path.join(HOOKS, 'duzeltme-isaretle.cjs'), 'utf8')).not.toContain('bir-kez')
+  })
+
+  it('session-board compact VE clear dönüşünde bütün kayıtları sıfırlar (kaynak)', () => {
     const kaynak = fs.readFileSync(path.join(HOOKS, 'session-board.cjs'), 'utf8')
-    const i = kaynak.indexOf("if (source === 'compact') {")
+    const i = kaynak.indexOf("if (source === 'compact' || source === 'clear') {")
     expect(i).toBeGreaterThan(0)
-    expect(kaynak.slice(i, i + 700)).toContain("require('./bir-kez.cjs').sifirla(sid)")
+    expect(kaynak.slice(i, i + 300)).toContain("require('./bir-kez.cjs').sifirla(sid)")
   })
 
   it('graphify-search zaman aşımı 20 sn (dış ikili; çıktı süzülmez)', () => {
@@ -176,4 +181,70 @@ describe('INV-KANCA-BIR-KEZ-1 · bağlantı', () => {
       .find((h) => h.command === 'graphify hook-guard search')
     expect(kayit?.timeout).toBe(20)
   })
+})
+
+describe('INV-KANCA-BIR-KEZ-1 · davranış (gerçek kanca süreci, geçici pano)', () => {
+  const kos = (kanca: string, girdi: unknown, env: Record<string, string>) =>
+    spawnSync(process.execPath, [path.join(HOOKS, kanca + '.cjs')], {
+      input: JSON.stringify(girdi),
+      encoding: 'utf8',
+      timeout: 90000,
+      env: { ...process.env, VITEST: '', ...env },
+    })
+  const baglam = (stdout: string): string => {
+    try {
+      return JSON.parse(stdout).hookSpecificOutput.additionalContext as string
+    } catch {
+      return ''
+    }
+  }
+
+  it('kart-alani-kapisi: KART ALANI başlığı oturumda bir kez, UYARI ve KART SATIRLARI her kartta (denetçi B3)', () => {
+    const pano = yeniPano()
+    const g = (baslik: string, sid = SID) => ({
+      tool_name: 'mcp__wrongstack-kanban__kanban_manage',
+      session_id: sid,
+      tool_input: { action: 'add_task', boardId: 'x', title: baslik },
+    })
+    const c1 = baglam(kos('kart-alani-kapisi', g('ARC-400 · deneme'), { VENTHUB_BOARD_DIR: pano }).stdout)
+    const c2 = baglam(kos('kart-alani-kapisi', g('ARC-401 · deneme'), { VENTHUB_BOARD_DIR: pano }).stdout)
+    const c3 = baglam(kos('kart-alani-kapisi', g('ARC-402 · deneme'), { VENTHUB_BOARD_DIR: pano }).stdout)
+    expect(c1).toContain('KART ALANI (ARAC)')
+    expect(c1).toContain('KART SATIRLARI UYARI')
+    expect(c2).not.toContain('KART ALANI (ARAC)')
+    expect(c2).toContain('KART SATIRLARI UYARI')
+    expect(c3).toContain('KART SATIRLARI UYARI')
+    // başka oturum başlığı yeniden görür
+    const d = baglam(kos('kart-alani-kapisi', g('ARC-403 · deneme', SID2), { VENTHUB_BOARD_DIR: pano }).stdout)
+    expect(d).toContain('KART ALANI (ARAC)')
+  })
+
+  it('patinaj-bekcisi: 4. ve 8. çağrı uyarıları AYRI durum (tırmanma sinyali süzülmez), toplam iki uyarı (denetçi B5)', () => {
+    const env = { VENTHUB_BOARD_DIR: yeniPano(), VENTHUB_PATINAJ_DIR: yeniPano() }
+    const g = { session_id: SID, tool_name: 'Bash', tool_input: { command: 'ayni-komut' }, tool_response: 'ayni-sonuc' }
+    const uyarilar: string[] = []
+    for (let i = 1; i <= 8; i++) uyarilar.push(baglam(kos('patinaj-bekcisi', g, env).stdout))
+    expect(uyarilar[3]).toContain('4 kez')
+    expect(uyarilar[7]).toContain('8 kez')
+    expect(uyarilar.filter((u) => u !== '')).toHaveLength(2)
+  })
+
+  it('session-board: clear ve compact dönüşü .bir-kez kayıtlarını siler, startup silmez (denetçi B2)', () => {
+    for (const [source, silinmeli] of [
+      ['clear', true],
+      ['compact', true],
+      ['startup', false],
+    ] as const) {
+      const pano = yeniPano()
+      const dosya = path.join(pano, '.bir-kez.soz-bekcisi-hatirlatma.' + SID + '.json')
+      fs.writeFileSync(dosya, '{}')
+      spawnSync(process.execPath, [path.join(HOOKS, 'session-board.cjs')], {
+        input: JSON.stringify({ source, session_id: SID, cwd: KOK }),
+        encoding: 'utf8',
+        timeout: 90000,
+        env: { ...process.env, VITEST: '', VENTHUB_BOARD_DIR: pano },
+      })
+      expect(fs.existsSync(dosya)).toBe(!silinmeli)
+    }
+  }, 240000)
 })
