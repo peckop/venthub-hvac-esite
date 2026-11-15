@@ -161,6 +161,8 @@ Filo kuralı: önce yerleşik `/code-review`; bu bölüm onunla çakışmaz, yal
 
 **Bağımlılık disiplini.** Yeni bağımlılık: standart kütüphane ve mevcut yardımcılar öncelikli, her bağımlılık bir yüktür; bakım durumu, bilinen açık, lisans uyumu sorulur. Mevcut bağımlılık yükseltmesi sıradan bir kod değişikliğidir; "bump deps" toplu birleştirmeleri en riskli olanıdır: (1) sürüm numarası değil değişiklik günlüğü okunur, majör yükseltmede geçiş notları; (2) değişiklik başına tek bağımlılık (kırılırsa suçlu belli, geri alma temiz); (3) kararı testler verir, "kuruldu" kanıt değildir, bağımlılığın davranışı etrafında kapsam inceyse asıl bulgu odur, önce test eklenir; (4) geçişli grafiğe bak, `package.json` değil kilit dosyası farkını incele; (5) kilit dosyasını dürüst tut, commit'le, elle düzenleme. Yerelde `pnpm install` ağır komuttur (BELLEK uyarısı varsa koşma); kilit dosyası farkı PR'da okunur. Güvenlik hükmü (typosquatting, ele geçirilmiş bakımcı) için `security-scanner`.
 
+**Bulguyu raporlamadan önce.** Her bulguyu, değişen koda ulaşan çağıranlara, korumalara ve testlere karşı doğrula; onlar bulguyu çürütüyorsa düşür. Tabandan gelen eski kusuru, bu değişikliğin getirdiği regresyondan ayrı etiketle. Sıfır bulgu geçerli bir sonuçtur: bulgu uydurmak, neyin gerçekten okunduğunu gizler.
+
 Kaynak: addyosmani/agent-skills code-review-and-quality @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT)
 
 ## Gelen inceleme yorumunu uygulamadan önce doğrula

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bu PR'ı doğruluk, güvenlik ve bakım açısından incele, merge'e hazır mı",
+    "dalımdaki değişikliklere kod incelemesi yap, bulguları önem sırasıyla yaz",
+    "code review yap: son üç commit'te mantık hatası var mı",
+    "yaptığım değişikliklere bak, bakım ve doğruluk açısından bulgu çıkar",
+    "kod inceleme: bu diff'te kaçırılan bir dal ya da yarış durumu var mı",
+    "PR'ı gözden geçir, engelleyici, düzeltilmeli ve küçük notları ayır",
+    "kodumu review eder misin, özellikle hata yollarına bak",
+    "bu birleştirme öncesi inceleme için bulguları kanıtlı yaz, uydurma bulgu istemiyorum",
+    "değişikliklerimi inceler misin, regresyon mu eski kusur mu ayır",
+    "pull request incelemesi: yapısal sorun varsa çaresini de öner",
+    "bu commit aralığına kod review yap, bağımlılık ekleyen kısma da bak",
+    "kod incelemesi lazım, değişiklik boyu fazla büyük mü bak"
+  ],
+  "should_not_trigger": [
+    "bitti demeden önce hangi kontrolleri koştuğumuzu ve sonuçlarını yaz",
+    "sadece git diff'e bakıp yıkıcı kalıpları tara, tam inceleme değil",
+    "ödeme webhook koduna güvenlik gözüyle bak",
+    "bu hatanın kök sebebini bul, test neden kırıldı",
+    "tarayıcıda siteyi gez ve kırık link ara",
+    "conventional commit mesajı yaz",
+    "bu planı uygulamadan önce red-team'den geçir",
+    "bağımlılıkları yükseltelim, hangi paket major güncellenmiş"
+  ]
+}

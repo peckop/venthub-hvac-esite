@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "yeni teklif modülü için önce spec yaz, kabul ölçütleri ölçülebilir olsun",
+    "bu özelliği kodlamadan önce gereksinimleri çıkar ve görev grafiğine böl",
+    "spec yaz: ürün karşılaştırma tablosu, kabul ölçütü ve kritik yol dahil",
+    "gereksinim belirsiz, kod yazmadan önce neyi yapacağımızı spec olarak netleştirelim",
+    "yayına çıkmış kargo hesaplama spec'ine yeni bir kural eklenecek, delta spec olarak yaz",
+    "bu sürümün kapsamı dışında kalan fikirleri spec'te ertelenmiş olarak nasıl tutarız",
+    "kabul ölçütlü bir spec hazırla, sonra görevlere ve bağımlılık sırasına ayıralım",
+    "spec yazmadan koda girme, önce gereksinimi ve sınırları yazalım",
+    "spesifikasyon odaklı ilerleyelim: spec, plan, görevler, uygulama sırasıyla",
+    "mevcut spec'imizi güncelle, karar değişti, önce spec sonra kod",
+    "speck yaz bu entegrasyon için, kapsam ve açık sorular bölümleri olsun",
+    "V2'ye bırakacağımız işleri spec'te kayda geçir, V1 kapsamı net kalsın"
+  ],
+  "should_not_trigger": [
+    "bu konuşmadan bir PRD üret, ürün gereksinim belgesi formatında",
+    "planı tracer-bullet kartlarına böl ve Kanban'a aç",
+    "yazılmış bu teknik planı çürüt, zayıf varsayımları bul",
+    "bu fikre değer mi diye altı soruyla sıkıştır, plan yazma",
+    "çok dosyalı bu yeniden düzenlemeyi aşamalı göç planına çevir",
+    "login sayfasındaki hata mesajının yazımını düzelt",
+    "şu fonksiyonun nasıl çalıştığını açıkla",
+    "vitest'te sepet bileşeni için test yaz"
+  ]
+}
