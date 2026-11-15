@@ -39,6 +39,13 @@ function parseBulletin(xml: string): ParsedBulletin | null {
   return { effectiveDate: `${year}-${month}-${day}`, rates }
 }
 
+// D5 (OPS-293): uç `verify_jwt=false` ve kimliksiz; yetkisiz çağrı sahte kur YAZDIRAMAZ ama her çağrı
+// TCMB'ye gider (kaynak tüketimi, kota). Sertleştirme: son TCMB satırı COOLDOWN_MS'ten yeniyse ya da bu
+// isolate yakın zamanda TCMB'ye gittiyse TCMB'ye HİÇ gitmeden `carried:true` döner. Kimlik denetimi
+// (JWT + Actions) bu işin DIŞINDA: ayrı karar, pg_cron çağıranını değiştirir.
+const COOLDOWN_MS = 30 * 60 * 1000
+let sonTcmbIstegiMs = 0 // isolate ömrü boyunca; soğuk başlangıçta 0 → DB satırı belirleyici
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { status: 200 })
@@ -54,8 +61,29 @@ serve(async (req: Request) => {
   }
   const supabase = createClient(supabaseUrl, serviceKey)
 
+  // Cooldown: TCMB'ye gitmeden ÖNCE. Okuma hatası fail-open (eski davranış), yalnız loga yazılır.
+  const cooldownYanit = () =>
+    new Response(JSON.stringify({ ok: true, carried: true, reason: 'cooldown' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  if (Date.now() - sonTcmbIstegiMs < COOLDOWN_MS) return cooldownYanit()
+  const { data: sonSatir, error: sonSatirHatasi } = await supabase
+    .from('currency_rates')
+    .select('fetched_at')
+    .eq('source', 'tcmb')
+    .order('fetched_at', { ascending: false })
+    .limit(1)
+  if (sonSatirHatasi) {
+    console.error('[tcmb-rates-sync] cooldown okunamadi:', sonSatirHatasi)
+  } else {
+    const sonMs = sonSatir?.[0]?.fetched_at ? Date.parse(sonSatir[0].fetched_at as string) : NaN
+    if (Number.isFinite(sonMs) && Date.now() - sonMs < COOLDOWN_MS) return cooldownYanit()
+  }
+
   let xml = ''
   try {
+    sonTcmbIstegiMs = Date.now()
     const res = await fetch(TCMB_URL, { headers: { Accept: 'application/xml' } })
     if (!res.ok) {
       // TCMB erişilemez → hata değil taşıma: mevcut son satır geçerli kalır (çözücü latest okur)
