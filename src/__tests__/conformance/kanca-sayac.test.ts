@@ -136,4 +136,41 @@ describe('INV-KANCA-SAYAC-1 · bağlantı', () => {
     const kaynak = fs.readFileSync(path.join(HOOKS, ad + '.cjs'), 'utf8')
     expect(kaynak).toContain("require('./kanca-sayac.cjs').say('" + ad + "'")
   })
+
+  // Denetçi bulgusu (PR #2563): alt dize denetimi aynı dosyada başka bir say() satırı varken karar çağrısının silinmesini
+  // göremiyordu. Her karar kolu kendi çağrısıyla ayrıca aranır.
+  const KARAR_CAGRILARI: Array<[string, string]> = [
+    ['hafiza-indeks-bekcisi', "say('hafiza-indeks-bekcisi', 'deny'"],
+    ['hafiza-indeks-bekcisi', "say('hafiza-indeks-bekcisi', 'kosu'"],
+    ['silme-baglanti-kapisi', "say('silme-baglanti-kapisi', 'deny')"],
+    ['silme-baglanti-kapisi', "say('silme-baglanti-kapisi', 'kosu'"],
+    ['sql-yazma-kapisi', "say('sql-yazma-kapisi', k ? k.karar : 'kosu'"],
+    ['pencere-kilidi-kapisi', "say('pencere-kilidi-kapisi', 'deny')"],
+    ['pencere-kilidi-kapisi', "say('pencere-kilidi-kapisi', 'kosu')"],
+    ['duzenleme-ani-lint', "say('duzenleme-ani-lint', kod === 2 ? 'deny' : 'kosu')"],
+    ['agir-komut-kilidi', "say('agir-komut-kilidi', r.ok ? 'allow' : 'deny'"],
+    ['board-release', "say('board-release', 'birak'"],
+    ['precompact-durum-kapisi', "say('precompact-durum-kapisi', 'deny'"],
+    ['precompact-durum-kapisi', "say('precompact-durum-kapisi', 'kosu'"],
+    ['accumulate-edits', "say('accumulate-edits', 'kosu'"],
+    ['kod-dizini-tazelik', "say('kod-dizini-tazelik', 'kosu')"],
+    ['kanban-tutarlilik-onarimi', "say('kanban-tutarlilik-onarimi', 'kosu')"],
+    ['son-konusma-dokumu', "say('son-konusma-dokumu', 'kosu')"],
+  ]
+  it.each(KARAR_CAGRILARI)('%s: karar çağrısı yerinde (%s)', (ad, parca) => {
+    const kaynak = fs.readFileSync(path.join(HOOKS, ad + '.cjs'), 'utf8')
+    expect(kaynak).toContain(parca)
+  })
+
+  it('silme-baglanti-kapisi: deny çağrısı karar() içinde, stdout yazımından ÖNCE', () => {
+    const kaynak = fs.readFileSync(path.join(HOOKS, 'silme-baglanti-kapisi.cjs'), 'utf8')
+    const i = kaynak.indexOf("say('silme-baglanti-kapisi', 'deny')")
+    const j = kaynak.indexOf('console.log(JSON.stringify({ hookSpecificOutput', i)
+    expect(i).toBeGreaterThan(0)
+    expect(j).toBeGreaterThan(i)
+  })
+
+  it('tavan: 7 günlük ölçüm tek nesilde kalsın (en az 8 MB)', () => {
+    expect(s.TAVAN_BAYT).toBeGreaterThanOrEqual(8 * 1024 * 1024)
+  })
 })

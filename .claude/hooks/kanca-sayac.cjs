@@ -9,14 +9,14 @@
  * sayısını tahminle değil kayıtla vermek ("SONRA" ölçümü, ARC-320 alt adımı).
  *
  * NE YAPMAZ: davranışı değiştirmez. Hata fırlatmaz (kancayı ASLA bozmaz), stdout/stderr'e yazmaz, çıkış kodu vermez,
- * komut ya da araç girdisi yazmaz (yalnız kanca adı ve kısa karar). Kaydı OKUMAZ. 512 KB'ı geçerse `.1` yedeğine döner
+ * komut ya da araç girdisi yazmaz (yalnız kanca adı ve kısa karar). Kaydı OKUMAZ. 8 MB'ı geçerse `.1` yedeğine döner
  * (tek nesil). Vana: VENTHUB_KANCA_SAYAC_KAPALI=1. Test koşusunda (VITEST) yazmaz; pano dizini: VENTHUB_BOARD_DIR.
  */
 const fs = require('node:fs')
 const path = require('node:path')
 
 const GUNLUK_ADI = 'kanca-sayac.jsonl'
-const TAVAN_BAYT = 512 * 1024
+const TAVAN_BAYT = 8 * 1024 * 1024 // ~84 bin satır/nesil: günde ~8 bin satırla 7 günlük ölçüm tek nesilde kalır (ARC-323 denetçi bulgusu)
 const KARARLAR = ['kosu', 'allow', 'deny', 'ask', 'uyari', 'birak']
 
 function panoDizini() {
