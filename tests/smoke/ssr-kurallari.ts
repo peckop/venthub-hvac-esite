@@ -213,7 +213,7 @@ export const ANASAYFA_MAX_BAILOUT = ANASAYFA_BILINCLI_ADALAR.reduce((n, a) => n 
  * bu yüzden tavan 2, 3 değil. *İki sınıfın aynı sayıyı vermesi tesadüf olabilir — ayrımı
  * ölçmeden tek tavan yazmak, iki sınıfı birbirine kefil yapardı.*
  *
- * ⚠ROTA SINIFI İLANI: `brands/[slug]` bugün `export const revalidate = 3600` +
+ * ⚠ROTA SINIFI İLANI: `brands/[slug]` bugün `export const revalidate = 86400` +
  * `generateStaticParams()` taşıyor ama **`export const dynamic` ilanı YOK** (ölçüldü:
  * `src/app/[lang]/brands/[slug]/page.tsx`). Yukarıdaki gerekçe düzeltmesine göre ayırt edici
  * olan tam budur: ilanı olmayan rotada `useSearchParams()` çağıran adalar marker DOĞURUR.

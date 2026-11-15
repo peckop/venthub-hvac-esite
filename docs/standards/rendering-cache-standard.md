@@ -16,7 +16,7 @@
 
 | Sınıf | Nasıl | Nerede | Neden |
 |---|---|---|---|
-| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP) · **hakkımızda** (canlı marka/ürün/aile sayacı, URN-75). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
+| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 86400` (yedek, 24 saat)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP) · **hakkımızda** (canlı marka/ürün/aile sayacı, URN-75). *(`destek/konular` statik içerik — yedek eklenmedi)* **ALT-187, 15 Kasım 2026:** Vercel Hobby Active CPU kotası; ISR Writes 101 bin/ay (101 adres × saatlik yazım + 5 dk ana sayfa döngüsü); webhook birincil kalır, yedek süre 3600 → 86400. **Bayatlık kabulü:** webhook kaçarsa sayfa en çok 24 saat bayat kalır (eskiden 1 saat) | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
 | **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · iletişim | İçerik deploy dışında değişmez |
 | **Dinamik** | `export const dynamic = 'force-dynamic'` | Admin/** · hesap/** · API rotaları | Kullanıcıya/oturuma özel; önbelleklenirse veri sızar |
 
@@ -99,12 +99,12 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu + (varsa) **ailenin SERİSİ** — keşif tag'lerine DOKUNMAZ (PS-042) |
 | `product_images` | `on_product_images_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + keşif tag'leri + `/sitemap.xml` — tablo canlıda **1.146 satır, 429 ürün** (25 Ekim 2026 ölçümü; eskiden 0 satırdı); zincir görsel yüklemesinden ÖNCE yerinde olmalıdır (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
 | `brands` | `on_brands_change` | var | markanın **tüm ailelerinin** PDP yolları + keşif tag'leri |
-| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout, ödeme sonucu ve **ana sayfa**: ürün vitrini bloğunun çizim kapısı, URN-98 2026-10-10) yeniden üretilir; keşif etiketlerine DOKUNMAZ. Ana sayfa bu sarmalı `unstable_cache` içinde okur: içindeki `no-store` fetch Next 15.5.27'de o kapsamda sayfayı dinamik işaretlemez, `resolveTenant(undefined)` başlık okumaz, yani sınıf statik kalır (bekçi INV-ANASAYFA-STATIK-1 + INV-ANASAYFA-VITRIN-1). Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
+| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout, ödeme sonucu ve **ana sayfa**: ürün vitrini bloğunun çizim kapısı, URN-98 2026-10-10) yeniden üretilir; keşif etiketlerine DOKUNMAZ. Ana sayfa bu sarmalı `unstable_cache` içinde okur: içindeki `no-store` fetch Next 15.5.27'de o kapsamda sayfayı dinamik işaretlemez, `resolveTenant(undefined)` başlık okumaz, yani sınıf statik kalır (bekçi INV-ANASAYFA-STATIK-1 + INV-ANASAYFA-VITRIN-1). Önbellek emniyet kemeri `revalidate: 86400` (webhook düşerse "açık" en fazla 24 saat bayat). **ALT-187, 15 Kasım 2026:** eskiden 300 (5 dk) idi; Next sayfa ömrünü en kısa iç önbellek süresine indirdiği için bu değer ana sayfayı (`/tr`, `/en`) her 5 dakikada yeniden ürettiriyordu — Vercel Hobby Active CPU kotası; ISR Writes 101 bin/ay (101 adres × saatlik yazım + 5 dk ana sayfa döngüsü); webhook birincil kalır, bayatlık üst sınırı 24 saat. **Bayatlık kabulü:** satış kipi anahtarı yanlış yönde bayat kalırsa (webhook düşerse) en çok 24 saat görünür; OPS onayıyla kabul edildi. DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
 > **HAKKIMIZDA SAYACI (URN-75, 2026-10-09).** `/[lang]/about` artık `tam statik` DEĞİL: marka / aktif ürün / aile sayısı
 > `getSiteSayaclari` ile canlı veriden gelir (`src/app/_components/siteSayaclari.ts`, `unstable_cache`, anahtar
-> `['site-sayaclari', lang, tenantId]`, etiket `PRODUCTS_DISCOVERY_TAG` + `discoveryTag(tenantId)`, `revalidate = 3600`).
+> `['site-sayaclari', lang, tenantId]`, etiket `PRODUCTS_DISCOVERY_TAG` + `discoveryTag(tenantId)`, `revalidate = 86400`; ALT-187, 15 Kasım 2026: 3600 → 86400, Vercel Hobby Active CPU kotası, webhook birincil kalır, bayatlık üst sınırı 24 saat).
 > Dayandığı üç tablo (`products` status/family_id/deleted_at, `product_families`, `brands`) keşif etiketini ZATEN tazelediği için
 > yeni tetik/handler dalı gerekmedi. Okunamazsa sayaç `null` olur ve kartlar çizilmez (uydurma sayı yok). Kapı:
 > `INV-HAKKIMIZDA-SAYAC-1` (`src/__tests__/conformance/hakkimizda-sayac.test.ts`). **Canlı tazeleme ölçümü** (§1.1: ürün değişince sayfanın
@@ -214,7 +214,7 @@ tazeler, sayfa başka etiketle önbelleklenmiş olurdu — **tazeleme ıskalar v
 Sayfa artık `DEFAULT_TENANT_ID` derleme sabitini kullanıyor; sabitin canlı `tenants` satırıyla
 birebir aynı olduğu prod SELECT ile ölçüldü (2026-09-09, tablo TEK satır).
 
-**Sınıf değişimi ve kanıtı.** Ana sayfa `revalidate = 3600` beyan ediyordu ama beyan ÖLÜYDÜ:
+**Sınıf değişimi ve kanıtı.** Ana sayfa `revalidate = 3600` beyan ediyordu (bugün 86400, ALT-187, 15 Kasım 2026) ama beyan ÖLÜYDÜ:
 canlı ölçüm (2026-09-14, `curl -I`) `/tr` ve `/en` için `Cache-Control: private, no-cache,
 no-store` + `X-Vercel-Cache: MISS` verdi — yani §1'deki "statik + ISR" sınıfında görünüp
 gerçekte **istek başına** üretiliyordu. Tek sebep `headers()` okumasıydı. Kaldırıldıktan sonra
@@ -321,12 +321,12 @@ zincir (§3 kuralı) — hepsi aynı keşif etiketine bağlanır, yeni önbellek
 | Marka eşleşmesi (`p_brand` adı) | `brands` | `on_brands_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
 
 Önbellek: `unstable_cache`, anahtar `['brand-catalog-summary', lang, tenantId, markaAdı]` (kural 12), etiketler
-`[PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)]`, `revalidate: 3600` emniyet kemeri — aile sayısı için kurulan
+`[PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)]`, `revalidate: 86400` emniyet kemeri (ALT-187, 15 Kasım 2026: 3600 → 86400, Vercel Hobby Active CPU kotası; webhook birincil kalır) — aile sayısı için kurulan
 `brand-active-product-count` sarmalıyla AYNI desen. Kapı: `markaKaynagi.test.ts` "katalog özeti önbellek sarmalı".
 
 **Hata yolu SAYIDAN FARKLIDIR (bilerek):** aile SAYISI okunamazsa karar fırlatır (yanlış "ürünsüz" noindex + harita dışı yazar,
 bkz. `markaUrunDurumu.ts`); bu ÖZET ise isteğe bağlı metindir — okunamazsa sayfa özet paragrafsız çizilir, uyarı basılır, hata
-önbelleğe YAZILMAZ ve sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Ürünsüz markada (sayı 0) özet sorgusu hiç atılmaz.
+önbelleğe YAZILMAZ ve sonraki yenilemede (webhook ya da en geç 24 saat; ALT-187) kendiliğinden döner. Ürünsüz markada (sayı 0) özet sorgusu hiç atılmaz.
 Üst veri (`<title>`/meta description) ve Brand JSON-LD bu özeti KULLANMAZ: yalnız kayıttaki nötr cümleden türer
 (`markaAciklamasi`, tek kaynak) — arama sonucu açıklaması DB gecikmesine/hatasına bağlanmaz.
 

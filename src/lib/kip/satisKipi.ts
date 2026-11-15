@@ -69,10 +69,14 @@ function cevabiCoz(ham: unknown): SatisKipi {
 
 /**
  * Önbellek süresi (sn): webhook düşerse ya da satır DELETE/yeniden adlandırılırsa "açık" en fazla bu kadar
- * bayat kalır (REC-168 plan-challenger Ç1: eskiden süresizdi, repodaki diğer tüm `unstable_cache`ler 3600).
- * Kısa tutulur çünkü yanlış yöndeki bayatlık paraya dokunur.
+ * bayat kalır (REC-168 plan-challenger Ç1: eskiden süresizdi).
+ * ALT-187 (15 Kasım 2026): 300 → 86400. Süre ana sayfanın CDN ömrünü de belirler (Next, sayfa ömrünü en kısa
+ * iç önbellek süresine indirir); 300 sn ana sayfayı (/tr, /en) her 5 dakikada yeniden üretiyordu ve Vercel Hobby
+ * Active CPU kotasını yiyordu. Birincil tazeleme webhook kalır (`SATIS_KIPI_TAG`); bu süre yalnız emniyet kemeridir
+ * ve bayatlık üst sınırı artık 24 saattir (OPS onayı, 15 Kasım 2026). Yanlış yöndeki bayatlık paraya
+ * dokunur; webhook düşerse anahtar değişimi en geç 24 saatte görünür.
  */
-export const SATIS_KIPI_ONBELLEK_SN = 300
+export const SATIS_KIPI_ONBELLEK_SN = 86400
 
 /**
  * DB'den okur; BAŞARISIZ okumada FIRLATIR — `unstable_cache` fırlatan çağrıyı ÖNBELLEĞE YAZMAZ.

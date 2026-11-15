@@ -56,10 +56,10 @@ const getCachedFamilies = (lang: string, tenantId: string, page: number) => unst
     offset: (page - 1) * PAGE_SIZE
   }),
   ['products-discovery-families', lang, tenantId, String(page)],
-  // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
-  // liste en fazla 1 saat bayat kalabilir. Sinyalli tazeleme (revalidateTag) aynen çalışır.
+  // revalidate: 86400 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
+  // liste en fazla 24 saat bayat kalabilir (ALT-187). Sinyalli tazeleme (revalidateTag) aynen çalışır.
   // (Ana sayfadaki (src/app/[lang]/page.tsx) desenle aynı emniyet kemeri.)
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /**
@@ -86,7 +86,7 @@ const getCachedKategoriler = (lang: string, tenantId: string) => unstable_cache(
     return { catData, sayimlar }
   },
   ['products-discovery-categories', lang, tenantId],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /**

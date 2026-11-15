@@ -31,8 +31,8 @@ import { UrunlerSayfasi, urunlerUstVerisiK3b } from '../../_components/urunlerSa
  */
 export const dynamic = 'force-static'
 
-/** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3. */
-export const revalidate = 3600
+/** ISR yedeği (24 saat; ALT-187) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3. */
+export const revalidate = 86400
 
 export async function generateStaticParams() {
   // K3-b açıkken TR adresi yalnız 308 verir → önceden üretilmez; içerik `/tr/urunler`'de.

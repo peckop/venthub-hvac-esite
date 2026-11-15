@@ -44,13 +44,13 @@ export function markaBul(slug: string): Marka | null {
  * Marka başına aktif ürün sayısı önbelleği (OPS-51). Anahtar `lang` VE `tenantId` içerir (kural 12); etiketler KEŞİF
  * alanıdır (`PRODUCTS_DISCOVERY_TAG` + kiracı etiketi): webhook ürün/aile değişiminde bu etiketi zaten tazeler, böylece
  * Flexiva'ya ürün girince sayı ve bu sayıya bağlı marka sayfası (+ site haritası) kendiliğinden yenilenir.
- * `revalidate: 3600` = webhook kaçarsa emniyet kemeri (sayfanın ISR süresiyle aynı). Hata FIRLATILIR (önbelleğe hata
+ * `revalidate: 86400` = webhook kaçarsa emniyet kemeri (sayfanın ISR süresiyle aynı). Hata FIRLATILIR (önbelleğe hata
  * yazılmaz); karar `markaUrunDurumu.ts` HATA YOLU'na göre ele alınır.
  */
 const getCachedMarkaUrunSayisi = (lang: string, tenantId: string, markaAdi: string) => unstable_cache(
   async () => getBrandFamilyCount(supabaseStaticClient, markaAdi),
   ['brand-active-product-count', lang, tenantId, markaAdi],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /** Aynı render'da (üst veri + gövde) tekrarlanan sayımı tekilleştirir (kural 6). */
@@ -131,7 +131,7 @@ function markaMetinleri(lang: string, brand: Marka, urunsuz: boolean) {
 export const getCachedMarkaKatalogOzeti = (lang: string, tenantId: string, markaAdi: string) => unstable_cache(
   async () => getBrandCatalogSummary(supabaseStaticClient, markaAdi),
   ['brand-catalog-summary', lang, tenantId, markaAdi],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /** Markanın katalog özetini okur; okuyamazsa FIRLATIR. Testte enjekte edilir (`MarkaSayfasi` → `katalogOzeti`). */
@@ -195,7 +195,7 @@ export function markaKatalogSayilari(ozet: BrandCatalogSummary | null): MarkaKat
 /**
  * Sayfa gövdesinin DB'den türeyen özet paragrafı + kutu sayıları. ÖZET İSTEĞE BAĞLI METİNDİR: okunamazsa sayfa onsuz
  * çizilir (uyarı basılır) — "ürünsüz marka" kararının tersine yanlış sonuç noindex/harita gibi bir sessiz hasar
- * yazmaz; ISR yenilemesini kırmak yerine bir sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Hata önbelleğe
+ * yazmaz; ISR yenilemesini kırmak yerine bir sonraki yenilemede (en geç 24 saat; ALT-187) kendiliğinden döner. Hata önbelleğe
  * YAZILMAZ (okuyucu fırlatır).
  */
 async function markaKatalogVerisi(
@@ -224,7 +224,7 @@ export const MARKA_AILE_AZAMI = 12
 export const getCachedMarkaAileleri = (lang: string, tenantId: string, markaAdi: string) => unstable_cache(
   async () => (await getFamiliesEnriched(supabaseStaticClient, { brand: markaAdi, limit: MARKA_AILE_AZAMI })).items,
   ['brand-families', lang, tenantId, markaAdi],
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 86400 }
 )()
 
 /** Markanın vitrin ailelerini okur; okuyamazsa FIRLATIR. Testte enjekte edilir (`MarkaSayfasi` → `aileler`). */

@@ -27,7 +27,7 @@ export const dynamic = 'force-static'
  * dışında değişmez" sınıfından çıktı: statik + talep-üzerine ISR (render cetveli §1). Birincil tazeleme webhook'un
  * keşif etiketidir; 3600 yalnız emniyet kemeri.
  */
-export const revalidate = 3600
+export const revalidate = 86400
 
 interface PageProps {
   params: Promise<{ lang: string }>

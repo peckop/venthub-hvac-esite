@@ -324,7 +324,7 @@ describe('INV-HAKKIMIZDA-SAYAC-1', () => {
   it('rota ISR ilan eder ve sayacı önbellekli sarmaldan okur', () => {
     const rota = oku('src/app/[lang]/about/page.tsx')
     expect(rota).toMatch(/export const dynamic = 'force-static'/)
-    expect(rota).toMatch(/export const revalidate = 3600/)
+    expect(rota).toMatch(/export const revalidate = 86400/)
     expect(rota).toMatch(/siteSayaclariOku\(lang, DEFAULT_TENANT_ID\)/)
     expect(rota).toMatch(/<PageComponent lang=\{lang\} sayaclar=\{sayaclar\} \/>/)
   })
@@ -333,7 +333,7 @@ describe('INV-HAKKIMIZDA-SAYAC-1', () => {
     const sarmal = oku('src/app/_components/siteSayaclari.ts')
     expect(sarmal).toMatch(/\['site-sayaclari', lang, tenantId\]/)
     expect(sarmal).toMatch(/tags: \[PRODUCTS_DISCOVERY_TAG, discoveryTag\(tenantId\)\]/)
-    expect(sarmal).toMatch(/revalidate: 3600/)
+    expect(sarmal).toMatch(/revalidate: 86400/)
     expect(sarmal).toMatch(/catch \(hata\)[\s\S]*return null/)
     expect(oku('src/lib/services/siteSayaclari.service.ts')).toMatch(/if \(error\) throw error/)
   })
