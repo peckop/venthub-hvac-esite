@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { oturumuKapat } from './yardimci/oturum-kapat'
+
 /**
  * Admin filtre çipi — donma / adres döngüsü bekçisi (REC-411).
  *
@@ -23,6 +25,11 @@ const EN_FAZLA_ADRES_YAZIMI = 2
 
 test.describe('admin filtre çipi', () => {
   test.skip(!EMAIL || !PASSWORD, 'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD gerekli (CI var+secret).')
+
+  // ALT-189: her test kendi girişini bitirir (yalnız yerel oturum; bkz. yardimci/oturum-kapat.ts).
+  test.afterEach(async ({ page }) => {
+    await oturumuKapat(page)
+  })
 
   test('ürün tablosunda çipe basmak sayfayı dondurmaz ve adresi döngüye sokmaz', async ({ page }) => {
     // Her gezinmede sıfırlanan sayaç: Next `router.replace` çağrısını `history.replaceState` ile yapar.

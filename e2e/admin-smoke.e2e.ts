@@ -1,5 +1,7 @@
 import { expect,test } from '@playwright/test'
 
+import { oturumuKapat } from './yardimci/oturum-kapat'
+
 /**
  * Admin runtime smoke — donma/loop bekçisi.
  *
@@ -16,6 +18,11 @@ const PASSWORD = process.env.E2E_ADMIN_PASSWORD
 test.describe('admin runtime smoke', () => {
   // Secret/credential yoksa atla (CI'ı kırma) — ama sebebini açıkça yaz.
   test.skip(!EMAIL || !PASSWORD, 'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD gerekli (CI var+secret).')
+
+  // ALT-189: her test kendi girişini bitirir (yalnız yerel oturum; bkz. yardimci/oturum-kapat.ts).
+  test.afterEach(async ({ page }) => {
+    await oturumuKapat(page)
+  })
 
   test('login → /admin boot olur, donmaz ve interaktiftir', async ({ page }) => {
     // 1) Gerçek login (email+şifre)
