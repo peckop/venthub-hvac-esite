@@ -1,15 +1,15 @@
 {
-  "asit-fani-nedir-korozyona-dayanikli-fan-secimi": {"iz":"5fdfd296240abc69","tarih":"2026-11-08"},
-  "banyo-tuvalet-fani-secimi": {"iz":"ac9bd02abef57d57","tarih":"2026-11-11"},
+  "asit-fani-nedir-korozyona-dayanikli-fan-secimi": {"iz":"daa9344ad58032cf","tarih":"2026-11-16"},
+  "banyo-tuvalet-fani-secimi": {"iz":"d16a899182ba0d95","tarih":"2026-11-16"},
   "cati-tipi-fan-nedir": {"iz":"156d02d6879f6296","tarih":"2026-11-08"},
-  "fan-cesitleri": {"iz":"dac3366c8bd917eb","tarih":"2026-11-11"},
-  "frekans-konvertoru": {"iz":"d332abff591ac9fc","tarih":"2026-11-09"},
+  "fan-cesitleri": {"iz":"c2741c98bda640f4","tarih":"2026-11-16"},
+  "frekans-konvertoru": {"iz":"3c4d6114546a1fac","tarih":"2026-11-16"},
   "hava-perdesi": {"iz":"19417d65f3560e99","tarih":"2026-11-12"},
-  "hucreli-aspirator-nedir": {"iz":"fb697974ab2ae125","tarih":"2026-11-08"},
-  "isi-geri-kazanim-cihazi-nedir": {"iz":"42e6ec95c70e8681","tarih":"2026-11-12"},
-  "kanal-tipi-fan-nedir": {"iz":"66db2eaf3333d2e0","tarih":"2026-11-12"},
+  "hucreli-aspirator-nedir": {"iz":"dbf3ee7b8b08ecce","tarih":"2026-11-16"},
+  "isi-geri-kazanim-cihazi-nedir": {"iz":"24ae6baac11575bb","tarih":"2026-11-16"},
+  "kanal-tipi-fan-nedir": {"iz":"d73ddfdb1ca73a9d","tarih":"2026-11-16"},
   "patlayici-ortamda-fan-secimi-atex": {"iz":"1c123038ec5a32d1","tarih":"2026-11-09"},
-  "plug-fan-nedir": {"iz":"0df91eb2eb63afea","tarih":"2026-11-08"},
-  "radyal-aksiyel-fan-secimi": {"iz":"20b85784bd62be2c","tarih":"2026-11-12"},
-  "sessiz-fan-secimi": {"iz":"57279aeae37ea782","tarih":"2026-11-09"}
+  "plug-fan-nedir": {"iz":"c18d8ec470dfa2c9","tarih":"2026-11-16"},
+  "radyal-aksiyel-fan-secimi": {"iz":"fe349b3946973c47","tarih":"2026-11-16"},
+  "sessiz-fan-secimi": {"iz":"c220f5de729650ae","tarih":"2026-11-16"}
 }
