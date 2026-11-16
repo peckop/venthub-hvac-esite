@@ -1548,6 +1548,19 @@ dosyayı `docs/` altına taşıyan PR'da varsayılan git eşlemesi yalnız yeni 
 atlatılamıyordu (ARAÇ canlı deneyi, ARC-333); orada `--no-renames` savunma derinliğidir, davranış değişikliği değil.
 Kollar INV-RITUEL-6.
 
+**Çekirdek tabandan (ALT-201, 16 Kasım 2026):** zorunlu çekirdek artık PR ağacındaki workflow dosyalarından değil
+`origin/master`ten (`git ls-tree` + `git show origin/master:.github/workflows/<ad>`) türetilir. Önceki hâlde bir PR
+çekirdekteki bir işi silerek, adını değiştirerek ya da `if:` ekleyerek çekirdeği küçültür ve küçülmüş çekirdekle yeşil
+alırdı (ci.yml sınıflayıcısı bilerek tabandan okur; ritüel okumuyordu, ARAÇ ARC-331). Taban çekirdeğindeki bir kapı PR'da
+yoksa madde 2 KIRMIZI verir. Taban listesi/okuması başarısızsa çekirdek BOŞ döner ve "CEKIRDEK BOS" ile KIRMIZI olur.
+Bedel adıyla: çekirdeği **bilerek** değiştiren (iş silen/yeniden adlandıran) PR artık ritüelden geçmez; OPS-192 yoluyla
+(tam fark okunur, ARAÇ hükmü, elle birleştirme) gider. Bu bilinçli: çekirdek değişikliği zaten bağımsız denetim ister.
+İmaj kapısı kapsamı (ALT-201 madde 1) kararı: dört yol **genişletilmedi**; ürün derlemesi `ci` içindeki `Build (blocking)`
+adımında koşar ve yalnız dar sınıfta (belge, edge, betik, karma) atlanır; `package.json`, `pnpm-lock.yaml`, `src/**` gibi
+girdiler dar sınıfta değildir, yani Build koşar. Yolları genişletmek her bağımlılık PR'ında Docker derlemesi koşturur
+(maliyet) ve `ci` Build ile aynı kırılmayı iki kez ölçer. Kalan kör nokta: yalnız Docker'a özgü, `Dockerfile`/`next.config.mjs`
+dışından gelen kırılma; canlıya çıkışta `yayin-imaji.yml` push kolu ölçer. Kollar INV-RITUEL-7.
+
 #### Kanıt
 
 Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**98 test**, vitest sayımı 16 Kasım 2026; ilk yazımda 19 kol
