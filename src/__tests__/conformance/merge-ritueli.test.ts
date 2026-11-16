@@ -441,6 +441,7 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
     imajKapisiTuret: (kok: string) => { kapi: { ad: string; yollar: string[] } | null; sinir: string | null }
     imajKapisiCoz: (m: string) => { ad?: string; yollar?: string[]; hata?: string }
     yolDeseniEslesir: (d: string, y: string) => boolean
+    emekliKapi: (c: unknown) => boolean
   }
   const gercek: Tam = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'))
 
@@ -448,25 +449,37 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
   const IMAJ = { ad: 'İmaj derle', yollar: ['Dockerfile', '.dockerignore', '.github/workflows/yayin-imaji.yml', 'next.config.mjs'] }
   const unstable = { ...PV_IYI, mergeStateStatus: 'UNSTABLE' }
   const girdi = (ek: Record<string, unknown> = {}): Record<string, unknown> => ({ ...tamGirdi(), cekirdek: ['ci'], ...ek })
-  const tablo = (...ek: Array<{ name: string; bucket: string }>) => [{ name: 'ci', bucket: 'pass' }, ...GECEN, ...ek]
+  type Kapi = { name: string; bucket: string; workflow?: string }
+  const tablo = (...ek: Kapi[]): Kapi[] => [{ name: 'ci', bucket: 'pass', workflow: 'CI' }, ...GECEN, ...ek]
 
   /** TEK kilit fonksiyonu: gerçek modül de, sabotajlı kopyalar da AYNI iddiaları geçer ya da kırılır. */
   function kilit(r: Mod) {
     // 1) #2571 benzeri: Vercel fail + UNSTABLE → madde 3 ve 4 YEŞİL, emekli kapı çıktıda GÖRÜNÜR
-    const s2571 = r.degerlendir(girdi({ pv: unstable, kapilar: tablo({ name: 'Vercel', bucket: 'fail' }) }))
+    const s2571 = r.degerlendir(girdi({ pv: unstable, kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }) }))
     expect(madde(s2571, 3).gecti, '#2571: emekli Vercel düşen sayıldı').toBe(true)
     expect(madde(s2571, 3).detay).toMatch(/emekli kapi sayilmadi: Vercel\(fail\)/)
     expect(madde(s2571, 4).gecti, '#2571: UNSTABLE emekli Vercel\'den ama reddedildi').toBe(true)
     expect(madde(s2571, 4).detay).toMatch(/UNSTABLE yalniz emekli Vercel/)
     // 2) emekli-dışı düşen kapı + UNSTABLE → madde 3 VE 4 kırmızı
-    const diger = r.degerlendir(girdi({ pv: unstable, kapilar: tablo({ name: 'e2e-smoke', bucket: 'fail' }, { name: 'Vercel', bucket: 'fail' }) }))
+    const diger = r.degerlendir(girdi({ pv: unstable, kapilar: tablo({ name: 'e2e-smoke', bucket: 'fail' }, { name: 'Vercel', bucket: 'fail', workflow: '' }) }))
     expect(madde(diger, 3).gecti, 'emekli-dışı düşen kapı yutuldu').toBe(false)
     expect(madde(diger, 4).gecti, 'UNSTABLE, emekli-dışı düşen kapı varken kabul edildi').toBe(false)
     // 3) liste TAM AD: başka adlı harici kapı da, 'Vercel' içeren başka ad da muaf DEĞİL
     for (const ad of ['Netlify', 'Vercel Deploy Preview', 'not-Vercel', 'vercel']) {
-      const s = r.degerlendir(girdi({ pv: unstable, kapilar: tablo({ name: ad, bucket: 'fail' }) }))
+      const s = r.degerlendir(girdi({ pv: unstable, kapilar: tablo({ name: ad, bucket: 'fail', workflow: '' }) }))
       expect(madde(s, 3).gecti, `"${ad}" düştü ama muaf sayıldı (alt dize/regex gevşemesi)`).toBe(false)
       expect(madde(s, 4).gecti, `"${ad}" ile UNSTABLE kabul edildi`).toBe(false)
+    }
+    // 4) AD SAHTECİLİĞİ: gerçek harici durumun `workflow` alanı '' (boş dize). Actions job'ı `name: Vercel` yazsa workflow dolu gelir;
+    //    alan HİÇ yoksa (undefined) da muaf DEĞİL (fail-closed).
+    const sahteler: Array<{ ad: string; kapi: Kapi }> = [
+      { ad: 'workflow=CI', kapi: { name: 'Vercel', bucket: 'fail', workflow: 'CI' } },
+      { ad: 'workflow alanı yok', kapi: { name: 'Vercel', bucket: 'fail' } },
+    ]
+    for (const { ad, kapi } of sahteler) {
+      const s = r.degerlendir(girdi({ pv: unstable, kapilar: tablo(kapi) }))
+      expect(madde(s, 3).gecti, `Vercel (${ad}) muaf sayıldı — ad sahteciliği`).toBe(false)
+      expect(madde(s, 4).gecti, `Vercel (${ad}) ile UNSTABLE kabul edildi`).toBe(false)
     }
   }
 
@@ -475,7 +488,7 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
 
     it('#2571 benzeri: ikinci emekli ad da ve PENDING emekli de sayılmaz; hepsi detayda görünür', () => {
       const s = gercek.degerlendir(girdi({ pv: unstable, kapilar: tablo(
-        { name: 'Vercel', bucket: 'pending' }, { name: 'Vercel Preview Comments', bucket: 'fail' }) }))
+        { name: 'Vercel', bucket: 'pending', workflow: '' }, { name: 'Vercel Preview Comments', bucket: 'fail', workflow: '' }) }))
       expect(madde(s, 3).gecti).toBe(true)
       expect(madde(s, 3).detay).toMatch(/Vercel\(pending\)/)
       expect(madde(s, 3).detay).toMatch(/Vercel Preview Comments\(fail\)/)
@@ -500,15 +513,15 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
     it('önceki kural AYNEN: DIRTY/BEHIND/UNKNOWN/HAS_HOOKS kırmızı; Vercel varlığı bunları kurtarmaz', () => {
       for (const st of ['DIRTY', 'BEHIND', 'UNKNOWN', 'HAS_HOOKS']) {
         const s = gercek.degerlendir(girdi({
-          pv: { ...PV_IYI, mergeStateStatus: st }, kapilar: tablo({ name: 'Vercel', bucket: 'fail' }),
+          pv: { ...PV_IYI, mergeStateStatus: st }, kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }),
         }))
         expect(madde(s, 4).gecti, `${st} geçti`).toBe(false)
       }
-      expect(madde(gercek.degerlendir(girdi({ pv: { ...unstable, mergeable: 'CONFLICTING' }, kapilar: tablo({ name: 'Vercel', bucket: 'fail' }) })), 4).gecti).toBe(false)
+      expect(madde(gercek.degerlendir(girdi({ pv: { ...unstable, mergeable: 'CONFLICTING' }, kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }) })), 4).gecti).toBe(false)
     })
 
     it('UNSTABLE kabulü sha ayrışmasını KURTARMAZ (aynı sıra: sha eşleşmesi korunur)', () => {
-      const s = gercek.degerlendir(girdi({ pv: unstable, uzakSha: 'baska', kapilar: tablo({ name: 'Vercel', bucket: 'fail' }) }))
+      const s = gercek.degerlendir(girdi({ pv: unstable, uzakSha: 'baska', kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }) }))
       expect(madde(s, 4).gecti).toBe(false)
       expect(madde(s, 4).detay).toMatch(/AYRISIYOR/)
     })
@@ -531,12 +544,23 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
         expect(gercek.emekliMi(ad), `"${ad}"`).toBe(false)
       }
     })
+
+    it('emekliKapi: yalnız workflow === \'\' (katı) VE tam ad; undefined/null/CI/boşluk muaf DEĞİL', () => {
+      expect(gercek.emekliKapi({ name: 'Vercel', bucket: 'fail', workflow: '' })).toBe(true)
+      expect(gercek.emekliKapi({ name: 'Vercel Preview Comments', bucket: 'fail', workflow: '' })).toBe(true)
+      for (const workflow of [undefined, null, 'CI', ' ', 0, false]) {
+        expect(gercek.emekliKapi({ name: 'Vercel', bucket: 'fail', workflow }), `workflow=${String(workflow)}`).toBe(false)
+      }
+      expect(gercek.emekliKapi({ name: 'Vercel', bucket: 'fail' })).toBe(false)
+      expect(gercek.emekliKapi({ name: 'Netlify', bucket: 'fail', workflow: '' })).toBe(false)
+      expect(gercek.emekliKapi(null)).toBe(false)
+    })
   })
 
   describe('eşdeğer kapı: İmaj derle (Vercel\'in işlevi kaldırılmadı, devredildi)', () => {
     const imajDegisti = ['Dockerfile', 'src/app/page.tsx']
     const imajDegismedi = ['src/app/page.tsx', 'docs/x.md']
-    const tabloVercelli = (...ek: Array<{ name: string; bucket: string }>) => tablo({ name: 'Vercel', bucket: 'fail' }, ...ek)
+    const tabloVercelli = (...ek: Kapi[]) => tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }, ...ek)
 
     it('yol DEĞİŞTİ + İmaj derle tabloda YOK → madde 2 KIRMIZI', () => {
       const s = gercek.degerlendir(girdi({ pv: unstable, kapilar: tabloVercelli(), imajKapisi: IMAJ, degisenDosyalar: imajDegisti }))
@@ -596,10 +620,67 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
       expect(gercek.yolDeseniEslesir('a/*.ts', 'a/b/c.ts')).toBe(false)
     })
 
+    it('glob: `**/` SIFIR dizin eşler (GitHub gibi): **/Dockerfile ≙ Dockerfile, a/**/b ≙ a/b; ama ön ek kayması eşleşmez', () => {
+      expect(gercek.yolDeseniEslesir('**/Dockerfile', 'Dockerfile')).toBe(true)
+      expect(gercek.yolDeseniEslesir('**/Dockerfile', 'x/y/Dockerfile')).toBe(true)
+      expect(gercek.yolDeseniEslesir('**/Dockerfile', 'x/MyDockerfile')).toBe(false)
+      expect(gercek.yolDeseniEslesir('a/**/b', 'a/b')).toBe(true)
+      expect(gercek.yolDeseniEslesir('a/**/b', 'a/x/y/b')).toBe(true)
+      expect(gercek.yolDeseniEslesir('a/**/b', 'ab')).toBe(false)
+    })
+
+    it('desteklenmeyen glob karakteri (?, [, {, baş !) imajKapisiCoz\'da fail-closed hata verir', () => {
+      for (const desen of ['Docker?ile', 'src/[ab].ts', 'src/{a,b}.ts', '!Dockerfile']) {
+        const r = gercek.imajKapisiCoz(`on:\n  pull_request:\n    paths:\n      - "${desen}"\njobs:\n  j:\n    name: J\n`)
+        expect(r.hata, desen).toMatch(/desteklenmeyen glob/)
+        expect(r.yollar, desen).toBeUndefined()
+      }
+    })
+
+    it('⭐İMAJ YOLU TABANDAN OKUNUR: PR kendi yayin-imaji.yml\'inden Dockerfile satırını silse de türetilen liste tabandaki 4 yolu taşır', () => {
+      const taban = [
+        'name: Y', 'on:', '  pull_request:', '    paths:', '      - Dockerfile', '      - .dockerignore',
+        '      - .github/workflows/yayin-imaji.yml', '      - next.config.mjs', 'jobs:', '  imaj:', '    name: İmaj derle', '',
+      ].join('\n')
+      const prAgaci = taban.replace('      - Dockerfile\n', '') // PR kapıyı daraltmış
+      const kok = sahteRepo({ 'yayin-imaji.yml': prAgaci })
+      // enjeksiyonsuz (PR ağacı) daraltılmış listeyi görür: sabotajın var olduğunu kanıtlar
+      expect(gercek.imajKapisiTuret(kok).kapi?.yollar).not.toContain('Dockerfile')
+      // tabandan okuyan çağrı daraltmayı GÖRMEZ
+      const t = gercek.imajKapisiTuret(kok, () => taban)
+      expect([...(t.kapi?.yollar ?? [])].sort()).toEqual([...IMAJ.yollar].sort())
+      expect(t.kapi?.ad).toBe('İmaj derle')
+    })
+
+    it('tabandan okunamazsa (fırlatır / boş metin) türetme null döner: fail-closed KIRMIZI', () => {
+      const kok = sahteRepo({})
+      expect(gercek.imajKapisiTuret(kok, () => { throw new Error('fatal: path does not exist in origin/master') }).kapi).toBeNull()
+      expect(gercek.imajKapisiTuret(kok, () => '').kapi).toBeNull()
+      const g = girdi({ kapilar: tablo(), imajKapisi: gercek.imajKapisiTuret(kok, () => '').kapi, degisenDosyalar: ['x'] })
+      expect(madde(gercek.degerlendir(g), 2).gecti).toBe(false)
+    })
+
+    it('imaj iş adı da tabandan gelir (PR ağacındaki ad değil)', () => {
+      const taban = 'on:\n  pull_request:\n    paths:\n      - Dockerfile\njobs:\n  imaj:\n    name: İmaj derle\n'
+      const kok = sahteRepo({ 'yayin-imaji.yml': taban.replace('İmaj derle', 'Başka ad') })
+      expect(gercek.imajKapisiTuret(kok, () => taban).kapi?.ad).toBe('İmaj derle')
+    })
+
+    it('modül yalnız child_process/fs/path ister (sabotaj kopyası tmp\'den bağımsız yüklenir) ve CLI tabandan + --no-renames okur', () => {
+      const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+      const ust = kaynak.slice(0, kaynak.indexOf('if (require.main === module)'))
+      const istenen = [...ust.matchAll(/require\(\s*['"]([^'"]+)['"]\s*\)/g)].map((m) => m[1])
+      expect(istenen.sort()).toEqual(['child_process', 'fs', 'path'])
+      expect(ust).not.toMatch(/require\([^'"\s)]/) // dinamik/göreli require yok
+      const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
+      expect(cli).toMatch(/imajKapisiTuret\(AGAC, \(\) => git\(\['show', 'origin\/master:\.github\/workflows\/'/)
+      expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/'/)
+      expect(cli).toMatch(/'--json', 'name,bucket,workflow'/)
+    })
+
     it('CLI imaj kapısını türetir ve değerlendirmeye verir (kaynak taraması: kol bağlantısı sessizce düşmesin)', () => {
       const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
       const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
-      expect(cli).toMatch(/imajKapisiTuret\(AGAC\)/)
       expect(cli).toMatch(/imajKapisi: imaj\.kapi, degisenDosyalar/)
     })
   })
@@ -607,15 +688,35 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
   describe('SABOTAJ: gevşetilmiş kopya AYNI kilit fonksiyonundan KIRMIZI verir (totoloji değil)', () => {
     const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
     let n = 0
-    function bozukKopya(eski: string, yeni: string): Mod {
-      expect(kaynak.includes(eski), `sabotaj hedefi kaynakta YOK (kod değişti, sabotajı güncelle): ${eski}`).toBe(true)
+    function bozukKopya(eski: string, yeni: string, ...ekler: Array<[string, string]>): Mod {
+      let bozuk = kaynak
+      for (const [e, y] of [[eski, yeni], ...ekler]) {
+        expect(bozuk.includes(e), `sabotaj hedefi kaynakta YOK (kod değişti, sabotajı güncelle): ${e}`).toBe(true)
+        bozuk = bozuk.replace(e, y)
+      }
       n += 1
       const dizin = path.join(process.env.RUNNER_TEMP || process.env.TMPDIR || process.env.TEMP || '/tmp', `ritual-sabotaj-${Date.now()}-${n}`)
       fs.mkdirSync(dizin, { recursive: true })
       const dosya = path.join(dizin, 'merge-ritueli.cjs')
-      fs.writeFileSync(dosya, kaynak.replace(eski, yeni), 'utf8')
+      fs.writeFileSync(dosya, bozuk, 'utf8')
       return require_(dosya)
     }
+
+    it('workflow === \'\' şartı silinirse (yalnız ad eşleşmesi) kilit KIRMIZI: Actions job\'ı "Vercel" adıyla muaf olurdu', () => {
+      const m = bozukKopya('return Boolean(c) && c.workflow === \'\' && emekliMi(c.name)', 'return Boolean(c) && emekliMi(c.name)')
+      expect(() => kilit(m)).toThrow()
+    })
+
+    it('UNSTABLE + kapı tablosu okunamadı (null) kabul edilirse AYRIŞIR: gerçek KIRMIZI, bozuk kopya YEŞİL', () => {
+      const m = bozukKopya(
+        'pv.mergeStateStatus === \'UNSTABLE\' && kapilar !== null',
+        'pv.mergeStateStatus === \'UNSTABLE\'',
+        ['const sorunlu = kapilar.filter(', 'const sorunlu = (kapilar || [{ name: \'Vercel\', bucket: \'fail\', workflow: \'\' }]).filter('],
+      )
+      const g = girdi({ pv: unstable, kapilar: null })
+      expect(madde(gercek.degerlendir(g), 4).gecti).toBe(false)
+      expect(madde(m.degerlendir(g), 4).gecti, 'null tablo + UNSTABLE kabul edildi: kol sabotajı ayırt etmiyor').toBe(true)
+    })
 
     it('kopya sağlam (hiçbir şey değişmeden) kilidi GEÇER — sabotaj harnessi kendini kanıtlar', () => {
       expect(() => kilit(bozukKopya('const DUSEN_KOVALARI', 'const DUSEN_KOVALARI'))).not.toThrow()
@@ -627,18 +728,18 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
     })
 
     it('UNSTABLE koşulunda "emekli-dışı düşen yok" kısmı silinirse kilit KIRMIZI', () => {
-      const m = bozukKopya('sorunlu.length > 0 && sorunlu.every((c) => emekliMi(c.name))', 'sorunlu.length > 0')
+      const m = bozukKopya('sorunlu.length > 0 && sorunlu.every((c) => emekliKapi(c))', 'sorunlu.length > 0')
       expect(() => kilit(m)).toThrow()
     })
 
     it('madde 3\'te emekli süzgeci tüm düşenleri yutacak biçimde gevşerse kilit KIRMIZI', () => {
-      const m = bozukKopya('const dusen = dusenHepsi.filter((c) => !emekliMi(c.name))', 'const dusen = []')
+      const m = bozukKopya('const dusen = dusenHepsi.filter((c) => !emekliKapi(c))', 'const dusen = []')
       expect(() => kilit(m)).toThrow()
     })
 
     it('imaj kapısı yokluğu gevşetilirse (YOK → geç) imaj kolu gerçek modülden AYRIŞIR', () => {
       const m = bozukKopya('if (imaj.length === 0) {', 'if (false) {')
-      const g = girdi({ pv: unstable, kapilar: tablo({ name: 'Vercel', bucket: 'fail' }), imajKapisi: IMAJ, degisenDosyalar: ['Dockerfile'] })
+      const g = girdi({ pv: unstable, kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }), imajKapisi: IMAJ, degisenDosyalar: ['Dockerfile'] })
       expect(madde(gercek.degerlendir(g), 2).gecti, 'gerçek modül imaj yokluğunu yakalamalı').toBe(false)
       expect(madde(m.degerlendir(g), 2).gecti, 'sabotajlı kopya imaj yokluğunu hâlâ yakaladı: kol sabotajı ayırt etmiyor').toBe(true)
     })

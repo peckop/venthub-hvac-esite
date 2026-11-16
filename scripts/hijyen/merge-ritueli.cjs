@@ -97,6 +97,16 @@ function emekliMi(ad) {
   return EMEKLI_AD_KUMESI.has(ad)
 }
 
+/**
+ * ⭐TEK emeklilik ölçütü (madde 3 süzgeci, `emekliNot`, madde 4 `sorunlu.every` HEPSİ bunu kullanır).
+ * Ad sahteciliği kapatıldı: bir Actions job'ına `name: Vercel` yazan workflow muaf OLMAZ. Gerçek harici Vercel
+ * durumu canlıda `{name:'Vercel',bucket:'fail',event:'',workflow:''}` (16 Kasım ölçümü, #2571); Actions kapılarında
+ * `workflow` dolu. KATI: yalnız `workflow === ''` (undefined/başka değer = muaf DEĞİL, fail-closed) VE tam ad.
+ */
+function emekliKapi(c) {
+  return Boolean(c) && c.workflow === '' && emekliMi(c.name)
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // TÜRETME — saf: girdi bir DİZİN, çıktı kapı adları + adıyla yazılmış sınırlar.
 // Saf olması fikstür kurulabilmesi içindir (§25): kol kendi workflow dizinini yazar.
@@ -254,6 +264,9 @@ function imajKapisiCoz(metin) {
     }
   }
   if (yollar.length === 0) return { hata: 'paths: listesi bos/cozulemedi' }
+  // Desteklenmeyen glob karakteri fail-closed: yanlış eşleşen desen "imaj yolu değişmedi" diyip kapıyı düşürebilir.
+  const desteksiz = yollar.find((p) => /^!|[?[{]/.test(p))
+  if (desteksiz) return { hata: 'desteklenmeyen glob karakteri (? [ { ya da bas ! ) paths icinde: ' + desteksiz }
   const c = workflowCoz(metin)
   const is = c.joblar.find((j) => j.ad) || c.joblar[0]
   if (!is) return { hata: 'jobs: icinde job bulunamadi' }
@@ -262,12 +275,19 @@ function imajKapisiCoz(metin) {
 
 /**
  * Repo kökünden imaj kapısını türetir. Okunamaz/çözülemezse `null` + sınır (çağıran fail-closed KIRMIZI verir).
+ * @param {string} kok repo kökü (`metinOku` verilmezse dosya buradan okunur)
+ * @param {() => string} [metinOku] verilirse yayin-imaji.yml metnini bu işlev döndürür (CLI: tabandan `git show`)
  * @returns {{kapi:{ad:string,yollar:string[]}|null, sinir:string|null}}
  */
-function imajKapisiTuret(kok) {
+function imajKapisiTuret(kok, metinOku) {
   let metin
   try {
-    metin = fs.readFileSync(path.join(kok, '.github', 'workflows', IMAJ_WORKFLOW_DOSYASI), 'utf8')
+    // ⭐CLI `metinOku`yu TABANDAN (git show origin/master:...) verir: yollar PR'ın kendi ağacından okunsaydı PR, kendi
+    // zorunlu kapısını `paths:` listesini daraltarak kaldırabilirdi. Varsayılan (enjeksiyon yok) kök altındaki dosyadır.
+    metin = typeof metinOku === 'function'
+      ? metinOku()
+      : fs.readFileSync(path.join(kok, '.github', 'workflows', IMAJ_WORKFLOW_DOSYASI), 'utf8')
+    if (typeof metin !== 'string' || metin.trim() === '') throw new Error('bos metin')
   } catch (e) {
     return { kapi: null, sinir: IMAJ_WORKFLOW_DOSYASI + ' OKUNAMADI: ' + String(e.message).slice(0, 80) }
   }
@@ -280,7 +300,10 @@ function imajKapisiTuret(kok) {
 function yolDeseniEslesir(desen, yol) {
   const d = String(desen).replace(/\\/g, '/')
   const y = String(yol).replace(/\\/g, '/')
-  const re = '^' + d.replace(/[.+^${}()|[\]\\?]/g, '\\$&').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\u0000/g, '.*') + '$'
+  // `**/` SIFIR dizin de eşler (GitHub gibi): `**/Dockerfile` ≙ `Dockerfile`, `a/**/b` ≙ `a/b`.
+  const re = '^' + d.replace(/[.+^${}()|[\]\\?]/g, '\\$&')
+    .replace(/\*\*\//g, '\u0001').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*')
+    .replace(/\u0001/g, '(?:.*/)?').replace(/\u0000/g, '.*') + '$'
   return new RegExp(re).test(y)
 }
 
@@ -289,7 +312,7 @@ function yolDeseniEslesir(desen, yol) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * @param {{pv:object|null, pvHata?:string, kapilar:Array<{name:string,bucket:string}>|null,
+ * @param {{pv:object|null, pvHata?:string, kapilar:Array<{name:string,bucket:string,workflow?:string}>|null,
  *          cekirdek:string[], uzakSha:string|null, migrationlar:string[]|null,
  *          mergeCommitSha:string|null}} girdi
  *   `mergeCommitSha`: REST'ten okunan `merge_commit_sha`. `null` = OKUNAMADI (fail-closed),
@@ -432,9 +455,9 @@ function degerlendir(girdi) {
     const sayilacak = (kovalar) => kapilar.filter((c) => kovalar.includes(c.bucket))
     const dusenHepsi = sayilacak(DUSEN_KOVALARI)
     const bekleyenHepsi = sayilacak(BEKLEYEN_KOVALARI)
-    const dusen = dusenHepsi.filter((c) => !emekliMi(c.name))
-    const bekleyen = bekleyenHepsi.filter((c) => !emekliMi(c.name))
-    const emekliler = [...dusenHepsi, ...bekleyenHepsi].filter((c) => emekliMi(c.name))
+    const dusen = dusenHepsi.filter((c) => !emekliKapi(c))
+    const bekleyen = bekleyenHepsi.filter((c) => !emekliKapi(c))
+    const emekliler = [...dusenHepsi, ...bekleyenHepsi].filter((c) => emekliKapi(c))
     const not = emekliNot(emekliler)
     if (dusen.length || bekleyen.length) {
       ekle(3, 'DUSEN 0 VE BEKLEYEN 0', false,
@@ -452,7 +475,7 @@ function degerlendir(girdi) {
   let unstableEmekliden = false
   if (pv.mergeable === 'MERGEABLE' && pv.mergeStateStatus === 'UNSTABLE' && kapilar !== null) {
     const sorunlu = kapilar.filter((c) => DUSEN_KOVALARI.includes(c.bucket) || BEKLEYEN_KOVALARI.includes(c.bucket))
-    unstableEmekliden = sorunlu.length > 0 && sorunlu.every((c) => emekliMi(c.name))
+    unstableEmekliden = sorunlu.length > 0 && sorunlu.every((c) => emekliKapi(c))
   }
   if (pv.mergeable !== 'MERGEABLE' || (!['CLEAN', 'BLOCKED'].includes(pv.mergeStateStatus) && !unstableEmekliden)) {
     ekle(4, 'MERGEABLE + hesaplanmis durum', false,
@@ -643,7 +666,7 @@ function ozDogrulama(yerelMetin, masterMetin) {
 module.exports = {
   ozDogrulama,
   turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
-  imajKapisiCoz, imajKapisiTuret, yolDeseniEslesir, emekliMi, EMEKLI_HARICI_KAPILAR,
+  imajKapisiCoz, imajKapisiTuret, yolDeseniEslesir, emekliMi, emekliKapi, EMEKLI_HARICI_KAPILAR,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
 
@@ -722,7 +745,8 @@ if (require.main === module) {
   } catch (e) { pvHata = String(e.message).slice(0, 120) }
 
   let kapilar = null
-  try { kapilar = JSON.parse(gh(['pr', 'checks', pr, '--json', 'name,bucket'])) } catch { kapilar = null }
+  // `workflow` ALANI ŞART (ALT-199): emeklilik `workflow === ''` ister; Actions job'ı aynı adı taşısa muaf olmaz.
+  try { kapilar = JSON.parse(gh(['pr', 'checks', pr, '--json', 'name,bucket,workflow'])) } catch { kapilar = null }
 
   // Birleşme ref'inin VARLIĞI yalnız REST'ten okunur (§20 dersi 3 + 2026-09-04 ölçümü).
   let mergeCommitSha = null
@@ -764,10 +788,12 @@ if (require.main === module) {
   } catch { inceleme = null }
 
   // ALT-199: imaj kapisi yayin-imaji.yml'den TURETILIR; degisen dosyalar tek yerden okunur (okuma sorusu da kullanir).
-  const imaj = imajKapisiTuret(AGAC)
+  // Yollar ve is adi TABANDAN (origin/master) okunur, PR agacindan degil: PR kendi zorunlu kapisini daraltamasin.
+  const imaj = imajKapisiTuret(AGAC, () => git(['show', 'origin/master:.github/workflows/' + IMAJ_WORKFLOW_DOSYASI]))
   let degisenDosyalar = null
   try {
-    degisenDosyalar = git(['diff', '--name-only', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+    // --no-renames: tasinan dosyanin ESKI yolu da listede gorunsun (Dockerfile -> baska ad tasimasi imaj yolunu atlatamaz).
+    degisenDosyalar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
   } catch { degisenDosyalar = null }
 
   yaz('  turetme: ' + okunanDosya + ' workflow okundu, zorunlu cekirdek ' + cekirdek.length +
