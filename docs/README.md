@@ -94,7 +94,7 @@
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
 | Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |
-| Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (TASLAK, karar 59) |
+| Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (v0.2, yürürlükte: site 15 Kasım 2026'dan beri DigitalOcean + Coolify) |
 | **Makine taşıma / yeni bilgisayar / yedek nerede?** Bu makineden başka bir Windows makineye geçiş: yalnız-yerel veri envanteri, paketle-kur-doğrula sırası, yeni makinede kurulum listesi, sırlar (gpg parolalı), günlük Drive yedeği ve geri yükleme komutları | `standards/makine-tasima-standard.md` (ALT-165; betikler `scripts/tasima/`, kapı INV-TASIMA-1 `makine-tasima.test.ts`) |
 | Belgeler **nasıl yazılır** (gövde/tarihçe, sahip), hangi bilgi **hangi katmanda** durur, belge bayatlığı **nasıl görünür**, doğru belge **ne zaman kendiliğinden gelir**? | `standards/belge-yonetimi-standard.md` (TASLAK, REC-400) |
 | e-Fatura/e-Arşiv, muhasebe, CRM/ERP, yönetici paneli, PIM ya da "satış olsa çalışır mı" **daha önce ölçüldü mü**? Ölçümü tekrarlamadan önce nereye bakılır? | `olcum/README.md` → konu başına defter (yeniden ölçme yalnız defterdeki tetikleyici oluşunca; sahip OPS) |
