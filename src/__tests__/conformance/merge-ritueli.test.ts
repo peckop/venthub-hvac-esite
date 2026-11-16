@@ -24,7 +24,7 @@ const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')
   degerlendir: (girdi: {
     pv: Record<string, unknown> | null
     pvHata?: string
-    kapilar: Array<{ name: string; bucket: string }> | null
+    kapilar: Array<{ name: string; bucket: string; workflow?: string }> | null
     cekirdek: string[]
     uzakSha: string | null
     migrationlar: string[] | null
@@ -438,7 +438,7 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
   type Mod = { degerlendir: Dj; emekliMi: (a: string) => boolean }
   type Tam = Mod & {
     EMEKLI_HARICI_KAPILAR: ReadonlyArray<{ ad: string; tarih: string; gerekce: string }>
-    imajKapisiTuret: (kok: string) => { kapi: { ad: string; yollar: string[] } | null; sinir: string | null }
+    imajKapisiTuret: (kok: string, metinOku?: () => string) => { kapi: { ad: string; yollar: string[] } | null; sinir: string | null }
     imajKapisiCoz: (m: string) => { ad?: string; yollar?: string[]; hata?: string }
     yolDeseniEslesir: (d: string, y: string) => boolean
     emekliKapi: (c: unknown) => boolean
