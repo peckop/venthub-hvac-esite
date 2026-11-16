@@ -30,7 +30,12 @@ rahatsız etti; OPS kaydı 16 Kasım 21:2x'te kaldırdı. Betik `%LOCALAPPDATA%\
 - İş bitince Docker **kapatılır**.
 - **Otomatik başlatma hiçbir yoldan yeniden kurulmaz:** HKCU Run kaydı, zamanlanmış görev ya da Docker Desktop'ın
   AutoStart ayarı. Aşağıdaki "Kurulum" bölümü tarihsel kayıttır, **uygulanmaz**.
-- İstisna (kendi başına otomatik başlatma değil): gece yedek görevi (`drive-yedek.cmd`) Docker kapalıysa onu o anda
+- **Gece yedek görevi (`drive-yedek.cmd`, 21:00) Docker Desktop'ı HİÇBİR koşulda başlatmaz** (ALT-204, OPS 16 Kasım).
+  Motor kapalıysa UnoPIM adımı atlanır, günlüğe "Docker kapali, UnoPIM yedegi atlandi; son yedek <tarih>" yazılır ve
+  `yedek-uyari.txt` KIRMIZI olmaz; yerel son `.vhenc` yine Drive'a kopyalanır. UnoPIM'in asıl yedeği UnoPIM her açıldığında,
+  kapatılmadan ÖNCE elle alınır (ALT-196). Motor zaten açıksa `unopim-yedek.cjs`, gerekirse yalnız veritabanı kabını açıp kapatır.
+  (Önceki sürüm Docker'ı o anda başlatıyordu; 16 Kasım 21:01'deki "kendiliğinden açılma" buydu, günlük satırı: "docker kapali: Docker Desktop baslatiliyor".)
+- ESKİ (kaldırıldı) istisna notu: gece yedek görevi Docker kapalıysa onu o anda
   başlatır; bu, oturum açılışıyla ilgisiz, yalnız yedek anında olur.
 
 ## Kurulum (TARİHSEL, UYGULANMAZ; yönetici yetkisi gerekmezdi, hepsi HKCU ve kullanıcı dizini)
