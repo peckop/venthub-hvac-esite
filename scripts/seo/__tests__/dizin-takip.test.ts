@@ -2,7 +2,8 @@
  * INV-DIZIN-TAKIP-1 · Dizin takip betiğinin ağsız çekirdeği (Kanban SEO dizin-takip kartı; cetvel
  * docs/standards/dizin-sistemleri-standard.md D7).
  *
- * Kilitlenenler: lastmod sonrası tarama TAMAM; lastmod sonrası istek eşik dolana kadar BEKLE, dolunca TEKRAR; hiç istek yoksa
+ * Kilitlenenler: lastmod sonrası tarama TAMAM; lastmod sonrası istek eşik dolana kadar BEKLE, dolunca TEKRAR (Bing, Yandex;
+ * Google'da TEKRAR yok, tek istek: SEO-112); lastmod'a yansımayan değişim --degisen listesiyle YAP üretir (SEO-115); hiç istek yoksa
  * YAP; noindex ATLA (kota boşa gitmez); ölçülemeyen durum YAP DEĞİL OLCULEMEDI; Bing "0001-01-01" yokluk değeri tarama
  * sayılmaz; IndexNow ve Yandex'in kendi kuralları; defterde bozuk satır sessizce yutulmaz (sayılır); içe aktarım iki kez
  * koşulursa çiftlemez; site haritası ve kapsam seçimi. Veri sahtedir (P6: gerçek arama verisi yok).
@@ -13,7 +14,7 @@ import { resolve, join } from 'node:path'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
-  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, defterAyristir, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
+  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
   satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
@@ -41,16 +42,19 @@ describe('karar: Google ve Bing', () => {
     const k = karar({ motor: 'google', lastmod: gun(5), sonTarama: gun(1), sonHareket: ms(gun(7)), simdi: NOW })
     expect(k.durum).toBe('BEKLE')
   })
-  it('istek lastmod sonrası, Google eşiği (7 gün) doldu → TEKRAR', () => {
-    const k = karar({ motor: 'google', lastmod: gun(1), sonTarama: null, sonHareket: ms(gun(2)), simdi: NOW + 0 })
-    expect(TEKRAR_ESIGI_GUN.google).toBe(7)
-    expect(k.durum).toBe('TEKRAR')
-  })
-  it('SEO-108: Google adresi hiç taramamış, istek 3 gün önce → TEKRAR; 2 gün önce → BEKLE; taranmış-eski adreste eşik 7 kalır', () => {
+  it('SEO-112: Google\'da TEKRAR yok, adres başına tek istek: istek ne kadar eski olursa olsun BEKLE (taranmış ya da hiç taranmamış)', () => {
+    expect(TEK_ISTEK_MOTORLARI.has('google')).toBe(true)
+    expect((TEKRAR_ESIGI_GUN as Record<string, number>).google).toBeUndefined()
     const lm = '2026-11-01T10:00:00Z'
-    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-11T22:00:00Z') }).durum).toBe('TEKRAR')
-    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-10T21:00:00Z') }).durum).toBe('BEKLE')
-    expect(karar({ motor: 'google', lastmod: lm, sonTarama: '2026-10-20T00:00:00Z', sonHareket: ms('2026-11-08T21:41:00Z'), simdi: ms('2026-11-11T22:00:00Z') }).durum).toBe('BEKLE')
+    const istek = ms('2026-11-02T08:00:00Z')
+    for (const simdi of [ms('2026-11-04T08:00:00Z'), ms('2026-11-10T08:00:00Z'), ms('2026-12-20T08:00:00Z')]) {
+      expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: istek, simdi }).durum).toBe('BEKLE')
+      expect(karar({ motor: 'google', lastmod: lm, sonTarama: '2026-10-20T00:00:00Z', sonHareket: istek, simdi }).durum).toBe('BEKLE')
+    }
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: null, sonHareket: istek, simdi: ms('2026-12-20T08:00:00Z') }).neden).toContain('tek istek')
+  })
+  it('SEO-112: Google\'da içerik istekten SONRA değişirse yeni istek hakkı doğar (tek istek değişim başınadır)', () => {
+    expect(karar({ motor: 'google', lastmod: gun(8), sonTarama: gun(1), sonHareket: ms(gun(5)), simdi: NOW }).durum).toBe('YAP')
   })
   it('Bing eşiği 5 gün: 6 gün önceki gönderim TEKRAR, 4 gün önceki BEKLE', () => {
     expect(karar({ motor: 'bing', lastmod: gun(1), sonTarama: null, sonHareket: ms(gun(4)), simdi: NOW }).durum).toBe('TEKRAR')
@@ -196,6 +200,58 @@ describe('harita ve kapsam', () => {
   it('--adres ile elle verilen adres kapsama girer', () => {
     const k = kapsamSec({ harita: haritaCoz(xml), hareketler: [], gun: 1, simdi: NOW, ek: [`${S}/tr/eski`] })
     expect(k.some((x) => x.adres === `${S}/tr/eski`)).toBe(true)
+  })
+})
+
+describe('SEO-115: lastmod\'a yansımayan değişim (--degisen listesi)', () => {
+  const DEGISIM = '2026-11-08T16:08:00Z'
+  it('lastmod eski, tarama lastmod sonrası AMA değişimden önce, istek yok → YAP (liste olmadan TAMAM)', () => {
+    const ortak = { motor: 'google', lastmod: gun(1), sonTarama: gun(5), sonHareket: null, simdi: NOW }
+    expect(karar(ortak).durum).toBe('TAMAM')
+    const k = karar({ ...ortak, degisen: DEGISIM })
+    expect(k.durum).toBe('YAP')
+    expect(k.neden).toContain('değişim (kod yayını)')
+  })
+  it('istek değişimden ÖNCE ise sayılmaz → YAP; değişimden SONRA ise BEKLE; tarama değişimden sonraysa TAMAM', () => {
+    const ortak = { motor: 'google', lastmod: gun(1), degisen: DEGISIM, simdi: NOW }
+    expect(karar({ ...ortak, sonTarama: gun(5), sonHareket: ms(gun(7)) }).durum).toBe('YAP')
+    expect(karar({ ...ortak, sonTarama: gun(5), sonHareket: ms(gun(9)) }).durum).toBe('BEKLE')
+    expect(karar({ ...ortak, sonTarama: gun(9), sonHareket: null }).durum).toBe('TAMAM')
+  })
+  it('değişim lastmod\'dan ESKİYSE lastmod esas kalır (liste kararı geriye çekmez)', () => {
+    expect(karar({ motor: 'google', lastmod: gun(9), degisen: DEGISIM, sonTarama: gun(8), sonHareket: null, simdi: NOW }).durum).toBe('YAP')
+    expect(karar({ motor: 'google', lastmod: gun(3), degisen: '2026-11-02T00:00:00Z', sonTarama: gun(4), simdi: NOW }).durum).toBe('TAMAM')
+  })
+  it('IndexNow: bildirim değişimden önceyse YAP, sonraysa TAMAM; noindex yine ATLA', () => {
+    expect(karar({ motor: 'indexnow', lastmod: gun(6), degisen: DEGISIM, sonHareket: ms(gun(7)), simdi: NOW }).durum).toBe('YAP')
+    expect(karar({ motor: 'indexnow', lastmod: gun(6), degisen: DEGISIM, sonHareket: ms(gun(9)), simdi: NOW }).durum).toBe('TAMAM')
+    expect(karar({ motor: 'google', lastmod: gun(1), degisen: DEGISIM, noindex: true, simdi: NOW }).durum).toBe('ATLA')
+  })
+  it('degisenCoz: ayırıcılar, göreli yol, yorum; aynı adreste en yeni tarih; bozuk satır SAYILIR', () => {
+    const { kayitlar, atlanan } = degisenCoz([
+      '# URN-164 konum yolu', '',
+      `${A} 2026-11-08T16:08:00Z`,
+      `/tr/category/ornek;2026-11-07T10:00:00Z`,
+      `${A},2026-11-09T09:00:00Z`,
+      `${A}\t2026-11-06T09:00:00Z`,
+      'https://baska-site.example/x 2026-11-08T16:08:00Z',
+      `${B} tarih-degil`,
+      'tek-sutun',
+    ].join('\r\n'))
+    expect(kayitlar.size).toBe(2)
+    expect(kayitlar.get(A)).toBe(ms('2026-11-09T09:00:00Z'))
+    expect(kayitlar.get(B)).toBe(ms('2026-11-07T10:00:00Z'))
+    expect(atlanan).toBe(3)
+    expect(degisenCoz('').kayitlar.size).toBe(0)
+  })
+  it('tabloUret: listedeki adres YAP olur ve satırda değişim tarihi taşınır; listede olmayan adres etkilenmez', () => {
+    const kapsam = [{ adres: A, lastmod: gun(1) }, { adres: B, lastmod: gun(1) }]
+    const olcum = { google: { [A]: { sonTarama: gun(5) }, [B]: { sonTarama: gun(5) } }, bing: {} }
+    const t = tabloUret({ kapsam, hareketler: [], olcum, simdi: NOW, degisen: new Map([[A, ms(DEGISIM)]]) })
+    expect(t[0].google.durum).toBe('YAP')
+    expect(t[0].degisen).toBe('2026-11-08T16:08:00.000Z')
+    expect(t[1].google.durum).toBe('TAMAM')
+    expect('degisen' in t[1]).toBe(false)
   })
 })
 

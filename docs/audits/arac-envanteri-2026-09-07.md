@@ -748,6 +748,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/hijyen/__tests__/canli-db-yedek.test.ts` | @vitest-environment node | ALTYAPI | scripts/ci/test-haritasi.json (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | AKTIF |
 | `scripts/hijyen/canli-db-yedek.cjs` | ALT-188 — CANLI VERİTABANI GECE TAM YEDEĞİ (Supabase Free: platform yedeği ve PITR YOK). | ALTYAPI | scripts/ci/test-haritasi.json, scripts/hijyen/__tests__/canli-db-yedek.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/hijyen/__tests__/canli-db-yedek.test.ts | AKTIF |
 | `scripts/hijyen/canli-db-yedek-kimlik.cjs` | ALT-188 — geçici salt-okunur giriş rolü (Supabase Yönetim API'si, `supabase db dump`un kullandığı yol). | ALTYAPI | scripts/hijyen/canli-db-yedek.cjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/hijyen/canli-db-yedek.cjs | AKTIF |
+| `scripts/seo/__tests__/degisen-adres-eski.test.ts` | INV-DEGISEN-ADRES-2 · --eski-adres: adresi değişmiş sayfanın ESKİ adresi IndexNow'a gider (SEO-112, OPS-313 onayı 2026-11-16). | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y2.1, `dizin-sistemleri-standard.md` D7 madde 15 / K4 eski adres istisnası | 2026-11-16: 12 test yeşil | — | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
