@@ -23,7 +23,17 @@ Docker'ın kendi açılış kaydı (`HKCU\...\Run` altında `Docker Desktop`) ka
 önce açılır, betik "zaten çalışıyor" deyip çekilir ve çökme sürer. Ayarlardaki `AutoStart` zaten `false`
 (2026-11-03 ölçüldü), yani Run kaydı ayardan bağımsız duruyordu.
 
-## Kurulum (yönetici yetkisi gerekmez; hepsi HKCU ve kullanıcı dizini)
+## ⛔ OTOMATİK BAŞLATMA YOK (OPS, 16 Kasım 2026; ALT-130 yan etkisi, Recep rahatsızlığı)
+`VentHub Docker acilis` Run kaydı Docker Desktop'ı her oturum açılışında kendiliğinden başlatıyordu ve Recep'i
+rahatsız etti; OPS kaydı 16 Kasım 21:2x'te kaldırdı. Betik `%LOCALAPPDATA%\VentHub\docker-acilis.ps1` yerinde durur.
+- Docker'a ihtiyaç olunca (ör. UnoPIM açarken) betik **elle** koşturulur: kalıntıyı temizler, sonra Docker'ı başlatır.
+- İş bitince Docker **kapatılır**.
+- **Otomatik başlatma hiçbir yoldan yeniden kurulmaz:** HKCU Run kaydı, zamanlanmış görev ya da Docker Desktop'ın
+  AutoStart ayarı. Aşağıdaki "Kurulum" bölümü tarihsel kayıttır, **uygulanmaz**.
+- İstisna (kendi başına otomatik başlatma değil): gece yedek görevi (`drive-yedek.cmd`) Docker kapalıysa onu o anda
+  başlatır; bu, oturum açılışıyla ilgisiz, yalnız yedek anında olur.
+
+## Kurulum (TARİHSEL, UYGULANMAZ; yönetici yetkisi gerekmezdi, hepsi HKCU ve kullanıcı dizini)
 ```powershell
 $h = Join-Path $env:LOCALAPPDATA 'VentHub'; New-Item -ItemType Directory -Force $h | Out-Null
 Copy-Item .\scripts\ci\docker-acilis.ps1 $h -Force   # depo kökünden koşulur
