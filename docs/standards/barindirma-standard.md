@@ -1,8 +1,9 @@
-# Barındırma Cetveli — v0.1 TASLAK
+# Barındırma Cetveli — v0.2
 
 > **Kapsam:** VentHub'ın her katmanı (site, veritabanı, DNS, e-posta, önbellek) **nerede** durur,
 > **niçin** orada durur, sağlayıcı değişirse **ne sökülür**.
-> **Durum:** TASLAK. Site barındırma sağlayıcısı **karar 59**'u bekliyor (Recep). Sağlayıcıdan
+> **Sahibi:** ALTYAPI · **Son doğrulama:** 2026-11-16 (ALTYAPI; taşıma planı `docs/plans/tasima-do-coolify-2026-11-15.md` ve canlı taşıma ölçümüne karşı).
+> **Durum:** YÜRÜRLÜKTE, site taşındı. Site 15 Kasım 2026'dan beri **DigitalOcean 2 GB droplet (Frankfurt) + Coolify** üzerinde (OPS-280, Recep kararı; plan ve ölçülen dersler `docs/plans/tasima-do-coolify-2026-11-15.md`); sağlayıcı seçimi (eski karar 59 sorusu) bununla kapandı. Sağlayıcıdan
 > bağımsız kurallar (§B2–§B5) bugünden geçerlidir.
 > **Ölçüm kaynağı:** REC-367 (2026-09-22) — üç aday yerelde derlendi ve ölçüldü; tablo Linear
 > REC-367 açıklamasının sonunda. **Doğuş sebebi:** Vercel ücretsiz takımı "dağıtım depolaması 10 GB
@@ -16,7 +17,7 @@
 | Katman | Bugün | Kanıt | Karar |
 |---|---|---|---|
 | Alan adı DNS'i | **Cloudflare** (brodie/ines.ns.cloudflare.com) | `nslookup -type=NS venthub.com.tr 1.1.1.1` | Kalır — taşıma sebebi yok |
-| Site (Next.js) | Vercel Hobby, proje `venthub-hvac-esite` | apex A 64.29.17.65 / 216.198.79.65, www CNAME cname.vercel-dns.com | **karar 59: _________** |
+| Site (Next.js) | **DigitalOcean 2 GB droplet (Frankfurt) + Coolify**; imaj GHCR `ghcr.io/peckop/venthub-hvac-esite`, derleme `yayin-imaji.yml` (GitHub Actions); 15 Kasım 2026'dan beri canlı | `docs/plans/tasima-do-coolify-2026-11-15.md`; DNS Cloudflare gri bulut (yalnız DNS) | **Karar: OPS-280 (Recep, 15 Kasım 2026).** Vercel projesi (`venthub-hvac-esite`) silinmedi ama Hobby kotası doldu, hesap 16 Kasım 00:37 TSİ'den beri duruyor: geri dönüş yolu kota yenilenene kadar kapalı (eski adresler apex A 64.29.17.65 / 216.198.79.65). GitHub'daki Vercel uygulaması 16 Kasım gecesi Recep onayıyla kaldırılıyor (OPS). **22 Kasım 2026: ALTYAPI Vercel geri dönüş kapanış önerisini OPS'a yazar.** |
 | Veritabanı / Auth / Storage / Edge Functions | Supabase `free`, eu-central-1 | 2026-09-16 ölçümü | Kalır; platform yedeği **yok** (Free), ama **gece tam yedek var** (ALT-188, 15 Kasım 2026): `scripts/hijyen/canli-db-yedek.cjs al`, `drive-yedek.cmd` içinde, AES-256-GCM şifreli `.vhenc`, Drive'da `yedek/canli-db`, 14 gün; geri yükleme kanıtlı (`docs/plans/rec409-canli-yedek-plani-2026-10-01.md` §8). Anahtar tek kopya, makine dışı kopya Recep kararı |
 | Gelen e-posta | Cloudflare Email Routing (MX route1-3.mx.cloudflare.net) | `nslookup -type=MX` | Kalır |
 | Giden e-posta | Resend — **alan adı doğrulanmamış** | `resend._domainkey` yok, `_dmarc` yok | REC-368 |
@@ -39,9 +40,9 @@ ile tazelendiğini varsayar (tek tüketici `src/app/api/webhook/supabase/route.t
 
 | Sağlayıcı tipi | Gerekli bileşen | REC-367 ölçümü |
 |---|---|---|
-| Vercel | yerleşik | çalışıyor (bugün) |
+| Vercel | yerleşik | çalışıyordu; bugün hesap durmuş (geri dönüş yolu kapalı, bkz. §B1) |
 | Cloudflare Workers + OpenNext | artımlı önbellek (R2) + etiket önbelleği (Durable Object) + kuyruk | webhook → etag değişti, MISS→HIT ✓ |
-| Tek Node sunucusu (`output: 'standalone'`) | dosya sistemi önbelleği (`.next/cache`) | webhook → MISS→HIT ✓; **çok örnekte paylaşılan `cacheHandler` (Redis) zorunlu** |
+| Tek Node sunucusu (`output: 'standalone'`) | dosya sistemi önbelleği (`.next/cache`) | webhook → MISS→HIT ✓; **çok örnekte paylaşılan `cacheHandler` (Redis) zorunlu**. **Bugünkü yol: Coolify, tek örnek.** |
 
 Konteyner diski kalıcı değilse yeniden başlatmada önbellek derleme çıktısına döner; bu hata
 değildir ama ilk isteklerin yavaş olacağı bilinir.
@@ -59,7 +60,7 @@ değildir ama ilk isteklerin yavaş olacağı bilinir.
 | Eski SPA kuralı | `public/_redirects` (`/* /index.html 200`) | Sil — Wrangler "sonsuz döngü" diye yok sayıyor |
 | Bayat Dockerfile | `deploy/Dockerfile` (Node 18, nginx, `/app/dist`) | Vite dönemi kalıntısı; Next'i çalıştırmaz. Doğru örnek REC-367 `Dockerfile.rec367` |
 
-## B5 — Taşıma sırası (karar 59 hangi sağlayıcıyı seçerse seçsin)
+## B5 — Taşıma sırası (uygulandı: 15 Kasım 2026, DigitalOcean + Coolify)
 
 1. §B2 ve §B4'teki sağlayıcıdan bağımsız düzeltmeler **Vercel'deyken** yapılır ve canlıda ölçülür.
 2. Seçilen sağlayıcıya **ayrı deneme adresinde** dağıtım; REC-367'de ölçülemeyenler burada ölçülür:
@@ -78,9 +79,9 @@ değildir ama ilk isteklerin yavaş olacağı bilinir.
   Risk: üçüncü taraf adaptör — Next sürüm yükseltmesi önce OpenNext desteğini bekler.
 - **DigitalOcean App Platform:** $10–12/ay (1 GiB); düz Node, adaptör yok; FRA bölgesi.
 - **Hetzner + Coolify:** €5,49/ay (CX23); sunucu bakımı (yama, yedek, izleme) Recep'e düşer.
-- **Vercel Pro:** karar 60 ile masadan kalktı.
+- **Vercel Pro:** karar 60 ile masadan kalktı. **Seçilen (15 Kasım 2026, OPS-280):** DigitalOcean 2 GB droplet + Coolify; derleme GitHub Actions'ta (sunucu 2 GB, `next build` 8 GB ister).
 
 ## Bekçiler
 
-Bugün yok. Karar 59'dan sonra: §B2 için "üretim derlemesinde `NEXT_PUBLIC_SITE_URL` https ile
+Bugün yok. Sağlayıcı kararından (OPS-280) sonra: §B2 için "üretim derlemesinde `NEXT_PUBLIC_SITE_URL` https ile
 başlar" conformance kolu; §B4 tamamlanınca "kaynakta `VERCEL_` ortam değişkeni okunmaz" kolu.
