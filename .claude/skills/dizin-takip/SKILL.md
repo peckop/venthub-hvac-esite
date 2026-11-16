@@ -12,7 +12,7 @@ metadata:
 > Bu skill **akışı sıralar, kuralı yeniden yazmaz.** Karar tablosu ve eşikler `docs/standards/dizin-sistemleri-standard.md` D7'de,
 > yayın sonrası zincir `docs/standards/rehber-yazisi-standard.md` R10'dadır (B11-B12 basamakları). Ayrıntı için oraya bak.
 
-Neden var: dizin isteği kotalıdır (Google günde yaklaşık 10, Yandex 10, Bing 100). Aynı adrese ikinci kez istek atmak kotayı yakar ve hiçbir şey kazandırmaz. Bu yüzden her istek bir defterde izlenir ve yalnız karar tablosu "YAP" ya da "TEKRAR" derse atılır.
+Neden var: dizin isteği kotalıdır (Google günde yaklaşık 10, Yandex 10, Bing 100). Aynı adrese ikinci kez istek atmak kotayı yakar ve hiçbir şey kazandırmaz. Bu yüzden her istek bir defterde izlenir ve yalnız karar tablosu "YAP" ya da "TEKRAR" derse atılır. Google'da TEKRAR yoktur: adres başına tek istek (D7 madde 15; Google belgesi yinelenen isteğin taramayı hızlandırmadığını yazar).
 
 ## Öncelik (Recep, 8 Kasım)
 
@@ -22,7 +22,7 @@ Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerind
 
 1. **Durum.** `GSC_SA_ANAHTAR` ortam değişkeni servis hesabı anahtar dosyasını gösterir (yolu ve içeriği depoya yazma). Sonra:
    `node scripts/seo/dizin-takip.mjs --durum --cikti <depo dışı yol>`
-   Her adres × motor için bir durum döner: **TAMAM / BEKLE / TEKRAR / YAP / ATLA / ESKI / OLCULEMEDI**. İstek yalnız **YAP** ve **TEKRAR** satırlarına atılır; diğerlerine atılmaz. OLCULEMEDI "taranmadı" demek değildir, ölçemedim demektir.
+   Her adres × motor için bir durum döner: **TAMAM / BEKLE / TEKRAR / YAP / ATLA / ESKI / OLCULEMEDI**. İstek yalnız **YAP** ve **TEKRAR** satırlarına atılır; diğerlerine atılmaz. Kod yayını sayfayı değiştirip `lastmod`'u değiştirmediyse adresler önce depo dışı `dizin-takip/degisen-adresler.txt` dosyasına `<adres> <ISO tarih>` olarak yazılır, tablo onları YAP yapar (D7 madde 14). OLCULEMEDI "taranmadı" demek değildir, ölçemedim demektir.
 2. **Motor adımı** (yalnız YAP/TEKRAR olanlar):
    - **Google:** Chrome (claude-in-chrome) ile Search Console. Üstteki "URL'yi denetle" kutusuna TAM `https://` adresi yaz, Enter; sonuç gelince "Dizine eklenmesini iste". 1-3 dakika bekle. Başarı mesajı "Dizine eklenmesi istendi"; "Kota Aşıldı" görünürse dur, yarına bırak.
    - Açılış satırı: `node scripts/seo/dizin-acilis.mjs --sadece-satir` son anlık görüntüden YAP/TEKRAR sayılarını verir; bugün ölçüm yoksa `--durum` arka planda başlar. İstek yine tablodan okunarak atılır.

@@ -8,10 +8,12 @@
  * istek sırası kimse görmediği için kaçtı. Burada TEK hareket defteri ve her adres×motor için tek karar vardır.
  * KURAL: istek atmadan önce bu betiğin kararına bakılır; karar YAP ya da TEKRAR değilse o adrese istek atılmaz.
  *
- * Karar (adres × motor): lastmod = sitemap lastmod (değişiklik tarihi).
+ * Karar (adres × motor): değişim = sitemap lastmod ile --degisen listesindeki tarihten yeni olanı (SEO-115: kod yayınıyla değişen
+ * sayfada lastmod değişmeyebilir; URN-164'te 101 adresin konum yolu değişti, lastmod aynı kaldı, tablo hepsini TAMAM saydı).
  *   TAMAM  son tarama ≥ lastmod (lastmod yoksa: taranmış).
- *   BEKLE  son tarama lastmod'dan eski/yok AMA lastmod'dan sonra istek/gönderim var, eşik dolmadı (Google 7, Bing 5, Yandex 7 gün).
- *   TEKRAR aynı durum, eşik doldu: istek işe yaramadı, yeniden istek hakkı doğar (Google'da adres hiç taranmamışsa eşik 3 gün, SEO-108).
+ *   BEKLE  son tarama lastmod'dan eski/yok AMA lastmod'dan sonra istek/gönderim var, eşik dolmadı (Bing 5, Yandex 7 gün); Google'da istek varsa hep BEKLE.
+ *   TEKRAR aynı durum, eşik doldu: yeniden istek hakkı doğar. YALNIZ Bing ve Yandex. Google'da TEKRAR YOKTUR (SEO-112, 16 Kasım 2026):
+ *          Google belgesi aynı adrese yinelenen isteğin taramayı hızlandırmadığını yazar; adres başına tek istek, karar BEKLE kalır.
  *   YAP    taranmamış/eski ve lastmod'dan sonra hiç istek yok.
  *   ATLA   sayfa noindex (istek kotayı boşa harcar).
  *   IndexNow: tarama bilgisi yoktur; bildirim lastmod'dan sonraysa TAMAM, değilse YAP.
@@ -19,6 +21,7 @@
  *
  * Kullanım:
  *   node scripts/seo/dizin-takip.mjs --durum [--gun N: yalnız son N günün adresleri; verilmezse TÜM site haritası] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
+ *        [--degisen <dosya>: satır başına "<adres> <ISO tarih>"; verilmezse defter klasöründeki degisen-adresler.txt varsa o okunur]
  *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme> <adres,adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
@@ -40,10 +43,15 @@ export const EYLEMLER = ['istek', 'gonderim', 'olcum', 'gorunme']
 export const GORUNME_SONUCLARI = ['gorundu', 'gorunmuyor', 'olculemedi']
 export const VARSAYILAN_KLASOR = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo').replace(/\\/g, '/')
 export const VARSAYILAN_DEFTER = `${VARSAYILAN_KLASOR}/dizin-takip/hareketler.jsonl`
-/** Aynı adrese yeniden istek hakkının doğduğu gün sayısı. Google günlük kotası ~10-11 olduğu için en uzunu. */
-export const TEKRAR_ESIGI_GUN = { google: 7, bing: 5, yandex: 7 }
-/** Google adresi hiç taramamışken (URL Inspection: bilinmiyor) yeniden istek hakkının doğduğu gün (SEO-108: 8 Kasım isteği 3 gün sonra hâlâ bilinmiyordu). */
-export const TEKRAR_ESIGI_HIC_TARANMAMIS_GUN = { google: 3 }
+/** Aynı adrese yeniden istek hakkının doğduğu gün sayısı (yalnız TEKRAR kararı olan motorlar). */
+export const TEKRAR_ESIGI_GUN = { bing: 5, yandex: 7 }
+/**
+ * Adres başına TEK istek atılan motorlar: değişimden sonra istek varsa karar eşikten bağımsız BEKLE kalır, TEKRAR üretilmez.
+ * Kaynak (okundu 2026-11-16): developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl (yinelenen istek taramayı hızlandırmaz).
+ */
+export const TEK_ISTEK_MOTORLARI = new Set(['google'])
+/** --degisen verilmediğinde defter klasöründe aranan dosya adı. */
+export const DEGISEN_DOSYA_ADI = 'degisen-adresler.txt'
 /** Tarama bilgisi API'den gelmeyen motorlarda adres bazlı kayıt başlangıcı: bundan eski lastmod'un geçmişi bilinmez → ESKI (istek atılmaz). */
 export const KAYIT_BASLANGICI = { indexnow: '2026-11-05T00:00:00Z', yandex: '2026-11-01T00:00:00Z' }
 const GUN_MS = 24 * 3600 * 1000
@@ -140,38 +148,65 @@ export function yandexSonTarama(hareketler, adres) {
 
 /**
  * Tek karar. Saf işlev: ağ ve dosya yok.
- * @param {{ motor: string, lastmod?: string|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string }} p
+ * degisen: lastmod'a yansımayan içerik değişiminin anı (SEO-115); lastmod'dan yeniyse karar onu esas alır.
+ * @param {{ motor: string, lastmod?: string|null, degisen?: string|number|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string }} p
  * @returns {{ durum: 'TAMAM'|'BEKLE'|'TEKRAR'|'YAP'|'ATLA'|'ESKI'|'OLCULEMEDI', neden: string }}
  */
-export function karar({ motor, lastmod = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '' }) {
+export function karar({ motor, lastmod = null, degisen = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '' }) {
   if (olculemedi) return { durum: 'OLCULEMEDI', neden: `durum okunamadı${hataMetni ? `: ${hataMetni}` : ''}; istek atmadan önce yeniden ölç` }
   if (noindex) return { durum: 'ATLA', neden: 'sayfa noindex; istek kotayı boşa harcar' }
-  const degisim = tarihAl(lastmod)
+  const lm = tarihAl(lastmod)
+  const dg = typeof degisen === 'number' ? degisen : tarihAl(degisen)
+  // SEO-115: listedeki değişim lastmod'dan yeniyse o esas alınır; saatlidir, gün başı düzeltmesi uygulanmaz.
+  const degisenEsas = dg !== null && (lm === null || dg > lm)
+  const degisim = degisenEsas ? dg : lm
+  const ad = degisenEsas ? 'değişim (kod yayını)' : 'lastmod'
   // Yalnız-tarih lastmod gün başına (00:00Z) düşer; o günün TR saatiyle ilk 3 saati önceki günün 21:00Z-24:00Z'sine denk gelir.
   // Bu aralıkta atılmış istek lastmod gününün değişikliğinden önce sayılmaz (SEO-98: 7 Kasım 22:49Z isteği 8 Kasım lastmod'una YAP dedirtiyordu).
-  const hareketDegisim = degisim !== null && yalnizTarihMi(lastmod) ? degisim - TR_SAAT_FARKI_MS : degisim
+  const hareketDegisim = degisim !== null && !degisenEsas && yalnizTarihMi(lastmod) ? degisim - TR_SAAT_FARKI_MS : degisim
   const tarama = typeof sonTarama === 'number' ? sonTarama : tarihAl(sonTarama)
   const baslangic = tarihAl(KAYIT_BASLANGICI[motor])
   const kayitOncesi = baslangic !== null && degisim !== null && degisim < baslangic
   if (motor === 'indexnow') {
     if (degisim === null) return { durum: 'TAMAM', neden: 'lastmod yok; günlük görev bildirir' }
-    if (hareket !== null && hareket >= hareketDegisim) return { durum: 'TAMAM', neden: 'bildirim lastmod sonrası' }
+    if (hareket !== null && hareket >= hareketDegisim) return { durum: 'TAMAM', neden: `bildirim ${ad} sonrası` }
     if (kayitOncesi) return { durum: 'ESKI', neden: 'lastmod adres bazlı kayıt başlangıcından önce; günlük görev kapsar' }
-    return { durum: 'YAP', neden: 'lastmod sonrası IndexNow bildirimi yok' }
+    return { durum: 'YAP', neden: `${ad} sonrası IndexNow bildirimi yok` }
   }
   // SEO-100: Google'da taranmış ama dizinde değilse (verdict) tarama tarihi TAMAM saymaz.
-  if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: 'son tarama lastmod sonrası' }
+  if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: `son tarama ${ad} sonrası` }
   if (hareket !== null && (degisim === null || hareket >= hareketDegisim)) {
     const gun = (simdi - hareket) / GUN_MS
-    // SEO-108: Google adresi HİÇ taramamışsa (URL bilinmiyor) 3 gün sonra istek tutmamış sayılır; taranmış-eski adreste 7 gün kalır.
-    const esik = tarama === null && motor === 'google' ? TEKRAR_ESIGI_HIC_TARANMAMIS_GUN.google : (TEKRAR_ESIGI_GUN[motor] ?? 7)
+    // SEO-112: Google'da adres başına tek istek; yinelenen istek hızlandırmaz, kota harcar. Karar BEKLE kalır (3 gün sonra yeniden ÖLÇÜM sürer, D7 madde 13).
+    if (TEK_ISTEK_MOTORLARI.has(motor)) return { durum: 'BEKLE', neden: `istek ${Math.floor(gun)} gün önce, tarama bekleniyor (tek istek: yinelenen istek hızlandırmaz)` }
+    const esik = TEKRAR_ESIGI_GUN[motor] ?? 7
     return gun >= esik
       ? { durum: 'TEKRAR', neden: `istek ${Math.floor(gun)} gün önce, tarama yok (eşik ${esik})` }
       : { durum: 'BEKLE', neden: `istek ${Math.floor(gun)} gün önce, tarama bekleniyor (eşik ${esik})` }
   }
   if (motor === 'yandex' && kayitOncesi) return { durum: 'ESKI', neden: 'lastmod Yandex kaydı başlamadan önce; geçmiş bilinmiyor, istek atılmaz' }
-  if (dizinde === false) return { durum: 'YAP', neden: `Google dizinde değil${kapsam ? ` (${kapsam})` : ''} ve lastmod sonrası istek yok` }
-  return { durum: 'YAP', neden: tarama === null ? 'hiç taranmamış ve lastmod sonrası istek yok' : 'tarama lastmod\'dan eski ve lastmod sonrası istek yok' }
+  if (dizinde === false) return { durum: 'YAP', neden: `Google dizinde değil${kapsam ? ` (${kapsam})` : ''} ve ${ad} sonrası istek yok` }
+  return { durum: 'YAP', neden: tarama === null ? `hiç taranmamış ve ${ad} sonrası istek yok` : `tarama ${ad} öncesi ve ${ad} sonrası istek yok` }
+}
+
+/**
+ * Değişen adres listesi (SEO-115). Satır: "<adres> <ISO tarih>" (ayırıcı boşluk, sekme, virgül ya da noktalı virgül); "#" ile başlayan ve boş satır atlanır.
+ * Aynı adres birden çok kez geçerse en yeni tarih kalır. Bozuk satır sessizce yutulmaz: `atlanan` sayılır.
+ * @returns {{ kayitlar: Map<string, number>, atlanan: number }}
+ */
+export function degisenCoz(metin) {
+  const kayitlar = new Map()
+  let atlanan = 0
+  for (const ham of String(metin ?? '').split(/\r?\n/)) {
+    const satir = ham.trim()
+    if (!satir || satir.startsWith('#')) continue
+    const [a, t] = satir.split(/[\s,;]+/)
+    const adres = a?.startsWith('http') ? a : a?.startsWith('/') ? `${SITE}${a}` : null
+    const an = tarihAl(t)
+    if (!adres || !(adres === SITE || adres.startsWith(`${SITE}/`)) || an === null) { atlanan++; continue }
+    if (!kayitlar.has(adres) || kayitlar.get(adres) < an) kayitlar.set(adres, an)
+  }
+  return { kayitlar, atlanan }
 }
 
 /** Site haritası XML → [{ adres, lastmod }]. lastmod yoksa null. */
@@ -198,14 +233,15 @@ export function kapsamSec({ harita, hareketler, gun = Infinity, simdi = Date.now
 }
 
 /** Adres satırları + motor ölçümleri + defter → karar tablosu. `olcum[motor][adres]` = { sonTarama, noindex, hata }. */
-export function tabloUret({ kapsam, hareketler, olcum, simdi = Date.now() }) {
+export function tabloUret({ kapsam, hareketler, olcum, simdi = Date.now(), degisen = new Map() }) {
   return kapsam.map(({ adres, lastmod }) => {
-    const satir = { adres, lastmod }
+    const dg = degisen.get(adres) ?? null
+    const satir = { adres, lastmod, ...(dg === null ? {} : { degisen: new Date(dg).toISOString() }) }
     for (const motor of MOTORLAR) {
       const o = olcum?.[motor]?.[adres] ?? {}
       const hareket = sonHareket(hareketler, motor, adres)
       const sonTarama = motor === 'yandex' ? yandexSonTarama(hareketler, adres) : o.sonTarama ?? null
-      const k = karar({ motor, lastmod, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '' })
+      const k = karar({ motor, lastmod, degisen: dg, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '' })
       satir[motor] = { ...k, sonTarama: typeof sonTarama === 'number' ? new Date(sonTarama).toISOString() : sonTarama, sonHareket: hareket === null ? null : new Date(hareket).toISOString() }
     }
     satir.gorunme = gorunmeOzeti(hareketler, adres, lastmod)
@@ -403,12 +439,21 @@ async function calistir() {
   const ek = (deger('--adres') || '').split(',').map((s) => s.trim()).filter(Boolean).map((a) => (a.startsWith('http') ? a : `${SITE}${a}`))
   const simdi = Date.now()
   const kapsam = kapsamSec({ harita, hareketler, gun, simdi, ek })
+  // SEO-115: değişen adres listesi. --degisen açıkça verildiyse dosya ZORUNLU; verilmediyse defter klasöründeki varsayılan dosya varsa okunur.
+  const degisenArg = deger('--degisen') || process.env.DIZIN_TAKIP_DEGISEN
+  const degisenYol = resolve(degisenArg || join(dirname(defter), DEGISEN_DOSYA_ADI))
+  if (degisenArg) {
+    yolKontrol(degisenYol, '--degisen')
+    if (!existsSync(degisenYol)) { console.error(`HATA: --degisen dosyası yok: ${degisenYol}`); process.exit(2) }
+  }
+  const degisenSonuc = existsSync(degisenYol) ? degisenCoz(readFileSync(degisenYol, 'utf8')) : { kayitlar: new Map(), atlanan: 0 }
   const adresler = kapsam.map((k) => k.adres)
   const olcum = { google: await googleOlc(adresler), bing: await bingOlc(adresler), yandex: {}, indexnow: {} }
-  const tablo = tabloUret({ kapsam, hareketler, olcum, simdi })
+  const tablo = tabloUret({ kapsam, hareketler, olcum, simdi, degisen: degisenSonuc.kayitlar })
   const md = markdownYaz(tablo, simdi)
   console.log(md)
   if (atlanan) console.log(`\nUYARI: defterde ${atlanan} geçersiz satır atlandı`)
+  if (degisenSonuc.kayitlar.size || degisenSonuc.atlanan) console.log(`\nDEĞİŞEN LİSTESİ: ${degisenSonuc.kayitlar.size} adres${degisenSonuc.atlanan ? ` · UYARI: ${degisenSonuc.atlanan} bozuk satır atlandı` : ''}`)
   const olculemedi = tablo.filter((s) => s.google.durum === 'OLCULEMEDI' || s.bing.durum === 'OLCULEMEDI').length
   if (cikti) {
     mkdirSync(resolve(cikti), { recursive: true })
