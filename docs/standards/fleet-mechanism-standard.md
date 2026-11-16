@@ -1542,12 +1542,17 @@ o dosyanın job'ları fail-closed olarak çekirdek dışında bırakılır.
 ritüel artık yalnız uyarı yazıp yeşile **devam etmez**: madde 8 (`TABAN TAZE (fetch)`) KIRMIZI olur, çünkü bayat
 `origin/master` ile ölçülen migration/Edge/imaj farkı ve kapı tablosu güvenilmezdir. Madde yalnız fetch denenip patlayınca
 görünür (başarılıda 7 madde, çıktı değişmez). Migration, Edge ve okuma-sorusu farkı da imaj farkı gibi `--no-renames` ile
-okunur; taşınan ya da yeniden adlandırılan dosyanın eski yolu listeden düşmez. Kollar INV-RITUEL-6.
+okunur. Gerçek kazanım **yol sınırsız** çağrıdadır (okuma sorusu, `okumaSorusuGerekli`): `.claude/hooks/x.cjs` gibi bir
+dosyayı `docs/` altına taşıyan PR'da varsayılan git eşlemesi yalnız yeni yolu listeler, eski (kanca) yol kaybolurdu;
+`--no-renames` ile eski yol da görünür. Migration ve Edge sayımı ise yol sınırlı çağrı olduğu için taşımayla zaten
+atlatılamıyordu (ARAÇ canlı deneyi, ARC-333); orada `--no-renames` savunma derinliğidir, davranış değişikliği değil.
+Kollar INV-RITUEL-6.
 
 #### Kanıt
 
-Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**19 kol**). Sabotaj **9/9** doğru
-sebeple kırmızı — aralarında *"türetmeyi tüm job'lara çevir"* (naif türetme yakalanır),
+Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**98 test**, vitest sayımı 16 Kasım 2026; ilk yazımda 19 kol
+ve sabotaj 9/9 idi, sonra ALT-199 ve ALT-200 kolları eklendi). Sabotaj kolları INV-RITUEL-1/3/5/6'da; her biri doğru
+sebeple kırmızı — ilk dokuzun aralarında *"türetmeyi tüm job'lara çevir"* (naif türetme yakalanır),
 *"`skipping`i düşen say"* (yanlış alarm geri gelir), *"boş `merge_commit_sha`yı var say"* ve
 *"PR okunamadı ama geçti işaretle"* (fail-closed) var. Çekirdek **saf**tır (`turetCekirdek`
 bir dizin, `degerlendir` ölçülmüş değerler alır), böylece kollar ölçtüğü durumu **üretir** (§25).
