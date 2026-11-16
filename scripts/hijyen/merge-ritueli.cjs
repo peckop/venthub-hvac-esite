@@ -560,6 +560,15 @@ function degerlendir(girdi) {
     ekle(7, 'ACIK INCELEME BULGUSU 0', !acik.acik, acik.acik ? acik.detay : '')
   }
 
+  // 8 — TABAN TAZELIGI (ALT-200): `git fetch origin master` basarisizsa origin/master bayat olabilir; bayat tabanla
+  // alinan her fark/kapi olcumu "gecmis" dedirtebilir. `undefined` = cagiran olcmedi (eski fikstur) -> madde eklenmez;
+  // yalniz `false` KIRMIZI verir (fetch denendi ve patladi). Basarili fetch'te madde gorunmez (7 maddelik cikti degismez).
+  if (girdi.fetchTamam === false) {
+    ekle(8, 'TABAN TAZE (fetch)', false,
+      'git fetch origin master BASARISIZ — origin/master BAYAT olabilir, migration/edge/imaj farki ve kapi tablosu ' +
+      'guvenilmez (fail-closed). Aga/kimlige bak, sonra ritueli tekrar kos.')
+  }
+
   return { maddeler, kirmizi: maddeler.filter((m) => !m.gecti).length }
 }
 
@@ -732,7 +741,9 @@ if (require.main === module) {
 
   yaz('== MERGE RITUELI — PR #' + pr + ' / ' + dal + ' ==')
 
-  try { git(['fetch', 'origin', 'master', '-q']) } catch { yaz('  ⚠fetch basarisiz — olcum BAYAT olabilir') }
+  // ALT-200: fetch patlarsa origin/master BAYAT olabilir; "uyari yaz, devam et" bayat tabanla YESIL verdirirdi. Madde 8 KIRMIZI.
+  let fetchTamam = true
+  try { git(['fetch', 'origin', 'master', '-q']) } catch { fetchTamam = false; yaz('  ⚠fetch basarisiz — olcum BAYAT olabilir (madde 8 KIRMIZI)') }
 
   // ÖZ-DOĞRULAMA (ARC-194 3b): --merge yalniz master'daki betikle. Okuma olcumunden ONCE, eylemden hep once.
   if (MERGE) {
@@ -772,7 +783,9 @@ if (require.main === module) {
 
   let migrationlar = null
   try {
-    migrationlar = git(['diff', '--name-only', 'origin/master...origin/' + dal, '--', 'supabase/migrations/'])
+    // --no-renames (ALT-200): migration/functions disina TASINAN dosyanin ESKI yolu da listede gorunsun; yoksa
+    // supabase/migrations/x.sql -> baska/yol.sql tasimasi migration sayacini atlatir.
+    migrationlar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal, '--', 'supabase/migrations/'])
       .split('\n').filter(Boolean)
   } catch { migrationlar = null }
 
@@ -780,7 +793,7 @@ if (require.main === module) {
   let functionsDegisen = null
   try {
     functionsDegisen = edgeDegisiklikleri(
-      git(['diff', '--name-only', 'origin/master...origin/' + dal, '--', 'supabase/functions/']).split('\n').filter(Boolean),
+      git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal, '--', 'supabase/functions/']).split('\n').filter(Boolean),
     )
   } catch { functionsDegisen = null }
 
@@ -817,7 +830,7 @@ if (require.main === module) {
 
   const { maddeler, kirmizi } = degerlendir({
     pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY, functionsDegisen, inceleme,
-    imajKapisi: imaj.kapi, degisenDosyalar,
+    imajKapisi: imaj.kapi, degisenDosyalar, fetchTamam,
   })
   for (const m of maddeler) {
     yaz((m.gecti ? '  YESIL   ' : '  ⛔KIRMIZI ') + m.no + '. ' + m.ad + (m.detay ? '  — ' + m.detay : ''))
@@ -831,7 +844,7 @@ if (require.main === module) {
   // ARC-110: kanca/ayar/MCP sınıfı PR'da sabit okuma sorusu. Madde DEĞİL: kırmızı sayısına
   // girmez, çıkış kodunu değiştirmez; ölçülemezse sessizce atlanır (hatırlatma, kapı değil).
   try {
-    const degisen = git(['diff', '--name-only', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+    const degisen = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
     if (okumaSorusuGerekli(degisen)) yaz('  ' + OKUMA_SORUSU_METNI)
   } catch { /* hatırlatma, ölçüt değil */ }
 

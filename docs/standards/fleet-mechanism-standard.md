@@ -1538,6 +1538,12 @@ her koşuda yazılır, çünkü kabul edilmiş eksik sessiz olamaz. YAML düz re
 çözülemeyen bir biçim çıkarsa dosya **sessizce atlanmaz**, `sinirlar` listesine yazılır ve
 o dosyanın job'ları fail-closed olarak çekirdek dışında bırakılır.
 
+**Taban tazeliği ve yeniden adlandırma (ALT-200, 16 Kasım 2026):** `git fetch origin master` başarısız olursa
+ritüel artık yalnız uyarı yazıp yeşile **devam etmez**: madde 8 (`TABAN TAZE (fetch)`) KIRMIZI olur, çünkü bayat
+`origin/master` ile ölçülen migration/Edge/imaj farkı ve kapı tablosu güvenilmezdir. Madde yalnız fetch denenip patlayınca
+görünür (başarılıda 7 madde, çıktı değişmez). Migration, Edge ve okuma-sorusu farkı da imaj farkı gibi `--no-renames` ile
+okunur; taşınan ya da yeniden adlandırılan dosyanın eski yolu listeden düşmez. Kollar INV-RITUEL-6.
+
 #### Kanıt
 
 Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**19 kol**). Sabotaj **9/9** doğru
