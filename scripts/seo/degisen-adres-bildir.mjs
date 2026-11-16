@@ -24,6 +24,13 @@
  *                           olmalı; K4 planı geçerli. --uygula yoksa kuru koşar. --taban verilirse yalnız gönderilen adresin
  *                           kaydı güncellenir; --kuyruk verilirse adresler Google kuyruğuna da girer.
  *
+ *   --eski-adres a,b        ESKİ ADRES BİLDİRİMİ (SEO-112, OPS-313 evet, 16 Kasım 2026): adresi değişmiş sayfanın ESKİ adresini
+ *                           IndexNow'a bildirir. IndexNow SSS: "yönlendirilen ve 404/410 veren adresleri de gönderin" (okundu
+ *                           2026-11-16). KAPILAR (hepsi şart, biri tutmazsa o adres hiçbir kipte gitmez): adres site alan adında,
+ *                           site haritasında DEĞİL (haritada yönlendirme olmaz), en çok 3 adımlık zincirde HER adım kalıcı
+ *                           yönlendirme (301/308; 302/303/307 geçici sayılır, reddedilir), zincir site içinde kalır, son durak 200,
+ *                           kanoniği kendisi ve site haritasında. Taban ve Google kuyruğuna dokunulmaz. --uygula yoksa kuru koşar.
+ *
  * KURALLAR:
  *   - Taban ve kuyruk DEPO DIŞINDA durur (P6: arama/sayfa verisi depoya yazılmaz); depo içi yol exit 2.
  *   - K4 (2026-09-03; karar 164 A) karar 376 (2026-10-16) ile GEVŞEDİ: `K4_GEVSEK = true` iken bayrak kapalıyken de haritadaki
@@ -253,6 +260,44 @@ export async function adresOku(fetchFn, adres, zamanAsimiMs = 20_000) {
   }
 }
 
+/** Eski adres zincirinde izin verilen azami adım (Google: "ideally no more than 3"). */
+export const ESKI_ADRES_AZAMI_ADIM = 3
+
+/**
+ * Eski (yönlendiren) adresin kapısı (SEO-112, OPS-313). Zinciri elle izler (redirect: 'manual'): her adım 301/308 olmalı,
+ * her durak site alan adında kalmalı, en çok `ESKI_ADRES_AZAMI_ADIM` adım olmalı, son durak 200 + kanonik kendisi olmalı.
+ * Dönüş: { durum: 'tamam', hedef, adim } ya da { durum: 'sorunlu' | 'okunamadi', neden }.
+ */
+export async function eskiAdresZinciri(fetchFn, adres, siteHost, zamanAsimiMs = 20_000) {
+  let simdi = adres
+  const gorulen = new Set([adres])
+  try {
+    for (let adim = 0; adim <= ESKI_ADRES_AZAMI_ADIM; adim++) {
+      const r = await fetchFn(simdi, { headers: { 'user-agent': 'venthub-degisen-adres' }, redirect: 'manual', signal: AbortSignal.timeout(zamanAsimiMs) })
+      if (r.status >= 500) return { durum: 'okunamadi', neden: `HTTP ${r.status}` }
+      if (r.status === 200) {
+        if (adim === 0) return { durum: 'sorunlu', neden: 'adres yönlendirmiyor (200); eski adres değil' }
+        const kanonik = kanonikAdres(await r.text())
+        if (kanonik !== simdi) return { durum: 'sorunlu', neden: `son durak kanoniği ${kanonik ?? 'yok'}` }
+        return { durum: 'tamam', hedef: simdi, adim }
+      }
+      if (r.status !== 301 && r.status !== 308) return { durum: 'sorunlu', neden: `HTTP ${r.status} (kalıcı yönlendirme değil; adım ${adim + 1})` }
+      if (adim === ESKI_ADRES_AZAMI_ADIM) return { durum: 'sorunlu', neden: `zincir ${ESKI_ADRES_AZAMI_ADIM} adımdan uzun` }
+      const konum = r.headers.get('location')
+      if (!konum) return { durum: 'sorunlu', neden: `HTTP ${r.status} ama Location yok` }
+      let sonraki
+      try { sonraki = new URL(konum, simdi) } catch { return { durum: 'sorunlu', neden: `Location çözülemedi: ${konum}` } }
+      if (sonraki.host !== siteHost) return { durum: 'sorunlu', neden: `zincir ${siteHost} dışına çıkıyor: ${sonraki.host}` }
+      simdi = sonraki.href
+      if (gorulen.has(simdi)) return { durum: 'sorunlu', neden: 'yönlendirme döngüsü' }
+      gorulen.add(simdi)
+    }
+    return { durum: 'sorunlu', neden: 'zincir bitmedi' }
+  } catch (e) {
+    return { durum: 'okunamadi', neden: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 /** Sınırlı eşzamanlılıkla sitemap adreslerini okur. */
 export async function haritayiTara(fetchFn, kayitlar, siteHost, esZamanli = 4) {
   const simdi = {}
@@ -380,8 +425,48 @@ async function zorlaListe({ fetchFn, siteUrl, host, kayitlar, tabanYolu, kuyrukY
   return { cikis: kabul ? 0 : 1 }
 }
 
+/**
+ * `--eski-adres a,b` kipi (SEO-112, OPS-313): yönlendiren eski adresleri IndexNow'a bildirir. Kapılar `eskiAdresZinciri` ve
+ * şunlar: adres site alan adında, site haritasında DEĞİL, zincirin son durağı site haritasında. Taban ve Google kuyruğuna
+ * dokunulmaz (eski adres Google'a istek hakkı doğurmaz; Google tarafı D7 madde 15). K4 anahtarı bu kipte uygulanmaz: gönderilen
+ * adresler zaten yayında değişmiş sayfaların eski adresleridir ve tek kapıları yukarıdaki doğrulamadır.
+ */
+async function eskiAdresListe({ fetchFn, siteUrl, host, kayitlar, kip, anahtar, cikti, adresler }) {
+  const istenen = [...new Set(adresler.map((a) => a.trim()).filter(Boolean))]
+  if (istenen.length === 0) return { cikis: 2, mesaj: '--eski-adres a,b biçiminde en az bir tam https adresi ister' }
+  const haritada = new Set(kayitlar.map((k) => k.adres))
+  const gidecek = []
+  const reddedilen = []
+  for (const adres of istenen) {
+    let yabanci = false
+    try { yabanci = new URL(adres).host !== host } catch { yabanci = true }
+    if (yabanci) { reddedilen.push(`${adres} (${host} dışında ya da geçersiz adres)`); continue }
+    if (haritada.has(adres)) { reddedilen.push(`${adres} (site haritasında: eski adres değil)`); continue }
+    const z = await eskiAdresZinciri(fetchFn, adres, host)
+    if (z.durum !== 'tamam') { reddedilen.push(`${adres} (${z.neden ?? z.durum})`); continue }
+    if (!haritada.has(z.hedef)) { reddedilen.push(`${adres} (hedef ${z.hedef} site haritasında yok)`); continue }
+    gidecek.push(adres)
+    cikti(`  KABUL ${adres} → ${z.hedef} (${z.adim} adım)`)
+  }
+  for (const r of reddedilen) cikti(`  REDDEDİLDİ (bildirilmez): ${r}`)
+  cikti(`eski adres: istenen ${istenen.length} · kabul ${gidecek.length} · reddedilen ${reddedilen.length}`)
+  if (gidecek.length === 0) return { cikis: 1, mesaj: 'verilen eski adreslerin hiçbiri kapıdan geçmedi, hiçbir şey gönderilmedi' }
+  if (kip !== 'uygula') {
+    cikti('KURU KOŞUM — hiçbir şey gönderilmedi, yazılmadı.')
+    return { cikis: 0 }
+  }
+  let indexnow = { durum: 'bos' }
+  try {
+    indexnow = await indexNowGonder(fetchFn, { host, anahtar, siteUrl, adresler: gidecek })
+  } catch (e) {
+    indexnow = { durum: 'hata', mesaj: e.message }
+  }
+  cikti(`IndexNow: ${indexnow.durum}${indexnow.http ? ` HTTP ${indexnow.http}` : ''}${indexnow.mesaj ? ` ${indexnow.mesaj}` : ''}`)
+  return { cikis: indexnow.durum === 'gonderildi' ? 0 : 1 }
+}
+
 /** Dışa açık çalıştırıcı: testler `fetchFn` ve zaman enjekte eder; CLI gerçek `fetch` verir. */
-export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek = K4_GEVSEK, anahtar, zaman = new Date().toISOString(), cikti = console.log, adresler: zorlaAdresler = /** @type {string[] | null} */ (null) }) {
+export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek = K4_GEVSEK, anahtar, zaman = new Date().toISOString(), cikti = console.log, adresler: zorlaAdresler = /** @type {string[] | null} */ (null), eskiAdresler = /** @type {string[] | null} */ (null) }) {
   const siteUrl = site.replace(/\/+$/, '')
   const host = new URL(siteUrl).host
   const harita = await fetchFn(`${siteUrl}/sitemap.xml`, { headers: { 'user-agent': 'venthub-degisen-adres' } })
@@ -389,6 +474,11 @@ export async function calistir({ fetchFn = fetch, site, tabanYolu, kuyrukYolu, k
   let kayitlar
   try { kayitlar = sitemapOku(await harita.text()) } catch (e) { return { cikis: 1, mesaj: e.message } }
 
+  if (eskiAdresler !== null) {
+    if (zorlaAdresler !== null) return { cikis: 2, mesaj: '--eski-adres ile --adres birlikte kullanılamaz' }
+    if (kip === 'taban-kur') return { cikis: 2, mesaj: '--eski-adres ile --taban-kur birlikte kullanılamaz' }
+    return eskiAdresListe({ fetchFn, siteUrl, host, kayitlar, kip, anahtar, cikti, adresler: eskiAdresler })
+  }
   if (zorlaAdresler !== null) return zorlaListe({ fetchFn, siteUrl, host, kayitlar, tabanYolu, kuyrukYolu, kip, k3bAcik, k4Gevsek, anahtar, zaman, cikti, adresler: zorlaAdresler })
 
   const taban = tabanOku(tabanYolu)
@@ -476,13 +566,15 @@ async function cli() {
 
   const adresArg = arg('--adres')
   if (adresArg !== undefined && typeof adresArg !== 'string') dur(2, 'HATA: --adres a,b biçiminde TAM https adresleri ister (Git Bash\'te /tr/... değil tam adres ver).')
-  if (typeof tabanYolu !== 'string' && adresArg === undefined) dur(2, 'HATA: --taban <dosya> gerekli.')
+  const eskiArg = arg('--eski-adres')
+  if (eskiArg !== undefined && typeof eskiArg !== 'string') dur(2, 'HATA: --eski-adres a,b biçiminde TAM https adresleri ister (Git Bash\'te /tr/... değil tam adres ver).')
+  if (typeof tabanYolu !== 'string' && adresArg === undefined && eskiArg === undefined) dur(2, 'HATA: --taban <dosya> gerekli.')
   const kip = process.argv.includes('--taban-kur') ? 'taban-kur' : process.argv.includes('--uygula') ? 'uygula' : 'kuru'
   if (process.argv.includes('--taban-kur') && process.argv.includes('--uygula')) dur(2, 'HATA: --taban-kur ile --uygula birlikte kullanılamaz.')
   let k3bAcik
   try { k3bAcik = k3bOku(readFileSync(resolve(DEPO_KOKU, 'src/config/features.ts'), 'utf8')) } catch (e) { dur(1, `DURDU: bayrak okunamadı (${e.message}); belirsizlikte K4 kapalı varsayılmaz, koşu durur.`) }
   const anahtar = kip === 'uygula' ? anahtarOku() : ''
-  const s = await calistir({ site, tabanYolu, kuyrukYolu, kip, k3bAcik, anahtar, adresler: adresArg === undefined ? null : adresArg.split(',') })
+  const s = await calistir({ site, tabanYolu, kuyrukYolu, kip, k3bAcik, anahtar, adresler: adresArg === undefined ? null : adresArg.split(','), eskiAdresler: eskiArg === undefined ? null : eskiArg.split(',') })
   if (s.mesaj) console.error(`${s.cikis === 2 ? 'HATA' : 'DURDU'}: ${s.mesaj}`)
   process.exit(s.cikis)
 }

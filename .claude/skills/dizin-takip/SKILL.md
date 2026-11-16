@@ -28,6 +28,7 @@ Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerind
    - Açılış satırı: `node scripts/seo/dizin-acilis.mjs --sadece-satir` son anlık görüntüden YAP/TEKRAR sayılarını verir; bugün ölçüm yoksa `--durum` arka planda başlar. İstek yine tablodan okunarak atılır.
    - Google tıklaması için çalışan parçacık: `node scripts/seo/tarayici-parcaciklari.mjs gsc` (window.__iste(adres, ilk)); sonra `--kaydet`. Robot doğrulaması çıkarsa dur.
    - **Bing:** `node scripts/seo/bing-url-gonder.mjs --gonder <adresler>` (günde 100).
+   - **Adresi değişmiş sayfanın ESKİ adresi (OPS-313):** `node scripts/seo/degisen-adres-bildir.mjs --kuyruk <depo dışı> --eski-adres <tam https adresler>` önce kuru koşar; kapıyı (haritada değil, her adım 301/308, ≤ 3 adım, son durak 200 + kanonik + haritada) geçen eski adresleri gösterir, `--uygula` IndexNow'a gönderir. Google'a eski adres için istek ATILMAZ (D7 madde 15).
    - **Yandex:** webmaster.yandex.com, bu site için indexing/reindex sayfasındaki metin kutusuna adresler satır satır (günde 10).
    - **IndexNow:** `node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk … --uygula`. Başlık/açıklama/H1 aynı kalıp gövdesi değişen yazı fark görünmez; o zaman listeyi zorla: `… --kuyruk … --adres <tam https adresler, virgülle> --uygula` (kapılar aynı: haritada, 200, kanonik kendisi).
 3. **Kayıt, aynı turda.** Eylemden hemen sonra:

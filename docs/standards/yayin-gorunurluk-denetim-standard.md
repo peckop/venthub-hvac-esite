@@ -137,29 +137,31 @@ yalnız "yayın günü listesi"ne güvenilmez. Haritada olmayan yeni adres (TR) 
 `bing-webmaster-oku.mjs --taban` (fark kipi, SEO-43), `sayfa-kalite.mjs` (+7). 14. günde gösterim, tık, sıra
 (`gsc-sayfa-oku.mjs`). Kartta tek satır + sayı; ham çıktı depo dışı dosyada.
 
-**Görünme kuralı: yayından 3 gün sonra yazı aramada yoksa sorun vardır (SEO-109, 2026-11-12).** Sıra bu kuralın konusu
+**Görünme kuralı: yayından 14 gün sonra yazı aramada yoksa arıza vardır; 3. günde "izle" (SEO-109, 2026-11-12; eşik SEO-112/OPS-313 ile 2026-11-16'da 3 günden 14 güne çıktı).** Sıra bu kuralın konusu
 değildir: yazı birinci sayfada birinci de olsa, beşinci sayfada onuncu da olsa "göründü" sayılır. Sorulan tek soru
 "yazının kendi adresi Google sonuçlarında var mı"dır. Gerekçe: 1–8 Kasım'da hava perdesi yazısının 3. ve 7. gün
 okumaları yalnız dizin durumu ve Search Console'a baktı; "dizinde, gösterim 0, veri gecikmeli" yazılıp beklendi ve yazı
 12 Kasım'da, 11. günde, Recep fark edince "aramada yok" bulundu. Search Console 2–3 gün gecikmelidir, bu yüzden 3. gün
 okumasının kanıtı Search Console değil **canlı arama**dır.
 
+**Eşik düzeltmesi (2026-11-16, SEO-112, OPS-313, Recep onayı).** Google'ın kendi belgeleri yeni adresin taranmasının "birkaç gün ile birkaç hafta" sürebildiğini yazar (developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl; başlık değişikliğinin görünmesi için de aynı: .../appearance/title-link, okundu 2026-11-16). 3. gün eşiği bu süreden kısaydı: normal bekleme "arıza" diye okunup sahibe iş çıkarıyordu. Yeni kural: **3. gün canlı arama ölçümü AYNEN yapılır ve kaydedilir; "görünmüyor" sonucu "izle"dir** (kırmızı değil): (i) ve (ii) maddelerindeki kontroller yine aynı gün koşar (URL denetimi, sayfa kusuru), ama bulgu kusur çıkarmadıkça sahibe iş açılmaz. Kusur çıkarsa (kanonik başka, noindex, haritada yok, 404) KIRMIZI aynı gündür. **Arıza hükmü 14. günde** verilir. 12 Kasım dersi (hava perdesi yazısının 11 gün fark edilmemesi) yine geçerlidir: fark edilmeme, ölçülmemekti; ölçüm 3. günde kalır, değişen yalnız hükmün günüdür.
+
 1. **3. gün (B13), canlı arama, her yazı için.** Chrome'da `hl=tr gl=tr pws=0` ile iki ölçüm: (a) `site:<yazı adresi>`;
    (b) yazının tam başlığı, tırnaksız (ilk 50 sonuçta yazının kendi adresi aranır; liste sayfası, kategori ya da başka
    sayfa çıkması "yazı göründü" demek değildir). Sonuç iki ölçümle de kartta tek satır olur: "göründü / görünmüyor /
    ölçülemedi". Search Console satırı (dizin durumu, son tarama, gösterim) ek bilgidir, hükmü belirlemez.
-2. **3. günde "görünmüyor" = KIRMIZI, aynı gün (GEO-SEO).** (i) URL denetimi: dizin durumu, son tarama, Google'ın seçtiği
+2. **3. günde "görünmüyor" = İZLE; kusur bulunursa KIRMIZI, aynı gün (GEO-SEO).** (i) URL denetimi: dizin durumu, son tarama, Google'ın seçtiği
    kanonik; dizinde değilse Y2.1 zinciri yeniden (Google isteği, onayı okunur, ertesi gün ilk iş); (ii) sayfa kusuru
    kontrolü: canlı HTML (kanonik, robots, title/H1), site haritasında ve `lastmod`'da var mı, yazıya bağlanan iç sayfa
    sayısı; (iii) aynı başlık metnini ya da açıklamayı taşıyan sayfa var mı (liste sayfası, kategori kartı); (iv) bulgu
    ve öneri aynı gün OPS'a gider (kart, sayılar), OPS Blog'a ya da Ürün'e ileterek sahibini belirler. GEO-SEO Blog'a kart
    açmaz, metne dokunmaz.
-3. **7. gün, hâlâ "görünmüyor".** Sahibi (Blog: başlık, içerik, iç bağlantı; Ürün: liste/kategori kartı, sayfa kodu)
-   3. günkü bulguya göre düzeltmeyi yapmış olmalıdır; yapılmadıysa OPS aynı gün sahibini sorar. Düzeltme sonrası Y2.1
+3. **7. gün, hâlâ "görünmüyor".** Kusur bulunmuşsa sahibi (Blog: başlık, içerik, iç bağlantı; Ürün: liste/kategori kartı, sayfa kodu)
+   3. günkü bulguya göre düzeltmeyi yapmış olmalıdır; yapılmadıysa OPS aynı gün sahibini sorar. Kusur yoksa 7. gün "izle" kalır (Google süresi hâlâ dolmadı). Düzeltme sonrası Y2.1
    zinciri yeniden koşar, canlı arama tekrar edilir ve sonuç karta yazılır. Hâlâ görünmüyorsa 14. güne "hüküm" olarak
    taşınır ve Y2.4 rakip kıyası ek olarak koşulur.
-4. **14. gün (B15).** Görünme kuralı yeniden ölçülür; gösterim, tık, sıra bu günün ek bilgisidir. 14. günde görünmüyorsa
-   yazı "görünmüyor listesi"ne girer ve sahibine öneri OPS üzerinden gider.
+4. **14. gün (B15): ARIZA HÜKMÜ.** Görünme kuralı yeniden ölçülür; gösterim, tık, sıra bu günün ek bilgisidir. 14. günde görünmüyorsa
+   arıza vardır, Y2.4 rakip kıyası koşar, yazı "görünmüyor listesi"ne girer ve sahibine öneri OPS üzerinden gider.
 5. **Kayıt.** 3., 7., 14. gün sonuçları ve "aramada ilk göründüğü gün" yeni bir tabloya değil, mevcut dizin defterine
    (`dizin-takip` / `olcum-defteri`) adres başına alan olarak yazılır; görünüm `dizin-takip --durum` çıktısıdır.
    "Yayın gününden ilk görünme gününe fark" bu alanlardan okunur.
