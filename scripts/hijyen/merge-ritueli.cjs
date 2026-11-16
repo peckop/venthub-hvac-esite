@@ -41,8 +41,10 @@
  *
  * ⚠KAPSAM SINIRI, ADIYLA (§21: kabul edilen boşluk SESSİZ olamaz)
  * ===============================================================
- *   · **Vercel kapıları türetilemez** — harici entegrasyondur, hiçbir workflow dosyasında
- *     yoktur. Çekirdeğe KONMAZ; ama görüldüğü hâlde düşerse madde 3 onları sayar.
+ *   · **Harici kapılar türetilemez** — entegrasyondur, hiçbir workflow dosyasında yoktur.
+ *     Çekirdeğe KONMAZ; görüldüğü hâlde düşerse madde 3 onları sayar. TEK İSTİSNA:
+ *     `EMEKLI_HARICI_KAPILAR` (tam ad; 15 Kasım 2026'dan beri Vercel, ALT-199) sayımdan çıkar ama
+ *     detayda görünür kalır; işlevi `İmaj derle` + `ci` eşdeğeriyle korunur (madde 2).
  *   · **YAML düz regex ile okunur**, gerçek çözücüyle değil. Desteklenen biçimler ölçüldü:
  *     `types: [a, b]`, çok satırlı `types:` + `- a`, `paths:` blok, ve `on: pull_request`
  *     kısayolu. Bunların dışında bir biçim çıkarsa türetme O DOSYAYI atlamaz — `sinirlar`
@@ -64,6 +66,46 @@ const path = require('path')
  *  düşen saymak günde altı yanlış alarm okutturdu (2026-09-03 ölçümü). */
 const DUSEN_KOVALARI = ['fail']
 const BEKLEYEN_KOVALARI = ['pending']
+
+/**
+ * ⭐EMEKLİ HARİCİ KAPILAR (ALT-199, OPS onaylı DEĞİŞİM — gevşetme değil).
+ * 15 Kasım 2026'da site DigitalOcean + Coolify'a taşındı; Vercel hesabı engelli, her PR'da commit durumu
+ * `Vercel: failure — Account is blocked` düşüyor (16 Kasım ölçümü, #2571: 19 kapı SUCCESS/SKIPPED, yalnız Vercel
+ * failure, mergeStateStatus=UNSTABLE). Bu kapı artık kod hakkında HİÇBİR ŞEY söylemez.
+ *
+ * KURAL: yalnız TAM AD eşleşmesi (alt dize/regex YOK) ve yalnız bu listedeki adlar; liste dışı hiçbir harici kapı
+ * muaf olmaz. Muaf kapı SESSİZ düşmez: madde 3 ve 4 detayında "emekli kapi sayilmadi: Vercel(fail)" görünür.
+ * Listeye ad eklemek bilinçli güncelleme ister (ratchet: merge-ritueli.test.ts literal küme sayar).
+ * Vercel'in işlevi (önizleme derlemesi kırık mı) kaldırılmadı, EŞDEĞERİNE devredildi: bkz. `imajKapisiTuret`.
+ */
+const EMEKLI_HARICI_KAPILAR = Object.freeze([
+  Object.freeze({
+    ad: 'Vercel',
+    tarih: '2026-11-15',
+    gerekce: 'Site Coolify\'a tasindi, Vercel hesabi engelli (Account is blocked); eslegi: ci + Imaj derle (ALT-187, ALT-199)',
+  }),
+  Object.freeze({
+    ad: 'Vercel Preview Comments',
+    tarih: '2026-11-15',
+    gerekce: 'Vercel on izleme yorum entegrasyonu; ayni hesapla birlikte emekli (ALT-187, ALT-199)',
+  }),
+])
+
+/** Tam ad eşleşmesi: `Set.has`. `includes`/regex KULLANILMAZ ('Vercel' içeren her ad muaf OLMAZ). */
+const EMEKLI_AD_KUMESI = new Set(EMEKLI_HARICI_KAPILAR.map((k) => k.ad))
+function emekliMi(ad) {
+  return EMEKLI_AD_KUMESI.has(ad)
+}
+
+/**
+ * ⭐TEK emeklilik ölçütü (madde 3 süzgeci, `emekliNot`, madde 4 `sorunlu.every` HEPSİ bunu kullanır).
+ * Ad sahteciliği kapatıldı: bir Actions job'ına `name: Vercel` yazan workflow muaf OLMAZ. Gerçek harici Vercel
+ * durumu canlıda `{name:'Vercel',bucket:'fail',event:'',workflow:''}` (16 Kasım ölçümü, #2571); Actions kapılarında
+ * `workflow` dolu. KATI: yalnız `workflow === ''` (undefined/başka değer = muaf DEĞİL, fail-closed) VE tam ad.
+ */
+function emekliKapi(c) {
+  return Boolean(c) && c.workflow === '' && emekliMi(c.name)
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TÜRETME — saf: girdi bir DİZİN, çıktı kapı adları + adıyla yazılmış sınırlar.
@@ -193,12 +235,88 @@ function turetCekirdek(kok) {
   return { kapilar: [...new Set(kapilar)].sort(), sinirlar, okunanDosya: dosyalar.length }
 }
 
+/** Yayın imajı workflow'u (Vercel önizleme derlemesinin eşdeğeri). Yollar bu dosyadan TÜRETİLİR. */
+const IMAJ_WORKFLOW_DOSYASI = 'yayin-imaji.yml'
+
+/**
+ * `yayin-imaji.yml` metninden imaj kapısını türetir. SAF.
+ * @returns {{ad:string, yollar:string[]}|{hata:string}}
+ */
+function imajKapisiCoz(metin) {
+  const { govde, kisayolMu } = onBlogu(metin)
+  if (kisayolMu) return { hata: 'on: kisayol bicimi — paths: okunamaz' }
+  const pr = pullRequestBlogu(govde)
+  if (pr === null) return { hata: 'on.pull_request blogu bulunamadi' }
+  const yollar = []
+  const bas = /^[ \t]*paths:[ \t]*(.*)$/m.exec(pr)
+  if (!bas) return { hata: 'on.pull_request.paths bulunamadi' }
+  const satirIci = bas[1].trim()
+  if (satirIci.startsWith('[')) {
+    for (const p of satirIci.replace(/^\[|\]$/g, '').split(',')) {
+      const t = p.trim().replace(/^['"]|['"]$/g, '')
+      if (t) yollar.push(t)
+    }
+  } else {
+    for (const s of pr.slice(bas.index + bas[0].length).split(/\r?\n/)) {
+      const m = /^[ \t]*-[ \t]*(\S.*?)[ \t]*$/.exec(s)
+      if (m) { yollar.push(m[1].replace(/^['"]|['"]$/g, '')); continue }
+      if (s.trim() !== '') break
+    }
+  }
+  if (yollar.length === 0) return { hata: 'paths: listesi bos/cozulemedi' }
+  // Desteklenmeyen glob karakteri fail-closed: yanlış eşleşen desen "imaj yolu değişmedi" diyip kapıyı düşürebilir.
+  const desteksiz = yollar.find((p) => /^!|[?[{]/.test(p))
+  if (desteksiz) return { hata: 'desteklenmeyen glob karakteri (? [ { ya da bas ! ) paths icinde: ' + desteksiz }
+  const c = workflowCoz(metin)
+  const is = c.joblar.find((j) => j.ad) || c.joblar[0]
+  if (!is) return { hata: 'jobs: icinde job bulunamadi' }
+  // Üst düzey workflow adı (gh pr checks `workflow` alanı: canlıda "Yayın İmajı (GHCR)", 16 Kasım #2571). Yoksa fail-closed.
+  const wm = /^name:[ \t]*(\S.*?)[ \t]*\r?$/m.exec(metin)
+  const workflow = wm ? wm[1].replace(/^['"]|['"]$/g, '') : ''
+  if (!workflow) return { hata: 'ust duzey workflow `name:` bulunamadi' }
+  return { ad: is.ad || is.id, workflow, yollar }
+}
+
+/**
+ * Repo kökünden imaj kapısını türetir. Okunamaz/çözülemezse `null` + sınır (çağıran fail-closed KIRMIZI verir).
+ * @param {string} kok repo kökü (`metinOku` verilmezse dosya buradan okunur)
+ * @param {() => string} [metinOku] verilirse yayin-imaji.yml metnini bu işlev döndürür (CLI: tabandan `git show`)
+ * @returns {{kapi:{ad:string,yollar:string[]}|null, sinir:string|null}}
+ */
+function imajKapisiTuret(kok, metinOku) {
+  let metin
+  try {
+    // ⭐CLI `metinOku`yu TABANDAN (git show origin/master:...) verir: yollar PR'ın kendi ağacından okunsaydı PR, kendi
+    // zorunlu kapısını `paths:` listesini daraltarak kaldırabilirdi. Varsayılan (enjeksiyon yok) kök altındaki dosyadır.
+    metin = typeof metinOku === 'function'
+      ? metinOku()
+      : fs.readFileSync(path.join(kok, '.github', 'workflows', IMAJ_WORKFLOW_DOSYASI), 'utf8')
+    if (typeof metin !== 'string' || metin.trim() === '') throw new Error('bos metin')
+  } catch (e) {
+    return { kapi: null, sinir: IMAJ_WORKFLOW_DOSYASI + ' OKUNAMADI: ' + String(e.message).slice(0, 80) }
+  }
+  const c = imajKapisiCoz(metin)
+  if (c.hata) return { kapi: null, sinir: IMAJ_WORKFLOW_DOSYASI + ': ' + c.hata }
+  return { kapi: c, sinir: null }
+}
+
+/** Basit glob → regex (`**`, `*`); düz yollar tam eşleşir. SAF. */
+function yolDeseniEslesir(desen, yol) {
+  const d = String(desen).replace(/\\/g, '/')
+  const y = String(yol).replace(/\\/g, '/')
+  // `**/` SIFIR dizin de eşler (GitHub gibi): `**/Dockerfile` ≙ `Dockerfile`, `a/**/b` ≙ `a/b`.
+  const re = '^' + d.replace(/[.+^${}()|[\]\\?]/g, '\\$&')
+    .replace(/\*\*\//g, '\u0001').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*')
+    .replace(/\u0001/g, '(?:.*/)?').replace(/\u0000/g, '.*') + '$'
+  return new RegExp(re).test(y)
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DEĞERLENDİRME — saf: ölçülmüş girdiler → beş madde. Ağ/disk YOK, fikstür kurulabilir.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * @param {{pv:object|null, pvHata?:string, kapilar:Array<{name:string,bucket:string}>|null,
+ * @param {{pv:object|null, pvHata?:string, kapilar:Array<{name:string,bucket:string,workflow?:string}>|null,
  *          cekirdek:string[], uzakSha:string|null, migrationlar:string[]|null,
  *          mergeCommitSha:string|null}} girdi
  *   `mergeCommitSha`: REST'ten okunan `merge_commit_sha`. `null` = OKUNAMADI (fail-closed),
@@ -296,23 +414,78 @@ function degerlendir(girdi) {
     }
   }
 
-  // 3
-  if (kapilar === null) {
-    ekle(3, 'DUSEN 0 VE BEKLEYEN 0', false, 'kapi tablosu OKUNAMADI')
-  } else {
-    const dusen = kapilar.filter((c) => DUSEN_KOVALARI.includes(c.bucket))
-    const bekleyen = kapilar.filter((c) => BEKLEYEN_KOVALARI.includes(c.bucket))
-    if (dusen.length || bekleyen.length) {
-      ekle(3, 'DUSEN 0 VE BEKLEYEN 0', false,
-        'dusen ' + dusen.length + ' [' + dusen.map((c) => c.name).join(',') + '] · bekleyen ' +
-        bekleyen.length + ' [' + bekleyen.map((c) => c.name).join(',') + ']')
+  // 2b — EŞDEĞER KAPI (ALT-199): Vercel'in işlevi "önizleme derlemesi kırık mı" idi. Emekli edildi ama işlev DÜŞMEDİ:
+  // PR imaj yolunu (yayin-imaji.yml `on.pull_request.paths`'ten TÜRETİLEN) değiştiriyorsa `İmaj derle` kapısı tabloda
+  // VAR ve SUCCESS (`pass`) olmak ZORUNDA. Yolu değişmeyen PR'da yokluk sorun değil (workflow zaten tetiklenmez).
+  // `undefined` = çağıran bu ölçümü vermedi (eski fikstürler); `null` = türetilemedi/okunamadı → fail-closed.
+  // ⚠`ci` (Lint-Build) ayrıca çekirdekte: ama `Build (blocking)` adımı dar sınıfta (belge/edge/betik/karma) ATLANIR (ci.yml,
+  // ALT-38c); imaj kapısı bu yüzden yalnız imaj yolu değişince değil, ürün derlemesi için `ci`nin kendi kararına bırakılır.
+  if (girdi.imajKapisi !== undefined) {
+    const m2 = maddeler.find((m) => m.no === 2)
+    const iptal = (neden) => { if (m2) { m2.gecti = false; m2.detay = (m2.detay ? m2.detay + ' · ' : '') + neden } }
+    if (girdi.imajKapisi === null) {
+      iptal('IMAJ KAPISI TURETILEMEDI (yayin-imaji.yml paths/job okunamadi) — olculemedi, fail-closed')
+    } else if (!Array.isArray(girdi.degisenDosyalar)) {
+      iptal('PR degisen dosya listesi OKUNAMADI — imaj yolu degisti mi bilinmiyor, fail-closed')
     } else {
-      ekle(3, 'DUSEN 0 VE BEKLEYEN 0', true, 'skipping DUSEN sayilmadi')
+      const imajYoluDegisti = girdi.degisenDosyalar.some((d) =>
+        girdi.imajKapisi.yollar.some((desen) => yolDeseniEslesir(desen, d)))
+      if (!imajYoluDegisti) {
+        if (m2 && m2.gecti) m2.detay += ' · imaj yolu degismedi, "' + girdi.imajKapisi.ad + '" beklenmez'
+      } else if (kapilar === null) {
+        iptal('imaj yolu degisti ama kapi tablosu OKUNAMADI')
+      } else {
+        // Ad + WORKFLOW birlikte: baska bir workflow'daki ayni adli job imaj kapisi SAYILMAZ.
+        const imaj = kapilar.filter((c) => c.name === girdi.imajKapisi.ad && c.workflow === girdi.imajKapisi.workflow)
+        if (imaj.length === 0) {
+          iptal('IMAJ YOLU DEGISTI ama "' + girdi.imajKapisi.ad + '" kapisi (workflow "' + girdi.imajKapisi.workflow +
+            '") tabloda YOK — Vercel\'in yerini tutan derleme hic kosmamis (var olmayan kapi "bekleyen" gorunmez)' +
+            (kapilar.some((c) => c.name === girdi.imajKapisi.ad) ? '; ayni adli kapi BASKA workflow\'da, sayilmadi' : ''))
+        } else if (!imaj.every((c) => c.bucket === 'pass')) {
+          iptal('IMAJ YOLU DEGISTI ve "' + girdi.imajKapisi.ad + '" SUCCESS degil (' +
+            imaj.map((c) => c.bucket).join(',') + ')')
+        } else if (m2 && m2.gecti) {
+          m2.detay += ' · imaj yolu degisti, "' + girdi.imajKapisi.ad + '" VAR ve SUCCESS (Vercel eslegi)'
+        }
+      }
     }
   }
 
-  // 4
-  if (pv.mergeable !== 'MERGEABLE' || !['CLEAN', 'BLOCKED'].includes(pv.mergeStateStatus)) {
+  // 3 — emekli harici kapılar (Vercel) düşen/bekleyen sayımından ÇIKAR ama detayda GÖRÜNÜR kalır (sessiz değil).
+  const emekliNot = (liste) => liste.length
+    ? 'emekli kapi sayilmadi: ' + liste.map((c) => c.name + '(' + c.bucket + ')').join(', ')
+    : ''
+  if (kapilar === null) {
+    ekle(3, 'DUSEN 0 VE BEKLEYEN 0', false, 'kapi tablosu OKUNAMADI')
+  } else {
+    const sayilacak = (kovalar) => kapilar.filter((c) => kovalar.includes(c.bucket))
+    const dusenHepsi = sayilacak(DUSEN_KOVALARI)
+    const bekleyenHepsi = sayilacak(BEKLEYEN_KOVALARI)
+    const dusen = dusenHepsi.filter((c) => !emekliKapi(c))
+    const bekleyen = bekleyenHepsi.filter((c) => !emekliKapi(c))
+    const emekliler = [...dusenHepsi, ...bekleyenHepsi].filter((c) => emekliKapi(c))
+    const not = emekliNot(emekliler)
+    if (dusen.length || bekleyen.length) {
+      ekle(3, 'DUSEN 0 VE BEKLEYEN 0', false,
+        'dusen ' + dusen.length + ' [' + dusen.map((c) => c.name).join(',') + '] · bekleyen ' +
+        bekleyen.length + ' [' + bekleyen.map((c) => c.name).join(',') + ']' + (not ? ' · ' + not : ''))
+    } else {
+      ekle(3, 'DUSEN 0 VE BEKLEYEN 0', true, 'skipping DUSEN sayilmadi' + (not ? ' · ' + not : ''))
+    }
+  }
+
+  // 4 — `UNSTABLE` YALNIZ şu koşulda kabul (ALT-199): mergeable=MERGEABLE VE kapı tablosunda düşen/bekleyen en az bir
+  // kapı var VE hepsi emekli harici listesinde (GitHub'ın UNSTABLE'ı yalnız emekli Vercel'den geliyor). Düşen/bekleyen
+  // emekli-dışı kapı varsa, tablo okunamadıysa ya da UNSTABLE'ı AÇIKLAYAN emekli kapı yoksa KIRMIZI (açıklanamayan UNSTABLE geçmez).
+  // DIRTY/BEHIND/UNKNOWN/HAS_HOOKS vb. önceki kuralla aynı: CLEAN ve BLOCKED dışı kırmızı.
+  let unstableEmekliden = false
+  if (pv.mergeable === 'MERGEABLE' && pv.mergeStateStatus === 'UNSTABLE' && kapilar !== null) {
+    // HER kapi ya pass/skipping ya emekli olmali: fail, pending, cancel ve BILINMEYEN kova emekli degilse sorunludur
+    // (cancel hicbir sayima girmediginden eskiden UNSTABLE'a gizlenebiliyordu — ARC-331).
+    const sorunlu = kapilar.filter((c) => !['pass', 'skipping'].includes(c.bucket))
+    unstableEmekliden = sorunlu.length > 0 && sorunlu.every((c) => emekliKapi(c))
+  }
+  if (pv.mergeable !== 'MERGEABLE' || (!['CLEAN', 'BLOCKED'].includes(pv.mergeStateStatus) && !unstableEmekliden)) {
     ekle(4, 'MERGEABLE + hesaplanmis durum', false,
       'mergeable=' + pv.mergeable + ' state=' + pv.mergeStateStatus +
       (pv.mergeable === 'UNKNOWN' || pv.mergeStateStatus === 'UNKNOWN'
@@ -325,7 +498,8 @@ function degerlendir(girdi) {
       String(girdi.uzakSha).slice(0, 8) + ' AYRISIYOR — kapilar BASKA commit\'i olcmus olabilir')
   } else {
     ekle(4, 'MERGEABLE + hesaplanmis durum', true,
-      'state=' + pv.mergeStateStatus + ', sha ' + String(girdi.uzakSha).slice(0, 8) + ' eslesiyor')
+      'state=' + pv.mergeStateStatus + ', sha ' + String(girdi.uzakSha).slice(0, 8) + ' eslesiyor' +
+      (unstableEmekliden ? ' · UNSTABLE yalniz emekli Vercel\'den (pass/skipping disindaki kapilarin — fail, pending, cancel, bilinmeyen — TAMAMI emekli listesinde)' : ''))
   }
 
   // 5
@@ -500,6 +674,7 @@ function ozDogrulama(yerelMetin, masterMetin) {
 module.exports = {
   ozDogrulama,
   turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
+  imajKapisiCoz, imajKapisiTuret, yolDeseniEslesir, emekliMi, emekliKapi, EMEKLI_HARICI_KAPILAR,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
 
@@ -578,7 +753,8 @@ if (require.main === module) {
   } catch (e) { pvHata = String(e.message).slice(0, 120) }
 
   let kapilar = null
-  try { kapilar = JSON.parse(gh(['pr', 'checks', pr, '--json', 'name,bucket'])) } catch { kapilar = null }
+  // `workflow` ALANI ŞART (ALT-199): emeklilik `workflow === ''` ister; Actions job'ı aynı adı taşısa muaf olmaz.
+  try { kapilar = JSON.parse(gh(['pr', 'checks', pr, '--json', 'name,bucket,workflow'])) } catch { kapilar = null }
 
   // Birleşme ref'inin VARLIĞI yalnız REST'ten okunur (§20 dersi 3 + 2026-09-04 ölçümü).
   let mergeCommitSha = null
@@ -619,15 +795,29 @@ if (require.main === module) {
     inceleme = sonCommit ? { yorumlar, sonCommit } : null
   } catch { inceleme = null }
 
+  // ALT-199: imaj kapisi yayin-imaji.yml'den TURETILIR; degisen dosyalar tek yerden okunur (okuma sorusu da kullanir).
+  // Yollar ve is adi TABANDAN (origin/master) okunur, PR agacindan degil: PR kendi zorunlu kapisini daraltamasin.
+  const imaj = imajKapisiTuret(AGAC, () => git(['show', 'origin/master:.github/workflows/' + IMAJ_WORKFLOW_DOSYASI]))
+  let degisenDosyalar = null
+  try {
+    // --no-renames: tasinan dosyanin ESKI yolu da listede gorunsun (Dockerfile -> baska ad tasimasi imaj yolunu atlatamaz).
+    degisenDosyalar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+  } catch { degisenDosyalar = null }
+
   yaz('  turetme: ' + okunanDosya + ' workflow okundu, zorunlu cekirdek ' + cekirdek.length +
     ' kapi: ' + (cekirdek.join(', ') || '(BOS)'))
   // §21: kabul edilen boşluk SESSİZ olamaz.
-  yaz('  ⚠sinir : Vercel kapilari harici entegrasyon — TURETILEMEZ, cekirdege konmaz ' +
-    '(gorulup duserse madde 3 sayar).')
+  yaz('  ⚠sinir : harici kapilar TURETILEMEZ, cekirdege konmaz; yalniz EMEKLI listesindekiler (tam ad: ' +
+    EMEKLI_HARICI_KAPILAR.map((k) => k.ad + ' ' + k.tarih).join(', ') + ') madde 3/4 sayimindan cikar ' +
+    've detayda gorunur; liste disi harici kapi duserse madde 3 KIRMIZI.')
+  yaz('  bilgi   imaj kapisi (Vercel eslegi): ' + (imaj.kapi
+    ? '"' + imaj.kapi.ad + '" — yollar: ' + imaj.kapi.yollar.join(', ')
+    : 'TURETILEMEDI (' + imaj.sinir + ') — imaj yolu degisen PR\'da fail-closed'))
   for (const s of sinirlar) yaz('  ⚠sinir : ' + s)
 
   const { maddeler, kirmizi } = degerlendir({
     pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY, functionsDegisen, inceleme,
+    imajKapisi: imaj.kapi, degisenDosyalar,
   })
   for (const m of maddeler) {
     yaz((m.gecti ? '  YESIL   ' : '  ⛔KIRMIZI ') + m.no + '. ' + m.ad + (m.detay ? '  — ' + m.detay : ''))
