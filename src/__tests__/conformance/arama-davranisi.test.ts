@@ -4,6 +4,7 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
@@ -134,6 +135,13 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
       'ISI GERİ KAZANIM',
       'İNLİNE',
       'inline',
+      // cetvel §8 vaka 18-23 (URN-168, 2026-11-16)
+      'kasals',
+      'fleksiva',
+      'kanal tipi fann',
+      '125 mm fan',
+      'nikotra',
+      'hava perdesi',
     ]
     const eksik = sorgular.filter((q) => !s.includes(`'${q}'`))
     expect(eksik, `vaka kumesi DARALMIS — eksik sorgular: ${eksik.join(' | ')}`).toEqual([])
@@ -295,5 +303,64 @@ describe('INV-SEARCH-BEHAVIOR-1 · Katman A saf fonksiyon ISKELETI (Adim 3)', ()
     const s = oku(path.join(KOK, 'src', '__tests__', 'conformance', 'arama-davranisi.test.ts'))
     expect(s).toContain('ISKELET_ADIM_3')
     expect(s).toMatch(/HENUZ YAZILMADI|HENÜZ YAZILMADI/)
+  })
+})
+
+/**
+ * URN-168 · vaka 18-23 karar fonksiyonları SABOTAJLA ölçülür (cetvel §8).
+ *
+ * Kapı canlıya bağlanır ve CI'da koşamaz; ama "bozuk sonuç gelirse kapı kırmızı verir mi"
+ * sorusu saf fonksiyonla CI'da ölçülür. Her kolda ÖNCE sağlam girdi geçer (kapı yanlış
+ * kırmızı vermesin), SONRA bozuk girdi hata metni döndürmeli (sahte yeşil olmasın).
+ */
+type Satir = { brand?: string; label?: string; type?: string }
+type Olcutler = {
+  markaVeyaSifir: (rows: Satir[], marka: string, aktif: number) => string | null
+  sifirBeklenen: (rows: Satir[]) => string | null
+  ilkSonuclarAdIbaresi: (adlar: string[], ibare: string, k: number) => string | null
+  oneriKategoriVar: (o: Satir[], ibare: string) => string | null
+}
+
+describe('INV-SEARCH-BEHAVIOR-1 · vaka 18-23 karar mantığı (sabotaj)', async () => {
+  const yol = path.join(KOK, 'scripts', 'db', 'checks', 'arama-vaka-olcutleri.mjs')
+  const m = (await import(/* @vite-ignore */ pathToFileURL(yol).href)) as Olcutler
+
+  it('marka-veya-sifir: sağlam geçer; marka dışı, boş, tavan aşımı ve hayalet marka KIRMIZI', () => {
+    const c = [{ brand: 'Casals' }, { brand: 'Casals' }]
+    expect(m.markaVeyaSifir(c, 'casals', 53)).toBeNull()
+    expect(m.markaVeyaSifir([], 'casals', 0)).toBeNull() // marka katalogda yok → 0 doğru
+    expect(m.markaVeyaSifir([...c, { brand: 'Vortice' }], 'casals', 53)).toMatch(/marka disi/)
+    expect(m.markaVeyaSifir([], 'casals', 53)).toMatch(/0 sonuc/)
+    expect(m.markaVeyaSifir(c, 'casals', 1)).toMatch(/TAVANI/)
+    expect(m.markaVeyaSifir(c, 'casals', 0)).toMatch(/katalogda YOK/)
+  })
+
+  it('sifir: 0 geçer, 1 sonuç KIRMIZI', () => {
+    expect(m.sifirBeklenen([])).toBeNull()
+    expect(m.sifirBeklenen([{ brand: 'X' }])).toMatch(/0 sonuc beklenirken 1/)
+  })
+
+  it('ilk-sonuc-ad-ibaresi: Lineo 125 ilk sıralarda geçer; 254 mm öne geçerse KIRMIZI; boş KIRMIZI', () => {
+    const iyi = ['Vortice Lineo 125', 'Vortice Lineo 125 Quiet', 'Vortice Lineo 125 T', 'Vortice Lineo 125 Timer', 'Vortice E 254 M']
+    expect(m.ilkSonuclarAdIbaresi(iyi, '125', 4)).toBeNull()
+    const kotu = ['Vortice E 254 M ATEX', ...iyi.slice(0, 3)]
+    expect(m.ilkSonuclarAdIbaresi(kotu, '125', 4)).toMatch(/ibaresini tasimiyor/)
+    expect(m.ilkSonuclarAdIbaresi([], '125', 4)).toMatch(/0 sonuc/)
+  })
+
+  it('oneri-kategori: kategori satırı geçer; yalnız ürün, boş ya da başka kategori KIRMIZI', () => {
+    const iyi = [{ type: 'product', label: 'Air Door' }, { type: 'category', label: 'Hava Perdeleri' }]
+    expect(m.oneriKategoriVar(iyi, 'hava perde')).toBeNull()
+    expect(m.oneriKategoriVar([{ type: 'product', label: 'Air Door' }], 'hava perde')).toMatch(/kategori onerisi YOK/)
+    expect(m.oneriKategoriVar([], 'hava perde')).toMatch(/YOK/)
+    expect(m.oneriKategoriVar([{ type: 'category', label: 'Fanlar' }], 'hava perde')).toMatch(/tasimiyor/)
+  })
+
+  it('betik yeni ölçütleri GERÇEKTEN çağırıyor (ölü ölçüt yok) ve TANIMSIZ ölçüt kolu duruyor', () => {
+    const s = oku(BETIK)
+    for (const f of ['markaVeyaSifir(', 'sifirBeklenen(', 'ilkSonuclarAdIbaresi(', 'oneriKategoriVar(']) {
+      expect(s, `${f} betikte cagrilmiyor`).toContain(f)
+    }
+    expect(s).toContain('TANIMSIZ olcut')
   })
 })

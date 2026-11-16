@@ -300,6 +300,12 @@ Aşağıdaki vakalar **taban**dır; genişletilebilir, daraltılamaz.
 | 13 | `jet fan` | ad isabeti sırası (K3.1e) | ilk satırın ad isabeti = kümedeki **en yüksek** ad isabeti (ada göre değil davranışa göre; katalog "Jet …" adlı başka ürün eklese de kırılmaz) |
 | 15 | `ISI GERİ KAZANIM`, `İNLİNE` | büyük İ (K5.2a) | küçük harfli yazımla **aynı sayı** |
 | 14 | `vortis` | marka tavanı (K8.4a) | ≤ Vortice aktif ürün sayısı, marka dışı **0** |
+| 18 | `kasals` | marka yazım hatası (URN-166) | marka katalogdaysa **≥ 1 ve hepsi o marka**, değilse **0** (veriye bağlı, sabit sayı yok) |
+| 19 | `fleksiva` | katalogda olmayan terim | **0** sonuç (uydurma eşleşme yok) |
+| 20 | `kanal tipi fann` | tek harf yazım hatası (URN-166) | vaka 8 ile **aynı küme** |
+| 21 | `125 mm fan` | birim + sayı (URN-166) | ilk **4** sonucun adı `125` taşır (254 mm öne geçmez) |
+| 22 | `nikotra` | marka yazım hatası (URN-166 sözlük) | ≤ Nicotra aktif ürün sayısı, marka dışı **0** |
+| 23 | `hava perdesi` | öneri kutusunda kategori (URN-139) | `type=category` ve etiketi `hava perde` taşıyan **≥ 1** satır; sahip + `anon` + `authenticated` rolüyle |
 
 ## 9. Hata yolları (kural 14)
 
