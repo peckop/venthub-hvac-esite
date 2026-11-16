@@ -73,3 +73,47 @@ Asistanın asıl ihtiyacı **yapılandırılmış özellik süzgeci** (debi, bas
 **Not:** 431 ürün canlı bugünkü aktif katalog; REC-340 ölçümünün 442'si 16 Eylül tarihli (fark katalog değişimi). Gecikme satırı "kısmi" (81 sıcak, 1 soğuk ölçüm): "10,9 sn bugün görülmüyor" cümlesi **sıcak tur için** doğrudur, soğuk tur sonucu gelmeden kesin değildir. Çürütücü (urun-curutucu) bulguları 2, 3, 4, 7 işlendi; doğrulama notu: alt ajan canlı veriyi yeniden ölçemedi, "kasals 53/53 Casals" benim canlı sorgumdur.
 
 **Açık/ölçülmedi:** (3) B2B/HVAC sitelerinin arama davranışı bu belgede **yok** (ayrı ölçüm gerekir); Altyapı'nın soğuk gecikme turları; Edge'de ONNX çalıştırma; bge-m3; gerçek arama günlüğü.
+
+## 6. Kurumsal çözümler: yerel OpenSearch denemesi (URN-170, 16 Kasım 2026)
+
+**Soru:** pgroonga yerine ya da yanında OpenSearch gibi bir motor, bizim 27 sorgumuzda daha iyi ilk sonuç veriyor mu?
+**Cevap:** hayır. Aynı 431 aktif ürün, aynı 27 sorgu: OpenSearch 2.17.1 (Türkçe analizör: apostrophe, tr_lower, asciifolding, tr_stemmer; katmanlar and, bulanık, gevşek) sonuç sayısında 27 sorgunun 21'inde pgroonga ile aynı çıktı; kalan 6'sında sapma var ve **ilk sonuç kalitesi pgroonga'dan iyi değil, dört vakada kötü**:
+- "125 mm fan": pgroonga 36 sonuç, ilk **Lineo 125** (doğru); OpenSearch 14 sonuç, ilk **E 304 M ATEX** (yanlış çap).
+- "kasals": pgroonga 53 (hepsi Casals); OpenSearch bulanık katmanda 73, ilk sonuç **SULU BATARYA** (ilgisiz).
+- "duvar tipi aspiratör": pgroonga 40; OpenSearch gevşek katmana düşüp 161 döndürdü (kesinlik kaybı).
+- "aspiratr": pgroonga 25, OpenSearch 38; "vortis" ve "nikotra" sayıları aynı (174 ve 35), ilk sonuçlar farklı ve OpenSearch'inki aranan marka ürünü değil.
+
+Sıfır sonuç vakaları ("fleksiva", "zzzqqq") iki motorda da 0. OpenSearch'in kazandığı bir vaka yok.
+
+**Ölçüm koşulu ve sınırı.** Yerel tek konteyner, 1 GB sınır, 512 MB heap; 431 belge yüklemesi 312 ms; sorgular 10-97 ms (ağsız, küçük veri: canlı gecikmeyle **kıyaslanamaz**, kanıt sayılmaz). Konteyner bellek tavanına yakın çalıştı (972 MiB / 1 GiB). Kıyas betiği depo dışı (C:/tmp/urn170/opensearch-kiyas.cjs), ham çıktı opensearch-sonuc.json. Alan ağırlığı, eşanlamlı ve sayısal süzgeç ayarı yapılmadan "kutudan çıktığı gibi" koşuldu; ince ayarla sonuç değişebilir.
+
+**Maliyet tarafı (ölçülen).** Ek hizmet: ayrı süreç ve en az 1 GB bellek, indeks senkronu (arama_indeksi_tazele tetiği ayrıca kurulmalı), tenant kapsamı (mutlak kural 12) uygulama katmanında yeniden yazılmalı. pgroonga veritabanı içinde, RLS ve tenant kapsamıyla birlikte geliyor.
+
+**Dış hizmetler (Algolia, Typesense, Meilisearch, Elastic bulut) için fiyat ve özellik karşılaştırması bu belgede YOK:** resmî fiyat ve özellik sayfalarından doğrulanmadığı için yazılmadı. Dış araç kararı dört kapılıdır (arac-envanteri-standard.md); ihtiyaç kapısı bugün kapalı, çünkü §1'deki kusurların iki sınıfı da motor değişimiyle değil sözlük ve tolerans ayarıyla kapanıyor.
+
+**Öneri:** Yol A kalır (pgroonga + sözlük + tolerans ayarı). Motor değişikliği için gerekçe yok; doğal dil cümleleri ölçülürse B (anlamsal) koşullu yeniden açılır. OpenSearch'e geçilecekse önce aynı 27 vakaya ağırlık ve eşanlamlı ayarı yapılıp yeniden ölçülmeli.
+
+### 6.1 Resmî sayfa ölçümü: ücretli ve açık kaynak seçenekler (16 Kasım 2026)
+
+**Yöntem ve çekince.** Araştırmacı ajan 19 resmî adresi okudu; sayfa özetleyen küçük model kullanıldığı için tek koşumdur. Üç çelişkili kalem ham sayfa metniyle ikinci kez ölçüldü (aşağıda işaretli). Hiçbir satıcı 431 ürün ve düşük trafik için aylık tutarı sayfada hesaplamıyor; (b) sütunu yalnız sayfada yazan başlangıç rakamıdır, bizim için hesaplanmış tutar değildir. "Ölçülmedi" = sayfada yok ya da sayfa açılmadı; tahmin yazılmadı.
+
+| Ürün | Ücretsiz katman | Aylık rakam (sayfada yazan) | Türkçe | Vektör/anlamsal | Lisans / kendi sunucu | Kaynak |
+|---|---|---|---|---|---|---|
+| Algolia | Grow: 0 $/ay, 10K arama/ay, 50K kayıt (ham sayfada yalnız 50K görüldü; ajanın okuduğu "100K" doğrulanamadı) | Elevate özel fiyat | ölçülmedi | NeuralSearch (anahtar kelime + anlamsal) | SaaS | algolia.com/pricing |
+| Elastic Cloud | yok, deneme var | rakam yok | ölçülmedi (doküman 404) | var (vektör) | SaaS | elastic.co/pricing |
+| Doofinder | yok, deneme | Basic 49 $ (yıllık 44 $), Pro 149 $, Advanced 349 $ (ham sayfada $49/$44/$149/$349 görüldü; ajanın "149 €" ifadesi Pro'ya ait olabilir) | dil listesinde yok | "anlamsal" ifadesi yok; AI Guided Search | SaaS | doofinder.com/en/pricing |
+| Klevu (Athos) | yok | "fiyat iste" | yazmıyor | hibrit arama | SaaS | athoscommerce.com/pricing |
+| Coveo | yok, deneme | "fiyat iste" | yazmıyor | AI arama | SaaS | coveo.com/en/pricing |
+| Bloomreach | yok | genel fiyat yok; küçük markalar için yıllık en az 60 bin $ (sayfa ifadesi) | yazmıyor | AI arama | SaaS | bloomreach.com/en/pricing |
+| Typesense | ücretsiz küme var (sınır yazmıyor) | ölçülmedi | yazmıyor | dolaylı (embedding) | sayfada lisans yok | cloud.typesense.org |
+| Meilisearch | Cloud 14 gün deneme, kalıcı ücretsiz yok | XS yaklaşık 20 $/ay (başlangıç; bölgeye göre 14,88 $ görüldü) | **EVET, doküman tablosunda Turkish (noktalı/noktasız i özel işleme); ham sayfada doğrulandı** | evet (tam metin + vektör + hibrit) | MIT | meilisearch.com/pricing, /docs/learn/resources/language |
+| OpenSearch | yönetilen için ölçülmedi | ölçülmedi | ölçülmedi (yerelde analizörle çalıştı, §6) | ölçülmedi | Apache 2.0 | opensearch.org/faq |
+| Elasticsearch | ölçülmedi | ölçülmedi | ölçülmedi | var | ELv2 ve SSPL; güncel lisans listesi doğrulanamadı | elastic.co |
+| Vespa | çekirdek ücretsiz; bulut deneme kredisi | saatlik vCPU/bellek/disk; aylık ölçülmedi | ölçülmedi | evet (vektör, sözcük, hibrit) | Apache 2.0 (çekirdek) | vespa.ai/pricing |
+| Qdrant | ücretsiz tek düğüm 1 GB RAM / 4 GB disk | kullanıma bağlı | ölçülmedi | yalnız vektör | sayfada yok | qdrant.tech/pricing |
+| Weaviate | Sandbox ücretsiz (100K nesne, 1 GB) | Flex 45 $/ay, Premium 400 $/ay'dan | ölçülmedi | evet, hibrit | sayfada yok | weaviate.io/pricing |
+| ParadeDB | topluluk sürümü kendi sunucuda ücretsiz | bulut özel önizleme | ölçülmedi | kısmi (beta) | AGPL-3.0 | paradedb.com/pricing |
+
+**Okuma (objektif).** Bu 14 satırda Türkçe desteği resmî sayfada açıkça yazan tek ürün Meilisearch'tir; gerisi ya yazmıyor ya ölçülmedi, bu "desteklemiyor" demek değildir. Meilisearch'in daha önce yerelde ölçülmüş kıyası (URN-165) ve bu bölümün OpenSearch kıyası aynı sonuca varıyor: ek motor, mevcut pgroonga'nın ilk sonuç kalitesini geçtiğini göstermedi. Ücretli hizmetlerin 431 ürün için gerçek tutarı satış görüşmesi gerektiriyor; bugün bu görüşme yapılmadı.
+
+**Kendi model eğitimi (ince ayar).** Hazır embedding modeli etiketsiz kullanılır; ince ayar sizin sorgu-ürün çiftlerinizle yeniden eğitimdir. Birincil kaynakta tipik örnek sayısı rakamı **bulunamadı: ölçülmedi**. Bu sitede gerçek arama trafiği bugün neredeyse sıfır olduğundan ince ayar için gereken sorgu-tıklama günlüğü yoktur; önce eş anlamlı tablosu ve tolerans ayarı (Yol A), veri birikince ince ayar değerlendirilir.
