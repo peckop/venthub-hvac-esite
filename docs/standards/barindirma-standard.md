@@ -2,7 +2,8 @@
 
 > **Kapsam:** VentHub'ın her katmanı (site, veritabanı, DNS, e-posta, önbellek) **nerede** durur,
 > **niçin** orada durur, sağlayıcı değişirse **ne sökülür**.
-> **Durum:** YÜRÜRLÜKTE, site taşındı. **Son doğrulama:** 2026-11-16. Site 15 Kasım 2026'dan beri **DigitalOcean 2 GB droplet (Frankfurt) + Coolify** üzerinde (OPS-280, Recep kararı; plan ve ölçülen dersler `docs/plans/tasima-do-coolify-2026-11-15.md`); sağlayıcı seçimi (eski karar 59 sorusu) bununla kapandı. Sağlayıcıdan
+> **Sahibi:** ALTYAPI · **Son doğrulama:** 2026-11-16 (ALTYAPI; taşıma planı `docs/plans/tasima-do-coolify-2026-11-15.md` ve canlı taşıma ölçümüne karşı).
+> **Durum:** YÜRÜRLÜKTE, site taşındı. Site 15 Kasım 2026'dan beri **DigitalOcean 2 GB droplet (Frankfurt) + Coolify** üzerinde (OPS-280, Recep kararı; plan ve ölçülen dersler `docs/plans/tasima-do-coolify-2026-11-15.md`); sağlayıcı seçimi (eski karar 59 sorusu) bununla kapandı. Sağlayıcıdan
 > bağımsız kurallar (§B2–§B5) bugünden geçerlidir.
 > **Ölçüm kaynağı:** REC-367 (2026-09-22) — üç aday yerelde derlendi ve ölçüldü; tablo Linear
 > REC-367 açıklamasının sonunda. **Doğuş sebebi:** Vercel ücretsiz takımı "dağıtım depolaması 10 GB
