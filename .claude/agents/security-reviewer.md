@@ -34,7 +34,7 @@ emin olmadığını PLAUSIBLE diye işaretle, CONFIRMED deme.
    ve S/T/R/I/D/E sorusunu sor; kötüye kullanım senaryosunu yaz, ilk test o olsun.
 10. **SSRF:** kullanıcının etkilediği URL (URL'den içe aktarma, webhook geri çağrısı, görsel proxy) şema/host izin listesinden
     geçiyor mu, tüm DNS kayıtları çözülüyor mu, özel ve rezerve adresler (loopback, 169.254.169.254) reddediliyor mu?
-11. **Sunucusuz rate limit:** bellek-içi sayaç Vercel'de instance başına çalışır (limit × instance olur ya da hiç tetiklenmez);
+11. **Çok örnekli rate limit:** bellek-içi sayaç örnek başına çalışır (Coolify'da tek örnek; ikinci örnek ya da Vercel'e dönüşte limit × örnek olur ya da hiç tetiklenmez);
     sınır paylaşımlı bir depoda (Supabase tablosu) mu tutuluyor?
 12. **Kurulum betiği kapısı:** yeni ya da değişen bağımlılıkta betik politikası ve lockfile farkı birlikte okunur; `audit fix --force`
     otomatik uygulanmaz; audit yalnız bilinen advisory'yi yakalar (yeni typosquat paketini yakalamaz). Kural kaynağı

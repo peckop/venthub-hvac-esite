@@ -73,9 +73,35 @@ function al() {
   fs.mkdirSync(hedef, { recursive: true })
   const t0 = Date.now()
   const pg = `${KAYNAK_PROJE}-unopim-pgsql-1`
-  kos('docker', ['exec', pg, 'sh', '-c', 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc -f /tmp/yedek.dump'])
-  kos('docker', ['cp', `${pg}:/tmp/yedek.dump`, path.join(hedef, 'db.dump')])
-  kos('docker', ['exec', pg, 'rm', '-f', '/tmp/yedek.dump'])
+  // ALT-204 (16 Kasım 21:02 gece yedeği): UnoPIM bilerek KAPALIYKEN (ALT-196) konteyner var ama çalışmıyor ve
+  // `docker exec` "is not running" ile düşüyordu. Çalışmıyorsa YALNIZ veritabanı konteyneri açılır, hazır olunca
+  // dökülür, iş bitince (başarıda da hatada da) eski haline (kapalı) döndürülür. Konteyner hiç yoksa inspect hata verir (fail-closed).
+  const acikti = kos('docker', ['inspect', '-f', '{{.State.Running}}', pg]) === 'true'
+  if (!acikti) {
+    kos('docker', ['start', pg])
+    pgHazirBekle(pg)
+  }
+  try {
+    kos('docker', ['exec', pg, 'sh', '-c', 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc -f /tmp/yedek.dump'])
+    kos('docker', ['cp', `${pg}:/tmp/yedek.dump`, path.join(hedef, 'db.dump')])
+    kos('docker', ['exec', pg, 'rm', '-f', '/tmp/yedek.dump'])
+    yedekGovdesi(kaynak, hedef, damga, t0, pg)
+  } finally {
+    if (!acikti) spawnSync('docker', ['stop', pg], { encoding: 'utf8' })
+  }
+}
+
+/** Postgres kabul edene kadar (en çok 90 sn) bekler; hazır olmazsa HATA (yarım dökümle devam edilmez). */
+function pgHazirBekle(pg) {
+  for (let i = 0; i < 45; i += 1) {
+    const r = spawnSync('docker', ['exec', pg, 'sh', '-c', 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"'], { encoding: 'utf8' })
+    if (r.status === 0) return
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000)
+  }
+  throw new Error(`${pg} 90 sn içinde hazır olmadı (pg_isready)`)
+}
+
+function yedekGovdesi(kaynak, hedef, damga, t0, pg) {
   kos('docker', ['run', '--rm', '-v', `${KAYNAK_PROJE}_unopim-storage:/v:ro`, '-v', `${hedef}:/out`, 'alpine', 'tar', 'czf', '/out/storage.tgz', '-C', '/v', '.'])
   const icerik = kos('docker', ['run', '--rm', '-v', `${hedef}:/in:ro`, 'alpine', 'tar', 'tzf', '/in/storage.tgz']).split('\n')
   if (!icerik.includes(ANAHTAR_TAR_YOLU)) throw new Error('storage.tgz içinde .app_key YOK — anahtarsız yedek geri kurulamaz, durdu')

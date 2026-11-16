@@ -7,8 +7,9 @@
 ## Proje Özeti
 
 HVAC (iklimlendirme/havalandırma) sektörüne özel **e-ticaret platformu**.
-**CANLI: `venthub.com.tr`** (kanonik, www'suz; `www` → apex 308; vercel.app = altyapı adresi,
-müşteriye verilmez). Faz 1 (Foundation) bitti; Faz 2 (White-Label/multi-tenant) **PARK'ta**
+**CANLI: `venthub.com.tr`** (kanonik, www'suz; `www` → apex 308; barındırma 15 Kasım 2026'dan beri
+**DigitalOcean + Coolify**, eski vercel.app adresi müşteriye verilmez; Vercel kırmızısı sorun değildir,
+`docs/plans/tasima-do-coolify-2026-11-15.md`). Faz 1 (Foundation) bitti; Faz 2 (White-Label/multi-tenant) **PARK'ta**
 (Recep kararı 2026-08-28, REC-88: öncelik kendi şirket + tek operatör; kural 12 yine geçerli).
 Birincil dil Türkçe, ikincil İngilizce.
 
@@ -19,7 +20,7 @@ Birincil dil Türkçe, ikincil İngilizce.
 - **TypeScript 5.7** strict — `any` **yasak**
 - **Supabase** (PostgreSQL + Auth + Edge Functions + Realtime + Storage), RLS-first
 - **React Three Fiber 9** + Drei (3D), **Tailwind 3.4** (design tokens), Framer Motion
-- **Vitest** (Testing Library + axe a11y), **Sentry**, **Vercel** hosting
+- **Vitest** (Testing Library + axe a11y), **Sentry**, hosting **DigitalOcean + Coolify** (GHCR imajı; Vercel projesi yalnız geri dönüş)
 - Entegrasyonlar: İyzico (ödeme), Resend (e-posta), Twilio (SMS/WhatsApp)
 - Paket yöneticisi: **pnpm**
 

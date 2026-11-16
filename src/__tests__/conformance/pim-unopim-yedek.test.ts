@@ -48,9 +48,22 @@ describe('INV-PIM-YEDEK-1 yedek betiği', () => {
     expect(kaynak).toMatch(/setAuthTag\(/)
     expect(kaynak).toMatch(/şifre anahtarı yedek dizininin içinde olamaz/)
     // anahtar kontrolü yedek BAŞLAMADAN koşar (al'ın ilk işlerinden)
-    const al = kaynak.slice(kaynak.indexOf('function al()'), kaynak.indexOf('function al()') + 600)
+    const al = kaynak.slice(kaynak.indexOf('function al()'), kaynak.indexOf('function pgHazirBekle'))
     expect(al.indexOf('sifreAnahtari(kok)')).toBeGreaterThan(-1)
     expect(al.indexOf('sifreAnahtari(kok)')).toBeLessThan(al.indexOf('pg_dump'))
+  })
+
+  it('ALT-204: konteyner KAPALIYSA yalnız veritabanı açılır, hazır beklenir, iş bitince (hatada da) eski haline döner', () => {
+    const al = kaynak.slice(kaynak.indexOf('function al()'), kaynak.indexOf('function pgHazirBekle'))
+    // durum ölçülür (varsayılmaz); konteyner hiç yoksa inspect hata verir (fail-closed)
+    expect(al).toMatch(/\['inspect', '-f', '\{\{\.State\.Running\}\}', pg\]/)
+    expect(al).toMatch(/if \(!acikti\) \{\s*kos\('docker', \['start', pg\]\)\s*pgHazirBekle\(pg\)/)
+    // dökümden ÖNCE açılır, finally'de yalnız KENDİ açtığı kapatılır; çalışan yığına dokunulmaz
+    expect(al.indexOf("['start', pg]")).toBeLessThan(al.indexOf('pg_dump'))
+    expect(al).toMatch(/finally \{\s*if \(!acikti\) spawnSync\('docker', \['stop', pg\]/)
+    // yalnız veritabanı konteyneri: compose up/down ya da tüm projeyi başlatan komut yok
+    expect(al).not.toMatch(/'compose'/)
+    expect(kaynak).toMatch(/function pgHazirBekle[\s\S]*pg_isready[\s\S]*throw new Error\(`\$\{pg\} 90 sn/)
   })
 
   it('down -v yalnız sabit deneme projesine — asıl kurulum adı hiçbir down komutunda geçmez', () => {
