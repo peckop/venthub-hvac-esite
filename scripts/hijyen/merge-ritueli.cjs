@@ -270,7 +270,11 @@ function imajKapisiCoz(metin) {
   const c = workflowCoz(metin)
   const is = c.joblar.find((j) => j.ad) || c.joblar[0]
   if (!is) return { hata: 'jobs: icinde job bulunamadi' }
-  return { ad: is.ad || is.id, yollar }
+  // Üst düzey workflow adı (gh pr checks `workflow` alanı: canlıda "Yayın İmajı (GHCR)", 16 Kasım #2571). Yoksa fail-closed.
+  const wm = /^name:[ \t]*(\S.*?)[ \t]*\r?$/m.exec(metin)
+  const workflow = wm ? wm[1].replace(/^['"]|['"]$/g, '') : ''
+  if (!workflow) return { hata: 'ust duzey workflow `name:` bulunamadi' }
+  return { ad: is.ad || is.id, workflow, yollar }
 }
 
 /**
@@ -431,10 +435,12 @@ function degerlendir(girdi) {
       } else if (kapilar === null) {
         iptal('imaj yolu degisti ama kapi tablosu OKUNAMADI')
       } else {
-        const imaj = kapilar.filter((c) => c.name === girdi.imajKapisi.ad)
+        // Ad + WORKFLOW birlikte: baska bir workflow'daki ayni adli job imaj kapisi SAYILMAZ.
+        const imaj = kapilar.filter((c) => c.name === girdi.imajKapisi.ad && c.workflow === girdi.imajKapisi.workflow)
         if (imaj.length === 0) {
-          iptal('IMAJ YOLU DEGISTI ama "' + girdi.imajKapisi.ad + '" kapisi tabloda YOK — Vercel\'in yerini tutan derleme ' +
-            'hic kosmamis (var olmayan kapi "bekleyen" gorunmez)')
+          iptal('IMAJ YOLU DEGISTI ama "' + girdi.imajKapisi.ad + '" kapisi (workflow "' + girdi.imajKapisi.workflow +
+            '") tabloda YOK — Vercel\'in yerini tutan derleme hic kosmamis (var olmayan kapi "bekleyen" gorunmez)' +
+            (kapilar.some((c) => c.name === girdi.imajKapisi.ad) ? '; ayni adli kapi BASKA workflow\'da, sayilmadi' : ''))
         } else if (!imaj.every((c) => c.bucket === 'pass')) {
           iptal('IMAJ YOLU DEGISTI ve "' + girdi.imajKapisi.ad + '" SUCCESS degil (' +
             imaj.map((c) => c.bucket).join(',') + ')')
@@ -474,7 +480,9 @@ function degerlendir(girdi) {
   // DIRTY/BEHIND/UNKNOWN/HAS_HOOKS vb. önceki kuralla aynı: CLEAN ve BLOCKED dışı kırmızı.
   let unstableEmekliden = false
   if (pv.mergeable === 'MERGEABLE' && pv.mergeStateStatus === 'UNSTABLE' && kapilar !== null) {
-    const sorunlu = kapilar.filter((c) => DUSEN_KOVALARI.includes(c.bucket) || BEKLEYEN_KOVALARI.includes(c.bucket))
+    // HER kapi ya pass/skipping ya emekli olmali: fail, pending, cancel ve BILINMEYEN kova emekli degilse sorunludur
+    // (cancel hicbir sayima girmediginden eskiden UNSTABLE'a gizlenebiliyordu — ARC-331).
+    const sorunlu = kapilar.filter((c) => !['pass', 'skipping'].includes(c.bucket))
     unstableEmekliden = sorunlu.length > 0 && sorunlu.every((c) => emekliKapi(c))
   }
   if (pv.mergeable !== 'MERGEABLE' || (!['CLEAN', 'BLOCKED'].includes(pv.mergeStateStatus) && !unstableEmekliden)) {
@@ -491,7 +499,7 @@ function degerlendir(girdi) {
   } else {
     ekle(4, 'MERGEABLE + hesaplanmis durum', true,
       'state=' + pv.mergeStateStatus + ', sha ' + String(girdi.uzakSha).slice(0, 8) + ' eslesiyor' +
-      (unstableEmekliden ? ' · UNSTABLE yalniz emekli Vercel\'den (dusen/bekleyen kapilarin TAMAMI emekli listesinde)' : ''))
+      (unstableEmekliden ? ' · UNSTABLE yalniz emekli Vercel\'den (pass/skipping disindaki kapilarin — fail, pending, cancel, bilinmeyen — TAMAMI emekli listesinde)' : ''))
   }
 
   // 5
