@@ -30,6 +30,7 @@ const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')
     migrationlar: string[] | null
     mergeCommitSha: string | null
     onay?: string | null
+    fetchTamam?: boolean
   }) => { maddeler: Array<{ no: number; ad: string; gecti: boolean; detay: string }>; kirmizi: number }
   onayGecerli: (ham: unknown) => { gecerli: boolean; sebep: string; metin: string }
   ONAY_ASGARI: number
@@ -792,6 +793,63 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
       const g = girdi({ pv: unstable, kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }), imajKapisi: IMAJ, degisenDosyalar: ['Dockerfile'] })
       expect(madde(gercek.degerlendir(g), 2).gecti, 'gerçek modül imaj yokluğunu yakalamalı').toBe(false)
       expect(madde(m.degerlendir(g), 2).gecti, 'sabotajlı kopya imaj yokluğunu hâlâ yakaladı: kol sabotajı ayırt etmiyor').toBe(true)
+    })
+  })
+})
+
+describe('INV-RITUEL-6 · taban tazeliği (fetch) + yeniden adlandırma kör noktası (ALT-200, 16 Kasım 2026)', () => {
+  const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+  const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
+
+  it('fetch BAŞARISIZ → madde 8 KIRMIZI (bayat origin/master ile yeşil verilmez); kırmızı sayısı artar', () => {
+    const iyi = ritual.degerlendir(tamGirdi({ fetchTamam: true }))
+    const kotu = ritual.degerlendir(tamGirdi({ fetchTamam: false }))
+    expect(iyi.kirmizi).toBe(0)
+    expect(madde(kotu, 8).gecti).toBe(false)
+    expect(madde(kotu, 8).detay).toMatch(/fetch/)
+    expect(kotu.kirmizi).toBe(1)
+  })
+
+  it('fetch başarılıysa ya da çağıran vermediyse (eski fikstür) madde 8 görünmez: çıktı değişmez', () => {
+    expect(ritual.degerlendir(tamGirdi({ fetchTamam: true })).maddeler.some((m) => m.no === 8)).toBe(false)
+    expect(ritual.degerlendir(tamGirdi()).maddeler.some((m) => m.no === 8)).toBe(false)
+  })
+
+  it('CLI fetch sonucunu ölçer ve değerlendirmeye verir (kaynak taraması: bağlantı sessizce düşmesin)', () => {
+    expect(cli).toMatch(/let fetchTamam = true\s*\n\s*try \{ git\(\['fetch', 'origin', 'master', '-q'\]\) \} catch \{ fetchTamam = false/)
+    expect(cli).toMatch(/degisenDosyalar, fetchTamam,/)
+  })
+
+  it('migration, functions ve okuma-sorusu farkı --no-renames ile okunur (taşınan dosyanın ESKİ yolu da görünür)', () => {
+    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal, '--', 'supabase\/migrations\/'\]/)
+    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal, '--', 'supabase\/functions\/'\]/)
+    // `git diff --name-only` ÇIPLAK (--no-renames'siz) hiçbir yerde kalmadı: tek biçim.
+    expect(cli).not.toMatch(/\['diff', '--name-only', 'origin/)
+  })
+
+  describe('SABOTAJ: gevşetilmiş kopya AYNI testten KIRMIZI verir (totoloji değil)', () => {
+    let n = 0
+    function bozukKopya(eski: string, yeni: string): typeof ritual {
+      expect(kaynak.includes(eski), `sabotaj hedefi kaynakta YOK (kod değişti, sabotajı güncelle): ${eski}`).toBe(true)
+      n += 1
+      const dizin = path.join(process.env.RUNNER_TEMP || process.env.TMPDIR || process.env.TEMP || '/tmp', `ritual-s6-${Date.now()}-${n}`)
+      fs.mkdirSync(dizin, { recursive: true })
+      const dosya = path.join(dizin, 'merge-ritueli.cjs')
+      fs.writeFileSync(dosya, kaynak.replace(eski, yeni), 'utf8')
+      return require_(dosya) as typeof ritual
+    }
+
+    it('madde 8 koşulu silinirse (fetch hatası yutulur) bozuk kopya YEŞİL verir, gerçek modül KIRMIZI', () => {
+      const m = bozukKopya('if (girdi.fetchTamam === false) {', 'if (false) {')
+      const g = tamGirdi({ fetchTamam: false })
+      expect(ritual.degerlendir(g).kirmizi).toBe(1)
+      expect(m.degerlendir(g).kirmizi, 'madde 8 kapatıldı ama kırmızı hâlâ: kol sabotajı ayırt etmiyor').toBe(0)
+    })
+
+    it('CLI\'da fetch bayrağı değerlendirmeye verilmezse kaynak taraması KIRMIZI olurdu', () => {
+      const bozuk = cli.replace('degisenDosyalar, fetchTamam,', 'degisenDosyalar,')
+      expect(bozuk).not.toMatch(/degisenDosyalar, fetchTamam,/)
+      expect(cli).toMatch(/degisenDosyalar, fetchTamam,/)
     })
   })
 })
