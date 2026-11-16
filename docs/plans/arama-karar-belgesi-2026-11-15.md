@@ -92,3 +92,28 @@ Sıfır sonuç vakaları ("fleksiva", "zzzqqq") iki motorda da 0. OpenSearch'in 
 **Dış hizmetler (Algolia, Typesense, Meilisearch, Elastic bulut) için fiyat ve özellik karşılaştırması bu belgede YOK:** resmî fiyat ve özellik sayfalarından doğrulanmadığı için yazılmadı. Dış araç kararı dört kapılıdır (arac-envanteri-standard.md); ihtiyaç kapısı bugün kapalı, çünkü §1'deki kusurların iki sınıfı da motor değişimiyle değil sözlük ve tolerans ayarıyla kapanıyor.
 
 **Öneri:** Yol A kalır (pgroonga + sözlük + tolerans ayarı). Motor değişikliği için gerekçe yok; doğal dil cümleleri ölçülürse B (anlamsal) koşullu yeniden açılır. OpenSearch'e geçilecekse önce aynı 27 vakaya ağırlık ve eşanlamlı ayarı yapılıp yeniden ölçülmeli.
+
+### 6.1 Resmî sayfa ölçümü: ücretli ve açık kaynak seçenekler (16 Kasım 2026)
+
+**Yöntem ve çekince.** Araştırmacı ajan 19 resmî adresi okudu; sayfa özetleyen küçük model kullanıldığı için tek koşumdur. Üç çelişkili kalem ham sayfa metniyle ikinci kez ölçüldü (aşağıda işaretli). Hiçbir satıcı 431 ürün ve düşük trafik için aylık tutarı sayfada hesaplamıyor; (b) sütunu yalnız sayfada yazan başlangıç rakamıdır, bizim için hesaplanmış tutar değildir. "Ölçülmedi" = sayfada yok ya da sayfa açılmadı; tahmin yazılmadı.
+
+| Ürün | Ücretsiz katman | Aylık rakam (sayfada yazan) | Türkçe | Vektör/anlamsal | Lisans / kendi sunucu | Kaynak |
+|---|---|---|---|---|---|---|
+| Algolia | Grow: 0 $/ay, 10K arama/ay, 50K kayıt (ham sayfada yalnız 50K görüldü; ajanın okuduğu "100K" doğrulanamadı) | Elevate özel fiyat | ölçülmedi | NeuralSearch (anahtar kelime + anlamsal) | SaaS | algolia.com/pricing |
+| Elastic Cloud | yok, deneme var | rakam yok | ölçülmedi (doküman 404) | var (vektör) | SaaS | elastic.co/pricing |
+| Doofinder | yok, deneme | Basic 49 $ (yıllık 44 $), Pro 149 $, Advanced 349 $ (ham sayfada $49/$44/$149/$349 görüldü; ajanın "149 €" ifadesi Pro'ya ait olabilir) | dil listesinde yok | "anlamsal" ifadesi yok; AI Guided Search | SaaS | doofinder.com/en/pricing |
+| Klevu (Athos) | yok | "fiyat iste" | yazmıyor | hibrit arama | SaaS | athoscommerce.com/pricing |
+| Coveo | yok, deneme | "fiyat iste" | yazmıyor | AI arama | SaaS | coveo.com/en/pricing |
+| Bloomreach | yok | genel fiyat yok; küçük markalar için yıllık en az 60 bin $ (sayfa ifadesi) | yazmıyor | AI arama | SaaS | bloomreach.com/en/pricing |
+| Typesense | ücretsiz küme var (sınır yazmıyor) | ölçülmedi | yazmıyor | dolaylı (embedding) | sayfada lisans yok | cloud.typesense.org |
+| Meilisearch | Cloud 14 gün deneme, kalıcı ücretsiz yok | XS yaklaşık 20 $/ay (başlangıç; bölgeye göre 14,88 $ görüldü) | **EVET, doküman tablosunda Turkish (noktalı/noktasız i özel işleme); ham sayfada doğrulandı** | evet (tam metin + vektör + hibrit) | MIT | meilisearch.com/pricing, /docs/learn/resources/language |
+| OpenSearch | yönetilen için ölçülmedi | ölçülmedi | ölçülmedi (yerelde analizörle çalıştı, §6) | ölçülmedi | Apache 2.0 | opensearch.org/faq |
+| Elasticsearch | ölçülmedi | ölçülmedi | ölçülmedi | var | ELv2 ve SSPL; güncel lisans listesi doğrulanamadı | elastic.co |
+| Vespa | çekirdek ücretsiz; bulut deneme kredisi | saatlik vCPU/bellek/disk; aylık ölçülmedi | ölçülmedi | evet (vektör, sözcük, hibrit) | Apache 2.0 (çekirdek) | vespa.ai/pricing |
+| Qdrant | ücretsiz tek düğüm 1 GB RAM / 4 GB disk | kullanıma bağlı | ölçülmedi | yalnız vektör | sayfada yok | qdrant.tech/pricing |
+| Weaviate | Sandbox ücretsiz (100K nesne, 1 GB) | Flex 45 $/ay, Premium 400 $/ay'dan | ölçülmedi | evet, hibrit | sayfada yok | weaviate.io/pricing |
+| ParadeDB | topluluk sürümü kendi sunucuda ücretsiz | bulut özel önizleme | ölçülmedi | kısmi (beta) | AGPL-3.0 | paradedb.com/pricing |
+
+**Okuma (objektif).** Bu 14 satırda Türkçe desteği resmî sayfada açıkça yazan tek ürün Meilisearch'tir; gerisi ya yazmıyor ya ölçülmedi, bu "desteklemiyor" demek değildir. Meilisearch'in daha önce yerelde ölçülmüş kıyası (URN-165) ve bu bölümün OpenSearch kıyası aynı sonuca varıyor: ek motor, mevcut pgroonga'nın ilk sonuç kalitesini geçtiğini göstermedi. Ücretli hizmetlerin 431 ürün için gerçek tutarı satış görüşmesi gerektiriyor; bugün bu görüşme yapılmadı.
+
+**Kendi model eğitimi (ince ayar).** Hazır embedding modeli etiketsiz kullanılır; ince ayar sizin sorgu-ürün çiftlerinizle yeniden eğitimdir. Birincil kaynakta tipik örnek sayısı rakamı **bulunamadı: ölçülmedi**. Bu sitede gerçek arama trafiği bugün neredeyse sıfır olduğundan ince ayar için gereken sorgu-tıklama günlüğü yoktur; önce eş anlamlı tablosu ve tolerans ayarı (Yol A), veri birikince ince ayar değerlendirilir.
