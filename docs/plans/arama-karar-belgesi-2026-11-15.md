@@ -73,3 +73,22 @@ Asistanın asıl ihtiyacı **yapılandırılmış özellik süzgeci** (debi, bas
 **Not:** 431 ürün canlı bugünkü aktif katalog; REC-340 ölçümünün 442'si 16 Eylül tarihli (fark katalog değişimi). Gecikme satırı "kısmi" (81 sıcak, 1 soğuk ölçüm): "10,9 sn bugün görülmüyor" cümlesi **sıcak tur için** doğrudur, soğuk tur sonucu gelmeden kesin değildir. Çürütücü (urun-curutucu) bulguları 2, 3, 4, 7 işlendi; doğrulama notu: alt ajan canlı veriyi yeniden ölçemedi, "kasals 53/53 Casals" benim canlı sorgumdur.
 
 **Açık/ölçülmedi:** (3) B2B/HVAC sitelerinin arama davranışı bu belgede **yok** (ayrı ölçüm gerekir); Altyapı'nın soğuk gecikme turları; Edge'de ONNX çalıştırma; bge-m3; gerçek arama günlüğü.
+
+## 6. Kurumsal çözümler: yerel OpenSearch denemesi (URN-170, 16 Kasım 2026)
+
+**Soru:** pgroonga yerine ya da yanında OpenSearch gibi bir motor, bizim 27 sorgumuzda daha iyi ilk sonuç veriyor mu?
+**Cevap:** hayır. Aynı 431 aktif ürün, aynı 27 sorgu: OpenSearch 2.17.1 (Türkçe analizör: apostrophe, tr_lower, asciifolding, tr_stemmer; katmanlar and, bulanık, gevşek) sonuç sayısında 27 sorgunun 21'inde pgroonga ile aynı çıktı; kalan 6'sında sapma var ve **ilk sonuç kalitesi pgroonga'dan iyi değil, dört vakada kötü**:
+- "125 mm fan": pgroonga 36 sonuç, ilk **Lineo 125** (doğru); OpenSearch 14 sonuç, ilk **E 304 M ATEX** (yanlış çap).
+- "kasals": pgroonga 53 (hepsi Casals); OpenSearch bulanık katmanda 73, ilk sonuç **SULU BATARYA** (ilgisiz).
+- "duvar tipi aspiratör": pgroonga 40; OpenSearch gevşek katmana düşüp 161 döndürdü (kesinlik kaybı).
+- "aspiratr": pgroonga 25, OpenSearch 38; "vortis" ve "nikotra" sayıları aynı (174 ve 35), ilk sonuçlar farklı ve OpenSearch'inki aranan marka ürünü değil.
+
+Sıfır sonuç vakaları ("fleksiva", "zzzqqq") iki motorda da 0. OpenSearch'in kazandığı bir vaka yok.
+
+**Ölçüm koşulu ve sınırı.** Yerel tek konteyner, 1 GB sınır, 512 MB heap; 431 belge yüklemesi 312 ms; sorgular 10-97 ms (ağsız, küçük veri: canlı gecikmeyle **kıyaslanamaz**, kanıt sayılmaz). Konteyner bellek tavanına yakın çalıştı (972 MiB / 1 GiB). Kıyas betiği depo dışı (C:/tmp/urn170/opensearch-kiyas.cjs), ham çıktı opensearch-sonuc.json. Alan ağırlığı, eşanlamlı ve sayısal süzgeç ayarı yapılmadan "kutudan çıktığı gibi" koşuldu; ince ayarla sonuç değişebilir.
+
+**Maliyet tarafı (ölçülen).** Ek hizmet: ayrı süreç ve en az 1 GB bellek, indeks senkronu (arama_indeksi_tazele tetiği ayrıca kurulmalı), tenant kapsamı (mutlak kural 12) uygulama katmanında yeniden yazılmalı. pgroonga veritabanı içinde, RLS ve tenant kapsamıyla birlikte geliyor.
+
+**Dış hizmetler (Algolia, Typesense, Meilisearch, Elastic bulut) için fiyat ve özellik karşılaştırması bu belgede YOK:** resmî fiyat ve özellik sayfalarından doğrulanmadığı için yazılmadı. Dış araç kararı dört kapılıdır (arac-envanteri-standard.md); ihtiyaç kapısı bugün kapalı, çünkü §1'deki kusurların iki sınıfı da motor değişimiyle değil sözlük ve tolerans ayarıyla kapanıyor.
+
+**Öneri:** Yol A kalır (pgroonga + sözlük + tolerans ayarı). Motor değişikliği için gerekçe yok; doğal dil cümleleri ölçülürse B (anlamsal) koşullu yeniden açılır. OpenSearch'e geçilecekse önce aynı 27 vakaya ağırlık ve eşanlamlı ayarı yapılıp yeniden ölçülmeli.
