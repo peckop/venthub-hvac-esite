@@ -21,6 +21,7 @@ const require_ = createRequire(import.meta.url)
 const KOK = path.resolve(__dirname, '..', '..', '..')
 const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')) as {
   turetCekirdek: (kok: string) => { kapilar: string[]; sinirlar: string[]; okunanDosya: number }
+  turetCekirdekTabandan: (listele: () => string[], oku: (ad: string) => string) => { kapilar: string[]; sinirlar: string[]; okunanDosya: number }
   degerlendir: (girdi: {
     pv: Record<string, unknown> | null
     pvHata?: string
@@ -30,6 +31,7 @@ const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')
     migrationlar: string[] | null
     mergeCommitSha: string | null
     onay?: string | null
+    fetchTamam?: boolean
   }) => { maddeler: Array<{ no: number; ad: string; gecti: boolean; detay: string }>; kirmizi: number }
   onayGecerli: (ham: unknown) => { gecerli: boolean; sebep: string; metin: string }
   ONAY_ASGARI: number
@@ -792,6 +794,166 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
       const g = girdi({ pv: unstable, kapilar: tablo({ name: 'Vercel', bucket: 'fail', workflow: '' }), imajKapisi: IMAJ, degisenDosyalar: ['Dockerfile'] })
       expect(madde(gercek.degerlendir(g), 2).gecti, 'gerçek modül imaj yokluğunu yakalamalı').toBe(false)
       expect(madde(m.degerlendir(g), 2).gecti, 'sabotajlı kopya imaj yokluğunu hâlâ yakaladı: kol sabotajı ayırt etmiyor').toBe(true)
+    })
+  })
+})
+
+describe('INV-RITUEL-6 · taban tazeliği (fetch) + yeniden adlandırma kör noktası (ALT-200, 16 Kasım 2026)', () => {
+  const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+  const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
+
+  it('fetch BAŞARISIZ → madde 8 KIRMIZI (bayat origin/master ile yeşil verilmez); kırmızı sayısı artar', () => {
+    const iyi = ritual.degerlendir(tamGirdi({ fetchTamam: true }))
+    const kotu = ritual.degerlendir(tamGirdi({ fetchTamam: false }))
+    expect(iyi.kirmizi).toBe(0)
+    expect(madde(kotu, 8).gecti).toBe(false)
+    expect(madde(kotu, 8).detay).toMatch(/fetch/)
+    expect(kotu.kirmizi).toBe(1)
+  })
+
+  it('fetch başarılıysa ya da çağıran vermediyse (eski fikstür) madde 8 görünmez: çıktı değişmez', () => {
+    expect(ritual.degerlendir(tamGirdi({ fetchTamam: true })).maddeler.some((m) => m.no === 8)).toBe(false)
+    expect(ritual.degerlendir(tamGirdi()).maddeler.some((m) => m.no === 8)).toBe(false)
+  })
+
+  it('CLI fetch sonucunu ölçer ve değerlendirmeye verir (kaynak taraması: bağlantı sessizce düşmesin)', () => {
+    expect(cli).toMatch(/let fetchTamam = true\s*\n\s*try \{ git\(\['fetch', 'origin', 'master', '-q'\]\) \} catch \{ fetchTamam = false/)
+    expect(cli).toMatch(/degisenDosyalar, fetchTamam,/)
+  })
+
+  it('migration, functions ve okuma-sorusu farkı --no-renames ile okunur (taşınan dosyanın ESKİ yolu da görünür)', () => {
+    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal, '--', 'supabase\/migrations\/'\]/)
+    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal, '--', 'supabase\/functions\/'\]/)
+    // `git diff --name-only` ÇIPLAK (--no-renames'siz) hiçbir yerde kalmadı: tek biçim.
+    expect(cli).not.toMatch(/\['diff', '--name-only', 'origin/)
+  })
+
+  describe('SABOTAJ: gevşetilmiş kopya AYNI testten KIRMIZI verir (totoloji değil)', () => {
+    let n = 0
+    function bozukKopya(eski: string, yeni: string): typeof ritual {
+      expect(kaynak.includes(eski), `sabotaj hedefi kaynakta YOK (kod değişti, sabotajı güncelle): ${eski}`).toBe(true)
+      n += 1
+      const dizin = path.join(process.env.RUNNER_TEMP || process.env.TMPDIR || process.env.TEMP || '/tmp', `ritual-s6-${Date.now()}-${n}`)
+      fs.mkdirSync(dizin, { recursive: true })
+      const dosya = path.join(dizin, 'merge-ritueli.cjs')
+      fs.writeFileSync(dosya, kaynak.replace(eski, yeni), 'utf8')
+      return require_(dosya) as typeof ritual
+    }
+
+    it('madde 8 koşulu silinirse (fetch hatası yutulur) bozuk kopya YEŞİL verir, gerçek modül KIRMIZI', () => {
+      const m = bozukKopya('if (girdi.fetchTamam === false) {', 'if (false) {')
+      const g = tamGirdi({ fetchTamam: false })
+      expect(ritual.degerlendir(g).kirmizi).toBe(1)
+      expect(m.degerlendir(g).kirmizi, 'madde 8 kapatıldı ama kırmızı hâlâ: kol sabotajı ayırt etmiyor').toBe(0)
+    })
+
+    it('CLI\'da fetch bayrağı değerlendirmeye verilmezse kaynak taraması KIRMIZI olurdu', () => {
+      const bozuk = cli.replace('degisenDosyalar, fetchTamam,', 'degisenDosyalar,')
+      expect(bozuk).not.toMatch(/degisenDosyalar, fetchTamam,/)
+      expect(cli).toMatch(/degisenDosyalar, fetchTamam,/)
+    })
+  })
+})
+
+describe('INV-RITUEL-7 · çekirdek TABANDAN türetilir, PR çekirdeği küçültemez (ALT-201, 16 Kasım 2026)', () => {
+  const kaynak = fs.readFileSync(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs'), 'utf8')
+  const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
+  const WF = (job: string, ad?: string) =>
+    `on:\n  pull_request:\n\njobs:\n  ${job}:\n${ad ? `    name: ${ad}\n` : ''}    runs-on: x\n`
+  /** git ls-tree çıktısı gibi TAM YOLLU adlar verir; oku yalnız dosya adıyla anahtarlanır (git show ...:.github/workflows/<ad>). */
+  const taban = (dosyalar: Record<string, string>) => ({
+    listele: () => Object.keys(dosyalar).map((f) => `.github/workflows/${f}`),
+    oku: (ad: string) => {
+      if (!(ad in dosyalar)) throw new Error(`fatal: path '.github/workflows/${ad}' does not exist in 'origin/master'`)
+      return dosyalar[ad]
+    },
+  })
+
+  it('tabandan türetme, ls-tree\'nin tam yollu adlarını dosya adına indirger ve diskten türetmeyle AYNI çekirdeği verir', () => {
+    const dosyalar = { 'a.yml': WF('ci'), 'b.yml': WF('size', 'Boyut Denetle'), 'notyaml.txt': 'x' }
+    const t = taban(dosyalar)
+    const r = ritual.turetCekirdekTabandan(t.listele, t.oku)
+    expect(r.kapilar).toEqual(['Boyut Denetle', 'ci'])
+    expect(r.okunanDosya).toBe(2)
+    const disk = ritual.turetCekirdek(sahteRepo({ 'a.yml': dosyalar['a.yml'], 'b.yml': dosyalar['b.yml'] }))
+    expect(r.kapilar).toEqual(disk.kapilar)
+  })
+
+  it('⭐PR çekirdeği KÜÇÜLTEMEZ: tabanda olan kapıyı PR silerse ritüel madde 2 KIRMIZI (PR ağacından türetme geçerdi)', () => {
+    const tabanCekirdek = ritual.turetCekirdekTabandan(...Object.values(taban({ 'a.yml': WF('ci'), 'b.yml': WF('size', 'Boyut Denetle') })) as [() => string[], (a: string) => string])
+    // PR b.yml'i silmiş: PR ağacından türetilen çekirdek yalnız ['ci'], kapı tablosunda 'Boyut Denetle' yok.
+    const prAgaci = ritual.turetCekirdek(sahteRepo({ 'a.yml': WF('ci') }))
+    const tablo = [{ name: 'ci', bucket: 'pass' }]
+    const eski = ritual.degerlendir(tamGirdi({ cekirdek: prAgaci.kapilar, kapilar: tablo }))
+    const yeni = ritual.degerlendir(tamGirdi({ cekirdek: tabanCekirdek.kapilar, kapilar: tablo }))
+    expect(madde(eski, 2).gecti, 'PR ağacı çekirdeği: silinen kapıyı beklemez (ESKİ delik)').toBe(true)
+    expect(madde(yeni, 2).gecti, 'taban çekirdeği silinen kapıyı bekler').toBe(false)
+    expect(madde(yeni, 2).detay).toMatch(/Boyut Denetle/)
+  })
+
+  it('BİLİNEN AÇIK (ALT-203 kapatacak): çekirdek işe `if: false` konursa iş tabloda skipping VAR görünür ve madde 2 GEÇER', () => {
+    // Bu test açığın VARLIĞINI sabitler (dürüstlük: "if: çekirdeği etkilemez" iddiası yalnız LİSTE için doğru, SONUÇ için değil).
+    // ALT-203 workflow dosyasına dokunan PR'ı KIRMIZI yaptığında bu beklenti ritüelin başka maddesine taşınır.
+    const sonuc = ritual.degerlendir(tamGirdi({
+      cekirdek: ['ci', 'Boyut Denetle'],
+      kapilar: [{ name: 'ci', bucket: 'pass' }, { name: 'Boyut Denetle', bucket: 'skipping' }],
+    }))
+    expect(madde(sonuc, 2).gecti, 'açık kapandıysa bu testi ALT-203 kapsamında güncelle').toBe(true)
+  })
+
+  it('çekirdek LİSTESİ `if:`/ad değişikliğinden etkilenmez (taban sabit); SONUÇ etkilenebilir, bkz. üstteki bilinen açık', () => {
+    const tab = ritual.turetCekirdekTabandan(...Object.values(taban({ 'a.yml': WF('ci') })) as [() => string[], (a: string) => string])
+    const prKosullu = ritual.turetCekirdek(sahteRepo({ 'a.yml': "on:\n  pull_request:\n\njobs:\n  ci:\n    if: github.actor == 'x'\n    runs-on: x\n" }))
+    const prAdli = ritual.turetCekirdek(sahteRepo({ 'a.yml': WF('ci', 'baska-ad') }))
+    expect(prKosullu.kapilar).toEqual([])
+    expect(prAdli.kapilar).toEqual(['baska-ad'])
+    expect(tab.kapilar).toEqual(['ci'])
+  })
+
+  it('FAIL-CLOSED: taban listesi okunamazsa çekirdek BOŞ + sınır yazılır → madde 2 KIRMIZI; tek dosya okunamazsa sınır yazılır', () => {
+    const r = ritual.turetCekirdekTabandan(() => { throw new Error('fatal: Not a valid object name origin/master') }, () => '')
+    expect(r.kapilar).toEqual([])
+    expect(r.sinirlar.join(' ')).toMatch(/taban.*OKUNAMADI/)
+    expect(madde(ritual.degerlendir(tamGirdi({ cekirdek: r.kapilar })), 2).gecti).toBe(false)
+    const kismi = ritual.turetCekirdekTabandan(
+      () => ['.github/workflows/a.yml', '.github/workflows/b.yml'],
+      (ad) => { if (ad === 'b.yml') throw new Error('fatal: bozuk nesne'); return WF('ci') },
+    )
+    expect(kismi.kapilar).toEqual(['ci'])
+    expect(kismi.sinirlar.join(' ')).toMatch(/b\.yml.*okunamadi/)
+  })
+
+  it('CLI çekirdeği tabandan türetir: ls-tree + show origin/master; PR ağacından turetCekirdek(AGAC) KALMADI', () => {
+    expect(cli).toMatch(/turetCekirdekTabandan\(/)
+    expect(cli).toMatch(/\['ls-tree', '--name-only', 'origin\/master', '\.github\/workflows\/'\]/)
+    expect(cli).toMatch(/\['show', 'origin\/master:\.github\/workflows\/' \+ ad\]/)
+    expect(cli).not.toMatch(/turetCekirdek\(AGAC\)/)
+  })
+
+  describe('SABOTAJ: gevşetilmiş kopya AYNI beklentiden KIRMIZI verir (totoloji değil)', () => {
+    let n = 0
+    function bozukKopya(eski: string, yeni: string): typeof ritual {
+      expect(kaynak.includes(eski), `sabotaj hedefi kaynakta YOK (kod değişti, sabotajı güncelle): ${eski}`).toBe(true)
+      n += 1
+      const dizin = path.join(process.env.RUNNER_TEMP || process.env.TMPDIR || process.env.TEMP || '/tmp', `ritual-s7-${Date.now()}-${n}`)
+      fs.mkdirSync(dizin, { recursive: true })
+      const dosya = path.join(dizin, 'merge-ritueli.cjs')
+      fs.writeFileSync(dosya, kaynak.replace(eski, yeni), 'utf8')
+      return require_(dosya) as typeof ritual
+    }
+
+    it('ls-tree tam yolu dosya adına indirgenmezse (ham yol oku\'ya gider) bozuk kopya çekirdeği KAYBEDER, gerçek modül bulur', () => {
+      const m = bozukKopya('.map((d) => String(d).split(/[\\\\/]/).pop())', '.map((d) => String(d))')
+      const t = taban({ 'a.yml': WF('ci') })
+      expect(ritual.turetCekirdekTabandan(t.listele, t.oku).kapilar).toEqual(['ci'])
+      expect(m.turetCekirdekTabandan(t.listele, t.oku).kapilar, 'tam yol oku\'ya gitti ama çekirdek hâlâ dolu: kol ayırt etmiyor').toEqual([])
+    })
+
+    it('liste hatası yutulup boş-olmayan varsayılana düşerse (fail-open) kopya KIRMIZI kolu geçirir; gerçek modül boş çekirdek verir', () => {
+      const m = bozukKopya("return { kapilar: [], sinirlar: ['taban (origin/master)", "return { kapilar: ['ci'], sinirlar: ['taban (origin/master)")
+      const hata = () => { throw new Error('fatal: x') }
+      expect(ritual.turetCekirdekTabandan(hata, () => '').kapilar).toEqual([])
+      expect(m.turetCekirdekTabandan(hata, () => '').kapilar, 'fail-open kopya boş çekirdek vermedi: kol ayırt etmiyor').toEqual(['ci'])
     })
   })
 })

@@ -1538,10 +1538,39 @@ her koşuda yazılır, çünkü kabul edilmiş eksik sessiz olamaz. YAML düz re
 çözülemeyen bir biçim çıkarsa dosya **sessizce atlanmaz**, `sinirlar` listesine yazılır ve
 o dosyanın job'ları fail-closed olarak çekirdek dışında bırakılır.
 
+**Taban tazeliği ve yeniden adlandırma (ALT-200, 16 Kasım 2026):** `git fetch origin master` başarısız olursa
+ritüel artık yalnız uyarı yazıp yeşile **devam etmez**: madde 8 (`TABAN TAZE (fetch)`) KIRMIZI olur, çünkü bayat
+`origin/master` ile ölçülen migration/Edge/imaj farkı ve kapı tablosu güvenilmezdir. Madde yalnız fetch denenip patlayınca
+görünür (başarılıda 7 madde, çıktı değişmez). Migration, Edge ve okuma-sorusu farkı da imaj farkı gibi `--no-renames` ile
+okunur. Gerçek kazanım **yol sınırsız** çağrıdadır (okuma sorusu, `okumaSorusuGerekli`): `.claude/hooks/x.cjs` gibi bir
+dosyayı `docs/` altına taşıyan PR'da varsayılan git eşlemesi yalnız yeni yolu listeler, eski (kanca) yol kaybolurdu;
+`--no-renames` ile eski yol da görünür. Migration ve Edge sayımı ise yol sınırlı çağrı olduğu için taşımayla zaten
+atlatılamıyordu (ARAÇ canlı deneyi, ARC-333); orada `--no-renames` savunma derinliğidir, davranış değişikliği değil.
+Kollar INV-RITUEL-6.
+
+**Çekirdek tabandan (ALT-201, 16 Kasım 2026):** zorunlu çekirdek artık PR ağacındaki workflow dosyalarından değil
+`origin/master`ten (`git ls-tree` + `git show origin/master:.github/workflows/<ad>`) türetilir. Önceki hâlde bir PR
+çekirdekteki bir işi silerek, adını değiştirerek ya da `if:` ekleyerek çekirdeği küçültür ve küçülmüş çekirdekle yeşil
+alırdı (ci.yml sınıflayıcısı bilerek tabandan okur; ritüel okumuyordu, ARAÇ ARC-331). Taban çekirdeğindeki bir kapı PR'da
+yoksa madde 2 KIRMIZI verir. Taban listesi/okuması başarısızsa çekirdek BOŞ döner ve "CEKIRDEK BOS" ile KIRMIZI olur.
+Bedel adıyla: çekirdeği **bilerek** değiştiren (iş silen/yeniden adlandıran) PR artık ritüelden geçmez; OPS-192 yoluyla
+(tam fark okunur, ARAÇ hükmü, elle birleştirme) gider. Bu bilinçli: çekirdek değişikliği zaten bağımsız denetim ister.
+⚠**Hâlâ AÇIK üç yol (ARAÇ ARC-334, kapanışı ALT-203):** çekirdek LİSTESİ PR'dan etkilenmez, ama SONUÇ etkilenebilir:
+(a) çekirdek işe `if: false` konursa iş tabloda `skipping` olarak VAR görünür ve ritüelden geçer; (b) taban işi silinip aynı
+ad başka bir workflow'da yeni iş olarak eklenirse madde 2 yalnız ada baktığı için geçer; (c) iş adı ve workflow aynı kalıp
+içi boşaltılırsa (adımlar silinip `echo`) tablo yeşil görünür. Üçünün kök nedeni PR'ın kapının kendi tanımını değiştirebilmesi;
+ALT-203 `.github/workflows/**` dosyasına dokunan her PR'ı ritüelde KIRMIZI yapıp OPS-192 yoluna yönlendirecek.
+İmaj kapısı kapsamı (ALT-201 madde 1) kararı: dört yol **genişletilmedi**; ürün derlemesi `ci` içindeki `Build (blocking)`
+adımında koşar ve yalnız dar sınıfta (belge, edge, betik, karma) atlanır; `package.json`, `pnpm-lock.yaml`, `src/**` gibi
+girdiler dar sınıfta değildir, yani Build koşar. Yolları genişletmek her bağımlılık PR'ında Docker derlemesi koşturur
+(maliyet) ve `ci` Build ile aynı kırılmayı iki kez ölçer. Kalan kör nokta: yalnız Docker'a özgü, `Dockerfile`/`next.config.mjs`
+dışından gelen kırılma; canlıya çıkışta `yayin-imaji.yml` push kolu ölçer. Kollar INV-RITUEL-7.
+
 #### Kanıt
 
-Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**19 kol**). Sabotaj **9/9** doğru
-sebeple kırmızı — aralarında *"türetmeyi tüm job'lara çevir"* (naif türetme yakalanır),
+Kollar: `src/__tests__/conformance/merge-ritueli.test.ts` (**98 test**, vitest sayımı 16 Kasım 2026; ilk yazımda 19 kol
+ve sabotaj 9/9 idi, sonra ALT-199 ve ALT-200 kolları eklendi). Sabotaj kolları INV-RITUEL-1/3/5/6'da; her biri doğru
+sebeple kırmızı — ilk dokuzun aralarında *"türetmeyi tüm job'lara çevir"* (naif türetme yakalanır),
 *"`skipping`i düşen say"* (yanlış alarm geri gelir), *"boş `merge_commit_sha`yı var say"* ve
 *"PR okunamadı ama geçti işaretle"* (fail-closed) var. Çekirdek **saf**tır (`turetCekirdek`
 bir dizin, `degerlendir` ölçülmüş değerler alır), böylece kollar ölçtüğü durumu **üretir** (§25).

@@ -51,6 +51,8 @@ import { fileURLToPath } from 'node:url'
 
 import pg from 'pg'
 
+import { ilkSonuclarAdIbaresi, markaVeyaSifir, oneriKategoriVar, sifirBeklenen } from './arama-vaka-olcutleri.mjs'
+
 const KOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const JSON_KIPI = process.argv.includes('--json')
 
@@ -82,10 +84,19 @@ const VAKALAR = [
   // tabloda ayrı vaka değil, bu yüzden 16 (referans) + 17 (büyük İ) olarak iki satıra açıldı.
   { no: 16, q: 'inline', olcut: 'sifir-degil', nicin: 'vaka 17 referansı (küçük harf)' },
   { no: 17, q: 'İNLİNE', olcut: 'ayni-sayi', referans: 16, nicin: 'büyük İ lower() öncesi indirilir (K5.2a, cetvel vaka 15)' },
+  // ── 2026-11-16, URN-168 (cetvel §8 vaka 18-23; URN-139/166 düzeltmelerinin KALICI bekçisi) ──
+  // Hepsi canlıda ölçülüp GEÇEN vakalardır (kırmızı→yeşil geçişi PR #2542/#2543'te yaşandı);
+  // kapı bundan sonra gerilemeyi yakalar. Karar mantığı saf fonksiyon: arama-vaka-olcutleri.mjs.
+  { no: 18, q: 'kasals', olcut: 'marka-veya-sifir', marka: 'casals', nicin: 'marka yazım hatası; marka katalogdaysa ≥1 ve hepsi o marka, değilse 0 (veriye bağlı)' },
+  { no: 19, q: 'fleksiva', olcut: 'sifir', nicin: 'katalogda olmayan terim 0 döner (uydurma eşleşme yok)' },
+  { no: 20, q: 'kanal tipi fann', olcut: 'ayni-kume', referans: 8, nicin: 'tek harf yazım hatası "kanal tipi fan" ile aynı küme (URN-166 tolerans)' },
+  { no: 21, q: '125 mm fan', olcut: 'ilk-sonuc-ad-ibaresi', ibare: '125', ilkK: 4, nicin: 'çap sayısı sıralamada öne çıkar, 254 mm gelmez (URN-166 birim)' },
+  { no: 22, q: 'nikotra', olcut: 'marka-tavani', marka: 'nicotra', nicin: 'marka yazım hatası, marka dışı sonuç 0 (URN-166 sözlük)' },
+  { no: 23, q: 'hava perdesi', olcut: 'oneri-kategori', ibare: 'hava perde', nicin: 'öneri kutusunda kategori satırı (URN-139 ek toleransı)' },
 ]
 
 /** K8.4a: bu ölçütlerde genel %40 tavanı UYGULANMAZ — tavan markanın aktif ürün sayısıdır. */
-const MARKA_OLCUTLERI = new Set(['marka-var', 'marka-tavani'])
+const MARKA_OLCUTLERI = new Set(['marka-var', 'marka-tavani', 'marka-veya-sifir'])
 
 /**
  * BİLİNEN KIRMIZILAR — ⭐LİSTE 09-16'DA KÜÇÜLDÜ (mandalın ikinci yönü işledi).
@@ -284,7 +295,7 @@ async function main() {
 
   // K8.4a: marka vakalarının tavanı = markanın aktif ürün sayısı (sabit sayı değil, canlıdan).
   const markaAktif = new Map()
-  for (const v of VAKALAR.filter((x) => x.olcut === 'marka-tavani')) {
+  for (const v of VAKALAR.filter((x) => x.olcut === 'marka-tavani' || x.olcut === 'marka-veya-sifir')) {
     const r = await client.query(
       "select count(*)::int as n from public.products where status='active' and deleted_at is null and brand ilike $1",
       [`%${v.marka}%`],
@@ -307,10 +318,46 @@ async function main() {
     adIsabeti.set(v.no, new Map(r.rows.map((x) => [x.id, Number(x.puan)])))
   }
 
+  // URN-168: ilk sonuçların ADLARI (sıralama davranışı) ve öneri satırları (sahip + anon rolü).
+  const ilkAdlar = new Map()
+  for (const v of VAKALAR.filter((x) => x.olcut === 'ilk-sonuc-ad-ibaresi')) {
+    const idler = sonuclar.get(v.no).slice(0, v.ilkK).map((r) => r.id)
+    const r = idler.length
+      ? await client.query(
+          "select p.id::text as id, concat_ws(' ', p.name, p.name_i18n->>'tr') as ad from public.products p where p.id = any($1::uuid[])",
+          [idler],
+        )
+      : { rows: [] }
+    const adPerId = new Map(r.rows.map((x) => [x.id, x.ad]))
+    ilkAdlar.set(v.no, idler.map((id) => adPerId.get(String(id)) ?? ''))
+  }
+  const oneriler = new Map()
+  const oneriRolHatalari = []
+  for (const v of VAKALAR.filter((x) => x.olcut === 'oneri-kategori')) {
+    const sahip = await client.query('select type, label from public.get_search_suggestions($1, 8)', [v.q])
+    oneriler.set(v.no, sahip.rows)
+    // Vitrin rolleri (cetvel: rol kolu ilana tabi değil): öneri anon ve authenticated ile de gelmeli.
+    for (const rol of ['anon', 'authenticated']) {
+      await client.query('begin')
+      try {
+        await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(VITRIN_IDDIALARI[rol])])
+        await client.query(`set local role ${ROL_PG[rol]}`)
+        const r = await client.query('select type, label from public.get_search_suggestions($1, 8)', [v.q])
+        const sebep = oneriKategoriVar(r.rows, v.ibare)
+        if (sebep) oneriRolHatalari.push(`[vaka ${v.no}] "${v.q}" ONERI ROL ${rol} — ${sebep}`)
+      } catch (e) {
+        oneriRolHatalari.push(`[vaka ${v.no}] "${v.q}" ONERI ROL ${rol} — sorgu HATA verdi: ${`${e.code ?? ''} ${e.message}`.trim()}`)
+      } finally {
+        await client.query('rollback')
+      }
+    }
+  }
+
   const ihlaller = []
   const uyarilar = []
   const gecenler = []
   const atlananlar = []
+  ihlaller.push(...oneriRolHatalari)
 
   // İddiasız kolun ön koşulu: onarım hedef veritabanında var mı (bkz. onarimVarMi yorumu).
   let onarim = null
@@ -394,6 +441,14 @@ async function main() {
         if (ilk === undefined) hata = 'ilk satirin ad isabeti olculemedi'
         else if (ilk < enYuksek) hata = `ilk satir ad isabeti ${ilk.toFixed(2)} < kumedeki en yuksek ${enYuksek.toFixed(2)}`
       }
+    } else if (v.olcut === 'marka-veya-sifir') {
+      hata = markaVeyaSifir(rows, v.marka, markaAktif.get(v.no) ?? 0)
+    } else if (v.olcut === 'sifir') {
+      hata = sifirBeklenen(rows)
+    } else if (v.olcut === 'ilk-sonuc-ad-ibaresi') {
+      hata = ilkSonuclarAdIbaresi(ilkAdlar.get(v.no) ?? [], v.ibare, v.ilkK)
+    } else if (v.olcut === 'oneri-kategori') {
+      hata = oneriKategoriVar(oneriler.get(v.no) ?? [], v.ibare)
     } else {
       hata = `TANIMSIZ olcut "${v.olcut}" — kapi bu vakayi OLCMUYOR`
     }

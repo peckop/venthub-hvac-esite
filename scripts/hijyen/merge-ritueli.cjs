@@ -213,12 +213,37 @@ function turetCekirdek(kok) {
   } catch (e) {
     return { kapilar: [], sinirlar: ['workflow dizini OKUNAMADI: ' + String(e.message).slice(0, 100)], okunanDosya: 0 }
   }
+  return cekirdekCoz(dosyalar, (f) => fs.readFileSync(path.join(dizin, f), 'utf8'))
+}
+
+/**
+ * ALT-201: çekirdek TABANDAN (origin/master) türetilir, PR ağacından DEĞİL. PR ağacından türetilince bir PR çekirdek
+ * bir işi silerek/yeniden adlandırarak/`if:` ekleyerek çekirdeği küçültebilir ve küçülmüş çekirdekle yeşil alırdı
+ * (ci.yml sınıflayıcısı bilerek tabandan okur; ritüel okumuyordu). Taban çekirdeği KALDIRILMIŞ bir iş tabloda
+ * bulunmayacağı için madde 2 KIRMIZI verir: çekirdeği bilerek değiştiren PR OPS/ARAÇ yolundan (elle) geçer.
+ * `listele()` tabandaki workflow dosya adlarını, `oku(ad)` bir dosyanın metnini verir; ikisi de HATA FIRLATIRSA
+ * fail-closed: çekirdek BOŞ döner ve madde 2 "CEKIRDEK BOS" ile KIRMIZI olur.
+ * @param {() => string[]} listele
+ * @param {(ad:string) => string} oku
+ */
+function turetCekirdekTabandan(listele, oku) {
+  let dosyalar
+  try {
+    dosyalar = listele().map((d) => String(d).split(/[\\/]/).pop()).filter((f) => /\.ya?ml$/i.test(f)).sort()
+  } catch (e) {
+    return { kapilar: [], sinirlar: ['taban (origin/master) workflow listesi OKUNAMADI: ' + String(e.message).slice(0, 100)], okunanDosya: 0 }
+  }
+  return cekirdekCoz(dosyalar, oku)
+}
+
+/** Ortak çözümleyici: dosya adları + metin okuyucudan çekirdek kapıları üretir. SAF (okuyucu dışarıdan). */
+function cekirdekCoz(dosyalar, oku) {
   const kapilar = []
   const sinirlar = []
   for (const f of dosyalar) {
     let metin
     try {
-      metin = fs.readFileSync(path.join(dizin, f), 'utf8')
+      metin = oku(f)
     } catch (e) {
       sinirlar.push(f + ': okunamadi (' + String(e.message).slice(0, 60) + ')')
       continue
@@ -560,6 +585,15 @@ function degerlendir(girdi) {
     ekle(7, 'ACIK INCELEME BULGUSU 0', !acik.acik, acik.acik ? acik.detay : '')
   }
 
+  // 8 — TABAN TAZELIGI (ALT-200): `git fetch origin master` basarisizsa origin/master bayat olabilir; bayat tabanla
+  // alinan her fark/kapi olcumu "gecmis" dedirtebilir. `undefined` = cagiran olcmedi (eski fikstur) -> madde eklenmez;
+  // yalniz `false` KIRMIZI verir (fetch denendi ve patladi). Basarili fetch'te madde gorunmez (7 maddelik cikti degismez).
+  if (girdi.fetchTamam === false) {
+    ekle(8, 'TABAN TAZE (fetch)', false,
+      'git fetch origin master BASARISIZ — origin/master BAYAT olabilir, migration/edge/imaj farki ve kapi tablosu ' +
+      'guvenilmez (fail-closed). Aga/kimlige bak, sonra ritueli tekrar kos.')
+  }
+
   return { maddeler, kirmizi: maddeler.filter((m) => !m.gecti).length }
 }
 
@@ -673,7 +707,7 @@ function ozDogrulama(yerelMetin, masterMetin) {
 
 module.exports = {
   ozDogrulama,
-  turetCekirdek, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
+  turetCekirdek, turetCekirdekTabandan, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
   imajKapisiCoz, imajKapisiTuret, yolDeseniEslesir, emekliMi, emekliKapi, EMEKLI_HARICI_KAPILAR,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
@@ -732,7 +766,9 @@ if (require.main === module) {
 
   yaz('== MERGE RITUELI — PR #' + pr + ' / ' + dal + ' ==')
 
-  try { git(['fetch', 'origin', 'master', '-q']) } catch { yaz('  ⚠fetch basarisiz — olcum BAYAT olabilir') }
+  // ALT-200: fetch patlarsa origin/master BAYAT olabilir; "uyari yaz, devam et" bayat tabanla YESIL verdirirdi. Madde 8 KIRMIZI.
+  let fetchTamam = true
+  try { git(['fetch', 'origin', 'master', '-q']) } catch { fetchTamam = false; yaz('  ⚠fetch basarisiz — olcum BAYAT olabilir (madde 8 KIRMIZI)') }
 
   // ÖZ-DOĞRULAMA (ARC-194 3b): --merge yalniz master'daki betikle. Okuma olcumunden ONCE, eylemden hep once.
   if (MERGE) {
@@ -765,14 +801,20 @@ if (require.main === module) {
       ? '' : String(rest.merge_commit_sha)
   } catch { mergeCommitSha = null }
 
-  const { kapilar: cekirdek, sinirlar, okunanDosya } = turetCekirdek(AGAC)
+  // ALT-201: çekirdek TABANDAN (origin/master) türetilir; PR ağacı çekirdeği küçültemez. `--no-pager` ve ağaç `git()` ile.
+  const { kapilar: cekirdek, sinirlar, okunanDosya } = turetCekirdekTabandan(
+    () => git(['ls-tree', '--name-only', 'origin/master', '.github/workflows/']).split('\n').filter(Boolean),
+    (ad) => git(['show', 'origin/master:.github/workflows/' + ad]),
+  )
 
   let uzakSha = null
   try { uzakSha = git(['rev-parse', 'origin/' + dal]) } catch { uzakSha = null }
 
   let migrationlar = null
   try {
-    migrationlar = git(['diff', '--name-only', 'origin/master...origin/' + dal, '--', 'supabase/migrations/'])
+    // --no-renames (ALT-200): migration/functions disina TASINAN dosyanin ESKI yolu da listede gorunsun; yoksa
+    // supabase/migrations/x.sql -> baska/yol.sql tasimasi migration sayacini atlatir.
+    migrationlar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal, '--', 'supabase/migrations/'])
       .split('\n').filter(Boolean)
   } catch { migrationlar = null }
 
@@ -780,7 +822,7 @@ if (require.main === module) {
   let functionsDegisen = null
   try {
     functionsDegisen = edgeDegisiklikleri(
-      git(['diff', '--name-only', 'origin/master...origin/' + dal, '--', 'supabase/functions/']).split('\n').filter(Boolean),
+      git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal, '--', 'supabase/functions/']).split('\n').filter(Boolean),
     )
   } catch { functionsDegisen = null }
 
@@ -804,7 +846,7 @@ if (require.main === module) {
     degisenDosyalar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
   } catch { degisenDosyalar = null }
 
-  yaz('  turetme: ' + okunanDosya + ' workflow okundu, zorunlu cekirdek ' + cekirdek.length +
+  yaz('  turetme: ' + okunanDosya + ' workflow okundu (TABANDAN origin/master), zorunlu cekirdek ' + cekirdek.length +
     ' kapi: ' + (cekirdek.join(', ') || '(BOS)'))
   // §21: kabul edilen boşluk SESSİZ olamaz.
   yaz('  ⚠sinir : harici kapilar TURETILEMEZ, cekirdege konmaz; yalniz EMEKLI listesindekiler (tam ad: ' +
@@ -817,7 +859,7 @@ if (require.main === module) {
 
   const { maddeler, kirmizi } = degerlendir({
     pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY, functionsDegisen, inceleme,
-    imajKapisi: imaj.kapi, degisenDosyalar,
+    imajKapisi: imaj.kapi, degisenDosyalar, fetchTamam,
   })
   for (const m of maddeler) {
     yaz((m.gecti ? '  YESIL   ' : '  ⛔KIRMIZI ') + m.no + '. ' + m.ad + (m.detay ? '  — ' + m.detay : ''))
@@ -831,7 +873,7 @@ if (require.main === module) {
   // ARC-110: kanca/ayar/MCP sınıfı PR'da sabit okuma sorusu. Madde DEĞİL: kırmızı sayısına
   // girmez, çıkış kodunu değiştirmez; ölçülemezse sessizce atlanır (hatırlatma, kapı değil).
   try {
-    const degisen = git(['diff', '--name-only', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+    const degisen = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
     if (okumaSorusuGerekli(degisen)) yaz('  ' + OKUMA_SORUSU_METNI)
   } catch { /* hatırlatma, ölçüt değil */ }
 
