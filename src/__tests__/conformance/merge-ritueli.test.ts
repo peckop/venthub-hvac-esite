@@ -891,7 +891,17 @@ describe('INV-RITUEL-7 · çekirdek TABANDAN türetilir, PR çekirdeği küçül
     expect(madde(yeni, 2).detay).toMatch(/Boyut Denetle/)
   })
 
-  it('PR `if:` ekleyerek ya da adı değiştirerek çekirdeği küçültse de taban çekirdeği değişmez', () => {
+  it('BİLİNEN AÇIK (ALT-203 kapatacak): çekirdek işe `if: false` konursa iş tabloda skipping VAR görünür ve madde 2 GEÇER', () => {
+    // Bu test açığın VARLIĞINI sabitler (dürüstlük: "if: çekirdeği etkilemez" iddiası yalnız LİSTE için doğru, SONUÇ için değil).
+    // ALT-203 workflow dosyasına dokunan PR'ı KIRMIZI yaptığında bu beklenti ritüelin başka maddesine taşınır.
+    const sonuc = ritual.degerlendir(tamGirdi({
+      cekirdek: ['ci', 'Boyut Denetle'],
+      kapilar: [{ name: 'ci', bucket: 'pass' }, { name: 'Boyut Denetle', bucket: 'skipping' }],
+    }))
+    expect(madde(sonuc, 2).gecti, 'açık kapandıysa bu testi ALT-203 kapsamında güncelle').toBe(true)
+  })
+
+  it('çekirdek LİSTESİ `if:`/ad değişikliğinden etkilenmez (taban sabit); SONUÇ etkilenebilir, bkz. üstteki bilinen açık', () => {
     const tab = ritual.turetCekirdekTabandan(...Object.values(taban({ 'a.yml': WF('ci') })) as [() => string[], (a: string) => string])
     const prKosullu = ritual.turetCekirdek(sahteRepo({ 'a.yml': "on:\n  pull_request:\n\njobs:\n  ci:\n    if: github.actor == 'x'\n    runs-on: x\n" }))
     const prAdli = ritual.turetCekirdek(sahteRepo({ 'a.yml': WF('ci', 'baska-ad') }))
