@@ -1519,8 +1519,21 @@ Ritüel **ikisini de** arar. Boş sha, durum etiketi temiz olsa bile kırmızıd
 
 #### ⚠Kapsam sınırı, adıyla (§21)
 
-**Vercel kapıları türetilemez** — harici entegrasyondur, hiçbir workflow dosyasında yoktur.
-Çekirdeğe **konmaz**; görüldüğü hâlde düşerse madde 3 sayar. Bu sınır betiğin **çıktısında**
+**Harici kapılar (Vercel dahil) türetilemez** — entegrasyondur, hiçbir workflow dosyasında yoktur.
+Çekirdeğe **konmaz**; görüldüğü hâlde düşerse madde 3 sayar. **Tek istisna (ALT-199, 16 Kasım 2026):**
+site 15 Kasım'da Coolify'a taşındı, Vercel hesabı engelli (her PR'da `Vercel: failure — Account is blocked`,
+`mergeStateStatus=UNSTABLE`). Betikteki tarihli `EMEKLI_HARICI_KAPILAR` listesi (yalnız **tam ad**:
+`Vercel`, `Vercel Preview Comments`; alt dize/regex yok, liste dışı harici kapı muaf olmaz) madde 3 sayımından
+çıkar ama detayda `emekli kapi sayilmadi: Vercel(fail)` diye **görünür** kalır; madde 4 `UNSTABLE`i yalnız
+mergeable=MERGEABLE ve düşen/bekleyen kapıların **tamamı** bu listedeyse kabul eder. Vercel'in işlevi
+(önizleme derlemesi kırık mı) kaldırılmadı, eşdeğerine devredildi: çekirdekteki `ci` ve PR imaj yolunu
+(`yayin-imaji.yml` `on.pull_request.paths`ten türetilir) değiştiriyorsa madde 2'de `İmaj derle` kapısı tabloda
+**var ve SUCCESS** olmak zorunda. Muafiyet yalnız tam ad **ve** `gh pr checks` çıktısındaki `workflow === ''` (harici durum) ister:
+Actions job'ına `name: Vercel` yazan muaf olmaz. İmaj yolları ve iş adı PR ağacından değil **tabandan** (`origin/master`) okunur.
+Kabul edilen sınır: imaj kapısı yalnız `yayin-imaji.yml`in dört yolunu (Dockerfile, .dockerignore, workflow, next.config.mjs)
+izler; bu yollar dışındaki bir değişikliğin derleme etkisini `ci` ölçer (`Build` adımı dar sınıfta atlanır, ALT-38c).
+Listeye ad eklemek bilinçli güncelleme ister (testteki literal küme).
+Bu sınır betiğin **çıktısında**
 her koşuda yazılır, çünkü kabul edilmiş eksik sessiz olamaz. YAML düz regex ile okunur;
 çözülemeyen bir biçim çıkarsa dosya **sessizce atlanmaz**, `sinirlar` listesine yazılır ve
 o dosyanın job'ları fail-closed olarak çekirdek dışında bırakılır.
