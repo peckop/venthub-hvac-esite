@@ -16,7 +16,8 @@
  * Kullanım:
  *   node scripts/rehber/govde-izi.mjs            # denetle (kırmızıysa çıkış 1)
  *   node scripts/rehber/govde-izi.mjs --yaz      # değişen/yeni yazıların izini kaydet; TARIH_UNUTULDU varsa REDDEDER
- *   node scripts/rehber/govde-izi.mjs --taban    # iz dosyası yoksa bugünkü durumu taban yazar (geçmiş için kırmızı vermez)
+ *   node scripts/rehber/govde-izi.mjs --yaz --ayni-gun   # aynı gün ikinci değişiklik: tarihi BUGÜN olan yazıyı kabul eder
+ *   node scripts/rehber/govde-izi.mjs --taban   # iz dosyası yoksa bugünkü durumu taban yazar (geçmiş için kırmızı vermez)
  * Çıkış: 0 temiz · 1 kırmızı ya da reddedildi · 2 kullanım hatası.
  */
 import { createHash } from 'node:crypto'
@@ -67,6 +68,24 @@ export function govdeIziDenetle(yazilar, izler) {
   return sorunlar
 }
 
+/** Bugünün tarihi (Europe/Istanbul), `YYYY-MM-DD`. */
+export function bugunIstanbul(simdi = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' }).format(simdi)
+}
+
+/**
+ * `--yaz` reddedeceği TARIH_UNUTULDU listesini döner. `bugun` verilirse (bayrak `--ayni-gun`), yazının
+ * `guncellemeTarihi` BUGÜN olan kayıtlar listeden düşer: aynı gün ikinci gövde değişikliğinde tarih zaten
+ * yayın günüdür, unutulmuş değildir (BLG-79, 17 Kasım 2026: aynı gün iki PR). Tarihi bugünden farklı olan
+ * kayıt bayrakla da reddedilir; bayraksız davranış değişmez.
+ */
+export function ayniGunAyikla(sorunlar, yazilar, bugun) {
+  const unutulan = sorunlar.filter((s) => s.tur === 'TARIH_UNUTULDU')
+  if (!bugun) return unutulan
+  const tarih = new Map(yazilar.map((y) => [y.kimlik, y.guncellemeTarihi]))
+  return unutulan.filter((s) => tarih.get(s.kimlik) !== bugun)
+}
+
 /** yazilar.ts metninden denetlenecek kayıtlar (ayrıştırıcı + özet). */
 export function yazilariOku(kaynak) {
   const t = kaynak.replace(/\r\n/g, '\n')
@@ -94,10 +113,10 @@ export function izleriSerilestir(izler) {
 
 function bas() {
   const arg = process.argv.slice(2)
-  const bilinen = new Set(['--yaz', '--taban'])
+  const bilinen = new Set(['--yaz', '--taban', '--ayni-gun'])
   const fazla = arg.filter((a) => !bilinen.has(a))
-  if (fazla.length > 0) {
-    console.error(`bilinmeyen bayrak: ${fazla.join(' ')} (kullanım: [--yaz | --taban])`)
+  if (fazla.length > 0 || (arg.includes('--ayni-gun') && !arg.includes('--yaz'))) {
+    console.error(`bilinmeyen ya da eksik bayrak: ${fazla.join(' ')} (kullanım: [--yaz [--ayni-gun] | --taban])`)
     process.exit(2)
   }
   const yazilar = yazilariOku(readFileSync(YAZILAR_TS, 'utf8'))
@@ -122,7 +141,7 @@ function bas() {
   const sorunlar = govdeIziDenetle(yazilar, izler)
 
   if (arg.includes('--yaz')) {
-    const unutulan = sorunlar.filter((s) => s.tur === 'TARIH_UNUTULDU')
+    const unutulan = ayniGunAyikla(sorunlar, yazilar, arg.includes('--ayni-gun') ? bugunIstanbul() : null)
     if (unutulan.length > 0) {
       for (const s of unutulan) console.error(`REDDEDİLDİ  ${s.ileti}`)
       process.exit(1)

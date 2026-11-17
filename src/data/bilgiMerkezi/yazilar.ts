@@ -90,6 +90,8 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // Güncelleme tarihi 2026-11-09 (BLG-56, R5.5 yalnız-ekleme revizyonu): elektromanyetik uyumluluk kategorilerinin kaynağı (Danfoss FC 102 kılavuzu) açıkça atfedildi.
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
@@ -200,7 +202,7 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 - Kurulum, devreye alma ve bakım yalnız yetkili ve eğitimli personel tarafından yapılmalıdır [4].
 - Toz, elektronik bileşenlerin üzerinde yalıtım katmanı gibi davranarak soğutmayı azaltır; bu yüzden soğutucu ve fanların düzenli olarak tozdan arındırılması önerilir [1].
 
-## Fiyatı belirleyen etkenler
+## Teklif için hangi bilgiler gerekir?
 
 Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
 
@@ -208,7 +210,7 @@ Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. İki tek
 - **Koruma sınıfı ve kitler.** FC 101 IP20 ya da IP54 gövdeyle sunulur; IP21 isteğe bağlı bir kitle sağlanır [3].
 - **Montaj yerinin koşulları.** Yüksek ortam sıcaklığı, yüksek rakım, yüksek anahtarlama frekansı ya da uzun motor kablosu akım düşürme gerektirebilir; bu durumlarda bir güç boyutu büyük cihaz seçilmesi önerilir [1].
 - **Elektromanyetik uyumluluk kategorisi.** EN/IEC 61800-3'e göre C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir (Danfoss FC 102 tasarım kılavuzuna göre) [1]. Teklifteki cihazın, kurulacağı ortamın kategorisine uyduğuna bakın.
-- **Kurulum kalemleri.** Toplam maliyete cihazın yanında kurulum da girer: motor kablosunun türü ve uzunluğu (FC 51'de ekranlı kabloda azami 15 m, ekransız kabloda azami 50 m [4]), kaçak akım koruması kullanılacaksa besleme tarafındaki Tip B cihaz [1] ve şebeke, motor ve kontrol kablolarının ayrı döşenmesi [1].
+- **Kurulum kalemleri.** Motor kablosunun türü ve uzunluğu (FC 51'de ekranlı kabloda azami 15 m, ekransız kabloda azami 50 m [4]), kaçak akım koruması kullanılacaksa besleme tarafındaki Tip B cihaz [1] ve şebeke, motor ve kontrol kablolarının ayrı döşenmesi [1].
 
 ## Frekans konvertörü seçiminde izlenecek yol
 
@@ -283,6 +285,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-09 (BLG-56, R5.5 yalnız-ekleme): duman tahliyesi fanlarının EN 12101-3 belgelendirme cümlesine kaynak atfı (üretici broşürü) eklendi.
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
@@ -385,7 +388,7 @@ Tipten bağımsız not:
 
 ## Fan debisi nedir ve kılavuzda hangi birimle verilir?
 
-Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1]. Kılavuz basıncı inç su sütunu (in. wg) ile verir [1]; üretici katalogları ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
+Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp; 1 cfm yaklaşık 1,70 m³/h) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1]. Kılavuz basıncı inç su sütunu (in. wg; 1 in. wg yaklaşık 249 Pa) ile verir [1]; üretici katalogları ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
 
 ## Fan eğrisi nasıl okunur?
 
@@ -1055,6 +1058,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-11-01',
     // 12 Kasım (BLG-75, URN-161): "ilgili yazılar" bloğu konuya göre açık kimlik listesiyle seçilir (önceki liste ortak "verimlilik" konusundan ilk üç yazıydı: çatı tipi, hücreli, plug fan); yazı gövdesi, başlık ve iddia değişmedi.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     ilgili: ['isi-geri-kazanim-cihazi-nedir', 'fan-cesitleri', 'kanal-tipi-fan-nedir'],
     urunler: ['vh:aile/vortice-ad-isiticisiz-hava-perdeleri', 'vh:aile/vortice-h-ad-elektrikli-isiticili-hava-perdeleri'],
@@ -1142,9 +1147,9 @@ Vortice kataloğunun uygulama listesinde gıda sanayi, hastaneler ve laboratuvar
 
 ANSI/AMCA 220-21, hava perdesi ünitelerinin aerodinamik performans derecelendirmesi için laboratuvar test yöntemlerini adında taşıyan AMCA belgesidir [5]. AMCA'nın tanıtım sayfası belgenin okuyucuyu hava perdesi üniteleriyle tanıştırmayı amaçladığını, hava perdesi teorisini, bileşenleri, test ve derecelendirmeyi, yapımı, uygulamaları, seçimi, montajı ve bakımı kapsadığını yazar [5]. Vortice kataloğunun hava perdesi sayfalarının metninde bu standarda ya da başka bir test standardına atıf yoktur [1]. Bu yüzden iki üreticinin debi ve hız değerlerini karşılaştırırken değerlerin hangi test yöntemine göre verildiğini sormanızı öneririz.
 
-## Fiyatı belirleyen etkenler
+## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve teklif için ürün sayfasındaki teklif formu kullanılır. Katalogda modeller arasında değişen seçenekler uzunluk, elektrikli ısıtıcının olup olmaması (H serisi) ve besleme gerilimidir (230 V ya da 380 V) [1]. Kızılötesi uzaktan kumanda ve kapı sensörü bağlantısı serinin ortak özelliğidir; katalog ayrıca ısıtıcısız seri için RVG 1A (12835), ısıtıcılı seri için RVG 2A (12836) kodlu regülatörleri listeler [1].
+Güncel fiyat ve teklif için ürün sayfasındaki teklif formu kullanılır. Katalogda modeller arasında değişen seçenekler uzunluk, elektrikli ısıtıcının olup olmaması (H serisi) ve besleme gerilimidir (230 V ya da 380 V) [1]. Katalog ayrıca ısıtıcısız seri için RVG 1A (12835), ısıtıcılı seri için RVG 2A (12836) kodlu regülatörleri listeler [1].
 
 ## Sık sorulan sorular
 
@@ -1211,6 +1216,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // 11 Kasım (BLG-71, Mevzuat düzeltmesi): giriş tanım cümlesi madde 2(1) fan tanımına göre yeniden yazıldı (sha a42b7ff8042b)
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
@@ -1248,6 +1255,8 @@ Havalandırmada kullanılan fan türleri, havanın fandan geçerken izlediği yo
 
 Avrupa Birliği'nin (AB) 2024/1834 sayılı fan tüzüğü aksiyel, karma akışlı ve santrifüj fanı gazın çarktan geçen akış açısına göre ayırır: eksenel (aksiyel) fan, akış açısı 20 dereceden küçük olan fandır; karma akışlı fan, akış açısı 20 derece ve üzeri, 70 dereceden küçük olan fandır; santrifüj fan, akış açısı 70 derece ve üzeri olan fandır (madde 2(18), 2(20), 2(19)) [1]. Akış açısı, çarka giren ve çıkan gaz akışı yönleri arasındaki açıdır (madde 2(17)); hesapta kanat çıkış kenarında göbekteki ve dış çaptaki açıların ortalaması alınır (Ek III, nokta 4) [1].
 
+2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır (madde 9(1)) [1][6]; eski tüzüğün Ek I, II ve III'ü, (AB) 2025/2481 ile değiştirilen aynı fıkraya göre, başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanları için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
+
 | Tür | Akış açısı (2024/1834 madde 2) | Gazın çarktaki yolu (açıklama) | Kaynak notu | VentHub kategorisi |
 |---|---|---|---|---|
 | Aksiyel | 20 dereceden küçük [1] | Çarkın dönme ekseni doğrultusunda (eksenel) [5] | ABD Enerji Bakanlığı kılavuzu: hafif ve kompakt olma eğilimi [2] | Aksiyel fanlar [4] |
@@ -1273,6 +1282,8 @@ ABD Enerji Bakanlığı kılavuzu fan seçimine hava özellikleri, debi, basın�
 ## VentHub'da hangi fan kategorileri ve serileri var? Endüstriyel fan çeşitleri dahil
 
 VentHub kataloğundaki kategoriler aynı ölçüte göre ayrılmamıştır: bazıları kullanım yerini (çatı, banyo, duman egzoz, şömine), bazıları yapıyı ya da malzemeyi (hücreli, plug, korozyona dayanımlı), biri işlevi (tavan vantilatörü) anlatır. Bir fan hem bir akış yoluna hem bir kategoriye girebilir; örneğin hücreli aspiratör, kayış kasnaklı bir radyal fandır [4].
+
+İlgili rehberler: [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi), [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
 
 - Aksiyel fanlar kategorisi duvara monte edilen, düşük ve orta basınçlı aksiyel fanları kapsar [4]; kategori sayfasındaki ailelerden biri Vortice Aksiyel Endüstriyel Fanlar'dır [4]; modeller: [aksiyel fanlar](vh:kategori/axial-industrial-fans).
 - Radyal (santrifüj) fanlar kategorisinin sayfası hücreli, plug ve gövdeli olmak üzere üç yapıyı tanıtır [4]; modeller: [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans).
@@ -1307,12 +1318,6 @@ Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır 
 ## Teklif için hangi bilgiler gerekir?
 
 Fan türü seçimini belirleyen girdiler hava özellikleri, debi, basınç ve sistem yerleşimidir [2]; kategoriye göre kanal çapı veya kesiti, çatı tipi ve eğimi ya da baca kesiti gibi girdiler eklenir [4]. Kategori sayfalarındaki ürünler için "Teklif İste" düğmesi bulunur [4].
-
-## Bu yazının sınırları nelerdir?
-
-Tüzük jet fanı da ayrı bir kategori sayar (madde 2(1)) [1]; VentHub'daki otopark jet fanları kategorisi 3 Kasım 2026'da ürün listelemiyordu [4]. İlgili rehberler: [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi), [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
-
-2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır (madde 9(1)) [1][6]; eski tüzüğün Ek I, II ve III'ü, (AB) 2025/2481 ile değiştirilen aynı fıkraya göre, başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanları için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
 ## Sık sorulan sorular
 
@@ -1365,6 +1370,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-11-06',
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/casals-enkelfan-ec-plug', 'vh:aile/casals-kentalfan-plug'],
     ilgiliKategoriler: ['vh:kategori/plug-fans'],
@@ -1384,7 +1390,7 @@ Kısaca:
 - Seçim: ABD Enerji Bakanlığı kılavuzuna göre fan seçimi hava özellikleri, hava debisi, basınç ve sistem yerleşimini bilerek başlar [3].
 - Seriler: VentHub'ın plug fan kategorisinde iki seri bulunur; biri harici rotorlu EC motorlu, biri IEC standart asenkron motorlu [5].
 
-Plug fan, ASHRAE Journal'da 1997'de yayımlanan bir makalenin başlığında "unhoused (plug/plenum) fans" ifadesiyle geçen kasasız bir fan türüdür [2]. ASHRAE sözlüğünde plenum fan girdisi vardır: tek girişli bir çarkla hava dağıtım sistemindeki bir plenum haznesini basınçlandıran fan düzeneği olarak tanımlanır [1].
+Plug fan, ASHRAE Journal'da 1997'de yayımlanan bir makalenin başlığında "unhoused (plug/plenum) fans" ifadesiyle geçen kasasız bir fan türüdür [2]. ASHRAE sözlüğünde plenum fan girdisi vardır: tek girişli bir çarkla hava dağıtım sistemindeki bir plenum haznesini basınçlandıran fan düzeneği olarak tanımlanır [1]. ASHRAE'nin tanımı plenum fan içindir [1]; plug fan ile plenum fan arasındaki ilişki yalnızca bir makale başlığına dayanır [2].
 
 ## Plug fan nasıl çalışır?
 
@@ -1418,10 +1424,6 @@ VentHub'ın [plug fanlar](vh:kategori/plug-fans) kategorisinde iki Casals serisi
 ## Teklif için hangi bilgiler gerekir?
 
 VentHub'ın plug fan kategorisi seçimi hava debisi ve basınç, motor tipi, besleme tipi ve model boyutuna bağlar [5].
-
-## Bu yazının sınırları nelerdir?
-
-ASHRAE'nin tanımı plenum fan içindir [1]; plug fan ile plenum fan arasındaki ilişki yalnızca bir makale başlığına dayanır [2].
 
 ## Sık sorulan sorular
 
@@ -1615,6 +1617,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     konu: 'verimlilik',
     yayinTarihi: '2026-11-08',
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-slimroof-cati-fanlari'],
     ilgiliKategoriler: ['vh:kategori/roof-fans'],
@@ -1648,14 +1652,14 @@ ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: eksenel fanla
 | Tür | Çatıdaki örnek | Kaynak |
 |---|---|---|
 | Eksenel (pervane tipi) | Pervane tipi fanlar yüksek debiyi düşük basınçta verir ve çatı havalandırmasında sık kullanılır | ABD Enerji Bakanlığı kılavuzu [1] |
-| Merkezkaç (santrifüj) | Bir üreticinin çatıya monte, dikey atışlı, hat içi santrifüj fan serisi, laboratuvar egzozu ve kimya endüstrisi gibi çok korozif uygulamalar için anlatılır | Üretici beyanı [8] |
-| Karışık akışlı | Bir üretici, egzozun yeniden emilimini önlemek için çatıda yukarı atışlı kayışlı karışık akışlı fan sunar | Üretici beyanı [6] |
+| Merkezkaç (santrifüj) | Çatıya monte, dikey atışlı, hat içi santrifüj fan serisi, laboratuvar egzozu ve kimya endüstrisi gibi çok korozif uygulamalar için anlatılır | Üretici beyanı [8] |
+| Karışık akışlı | Egzozun yeniden emilimini önlemek için çatıda yukarı atışlı kayışlı karışık akışlı fan sunulur | Üretici beyanı [6] |
 
 ## Üreticiler çatı fanlarını nasıl anlatıyor?
 
 Üretici sayfasına göre çatı fanı aralığı konut, ticari ve endüstriyel uygulamaları kapsar [4]. Bir seri hava sıkılığı yüksek ve bakımı kolay, plastik ya da alüminyum başlıklıdır; eğilebilir sistemi tam sökmeden bakıma izin verir [4]. Bir başka seri yüksek verimli EC motorlu, bir diğeri kimya, petrokimya, laboratuvar ya da çeker ocak gibi ortamlarda korozyona dayanacak biçimde tasarlanmıştır [4].
 
-İkinci bir üretici (ilk üreticinin sayfa altbilgisi, ikinci üreticinin adını taşıyan bir grup listesi verir [4][5]), başlığın yuvarlak tasarımının yağmur girişi riskini azalttığını, koruyucu başlığın motor ve pervane bakımı için kolayca çıkarıldığını ve EC motorun entegre elektronik kontrolle motoru optimum yükte çalıştırdığını bildirir [5]. Üçüncü bir üretici, dikey atışla egzoz havası çekmek için tasarladığı çatı fanı serisinin mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalarda tercih edilebileceğini ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygun olduğunu yazar [7].
+Vortice, Slimroof serisinde başlığın yuvarlak tasarımının yağmur girişi riskini azalttığını, koruyucu başlığın motor ve pervane bakımı için kolayca çıkarıldığını ve EC motorun entegre elektronik kontrolle motoru optimum yükte çalıştırdığını bildirir [5]. Bir başka üreticinin dikey atışla egzoz havası çeken çatı fanı serisi mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalar için sunulur ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygundur [7].
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -1837,6 +1841,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     yayinTarihi: '2026-11-08',
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/avens-hucreli-aspiratorler-hf-fw', 'vh:aile/avens-hucreli-aspiratorler-hf-s'],
     ilgiliKategoriler: ['vh:kategori/cabinet-fans'],
@@ -1863,7 +1868,7 @@ Kısaca:
 
 ## Kanat tipi hücreli aspiratör seçimini nasıl etkiler?
 
-DOE/AMCA rehberi santrifüj fanlarda öne eğik ve geriye eğik kanat ayrımını yapar [1]. Öne eğik kanat dönme yönünde kıvrılır; bu fan tipi nispeten düşük hızlarda çalışabilir, bu da düşük gürültü düzeyi anlamına gelir, ama verimi görece düşüktür (yüzde 55 ile 65 arası) ve motor aşırı yüklenmesini önlemek için tahrik motoru seçimine dikkat edilmesi gerekir [1]. Geriye eğik kanat dönme yönünden uzağa yatar; düz, eğri ve kanat profilli üç biçimi vardır, eğri kanatlı fanlar daha verimli olma eğilimindedir, düz kanatlılar ise daha sağlamdır; kanat profilli fanlarda verim yüzde 85'in üzerine çıkabilir [1]. Geriye eğik fanın güç eğrisi yüksek debide düşer; bu tip, yüksek debide sistem davranışının belirsiz olduğu durumlarda sık seçilir [1].
+DOE/AMCA rehberi santrifüj fanlarda öne eğik ve geriye eğik kanat ayrımını yapar [1]. Öne eğik kanat dönme yönünde kıvrılır; bu fan tipi nispeten düşük hızlarda çalışabilir, bu da düşük gürültü düzeyi anlamına gelir, ama verimi görece düşüktür (yüzde 55 ile 65 arası) ve motor aşırı yüklenmesini önlemek için tahrik motoru seçimine dikkat edilmesi gerekir [1]. Geriye eğik kanat dönme yönünden uzağa yatar; düz, eğri ve kanat profilli üç biçimi vardır, eğri kanatlı fanlar daha verimli olma eğilimindedir, düz kanatlılar ise daha sağlamdır; kanat profilli fanlarda verim yüzde 85'in üzerine çıkabilir [1]. DOE/AMCA rehberi geriye eğik kanatta düşük çarpma açısı nedeniyle partikül birikiminin kolaylaşabileceğini, kanat profilli tipin stall ve aşınmaya duyarlı olduğunu yazar [1]. Geriye eğik fanın güç eğrisi yüksek debide düşer; bu tip, yüksek debide sistem davranışının belirsiz olduğu durumlarda sık seçilir [1].
 
 | Kanat tipi | Verim | Güç eğrisi | Seçim notu |
 |---|---|---|---|
@@ -1878,7 +1883,7 @@ DOE/AMCA rehberi doğrudan tahriklerin kayışlı tahrike göre daha yüksek ver
 
 ## Hücreli aspiratörde çalışma noktası neden önemlidir?
 
-Fan performans eğrisinin önemli bir noktası, fanın en ekonomik çalıştığı en verimli noktadır; fanın çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1]. Çalışma noktasının fan eğrisi üzerindeki yeri, fanın ne kadar uygun boyutlandırıldığı hakkında da bir fikir verebilir [1]. DOE/AMCA rehberi, sistem eğrisinin her sistem bileşeninin kayıplarının toplanmasıyla hesaplandığını ve fan çıkışına yakın dirsek konmasının iletilen debiyi yüzde 30'a kadar düşürebilecek bir sistem etkisi yaratabileceğini yazar [1]. Boyutların gereğinden büyük seçilmesi verimsiz çalışma, aşırı hava gürültüsü ve düşük güvenilirlik doğurur [1].
+Fan performans eğrisinin önemli bir noktası, fanın en ekonomik çalıştığı en verimli noktadır; fanın çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1]. Çalışma noktasının fan eğrisi üzerindeki yeri, fanın ne kadar uygun boyutlandırıldığı hakkında da bir fikir verebilir [1]. DOE/AMCA rehberi, sistem eğrisinin her sistem bileşeninin kayıplarının toplanmasıyla hesaplandığını ve fan çıkışına yakın dirsek konmasının iletilen debiyi yüzde 30'a kadar düşürebilecek bir sistem etkisi yaratabileceğini yazar [1]. Boyutların gereğinden büyük seçilmesi verimsiz çalışma, aşırı hava gürültüsü ve düşük güvenilirlik doğurur [1]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
 
 ## Kayış ve kasnak bakımında nelere dikkat edilir?
 
@@ -1891,13 +1896,6 @@ Uygun kayış gerginliği genellikle tepe yükte kaymayı önleyen en düşük g
 - Sistem koşulları: hava özellikleri (nem, sıcaklık, yoğunluk, kirletici düzeyi), hava debisi, basınç ve sistem yerleşimi [1].
 - Tahrik: hücreli aileler kayış kasnaklıdır; kayışlı tahrik devir esnekliği sağlar [1][4].
 - Aile: sık kanatlı ya da seyrek kanatlı aile seçimi [4][5].
-
-## Bu yazının sınırları
-
-- DOE/AMCA rehberi geriye eğik kanatta düşük çarpma açısı nedeniyle partikül birikiminin kolaylaşabileceğini, kanat profilli tipin stall ve aşınmaya duyarlı olduğunu yazar [1].
-- DOE/AMCA rehberi öne eğik fanın kirli hatlara uygunluğunu iki ayrı yerde farklı anlatır [1].
-- İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
-- Verim ve kayıp aralıkları 2003 tarihli bir rehbere aittir ve güncel ürün verisi sayılmamalıdır.
 
 ## VentHub'da hangi hücreli aspiratör serileri var?
 
@@ -1953,6 +1951,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // 11 Kasım (BLG-70): yalnız yazıdan yazıya iç bağlantı cümlesi eklendi; iddia yok
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
@@ -1979,23 +1979,23 @@ ABD Enerji Bakanlığı spot havalandırmayı, yerel egzoz fanlarıyla kirletici
 
 ## Banyo ve tuvaletin havalandırılması imar yönetmeliğine göre zorunlu mu?
 
-Planlı Alanlar İmar Yönetmeliği uygulama imar planı bulunan alanları kapsar (madde 2) [1]. Bu yönetmeliğe göre binalarda banyo, tuvalet ve benzeri kullanım alanlarının havalandırma bacası ile ya da mekanik havalandırma ile havalandırılması zorunludur (madde 32/9) [1]. Aynı yönetmelik, bağımsız bölümün tuvalet, banyo ve benzeri ıslak hacimlerinde mekanik havalandırma yapılmadığında yapılacak havalandırma penceresinin net 0,30 × 0,30 metreden küçük olamayacağını yazar (madde 39/6) [1]. Metin mekanik fanı tek yol olarak yazmaz, baca ya da mekanik havalandırma seçeneklerini birlikte sayar [1].
+Planlı Alanlar İmar Yönetmeliği uygulama imar planı bulunan alanları kapsar (madde 2) [1]. Bu yönetmeliğe göre binalarda banyo, tuvalet ve benzeri kullanım alanlarının havalandırma bacası ile ya da mekanik havalandırma ile havalandırılması zorunludur (madde 32/9) [1]. Aynı yönetmelik, bağımsız bölümün tuvalet, banyo ve benzeri ıslak hacimlerinde mekanik havalandırma yapılmadığında yapılacak havalandırma penceresinin net 0,30 × 0,30 metreden küçük olamayacağını yazar (madde 39/6) [1]. Metin mekanik fanı tek yol olarak yazmaz, baca ya da mekanik havalandırma seçeneklerini birlikte sayar [1]. İlgili rehber: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
 
 ## Banyo fanı debisi için hangi ölçütler kullanılıyor?
 
-Türkiye'de incelenen yönetmeliklerin gövde metninde banyo ve tuvalet fanı için debi değeri verilmez [1][2]; karşılaştırma için iki yurt dışı ölçüt kullanılır [3][4]. Home Ventilating Institute (HVI), 100 fit kareye kadar olan banyoda fanın fit kare başına 1 CFM hava sağlamasını önerir [4]. İngiltere'de (England) Approved Document F'in 1. cildi, aralıklı egzoz sistemleri için en düşük egzoz hızını banyo için 15 l/s, tuvalet için 6 l/s olarak Tablo 1.1'de verir [3]. Tuvalet için pencereyle havalandırma yönergesi alternatif olarak kullanılabilir; belge ayrıca daha az hava sızdırmaz konutlarda aralıklı egzoz fanlarının tüm ıslak hacimlere konmasını önerir (madde 1.47, rehber niteliğinde; kapsamı Tablo 1.6'da daha az hava sızdırmaz konut olarak verilir) [3].
+Türkiye'de incelenen yönetmeliklerin gövde metninde banyo ve tuvalet fanı için debi değeri verilmez [1][2]; karşılaştırma için iki yurt dışı ölçüt kullanılır [3][4]. Home Ventilating Institute (HVI), 100 fit kareye (yaklaşık 9,3 m²) kadar olan banyoda fanın fit kare başına 1 CFM (m² başına yaklaşık 18,3 m³/h) hava sağlamasını önerir [4]. İngiltere'de (England) Approved Document F'in 1. cildi, aralıklı egzoz sistemleri için en düşük egzoz hızını banyo için 15 l/s, tuvalet için 6 l/s olarak Tablo 1.1'de verir [3]. Tuvalet için pencereyle havalandırma yönergesi alternatif olarak kullanılabilir; belge ayrıca daha az hava sızdırmaz konutlarda aralıklı egzoz fanlarının tüm ıslak hacimlere konmasını önerir (madde 1.47, rehber niteliğinde; kapsamı Tablo 1.6'da daha az hava sızdırmaz konut olarak verilir) [3].
 
-İki ölçüt farklı birimde ve farklı mantıktadır: biri alan başına öneridir, öbürü en düşük egzoz hızıdır; bu yüzden yan yana okunamaz.
+İki ölçüt farklı birimde ve farklı mantıktadır: biri alan başına öneridir, öbürü en düşük egzoz hızıdır; bu yüzden yan yana okunamaz. HVI ABD kaynaklıdır, İngiltere belgesi yalnız İngiltere içindir; bu ölçütler Türkiye'de bağlayıcı değildir [3][4].
 
 | Ölçüt | Değer | Geçerli olduğu yer | Kaynak |
 |---|---|---|---|
-| HVI banyo havalandırması önerisi | 100 ft²'ye kadar olan banyoda ft² başına 1 CFM [4] | Yer belirtilmemiş; ABD birimleriyle yazılmış sektör önerisi [4] | [4] |
+| HVI banyo havalandırması önerisi | 100 ft²'ye (yaklaşık 9,3 m²) kadar olan banyoda ft² başına 1 CFM (m² başına yaklaşık 18,3 m³/h) [4] | Yer belirtilmemiş; ABD birimleriyle yazılmış sektör önerisi [4] | [4] |
 | Approved Document F, Tablo 1.1 (banyo, aralıklı egzoz) | En az 15 l/s [3] | İngiltere (England) | [3] |
 | Planlı Alanlar İmar Yönetmeliği, madde 32 ve 39 [1] | Gövde metninde debi değeri verilmez [1] | Türkiye (imar planlı alanlar) [1] | [1] |
 
 ## Banyo fanının sesi ve verimi hangi değerlerle anlatılır?
 
-ABD'deki ENERGY STAR programının güncel ölçütleri, 10 ile 89 CFM arasındaki banyo ve yardımcı oda fanları için en az 2,8 CFM/W verim ve en çok 2,0 sone ses düzeyi ister; sone değeri belirli bir referans statik basınçtaki ölçüme bağlıdır [6]. ABD Enerji Bakanlığı, gürültülü havalandırma fanlarının verimli ve sessiz ENERGY STAR modelleriyle değiştirilmesini önerir [5]. Üretici broşüründe ses basıncı 3 m uzaklıkta dB(A) olarak verilir: azami 90 m³/h debili bir modelde 26,9, azami 175 m³/h debili bir modelde 32,3 dB(A) [8]. Sone ile dB(A) farklı büyüklüklerdir. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+ABD'deki ENERGY STAR programının güncel ölçütleri, 10 ile 89 CFM (yaklaşık 17 ile 150 m³/h) arasındaki banyo ve yardımcı oda fanları için en az 2,8 CFM/W (W başına yaklaşık 4,8 m³/h) verim ve en çok 2,0 sone ses düzeyi ister; sone değeri belirli bir referans statik basınçtaki ölçüme bağlıdır [6]. ABD Enerji Bakanlığı, gürültülü havalandırma fanlarının verimli ve sessiz ENERGY STAR modelleriyle değiştirilmesini önerir [5]. Üretici broşüründe ses basıncı 3 m uzaklıkta dB(A) olarak verilir: azami 90 m³/h debili bir modelde 26,9, azami 175 m³/h debili bir modelde 32,3 dB(A) [8]. Sone ile dB(A) farklı büyüklüklerdir. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
 
 ## Banyo fanı hangi kumanda türleriyle çalışır?
 
@@ -2013,18 +2013,12 @@ Quadro Evo broşürüne göre ürün, IP45 koruma derecesiyle banyonun 1. bölge
 
 İlgili ürün sayfalarında fiyat gösterilmez, teklif istenir [11]. Teklifte hazır bulundurulacak seçim girdileri şunlardır:
 
-- Odanın alanı: HVI 100 fit kareye kadar banyolarda alan başına, daha büyük banyolarda sıhhi tesisat elemanlarının sayısına ve türüne göre öneri verir [4].
+- Odanın alanı: HVI 100 fit kareye (yaklaşık 9,3 m²) kadar banyolarda alan başına, daha büyük banyolarda sıhhi tesisat elemanlarının sayısına ve türüne göre öneri verir [4].
 - Montaj şekli: duvar, tavan ya da kanal bağlantısı kategori sayfasında anılır [11].
 - Kanal uzunluğu ve çıkış: izin verilen basınç kaybı üretici ve kurulum referansına bağlıdır; üretici değeri yalnız kendi referans kurulumu için verilmiştir [9].
 - Kumanda tercihi: nem, zamanlayıcı ve hareket algılama [10].
 - Ses beklentisi: sone ya da dB(A) ve ölçüm uzaklığı [6][8].
 - Yerel gereksinim: baca, mekanik havalandırma ve pencere seçenekleri yönetmelikte yazılıdır [1].
-
-## Bu yazının sınırları
-
-- Binalarda Enerji Performansı Yönetmeliği, havalandırma ve iklimlendirme sistemlerinin tasarımında TS 3419 ve ilgili Avrupa standartlarına uyulmasını ister (madde 17/1) [2].
-- HVI ve ENERGY STAR ABD kaynaklıdır, İngiltere belgesi yalnız İngiltere içindir; bu ölçütler Türkiye'de bağlayıcı değildir [3][4][6].
-- İlgili rehber: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
 
 ## VentHub'da hangi banyo ve tuvalet fanı serileri var?
 
