@@ -22,6 +22,10 @@ const KOK = path.resolve(__dirname, '..', '..', '..')
 const ritual = require_(path.join(KOK, 'scripts', 'hijyen', 'merge-ritueli.cjs')) as {
   turetCekirdek: (kok: string) => { kapilar: string[]; sinirlar: string[]; okunanDosya: number }
   workflowDegisiklikleri: (dosyalar: unknown) => string[]
+  edgeDegisiklikleri: (dosyalar: unknown) => string[]
+  adListesiCoz: (ham: unknown) => string[]
+  degisenAdlari: (git: (args: string[]) => string, dal: string, yol?: string) => string[]
+  KAPI_TANIM_ONEKLERI: string[]
   turetCekirdekTabandan: (listele: () => string[], oku: (ad: string) => string) => { kapilar: string[]; sinirlar: string[]; okunanDosya: number }
   degerlendir: (girdi: {
     pv: Record<string, unknown> | null
@@ -713,7 +717,8 @@ describe('INV-RITUEL-5 · emekli harici kapı (Vercel) + eşdeğer imaj kapısı
       expect(ust).not.toMatch(/require\([^'"\s)]/) // dinamik/göreli require yok
       const cli = kaynak.slice(kaynak.indexOf('if (require.main === module)'))
       expect(cli).toMatch(/imajKapisiTuret\(AGAC, \(\) => git\(\['show', 'origin\/master:\.github\/workflows\/'/)
-      expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/'/)
+      expect(kaynak).toMatch(/\['diff', '-z', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/'/)
+      expect(cli).toMatch(/degisenAdlari\(git, dal\)/)
       expect(cli).toMatch(/'--json', 'name,bucket,workflow'/)
     })
 
@@ -824,10 +829,11 @@ describe('INV-RITUEL-6 · taban tazeliği (fetch) + yeniden adlandırma kör nok
   })
 
   it('migration, functions ve okuma-sorusu farkı --no-renames ile okunur (taşınan dosyanın ESKİ yolu da görünür)', () => {
-    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal, '--', 'supabase\/migrations\/'\]/)
-    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal, '--', 'supabase\/functions\/'\]/)
-    // `git diff --name-only` ÇIPLAK (--no-renames'siz) hiçbir yerde kalmadı: tek biçim.
-    expect(cli).not.toMatch(/\['diff', '--name-only', 'origin/)
+    // ARC-335: TEK okuyucu (`degisenAdlari`), `-z` + `--no-renames`; CLI'da doğrudan `git(['diff'` KALMADI.
+    expect(kaynak).toMatch(/\['diff', '-z', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal\]/)
+    expect(cli).toMatch(/degisenAdlari\(git, dal, 'supabase\/migrations\/'\)/)
+    expect(cli).toMatch(/degisenAdlari\(git, dal, 'supabase\/functions\/'\)/)
+    expect(cli).not.toMatch(/git\(\['diff'/)
   })
 
   describe('SABOTAJ: gevşetilmiş kopya AYNI testten KIRMIZI verir (totoloji değil)', () => {
@@ -932,7 +938,7 @@ describe('INV-RITUEL-7 · çekirdek TABANDAN türetilir, PR çekirdeği küçül
 
   it('CLI çekirdeği tabandan türetir: ls-tree + show origin/master; PR ağacından turetCekirdek(AGAC) KALMADI', () => {
     expect(cli).toMatch(/turetCekirdekTabandan\(/)
-    expect(cli).toMatch(/\['ls-tree', '--name-only', 'origin\/master', '\.github\/workflows\/'\]/)
+    expect(cli).toMatch(/\['ls-tree', '-z', '--name-only', 'origin\/master', '\.github\/workflows\/'\]/)
     expect(cli).toMatch(/\['show', 'origin\/master:\.github\/workflows\/' \+ ad\]/)
     expect(cli).not.toMatch(/turetCekirdek\(AGAC\)/)
   })
@@ -1008,18 +1014,58 @@ describe('INV-RITUEL-8 · workflow dosyasına dokunan PR KIRMIZI: kapı kendi ta
     expect(ritual.degerlendir(tamGirdi({ workflowDegisen: undefined })).maddeler.some((m) => m.no === 9)).toBe(false)
   })
 
-  it('workflowDegisiklikleri: yalnız .github/workflows/ altı; ters bölü normalleşir; dependabot.yml, .github/actions, benzer önek ve docs EŞLEŞMEZ', () => {
+  it('workflowDegisiklikleri: workflows, actions ve ci-bagimliliklari altı; ters bölü ve BÜYÜK/küçük harf normalleşir; dependabot.yml, benzer önek ve docs EŞLEŞMEZ', () => {
+    expect(ritual.KAPI_TANIM_ONEKLERI).toEqual(['.github/workflows/', '.github/actions/', '.github/ci-bagimliliklari/'])
     expect(ritual.workflowDegisiklikleri([
       CI, '.github\\workflows\\b.yml', '.github/dependabot.yml', '.github/actions/x/action.yml',
+      '.github/ci-bagimliliklari/kur.sh', '.GitHub/Workflows/X.yml',
       'docs/.github/workflows/c.yml', 'x.github/workflows/d.yml', '.github/workflowsX/e.yml', 'src/a.ts',
-    ])).toEqual([CI, '.github\\workflows\\b.yml'])
+    ])).toEqual([CI, '.github\\workflows\\b.yml', '.github/actions/x/action.yml', '.github/ci-bagimliliklari/kur.sh', '.GitHub/Workflows/X.yml'])
     expect(ritual.workflowDegisiklikleri(null)).toEqual([])
     expect(ritual.workflowDegisiklikleri(undefined)).toEqual([])
   })
 
   it('CLI değişen dosya listesinden madde 9 girdisini üretir; liste okunamazsa null verir (kaynak taraması: bağlantı sessizce düşmesin)', () => {
     expect(cli).toMatch(/workflowDegisen: degisenDosyalar === null \? null : workflowDegisiklikleri\(degisenDosyalar\)/)
-    expect(cli).toMatch(/\['diff', '--name-only', '--no-renames', 'origin\/master\.\.\.origin\/' \+ dal\]/)
+    expect(cli).toMatch(/degisenDosyalar = degisenAdlari\(git, dal\)/)
+  })
+
+  describe('ASCII dışı yol (ARC-335): git -z OLMADAN yolu tırnaklı verir, startsWith süzgeçleri onu kaçırırdı', () => {
+    const tirnakli = (ad: string) => /[^\x20-\x7e]/.test(ad)
+      ? '"' + [...Buffer.from(ad, 'utf8')].map((b) => (b >= 0x80 || b < 0x20 ? '\\' + b.toString(8).padStart(3, '0') : String.fromCharCode(b))).join('') + '"'
+      : ad
+    const ADLAR = ['supabase/migrations/20261117000000_ü.sql', 'supabase/functions/ürün/index.ts', '.github/workflows/çi.yml', '.claude/hooks/ğ.cjs', 'src/ö.ts']
+    /** Gerçek git'in iki davranışı: `-z` → düz adlar + NUL; `-z` yok → tırnaklı + sekizlik kaçışlı, satır sonlu. */
+    const sahteGit = (args: string[]) => {
+      const i = args.indexOf('--')
+      const yol = i >= 0 ? args[i + 1] : null
+      const liste = ADLAR.filter((a) => !yol || a.startsWith(yol))
+      return args.includes('-z') ? liste.map((a) => a + '\0').join('') : liste.map(tirnakli).join('\n')
+    }
+
+    it('fikstür gerçeği: -z yokken yol tırnaklı gelir ve süzgeç onu kaçırır (kaçağın KENDİSİ)', () => {
+      const ham = sahteGit(['diff', '--name-only', '--', '.github/workflows/'])
+      expect(ham).toBe('".github/workflows/\\303\\247i.yml"')
+      expect(ritual.workflowDegisiklikleri(ham.split('\n'))).toEqual([])
+    })
+
+    it('migration, Edge, workflow ve okuma-sorusu süzgeçlerinin HEPSİ -z ile ASCII dışı yolu görür', () => {
+      expect(ritual.degisenAdlari(sahteGit, 'x', 'supabase/migrations/')).toEqual(['supabase/migrations/20261117000000_ü.sql'])
+      expect(ritual.edgeDegisiklikleri(ritual.degisenAdlari(sahteGit, 'x', 'supabase/functions/'))).toEqual(['supabase/functions/ürün/index.ts'])
+      expect(ritual.workflowDegisiklikleri(ritual.degisenAdlari(sahteGit, 'x'))).toEqual(['.github/workflows/çi.yml'])
+      expect(ritual.okumaSorusuGerekli(ritual.degisenAdlari(sahteGit, 'x'))).toBe(true)
+    })
+
+    it('adListesiCoz: NUL ayırır, boşları atar, satır sonu içeren adı bölmez', () => {
+      expect(ritual.adListesiCoz('a\nb\0c\0')).toEqual(['a\nb', 'c'])
+      expect(ritual.adListesiCoz('')).toEqual([])
+      expect(ritual.adListesiCoz(null)).toEqual([])
+    })
+
+    it('CLI\'da doğrudan git(["diff" ve satır-bölmeli ls-tree KALMADI; ls-tree de -z kullanır', () => {
+      expect(cli).not.toMatch(/git\(\['diff'/)
+      expect(cli).toMatch(/adListesiCoz\(git\(\['ls-tree', '-z'/)
+    })
   })
 
   describe('SABOTAJ: gevşetilmiş kopya AYNI beklentiden KIRMIZI verir (totoloji değil)', () => {
@@ -1049,9 +1095,58 @@ describe('INV-RITUEL-8 · workflow dosyasına dokunan PR KIRMIZI: kapı kendi ta
     })
 
     it('yol süzgeci bozulursa (başka önek) kopya workflow değişikliğini GÖRMEZ; gerçek modül görür', () => {
-      const m = bozukKopya(".startsWith('.github/workflows/'))\n}", ".startsWith('.github/workflowsX/'))\n}")
+      const m = bozukKopya('ad.startsWith(onek)', "ad.startsWith(onek + 'x')")
       expect(ritual.workflowDegisiklikleri([CI])).toEqual([CI])
       expect(m.workflowDegisiklikleri([CI]), 'süzgeç bozuldu ama workflow yolu hâlâ görünüyor: kol ayırt etmiyor').toEqual([])
+    })
+
+    it('küçük harfe indirme silinirse kopya `.GitHub/Workflows/` biçimini GÖRMEZ; gerçek modül görür', () => {
+      const m = bozukKopya("'/').toLowerCase()", "'/')")
+      expect(ritual.workflowDegisiklikleri(['.GitHub/Workflows/X.yml'])).toEqual(['.GitHub/Workflows/X.yml'])
+      expect(m.workflowDegisiklikleri(['.GitHub/Workflows/X.yml'])).toEqual([])
+    })
+
+    it('önek listesinden actions ya da ci-bagimliliklari düşerse kopya o dizini GÖRMEZ', () => {
+      const m = bozukKopya("'.github/actions/', '.github/ci-bagimliliklari/'", "'.github/actions-yok/', '.github/ci-bagimliliklari-yok/'")
+      for (const yol of ['.github/actions/x/action.yml', '.github/ci-bagimliliklari/kur.sh']) {
+        expect(ritual.workflowDegisiklikleri([yol])).toEqual([yol])
+        expect(m.workflowDegisiklikleri([yol]), `${yol} önek düştü ama hâlâ görünüyor: kol ayırt etmiyor`).toEqual([])
+      }
+    })
+
+    describe('-z kaldırılırsa (tırnaklı yol) HER süzgeç için bozuk kopya KAÇIRIR, gerçek modül görür', () => {
+      const tirnakli = (ad: string) => /[^\x20-\x7e]/.test(ad)
+        ? '"' + [...Buffer.from(ad, 'utf8')].map((b) => (b >= 0x80 || b < 0x20 ? '\\' + b.toString(8).padStart(3, '0') : String.fromCharCode(b))).join('') + '"'
+        : ad
+      const ADLAR = ['supabase/migrations/20261117000000_ü.sql', 'supabase/functions/ürün/index.ts', '.github/workflows/çi.yml', '.claude/hooks/ğ.cjs']
+      const sahteGit = (args: string[]) => {
+        const i = args.indexOf('--')
+        const yol = i >= 0 ? args[i + 1] : null
+        const liste = ADLAR.filter((a) => !yol || a.startsWith(yol))
+        return args.includes('-z') ? liste.map((a) => a + '\0').join('') : liste.map(tirnakli).join('\n')
+      }
+      const zsiz = () => bozukKopya("['diff', '-z', '--name-only'", "['diff', '--name-only'")
+
+      it('migration: tam ad okunur (kopya tırnaklı/kaçışlı adı verir)', () => {
+        const m = zsiz()
+        expect(ritual.degisenAdlari(sahteGit, 'x', 'supabase/migrations/')).toEqual(['supabase/migrations/20261117000000_ü.sql'])
+        expect(m.degisenAdlari(sahteGit, 'x', 'supabase/migrations/')).not.toContain('supabase/migrations/20261117000000_ü.sql')
+      })
+      it('Edge: ASCII dışı functions yolu sayılır (kopya 0 görür)', () => {
+        const m = zsiz()
+        expect(ritual.edgeDegisiklikleri(ritual.degisenAdlari(sahteGit, 'x', 'supabase/functions/'))).toHaveLength(1)
+        expect(m.edgeDegisiklikleri(m.degisenAdlari(sahteGit, 'x', 'supabase/functions/'))).toHaveLength(0)
+      })
+      it('workflow: ASCII dışı workflow yolu madde 9 girdisine girer (kopya girmez)', () => {
+        const m = zsiz()
+        expect(ritual.workflowDegisiklikleri(ritual.degisenAdlari(sahteGit, 'x'))).toEqual(['.github/workflows/çi.yml'])
+        expect(m.workflowDegisiklikleri(m.degisenAdlari(sahteGit, 'x'))).toEqual([])
+      })
+      it('okuma sorusu: ASCII dışı kanca yolu soruyu tetikler (kopya sessiz kalır)', () => {
+        const m = zsiz()
+        expect(ritual.okumaSorusuGerekli(ritual.degisenAdlari(sahteGit, 'x'))).toBe(true)
+        expect(m.okumaSorusuGerekli(m.degisenAdlari(sahteGit, 'x'))).toBe(false)
+      })
     })
   })
 })

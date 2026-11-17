@@ -603,7 +603,7 @@ function degerlendir(girdi) {
     ekle(9, 'WORKFLOW DOKUNUSU 0', false, 'degisen dosya listesi OKUNAMADI — olculemedi (fail-closed)')
   } else if (Array.isArray(girdi.workflowDegisen) && girdi.workflowDegisen.length) {
     ekle(9, 'WORKFLOW DOKUNUSU 0', false,
-      'workflow degisikligi = kapi degisikligi · ' + girdi.workflowDegisen.length + ' dosya: ' +
+      'kapi TANIMI/kurulumu degisikligi (.github/workflows|actions|ci-bagimliliklari) = kapi degisikligi · ' + girdi.workflowDegisen.length + ' dosya: ' +
       girdi.workflowDegisen.slice(0, 3).join(', ') + (girdi.workflowDegisen.length > 3 ? ' …' : '') +
       '  — birlestirme OPS-192 yolundan: tam fark okunur, ARAC hukmu, elle gh pr merge (--admin YOK). Istisna yok.')
   }
@@ -650,7 +650,36 @@ function edgeDegisiklikleri(dosyalar) {
  * @param {string[]|null|undefined} dosyalar
  */
 function workflowDegisiklikleri(dosyalar) {
-  return (dosyalar || []).filter((d) => String(d).replace(/\\/g, '/').startsWith('.github/workflows/'))
+  return (dosyalar || []).filter((d) => {
+    const ad = String(d).replace(/\\/g, '/').toLowerCase()
+    return KAPI_TANIM_ONEKLERI.some((onek) => ad.startsWith(onek))
+  })
+}
+
+/**
+ * Kapının TANIMINI ya da kurulumunu taşıyan dizinler (ALT-203 + ARC-335 düzeltmesi). Küçük harfe indirilmiş karşılaştırılır
+ * (`.github/Workflows/` gibi biçimler de görünür). KABUL EDİLEN SINIR: kapıların ÇAĞIRDIĞI `scripts/ci/**`,
+ * `scripts/db/checks/**` ve package.json komutları bu listede DEĞİL (her PR'ı OPS-192'ye iterdi); cetvel §20.1.
+ */
+const KAPI_TANIM_ONEKLERI = ['.github/workflows/', '.github/actions/', '.github/ci-bagimliliklari/']
+
+/**
+ * NUL ayraçlı (`git ... -z`) çıktıyı ad dizisine çevirir. SAF. ARC-335: `-z` OLMAZSA git ASCII dışı ya da `"`/`\` içeren
+ * yolları TIRNAKLI + sekizlik kaçışlı verir (`".github/workflows/\303\247i.yml"`) ve `startsWith` süzgeçleri onu KAÇIRIR.
+ */
+function adListesiCoz(ham) {
+  return String(ham || '').split('\0').filter(Boolean)
+}
+
+/**
+ * Değişen dosya adları: `diff -z --name-only --no-renames origin/master...origin/<dal> [-- yol]`. `git` bir
+ * `(args) => string` çalıştırıcıdır (CLI'da `-C <ağaç>` ile sarılı, testte sahte). Dört süzgeç (migration, Edge, workflow,
+ * okuma sorusu) TEK buradan okur: bir yerde `-z` unutulursa o süzgeç tırnaklı yolu kaçırır.
+ */
+function degisenAdlari(git, dal, yol) {
+  const args = ['diff', '-z', '--name-only', '--no-renames', 'origin/master...origin/' + dal]
+  if (yol) args.push('--', yol)
+  return adListesiCoz(git(args))
 }
 
 /**
@@ -730,7 +759,7 @@ function ozDogrulama(yerelMetin, masterMetin) {
 
 module.exports = {
   ozDogrulama,
-  turetCekirdek, turetCekirdekTabandan, workflowCoz, workflowDegisiklikleri, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
+  turetCekirdek, turetCekirdekTabandan, workflowCoz, workflowDegisiklikleri, KAPI_TANIM_ONEKLERI, adListesiCoz, degisenAdlari, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
   imajKapisiCoz, imajKapisiTuret, yolDeseniEslesir, emekliMi, emekliKapi, EMEKLI_HARICI_KAPILAR,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
@@ -826,7 +855,7 @@ if (require.main === module) {
 
   // ALT-201: çekirdek TABANDAN (origin/master) türetilir; PR ağacı çekirdeği küçültemez. `--no-pager` ve ağaç `git()` ile.
   const { kapilar: cekirdek, sinirlar, okunanDosya } = turetCekirdekTabandan(
-    () => git(['ls-tree', '--name-only', 'origin/master', '.github/workflows/']).split('\n').filter(Boolean),
+    () => adListesiCoz(git(['ls-tree', '-z', '--name-only', 'origin/master', '.github/workflows/'])),
     (ad) => git(['show', 'origin/master:.github/workflows/' + ad]),
   )
 
@@ -837,16 +866,13 @@ if (require.main === module) {
   try {
     // --no-renames (ALT-200): migration/functions disina TASINAN dosyanin ESKI yolu da listede gorunsun; yoksa
     // supabase/migrations/x.sql -> baska/yol.sql tasimasi migration sayacini atlatir.
-    migrationlar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal, '--', 'supabase/migrations/'])
-      .split('\n').filter(Boolean)
+    migrationlar = degisenAdlari(git, dal, 'supabase/migrations/')
   } catch { migrationlar = null }
 
   // ARC-259: Edge functions değişikliği + açık inceleme bulgusu. Ölçülemezse null (fail-closed, KIRMIZI).
   let functionsDegisen = null
   try {
-    functionsDegisen = edgeDegisiklikleri(
-      git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal, '--', 'supabase/functions/']).split('\n').filter(Boolean),
-    )
+    functionsDegisen = edgeDegisiklikleri(degisenAdlari(git, dal, 'supabase/functions/'))
   } catch { functionsDegisen = null }
 
   let inceleme = null
@@ -866,7 +892,7 @@ if (require.main === module) {
   let degisenDosyalar = null
   try {
     // --no-renames: tasinan dosyanin ESKI yolu da listede gorunsun (Dockerfile -> baska ad tasimasi imaj yolunu atlatamaz).
-    degisenDosyalar = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+    degisenDosyalar = degisenAdlari(git, dal)
   } catch { degisenDosyalar = null }
 
   yaz('  turetme: ' + okunanDosya + ' workflow okundu (TABANDAN origin/master), zorunlu cekirdek ' + cekirdek.length +
@@ -897,7 +923,7 @@ if (require.main === module) {
   // ARC-110: kanca/ayar/MCP sınıfı PR'da sabit okuma sorusu. Madde DEĞİL: kırmızı sayısına
   // girmez, çıkış kodunu değiştirmez; ölçülemezse sessizce atlanır (hatırlatma, kapı değil).
   try {
-    const degisen = git(['diff', '--name-only', '--no-renames', 'origin/master...origin/' + dal]).split('\n').filter(Boolean)
+    const degisen = degisenAdlari(git, dal)
     if (okumaSorusuGerekli(degisen)) yaz('  ' + OKUMA_SORUSU_METNI)
   } catch { /* hatırlatma, ölçüt değil */ }
 
