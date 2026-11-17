@@ -115,6 +115,7 @@ Sıra yol haritasındandır; üç iş aynı anda yürür, sonra ortak kontrol, e
 | Dondurulmuş eski adres evreni ve dizinli adreslerin ölçümü | GEO-SEO ölçer, URUN tabloya alır | orta | SEO-76 (beklemede) |
 | Dizin: yeni sitenin ve eski adreslerin arama motorlarındaki durumu | Geçişte dizin kaybı olmasın | orta | `geo-seo-dizin.md` |
 | Ürün durumu SQL'le değişince site haritası tazelenmiyor | 17 Kasım: yuvarlak kanal fanı ailesinin 7 ürünü SQL ile yeniden yayına alındı, sayfa 200 oldu ama `sitemap.xml` önbellekte kaldı (en çok 6 saat); yeni sitede ürün durumu değişimi haritayı tazelemeli, yoksa IndexNow kapısı yeni adresi reddeder (SEO-68) | orta | SEO-68 |
+| llms.txt sayıları otomatik üretilsin | Eski sitede `llms.txt`'teki "N indexable URLs" ve "N categories" sayıları elle yazılıyordu; katalog değişince (17 Kasım: ürün geri alma, 101→102 ve 28→29) canlı kapı LLMS-SAYFA kırmızı verdi ve elle düzeltme gerekti. Yeni sitede `llms.txt` baştan üretilirken bu iki sayı site haritasından üretilmeli, elle yazılmamalı (OPS 18 Kasım: eski siteye araç yazılmaz, sayı satırı taşınmaz) | düşük | SEO-120 |
 | Satış kipi: şirket kurulunca tek anahtarla geçiş; o gün yeni iş yapılmaz | İki kip de Design'da hazırlanır, sepet ve satış kipi şirket kurulmadan test edilir | orta | OPS-180 |
 | Canlıya aktarım planı | Önizleme "tamam" olunca konuşulur; kapsam 4. bölümde | düşük | OPS-180 |
 | Bu defter için `olcum` komutu (manifest, plan dosyası ve alt defterlerdeki kart numaralarının tutarlılığı) | Defter `kontrolsuz` kalmasın; şimdilik `pilot` | düşük | açılacak |

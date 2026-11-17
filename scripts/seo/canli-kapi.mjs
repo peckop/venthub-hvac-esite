@@ -349,12 +349,29 @@ const gorunenMetin = (html) => String(html)
   .replace(/&amp;/g, '&')
   .replace(/\s+/g, ' ')
 
+/**
+ * Yasak ifade görünen metinde var mı. Rakamla BAŞLAYAN ifade ("81 il") alt dize olarak aranırsa başka bir sayının
+ * kuyruğuyla eşleşir ("2025/2481 ile" ve "16281 ile ilgili" 18 Kasım 2026'da sahte KIRMIZI verdi, SEO-120): bu yüzden
+ * eşleşmenin hemen ÖNÜNDE rakam varsa sayılmaz. Sonu açık bırakılır: "81 ile kargo" vaadi hâlâ yakalanır. Rakamla
+ * başlamayan ifadelerde davranış değişmez (kapı gevşemez).
+ */
+export function yasakIfadeVarMi(metin, ifade) {
+  const k = trKucuk(ifade)
+  const rakamlaBaslar = /^\d/.test(k)
+  let i = metin.indexOf(k)
+  while (i !== -1) {
+    if (!(rakamlaBaslar && i > 0 && /\d/.test(metin[i - 1]))) return true
+    i = metin.indexOf(k, i + 1)
+  }
+  return false
+}
+
 function vitrinIddiaKontrolu(sayfalar, cikti) {
   for (const s of sayfalar) {
     if (s.html == null) continue
     const metin = trKucuk(gorunenMetin(s.html))
     for (const { ifade, kaynak } of VITRIN_YASAK_IFADELER) {
-      if (metin.includes(trKucuk(ifade))) cikti.push(bulgu('VITRIN-IDDIA', 'KIRMIZI', s.yol, `yasak ifade "${ifade}" görünen metinde: ${kaynak}`))
+      if (yasakIfadeVarMi(metin, ifade)) cikti.push(bulgu('VITRIN-IDDIA', 'KIRMIZI', s.yol, `yasak ifade "${ifade}" görünen metinde: ${kaynak}`))
     }
   }
 }
