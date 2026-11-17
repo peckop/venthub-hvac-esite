@@ -185,6 +185,13 @@ jobs:
           DEFTER_KAPISI_KIP: uyari
         run: node scripts/ci/defter-pr-kapisi.cjs
 
+      # ALT-181 / ALT-177 — YÖNLENDİRME TABLOSU KAPISI. Eski->yeni adres tablosu (docs/plans/rec-300-adres-esleme/eski-yeni.csv)
+      # A5-A7 ve A9 kurallarına karşı ölçülür (tek sıçrama, ölü hedef yok, eski adres canlı değil, bütçe). Salt-okuma, ağ yok, LLM yok,
+      # yeni sır yok; ihlalde çıkış 1 (KIRMIZI). Mantık ve test: scripts/ci/yonlendirme-kapisi.cjs (INV-YONLENDIRME-TABLO-1).
+      # Master'da 17 Kasım 2026'da yerelde ölçüldü: 1259 satır, 0 ihlal. `continue-on-error` YOK (INV-CI-EDITED-1).
+      - name: Yönlendirme tablosu kapısı (ALT-181)
+        run: node scripts/ci/yonlendirme-kapisi.cjs
+
       # ALT-38 — `edited` AYNASI (cetvel: docs/standards/test-karnesi-standard.md §4; mantık ve test: scripts/ci/edited-ayna.cjs).
       # Yalnız PR düzenlemesinde koşar. Aynı head SHA için bu koşudan ÖNCE başlamış bir TAM koşu `success` ile bitmişse ve
       # o koşunun `taban izi` bu koşunun tabanıyla (HEAD^1) BİREBİR aynıysa ağır adımlar ATLANIR (kod ve taban aynı: gerçek
