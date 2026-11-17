@@ -594,6 +594,20 @@ function degerlendir(girdi) {
       'guvenilmez (fail-closed). Aga/kimlige bak, sonra ritueli tekrar kos.')
   }
 
+  // 9 — WORKFLOW DOKUNUSU (ALT-203, ARC-334): PR kapinin KENDI tanimini degistirebilir (`if: false` skipping gecer,
+  // ayni adla baska workflow'a tasima, ici bosaltma). Cekirdek tabandan turese de bu uc yol acik kalir; kok neden tek:
+  // `.github/workflows/**` degisiyor. ISTISNA YOK: workflow PR'i = kapi PR'i, birlestirme OPS-192 yolundan (tam fark okunur,
+  // ARAC hukmu, elle gh pr merge). `undefined` = cagiran olcmedi (eski fikstur) -> madde eklenmez; `null` = OKUNAMADI
+  // (fail-closed KIRMIZI); bos dizi = dokunmuyor -> madde GORUNMEZ (cikti degismez).
+  if (girdi.workflowDegisen === null) {
+    ekle(9, 'WORKFLOW DOKUNUSU 0', false, 'degisen dosya listesi OKUNAMADI — olculemedi (fail-closed)')
+  } else if (Array.isArray(girdi.workflowDegisen) && girdi.workflowDegisen.length) {
+    ekle(9, 'WORKFLOW DOKUNUSU 0', false,
+      'workflow degisikligi = kapi degisikligi · ' + girdi.workflowDegisen.length + ' dosya: ' +
+      girdi.workflowDegisen.slice(0, 3).join(', ') + (girdi.workflowDegisen.length > 3 ? ' …' : '') +
+      '  — birlestirme OPS-192 yolundan: tam fark okunur, ARAC hukmu, elle gh pr merge (--admin YOK). Istisna yok.')
+  }
+
   return { maddeler, kirmizi: maddeler.filter((m) => !m.gecti).length }
 }
 
@@ -628,6 +642,15 @@ function bulguVarMi(govde) {
  */
 function edgeDegisiklikleri(dosyalar) {
   return (dosyalar || []).filter((d) => String(d).replace(/\\/g, '/').startsWith('supabase/functions/'))
+}
+
+/**
+ * Workflow dokunuşu (ALT-203): `.github/workflows/` altındaki yollar. SAF. Girdi `--no-renames` listesidir
+ * (taşınan dosyanın ESKİ yolu da görünür). Ters bölü normalleştirilir.
+ * @param {string[]|null|undefined} dosyalar
+ */
+function workflowDegisiklikleri(dosyalar) {
+  return (dosyalar || []).filter((d) => String(d).replace(/\\/g, '/').startsWith('.github/workflows/'))
 }
 
 /**
@@ -707,7 +730,7 @@ function ozDogrulama(yerelMetin, masterMetin) {
 
 module.exports = {
   ozDogrulama,
-  turetCekirdek, turetCekirdekTabandan, workflowCoz, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
+  turetCekirdek, turetCekirdekTabandan, workflowCoz, workflowDegisiklikleri, degerlendir, onayGecerli, okumaSorusuGerekli, edgeDegisiklikleri, acikIncelemeBulgusu,
   imajKapisiCoz, imajKapisiTuret, yolDeseniEslesir, emekliMi, emekliKapi, EMEKLI_HARICI_KAPILAR,
   DUSEN_KOVALARI, BEKLEYEN_KOVALARI, ONAY_ASGARI, OKUMA_SORUSU_YOLLARI, OKUMA_SORUSU_METNI,
 }
@@ -860,6 +883,7 @@ if (require.main === module) {
   const { maddeler, kirmizi } = degerlendir({
     pv, pvHata, kapilar, cekirdek, uzakSha, migrationlar, mergeCommitSha, onay: ONAY, functionsDegisen, inceleme,
     imajKapisi: imaj.kapi, degisenDosyalar, fetchTamam,
+    workflowDegisen: degisenDosyalar === null ? null : workflowDegisiklikleri(degisenDosyalar),
   })
   for (const m of maddeler) {
     yaz((m.gecti ? '  YESIL   ' : '  ⛔KIRMIZI ') + m.no + '. ' + m.ad + (m.detay ? '  — ' + m.detay : ''))

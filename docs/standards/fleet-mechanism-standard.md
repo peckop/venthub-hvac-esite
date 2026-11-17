@@ -1555,11 +1555,12 @@ alırdı (ci.yml sınıflayıcısı bilerek tabandan okur; ritüel okumuyordu, A
 yoksa madde 2 KIRMIZI verir. Taban listesi/okuması başarısızsa çekirdek BOŞ döner ve "CEKIRDEK BOS" ile KIRMIZI olur.
 Bedel adıyla: çekirdeği **bilerek** değiştiren (iş silen/yeniden adlandıran) PR artık ritüelden geçmez; OPS-192 yoluyla
 (tam fark okunur, ARAÇ hükmü, elle birleştirme) gider. Bu bilinçli: çekirdek değişikliği zaten bağımsız denetim ister.
-⚠**Hâlâ AÇIK üç yol (ARAÇ ARC-334, kapanışı ALT-203):** çekirdek LİSTESİ PR'dan etkilenmez, ama SONUÇ etkilenebilir:
+**Workflow dokunuşu KIRMIZI (ALT-203, 17 Kasım 2026; aşağıdaki üç yol KAPANDI, kollar INV-RITUEL-8):** PR `.github/workflows/**` altındaki herhangi bir dosyaya dokunuyorsa (`git diff --name-only --no-renames`, eski ve yeni yol) ritüelde madde 9 KIRMIZI olur; mesaj: workflow değişikliği = kapı değişikliği, birleştirme OPS-192 yolundan (tam fark okunur, ARAÇ hükmü, elle `gh pr merge`, `--admin` YOK). Dokunmayan PR'da madde görünmez (çıktı değişmez); değişen dosya listesi okunamazsa KIRMIZI (fail-closed). **İstisna yok.** Bedel adıyla: meşru workflow PR'ları da (kapı ekleme, sürüm yükseltme, CI düzeltmesi) ve Dependabot `github_actions` PR'ları (`.github/workflows` içindeki `uses:` satırlarını değiştirir) artık ritüelden geçmez, OPS-192 yoluna düşer. Yalnız `uses:` sha satırlarını değiştiren farkı ayrı bir yola almak (ayrı karar kartı) bilinçli olarak yapılmadı: `uses:` satırı da kapının çalıştırdığı kodu değiştirir. Kalan kör nokta: `.github/actions/**` (kompozit eylemler) bu maddede değil; bugün depoda `.github/actions` dizini ve yerel `uses: ./` yok (17 Kasım 2026 ölçüldü), biri eklenirse kapsam genişletilir.
+Eski açık (tarihsel kayıt, ARAÇ ARC-334): çekirdek LİSTESİ PR'dan etkilenmez, ama SONUÇ etkilenebilir:
 (a) çekirdek işe `if: false` konursa iş tabloda `skipping` olarak VAR görünür ve ritüelden geçer; (b) taban işi silinip aynı
 ad başka bir workflow'da yeni iş olarak eklenirse madde 2 yalnız ada baktığı için geçer; (c) iş adı ve workflow aynı kalıp
 içi boşaltılırsa (adımlar silinip `echo`) tablo yeşil görünür. Üçünün kök nedeni PR'ın kapının kendi tanımını değiştirebilmesi;
-ALT-203 `.github/workflows/**` dosyasına dokunan her PR'ı ritüelde KIRMIZI yapıp OPS-192 yoluna yönlendirecek.
+ALT-203 `.github/workflows/**` dosyasına dokunan her PR'ı ritüelde KIRMIZI yapıp OPS-192 yoluna yönlendirdi (yukarıdaki paragraf).
 İmaj kapısı kapsamı (ALT-201 madde 1) kararı: dört yol **genişletilmedi**; ürün derlemesi `ci` içindeki `Build (blocking)`
 adımında koşar ve yalnız dar sınıfta (belge, edge, betik, karma) atlanır; `package.json`, `pnpm-lock.yaml`, `src/**` gibi
 girdiler dar sınıfta değildir, yani Build koşar. Yolları genişletmek her bağımlılık PR'ında Docker derlemesi koşturur
