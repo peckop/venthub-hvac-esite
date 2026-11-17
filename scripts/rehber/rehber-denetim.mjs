@@ -287,7 +287,12 @@ export const MARKA_SERI_ADLARI = [
   // seri adları (sitede aile adı olarak geçenler). "Radon" gaz adı olarak da geçtiği için listeye ALINMAZ (yanlış pozitif).
   'ENKELFAN', 'KENTALFAN', 'CLIBOS-TR', 'CLIBOS', 'CIKSTORM', 'LINEO', 'VORT', 'VLT',
 ]
-/** Tüm yazıda (seri bölümü ve Kaynaklar dahil) marka + seri adı toplamı en çok bu kadar olabilir (genel rehber türü). */
+/**
+ * Anlatım gövdesinde marka + seri adı toplamı en çok bu kadar olabilir (genel rehber türü).
+ * v0.28 (BLG-85, OPS-325): `## Kaynaklar` ve seri listesi bölümü sayıma girmez. Bu iki bölüm ad taşımak zorundadır;
+ * sayıma girdiklerinde kanal tipi fan yazısında tavan gövdeye tek ad eklenmeden doluyordu (4 + 4 = 8) ve R3.4 m
+ * ("bir üretici" yazılmaz) uygulanamıyordu.
+ */
 export const MARKA_TOPLAM_TAVAN = 8
 /** "Genel rehber" türü bu başlıkla tanınır; tavan yalnız bu türde işler. */
 export const SERI_BOLUMU_KALIBI = /^VentHub'da hangi .+ serileri var\?$/
@@ -303,7 +308,13 @@ export function markaDenetle(md) {
   )
   // adres ve vh: bağlantı hedefleri marka sözcüğü içerir (casals-...); yalnız görünen metin sayılır
   let toplam = 0
-  for (const ham of satirlar) toplam += [...ham.replace(/https?:\/\/\S+/g, ' ').replace(/\]\([^)]*\)/g, ']').matchAll(ad)].length
+  let sayimDisi = false // `## Kaynaklar` ve seri listesi bölümünün içindeyken true
+  for (const ham of satirlar) {
+    const b = baslik(ham)
+    if (b !== undefined) sayimDisi = b === 'Kaynaklar' || SERI_BOLUMU_KALIBI.test(b)
+    if (sayimDisi) continue
+    toplam += [...ham.replace(/https?:\/\/\S+/g, ' ').replace(/\]\([^)]*\)/g, ']').matchAll(ad)].length
+  }
   return toplam > MARKA_TOPLAM_TAVAN ? [{ sinif: 'MARKA-TOPLAM', ayrinti: `${toplam} adet (en çok ${MARKA_TOPLAM_TAVAN})` }] : []
 }
 
