@@ -15,6 +15,8 @@
  *   7. Başlık yapısı (R11, BLG-12): konu terimi taşımayan H2 oranı ve aynı ifadenin her H2'de tekrarı
  *      UYARI verir, KIRMIZI vermez (Google'ın resmî belgelerinde H2/H3 için konu ifadesi şartı ve
  *      sayısal eşik yok; eşikler bizim). Zorunlu bölüm başlıkları sayılmaz.
+ *   8. Üslup (R3.4, BLG-79) ayrı dosyadadır: `uslup-denetim.test.ts` (INV-REHBER-USLUP-1); temiz örnek burada da üslup uyarısı vermez.
+ *   9. Marka (R3.3 madde 8, v0.24): `MARKA-GOVDEDE` kırmızısı kalktı; yalnız toplam tavanı (`MARKA-TOPLAM`) kırmızıdır.
  * Yazı taslakları depoya GİRMEZ (R4.8) — buradaki metinler UYDURMA örnektir, gerçek yazı değil.
  */
 import { describe, it, expect } from 'vitest'
@@ -28,7 +30,7 @@ meta_aciklama: Örnek cihazın ne işe yaradığı ve seçimde bakılacak ölç�
 ---
 # Örnek cihaz nedir?
 
-Örnek cihaz, havayı bir kanaldan diğerine taşıyan temel bir ekipmandır. Seçimde taşınacak hava miktarı, kanal yolundaki direnç ve montaj yeri birlikte değerlendirilir. Bu yazı önce cihazın görevini anlatır, sonra seçim ölçütlerini sıralar, en sonda sık sorulan sorulara ve kaynaklara yer verir.
+Örnek cihaz, havayı bir kanaldan diğerine taşıyan temel bir ekipmandır. Seçimde taşınacak hava miktarı, kanal yolundaki direnç ve montaj yeri birlikte değerlendirilir. Montajda kanal yönü ve erişim, bakımda üretici kılavuzundaki aralıklar ve kayıt düzeni esas alınır, seçim bu ölçütlerle birlikte yapılır.
 
 Kısaca:
 
@@ -38,7 +40,7 @@ Kısaca:
 
 Örnek cihaz, havayı bir kanaldan diğerine taşır [1]. Çıkış hızı genellikle 7–9 m/s aralığındadır [1].
 
-> **Not:** Bu yazı genel bilgidir, proje hesabının yerini tutmaz.
+> **Not:** Genel bilgidir, proje hesabının yerini tutmaz.
 
 | Ölçüt | Değer |
 |---|---|
@@ -252,53 +254,53 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
     })
     expect(h2Basliklari(teklif)).not.toContain('Teklif için hangi bilgiler gerekir?')
   })
-  describe('R3.3 marka yoğunluğu (BLG-33 v1l vakası: gövdede marka ve seri adı)', () => {
+  describe('R3.3 marka yoğunluğu (BLG-33 v1l vakası; v0.24: gövdede marka serbest, yalnız toplam tavan kırmızı)', () => {
     const SERI = "## VentHub'da hangi plug fan serileri var?"
     const kur = (govde: string, seri: string, kaynak: string) =>
       `# Başlık\n\n${govde}\n\n${SERI}\n\n${seri}\n\n## Kaynaklar\n\n${kaynak}\n`
     const KAYNAK = '1. Casals, Plug fans katalogu. https://example.com/casals-enkelfan\n'
+    const siniflarMarka = (md: string) => markaDenetle(md).map((k: { sinif: string }) => k.sinif)
     it('v1m benzeri: adlar yalnız seri bölümünde ve Kaynaklar\'da → yeşil', () => {
       const md = kur('Plug fan, kasasız bir fan türüdür [1].', "İki Casals serisi var: [ENKELFAN](vh:aile/casals-enkelfan) ve KENTALFAN [1].", KAYNAK)
       expect(markaDenetle(md)).toEqual([])
     })
-    it('v1l benzeri: gövdede marka ve seri adı → MARKA-GOVDEDE KIRMIZI, adlar sayılarıyla yazılır', () => {
+    it('v0.24 (BLG-79, R3.4 m): v1l benzeri gövdede marka ve seri adı artık KIRMIZI değil; MARKA-GOVDEDE sınıfı kalktı', () => {
+      // 4 adet gövdede + 1 adet Kaynaklar'da = 5, tavanın (8) altında: eski kapı burada MARKA-GOVDEDE kırmızısı veriyordu
       const md = kur("Casals'ın ENKELFAN serisinde çark geriye eğiktir [1]. KENTALFAN da öyledir [1]. Casals bunu yazar [1].", 'İki seri var [1].', KAYNAK)
-      expect(markaDenetle(md)).toEqual([
-        { sinif: 'MARKA-GOVDEDE', ayrinti: '4 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): Casals ×2, ENKELFAN ×1, KENTALFAN ×1' },
-      ])
+      expect(markaDenetle(md)).toEqual([])
+      expect(denetle(md.replace('# Başlık', '# Casals ENKELFAN'), { iddialar: IDDIALAR }).kirmizi.map((k: { sinif: string }) => k.sinif)).not.toContain('MARKA-GOVDEDE')
     })
-    it('BLG-37: sitedeki markalar ve seri adları (fan-cesitleri / radyal-aksiyel benzeri gövde) KIRMIZI; "radon" gazı adı sayılmaz', () => {
+    it('BLG-37: gövdede sekiz marka ve seri adı + Kaynaklar\'da bir ad = 9 → yalnız MARKA-TOPLAM KIRMIZI (sabotaj kolu korunur); "radon" gazı adı sayılmaz', () => {
       const md = kur(
         'Kanal tipi fanda Vortice LINEO ve VORT HR örnek verilir [1]. Radyal fanda Nicotra Gebhardt, sürücüde Danfoss VLT, ısı geri kazanımda Avens anılır [1].',
         'İki seri var [1].',
         KAYNAK,
       )
-      expect(markaDenetle(md)).toEqual([
-        { sinif: 'MARKA-GOVDEDE', ayrinti: '8 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): Vortice ×1, LINEO ×1, VORT ×1, Nicotra ×1, Gebhardt ×1, Danfoss ×1, VLT ×1, Avens ×1' },
-        { sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }, // 8 gövdede + Kaynaklar'daki Casals
-      ])
+      expect(markaDenetle(md)).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }]) // 8 gövdede + Kaynaklar'daki Casals
       expect(markaDenetle(kur('Radon gazı konut havasında birikebilir [1].', 'İki seri var [1].', KAYNAK))).toEqual([])
     })
     it('seri bölümü ve Kaynaklar dahil toplam 8 üstü → MARKA-TOPLAM KIRMIZI, 8 geçer', () => {
       const seri = (n: number) => Array.from({ length: n }, () => 'Casals').join(' ve ') + ' [1].'
-      expect(markaDenetle(kur('Genel bilgi [1].', seri(7), KAYNAK)).map((k: { sinif: string }) => k.sinif)).toEqual([])
+      expect(siniflarMarka(kur('Genel bilgi [1].', seri(7), KAYNAK))).toEqual([])
       expect(markaDenetle(kur('Genel bilgi [1].', seri(8), KAYNAK))).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }])
     })
-    it('adres ve vh: bağlantı hedefleri sayılmaz; CLIBOS-TR tek ad sayılır, uzun ad önce eşleşir', () => {
+    it('adres ve vh: bağlantı hedefleri sayılmaz; CLIBOS-TR tek ad sayılır (CLIBOS ve TR diye ikiye bölünmez)', () => {
       const md = kur('Bilgi [1].', '[ENKELFAN](vh:aile/casals-enkelfan-ec-plug) ve CLIBOS-TR [1].', '1. Kaynak https://venthub.com.tr/tr/products/casals-kentalfan-plug\n')
       expect(markaDenetle(md)).toEqual([])
-      expect(markaDenetle(md.replace('Bilgi [1].', 'CLIBOS-TR [1].'))).toEqual([
-        { sinif: 'MARKA-GOVDEDE', ayrinti: '1 adet (seri bölümü ve Kaynaklar dışında 0 olmalı): CLIBOS-TR ×1' },
+      // gövdede 9, seri bölümünde ENKELFAN ve CLIBOS-TR = 11; hedefteki casals-... sayılmaz, CLIBOS-TR tek ad
+      expect(markaDenetle(md.replace('Bilgi [1].', `${Array(9).fill('CLIBOS-TR').join(' ')} [1].`))).toEqual([
+        { sinif: 'MARKA-TOPLAM', ayrinti: '11 adet (en çok 8)' },
       ])
     })
     it('"VentHub\'da hangi ... serileri var?" bölümü olmayan yazıda (genel rehber değil) kapı çalışmaz', () => {
       expect(markaDenetle('# Başlık\n\nCasals ENKELFAN KENTALFAN Casals ENKELFAN KENTALFAN Casals ENKELFAN KENTALFAN [1].\n')).toEqual([])
     })
-    it('denetle() kapıyı çalıştırır (MARKA-GOVDEDE kırmızı olarak çıkar)', () => {
+    it('denetle() kapıyı çalıştırır: tavan aşımı MARKA-TOPLAM kırmızısı olarak çıkar, gövdede marka tek başına çıkmaz', () => {
       const md = TEMIZ.replace('## Sık sorulan sorular', `${SERI}\n\nİki seri var.\n\n## Sık sorulan sorular`)
       const sinif = (m: string) => denetle(m, { iddialar: IDDIALAR }).kirmizi.map((k: { sinif: string }) => k.sinif)
-      expect(sinif(md)).not.toContain('MARKA-GOVDEDE')
-      expect(sinif(md.replace('# ', '# Casals '))).toContain('MARKA-GOVDEDE')
+      expect(sinif(md)).not.toContain('MARKA-TOPLAM')
+      expect(sinif(md.replace('# ', '# Casals '))).not.toContain('MARKA-TOPLAM')
+      expect(sinif(md.replace('# ', `# ${Array(9).fill('Casals').join(' ')} `))).toContain('MARKA-TOPLAM')
     })
   })
   it('⭐09-24 vakası: fiyat bölümü yok, sorumluluk yalnız "> Not:" satırı → iki KIRMIZI', () => {

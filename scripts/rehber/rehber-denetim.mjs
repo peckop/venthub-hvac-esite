@@ -276,6 +276,8 @@ export function konuTerimleri(md) {
 
 /**
  * R3.3 marka yoğunluğu kapısı (BLG-35, OPS kararı 2026-11-03; tetik: BLG-33 v1l 1145 kelimede 21 Casals + 33 seri adı).
+ * ⚠v0.24 (BLG-79, OPS-314): `MARKA-GOVDEDE` KIRMIZI kolu KALKTI. Marka ve seri adı kaynak oldukları yerde gövdede yazılır
+ * (R3.4 m); "bir üretici" diye gizleme okuru yanıltıyordu. Kalan koruma "katalog gibi okunma" tavanıdır: toplam sayım.
  * Sabit liste ile başlar; brands tablosu ve kaynak dizini seri adlarından genişletilir (genişletme = bu diziye ekleme + test).
  * Uzun ad önce gelir (CLIBOS-TR, CLIBOS'tan önce eşleşsin).
  */
@@ -285,9 +287,9 @@ export const MARKA_SERI_ADLARI = [
   // seri adları (sitede aile adı olarak geçenler). "Radon" gaz adı olarak da geçtiği için listeye ALINMAZ (yanlış pozitif).
   'ENKELFAN', 'KENTALFAN', 'CLIBOS-TR', 'CLIBOS', 'CIKSTORM', 'LINEO', 'VORT', 'VLT',
 ]
-/** Tüm yazıda marka + seri adı toplamı en çok bu kadar olabilir (genel rehber türü). */
+/** Tüm yazıda (seri bölümü ve Kaynaklar dahil) marka + seri adı toplamı en çok bu kadar olabilir (genel rehber türü). */
 export const MARKA_TOPLAM_TAVAN = 8
-/** "Genel rehber" türü bu başlıkla tanınır; marka ve seri adları yalnız bu bölümde ve `## Kaynaklar`da serbesttir. */
+/** "Genel rehber" türü bu başlıkla tanınır; tavan yalnız bu türde işler. */
 export const SERI_BOLUMU_KALIBI = /^VentHub'da hangi .+ serileri var\?$/
 const kacis = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 export function markaDenetle(md) {
@@ -299,26 +301,10 @@ export function markaDenetle(md) {
     `(?<![\\p{L}\\p{N}-])(${[...MARKA_SERI_ADLARI].sort((a, b) => b.length - a.length).map(kacis).join('|')})(?![\\p{L}\\p{N}-])`,
     'giu',
   )
-  const dis = new Map()
+  // adres ve vh: bağlantı hedefleri marka sözcüğü içerir (casals-...); yalnız görünen metin sayılır
   let toplam = 0
-  let bolum = ''
-  for (const ham of satirlar) {
-    if (/^#\s/.test(ham)) bolum = ''
-    else if (baslik(ham) !== undefined) bolum = baslik(ham)
-    // adres ve vh: bağlantı hedefleri marka sözcüğü içerir (casals-...); yalnız görünen metin sayılır
-    const s = ham.replace(/https?:\/\/\S+/g, ' ').replace(/\]\([^)]*\)/g, ']')
-    const bulunan = [...s.matchAll(ad)].map((m) => m[1])
-    toplam += bulunan.length
-    if (bolum === 'Kaynaklar' || SERI_BOLUMU_KALIBI.test(bolum)) continue
-    for (const b of bulunan) dis.set(b, (dis.get(b) || 0) + 1)
-  }
-  const kirmizi = []
-  if (dis.size) {
-    const sayi = [...dis.values()].reduce((a, b) => a + b, 0)
-    kirmizi.push({ sinif: 'MARKA-GOVDEDE', ayrinti: `${sayi} adet (seri bölümü ve Kaynaklar dışında 0 olmalı): ${[...dis].map(([k, n]) => `${k} ×${n}`).join(', ')}` })
-  }
-  if (toplam > MARKA_TOPLAM_TAVAN) kirmizi.push({ sinif: 'MARKA-TOPLAM', ayrinti: `${toplam} adet (en çok ${MARKA_TOPLAM_TAVAN})` })
-  return kirmizi
+  for (const ham of satirlar) toplam += [...ham.replace(/https?:\/\/\S+/g, ' ').replace(/\]\([^)]*\)/g, ']').matchAll(ad)].length
+  return toplam > MARKA_TOPLAM_TAVAN ? [{ sinif: 'MARKA-TOPLAM', ayrinti: `${toplam} adet (en çok ${MARKA_TOPLAM_TAVAN})` }] : []
 }
 
 /** Zorunlu bölümler hariç `## ` başlıkları (üçüncü seviye ve H1 hariç). */
@@ -361,6 +347,74 @@ export function baslikDenetle(md) {
     })
   }
   return { uyari, olcu: { h2: n, konulu: konulu.length, oran, tekrar, terimler } }
+}
+
+// ─── üslup: makale dili (R3.4; UYARI, KIRMIZI DEĞİL) ─────────────────────────────
+/**
+ * R3.4 (v0.24, BLG-79, OPS-314): rehber yazısı makale diliyle yazılır; şerh, kendinden söz, yönlendirme ve gizlenen marka yoktur.
+ * Kapı yalnız deseni görür (anlam, tekrar ve kapsam okuması çürütücü turundadır); bu yüzden `kirmizi` dizisine DEĞİL `uyari`
+ * dizisine yazar ve her uyarıya satır numarası ile eşleşen ifade basar. Tarama gövde metnindedir: ön bilgi, `## Teknik
+ * sorumluluk notu` bölümü (sabit ilk cümle "Bu yazı genel mühendislik bilgisi verir…" R3.4 c ve n'nin tek istisnasıdır) ve
+ * `## Kaynaklar` altındaki numaralı kaynak maddeleri taranmaz. Metin Türkçe küçük harfe çevrilip taranır (büyük/küçük duyarsız).
+ *
+ * Desenler cetvelde (R3.4) adı geçen ifadelerin yanında mekanik çekim biçimlerini (yazıda/yazının/yazıya, rehberde/rehberin,
+ * "bakınız", "bakılabilir") ve yayındaki 13 yazıda görülen eşdeğer biçimleri kapsar ("… bölümünde sıralanır", "aşağıda ayrı
+ * anlatılır", "yazarın okumasıdır/derlemesidir"): ilk kurulumda yalnız adı geçen ifadelerle yönlendirme 0 uyarı verdi,
+ * oysa BLOG taraması 25 yer saymıştı. "bu yazılım" gibi başka sözcükler tam sözcük sınırıyla dışarıda kalır.
+ */
+export const USLUP_DESENLERI = [
+  { sinif: 'USLUP-KENDINDEN-SOZ', re: kelime('bu\\s+(?:yazı(?:da|daki|dan|nın|ya|yı)?|rehber(?:de|deki|den|in|e|i)?)') },
+  {
+    sinif: 'USLUP-SERH',
+    // ikinci satır: yayındaki yazılarda görülen "bu, yazarın okumasıdır / derlemesidir" biçimi (aynı şerh; 17 Kasım ölçümü)
+    re: kelime(
+      'çıkarım(?:ı)?dır|okunmamıştır|ele\\s+alınmaz|yazılı\\s+değildir|söylemez|anmaz|' +
+        'yazarın\\s+(?:okuması|derlemesi)\\p{L}*',
+    ),
+  },
+  {
+    sinif: 'USLUP-YONLENDIRME',
+    // ikinci ve üçüncü satır: yayındaki yazılarda görülen biçimler ("… bölümünde sıralanır", "aşağıda ayrı anlatılır", "6 numaralı kaynağa bakınız")
+    re: kelime(
+      '(?:bölümüne|rehberine|yazısına)\\s+(?:bakın|bakınız|bakılabilir)|(?:rehberinde|yazısında)\\s+anlatılır|' +
+        'bölümünde\\s+(?:sıralanır|toplanmıştır)|aşağıda\\s+(?:ayrı\\s+)?(?:anlatılır|ele\\s+alınır|sıralanır)|' +
+        'numaralı\\s+kaynağa\\s+bak(?:ın|ınız|ılabilir)',
+    ),
+  },
+  { sinif: 'USLUP-HESAP-TARIFI', re: /\(hesap\s*:/u },
+  { sinif: 'USLUP-BIR-URETICI', re: /(?<![\p{L}\p{N}])bir\s+üretici\p{L}*/u },
+]
+/** Çekince fiili: aynı cümlede 2 ve üzeri USLUP-CEKINCE-TEKRAR (R3.4 i). */
+const CEKINCE_FIILI = new RegExp(`${S}eğilimindedir(?:ler)?${E}`, 'gu')
+const USLUP_CEKINCE_ESIGI = 2
+const CUMLE_BOL = /(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ"“(0-9])/u
+
+/**
+ * @param {string} md yazı (isteğe bağlı ön bilgili markdown)
+ * @returns {{ sinif: string, ayrinti: string, satir: number, ifade: string }[]} satır numarası `md`'nin kendi satırıdır (1'den; ön bilgi dahil)
+ */
+export function uslupDenetle(md) {
+  const metin = md.replace(/\r\n/g, '\n')
+  const onBilgi = metin.match(/^---\n[\s\S]*?\n---\n/)
+  const basla = onBilgi ? onBilgi[0].split('\n').length - 1 : 0
+  const uyari = []
+  const ekle = (sinif, satir, ifade, ek = '') => uyari.push({ sinif, ayrinti: `satır ${satir}: «${ifade}»${ek}`, satir, ifade })
+  const desenler = USLUP_DESENLERI.map((d) => ({ sinif: d.sinif, re: new RegExp(d.re.source, 'giu') }))
+  let bolum = ''
+  metin.split('\n').forEach((ham, i) => {
+    if (i < basla) return
+    if (/^#\s/.test(ham)) bolum = ''
+    else if (/^##\s/.test(ham)) bolum = ham.replace(/^##\s+/, '').trim()
+    if (bolum === 'Teknik sorumluluk notu') return
+    if (bolum === 'Kaynaklar' && /^\s*\d+\.\s/.test(ham)) return
+    const kucuk = ham.toLocaleLowerCase('tr')
+    for (const { sinif, re } of desenler) for (const m of kucuk.matchAll(re)) ekle(sinif, i + 1, m[0])
+    for (const cumle of ham.split(CUMLE_BOL)) {
+      const n = [...cumle.toLocaleLowerCase('tr').matchAll(CEKINCE_FIILI)].length
+      if (n >= USLUP_CEKINCE_ESIGI) ekle('USLUP-CEKINCE-TEKRAR', i + 1, 'eğilimindedir', ` ×${n} (bir cümlede en çok 1)`)
+    }
+  })
+  return uyari.sort((a, b) => a.satir - b.satir)
 }
 
 // ─── iç bağlantı (R3) ──────────────────────────────────────────────────────────
@@ -474,6 +528,9 @@ export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
 
   // 7. Başlık yapısı (R11): UYARI, `kirmizi` dizisine GİRMEZ (resmî eşik yok, eşikler bizim)
   const { uyari } = baslikDenetle(md)
+
+  // 8. Üslup (R3.4 makale dili): UYARI, `kirmizi` dizisine GİRMEZ; yayındaki yazılar ayrı PR'larda tek tek düzeltilir
+  uyari.push(...uslupDenetle(md))
 
   return { kirmizi, uyari, ozet: { cumle: birimler.length, atif: kullanilan.size, kaynak: kaynaklar.size, olumsuz: olumsuzlar.length, mevzuat: mevzuatlar.length } }
 }
