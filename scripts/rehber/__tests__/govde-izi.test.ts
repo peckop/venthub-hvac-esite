@@ -10,12 +10,12 @@
  * Ağ yok.
  */
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { govdeIziDenetle, iziHesapla, izleriOku, izleriSerilestir, yazilariOku } from '../govde-izi.mjs'
+import { ayniGunAyikla, bugunIstanbul, govdeIziDenetle, iziHesapla, izleriOku, izleriSerilestir, yazilariOku } from '../govde-izi.mjs'
 
 const KOK = resolve(__dirname, '..', '..', '..')
 const kaynak = readFileSync(join(KOK, 'src/data/bilgiMerkezi/yazilar.ts'), 'utf8')
@@ -129,5 +129,41 @@ describe('INV-REHBER-GOVDE-IZI-1 · komut satırı', () => {
     const r = spawnSync(process.execPath, [join(KOK, 'scripts/rehber/govde-izi.mjs'), '--taban'], { encoding: 'utf8' })
     expect(r.status).toBe(1)
     expect(r.stderr).toContain('zaten var')
+  })
+})
+
+describe('INV-REHBER-GOVDE-IZI-1 · aynı gün ikinci değişiklik (--ayni-gun, BLG-79)', () => {
+  const [ilk, ...geri] = yazilar
+  const bozuk = [{ ...ilk, govde: `${ilk.govde}
+Yeni cümle.` }, ...geri]
+  const sorunlar = govdeIziDenetle(bozuk, temizIzler())
+
+  it('bayraksız (bugun = null): TARIH_UNUTULDU reddedilir', () => {
+    expect(ayniGunAyikla(sorunlar, bozuk, null).map((s: { kimlik: string }) => s.kimlik)).toEqual([ilk.kimlik])
+  })
+
+  it('bayraklı ve yazının tarihi BUGÜN: kabul edilir (liste boş)', () => {
+    expect(ayniGunAyikla(sorunlar, bozuk, ilk.guncellemeTarihi)).toEqual([])
+  })
+
+  it('SABOTAJ: bayraklı ama yazının tarihi bugün DEĞİL: yine reddedilir', () => {
+    expect(ayniGunAyikla(sorunlar, bozuk, '2099-01-01').map((s: { kimlik: string }) => s.kimlik)).toEqual([ilk.kimlik])
+  })
+
+  it('bugunIstanbul gün sınırını İstanbul saatiyle hesaplar (gece yarısı: 23:59 aynı gün, 00:01 ertesi gün)', () => {
+    // İstanbul UTC+3: 17 Kasım 23:59 TSİ = 20:59Z; 18 Kasım 00:01 TSİ = 21:01Z (UTC günü hâlâ 17).
+    expect(bugunIstanbul(new Date('2026-11-17T20:59:00Z'))).toBe('2026-11-17')
+    expect(bugunIstanbul(new Date('2026-11-17T21:01:00Z'))).toBe('2026-11-18')
+    expect(bugunIstanbul(new Date('2026-11-17T12:00:00Z'))).toBe('2026-11-17')
+  })
+
+  it('CI ve paket betikleri --ayni-gun bayrağını kullanmaz (denetim hep bayraksız koşar)', () => {
+    const dosyalar = ['package.json', ...readdirSync(join(KOK, '.github/workflows')).map((d) => join('.github/workflows', d))]
+    for (const d of dosyalar) expect(readFileSync(join(KOK, d), 'utf8'), d).not.toContain('--ayni-gun')
+  })
+
+  it('--ayni-gun tek başına (--yaz olmadan) çıkış 2 verir', () => {
+    const r = spawnSync(process.execPath, [join(KOK, 'scripts/rehber/govde-izi.mjs'), '--ayni-gun'], { encoding: 'utf8' })
+    expect(r.status).toBe(2)
   })
 })
