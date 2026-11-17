@@ -484,6 +484,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; "bu Tüzük yürürlükten kalkmış" yerine "bu Tüzük'ün genel hükümleri yürürlükten kalkmış". Tek cümle; tarihler ve kaynaklar aynı. Önceki değer: 2026-11-08.
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: yazı R3.4 üslup kurallarıyla yeniden yazıldı (pilot); şerh, kendinden söz, tekrar ve ekotasarım takvimi çıktı, yeni iddia yok.
+    // BLG-81: yazı okur sorusu sırasıyla yeniden kuruldu (kontrol listesi başa, tutanak gösterimi ve tek cümlelik bölüm çıktı); yeni iddia, sayı, kaynak yok.
+    // BLG-81 tur 2: doğrulayıcı bulguları işlendi (Vortice/Lineo kaydı ve koşullar geri kondu; iki H2 eski adıyla korundu).
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
@@ -496,111 +498,110 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Ses değerini hangi koşulda okuyacağınızı bu rehberde bulun.',
         govde: `# Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü
 
-Sessiz kanal fanı seçerken önce katalogdaki ses değerinin hangi koşulda verildiğine bakılır; Vortice Lineo Quiet kataloğunda aynı modelin sesi ayar noktasına ve yola (emiş, üfleme, gövde) göre değişir [2]. Ses basıncı düzeyi belirli bir noktadaki sesi, ses gücü düzeyi kaynağın yaydığı sesi gösterir [1].
+Sessiz kanal fanı seçerken fanın sürekli çalışacağı ayardaki ses değerine bakılır: Vortice Lineo Quiet kataloğunda aynı modelin sesi ayar noktasına ve yola (emiş, üfleme, gövde) göre değişir [2]. Bu katalogda ses basıncı 3 m mesafede, serbest alanda hesaplanır [2]; Binaların Gürültüye Karşı Korunması Hakkında Yönetmeliğin sınırı odada ölçülen düzey içindir [1].
 
 Kısaca:
 
-- Sessiz fan: izin verilen gürültü düzeyi mekâna göre değişir [1].
-- Koşul: katalogdaki ses basıncı 3 m mesafede, serbest alanda hesaplanır [2].
-- Yeterli değer: Yönetmeliğin sınırı odada ölçülen LAeq,nT değeri içindir [1].
-- Ayar noktası: Lineo 100 Quiet ES'te kataloğun verdiği en düşük ve en yüksek ayar noktası (4 V ve 10 V) arasında üfleme sesi 20,1 dB(A), gövde sesi 21,0 dB(A), emiş sesi 17,9 dB(A) değişir [2].
+- Hedef: yeni binada en az C sınıfı aranır; bu sınıfta sürekli gürültü üreten servis ekipmanı için konutta gece yatak odası sınırı 30 dB'dir [1].
+- Hız: Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken 3 m'deki gövde yayını 30,9 dB(A)'dan 9,9 dB(A)'ya düşer [2].
+- Boyut: fazla büyük seçilen fan yüksek hava akımı gürültüsü oluşturur [4].
+- Montaj: fan ve kanal bağlantılarında titreşim yalıtımı kullanılır [1].
 
-Katalogda ses değeri yol (emiş, üfleme, gövde), ayar noktası ve mesafe koşuluyla birlikte verilir [2]. Örneğin Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].
+## Sessiz kanal fanı seçerken kontrol listesi
+
+1. Hedefi odada ölçülecek düzey olarak koyun [1].
+2. Fanın sürekli çalışacağı ayar noktasının satırını okuyun; düşük ve yüksek ayar arasındaki ses farkı modele göre değişir [2].
+3. Ses değerinin koşulunu okuyun: yol (emiş, üfleme, gövde), ayar noktası ve mesafe [2].
+4. Gereğinden büyük fan seçmeyin; fazla büyük fan yüksek hava akımı gürültüsü üretir [4].
+5. Fanı ve kanal bağlantılarını titreşim yalıtımıyla kurun; fan kutusunun tavan panosuna ve taşıyıcıya doğrudan değmemesine dikkat edin [1][4].
+6. Kanal tasarımında kanal içi gürültü düzeyini hesaplatın; binanın özelliğinden dolayı EK-5 Tablo 5.1'de izin verilen iç gürültü sınırları aşılırsa kanal içi ses yalıtımı yapılır [1].
+7. Hız kumandası seçeneklerine bakın: 0–10 V sinyali, hız seçici ya da hız ayarlayıcı [2].
 
 ## Sessiz fan nedir?
 
 Vortice, Lineo Quiet'i yaydığı sesi azaltmak için tasarladığını belirttiği bir kanal fanı olarak tanıtır [2]. Lineo Quiet ürünlerinde ses emici kaplama dış gövdeye bütünleşiktir ve çevreye yayılan ses emisyonunu en aza indirmek için optimize edilmiştir [2].
 
-Lineo Quiet modellerinde fan sesi dB(A) ile verilir [2]. Binaların Gürültüye Karşı Korunması Hakkında Yönetmeliğe göre A-ağırlıklı ses basınç düzeyi (dBA), insan işitme sisteminin düşük basınçlı seslere karşı en çok hassas olduğu orta ve yüksek frekanslara daha fazla ağırlık veren A-ağırlık şebekesi yardımıyla elde edilen tek sayılı bir ses düzeyi birimidir [1].
-
-İzin verilen gürültü düzeyi mekâna göre değişir: Yönetmelikte servis ekipmanından kaynaklanan gürültü için mekâna ve akustik performans sınıfına göre ayrı değerler verilir; servis ekipmanı, ısıtma ve iklimlendirme sistemlerini de kapsayan teknik donatılar olarak tanımlanır [1].
-
-Dünya Sağlık Örgütü'nün (WHO) 1999 tarihli topluluk gürültüsü rehberinde yatak odası iç mekân değeri, uyku bölünmesini önlemek için sürekli gürültüde 30 dB LAeq, tek tek ses olaylarında 45 dB LAmax'tır [3]. Gürültüde düşük frekanslı bileşenler çoksa değerlerin kılavuz değerlerden de düşük olması gerekir [3].
+Lineo Quiet modellerinde fan sesi dB(A) ile verilir [2]. dB(A), insan işitme sisteminin en çok hassas olduğu orta ve yüksek frekanslara daha fazla ağırlık veren, tek sayılı bir ses düzeyi birimidir [1].
 
 ## Ses gücü ile ses basıncı arasındaki fark nedir?
 
-Yönetmeliğe göre ses basıncı düzeyi (Lp), ortamda belli bir noktada ölçülen ses basıncının 20 µPa referans ses basıncına oranından hesaplanan ve dB cinsinden verilen değerdir [1]. Ses gücü düzeyi (Lw) ise ses kaynağının yaydığı ses gücünün 10⁻¹² watt referans ses gücüne oranından hesaplanan değerdir [1].
+Ses gücü düzeyi (Lw) kaynağın yaydığı sesi, ses basıncı düzeyi (Lp) ortamda belli bir noktada ölçülen sesi gösterir [1]. Vortice kataloğunda iki büyüklük ayrı verilir: Lineo Quiet için ses gücü Lw dB(A) ile, ses basıncı Lp dB(A) ile gösterilir [2].
 
-Vortice kataloğunda iki büyüklük ayrı verilir: Lineo Quiet için ses gücü Lw dB(A) ile, ses basıncı Lp dB(A) ile gösterilir [2]. İlgili rehber: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
-
-Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelikte servis ekipmanından kaynaklanan iç gürültü sürekli ses için LAeq,nT, kesikli ses için LAF,max,nT göstergesiyle değerlendirilir [1].
-
-### Ses gücü beyanı
-
-Yönetmeliğe göre binalarda kullanılacak mekanik ve elektrik ekipmanın ses gücü düzeyinin ölçüldüğü standartla birlikte beyan edilmesi gerekir [1].
+Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelikte servis ekipmanından kaynaklanan iç gürültü sürekli ses için LAeq,nT, kesikli ses için LAF,max,nT göstergesiyle değerlendirilir [1]. Binalarda kullanılacak mekanik ve elektrik ekipmanın ses gücü düzeyinin, ölçüldüğü standartla birlikte beyan edilmesi gerekir [1].
 
 ## Vortice kataloğunda ses değeri hangi koşulda verilir?
 
-Vortice kataloğunda ses basıncı 3 m mesafede, serbest alanda hesaplanmış olarak verilir [2]. Lineo Quiet teknik ve performans tablolarındaki veriler 50 Hz besleme içindir [2].
+Vortice kataloğunda ses basıncı 3 m mesafede, serbest alanda hesaplanmış olarak verilir [2]. Lineo Quiet modellerinde ses üç yol için ayrı verilir: emiş, üfleme ve gövde yayını [2]. ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar ayar noktası olarak okunur. Lineo Quiet teknik ve performans tablolarındaki veriler 50 Hz besleme içindir [2].
 
-Lineo Quiet modellerinde ses üç yol için ayrı verilir: INTAKE, SUPPLY ve BREAKOUT sütunları; bunlar emiş, üfleme ve gövde yayını olarak okunur [2].
+## Sessiz kanal fanında kaç dB(A) yeterli?
 
-Ses değeri şu sırayla okunur: önce değer, sonra ayar noktası, yol ve mesafe. Örnek: 9,9 dB(A) · 4 V · gövde, 3 m [2].
+Katalog değeri 3 m mesafede, serbest alanda hesaplanan ses basıncıdır [2]; Yönetmeliğin sınırı odada ölçülen LAeq,nT değeri içindir [1]. Sınır mekâna göre değişir: Yönetmeliğin EK-5 Tablo 5.1'inde sürekli gürültü üreten servis ekipmanı için iç gürültü sınırları mekâna, zaman dilimine ve akustik performans sınıfına göre verilir [1]. Servis ekipmanı, ısıtma ve iklimlendirme sistemlerini de kapsayan teknik donatılardır [1].
+
+C sınıfında sınır konutta gece yatak odası için 30 dB, yaşam alanı için 35 dB, büro özel odası için 40 dB'dir; D sınıfında bu değerler 34 dB, 39 dB ve 44 dB'dir [1].
+
+| Mekân | Zaman dilimi [1] | C sınıfı (dB) [1] | D sınıfı (dB) [1] |
+|---|---|---|---|
+| Konut, yatak odası | Gece (23.00–07.00) [1] | 30 | 34 |
+| Konut, yaşam alanı | 24 saat [1] | 35 | 39 |
+| Konut, mutfak | 24 saat [1] | 35 | 39 |
+| Konaklama, yatak odası | Gece (23.00–07.00) [1] | 30 | 34 |
+| Büro, özel oda | Gündüz–Akşam (07.00–23.00) [1] | 40 | 44 |
+| Büro, toplantı odası | Gündüz–Akşam (07.00–23.00) [1] | 35 | 39 |
+
+A sınıfı en yüksek, F sınıfı en düşük performansı gösterir [1]. Yeni yapılacak binalarda en az C, mevcut binalarda kullanım amacı değişirse ya da esaslı tadilat yapılırsa tadilatın etkilediği bağımsız birimlerde en az D sınıfı sağlanır [1].
+
+Yönetmelik uyarınca ölçümler, işletmeye alma aşamasında idarenin istemesi hâlinde TS EN ISO 10052 ve TS EN ISO 16032'ye göre yapılır; sonuçlar sınır değerlerden yüksek çıkarsa EK-8'deki önlemler uygulanır [1].
+
+Dünya Sağlık Örgütü'nün (WHO) 1999 tarihli topluluk gürültüsü rehberinde yatak odası iç mekân değeri, uyku bölünmesini önlemek için sürekli gürültüde 30 dB LAeq, tek tek ses olaylarında 45 dB LAmax'tır [3]. Gürültüde düşük frekanslı bileşenler çoksa değerlerin kılavuz değerlerden de düşük olması gerekir [3].
 
 ## Fanın sesini neler belirler?
 
 Endüstriyel havalandırma uygulamalarında bir fanın ürettiği gürültü fan tipine, debiye ve basınca bağlıdır [4]. Fazla büyük seçilen fanlar yüksek hava akımı gürültüsü oluşturur [4]. Yüksek kapasitede çalıştırılıp debisi kısılan fanın da yüksek gürültü üretme eğilimi vardır [4].
 
-Hız etkisi Lineo 100 Quiet ES (17170) değerlerinde görülür [2]. Ses basıncı 3 m mesafede, serbest alanda hesaplanmıştır [2]:
+Hızın etkisi Lineo 100 Quiet ES (17170) değerlerinde görülür (ses basıncı 3 m, serbest alan) [2]:
 
-| Ayar noktası [2] | Azami debi (m³/h) [2] | Üfleme Lp (dB(A)) [2] | Gövde Lp (dB(A)) [2] |
+| Ayar noktası (V) [2] | Azami debi (m³/h) | Üfleme (dB(A)) | Gövde (dB(A)) |
 |---|---|---|---|
-| 4 V [2] | 135 | 20,6 | 9,9 |
-| 6 V [2] | 175 | 26,1 | 15,9 |
-| 8 V [2] | 250 | 36,7 | 24,8 |
-| 10 V [2] | 300 | 40,7 | 30,9 |
+| 4 | 135 | 20,6 | 9,9 |
+| 6 | 175 | 26,1 | 15,9 |
+| 8 | 250 | 36,7 | 24,8 |
+| 10 | 300 | 40,7 | 30,9 |
 
-Bu modelde ayar 4 V'tan 10 V'a çıkarken debi 135 m³/h'ten 300 m³/h'e (yaklaşık 2,2 katı) yükselir; üfleme sesi 20,1 dB(A), gövde sesi 21,0 dB(A), emiş sesi 17,9 dB(A) artar [2].
+Bu modelde ayar 4 V'tan 10 V'a çıkarken azami debi 135 m³/h'ten 300 m³/h'e yükselir; üfleme sesi 20,6 dB(A)'dan 40,7 dB(A)'ya, gövde yayını 9,9 dB(A)'dan 30,9 dB(A)'ya çıkar [2].
 
-Fan tipi de sesin yapısını etkiler: aksiyel fanlar, aynı kapasitedeki hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır, yüksek frekanslar da genellikle daha kolay azaltılır [4].
+Fan tipi de sesi etkiler: aksiyel fanlar, aynı kapasitedeki hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır ve bunları azaltmak çoğu zaman daha kolaydır [4].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
 
 ## Kanal fanında sessizlik nasıl sağlanır?
 
-Yönetmelikte tesisat ve servis ekipmanlarından kaynaklanan gürültünün kontrolü için mekanik sistemlerde gürültü kontrolü kurallarının (EK-8) uygulanması öngörülür [1]. Bu kurallar fan seçimini, titreşim yalıtımını, kanal içi ses yalıtımını ve hız ayarını birlikte kapsar; fan sistemlerinde gürültü azaltma yöntemleri de aynı başlıkları destekler [1][4]. İlgili rehber: [Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar](vh:yazi/kanal-tipi-fan-nedir).
+Yönetmelikte tesisat ve servis ekipmanlarından kaynaklanan gürültünün kontrolü için mekanik sistemlerde gürültü kontrolü kurallarının (EK-8) uygulanması öngörülür [1]. Bu kurallar fan seçimini, titreşim yalıtımını, kanal içi ses yalıtımını ve hız ayarını birlikte kapsar [1].
 
-### Sessiz fan tipi seçimi ve yerleşimi
+### Fan seçimi ve yerleşimi
 
-EK-8'e göre gürültü emisyonu azaltılmış sessiz fan tipinin seçilmesine, hava akımı, fan hızı ve statik basınç ayarlarıyla gürültünün azaltılmasına ve fanın hava türbülansını azaltacak biçimde yönlendirilmesine dikkat edilmesi öngörülür [1]. Gürültüye çok hassas mekânların tavanında önlem alınmadan fan yerleştirilemez [1].
+EK-8'e göre gürültü emisyonu azaltılmış sessiz fan tipinin seçilmesine, gürültünün hava akımı, fan hızı ve statik basınç ayarlarıyla azaltılmasına ve fanın hava türbülansını azaltacak biçimde yönlendirilmesine dikkat edilir [1]. Gürültüye çok hassas mekânların tavanında önlem alınmadan fan yerleştirilemez [1].
 
-### Titreşim yalıtımı ve esnek yastık
+### Titreşim yalıtımı
 
-EK-8'e göre servis ekipmanlarının zemine bağlantılarında ve boru ile kanal bağlantılarında titreşim yalıtımı kullanılması gerekir [1]. Fan ve fancoil kutularının tavan panolarına ve ses köprüsü yapacak taşıyıcılara doğrudan temas etmemesi, arada esnek yastık kullanılması da aynı bölümdedir [1]. Fanın kauçuk gibi yumuşak bir malzemeye ya da uygun bir yay izolatörüne oturtularak aktarılan titreşim enerjisinin sınırlanması gürültü azaltma yöntemleri arasındadır [4].
+EK-8'e göre servis ekipmanlarının zemine bağlantılarında ve boru ile kanal bağlantılarında titreşim yalıtımı kullanılması gerekir [1]. Fan ve fancoil kutularının tavan panolarına ve ses köprüsü yapacak taşıyıcılara doğrudan temas etmemesi için arada esnek yastık kullanılır [1]. Fanın kauçuk gibi yumuşak bir malzemeye ya da uygun bir yay izolatörüne oturtulması aktarılan titreşim enerjisini sınırlar [4].
 
 ### Susturucu ve kanal içi ses yalıtımı
 
-TS EN ISO 7235, havalandırma kanalına monte edilen susturucular için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümlerini kapsar ve Yönetmeliğin ölçüm standartları listesindedir [1]. Yönetmeliğe göre kanal tasarımı sırasında kanal içi gürültü düzeyinin de hesaplanması gerekir; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Tablo 5.1, izin verilen en yüksek iç gürültü düzeylerini içerir [1]. Kanalı yalıtmak ve ses sönümleyici malzeme ya da bölme (baffle) kullanmak gürültü azaltma yöntemleri arasındadır [4].
+Yönetmeliğe göre kanal tasarımı sırasında kanal içi gürültü düzeyinin de hesaplanması gerekir; binanın özelliğinden dolayı EK-5 Tablo 5.1'de izin verilen iç gürültü sınırları aşılırsa kanal içi ses yalıtımı yapılır [1]. Kanalı yalıtmak ve ses sönümleyici malzeme ya da bölme (baffle) kullanmak gürültü azaltma yöntemleri arasındadır [4]. Havalandırma kanalına monte edilen susturucuların eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
 
-### Hız kumandası ve devir ayarı
+### Hız kumandası
 
-Lineo Quiet ES sürümü iki hızlı, elektronik kontrollü EC fırçasız motorludur; her hız kurulumda ayarlanır, cihaz alternatif olarak tek hızda çalışabilir ve bu hız kullanıcı tarafından 0–10 V sinyaliyle ayarlanır [2]. AC sürümlü Lineo Quiet'te motor modele göre 2 ya da 3 hızlıdır [2]. Hız kontrolü için AC modellerde TRIO-LINEO 503 üç hız seçici, C5 0.5 ve C 1.5 hız ayarlayıcıları, yalnız Ø250 ve Ø315 modeller için de C 2.5 hız ayarlayıcısı; ES modellerde POT-IT ve POT potansiyometreleri kumanda olarak verilir [2]. Katalogda bu kumandalar SPEED SELECTOR (hız seçici), SPEED CONTROLLER (hız ayarlayıcı) ve POTENTIOMETER (potansiyometre) adlarıyla verilir [2]. Değişken hız sürücüleri (VFD) düşük sistem talebinde hava akımı gürültüsünü azaltır [4]. İlgili rehber: [Frekans konvertörü nedir, fan ve pompada nasıl seçilir?](vh:yazi/frekans-konvertoru)
+Lineo Quiet ES sürümü iki hızlı, elektronik kontrollü EC fırçasız motorludur; her hız kurulumda ayarlanır, cihaz alternatif olarak tek hızda çalışabilir ve bu hız kullanıcı tarafından 0–10 V sinyaliyle ayarlanır [2]. AC sürümlü Lineo Quiet'te motor modele göre 2 ya da 3 hızlıdır [2]. Değişken hız sürücüleri (VFD) düşük sistem talebinde hava akımı gürültüsünü azaltır [4].
 
-
-## Sessiz kanal fanında kaç dB(A) yeterli?
-
-Katalog değeri 3 m mesafede, serbest alanda hesaplanan ses basıncıdır [2]; Yönetmeliğin sınırı odada ölçülen LAeq,nT değeri içindir [1].
-
-Yönetmelikte sürekli gürültü üreten servis ekipmanı için konutta gece yatak odasında C sınıfında 30 dB, D sınıfında 34 dB; yaşam alanında 35 ve 39 dB; büro özel odasında 40 ve 44 dB değerleri odada ölçülen gürültü (LAeq,nT) olarak verilir [1]. Yönetmeliğin EK-5 Tablo 5.1'inde sürekli gürültü üreten servis ekipmanı için iç gürültü sınırları mekâna, zaman dilimine ve akustik performans sınıfına göre verilir; A sınıfı en yüksek, F sınıfı en düşük performansı gösterir [1]. Yeni yapılacak binalarda en az C, mevcut binalarda kullanım amacı değişirse ya da esaslı tadilat yapılırsa tadilatın etkilediği bağımsız birimlerde en az D sınıfı sağlanır [1].
-
-| Mekân [1] | Zaman dilimi [1] | C sınıfı, LAeq,nT [1] | D sınıfı, LAeq,nT [1] |
-|---|---|---|---|
-| Konut, yatak odası | Gece (23.00–07.00) | 30 dB [1] | 34 dB [1] |
-| Konut, yaşam alanı | 24 saat [1] | 35 dB [1] | 39 dB [1] |
-| Konut, mutfak | 24 saat [1] | 35 dB [1] | 39 dB [1] |
-| Konaklama, yatak odası | Gece (23.00–07.00) | 30 dB [1] | 34 dB [1] |
-| Büro, özel oda | Gündüz–Akşam (07.00–23.00) | 40 dB [1] | 44 dB [1] |
-| Büro, toplantı odası | Gündüz–Akşam (07.00–23.00) | 35 dB [1] | 39 dB [1] |
-
-Ölçümler, Yönetmelik uyarınca işletmeye alma aşamasında idarenin istemesi hâlinde TS EN ISO 10052 ve TS EN ISO 16032'ye göre yapılır; sonuçlar sınır değerlerden yüksek çıkarsa EK-8'deki önlemler uygulanır [1].
+İlgili rehber: [Frekans konvertörü nedir, fan ve pompada nasıl seçilir?](vh:yazi/frekans-konvertoru)
 
 ## Örnek: Vortice Lineo Quiet'in ses değerleri
 
-Vortice Lineo Quiet motor sürümü bakımından iki sürümle gelir: 2 ya da 3 hızlı AC motorlu Lineo Quiet ve EC fırçasız motorlu Lineo Quiet ES [2]. Vortice'ye göre Lineo ürün ailesi, konut, ticari ya da endüstriyel mekânların kanallı havalandırması için tasarlanmış karma akışlı kanal fanlarıdır; karma akışlı çark, helisel fanların yüksek debisi ile santrifüj fanların yüksek basıncının birleşimidir [2]. Susturmalı ürünlerde ses emici kabuk bakım sonunda yeniden takıldığında özgün ses performansının test koşullarında geri kazanıldığı katalogda belirtilir [2]. Tablolar Ø100, 125, 150, 200, 250 ve 315 mm modellerini içerir; katalogda ayrıca Ø160 modeller de bulunur [2].
+Vortice'ye göre Lineo ürün ailesi, konut, ticari ya da endüstriyel mekânların kanallı havalandırması için tasarlanmış karma akışlı kanal fanlarıdır; karma akışlı çark, helisel fanların yüksek debisi ile santrifüj fanların yüksek basıncının birleşimidir [2]. Lineo Quiet iki motor sürümüyle gelir: 2 ya da 3 hızlı AC motorlu Lineo Quiet ve EC fırçasız motorlu Lineo Quiet ES [2]. Aşağıdaki tablolar Ø100, 125, 150, 200, 250 ve 315 mm modellerini içerir; katalogda ayrıca Ø160 modeller de bulunur [2].
 
-Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar ayar noktası olarak okunur.
+EC motorlu Lineo Quiet ES, kataloğun verdiği en düşük ve en yüksek ayar noktası (ses basıncı 3 m, serbest alan) [2]:
 
-**EC motorlu Lineo Quiet ES, kataloğun verdiği en düşük ve en yüksek ayar noktası (4 V ve 10 V; ses basıncı 3 m, serbest alan) [2]:**
-
-| Model (kod) | Azami debi, ayar 4 V (m³/h) [2] | Üfleme Lp, 4 V (dB(A)) [2] | Gövde Lp, 4 V (dB(A)) [2] | Azami debi, ayar 10 V (m³/h) [2] | Üfleme Lp, 10 V (dB(A)) [2] | Gövde Lp, 10 V (dB(A)) [2] |
+| Model (kod) | Azami debi, 4 V (m³/h) [2] | Üfleme, 4 V (dB(A)) [2] | Gövde, 4 V (dB(A)) [2] | Azami debi, 10 V (m³/h) [2] | Üfleme, 10 V (dB(A)) [2] | Gövde, 10 V (dB(A)) [2] |
 |---|---|---|---|---|---|---|
 | Lineo 100 Quiet ES (17170) | 135 | 20,6 | 9,9 | 300 | 40,7 | 30,9 |
 | Lineo 125 Quiet ES (17171) | 180 | 21 | 11,3 | 380 | 40 | 28,7 |
@@ -609,9 +610,9 @@ Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar 
 | Lineo 250 Quiet ES (17175) | 750 | 37,3 | 24,7 | 1485 | 53,2 | 41 |
 | Lineo 315 Quiet ES (17176) | 1400 | 41,2 | 33,5 | 2630 | 54,5 | 48,3 |
 
-**AC motorlu Lineo Quiet, en düşük ve en yüksek hız (ses basıncı 3 m, serbest alan) [2]:**
+AC motorlu Lineo Quiet, en düşük ve en yüksek hız (ses basıncı 3 m, serbest alan) [2]:
 
-| Model (kod) | Azami debi, en düşük hız (m³/h) [2] | Üfleme Lp, en düşük hız (dB(A)) [2] | Gövde Lp, en düşük hız (dB(A)) [2] | Azami debi, en yüksek hız (m³/h) [2] | Üfleme Lp, en yüksek hız (dB(A)) [2] | Gövde Lp, en yüksek hız (dB(A)) [2] |
+| Model (kod) | Azami debi, en düşük hız (m³/h) | Üfleme, en düşük hız (dB(A)) | Gövde, en düşük hız (dB(A)) | Azami debi, en yüksek hız (m³/h) | Üfleme, en yüksek hız (dB(A)) | Gövde, en yüksek hız (dB(A)) |
 |---|---|---|---|---|---|---|
 | Lineo 100 Quiet (17160) | 150 | 22,5 | 16 | 260 | 35,1 | 28,4 |
 | Lineo 125 Quiet (17161) | 190 | 21,1 | 12,3 | 320 | 35 | 26,9 |
@@ -620,19 +621,11 @@ Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar 
 | Lineo 250 Quiet (17165) | 960 | 43,7 | 32,2 | 1550 | 53,7 | 41,9 |
 | Lineo 315 Quiet (17166) | 2070 | 50,5 | 39,5 | 2890 | 57,4 | 47 |
 
-Aynı çapta Quiet olmayan Lineo ile karşılaştırma: Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet (17164) gövde yayını 35,5 dB(A) · en yüksek hız · gövde, 3 m, emiş tarafı 48 dB(A) · en yüksek hız · emiş, 3 m'dir; azami debisi 1160 m³/h'tir [2]. Lineo 200 (17180) için 3 m serbest alan koşulunda gövde yayını 46,9 dB(A), emiş tarafı 55,4 dB(A) ve azami debi 1135 m³/h olarak verilir [2]. Katalogdaki KG değeri de farklıdır: Lineo 200 Quiet 8,6 kg, Lineo 200 4,9 kg [2].
+Quiet olmayan Lineo ile fark aynı çapta görülür (ses basıncı 3 m, serbest alan): Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet (17164) gövdeden 35,5 dB(A), emişten 48 dB(A) ses verir ve azami debisi 1160 m³/h'tir; Lineo 200 (17180) gövdeden 46,9 dB(A), emişten 55,4 dB(A) ses verir ve azami debisi 1135 m³/h'tir [2].
 
-Ürün sayfasında genel bilgiler, modellerin teknik özellikleri ve model listesi bulunur: [Vortice Lineo Quiet kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari). Kanal içi kurulum için diğer modeller [kanal tipi fanlar](vh:kategori/duct-fans) kategorisindedir.
+Modellerin teknik özellikleri ve model listesi ürün sayfasındadır: [Vortice Lineo Quiet kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari). Kanal içi kurulum için diğer modeller [kanal tipi fanlar](vh:kategori/duct-fans) kategorisindedir.
 
-## Sessiz kanal fanı seçerken kontrol listesi
-
-1. Ses değerinin koşulunu okuyun: yol (emiş, üfleme, gövde), ayar noktası ve mesafe [2].
-2. Hedefi odada ölçülecek düzey olarak koyun [1].
-3. Fanın sürekli çalışacağı ayar noktasının satırını okuyun; düşük ve yüksek ayar arasındaki ses farkı modele göre değişir [2].
-4. Gereğinden büyük fan seçmeyin; fazla büyük fan yüksek hava akımı gürültüsü üretir [4].
-5. Fanı ve kanal bağlantılarını titreşim yalıtımıyla kurun; fan kutusunun tavan panosuna ve taşıyıcıya doğrudan değmemesine dikkat edin [1][4].
-6. Kanal tasarımında kanal içi gürültü düzeyini hesaplatın; EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]; ses sönümleyici malzeme ya da bölme (baffle) kullanmak da gürültü azaltma yöntemleri arasındadır [4].
-7. Hız kumandası seçeneklerine bakın: 0–10 V sinyali, hız seçici ya da hız ayarlayıcı [2].
+İlgili rehber: [Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar](vh:yazi/kanal-tipi-fan-nedir)
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -640,33 +633,33 @@ Güncel fiyat bilgisi için ürün sayfasından teklif isteyin.
 
 - **Kanal çapı ve debi.** Teklif için kanal çapı ve istenen debi bilinmelidir; Lineo Quiet modellerinin nominal çapı 100 ile 315 mm arasındadır ve azami debi çapla değişir [2].
 - **Motor sürümü.** AC ya da ES sürümünden hangisinin istendiği belirtilmelidir; AC sürümünde motor 2 ya da 3 hızlıdır, ES sürümünde motor elektronik kontrollü EC fırçasızdır [2].
-- **Hız kumandası.** Hangi hız kumandasının kullanılacağı belirtilmelidir; TRIO-LINEO 503, C5 0.5, C 1.5, C 2.5, POT-IT ve POT gibi kumanda ve ayarlayıcılar ayrı kodlu kumandalardır [2].
+- **Hız kumandası.** Hangi hız kumandasının kullanılacağı belirtilmelidir; AC modeller için hız seçici ve hız ayarlayıcılar, ES modeller için potansiyometreler ayrı kodlu kumandalardır [2].
 
 ## Sık sorulan sorular
 
 ### En sessiz kanal fanı hangisidir?
 
-Katalogda ses değeri model, ayar noktası, yol ve mesafeyle verilir [2].
+Lineo Quiet ailesinde en düşük ses basıncı Lineo 100 Quiet ES'in 4 V ayarındadır: gövdeden 9,9 dB(A), üflemeden 20,6 dB(A); bu ayarda azami debi 135 m³/h'tir [2]. Aynı model 10 V'ta 300 m³/h verir ve gövdeden 30,9 dB(A) ses yayar [2].
 
 ### Yatak odasında ve ofiste fan gürültüsü en çok kaç dB olabilir?
 
-Hedef mekâna bağlıdır [1]. Yönetmelikte sürekli gürültü için konutta gece yatak odasında C sınıfında 30 dB, D sınıfında 34 dB; büro özel odasında 40 ve 44 dB değerleri verilir [1]. WHO'nun 1999 değeri yatak odası için 30 dB LAeq ve 45 dB LAmax'tır [3]. Yönetmelikteki bu sınırlar odada ölçülen servis ekipmanı gürültüsüne uygulanır [1].
+Yönetmelikte sürekli gürültü için konutta gece yatak odasında C sınıfında 30 dB, D sınıfında 34 dB; büro özel odasında 40 ve 44 dB değerleri verilir [1]. Yeni yapılacak binalarda en az C sınıfı sağlanır [1]. Bu sınırlar odada ölçülen servis ekipmanı gürültüsüne uygulanır [1]. WHO'nun 1999 değeri yatak odası için 30 dB LAeq ve 45 dB LAmax'tır [3].
 
 ### Devri düşürünce fan sessizleşir mi?
 
-Katalog verilerine göre ayar düştükçe ses düşer: Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken gövde yayını 30,9 dB(A)'dan 9,9 dB(A)'ya düşer, azami debi 300 m³/h'ten 135 m³/h'e iner [2].
+Lineo Quiet'te katalog verilerine göre ayar düştükçe ses düşer: Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken gövde yayını 30,9 dB(A)'dan 9,9 dB(A)'ya düşer, azami debi 300 m³/h'ten 135 m³/h'e iner [2].
 
 ### Kanal fanında susturucu gerekir mi?
 
-Yönetmeliğe göre kanal tasarımında kanal içi gürültü hesaplanır; EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Havalandırma kanalına monte edilen susturucular ve hava sonlandırma birimleri için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
+Yönetmeliğe göre kanal tasarımında kanal içi gürültü hesaplanır; binanın özelliğinden dolayı EK-5 Tablo 5.1'de izin verilen iç gürültü sınırları aşılırsa kanal içi ses yalıtımı yapılır [1]. Havalandırma kanalına monte edilen susturucular ve hava sonlandırma birimleri için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
 
 ### Aksiyel fan mı santrifüj (radyal) fan mı daha sessizdir?
 
-Aynı kapasitede aksiyel fanlar, hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır, yüksek frekanslar da genellikle daha kolay azaltılır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4]. İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+Aynı kapasitede aksiyel fanlar, hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır ve bunları azaltmak çoğu zaman daha kolaydır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4].
 
 ### Vortice Lineo Quiet kaç dB(A) ses çıkarır?
 
-Lineo Quiet modellerinde katalogdaki en düşük gövde değeri 9,9 dB(A) · 4 V · gövde, 3 m (Lineo 100 Quiet ES), en yüksek gövde değeri 48,3 dB(A) · 10 V · gövde, 3 m'dir (Lineo 315 Quiet ES) [2]. Bunlar gövde yayını değerleridir; aynı modelde 10 V'ta emiş yolu 56,5 dB(A) · 10 V · emiş, 3 m, üfleme yolu 54,5 dB(A) · 10 V · üfleme, 3 m'dir [2]. Lineo Quiet ailesinin en yüksek emiş değeri AC sürümünde Lineo 315 Quiet'in en yüksek hızında 58,4 dB(A) · en yüksek hız · emiş, 3 m'dir [2].
+Lineo Quiet modellerinde katalogdaki en düşük gövde değeri Lineo 100 Quiet ES'in 4 V ayarındaki 9,9 dB(A), en yüksek gövde değeri Lineo 315 Quiet ES'in 10 V ayarındaki 48,3 dB(A)'dır [2]. Lineo 315 Quiet ES 10 V'ta emişten 56,5 dB(A), üflemeden 54,5 dB(A) ses verir [2]. Ailenin en yüksek emiş değeri AC motorlu Lineo 315 Quiet'in en yüksek hızındaki 58,4 dB(A)'dır [2]. Bütün değerler 3 m mesafede, serbest alanda hesaplanmış ses basıncıdır [2].
 
 ## Kaynaklar
 
@@ -679,7 +672,7 @@ Lineo Quiet modellerinde katalogdaki en düşük gövde değeri 9,9 dB(A) · 4 V
 
 ## Teknik sorumluluk notu
 
-Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Yönetmelik yayımından bir yıl sonra yürürlüğe girmiştir [1]; WHO değerleri 1999 tarihli kılavuza dayanır [3]. Kurulum yetkili personelle yapılmalıdır.
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. WHO değerleri 1999 tarihli kılavuza dayanır [3]. Kurulum yetkili personelle yapılmalıdır.
 `,
       },
     },
