@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   kontrolEt, haritaCoz, sayfaAlanlari, jsonldBloklari, robotsDisallow, robotsEslesir,
-  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu, hamDegerHucreleri,
+  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu, hamDegerHucreleri, yasakIfadeVarMi,
 } from '../canli-kapi.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -677,6 +677,27 @@ describe('INV-CANLI-KAPI-1 · VITRIN-IDDIA (URN-60, karar 295)', () => {
       expect(b[0].adres).toBe('/tr/a')
       expect(b[0].seviye).toBe('KIRMIZI')
     }
+  })
+  it('SEO-120 negatif: "81 il" başka sayının kuyruğunda (önünde rakam) sayılmaz: "2025/2481 ile", model kodu "16281 ile ilgili"', () => {
+    for (const metin of ['Düzenleme (AB) 2025/2481 ile birlikte uygulanır', 'Model kodu 16281 ile ilgili ölçüler']) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[1], '<h1>', `<h1>${metin} `)
+      expect(kodlar(v, 'VITRIN-IDDIA'), metin).toEqual([])
+    }
+  })
+  it('SEO-120 pozitif: gerçek "81 ile kargo" vaadi hâlâ KIRMIZI (başta, ortada, rakamsız önde); önünde rakam olan ve olmayan aynı sayfada ise yakalanır', () => {
+    for (const metin of ['81 ile kargo', 'Türkiye genelinde 81 ile kargo', '(81 ile kargo)', 'Model 16281 ile ilgili; ayrıca 81 ile ücretsiz kargo']) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[1], '<h1>', `<h1>${metin} `)
+      expect(kodlar(v, 'VITRIN-IDDIA').length, `"${metin}" yakalanmadı`).toBeGreaterThan(0)
+    }
+  })
+  it('SEO-120: yasakIfadeVarMi yalnız rakamla başlayan ifadede önündeki rakamı eler; rakamsız ifadelerde alt dize davranışı değişmez', () => {
+    expect(yasakIfadeVarMi('2025/2481 ile', '81 il')).toBe(false)
+    expect(yasakIfadeVarMi('81 ile kargo', '81 il')).toBe(true)
+    expect(yasakIfadeVarMi('16281 ile ilgili ve 81 ilde', '81 il')).toBe(true)
+    expect(yasakIfadeVarMi('xçok satanlar', 'Çok Satanlar')).toBe(true)
+    expect(yasakIfadeVarMi('x%92 optimizasyon', '%92')).toBe(true)
   })
   it('URN-79 sabotaj: marka kayıtlarından kalkan üretici övgüleri (TR+EN) geri gelirse KIRMIZI; React\'in `&#x27;` yazdığı kesme işaretli hâl de yakalanır', () => {
     const geriGelenler = [
