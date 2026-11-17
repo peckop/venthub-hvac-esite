@@ -22,7 +22,10 @@
  * Kullanım:
  *   node scripts/seo/dizin-takip.mjs --durum [--gun N: yalnız son N günün adresleri; verilmezse TÜM site haritası] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
  *        [--degisen <dosya>: satır başına "<adres> <ISO tarih>"; verilmezse defter klasöründeki degisen-adresler.txt varsa o okunur]
- *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme> <adres,adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
+ *        [--kalan <motor> [--sinir N]: tablo yerine yalnız o motorun YAP/TEKRAR adreslerini satır satır basar; elle kalan listesi tutulmaz (SEO-118)]
+ *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme|degisim> <adres,adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
+ *        (degisim: kod yayını sayfayı değiştirdi, motor google yazılır; değişen liste artık defterden türer. --tarih ile geçmiş tarih verilebilir)
+ *   node scripts/seo/dizin-takip.mjs --degisen-ice-aktar [--degisen <dosya>]   (eski degisen-adresler.txt satırlarını deftere tek seferlik taşır)
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
  * Defter ve çıktı depoya GİRMEZ (repo PUBLIC; pazar-olcum P6): depo içi yol REDDEDİLİR.
@@ -38,7 +41,7 @@ import { satirCikar } from './gsc-url-denetim.mjs'
 export const SITE = 'https://venthub.com.tr'
 export const GSC_MULK = 'sc-domain:venthub.com.tr'
 export const MOTORLAR = ['google', 'bing', 'yandex', 'indexnow']
-export const EYLEMLER = ['istek', 'gonderim', 'olcum', 'gorunme']
+export const EYLEMLER = ['istek', 'gonderim', 'olcum', 'gorunme', 'degisim']
 /** SEO-109: 'gorunme' eylemi canlı arama sonucudur (istek DEĞİL); sonuc: gorundu | gorunmuyor | olculemedi. Sıra aranmaz, yalnız yazının kendi adresi sonuçlarda var mı. */
 export const GORUNME_SONUCLARI = ['gorundu', 'gorunmuyor', 'olculemedi']
 export const VARSAYILAN_KLASOR = join(homedir(), 'VentHub-Olcum-Arsiv', 'geo-seo').replace(/\\/g, '/')
@@ -50,6 +53,14 @@ export const TEKRAR_ESIGI_GUN = { bing: 5, yandex: 7 }
  * Kaynak (okundu 2026-11-16): developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl (yinelenen istek taramayı hızlandırmaz).
  */
 export const TEK_ISTEK_MOTORLARI = new Set(['google'])
+
+/**
+ * SEO-118: bekleyen istek penceresi (Yandex). İstek kuyruktayken sayfa yeniden değişirse robot yeni hâli çeker; ikinci istek boşa gider.
+ * Süre ölçümden gelir (OPS onayı 2026-11-17, kart SEO-118 notu): panel işlenme SAATİ vermez, yalnız durum; 16 Kasım 13:01 grubu 17 Kasım 10:55'te
+ * "Request processed" (en çok 21,9 saat), 17 Kasım 10:55 grubu 17:15'te işlenmişti (en çok 6,3 saat). Ölçülen en büyük üst sınır 22 saate yuvarlandı.
+ * Sonraki turlarda panelden "işlendi" gözlemi deftere yazılıp pencere küçültülür; uydurma sabit değil, kart notundaki ölçüm.
+ */
+export const YANDEX_ISTEK_PENCERESI_MS = 22 * 60 * 60 * 1000
 /** --degisen verilmediğinde defter klasöründe aranan dosya adı. */
 export const DEGISEN_DOSYA_ADI = 'degisen-adresler.txt'
 /** Tarama bilgisi API'den gelmeyen motorlarda adres bazlı kayıt başlangıcı: bundan eski lastmod'un geçmişi bilinmez → ESKI (istek atılmaz). */
@@ -76,6 +87,7 @@ export function yalnizTarihMi(deger) {
 export function hareketGecerliMi(h) {
   return !!h && MOTORLAR.includes(h.motor) && EYLEMLER.includes(h.eylem)
     && (h.eylem !== 'gorunme' || (h.motor === 'google' && GORUNME_SONUCLARI.includes(h.sonuc)))
+    && (h.eylem !== 'degisim' || h.motor === 'google')
     && typeof h.adres === 'string' && h.adres.startsWith(`${SITE}/`) && tarihAl(h.tarih) !== null
 }
 
@@ -103,11 +115,54 @@ export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOSt
 export function sonHareket(hareketler, motor, adres) {
   let en = null
   for (const h of hareketler) {
-    if (h.motor !== motor || h.adres !== adres || h.eylem === 'olcum' || h.eylem === 'gorunme') continue
+    if (h.motor !== motor || h.adres !== adres || h.eylem === 'olcum' || h.eylem === 'gorunme' || h.eylem === 'degisim') continue
     const t = tarihAl(h.tarih)
     if (t !== null && (en === null || t > en)) en = t
   }
   return en
+}
+
+/**
+ * SEO-118: değişen adres listesi DEFTERDEN türer. 'degisim' eylemi (motor google, yalnız defter satırı sözleşmesi gereği) "kod yayını bu sayfayı
+ * değiştirdi" demektir; istek/gönderim sayılmaz. Aynı adreste en yeni tarih esas alınır. Eski degisen-adresler.txt dosyası aynı biçimde birleşir.
+ * @returns {Map<string, number>}
+ */
+export function degisenDefterden(hareketler) {
+  const kayitlar = new Map()
+  for (const h of hareketler ?? []) {
+    if (h?.eylem !== 'degisim') continue
+    const t = tarihAl(h.tarih)
+    if (t !== null && (!kayitlar.has(h.adres) || kayitlar.get(h.adres) < t)) kayitlar.set(h.adres, t)
+  }
+  return kayitlar
+}
+
+/** İki değişen-adres haritasını birleştirir (adres başına en yeni tarih). */
+export function degisenBirlestir(...haritalar) {
+  const sonuc = new Map()
+  for (const m of haritalar) for (const [a, t] of m) if (!sonuc.has(a) || sonuc.get(a) < t) sonuc.set(a, t)
+  return sonuc
+}
+
+/**
+ * SEO-118: bir motorun KALAN listesi = tablonun YAP/TEKRAR adresleri; elle tutulan liste yoktur. Sıra: bilgi merkezi yazıları, sonra diğerleri
+ * (kategori/ürün), sonra alfabetik. `sinir` verilirse ilk N (günlük kota).
+ * @param {Array<{ adres: string }>} tablo
+ * @param {string} motor
+ * @param {number} [sinir]
+ */
+export function kalanListe(tablo, motor, sinir = Infinity) {
+  const yazi = (a) => /\/bilgi-merkezi\/[^/]+$/.test(a)
+  return tablo
+    .filter((s) => s[motor] && (s[motor].durum === 'YAP' || s[motor].durum === 'TEKRAR'))
+    .map((s) => s.adres)
+    .sort((a, b) => (yazi(b) ? 1 : 0) - (yazi(a) ? 1 : 0) || a.localeCompare(b))
+    .slice(0, sinir)
+}
+
+/** SEO-118: seçilen motorda OLCULEMEDI adres sayısı (kalan liste "boş" ile "ölçülemedi"yi ayırmak için). */
+export function olculemediSayisi(tablo, motor) {
+  return tablo.filter((s) => s[motor] && s[motor].durum === 'OLCULEMEDI').length
 }
 
 /**
@@ -175,6 +230,10 @@ export function karar({ motor, lastmod = null, degisen = null, sonTarama = null,
   }
   // SEO-100: Google'da taranmış ama dizinde değilse (verdict) tarama tarihi TAMAM saymaz.
   if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: `son tarama ${ad} sonrası` }
+  // SEO-118: Yandex isteği değişimden ÖNCE atılmış ama henüz işlenmemiş olabilir (pencere içinde): robot yeni hâli alır, ikinci istek atılmaz.
+  if (motor === 'yandex' && hareket !== null && degisim !== null && hareket < hareketDegisim && simdi - hareket < YANDEX_ISTEK_PENCERESI_MS) {
+    return { durum: 'BEKLE', neden: `istek ${Math.floor((simdi - hareket) / 3600000)} saat önce, ${ad} sonrası değişmiş; kuyruktaki istek yeni hâli alır (pencere 22 saat)` }
+  }
   if (hareket !== null && (degisim === null || hareket >= hareketDegisim)) {
     const gun = (simdi - hareket) / GUN_MS
     // SEO-112: Google'da adres başına tek istek; yinelenen istek hızlandırmaz, kota harcar. Karar BEKLE kalır (3 gün sonra yeniden ÖLÇÜM sürer, D7 madde 13).
@@ -425,6 +484,25 @@ async function calistir() {
     return
   }
 
+  // SEO-118: eski degisen-adresler.txt satırlarını deftere 'degisim' olarak taşır (idempotent: aynı adres+tarih ikinci kez yazılmaz). Sonra dosya silinebilir.
+  if (arg.includes('--degisen-ice-aktar')) {
+    const yol = resolve(deger('--degisen') || join(dirname(defter), DEGISEN_DOSYA_ADI))
+    yolKontrol(yol, '--degisen')
+    if (!existsSync(yol)) { console.error(`HATA: --degisen dosyası yok: ${yol}`); process.exit(2) }
+    const { kayitlar, atlanan } = degisenCoz(readFileSync(yol, 'utf8'))
+    const aday = [...kayitlar].map(([adres, t]) => ({ tarih: new Date(t).toISOString(), motor: 'google', eylem: 'degisim', adres, kaynak: 'degisen-dosyasi' }))
+    const yeni = yeniOlanlar(defterOku(defter).hareketler, aday)
+    mkdirSync(dirname(defter), { recursive: true })
+    if (yeni.length) appendFileSync(defter, `${yeni.map(satirYaz).join('\n')}\n`)
+    console.log(`değişen içe aktarım: adres ${kayitlar.size} · yeni ${yeni.length} · zaten vardı ${aday.length - yeni.length}${atlanan ? ` · UYARI: ${atlanan} bozuk satır atlandı` : ''} → ${defter}`)
+    if (yeni.length) yedekAl(defter)
+    return
+  }
+
+  // SEO-118: --kalan/--sinir bağımsız değişkenleri AĞA gitmeden doğrulanır (değersiz --kalan sessizce --durum akışına düşmesin).
+  if (arg.includes('--kalan') && !MOTORLAR.includes(deger('--kalan'))) { console.error(`HATA: --kalan motoru ${MOTORLAR.join('|')} olmalı`); process.exit(2) }
+  if (arg.includes('--sinir') && (!Number.isInteger(Number(deger('--sinir'))) || Number(deger('--sinir')) < 1)) { console.error('HATA: --sinir pozitif tam sayı olmalı'); process.exit(2) }
+
   // --durum (varsayılan)
   // --cikti verilmezse durum anlık görüntüsü defterin klasörüne yazılır: sonuç geçmişi (hangi gün dizine girdi) kaybolmaz.
   const cikti = deger('--cikti') || dirname(defter)
@@ -449,7 +527,21 @@ async function calistir() {
   const degisenSonuc = existsSync(degisenYol) ? degisenCoz(readFileSync(degisenYol, 'utf8')) : { kayitlar: new Map(), atlanan: 0 }
   const adresler = kapsam.map((k) => k.adres)
   const olcum = { google: await googleOlc(adresler), bing: await bingOlc(adresler), yandex: {}, indexnow: {} }
-  const tablo = tabloUret({ kapsam, hareketler, olcum, simdi, degisen: degisenSonuc.kayitlar })
+  const tablo = tabloUret({ kapsam, hareketler, olcum, simdi, degisen: degisenBirlestir(degisenSonuc.kayitlar, degisenDefterden(hareketler)) })
+  // SEO-118: --kalan <motor> [--sinir N] yalnız o motorun YAP/TEKRAR adreslerini satır satır basar (günlük tur listesi; elle liste yok).
+  if (arg.includes('--kalan')) {
+    const kalanMotor = deger('--kalan')
+    if (!MOTORLAR.includes(kalanMotor)) { console.error(`HATA: --kalan motoru ${MOTORLAR.join('|')} olmalı`); process.exit(2) }
+    const sinir = deger('--sinir') ? Number(deger('--sinir')) : Infinity
+    if (deger('--sinir') && (!Number.isInteger(sinir) || sinir < 1)) { console.error('HATA: --sinir pozitif tam sayı olmalı'); process.exit(2) }
+    const liste = kalanListe(tablo, kalanMotor, sinir)
+    const olculemeyen = olculemediSayisi(tablo, kalanMotor)
+    if (liste.length) console.log(liste.join('\n'))
+    // Sessiz sıfır yok: ölçülemeyen adres "yapılacak yok" diye okunmaz.
+    if (olculemeyen) { console.error(`UYARI: ${kalanMotor} için ${olculemeyen}/${tablo.length} adreste durum okunamadı (OLCULEMEDI); liste eksik olabilir${liste.length ? '' : ', "kalan yok" DEĞİL'}`); process.exit(1) }
+    if (!liste.length) console.error(`kalan yok: ${kalanMotor} için YAP/TEKRAR adres yok (ölçüm temiz)`)
+    return
+  }
   const md = markdownYaz(tablo, simdi)
   console.log(md)
   if (atlanan) console.log(`\nUYARI: defterde ${atlanan} geçersiz satır atlandı`)
