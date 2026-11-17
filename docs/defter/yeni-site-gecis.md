@@ -114,6 +114,7 @@ Sıra yol haritasındandır; üç iş aynı anda yürür, sonra ortak kontrol, e
 | 308 kuralları CI kapıları (eski→yeni 200 tek sıçrama, boyut bütçesi, zincir ve çakışma); `?sku=` yönlendirmesi | Barındırma Cloudflare'e taşınabilir kalır, kural sağlayıcıya özgü yazılmaz | orta | ALT-177 |
 | Dondurulmuş eski adres evreni ve dizinli adreslerin ölçümü | GEO-SEO ölçer, URUN tabloya alır | orta | SEO-76 (beklemede) |
 | Dizin: yeni sitenin ve eski adreslerin arama motorlarındaki durumu | Geçişte dizin kaybı olmasın | orta | `geo-seo-dizin.md` |
+| Ürün durumu SQL'le değişince site haritası tazelenmiyor | 17 Kasım: yuvarlak kanal fanı ailesinin 7 ürünü SQL ile yeniden yayına alındı, sayfa 200 oldu ama `sitemap.xml` önbellekte kaldı (en çok 6 saat); yeni sitede ürün durumu değişimi haritayı tazelemeli, yoksa IndexNow kapısı yeni adresi reddeder (SEO-68) | orta | SEO-68 |
 | Satış kipi: şirket kurulunca tek anahtarla geçiş; o gün yeni iş yapılmaz | İki kip de Design'da hazırlanır, sepet ve satış kipi şirket kurulmadan test edilir | orta | OPS-180 |
 | Canlıya aktarım planı | Önizleme "tamam" olunca konuşulur; kapsam 4. bölümde | düşük | OPS-180 |
 | Bu defter için `olcum` komutu (manifest, plan dosyası ve alt defterlerdeki kart numaralarının tutarlılığı) | Defter `kontrolsuz` kalmasın; şimdilik `pilot` | düşük | açılacak |
