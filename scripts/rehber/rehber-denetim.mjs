@@ -104,7 +104,7 @@ const BIRIM = '(?:m³\\/h|m3\\/h|m³\\/s|l\\/s|kPa|Pa|kW|W|kVA|V|Hz|A|dB\\(A\\)|
 /** Sayı + birim ya da yüzde: kaynak ister (R2.2). Yıl ("2026") ve sıra ("3. adım") tek başına sayılmaz. */
 export const SAYI_BIRIM = new RegExp(`(?:%\\s?\\d)|(?:\\d[\\d.,]*\\s?(?:[–-]\\s?\\d[\\d.,]*\\s?)?${BIRIM}${E})`, 'u')
 export const OLUMSUZ = kelime('içermez|içermiyor|gerekmez|gerektirmez|yoktur|değildir|olmaz|bulunmaz|etmez|yapmaz|sağlamaz|gerek yoktur')
-export const MEVZUAT = kelime('zorunlu(?:dur|luğu|luk)?|yasak(?:tır)?|yönetmelik\\p{L}*|mevzuat\\p{L}*|kanun\\p{L}*|tebliğ\\p{L}*')
+export const MEVZUAT = kelime('zorunlu(?:dur|luğu|luk)?|yasak(?:tır)?|yönetmeli[kğ]\\p{L}*|mevzuat\\p{L}*|kanun\\p{L}*|tebliğ\\p{L}*')
 const VARSAYIM = kelime('varsay\\p{L}*|örnek varsayım|diyelim')
 
 /** R4.2 garanti ve üstünlük vaadi. */
