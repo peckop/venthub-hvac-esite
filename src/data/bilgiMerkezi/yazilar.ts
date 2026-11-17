@@ -736,6 +736,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // 12 Kasım (BLG-75): "Hava perdesi de bu yazıda ele alınmaz" kapsam cümlesi ve hava perdesi rehberine bağlantı eklendi; yalnız ekleme, iddia yok
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok; [3] için baskı yılı kaydı (BLG-84)
     guncellemeTarihi: '2026-11-17',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
@@ -750,67 +751,70 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Kanal fanı seçmeden önce türleri ve takılacağı yerleri bu rehberde karşılaştırın.',
         govde: `# Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar
 
-Kanal tipi fanlar kanala entegre edilerek havalandırma sistemlerinde çalışır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı rehberi fanları santrifüj ve aksiyel diye ikiye ayırır, kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı uygun tür olarak anlatır [1].
+Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve kanala entegre edilen fanlardır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı (DOE) ile AMCA International'ın rehberi fanları santrifüj ve aksiyel diye ikiye ayırır, kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı uygun tür olarak anlatır [1].
 
 Kısaca:
 
-- Çalışma: tüp tipi aksiyel fan, kanal kayıplarını yenecek basıncı oluşturduğu için egzoz uygulamalarında sık kullanılır [1].
-- Kesit: fark fanın bağlandığı kanalın kesitindedir; bir firmanın bilgi sayfasına göre dikdörtgen olanı sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
-- Seçim: fan seçimi hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi bilinerek başlar [1].
-- Kullanım: kataloga göre plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilir [4].
+- Kullanım: tüp tipi aksiyel fan egzoz uygulamalarında sık kullanılır [1]; kataloga göre plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilir [4].
+- Kesit: bir firmanın bilgi sayfasına göre dikdörtgen kanal tipi fan sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
+- Seçim: hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
+- Fan boyutu: gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz [1].
 
-Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve kanala entegre edilen fanlardır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. Hangi kanal fanlarının bulunduğu iki ölçüte göre anlatılır: kesite göre yuvarlak ve dikdörtgen [2]; fan türü olarak santrifüj ve aksiyel (tüp tipi, kılavuz kanatlı) [1] ve üretici anlatımıyla karma akışlı [4]. ABD Enerji Bakanlığı (U.S. Department of Energy, DOE) ile AMCA International'ın rehberi fanları santrifüj ve aksiyel olarak ikiye ayırır ve kanallı iklimlendirme tesisatına uygun tür olarak tüp tipi aksiyel fanı anlatır [1]; katalogda kanal fanı serilerinden biri karma akışlı olarak tanımlanır [4]. Kullanım alanları egzoz uygulamaları [1], asma tavan ve çatı arası ile mutfak, tuvalet, laboratuvar, bar ve restoran gibi mekânlardır [4].
+## Kanal tipi fan seçerken hangi bilgilere bakılır?
+
+Fan seçimi, hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
+
+- **Debi ve basınç.** Fan, sistemin debi ve basınç gereksinimleri hesaplanarak seçilir [1].
+- **Sistem kayıpları.** Sistem eğrisi, damper, kanal, filtre ve dirsek gibi her bileşenin kaybı toplanarak hesaplanır; bileşenlerin etkileşiminden doğan performans değişimine sistem etkisi denir [1].
+- **Fan boyutu.** Gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz, ağır durumlarda kararsız çalışabilir, fazla akış enerjisi üretir ve gürültüyü artırır [1].
+- **Kesit ve montaj alanı.** 2016 baskılı üretici kataloğunda anlatılan karma akışlı kanal fanı serisi standart yuvarlak kesitli borulara, özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3]; bir firmanın bilgi sayfasına göre dikdörtgen kanal tipi fan sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
+
+İlgili rehberler: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
 
 ## Kanal tipi fan nasıl çalışır?
 
-DOE rehberine göre tüp tipi aksiyel fanlar egzoz uygulamalarında sık kullanılır, çünkü kanal kayıplarını yenmeye yetecek basıncı oluşturur [1]. Rehber fanları iki ana türe ayırır: santrifüj ve aksiyel [1]. Santrifüj fan, dönen bir çarkla havanın hızını artırır; hava çarkın göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır ve bu enerji, hava çıkışa girmeden önce yavaşlarken statik basınç artışına dönüşür [1]. Aksiyel fan ise havayı fanın ekseni boyunca hareket ettirir; hava, pervane ile uçak kanadındaki gibi kanat yüzeyinde oluşan aerodinamik kaldırma kuvvetiyle basınçlandırılır [1].
+DOE rehberi fanları iki ana türe ayırır: santrifüj ve aksiyel [1].
 
-Aksiyel fanın silindirli türü tüp tipi aksiyel fandır: DOE rehberi bunu bir silindirin içine yerleştirilmiş pervane tipi fan olarak tanımlar ve hava akışı özelliklerini iyileştirdiği için pervane tipi fandan daha yüksek basınç ve daha iyi verim sağladığını yazar [1]. Tüp tipi aksiyel fanlar orta basınçlı, yüksek debili uygulamalarda kullanılır [1]. DOE rehberi, çıkışına kılavuz kanatlar eklenmiş tüp tipi aksiyel fanı kılavuz kanatlı (vaneaxial) aksiyel fan olarak tanımlar [1]. Katalogda karma akışlı çark, helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatılır [4].
+- **Santrifüj fan** dönen bir çarkla havanın hızını artırır; hava çarkın göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır ve bu enerji, hava çıkışa girmeden önce yavaşlarken statik basınç artışına dönüşür [1].
+- **Aksiyel fan** havayı fanın ekseni boyunca hareket ettirir; hava, pervane ile uçak kanadındaki gibi kanat yüzeyinde oluşan aerodinamik kaldırma kuvvetiyle basınçlandırılır [1].
+
+Aksiyel fanın silindirli türü tüp tipi aksiyel fandır: DOE rehberi bunu bir silindirin içine yerleştirilmiş pervane tipi fan olarak tanımlar ve hava akışı özelliklerini iyileştirdiği için pervane tipi fandan daha yüksek basınç ve daha iyi verim sağladığını yazar [1]. Tüp tipi aksiyel fanlar orta basınçlı, yüksek debili uygulamalarda kullanılır [1]. Egzoz uygulamalarında sık kullanılır, çünkü kanal kayıplarını yenmeye yetecek basıncı oluşturur [1].
+
+Çıkışına kılavuz kanatlar eklenmiş tüp tipi aksiyel fana kılavuz kanatlı (vaneaxial) aksiyel fan denir [1]. Katalogda karma akışlı çark, helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatılır [4].
 
 ## Kanal fanı çeşitleri nelerdir?
 
 Kanal fanları iki ölçüte göre ayrılır: kesite göre yuvarlak ve dikdörtgen [2]; fan türü olarak santrifüj ve aksiyel (tüp tipi, kılavuz kanatlı) [1] ve üretici anlatımıyla karma akışlı [4].
 
-| Tür | Çalışma ilkesi | Kaynak |
-|---|---|---|
-| Santrifüj | Havayı radyal yönde hızlandırır, kinetik enerjiyi basınca çevirir | [1] |
-| Aksiyel | Havayı fanın ekseni boyunca hareket ettirir | [1] |
-| Tüp tipi aksiyel | Silindir içindeki pervane tipi fandır; orta basınç ve yüksek debili uygulamalara uygundur | [1] |
-| Kılavuz kanatlı aksiyel | Tüp tipi aksiyel fana çıkış kanatları eklenmiş türdür | [1] |
-| Karma akışlı (üretici anlatımı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir | [4] |
+| Tür | Çalışma ilkesi |
+|---|---|
+| Santrifüj | Havayı radyal yönde hızlandırır, kinetik enerjiyi basınca çevirir [1] |
+| Aksiyel | Havayı fanın ekseni boyunca hareket ettirir [1] |
+| Tüp tipi aksiyel | Silindir içindeki pervane tipi fandır; orta basınç ve yüksek debili uygulamalara uygundur [1] |
+| Kılavuz kanatlı aksiyel | Tüp tipi aksiyel fana çıkış kanatları eklenmiş türdür [1] |
+| Karma akışlı (üretici anlatımı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir [4] |
 
 ## Yuvarlak ve dikdörtgen kesit farkı nedir?
 
-Fark, fanın bağlandığı kanalın kesitindedir. Bir firmanın bilgi sayfası yuvarlak kanal tipi fanı yuvarlak bir kanala entegre fan, dikdörtgen kanal tipi fanı ise dikdörtgen kesitli kanallara entegre fan olarak tanımlar; aynı sayfa dikdörtgen kesitli olanı büyük hava hacimlerini taşımak için tasarlanmış ve sıkışık alanlarda daha iyi yer kullanımı sağlayan fan olarak anlatır [2]. Aynı serinin üretici kataloğunda anlatılan karma akışlı kanal fanı serisi, standart yuvarlak kesitli borulara takılabildiği gibi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3].
+Fark, fanın bağlandığı kanalın kesitindedir. Bir firmanın bilgi sayfası yuvarlak kanal tipi fanı yuvarlak bir kanala entegre fan, dikdörtgen kanal tipi fanı ise dikdörtgen kesitli kanallara entegre fan olarak tanımlar [2]. Aynı sayfa dikdörtgen kesitli olanı büyük hava hacimlerini taşımak için tasarlanmış ve sıkışık alanlarda daha iyi yer kullanımı sağlayan fan olarak anlatır [2].
+
+Aynı serinin 2016 baskılı üretici kataloğunda anlatılan karma akışlı kanal fanı serisi, standart yuvarlak kesitli borulara takılabildiği gibi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3].
 
 ## Kanal tipi fan nerede kullanılır? Kullanım alanları
 
-Kanal fanlarının kullanım alanları kaynaklarda yerleşime göre anlatılır: kanal hattının içinde ve kanal sisteminin ucunda [4]; uygulama olarak egzoz da anılır [1]. Kaynaklarda egzoz uygulamaları, asma tavan ve çatı arası ile dış mekân kullanım yeri olarak anılır [1][4]. DOE rehberi tüp tipi aksiyel fanların yer açısından da verimli olduğunu yazar [1]. Katalogda plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilen kanal fanı olarak sunulur ve mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygun görülür; boyalı sac çelik gövdeli bir seri de asma tavan ve çatı arası kurulumu için tanımlanır [4]. Yüksekliği çok düşük bir seri, kısa asma tavanlara monte edilmeye elverişlidir [4].
+Kanal fanlarının kullanım alanları kaynaklarda yerleşime göre anlatılır: kanal hattının içinde ve kanal sisteminin ucunda [4]; uygulama olarak egzoz da anılır [1].
 
-Aynı katalog kanal sisteminin ucuna takılan türleri de listeler. Çelik sac duvar tipi fanlar laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânların havalandırma ihtiyacını karşılar; çatı tipi fanlar çatıdan atış yapan ticari ve endüstriyel mekânlar için tanımlanmıştır [4]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [4].
+Kanal içi için katalogda plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilen kanal fanı olarak sunulur ve konut, ticari ve endüstriyel mekânlar için uygun görülür; boyalı sac çelik gövdeli bir seri de asma tavan ve çatı arası kurulumu için tanımlanır [4]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [4]. Aynı katalog kanal sisteminin ucuna takılan türleri de listeler: çelik sac duvar tipi fanlar ve çatı tipi fanlar [4].
 
-| Yerleşim | Anlatılan kullanım | Kaynak |
-|---|---|---|
-| Egzoz uygulamaları | Tüp tipi aksiyel fan: kanal kayıplarını yenecek basınç, yer açısından verimli | [1] |
-| Asma tavan ya da çatı arası, kanal içi | Mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane, dükkân | [4] |
-| Kısa asma tavan | Çok kısa yükseklik sayesinde kısa asma tavanlara uygun | [4] |
-| Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [4] |
-| Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [4] |
+| Yerleşim | Anlatılan kullanım |
+|---|---|
+| Egzoz uygulamaları | Tüp tipi aksiyel fan: kanal kayıplarını yenecek basınç, yer açısından verimli [1] |
+| Asma tavan ya da çatı arası, kanal içi | Plastik reçine gövdeli seri: mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi mekânlar [4] |
+| Kısa asma tavan | Yüksekliği çok düşük bir seri, kısa asma tavanlara monte edilmeye elverişlidir [4] |
+| Kanal ucunda, duvarda | Çelik sac duvar tipi fanlar: laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânlar [4] |
+| Kanal ucunda, çatıda | Çatı tipi fanlar: çatıdan atış yapan ticari ve endüstriyel mekânlar [4] |
 
-İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi)
-
-## Kanal tipi fan seçerken hangi bilgilere bakılır?
-
-DOE rehberine göre fan seçimi, hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar; fan, sistemin debi ve basınç gereksinimleri hesaplanarak seçilir [1]. Sistem eğrisi, damper, kanal, filtre ve dirsek gibi her bileşenin kaybı toplanarak hesaplanır; bileşenlerin etkileşiminden doğan performans değişimine sistem etkisi denir [1]. Gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz, ağır durumlarda kararsız çalışabilir, fazla akış enerjisi üretir ve gürültüyü artırır [1].
-
-| Seçim girdisi | Kaynak ne söylüyor | Kaynak |
-|---|---|---|
-| Debi ve basınç | Seçim, sistemin hava debisi ve basınç gereksiniminin hesabına dayanır | [1] |
-| Sistem kayıpları | Damper, kanal, filtre, dirsek gibi bileşen kayıpları toplanır | [1] |
-| Fan boyutu | Gereğinden büyük fan, verimin en yüksek olduğu noktada çalışmaz | [1] |
-| Kesit ve montaj alanı | Üretici anlatımı: yuvarlak ya da dikdörtgen kanal [3]; firma bilgi yazısı: dikdörtgen kesitte sıkışık alan avantajı [2] | [2][3] |
-
-İlgili rehberler: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
+İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
 
 ## Sık sorulan sorular
 
@@ -820,7 +824,7 @@ DOE rehberine göre fan seçimi, hava debisi, sıcaklık, basınç, hava akımı
 
 ### Kanal tipi fan dikdörtgen kanala takılabilir mi?
 
-Üretici kataloğuna göre evet: karma akışlı kanal fanı serisi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabilir [3].
+2016 baskılı üretici kataloğuna göre evet: karma akışlı kanal fanı serisi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabilir [3].
 
 ### Kanal tipi fan dışarıya ya da çatıya monte edilebilir mi?
 
@@ -832,7 +836,7 @@ Katalogda karma akışlı kanal fanı serisi yatay ya da dikey kanallı montaj i
 
 ### Birden fazla kanal tipi fan seri ya da paralel bağlanabilir mi?
 
-Katalogda karma akışlı kanal fanı serisi için paralel ve seri bağlantı düzenleri gösterilir; paralel bağlantıda debinin, seri bağlantıda basıncın iki katına çıktığı belirtilir [3].
+2016 baskılı katalogda karma akışlı kanal fanı serisi için paralel ve seri bağlantı düzenleri gösterilir; paralel bağlantıda debinin, seri bağlantıda basıncın iki katına çıktığı belirtilir [3].
 
 ### Tüp tipi aksiyel fan ile kılavuz kanatlı aksiyel fan arasındaki fark nedir?
 
@@ -844,20 +848,31 @@ Fark çıkış kanatlarıdır: kılavuz kanatlı fanda bu kanatlar hava akış d
 
 ## VentHub'da hangi kanal tipi fan serileri var?
 
-VentHub'un [kanal tipi fanlar kategorisinde](vh:kategori/duct-fans) şu aileler listelenir: [AVenS dikdörtgen kanal tipi radyal fanlar](vh:aile/avens-dikdortgen-kanal-tipi-radyal-fanlar), [LINEO kanal fanları](vh:aile/vortice-lineo-kanal-fanlari), [LINEO Quiet sessiz kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari), [Radon serisi kanal fanları](vh:aile/vortice-radon-serisi-kanal-fanlari) ve [VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari).
+VentHub'un [kanal tipi fanlar kategorisinde](vh:kategori/duct-fans) şu aileler listelenir:
+
+- [AVenS dikdörtgen kanal tipi radyal fanlar](vh:aile/avens-dikdortgen-kanal-tipi-radyal-fanlar)
+- [LINEO kanal fanları](vh:aile/vortice-lineo-kanal-fanlari)
+- [LINEO Quiet sessiz kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari)
+- [Radon serisi kanal fanları](vh:aile/vortice-radon-serisi-kanal-fanlari)
+- [VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari)
 
 ## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklif için şu bilgileri hazırlayın: hava debisi, sıcaklık, basınç, hava akımının özellikleri, sistem yerleşimi, kanalın kesiti ve montaj alanı.
+Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklif için şu bilgileri hazırlayın:
+
+- Hava debisi, sıcaklık ve basınç
+- Hava akımının özellikleri
+- Sistem yerleşimi
+- Kanalın kesiti ve montaj alanı
 
 ## Kaynaklar
 
-Üretici belgelerinde verilen sayfa numaraları kataloğun basılı sayfa numarasıdır. DOE rehberinde basılı sayfa numarası kullanılmıştır. Kaynak [3] ve [4] aynı üreticinin katalogları, [2] ise bu üreticinin bir serisini anlatan firma yazısıdır; üçü birbirinden bağımsız kaynak sayılmaz.
+Üretici belgelerinde ve DOE rehberinde verilen sayfa numaraları basılı sayfa numarasıdır.
 
 1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 8, 17, 19, 22, 23. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 25.10.2026)
 2. Avens Havalandırma, "LINEO Kanal Tipi Fanlar" bilgi yazısı (firma sitesi blog bölümü), https://www.avensair.com/lineo-kanal-tipi-fanlar (erişim 04.11.2026).
-3. Vortice, Commercial Ventilation in Line kataloğu (dosya adı Commercial_Ventilation_in_Line_1.pdf), s. 5, 7 (üretici belgesi).
-4. Vortice, In-Line Fans Range kataloğu (dosya adı Doc_Pubblicita_In-Line_Fans_Range_191875.pdf), s. 4, 5, 36, 42, 74, 78, 84, 90 (üretici belgesi).
+3. Vortice, Commercial Ventilation in Line kataloğu, Şubat 2016 baskısı, s. 5, 7 (üretici belgesi).
+4. Vortice, In-Line Fans Range kataloğu, Ocak 2026 baskısı, s. 4, 5, 36, 42, 74, 78, 84, 90 (üretici belgesi).
 
 ## Teknik sorumluluk notu
 
