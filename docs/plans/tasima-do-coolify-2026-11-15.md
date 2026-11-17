@@ -19,7 +19,7 @@
 Vercel production'da tanımlı olanlar (adlar; değerler yazılmaz):
 
 - **Derlemeye girer (halka açık, depo değişkeni `IMAJ_*`):** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SHOP_WHATSAPP`, `NEXT_PUBLIC_SENTRY_DSN`. `NEXT_PUBLIC_SITE_URL=https://venthub.com.tr` iş akışında sabit: Vercel'de tanımsızdı ve kod `VERCEL_PROJECT_PRODUCTION_URL`e düşüyordu; Docker'da düşülecek yer `localhost:3000` olurdu.
-- **Çalışma anında Coolify'da (sır):** `JWT_CLAIMS_COOKIE_SECRET` (yoksa admin erişimi fail-closed reddedilir), `SUPABASE_WEBHOOK_SECRET`. İsteğe bağlı: `SUPABASE_WEBHOOK_SECRET_NEXT`.
+- **Çalışma anında Coolify'da (sır):** `JWT_CLAIMS_COOKIE_SECRET` (yoksa admin erişimi fail-closed reddedilir), `SUPABASE_WEBHOOK_SECRET`. İsteğe bağlı: `SUPABASE_WEBHOOK_SECRET_NEXT`. **Değer kaynağı:** Vercel `env pull` hassas (sensitive) değişkenin değerini vermez, yerine 11 karakterlik `[SENSITIVE]` yer tutucusu yazar; bu değer Coolify'a girerse uygulama sessizce yanlış sırla çalışır (15-17 Kasım 2026: webhook imzası doğrulanmadı, sayfa tazeleme durdu, ALT-206). Bu üç sırrın değeri `env pull` ile alınmaz; kaynağından (Supabase Vault, yeni rastgele üretim) elle konur ve konduktan sonra yalnız uzunluk ile sha256 ön eki ölçülür, değer hiçbir yere yazılmaz. Coolify'da `[SENSITIVE]` değeri taşıyan değişken (üretim ya da önizleme) kalmamalıdır.
 - **Vercel'de var, kodda okunmuyor:** `NEXT_PUBLIC_IYZICO_*` (üç anahtar; kaynakta okuyan yok, ayrı konu: `NEXT_PUBLIC_` önekli sır adı), `SENTRY_DSN`.
 - `SUPABASE_SERVICE_ROLE_KEY` Vercel'de YOK; Next tarafı kullanmıyor.
 - `@vercel/analytics`: Vercel dışında istek atmaz, kaldırılmadı (Vercel'e dönüşte bozulmaz).
