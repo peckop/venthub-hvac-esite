@@ -27,7 +27,7 @@ import { afterAll, describe, expect, it } from 'vitest'
  *
  * BUGÜNKÜ ÖLÇÜM (ağaç origin/master fd9d074ce, 3 kapı): dagitim-hazir-kapisi üç bağda tam. defter-pr-kapisi ve
  * yonlendirme-kapisi testlerinin haritada satırı YOK (testler 2026-11-09 #2441 ve 2026-11-10 #2473'te eklendi).
- * yonlendirme-kapisi hiçbir iş akışında koşmuyor; yalnız kendi vitest testi koşturuyor (test gerçek tabloyu da denetler).
+ * yonlendirme-kapisi o gün hiçbir iş akışında koşmuyordu (yalnız kendi vitest testi koşturuyordu); ALT-181'de ci.yml'e bağlandı (17 Kasım).
  * İki harita eksiği `BILINEN_EKSIK` listesinde adıyla ilan edilir; diğer her eksik KIRMIZIDIR.
  *
  * ── MANDAL (İKİ YÖNLÜ) ─────────────────────────────────────────────────────────
@@ -45,13 +45,16 @@ import { afterAll, describe, expect, it } from 'vitest'
  *   kanıtı DEĞİLDİR; bu test kapının SAHİPSİZ KALMADIĞINI ölçer, çağrının doğruluğunu kapının kendi testi ölçer.
  * - (c) iş akışı kolu: yorumsuz bir satırda `node` ve `scripts/ci/<ad>.cjs` birlikte geçer. `package.json` betiği üzerinden
  *   dolaylı çağrı (`pnpm gate:x`) SAYILMAZ; böyle bir bağ doğarsa kural bilerek genişletilir, sessizce gevşemez.
- * - ⚠(c)'NİN VİTEST KOLU KAPININ KENDİ BİRİM TESTİNİ DE SAYAR (görev tanımı: "iş akışında YA DA bir vitest testinde"). Sonuç,
- *   2026-11-15'te ölçüldü: testi olan bir kapıda (c) fiilen (a)'dan türer; `dagitim-hazir.yml` içindeki `node` komutu yoruma
- *   çevrilince bu test YEŞİL KALDI (kapının kendi testi adını anıyor). İş akışı değişmezini kapıların kendi testleri ölçer
- *   (INV-DAGITIM-HAZIR-1, `ci-edited-ayna.test.ts`); bu dosya "sahipsiz kapı" sınıfını yakalar, "iş akışı koptu" sınıfını değil.
- *   Sıkılaştırma tek satırdır: `olc` içinde `vitestler` süzgecine `!testler.includes(t)` ekleyin; bedeli iş akışsız kapının
- *   `calisma` borcuna girmesidir (ölçüldü: tek yeni kırmızı `yonlendirme-kapisi :: calisma`; kapı yalnız kendi vitest testinde
- *   koşuyor ve o test gerçek tabloyu da denetliyor). Karar sahibi: ALTYAPI müdürü.
+ * - (c)'NİN VİTEST KOLU KAPININ KENDİ BİRİM TESTİNİ SAYMAZ (ALT-181, 17 Kasım 2026, karar sahibi ALTYAPI müdürü). Eskiden sayardı ve
+ *   sonuç 2026-11-15'te ölçüldü: testi olan bir kapıda (c) fiilen (a)'dan türüyordu; `dagitim-hazir.yml` içindeki `node` komutu yoruma
+ *   çevrilince bu test YEŞİL KALDI. Şimdi kapının `scripts/ci/__tests__/` altındaki adıyla anan testleri (a kolu) vitest kanıtından
+ *   düşülür: kapıyı başka bir vitest testi (kapıdan bağımsız, ör. bir conformance) anmıyorsa ve iş akışında `node` satırı yoksa kapı
+ *   `calisma` borcundadır. Bedel: iş akışsız kapı artık görünür kırmızıdır (yonlendirme-kapisi bu PR'da ci.yml'e bağlanarak kapandı).
+ *   SINIR (ALT-181, 17 Kasım ölçümü): vitest kolu kapıyı adıyla anan HER testi sayar; `ci-edited-ayna.test.ts` ci.yml adımlarını adıyla anar
+ *   ve `run:` satırını TAM eşitlikle denetler. Bu yüzden ci.yml'deki bir kapı adımı `echo`ya çevrilirse bu dosya YEŞİL KALIR, ama
+ *   INV-CI-EDITED-1 KIRMIZI verir (sabotajla ölçüldü: `run: echo kapali` → 3 kırmızı). Yani koruma var, sahibi o testtir; bu dosya
+ *   "hiçbir testin ve iş akışının anmadığı sahipsiz kapı" sınıfını yakalar. Kapının kendi birim testi yetmediği için artık yeşil
+ *   sayılmaz (iş akışsız kapı görünür kırmızı).
  * - (b) harita kolu: satırın VARLIĞI. Satırın tazeliği (sha) `node scripts/ci/test-haritasi-uret.cjs --kontrol`'ündür.
  * - Vitest kolunun evreni: `scripts/ci/test-haritasi-uret.cjs` KOD_KOKLERI ile aynı kökler. BU DOSYA evrenden DIŞLANIR
  *   (kendini taramaz): `BILINEN_EKSIK` kapı adlarını içerir, dışlanmazsa ilan edilen eksiğin kendisi "vitest testinde
@@ -102,7 +105,7 @@ interface KapiKaniti {
   haritasizTestler: string[]
   /** (c) kapıyı yorumsuz `node` satırıyla çağıran iş akışları. */
   isAkislari: string[]
-  /** (c) kapıyı anan vitest testleri (bu dosya hariç). */
+  /** (c) kapıyı anan vitest testleri (bu dosya ve kapının KENDİ birim testi hariç: kendi testi çalışma kanıtı değildir). */
   vitestler: string[]
 }
 
@@ -290,7 +293,7 @@ function olc(kok: string, haricTutulan: string): Olcum {
       testler,
       haritasizTestler: testler.filter((t) => !harita.has(t)),
       isAkislari: isAkislari.filter((w) => isAkisiCagirirMi(satirlar(w, 'yaml'), kapi)),
-      vitestler: tumTestler.filter((t) => t !== haricTutulan && kapiAnarMi(satirlar(t, 'js'), kapiAdi)),
+      vitestler: tumTestler.filter((t) => t !== haricTutulan && !testler.includes(t) && kapiAnarMi(satirlar(t, 'js'), kapiAdi)),
     }
   })
 
@@ -375,9 +378,9 @@ describe('INV-CI-KAPI-BAGLI-1 · SABOTAJ · saf karar (bağı eksik sahte girdi 
     ['test yok ama iş akışı var: test ve harita eksik (boş küme "satır tam" sayılmaz)', kanit({ isAkislari: ['.github/workflows/x.yml'] }), ['test', 'harita']],
     ['test var, harita satırı yok, iş akışı var: yalnız harita', kanit({ testler: [SAHTE_TEST], haritasizTestler: [SAHTE_TEST], isAkislari: ['.github/workflows/x.yml'] }), ['harita']],
     ['test + harita var, ne iş akışı ne vitest: yalnız çalışma', kanit({ testler: [SAHTE_TEST] }), ['calisma']],
-    ['test + harita + yalnız vitest anması: tam (vitest yolu geçerli)', kanit({ testler: [SAHTE_TEST], vitestler: [SAHTE_TEST] }), []],
+    ['test + harita + kapıyı anan BAŞKA bir vitest testi: tam (vitest yolu geçerli)', kanit({ testler: [SAHTE_TEST], vitestler: ['src/__tests__/conformance/baska.test.ts'] }), []],
     ['test + harita + yalnız iş akışı: tam (iş akışı yolu geçerli)', kanit({ testler: [SAHTE_TEST], isAkislari: ['.github/workflows/x.yml'] }), []],
-    ['iki testten biri haritasız: harita eksik (hepsinin satırı olmalı)', kanit({ testler: [SAHTE_TEST, 'scripts/ci/__tests__/b.test.ts'], haritasizTestler: ['scripts/ci/__tests__/b.test.ts'], vitestler: [SAHTE_TEST] }), ['harita']],
+    ['iki testten biri haritasız: harita eksik (hepsinin satırı olmalı)', kanit({ testler: [SAHTE_TEST, 'scripts/ci/__tests__/b.test.ts'], haritasizTestler: ['scripts/ci/__tests__/b.test.ts'], vitestler: ['src/__tests__/conformance/baska.test.ts'] }), ['harita']],
   ]
   it.each(durumlar)('%s', (_ad, girdi, beklenen) => {
     expect(eksikBaglar(girdi)).toEqual(beklenen)
@@ -467,9 +470,15 @@ describe('INV-CI-KAPI-BAGLI-1 · SABOTAJ · tüm hat geçici depo ağacında (ke
     )
     expect(olculenEksikler(o)).toEqual([])
   })
-  it('harita satırı silinirse yalnız harita; iş akışı komutu yoruma çevrilirse test vitest kolundan çalışma bağını korur', () => {
+  it('harita satırı silinirse yalnız harita; iş akışı komutu yoruma çevrilirse kapının KENDİ testi çalışma bağını KORUMAZ', () => {
     const dosyalar = { ...bagsiz, [SAHTE_TEST]: TEST_ICERIK, '.github/workflows/a.yml': IS_AKISI }
     expect(olculenEksikler(olc(agac({ ...dosyalar, [HARITA_YOLU]: harita() }), KENDI_YOLU)).map((e) => e.bag)).toEqual(['harita'])
+    // SABOTAJ (ALT-181): iş akışı satırı yoruma çevrildi, kapıyı yalnız kendi birim testi anıyor. ESKİDEN yeşil kalırdı (sahte yeşil); şimdi çalışma eksik.
+    const komutYorumda = { ...dosyalar, [HARITA_YOLU]: harita(SAHTE_TEST), '.github/workflows/a.yml': '# node scripts/ci/sahte-kapisi.cjs\njobs: {}\n' }
+    expect(olculenEksikler(olc(agac(komutYorumda), KENDI_YOLU)).map((e) => e.bag)).toEqual(['calisma'])
+    // Kontrol kolu: aynı ağaca kapıdan bağımsız, kapıyı adıyla anan BAŞKA bir vitest testi eklenince çalışma bağı kurulur.
+    const baskaTestle = { ...komutYorumda, 'src/__tests__/conformance/baska.test.ts': TEST_ICERIK }
+    expect(olculenEksikler(olc(agac(baskaTestle), KENDI_YOLU))).toEqual([])
     // Aynı kapıyı bu kez yalnız ESKİ ADLI bir testle ve yorumlanmış iş akışıyla bağla: üç bağ da kopar.
     const kopuk = agac({
       ...bagsiz,

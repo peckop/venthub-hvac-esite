@@ -311,6 +311,13 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     },
     anahtarlar: ['name', 'if', 'env', 'run'],
   },
+  // ALT-181 (ALT-177): yönlendirme tablosu kapısı. Salt-okuma, olaydan bağımsız; koşulsuz çalışır (ayna koşulu taşırsa düzenleme koşusunda atlanırdı), `continue-on-error` yok.
+  {
+    ad: 'Yönlendirme tablosu kapısı (ALT-181)',
+    kosul: null,
+    run: 'run: node scripts/ci/yonlendirme-kapisi.cjs',
+    anahtarlar: ['name', 'run'],
+  },
   {
     ad: AYNA_ADIM_ADI,
     kosul: AYNA_KOSULU,
