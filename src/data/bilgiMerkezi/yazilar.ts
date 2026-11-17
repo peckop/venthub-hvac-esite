@@ -1843,6 +1843,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: iki H2 adı (başlık tekrarı uyarısı); gövde değişmedi.
+    // BLG-79: bir H2 adı (başlık tekrarı uyarısı); gövde değişmedi.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/avens-hucreli-aspiratorler-hf-fw', 'vh:aile/avens-hucreli-aspiratorler-hf-s'],
     ilgiliKategoriler: ['vh:kategori/cabinet-fans'],
@@ -1867,7 +1868,7 @@ Kısaca:
 
 2003 tarihli ABD Enerji Bakanlığı ile AMCA International ortak rehberi (DOE/AMCA rehberi) santrifüj fanları, havayı radyal yönde hızlandırıp hareket yönünü değiştiren, nispeten yüksek basınç üretebilen ve hava akımında nem ve partikül bulunan "kirli" hatlarda sık kullanılan fanlar olarak anlatır [1]. 2026 ürün listesi hücreli aspiratörleri "Hücreli aspiratörler" başlığı altında toplar, ailelerine sık ya da seyrek kanatlı kayış kasnaklı hücreli radyal fan der ve bunları 50 mm standart hücre paneli, dış cidarı elektrostatik toz boyalı, statik ve dinamik balansı ayarlı, yüksek performanslı radyal fanlar olarak tanımlar [4]. VentHub'ın kategori ve aile sayfaları aynı fanları çift cidar hücreli radyal fan aileleri olarak anlatır [5]. İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
 
-## Kanat tipi seçimi neye göre yapılır?
+## Kanat tipleri arasında ne fark var?
 
 DOE/AMCA rehberi santrifüj fanlarda öne eğik ve geriye eğik kanat ayrımını yapar [1]. Öne eğik kanat dönme yönünde kıvrılır; bu fan tipi nispeten düşük hızlarda çalışabilir, bu da düşük gürültü düzeyi anlamına gelir, ama verimi görece düşüktür (yüzde 55 ile 65 arası) ve motor aşırı yüklenmesini önlemek için tahrik motoru seçimine dikkat edilmesi gerekir [1]. Geriye eğik kanat dönme yönünden uzağa yatar; düz, eğri ve kanat profilli üç biçimi vardır, eğri kanatlı fanlar daha verimli olma eğilimindedir, düz kanatlılar ise daha sağlamdır; kanat profilli fanlarda verim yüzde 85'in üzerine çıkabilir [1]. DOE/AMCA rehberi geriye eğik kanatta düşük çarpma açısı nedeniyle partikül birikiminin kolaylaşabileceğini, kanat profilli tipin stall ve aşınmaya duyarlı olduğunu yazar [1]. Geriye eğik fanın güç eğrisi yüksek debide düşer; bu tip, yüksek debide sistem davranışının belirsiz olduğu durumlarda sık seçilir [1].
 
@@ -1882,7 +1883,7 @@ Aynı liste eğim yönünü ve kanat sıklığını başka serilerde de belirtir
 
 DOE/AMCA rehberi doğrudan tahriklerin kayışlı tahrike göre daha yüksek verim, daha az yer ve daha düşük bakım gibi avantajları olduğunu yazar; doğrudan tahrikli fan motor devrinde dönmek zorundadır, kayışlı tahrik ise fan hızı seçiminde esneklik sağlar [1]. Kayışlı tahrikin bedeli de yazılıdır: yeni ve doğru ayarlı kayışlarda bile yüzde 5 ile 10 arasında güç iletimi kaybı olur [1]. VentHub'daki hücreli aileler yalnız kayış kasnaklıdır [4][5]; ürün listesinde doğrudan tahrikli hücreli model yoktur [4]. Doğrudan tahrik gerekiyorsa hücreli ailelerin dışına bakmak gerekir; DOE/AMCA rehberi her tahrik seçeneğinin avantajları ve sakıncaları olduğunu yazar [1].
 
-## Hücreli aspiratörde çalışma noktası (debi ve basınç) neden önemlidir?
+## Hücreli aspiratörde çalışma noktası neden önemlidir?
 
 Fan performans eğrisinin önemli bir noktası, fanın en ekonomik çalıştığı en verimli noktadır; fanın çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1]. Çalışma noktasının fan eğrisi üzerindeki yeri, fanın ne kadar uygun boyutlandırıldığı hakkında da bir fikir verebilir [1]. DOE/AMCA rehberi, sistem eğrisinin her sistem bileşeninin kayıplarının toplanmasıyla hesaplandığını ve fan çıkışına yakın dirsek konmasının iletilen debiyi yüzde 30'a kadar düşürebilecek bir sistem etkisi yaratabileceğini yazar [1]. Boyutların gereğinden büyük seçilmesi verimsiz çalışma, aşırı hava gürültüsü ve düşük güvenilirlik doğurur [1]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
 
