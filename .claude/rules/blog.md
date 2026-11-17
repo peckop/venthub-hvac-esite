@@ -22,6 +22,7 @@ Bu dosya işaretçidir. Tam metin ve kanıt: `docs/standards/rehber-yazisi-stand
 - `hide_price` kategoride fiyat cümlesi yazılmaz; gömülü RSC verisinde fiyat olabilir.
 - Üretici/DOE belgesi künyesi sayfada yazılı numaradan ölçülür (basılı numara ile PDF indeksi farklı).
 - Tuzaklı kopya yanında temiz kopya zorunludur.
+- Doğrulama bulgusu metni daraltarak çözülür, şerh ekleyerek değil; gövdede şerh, kendinden söz ve yönlendirme yazılmaz, marka kaynak olduğu yerde adıyla yazılır (R3.4 a–n; kapı `uslupDenetle`, UYARI).
 
 ## R10.6 dokuz madde (B8 PR gövdesinde tablo)
 
