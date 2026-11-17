@@ -270,26 +270,26 @@ describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
       expect(markaDenetle(md)).toEqual([])
       expect(denetle(md.replace('# Başlık', '# Casals ENKELFAN'), { iddialar: IDDIALAR }).kirmizi.map((k: { sinif: string }) => k.sinif)).not.toContain('MARKA-GOVDEDE')
     })
-    it('BLG-37: gövdede sekiz marka ve seri adı + Kaynaklar\'da bir ad = 9 → yalnız MARKA-TOPLAM KIRMIZI (sabotaj kolu korunur); "radon" gazı adı sayılmaz', () => {
-      const md = kur(
-        'Kanal tipi fanda Vortice LINEO ve VORT HR örnek verilir [1]. Radyal fanda Nicotra Gebhardt, sürücüde Danfoss VLT, ısı geri kazanımda Avens anılır [1].',
-        'İki seri var [1].',
-        KAYNAK,
-      )
-      expect(markaDenetle(md)).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }]) // 8 gövdede + Kaynaklar'daki Casals
+    it('BLG-37 + BLG-85: gövdede sekiz ad geçer (Kaynaklar sayılmaz), dokuzuncu ad MARKA-TOPLAM KIRMIZI (sabotaj kolu korunur); "radon" gazı adı sayılmaz', () => {
+      const sekiz = 'Kanal tipi fanda Vortice LINEO ve VORT HR örnek verilir [1]. Radyal fanda Nicotra Gebhardt, sürücüde Danfoss VLT, ısı geri kazanımda Avens anılır [1].'
+      expect(markaDenetle(kur(sekiz, 'İki seri var [1].', KAYNAK))).toEqual([]) // 8 gövdede; Kaynaklar'daki Casals sayılmaz (v0.28)
+      expect(markaDenetle(kur(`${sekiz} Casals da anılır [1].`, 'İki seri var [1].', KAYNAK))).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }])
       expect(markaDenetle(kur('Radon gazı konut havasında birikebilir [1].', 'İki seri var [1].', KAYNAK))).toEqual([])
     })
-    it('seri bölümü ve Kaynaklar dahil toplam 8 üstü → MARKA-TOPLAM KIRMIZI, 8 geçer', () => {
+    it('v0.28 (BLG-85, OPS-325): seri listesi bölümü ve Kaynaklar sayıma girmez; sonraki H2 ile sayım yeniden başlar', () => {
       const seri = (n: number) => Array.from({ length: n }, () => 'Casals').join(' ve ') + ' [1].'
-      expect(siniflarMarka(kur('Genel bilgi [1].', seri(7), KAYNAK))).toEqual([])
-      expect(markaDenetle(kur('Genel bilgi [1].', seri(8), KAYNAK))).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }])
+      // seri bölümünde 20 ad + Kaynaklar'da 1 ad: gövdede 0 → yeşil (eski kapı burada 21 adet KIRMIZI verirdi)
+      expect(siniflarMarka(kur('Genel bilgi [1].', seri(20), KAYNAK))).toEqual([])
+      // seri bölümünden SONRA gelen anlatım bölümü yeniden sayılır: gövdede 9 → KIRMIZI
+      const md = kur('Genel bilgi [1].', seri(20), KAYNAK).replace('## Kaynaklar', `## Teklif için hangi bilgiler gerekir?\n\n${seri(9)}\n\n## Kaynaklar`)
+      expect(markaDenetle(md)).toEqual([{ sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' }])
     })
     it('adres ve vh: bağlantı hedefleri sayılmaz; CLIBOS-TR tek ad sayılır (CLIBOS ve TR diye ikiye bölünmez)', () => {
       const md = kur('Bilgi [1].', '[ENKELFAN](vh:aile/casals-enkelfan-ec-plug) ve CLIBOS-TR [1].', '1. Kaynak https://venthub.com.tr/tr/products/casals-kentalfan-plug\n')
       expect(markaDenetle(md)).toEqual([])
-      // gövdede 9, seri bölümünde ENKELFAN ve CLIBOS-TR = 11; hedefteki casals-... sayılmaz, CLIBOS-TR tek ad
+      // gövdede 9 (seri bölümündeki ENKELFAN ve CLIBOS-TR sayılmaz, v0.28); hedefteki casals-... sayılmaz, CLIBOS-TR tek ad
       expect(markaDenetle(md.replace('Bilgi [1].', `${Array(9).fill('CLIBOS-TR').join(' ')} [1].`))).toEqual([
-        { sinif: 'MARKA-TOPLAM', ayrinti: '11 adet (en çok 8)' },
+        { sinif: 'MARKA-TOPLAM', ayrinti: '9 adet (en çok 8)' },
       ])
     })
     it('"VentHub\'da hangi ... serileri var?" bölümü olmayan yazıda (genel rehber değil) kapı çalışmaz', () => {
