@@ -56,13 +56,13 @@ describe('liste kartı — güncelleme tarihi', () => {
     expect(container.textContent).toContain(`Updated ${tarihYaz('2026-10-10', 'en')}`)
   })
 
-  it('yayındaki içerik: rehber yazılarının güncelleme tarihi ve kartın bastığı tarih (kanal tipi 2026-11-08: BLG-52 kısa katman; frekans 2026-11-09: BLG-56 EMC kaynak atfı; radyal-aksiyel 2026-11-12: BLG-74 fan debisi ve basınç bölümleri; fan çeşitleri ve sessiz fan 2026-11-09: BLG-63 AB-327/2011 geçiş dönemi cümleleri; dördü 2026-11-16: BLG-78 bağlantı metinleri hedef başlıkla birebir; sessiz fan 2026-11-17: BLG-79 üslup yeniden yazımı)', () => {
+  it('yayındaki içerik: rehber yazılarının güncelleme tarihi ve kartın bastığı tarih (kanal tipi 2026-11-08: BLG-52 kısa katman; frekans 2026-11-09: BLG-56 EMC kaynak atfı; radyal-aksiyel 2026-11-12: BLG-74 fan debisi ve basınç bölümleri; fan çeşitleri ve sessiz fan 2026-11-09: BLG-63 AB-327/2011 geçiş dönemi cümleleri; dördü 2026-11-16: BLG-78 bağlantı metinleri hedef başlıkla birebir; beşi 2026-11-17: BLG-79 R3.4 üslup düzeltmesi)', () => {
     const kartlar = listeKartlari('tr', YAZILAR)
     const beklenen: Array<[string, string, string]> = [
-      ['frekans-konvertoru', '2026-11-16', '16 Kasım 2026'],
-      ['fan-cesitleri', '2026-11-16', '16 Kasım 2026'],
-      ['radyal-aksiyel-fan-secimi', '2026-11-16', '16 Kasım 2026'],
-      ['kanal-tipi-fan-nedir', '2026-11-16', '16 Kasım 2026'],
+      ['frekans-konvertoru', '2026-11-17', '17 Kasım 2026'],
+      ['fan-cesitleri', '2026-11-17', '17 Kasım 2026'],
+      ['radyal-aksiyel-fan-secimi', '2026-11-17', '17 Kasım 2026'],
+      ['kanal-tipi-fan-nedir', '2026-11-17', '17 Kasım 2026'],
       ['sessiz-fan-secimi', '2026-11-17', '17 Kasım 2026'],
     ]
     for (const [kimlik, iso, yazili] of beklenen) {
