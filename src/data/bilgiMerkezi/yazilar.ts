@@ -92,6 +92,7 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-82: yazı R3.5 okur gözü kurallarıyla yeniden düzenlendi (seçim yolu başa, yinelenen giriş ve şerhler çıktı); yeni iddia, sayı, kaynak yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
@@ -102,15 +103,23 @@ export const YAZILAR: readonly RehberYazisi[] = [
         kartOzeti: 'Konvertör seçimine nereden başlayacağınızı bu rehberde bulun.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
 
-Frekans konvertörü, motorun hızını motora verdiği gerilimi ve frekansı değiştirerek ayarlayan elektronik kontrol cihazıdır [1]. Pompa ve fanda hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır; üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Cihaz seçimi besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiğine bakılarak yapılır [1][2].
+Frekans konvertörü, motora verdiği gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik kontrol cihazıdır [1]. Fan ve pompa için seçim besleme gerilimine, güç aralığına, koruma sınıfına, çalışma ortamına ve uygulamanın tork karakteristiğine bakılarak yapılır [1][2]. Fan ve pompada hız anma değerine göre %20 azaltıldığında, üretici belgesindeki örnekte elektrik tüketimi %50 azalır [2].
 
 Kısaca:
 
-- Çalışma: cihaz temel biçiminde doğrultucu, DC ara devre, invertör ve kontrol birimi olmak üzere dört ana bölüme ayrılabilir [1].
-- Enerji: santrifüj fan ve pompada küçük bir hız düşüşü güçte büyük bir düşüş getirir [2].
 - Tork: pompa ve fanlar değişken tork uygulamasıdır; bu uygulamada düşük hızda motor için ek soğutma ya da akım düşürme gerekmez [1].
+- Enerji: santrifüj fan ve pompada küçük bir hız düşüşü güçte büyük bir düşüş getirir [2].
+- Ortam: yüksek ortam sıcaklığı, yüksek rakım ve uzun motor kablosu akım düşürme gerektirebilir [1].
+- Güç: FC 51 gerilim sınıfına göre 0,18 kW ile 22 kW, FC 101 0,25 kW ile 90 kW arasında güç sunar [2][6].
 
-Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
+## Frekans konvertörü seçiminde izlenecek yol
+
+1. Uygulamanın değişken tork mu sabit tork mu olduğunu belirleyin [1].
+2. Besleme gerilimine ve güç aralığına uygun aileyi seçin [2][4].
+3. Montaj yerinin sıcaklık, rakım ve kablo uzunluğu koşullarını kontrol edin; gerekiyorsa bir üst güç boyutunu seçin [1].
+4. Ortama uygun koruma sınıfını belirleyin [3][5].
+5. Kurulumu elektromanyetik uyumluluk ve topraklama kurallarına göre planlayın [1].
+6. Pompa sistemlerinde enerji tasarrufu hesabında statik basma yüksekliğini göz önüne alın [7].
 
 ## Frekans konvertörü nedir?
 
@@ -118,14 +127,14 @@ Frekans konvertörü, motor hızını değiştirebilen ya da yükteki değişime
 
 ## Frekans konvertörü nasıl çalışır?
 
-Bir frekans konvertörü temel biçiminde dört ana bölüme ayrılabilir: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
+Bir frekans konvertörü temel biçiminde dört ana bölüme ayrılabilir: doğrultucu, DC ara devre, invertör ve kontrol birimi [1].
 
-| Bölüm | Görevi |
+| Bölüm | Görevi [1] |
 |---|---|
-| Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir [1] |
-| DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler [1] |
-| İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
-| Kontrol birimi | Yazılım, donanımı çalıştırarak AC motoru kontrol eden ve düzenleyen değişken gerilimi üretir [1] |
+| Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir |
+| DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler |
+| İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir |
+| Kontrol birimi | Yazılım, donanımı çalıştırarak AC motoru kontrol eden ve düzenleyen değişken gerilimi üretir |
 
 İnvertör, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
 
@@ -143,7 +152,7 @@ Frekans konvertörü, fan ya da pompanın hızını dahili kontrolüyle değişt
 
 ## Frekans konvertörüyle yumuşak kalkış
 
-Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıldız/üçgen yol verici ya da yumuşak yol verici kullanılır; frekans konvertörü kullanıldığında bu ayrı yol vericilere gerek kalmaz [2][1]. Frekans konvertörü motoru kalkındırırken anma akımından fazla akım çekmez [2].
+Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıldız/üçgen yol verici ya da yumuşak yol verici kullanılır; frekans konvertörü kullanıldığında bu ayrı yol vericilere gerek kalmaz [1][2]. Frekans konvertörü motoru kalkındırırken anma akımından fazla akım çekmez [2].
 
 ## Değişken tork ve sabit tork uygulamaları
 
@@ -160,12 +169,14 @@ Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıl
 
 ## Danfoss FC 51, FC 101 ve FC 102 karşılaştırması
 
-| Özellik | FC 51 (VLT Micro Drive) | FC 101 (VLT HVAC Basic Drive) | FC 102 (VLT HVAC Drive) |
-|---|---|---|---|
-| Güç aralığı | 0,18–22 kW, gerilim sınıfına göre [6] | 0,25–90 kW [2] | Modele göre; ürün sayfasına bakınız |
-| Giriş | Tek faz 200–240 V; üç faz 200–240 V ve 380–480 V [4] | Üç faz 200–240 V, 380–480 V, 525–600 V [2] | Modele göre; ürün sayfasına bakınız |
-| Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] | Modele göre; ürün sayfasına bakınız |
-| Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] | Yerleşik PID kontrolü, pompa kademeleme [1] |
+| Özellik | FC 51 (VLT Micro Drive) | FC 101 (VLT HVAC Basic Drive) |
+|---|---|---|
+| Güç aralığı | 0,18–22 kW, gerilim sınıfına göre [6] | 0,25–90 kW [2] |
+| Giriş | Tek faz 200–240 V; üç faz 200–240 V ve 380–480 V [4] | Üç faz 200–240 V, 380–480 V, 525–600 V [2] |
+| Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] |
+| Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] |
+
+FC 102'nin (VLT HVAC Drive) 355–800 kW gövdelerinde yerleşik PID kontrolü ve pompa kademeleme bulunur [1].
 
 Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 101](vh:aile/danfoss-vlt-hvac-basic-drive-fc-101) ve [FC 102](vh:aile/danfoss-vlt-hvac-drive-fc-102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
 
@@ -173,23 +184,21 @@ Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 
 
 - **Uyku modu.** Debi düşük ya da sıfır olduğunda sürücü enerji tasarrufu için uyku moduna geçer; basınç ayar değerinin altına düştüğünde kendiliğinden yeniden başlar [3].
 - **Yangın modu.** Sürücünün kendini korumak için durmasını engeller; merdiven basınçlandırma, otopark egzoz fanları ve duman tahliyesi gibi uygulamalarda fanın çalışmasını sürdürür [3].
-- **Yerleşik PID kontrolü.** Kapalı çevrim sistemlerde basıncı, debiyi ya da sıcaklığı korumak için dış kontrol cihazına duyulan ihtiyacı ortadan kaldırır; iki ayrı cihazdan gelen iki geri besleme sinyaliyle çalışabilir [1].
+- **Yerleşik PID kontrolü.** FC 102'nin 355–800 kW gövdelerinde, kapalı çevrim sistemlerde basıncı, debiyi ya da sıcaklığı korumak için dış kontrol cihazına duyulan ihtiyacı ortadan kaldırır; iki ayrı cihazdan gelen iki geri besleme sinyaliyle çalışabilir [1].
 - **Otomatik enerji optimizasyonu.** FC 51'de HVAC uygulamalarında %5–15 enerji tasarrufu sağlar [6].
-- **Pompa kademeleme.** FC 102'nin temel kademe kontrolü, değişken hızlı bir pompaya ek olarak sabit hızlı pompaları sırayla devreye alır [1].
-
-FC 102 işlevleri için kaynak olarak kullanılan tasarım kılavuzu 355–800 kW gövdeleri kapsar [1]. Bu yüzden yerleşik PID kontrolünün ve pompa kademelemenin seçtiğiniz güçteki modelde bulunduğunu ürün belgesinden doğrulayın.
+- **Pompa kademeleme.** FC 102'nin 355–800 kW gövdelerinde temel kademe kontrolü, değişken hızlı bir pompaya ek olarak sabit hızlı pompaları sırayla devreye alır [1].
 
 ## Üç fazlı girişli frekans konvertörlerinde verimlilik şartı var mı?
 
 AB'nin 2019/1781 sayılı Komisyon Tüzüğü, 1 Temmuz 2021'den itibaren 0,12 kW ile 1000 kW arasındaki motorlarla kullanılan üç fazlı girişli değişken hız sürücülerinin güç kayıplarının IE2 verim düzeyine karşılık gelen en yüksek güç kaybını aşmamasını zorunlu kılar [8]. Tüzük 2021'de (EU) 2021/341 sayılı tüzükle değiştirildi; 24.01.2023 tarihli konsolide metinde sürücülere yönelik IE2 şartı ilk metindeki ifadesiyle yer alır [9].
 
-Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye duyarlı tasarım gereklilikleri, Sanayi ve Teknoloji Bakanlığı'nın 28 Nisan 2021 tarihli ve 31468 sayılı Resmî Gazete'de yayımlanan Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM: 2021/16) ile belirlenmiştir [10]. Tebliğ, 0,12 kW ile 1000 kW arasındaki motorlarla çalışan üç fazlı girişli değişken hız sürücülerini kapsar ve AB'nin 2019/1781 sayılı Komisyon Tüzüğü ile onu değiştiren 2021/341 sayılı tüzük esas alınarak hazırlanmıştır [10]. Tebliğin maddelerinin çoğu 15 Ağustos 2021'de yürürlüğe girmiştir; ilk metindeki 1 Temmuz 2021 tarihi, 29 Haziran 2021 tarihli değişiklik tebliğiyle (SGM: 2021/23) ertelenmiştir [10][12]. Bu nedenle Türkiye'deki başlangıç tarihi, AB tüzüğünün uygulandığı 1 Temmuz 2021'den farklıdır [8][12]. Tebliğ, 1 sayılı Cumhurbaşkanlığı Kararnamesi ile 2010/643 sayılı Bakanlar Kurulu Kararıyla yürürlüğe konulan yönetmeliğe dayanır [10].
+Türkiye'de 0,12 kW ile 1000 kW arasındaki motorlarla çalışan üç fazlı girişli değişken hız sürücüleri, 28 Nisan 2021 tarihli ve 31468 sayılı Resmî Gazete'de yayımlanan Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM: 2021/16) kapsamındadır; Tebliğ, AB'nin 2019/1781 sayılı Komisyon Tüzüğü ile onu değiştiren 2021/341 sayılı tüzük esas alınarak hazırlanmıştır [10]. Tebliğin sürücülere yönelik şartı, 29 Haziran 2021 tarihli değişiklik tebliğiyle (SGM: 2021/23) 15 Ağustos 2021'den itibaren uygulanır [10][12].
 
 ## Sürücü kurulumunda dikkat edilecekler
 
-- Motor kablosundaki hızlı gerilim değişimi (dU/dt), kablonun fazları ile ekranı ve ekran ile toprak arasında kaçak akımlar oluşturur; bu da sürücünün elektromanyetik yayılımını değiştirir [1].
 - Şebeke, motor ve kontrol kabloları birbirinden ayrı döşenmelidir; aksi hâlde istenmeyen davranış ya da düşük performans görülebilir [1].
-- Sürücüler için elektromanyetik uyumluluk kategorileri (C1–C4) EN/IEC 61800-3 standardında tanımlanır: C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Bu sınıflandırma Danfoss FC 102 tasarım kılavuzundan aktarılmıştır [1]. Standardın güncel baskısı ayarlanabilir hızlı sürücü sistemlerinin EMC gerekliliklerini tanımlar [11].
+- Motor kablosundaki hızlı gerilim değişimi (dU/dt), kablonun fazları ile ekranı ve ekran ile toprak arasında kaçak akımlar oluşturur; bu da sürücünün elektromanyetik yayılımını değiştirir [1].
+- Danfoss FC 102 tasarım kılavuzuna göre sürücülerin elektromanyetik uyumluluk kategorileri (C1–C4) EN/IEC 61800-3 standardında tanımlanır: C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Standardın güncel baskısı ayarlanabilir hızlı sürücü sistemlerinin EMC gerekliliklerini tanımlar [11].
 - Motor yatak akımlarını önlemek için tahrik ucu olmayan tarafta yalıtımlı rulman kullanılması ve sürücü, motor ile tahrik edilen makinenin doğru topraklanması önerilir [1].
 - Elektrik çarpmasına karşı kaçak akım koruma cihazı kullanılacaksa besleme tarafında yalnız Tip B cihaz kullanılmalıdır, çünkü sürücü toprak iletkeninde DC akım oluşturabilir [1].
 - Sürücü patlayıcı ortama kurulmamalıdır; gerekiyorsa bu alanın dışındaki bir panoya yerleştirilir [1].
@@ -204,40 +213,31 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 
 ## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
+Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. Doğru cihaz seçimi ve birebir karşılaştırılabilir teklif alabilmek için şu bilgileri paylaşmanız gerekir:
 
 - **Güç ve giriş gerilimi.** Aynı aile içinde modeli güç ve gerilim sınıfı belirler; örneğin FC 101 0,25 kW ile 90 kW arasında, üç fazlı 200–240 V, 380–480 V ve 525–600 V girişle üretilir [2].
 - **Koruma sınıfı ve kitler.** FC 101 IP20 ya da IP54 gövdeyle sunulur; IP21 isteğe bağlı bir kitle sağlanır [3].
 - **Montaj yerinin koşulları.** Yüksek ortam sıcaklığı, yüksek rakım, yüksek anahtarlama frekansı ya da uzun motor kablosu akım düşürme gerektirebilir; bu durumlarda bir güç boyutu büyük cihaz seçilmesi önerilir [1].
-- **Elektromanyetik uyumluluk kategorisi.** EN/IEC 61800-3'e göre C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir (Danfoss FC 102 tasarım kılavuzuna göre) [1]. Teklifteki cihazın, kurulacağı ortamın kategorisine uyduğuna bakın.
-- **Kurulum kalemleri.** Motor kablosunun türü ve uzunluğu (FC 51'de ekranlı kabloda azami 15 m, ekransız kabloda azami 50 m [4]), kaçak akım koruması kullanılacaksa besleme tarafındaki Tip B cihaz [1] ve şebeke, motor ve kontrol kablolarının ayrı döşenmesi [1].
-
-## Frekans konvertörü seçiminde izlenecek yol
-
-1. Uygulamanın değişken tork mu sabit tork mu olduğunu belirleyin [1].
-2. Besleme gerilimine ve güç aralığına uygun aileyi seçin [2][4].
-3. Montaj yerinin sıcaklık, rakım ve kablo uzunluğu koşullarını kontrol edin; gerekiyorsa bir üst güç boyutunu seçin [1].
-4. Ortama uygun koruma sınıfını belirleyin [3][5].
-5. Kurulumu elektromanyetik uyumluluk ve topraklama kurallarına göre planlayın [1].
-6. Pompa sistemlerinde enerji tasarrufu hesabında statik basma yüksekliğini göz önüne alın [7].
 
 ## Sık sorulan sorular
 
 ### Frekans konvertörü ile invertör aynı şey mi?
 
-Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. Bu en yaygın biçim, gerilim kaynaklı ve darbe genişlik modülasyonlu (PWM) frekans konvertörüdür; kaynak ona çoğu zaman yanlışlıkla invertör dendiğini de belirtir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
+İnvertör, frekans konvertörünün içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1]. Elektronik değişken hız sürücülerinin en yaygın biçimi gerilim kaynaklı ve darbe genişlik modülasyonlu (PWM) frekans konvertörüdür; pompa rehberi ona çoğu zaman yanlışlıkla invertör dendiğini belirtir [7].
 
 ### Frekans konvertörü ne kadar enerji tasarrufu sağlar?
 
-Tasarruf uygulamaya bağlıdır. Fan ve pompada hızı %20 azaltmak, üretici örneğinde elektrik tüketimini %50 azaltır [2]. FC 101 seçim kılavuzu da değişken tork uygulamalarında bu oranı tipik değer olarak verir [3]. Statik basma yüksekliği olan pompa sistemlerinde gerçek tasarruf ayrıca hesaplanmalıdır [7].
+Fan ve pompada hızı %20 azaltmak, üretici örneğinde elektrik tüketimini %50 azaltır [2]. FC 101 seçim kılavuzu da değişken tork uygulamalarında bu oranı tipik değer olarak verir [3]. Tasarruf uygulamaya bağlıdır. Statik basma yüksekliği olan pompa sistemlerinde gerçek tasarruf ayrıca hesaplanmalıdır [7].
 
 ### Frekans konvertörü motorda ses yapar mı?
 
-Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5].
+
+İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi)
 
 ### Yangın modunda frekans konvertörü fanı durdurur mu?
 
-FC 101'in yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3]. Bu cevap yalnız Danfoss FC 101 için kaynaklıdır; başka sürücülerin yangın modu davranışı o sürücünün kılavuzundan okunmalıdır.
+Danfoss FC 101'de yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3].
 
 ### Türkiye'de frekans konvertörleri için verimlilik şartı var mı?
 
@@ -245,7 +245,7 @@ Evet. AB tüzüğüne göre 1 Temmuz 2021'den beri üç fazlı girişli değişk
 
 ### Frekans konvertörü teklifi için hangi bilgileri paylaşmalıyım?
 
-Teklifin doğru cihaza dayanması için motorun gücü, besleme gerilimi ve faz sayısı [2][4], uygulamanın değişken tork mu sabit tork mu olduğu [1], montaj yerinin sıcaklığı ve rakımı ile motor kablosunun uzunluğu [1] ve istenen koruma sınıfı [3][5] gerekir. Bu bilgilerle aynı özellikteki cihazlar karşılaştırılabilir.
+Motorun gücü, besleme gerilimi ve faz sayısı [2][4], uygulamanın değişken tork mu sabit tork mu olduğu [1], montaj yerinin sıcaklığı ve rakımı ile motor kablosunun uzunluğu [1] ve istenen koruma sınıfı [3][5] gerekir.
 
 ## Kaynaklar
 
@@ -286,6 +286,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok
     guncellemeTarihi: '2026-11-17',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
@@ -302,29 +303,29 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Uygulamanıza hangi fan tipinin uyduğunu bu rehberde bulun.',
         govde: `# Radyal ve aksiyel fan farkı nedir?
 
-İki fan havayı farklı yönde hareket ettirir: aksiyel fanda hava fan ekseni boyunca ilerler, radyal (santrifüj) fanda ise hava radyal yönde hızlandırılır ve kinetik enerji basınca dönüşür [1]. Temiz, düşük basınçlı ve yüksek debili hava akımlarında çoğunlukla aksiyel fan; yüksek basınç gerektiren ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımlarında çoğunlukla radyal fan öne çıkar [1].
+Aksiyel fanda hava fan ekseni boyunca ilerler; radyal (santrifüj) fanda hava radyal yönde hızlandırılır ve kinetik enerji basınca dönüşür [1]. Temiz, düşük basınçlı ve yüksek debili hava akımlarında çoğunlukla aksiyel fan; yüksek basınç gerektiren ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımlarında çoğunlukla radyal fan öne çıkar [1].
 
 Kısaca:
 
-- Farklar: hava yönü, basınç ve debi, verim, ses, kirli hava ve boyut açısından ortaya çıkar [1].
-- Seçim: debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
-- Fan eğrisi: kayışlı bir radyal fan kataloğunda eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2].
-
-Aksiyel fan havayı pervane gibi fan ekseni doğrultusunda iter; radyal (santrifüj) fan ise havayı radyal yönde hızlandırıp kinetik enerjiyi basınca çevirir [1]. Pervane tipi aksiyel fanlar düşük basınçta yüksek debi üretir [1]; radyal düz kanatlı fanlar ise yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1]. Kısaca: temiz hava, düşük basınç ve yüksek debi çoğunlukla aksiyel fanı; yüksek basınç ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımı çoğunlukla radyal fanı öne çıkarır [1].
+- Aksiyel fan: benzer kapasiteli santrifüj fandan daha kompakt, hafif ve düşük maliyetlidir; çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildir [1].
+- Radyal fan: nispeten yüksek basınç üretebilir; nem ve parçacık içeriği yüksek hava akımlarında sık kullanılır [1].
+- Seçim: debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi çalışma koşulları önce aksiyel mi santrifüj mü gerektiğini belirler [1].
 
 ## Radyal ve aksiyel fan arasındaki farklar
 
-| Özellik | Aksiyel fan | Radyal (santrifüj) fan |
-|---|---|---|
-| Hava yönü | Hava fan eksenine paralel akar [1] | Hava akımı radyal yönde hızlandırılır [1] |
-| Basınç ve debi | Pervane tipi düşük basınçta yüksek debi üretir; tüp tipi orta basınç ve yüksek debide, kılavuz kanatlı tip orta ila yüksek basınçlı uygulamalarda kullanılır [1] | Radyal düz kanatlı fanlar düşük ve orta debide, yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1] |
-| Verim | Pervane tipi görece düşük verimlidir; havayarı profilli, küçük boşluklu kılavuz kanatlı tip %85'e kadar çıkar [1] | Öne eğik kanatta %55–65; havayarı profilli geriye eğik kanatta %85'in üzerine çıkabilir [1] |
-| Ses | Aynı debi için benzer bir santrifüj fandan daha hızlı dönmesi gerekir; bu yüzden bir ölçüde daha gürültülüdür, gürültü kolay sönümlenen yüksek frekanslarda yoğunlaşır [1] | Öne eğik kanatlı tip nispeten düşük devirde çalışabilir; bu düşük gürültü düzeyine karşılık gelir [1] |
-| Kirli hava | Genellikle temiz hava uygulamalarında kullanılır; toz, duman ve buhar gibi küçük parçacıklı egzoz akımlarında da sık kullanılır; kayışlı tahrikli aksiyel fanda motor hava akımının dışında kalır, bu doğrudan tahrikli aksiyel fana göre yüksek sıcaklıklı, kirli ya da korozif ortamda üstünlük olabilir [1] | Nem ve parçacık içeriği yüksek "kirli" hava akımlarında sık kullanılır; radyal düz kanat toz, odun talaşı ve metal hurdasına uygundur, öne eğik kanat genellikle temiz havayla sınırlıdır [1] |
-| Tipik kullanım | Temiz hava, düşük basınç, yüksek debi; çatı havalandırması (pervane tipi), kanallı HVAC ve egzoz (tüp tipi) [1] | Yüksek basınç, kirli hava akımları, malzeme taşıma, daha yüksek sıcaklıktaki sistemler [1] |
-| Boyut, ağırlık, maliyet | Benzer kapasiteli santrifüj fandan daha kompakt, hafif ve düşük maliyetlidir [1] | Benzer kapasiteli aksiyel fana göre daha fazla dönen kütleye sahiptir ve daha az kompakttır [1] |
+Radyal fan ile santrifüj fan aynı tür için kullanılır; "radyal düz" ve "radyal uçlu" ise santrifüj fanların kanat biçimleridir [1].
 
-Aksiyel ve santrifüj fanların basınç, debi ve verim yetenekleri kısmen çakışır; çoğunlukla birbirinin yerine kullanılamazlar [1]. Radyal fan ile santrifüj fan aynı tür için kullanılır; "radyal düz" ve "radyal uçlu" ise santrifüj fanların kanat biçimleridir [1].
+| Özellik | Aksiyel fan [1] | Radyal (santrifüj) fan [1] |
+|---|---|---|
+| Hava yönü | Hava fan eksenine paralel akar | Hava akımı radyal yönde hızlandırılır |
+| Basınç ve debi | Pervane tipi düşük basınçta yüksek debi üretir; tüp tipi orta basınç ve yüksek debide, kılavuz kanatlı tip orta ila yüksek basınçlı uygulamalarda kullanılır | Radyal düz kanatlı fanlar düşük ve orta debide, yüksek basınç gerektiren uygulamalarda yaygın kullanılır |
+| Verim | Pervane tipi görece düşük verimlidir; kanat profilli, küçük boşluklu kılavuz kanatlı tip %85'e kadar çıkar [1] | Öne eğik kanatta %55–65; kanat profilli geriye eğik kanatta %85'in üzerine çıkabilir [1] |
+| Ses | Aynı debi için benzer bir santrifüj fandan daha hızlı dönmesi gerekir; bu yüzden bir ölçüde daha gürültülüdür, gürültü kolay sönümlenen yüksek frekanslarda yoğunlaşır | Öne eğik kanatlı tip nispeten düşük devirde çalışabilir; bu düşük gürültü düzeyine karşılık gelir |
+| Kirli hava | Genellikle temiz hava uygulamalarında kullanılır; toz, duman ve buhar gibi küçük parçacıklı egzoz akımlarında da sık kullanılır | Nem ve parçacık içeriği yüksek "kirli" hava akımlarında sık kullanılır; radyal düz kanat toz, odun talaşı ve metal hurdasına uygundur, öne eğik kanat genellikle temiz havayla sınırlıdır |
+| Tipik kullanım | Temiz hava, düşük basınç, yüksek debi; çatı havalandırması (pervane tipi), kanallı HVAC ve egzoz (tüp tipi) | Yüksek basınç, kirli hava akımları, malzeme taşıma, daha yüksek sıcaklıktaki sistemler |
+| Boyut, ağırlık, maliyet | Benzer kapasiteli santrifüj fandan daha kompakt, hafif ve düşük maliyetlidir | Benzer kapasiteli aksiyel fana göre daha fazla dönen kütleye sahiptir ve daha az kompakttır |
+
+Aksiyel ve santrifüj fanların basınç, debi ve verim yetenekleri kısmen çakışır; çoğunlukla birbirinin yerine kullanılamazlar [1].
 
 ## Hangi durumda hangisi?
 
@@ -336,34 +337,56 @@ Seçim, debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi 
 - Toz, odun talaşı ya da metal hurdası taşıyan hava: radyal düz kanat; küçük parçacıklı ya da yüksek nemli hava: radyal uçlu kanat [1].
 - Çalışma koşulları geniş ölçüde değişiyorsa aksiyel fan özellikle uygun değildir; bazı santrifüj tipleri ise geniş çalışma koşullarına uyar [1].
 
+## Fan seçiminde izlenecek yol
+
+1. Sistemin gerektirdiği debiyi ve toplam basıncı belirleyin; sistem eğrisini çıkarın [1].
+2. Havanın nem ve parçacık içeriğini belirleyin; bunlar fan tipi seçiminde önemli etkenlerdir [1].
+3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
+4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
+5. Fan girişindeki dirseği fana çok yakın yerleştirmeyin: girişten önce kanal çapının en az üç katı düz kanal bırakın, bu mümkün değilse giriş kutusu ya da akış düzeltici kullanın [1]. Çıkışta dirsek ve benzeri bağlantı parçalarını fandan yeterince uzağa yerleştirin [1].
+6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [4].
+7. Patlayıcı ortam söz konusuysa: (EU) 2024/1834 sayılı tüzüğün kapsam dışı koşulu, fanın yalnız o ortamda çalışmak üzere belirtilmiş ve bu amaçla özel olarak tasarlanıp pazarlanmış olmasıdır; bunu gösteren belgeyi üreticiden isteyin [5]. İlgili rehber: [Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?](vh:yazi/patlayici-ortamda-fan-secimi-atex).
+
 ## Radyal fan nedir ve nasıl çalışır?
 
-Santrifüj (radyal) fan, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımıdır [1]. Bu fan havayı radyal yönde hızlandırır ve kazandığı kinetik enerjiyi basınca dönüştürür [1]. Hava çark göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır; bu enerji, hava boşaltmaya girmeden önce yavaşlarken statik basınç artışına çevrilir [1]. Radyal fanlar nispeten yüksek basınç üretebilir; sıklıkla "kirli" hava akımlarında (yüksek nem ve parçacık içeriği), malzeme taşıma uygulamalarında ve daha yüksek sıcaklıktaki sistemlerde kullanılır [1]. Endüstride en yaygın kullanılan fan tipidir; yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına göre yapılabilir [1]. Öne eğik, radyal düz, radyal uçlu ve geriye eğik gibi kanat biçimleri vardır [1]. Bazı santrifüj tipleri geniş ölçüde değişen çalışma koşullarına hizmet edebilir; bu önemli bir avantajdır [1]. Radyal düz kanatlı tip dayanıklı yapısıyla endüstrinin iş atı sayılır [1]. VentHub'da bu fanları [radyal fanlar](vh:kategori/centrifugal-fans) kategorisinde inceleyebilirsiniz.
+Santrifüj (radyal) fan, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımıdır [1]. Hava çark göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır; bu enerji, hava boşaltmaya girmeden önce yavaşlarken statik basınç artışına çevrilir [1].
+
+Radyal fanlar nispeten yüksek basınç üretebilir [1]. Endüstride en yaygın kullanılan fan tipidir; yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına göre yapılabilir [1]. Sıklıkla nem ve parçacık içeriği yüksek "kirli" hava akımlarında, malzeme taşıma uygulamalarında ve daha yüksek sıcaklıktaki sistemlerde kullanılır [1]. Bazı santrifüj tipleri geniş ölçüde değişen çalışma koşullarına hizmet edebilir [1].
+
+VentHub'da bu fanları [radyal fanlar](vh:kategori/centrifugal-fans) kategorisinde inceleyebilirsiniz.
 
 ## Radyal fanlarda kanat tipleri
 
-Radyal fanlar kanat tipine göre öne eğik, radyal düz, radyal uçlu, geriye eğik gibi gruplara ayrılır [1]; kanat tipi verimi ve kirli havaya uygunluğu etkiler [1].
+Radyal fanlar kanat tipine göre öne eğik, radyal düz, radyal uçlu, geriye eğik gibi gruplara ayrılır; kanat tipi verimi ve kirli havaya uygunluğu etkiler [1].
 
 | Kanat tipi | Verim | Kirli ya da parçacıklı hava |
 |---|---|---|
 | Öne eğik | %55–65 [1] | Genellikle temiz hava uygulamalarıyla sınırlı [1] |
 | Radyal düz kanat | — | Toz, odun talaşı ve metal hurdası taşıyan hava akımlarına uygun [1] |
 | Radyal uçlu | %75'e kadar [1] | Küçük parçacıklı ve yüksek nemli hava akımlarına uygun [1] |
-| Geriye eğik, havayarı profilli | %85'in üzerine çıkabilir [1] | Düşük çarpma açısı kanatlarda birikmeye yol açabilir [1] |
+| Geriye eğik, kanat profilli | %85'in üzerine çıkabilir [1] | Düşük çarpma açısı kanatlarda birikmeye yol açabilir [1] |
 
-Geriye eğik kanatlı fanlarda en verimli olanlar havayarı profilli kanatlardır [1]. Bu kanatlar kaldırma kuvvetiyle çalıştığı için bu fan tipi tutunma kaybına (stall) bağlı kararsız çalışmaya karşı hassastır [1].
+Radyal düz kanatlı tip dayanıklı yapısıyla endüstrinin iş atı sayılır [1]. Geriye eğik kanatlı fanlarda en verimli olanlar kanat profilli kanatlardır [1]. Bu kanatlar kaldırma kuvvetiyle çalıştığı için bu fan tipi tutunma kaybına (stall) bağlı kararsız çalışmaya karşı hassastır [1].
 
 ## Aksiyel fan nedir ve nasıl çalışır?
 
-Aksiyel fan, havanın akışının çarkın dönme eksenine esas olarak paralel olduğu fandır; çark silindirik bir gövdenin içindedir [1]. Adından anlaşılacağı gibi havayı fanın ekseni boyunca hareket ettirir; hava, kanatların oluşturduğu aerodinamik kaldırma kuvvetiyle basınçlandırılır, tıpkı pervane ve uçak kanadı gibi [1]. Aksiyel fanlar bazen santrifüj fanlarla birbirinin yerine kullanılabilse de genellikle "temiz hava", düşük basınç ve yüksek debi uygulamalarında kullanılır [1]. Benzer kapasiteli santrifüj fanlardan daha az dönen kütleye sahiptir ve daha kompakttır [1]. Daha yüksek devirde çalışma eğilimindedir ve aynı kapasitedeki kanal içi santrifüj fanlardan biraz daha gürültülüdür; bu gürültü yüksek frekanslarda yoğunlaşır ve daha kolay sönümlenir [1]. Pervane tipi, tüp tipi ve kılavuz kanatlı olmak üzere üç temel türü vardır [1]. Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu nedenle çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildirler; birçok aksiyel fanda bu sorun, tutunma kaybını önleyici donanımlı bir fan seçilerek çözülebilir [1]. VentHub'da bu fanları [aksiyel fanlar](vh:kategori/axial-industrial-fans) kategorisinde inceleyebilirsiniz.
+Aksiyel fan, havanın akışının çarkın dönme eksenine esas olarak paralel olduğu fandır; çark silindirik bir gövdenin içindedir [1]. Hava, kanatların oluşturduğu aerodinamik kaldırma kuvvetiyle basınçlandırılır, tıpkı pervane ve uçak kanadı gibi [1].
+
+Aksiyel fanlar bazen santrifüj fanlarla birbirinin yerine kullanılabilse de genellikle "temiz hava", düşük basınç ve yüksek debi uygulamalarında kullanılır [1]. Daha yüksek devirde çalışma eğilimindedir ve aynı kapasitedeki kanal içi santrifüj fanlardan biraz daha gürültülüdür; bu gürültü yüksek frekanslarda yoğunlaşır ve daha kolay sönümlenir [1].
+
+Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu nedenle çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildirler [1]. Birçok aksiyel fanda bu sorun, tutunma kaybını önleyici donanımlı bir fan seçilerek çözülebilir [1].
+
+VentHub'da bu fanları [aksiyel fanlar](vh:kategori/axial-industrial-fans) kategorisinde inceleyebilirsiniz.
 
 ## Aksiyel fan türleri
 
+Aksiyel fanın pervane tipi, tüp tipi ve kılavuz kanatlı olmak üzere üç temel türü vardır [1].
+
 - **Pervane tipi.** Düşük basınçta yüksek debi üretir; görece düşük verimlidir ama basit yapısı sayesinde ucuzdur [1].
 - **Tüp tipi (tubeaxial).** Orta basınç ve yüksek debi gerektiren uygulamalarda kullanılır ve kanallı HVAC tesisatına uygundur [1]. Motora doğrudan bağlanabildiği gibi kayışla da tahrik edilebilir [1].
-- **Kılavuz kanatlı (vaneaxial).** Esasen tüp tipi bir fanın çıkışına, akışı düzelten ve havanın kinetik enerjisini basınca çeviren kanatlar eklenmiş hâlidir [1]. Havayarı profilli kanatlar ve küçük boşluklarla üretildiğinde verimi %85'e kadar çıkabilir [1].
+- **Kılavuz kanatlı (vaneaxial).** Esasen tüp tipi bir fanın çıkışına, akışı düzelten ve havanın kinetik enerjisini basınca çeviren kanatlar eklenmiş hâlidir [1]. Kanat profilli kanatlar ve küçük boşluklarla üretildiğinde verimi %85'e kadar çıkabilir [1].
 
-Tahrik biçimi de seçimi etkiler: doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1].
+Tahrik biçimi de seçimi etkiler. Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1]. Kayışlı tahrikli aksiyel fanda motor hava akımının dışında kalır; bu, doğrudan tahrikli aksiyel fana göre yüksek sıcaklıklı, kirli ya da korozif ortamda üstünlük olabilir [1].
 
 ## Radyal ve aksiyel fanların kullanım alanları
 
@@ -382,54 +405,60 @@ Radyal fanlar:
 - Malzeme taşıma ve daha yüksek sıcaklıktaki sistemler: santrifüj fanlar [1].
 - Otopark: geriye kıvrık metal kanatlı santrifüj çarklı indüksiyon tipi jet fanlar kullanılır [4].
 
-Tipten bağımsız not:
-
-- Duman tahliyesi: yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir [4].
+Tipten bağımsız olarak, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir [4].
 
 ## Fan debisi nedir ve kılavuzda hangi birimle verilir?
 
-Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp; 1 cfm yaklaşık 1,70 m³/h) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1]. Kılavuz basıncı inç su sütunu (in. wg; 1 in. wg yaklaşık 249 Pa) ile verir [1]; üretici katalogları ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
+Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp; 1 cfm yaklaşık 1,70 m³/h) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Kılavuz basıncı inç su sütunu (in. wg; 1 in. wg yaklaşık 249 Pa) ile verir [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1].
+
+Üretici kataloglarını ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
 
 ## Fan eğrisi nasıl okunur?
 
-Fan eğrisi, fanın ürettiği basıncın ve gereken gücün fanın geçirebildiği hava debisi aralığı boyunca çizildiği grafiktir [1]. Kayışlı bir radyal fan kataloğunda eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
+Fan eğrisi, fanın ürettiği basıncın ve gereken gücün fanın geçirebildiği hava debisi aralığı boyunca çizildiği grafiktir [1]. Kayışlı bir radyal fan kataloğunda eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir; bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
 
-Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Sistem eğrisi, sistemin bileşenlerindeki kayıpların toplanmasıyla hesaplanır [1]. Kılavuza göre fan, sistem eğrisinin fan eğrisini en yüksek verim noktasının yakınında olmayan bir noktada kesmesi nedeniyle verimsiz çalışabilir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1]. Radyal düz kanatlı fanlarda tutunma kaybı sorunları diğer fanlara göre daha az görülür [1]. Çalışma koşulları geniş ölçüde değişen sistemlerde aksiyel fan özellikle uygun değildir, çünkü şiddetli bir tutunma kaybı bölgesi vardır [1]; tutunma kaybı öne eğik ve geriye eğik santrifüj fanlarda da şiddetli olabilir [1].
+Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir; sistemin bileşenlerindeki kayıpların toplanmasıyla hesaplanır [1]. Kılavuza göre:
+
+- Sistem eğrisi fan eğrisini en yüksek verim noktasının yakınında olmayan bir noktada keserse fan verimsiz çalışabilir [1].
+- Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1].
+- Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1].
+
+Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; tutunma kaybı öne eğik ve geriye eğik santrifüj fanlarda da şiddetli olabilir [1]. Radyal düz kanatlı fanlarda tutunma kaybı sorunları diğer fanlara göre daha az görülür [1].
 
 ## Toplam basınç artışı ile statik basınç artışı nasıl ilişkilidir?
 
-Kayışlı bir santrifüj fan kataloğunda eğriler fanın toplam basınç artışını gösterir [2]. Çıkıştaki dinamik basınç, fan çıkışındaki flanşlı kesit alanına göre alınır [2]. Fan çıkışına kanal takılıysa statik basınç artışı, toplam basınç artışından çıkıştaki dinamik basıncın çıkarılmasıyla bulunur; kanal yoksa (serbest çıkış) dinamik basınç, serbest çıkış için verilen bir düzeltme katsayısıyla çarpılarak çıkarılır [2]. Bu, ilgili fan serisi için verilen hesap yöntemidir; başka kataloglarda gösterim ve katsayılar farklı olabilir.
+Kayışlı bir santrifüj fan kataloğunda eğriler fanın toplam basınç artışını gösterir [2]. Çıkıştaki dinamik basınç, fan çıkışındaki flanşlı kesit alanına göre alınır [2]. Statik basınç artışı şöyle bulunur:
+
+- Fan çıkışına kanal takılıysa toplam basınç artışından çıkıştaki dinamik basınç çıkarılır [2].
+- Kanal yoksa (serbest çıkış) dinamik basınç, serbest çıkış için verilen bir düzeltme katsayısıyla çarpılarak çıkarılır [2].
+
+Bu, ilgili fan serisi için verilen hesap yöntemidir; başka kataloglarda gösterim ve katsayılar farklı olabilir.
 
 ## Fanı en yüksek verim noktasına yakın seçin
 
-Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve onarımlar arasındaki süreyi uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1]. Fan devri düşürüldüğünde debi devirle doğrusal, basınç devrin karesiyle, güç devrin küpüyle değişir [1].
+Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve onarımlar arasındaki süreyi uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1].
+
+Fan devri düşürüldüğünde debi devirle doğrusal, basınç devrin karesiyle, güç devrin küpüyle değişir [1].
 
 ## Montaj, hava yoğunluğu ve ses
 
-Fan çıkışına yakın konumlandırılmış bir dirsek, iletilen debiyi %30'a kadar azaltan bir sistem etkisi yaratabilir [1]. Fan eğrilerinin çoğu standart hava yoğunluğu varsayımıyla çizilir; ölçülen statik basınç, gerçek hava yoğunluğu ile eğrinin çizildiği yoğunluk arasındaki farka göre düzeltilmelidir [1]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+Fan çıkışına yakın konumlandırılmış bir dirsek, iletilen debiyi %30'a kadar azaltan bir sistem etkisi yaratabilir [1]. Fan eğrilerinin çoğu standart hava yoğunluğu varsayımıyla çizilir; ölçülen statik basınç, gerçek hava yoğunluğu ile eğrinin çizildiği yoğunluk arasındaki farka göre düzeltilmelidir [1].
 
-## Fan seçiminde izlenecek yol
-
-1. Sistemin gerektirdiği debiyi ve toplam basıncı belirleyin; sistem eğrisini çıkarın [1].
-2. Havanın nem ve parçacık içeriğini belirleyin; bunlar fan tipi seçiminde önemli etkenlerdir [1].
-3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
-4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
-5. Fan girişindeki dirseği fana çok yakın yerleştirmeyin: girişten önce kanal çapının en az üç katı düz kanal bırakın, bu mümkün değilse giriş kutusu ya da akış düzeltici kullanın; çıkışta dirsek ve benzeri bağlantı parçalarını fandan yeterince uzağa yerleştirin [1].
-6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [4]; patlayıcı ortam söz konusuysa, tüzüğün kapsam dışı koşulu fanın yalnız o ortamda çalışmak üzere belirtilmiş ve bu amaçla özel olarak tasarlanıp pazarlanmış olması olduğundan, bunu gösteren belgeyi üreticiden isteyin [5].
+İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
 
 ## Sık sorulan sorular
 
 ### Radyal fan mı daha verimli, aksiyel fan mı?
 
-Tipe bağlıdır. Havayarı profilli geriye eğik radyal fanlarda verim %85'in üzerine çıkabilir [1]. Havayarı profilli, küçük boşluklu kılavuz kanatlı aksiyel fanlar da %85'e kadar verime ulaşabilir [1]. Öne eğik radyal fanlarda verim %55–65 aralığındadır [1].
+Tipe bağlıdır. Kanat profilli geriye eğik radyal fanlarda verim %85'in üzerine çıkabilir [1]. Kanat profilli, küçük boşluklu kılavuz kanatlı aksiyel fanlar da %85'e kadar verime ulaşabilir [1]. Öne eğik radyal fanlarda verim %55–65 aralığındadır [1].
 
 ### Aksiyel fan kanala takılır mı?
 
-Tüp tipi aksiyel fanlar kanallı HVAC tesisatına uygundur [1]. Sanayi havalandırma kataloğunda uzun gövdeli kanallı aksiyel fanlar bulunur; kanatları fan durdurulmuşken ayarlanabilir [3].
+Evet; tüp tipi aksiyel fanlar kanallı HVAC tesisatına uygundur [1]. Sanayi havalandırma kataloğunda uzun gövdeli kanallı aksiyel fanlar bulunur; kanatları fan durdurulmuşken ayarlanabilir [3].
 
 ### Fan eğrisindeki verim her devirde geçerli mi?
 
-Katalogda verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
+Kayışlı bir radyal fan kataloğunda diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
 
 ### Fazla büyük fan seçmenin zararı ne?
 
@@ -437,15 +466,26 @@ Büyük seçilen fan en yüksek verim noktasından uzakta çalışabilir; çalı
 
 ### Fanlar için 327/2011 sayılı AB tüzüğü hâlâ geçerli mi?
 
-Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır. (EU) 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [5]; eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [7]. Türkiye'de tebliğin diğer hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [6]. Türkiye'de eski tebliğin ekleri ise entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
+Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır.
+
+- AB'de: (EU) 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [5]. Eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [7].
+- Türkiye'de: tebliğin diğer hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [6]. Eski tebliğin ekleri ise entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
 ## VentHub'da hangi radyal ve aksiyel fan serileri var?
 
-Nicotra Gebhardt'ın radyal fan serileri [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarındadır. Aksiyel tarafta Vortice'nin [Vorticel E serisi](vh:aile/vortice-aksiyel-endustriyel-fanlar) düşük basınçlı plaka tipi aksiyel fan serisidir [3]. Diğer fanları [radyal fanlar](vh:kategori/centrifugal-fans), [aksiyel fanlar](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde bulabilirsiniz. İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
+Nicotra Gebhardt'ın radyal fan serileri [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarındadır. Aksiyel tarafta Vortice'nin [Vorticel E serisi](vh:aile/vortice-aksiyel-endustriyel-fanlar) düşük basınçlı plaka tipi aksiyel fan serisidir [3]. Diğer fanları [radyal fanlar](vh:kategori/centrifugal-fans), [aksiyel fanlar](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde bulabilirsiniz.
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
 
 ## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifin doğru fana dayanması için gerekli debi ve toplam basıncı [1], havanın temiz ya da parçacıklı olup olmadığını [1], taşınan havanın sıcaklığı ve yoğunluğunu [1][2], montaj yerindeki bağlantı düzenini [1] ve patlayıcı ortam ya da duman tahliyesi gibi özel bir kullanım olup olmadığını [4][5] bildirin.
+Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifin doğru fana dayanması için şunları bildirin:
+
+- Gerekli debi ve toplam basınç [1].
+- Havanın temiz ya da parçacıklı olduğu [1].
+- Taşınan havanın sıcaklığı ve yoğunluğu [1][2].
+- Montaj yerindeki bağlantı düzeni [1].
+- Patlayıcı ortam ya da duman tahliyesi gibi özel bir kullanım olup olmadığı [4][5].
 
 ## Kaynaklar
 
@@ -457,7 +497,7 @@ Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğme
 4. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
 5. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, md. 1(3), 9, 10, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
 6. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2), md. 1, 10–12, geçici md. 1. https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 11.10.2026)
-7. Avrupa Komisyonu, (AB) 2025/2481 sayılı Komisyon Tüzüğü (2024/1834'ü değiştiren tüzük), madde 1(4), Resmî Gazete (OJ L, 8.12.2025); metin EUR-Lex'ten alınan iki yerel kopyadan (HTML ve metin dışa aktarımı) okundu ve madde 9(1) bakımından Resmî Gazete metninin bir PDF kopyasıyla karşılaştırıldı, üçünde de aynıdır; EUR-Lex'in canlı sayfası 3 Kasım 2026'da bot doğrulaması verdiği için yeniden doğrulanamadı: http://data.europa.eu/eli/reg/2025/2481/oj
+7. Avrupa Komisyonu, (AB) 2025/2481 sayılı Komisyon Tüzüğü (2024/1834 sayılı tüzüğü değiştiren tüzük), madde 1(4), Resmî Gazete (OJ L, 8.12.2025). http://data.europa.eu/eli/reg/2025/2481/oj (erişim 17.11.2026)
 
 ## Teknik sorumluluk notu
 
@@ -484,6 +524,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-09 (BLG-63): AB-327/2011 durumu kayıtta "geçiş döneminde" oldu; "bu Tüzük yürürlükten kalkmış" yerine "bu Tüzük'ün genel hükümleri yürürlükten kalkmış". Tek cümle; tarihler ve kaynaklar aynı. Önceki değer: 2026-11-08.
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: yazı R3.4 üslup kurallarıyla yeniden yazıldı (pilot); şerh, kendinden söz, tekrar ve ekotasarım takvimi çıktı, yeni iddia yok.
+    // BLG-81: yazı okur sorusu sırasıyla yeniden kuruldu (kontrol listesi başa, tutanak gösterimi ve tek cümlelik bölüm çıktı); yeni iddia, sayı, kaynak yok.
+    // BLG-81 tur 2: doğrulayıcı bulguları işlendi (Vortice/Lineo kaydı ve koşullar geri kondu; iki H2 eski adıyla korundu).
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
@@ -496,111 +538,110 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Ses değerini hangi koşulda okuyacağınızı bu rehberde bulun.',
         govde: `# Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü
 
-Sessiz kanal fanı seçerken önce katalogdaki ses değerinin hangi koşulda verildiğine bakılır; Vortice Lineo Quiet kataloğunda aynı modelin sesi ayar noktasına ve yola (emiş, üfleme, gövde) göre değişir [2]. Ses basıncı düzeyi belirli bir noktadaki sesi, ses gücü düzeyi kaynağın yaydığı sesi gösterir [1].
+Sessiz kanal fanı seçerken fanın sürekli çalışacağı ayardaki ses değerine bakılır: Vortice Lineo Quiet kataloğunda aynı modelin sesi ayar noktasına ve yola (emiş, üfleme, gövde) göre değişir [2]. Bu katalogda ses basıncı 3 m mesafede, serbest alanda hesaplanır [2]; Binaların Gürültüye Karşı Korunması Hakkında Yönetmeliğin sınırı odada ölçülen düzey içindir [1].
 
 Kısaca:
 
-- Sessiz fan: izin verilen gürültü düzeyi mekâna göre değişir [1].
-- Koşul: katalogdaki ses basıncı 3 m mesafede, serbest alanda hesaplanır [2].
-- Yeterli değer: Yönetmeliğin sınırı odada ölçülen LAeq,nT değeri içindir [1].
-- Ayar noktası: Lineo 100 Quiet ES'te kataloğun verdiği en düşük ve en yüksek ayar noktası (4 V ve 10 V) arasında üfleme sesi 20,1 dB(A), gövde sesi 21,0 dB(A), emiş sesi 17,9 dB(A) değişir [2].
+- Hedef: yeni binada en az C sınıfı aranır; bu sınıfta sürekli gürültü üreten servis ekipmanı için konutta gece yatak odası sınırı 30 dB'dir [1].
+- Hız: Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken 3 m'deki gövde yayını 30,9 dB(A)'dan 9,9 dB(A)'ya düşer [2].
+- Boyut: fazla büyük seçilen fan yüksek hava akımı gürültüsü oluşturur [4].
+- Montaj: fan ve kanal bağlantılarında titreşim yalıtımı kullanılır [1].
 
-Katalogda ses değeri yol (emiş, üfleme, gövde), ayar noktası ve mesafe koşuluyla birlikte verilir [2]. Örneğin Lineo 100 Quiet ES için gövde yayını 9,9 dB(A) · 4 V · gövde, 3 m ile 30,9 dB(A) · 10 V · gövde, 3 m arasındadır [2].
+## Sessiz kanal fanı seçerken kontrol listesi
+
+1. Hedefi odada ölçülecek düzey olarak koyun [1].
+2. Fanın sürekli çalışacağı ayar noktasının satırını okuyun; düşük ve yüksek ayar arasındaki ses farkı modele göre değişir [2].
+3. Ses değerinin koşulunu okuyun: yol (emiş, üfleme, gövde), ayar noktası ve mesafe [2].
+4. Gereğinden büyük fan seçmeyin; fazla büyük fan yüksek hava akımı gürültüsü üretir [4].
+5. Fanı ve kanal bağlantılarını titreşim yalıtımıyla kurun; fan kutusunun tavan panosuna ve taşıyıcıya doğrudan değmemesine dikkat edin [1][4].
+6. Kanal tasarımında kanal içi gürültü düzeyini hesaplatın; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1].
+7. Hız kumandası seçeneklerine bakın: 0–10 V sinyali, hız seçici ya da hız ayarlayıcı [2].
 
 ## Sessiz fan nedir?
 
 Vortice, Lineo Quiet'i yaydığı sesi azaltmak için tasarladığını belirttiği bir kanal fanı olarak tanıtır [2]. Lineo Quiet ürünlerinde ses emici kaplama dış gövdeye bütünleşiktir ve çevreye yayılan ses emisyonunu en aza indirmek için optimize edilmiştir [2].
 
-Lineo Quiet modellerinde fan sesi dB(A) ile verilir [2]. Binaların Gürültüye Karşı Korunması Hakkında Yönetmeliğe göre A-ağırlıklı ses basınç düzeyi (dBA), insan işitme sisteminin düşük basınçlı seslere karşı en çok hassas olduğu orta ve yüksek frekanslara daha fazla ağırlık veren A-ağırlık şebekesi yardımıyla elde edilen tek sayılı bir ses düzeyi birimidir [1].
-
-İzin verilen gürültü düzeyi mekâna göre değişir: Yönetmelikte servis ekipmanından kaynaklanan gürültü için mekâna ve akustik performans sınıfına göre ayrı değerler verilir; servis ekipmanı, ısıtma ve iklimlendirme sistemlerini de kapsayan teknik donatılar olarak tanımlanır [1].
-
-Dünya Sağlık Örgütü'nün (WHO) 1999 tarihli topluluk gürültüsü rehberinde yatak odası iç mekân değeri, uyku bölünmesini önlemek için sürekli gürültüde 30 dB LAeq, tek tek ses olaylarında 45 dB LAmax'tır [3]. Gürültüde düşük frekanslı bileşenler çoksa değerlerin kılavuz değerlerden de düşük olması gerekir [3].
+Lineo Quiet modellerinde fan sesi dB(A) ile verilir [2]. dB(A), insan işitme sisteminin en çok hassas olduğu orta ve yüksek frekanslara daha fazla ağırlık veren, tek sayılı bir ses düzeyi birimidir [1].
 
 ## Ses gücü ile ses basıncı arasındaki fark nedir?
 
-Yönetmeliğe göre ses basıncı düzeyi (Lp), ortamda belli bir noktada ölçülen ses basıncının 20 µPa referans ses basıncına oranından hesaplanan ve dB cinsinden verilen değerdir [1]. Ses gücü düzeyi (Lw) ise ses kaynağının yaydığı ses gücünün 10⁻¹² watt referans ses gücüne oranından hesaplanan değerdir [1].
+Ses gücü düzeyi (Lw) kaynağın yaydığı sesi, ses basıncı düzeyi (Lp) ortamda belli bir noktada ölçülen sesi gösterir [1]. Vortice kataloğunda iki büyüklük ayrı verilir: Lineo Quiet için ses gücü Lw dB(A) ile, ses basıncı Lp dB(A) ile gösterilir [2].
 
-Vortice kataloğunda iki büyüklük ayrı verilir: Lineo Quiet için ses gücü Lw dB(A) ile, ses basıncı Lp dB(A) ile gösterilir [2]. İlgili rehber: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
-
-Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelikte servis ekipmanından kaynaklanan iç gürültü sürekli ses için LAeq,nT, kesikli ses için LAF,max,nT göstergesiyle değerlendirilir [1].
-
-### Ses gücü beyanı
-
-Yönetmeliğe göre binalarda kullanılacak mekanik ve elektrik ekipmanın ses gücü düzeyinin ölçüldüğü standartla birlikte beyan edilmesi gerekir [1].
+Bina içindeki değerlendirme başka bir göstergeyle yapılır: Yönetmelikte servis ekipmanından kaynaklanan iç gürültü sürekli ses için LAeq,nT, kesikli ses için LAF,max,nT göstergesiyle değerlendirilir [1]. Binalarda kullanılacak mekanik ve elektrik ekipmanın ses gücü düzeyinin, ölçüldüğü standartla birlikte beyan edilmesi gerekir [1].
 
 ## Vortice kataloğunda ses değeri hangi koşulda verilir?
 
-Vortice kataloğunda ses basıncı 3 m mesafede, serbest alanda hesaplanmış olarak verilir [2]. Lineo Quiet teknik ve performans tablolarındaki veriler 50 Hz besleme içindir [2].
+Vortice kataloğunda ses basıncı 3 m mesafede, serbest alanda hesaplanmış olarak verilir [2]. Lineo Quiet modellerinde ses üç yol için ayrı verilir: emiş, üfleme ve gövde yayını [2]. ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar ayar noktası olarak okunur. Lineo Quiet teknik ve performans tablolarındaki veriler 50 Hz besleme içindir [2].
 
-Lineo Quiet modellerinde ses üç yol için ayrı verilir: INTAKE, SUPPLY ve BREAKOUT sütunları; bunlar emiş, üfleme ve gövde yayını olarak okunur [2].
+## Sessiz kanal fanında kaç dB(A) yeterli?
 
-Ses değeri şu sırayla okunur: önce değer, sonra ayar noktası, yol ve mesafe. Örnek: 9,9 dB(A) · 4 V · gövde, 3 m [2].
+Katalog değeri 3 m mesafede, serbest alanda hesaplanan ses basıncıdır [2]; Yönetmeliğin sınırı odada ölçülen LAeq,nT değeri içindir [1]. Sınır mekâna göre değişir: Yönetmeliğin EK-5 Tablo 5.1'inde sürekli gürültü üreten servis ekipmanı için iç gürültü sınırları mekâna, zaman dilimine ve akustik performans sınıfına göre verilir [1]. Servis ekipmanı, ısıtma ve iklimlendirme sistemlerini de kapsayan teknik donatılardır [1].
+
+C sınıfında sınır konutta gece yatak odası için 30 dB, yaşam alanı için 35 dB, büro özel odası için 40 dB'dir; D sınıfında bu değerler 34 dB, 39 dB ve 44 dB'dir [1].
+
+| Mekân | Zaman dilimi [1] | C sınıfı (dB) [1] | D sınıfı (dB) [1] |
+|---|---|---|---|
+| Konut, yatak odası | Gece (23.00–07.00) [1] | 30 | 34 |
+| Konut, yaşam alanı | 24 saat [1] | 35 | 39 |
+| Konut, mutfak | 24 saat [1] | 35 | 39 |
+| Konaklama, yatak odası | Gece (23.00–07.00) [1] | 30 | 34 |
+| Büro, özel oda | Gündüz–Akşam (07.00–23.00) [1] | 40 | 44 |
+| Büro, toplantı odası | Gündüz–Akşam (07.00–23.00) [1] | 35 | 39 |
+
+A sınıfı en yüksek, F sınıfı en düşük performansı gösterir [1]. Yeni yapılacak binalarda en az C, mevcut binalarda kullanım amacı değişirse ya da esaslı tadilat yapılırsa tadilatın etkilediği bağımsız birimlerde en az D sınıfı sağlanır [1].
+
+Yönetmelik uyarınca ölçümler, işletmeye alma aşamasında idarenin istemesi hâlinde TS EN ISO 10052 ve TS EN ISO 16032'ye göre yapılır; sonuçlar sınır değerlerden yüksek çıkarsa EK-8'deki önlemler uygulanır [1].
+
+Dünya Sağlık Örgütü'nün (WHO) 1999 tarihli topluluk gürültüsü rehberinde yatak odası iç mekân değeri, uyku bölünmesini önlemek için sürekli gürültüde 30 dB LAeq, tek tek ses olaylarında 45 dB LAmax'tır [3]. Gürültüde düşük frekanslı bileşenler çoksa değerlerin kılavuz değerlerden de düşük olması gerekir [3].
 
 ## Fanın sesini neler belirler?
 
 Endüstriyel havalandırma uygulamalarında bir fanın ürettiği gürültü fan tipine, debiye ve basınca bağlıdır [4]. Fazla büyük seçilen fanlar yüksek hava akımı gürültüsü oluşturur [4]. Yüksek kapasitede çalıştırılıp debisi kısılan fanın da yüksek gürültü üretme eğilimi vardır [4].
 
-Hız etkisi Lineo 100 Quiet ES (17170) değerlerinde görülür [2]. Ses basıncı 3 m mesafede, serbest alanda hesaplanmıştır [2]:
+Hızın etkisi Lineo 100 Quiet ES (17170) değerlerinde görülür (ses basıncı 3 m, serbest alan) [2]:
 
-| Ayar noktası [2] | Azami debi (m³/h) [2] | Üfleme Lp (dB(A)) [2] | Gövde Lp (dB(A)) [2] |
+| Ayar noktası (V) [2] | Azami debi (m³/h) | Üfleme (dB(A)) | Gövde (dB(A)) |
 |---|---|---|---|
-| 4 V [2] | 135 | 20,6 | 9,9 |
-| 6 V [2] | 175 | 26,1 | 15,9 |
-| 8 V [2] | 250 | 36,7 | 24,8 |
-| 10 V [2] | 300 | 40,7 | 30,9 |
+| 4 | 135 | 20,6 | 9,9 |
+| 6 | 175 | 26,1 | 15,9 |
+| 8 | 250 | 36,7 | 24,8 |
+| 10 | 300 | 40,7 | 30,9 |
 
-Bu modelde ayar 4 V'tan 10 V'a çıkarken debi 135 m³/h'ten 300 m³/h'e (yaklaşık 2,2 katı) yükselir; üfleme sesi 20,1 dB(A), gövde sesi 21,0 dB(A), emiş sesi 17,9 dB(A) artar [2].
+Bu modelde ayar 4 V'tan 10 V'a çıkarken azami debi 135 m³/h'ten 300 m³/h'e yükselir; üfleme sesi 20,6 dB(A)'dan 40,7 dB(A)'ya, gövde yayını 9,9 dB(A)'dan 30,9 dB(A)'ya çıkar [2].
 
-Fan tipi de sesin yapısını etkiler: aksiyel fanlar, aynı kapasitedeki hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır, yüksek frekanslar da genellikle daha kolay azaltılır [4].
+Fan tipi de sesi etkiler: aksiyel fanlar, aynı kapasitedeki hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır ve bunları azaltmak çoğu zaman daha kolaydır [4].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
 
 ## Kanal fanında sessizlik nasıl sağlanır?
 
-Yönetmelikte tesisat ve servis ekipmanlarından kaynaklanan gürültünün kontrolü için mekanik sistemlerde gürültü kontrolü kurallarının (EK-8) uygulanması öngörülür [1]. Bu kurallar fan seçimini, titreşim yalıtımını, kanal içi ses yalıtımını ve hız ayarını birlikte kapsar; fan sistemlerinde gürültü azaltma yöntemleri de aynı başlıkları destekler [1][4]. İlgili rehber: [Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar](vh:yazi/kanal-tipi-fan-nedir).
+Yönetmelikte tesisat ve servis ekipmanlarından kaynaklanan gürültünün kontrolü için mekanik sistemlerde gürültü kontrolü kurallarının (EK-8) uygulanması öngörülür [1]. Bu kurallar fan seçimini, titreşim yalıtımını, kanal içi ses yalıtımını ve hız ayarını birlikte kapsar [1].
 
-### Sessiz fan tipi seçimi ve yerleşimi
+### Fan seçimi ve yerleşimi
 
-EK-8'e göre gürültü emisyonu azaltılmış sessiz fan tipinin seçilmesine, hava akımı, fan hızı ve statik basınç ayarlarıyla gürültünün azaltılmasına ve fanın hava türbülansını azaltacak biçimde yönlendirilmesine dikkat edilmesi öngörülür [1]. Gürültüye çok hassas mekânların tavanında önlem alınmadan fan yerleştirilemez [1].
+EK-8'e göre gürültü emisyonu azaltılmış sessiz fan tipinin seçilmesine, gürültünün hava akımı, fan hızı ve statik basınç ayarlarıyla azaltılmasına ve fanın hava türbülansını azaltacak biçimde yönlendirilmesine dikkat edilir [1]. Gürültüye çok hassas mekânların tavanında önlem alınmadan fan yerleştirilemez [1].
 
-### Titreşim yalıtımı ve esnek yastık
+### Titreşim yalıtımı
 
-EK-8'e göre servis ekipmanlarının zemine bağlantılarında ve boru ile kanal bağlantılarında titreşim yalıtımı kullanılması gerekir [1]. Fan ve fancoil kutularının tavan panolarına ve ses köprüsü yapacak taşıyıcılara doğrudan temas etmemesi, arada esnek yastık kullanılması da aynı bölümdedir [1]. Fanın kauçuk gibi yumuşak bir malzemeye ya da uygun bir yay izolatörüne oturtularak aktarılan titreşim enerjisinin sınırlanması gürültü azaltma yöntemleri arasındadır [4].
+EK-8'e göre servis ekipmanlarının zemine bağlantılarında ve boru ile kanal bağlantılarında titreşim yalıtımı kullanılması gerekir [1]. Fan ve fancoil kutularının tavan panolarına ve ses köprüsü yapacak taşıyıcılara doğrudan temas etmemesi için arada esnek yastık kullanılır [1]. Fanın kauçuk gibi yumuşak bir malzemeye ya da uygun bir yay izolatörüne oturtulması aktarılan titreşim enerjisini sınırlar [4].
 
 ### Susturucu ve kanal içi ses yalıtımı
 
-TS EN ISO 7235, havalandırma kanalına monte edilen susturucular için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümlerini kapsar ve Yönetmeliğin ölçüm standartları listesindedir [1]. Yönetmeliğe göre kanal tasarımı sırasında kanal içi gürültü düzeyinin de hesaplanması gerekir; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Tablo 5.1, izin verilen en yüksek iç gürültü düzeylerini içerir [1]. Kanalı yalıtmak ve ses sönümleyici malzeme ya da bölme (baffle) kullanmak gürültü azaltma yöntemleri arasındadır [4].
+Yönetmeliğe göre kanal tasarımı sırasında kanal içi gürültü düzeyinin de hesaplanması gerekir; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Tablo 5.1, izin verilen en yüksek iç gürültü düzeylerini içerir [1]. Kanalı yalıtmak ve ses sönümleyici malzeme ya da bölme (baffle) kullanmak gürültü azaltma yöntemleri arasındadır [4]. Havalandırma kanalına monte edilen susturucuların eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
 
-### Hız kumandası ve devir ayarı
+### Hız kumandası
 
-Lineo Quiet ES sürümü iki hızlı, elektronik kontrollü EC fırçasız motorludur; her hız kurulumda ayarlanır, cihaz alternatif olarak tek hızda çalışabilir ve bu hız kullanıcı tarafından 0–10 V sinyaliyle ayarlanır [2]. AC sürümlü Lineo Quiet'te motor modele göre 2 ya da 3 hızlıdır [2]. Hız kontrolü için AC modellerde TRIO-LINEO 503 üç hız seçici, C5 0.5 ve C 1.5 hız ayarlayıcıları, yalnız Ø250 ve Ø315 modeller için de C 2.5 hız ayarlayıcısı; ES modellerde POT-IT ve POT potansiyometreleri kumanda olarak verilir [2]. Katalogda bu kumandalar SPEED SELECTOR (hız seçici), SPEED CONTROLLER (hız ayarlayıcı) ve POTENTIOMETER (potansiyometre) adlarıyla verilir [2]. Değişken hız sürücüleri (VFD) düşük sistem talebinde hava akımı gürültüsünü azaltır [4]. İlgili rehber: [Frekans konvertörü nedir, fan ve pompada nasıl seçilir?](vh:yazi/frekans-konvertoru)
+Lineo Quiet ES sürümü iki hızlı, elektronik kontrollü EC fırçasız motorludur; her hız kurulumda ayarlanır, cihaz alternatif olarak tek hızda çalışabilir ve bu hız kullanıcı tarafından 0–10 V sinyaliyle ayarlanır [2]. AC sürümlü Lineo Quiet'te motor modele göre 2 ya da 3 hızlıdır [2]. Değişken hız sürücüleri (VFD) düşük sistem talebinde hava akımı gürültüsünü azaltır [4].
 
-
-## Sessiz kanal fanında kaç dB(A) yeterli?
-
-Katalog değeri 3 m mesafede, serbest alanda hesaplanan ses basıncıdır [2]; Yönetmeliğin sınırı odada ölçülen LAeq,nT değeri içindir [1].
-
-Yönetmelikte sürekli gürültü üreten servis ekipmanı için konutta gece yatak odasında C sınıfında 30 dB, D sınıfında 34 dB; yaşam alanında 35 ve 39 dB; büro özel odasında 40 ve 44 dB değerleri odada ölçülen gürültü (LAeq,nT) olarak verilir [1]. Yönetmeliğin EK-5 Tablo 5.1'inde sürekli gürültü üreten servis ekipmanı için iç gürültü sınırları mekâna, zaman dilimine ve akustik performans sınıfına göre verilir; A sınıfı en yüksek, F sınıfı en düşük performansı gösterir [1]. Yeni yapılacak binalarda en az C, mevcut binalarda kullanım amacı değişirse ya da esaslı tadilat yapılırsa tadilatın etkilediği bağımsız birimlerde en az D sınıfı sağlanır [1].
-
-| Mekân [1] | Zaman dilimi [1] | C sınıfı, LAeq,nT [1] | D sınıfı, LAeq,nT [1] |
-|---|---|---|---|
-| Konut, yatak odası | Gece (23.00–07.00) | 30 dB [1] | 34 dB [1] |
-| Konut, yaşam alanı | 24 saat [1] | 35 dB [1] | 39 dB [1] |
-| Konut, mutfak | 24 saat [1] | 35 dB [1] | 39 dB [1] |
-| Konaklama, yatak odası | Gece (23.00–07.00) | 30 dB [1] | 34 dB [1] |
-| Büro, özel oda | Gündüz–Akşam (07.00–23.00) | 40 dB [1] | 44 dB [1] |
-| Büro, toplantı odası | Gündüz–Akşam (07.00–23.00) | 35 dB [1] | 39 dB [1] |
-
-Ölçümler, Yönetmelik uyarınca işletmeye alma aşamasında idarenin istemesi hâlinde TS EN ISO 10052 ve TS EN ISO 16032'ye göre yapılır; sonuçlar sınır değerlerden yüksek çıkarsa EK-8'deki önlemler uygulanır [1].
+İlgili rehber: [Frekans konvertörü nedir, fan ve pompada nasıl seçilir?](vh:yazi/frekans-konvertoru)
 
 ## Örnek: Vortice Lineo Quiet'in ses değerleri
 
-Vortice Lineo Quiet motor sürümü bakımından iki sürümle gelir: 2 ya da 3 hızlı AC motorlu Lineo Quiet ve EC fırçasız motorlu Lineo Quiet ES [2]. Vortice'ye göre Lineo ürün ailesi, konut, ticari ya da endüstriyel mekânların kanallı havalandırması için tasarlanmış karma akışlı kanal fanlarıdır; karma akışlı çark, helisel fanların yüksek debisi ile santrifüj fanların yüksek basıncının birleşimidir [2]. Susturmalı ürünlerde ses emici kabuk bakım sonunda yeniden takıldığında özgün ses performansının test koşullarında geri kazanıldığı katalogda belirtilir [2]. Tablolar Ø100, 125, 150, 200, 250 ve 315 mm modellerini içerir; katalogda ayrıca Ø160 modeller de bulunur [2].
+Vortice'ye göre Lineo ürün ailesi, konut, ticari ya da endüstriyel mekânların kanallı havalandırması için tasarlanmış karma akışlı kanal fanlarıdır; karma akışlı çark, helisel fanların yüksek debisi ile santrifüj fanların yüksek basıncının birleşimidir [2]. Lineo Quiet iki motor sürümüyle gelir: 2 ya da 3 hızlı AC motorlu Lineo Quiet ve EC fırçasız motorlu Lineo Quiet ES [2]. Aşağıdaki tablolar Ø100, 125, 150, 200, 250 ve 315 mm modellerini içerir; katalogda ayrıca Ø160 modeller de bulunur [2].
 
-Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar ayar noktası olarak okunur.
+EC motorlu Lineo Quiet ES, kataloğun verdiği en düşük ve en yüksek ayar noktası (ses basıncı 3 m, serbest alan) [2]:
 
-**EC motorlu Lineo Quiet ES, kataloğun verdiği en düşük ve en yüksek ayar noktası (4 V ve 10 V; ses basıncı 3 m, serbest alan) [2]:**
-
-| Model (kod) | Azami debi, ayar 4 V (m³/h) [2] | Üfleme Lp, 4 V (dB(A)) [2] | Gövde Lp, 4 V (dB(A)) [2] | Azami debi, ayar 10 V (m³/h) [2] | Üfleme Lp, 10 V (dB(A)) [2] | Gövde Lp, 10 V (dB(A)) [2] |
+| Model (kod) | Azami debi, 4 V (m³/h) [2] | Üfleme, 4 V (dB(A)) [2] | Gövde, 4 V (dB(A)) [2] | Azami debi, 10 V (m³/h) [2] | Üfleme, 10 V (dB(A)) [2] | Gövde, 10 V (dB(A)) [2] |
 |---|---|---|---|---|---|---|
 | Lineo 100 Quiet ES (17170) | 135 | 20,6 | 9,9 | 300 | 40,7 | 30,9 |
 | Lineo 125 Quiet ES (17171) | 180 | 21 | 11,3 | 380 | 40 | 28,7 |
@@ -609,9 +650,9 @@ Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar 
 | Lineo 250 Quiet ES (17175) | 750 | 37,3 | 24,7 | 1485 | 53,2 | 41 |
 | Lineo 315 Quiet ES (17176) | 1400 | 41,2 | 33,5 | 2630 | 54,5 | 48,3 |
 
-**AC motorlu Lineo Quiet, en düşük ve en yüksek hız (ses basıncı 3 m, serbest alan) [2]:**
+AC motorlu Lineo Quiet, en düşük ve en yüksek hız (ses basıncı 3 m, serbest alan) [2]:
 
-| Model (kod) | Azami debi, en düşük hız (m³/h) [2] | Üfleme Lp, en düşük hız (dB(A)) [2] | Gövde Lp, en düşük hız (dB(A)) [2] | Azami debi, en yüksek hız (m³/h) [2] | Üfleme Lp, en yüksek hız (dB(A)) [2] | Gövde Lp, en yüksek hız (dB(A)) [2] |
+| Model (kod) | Azami debi, en düşük hız (m³/h) | Üfleme, en düşük hız (dB(A)) | Gövde, en düşük hız (dB(A)) | Azami debi, en yüksek hız (m³/h) | Üfleme, en yüksek hız (dB(A)) | Gövde, en yüksek hız (dB(A)) |
 |---|---|---|---|---|---|---|
 | Lineo 100 Quiet (17160) | 150 | 22,5 | 16 | 260 | 35,1 | 28,4 |
 | Lineo 125 Quiet (17161) | 190 | 21,1 | 12,3 | 320 | 35 | 26,9 |
@@ -620,19 +661,11 @@ Katalogda ES modelleri 4, 6, 8 ve 10 V sütunlarıyla verilir [2]; bu sütunlar 
 | Lineo 250 Quiet (17165) | 960 | 43,7 | 32,2 | 1550 | 53,7 | 41,9 |
 | Lineo 315 Quiet (17166) | 2070 | 50,5 | 39,5 | 2890 | 57,4 | 47 |
 
-Aynı çapta Quiet olmayan Lineo ile karşılaştırma: Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet (17164) gövde yayını 35,5 dB(A) · en yüksek hız · gövde, 3 m, emiş tarafı 48 dB(A) · en yüksek hız · emiş, 3 m'dir; azami debisi 1160 m³/h'tir [2]. Lineo 200 (17180) için 3 m serbest alan koşulunda gövde yayını 46,9 dB(A), emiş tarafı 55,4 dB(A) ve azami debi 1135 m³/h olarak verilir [2]. Katalogdaki KG değeri de farklıdır: Lineo 200 Quiet 8,6 kg, Lineo 200 4,9 kg [2].
+Quiet olmayan Lineo ile fark aynı çapta görülür (ses basıncı 3 m, serbest alan): Ø200 AC modellerinde en yüksek hızda Lineo 200 Quiet (17164) gövdeden 35,5 dB(A), emişten 48 dB(A) ses verir ve azami debisi 1160 m³/h'tir; Lineo 200 (17180) gövdeden 46,9 dB(A), emişten 55,4 dB(A) ses verir ve azami debisi 1135 m³/h'tir [2].
 
-Ürün sayfasında genel bilgiler, modellerin teknik özellikleri ve model listesi bulunur: [Vortice Lineo Quiet kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari). Kanal içi kurulum için diğer modeller [kanal tipi fanlar](vh:kategori/duct-fans) kategorisindedir.
+Modellerin teknik özellikleri ve model listesi ürün sayfasındadır: [Vortice Lineo Quiet kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari). Kanal içi kurulum için diğer modeller [kanal tipi fanlar](vh:kategori/duct-fans) kategorisindedir.
 
-## Sessiz kanal fanı seçerken kontrol listesi
-
-1. Ses değerinin koşulunu okuyun: yol (emiş, üfleme, gövde), ayar noktası ve mesafe [2].
-2. Hedefi odada ölçülecek düzey olarak koyun [1].
-3. Fanın sürekli çalışacağı ayar noktasının satırını okuyun; düşük ve yüksek ayar arasındaki ses farkı modele göre değişir [2].
-4. Gereğinden büyük fan seçmeyin; fazla büyük fan yüksek hava akımı gürültüsü üretir [4].
-5. Fanı ve kanal bağlantılarını titreşim yalıtımıyla kurun; fan kutusunun tavan panosuna ve taşıyıcıya doğrudan değmemesine dikkat edin [1][4].
-6. Kanal tasarımında kanal içi gürültü düzeyini hesaplatın; EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]; ses sönümleyici malzeme ya da bölme (baffle) kullanmak da gürültü azaltma yöntemleri arasındadır [4].
-7. Hız kumandası seçeneklerine bakın: 0–10 V sinyali, hız seçici ya da hız ayarlayıcı [2].
+İlgili rehber: [Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar](vh:yazi/kanal-tipi-fan-nedir)
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -640,46 +673,46 @@ Güncel fiyat bilgisi için ürün sayfasından teklif isteyin.
 
 - **Kanal çapı ve debi.** Teklif için kanal çapı ve istenen debi bilinmelidir; Lineo Quiet modellerinin nominal çapı 100 ile 315 mm arasındadır ve azami debi çapla değişir [2].
 - **Motor sürümü.** AC ya da ES sürümünden hangisinin istendiği belirtilmelidir; AC sürümünde motor 2 ya da 3 hızlıdır, ES sürümünde motor elektronik kontrollü EC fırçasızdır [2].
-- **Hız kumandası.** Hangi hız kumandasının kullanılacağı belirtilmelidir; TRIO-LINEO 503, C5 0.5, C 1.5, C 2.5, POT-IT ve POT gibi kumanda ve ayarlayıcılar ayrı kodlu kumandalardır [2].
+- **Hız kumandası.** Hangi hız kumandasının kullanılacağı belirtilmelidir; AC modeller için hız seçici ve hız ayarlayıcılar, ES modeller için potansiyometreler ayrı kodlu kumandalardır [2].
 
 ## Sık sorulan sorular
 
 ### En sessiz kanal fanı hangisidir?
 
-Katalogda ses değeri model, ayar noktası, yol ve mesafeyle verilir [2].
+Lineo Quiet ailesinde en düşük ses basıncı Lineo 100 Quiet ES'in 4 V ayarındadır: gövdeden 9,9 dB(A), üflemeden 20,6 dB(A); bu ayarda azami debi 135 m³/h'tir [2]. Aynı model 10 V'ta 300 m³/h verir ve gövdeden 30,9 dB(A) ses yayar [2].
 
 ### Yatak odasında ve ofiste fan gürültüsü en çok kaç dB olabilir?
 
-Hedef mekâna bağlıdır [1]. Yönetmelikte sürekli gürültü için konutta gece yatak odasında C sınıfında 30 dB, D sınıfında 34 dB; büro özel odasında 40 ve 44 dB değerleri verilir [1]. WHO'nun 1999 değeri yatak odası için 30 dB LAeq ve 45 dB LAmax'tır [3]. Yönetmelikteki bu sınırlar odada ölçülen servis ekipmanı gürültüsüne uygulanır [1].
+Yönetmelikte sürekli gürültü için konutta gece yatak odasında C sınıfında 30 dB, D sınıfında 34 dB; büro özel odasında 40 ve 44 dB değerleri verilir [1]. Yeni yapılacak binalarda en az C sınıfı sağlanır [1]. Bu sınırlar odada ölçülen servis ekipmanı gürültüsüne uygulanır [1]. WHO'nun 1999 değeri yatak odası için 30 dB LAeq ve 45 dB LAmax'tır [3].
 
 ### Devri düşürünce fan sessizleşir mi?
 
-Katalog verilerine göre ayar düştükçe ses düşer: Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken gövde yayını 30,9 dB(A)'dan 9,9 dB(A)'ya düşer, azami debi 300 m³/h'ten 135 m³/h'e iner [2].
+Lineo Quiet'te katalog verilerine göre ayar düştükçe ses düşer: Lineo 100 Quiet ES'te ayar 10 V'tan 4 V'a inerken gövde yayını 30,9 dB(A)'dan 9,9 dB(A)'ya düşer, azami debi 300 m³/h'ten 135 m³/h'e iner [2].
 
 ### Kanal fanında susturucu gerekir mi?
 
-Yönetmeliğe göre kanal tasarımında kanal içi gürültü hesaplanır; EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Havalandırma kanalına monte edilen susturucular ve hava sonlandırma birimleri için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
+Yönetmeliğe göre kanal tasarımında kanal içi gürültü hesaplanır; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Havalandırma kanalına monte edilen susturucular ve hava sonlandırma birimleri için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
 
 ### Aksiyel fan mı santrifüj (radyal) fan mı daha sessizdir?
 
-Aynı kapasitede aksiyel fanlar, hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır, yüksek frekanslar da genellikle daha kolay azaltılır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4]. İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+Aynı kapasitede aksiyel fanlar, hat içi santrifüj fanlardan genellikle biraz daha gürültülüdür; bu gürültüde çoğunlukla yüksek frekanslar baskındır ve bunları azaltmak çoğu zaman daha kolaydır [4]. Seçim debi ve basınç gibi sistem ihtiyacına göre yapılır [4].
 
 ### Vortice Lineo Quiet kaç dB(A) ses çıkarır?
 
-Lineo Quiet modellerinde katalogdaki en düşük gövde değeri 9,9 dB(A) · 4 V · gövde, 3 m (Lineo 100 Quiet ES), en yüksek gövde değeri 48,3 dB(A) · 10 V · gövde, 3 m'dir (Lineo 315 Quiet ES) [2]. Bunlar gövde yayını değerleridir; aynı modelde 10 V'ta emiş yolu 56,5 dB(A) · 10 V · emiş, 3 m, üfleme yolu 54,5 dB(A) · 10 V · üfleme, 3 m'dir [2]. Lineo Quiet ailesinin en yüksek emiş değeri AC sürümünde Lineo 315 Quiet'in en yüksek hızında 58,4 dB(A) · en yüksek hız · emiş, 3 m'dir [2].
+Lineo Quiet modellerinde katalogdaki en düşük gövde değeri Lineo 100 Quiet ES'in 4 V ayarındaki 9,9 dB(A), en yüksek gövde değeri Lineo 315 Quiet ES'in 10 V ayarındaki 48,3 dB(A)'dır [2]. Lineo 315 Quiet ES 10 V'ta emişten 56,5 dB(A), üflemeden 54,5 dB(A) ses verir [2]. Ailenin en yüksek emiş değeri AC motorlu Lineo 315 Quiet'in en yüksek hızındaki 58,4 dB(A)'dır [2]. Bütün değerler 3 m mesafede, serbest alanda hesaplanmış ses basıncıdır [2].
 
 ## Kaynaklar
 
 Üretici belgelerinde verilen sayfa numaraları PDF dosyasındaki sayfa sırasıdır; basılı sayfa numarasından farklı olabilir.
 
-1. T.C. Resmî Gazete, 31.05.2017, Sayı 30082, Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik (Çevre ve Şehircilik Bakanlığı), md. 4, 6, 9, 13, 17, 18, 23, EK-5 Tablo 5.1, EK-8, EK-9. https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm ve ekleri https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7-1.pdf (erişim 16.10.2026)
+1. T.C. Resmî Gazete, 31.05.2017, Sayı 30082, Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik (Çevre ve Şehircilik Bakanlığı), md. 4, 6, 9, 13, 17, 18, EK-5 Tablo 5.1, EK-8, EK-9. https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm ve ekleri https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7-1.pdf (erişim 16.10.2026)
 2. Vortice, LINEO Range kataloğu (dosya adı Doc_Pubblicita_Lineo_Range_193047.pdf), basılı künye Cod. 5.170.084.547 – Mayıs 2026 (son sayfada ayrıca 5.170.084.504, Şubat 2026 kodu da yazılıdır), s. 4–6, 10, 12, 15, 18, 21, 24, 28 (üretici belgesi).
 3. Dünya Sağlık Örgütü (WHO), Guidelines for Community Noise, Berglund, Lindvall, Schwela (ed.), 1999, bölüm 4.3 ve 4.3.1 (basılı s. 43). https://iris.who.int/handle/10665/66217 (erişim 16.10.2026)
 4. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 22, 45 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 16.10.2026)
 
 ## Teknik sorumluluk notu
 
-Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Yönetmelik yayımından bir yıl sonra yürürlüğe girmiştir [1]; WHO değerleri 1999 tarihli kılavuza dayanır [3]. Kurulum yetkili personelle yapılmalıdır.
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. WHO değerleri 1999 tarihli kılavuza dayanır [3]. Kurulum yetkili personelle yapılmalıdır.
 `,
       },
     },
@@ -703,6 +736,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // 12 Kasım (BLG-75): "Hava perdesi de bu yazıda ele alınmaz" kapsam cümlesi ve hava perdesi rehberine bağlantı eklendi; yalnız ekleme, iddia yok
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
+    // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok; [3] için baskı yılı kaydı (BLG-84)
     guncellemeTarihi: '2026-11-17',
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
@@ -717,67 +751,70 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Kanal fanı seçmeden önce türleri ve takılacağı yerleri bu rehberde karşılaştırın.',
         govde: `# Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar
 
-Kanal tipi fanlar kanala entegre edilerek havalandırma sistemlerinde çalışır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı rehberi fanları santrifüj ve aksiyel diye ikiye ayırır, kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı uygun tür olarak anlatır [1].
+Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve kanala entegre edilen fanlardır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı (DOE) ile AMCA International'ın rehberi fanları santrifüj ve aksiyel diye ikiye ayırır, kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı uygun tür olarak anlatır [1].
 
 Kısaca:
 
-- Çalışma: tüp tipi aksiyel fan, kanal kayıplarını yenecek basıncı oluşturduğu için egzoz uygulamalarında sık kullanılır [1].
-- Kesit: fark fanın bağlandığı kanalın kesitindedir; bir firmanın bilgi sayfasına göre dikdörtgen olanı sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
-- Seçim: fan seçimi hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi bilinerek başlar [1].
-- Kullanım: kataloga göre plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilir [4].
+- Kullanım: tüp tipi aksiyel fan egzoz uygulamalarında sık kullanılır [1]; kataloga göre plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilir [4].
+- Kesit: bir firmanın bilgi sayfasına göre dikdörtgen kanal tipi fan sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
+- Seçim: hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
+- Fan boyutu: gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz [1].
 
-Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve kanala entegre edilen fanlardır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. Hangi kanal fanlarının bulunduğu iki ölçüte göre anlatılır: kesite göre yuvarlak ve dikdörtgen [2]; fan türü olarak santrifüj ve aksiyel (tüp tipi, kılavuz kanatlı) [1] ve üretici anlatımıyla karma akışlı [4]. ABD Enerji Bakanlığı (U.S. Department of Energy, DOE) ile AMCA International'ın rehberi fanları santrifüj ve aksiyel olarak ikiye ayırır ve kanallı iklimlendirme tesisatına uygun tür olarak tüp tipi aksiyel fanı anlatır [1]; katalogda kanal fanı serilerinden biri karma akışlı olarak tanımlanır [4]. Kullanım alanları egzoz uygulamaları [1], asma tavan ve çatı arası ile mutfak, tuvalet, laboratuvar, bar ve restoran gibi mekânlardır [4].
+## Kanal tipi fan seçerken hangi bilgilere bakılır?
+
+Fan seçimi, hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
+
+- **Debi ve basınç.** Fan, sistemin debi ve basınç gereksinimleri hesaplanarak seçilir [1].
+- **Sistem kayıpları.** Sistem eğrisi, damper, kanal, filtre ve dirsek gibi her bileşenin kaybı toplanarak hesaplanır; bileşenlerin etkileşiminden doğan performans değişimine sistem etkisi denir [1].
+- **Fan boyutu.** Gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz, ağır durumlarda kararsız çalışabilir, fazla akış enerjisi üretir ve gürültüyü artırır [1].
+- **Kesit ve montaj alanı.** 2016 baskılı üretici kataloğunda anlatılan karma akışlı kanal fanı serisi standart yuvarlak kesitli borulara, özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3]; bir firmanın bilgi sayfasına göre dikdörtgen kanal tipi fan sıkışık alanlarda daha iyi yer kullanımı sağlar [2].
+
+İlgili rehberler: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
 
 ## Kanal tipi fan nasıl çalışır?
 
-DOE rehberine göre tüp tipi aksiyel fanlar egzoz uygulamalarında sık kullanılır, çünkü kanal kayıplarını yenmeye yetecek basıncı oluşturur [1]. Rehber fanları iki ana türe ayırır: santrifüj ve aksiyel [1]. Santrifüj fan, dönen bir çarkla havanın hızını artırır; hava çarkın göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır ve bu enerji, hava çıkışa girmeden önce yavaşlarken statik basınç artışına dönüşür [1]. Aksiyel fan ise havayı fanın ekseni boyunca hareket ettirir; hava, pervane ile uçak kanadındaki gibi kanat yüzeyinde oluşan aerodinamik kaldırma kuvvetiyle basınçlandırılır [1].
+DOE rehberi fanları iki ana türe ayırır: santrifüj ve aksiyel [1].
 
-Aksiyel fanın silindirli türü tüp tipi aksiyel fandır: DOE rehberi bunu bir silindirin içine yerleştirilmiş pervane tipi fan olarak tanımlar ve hava akışı özelliklerini iyileştirdiği için pervane tipi fandan daha yüksek basınç ve daha iyi verim sağladığını yazar [1]. Tüp tipi aksiyel fanlar orta basınçlı, yüksek debili uygulamalarda kullanılır [1]. DOE rehberi, çıkışına kılavuz kanatlar eklenmiş tüp tipi aksiyel fanı kılavuz kanatlı (vaneaxial) aksiyel fan olarak tanımlar [1]. Katalogda karma akışlı çark, helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatılır [4].
+- **Santrifüj fan** dönen bir çarkla havanın hızını artırır; hava çarkın göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır ve bu enerji, hava çıkışa girmeden önce yavaşlarken statik basınç artışına dönüşür [1].
+- **Aksiyel fan** havayı fanın ekseni boyunca hareket ettirir; hava, pervane ile uçak kanadındaki gibi kanat yüzeyinde oluşan aerodinamik kaldırma kuvvetiyle basınçlandırılır [1].
+
+Aksiyel fanın silindirli türü tüp tipi aksiyel fandır: DOE rehberi bunu bir silindirin içine yerleştirilmiş pervane tipi fan olarak tanımlar ve hava akışı özelliklerini iyileştirdiği için pervane tipi fandan daha yüksek basınç ve daha iyi verim sağladığını yazar [1]. Tüp tipi aksiyel fanlar orta basınçlı, yüksek debili uygulamalarda kullanılır [1]. Egzoz uygulamalarında sık kullanılır, çünkü kanal kayıplarını yenmeye yetecek basıncı oluşturur [1].
+
+Çıkışına kılavuz kanatlar eklenmiş tüp tipi aksiyel fana kılavuz kanatlı (vaneaxial) aksiyel fan denir [1]. Katalogda karma akışlı çark, helisel fanların yüksek debisini santrifüj fanların yüksek basıncıyla birleştiren çark olarak anlatılır [4].
 
 ## Kanal fanı çeşitleri nelerdir?
 
 Kanal fanları iki ölçüte göre ayrılır: kesite göre yuvarlak ve dikdörtgen [2]; fan türü olarak santrifüj ve aksiyel (tüp tipi, kılavuz kanatlı) [1] ve üretici anlatımıyla karma akışlı [4].
 
-| Tür | Çalışma ilkesi | Kaynak |
-|---|---|---|
-| Santrifüj | Havayı radyal yönde hızlandırır, kinetik enerjiyi basınca çevirir | [1] |
-| Aksiyel | Havayı fanın ekseni boyunca hareket ettirir | [1] |
-| Tüp tipi aksiyel | Silindir içindeki pervane tipi fandır; orta basınç ve yüksek debili uygulamalara uygundur | [1] |
-| Kılavuz kanatlı aksiyel | Tüp tipi aksiyel fana çıkış kanatları eklenmiş türdür | [1] |
-| Karma akışlı (üretici anlatımı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir | [4] |
+| Tür | Çalışma ilkesi |
+|---|---|
+| Santrifüj | Havayı radyal yönde hızlandırır, kinetik enerjiyi basınca çevirir [1] |
+| Aksiyel | Havayı fanın ekseni boyunca hareket ettirir [1] |
+| Tüp tipi aksiyel | Silindir içindeki pervane tipi fandır; orta basınç ve yüksek debili uygulamalara uygundur [1] |
+| Kılavuz kanatlı aksiyel | Tüp tipi aksiyel fana çıkış kanatları eklenmiş türdür [1] |
+| Karma akışlı (üretici anlatımı) | Yüksek debiyi santrifüj fanın yüksek basıncıyla birleştirir [4] |
 
 ## Yuvarlak ve dikdörtgen kesit farkı nedir?
 
-Fark, fanın bağlandığı kanalın kesitindedir. Bir firmanın bilgi sayfası yuvarlak kanal tipi fanı yuvarlak bir kanala entegre fan, dikdörtgen kanal tipi fanı ise dikdörtgen kesitli kanallara entegre fan olarak tanımlar; aynı sayfa dikdörtgen kesitli olanı büyük hava hacimlerini taşımak için tasarlanmış ve sıkışık alanlarda daha iyi yer kullanımı sağlayan fan olarak anlatır [2]. Aynı serinin üretici kataloğunda anlatılan karma akışlı kanal fanı serisi, standart yuvarlak kesitli borulara takılabildiği gibi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3].
+Fark, fanın bağlandığı kanalın kesitindedir. Bir firmanın bilgi sayfası yuvarlak kanal tipi fanı yuvarlak bir kanala entegre fan, dikdörtgen kanal tipi fanı ise dikdörtgen kesitli kanallara entegre fan olarak tanımlar [2]. Aynı sayfa dikdörtgen kesitli olanı büyük hava hacimlerini taşımak için tasarlanmış ve sıkışık alanlarda daha iyi yer kullanımı sağlayan fan olarak anlatır [2].
+
+Aynı serinin 2016 baskılı üretici kataloğunda anlatılan karma akışlı kanal fanı serisi, standart yuvarlak kesitli borulara takılabildiği gibi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına da takılabilir [3].
 
 ## Kanal tipi fan nerede kullanılır? Kullanım alanları
 
-Kanal fanlarının kullanım alanları kaynaklarda yerleşime göre anlatılır: kanal hattının içinde ve kanal sisteminin ucunda [4]; uygulama olarak egzoz da anılır [1]. Kaynaklarda egzoz uygulamaları, asma tavan ve çatı arası ile dış mekân kullanım yeri olarak anılır [1][4]. DOE rehberi tüp tipi aksiyel fanların yer açısından da verimli olduğunu yazar [1]. Katalogda plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilen kanal fanı olarak sunulur ve mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi konut, ticari ve endüstriyel mekânlar için uygun görülür; boyalı sac çelik gövdeli bir seri de asma tavan ve çatı arası kurulumu için tanımlanır [4]. Yüksekliği çok düşük bir seri, kısa asma tavanlara monte edilmeye elverişlidir [4].
+Kanal fanlarının kullanım alanları kaynaklarda yerleşime göre anlatılır: kanal hattının içinde ve kanal sisteminin ucunda [4]; uygulama olarak egzoz da anılır [1].
 
-Aynı katalog kanal sisteminin ucuna takılan türleri de listeler. Çelik sac duvar tipi fanlar laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânların havalandırma ihtiyacını karşılar; çatı tipi fanlar çatıdan atış yapan ticari ve endüstriyel mekânlar için tanımlanmıştır [4]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [4].
+Kanal içi için katalogda plastik reçine gövdeli bir seri asma tavana ya da çatı arasına monte edilen kanal fanı olarak sunulur ve konut, ticari ve endüstriyel mekânlar için uygun görülür; boyalı sac çelik gövdeli bir seri de asma tavan ve çatı arası kurulumu için tanımlanır [4]. Dış mekâna kurulmak üzere tasarlanmış boyalı sac çelik gövdeli kanal fanları da aynı katalogda yer alır [4]. Aynı katalog kanal sisteminin ucuna takılan türleri de listeler: çelik sac duvar tipi fanlar ve çatı tipi fanlar [4].
 
-| Yerleşim | Anlatılan kullanım | Kaynak |
-|---|---|---|
-| Egzoz uygulamaları | Tüp tipi aksiyel fan: kanal kayıplarını yenecek basınç, yer açısından verimli | [1] |
-| Asma tavan ya da çatı arası, kanal içi | Mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane, dükkân | [4] |
-| Kısa asma tavan | Çok kısa yükseklik sayesinde kısa asma tavanlara uygun | [4] |
-| Kanal ucunda, duvarda | Laboratuvar, bar, restoran, çamaşırhane, spor salonu | [4] |
-| Kanal ucunda, çatıda | Çatıdan atış yapan ticari ve endüstriyel mekânlar | [4] |
+| Yerleşim | Anlatılan kullanım |
+|---|---|
+| Egzoz uygulamaları | Tüp tipi aksiyel fan: kanal kayıplarını yenecek basınç, yer açısından verimli [1] |
+| Asma tavan ya da çatı arası, kanal içi | Plastik reçine gövdeli seri: mutfak, tuvalet, laboratuvar, bar, restoran, çamaşırhane ve dükkân gibi mekânlar [4] |
+| Kısa asma tavan | Yüksekliği çok düşük bir seri, kısa asma tavanlara monte edilmeye elverişlidir [4] |
+| Kanal ucunda, duvarda | Çelik sac duvar tipi fanlar: laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânlar [4] |
+| Kanal ucunda, çatıda | Çatı tipi fanlar: çatıdan atış yapan ticari ve endüstriyel mekânlar [4] |
 
-İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi)
-
-## Kanal tipi fan seçerken hangi bilgilere bakılır?
-
-DOE rehberine göre fan seçimi, hava debisi, sıcaklık, basınç, hava akımının özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar; fan, sistemin debi ve basınç gereksinimleri hesaplanarak seçilir [1]. Sistem eğrisi, damper, kanal, filtre ve dirsek gibi her bileşenin kaybı toplanarak hesaplanır; bileşenlerin etkileşiminden doğan performans değişimine sistem etkisi denir [1]. Gereğinden büyük seçilen fan, verimin en yüksek olduğu noktada çalışmaz, ağır durumlarda kararsız çalışabilir, fazla akış enerjisi üretir ve gürültüyü artırır [1].
-
-| Seçim girdisi | Kaynak ne söylüyor | Kaynak |
-|---|---|---|
-| Debi ve basınç | Seçim, sistemin hava debisi ve basınç gereksiniminin hesabına dayanır | [1] |
-| Sistem kayıpları | Damper, kanal, filtre, dirsek gibi bileşen kayıpları toplanır | [1] |
-| Fan boyutu | Gereğinden büyük fan, verimin en yüksek olduğu noktada çalışmaz | [1] |
-| Kesit ve montaj alanı | Üretici anlatımı: yuvarlak ya da dikdörtgen kanal [3]; firma bilgi yazısı: dikdörtgen kesitte sıkışık alan avantajı [2] | [2][3] |
-
-İlgili rehberler: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
+İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
 
 ## Sık sorulan sorular
 
@@ -787,7 +824,7 @@ DOE rehberine göre fan seçimi, hava debisi, sıcaklık, basınç, hava akımı
 
 ### Kanal tipi fan dikdörtgen kanala takılabilir mi?
 
-Üretici kataloğuna göre evet: karma akışlı kanal fanı serisi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabilir [3].
+2016 baskılı üretici kataloğuna göre evet: karma akışlı kanal fanı serisi özel montaj aksesuarlarıyla dikdörtgen hava kanallarına takılabilir [3].
 
 ### Kanal tipi fan dışarıya ya da çatıya monte edilebilir mi?
 
@@ -799,7 +836,7 @@ Katalogda karma akışlı kanal fanı serisi yatay ya da dikey kanallı montaj i
 
 ### Birden fazla kanal tipi fan seri ya da paralel bağlanabilir mi?
 
-Katalogda karma akışlı kanal fanı serisi için paralel ve seri bağlantı düzenleri gösterilir; paralel bağlantıda debinin, seri bağlantıda basıncın iki katına çıktığı belirtilir [3].
+2016 baskılı katalogda karma akışlı kanal fanı serisi için paralel ve seri bağlantı düzenleri gösterilir; paralel bağlantıda debinin, seri bağlantıda basıncın iki katına çıktığı belirtilir [3].
 
 ### Tüp tipi aksiyel fan ile kılavuz kanatlı aksiyel fan arasındaki fark nedir?
 
@@ -811,20 +848,31 @@ Fark çıkış kanatlarıdır: kılavuz kanatlı fanda bu kanatlar hava akış d
 
 ## VentHub'da hangi kanal tipi fan serileri var?
 
-VentHub'un [kanal tipi fanlar kategorisinde](vh:kategori/duct-fans) şu aileler listelenir: [AVenS dikdörtgen kanal tipi radyal fanlar](vh:aile/avens-dikdortgen-kanal-tipi-radyal-fanlar), [LINEO kanal fanları](vh:aile/vortice-lineo-kanal-fanlari), [LINEO Quiet sessiz kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari), [Radon serisi kanal fanları](vh:aile/vortice-radon-serisi-kanal-fanlari) ve [VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari).
+VentHub'un [kanal tipi fanlar kategorisinde](vh:kategori/duct-fans) şu aileler listelenir:
+
+- [AVenS dikdörtgen kanal tipi radyal fanlar](vh:aile/avens-dikdortgen-kanal-tipi-radyal-fanlar)
+- [LINEO kanal fanları](vh:aile/vortice-lineo-kanal-fanlari)
+- [LINEO Quiet sessiz kanal fanları](vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari)
+- [Radon serisi kanal fanları](vh:aile/vortice-radon-serisi-kanal-fanlari)
+- [VORT Commercial In-Line dikdörtgen kanal fanları](vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari)
 
 ## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklif için şu bilgileri hazırlayın: hava debisi, sıcaklık, basınç, hava akımının özellikleri, sistem yerleşimi, kanalın kesiti ve montaj alanı.
+Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklif için şu bilgileri hazırlayın:
+
+- Hava debisi, sıcaklık ve basınç
+- Hava akımının özellikleri
+- Sistem yerleşimi
+- Kanalın kesiti ve montaj alanı
 
 ## Kaynaklar
 
-Üretici belgelerinde verilen sayfa numaraları kataloğun basılı sayfa numarasıdır. DOE rehberinde basılı sayfa numarası kullanılmıştır. Kaynak [3] ve [4] aynı üreticinin katalogları, [2] ise bu üreticinin bir serisini anlatan firma yazısıdır; üçü birbirinden bağımsız kaynak sayılmaz.
+Üretici belgelerinde ve DOE rehberinde verilen sayfa numaraları basılı sayfa numarasıdır.
 
 1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 8, 17, 19, 22, 23. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 25.10.2026)
 2. Avens Havalandırma, "LINEO Kanal Tipi Fanlar" bilgi yazısı (firma sitesi blog bölümü), https://www.avensair.com/lineo-kanal-tipi-fanlar (erişim 04.11.2026).
-3. Vortice, Commercial Ventilation in Line kataloğu (dosya adı Commercial_Ventilation_in_Line_1.pdf), s. 5, 7 (üretici belgesi).
-4. Vortice, In-Line Fans Range kataloğu (dosya adı Doc_Pubblicita_In-Line_Fans_Range_191875.pdf), s. 4, 5, 36, 42, 74, 78, 84, 90 (üretici belgesi).
+3. Vortice, Commercial Ventilation in Line kataloğu, Şubat 2016 baskısı, s. 5, 7 (üretici belgesi).
+4. Vortice, In-Line Fans Range kataloğu, Ocak 2026 baskısı, s. 4, 5, 36, 42, 74, 78, 84, 90 (üretici belgesi).
 
 ## Teknik sorumluluk notu
 
