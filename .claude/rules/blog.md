@@ -23,7 +23,7 @@ Bu dosya işaretçidir. Tam metin ve kanıt: `docs/standards/rehber-yazisi-stand
 - Üretici/DOE belgesi künyesi sayfada yazılı numaradan ölçülür (basılı numara ile PDF indeksi farklı).
 - Tuzaklı kopya yanında temiz kopya zorunludur.
 - Doğrulama bulgusu metni daraltarak çözülür, şerh ekleyerek değil; gövdede şerh, kendinden söz ve yönlendirme yazılmaz, marka kaynak olduğu yerde adıyla yazılır (R3.4 a–n; kapı `uslupDenetle`, UYARI).
-- Yazı başlıktaki soruyu cevaplar: giriş cevap verir, kontrol listesi başta durur, sayı düz cümleyle yazılır, her SSS cevabı sorusunu cevaplar, tek cümlelik bölüm açılmaz, kapsam kaydı ("Vortice kataloğunda") düşmez (R3.5 a–k; kapı yok). Kapı uyarısının sıfır olması "düzeltildi" demek değildir: canlı sayfa baştan sona okunmadan iş bitmiş sayılmaz (R10.6 madde 10).
+- Yazı başlıktaki soruyu cevaplar: giriş cevap verir, kontrol listesi başta durur, sayı düz cümleyle yazılır, her SSS cevabı sorusunu cevaplar, tek cümlelik bölüm açılmaz, kapsam kaydı ("Vortice kataloğunda") düşmez (R3.5 a–k; kapı yok). Yeniden yazımdan önce beş yere bak (R3.5 l–p): adı gizlenmiş kaynak ("bir firma", "üretici kataloğu") kayıt değildir, adıyla yazılır; Kaynaklar'da süreç notu ve dosya adı kalmaz; terim öteki yazılarla aynıdır; tablo sadeleşirken seri kaydı hücreye taşınır; kaynakta olmayan sıra ve buyruk eklenmez. Dış değerlendirme önerisi kaynağa karşı ölçülür. Kapı uyarısının sıfır olması "düzeltildi" demek değildir: canlı sayfa baştan sona okunmadan iş bitmiş sayılmaz (R10.6 madde 10).
 
 ## R10.6 on madde (B8 PR gövdesinde tablo)
 
