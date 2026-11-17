@@ -1619,6 +1619,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
+    // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-slimroof-cati-fanlari'],
     ilgiliKategoriler: ['vh:kategori/roof-fans'],
@@ -1659,7 +1661,9 @@ ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: eksenel fanla
 
 Üretici sayfasına göre çatı fanı aralığı konut, ticari ve endüstriyel uygulamaları kapsar [4]. Bir seri hava sıkılığı yüksek ve bakımı kolay, plastik ya da alüminyum başlıklıdır; eğilebilir sistemi tam sökmeden bakıma izin verir [4]. Bir başka seri yüksek verimli EC motorlu, bir diğeri kimya, petrokimya, laboratuvar ya da çeker ocak gibi ortamlarda korozyona dayanacak biçimde tasarlanmıştır [4].
 
-Vortice, Slimroof serisinde başlığın yuvarlak tasarımının yağmur girişi riskini azalttığını, koruyucu başlığın motor ve pervane bakımı için kolayca çıkarıldığını ve EC motorun entegre elektronik kontrolle motoru optimum yükte çalıştırdığını bildirir [5]. Bir başka üreticinin dikey atışla egzoz havası çeken çatı fanı serisi mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalar için sunulur ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygundur [7].
+Vortice, Slimroof serisinde başlığın yuvarlak tasarımının yağmur girişi riskini azalttığını, koruyucu başlığın motor ve pervane bakımı için kolayca çıkarıldığını ve EC motorun entegre elektronik kontrolle motoru optimum yükte çalıştırdığını bildirir [5].
+
+Dikey atışla egzoz havası çeken bir çatı fanı serisi mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalar için sunulur ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygundur [7].
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -1955,6 +1959,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-79: Kısaca maddelerinden ABD birimleri çıkarıldı (R3.4 k).
+    // BLG-79: Kısaca maddelerinden ABD birimleri çıkarıldı (R3.4 k).
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
@@ -1971,8 +1977,8 @@ Banyo ve tuvalet fanı, nemi ve kirleticileri oluştuğu yerde odadan atan yerel
 Kısaca:
 
 - Mevzuat: baca ya da mekanik havalandırma istenir, gövdede debi yoktur; bağımsız bölümün ıslak hacminde mekanik havalandırma yapılmazsa pencere net 0,30 × 0,30 m'den küçük olamaz [1].
-- Debi: HVI 100 ft²'ye kadar banyoda 1 CFM/ft² önerir [4]; İngiltere konutlarında aralıklı egzozda banyo en az 15, tuvalet 6 l/s [3].
-- Ses: ENERGY STAR 10-89 CFM banyo/yardımcı fanlarında en az 2,8 CFM/W, azami 2,0 sone ister [6].
+- Debi: HVI belirli bir alana kadar olan banyoda debiyi alana göre önerir [4]; İngiltere konutlarında aralıklı egzozda banyo en az 15, tuvalet 6 l/s [3].
+- Ses: ENERGY STAR, yaklaşık 17 ile 150 m³/h aralığındaki banyo fanlarında azami 2,0 sone ister [6].
 - Kumanda: broşürde nem eşiği, hareket algılama fanı açar, zamanlayıcı kapatır [10].
 
 ## Banyo ve tuvalet fanı ne işe yarar?
