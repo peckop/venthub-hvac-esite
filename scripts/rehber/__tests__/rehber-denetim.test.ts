@@ -22,7 +22,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, kisaKatmanAyir, bolumMetni,SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari, markaDenetle } from '../rehber-denetim.mjs'
+import { MEVZUAT, denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, kisaKatmanAyir, bolumMetni,SORUMLULUK_ILK_CUMLE, baslikDenetle, konuTerimleri, h2Basliklari, markaDenetle } from '../rehber-denetim.mjs'
 
 const TEMIZ = `---
 baslik: Örnek cihaz nedir, nasıl seçilir?
@@ -440,5 +440,25 @@ describe('INV-REHBER-DENETIM-1 · ağsız', () => {
   it('denetim modülü ağa ve diske çıkmaz (CI kapısı şartı)', () => {
     const kaynak = readFileSync(join(__dirname, '..', 'rehber-denetim.mjs'), 'utf8')
     expect(kaynak).not.toMatch(/\bfetch\s*\(|node:http|node:https|node:fs|writeFile|readFile/)
+  })
+})
+
+describe('MEVZUAT deseni · ünsüz yumuşaması (BLG-80)', () => {
+  it('"yönetmelik" kökünün yumuşamış çekimleri de mevzuat cümlesi sayılır', () => {
+    for (const c of ['Yönetmeliğe göre ölçüm yapılır.', 'Yönetmeliğin ekinde değerler verilir.', 'İlgili yönetmeliği uygulayın.', 'Yönetmelikte sınır yazılıdır.', 'Yönetmelik bunu ister.']) {
+      expect(MEVZUAT.test(c), c).toBe(true)
+    }
+  })
+
+  it('mevzuat sözcüğü taşımayan benzer sözcükler eşleşmez (yanlış pozitif yok)', () => {
+    for (const c of ['Fan yönetimi kolaydır.', 'Yönetim paneli ayrı satılır.', 'Kanal içi hız artar.']) {
+      expect(MEVZUAT.test(c), c).toBe(false)
+    }
+  })
+
+  it('atıfsız "Yönetmeliğe göre" cümlesi KIRMIZI verir (düzeltmeden önce kaçıyordu)', () => {
+    const md = TEMIZ.replace('düşünelim.', 'düşünelim. Yönetmeliğe göre bu değer uygulanır.')
+    expect(md).not.toBe(TEMIZ)
+    expect(siniflar(md)).toContain('ATIFSIZ-IDDIA')
   })
 })

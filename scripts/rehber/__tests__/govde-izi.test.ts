@@ -146,6 +146,15 @@ Yeni cümle.` }, ...geri]
     expect(ayniGunAyikla(sorunlar, bozuk, ilk.guncellemeTarihi)).toEqual([])
   })
 
+  it('yalnız TARIH_UNUTULDU süzülür: KAYIT_YOK ve IZ_ESKI --yaz reddine girmez (bayraklı ve bayraksız; BLG-80)', () => {
+    const baska = [
+      { kimlik: 'a', tur: 'KAYIT_YOK', ileti: '' },
+      { kimlik: 'b', tur: 'IZ_ESKI', ileti: '' },
+    ]
+    expect(ayniGunAyikla(baska, bozuk, null)).toEqual([])
+    expect(ayniGunAyikla(baska, bozuk, ilk.guncellemeTarihi)).toEqual([])
+  })
+
   it('SABOTAJ: bayraklı ama yazının tarihi bugün DEĞİL: yine reddedilir', () => {
     expect(ayniGunAyikla(sorunlar, bozuk, '2099-01-01').map((s: { kimlik: string }) => s.kimlik)).toEqual([ilk.kimlik])
   })
