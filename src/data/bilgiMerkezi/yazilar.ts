@@ -286,6 +286,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok
     guncellemeTarihi: '2026-11-17',
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
@@ -302,29 +303,29 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         kartOzeti: 'Uygulamanıza hangi fan tipinin uyduğunu bu rehberde bulun.',
         govde: `# Radyal ve aksiyel fan farkı nedir?
 
-İki fan havayı farklı yönde hareket ettirir: aksiyel fanda hava fan ekseni boyunca ilerler, radyal (santrifüj) fanda ise hava radyal yönde hızlandırılır ve kinetik enerji basınca dönüşür [1]. Temiz, düşük basınçlı ve yüksek debili hava akımlarında çoğunlukla aksiyel fan; yüksek basınç gerektiren ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımlarında çoğunlukla radyal fan öne çıkar [1].
+Aksiyel fanda hava fan ekseni boyunca ilerler; radyal (santrifüj) fanda hava radyal yönde hızlandırılır ve kinetik enerji basınca dönüşür [1]. Temiz, düşük basınçlı ve yüksek debili hava akımlarında çoğunlukla aksiyel fan; yüksek basınç gerektiren ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımlarında çoğunlukla radyal fan öne çıkar [1].
 
 Kısaca:
 
-- Farklar: hava yönü, basınç ve debi, verim, ses, kirli hava ve boyut açısından ortaya çıkar [1].
-- Seçim: debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi çalışma koşullarının bilinmesiyle başlar [1].
-- Fan eğrisi: kayışlı bir radyal fan kataloğunda eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2].
-
-Aksiyel fan havayı pervane gibi fan ekseni doğrultusunda iter; radyal (santrifüj) fan ise havayı radyal yönde hızlandırıp kinetik enerjiyi basınca çevirir [1]. Pervane tipi aksiyel fanlar düşük basınçta yüksek debi üretir [1]; radyal düz kanatlı fanlar ise yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1]. Kısaca: temiz hava, düşük basınç ve yüksek debi çoğunlukla aksiyel fanı; yüksek basınç ya da kirli, parçacıklı ve yüksek sıcaklıklı hava akımı çoğunlukla radyal fanı öne çıkarır [1].
+- Aksiyel fan: benzer kapasiteli santrifüj fandan daha kompakt, hafif ve düşük maliyetlidir; çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildir [1].
+- Radyal fan: nispeten yüksek basınç üretebilir; nem ve parçacık içeriği yüksek hava akımlarında sık kullanılır [1].
+- Seçim: debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi çalışma koşulları önce aksiyel mi santrifüj mü gerektiğini belirler [1].
 
 ## Radyal ve aksiyel fan arasındaki farklar
 
-| Özellik | Aksiyel fan | Radyal (santrifüj) fan |
-|---|---|---|
-| Hava yönü | Hava fan eksenine paralel akar [1] | Hava akımı radyal yönde hızlandırılır [1] |
-| Basınç ve debi | Pervane tipi düşük basınçta yüksek debi üretir; tüp tipi orta basınç ve yüksek debide, kılavuz kanatlı tip orta ila yüksek basınçlı uygulamalarda kullanılır [1] | Radyal düz kanatlı fanlar düşük ve orta debide, yüksek basınç gerektiren uygulamalarda yaygın kullanılır [1] |
-| Verim | Pervane tipi görece düşük verimlidir; havayarı profilli, küçük boşluklu kılavuz kanatlı tip %85'e kadar çıkar [1] | Öne eğik kanatta %55–65; havayarı profilli geriye eğik kanatta %85'in üzerine çıkabilir [1] |
-| Ses | Aynı debi için benzer bir santrifüj fandan daha hızlı dönmesi gerekir; bu yüzden bir ölçüde daha gürültülüdür, gürültü kolay sönümlenen yüksek frekanslarda yoğunlaşır [1] | Öne eğik kanatlı tip nispeten düşük devirde çalışabilir; bu düşük gürültü düzeyine karşılık gelir [1] |
-| Kirli hava | Genellikle temiz hava uygulamalarında kullanılır; toz, duman ve buhar gibi küçük parçacıklı egzoz akımlarında da sık kullanılır; kayışlı tahrikli aksiyel fanda motor hava akımının dışında kalır, bu doğrudan tahrikli aksiyel fana göre yüksek sıcaklıklı, kirli ya da korozif ortamda üstünlük olabilir [1] | Nem ve parçacık içeriği yüksek "kirli" hava akımlarında sık kullanılır; radyal düz kanat toz, odun talaşı ve metal hurdasına uygundur, öne eğik kanat genellikle temiz havayla sınırlıdır [1] |
-| Tipik kullanım | Temiz hava, düşük basınç, yüksek debi; çatı havalandırması (pervane tipi), kanallı HVAC ve egzoz (tüp tipi) [1] | Yüksek basınç, kirli hava akımları, malzeme taşıma, daha yüksek sıcaklıktaki sistemler [1] |
-| Boyut, ağırlık, maliyet | Benzer kapasiteli santrifüj fandan daha kompakt, hafif ve düşük maliyetlidir [1] | Benzer kapasiteli aksiyel fana göre daha fazla dönen kütleye sahiptir ve daha az kompakttır [1] |
+Radyal fan ile santrifüj fan aynı tür için kullanılır; "radyal düz" ve "radyal uçlu" ise santrifüj fanların kanat biçimleridir [1].
 
-Aksiyel ve santrifüj fanların basınç, debi ve verim yetenekleri kısmen çakışır; çoğunlukla birbirinin yerine kullanılamazlar [1]. Radyal fan ile santrifüj fan aynı tür için kullanılır; "radyal düz" ve "radyal uçlu" ise santrifüj fanların kanat biçimleridir [1].
+| Özellik | Aksiyel fan [1] | Radyal (santrifüj) fan [1] |
+|---|---|---|
+| Hava yönü | Hava fan eksenine paralel akar | Hava akımı radyal yönde hızlandırılır |
+| Basınç ve debi | Pervane tipi düşük basınçta yüksek debi üretir; tüp tipi orta basınç ve yüksek debide, kılavuz kanatlı tip orta ila yüksek basınçlı uygulamalarda kullanılır | Radyal düz kanatlı fanlar düşük ve orta debide, yüksek basınç gerektiren uygulamalarda yaygın kullanılır |
+| Verim | Pervane tipi görece düşük verimlidir; kanat profilli, küçük boşluklu kılavuz kanatlı tip %85'e kadar çıkar [1] | Öne eğik kanatta %55–65; kanat profilli geriye eğik kanatta %85'in üzerine çıkabilir [1] |
+| Ses | Aynı debi için benzer bir santrifüj fandan daha hızlı dönmesi gerekir; bu yüzden bir ölçüde daha gürültülüdür, gürültü kolay sönümlenen yüksek frekanslarda yoğunlaşır | Öne eğik kanatlı tip nispeten düşük devirde çalışabilir; bu düşük gürültü düzeyine karşılık gelir |
+| Kirli hava | Genellikle temiz hava uygulamalarında kullanılır; toz, duman ve buhar gibi küçük parçacıklı egzoz akımlarında da sık kullanılır | Nem ve parçacık içeriği yüksek "kirli" hava akımlarında sık kullanılır; radyal düz kanat toz, odun talaşı ve metal hurdasına uygundur, öne eğik kanat genellikle temiz havayla sınırlıdır |
+| Tipik kullanım | Temiz hava, düşük basınç, yüksek debi; çatı havalandırması (pervane tipi), kanallı HVAC ve egzoz (tüp tipi) | Yüksek basınç, kirli hava akımları, malzeme taşıma, daha yüksek sıcaklıktaki sistemler |
+| Boyut, ağırlık, maliyet | Benzer kapasiteli santrifüj fandan daha kompakt, hafif ve düşük maliyetlidir | Benzer kapasiteli aksiyel fana göre daha fazla dönen kütleye sahiptir ve daha az kompakttır |
+
+Aksiyel ve santrifüj fanların basınç, debi ve verim yetenekleri kısmen çakışır; çoğunlukla birbirinin yerine kullanılamazlar [1].
 
 ## Hangi durumda hangisi?
 
@@ -336,34 +337,56 @@ Seçim, debi, sıcaklık, basınç, hava özellikleri ve sistem yerleşimi gibi 
 - Toz, odun talaşı ya da metal hurdası taşıyan hava: radyal düz kanat; küçük parçacıklı ya da yüksek nemli hava: radyal uçlu kanat [1].
 - Çalışma koşulları geniş ölçüde değişiyorsa aksiyel fan özellikle uygun değildir; bazı santrifüj tipleri ise geniş çalışma koşullarına uyar [1].
 
+## Fan seçiminde izlenecek yol
+
+1. Sistemin gerektirdiği debiyi ve toplam basıncı belirleyin; sistem eğrisini çıkarın [1].
+2. Havanın nem ve parçacık içeriğini belirleyin; bunlar fan tipi seçiminde önemli etkenlerdir [1].
+3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
+4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
+5. Fan girişindeki dirseği fana çok yakın yerleştirmeyin: girişten önce kanal çapının en az üç katı düz kanal bırakın, bu mümkün değilse giriş kutusu ya da akış düzeltici kullanın [1]. Çıkışta dirsek ve benzeri bağlantı parçalarını fandan yeterince uzağa yerleştirin [1].
+6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [4].
+7. Patlayıcı ortam söz konusuysa: (EU) 2024/1834 sayılı tüzüğün kapsam dışı koşulu, fanın yalnız o ortamda çalışmak üzere belirtilmiş ve bu amaçla özel olarak tasarlanıp pazarlanmış olmasıdır; bunu gösteren belgeyi üreticiden isteyin [5]. İlgili rehber: [Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?](vh:yazi/patlayici-ortamda-fan-secimi-atex).
+
 ## Radyal fan nedir ve nasıl çalışır?
 
-Santrifüj (radyal) fan, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımıdır [1]. Bu fan havayı radyal yönde hızlandırır ve kazandığı kinetik enerjiyi basınca dönüştürür [1]. Hava çark göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır; bu enerji, hava boşaltmaya girmeden önce yavaşlarken statik basınç artışına çevrilir [1]. Radyal fanlar nispeten yüksek basınç üretebilir; sıklıkla "kirli" hava akımlarında (yüksek nem ve parçacık içeriği), malzeme taşıma uygulamalarında ve daha yüksek sıcaklıktaki sistemlerde kullanılır [1]. Endüstride en yaygın kullanılan fan tipidir; yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına göre yapılabilir [1]. Öne eğik, radyal düz, radyal uçlu ve geriye eğik gibi kanat biçimleri vardır [1]. Bazı santrifüj tipleri geniş ölçüde değişen çalışma koşullarına hizmet edebilir; bu önemli bir avantajdır [1]. Radyal düz kanatlı tip dayanıklı yapısıyla endüstrinin iş atı sayılır [1]. VentHub'da bu fanları [radyal fanlar](vh:kategori/centrifugal-fans) kategorisinde inceleyebilirsiniz.
+Santrifüj (radyal) fan, havanın çarkın dönme eksenine dik yönde boşaltıldığı fan tasarımıdır [1]. Hava çark göbeğinden kanat uçlarına doğru ilerlerken kinetik enerji kazanır; bu enerji, hava boşaltmaya girmeden önce yavaşlarken statik basınç artışına çevrilir [1].
+
+Radyal fanlar nispeten yüksek basınç üretebilir [1]. Endüstride en yaygın kullanılan fan tipidir; yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına göre yapılabilir [1]. Sıklıkla nem ve parçacık içeriği yüksek "kirli" hava akımlarında, malzeme taşıma uygulamalarında ve daha yüksek sıcaklıktaki sistemlerde kullanılır [1]. Bazı santrifüj tipleri geniş ölçüde değişen çalışma koşullarına hizmet edebilir [1].
+
+VentHub'da bu fanları [radyal fanlar](vh:kategori/centrifugal-fans) kategorisinde inceleyebilirsiniz.
 
 ## Radyal fanlarda kanat tipleri
 
-Radyal fanlar kanat tipine göre öne eğik, radyal düz, radyal uçlu, geriye eğik gibi gruplara ayrılır [1]; kanat tipi verimi ve kirli havaya uygunluğu etkiler [1].
+Radyal fanlar kanat tipine göre öne eğik, radyal düz, radyal uçlu, geriye eğik gibi gruplara ayrılır; kanat tipi verimi ve kirli havaya uygunluğu etkiler [1].
 
 | Kanat tipi | Verim | Kirli ya da parçacıklı hava |
 |---|---|---|
 | Öne eğik | %55–65 [1] | Genellikle temiz hava uygulamalarıyla sınırlı [1] |
 | Radyal düz kanat | — | Toz, odun talaşı ve metal hurdası taşıyan hava akımlarına uygun [1] |
 | Radyal uçlu | %75'e kadar [1] | Küçük parçacıklı ve yüksek nemli hava akımlarına uygun [1] |
-| Geriye eğik, havayarı profilli | %85'in üzerine çıkabilir [1] | Düşük çarpma açısı kanatlarda birikmeye yol açabilir [1] |
+| Geriye eğik, kanat profilli | %85'in üzerine çıkabilir [1] | Düşük çarpma açısı kanatlarda birikmeye yol açabilir [1] |
 
-Geriye eğik kanatlı fanlarda en verimli olanlar havayarı profilli kanatlardır [1]. Bu kanatlar kaldırma kuvvetiyle çalıştığı için bu fan tipi tutunma kaybına (stall) bağlı kararsız çalışmaya karşı hassastır [1].
+Radyal düz kanatlı tip dayanıklı yapısıyla endüstrinin iş atı sayılır [1]. Geriye eğik kanatlı fanlarda en verimli olanlar kanat profilli kanatlardır [1]. Bu kanatlar kaldırma kuvvetiyle çalıştığı için bu fan tipi tutunma kaybına (stall) bağlı kararsız çalışmaya karşı hassastır [1].
 
 ## Aksiyel fan nedir ve nasıl çalışır?
 
-Aksiyel fan, havanın akışının çarkın dönme eksenine esas olarak paralel olduğu fandır; çark silindirik bir gövdenin içindedir [1]. Adından anlaşılacağı gibi havayı fanın ekseni boyunca hareket ettirir; hava, kanatların oluşturduğu aerodinamik kaldırma kuvvetiyle basınçlandırılır, tıpkı pervane ve uçak kanadı gibi [1]. Aksiyel fanlar bazen santrifüj fanlarla birbirinin yerine kullanılabilse de genellikle "temiz hava", düşük basınç ve yüksek debi uygulamalarında kullanılır [1]. Benzer kapasiteli santrifüj fanlardan daha az dönen kütleye sahiptir ve daha kompakttır [1]. Daha yüksek devirde çalışma eğilimindedir ve aynı kapasitedeki kanal içi santrifüj fanlardan biraz daha gürültülüdür; bu gürültü yüksek frekanslarda yoğunlaşır ve daha kolay sönümlenir [1]. Pervane tipi, tüp tipi ve kılavuz kanatlı olmak üzere üç temel türü vardır [1]. Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu nedenle çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildirler; birçok aksiyel fanda bu sorun, tutunma kaybını önleyici donanımlı bir fan seçilerek çözülebilir [1]. VentHub'da bu fanları [aksiyel fanlar](vh:kategori/axial-industrial-fans) kategorisinde inceleyebilirsiniz.
+Aksiyel fan, havanın akışının çarkın dönme eksenine esas olarak paralel olduğu fandır; çark silindirik bir gövdenin içindedir [1]. Hava, kanatların oluşturduğu aerodinamik kaldırma kuvvetiyle basınçlandırılır, tıpkı pervane ve uçak kanadı gibi [1].
+
+Aksiyel fanlar bazen santrifüj fanlarla birbirinin yerine kullanılabilse de genellikle "temiz hava", düşük basınç ve yüksek debi uygulamalarında kullanılır [1]. Daha yüksek devirde çalışma eğilimindedir ve aynı kapasitedeki kanal içi santrifüj fanlardan biraz daha gürültülüdür; bu gürültü yüksek frekanslarda yoğunlaşır ve daha kolay sönümlenir [1].
+
+Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu nedenle çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildirler [1]. Birçok aksiyel fanda bu sorun, tutunma kaybını önleyici donanımlı bir fan seçilerek çözülebilir [1].
+
+VentHub'da bu fanları [aksiyel fanlar](vh:kategori/axial-industrial-fans) kategorisinde inceleyebilirsiniz.
 
 ## Aksiyel fan türleri
 
+Aksiyel fanın pervane tipi, tüp tipi ve kılavuz kanatlı olmak üzere üç temel türü vardır [1].
+
 - **Pervane tipi.** Düşük basınçta yüksek debi üretir; görece düşük verimlidir ama basit yapısı sayesinde ucuzdur [1].
 - **Tüp tipi (tubeaxial).** Orta basınç ve yüksek debi gerektiren uygulamalarda kullanılır ve kanallı HVAC tesisatına uygundur [1]. Motora doğrudan bağlanabildiği gibi kayışla da tahrik edilebilir [1].
-- **Kılavuz kanatlı (vaneaxial).** Esasen tüp tipi bir fanın çıkışına, akışı düzelten ve havanın kinetik enerjisini basınca çeviren kanatlar eklenmiş hâlidir [1]. Havayarı profilli kanatlar ve küçük boşluklarla üretildiğinde verimi %85'e kadar çıkabilir [1].
+- **Kılavuz kanatlı (vaneaxial).** Esasen tüp tipi bir fanın çıkışına, akışı düzelten ve havanın kinetik enerjisini basınca çeviren kanatlar eklenmiş hâlidir [1]. Kanat profilli kanatlar ve küçük boşluklarla üretildiğinde verimi %85'e kadar çıkabilir [1].
 
-Tahrik biçimi de seçimi etkiler: doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1].
+Tahrik biçimi de seçimi etkiler. Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1]. Kayışlı tahrikli aksiyel fanda motor hava akımının dışında kalır; bu, doğrudan tahrikli aksiyel fana göre yüksek sıcaklıklı, kirli ya da korozif ortamda üstünlük olabilir [1].
 
 ## Radyal ve aksiyel fanların kullanım alanları
 
@@ -382,54 +405,60 @@ Radyal fanlar:
 - Malzeme taşıma ve daha yüksek sıcaklıktaki sistemler: santrifüj fanlar [1].
 - Otopark: geriye kıvrık metal kanatlı santrifüj çarklı indüksiyon tipi jet fanlar kullanılır [4].
 
-Tipten bağımsız not:
-
-- Duman tahliyesi: yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir [4].
+Tipten bağımsız olarak, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre üçüncü taraf bir kuruluşça belgelendirilir [4].
 
 ## Fan debisi nedir ve kılavuzda hangi birimle verilir?
 
-Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp; 1 cfm yaklaşık 1,70 m³/h) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1]. Kılavuz basıncı inç su sütunu (in. wg; 1 in. wg yaklaşık 249 Pa) ile verir [1]; üretici katalogları ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
+Fan debisi, fanın ya da sistemin birim zamanda geçirdiği hava hacmidir; ABD Enerji Bakanlığı kılavuzunun sözlüğü cfm birimini (dakikadaki fit küp; 1 cfm yaklaşık 1,70 m³/h) belirli bir fan veya sistem için akış hacmi olarak tanımlar [1]. Kılavuz basıncı inç su sütunu (in. wg; 1 in. wg yaklaşık 249 Pa) ile verir [1]. Fanın debi ve basınç çıktıları birbirine bağlıdır [1].
+
+Üretici kataloglarını ve ürün sayfalarını karşılaştırırken debi ve basıncın hangi birimle yazıldığına bakın.
 
 ## Fan eğrisi nasıl okunur?
 
-Fan eğrisi, fanın ürettiği basıncın ve gereken gücün fanın geçirebildiği hava debisi aralığı boyunca çizildiği grafiktir [1]. Kayışlı bir radyal fan kataloğunda eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
+Fan eğrisi, fanın ürettiği basıncın ve gereken gücün fanın geçirebildiği hava debisi aralığı boyunca çizildiği grafiktir [1]. Kayışlı bir radyal fan kataloğunda eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir; bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
 
-Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Sistem eğrisi, sistemin bileşenlerindeki kayıpların toplanmasıyla hesaplanır [1]. Kılavuza göre fan, sistem eğrisinin fan eğrisini en yüksek verim noktasının yakınında olmayan bir noktada kesmesi nedeniyle verimsiz çalışabilir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1]. Radyal düz kanatlı fanlarda tutunma kaybı sorunları diğer fanlara göre daha az görülür [1]. Çalışma koşulları geniş ölçüde değişen sistemlerde aksiyel fan özellikle uygun değildir, çünkü şiddetli bir tutunma kaybı bölgesi vardır [1]; tutunma kaybı öne eğik ve geriye eğik santrifüj fanlarda da şiddetli olabilir [1].
+Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir; sistemin bileşenlerindeki kayıpların toplanmasıyla hesaplanır [1]. Kılavuza göre:
+
+- Sistem eğrisi fan eğrisini en yüksek verim noktasının yakınında olmayan bir noktada keserse fan verimsiz çalışabilir [1].
+- Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1].
+- Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, kararlı bir çalışma noktası arayıp duran kararsız bir davranışa girebilir [1].
+
+Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; tutunma kaybı öne eğik ve geriye eğik santrifüj fanlarda da şiddetli olabilir [1]. Radyal düz kanatlı fanlarda tutunma kaybı sorunları diğer fanlara göre daha az görülür [1].
 
 ## Toplam basınç artışı ile statik basınç artışı nasıl ilişkilidir?
 
-Kayışlı bir santrifüj fan kataloğunda eğriler fanın toplam basınç artışını gösterir [2]. Çıkıştaki dinamik basınç, fan çıkışındaki flanşlı kesit alanına göre alınır [2]. Fan çıkışına kanal takılıysa statik basınç artışı, toplam basınç artışından çıkıştaki dinamik basıncın çıkarılmasıyla bulunur; kanal yoksa (serbest çıkış) dinamik basınç, serbest çıkış için verilen bir düzeltme katsayısıyla çarpılarak çıkarılır [2]. Bu, ilgili fan serisi için verilen hesap yöntemidir; başka kataloglarda gösterim ve katsayılar farklı olabilir.
+Kayışlı bir santrifüj fan kataloğunda eğriler fanın toplam basınç artışını gösterir [2]. Çıkıştaki dinamik basınç, fan çıkışındaki flanşlı kesit alanına göre alınır [2]. Statik basınç artışı şöyle bulunur:
+
+- Fan çıkışına kanal takılıysa toplam basınç artışından çıkıştaki dinamik basınç çıkarılır [2].
+- Kanal yoksa (serbest çıkış) dinamik basınç, serbest çıkış için verilen bir düzeltme katsayısıyla çarpılarak çıkarılır [2].
+
+Bu, ilgili fan serisi için verilen hesap yöntemidir; başka kataloglarda gösterim ve katsayılar farklı olabilir.
 
 ## Fanı en yüksek verim noktasına yakın seçin
 
-Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve onarımlar arasındaki süreyi uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1]. Fan devri düşürüldüğünde debi devirle doğrusal, basınç devrin karesiyle, güç devrin küpüyle değişir [1].
+Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve onarımlar arasındaki süreyi uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1].
+
+Fan devri düşürüldüğünde debi devirle doğrusal, basınç devrin karesiyle, güç devrin küpüyle değişir [1].
 
 ## Montaj, hava yoğunluğu ve ses
 
-Fan çıkışına yakın konumlandırılmış bir dirsek, iletilen debiyi %30'a kadar azaltan bir sistem etkisi yaratabilir [1]. Fan eğrilerinin çoğu standart hava yoğunluğu varsayımıyla çizilir; ölçülen statik basınç, gerçek hava yoğunluğu ile eğrinin çizildiği yoğunluk arasındaki farka göre düzeltilmelidir [1]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+Fan çıkışına yakın konumlandırılmış bir dirsek, iletilen debiyi %30'a kadar azaltan bir sistem etkisi yaratabilir [1]. Fan eğrilerinin çoğu standart hava yoğunluğu varsayımıyla çizilir; ölçülen statik basınç, gerçek hava yoğunluğu ile eğrinin çizildiği yoğunluk arasındaki farka göre düzeltilmelidir [1].
 
-## Fan seçiminde izlenecek yol
-
-1. Sistemin gerektirdiği debiyi ve toplam basıncı belirleyin; sistem eğrisini çıkarın [1].
-2. Havanın nem ve parçacık içeriğini belirleyin; bunlar fan tipi seçiminde önemli etkenlerdir [1].
-3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
-4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
-5. Fan girişindeki dirseği fana çok yakın yerleştirmeyin: girişten önce kanal çapının en az üç katı düz kanal bırakın, bu mümkün değilse giriş kutusu ya da akış düzeltici kullanın; çıkışta dirsek ve benzeri bağlantı parçalarını fandan yeterince uzağa yerleştirin [1].
-6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [4]; patlayıcı ortam söz konusuysa, tüzüğün kapsam dışı koşulu fanın yalnız o ortamda çalışmak üzere belirtilmiş ve bu amaçla özel olarak tasarlanıp pazarlanmış olması olduğundan, bunu gösteren belgeyi üreticiden isteyin [5].
+İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
 
 ## Sık sorulan sorular
 
 ### Radyal fan mı daha verimli, aksiyel fan mı?
 
-Tipe bağlıdır. Havayarı profilli geriye eğik radyal fanlarda verim %85'in üzerine çıkabilir [1]. Havayarı profilli, küçük boşluklu kılavuz kanatlı aksiyel fanlar da %85'e kadar verime ulaşabilir [1]. Öne eğik radyal fanlarda verim %55–65 aralığındadır [1].
+Tipe bağlıdır. Kanat profilli geriye eğik radyal fanlarda verim %85'in üzerine çıkabilir [1]. Kanat profilli, küçük boşluklu kılavuz kanatlı aksiyel fanlar da %85'e kadar verime ulaşabilir [1]. Öne eğik radyal fanlarda verim %55–65 aralığındadır [1].
 
 ### Aksiyel fan kanala takılır mı?
 
-Tüp tipi aksiyel fanlar kanallı HVAC tesisatına uygundur [1]. Sanayi havalandırma kataloğunda uzun gövdeli kanallı aksiyel fanlar bulunur; kanatları fan durdurulmuşken ayarlanabilir [3].
+Evet; tüp tipi aksiyel fanlar kanallı HVAC tesisatına uygundur [1]. Sanayi havalandırma kataloğunda uzun gövdeli kanallı aksiyel fanlar bulunur; kanatları fan durdurulmuşken ayarlanabilir [3].
 
 ### Fan eğrisindeki verim her devirde geçerli mi?
 
-Katalogda verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
+Kayışlı bir radyal fan kataloğunda diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2].
 
 ### Fazla büyük fan seçmenin zararı ne?
 
@@ -437,15 +466,26 @@ Büyük seçilen fan en yüksek verim noktasından uzakta çalışabilir; çalı
 
 ### Fanlar için 327/2011 sayılı AB tüzüğü hâlâ geçerli mi?
 
-Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır. (EU) 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [5]; eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [7]. Türkiye'de tebliğin diğer hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [6]. Türkiye'de eski tebliğin ekleri ise entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
+Genel hükümleri yürürlükten kalktı; ekleri geçiş döneminde uygulanır.
+
+- AB'de: (EU) 2024/1834 sayılı tüzük, 327/2011'in genel hükümlerini 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [5]. Eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [7].
+- Türkiye'de: tebliğin diğer hükümleri 24 Temmuz 2027'de yürürlüğe girer; o tarihe kadar önceki tebliğ yürürlükte kalır [6]. Eski tebliğin ekleri ise entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [6].
 
 ## VentHub'da hangi radyal ve aksiyel fan serileri var?
 
-Nicotra Gebhardt'ın radyal fan serileri [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarındadır. Aksiyel tarafta Vortice'nin [Vorticel E serisi](vh:aile/vortice-aksiyel-endustriyel-fanlar) düşük basınçlı plaka tipi aksiyel fan serisidir [3]. Diğer fanları [radyal fanlar](vh:kategori/centrifugal-fans), [aksiyel fanlar](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde bulabilirsiniz. İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
+Nicotra Gebhardt'ın radyal fan serileri [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarındadır. Aksiyel tarafta Vortice'nin [Vorticel E serisi](vh:aile/vortice-aksiyel-endustriyel-fanlar) düşük basınçlı plaka tipi aksiyel fan serisidir [3]. Diğer fanları [radyal fanlar](vh:kategori/centrifugal-fans), [aksiyel fanlar](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde bulabilirsiniz.
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
 
 ## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifin doğru fana dayanması için gerekli debi ve toplam basıncı [1], havanın temiz ya da parçacıklı olup olmadığını [1], taşınan havanın sıcaklığı ve yoğunluğunu [1][2], montaj yerindeki bağlantı düzenini [1] ve patlayıcı ortam ya da duman tahliyesi gibi özel bir kullanım olup olmadığını [4][5] bildirin.
+Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifin doğru fana dayanması için şunları bildirin:
+
+- Gerekli debi ve toplam basınç [1].
+- Havanın temiz ya da parçacıklı olduğu [1].
+- Taşınan havanın sıcaklığı ve yoğunluğu [1][2].
+- Montaj yerindeki bağlantı düzeni [1].
+- Patlayıcı ortam ya da duman tahliyesi gibi özel bir kullanım olup olmadığı [4][5].
 
 ## Kaynaklar
 
@@ -457,7 +497,7 @@ Güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğme
 4. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
 5. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, md. 1(3), 9, 10, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
 6. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2), md. 1, 10–12, geçici md. 1. https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 11.10.2026)
-7. Avrupa Komisyonu, (AB) 2025/2481 sayılı Komisyon Tüzüğü (2024/1834'ü değiştiren tüzük), madde 1(4), Resmî Gazete (OJ L, 8.12.2025); metin EUR-Lex'ten alınan iki yerel kopyadan (HTML ve metin dışa aktarımı) okundu ve madde 9(1) bakımından Resmî Gazete metninin bir PDF kopyasıyla karşılaştırıldı, üçünde de aynıdır; EUR-Lex'in canlı sayfası 3 Kasım 2026'da bot doğrulaması verdiği için yeniden doğrulanamadı: http://data.europa.eu/eli/reg/2025/2481/oj
+7. Avrupa Komisyonu, (AB) 2025/2481 sayılı Komisyon Tüzüğü (2024/1834 sayılı tüzüğü değiştiren tüzük), madde 1(4), Resmî Gazete (OJ L, 8.12.2025). http://data.europa.eu/eli/reg/2025/2481/oj (erişim 17.11.2026)
 
 ## Teknik sorumluluk notu
 
