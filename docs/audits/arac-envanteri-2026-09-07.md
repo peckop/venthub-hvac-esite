@@ -1188,6 +1188,20 @@ gerektirmez).
   üç bağ da kırmızı, ilan yanlış bağa çevrilince iki yön de kırmızı (her sabotaj geri alındı, sha256 doğrulandı).
   **Sınır (başlıkta da yazılı):** kapının kendi birim testi (c)'nin vitest kolunu da doldurur; iş akışı komutu koparsa bu test
   kırmızı vermez (ölçüldü), o değişmezi kapıların kendi testleri ölçer.
+- **`src/__tests__/conformance/webhook-aile-tablo.test.ts` — `INV-WEBHOOK-AILE-1`** (ALT-182, 17 Kasım 2026) — durum
+  **KAL**, sahip ALTYAPI. Webhook ailesini TEK TABLODA ölçer: uç keşfi dosya sisteminden (`supabase/functions/*/index.ts` ve
+  `src/app/api/**/route.ts`; imza sinyali ya da yolda webhook/callback), her uç için imza (ham gövde + sabit zamanlı karşılaştırma),
+  zaman damgası penceresi, olay kimliği tekilleştirme (kanıt desenleri kaynakta okunur) ve hata gövdesinde ham `.message` yok.
+  Tabloda olmayan yeni uç KIRMIZI, tabloda olup keşfedilmeyen satır KIRMIZI (bayat); muaf hücre yazılı gerekçe (≥ 40 karakter) +
+  kart numarası ister ve sayısı tavanı (5: order-paid ve quote olay tablosu OPS-293 D6, iyzico-callback üç hücre ALT-182) aşamaz.
+  Tetik: PR (`ci` vitest). Kardeşleri `webhook-imza-kapsami*`, `webhook-hata-govdesi`, `webhook-duz-yol-istisna` uç adını elle
+  listeler; bu test onların yakalayamadığı "listede olmayan yeni uç" sınıfını kapatır, davranışı onlar ölçer.
+  **Neden §3.2'de satır değil:** evren `scripts/**`, bu dosya `src/` altında (bkz. yukarıdaki `INV-CI-KAPI-BAGLI-1` notu).
+  **Kanıt:** 18 sınama; sabotaj kolları: yeni uç, bayat satır, imza/ham gövde/zaman/olay kanıtının sökülmesi, dört uçta hata
+  gövdesine `.message` sızdırma, kartsız ve kısa gerekçeli muaf, muaf tavanı, geçici ağaçta keşif (adsız imza sinyali, yorumdaki
+  anma sayılmıyor, boş ağaç), ortak yardımcıdan `timingSafeEquals` sökülmesi.
+  **Sınır:** sinyalsiz ve adında webhook/callback geçmeyen bir uç keşfedilmez; kanıt desenleri varlık kanıtıdır, davranışı
+  uçların kendi testleri ölçer.
 
 ---
 
