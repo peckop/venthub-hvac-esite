@@ -92,6 +92,7 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
+    // BLG-82: yazı R3.5 okur gözü kurallarıyla yeniden düzenlendi (seçim yolu başa, yinelenen giriş ve şerhler çıktı); yeni iddia, sayı, kaynak yok.
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
@@ -102,15 +103,23 @@ export const YAZILAR: readonly RehberYazisi[] = [
         kartOzeti: 'Konvertör seçimine nereden başlayacağınızı bu rehberde bulun.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
 
-Frekans konvertörü, motorun hızını motora verdiği gerilimi ve frekansı değiştirerek ayarlayan elektronik kontrol cihazıdır [1]. Pompa ve fanda hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır; üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Cihaz seçimi besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiğine bakılarak yapılır [1][2].
+Frekans konvertörü, motora verdiği gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik kontrol cihazıdır [1]. Fan ve pompa için seçim besleme gerilimine, güç aralığına, koruma sınıfına, çalışma ortamına ve uygulamanın tork karakteristiğine bakılarak yapılır [1][2]. Fan ve pompada hız anma değerine göre %20 azaltıldığında, üretici belgesindeki örnekte elektrik tüketimi %50 azalır [2].
 
 Kısaca:
 
-- Çalışma: cihaz temel biçiminde doğrultucu, DC ara devre, invertör ve kontrol birimi olmak üzere dört ana bölüme ayrılabilir [1].
-- Enerji: santrifüj fan ve pompada küçük bir hız düşüşü güçte büyük bir düşüş getirir [2].
 - Tork: pompa ve fanlar değişken tork uygulamasıdır; bu uygulamada düşük hızda motor için ek soğutma ya da akım düşürme gerekmez [1].
+- Enerji: santrifüj fan ve pompada küçük bir hız düşüşü güçte büyük bir düşüş getirir [2].
+- Ortam: yüksek ortam sıcaklığı, yüksek rakım ve uzun motor kablosu akım düşürme gerektirebilir [1].
+- Güç: FC 51 gerilim sınıfına göre 0,18 kW ile 22 kW, FC 101 0,25 kW ile 90 kW arasında güç sunar [2][6].
 
-Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
+## Frekans konvertörü seçiminde izlenecek yol
+
+1. Uygulamanın değişken tork mu sabit tork mu olduğunu belirleyin [1].
+2. Besleme gerilimine ve güç aralığına uygun aileyi seçin [2][4].
+3. Montaj yerinin sıcaklık, rakım ve kablo uzunluğu koşullarını kontrol edin; gerekiyorsa bir üst güç boyutunu seçin [1].
+4. Ortama uygun koruma sınıfını belirleyin [3][5].
+5. Kurulumu elektromanyetik uyumluluk ve topraklama kurallarına göre planlayın [1].
+6. Pompa sistemlerinde enerji tasarrufu hesabında statik basma yüksekliğini göz önüne alın [7].
 
 ## Frekans konvertörü nedir?
 
@@ -118,14 +127,14 @@ Frekans konvertörü, motor hızını değiştirebilen ya da yükteki değişime
 
 ## Frekans konvertörü nasıl çalışır?
 
-Bir frekans konvertörü temel biçiminde dört ana bölüme ayrılabilir: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
+Bir frekans konvertörü temel biçiminde dört ana bölüme ayrılabilir: doğrultucu, DC ara devre, invertör ve kontrol birimi [1].
 
-| Bölüm | Görevi |
+| Bölüm | Görevi [1] |
 |---|---|
-| Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir [1] |
-| DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler [1] |
-| İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
-| Kontrol birimi | Yazılım, donanımı çalıştırarak AC motoru kontrol eden ve düzenleyen değişken gerilimi üretir [1] |
+| Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir |
+| DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler |
+| İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir |
+| Kontrol birimi | Yazılım, donanımı çalıştırarak AC motoru kontrol eden ve düzenleyen değişken gerilimi üretir |
 
 İnvertör, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
 
@@ -143,7 +152,7 @@ Frekans konvertörü, fan ya da pompanın hızını dahili kontrolüyle değişt
 
 ## Frekans konvertörüyle yumuşak kalkış
 
-Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıldız/üçgen yol verici ya da yumuşak yol verici kullanılır; frekans konvertörü kullanıldığında bu ayrı yol vericilere gerek kalmaz [2][1]. Frekans konvertörü motoru kalkındırırken anma akımından fazla akım çekmez [2].
+Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıldız/üçgen yol verici ya da yumuşak yol verici kullanılır; frekans konvertörü kullanıldığında bu ayrı yol vericilere gerek kalmaz [1][2]. Frekans konvertörü motoru kalkındırırken anma akımından fazla akım çekmez [2].
 
 ## Değişken tork ve sabit tork uygulamaları
 
@@ -160,12 +169,14 @@ Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıl
 
 ## Danfoss FC 51, FC 101 ve FC 102 karşılaştırması
 
-| Özellik | FC 51 (VLT Micro Drive) | FC 101 (VLT HVAC Basic Drive) | FC 102 (VLT HVAC Drive) |
-|---|---|---|---|
-| Güç aralığı | 0,18–22 kW, gerilim sınıfına göre [6] | 0,25–90 kW [2] | Modele göre; ürün sayfasına bakınız |
-| Giriş | Tek faz 200–240 V; üç faz 200–240 V ve 380–480 V [4] | Üç faz 200–240 V, 380–480 V, 525–600 V [2] | Modele göre; ürün sayfasına bakınız |
-| Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] | Modele göre; ürün sayfasına bakınız |
-| Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] | Yerleşik PID kontrolü, pompa kademeleme [1] |
+| Özellik | FC 51 (VLT Micro Drive) | FC 101 (VLT HVAC Basic Drive) |
+|---|---|---|
+| Güç aralığı | 0,18–22 kW, gerilim sınıfına göre [6] | 0,25–90 kW [2] |
+| Giriş | Tek faz 200–240 V; üç faz 200–240 V ve 380–480 V [4] | Üç faz 200–240 V, 380–480 V, 525–600 V [2] |
+| Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] |
+| Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] |
+
+FC 102'nin (VLT HVAC Drive) 355–800 kW gövdelerinde yerleşik PID kontrolü ve pompa kademeleme bulunur [1].
 
 Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 101](vh:aile/danfoss-vlt-hvac-basic-drive-fc-101) ve [FC 102](vh:aile/danfoss-vlt-hvac-drive-fc-102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
 
@@ -173,23 +184,21 @@ Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 
 
 - **Uyku modu.** Debi düşük ya da sıfır olduğunda sürücü enerji tasarrufu için uyku moduna geçer; basınç ayar değerinin altına düştüğünde kendiliğinden yeniden başlar [3].
 - **Yangın modu.** Sürücünün kendini korumak için durmasını engeller; merdiven basınçlandırma, otopark egzoz fanları ve duman tahliyesi gibi uygulamalarda fanın çalışmasını sürdürür [3].
-- **Yerleşik PID kontrolü.** Kapalı çevrim sistemlerde basıncı, debiyi ya da sıcaklığı korumak için dış kontrol cihazına duyulan ihtiyacı ortadan kaldırır; iki ayrı cihazdan gelen iki geri besleme sinyaliyle çalışabilir [1].
+- **Yerleşik PID kontrolü.** FC 102'nin 355–800 kW gövdelerinde, kapalı çevrim sistemlerde basıncı, debiyi ya da sıcaklığı korumak için dış kontrol cihazına duyulan ihtiyacı ortadan kaldırır; iki ayrı cihazdan gelen iki geri besleme sinyaliyle çalışabilir [1].
 - **Otomatik enerji optimizasyonu.** FC 51'de HVAC uygulamalarında %5–15 enerji tasarrufu sağlar [6].
-- **Pompa kademeleme.** FC 102'nin temel kademe kontrolü, değişken hızlı bir pompaya ek olarak sabit hızlı pompaları sırayla devreye alır [1].
-
-FC 102 işlevleri için kaynak olarak kullanılan tasarım kılavuzu 355–800 kW gövdeleri kapsar [1]. Bu yüzden yerleşik PID kontrolünün ve pompa kademelemenin seçtiğiniz güçteki modelde bulunduğunu ürün belgesinden doğrulayın.
+- **Pompa kademeleme.** FC 102'nin 355–800 kW gövdelerinde temel kademe kontrolü, değişken hızlı bir pompaya ek olarak sabit hızlı pompaları sırayla devreye alır [1].
 
 ## Üç fazlı girişli frekans konvertörlerinde verimlilik şartı var mı?
 
 AB'nin 2019/1781 sayılı Komisyon Tüzüğü, 1 Temmuz 2021'den itibaren 0,12 kW ile 1000 kW arasındaki motorlarla kullanılan üç fazlı girişli değişken hız sürücülerinin güç kayıplarının IE2 verim düzeyine karşılık gelen en yüksek güç kaybını aşmamasını zorunlu kılar [8]. Tüzük 2021'de (EU) 2021/341 sayılı tüzükle değiştirildi; 24.01.2023 tarihli konsolide metinde sürücülere yönelik IE2 şartı ilk metindeki ifadesiyle yer alır [9].
 
-Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye duyarlı tasarım gereklilikleri, Sanayi ve Teknoloji Bakanlığı'nın 28 Nisan 2021 tarihli ve 31468 sayılı Resmî Gazete'de yayımlanan Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM: 2021/16) ile belirlenmiştir [10]. Tebliğ, 0,12 kW ile 1000 kW arasındaki motorlarla çalışan üç fazlı girişli değişken hız sürücülerini kapsar ve AB'nin 2019/1781 sayılı Komisyon Tüzüğü ile onu değiştiren 2021/341 sayılı tüzük esas alınarak hazırlanmıştır [10]. Tebliğin maddelerinin çoğu 15 Ağustos 2021'de yürürlüğe girmiştir; ilk metindeki 1 Temmuz 2021 tarihi, 29 Haziran 2021 tarihli değişiklik tebliğiyle (SGM: 2021/23) ertelenmiştir [10][12]. Bu nedenle Türkiye'deki başlangıç tarihi, AB tüzüğünün uygulandığı 1 Temmuz 2021'den farklıdır [8][12]. Tebliğ, 1 sayılı Cumhurbaşkanlığı Kararnamesi ile 2010/643 sayılı Bakanlar Kurulu Kararıyla yürürlüğe konulan yönetmeliğe dayanır [10].
+Türkiye'de 0,12 kW ile 1000 kW arasındaki motorlarla çalışan üç fazlı girişli değişken hız sürücüleri, 28 Nisan 2021 tarihli ve 31468 sayılı Resmî Gazete'de yayımlanan Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM: 2021/16) kapsamındadır; Tebliğ, AB'nin 2019/1781 sayılı Komisyon Tüzüğü ile onu değiştiren 2021/341 sayılı tüzük esas alınarak hazırlanmıştır [10]. Tebliğin sürücülere yönelik şartı, 29 Haziran 2021 tarihli değişiklik tebliğiyle (SGM: 2021/23) 15 Ağustos 2021'den itibaren uygulanır [10][12].
 
 ## Sürücü kurulumunda dikkat edilecekler
 
-- Motor kablosundaki hızlı gerilim değişimi (dU/dt), kablonun fazları ile ekranı ve ekran ile toprak arasında kaçak akımlar oluşturur; bu da sürücünün elektromanyetik yayılımını değiştirir [1].
 - Şebeke, motor ve kontrol kabloları birbirinden ayrı döşenmelidir; aksi hâlde istenmeyen davranış ya da düşük performans görülebilir [1].
-- Sürücüler için elektromanyetik uyumluluk kategorileri (C1–C4) EN/IEC 61800-3 standardında tanımlanır: C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Bu sınıflandırma Danfoss FC 102 tasarım kılavuzundan aktarılmıştır [1]. Standardın güncel baskısı ayarlanabilir hızlı sürücü sistemlerinin EMC gerekliliklerini tanımlar [11].
+- Motor kablosundaki hızlı gerilim değişimi (dU/dt), kablonun fazları ile ekranı ve ekran ile toprak arasında kaçak akımlar oluşturur; bu da sürücünün elektromanyetik yayılımını değiştirir [1].
+- Danfoss FC 102 tasarım kılavuzuna göre sürücülerin elektromanyetik uyumluluk kategorileri (C1–C4) EN/IEC 61800-3 standardında tanımlanır: C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir [1]. Standardın güncel baskısı ayarlanabilir hızlı sürücü sistemlerinin EMC gerekliliklerini tanımlar [11].
 - Motor yatak akımlarını önlemek için tahrik ucu olmayan tarafta yalıtımlı rulman kullanılması ve sürücü, motor ile tahrik edilen makinenin doğru topraklanması önerilir [1].
 - Elektrik çarpmasına karşı kaçak akım koruma cihazı kullanılacaksa besleme tarafında yalnız Tip B cihaz kullanılmalıdır, çünkü sürücü toprak iletkeninde DC akım oluşturabilir [1].
 - Sürücü patlayıcı ortama kurulmamalıdır; gerekiyorsa bu alanın dışındaki bir panoya yerleştirilir [1].
@@ -204,40 +213,31 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 
 ## Teklif için hangi bilgiler gerekir?
 
-Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
+Güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. Doğru cihaz seçimi ve birebir karşılaştırılabilir teklif alabilmek için şu bilgileri paylaşmanız gerekir:
 
 - **Güç ve giriş gerilimi.** Aynı aile içinde modeli güç ve gerilim sınıfı belirler; örneğin FC 101 0,25 kW ile 90 kW arasında, üç fazlı 200–240 V, 380–480 V ve 525–600 V girişle üretilir [2].
 - **Koruma sınıfı ve kitler.** FC 101 IP20 ya da IP54 gövdeyle sunulur; IP21 isteğe bağlı bir kitle sağlanır [3].
 - **Montaj yerinin koşulları.** Yüksek ortam sıcaklığı, yüksek rakım, yüksek anahtarlama frekansı ya da uzun motor kablosu akım düşürme gerektirebilir; bu durumlarda bir güç boyutu büyük cihaz seçilmesi önerilir [1].
-- **Elektromanyetik uyumluluk kategorisi.** EN/IEC 61800-3'e göre C1 ve C2 konut ve ofis ortamı, C3 endüstriyel ortam içindir (Danfoss FC 102 tasarım kılavuzuna göre) [1]. Teklifteki cihazın, kurulacağı ortamın kategorisine uyduğuna bakın.
-- **Kurulum kalemleri.** Motor kablosunun türü ve uzunluğu (FC 51'de ekranlı kabloda azami 15 m, ekransız kabloda azami 50 m [4]), kaçak akım koruması kullanılacaksa besleme tarafındaki Tip B cihaz [1] ve şebeke, motor ve kontrol kablolarının ayrı döşenmesi [1].
-
-## Frekans konvertörü seçiminde izlenecek yol
-
-1. Uygulamanın değişken tork mu sabit tork mu olduğunu belirleyin [1].
-2. Besleme gerilimine ve güç aralığına uygun aileyi seçin [2][4].
-3. Montaj yerinin sıcaklık, rakım ve kablo uzunluğu koşullarını kontrol edin; gerekiyorsa bir üst güç boyutunu seçin [1].
-4. Ortama uygun koruma sınıfını belirleyin [3][5].
-5. Kurulumu elektromanyetik uyumluluk ve topraklama kurallarına göre planlayın [1].
-6. Pompa sistemlerinde enerji tasarrufu hesabında statik basma yüksekliğini göz önüne alın [7].
 
 ## Sık sorulan sorular
 
 ### Frekans konvertörü ile invertör aynı şey mi?
 
-Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. Bu en yaygın biçim, gerilim kaynaklı ve darbe genişlik modülasyonlu (PWM) frekans konvertörüdür; kaynak ona çoğu zaman yanlışlıkla invertör dendiğini de belirtir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
+İnvertör, frekans konvertörünün içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1]. Elektronik değişken hız sürücülerinin en yaygın biçimi gerilim kaynaklı ve darbe genişlik modülasyonlu (PWM) frekans konvertörüdür; pompa rehberi ona çoğu zaman yanlışlıkla invertör dendiğini belirtir [7].
 
 ### Frekans konvertörü ne kadar enerji tasarrufu sağlar?
 
-Tasarruf uygulamaya bağlıdır. Fan ve pompada hızı %20 azaltmak, üretici örneğinde elektrik tüketimini %50 azaltır [2]. FC 101 seçim kılavuzu da değişken tork uygulamalarında bu oranı tipik değer olarak verir [3]. Statik basma yüksekliği olan pompa sistemlerinde gerçek tasarruf ayrıca hesaplanmalıdır [7].
+Fan ve pompada hızı %20 azaltmak, üretici örneğinde elektrik tüketimini %50 azaltır [2]. FC 101 seçim kılavuzu da değişken tork uygulamalarında bu oranı tipik değer olarak verir [3]. Tasarruf uygulamaya bağlıdır. Statik basma yüksekliği olan pompa sistemlerinde gerçek tasarruf ayrıca hesaplanmalıdır [7].
 
 ### Frekans konvertörü motorda ses yapar mı?
 
-Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+Anahtarlama frekansı düşük tutulursa motorda duyulabilir ses oluşur; yüksek tutulursa sürücüde ısı artar [1]. FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir [5].
+
+İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi)
 
 ### Yangın modunda frekans konvertörü fanı durdurur mu?
 
-FC 101'in yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3]. Bu cevap yalnız Danfoss FC 101 için kaynaklıdır; başka sürücülerin yangın modu davranışı o sürücünün kılavuzundan okunmalıdır.
+Danfoss FC 101'de yangın modu açıldığında sürücü kendini korumak için durmaz; kontrol sinyallerine, uyarılara ya da alarmlara bakmadan fanın çalışmasını sürdürür [3].
 
 ### Türkiye'de frekans konvertörleri için verimlilik şartı var mı?
 
@@ -245,7 +245,7 @@ Evet. AB tüzüğüne göre 1 Temmuz 2021'den beri üç fazlı girişli değişk
 
 ### Frekans konvertörü teklifi için hangi bilgileri paylaşmalıyım?
 
-Teklifin doğru cihaza dayanması için motorun gücü, besleme gerilimi ve faz sayısı [2][4], uygulamanın değişken tork mu sabit tork mu olduğu [1], montaj yerinin sıcaklığı ve rakımı ile motor kablosunun uzunluğu [1] ve istenen koruma sınıfı [3][5] gerekir. Bu bilgilerle aynı özellikteki cihazlar karşılaştırılabilir.
+Motorun gücü, besleme gerilimi ve faz sayısı [2][4], uygulamanın değişken tork mu sabit tork mu olduğu [1], montaj yerinin sıcaklığı ve rakımı ile motor kablosunun uzunluğu [1] ve istenen koruma sınıfı [3][5] gerekir.
 
 ## Kaynaklar
 
