@@ -1620,6 +1620,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
+    // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-slimroof-cati-fanlari'],
     ilgiliKategoriler: ['vh:kategori/roof-fans'],
@@ -1662,7 +1663,7 @@ ABD Enerji Bakanlığı kılavuzu fanları iki ana türe ayırır: eksenel fanla
 
 Vortice, Slimroof serisinde başlığın yuvarlak tasarımının yağmur girişi riskini azalttığını, koruyucu başlığın motor ve pervane bakımı için kolayca çıkarıldığını ve EC motorun entegre elektronik kontrolle motoru optimum yükte çalıştırdığını bildirir [5].
 
-Dikey atışla egzoz havası çeken bir çatı fanı serisi, mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalar için sunulur ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygundur [7].
+Dikey atışla egzoz havası çeken bir çatı fanı serisi mutfak egzozu, proses havası ve sanayi fırınları gibi uygulamalar için sunulur ve sürekli çalışmada 120 °C'ye kadar hava sıcaklığına uygundur [7].
 
 ## Teklif için hangi bilgiler gerekir?
 
@@ -1959,6 +1960,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: Kısaca maddelerinden ABD birimleri çıkarıldı (R3.4 k).
+    // BLG-79: Kısaca maddelerinden ABD birimleri çıkarıldı (R3.4 k).
     guncellemeTarihi: '2026-11-17',
     urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
@@ -1976,7 +1978,7 @@ Kısaca:
 
 - Mevzuat: baca ya da mekanik havalandırma istenir, gövdede debi yoktur; bağımsız bölümün ıslak hacminde mekanik havalandırma yapılmazsa pencere net 0,30 × 0,30 m'den küçük olamaz [1].
 - Debi: HVI belirli bir alana kadar olan banyoda debiyi alana göre önerir [4]; İngiltere konutlarında aralıklı egzozda banyo en az 15, tuvalet 6 l/s [3].
-- Ses: ENERGY STAR banyo ve yardımcı oda fanlarında asgari verim ve azami 2,0 sone ister [6].
+- Ses: ENERGY STAR, yaklaşık 17 ile 150 m³/h aralığındaki banyo fanlarında azami 2,0 sone ister [6].
 - Kumanda: broşürde nem eşiği, hareket algılama fanı açar, zamanlayıcı kapatır [10].
 
 ## Banyo ve tuvalet fanı ne işe yarar?
