@@ -514,7 +514,7 @@ Kısaca:
 3. Ses değerinin koşulunu okuyun: yol (emiş, üfleme, gövde), ayar noktası ve mesafe [2].
 4. Gereğinden büyük fan seçmeyin; fazla büyük fan yüksek hava akımı gürültüsü üretir [4].
 5. Fanı ve kanal bağlantılarını titreşim yalıtımıyla kurun; fan kutusunun tavan panosuna ve taşıyıcıya doğrudan değmemesine dikkat edin [1][4].
-6. Kanal tasarımında kanal içi gürültü düzeyini hesaplatın; binanın özelliğinden dolayı EK-5 Tablo 5.1'de izin verilen iç gürültü sınırları aşılırsa kanal içi ses yalıtımı yapılır [1].
+6. Kanal tasarımında kanal içi gürültü düzeyini hesaplatın; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1].
 7. Hız kumandası seçeneklerine bakın: 0–10 V sinyali, hız seçici ya da hız ayarlayıcı [2].
 
 ## Sessiz fan nedir?
@@ -587,7 +587,7 @@ EK-8'e göre servis ekipmanlarının zemine bağlantılarında ve boru ile kanal
 
 ### Susturucu ve kanal içi ses yalıtımı
 
-Yönetmeliğe göre kanal tasarımı sırasında kanal içi gürültü düzeyinin de hesaplanması gerekir; binanın özelliğinden dolayı EK-5 Tablo 5.1'de izin verilen iç gürültü sınırları aşılırsa kanal içi ses yalıtımı yapılır [1]. Kanalı yalıtmak ve ses sönümleyici malzeme ya da bölme (baffle) kullanmak gürültü azaltma yöntemleri arasındadır [4]. Havalandırma kanalına monte edilen susturucuların eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
+Yönetmeliğe göre kanal tasarımı sırasında kanal içi gürültü düzeyinin de hesaplanması gerekir; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Tablo 5.1, izin verilen en yüksek iç gürültü düzeylerini içerir [1]. Kanalı yalıtmak ve ses sönümleyici malzeme ya da bölme (baffle) kullanmak gürültü azaltma yöntemleri arasındadır [4]. Havalandırma kanalına monte edilen susturucuların eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
 
 ### Hız kumandası
 
@@ -651,7 +651,7 @@ Lineo Quiet'te katalog verilerine göre ayar düştükçe ses düşer: Lineo 100
 
 ### Kanal fanında susturucu gerekir mi?
 
-Yönetmeliğe göre kanal tasarımında kanal içi gürültü hesaplanır; binanın özelliğinden dolayı EK-5 Tablo 5.1'de izin verilen iç gürültü sınırları aşılırsa kanal içi ses yalıtımı yapılır [1]. Havalandırma kanalına monte edilen susturucular ve hava sonlandırma birimleri için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
+Yönetmeliğe göre kanal tasarımında kanal içi gürültü hesaplanır; binanın özelliğinden dolayı EK-5.1'de verilen gürültü düzeyleri aşılırsa kanal içi ses yalıtımı yapılır [1]. Havalandırma kanalına monte edilen susturucular ve hava sonlandırma birimleri için eklenti kaybı, akış gürültüsü ve toplam basınç kaybı ölçümleri TS EN ISO 7235'te tanımlıdır [1].
 
 ### Aksiyel fan mı santrifüj (radyal) fan mı daha sessizdir?
 
@@ -665,7 +665,7 @@ Lineo Quiet modellerinde katalogdaki en düşük gövde değeri Lineo 100 Quiet 
 
 Üretici belgelerinde verilen sayfa numaraları PDF dosyasındaki sayfa sırasıdır; basılı sayfa numarasından farklı olabilir.
 
-1. T.C. Resmî Gazete, 31.05.2017, Sayı 30082, Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik (Çevre ve Şehircilik Bakanlığı), md. 4, 6, 9, 13, 17, 18, 23, EK-5 Tablo 5.1, EK-8, EK-9. https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm ve ekleri https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7-1.pdf (erişim 16.10.2026)
+1. T.C. Resmî Gazete, 31.05.2017, Sayı 30082, Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik (Çevre ve Şehircilik Bakanlığı), md. 4, 6, 9, 13, 17, 18, EK-5 Tablo 5.1, EK-8, EK-9. https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm ve ekleri https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7-1.pdf (erişim 16.10.2026)
 2. Vortice, LINEO Range kataloğu (dosya adı Doc_Pubblicita_Lineo_Range_193047.pdf), basılı künye Cod. 5.170.084.547 – Mayıs 2026 (son sayfada ayrıca 5.170.084.504, Şubat 2026 kodu da yazılıdır), s. 4–6, 10, 12, 15, 18, 21, 24, 28 (üretici belgesi).
 3. Dünya Sağlık Örgütü (WHO), Guidelines for Community Noise, Berglund, Lindvall, Schwela (ed.), 1999, bölüm 4.3 ve 4.3.1 (basılı s. 43). https://iris.who.int/handle/10665/66217 (erişim 16.10.2026)
 4. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 22, 45 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 16.10.2026)
