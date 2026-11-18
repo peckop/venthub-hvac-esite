@@ -1,6 +1,6 @@
 # OPS defteri: yeni site geçişi (tek süreç)
 
-Sahibi: OPS · Son doğrulama: 2026-11-09 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: OPS-180 (ana kart), OPS-258, HRT-128
+Sahibi: OPS · Son doğrulama: 2026-11-18 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: OPS-180 (ana kart), OPS-258, HRT-128
 
 **Son tarih: Design projesi 14 Aralık 2026'da kapanıyor.** Design'daki içerik, adres verisi, görseller ve makaleler o tarihten önce kalıcı depoya alınır (kart OPS-228).
 
@@ -14,7 +14,8 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 | Parça | Ne | Alt defter ya da kart |
 |---|---|---|
-| Design | Claude Design'daki "Venthub New" projesi yeni sitenin kaynağı; eksiklerini Recep yaptırır, eksik listesini OPS verir; OPS Design'a kendiliğinden şart ya da kural yazmaz | 2. bölüm B; kart OPS-180 |
+| Design | Claude Design'daki "Venthub New" projesi yeni sitenin ve panelin kaynağı; eksiklerini Recep yaptırır, eksik listesini OPS verir; OPS Design'a kendiliğinden şart ya da kural yazmaz | 2. bölüm B; kart OPS-180 |
+| Kurumsal belgeler | Basılı/PDF belgelerin (teklif, sipariş onayı, fatura, irsaliye, makbuz, mutabakat, satınalma seti, e-postalar) sahibi ayrı Design projesi "VentHub Kurumsal Belgeler"; panel kopyayı alır ve kaydı tek `veri` alanıyla verir | 4. bölüm (18 Kasım); TSR-27, OPS-334 |
 | Adres | Tek önek şeması, eski adreslerin yeni adreslere 308 yönlendirmesi | `docs/defter/urun-adres.md`; URN-157, ALT-177, SEO-76 |
 | UnoPIM / ürün verisi | Ürün verisinin tek kaynağı; Design ile sayı farkı ve görselsiz ürünler | KTL-82 (Katalog); 2. bölüm A |
 | Arka uç | Veritabanı, sipariş, teklif, ödeme, sunucu fonksiyonları canlıdan olduğu gibi alınır | OPS-180 (kapsam: yeni site mevcut arka uca bağlanır) |
@@ -34,6 +35,11 @@ Daha önce yazılmış plan: `docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md
 
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
+| 2026-11-18 | Kurumsal belge şablonları incelendi (15 belge ve hâlleri, 8 yeni e-posta); şablon bulguları Kurumsal Belgeler projesine, panel önizleme eksikleri Venthub New'e gitti; Venthub New dört belgeyi panel önizlemesine bağlayacak | Ağır 8 bulgu: koşullarda çiğ alan adları, fatura tahsil/vade çelişkisi, yurt dışı irsaliyede tek GTİP, makbuzda çek yer tutucusu; tevkifat ve ihracat hesabı doğru | TSR-27, OPS-334 |
+| 2026-11-18 | E-posta şablonlarındaki noktalı alan adları (`{{alici.yetkili}}`) ölçüldü: mevcut motor (`supabase/functions/_shared/kodlama.ts` renderTemplate) yalnız düz adı çözüyor | Yeni panelin e-postaları koda geçerken motor nokta yolunu çözmeli; şablon adları değişmez | OPS-334 |
+| 2026-11-18 | Önizleme Design Venthub New'in son hâliyle yeniden yayınlandı (karar 410 menü yapısı) | Tasarım ölçümü geçti | OPS-329 |
+| 2026-11-18 | Vortice belgeleri (Radon, AE ES, Torrette, In-Line, Tiracamino) Design Venthub New'e yüklendi, İçerik işledi; AE ES'de yeni kataloga göre 41228-41231 çıkarıldı | Ürün içeriği yeni kataloga göre | OPS-327, OPS-330 |
+| 2026-11-18 | Rehber yazısında tarih gizleme pilotu eski sitede tek yazıda canlıya çıktı (sayfada ve yapılandırılmış veride tarih yok, site haritası `lastmod` kalır) | Yeni sitede aynı kural Design'a iletildi | BLG-87, TSR-26, OPS-332 |
 | 2026-11-09 | Yeni sitenin tek önek adres şeması cetvele işlendi (`/urunler`, `/uygulama-alanlari`, `/rehber`) | `adres-semasi-standard.md` v0.3, #2449; adres ayrıntısı `urun-adres.md` | URN-159 |
 | 2026-11-09 | 308 takip paylaşımı: eşleştirme tablosu ve yönlendirme URUN, rota dili ve arama yönlendirmesi ALTYAPI, ölçüm GEO-SEO | Üç kart: URN-157 (beklemede), ALT-177, SEO-76 | URN-157, ALT-177, SEO-76 |
 | 2026-11-09 | Dizin süreci ve adres süreci kendi alt defterlerine alındı; bu defter ikisini tek süreç altında toplar | `urun-adres.md`, `geo-seo-dizin.md` (pilot) | OPS-258 |
@@ -117,6 +123,10 @@ Sıra yol haritasındandır; üç iş aynı anda yürür, sonra ortak kontrol, e
 | Ürün durumu SQL'le değişince site haritası tazelenmiyor | 17 Kasım: yuvarlak kanal fanı ailesinin 7 ürünü SQL ile yeniden yayına alındı, sayfa 200 oldu ama `sitemap.xml` önbellekte kaldı (en çok 6 saat); yeni sitede ürün durumu değişimi haritayı tazelemeli, yoksa IndexNow kapısı yeni adresi reddeder (SEO-68) | orta | SEO-68 |
 | llms.txt sayıları otomatik üretilsin | Eski sitede `llms.txt`'teki "N indexable URLs" ve "N categories" sayıları elle yazılıyordu; katalog değişince (17 Kasım: ürün geri alma, 101→102 ve 28→29) canlı kapı LLMS-SAYFA kırmızı verdi ve elle düzeltme gerekti. Yeni sitede `llms.txt` baştan üretilirken bu iki sayı site haritasından üretilmeli, elle yazılmamalı (OPS 18 Kasım: eski siteye araç yazılmaz, sayı satırı taşınmaz) | düşük | SEO-120 |
 | Yeni sitede canlı kapı LANG ve YONLENDIRME-ZINCIRI yeşil olmalı | Eski sitede iki kusur bilerek açık bırakıldı: LANG (`/en` ve `/en/products` `<html lang="tr">` basıyor, kök layout dili sabit; kayıt REC-373) ve YONLENDIRME-ZINCIRI (`/category/fanlar` 308→307→308, 3 sıçrama, en çok 2; kayıt REC-495). İkisinin kaydı 1 Kasım'da yeni siteye bırakıldığı için iptal edildi (OPS-196, karar 412); canlı kapı bu yüzden "yeni" kırmızı gösteriyor ve OPS'un kararıyla susturulmuyor (18 Kasım). Şart: yeni sitede `node scripts/seo/canli-kapi.mjs` bu iki kodu KIRMIZI vermemeli (dil başlığı sayfa diline göre, eski öneksiz adres en çok 2 sıçramayla hedefe) | orta | SEO-119 |
+| Kategori sayfasında "ilgili rehberler" yayın tarihine göre değil konuya göre seçilsin | Eski sitede yeni yazılar konusu uyan eski yazıları (sessiz fan, radyal-aksiyel) kutudan düşürüyor; karar 412 gereği eski sitede düzeltilmez, yeni sitede baştan konuya göre kurulur | orta | OPS-180 |
+| Rehber yazılarında tarih sayfada ve arama sonucunda görünmez; botlar görebilir (site haritası `lastmod`) | Eski sitede pilot BLG-87; yeni sitede Design'ın sonraki paketinde | orta | TSR-26, OPS-332 |
+| Kurumsal belgeler panel önizlemesine bağlanır | Kurumsal Belgeler projesi düzeltmeleri bitirince Venthub New güncel kopyayla bağlar; panel önizlemedeki künye/ETTN/sevk saati eksikleri çoğunlukla kendiliğinden kapanır | yüksek | OPS-334, TSR-27 |
+| Design projesinin taşınması: taşıma en çok 5.000 dosya okuyor, Venthub New 5.311 dosya | Geçici ve ekran görüntüsü klasörleri silinirse sınırın altına iner; silme kararı 7 Aralık'ta yeniden sorulur (yedek alındı) | yüksek | OPS-333, OPS-228 |
 | Satış kipi: şirket kurulunca tek anahtarla geçiş; o gün yeni iş yapılmaz | İki kip de Design'da hazırlanır, sepet ve satış kipi şirket kurulmadan test edilir | orta | OPS-180 |
 | Canlıya aktarım planı | Önizleme "tamam" olunca konuşulur; kapsam 4. bölümde | düşük | OPS-180 |
 | Bu defter için `olcum` komutu (manifest, plan dosyası ve alt defterlerdeki kart numaralarının tutarlılığı) | Defter `kontrolsuz` kalmasın; şimdilik `pilot` | düşük | açılacak |
@@ -128,6 +138,9 @@ Bu arada eski sitede yalnız iki tür iş yapılır: bugün zarar veren sorunlar
 
 | Tarih | Karar | Not |
 |---|---|---|
+| 2026-11-18 | Kurumsal belgelerin (basılı/PDF) tek kaynağı "VentHub Kurumsal Belgeler" Design projesidir; panel kopyayı alır, kaydı tek `veri` alanıyla verir | OPS-334 |
+| 2026-11-18 | Rehber yazılarında tarih sayfada ve aramada görünmez, botlar görebilir; önce tek yazıda pilot, sonra hepsi | BLG-87, OPS-332 |
+| 2026-11-18 | Rehber yazılarının yayın kararı yazı başına Recep'tedir | OPS-331 |
 | 2026-11-09 | Yeni site geçişi tek süreçtir; adres, Design ve dizin onun parçasıdır, ayrı araştırma ya da iş açılmaz | Bu defterin varlık nedeni |
 | 2026-11-06 | 1. Esas Design'dır: yeni sitenin kaynağı Design'daki "Venthub New" projesi, canlı vitrin taşınmaz; canlıdan yalnız arka uç (veritabanı, sipariş, teklif, ödeme, sunucu fonksiyonları) ve eski adreslerin yeni adreslere yönlendirmesi alınır | OPS-180 |
 | 2026-11-06 | 2. Ürün verisinin tek kaynağı UnoPIM; Design'da tamamlanan içerik UnoPIM'e alınır; UnoPIM eksiksiz olmadan hiçbir ürün yayına girmez | OPS-180 |
