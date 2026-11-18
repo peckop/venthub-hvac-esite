@@ -161,6 +161,7 @@ export async function YaziRotasi({ params, bolumDili }: { params: Params; bolumD
     dil: bolumDili,
     yayinTarihi: yazi.yayinTarihi,
     guncellemeTarihi: yazi.guncellemeTarihi,
+    tarihGizli: yazi.tarihGizli,
   })
   const kirinti = konumYoluJsonLd({
     lang: bolumDili,

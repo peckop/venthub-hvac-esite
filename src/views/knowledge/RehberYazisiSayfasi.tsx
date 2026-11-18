@@ -55,7 +55,9 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
   const t = (anahtar: string) => getDictValue(dict, anahtar)
   const listeHref = bilgiMerkeziListeHref(dil)
   const yayin = tarihYaz(yazi.yayinTarihi, dil)
-  const guncellendi = yazi.guncellemeTarihi !== yazi.yayinTarihi ? tarihYaz(yazi.guncellemeTarihi, dil) : null
+  // `tarihGizli` (OPS-332): künyede ne yayın ne güncelleme tarihi basılır.
+  const tarihGoster = !yazi.tarihGizli
+  const guncellendi = tarihGoster && yazi.guncellemeTarihi !== yazi.yayinTarihi ? tarihYaz(yazi.guncellemeTarihi, dil) : null
   const icindekilerBasligi = t('bilgiMerkezi.yazi.icindekiler')
 
   return (
@@ -89,8 +91,12 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
           <h1 className="text-4xl font-bold tracking-tight text-primary-navy lg:text-5xl">{ayrismis.h1}</h1>
           <p className="mt-4 flex flex-wrap gap-x-2 text-base text-industrial-gray">
             <span>{t('bilgiMerkezi.yazi.yazar')}</span>
-            <span aria-hidden="true">{'·'}</span>
-            <time dateTime={yazi.yayinTarihi}>{yayin}</time>
+            {tarihGoster && (
+              <>
+                <span aria-hidden="true">{'·'}</span>
+                <time dateTime={yazi.yayinTarihi}>{yayin}</time>
+              </>
+            )}
             <span aria-hidden="true">{'·'}</span>
             <span>{t('bilgiMerkezi.yazi.okumaSuresi').replace('{{count}}', String(okumaSuresi))}</span>
             {guncellendi && (

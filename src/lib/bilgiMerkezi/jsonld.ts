@@ -16,6 +16,8 @@ export interface MakaleJsonLdGirdisi {
   dil: 'tr' | 'en'
   yayinTarihi: string
   guncellemeTarihi: string
+  /** Açıksa `datePublished` ve `dateModified` yazılmaz (yazı kaydındaki `tarihGizli`; OPS-332). */
+  tarihGizli?: boolean
 }
 
 export function makaleJsonLd(g: MakaleJsonLdGirdisi): Record<string, unknown> {
@@ -27,8 +29,7 @@ export function makaleJsonLd(g: MakaleJsonLdGirdisi): Record<string, unknown> {
     headline: g.baslik,
     description: g.aciklama,
     inLanguage: g.dil === 'en' ? 'en' : 'tr',
-    datePublished: g.yayinTarihi,
-    dateModified: g.guncellemeTarihi,
+    ...(g.tarihGizli ? {} : { datePublished: g.yayinTarihi, dateModified: g.guncellemeTarihi }),
     author: kurum,
     publisher: kurum,
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },

@@ -29,11 +29,12 @@ export function listeKartlari(dil: YaziDili, yazilar: readonly RehberYazisi[] = 
       // Kart metni `kartOzeti`dir; meta açıklaması (`ozet`) kartta BASILMAZ (SEO-30). Boşsa kart metin çizmez.
       kartOzeti: m.kartOzeti.trim(),
       konu: getDictValue(dict, `bilgiMerkezi.konular.${y.konu}`),
-      tarih: tarihYaz(y.yayinTarihi, dil),
-      tarihIso: y.yayinTarihi,
+      // `tarihGizli` (OPS-332): kartta ne yayın ne güncelleme tarihi basılır; sıra yine yayın tarihine göredir.
+      tarih: y.tarihGizli ? null : tarihYaz(y.yayinTarihi, dil),
+      tarihIso: y.tarihGizli ? null : y.yayinTarihi,
       // Yazı künyesiyle aynı kural: güncelleme tarihi yayın tarihinden farklıysa kartta da basılır.
-      guncelleme: y.guncellemeTarihi !== y.yayinTarihi ? tarihYaz(y.guncellemeTarihi, dil) : null,
-      guncellemeIso: y.guncellemeTarihi !== y.yayinTarihi ? y.guncellemeTarihi : null,
+      guncelleme: !y.tarihGizli && y.guncellemeTarihi !== y.yayinTarihi ? tarihYaz(y.guncellemeTarihi, dil) : null,
+      guncellemeIso: !y.tarihGizli && y.guncellemeTarihi !== y.yayinTarihi ? y.guncellemeTarihi : null,
     }
   })
 }
