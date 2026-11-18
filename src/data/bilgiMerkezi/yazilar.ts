@@ -2171,6 +2171,524 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-60), doğrulanmış metin: taslak v5 (sha 02362796975b). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82): aile adları yalnız "VentHub'da hangi ATEX fan serileri var?" bölümünde ve Kaynaklar'da. JET serisi bu sürümde yazıdan çıkarıldı, ürün bağı metindeki iki aileye göre. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok, yalnız ABD OSHA kuralları ve AB 1999/92/AT Direktifi. Fiyat yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'boyahane-havalandirma-fani-secimi',
+    konu: 'guvenlik',
+    yayinTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-18',
+    urunler: ['vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar', 'vh:aile/vortice-vort-e-atex-fanlar'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'boyahane-havalandirma-fani-nasil-secilir',
+        ozet: "Boyahane fanı seçerken egzoz havası miktarına, fan malzemesine ve topraklamaya, motor yerine ve elektrik donanımının patlayıcı ortama uygunluğuna bakılır.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Boyahane fanı seçerken egzoz havası miktarının, fan malzemesinin, motor yerinin ve patlayıcı ortam donanımının nasıl ele alındığını görmek için bu rehberden başlayın.",
+        govde: `# Boyahane havalandırma fanı nasıl seçilir?
+
+Boyahane havalandırma fanı seçilirken egzoz havasının miktarına, fanın malzemesine ve topraklanmasına, motorun yerine ve elektrik donanımının patlayıcı ortama uygunluğuna bakılır [2][3][4][5]. Hava miktarı ve motor yeri için ABD OSHA kuralları, donanım kategorisi için Avrupa Birliği'nin 1999/92/AT Direktifi hüküm koyar [2][4][5].
+
+Kısaca:
+
+- Hava miktarı: ABD OSHA kuralında kabinden atılan toplam hava, çözücü buharını alt patlama sınırının yüzde 25'ine seyreltecek kadar olmalıdır [2].
+- Fan: yanıcı ortamlarda fanlar çoğunlukla demir dışı alaşımdan yapılır ve dönen parçalarıyla birlikte topraklanmalıdır [3].
+- Motor: ABD kuralında yanıcı ve parlayıcı kaplama malzemesi püskürtülen kabinin ya da kanalın içine egzoz fanının motoru konmaz [5].
+- Donanım: 1999/92/AT'de, patlamadan korunma belgesi aksini belirtmedikçe, Bölge (Zone) 1 için kategori 1 ya da 2, Bölge 2 için 1, 2 ya da 3 [4].
+
+## Boyahane fanı seçiminde nelere bakılır?
+
+| Konu | Dayanak | Hüküm ya da öneri |
+|---|---|---|
+| Hava miktarı | OSHA 1910.94 (ABD) | Çözücü buharı, alt patlama sınırının yüzde 25'ine seyreltilir [2] |
+| Fan malzemesi | DOE/AMCA rehberi (ABD) | Çoğunlukla demir dışı alaşım; dönen parçalar dahil topraklama [3] |
+| Fanın dönen elemanı | OSHA 1910.107 (ABD) | Yanıcı ve parlayıcı kaplama malzemesinin püskürtüldüğü işlemlerde demir dışı ya da kıvılcım çıkarmayan malzeme; ya da böyle bir malzemeden gövde veya kaplama [5] |
+| Motor ve kayış | OSHA 1910.107 (ABD) | Yanıcı ve parlayıcı kaplama malzemesinin püskürtüldüğü kabinlerde motor kabin ve kanalın dışında; kayış, kayış ve kasnak kapatılmadıkça kabine ya da kanala girmez [5] |
+| Kabin ve kanal | OSHA 1910.94 (ABD) | Yapımda yanıcı malzeme kullanılmaz [2] |
+| Elektrik donanımı | OSHA 1910.107 (ABD) | Püskürtme alanında ve yanıcı kalıntı birikintisine maruz değilse, patlamaya dayanıklı tip [5] |
+| Donanım kategorisi | 1999/92/AT Direktifi (AB) | Patlamadan korunma belgesi aksini belirtmedikçe Bölge 1'de kategori 1 ya da 2, Bölge 2'de 1, 2 ya da 3 [4] |
+
+## Kirleticinin özellikleri neden havalandırma tasarımında önemlidir?
+
+Toz, duman ve sis gibi proses kirleticileri aşındırıcı, yapışkan ya da yoğuşabilir olabilir, bazıları da yanıcı olabilir; İngiltere'nin Health and Safety Executive (HSE) kurumunun rehberine göre yerel havalandırmanın tasarımını bu özellikler belirler [1].
+
+Seyrelmesi engellenen buhar-hava karışımı, örneğin kapalı bir alana aktığında, çöker; zehirli bir risk, malzemeye göre de yanıcı bir risk doğurabilir [1]. Çoğu işyerinde ise hava hareketi ve cereyan doymuş buhar-hava karışımını hızla seyreltir [1].
+
+İlgili rehber: [Asit fanı nedir? Korozyona ve kimyasala dayanıklı fan nasıl seçilir](vh:yazi/asit-fani-nedir-korozyona-dayanikli-fan-secimi)
+
+## Boyahane egzoz havası ne kadar olmalı?
+
+ABD İş Sağlığı ve Güvenliği İdaresi'nin (OSHA) püskürtme kabinlerine ilişkin kuralında, kabinden atılan toplam hava hacmi çözücü buharını püskürtülen çözücünün alt patlama sınırının yüzde 25'ine seyreltecek büyüklükte olmalıdır [2]. Yeterli bir hava ikame sistemi bulunmayan kabinlerde kural, kabin açıklıklarından içeri giren havanın hızı için de asgari değerler verir [2].
+
+## Boyahane fanının malzemesi ve motoru nasıl olmalı?
+
+ABD Enerji Bakanlığı (DOE) ile AMCA International'ın 2003 tarihli ortak rehberine göre yanıcı ortamlarda fanlar, metalin metale temasından doğan kıvılcım riskini azaltmak için çoğunlukla demir dışı alaşımlardan yapılır; bazı uygulamalarda fanın belirli parçaları kıvılcıma dayanıklı malzemeden üretilebilir [3]. Statik deşarj kıvılcımını azaltmak için fan, dönen parçaları dahil topraklanmalıdır [3].
+
+OSHA'nın 1910.107 numaralı kuralında, yanıcı ve parlayıcı kaplama malzemesinin püskürtüldüğü işlemlerde fan ve motor için şu hükümler vardır: fanın dönen elemanı demir dışı ya da kıvılcım çıkarmayan malzemeden olmalı veya gövde böyle bir malzemeden olmalı ya da onunla kaplanmalıdır; egzoz fanlarını çalıştıran elektrik motorları kabinin ya da kanalların içine konmaz; kayış, kayış ve kasnak tamamen kapatılmadıkça kabine ya da kanala girmez [5]. 1910.107 püskürtme alanını yanıcı buhar ya da sisin ya da yanıcı kalıntı, toz ve birikintilerin tehlikeli miktarda bulunduğu alan olarak tanımlar; bu alanda bulunan ve yanıcı kalıntı birikintisine maruz olmayan elektrik tesisatı ve donanımı patlamaya dayanıklı tipte olmalıdır [5].
+
+OSHA'nın 1910.94 kuralında püskürtme kabininin ve ona bağlı besleme ve egzoz kanalının yapımında yanıcı malzeme kullanılmaz [2].
+
+## Boyahanede bölge ve donanım kategorisi nasıl eşleşir?
+
+Yanıcılık tehlikesi olan yerde yerel havalandırmanın tasarımı, bölgeleme ve patlama tahliyesi gibi konuları da hesaba katmalıdır [1]. Avrupa Birliği'nin 1999/92/AT sayılı Direktifinin Ek II B bölümüne göre patlayıcı atmosfer oluşabilecek yerlerde donanım ve koruyucu sistemler, patlamadan korunma belgesi aksini belirtmiyorsa, kategorilere göre seçilir: Bölge 1'de kategori 1 ya da 2, Bölge 2'de kategori 1, 2 ya da 3 donanım [4].
+
+İlgili rehber: [Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?](vh:yazi/patlayici-ortamda-fan-secimi-atex)
+
+## VentHub'da hangi ATEX fan serileri var?
+
+VentHub aile sayfalarına göre [Vorticent CMS ATEX](vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar) serisinde 12/5 T4 ve 14/5 T4 (0,09 kW) modelleri fan için Ex h IIB+H2 T4 Gb, motor için Ex eb IIC T4 Gb işaretiyle Bölge 1'e; 14/5 T2 (0,25 kW), 16/6 T2, 22/9 T4, 25/10 T4, 28/11 T4, 31/12 T4, 35/14 T4, 40/16 T4 ve 45/18 T4 modelleri fan için Ex h IIB T3 Gc, motor için Ex ec IIC T3 Gc işaretiyle Bölge 2'ye uygundur [6]. Seri −20 °C ile 40 °C ortam sıcaklığı aralığında, toz içermeyen temiz hava taşımaya uygundur [6]. Bu koşul toz içeren havayı kapsamaz [6]. [VORT-E ATEX](vh:aile/vortice-vort-e-atex-fanlar) serisindeki 40320 modeli, patlayıcı toz ve gaz içeren (ATEX II 2G/D h T3/125°C X Gb/Db) ortamların havalandırılması için tasarlanmış ex-proof aksiyel sanayi fanıdır [6].
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Teklif için hangi bilgiler gerekir?
+
+Teklif, aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [6]. Seçimde kullanılan bilgiler:
+
+- Çözücü: püskürtülen çözücü, alt patlama sınırı, birim çözücü miktarının buhar hacmi ve dakikada buharlaşan çözücü miktarı; OSHA kuralındaki hava debisi bunlardan hesaplanır [2].
+- Sistem koşulları: hava özellikleri, debi, basınç ve sistem yerleşimi [3].
+- Alanın bölgesi: donanım kategorisi bölgeye göre seçilir [4].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Sık sorulan sorular
+
+### HSE rehberinde boya püskürtme kabini hangi muhafaza türüne örnek verilir?
+
+HSE rehberinde boya püskürtme kabini, operatörü ve işlemi tamamen çevreleyen oda tipi muhafazalara verilen adlardan biri olarak geçer [1].
+
+### Boyahane fanı ATEX olmak zorunda mı?
+
+Alanda patlayıcı atmosfer oluşabiliyorsa AB'de evet: 1999/92/AT, patlamadan korunma belgesi aksini belirtmedikçe, donanımın bölgeye uygun kategoride seçilmesini ister [4].
+
+### Boyahane egzozunda hava miktarı nasıl belirlenir?
+
+ABD OSHA kuralında atılan toplam hava, püskürtülen çözücünün buharını alt patlama sınırının yüzde 25'ine seyreltecek kadar olmalıdır [2].
+
+### Boyahane kanalı hangi malzemeden yapılmamalı?
+
+ABD OSHA kuralına göre yanıcı malzemeden yapılmamalıdır [2].
+
+### Yanıcı ortamda fan neden demir dışı alaşımdan yapılır?
+
+Demir dışı alaşım, metalin metale temasından doğan kıvılcım riskini azaltmak için kullanılır [3].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), HSG258 Controlling airborne contaminants at work: A guide to local exhaust ventilation (LEV), 3. baskı, 2017, ¶44, ¶47, ¶48, ¶49, ¶110. https://books.hse.gov.uk/gempdf/hsg258.pdf (erişim 08.11.2026)
+2. U.S. Occupational Safety and Health Administration, 29 CFR 1910.94(c) Spray finishing operations, (c)(3)(i)(b), (c)(6)(i), (c)(6)(ii); GPO CFR 2024 baskısı. https://www.govinfo.gov/content/pkg/CFR-2024-title29-vol5/xml/CFR-2024-title29-vol5-sec1910-94.xml (erişim 08.11.2026)
+3. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, Nisan 2003, basılı s. 4, 5 ve 17. https://www.energy.gov/sites/prod/files/2014/05/f16/fan_sourcebook.pdf (erişim 08.11.2026)
+4. Avrupa Parlamentosu ve Konseyi, 1999/92/AT sayılı Direktif (16 Aralık 1999), Ek II B (donanım seçimi ölçütleri), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:31999L0092 (erişim 09.11.2026)
+5. U.S. Occupational Safety and Health Administration, 29 CFR 1910.107 Spray finishing using flammable and combustible materials, (a)(2) spraying area tanımı, (c)(6) elektrik tesisatı hükmü ve (d)(4), (d)(5), (d)(6) fan dönen elemanı, elektrik motoru ve kayış hükümleri, (n) kapsam; GPO CFR 2024 baskısı. https://www.govinfo.gov/content/pkg/CFR-2024-title29-vol5/xml/CFR-2024-title29-vol5-sec1910-107.xml (erişim 18.11.2026)
+6. VentHub, Vorticent CMS ATEX ve VORT-E ATEX aile sayfaları: https://venthub.com.tr/tr/products/vortice-vorticent-cms-atex-santrifuj-fanlar , https://venthub.com.tr/tr/products/vortice-vort-e-atex-fanlar (erişim 18.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Aktarılan kurallar yayın tarihindeki hâlleriyle verilmiştir ve Türkiye'deki yükümlülüklerin yerini tutmaz. Patlayıcı ortamda kullanılacak ekipmanın uygunluğu üreticinin teknik belgeleri ve yetkili uzman değerlendirmesiyle doğrulanmalıdır. Montaj ve elektrik bağlantısı yetkili personelle yapılır; ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-64), doğrulanmış metin: taslak v5 (sha 71e97cf912da). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82): aile adları Kısaca maddesinde, "VentHub'da hangi endüstriyel havalandırma fanı serileri var?" bölümünde, son SSS cevabında ve Kaynaklar'da. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'atolye-havalandirma-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-18',
+    urunler: ['vh:aile/vortice-aksiyel-endustriyel-fanlar', 'vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'atolye-havalandirma-fani-nasil-secilir',
+        ozet: "Atölye havalandırma fanı seçimi, havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi ile debi, basınç ve sistem yerleşimi bilinerek başlar.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Atölye fanı seçerken havalandırma ile zararlı maddelerin havadan uzaklaştırılmasının nasıl ayrıldığını görmek için bu rehberden başlayın.",
+        govde: `# Atölye havalandırma fanı nasıl seçilir?
+
+Atölye havalandırma fanı seçimi; taşınacak havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri, gereken hava debisi, basınç ve sistem yerleşimi bilinerek başlar [1]. Kaynak dumanı ve proseslerin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılması ise HSE'nin işyeri havalandırması rehberinin kapsamı dışındadır [2].
+
+Kısaca:
+
+- Havalandırma: HSE'ye göre havalandırma doğal yolla kapı, pencere ve diğer açıklıklardan, mekanik yolla fanlarla yapılır [2].
+- VentHub aileleri: Vortice aksiyel endüstriyel fanlar ticari ve endüstriyel hacimlerin havalandırması için, Nicotra Gebhardt RDH radyal (santrifüj) fanlar ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için tasarlanmıştır [3].
+- Teklif: aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [3].
+
+## Atölyede havalandırma ile zararlı maddelerin havadan uzaklaştırılması nasıl ayrılır?
+
+HSE'nin işyeri havalandırması rehberinde havalandırma, dışarıdan temiz hava getirme ve iç havayı uzaklaştırma işlemidir; kaynak dumanı ve proseslerin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılması için rehber COSHH (Control of Substances Hazardous to Health Regulations) ile yerel egzoz havalandırması rehberlerine yönlendirir [2].
+
+| İhtiyaç | HSE'de karşılığı [2] |
+|---|---|
+| Dışarıdan temiz hava getirmek, iç havayı uzaklaştırmak | İşyeri havalandırması rehberi; havalandırma doğal yolla ya da fanla mekanik yolla yapılır |
+| Kaynak dumanı ve proses tozu gibi zararlı maddeleri havadan uzaklaştırmak | COSHH ve yerel egzoz havalandırması rehberleri |
+
+İlgili rehber: [Boyahane havalandırma fanı nasıl seçilir?](vh:yazi/boyahane-havalandirma-fani-secimi)
+
+## VentHub'da hangi endüstriyel havalandırma fanı serileri var?
+
+Aksiyel fanlar santrifüj fanlarla zaman zaman birbirinin yerine kullanılabilse de çoğunlukla temiz havada, düşük basınçlı ve yüksek debili uygulamalarda kullanılır [1]. Santrifüj fanlar ise yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına uygun yapılabilir [1].
+
+VentHub ailelerinden örnekler şunlardır. [Vortice aksiyel endüstriyel fanlar](vh:aile/vortice-aksiyel-endustriyel-fanlar), ticari ve endüstriyel hacimlerin havalandırması için tasarlanmış duvar tipi bir endüstriyel aksiyel fan ailesidir; farklı çaplarda, monofaze ve trifaze sürümleri bulunur [3]. [Nicotra Gebhardt RDH radyal fanlar](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ise ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için özel olarak tasarlanmıştır [3].
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Teklif için hangi bilgiler gerekir?
+
+Teklif, aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [3]. Fan seçiminin dayandığı çalışma koşulları şunlardır:
+
+- Taşınacak havanın özellikleri: nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi [1].
+- Gereken hava debisi [1].
+- Basınç [1].
+- Sistem yerleşimi [1].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Sık sorulan sorular
+
+### Havalandırmada uzaklaştırılan iç hava nasıl olabilir?
+
+HSE'ye göre iç hava bayat olabilir, iş makineleri ve prosesler yüzünden sıcak ve nemli olabilir ya da kirletici ve başka safsızlıklar içerebilir [2].
+
+### Mekanik havalandırma nedir?
+
+Mekanik havalandırma, havayı fanlarla odalara veren ve odalardan alan havalandırmadır [2]. Küçük alanlarda ve binalarda fanlar odanın içinde olabilir; büyük binalarda kanal ve fan ağıyla odalara temiz hava üflenebilir ve/veya bayat hava çekilebilir [2].
+
+### Doğal ve mekanik havalandırma farkı nedir?
+
+Doğal havalandırma havayı kapılardan, pencerelerden ve menfez ya da ızgara gibi diğer açıklıklardan sağlar; mekanik havalandırma fan kullanır [2]. Birçok binada ikisi bir arada, farklı alanlarda kullanılır [2].
+
+### Atölye fanı aksiyel mi radyal mi seçilir?
+
+Bunu sistemin çalışma koşulları belirler: havanın özellikleri, hava debisi, basınç ve sistem yerleşimi, santrifüj ya da aksiyel fandan hangisinin gerektiğini gösterir [1].
+
+### VentHub'da endüstriyel havalandırma için hangi fan aileleri var?
+
+Örnekler Vortice aksiyel endüstriyel fanlar ile Nicotra Gebhardt RDH radyal fanlardır; teklif aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [3].
+
+## Kaynaklar
+
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, Nisan 2003, basılı s. 4, 17 ve 19. https://www.energy.gov/sites/prod/files/2014/05/f16/fan_sourcebook.pdf (erişim 18.11.2026)
+2. UK Health and Safety Executive (HSE), Ventilation in the workplace, Overview. https://www.hse.gov.uk/ventilation/index.htm (erişim 18.11.2026)
+3. VentHub, Vortice aksiyel endüstriyel fanlar ve Nicotra Gebhardt RDH radyal fanlar aile sayfaları (erişim 18.11.2026): https://venthub.com.tr/tr/products/vortice-aksiyel-endustriyel-fanlar , https://venthub.com.tr/tr/products/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-65), doğrulanmış metin: taslak v7 (sha 9177cf4fa3e7). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82). Ürün bağları metindeki üç aileye göre: Hyperblade, aksiyel endüstriyel, Slimroof; önceki sürümdeki 61181 modeli metinden çıktı. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'depo-havalandirma-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-18',
+    urunler: ['vh:aile/vortice-nordik-hvls-hyperblade', 'vh:aile/vortice-aksiyel-endustriyel-fanlar', 'vh:aile/vortice-slimroof-cati-fanlari'],
+    ilgiliKategoriler: ['vh:kategori/industrial-ceiling-fans', 'vh:kategori/axial-industrial-fans', 'vh:kategori/roof-fans'],
+    diller: {
+      tr: {
+        slug: 'depo-havalandirma-fani-nasil-secilir',
+        ozet: "Depoda fan seçimi işe bağlıdır: havalandırma temiz hava getirip iç havayı uzaklaştırır, endüstriyel tavan vantilatörü içerideki havayı karıştırır.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Depoda havalandırma fanı ile endüstriyel tavan vantilatörünün farkını ve hangi ürün grubunun hangi işe uyduğunu görmek için bu rehberden başlayın.",
+        govde: `# Depo havalandırma fanı nasıl seçilir?
+
+Depoda fan seçimi önce yapılacak işe bağlıdır: havalandırma dışarıdan temiz hava getirip iç havayı uzaklaştırır [3], endüstriyel (büyük çaplı) tavan vantilatörü ise havayı dışarı atmadan içerideki havayı karıştırır [2]. Seçimi belirleyen sorular arasında tavan vantilatöründe tavan yüksekliği, kapsanacak alan ve asma noktasının taşıma kapasitesi, duvar tipi aksiyel ve çatı tipi fanda gereken debi vardır [2][4].
+
+Kısaca:
+
+- Havalandırma: Mekanik havalandırma havayı odalara vermek ve odalardan almak için fan kullanır; büyük binalarda kanal ve fan ağı kullanılabilir [3].
+- Tavan vantilatörü: Endüstriyel tavan vantilatörü yazın serinlik hissi verir, kışın tavanda biriken sıcak havayı aşağı indirir [2].
+- Seriler: VentHub'da endüstriyel tavan vantilatörleri kategorisinde Vortice Nordik HVLS Hyperblade ailesi ve 7 modeli bulunur [2].
+
+## Depoda havalandırma ile hava karıştırma farkı nedir?
+
+Havalandırmayla uzaklaştırılan iç hava bayat olabilir, makineler ve süreçler yüzünden sıcak ve nemli olabilir ya da kirletici içerebilir [3]. Mekanik havalandırmada fanlar havayı odalara verir ve odalardan alır; küçük alanlarda fan odanın içinde olabilir, büyük binalarda kanal ve fan ağı kullanılabilir [3].
+
+| İş | Ne yapar | VentHub'da ürün grubu |
+|---|---|---|
+| Havalandırma (hava verme ve alma) | Dışarıdan temiz hava getirir, iç havayı uzaklaştırır [3] | Duvar tipi aksiyel fanlar (havalandırma için tasarlanmış) ve havayı binanın en üstünden dışarı atan çatı tipi fanlar [4] |
+| Hava karıştırma | Havayı dışarı atmadan içerideki havayı karıştırır [2] | Endüstriyel tavan vantilatörleri [2] |
+
+VentHub'daki duvar tipi aksiyel fanlar düşük ve orta basınçlı serilerdir ve spor salonu gibi ticari ve endüstriyel hacimlerin havalandırması için tasarlanmıştır [4].
+
+İlgili rehberler: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+
+## Endüstriyel tavan vantilatörü depoda ne işe yarar?
+
+Endüstriyel tavan vantilatörleri, büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; depo, spor salonu, fabrika ve showroom bunların tipik uygulamalarıdır [2]. Etkileri mevsime göre değişir:
+
+| Mevsim | Endüstriyel tavan vantilatörünün etkisi [2] |
+|---|---|
+| Yaz | İçerideki havayı karıştırarak serinlik hissi verir |
+| Kış | Tavanda biriken sıcak havayı aşağı indirir |
+
+Çok sıcak havalarda iş yerinde ısı stresi riski artabilir; sıcaklığı kontrol etmenin örnek yolları arasında fan ya da klima kullanmak da sayılır [1].
+
+## VentHub'da hangi depo havalandırma fanı serileri var?
+
+[Endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans) kategorisinde [Vortice Nordik HVLS Hyperblade](vh:aile/vortice-nordik-hvls-hyperblade) ailesi bulunur [2]. Ailenin 7 modeli fırçasız EC motorlu, 5 kanatlı tavan vantilatörleridir; nominal kanat çapı 3,0 m ile 7,0 m arasındadır [2]. 3,0 m ve 4,0 m modellerin monofaze ve trifaze sürümü, 5,0 m, 6,0 m ve 7,0 m modellerin trifaze sürümü vardır; maksimum debi 79.400–330.800 m³/h aralığındadır [2].
+
+Havalandırma için [aksiyel fanlar](vh:kategori/axial-industrial-fans) kategorisinde 16 modelli [Vortice aksiyel endüstriyel fanlar](vh:aile/vortice-aksiyel-endustriyel-fanlar) ailesi bulunur; maksimum debi 1.850–14.500 m³/h aralığındadır [4]. Patlayıcı ortam (ATEX) gerektiren uygulamalar için kategoride ayrı bir aile vardır [4]. [Çatı tipi fanlar](vh:kategori/roof-fans) kategorisinde [Vortice Slimroof çatı fanları](vh:aile/vortice-slimroof-cati-fanlari) ailesi bulunur [4].
+
+İlgili rehberler: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri), [Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?](vh:yazi/patlayici-ortamda-fan-secimi-atex)
+
+## Teklif için hangi bilgiler gerekir?
+
+Aile sayfalarında teklif "Teknik Teklif İste" düğmesiyle istenir [2][4]. Ürün grubuna göre seçimi belirleyen sorular şunlardır:
+
+- Endüstriyel tavan vantilatörü: tavan yüksekliği, kapsanacak alan ve asma noktasının taşıma kapasitesi [2]
+- Aksiyel fan: gereken debi, fanın nominal çapı ve ortamda gaz ya da toz kaynaklı patlama riskinin bulunup bulunmadığı [4]
+- Çatı tipi fan: çatı tipi ve eğimi, gereken debi ve tahliye edilen havanın niteliği [4]
+
+## Sık sorulan sorular
+
+### Endüstriyel tavan vantilatörü depoda havalandırmanın yerini tutar mı?
+
+Hayır; endüstriyel tavan vantilatörü havayı dışarı atmaz, içerideki havayı karıştırır [2]. Havalandırma ise dışarıdan temiz hava getirip iç havayı uzaklaştırır [3].
+
+### Endüstriyel tavan vantilatörü kışın işe yarar mı?
+
+Evet; tavanda biriken sıcak havayı aşağı indirir [2].
+
+### Doğal havalandırma ile mekanik havalandırma arasındaki fark nedir?
+
+Doğal havalandırma havayı kapı, pencere ve ızgara gibi açıklıklardan sağlar; mekanik havalandırma havayı fanla içeri verir ve dışarı çıkarır [3]. Birçok binada ikisi birlikte bulunur [3].
+
+### İyi havalandırma hangi sonuçlarla ilişkilendirilir?
+
+Araştırmalar iyi havalandırmayı daha iyi sağlık, daha iyi konsantrasyon, ortamdan daha yüksek memnuniyet, işe daha düşük devamsızlık ve birçok hava kirleticisine daha az maruziyetle ilişkili bulmuştur [3].
+
+### İş yerinde ısı stresine karşı sıcaklık nasıl kontrol edilir?
+
+Isı kaynakları mümkünse kaldırılır ya da azaltılır ve sıcaklık mühendislik çözümleriyle kontrol edilir: süreçleri değiştirmek, fan ya da klima kullanmak ve makine gibi kaynakların ışınım ısısına karşı fiziksel engel koymak bunlara örnektir [1].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Temperature in the workplace: Heat stress, https://www.hse.gov.uk/temperature/employer/heat-stress.htm (erişim 18.11.2026)
+2. VentHub, Endüstriyel Tavan Vantilatörleri kategori sayfası ve Vortice Nordik HVLS Hyperblade aile sayfası: https://venthub.com.tr/tr/category/tavan-vantilatorleri , https://venthub.com.tr/tr/products/vortice-nordik-hvls-hyperblade (erişim 18.11.2026)
+3. UK Health and Safety Executive (HSE), Ventilation in the workplace: Overview, https://www.hse.gov.uk/ventilation/index.htm (erişim 18.11.2026)
+4. VentHub, Aksiyel Fanlar ve Çatı Tipi Fanlar kategori sayfaları ve Vortice Aksiyel Endüstriyel Fanlar aile sayfası: https://venthub.com.tr/tr/category/aksiyel-fanlar , https://venthub.com.tr/tr/category/cati-tipi-fanlar , https://venthub.com.tr/tr/products/vortice-aksiyel-endustriyel-fanlar (erişim 18.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Havalandırma ve ısı stresi bilgisi İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) rehberlerine dayanır; Türkiye'deki yasal yükümlülüklerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-66), doğrulanmış metin: taslak v5 (sha 5864ff24e83c). Okur gözüyle yeniden düzenlendi (R3.5, BLG-82); H1 "Demir çelik tesislerinde ısı kontrolü ve havalandırma nasıl sağlanır?" oldu, adres (slug) ve kimlik değişmedi. Markasız gövde: VentHub'ın dört fan kategorisi "VentHub'da hangi fan serileri var?" bölümünde anılır, ürün (aile) bağı yok (urunler boş). Kaynaklar OSHA, HSE, DOE/AMCA ve VentHub kategori sayfaları. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'demir-celik-isi-kontrolu-havalandirma',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-18',
+    urunler: [],
+    ilgiliKategoriler: ['vh:kategori/industrial-ceiling-fans', 'vh:kategori/axial-industrial-fans', 'vh:kategori/centrifugal-fans', 'vh:kategori/roof-fans'],
+    diller: {
+      tr: {
+        slug: 'demir-celik-tesisi-isi-kontrolu-havalandirma-kaynaklari',
+        ozet: "Demir çelik tesislerinde ısıya maruziyet, OSHA'nın sıraladığı mühendislik kontrolleriyle azaltılabilir: genel havalandırma, soğutma fanları, yerel egzoz.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Demir çelik tesislerinde ısıya maruziyeti azaltan önlemleri ve VentHub'daki fan kategorilerini görmek için bu rehberden başlayın.",
+        govde: `# Demir çelik tesislerinde ısı kontrolü ve havalandırma nasıl sağlanır?
+
+Demir çelik tesislerinde ısıya maruziyet, OSHA'nın iş yerleri için sıraladığı mühendislik kontrolleriyle azaltılabilir: genel havalandırmayı artırmak, soğutma fanları, yüksek ısı ya da nem üretilen noktalarda yerel egzoz havalandırması, fırın duvarları gibi sıcak yüzeylerin yalıtımı ve ışınımlı ısıyı başka yöne çeviren yansıtıcı kalkanlar [2]. Demir çelik tesisleri ve dökümhaneler, kapalı alanda tehlikeli ısı maruziyetinin görülebildiği işler arasındadır [1].
+
+Kısaca:
+
+- Isı önlemleri: Süreçleri değiştirmek ve fan ya da klima kullanmak da sıcaklık kontrolü örnekleridir [3].
+- Çalışma uygulamaları: Mühendislik kontrolleriyle serinletilemeyen yerlerde ısı stresi güvenli çalışmaya izin vermeyecek kadar yükselirse çalışma uygulamalarının değiştirilmesi önerilir [2].
+- Fan serileri: VentHub'ın radyal (santrifüj) fanlar kategorisindeki fanlar aksiyel fanlara göre daha yüksek basınç üretir [5].
+- Teklif: Fan seçimi hava özellikleri, hava debisi, basınç ve sistem yerleşimi bilinerek başlar [4].
+
+## Demir çelik tesislerinde ısıya maruziyet hangi önlemlerle azaltılabilir?
+
+OSHA'nın ve HSE'nin iş yerleri için verdiği listelerde yer alan önlemler şunlardır:
+
+| Önlem | Nerede ya da nasıl | Kaynak |
+|---|---|---|
+| Genel havalandırmayı artırmak, soğutma fanları, klima | Mühendislik kontrolleri listesinde; klima örnekleri vinç ve inşaat ekipmanı kabinleri ile dinlenme odaları | [2] |
+| Yerel egzoz havalandırması | Yüksek ısı ya da nem üretilen noktalarda | [2] |
+| Püskürtmeli fanlar | İnce su damlacıkları püskürtür | [2] |
+| Yansıtıcı kalkan | Işınımlı ısıyı başka yöne çevirir | [2] |
+| Sıcak yüzey yalıtımı | Fırın duvarları gibi sıcak yüzeylerde | [2] |
+| Süreci değiştirmek, fan ya da klima kullanmak | Sıcaklığı mühendislik çözümleriyle kontrol etme örnekleri | [3] |
+| Fiziksel engeller | Işınımlı ısıya maruziyeti azaltır | [3] |
+
+Bazı çalışma yerleri mühendislik kontrolleriyle serinletilemez; bu yerlerde ısı stresi güvenli çalışmaya izin vermeyecek kadar yükselirse çalışma uygulamalarının değiştirilmesi önerilir [2].
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Demir çelik tesislerinde tehlikeli ısı maruziyeti görülür mü?
+
+Evet. OSHA'nın ısı tablosunda kapalı alanda tehlikeli ısı maruziyetinin görülebildiği işler arasında demir çelik tesisleri ve dökümhaneler yer alır; tehlikeli ısı maruziyeti kapalı ya da açık alanda görülebilir [1]. HSE de dökümhaneleri ve izabe işlemlerini ısı stresinin görülebildiği iş yerlerine örnek verir [3].
+
+## VentHub'da hangi fan serileri var?
+
+VentHub'ın dört fan kategorisi sayfasındaki tanımlar şunlardır:
+
+- [Endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans): büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı tavan vantilatörleri; havayı dışarı atmaz, içerideki havayı karıştırır [5].
+- [Aksiyel fanlar](vh:kategori/axial-industrial-fans): duvara monte edilen, düşük ve orta basınçlı, ticari ve endüstriyel hacimlerin havalandırması için tasarlanmış fanlar [5].
+- [Radyal fanlar](vh:kategori/centrifugal-fans): havayı çarkın çevresine doğru fırlatarak basan, aksiyel fanlara göre daha yüksek basınç üreten fanlar; uzun kanal hatları, filtreli sistemler ve hücreli tesisatlar için tercih edilir [5].
+- [Çatı tipi fanlar](vh:kategori/roof-fans): havayı binanın en üstünden dışarı atan, çatıya oturan fanlar [5].
+
+İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+
+## Teklif için hangi bilgiler gerekir?
+
+ABD Enerji Bakanlığı kılavuzuna göre fan seçimi, sistemin çalışma koşullarını bilerek başlar [4]:
+
+- Hava özellikleri: nem, sıcaklık, yoğunluk, kirlilik düzeyi gibi
+- Hava debisi
+- Basınç
+- Sistem yerleşimi
+
+Bu kategori sayfalarında her ürün ailesinin yanında "Teklif İste" düğmesi bulunur [5].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Sık sorulan sorular
+
+### Tehlikeli ısı yalnız sıcak hava dalgalarında mı görülür?
+
+Hayır. OSHA'ya göre tehlikeli ısı maruziyeti, koşullar uygunsa yalnız sıcak hava dalgalarında değil, her mevsimde görülebilir [1].
+
+### Mühendislik kontrolleriyle serinletilemeyen çalışma yerinde ne yapılır?
+
+Isı stresi güvenli çalışmaya izin vermeyecek kadar yükselirse OSHA çalışma uygulamalarının değiştirilmesini önerir [2].
+
+### Dökümhanelerde ısı stresine yol açan sıcak ortam nereden kaynaklanır?
+
+HSE'ye göre bu iş yerlerinde sıcak ortam süreçten ya da kısıtlı alanlardan kaynaklanır; dökümhaneler ve izabe işlemleri örnekler arasındadır [3].
+
+### Isıya karşı klima hangi yerlerde kullanılır?
+
+OSHA'nın mühendislik kontrolleri listesinde klima için verilen örnekler klimalı vinç ve inşaat ekipmanı kabinleri ile dinlenme odalarıdır [2].
+
+### VentHub'da radyal fan seçimini hangi sorular belirler?
+
+VentHub'ın radyal fanlar kategori sayfası gereken basıncı, fanın bir hücre içine mi yoksa doğrudan santrale mi gireceğini ve kanat yönünü (öne ya da geriye eğik) sayar [5].
+
+## Kaynaklar
+
+1. U.S. Occupational Safety and Health Administration (OSHA), Heat - Overview: Working in Outdoor and Indoor Heat Environments, tablo "Hazardous heat exposure for Indoors or Outdoors". https://www.osha.gov/heat-exposure (erişim 18.11.2026)
+2. OSHA, Heat - Engineering Controls, Work Practices, and Personal Protective Equipment. https://www.osha.gov/heat-exposure/controls (erişim 18.11.2026)
+3. UK Health and Safety Executive (HSE), Temperature in the workplace: Heat stress. https://www.hse.gov.uk/temperature/employer/heat-stress.htm (erişim 18.11.2026)
+4. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, basılı s. 17. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 18.11.2026)
+5. VentHub, endüstriyel tavan vantilatörleri, aksiyel fanlar, radyal (santrifüj) fanlar ve çatı tipi fanlar kategori sayfaları (erişim 18.11.2026): https://venthub.com.tr/tr/category/tavan-vantilatorleri , https://venthub.com.tr/tr/category/aksiyel-fanlar , https://venthub.com.tr/tr/category/radyal-fanlar , https://venthub.com.tr/tr/category/cati-tipi-fanlar
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. OSHA ve HSE sırasıyla ABD ve Birleşik Krallık kurumlarıdır; bu bilgiler Türkiye'deki yükümlülüklerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Kategori bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
+  {
+    // BLOG (BLG-67), doğrulanmış metin: taslak v5 (sha a9aa292f54b5). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82); başlıkta, adreste ve kimlikte "restoran" yok (OPS kararı). Aile adı girişte, "VentHub'da hangi mutfak egzoz fanı serileri var?" bölümünde, iki SSS cevabında ve Kaynaklar'da. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok.
+    // Doğrulama: iddia tablosu kapıdan geçti (kırmızı 0); bu sürümde tuzaklı kol koşmadı; doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82).
+    kimlik: 'mutfak-egzoz-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-18',
+    urunler: ['vh:aile/vortice-vort-qbk-sal-kc-evo'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'mutfak-egzoz-fani-nasil-secilir',
+        ozet: "Mutfak egzoz fanı seçimi, havanın özellikleri ile debi, basınç ve sistem yerleşimi bilinerek başlar; gaz yakan cihazlarda tamamlama havası önemlidir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Mutfak egzoz fanı seçerken havanın özelliklerinin, tamamlama havasının ve motor konumunun nasıl ele alındığını görmek için bu rehberden başlayın.",
+        govde: `# Mutfak egzoz fanı nasıl seçilir?
+
+Mutfak egzoz fanının seçimi, taşınacak havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri ile gereken debi, basınç ve sistem yerleşimi bilinerek başlar [3]. VentHub'daki Vortice VORT QBK SAL KC Evo ailesi, sıcak, nemli ve kirli havayı dışarı atmak için tasarlanmış, yağ ve is yüklü havanın işlenmesine uygun hücreli bir mutfak egzoz fanı ailesidir [2].
+
+Kısaca:
+
+- Fan türü: radyal (santrifüj) fanlar yüksek nem ve partikül içeriğine sahip "kirli" hava akımlarında ve yüksek sıcaklıklı sistemlerde sık kullanılır [3].
+- Motorun konumu: santrifüj fanlarda motor fan gövdesinin dışına konabilir [3].
+- Tamamlama havası: gaz yakan cihazlar için yeterli tamamlama havası (makeup air) özellikle önemlidir [1].
+- VentHub'da: ailede 315 ile 630 mm arasında nominal çaplı, monofaze ve trifaze modeller vardır [2].
+
+## Mutfak egzoz fanı seçerken nelere bakılır?
+
+Fan seçimini başlatan koşullar havanın özellikleri, debi, basınç ve sistem yerleşimidir; bu koşullar santrifüj ya da aksiyel fandan hangisinin gerektiğini belirler [3]. Ticari mutfakta gaz yakan cihazlar için yeterli tamamlama havası sağlamak da özellikle önemlidir [1].
+
+| Ölçüt | Ne bakılır | Kaynak |
+|---|---|---|
+| Havanın özellikleri | Nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikler | [3] |
+| Debi, basınç ve yerleşim | Gereken hava debisi, basınç ve sistem yerleşimi; santrifüj ya da aksiyel fan seçimini bu koşullar belirler | [3] |
+| Fan türü | Santrifüj fanlar yüksek nem ve partikül içeriğine sahip "kirli" hava akımlarında, malzeme taşımada ve yüksek sıcaklıklı sistemlerde sık kullanılır | [3] |
+| Motorun konumu | Santrifüj fanlarda motor fan gövdesinin dışına konup çarka mil keçesiyle bağlanabildiği için partikül içeriği daha az önemlidir | [3] |
+| Tamamlama havası | Gaz yakan cihazlarda yeterli hava girmemesi ve hatalı baca düzeni eksik yanmaya ve karbon monoksit gibi yanma ürünlerinin birikmesine yol açabilir | [1] |
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Ticari mutfakta havalandırma neleri kapsar?
+
+İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) yemek hizmeti sektörüne yönelik sıkça sorulan sorular sayfasına göre mutfak havalandırması güvenli ve konforlu bir çalışma ortamı için gereklidir [1]. Pişirmenin ürettiği duman, buhar ve ısıyı güvenli bir dış noktaya atmak için havalandırma gerekir; bu genellikle pişirme cihazlarının üstündeki kanopi davlumbazdan mekanik egzozla sağlanır [1]. Havalandırma sistemi mutfağın tamamında genel havalandırma da sağlamalıdır [1]. Katı yakıtlı cihazlar normal çalışmalarında karbon monoksit üretir ve zehirli dumanı uzaklaştıran uygun bir egzoz sistemi ister [1].
+
+İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+
+## VentHub'da hangi mutfak egzoz fanı serileri var?
+
+VentHub'ın [Vortice VORT QBK SAL KC Evo](vh:aile/vortice-vort-qbk-sal-kc-evo) ailesi Radyal (Santrifüj) Fanlar kategorisindedir; ailenin maksimum debileri 2.540–22.100 m³/h aralığındadır [2]. Ailenin modelleri 315 ile 630 mm arasında nominal çaplı, monofaze ya da trifaze, 25 mm taşyünü iç izolasyonlu ve plug fanlı hücreli mutfak aspiratörleridir; motorları hava akımının dışında yer alır [2]. Örneğin aile sayfasında 43151 kodlu 315 mm'lik monofaze modelin en yüksek debisi 2.540 m³/h, en yüksek statik basıncı 370 Pa olarak verilir [2].
+
+İlgili rehberler: [Hücreli aspiratör nedir, seçerken nelere bakılır?](vh:yazi/hucreli-aspirator-nedir), [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Teklif için hangi bilgiler gerekir?
+
+Teklif, aile sayfasındaki "Teknik Teklif İste" düğmesiyle istenir; sayfada 21 model listelenir [2]. Teklif için şu bilgiler hazırlanır:
+
+- Debi ve basınç: fan seçimi gereken hava debisi ve basınç bilinerek başlar [3].
+- Cihazların yakıt türü: gaz yakan cihazlarda yeterli tamamlama havası özellikle önemlidir; katı yakıtlı cihazlarda uygun bir egzoz sistemi bulunmalıdır [1].
+- Nominal çap: 315 ile 630 mm arası [2].
+- Besleme: monofaze ya da trifaze [2].
+
+## Sık sorulan sorular
+
+### Mutfakta havalandırma neden gerekir?
+
+Ticari mutfakta güvenli ve konforlu bir çalışma ortamı için gerekir [1].
+
+### Mutfak havalandırması yalnız davlumbazdan mı yapılır?
+
+Hayır; ticari mutfakta havalandırma sistemi mutfağın tamamında genel havalandırma da sağlamalıdır [1].
+
+### Katı yakıtlı pişirme cihazında egzoz neden gerekir?
+
+Katı yakıtlı cihazlar normal çalışmalarında karbon monoksit ürettiği için gerekir [1].
+
+### Mutfak egzoz fanında motorun hava akımı dışında olması ne sağlar?
+
+Santrifüj fanlarda motor fan gövdesinin dışına konabildiği için partikül içeriği daha az önemlidir [3]. Vortice VORT QBK SAL KC Evo modellerinde motor hava akımının dışındadır [2].
+
+### Mutfakta tamamlama havası verilmezse ne olur?
+
+Gaz yakan cihazlarda yeterli hava girmemesi eksik yanmaya ve karbon monoksit birikimine yol açabilir [1].
+
+### VentHub'da hangi mutfak egzoz fanı ailesi var?
+
+VentHub'da Vortice VORT QBK SAL KC Evo ailesi bulunur [2]. Aile, Radyal (Santrifüj) Fanlar kategorisindedir [2].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Frequently asked questions (Catering and hospitality), "Ventilation and temperature". https://www.hse.gov.uk/catering/faqs.htm (erişim 18.11.2026)
+2. VentHub, Vortice VORT QBK SAL KC Evo aile sayfası. https://venthub.com.tr/tr/products/vortice-vort-qbk-sal-kc-evo (erişim 18.11.2026)
+3. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, basılı s. 3, 5 ve 17. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 08.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Mutfak havalandırması bilgisi İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) yemek hizmeti sektörüne yönelik sayfasındandır ve Türkiye'deki yükümlülükleri belirlemez. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
