@@ -58,6 +58,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['avens-hucreli-aspiratorler-hf-s', 'AVenS Hücreli Aspiratörler HF-S'],
     // Çatı tipi fan nedir yazısı (BLG-49, 2026-11): Slimroof aile sayfası canlıda 200 verir (8 Kasım ölçümü; kategori sayfasından).
     ['vortice-slimroof-cati-fanlari', 'Vortice Slimroof Çatı Fanları'],
+    // Okur gözü düzeltmesi (BLG-82 izleyen, 2026-11-18): Radon çatı fanı aile sayfası canlıda 200 verir (18 Kasım ölçümü).
+    ['vortice-radon-serisi-cati-fanlari', 'Vortice Radon Serisi Çatı Fanları'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
