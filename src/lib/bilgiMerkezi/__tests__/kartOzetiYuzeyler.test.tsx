@@ -147,7 +147,8 @@ describe('meta açıklaması, og:description ve Article JSON-LD ozet’te AYNEN 
       expect(makale, `${y.kimlik}: Article JSON-LD yok`).toBeDefined()
       expect(makale?.description, `${y.kimlik}: JSON-LD description`).toBe(m.ozet)
       expect(JSON.stringify(betikler), `${y.kimlik}: kart özeti yapısal veriye sızmış`).not.toContain(m.kartOzeti)
-      expect(makale?.dateModified, `${y.kimlik}: dateModified`).toBe(y.guncellemeTarihi)
+      // `tarihGizli` yazıda Article tarih taşımaz (OPS-332; kapı tarihGizli.test.tsx).
+      expect(makale?.dateModified, `${y.kimlik}: dateModified`).toBe(y.tarihGizli ? undefined : y.guncellemeTarihi)
       unmount()
     }
   })

@@ -55,6 +55,12 @@ export interface RehberYazisi {
   /** ISO tarih (YYYY-MM-DD). */
   yayinTarihi: string
   guncellemeTarihi: string
+  /**
+   * Açıksa yayın ve güncelleme tarihi OKURA gösterilmez (yazı künyesi, liste kartı) ve Article
+   * JSON-LD'sine `datePublished`/`dateModified` yazılmaz. Site haritası `lastmod` DEĞİŞMEZ
+   * (OPS-332 pilotu). Kapı: tarihGizli.test.tsx.
+   */
+  tarihGizli?: boolean
   /** Ürün kartı olarak basılacak kimlikler (`vh:aile/…`, `vh:model/…`). Fiyat basılmaz (R3). */
   urunler: readonly string[]
   /**
@@ -896,6 +902,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-82 okur gozu yeniden yazim
     guncellemeTarihi: '2026-11-17',
+    // OPS-332 pilotu: tarih okura ve Article JSON-LD'sine basılmaz; site haritası lastmod kalır.
+    tarihGizli: true,
     urunler: [
       'vh:aile/vortice-vort-hr-isi-geri-kazanim',
       'vh:aile/vortice-vort-mono',

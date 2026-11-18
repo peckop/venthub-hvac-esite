@@ -20,8 +20,9 @@ export interface ListeKarti {
   /** Kartta görünen metin (yazının `kartOzeti`); meta açıklaması DEĞİL. Boşsa paragraf çizilmez. */
   kartOzeti: string
   konu: string
-  tarih: string
-  tarihIso: string
+  /** Yayın tarihi; yazıda `tarihGizli` açıksa `null` ve kartta hiçbir tarih basılmaz (OPS-332). */
+  tarih: string | null
+  tarihIso: string | null
   /** Güncelleme tarihi (görünen biçim); yayın tarihinden FARKLI değilse `null` ve kartta basılmaz. */
   guncelleme: string | null
   guncellemeIso: string | null
@@ -76,8 +77,12 @@ export default function BilgiMerkeziArama({ kartlar, dil, metin }: Props) {
               >
                 <span className="flex flex-wrap gap-x-2 text-sm text-industrial-gray">
                   <span className="font-semibold text-brand-cyan-ink">{k.konu}</span>
-                  <span aria-hidden="true">{'·'}</span>
-                  <time dateTime={k.tarihIso}>{k.tarih}</time>
+                  {k.tarih && k.tarihIso && (
+                    <>
+                      <span aria-hidden="true">{'·'}</span>
+                      <time dateTime={k.tarihIso}>{k.tarih}</time>
+                    </>
+                  )}
                   {k.guncelleme && k.guncellemeIso && (
                     <>
                       <span aria-hidden="true">{'·'}</span>
