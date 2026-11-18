@@ -41,7 +41,7 @@ describe('INV-REHBER-ENVANTER-1 · ayrıştırma (gerçek yazilar.ts)', () => {
 
   it('ürün ve kategori kimlikleri vh: önekli diziden okunur', () => {
     const cati = yazilar.find((y: { kimlik: string }) => y.kimlik === 'cati-tipi-fan-nedir')
-    expect(cati.urunler).toEqual(['vh:aile/vortice-slimroof-cati-fanlari'])
+    expect(cati.urunler).toEqual(['vh:aile/vortice-slimroof-cati-fanlari', 'vh:aile/vortice-radon-serisi-cati-fanlari'])
     expect(cati.kategoriler).toEqual(['vh:kategori/roof-fans'])
   })
 
