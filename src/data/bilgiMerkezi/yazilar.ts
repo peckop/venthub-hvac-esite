@@ -2191,6 +2191,107 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-67), doğrulanmış metin: taslak v5 (sha a9aa292f54b5). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82); başlıkta, adreste ve kimlikte "restoran" yok (OPS kararı). Aile adı girişte, "VentHub'da hangi mutfak egzoz fanı serileri var?" bölümünde, iki SSS cevabında ve Kaynaklar'da. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok.
+    // Doğrulama: iddia tablosu kapıdan geçti (kırmızı 0); bu sürümde tuzaklı kol koşmadı; doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82).
+    kimlik: 'mutfak-egzoz-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-19',
+    guncellemeTarihi: '2026-11-19',
+    tarihGizli: true,
+    urunler: ['vh:aile/vortice-vort-qbk-sal-kc-evo'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'mutfak-egzoz-fani-nasil-secilir',
+        ozet: "Mutfak egzoz fanı seçimi, havanın özellikleri ile debi, basınç ve sistem yerleşimi bilinerek başlar; gaz yakan cihazlarda tamamlama havası önemlidir.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Mutfak egzoz fanı seçerken havanın özelliklerinin, tamamlama havasının ve motor konumunun nasıl ele alındığını görmek için bu rehberden başlayın.",
+        govde: `# Mutfak egzoz fanı nasıl seçilir?
+
+Mutfak egzoz fanının seçimi, taşınacak havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri ile gereken debi, basınç ve sistem yerleşimi bilinerek başlar [3]. VentHub'daki Vortice VORT QBK SAL KC Evo ailesi, sıcak, nemli ve kirli havayı dışarı atmak için tasarlanmış, yağ ve is yüklü havanın işlenmesine uygun hücreli bir mutfak egzoz fanı ailesidir [2].
+
+Kısaca:
+
+- Fan türü: radyal (santrifüj) fanlar yüksek nem ve partikül içeriğine sahip "kirli" hava akımlarında ve yüksek sıcaklıklı sistemlerde sık kullanılır [3].
+- Motorun konumu: santrifüj fanlarda motor fan gövdesinin dışına konabilir [3].
+- Tamamlama havası: gaz yakan cihazlar için yeterli tamamlama havası (makeup air) özellikle önemlidir [1].
+- VentHub'da: ailede 315 ile 630 mm arasında nominal çaplı, monofaze ve trifaze modeller vardır [2].
+
+## Mutfak egzoz fanı seçerken nelere bakılır?
+
+Fan seçimini başlatan koşullar havanın özellikleri, debi, basınç ve sistem yerleşimidir; bu koşullar santrifüj ya da aksiyel fandan hangisinin gerektiğini belirler [3]. Ticari mutfakta gaz yakan cihazlar için yeterli tamamlama havası sağlamak da özellikle önemlidir [1].
+
+| Ölçüt | Ne bakılır | Kaynak |
+|---|---|---|
+| Havanın özellikleri | Nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikler | [3] |
+| Debi, basınç ve yerleşim | Gereken hava debisi, basınç ve sistem yerleşimi; santrifüj ya da aksiyel fan seçimini bu koşullar belirler | [3] |
+| Fan türü | Santrifüj fanlar yüksek nem ve partikül içeriğine sahip "kirli" hava akımlarında, malzeme taşımada ve yüksek sıcaklıklı sistemlerde sık kullanılır | [3] |
+| Motorun konumu | Santrifüj fanlarda motor fan gövdesinin dışına konup çarka mil keçesiyle bağlanabildiği için partikül içeriği daha az önemlidir | [3] |
+| Tamamlama havası | Gaz yakan cihazlarda yeterli hava girmemesi ve hatalı baca düzeni eksik yanmaya ve karbon monoksit gibi yanma ürünlerinin birikmesine yol açabilir | [1] |
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Ticari mutfakta havalandırma neleri kapsar?
+
+İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) yemek hizmeti sektörüne yönelik sıkça sorulan sorular sayfasına göre mutfak havalandırması güvenli ve konforlu bir çalışma ortamı için gereklidir [1]. Pişirmenin ürettiği duman, buhar ve ısıyı güvenli bir dış noktaya atmak için havalandırma gerekir; bu genellikle pişirme cihazlarının üstündeki kanopi davlumbazdan mekanik egzozla sağlanır [1]. Havalandırma sistemi mutfağın tamamında genel havalandırma da sağlamalıdır [1]. Katı yakıtlı cihazlar normal çalışmalarında karbon monoksit üretir ve zehirli dumanı uzaklaştıran uygun bir egzoz sistemi ister [1].
+
+İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+
+## VentHub'da hangi mutfak egzoz fanı serileri var?
+
+VentHub'ın [Vortice VORT QBK SAL KC Evo](vh:aile/vortice-vort-qbk-sal-kc-evo) ailesi Radyal (Santrifüj) Fanlar kategorisindedir; ailenin maksimum debileri 2.540–22.100 m³/h aralığındadır [2]. Ailenin modelleri 315 ile 630 mm arasında nominal çaplı, monofaze ya da trifaze, 25 mm taşyünü iç izolasyonlu ve plug fanlı hücreli mutfak aspiratörleridir; motorları hava akımının dışında yer alır [2]. Örneğin aile sayfasında 43151 kodlu 315 mm'lik monofaze modelin en yüksek debisi 2.540 m³/h, en yüksek statik basıncı 370 Pa olarak verilir [2].
+
+İlgili rehberler: [Hücreli aspiratör nedir, seçerken nelere bakılır?](vh:yazi/hucreli-aspirator-nedir), [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Teklif için hangi bilgiler gerekir?
+
+Teklif, aile sayfasındaki "Teknik Teklif İste" düğmesiyle istenir; sayfada 21 model listelenir [2]. Teklif için şu bilgiler hazırlanır:
+
+- Debi ve basınç: fan seçimi gereken hava debisi ve basınç bilinerek başlar [3].
+- Cihazların yakıt türü: gaz yakan cihazlarda yeterli tamamlama havası özellikle önemlidir; katı yakıtlı cihazlarda uygun bir egzoz sistemi bulunmalıdır [1].
+- Nominal çap: 315 ile 630 mm arası [2].
+- Besleme: monofaze ya da trifaze [2].
+
+## Sık sorulan sorular
+
+### Mutfakta havalandırma neden gerekir?
+
+Ticari mutfakta güvenli ve konforlu bir çalışma ortamı için gerekir [1].
+
+### Mutfak havalandırması yalnız davlumbazdan mı yapılır?
+
+Hayır; ticari mutfakta havalandırma sistemi mutfağın tamamında genel havalandırma da sağlamalıdır [1].
+
+### Katı yakıtlı pişirme cihazında egzoz neden gerekir?
+
+Katı yakıtlı cihazlar normal çalışmalarında karbon monoksit ürettiği için gerekir [1].
+
+### Mutfak egzoz fanında motorun hava akımı dışında olması ne sağlar?
+
+Santrifüj fanlarda motor fan gövdesinin dışına konabildiği için partikül içeriği daha az önemlidir [3]. Vortice VORT QBK SAL KC Evo modellerinde motor hava akımının dışındadır [2].
+
+### Mutfakta tamamlama havası verilmezse ne olur?
+
+Gaz yakan cihazlarda yeterli hava girmemesi eksik yanmaya ve karbon monoksit birikimine yol açabilir [1].
+
+### VentHub'da hangi mutfak egzoz fanı ailesi var?
+
+VentHub'da Vortice VORT QBK SAL KC Evo ailesi bulunur [2]. Aile, Radyal (Santrifüj) Fanlar kategorisindedir [2].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Frequently asked questions (Catering and hospitality), "Ventilation and temperature". https://www.hse.gov.uk/catering/faqs.htm (erişim 18.11.2026)
+2. VentHub, Vortice VORT QBK SAL KC Evo aile sayfası. https://venthub.com.tr/tr/products/vortice-vort-qbk-sal-kc-evo (erişim 18.11.2026)
+3. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, basılı s. 3, 5 ve 17. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 08.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Mutfak havalandırması bilgisi İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) yemek hizmeti sektörüne yönelik sayfasındandır ve Türkiye'deki yükümlülükleri belirlemez. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */

@@ -168,7 +168,8 @@ describe('kategori → rehber eşlemesi (sessiz fan rehberi)', () => {
     const sessiz = TR_METINLER.find((x) => x.y.kimlik === 'sessiz-fan-secimi')
     expect(sessiz, 'yazı yayından kalktıysa bu testi de güncelle').toBeDefined()
     for (const hedef of ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'] as const) {
-      const r = ilgiliRehberler(hedef, 'tr', 3, YAZILAR, false)
+      // Test eşlemenin VARLIĞINI ölçer (adet = tüm yazılar); kartın gösterdiği ilk 3 yazı yayın tarihine göre değişir (BLG-67 ve sonraki sektör yazıları).
+      const r = ilgiliRehberler(hedef, 'tr', YAZILAR.length, YAZILAR, false)
       expect(r.map((x) => x.href), hedef).toContain(`/tr/bilgi-merkezi/${sessiz?.m.slug}`)
     }
   })
