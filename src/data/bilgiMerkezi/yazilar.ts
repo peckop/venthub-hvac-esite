@@ -2292,6 +2292,108 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-65), doğrulanmış metin: taslak v7 (sha 9177cf4fa3e7). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82). Ürün bağları metindeki üç aileye göre: Hyperblade, aksiyel endüstriyel, Slimroof; önceki sürümdeki 61181 modeli metinden çıktı. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'depo-havalandirma-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-20',
+    guncellemeTarihi: '2026-11-20',
+    tarihGizli: true,
+    urunler: ['vh:aile/vortice-nordik-hvls-hyperblade', 'vh:aile/vortice-aksiyel-endustriyel-fanlar', 'vh:aile/vortice-slimroof-cati-fanlari'],
+    ilgiliKategoriler: ['vh:kategori/industrial-ceiling-fans', 'vh:kategori/axial-industrial-fans', 'vh:kategori/roof-fans'],
+    diller: {
+      tr: {
+        slug: 'depo-havalandirma-fani-nasil-secilir',
+        ozet: "Depoda fan seçimi işe bağlıdır: havalandırma temiz hava getirip iç havayı uzaklaştırır, endüstriyel tavan vantilatörü içerideki havayı karıştırır.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Depoda havalandırma fanı ile endüstriyel tavan vantilatörünün farkını ve hangi ürün grubunun hangi işe uyduğunu görmek için bu rehberden başlayın.",
+        govde: `# Depo havalandırma fanı nasıl seçilir?
+
+Depoda fan seçimi önce yapılacak işe bağlıdır: havalandırma dışarıdan temiz hava getirip iç havayı uzaklaştırır [3], endüstriyel (büyük çaplı) tavan vantilatörü ise havayı dışarı atmadan içerideki havayı karıştırır [2]. Seçimi belirleyen sorular arasında tavan vantilatöründe tavan yüksekliği, kapsanacak alan ve asma noktasının taşıma kapasitesi, duvar tipi aksiyel ve çatı tipi fanda gereken debi vardır [2][4].
+
+Kısaca:
+
+- Havalandırma: Mekanik havalandırma havayı odalara vermek ve odalardan almak için fan kullanır; büyük binalarda kanal ve fan ağı kullanılabilir [3].
+- Tavan vantilatörü: Endüstriyel tavan vantilatörü yazın serinlik hissi verir, kışın tavanda biriken sıcak havayı aşağı indirir [2].
+- Seriler: VentHub'da endüstriyel tavan vantilatörleri kategorisinde Vortice Nordik HVLS Hyperblade ailesi ve 7 modeli bulunur [2].
+
+## Depoda havalandırma ile hava karıştırma farkı nedir?
+
+Havalandırmayla uzaklaştırılan iç hava bayat olabilir, makineler ve süreçler yüzünden sıcak ve nemli olabilir ya da kirletici içerebilir [3]. Mekanik havalandırmada fanlar havayı odalara verir ve odalardan alır; küçük alanlarda fan odanın içinde olabilir, büyük binalarda kanal ve fan ağı kullanılabilir [3].
+
+| İş | Ne yapar | VentHub'da ürün grubu |
+|---|---|---|
+| Havalandırma (hava verme ve alma) | Dışarıdan temiz hava getirir, iç havayı uzaklaştırır [3] | Duvar tipi aksiyel fanlar (havalandırma için tasarlanmış) ve havayı binanın en üstünden dışarı atan çatı tipi fanlar [4] |
+| Hava karıştırma | Havayı dışarı atmadan içerideki havayı karıştırır [2] | Endüstriyel tavan vantilatörleri [2] |
+
+VentHub'daki duvar tipi aksiyel fanlar düşük ve orta basınçlı serilerdir ve spor salonu gibi ticari ve endüstriyel hacimlerin havalandırması için tasarlanmıştır [4].
+
+İlgili rehberler: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+
+## Endüstriyel tavan vantilatörü depoda ne işe yarar?
+
+Endüstriyel tavan vantilatörleri, büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; depo, spor salonu, fabrika ve showroom bunların tipik uygulamalarıdır [2]. Etkileri mevsime göre değişir:
+
+| Mevsim | Endüstriyel tavan vantilatörünün etkisi [2] |
+|---|---|
+| Yaz | İçerideki havayı karıştırarak serinlik hissi verir |
+| Kış | Tavanda biriken sıcak havayı aşağı indirir |
+
+Çok sıcak havalarda iş yerinde ısı stresi riski artabilir; sıcaklığı kontrol etmenin örnek yolları arasında fan ya da klima kullanmak da sayılır [1].
+
+## VentHub'da hangi depo havalandırma fanı serileri var?
+
+[Endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans) kategorisinde [Vortice Nordik HVLS Hyperblade](vh:aile/vortice-nordik-hvls-hyperblade) ailesi bulunur [2]. Ailenin 7 modeli fırçasız EC motorlu, 5 kanatlı tavan vantilatörleridir; nominal kanat çapı 3,0 m ile 7,0 m arasındadır [2]. 3,0 m ve 4,0 m modellerin monofaze ve trifaze sürümü, 5,0 m, 6,0 m ve 7,0 m modellerin trifaze sürümü vardır; maksimum debi 79.400–330.800 m³/h aralığındadır [2].
+
+Havalandırma için [aksiyel fanlar](vh:kategori/axial-industrial-fans) kategorisinde 16 modelli [Vortice aksiyel endüstriyel fanlar](vh:aile/vortice-aksiyel-endustriyel-fanlar) ailesi bulunur; maksimum debi 1.850–14.500 m³/h aralığındadır [4]. Patlayıcı ortam (ATEX) gerektiren uygulamalar için kategoride ayrı bir aile vardır [4]. [Çatı tipi fanlar](vh:kategori/roof-fans) kategorisinde [Vortice Slimroof çatı fanları](vh:aile/vortice-slimroof-cati-fanlari) ailesi bulunur [4].
+
+İlgili rehberler: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri), [Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?](vh:yazi/patlayici-ortamda-fan-secimi-atex)
+
+## Teklif için hangi bilgiler gerekir?
+
+Aile sayfalarında teklif "Teknik Teklif İste" düğmesiyle istenir [2][4]. Ürün grubuna göre seçimi belirleyen sorular şunlardır:
+
+- Endüstriyel tavan vantilatörü: tavan yüksekliği, kapsanacak alan ve asma noktasının taşıma kapasitesi [2]
+- Aksiyel fan: gereken debi, fanın nominal çapı ve ortamda gaz ya da toz kaynaklı patlama riskinin bulunup bulunmadığı [4]
+- Çatı tipi fan: çatı tipi ve eğimi, gereken debi ve tahliye edilen havanın niteliği [4]
+
+## Sık sorulan sorular
+
+### Endüstriyel tavan vantilatörü depoda havalandırmanın yerini tutar mı?
+
+Hayır; endüstriyel tavan vantilatörü havayı dışarı atmaz, içerideki havayı karıştırır [2]. Havalandırma ise dışarıdan temiz hava getirip iç havayı uzaklaştırır [3].
+
+### Endüstriyel tavan vantilatörü kışın işe yarar mı?
+
+Evet; tavanda biriken sıcak havayı aşağı indirir [2].
+
+### Doğal havalandırma ile mekanik havalandırma arasındaki fark nedir?
+
+Doğal havalandırma havayı kapı, pencere ve ızgara gibi açıklıklardan sağlar; mekanik havalandırma havayı fanla içeri verir ve dışarı çıkarır [3]. Birçok binada ikisi birlikte bulunur [3].
+
+### İyi havalandırma hangi sonuçlarla ilişkilendirilir?
+
+Araştırmalar iyi havalandırmayı daha iyi sağlık, daha iyi konsantrasyon, ortamdan daha yüksek memnuniyet, işe daha düşük devamsızlık ve birçok hava kirleticisine daha az maruziyetle ilişkili bulmuştur [3].
+
+### İş yerinde ısı stresine karşı sıcaklık nasıl kontrol edilir?
+
+Isı kaynakları mümkünse kaldırılır ya da azaltılır ve sıcaklık mühendislik çözümleriyle kontrol edilir: süreçleri değiştirmek, fan ya da klima kullanmak ve makine gibi kaynakların ışınım ısısına karşı fiziksel engel koymak bunlara örnektir [1].
+
+## Kaynaklar
+
+1. UK Health and Safety Executive (HSE), Temperature in the workplace: Heat stress, https://www.hse.gov.uk/temperature/employer/heat-stress.htm (erişim 18.11.2026)
+2. VentHub, Endüstriyel Tavan Vantilatörleri kategori sayfası ve Vortice Nordik HVLS Hyperblade aile sayfası: https://venthub.com.tr/tr/category/tavan-vantilatorleri , https://venthub.com.tr/tr/products/vortice-nordik-hvls-hyperblade (erişim 18.11.2026)
+3. UK Health and Safety Executive (HSE), Ventilation in the workplace: Overview, https://www.hse.gov.uk/ventilation/index.htm (erişim 18.11.2026)
+4. VentHub, Aksiyel Fanlar ve Çatı Tipi Fanlar kategori sayfaları ve Vortice Aksiyel Endüstriyel Fanlar aile sayfası: https://venthub.com.tr/tr/category/aksiyel-fanlar , https://venthub.com.tr/tr/category/cati-tipi-fanlar , https://venthub.com.tr/tr/products/vortice-aksiyel-endustriyel-fanlar (erişim 18.11.2026)
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Havalandırma ve ısı stresi bilgisi İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) rehberlerine dayanır; Türkiye'deki yasal yükümlülüklerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
