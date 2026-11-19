@@ -65,14 +65,16 @@ describe('liste kartı — güncelleme tarihi', () => {
       ['kanal-tipi-fan-nedir', '2026-11-17', '17 Kasım 2026'],
       ['sessiz-fan-secimi', '2026-11-17', '17 Kasım 2026'],
     ]
+    // BLG-88 (OPS-332): yayındaki her yazıda `tarihGizli` açık; güncelleme tarihi kayıtta durur (sitemap
+    // lastmod onu izler) ama kart BASMAZ. Bayrağı kapalı bir yazı gelirse kart yine biçimli tarihi basar.
     for (const [kimlik, iso, yazili] of beklenen) {
       const yazi = YAZILAR.find((y) => y.kimlik === kimlik)
       expect(yazi, `${kimlik} yayın listesinde yok`).toBeDefined()
       expect(yazi?.guncellemeTarihi, kimlik).toBe(iso)
       const kart = kartlar.find((k) => k.href.endsWith(`/${yazi?.diller.tr?.slug}`))
       expect(kart, `${kimlik} kartı yok`).toBeDefined()
-      expect(kart?.guncelleme, kimlik).toBe(yazili)
-      expect(kart?.guncellemeIso, kimlik).toBe(iso)
+      expect(kart?.guncelleme, kimlik).toBe(yazi?.tarihGizli ? null : yazili)
+      expect(kart?.guncellemeIso, kimlik).toBe(yazi?.tarihGizli ? null : iso)
     }
   })
 })
