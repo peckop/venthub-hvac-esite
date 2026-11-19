@@ -86,21 +86,43 @@ describe('tarihGizli — Article JSON-LD ve site haritası', () => {
   })
 })
 
-describe('tarihGizli — yayındaki içerik (pilot)', () => {
-  it('bayrak yalnız ısı geri kazanım yazısında açık', () => {
-    expect(YAZILAR.filter((y) => y.tarihGizli).map((y) => y.kimlik)).toEqual(['isi-geri-kazanim-cihazi-nedir'])
+describe('tarihGizli — yayındaki içerik (BLG-88: bütün yazılar)', () => {
+  it('yayındaki HER yazıda bayrak açık (yeni yazı da bayrakla girer)', () => {
+    expect(YAZILAR.length).toBeGreaterThan(0)
+    expect(YAZILAR.filter((y) => !y.tarihGizli).map((y) => y.kimlik)).toEqual([])
   })
 
-  it('pilot yazının canlı rotası: sayfada <time> yok, Article tarih taşımıyor', async () => {
-    const yazi = YAZILAR.find((y) => y.kimlik === 'isi-geri-kazanim-cihazi-nedir') as RehberYazisi
-    const params = Promise.resolve({ lang: 'tr', yazi: (yazi.diller.tr as YaziMetni).slug })
-    const { container } = render(await YaziRotasi({ params, bolumDili: 'tr' }))
+  it('her yazının rotası: sayfada <time> yok, Article tarih taşımıyor', async () => {
+    for (const yazi of YAZILAR) {
+      const m = yazi.diller.tr
+      if (!m) continue
+      const params = Promise.resolve({ lang: 'tr', yazi: m.slug })
+      const { container, unmount } = render(await YaziRotasi({ params, bolumDili: 'tr' }))
+      expect(zamanlar(container), yazi.kimlik).toEqual([])
+      const makale = Array.from(container.querySelectorAll('script[type="application/ld+json"]'))
+        .map((s) => JSON.parse(s.textContent ?? '{}') as Record<string, unknown>)
+        .find((j) => j['@type'] === 'Article')
+      expect(makale, yazi.kimlik).toBeDefined()
+      expect(makale, yazi.kimlik).not.toHaveProperty('datePublished')
+      expect(makale, yazi.kimlik).not.toHaveProperty('dateModified')
+      unmount()
+    }
+  })
+
+  it('liste sayfası: hiçbir kartta tarih yok', () => {
+    const { container } = render(<BilgiMerkeziListe dil="tr" />)
+    expect(container.querySelectorAll('ul > li').length).toBe(YAZILAR.filter((y) => y.diller.tr).length)
     expect(zamanlar(container)).toEqual([])
-    const makale = Array.from(container.querySelectorAll('script[type="application/ld+json"]'))
-      .map((s) => JSON.parse(s.textContent ?? '{}') as Record<string, unknown>)
-      .find((j) => j['@type'] === 'Article')
-    expect(makale).toBeDefined()
-    expect(makale).not.toHaveProperty('datePublished')
-    expect(makale).not.toHaveProperty('dateModified')
+  })
+
+  it('site haritası lastmod yine güncelleme tarihini izler (bayrak dokunmaz)', () => {
+    const satirlar = bilgiMerkeziSiteHaritasi('https://venthub.com.tr', false, YAZILAR)
+    for (const y of YAZILAR) {
+      const m = y.diller.tr
+      if (!m) continue
+      const satir = satirlar.find((s) => s.url.endsWith(`/${m.slug}`))
+      expect(satir, y.kimlik).toBeDefined()
+      expect((satir?.lastModified as Date).toISOString().slice(0, 10), y.kimlik).toBe(y.guncellemeTarihi)
+    }
   })
 })

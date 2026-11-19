@@ -58,7 +58,8 @@ export interface RehberYazisi {
   /**
    * Açıksa yayın ve güncelleme tarihi OKURA gösterilmez (yazı künyesi, liste kartı) ve Article
    * JSON-LD'sine `datePublished`/`dateModified` yazılmaz. Site haritası `lastmod` DEĞİŞMEZ
-   * (OPS-332 pilotu). Kapı: tarihGizli.test.tsx.
+   * (OPS-332; pilot BLG-87, bütün yayındaki yazılar BLG-88). Yeni yazı da `true` ile girer
+   * (rehber-yazisi-standard R3 künye satırı). Kapı: tarihGizli.test.tsx.
    */
   tarihGizli?: boolean
   /** Ürün kartı olarak basılacak kimlikler (`vh:aile/…`, `vh:model/…`). Fiyat basılmaz (R3). */
@@ -100,6 +101,7 @@ export const YAZILAR: readonly RehberYazisi[] = [
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-82: yazı R3.5 okur gözü kurallarıyla yeniden düzenlendi (seçim yolu başa, yinelenen giriş ve şerhler çıktı); yeni iddia, sayı, kaynak yok.
     guncellemeTarihi: '2026-11-17',
+    tarihGizli: true,
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
@@ -294,6 +296,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok
     guncellemeTarihi: '2026-11-17',
+    tarihGizli: true,
     urunler: [
       'vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar',
       'vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar',
@@ -533,6 +536,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-81: yazı okur sorusu sırasıyla yeniden kuruldu (kontrol listesi başa, tutanak gösterimi ve tek cümlelik bölüm çıktı); yeni iddia, sayı, kaynak yok.
     // BLG-81 tur 2: doğrulayıcı bulguları işlendi (Vortice/Lineo kaydı ve koşullar geri kondu; iki H2 eski adıyla korundu).
     guncellemeTarihi: '2026-11-17',
+    tarihGizli: true,
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
@@ -744,6 +748,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok; [3] için baskı yılı kaydı (BLG-84)
     guncellemeTarihi: '2026-11-17',
+    tarihGizli: true,
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
       'vh:aile/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari',
@@ -902,7 +907,6 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-82 okur gozu yeniden yazim
     guncellemeTarihi: '2026-11-17',
-    // OPS-332 pilotu: tarih okura ve Article JSON-LD'sine basılmaz; site haritası lastmod kalır.
     tarihGizli: true,
     urunler: [
       'vh:aile/vortice-vort-hr-isi-geri-kazanim',
@@ -1135,6 +1139,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     ilgili: ['isi-geri-kazanim-cihazi-nedir', 'fan-cesitleri', 'kanal-tipi-fan-nedir'],
     // 18 Kasım (BLG-86, R5.1.2 küçük düzeltme): enerji bölümünün ilk cümlesi girişle tekrarı bırakıldı; iki SSS cevabının ilk cümlesi cevap verir hâle geldi; yeni iddia yok.
     urunler: ['vh:aile/vortice-ad-isiticisiz-hava-perdeleri', 'vh:aile/vortice-h-ad-elektrikli-isiticili-hava-perdeleri'],
@@ -1300,6 +1305,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     // 18 Kasım (BLG-86): Kaynak 5 Birleşik Krallık sitesi yerine EUR-Lex özgün metnine çevrildi (tanımlar ölçüldü: aksiyel, santrifüj, karma akışlı, çapraz akışlı aynı); gövde değişmedi.
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
     ilgiliKategoriler: [
@@ -1447,6 +1453,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     // 18 Kasım (BLG-86, R5.1.2): "aynı şey midir" cevabının ilk cümlesi cevap verir; Kaynak 4'e Casals katalog adresi eklendi (revizyon kodu CV092024 PDF'te ölçüldü); yeni iddia yok.
     urunler: ['vh:aile/casals-enkelfan-ec-plug', 'vh:aile/casals-kentalfan-plug'],
     ilgiliKategoriler: ['vh:kategori/plug-fans'],
@@ -1557,6 +1564,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     // 18 Kasım (BLG-86, R5.1.2): tek cümlelik "Atık su arıtma" bölümüne kaynaktaki ikinci bilgi (hidrojen sülfür atık suda en yaygın gaz, Kaynak 5) eklendi; zaten ATEX bölümünde aynı kaynakla yazılıydı.
     urunler: ['vh:aile/seat-serisi', 'vh:aile/jet-serisi', 'vh:aile/storm-serisi'],
     ilgiliKategoriler: ['vh:kategori/corrosion-and-acid-resistant-fans'],
@@ -1707,6 +1715,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     // 18 Kasım (BLG-86): Radon ailesi ürün listesine ve metindeki bağlantıya eklendi (aile sayfası canlıda 200, 18 Kasım ölçümü); yeni iddia yok.
     urunler: ['vh:aile/vortice-slimroof-cati-fanlari', 'vh:aile/vortice-radon-serisi-cati-fanlari'],
     ilgiliKategoriler: ['vh:kategori/roof-fans'],
@@ -1817,6 +1826,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     // 18 Kasım (BLG-86): model adlarındaki T4 ve T2 için tek cümle eklendi (ürün sayfasında model adının parçası; bölge ayrı alandan okunur); yeni iddia yok.
     urunler: ['vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar', 'vh:aile/jet-serisi'],
     ilgiliKategoriler: ['vh:kategori/centrifugal-fans', 'vh:kategori/corrosion-and-acid-resistant-fans'],
@@ -1944,6 +1954,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: bir H2 adı (başlık tekrarı uyarısı); gövde değişmedi.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     urunler: ['vh:aile/avens-hucreli-aspiratorler-hf-fw', 'vh:aile/avens-hucreli-aspiratorler-hf-s'],
     ilgiliKategoriler: ['vh:kategori/cabinet-fans'],
     diller: {
@@ -2062,6 +2073,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: Kısaca maddelerinden ABD birimleri çıkarıldı (R3.4 k).
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
     guncellemeTarihi: '2026-11-18',
+    tarihGizli: true,
     urunler: ['vh:aile/vortice-punto-evo-flexo-banyo-fanlari', 'vh:aile/vortice-vort-quadro-evo', 'vh:aile/avens-qe-b-kasa-serisi'],
     ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans'],
     diller: {
