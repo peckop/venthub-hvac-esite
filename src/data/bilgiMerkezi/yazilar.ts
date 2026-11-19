@@ -2604,6 +2604,116 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-66), doğrulanmış metin: taslak v5 (sha 5864ff24e83c). Okur gözüyle yeniden düzenlendi (R3.5, BLG-82); H1 "Demir çelik tesislerinde ısı kontrolü ve havalandırma nasıl sağlanır?" oldu, adres (slug) ve kimlik değişmedi. Markasız gövde: VentHub'ın dört fan kategorisi "VentHub'da hangi fan serileri var?" bölümünde anılır, ürün (aile) bağı yok (urunler boş). Kaynaklar OSHA, HSE, DOE/AMCA ve VentHub kategori sayfaları. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'demir-celik-isi-kontrolu-havalandirma',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-23',
+    guncellemeTarihi: '2026-11-23',
+    tarihGizli: true,
+    urunler: [],
+    ilgiliKategoriler: ['vh:kategori/industrial-ceiling-fans', 'vh:kategori/axial-industrial-fans', 'vh:kategori/centrifugal-fans', 'vh:kategori/roof-fans'],
+    diller: {
+      tr: {
+        slug: 'demir-celik-tesisi-isi-kontrolu-havalandirma-kaynaklari',
+        ozet: "Demir çelik tesislerinde ısıya maruziyet, OSHA'nın sıraladığı mühendislik kontrolleriyle azaltılabilir: genel havalandırma, soğutma fanları, yerel egzoz.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Demir çelik tesislerinde ısıya maruziyeti azaltan önlemleri ve VentHub'daki fan kategorilerini görmek için bu rehberden başlayın.",
+        govde: `# Demir çelik tesislerinde ısı kontrolü ve havalandırma nasıl sağlanır?
+
+Demir çelik tesislerinde ısıya maruziyet, OSHA'nın iş yerleri için sıraladığı mühendislik kontrolleriyle azaltılabilir: genel havalandırmayı artırmak, soğutma fanları, yüksek ısı ya da nem üretilen noktalarda yerel egzoz havalandırması, fırın duvarları gibi sıcak yüzeylerin yalıtımı ve ışınımlı ısıyı başka yöne çeviren yansıtıcı kalkanlar [2]. Demir çelik tesisleri ve dökümhaneler, kapalı alanda tehlikeli ısı maruziyetinin görülebildiği işler arasındadır [1].
+
+Kısaca:
+
+- Isı önlemleri: Süreçleri değiştirmek ve fan ya da klima kullanmak da sıcaklık kontrolü örnekleridir [3].
+- Çalışma uygulamaları: Mühendislik kontrolleriyle serinletilemeyen yerlerde ısı stresi güvenli çalışmaya izin vermeyecek kadar yükselirse çalışma uygulamalarının değiştirilmesi önerilir [2].
+- Fan serileri: VentHub'ın radyal (santrifüj) fanlar kategorisindeki fanlar aksiyel fanlara göre daha yüksek basınç üretir [5].
+- Teklif: Fan seçimi hava özellikleri, hava debisi, basınç ve sistem yerleşimi bilinerek başlar [4].
+
+## Demir çelik tesislerinde ısıya maruziyet hangi önlemlerle azaltılabilir?
+
+OSHA'nın ve HSE'nin iş yerleri için verdiği listelerde yer alan önlemler şunlardır:
+
+| Önlem | Nerede ya da nasıl | Kaynak |
+|---|---|---|
+| Genel havalandırmayı artırmak, soğutma fanları, klima | Mühendislik kontrolleri listesinde; klima örnekleri vinç ve inşaat ekipmanı kabinleri ile dinlenme odaları | [2] |
+| Yerel egzoz havalandırması | Yüksek ısı ya da nem üretilen noktalarda | [2] |
+| Püskürtmeli fanlar | İnce su damlacıkları püskürtür | [2] |
+| Yansıtıcı kalkan | Işınımlı ısıyı başka yöne çevirir | [2] |
+| Sıcak yüzey yalıtımı | Fırın duvarları gibi sıcak yüzeylerde | [2] |
+| Süreci değiştirmek, fan ya da klima kullanmak | Sıcaklığı mühendislik çözümleriyle kontrol etme örnekleri | [3] |
+| Fiziksel engeller | Işınımlı ısıya maruziyeti azaltır | [3] |
+
+Bazı çalışma yerleri mühendislik kontrolleriyle serinletilemez; bu yerlerde ısı stresi güvenli çalışmaya izin vermeyecek kadar yükselirse çalışma uygulamalarının değiştirilmesi önerilir [2].
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Demir çelik tesislerinde tehlikeli ısı maruziyeti görülür mü?
+
+Evet. OSHA'nın ısı tablosunda kapalı alanda tehlikeli ısı maruziyetinin görülebildiği işler arasında demir çelik tesisleri ve dökümhaneler yer alır; tehlikeli ısı maruziyeti kapalı ya da açık alanda görülebilir [1]. HSE de dökümhaneleri ve izabe işlemlerini ısı stresinin görülebildiği iş yerlerine örnek verir [3].
+
+## VentHub'da hangi fan serileri var?
+
+VentHub'ın dört fan kategorisi sayfasındaki tanımlar şunlardır:
+
+- [Endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans): büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı tavan vantilatörleri; havayı dışarı atmaz, içerideki havayı karıştırır [5].
+- [Aksiyel fanlar](vh:kategori/axial-industrial-fans): duvara monte edilen, düşük ve orta basınçlı, ticari ve endüstriyel hacimlerin havalandırması için tasarlanmış fanlar [5].
+- [Radyal fanlar](vh:kategori/centrifugal-fans): havayı çarkın çevresine doğru fırlatarak basan, aksiyel fanlara göre daha yüksek basınç üreten fanlar; uzun kanal hatları, filtreli sistemler ve hücreli tesisatlar için tercih edilir [5].
+- [Çatı tipi fanlar](vh:kategori/roof-fans): havayı binanın en üstünden dışarı atan, çatıya oturan fanlar [5].
+
+İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+
+## Teklif için hangi bilgiler gerekir?
+
+ABD Enerji Bakanlığı kılavuzuna göre fan seçimi, sistemin çalışma koşullarını bilerek başlar [4]:
+
+- Hava özellikleri: nem, sıcaklık, yoğunluk, kirlilik düzeyi gibi
+- Hava debisi
+- Basınç
+- Sistem yerleşimi
+
+Bu kategori sayfalarında her ürün ailesinin yanında "Teklif İste" düğmesi bulunur [5].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Sık sorulan sorular
+
+### Tehlikeli ısı yalnız sıcak hava dalgalarında mı görülür?
+
+Hayır. OSHA'ya göre tehlikeli ısı maruziyeti, koşullar uygunsa yalnız sıcak hava dalgalarında değil, her mevsimde görülebilir [1].
+
+### Mühendislik kontrolleriyle serinletilemeyen çalışma yerinde ne yapılır?
+
+Isı stresi güvenli çalışmaya izin vermeyecek kadar yükselirse OSHA çalışma uygulamalarının değiştirilmesini önerir [2].
+
+### Dökümhanelerde ısı stresine yol açan sıcak ortam nereden kaynaklanır?
+
+HSE'ye göre bu iş yerlerinde sıcak ortam süreçten ya da kısıtlı alanlardan kaynaklanır; dökümhaneler ve izabe işlemleri örnekler arasındadır [3].
+
+### Isıya karşı klima hangi yerlerde kullanılır?
+
+OSHA'nın mühendislik kontrolleri listesinde klima için verilen örnekler klimalı vinç ve inşaat ekipmanı kabinleri ile dinlenme odalarıdır [2].
+
+### VentHub'da radyal fan seçimini hangi sorular belirler?
+
+VentHub'ın radyal fanlar kategori sayfası gereken basıncı, fanın bir hücre içine mi yoksa doğrudan santrale mi gireceğini ve kanat yönünü (öne ya da geriye eğik) sayar [5].
+
+## Kaynaklar
+
+1. U.S. Occupational Safety and Health Administration (OSHA), Heat - Overview: Working in Outdoor and Indoor Heat Environments, tablo "Hazardous heat exposure for Indoors or Outdoors". https://www.osha.gov/heat-exposure (erişim 18.11.2026)
+2. OSHA, Heat - Engineering Controls, Work Practices, and Personal Protective Equipment. https://www.osha.gov/heat-exposure/controls (erişim 18.11.2026)
+3. UK Health and Safety Executive (HSE), Temperature in the workplace: Heat stress. https://www.hse.gov.uk/temperature/employer/heat-stress.htm (erişim 18.11.2026)
+4. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, basılı s. 17. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 18.11.2026)
+5. VentHub, endüstriyel tavan vantilatörleri, aksiyel fanlar, radyal (santrifüj) fanlar ve çatı tipi fanlar kategori sayfaları (erişim 18.11.2026): https://venthub.com.tr/tr/category/tavan-vantilatorleri , https://venthub.com.tr/tr/category/aksiyel-fanlar , https://venthub.com.tr/tr/category/radyal-fanlar , https://venthub.com.tr/tr/category/cati-tipi-fanlar
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. OSHA ve HSE sırasıyla ABD ve Birleşik Krallık kurumlarıdır; bu bilgiler Türkiye'deki yükümlülüklerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Kategori bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
