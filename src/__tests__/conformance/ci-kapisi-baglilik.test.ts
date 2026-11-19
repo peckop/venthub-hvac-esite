@@ -120,22 +120,9 @@ interface Olcum {
  * İLAN EDİLMİŞ EKSİKLER. Her satır: kapı + eksik bağ + gerekçe + kart. Liste yalnız KÜÇÜLEBİLİR (bkz. mandal).
  * Satırı silmek için bağı kurun; bağ kurulunca "ilan bayat" kolu zaten kırmızı verir.
  */
-const BILINEN_EKSIK: readonly BilinenEksik[] = [
-  {
-    kapi: 'scripts/ci/defter-pr-kapisi.cjs',
-    bag: 'harita',
-    gerekce:
-      'Testi defter-pr-kapisi.test.ts 2026-11-09 (#2441) eklendi; test-haritasi.json satırı henüz ölçülmedi. Harita ortak dosya: ALT-184 tazeler, satır belirince bu ilan silinir.',
-    kart: 'ALT-181',
-  },
-  {
-    kapi: 'scripts/ci/yonlendirme-kapisi.cjs',
-    bag: 'harita',
-    gerekce:
-      'Testi yonlendirme-kapisi.test.ts 2026-11-10 (#2473) eklendi; test-haritasi.json satırı henüz ölçülmedi. Harita ortak dosya: ALT-184 tazeler, satır belirince bu ilan silinir.',
-    kart: 'ALT-181',
-  },
-]
+// ALT-208 (19 Kasım): test-haritasi.json tazelendi (--bayat), defter-pr-kapisi ve yonlendirme-kapisi testleri haritaya girdi;
+// iki ilan silindi. Liste boş: bugün bilinen harita eksiği yok, her eksik KIRMIZIDIR.
+const BILINEN_EKSIK: readonly BilinenEksik[] = []
 /** Liste yalnız küçülür: yeni borç ilanı bu sayıyı yükseltmeyi gerektirir (görünür diff). */
 const BILINEN_EKSIK_TAVAN = 2
 
