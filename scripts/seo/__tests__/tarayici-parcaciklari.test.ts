@@ -40,9 +40,10 @@ describe('gsc', () => {
 // INV-DIZIN-ISTEK-KAPI-1 (SEO-130, D4 "Google tek istek"): parçacık tablo dışı adrese ve aynı adrese ikinci kez TIKLAMAZ.
 describe('gsc tablo kapısı', () => {
   /** Sahte GSC sayfası: girişe yazılan adres sayfa metnine düşer, düğmeye basınca "istendi" metni çıkar. */
-  function sahteSayfa() {
+  function sahteSayfa(mod: 'ok' | 'hata' | 'sessiz' = 'ok') {
     let deger = ''
     let istendi = false
+    const sonucMetni = () => (!istendi ? '' : mod === 'ok' ? 'Dizine eklenmesi istendi' : mod === 'hata' ? 'Kota Aşıldı' : '')
     const tiklamalar: string[] = []
     const inp: any = {
       getAttribute: () => 'URL inceleyin', placeholder: '', focus() {}, dispatchEvent() {},
@@ -55,7 +56,7 @@ describe('gsc tablo kapısı', () => {
     Object.defineProperty(HTMLInputElement.prototype, 'value', { set(v: string) { deger = v; istendi = false }, configurable: true })
     const document: any = {
       querySelectorAll: (s: string) => (s === 'input' ? [inp] : s === 'span' ? [dugme] : []),
-      get body() { return { innerText: `URL Denetimi ${'x'.repeat(40)} ${deger} ${istendi ? 'Dizine eklenmesi istendi' : ''}` } },
+      get body() { return { innerText: `URL Denetimi ${'x'.repeat(40)} ${deger} ${sonucMetni()}` } },
     }
     const baglam: any = {
       window: {}, document, HTMLInputElement, Event: class {}, KeyboardEvent: class {},
@@ -86,6 +87,30 @@ describe('gsc tablo kapısı', () => {
     expect((await baglam.window.__iste('https://c/', false, { zorla: 'evet' })).durum).toBe('TABLODA YOK')
     expect((await baglam.window.__iste('https://c/', false, { zorla: true })).sonuc).toBe('ISTENDI')
     expect(tiklamalar).toEqual(['https://c/'])
+  })
+
+  it('eşzamanlı iki çağrıda yalnız biri tıklar, öteki TEKRAR RED', async () => {
+    const { baglam, tiklamalar } = sahteSayfa()
+    vm.runInNewContext(gscParcacigi(['https://a/']), baglam)
+    const [r1, r2] = await Promise.all([baglam.window.__iste('https://a/', false), baglam.window.__iste('https://a/', false)])
+    expect([r1.durum, r2.durum]).toContain('TEKRAR RED')
+    expect(tiklamalar).toEqual(['https://a/'])
+  })
+
+  it('sonucu belirsiz (ZAMAN ASIMI) istek kilitli kalır: ikinci çağrı TEKRAR RED', async () => {
+    const { baglam, tiklamalar } = sahteSayfa('sessiz')
+    vm.runInNewContext(gscParcacigi(['https://a/']), baglam)
+    expect((await baglam.window.__iste('https://a/', false)).sonuc).toBe('ZAMAN ASIMI')
+    expect((await baglam.window.__iste('https://a/', false)).durum).toBe('TEKRAR RED')
+    expect(tiklamalar).toEqual(['https://a/'])
+  })
+
+  it('açık HATA (kota) kilidi kaldırır: aynı adres yeniden denenebilir', async () => {
+    const { baglam, tiklamalar } = sahteSayfa('hata')
+    vm.runInNewContext(gscParcacigi(['https://a/']), baglam)
+    expect((await baglam.window.__iste('https://a/', false)).sonuc).toMatch(/^HATA:/)
+    expect((await baglam.window.__iste('https://a/', false)).sonuc).toMatch(/^HATA:/)
+    expect(tiklamalar).toEqual(['https://a/', 'https://a/'])
   })
 
   it('izinliCoz yalnız https satırlarını alır, uyarıyı ve tekrarı atar', () => {
@@ -140,6 +165,12 @@ describe('CLI', () => {
     expect(iyi.stdout).toContain('"https://venthub.com.tr/tr/x"')
     const bos = join(kl, 'bos.txt'); writeFileSync(bos, 'kalan yok\n')
     expect(spawnSync(process.execPath, [BETIK, 'gsc', '--izinli', bos], { encoding: 'utf8' }).status).toBe(1)
+    const uzun = join(kl, 'uzun.txt')
+    writeFileSync(uzun, Array.from({ length: 16 }, (_, i) => `https://venthub.com.tr/tr/x${i}`).join('\n'))
+    expect(spawnSync(process.execPath, [BETIK, 'gsc', '--izinli', uzun], { encoding: 'utf8' }).status).toBe(2)
+    const stdin = spawnSync(process.execPath, [BETIK, 'gsc', '--izinli', '-'], { encoding: 'utf8', input: 'https://venthub.com.tr/tr/y\n' })
+    expect(stdin.status).toBe(0)
+    expect(stdin.stdout).toContain('"https://venthub.com.tr/tr/y"')
     const zorla = spawnSync(process.execPath, [BETIK, 'gsc', '--zorla'], { encoding: 'utf8' })
     expect(zorla.status).toBe(0)
     expect(zorla.stderr).toContain('UYARI')
