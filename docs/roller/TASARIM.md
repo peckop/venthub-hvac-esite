@@ -18,6 +18,9 @@ Amaç ve Nasıl: `docs/roller/TASARIM-gorevler.md`.
 ## Düzenli görevler
 - 6 görev, tetiğe bağlı 5: `docs/roller/TASARIM-gorevler.md`.
 
+## Sürekli defterler
+- tasarim-yuzey-gozlem
+
 ## Dosyalar
 `src/design-system/**`, `src/components/ds/**`, `src/index.css`, `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` + `body` sınıfı), `docs/plans/tasarim-kod-plani-v2*`; Design Venthub New `surec/` deneme istek ve rapor dosyaları (depo dışı). Cetvel: marka token eşlemesi; storefront-design URUN'da.
 
