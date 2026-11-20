@@ -78,7 +78,14 @@ const OTURUMA_GIREN = new Set(['name', 'description', 'argument-hint'])
  * 27,5 KB (28 160 bayt) = bugünkü toplam + ~0,24 KB baş payı. Tetik sınavı 11/12 ve 8/8.
  * ✅OPS onayı 13 Kasım 2026, YTN-55.
  */
-const BUTCE_BAYT = 27.5 * 1024
+/**
+ * ⭐BÜTÇE 27,5 → 28 KB (YTN-58, ölçüm 2026-11-20). site-gorsel-inceleme (TASARIM görsel inceleme skill'i, OPS-340)
+ * oturum listesine ekledi: 28 160 → 28 269 bayt (109 bayt aşım, 75 → 76 skill). Açıklama 282 karakter (tavan 300);
+ * kısaltmak panel-gezinme ile ayrımı silerdi, YTN-42 yolu: ölçülmüş aşımda tavan artar, tetik cümleleri kısaltılmaz.
+ * 28 KB (28 672 bayt) = bugünkü toplam + ~0,39 KB baş payı. Tetik sınavı docs/audits/skills-eval-2026-11-20-ytn58*.
+ * ✅Recep onayı 20 Kasım 2026 (oturumda, tavan engelse artırılsın), YTN-58.
+ */
+const BUTCE_BAYT = 28 * 1024
 
 /** Tek bir açıklamanın tavanı. Yeni skill'ler için geçerli; bugünkü aşanlar aşağıda ADIYLA. */
 const ACIKLAMA_TAVANI = 300

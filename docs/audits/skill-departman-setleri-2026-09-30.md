@@ -245,7 +245,7 @@ Bu bölümdeki skill'lerde dikkat:
 | Araştırmacı | venthub-tasarim-dili (11,4K) | 0,0K | browse (29,9K, y), web-platform-baseline (10,5K, y) | — |
 | Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (11,0K, y) | 11,0K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
 | Çürütücü | plan-challenger (14,6K), web-design-guidelines (4K) | 18,6K | — | — |
-| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (14,5K) | — |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (14,5K), site-gorsel-inceleme (11,9K) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -258,6 +258,7 @@ Bu bölümdeki skill'lerde dikkat:
 - **accessibility** — not: SKILL.md düzeltme akışı tarif ediyor; Doğrulayıcı yalnız ölçer, düzeltmez (§10.3)
 - **webapp-testing** — UYARI: örnekler npm run dev; VentHub pnpm kullanır.
 - **panel-gezinme** — YTN-55 (13 Kasım 2026): Design Venthub New kiracı panelini yalnız claude-in-chrome ile gezer; Doğrulayıcı panel turunda adıyla çağırır, tuzak listesini TASARIM besler.
+- **site-gorsel-inceleme** — YTN-58 (20 Kasım 2026, OPS-340): önizleme sitesinin ve panelinin şablonlarını yalnız claude-in-chrome ile gezip görsel tasarım ve UI/UX bulgularını 1-5 puanla raporlar; salt rapor (düzeltme, commit ve Design'a yazma yok). Doğrulayıcı görsel inceleme turunda adıyla çağırır; bakış listesini TASARIM besler. gstack design-review ve qa-only'den yalnız denetim maddeleri alındı.
 
 ### URUN
 
