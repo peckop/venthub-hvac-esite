@@ -28,6 +28,7 @@
  *        (degisim: kod yayını sayfayı değiştirdi, motor google yazılır; değişen liste artık defterden türer. --tarih ile geçmiş tarih verilebilir)
  *        (SEO-127: adresler VİRGÜLLE TEK argümandır; boşlukla verilen ikinci adres eskiden sessizce düşüyordu, artık çıkış 2. Her adres https:// ile başlar,
  *         Git Bash'in /tr/x → C:/Program Files/Git/tr/x çevirisi de çıkış 2'dir. --neden/--kart satıra `neden`/`kart` alanı yazar; --kart biçimi ÖNEK-sayı)
+ *   node scripts/seo/dizin-takip.mjs --bag   (SEO-132: her gorunme/olcum satırını kendinden önceki son isteğe bağlar, aradaki günü yazar; salt okur)
  *   node scripts/seo/dizin-takip.mjs --degisen-ice-aktar [--degisen <dosya>]   (eski degisen-adresler.txt satırlarını deftere tek seferlik taşır)
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
@@ -112,17 +113,52 @@ export function defterAyristir(metin) {
 const anahtar = (h) => `${h.motor}|${h.eylem}|${h.adres}|${new Date(h.tarih).toISOString()}`
 
 /** Defter satırı biçimi: tek satır JSON. */
-export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, ...(h.sonuc ? { sonuc: h.sonuc } : {}), ...(h.kaynak ? { kaynak: h.kaynak } : {}), ...(h.neden ? { neden: String(h.neden) } : {}), ...(h.kart ? { kart: String(h.kart) } : {}) })
+export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, ...(h.sonuc ? { sonuc: h.sonuc } : {}), ...(h.kaynak ? { kaynak: h.kaynak } : {}), ...(h.neden ? { neden: String(h.neden) } : {}), ...(h.kart ? { kart: String(h.kart) } : {}), ...(h.istekTarihi ? { istekTarihi: String(h.istekTarihi) } : {}) })
 
-/** Bir adres×motor için son istek/gönderim zamanı (ms) ya da null. 'olcum' hareketi istek sayılmaz. */
-export function sonHareket(hareketler, motor, adres) {
+/** Bir adres×motor için son istek/gönderim zamanı (ms) ya da null. 'olcum' hareketi istek sayılmaz. `oncesi` (ms) verilirse yalnız ondan önceki (eşit dahil) eylemler. */
+export function sonHareket(hareketler, motor, adres, oncesi = Infinity) {
+  if (typeof oncesi !== 'number' || Number.isNaN(oncesi)) oncesi = Infinity
   let en = null
   for (const h of hareketler) {
     if (h.motor !== motor || h.adres !== adres || h.eylem === 'olcum' || h.eylem === 'gorunme' || h.eylem === 'degisim') continue
     const t = tarihAl(h.tarih)
-    if (t !== null && (en === null || t > en)) en = t
+    if (t !== null && t <= oncesi && (en === null || t > en)) en = t
   }
   return en
+}
+
+/** SEO-132: sonuç satırı mı (istek değil, isteğin etkisini ölçen satır)? */
+export const sonucSatiriMi = (h) => h?.eylem === 'gorunme' || h?.eylem === 'olcum'
+
+/**
+ * SEO-132: bir sonuç satırını (gorunme/olcum) aynı adres × motor için KENDİSİNDEN ÖNCEKİ son istek/gönderime bağlar.
+ * Görünme ölçümü Google satırıdır; bağlandığı istek de Google isteğidir. İstek yoksa null (istek atılmadan görünen adres de bir bulgudur).
+ * @returns {string|null} ISO tarih
+ */
+export function istekTarihiBul(hareketler, h) {
+  if (!sonucSatiriMi(h)) return null
+  const t = tarihAl(h.tarih)
+  if (t === null) return null
+  const en = sonHareket(hareketler, h.motor, h.adres, t)
+  return en === null ? null : new Date(en).toISOString()
+}
+
+/**
+ * SEO-132: istek → sonuç bağı tablosu (salt okur; defter yeniden yazılmaz). Her sonuç satırı için bağlı istek tarihi ve aradaki gün.
+ * Satırda kayıtlı istekTarihi varsa o esas alınır (kayıt anındaki bağ), yoksa defterden hesaplanır.
+ * @returns {Array<{ tarih: string, motor: string, eylem: string, adres: string, sonuc: string|null, istekTarihi: string|null, gun: number|null }>}
+ */
+export function bagTablosu(hareketler) {
+  return hareketler
+    .filter(sonucSatiriMi)
+    .map((h) => {
+      // Kayıtlı alan yalnız geçerli ISO metniyse ve satır tarihinden sonra değilse esas alınır; elle bozulmuş değer yerine defterden hesaplanır.
+      const kayitli = typeof h.istekTarihi === 'string' ? tarihAl(h.istekTarihi) : null
+      const istek = kayitli !== null && kayitli <= tarihAl(h.tarih) ? new Date(kayitli).toISOString() : istekTarihiBul(hareketler, h)
+      const gun = istek === null ? null : Math.floor((tarihAl(h.tarih) - tarihAl(istek)) / GUN_MS)
+      return { tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, sonuc: h.sonuc ?? null, istekTarihi: istek, gun }
+    })
+    .sort((a, b) => a.tarih.localeCompare(b.tarih) || a.adres.localeCompare(b.adres))
 }
 
 /**
@@ -499,10 +535,27 @@ async function calistir() {
     const simdi = verilen ? new Date(verilen).toISOString() : new Date().toISOString()
     const hareketler = adresler.map((adres) => ({ tarih: simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: 'kaydet', ...(neden ? { neden } : {}), ...(kart ? { kart } : {}) }))
     if (!adresler.length || hareketler.some((h) => !hareketGecerliMi(h))) { console.error('HATA: --kaydet <motor> <eylem> <adres,adres> geçersiz (motor/eylem/adres siteye ait olmalı)'); process.exit(2) }
+    // SEO-132: sonuç satırı (gorunme/olcum) kayıt anında bağlı olduğu son isteğin tarihini taşır.
+    if (sonucSatiriMi({ eylem })) {
+      const mevcut = defterOku(defter).hareketler
+      for (const h of hareketler) { const t = istekTarihiBul(mevcut, h); if (t) h.istekTarihi = t }
+    }
     mkdirSync(dirname(defter), { recursive: true })
     appendFileSync(defter, `${hareketler.map(satirYaz).join('\n')}\n`)
     console.log(`kaydedildi: ${hareketler.length} hareket → ${defter}`)
     yedekAl(defter)
+    return
+  }
+
+  // SEO-132: istek → sonuç bağı raporu (salt okur; defter değişmez). Çıktı stdout'a TSV; arama/sorgu verisi içermez (yalnız site adresi ve tarih).
+  if (arg.includes('--bag')) {
+    const { hareketler, atlanan } = defterOku(defter)
+    const satirlar = bagTablosu(hareketler)
+    console.log(['tarih', 'motor', 'eylem', 'sonuc', 'istekTarihi', 'gun', 'adres'].join('\t'))
+    const hucre = (v) => String(v).replace(/[\t\r\n]+/g, ' ')
+    for (const s of satirlar) console.log([s.tarih, s.motor, s.eylem, s.sonuc ?? '-', s.istekTarihi ?? 'ISTEK YOK', s.gun ?? '-', s.adres].map(hucre).join('\t'))
+    const bagsiz = satirlar.filter((s) => s.istekTarihi === null).length
+    console.error(`bağ: ${satirlar.length} sonuç satırı · isteğe bağlı ${satirlar.length - bagsiz} · istek yok ${bagsiz}${atlanan ? ` · UYARI: ${atlanan} bozuk satır atlandı` : ''}`)
     return
   }
 

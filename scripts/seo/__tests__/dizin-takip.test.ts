@@ -11,11 +11,11 @@
 import { describe, it, expect } from 'vitest'
 import { execFileSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
   BING_ARALIK_MS, KAYIT_BASLANGICI, KART_BICIMI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, kaydetArgumanlariCoz, markdownYaz,
-  satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
+  satirYaz, sonHareket, yedekAl, bagTablosu, istekTarihiBul, sonucSatiriMi, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
 const S = 'https://venthub.com.tr'
@@ -530,6 +530,81 @@ describe('SEO-127: CLI --kaydet (uçtan uca, depo dışı klasör, yedek kapalı
       const ayrisim = defterAyristir(readFileSync(defter, 'utf8'))
       expect(ayrisim.hareketler).toHaveLength(3)
       expect(ayrisim.atlanan).toBe(0)
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+})
+
+// INV-DIZIN-BAG-1 (SEO-132, D7 madde 1): her sonuç satırı (gorunme/olcum) kendinden ÖNCEKİ son isteğe bağlanır; bağ tablosu salt okurdur.
+describe('SEO-132: istek → sonuç bağı (INV-DIZIN-BAG-1)', () => {
+  const ist = (n: number, adres = A, motor = 'google', eylem = 'istek') => ({ tarih: gun(n), motor, eylem, adres })
+  const gor = (n: number, sonuc = 'gorundu', adres = A) => ({ tarih: gun(n), motor: 'google', eylem: 'gorunme', adres, sonuc })
+
+  it('yalnız gorunme ve olcum sonuç satırıdır', () => {
+    expect(sonucSatiriMi(gor(5))).toBe(true)
+    expect(sonucSatiriMi({ ...ist(5), eylem: 'olcum' })).toBe(true)
+    for (const e of ['istek', 'gonderim', 'degisim']) expect(sonucSatiriMi({ ...ist(5), eylem: e }), e).toBe(false)
+  })
+  it('sonuç, kendinden ÖNCEKİ son isteğe bağlanır; sonraki istek ve başka adres/motor sayılmaz', () => {
+    const h = [ist(2), ist(4), ist(9), ist(3, B), ist(5, A, 'bing', 'gonderim'), { ...ist(6), eylem: 'degisim' }]
+    expect(istekTarihiBul(h, gor(7))).toBe(gun(4))
+    expect(istekTarihiBul(h, gor(1))).toBeNull()
+    expect(istekTarihiBul(h, { tarih: gun(7), motor: 'bing', eylem: 'olcum', adres: A })).toBe(gun(5))
+    expect(istekTarihiBul(h, ist(7))).toBeNull() // istek satırı sonuç değildir
+  })
+  it('aynı andaki istek bağlanır (gün 0); 1 ms sonraki istek bağlanmaz', () => {
+    expect(istekTarihiBul([ist(5)], gor(5))).toBe(gun(5))
+    expect(bagTablosu([ist(5), gor(5)])[0]).toMatchObject({ istekTarihi: gun(5), gun: 0 })
+    const birMsSonra = { ...ist(5), tarih: new Date(Date.parse(gun(5)) + 1).toISOString() }
+    expect(istekTarihiBul([birMsSonra], gor(5))).toBeNull()
+  })
+  it('aradaki gün aşağı yuvarlanır (3,5 gün → 3), gorunmeOzeti.gunFarki ile aynı kural', () => {
+    const sonuc = { ...gor(5), tarih: '2026-11-05T20:00:00.000Z' }
+    expect(bagTablosu([ist(2), sonuc])[0]).toMatchObject({ gun: 3 })
+  })
+  it('bozuk kayıtlı istekTarihi (satırdan sonra, sayı, metin) yok sayılır, defterden hesaplanır', () => {
+    for (const kotu of [gun(9), 12345, 'abc']) {
+      const t = bagTablosu([ist(2), { ...gor(5), istekTarihi: kotu }])
+      expect(t[0], String(kotu)).toMatchObject({ istekTarihi: gun(2), gun: 3 })
+    }
+  })
+  it('sonHareket oncesi null/NaN verilirse sınır yok sayılır (tüm kayıtları dışlamaz)', () => {
+    expect(sonHareket([ist(2), ist(9)], 'google', A, null as unknown as number)).toBe(Date.parse(gun(9)))
+    expect(sonHareket([ist(2), ist(9)], 'google', A, Number.NaN)).toBe(Date.parse(gun(9)))
+  })
+  it('bağ tablosu gün farkını verir; istek yoksa null; kayıtlı istekTarihi hesaptan önce gelir', () => {
+    const h = [ist(2), gor(5), gor(3, 'gorunmuyor', B), { ...gor(8), istekTarihi: gun(1) }]
+    const t = bagTablosu(h)
+    expect(t).toHaveLength(3)
+    expect(t[0]).toMatchObject({ adres: B, istekTarihi: null, gun: null })
+    expect(t[1]).toMatchObject({ adres: A, tarih: gun(5), istekTarihi: gun(2), gun: 3, sonuc: 'gorundu' })
+    expect(t[2]).toMatchObject({ tarih: gun(8), istekTarihi: gun(1), gun: 7 })
+  })
+  it('istekTarihi satıra yazılır, yoksa alan hiç yoktur; görünme özeti alandan etkilenmez', () => {
+    expect(JSON.parse(satirYaz({ ...gor(5), istekTarihi: gun(2) }))).toMatchObject({ istekTarihi: gun(2) })
+    expect('istekTarihi' in JSON.parse(satirYaz(gor(5)))).toBe(false)
+    expect(gorunmeOzeti([{ ...gor(5), istekTarihi: gun(2) }], A)).toEqual(gorunmeOzeti([gor(5)], A))
+    expect(sonHareket([ist(2), ist(9)], 'google', A)).toBe(Date.parse(gun(9))) // eski çağrı biçimi değişmedi
+  })
+  it('CLI: --kaydet gorunme istek tarihini defterden alır; --bag defteri DEĞİŞTİRMEZ', () => {
+    const betik = resolve(__dirname, '..', 'dizin-takip.mjs')
+    const d = mkdtempSync(join(tmpdir(), 'dizin-bag-'))
+    const kos = (args: string[]) => execFileSync(process.execPath, [betik, ...args, '--hareket', join(d, 'h.jsonl')], { encoding: 'utf8', stdio: 'pipe', env: { ...process.env, DIZIN_TAKIP_YEDEK2: '' } })
+    try {
+      kos(['--kaydet', 'google', 'istek', A, '--tarih', gun(2)])
+      kos(['--kaydet', 'google', 'gorunme', `${A},${B}`, '--sonuc', 'gorundu', '--tarih', gun(6)])
+      const satirlar = readFileSync(join(d, 'h.jsonl'), 'utf8').trim().split('\n').map((s) => JSON.parse(s))
+      expect(satirlar[1]).toMatchObject({ adres: A, eylem: 'gorunme', istekTarihi: gun(2) })
+      expect('istekTarihi' in satirlar[2]).toBe(false)
+      kos(['--kaydet', 'yandex', 'olcum', A, '--sonuc', 'aramada\tek', '--tarih', gun(7)])
+      const agac = () => readdirSync(d, { recursive: true }).map(String).sort().map((y) => `${y}:${statSync(join(d, y)).isFile() ? `${statSync(join(d, y)).mtimeMs}:${readFileSync(join(d, y), 'utf8')}` : '<klasor>'}`)
+      const once = agac()
+      const cikti = kos(['--bag'])
+      expect(agac()).toEqual(once) // salt okur: defter, yedek klasörü ve yeni dosya yok
+      expect(cikti).toContain(`${gun(2)}\t4\t${A}`)
+      expect(cikti).toContain(`ISTEK YOK\t-\t${B}`)
+      const satirlarBag = cikti.trim().split('\n')
+      expect(satirlarBag[0]).toBe('tarih\tmotor\teylem\tsonuc\tistekTarihi\tgun\tadres')
+      for (const s of satirlarBag) expect(s.split('\t'), s).toHaveLength(7) // hücredeki sekme kolon kaydırmaz
     } finally { rmSync(d, { recursive: true, force: true }) }
   })
 })
