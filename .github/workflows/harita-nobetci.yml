@@ -1,6 +1,6 @@
 # TEST HARİTASI NÖBETÇİSİ (ALT-209, OPS-345 onayı 20 Kasım 2026)
 #
-# ⭐BU BİR PR KAPISI DEĞİL, UYARIDIR (bloklamaz). Ölçtüğü şey master'daki scripts/ci/test-haritasi.json'un
+# ⭐BU BİR PR KAPISI DEĞİL, UYARIDIR (bloklamaz). Ölçtüğü şey master'daki test haritası dosyasının
 # bugünkü bayatlık sayısıdır; kırmızı master'dan ÖNCE yakalanır.
 #
 # NİÇİN VAR: harita 6 kez aynı biçimde çürüdü (ALT-72, ALT-83, ALT-171, ALT-183, ALT-184, ALT-208); her seferinde

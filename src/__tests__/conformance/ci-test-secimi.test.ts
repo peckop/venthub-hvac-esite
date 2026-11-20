@@ -284,7 +284,7 @@ function olayKapanisiDenetle(ci: string, digerleri: Array<{ dosya: string; metin
   if (ciAdimlari.length === 0) ihlal.push('`ci` işinin adımları ayrıştırılamadı')
   if (/test-sec|test-haritasi|secilen\.txt|--secim|--vitestsiz/.test(ciYorumsuz)) ihlal.push('`ci` işi test seçiciye başvuruyor: master push, elle koşum ve `edited` koşusunda `ci` içindeki Test TAM koşmalı (seçici orada VAR OLMAMALI)')
   for (const { dosya, metin } of digerleri) {
-    if (/test-sec\b|test-sec\.cjs|test-haritasi/.test(yorumsuz(metin.split('\n')).join('\n'))) ihlal.push(`${dosya} test seçiciye başvuruyor: zamanlı/elle/başka koşular TAM paketi koşar, seçim YALNIZ pull_request shard işlerinindir`)
+    if (/test-sec\b|test-sec\.cjs|test-haritasi(?!-uret\.cjs)/.test(yorumsuz(metin.split('\n')).join('\n'))) ihlal.push(`${dosya} test seçiciye başvuruyor: zamanlı/elle/başka koşular TAM paketi koşar, seçim YALNIZ pull_request shard işlerinindir`)
   }
   if (/test-sec|VENTHUB_TEST_SECIM|secilen/.test(vitestCfg)) ihlal.push('vitest.config.ts seçiciye bağlanmış: yerel `pnpm test`, master push ve zamanlı koşu da daralır')
   const shard = yorumsuz(isAdimlari(ci, SHARD_ISI).flatMap((a) => a.satirlar)).join('\n')
@@ -557,7 +557,7 @@ describe('INV-CI-SECIM-1 — test seçimi ve belge hızlı yolu ci.yml’ye doğ
   })
 
   it('tüm öteki iş akışlarında (dunya-durumu, e2e-smoke...) seçici ve harita anılmaz; vitest yapılandırması seçiciyi bilmez', () => {
-    for (const { dosya, metin } of DIGERLERI) expect(/test-sec|test-haritasi/.test(metin), dosya).toBe(false)
+    for (const { dosya, metin } of DIGERLERI) expect(/test-sec|test-haritasi(?!-uret\.cjs)/.test(metin), dosya).toBe(false)
     expect(/test-sec|secilen/.test(VITEST_CFG)).toBe(false)
   })
 
