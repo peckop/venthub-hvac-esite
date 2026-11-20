@@ -73,6 +73,21 @@
       "kaynakIzi": "node scripts/icerik-hatti/unopim-icerik-olc.mjs --iz",
       "disKaynak": "unopim",
       "durum": "pilot"
+    },
+    {
+      "ad": "tasarim-yuzey-gozlem",
+      "dosya": "docs/defter/tasarim-yuzey-gozlem.md",
+      "sahip": "TASARIM",
+      "ozet": "Müşteri sitesi ve kiracı paneli görsel ve işlev gözlemi: hangi ekran ne zaman ölçüldü, hangi bulgu açık, ne zaman yeniden ölçülür",
+      "izlenen": [
+        "docs/roller/TASARIM-gorevler.md",
+        "docs/plans/yeni-site-gecis-tek-resim-2026-11-01.md"
+      ],
+      "tazelikGun": 14,
+      "tetik": ["kart-kapanisi", "sure", "dis-kaynak"],
+      "olcum": null,
+      "disKaynak": "design",
+      "durum": "kontrolsuz"
     }
   ]
 }
