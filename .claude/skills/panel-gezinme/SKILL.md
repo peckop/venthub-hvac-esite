@@ -13,7 +13,7 @@ Kiracı panelinin tasarımını Claude Code'un kendi kapısıyla, yani **claude-
 
 ## Ne zaman
 
-Design Venthub New içindeki panel şablonlarını (Teklifler ve belge zinciri) canlı tasarımda yürütüp ölçmek, ya da TASARIM bir düzeltme yaptıktan sonra aynı maddeleri yeniden ölçmek gerektiğinde.
+Kiracı panelini (Teklifler ve belge zinciri, modül sayfaları) yürütüp ölçmek, ya da Design bir düzeltme yaptıktan sonra aynı maddeleri yeniden ölçmek gerektiğinde. 20 Kasım'dan beri ölçüm varsayılan olarak **önizleme kopyasında** yapılır (aşağıda Kurulum); Design Venthub New projesinin içi Design'ın çalışma alanıdır, orada yalnız görev metni açıkça isterse ölçülür.
 
 ## Ne zaman DEĞİL
 
@@ -25,8 +25,10 @@ Design Venthub New içindeki panel şablonlarını (Teklifler ve belge zinciri) 
 
 - Yalnız claude-in-chrome (`mcp__claude-in-chrome__*`). Playwright, başsız tarayıcı ve yerleşik tarayıcı kullanılmaz: Design oturumu Recep'in Chrome'unda açık. Araçlar ertelenmişse hepsini tek bir ToolSearch çağrısında yükle.
 - Önce `tabs_context_mcp` ile açık sekmelere bak; başkasının sekmesine dokunma. Kendi sekmeni aç, bitince kapat.
-- Adres: claude.ai/design altında "Design Venthub New" projesi; Teklifler şablonu `templates/panel-teklifler/PanelTeklifler.dc.html`, sunum modu `present=1`. Proje kimliğini TASARIM görev metninde verir; depoya yazılmaz.
-- Panel çapraz kaynaklı bir iframe içindedir: DOM okunmaz. Ekran görüntüsü al, koordinatla tıkla. Görüntü yarım ölçekli gelebilir; küçük yazıyı `zoom` ile doğrula.
+- **Önizleme kopyası (varsayılan):** adresi görev metni verir. Sayfalar listesinde "Mağaza ayarları" kartı paneli açar; panel aynı kaynaklı bir iframe'dedir (`#cer`), bu yüzden DOM okunur: ölçümü `javascript_tool` ile `document.getElementById('cer').contentDocument` üzerinden yap, tıklamayı gerçek tıkla yap. `find`, `read_page` ve `form_input` iframe içini görmez. Karşılaştır gibi çekmeceler `#cer` içinde ikinci bir iframe olabilir.
+- Önizleme kopyasında genişlik: sayfadaki "Mobil 390" ve "Masaüstü" düğmelerini kullan; iframe adresini elle kurma (parametresiz kurulan iframe sahte yatay taşma verir). `resize_window` 1568 verse de gerçek `innerWidth` 1604 çıkar; ölçüme ölçülen değeri yaz.
+- Design projesi (yalnız görev metni isterse): claude.ai/design altında "Design Venthub New" projesi; Teklifler şablonu `templates/panel-teklifler/PanelTeklifler.dc.html`, sunum modu `present=1`. Proje kimliğini TASARIM görev metninde verir; depoya yazılmaz.
+- Design projesinde panel çapraz kaynaklı bir iframe içindedir: DOM okunmaz. Ekran görüntüsü al, koordinatla tıkla. Görüntü yarım ölçekli gelebilir; küçük yazıyı `zoom` ile doğrula.
 - Genişlik: sayfadaki iframe'in genişliğini `javascript_tool` ile ayarla (1604, 1100, 900); bitince 100%'e geri al. Genişlik değişince iframe yeniden yüklenir.
 
 ## Yasaklar (neden: sunum modu ve kayıtlar Recep'in gerçek tasarım durumudur)
@@ -87,6 +89,18 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Çalışan görev metnine "kapsam dışı düğmeye basma (Onayla, Sil, Gönder, Hepsini seç)" satırı yazılır (tur 11'de çalışan Onayla'ya basıp bir siparişi onayladı). Kare kimliği (ss_) dosya adı değildir: görsel gerekiyorsa çalışandan zaman damgalı dosya adı iste.
 - Datalist etiketleri: Cihaz parkından seç "Cihaz adı · IR-no" (ör. "Vortice Lineo 100 Quiet ES · IR-2026-0009") + Tab; kısmi yazı alanı temizler. Cariler liste aramasında çok karakterli yazıda ilk harften sonra odak kaybolabilir: kutuya yeniden tıkla.
 - Design sayfası ağırdır: sohbete uzun metin yazarken Chrome sekmesi donabilir (CDP zaman aşımı); metni kısa tut, donarsa sekmeyi kapatıp yeniden aç.
+
+Önizleme kopyası tuzakları (20 Kasım yeniden ölçümü):
+
+- `javascript_tool` çıktısına adres, `href`, `outerHTML`, `?` ya da `&` koyma: araç çıktıyı "BLOCKED" diye keser. Düz metin ve sayı döndür (yazı, genişlik, yükseklik, renk).
+- Ekran dışındaki bölümler `content-visibility` ile çizilmemiş olabilir; ölçmeden önce o bölüme `content-visibility: visible` yaz. Dil ya da genişlik değişince bu ayar silinir, yeniden yaz.
+- Odak halkası geçişlidir: Tab'dan sonra 350-400 ms bekle, sonra `outline` ve rengi oku; hemen okunan değer eski durumu verir.
+- Önizleme verisi tarayıcı deposunda sekmeler arasında ortaktır: başka çalışanların DENEME kayıtları listede görünür (dokunma), sizin açtığınız da onlara görünür. Aynı anda kayıt açan en çok bir çalışan olur; salt ölçüm yapanlar paralel koşabilir, her çalışan kendi sekmesinde (görev metni `tabId` verir).
+- Panelin ⋯ › Önizle düğmesi kendiliğinden yeni sekme açar; görev metni istemedikçe basma. Düğme bağlantı değil (`BUTTON type=button`, `href` yok), nereye açıldığı DOM'dan okunmaz.
+- Önizleme kopyasında stok yoktur: Sayım listesi "Henüz sayım yok", "Sayım başlat"ta ürün türü boş gelir. Sayım ya da "Eldekine eşitle" ölçülecekse önce bir DENEME ürününe stok girişi gerekir; görev metni bunu istemiyorsa "ölçülemedi: stok yok" yaz.
+- Satınalma siparişinin "Diğer işlemler" menüsünde "Şablon olarak kaydet" yoktur (Satış'ta vardır); yokluğu menü satırlarını yazarak raporla.
+- "Cari ekle"de Rol "Tedarikçi" seçip kaydedince listede "MÜŞTERİ" görünebilir (20 Kasım, tek deneme): rol alanını kayıttan sonra listede doğrula.
+- Alt ajanda Skill aracı bu skill'i "Unknown skill" diye bulamayabilir: görev metni dosya yolunu verir, `SKILL.md`'yi oku ve uygula. Kareler `save_to_disk` ile araç sonuç dizinine düşer; yolu araç çıktısından aynen yaz.
 
 ## Ölçüm sırası
 
