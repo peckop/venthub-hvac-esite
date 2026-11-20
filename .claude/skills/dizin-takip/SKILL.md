@@ -26,7 +26,7 @@ Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerind
 2. **Motor adımı** (yalnız YAP/TEKRAR olanlar):
    - **Google:** Chrome (claude-in-chrome) ile Search Console. Üstteki "URL'yi denetle" kutusuna TAM `https://` adresi yaz, Enter; sonuç gelince "Dizine eklenmesini iste". 1-3 dakika bekle. Başarı mesajı "Dizine eklenmesi istendi"; "Kota Aşıldı" görünürse dur, yarına bırak.
    - Açılış satırı: `node scripts/seo/dizin-acilis.mjs --sadece-satir` son anlık görüntüden YAP/TEKRAR sayılarını verir; bugün ölçüm yoksa `--durum` arka planda başlar. İstek yine tablodan okunarak atılır.
-   - Google tıklaması için çalışan parçacık: `node scripts/seo/tarayici-parcaciklari.mjs gsc` (window.__iste(adres, ilk)); sonra `--kaydet`. Robot doğrulaması çıkarsa dur.
+   - Google tıklaması iki adımdır (SEO-130): önce kalan adresleri çıkar, `node scripts/seo/dizin-takip.mjs --kalan google --sinir N > f` (N = günün kalan kotası, f depo dışı bir dosya); sonra parçacık yalnız o listeyle çalışır, `node scripts/seo/tarayici-parcaciklari.mjs gsc --izinli f` (window.__iste(adres, ilk)); sonra `--kaydet`. Listede olmayan adrese istek atılmaz; tek istisna `--zorla`. Robot doğrulaması çıkarsa dur.
    - **Bing:** `node scripts/seo/bing-url-gonder.mjs --gonder <adresler>` (günde 100).
    - **Yandex:** webmaster.yandex.com, bu site için indexing/reindex sayfasındaki metin kutusuna adresler satır satır (günde 10).
    - **IndexNow:** `node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk … --uygula`. Başlık/açıklama/H1 aynı kalıp gövdesi değişen yazı fark görünmez; o zaman listeyi zorla: `… --kuyruk … --adres <tam https adresler, virgülle> --uygula` (kapılar aynı: haritada, 200, kanonik kendisi).
