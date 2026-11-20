@@ -1,0 +1,18 @@
+{
+  "damga": "2026-11-20T11:42:03.876Z",
+  "etiket": "ytn61-d",
+  "model": "claude-haiku-4-5-20251001",
+  "arkaUc": "cli",
+  "kuru": false,
+  "ornek": null,
+  "agaclar": [
+    {
+      "agac": "",
+      "skill": 0,
+      "sinavli": 0,
+      "sinavsiz": []
+    }
+  ],
+  "istek": 0,
+  "sonuclar": []
+}

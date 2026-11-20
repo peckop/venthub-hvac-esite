@@ -1,6 +1,6 @@
 ---
 name: panel-gezinme
-description: 'Kiracı panelini (ERP) Design Venthub New içinde gerçek Chrome ile kullanıcı gözüyle gezer ve ölçer: sunum modu, genişlik değişimi, DENEME kayıtlarıyla belge zinciri, rapor. Tetik: "paneli gez", "panel ölçümü", "Design düzeltmesini yeniden ölç". Kod yazmaz, kayıt silmez.'
+description: 'Kiracı panelini (ERP) önizleme kopyasında ya da Design Venthub New içinde gerçek Chrome ile kullanıcı gözüyle gezer ve ölçer: sunum modu, genişlik değişimi, DENEME kayıtlarıyla belge zinciri, rapor; görsel puanlama değil. Tetik: "paneli gez", "panel ölçümü", "Design düzeltmesini yeniden ölç".'
 category: research
 metadata:
   kaynak: "TASARIM elle taslağı (TSR-19 turlarında çıkan tuzaklar); skill-creator ile yeniden yazıldı"

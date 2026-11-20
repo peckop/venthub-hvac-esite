@@ -1,6 +1,6 @@
 ---
 name: site-gorsel-inceleme
-description: 'Önizleme sitesinin ve panelinin (Design Venthub New dışı) şablonlarını Chrome''da gezip hiyerarşi, boşluk, tutarlılık, kontrast, odak kusurlarını 1-5 puanlar, kareyle RAPORLAR; düzeltmez. Tetik: "siteyi kullanıcı gözüyle incele", "ilk bakışta ne anlaşılıyor", "görsel inceleme turu".'
+description: 'Önizleme sitesinin ve panel ekranlarının görsel tasarımını (hiyerarşi, boşluk, tutarlılık, kontrast, odak) Chrome''da gezip 1-5 puanlar, kareyle RAPORLAR; işlev yürütmez, düzeltmez. Tetik: "siteyi kullanıcı gözüyle incele", "ilk bakışta ne anlaşılıyor", "görsel inceleme turu".'
 category: research
 metadata:
   kaynak: "TASARIM ihtiyaç metni (TSR-28, 20 Kasım 2026); denetim listeleri gstack design-review ve qa-only'den VentHub'a uyarlandı (arac-envanteri-standard dört kapı)"

@@ -8,10 +8,12 @@
     "ERP panelini kullanıcı gözüyle gez, bağlı belgeler bölümünde ham [xx.yy] anahtar kalmış mı bak",
     "kiracı panelinin sunum modunu açıp genişliği 1604, 1100 ve 900 yaparak her birinde ölçüm al",
     "paneli gezsek, Teklifler listesindeki Kaydet düğmesi ve Başka pencerede de açık uyarısı ne yapıyor, ölçüp rapor yaz",
-    "chrome deneme istek dosyasındaki maddeleri sırayla yürütüp geçti kaldı denenemedi diye raporla",
+    "panel için chrome deneme istek dosyasındaki maddeleri sırayla yürütüp geçti kaldı denenemedi diye raporla",
     "Panel tasarımını gezip tahsilat adımına kadar ilerler misin, kayıt adlarını DENEME ile başlat",
     "panel olcumunu tekrarlar misin, onceki turda kalan maddeler duzelmis mi diye bak",
-    "tasarım doğrulaması için kiracı panelini Chrome ile dolaş, ekran görüntülerini kaydedip rapor yaz"
+    "kiracı panelini Chrome ile dolaş, Teklifler listesindeki düğmelerin ne yaptığını ölçüp işlev raporu yaz",
+    "önizleme kopyasındaki paneli Chrome ile gezip Teklifler ve belge zincirini DENEME kayıtlarıyla yürüt, ölçüp raporla",
+    "önizlemedeki panelde Mağaza ayarları kartından paneli açıp 390 ve masaüstü genişlikte ölçüm al"
   ],
   "should_not_trigger": [
     "canlı vitrin sitesini tarayıcıda gezip kırık link ve konsol hatası var mı bak, bulduklarını da düzelt",
@@ -21,6 +23,8 @@
     "sitenin erişilebilirlik denetimini yap, WCAG 2.2 kurallarına göre bulguları listele",
     "Design projesine yeni bir panel şablonu dosyası yaz ve DesignSync ile gönder",
     "panelin Supabase tablolarına tenant filtresi ekleyen RLS politikası yaz",
-    "bu PR'daki admin panel değişikliğinin farkını incele, merge'e hazır mı"
+    "bu PR'daki admin panel değişikliğinin farkını incele, merge'e hazır mı",
+    "önizlemedeki panel ekranlarının görsel tutarlılığını ve hiyerarşisini 1-5 puanla, işlev yürütme",
+    "önizleme sitesinin ana sayfasına ilk kez gören gözüyle bak, ilk bakışta ne anlaşıldığını raporla"
   ]
 }

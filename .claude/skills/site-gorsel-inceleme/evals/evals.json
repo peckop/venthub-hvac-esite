@@ -11,7 +11,8 @@
     "teklif formu şablonunu ilk beş saniyede ne anlaşılıyor diye değerlendir ve 1-5 puan ver",
     "sitenin tüm sayfa şablonlarını masaüstü ve mobilde gezip tutarsızlıkları listele",
     "fotoğraf üstündeki yazılar okunuyor mu, ürün kartları sayfalar arası aynı mı, görsel olarak incele",
-    "mobil ve masaüstünde sayfa şablonlarının boşluk ve hizalamasını kareyle raporla, ilk bakışta ne anlaşıldığını yaz"
+    "mobil ve masaüstünde sayfa şablonlarının boşluk ve hizalamasını kareyle raporla, ilk bakışta ne anlaşıldığını yaz",
+    "önizlemedeki panel ekranlarının görsel tutarlılığını ve hiyerarşisini 1-5 puanla, işlev yürütme"
   ],
   "should_not_trigger": [
     "bu butonun rengini değiştir ve kodu düzelt",
@@ -21,6 +22,7 @@
     "WCAG denetimi yap ve erişilebilirlik hatalarını kodda düzelt",
     "Design'a menü sayfası için emir yaz",
     "canlı siteyi gezip kırık link ve konsol hatası bul, bulduklarını düzelt",
-    "ürün sayfasına yeni bir karşılaştırma bölümü tasarla ve Tailwind ile kodla"
+    "ürün sayfasına yeni bir karşılaştırma bölümü tasarla ve Tailwind ile kodla",
+    "önizleme kopyasındaki paneli Chrome ile gezip Teklifler ve belge zincirini DENEME kayıtlarıyla yürüt, ölçüp raporla"
   ]
 }
