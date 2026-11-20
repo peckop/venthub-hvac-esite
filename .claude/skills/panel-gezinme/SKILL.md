@@ -20,6 +20,7 @@ Kiracı panelini (Teklifler ve belge zinciri, modül sayfaları) yürütüp öl�
 - Canlı vitrin sitesini gezmek ve hata düzeltmek: `qa` skill'i.
 - Kod, stil ya da tasarım dosyasına yazmak: bu skill yalnız ölçer; Design'a yazma yalnız Recep sözüyle, DesignSync ile, yeni dosya olarak.
 - Erişilebilirlik kural denetimi: `accessibility` ya da `web-design-guidelines`.
+- Panel ekranının görsel puanlaması (hiyerarşi, boşluk, kontrast, 1-5 puan, ilk bakış): `site-gorsel-inceleme`. Bu skill işlevi yürütür ve ölçer, görünüşü puanlamaz.
 
 ## Kurulum
 
@@ -29,7 +30,7 @@ Kiracı panelini (Teklifler ve belge zinciri, modül sayfaları) yürütüp öl�
 - Önizleme kopyasında genişlik: sayfadaki "Mobil 390" ve "Masaüstü" düğmelerini kullan; iframe adresini elle kurma (parametresiz kurulan iframe sahte yatay taşma verir). `resize_window` 1568 verse de gerçek `innerWidth` 1604 çıkar; ölçüme ölçülen değeri yaz.
 - Design projesi (yalnız görev metni isterse): claude.ai/design altında "Design Venthub New" projesi; Teklifler şablonu `templates/panel-teklifler/PanelTeklifler.dc.html`, sunum modu `present=1`. Proje kimliğini TASARIM görev metninde verir; depoya yazılmaz.
 - Design projesinde panel çapraz kaynaklı bir iframe içindedir: DOM okunmaz. Ekran görüntüsü al, koordinatla tıkla. Görüntü yarım ölçekli gelebilir; küçük yazıyı `zoom` ile doğrula.
-- Genişlik: sayfadaki iframe'in genişliğini `javascript_tool` ile ayarla (1604, 1100, 900); bitince 100%'e geri al. Genişlik değişince iframe yeniden yüklenir.
+- Design projesinde genişlik: sayfadaki iframe'in genişliğini `javascript_tool` ile ayarla (1604, 1100, 900); bitince 100%'e geri al. Genişlik değişince iframe yeniden yüklenir. Önizleme kopyasında bu satır geçerli değil, yukarıdaki düğmeleri kullan.
 
 ## Yasaklar (neden: sunum modu ve kayıtlar Recep'in gerçek tasarım durumudur)
 
