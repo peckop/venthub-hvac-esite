@@ -1,0 +1,203 @@
+{
+ "kova": "katalog-pdf",
+ "satirlar": [
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Air_Door_Range_189461.pdf",
+   "dosya": "Doc_Pubblicita_Air_Door_Range_189461.pdf",
+   "yol": "markalar/vortice/hava-perdesi/01-input/Doc_Pubblicita_Air_Door_Range_189461.pdf",
+   "sha256": "45569567bd7afed03924b38fcf41b24458b625f1cf592e2e1a7fd1683cbabdf3",
+   "boyut_bayt": 8731615,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Residential_Ventilation2024_186926.pdf",
+   "dosya": "Doc_Pubblicita_Residential_Ventilation2024_186926.pdf",
+   "yol": "markalar/vortice/konut-fanlari/brochures/01-input/Doc_Pubblicita_Residential_Ventilation2024_186926.pdf",
+   "sha256": "45a3f2edd581a3917510b83cc84ce5de33b9d74648f34f7f4b63199a342be6f7",
+   "boyut_bayt": 11146401,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_In-Line_Fans_Range_191875.pdf",
+   "dosya": "Doc_Pubblicita_In-Line_Fans_Range_191875.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-commercial-in-line/01-input/Doc_Pubblicita_In-Line_Fans_Range_191875.pdf",
+   "sha256": "c5a11bb01af3456b88d2650830b1279993570c737dc366d23e9f956f3c651454",
+   "boyut_bayt": 9506836,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Deumido_Evo_Range_177678.pdf",
+   "dosya": "Doc_Pubblicita_Deumido_Evo_Range_177678.pdf",
+   "yol": "markalar/vortice/konut-fanlari/deumido-range/01-input/Doc_Pubblicita_Deumido_Evo_Range_177678.pdf",
+   "sha256": "4d187a6328d4a5474ef6f4b1e30dd8688bdabb534990977e6a6f89bfb0fa9855",
+   "boyut_bayt": 10283042,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/E_ATEX_Range_yeni_2025.pdf",
+   "dosya": "E_ATEX_Range_yeni_2025.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-e-atex/01-input/E_ATEX_Range_yeni_2025.pdf",
+   "sha256": "af6cb010744cd2b99d1c69f1726970d0209e1aa0821e7a3f29267bcc6d3a5ca5",
+   "boyut_bayt": 12289935,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Torrette_2026_194503.pdf",
+   "dosya": "Doc_Pubblicita_Torrette_2026_194503.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-heatmaster-slimroof/01-input/Doc_Pubblicita_Torrette_2026_194503.pdf",
+   "sha256": "3153e4381c7c5f93607af4bb585287e928ed5895a1d960a6425bb0cfa5a58585",
+   "boyut_bayt": 15990074,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Lineo_Range_193047.pdf",
+   "dosya": "Doc_Pubblicita_Lineo_Range_193047.pdf",
+   "yol": "markalar/vortice/konut-fanlari/lineo-quiet/01-input/Doc_Pubblicita_Lineo_Range_193047.pdf",
+   "sha256": "0ab5054fcaefa15c73dbe9b15b8fbf53095585a1943c79350b85d814c25aca74",
+   "boyut_bayt": 5062191,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Industrial_ceiling_fans_HVLS_194582.pdf",
+   "dosya": "Doc_Pubblicita_Industrial_ceiling_fans_HVLS_194582.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-nordik-hvls/01-input/Doc_Pubblicita_Industrial_ceiling_fans_HVLS_194582.pdf",
+   "sha256": "0bb7a19b364318287988b99b4b362841fb0eaf09df95309e5c5076303d2bc3cb",
+   "boyut_bayt": 1806793,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_VORT_HR_W-ALL_100_DF_193392.pdf",
+   "dosya": "Doc_Pubblicita_VORT_HR_W-ALL_100_DF_193392.pdf",
+   "yol": "markalar/vortice/isi-geri-kazanim/01-input/Doc_Pubblicita_VORT_HR_W-ALL_100_DF_193392.pdf",
+   "sha256": "8a83035206accdc98e086f42b1ce70148da4b4cc5f53d4ccd9386eecccad98b6",
+   "boyut_bayt": 1598630,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Sistema_Vort_Jet_Fan_150574.pdf",
+   "dosya": "Doc_Pubblicita_Sistema_Vort_Jet_Fan_150574.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/01-input/Doc_Pubblicita_Sistema_Vort_Jet_Fan_150574.pdf",
+   "sha256": "bbd79f5f11ba2e191e1b1378d6273062e3b9587ac01453d8a0376273a2d7d411",
+   "boyut_bayt": 3782105,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/vortice-vort-mono-wifi-189860.pdf",
+   "dosya": "vortice-vort-mono-wifi-189860.pdf",
+   "yol": "markalar/vortice/konut-fanlari/vort-mono/01-input/vortice-vort-mono-wifi-189860.pdf",
+   "sha256": "3d65110e25c49746872729f3a40641e1cd0156c00d11223880a450c8226b5b83",
+   "boyut_bayt": 12921347,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/industrial_Ventilation.pdf",
+   "dosya": "industrial_Ventilation.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-industrial-ventilation/01-input/industrial_Ventilation.pdf",
+   "sha256": "44fd6cdd97c6418a730391f1c74948b4367e3a773bcce5e3cfb44d76b6c2b416",
+   "boyut_bayt": 13294219,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Vort_QBK_HE_Range_177688.pdf",
+   "dosya": "Doc_Pubblicita_Vort_QBK_HE_Range_177688.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-qbk-he/01-input/Doc_Pubblicita_Vort_QBK_HE_Range_177688.pdf",
+   "sha256": "2351fb5b3a029c63cdd863f21b60afe38e957081706860e6f62540c72fc5007b",
+   "boyut_bayt": 9561886,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Vort_QBK_SAL-KC_EVO_190829.pdf",
+   "dosya": "Doc_Pubblicita_Vort_QBK_SAL-KC_EVO_190829.pdf",
+   "yol": "markalar/vortice/endustriyel-fan-serisi/vort-qbk-sal-kc-evo/01-input/Doc_Pubblicita_Vort_QBK_SAL-KC_EVO_190829.pdf",
+   "sha256": "892f4e1efad05a5179120f4f2099518649198c64ee6641c0623dc3f5e198e766",
+   "boyut_bayt": 10910062,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_179649.pdf",
+   "dosya": "Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_179649.pdf",
+   "yol": "markalar/vortice/konut-fanlari/vort-quadro-evo/01-input/Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_179649.pdf",
+   "sha256": "d71d91827e8f17d11b73853f845257ec5616c7d11d7b640687fe23bc66562285",
+   "boyut_bayt": 5028715,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_Serie_Vorticel_AE_ES_195101.pdf",
+   "dosya": "Doc_Pubblicita_Serie_Vorticel_AE_ES_195101.pdf",
+   "yol": "markalar/vortice/konut-fanlari/vorticel-a-e-es/01-input/Doc_Pubblicita_Serie_Vorticel_AE_ES_195101.pdf",
+   "sha256": "274d2527e24eede6cd4cd349ba75e13f9f758fe59f9673ee84540c44a5a8f433",
+   "boyut_bayt": 963714,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/vortice/Doc_Pubblicita_VORTICENT_CMS_RANGE_193646.pdf",
+   "dosya": "Doc_Pubblicita_VORTICENT_CMS_RANGE_193646.pdf",
+   "yol": "markalar/vortice/vorticent-cms-atex/01-input/Doc_Pubblicita_VORTICENT_CMS_RANGE_193646.pdf",
+   "sha256": "3ccb4105b89c037485f8848aeaa6148a1b92f96c30b6a2e352f2dbd4dcf12c1d",
+   "boyut_bayt": 7759076,
+   "durum": "guncel",
+   "envanter_marka": "vortice"
+  },
+  {
+   "anahtar": "katalog/danfoss/FC102_1.1-90kW_DesignGuide_AJ299549559248en-002001.pdf",
+   "dosya": "FC102_1.1-90kW_DesignGuide_AJ299549559248en-002001.pdf",
+   "yol": "markalar/danfoss/frekans-konvertorleri-fc102/01-input/FC102_1.1-90kW_DesignGuide_AJ299549559248en-002001.pdf",
+   "sha256": "75f595942d2205f7c5c284eff4bcb36c43fa9a3979c4f1827ec2f551dd577962",
+   "boyut_bayt": 5356063,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "danfoss"
+  },
+  {
+   "anahtar": "katalog/nicotra-gebhardt/479-series-adh.pdf",
+   "dosya": "479-series-adh.pdf",
+   "yol": "markalar/nicotra-gebhardt/sik-kanatli-radyal-fanlar-adh/01-input/479-series-adh.pdf",
+   "sha256": "52f67a2d4bc7d18d6fd5fe2a0f7ad8343fdde678947a5e21236dfb2da5170108",
+   "boyut_bayt": 8616605,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "nicotra-gebhardt"
+  },
+  {
+   "anahtar": "katalog/nicotra-gebhardt/480-series-at.pdf",
+   "dosya": "480-series-at.pdf",
+   "yol": "markalar/nicotra-gebhardt/radyal-fanlar-at/01-input/480-series-at.pdf",
+   "sha256": "efb3acdf4d1dfbee5d78f6d2c377e493cbd0f2a42e6725e97457ef91829f360d",
+   "boyut_bayt": 8992145,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "nicotra-gebhardt"
+  },
+  {
+   "anahtar": "katalog/nicotra-gebhardt/481-series-rdh.pdf",
+   "dosya": "481-series-rdh.pdf",
+   "yol": "markalar/nicotra-gebhardt/seyrek-kanatli-radyal-fanlar-rdh/01-input/481-series-rdh.pdf",
+   "sha256": "c38c4dd50c2f2bcbe4b90f1fc98b3f28460f5f081f29485fb1e74aff1b46db95",
+   "boyut_bayt": 8259637,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "nicotra-gebhardt"
+  },
+  {
+   "anahtar": "katalog/seat/seat-brochure-2024-11.pdf",
+   "dosya": "seat-brochure-2024-11.pdf",
+   "yol": "markalar/seat/endustriyel-fan-serisi/01-input/seat-brochure-2024-11.pdf",
+   "sha256": "49d2e4dcd0add8eb36b3d6102ee124156f4f0ed57b078cf540a14412ac8a0bc0",
+   "boyut_bayt": 4851307,
+   "durum": "kontrol-edilmedi",
+   "envanter_marka": "seat"
+  }
+ ]
+}
