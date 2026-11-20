@@ -1,0 +1,4730 @@
+{
+ "kova": "katalog-gorsel",
+ "satirlar": [
+  {
+   "anahtar": "vortice-ariett/VRT-11966.png",
+   "kaynak": "product/862/image/01.png",
+   "tur": "image/png",
+   "sha256": "9a45cd1dc8ac803c2387dbd72f060d8b587c6328b01b24680b8fdfb4e24c78bd",
+   "boyut_bayt": 240000
+  },
+  {
+   "anahtar": "vortice-ariett/VRT-12000.png",
+   "kaynak": "product/863/image/01.png",
+   "tur": "image/png",
+   "sha256": "7dfecce7872dec38a8c9719b778163489dcdf66dc0b377a18d8709c9f903b3c2",
+   "boyut_bayt": 363791
+  },
+  {
+   "anahtar": "vortice-ariett/VRT-12001.png",
+   "kaynak": "product/864/image/01.png",
+   "tur": "image/png",
+   "sha256": "7dfecce7872dec38a8c9719b778163489dcdf66dc0b377a18d8709c9f903b3c2",
+   "boyut_bayt": 363791
+  },
+  {
+   "anahtar": "vortice-ariett/VRT-12010.png",
+   "kaynak": "product/865/image/01.png",
+   "tur": "image/png",
+   "sha256": "b75574a905c7af8e7f570c0032944b0df2b56c70d6cd7439518c2cd65efa130a",
+   "boyut_bayt": 274634
+  },
+  {
+   "anahtar": "vortice-ariett/VRT-12011.png",
+   "kaynak": "product/866/image/01.png",
+   "tur": "image/png",
+   "sha256": "b75574a905c7af8e7f570c0032944b0df2b56c70d6cd7439518c2cd65efa130a",
+   "boyut_bayt": 274634
+  },
+  {
+   "anahtar": "vortice-k-range/VRT-10204.png",
+   "kaynak": "product/867/image/01.png",
+   "tur": "image/png",
+   "sha256": "5d4a042d2d437a38e573f2da9d6ef247791cbb2ec8e3d9164004a18935bb8ded",
+   "boyut_bayt": 261314
+  },
+  {
+   "anahtar": "vortice-k-range/VRT-10904.png",
+   "kaynak": "product/868/image/01.png",
+   "tur": "image/png",
+   "sha256": "a527318633115fed7bd8a17920c03e1e968c286968341fb20e2c42e94adb291e",
+   "boyut_bayt": 272902
+  },
+  {
+   "anahtar": "vortice-punto-evo-es/VRT-11268.png",
+   "kaynak": "product/869/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo-es/VRT-11269.png",
+   "kaynak": "product/870/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11306.png",
+   "kaynak": "product/871/image/01.png",
+   "tur": "image/png",
+   "sha256": "2d525c2ee9a8b91690b0c91b3de0eb62b6d736bdb0a6cd0126fea6c7a8385205",
+   "boyut_bayt": 589755
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11307.png",
+   "kaynak": "product/872/image/01.png",
+   "tur": "image/png",
+   "sha256": "e209aaa5594850f2255b41c64287ac100e50a94df43b308f96805f1409093d22",
+   "boyut_bayt": 648669
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11308.png",
+   "kaynak": "product/873/image/01.png",
+   "tur": "image/png",
+   "sha256": "ab8fd0af5720a05e366f5a515f39c58c4a79bc54760e7daf65804ba01be68a95",
+   "boyut_bayt": 586289
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11309.png",
+   "kaynak": "product/874/image/01.png",
+   "tur": "image/png",
+   "sha256": "4970a1d175671a4c83f65742686d4e19ac7dce4147d2c215170e0e1d9d382129",
+   "boyut_bayt": 597520
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11316.png",
+   "kaynak": "product/875/image/01.png",
+   "tur": "image/png",
+   "sha256": "2d525c2ee9a8b91690b0c91b3de0eb62b6d736bdb0a6cd0126fea6c7a8385205",
+   "boyut_bayt": 589755
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11317.png",
+   "kaynak": "product/876/image/01.png",
+   "tur": "image/png",
+   "sha256": "e209aaa5594850f2255b41c64287ac100e50a94df43b308f96805f1409093d22",
+   "boyut_bayt": 648669
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11318.png",
+   "kaynak": "product/877/image/01.png",
+   "tur": "image/png",
+   "sha256": "ab8fd0af5720a05e366f5a515f39c58c4a79bc54760e7daf65804ba01be68a95",
+   "boyut_bayt": 586289
+  },
+  {
+   "anahtar": "vortice-punto-evo-gold/VRT-11319.png",
+   "kaynak": "product/878/image/01.png",
+   "tur": "image/png",
+   "sha256": "4970a1d175671a4c83f65742686d4e19ac7dce4147d2c215170e0e1d9d382129",
+   "boyut_bayt": 597520
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11260.png",
+   "kaynak": "product/879/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11261.png",
+   "kaynak": "product/880/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11262.png",
+   "kaynak": "product/881/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11263.png",
+   "kaynak": "product/882/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11264.png",
+   "kaynak": "product/883/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11270.png",
+   "kaynak": "product/884/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11271.png",
+   "kaynak": "product/885/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11272.png",
+   "kaynak": "product/886/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11273.png",
+   "kaynak": "product/887/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-evo/VRT-11274.png",
+   "kaynak": "product/888/image/01.png",
+   "tur": "image/png",
+   "sha256": "fe107d72b0b3bb5949d9a1a03777829f6bc8eeb1263581398aea2aa61f631ffb",
+   "boyut_bayt": 618619
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11122.png",
+   "kaynak": "product/889/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11123.png",
+   "kaynak": "product/890/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11124.png",
+   "kaynak": "product/891/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11125.png",
+   "kaynak": "product/892/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11126.png",
+   "kaynak": "product/893/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11127.png",
+   "kaynak": "product/894/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11128.png",
+   "kaynak": "product/895/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11129.png",
+   "kaynak": "product/896/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11131.png",
+   "kaynak": "product/897/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11132.png",
+   "kaynak": "product/898/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11133.png",
+   "kaynak": "product/899/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11135.png",
+   "kaynak": "product/900/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11136.png",
+   "kaynak": "product/901/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11137.png",
+   "kaynak": "product/902/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11138.png",
+   "kaynak": "product/903/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11139.png",
+   "kaynak": "product/904/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11149.png",
+   "kaynak": "product/905/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11176.png",
+   "kaynak": "product/906/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11185.png",
+   "kaynak": "product/907/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11186.png",
+   "kaynak": "product/908/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-filo/VRT-11187.png",
+   "kaynak": "product/909/image/01.png",
+   "tur": "image/png",
+   "sha256": "47611849ae742e5594e1119e07b24f37dd4880385e0482dcb03598e559ab1b4c",
+   "boyut_bayt": 480498
+  },
+  {
+   "anahtar": "vortice-punto-four/VRT-11143.png",
+   "kaynak": "product/910/image/01.png",
+   "tur": "image/png",
+   "sha256": "75e9dfc6b9a65049ff60a170ce3cddff5e775453ac760f1cf36e38152b22d954",
+   "boyut_bayt": 381357
+  },
+  {
+   "anahtar": "vortice-punto-four/VRT-11144.png",
+   "kaynak": "product/911/image/01.png",
+   "tur": "image/png",
+   "sha256": "75e9dfc6b9a65049ff60a170ce3cddff5e775453ac760f1cf36e38152b22d954",
+   "boyut_bayt": 381357
+  },
+  {
+   "anahtar": "vortice-punto-four/VRT-11145.png",
+   "kaynak": "product/912/image/01.png",
+   "tur": "image/png",
+   "sha256": "75e9dfc6b9a65049ff60a170ce3cddff5e775453ac760f1cf36e38152b22d954",
+   "boyut_bayt": 381357
+  },
+  {
+   "anahtar": "vortice-punto-four/VRT-11146.png",
+   "kaynak": "product/913/image/01.png",
+   "tur": "image/png",
+   "sha256": "75e9dfc6b9a65049ff60a170ce3cddff5e775453ac760f1cf36e38152b22d954",
+   "boyut_bayt": 381357
+  },
+  {
+   "anahtar": "vortice-punto-four/VRT-11147.png",
+   "kaynak": "product/914/image/01.png",
+   "tur": "image/png",
+   "sha256": "75e9dfc6b9a65049ff60a170ce3cddff5e775453ac760f1cf36e38152b22d954",
+   "boyut_bayt": 381357
+  },
+  {
+   "anahtar": "vortice-punto-four/VRT-11148.png",
+   "kaynak": "product/915/image/01.png",
+   "tur": "image/png",
+   "sha256": "75e9dfc6b9a65049ff60a170ce3cddff5e775453ac760f1cf36e38152b22d954",
+   "boyut_bayt": 381357
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11100.png",
+   "kaynak": "product/916/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11101.png",
+   "kaynak": "product/917/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11102.png",
+   "kaynak": "product/918/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11103.png",
+   "kaynak": "product/919/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11104.png",
+   "kaynak": "product/920/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11105.png",
+   "kaynak": "product/921/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11106.png",
+   "kaynak": "product/922/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11110.png",
+   "kaynak": "product/923/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11111.png",
+   "kaynak": "product/924/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11116.png",
+   "kaynak": "product/925/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto-ghost/VRT-11117.png",
+   "kaynak": "product/926/image/01.png",
+   "tur": "image/png",
+   "sha256": "7d89c08803e37842437013d24f064a9f2c9f9e4f84617557b3a83221fa1e7329",
+   "boyut_bayt": 311215
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11201.png",
+   "kaynak": "product/927/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11202.png",
+   "kaynak": "product/928/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11203.png",
+   "kaynak": "product/929/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11211.png",
+   "kaynak": "product/930/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11212.png",
+   "kaynak": "product/931/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11221.png",
+   "kaynak": "product/932/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11222.png",
+   "kaynak": "product/933/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11223.png",
+   "kaynak": "product/934/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11231.png",
+   "kaynak": "product/935/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11232.png",
+   "kaynak": "product/936/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11301.png",
+   "kaynak": "product/937/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11302.png",
+   "kaynak": "product/938/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11311.png",
+   "kaynak": "product/939/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11312.png",
+   "kaynak": "product/940/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11321.png",
+   "kaynak": "product/941/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11322.png",
+   "kaynak": "product/942/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11331.png",
+   "kaynak": "product/943/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11332.png",
+   "kaynak": "product/944/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11401.png",
+   "kaynak": "product/945/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11402.png",
+   "kaynak": "product/946/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11411.png",
+   "kaynak": "product/947/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11412.png",
+   "kaynak": "product/948/image/01.png",
+   "tur": "image/png",
+   "sha256": "1adac5c8d386bf7ca8378b87960c17234e37bd641e4e6d385339a837b67249ec",
+   "boyut_bayt": 359337
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11421.png",
+   "kaynak": "product/949/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11422.png",
+   "kaynak": "product/950/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11431.png",
+   "kaynak": "product/951/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11432.png",
+   "kaynak": "product/952/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11616.png",
+   "kaynak": "product/953/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11641.png",
+   "kaynak": "product/954/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11646.png",
+   "kaynak": "product/955/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11681.png",
+   "kaynak": "product/956/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11682.png",
+   "kaynak": "product/957/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11683.png",
+   "kaynak": "product/958/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11684.png",
+   "kaynak": "product/959/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11692.png",
+   "kaynak": "product/960/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11698.png",
+   "kaynak": "product/961/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11741.png",
+   "kaynak": "product/962/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11746.png",
+   "kaynak": "product/963/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11781.png",
+   "kaynak": "product/964/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11782.png",
+   "kaynak": "product/965/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11783.png",
+   "kaynak": "product/966/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11784.png",
+   "kaynak": "product/967/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11851.png",
+   "kaynak": "product/968/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11856.png",
+   "kaynak": "product/969/image/01.png",
+   "tur": "image/png",
+   "sha256": "196ff1d27c9eeff0e5faa419e9e0097f98e8d12bdc0033381f743e671fd3c458",
+   "boyut_bayt": 245389
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11881.png",
+   "kaynak": "product/970/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11882.png",
+   "kaynak": "product/971/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11883.png",
+   "kaynak": "product/972/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-punto/VRT-11884.png",
+   "kaynak": "product/973/image/01.png",
+   "tur": "image/png",
+   "sha256": "e4d64040dbee81169662655e7dbed38a8ebc69bcbb2584f688bfed1828db71e2",
+   "boyut_bayt": 376467
+  },
+  {
+   "anahtar": "vortice-vario-i/VRT-12413.png",
+   "kaynak": "product/974/image/01.png",
+   "tur": "image/png",
+   "sha256": "60ea75394aadd158b6d43498361ab3eb92834aaf41d181ec7d5119549d0f88ad",
+   "boyut_bayt": 286561
+  },
+  {
+   "anahtar": "vortice-vario-i/VRT-12416.png",
+   "kaynak": "product/975/image/01.png",
+   "tur": "image/png",
+   "sha256": "e7b03b3f3a05d4180f15488e40166f740edc334ffd956d167af6c1c5cd08078f",
+   "boyut_bayt": 389480
+  },
+  {
+   "anahtar": "vortice-vario-i/VRT-12453.png",
+   "kaynak": "product/976/image/01.png",
+   "tur": "image/png",
+   "sha256": "e7b03b3f3a05d4180f15488e40166f740edc334ffd956d167af6c1c5cd08078f",
+   "boyut_bayt": 389480
+  },
+  {
+   "anahtar": "vortice-vario-i/VRT-12456.png",
+   "kaynak": "product/977/image/01.png",
+   "tur": "image/png",
+   "sha256": "e7b03b3f3a05d4180f15488e40166f740edc334ffd956d167af6c1c5cd08078f",
+   "boyut_bayt": 389480
+  },
+  {
+   "anahtar": "vortice-vario-i/VRT-12613.png",
+   "kaynak": "product/978/image/01.png",
+   "tur": "image/png",
+   "sha256": "e7b03b3f3a05d4180f15488e40166f740edc334ffd956d167af6c1c5cd08078f",
+   "boyut_bayt": 389480
+  },
+  {
+   "anahtar": "vortice-vario-i/VRT-12616.png",
+   "kaynak": "product/979/image/01.png",
+   "tur": "image/png",
+   "sha256": "e7b03b3f3a05d4180f15488e40166f740edc334ffd956d167af6c1c5cd08078f",
+   "boyut_bayt": 389480
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12412.png",
+   "kaynak": "product/980/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12415.png",
+   "kaynak": "product/981/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12451.png",
+   "kaynak": "product/982/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12452.png",
+   "kaynak": "product/983/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12454.png",
+   "kaynak": "product/984/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12455.png",
+   "kaynak": "product/985/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12611.png",
+   "kaynak": "product/986/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12612.png",
+   "kaynak": "product/987/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12614.png",
+   "kaynak": "product/988/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vario/VRT-12615.png",
+   "kaynak": "product/989/image/01.png",
+   "tur": "image/png",
+   "sha256": "dc03b5e85632beb4023f52bdae1fc734499dd6cb8285e72559fa470cd5c760cd",
+   "boyut_bayt": 485090
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11967.png",
+   "kaynak": "product/990/image/01.png",
+   "tur": "image/png",
+   "sha256": "21a2275531f89dcb9ccb460dd0758c63c80adeca8babc44c5e40f6195a8622b7",
+   "boyut_bayt": 572892
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11968.png",
+   "kaynak": "product/991/image/01.png",
+   "tur": "image/png",
+   "sha256": "21a2275531f89dcb9ccb460dd0758c63c80adeca8babc44c5e40f6195a8622b7",
+   "boyut_bayt": 572892
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11971.png",
+   "kaynak": "product/992/image/01.png",
+   "tur": "image/png",
+   "sha256": "3be79a4149f40dc10fe6f841b1fac46d4d25240cc5d532f960b1bdcd900b3b93",
+   "boyut_bayt": 460019
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11972.png",
+   "kaynak": "product/993/image/01.png",
+   "tur": "image/png",
+   "sha256": "3be79a4149f40dc10fe6f841b1fac46d4d25240cc5d532f960b1bdcd900b3b93",
+   "boyut_bayt": 460019
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11977.png",
+   "kaynak": "product/994/image/01.png",
+   "tur": "image/png",
+   "sha256": "21a2275531f89dcb9ccb460dd0758c63c80adeca8babc44c5e40f6195a8622b7",
+   "boyut_bayt": 572892
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11978.png",
+   "kaynak": "product/995/image/01.png",
+   "tur": "image/png",
+   "sha256": "21a2275531f89dcb9ccb460dd0758c63c80adeca8babc44c5e40f6195a8622b7",
+   "boyut_bayt": 572892
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11995.png",
+   "kaynak": "product/996/image/01.png",
+   "tur": "image/png",
+   "sha256": "3be79a4149f40dc10fe6f841b1fac46d4d25240cc5d532f960b1bdcd900b3b93",
+   "boyut_bayt": 460019
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-11996.png",
+   "kaynak": "product/997/image/01.png",
+   "tur": "image/png",
+   "sha256": "3be79a4149f40dc10fe6f841b1fac46d4d25240cc5d532f960b1bdcd900b3b93",
+   "boyut_bayt": 460019
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-12002.png",
+   "kaynak": "product/998/image/01.png",
+   "tur": "image/png",
+   "sha256": "21a2275531f89dcb9ccb460dd0758c63c80adeca8babc44c5e40f6195a8622b7",
+   "boyut_bayt": 572892
+  },
+  {
+   "anahtar": "vortice-vort-press/VRT-12004.png",
+   "kaynak": "product/999/image/01.png",
+   "tur": "image/png",
+   "sha256": "21a2275531f89dcb9ccb460dd0758c63c80adeca8babc44c5e40f6195a8622b7",
+   "boyut_bayt": 572892
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12017.png",
+   "kaynak": "product/1000/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12018.png",
+   "kaynak": "product/1001/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12020.png",
+   "kaynak": "product/1002/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12021.png",
+   "kaynak": "product/1003/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12023.png",
+   "kaynak": "product/1004/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12024.png",
+   "kaynak": "product/1005/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12065.png",
+   "kaynak": "product/1006/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12066.png",
+   "kaynak": "product/1007/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro-i/VRT-12067.png",
+   "kaynak": "product/1008/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11638.png",
+   "kaynak": "product/1009/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11648.png",
+   "kaynak": "product/1010/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11936.png",
+   "kaynak": "product/1011/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11940.png",
+   "kaynak": "product/1012/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11944.png",
+   "kaynak": "product/1013/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11945.png",
+   "kaynak": "product/1014/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11946.png",
+   "kaynak": "product/1015/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11952.png",
+   "kaynak": "product/1016/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11954.png",
+   "kaynak": "product/1017/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11975.png",
+   "kaynak": "product/1018/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "vortice-vort-quadro/VRT-11989.png",
+   "kaynak": "product/1019/image/01.png",
+   "tur": "image/png",
+   "sha256": "f9c869280304c910f2617a60ea285200414c166cee0dd51b880c6ab7f5302686",
+   "boyut_bayt": 341136
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11560.png",
+   "kaynak": "product/101/image/01.png",
+   "tur": "image/png",
+   "sha256": "d17b0157ce1220f3830639da38e2b85e7da7e0cbcf021094000de3c26ba52dd5",
+   "boyut_bayt": 168116
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11561.png",
+   "kaynak": "product/102/image/01.png",
+   "tur": "image/png",
+   "sha256": "f1b83d894736eeb83e681045fd01d82f9fae6c98b425d981e41837dcc03a98ea",
+   "boyut_bayt": 204461
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11562.png",
+   "kaynak": "product/103/image/01.png",
+   "tur": "image/png",
+   "sha256": "532d9ba4094acb90646c4a860bda40ef9f12cdb3049b9d07197979882d4de8a6",
+   "boyut_bayt": 226861
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11563.png",
+   "kaynak": "product/104/image/01.png",
+   "tur": "image/png",
+   "sha256": "c5a25a8a5ced13a1f6284750a44b0c747764b8ec40704510629641d6e33aa057",
+   "boyut_bayt": 203326
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11564.png",
+   "kaynak": "product/105/image/01.png",
+   "tur": "image/png",
+   "sha256": "632b8aadc866f64b1380c52b6bfdeabbd22aea90c472064c6ce61b84d4919ba6",
+   "boyut_bayt": 269094
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11565.png",
+   "kaynak": "product/106/image/01.png",
+   "tur": "image/png",
+   "sha256": "db9d8683e72d5e6607ec550e457a97e1a1b5be97bad4bcf5c978b228035d6a4a",
+   "boyut_bayt": 129848
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11566.png",
+   "kaynak": "product/107/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f603e47b18108764279a8bc22ec71b9444a7904e843a69079e9f37bb775f982",
+   "boyut_bayt": 148674
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11567.png",
+   "kaynak": "product/108/image/01.png",
+   "tur": "image/png",
+   "sha256": "e6e14b567bb182edaa386812b14687f585c2bcad51e03931c07f1c6da3c8cea5",
+   "boyut_bayt": 137417
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11568.png",
+   "kaynak": "product/109/image/01.png",
+   "tur": "image/png",
+   "sha256": "10d30641478c3e2c2ba9e5d266f4c764d43f0f2419acbc3aa740e2e4944da237",
+   "boyut_bayt": 147664
+  },
+  {
+   "anahtar": "avens-qe-b-kasa/AVE-11569.png",
+   "kaynak": "product/1155/image/01.png",
+   "tur": "image/png",
+   "sha256": "fd53b43ccf1c758fcdc73f4801054cbaa3170f316868960e67d9b9165f9b6a8a",
+   "boyut_bayt": 148238
+  },
+  {
+   "anahtar": "vortice-notus/VRT-11177.png",
+   "kaynak": "product/1158/image/urun-s4-1.png",
+   "tur": "image/png",
+   "sha256": "3bfae8099d0c1103fd14e9c4c901a77ee5e90985e5a08e644b385b46804ad37b",
+   "boyut_bayt": 53358
+  },
+  {
+   "anahtar": "vortice-notus/VRT-11903.png",
+   "kaynak": "product/1159/image/urun-s4-1.png",
+   "tur": "image/png",
+   "sha256": "3bfae8099d0c1103fd14e9c4c901a77ee5e90985e5a08e644b385b46804ad37b",
+   "boyut_bayt": 53358
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16200.png",
+   "kaynak": "product/445/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16201.png",
+   "kaynak": "product/446/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16202.png",
+   "kaynak": "product/447/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16203.png",
+   "kaynak": "product/448/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16204.png",
+   "kaynak": "product/449/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16205.png",
+   "kaynak": "product/450/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16206.png",
+   "kaynak": "product/451/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-es/VRT-16207.png",
+   "kaynak": "product/452/image/01.png",
+   "tur": "image/png",
+   "sha256": "a2275b51880c2a1f4df56716e31bdebaba65afed1af6d6bf8a310906dcdd0a8d",
+   "boyut_bayt": 157917
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet-es/VRT-16270.png",
+   "kaynak": "product/453/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet-es/VRT-16271.png",
+   "kaynak": "product/454/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet-es/VRT-16274.png",
+   "kaynak": "product/455/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet-es/VRT-16275.png",
+   "kaynak": "product/456/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet-es/VRT-16276.png",
+   "kaynak": "product/457/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16260.png",
+   "kaynak": "product/458/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16261.png",
+   "kaynak": "product/459/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16262.png",
+   "kaynak": "product/460/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16263.png",
+   "kaynak": "product/461/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16264.png",
+   "kaynak": "product/462/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16265.png",
+   "kaynak": "product/463/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line-quiet/VRT-16266.png",
+   "kaynak": "product/464/image/01.png",
+   "tur": "image/png",
+   "sha256": "a3c099fdb73a82bdbc52de915887cf4adae38f6447e1cc2690c4f357debc2c19",
+   "boyut_bayt": 255907
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16250.png",
+   "kaynak": "product/465/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16251.png",
+   "kaynak": "product/466/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16252.png",
+   "kaynak": "product/467/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16253.png",
+   "kaynak": "product/468/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16254.png",
+   "kaynak": "product/469/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16255.png",
+   "kaynak": "product/470/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-in-line/VRT-16256.png",
+   "kaynak": "product/471/image/01.png",
+   "tur": "image/png",
+   "sha256": "9177ad1631ec6211543d68e31e31927021f9fa5e726d0fa3c1ab9ba8b301a37b",
+   "boyut_bayt": 287739
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16098.png",
+   "kaynak": "product/472/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16140.png",
+   "kaynak": "product/473/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16141.png",
+   "kaynak": "product/474/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16142.png",
+   "kaynak": "product/475/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16183.png",
+   "kaynak": "product/476/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16184.png",
+   "kaynak": "product/477/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16185.png",
+   "kaynak": "product/478/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16186.png",
+   "kaynak": "product/479/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-rf/VRT-16187.png",
+   "kaynak": "product/480/image/01.png",
+   "tur": "image/png",
+   "sha256": "ca6fb4e8a8b0142440ea98bd47deffd5d007f48cd93586a3568f446577fc07ac",
+   "boyut_bayt": 258294
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16099.png",
+   "kaynak": "product/481/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16120.png",
+   "kaynak": "product/482/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16121.png",
+   "kaynak": "product/483/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16122.png",
+   "kaynak": "product/484/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16133.png",
+   "kaynak": "product/485/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16134.png",
+   "kaynak": "product/486/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16135.png",
+   "kaynak": "product/487/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16136.png",
+   "kaynak": "product/488/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-md-e-w/VRT-16137.png",
+   "kaynak": "product/489/image/01.png",
+   "tur": "image/png",
+   "sha256": "81220eb26d6a0d1b5e11426c85b7644ca16214695d99d27947adea47e3835971",
+   "boyut_bayt": 177339
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16008.png",
+   "kaynak": "product/490/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16018.png",
+   "kaynak": "product/491/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16028.png",
+   "kaynak": "product/492/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16034.png",
+   "kaynak": "product/493/image/01.png",
+   "tur": "image/png",
+   "sha256": "a4b13ea9502798a64ac047fce80a595459d9ae65f708626b89d88f18f7b8a894",
+   "boyut_bayt": 479992
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16035.png",
+   "kaynak": "product/494/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16038.png",
+   "kaynak": "product/495/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16039.png",
+   "kaynak": "product/496/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16041.png",
+   "kaynak": "product/497/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16044.png",
+   "kaynak": "product/498/image/01.png",
+   "tur": "image/png",
+   "sha256": "a4b13ea9502798a64ac047fce80a595459d9ae65f708626b89d88f18f7b8a894",
+   "boyut_bayt": 479992
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16054.png",
+   "kaynak": "product/499/image/01.png",
+   "tur": "image/png",
+   "sha256": "a4b13ea9502798a64ac047fce80a595459d9ae65f708626b89d88f18f7b8a894",
+   "boyut_bayt": 479992
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16064.png",
+   "kaynak": "product/500/image/01.png",
+   "tur": "image/png",
+   "sha256": "a4b13ea9502798a64ac047fce80a595459d9ae65f708626b89d88f18f7b8a894",
+   "boyut_bayt": 479992
+  },
+  {
+   "anahtar": "vortice-ca-v0/VRT-16090.png",
+   "kaynak": "product/501/image/01.png",
+   "tur": "image/png",
+   "sha256": "9c289ca7265e5dfabf5565e665b24ee206d3522ed35b2eaabb4f2c0289cac8f1",
+   "boyut_bayt": 353473
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17158.png",
+   "kaynak": "product/502/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17159.png",
+   "kaynak": "product/503/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17167.png",
+   "kaynak": "product/507/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17168.png",
+   "kaynak": "product/508/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17169.png",
+   "kaynak": "product/509/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17178.png",
+   "kaynak": "product/504/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17179.png",
+   "kaynak": "product/505/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-lineo-es/VRT-17183.png",
+   "kaynak": "product/506/image/01.png",
+   "tur": "image/png",
+   "sha256": "6d2312d623880284e2160853a64000ad4748d4c2d661218b05c6b52aea497a6a",
+   "boyut_bayt": 291287
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41220.png",
+   "kaynak": "product/752/image/01.png",
+   "tur": "image/png",
+   "sha256": "6b7a11d3f3c2ce87c2cd1d27f832f84fd8a849fb93a3a425a391ae364b881923",
+   "boyut_bayt": 491658
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41221.png",
+   "kaynak": "product/753/image/01.png",
+   "tur": "image/png",
+   "sha256": "6b7a11d3f3c2ce87c2cd1d27f832f84fd8a849fb93a3a425a391ae364b881923",
+   "boyut_bayt": 491658
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41222.png",
+   "kaynak": "product/754/image/01.png",
+   "tur": "image/png",
+   "sha256": "49457140f6a11976e7024f6e28ad76c85ddc4fc7d92a8f597124e2e3c2b787d1",
+   "boyut_bayt": 658223
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41223.png",
+   "kaynak": "product/755/image/01.png",
+   "tur": "image/png",
+   "sha256": "49457140f6a11976e7024f6e28ad76c85ddc4fc7d92a8f597124e2e3c2b787d1",
+   "boyut_bayt": 658223
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41224.png",
+   "kaynak": "product/756/image/01.png",
+   "tur": "image/png",
+   "sha256": "49457140f6a11976e7024f6e28ad76c85ddc4fc7d92a8f597124e2e3c2b787d1",
+   "boyut_bayt": 658223
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41225.png",
+   "kaynak": "product/757/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41226.png",
+   "kaynak": "product/758/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41227.png",
+   "kaynak": "product/759/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41228.png",
+   "kaynak": "product/760/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41229.png",
+   "kaynak": "product/761/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41230.png",
+   "kaynak": "product/762/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-a-e-es/VRT-41231.png",
+   "kaynak": "product/763/image/01.png",
+   "tur": "image/png",
+   "sha256": "52235bc5cde61f2b89aaba6f1b2cd1c08debaf2b56477bdac05745ad3cb685ff",
+   "boyut_bayt": 730614
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp-es/VRT-40632.png",
+   "kaynak": "product/793/image/01.png",
+   "tur": "image/png",
+   "sha256": "db8b48ac835fe552646564b9992fa6c05860bcfd8e9f863d6994c849b2ca14fa",
+   "boyut_bayt": 613631
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp-es/VRT-40633.png",
+   "kaynak": "product/794/image/01.png",
+   "tur": "image/png",
+   "sha256": "db8b48ac835fe552646564b9992fa6c05860bcfd8e9f863d6994c849b2ca14fa",
+   "boyut_bayt": 613631
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp-es/VRT-40634.png",
+   "kaynak": "product/795/image/01.png",
+   "tur": "image/png",
+   "sha256": "db8b48ac835fe552646564b9992fa6c05860bcfd8e9f863d6994c849b2ca14fa",
+   "boyut_bayt": 613631
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp-es/VRT-40635.png",
+   "kaynak": "product/796/image/01.png",
+   "tur": "image/png",
+   "sha256": "db8b48ac835fe552646564b9992fa6c05860bcfd8e9f863d6994c849b2ca14fa",
+   "boyut_bayt": 613631
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40604.png",
+   "kaynak": "product/797/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40605.png",
+   "kaynak": "product/798/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40606.png",
+   "kaynak": "product/799/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40607.png",
+   "kaynak": "product/800/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40608.png",
+   "kaynak": "product/801/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40609.png",
+   "kaynak": "product/802/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40610.png",
+   "kaynak": "product/803/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40611.png",
+   "kaynak": "product/804/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40612.png",
+   "kaynak": "product/805/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40613.png",
+   "kaynak": "product/806/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40614.png",
+   "kaynak": "product/807/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40615.png",
+   "kaynak": "product/808/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40616.png",
+   "kaynak": "product/809/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40617.png",
+   "kaynak": "product/810/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40618.png",
+   "kaynak": "product/811/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40619.png",
+   "kaynak": "product/812/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40620.png",
+   "kaynak": "product/813/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40621.png",
+   "kaynak": "product/814/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40622.png",
+   "kaynak": "product/815/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40623.png",
+   "kaynak": "product/816/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40624.png",
+   "kaynak": "product/817/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40625.png",
+   "kaynak": "product/818/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40626.png",
+   "kaynak": "product/819/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40627.png",
+   "kaynak": "product/820/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40628.png",
+   "kaynak": "product/821/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40629.png",
+   "kaynak": "product/822/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40630.png",
+   "kaynak": "product/823/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-ehp/VRT-40631.png",
+   "kaynak": "product/824/image/01.png",
+   "tur": "image/png",
+   "sha256": "b82c2ce21c5e091eba3c27e672b6100e685a06764eaa11314641c1704a5acd4d",
+   "boyut_bayt": 610427
+  },
+  {
+   "anahtar": "vortice-vorticel-elp/VRT-40600.png",
+   "kaynak": "product/825/image/01.png",
+   "tur": "image/png",
+   "sha256": "ff0a222b32af5979d395c4823905666f8b91f013030c82f8e3de7b69654f88e6",
+   "boyut_bayt": 591414
+  },
+  {
+   "anahtar": "vortice-vorticel-elp/VRT-40601.png",
+   "kaynak": "product/826/image/01.png",
+   "tur": "image/png",
+   "sha256": "ff0a222b32af5979d395c4823905666f8b91f013030c82f8e3de7b69654f88e6",
+   "boyut_bayt": 591414
+  },
+  {
+   "anahtar": "vortice-vorticel-elp/VRT-40602.png",
+   "kaynak": "product/827/image/01.png",
+   "tur": "image/png",
+   "sha256": "ff0a222b32af5979d395c4823905666f8b91f013030c82f8e3de7b69654f88e6",
+   "boyut_bayt": 591414
+  },
+  {
+   "anahtar": "vortice-vorticel-elp/VRT-40603.png",
+   "kaynak": "product/828/image/01.png",
+   "tur": "image/png",
+   "sha256": "ff0a222b32af5979d395c4823905666f8b91f013030c82f8e3de7b69654f88e6",
+   "boyut_bayt": 591414
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42100.png",
+   "kaynak": "product/829/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42101.png",
+   "kaynak": "product/830/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42102.png",
+   "kaynak": "product/831/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42103.png",
+   "kaynak": "product/832/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42104.png",
+   "kaynak": "product/833/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42105.png",
+   "kaynak": "product/834/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42106.png",
+   "kaynak": "product/835/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42107.png",
+   "kaynak": "product/836/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42108.png",
+   "kaynak": "product/837/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42109.png",
+   "kaynak": "product/838/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42110.png",
+   "kaynak": "product/839/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42111.png",
+   "kaynak": "product/840/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42112.png",
+   "kaynak": "product/841/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42113.png",
+   "kaynak": "product/842/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mhp/VRT-42114.png",
+   "kaynak": "product/843/image/01.png",
+   "tur": "image/png",
+   "sha256": "1f61a205e25fe1959d509380f563b67729da030ce1545ae926f745e91b82f6fa",
+   "boyut_bayt": 368190
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42209.png",
+   "kaynak": "product/852/image/01.png",
+   "tur": "image/png",
+   "sha256": "87061f01f37e59181501bf998a574c11d17acb7d4292799c68ea3d53ee88c3b3",
+   "boyut_bayt": 504837
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42210.png",
+   "kaynak": "product/853/image/01.png",
+   "tur": "image/png",
+   "sha256": "346173902eb95d5c1b20915f9a616c96aa34bff8c5ffad5802c6c1495db3b9d9",
+   "boyut_bayt": 480490
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42217.png",
+   "kaynak": "product/854/image/01.png",
+   "tur": "image/png",
+   "sha256": "87061f01f37e59181501bf998a574c11d17acb7d4292799c68ea3d53ee88c3b3",
+   "boyut_bayt": 504837
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42228.png",
+   "kaynak": "product/855/image/01.png",
+   "tur": "image/png",
+   "sha256": "87061f01f37e59181501bf998a574c11d17acb7d4292799c68ea3d53ee88c3b3",
+   "boyut_bayt": 504837
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42263.png",
+   "kaynak": "product/856/image/01.png",
+   "tur": "image/png",
+   "sha256": "346173902eb95d5c1b20915f9a616c96aa34bff8c5ffad5802c6c1495db3b9d9",
+   "boyut_bayt": 480490
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42309.png",
+   "kaynak": "product/857/image/01.png",
+   "tur": "image/png",
+   "sha256": "87061f01f37e59181501bf998a574c11d17acb7d4292799c68ea3d53ee88c3b3",
+   "boyut_bayt": 504837
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42310.png",
+   "kaynak": "product/858/image/01.png",
+   "tur": "image/png",
+   "sha256": "346173902eb95d5c1b20915f9a616c96aa34bff8c5ffad5802c6c1495db3b9d9",
+   "boyut_bayt": 480490
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42317.png",
+   "kaynak": "product/859/image/01.png",
+   "tur": "image/png",
+   "sha256": "87061f01f37e59181501bf998a574c11d17acb7d4292799c68ea3d53ee88c3b3",
+   "boyut_bayt": 504837
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42328.png",
+   "kaynak": "product/860/image/01.png",
+   "tur": "image/png",
+   "sha256": "87061f01f37e59181501bf998a574c11d17acb7d4292799c68ea3d53ee88c3b3",
+   "boyut_bayt": 504837
+  },
+  {
+   "anahtar": "vortice-vorticel-mpc-e/VRT-42359.png",
+   "kaynak": "product/861/image/01.png",
+   "tur": "image/png",
+   "sha256": "346173902eb95d5c1b20915f9a616c96aa34bff8c5ffad5802c6c1495db3b9d9",
+   "boyut_bayt": 480490
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1000.jpg",
+   "kaynak": "product/635/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1000-D.jpg",
+   "kaynak": "product/647/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1120.jpg",
+   "kaynak": "product/636/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1120-D.jpg",
+   "kaynak": "product/648/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1250.jpg",
+   "kaynak": "product/637/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1250-D.jpg",
+   "kaynak": "product/649/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1400.jpg",
+   "kaynak": "product/638/image/VRT-HP-1400.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-1400-D.jpg",
+   "kaynak": "product/650/image/VRT-HP-1400-D.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-400.jpg",
+   "kaynak": "product/627/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-400-D.jpg",
+   "kaynak": "product/639/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-450.jpg",
+   "kaynak": "product/628/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-450-D.jpg",
+   "kaynak": "product/640/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-500.jpg",
+   "kaynak": "product/629/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-500-D.jpg",
+   "kaynak": "product/641/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-560.jpg",
+   "kaynak": "product/630/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-560-D.jpg",
+   "kaynak": "product/642/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-630.jpg",
+   "kaynak": "product/631/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-630-D.jpg",
+   "kaynak": "product/643/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-710.jpg",
+   "kaynak": "product/632/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-710-D.jpg",
+   "kaynak": "product/644/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-800.jpg",
+   "kaynak": "product/633/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-800-D.jpg",
+   "kaynak": "product/645/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-900.jpg",
+   "kaynak": "product/634/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-mpc-hp/VRT-HP-900-D.jpg",
+   "kaynak": "product/646/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "b63ff69702332748cc8e0dba471a7eb617fa2ef4cbd4ba78d6a11daa07735112",
+   "boyut_bayt": 194458
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30302.png",
+   "kaynak": "product/1022/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30321.png",
+   "kaynak": "product/1023/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30322.png",
+   "kaynak": "product/1024/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30323.png",
+   "kaynak": "product/1025/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30324.png",
+   "kaynak": "product/1026/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30325.png",
+   "kaynak": "product/1027/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30326.png",
+   "kaynak": "product/1028/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30327.png",
+   "kaynak": "product/1029/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30328.png",
+   "kaynak": "product/1030/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30329.png",
+   "kaynak": "product/1031/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30330.png",
+   "kaynak": "product/1032/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30331.png",
+   "kaynak": "product/1033/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30332.png",
+   "kaynak": "product/1034/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30333.png",
+   "kaynak": "product/1035/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30334.png",
+   "kaynak": "product/1036/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30335.png",
+   "kaynak": "product/1037/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30336.png",
+   "kaynak": "product/1038/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30337.png",
+   "kaynak": "product/1039/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30351.png",
+   "kaynak": "product/1040/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30902.png",
+   "kaynak": "product/1041/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-c-e/VRT-30951.png",
+   "kaynak": "product/1042/image/01.png",
+   "tur": "image/png",
+   "sha256": "f6b3d645b7ee65796c79ec6e082f56618906b876feae281b7d16db1961ce708c",
+   "boyut_bayt": 509431
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30134.png",
+   "kaynak": "product/1043/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30135.png",
+   "kaynak": "product/1044/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30136.png",
+   "kaynak": "product/1045/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30138.png",
+   "kaynak": "product/1046/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30139.png",
+   "kaynak": "product/1047/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30140.png",
+   "kaynak": "product/1048/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30141.png",
+   "kaynak": "product/1049/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30142.png",
+   "kaynak": "product/1050/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30143.png",
+   "kaynak": "product/1051/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30144.png",
+   "kaynak": "product/1052/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30146.png",
+   "kaynak": "product/1053/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30147.png",
+   "kaynak": "product/1054/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30148.png",
+   "kaynak": "product/1055/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30149.png",
+   "kaynak": "product/1056/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30150.png",
+   "kaynak": "product/1057/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30151.png",
+   "kaynak": "product/1058/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30152.png",
+   "kaynak": "product/1059/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30153.png",
+   "kaynak": "product/1060/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30154.png",
+   "kaynak": "product/1061/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30155.png",
+   "kaynak": "product/1062/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30156.png",
+   "kaynak": "product/1063/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30157.png",
+   "kaynak": "product/1064/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30158.png",
+   "kaynak": "product/1065/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30159.png",
+   "kaynak": "product/1066/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30160.png",
+   "kaynak": "product/1067/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30161.png",
+   "kaynak": "product/1068/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30162.png",
+   "kaynak": "product/1069/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30163.png",
+   "kaynak": "product/1070/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30164.png",
+   "kaynak": "product/1071/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30165.png",
+   "kaynak": "product/1072/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30166.png",
+   "kaynak": "product/1073/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30167.png",
+   "kaynak": "product/1074/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30168.png",
+   "kaynak": "product/1075/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30185.png",
+   "kaynak": "product/1076/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30186.png",
+   "kaynak": "product/1077/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30187.png",
+   "kaynak": "product/1078/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30188.png",
+   "kaynak": "product/1079/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30189.png",
+   "kaynak": "product/1080/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-cms/VRT-30190.png",
+   "kaynak": "product/1081/image/01.png",
+   "tur": "image/png",
+   "sha256": "59e36d0d7370655ae91828f51ef4660fac358adab9b54f36e8ea0fd74f889cf5",
+   "boyut_bayt": 530665
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30100.png",
+   "kaynak": "product/1082/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30101.png",
+   "kaynak": "product/1083/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30102.png",
+   "kaynak": "product/1084/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30103.png",
+   "kaynak": "product/1085/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30104.png",
+   "kaynak": "product/1086/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30105.png",
+   "kaynak": "product/1087/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30106.png",
+   "kaynak": "product/1088/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30107.png",
+   "kaynak": "product/1089/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30108.png",
+   "kaynak": "product/1090/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30109.png",
+   "kaynak": "product/1091/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30110.png",
+   "kaynak": "product/1092/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30111.png",
+   "kaynak": "product/1093/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30112.png",
+   "kaynak": "product/1094/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30113.png",
+   "kaynak": "product/1095/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30114.png",
+   "kaynak": "product/1096/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30115.png",
+   "kaynak": "product/1097/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30116.png",
+   "kaynak": "product/1098/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-a/VRT-30117.png",
+   "kaynak": "product/1099/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30118.png",
+   "kaynak": "product/1100/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30119.png",
+   "kaynak": "product/1101/image/01.png",
+   "tur": "image/png",
+   "sha256": "b0f29602958b400240df217c80f8414b9d3dd970447a0fc334d4d6e6584dbf9b",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30120.png",
+   "kaynak": "product/1102/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30121.png",
+   "kaynak": "product/1103/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30122.png",
+   "kaynak": "product/1104/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30123.png",
+   "kaynak": "product/1105/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30124.png",
+   "kaynak": "product/1106/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30125.png",
+   "kaynak": "product/1107/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30126.png",
+   "kaynak": "product/1108/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30127.png",
+   "kaynak": "product/1109/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30128.png",
+   "kaynak": "product/1110/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30129.png",
+   "kaynak": "product/1111/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30130.png",
+   "kaynak": "product/1112/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30131.png",
+   "kaynak": "product/1113/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30132.png",
+   "kaynak": "product/1114/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-vorticent-crc-r/VRT-30133.png",
+   "kaynak": "product/1115/image/01.png",
+   "tur": "image/png",
+   "sha256": "6cf454654e01d60aef15c137090d9141ccfc3ea2652a9a562c788b9d4d50eed7",
+   "boyut_bayt": 339803
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15070.png",
+   "kaynak": "product/726/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15071.png",
+   "kaynak": "product/727/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15072.png",
+   "kaynak": "product/728/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15073.png",
+   "kaynak": "product/729/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15074.png",
+   "kaynak": "product/730/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15075.png",
+   "kaynak": "product/731/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15076.png",
+   "kaynak": "product/732/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15077.png",
+   "kaynak": "product/733/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15078.png",
+   "kaynak": "product/734/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15079.png",
+   "kaynak": "product/735/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15115.png",
+   "kaynak": "product/736/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15155.png",
+   "kaynak": "product/737/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15205.png",
+   "kaynak": "product/738/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15215.png",
+   "kaynak": "product/739/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15216.png",
+   "kaynak": "product/740/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15255.png",
+   "kaynak": "product/741/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15355.png",
+   "kaynak": "product/742/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15356.png",
+   "kaynak": "product/743/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15555.png",
+   "kaynak": "product/744/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e/VRT-15556.png",
+   "kaynak": "product/745/image/01.png",
+   "tur": "image/png",
+   "sha256": "ce6f6325398497229178ea4e853641dcdb08f4b2d39446ed8621d5ba5e1d7fd0",
+   "boyut_bayt": 461492
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15121.png",
+   "kaynak": "product/651/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15122.png",
+   "kaynak": "product/652/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15123.png",
+   "kaynak": "product/653/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15125.png",
+   "kaynak": "product/654/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15126.png",
+   "kaynak": "product/655/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15127.png",
+   "kaynak": "product/656/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15128.png",
+   "kaynak": "product/657/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15129.png",
+   "kaynak": "product/658/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15130.png",
+   "kaynak": "product/659/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15131.png",
+   "kaynak": "product/660/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15132.png",
+   "kaynak": "product/661/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15133.png",
+   "kaynak": "product/662/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15134.png",
+   "kaynak": "product/663/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15135.png",
+   "kaynak": "product/664/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-rf-eu/VRT-15136.png",
+   "kaynak": "product/665/image/01.png",
+   "tur": "image/png",
+   "sha256": "577c17b8073c22c547401b332afc566a1caf39b726c5b7841a84fc945e22a384",
+   "boyut_bayt": 563443
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15180.png",
+   "kaynak": "product/666/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15181.png",
+   "kaynak": "product/667/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15182.png",
+   "kaynak": "product/668/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15183.png",
+   "kaynak": "product/669/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15184.png",
+   "kaynak": "product/670/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15185.png",
+   "kaynak": "product/671/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15186.png",
+   "kaynak": "product/672/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15187.png",
+   "kaynak": "product/673/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15188.png",
+   "kaynak": "product/674/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15189.png",
+   "kaynak": "product/675/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15190.png",
+   "kaynak": "product/676/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15191.png",
+   "kaynak": "product/677/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15192.png",
+   "kaynak": "product/678/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15193.png",
+   "kaynak": "product/679/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15194.png",
+   "kaynak": "product/680/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15195.png",
+   "kaynak": "product/681/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15196.png",
+   "kaynak": "product/682/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15197.png",
+   "kaynak": "product/683/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15198.png",
+   "kaynak": "product/684/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-torrette-tr-e-v/VRT-15199.png",
+   "kaynak": "product/685/image/01.png",
+   "tur": "image/png",
+   "sha256": "06b96b29b48f7825720b6f779f13ef089bcb00d58d2943f0a12e680c35205335",
+   "boyut_bayt": 422488
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45780.png",
+   "kaynak": "product/1116/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45781.png",
+   "kaynak": "product/1117/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45782.png",
+   "kaynak": "product/1118/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45783.png",
+   "kaynak": "product/1119/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45784.png",
+   "kaynak": "product/1120/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45785.png",
+   "kaynak": "product/1121/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45786.png",
+   "kaynak": "product/1122/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45787.png",
+   "kaynak": "product/1123/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45788.png",
+   "kaynak": "product/1124/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45789.png",
+   "kaynak": "product/1125/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45790.png",
+   "kaynak": "product/1126/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45791.png",
+   "kaynak": "product/1127/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45792.png",
+   "kaynak": "product/1128/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45793.png",
+   "kaynak": "product/1129/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-comfort/VRT-45794.png",
+   "kaynak": "product/1130/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45765.png",
+   "kaynak": "product/1131/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45766.png",
+   "kaynak": "product/1132/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45767.png",
+   "kaynak": "product/1133/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45768.png",
+   "kaynak": "product/1134/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45769.png",
+   "kaynak": "product/1135/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45770.png",
+   "kaynak": "product/1136/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45771.png",
+   "kaynak": "product/1137/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45772.png",
+   "kaynak": "product/1138/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45773.png",
+   "kaynak": "product/1139/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45774.png",
+   "kaynak": "product/1140/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45775.png",
+   "kaynak": "product/1141/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45776.png",
+   "kaynak": "product/1142/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45777.png",
+   "kaynak": "product/1143/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45778.png",
+   "kaynak": "product/1144/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-qbk-he-sal/VRT-45779.png",
+   "kaynak": "product/1145/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a53455cd447cfd202329a2ee20346623d0d2f5979dd36105ac0523ab3eec8c2",
+   "boyut_bayt": 469766
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1000.jpg",
+   "kaynak": "product/572/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1000-D.jpg",
+   "kaynak": "product/582/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1000-SC.jpg",
+   "kaynak": "product/592/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1000-SC-D.jpg",
+   "kaynak": "product/602/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1120.jpg",
+   "kaynak": "product/573/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1120-D.jpg",
+   "kaynak": "product/583/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1120-SC.jpg",
+   "kaynak": "product/593/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1120-SC-D.jpg",
+   "kaynak": "product/603/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1250.jpg",
+   "kaynak": "product/574/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1250-D.jpg",
+   "kaynak": "product/584/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1250-SC.jpg",
+   "kaynak": "product/594/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-1250-SC-D.jpg",
+   "kaynak": "product/604/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-450.jpg",
+   "kaynak": "product/565/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-450-D.jpg",
+   "kaynak": "product/575/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-450-SC.jpg",
+   "kaynak": "product/585/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-450-SC-D.jpg",
+   "kaynak": "product/595/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-500.jpg",
+   "kaynak": "product/566/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-500-D.jpg",
+   "kaynak": "product/576/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-500-SC.jpg",
+   "kaynak": "product/586/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-500-SC-D.jpg",
+   "kaynak": "product/596/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-560.jpg",
+   "kaynak": "product/567/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-560-D.jpg",
+   "kaynak": "product/577/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-560-SC.jpg",
+   "kaynak": "product/587/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-560-SC-D.jpg",
+   "kaynak": "product/597/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-630.jpg",
+   "kaynak": "product/568/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-630-D.jpg",
+   "kaynak": "product/578/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-630-SC.jpg",
+   "kaynak": "product/588/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-630-SC-D.jpg",
+   "kaynak": "product/598/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-710.jpg",
+   "kaynak": "product/569/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-710-D.jpg",
+   "kaynak": "product/579/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-710-SC.jpg",
+   "kaynak": "product/589/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-710-SC-D.jpg",
+   "kaynak": "product/599/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-800.jpg",
+   "kaynak": "product/570/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-800-D.jpg",
+   "kaynak": "product/580/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-800-SC.jpg",
+   "kaynak": "product/590/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-800-SC-D.jpg",
+   "kaynak": "product/600/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-900.jpg",
+   "kaynak": "product/571/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-900-D.jpg",
+   "kaynak": "product/581/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "18d137ca2728114a08c18be4008a28033b462a743d0630203c0fa4d7b298ceab",
+   "boyut_bayt": 35697
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-900-SC.jpg",
+   "kaynak": "product/591/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed-f400/VRT-EDF-900-SC-D.jpg",
+   "kaynak": "product/601/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "930dc4951a6673d2d2c26425304e6f2a2a4a7f384b840fc42ddb13f222f705e1",
+   "boyut_bayt": 40683
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1000.jpg",
+   "kaynak": "product/612/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1000-D.jpg",
+   "kaynak": "product/623/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1120.jpg",
+   "kaynak": "product/613/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1120-D.jpg",
+   "kaynak": "product/624/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1250.jpg",
+   "kaynak": "product/614/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1250-D.jpg",
+   "kaynak": "product/625/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1400.jpg",
+   "kaynak": "product/615/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-1400-D.jpg",
+   "kaynak": "product/626/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-400.jpg",
+   "kaynak": "product/605/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-400-D.jpg",
+   "kaynak": "product/616/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-500.jpg",
+   "kaynak": "product/606/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-500-D.jpg",
+   "kaynak": "product/617/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-560.jpg",
+   "kaynak": "product/607/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-560-D.jpg",
+   "kaynak": "product/618/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-630.jpg",
+   "kaynak": "product/608/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-630-D.jpg",
+   "kaynak": "product/619/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-710.jpg",
+   "kaynak": "product/609/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-710-D.jpg",
+   "kaynak": "product/620/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-800.jpg",
+   "kaynak": "product/610/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-800-D.jpg",
+   "kaynak": "product/621/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-900.jpg",
+   "kaynak": "product/611/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-mpc-ed/VRT-ED-900-D.jpg",
+   "kaynak": "product/622/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "ce4395b03686ba189b196e369832098eb7db6aba08e3aef97052a0253640277e",
+   "boyut_bayt": 77542
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15160.png",
+   "kaynak": "product/686/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15161.png",
+   "kaynak": "product/687/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15162.png",
+   "kaynak": "product/688/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15163.png",
+   "kaynak": "product/689/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15164.png",
+   "kaynak": "product/690/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15165.png",
+   "kaynak": "product/691/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15166.png",
+   "kaynak": "product/692/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15167.png",
+   "kaynak": "product/693/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15168.png",
+   "kaynak": "product/694/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15169.png",
+   "kaynak": "product/695/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15170.png",
+   "kaynak": "product/696/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15171.png",
+   "kaynak": "product/697/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15172.png",
+   "kaynak": "product/698/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15173.png",
+   "kaynak": "product/699/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15174.png",
+   "kaynak": "product/700/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15175.png",
+   "kaynak": "product/701/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15176.png",
+   "kaynak": "product/702/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15177.png",
+   "kaynak": "product/703/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15178.png",
+   "kaynak": "product/704/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed-v/VRT-15179.png",
+   "kaynak": "product/705/image/01.png",
+   "tur": "image/png",
+   "sha256": "f8e95ffbf349625815aa5cc3c4e22dca41c19531e1e7abb22301fa1e8a1b7f04",
+   "boyut_bayt": 548847
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15039.png",
+   "kaynak": "product/706/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15040.png",
+   "kaynak": "product/707/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15041.png",
+   "kaynak": "product/708/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15042.png",
+   "kaynak": "product/709/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15043.png",
+   "kaynak": "product/710/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15045.png",
+   "kaynak": "product/711/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15046.png",
+   "kaynak": "product/712/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15047.png",
+   "kaynak": "product/713/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15048.png",
+   "kaynak": "product/714/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15049.png",
+   "kaynak": "product/715/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15080.png",
+   "kaynak": "product/716/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15081.png",
+   "kaynak": "product/717/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15082.png",
+   "kaynak": "product/718/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15083.png",
+   "kaynak": "product/719/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15084.png",
+   "kaynak": "product/720/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15085.png",
+   "kaynak": "product/721/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15086.png",
+   "kaynak": "product/722/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15087.png",
+   "kaynak": "product/723/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15919.png",
+   "kaynak": "product/724/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-torrette-tr-ed/VRT-15920.png",
+   "kaynak": "product/725/image/01.png",
+   "tur": "image/png",
+   "sha256": "ddfefe1d81df821ec60b8c95793dd608cc24e4f531e57a6b3a5ae799ae1e5ba0",
+   "boyut_bayt": 482491
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45612.jpg",
+   "kaynak": "product/528/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45613.jpg",
+   "kaynak": "product/529/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45614.jpg",
+   "kaynak": "product/530/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45615.jpg",
+   "kaynak": "product/531/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45616.jpg",
+   "kaynak": "product/532/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45617.jpg",
+   "kaynak": "product/533/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45618.jpg",
+   "kaynak": "product/534/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45619.jpg",
+   "kaynak": "product/535/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45633.jpg",
+   "kaynak": "product/536/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45634.jpg",
+   "kaynak": "product/537/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45635.jpg",
+   "kaynak": "product/538/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45636.jpg",
+   "kaynak": "product/539/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45637.jpg",
+   "kaynak": "product/540/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45638.jpg",
+   "kaynak": "product/541/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45639.jpg",
+   "kaynak": "product/542/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45640.jpg",
+   "kaynak": "product/543/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45642.jpg",
+   "kaynak": "product/544/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45644.jpg",
+   "kaynak": "product/545/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45646.jpg",
+   "kaynak": "product/546/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45648.jpg",
+   "kaynak": "product/547/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45650.jpg",
+   "kaynak": "product/548/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45652.jpg",
+   "kaynak": "product/549/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45654.jpg",
+   "kaynak": "product/550/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a-f400/VRT-45656.jpg",
+   "kaynak": "product/551/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "2fc5912fc024d53df4bdd54d1bd68b457a5fa4190f0027cdd6f44ef092197979",
+   "boyut_bayt": 21566
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45641.png",
+   "kaynak": "product/552/image/01.png",
+   "tur": "image/png",
+   "sha256": "218d53cb85120df4c0466bb46886a72bbecf2b370c5f7ccdaf750ca22b60842c",
+   "boyut_bayt": 215144
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45643.png",
+   "kaynak": "product/553/image/01.png",
+   "tur": "image/png",
+   "sha256": "218d53cb85120df4c0466bb46886a72bbecf2b370c5f7ccdaf750ca22b60842c",
+   "boyut_bayt": 215144
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45645.png",
+   "kaynak": "product/554/image/01.png",
+   "tur": "image/png",
+   "sha256": "218d53cb85120df4c0466bb46886a72bbecf2b370c5f7ccdaf750ca22b60842c",
+   "boyut_bayt": 215144
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45647.png",
+   "kaynak": "product/555/image/01.png",
+   "tur": "image/png",
+   "sha256": "218d53cb85120df4c0466bb46886a72bbecf2b370c5f7ccdaf750ca22b60842c",
+   "boyut_bayt": 215144
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45649.png",
+   "kaynak": "product/556/image/01.png",
+   "tur": "image/png",
+   "sha256": "218d53cb85120df4c0466bb46886a72bbecf2b370c5f7ccdaf750ca22b60842c",
+   "boyut_bayt": 215144
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45651.jpg",
+   "kaynak": "product/557/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "f090f1ad87ff1c02a9eacce94e9c2fc21ba384d693b51b8ce4dc9a2d72f8aba5",
+   "boyut_bayt": 125368
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45653.jpg",
+   "kaynak": "product/558/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "f090f1ad87ff1c02a9eacce94e9c2fc21ba384d693b51b8ce4dc9a2d72f8aba5",
+   "boyut_bayt": 125368
+  },
+  {
+   "anahtar": "vortice-jet-a/VRT-45655.jpg",
+   "kaynak": "product/559/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "f090f1ad87ff1c02a9eacce94e9c2fc21ba384d693b51b8ce4dc9a2d72f8aba5",
+   "boyut_bayt": 125368
+  },
+  {
+   "anahtar": "vortice-jet-r-f400/VRT-45717.jpg",
+   "kaynak": "product/560/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "44b37b403300e0d0c81d03263f3d1e7a6a8df0b537a7e8cfc18d538b650f764d",
+   "boyut_bayt": 33430
+  },
+  {
+   "anahtar": "vortice-jet-r-f400/VRT-45718.jpg",
+   "kaynak": "product/561/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "44b37b403300e0d0c81d03263f3d1e7a6a8df0b537a7e8cfc18d538b650f764d",
+   "boyut_bayt": 33430
+  },
+  {
+   "anahtar": "vortice-jet-r-f400/VRT-45719.jpg",
+   "kaynak": "product/562/image/01.jpg",
+   "tur": "image/jpeg",
+   "sha256": "44b37b403300e0d0c81d03263f3d1e7a6a8df0b537a7e8cfc18d538b650f764d",
+   "boyut_bayt": 33430
+  },
+  {
+   "anahtar": "vortice-jet-r/VRT-45657.png",
+   "kaynak": "product/563/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a85806d297fba5ae099e5dd30bfb433758f9a8febc9bf94e22153340b996a1c",
+   "boyut_bayt": 200110
+  },
+  {
+   "anahtar": "vortice-jet-r/VRT-45659.png",
+   "kaynak": "product/564/image/01.png",
+   "tur": "image/png",
+   "sha256": "3a85806d297fba5ae099e5dd30bfb433758f9a8febc9bf94e22153340b996a1c",
+   "boyut_bayt": 200110
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30301.png",
+   "kaynak": "product/1146/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30304.png",
+   "kaynak": "product/1147/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30305.png",
+   "kaynak": "product/1148/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30306.png",
+   "kaynak": "product/1149/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30307.png",
+   "kaynak": "product/1150/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30308.png",
+   "kaynak": "product/1151/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30309.png",
+   "kaynak": "product/1152/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30310.png",
+   "kaynak": "product/1153/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-c-atex/VRT-30311.png",
+   "kaynak": "product/1154/image/01.png",
+   "tur": "image/png",
+   "sha256": "1b34479df267c0ab29e7ef6c8754a93b50f8345eb9968363802a8ff46b1a81c2",
+   "boyut_bayt": 459392
+  },
+  {
+   "anahtar": "vortice-hri-dh/VRT-45091.png",
+   "kaynak": "product/746/image/01.png",
+   "tur": "image/png",
+   "sha256": "4eec1beb26a108a832f29a1c86cabbc7a38f7f52fb5c95738b7523843e5120a8",
+   "boyut_bayt": 207404
+  },
+  {
+   "anahtar": "vortice-hri-dh/VRT-45092.png",
+   "kaynak": "product/747/image/01.png",
+   "tur": "image/png",
+   "sha256": "4eec1beb26a108a832f29a1c86cabbc7a38f7f52fb5c95738b7523843e5120a8",
+   "boyut_bayt": 207404
+  },
+  {
+   "anahtar": "vortice-hri-dh/VRT-45093.png",
+   "kaynak": "product/748/image/01.png",
+   "tur": "image/png",
+   "sha256": "4eec1beb26a108a832f29a1c86cabbc7a38f7f52fb5c95738b7523843e5120a8",
+   "boyut_bayt": 207404
+  },
+  {
+   "anahtar": "vortice-hri-dh/VRT-45094.png",
+   "kaynak": "product/749/image/01.png",
+   "tur": "image/png",
+   "sha256": "4eec1beb26a108a832f29a1c86cabbc7a38f7f52fb5c95738b7523843e5120a8",
+   "boyut_bayt": 207404
+  },
+  {
+   "anahtar": "vortice-hri-flat/VRT-11281.png",
+   "kaynak": "product/750/image/01.png",
+   "tur": "image/png",
+   "sha256": "414af0841712d4fb69dea897fdbdfdccc3eb958429f85d73c79d6d5ee100fc67",
+   "boyut_bayt": 322399
+  },
+  {
+   "anahtar": "vortice-hri-flat/VRT-11282.png",
+   "kaynak": "product/751/image/01.png",
+   "tur": "image/png",
+   "sha256": "414af0841712d4fb69dea897fdbdfdccc3eb958429f85d73c79d6d5ee100fc67",
+   "boyut_bayt": 322399
+  },
+  {
+   "anahtar": "vortice-phantom/VRT-10914.png",
+   "kaynak": "product/1160/image/urun-s76-1.png",
+   "tur": "image/png",
+   "sha256": "828b60e18d947e28c5ccf68c7e1a0d2fa02de3b775827a12a102b46330f3a87a",
+   "boyut_bayt": 42023
+  },
+  {
+   "anahtar": "vortice-phantom/VRT-10925.png",
+   "kaynak": "product/1161/image/urun-s76-1.png",
+   "tur": "image/png",
+   "sha256": "828b60e18d947e28c5ccf68c7e1a0d2fa02de3b775827a12a102b46330f3a87a",
+   "boyut_bayt": 42023
+  },
+  {
+   "anahtar": "vortice-phantom/VRT-10926.png",
+   "kaynak": "product/1162/image/urun-s76-1.png",
+   "tur": "image/png",
+   "sha256": "828b60e18d947e28c5ccf68c7e1a0d2fa02de3b775827a12a102b46330f3a87a",
+   "boyut_bayt": 42023
+  },
+  {
+   "anahtar": "vortice-phantom/VRT-10927.png",
+   "kaynak": "product/1163/image/urun-s76-1.png",
+   "tur": "image/png",
+   "sha256": "828b60e18d947e28c5ccf68c7e1a0d2fa02de3b775827a12a102b46330f3a87a",
+   "boyut_bayt": 42023
+  },
+  {
+   "anahtar": "vortice-phantom/VRT-11291.png",
+   "kaynak": "product/1164/image/urun-s76-1.png",
+   "tur": "image/png",
+   "sha256": "828b60e18d947e28c5ccf68c7e1a0d2fa02de3b775827a12a102b46330f3a87a",
+   "boyut_bayt": 42023
+  },
+  {
+   "anahtar": "vortice-phantom/VRT-11293.png",
+   "kaynak": "product/1165/image/urun-s76-1.png",
+   "tur": "image/png",
+   "sha256": "828b60e18d947e28c5ccf68c7e1a0d2fa02de3b775827a12a102b46330f3a87a",
+   "boyut_bayt": 42023
+  },
+  {
+   "anahtar": "vortice-penta/VRT-12103.png",
+   "kaynak": "product/1156/image/urun-s12-1.png",
+   "tur": "image/png",
+   "sha256": "0c94a2180359aaad8bcbbaa7e96d7822c4b243495e754dcfb72415a8238e10fb",
+   "boyut_bayt": 58193
+  },
+  {
+   "anahtar": "vortice-platt/VRT-12108.png",
+   "kaynak": "product/1157/image/urun-s8-1.png",
+   "tur": "image/png",
+   "sha256": "66461c35737b1d1756399e5c18e0e1b0b79146787048d8c49f0073395441c334",
+   "boyut_bayt": 60586
+  },
+  {
+   "anahtar": "vortice-sanikit/VRT-25095.png",
+   "kaynak": "product/1166/image/70_EN_25095_Foto_WEB_vortSanikit250_170674.png",
+   "tur": "image/png",
+   "sha256": "c13e93d80e6782b664719acaf31863158f86bcab8fcdfac255b5a176cd931107",
+   "boyut_bayt": 140619
+  },
+  {
+   "anahtar": "vortice-sanikit/VRT-25096.png",
+   "kaynak": "product/1167/image/70_EN_25096_Foto_WEB_vortSanikit400_01_170787.png",
+   "tur": "image/png",
+   "sha256": "f1dde40ed7cbd3780e84a17efa37a2f868e2f3d98822b73cf28e089c22ac2b01",
+   "boyut_bayt": 132722
+  }
+ ]
+}
