@@ -1382,10 +1382,6 @@
    "toplamKB": 11.4,
    "adiylaCagir": [
     {
-     "ad": "browse",
-     "kb": 29.9
-    },
-    {
      "ad": "web-platform-baseline",
      "kb": 10.5
     }
