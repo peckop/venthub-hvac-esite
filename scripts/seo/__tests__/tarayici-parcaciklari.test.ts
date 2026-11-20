@@ -9,7 +9,10 @@ import { describe, it, expect } from 'vitest'
 import { spawnSync } from 'node:child_process'
 import { resolve } from 'node:path'
 import vm from 'node:vm'
-import { GSC_ISTEK_PARCACIGI, BING_SERP_PARCACIGI, GOOGLE_SERP_PARCACIGI, PARCACIKLAR } from '../tarayici-parcaciklari.mjs'
+import { GSC_ISTEK_PARCACIGI, BING_SERP_PARCACIGI, GOOGLE_SERP_PARCACIGI, PARCACIKLAR, gscParcacigi, izinliCoz } from '../tarayici-parcaciklari.mjs'
+import { writeFileSync, mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 const BETIK = resolve(__dirname, '..', 'tarayici-parcaciklari.mjs')
 
@@ -29,8 +32,64 @@ describe('gsc', () => {
   })
   it('giriş alanı yoksa GIRIS YOK döner', async () => {
     const pencere: any = { window: {}, document: { querySelectorAll: () => [] } }
-    vm.runInNewContext(GSC_ISTEK_PARCACIGI, pencere)
+    vm.runInNewContext(gscParcacigi(['https://x/']), pencere)
     expect(await pencere.window.__iste('https://x/', false)).toEqual({ url: 'https://x/', durum: 'GIRIS YOK' })
+  })
+})
+
+// INV-DIZIN-ISTEK-KAPI-1 (SEO-130, D4 "Google tek istek"): parçacık tablo dışı adrese ve aynı adrese ikinci kez TIKLAMAZ.
+describe('gsc tablo kapısı', () => {
+  /** Sahte GSC sayfası: girişe yazılan adres sayfa metnine düşer, düğmeye basınca "istendi" metni çıkar. */
+  function sahteSayfa() {
+    let deger = ''
+    let istendi = false
+    const tiklamalar: string[] = []
+    const inp: any = {
+      getAttribute: () => 'URL inceleyin', placeholder: '', focus() {}, dispatchEvent() {},
+    }
+    const dugme: any = {
+      children: [], textContent: 'Dizine eklenmesini iste', scrollIntoView() {},
+      closest: () => ({ click: () => { tiklamalar.push(deger); istendi = true } }),
+    }
+    class HTMLInputElement {}
+    Object.defineProperty(HTMLInputElement.prototype, 'value', { set(v: string) { deger = v; istendi = false }, configurable: true })
+    const document: any = {
+      querySelectorAll: (s: string) => (s === 'input' ? [inp] : s === 'span' ? [dugme] : []),
+      get body() { return { innerText: `URL Denetimi ${'x'.repeat(40)} ${deger} ${istendi ? 'Dizine eklenmesi istendi' : ''}` } },
+    }
+    const baglam: any = {
+      window: {}, document, HTMLInputElement, Event: class {}, KeyboardEvent: class {},
+      setTimeout: (f: () => void) => f(), Promise,
+    }
+    return { baglam, tiklamalar }
+  }
+
+  it('listede olmayan adrese tıklamaz: TABLODA YOK', async () => {
+    const { baglam, tiklamalar } = sahteSayfa()
+    vm.runInNewContext(gscParcacigi(['https://a/']), baglam)
+    expect(await baglam.window.__iste('https://b/', false)).toEqual({ url: 'https://b/', durum: 'TABLODA YOK' })
+    expect(tiklamalar).toEqual([])
+  })
+
+  it('aynı adres ikinci kez reddedilir: TEKRAR RED, tek tıklama', async () => {
+    const { baglam, tiklamalar } = sahteSayfa()
+    vm.runInNewContext(gscParcacigi(['https://a/']), baglam)
+    const ilk = await baglam.window.__iste('https://a/', false)
+    expect(ilk.sonuc).toBe('ISTENDI')
+    expect(await baglam.window.__iste('https://a/', false)).toEqual({ url: 'https://a/', durum: 'TEKRAR RED' })
+    expect(tiklamalar).toEqual(['https://a/'])
+  })
+
+  it('zorla:true bilinçli istisnadır; zorla:"evet" gibi gevşek değer geçmez', async () => {
+    const { baglam, tiklamalar } = sahteSayfa()
+    vm.runInNewContext(GSC_ISTEK_PARCACIGI, baglam)
+    expect((await baglam.window.__iste('https://c/', false, { zorla: 'evet' })).durum).toBe('TABLODA YOK')
+    expect((await baglam.window.__iste('https://c/', false, { zorla: true })).sonuc).toBe('ISTENDI')
+    expect(tiklamalar).toEqual(['https://c/'])
+  })
+
+  it('izinliCoz yalnız https satırlarını alır, uyarıyı ve tekrarı atar', () => {
+    expect(izinliCoz('https://a/\nUYARI: x\n\nhttps://a/\r\nhttps://b/ \nkalan yok')).toEqual(['https://a/', 'https://b/'])
   })
 })
 
@@ -71,5 +130,18 @@ describe('CLI', () => {
     expect(iyi.stdout).toContain('b_algo')
     const kotu = spawnSync(process.execPath, [BETIK, 'yandex'], { encoding: 'utf8' })
     expect(kotu.status).toBe(2)
+  })
+  it('gsc listesiz ve --zorla\'sız 2 ile reddedilir; --izinli dosyadaki adresleri gömer; boş liste 1', () => {
+    expect(spawnSync(process.execPath, [BETIK, 'gsc'], { encoding: 'utf8' }).status).toBe(2)
+    const kl = mkdtempSync(join(tmpdir(), 'seo130-'))
+    const dolu = join(kl, 'kalan.txt'); writeFileSync(dolu, 'https://venthub.com.tr/tr/x\n')
+    const iyi = spawnSync(process.execPath, [BETIK, 'gsc', '--izinli', dolu], { encoding: 'utf8' })
+    expect(iyi.status).toBe(0)
+    expect(iyi.stdout).toContain('"https://venthub.com.tr/tr/x"')
+    const bos = join(kl, 'bos.txt'); writeFileSync(bos, 'kalan yok\n')
+    expect(spawnSync(process.execPath, [BETIK, 'gsc', '--izinli', bos], { encoding: 'utf8' }).status).toBe(1)
+    const zorla = spawnSync(process.execPath, [BETIK, 'gsc', '--zorla'], { encoding: 'utf8' })
+    expect(zorla.status).toBe(0)
+    expect(zorla.stderr).toContain('UYARI')
   })
 })
