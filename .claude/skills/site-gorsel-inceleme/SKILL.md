@@ -32,6 +32,7 @@ Bir sitenin ya da panelin şablonlarını tasarım gözüyle puanlamak, "ilk bak
 - Sekme kuralları, iframe sınırları ve ESCAPE yasağı `panel-gezinme` skill'inde yazılı; onları oradan oku, burada tekrarlanmaz. Kısaca: önce `tabs_context_mcp`, başkasının sekmesine dokunma, kendi sekmeni aç ve bitince kapat.
 - **Yüzeyler:** önizleme sitesi (onizleme.venthub.com.tr, `/onizleme/` Sayfalar listesi) ve panel ("Mağaza ayarları" kartından açılır). Design Venthub New'de ölçülmez. Görsel inceleme kayıt açmaz; test verisi gerekirse `DENEME-27` öneki.
 - **İki genişlik:** 1568 px ve 390 px. Genişliği `resize_window` ile ya da panelde "Mobil 390" düğmesiyle değiştir; yatay kaymayı `javascript_tool` ile `document.documentElement.scrollWidth > innerWidth` karşılaştırarak doğrula. TR ve EN en az ana şablonlarda.
+- Tam sayfa ekran görüntüsünde `content-visibility: auto` bölümleri boş çıkar (sayfa görünür alana inmeden çizilmez); yakalamadan önce `javascript_tool` ile `content-visibility: visible` enjekte et, yoksa boş bölümü "içerik yok" diye bulgu yazarsın (TASARIM, 20 Kasım).
 - Genişlik değişince sayfa yeniden yüklenir: 2-10 sn bekle, sonra ölç. Tıklama gecikmeyle yansır; her kritik adımdan önce yeni ekran görüntüsü al.
 
 ## Her şablonda sıra
