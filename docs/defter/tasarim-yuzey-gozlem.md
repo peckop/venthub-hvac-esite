@@ -13,6 +13,7 @@ Okuma notları (2. bölüm için). Tarihler 2026'dır. Durum: **geçti** = ilk �
 
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
+| 2026-11-20 | Görsel inceleme turu (site-gorsel-inceleme skill'iyle ilk koşu): site 21 şablon, panel 8 ekran masaüstü ve 6 ekran 390 px; ilk 5 saniye, hiyerarşi, boşluk, tutarlılık, kontrast, odak, 44 px, duyarlılık | Ağır 6 (mobil menüde odak tuzağı, Seri model satırında teklif düğmesi yok, Karşılaştır başlık sabit değil ve grafik eğrileri aynı renk, panel alt çubuğunda "D" harfi, mobil geçişte konum sıfırlanması, mobil liste satırı tıklaması şüphesi), orta yaklaşık 35, hafif yaklaşık 30; 3 ve altı puanlı yerler Design'a çizimle seçenek listesinde; Design paketine girmedi (OPS özeti bekliyor) | TSR-28 |
 | 2026-11-20 | Yeniden ölçüm: Design'ın 19 Kasım paketinden sonra panel ve site, madde 1-8 (parça 1) ve 10-13, 15, EK A-C (parça 2); kalan ölçüm A (teklif onayı, durum ekranları, açılış ham anahtarı, basma alanı, kıyas çubuğu) ve B (bayi başvurusu, taslak Önizle, iş emri bildirimi, Taleplerim, üst çubuk) | p1: geçti 3 · kısmen 3 · kaldı 2; p2: geçti 3 · kısmen 4 · ölçülemedi 1 (16 hüküm); kalan ölçüm A (8 hüküm): geçti 1 · kısmen 1 · kaldı 4 · ölçülemedi 2; kalan ölçüm B (5 hüküm): geçti 1 · kısmen 1 · kaldı 2 · ölçülemedi 1 | OPS-338 |
 | 2026-11-19 | Site tur 1 (önizleme sitesi, TR ve EN, 1604 ve 390 px): p1 menü, gezinti, ürün zinciri, arama, markalar; p2 form, teklif onayı, belgeler, rehber, hesapla, destek, 390 px ve yavaş bağlantı | p1 15 hüküm: geçti 6 · kısmen 7 · kaldı 1 · ölçülemedi 1; p2 20 hüküm: geçti 11 · kısmen 5 · kaldı 3 · ölçülemedi 1; 15 başlıklı tek Design paketi çıktı | OPS-336, OPS-337 |
 | 2026-11-19 | Tur 27 (30 madde + tevkifat + KDV istisna kodu + rehber tarihi) ve aynı gün yeniden ölçüm (10 madde) | Tur 27: geçti 20 · kısmen 9 · geçmedi 1 (Design'a 11 açık); yeniden ölçüm: geçti 9 · kısmen 1; on açığın dokuzu kapandı | OPS-335 |
@@ -85,6 +86,17 @@ Okuma notları (2. bölüm için). Tarihler 2026'dır. Durum: **geçti** = ilk �
 | Üretim (6 sayfa, Plan) | ölçülmedi | n/a | ölçülmedi: Plan etiketli, sayfa kurulmadı (tur 13'te "henüz kurulmadı" metni görüldü) | — | Design sayfayı kurunca | panel-kapsam-tablosu |
 | Plan sayfaları (Servis 2, Ürün 3, Ön muhasebe 4, Mağaza 1, Cari Gruplar, Katalog Setler ve diğer) | ölçülmedi | n/a | ölçülmedi: iskelet; sonradan kurulan Raporlar ve Masraflar yukarıda ayrı | — | Design sayfayı kurunca | panel-kapsam-tablosu |
 | Müşteri hizmetleri (4 sayfa, kapalı modül) ve içe aktarma (cari, stok) | ölçülmedi | n/a | ölçülmedi: modül kapalı; dosya seçici araçla sürülemiyor | — | Design modülü açınca; içe aktarma için araç yolu bulununca | panel-kapsam-tablosu |
+
+**2c. Görsel inceleme (skill turu, 2026-11-20).** Satır = bakış; ilk koşu tek geçişte yapıldı, ayrıntı depo dışı arşivde. Tazelik kuralı aynıdır: aşağıdaki açıklar Design paketine girip düzelene kadar bu bakışlar yeniden koşulmaz.
+
+| Bakış | Son ölçüm | Açık (a/o/h) | Durum | Sonraki ölçüm |
+|---|---|---|---|---|
+| Site: ilk 5 saniye, hiyerarşi, boşluk, tutarlılık (21 şablon) | 2026-11-20 | 2/16/14 | açık; Design'a gitmedi (OPS özeti bekliyor) | Design düzeltti |
+| Site: kontrast ve odak (8 şablon hesaplı, kalanı ortak bant) | 2026-11-20 | 1/3/2 | açık: mobil menü odak tuzağı, duyuru bandı odak halkası 1:1, form kenarlığı 1,65:1 | Design düzeltti |
+| Panel: yoğunluk, tablo, çekmece, sekme (masaüstü 8 ekran) | 2026-11-20 | 0/10/8 | açık; Design'a gitmedi | Design düzeltti |
+| Panel: 390 px (6 ekran) ve alt çubuk | 2026-11-20 | 2/6/4 | açık: "D" harfi, konum sıfırlanması, satır tıklaması şüphesi (390'da yeniden doğrulanacak) | yeniden doğrulama |
+| Kurumsal Belge önizlemesi | 2026-11-20 | 0/1/5 | 390 ölçülemedi (sayfa daralmıyor) | ölçülmedi |
+| Ölçülemeyen: Hesabım oturumlu, Teklif onayı geçerli hâl, 404 yükleniyor/hata | 2026-11-20 | n/a | ölçülmedi (kimlik girilmez, örnek teklif yok, durum sayfada yok) | Design'a soru |
 
 ## 3 Sırada ve yapılabilecekler
 
