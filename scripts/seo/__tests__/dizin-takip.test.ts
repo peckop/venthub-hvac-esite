@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest'
 import { execFileSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
   BING_ARALIK_MS, KAYIT_BASLANGICI, KART_BICIMI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, kaydetArgumanlariCoz, markdownYaz,
@@ -551,6 +551,26 @@ describe('SEO-132: istek → sonuç bağı (INV-DIZIN-BAG-1)', () => {
     expect(istekTarihiBul(h, { tarih: gun(7), motor: 'bing', eylem: 'olcum', adres: A })).toBe(gun(5))
     expect(istekTarihiBul(h, ist(7))).toBeNull() // istek satırı sonuç değildir
   })
+  it('aynı andaki istek bağlanır (gün 0); 1 ms sonraki istek bağlanmaz', () => {
+    expect(istekTarihiBul([ist(5)], gor(5))).toBe(gun(5))
+    expect(bagTablosu([ist(5), gor(5)])[0]).toMatchObject({ istekTarihi: gun(5), gun: 0 })
+    const birMsSonra = { ...ist(5), tarih: new Date(Date.parse(gun(5)) + 1).toISOString() }
+    expect(istekTarihiBul([birMsSonra], gor(5))).toBeNull()
+  })
+  it('aradaki gün aşağı yuvarlanır (3,5 gün → 3), gorunmeOzeti.gunFarki ile aynı kural', () => {
+    const sonuc = { ...gor(5), tarih: '2026-11-05T20:00:00.000Z' }
+    expect(bagTablosu([ist(2), sonuc])[0]).toMatchObject({ gun: 3 })
+  })
+  it('bozuk kayıtlı istekTarihi (satırdan sonra, sayı, metin) yok sayılır, defterden hesaplanır', () => {
+    for (const kotu of [gun(9), 12345, 'abc']) {
+      const t = bagTablosu([ist(2), { ...gor(5), istekTarihi: kotu }])
+      expect(t[0], String(kotu)).toMatchObject({ istekTarihi: gun(2), gun: 3 })
+    }
+  })
+  it('sonHareket oncesi null/NaN verilirse sınır yok sayılır (tüm kayıtları dışlamaz)', () => {
+    expect(sonHareket([ist(2), ist(9)], 'google', A, null as unknown as number)).toBe(Date.parse(gun(9)))
+    expect(sonHareket([ist(2), ist(9)], 'google', A, Number.NaN)).toBe(Date.parse(gun(9)))
+  })
   it('bağ tablosu gün farkını verir; istek yoksa null; kayıtlı istekTarihi hesaptan önce gelir', () => {
     const h = [ist(2), gor(5), gor(3, 'gorunmuyor', B), { ...gor(8), istekTarihi: gun(1) }]
     const t = bagTablosu(h)
@@ -575,11 +595,16 @@ describe('SEO-132: istek → sonuç bağı (INV-DIZIN-BAG-1)', () => {
       const satirlar = readFileSync(join(d, 'h.jsonl'), 'utf8').trim().split('\n').map((s) => JSON.parse(s))
       expect(satirlar[1]).toMatchObject({ adres: A, eylem: 'gorunme', istekTarihi: gun(2) })
       expect('istekTarihi' in satirlar[2]).toBe(false)
-      const once = readFileSync(join(d, 'h.jsonl'), 'utf8')
+      kos(['--kaydet', 'yandex', 'olcum', A, '--sonuc', 'aramada\tek', '--tarih', gun(7)])
+      const agac = () => readdirSync(d, { recursive: true }).map(String).sort().map((y) => `${y}:${statSync(join(d, y)).isFile() ? `${statSync(join(d, y)).mtimeMs}:${readFileSync(join(d, y), 'utf8')}` : '<klasor>'}`)
+      const once = agac()
       const cikti = kos(['--bag'])
-      expect(readFileSync(join(d, 'h.jsonl'), 'utf8')).toBe(once)
+      expect(agac()).toEqual(once) // salt okur: defter, yedek klasörü ve yeni dosya yok
       expect(cikti).toContain(`${gun(2)}\t4\t${A}`)
       expect(cikti).toContain(`ISTEK YOK\t-\t${B}`)
+      const satirlarBag = cikti.trim().split('\n')
+      expect(satirlarBag[0]).toBe('tarih\tmotor\teylem\tsonuc\tistekTarihi\tgun\tadres')
+      for (const s of satirlarBag) expect(s.split('\t'), s).toHaveLength(7) // hücredeki sekme kolon kaydırmaz
     } finally { rmSync(d, { recursive: true, force: true }) }
   })
 })

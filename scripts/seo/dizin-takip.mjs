@@ -117,6 +117,7 @@ export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOSt
 
 /** Bir adres×motor için son istek/gönderim zamanı (ms) ya da null. 'olcum' hareketi istek sayılmaz. `oncesi` (ms) verilirse yalnız ondan önceki (eşit dahil) eylemler. */
 export function sonHareket(hareketler, motor, adres, oncesi = Infinity) {
+  if (typeof oncesi !== 'number' || Number.isNaN(oncesi)) oncesi = Infinity
   let en = null
   for (const h of hareketler) {
     if (h.motor !== motor || h.adres !== adres || h.eylem === 'olcum' || h.eylem === 'gorunme' || h.eylem === 'degisim') continue
@@ -151,7 +152,9 @@ export function bagTablosu(hareketler) {
   return hareketler
     .filter(sonucSatiriMi)
     .map((h) => {
-      const istek = tarihAl(h.istekTarihi) !== null ? new Date(h.istekTarihi).toISOString() : istekTarihiBul(hareketler, h)
+      // Kayıtlı alan yalnız geçerli ISO metniyse ve satır tarihinden sonra değilse esas alınır; elle bozulmuş değer yerine defterden hesaplanır.
+      const kayitli = typeof h.istekTarihi === 'string' ? tarihAl(h.istekTarihi) : null
+      const istek = kayitli !== null && kayitli <= tarihAl(h.tarih) ? new Date(kayitli).toISOString() : istekTarihiBul(hareketler, h)
       const gun = istek === null ? null : Math.floor((tarihAl(h.tarih) - tarihAl(istek)) / GUN_MS)
       return { tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, sonuc: h.sonuc ?? null, istekTarihi: istek, gun }
     })
@@ -549,7 +552,8 @@ async function calistir() {
     const { hareketler, atlanan } = defterOku(defter)
     const satirlar = bagTablosu(hareketler)
     console.log(['tarih', 'motor', 'eylem', 'sonuc', 'istekTarihi', 'gun', 'adres'].join('\t'))
-    for (const s of satirlar) console.log([s.tarih, s.motor, s.eylem, s.sonuc ?? '-', s.istekTarihi ?? 'ISTEK YOK', s.gun ?? '-', s.adres].join('\t'))
+    const hucre = (v) => String(v).replace(/[\t\r\n]+/g, ' ')
+    for (const s of satirlar) console.log([s.tarih, s.motor, s.eylem, s.sonuc ?? '-', s.istekTarihi ?? 'ISTEK YOK', s.gun ?? '-', s.adres].map(hucre).join('\t'))
     const bagsiz = satirlar.filter((s) => s.istekTarihi === null).length
     console.error(`bağ: ${satirlar.length} sonuç satırı · isteğe bağlı ${satirlar.length - bagsiz} · istek yok ${bagsiz}${atlanan ? ` · UYARI: ${atlanan} bozuk satır atlandı` : ''}`)
     return
