@@ -14,7 +14,7 @@ import { resolve, join } from 'node:path'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
-  BING_ARALIK_MS, KAYIT_BASLANGICI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, markdownYaz,
+  BING_ARALIK_MS, KAYIT_BASLANGICI, KART_BICIMI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, kaydetArgumanlariCoz, markdownYaz,
   satirYaz, sonHareket, yedekAl, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
@@ -383,5 +383,135 @@ describe('görünme alanı (SEO-109: canlı arama sonucu, sıra değil)', () => 
     expect(md).toMatch(/category\/ornek \| .*ölçülmedi/)
     const t2 = tabloUret({ kapsam, hareketler: [g(4, 'gorundu')], olcum: {}, simdi: NOW })
     expect(markdownYaz(t2, NOW)).toMatch(/GÖRÜNDÜ ilk 11-04 \(\+3g\)/)
+  })
+})
+
+// INV-DIZIN-KAYDET-1 (SEO-127, D7 madde 2): --kaydet sessiz veri kaybı ve yanlış adres yazmaz; gerekçe ve kart satıra yazılır.
+describe('SEO-127: --kaydet argüman kapıları (INV-DIZIN-KAYDET-1)', () => {
+  const c = (...a: string[]) => kaydetArgumanlariCoz(['--kaydet', ...a])
+
+  it('virgüllü tek argüman geçer (boşluk ve boş parça temizlenir)', () => {
+    expect(c('google', 'istek', `${A},${B}`)).toMatchObject({ motor: 'google', eylem: 'istek', adresler: [A, B], neden: null, kart: null })
+    expect(c('google', 'istek', ` ${A} , ${B},`)).toMatchObject({ adresler: [A, B] })
+  })
+  it('boşlukla verilen ikinci ve sonraki adres HATA: eskiden sessizce düşerdi', () => {
+    for (const girdi of [[A, B], [A, B, '--sonuc', 'aramada'], [`${A},${B}`, B]]) {
+      const r = c('google', 'istek', ...girdi)
+      expect(r).toHaveProperty('hata')
+      expect((r as { hata: string }).hata).toContain('virgülle tek argüman')
+    }
+  })
+  it('seçenek değerleri fazla argüman sayılmaz; seçenekler --kaydet öncesinde de olabilir', () => {
+    const r = c('google', 'istek', A, '--sonuc', 'aramada', '--tarih', '2026-11-04T07:11:00Z', '--hareket', '/x/y.jsonl', '--neden', 'bilerek tekrar', '--kart', 'SEO-127')
+    expect(r).toMatchObject({ adresler: [A], neden: 'bilerek tekrar', kart: 'SEO-127' })
+    expect(kaydetArgumanlariCoz(['--hareket', '/x/y.jsonl', '--kaydet', 'google', 'istek', A])).toMatchObject({ adresler: [A] })
+  })
+  it('--neden metnini tırnaksız verirsen ikinci kelime fazla argümandır: HATA', () => {
+    expect(c('google', 'istek', A, '--neden', 'bilerek', 'tekrar')).toHaveProperty('hata')
+  })
+  it('https:// ile başlamayan her adres HATA: göreli yol, http, Git Bash çevirisi, ikinci adres', () => {
+    for (const kotu of ['/tr/bilgi-merkezi/x', 'C:/Program Files/Git/tr/bilgi-merkezi/x', 'http://venthub.com.tr/tr/x', 'venthub.com.tr/tr/x', `${A},/tr/x`]) {
+      const r = c('google', 'istek', kotu)
+      expect(r, kotu).toHaveProperty('hata')
+      expect((r as { hata: string }).hata).toContain('https://')
+    }
+  })
+  it('eksik konumsal argüman ya da seçenek adres yerine HATA', () => {
+    expect(c('google', 'istek')).toHaveProperty('hata')
+    expect(c('google', 'istek', '--sonuc', 'aramada')).toHaveProperty('hata')
+  })
+  it('--kart yalnız ÖNEK-sayı (büyük harf); değersiz ya da başka bayrakla biten HATA', () => {
+    expect(KART_BICIMI.test('SEO-127')).toBe(true)
+    for (const kotu of ['seo-127', 'SEO127', 'SEO-', '127', 'SEO-127x', 'SEO-12-3', ' SEO-127']) expect(c('google', 'istek', A, '--kart', kotu), kotu).toHaveProperty('hata')
+    expect(c('google', 'istek', A, '--kart')).toHaveProperty('hata')
+    expect(c('google', 'istek', A, '--kart', '--neden', 'x')).toHaveProperty('hata')
+    expect(c('google', 'istek', A, '--kart', 'URN-5')).toMatchObject({ kart: 'URN-5' })
+  })
+  it('--neden değersiz, boş ya da başka bayrakla biterse HATA', () => {
+    expect(c('google', 'istek', A, '--neden')).toHaveProperty('hata')
+    expect(c('google', 'istek', A, '--neden', '  ')).toHaveProperty('hata')
+    expect(c('google', 'istek', A, '--neden', '--kart', 'SEO-1')).toHaveProperty('hata')
+  })
+  it('neden/kart satıra yazılır, yoksa alan hiç yoktur; okuma ve tablo bu alanlardan etkilenmez', () => {
+    const temel = { tarih: gun(4), motor: 'google', eylem: 'istek', adres: A }
+    const zengin = { ...temel, neden: 'bilerek tekrar: yanlış adres kaydı', kart: 'SEO-127' }
+    expect(JSON.parse(satirYaz(zengin))).toMatchObject({ neden: 'bilerek tekrar: yanlış adres kaydı', kart: 'SEO-127' })
+    const sade = JSON.parse(satirYaz(temel))
+    expect('neden' in sade).toBe(false)
+    expect('kart' in sade).toBe(false)
+    const r = defterAyristir([satirYaz(zengin), satirYaz(temel)].join('\n'))
+    expect(r.hareketler).toHaveLength(2)
+    expect(r.atlanan).toBe(0)
+    const kapsam = [{ adres: A, lastmod: gun(3) }]
+    expect(tabloUret({ kapsam, hareketler: [zengin], olcum: {}, simdi: NOW })).toEqual(tabloUret({ kapsam, hareketler: [temel], olcum: {}, simdi: NOW }))
+    expect(yeniOlanlar([temel], [zengin])).toHaveLength(0)
+  })
+})
+
+describe('SEO-127: CLI --kaydet (uçtan uca, depo dışı klasör, yedek kapalı)', () => {
+  const betik = resolve(__dirname, '..', 'dizin-takip.mjs')
+  const calistir = (args: string[]) => {
+    try {
+      const cikti = execFileSync(process.execPath, [betik, ...args], { encoding: 'utf8', stdio: 'pipe', env: { ...process.env, DIZIN_TAKIP_YEDEK2: '' } })
+      return { kod: 0, cikti, hata: '' }
+    } catch (e) {
+      const x = e as { status: number; stderr: Buffer | string }
+      return { kod: x.status, cikti: '', hata: String(x.stderr) }
+    }
+  }
+  const klasor = () => mkdtempSync(join(tmpdir(), 'dizin-kaydet-'))
+
+  it('boşlukla verilen ikinci adres: çıkış 2, deftere HİÇBİR satır yazılmaz', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      const r = calistir(['--kaydet', 'google', 'istek', A, B, '--hareket', defter])
+      expect(r.kod).toBe(2)
+      expect(r.hata).toContain('virgülle tek argüman')
+      expect(existsSync(defter)).toBe(false)
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+  it('https olmayan adres (Git Bash çevirisi dahil): çıkış 2, defter yok', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      for (const kotu of ['C:/Program Files/Git/tr/bilgi-merkezi/x', '/tr/bilgi-merkezi/x']) {
+        const r = calistir(['--kaydet', 'google', 'istek', kotu, '--hareket', defter])
+        expect(r.kod, kotu).toBe(2)
+        expect(r.hata).toContain('https://')
+      }
+      expect(existsSync(defter)).toBe(false)
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+  it('bozuk --kart: çıkış 2, defter yok', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      const r = calistir(['--kaydet', 'google', 'istek', A, '--kart', 'seo-127', '--hareket', defter])
+      expect(r.kod).toBe(2)
+      expect(r.hata).toContain('--kart')
+      expect(existsSync(defter)).toBe(false)
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+  it('geçerli çağrı: virgüllü iki adres iki satır, neden ve kart her satırda; alansız çağrıda alan yok; defter okunur', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      const tarih = '2026-11-20T08:00:00Z'
+      const r1 = calistir(['--kaydet', 'google', 'istek', `${A},${B}`, '--neden', 'bilerek tekrar: kota sonrası', '--kart', 'SEO-127', '--tarih', tarih, '--hareket', defter])
+      expect(r1.kod).toBe(0)
+      expect(r1.cikti).toContain('kaydedildi: 2 hareket')
+      const r2 = calistir(['--kaydet', 'bing', 'gonderim', A, '--tarih', tarih, '--hareket', defter])
+      expect(r2.kod).toBe(0)
+      const satirlar = readFileSync(defter, 'utf8').trim().split('\n').map((s) => JSON.parse(s))
+      expect(satirlar).toHaveLength(3)
+      expect(satirlar.slice(0, 2).map((s) => s.adres)).toEqual([A, B])
+      for (const s of satirlar.slice(0, 2)) expect(s).toMatchObject({ motor: 'google', eylem: 'istek', kaynak: 'kaydet', neden: 'bilerek tekrar: kota sonrası', kart: 'SEO-127' })
+      expect('neden' in satirlar[2]).toBe(false)
+      expect('kart' in satirlar[2]).toBe(false)
+      const ayrisim = defterAyristir(readFileSync(defter, 'utf8'))
+      expect(ayrisim.hareketler).toHaveLength(3)
+      expect(ayrisim.atlanan).toBe(0)
+    } finally { rmSync(d, { recursive: true, force: true }) }
   })
 })

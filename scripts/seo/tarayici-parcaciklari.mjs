@@ -11,20 +11,28 @@
  * Kullanım: node scripts/seo/tarayici-parcaciklari.mjs <gsc|bing|google>   → parçacık metni stdout'a.
  *
  * TABLO KAPISI (SEO-130, D4 "Google tek istek"): gsc parçacığı yalnız dizin-takip tablosunun YAP/TEKRAR listesindeki
- * adrese istek atar. Liste CLI aşamasında gömülür (tarayıcı dizin-takip'i çağıramaz):
+ * adrese istek atar. Liste CLI aşamasında gömülür (tarayıcı dizin-takip'i çağıramaz). SEO-127: TERCİH EDİLEN yol tek komuttur,
+ * liste elle tutulmaz, dosyaya yazılmaz:
+ *   node scripts/seo/tarayici-parcaciklari.mjs gsc --kalan google [--sinir N]
+ * (`dizin-takip.mjs --kalan google --sinir N` alt süreç olarak koşar; çıkış 1 = OLCULEMEDI uyarısı, 2 = araç koşmadı: parçacık ÜRETİLMEZ,
+ * alt sürecin stderr'i aynen geçer, aynı kodla çıkılır.) Eski iki adım hâlâ çalışır ama elle liste uyarısı verir:
  *   node scripts/seo/dizin-takip.mjs --kalan google --sinir N > kalan.txt
  *   node scripts/seo/tarayici-parcaciklari.mjs gsc --izinli kalan.txt      (ya da `--izinli -` ile stdin)
+ * ISTENDI sonucu `kaydet` alanı taşır (SEO-127): hazır kopyalanacak `dizin-takip.mjs --kaydet google istek <url>` satırı.
  * Listede olmayan adres {durum:'TABLODA YOK'} ile, aynı oturumda ikinci kez istenen adres {durum:'TEKRAR RED'} ile
  * reddedilir; tıklama yapılmaz. Adres kapıdan geçtiği AN kilitlenir (eşzamanlı ikinci çağrı ve ZAMAN ASIMI ile belirsiz
  * kalan isteğin tekrarı da reddedilir); kilit yalnız tıklama olmadıysa (GIRIS YOK, DUGME YOK) ya da açık `HATA:`
  * sonucunda (kota, hata kutusu) kalkar. Liste en çok
  * IZINLI_TAVAN adres (çıkış 2). Bilerek tekrar: tarayıcıda __iste(adres, ilk, {zorla:true}); CLI'da `gsc --zorla`
- * listesiz parçacık üretir ama yine her çağrıda {zorla:true} ister. --izinli ve --zorla yoksa gsc çıkış 2 verir.
+ * listesiz parçacık üretir ama yine her çağrıda {zorla:true} ister. --kalan, --izinli ve --zorla yoksa gsc çıkış 2 verir.
+ * `kaydet` yalnız adres güvenli karakterlerden oluşuyorsa (kabuğa kopyalanırken komut enjekte olmaz) eklenir; değilse alan yoktur, kayıt elle yazılır.
  * Sınırlar: robot doğrulaması (captcha) atlatılmaz, yalnız bildirilir; çıktıya sorgu dizesi (query string) konmaz
  * (javascript_tool "[BLOCKED: Cookie/query string data]" verir); Yandex elle formu 10 Kasım SEO-105 ile geri geldi (günde 10, form elle;
  * dizin-sistemleri-standard D7 madde 11). Her istekten sonra `dizin-takip.mjs --kaydet` çalıştırılır.
  */
-import { pathToFileURL } from 'node:url'
+import { execFileSync } from 'node:child_process'
+import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { readFileSync } from 'node:fs'
 
 /** Gömülebilecek en çok adres: Google günlük kotası ölçülmüş ~11 (D7 madde 15 notu); --sinir'siz tam liste gömülmesin. */
@@ -33,6 +41,15 @@ export const IZINLI_TAVAN = 15
 /** dizin-takip --kalan çıktısından adres listesi (yalnız https satırları; uyarı/boş satır atlanır). */
 export function izinliCoz(metin) {
   return [...new Set(String(metin).split(/\r?\n/).map((s) => s.trim()).filter((s) => /^https:\/\/\S+$/.test(s)))]
+}
+
+/**
+ * SEO-127: `--kalan` alt sürecinin betiği. Varsayılan komşu `dizin-takip.mjs`; DIZIN_TAKIP_BETIK yalnız TEST içindir (alt süreci gerçek ağa
+ * gitmeden sahte bir betiğe yönlendirir), üretimde verilmez.
+ * @param {NodeJS.ProcessEnv} [env]
+ */
+export function dizinTakipBetigi(env = process.env) {
+  return env.DIZIN_TAKIP_BETIK || join(dirname(fileURLToPath(import.meta.url)), 'dizin-takip.mjs')
 }
 
 /**
@@ -61,6 +78,7 @@ window.__iste = async function(url, ilk, secenek){
   const kilitBende = !window.__gonderildi.has(url);
   window.__gonderildi.add(url);
   const r = await govde(url, ilk);
+  if(r.sonuc==='ISTENDI' && /^https:\\/\\/[A-Za-z0-9._~\\/%-]+$/.test(url)) r.kaydet = 'node scripts/seo/dizin-takip.mjs --kaydet google istek ' + url;
   const tiklanmadi = r.durum==='GIRIS YOK' || r.durum==='DUGME YOK';
   if(kilitBende && (tiklanmadi || String(r.sonuc||'').indexOf('HATA:')===0)) window.__gonderildi.delete(url);
   return r;
@@ -129,27 +147,48 @@ export const PARCACIKLAR = { gsc: GSC_ISTEK_PARCACIGI, bing: BING_SERP_PARCACIGI
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const ad = process.argv[2]
   if (!ad || !Object.hasOwn(PARCACIKLAR, ad)) {
-    console.error('Kullanım: tarayici-parcaciklari.mjs <gsc --izinli <dosya|-> | gsc --zorla | bing | google>')
+    console.error('Kullanım: tarayici-parcaciklari.mjs <gsc --kalan google [--sinir N] | gsc --izinli <dosya|-> | gsc --zorla | bing | google>')
     process.exit(2)
   }
   if (ad !== 'gsc') {
     process.stdout.write(PARCACIKLAR[ad] + '\n')
   } else {
     const arg = process.argv.slice(3)
-    const i = arg.indexOf('--izinli')
-    if (i >= 0) {
-      const kaynak = arg[i + 1]
-      if (!kaynak) { console.error('HATA: --izinli <dosya|-> değeri yok'); process.exit(2) }
-      const izinli = izinliCoz(readFileSync(kaynak === '-' ? 0 : kaynak, 'utf8'))
+    const deger = (b) => { const k = arg.indexOf(b); return k >= 0 ? arg[k + 1] : undefined }
+    /** Listeyi gömer: boş liste 1, tavan üstü 2, aksi hâlde parçacık stdout'a. */
+    const gom = (izinli, kaynak) => {
       if (!izinli.length) { console.error('HATA: izinli liste boş (dizin-takip --kalan google çıktısı "kalan yok" olabilir; PowerShell 5.1 `>` UTF-16 yazar, Git Bash kullan); istek atılacak adres yok'); process.exit(1) }
-      if (izinli.length > IZINLI_TAVAN) { console.error(`HATA: izinli liste ${izinli.length} adres, tavan ${IZINLI_TAVAN} (Google günlük kotası ~11): dizin-takip --kalan google --sinir N ile kısalt`); process.exit(2) }
-      console.error(`tablo kapısı: ${izinli.length} adres gömüldü`)
+      if (izinli.length > IZINLI_TAVAN) { console.error(`HATA: izinli liste ${izinli.length} adres, tavan ${IZINLI_TAVAN} (Google günlük kotası ~11): --sinir N ile kısalt`); process.exit(2) }
+      console.error(`tablo kapısı: ${izinli.length} adres gömüldü (${kaynak})`)
       process.stdout.write(gscParcacigi(izinli) + '\n')
+    }
+    if (arg.includes('--kalan')) {
+      // SEO-127: liste elle tutulmaz; dizin-takip --kalan alt süreci üretir. Argüman hataları ağa gitmeden 2.
+      if (arg.includes('--izinli') || arg.includes('--zorla')) { console.error('HATA: --kalan ile --izinli/--zorla birlikte verilmez (tek liste kaynağı)'); process.exit(2) }
+      if (deger('--kalan') !== 'google') { console.error('HATA: gsc yalnız --kalan google ister'); process.exit(2) }
+      const sinir = deger('--sinir')
+      if (arg.includes('--sinir') && (sinir === undefined || !/^[1-9]\d*$/.test(sinir))) { console.error('HATA: --sinir pozitif tam sayı olmalı'); process.exit(2) }
+      let cikti
+      try {
+        // stderr canlı geçer (OLCULEMEDI uyarısı, "kalan yok"); stdout liste. Aynı ortam: GSC anahtarı alt sürece de gider.
+        cikti = execFileSync(process.execPath, [dizinTakipBetigi(), '--kalan', 'google', ...(sinir ? ['--sinir', sinir] : [])], { env: process.env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] })
+      } catch (e) {
+        const kod = Number.isInteger(e.status) ? e.status : 2
+        if (!Number.isInteger(e.status)) console.error(`HATA: dizin-takip alt süreci koşmadı: ${e.message}`)
+        console.error(`HATA: kalan liste üretilemedi (dizin-takip çıkış ${kod}); parçacık ÜRETİLMEDİ`)
+        process.exit(kod)
+      }
+      gom(izinliCoz(cikti), '--kalan google')
+    } else if (arg.includes('--izinli')) {
+      console.error('UYARI: elle liste; tercih --kalan (gsc --kalan google --sinir N): liste tablodan türer, dosyaya yazılmaz')
+      const kaynak = deger('--izinli')
+      if (!kaynak) { console.error('HATA: --izinli <dosya|-> değeri yok'); process.exit(2) }
+      gom(izinliCoz(readFileSync(kaynak === '-' ? 0 : kaynak, 'utf8')), '--izinli')
     } else if (arg.includes('--zorla')) {
-      console.error('UYARI: --zorla: listesiz parçacık; her istek __iste(adres, ilk, {zorla:true}) ister ve D4 tekrar istek istisnasıdır, gerekçe deftere yazılır')
+      console.error('UYARI: --zorla: listesiz parçacık; her istek __iste(adres, ilk, {zorla:true}) ister ve D4 tekrar istek istisnasıdır, gerekçe deftere `dizin-takip.mjs --kaydet ... --neden "<gerekçe>"` ile yazılır')
       process.stdout.write(GSC_ISTEK_PARCACIGI + '\n')
     } else {
-      console.error('HATA: gsc parçacığı tablo kapılıdır: önce `dizin-takip.mjs --kalan google --sinir N > f`, sonra `gsc --izinli f` (bilerek tekrar: --zorla)')
+      console.error('HATA: gsc parçacığı tablo kapılıdır: `gsc --kalan google --sinir N` (bilerek tekrar: --zorla)')
       process.exit(2)
     }
   }

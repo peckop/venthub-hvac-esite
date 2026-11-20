@@ -23,8 +23,11 @@
  *   node scripts/seo/dizin-takip.mjs --durum [--gun N: yalnız son N günün adresleri; verilmezse TÜM site haritası] [--adres a,b] [--cikti <depo-dışı klasör>] [--hareket <dosya>]
  *        [--degisen <dosya>: satır başına "<adres> <ISO tarih>"; verilmezse defter klasöründeki degisen-adresler.txt varsa o okunur]
  *        [--kalan <motor> [--sinir N]: tablo yerine yalnız o motorun YAP/TEKRAR adreslerini satır satır basar; elle kalan listesi tutulmaz (SEO-118)]
- *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme|degisim> <adres,adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
+ *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme|degisim> <https://adres,https://adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
+ *        [--neden "<gerekçe>"] [--kart <ÖNEK-sayı>] [--tarih <ISO>]
  *        (degisim: kod yayını sayfayı değiştirdi, motor google yazılır; değişen liste artık defterden türer. --tarih ile geçmiş tarih verilebilir)
+ *        (SEO-127: adresler VİRGÜLLE TEK argümandır; boşlukla verilen ikinci adres eskiden sessizce düşüyordu, artık çıkış 2. Her adres https:// ile başlar,
+ *         Git Bash'in /tr/x → C:/Program Files/Git/tr/x çevirisi de çıkış 2'dir. --neden/--kart satıra `neden`/`kart` alanı yazar; --kart biçimi ÖNEK-sayı)
  *   node scripts/seo/dizin-takip.mjs --degisen-ice-aktar [--degisen <dosya>]   (eski degisen-adresler.txt satırlarını deftere tek seferlik taşır)
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
@@ -109,7 +112,7 @@ export function defterAyristir(metin) {
 const anahtar = (h) => `${h.motor}|${h.eylem}|${h.adres}|${new Date(h.tarih).toISOString()}`
 
 /** Defter satırı biçimi: tek satır JSON. */
-export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, ...(h.sonuc ? { sonuc: h.sonuc } : {}), ...(h.kaynak ? { kaynak: h.kaynak } : {}) })
+export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, ...(h.sonuc ? { sonuc: h.sonuc } : {}), ...(h.kaynak ? { kaynak: h.kaynak } : {}), ...(h.neden ? { neden: String(h.neden) } : {}), ...(h.kart ? { kart: String(h.kart) } : {}) })
 
 /** Bir adres×motor için son istek/gönderim zamanı (ms) ya da null. 'olcum' hareketi istek sayılmaz. */
 export function sonHareket(hareketler, motor, adres) {
@@ -367,6 +370,45 @@ export function yeniOlanlar(mevcut, adaylar) {
   return adaylar.filter((h) => { const k = anahtar(h); if (var_.has(k) || gorulen.has(k)) return false; gorulen.add(k); return true })
 }
 
+/** SEO-127: `--kart` biçimi (Kanban numarası): ÖNEK-sayı, büyük harf. */
+export const KART_BICIMI = /^[A-Z]+-\d+$/
+/** `--kaydet` adres argümanından sonra DEĞER alan seçenekler: fazla-argüman taramasında değerleri bağımsız argüman sanmamak için atlanır. */
+const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart', '--cikti', '--gun', '--adres', '--degisen', '--klasor', '--kalan', '--sinir']
+
+/**
+ * SEO-127: `--kaydet <motor> <eylem> <adresler> [--neden t] [--kart K]` argümanlarını çözer ve doğrular (saf işlev; çıkış kararı çağırandadır).
+ * Eskiden `arg.slice(i + 1, i + 4)` yalnız üç argüman alıyor, boşlukla verilen ikinci ve sonraki adres SESSİZCE düşüyordu (deftere tek adres yazılıyor,
+ * kayıtsız adres bir sonraki tabloda yine YAP çıkıyordu). Artık adres argümanından sonra seçenek olmayan fazla argüman, https:// ile başlamayan adres
+ * (Git Bash'in /tr/x → C:/Program Files/Git/tr/x çevirisi dahil) ve `--kart`/`--neden` biçim hatası HATA verir.
+ * @param {string[]} arg process.argv.slice(2)
+ * @returns {{ hata: string } | { motor: string, eylem: string, adresler: string[], neden: string|null, kart: string|null }}
+ */
+export function kaydetArgumanlariCoz(arg) {
+  const i = arg.indexOf('--kaydet')
+  const [motor, eylem, liste] = arg.slice(i + 1, i + 4)
+  if (liste === undefined || liste.startsWith('--')) return { hata: '--kaydet <motor> <eylem> <adres,adres> eksik: üç konumsal argüman ister' }
+  const fazla = []
+  for (let j = i + 4; j < arg.length; j++) {
+    if (arg[j].startsWith('--')) { if (DEGERLI_SECENEKLER.includes(arg[j])) j++; continue }
+    fazla.push(arg[j])
+  }
+  if (fazla.length) return { hata: `--kaydet adres argümanından sonra fazladan argüman ${JSON.stringify(fazla[0])}: adresleri virgülle tek argüman ver (boşlukla ayrılan ikinci ve sonraki adres kaydedilmezdi); --neden metnini tırnakla ver` }
+  const adresler = liste.split(',').map((s) => s.trim()).filter(Boolean)
+  const httpsDegil = adresler.find((a) => !/^https:\/\//.test(a))
+  if (httpsDegil !== undefined) return { hata: `--kaydet adresi https:// ile başlamalı: ${JSON.stringify(httpsDegil)} (Git Bash /tr/... yolunu Windows yoluna çevirir; tam https adres ver)` }
+  const secenek = (ad) => {
+    const k = arg.indexOf(ad)
+    if (k < 0) return { var_: false, deger: null }
+    const d = arg[k + 1]
+    return { var_: true, deger: d === undefined || d.startsWith('--') || !d.trim() ? null : d }
+  }
+  const n = secenek('--neden')
+  if (n.var_ && n.deger === null) return { hata: '--neden metin ister (boşluklu gerekçeyi tırnakla ver)' }
+  const k = secenek('--kart')
+  if (k.var_ && (k.deger === null || !KART_BICIMI.test(k.deger))) return { hata: `--kart ÖNEK-sayı biçiminde olmalı (örn. SEO-127), verilen: ${JSON.stringify(k.deger)}` }
+  return { motor, eylem, adresler, neden: n.deger, kart: k.deger }
+}
+
 // ---------------------------------------------------------------- CLI (ağ ve dosya burada)
 
 function defterOku(yol) {
@@ -445,14 +487,14 @@ async function calistir() {
   yolKontrol(defter, '--hareket')
 
   if (arg.includes('--kaydet')) {
-    const i = arg.indexOf('--kaydet')
-    const [motor, eylem, liste] = arg.slice(i + 1, i + 4)
+    const cozum = kaydetArgumanlariCoz(arg)
+    if ('hata' in cozum) { console.error(`HATA: ${cozum.hata}`); process.exit(2) }
+    const { motor, eylem, adresler, neden, kart } = cozum
     const sonuc = deger('--sonuc')
-    const adresler = String(liste ?? '').split(',').map((s) => s.trim()).filter(Boolean).map((a) => (a.startsWith('http') ? a : `${SITE}${a}`))
     const verilen = deger('--tarih')
     if (verilen !== undefined && tarihAl(verilen) === null) { console.error('HATA: --tarih geçerli bir ISO tarih olmalı (örn. 2026-11-04T07:11:00Z)'); process.exit(2) }
     const simdi = verilen ? new Date(verilen).toISOString() : new Date().toISOString()
-    const hareketler = adresler.map((adres) => ({ tarih: simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: 'kaydet' }))
+    const hareketler = adresler.map((adres) => ({ tarih: simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: 'kaydet', ...(neden ? { neden } : {}), ...(kart ? { kart } : {}) }))
     if (!adresler.length || hareketler.some((h) => !hareketGecerliMi(h))) { console.error('HATA: --kaydet <motor> <eylem> <adres,adres> geçersiz (motor/eylem/adres siteye ait olmalı)'); process.exit(2) }
     mkdirSync(dirname(defter), { recursive: true })
     appendFileSync(defter, `${hareketler.map(satirYaz).join('\n')}\n`)
