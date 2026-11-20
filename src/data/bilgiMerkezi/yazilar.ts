@@ -2461,7 +2461,7 @@ Yanıcılık tehlikesi olan yerde yerel havalandırmanın tasarımı, bölgeleme
 
 ## VentHub'da hangi ATEX fan serileri var?
 
-VentHub aile sayfalarına göre [Vorticent CMS ATEX](vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar) serisinde 12/5 T4 ve 14/5 T4 (0,09 kW) modelleri fan için Ex h IIB+H2 T4 Gb, motor için Ex eb IIC T4 Gb işaretiyle Bölge 1'e; 14/5 T2 (0,25 kW), 16/6 T2, 22/9 T4, 25/10 T4, 28/11 T4, 31/12 T4, 35/14 T4, 40/16 T4 ve 45/18 T4 modelleri fan için Ex h IIB T3 Gc, motor için Ex ec IIC T3 Gc işaretiyle Bölge 2'ye uygundur [6]. Seri −20 °C ile 40 °C ortam sıcaklığı aralığında, toz içermeyen temiz hava taşımaya uygundur [6]. Bu koşul toz içeren havayı kapsamaz [6]. [VORT-E ATEX](vh:aile/vortice-vort-e-atex-fanlar) serisindeki 40320 modeli, patlayıcı toz ve gaz içeren (ATEX II 2G/D h T3/125°C X Gb/Db) ortamların havalandırılması için tasarlanmış ex-proof aksiyel sanayi fanıdır [6].
+VentHub aile sayfalarına göre [Vorticent CMS ATEX](vh:aile/vortice-vorticent-cms-atex-santrifuj-fanlar) serisinde 12/5 T4 ve 14/5 T4 (0,09 kW) modelleri fan için Ex h IIB+H2 T4 Gb, motor için Ex eb IIC T4 Gb işaretiyle Bölge 1'e; 14/5 T2 (0,25 kW), 16/6 T2, 22/9 T4, 25/10 T4, 28/11 T4, 31/12 T4, 35/14 T4, 40/16 T4 ve 45/18 T4 modelleri fan için Ex h IIB T3 Gc, motor için Ex ec IIC T3 Gc işaretiyle Bölge 2'ye uygundur [6]. Seri −20 °C ile 40 °C ortam sıcaklığı aralığında, toz içermeyen temiz hava taşımaya uygundur [6]. [VORT-E ATEX](vh:aile/vortice-vort-e-atex-fanlar) serisindeki 40320 modeli, patlayıcı toz ve gaz içeren (ATEX II 2G/D h T3/125°C X Gb/Db) ortamların havalandırılması için tasarlanmış ex-proof aksiyel sanayi fanıdır [6].
 
 İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
 
