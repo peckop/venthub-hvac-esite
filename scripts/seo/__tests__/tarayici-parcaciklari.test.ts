@@ -113,6 +113,33 @@ describe('gsc tablo kapısı', () => {
     expect(tiklamalar).toEqual(['https://a/', 'https://a/'])
   })
 
+  it('başarısız zorla denemesi önceki başarılı isteğin kilidini silmez', async () => {
+    const s = sahteSayfa()
+    vm.runInNewContext(gscParcacigi(['https://a/']), s.baglam)
+    expect((await s.baglam.window.__iste('https://a/', false)).sonuc).toBe('ISTENDI')
+    // aynı pencere, kota dolu sayfa: zorla denemesi HATA alır
+    const h = sahteSayfa('hata')
+    h.baglam.window = s.baglam.window
+    vm.runInNewContext(gscParcacigi(['https://a/']), h.baglam)
+    expect((await h.baglam.window.__iste('https://a/', false, { zorla: true })).sonuc).toMatch(/^HATA:/)
+    expect((await h.baglam.window.__iste('https://a/', false)).durum).toBe('TEKRAR RED')
+  })
+
+  it('ilk=true: sayfadaki adres istenenle birebir değilse (önek-slug) tıklamaz, kilidi bırakır', async () => {
+    const { baglam, tiklamalar } = sahteSayfa()
+    vm.runInNewContext(gscParcacigi(['https://a/x', 'https://a/x-uzun']), baglam)
+    await baglam.window.__iste('https://a/x-uzun', false) // sayfada x-uzun açık
+    expect((await baglam.window.__iste('https://a/x', true)).durum).toBe('DUGME YOK')
+    expect(tiklamalar).toEqual(['https://a/x-uzun'])
+    expect((await baglam.window.__iste('https://a/x', false)).sonuc).toBe('ISTENDI')
+  })
+
+  it('iç gövde pencereye açılmaz: kapı atlanamaz', () => {
+    const { baglam } = sahteSayfa()
+    vm.runInNewContext(gscParcacigi(['https://a/']), baglam)
+    expect(Object.keys(baglam.window).sort()).toEqual(['__gonderildi', '__iste', '__izinli'])
+  })
+
   it('izinliCoz yalnız https satırlarını alır, uyarıyı ve tekrarı atar', () => {
     expect(izinliCoz('https://a/\nUYARI: x\n\nhttps://a/\r\nhttps://b/ \nkalan yok')).toEqual(['https://a/', 'https://b/'])
   })

@@ -42,17 +42,30 @@ export function izinliCoz(metin) {
 export function gscParcacigi(izinli = []) {
   return `window.__izinli = new Set(${JSON.stringify(izinli)});
 window.__gonderildi = window.__gonderildi || new Set();
+(function(){
+const sayfadaTam = function(metin, url){
+  let i = metin.indexOf(url);
+  while(i >= 0){
+    const sonraki = metin.charAt(i + url.length);
+    if(!/[A-Za-z0-9\\-_/.?#%]/.test(sonraki)) return true;
+    i = metin.indexOf(url, i + 1);
+  }
+  return false;
+};
+const govde = async function(url, ilk){
+  if(!ilk){` + GSC_GOVDE + `
 window.__iste = async function(url, ilk, secenek){
   const zorla = !!(secenek && secenek.zorla === true);
   if(!zorla && !window.__izinli.has(url)) return {url, durum:'TABLODA YOK'};
   if(!zorla && window.__gonderildi.has(url)) return {url, durum:'TEKRAR RED'};
+  const kilitBende = !window.__gonderildi.has(url);
   window.__gonderildi.add(url);
-  const r = await window.__isteGovde(url, ilk);
-  if(r.durum==='GIRIS YOK' || r.durum==='DUGME YOK' || String(r.sonuc||'').indexOf('HATA:')===0) window.__gonderildi.delete(url);
+  const r = await govde(url, ilk);
+  const tiklanmadi = r.durum==='GIRIS YOK' || r.durum==='DUGME YOK';
+  if(kilitBende && (tiklanmadi || String(r.sonuc||'').indexOf('HATA:')===0)) window.__gonderildi.delete(url);
   return r;
 };
-window.__isteGovde = async function(url, ilk){
-  if(!ilk){` + GSC_GOVDE
+})();`
 }
 
 const GSC_GOVDE = `
@@ -69,9 +82,9 @@ const GSC_GOVDE = `
   for(let i=0;i<30;i++){
     await new Promise(r=>setTimeout(r,2000));
     s=[...document.querySelectorAll('span')].find(e=>e.children.length===0 && /dizine eklenmesini iste/i.test(e.textContent||''));
-    if(s && document.body.innerText.includes(url)) break;
+    if(s && sayfadaTam(document.body.innerText, url)) break;
   }
-  if(!s) return {url, durum:'DUGME YOK'};
+  if(!s || !sayfadaTam(document.body.innerText, url)) return {url, durum:'DUGME YOK'};
   const once=document.body.innerText; const i0=once.indexOf('URL Denetimi');
   const durum=once.slice(i0+30,i0+130).replace(/\\n/g,' ');
   s.scrollIntoView({block:'center'});
