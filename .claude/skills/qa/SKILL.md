@@ -46,8 +46,8 @@ ekran görüntüsünü **Recep'e gösterir**, konsolu okur ve kanıtsız hiçbir
 4. **Preview/staging'de mutasyon** (form gönderme, kayıt oluşturma) için koşum başına **bir kez**
    Recep'e sorulur; uzak/otonom oturumda sorulamıyorsa mutasyon yapılmaz, rapora "doğrulanamadı"
    yazılır.
-5. **Uzak Claude Code konteynerinde** Chromium dış siteye çıkamaz (proxy CONNECT reddi, 2026-09-08
-   ölçüldü). Orada hedef = yerel `pnpm build && pnpm start` (`http://localhost:3000`). Vercel
+5. **Uzak Claude Code konteynerinde** claude-in-chrome yoktur ve başsız tarayıcı dış siteye çıkamaz (proxy
+   CONNECT reddi, 2026-09-08 ölçüldü). Tarayıcı turu orada koşulmaz: durum `ENGELLI` yazılır. Vercel
    preview veya prod bakışı **yerel makineden** koşulur.
 
 ## YTN-21 eklemeleri: tarayıcı güvenliği ve ağ/konsol teşhisi
@@ -109,7 +109,7 @@ rapora girer: `URL= HTTP= TEXT_WORDS= INTERACTIVE= CONSOLE_ERRORS= LINKS_BROKEN=
 | `TEXT_WORDS` | `javascript_tool`, aynı adresin sunucu HTML'i (JS'siz) salt okuma: `const h=await(await fetch(location.href,{credentials:'omit'})).text(); h.replace(/<(script\|style\|noscript)[\s\S]*?<\/\1>/gi,' ').replace(/<[^>]+>/g,' ').split(/\s+/).filter(Boolean).length` |
 | `INTERACTIVE` | `javascript_tool`: `document.querySelectorAll('a,button,input,select,textarea,[role=button]').length` |
 | `CONSOLE_ERRORS` | `read_console_messages` (yalnız error; sayfa açıldıktan ve her etkileşimden sonra) |
-| `LINKS_BROKEN` | `javascript_tool`, aynı kökenli en çok 30 bağlantıya salt okuma `fetch` (HEAD), durumu 400 ve üstü olanlar |
+| `LINKS_BROKEN` | `javascript_tool`, aynı kökenli en çok 30 bağlantıya salt okuma `fetch` (HEAD), durumu 400 ve üstü olanlar; çıkış, sepet, silme gibi yan etkili bağlantıları atla, 405 veren HEAD'i GET ile yeniden dene |
 | `KARE` | `computer` ekran görüntüsü; rapora hangi sayfa, hangi adım, hangi genişlik yazılır |
 
 `TEXT_WORDS` **kural 5 ölçümüdür**: vitrin sayfasında 0-20 kelime = Suspense sınırı sayfa kökünde, kırmızı (tarayıcı
@@ -153,7 +153,7 @@ hukuki/bilgi sayfaları sonra. 5-10 iyi kanıtlı bulgu > 20 belirsiz cümle.
 Şiddet: critical | high | medium | low      Kategori: functional | visual | ux | content | perf | a11y | console
 Sayfa: <url>  (tr/en, masaüstü/mobil)
 Tekrar: 1) … 2) …   (ikinci denemede de oldu mu? — tek seferlik ise "doğrulanamadı")
-Kanıt: ekran/issue-NNN-once.jpg, ekran/issue-NNN-sonra.jpg, CONSOLE_ERRORS=…
+Kanıt: önce ve sonra karesi (sayfa, adım, genişlik), CONSOLE_ERRORS=…
 Beklenen / Gözlenen:
 ```
 
