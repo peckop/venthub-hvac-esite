@@ -257,6 +257,10 @@
     {
      "ad": "incremental-implementation",
      "kb": 7.7
+    },
+    {
+     "ad": "calisma-kopyasi-sil",
+     "kb": 6.5
     }
    ],
    "bekleyen": []
@@ -495,6 +499,10 @@
     {
      "ad": "diagram",
      "kb": 16
+    },
+    {
+     "ad": "rehber-yayin",
+     "kb": 6.6
     }
    ],
    "bekleyen": []
@@ -526,7 +534,12 @@
     }
    ],
    "toplamKB": 12.5,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "write-seo-geo-content",
+     "kb": 24.2
+    }
+   ],
    "bekleyen": []
   },
   {
@@ -720,6 +733,10 @@
     {
      "ad": "write-seo-geo-content",
      "kb": 24.2
+    },
+    {
+     "ad": "seo-olcum",
+     "kb": 4.2
     }
    ],
    "bekleyen": []
@@ -741,7 +758,12 @@
     }
    ],
    "toplamKB": 13.9,
-   "adiylaCagir": [],
+   "adiylaCagir": [
+    {
+     "ad": "dizin-takip",
+     "kb": 6.8
+    }
+   ],
    "bekleyen": []
   },
   {
