@@ -146,6 +146,14 @@ describe('gsc tablo kapısı', () => {
     const parcalar = (r.kaydet as string).split(' ')
     expect(kaydetArgumanlariCoz(parcalar.slice(2))).toMatchObject({ motor: 'google', eylem: 'istek', adresler: [adres] })
   })
+  it('zorla ile ISTENDI: kaydet satırı --neden yer tutucusu taşır (gerekçesiz zorlama kaydı yapıştırılmaz)', async () => {
+    const { baglam } = sahteSayfa()
+    const adres = 'https://venthub.com.tr/tr/bilgi-merkezi/yazi-z'
+    vm.runInNewContext(gscParcacigi([]), baglam)
+    const r = await baglam.window.__iste(adres, false, { zorla: true })
+    expect(r.sonuc).toBe('ISTENDI')
+    expect(r.kaydet).toBe(`node scripts/seo/dizin-takip.mjs --kaydet google istek ${adres} --neden "<zorla gerekcesi>"`)
+  })
   it('ISTENDI dışındaki her sonuçta kaydet alanı YOK (HATA, ZAMAN ASIMI, TABLODA YOK, TEKRAR RED)', async () => {
     const hata = sahteSayfa('hata')
     vm.runInNewContext(gscParcacigi(['https://a/']), hata.baglam)
@@ -313,8 +321,8 @@ describe('gsc --kalan google (SEO-127)', () => {
     }
   })
   it('alt süreç betiği ortam değişkeniyle değişir; varsayılan komşu dizin-takip.mjs\'dir', () => {
-    expect(dizinTakipBetigi({ DIZIN_TAKIP_BETIK: '/x/sahte.mjs' })).toBe('/x/sahte.mjs')
-    const varsayilan = dizinTakipBetigi({})
+    expect(dizinTakipBetigi({ DIZIN_TAKIP_BETIK: '/x/sahte.mjs' } as unknown as NodeJS.ProcessEnv)).toBe('/x/sahte.mjs')
+    const varsayilan = dizinTakipBetigi({} as unknown as NodeJS.ProcessEnv)
     expect(varsayilan.replace(/\\/g, '/')).toMatch(/scripts\/seo\/dizin-takip\.mjs$/)
     expect(existsSync(varsayilan)).toBe(true)
   })

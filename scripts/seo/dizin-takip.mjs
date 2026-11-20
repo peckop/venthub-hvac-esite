@@ -372,8 +372,9 @@ export function yeniOlanlar(mevcut, adaylar) {
 
 /** SEO-127: `--kart` biçimi (Kanban numarası): ÖNEK-sayı, büyük harf. */
 export const KART_BICIMI = /^[A-Z]+-\d+$/
-/** `--kaydet` adres argümanından sonra DEĞER alan seçenekler: fazla-argüman taramasında değerleri bağımsız argüman sanmamak için atlanır. */
-const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart', '--cikti', '--gun', '--adres', '--degisen', '--klasor', '--kalan', '--sinir']
+/** `--kaydet` yolunun okuduğu DEĞERLİ seçenekler: fazla-argüman taramasında değerleri bağımsız argüman sanmamak için atlanır. Liste bilerek dardır:
+ * `--kaydet` ile anlamsız bir değerli seçenek (`--adres B`, `--kalan B`) verilirse değeri fazla argüman sayılır ve HATA verir (B sessizce düşmez). */
+const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart']
 
 /**
  * SEO-127: `--kaydet <motor> <eylem> <adresler> [--neden t] [--kart K]` argümanlarını çözer ve doğrular (saf işlev; çıkış kararı çağırandadır).
@@ -385,6 +386,8 @@ const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kar
  */
 export function kaydetArgumanlariCoz(arg) {
   const i = arg.indexOf('--kaydet')
+  const esittir = arg.find((a) => /^--[^=\s]+=/.test(a))
+  if (esittir !== undefined) return { hata: `${JSON.stringify(esittir)}: --ad=değer biçimi okunmaz (değer sessizce düşerdi); --ad değer biçiminde ver` }
   const [motor, eylem, liste] = arg.slice(i + 1, i + 4)
   if (liste === undefined || liste.startsWith('--')) return { hata: '--kaydet <motor> <eylem> <adres,adres> eksik: üç konumsal argüman ister' }
   const fazla = []
@@ -394,8 +397,8 @@ export function kaydetArgumanlariCoz(arg) {
   }
   if (fazla.length) return { hata: `--kaydet adres argümanından sonra fazladan argüman ${JSON.stringify(fazla[0])}: adresleri virgülle tek argüman ver (boşlukla ayrılan ikinci ve sonraki adres kaydedilmezdi); --neden metnini tırnakla ver` }
   const adresler = liste.split(',').map((s) => s.trim()).filter(Boolean)
-  const httpsDegil = adresler.find((a) => !/^https:\/\//.test(a))
-  if (httpsDegil !== undefined) return { hata: `--kaydet adresi https:// ile başlamalı: ${JSON.stringify(httpsDegil)} (Git Bash /tr/... yolunu Windows yoluna çevirir; tam https adres ver)` }
+  const httpsDegil = adresler.find((a) => !/^https:\/\/\S+$/.test(a))
+  if (httpsDegil !== undefined) return { hata: `--kaydet adresi https:// ile başlamalı ve boşluk/yeni satır içermemeli: ${JSON.stringify(httpsDegil)} (satır satır listeyi virgülle birleştir; Git Bash /tr/... yolunu Windows yoluna çevirir; tam https adres ver)` }
   const secenek = (ad) => {
     const k = arg.indexOf(ad)
     if (k < 0) return { var_: false, deger: null }

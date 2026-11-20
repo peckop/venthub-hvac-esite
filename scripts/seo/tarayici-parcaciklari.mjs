@@ -78,7 +78,7 @@ window.__iste = async function(url, ilk, secenek){
   const kilitBende = !window.__gonderildi.has(url);
   window.__gonderildi.add(url);
   const r = await govde(url, ilk);
-  if(r.sonuc==='ISTENDI' && /^https:\\/\\/[A-Za-z0-9._~\\/%-]+$/.test(url)) r.kaydet = 'node scripts/seo/dizin-takip.mjs --kaydet google istek ' + url;
+  if(r.sonuc==='ISTENDI' && /^https:\\/\\/[A-Za-z0-9._~\\/%-]+$/.test(url)) r.kaydet = 'node scripts/seo/dizin-takip.mjs --kaydet google istek ' + url + (zorla ? ' --neden "<zorla gerekcesi>"' : '');
   const tiklanmadi = r.durum==='GIRIS YOK' || r.durum==='DUGME YOK';
   if(kilitBende && (tiklanmadi || String(r.sonuc||'').indexOf('HATA:')===0)) window.__gonderildi.delete(url);
   return r;

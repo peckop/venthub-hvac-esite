@@ -416,6 +416,24 @@ describe('SEO-127: --kaydet argüman kapıları (INV-DIZIN-KAYDET-1)', () => {
       expect((r as { hata: string }).hata).toContain('https://')
     }
   })
+  it('boşluk ya da yeni satır içeren tek argüman HATA: "$(cat kalan.txt)" iki adresi tek bozuk satır yazardı', () => {
+    for (const kotu of [`${A}\n${B}`, `${A} ${B}`, `${A}\t${B}`, `${B},${A}\n${B}`]) {
+      const r = c('google', 'istek', kotu)
+      expect(r, JSON.stringify(kotu)).toHaveProperty('hata')
+      expect((r as { hata: string }).hata).toContain('boşluk')
+    }
+  })
+  it('--ad=değer biçimi HATA: --neden=x ve --kart=SEO-1 eskiden sessizce yutulurdu', () => {
+    for (const kotu of ['--neden=bilerek tekrar', '--kart=SEO-127', '--kart=seo-bozuk', '--sonuc=aramada']) {
+      const r = c('google', 'istek', A, kotu)
+      expect(r, kotu).toHaveProperty('hata')
+      expect((r as { hata: string }).hata).toContain('--ad=değer')
+    }
+    expect(kaydetArgumanlariCoz(['--hareket=/x/y.jsonl', '--kaydet', 'google', 'istek', A])).toHaveProperty('hata')
+  })
+  it('--kaydet ile anlamsız değerli seçenek (--adres B, --kalan B) değeri sessizce düşmez: HATA', () => {
+    for (const ad of ['--adres', '--kalan', '--cikti', '--sinir']) expect(c('google', 'istek', A, ad, B), ad).toHaveProperty('hata')
+  })
   it('eksik konumsal argüman ya da seçenek adres yerine HATA', () => {
     expect(c('google', 'istek')).toHaveProperty('hata')
     expect(c('google', 'istek', '--sonuc', 'aramada')).toHaveProperty('hata')
