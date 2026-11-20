@@ -12,7 +12,7 @@ metadata:
 > Bu skill **akışı sıralar, kuralı yeniden yazmaz.** Karar tablosu ve eşikler `docs/standards/dizin-sistemleri-standard.md` D7'de,
 > yayın sonrası zincir `docs/standards/rehber-yazisi-standard.md` R10'dadır (B11-B12 basamakları). Ayrıntı için oraya bak.
 
-Neden var: dizin isteği kotalıdır (Google günde yaklaşık 10, Yandex 10, Bing 100). Aynı adrese ikinci kez istek atmak kotayı yakar ve hiçbir şey kazandırmaz. Bu yüzden her istek bir defterde izlenir ve yalnız karar tablosu "YAP" ya da "TEKRAR" derse atılır.
+Neden var: dizin isteği kotalıdır (Google günde yaklaşık 10, Yandex 10, Bing 100). Aynı adrese ikinci kez istek atmak kotayı yakar ve hiçbir şey kazandırmaz. Bu yüzden her istek bir defterde izlenir ve yalnız karar tablosu "YAP" derse atılır; "TEKRAR" yalnız Bing ve Yandex'te vardır, Google'da aynı adrese tek istek gider (D7 madde 15).
 
 ## Öncelik (Recep, 8 Kasım)
 
@@ -22,17 +22,19 @@ Dizin isteği GEO-SEO listesinin en önündedir; takip ve kontrol ölçümlerind
 
 1. **Durum.** `GSC_SA_ANAHTAR` ortam değişkeni servis hesabı anahtar dosyasını gösterir (yolu ve içeriği depoya yazma). Sonra:
    `node scripts/seo/dizin-takip.mjs --durum --cikti <depo dışı yol>`
-   Her adres × motor için bir durum döner: **TAMAM / BEKLE / TEKRAR / YAP / ATLA / ESKI / OLCULEMEDI**. İstek yalnız **YAP** ve **TEKRAR** satırlarına atılır; diğerlerine atılmaz. OLCULEMEDI "taranmadı" demek değildir, ölçemedim demektir.
-2. **Motor adımı** (yalnız YAP/TEKRAR olanlar):
+   Her adres × motor için bir durum döner: **TAMAM / BEKLE / TEKRAR / YAP / ATLA / ESKI / OLCULEMEDI**. İstek **YAP** satırlarına atılır; **TEKRAR** yalnız Bing (5 gün) ve Yandex'te (7 gün) çıkar, Google'da çıkmaz (karar BEKLE kalır). Diğerlerine istek atılmaz. OLCULEMEDI "taranmadı" demek değildir, ölçemedim demektir.
+2. **Motor adımı** (yalnız YAP olanlar; Bing ve Yandex'te TEKRAR da):
    - **Google:** Chrome (claude-in-chrome) ile Search Console. Üstteki "URL'yi denetle" kutusuna TAM `https://` adresi yaz, Enter; sonuç gelince "Dizine eklenmesini iste". 1-3 dakika bekle. Başarı mesajı "Dizine eklenmesi istendi"; "Kota Aşıldı" görünürse dur, yarına bırak.
    - Açılış satırı: `node scripts/seo/dizin-acilis.mjs --sadece-satir` son anlık görüntüden YAP/TEKRAR sayılarını verir; bugün ölçüm yoksa `--durum` arka planda başlar. İstek yine tablodan okunarak atılır.
-   - Google tıklaması iki adımdır (SEO-130): önce kalan adresleri çıkar, `node scripts/seo/dizin-takip.mjs --kalan google --sinir N > f` (N = günün kalan kotası, f depo dışı bir dosya); sonra parçacık yalnız o listeyle çalışır, `node scripts/seo/tarayici-parcaciklari.mjs gsc --izinli f` (window.__iste(adres, ilk)); sonra `--kaydet`. Listede olmayan adrese istek atılmaz; tek istisna `--zorla`. Robot doğrulaması çıkarsa dur.
+   - Google tıklaması tek komutla başlar (SEO-127, SEO-130): `node scripts/seo/tarayici-parcaciklari.mjs gsc --kalan google --sinir N` (N = günün kalan kotası). Liste dizin-takip tablosundan türer ve parçacığa gömülür; elle liste dosyası (`--izinli f`) uyarı verir, tercih edilmez. Tarayıcıda `window.__iste(adres, ilk)` çağrılır. Liste en çok 15 adres alır, aşılırsa çıkış 2; `--kalan` ile `--izinli`/`--zorla` birlikte verilmez.
+   - `__iste` dönüşleri: **ISTENDI** (çıktıdaki hazır `kaydet` satırını aynen koştur), **TABLODA YOK** (adres listede değil, istek atılmaz), **TEKRAR RED** (aynı oturumda ikinci istek, atılmaz). Robot doğrulaması çıkarsa dur.
+   - Tek istisna bilerek tekrar: tarayıcıda `__iste(adres, ilk, {zorla:true})`. CLI'da `gsc --zorla` listesiz parçacık üretir ama yine her çağrıda `{zorla:true}` ister. Gerekçe deftere yazılır: `--kaydet ... --neden "<gerekçe>"`.
    - **Bing:** `node scripts/seo/bing-url-gonder.mjs --gonder <adresler>` (günde 100).
    - **Yandex:** webmaster.yandex.com, bu site için indexing/reindex sayfasındaki metin kutusuna adresler satır satır (günde 10).
    - **IndexNow:** `node scripts/seo/degisen-adres-bildir.mjs --taban … --kuyruk … --uygula`. Başlık/açıklama/H1 aynı kalıp gövdesi değişen yazı fark görünmez; o zaman listeyi zorla: `… --kuyruk … --adres <tam https adresler, virgülle> --uygula` (kapılar aynı: haritada, 200, kanonik kendisi).
 3. **Kayıt, aynı turda.** Eylemden hemen sonra:
-   `node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <https-adres,adres>`
-   `--sonuc` ve `--tarih` isteğe bağlıdır; Yandex'te panel geçmişinden gelen eski kayıt için `--tarih` verilir. Eski kayıtları toplu almak için `--ice-aktar` vardır. Kayıt atlanırsa bir sonraki `--durum` aynı adrese yine YAP der ve kota boşa gider.
+   `node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum> <https://adres1,https://adres2>`
+   Adresler virgülle tek argümandır ve her biri `https://` ile başlar; boşlukla verilen ikinci adres, http'siz adres ve Git Bash'in çevirdiği `C:/Program Files/Git/...` çıkış 2 verir (SEO-127). `--neden "<gerekçe>"` ve `--kart <ÖNEK-sayı>` satıra gerekçe ve kart yazar (zorla istekte gerekçe yazılır). `--sonuc` ve `--tarih` isteğe bağlıdır; Yandex'te panel geçmişinden gelen eski kayıt için `--tarih` verilir. Eski kayıtları toplu almak için `--ice-aktar` vardır. Kayıt atlanırsa bir sonraki `--durum` aynı adrese yine YAP der ve kota boşa gider.
 
 ## Tuzaklar (ölçülmüş)
 
