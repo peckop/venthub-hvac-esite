@@ -38,7 +38,6 @@ const DIS_BAGIMLILIK: Record<string, { kaynak: Kaynak; olcum: string }> = {
   pdf: { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/pdf (dosya var; canlı denenmedi)' },
   // "adıyla çağır" listelerinde geçenler (ön yüklenmez, Skill aracıyla çağrılır); aynı ölçüm: dosya ~/.claude/skills altında var
   benchmark: { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/benchmark (adıyla çağır; dosya var)' },
-  browse: { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/browse (adıyla çağır; dosya var)' },
   canary: { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/canary (adıyla çağır; dosya var)' },
   'design-dna': { kaynak: 'kullanici', olcum: '2026-10-01: ~/.claude/skills/design-dna (adıyla çağır; dosya var)' },
   // HRT-61: BLOG uygulayıcı satırı artık üretilir (uret: true), adıyla çağır listesindeki diagram taranır

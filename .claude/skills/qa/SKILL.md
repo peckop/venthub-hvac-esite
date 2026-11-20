@@ -20,8 +20,8 @@ description: >-
 > **ALINAN (yöntem):** diff-farkında mod, sayfa başına kontrol listesi, iki kanıt katmanı
 > (etkileşimli/statik), sağlık puanı rubriği ve ağırlıkları, düzeltme döngüsü (bul → asgari fix →
 > commit → yeniden ölç → sınıfla), öz-denetim eşiği (%20) ve 50 üst sınırı, "tarayıcıyı atlama" kuralı.
-> **BİZDEN:** `scripts/gez.mjs` (sıfırdan; Playwright+Chromium, etiketli çıktı, `TEXT_WORDS` = kural 5
-> ölçümü), güvenlik sınırı (prod yalnız bakış, "Ödemeye Geç" yasak), VentHub kontrol listesi (fiyat,
+> **BİZDEN:** etiketli ölçüm satırları (claude-in-chrome ile; `TEXT_WORDS` = kural 5
+> ölçümü; Playwright betiği YTN-59'da kalktı), güvenlik sınırı (prod yalnız bakış, "Ödemeye Geç" yasak), VentHub kontrol listesi (fiyat,
 > kategori adı, SKU sızıntısı, 3D), TR/EN çift gezinti, rapor yeri (`docs/audits/`), uzak konteyner
 > kısıtı, migration → ayrı emir kuralı. **ALINMAYAN:** Aside tarayıcı, `$B` ikilisi, learnings-log,
 > telemetri, TODOS.md, test-bootstrap bölümü.
@@ -46,16 +46,16 @@ ekran görüntüsünü **Recep'e gösterir**, konsolu okur ve kanıtsız hiçbir
 4. **Preview/staging'de mutasyon** (form gönderme, kayıt oluşturma) için koşum başına **bir kez**
    Recep'e sorulur; uzak/otonom oturumda sorulamıyorsa mutasyon yapılmaz, rapora "doğrulanamadı"
    yazılır.
-5. **Uzak Claude Code konteynerinde** Chromium dış siteye çıkamaz (proxy CONNECT reddi, 2026-09-08
-   ölçüldü). Orada hedef = yerel `pnpm build && pnpm start` (`http://localhost:3000`). Vercel
+5. **Uzak Claude Code konteynerinde** claude-in-chrome yoktur ve başsız tarayıcı dış siteye çıkamaz (proxy
+   CONNECT reddi, 2026-09-08 ölçüldü). Tarayıcı turu orada koşulmaz: durum `ENGELLI` yazılır. Vercel
    preview veya prod bakışı **yerel makineden** koşulur.
 
 ## YTN-21 eklemeleri: tarayıcı güvenliği ve ağ/konsol teşhisi
 
 > Kaynak: addyosmani/agent-skills browser-testing-with-devtools @f3400940f6961e68fa56bdb6214d0183d8d8ae49 (MIT); VentHub'a uyarlandı, 26 Ekim 2026, YTN-21. MCP/DevTools kurulumu alınmadı.
 
-**Tarayıcı seçimi.** Etkileşimli bakış için uygulama içi tarayıcı bölmesi ya da claude-in-chrome kullanılır; yeni
-başsız tarayıcı ya da Playwright süreci açılmaz (aşağıdaki `scripts/gez.mjs` ve `e2e/` mevcut araçlardır, bu satır yeni araç eklemeyi yasaklar).
+**Tarayıcı seçimi.** Gezi ve ölçüm yalnız claude-in-chrome ile yapılır (filo kuralı: tarayıcı yalnız claude-in-chrome);
+yeni başsız tarayıcı ya da Playwright süreci açılmaz. `e2e/` depodaki test paketidir, bu skill'in gezi aracı değildir.
 
 **Profil yalıtımı.** Gerçek, oturum açık tarayıcı profili ihtimalen e-posta, banka ve yönetim paneli oturumları taşır;
 sayfadaki enjekte talimat + oturum açık tarayıcı en kötü birleşimdir. Localhost testi gerçek oturum istemez: mümkünse
@@ -93,24 +93,31 @@ yeniden oynat, yanıtı doğrula.
 | URL verildi | O URL; preview (`*.vercel.app`) → tam mod; prod → yalnız bakış |
 | `--hizli` | Ana sayfa + üst gezinmedeki ilk 5 hedef, 2 dakika |
 
-Yerel sunucu: `pnpm build && pnpm start` (Playwright config `webServer` ile aynı). Ortam
-değişkenleri `.env.local`'dan; yoksa admin/checkout sayfaları giriş ister, rapora yaz.
+Yerel sunucu: `pnpm build && pnpm start`. Ortam değişkenleri `.env.local`'dan; yoksa admin/checkout
+sayfaları giriş ister, rapora yaz.
 
-## Araç: `scripts/gez.mjs`
+## Araç: claude-in-chrome
 
-```bash
-node .claude/skills/qa/scripts/gez.mjs <url> [--out qa-raporlari/ekran] [--ad isim] [--mobil] [--linkler] [--tikla "button:Sepete Ekle"]
-# uzak konteynerde: QA_CHROMIUM=/opt/pw-browsers/chromium node ...
-```
+Araçlar ertelenmişse tek `ToolSearch` çağrısıyla yükle (`tabs_context_mcp`, `tabs_create_mcp`, `navigate`, `computer`,
+`read_page`, `get_page_text`, `read_console_messages`, `read_network_requests`, `resize_window`, `javascript_tool`).
+Önce `tabs_context_mcp`; kendi yeni sekmende çalış, Recep'in açık sekmelerine dokunma. Her sayfa için bu satırlar
+rapora girer: `URL= HTTP= TEXT_WORDS= INTERACTIVE= CONSOLE_ERRORS= LINKS_BROKEN= KARE=`.
 
-Satır etiketli çıktı rapora olduğu gibi girer: `URL= HTTP= TEXT_WORDS= INTERACTIVE= CONSOLE_ERRORS=
-LINKS_BROKEN= SCREENSHOT=` ve sonda `QA_STEP_OK`. `TEXT_WORDS` sunucu HTML'inin (JS'siz) görünür
-kelime sayısıdır — **kural 5 ölçümü**: vitrin sayfasında 0-20 kelime = Suspense sınırı sayfa
-kökünde, kırmızı. `--mobil` Pixel 7 emülasyonu (reflow, T050 hattı). Betik aynı anda tek bir
-etkileşim yapar; çok adımlı akış için `e2e/` deseninde geçici bir Playwright spec yaz
-(`scratchpad`'e, repoya değil) ve aynı etiketleri bas.
+| Satır | Nasıl ölçülür |
+|---|---|
+| `URL`, `HTTP` | `navigate`, sonra `read_network_requests` (belge isteğinin durumu) |
+| `TEXT_WORDS` | `javascript_tool`, aynı adresin sunucu HTML'i (JS'siz) salt okuma: `const h=await(await fetch(location.href,{credentials:'omit'})).text(); h.replace(/<(script\|style\|noscript)[\s\S]*?<\/\1>/gi,' ').replace(/<[^>]+>/g,' ').split(/\s+/).filter(Boolean).length` |
+| `INTERACTIVE` | `javascript_tool`: `document.querySelectorAll('a,button,input,select,textarea,[role=button]').length` |
+| `CONSOLE_ERRORS` | `read_console_messages` (yalnız error; sayfa açıldıktan ve her etkileşimden sonra) |
+| `LINKS_BROKEN` | `javascript_tool`, aynı kökenli en çok 30 bağlantıya salt okuma `fetch` (HEAD), durumu 400 ve üstü olanlar; çıkış, sepet, silme gibi yan etkili bağlantıları atla, 405 veren HEAD'i GET ile yeniden dene |
+| `KARE` | `computer` ekran görüntüsü; rapora hangi sayfa, hangi adım, hangi genişlik yazılır |
 
-**Her ekran görüntüsünü `Read` ile aç** ki Recep de görsün; okunmayan görüntü yok hükmündedir.
+`TEXT_WORDS` **kural 5 ölçümüdür**: vitrin sayfasında 0-20 kelime = Suspense sınırı sayfa kökünde, kırmızı (tarayıcı
+yerleşimi değil, sunucunun verdiği gövde sayılır). Mobil bakış: `resize_window` ile 390×844; bitince eski boyuta dön.
+Etkileşim (tıklama, form) `computer` ile yapılır, her adımdan sonra konsol okunur; çok adımlı akış aynı sekmede ardışık
+adımlardır, betik yazılmaz. Güvenlik sınırı ve "JavaScript yürütme: salt okuma" kuralı bu ölçümlerin hepsi için geçerlidir.
+
+**Her ekran görüntüsünü bulguyla birlikte Recep'e göster**; rapora girmeyen kare yok hükmündedir.
 
 ## Diff-farkında mod (özellik dalında varsayılan)
 
@@ -121,9 +128,8 @@ etkileşim yapar; çok adımlı akış için `e2e/` deseninde geçici bir Playwr
    fonksiyonu çağıran akış (checkout, iade…).
 3. Sayfa bulunamıyorsa **tarayıcıyı atlama**: hızlı mod koş (backend/config değişikliği de
    uygulamayı bozar).
-4. Her etkilenen sayfa için: gez → ekran görüntüsü → `CONSOLE_ERRORS` → etkileşimliyse `--tikla`
-   ya da geçici spec ile akışı sür → **TR ve EN** ikisi de (i18n parity) → görsel değişiklikse
-   `--mobil` de.
+4. Her etkilenen sayfa için: gez → ekran görüntüsü → `CONSOLE_ERRORS` → etkileşimliyse tıklayarak
+   akışı sür → **TR ve EN** ikisi de (i18n parity) → görsel değişiklikse 390 px de.
 5. Commit mesajı/PR açıklamasındaki niyetle karşılaştır: değişiklik yapması gerekeni yapıyor mu?
 6. Bitişik sayfalarda regresyon var mı (aynı bileşeni kullanan bir başka rota)?
 
@@ -147,7 +153,7 @@ hukuki/bilgi sayfaları sonra. 5-10 iyi kanıtlı bulgu > 20 belirsiz cümle.
 Şiddet: critical | high | medium | low      Kategori: functional | visual | ux | content | perf | a11y | console
 Sayfa: <url>  (tr/en, masaüstü/mobil)
 Tekrar: 1) … 2) …   (ikinci denemede de oldu mu? — tek seferlik ise "doğrulanamadı")
-Kanıt: ekran/issue-NNN-once.jpg, ekran/issue-NNN-sonra.jpg, CONSOLE_ERRORS=…
+Kanıt: önce ve sonra karesi (sayfa, adım, genişlik), CONSOLE_ERRORS=…
 Beklenen / Gözlenen:
 ```
 
@@ -173,7 +179,7 @@ Her bulgu için şiddet sırasıyla:
    Tailwind yok, sözlük dışı metin yok, migration gerekiyorsa **bu döngüde yapılmaz** (kural 13 →
    ayrı emir).
 3. **Commit** — `fix(qa): ISSUE-NNN — kısa açıklama`, yalnız değişen dosyalar.
-4. **Yeniden ölç** — aynı sayfayı aynı komutla gez; `-sonra.jpg` + `CONSOLE_ERRORS` karşılaştır.
+4. **Yeniden ölç** — aynı sayfayı aynı adımlarla gez; önceki ve sonraki kareyi + `CONSOLE_ERRORS` karşılaştır.
 5. **Sınıfla** — `verified` (yeniden ölçüm doğruladı, yeni hata yok) · `best-effort` (auth/dış
    servis yüzünden tam ölçülemedi) · `reverted` (kötüleşti → `git revert HEAD`, bulgu "deferred").
 6. **Regresyon testi** — `verified` ve davranışsal (saf CSS değil) düzeltmede `e2e/` ya da vitest
