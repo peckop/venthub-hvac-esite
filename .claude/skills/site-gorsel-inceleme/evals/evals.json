@@ -3,7 +3,7 @@
     "siteyi baştan aşağı kullanıcı gözüyle incele, her şablonu puanla",
     "ana sayfa ilk bakışta ne anlatıyor, nereye basılır belli mi bak",
     "mobilde yerleşim bozuk mu, 390 pikselde şablonları gezip bulguları raporla",
-    "önizlemedeki panel ekranlarını görsel tutarlılık açısından 1-5 puanla",
+    "ürün kartı, kategori ve ana sayfa şablonlarının görsel tutarlılığını 1-5 puanla, düzeltme yapma",
     "gorsel inceleme turu baslat, önizleme sitesinin ürün ve karşılaştır sayfalarından başla",
     "hiyerarşi, boşluk ve hizalama kusurlarını raporla, düzeltme yapma",
     "görsel inceleme turunda kontrastlar ve odak halkası nasıl, klavyeyle gezince takılan yer var mı, sayfa şablonlarını puanla",
@@ -11,7 +11,7 @@
     "teklif formu şablonunu ilk beş saniyede ne anlaşılıyor diye değerlendir ve 1-5 puan ver",
     "sitenin tüm sayfa şablonlarını masaüstü ve mobilde gezip tutarsızlıkları listele",
     "fotoğraf üstündeki yazılar okunuyor mu, ürün kartları sayfalar arası aynı mı, görsel olarak incele",
-    "önizleme panelinde masa ve teklif listesi için görsel inceleme turu yap, bilgi yoğunluğu ve hiyerarşiyi S1-S4 puanla"
+    "mobil ve masaüstünde sayfa şablonlarının boşluk ve hizalamasını kareyle raporla, ilk bakışta ne anlaşıldığını yaz"
   ],
   "should_not_trigger": [
     "bu butonun rengini değiştir ve kodu düzelt",
