@@ -96,6 +96,9 @@ Okuma notları (2. bölüm için). Tarihler 2026'dır. Durum: **geçti** = ilk �
 | Panel: yoğunluk, tablo, çekmece, sekme (masaüstü 8 ekran) | 2026-11-20 | 0/10/8 | açık; Design'a gitmedi | Design düzeltti |
 | Panel: 390 px (6 ekran) ve alt çubuk | 2026-11-20 | 2/6/4 | açık: "D" harfi, konum sıfırlanması, satır tıklaması şüphesi (390'da yeniden doğrulanacak) | yeniden doğrulama |
 | Kurumsal Belge önizlemesi | 2026-11-20 | 0/1/5 | 390 ölçülemedi (sayfa daralmıyor) | ölçülmedi |
+| Site: klavye ve odak (14 şablon masaüstü, 3 şablon 390 px) | 2026-11-20 | 0/5/1 | açık: arama paneli odak çıkınca kapanmıyor ve odağı örtüyor, alt bilgi odak halkası 1:1, mobil Ürün sabit alt çubuk odağı örtüyor, menü çekmecesi odağı içeri almıyor ve 7 adsız durak, atlama bağlantısı yok, radyo grupları ayrı durak; Tab ile çıkılamayan yer yok; Design'a gitmedi (ek 2, OPS onayı bekliyor) | Design düzeltti |
+| Ölçülmedi: mobil odak örtmesi gerçek telefon yüksekliğinde (önizleme penceresi 616 px) | 2026-11-20 | n/a | ölçülmedi (araç: pencere yüksekliği sabit) | gerçek cihaz ya da yüksek pencerede yeniden |
+| Ölçülmedi: 44 px altı öğelerin ::after basma alanı (Gizli seviyeler 14×28, Kodu kopyala 28×28, galeri noktaları 22×44 ve diğerleri) | 2026-11-20 | n/a | ölçülmedi (gerçek tıkla doğrulanmadı) | Design düzeltti ya da gerçek tıkla ayrı ölçüm |
 | Ölçülemeyen: Hesabım oturumlu, Teklif onayı geçerli hâl, 404 yükleniyor/hata | 2026-11-20 | n/a | ölçülmedi (kimlik girilmez, örnek teklif yok, durum sayfada yok) | Design'a soru |
 
 ## 3 Sırada ve yapılabilecekler
