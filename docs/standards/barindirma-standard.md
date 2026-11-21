@@ -23,7 +23,7 @@
 | Giden e-posta | Resend — **alan adı doğrulanmamış** | `resend._domainkey` yok, `_dmarc` yok | REC-368 |
 | Ziyaretçi analitiği | `@vercel/analytics` bileşeni var, **projede Web Analytics açık değil** | Vercel API `count_pageviews` → 404 "Web Analytics not found" | Veri toplamıyor → sökülür (§B4) |
 | Görsel optimizasyonu | **Kapalı** (`next.config.mjs` `images.unoptimized: true`) | Hobby dönüşüm kotası (5000) köprüsü | Sağlayıcı seçilince yeniden değerlendirilir |
-| Medya (katalog PDF'i, model görseli) | **Cloudflare R2**, iki kova: `venthub-katalog` (22 PDF), `venthub-gorsel` (675 görsel); ikisi de **kapalı** (21 Kasım 2026) | `C:/tmp/ktl100-out/yukle-manifest.jsonl` (697 satır, hepsi `yuklendi`, 21 Kasım 15:28-15:54); kapalı olması OPS ölçümü (21 Kasım) | Kural §B7. `venthub-yedek` kovası **AÇILMADI**, bu cetvelde yoktur |
+| Medya (katalog PDF'i, model görseli) | **Cloudflare R2**, iki kova: `venthub-katalog` (22 PDF), `venthub-gorsel` (675 görsel); ikisi de **kapalı** (21 Kasım 2026) | 21 Kasım yerel kayıt `C:/tmp/ktl100-out/yukle-manifest.jsonl` (geçici; kalıcı kanıt KTL-100 notu; 697 satır, hepsi `yuklendi`, 21 Kasım 15:28-15:54); kapalı olması OPS ölçümü (21 Kasım) | Kural §B7. `venthub-yedek` kovası **AÇILMADI**, bu cetvelde yoktur |
 
 ## B2 — Site adresi derleme anında VERİLİR (DEĞİŞMEZ)
 
@@ -85,21 +85,24 @@ değildir ama ilk isteklerin yavaş olacağı bilinir.
 ## B7 — Medya kovası (Cloudflare R2): kurallar (21 Kasım 2026, OPS-354 / KTL-100)
 
 **Bugünkü durum (OPS ölçümü, 21 Kasım 2026):** `venthub-katalog` (22 PDF) ve `venthub-gorsel` (675 görsel) **kapalı**;
-`r2.dev` genel adresi kapalı; API anahtarı **yok**; özel alan adı **yok**. Yükleme kaydı `yukle-manifest.jsonl`:
+`r2.dev` genel adresi kapalı; API anahtarı **yok**; özel alan adı **yok**. Yükleme kaydı `yukle-manifest.jsonl`
+(21 Kasım yerel kayıt, `C:/tmp` geçici; kalıcı kanıt KTL-100 kanıt notudur, bu dosya değil):
 697 satır (22 + 675), her satırda kova, anahtar, bayt, `sha256`, tür, sonuç ve saat. `venthub-yedek` adlı bir kova
 **açılmadı**: yedek kovası bu cetvelde "var" diye anılmaz; açıldığı gün ayrı madde olarak eklenir.
 
 1. **Model başına anahtar.** Dosya anahtarı model (ürün) başınadır; aynı görsel birçok modelde kullanılsa da dosya
    modelin anahtarıyla yazılır (ölçüm: 675 dosyanın benzersiz içeriği 77 dosyadır, tekilleştirme için anahtar bozulmaz).
-2. **Yüklemede hash geri okuma.** Her yükleme sonrası nesne geri okunur ve `sha256` kaydı ile karşılaştırılır; eşleşmeyen
-   satır `yuklendi` yazılmaz. Kanıt kaydı manifesttir.
+2. **Yükleme öncesi hash karşılaştırma, sonrası örneklemeli geri okuma.** Her dosyanın `sha256` değeri yüklemeden ÖNCE
+   listeyle karşılaştırılır; eşleşmeyen dosya yüklenmez. Yükleme sonrası geri okuma tüm dosyalarda değil örneklemde
+   yapılır (21 Kasım: 32 dosya, 32/32 aynı; Katalog 20, OPS ayrı 12). Manifest "geri okundu" kanıtı DEĞİLDİR, yükleme
+   kaydıdır; tam geri okuma gerekiyorsa ayrı iş olarak koşulur.
 3. **Kovayı açmak yalnız Recep kararıdır.** Genel erişim (`r2.dev`), özel alan adı bağlama ve API anahtarı üretme
    ALTYAPI, KATALOG ya da OPS tarafından kendiliğinden yapılmaz. Kapalı kova varsayılandır. Sebep: 22 PDF üretici
    kataloğudur (Vortice, Nicotra, SEAT, Danfoss) ve yeniden dağıtım izni ayrı bir sorudur (KTL-100 liste ölçümü).
 4. **Sayaç gecikebilir.** R2 panosundaki nesne sayısı ve boyut sayaçları yüklemenin gerisinde kalabilir; "yüklendi"
-   kanıtı panonun sayacı DEĞİL, manifest ve geri indirmedir (bkz. kural 2).
+   kanıtı panonun sayacı DEĞİL, manifest ve örneklemeli geri indirmedir (bkz. kural 2).
 5. **Harcama tavanı yoktur.** R2'de otomatik harcama tavanı konmaz; bütçe uyarısı kurulacaksa Recep kararıyla kurulur.
-   Boyut bugün küçüktür (PDF 168,5 MiB + görsel 232,6 MiB), ama bu bir ölçüm tarihi taşıyan sayıdır, tavan değildir.
+   Boyut bugün küçüktür (PDF 168,5 MiB + görsel 230,1 MiB; 116 JPEG'in üst verisi temizlendikten sonraki boyut), ama bu bir ölçüm tarihi taşıyan sayıdır, tavan değildir.
 
 **Bekçi:** yok. İlk kova açma ya da anahtar üretme kararında bu madde güncellenir ve bir kapı gerekip gerekmediği
 ayrıca değerlendirilir.
