@@ -7,7 +7,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { EYLEMLER, YANDEX_ISTEK_PENCERESI_MS, defterAyristir, degisenBirlestir, degisenDefterden, hareketGecerliMi, kalanListe, karar, olculemediSayisi, sonHareket } from '../dizin-takip.mjs'
+import { EYLEMLER, OTOMATIK_GOOGLE_ISTEK_DISI, YANDEX_ISTEK_PENCERESI_MS, defterAyristir, degisenBirlestir, degisenDefterden, hareketGecerliMi, kalanListe, karar, olculemediSayisi, sonHareket, tabloUret } from '../dizin-takip.mjs'
 
 const SITE = 'https://venthub.com.tr'
 const A = `${SITE}/tr/bilgi-merkezi/yazi-a`
@@ -121,5 +121,56 @@ describe('INV-DIZIN-KALAN-1 · Yandex bekleyen istek penceresi', () => {
     expect(karar({ ...ortak, degisen, sonHareket: simdi - 2 * SAAT }).durum).toBe('BEKLE')
     expect(karar({ ...ortak, motor: 'bing', degisen, sonHareket: simdi - 8 * SAAT }).durum).toBe('YAP')
     expect(karar({ ...ortak, motor: 'google', degisen, sonHareket: simdi - 8 * SAAT }).durum).toBe('YAP')
+  })
+})
+
+// INV-DIZIN-KALAN-SIRA-1 (SEO-134, D7 madde 15): kota önce hiç istek almamış adrese gider; liste sayfası otomatik Google isteği almaz.
+describe('SEO-134: Google kalan sırası ve liste sayfası (INV-DIZIN-KALAN-SIRA-1)', () => {
+  const LISTE = `${SITE}/tr/bilgi-merkezi`
+  const IST = '2026-11-10T08:00:00.000Z'
+  const g = (adres: string, sonHareket: string | null, durum = 'YAP') => ({ adres, google: { durum, sonHareket }, bing: { durum, sonHareket }, yandex: { durum: 'TAMAM' }, indexnow: { durum: 'TAMAM' } })
+  const simdi = Date.parse('2026-11-21T08:00:00Z')
+
+  it('Google: hiç istek almamış adres, yazı olsa bile istek almış adresin önüne geçer; sınır önce onları alır', () => {
+    const t = [g(A, IST), g(KAT, null), g(B, null), g(URUN, IST)]
+    expect(kalanListe(t, 'google')).toEqual([B, KAT, A, URUN])
+    expect(kalanListe(t, 'google', 2)).toEqual([B, KAT])
+  })
+  it('Bing sırası istek geçmişinden etkilenmez (yazı önce, sonra alfabetik)', () => {
+    expect(kalanListe([g(A, IST), g(KAT, null), g(B, null)], 'bing')).toEqual([A, B, KAT])
+  })
+  it('Google: istek almış + sayfa sonra değişmiş YAP kalır (D7 m.15); aynı hâle ikinci istek BEKLE', () => {
+    const ortak = { motor: 'google', sonTarama: null, sonHareket: Date.parse(IST), simdi }
+    expect(karar({ ...ortak, lastmod: '2026-11-15T08:00:00.000Z' }).durum).toBe('YAP')
+    expect(karar({ ...ortak, lastmod: '2026-11-05T08:00:00.000Z' }).durum).toBe('BEKLE')
+  })
+  it('hiç istek almamış adres YAP; Bing ve Yandex TEKRAR davranışı değişmez', () => {
+    expect(karar({ motor: 'google', lastmod: '2026-11-15T08:00:00.000Z', simdi }).durum).toBe('YAP')
+    const eski = { lastmod: '2026-11-05T08:00:00.000Z', sonTarama: null, sonHareket: Date.parse(IST), simdi }
+    expect(karar({ ...eski, motor: 'bing' }).durum).toBe('TEKRAR')
+    expect(karar({ ...eski, motor: 'yandex' }).durum).toBe('TEKRAR')
+  })
+  it('liste sayfası Google\'da otomatik YAP olmaz, taranmışsa TAMAM kalır; diğer motorlarda bayrak etkisiz', () => {
+    const lm = '2026-11-15T08:00:00.000Z'
+    expect(OTOMATIK_GOOGLE_ISTEK_DISI.has(LISTE)).toBe(true)
+    const tablo = tabloUret({ kapsam: [{ adres: LISTE, lastmod: lm }], hareketler: [], olcum: { google: { [LISTE]: { sonTarama: '2026-11-01T00:00:00Z' } }, bing: { [LISTE]: { sonTarama: '2026-11-01T00:00:00Z' } } }, simdi })
+    expect(tablo[0].google.durum).toBe('BEKLE')
+    expect(tablo[0].google.neden).toContain('--zorla')
+    expect(tablo[0].bing.durum).toBe('YAP')
+    expect(kalanListe(tablo, 'google')).toEqual([])
+    expect(karar({ motor: 'google', lastmod: lm, sonTarama: '2026-11-16T00:00:00Z', otomatikIstekDisi: true, simdi }).durum).toBe('TAMAM')
+    expect(karar({ motor: 'google', lastmod: lm, noindex: true, otomatikIstekDisi: true, simdi }).durum).toBe('ATLA')
+  })
+  it('liste sayfası bayrağı ölçüm hatasını örtmez; Yandex ve IndexNow kararını değiştirmez', () => {
+    const lm = '2026-11-15T08:00:00.000Z'
+    expect(karar({ motor: 'google', lastmod: lm, olculemedi: true, otomatikIstekDisi: true, simdi }).durum).toBe('OLCULEMEDI')
+    expect(karar({ motor: 'yandex', lastmod: lm, otomatikIstekDisi: true, simdi }).durum).toBe('YAP')
+    expect(karar({ motor: 'indexnow', lastmod: lm, otomatikIstekDisi: true, simdi }).durum).toBe('YAP')
+  })
+  it('aynı istek grubunda yazı, alfabede önce gelen yazı dışı adresin önüne geçer', () => {
+    const yaziDisi = `${SITE}/tr/about`
+    const yazi = `${SITE}/tr/bilgi-merkezi/zeta`
+    expect(kalanListe([g(yaziDisi, null), g(yazi, null)], 'google')).toEqual([yazi, yaziDisi])
+    expect(kalanListe([g(yaziDisi, IST), g(yazi, IST)], 'google')).toEqual([yazi, yaziDisi])
   })
 })

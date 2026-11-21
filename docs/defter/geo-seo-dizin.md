@@ -22,6 +22,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 
 | Tarih | İş | Neden | Sonuç | Kart |
 |---|---|---|---|---|
+| 2026-11-21 | Google kalan sırası önce hiç istek almamış adres; Bilgi Merkezi liste sayfası otomatik istek dışı | Kota yaklaşık 11 iken daha önce istek almış adresler sırayı karıştırıyordu, liste sayfası her yeni yazıda yeniden YAP oluyordu | `kalanListe` sırası, `OTOMATIK_GOOGLE_ISTEK_DISI`, D7 madde 15; değişim başına bir istek kuralı aynı | SEO-134 |
 | 2026-11-09 | Bing durum ölçümü tam kapsamda yavaş okur; OLCULEMEDI 61 → 7 | Tam kapsam Bing hız sınırına takılıyordu | `BING_ARALIK_MS` [1000, 2000, 3500] | SEO-102 |
 | 2026-11-09 | Defter ve tutarlılık kontrolü | Alanın bugünkü hâli tek yerde, depo-güvenli | Bu dosya + `dizin-defter-kontrol.mjs` | SEO-101 |
 | 2026-11-09 | Takip kapsamı tüm site haritası; Google "dizinde" olmadan TAMAM vermez | Tablo 101 adresin 40'ını izliyordu; taranmış ama dizinde olmayan sayfa TAMAM görünüyordu | 101 adresin 87'si Google dizininde, 14'ü değil; 7 ürün sayfası hiç istek almamıştı | SEO-100 |
