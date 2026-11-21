@@ -110,6 +110,14 @@ kurulmadı. Yükleme kaydı `yukle-manifest.jsonl`
    kanıtı panonun sayacı DEĞİL, manifest ve örneklemeli geri indirmedir (bkz. kural 2).
 5. **Harcama tavanı yoktur.** R2'de otomatik harcama tavanı konmaz; bütçe uyarısı kurulacaksa Recep kararıyla kurulur.
    Boyut bugün küçüktür (PDF 168,5 MiB + görsel 230,1 MiB; 116 JPEG'in üst verisi temizlendikten sonraki boyut), ama bu bir ölçüm tarihi taşıyan sayıdır, tavan değildir.
+6. **CORS ve Origin'siz başlık (yalnız `venthub-gorsel`; 21 Kasım 2026, OPS-364 ölçümü).** İki ayar birlikte durur:
+   (a) kovada CORS: izinli origin `*`, yalnız `GET`, `max-age` 86400; (b) `venthub.com.tr` alanında **Response Header
+   Transform Rule** "medya CORS ACAO": eşleşme `https://medya.venthub.com.tr/*`, statik `Access-Control-Allow-Origin: *`.
+   Sebep: Origin'siz bir istek başlıksız yanıt aldığında o yanıt önbelleğe girer ve sonraki `crossorigin` görsel
+   yüklemesi önbellekten başlıksız cevapla düşüyordu; kural başlığı Origin'e bakmadan her yanıta koyar. Geri alma:
+   kuralı silmek (kova CORS'u kalır, ayrı alınır). `venthub-katalog` kovasında CORS **yoktur**; PDF'ler `crossorigin`
+   yüklenmez, ihtiyaç doğarsa ayrı karar. Bu iki ayar bu cetvelde yalnız kayıttır; değiştirmek ALTYAPI/OPS işidir ve
+   değişen ayar aynı gün buraya yazılır. Kuralın kendisi hesap panelinde durur, depoda dosyası yoktur (bekçi yok).
 
 **Bekçi:** yok. Yeni kova açma, yeni alan adı ya da anahtar üretme kararında bu madde güncellenir ve bir kapı
 gerekip gerekmediği ayrıca değerlendirilir.
