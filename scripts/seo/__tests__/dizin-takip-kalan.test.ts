@@ -161,4 +161,16 @@ describe('SEO-134: Google kalan sırası ve liste sayfası (INV-DIZIN-KALAN-SIRA
     expect(karar({ motor: 'google', lastmod: lm, sonTarama: '2026-11-16T00:00:00Z', otomatikIstekDisi: true, simdi }).durum).toBe('TAMAM')
     expect(karar({ motor: 'google', lastmod: lm, noindex: true, otomatikIstekDisi: true, simdi }).durum).toBe('ATLA')
   })
+  it('liste sayfası bayrağı ölçüm hatasını örtmez; Yandex ve IndexNow kararını değiştirmez', () => {
+    const lm = '2026-11-15T08:00:00.000Z'
+    expect(karar({ motor: 'google', lastmod: lm, olculemedi: true, otomatikIstekDisi: true, simdi }).durum).toBe('OLCULEMEDI')
+    expect(karar({ motor: 'yandex', lastmod: lm, otomatikIstekDisi: true, simdi }).durum).toBe('YAP')
+    expect(karar({ motor: 'indexnow', lastmod: lm, otomatikIstekDisi: true, simdi }).durum).toBe('YAP')
+  })
+  it('aynı istek grubunda yazı, alfabede önce gelen yazı dışı adresin önüne geçer', () => {
+    const yaziDisi = `${SITE}/tr/about`
+    const yazi = `${SITE}/tr/bilgi-merkezi/zeta`
+    expect(kalanListe([g(yaziDisi, null), g(yazi, null)], 'google')).toEqual([yazi, yaziDisi])
+    expect(kalanListe([g(yaziDisi, IST), g(yazi, IST)], 'google')).toEqual([yazi, yaziDisi])
+  })
 })

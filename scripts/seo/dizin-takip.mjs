@@ -11,7 +11,7 @@
  * Karar (adres × motor): değişim = sitemap lastmod ile --degisen listesindeki tarihten yeni olanı (SEO-115: kod yayınıyla değişen
  * sayfada lastmod değişmeyebilir; URN-164'te 101 adresin konum yolu değişti, lastmod aynı kaldı, tablo hepsini TAMAM saydı).
  *   TAMAM  son tarama ≥ lastmod (lastmod yoksa: taranmış).
- *   BEKLE  son tarama lastmod'dan eski/yok AMA lastmod'dan sonra istek/gönderim var, eşik dolmadı (Bing 5, Yandex 7 gün); Google'da istek varsa hep BEKLE.
+ *   BEKLE  son tarama lastmod'dan eski/yok AMA lastmod'dan sonra istek/gönderim var, eşik dolmadı (Bing 5, Yandex 7 gün); Google'da istek varsa hep BEKLE; Bilgi Merkezi liste sayfası Google'da otomatik YAP olmaz, BEKLE kalır (SEO-134).
  *   TEKRAR aynı durum, eşik doldu: yeniden istek hakkı doğar. YALNIZ Bing ve Yandex. Google'da TEKRAR YOKTUR (SEO-112, 16 Kasım 2026):
  *          Google belgesi aynı adrese yinelenen isteğin taramayı hızlandırmadığını yazar; adres başına tek istek, karar BEKLE kalır.
  *   YAP    taranmamış/eski ve lastmod'dan sonra hiç istek yok.
@@ -186,8 +186,8 @@ export function degisenBirlestir(...haritalar) {
 }
 
 /**
- * SEO-118: bir motorun KALAN listesi = tablonun YAP/TEKRAR adresleri; elle tutulan liste yoktur. Sıra: bilgi merkezi yazıları, sonra diğerleri
- * (kategori/ürün), sonra alfabetik. `sinir` verilirse ilk N (günlük kota).
+ * SEO-118: bir motorun KALAN listesi = tablonun YAP/TEKRAR adresleri; elle tutulan liste yoktur. Sıra: Google'da önce hiç istek almamış adresler
+ * (SEO-134), sonra her grupta bilgi merkezi yazıları, diğerleri (kategori/ürün), alfabetik. `sinir` verilirse ilk N (günlük kota).
  * @param {Array<{ adres: string }>} tablo
  * @param {string} motor
  * @param {number} [sinir]
@@ -247,7 +247,7 @@ export function yandexSonTarama(hareketler, adres) {
 /**
  * Tek karar. Saf işlev: ağ ve dosya yok.
  * degisen: lastmod'a yansımayan içerik değişiminin anı (SEO-115); lastmod'dan yeniyse karar onu esas alır.
- * @param {{ motor: string, lastmod?: string|null, degisen?: string|number|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string }} p
+ * @param {{ motor: string, lastmod?: string|null, degisen?: string|number|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string, otomatikIstekDisi?: boolean }} p
  * @returns {{ durum: 'TAMAM'|'BEKLE'|'TEKRAR'|'YAP'|'ATLA'|'ESKI'|'OLCULEMEDI', neden: string }}
  */
 export function karar({ motor, lastmod = null, degisen = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '', otomatikIstekDisi = false }) {
