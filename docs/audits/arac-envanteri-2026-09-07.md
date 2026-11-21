@@ -755,6 +755,8 @@ madde 1 gereği araç sayılmaz.
 | `scripts/hijyen/canli-db-yedek-kimlik.cjs` | ALT-188 — geçici salt-okunur giriş rolü (Supabase Yönetim API'si, `supabase db dump`un kullandığı yol). | ALTYAPI | scripts/hijyen/canli-db-yedek.cjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/hijyen/canli-db-yedek.cjs | AKTIF |
 | `scripts/seo/__tests__/degisen-adres-eski.test.ts` | INV-DEGISEN-ADRES-2 · --eski-adres: adresi değişmiş sayfanın ESKİ adresi IndexNow'a gider (SEO-112, OPS-313 onayı 2026-11-16). | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y2.1, `dizin-sistemleri-standard.md` D7 madde 15 / K4 eski adres istisnası | 2026-11-16: 12 test yeşil | — | AKTIF |
 | `scripts/seo/__tests__/dizin-takip-kalan.test.ts` | INV-DIZIN-KALAN-1 (SEO-118): kalan liste elle tutulmaz, değişen liste defterden türer. | GEO-SEO | `dizin-sistemleri-standard.md` D7 madde 16 (tek kaynak defter, SEO-118) | 2026-11-17: 12 test yeşil | — | AKTIF |
+| `scripts/rehber/__tests__/yayin-paketi.test.ts` | Yayın paketi aracının testi: CRLF, fikstür, sayılar ve ret yolları (BLG-90, OPS-345). | BLOG | CI: vitest | 2026-11-21 (12 test yeşil) | kendisi | AKTIF |
+| `scripts/rehber/yayin-paketi.mjs` | REHBER YAYIN PAKETİ — hazır bir yazıyı, master'dan açılmış dala tek komutla yayın kaydı olarak ekler (BLG-90, OPS-345; rehber-yazisi-standard.md B8) | BLOG | elle: `node scripts/rehber/yayin-paketi.mjs` (CI'da koşmaz; mantık testle korunur) | 2026-11-21 (atölye yazısı, elle dalla birebir) | scripts/rehber/__tests__/yayin-paketi.test.ts | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
