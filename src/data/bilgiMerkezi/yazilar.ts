@@ -747,7 +747,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok; [3] için baskı yılı kaydı (BLG-84)
-    guncellemeTarihi: '2026-11-17',
+    guncellemeTarihi: '2026-11-21',
     tarihGizli: true,
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
@@ -825,7 +825,7 @@ Kanal içi için katalogda plastik reçine gövdeli bir seri asma tavana ya da �
 | Kanal ucunda, duvarda | Çelik sac duvar tipi fanlar: laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânlar [4] |
 | Kanal ucunda, çatıda | Çatı tipi fanlar: çatıdan atış yapan ticari ve endüstriyel mekânlar [4] |
 
-İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir? Isıtıcılı ve ısıtıcısız model, montaj yüksekliği ve enerji etkisi](vh:yazi/hava-perdesi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
 
 ## Sık sorulan sorular
 
@@ -1138,7 +1138,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
-    guncellemeTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-21',
     tarihGizli: true,
     ilgili: ['isi-geri-kazanim-cihazi-nedir', 'fan-cesitleri', 'kanal-tipi-fan-nedir'],
     // 18 Kasım (BLG-86, R5.1.2 küçük düzeltme): enerji bölümünün ilk cümlesi girişle tekrarı bırakıldı; iki SSS cevabının ilk cümlesi cevap verir hâle geldi; yeni iddia yok.
@@ -1149,7 +1149,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         ozet: "Hava perdesi kapı açıkken dış havanın içeri girişini azaltmaya çalışır. Çalışma ilkesi, enerji etkisinin sınırları, model ve montaj yüksekliği seçenekleri.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
         kartOzeti: 'Hava perdesi seçmeden önce kaynaklı model bilgisini ve enerji etkisinin sınırlarını bu rehberde okuyun.',
-        govde: `# Hava perdesi nedir, nasıl seçilir?
+        govde: `# Hava perdesi nedir, nasıl seçilir? Isıtıcılı ve ısıtıcısız model, montaj yüksekliği ve enerji etkisi
 
 Hava perdesi, kapı ya da geçiş açıklığının üstüne monte edilen ve açıklık boyunca aşağı doğru hava akımı üfleyen cihazdır; bu akım kapı açıkken dış havanın içeri girişini sınırlamaya çalışır [1][3]. Perdenin sağladığı tasarruf sabit bir yüzde değildir [2][3]; Hava Hareketi ve Kontrol Derneği'nin (AMCA) bir bilgisayar modelleme çalışmasına göre enerji performansı kapı kullanım sıklığına ve bina girişinin yönüne bağlıdır [2].
 
@@ -1304,7 +1304,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
-    guncellemeTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-21',
     tarihGizli: true,
     // 18 Kasım (BLG-86): Kaynak 5 Birleşik Krallık sitesi yerine EUR-Lex özgün metnine çevrildi (tanımlar ölçüldü: aksiyel, santrifüj, karma akışlı, çapraz akışlı aynı); gövde değişmedi.
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
@@ -1383,7 +1383,7 @@ VentHub kataloğundaki kategoriler aynı ölçüte göre ayrılmamıştır: baz�
 - Şömine ve baca fanları bacanın çekişini mekanik olarak destekleyen fanlardır [4]; modeller: [şömine ve baca fanları](vh:kategori/chimney-fans).
 - Endüstriyel tavan vantilatörleri büyük hacimlerde havayı yavaş ama çok geniş bir alanda hareket ettiren büyük çaplı vantilatörlerdir; havayı dışarı atmaz, içerideki havayı karıştırır [4]; modeller: [endüstriyel tavan vantilatörleri](vh:kategori/industrial-ceiling-fans).
 
-İlgili rehberler: [Hava perdesi nedir, nasıl seçilir?](vh:yazi/hava-perdesi), [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
+İlgili rehberler: [Hava perdesi nedir, nasıl seçilir? Isıtıcılı ve ısıtıcısız model, montaj yüksekliği ve enerji etkisi](vh:yazi/hava-perdesi), [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir)
 
 ## Kanal tipi, hücreli aspiratör, çapraz akışlı ve plug fan nedir?
 
