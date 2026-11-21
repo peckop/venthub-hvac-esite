@@ -869,6 +869,21 @@ p, li {
   }
 }
 
+/* URN-174: rehber yazısı içindekiler — TEK <details>. Dar ekranda açılır kutu; lg (1024px) ve üstünde içerik hep
+   açık, özet gizli (yapışkan yan sütun). `::details-content` desteklenmeyen tarayıcıda özet masaüstünde de kalır,
+   liste kapanabilir ama kaybolmaz. Tailwind `lg` kesimiyle aynı (1024px). */
+@media (min-width: 1024px) {
+  @supports selector(::details-content) {
+    .icindekiler-detay > summary {
+      display: none;
+    }
+    .icindekiler-detay::details-content {
+      content-visibility: visible;
+      display: block;
+    }
+  }
+}
+
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
 .custom-scrollbar-light::-webkit-scrollbar { width: 4px; }
