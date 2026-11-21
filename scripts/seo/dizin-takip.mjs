@@ -57,6 +57,8 @@ export const TEKRAR_ESIGI_GUN = { bing: 5, yandex: 7 }
  * Kaynak (okundu 2026-11-16): developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl (yinelenen istek taramayı hızlandırmaz).
  */
 export const TEK_ISTEK_MOTORLARI = new Set(['google'])
+/** SEO-134: her yeni yazıda değişen liste sayfası; değişim başına otomatik Google isteği kotayı yer (21 Kasım: 5 istek). */
+export const OTOMATIK_GOOGLE_ISTEK_DISI = new Set([`${SITE}/tr/bilgi-merkezi`])
 
 /**
  * SEO-118: bekleyen istek penceresi (Yandex). İstek kuyruktayken sayfa yeniden değişirse robot yeni hâli çeker; ikinci istek boşa gider.
@@ -194,8 +196,10 @@ export function kalanListe(tablo, motor, sinir = Infinity) {
   const yazi = (a) => /\/bilgi-merkezi\/[^/]+$/.test(a)
   return tablo
     .filter((s) => s[motor] && (s[motor].durum === 'YAP' || s[motor].durum === 'TEKRAR'))
+    .map((s) => ({ adres: s.adres, istekAlmis: TEK_ISTEK_MOTORLARI.has(motor) && !!s[motor].sonHareket }))
+    // SEO-134 (D7 madde 15): tek istek motorunda kota önce hiç istek almamış adreslere, sonra istekten sonra değişmiş adreslere gider.
+    .sort((a, b) => Number(a.istekAlmis) - Number(b.istekAlmis) || (yazi(b.adres) ? 1 : 0) - (yazi(a.adres) ? 1 : 0) || a.adres.localeCompare(b.adres))
     .map((s) => s.adres)
-    .sort((a, b) => (yazi(b) ? 1 : 0) - (yazi(a) ? 1 : 0) || a.localeCompare(b))
     .slice(0, sinir)
 }
 
@@ -246,7 +250,7 @@ export function yandexSonTarama(hareketler, adres) {
  * @param {{ motor: string, lastmod?: string|null, degisen?: string|number|null, sonTarama?: string|number|null, sonHareket?: number|null, noindex?: boolean, simdi?: number, olculemedi?: boolean, hataMetni?: string, dizinde?: boolean|null, kapsam?: string }} p
  * @returns {{ durum: 'TAMAM'|'BEKLE'|'TEKRAR'|'YAP'|'ATLA'|'ESKI'|'OLCULEMEDI', neden: string }}
  */
-export function karar({ motor, lastmod = null, degisen = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '' }) {
+export function karar({ motor, lastmod = null, degisen = null, sonTarama = null, sonHareket: hareket = null, noindex = false, simdi = Date.now(), olculemedi = false, hataMetni = '', dizinde = null, kapsam = '', otomatikIstekDisi = false }) {
   if (olculemedi) return { durum: 'OLCULEMEDI', neden: `durum okunamadı${hataMetni ? `: ${hataMetni}` : ''}; istek atmadan önce yeniden ölç` }
   if (noindex) return { durum: 'ATLA', neden: 'sayfa noindex; istek kotayı boşa harcar' }
   const lm = tarihAl(lastmod)
@@ -269,6 +273,8 @@ export function karar({ motor, lastmod = null, degisen = null, sonTarama = null,
   }
   // SEO-100: Google'da taranmış ama dizinde değilse (verdict) tarama tarihi TAMAM saymaz.
   if (tarama !== null && dizinde !== false && (degisim === null || tarama >= degisim)) return { durum: 'TAMAM', neden: `son tarama ${ad} sonrası` }
+  // SEO-134: liste sayfası her yeni yazıda değişir; Google'a otomatik istek çıkmaz. Gerekirse bilinçli yol --zorla + --neden.
+  if (otomatikIstekDisi && TEK_ISTEK_MOTORLARI.has(motor)) return { durum: 'BEKLE', neden: 'liste sayfası her yeni yazıda değişir; otomatik Google isteği yok (gerekirse --zorla ve --neden)' }
   // SEO-118: Yandex isteği değişimden ÖNCE atılmış ama henüz işlenmemiş olabilir (pencere içinde): robot yeni hâli alır, ikinci istek atılmaz.
   if (motor === 'yandex' && hareket !== null && degisim !== null && hareket < hareketDegisim && simdi - hareket < YANDEX_ISTEK_PENCERESI_MS) {
     return { durum: 'BEKLE', neden: `istek ${Math.floor((simdi - hareket) / 3600000)} saat önce, ${ad} sonrası değişmiş; kuyruktaki istek yeni hâli alır (pencere 22 saat)` }
@@ -339,7 +345,7 @@ export function tabloUret({ kapsam, hareketler, olcum, simdi = Date.now(), degis
       const o = olcum?.[motor]?.[adres] ?? {}
       const hareket = sonHareket(hareketler, motor, adres)
       const sonTarama = motor === 'yandex' ? yandexSonTarama(hareketler, adres) : o.sonTarama ?? null
-      const k = karar({ motor, lastmod, degisen: dg, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '' })
+      const k = karar({ motor, lastmod, degisen: dg, sonTarama, sonHareket: hareket, noindex: !!o.noindex, simdi, olculemedi: !!o.hata, hataMetni: o.hata ? String(o.hata).slice(0, 80) : '', dizinde: o.dizinde ?? null, kapsam: o.kapsam ?? '', otomatikIstekDisi: OTOMATIK_GOOGLE_ISTEK_DISI.has(adres) })
       satir[motor] = { ...k, sonTarama: typeof sonTarama === 'number' ? new Date(sonTarama).toISOString() : sonTarama, sonHareket: hareket === null ? null : new Date(hareket).toISOString() }
     }
     satir.gorunme = gorunmeOzeti(hareketler, adres, lastmod)
