@@ -106,7 +106,17 @@ describe('yayin-paketi', () => {
     expect(paketHazirla(hedef, kaynakDosyalar(), aile).dosyalar.sahteKaynak).toBeUndefined()
   })
 
+  it('aile yorumundaki $ kalıbını özel anlamıyla işlemez', () => {
+    const aile = { ...secenek, aile: 'yeni-aile', aileAdi: 'Yeni Aile', aileYorum: "maliyet $& ve $$ ve $' sonu" }
+    const { dosyalar } = paketHazirla(hedefDosyalar(), kaynakDosyalar(), aile)
+    expect(dosyalar.sahteKaynak).toContain("// maliyet $& ve $$ ve $' sonu\n")
+    expect(dosyalar.sahteKaynak.match(/vorticent-cms/g)).toHaveLength(1)
+  })
+
   it.each([
+    ['aile adında tırnak', hedefDosyalar(), kaynakDosyalar(), { ...secenek, aile: 'x', aileAdi: "O'Brien", aileYorum: 'y' }, /kaçış/],
+    ['var olmayan gün', hedefDosyalar(), kaynakDosyalar(), { ...secenek, tarih: '2026-13-45' }, /tarih/],
+    ['gövdede kayıt sınırına benzeyen satır', hedefDosyalar(), kaynakDosyalar('ilk\n  },\ndevam'), secenek, /kesik/],
     ['kırık yazı bağlantısı', hedefDosyalar(), kaynakDosyalar('[x](vh:yazi/yok)'), secenek, /kırık/],
     ['kayıt zaten ekli', { ...hedefDosyalar(), yazilar: yazilar(kayit('b', 'b-slug')) }, kaynakDosyalar(), secenek, /zaten/],
     ['kaynakta kayıt yok', hedefDosyalar(), kaynakDosyalar(), { ...secenek, kimlik: 'c' }, /kayıt yok/],

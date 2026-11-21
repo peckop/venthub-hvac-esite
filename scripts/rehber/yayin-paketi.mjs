@@ -32,6 +32,7 @@ export const YOLLAR = {
   sahteKaynak: 'src/lib/bilgiMerkezi/__tests__/sahteKaynak.ts',
 }
 
+const IZ_DOSYASI = 'src/lib/bilgiMerkezi/__tests__/govde-izleri.json'
 const AILE_CAPASI = "    ['vortice-vorticent-cms-atex-santrifuj-fanlar', 'Vortice Vorticent CMS ATEX Santrifüj Fanlar'],\n"
 
 export class PaketHatasi extends Error {}
@@ -167,8 +168,11 @@ function aileEkle(metin, { aile, aileAdi, aileYorum }) {
   const t = lfYap(metin)
   if (t.includes(`['${aile}',`)) return metin
   if (!aileAdi || !aileYorum) throw new PaketHatasi('--aile ile --aile-adi ve --aile-yorum da gerekir')
+  if ([aile, aileAdi].some((x) => /['\\\r\n]/.test(x)) || /[\r\n]/.test(aileYorum)) {
+    throw new PaketHatasi('aile, aile adı ya da yorumda kaçış gerektiren karakter var')
+  }
   if (!t.includes(AILE_CAPASI)) throw new PaketHatasi('sahteKaynak çapası bulunamadı')
-  return sonuKoru(metin, t.replace(AILE_CAPASI, `${AILE_CAPASI}    // ${aileYorum}\n    ['${aile}', '${aileAdi}'],\n`))
+  return sonuKoru(metin, t.replace(AILE_CAPASI, () => `${AILE_CAPASI}    // ${aileYorum}\n    ['${aile}', '${aileAdi}'],\n`))
 }
 
 /** Dizideki `vh:yazi/<kimlik>` hedeflerinden kaydı olmayanlar. */
@@ -177,18 +181,31 @@ export function kirikBaglantilar(yazilarMetni) {
   return [...new Set([...yazilarMetni.matchAll(/vh:yazi\/([a-z0-9-]+)/g)].map((m) => m[1]))].filter((h) => !kimlikler.has(h))
 }
 
+const gecerliTarih = (tarih) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tarih ?? '')) return false
+  const gun = new Date(`${tarih}T00:00:00Z`)
+  return !Number.isNaN(gun.getTime()) && gun.toISOString().slice(0, 10) === tarih
+}
+
+/** Kayıt sınırı gövde içindeki bir satıra denk gelirse şablon metni açık kalır; böyle blok yazılmaz. */
+function blokButunMu(blok) {
+  const tirnak = (blok.join('\n').match(/(?<!\\)`/g) ?? []).length
+  if (tirnak % 2 !== 0) throw new PaketHatasi('kayıt bloğu kesik: şablon metni kapanmıyor')
+}
+
 /**
  * Saf çekirdek: dosyaya dokunmaz. `hedef` ve `kaynak`, YOLLAR anahtarlarıyla dosya metinleridir (kaynakta
  * yazilar, sitemapAltin, rotaFikstur). Yeni metinleri ve özeti döner; bir adım tutmazsa PaketHatasi atar.
  */
 export function paketHazirla(hedef, kaynak, secenek) {
   const { kimlik, tarih, kart, sira, aile } = secenek
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(tarih ?? '')) throw new PaketHatasi('tarih YYYY-AA-GG olmalı')
+  if (!gecerliTarih(tarih)) throw new PaketHatasi('tarih geçerli bir YYYY-AA-GG olmalı')
   if (!kimlik || !/^BLG-\d+$/.test(kart ?? '') || !sira) throw new PaketHatasi('kimlik, kart (BLG-n) ve sira gerekir')
 
   const yaziSatir = lfYap(hedef.yazilar).split('\n')
   if (yaziSatir.includes(`    kimlik: '${kimlik}',`)) throw new PaketHatasi(`kayıt zaten ekli: ${kimlik}`)
   const blok = kaydiHazirla(kayitBlogu(lfYap(kaynak.yazilar).split('\n'), kimlik), tarih)
+  blokButunMu(blok)
   const slug = blokSlug(blok)
   const oncekiSlug = sonKayitSlug(yaziSatir)
   const { kapanis } = diziSiniri(yaziSatir)
@@ -243,8 +260,21 @@ function main() {
       console.log(degisen.map((y) => `  ${y}`).join('\n'))
       return 0
     }
-    for (const [ad, metin] of Object.entries(dosyalar)) writeFileSync(join(kok, YOLLAR[ad]), metin)
-    execFileSync(process.execPath, [join(kok, 'scripts/rehber/govde-izi.mjs'), '--yaz'], { cwd: kok, stdio: 'inherit' })
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', 'origin/master', 'HEAD'], { cwd: kok, stdio: 'ignore' })
+    } catch {
+      throw new PaketHatasi('dal güncel origin/master üstünde değil; önce git fetch origin master, sonra master\'dan yeni dal aç')
+    }
+    const izYolu = join(kok, IZ_DOSYASI)
+    const izOzgun = readFileSync(izYolu, 'utf8')
+    try {
+      for (const [ad, metin] of Object.entries(dosyalar)) writeFileSync(join(kok, YOLLAR[ad]), metin)
+      execFileSync(process.execPath, [join(kok, 'scripts/rehber/govde-izi.mjs'), '--yaz'], { cwd: kok, stdio: 'inherit' })
+    } catch (hata) {
+      for (const ad of Object.keys(dosyalar)) writeFileSync(join(kok, YOLLAR[ad]), hedef[ad])
+      writeFileSync(izYolu, izOzgun)
+      throw new PaketHatasi(`yazım tamamlanamadı, dosyalar geri alındı: ${hata instanceof Error ? hata.message : String(hata)}`)
+    }
     console.log(`TAMAM: ${ozet.kimlik} (${ozet.satir} satır), önceki ${ozet.oncekiSlug}, tarih ${ozet.tarih}; kapalı ${ozet.kapali}, açık ${ozet.acik}, llms ${ozet.llms}`)
     return 0
   } catch (hata) {
