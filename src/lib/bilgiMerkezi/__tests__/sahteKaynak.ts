@@ -49,6 +49,8 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['storm-serisi', 'STORM Serisi'],
     // Patlayıcı ortamda fan seçimi (ATEX) yazısı (BLG-51, 2026-11): Vorticent CMS ATEX aile sayfası canlıda 200 verir (8 Kasım ölçümü; ürün sayfası).
     ['vortice-vorticent-cms-atex-santrifuj-fanlar', 'Vortice Vorticent CMS ATEX Santrifüj Fanlar'],
+    // BLG-60 (2026-11): boyahane yazısı: VORT-E ATEX aile sayfası canlıda 200 verir (9 Kasım ölçümü; ürün sayfası).
+    ['vortice-vort-e-atex-fanlar', 'Vortice VORT-E ATEX Fanlar'],
     // BLG-65 (2026-11): depo yazısı: Nordik HVLS Hyperblade aile sayfası canlıda 200 verir (9 Kasım ölçümü; ürün sayfası).
     ['vortice-nordik-hvls-hyperblade', 'Vortice Nordik HVLS Hyperblade'],
     // BLG-67 (2026-11): mutfak yazısı: VORT QBK SAL KC Evo aile sayfası canlıda 200 verir (9 Kasım ölçümü; ürün sayfası).
