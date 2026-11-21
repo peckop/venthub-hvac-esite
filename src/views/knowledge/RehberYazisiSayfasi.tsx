@@ -20,7 +20,8 @@ import RehberGovdesi from './RehberGovdesi'
  * kusuru taşınmadı).
  *
  * İçindekiler masaüstünde solda yapışkan sütun, dar ekranda açılır kutu (`<details>`) — tasarım
- * ekran 14 (uzun-metin şablonu) ve R3. JavaScript gerektirmez.
+ * ekran 14 (uzun-metin şablonu) ve R3. JavaScript gerektirmez. TEK `<details>` (URN-174): liste HTML'de
+ * bir kez; masaüstünde içeriği açık tutan kural `.icindekiler-detay` (src/index.css, `::details-content`).
  */
 
 const odakSinifi =
@@ -33,7 +34,7 @@ export function tarihYaz(iso: string, dil: string): string {
 
 function Icindekiler({ ogeler, baslik }: { ogeler: YaziSayfasi['icindekiler']; baslik: string }) {
   return (
-    <nav aria-label={baslik}>
+    <nav aria-label={baslik} data-icindekiler>
       <p className="mb-3 text-sm font-semibold uppercase tracking-hvac-tight text-primary-navy">{baslik}</p>
       <ol className="text-base">
         {ogeler.map((o) => (
@@ -110,25 +111,23 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
           </p>
         </header>
 
-        {icindekiler.length > 0 && (
-          <details className="mt-8 rounded-hvac-sm border border-light-gray p-4 lg:hidden">
-            <summary className={`flex min-h-11 cursor-pointer items-center font-semibold text-primary-navy ${odakSinifi}`}>{icindekilerBasligi}</summary>
-            <div className="mt-4">
-              <Icindekiler ogeler={icindekiler} baslik={icindekilerBasligi} />
-            </div>
-          </details>
-        )}
-
-        <div className="mt-10 lg:grid lg:grid-cols-4 lg:gap-12">
+        <div className="mt-8 lg:mt-10 lg:grid lg:grid-cols-4 lg:gap-12">
+          {/* URN-174 (OPS-359, SEO-137): içindekiler HTML'de TEK kez basılır. Eskiden mobil `<details>` ve masaüstü
+              `<aside>` ayrı ayrı çağrılıyordu; 16/16 yazıda liste ham HTML'de iki kez çıktı. Şimdi tek `<details>`:
+              dar ekranda açılır kutu, `lg` ve üstünde içerik hep açık, özet gizli, yapışkan yan sütun
+              (kural `.icindekiler-detay`, src/index.css). Sütun dar ekranda gövdenin üstünde dizilir (ızgara tek sütun). */}
           {icindekiler.length > 0 && (
-            <aside className="hidden lg:col-span-1 lg:block">
-              <div className="sticky top-24">
-                <Icindekiler ogeler={icindekiler} baslik={icindekilerBasligi} />
-              </div>
+            <aside className="mb-10 lg:col-span-1 lg:mb-0">
+              <details className="icindekiler-detay rounded-hvac-sm border border-light-gray p-4 lg:sticky lg:top-24 lg:rounded-none lg:border-0 lg:p-0">
+                <summary className={`flex min-h-11 cursor-pointer items-center font-semibold text-primary-navy ${odakSinifi}`}>{icindekilerBasligi}</summary>
+                <div className="mt-4">
+                  <Icindekiler ogeler={icindekiler} baslik={icindekilerBasligi} />
+                </div>
+              </details>
             </aside>
           )}
 
-          <div className={`min-w-0 max-w-content ${icindekiler.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+          <div className={`min-w-0 max-w-content ${icindekiler.length > 0 ? 'lg:col-span-3' : 'mt-2 lg:mt-0 lg:col-span-4'}`}>
             {/* Gövde genişliği bilerek sütun genişliğinde (`max-w-content`). Satır ölçüsü Design'da
                 çelişkili (DS 66ch/16px ↔ Menü v18 720px/17px); TASARIM geri aldı (c64cafc4, 2026-09-25),
                 karar DS geçişinde token düzeyinde uygulanır — burada tek seferlik sınıf açma. */}
