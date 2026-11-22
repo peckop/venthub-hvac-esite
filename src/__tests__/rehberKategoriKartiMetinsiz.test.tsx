@@ -36,15 +36,36 @@ describe('kategori kartı — tanıtım metni yok', () => {
   it('örnek yazı: kartta açıklama yok, bağlantı ve hedef veri modeliyle aynı', async () => {
     const yazi = { ...ORNEK_YAZI, ilgiliKategoriler: ['vh:kategori/duct-fans', 'vh:kategori/roof-fans'] as const }
     const sayfa = await yaziSayfasiHazirla(yazi, 'tr', sahteKaynak(), [yazi])
-    expect(sayfa.kategoriKartlari.some((k) => k.aciklama.length > 0)).toBe(true) // veri hâlâ dolu: ölçüt boş veride yeşil olmasın
+    // Veri modeli de tanıtım metni taşımaz (URN-175): kartta yalnız ad + href.
+    for (const k of sayfa.kategoriKartlari) expect(Object.keys(k).sort()).toEqual(['ad', 'href'])
     const { container } = render(<RehberYazisiSayfasi sayfa={sayfa} />)
     expect(kartMetinsizMi(container, 2)).toBeNull()
     const kartlar = Array.from(container.querySelectorAll<HTMLAnchorElement>(KART))
     expect(kartlar.map((a) => a.getAttribute('href'))).toEqual(sayfa.kategoriKartlari.map((k) => k.href))
-    for (const [i, a] of kartlar.entries()) {
-      expect(a.textContent).not.toContain(sayfa.kategoriKartlari[i]?.aciklama)
-      expect(a.textContent).toContain(sayfa.kategoriKartlari[i]?.ad)
+    for (const [i, a] of kartlar.entries()) expect(a.textContent).toContain(sayfa.kategoriKartlari[i]?.ad)
+  })
+
+  it('GERÇEK kaynak: veritabanı satırında tanıtım metni olsa bile sorguya girmez, sunucu HTML’ine sızmaz', async () => {
+    const GIZLI = 'GİZLİ KATEGORİ TANITIM PARAGRAFI'
+    const secilenSutunlar: string[] = []
+    const satir = { slug: 'duct-fans', name: 'Duct Fans', menu_label: null, translation_key: null, description: GIZLI, metadata: {}, is_active: true }
+    const zincir: Record<string, unknown> = {}
+    zincir.select = (sutunlar: string) => {
+      secilenSutunlar.push(sutunlar)
+      return zincir
     }
+    zincir.eq = () => zincir
+    zincir.limit = () => zincir
+    zincir.maybeSingle = async () => ({ data: satir, error: null })
+    const { bilgiMerkeziKaynagi } = await vi.importActual<typeof import('../lib/data/bilgiMerkeziKaynak')>('../lib/data/bilgiMerkeziKaynak')
+    const gercek = bilgiMerkeziKaynagi({ from: () => zincir } as never)
+    const yazi = { ...ORNEK_YAZI, ilgiliKategoriler: ['vh:kategori/duct-fans'] as const }
+    const sayfa = await yaziSayfasiHazirla(yazi, 'tr', { ...sahteKaynak(), kategoriKarti: gercek.kategoriKarti }, [yazi])
+    expect(secilenSutunlar.length).toBeGreaterThan(0)
+    for (const s of secilenSutunlar) expect(s).not.toContain('description')
+    const { container } = render(<RehberYazisiSayfasi sayfa={sayfa} />)
+    expect(container.innerHTML).not.toContain(GIZLI)
+    expect(JSON.stringify(sayfa.kategoriKartlari)).not.toContain(GIZLI)
   })
 
   it('yayındaki HER TR yazı: kategori kartı varsa metinsiz ve bağlantı sayısı veri modeliyle aynı', async () => {
