@@ -118,7 +118,8 @@ describe('ALT-123 migration kilidin tüm parçalarını taşıyor', () => {
 
   it('kendini üye, moderatör ve yönetici claim\'iyle sınar (rol taklidi)', () => {
     expect(/set local role authenticated/i.test(kod)).toBe(true)
-    expect(/"user_role":"admin"/.test(kod) && /"user_role":"moderator"/.test(kod)).toBe(true)
+    expect(/jsonb_build_object\('user_role', 'admin'\)/.test(kod) && /"user_role":"moderator"/.test(kod)).toBe(true)
+    expect(/from public\.user_profiles where role in \('admin', 'super_admin'\)/i.test(kod), 'yönetici sınaması gerçek profil kullanmıyor').toBe(true)
     expect(/insufficient_privilege/i.test(kod)).toBe(true)
     expect(/has_column_privilege\('authenticated'/i.test(kod)).toBe(true)
     expect(/public\.maliyet_yenile\(v_json\)/i.test(kod), 'maliyet_yenile yazım yolu sınanmıyor').toBe(true)

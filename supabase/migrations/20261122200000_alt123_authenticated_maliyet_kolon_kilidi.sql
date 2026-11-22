@@ -196,7 +196,8 @@ declare
                              'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name'];
   v_uye      text := '{"sub":"00000000-0000-4000-8000-0000000000b2","role":"authenticated"}';
   v_mod      text := '{"sub":"00000000-0000-4000-8000-0000000000c3","role":"authenticated","app_metadata":{"user_role":"moderator"}}';
-  v_admin    text := '{"sub":"00000000-0000-4000-8000-0000000000a1","role":"authenticated","app_metadata":{"user_role":"admin"}}';
+  v_admin    text;
+  v_admin_id uuid;
   v_claim    text;
   v_k        text;
   v_n        int;
@@ -214,6 +215,15 @@ begin
   select string_agg(format('%I', column_name), ', ' order by ordinal_position) into v_izinli
     from information_schema.columns
    where table_schema = 'public' and table_name = 'products' and column_name <> all(v_hassas);
+
+  -- Yönetici sınaması GERÇEK bir yönetici profiliyle yapılır: products UPDATE politikası auth.uid()'in
+  -- user_profiles'ta admin/super_admin/moderator olmasını ister (JWT claim tek başına yetmez). Yazım sonunda geri alınır.
+  select id into v_admin_id from public.user_profiles where role in ('admin', 'super_admin') order by created_at limit 1;
+  if v_admin_id is null then
+    raise exception 'DURDU: sınama için admin/super_admin profili yok';
+  end if;
+  v_admin := jsonb_build_object('sub', v_admin_id, 'role', 'authenticated',
+                                'app_metadata', jsonb_build_object('user_role', 'admin'))::text;
 
   select coalesce(array_agg(id), array[]::uuid[]) into v_ids
     from (select id from public.products where status = 'active' and deleted_at is null limit 50) s;
