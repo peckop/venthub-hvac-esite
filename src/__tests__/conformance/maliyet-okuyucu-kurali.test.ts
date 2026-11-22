@@ -37,7 +37,7 @@ const COSTS_ACILIS_RE = /\bproduct_costs\s*(?:![\w]+)?\s*\(/
 const PRODUCTS_GOMME_RE = /\bproducts\s*(?:![\w]+)?\s*\(/g
 
 function yorumsuz(kaynak: string): string {
-  return kaynak.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' ')).replace(/^(\s*)\/\/.*$/gm, '$1')
+  return kaynak.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' ')).replace(/^(\s*)(?<!:)\/\/.*$/gm, '$1')
 }
 
 /** `(` konumundan eşleşen `)` konumunu bulur; dizgeleri atlar. */
@@ -236,6 +236,8 @@ describe('INV-MALIYET-OKUYUCU-1 · products SELECT listesinde maliyet/tedarik ko
     expect(okuyucuIhlalleri(`await s.from('inventory_velocity').select('product_id, supplier_name')`)).toHaveLength(0)
     expect(okuyucuIhlalleri(`await s.from('orders').select('id, products(name, sku)')`)).toHaveLength(0)
     expect(okuyucuIhlalleri(`// s.from('products').select('purchase_price')`)).toHaveLength(0)
+    // Şema-güvenlik alt sınırı: URL taşıyan satır sıyırılmaz, hedef GERÇEKTEN toplanır.
+    expect(okuyucuIhlalleri(`const u = 'https://x.test'; await s.from('products').select('purchase_price')`)).toHaveLength(1)
     expect(okuyucuIhlalleri(`await s.from('products').select('id', { count: 'exact', head: true })`)).toHaveLength(0)
   })
 })
