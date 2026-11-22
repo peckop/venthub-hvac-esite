@@ -18,8 +18,10 @@
  *  - Başka bir hassas olmayan kolon okunamaz -> ::warning (yeni kolon anon'a grant edilmemiş; vitrin seçerse 42501).
  * Ölçememek geçmek değildir: SUPABASE_DB_URL yoksa ya da sorgu patlarsa KIRMIZI.
  *
- * ⚠SINIR (adıyla): yalnız `anon` ölçülür. `authenticated` hâlâ okuyabilir (kayıt açık) — kapanışı ALT-73 Aşama B.
- * Bu nöbetçi onu KIRMIZI saymaz; saysaydı doğar doğmaz kırmızı olurdu ve güvenilmez hâle gelirdi.
+ * ALT-123 (Aşama B, authenticated): aynı katalog sorgusu `authenticated` rolü için de koşar. 8 maliyet/tedarik kolonu
+ * (warehouse_location HARİÇ: depo konumu authenticated'da bilinçle AÇIK, inventory_velocity okur) giriş yapmış üyeye
+ * kapalı olmalı. Migration 20261122200000 inmeden ölçüm "beklemede" sayılır (işaret: maliyet_yenile gövdesi
+ * product_costs'a bağlandı mı); indikten sonra açık kolon KIRMIZIDIR.
  */
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -41,12 +43,19 @@ export const HASSAS_KOLONLAR = [
   'warehouse_location', // depo konumu: iç bilgi, vitrinden bilinçle çıkarıldı (product.columns.ts, REC-140)
 ]
 
+/**
+ * authenticated'a KAPALI olması gereken kolonlar (migration 20261122200000 ile aynı liste, 8 kolon).
+ * warehouse_location YOK: authenticated'da bilinçle açık (inventory_velocity okur; ayrı takip).
+ */
+export const AUTH_HASSAS_KOLONLAR = HASSAS_KOLONLAR.filter((k) => k !== 'warehouse_location')
+
 /** Vitrinin her sayfada seçtiği; okunamazsa site kırılır. */
 export const CEKIRDEK_KOLONLAR = ['id', 'name', 'sku', 'status', 'family_id']
 
 const SORGU = `
   select a.attname::text as kolon,
-         has_column_privilege('anon', 'public.products', a.attnum, 'select') as okunabilir
+         has_column_privilege('anon', 'public.products', a.attnum, 'select') as okunabilir,
+         has_column_privilege('authenticated', 'public.products', a.attnum, 'select') as auth_okunabilir
     from pg_attribute a
    where a.attrelid = 'public.products'::regclass
      and a.attnum > 0
@@ -56,6 +65,10 @@ const SORGU = `
 /** Migration uygulandı mı? display_price(uuid) aşırı yüklemesi yalnız ALT-73 migration'ıyla gelir. */
 const UYGULANDI_SORGU = "select to_regprocedure('public.display_price(uuid)') is not null as uygulandi"
 
+/** ALT-123 migration'ı uygulandı mı? Yalnız o migration maliyet_yenile gövdesini product_costs'a bağlar. */
+const AUTH_UYGULANDI_SORGU =
+  "select coalesce(pg_get_functiondef(to_regprocedure('public.maliyet_yenile(jsonb)')) like '%product_costs%', false) as uygulandi"
+
 /**
  * Saf karar: katalog satırlarından hüküm çıkarır (ağ/DB yok; testlenir).
  * `uygulandi === false` (migration henüz prod'a inmedi): PR koşumunda canlı katalog doğal olarak eski durumdadır;
@@ -64,6 +77,15 @@ const UYGULANDI_SORGU = "select to_regprocedure('public.display_price(uuid)') is
  * @param {{uygulandi?: boolean}} [baglam]
  */
 export function degerlendir(satirlar, baglam = {}) {
+  return hukum(satirlar, HASSAS_KOLONLAR, baglam)
+}
+
+/** authenticated için aynı hüküm (hassas liste 8 kolon). */
+export function degerlendirAuthenticated(satirlar, baglam = {}) {
+  return hukum(satirlar, AUTH_HASSAS_KOLONLAR, baglam)
+}
+
+function hukum(satirlar, hassasListe, baglam) {
   if (baglam.uygulandi === false) {
     return {
       toplam: satirlar.length,
@@ -77,15 +99,56 @@ export function degerlendir(satirlar, baglam = {}) {
     }
   }
   const harita = new Map(satirlar.map((s) => [s.kolon, s.okunabilir === true]))
-  const acik = HASSAS_KOLONLAR.filter((k) => harita.get(k) === true)
-  const eksik = HASSAS_KOLONLAR.filter((k) => !harita.has(k))
+  const acik = hassasListe.filter((k) => harita.get(k) === true)
+  const eksik = hassasListe.filter((k) => !harita.has(k))
   const cekirdekKapali = CEKIRDEK_KOLONLAR.filter((k) => harita.get(k) !== true)
   const digerKapali = [...harita.entries()]
-    .filter(([k, ok]) => !ok && !HASSAS_KOLONLAR.includes(k) && !CEKIRDEK_KOLONLAR.includes(k))
+    .filter(([k, ok]) => !ok && !hassasListe.includes(k) && !CEKIRDEK_KOLONLAR.includes(k))
     .map(([k]) => k)
   const kirmizi = acik.length > 0 || eksik.length > 0 || cekirdekKapali.length > 0
   const uyari = !kirmizi && digerKapali.length > 0
   return { toplam: satirlar.length, acik, eksik, cekirdekKapali, digerKapali, kirmizi, uyari, beklemede: false }
+}
+
+/** authenticated hükmünü yazar; kırmızıysa true döner (çıkış kararı main'de). */
+function authRapor(o) {
+  if (o.beklemede) {
+    const pr = process.env.GITHUB_EVENT_NAME === 'pull_request'
+    console.error(
+      `::${pr ? 'notice' : 'warning'} title=maliyet kolon nobetcisi::ALT-123 migration'i (authenticated kilidi) canli veritabanina HENUZ UYGULANMAMIS ` +
+        `(maliyet_yenile product_costs'a bagli degil) — authenticated olcumu BEKLEMEDE, gecmis sayilmaz.`,
+    )
+    return false
+  }
+  console.error(
+    `maliyet-kolon-nobetcisi: authenticated'a acik hassas kolon sayisi=${o.acik.length}, eksik hassas=${o.eksik.length}`,
+  )
+  if (o.acik.length > 0) {
+    console.error(
+      `::error title=maliyet kolon nobetcisi::authenticated su maliyet kolonlarini OKUYABILIYOR: ${o.acik.join(', ')} — giris yapmis her uye gorur (ALT-123).`,
+    )
+  }
+  if (o.eksik.length > 0) {
+    console.error(
+      `::error title=maliyet kolon nobetcisi::hassas kolon katalogda YOK (${o.eksik.join(', ')}) — nobetci ve migration listesi guncellenmeli.`,
+    )
+  }
+  if (o.cekirdekKapali.length > 0) {
+    console.error(
+      `::error title=maliyet kolon nobetcisi::vitrin cekirdek kolonu authenticated icin OKUNAMIYOR: ${o.cekirdekKapali.join(', ')} — oturumlu vitrin permission denied verir.`,
+    )
+  }
+  if (o.digerKapali.length > 0 && !o.kirmizi) {
+    console.error(
+      `::warning title=maliyet kolon nobetcisi::authenticated su hassas olmayan kolonlari okuyamiyor: ${o.digerKapali.join(', ')} — yeni kolon authenticated'a grant edilmemis olabilir.`,
+    )
+  }
+  if (o.kirmizi) {
+    console.error(
+      'YAPILACAK: `revoke select (<kolon>) on public.products from authenticated` (tablo duzeyi SELECT varsa once kaldir) ya da vitrin kolonuna `grant select (<kolon>) on public.products to authenticated`. Geri alma: scripts/db/rollback/20261122200000_alt123_authenticated_maliyet_kolon_kilidi_geri_al.sql',
+    )
+  }
+  return o.kirmizi
 }
 
 async function main() {
@@ -102,13 +165,21 @@ async function main() {
   await client.connect()
   let satirlar
   let uygulandi
+  let authUygulandi
   try {
     satirlar = (await client.query(SORGU)).rows
     uygulandi = (await client.query(UYGULANDI_SORGU)).rows[0]?.uygulandi === true
+    authUygulandi = (await client.query(AUTH_UYGULANDI_SORGU)).rows[0]?.uygulandi === true
   } finally {
     await client.end()
   }
 
+  const authKirmizi = authRapor(
+    degerlendirAuthenticated(
+      satirlar.map((s) => ({ kolon: s.kolon, okunabilir: s.auth_okunabilir })),
+      { uygulandi: authUygulandi },
+    ),
+  )
   const o = degerlendir(satirlar, { uygulandi })
   if (o.beklemede) {
     // PR koşumunda "uygulanmadı" beklenen durumdur (migration birleşmeden prod'a inmez): bildirim.
@@ -120,6 +191,7 @@ async function main() {
       `::${seviye} title=maliyet kolon nobetcisi::ALT-73 migration'i canli veritabanina HENUZ UYGULANMAMIS (display_price(uuid) yok) — ` +
         `olcum BEKLEMEDE, gecmis sayilmaz.${pr ? ' Birlesme + supabase-migrate sonrasi ilk kosumda gercek olcum yapilir.' : ' PR disi kosumda bu beklenmez: supabase-migrate bitmeden mi kostu, yoksa kilit hic inmedi mi? Elle bak.'}`,
     )
+    if (authKirmizi) process.exit(1)
     return
   }
   console.error(
@@ -141,7 +213,8 @@ async function main() {
       `::error title=maliyet kolon nobetcisi::vitrin cekirdek kolonu anon icin OKUNAMIYOR: ${o.cekirdekKapali.join(', ')} — vitrin permission denied verir.`,
     )
   }
-  if (o.kirmizi) {
+  if (o.kirmizi || authKirmizi) {
+    if (!o.kirmizi) process.exit(1)
     console.error(
       "YAPILACAK: yetkiyi kapat (`revoke select (<kolon>) on public.products from anon` + tablo duzeyi SELECT varsa kaldir) ya da vitrin kolonuna `grant select (<kolon>) on public.products to anon`. Geri alma: scripts/db/rollback/20261101150000_alt73_anon_maliyet_kolon_kilidi_geri_al.sql",
     )
