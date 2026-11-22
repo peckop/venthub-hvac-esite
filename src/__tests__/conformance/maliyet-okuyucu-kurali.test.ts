@@ -31,7 +31,10 @@ const KOLONLAR = [
   'last_purchased_at',
   'supplier_name',
 ] as const
-const KOLON_RE = new RegExp(`\\b(${KOLONLAR.join('|')})\\b`)
+const FILTRE_YONTEMLERI = new Set([
+  'order', 'eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'like', 'ilike', 'is', 'in', 'not', 'contains', 'match', 'filter',
+])
+const KOLON_RE =new RegExp(`\\b(${KOLONLAR.join('|')})\\b`)
 const YILDIZ_RE = /(^|[\s,(])\*/
 const COSTS_ACILIS_RE = /\bproduct_costs\s*(?:![\w]+)?\s*\(/
 const PRODUCTS_GOMME_RE = /\bproducts\s*(?:![\w]+)?\s*\(/g
@@ -163,6 +166,12 @@ export function okuyucuIhlalleri(kaynak: string, sabitler: Map<string, string[]>
   // (1) from('products') zincirinin SELECT listesi
   for (const m of govde.matchAll(/\.from\(\s*['"`]products['"`]\s*\)/g)) {
     for (const c of zincir(govde, m.index + m[0].length)) {
+      // Süzgeç ve sıralama kolonları da SELECT yetkisi ister (PostgREST): `.order('supplier_name')`, `.eq('cost_in_base', 1)`.
+      if (FILTRE_YONTEMLERI.has(c.yontem)) {
+        const kolon = /^\s*['"`]([a-z_]+)['"`]/.exec(ilkArguman(c.arg))?.[1]
+        if (kolon && (KOLONLAR as readonly string[]).includes(kolon)) out.push(`from('products').${c.yontem}('${kolon}')`)
+        continue
+      }
       if (c.yontem !== 'select') continue
       const metin = costsGommesiz(secimMetni(ilkArguman(c.arg), sabitler))
       if (YILDIZ_RE.test(metin.replace(/['"`]/g, ' ')) || KOLON_RE.test(metin)) {
@@ -223,6 +232,9 @@ describe('INV-MALIYET-OKUYUCU-1 · products SELECT listesinde maliyet/tedarik ko
     expect(okuyucuIhlalleri(`await s.from('products').insert([p]).select('id, cost_in_base')`)).toHaveLength(1)
     expect(okuyucuIhlalleri(`await s.from('orders').select('id, products(*)')`)).toHaveLength(1)
     expect(okuyucuIhlalleri(`await s.from('orders').select('id, product:products(name, last_purchased_at)')`)).toHaveLength(1)
+    expect(okuyucuIhlalleri(`await s.from('products').select('id').order('supplier_name')`)).toHaveLength(1)
+    expect(okuyucuIhlalleri(`await s.from('products').select('id').gt('cost_in_base', 5)`)).toHaveLength(1)
+    expect(okuyucuIhlalleri(`await s.from('products').select('id').order('name').eq('status', 'active')`)).toHaveLength(0)
     const sabit = new Map([['KOLON_LISTESI', [`'id, name, purchase_currency'`]]])
     expect(okuyucuIhlalleri(`await s.from('products').select(KOLON_LISTESI)`, sabit)).toHaveLength(1)
   })
