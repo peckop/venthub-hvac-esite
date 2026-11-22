@@ -2513,6 +2513,97 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
       },
     },
   },
+  {
+    // BLOG (BLG-64), doğrulanmış metin: taslak v5 (sha 71e97cf912da). Kısa sektör sayfası (cetvel R3.3), okur gözüyle yeniden düzenlendi (R3.5, BLG-82): aile adları Kısaca maddesinde, "VentHub'da hangi endüstriyel havalandırma fanı serileri var?" bölümünde, son SSS cevabında ve Kaynaklar'da. Mevzuat paketi yok: Türkiye mevzuatı iddiası yok. Fiyat yok, debi yok.
+    // Doğrulama: tuzaklı kopya 8/8, doğrulayıcı engelleyicileri kapatıldı, Gemini dil incelemesi cetvel R3.5 v ölçüsüyle işlendi (BLG-82); iddia tablosu kapıdan geçti (kırmızı 0).
+    kimlik: 'atolye-havalandirma-fani-secimi',
+    konu: 'verimlilik',
+    yayinTarihi: '2026-11-22',
+    guncellemeTarihi: '2026-11-22',
+    tarihGizli: true,
+    urunler: ['vh:aile/vortice-aksiyel-endustriyel-fanlar', 'vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar'],
+    ilgiliKategoriler: [],
+    diller: {
+      tr: {
+        slug: 'atolye-havalandirma-fani-nasil-secilir',
+        ozet: "Atölye havalandırma fanı seçimi, havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi ile debi, basınç ve sistem yerleşimi bilinerek başlar.",
+        // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
+        kartOzeti: "Atölye fanı seçerken havalandırma ile zararlı maddelerin havadan uzaklaştırılmasının nasıl ayrıldığını görmek için bu rehberden başlayın.",
+        govde: `# Atölye havalandırma fanı nasıl seçilir?
+
+Atölye havalandırma fanı seçimi; taşınacak havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri, gereken hava debisi, basınç ve sistem yerleşimi bilinerek başlar [1]. Kaynak dumanı ve proseslerin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılması ise HSE'nin işyeri havalandırması rehberinin kapsamı dışındadır [2].
+
+Kısaca:
+
+- Havalandırma: HSE'ye göre havalandırma doğal yolla kapı, pencere ve diğer açıklıklardan, mekanik yolla fanlarla yapılır [2].
+- VentHub aileleri: Vortice aksiyel endüstriyel fanlar ticari ve endüstriyel hacimlerin havalandırması için, Nicotra Gebhardt RDH radyal (santrifüj) fanlar ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için tasarlanmıştır [3].
+- Teklif: aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [3].
+
+## Atölyede havalandırma ile zararlı maddelerin havadan uzaklaştırılması nasıl ayrılır?
+
+HSE'nin işyeri havalandırması rehberinde havalandırma, dışarıdan temiz hava getirme ve iç havayı uzaklaştırma işlemidir; kaynak dumanı ve proseslerin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılması için rehber COSHH (Control of Substances Hazardous to Health Regulations) ile yerel egzoz havalandırması rehberlerine yönlendirir [2].
+
+| İhtiyaç | HSE'de karşılığı [2] |
+|---|---|
+| Dışarıdan temiz hava getirmek, iç havayı uzaklaştırmak | İşyeri havalandırması rehberi; havalandırma doğal yolla ya da fanla mekanik yolla yapılır |
+| Kaynak dumanı ve proses tozu gibi zararlı maddeleri havadan uzaklaştırmak | COSHH ve yerel egzoz havalandırması rehberleri |
+
+İlgili rehber: [Boyahane havalandırma fanı nasıl seçilir?](vh:yazi/boyahane-havalandirma-fani-secimi)
+
+## VentHub'da hangi endüstriyel havalandırma fanı serileri var?
+
+Aksiyel fanlar santrifüj fanlarla zaman zaman birbirinin yerine kullanılabilse de çoğunlukla temiz havada, düşük basınçlı ve yüksek debili uygulamalarda kullanılır [1]. Santrifüj fanlar ise yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına uygun yapılabilir [1].
+
+VentHub ailelerinden örnekler şunlardır. [Vortice aksiyel endüstriyel fanlar](vh:aile/vortice-aksiyel-endustriyel-fanlar), ticari ve endüstriyel hacimlerin havalandırması için tasarlanmış duvar tipi bir endüstriyel aksiyel fan ailesidir; farklı çaplarda, monofaze ve trifaze sürümleri bulunur [3]. [Nicotra Gebhardt RDH radyal fanlar](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ise ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için özel olarak tasarlanmıştır [3].
+
+İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+
+## Teklif için hangi bilgiler gerekir?
+
+Teklif, aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [3]. Fan seçiminin dayandığı çalışma koşulları şunlardır:
+
+- Taşınacak havanın özellikleri: nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi [1].
+- Gereken hava debisi [1].
+- Basınç [1].
+- Sistem yerleşimi [1].
+
+İlgili rehber: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi)
+
+## Sık sorulan sorular
+
+### Havalandırmada uzaklaştırılan iç hava nasıl olabilir?
+
+HSE'ye göre iç hava bayat olabilir, iş makineleri ve prosesler yüzünden sıcak ve nemli olabilir ya da kirletici ve başka safsızlıklar içerebilir [2].
+
+### Mekanik havalandırma nedir?
+
+Mekanik havalandırma, havayı fanlarla odalara veren ve odalardan alan havalandırmadır [2]. Küçük alanlarda ve binalarda fanlar odanın içinde olabilir; büyük binalarda kanal ve fan ağıyla odalara temiz hava üflenebilir ve/veya bayat hava çekilebilir [2].
+
+### Doğal ve mekanik havalandırma farkı nedir?
+
+Doğal havalandırma havayı kapılardan, pencerelerden ve menfez ya da ızgara gibi diğer açıklıklardan sağlar; mekanik havalandırma fan kullanır [2]. Birçok binada ikisi bir arada, farklı alanlarda kullanılır [2].
+
+### Atölye fanı aksiyel mi radyal mi seçilir?
+
+Bunu sistemin çalışma koşulları belirler: havanın özellikleri, hava debisi, basınç ve sistem yerleşimi, santrifüj ya da aksiyel fandan hangisinin gerektiğini gösterir [1].
+
+### VentHub'da endüstriyel havalandırma için hangi fan aileleri var?
+
+Örnekler Vortice aksiyel endüstriyel fanlar ile Nicotra Gebhardt RDH radyal fanlardır; teklif aile sayfalarındaki "Teknik Teklif İste" düğmesiyle istenir [3].
+
+## Kaynaklar
+
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, Nisan 2003, basılı s. 4, 17 ve 19. https://www.energy.gov/sites/prod/files/2014/05/f16/fan_sourcebook.pdf (erişim 18.11.2026)
+2. UK Health and Safety Executive (HSE), Ventilation in the workplace, Overview. https://www.hse.gov.uk/ventilation/index.htm (erişim 18.11.2026)
+3. VentHub, Vortice aksiyel endüstriyel fanlar ve Nicotra Gebhardt RDH radyal fanlar aile sayfaları (erişim 18.11.2026): https://venthub.com.tr/tr/products/vortice-aksiyel-endustriyel-fanlar , https://venthub.com.tr/tr/products/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar
+
+## Teknik sorumluluk notu
+
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Montaj ve elektrik bağlantısı yetkili personelle yapılır. Ürün bilgileri yayın tarihindeki sürüme aittir.
+`,
+      },
+    },
+  },
 ]
 
 /** O dilde yazılmış yazılar, yeniden eskiye (R3 liste sayfası). */
