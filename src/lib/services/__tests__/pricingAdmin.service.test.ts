@@ -158,9 +158,8 @@ describe('toPricingProductInput — marka köprüsü', () => {
     expect(out.brandId).toBe('brand-vortice')
   })
 
-  it('maliyet satırı yok/görünmez (RLS, yönetici değil): costInBase null — sessiz 0 değil', () => {
-    const out = toPricingProductInput({ ...PRODUCT_ROW, product_costs: null }, new Map())
-    expect(out.costInBase).toBeNull()
+  it('maliyet satırı yok/görünmez (RLS, bayat jeton): sessiz null değil, açık HATA (fiyatlar pasifleşmesin)', () => {
+    expect(() => toPricingProductInput({ ...PRODUCT_ROW, product_costs: null }, new Map())).toThrow(/product_costs okunamadı/)
   })
 
   it('maliyetsiz ürün: costInBase null taşınır (cost_plus fiyatlayamaz sinyali)', () => {

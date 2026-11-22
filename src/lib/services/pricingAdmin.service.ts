@@ -335,6 +335,11 @@ export async function loadBrandIdByName(supabase: SupabaseClient<Database>): Pro
 
 /** Saf: ürün satırı → fiyat motoru girdisi (marka metni FK'ye köprülenir). */
 export function toPricingProductInput(row: ProductScopeRow, brandIdByName: Map<string, string>): SampleProduct {
+  // Fail-closed (ALT-123): her ürünün maliyet satırı vardır (migration Guard A). Gömme boşsa satır yetkisizlikle
+  // gizlenmiştir (ör. JWT'de rol henüz yenilenmedi); "maliyet yok" diye sessiz null yazmak fiyatları pasifleştirirdi.
+  if (row.product_costs === null) {
+    throw new Error(`product_costs okunamadı (ürün ${row.id}): yönetici oturumunu yenileyip tekrar deneyin`)
+  }
   return {
     id: row.id,
     brandId: brandIdByName.get(row.brand) ?? brandIdByName.get(row.brand.trim()) ?? null,
