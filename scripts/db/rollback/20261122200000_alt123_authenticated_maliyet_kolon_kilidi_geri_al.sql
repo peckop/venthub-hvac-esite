@@ -10,8 +10,8 @@
 
 begin;
 
-set lock_timeout = '5s';
-set statement_timeout = '30s';
+set local lock_timeout = '5s';
+set local statement_timeout = '30s';
 
 -- (1) Tablo düzeyi SELECT geri (kolon düzeyi grant'ler zaten tablo yetkisinin alt kümesidir; çakışma zararsız).
 grant select on public.products to authenticated;

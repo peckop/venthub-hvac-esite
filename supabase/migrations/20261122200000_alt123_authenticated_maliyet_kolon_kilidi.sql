@@ -112,6 +112,17 @@ begin
       using errcode = '22023';
   end if;
 
+  -- Eşzamanlılık (B8): hedef satırlar ÖNCE kilitlenir (id sırasıyla, kilit sırası kaynaklı kilitlenme olmasın). Eski gövde
+  -- `p.purchase_price = s.purchase_price` kıyasını hedef satırda yapıyordu (READ COMMITTED'de eşzamanlı güncellemeden sonra
+  -- yeniden değerlendirilir); kıyas artık product_costs üzerinde olduğundan bayat okuma olmasın diye kilit şart.
+  -- FOR UPDATE yalnız id/tenant_id SELECT ve UPDATE yetkisi ister (ikisi de verili).
+  perform 1
+    from public.products p
+   where p.id in (select s.id from jsonb_to_recordset(p_satirlar) as s(id uuid))
+     and p.tenant_id = public.jwt_tenant_id()
+   order by p.id
+     for update;
+
   -- Beklenen: şu an gerçekten DEĞİŞECEK satır sayısı (gelen değer sütun duyarlığına yuvarlanmış hâliyle).
   -- ALT-123: mevcut değerler products'tan DEĞİL product_costs'tan okunur (kolon yetkisi kilidi).
   select count(*) into v_beklenen
