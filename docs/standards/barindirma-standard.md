@@ -134,15 +134,21 @@ girmez.
 
 **Kapalı ayarla normal dağıtımın geçişi (aynı gün):** dağıtım #93: yeni konteyner başladı 18:44:01Z, "5 sn proxy bekleniyor",
 eski konteyner 18:44:09Z'de silindi, bitiş 18:44:13Z. Yoklamada (122 satır, 25 saniye iki yoklayıcı üst üste yazdı)
-`/tr` istekleri **18:44:11 ve 18:44:12'de 10 sn'de zaman aşımına uğradı**, `/api/health` her saniye 200 verdi. Yani geçişte
-hafif uç sağlam, soğuk önbellekli sayfa ilk istekte yavaştır; 21:28 TSİ 503'ü ve `/tr`, `/tr/about`, liste sayfalarındaki
-504'ler bu desenle uyumludur (kanıt değil: proxy günlüğü ölçülmedi, SSH yok). **5 eşzamanlı istekte kapasite sorusu ölçülmedi.**
+`/tr` istekleri **18:44:11 ve 18:44:12'de başlayıp 10 sn'de zaman aşımına uğradı**; 18:44:23'ten sonra hepsi 200 (ilk istek
+0,58 sn). Sebep AYRILAMADI: iki açıklama da uyar. (a) Yeni konteynerde soğuk önbellekle sayfa üretimi uzadı. (b) Eski konteyner
+silinirken bağlantılar yanıtsız kaldı. `/api/health` sütunu bunu ayırmaz: aynı satırda `/tr` zaman aşımından 10 sn SONRA
+ölçülür. Ayırmak için sonraki dağıtımda iki yolu bağımsız döngülerle yoklamak gerekir. 21:28 TSİ 503'ü ve `/tr`, `/tr/about`,
+liste sayfalarındaki 504'ler bu pencereyle ZAMAN olarak uyumludur (kanıt değil: proxy günlüğü ölçülmedi, SSH yok).
+**5 eşzamanlı istekte kapasite sorusu ölçülmedi.**
 
 **Kural:** (1) Coolify sağlık kontrolü, imajda `curl` ya da `wget` olmadan açılmaz; açmak için önce Dockerfile'a `curl`
-eklenir (imaj değişikliği, ayrı PR ve ayrı onay). (2) Geçiş kesintisini kapatmanın doğru yolu `/api/health` değil, ısıtılmış
-sayfadır: sağlık yolu `/tr` olmalıdır ki yeni konteyner trafik almadan önce ilk sayfayı render etmiş olsun. (3) Ayar
-canlı değişiklik sayılır: önce OPS'a "ne değişiyor, nasıl geri alınır" (plan §Ölçülen dersler 3), geri alma = ayarı kapatıp
-yeniden dağıtmak.
+eklenir (imaj değişikliği, ayrı PR ve ayrı onay). (2) Sağlık yolu **`/api/health` kalır**; `/tr` olmaz. Sebep: Coolify
+kontrolü Docker `HEALTHCHECK` olarak SÜREKLİ koşar (aralık 5 sn, deneme 10) ve Traefik Docker sağlayıcısı sağlıksız ya da
+"starting" konteyneri yönlendirmeden çıkarır (Coolify belgesi: yalnız sağlıklı kaynak trafik alır; Traefik belgesi/kaynak
+tartışması: "Filtering unhealthy or starting container"). `/tr` yolu Supabase yavaşlayınca ya da sayfa geç üretilince çalışan
+konteyneri trafikten düşürür; bu bugünkü kısa hatadan büyük kesintidir. Sayfa ısıtması sağlık yoluna bağlanmaz, ayrı öneri
+olur. (3) Ayar canlı değişiklik sayılır: önce OPS'a "ne değişiyor, nasıl geri alınır" (plan §Ölçülen dersler 3), geri alma =
+ayarı kapatıp yeniden dağıtmak.
 
 ## Bekçiler
 
