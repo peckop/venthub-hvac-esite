@@ -224,3 +224,14 @@ Açılış şartı TAKVİM DEĞİL KAPI (challenger v2 2.C): Faz 2-kod ve REC-38
 | G15 | Faz 3 provası `drop column supplier_name` / `purchase_price` | DURDU (CASCADE'siz): `inventory_velocity` / `inventory_summary`, `denetim_izi_products_upd`, `trg_product_costs_senkron_upd` bağımlı — Faz 3 madde 1-2-4'ün sırası doğrulandı |
 
 **Gölge sınırları (adıyla):** `auth.uid()` gölgede NULL → products RLS'li UPDATE admin için bile 0 satır; G10 bu yüzden products RLS'i YALNIZ gölgede kapatarak ölçüldü (tetik davranışı ölçüldü, politika değil). `handle_supabase_webhook` (vault yok) yalnız gölgede kapatıldı. authenticated'a `auth` şema erişimi canlıdaki gibi gölgede verildi. `unique(id, tenant_id)` kilit süresi 1 satırda anlamsız → canlıda `lock_timeout` korur. `row_pk` (2.B.6) Faz 3 kapsamı, ölçülmedi.
+
+## 10 · Aşama B uygulama notu — authenticated kilidi (ALT-123, 22 Kasım 2026)
+
+Aşama A (anon) 1 Kasım'da indi; bu aşama authenticated rolünü kapatır. İki PR, sıra bağlayıcı: önce okuyucuları `product_costs`'a taşıyan kod PR'ı canlıya iner, sonra migration (Recep sözüyle; birleşince supabase-migrate prod'a uygular).
+
+- **Migration:** `20261122200000_alt123_authenticated_maliyet_kolon_kilidi.sql`; geri alma `scripts/db/rollback/20261122200000_alt123_authenticated_maliyet_kolon_kilidi_geri_al.sql` (otomatik uygulanmaz). Kapsam 8 kolon (7 maliyet + `supplier_name`).
+- **Sapma (adıyla):** `warehouse_location` bu aşamada kapatılmaz: `inventory_velocity` (security_invoker) onu `products`'tan authenticated ile okur ve envanter ekranı yazar. Ayrı karar; nöbetçide authenticated listesinde yok.
+- **`maliyet_yenile` yeniden yazıldı** (INVOKER kalır): mevcut değerleri `products`'tan değil `product_costs`'tan okur, yazım `products`'ta kalır (yazıcı kuralı; senkron tetiği taşır). Hata kodları ve sayım eşitliği aynı.
+- **Ölçüm (gölge, tek kullanımlık konteyner, 5 ürünlük tohum):** üye 8 kolonda reddedilir, `product_costs` 0 satır; yönetici 5 satır görür, ürün güncellemesi, `inventory_*` ve gerçekten değiştiren `maliyet_yenile` çalışır; geri alma tablo SELECT'ini geri verir; kilit satırı çıkarılmış sabotaj sürümünde Guard E migration'ı DURDURUR. Gölge sınırı: `fts_search_products` (pgroonga yok) gölgede atlandı, canlıda Guard E içinde sınanır; yönetici sınaması gerçek bir yönetici profili ister (products UPDATE politikası `auth.uid()` ile `user_profiles`'a bakar).
+- **Kapılar:** `INV-MALIYET-OKUYUCU-1` (kod PR'ı: products SELECT listelerinde 8 kolon yok), `INV-MALIYET-KOLON-3` (migration + geri alma + bedel: sonraki yeni products kolonu authenticated'a grant edilir ya da `-- authenticated-kapali: <kolon>`), nöbetçi authenticated ölçümü (`db-advisor.yml`, migration inmeden "beklemede").
+- **Bedeli:** `products`'a eklenecek her yeni kolon authenticated için okunamaz olur; migration `grant select (<kolon>) on public.products to anon, authenticated;` taşımalıdır.
