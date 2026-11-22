@@ -97,7 +97,11 @@ const AdminDashboardPage: React.FC = () => {
       const [returnsRes, shipRes, productsRes, chartReturnsRes, abcRes] = await Promise.all([
         supabase.from('venthub_returns').select('id', { count: 'exact', head: true }).in('status', ['requested', 'approved']),
         supabase.from('venthub_orders').select('id', { count: 'exact', head: true }).is('shipped_at', null).in('status', ['confirmed', 'processing']),
-        supabase.from('products').select('purchase_price, price, stock_qty, low_stock_threshold'),
+        // Maliyet (liste fiyatı) products'ta değil product_costs'ta (RLS: yalnız admin). Yönetici olmayanda
+        // gömme istenmez: kart zaten gizli, ağ yanıtına maliyet hiç gelmez (ALT-123).
+        showCost
+          ? supabase.from('products').select('price, stock_qty, low_stock_threshold, product_costs(purchase_price)')
+          : supabase.from('products').select('price, stock_qty, low_stock_threshold'),
         supabase.from('venthub_returns').select('id, created_at').gte('created_at', sevenDaysAgoISO),
         /*
           ABC sınıfı `inventory_summary`'de — `inventory_velocity`'de DEĞİL.
@@ -220,7 +224,11 @@ const AdminDashboardPage: React.FC = () => {
       )
 
       if (productsRes.data) {
-        const rawProducts = productsRes.data as import('../../types/db-rows').DbProduct[]
+        const rawProducts = productsRes.data as Array<{
+          stock_qty?: number | null
+          low_stock_threshold?: number | null
+          product_costs?: { purchase_price: number | null } | null
+        }>
 
         // Use a single O(n) loop to calculate both tiedCapital and alarmCount
         let capital = 0
@@ -229,7 +237,8 @@ const AdminDashboardPage: React.FC = () => {
         for (let i = 0; i < rawProducts.length; i++) {
           const p = rawProducts[i]
           const stockQty = typeof p.stock_qty === 'number' ? p.stock_qty : 0
-          const purchasePrice = typeof p.purchase_price === 'number' ? p.purchase_price : 0
+          const purchasePrice =
+            typeof p.product_costs?.purchase_price === 'number' ? p.product_costs.purchase_price : 0
           const lowStockThreshold = typeof p.low_stock_threshold === 'number' ? p.low_stock_threshold : 5
 
           capital += purchasePrice * stockQty
@@ -247,7 +256,7 @@ const AdminDashboardPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [t])
+  }, [t, showCost])
 
   useEffect(() => {
     loadKPIs()

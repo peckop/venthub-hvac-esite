@@ -36,14 +36,18 @@ export interface ProductScopeRow {
   sku: string
   brand: string
   category_id: string | null
-  cost_in_base: number | null
+  /**
+   * Donmuş TL maliyet `product_costs`'ta durur (RLS: yalnız yönetici). İlişki bire bir → nesne ya da null.
+   * `null` = maliyet satırı yok/görünmez; `costInBase` null olur (yalnız 'fixed' kural fiyatlar), sessiz 0 değil.
+   */
+  product_costs: { cost_in_base: number | null } | null
 }
 
 /** Örnek ürün = fiyat motoru girdisi + panelde gösterilecek kimlik alanları. */
 export type SampleProduct = PricingProductInput & { name: string; sku: string }
 
 /** Fiyat motorunun ürün girdisi için gereken SSOT kolon listesi (materialize servisi de bunu kullanır). */
-export const PRODUCT_SCOPE_COLUMNS = 'id, name, sku, brand, category_id, cost_in_base'
+export const PRODUCT_SCOPE_COLUMNS = 'id, name, sku, brand, category_id, product_costs(cost_in_base)'
 
 /** Panelde tek seferde listelenen kural üst sınırı (kural sayısı düzinelerle ölçülür). */
 export const PRICING_RULE_LIST_LIMIT = 500
@@ -331,11 +335,16 @@ export async function loadBrandIdByName(supabase: SupabaseClient<Database>): Pro
 
 /** Saf: ürün satırı → fiyat motoru girdisi (marka metni FK'ye köprülenir). */
 export function toPricingProductInput(row: ProductScopeRow, brandIdByName: Map<string, string>): SampleProduct {
+  // Fail-closed (ALT-123): her ürünün maliyet satırı vardır (migration Guard A). Gömme boşsa satır yetkisizlikle
+  // gizlenmiştir (ör. JWT'de rol henüz yenilenmedi); "maliyet yok" diye sessiz null yazmak fiyatları pasifleştirirdi.
+  if (row.product_costs === null) {
+    throw new Error(`product_costs okunamadı (ürün ${row.id}): yönetici oturumunu yenileyip tekrar deneyin`)
+  }
   return {
     id: row.id,
     brandId: brandIdByName.get(row.brand) ?? brandIdByName.get(row.brand.trim()) ?? null,
     categoryId: row.category_id ?? null,
-    costInBase: row.cost_in_base ?? null,
+    costInBase: row.product_costs?.cost_in_base ?? null,
     name: row.name,
     sku: row.sku,
   }
@@ -498,7 +507,7 @@ const SCOPE_SCAN_MAX_PAGES = 50
  *  · Aktif + silinmemiş ürünler (diğer kapsam ölçümleriyle aynı taban).
  *  · Dönen değerler trim+BÜYÜK harf, tekil ve sıralıdır.
  *  · **Boş dizi = kapsamda aktif ürün YOK.** Bu okuma kesindir çünkü
- *    `products.purchase_currency` NOT NULL'dır — "ürün var ama para birimi yok" hâli
+ *    `product_costs.purchase_currency` NOT NULL'dır — "ürün var ama para birimi yok" hâli
  *    doğmaz, dolayısıyla boş dizi belirsiz değildir.
  *
  * SESSİZ KESME YASAĞI: PostgREST tek istekte en çok 1000 satır döndürür. Tek sorguyla
@@ -519,7 +528,7 @@ export async function distinctPurchaseCurrenciesInScope(
     const from = page * SCOPE_SCAN_PAGE
     const baseQuery = supabase
       .from('products')
-      .select('purchase_currency')
+      .select('id, product_costs(purchase_currency)')
       .is('deleted_at', null)
       .eq('status', 'active')
 
@@ -531,7 +540,12 @@ export async function distinctPurchaseCurrenciesInScope(
 
     const rows = data ?? []
     for (const row of rows) {
-      const currency = (row.purchase_currency ?? '').trim().toUpperCase()
+      // Maliyet satırı yok/görünmez: "para birimi yok" DEĞİL "bilinmiyor" — sessiz atlamak kümeyi eksik bırakıp
+      // yanlış kuru kilitletirdi. Açık hata (yönetici olmayan oturum da buraya düşer: RLS 0 satır).
+      if (!row.product_costs) {
+        throw new Error(`distinctPurchaseCurrenciesInScope: ürün ${row.id} için maliyet satırı yok ya da görünmüyor.`)
+      }
+      const currency = (row.product_costs.purchase_currency ?? '').trim().toUpperCase()
       if (currency) found.add(currency)
     }
     if (rows.length < SCOPE_SCAN_PAGE) return [...found].sort()

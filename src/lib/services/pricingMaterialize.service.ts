@@ -14,10 +14,13 @@ import {
 import { fetchActivePolicies, resolveFxLocks, resolveFxLockWithPolicies } from './pricingPolicy.service'
 
 /** `refreshCostInBase`'in okuduğu ürün kolonları (products.Row'un alt kümesi). */
-type CostRefreshProductRow = Pick<
-  Database['public']['Tables']['products']['Row'],
-  'id' | 'brand' | 'category_id' | 'purchase_price' | 'purchase_currency' | 'cost_in_base' | 'purchase_rate_to_base'
->
+type CostRefreshProductRow = Pick<Database['public']['Tables']['products']['Row'], 'id' | 'brand' | 'category_id'> & {
+  /** Maliyet alanları `product_costs`'ta (RLS: yalnız yönetici); bire bir ilişki → nesne ya da null. */
+  product_costs: Pick<
+    Database['public']['Tables']['product_costs']['Row'],
+    'purchase_price' | 'purchase_currency' | 'cost_in_base' | 'purchase_rate_to_base'
+  > | null
+}
 
 /**
  * W1b · Materialize servisi (T001-VH).
@@ -171,7 +174,7 @@ export async function refreshCostInBase(
         // için bu alanları ister. Eskiden çekilmiyordu ve kilit çözümüne yalnız `id`
         // geçiyordu — iki kapsam bu halkada SESSİZCE yok sayılıyordu (aşağıya bak).
         .select(
-          'id, brand, category_id, purchase_price, purchase_currency, cost_in_base, purchase_rate_to_base',
+          'id, brand, category_id, product_costs(purchase_price, purchase_currency, cost_in_base, purchase_rate_to_base)',
           { count: 'exact' },
         )
         .is('deleted_at', null)
@@ -240,13 +243,16 @@ export async function refreshCostInBase(
       skippedFxLocked++
       continue
     }
-    const purchasePrice = Number(p.purchase_price)
-    if (!Number.isFinite(purchasePrice) || purchasePrice <= 0) {
+    // Maliyet satırı yok/görünmez (yönetici olmayan oturum ya da eksik senkron): sessiz 0 yazmak yerine
+    // "alış fiyatı yok" sayacına düşer ve özette görünür.
+    const cost = p.product_costs
+    const purchasePrice = cost ? Number(cost.purchase_price) : Number.NaN
+    if (!cost || !Number.isFinite(purchasePrice) || purchasePrice <= 0) {
       skippedNoPurchasePrice++
       continue
     }
 
-    const fx = await getRateFor(p.purchase_currency)
+    const fx = await getRateFor(cost.purchase_currency)
     if (!fx) {
       skippedNoRate++
       continue
@@ -256,8 +262,8 @@ export async function refreshCostInBase(
     // Sütun duyarlığına (numeric(18,6)) yuvarla: fazla ondalıklı kur her koşuda "değişti" görünüp satırı boşuna
     // yeniden yazmasın (DB de aynı duyarlığa yuvarlar; günlük yazılmaz ama satır ve sayaç şişerdi).
     const newRate = Math.round(fx.rate * 1e6) / 1e6
-    const sameCost = p.cost_in_base != null && Math.abs(Number(p.cost_in_base) - newCostInBase) < 1e-9
-    const sameRate = p.purchase_rate_to_base != null && Math.abs(Number(p.purchase_rate_to_base) - newRate) < 1e-9
+    const sameCost = cost.cost_in_base != null && Math.abs(Number(cost.cost_in_base) - newCostInBase) < 1e-9
+    const sameRate = cost.purchase_rate_to_base != null && Math.abs(Number(cost.purchase_rate_to_base) - newRate) < 1e-9
     if (sameCost && sameRate) continue
 
     updated++
@@ -266,7 +272,7 @@ export async function refreshCostInBase(
       costInBase: newCostInBase,
       purchaseRateToBase: newRate,
       purchasePrice,
-      purchaseCurrency: p.purchase_currency,
+      purchaseCurrency: cost.purchase_currency,
     })
   }
 
