@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.31 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.32 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -124,6 +124,8 @@ GEO-SEO'ya yazılır. Kapı yazılmadı (ARAÇ işi); fark betiği BLOG çalış
 
 **v0.31 (2026-11-21, BLG-90, OPS-345 öneri 2):** **Yayın kaydı tek komutla kurulur.** B8'e `scripts/rehber/yayin-paketi.mjs` eklendi: hazır yazıyı kaynak daldan alır, güncel master üstüne ayrı dal olarak kurar (tarihler, `tarihGizli`, iki site haritası fikstürü, test sayıları, llms sayısı, gerekirse sahte katalog, gövde izi); kırık `vh:yazi` bağlantısında hiçbir dosyaya yazmaz. Her yazının PR'ı master'dan açılır, zincirli dal kurulmaz (13-20 Kasım'da squash üç kez çakıştı). Ölçüm: atölye yazısında aracın çıktısı elle hazırlanan dalla altı dosyada birebir aynı.
 
+**v0.32 (2026-11-22, BLG-59, OPS onayı):** **Yazılar birbirini destekler.** R1.3, yazı ile yazı çakışmasının yanına yazı ile aynı adlı kategori veya liste sayfası çakışmasını ekledi: yeni yazı farklı bir soruya cevap verir ve mevcut içeriğe bağlanır; hedef çakışıyorsa yeni yazı açılmaz, mevcut yazı R5.5 ile genişletilir.
+
 ---
 
 ## R0 — Kapsam
@@ -198,6 +200,8 @@ karşılığı yoktur. Bu, rakip emsaliyle bilerek ayrışan bir tercihtir.
 Aynı sorguya iki yazı yarışmaz. Yeni konu açılmadan önce Search Console'da sorgu+sayfa kırılımıyla o
 küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişletilmesi** (R5.5 revizyonu)
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
+
+Yeni yazı, mevcut bir yazının ya da aynı adlı kategori veya liste sayfasının arama hedefini tekrar etmez; farklı bir soruya cevap verir ve en az bir mevcut yazıya ya da kategoriye bağlanır. Hedef çakışıyorsa yeni yazı açılmaz, mevcut yazı R5.5 ile genişletilir.
 
 **Önceki çalışma taraması betiktir (BLG-58).** Yayındaki yazıların konu, adres, ürün, kategori ve mevzuat kalemi tablosunu elle çıkarma; `node scripts/rehber/yazi-envanteri.mjs` üretir (dizin durumu depo dışı dosyadan gelir, yoksa "ÖLÇÜLMEDİ" yazar). Karta "önceki çalışma" satırı yazılırken bu tablo kullanılır.
 
