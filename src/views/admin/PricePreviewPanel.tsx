@@ -52,10 +52,13 @@ interface ProductSearchRow {
   sku: string
   brand: string
   category_id: string | null
-  purchase_price: number
-  purchase_currency: string
-  purchase_rate_to_base: number | null
-  cost_in_base: number | null
+  /** Maliyet `product_costs`'ta (RLS: yalnız yönetici). null = satır yok/görünmez → "maliyet yok", sessiz 0 değil. */
+  product_costs: {
+    purchase_price: number
+    purchase_currency: string
+    purchase_rate_to_base: number | null
+    cost_in_base: number | null
+  } | null
 }
 
 interface PriceListOption {
@@ -65,7 +68,7 @@ interface PriceListOption {
 }
 
 const PRODUCT_SELECT =
-  'id,name,sku,brand,category_id,purchase_price,purchase_currency,purchase_rate_to_base,cost_in_base'
+  'id,name,sku,brand,category_id,product_costs(purchase_price,purchase_currency,purchase_rate_to_base,cost_in_base)'
 const SEARCH_DEBOUNCE_MS = 300
 const SEARCH_LIMIT = 20
 const BASE_BOOK_VALUE = 'base'
@@ -451,9 +454,11 @@ const PricePreviewPanel: React.FC = () => {
                   {t('admin.pricing.preview.cost.purchasePrice')}
                 </dt>
                 <dd className="font-semibold text-admin-fg">
-                  {formatCurrency(selectedProduct.purchase_price, locale, {
-                    currency: selectedProduct.purchase_currency,
-                  })}
+                  {selectedProduct.product_costs
+                    ? formatCurrency(selectedProduct.product_costs.purchase_price, locale, {
+                        currency: selectedProduct.product_costs.purchase_currency,
+                      })
+                    : '—'}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-4">
@@ -461,8 +466,8 @@ const PricePreviewPanel: React.FC = () => {
                   {t('admin.pricing.preview.cost.exchangeRate')}
                 </dt>
                 <dd className="font-semibold text-admin-fg">
-                  {selectedProduct.purchase_rate_to_base != null
-                    ? formatNumber(selectedProduct.purchase_rate_to_base, locale, { maximumFractionDigits: 4 })
+                  {selectedProduct.product_costs?.purchase_rate_to_base != null
+                    ? formatNumber(selectedProduct.product_costs.purchase_rate_to_base, locale, { maximumFractionDigits: 4 })
                     : '—'}
                 </dd>
               </div>
@@ -471,11 +476,13 @@ const PricePreviewPanel: React.FC = () => {
                   {t('admin.pricing.preview.cost.costInBase')}
                 </dt>
                 <dd className="font-semibold text-admin-fg">
-                  {selectedProduct.cost_in_base != null ? formatCurrency(selectedProduct.cost_in_base, locale, { currency: 'TRY' }) : '—'}
+                  {selectedProduct.product_costs?.cost_in_base != null
+                    ? formatCurrency(selectedProduct.product_costs.cost_in_base, locale, { currency: 'TRY' })
+                    : '—'}
                 </dd>
               </div>
             </dl>
-            {selectedProduct.cost_in_base == null ? (
+            {selectedProduct.product_costs?.cost_in_base == null ? (
               <div className="mt-6 p-4 rounded-admin-md bg-admin-warning-weak border border-admin-warning/30 text-admin-warning text-xs font-bold leading-relaxed">
                 {t('admin.pricing.preview.noCostHint')}
               </div>

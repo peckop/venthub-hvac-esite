@@ -102,7 +102,7 @@ const PRODUCT_ROW: ProductScopeRow = {
   sku: 'VQM-100',
   brand: 'Vortice',
   category_id: 'c1',
-  cost_in_base: 1000,
+  product_costs: { cost_in_base: 1000 },
 }
 
 // ── Saf çevriciler (float tuzağı dahil) ──────────────────────────────────────
@@ -158,8 +158,13 @@ describe('toPricingProductInput — marka köprüsü', () => {
     expect(out.brandId).toBe('brand-vortice')
   })
 
+  it('maliyet satırı yok/görünmez (RLS, yönetici değil): costInBase null — sessiz 0 değil', () => {
+    const out = toPricingProductInput({ ...PRODUCT_ROW, product_costs: null }, new Map())
+    expect(out.costInBase).toBeNull()
+  })
+
   it('maliyetsiz ürün: costInBase null taşınır (cost_plus fiyatlayamaz sinyali)', () => {
-    const out = toPricingProductInput({ ...PRODUCT_ROW, cost_in_base: null }, new Map())
+    const out = toPricingProductInput({ ...PRODUCT_ROW, product_costs: { cost_in_base: null } }, new Map())
     expect(out.costInBase).toBeNull()
   })
 })
@@ -222,7 +227,7 @@ describe('sampleProductsInScope', () => {
     expect(samples[0]).toMatchObject({ id: 'p1', sku: 'VQM-100', brandId: 'brand-vortice', costInBase: 1000 })
     const url = decodeURIComponent(calls[0].url)
     expect(url).toContain('limit=3')
-    expect(url).toContain('cost_in_base')
+    expect(url).toContain('product_costs(cost_in_base)')
   })
 })
 
@@ -232,14 +237,28 @@ describe('sampleProductsInScope', () => {
 // Dolayısıyla EKSİK bir küme, sessizce YANLIŞ kur kilitlenmesi demektir. Bu blok
 // tam olarak "eksik küme üretebilecek" iki yolu kapatır: örnekleme ve sayfa kesmesi.
 
+/** Maliyet satırı product_costs'tan gömülü gelir (bire bir ilişki → nesne). */
+const pc = (purchase_currency: string) => ({ id: 'px', product_costs: { purchase_currency } })
+
 describe('distinctPurchaseCurrenciesInScope', () => {
+  it('maliyet satırı olmayan ürün: EKSİK küme değil açık HATA (yanlış kur kilitlenmesin)', async () => {
+    const { supabase } = stubClient({ products: [pc('EUR'), { id: 'p-yok', product_costs: null }] })
+    await expect(distinctPurchaseCurrenciesInScope(supabase, 4, null)).rejects.toThrow(/p-yok.*maliyet satırı/)
+  })
+
+  it('para birimi product_costs gömmesinden istenir (products kolonu değil)', async () => {
+    const { supabase, calls } = stubClient({ products: [pc('EUR')] })
+    await distinctPurchaseCurrenciesInScope(supabase, 4, null)
+    expect(decodeURIComponent(calls[0].url)).toContain('product_costs(purchase_currency)')
+  })
+
   it('ÖRNEKLEME YOK: istek kapsamın tamamını ister (küçük limit atmaz)', async () => {
     const { supabase, calls } = stubClient({
       products: [
-        { purchase_currency: 'EUR' },
-        { purchase_currency: 'EUR' },
-        { purchase_currency: 'EUR' },
-        { purchase_currency: 'USD' },
+        pc('EUR'),
+        pc('EUR'),
+        pc('EUR'),
+        pc('USD'),
       ],
     })
 
@@ -258,19 +277,19 @@ describe('distinctPurchaseCurrenciesInScope', () => {
   it('normalize eder, tekilleştirir, sıralar', async () => {
     const { supabase } = stubClient({
       products: [
-        { purchase_currency: ' eur ' },
-        { purchase_currency: 'USD' },
-        { purchase_currency: 'eur' },
-        { purchase_currency: '' },
+        pc(' eur '),
+        pc('USD'),
+        pc('eur'),
+        pc(''),
       ],
     })
     expect(await distinctPurchaseCurrenciesInScope(supabase, 4, null)).toEqual(['EUR', 'USD'])
   })
 
   it('SESSİZ KESME YOK: 1000 satırlık ilk sayfadan sonrasını da tarar', async () => {
-    const firstPage = Array.from({ length: 1000 }, () => ({ purchase_currency: 'EUR' }))
+    const firstPage = Array.from({ length: 1000 }, () => (pc('EUR')))
     const { supabase, calls } = stubClient({}, 0, {
-      products: [firstPage, [{ purchase_currency: 'USD' }]],
+      products: [firstPage, [pc('USD')]],
     })
 
     // Tek sorguyla okuyan bir gerçeklemede USD 1001. satırda kalır ve küme
@@ -280,7 +299,7 @@ describe('distinctPurchaseCurrenciesInScope', () => {
   })
 
   it('sayfa sınırı aşılırsa EKSİK küme değil HATA döner', async () => {
-    const fullPage = Array.from({ length: 1000 }, () => ({ purchase_currency: 'EUR' }))
+    const fullPage = Array.from({ length: 1000 }, () => (pc('EUR')))
     const { supabase } = stubClient({}, 0, {
       products: Array.from({ length: 60 }, () => fullPage),
     })
@@ -288,7 +307,7 @@ describe('distinctPurchaseCurrenciesInScope', () => {
   })
 
   it('kapsam boşsa [] döner ve ürün sorgusu ATILMAZ (fail-open yok)', async () => {
-    const { supabase, calls } = stubClient({ brands: [], products: [{ purchase_currency: 'EUR' }] })
+    const { supabase, calls } = stubClient({ brands: [], products: [pc('EUR')] })
 
     // Hedef seçilmemiş
     expect(await distinctPurchaseCurrenciesInScope(supabase, 2, null)).toEqual([])
@@ -302,7 +321,7 @@ describe('distinctPurchaseCurrenciesInScope', () => {
   it('kapsam mantığı sayaçla AYNI kaynaktan gelir (marka adı + kategori alt-ağacı)', async () => {
     const { supabase, calls } = stubClient({
       brands: [{ id: 'b1', name: 'Vortice' }],
-      products: [{ purchase_currency: 'EUR' }],
+      products: [pc('EUR')],
     })
     await distinctPurchaseCurrenciesInScope(supabase, 2, 'b1')
     expect(decodeURIComponent(calls[1].url)).toContain('brand=eq.Vortice')
@@ -312,7 +331,7 @@ describe('distinctPurchaseCurrenciesInScope', () => {
         { id: 'c-parent', parent_id: null },
         { id: 'c-child', parent_id: 'c-parent' },
       ],
-      products: [{ purchase_currency: 'TRY' }],
+      products: [pc('TRY')],
     })
     await distinctPurchaseCurrenciesInScope(cascade.supabase, 3, 'c-parent')
     const productsUrl = decodeURIComponent(cascade.calls[cascade.calls.length - 1].url)

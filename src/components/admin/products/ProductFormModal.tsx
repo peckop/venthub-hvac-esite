@@ -3,16 +3,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Loader2, Save,X } from 'lucide-react'
-import React, { useCallback,useEffect, useState } from 'react'
+import React, { useCallback,useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { useRole } from '@/hooks/useRole'
 import { useI18n } from '@/i18n/I18nProvider';
+import { canViewCost } from '@/lib/rbac'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import type { DbCategory, DbJson,DbProductInsert, DbProductUpdate } from '../../../types/db-rows'
 import { ADMIN_PRODUCT_FORM_COLUMNS } from './productForm.columns'
+import { buildCostPayload } from './productForm.payload'
 
 // Form schema
 const getProductSchema = (t: (key: string) => string) => z.object({
@@ -51,6 +54,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
 
     const productSchema = React.useMemo(() => getProductSchema(t), [t])
 
+    // Maliyet yazımı yalnız yönetici (UI izni ⊆ DB izni; canViewCost = public.is_admin_user()).
+    const { role } = useRole()
+    const isAdmin = canViewCost(role)
+
+    // Yüklenen alış fiyatı: "alan değişti mi" kararı bununla kıyaslanır (formState.dirtyFields'e abone olmak
+    // reset() her çağrıldığında yeniden çizim doğurur). undefined = yeni ürün / henüz yüklenmedi.
+    const initialPurchasePrice = useRef<number | undefined>(undefined)
+
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
         defaultValues: {
@@ -66,6 +77,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
             const { data: product, error } = await supabase.from('products').select(ADMIN_PRODUCT_FORM_COLUMNS).eq('id', id).single()
             if (error) throw error
 
+            initialPurchasePrice.current = Number(product.product_costs?.purchase_price) || 0
             reset({
                 name: product.name,
                 sku: product.sku,
@@ -73,7 +85,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 model_code: product.model_code || '',
                 category_id: product.category_id || '',
                 status: (product.status as 'active' | 'out_of_stock' | 'inactive') || 'active',
-                purchase_price: Number(product.purchase_price) || 0,
+                // Maliyet product_costs'ta: satır yok/görünmez (yönetici değil) → 0; değişmeyen alan yüke girmez.
+                purchase_price: Number(product.product_costs?.purchase_price) || 0,
                 stock_qty: product.stock_qty || 0,
                 low_stock_threshold: product.low_stock_threshold || 5,
                 description: (() => {
@@ -119,6 +132,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
             // Modal parent'ta kosulsuz render edilir (unmount olmaz) — onceki
             // urunun EN cevirisi state'te kalip yeni urune sizmasin.
             setDescriptionI18n({})
+            initialPurchasePrice.current = undefined
         }
     }, [open, _productId, reset, loadProduct])
 
@@ -127,12 +141,19 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         try {
             // D4: legacy description kolonu yok — form değeri description_i18n.tr'ye
             // yazılır, mevcut EN çevirisi korunur.
-            const { description, ...rest } = values
+            // purchase_price yükten AYRILIR; yalnız yönetici + alan değiştiyse geri eklenir (buildCostPayload).
+            const { description, purchase_price, ...rest } = values
+            const costPayload = buildCostPayload({
+                isAdmin,
+                purchasePriceDirty: purchase_price !== initialPurchasePrice.current,
+                purchasePrice: purchase_price,
+            })
             const description_i18n = { ...descriptionI18n, tr: description ?? '' } as DbJson
 
             if (_productId) {
                 const payload: DbProductUpdate = {
                     ...rest,
+                    ...costPayload,
                     description_i18n,
                     technical_specs: values.technical_specs as DbJson
                 }
@@ -141,6 +162,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
             } else {
                 const payload: DbProductInsert = {
                     ...rest,
+                    ...costPayload,
                     description_i18n,
                     technical_specs: values.technical_specs as DbJson
                 }

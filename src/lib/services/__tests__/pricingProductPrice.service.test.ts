@@ -222,7 +222,8 @@ function productRow(id: string, cost: number | null = 1000): Row {
     sku: `SKU-${id}`,
     brand: '',
     category_id: null,
-    cost_in_base: cost,
+    // Maliyet products'ta değil product_costs'ta (bire bir gömme → nesne).
+    product_costs: { cost_in_base: cost },
     status: 'active',
     deleted_at: null,
   }

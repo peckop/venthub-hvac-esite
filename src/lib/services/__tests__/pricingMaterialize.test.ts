@@ -57,6 +57,30 @@ interface ProductFixtureRow {
   purchase_price?: number
   purchase_currency?: string
   purchase_rate_to_base?: number | null
+  /** true → product_costs satırı yok/görünmez (RLS: yönetici değil ya da senkron eksik): gömme null döner. */
+  maliyet_yok?: boolean
+}
+
+/**
+ * Sunucu davranışı: maliyet alanları products'ta DEĞİL product_costs'ta durur (bire bir gömme → nesne ya da null).
+ * Düz fixture okunaklı kalsın diye burada gömülü biçime çevrilir; düz maliyet kolonu yanıta HİÇ girmez.
+ */
+function gomuluUrun(r: ProductFixtureRow): Record<string, unknown> {
+  return {
+    id: r.id,
+    name: r.name,
+    sku: r.sku,
+    brand: r.brand,
+    category_id: r.category_id,
+    product_costs: r.maliyet_yok
+      ? null
+      : {
+          purchase_price: r.purchase_price ?? 0,
+          purchase_currency: r.purchase_currency ?? 'EUR',
+          purchase_rate_to_base: r.purchase_rate_to_base ?? null,
+          cost_in_base: r.cost_in_base,
+        },
+  }
 }
 
 interface StubTables {
@@ -114,7 +138,7 @@ function stubClient(
 
     if (method === 'GET') {
       gets?.push(url)
-      const tumu = lookup[table] ?? []
+      const tumu = table === 'products' ? (tables.products ?? []).map(gomuluUrun) : (lookup[table] ?? [])
 
       // ⛔SAHTE SUNUCU `Range` VE `Content-Range`i TAŞIMALI (INV-TAVAN-1, 2026-09-07).
       //
@@ -477,6 +501,32 @@ describe('refreshCostInBase', () => {
     expect(summary.scanned).toBe(1)
     expect(summary.skippedNoPurchasePrice).toBe(1)
     expect(summary.updated).toBe(0)
+  })
+
+  it('maliyet satırı yok/görünmez ürünü sessiz 0 yazmadan atlar ve sayar; maliyeti okuma product_costs gömmesiyle yapılır', async () => {
+    const calls: CapturedWrite[] = []
+    const gets: URL[] = []
+    const supabase = stubClient(
+      {
+        products: [
+          { id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: null, maliyet_yok: true },
+          { id: 'p2', name: 'Fan B', sku: 'SKU-2', brand: 'Vortice', category_id: null, cost_in_base: null, purchase_price: 10, purchase_currency: 'EUR', purchase_rate_to_base: null },
+        ],
+        currency_rates: [{ rate: 35, effective_date: '2026-08-13' }],
+      },
+      calls,
+      gets,
+    )
+
+    const summary = await refreshCostInBase(supabase, { dryRun: false })
+
+    expect(summary.scanned).toBe(2)
+    expect(summary.skippedNoPurchasePrice).toBe(1)
+    expect(summary.updated).toBe(1)
+    const rpc = calls.filter((c) => c.table === 'maliyet_yenile')
+    expect((rpc[0].body as { p_satirlar: { id: string }[] }).p_satirlar.map((r) => r.id)).toEqual(['p2'])
+    const urunGet = gets.find((u) => u.pathname.endsWith('/products'))
+    expect(decodeURIComponent(urunGet?.search ?? '')).toContain('product_costs(purchase_price,purchase_currency,cost_in_base,purchase_rate_to_base)')
   })
 
   it('EUR kuruyla cost_in_base hesaplar ve DEĞİŞTİYSE günceller (dryRun:false)', async () => {
