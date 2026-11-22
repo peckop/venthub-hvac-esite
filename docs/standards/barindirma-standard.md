@@ -2,7 +2,7 @@
 
 > **Kapsam:** VentHub'ın her katmanı (site, veritabanı, DNS, e-posta, önbellek) **nerede** durur,
 > **niçin** orada durur, sağlayıcı değişirse **ne sökülür**.
-> **Sahibi:** ALTYAPI · **Son doğrulama:** 2026-11-16 (ALTYAPI; taşıma planı `docs/plans/tasima-do-coolify-2026-11-15.md` ve canlı taşıma ölçümüne karşı); §B7 (R2 medya kovası) 2026-11-21 OPS ölçümüne ve yükleme manifestine dayanır, ALTYAPI yeniden ölçmedi.
+> **Sahibi:** ALTYAPI · **Son doğrulama:** 2026-11-16 (ALTYAPI; taşıma planı `docs/plans/tasima-do-coolify-2026-11-15.md` ve canlı taşıma ölçümüne karşı); §B7 (R2 medya kovası) 2026-11-21 OPS ölçümüne ve yükleme manifestine dayanır, ALTYAPI yeniden ölçmedi; §B8 (Coolify sağlık kontrolü, dağıtım geçişi) 2026-11-22 ALTYAPI'nın kendi ölçümüne dayanır (ALT-215).
 > **Durum:** YÜRÜRLÜKTE, site taşındı. Site 15 Kasım 2026'dan beri **DigitalOcean 2 GB droplet (Frankfurt) + Coolify** üzerinde (OPS-280, Recep kararı; plan ve ölçülen dersler `docs/plans/tasima-do-coolify-2026-11-15.md`); sağlayıcı seçimi (eski karar 59 sorusu) bununla kapandı. Sağlayıcıdan
 > bağımsız kurallar (§B2–§B5) bugünden geçerlidir.
 > **Ölçüm kaynağı:** REC-367 (2026-09-22) — üç aday yerelde derlendi ve ölçüldü; tablo Linear
@@ -121,6 +121,28 @@ kurulmadı. Yükleme kaydı `yukle-manifest.jsonl`
 
 **Bekçi:** yok. Yeni kova açma, yeni alan adı ya da anahtar üretme kararında bu madde güncellenir ve bir kapı
 gerekip gerekmediği ayrıca değerlendirilir.
+
+## B8 — Coolify dağıtım geçişi ve sağlık kontrolü (22 Kasım 2026, ALT-215, ALTYAPI ölçümü)
+
+**Olgu (ölçüldü):** Coolify uygulamasında kendi sağlık kontrolü (`health_check_enabled`) **kapalıdır** ve **açılamaz**:
+çalışma imajı `node:24-bookworm-slim` tabanlıdır, içinde `curl` da `wget` de yoktur. Kontrol `/api/health` yoluyla açılıp
+dağıtım tetiklendiğinde Coolify 10 denemenin tamamında `curl: not found / wget: not found` aldı, "yeni konteyner sağlıksız"
+deyip eski konteynere döndü (dağıtım #92, 18:41:42Z-18:43:14Z). Geri dönüş çalıştı: bu pencerede site yoklaması
+(saniyede 1 istek, `/tr` ve `/api/health`) **200 dışı yanıt vermedi**. Ayar kapatıldı, kapalı hâli doğrulandı.
+Dockerfile'daki `HEALTHCHECK` (node ile `/api/health`) Docker durumunu "healthy" tutar ama Coolify'ın dağıtım beklemesine
+girmez.
+
+**Kapalı ayarla normal dağıtımın geçişi (aynı gün):** dağıtım #93: yeni konteyner başladı 18:44:01Z, "5 sn proxy bekleniyor",
+eski konteyner 18:44:09Z'de silindi, bitiş 18:44:13Z. Yoklamada (122 satır, 25 saniye iki yoklayıcı üst üste yazdı)
+`/tr` istekleri **18:44:11 ve 18:44:12'de 10 sn'de zaman aşımına uğradı**, `/api/health` her saniye 200 verdi. Yani geçişte
+hafif uç sağlam, soğuk önbellekli sayfa ilk istekte yavaştır; 21:28 TSİ 503'ü ve `/tr`, `/tr/about`, liste sayfalarındaki
+504'ler bu desenle uyumludur (kanıt değil: proxy günlüğü ölçülmedi, SSH yok). **5 eşzamanlı istekte kapasite sorusu ölçülmedi.**
+
+**Kural:** (1) Coolify sağlık kontrolü, imajda `curl` ya da `wget` olmadan açılmaz; açmak için önce Dockerfile'a `curl`
+eklenir (imaj değişikliği, ayrı PR ve ayrı onay). (2) Geçiş kesintisini kapatmanın doğru yolu `/api/health` değil, ısıtılmış
+sayfadır: sağlık yolu `/tr` olmalıdır ki yeni konteyner trafik almadan önce ilk sayfayı render etmiş olsun. (3) Ayar
+canlı değişiklik sayılır: önce OPS'a "ne değişiyor, nasıl geri alınır" (plan §Ölçülen dersler 3), geri alma = ayarı kapatıp
+yeniden dağıtmak.
 
 ## Bekçiler
 
