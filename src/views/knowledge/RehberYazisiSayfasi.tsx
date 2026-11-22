@@ -133,7 +133,8 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
                 karar DS geçişinde token düzeyinde uygulanır — burada tek seferlik sınıf açma. */}
             <RehberGovdesi bloklar={ayrismis.bloklar} hrefler={hrefler} />
 
-            {/* URN-151: kategori kartları (markasız, R3.3) aile kartlarından ÖNCE: genelden özele. Boş liste görünmez. */}
+            {/* URN-151: kategori kartları (markasız, R3.3) aile kartlarından ÖNCE: genelden özele. Boş liste görünmez.
+                URN-175: kartta tanıtım metni yok, yalnız kategori adı + düğme etiketi. */}
             {kategoriKartlari.length > 0 && (
               <section aria-labelledby="ilgili-kategoriler" className="mt-16">
                 <h2 id="ilgili-kategoriler" className="text-2xl font-bold tracking-tight text-primary-navy">
@@ -147,8 +148,8 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
                         className={`block h-full rounded-hvac-sm border border-light-gray p-5 transition-colors hover:border-brand-cyan-ink ${odakSinifi}`}
                       >
                         <span className="block font-semibold text-primary-navy">{k.ad}</span>
-                        {/* Kısa metin yoksa (EN'de çoğu kategori) satır hiç basılmaz; Türkçe metin yedeği konmaz. */}
-                        {k.aciklama ? <span className="mt-2 block text-sm text-industrial-gray line-clamp-2">{k.aciklama}</span> : null}
+                        {/* URN-175 (OPS-368): kart yalnız ad + bağlantı basar. Kategori tanıtım paragrafı (`k.aciklama`)
+                            kategori sayfasındaki metinle aynıydı; yazıda yinelenmez (INV-REHBER-KATEGORI-KARTI-METINSIZ-1). */}
                         <span className="mt-2 block text-sm text-brand-cyan-ink">{t('bilgiMerkezi.yazi.kategoriDugme')}</span>
                       </Link>
                     </li>
