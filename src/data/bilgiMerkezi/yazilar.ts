@@ -759,7 +759,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'kanal-tipi-fan-nedir-nerede-kullanilir',
         ozet: "Kanal fanları nelerdir, nerede kullanılır? Kullanım alanları, yuvarlak ve dikdörtgen kesit farkı, fan türleri ve seçimde bakılacak bilgiler.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz; yeni iddia, sayı ya da marka yok.
-        kartOzeti: 'Kanal fanı seçmeden önce türleri ve takılacağı yerleri bu rehberde karşılaştırın.',
+        kartOzeti: 'Kanal fanı türlerini ve yerini bu rehberde karşılaştırın.',
         govde: `# Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar
 
 Kanal fanları (kanal tipi fanlar), havalandırma sistemlerinde kullanılan ve kanala entegre edilen fanlardır; bağlandıkları kanalın kesiti yuvarlak ya da dikdörtgen olabilir [2]. ABD Enerji Bakanlığı (DOE) ile AMCA International'ın rehberi fanları santrifüj ve aksiyel diye ikiye ayırır, kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı uygun tür olarak anlatır [1].
@@ -918,7 +918,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'isi-geri-kazanim-cihazi-nedir-nasil-secilir',
         ozet: "Isı geri kazanım cihazı egzoz havasının ısısını taze havaya aktarır. Çalışma prensibi, eşanjör türleri ve seçimde bakılacak debi, filtre, verim ve ses.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz; yeni iddia, sayı ya da marka yok.
-        kartOzeti: 'Isı geri kazanım cihazı seçmeden önce türleri ve seçim ölçütlerini bu rehberde karşılaştırın.',
+        kartOzeti: 'Cihaz türlerini ve seçim ölçütlerini bu rehberde karşılaştırın.',
         govde: `# Isı geri kazanım cihazı nedir, nasıl seçilir?
 
 Isı geri kazanım cihazı, egzoz havasıyla dışarı atılacak ısıyı içeri alınan taze havaya aktaran havalandırma cihazıdır [1][2]. Isı geri kazanımlı havalandırıcıda (HRV) hava-hava ısı eşanjörü iki yalıtılmış hava akımı arasında ısı aktarır [2]. Nemi de aktaran türe enerji geri kazanımlı havalandırıcı (ERV) denir [4][1].
@@ -1148,7 +1148,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'hava-perdesi',
         ozet: "Hava perdesi kapı açıkken dış havanın içeri girişini azaltmaya çalışır. Çalışma ilkesi, enerji etkisinin sınırları, model ve montaj yüksekliği seçenekleri.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: 'Hava perdesi seçmeden önce kaynaklı model bilgisini ve enerji etkisinin sınırlarını bu rehberde okuyun.',
+        kartOzeti: 'Model bilgisini ve enerji etkisini bu rehberde okuyun.',
         govde: `# Hava perdesi nedir, nasıl seçilir? Isıtıcılı ve ısıtıcısız model, montaj yüksekliği ve enerji etkisi
 
 Hava perdesi, kapı ya da geçiş açıklığının üstüne monte edilen ve açıklık boyunca aşağı doğru hava akımı üfleyen cihazdır; bu akım kapı açıkken dış havanın içeri girişini sınırlamaya çalışır [1][3]. Perdenin sağladığı tasarruf sabit bir yüzde değildir [2][3]; Hava Hareketi ve Kontrol Derneği'nin (AMCA) bir bilgisayar modelleme çalışmasına göre enerji performansı kapı kullanım sıklığına ve bina girişinin yönüne bağlıdır [2].
@@ -1326,7 +1326,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'fan-cesitleri',
         ozet: "Fan çeşitleri akış yoluna göre aksiyel, radyal ve karma akışlı olarak ayrılır. AB tüzüğündeki akış açısı sınırları ve VentHub fan kategorileri bu yazıda. Endüstriyel fan çeşitleri de VentHub kategorileri içinde listelenir.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Fan türlerini akış yoluna ve VentHub kategorilerine göre karşılaştırmak için bu rehberden başlayın; kategori sayfalarına buradan geçin.",
+        kartOzeti: "Fan türlerini akış yoluna göre bu rehberde karşılaştırın.",
         govde: `# Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar
 
 Havalandırmada kullanılan fanlar, havanın fandan geçerken izlediği yola göre başlıca aksiyel, radyal (santrifüj), karma akışlı ve çapraz akışlı olarak ayrılır [1]. ABD Enerji Bakanlığı kılavuzu iki ana tür sayar: aksiyel ve santrifüj [2]; Avrupa Birliği'nin (AB) 2024/1834 sayılı fan tüzüğüne göre fan aksiyel, santrifüj, çapraz akışlı, karma akışlı ya da jet olabilir (madde 2(1)) [1]. Hangi türün seçileceği hava özelliklerine, debiye, basınca ve sistem yerleşimine bağlıdır [2].
@@ -1462,7 +1462,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'plug-fan-nedir',
         ozet: "Plug fan nedir? Çark ve tahrik yapısı, kullanım yerleri, seçim girdileri ve VentHub'daki plug fan serileri.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini, kategori sayfası metnini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Plug fanın ne olduğunu, VentHub'daki iki seriyi ve seçimde gereken girdileri görmek için bu rehberden başlayın.",
+        kartOzeti: "Plug fan seçiminde gereken girdileri bu rehberde bulun.",
         govde: `# Plug fan nedir, nasıl çalışır, nerede kullanılır?
 
 Plug fan, kasasız bir fan türüdür; ASHRAE Journal'da 1997'de yayımlanan bir makalenin başlığında "unhoused (plug/plenum) fans" ifadesiyle geçer [2]. Casals kataloğunda EC ve IEC motorlu plug fanlar geriye eğik kanatlı, tek emişli, doğrudan tahrikli çarkı olan radyal (santrifüj) fanlardır [4]. Casals bu fanları klima cihazı, plenum, kompresör, kurutucu, kabin ve fotovoltaik invertöre entegre edilmek üzere uygun görür [4].
@@ -1573,7 +1573,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'asit-fani-nedir-korozyona-dayanikli-fan-secimi',
         ozet: "Asit fanı, yani korozyona dayanıklı fan nedir? Hangi ortamlarda gündeme gelir, PP asit fanı dahil hangi malzemeler anılır, motor nerede olmalı, ATEX ile ilişkisi.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Asit fanının ne olduğunu, hangi ortamlarda gündeme geldiğini ve malzeme, motor yeri ile ATEX açısından neye bakılacağını görmek için bu rehberden başlayın.",
+        kartOzeti: "Asit fanında neye bakılacağını bu rehberde bulun.",
         govde: `# Asit fanı nedir? Korozyona ve kimyasala dayanıklı fan nasıl seçilir
 
 Asit fanı, havadaki aşındırıcı gaz, buhar ya da damlacıklara dayanacak malzemelerle yapılan fandır. Laboratuvar çeker ocağı, kapalı yüzme havuzu ve atık su arıtma kaynaklarda aşındırıcı ortam örnekleri olarak geçer [2][5][6]. Malzeme seçimi, kaynaklara göre tahliye edilen maddelerle uyuma bağlıdır; anılan malzemeler arasında polipropilen, PVC, cam elyaf ve kaplamalı çelik vardır [2][3][4].
@@ -1724,7 +1724,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'cati-tipi-fan-nedir-nasil-secilir',
         ozet: "Çatı tipi fan nedir? Çatıdan egzoz atarken hangi ilke belirleyicidir, çatıda hangi fan türleri kullanılır, seçimde hangi bilgiler gerekir ve VentHub'da hangi çatı tipi fan serileri var.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Çatı tipi fanın ne anlama geldiğini, egzoz atışında nelere dikkat edildiğini ve seçimde gereken bilgileri görmek için bu rehberden başlayın.",
+        kartOzeti: "Çatı tipi fanda neye bakılacağını bu rehberde bulun.",
         govde: `# Çatı tipi fan nedir, nasıl seçilir?
 
 Çatı tipi fan, çatıya monte edilip havayı binanın dışına atan fan anlamında kullanılır; üretici sayfalarında terim egzoz çatı fanları için bu anlamda geçer, bazı üreticiler besleme çatı fanlarını da aynı adla sunar [4][6][8]. Seçimde iki soru sorulur: atılan hava binaya geri girecek mi [2] ve fan hangi koşulda çalışacak [1].
@@ -1835,7 +1835,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'patlayici-ortamda-fan-secimi-atex-bolge-kategori',
         ozet: "ATEX nedir, bölge ve ekipman kategorisi ne anlama gelir, bölge 2'de hangi kategori kullanılır, Türkiye'de karşılığı olan yönetmelikler hangileridir ve VentHub'da hangi serilerin sayfasında ATEX bölgesi yazılı.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Patlayıcı ortamda fan seçerken bölgenin ve ekipman kategorisinin ne demek olduğunu görmek için bu rehberden başlayın.",
+        kartOzeti: "Bölge ve ekipman kategorisini bu rehberde okuyun.",
         govde: `# Patlayıcı ortamda fan seçimi: ATEX, bölge ve kategori nedir?
 
 ATEX, patlayıcı ortamlara ilişkin iki AB direktifine verilen addır: biri bu ortamlarda kullanılacak ekipmanı, öteki işyerinde çalışanların korunmasını düzenler [3]. Fan seçiminde iki soru sorulur: işyerindeki alan hangi bölgeye sınıflandırılmış [2][3] ve o bölgede hangi ekipman kategorisi kullanılabilir [2]. Gaz ortamında bölge 2 için kategori 3 ekipman sayılır [1][2].
@@ -1962,7 +1962,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'hucreli-aspirator-nedir-secerken-nelere-bakilir',
         ozet: "Hücreli aspiratör nedir? Kanat tipi, kayışlı ve doğrudan tahrik, çalışma noktası ve kayış bakımı seçimi nasıl etkiler; teklif için hangi bilgiler gerekir.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Hücreli aspiratörün ne anlama geldiğini, kanat ve tahrik seçiminin neye bağlı olduğunu görmek için bu rehberden başlayın.",
+        kartOzeti: "Hücreli aspiratörde neye bakılacağını bu rehberde bulun.",
         govde: `# Hücreli aspiratör nedir, seçerken nelere bakılır?
 
 Hücreli aspiratör, AVenS'in 2026 ürün kataloğunda sık ya da seyrek kanatlı kayış kasnaklı hücreli radyal fan olarak anlatılan fan ailesidir [4]. 2003 tarihli ABD Enerji Bakanlığı ve AMCA rehberine göre seçim, sistemin çalışma koşullarının bilinmesiyle başlar: hava özellikleri, debi, basınç ve sistem yerleşimi [1].
@@ -2081,7 +2081,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'banyo-ve-tuvalet-fani-nasil-secilir',
         ozet: "Banyo ve tuvalet fanı imar yönetmeliğine göre zorunlu mu? Debi, ses ve kumanda ölçütleri nelerdir; teklif için hangi bilgiler gerekir.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Banyo ve tuvalet fanı seçerken mevzuatın, debinin, sesin ve kumandanın nasıl ele alındığını görmek için bu rehberden başlayın.",
+        kartOzeti: "Mevzuat, debi, ses ve kumandayı bu rehberde okuyun.",
         govde: `# Banyo ve tuvalet fanı nasıl seçilir?
 
 Banyo ve tuvalet fanı, nemi ve kirleticileri oluştuğu yerde odadan atan yerel egzoz fanıdır; ABD Enerji Bakanlığı banyo egzoz fanlarını bu türden sayar [5]. Türkiye'de incelenen iki yönetmeliğin gövde metninde bu fanlar için debi değeri yoktur [1][2]. Ölçütler yurt dışı kaynaklıdır [3][4].
@@ -2206,7 +2206,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'mutfak-egzoz-fani-nasil-secilir',
         ozet: "Mutfak egzoz fanı seçimi, havanın özellikleri ile debi, basınç ve sistem yerleşimi bilinerek başlar; gaz yakan cihazlarda tamamlama havası önemlidir.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Mutfak egzoz fanı seçerken havanın özelliklerinin, tamamlama havasının ve motor konumunun nasıl ele alındığını görmek için bu rehberden başlayın.",
+        kartOzeti: "Tamamlama havası ve motor konumunu bu rehberde okuyun.",
         govde: `# Mutfak egzoz fanı nasıl seçilir?
 
 Mutfak egzoz fanının seçimi, taşınacak havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri ile gereken debi, basınç ve sistem yerleşimi bilinerek başlar [3]. VentHub'daki Vortice VORT QBK SAL KC Evo ailesi, sıcak, nemli ve kirli havayı dışarı atmak için tasarlanmış, yağ ve is yüklü havanın işlenmesine uygun hücreli bir mutfak egzoz fanı ailesidir [2].
@@ -2307,7 +2307,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'depo-havalandirma-fani-nasil-secilir',
         ozet: "Depoda fan seçimi işe bağlıdır: havalandırma temiz hava getirip iç havayı uzaklaştırır, endüstriyel tavan vantilatörü içerideki havayı karıştırır.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Depoda havalandırma fanı ile endüstriyel tavan vantilatörünün farkını ve hangi ürün grubunun hangi işe uyduğunu görmek için bu rehberden başlayın.",
+        kartOzeti: "Depoda fan ile tavan vantilatörünü bu rehberde karşılaştırın.",
         govde: `# Depo havalandırma fanı nasıl seçilir?
 
 Depoda fan seçimi önce yapılacak işe bağlıdır: havalandırma dışarıdan temiz hava getirip iç havayı uzaklaştırır [3], endüstriyel (büyük çaplı) tavan vantilatörü ise havayı dışarı atmadan içerideki havayı karıştırır [2]. Seçimi belirleyen sorular arasında tavan vantilatöründe tavan yüksekliği, kapsanacak alan ve asma noktasının taşıma kapasitesi, duvar tipi aksiyel ve çatı tipi fanda gereken debi vardır [2][4].
@@ -2409,7 +2409,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'boyahane-havalandirma-fani-nasil-secilir',
         ozet: "Boyahane fanı seçerken egzoz havası miktarına, fan malzemesine ve topraklamaya, motor yerine ve elektrik donanımının patlayıcı ortama uygunluğuna bakılır.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Boyahane fanı seçerken egzoz havası miktarının, fan malzemesinin, motor yerinin ve patlayıcı ortam donanımının nasıl ele alındığını görmek için bu rehberden başlayın.",
+        kartOzeti: "Boyahane fanı seçimini bu rehberde okuyun.",
         govde: `# Boyahane havalandırma fanı nasıl seçilir?
 
 Boyahane havalandırma fanı seçilirken egzoz havasının miktarına, fanın malzemesine ve topraklanmasına, motorun yerine ve elektrik donanımının patlayıcı ortama uygunluğuna bakılır [2][3][4][5]. Hava miktarı ve motor yeri için ABD OSHA kuralları, donanım kategorisi için Avrupa Birliği'nin 1999/92/AT Direktifi hüküm koyar [2][4][5].
@@ -2528,7 +2528,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         slug: 'atolye-havalandirma-fani-nasil-secilir',
         ozet: "Atölye havalandırma fanı seçimi, havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi ile debi, basınç ve sistem yerleşimi bilinerek başlar.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
-        kartOzeti: "Atölye fanı seçerken havalandırma ile zararlı maddelerin havadan uzaklaştırılmasının nasıl ayrıldığını görmek için bu rehberden başlayın.",
+        kartOzeti: "Atölye fanı seçimini bu rehberde okuyun.",
         govde: `# Atölye havalandırma fanı nasıl seçilir?
 
 Atölye havalandırma fanı seçimi; taşınacak havanın nem, sıcaklık, yoğunluk ve kirlilik düzeyi gibi özellikleri, gereken hava debisi, basınç ve sistem yerleşimi bilinerek başlar [1]. Kaynak dumanı ve proseslerin ürettiği toz gibi zararlı maddelerin havadan uzaklaştırılması ise HSE'nin işyeri havalandırması rehberinin kapsamı dışındadır [2].
