@@ -88,6 +88,21 @@ updates:
       # o sitenin kendi sürüm kararıyla.
       - dependency-name: 'framer-motion'
         update-types: ['version-update:semver-major']
+      # ALT-221 (23 Kasım, karar 412): `recharts` major'ı yok sayılır. 2→3 admin paneli tiplerini kırdı
+      # (AbcPieChart.tsx Formatter tipi, ActivityHeatmap.tsx number[] ve readonly [number, number]; #2677
+      # kapatıldı); panel kodu uyarlanmadan birleşmez, yeni site sıfırdan kurulacak.
+      # KALDIRMA ŞARTI: admin paneli recharts 3 API'sine uyarlandığı gün.
+      - dependency-name: 'recharts'
+        update-types: ['version-update:semver-major']
+      # ALT-221 (23 Kasım): `@sentry/nextjs` >=11.13.0 yok sayılır. 11.13.0 "Emit the tunnel route handler"
+      # ile `tunnelRoute: "/monitoring"` yeniden yazımı kalkıyor görünür: rota-dili-acik-kip testi
+      # ("Sentry tüneli: /monitoring için yeniden yazım VAR") 11.15'te de düştü (#2662, #2676; 4141 test geçti,
+      # tek kırmızı). Tünel tarayıcı hata iletimini taşır; yeni davranış (route handler, CSP, reklam engelleyici
+      # yolu) ölçülüp test uyarlanana kadar bekler. Kurulu sürüm 11.12.0. Yeni sürüm gerekirse bu satır elle
+      # kaldırılır.
+      # KALDIRMA ŞARTI: tünel route handler davranışı ölçüldü ve rota-dili-acik-kip testi ona göre uyarlandı.
+      - dependency-name: '@sentry/nextjs'
+        versions: ['>=11.13.0']
       # (Sentry ana sürüm ertelemesi — karar 17 — ALT-46'da kaldırıldı: @sentry/nextjs 11.9.0 kuruldu,
       # kaldırma şartı oluştu. Bot bundan sonra @sentry/* ana sürümlerini normal PR olarak açar.)
       # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
