@@ -190,11 +190,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                             {getCategoryIcon(sub.slug, { size: 28 })}
                                         </div>
                                     )}
-                                    <h3 className="text-2xl font-bold text-slate-950 mb-4 tracking-tight">{subVm?.displayName}</h3>
-                                    {/* INV-DIL-DUSUSU-1: bu dilde metin yoksa boş paragraf çizilmez. */}
-                                    {subVm?.description ? (
-                                        <p data-testid="alt-kategori-aciklama" className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm.description}</p>
-                                    ) : null}
+                                    <h3 className="text-2xl font-bold text-slate-950 mb-10 tracking-tight">{subVm?.displayName}</h3>
+                                    {/* URN-176 (OPS-368, SEO-138): kartta alt kategorinin tanıtım paragrafı YOK. Aynı metin alt kategori
+                                        sayfasının kendi girişinde duruyor; burada da basılınca üst-alt sayfa çiftlerinde 29-93 kelimelik
+                                        kopya oluşuyordu. Kart yalnız görsel/ikon + ad + bağlantı (INV-ALTGRUP-KART-METINSIZ-1). */}
                                     <div className="flex items-center gap-3 text-xs font-black uppercase tracking-hvac-relaxed text-slate-400 group-hover:text-cyan-600 transition-colors">
                                         <span>{t('category.showcase.exploreSeries')}</span>
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
