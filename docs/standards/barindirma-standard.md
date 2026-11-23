@@ -2,7 +2,7 @@
 
 > **Kapsam:** VentHub'ın her katmanı (site, veritabanı, DNS, e-posta, önbellek) **nerede** durur,
 > **niçin** orada durur, sağlayıcı değişirse **ne sökülür**.
-> **Sahibi:** ALTYAPI · **Son doğrulama:** 2026-11-16 (ALTYAPI; taşıma planı `docs/plans/tasima-do-coolify-2026-11-15.md` ve canlı taşıma ölçümüne karşı); §B7 (R2 medya kovası) 2026-11-21 OPS ölçümüne ve yükleme manifestine dayanır, ALTYAPI yeniden ölçmedi; §B8 (Coolify sağlık kontrolü, dağıtım geçişi) 2026-11-22 ALTYAPI'nın kendi ölçümüne dayanır (ALT-215).
+> **Sahibi:** ALTYAPI · **Son doğrulama:** 2026-11-16 (ALTYAPI; taşıma planı `docs/plans/tasima-do-coolify-2026-11-15.md` ve canlı taşıma ölçümüne karşı); §B7 (R2 medya kovası) 2026-11-21 OPS ölçümüne ve yükleme manifestine dayanır, ALTYAPI yeniden ölçmedi; §B8 (Coolify sağlık kontrolü, dağıtım geçişi) 2026-11-22 ve 2026-11-23 ALTYAPI'nın kendi ölçümüne dayanır (ALT-215).
 > **Durum:** YÜRÜRLÜKTE, site taşındı. Site 15 Kasım 2026'dan beri **DigitalOcean 2 GB droplet (Frankfurt) + Coolify** üzerinde (OPS-280, Recep kararı; plan ve ölçülen dersler `docs/plans/tasima-do-coolify-2026-11-15.md`); sağlayıcı seçimi (eski karar 59 sorusu) bununla kapandı. Sağlayıcıdan
 > bağımsız kurallar (§B2–§B5) bugünden geçerlidir.
 > **Ölçüm kaynağı:** REC-367 (2026-09-22) — üç aday yerelde derlendi ve ölçüldü; tablo Linear
@@ -124,7 +124,12 @@ gerekip gerekmediği ayrıca değerlendirilir.
 
 ## B8 — Coolify dağıtım geçişi ve sağlık kontrolü (22 Kasım 2026, ALT-215, ALTYAPI ölçümü)
 
-**Olgu (ölçüldü):** Coolify uygulamasında kendi sağlık kontrolü (`health_check_enabled`) **kapalıdır** ve **açılamaz**:
+> **23 Kasım 2026 güncellemesi (ALT-215, ALTYAPI ölçümü):** imaja `curl` eklendi (PR 2659) ve sağlık kontrolü **AÇILDI**
+> (`/api/health`, başlangıç payı 30 sn, ilk denemede healthy). Tek dağıtımda (09:53:36-09:54:21Z) bağımsız yoklama: `/api/health`
+> 283/283 200; `/tr` 238 yoklamada 503/504 sıfır, eski konteyner silinirken 1 zaman aşımı (10 sn). Aşağıdaki metin 22 Kasım
+> hâlini (kontrol kapalı, imajda curl yok) tarihi olarak anlatır.
+
+**Olgu (ölçüldü, 22 Kasım):** Coolify uygulamasında kendi sağlık kontrolü (`health_check_enabled`) o gün **kapalıydı** ve **açılamıyordu**:
 çalışma imajı `node:24-bookworm-slim` tabanlıdır, içinde `curl` da `wget` de yoktur. Kontrol `/api/health` yoluyla açılıp
 dağıtım tetiklendiğinde Coolify 10 denemenin tamamında `curl: not found / wget: not found` aldı, "yeni konteyner sağlıksız"
 deyip eski konteynere döndü (dağıtım #92, 18:41:42Z-18:43:14Z). Geri dönüş çalıştı: bu pencerede site yoklaması
