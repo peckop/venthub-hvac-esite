@@ -106,8 +106,10 @@ describe('vitrin kolon listeleri maliyet taşımaz', () => {
     expect(bulunan).toEqual([])
   })
 
-  it('yönetici formu listesi alış fiyatını okur (kaydet 0\'a ezmesin)', () => {
-    expect(kolonlar(ADMIN_PRODUCT_FORM_COLUMNS)).toContain('purchase_price')
+  it('yönetici formu listesi alış fiyatını product_costs gömmesinden okur (kaydet 0\'a ezmesin; ALT-123)', () => {
+    // Düz `purchase_price` products kolonu değildir artık: authenticated'dan kolon yetkisi alınır.
+    expect(ADMIN_PRODUCT_FORM_COLUMNS).toContain('product_costs(purchase_price)')
+    expect(kolonlar(ADMIN_PRODUCT_FORM_COLUMNS)).not.toContain('purchase_price')
   })
 })
 
