@@ -56,9 +56,26 @@ updates:
           - '@types/three'
           - '@react-three/*'
       # Ana sürüm OLMAYAN her şey tek PR. Ana sürümler bu gruba girmez → ayrı ayrı PR.
+      # ALT-220 (23 Kasım): @sentry/nextjs ve axe-core gruptan ÇIKARILDI, kendi PR'larını açar.
+      # Sebep (2662, ölçüldü): grup içindeyken 11.12→11.15 tünel yeniden yazımını (rota-dili-acik-kip
+      # testi) ve 4.14.0→4.14.1 axe "karar verilemedi" sayısını (22 > taban 21) oynattı; tek PR'da
+      # 12 zararsız paketi kırmızı tutuyordu. Ayrı PR gelince paket bazında ölçülür.
+      # KALDIRMA ŞARTI: Sentry tünel testi ve axe tabanı yeni sürümle yeşile döndüğü gün çıkarma silinir.
       kucuk-ve-yama:
         update-types: [minor, patch]
+        exclude-patterns:
+          - '@sentry/nextjs'
+          - 'axe-core'
     ignore:
+      # ALT-220 (23 Kasım): @types/node majoru ÇALIŞMA ZAMANINDA kalır. engines node 24.x, CI node 24;
+      # 26 tipi 24'te olmayan API'yi derletir (#2663). KALDIRMA ŞARTI: runtime Node 26'ya çıktığı gün.
+      - dependency-name: '@types/node'
+        versions: ['>=25.0.0']
+      # ALT-220 (23 Kasım): @vitejs/plugin-react major'ı Vite geçişine kadar yok sayılır. 5.x kurulumda
+      # postinstall tip denetimini kırdı (vitest.config.ts TS2307, #2664); kazancı yok (vite 6).
+      # KALDIRMA ŞARTI: vite 7/8 geçişi başladığı gün.
+      - dependency-name: '@vitejs/plugin-react'
+        update-types: ['version-update:semver-major']
       # (Sentry ana sürüm ertelemesi — karar 17 — ALT-46'da kaldırıldı: @sentry/nextjs 11.9.0 kuruldu,
       # kaldırma şartı oluştu. Bot bundan sonra @sentry/* ana sürümlerini normal PR olarak açar.)
       # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
