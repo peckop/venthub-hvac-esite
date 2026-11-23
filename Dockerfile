@@ -48,6 +48,10 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     PORT=3000
 WORKDIR /uygulama
+# curl: Coolify uygulama sağlık kontrolü kapsayıcı İÇİNDE curl ya da wget ile koşar; bookworm-slim'de ikisi de yok
+# (22 Kasım 2026, ALT-215: kontrol açılınca "curl: not found / wget: not found", dağıtım geri alındı). Yalnız bu iş için.
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 1001 venthub && useradd --system --uid 1001 --gid venthub venthub
 # Standalone çıktı kendi node_modules alt kümesini taşır; static ve public ayrıca kopyalanır.
 COPY --from=derleme --chown=venthub:venthub /uygulama/.next/standalone ./
