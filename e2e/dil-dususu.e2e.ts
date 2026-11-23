@@ -34,17 +34,15 @@ test.describe('INV-DIL-DUSUSU-1 — EN sayfada TR gövde metni yok', () => {
     for (const parca of trMetin) expect(enHtml.includes(parca.slice(0, 60)), `EN sayfada TR metin: ${parca.slice(0, 60)}`).toBe(false)
   })
 
-  test('kategori alt dal paragrafları', async ({ request }) => {
+  // URN-176 (OPS-368): alt kategori kartı tanıtım paragrafı basmaz (üst-alt kopya); iki dilde de 0 paragraf.
+  test('kategori alt dal kartlarında paragraf yok', async ({ request }) => {
     const tr = await request.get(`/tr${ORNEK_KATEGORI}`)
     expect(tr.status()).toBe(200)
-    const trMetin = testIdMetinleri(await tr.text(), 'alt-kategori-aciklama')
-    // Boş liste = boş geçiş; ölçülecek TR metin yoksa test hiçbir şey kanıtlamaz.
-    expect(trMetin.length, 'TR kategori sayfasında alt dal açıklaması bekleniyordu').toBeGreaterThan(0)
+    expect(testIdMetinleri(await tr.text(), 'alt-kategori-aciklama')).toEqual([])
 
     const en = await request.get(`/en/category/fans`)
     expect(en.status()).toBe(200)
-    const enHtml = await en.text()
-    for (const parca of trMetin) expect(enHtml.includes(parca.slice(0, 60)), `EN sayfada TR metin: ${parca.slice(0, 60)}`).toBe(false)
+    expect(testIdMetinleri(await en.text(), 'alt-kategori-aciklama')).toEqual([])
   })
 
   // 2026-09-23 ölçümü: kategori sayfasının aile listesi {tr,en} açıklamayı gömülü veriye
