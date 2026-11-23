@@ -226,7 +226,8 @@ const RATCHETS: Ratchet[] = [
     // ve ham `{marka}` değeri; ikisi de kaynaksız/ham) kalktı, ikisinin `text-slate-500` etiketi gitti. Kazanç yan ürün.
     // 2026-10-26 · 1418 -> 1417: URN-145 — BrandDetailPage'in yükleme iskeleti (bir `bg-slate-*` satırı) tarayıcı çağrısıyla
     // birlikte kalktı. Kazanç yan ürün.
-    tavan: 1417,
+    // 2026-11-23 · 1417 -> 1416: URN-176 — alt kategori kartının tanıtım paragrafı (`text-slate-500`) kalktı. Kazanç yan ürün.
+    tavan: 1416,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
