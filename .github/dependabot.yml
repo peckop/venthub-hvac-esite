@@ -103,6 +103,49 @@ updates:
       # KALDIRMA ŞARTI: tünel route handler davranışı ölçüldü ve rota-dili-acik-kip testi ona göre uyarlandı.
       - dependency-name: '@sentry/nextjs'
         versions: ['>=11.13.0']
+      # ALT-223 (23 Kasım, karar 412): KALAN AÇIK MAJOR ADAYLARI TOPLU YOK SAYILIR (npm registry'ye karşı 23 Kasım
+      # ölçümü, 79 bağımlılıktan 20'si bir ana sürüm geride; 7'si yukarıda zaten yok sayılıyor). Sebep: eski vitrin
+      # yeni siteye geçince silinecek, yeni site kendi sürümleriyle sıfırdan kurulacak; ana sürümler tek tek PR olarak
+      # gelip her seferinde log okutuyor (#2662-#2681). Her satır tek bir ailenin kaydıdır.
+      # KALDIRMA ŞARTI (hepsi için): ilgili paketin kullanıldığı eski vitrin kodu silindiği gün satır silinir; eski
+      # vitrin kalırken bir ana sürüm GEREKİRSE (güvenlik, Node/Next uyumu) o satır elle kaldırılır, kayıt bu dosyada kalır.
+      # Tailwind 4 ailesi (birlikte hareket eder: tailwind-merge 3 Tailwind 4 ister, eklenti 4 aynı yönde):
+      - dependency-name: 'tailwindcss'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'tailwind-merge'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'eslint-plugin-tailwindcss'
+        update-types: ['version-update:semver-major']
+      # ESLint 10 ailesi (eslint-config-next 15 ve eklentilerle uyum ölçülmedi):
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      # Derleme ve test zinciri (birlikte hareket eder; Vite 8 + Vitest 5 + jsdom 31 ayrı geçiş işidir):
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'vite'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'vitest'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vitest/coverage-v8'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'jsdom'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@testing-library/jest-dom'
+        update-types: ['version-update:semver-major']
+      # Tek paketler (davranış farkını CI ölçmez):
+      - dependency-name: 'lucide-react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'isomorphic-dompurify'
+        update-types: ['version-update:semver-major']
+      # ALT-223 (23 Kasım, karar 412): `axe-core` >=4.14.1 yok sayılır. 4.14.1 (#2680, #2662) admin-smoke'ta
+      # color-contrast "karar verilemedi" düğüm sayısını tabanın (21) üstüne, 22'ye çıkarıyor; taban 21 KALIR, kapı
+      # gevşemez. Yeni axe düğümünün gerçekte ne olduğu ölçülmeden yükseltilmez.
+      # KALDIRMA ŞARTI: yeni axe sürümünde "karar verilemedi" sayısı tabana (21) sığdığı ya da düğümün nedeni
+      # ölçülüp taban bilinçli yeniden belirlendiği (Recep kararı) gün.
+      - dependency-name: 'axe-core'
+        versions: ['>=4.14.1']
       # (Sentry ana sürüm ertelemesi — karar 17 — ALT-46'da kaldırıldı: @sentry/nextjs 11.9.0 kuruldu,
       # kaldırma şartı oluştu. Bot bundan sonra @sentry/* ana sürümlerini normal PR olarak açar.)
       # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
