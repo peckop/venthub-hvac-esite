@@ -19,21 +19,19 @@ import { sahteKaynak } from './sahteKaynak'
 const kategorili = (kimlikler: readonly `vh:kategori/${string}`[]): RehberYazisi => ({ ...ORNEK_YAZI, ilgiliKategoriler: kimlikler })
 
 describe('kategori kartı — sayfa modeli', () => {
-  it('⭐ilgiliKategoriler → kart: ad, kısa metin ve dil önekli kategori adresi (TR)', async () => {
+  it('⭐ilgiliKategoriler → kart: ad ve dil önekli kategori adresi (TR)', async () => {
     const yazi = kategorili(['vh:kategori/duct-fans', 'vh:kategori/roof-fans'])
     const s = await yaziSayfasiHazirla(yazi, 'tr', sahteKaynak(), [yazi])
     expect(s.kategoriKartlari.map((k) => k.ad)).toEqual(['Kategori duct-fans', 'Kategori roof-fans'])
-    expect(s.kategoriKartlari[0]?.aciklama).toBe('duct-fans kategorisinin kısa metni.')
     expect(s.kategoriKartlari[0]?.href).toMatch(/^\/tr\/.*kanal-tipi-fanlar/)
     expect(s.kategoriKartlari[1]?.href).toMatch(/^\/tr\/.*cati-tipi-fanlar/)
   })
 
-  it('EN: adres /en/ önekli; kısa metin yoksa BOŞ (Türkçe yedek yok) ama kart yine çizilir', async () => {
+  it('EN: adres /en/ önekli, kart çizilir', async () => {
     const yazi = kategorili(['vh:kategori/duct-fans'])
     const s = await yaziSayfasiHazirla(yazi, 'en', sahteKaynak(), [yazi])
     expect(s.kategoriKartlari).toHaveLength(1)
     expect(s.kategoriKartlari[0]?.href).toMatch(/^\/en\/.*duct-fans/)
-    expect(s.kategoriKartlari[0]?.aciklama).toBe('')
   })
 
   it('⭐alan yok ya da boş → kart yok; aile kartı olan yazı aynı kalır', async () => {
@@ -78,7 +76,7 @@ describe('kategori kartı — sayfa modeli', () => {
 
   it('HATA YOLU: görünen ad boşsa ATAR (boş başlıklı kart basılmaz)', async () => {
     const yazi = kategorili(['vh:kategori/duct-fans'])
-    const kaynak = sahteKaynak({ kategoriKarti: async (slug) => ({ slug, ad: '  ', aciklama: 'x' }) })
+    const kaynak = sahteKaynak({ kategoriKarti: async (slug) => ({ slug, ad: '  ' }) })
     await expect(yaziSayfasiHazirla(yazi, 'tr', kaynak, [yazi])).rejects.toThrow(/görünen ad boş/)
   })
 
@@ -102,7 +100,7 @@ describe('kategori kartı — sayfa modeli', () => {
 })
 
 describe('kategori kartı — görünüm', () => {
-  it('⭐başlık sözlükten (TR/EN), kartlar bağlantı, kısa metin yoksa satır yok', async () => {
+  it('⭐başlık sözlükten (TR/EN), kartlar bağlantı, kartta tanıtım metni yok', async () => {
     const yazi = kategorili(['vh:kategori/duct-fans', 'vh:kategori/roof-fans'])
     const trSayfa = await yaziSayfasiHazirla(yazi, 'tr', sahteKaynak(), [yazi])
     const { container, unmount } = render(<RehberYazisiSayfasi sayfa={trSayfa} />)
@@ -111,7 +109,8 @@ describe('kategori kartı — görünüm', () => {
     const kartlar = container.querySelectorAll('section[aria-labelledby="ilgili-kategoriler"] li a')
     expect(kartlar).toHaveLength(2)
     expect(kartlar[0]?.getAttribute('href')).toBe(trSayfa.kategoriKartlari[0]?.href)
-    expect(kartlar[0]?.textContent).toContain('duct-fans kategorisinin kısa metni.')
+    expect(kartlar[0]?.textContent).not.toContain('kısa metni')
+    expect(kartlar[0]?.querySelectorAll('span')).toHaveLength(2)
     expect(kartlar[0]?.textContent).toContain(tr.bilgiMerkezi.yazi.kategoriDugme)
 
     // İkinci çizimden önce ilki sökülür: `#id` seçici belge genelinde ilk eşleşmeyi bulur, aynı kimlikli iki çizimde
@@ -121,7 +120,7 @@ describe('kategori kartı — görünüm', () => {
     const { container: enKap } = render(<RehberYazisiSayfasi sayfa={enSayfa} />)
     expect(enKap.querySelector('#ilgili-kategoriler')?.textContent).toBe(en.bilgiMerkezi.yazi.kategorilerBaslik)
     const enKart = enKap.querySelector('section[aria-labelledby="ilgili-kategoriler"] li a')
-    // EN'de kısa metin boş: kartta yalnız ad + düğme (Türkçe yedek metin yok).
+    // EN kartında da yalnız ad + düğme (tanıtım metni yok, URN-175).
     expect(enKart?.querySelectorAll('span')).toHaveLength(2)
     expect(enKart?.textContent).not.toContain('kısa metni')
   })

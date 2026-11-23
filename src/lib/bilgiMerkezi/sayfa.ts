@@ -23,10 +23,10 @@ import {
 export type BilgiMerkeziKaynagi = IcBaglantiKaynagi & {
   aileKarti(slug: string, dil: string): Promise<{ slug: string; ad: string } | null>
   /**
-   * Kategori kartı verisi (URN-151). `ad` = `getCategoryDisplayName` (sözlük → menü etiketi → ad), `aciklama` =
-   * `getCategoryDescription` (o dilin metni; yoksa BOŞ dize, başka dile düşme yok). Pasif/silinmiş kategori `null`.
+   * Kategori kartı verisi (URN-151). `ad` = `getCategoryDisplayName` (sözlük → menü etiketi → ad). Pasif/silinmiş
+   * kategori `null`. Tanıtım metni (`description`) BİLEREK yok (URN-175, OPS-368): kategori sayfasında durur.
    */
-  kategoriKarti(slug: string, dil: string): Promise<{ slug: string; ad: string; aciklama: string } | null>
+  kategoriKarti(slug: string, dil: string): Promise<{ slug: string; ad: string } | null>
 }
 
 export interface UrunKarti {
@@ -34,11 +34,9 @@ export interface UrunKarti {
   href: Route
 }
 
-/** Yazının "İlgili ürün kategorileri" kutusundaki kart (URN-151). Markasızdır: kategori adı + kısa metin. */
+/** Yazının "İlgili ürün kategorileri" kutusundaki kart (URN-151). Markasızdır: yalnız kategori adı + bağlantı (URN-175). */
 export interface KategoriKarti {
   ad: string
-  /** Kategorinin o dildeki kısa metni; yoksa boş (görünüm satırı hiç basmaz, Türkçe metin yedeği konmaz). */
-  aciklama: string
   href: Route
 }
 
@@ -106,7 +104,7 @@ async function kategoriKartiHazirla(kimlik: string, dil: YaziDili, kaynak: Bilgi
   const kart = guncel ? await kaynak.kategoriKarti(guncel, dil) : null
   if (!kart) throw new IcBaglantiHatasi(kimlik, 'kategori kartı için etkin kategori bulunamadı')
   if (!kart.ad.trim()) throw new IcBaglantiHatasi(kimlik, 'kategori kartı için görünen ad boş')
-  return { ad: kart.ad, aciklama: kart.aciklama.trim(), href }
+  return { ad: kart.ad, href }
 }
 
 export async function yaziSayfasiHazirla(
