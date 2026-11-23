@@ -139,6 +139,13 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'isomorphic-dompurify'
         update-types: ['version-update:semver-major']
+      # ALT-223 (23 Kasım, karar 412): `axe-core` >=4.14.1 yok sayılır. 4.14.1 (#2680, #2662) admin-smoke'ta
+      # color-contrast "karar verilemedi" düğüm sayısını tabanın (21) üstüne, 22'ye çıkarıyor; taban 21 KALIR, kapı
+      # gevşemez. Yeni axe düğümünün gerçekte ne olduğu ölçülmeden yükseltilmez.
+      # KALDIRMA ŞARTI: yeni axe sürümünde "karar verilemedi" sayısı tabana (21) sığdığı ya da düğümün nedeni
+      # ölçülüp taban bilinçli yeniden belirlendiği (Recep kararı) gün.
+      - dependency-name: 'axe-core'
+        versions: ['>=4.14.1']
       # (Sentry ana sürüm ertelemesi — karar 17 — ALT-46'da kaldırıldı: @sentry/nextjs 11.9.0 kuruldu,
       # kaldırma şartı oluştu. Bot bundan sonra @sentry/* ana sürümlerini normal PR olarak açar.)
       # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
