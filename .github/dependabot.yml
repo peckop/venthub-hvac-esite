@@ -76,6 +76,18 @@ updates:
       # KALDIRMA ŞARTI: vite 7/8 geçişi başladığı gün.
       - dependency-name: '@vitejs/plugin-react'
         update-types: ['version-update:semver-major']
+      # ALT-220 (23 Kasım, karar 412): `supabase` (CLI) major'ı yok sayılır. CI iş akışları CLI'ı setup-cli ile
+      # 2.101.0'a sabitler; bu devDependency'yi çalıştıran yer yok. v3 kırıcıları (--db-url/--project-ref yerine
+      # --remote, varsayılan hedef yerel yığın) pin yükseltilince ayrı işte ele alınır (#2671 kapatıldı).
+      # KALDIRMA ŞARTI: CLI v3 geçişi (pin + çağrılar + gölge ölçüm) başladığı gün.
+      - dependency-name: 'supabase'
+        update-types: ['version-update:semver-major']
+      # ALT-220 (23 Kasım, karar 412): `framer-motion` major'ı yok sayılır. 11→14 üç ana sürüm, 32 dosyada
+      # kullanım, animasyon farkını CI ölçmez; eski vitrin yeni siteye geçince silinecek (#2672 kapatıldı).
+      # KALDIRMA ŞARTI: eski vitrin silindiği gün (paket de kalkar) ya da yeni sitede framer-motion kullanılırsa
+      # o sitenin kendi sürüm kararıyla.
+      - dependency-name: 'framer-motion'
+        update-types: ['version-update:semver-major']
       # (Sentry ana sürüm ertelemesi — karar 17 — ALT-46'da kaldırıldı: @sentry/nextjs 11.9.0 kuruldu,
       # kaldırma şartı oluştu. Bot bundan sonra @sentry/* ana sürümlerini normal PR olarak açar.)
       # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
