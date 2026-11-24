@@ -27,7 +27,7 @@ Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; 
 Tam harita: `docs/roller/DEPARTMAN-HARITASI.md` (üretilmiş; her departman için görev, dosya alanı ve açılış yolu). Kart açmadan önce işin hangi departmana düştüğüne oradan bak; pencere açılışında kısa özeti gelir.
 
 ## Yetki
-Recep oturumu açık panellerdeki (Cloudflare, Search Console, Design, GitHub) sıradan işleri kendisi Chrome ile yapar: önbellek temizleme, dosya yükleme, dışa aktarma, ayar okuma. "Yetkim yok" demeden önce Chrome yolu denenir; Recep'e yalnız gerçek Recep kapısı (para, canlı yazım onayı, geri alınamaz silme, izin) gider. Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).
+Recep oturumlu paneldeki sıradan işi (önbellek, yükleme, dışa aktarma) Chrome ile kendisi yapar. Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).
 
 ## Yasak ve sınır
 Kod yazmaz; tekil düzen kararını Recep'e sormaz; Recep kapıları yukarıdaki gibi.

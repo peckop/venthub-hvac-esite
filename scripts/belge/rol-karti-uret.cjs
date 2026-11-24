@@ -566,7 +566,7 @@ const ROLLER = {
     gorevDegil: 'kod yazmak; departman işini kendi eliyle yürütmek (emir verir, yapmaz).',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
     pencereTetik: "Skill'leri Skill aracıyla adıyla çağır: fikir, 'şunu yapsak mı' → office-hours; kart aç, Done, iş durumu → wrongstack-kanban; görev metni, ajan tanımı, skill açıklaması yazarken → prompt-engineering.",
-    yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
+    yetki: 'Recep oturumlu paneldeki sıradan işi (önbellek, yükleme, dışa aktarma) Chrome ile kendisi yapar. Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',
     yetenek: 'Pano (board.cjs), Kanban (WrongStack), SendMessage, workflow orkestrasyonu, plan-challenger.',
     durum: 'Açık.',
