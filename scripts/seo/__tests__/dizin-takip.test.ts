@@ -14,7 +14,7 @@ import { resolve, join } from 'node:path'
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import {
-  BING_ARALIK_MS, KAYIT_BASLANGICI, KART_BICIMI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, kaydetArgumanlariCoz, markdownYaz,
+  BING_ARALIK_MS, KAYIT_BASLANGICI, KART_BICIMI, TEKRAR_ESIGI_GUN, TEK_ISTEK_MOTORLARI, defterAyristir, degisenCoz, eskiKayitlariCoz, googleIstekKapisi, gorunmeOzeti, haritaCoz, hareketGecerliMi, kapsamSec, karar, kaydetArgumanlariCoz, markdownYaz,
   satirYaz, sonHareket, yedekAl, bagTablosu, istekTarihiBul, sonucSatiriMi, tabloUret, tarihAl, yandexSonTarama, yeniOlanlar, yalnizTarihMi,
 } from '../dizin-takip.mjs'
 
@@ -516,7 +516,8 @@ describe('SEO-127: CLI --kaydet (uçtan uca, depo dışı klasör, yedek kapalı
     try {
       const defter = join(d, 'hareketler.jsonl')
       const tarih = '2026-11-20T08:00:00Z'
-      const r1 = calistir(['--kaydet', 'google', 'istek', `${A},${B}`, '--neden', 'bilerek tekrar: kota sonrası', '--kart', 'SEO-127', '--tarih', tarih, '--hareket', defter])
+      // SEO-141: kanıtsız çoklu adres yalnız google/istek dışında geçer; burada bing/gonderim kullanılır.
+      const r1 = calistir(['--kaydet', 'bing', 'gonderim', `${A},${B}`, '--neden', 'bilerek tekrar: kota sonrası', '--kart', 'SEO-127', '--tarih', tarih, '--hareket', defter])
       expect(r1.kod).toBe(0)
       expect(r1.cikti).toContain('kaydedildi: 2 hareket')
       const r2 = calistir(['--kaydet', 'bing', 'gonderim', A, '--tarih', tarih, '--hareket', defter])
@@ -524,13 +525,69 @@ describe('SEO-127: CLI --kaydet (uçtan uca, depo dışı klasör, yedek kapalı
       const satirlar = readFileSync(defter, 'utf8').trim().split('\n').map((s) => JSON.parse(s))
       expect(satirlar).toHaveLength(3)
       expect(satirlar.slice(0, 2).map((s) => s.adres)).toEqual([A, B])
-      for (const s of satirlar.slice(0, 2)) expect(s).toMatchObject({ motor: 'google', eylem: 'istek', kaynak: 'kaydet', neden: 'bilerek tekrar: kota sonrası', kart: 'SEO-127' })
+      for (const s of satirlar.slice(0, 2)) expect(s).toMatchObject({ motor: 'bing', eylem: 'gonderim', kaynak: 'kaydet', neden: 'bilerek tekrar: kota sonrası', kart: 'SEO-127' })
       expect('neden' in satirlar[2]).toBe(false)
       expect('kart' in satirlar[2]).toBe(false)
       const ayrisim = defterAyristir(readFileSync(defter, 'utf8'))
       expect(ayrisim.hareketler).toHaveLength(3)
       expect(ayrisim.atlanan).toBe(0)
     } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+
+  // INV-DIZIN-KAYDET-2 (SEO-141): 23 Kasım'da tek çağrı iki adresi "istek" yazdı, giden yalnız biriydi.
+  it('SEO-141: kanıtsız çoklu google/istek çıkış 2, deftere satır yazılmaz', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      const r = calistir(['--kaydet', 'google', 'istek', `${A},${B}`, '--hareket', defter])
+      expect(r.kod).toBe(2)
+      expect(r.hata).toContain('SEO-141')
+      expect(existsSync(defter)).toBe(false)
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+  it('SEO-141: --kanit dosyasında her adres ISTENDI ise geçer, her satır kendi onay saatini taşır', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      const kanit = join(d, 'tur.json')
+      writeFileSync(kanit, JSON.stringify({ bitti: true, s: [{ url: A, sonuc: 'ISTENDI', saat: '2026-11-24T19:15:33.304Z' }, { url: B, sonuc: 'ISTENDI', saat: '2026-11-24T19:15:54.642Z' }] }))
+      const r = calistir(['--kaydet', 'google', 'istek', `${A},${B}`, '--kanit', kanit, '--hareket', defter])
+      expect(r.kod).toBe(0)
+      const satirlar = readFileSync(defter, 'utf8').trim().split('\n').map((s) => JSON.parse(s))
+      expect(satirlar.map((s) => s.tarih)).toEqual(['2026-11-24T19:15:33.304Z', '2026-11-24T19:15:54.642Z'])
+      for (const s of satirlar) expect(s.kaynak).toBe('kaydet-kanit')
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+  it('SEO-141: kanıtta bir adres ISTENDI değilse ya da yoksa çıkış 2, hiçbir satır yazılmaz', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      for (const s of [[{ url: A, sonuc: 'ISTENDI' }], [{ url: A, sonuc: 'ISTENDI' }, { url: B, sonuc: 'HATA: Kota aşıldı' }], [{ url: A, sonuc: 'ISTENDI' }, { url: B, durum: 'DUGME YOK' }]]) {
+        const r = calistir(['--kaydet', 'google', 'istek', `${A},${B}`, '--kanit', JSON.stringify({ s }), '--hareket', defter])
+        expect(r.kod, JSON.stringify(s)).toBe(2)
+        expect(r.hata).toContain(B)
+      }
+      expect(existsSync(defter)).toBe(false)
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
+})
+
+describe('SEO-141: googleIstekKapisi (saf)', () => {
+  it('google dışı motor ve istek dışı eylem kapıdan etkilenmez', () => {
+    expect(googleIstekKapisi({ motor: 'bing', eylem: 'gonderim', adresler: [A, B], kanit: null })).not.toHaveProperty('hata')
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'olcum', adresler: [A, B], kanit: null })).not.toHaveProperty('hata')
+  })
+  it('tek adres kanıtsız geçer (__iste hazır kaydet satırı); çoklu kanıtsız HATA', () => {
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: null })).not.toHaveProperty('hata')
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A, B], kanit: null })).toHaveProperty('hata')
+  })
+  it('kanıt dizi ya da {s} biçimi; başka biçim HATA; geçersiz saat null kalır', () => {
+    const ok = googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: [{ url: A, sonuc: 'ISTENDI', saat: 'yok' }] })
+    expect('saatler' in ok && ok.saatler.get(A)).toBe(null)
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: { x: 1 } })).toHaveProperty('hata')
+  })
+  it('tek adres kanıtla verilirse de ISTENDI aranır', () => {
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: [{ url: A, sonuc: 'ZAMAN ASIMI' }] })).toHaveProperty('hata')
   })
 })
 
