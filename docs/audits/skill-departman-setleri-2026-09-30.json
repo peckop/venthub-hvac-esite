@@ -1489,7 +1489,7 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 30.9,
+   "toplamKB": 43.4,
    "adiylaCagir": [
     {
      "ad": "panel-gezinme",
@@ -1498,6 +1498,10 @@
     {
      "ad": "site-gorsel-inceleme",
      "kb": 15.2
+    },
+    {
+     "ad": "site-yolculuk-denetimi",
+     "kb": 12.5
     }
    ],
    "bekleyen": []

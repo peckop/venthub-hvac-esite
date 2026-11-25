@@ -1,0 +1,23 @@
+{
+  "should_trigger": [
+    "kullanıcı yolculuğu denetimi yap, sekiz senaryoyu zip 19 için yürüt",
+    "müşteri bu siteden ürün bulabiliyor mu, ana sayfadan modele kadar kaç tıkta gidiliyor ölç",
+    "senaryoları yürüt: arama, Hesapla, föy bulma, karşılaştırma, teklif formu, sepetten ödemeye",
+    "kac tikta teklife ulasiliyor, teklif formunun son adımına kadar git ama gönderme",
+    "yeni zip ile yolculukları kıyasla, S1-S8 tablosunu güncelle",
+    "sonuçsuz aramada kullanıcı nerede takılıyor, bilinen bir model kodunu da arayıp bul",
+    "S1 ve S3'ü İngilizce ve 390 pikselde de yürüt, tamam yarım terk diye yaz",
+    "satış kipinde sepete ekleyip ödeme ekranına kadar gidilebiliyor mu dene, öde'ye basma",
+    "Yolculuk Denetimi turu başlat, NN/g sezgileriyle takılmaları işaretle",
+    "teknik föy ya da CAD dosyasını bir müşteri kaç adımda bulur, iki seriyi karşılaştırmak kolay mı"
+  ],
+  "should_not_trigger": [
+    "siteyi baştan aşağı kullanıcı gözüyle incele, her şablonu hiyerarşi ve boşluk için 1-5 puanla",
+    "önizleme kopyasındaki paneli Chrome ile gezip Teklifler ve belge zincirini DENEME kayıtlarıyla yürüt, ölçüp raporla",
+    "canlı siteyi gezip kırık link ve konsol hatası bul, bulduklarını düzelt",
+    "bu kare K kurallarına uygun mu, kabul edilir mi",
+    "sayfa neden yavaş açılıyor, LCP ve CLS değerlerini ölç",
+    "arama kutusunun kodunu düzelt ve sonuçsuz aramaya öneri listesi ekle",
+    "teklif formunu doldur ve gerçekten gönder, e-posta geldi mi bak"
+  ]
+}

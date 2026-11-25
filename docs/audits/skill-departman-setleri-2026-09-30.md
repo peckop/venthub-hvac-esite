@@ -245,7 +245,7 @@ Bu bölümdeki skill'lerde dikkat:
 | Araştırmacı | venthub-tasarim-dili (11,4K) | 0,0K | web-platform-baseline (10,5K, y) | — (browse çıkarıldı: filo kuralı tarayıcı yalnız claude-in-chrome, OPS onayı 20 Kasım, YTN-59) |
 | Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (11,0K, y) | 11,0K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
 | Çürütücü | plan-challenger (14,6K), web-design-guidelines (4K) | 18,6K | — | — |
-| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (14,5K), site-gorsel-inceleme (15,2K) | — |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (14,5K), site-gorsel-inceleme (15,2K), site-yolculuk-denetimi (12,5K) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -259,6 +259,7 @@ Bu bölümdeki skill'lerde dikkat:
 - **webapp-testing** — UYARI: örnekler npm run dev; VentHub pnpm kullanır.
 - **panel-gezinme** — YTN-55 (13 Kasım 2026): Design Venthub New kiracı panelini yalnız claude-in-chrome ile gezer; Doğrulayıcı panel turunda adıyla çağırır, tuzak listesini TASARIM besler.
 - **site-gorsel-inceleme** — YTN-58 (20 Kasım 2026, OPS-340): önizleme sitesinin ve panelinin şablonlarını yalnız claude-in-chrome ile gezip görsel tasarım ve UI/UX bulgularını 1-5 puanla raporlar; salt rapor (düzeltme, commit ve Design'a yazma yok). Doğrulayıcı görsel inceleme turunda adıyla çağırır; bakış listesini TASARIM besler. gstack design-review ve qa-only'den yalnız denetim maddeleri alındı.
+- **site-yolculuk-denetimi** — TSR-45 (25 Kasım 2026, OPS emri): önizleme sitesinde sekiz sabit müşteri yolculuğunu (ana sayfadan modele, arama, Hesapla, föy/CAD, karşılaştırma, teklif formu, sepetten ödemeye) yalnız claude-in-chrome ile yürütür; tamam/yarım/terk, tık sayısı ve takılmayı NN/g 10 sezgisiyle zip × senaryo tablosuna yazar. Gönder ve Öde'ye basılmaz. Doğrulayıcı yolculuk turunda adıyla çağırır; senaryo listesini TASARIM besler.
 
 ### URUN
 
