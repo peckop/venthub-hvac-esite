@@ -245,7 +245,7 @@ Bu bölümdeki skill'lerde dikkat:
 | Araştırmacı | venthub-tasarim-dili (11,4K) | 0,0K | web-platform-baseline (10,5K, y) | — (browse çıkarıldı: filo kuralı tarayıcı yalnız claude-in-chrome, OPS onayı 20 Kasım, YTN-59) |
 | Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (11,0K, y) | 11,0K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
 | Çürütücü | plan-challenger (14,6K), web-design-guidelines (4K) | 18,6K | — | — |
-| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (14,5K), site-gorsel-inceleme (15,2K), site-yolculuk-denetimi (17,3K) | — |
+| Doğrulayıcı | verify-before-done (12,5K), accessibility (14,5K), webapp-testing (3,9K, y) | 3,9K | panel-gezinme (14,5K), site-gorsel-inceleme (15,2K), site-yolculuk-denetimi (19,8K) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
