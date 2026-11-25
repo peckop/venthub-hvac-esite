@@ -1,0 +1,98 @@
+# TEST HARİTASI NÖBETÇİSİ (ALT-209, OPS-345 onayı 20 Kasım 2026)
+#
+# ⭐BU BİR PR KAPISI DEĞİL, UYARIDIR (bloklamaz). Ölçtüğü şey master'daki test haritası dosyasının
+# bugünkü bayatlık sayısıdır; kırmızı master'dan ÖNCE yakalanır.
+#
+# NİÇİN VAR: harita 6 kez aynı biçimde çürüdü (ALT-72, ALT-83, ALT-171, ALT-183, ALT-184, ALT-208); her seferinde
+# eşik (190, INV-TEST-HARITA-1) aşılınca master kırmızıya döndü ve kart başına elle onarıldı. Tetikleyici yoktu.
+#
+# ⭐EŞİK ÖLÇÜLMÜŞ DEĞER (UYARI_ESIGI=100): 13 Kasım'da bayat 68 + kayıtsız 67 = 135 iken test:ilgili yanlış test seçti
+# ve iki PR yerelde yeşil, CI'da kırmızı döndü (ALT-184 kartı); 19 Kasım'da 191'de master kırmızıya döndü. 100, ilk
+# zararın (135) altında, kapının (190) çok altındadır. Eşik değişirse bu yorum ve ALT-209 notu birlikte güncellenir.
+#
+# TEK KART: aşımda "harita-nobetci" etiketli AÇIK tek issue tutulur; varsa yorum eklenir (çoğalmaz), yoksa açılır.
+# Haritayı TAZELEMEZ (tazeleme 2 işçiyle ~8 dk ve PR ister; sahibi ALTYAPI müdürüdür).
+name: Test Haritası Nöbetçisi
+
+on:
+  schedule:
+    # Haftalık, pazartesi 06:20 UTC (katalog-sayim 06:10, ssr-duman 06:40 ile çakışmaz).
+    - cron: '20 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: harita-nobetci
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  nobetci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    env:
+      UYARI_ESIGI: '100'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # FAIL-CLOSED: ölçüm çıktısı okunamazsa iş KIRMIZI olur (ölçememek geçmek değildir).
+      - name: Bayatlık ölç
+        id: olc
+        run: |
+          set -uo pipefail
+          CIKTI="$(node scripts/ci/test-haritasi-uret.cjs --kontrol 2>&1)" || true
+          echo "$CIKTI"
+          SATIR="$(echo "$CIKTI" | grep -E '^\[harita\] sorun [0-9]+ · bayat kayıt [0-9]+ · kayıtsız test [0-9]+' | head -1)"
+          if [ -z "$SATIR" ]; then
+            echo "::error::harita ölçüm satırı okunamadı (fail-closed)"
+            exit 1
+          fi
+          BAYAT="$(echo "$SATIR" | sed -E 's/.*bayat kayıt ([0-9]+).*/\1/')"
+          KAYITSIZ="$(echo "$SATIR" | sed -E 's/.*kayıtsız test ([0-9]+).*/\1/')"
+          TOPLAM=$((BAYAT + KAYITSIZ))
+          echo "bayat=$BAYAT" >> "$GITHUB_OUTPUT"
+          echo "kayitsiz=$KAYITSIZ" >> "$GITHUB_OUTPUT"
+          echo "toplam=$TOPLAM" >> "$GITHUB_OUTPUT"
+          echo "### Test haritası: bayat $BAYAT + kayıtsız $KAYITSIZ = $TOPLAM (uyarı eşiği $UYARI_ESIGI, kapı 190)" >> "$GITHUB_STEP_SUMMARY"
+
+      # Aşım: tek açık issue. Varsa yorum, yoksa aç. İş yeşil kalır (bloklamaz).
+      - name: Uyarı kartı (tekrar açmaz)
+        if: ${{ fromJSON(steps.olc.outputs.toplam) > fromJSON(env.UYARI_ESIGI) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BAYAT: ${{ steps.olc.outputs.bayat }}
+          KAYITSIZ: ${{ steps.olc.outputs.kayitsiz }}
+          TOPLAM: ${{ steps.olc.outputs.toplam }}
+        run: |
+          set -euo pipefail
+          ETIKET="harita-nobetci"
+          gh label create "$ETIKET" --color FBCA04 --description "Test haritası bayatlama uyarısı (ALT-209)" 2>/dev/null || true
+          GOVDE="Test haritası bayatlıyor: bayat ${BAYAT} + kayıtsız ${KAYITSIZ} = ${TOPLAM} (uyarı eşiği ${UYARI_ESIGI}, kapı 190). Tazele: node scripts/ci/test-haritasi-uret.cjs --bayat (tek PR). Koşu: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          MEVCUT="$(gh issue list --label "$ETIKET" --state open --json number -q '.[0].number // empty')"
+          if [ -n "$MEVCUT" ]; then
+            gh issue comment "$MEVCUT" --body "$GOVDE"
+            echo "mevcut issue #$MEVCUT güncellendi"
+          else
+            gh issue create --title "Test haritası bayatlıyor (${TOPLAM} > ${UYARI_ESIGI})" --label "$ETIKET" --body "$GOVDE"
+          fi
