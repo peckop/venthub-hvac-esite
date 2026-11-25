@@ -1489,7 +1489,7 @@
      "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 43.4,
+   "toplamKB": 48.2,
    "adiylaCagir": [
     {
      "ad": "panel-gezinme",
@@ -1501,7 +1501,7 @@
     },
     {
      "ad": "site-yolculuk-denetimi",
-     "kb": 12.5
+     "kb": 17.3
     }
    ],
    "bekleyen": []
