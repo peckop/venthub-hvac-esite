@@ -24,7 +24,8 @@
  *        [--degisen <dosya>: satır başına "<adres> <ISO tarih>"; verilmezse defter klasöründeki degisen-adresler.txt varsa o okunur]
  *        [--kalan <motor> [--sinir N]: tablo yerine yalnız o motorun YAP/TEKRAR adreslerini satır satır basar; elle kalan listesi tutulmaz (SEO-118)]
  *   node scripts/seo/dizin-takip.mjs --kaydet <google|bing|yandex|indexnow> <istek|gonderim|olcum|gorunme|degisim> <https://adres,https://adres> [--sonuc aramada | gorundu|gorunmuyor|olculemedi]
- *        [--neden "<gerekçe>"] [--kart <ÖNEK-sayı>] [--tarih <ISO>]
+ *        [--neden "<gerekçe>"] [--kart <ÖNEK-sayı>] [--tarih <ISO>] [--kanit <tur-çıktısı.json | JSON>]
+ *        (SEO-141: google/istek tek çağrıda birden çok adres yalnız --kanit ile geçer; her adresin tur çıktısında ISTENDI satırı olmalı)
  *        (degisim: kod yayını sayfayı değiştirdi, motor google yazılır; değişen liste artık defterden türer. --tarih ile geçmiş tarih verilebilir)
  *        (SEO-127: adresler VİRGÜLLE TEK argümandır; boşlukla verilen ikinci adres eskiden sessizce düşüyordu, artık çıkış 2. Her adres https:// ile başlar,
  *         Git Bash'in /tr/x → C:/Program Files/Git/tr/x çevirisi de çıkış 2'dir. --neden/--kart satıra `neden`/`kart` alanı yazar; --kart biçimi ÖNEK-sayı)
@@ -416,7 +417,7 @@ export function yeniOlanlar(mevcut, adaylar) {
 export const KART_BICIMI = /^[A-Z]+-\d+$/
 /** `--kaydet` yolunun okuduğu DEĞERLİ seçenekler: fazla-argüman taramasında değerleri bağımsız argüman sanmamak için atlanır. Liste bilerek dardır:
  * `--kaydet` ile anlamsız bir değerli seçenek (`--adres B`, `--kalan B`) verilirse değeri fazla argüman sayılır ve HATA verir (B sessizce düşmez). */
-const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart']
+const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart', '--kanit']
 
 /**
  * SEO-127: `--kaydet <motor> <eylem> <adresler> [--neden t] [--kart K]` argümanlarını çözer ve doğrular (saf işlev; çıkış kararı çağırandadır).
@@ -451,7 +452,35 @@ export function kaydetArgumanlariCoz(arg) {
   if (n.var_ && n.deger === null) return { hata: '--neden metin ister (boşluklu gerekçeyi tırnakla ver)' }
   const k = secenek('--kart')
   if (k.var_ && (k.deger === null || !KART_BICIMI.test(k.deger))) return { hata: `--kart ÖNEK-sayı biçiminde olmalı (örn. SEO-127), verilen: ${JSON.stringify(k.deger)}` }
-  return { motor, eylem, adresler, neden: n.deger, kart: k.deger }
+  const kn = secenek('--kanit')
+  if (kn.var_ && kn.deger === null) return { hata: '--kanit tur çıktısı ister (JSON metni ya da .json dosya yolu)' }
+  return { motor, eylem, adresler, neden: n.deger, kart: k.deger, kanit: kn.deger }
+}
+
+/**
+ * SEO-141 (INV-DIZIN-KAYDET-2): Search Console her onayda tek adres alır; deftere yazılan her google/istek satırı ayrı bir onayın kaydı olmalıdır.
+ * Olay (23 Kasım): tek --kaydet çağrısı atölye ve demir çelik adreslerini aynı milisaniyeyle "istek" yazdı; giden yalnız atölye isteğiydi,
+ * demir çelik iki gün "istendi" sanıldı ve Google onu hiç taramadı. Kural: google/istek tek çağrıda birden çok adres alacaksa --kanit ile
+ * tarayıcı turunun çıktısı verilir (window.__tur → {s:[{url,sonuc,saat}]} ya da __iste sonuç dizisi); her adresin o çıktıda ISTENDI
+ * satırı olmalıdır ve satır kendi onay saatini taşır. Kanıtsız çoklu google/istek HATA. Tek adres __iste'nin hazır kaydet satırıdır, geçer.
+ * @param {{ motor: string, eylem: string, adresler: string[], kanit: unknown }} g kanit: ayrıştırılmış JSON (null = yok)
+ * @returns {{ hata: string } | { saatler: Map<string, string|null> }}
+ */
+export function googleIstekKapisi({ motor, eylem, adresler, kanit }) {
+  const saatler = new Map()
+  if (!TEK_ISTEK_MOTORLARI.has(motor) || eylem !== 'istek') return { saatler }
+  if (kanit == null) {
+    if (adresler.length > 1) return { hata: `google/istek tek çağrıda ${adresler.length} adres: Search Console her onayda tek adres alır, toplu kayıt gitmemiş isteği "istendi" yazar (SEO-141). Her adresi kendi kaydet satırıyla yaz ya da --kanit ile tur çıktısını ver` }
+    return { saatler }
+  }
+  const dizi = Array.isArray(kanit) ? kanit : (kanit && typeof kanit === 'object' && Array.isArray(kanit.s) ? kanit.s : null)
+  if (!dizi) return { hata: '--kanit dizi ya da {s:[...]} biçiminde tur çıktısı olmalı' }
+  for (const a of adresler) {
+    const r = dizi.find((x) => x && x.url === a)
+    if (!r || r.sonuc !== 'ISTENDI') return { hata: `--kanit içinde ${a} için ISTENDI yok (${r ? JSON.stringify(r.sonuc ?? r.durum ?? null) : 'satır yok'}): bu adresin isteği gitmemiş, deftere yazılmaz` }
+    saatler.set(a, typeof r.saat === 'string' && tarihAl(r.saat) !== null ? new Date(r.saat).toISOString() : null)
+  }
+  return { saatler }
 }
 
 // ---------------------------------------------------------------- CLI (ağ ve dosya burada)
@@ -534,12 +563,18 @@ async function calistir() {
   if (arg.includes('--kaydet')) {
     const cozum = kaydetArgumanlariCoz(arg)
     if ('hata' in cozum) { console.error(`HATA: ${cozum.hata}`); process.exit(2) }
-    const { motor, eylem, adresler, neden, kart } = cozum
+    const { motor, eylem, adresler, neden, kart, kanit: kanitHam } = cozum
+    let kanit = null
+    if (kanitHam != null) {
+      try { kanit = JSON.parse(/^\s*[[{]/.test(kanitHam) ? kanitHam : readFileSync(resolve(kanitHam), 'utf8')) } catch (e) { console.error(`HATA: --kanit okunamadı: ${e.message}`); process.exit(2) }
+    }
+    const kapi = googleIstekKapisi({ motor, eylem, adresler, kanit })
+    if ('hata' in kapi) { console.error(`HATA: ${kapi.hata}`); process.exit(2) }
     const sonuc = deger('--sonuc')
     const verilen = deger('--tarih')
     if (verilen !== undefined && tarihAl(verilen) === null) { console.error('HATA: --tarih geçerli bir ISO tarih olmalı (örn. 2026-11-04T07:11:00Z)'); process.exit(2) }
     const simdi = verilen ? new Date(verilen).toISOString() : new Date().toISOString()
-    const hareketler = adresler.map((adres) => ({ tarih: simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: 'kaydet', ...(neden ? { neden } : {}), ...(kart ? { kart } : {}) }))
+    const hareketler = adresler.map((adres) => ({ tarih: kapi.saatler.get(adres) || simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: kanit ? 'kaydet-kanit' : 'kaydet', ...(neden ? { neden } : {}), ...(kart ? { kart } : {}) }))
     if (!adresler.length || hareketler.some((h) => !hareketGecerliMi(h))) { console.error('HATA: --kaydet <motor> <eylem> <adres,adres> geçersiz (motor/eylem/adres siteye ait olmalı)'); process.exit(2) }
     // SEO-132: sonuç satırı (gorunme/olcum) kayıt anında bağlı olduğu son isteğin tarihini taşır.
     if (sonucSatiriMi({ eylem })) {
