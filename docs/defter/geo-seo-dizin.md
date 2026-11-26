@@ -39,60 +39,60 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 <!-- OZET:BASLA -->
 ```json
 {
-  "anlikGoruntu": "dizin-takip-2026-11-10.json",
-  "gun": "2026-11-10",
-  "sha256": "3686cf164e333ed51e35dab09549e78669adafe97758e48bf32d743e49482e9c",
-  "adresSayisi": 101,
+  "anlikGoruntu": "dizin-takip-2026-11-26.json",
+  "gun": "2026-11-26",
+  "sha256": "ac08842d5da408e5b661f8d384837c81625ee53bc0672f5b047a57c7b07777f4",
+  "adresSayisi": 110,
   "kapsam": {
     "about": 1,
-    "bilgi-merkezi": 14,
+    "bilgi-merkezi": 19,
     "brands": 7,
-    "category": 29,
+    "category": 30,
     "contact": 1,
-    "diger": 1,
-    "products": 47,
+    "diger": 2,
+    "products": 49,
     "urun-secici": 1
   },
   "kararlar": {
     "google": {
-      "TAMAM": 73,
-      "BEKLE": 12,
+      "TAMAM": 57,
+      "BEKLE": 13,
       "TEKRAR": 0,
-      "YAP": 16,
+      "YAP": 40,
       "ATLA": 0,
       "ESKI": 0,
       "OLCULEMEDI": 0
     },
     "bing": {
-      "TAMAM": 69,
-      "BEKLE": 17,
-      "TEKRAR": 0,
-      "YAP": 7,
-      "ATLA": 0,
-      "ESKI": 0,
-      "OLCULEMEDI": 8
-    },
-    "indexnow": {
-      "TAMAM": 33,
+      "TAMAM": 0,
       "BEKLE": 0,
       "TEKRAR": 0,
-      "YAP": 1,
+      "YAP": 0,
       "ATLA": 0,
-      "ESKI": 67,
+      "ESKI": 0,
+      "OLCULEMEDI": 110
+    },
+    "indexnow": {
+      "TAMAM": 101,
+      "BEKLE": 0,
+      "TEKRAR": 0,
+      "YAP": 9,
+      "ATLA": 0,
+      "ESKI": 0,
       "OLCULEMEDI": 0
     },
     "yandex": {
       "TAMAM": 0,
-      "BEKLE": 15,
-      "TEKRAR": 4,
-      "YAP": 17,
+      "BEKLE": 6,
+      "TEKRAR": 27,
+      "YAP": 77,
       "ATLA": 0,
-      "ESKI": 65,
+      "ESKI": 0,
       "OLCULEMEDI": 0
     }
   },
   "olculemeyen": {
-    "bing: ThrottleHost": 8
+    "bing: ThrottleHost": 110
   }
 }
 ```
