@@ -33,11 +33,19 @@ Son ölçüm: 2026-09-29 (OPS, 3 Sonnet web araştırması). Bağlam: ŞİRKET K
 ## ERP (ERPNext / Odoo CE / Dolibarr)
 | | ERPNext | Odoo CE | Dolibarr |
 |---|---|---|---|
-| Lisans | AGPL, tüm modüller ücretsiz | LGPL; ücretsiz Online tek uygulama, API yok | GPL |
-| TR hesap planı | Çekirdekte (v15.29) | l10n_tr var; tam raporlar Enterprise | YOK |
-| e-Fatura | Topluluk: Turkish-Delight (Logedosoft, 25 yıldız) | Resmî Nilvera modülü Enterprise'a taşındı | Tek kişilik İşNet modülü |
+| Lisans | AGPL, tüm modüller ücretsiz | Community LGPL-3; Online Standard planında API yok, kendi sunucu ve harici API yalnız Custom planında (26 Kasım düzeltmesi aşağıda) | GPL |
+| TR hesap planı | Çekirdekte (v15.29) | l10n_tr var; mali tablolar, banka mutabakatı, l10n_tr_reports ve e-Defter Community'de yok | YOK |
+| e-Fatura | Topluluk: Turkish-Delight (Logedosoft, 25 yıldız) | Resmî Nilvera modülleri 19.0 Community'de LGPL-3; Enterprise'a taşınma yalnız 20.0'da | Tek kişilik İşNet modülü |
 | Sunucu | AYRI (Frappe Cloud $5–20/ay ya da VPS 4–8 GB) | AYRI (VPS 4 GB) | AYRI (hafif) |
 Hetzner ~€4–7/ay; bakım (yedek, güncelleme) bize kalır.
+
+### Düzeltme 2026-11-26 — Odoo Community ve Enterprise ayrımı (OPS-413)
+Kaynak: OPS-413 ölçümü, 26 Kasım, ops-arastirmaci. Yukarıdaki tablonun Odoo sütunu bu ölçümle düzeltildi; Hüküm bölümleri değişmedi.
+- **e-Fatura modülleri:** "resmî Nilvera modülü Enterprise'a taşındı" cümlesi yalnız Odoo 20.0 için doğru. 19.0 Community'de l10n_tr_nilvera, l10n_tr_nilvera_einvoice, l10n_tr_nilvera_einvoice_extended, l10n_tr_gib_invoice_scenarios ve l10n_tr_nilvera_edispatch LGPL-3 olarak duruyor. Taşıma 20.0 dalında b7786f2669 commit'iyle yapıldı (2026-09-15). 19.0 desteği Eylül 2028'e kadar sürüyor (planlı).
+- **Community'de olmayanlar:** mali tablolar (account_reports), banka mutabakatı (account_accountant), l10n_tr_reports ve e-Defter. **Community'de olanlar:** dönem kilitleri ve kilit istisnası (account/models/company.py, account_lock_exception.py).
+- **Fiyat** (odoo.com/pricing, 26 Kasım, EUR, kullanıcı başına aylık): Standard 11,90–14,80, yalnız Online, API yok. Custom 22,90–27,90; kendi sunucuda kurulum ve harici API yalnız bu planda.
+- **Ürün kaydı:** Odoo'nun stock modülü kendi product tablosuna bağlı. Stok Odoo'da tutulursa ürün ana kaydı iki yerde olur.
+- **19.0 için üçüncü taraf modüller:** Birfatura e-Fatura 250 € (AGPL), Uyumsoft 149 €, Viyug 149 €, mali tablo modülü 119 €. İzibiz modülü yalnız 18.0'da var. OCA'nın 19.0 dalı boş.
 
 ## Hüküm (09-29)
 Başlangıç: API'li ön muhasebe ya da kontörlü entegratör + bizim sistemden otomatik tetik; ERP ERKEN. ERP tetikleyicileri: hacim artışı, 2. kişi, gerçek satınalma/depo/teknik servis → o gün ilk aday ERPNext (Frappe Cloud). Mali müşavir: şirket türü, defter usulü, e-Fatura takvimi (yazılı).
