@@ -128,7 +128,7 @@ Dayanak: yalnız firmaların kendi sayfaları (yukarıdaki ölçüm ve aynı gü
 | Ş5 | İmzalanabilir veri işleyen sözleşmesi | 6698 s. Kanun m.12 (veri sorumlusu, veri işleyenle birlikte sorumlu; [mevzuat.gov.tr](https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=6698&MevzuatTur=1&MevzuatTertip=5)) | hukuki güvence (kanun sözleşmeyi adıyla şart koşmaz; m.12/2 müşterek sorumluluk yükler) |
 | Ş6 | ISO 27001 belgesi | kanuni zorunluluk değil | güvence tercihi (OPS emri) |
 | Ş7 | Türkiye'de yedek hizmeti ya da S3 uyumlu depolama | barındırma yedek kuralı (ikinci kopya) | işletme zorunluluğu |
-| Ş8 | En az 1 Gbps port | Supabase ve Coolify belgelerinde böyle bir şart yok | tercih (OPS emri); Turhost sonucunu tek başına belirliyor |
+| Ş8 | Port: 1 Gbps güçlü tercih; 200 Mbps üstü kabul | Supabase ve Coolify belgelerinde port şartı yok | güçlü tercih, zorunlu değil (OPS kararı, 26 Kasım) |
 | Ş9 | IPv4 adresi ve KDV'li kurumsal fatura | alan adı yönlendirmesi; muhasebe | işletme zorunluluğu (yasal KDV istisnalı e-fatura da muhasebeye uygundur) |
 
 ### Aday tablosu
@@ -141,13 +141,13 @@ Dayanak: yalnız firmaların kendi sayfaları (yukarıdaki ölçüm ve aynı gü
 | Ş3 NVMe | ? (kartta "Raid50 SSD", metinde "NVMe/SSD") | GEÇTİ | GEÇTİ | ? (kartta "SSD", genel metinde "NVMe") |
 | Ş4 veri ve yedek Türkiye'de | GEÇTİ (Denizli, firma beyanı) | GEÇTİ (Denizli; Acronis yedeği İstanbul) | veri ve yedek GEÇTİ ("yurt dışına çıkmaz", "hizmetlerin tamamında Türkiye içerisinde" [beyanı](https://radore.com/tr/hizmetler/kvkk-uyumlu-sunucu-bulut)); yedek şehri ? | ? (sunucular Türkiye'de, fakat [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) firmanın ve iş birliği yaptığı üçüncü kişilerin kişisel veriyi yurt dışına aktarabileceğini yazıyor); yedek yeri ? |
 | Ş4 yurt dışı aktarım kapatılabilir | ? ([ağ sayfası](https://www.netinternet.tr/altyapimiz/network-altyapisi) yurt dışı temizleme merkezi diyor, KVKK sayfası yurt içi operatör diyor) | ? (yurt dışı saldırılar yurt dışında filtreleniyor; kapatma yolu yazmıyor) | ? ([güvenlik sayfası](https://radore.com/tr/hizmetler/guvenlik) DDoS için Cloudflare anıyor; pakette varsayılan mı yazmıyor) | ? |
-| Ş5 veri işleyen sözleşmesi | GEÇTİ, çekinceli (sayfada boş taslak alanları; dosya okunmadı) | ? (metinde İlkbyte adı geçmiyor; tüzel kişi aynı) | ? (yalnız "veri işleyen sıfatıyla" beyanı) | ? |
-| Ş6 ISO 27001 | GEÇTİ (2022, no IS-190122; kapsam okunmadı) | ? (kendi metni 2013 sürümü, numara yok) | GEÇTİ (sayfada "ISO 27001"; sürüm ve numara doğrulanmadı, dosya indirilmedi) | ? |
+| Ş5 veri işleyen sözleşmesi | GEÇTİ, çekinceli (sayfada boş taslak alanları; dosya okunmadı) | ? (metinde İlkbyte adı geçmiyor; tüzel kişi aynı) | ? (yalnız "veri işleyen sıfatıyla" beyanı) | KALDI (yasal sayfalarda imzalanacak sözleşme bulunamadı) |
+| Ş6 ISO 27001 | GEÇTİ (2022, no IS-190122; kapsam okunmadı) | ? (kendi metni 2013 sürümü, numara yok) | GEÇTİ (sayfada "ISO 27001"; sürüm ve numara doğrulanmadı, dosya indirilmedi) | KALDI (ana sayfa, hakkımızda, yasal, sunucu sayfalarında geçmiyor) |
 | Ş7 Türkiye'de yedek ya da S3 | GEÇTİ (ücretli yedek) | GEÇTİ | hizmet var; ülke Türkiye (genel beyan), şehir ve ücret ? | hizmet var, yeri ? |
-| Ş8 1 Gbps port | ? | GEÇTİ (1 Gbps; 100 Mbps garantili) | ? (süresi geçmiş 24.02-30.04.2026 kampanya koşulunda "100 Mbps simetrik") | **KALDI** ([kartta](https://www.turhost.com/sunucu/vps-tr-sunucu/) 200 ve 400 Mbit) |
+| Ş8 port | ? | GEÇTİ (1 Gbps; 100 Mbps garantili) | ? (süresi geçmiş 24.02-30.04.2026 kampanya koşulunda "100 Mbps simetrik") | TR 6 400 Mbit kabul aralığında; TR 4 200 Mbit sınırda; 1 Gbps yok ([kart](https://www.turhost.com/sunucu/vps-tr-sunucu/)) |
 | Ş9 IPv4 | GEÇTİ (1 adet) | GEÇTİ ([1 IPv4, 1 IPv6](https://www.ilkbyte.com/kiralik-sunucu-paketlerimiz/enterprise-sunucu)) | ? | ? |
 | Ş9 KDV'li fatura | e-fatura GEÇTİ ([2022 duyurusu](https://www.netinternet.tr/blog/oedeme-ve-faturalandirma-islemleri-hakkinda-degisiklik): ödemeden sonra 7 gün içinde); KDV oranı ? | e-fatura GEÇTİ; sunucu hizmeti 4691 sayılı Kanunla KDV'den muaf ([2018 yazısı](https://www.ilkbyte.com/bulut-sunucu-bilgi-bankasi/ilkbyte-saatlik-sunucu-ucretlendirmesi-ve-vergilendirme-hakkinda-bilgiler)), istisnanın sürdüğü sorulur | fiyata KDV eklenir ([sayfa](https://radore.com/tr/hizmetler/bulut-sunucu): "Fiyatlara KDV dahil değildir", sepette %20); e-fatura ? | KDV siparişte eklenir (kullanıcı sözleşmesi); e-fatura ? |
-| **Sonuç** | **Aday** | **Aday** (yurt dışı filtreleme cevaplanmadan karar yok) | **Aday** | **Elendi (Ş8)** |
+| **Sonuç** | **Aday** | **Aday** (yurt dışı filtreleme cevaplanmadan karar yok) | **Aday** | **Elendi (Ş4, Ş5, Ş6)** |
 
 ### Elenenler
 
@@ -157,14 +157,14 @@ Dayanak: yalnız firmaların kendi sayfaları (yukarıdaki ölçüm ve aynı gü
 | Hostopya (canlı ortam), ek | işlemci Xeon E5-2680 v4 (2016); disk paylaşımlı | Recep'in araştırması (işlemci adı sayfada da yazıyor; "paylaşımlı disk" tarafımızdan ölçülmedi) |
 | İlkbyte Cloud III (8 GB) | disk NVMe değil (Ş3) | ölçüm |
 | Radore RAM-Core ve RAM-Advance | 1 ve 2 çekirdek (Ş2) | ölçüm |
-| Turhost VDS TR 4 ve TR 6 | port 200 ve 400 Mbit (Ş8) | ölçüm. 1 Gbps sanal pakette yalnız 64 GB'lik VDS TR 10 ve üstünde (liste $198,23); [fiziksel sunucuda](https://www.turhost.com/sunucu/dedicated-server/) stoktaki en küçük model 32 GB E65 (liste $219,77, ilk 3 ay $79,99; disk E-SSD, NVMe değil). 8 ve 16 GB için 1 Gbps yolu bulunamadı; sipariş panelindeki ek port seçeneği ölçülmedi. Ş8 gevşetilirse Turhost yeniden aday olur; o zaman sözleşmedeki yurt dışı aktarım hükmü belirleyici olur |
+| Turhost VDS TR 4 ve TR 6 | Asıl gerekçe: [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) kişisel verinin yurt dışına aktarılabileceğini yazıyor (Ş4); ISO 27001 belgesi ve imzalanacak veri işleyen sözleşmesi sayfalarda bulunamadı (Ş6, Ş5). İkincil: port 200 ve 400 Mbit, 1 Gbps yok (Ş8) | ölçüm. 1 Gbps sanal pakette yalnız 64 GB'lik VDS TR 10 ve üstünde (liste $198,23); [fiziksel sunucuda](https://www.turhost.com/sunucu/dedicated-server/) stoktaki en küçük model 32 GB E65 (liste $219,77, ilk 3 ay $79,99; disk E-SSD, NVMe değil). 8 ve 16 GB için 1 Gbps yolu bulunamadı; sipariş panelindeki ek port seçeneği ölçülmedi. |
 
 ### Güncel mesaj (yalnız adaylar; gönderimi OPS yapar)
 
 Konu: VentHub için sunucu şartları ve fiyat teklifi talebi
 
 > Merhaba,
-> VentHub için Türkiye'de barındırılacak 8 GB ve 16 GB bellekli sanal sunucu arıyoruz. Sunucuda Docker ile kendi barındırdığımız Supabase (PostgreSQL), Coolify ve bir Next.js uygulaması çalışacak. Asgari şartlarımız: tam sanal makine, en az 4 vCPU ve NVMe disk, veri ve yedeğin Türkiye'de kalması, imzalanabilir KVKK veri işleyen sözleşmesi, ISO 27001, en az 1 Gbps port.
+> VentHub için Türkiye'de barındırılacak 8 GB ve 16 GB bellekli sanal sunucu arıyoruz. Sunucuda Docker ile kendi barındırdığımız Supabase (PostgreSQL), Coolify ve bir Next.js uygulaması çalışacak. Asgari şartlarımız: tam sanal makine, en az 4 vCPU ve NVMe disk, veri ve yedeğin Türkiye'de kalması, imzalanabilir KVKK veri işleyen sözleşmesi, ISO 27001, tercihen 1 Gbps (en az 200 Mbps üstü) port.
 > Aşağıdaki soruları yanıtlamanızı ve güncel fiyat teklifinizi rica ederiz. Bu ileti yalnız bilgi ve teklif talebidir; sipariş ya da ödeme taahhüdü içermez.
 > [firmaya özel sorular]
 > Teşekkürler.
