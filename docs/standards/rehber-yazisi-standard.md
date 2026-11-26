@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.32 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.33 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -126,6 +126,8 @@ GEO-SEO'ya yazılır. Kapı yazılmadı (ARAÇ işi); fark betiği BLOG çalış
 
 **v0.32 (2026-11-22, BLG-59, OPS onayı):** **Yazılar birbirini destekler.** R1.3, yazı ile yazı çakışmasının yanına yazı ile aynı adlı kategori veya liste sayfası çakışmasını ekledi: yeni yazı farklı bir soruya cevap verir ve mevcut içeriğe bağlanır; hedef çakışıyorsa yeni yazı açılmaz, mevcut yazı R5.5 ile genişletilir.
 
+**v0.33 (2026-11-26, BLG-95, Geo-SEO SEO-144 önerisi, OPS-407 onayı):** **Dört bakım kuralı.** (K1) R10.6 madde 1: yazının gövdesi, başlığı ve kart özeti hiçbir kategori, liste ya da aile sayfasıyla 25 ve üstü ardışık kelime paylaşmaz; şimdilik elle ölçülür, kapı adayıdır. (K2) R11.3 Y10: title ve H1 site içinde tekildir, ayırt edici bir terim taşır. (K3) R1.3: taslağa "sorgu sahibi" satırı yazılır. (K7) R3.2: yazıya gelen iç bağlantı sayısı yayın kaydına yazılır, eşik yoktur. Dayanaklar OPS-368, SEO-85, SEO-81, SEO-112, SEO-109. **Çekince (Geo-SEO):** bu düzeltmelerden sonra bazı yazılar öne çıktı, ama düzeltmeler toplu yapıldı ve kontrol grubu yoktu; maddeler gecikmenin nedeni olarak değil, tekrarı önleyen bakım kuralı olarak okunur. Geo-SEO karşılığı `yayin-gorunurluk-denetim-standard.md` Y2.6.
+
 ---
 
 ## R0 — Kapsam
@@ -202,6 +204,8 @@ küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişle
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 
 Yeni yazı, mevcut bir yazının ya da aynı adlı kategori veya liste sayfasının arama hedefini tekrar etmez; farklı bir soruya cevap verir ve en az bir mevcut yazıya ya da kategoriye bağlanır. Hedef çakışıyorsa yeni yazı açılmaz, mevcut yazı R5.5 ile genişletilir.
+
+**Sorgu sahibi satırı (v0.33, K3, SEO-112).** Taslağın kartına ve iddia tablosunun başına bir "sorgu sahibi" satırı yazılır: yazının hedeflediği sorgular ve aynı konuda kategori sayfası varsa onun sahip olduğu sorgular. Tür, çeşit ve fiyat sorguları kategori sayfasınındır; yazı bunları hedeflemez. "Nedir" ve "nasıl seçilir" sorguları yazınındır. Satır boşsa ya da yazı kategorinin sorgusunu hedefliyorsa taslak B5'e geçmez. **Niçin:** SEO-112 ölçümünde kategorisi olan yazıların yerine aramada kategori sayfası çıktı. Bu bir bakım kuralıdır, gecikmenin kanıtlanmış nedeni değildir (kontrol grubu yok).
 
 **Önceki çalışma taraması betiktir (BLG-58).** Yayındaki yazıların konu, adres, ürün, kategori ve mevzuat kalemi tablosunu elle çıkarma; `node scripts/rehber/yazi-envanteri.mjs` üretir (dizin durumu depo dışı dosyadan gelir, yoksa "ÖLÇÜLMEDİ" yazar). Karta "önceki çalışma" satırı yazılırken bu tablo kullanılır.
 
@@ -440,6 +444,7 @@ yeni rehberlere (en çok 3) doğrudan bağlanır. Bağlantı sunucuda çizilir (
 | Boş blok basılmaz | O konuda yazı yoksa ya da Bilgi Merkezi o dilde kapalıysa (EN, R6) blok hiç çıkmaz |
 | Anahtar | Kimliğin yazıldığı slug (kategori = kanonik EN slug, aile = aile slug'ı). Yazı takma adlı eski slug taşırsa ters dizin eşleşmez; yeniden yazımda kimlik güncel slug'la yazılır |
 | Kapı | INV-REHBER-TERS-BAGLANTI-1 (`src/lib/bilgiMerkezi/__tests__/tersDizin.test.ts`) — yayındaki frekans konvertörü yazısının kategorisine ve üç Danfoss ailesine döndüğünü de ölçer |
+| Gelen bağlantı kaydı (v0.33, K7) | Yayın kaydına (B10 kart notu) yazıya site içinden gelen iç bağlantı sayısı yazılır: kaç sayfa, hangi türden (yazı, kategori, aile, liste, ana sayfa). **Eşik yoktur.** SEO-109 ölçümünde sayı tek başına görünme hızını açıklamadı; kayıt ileride kıyas yapabilmek içindir |
 
 **Niçin (ölçüm, 2026-09-29, A sınıfı):** frekans konvertörü rehberi 09-25'te yayına girdi; 09-27'de
 Search Console "Google tarafından bilinmiyor" dedi, 09-29'da aramada yazı değil yalnız liste sayfası
@@ -961,7 +966,7 @@ tablo OPS'a B8 PR'ıyla birlikte gider, OPS bağımsız doğrulayıcıyla ayrıc
 
 | # | Madde | Kanıt biçimi | Kapıya çevrilebilir mi (öneri; kapıyı ARAÇ yazar, HRT-70) |
 |---|---|---|---|
-| 1 | Rehber kartı meta açıklamasını kopyalamıyor; `data-nosnippet` ve INV-BILGI-MERKEZI-KART-3 bu yazı için de yeşil; yazıyı gösterecek kategori ve aile sayfaları listelenir | `kartOzeti`, `kartOzetiYuzeyler`, `kartNosnippet` testleri; yazıyı gösterecek sayfa listesi (ters dizin); kartOzeti ve başlığın canlı kategori/aile metniyle 3'lü dizilim çakışması | **Evet, zaten kapı:** INV-BILGI-MERKEZI-KART-3 testi yeni yazıyı kendiliğinden kapsar. Eksik: canlı sayfa çakışması ölçümü betiği (`rehber-denetim` ağlı kol) |
+| 1 | Rehber kartı meta açıklamasını kopyalamıyor; `data-nosnippet` ve INV-BILGI-MERKEZI-KART-3 bu yazı için de yeşil; yazıyı gösterecek kategori ve aile sayfaları listelenir | `kartOzeti`, `kartOzetiYuzeyler`, `kartNosnippet` testleri; yazıyı gösterecek sayfa listesi (ters dizin); kartOzeti ve başlığın canlı kategori/aile metniyle 3'lü dizilim çakışması. **(v0.33, K1, OPS-368)** Yazının gövdesi, başlığı ve kart özeti hiçbir kategori, liste ya da aile sayfasıyla **25 ve üstü ardışık kelime** paylaşmaz; ölçüm ekranda kesilen kısım dahil ham HTML üzerinde yapılır; ürün ve seri adı, uyarı metni ve resmî atıf hariç tutulur. Kanıt: karşılaştırılan sayfa listesi ve en uzun ortak dizi uzunluğu | **Evet, zaten kapı:** INV-BILGI-MERKEZI-KART-3 testi yeni yazıyı kendiliğinden kapsar. Eksik: canlı sayfa çakışması ölçümü betiği (`rehber-denetim` ağlı kol). 25 kelime ölçümü şimdilik elle yapılır, **kapı adayıdır** (yazılmadı) |
 | 2 | Yazıdaki her sayı katalog ve canlı ürün sayfasıyla aynı; katalog-canlı fark KATALOG/ÜRÜN'e kartla gider; bölünmüş ailede toplam alınır | iddia tablosu (ham alıntı), 3f örnekleme, canlı aile sayfası sayıları | **Kısmen:** iddia tablosundaki sayı iddialarını canlı aile sayfasıyla karşılaştıran ağlı betik; seri adının canlıda var olup olmadığı |
 | 3 | Yazıda fiyat ya da fiyat ima eden cümle yok (`hide_price` kategoride fiyat cümlesi yazılmaz) | gövde taraması (₺, TL, fiyat sözcükleri) ve canlı aile sayfası ölçümü | **Kısmen kapı var:** `FIYAT` deseni (para birimi + rakam) kalıp kapısında KIRMIZI verir; eksik olan fiyat ima eden cümle UYARI kolu ve canlı aile sayfası ölçümü (₺/TL sayısı, "Teklif" sayısı) |
 | 4 | R10.5 beş madde: axe kontrast tavanı PR'dan ÖNCE ölçüldü; fikstürler (sahte katalog, site haritası altın dosyası ve satır sayıları, rota-dili conformance) güncellendi; ölçüm dosyası depo dışı (`/tmp` değil) | axe e2e sonucu (CI), fikstür testlerinin yeşil çıktısı | **Kısmen:** fikstür kırıklarını yeni yazı kaydı eklendiğinde yerelde koşan tek `test:ilgili` kümesi; axe e2e CI'da zaten kapı |
@@ -1056,6 +1061,7 @@ resmî satırlara yaslanır ama onları aşar, bu yüzden aşağıdaki uyarı ko
 | Y7 | Başlığın metni değişirse içindekinin çapası da değişir; dışarıdan o çapaya bağlantı varsa eski çapa kırılır (R10 B9 ölçümünde çapa bağlantısı sorulur) | R6 | İLKE |
 | Y8 | Gövde ve SSS cevapları daraltılabilir (accordion, sekme) yapılmaz; bölüm içeriği sayfa yüklenirken görünür kalır ve sayfa yüklenirken kaydırma konumu JS ile değiştirilmez, adresteki hash silinmez. Şablon kararıdır (URUN); değişirse bu satır yeniden ölçülür | 13 | RESMÎ (öneri, garanti değil) |
 | Y9 | **(v0.19, K6)** Yayındaki yazıda H1, H2, H3 ya da SSS'ye, aranan sorgunun eşanlamlı ifadesi **yalnız ekleme** ile eklenebilir (R5.5 "var olan ifade silinmez" korunur); karar GEO-SEO'nun SERP okumasıyla verilir, BLOG yazar; gövdeye iddia ekleniyorsa R5.5 tam okuma, yalnız başlıksa R5.5 başlık-yalnız revizyon akışı | 3, 5, 8 (+ R5.5) | İLKE |
+| Y10 | **(v0.33, K2)** Yazının title ve H1 değeri site içinde tekildir: hiçbir kategori, liste ya da eski adres sayfasının başlığıyla aynı değildir ve yazıyı ayırt eden bir terim taşır (ör. çatı yazısında "egzoz atış yeri"). Kanıt yayın öncesi kontrol tablosunda title ve H1 için aynı başlıklı sayfa sayısıdır (0 olmalı). Dayanak SEO-85: fan çeşitleri başlığı bir rakiple aynıydı; SEO-81: hedef kavram başlıkta yoktu. Bakım kuralıdır, sıranın kanıtlanmış nedeni değildir | 1, 2 (+ R1.3) | İLKE |
 
 ### R11.4 Denetim kolu (`baslikDenetle`, UYARI)
 
