@@ -1305,6 +1305,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
+    // BLG-96 (26 Kasım): hücreli aspiratör yazısının yeni başlığına giden bağlantı metni (aynı gün ikinci değişiklik).
     guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     // 18 Kasım (BLG-86): Kaynak 5 Birleşik Krallık sitesi yerine EUR-Lex özgün metnine çevrildi (tanımlar ölçüldü: aksiyel, santrifüj, karma akışlı, çapraz akışlı aynı); gövde değişmedi.
@@ -1378,7 +1379,7 @@ VentHub kataloğundaki kategoriler aynı ölçüte göre ayrılmamıştır: baz�
 - Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans). İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi](vh:yazi/cati-tipi-fan-nedir)
 - Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans). İlgili rehber: [Banyo ve tuvalet fanı nasıl seçilir?](vh:yazi/banyo-tuvalet-fani-secimi)
 - Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır [4]; modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
-- Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans). İlgili rehber: [Hücreli aspiratör nedir, seçerken nelere bakılır?](vh:yazi/hucreli-aspirator-nedir)
+- Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans). İlgili rehber: [Hücreli aspiratör nedir, nasıl seçilir?](vh:yazi/hucreli-aspirator-nedir)
 - Plug fanlar geriye eğik kanatlı, tek emişli ve doğrudan tahrikli fanlardır [4]; modeller: [plug fanlar](vh:kategori/plug-fans). İlgili rehber: [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir)
 - Korozyona ve aside dayanımlı fanlar kategorisi santrifüj fanları kapsar [4]; modeller: [korozyona ve aside dayanımlı fanlar](vh:kategori/corrosion-and-acid-resistant-fans). İlgili rehber: [Asit fanı nedir? Korozyona ve kimyasala dayanıklı fan nasıl seçilir](vh:yazi/asit-fani-nedir-korozyona-dayanikli-fan-secimi)
 - Şömine ve baca fanları bacanın çekişini mekanik olarak destekleyen fanlardır [4]; modeller: [şömine ve baca fanları](vh:kategori/chimney-fans).
@@ -1453,7 +1454,8 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
-    guncellemeTarihi: '2026-11-18',
+    // BLG-96 (26 Kasım): hücreli aspiratör yazısının yeni başlığına giden bağlantı metni.
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     // 18 Kasım (BLG-86, R5.1.2): "aynı şey midir" cevabının ilk cümlesi cevap verir; Kaynak 4'e Casals katalog adresi eklendi (revizyon kodu CV092024 PDF'te ölçüldü); yeni iddia yok.
     urunler: ['vh:aile/casals-enkelfan-ec-plug', 'vh:aile/casals-kentalfan-plug'],
@@ -1516,7 +1518,7 @@ VentHub'ın plug fan kategorisi seçimi dört bilgiye bağlar [5]:
 - Besleme tipi: tek faz ya da üç faz
 - Model boyutu
 
-İlgili rehberler: [Hücreli aspiratör nedir, seçerken nelere bakılır?](vh:yazi/hucreli-aspirator-nedir), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+İlgili rehberler: [Hücreli aspiratör nedir, nasıl seçilir?](vh:yazi/hucreli-aspirator-nedir), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
 
 ## Sık sorulan sorular
 
@@ -1954,30 +1956,38 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: iki H2 adı (başlık tekrarı uyarısı); gövde değişmedi.
     // BLG-79: bir H2 adı (başlık tekrarı uyarısı); gövde değişmedi.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
-    guncellemeTarihi: '2026-11-18',
+    // BLG-96 (26 Kasım, SEO-148): R5.1 revizyonu; H1 "nasıl seçilir?", çalışma, kullanım, debi (CCOHS), basınç kaybı, montaj bölümleri ve iki SSS; üç doğrulama turu.
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: ['vh:aile/avens-hucreli-aspiratorler-hf-fw', 'vh:aile/avens-hucreli-aspiratorler-hf-s'],
     ilgiliKategoriler: ['vh:kategori/cabinet-fans'],
     diller: {
       tr: {
         slug: 'hucreli-aspirator-nedir-secerken-nelere-bakilir',
-        ozet: "Hücreli aspiratör nedir? Kanat tipi, kayışlı ve doğrudan tahrik, çalışma noktası ve kayış bakımı seçimi nasıl etkiler; teklif için hangi bilgiler gerekir.",
+        ozet: "Hücreli aspiratör nedir, nasıl seçilir? Debi hesabı, basınç kaybı, kanat tipi, kayışlı ve doğrudan tahrik, montaj ve kayış bakımı; teklif için hangi bilgiler gerekir.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Hücreli aspiratörde neye bakılacağını bu rehberde bulun.",
-        govde: `# Hücreli aspiratör nedir, seçerken nelere bakılır?
+        govde: `# Hücreli aspiratör nedir, nasıl seçilir?
 
-Hücreli aspiratör, AVenS'in 2026 ürün kataloğunda sık ya da seyrek kanatlı kayış kasnaklı hücreli radyal fan olarak anlatılan fan ailesidir [4]. 2003 tarihli ABD Enerji Bakanlığı ve AMCA rehberine göre seçim, sistemin çalışma koşullarının bilinmesiyle başlar: hava özellikleri, debi, basınç ve sistem yerleşimi [1].
+Hücreli aspiratör, çift cidarlı hücre panelli bir gövdesi olan ve yüksek debi ile yüksek basınç için sunulan radyal (santrifüj) fandır. AVenS 2026 ürün kataloğu bu aileleri 50 mm standart hücre panelli, sık ya da seyrek kanatlı kayış kasnaklı hücreli radyal fanlar olarak tanımlar [4]. Seçim hava özellikleri, debi, basınç ve sistem yerleşimiyle başlar [1].
 
 Kısaca:
 
-- Tanım: kayış kasnaklı radyal fan olarak adlandırılır [4].
-- Seçim: sistem koşullarının bilinmesiyle başlar; fan en verimli noktasından uzaklaştıkça yatak yükü ve gürültü artar [1].
-- Tahrik: kayış devir seçiminde esneklik sağlar, doğrudan tahrik daha verimli ve bakımı daha azdır [1].
-- Kanat: geriye eğik biçimlerde kanat profilli fanların verimi yüzde 85'i aşabilir; rehber kanat profilli tipin stall ve aşınmaya duyarlı olduğunu da yazar [1].
+- Debi: oda hacmi ile saatteki hava değişim sayısının çarpımıdır; gereken değişim sayısını genellikle yönetmelikler ve tasarım standartları verir [6].
+- Sistem etkisi: fan çıkışına yakın bir dirsek iletilen debiyi yüzde 30'a kadar düşürebilir [1].
+- Tahrik: kayış devir seçiminde esneklik sağlar, doğrudan tahrik daha verimlidir [1].
 
 ## Hücreli aspiratör nedir?
 
 2003 tarihli ABD Enerji Bakanlığı ile AMCA International ortak rehberi (DOE/AMCA rehberi) santrifüj fanları, havayı radyal yönde hızlandırıp hareket yönünü değiştiren, nispeten yüksek basınç üretebilen ve hava akımında nem ve partikül bulunan "kirli" hatlarda sık kullanılan fanlar olarak anlatır [1]. AVenS 2026 ürün kataloğu hücreli aspiratörleri "Hücreli aspiratörler" başlığı altında toplar, ailelerine sık ya da seyrek kanatlı kayış kasnaklı hücreli radyal fan der ve bunları 50 mm standart hücre paneli, dış cidarı elektrostatik toz boyalı, statik ve dinamik balansı ayarlı, yüksek performanslı radyal fanlar olarak tanımlar [4]. VentHub'ın kategori ve aile sayfaları aynı fanları çift cidar hücreli radyal fan aileleri olarak anlatır [5]. İlgili rehber: [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri).
+
+## Hücreli aspiratör nasıl çalışır?
+
+Hücreli ailelerde fan, motordan kayış ve kasnaklarla tahrik edilir [4]. DOE/AMCA rehberine göre santrifüj fan, hava akımını radyal yönde hızlandırarak akış üretir ve kinetik enerjiyi basınca çevirir [1]. Rehber kayışlı tahrikin bir avantajını da yazar: kasnak çapları değiştirilerek fanın çalışma devri ayarlanabilir [1]. Rehbere göre fanın en verimli noktasına yakın çalışması performansını iyileştirir ve aşınmayı azaltır [1].
+
+## Hücreli aspiratör nerede kullanılır?
+
+DOE/AMCA rehberine göre santrifüj fanlar endüstride en yaygın kullanılan fan türüdür; yüksek basıncı yüksek verimle üretebilir ve zorlu çalışma koşullarına göre yapılabilir [1]. Aksiyel fanlar ise rehbere göre daha çok "temiz hava", düşük basınç ve yüksek debi uygulamalarında kullanılır [1]. Hücreli aileler katalogda "yüksek debi ve yüksek basınç" etiketiyle ve model başına 3.400 ile 25.000 m³/h arası debiyle yer alır [4]; VentHub'daki sık kanatlı aile sayfası da sık kanatlı aileyi yüksek debi ve yüksek basınç gerektiren havalandırma uygulamaları için anlatır [5]. Bu ailelerin katalog satırlarında duman egzozu sınıfı yer almaz [4]; yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlar ayrı bir kategoride, [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) altında toplanır [5].
 
 ## Kanat tipleri arasında ne fark var?
 
@@ -1996,25 +2006,38 @@ AVenS 2026 ürün kataloğu eğim yönünü ve kanat sıklığını başka seril
 
 ## Kayışlı ve doğrudan tahrik arasında ne fark var?
 
-DOE/AMCA rehberi doğrudan tahriklerin kayışlı tahrike göre daha yüksek verim, daha az yer ve daha düşük bakım gibi avantajları olduğunu yazar; doğrudan tahrikli fan motor devrinde dönmek zorundadır, kayışlı tahrik ise fan hızı seçiminde esneklik sağlar [1]. Kayışlı tahrikin bedeli de yazılıdır: yeni ve doğru ayarlı kayışlarda bile yüzde 5 ile 10 arasında güç iletimi kaybı olur [1]. VentHub'daki hücreli aileler yalnız kayış kasnaklıdır [4][5]; AVenS 2026 ürün kataloğunda doğrudan tahrikli hücreli model yoktur [4]. Doğrudan tahrik gerekiyorsa hücreli ailelerin dışına bakmak gerekir; DOE/AMCA rehberi her tahrik seçeneğinin avantajları ve sakıncaları olduğunu yazar [1]. İlgili rehber: [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir)
+DOE/AMCA rehberi doğrudan tahriklerin kayışlı tahrike göre daha yüksek verim, daha az yer ve daha düşük bakım gibi avantajları olduğunu yazar; doğrudan tahrikli fan motor devrinde dönmek zorundadır, kayışlı tahrik ise fan hızı seçiminde esneklik sağlar [1]. Kayışlı tahrikin bedeli de yazılıdır: yeni ve doğru ayarlı kayışlarda bile yüzde 5 ile 10 arasında güç iletimi kaybı olur [1]. VentHub'daki hücreli aileler yalnız kayış kasnaklıdır [4][5]; AVenS 2026 ürün kataloğunda doğrudan tahrikli hücreli model yoktur [4]. DOE/AMCA rehberi her tahrik seçeneğinin avantajları ve sakıncaları olduğunu yazar [1]. İlgili rehber: [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir)
 
-## Hücreli aspiratörde çalışma noktası neden önemlidir?
+## Hücreli aspiratörün debisi nasıl hesaplanır?
 
-Fan performans eğrisinin önemli bir noktası, fanın en ekonomik çalıştığı en verimli noktadır; fanın çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1]. Çalışma noktasının fan eğrisi üzerindeki yeri, fanın ne kadar uygun boyutlandırıldığı hakkında da bir fikir verebilir [1]. DOE/AMCA rehberi, sistem eğrisinin her sistem bileşeninin kayıplarının toplanmasıyla hesaplandığını ve fan çıkışına yakın dirsek konmasının iletilen debiyi yüzde 30'a kadar düşürebilecek bir sistem etkisi yaratabileceğini yazar [1]. Boyutların gereğinden büyük seçilmesi verimsiz çalışma, aşırı hava gürültüsü ve düşük güvenilirlik doğurur [1]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+Kanada İş Sağlığı ve Güvenliği Merkezi'nin (CCOHS) havalandırma bilgi sayfasına göre hava değişimi, çalışma alanındaki havanın tamamının yenilenmesidir; gereken debi, saatteki hava değişim sayısı ile oda hacminin çarpımıdır [6]:
 
-## Kayış ve kasnak bakımında nelere dikkat edilir?
+Debi (m³/h) = hava değişim sayısı (1/saat) × oda hacmi (m³)
 
-Uygun kayış gerginliği genellikle tepe yükte kaymayı önleyen en düşük gerginliktir; doğru montaj da dikkatli hizalama ve gerginlik ayarı ister [1]. Rehberin bakım kontrol listesi kayışın durumunu, sıkılığını ve hizalamasını kontrol etmeyi sayar [1]. Yetersiz kayış gerginliği kayış çırpması ya da kayması yüzünden yüksek ses düzeylerine de yol açabilir [1]. İlgili rehber: [Frekans konvertörü nedir, fan ve pompada nasıl seçilir?](vh:yazi/frekans-konvertoru)
+Sayfadaki örnekte 12,5 m uzunluğunda, 12,5 m genişliğinde ve 4 m yüksekliğindeki bir odanın hacmi 625 m³'tür; bu havayı saatte yalnız bir kez değiştirmek için 625 m³/h debi gerekir [6]. Örnekteki saatte bir değişim yalnız hesabı göstermek içindir; gereken değişim sayısı yapının kullanımına göre değişir [6]. CCOHS, gereken değişim sayısını genellikle iş sağlığı ve güvenliği mevzuatının, yangın ve yapı yönetmeliklerinin ya da havalandırma tasarım standartlarının verdiğini yazar [6]. Sayfa, bazı tehlikelerin, ısının ya da kokunun denetiminde saatteki hava değişim sayısının uygun bir ölçüt olmayabileceğini de belirtir [6].
+
+## Basınç kaybı ve dirsekler debiyi nasıl etkiler?
+
+DOE/AMCA rehberine göre sistem eğrisi tasarımda genellikle sistem bileşenlerinin (damperler, kanallar, bölmeler, filtreler, T ve Y bağlantılar, dirsekler, menfezler, panjurlar gibi) kayıplarının toplanmasıyla hesaplanır [1]. Bileşenlerin birbirini etkilemesinden doğan performans değişimine sistem etkisi denir; fan çıkışına yakın konan bir dirsek iletilen debiyi yüzde 30'a kadar düşürebilecek bir sistem etkisi yaratabilir [1]. Fan girişine ya da çıkışına yakın birden çok dirsek maliyetli bir sistem etkisi yaratabilir; küçük kanal kesitinin ya da sıkışık kanal yerleşiminin getirdiği ek basınç düşümleri de işletme maliyetini belirgin biçimde artırabilir [1]. Rehbere göre sistem etkisi, akış profili olabildiğince düzgün tutularak en aza indirilir; yer kısıtı ideal yerleşimi engelliyorsa sistem etkisi fan seçimine katılır, fanın hemen önünde ya da arkasında dirsek varsa bir akış düzeltici düşünülmelidir [1]. Hücreli ailelerin katalog tablosu her model için debinin yanında "basınç kaybı" sütununda 250 ile 500 Pa arası bir değer verir [4].
+
+## Fanın çalışma noktası neden önemlidir?
+
+Fan performans eğrisinin önemli bir noktası, fanın en ekonomik çalıştığı en verimli noktadır; fanın çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1]. Çalışma noktasının fan eğrisi üzerindeki yeri, fanın ne kadar uygun boyutlandırıldığı hakkında da bir fikir verebilir [1]. Boyutların gereğinden büyük seçilmesi verimsiz çalışma, aşırı hava gürültüsü ve düşük güvenilirlik doğurur [1]. İlgili rehber: [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
+
+## Montaj, kayış ve kasnak bakımında nelere dikkat edilir?
+
+DOE/AMCA rehberine göre fanı lastik gibi yumuşak bir malzemeye ya da uygun bir yaylı izolatöre oturtmak, iletilen titreşim enerjisini sınırlar ve gürültüyü azaltmanın yollarından biridir [1]. Uygun kayış gerginliği genellikle tepe yükte kaymayı önleyen en düşük gerginliktir; doğru montaj da dikkatli hizalama ve gerginlik ayarı ister [1]. Rehberin bakım kontrol listesi kayışın durumunu, sıkılığını ve hizalamasını kontrol etmeyi sayar [1]. Yetersiz kayış gerginliği kayış çırpması ya da kayması yüzünden yüksek ses düzeylerine de yol açabilir [1]. Kanal kaçaklarının kaynakları, kötü oturmuş birleşimler ile kanallardaki ve esnek bağlantılardaki yırtık ya da çatlaklar gözle incelenerek bulunabilir [1]. İlgili rehber: [Frekans konvertörü nedir, fan ve pompada nasıl seçilir?](vh:yazi/frekans-konvertoru)
 
 ## VentHub'da hangi hücreli aspiratör serileri var?
 
-VentHub'ın [hücreli aspiratörler](vh:kategori/cabinet-fans) kategorisinde ikisi de AVenS markalı iki aile bulunur [5]. [AVenS HF-FW](vh:aile/avens-hucreli-aspiratorler-hf-fw) altı modellidir ve sık kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi olarak anlatılır [5]. [AVenS HF-S](vh:aile/avens-hucreli-aspiratorler-hf-s) yedi modellidir ve seyrek kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi olarak, 25.000 m³/h debiye ve 11 kW motor gücüne kadar modellerle anlatılır [5]. AVenS'in 2026 ürün kataloğu HF-FW ailesinde 3.400 ile 18.000 m³/h, HF-S ailesinde 4.000 ile 25.000 m³/h debi değerlerini satır başına verir [4].
+VentHub'ın [hücreli aspiratörler](vh:kategori/cabinet-fans) kategorisinde ikisi de AVenS markalı iki aile bulunur: sık kanatlı [AVenS HF-FW](vh:aile/avens-hucreli-aspiratorler-hf-fw) ve seyrek kanatlı [AVenS HF-S](vh:aile/avens-hucreli-aspiratorler-hf-s) [5]. AVenS 2026 ürün kataloğu HF-FW ailesinde 3.400 ile 18.000 m³/h, HF-S ailesinde 4.000 ile 25.000 m³/h debi değerlerini satır başına verir [4].
 
 ## Teklif için hangi bilgiler gerekir?
 
-İlgili aile sayfalarında fiyat gösterilmez, teklif istenir [5]. Teklifte hazır bulundurulacak seçim girdileri şunlardır:
+İlgili aile sayfalarında fiyat gösterilmez, teklif istenir [5]. Fan seçiminde kullanılan girdiler şunlardır:
 
 - Sistem koşulları: hava özellikleri (nem, sıcaklık, yoğunluk, kirletici düzeyi), hava debisi, basınç ve sistem yerleşimi [1].
+- Debi: oda hacmi ve gereken hava değişim sayısı [6].
 - Tahrik: hücreli aileler kayış kasnaklıdır; kayışlı tahrik devir esnekliği sağlar [1][4].
 - Aile: sık kanatlı ya da seyrek kanatlı aile seçimi [4][5].
 
@@ -2024,9 +2047,17 @@ VentHub'ın [hücreli aspiratörler](vh:kategori/cabinet-fans) kategorisinde iki
 
 AVenS 2026 ürün kataloğuna göre evet: katalog hücreli aspiratörleri kayış kasnaklı hücreli radyal fanlar olarak adlandırır [4]. DOE/AMCA rehberi santrifüj fanların havayı radyal yönde hızlandırdığını yazar [1]; rehber "radial" sözcüğünü fan türü adı olarak yalnız radyal kanatlı ve radyal uçlu tipler için kullanır, santrifüj fanın genel adı olarak kullanmaz [1].
 
+### Hücreli aspiratörün kanal fanından farkı ne?
+
+Fan türü tek başına farkı vermez: hücreli ailelerin yer aldığı katalogda "dikdörtgen kanal tipi radyal fanlar" ayrı bir başlıktır, yani kanal fanı da radyal olabilir [4]. Hücreli aspiratörler aynı katalogda 50 mm standart hücre panelli, kayış kasnaklı hücreli radyal fanlar olarak kendi başlıkları altında yer alır [4]. Katalog ikisini ayrı gövde tanımlarıyla anlatır: dikdörtgen kanal tipi radyal fan galvaniz çelik metal gövdeli ve kendinden flanşlı, hücreli aileler ise 50 mm hücre panelli ve dış cidarı elektrostatik toz boyalıdır [4]. DOE/AMCA rehberi ise kanallı iklimlendirme tesisatı için tüp tipi aksiyel fanı da uygun tür olarak anlatır [1]. İlgili rehber: [Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar](vh:yazi/kanal-tipi-fan-nedir)
+
+### Hücreli aspiratörün sesi nasıl azaltılır?
+
+DOE/AMCA rehberi, yüksek fan gürültüsü kaçınılmazsa kanalın yalıtılmasını, fanın lastik gibi yumuşak bir malzemeye ya da yaylı izolatöre oturtulmasını ve sesi yutan malzeme ya da bölmeler kullanılmasını sayar [1]. Rehbere göre aynı fan tipi için görece yüksek gürültü çoğu zaman verimsiz çalışmanın işaretidir [1].
+
 ### Sık kanatlı ile seyrek kanatlı fan aynı şey midir?
 
-Hayır; AVenS 2026 ürün kataloğunda iki ayrı ailedir: biri sık kanatlı, öbürü seyrek kanatlı [4]. Hücreli ailelerin başlıklarında eğim yönü geçmez [4].
+Hayır; AVenS 2026 ürün kataloğunda iki ayrı ailedir ve debi aralıkları da farklıdır: sık kanatlı aile 3.400 ile 18.000 m³/h, seyrek kanatlı aile 4.000 ile 25.000 m³/h arasındadır [4]. Hücreli ailelerin başlıklarında eğim yönü geçmez [4].
 
 ### Kayışlı fanda en çok bakım gerektiren parça hangisidir?
 
@@ -2040,17 +2071,14 @@ DOE/AMCA rehberine göre kasnak çapları değiştirilerek fan hızı artırıla
 
 DOE/AMCA rehberi, kayışlı tahrikli ve yükü görece sabit bir uygulamada yalnız fanı yavaşlatmak için frekans sürücü kullanmanın kasnak değişiminden büyük olasılıkla daha az ekonomik olduğunu yazar [1].
 
-### VentHub'da hangi hücreli aspiratörler var?
-
-Kategoride iki aile bulunur: sık kanatlı HF-FW ve seyrek kanatlı HF-S; teklif aile sayfalarından istenir [5].
-
 ## Kaynaklar
 
-1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, Nisan 2003, PDF s. 7, 8, 10, 12, 13, 15, 21–25, 29, 30, 33, 38–40, 51, 53 ve 54. https://www.energy.gov/sites/prod/files/2014/05/f16/fan_sourcebook.pdf (erişim 08.11.2026)
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, Nisan 2003, PDF s. 7, 8, 10, 12, 13, 15, 21–25, 27, 29, 30, 33, 38–40, 51, 53 ve 54. https://www.energy.gov/sites/prod/files/2014/05/f16/fan_sourcebook.pdf (erişim 08.11.2026)
 2. Nicotra Gebhardt, High performance centrifugal fan ADH katalog, Issue 2.5 EN, Ağustos 2013, PDF s. 1, 5 ve 8.
 3. Nicotra Gebhardt, High performance centrifugal fan RDH katalog, Issue 2.5 EN, Ağustos 2013, PDF s. 1, 5, 7 ve 8.
-4. AVenS, Ürün Fiyat Kataloğu 2026, s. 28, 49 ve 52–55.
-5. VentHub, hücreli aspiratörler kategori sayfası ve HF-FW, HF-S aile sayfaları (erişim 08.11.2026): https://venthub.com.tr/tr/category/hucreli-aspiratorler , https://venthub.com.tr/tr/products/avens-hucreli-aspiratorler-hf-fw , https://venthub.com.tr/tr/products/avens-hucreli-aspiratorler-hf-s
+4. AVenS, Ürün Fiyat Kataloğu 2026, s. 4, 27, 28, 49 ve 52–55.
+5. VentHub, hücreli aspiratörler kategori sayfası, HF-FW ve HF-S aile sayfaları ve duman egzoz fanları kategori sayfası (erişim 26.11.2026): https://venthub.com.tr/tr/category/hucreli-aspiratorler , https://venthub.com.tr/tr/products/avens-hucreli-aspiratorler-hf-fw , https://venthub.com.tr/tr/products/avens-hucreli-aspiratorler-hf-s , https://venthub.com.tr/tr/category/duman-egzoz-fanlari
+6. Canadian Centre for Occupational Health and Safety (CCOHS), Industrial Ventilation - 2. Units and Measures, bilgi sayfası (son gözden geçirme 05.07.2023). https://www.ccohs.ca/oshanswers/prevention/ventilation/units.html (erişim 26.11.2026)
 
 ## Teknik sorumluluk notu
 
@@ -2198,6 +2226,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'mutfak-egzoz-fani-secimi',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-19',
+    // BLG-96 (26 Kasım): hücreli aspiratör yazısının yeni başlığına giden bağlantı metni (aynı gün ikinci değişiklik).
     guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: ['vh:aile/vortice-vort-qbk-sal-kc-evo'],
@@ -2243,7 +2272,7 @@ Fan seçimini başlatan koşullar havanın özellikleri, debi, basınç ve siste
 
 VentHub'ın [Vortice VORT QBK SAL KC Evo](vh:aile/vortice-vort-qbk-sal-kc-evo) ailesi Radyal (Santrifüj) Fanlar kategorisindedir; ailenin maksimum debileri 2.540–22.100 m³/h aralığındadır [2]. Ailenin modelleri 315 ile 630 mm arasında nominal çaplı, monofaze ya da trifaze, 25 mm taşyünü iç izolasyonlu ve plug fanlı hücreli mutfak aspiratörleridir; motorları hava akımının dışında yer alır [2]. Örneğin aile sayfasında 43151 kodlu 315 mm'lik monofaze modelin en yüksek debisi 2.540 m³/h, en yüksek statik basıncı 370 Pa olarak verilir [2].
 
-İlgili rehberler: [Hücreli aspiratör nedir, seçerken nelere bakılır?](vh:yazi/hucreli-aspirator-nedir), [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
+İlgili rehberler: [Hücreli aspiratör nedir, nasıl seçilir?](vh:yazi/hucreli-aspirator-nedir), [Plug fan nedir, nasıl çalışır, nerede kullanılır?](vh:yazi/plug-fan-nedir), [Fan çeşitleri nelerdir? Aksiyel, radyal ve karma akışlı fanlar](vh:yazi/fan-cesitleri)
 
 ## Teklif için hangi bilgiler gerekir?
 
