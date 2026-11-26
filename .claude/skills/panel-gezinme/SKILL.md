@@ -81,7 +81,7 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Stok sayfalarında Depo süzgeci boş kutu görünür: kutuya tıkla, etiketin ilk harflerini yaz, Enter (ok tuşu etkisiz). Tek depo varken transfer için önce Depolar › Depo ekle (DENEME). Sayım kapanınca stok geri alınamaz: yalnız DENEME ürününde sayım yap.
 - Fiyatlar'da satır işaretlenince çıkan "Süzgece uyan N satırın hepsini seç" düğmesine basma (toplu fiyat riski). Teklif ayarında değişiklik sonrası Tab yetmez, alt çubuktan Kaydet.
 - Dönem kilidi kaydetmede hata vermez; kilitli tarihli taslak kaydedilir, denetim sağ paneldeki "Göndermeden önce" satırında ve Kes'te olur (kırmızı hata yalnız Kes ile çıkar, kalıcı belge riski: basma). Kilit görevinde onay kartı numarası görev metninde yazılı olmazsa çalışan durur.
-- Ctrl K'den sonra 1-2 sn bekle, hemen yazılan metin palete düşmez. Listede ↑↓ satır seçmez, odağı "Yeni sipariş" düğmesine taşır ve Enter boş sipariş açar: kayıt aç, tuşla gezme. Panelin kısayol listesi: ?, Ctrl K, Ctrl S, Shift+tık, ↑↓, Enter, Boşluk, Esc; G/N/V yoktur.
+- Ctrl K'den sonra 1-2 sn bekle, hemen yazılan metin palete düşmez. Listede ↑↓ satır seçmez, odağı "Yeni sipariş" düğmesine taşır ve Enter boş sipariş açar: kayıt aç, tuşla gezme. Panelin kısayol listesi: ?, Ctrl K, Ctrl S, Shift+tık, ↑↓, Enter, Boşluk, Esc. "+ Yeni" menüsünde G, N, V kısayol çipleri vardır (26 Kasım; ilk vurgulu satır "Görüşme kaydet", menü sırası açıldığı sayfaya göre değişir).
 - "Diğer" sekme menüsü kaydırılamaz (sığmayan sekmeye erişilmez). Sekme çubuğu toplamı 40'ta kalabilir.
 - Sütun panelinde işaretlenen sütun "Dar pencere: … gizlendi." ile sessizce gizlenebilir (tablo altı gri satır): kanıt bu satırdır. "Varsayılana dön" uzun panellerde ekran dışında kalır.
 - Tarih alanına yazarken ilk karakterden sonra odak kaybolabilir: alana yeniden tıkla. Kayıtta sessizce proje (P-xxxx) açılır; açılan kaydı raporla.
@@ -102,6 +102,16 @@ Bu liste her tur sonunda **TASARIM** tarafından beslenir; çalışan kendi baş
 - Satınalma siparişinin "Diğer işlemler" menüsünde "Şablon olarak kaydet" yoktur (Satış'ta vardır); yokluğu menü satırlarını yazarak raporla.
 - "Cari ekle"de Rol "Tedarikçi" seçip kaydedince listede "MÜŞTERİ" görünebilir (20 Kasım, tek deneme): rol alanını kayıttan sonra listede doğrula.
 - Alt ajanda Skill aracı bu skill'i "Unknown skill" diye bulamayabilir: görev metni dosya yolunu verir, `SKILL.md`'yi oku ve uygula. Kareler `save_to_disk` ile araç sonuç dizinine düşer; yolu araç çıktısından aynen yaz.
+
+Önizleme kopyası tuzakları (26 Kasım yerleşim turu):
+
+- Ekran görüntüsü 1568 px genişlikte, sayfanın CSS genişliği 1604 px: kareden okunan x ve y ×0,9776 ile çevrilmeden tıklanırsa sağ kenardaki düğme yerine iframe kaydırma çubuğuna basılır.
+- 390 genişlikte sayfa iframe belgesinde değil içteki kaydırılabilir DIV'de kayar: `scrollTo` çalışmaz, o DIV'i bulup `scrollTop` ver.
+- Satış alt menüsünden Teklifler'e ilk geçişte "PanelTeklifler.dc: Cannot read properties of undefined (reading 'Provider')" ile "Yükleniyor..." sonsuz kalabilir; önizleme şeridindeki "Masaüstü" ya da "Mobil 390" düğmesine yeniden basmak iframe'i yenileyip sayfayı açar. Hatayı bulgu olarak yaz, sonra bu yolla devam et.
+- Kirli form çubuğunu kayıt açmadan ölçmek için Yeni cari tam formuna bir harf yaz, ölç, "Değişiklikleri geri al"a bas. Başka formlarda yazı `vh-form-taslak` anahtarına düşer; paralel turda yapma.
+- `vh-panel-sekme` anahtarını panel kendisi yazar ve paralel çalışanlar ortak kullanır: tur sonunda geri yazma, başkasının açtığı sekmeleri silersin.
+- Ürünler'de Seri kipinde bir seriye basmak ürün kartını açmaz, Model listesini o seriyle süzer. Model kartı açılışı çökebilir (H1); kart yerleşimi gerekiyorsa "+ Yeni › Yeni ürün" tam formunu ölç, Kaydet'e basma.
+- "Cari ekle" çekmecesinde Vazgeç düğmesi yoktur, yalnız × ile kapanır; çekmece `role=dialog aria-modal=true` taşır, açılışta odak ilk alanda değil çekmece kabındadır.
 
 ## Ölçüm sırası
 
