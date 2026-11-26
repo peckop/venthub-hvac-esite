@@ -1,7 +1,7 @@
 # Ölçüm defteri: KVKK yurt dışı aktarım ve veri yerleşimi
 
-Sahibi: OPS · Son doğrulama: 2026-11-25 · Kart: OPS-394
-Son ölçüm: 2026-11-25 (OPS araştırmacısı; resmî sayfalar ham indirildi). Hukuki son söz avukat/mali müşavir.
+Sahibi: OPS · Son doğrulama: 2026-11-26 · Kart: OPS-394, OPS-398 (ALT-225)
+Son ölçüm: 2026-11-25 (OPS araştırmacısı; resmî sayfalar ham indirildi). Sağlayıcı ölçümü ve veri haritası: 2026-11-26 (ALTYAPI, aşağıda). Hukuki son söz avukat/mali müşavir.
 
 ## Kural (KVKK m.9, 7499 s. Kanun)
 | Konu | Bulgu |
@@ -18,14 +18,94 @@ Kaynak: kvkk.gov.tr/Icerik/2053, /8170, /8043, /8145; resmigazete 20240710-2; me
 Supabase (DPA 1 Ağu 2026), DigitalOcean (14 Eki 2026), Cloudflare (6.4, 3 Nis 2026): yalnız AB SCC/UK/DPF; Türkiye/KVKK anılmıyor. İmzalayıp imzalamayacakları yazılı sorulmadı.
 
 ## Dış servisler (depo okuması)
-Supabase (tüm müşteri verisi, Frankfurt) · DO+Coolify (Frankfurt) · Cloudflare (DNS, gelen e-posta, R2 yalnız ürün görseli) · Resend (e-posta, ad, adres, sipariş; ABD) · Twilio (telefon, mesaj; ABD, doğrulanmadı) · Sentry (bölge ölçülmedi) · iyzico (Türk, doğrulanmadı) · GA4 (rızalı) · Google Drive (şifreli DB yedeği) · Anthropic (uygulamada çağrı yok).
+Supabase (tüm müşteri verisi, Frankfurt) · DO+Coolify (Amsterdam; 26 Kasım düzeltmesi, önceki "Frankfurt" yanlıştı) · Cloudflare (DNS, gelen e-posta, R2 yalnız ürün görseli) · Resend (e-posta, ad, adres, sipariş; ABD) · Twilio (telefon, mesaj; ABD, doğrulanmadı) · Sentry (Almanya, 26 Kasım ölçümü) · iyzico (Türk, doğrulanmadı) · GA4 (rızalı) · Google Drive (şifreli DB yedeği) · Anthropic (uygulamada çağrı yok).
 
 ## Türkiye'de barındırma (fiyat 2026-11-25)
-Natro XCloud TR 8 GB ₺1.518/ay (indirimli) · Turhost VDS TR 8 GB $24,99 → $72,79 (İstanbul) · Radore Cloud 8 GB $29,5 (İstanbul) · Turkcell/TT/Bulutistan teklifle. Supabase self-host: en az 4 GB, önerilen 8 GB+. Tuzak: Natro "Sanal Sunucu" ve Turhost "VPS Plus" Hollanda'da. Docker/KVM satıştan teyit edilmeli.
+Natro XCloud TR 8 GB ₺1.518/ay (indirimli) · Turhost VDS TR 8 GB $24,99 → $72,79 (İstanbul) · Radore Cloud 8 GB $29,5 (İstanbul) · Turkcell/TT/Bulutistan teklifle. Supabase self-host: en az 4 GB, önerilen 8 GB+. Tuzak: Natro "Sanal Sunucu" ve Turhost "VPS Plus" Hollanda'da. Docker/KVM satıştan teyit edilmeli. Dört firmanın ayrıntılı ölçümü aşağıda: "Türkiye'de sunucu sağlayıcı ölçümü (2026-11-26)".
 
 ## Hüküm (2026-11-25, Recep kararı bekliyor)
 Seçenek A: yurt dışında kal, her işleyenle standart sözleşme + bildirim (sağlayıcılar imzalamayabilir). Seçenek B: veri Türkiye'de (self-host Supabase + Coolify), e-posta/SMS için Türk sağlayıcı ya da sözleşme. OPS önerisi B, Design canlı taşımasıyla birlikte.
 ## Ölçülmedi
-Sağlayıcı imza kararları; Sentry bölgesi; Twilio/iyzico konumu; e-fatura/e-defter yurt içi saklama (VUK 509 resmî metni); aydınlatma metni.
+Sağlayıcı imza kararları; firmaların yazılı cevapları ve yayımlanmış sözleşme/sertifika dosyalarının içeriği; Twilio/iyzico konumu; e-fatura/e-defter yurt içi saklama (VUK 509 resmî metni); aydınlatma metni.
 ## Yeniden ölçme tetikleyicisi
 Kurul yeterlilik kararı; sağlayıcı cevabı; barındırma kararı.
+
+## Türkiye'de sunucu sağlayıcı ölçümü (2026-11-26, ALT-225 / OPS-398)
+
+Yöntem: dört araştırmacı firmaların kendi sayfalarını okudu (26 Kasım 2026); fiyat, belge ve konum iddialarının bir örneklemi aynı gün sayfadan ikinci kez okundu. Form doldurulmadı, sipariş adımı açılmadı, firmaya yazılmadı, dosya diske indirilmedi. "bulunamadı" = taranan sayfalarda yok; "hizmet yok" demek değildir. Fiyatlar sayfadaki para birimiyle yazıldı, çevrilmedi.
+
+Kaynak kısaltmaları: **N** [netinternet.tr/ssd-vds-sanal-sunucu](https://www.netinternet.tr/ssd-vds-sanal-sunucu) · **NK** [netinternet.tr KVKK şartları](https://www.netinternet.tr/altyapimiz/kvkk-veri-isleme-ve-gizlilik-sartlari) · **İ** [ilkbyte.com/llms.txt](https://www.ilkbyte.com/llms.txt) ve [cloud sunucu](https://www.ilkbyte.com/kiralik-sunucu-paketlerimiz/cloud-sunucu) (İlkbyte, Netinternet'in bulut markası) · **T** [turhost.com VDS TR](https://www.turhost.com/sunucu/vps-tr-sunucu/) · **TS** [turhost.com/sunucu](https://www.turhost.com/sunucu/) · **R** [radore.com bulut sunucu](https://radore.com/tr/hizmetler/bulut-sunucu) · **RV** [veri merkezi](https://radore.com/tr/veri-merkezi) · **RH** [hakkında](https://radore.com/tr/hakkinda) · **RK** [KVKK uyumlu sunucu](https://radore.com/tr/hizmetler/kvkk-uyumlu-sunucu-bulut) · **H** [hostopya.com/vds-sunucu](https://hostopya.com/vds-sunucu) · **HC** [colocation](https://hostopya.com/colocation) · **HK** [KVKK belgeleri](https://hostopya.com/kvkk-belgeleri) · **HG** [gold sanal sunucu](https://hostopya.com/gold-sanal-sunucu) ve [sipariş paneli listesi](https://musteri.hostopya.com/store/gold-sanal-sunucu)
+
+### 8 GB ve 16 GB paketler (aylık)
+
+| Firma | Paket | İşlemci | Disk | Port / trafik | Fiyat | KDV | Kaynak |
+|---|---|---|---|---|---|---|---|
+| Netinternet | SSD VDS III, 8 GB | 4 çekirdek, model yazmıyor | 80 GB "Raid50 SSD" (aynı sayfada "NVMe/SSD") | port yazmıyor / 8 TB | $17,50 ilk 3 ay; liste $35,00 | ibare yok | N |
+| Netinternet | SSD VDS V, 16 GB | 8 çekirdek, model yazmıyor | 160 GB, aynı | port yazmıyor / 10 TB | $31,07 ilk 3 ay; liste $54,50 | ibare yok | N |
+| İlkbyte | Cloud III, 8 GB | 4 vCPU, "Intel Xeon" (sayfada "SAS/SATA disk" ifadesi de geçiyor) | 80 GB SSD | 1 Gbps port, 100 Mbps'e kadar garantili / 3000 GB | $21,99 | paket tablosunda ibare yok | İ |
+| İlkbyte | Enterprise I, 16 GB | 6 vCPU | 120 GB NVMe | aynı port / 5000 GB | $48,00 | aynı | İ |
+| Turhost | VDS TR 4, 8 GB | 4 vCPU, "Intel Xeon" / "Xeon E5" | 200 GB "SSD" (metinde "NVMe SSD", "%100 NVME SAN") | kartta 200 Mbit (metinde 100 Mbit) / 3000 GB | liste $72,79; ilk 3 ay $24,99; 12 ayda $29,99/ay | hariç | T |
+| Turhost | VDS TR 6, 16 GB | 6 vCPU, aynı | 300 GB, aynı | kartta 400 Mbit / 5000 GB | liste $110,42; ilk 3 ay $44,99; 12 ayda $49,99/ay | hariç | T |
+| Radore | Disk-Elite, 8 GB | 4 çekirdek 2,70 GHz, model yazmıyor | 300 GB NVMe SSD | yazmıyor | $29,5 | hariç | R |
+| Radore | CPU-Elite, 8 GB | 8 çekirdek 2,70 GHz | 150 GB NVMe SSD | yazmıyor | $31,0 | hariç | R |
+| Radore | RAM-Advance, 16 GB | 2 çekirdek 2,70 GHz | 100 GB NVMe SSD | yazmıyor | $21,0 | hariç | R |
+| Radore | Disk-Infinity, 16 GB | 6 çekirdek 2,70 GHz | 500 GB NVMe SSD | yazmıyor | $49,5 | hariç | R |
+| Radore | CPU-Infinity, 16 GB | 16 çekirdek 2,70 GHz | 250 GB NVMe SSD | yazmıyor | $60,0 | hariç | R |
+| Hostopya | VDS-5, 8 GB | 6 çekirdek, Xeon E5-2680 v4 | 90 GB "NVMe/SSD" | 100 Mbps paylaşımlı / sınırsız (adil kullanım) | ₺239,99 | hariç (%20 eklenir) | H |
+| Hostopya | VDS-8, 16 GB | 8 çekirdek, aynı | 150 GB "NVMe/SSD" | aynı | ₺529,99 | hariç | H |
+| Hostopya | Gold-4, 8 GB | Xeon Gold 6138; sayfa 4 çekirdek/100 GB, panel 6 CPU/70 GB (çelişki) | NVMe | 100 Mbps | ₺319,99 | hariç | HG |
+
+Radore'da 8 GB'lik daha ucuz bir seri de var (RAM-Core, 1 çekirdek, 50 GB, $10,5). 25 Kasım'daki $29,5 ve $31 ölçümlerinin ikisi de doğrudur: ayrı serilerdir.
+
+### Konum, belge, KVKK, depolama, iletişim
+
+| Kalem | Netinternet | Turhost | Radore | Hostopya |
+|---|---|---|---|---|
+| Veri merkezi | Kendi merkezi, Denizli (Pamukkale Teknokent); İlkbyte yedekleri İstanbul (NK, İ) | Türk Telekom Gayrettepe, İstanbul (T). "VDS Plus / VPS Plus" ürünleri Amsterdam: karıştırılmaz | Kendi merkezi, Levent MetroCity, İstanbul (RV) | Datacasa, Başakşehir İstanbul; üçüncü taraf tesis (HC, HK) |
+| KVM / Docker | Docker kurulabileceği yazılı (N); "KVM" ifadesi yok | KVM cümlesi yalnız Amsterdam ürün sayfasında; Docker ifadesi yok | ikisi de bulunamadı | "KVM", tam root, Docker ve Kubernetes yazılı (H) |
+| Tier | Çelişki: [llms-full](https://www.netinternet.tr/llms-full.txt) "Tier III+" diyor; NK "Uptime Institute Tier veya TSE belgesi bulunmamaktadır" diyor | "Tier 3 sertifikalı" iddiası (Türk Telekom tesisi için), belge no yok (TS) | Blog yazısında "TIER II ve III çözümleri" ifadesi; yayımlanan belgeler arasında Tier yok (RH) | "Tier III+ sertifikalı" (H) ve "standardına göre tasarlanmış" (HC); belge no yok |
+| ISO 27001 | ISO/IEC 27001:2022, no IS-190122, PROKS (NK); sertifika dosyası yayımda | bulunamadı | ISO 27001:2022, dosya yayımda (RH) | yalnız "standartlarına uygun yönetilmektedir" beyanı; belgenin kime ait olduğu yazmıyor (HC) |
+| Veri işleyen sözleşmesi | VAR (dosya yayımda). Aynı sayfada doldurulmamış taslak alanları duruyor: "[3] iş günü", "[N] gün sonra silinir" (NK) | bulunamadı (aydınlatma metni ve kullanıcı sözleşmesinde KVKK maddesi var) | "veri işleyen sıfatıyla" beyanı (RK); ayrı ek bulunamadı | aydınlatma metninde "veri işleyen sıfatıyla" (HK); ayrı ek bulunamadı. DDoS filtrelemede Gcore (Lüksemburg) anılıyor |
+| S3 uyumlu depolama | yönetilen hizmet bulunamadı (kendi sunucunda MinIO imajı) | bulunamadı | bulunamadı | bulunamadı |
+| Satış kanalı | satışa özel adres bulunamadı: bilgi@netinternet.com.tr, bilgi@ilkbyte.com; 0850 885 0 885; WhatsApp bulunamadı ([iletişim](https://www.netinternet.tr/iletisim)) | satis@turhost.com; 0212 227 74 74; WhatsApp numarası bulunamadı ([iletişim](https://www.turhost.com/iletisim/)) | satis@radore.com; 0212 344 04 94 (destek); WhatsApp bulunamadı ([iletişim](https://radore.com/tr/iletisim)) | destek@hostopya.com; telefon ve WhatsApp +90 850 309 88 67 ([iletişim](https://hostopya.com/iletisim)) |
+
+**Sayfalardan çıkan sonuç:** hiçbir firmada dört şart (KVM ile Docker, imzalanabilir veri işleyen sözleşmesi, ISO 27001 belgesi, Türkiye'de ikinci yedek için S3) birlikte doğrulanamadı. Seçim yazılı cevaplardan sonra yapılabilir. 8 GB'de en düşük dolar liste fiyatı İlkbyte Cloud III ($21,99, NVMe değil), NVMe'li en düşük Radore Disk-Elite ($29,5; tek çekirdekli RAM-Core hariç). TL fiyatlı Hostopya kur çevrilmeden kıyaslanmadı.
+
+**Yayımlanmış, içeriği okunmamış dosyalar** (indirme ayrıca onay ister):
+Netinternet [veri işleyen sözleşmesi](https://kova1.ni.net.tr/pdf/Netinternet_Tedarikci_Gizlilik_ve_KVK_Sozlesmesi.pdf) (207.688 bayt) ve [ISO 27001 sertifikası](https://kova1.ni.net.tr/pdf/Netinternet_27001_Sertifika.pdf) (873.907 bayt) · Radore [genel hizmet sözleşmesi](https://static.radore.com/documents/radore-web-genel-hizmet-sozlesmesi.pdf) (154.600), [gizlilik/KVKK ilkeleri](https://static.radore.com/documents/radore-web-gizlilik-kvkk-ilkeleri.pdf) (436.730), [ISO 27001](https://static.radore.com/pdf/certificates/Radore-27001-2026.pdf) (350.430). Bir araştırmacı, "indirme yok" talimatı gelmeden önce üç Radore dosyasına istek attı; gelen içerik atıldı, diske yazılmadı ve okunmadı.
+
+### Firmalara gidecek metin (gönderimi OPS yapar)
+
+Konu: VentHub için sunucu bilgisi ve fiyat teklifi talebi
+
+> Merhaba,
+> VentHub için Türkiye'de barındırılacak, 8 GB ve 16 GB bellekli sanal sunucu seçeneklerini araştırıyoruz. Sunucuda Docker ile kendi barındırdığımız Supabase (PostgreSQL), Coolify ve bir Next.js uygulaması çalışacak; kişisel veriler Türkiye'de kalmalı.
+> Aşağıdaki soruları yanıtlamanızı ve güncel fiyat teklifinizi rica ederiz. Bu ileti yalnız bilgi ve teklif talebidir; sipariş ya da ödeme taahhüdü içermez.
+> [firmaya özel sorular]
+> Teşekkürler.
+> VentHub, [imza]
+
+Yalnız sayfada cevabı bulunmayan sorular:
+
+| Firma · adres | Sorular |
+|---|---|
+| Netinternet · bilgi@netinternet.com.tr, bilgi@ilkbyte.com | 1) VDS III ve V ile İlkbyte Cloud III ve Enterprise I'in işlemci modeli nedir? 2) VDS diskleri SSD mi NVMe mi? 3) VDS port hızı ve garantili hız nedir? 4) Sanallaştırma KVM mi? 5) Liste fiyatlarına KDV dahil mi; yıllık ödemede fiyat nedir? 6) Yayımlanan veri işleyen sözleşmesi İlkbyte'ı da kapsıyor mu; sayfadaki boş alanların (süreler) imzalanacak değerleri nedir? 7) İlkbyte'ta yurt dışı kaynaklı saldırı trafiği temizlenirken veri yurt dışına çıkıyor mu? 8) Sitede Tier için iki farklı ifade var; geçerli bir Tier belgeniz var mı? 9) Türkiye'de S3 uyumlu depolama sunuyor musunuz, fiyatı nedir? |
+| Turhost · satis@turhost.com | 1) VDS TR 4 ve 6'nın işlemci modeli nedir? 2) Disk NVMe mi, RAID düzeyi nedir? 3) Port hızı 200/400 Mbit mi 100 Mbit mi; trafik aşımında ne olur? 4) VDS TR'de sanallaştırma KVM mi; Docker çalıştırılabilir mi? 5) İndirim bitince yenileme fiyatı nedir? 6) Yedekler hangi merkezde tutulur? 7) Tier belgesinin numarası nedir; ISO 27001 belgeniz var mı? 8) İmzalanacak KVKK veri işleyen sözleşmesi metnini paylaşır mısınız? 9) Türkiye'de S3 uyumlu depolama sunuyor musunuz, fiyatı nedir? |
+| Radore · satis@radore.com | 1) Disk-Elite, CPU-Elite ve 16 GB paketlerin işlemci modeli nedir? 2) RAID düzeyi nedir? 3) Port hızı ve trafik sınırı nedir? 4) Sanallaştırma KVM mi; Docker çalıştırılabilir mi? 5) Taahhüt indirimi geçerli mi, koşulu nedir? 6) Bulut sunucu ve yedekleri hangi veri merkezinde tutulur? 7) Veri merkezi için Tier belgeniz var mı, numarası nedir? 8) İmzalanacak KVKK veri işleyen sözleşmesi metnini paylaşır mısınız? 9) Türkiye'de S3 uyumlu depolama sunuyor musunuz, fiyatı nedir? |
+| Hostopya · destek@hostopya.com, WhatsApp +90 850 309 88 67 | 1) VDS-5 ve VDS-8 diskleri NVMe mi SSD mi, RAID düzeyi nedir? 2) Port hızı yükseltilebilir mi, ücreti nedir? 3) Gold-4 için tanıtım sayfası ile sipariş paneli farklı; hangisi geçerli? 4) Yıllık ödeme fiyatı ve yenileme koşulu nedir? 5) Yedekler nerede tutulur, ücreti nedir? 6) DDoS filtrelemede trafik ya da IP bilgisi yurt dışına çıkıyor mu, kapatılabiliyor mu? 7) ISO 27001 ve Tier belgeleri kime ait, numaraları nedir? 8) İmzalanacak KVKK veri işleyen sözleşmesi metnini paylaşır mısınız? 9) Türkiye'de S3 uyumlu depolama sunuyor musunuz, fiyatı nedir? |
+
+### Bugünkü servislerin veri haritası (2026-11-26)
+
+| Servis | Ne veri tutuyor ya da alıyor | Nerede | Kanıt | Yerine ne konabilir (öneri, ölçülmedi) |
+|---|---|---|---|---|
+| Supabase | veritabanı, kimlik, dosya, sunucu fonksiyonları: müşteri verisinin ana deposu | `eu-central-1` (Frankfurt) | proje listesi, 26 Kasım | Türkiye'deki sunucuda self-host Supabase |
+| DigitalOcean + Coolify (sitenin sunucusu) | uygulama trafiği ve sunucu kayıtları | Amsterdam | alan adının IP'si DigitalOcean [bölge listesinde](https://digitalocean.com/geo/google.csv) Amsterdam; bölge kodu AMS3 OPS bildirimi | Türkiye'deki sunucu ve Coolify |
+| Resend | giden e-posta: alıcı adresi, ad, sipariş, teklif ve kargo bildirimi içeriği | ABD (25 Kasım kaydı, yeniden ölçülmedi) | `supabase/functions/` bildirim fonksiyonları | Türk e-posta gönderim sağlayıcısı ya da standart sözleşme |
+| Sentry | hata kayıtları ve %5 izleme örneği; hata içeriğinde kişisel veri geçebilir (ölçülmedi) | Almanya alım noktası (`ingest.de`) | canlı sitenin paketindeki adres, 26 Kasım | Türkiye'deki sunucuda kendi hata toplayıcımız ya da sözleşme |
+| Cloudflare | DNS; gelen e-posta yönlendirme (ileti içeriği geçer); R2'de ürün görseli ve katalog dosyaları | küresel ağ; R2 konumu ölçülmedi | barindirma-standard §B1, §B7 | gelen e-posta için Türk posta hizmeti; DNS ve açık ürün dosyaları ayrıca değerlendirilir |
+| GitHub | kaynak kod, CI kayıtları ve çıktıları, derlenmiş imaj; müşteri verisi saklamak için kullanılmıyor | GitHub; konum ölçülmedi | `.github/workflows/` | kalabilir; CI çıktılarına kişisel veri girmemesi kuraldır |
+| Vercel (kalıntı) | site buradan sunulmuyor; eski proje duruyor (içerdiği veri ve ortam değişkenleri ölçülmedi). `@vercel/analytics` bağımlılığı kodda | Vercel | canlı IP; barindirma-standard §B1, §B4 | proje silinir (geri alınamaz, Recep kararı), bağımlılık sökülür |
+| iyzico | ödeme isteği: ad, soyad, e-posta, telefon, adres, IP | Türk ödeme kuruluşu; veri konumu ölçülmedi | `supabase/functions/iyzico-payment` | kalır; aktarım ve işleyen metni teyit edilir |
+| Twilio (emirde yoktu) | SMS ve WhatsApp: telefon ve ileti metni | ABD (doğrulanmadı) | `supabase/functions/notification-service` | Türk SMS sağlayıcısı |
+| Google Analytics (emirde yoktu) | rıza veren ziyaretçinin kullanım verisi | Google; konum ölçülmedi | `ConsentGatedAnalytics` | Türkiye'de barındırılan analitik ya da sözleşme |
+| Google Drive (emirde yoktu) | şifreli veritabanı yedeği | Google; konum ölçülmedi | barindirma-standard §B1 | Türkiye'de ikinci firmanın S3 depolaması |
