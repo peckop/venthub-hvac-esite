@@ -22,9 +22,11 @@ export default defineConfig({
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: BASE_URL,
-    trace: 'retain-on-failure',
+    // KAPALI (ALT-226, INV-E2E-CIKTI-1): testler gerçek hesapla giriş yapar ve depo herkese açık;
+    // kayıt kimlik bilgisi taşıyabilir. Yerelde teşhis gerekirse komuta `--trace on` eklenir.
+    trace: 'off',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'off',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

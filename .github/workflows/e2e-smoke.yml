@@ -272,10 +272,5 @@ jobs:
           # Repo/organizasyonda gerçek bir secret tanımlıysa o kullanılır.
           JWT_CLAIMS_COOKIE_SECRET: ${{ secrets.JWT_CLAIMS_COOKIE_SECRET || 'e2e-ephemeral-ci-claims-key-not-a-production-secret' }}
 
-      - name: Upload Playwright report on failure
-        if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
+      # Rapor artefaktı YÜKLENMEZ (ALT-226, INV-E2E-CIKTI-1): kimlik bilgisi taşıyabilecek test çıktısı
+      # herkese açık depoda paylaşılmaz. Teşhis iş kaydındaki `list` raporundan yapılır.
