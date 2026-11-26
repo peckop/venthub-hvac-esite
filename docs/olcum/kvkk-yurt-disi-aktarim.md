@@ -1,6 +1,6 @@
 # Ölçüm defteri: KVKK yurt dışı aktarım ve veri yerleşimi
 
-Sahibi: OPS · Son doğrulama: 2026-11-26 · Kart: OPS-394, OPS-398 (ALT-225)
+Sahibi: OPS · Son doğrulama: 2026-11-26 · Kart: OPS-394, OPS-398 (ALT-225, ALT-228)
 Son ölçüm: 2026-11-25 (OPS araştırmacısı; resmî sayfalar ham indirildi). Sağlayıcı ölçümü ve veri haritası: 2026-11-26 (ALTYAPI, aşağıda). Hukuki son söz avukat/mali müşavir.
 
 ## Kural (KVKK m.9, 7499 s. Kanun)
@@ -77,6 +77,8 @@ Netinternet [veri işleyen sözleşmesi](https://kova1.ni.net.tr/pdf/Netinternet
 
 ### Firmalara gidecek metin (gönderimi OPS yapar)
 
+**Eskidi (26 Kasım, ALT-228):** gönderilecek güncel metin ve alıcılar aşağıdaki "Asgari şartlar ve aday eleme" bölümündedir.
+
 Konu: VentHub için sunucu bilgisi ve fiyat teklifi talebi
 
 > Merhaba,
@@ -110,3 +112,67 @@ Yalnız sayfada cevabı bulunmayan sorular:
 | Twilio (emirde yoktu) | SMS ve WhatsApp: telefon ve ileti metni | ABD (doğrulanmadı) | `supabase/functions/notification-service` | Türk SMS sağlayıcısı |
 | Google Analytics (emirde yoktu) | rıza veren ziyaretçinin kullanım verisi | Google; konum ölçülmedi | `ConsentGatedAnalytics` | Türkiye'de barındırılan analitik ya da sözleşme |
 | Google Drive (emirde yoktu) | şifreli veritabanı yedeği | Google; konum ölçülmedi | barindirma-standard §B1 | Türkiye'de ikinci firmanın S3 depolaması |
+
+## Asgari şartlar ve aday eleme (2026-11-26, ALT-228)
+
+Dayanak: yalnız firmaların kendi sayfaları (yukarıdaki ölçüm ve aynı gün yapılan eksik madde araması). Firmaya yazılmadı, dosya indirilmedi. **GEÇTİ** = sayfa şartı karşıladığını söylüyor; **KALDI** = sayfa karşılamadığını gösteriyor; **?** = bilinmiyor, soruya girer. "Bilinmiyor" firmanın hizmeti olmadığı anlamına gelmez.
+
+### Şartlar ve dayanakları
+
+| No | Şart | Dayanak | Niteliği |
+|---|---|---|---|
+| Ş1 | Tam sanal makine (KVM benzeri; OpenVZ ya da konteyner değil) ve Docker çalıştırma izni | Supabase [kendi sunucuda kurulum](https://supabase.com/docs/guides/self-hosting/docker) Docker ister; Coolify [root ya da sudo erişimli sunucu](https://coolify.io/docs/get-started/installation) ister | Docker ve root belgeden; "tam sanal makine" bizim çıkarımımız (konteyner tabanlı VDS'te Docker çalışmayabilir) |
+| Ş2 | En az 8 GB RAM, 4 vCPU, 80 GB disk | Supabase belgesinde önerilen: 8 GB+, 4 çekirdek+, 80 GB+ SSD (asgari 4 GB, 2 çekirdek, 40 GB); Coolify ayrıca 2 çekirdek, 2 GB, 10 GB ister | önerilen düzey (pay bırakır) |
+| Ş3 | Disk NVMe | belge yalnız SSD diyor | tercih (OPS emri) |
+| Ş4 | Veri ve yedek Türkiye'de; DDoS ya da CDN yurt dışı aktarımı kapatılabilir | 6698 s. Kanun m.9 (yukarıdaki "Kural" tablosu) | hukuki hedef (Recep kararı: veri Türkiye'de) |
+| Ş5 | İmzalanabilir veri işleyen sözleşmesi | 6698 s. Kanun m.12 (veri sorumlusu, veri işleyenle birlikte sorumlu; [mevzuat.gov.tr](https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=6698&MevzuatTur=1&MevzuatTertip=5)) | hukuki güvence (kanun sözleşmeyi adıyla şart koşmaz; m.12/2 müşterek sorumluluk yükler) |
+| Ş6 | ISO 27001 belgesi | kanuni zorunluluk değil | güvence tercihi (OPS emri) |
+| Ş7 | Türkiye'de yedek hizmeti ya da S3 uyumlu depolama | barındırma yedek kuralı (ikinci kopya) | işletme zorunluluğu |
+| Ş8 | En az 1 Gbps port | Supabase ve Coolify belgelerinde böyle bir şart yok | tercih (OPS emri); Turhost sonucunu tek başına belirliyor |
+| Ş9 | IPv4 adresi ve KDV'li kurumsal fatura | alan adı yönlendirmesi; muhasebe | işletme zorunluluğu (yasal KDV istisnalı e-fatura da muhasebeye uygundur) |
+
+### Aday tablosu
+
+| Şart | Netinternet SSD VDS III (8) ve V (16) | İlkbyte Enterprise I (16) | Radore 4 vCPU ve üstü (Disk-Elite, CPU-Elite, Disk-Infinity, CPU-Infinity) | Turhost VDS TR 4 (8) ve TR 6 (16) |
+|---|---|---|---|---|
+| Ş1 sanallaştırma türü | ? ([bilgi bankası](https://www.netinternet.tr/teknik-sorular) VDS için VMware Tools anıyor; tarihi yok) | ? (metinde "qcow2"; tür yazmıyor) | ? (sayfa verisinde "Proxmox VPS"; sanal makine mi konteyner mi yazmıyor) | GEÇTİ, genel sayfada "KVM" ([VDS nedir](https://www.turhost.com/vds-nedir/)); VDS TR sayfasında yok |
+| Ş1 Docker | GEÇTİ | GEÇTİ ([Docker](https://www.ilkbyte.com/uygulamalar/docker)) | ? | ? |
+| Ş2 RAM, vCPU, disk | GEÇTİ (4 ve 8 çekirdek; 80 ve 160 GB) | GEÇTİ (6 vCPU, 120 GB) | GEÇTİ | GEÇTİ |
+| Ş3 NVMe | ? (kartta "Raid50 SSD", metinde "NVMe/SSD") | GEÇTİ | GEÇTİ | ? (kartta "SSD", genel metinde "NVMe") |
+| Ş4 veri ve yedek Türkiye'de | GEÇTİ (Denizli, firma beyanı) | GEÇTİ (Denizli; Acronis yedeği İstanbul) | veri ve yedek GEÇTİ ("yurt dışına çıkmaz", "hizmetlerin tamamında Türkiye içerisinde" [beyanı](https://radore.com/tr/hizmetler/kvkk-uyumlu-sunucu-bulut)); yedek şehri ? | ? (sunucular Türkiye'de, fakat [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) firmanın ve iş birliği yaptığı üçüncü kişilerin kişisel veriyi yurt dışına aktarabileceğini yazıyor); yedek yeri ? |
+| Ş4 yurt dışı aktarım kapatılabilir | ? ([ağ sayfası](https://www.netinternet.tr/altyapimiz/network-altyapisi) yurt dışı temizleme merkezi diyor, KVKK sayfası yurt içi operatör diyor) | ? (yurt dışı saldırılar yurt dışında filtreleniyor; kapatma yolu yazmıyor) | ? ([güvenlik sayfası](https://radore.com/tr/hizmetler/guvenlik) DDoS için Cloudflare anıyor; pakette varsayılan mı yazmıyor) | ? |
+| Ş5 veri işleyen sözleşmesi | GEÇTİ, çekinceli (sayfada boş taslak alanları; dosya okunmadı) | ? (metinde İlkbyte adı geçmiyor; tüzel kişi aynı) | ? (yalnız "veri işleyen sıfatıyla" beyanı) | ? |
+| Ş6 ISO 27001 | GEÇTİ (2022, no IS-190122; kapsam okunmadı) | ? (kendi metni 2013 sürümü, numara yok) | GEÇTİ (sayfada "ISO 27001"; sürüm ve numara doğrulanmadı, dosya indirilmedi) | ? |
+| Ş7 Türkiye'de yedek ya da S3 | GEÇTİ (ücretli yedek) | GEÇTİ | hizmet var; ülke Türkiye (genel beyan), şehir ve ücret ? | hizmet var, yeri ? |
+| Ş8 1 Gbps port | ? | GEÇTİ (1 Gbps; 100 Mbps garantili) | ? (süresi geçmiş 24.02-30.04.2026 kampanya koşulunda "100 Mbps simetrik") | **KALDI** ([kartta](https://www.turhost.com/sunucu/vps-tr-sunucu/) 200 ve 400 Mbit) |
+| Ş9 IPv4 | GEÇTİ (1 adet) | GEÇTİ ([1 IPv4, 1 IPv6](https://www.ilkbyte.com/kiralik-sunucu-paketlerimiz/enterprise-sunucu)) | ? | ? |
+| Ş9 KDV'li fatura | e-fatura GEÇTİ ([2022 duyurusu](https://www.netinternet.tr/blog/oedeme-ve-faturalandirma-islemleri-hakkinda-degisiklik): ödemeden sonra 7 gün içinde); KDV oranı ? | e-fatura GEÇTİ; sunucu hizmeti 4691 sayılı Kanunla KDV'den muaf ([2018 yazısı](https://www.ilkbyte.com/bulut-sunucu-bilgi-bankasi/ilkbyte-saatlik-sunucu-ucretlendirmesi-ve-vergilendirme-hakkinda-bilgiler)), istisnanın sürdüğü sorulur | fiyata KDV eklenir ([sayfa](https://radore.com/tr/hizmetler/bulut-sunucu): "Fiyatlara KDV dahil değildir", sepette %20); e-fatura ? | KDV siparişte eklenir (kullanıcı sözleşmesi); e-fatura ? |
+| **Sonuç** | **Aday** | **Aday** (yurt dışı filtreleme cevaplanmadan karar yok) | **Aday** | **Elendi (Ş8)** |
+
+### Elenenler
+
+| Firma ya da paket | Gerekçe | Kaynağı |
+|---|---|---|
+| Hostopya (canlı ortam) | port 100 Mbps paylaşımlı; DDoS ve içerik dağıtımı için Gcore ve Cloudflare'a yurt dışı aktarım | kendi ölçümümüz ([VDS](https://hostopya.com/vds-sunucu), [KVKK belgeleri](https://hostopya.com/kvkk-belgeleri)) |
+| Hostopya (canlı ortam), ek | işlemci Xeon E5-2680 v4 (2016); disk paylaşımlı | Recep'in araştırması (işlemci adı sayfada da yazıyor; "paylaşımlı disk" tarafımızdan ölçülmedi) |
+| İlkbyte Cloud III (8 GB) | disk NVMe değil (Ş3) | ölçüm |
+| Radore RAM-Core ve RAM-Advance | 1 ve 2 çekirdek (Ş2) | ölçüm |
+| Turhost VDS TR 4 ve TR 6 | port 200 ve 400 Mbit (Ş8) | ölçüm. 1 Gbps sanal pakette yalnız 64 GB'lik VDS TR 10 ve üstünde (liste $198,23); [fiziksel sunucuda](https://www.turhost.com/sunucu/dedicated-server/) stoktaki en küçük model 32 GB E65 (liste $219,77, ilk 3 ay $79,99; disk E-SSD, NVMe değil). 8 ve 16 GB için 1 Gbps yolu bulunamadı; sipariş panelindeki ek port seçeneği ölçülmedi. Ş8 gevşetilirse Turhost yeniden aday olur; o zaman sözleşmedeki yurt dışı aktarım hükmü belirleyici olur |
+
+### Güncel mesaj (yalnız adaylar; gönderimi OPS yapar)
+
+Konu: VentHub için sunucu şartları ve fiyat teklifi talebi
+
+> Merhaba,
+> VentHub için Türkiye'de barındırılacak 8 GB ve 16 GB bellekli sanal sunucu arıyoruz. Sunucuda Docker ile kendi barındırdığımız Supabase (PostgreSQL), Coolify ve bir Next.js uygulaması çalışacak. Asgari şartlarımız: tam sanal makine, en az 4 vCPU ve NVMe disk, veri ve yedeğin Türkiye'de kalması, imzalanabilir KVKK veri işleyen sözleşmesi, ISO 27001, en az 1 Gbps port.
+> Aşağıdaki soruları yanıtlamanızı ve güncel fiyat teklifinizi rica ederiz. Bu ileti yalnız bilgi ve teklif talebidir; sipariş ya da ödeme taahhüdü içermez.
+> [firmaya özel sorular]
+> Teşekkürler.
+> VentHub, [imza]
+
+| Firma · alıcı | Sorular |
+|---|---|
+| Netinternet ve İlkbyte (tek ileti) · bilgi@netinternet.com.tr, bilgi@ni.net.tr, bilgi@ilkbyte.com | 1) SSD VDS III, V ve İlkbyte Enterprise I'de hipervizör nedir (VDS için VMware mi), tam sanal makine mi? 2) VDS III ve V diskleri NVMe mi? 3) VDS III ve V'te port 1 Gbps mi, garantili hız nedir? 4) VDS fiyatlarına KDV ekleniyor mu; İlkbyte sunucu hizmetindeki 4691 sayılı Kanun KDV istisnası bugün de geçerli mi? 5) DDoS koruması için yurt dışındaki merkeze hangi veri gidiyor; VDS ve İlkbyte için bu aktarım kapatılabiliyor mu, kapatılırsa koruma nasıl sağlanır? 6) Yayımlanan veri işleyen sözleşmesi İlkbyte hizmetlerini de kapsıyor mu; sayfadaki boş alanların (süreler) imzalanacak değerleri nedir? 7) IS-190122 numaralı ISO 27001 belgenizin kapsamı İlkbyte'ı da içeriyor mu? |
+| Radore · satis@radore.com | 1) Disk-Elite, CPU-Elite, Disk-Infinity ve CPU-Infinity'de hipervizör nedir; tam sanal makine mi, konteyner mi? 2) Docker çalıştırılabilir mi? 3) Bu paketlerde port hızı nedir, 1 Gbps sunuluyor mu? 4) IPv4 adresi dahil mi? 5) Kurumsal e-fatura kesiyor musunuz? 6) Yedekler hangi şehirde tutulur, pakete dahil mi, ücreti nedir? 7) Bulut sunucuda DDoS koruması Cloudflare üzerinden mi geçiyor; yurt dışına veri aktarımı kapatılabiliyor mu? 8) İmzalanacak KVKK veri işleyen sözleşmesi metnini paylaşır mısınız? 9) ISO 27001 belge numaranız ve kapsamı nedir? |
+
+Turhost ve Hostopya'ya ileti gitmez. Yukarıdaki 26 Kasım soru tablosunun yerini bu liste aldı.
