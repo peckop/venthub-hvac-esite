@@ -64,7 +64,8 @@ describe('liste kartı — güncelleme tarihi', () => {
       ['fan-cesitleri', '2026-11-26', '26 Kasım 2026'],
       ['radyal-aksiyel-fan-secimi', '2026-11-17', '17 Kasım 2026'],
       ['kanal-tipi-fan-nedir', '2026-11-26', '26 Kasım 2026'],
-      ['sessiz-fan-secimi', '2026-11-17', '17 Kasım 2026'],
+      // BLG-81 R5.5 (26 Kasım): sayfa altı kategori kartı kanal tipi fanlara döndü.
+      ['sessiz-fan-secimi', '2026-11-26', '26 Kasım 2026'],
     ]
     // BLG-88 (OPS-332): yayındaki her yazıda `tarihGizli` açık; güncelleme tarihi kayıtta durur (sitemap
     // lastmod onu izler) ama kart BASMAZ. Bayrağı kapalı bir yazı gelirse kart yine biçimli tarihi basar.

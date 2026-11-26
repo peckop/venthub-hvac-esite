@@ -535,11 +535,12 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yazı R3.4 üslup kurallarıyla yeniden yazıldı (pilot); şerh, kendinden söz, tekrar ve ekotasarım takvimi çıktı, yeni iddia yok.
     // BLG-81: yazı okur sorusu sırasıyla yeniden kuruldu (kontrol listesi başa, tutanak gösterimi ve tek cümlelik bölüm çıktı); yeni iddia, sayı, kaynak yok.
     // BLG-81 tur 2: doğrulayıcı bulguları işlendi (Vortice/Lineo kaydı ve koşullar geri kondu; iki H2 eski adıyla korundu).
-    guncellemeTarihi: '2026-11-17',
+    // BLG-81 R5.5 (26 Kasım): sayfa altı kategori kartı aksiyel fanlar (ATEX açıklamalı) yerine kanal tipi fanlar; gövde ve iddia değişmedi.
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: ['vh:aile/vortice-lineo-quiet-sessiz-kanal-fanlari'],
-    // Kategori sayfalarından rehbere bağlantı (URN-140): gövdede bağlantısı olmayan kategoriler.
-    ilgiliKategoriler: ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'],
+    // Sayfa altı "İlgili ürün kategorileri" kartları ve kategori sayfalarından rehbere bağlantı (URN-140, URN-151).
+    ilgiliKategoriler: ['vh:kategori/duct-fans', 'vh:kategori/bathroom-toilet-fans'],
     diller: {
       tr: {
         slug: 'sessiz-fan-nasil-secilir',
