@@ -233,6 +233,45 @@ SEO-94 ölçümünde bir rakip, sektör ya da uygulama adı taşıyan doğal sor
 
 Kural: sektör sayfası talebi tek bir rakibin varlığıyla gerekçelendirilmez; gerekçe ürün karşılığı, kaynak paketi ve ölçülen talebin birlikte var olmasıdır.
 
+### Y2.6 Yayın öncesi görünürlük kontrolü: 22-26 Kasım dersleri (SEO-144, 2026-11-26, OPS-407)
+
+Ekim ve Kasım 2026'da birçok rehber yazısı Google'da geç göründü; o süre boyunca aramada yazının yerine kategori sayfası, Bilgi Merkezi liste sayfası ya da eski adres çıktı. Aşağıdaki dokuz neden kartlardan derlendi. Kanıtın gücü iki türlüdür ve ikisi karıştırılmaz:
+
+- **Kanıtlı süreç hatası (S):** hata yaşandı, sebebi ölçüldü ve kapıyla kapatıldı. Görünürlüğü ne kadar geciktirdiği ölçülmedi.
+- **Hijyen (H):** kusur bizdeydi ve düzeltildi. Düzeltmeden sonra bazı yazılar öne çıktı, ama düzeltme toplu yapıldı, kontrol grubu yok ve karşı örnekler var. Bu yüzden "gecikmenin nedeni budur" yazılmaz. Madde, kusur tekrar etmesin diye vardır.
+
+| # | Ders | Tür | Kök neden | Kanıt | Düzeltme ve sonrası |
+|---|---|---|---|---|---|
+| N1 | Kategori tanıtım paragrafı yazıda aynen geçiyordu | H | Kart metni ekranda kesiliyordu ama tam metin HTML'deydi; 106 sayfada yüzlerce kopya çifti vardı | OPS-368, SEO-138 (22-23 Kasım) | PR #2657, #2666, #2674 ile 25 kelime ve üstü ortak metin sıfırlandı. 26 Kasım okumasında beş yazının ikisi öne çıktı, üçü çıkmadı; karşı örnek olarak yüksek kopyalı iki yazı zaten öndeydi (SEO-138) |
+| N2 | Aynı ya da çok benzer başlık; eski adres | H | (a) Bir yazının başlığı bir rakip sayfayla aynıydı. (b) Adres değişince eski adres yönlendirildi ama aramada uzun süre kaldı; IndexNow ve Bing'e eski adres gönderilmemişti | SEO-85, SEO-112 (12, 16, 21 ve 22 Kasım), SEO-138 (26 Kasım) | (a) Başlık değişti (BLG-40), etkisi ölçülmedi. (b) PR #2584 ile düzeldi; eski banyo kategori adresi 26 Kasım'da hâlâ aramada |
+| N3 | Kategori ya da liste sayfası yazının önüne geçiyor | H | Aynı konuda kategorisi olan yazılar daha seyrek öne çıktı; liste sayfası yeni yazıdan önce tarandığında öne çıktı (tek örnek) | SEO-112 (13 ve 22 Kasım), SEO-141 (24 Kasım) | Konum yolu düzeltmesinin (URN-164) ardından öne çıkan yazı sayısı arttı, sebep ayrılamadı |
+| N4 | Aramada eski tarih satırı | H | Sayfada görünen tarih ve `Article` tarih alanı | SEO-125, OPS-332 (19-26 Kasım) | Tarih gizlendi (#2615, #2617). 13 yazının 10'unda satır kalktı; bir yazıda taramadan sonra da kaldı (neden ölçülmedi). Görünürlüğe etkisine kanıt yok |
+| N5 | Gitmemiş istek "istendi" diye deftere yazıldı | S | Tek `--kaydet` çağrısı birden çok adresi yazdı; onay yalnız birinde okunmuştu (8, 10, 13, 22 ve 23 Kasım) | SEO-141 (25 Kasım) | D7 madde 18 kapısı (PR #2687): çoklu kayıt `--kanit` ister. 26 Kasım'daki ilk kullanımda 7 adres tek tek istendi |
+| N6 | Aynı adrese tekrar Google isteği | S | İstek listesi tablodan değil tetik metninden alındı; aynı yeni adrese bir haftada altı istek gitti | SEO-112 (16 Kasım), SEO-134 | D7 madde 15 ve 17 (tablo kapısı). Zararı, günlük hakkın boşa gitmesi ve sıranın gecikmesi |
+| N7 | İç bağlantı | H | Gelen bağlantı sayısı yazıdan yazıya değişiyordu; bir yazı ana sayfa bloğundan düşmüştü | SEO-109 (12-13 Kasım), SEO-112 (22 Kasım) | Sayı tek başına hızı açıklamadı. Eşik yazılmaz; yalnız kaydı tutulur |
+| N8 | Başlık ve H1 hedef sorguya uymuyordu | H | Başlıkta, H1'de ve ara başlıklarda hedef kavram yoktu; bağlantı metni H1'den farklı olunca arama sonucu başlığı bağlantı metninden üretildi (hipotez) | SEO-81 (3-4 Kasım), SEO-136 (21 Kasım), SEO-110 (26 Kasım) | Kavram eklendi; markalı aramada erken, markasız aramada geç görünüldü. Önce ve sonra ölçümü yok |
+| N9 | İçerik değişti, `lastmod` değişmedi | S | Şablon değişiklikleri (URN-164, BLG-88) site haritası tarihine yansımadı; dizin takibi bu adresleri tamam saydı | SEO-112 (14 Kasım), SEO-134 | D7 madde 14: değişen adres listesi |
+
+**Yayın öncesi kontrol maddeleri.** Yeni ya da değişen her yazı, kategori ve sayfa taslağı R10 B6a okumasına geldiğinde GEO-SEO bu maddeleri karta yazar. "Oto" sütunu, maddenin betikle ölçülüp ölçülemediğini gösterir. "Yeni site" sütunu, maddenin yeni sitenin sayfa içerik haritasına (TSR-48) girip girmediğini gösterir.
+
+| Madde | Kontrol | Ders | Oto | Yeni site |
+|---|---|---|---|---|
+| K1 | Yazının gövdesi, başlığı ve kart özeti hiçbir kategori, liste ya da aile sayfasıyla 25 ve üstü ardışık kelime paylaşmaz. Ölçüm, ekran kesmesi dahil ham HTML üzerinde yapılır; ürün ve seri adı, uyarı metni ve resmî atıf hariç tutulur | N1 | Evet: OPS-368 kopya taraması (iki eşzamanlı istek); betik henüz depoda değil, depoya alınması ayrı kart | Evet |
+| K2 | Title ve H1 site içinde tekildir: kategori, liste ya da eski adres hedefiyle aynı değildir ve ayırt edici bir terim taşır | N2, N8 | Kısmen: site içi tekillik site haritası taramasıyla ölçülür; rakiple çakışma elle bakılır (Y2.4 4a) | Evet |
+| K3 | Sorgu sahibi satırı: hedef sorgu kümesinin hangi sayfaya ait olduğu yazılır. Yazı, kategorinin sorgusunu (tür, çeşit, fiyat) hedeflemez; kategori de yazının sorgusunu (nedir, nasıl seçilir) hedeflemez | N3 | Kısmen: aynı adlı kategori olup olmadığı otomatik bakılır; niyet kararı elle verilir | Evet |
+| K4 | Adres değişince eski adres 308 ile yönlenir; IndexNow'a eski ve yeni adres birlikte gider; Google'a tek istek gider; eski adrese iç bağlantı kalmaz; 14. günde eski adresin son tarama tarihi yazılır | N2 | Evet: adres denetimi ve URL denetimi | Evet (308 haritası olarak) |
+| K5 | İçerik değişip `lastmod` değişmiyorsa adres, değişen adres listesine yazılır | N9 | Evet: gövde izi değişip `lastmod` aynı kalıyorsa kapı kırmızı verir (yazılması ayrı kart) | Hayır (süreç) |
+| K6 | Yayın günü Google isteği her adres için tek tek atılır ve onay o adres için okunur; çoklu kayıt `--kanit` ile yapılır | N5, N6 | Evet: D7 madde 15, 17 ve 18 kapıları var | Hayır (süreç) |
+| K7 | Gövdede yetim bağlantı yoktur, ters yön bağlantıları (R3.2) kurulur ve gelen bağlantı sayısı kayda yazılır. Eşik konmaz | N7 | Evet: bağlantı taraması | Evet |
+| K8 | Yayının 7. gününde aramadaki tarih satırı okunur; taramadan sonra da kalıyorsa kayda geçer. "Göründü" sonucu markalı ve markasız arama için ayrı yazılır | N4, N8 | Kısmen: HTML'de tarih alanının olmadığı otomatik ölçülür; arama sonucu elle okunur | Evet |
+
+Kurallar:
+
+- Bu maddeler yayını durdurmaz, kayıt üretir. Engelleme kararı R10'un ve OPS'un işidir.
+- Depoya giren kayıtta sıra, gösterim ve sorgu yazılmaz, yalnız kart numarası ve tarih yazılır (P6).
+- Rehber cetveline giren karşılıkları (K1, K2, K3, K7) BLOG yazar; GEO-SEO yalnız önerir.
+- Hijyen (H) maddesini nedensellik cümlesine çevirmeden önce SEO-135 (28 Kasım) ve SEO-112 +28 gün (12 Aralık) okumaları beklenir.
+
 ## Y3 — Kabul (yayın günü ve sonrası)
 
 - Eski adres: `AYNI` ya da `TEK-308` (dil öneki olmayan eski adreste tek 307 meşru, plan §4); **ZINCIR 0 ·
