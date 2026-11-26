@@ -51,14 +51,24 @@ function specDenetle(ad: string, spec: string): string[] {
   const kod = yorumsuz(spec)
   const acik = [...kod.matchAll(/\b(trace|video)["']?\s*:(?!\s*'off')\s*[^,\n}]+/g)].map((m) => `${ad}: ${m[0].trim()}`)
   if (/\.text\(\)\)?\.slice\(/.test(kod)) acik.push(`${ad}: yanıt gövdesi kırpılıp taşınıyor`)
-  // Giriş yapan dosyada yanıt gövdesi hiçbir biçimde mesaja, nesneye ya da kırpmaya girmez.
+  // Giriş yapan dosyada yanıt gövdesi mesaja, nesneye ya da kırpmaya girmez. Kilit bilinen kalıpları
+  // yakalar (aşağıdaki sabotaj listesi); page.evaluate içinden dönen gövde gibi dolaylı yollar kapsam dışı.
   // Herkese açık sayfa HTML'ini okuyan dosyalar (ssr-html, dil-dususu) giriş sırrı kullanmaz; kapsam dışı.
   if (/E2E_[A-Z_]*(PASSWORD|EMAIL|TOKEN|SECRET)/.test(kod)) {
     const govdeDegiskeni = [...kod.matchAll(/(?:const|let|var)\s+(\w+)\s*=\s*await\s+[\w.]+\.(?:text|json)\(\)/g)].map((m) => m[1])
-    const kirpilan = govdeDegiskeni.some((d) => new RegExp(`\\b${d}\\s*\\.\\s*(slice|substring|substr)\\s*\\(`).test(kod))
+    const kirpilan = govdeDegiskeni.some((d) =>
+      [
+        `\\b${d}\\s*\\.\\s*(slice|substring|substr)\\s*\\(`,
+        `\\bexpect\\([^\\n]*,\\s*${d}\\b`,
+        `\\$\\{\\s*${d}\\b`,
+        `\\bbody\\s*:\\s*${d}\\b`,
+        `JSON\\.stringify\\(\\s*${d}\\b`,
+      ].some((k) => new RegExp(k).test(kod)),
+    )
     const tasinan =
       kirpilan ||
       /\.(?:text|json)\(\)\)?\s*\.\s*(slice|substring|substr)\s*\(/.test(kod) ||
+      /\.(?:text|json)\(\)\s*\.then\(\s*\(?\s*\w+\s*\)?\s*=>\s*\w+\s*\.\s*(slice|substring|substr)\s*\(/.test(kod) ||
       /\bbody\s*:\s*(?:\(\s*)?await\s+[\w.]+\.(?:text|json)\(\)/.test(kod) ||
       /JSON\.stringify\(\s*await\s+[\w.]+\.json\(\)/.test(kod) ||
       /\$\{\s*(?:\(\s*)?await\s+[\w.]+\.(?:text|json)\(\)/.test(kod)
@@ -145,6 +155,11 @@ describe('INV-E2E-CIKTI-1 · kimlik bilgisi taşıyabilecek test çıktısı yü
     ['nesneye gövde', 'return { status: r.status(), body: await r.text() }'],
     ['json metne', 'expect(r.ok(), JSON.stringify(await r.json())).toBe(true)'],
     ['şablona gövde', 'expect(r.ok(), `yanıt: ${await r.text()}`).toBe(true)'],
+    ['değişken mesajda', 'const t = await r.text()\nexpect(r.status(), t).toBe(200)'],
+    ['değişken şablonda', 'const t = await r.text()\nthrow new Error(`hata ${t}`)'],
+    ['değişken nesnede', 'const t = await r.text()\nreturn { body: t }'],
+    ['json değişkeni metne', 'const j = await r.json()\nconsole.log(JSON.stringify(j))'],
+    ['then ile kırpma', 'const k = await r.text().then((t) => t.slice(0, 80))'],
   ])('SABOTAJ giriş yapan spec: %s', (_ad, satir) => {
     expect(specDenetle('x.e2e.ts', girisli + satir)).not.toEqual([])
   })
