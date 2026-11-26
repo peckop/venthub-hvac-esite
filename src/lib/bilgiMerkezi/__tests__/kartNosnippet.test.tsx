@@ -164,10 +164,11 @@ describe('kart özeti data-nosnippet içinde basılır — her yüzey', () => {
 })
 
 describe('kategori → rehber eşlemesi (sessiz fan rehberi)', () => {
-  it('⭐banyo-tuvalet fanları ve aksiyel fanlar kategorisinden sessiz fan rehberi gelir', () => {
+  // BLG-81 R5.5 (26 Kasım): sayfa altı kartı aksiyel fanlar yerine kanal tipi fanlar (sessiz kanal fanı yazısı).
+  it('⭐banyo-tuvalet fanları ve kanal tipi fanlar kategorisinden sessiz fan rehberi gelir', () => {
     const sessiz = TR_METINLER.find((x) => x.y.kimlik === 'sessiz-fan-secimi')
     expect(sessiz, 'yazı yayından kalktıysa bu testi de güncelle').toBeDefined()
-    for (const hedef of ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/axial-industrial-fans'] as const) {
+    for (const hedef of ['vh:kategori/bathroom-toilet-fans', 'vh:kategori/duct-fans'] as const) {
       // Test eşlemenin VARLIĞINI ölçer (adet = tüm yazılar); kartın gösterdiği ilk 3 yazı yayın tarihine göre değişir (BLG-67 ve sonraki sektör yazıları).
       const r = ilgiliRehberler(hedef, 'tr', YAZILAR.length, YAZILAR, false)
       expect(r.map((x) => x.href), hedef).toContain(`/tr/bilgi-merkezi/${sessiz?.m.slug}`)
