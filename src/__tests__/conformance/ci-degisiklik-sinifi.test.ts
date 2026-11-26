@@ -49,7 +49,6 @@ const SINIF_ADI = "Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanı
  */
 const CI_SINIF_OKUYAN = ['Next.js derleme önbelleği', 'Build (blocking)', 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)']
 const E2E_HEP_KOSAN = ['Merge-ref çözümle (yalnız elle tetiklemede)', 'Checkout', SINIF_ADI]
-const E2E_YUKLEME_ADIMI = 'Upload Playwright report on failure'
 /** Çökme yedeği: `node` çıkış kodu sıfırdan farklıysa adım `tam` yazar (gövde girintisi atılmış hâliyle, adımın SON satırları). */
 const COKME_YEDEGI = /node "\$RUNNER_TEMP\/degisiklik-sinifi\.cjs" \|\| cikis=\$\?\nif \[ "\$cikis" -ne 0 \]; then\n[^\n]*\n  printf 'sinif=tam\\n[^\n]*>> "\$GITHUB_OUTPUT"\nfi$/
 
@@ -183,10 +182,6 @@ function e2eDenetle(e2e: string, ci: string): string[] {
   const sonraki = ad.slice(sinifIdx + 1)
   if (sonraki.length === 0) ihlal.push('e2e-smoke.yml: sınıf adımından sonra adım yok')
   for (const a of sonraki) {
-    if (a.ad === E2E_YUKLEME_ADIMI) {
-      if (JSON.stringify(ifler(a)) !== JSON.stringify(['if: failure()'])) ihlal.push(`e2e-smoke.yml: "${a.ad}" \`if: failure()\` olmalı (bulunan ${JSON.stringify(ifler(a))})`)
-      continue
-    }
     if (JSON.stringify(ifler(a)) !== JSON.stringify([KOSUL_E2E])) ihlal.push(`e2e-smoke.yml: ağır adım "${a.ad}" daraltma koşulunu TAM taşımıyor (bulunan ${JSON.stringify(ifler(a))}, beklenen ["${KOSUL_E2E}"])`)
   }
   for (const a of ad.slice(0, sinifIdx)) {
@@ -276,7 +271,6 @@ describe('INV-CI-SINIF-1 · sınıf kararı iki iş akışında AYNI ve güvenli
     { ad: 'dar kümeye `tam` girer', boz: (c) => c.split(DAR_LITERAL).join('["belge","edge","betik","karma","tam"]'), beklenen: 'dar sınıf kümesi sınıflayıcıyla AYNI değil' },
     { ad: 'sınıf adımı PR koşulunu kaybeder', boz: (c) => c.replace("        if: github.event_name == 'pull_request'\n        run: |\n          if ! git show", '        run: |\n          if ! git show'), beklenen: 'sınıf adımı `if: github.event_name' },
     { ad: 'sınıf adımı PR kopyasını koşar (tabandan çıkarılmaz)', boz: (c) => c.replace('git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs', 'cat scripts/ci/degisiklik-sinifi.cjs'), beklenen: 'sınıf adımının gövdesi ci.yml\'dekiyle BİREBİR aynı değil' },
-    { ad: 'yükleme adımı koşulunu kaybeder', boz: (c) => c.replace(`- name: ${E2E_YUKLEME_ADIMI}\n        if: failure()\n`, `- name: ${E2E_YUKLEME_ADIMI}\n`), beklenen: `"${E2E_YUKLEME_ADIMI}" \`if: failure()\` olmalı` },
     { ad: 'çökme yedeği yalnız bu iş akışında silinir (iki yerde farklı karar)', boz: (c) => c.replace(' || cikis=$?', ''), beklenen: 'sınıf adımının gövdesi ci.yml\'dekiyle BİREBİR aynı değil' },
   ]
   it.each(E2E_BOZ)('sabotaj e2e-smoke.yml: $ad', ({ boz, beklenen }) => {
