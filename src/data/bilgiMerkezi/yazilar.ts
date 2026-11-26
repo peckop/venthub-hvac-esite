@@ -747,7 +747,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // Güncelleme tarihi 2026-11-16 (BLG-78): yazıdan yazıya bağlantı metinleri hedef yazının başlığıyla birebir yapıldı.
     // BLG-79: R3.4 üslup düzeltmesi; yalnız silme, daraltma ve özne değişikliği, yeni iddia yok.
     // BLG-82: okur gözüyle yeniden düzenleme (R3.5); yeni iddia yok; [3] için baskı yılı kaydı (BLG-84)
-    guncellemeTarihi: '2026-11-21',
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: [
       'vh:aile/vortice-lineo-kanal-fanlari',
@@ -825,7 +825,7 @@ Kanal içi için katalogda plastik reçine gövdeli bir seri asma tavana ya da �
 | Kanal ucunda, duvarda | Çelik sac duvar tipi fanlar: laboratuvar, bar, restoran, çamaşırhane ve spor salonu gibi mekânlar [4] |
 | Kanal ucunda, çatıda | Çatı tipi fanlar: çatıdan atış yapan ticari ve endüstriyel mekânlar [4] |
 
-İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir? Isıtıcılı ve ısıtıcısız model, montaj yüksekliği ve enerji etkisi](vh:yazi/hava-perdesi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+İlgili rehberler: [Isı geri kazanım cihazı nedir, nasıl seçilir?](vh:yazi/isi-geri-kazanim-cihazi-nedir), [Hava perdesi nedir, nasıl seçilir? Isıtıcılı ve ısıtıcısız model, montaj yüksekliği ve enerji etkisi](vh:yazi/hava-perdesi), [Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi](vh:yazi/cati-tipi-fan-nedir)
 
 ## Sık sorulan sorular
 
@@ -1304,7 +1304,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // BLG-79: yapı düzeltmesi (Sınırlar başlığı, üretici kalıbı, teklif başlığı, SI karşılığı); yeni iddia yok.
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
-    guncellemeTarihi: '2026-11-21',
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     // 18 Kasım (BLG-86): Kaynak 5 Birleşik Krallık sitesi yerine EUR-Lex özgün metnine çevrildi (tanımlar ölçüldü: aksiyel, santrifüj, karma akışlı, çapraz akışlı aynı); gövde değişmedi.
     urunler: ['vh:aile/vortice-lineo-kanal-fanlari', 'vh:aile/vortice-aksiyel-endustriyel-fanlar'],
@@ -1374,7 +1374,7 @@ VentHub kataloğundaki kategoriler aynı ölçüte göre ayrılmamıştır: baz�
 - Aksiyel fanlar kategorisi duvara monte edilen, düşük ve orta basınçlı aksiyel fanları kapsar [4]; kategori sayfasındaki ailelerden biri Vortice Aksiyel Endüstriyel Fanlar'dır [4]; modeller: [aksiyel fanlar](vh:kategori/axial-industrial-fans).
 - Radyal (santrifüj) fanlar kategorisinin sayfası hücreli, plug ve gövdeli olmak üzere üç yapıyı tanıtır [4]; modeller: [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans).
 - Kanal tipi fanlar havayı kanal hattının içinde taşır ve kanala seri bağlanır; kategoride karma akışlı iki LINEO ailesi (LINEO ve LINEO Quiet) de bulunur [3][4]; modeller: [kanal tipi fanlar](vh:kategori/duct-fans). İlgili rehberler: [Kanal tipi fan nedir, nerede kullanılır? Fan türleri ve seçimde bakılacaklar](vh:yazi/kanal-tipi-fan-nedir), [Sessiz kanal fanı nasıl seçilir? dB(A) ve ses gücü](vh:yazi/sessiz-fan-secimi).
-- Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans). İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+- Çatı tipi fanlar havayı binanın en üstünden dışarı atan, çatıya oturan fanlardır [4]; modeller: [çatı tipi fanlar](vh:kategori/roof-fans). İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi](vh:yazi/cati-tipi-fan-nedir)
 - Banyo ve tuvalet fanları nemin ve kokunun kaynağında alındığı küçük hacim fanlarıdır [4]; modeller: [banyo ve tuvalet fanları](vh:kategori/bathroom-toilet-fans). İlgili rehber: [Banyo ve tuvalet fanı nasıl seçilir?](vh:yazi/banyo-tuvalet-fani-secimi)
 - Duman egzoz fanları yangın hâlinde dumanı tahliye etmek üzere yüksek sıcaklıkta çalışmaya sertifikalı fanlardır [4]; modeller: [duman egzoz fanları](vh:kategori/smoke-exhaust-fans).
 - Hücreli aspiratörler kayış kasnaklı hücreli radyal fanlardır [4]; modeller: [hücreli aspiratörler](vh:kategori/cabinet-fans). İlgili rehber: [Hücreli aspiratör nedir, seçerken nelere bakılır?](vh:yazi/hucreli-aspirator-nedir)
@@ -1714,7 +1714,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
     // BLG-79: satılmayan markanın cümlesi edilgen kuruldu (R3.4 m).
     // Gemini dil incelemesi ve doğrulama sonrası okur gözüyle yeniden düzenlendi (BLG-82)
-    guncellemeTarihi: '2026-11-18',
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     // 18 Kasım (BLG-86): Radon ailesi ürün listesine ve metindeki bağlantıya eklendi (aile sayfası canlıda 200, 18 Kasım ölçümü); yeni iddia yok.
     urunler: ['vh:aile/vortice-slimroof-cati-fanlari', 'vh:aile/vortice-radon-serisi-cati-fanlari'],
@@ -1725,7 +1725,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
         ozet: "Çatı tipi fan nedir? Çatıdan egzoz atarken hangi ilke belirleyicidir, çatıda hangi fan türleri kullanılır, seçimde hangi bilgiler gerekir ve VentHub'da hangi çatı tipi fan serileri var.",
         // Kart metni YÖNLENDİRME cümlesidir (URN-140): rehberin cümlelerini ve meta açıklamasını tekrarlamaz.
         kartOzeti: "Çatı tipi fanda neye bakılacağını bu rehberde bulun.",
-        govde: `# Çatı tipi fan nedir, nasıl seçilir?
+        govde: `# Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi
 
 Çatı tipi fan, çatıya monte edilip havayı binanın dışına atan fan anlamında kullanılır; üretici sayfalarında terim egzoz çatı fanları için bu anlamda geçer, bazı üreticiler besleme çatı fanlarını da aynı adla sunar [4][6][8]. Seçimde iki soru sorulur: atılan hava binaya geri girecek mi [2] ve fan hangi koşulda çalışacak [1].
 
@@ -2197,7 +2197,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'mutfak-egzoz-fani-secimi',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-19',
-    guncellemeTarihi: '2026-11-19',
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: ['vh:aile/vortice-vort-qbk-sal-kc-evo'],
     ilgiliKategoriler: [],
@@ -2236,7 +2236,7 @@ Fan seçimini başlatan koşullar havanın özellikleri, debi, basınç ve siste
 
 İngiltere Sağlık ve Güvenlik İdaresi'nin (HSE) yemek hizmeti sektörüne yönelik sıkça sorulan sorular sayfasına göre mutfak havalandırması güvenli ve konforlu bir çalışma ortamı için gereklidir [1]. Pişirmenin ürettiği duman, buhar ve ısıyı güvenli bir dış noktaya atmak için havalandırma gerekir; bu genellikle pişirme cihazlarının üstündeki kanopi davlumbazdan mekanik egzozla sağlanır [1]. Havalandırma sistemi mutfağın tamamında genel havalandırma da sağlamalıdır [1]. Katı yakıtlı cihazlar normal çalışmalarında karbon monoksit üretir ve zehirli dumanı uzaklaştıran uygun bir egzoz sistemi ister [1].
 
-İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi](vh:yazi/cati-tipi-fan-nedir)
 
 ## VentHub'da hangi mutfak egzoz fanı serileri var?
 
@@ -2298,7 +2298,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'depo-havalandirma-fani-secimi',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-20',
-    guncellemeTarihi: '2026-11-20',
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: ['vh:aile/vortice-nordik-hvls-hyperblade', 'vh:aile/vortice-aksiyel-endustriyel-fanlar', 'vh:aile/vortice-slimroof-cati-fanlari'],
     ilgiliKategoriler: ['vh:kategori/industrial-ceiling-fans', 'vh:kategori/axial-industrial-fans', 'vh:kategori/roof-fans'],
@@ -2329,7 +2329,7 @@ Havalandırmayla uzaklaştırılan iç hava bayat olabilir, makineler ve süreç
 
 VentHub'daki duvar tipi aksiyel fanlar düşük ve orta basınçlı serilerdir ve spor salonu gibi ticari ve endüstriyel hacimlerin havalandırması için tasarlanmıştır [4].
 
-İlgili rehberler: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi), [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+İlgili rehberler: [Radyal ve aksiyel fan farkı nedir?](vh:yazi/radyal-aksiyel-fan-secimi), [Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi](vh:yazi/cati-tipi-fan-nedir)
 
 ## Endüstriyel tavan vantilatörü depoda ne işe yarar?
 
@@ -2610,7 +2610,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     kimlik: 'demir-celik-isi-kontrolu-havalandirma',
     konu: 'verimlilik',
     yayinTarihi: '2026-11-23',
-    guncellemeTarihi: '2026-11-23',
+    guncellemeTarihi: '2026-11-26',
     tarihGizli: true,
     urunler: [],
     ilgiliKategoriler: ['vh:kategori/industrial-ceiling-fans', 'vh:kategori/axial-industrial-fans', 'vh:kategori/centrifugal-fans', 'vh:kategori/roof-fans'],
@@ -2662,7 +2662,7 @@ VentHub'ın dört fan kategorisi sayfasındaki tanımlar şunlardır:
 - [Radyal fanlar](vh:kategori/centrifugal-fans): havayı çarkın çevresine doğru fırlatarak basan, aksiyel fanlara göre daha yüksek basınç üreten fanlar; uzun kanal hatları, filtreli sistemler ve hücreli tesisatlar için tercih edilir [5].
 - [Çatı tipi fanlar](vh:kategori/roof-fans): havayı binanın en üstünden dışarı atan, çatıya oturan fanlar [5].
 
-İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir?](vh:yazi/cati-tipi-fan-nedir)
+İlgili rehber: [Çatı tipi fan nedir, nasıl seçilir? Egzoz atış yeri, fan türü ve bakım erişimi](vh:yazi/cati-tipi-fan-nedir)
 
 ## Teklif için hangi bilgiler gerekir?
 

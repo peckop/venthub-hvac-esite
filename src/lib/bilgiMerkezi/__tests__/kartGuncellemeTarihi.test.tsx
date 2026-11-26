@@ -60,9 +60,10 @@ describe('liste kartı — güncelleme tarihi', () => {
     const kartlar = listeKartlari('tr', YAZILAR)
     const beklenen: Array<[string, string, string]> = [
       ['frekans-konvertoru', '2026-11-17', '17 Kasım 2026'],
-      ['fan-cesitleri', '2026-11-21', '21 Kasım 2026'],
+      // BLG-91 (26 Kasım): çatı yazısının yeni başlığına giden bağlantı metni.
+      ['fan-cesitleri', '2026-11-26', '26 Kasım 2026'],
       ['radyal-aksiyel-fan-secimi', '2026-11-17', '17 Kasım 2026'],
-      ['kanal-tipi-fan-nedir', '2026-11-21', '21 Kasım 2026'],
+      ['kanal-tipi-fan-nedir', '2026-11-26', '26 Kasım 2026'],
       ['sessiz-fan-secimi', '2026-11-17', '17 Kasım 2026'],
     ]
     // BLG-88 (OPS-332): yayındaki her yazıda `tarihGizli` açık; güncelleme tarihi kayıtta durur (sitemap
