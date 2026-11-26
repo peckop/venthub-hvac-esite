@@ -11,19 +11,25 @@
  *      sonuç sonraki açılışta/aynı gün satıra yansır. Zamanlayıcı yok (karar 53): tetik açılıştır.
  *   3) GÖRÜNME VADESİ (SEO-114): yayından 3./7./14. gün vadesi gelen ama canlı arama (`gorunme` eylemi) kaydı olmayan yazı sayısı
  *      (Y2.1 madde 6); yalnız `gorunme` sayılır, URL denetimi/gösterim/istek saymaz.
+ *   4) ETKİ DEFTERİ UYARISI (SEO-147): `dizin-takip --etki` son koşu saati (INDEKS.md ve depo içi defter, en yenisi) 24 saatten eskiyse ya da kayıtsızsa
+ *      aynı satırın sonuna "ETKİ DEFTERİ: son koşu <n> saat önce — dizin-takip --etki" eklenir (kaynak: etki-son-kosu.mjs; dosya yoksa da tek satır uyarı, çökme yok).
  * SALT-OKUMA (yalnız arşive anlık görüntü ve kilit yazar), fail-open (her hata çıkış 0, sessiz), vana
  * `VENTHUB_DIZIN_ACILIS_KAPAT=1`. İstek ATMAZ; istek kararı hâlâ `dizin-takip` tablosundan okunur.
  *
  * Kullanım: node scripts/seo/dizin-acilis.mjs [--sadece-satir]   (--sadece-satir: arka plan başlatma)
  * Cetvel: docs/standards/dizin-sistemleri-standard.md D7.
  */
-import { readdirSync, readFileSync, writeFileSync, statSync, mkdirSync } from 'node:fs'
-import { homedir } from 'node:os'
-import { join, dirname, resolve } from 'node:path'
+import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { homedir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { acilisUyarisi } from './etki-son-kosu.mjs'
+
 const BU_DIZIN = dirname(fileURLToPath(import.meta.url))
+/** SEO-147: depo içi defterdeki ETKİ bloğunun yolu (son koşu saati INDEKS.md ile birlikte okunur; en yenisi geçerli). */
+const ETKI_MD_YOLU = join(BU_DIZIN, '..', '..', 'docs', 'defter', 'geo-seo-dizin.md')
 // `detached: true` yalnız merkezî başlatıcıda yazılır (INV-KOPUK-1, REC-415): kopuk çocuk konsol penceresi açmasın.
 const { kopukBaslat } = createRequire(import.meta.url)('../board/kopuk-baslat.cjs')
 export const KILIT_OMRU_MS = 30 * 60 * 1000
@@ -113,15 +119,20 @@ function vadeParcasi(vade) {
   return ` | GÖRÜNME VADESİ: ${vade.toplam} yazı canlı aramayla ölçülmedi (${k})`
 }
 
-/** Tek satır. anlik null ise "anlık görüntü yok"; bugünden eskiyse "bayat" diye işaretlenir. vade (isteğe bağlı) görünme vadesi parçasını ekler. */
-export function satirUret(anlik, bugun, vade = null) {
-  if (!anlik) return `DİZİN ${bugun}: anlık görüntü yok; dizin-takip --durum arka planda başlatıldı, istekten önce tabloyu oku${vadeParcasi(vade)}`
+/**
+ * Tek satır. anlik null ise "anlık görüntü yok"; bugünden eskiyse "bayat" diye işaretlenir. vade (isteğe bağlı) görünme vadesi parçasını ekler.
+ * etki (SEO-147, isteğe bağlı): etki defteri uyarı parçası ("ETKİ DEFTERİ: son koşu 30 saat önce — dizin-takip --etki"); kanca yalnız İLK satırı basar,
+ * bu yüzden uyarı ayrı satır değil AYNI satırın sonuna eklenir. Boşsa satır eskisi gibi kalır.
+ */
+export function satirUret(anlik, bugun, vade = null, etki = '') {
+  const ek = etki ? ` | ${etki}` : ''
+  if (!anlik) return `DİZİN ${bugun}: anlık görüntü yok; dizin-takip --durum arka planda başlatıldı, istekten önce tabloyu oku${vadeParcasi(vade)}${ek}`
   const s = sayilar(anlik.tablo)
   const parca = MOTORLAR.map(([k, ad]) => `${ad} ${s[k]}`).join(', ')
   const bayat = anlik.gun < bugun ? ` — BAYAT (${anlik.gun}); güncel ölçüm arka planda` : ''
   const toplam = Object.values(s).reduce((a, b) => a + b, 0)
   const sonuc = toplam ? 'önce bunlar (kota artığı, sonra yeni yazı)' : 'bekleyen istek yok'
-  return `DİZİN ${bugun}: YAP/TEKRAR ${parca} — ${sonuc}${bayat}${vadeParcasi(vade)}`
+  return `DİZİN ${bugun}: YAP/TEKRAR ${parca} — ${sonuc}${bayat}${vadeParcasi(vade)}${ek}`
 }
 
 /** Yazı kaydı + defterden vade özeti; kaynak okunamazsa null (satır vade parçasız kalır, fail-open). */
@@ -147,9 +158,10 @@ function arkaPlanBaslat(klasor, env) {
 
 /**
  * Çekirdek: satırı döndürür; gerekirse arka plan ölçümü başlatır. Hiçbir koşulda fırlatmaz.
- * @param {{klasor?: string, simdi?: number, env?: Record<string, string | undefined>, baslat?: boolean, baslatici?: (klasor: string, env: Record<string, string | undefined>) => void}} [secenek]
+ * `etki` (SEO-147): etki defterinin son koşu kaynakları; varsayılan INDEKS.md (arşivin bir üstü) + depo içi defter. 24 saatten eski ya da kayıtsızsa satır uyarı taşır.
+ * @param {{klasor?: string, simdi?: number, env?: Record<string, string | undefined>, baslat?: boolean, baslatici?: (klasor: string, env: Record<string, string | undefined>) => void, etki?: { indeksYolu?: string | null, mdYolu?: string | null }}} [secenek]
  */
-export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = process.env, baslat = true, baslatici = arkaPlanBaslat } = {}) {
+export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = process.env, baslat = true, baslatici = arkaPlanBaslat, etki = {} } = {}) {
   if (env.VENTHUB_DIZIN_ACILIS_KAPAT === '1') return ''
   try {
     const bugun = trGun(simdi)
@@ -159,7 +171,8 @@ export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = pr
     if (!taze && baslat && !kilitTaze(klasor, simdi)) {
       try { baslatici(klasor, env); baslatildi = true } catch { /* sessiz */ }
     }
-    const satir = satirUret(anlik, bugun, vadeOku({ klasor, bugun }))
+    const uyari = acilisUyarisi({ indeksYolu: etki.indeksYolu === undefined ? join(dirname(klasor), 'INDEKS.md') : etki.indeksYolu, mdYolu: etki.mdYolu === undefined ? ETKI_MD_YOLU : etki.mdYolu, simdi })
+    const satir = satirUret(anlik, bugun, vadeOku({ klasor, bugun }), uyari)
     return !taze && !baslatildi && !anlik ? satir.replace('arka planda başlatıldı', 'ölçüm sürüyor ya da başlatılamadı') : satir
   } catch {
     return ''

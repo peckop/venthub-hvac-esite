@@ -32,10 +32,14 @@
  *   node scripts/seo/dizin-takip.mjs --bag   (SEO-132: her gorunme/olcum satırını kendinden önceki son isteğe bağlar, aradaki günü yazar; salt okur)
  *   node scripts/seo/dizin-takip.mjs --degisen-ice-aktar [--degisen <dosya>]   (eski degisen-adresler.txt satırlarını deftere tek seferlik taşır)
  *   node scripts/seo/dizin-takip.mjs --ice-aktar [--klasor ~/VentHub-Olcum-Arsiv/geo-seo]   (eski kayıtların tek seferlik içe aktarımı)
+ *   ETKİ DEFTERİ (SEO-147, cetvel D8.1; yeni defter YOK: 'degisim' satırı etki satırı olur; AĞSIZ):
+ *   node scripts/seo/dizin-takip.mjs --kaydet google degisim <https://adres> --kart SEO-147 --pr 2690 --hipotez "<neden değişti, ne bekleniyor>" [--neden ..]
+ *   node scripts/seo/dizin-takip.mjs --etki-doldur [--baslangic 2026-08-28] [--kuru]   (tek seferlik/idempotent: mevcut degisim satırlarına kart+pr, git geçmişinden eksik değişiklikler; önce yedek)
+ *   node scripts/seo/dizin-takip.mjs --etki [--cikti <depo-dışı klasör>] [--arsiv <geo-seo klasörü>] [--yeniden] [--kuru]   (vadeler, hüküm, sayfa-zaman/<slug>.json, ozet.json, son koşu saati)
  * Çıkış: 0 temiz · 1 ölçüm hatası (Google/Bing/harita okunamadı) · 2 araç koşmadı (bozuk girdi, depo içi çıktı, anahtar yok).
  * Defter ve çıktı depoya GİRMEZ (repo PUBLIC; pazar-olcum P6): depo içi yol REDDEDİLİR.
  */
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -90,12 +94,51 @@ export function yalnizTarihMi(deger) {
   return /^\d{4}-\d{2}-\d{2}$/.test(s) || /^\d{4}-\d{2}-\d{2}T00:00:00(\.0+)?(Z|\+00:00)$/.test(s)
 }
 
-/** Defter satırı geçerli mi: bilinen motor ve eylem, siteye ait adres, geçerli tarih. */
+/**
+ * SEO-147 (etki defteri): 'degisim' satırı ETKİ SATIRI olur. Yeni defter açılmadı; aynı satıra isteğe bağlı alanlar eklendi, eski satırlar aynen geçerli.
+ * Cetvel: dizin-sistemleri-standard.md D8.1. Alan anlamları:
+ *   kart (SEO-nn/BLG-nn) · pr (sayı) · commit (git kısa sha) · hipotez (neden değişti, ne bekleniyor; kısa metin)
+ *   once   değişiklik öncesi durum özeti (son tarama, görünme, sıra)           · null ya da nesne
+ *   vadeler {"3","7","14","28"}: her biri null (vade gelmedi/ölçüm yok) ya da ölçüm özeti
+ *   kontrol aynı dönemde değişmeyen karşılaştırma adresleri (varsa)
+ *   cakisan aynı adreste ±7 günde başka değişiklik varsa TEK CÜMLE
+ *   hukum   olumlu | olumsuz | notr | ayrilamiyor | bekliyor · hukumNotu: hükmün tek cümlelik gerekçesi
+ * `kaynak: 'git-gecmisi'` satırı git geçmişinden sonradan eklenen değişikliktir (--etki-doldur); karar tablosunu (`degisenDefterden`) ETKİLEMEZ.
+ */
+export const VADE_GUNLERI = [3, 7, 14, 28]
+export const HUKUMLER = ['olumlu', 'olumsuz', 'notr', 'ayrilamiyor', 'bekliyor']
+/** Etki alanları; `satirYaz` bu sırayla yazar (kart/neden/kaynak taban alanlardır). */
+export const ETKI_ALANLARI = ['pr', 'commit', 'hipotez', 'once', 'vadeler', 'kontrol', 'cakisan', 'hukum', 'hukumNotu']
+export const GIT_GECMISI = 'git-gecmisi'
+const duzNesneMi = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
+
+/** Etki alanları biçimce geçerli mi? Alan yok ya da null geçerlidir (eski satır). Yalnız 'degisim' satırında denetlenir. */
+export function etkiAlanlariGecerliMi(h) {
+  if (!h || h.eylem !== 'degisim') return true
+  const yok = (v) => v === undefined || v === null
+  if (!yok(h.kart) && !(typeof h.kart === 'string' && KART_BICIMI.test(h.kart))) return false
+  if (!yok(h.pr) && !(Number.isInteger(h.pr) && h.pr > 0)) return false
+  if (!yok(h.commit) && !(typeof h.commit === 'string' && /^[0-9a-f]{7,40}$/.test(h.commit))) return false
+  if (!yok(h.hipotez) && !(typeof h.hipotez === 'string' && h.hipotez.trim())) return false
+  if (!yok(h.once) && !duzNesneMi(h.once)) return false
+  if (!yok(h.vadeler)) {
+    if (!duzNesneMi(h.vadeler)) return false
+    for (const [k, v] of Object.entries(h.vadeler)) if (!VADE_GUNLERI.map(String).includes(k) || !(v === null || duzNesneMi(v))) return false
+  }
+  if (!yok(h.kontrol) && !(Array.isArray(h.kontrol) && h.kontrol.every((a) => typeof a === 'string'))) return false
+  if (!yok(h.cakisan) && typeof h.cakisan !== 'string') return false
+  if (!yok(h.hukum) && !HUKUMLER.includes(h.hukum)) return false
+  if (!yok(h.hukumNotu) && typeof h.hukumNotu !== 'string') return false
+  return true
+}
+
+/** Defter satırı geçerli mi: bilinen motor ve eylem, siteye ait adres, geçerli tarih; degisim satırında etki alanları biçimce doğru. */
 export function hareketGecerliMi(h) {
   return !!h && MOTORLAR.includes(h.motor) && EYLEMLER.includes(h.eylem)
     && (h.eylem !== 'gorunme' || (h.motor === 'google' && GORUNME_SONUCLARI.includes(h.sonuc)))
     && (h.eylem !== 'degisim' || h.motor === 'google')
     && typeof h.adres === 'string' && h.adres.startsWith(`${SITE}/`) && tarihAl(h.tarih) !== null
+    && etkiAlanlariGecerliMi(h)
 }
 
 /** JSONL metni → geçerli hareketler + atlanan satır sayısı (sessiz yutma yok: sayı raporlanır). */
@@ -115,8 +158,11 @@ export function defterAyristir(metin) {
 
 const anahtar = (h) => `${h.motor}|${h.eylem}|${h.adres}|${new Date(h.tarih).toISOString()}`
 
+/** SEO-147: yalnız 'degisim' satırı etki alanlarını taşır; undefined/null alan yazılmaz (yok = bilinmiyor). */
+const etkiParcasi = (h) => (h.eylem === 'degisim' ? Object.fromEntries(ETKI_ALANLARI.filter((k) => h[k] !== undefined && h[k] !== null).map((k) => [k, h[k]])) : {})
+
 /** Defter satırı biçimi: tek satır JSON. */
-export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, ...(h.sonuc ? { sonuc: h.sonuc } : {}), ...(h.kaynak ? { kaynak: h.kaynak } : {}), ...(h.neden ? { neden: String(h.neden) } : {}), ...(h.kart ? { kart: String(h.kart) } : {}), ...(h.istekTarihi ? { istekTarihi: String(h.istekTarihi) } : {}) })
+export const satirYaz = (h) => JSON.stringify({ tarih: new Date(h.tarih).toISOString(), motor: h.motor, eylem: h.eylem, adres: h.adres, ...(h.sonuc ? { sonuc: h.sonuc } : {}), ...(h.kaynak ? { kaynak: h.kaynak } : {}), ...(h.neden ? { neden: String(h.neden) } : {}), ...(h.kart ? { kart: String(h.kart) } : {}), ...(h.istekTarihi ? { istekTarihi: String(h.istekTarihi) } : {}), ...etkiParcasi(h) })
 
 /** Bir adres×motor için son istek/gönderim zamanı (ms) ya da null. 'olcum' hareketi istek sayılmaz. `oncesi` (ms) verilirse yalnız ondan önceki (eşit dahil) eylemler. */
 export function sonHareket(hareketler, motor, adres, oncesi = Infinity) {
@@ -173,6 +219,9 @@ export function degisenDefterden(hareketler) {
   const kayitlar = new Map()
   for (const h of hareketler ?? []) {
     if (h?.eylem !== 'degisim') continue
+    // SEO-147: git geçmişinden sonradan eklenen satır (--etki-doldur) etki analizi içindir; "kod yayını bugün değişti" sinyali DEĞİLDİR.
+    // Yoksa geçmiş commit saati lastmod'dan yeni sayılıp TAMAM/BEKLE kararını YAP'a çevirebilir ve kota boşa gider.
+    if (h.kaynak === GIT_GECMISI) continue
     const t = tarihAl(h.tarih)
     if (t !== null && (!kayitlar.has(h.adres) || kayitlar.get(h.adres) < t)) kayitlar.set(h.adres, t)
   }
@@ -417,7 +466,7 @@ export function yeniOlanlar(mevcut, adaylar) {
 export const KART_BICIMI = /^[A-Z]+-\d+$/
 /** `--kaydet` yolunun okuduğu DEĞERLİ seçenekler: fazla-argüman taramasında değerleri bağımsız argüman sanmamak için atlanır. Liste bilerek dardır:
  * `--kaydet` ile anlamsız bir değerli seçenek (`--adres B`, `--kalan B`) verilirse değeri fazla argüman sayılır ve HATA verir (B sessizce düşmez). */
-const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart', '--kanit']
+const DEGERLI_SECENEKLER = ['--sonuc', '--tarih', '--hareket', '--neden', '--kart', '--kanit', '--pr', '--hipotez']
 
 /**
  * SEO-127: `--kaydet <motor> <eylem> <adresler> [--neden t] [--kart K]` argümanlarını çözer ve doğrular (saf işlev; çıkış kararı çağırandadır).
@@ -454,7 +503,13 @@ export function kaydetArgumanlariCoz(arg) {
   if (k.var_ && (k.deger === null || !KART_BICIMI.test(k.deger))) return { hata: `--kart ÖNEK-sayı biçiminde olmalı (örn. SEO-127), verilen: ${JSON.stringify(k.deger)}` }
   const kn = secenek('--kanit')
   if (kn.var_ && kn.deger === null) return { hata: '--kanit tur çıktısı ister (JSON metni ya da .json dosya yolu)' }
-  return { motor, eylem, adresler, neden: n.deger, kart: k.deger, kanit: kn.deger }
+  // SEO-147: --pr ve --hipotez yalnız degisim (etki satırı) içindir; başka eylemde sessizce düşmesin diye HATA.
+  const pr = secenek('--pr')
+  const hp = secenek('--hipotez')
+  if ((pr.var_ || hp.var_) && eylem !== 'degisim') return { hata: '--pr ve --hipotez yalnız degisim eyleminde kullanılır (etki satırı, SEO-147)' }
+  if (pr.var_ && (pr.deger === null || !/^[1-9]\d*$/.test(pr.deger))) return { hata: `--pr pozitif tam sayı olmalı (örn. 2690), verilen: ${JSON.stringify(pr.deger)}` }
+  if (hp.var_ && hp.deger === null) return { hata: '--hipotez metin ister (boşluklu metni tırnakla ver)' }
+  return { motor, eylem, adresler, neden: n.deger, kart: k.deger, kanit: kn.deger, pr: pr.deger === null ? null : Number(pr.deger), hipotez: hp.deger }
 }
 
 /**
@@ -563,7 +618,7 @@ async function calistir() {
   if (arg.includes('--kaydet')) {
     const cozum = kaydetArgumanlariCoz(arg)
     if ('hata' in cozum) { console.error(`HATA: ${cozum.hata}`); process.exit(2) }
-    const { motor, eylem, adresler, neden, kart, kanit: kanitHam } = cozum
+    const { motor, eylem, adresler, neden, kart, kanit: kanitHam, pr, hipotez } = cozum
     let kanit = null
     if (kanitHam != null) {
       try { kanit = JSON.parse(/^\s*[[{]/.test(kanitHam) ? kanitHam : readFileSync(resolve(kanitHam), 'utf8')) } catch (e) { console.error(`HATA: --kanit okunamadı: ${e.message}`); process.exit(2) }
@@ -574,7 +629,7 @@ async function calistir() {
     const verilen = deger('--tarih')
     if (verilen !== undefined && tarihAl(verilen) === null) { console.error('HATA: --tarih geçerli bir ISO tarih olmalı (örn. 2026-11-04T07:11:00Z)'); process.exit(2) }
     const simdi = verilen ? new Date(verilen).toISOString() : new Date().toISOString()
-    const hareketler = adresler.map((adres) => ({ tarih: kapi.saatler.get(adres) || simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: kanit ? 'kaydet-kanit' : 'kaydet', ...(neden ? { neden } : {}), ...(kart ? { kart } : {}) }))
+    const hareketler = adresler.map((adres) => ({ tarih: kapi.saatler.get(adres) || simdi, motor, eylem, adres, ...(sonuc ? { sonuc } : {}), kaynak: kanit ? 'kaydet-kanit' : 'kaydet', ...(neden ? { neden } : {}), ...(kart ? { kart } : {}), ...(pr ? { pr } : {}), ...(hipotez ? { hipotez } : {}) }))
     if (!adresler.length || hareketler.some((h) => !hareketGecerliMi(h))) { console.error('HATA: --kaydet <motor> <eylem> <adres,adres> geçersiz (motor/eylem/adres siteye ait olmalı)'); process.exit(2) }
     // SEO-132: sonuç satırı (gorunme/olcum) kayıt anında bağlı olduğu son isteğin tarihini taşır.
     if (sonucSatiriMi({ eylem })) {
@@ -638,6 +693,15 @@ async function calistir() {
     return
   }
 
+  // SEO-147: etki defteri, AĞSIZ. --etki-doldur = geçmiş doldurma (kart/pr + git geçmişi satırları; yedekli, idempotent). --etki = vadeler + hüküm +
+  // sayfa-zaman/<slug>.json + ozet.json (depo dışı) + son koşu saati. Mantık dizin-etki*.mjs'tedir ve bu dosyayı İÇE AKTARIR; bu yüzden onlar
+  // ayrı süreç olarak koşar (bu dosyanın üst düzey `await calistir()`'ı sürerken dinamik içe aktarım kilitlenirdi).
+  if (arg.includes('--etki-doldur') || arg.includes('--etki')) {
+    const betik = join(dirname(fileURLToPath(import.meta.url)), arg.includes('--etki-doldur') ? 'dizin-etki-doldur.mjs' : 'dizin-etki.mjs')
+    const r = spawnSync(process.execPath, [betik, ...arg], { stdio: 'inherit', env: process.env })
+    process.exit(r.status ?? 2)
+  }
+
   // SEO-118: --kalan/--sinir bağımsız değişkenleri AĞA gitmeden doğrulanır (değersiz --kalan sessizce --durum akışına düşmesin).
   if (arg.includes('--kalan') && !MOTORLAR.includes(deger('--kalan'))) { console.error(`HATA: --kalan motoru ${MOTORLAR.join('|')} olmalı`); process.exit(2) }
   if (arg.includes('--sinir') && (!Number.isInteger(Number(deger('--sinir'))) || Number(deger('--sinir')) < 1)) { console.error('HATA: --sinir pozitif tam sayı olmalı'); process.exit(2) }
@@ -655,7 +719,8 @@ async function calistir() {
   if (!harita.length) { console.error('HATA: site haritası boş ya da çözülemedi (sessiz sıfır yok)'); process.exit(1) }
   const ek = (deger('--adres') || '').split(',').map((s) => s.trim()).filter(Boolean).map((a) => (a.startsWith('http') ? a : `${SITE}${a}`))
   const simdi = Date.now()
-  const kapsam = kapsamSec({ harita, hareketler, gun, simdi, ek })
+  // SEO-147: git geçmişinden eklenen etki satırları (kaynak git-gecmisi) takip kapsamını GENİŞLETMEZ (yayından kalkmış adres tabloya girmesin).
+  const kapsam = kapsamSec({ harita, hareketler: hareketler.filter((h) => h.kaynak !== GIT_GECMISI), gun, simdi, ek })
   // SEO-115: değişen adres listesi. --degisen açıkça verildiyse dosya ZORUNLU; verilmediyse defter klasöründeki varsayılan dosya varsa okunur.
   const degisenArg = deger('--degisen') || process.env.DIZIN_TAKIP_DEGISEN
   const degisenYol = resolve(degisenArg || join(dirname(defter), DEGISEN_DOSYA_ADI))

@@ -1,6 +1,6 @@
 # GEO-SEO dizin defteri — hangi sayfa hangi arama motorunda, ne yaptık, sırada ne var
 
-Sahibi: GEO-SEO · Son doğrulama: 2026-11-10 · Cetvel: `docs/standards/departman-defter-standard.md` · Alan cetveli: `docs/standards/dizin-sistemleri-standard.md` (D7, D8) · Kayıt: OPS-258, SEO-101
+Sahibi: GEO-SEO · Son doğrulama: 2026-11-26 · Cetvel: `docs/standards/departman-defter-standard.md` · Alan cetveli: `docs/standards/dizin-sistemleri-standard.md` (D7, D8, D8.1) · Kayıt: OPS-258, SEO-101, SEO-147
 
 Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor tablosu, arama sorgusu, tıklama ve sıra verisi burada durmaz (P6, cetvel D5); onlar depo dışı arşivde kalır (`~/VentHub-Olcum-Arsiv/geo-seo/dizin-takip/`: `hareketler.jsonl` işlem defteri, `dizin-takip-<gün>.json` günlük anlık görüntü, `yedek/` günlük kopya). Tutarlılık: `node scripts/seo/dizin-defter-kontrol.mjs` (0 tutarlı, 1 sapma, 2 ölçülemedi); özeti yenilemek için `--ozet`.
 
@@ -22,6 +22,7 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 
 | Tarih | İş | Neden | Sonuç | Kart |
 |---|---|---|---|---|
+| 2026-11-26 | Etki defteri: değişiklik başına tek satır (kart, PR, hipotez, önce, 3/7/14/28. gün vadeleri, çakışma, hüküm), geriye dönük doldurma, adres başına zaman çizgisi | Bir değişikliğin etkisi hatırlamaya bağlıydı; çakışan değişiklikler birbirine karışıyordu | `dizin-takip.mjs --etki-doldur` ve `--etki`, `dizin-etki.mjs`, `dizin-etki-doldur.mjs`, `etki-son-kosu.mjs`, D8.1 | SEO-147 |
 | 2026-11-21 | Google kalan sırası önce hiç istek almamış adres; Bilgi Merkezi liste sayfası otomatik istek dışı | Kota yaklaşık 11 iken daha önce istek almış adresler sırayı karıştırıyordu, liste sayfası her yeni yazıda yeniden YAP oluyordu | `kalanListe` sırası, `OTOMATIK_GOOGLE_ISTEK_DISI`, D7 madde 15; değişim başına bir istek kuralı aynı | SEO-134 |
 | 2026-11-09 | Bing durum ölçümü tam kapsamda yavaş okur; OLCULEMEDI 61 → 7 | Tam kapsam Bing hız sınırına takılıyordu | `BING_ARALIK_MS` [1000, 2000, 3500] | SEO-102 |
 | 2026-11-09 | Defter ve tutarlılık kontrolü | Alanın bugünkü hâli tek yerde, depo-güvenli | Bu dosya + `dizin-defter-kontrol.mjs` | SEO-101 |
@@ -109,6 +110,15 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 | İşlem defteri | 1 Kasım 2026'dan beri her istek/gönderim satırı (motor, eylem, adres, tarih) | 2026-11-09 | `scripts/seo/dizin-takip.mjs --kaydet`; depo dışı `hareketler.jsonl` |
 | Açılış satırı | GEO-SEO penceresi açılışında YAP/TEKRAR sayıları | 2026-11-09 | `scripts/seo/dizin-acilis.mjs`, `.claude/hooks/dizin-acilis.cjs` |
 | Ölçüm arşivi | Konu başına "daha önce ölçüldü mü" kaydı | 2026-11-06 | `scripts/seo/olcum-defteri.mjs`, D8 |
+| Etki defteri | `degisim` satırı etki satırıdır; vadeler yalnız vadesi gelince dolar, hüküm olumlu/olumsuz/notr/ayrilamiyor/bekliyor. Çıktılar depo dışı: `dizin-takip/sayfa-zaman/<slug>.json`, `ozet.json`; son koşu saati INDEKS.md'de ve aşağıdaki blokta | 2026-11-26 | `node scripts/seo/dizin-takip.mjs --etki`; `--etki-doldur` tek seferlik; D8.1 |
+
+Etki defteri son koşu bloğu `dizin-takip --etki` çıktısıdır; elle düzenlenmez. Yalnız saat ve sayı taşır (adres, sorgu, sıra, tıklama, gösterim bu bloğa girmez, P6).
+
+<!-- ETKI:BASLA -->
+Etki defteri son koşu: 2026-11-26T08:35:00.914Z
+- etki satırı: 272 (git geçmişinden eklenen: 138)
+- hüküm: olumlu 1, olumsuz 1, notr 2, ayrilamiyor 131, bekliyor 137
+<!-- ETKI:BITIS -->
 
 ## 3. Sırada ve yapılabilecekler
 
