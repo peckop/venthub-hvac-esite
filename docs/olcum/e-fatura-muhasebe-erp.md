@@ -3,6 +3,19 @@
 Sahibi: OPS · Son doğrulama: 2026-09-29 · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
 Son ölçüm: 2026-09-29 (OPS, 3 Sonnet web araştırması). Bağlam: ŞİRKET KURULMADI, muhasebe programı yok, tek operatör, az sipariş (bkz. sirket-kurulmadi-satis-hazirligi).
 
+## ÖNCE BURAYI OKU — ERP'de bugüne kadar ne kararlaştırıldı (sade özet, güncel: 2026-11-26)
+Bu bölüm, aşağıdaki ölçümlerin ve tarihli eklerin sonucudur. ERP, Odoo, entegratör ya da müşavir sorusu geldiğinde yeniden araştırma açmadan önce burası okunur; yeni karar çıkınca bu bölüm güncellenir.
+
+1. **ERP'yi kendimiz yazıyoruz.** Ürün, fiyat, stok, cari, teklif ve sipariş tek veritabanında kalır. Hazır ERP (Odoo, ERPNext) kurulmaz (24 Kasım ve 26 Kasım kararları; aşağıdaki "GÜNCELLEME 2026-11-24" ve "GÜNCELLEME 2026-11-26" bölümleri).
+2. **Neden Odoo değil:** Odoo'nun ücretli sürümü abonelik olduğu için yeniden satılamaz. Ücretsiz sürümde mali tablolar, banka mutabakatı ve e-Defter yok. Odoo'nun stok modülü kendi ürün tablosuna bağlı olduğu için ürün iki yerde tutulurdu.
+3. **Odoo'dan aldığımız tek şey örnek.** Dönem kilidi (satış, alış, vergi, mali yıl ayrı; kesin kilit ve istisna kaydı), stok (çoklu depo, parti/seri, ek maliyet dağıtımı) ve satınalma akışları örnek alınır, kendi kodumuzla yazılır. Odoo kodu kopyalanmaz (LGPL yükümlülüğü getirir, yapımıza da uymaz). Odoo 19.0'ın Eylül 2028'e kadar süren bakımı bizi bağlamaz; tek yararı, 19.0'daki açık lisanslı Nilvera e-belge modüllerinin entegratör bağlantısını yazarken okunabilir başvuru olmasıdır.
+4. **Sıra: önce kendi kullanımımız, kiralama sonra.** ERP önce kendi şirketimizde kurulur, çalıştırılır ve kullanılır. Her şeyin hazır ve çalışır olduğundan emin olunca kiralama (birden çok firmaya açma) etkinleştirilir. Kiralama açılmadan önce firma verilerinin birbirinden ayrık olması (Faz 2 kiracı ayrımı, CLAUDE.md kural 12) bitmiş olmalıdır; Faz 2 bugün parkta.
+5. **Kapsam dışı:** bilanço, gelir tablosu, mizan ve e-Defter müşavirin programında kalır. Panel müşavire üç dosya verir: muhasebe fişi, fatura XML/PDF, banka ekstresi ("EK 2026-11-25").
+6. **e-Fatura, e-Arşiv, e-İrsaliye:** GİB'e iletimi dışarıdan, kontörlü bir entegratör yapar. Fatura hazırlama, tetik, e-posta ve arşiv bizde kalır. Panel gönderim durumunu, hatayı ve yeniden göndermeyi gösterir.
+7. **Entegratör seçimi açık.** Aday sırası: Nilvera (REST/OAuth2, test ortamı var; Odoo 19.0'daki açık modülleri başvuru olarak okunabilir), Turkcell e-Şirket (REST, yıllık zorunlu paket yok), Mükellef. Paraşüt entegratör değil, ön muhasebe programıdır (aylık abonelik); kendi ERP'mizle örtüşür, seçilmez. Fiyatlar yazılı teklifle alınacak; teklif şirket kuruluşundan sonra istenir.
+8. **Müşavir açık.** Müşavirin kullandığı program sorulmadı; dışa aktarım dosyasının biçimi o programın şablonuna göre yazılacak. e-Fatura eşiği ve geçiş takvimi müşavire yazılı teyit ettirilecek.
+9. **Bugünkü iş:** panel önizlemesi Design Venthub New'de. Tasarım'ın kullanım denetimi (TSR-46) bitti, düzeltme paketi Design'a gidiyor; ilk sekiz madde veri bozan ya da işi durduran hatalar.
+
 ## Yasal zorunluluk (kaynak: 509 Sıra No VUK Genel Tebliği mevzuat.gov.tr; TÜRMOB sirküler 12.01.2026/25)
 | Konu | Sonuç |
 |---|---|
