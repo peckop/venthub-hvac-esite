@@ -51,6 +51,19 @@ function specDenetle(ad: string, spec: string): string[] {
   const kod = yorumsuz(spec)
   const acik = [...kod.matchAll(/\b(trace|video)["']?\s*:(?!\s*'off')\s*[^,\n}]+/g)].map((m) => `${ad}: ${m[0].trim()}`)
   if (/\.text\(\)\)?\.slice\(/.test(kod)) acik.push(`${ad}: yanıt gövdesi kırpılıp taşınıyor`)
+  // Giriş yapan dosyada yanıt gövdesi hiçbir biçimde mesaja, nesneye ya da kırpmaya girmez.
+  // Herkese açık sayfa HTML'ini okuyan dosyalar (ssr-html, dil-dususu) giriş sırrı kullanmaz; kapsam dışı.
+  if (/E2E_[A-Z_]*(PASSWORD|EMAIL|TOKEN|SECRET)/.test(kod)) {
+    const govdeDegiskeni = [...kod.matchAll(/(?:const|let|var)\s+(\w+)\s*=\s*await\s+[\w.]+\.(?:text|json)\(\)/g)].map((m) => m[1])
+    const kirpilan = govdeDegiskeni.some((d) => new RegExp(`\\b${d}\\s*\\.\\s*(slice|substring|substr)\\s*\\(`).test(kod))
+    const tasinan =
+      kirpilan ||
+      /\.(?:text|json)\(\)\)?\s*\.\s*(slice|substring|substr)\s*\(/.test(kod) ||
+      /\bbody\s*:\s*(?:\(\s*)?await\s+[\w.]+\.(?:text|json)\(\)/.test(kod) ||
+      /JSON\.stringify\(\s*await\s+[\w.]+\.json\(\)/.test(kod) ||
+      /\$\{\s*(?:\(\s*)?await\s+[\w.]+\.(?:text|json)\(\)/.test(kod)
+    if (tasinan) acik.push(`${ad}: giriş yapan dosyada yanıt gövdesi taşınıyor`)
+  }
   if (/\btracing\.start\s*\(/.test(kod) || /\brecordVideo\b|\brecordHar\b/.test(kod)) acik.push(`${ad}: elle kayıt başlatılıyor`)
   return acik
 }
@@ -60,7 +73,7 @@ function isAkisiDenetle(ad: string, yml: string): string[] {
   const ihlal: string[] = []
   // Dışarı dosya çıkaran her yol: yükleme eylemleri (ad büyük/küçük harf fark etmez), önbelleğe yazma, sürüm eki.
   const yukluyor = /uses:\s*\S*(upload|release)\S*@/i.test(kod) || /\bgh\s+release\s+(upload|create)\b/.test(kod)
-  const onbellek = /uses:\s*actions\/cache(\/save)?@/i.test(kod)
+  const onbellek = /uses:\s*["']?actions\/cache(\/save)?@/i.test(kod)
   const ciktiYolu = /playwright-report|test-results|blob-report/.test(kod)
   const sirli = /E2E_[A-Z_]*PASSWORD/.test(kod)
   const testKosan = sirli || /playwright\s+test\b/.test(kod)
@@ -122,6 +135,26 @@ describe('INV-E2E-CIKTI-1 · kimlik bilgisi taşıyabilecek test çıktısı yü
     ['return { status: r.status, body: (await r.text()).slice(0, 120) }'],
   ])('SABOTAJ spec: %s', (satir) => {
     expect(specDenetle('x.e2e.ts', satir)).not.toEqual([])
+  })
+
+  const girisli = "const parola = process.env.E2E_ADMIN_PASSWORD\n"
+  it.each([
+    ['değişkene alıp kırpma', 'const t = await r.text()\nexpect(r.status(), t.slice(0, 120)).toBe(200)'],
+    ['substring', 'const t = await r.text()\nconst k = t.substring(0, 50)'],
+    ['satır sonlu zincir', 'const k = (await r.text())\n  .slice(0, 80)'],
+    ['nesneye gövde', 'return { status: r.status(), body: await r.text() }'],
+    ['json metne', 'expect(r.ok(), JSON.stringify(await r.json())).toBe(true)'],
+    ['şablona gövde', 'expect(r.ok(), `yanıt: ${await r.text()}`).toBe(true)'],
+  ])('SABOTAJ giriş yapan spec: %s', (_ad, satir) => {
+    expect(specDenetle('x.e2e.ts', girisli + satir)).not.toEqual([])
+  })
+
+  it('giriş sırrı olmayan dosyada sayfa HTML okumak serbest', () => {
+    expect(specDenetle('x.e2e.ts', 'const html = await res.text()\nexpect(html).toContain("x")')).toEqual([])
+  })
+
+  it('tırnaklı önbellek eylemi de yakalanır', () => {
+    expect(isAkisiDenetle('e2e-smoke.yml', smoke + '\n      - uses: "actions/cache@abc"\n        with:\n          path: test-results/\n')).not.toEqual([])
   })
 
   it.each([
