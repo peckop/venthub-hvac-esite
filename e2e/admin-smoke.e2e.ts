@@ -154,9 +154,14 @@ test.describe('admin runtime smoke', () => {
 
     let raw = decodeURIComponent(chunks.map((c) => c.value).join(''))
     if (raw.startsWith('base64-')) raw = Buffer.from(raw.slice(7), 'base64url').toString('utf8')
-    const parsed = JSON.parse(raw)
-    const token: string | undefined =
-      parsed?.access_token ?? (Array.isArray(parsed) ? parsed[0] : undefined)
+    // Ayrıştırma hatası ham metni mesaja koyar; iş kaydı herkese açık olduğu için hata metni sabittir (ALT-227).
+    let parsed: { access_token?: string } | string[] | null = null
+    try {
+      parsed = JSON.parse(raw)
+    } catch {
+      throw new Error('Oturum çerezi JSON olarak ayrıştırılamadı (içerik bilerek yazılmaz).')
+    }
+    const token: string | undefined = Array.isArray(parsed) ? parsed[0] : parsed?.access_token
     expect(typeof token, 'Çerezden access_token çıkarılamadı.').toBe('string')
 
     // JWT gövdesi imzasızdır ve herkese açıktır — sır DEĞİL. Yalnız teşhis alanlarını
@@ -181,7 +186,7 @@ test.describe('admin runtime smoke', () => {
         const r = await fetch(`${url}/auth/v1/user`, {
           headers: { Authorization: `Bearer ${tok}`, apikey: key },
         })
-        return { status: r.status, body: (await r.text()).slice(0, 120) }
+        return { status: r.status }
       },
       { url: supabaseUrl as string, key: anonKey as string, tok: token as string },
     )
@@ -198,16 +203,16 @@ test.describe('admin runtime smoke', () => {
           },
           body: JSON.stringify({}), // BİLEREK boş — mutasyona ulaşmadan doğrulamada durur
         })
-        return { status: resp.status, body: (await resp.text()).slice(0, 160) }
+        return { status: resp.status }
       },
       { url: supabaseUrl as string, key: anonKey as string, tok: token as string },
     )
-    result.body =
-      `${result.body} | ${diag} | authProbe=${authProbe.status} ${authProbe.body}`
+    // Yanıt gövdeleri mesaja girmez (INV-E2E-CIKTI-1): yalnız durum kodları ve teşhis alanları.
+    const teshis = `${diag} | authProbe=${authProbe.status}`
 
     expect(
       result.status,
-      `Beklenen 400 (missing_fields = auth geçti). Alınan ${result.status}: ${result.body}\n` +
+      `Beklenen 400 (missing_fields = auth geçti). Alınan ${result.status}: ${teshis}\n` +
         '401 → geçit reddetti (verify_jwt / token).\n' +
         '403 → rol kapısı reddetti (tenant-scoped user_profiles sorgusu adminleri bulamıyor).\n' +
         '-1/-3 → oturum çerezi okunamadı (login akışı ya da çerez formatı değişmiş).',
