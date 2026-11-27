@@ -517,7 +517,9 @@ export function kaydetArgumanlariCoz(arg) {
  * Olay (23 Kasım): tek --kaydet çağrısı atölye ve demir çelik adreslerini aynı milisaniyeyle "istek" yazdı; giden yalnız atölye isteğiydi,
  * demir çelik iki gün "istendi" sanıldı ve Google onu hiç taramadı. Kural: google/istek tek çağrıda birden çok adres alacaksa --kanit ile
  * tarayıcı turunun çıktısı verilir (window.__tur → {s:[{url,sonuc,saat}]} ya da __iste sonuç dizisi); her adresin o çıktıda ISTENDI
- * satırı olmalıdır ve satır kendi onay saatini taşır. Kanıtsız çoklu google/istek HATA. Tek adres __iste'nin hazır kaydet satırıdır, geçer.
+ * satırı olmalıdır ve satır kendi onay saatini taşır. Kanıtsız çoklu google/istek HATA.
+ * SEO-152 (D7 m.19): tek adres de kanıt ister. Çoklu kapı varken 23 Kasım çağrısı iki ayrı tek adres satırına bölünerek aynı yanlışı
+ * yazabiliyordu (demir çelik onaysız "istendi"). __iste'nin hazır kaydet satırı kanıtı kendisi taşır; kanıt tek nesne {url,sonuc,saat} de olabilir.
  * @param {{ motor: string, eylem: string, adresler: string[], kanit: unknown }} g kanit: ayrıştırılmış JSON (null = yok)
  * @returns {{ hata: string } | { saatler: Map<string, string|null> }}
  */
@@ -525,11 +527,13 @@ export function googleIstekKapisi({ motor, eylem, adresler, kanit }) {
   const saatler = new Map()
   if (!TEK_ISTEK_MOTORLARI.has(motor) || eylem !== 'istek') return { saatler }
   if (kanit == null) {
-    if (adresler.length > 1) return { hata: `google/istek tek çağrıda ${adresler.length} adres: Search Console her onayda tek adres alır, toplu kayıt gitmemiş isteği "istendi" yazar (SEO-141). Her adresi kendi kaydet satırıyla yaz ya da --kanit ile tur çıktısını ver` }
-    return { saatler }
+    if (adresler.length > 1) return { hata: `google/istek tek çağrıda ${adresler.length} adres: Search Console her onayda tek adres alır, toplu kayıt gitmemiş isteği "istendi" yazar (SEO-141). --kanit ile tur çıktısını ver` }
+    return { hata: 'google/istek kanıtsız: onay o adres için okunmadan satır yazılmaz (SEO-152, D7 m.19). __iste sonucundaki hazır kaydet satırını kullan ya da --kanit ile tur çıktısını ver' }
   }
-  const dizi = Array.isArray(kanit) ? kanit : (kanit && typeof kanit === 'object' && Array.isArray(kanit.s) ? kanit.s : null)
-  if (!dizi) return { hata: '--kanit dizi ya da {s:[...]} biçiminde tur çıktısı olmalı' }
+  const dizi = Array.isArray(kanit) ? kanit
+    : (kanit && typeof kanit === 'object' && Array.isArray(kanit.s) ? kanit.s
+      : (kanit && typeof kanit === 'object' && typeof kanit.url === 'string' ? [kanit] : null))
+  if (!dizi) return { hata: '--kanit dizi, {s:[...]} ya da tek {url,sonuc,saat} biçiminde tur çıktısı olmalı' }
   for (const a of adresler) {
     const r = dizi.find((x) => x && x.url === a)
     if (!r || r.sonuc !== 'ISTENDI') return { hata: `--kanit içinde ${a} için ISTENDI yok (${r ? JSON.stringify(r.sonuc ?? r.durum ?? null) : 'satır yok'}): bu adresin isteği gitmemiş, deftere yazılmaz` }
