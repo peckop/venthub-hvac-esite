@@ -1,6 +1,6 @@
 # Ölçüm defteri: e-Fatura / e-Arşiv / muhasebe / ERP / sunucu
 
-Sahibi: OPS · Son doğrulama: 2026-09-29 · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
+Sahibi: OPS · Son doğrulama: 2026-11-27 · Kaynak: Recep 09-29 "önceki ve şimdiki ölçümleri bir md'de birleştir"
 Son ölçüm: 2026-09-29 (OPS, 3 Sonnet web araştırması). Bağlam: ŞİRKET KURULMADI, muhasebe programı yok, tek operatör, az sipariş (bkz. sirket-kurulmadi-satis-hazirligi).
 
 ## ÖNCE BURAYI OKU — ERP'de bugüne kadar ne kararlaştırıldı (sade özet, güncel: 2026-11-26)
@@ -85,3 +85,13 @@ Sahibin kendi ERP'si Design Venthub New içinde geliştirildi (ERP ve Mağaza ik
 
 ## EK 2026-11-25 — para defteri çekirdeği (OPS-393)
 Hazır çekirdek alınmaz; kendi şema: fiş başlığı + satırlar, ertelenmiş borç=alacak tetiği (Lefra deseni, MIT), UPDATE/DELETE yasağı, ters kayıt, dönem kilidi (ERPNext Accounting Period deseni). pgledger'dan (MIT, v0.9) idempotency, event_at, önceki/sonraki bakiye fikri. TigerBeetle fazla (ayrı küme). ERPNext lisansı GPL-3.0 (GitHub API; yukarıdaki "AGPL" düzeltildi). Müşavir aktarımı: müşavirin programı sorulur, o programın şablonu esas; dışa aktarım üç dosya: fiş (GİB elektronik muhasebe fişi alanları), fatura XML/PDF (UBL-TR 1.2.1), banka ekstresi. Tekdüzen Hesap Planı resmî kaynağı RG 26.12.1992 / 21447 mükerrer (taranmış PDF, makine okunur liste yok) → 3 haneli liste bir kez çıkarılır. Luca Excel/XML içe alıyor; Zirve/Mikro/Logo/ETA resmî şablonu bulunamadı.
+
+## EK 2026-11-27 — müşavir görüşü ve resmî kaynak doğrulaması (fatura reddi, Ba/Bs, Logo)
+Kaynak: uygulamada çalışan bir mali müşavir adayının yazılı görüşü (27 Kasım 2026) + GİB/RG metinleri (indirme 2026-11-26, sha256'lı dizin depo dışında). Görüş, müşavirin başka bir firmadaki düzenine dayanır; genel kural olan satırlar **kesin**, programa bağlı satırlar **koşullu** işaretlidir.
+- **Kesin — reddedilen ticari e-fatura:** satıcı tarafında muhasebeye hiç alınmaz, fatura kesilmemiş gibi işlem görür. e-Defter beratı gönderilmediyse kayıt ön muhasebeden/taslak fişten silinir; berat gönderildiyse silinemez, **ters kayıt (iptal yevmiye fişi)** ile kapatılır. Panel kuralı: red gelen faturanın kesinleşmemiş fişi silinir, kesinleşmiş fişi ters kayıtla kapatılır (para defteri çekirdeğinin UPDATE/DELETE yasağıyla uyumlu: kesin fiş hiç silinmez).
+- **Kesin — KDV:** fatura bir dönem kesilip sonraki dönemde reddedildiyse, önceki dönemin beyannamesi verilmediyse beyannameye alınmaz; verildiyse **düzeltme beyannamesi** verilir. Panel kuralı: red tarihi ile fatura dönemi farklıysa ve dönem kapalıysa (dönem kilidi) "düzeltme beyannamesi gerekir" uyarısı çıkar.
+- **Kesin — Ba/Bs kaldırıldı:** 565 Sıra No.lu VUK Genel Tebliği, RG 25.09.2024/32673, yürürlük 1.10.2024; Eylül 2024 döneminden itibaren Form Ba/Bs verilmez (362, 381, 396 kaldırıldı). GİB kılavuzlarındaki "sanal Ba/Bs" ifadeleri tarihseldir. Panel kuralı: Ba/Bs raporu/çıktısı tasarlanmaz.
+- **Kesin — süreler (resmî metin):** ticari faturada red 8 gün (İptal Kılavuzu v1.2 s.5, TTK m.21/2); e-Arşiv iptali 8 gün (e-Arşiv İptal Kılavuzu v1.1 s.5); e-İrsaliye yanıtı fiili sevkten itibaren 7 gün, yanıt yoksa mal tam teslim alınmış sayılır (e-İrsaliye Kılavuzu v1.2 s.24); temel faturada portal iptalinde karşı tarafın onay zorunluluğu yok (İptal Kılavuzu v1.2, 2019 v1.0'ın yerine geçti). 598 Sıra No.lu tebliğ (RG 24.11.2026/33440, yürürlük 1.1.2027) bu bölümlere dokunmuyor.
+- **Koşullu — Logo:** müşavirin kullandığı düzen Logo Go Wings + **Logo Connect**; Excel şablonu kullanılmıyor, e-faturalar entegratör kutusundan doğrudan Logo'ya kaydediliyor. **Logo Connect yalnız eLogo entegratörüyle çalışır.** Sonuç: VentHub'ın müşaviri Logo kullanırsa entegratör eLogo seçilir ve müşavire ayrı fatura dışa aktarımı gerekmez; başka program kullanırsa 2026-11-25 ekindeki üç dosyalı aktarım geçerli kalır. VentHub'ın müşaviri henüz belli değil (şirket kurulmadı).
+- **Açık:** ödeme kuruluşu (iyzico) tahsilatı ve komisyon kesintisinin kaydı — soruldu, cevap bekleniyor.
+- **Yeniden ölçme tetiği:** VentHub'ın müşaviri belli olunca (program ve aktarım biçimi), ya da 509'u değiştiren yeni tebliğ çıkınca.
