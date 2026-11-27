@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process'
 import { resolve } from 'node:path'
 import vm from 'node:vm'
 import { GSC_ISTEK_PARCACIGI, BING_SERP_PARCACIGI, GOOGLE_SERP_PARCACIGI, PARCACIKLAR, dizinTakipBetigi, gscParcacigi, izinliCoz } from '../tarayici-parcaciklari.mjs'
-import { kaydetArgumanlariCoz } from '../dizin-takip.mjs'
+import { googleIstekKapisi, kaydetArgumanlariCoz } from '../dizin-takip.mjs'
 import { existsSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
 import { EOL, tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -142,9 +142,14 @@ describe('gsc tablo kapısı', () => {
     vm.runInNewContext(gscParcacigi([adres]), baglam)
     const r = await baglam.window.__iste(adres, false)
     expect(r.sonuc).toBe('ISTENDI')
-    expect(r.kaydet).toBe(`node scripts/seo/dizin-takip.mjs --kaydet google istek ${adres}`)
-    const parcalar = (r.kaydet as string).split(' ')
-    expect(kaydetArgumanlariCoz(parcalar.slice(2))).toMatchObject({ motor: 'google', eylem: 'istek', adresler: [adres] })
+    // SEO-152: satır o adresin onay kanıtını tek tırnak içinde taşır; kanıtın saati sonucun saatidir.
+    expect(typeof r.saat).toBe('string')
+    const kanit = JSON.stringify({ url: adres, sonuc: 'ISTENDI', saat: r.saat })
+    expect(r.kaydet).toBe(`node scripts/seo/dizin-takip.mjs --kaydet google istek ${adres} --kanit '${kanit}'`)
+    // kabuk ayrıştırması: tek tırnaklı parça tek argüman
+    const parcalar = ((r.kaydet as string).match(/'[^']*'|\S+/g) ?? []).map((p: string) => p.replace(/^'(.*)'$/, '$1'))
+    expect(kaydetArgumanlariCoz(parcalar.slice(2))).toMatchObject({ motor: 'google', eylem: 'istek', adresler: [adres], kanit })
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [adres], kanit: JSON.parse(kanit) })).not.toHaveProperty('hata')
   })
   it('zorla ile ISTENDI: kaydet satırı --neden yer tutucusu taşır (gerekçesiz zorlama kaydı yapıştırılmaz)', async () => {
     const { baglam } = sahteSayfa()
@@ -152,7 +157,7 @@ describe('gsc tablo kapısı', () => {
     vm.runInNewContext(gscParcacigi([]), baglam)
     const r = await baglam.window.__iste(adres, false, { zorla: true })
     expect(r.sonuc).toBe('ISTENDI')
-    expect(r.kaydet).toBe(`node scripts/seo/dizin-takip.mjs --kaydet google istek ${adres} --neden "<zorla gerekcesi>"`)
+    expect(r.kaydet).toBe(`node scripts/seo/dizin-takip.mjs --kaydet google istek ${adres} --kanit '${JSON.stringify({ url: adres, sonuc: 'ISTENDI', saat: r.saat })}' --neden "<zorla gerekcesi>"`)
   })
   it('ISTENDI dışındaki her sonuçta kaydet alanı YOK (HATA, ZAMAN ASIMI, TABLODA YOK, TEKRAR RED)', async () => {
     const hata = sahteSayfa('hata')
