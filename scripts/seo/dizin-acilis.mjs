@@ -13,6 +13,8 @@
  *      (Y2.1 madde 6); yalnız `gorunme` sayılır, URL denetimi/gösterim/istek saymaz.
  *   4) ETKİ DEFTERİ UYARISI (SEO-147): `dizin-takip --etki` son koşu saati (INDEKS.md ve depo içi defter, en yenisi) 24 saatten eskiyse ya da kayıtsızsa
  *      aynı satırın sonuna "ETKİ DEFTERİ: son koşu <n> saat önce — dizin-takip --etki" eklenir (kaynak: etki-son-kosu.mjs; dosya yoksa da tek satır uyarı, çökme yok).
+ *   5) KAYAN KOTA (SEO-153): "Google kota: son 24 saatte N istek, M hak boş[, ilk hak SS:DD TSİ], sırada K adres" (defterden; sınır 11, D7 m.20).
+ *      Otomatik istek görevi YOK: satır yalnız sayar, istek yine elle ve dizin-takip kararıyla atılır.
  * SALT-OKUMA (yalnız arşive anlık görüntü ve kilit yazar), fail-open (her hata çıkış 0, sessiz), vana
  * `VENTHUB_DIZIN_ACILIS_KAPAT=1`. İstek ATMAZ; istek kararı hâlâ `dizin-takip` tablosundan okunur.
  *
@@ -112,6 +114,28 @@ export function gorunmeVadesi({ yazilar, hareketler, bugun }) {
   return { toplam: adlar.length, kirilim, adlar }
 }
 
+/** SEO-153: Search Console elle istek sınırı, kayan 24 saatte ölçülmüş 11 istek (D7 madde 15 notu; 12. istek "Kota Aşıldı"). */
+export const GOOGLE_KAYAN_SINIR = 11
+const TSI_SAAT = (ms) => new Date(ms + 3 * 3600 * 1000).toISOString().slice(11, 16)
+
+/**
+ * SEO-153 (SEO-151 öneri 2): kayan 24 saat kota parçası. Defterdeki son 24 saatin google/istek satırları sayılır; boş hak = sınır − sayı.
+ * Hak yoksa ilk hakkın açılacağı saat (en eski isteğin 24 saat sonrası, TSİ) yazılır. `sirada` anlık görüntüdeki Google YAP/TEKRAR sayısıdır
+ * (null = anlık yok, parça "sırada ?" der). İstek ATILMAZ, zamanlayıcı kurulmaz: yalnız sayı.
+ * @param {{ hareketler: Array<Record<string, unknown>>, simdi: number, sirada: number | null }} g
+ */
+export function kotaParcasi({ hareketler, simdi, sirada }) {
+  const saatler = hareketler
+    .filter((h) => h?.motor === 'google' && h?.eylem === 'istek' && typeof h.tarih === 'string')
+    .map((h) => Date.parse(/** @type {string} */ (h.tarih)))
+    .filter((t) => Number.isFinite(t) && t <= simdi && simdi - t < GUN_MS)
+    .sort((a, b) => a - b)
+  const n = saatler.length
+  const bos = Math.max(0, GOOGLE_KAYAN_SINIR - n)
+  const acilis = bos === 0 ? `, ilk hak ${TSI_SAAT(saatler[n - GOOGLE_KAYAN_SINIR] + GUN_MS)} TSİ` : ''
+  return `Google kota: son 24 saatte ${n} istek, ${bos} hak boş${acilis}, sırada ${sirada ?? '?'} adres`
+}
+
 function vadeParcasi(vade) {
   if (!vade) return ''
   if (!vade.toplam) return ' | görünme vadesi: yok'
@@ -124,8 +148,8 @@ function vadeParcasi(vade) {
  * etki (SEO-147, isteğe bağlı): etki defteri uyarı parçası ("ETKİ DEFTERİ: son koşu 30 saat önce — dizin-takip --etki"); kanca yalnız İLK satırı basar,
  * bu yüzden uyarı ayrı satır değil AYNI satırın sonuna eklenir. Boşsa satır eskisi gibi kalır.
  */
-export function satirUret(anlik, bugun, vade = null, etki = '') {
-  const ek = etki ? ` | ${etki}` : ''
+export function satirUret(anlik, bugun, vade = null, etki = '', kota = '') {
+  const ek = `${kota ? ` | ${kota}` : ''}${etki ? ` | ${etki}` : ''}`
   if (!anlik) return `DİZİN ${bugun}: anlık görüntü yok; dizin-takip --durum arka planda başlatıldı, istekten önce tabloyu oku${vadeParcasi(vade)}${ek}`
   const s = sayilar(anlik.tablo)
   const parca = MOTORLAR.map(([k, ad]) => `${ad} ${s[k]}`).join(', ')
@@ -172,7 +196,9 @@ export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = pr
       try { baslatici(klasor, env); baslatildi = true } catch { /* sessiz */ }
     }
     const uyari = acilisUyarisi({ indeksYolu: etki.indeksYolu === undefined ? join(dirname(klasor), 'INDEKS.md') : etki.indeksYolu, mdYolu: etki.mdYolu === undefined ? ETKI_MD_YOLU : etki.mdYolu, simdi })
-    const satir = satirUret(anlik, bugun, vadeOku({ klasor, bugun }), uyari)
+    let kota = ''
+    try { kota = kotaParcasi({ hareketler: hareketOku(klasor), simdi, sirada: anlik ? sayilar(anlik.tablo).google : null }) } catch { /* fail-open: parça düşer */ }
+    const satir = satirUret(anlik, bugun, vadeOku({ klasor, bugun }), uyari, kota)
     return !taze && !baslatildi && !anlik ? satir.replace('arka planda başlatıldı', 'ölçüm sürüyor ya da başlatılamadı') : satir
   } catch {
     return ''

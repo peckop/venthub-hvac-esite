@@ -10,7 +10,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { kuyrukSatiri, trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS, yayinTarihleri, gorunmeVadesi, hareketOku, vadeOku } from '../dizin-acilis.mjs'
+import { kotaParcasi, GOOGLE_KAYAN_SINIR, kuyrukSatiri, trGun, enSonAnlik, sayilar, satirUret, calistir, kilitTaze, KILIT_OMRU_MS, yayinTarihleri, gorunmeVadesi, hareketOku, vadeOku } from '../dizin-acilis.mjs'
 
 const BETIK = resolve(__dirname, '..', 'dizin-acilis.mjs')
 const gecici: string[] = []
@@ -183,5 +183,28 @@ describe('görünme vadesi (SEO-114, SEO-113 önerisi B)', () => {
     const v = vadeOku({ klasor: dizin(), bugun: '2026-11-12' })
     expect(v).not.toBeNull()
     expect(v?.kirilim).toBeDefined()
+  })
+})
+
+// INV-DIZIN-KOTA-1 (SEO-153, D7 m.20): açılış satırı kayan 24 saat Google kotasını defterden sayar; istek atmaz.
+describe('SEO-153: kayan 24 saat kota parçası', () => {
+  const ist = (iso: string, motor = 'google', eylem = 'istek') => ({ motor, eylem, adres: 'https://x/', tarih: iso })
+  it('yalnız son 24 saatin google/istek satırları sayılır; bing, olcum ve 24 saatten eskisi sayılmaz', () => {
+    const h = [ist('2026-11-08T06:59:00Z'), ist('2026-11-08T07:01:00Z'), ist('2026-11-09T06:00:00Z'), ist('2026-11-09T06:30:00Z', 'bing'), ist('2026-11-09T06:40:00Z', 'google', 'olcum')]
+    expect(kotaParcasi({ hareketler: h, simdi: SIMDI, sirada: 5 })).toBe('Google kota: son 24 saatte 2 istek, 9 hak boş, sırada 5 adres')
+  })
+  it('sınır dolunca boş hak 0 ve ilk hakkın açılış saati (en eski sayılan isteğin 24 saat sonrası, TSİ)', () => {
+    const h = Array.from({ length: GOOGLE_KAYAN_SINIR }, (_, i) => ist(new Date(Date.parse('2026-11-08T10:00:00Z') + i * 60_000).toISOString()))
+    expect(kotaParcasi({ hareketler: h, simdi: SIMDI, sirada: 3 })).toBe('Google kota: son 24 saatte 11 istek, 0 hak boş, ilk hak 13:00 TSİ, sırada 3 adres')
+  })
+  it('anlık görüntü yoksa sırada "?"; bozuk ve gelecek tarihli satır sayılmaz', () => {
+    const h = [{ motor: 'google', eylem: 'istek', tarih: 'bozuk' }, ist('2026-11-10T00:00:00Z'), ist('2026-11-09T05:00:00Z')]
+    expect(kotaParcasi({ hareketler: h, simdi: SIMDI, sirada: null })).toBe('Google kota: son 24 saatte 1 istek, 10 hak boş, sırada ? adres')
+  })
+  it('calistir: parça satıra eklenir, sırada sayısı anlık görüntünün Google YAP/TEKRAR sayısıdır', () => {
+    const k = dizin(); yaz(k, '2026-11-09', [satir('YAP', 'TAMAM', 'TAMAM'), satir('TEKRAR', 'TAMAM', 'TAMAM')])
+    writeFileSync(join(k, 'hareketler.jsonl'), `${JSON.stringify(ist('2026-11-09T06:00:00Z'))}\n`)
+    const s = calistir({ klasor: k, simdi: SIMDI, env: {}, baslatici: () => {}, etki: { indeksYolu: null, mdYolu: null } })
+    expect(s).toContain('Google kota: son 24 saatte 1 istek, 10 hak boş, sırada 2 adres')
   })
 })
