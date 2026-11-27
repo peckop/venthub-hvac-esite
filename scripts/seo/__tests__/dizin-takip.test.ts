@@ -570,6 +570,35 @@ describe('SEO-127: CLI --kaydet (uçtan uca, depo dışı klasör, yedek kapalı
       expect(existsSync(defter)).toBe(false)
     } finally { rmSync(d, { recursive: true, force: true }) }
   })
+
+  // INV-DIZIN-KAYDET-3 (SEO-152): 23 Kasım çağrısının yeniden üretimi. Onay yalnız atölye için okundu (tek tur çıktısı satırı).
+  // Eski kapı çoklu çağrıyı durduruyordu ama aynı yanlış iki tek adres çağrısına bölünerek yazılabiliyordu: demir çelik onaysız "istendi".
+  it('SEO-152: 23 Kasım, tek onay iki adres: ne toplu ne bölünmüş kanıtsız kayıt demir çeliği yazar; atölye kendi kanıtıyla geçer', () => {
+    const d = klasor()
+    try {
+      const defter = join(d, 'hareketler.jsonl')
+      const ATOLYE = 'https://venthub.com.tr/tr/bilgi-merkezi/atolye-havalandirmasi-nasil-yapilir'
+      const DEMIR = 'https://venthub.com.tr/tr/bilgi-merkezi/demir-celik-tesisi-havalandirmasi'
+      const onay = { url: ATOLYE, sonuc: 'ISTENDI', saat: '2026-11-23T10:37:12.000Z' }
+      // (a) 23 Kasım'daki asıl çağrı: tek --kaydet, iki adres, kanıtsız
+      expect(calistir(['--kaydet', 'google', 'istek', `${ATOLYE},${DEMIR}`, '--hareket', defter]).kod).toBe(2)
+      // (b) aynı yanlışın bölünmüş hâli: iki ayrı tek adres çağrısı, kanıtsız
+      for (const a of [ATOLYE, DEMIR]) {
+        const r = calistir(['--kaydet', 'google', 'istek', a, '--hareket', defter])
+        expect(r.kod, a).toBe(2)
+        expect(r.hata).toContain('SEO-152')
+      }
+      // (c) atölyenin onay kanıtı demir çeliği taşımaz
+      expect(calistir(['--kaydet', 'google', 'istek', DEMIR, '--kanit', JSON.stringify(onay), '--hareket', defter]).kod).toBe(2)
+      expect(existsSync(defter)).toBe(false)
+      // (d) atölye kendi kanıtıyla tek satır, onay saatiyle
+      const ok = calistir(['--kaydet', 'google', 'istek', ATOLYE, '--kanit', JSON.stringify(onay), '--hareket', defter])
+      expect(ok.kod).toBe(0)
+      const satirlar = readFileSync(defter, 'utf8').trim().split('\n').map((s) => JSON.parse(s))
+      expect(satirlar).toHaveLength(1)
+      expect(satirlar[0]).toMatchObject({ adres: ATOLYE, motor: 'google', eylem: 'istek', tarih: onay.saat, kaynak: 'kaydet-kanit' })
+    } finally { rmSync(d, { recursive: true, force: true }) }
+  })
 })
 
 describe('SEO-141: googleIstekKapisi (saf)', () => {
@@ -577,9 +606,16 @@ describe('SEO-141: googleIstekKapisi (saf)', () => {
     expect(googleIstekKapisi({ motor: 'bing', eylem: 'gonderim', adresler: [A, B], kanit: null })).not.toHaveProperty('hata')
     expect(googleIstekKapisi({ motor: 'google', eylem: 'olcum', adresler: [A, B], kanit: null })).not.toHaveProperty('hata')
   })
-  it('tek adres kanıtsız geçer (__iste hazır kaydet satırı); çoklu kanıtsız HATA', () => {
-    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: null })).not.toHaveProperty('hata')
+  it('SEO-152: tek adres de kanıtsız HATA; çoklu kanıtsız HATA', () => {
+    const tek = googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: null })
+    expect(tek).toHaveProperty('hata')
+    expect('hata' in tek && tek.hata).toContain('SEO-152')
     expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A, B], kanit: null })).toHaveProperty('hata')
+  })
+  it('SEO-152: kanıt tek nesne {url,sonuc,saat} olabilir; saat satıra geçer', () => {
+    const ok = googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: { url: A, sonuc: 'ISTENDI', saat: '2026-11-23T10:30:00.000Z' } })
+    expect('saatler' in ok && ok.saatler.get(A)).toBe('2026-11-23T10:30:00.000Z')
+    expect(googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: { url: B, sonuc: 'ISTENDI' } })).toHaveProperty('hata')
   })
   it('kanıt dizi ya da {s} biçimi; başka biçim HATA; geçersiz saat null kalır', () => {
     const ok = googleIstekKapisi({ motor: 'google', eylem: 'istek', adresler: [A], kanit: [{ url: A, sonuc: 'ISTENDI', saat: 'yok' }] })
@@ -647,7 +683,7 @@ describe('SEO-132: istek → sonuç bağı (INV-DIZIN-BAG-1)', () => {
     const d = mkdtempSync(join(tmpdir(), 'dizin-bag-'))
     const kos = (args: string[]) => execFileSync(process.execPath, [betik, ...args, '--hareket', join(d, 'h.jsonl')], { encoding: 'utf8', stdio: 'pipe', env: { ...process.env, DIZIN_TAKIP_YEDEK2: '' } })
     try {
-      kos(['--kaydet', 'google', 'istek', A, '--tarih', gun(2)])
+      kos(['--kaydet', 'google', 'istek', A, '--kanit', JSON.stringify({ url: A, sonuc: 'ISTENDI', saat: gun(2) }), '--tarih', gun(2)])
       kos(['--kaydet', 'google', 'gorunme', `${A},${B}`, '--sonuc', 'gorundu', '--tarih', gun(6)])
       const satirlar = readFileSync(join(d, 'h.jsonl'), 'utf8').trim().split('\n').map((s) => JSON.parse(s))
       expect(satirlar[1]).toMatchObject({ adres: A, eylem: 'gorunme', istekTarihi: gun(2) })

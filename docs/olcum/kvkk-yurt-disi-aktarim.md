@@ -139,15 +139,15 @@ Dayanak: yalnız firmaların kendi sayfaları (yukarıdaki ölçüm ve aynı gü
 | Ş1 Docker | GEÇTİ | GEÇTİ ([Docker](https://www.ilkbyte.com/uygulamalar/docker)) | ? | ? |
 | Ş2 RAM, vCPU, disk | GEÇTİ (4 ve 8 çekirdek; 80 ve 160 GB) | GEÇTİ (6 vCPU, 120 GB) | GEÇTİ | GEÇTİ |
 | Ş3 NVMe | ? (kartta "Raid50 SSD", metinde "NVMe/SSD") | GEÇTİ | GEÇTİ | ? (kartta "SSD", genel metinde "NVMe") |
-| Ş4 veri ve yedek Türkiye'de | GEÇTİ (Denizli, firma beyanı) | GEÇTİ (Denizli; Acronis yedeği İstanbul) | veri ve yedek GEÇTİ ("yurt dışına çıkmaz", "hizmetlerin tamamında Türkiye içerisinde" [beyanı](https://radore.com/tr/hizmetler/kvkk-uyumlu-sunucu-bulut)); yedek şehri ? | ? (sunucular Türkiye'de, fakat [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) firmanın ve iş birliği yaptığı üçüncü kişilerin kişisel veriyi yurt dışına aktarabileceğini yazıyor); yedek yeri ? |
+| Ş4 veri ve yedek Türkiye'de | GEÇTİ (Denizli, firma beyanı) | GEÇTİ (Denizli; Acronis yedeği İstanbul) | veri ve yedek GEÇTİ ("yurt dışına çıkmaz", "hizmetlerin tamamında Türkiye içerisinde" [beyanı](https://radore.com/tr/hizmetler/kvkk-uyumlu-sunucu-bulut)); yedek şehri ? | KALDI (sunucular Türkiye'de, fakat [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) firmanın ve iş birliği yaptığı üçüncü kişilerin kişisel veriyi yurt dışına aktarabileceğini yazıyor); yedek yeri ? |
 | Ş4 yurt dışı aktarım kapatılabilir | ? ([ağ sayfası](https://www.netinternet.tr/altyapimiz/network-altyapisi) yurt dışı temizleme merkezi diyor, KVKK sayfası yurt içi operatör diyor) | ? (yurt dışı saldırılar yurt dışında filtreleniyor; kapatma yolu yazmıyor) | ? ([güvenlik sayfası](https://radore.com/tr/hizmetler/guvenlik) DDoS için Cloudflare anıyor; pakette varsayılan mı yazmıyor) | ? |
-| Ş5 veri işleyen sözleşmesi | GEÇTİ, çekinceli (sayfada boş taslak alanları; dosya okunmadı) | ? (metinde İlkbyte adı geçmiyor; tüzel kişi aynı) | ? (yalnız "veri işleyen sıfatıyla" beyanı) | KALDI (yasal sayfalarda imzalanacak sözleşme bulunamadı) |
-| Ş6 ISO 27001 | GEÇTİ (2022, no IS-190122; kapsam okunmadı) | ? (kendi metni 2013 sürümü, numara yok) | GEÇTİ (sayfada "ISO 27001"; sürüm ve numara doğrulanmadı, dosya indirilmedi) | KALDI (ana sayfa, hakkımızda, yasal, sunucu sayfalarında geçmiyor) |
+| Ş5 veri işleyen sözleşmesi | GEÇTİ, çekinceli (sayfada boş taslak alanları; dosya okunmadı) | ? (metinde İlkbyte adı geçmiyor; tüzel kişi aynı) | ? (yalnız "veri işleyen sıfatıyla" beyanı) | ? (yasal sayfalarda imzalanacak sözleşme bulunamadı) |
+| Ş6 ISO 27001 | GEÇTİ (2022, no IS-190122; kapsam okunmadı) | ? (kendi metni 2013 sürümü, numara yok) | GEÇTİ (sayfada "ISO 27001"; sürüm ve numara doğrulanmadı, dosya indirilmedi) | ? (ana sayfa, hakkımızda, yasal, sunucu sayfalarında geçmiyor) |
 | Ş7 Türkiye'de yedek ya da S3 | GEÇTİ (ücretli yedek) | GEÇTİ | hizmet var; ülke Türkiye (genel beyan), şehir ve ücret ? | hizmet var, yeri ? |
 | Ş8 port | ? | GEÇTİ (1 Gbps; 100 Mbps garantili) | ? (süresi geçmiş 24.02-30.04.2026 kampanya koşulunda "100 Mbps simetrik") | TR 6 400 Mbit kabul aralığında; TR 4 200 Mbit sınırda; 1 Gbps yok ([kart](https://www.turhost.com/sunucu/vps-tr-sunucu/)) |
 | Ş9 IPv4 | GEÇTİ (1 adet) | GEÇTİ ([1 IPv4, 1 IPv6](https://www.ilkbyte.com/kiralik-sunucu-paketlerimiz/enterprise-sunucu)) | ? | ? |
 | Ş9 KDV'li fatura | e-fatura GEÇTİ ([2022 duyurusu](https://www.netinternet.tr/blog/oedeme-ve-faturalandirma-islemleri-hakkinda-degisiklik): ödemeden sonra 7 gün içinde); KDV oranı ? | e-fatura GEÇTİ; sunucu hizmeti 4691 sayılı Kanunla KDV'den muaf ([2018 yazısı](https://www.ilkbyte.com/bulut-sunucu-bilgi-bankasi/ilkbyte-saatlik-sunucu-ucretlendirmesi-ve-vergilendirme-hakkinda-bilgiler)), istisnanın sürdüğü sorulur | fiyata KDV eklenir ([sayfa](https://radore.com/tr/hizmetler/bulut-sunucu): "Fiyatlara KDV dahil değildir", sepette %20); e-fatura ? | KDV siparişte eklenir (kullanıcı sözleşmesi); e-fatura ? |
-| **Sonuç** | **Aday** | **Aday** (yurt dışı filtreleme cevaplanmadan karar yok) | **Aday** | **Elendi (Ş4, Ş5, Ş6)** |
+| **Sonuç** | **Aday** | **Aday** (yurt dışı filtreleme cevaplanmadan karar yok) | **Aday** | **Elendi (Ş4)** |
 
 ### Elenenler
 
@@ -157,7 +157,7 @@ Dayanak: yalnız firmaların kendi sayfaları (yukarıdaki ölçüm ve aynı gü
 | Hostopya (canlı ortam), ek | işlemci Xeon E5-2680 v4 (2016); disk paylaşımlı | Recep'in araştırması (işlemci adı sayfada da yazıyor; "paylaşımlı disk" tarafımızdan ölçülmedi) |
 | İlkbyte Cloud III (8 GB) | disk NVMe değil (Ş3) | ölçüm |
 | Radore RAM-Core ve RAM-Advance | 1 ve 2 çekirdek (Ş2) | ölçüm |
-| Turhost VDS TR 4 ve TR 6 | Asıl gerekçe: [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) kişisel verinin yurt dışına aktarılabileceğini yazıyor (Ş4); ISO 27001 belgesi ve imzalanacak veri işleyen sözleşmesi sayfalarda bulunamadı (Ş6, Ş5). İkincil: port 200 ve 400 Mbit, 1 Gbps yok (Ş8) | ölçüm. 1 Gbps sanal pakette yalnız 64 GB'lik VDS TR 10 ve üstünde (liste $198,23); [fiziksel sunucuda](https://www.turhost.com/sunucu/dedicated-server/) stoktaki en küçük model 32 GB E65 (liste $219,77, ilk 3 ay $79,99; disk E-SSD, NVMe değil). 8 ve 16 GB için 1 Gbps yolu bulunamadı; sipariş panelindeki ek port seçeneği ölçülmedi. |
+| Turhost VDS TR 4 ve TR 6 | Asıl gerekçe: [kullanıcı sözleşmesi](https://www.turhost.com/yasal/kullanici-sozlesmesi/) kişisel verinin yurt dışına aktarılabileceğini yazıyor (Ş4). Eleme gerekçesi yalnız budur. ISO 27001 belgesi ve imzalanacak veri işleyen sözleşmesi sayfalarda bulunamadı; bunlar "?" sayılır, eleme gerekçesi değildir (Ş6, Ş5). Not: port 200 ve 400 Mbit, 1 Gbps yok (Ş8) | ölçüm. 1 Gbps sanal pakette yalnız 64 GB'lik VDS TR 10 ve üstünde (liste $198,23); [fiziksel sunucuda](https://www.turhost.com/sunucu/dedicated-server/) stoktaki en küçük model 32 GB E65 (liste $219,77, ilk 3 ay $79,99; disk E-SSD, NVMe değil). 8 ve 16 GB için 1 Gbps yolu bulunamadı; sipariş panelindeki ek port seçeneği ölçülmedi. |
 
 ### Güncel mesaj (yalnız adaylar; gönderimi OPS yapar)
 
@@ -176,3 +176,28 @@ Konu: VentHub için sunucu şartları ve fiyat teklifi talebi
 | Radore · satis@radore.com | 1) Disk-Elite, CPU-Elite, Disk-Infinity ve CPU-Infinity'de hipervizör nedir; tam sanal makine mi, konteyner mi? 2) Docker çalıştırılabilir mi? 3) Bu paketlerde port hızı nedir, 1 Gbps sunuluyor mu? 4) IPv4 adresi dahil mi? 5) Kurumsal e-fatura kesiyor musunuz? 6) Yedekler hangi şehirde tutulur, pakete dahil mi, ücreti nedir? 7) Bulut sunucuda DDoS koruması Cloudflare üzerinden mi geçiyor; yurt dışına veri aktarımı kapatılabiliyor mu? 8) İmzalanacak KVKK veri işleyen sözleşmesi metnini paylaşır mısınız? 9) ISO 27001 belge numaranız ve kapsamı nedir? |
 
 Turhost ve Hostopya'ya ileti gitmez. Yukarıdaki 26 Kasım soru tablosunun yerini bu liste aldı.
+
+## Firma cevapları, kurumsal bulut ve yedek düzeni (2026-11-27, ALT-233 / OPS-398)
+Kaynak: 26 Kasım teklif iletilerine gelen yazılı cevaplar (Recep'in e-posta kutusu) ve ALTYAPI araştırması (resmî sayfalar, dört kilit iddia ikinci ajanla doğrulandı).
+
+| Konu | İlkbyte / Netinternet (yazılı, 27 Kas) | Radore (yazılı, 26 Kas) |
+|---|---|---|
+| Sanallaştırma | İlkbyte KVM, Netinternet VDS VMware | KVM, tam sanal makine, Docker serbest |
+| Disk | Netinternet VDS SATA SSD (RAID50) | NVMe |
+| Port | Garanti 100 Mbit | 100 Mbit; 1 Gbps ayda 9.900 TL ek |
+| KDV | Fiyatlar KDV dahil; İlkbyte'ta KDV istisnası sürüyor | Fiyatlar KDV hariç |
+| DDoS | Yurt içi saldırı trafiği Türkiye'de, yurt dışı kaynaklı trafik yurt dışındaki merkezde temizlenir | Pakete dahil değil, ücretli; üçüncü taraf yok |
+| Yedek | — | Türkiye'de; işletim sistemi başına ayda 10 $ + her 10 GB için 0,40 $ |
+| Veri işleyen sözleşmesi | Sözleşme İlkbyte'ı da kapsar (güncel PDF ekte geldi) | Yalnız 12 ay taahhütlü yönetilen hizmette taraf olur; yönetilmeyen sunucuda yok |
+| ISO 27001 | Tüm hizmetler için geçerli | Var (sertifika sayfası) |
+| Paket (16 GB) | İlkbyte Enterprise I 48 $/ay | Disk-Infinity 49,50 $/ay + KDV |
+
+Netinternet VDS (VMware ESXi) 4-5 Ekim 2026'da fidye saldırısıyla yaklaşık 29,5 saat kesildi (status.ni.tr/maintenance/902); VDS elendi. bilgi@netinternet.com.tr adresi geri döndü (550), cevap satis@ni.net.tr üzerinden geldi.
+
+Kurumsal bulut: Turkcell Sanal Veri Merkezi fiyat yayımlamıyor (teklif), VMware tabanlı; Türk Telekom Bulut sanal sunucu 400-450 TL'den, 12 ay taahhüt. İkisinde SLA yüzdesi ve veri işleyen sözleşmesi sayfada bulunamadı; Şikâyetvar'da bulut sunucuya özgü kayıt 0. Yazılı teklif olmadan kıyaslanamaz.
+
+Yedek (3-2-1): canlı veritabanı 279 MB, depolama 36 MB (ölçüldü). İkinci kopya sunucuda şifreli artımlı depo (pgBackRest ya da wal-g; Supabase imajında yok, yan konteyner gerekir), sürekli açık yerel cihaz her gece değişeni çeker (Synology DS124 + 2 TB yaklaşık 18-20 bin TL tek sefer, satıcı fiyatı). Üçüncü kopya Türkiye'de nesne deposu (DT Cloud 0,04 $/GB, dönem yazmıyor) ya da İlkbyte Acronis (teklifle). Yerel cihaz için tam disk şifreleme, kilitli oda, erişim kaydı, uzaktan erişimde iki aşamalı doğrulama. Geri yükleme süresi ölçülmedi.
+
+Google Drive: kişisel hesap şartlarında veri işleme sözleşmesi yok; yurt dışı veri merkezinde tutmak aktarım sayılır (Kurul 2022/249). Şifreli yedekte anahtar bizdeyse aktarım sayılmaz diyen Kurum metni bulunamadı. Google Cloud DPA'da Türkiye faturalı müşteri için Türk standart sözleşmesi var, bildirim müşterinin yükümlülüğü. Hüküm: kişisel Drive yedek kopya sayılmaz; bugünkü şifreli DB yedeği yeni düzen kurulunca Türkiye'deki kopyaya taşınır.
+
+Hüküm (2026-11-27): ana sunucu İlkbyte önerilir; Turkcell ve Türk Telekom yazılı teklifi Recep kararı bekliyor. Şirket kurulmadan imza ve sipariş yok.

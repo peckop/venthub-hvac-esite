@@ -18,7 +18,8 @@
  * alt sürecin stderr'i aynen geçer, aynı kodla çıkılır.) Eski iki adım hâlâ çalışır ama elle liste uyarısı verir:
  *   node scripts/seo/dizin-takip.mjs --kalan google --sinir N > kalan.txt
  *   node scripts/seo/tarayici-parcaciklari.mjs gsc --izinli kalan.txt      (ya da `--izinli -` ile stdin)
- * ISTENDI sonucu `kaydet` alanı taşır (SEO-127): hazır kopyalanacak `dizin-takip.mjs --kaydet google istek <url>` satırı.
+ * ISTENDI sonucu `kaydet` alanı taşır (SEO-127): hazır kopyalanacak `dizin-takip.mjs --kaydet google istek <url> --kanit '<json>'` satırı;
+ * kanıt o adresin onay saatini taşır (SEO-152: tek adres de kanıtsız yazılmaz).
  * Listede olmayan adres {durum:'TABLODA YOK'} ile, aynı oturumda ikinci kez istenen adres {durum:'TEKRAR RED'} ile
  * reddedilir; tıklama yapılmaz. Adres kapıdan geçtiği AN kilitlenir (eşzamanlı ikinci çağrı ve ZAMAN ASIMI ile belirsiz
  * kalan isteğin tekrarı da reddedilir); kilit yalnız tıklama olmadıysa (GIRIS YOK, DUGME YOK) ya da açık `HATA:`
@@ -78,7 +79,8 @@ window.__iste = async function(url, ilk, secenek){
   const kilitBende = !window.__gonderildi.has(url);
   window.__gonderildi.add(url);
   const r = await govde(url, ilk);
-  if(r.sonuc==='ISTENDI' && /^https:\\/\\/[A-Za-z0-9._~\\/%-]+$/.test(url)) r.kaydet = 'node scripts/seo/dizin-takip.mjs --kaydet google istek ' + url + (zorla ? ' --neden "<zorla gerekcesi>"' : '');
+  if(r.sonuc==='ISTENDI') r.saat = new Date().toISOString();
+  if(r.sonuc==='ISTENDI' && /^https:\\/\\/[A-Za-z0-9._~\\/%-]+$/.test(url)) r.kaydet = 'node scripts/seo/dizin-takip.mjs --kaydet google istek ' + url + ' --kanit \\'' + JSON.stringify({url: url, sonuc: 'ISTENDI', saat: r.saat}) + '\\'' + (zorla ? ' --neden "<zorla gerekcesi>"' : '');
   const tiklanmadi = r.durum==='GIRIS YOK' || r.durum==='DUGME YOK';
   if(kilitBende && (tiklanmadi || String(r.sonuc||'').indexOf('HATA:')===0)) window.__gonderildi.delete(url);
   return r;
