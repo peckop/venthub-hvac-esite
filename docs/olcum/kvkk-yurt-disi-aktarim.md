@@ -176,3 +176,28 @@ Konu: VentHub için sunucu şartları ve fiyat teklifi talebi
 | Radore · satis@radore.com | 1) Disk-Elite, CPU-Elite, Disk-Infinity ve CPU-Infinity'de hipervizör nedir; tam sanal makine mi, konteyner mi? 2) Docker çalıştırılabilir mi? 3) Bu paketlerde port hızı nedir, 1 Gbps sunuluyor mu? 4) IPv4 adresi dahil mi? 5) Kurumsal e-fatura kesiyor musunuz? 6) Yedekler hangi şehirde tutulur, pakete dahil mi, ücreti nedir? 7) Bulut sunucuda DDoS koruması Cloudflare üzerinden mi geçiyor; yurt dışına veri aktarımı kapatılabiliyor mu? 8) İmzalanacak KVKK veri işleyen sözleşmesi metnini paylaşır mısınız? 9) ISO 27001 belge numaranız ve kapsamı nedir? |
 
 Turhost ve Hostopya'ya ileti gitmez. Yukarıdaki 26 Kasım soru tablosunun yerini bu liste aldı.
+
+## Firma cevapları, kurumsal bulut ve yedek düzeni (2026-11-27, ALT-233 / OPS-398)
+Kaynak: 26 Kasım teklif iletilerine gelen yazılı cevaplar (Recep'in e-posta kutusu) ve ALTYAPI araştırması (resmî sayfalar, dört kilit iddia ikinci ajanla doğrulandı).
+
+| Konu | İlkbyte / Netinternet (yazılı, 27 Kas) | Radore (yazılı, 26 Kas) |
+|---|---|---|
+| Sanallaştırma | İlkbyte KVM, Netinternet VDS VMware | KVM, tam sanal makine, Docker serbest |
+| Disk | Netinternet VDS SATA SSD (RAID50) | NVMe |
+| Port | Garanti 100 Mbit | 100 Mbit; 1 Gbps ayda 9.900 TL ek |
+| KDV | Fiyatlar KDV dahil; İlkbyte'ta KDV istisnası sürüyor | Fiyatlar KDV hariç |
+| DDoS | Yurt içi saldırı trafiği Türkiye'de, yurt dışı kaynaklı trafik yurt dışındaki merkezde temizlenir | Pakete dahil değil, ücretli; üçüncü taraf yok |
+| Yedek | — | Türkiye'de; işletim sistemi başına ayda 10 $ + her 10 GB için 0,40 $ |
+| Veri işleyen sözleşmesi | Sözleşme İlkbyte'ı da kapsar (güncel PDF ekte geldi) | Yalnız 12 ay taahhütlü yönetilen hizmette taraf olur; yönetilmeyen sunucuda yok |
+| ISO 27001 | Tüm hizmetler için geçerli | Var (sertifika sayfası) |
+| Paket (16 GB) | İlkbyte Enterprise I 48 $/ay | Disk-Infinity 49,50 $/ay + KDV |
+
+Netinternet VDS (VMware ESXi) 4-5 Ekim 2026'da fidye saldırısıyla yaklaşık 29,5 saat kesildi (status.ni.tr/maintenance/902); VDS elendi. bilgi@netinternet.com.tr adresi geri döndü (550), cevap satis@ni.net.tr üzerinden geldi.
+
+Kurumsal bulut: Turkcell Sanal Veri Merkezi fiyat yayımlamıyor (teklif), VMware tabanlı; Türk Telekom Bulut sanal sunucu 400-450 TL'den, 12 ay taahhüt. İkisinde SLA yüzdesi ve veri işleyen sözleşmesi sayfada bulunamadı; Şikâyetvar'da bulut sunucuya özgü kayıt 0. Yazılı teklif olmadan kıyaslanamaz.
+
+Yedek (3-2-1): canlı veritabanı 279 MB, depolama 36 MB (ölçüldü). İkinci kopya sunucuda şifreli artımlı depo (pgBackRest ya da wal-g; Supabase imajında yok, yan konteyner gerekir), sürekli açık yerel cihaz her gece değişeni çeker (Synology DS124 + 2 TB yaklaşık 18-20 bin TL tek sefer, satıcı fiyatı). Üçüncü kopya Türkiye'de nesne deposu (DT Cloud 0,04 $/GB, dönem yazmıyor) ya da İlkbyte Acronis (teklifle). Yerel cihaz için tam disk şifreleme, kilitli oda, erişim kaydı, uzaktan erişimde iki aşamalı doğrulama. Geri yükleme süresi ölçülmedi.
+
+Google Drive: kişisel hesap şartlarında veri işleme sözleşmesi yok; yurt dışı veri merkezinde tutmak aktarım sayılır (Kurul 2022/249). Şifreli yedekte anahtar bizdeyse aktarım sayılmaz diyen Kurum metni bulunamadı. Google Cloud DPA'da Türkiye faturalı müşteri için Türk standart sözleşmesi var, bildirim müşterinin yükümlülüğü. Hüküm: kişisel Drive yedek kopya sayılmaz; bugünkü şifreli DB yedeği yeni düzen kurulunca Türkiye'deki kopyaya taşınır.
+
+Hüküm (2026-11-27): ana sunucu İlkbyte önerilir; Turkcell ve Türk Telekom yazılı teklifi Recep kararı bekliyor. Şirket kurulmadan imza ve sipariş yok.
