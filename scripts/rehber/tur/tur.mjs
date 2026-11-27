@@ -3,7 +3,7 @@
  * REHBER DOĞRULAMA TURU — komut satırı (rehber-yazisi-standard.md R5.1.2, OPS-255). Mantık: tur-lib.mjs.
  *
  * Kullanım (hepsi ağsız; çıkış 0 temiz/başarılı · 1 kırmızı ya da hata):
- *   node scripts/rehber/tur/tur.mjs iskelet <taslak.md> <iddialar.json>        # tabloyu günceller: yeni satırlar alıntısız eklenir, kapsam açıkları yazılır
+ *   node scripts/rehber/tur/tur.mjs iskelet <taslak.md> <iddialar.json>        # tabloyu günceller: yeni satırlar alıntısız eklenir, kapsam açıkları yazılır; gövdede duran elle satır korunur, metni gövdeden çıkan satır DÜŞEN listelenir ve çıkış 1 (BLG-98)
  *   node scripts/rehber/tur/tur.mjs yama    <girdi.md> <yama.json> <cikti.md>   # [{eski,yeni,adet?}] uygular, sha basar
  *   node scripts/rehber/tur/tur.mjs fark    <onceki.md> <sonraki.md>           # değişen cümleler + önceki/sonraki sha (kart notu için)
  *   node scripts/rehber/tur/tur.mjs kapi    <taslak.md> [iddialar.json]        # denetle() + aynı-sayı + kapsam sözcüğü açıkları
@@ -50,9 +50,10 @@ export function calistir(argv) {
       const mevcutDosya = existsSync(tabloYolu) ? okuJson(tabloYolu) : { surum: '', iddialar: [] }
       const r = iddiaIskeleti(oku(taslak), mevcutDosya.iddialar || [])
       yaz(tabloYolu, `${JSON.stringify({ ...mevcutDosya, iddialar: r.iddialar }, null, 1)}\n`)
-      log(`iskelet: ${r.iddialar.length} satır (${r.eslenen} korundu, ${r.yeni.length} yeni alıntısız)`)
+      log(`iskelet: ${r.iddialar.length} satır (${r.eslenen} korundu, ${r.elleKorunan} elle korundu, ${r.yeni.length} yeni alıntısız, ${r.dusen.length} düşen)`)
       for (const k of r.kapsamAciklari) log(` ~ KAPSAM-SOZCUGU "${k.sozcuk}": ${k.cumle.slice(0, 160)}`)
-      return r.kapsamAciklari.length === 0 ? 0 : 1
+      for (const d of r.dusen) log(` ! DUSEN (metin gövdede yok): ${String(d.metin || '').slice(0, 160)}`)
+      return r.kapsamAciklari.length === 0 && r.dusen.length === 0 ? 0 : 1
     }
     case 'yama': {
       const [girdi, yamaYolu, cikti] = a
