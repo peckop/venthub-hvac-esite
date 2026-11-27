@@ -110,15 +110,9 @@ Bu defter depoya girebilen **özettir**: sayı, tarih, sha256. Ham adres×motor 
 | İşlem defteri | 1 Kasım 2026'dan beri her istek/gönderim satırı (motor, eylem, adres, tarih) | 2026-11-09 | `scripts/seo/dizin-takip.mjs --kaydet`; depo dışı `hareketler.jsonl` |
 | Açılış satırı | GEO-SEO penceresi açılışında YAP/TEKRAR sayıları | 2026-11-09 | `scripts/seo/dizin-acilis.mjs`, `.claude/hooks/dizin-acilis.cjs` |
 | Ölçüm arşivi | Konu başına "daha önce ölçüldü mü" kaydı | 2026-11-06 | `scripts/seo/olcum-defteri.mjs`, D8 |
-| Etki defteri | `degisim` satırı etki satırıdır; vadeler yalnız vadesi gelince dolar, hüküm olumlu/olumsuz/notr/ayrilamiyor/bekliyor. Çıktılar depo dışı: `dizin-takip/sayfa-zaman/<slug>.json`, `ozet.json`; son koşu saati INDEKS.md'de ve aşağıdaki blokta | 2026-11-26 | `node scripts/seo/dizin-takip.mjs --etki`; `--etki-doldur` tek seferlik; D8.1 |
+| Etki defteri | `degisim` satırı etki satırıdır; vadeler yalnız vadesi gelince dolar, hüküm olumlu/olumsuz/notr/ayrilamiyor/bekliyor. Çıktılar depo dışı: `dizin-takip/sayfa-zaman/<slug>.json`, `ozet.json`; son koşu saati yalnız depo dışı INDEKS.md'de | 2026-11-27 | `node scripts/seo/dizin-takip.mjs --etki`; `--etki-doldur` tek seferlik; D8.1 |
 
-Etki defteri son koşu bloğu `dizin-takip --etki` çıktısıdır; elle düzenlenmez. Yalnız saat ve sayı taşır (adres, sorgu, sıra, tıklama, gösterim bu bloğa girmez, P6).
-
-<!-- ETKI:BASLA -->
-Etki defteri son koşu: 2026-11-26T08:35:00.914Z
-- etki satırı: 272 (git geçmişinden eklenen: 138)
-- hüküm: olumlu 1, olumsuz 1, notr 2, ayrilamiyor 131, bekliyor 137
-<!-- ETKI:BITIS -->
+Etki defterinin son koşu saati yalnız depo dışı `INDEKS.md` içinde tutulur (SEO-154).
 
 ## 3. Sırada ve yapılabilecekler
 

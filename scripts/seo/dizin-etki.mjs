@@ -38,9 +38,8 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { depoIcindeMi } from './bing-webmaster-oku.mjs'
-import { DEFTER_YOLU } from './dizin-defter-kontrol.mjs'
 import { GIT_GECMISI, hareketGecerliMi, HUKUMLER, satirYaz, SITE, tarihAl, VADE_GUNLERI, VARSAYILAN_DEFTER, yedekAl } from './dizin-takip.mjs'
-import { atomikYaz, indeksYaz, mdYaz } from './etki-son-kosu.mjs'
+import { atomikYaz, indeksYaz } from './etki-son-kosu.mjs'
 import { ciktiYoluKontrol } from './gsc-sayfa-oku.mjs'
 
 export const KOK = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
@@ -489,10 +488,11 @@ export function onYedekAl(defter, simdi = Date.now()) {
 }
 
 /**
- * Ana işlem. Kaynakları okur, etki satırlarını hesaplar, (kuru değilse) defteri/zaman çizgisini/özeti/son koşu satırlarını yazar.
+ * Ana işlem. Kaynakları okur, etki satırlarını hesaplar, (kuru değilse) defteri/zaman çizgisini/özeti/son koşu satırını yazar.
+ * Son koşu saati YALNIZ depo dışı INDEKS.md'ye yazılır; depo içi hiçbir dosyaya dokunulmaz (SEO-154: depo içi ETKI bloğu her koşuda depoyu kirletiyordu).
  * @returns {{ kod: number, mesajlar: string[], hata?: string, ozet?: object }}
  */
-export function etkiKos({ defter, arsiv = dirname(dirname(defter)), cikti = dirname(defter), olcumler = join(arsiv, 'olcumler.jsonl'), gscKlasor = join(arsiv, 'gsc-sayfa'), indeks = join(arsiv, 'INDEKS.md'), md = DEFTER_YOLU, simdi = Date.now(), yeniden = false, kuru = false, kok = KOK, gunlukYedek = true }) {
+export function etkiKos({ defter, arsiv = dirname(dirname(defter)), cikti = dirname(defter), olcumler = join(arsiv, 'olcumler.jsonl'), gscKlasor = join(arsiv, 'gsc-sayfa'), indeks = join(arsiv, 'INDEKS.md'), simdi = Date.now(), yeniden = false, kuru = false, kok = KOK, gunlukYedek = true }) {
   for (const [ad, yol] of [['--hareket', defter], ['--cikti', cikti], ['--arsiv', arsiv], ['--olcumler', olcumler], ['--gsc-sayfa', gscKlasor]]) {
     const k = etkiYoluKontrol(yol, kok)
     if (!k.gecerli) return { kod: 2, mesajlar: [], hata: `${ad}: ${k.neden}` }
@@ -540,9 +540,7 @@ export function etkiKos({ defter, arsiv = dirname(dirname(defter)), cikti = dirn
   const iso = new Date(simdi).toISOString()
   mkdirSync(dirname(indeks), { recursive: true })
   const i = indeksYaz(indeks, iso)
-  const m = mdYaz(md, { iso, satirSayisi: ozet.satirSayisi, gitGecmisi: ozet.gitGecmisi, hukumler: ozet.hukumDagilimi })
-  mesajlar.push(`son koşu ${iso}: INDEKS ${i} · defter md ${m}`)
-  if (m !== 'yazildi') mesajlar.push(`UYARI: depo içi defterde ETKI bloğu yazılamadı (${m}): ${md}`)
+  mesajlar.push(`son koşu ${iso}: INDEKS ${i}`)
   mesajlar.push(`etki: ${etkiSatirlari.length} satır · ölçümlü ${ozet.olcumluSatir} · hüküm ${HUKUMLER.map((k) => `${k} ${ozet.hukumDagilimi[k]}`).join(', ')}`)
   const atlanan = olc.atlanan + gsc.atlanan + satirlar.filter((s) => s.ham.trim() && !s.h).length
   if (atlanan) mesajlar.push(`UYARI: ${atlanan} bozuk/okunamayan kaynak satırı ya da dosya atlandı`)
@@ -563,7 +561,6 @@ export function cli(arg = process.argv.slice(2)) {
     ...(deger('--olcumler') ? { olcumler: resolve(deger('--olcumler')) } : {}),
     ...(deger('--gsc-sayfa') ? { gscKlasor: resolve(deger('--gsc-sayfa')) } : {}),
     ...(deger('--indeks') ? { indeks: resolve(deger('--indeks')) } : {}),
-    ...(deger('--md') ? { md: resolve(deger('--md')) } : {}),
   }
   const r = etkiKos(secenek)
   for (const m of r.mesajlar) console.log(m)

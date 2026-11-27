@@ -204,7 +204,7 @@ describe('SEO-153: kayan 24 saat kota parçası', () => {
   it('calistir: parça satıra eklenir, sırada sayısı anlık görüntünün Google YAP/TEKRAR sayısıdır', () => {
     const k = dizin(); yaz(k, '2026-11-09', [satir('YAP', 'TAMAM', 'TAMAM'), satir('TEKRAR', 'TAMAM', 'TAMAM')])
     writeFileSync(join(k, 'hareketler.jsonl'), `${JSON.stringify(ist('2026-11-09T06:00:00Z'))}\n`)
-    const s = calistir({ klasor: k, simdi: SIMDI, env: {}, baslatici: () => {}, etki: { indeksYolu: null, mdYolu: null } })
+    const s = calistir({ klasor: k, simdi: SIMDI, env: {}, baslatici: () => {}, etki: { indeksYolu: null } })
     expect(s).toContain('Google kota: son 24 saatte 1 istek, 10 hak boş, sırada 2 adres')
   })
 })

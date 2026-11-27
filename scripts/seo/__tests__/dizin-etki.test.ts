@@ -3,8 +3,9 @@
  *
  * Kilitlenenler: vade eşleme (hedef güne en yakın ölçüm, ±1 gün tolerans; sıra yoksa gorunmedi; ölçüm yok ≠ görünmedi; vadesi gelmemiş null);
  * hüküm kuralları (olumlu, olumsuz, notr, bekliyor + ayrilamiyor ve TEK CÜMLELİK cakisan); once hesabı; depo içi çıktı yolu reddi (P6);
- * uçtan uca koşu: yedek, bozuk satırın korunması, eşzamanlı ekleme, idempotent ikinci koşu, sayfa-zaman/ozet çıktıları, son koşu satırları
- * (INDEKS + depo içi blok yalnız SAYI taşır) ve açılış uyarısı. Veri sahtedir (P6: gerçek arama verisi yok).
+ * uçtan uca koşu: yedek, bozuk satırın korunması, eşzamanlı ekleme, idempotent ikinci koşu, sayfa-zaman/ozet çıktıları, son koşu satırı
+ * (YALNIZ depo dışı INDEKS; SEO-154: depo içi ETKI bloğu kaldırıldı, INV-DIZIN-ETKI-INDEKS-1 depo içi defterin bayt bayt değişmediğini kilitler)
+ * ve açılış uyarısı (yalnız INDEKS okur). Veri sahtedir (P6: gerçek arama verisi yok).
  */
 import { spawnSync } from 'node:child_process'
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -19,7 +20,7 @@ adresTipi, cakisanCumlesi, cakisanlariBul,   CAKISMA_GUN, defterSatirlari, defte
   hukumHesapla, kayitlariKur, KOK, kontrolBul, olcumBul, onceHesapla, ozetUret, SIRA_ESIGI, trGun, zamanCizgisi,
 } from '../dizin-etki.mjs'
 import { satirYaz } from '../dizin-takip.mjs'
-import { acilisUyarisi, BLOK_BASLA, BLOK_BITIS, blokUret, indeksMetniniGuncelle, mdMetniniGuncelle, sonKosuOku } from '../etki-son-kosu.mjs'
+import { acilisUyarisi, indeksMetniniGuncelle, indeksYaz, sonKosuOku } from '../etki-son-kosu.mjs'
 
 const S = 'https://venthub.com.tr'
 const A = `${S}/tr/bilgi-merkezi/a-yazi`
@@ -372,11 +373,12 @@ describe('etkiKos: uçtan uca (geçici arşiv, depo dışı)', () => {
     writeFileSync(join(dt, 'dizin-takip-2026-11-03.json'), JSON.stringify({ alinma: '2026-11-03T08:00:00Z', tablo: [{ adres: A, google: { sonTarama: '2026-10-25T05:00:00Z' }, bing: {} }] }))
     writeFileSync(join(arsiv, 'olcumler.jsonl'), `${JSON.stringify({ tarih: '2026-11-08T09:00:00Z', sorgu: 'ornek', motor: 'google', kart: 'SEO-9', kaynak: 'seo9/', tur: 'serp', sira: 5, adres: A })}\nBOZUK\n`)
     writeFileSync(join(arsiv, 'INDEKS.md'), '# İndeks\nilk satır\nbaşka bilgi: 1\n')
+    // SEO-154: depo içi defterin geçici KOPYASI (eski ETKI bloklu biçim). `etkiKos` artık hiçbir depo içi dosyaya yazmaz; kopya bayt bayt aynı kalmalıdır.
     const md = join(arsiv, 'defter.md')
-    writeFileSync(md, `# Defter\n\n<!-- OZET:BASLA -->\nözet\n<!-- OZET:BITIS -->\n\nÖnce\n\n${BLOK_BASLA}\neski blok\n${BLOK_BITIS}\n\nSonra\n`)
+    writeFileSync(md, '# Defter\n\n<!-- OZET:BASLA -->\nözet\n<!-- OZET:BITIS -->\n\nÖnce\n\n<!-- ETKI:BASLA -->\neski blok\n<!-- ETKI:BITIS -->\n\nSonra\n')
     return { arsiv, dt, defter, md }
   }
-  const kos = (k: ReturnType<typeof kur>, ek: Record<string, unknown> = {}) => etkiKos({ defter: k.defter, md: k.md, simdi: SIMDI, gunlukYedek: false, ...ek })
+  const kos = (k: ReturnType<typeof kur>, ek: Record<string, unknown> = {}) => etkiKos({ defter: k.defter, simdi: SIMDI, gunlukYedek: false, ...ek })
 
   it('vadeler ve hüküm yazılır; bozuk satır ve istek satırı aynen kalır; yedek alınır', () => {
     const k = kur()
@@ -415,24 +417,57 @@ describe('etkiKos: uçtan uca (geçici arşiv, depo dışı)', () => {
     expect(ozet.hukumDagilimi).toMatchObject({ olumlu: 1, ayrilamiyor: 2 })
   })
 
-  it('son koşu iki yere yazılır: INDEKS satırı (diğer satırlar korunur) ve depo içi blok (yalnız sayı, adres yok)', () => {
+  it('son koşu YALNIZ INDEKS satırına yazılır (diğer satırlar korunur); mesaj depo içi defterden söz etmez', () => {
     const k = kur()
-    kos(k)
+    const r = kos(k)
     const indeks = readFileSync(join(k.arsiv, 'INDEKS.md'), 'utf8')
     expect(indeks).toContain('ilk satır')
     expect(indeks).toContain('başka bilgi: 1')
     expect(indeks).toContain('etki defteri son koşu: 2026-11-12T08:00:00.000Z')
     expect(sonKosuOku(indeks)).toBe(SIMDI)
-    const md = readFileSync(k.md, 'utf8')
-    expect(md).toContain('Önce')
-    expect(md).toContain('Sonra')
-    expect(md).toContain('<!-- OZET:BASLA -->\nözet\n<!-- OZET:BITIS -->') // OZET bloğuna dokunulmaz
-    expect(md).not.toContain('eski blok')
-    const blok = md.slice(md.indexOf(BLOK_BASLA), md.indexOf(BLOK_BITIS) + BLOK_BITIS.length)
-    expect(blok).toContain('Etki defteri son koşu: 2026-11-12T08:00:00.000Z')
-    expect(blok).toContain('etki satırı: 3')
-    expect(blok).toContain('olumlu 1')
-    expect(blok).not.toMatch(/https?:|venthub|sorgu|sıra \d|tıklama|gösterim/i)
+    expect(indeks.match(/etki defteri son koşu:/g)).toHaveLength(1)
+    expect(r.mesajlar).toContain('son koşu 2026-11-12T08:00:00.000Z: INDEKS eklendi')
+    expect(r.mesajlar.join('\n')).not.toMatch(/defter md|ETKI bloğu|blok-yok/)
+  })
+
+  it('INV-DIZIN-ETKI-INDEKS-1: koşu depo içi defteri BAYT BAYT değiştirmez (geçici kopya ve gerçek defter); saat INDEKS\'te', () => {
+    const k = kur()
+    const kopyaOnce = readFileSync(k.md)
+    const gercek = join(KOK, 'docs', 'defter', 'geo-seo-dizin.md')
+    const gercekOnce = readFileSync(gercek)
+    try {
+      // `md` eski çağıran biçimidir (SEO-154 öncesi); parametre artık yok sayılır, kopyaya YAZILMAZ.
+      const r = kos(k, { md: k.md })
+      expect(r.kod, r.hata).toBe(0)
+      expect(readFileSync(k.md).equals(kopyaOnce)).toBe(true)
+      expect(readFileSync(k.md, 'utf8')).toContain('eski blok')
+      expect(readFileSync(gercek).equals(gercekOnce)).toBe(true) // varsayılan yol da depo içi defteri hedeflememeli
+      expect(sonKosuOku(readFileSync(join(k.arsiv, 'INDEKS.md'), 'utf8'))).toBe(SIMDI)
+    } finally {
+      if (!readFileSync(gercek).equals(gercekOnce)) writeFileSync(gercek, gercekOnce) // regresyon durumunda depoyu kirli bırakma
+    }
+    // Yapısal: depo içi defterde ETKI bloğu yok (kaldırıldı); OZET bloğu duruyor.
+    const defterMetni = gercekOnce.toString('utf8')
+    expect(defterMetni).not.toMatch(/ETKI:BASLA|ETKI:BITIS/)
+    expect(defterMetni).toContain('<!-- OZET:BASLA -->')
+  })
+
+  it('INDEKS yoksa (üst klasör dahil) oluşturulur; ikinci koşu satırı çiftlemez', () => {
+    const k = kur()
+    const indeks = join(k.arsiv, 'yeni', 'ic', 'INDEKS.md')
+    expect(kos(k, { indeks }).mesajlar).toContain('son koşu 2026-11-12T08:00:00.000Z: INDEKS olusturuldu')
+    expect(readFileSync(indeks, 'utf8')).toBe('etki defteri son koşu: 2026-11-12T08:00:00.000Z\n')
+    kos(k, { indeks, simdi: ms('2026-11-13T08:00:00Z') })
+    expect(readFileSync(indeks, 'utf8')).toBe('etki defteri son koşu: 2026-11-13T08:00:00.000Z\n')
+  })
+
+  it('indeksYaz: dönüş değeri olusturuldu / eklendi / guncellendi', () => {
+    const d = dizin()
+    const yol = join(d, 'INDEKS.md')
+    expect(indeksYaz(yol, '2026-11-12T08:00:00.000Z')).toBe('olusturuldu')
+    writeFileSync(yol, '# başlık\n')
+    expect(indeksYaz(yol, '2026-11-12T08:00:00.000Z')).toBe('eklendi')
+    expect(indeksYaz(yol, '2026-11-13T08:00:00.000Z')).toBe('guncellendi')
   })
 
   it('ikinci koşu idempotent: satır değişmez, yeni yedek açılmaz, vadeler korunur', () => {
@@ -461,24 +496,23 @@ describe('etkiKos: uçtan uca (geçici arşiv, depo dışı)', () => {
   it('--kuru hiçbir şey yazmaz', () => {
     const k = kur()
     const once = readFileSync(k.defter, 'utf8')
-    const mdOnce = readFileSync(k.md, 'utf8')
+    const indeksOnce = readFileSync(join(k.arsiv, 'INDEKS.md'), 'utf8')
     const r = kos(k, { kuru: true })
     expect(r.kod).toBe(0)
     expect(r.mesajlar[0]).toContain('KURU')
     expect(readFileSync(k.defter, 'utf8')).toBe(once)
-    expect(readFileSync(k.md, 'utf8')).toBe(mdOnce)
+    expect(readFileSync(join(k.arsiv, 'INDEKS.md'), 'utf8')).toBe(indeksOnce)
     expect(existsSync(join(k.dt, 'ozet.json'))).toBe(false)
     expect(readdirSync(k.dt).some((x) => x.startsWith('hareketler.yedek-'))).toBe(false)
   })
 
-  it('defter dosyası yoksa ya da md bloğu yoksa: yoksa kod 2; blok yoksa uyarı ama kod 0 ve defter bozulmaz', () => {
+  it('defter dosyası yoksa kod 2 ve hiçbir şey yazılmaz (INDEKS dahil)', () => {
     const k = kur()
-    expect(etkiKos({ defter: join(k.arsiv, 'yok', 'hareketler.jsonl'), simdi: SIMDI }).kod).toBe(2)
-    writeFileSync(k.md, '# bloksuz\n')
-    const r = kos(k)
-    expect(r.kod).toBe(0)
-    expect(r.mesajlar.join('\n')).toContain('blok-yok')
-    expect(readFileSync(k.md, 'utf8')).toBe('# bloksuz\n')
+    const indeksOnce = readFileSync(join(k.arsiv, 'INDEKS.md'), 'utf8')
+    const r = etkiKos({ defter: join(k.arsiv, 'yok', 'hareketler.jsonl'), simdi: SIMDI })
+    expect(r.kod).toBe(2)
+    expect(r.hata).toContain('defter yok')
+    expect(readFileSync(join(k.arsiv, 'INDEKS.md'), 'utf8')).toBe(indeksOnce)
   })
 })
 
@@ -512,37 +546,38 @@ describe('son koşu saati: INDEKS, blok, açılış uyarısı', () => {
     expect(indeksMetniniGuncelle(`a\n- etki defteri son koşu: ${iso1}\nb\n`, iso2)).toBe(`a\netki defteri son koşu: ${iso2}\nb\n`)
     expect(indeksMetniniGuncelle('', iso1)).toBe(`etki defteri son koşu: ${iso1}\n`)
   })
-  it('blokUret yalnız SAYI alır: adres, metin, sızdırılmaya çalışılan alan bloğa girmez; geçersiz sayı 0', () => {
-    const blok = blokUret({ iso: '2026-11-12T08:00:00.000Z', satirSayisi: 12, gitGecmisi: 3, hukumler: { olumlu: 2, olumsuz: 1, notr: 0, ayrilamiyor: 4, bekliyor: 5, 'https://venthub.com.tr/x': 9 } as never })
-    expect(blok.startsWith(BLOK_BASLA)).toBe(true)
-    expect(blok.endsWith(BLOK_BITIS)).toBe(true)
-    expect(blok).toContain('etki satırı: 12 (git geçmişinden eklenen: 3)')
-    expect(blok).toContain('olumlu 2, olumsuz 1, notr 0, ayrilamiyor 4, bekliyor 5')
-    expect(blok).not.toMatch(/https?:|venthub/)
-    expect(blokUret({ iso: 'x', satirSayisi: -1, gitGecmisi: 1.5 as never, hukumler: { olumlu: '7' } as never })).toContain('etki satırı: 0 (git geçmişinden eklenen: 0)')
-  })
-  it('mdMetniniGuncelle: yalnız bloğu değiştirir; blok yoksa null', () => {
-    expect(mdMetniniGuncelle('a\nb', 'X')).toBeNull()
-    expect(mdMetniniGuncelle(`a\n${BLOK_BASLA}\neski\n${BLOK_BITIS}\nz`, 'YENI')).toBe('a\nYENI\nz')
-  })
-  it('açılış uyarısı: taze sessiz; 24 saat ve eski "n saat önce"; kayıt yok/okunamıyor tek satır uyarı; iki kaynaktan en yeni geçer; fırlatmaz', () => {
+  it('açılış uyarısı (INDEKS): taze sessiz; 24 saat ve eski "n saat önce"; kayıt yok/okunamıyor tek satır uyarı; fırlatmaz', () => {
     const d = dizin()
     const indeks = join(d, 'INDEKS.md')
-    const md = join(d, 'd.md')
     const simdi = ms('2026-11-12T12:00:00Z')
-    expect(acilisUyarisi({ indeksYolu: indeks, mdYolu: md, simdi })).toBe('ETKİ DEFTERİ: son koşu kaydı yok — dizin-takip --etki')
+    expect(acilisUyarisi({ indeksYolu: indeks, simdi })).toBe('ETKİ DEFTERİ: son koşu kaydı yok — dizin-takip --etki') // dosya yok
     expect(acilisUyarisi({ indeksYolu: join(d, 'olmayan', 'x.md'), simdi })).toContain('kaydı yok')
+    expect(acilisUyarisi({ simdi })).toContain('kaydı yok') // yol hiç verilmedi
+    expect(acilisUyarisi({ indeksYolu: null, simdi })).toContain('kaydı yok')
     writeFileSync(indeks, 'etki defteri son koşu: 2026-11-12T09:00:00.000Z\n')
-    expect(acilisUyarisi({ indeksYolu: indeks, mdYolu: md, simdi })).toBe('')
+    expect(acilisUyarisi({ indeksYolu: indeks, simdi })).toBe('')
     writeFileSync(indeks, 'etki defteri son koşu: 2026-11-11T08:00:00.000Z\n') // 28 saat önce
     expect(acilisUyarisi({ indeksYolu: indeks, simdi })).toBe('ETKİ DEFTERİ: son koşu 28 saat önce — dizin-takip --etki')
     writeFileSync(indeks, 'etki defteri son koşu: 2026-11-11T12:00:00.000Z\n') // tam 24 saat: eşik dahil
     expect(acilisUyarisi({ indeksYolu: indeks, simdi })).toContain('24 saat önce')
-    writeFileSync(md, `${BLOK_BASLA}\nEtki defteri son koşu: 2026-11-12T10:00:00.000Z\n${BLOK_BITIS}`) // md daha yeni: o geçer
-    expect(acilisUyarisi({ indeksYolu: indeks, mdYolu: md, simdi })).toBe('')
-    expect(acilisUyarisi({ indeksYolu: indeks, mdYolu: md, simdi: ms('2026-11-12T10:00:00Z') - 1 })).toBe('') // gelecek saat: 0 saat
-    expect(() => acilisUyarisi({ indeksYolu: d, mdYolu: d, simdi })).not.toThrow() // klasör dosya diye verildi
-    expect(acilisUyarisi({ indeksYolu: d, mdYolu: d, simdi })).toContain('kaydı yok')
+    writeFileSync(indeks, 'etki defteri son koşu: 2026-11-11T12:00:01.000Z\n') // 24 saatin 1 sn altı: sessiz
+    expect(acilisUyarisi({ indeksYolu: indeks, simdi })).toBe('')
+    writeFileSync(indeks, 'etki defteri son koşu: 2026-11-12T10:00:00.000Z\n')
+    expect(acilisUyarisi({ indeksYolu: indeks, simdi: ms('2026-11-12T10:00:00Z') - 1 })).toBe('') // gelecek saat: 0 saat
+    writeFileSync(indeks, '# içinde son koşu satırı olmayan indeks\nbaşka: 1\n') // bozuk/ilgisiz içerik = kayıt yok
+    expect(acilisUyarisi({ indeksYolu: indeks, simdi })).toContain('kaydı yok')
+    expect(() => acilisUyarisi({ indeksYolu: d, simdi })).not.toThrow() // klasör dosya diye verildi
+    expect(acilisUyarisi({ indeksYolu: d, simdi })).toContain('kaydı yok')
+  })
+  it('INV-DIZIN-ETKI-INDEKS-1: açılış uyarısı YALNIZ INDEKS\'e bakar; depo içi blok taze olsa bile INDEKS yoksa "kaydı yok"', () => {
+    const d = dizin()
+    const simdi = ms('2026-11-12T12:00:00Z')
+    const eskiMd = join(d, 'defter.md')
+    writeFileSync(eskiMd, '<!-- ETKI:BASLA -->\nEtki defteri son koşu: 2026-11-12T11:00:00.000Z\n<!-- ETKI:BITIS -->\n') // taze ama artık okunmaz
+    const eskiCagri = { indeksYolu: join(d, 'INDEKS.md'), mdYolu: eskiMd, simdi } // SEO-154 öncesi çağıran biçimi
+    expect(acilisUyarisi(eskiCagri as never)).toBe('ETKİ DEFTERİ: son koşu kaydı yok — dizin-takip --etki')
+    writeFileSync(join(d, 'INDEKS.md'), 'etki defteri son koşu: 2026-11-10T12:00:00.000Z\n') // INDEKS eski, md taze: INDEKS kazanır
+    expect(acilisUyarisi(eskiCagri as never)).toBe('ETKİ DEFTERİ: son koşu 48 saat önce — dizin-takip --etki')
   })
   it('açılış satırı (dizin-acilis.calistir): uyarı AYNI satırın sonuna eklenir (kanca yalnız ilk satırı basar); taze ise satır eskisi gibi', () => {
     const arsiv = dizin()
@@ -551,15 +586,15 @@ describe('son koşu saati: INDEKS, blok, açılış uyarısı', () => {
     writeFileSync(join(dt, 'dizin-takip-2026-11-12.json'), JSON.stringify({ alinma: '2026-11-12T08:00:00Z', tablo: [] }))
     const simdi = ms('2026-11-12T12:00:00Z')
     const temel = { klasor: dt, simdi, env: {}, baslat: false }
-    const eski = acilisCalistir({ ...temel, etki: { indeksYolu: null, mdYolu: null } })
-    // kaynak verilmemişse (ikisi de null) kayıt yok uyarısı
+    const eski = acilisCalistir({ ...temel, etki: { indeksYolu: null } })
+    // kaynak verilmemişse (null) kayıt yok uyarısı
     expect(eski).toContain('ETKİ DEFTERİ: son koşu kaydı yok — dizin-takip --etki')
     expect(eski.split('\n')).toHaveLength(1)
     writeFileSync(join(arsiv, 'INDEKS.md'), 'etki defteri son koşu: 2026-11-12T10:00:00.000Z\n')
-    const taze = acilisCalistir({ ...temel, etki: { mdYolu: null } })
+    const taze = acilisCalistir(temel) // varsayılan kaynak: arşivin bir üstündeki INDEKS.md; depo içi defter okunmaz
     expect(taze).not.toContain('ETKİ DEFTERİ')
     writeFileSync(join(arsiv, 'INDEKS.md'), 'etki defteri son koşu: 2026-11-10T10:00:00.000Z\n')
-    const bayat = acilisCalistir({ ...temel, etki: { mdYolu: null } })
+    const bayat = acilisCalistir(temel)
     expect(bayat).toContain('| ETKİ DEFTERİ: son koşu 50 saat önce — dizin-takip --etki')
     expect(bayat.startsWith(taze)).toBe(true)
     expect(bayat.length).toBeLessThan(400) // kanca tek satırı 400 karakterle keser
