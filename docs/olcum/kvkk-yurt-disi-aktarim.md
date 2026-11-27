@@ -201,3 +201,26 @@ Yedek (3-2-1): canlı veritabanı 279 MB, depolama 36 MB (ölçüldü). İkinci 
 Google Drive: kişisel hesap şartlarında veri işleme sözleşmesi yok; yurt dışı veri merkezinde tutmak aktarım sayılır (Kurul 2022/249). Şifreli yedekte anahtar bizdeyse aktarım sayılmaz diyen Kurum metni bulunamadı. Google Cloud DPA'da Türkiye faturalı müşteri için Türk standart sözleşmesi var, bildirim müşterinin yükümlülüğü. Hüküm: kişisel Drive yedek kopya sayılmaz; bugünkü şifreli DB yedeği yeni düzen kurulunca Türkiye'deki kopyaya taşınır.
 
 Hüküm (2026-11-27): ana sunucu İlkbyte önerilir; Turkcell ve Türk Telekom yazılı teklifi Recep kararı bekliyor. Şirket kurulmadan imza ve sipariş yok.
+
+## Kurumsal bulut: Turkcell, Türk Telekom, Bulutistan, Vodafone (2026-11-27, OPS-398)
+Kaynak: firmaların kendi sayfaları (turkcellbulut ve turktelekombulut tarayıcıda okundu), Uptime Institute dizini, TCMB kuru 27.11.2026 (1 $ = 50,6955 TL). Hesap açılmadı, form doldurulmadı.
+
+| Konu | Turkcell (Sanal Veri Merkezi) | Türk Telekom Bulut |
+|---|---|---|
+| Satış | Kurumsal portal (VMware vCloud Director), taahhüt yok, aylık; ağ hizmeti ve kapasite havuzu zorunlu | Self-servis üyelik (VKN ya da TCKN); 30 gün ücretsiz deneme (32 GB, 1 TB), bitince liste fiyatından otomatik faturalanır |
+| Fiyat | Yayımlı değil | Sunucu 400-450 TL'den; erişim 174, yedek 340, DDoS 93-467 TL ayrı; 16 GB tablosu giriş arkasında |
+| Veri merkezi | Uptime: Gebze ve Ankara Tier III Tasarım+Yapı+Gold İşletme | Uptime: Esenyurt Tier III Tasarım+Yapı+Gold; Ümitköy dizinde yok |
+| Belge | ISO 27001/27017/22301, PCI DSS (beyan) | Tier III, TS EN 50600; ISO 27001 anılmıyor |
+| SLA | Yüzde ve tazminat yayımlı değil; durum sayfası yok | Yayımlı SLA yok; "%99,995" tesis beyanı; durum sayfası yok |
+| Disk | SAS/SSD, NVMe yok | SATA/SSD, NVMe yok |
+| DDoS / yedek | Dahil değil | Ayrı ücret; Cloud DDoS trafiği yurt dışı temizleme noktalarına gider |
+| Veri işleyen sözleşmesi | Kamuya açık metin yok | Bulunamadı |
+| Docker | Yazılı değil | Yazılı değil |
+
+Bulutistan: satış temsilcisiyle, fiyat yok; ISO 27001/27017/27018/27701/22301, SOC 1; Tier belgesi ve konum yok; şartlar m.4.7 kesintisizlik garantisi vermiyor, m.4.14 veri merkezini bildirimsiz değiştirebiliyor. Vodafone: kurumsal bulut sayfası bulunamadı.
+Uptime dizininde Radore, İlkbyte/Netinternet, Bulutistan, Natro yok; Turhost'un Gayrettepe merkezi yalnız Tasarım belgeli.
+Fiyat kıyası: İlkbyte Enterprise I 16 GB ≈ 2.433 TL (KDV dahil, her şey dahil); Radore Disk-Infinity ≈ 3.011 TL (KDV dahil). Kurumsal 16 GB fiyatı ölçülemedi.
+Cumhurbaşkanlığı Bilgi ve İletişim Güvenliği Rehberi v1.1 (Mart 2026, s.11) yalnız kamu kurumlarını ve kritik altyapıyı kapsar; VentHub için seçim ölçütü değil.
+
+Hüküm: kurumsalın ölçülen artısı veri merkezi belgesi (Tier III, üç aşama) ve ISO listesi; fiyat, SLA, NVMe, veri işleyen sözleşmesi ve Docker'da İlkbyte'ın önünde olduğu kanıtlanamadı. Teklif iletisinde sorulacak sekiz başlık: tek kalem aylık toplam, ürün SLA'sı ve tazminat, imzalanabilir veri işleyen sözleşmesi ve yurt dışı trafik taahhüdü, veri merkezi ve belge numaraları, disk/vCPU/root/Docker, yedek ve felaket kurtarma, şirket kurulmadan açılış ve fesih, destek süreleri.
+Ölçülmedi: kurumsal 16 GB fiyatı, SLA ve sözleşme metinleri, belge numaraları, Docker izni, Bulutistan konumu.
