@@ -17,10 +17,18 @@ Site ve kiracı panelinin her sayfa şablonunu, ilk kez gören bir kullanıcın�
 
 Bir sitenin ya da panelin şablonlarını tasarım gözüyle puanlamak, "ilk bakışta ne anlatıyor" sorusuna kanıtlı cevap vermek, mobil ve masaüstü yerleşimi karşılaştırmak, Design'a gidecek görsel bulguları toplamak gerektiğinde.
 
+**Dış göz turu** (önizlemede ajanların kullanıcı gözüyle panel ve site ölçümü) iki bölümden oluşur ve sırası değişmez:
+
+1. **Önce program gözü.** Her ekran profesyonel bir uygulama gibi bütün olarak değerlendirilir. Üç soru: ilk kez açan biri ne yapacağını anlıyor mu; ana iş kaç adımda bitiyor; aynı iş Logo, Paraşüt ve Odoo'da nasıl yapılıyor (sitede sektör rakipleri, görev metninden). Çıktı, önem sırasıyla "profesyonel görünmeyen yerler" listesidir. Bu bölüm üç ekseni birlikte ölçer: görsel ve yerleşim (aşağıdaki 1-9. adımlar, S1-S5), bağlam eylemi (10. adım) ve kurumsal kıyas (kendi bölümü; üçüncü sorunun cevabı oradan gelir).
+2. **Sonra Design'ın "düzeltildi" maddelerinin tek tek kontrolü.** Maddeler görev metninde verilir, skill madde uydurmaz; her madde için geçti ya da kaldı, ölçü (px) ve tık sayısı yazılır.
+
+Neden bu sıra: madde kontrolü tek başına hatayı yakalar, ama ürünün profesyonel bir program gibi çalışıp çalışmadığını göstermez; önce madde listesini okuyan göz de listede olmayan eksiği artık görmez. Bölümlerden biri koşulmadıysa tur "dış göz turu" diye raporlanmaz; koşulmayan bölüm ve eksen KAPSAM satırına yazılır.
+
 ## Ne zaman DEĞİL
 
 - Rengi, boşluğu ya da bir düğmeyi değiştirmek: düzeltme bu skill'de yok; istek TASARIM'dan Design'a gider.
 - Formu doldurup göndermek, belge zinciri yürütmek, işlev ölçmek: `panel-gezinme` (panel) ya da site deneme turu.
+- Müşteri senaryosunu baştan sona yürütüp kaç tıkta bittiğini ölçmek: `site-yolculuk-denetimi`. Dış göz turunun 2. bölümündeki tık sayısı tek bir düzeltme maddesinin ölçüsüdür, senaryo değil.
 - Gelen bir karenin K kurallarına uyup uymadığını söylemek: `venthub-tasarim-dili`.
 - Yavaşlığın sebebini bulmak: `web-performance`. WCAG kural denetimi ve kod düzeltmesi: `accessibility`.
 - Kırık bağlantı ve sağlık puanı avı: `qa`.
@@ -51,6 +59,7 @@ Sıra önemlidir: ilk izlenim bozulmadan yazılır, çünkü sonradan gezen göz
 7. **Duyarlılık.** 1568 ve 390 px'te aynı sayfa: yatay kayma, kırpılan ya da üst üste binen öğe, mobilde ilk ekranda ana eylem erişilebilir mi.
 8. **Hareket ve durum.** Yükleme (ham anahtar parlaması, iskelet), boş durum, hata durumu, geçişte sıçrama. Hover ve `title` yazıları araçla görülemez: "denenemedi: araç sınırı" yaz.
 9. **İçerik hissi** (yazım denetimi değil, yalnız gözlem): ham anahtar (`⟦…⟧`), dil karışması, K7 (boş alan "—" ile gösterilmez), K39 (fiyatsız ürün "Teklif iste").
+10. **Bağlam eylemi.** Her alan, satır ya da kart için o an gereken eylem (ekle, ara, seç, kopyala, sil, ayrıntı, yeni oluştur) o öğenin hemen yanında mı (aynı satır, aynı kart, alan içi düğme), yoksa sayfa başında ya da sonunda uzak bir yerde mi. Uzak düğme işlev olarak çalışsa bile kullanıcıya "bunu nerede yaparım" sorusunu sordurur; 4. adımın tutarlılık bakışı bunu yakalamaz, çünkü düğme her sayfada aynı yerde olup yine de çalıştığı öğeden uzak olabilir. Ölç: öğenin ve eylem düğmesinin `getBoundingClientRect` değerinden aradaki mesafeyi px olarak yaz; eylemi bulmak için kaç kez kaydırdığını ya da gözün kaç kez sıçradığını say. Örnekler panelden: teklif satırında ürün ara ve sil, cari alanında "yeni cari" (başka sayfaya gitmeden yerinde oluşturulabiliyor mu), stok satırında hareket. Sitede de geçerli (ürün kartında ekle ve karşılaştır, filtre alanında temizle). Eşik uydurulmaz: mesafeyi, kaydırma sayısını ve gözlemi yaz, hükmü Puanlama'daki 1-5 anlamıyla ver. Eylem düğmesine yalnız ölçmek için basılmaz (6. adım kuralı); düğmenin çalışıp çalışmadığı bu skill'in işi değil, yeri bu skill'in işidir.
 
 Panelde 2. adım yerine masa/liste/belge sayfası yoğunluğuna bak: bilgi hiyerarşisi, tablo okunabilirliği, çekmece ve sekme davranışı.
 
@@ -68,6 +77,7 @@ Her bulgu hangi maddenin yakaladığını kodla belirtir (rapor biçiminde "madd
 | `D1` / `D2` / `D3` | yatay kayma / kırpılan ya da üst üste binen öğe / mobilde ana eylem erişilemiyor |
 | `M1` / `M2` / `M3` | yükleme durumu (iskelet, ham anahtar parlaması) / boş ve hata durumu / geçişte sıçrama |
 | `I1` / `I2` / `I3` | ham anahtar / dil karışması / K7 ve K39 |
+| `E1` / `E2` / `E3` | gereken eylem öğeden uzakta (sayfa başı ya da sonu) / yerinde eylem yok, başka sayfaya gitmek gerekiyor / eylemi bulmak için kaydırma ya da göz sıçraması gerekiyor |
 | `Y1` / `Y2` / `Y3` | ilk 5 saniyede sayfanın işi anlaşılmıyor / ilk basılacak yer belli değil / trunk testinin 6 sorusundan eksik cevap |
 | `Y0` | listede olmayan bakış |
 
@@ -82,16 +92,32 @@ gstack design-review'dan **alınan** boyutlar: hiyerarşi, tipografi, boşluk, r
 Her ekran grubu için dört soru, her biri 1-5 puan ve tek cümle gerekçe; gerekçe görülen bir öğeye dayanır (ekran adı, öğe, kare yolu). Puan şu anlama gelir: 5 = ilk kez açan takılmadan anlıyor ve yapıyor; 4 = küçük tereddüt, kendiliğinden çözülüyor; 3 = bir adımı fark etmek için araştırmak gerek; 2 = çoğu kullanıcı yolu bulamaz ya da yanlış anlar; 1 = çalışmıyor ya da yanıltıyor.
 
 - **S1 Kabuk ve menü:** simgeler anlaşılır mı, aktif sayfa ve modül belli mi (sitede: üst menü, arama, alt bilgi, mobil alt sekme).
-- **S2 Yerleşim:** başlık, eylem düğmesi, tablo ve kart sırası, boşluk, bilgi yoğunluğu.
+- **S2 Yerleşim:** başlık, eylem düğmesi, tablo ve kart sırası, boşluk, bilgi yoğunluğu; bağlam eylemi (10. adım): o an gereken eylem öğenin yanında mı, uzaktaysa kaç px ve kaç kaydırma. Gerekçe `E` kodlu bulguya ve ölçüye dayanır.
 - **S3 Tutarlılık:** aynı iş aynı yerde ve aynı biçimde mi.
 - **S4 Kullanıcı kolaylığı:** sık iş için tık sayısı (hedef ≤ 4), hata mesajı yeri.
 - **S5 İlk 5 saniye** (yalnız site): ne anlaşılıyor, nereye basılır; puansız tek cümle ya da 1-5 kısa.
 
 3 ve altı puanlı yerler "Design'a çizimle seçenek için" listesine girer; seçim Recep'indir ve OPS sorar. Kendi başına seçim yapma.
 
+## Kurumsal kıyas
+
+Panelin bir ekranı "kötü" mü, yoksa iş zaten öyle mi yapılıyor sorusunu yalnız kendi karemize bakan puan cevaplayamaz; kıyas bu boşluğu kapatır. Aynı iş için Türkiye pazarındaki kurumsal ve profesyonel yazılımlara bakılır: panelde Logo, Mikro, Paraşüt ve Odoo; sitede sektör rakipleri görev metninden gelir, skill rakip adı uydurmaz.
+
+- **Yalnız herkese açık kaynak:** resmi belge, yardım sayfası, tanıtım ekran görüntüsü, demo videosu. Hesap açılmaz, deneme kaydı yapılmaz, kimlik bilgisi girilmez.
+- **Kaynaksız kıyas yazılmaz.** Her satır kaynak adresi taşır. Kaynakta görülmeyen şey yazılmaz: ekran görüntüsünde görünmeyen bir düğmeye "yok" demek yerine "kaynakta görünmüyor" yaz; görmediğin davranışı (tık sayısı, açılır pencere) tahminle doldurma.
+- **Rakip daha iyiyse açıkça yaz.** VentHub'ı kayırma; hüküm somut bir öğeye (ekran, düğme, adım sayısı) dayanır.
+- Kıyas bir hüküm değil bir girdidir: rakibin önde olduğu satırlar Design'a çizimle seçenek olarak gider, seçim Recep'indir (yukarıdaki puanlama kuralı).
+
+Satır biçimi:
+
+| Ekran/iş | VentHub (kare) | Rakip (kaynak) | Fark | Hangisi önde | Öneri |
+|---|---|---|---|---|---|
+
+"VentHub (kare)" hücresi aracın verdiği kare yolunu, "Rakip (kaynak)" hücresi rakip adını ve kaynak adresini taşır.
+
 ## Şiddet ve bulgu biçimi
 
-Şiddet üç sınıftır: **ağır** (iş yapılamıyor, ham anahtar, taşma, ana eylem yok), **orta** (tutarsızlık, 44 px altı, kontrast), **hafif** (kozmetik).
+Şiddet üç sınıftır: **ağır** (iş yapılamıyor, ham anahtar, taşma, ana eylem yok), **orta** (tutarsızlık, 44 px altı, kontrast), **hafif** (kozmetik). `E` kodlu bulguda gereken eylem hiç bulunamıyorsa ağır; bulunuyor ama uzak ya da kaydırma gerektiriyorsa orta.
 
 Her bulgu şu alanları taşır; biri eksikse bulgu yazılmaz:
 
@@ -111,11 +137,20 @@ Kanıtsız bulgu yazılmaz. Ölçemediğine "ölçülemedi" yaz ve sebebini ekle
 
 Dosya `C:\tmp\gorsel-inceleme-<yüzey>-<tarih>.md` (yüzey: `site` ya da `panel`); kareler aracın verdiği yollardadır; müdür onları `C:\tmp\gorsel-inceleme-kareler-<yüzey>-<tarih>\` altına kopyalar. Üstte `KAPSAM: n/N şablon` satırı; sonra şablon başına bir blok: ilk 5 saniye cümlesi, S1-S4 puanları, bulgu tablosu, kare yolları. Sonda: puanı ≤ 3 olanların özet tablosu, ağır/orta/hafif sayısı, ölçülemeyenler (sebebiyle), listede olmayan bulgular.
 
+**Dış göz turu raporunun sırası** Ne zaman bölümündeki sıradır, karıştırılmaz:
+
+1. KAPSAM satırı (hangi bölüm ve eksen koşuldu, hangisi koşulmadı).
+2. **Bölüm 1, program gözü:** önem sırasıyla "profesyonel görünmeyen yerler" listesi (ağır, orta, hafif; her satırda madde kodu ve kare), ardından şablon blokları ve Kurumsal kıyas tablosu.
+3. **Bölüm 2, düzeltme kontrolü:** Design'ın "düzeltildi" maddeleri için `| Madde | Beklenen | Ölçülen (px, tık) | Geçti / kaldı | Kare |` tablosu. Bölüm 1 yazılmadan bu tabloya başlanmaz.
+4. Sonda ölçülemeyenler ve listede olmayan bulgular.
+
 Rapor önce OPS'a gider; onaydan sonra Design'a TASARIM tek paket olarak iletir. Skill Design'a yazmaz.
 
 ## Çalışan düzeni
 
 Tamamı tek çalışana sığmaz (şablon sayısı büyük, ajan 8 şablondan sonra tahmine kayar). Müdür işi **≤ 8 şablonluk parçalara** böler; çalışan her şablon için sayfa başlığı, ham yazı ve kare yolu getirir. Müdür 2-3 satırı kendi Chrome'unda örnekler; örnekleme tutmuyorsa o parça yeniden koşar. Aynı anda iki sekmede paralel koşum olur; çünkü önizleme verisi tarayıcıda ortak, kayıt açan en çok bir çalışan olur. Çalışan görev metnine "kapsam dışı düğmeye basma (Onayla, Sil, Gönder)" satırı ve skill dosya yolu (`.claude/skills/site-gorsel-inceleme/SKILL.md`, çalışanın çalışma kopyasındaki yol) yazılır. Alt ajanda `Skill` aracı "Unknown skill" derse (pilotta bir kez oldu; 20 Kasım ölçümünde skill birleşmiş ağaçta aynı ajan türünde çözüldü, yani sebep büyük olasılıkla çalışma kopyasında skill dosyasının henüz olmaması) çalışan dosyayı `Read` ile açıp aynen uygular; kaydı rapora "skill dosyadan okundu" diye yazar.
+
+**Kurumsal kıyası araştırmacı çalışan yapar** (`tasarim-arastirmaci`, salt okuma): görev metnine kıyaslanacak ekran, VentHub kare yolu ve rakip listesi yazılır; çalışan yalnız herkese açık kaynağı okur, hesap açmaz, her satırı kaynak adresiyle döner. Kaynağı olmayan satırı müdür rapora almaz.
 
 ## Yasaklar
 
