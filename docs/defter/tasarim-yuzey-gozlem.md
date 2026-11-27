@@ -1,6 +1,6 @@
 # TASARIM defteri: yüzey gözlemi (müşteri sitesi ve kiracı paneli)
 
-Sahibi: TASARIM · Son doğrulama: 2026-11-24 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: TSR-29 (kayıt), TSR-21, TSR-23, TSR-36…TSR-42 (dış göz turları, zip 11-18), OPS-335, OPS-336, OPS-337, OPS-338
+Sahibi: TASARIM · Son doğrulama: 2026-11-27 · Cetvel: `docs/standards/departman-defter-standard.md` · Kaynak: TSR-29 (kayıt), TSR-21, TSR-23, TSR-36…TSR-42 (dış göz turları, zip 11-18), TSR-44…TSR-49 (zip 19-20, yolculuk denetimleri, panel yerleşimi), OPS-335, OPS-336, OPS-337, OPS-338
 
 **Kapsam.** Design projesinin yayınladığı iki yüzeyin görsel ve işlev gözlemi: müşteri sitesi (SiteShell, `onizleme.venthub.com.tr`) ve kiracı paneli (PanelShell, ERP). Gözlemi TASARIM yapar (gerçek Chrome, kod okunmaz, kayıt silinmez); düzeltme Design'dadır, bu defter düzeltme yazmaz. Defter bir **tazelik haritasıdır**: hangi ekran ne zaman ölçüldü, hangi bulgu açık, ne zaman yeniden ölçülür.
 Kapsam dışı: canlı sitenin kendisi (eski vitrin; GEO-SEO ve URUN ölçer), kurumsal belge şablonlarının içeriği (sahibi Kurumsal Belgeler projesi; yalnız durum satırı burada), ürün verisi (KATALOG).
@@ -13,14 +13,24 @@ Okuma notları (2. bölüm için). Tarihler 2026'dır. Durum: **geçti** = ilk �
 
 ## 1 Ne yaptık
 
-<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:tasarim-yuzey-gozlem etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs tasarim-yuzey-gozlem --yaz · Üretildi: 2026-11-24 -->
+<!-- DEFTER-KANBAN:ne-yaptik BASLA — Kanban'dan üretilir (defter:tasarim-yuzey-gozlem etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs tasarim-yuzey-gozlem --yaz · Üretildi: 2026-11-27 -->
 | Kapanış | Kart | İş | Sahip |
 |---|---|---|---|
-| — | (etiketli biten kart yok) | | |
+| 2026-11-24 | TSR-42 | Yüzey gözlem defterini TSR-35…41 sonuçları ve zip 18 envanteriyle güncelle | TASARIM |
+| 2026-11-24 | TSR-40 | Venthub New (17) dış göz 5. tur: tur 4-5 düzeltmeleri, 8 ve 17 doğrulama, ölçü… | TASARIM |
+| 2026-11-24 | TSR-39 | Venthub New (16) dış göz ölçümü: tur 3, 2. tur 8-18 ve yeni maddeler | TASARIM |
+| 2026-11-24 | TSR-38 | Venthub New (13) dışarıdan ölçüm: Design 1-7 düzeltmeleri + 7 ek kontrol | TASARIM |
+| 2026-11-24 | TSR-37 | Venthub New (12) dış göz turu: düzeltilen 22 madde + 24 maddelik liste | TASARIM |
+| 2026-11-24 | TSR-36 | Mobil 390 tam akış ölçümü | tasarim |
 <!-- DEFTER-KANBAN:ne-yaptik BITIS -->
 
 | Tarih | İş | Sonuç | Kart |
 |---|---|---|---|
+| 2026-11-26 | Panel yerleşim önerisi, 6 ekran (ana sayfa, teklif, cari, fatura, stok ve mal kabul, ürün), 1604 ve 390, kayıt açılmadı; Paraşüt, Odoo, Zoho kıyası; renk seçenekleri 49a/b/c | Üç ortak sorun: dolu birincil düğme çoğu ekranda yok (yeni üründe Kaydet hiç yok), asıl iş ilk ekranın altında, turuncu hem birincil düğme hem uyarı. Taslak Recep onayıyla Design'a gitti (E13); renk kararı Design'ın seçenek sayfasında, kareler alınmadı | TSR-49 |
+| 2026-11-26 | Sayfa içerik haritası (bilgi parçası × aile, seri, model) ve föy bağlantı isteği | Harita İçerik projesinden geldi, föy bağlantı isteği İçerik'e yüklendi; cevap bekleniyor, ekran ölçümü yok | TSR-48 |
+| 2026-11-26 | Panel yolculuk denetimi P1-P4 pilotu (yeni cari, yeni teklif, teklif → sipariş, sipariş → irsaliye) ve P5-P8; eksen raporları A-M; Odoo 19, Paraşüt, GİB kaynaklı karşılaştırma (F8, e-Belge durum adları, dönem kilidi) | P1 4 tık, P2 9 tık (en kısa 6), P3 2 tık, P4 1 tık; sezgi 26/40; bulgular F1-F17 (orta 9, hafif 8); en ağır F8 (gönderilmemiş taslak onaysız siparişe dönüyor, Design onay penceresi ve teklife dönüşü planına aldı) ve F9 (zincirde fatura yolu yok). Design paketine girdi; zip yayını sonrası yeniden ölçülecek. DENEME kayıtları açık | TSR-46 |
+| 2026-11-25 | Site yolculuk denetimi zip 19 (S1-S4 pilotu) ve zip 20 (S1-S4 yeniden, S7-S8 ilk ölçüm), 1604 ve 390, TR ve EN | Zip 19: 7 senaryo tamam, S4 yarım (Hesapla 325 m³/h → 180 m³/h seriye varılıyor, 8 tık). Zip 20: değişmedi (S4 9 tık, debi taşınmıyor ve süzgeç yok, ağır); Punto üç düzeyde farklı sayı ve Gizlilik yer tutucusu orta, değişmedi; S7 3 tık, S8 ödeme sayfası 3, son düğme 12 tık; sezgi 25/40 ve 23/36. Basılmadı: Gönder, Siparişi ver, Ödemeye geç | TSR-45, TSR-47 |
+| 2026-11-25 | Dış göz 8. tur, zip 19 (tur 7 maddeleri, kenar kesik kontrolü) ve zip 20 doğrulama | Zip 19: çok satırlı girinti geçmedi (**TEKRAR**, 4. tur), stil çift yüklenmesi geçmedi (6 ekranda 2 kez), ViewTransition 390'da kısmen, Ayarlar ağacı geçti. Zip 20: kapak, çok satırlı girinti ve stil çifti geçti (3/4); kesik ölçü çizimi geçmedi (10 örnekten 9'u kesik) | TSR-44 |
 | 2026-11-20 | Görsel inceleme turu (site-gorsel-inceleme skill'iyle ilk koşu): site 21 şablon, panel 8 ekran masaüstü ve 6 ekran 390 px; ilk 5 saniye, hiyerarşi, boşluk, tutarlılık, kontrast, odak, 44 px, duyarlılık | Ağır 6 (mobil menüde odak tuzağı, Seri model satırında teklif düğmesi yok, Karşılaştır başlık sabit değil ve grafik eğrileri aynı renk, panel alt çubuğunda "D" harfi, mobil geçişte konum sıfırlanması, mobil liste satırı tıklaması şüphesi), orta yaklaşık 35, hafif yaklaşık 30; 3 ve altı puanlı yerler Design'a çizimle seçenek listesinde; Design paketine girmedi (OPS özeti bekliyor) | TSR-28 |
 | 2026-11-20 | Zip 6 yeniden ölçümü (ek 4 cevabı, 17 madde); iki çalışan paralel | Site (8): düzeldi 4 (Durum yükleniyor ve hata görünümü, Ana sayfa kartı dolu hap, Teklif onayı kartı, Konut düğmesi ilk ekranda) · kısmen 1 (arama paneli Tab 20→8) · kaldı 2 (Karşılaştır üst boşluk, arama vurgu↔Enter) · ölçülemedi 1 (Durum·hata soğuk açılış). Panel (8): düzeldi 4 (kilitli belgede gri alan, Önizle başlığı, Cari "–", Model fiyat başlığı) · kısmen 3 (sağ kutu sırası, B1 anahtar ve genişlik, 390 dokunma 15/19) · kaldı 1 (Ayarlar'a basınca Firma bilgileri açılmıyor, üçüncü tur). Açık kalan 13 madde Design'a (ek 5) | TSR-28 |
 | 2026-11-20 | Zip 5 yeniden ölçümü (ek 3 cevabı, 28 madde) ve Recep kararları (Önizle panel içinde, belge sayfası A1, Ayarlar B1); dört çalışan paralel, ayrı sekmelerde | Site (14): düzeldi 8 · kısmen 5 · değişmedi 1 (Kurumsal Belge önizlemesi, başka projede). Panel (13): düzeldi 7 (Önizle panel içinde, 390 sekme şeridi, Vazgeç, Satınalma şablon menüsü, Hepsi N, Eldekine eşitle, cari rol) · kısmen 5 (A1, B1, "–" hücreler, fiyat başlığı, 390 dokunma) · kaldı 1 (Ayarlar'a basınca gövde değişmiyor; müdür ayrıca doğruladı). Açık kalan 18 madde Design'a (ek 4) | TSR-28 |
@@ -125,17 +135,12 @@ Okuma notları (2. bölüm için). Tarihler 2026'dır. Durum: **geçti** = ilk �
 
 ## 3 Sırada ve yapılabilecekler
 
-<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:tasarim-yuzey-gozlem etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs tasarim-yuzey-gozlem --yaz · Üretildi: 2026-11-24 -->
+<!-- DEFTER-KANBAN:sirada BASLA — Kanban'dan üretilir (defter:tasarim-yuzey-gozlem etiketi), elle düzenleme; node scripts/hijyen/defter-kartlari.cjs tasarim-yuzey-gozlem --yaz · Üretildi: 2026-11-27 -->
 | Kart | İş | Durum | Sahip |
 |---|---|---|---|
 | TSR-35 | Design'da tüm ürün görsellerini medya adresine bağlatma | In Progress | TASARIM |
-| TSR-36 | Mobil 390 tam akış ölçümü | In Progress | tasarim |
-| TSR-37 | Venthub New (12) dış göz turu: düzeltilen 22 madde + 24 maddelik liste | In Progress | TASARIM |
-| TSR-38 | Venthub New (13) dışarıdan ölçüm: Design 1-7 düzeltmeleri + 7 ek kontrol | In Progress | TASARIM |
-| TSR-39 | Venthub New (16) dış göz ölçümü: tur 3, 2. tur 8-18 ve yeni maddeler | In Progress | TASARIM |
-| TSR-40 | Venthub New (17) dış göz 5. tur: tur 4-5 düzeltmeleri, 8 ve 17 doğrulama, ölçü… | In Progress | TASARIM |
 | TSR-41 | Venthub New (18) dış göz 7. tur: 6. tur 14 madde, ViewTransition, ölçü çizimi… | In Progress | TASARIM |
-| TSR-42 | Yüzey gözlem defterini TSR-35…41 sonuçları ve zip 18 envanteriyle güncelle | In Progress | TASARIM |
+| TSR-44 | Venthub New (19) zip indirme + dış göz 8. tur (tur 7 maddeleri, kenar kesik… | Backlog | TASARIM |
 <!-- DEFTER-KANBAN:sirada BITIS -->
 
 | Madde | Gerekçe | Öncelik | Kart |
