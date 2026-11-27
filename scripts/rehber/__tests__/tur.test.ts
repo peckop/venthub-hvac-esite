@@ -143,6 +143,32 @@ describe('INV-REHBER-TUR-1 · iddia iskeleti ve kapsam sözcükleri', () => {
     expect(iddiaIskeleti(ORNEK, doldurulmus).iddialar).toEqual(ikinci.iddialar)
   })
 
+  it('iskelet (BLG-98): desensiz ama elle eklenmiş satır gövdede durdukça KORUNUR, düşen 0', () => {
+    const elle = { metin: 'Hücreli aspiratör kabin içinde bir fandır.', kaynak: [4], tur: 'genel', alinti: 'tanım alıntısı' }
+    const md = `${ORNEK.trimEnd()}\n\nHücreli aspiratör kabin içinde bir fandır.\n`
+    const ilk = iddiaIskeleti(md, [])
+    const r = iddiaIskeleti(md, [...ilk.iddialar, elle])
+    expect(r.elleKorunan).toBe(1)
+    expect(r.dusen).toEqual([])
+    expect(r.iddialar).toContainEqual(elle)
+  })
+
+  it('iskelet (BLG-98): metni gövdeden çıkan satır DÜŞEN olarak döner; komut satırı çıkış 1 verir', () => {
+    const k = mkdtempSync(join(tmpdir(), 'tur-dusen-'))
+    const taslak = join(k, 'taslak.md')
+    const tablo = join(k, 'iddialar.json')
+    writeFileSync(taslak, ORNEK, 'utf8')
+    const ilk = iddiaIskeleti(ORNEK, []).iddialar.map((i: { metin: string }) => ({ ...i, alinti: `alıntı: ${i.metin}` }))
+    const kayip = { metin: 'Bu cümle taslakta artık yok.', kaynak: [], tur: 'genel', alinti: 'eski alıntı' }
+    const r = iddiaIskeleti(ORNEK, [...ilk, kayip])
+    expect(r.dusen).toEqual([kayip])
+    expect(r.iddialar).not.toContainEqual(kayip)
+    writeFileSync(tablo, JSON.stringify({ surum: 't', iddialar: [...ilk, kayip] }), 'utf8')
+    expect(calistir(['iskelet', taslak, tablo])).toBe(1)
+    writeFileSync(tablo, JSON.stringify({ surum: 't', iddialar: ilk }), 'utf8')
+    expect(calistir(['iskelet', taslak, tablo])).toBe(0)
+  })
+
   it('normalize: atıf işareti ve büyük/küçük harf farkını yok sayar', () => {
     expect(normalize('Debi 500 [1][2]  VERİLİR')).toBe(normalize('debi 500 verilir'))
   })

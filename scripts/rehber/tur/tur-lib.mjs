@@ -55,13 +55,22 @@ export function iddiaIskeleti(md, mevcut = []) {
   const yeni = []
   const kapsamAciklari = []
   let eslenen = 0
+  let elleKorunan = 0
   const goruldu = new Set()
   for (const c of cumleler(govde)) {
     const kapsam = c.match(KAPSAM_SOZCUKLERI)
     const atifli = /\[\d/.test(c)
     const desenli = SAYI_BIRIM.test(c) || OLUMSUZ.test(c) || MEVZUAT.test(c)
-    if (!atifli && !desenli && !kapsam) continue
     const n = normalize(c)
+    if (!atifli && !desenli && !kapsam) {
+      // BLG-98: desen taşımayan ama tabloya ELLE eklenmiş cümle (ör. atıfsız tanım) gövdede durdukça korunur.
+      if (n && !goruldu.has(n) && tablo.has(n)) {
+        goruldu.add(n)
+        elleKorunan++
+        iddialar.push(tablo.get(n))
+      }
+      continue
+    }
     if (!n || goruldu.has(n)) continue
     goruldu.add(n)
     const var_ = tablo.get(n)
@@ -76,7 +85,9 @@ export function iddiaIskeleti(md, mevcut = []) {
     iddialar.push(satir)
     if (kapsam) kapsamAciklari.push({ cumle: c, sozcuk: kapsam[0] })
   }
-  return { iddialar, yeni, eslenen, kapsamAciklari }
+  // BLG-98: metni gövdede artık geçmeyen mevcut satır sessizce kaybolmaz; çağıran listeler ve kırmızı verir.
+  const dusen = mevcut.filter((i) => !goruldu.has(normalize(i.metin || '')))
+  return { iddialar, yeni, eslenen, elleKorunan, dusen, kapsamAciklari }
 }
 
 /**
