@@ -1,14 +1,14 @@
 /**
- * ETKİ DEFTERİ SON KOŞU SAATİ (Kanban SEO-147; cetvel docs/standards/dizin-sistemleri-standard.md D8.1).
+ * ETKİ DEFTERİ SON KOŞU SAATİ (Kanban SEO-147, SEO-154; cetvel docs/standards/dizin-sistemleri-standard.md D8.1).
  *
  * Neden ayrı, bağımlılıksız bir modül: son koşu saatini HEM `dizin-etki.mjs` (yazar) HEM `dizin-acilis.mjs` (açılış kancasında okur, 12 sn tavanlı)
  * kullanır; biçim iki yerde ayrı yazılırsa okuyan yazanı tanımaz ve "koşmadı" uyarısı sürekli yanlış çalar. Bu dosya yalnız `node:fs` içe aktarır.
  *
- * İKİ YER (depo dışı + depo içi):
- *   1. DEPO DIŞI `<arşiv>/INDEKS.md`: bir `etki defteri son koşu: <ISO>` satırı (varsa güncellenir, yoksa eklenir).
- *   2. DEPO İÇİ `docs/defter/geo-seo-dizin.md`: `<!-- ETKI:BASLA -->`…`<!-- ETKI:BITIS -->` bloğu. YALNIZ depo-güvenli içerik: saat ve SAYILAR
- *      (satır sayısı, hüküm dağılımı). Sorgu, sıra, tıklama, gösterim, adres bazlı arama verisi bu bloğa GİRMEZ (repo PUBLIC, P6);
- *      `blokUret` yalnız sayı alır, adres/metin kabul etmez. `dizin-defter-kontrol.mjs` ÖZET bloğuna (`OZET:`) dokunulmaz.
+ * TEK YER (depo dışı): `<arşiv>/INDEKS.md` içinde bir `etki defteri son koşu: <ISO>` satırı (varsa güncellenir, yoksa eklenir).
+ *
+ * SEO-154: depo içi `docs/defter/geo-seo-dizin.md` içindeki `ETKI:BASLA`/`ETKI:BITIS` bloğu KALDIRILDI. Her `--etki` koşusu o bloğa yeni saat ve sayı
+ * yazdığı için depo her koşuda kirleniyordu (commit'lenmemiş değişiklik, elle temizlik, yanlışlıkla commit'e girme riski). Saat artık yalnız INDEKS'te
+ * durur; depo içi hiçbir dosyaya yazılmaz. Sayılar (satır sayısı, hüküm dağılımı) zaten depo dışı `ozet.json` içindedir (D8.1 madde 5).
  *
  * Açılış uyarısı (`acilisUyarisi`): son koşu 24 saatten eskiyse ya da hiç yoksa TEK parça uyarı döner; fail-open (okunamayan dosya "yok" sayılır, fırlatmaz).
  */
@@ -17,9 +17,6 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 export const SON_KOSU_ETIKETI = 'etki defteri son koşu'
 export const SON_KOSU_DESENI = /etki defteri son koşu:\s*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)/gi
 export const ESIK_SAAT = 24
-export const BLOK_BASLA = '<!-- ETKI:BASLA -->'
-export const BLOK_BITIS = '<!-- ETKI:BITIS -->'
-const HUKUMLER_SIRALI = ['olumlu', 'olumsuz', 'notr', 'ayrilamiyor', 'bekliyor']
 
 /** Metindeki EN YENİ son koşu zamanı (ms) ya da null. */
 export function sonKosuOku(metin) {
@@ -57,53 +54,20 @@ export function indeksYaz(yol, iso) {
   return sonKosuOku(eski) === null ? 'eklendi' : 'guncellendi'
 }
 
-/**
- * Depo içi blok metni. SAYILAR dışında hiçbir şey kabul etmez (P6): adres, sorgu, sıra, tıklama, gösterim bu işleve ULAŞAMAZ.
- * @param {{ iso: string, satirSayisi: number, gitGecmisi: number, hukumler: Record<string, number> }} p
- */
-export function blokUret({ iso, satirSayisi, gitGecmisi, hukumler }) {
-  const say = (n) => (Number.isInteger(n) && n >= 0 ? n : 0)
-  const dagilim = HUKUMLER_SIRALI.map((k) => `${k} ${say(hukumler?.[k])}`).join(', ')
-  return [
-    BLOK_BASLA,
-    `Etki defteri son koşu: ${iso}`,
-    `- etki satırı: ${say(satirSayisi)} (git geçmişinden eklenen: ${say(gitGecmisi)})`,
-    `- hüküm: ${dagilim}`,
-    BLOK_BITIS,
-  ].join('\n')
-}
-
-/** Defter metnindeki ETKİ bloğunu değiştirir. Blok yoksa `null` (dosya bozulmaz, çağıran hata yazar). */
-export function mdMetniniGuncelle(metin, blok) {
-  const a = metin.indexOf(BLOK_BASLA)
-  const b = metin.indexOf(BLOK_BITIS)
-  if (a < 0 || b < a) return null
-  return `${metin.slice(0, a)}${blok}${metin.slice(b + BLOK_BITIS.length)}`
-}
-
-/** Depo içi defter dosyasındaki ETKİ bloğunu günceller. @returns {'yazildi'|'blok-yok'|'dosya-yok'} */
-export function mdYaz(yol, bilgi) {
-  if (!existsSync(yol)) return 'dosya-yok'
-  const yeni = mdMetniniGuncelle(readFileSync(yol, 'utf8'), blokUret(bilgi))
-  if (yeni === null) return 'blok-yok'
-  atomikYaz(yol, yeni)
-  return 'yazildi'
-}
-
 function guvenliOku(yol) {
   try { return readFileSync(yol, 'utf8') } catch { return '' }
 }
 
 /**
- * Açılış satırına eklenecek uyarı parçası ('' = temiz). İki kaynaktan EN YENİ saat alınır (INDEKS depo dışı, md depo içi).
+ * Açılış satırına eklenecek uyarı parçası ('' = temiz). YALNIZ depo dışı INDEKS.md okunur (SEO-154: depo içi blok kalktı).
  * Fail-open: dosya yoksa/okunamazsa "kaydı yok" uyarısı (sessiz değil), asla fırlatmaz.
- * @param {{ indeksYolu?: string|null, mdYolu?: string|null, simdi?: number }} p
+ * @param {{ indeksYolu?: string|null, simdi?: number }} p
  */
-export function acilisUyarisi({ indeksYolu = null, mdYolu = null, simdi = Date.now() } = {}) {
+export function acilisUyarisi({ indeksYolu = null, simdi = Date.now() } = {}) {
   try {
-    const adaylar = [indeksYolu, mdYolu].filter(Boolean).map((y) => sonKosuOku(guvenliOku(y))).filter((t) => t !== null)
-    if (!adaylar.length) return 'ETKİ DEFTERİ: son koşu kaydı yok — dizin-takip --etki'
-    const saat = Math.max(0, Math.floor((simdi - Math.max(...adaylar)) / 3600000))
+    const t = indeksYolu ? sonKosuOku(guvenliOku(indeksYolu)) : null
+    if (t === null) return 'ETKİ DEFTERİ: son koşu kaydı yok — dizin-takip --etki'
+    const saat = Math.max(0, Math.floor((simdi - t) / 3600000))
     return saat >= ESIK_SAAT ? `ETKİ DEFTERİ: son koşu ${saat} saat önce — dizin-takip --etki` : ''
   } catch {
     return 'ETKİ DEFTERİ: son koşu kaydı okunamadı — dizin-takip --etki'

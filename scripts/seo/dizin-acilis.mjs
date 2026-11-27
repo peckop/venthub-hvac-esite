@@ -11,7 +11,7 @@
  *      sonuç sonraki açılışta/aynı gün satıra yansır. Zamanlayıcı yok (karar 53): tetik açılıştır.
  *   3) GÖRÜNME VADESİ (SEO-114): yayından 3./7./14. gün vadesi gelen ama canlı arama (`gorunme` eylemi) kaydı olmayan yazı sayısı
  *      (Y2.1 madde 6); yalnız `gorunme` sayılır, URL denetimi/gösterim/istek saymaz.
- *   4) ETKİ DEFTERİ UYARISI (SEO-147): `dizin-takip --etki` son koşu saati (INDEKS.md ve depo içi defter, en yenisi) 24 saatten eskiyse ya da kayıtsızsa
+ *   4) ETKİ DEFTERİ UYARISI (SEO-147, SEO-154): `dizin-takip --etki` son koşu saati (YALNIZ depo dışı INDEKS.md; depo içi blok kaldırıldı) 24 saatten eskiyse ya da kayıtsızsa
  *      aynı satırın sonuna "ETKİ DEFTERİ: son koşu <n> saat önce — dizin-takip --etki" eklenir (kaynak: etki-son-kosu.mjs; dosya yoksa da tek satır uyarı, çökme yok).
  *   5) KAYAN KOTA (SEO-153): "Google kota: son 24 saatte N istek, M hak boş[, ilk hak SS:DD TSİ], sırada K adres" (defterden; sınır 11, D7 m.20).
  *      Otomatik istek görevi YOK: satır yalnız sayar, istek yine elle ve dizin-takip kararıyla atılır.
@@ -30,8 +30,6 @@ import { fileURLToPath } from 'node:url'
 import { acilisUyarisi } from './etki-son-kosu.mjs'
 
 const BU_DIZIN = dirname(fileURLToPath(import.meta.url))
-/** SEO-147: depo içi defterdeki ETKİ bloğunun yolu (son koşu saati INDEKS.md ile birlikte okunur; en yenisi geçerli). */
-const ETKI_MD_YOLU = join(BU_DIZIN, '..', '..', 'docs', 'defter', 'geo-seo-dizin.md')
 // `detached: true` yalnız merkezî başlatıcıda yazılır (INV-KOPUK-1, REC-415): kopuk çocuk konsol penceresi açmasın.
 const { kopukBaslat } = createRequire(import.meta.url)('../board/kopuk-baslat.cjs')
 export const KILIT_OMRU_MS = 30 * 60 * 1000
@@ -182,8 +180,8 @@ function arkaPlanBaslat(klasor, env) {
 
 /**
  * Çekirdek: satırı döndürür; gerekirse arka plan ölçümü başlatır. Hiçbir koşulda fırlatmaz.
- * `etki` (SEO-147): etki defterinin son koşu kaynakları; varsayılan INDEKS.md (arşivin bir üstü) + depo içi defter. 24 saatten eski ya da kayıtsızsa satır uyarı taşır.
- * @param {{klasor?: string, simdi?: number, env?: Record<string, string | undefined>, baslat?: boolean, baslatici?: (klasor: string, env: Record<string, string | undefined>) => void, etki?: { indeksYolu?: string | null, mdYolu?: string | null }}} [secenek]
+ * `etki` (SEO-147, SEO-154): etki defterinin son koşu kaynağı; varsayılan INDEKS.md (arşivin bir üstü), depo içi okuma yok. 24 saatten eski ya da kayıtsızsa satır uyarı taşır.
+ * @param {{klasor?: string, simdi?: number, env?: Record<string, string | undefined>, baslat?: boolean, baslatici?: (klasor: string, env: Record<string, string | undefined>) => void, etki?: { indeksYolu?: string | null }}} [secenek]
  */
 export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = process.env, baslat = true, baslatici = arkaPlanBaslat, etki = {} } = {}) {
   if (env.VENTHUB_DIZIN_ACILIS_KAPAT === '1') return ''
@@ -195,7 +193,7 @@ export function calistir({ klasor = arsivKlasoru(), simdi = Date.now(), env = pr
     if (!taze && baslat && !kilitTaze(klasor, simdi)) {
       try { baslatici(klasor, env); baslatildi = true } catch { /* sessiz */ }
     }
-    const uyari = acilisUyarisi({ indeksYolu: etki.indeksYolu === undefined ? join(dirname(klasor), 'INDEKS.md') : etki.indeksYolu, mdYolu: etki.mdYolu === undefined ? ETKI_MD_YOLU : etki.mdYolu, simdi })
+    const uyari = acilisUyarisi({ indeksYolu: etki.indeksYolu === undefined ? join(dirname(klasor), 'INDEKS.md') : etki.indeksYolu, simdi })
     let kota = ''
     try { kota = kotaParcasi({ hareketler: hareketOku(klasor), simdi, sirada: anlik ? sayilar(anlik.tablo).google : null }) } catch { /* fail-open: parça düşer */ }
     const satir = satirUret(anlik, bugun, vadeOku({ klasor, bugun }), uyari, kota)
