@@ -68,8 +68,22 @@ describe('orderStatusMachine — kanban monotonluk kapısı (T058-VH)', () => {
 
   it('normal ileri akış açık', () => {
     expect(canTransitionOrder('pending', 'confirmed')).toBe(true)
-    expect(canTransitionOrder('confirmed', 'shipped')).toBe(true)
+    expect(canTransitionOrder('confirmed', 'processing')).toBe(true)
+    expect(canTransitionOrder('processing', 'shipped')).toBe(true)
     expect(canTransitionOrder('shipped', 'delivered')).toBe(true)
+  })
+
+  it('"hazırlanıyor" adımı ATLANAMAZ: kargoya yalnız `processing`ten girilir (karar 221)', () => {
+    // `confirmed → shipped` kestirmesi vardı; `paid → shipped` eklemek (mutasyon S08)
+    // bütün paketi yeşil bırakıyordu. Tek tek geçiş saymak yerine DEĞİŞMEZİ sabitliyoruz:
+    // dokuz durumun hangisinden `shipped`e girilebildiği. Yeni bir kestirme eklenirse
+    // (hangi durumdan olursa olsun) bu test kırmızı verir.
+    const hepsi = [
+      'pending', 'paid', 'confirmed', 'processing', 'shipped',
+      'delivered', 'cancelled', 'refunded', 'partial_refunded',
+    ]
+    const kargoyaGirebilen = hepsi.filter((s) => canTransitionOrder(s, 'shipped'))
+    expect(kargoyaGirebilen).toEqual(['processing'])
   })
 
   it('teslim edilene kadar iptal her aşamada mümkün', () => {
