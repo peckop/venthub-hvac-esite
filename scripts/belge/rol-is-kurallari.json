@@ -92,7 +92,10 @@
     "TASARIM": {
       "yollar": ["src/design-system/**", "src/components/ds/**"],
       "kurallar": [
-        "**Kart açarken numara boş mu doğrulanır.** Yeni kart numarası verilmeden önce `search_tasks` ile o numara aranır; aynı numara iki kartta çıkarsa ikincisi yeniden numaralanır ve ilk kartın notuna yazılır. Olay: TSR-16 numarası iki kartta çıktı (TASARIM önerisi, OPS onayı 13 Kasım)."
+        "**Kart açarken numara boş mu doğrulanır.** Yeni kart numarası verilmeden önce `search_tasks` ile o numara aranır; aynı numara iki kartta çıkarsa ikincisi yeniden numaralanır ve ilk kartın notuna yazılır. Olay: TSR-16 numarası iki kartta çıktı (TASARIM önerisi, OPS onayı 13 Kasım).",
+        "**Recep isteği aynı turda kart olur, Design'a aynen gider.** Recep'in her isteği aynı turda TASARIM panosunda karta yazılır. Kartta recep-istegi etiketi, Recep'in sözü, ekran görüntüsü yolu, kabul ölçütü ve kanıt kontrolü bulunur. İstek Design'a sözü ve görüntüsüyle, pakete gömülmeden gider. Gönderilen metin Design sohbetinde görülünce karta not düşülür ve OPS'a kart numarası bildirilir. Zip kontrolü önce açık recep-istegi kartlarını ölçer, sonra Design'ın yapıldı listesine bakar. Kart ancak önizlemede ölçülünce Done olur. Geliştirme istekleri küçük kusurlardan önce yapılır. Recep'in isteği yorumlanıp genişletilmez. Olay: 28 Kasım'da on istek kartsız yürütüldü ve katalog büyütme isteği Design'a hiç ulaşmadı (OPS-427).",
+        "**Design \"yapıldı\" deyince önce tamamlama sorusu sorulur.** Design bir zip'i ya da işi bitti diye bildirince TASARIM, OPS'a zip haberi vermeden önce Design'a kart numaralarıyla sorar: her maddeyi tek tek kontrol et, eksiksiz bitti mi, eksik ne kaldı? Eksik varsa tamamlattırılır ve soru tekrarlanır; zip haberi \"eksik yok\" cevabından sonra verilir. Olay: Design işin bir kısmını yapıp bitti diyor, sorulunca eksiğini söyleyip tamamlıyor (OPS, 28 Kasım).",
+        "**Recep'in sözüne eklenti yapılmaz.** Recep'in sözü genişletilmez, yorumlanıp söylemediği bir istek eklenmez. Anlam belirsizse OPS'a tek soru sorulur. Olay: 28 Kasım'da yazının yeterince büyümediği şikâyetine istenmeyen büyütme düğmesi eklendi. Oysa telefonda iki parmakla büyütme zaten çalışıyordu."
       ]
     },
     "URUN": {
