@@ -918,9 +918,8 @@ canlı ölçülmesi, R5.1 adım 2'de `genel` türün sınırı) BLG-10 adım 2'd
   bu yüzden ölçü kapıların etkisini göstermez; ayrıca BLG-15 mevzuat ağırdı (116 iddia satırı, Yönetmelik ek tabloları
   görüntüden okundu, AB dar ek). Turlarda bulunan gerçek hata kalıpları R5.1.1 ve R2.6'ya yazıldı.
   Hedef kalkmadı: R5.1.1 ve R2.6 maddeleri sonraki yazıda sınanır.
-- **Yazı kartının kapanışı:** yazı kartı Done'a B10, B11 ve B12 kayıtları kartta olmadan taşınmaz
-  (kanıt: kart notunda canlı 200, Search Console isteği, IndexNow yanıtı). Frekans yazısında bu halka
-  eksik kaldığı için bu madde var.
+- **Yazı kartının kapanışı (OPS-419, 28 Kasım 2026):** yazı kartı B10 kaydıyla (kart notunda canlı 200 ve tam okuma) Done'a taşınır;
+  B11 (Google dizin isteği) ve B12 (IndexNow, Bing) GEO-SEO kartına devredilir ve o kartın numarası yazı kartının notuna yazılır.
 - **Skill:** bu akış `.claude/skills/rehber-yayin` ile yönlendirilir (BLG-11 adım 3); tetiği Türkçe doğal
   ifadelerdir ("yeni yazı", "blog yazısı", "rehber yazısı", "yazı yayınlandı", "yazı yayına çıkıyor",
   "dizine ekle"). Tetiğin gerçekten çalıştığı OPS-124 pilotunda ölçülür; ölçülmeden "çalışıyor" yazılmaz.
